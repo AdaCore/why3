@@ -1092,13 +1092,9 @@ let color_loc ~color loc =
   let f, l, b, e = Loc.get loc in
   if f = !current_file then color_loc ~color source_view l b e
 
-let rec color_f_locs () f =
+let rec color_t_locs () f =
   Util.option_iter (color_loc ~color:location_tag) f.Term.t_loc;
-  Term.t_fold color_t_locs color_f_locs () f
-
-and color_t_locs () t =
-  Util.option_iter (color_loc ~color:location_tag) t.Term.t_loc;
-  Term.t_fold color_t_locs color_f_locs () t
+  Term.t_fold color_t_locs () f
 
 let scroll_to_source_goal g =
   let t = M.get_task g in
@@ -1109,7 +1105,7 @@ let scroll_to_source_goal g =
         { Task.task_decl =
             { Theory.td_node =
                 Theory.Decl { Decl.d_node = Decl.Dprop (Decl.Pgoal, _, f)}}} ->
-        color_f_locs () f
+        color_t_locs () f
     | _ ->
         assert false
 

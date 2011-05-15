@@ -55,7 +55,7 @@ module Transform = struct
     let alpha = ty_var (create_tvsymbol (id_fresh "a")) in
     create_fsymbol (id_fresh "type_of") [alpha] ty_type
 
-  let app_type t = t_app fs_type [t] ty_type
+  let app_type t = fs_app fs_type [t] ty_type
 
   (** rewrite a closed formula modulo its free typevars
       using selection functions *)
@@ -64,7 +64,7 @@ module Transform = struct
     | Tyvar tvar -> Mtv.add tvar t acc
     | Tyapp (ts,tyl) ->
       let fold acc ls_select ty =
-        extract_tvar acc (t_app ls_select [t] ty_type) ty in
+        extract_tvar acc (fs_app ls_select [t] ty_type) ty in
       List.fold_left2 fold acc (ls_selects_of_ts ts) tyl
 
   let type_close_select tvs ts fn f =
@@ -115,9 +115,9 @@ module Transform = struct
     match t.t_node with
     | Tapp(f, terms) ->
       let terms = args_transform kept varM f terms (t_type t) in
-      e_app (findL f) terms t.t_ty
+      t_app (findL f) terms t.t_ty
     | _ -> (* default case : traverse *)
-      t_map (term_transform kept varM) (fmla_transform kept varM) t
+      TermTF.t_map (term_transform kept varM) (fmla_transform kept varM) t
 
   (** translation of formulae *)
   and fmla_transform kept varM f =
@@ -125,17 +125,17 @@ module Transform = struct
       (* first case : predicate are not translated *)
     | Tapp(p,terms) ->
       let terms = List.map (term_transform kept varM) terms in
-      f_app (findL p) terms
+      ps_app (findL p) terms
     | Fquant(q,_) ->
       let vsl,trl,fmla = f_open_all_quant q f in
       let fmla = fmla_transform kept varM fmla in
       let fmla2 = guard q kept varM fmla vsl in
         (* TODO : how to modify the triggers? *)
-      let trl = tr_map (term_transform kept varM)
+      let trl = TermTF.tr_map (term_transform kept varM)
         (fmla_transform kept varM) trl in
       f_quant q (f_close_quant vsl trl fmla2)
     | _ -> (* otherwise : just traverse and translate *)
-      t_map (term_transform kept varM) (fmla_transform kept varM) f(*   in *)
+      TermTF.t_map (term_transform kept varM) (fmla_transform kept varM) f(*   in *)
     (* Format.eprintf "fmla_to : %a@." Pretty.print_fmla f;f *)
 
   and guard q kept varM fmla vsl =
@@ -168,7 +168,7 @@ module Transform = struct
         let fn varM f =
           let fmla2 = guard q kept varM f vsl in
           (* TODO : how to modify the triggers? *)
-          let trl = tr_map (term_transform kept varM)
+          let trl = TermTF.tr_map (term_transform kept varM)
             (fmla_transform kept varM) trl in
           fn varM (f_quant q (f_close_quant vsl trl fmla2))
         in
@@ -190,7 +190,7 @@ module Transform = struct
           let terms = List.map t_var varl in
           let terms = args_transform kept varM lsymbol terms ty_val in
           let fmla =
-            f_equ (app_type (t_app (findL lsymbol) terms ty_val))
+            f_equ (app_type (fs_app (findL lsymbol) terms ty_val))
               (term_of_ty varM ty_val) in
           let guard fmla vs =
             if Sty.mem vs.vs_ty kept then fmla else
@@ -228,10 +228,10 @@ module Transform = struct
       (match expr.t_ty with
       | Some _ ->
           let t = term_transform kept varM expr in
-          Decl.make_fs_defn new_lsymbol vars t
+          Decl.make_ls_defn new_lsymbol vars t
       | None ->
           let f = fmla_transform kept varM expr in
-          Decl.make_ps_defn new_lsymbol vars f)
+          Decl.make_ls_defn new_lsymbol vars f)
     | (lsymbol, None) ->
       (findL lsymbol, None)
     in

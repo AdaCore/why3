@@ -120,7 +120,7 @@ let rec rewrite_term env tvar vsvar t =
       let tl = List.map (fnT vsvar) tl in
       let ty = oty_inst tvar t.t_ty in
       let p = find_logic env p (List.map t_type tl) ty in
-      e_app p tl ty
+      t_app p tl ty
     | Tif(f, t1, t2) ->
       t_if (fnF vsvar f) (fnT vsvar t1) (fnT vsvar t2)
     | Tlet (t1, b) ->
@@ -145,21 +145,21 @@ and rewrite_fmla env tvar vsvar f =
     | Tapp(p, tl) ->
       let tl = List.map (fnT vsvar) tl in
       let p = find_logic env p (List.map t_type tl) None in
-      f_app p tl
+      ps_app p tl
     | Fquant(q, b) ->
       let vl, tl, f1, cb = f_open_quant_cb b in
       let vsvar,vl = map_fold_left (conv_vs tvar) vsvar vl in
       let f1 = fnF vsvar f1 in
-      let tl = tr_map (fnT vsvar) (fnF vsvar) tl in
+      let tl = TermTF.tr_map (fnT vsvar) (fnF vsvar) tl in
       f_quant q (cb vl tl f1)
     | Tlet (t1, b) -> let u,f2,cb = t_open_bound_cb b in
       let (vsvar',u) = conv_vs tvar vsvar u in
       let t1 = fnT vsvar t1 and f2 = fnF vsvar' f2 in
       (* Format.eprintf "u.vs_ty : %a == t1.t_ty : %a@." *)
       (*    Pretty.print_ty u.vs_ty Pretty.print_ty t1.t_ty; *)
-      Ty.check_ty_equal u.vs_ty (t_type t1);
+      Ty.ty_equal_check u.vs_ty (t_type t1);
       t_let t1 (cb u f2)
-    | _ -> t_map (fun _ -> assert false) (fnF vsvar) f
+    | _ -> TermTF.t_map (fun _ -> assert false) (fnF vsvar) f
 
 
 module Ssubst =

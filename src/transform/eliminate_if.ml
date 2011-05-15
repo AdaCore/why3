@@ -26,7 +26,7 @@ open Decl
 
 let rec has_if t = match t.t_node with
   | Tif _ -> true
-  | _ -> t_any has_if ffalse t
+  | _ -> TermTF.t_any has_if ffalse t
 
 let rec elim_t contT t =
   let contTl e = contT (t_label_copy t e) in
@@ -50,23 +50,23 @@ let rec elim_t contT t =
       let cont_case_f t1 = t_case t1 (List.rev_map close bl) in
       elim_t (if fi then cont_case_f else cont_case_t) t1
   | _ ->
-      t_map_cont elim_t elim_f contT t
+      TermTF.t_map_cont elim_t elim_f contT t
 
 and elim_f contF f = match f.t_node with
   | Tapp _ | Tlet _ | Tcase _ ->
-      contF (t_map_cont elim_t elim_f (fun f -> f) f)
-  | _ -> t_map_cont elim_tr elim_f contF f
+      contF (TermTF.t_map_cont elim_t elim_f (fun f -> f) f)
+  | _ -> TermTF.t_map_cont elim_tr elim_f contF f
 
 (* the only terms we still can meet are the terms in triggers *)
 and elim_tr contT t = match t.t_node with
   | Tif _ ->
       Printer.unsupportedTerm t
         "cannot eliminate 'if-then-else' in trigger terms"
-  | _ -> t_map_cont elim_tr elim_f contT t
+  | _ -> TermTF.t_map_cont elim_tr elim_f contT t
 
 let elim_f f = elim_f (fun f -> f) f
 
-let rec elim_t t = t_map elim_t elim_f t
+let rec elim_t t = TermTF.t_map elim_t elim_f t
 
 let add_ld axl d = match d with
   | _, None -> axl, d
@@ -76,7 +76,7 @@ let add_ld axl d = match d with
         | Some _ when has_if e ->
             let nm = ls.ls_name.id_string ^ "_def" in
             let pr = create_prsymbol (id_derive nm ls.ls_name) in
-            let hd = e_app ls (List.map t_var vl) e.t_ty in
+            let hd = t_app ls (List.map t_var vl) e.t_ty in
             let f = f_forall_close vl [] (elim_f (f_equ hd e)) in
             create_prop_decl Paxiom pr f :: axl, (ls, None)
         | _ ->
@@ -89,13 +89,13 @@ let elim_d d = match d.d_node with
       let d = create_logic_decl l in
       d :: List.rev axl
   | _ ->
-      [decl_map (fun _ -> assert false) elim_f d]
+      [DeclTF.decl_map (fun _ -> assert false) elim_f d]
 
 let eliminate_if_term = Trans.decl elim_d None
 
 (** Eliminate if-then-else in formulas *)
 
-let rec elim_t t = t_map elim_t (elim_f true) t
+let rec elim_t t = TermTF.t_map elim_t (elim_f true) t
 
 and elim_f sign f = match f.t_node with
   | Tif (f1,f2,f3) ->
@@ -106,9 +106,9 @@ and elim_f sign f = match f.t_node with
       if sign then f_and (f_implies f1n f2) (f_implies (f_not f1p) f3)
               else f_or (f_and f1p f2) (f_and (f_not f1n) f3)
   | _ ->
-      f_map_sign elim_t elim_f sign f
+      TermTF.t_map_sign (const elim_t) elim_f sign f
 
-let eliminate_if_fmla = Trans.rewrite elim_t (elim_f true) None
+let eliminate_if_fmla = Trans.rewriteTF elim_t (elim_f true) None
 
 let eliminate_if = Trans.compose eliminate_if_term eliminate_if_fmla
 

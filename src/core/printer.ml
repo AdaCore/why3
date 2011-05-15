@@ -282,7 +282,7 @@ let () = Exn_printer.register (fun fmt exn -> match exn with
         Pretty.print_ts e s
   | UnsupportedTerm (e,s) ->
       fprintf fmt "@[<hov 3> This expression isn't supported:@\n%a@\n%s@]"
-        Pretty.print_expr e s
+        Pretty.print_term e s
   | UnsupportedDecl (d,s) ->
       fprintf fmt "@[<hov 3> This declaration isn't supported:@\n%a@\n%s@]"
         Pretty.print_decl d s

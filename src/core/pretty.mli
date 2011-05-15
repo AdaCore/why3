@@ -45,8 +45,6 @@ val print_binop : formatter -> binop -> unit      (* binary operator *)
 val print_const : formatter -> constant -> unit   (* int/real constant *)
 val print_pat : formatter -> pattern -> unit      (* pattern *)
 val print_term : formatter -> term -> unit        (* term *)
-val print_fmla : formatter -> fmla -> unit        (* formula *)
-val print_expr : formatter -> expr -> unit        (* term or formula *)
 
 val print_label : formatter -> label -> unit
 val print_pkind : formatter -> prop_kind -> unit

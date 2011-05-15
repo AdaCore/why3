@@ -87,7 +87,7 @@ let rec rewrite_term tenv ud vm t =
   | Tapp (fs,tl) ->
       let fs = conv_ls tenv ud fs in
       let tl = List.map (fnT vm) tl in
-      t_app fs tl (of_option fs.ls_value)
+      fs_app fs tl (of_option fs.ls_value)
   | Tif (f, t1, t2) ->
       t_if (fnF vm f) (fnT vm t1) (fnT vm t2)
   | Tlet (t1, b) ->
@@ -105,16 +105,16 @@ and rewrite_fmla tenv ud vm f =
   let fnF = rewrite_fmla tenv ud in
   match f.t_node with
   | Tapp (ps,tl) when ls_equal ps ps_equ ->
-      f_app ps (List.map (fnT vm) tl)
+      ps_app ps (List.map (fnT vm) tl)
   | Tapp (ps,tl) ->
       let ps = conv_ls tenv ud ps in
       let tl = List.map (fnT vm) tl in
-      f_app ps tl
+      ps_app ps tl
   | Fquant (q,b) ->
       let vl, tl, f1, close = f_open_quant_cb b in
       let add m v = let v' = conv_vs tenv ud v in Mvs.add v (t_var v') m, v' in
       let vm', vl' = Util.map_fold_left add vm vl in
-      let tl' = tr_map (fnT vm') (fnF vm') tl in
+      let tl' = TermTF.tr_map (fnT vm') (fnF vm') tl in
       let f1' = fnF vm' f1 in
       f_quant q (close vl' tl' f1')
   | Tlet (t1, b) ->
@@ -125,7 +125,7 @@ and rewrite_fmla tenv ud vm f =
       t_let t1' (close u' f1')
   | Tcase _ ->
       Printer.unsupportedFmla f "unsupported formula"
-  | _ -> t_map (fnT vm) (fnF vm) f
+  | _ -> TermTF.t_map (fnT vm) (fnF vm) f
 
 let decl_ud ud task =
   let add ts () task = add_ty_decl task [ts,Tabstract] in
@@ -157,7 +157,7 @@ let fold tenv taskpre task =
         | Dprop _ ->
           let ud = Hts.create 3 in
           decl_ud ud (add_decl task
-                        (decl_map (fnT ud Mvs.empty) (fnF ud Mvs.empty) d))
+                        (DeclTF.decl_map (fnT ud Mvs.empty) (fnF ud Mvs.empty) d))
       end
     | Meta(meta,ml) ->
       begin try

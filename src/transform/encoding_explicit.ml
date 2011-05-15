@@ -69,18 +69,18 @@ module Transform = struct
   let rec term_transform varM t = match t.t_node with
     | Tapp(f, terms) ->
       let terms = args_transform varM f terms t.t_ty in
-      e_app (findL f) terms t.t_ty
+      t_app (findL f) terms t.t_ty
     | _ -> (* default case : traverse *)
-      t_map (term_transform varM) (fmla_transform varM) t
+      TermTF.t_map (term_transform varM) (fmla_transform varM) t
 
   (** translation of formulae *)
   and fmla_transform varM f = match f.t_node with
       (* first case : predicate (not =), we must translate it and its args *)
     | Tapp(p,terms) when not (ls_equal p ps_equ) ->
       let terms = args_transform varM p terms None in
-      f_app (findL p) terms
+      ps_app (findL p) terms
     | _ -> (* otherwise : just traverse and translate *)
-      t_map (term_transform varM) (fmla_transform varM) f
+      TermTF.t_map (term_transform varM) (fmla_transform varM) f
 
   and args_transform varM ls args ty =
     (* Debug.print_list Pretty.print_ty Format.std_formatter type_vars; *)
@@ -107,10 +107,10 @@ module Transform = struct
       (match expr.t_ty with
       | Some _ ->
           let t = term_transform varM expr in
-          Decl.make_fs_defn new_lsymbol vars t
+          Decl.make_ls_defn new_lsymbol vars t
       | None ->
           let f = fmla_transform varM expr in
-          Decl.make_ps_defn new_lsymbol vars f)
+          Decl.make_ls_defn new_lsymbol vars f)
     | (lsymbol, None) ->
       (findL lsymbol, None)
     in

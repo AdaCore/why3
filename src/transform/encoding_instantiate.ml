@@ -263,12 +263,12 @@ let find_logic menv tvar p tyl ret =
 (*     | Tyterm tyterm -> *)
 (*       match menv.tenv with *)
 (*         | Incomplete -> assert false *)
-(*         | Tenv tenv -> t_app tenv.sort [tyterm;t] tenv.deco *)
+(*         | Tenv tenv -> fs_app tenv.sort [tyterm;t] tenv.deco *)
 
 (* let sort_app tenv ty t = *)
 (*   match tenv with *)
 (*     | Incomplete -> assert false *)
-(*     | Tenv tenv -> t_app tenv.sort [ty;t] tenv.deco    *)
+(*     | Tenv tenv -> fs_app tenv.sort [ty;t] tenv.deco    *)
 
 
 let conv_vs menv tvar vsvar vs =
@@ -288,7 +288,7 @@ let rec rewrite_term menv tvar vsvar t =
     | Tapp(p,tl) ->
       let tl' = List.map (fnT vsvar) tl in
       let p = find_logic menv tvar p tl t.t_ty in
-      t_app p tl' (projty_real menv tvar (t_type t))
+      fs_app p tl' (projty_real menv tvar (t_type t))
     | Tif(f, t1, t2) ->
       t_if (fnF vsvar f) (fnT vsvar t1) (fnT vsvar t2)
     | Tlet (t1, b) -> let u,t2,cb = t_open_bound_cb b in
@@ -312,7 +312,7 @@ and rewrite_fmla menv tvar vsvar f =
     | Tapp(p, tl) ->
       let tl' = List.map (fnT vsvar) tl in
       let p = find_logic menv tvar p tl None in
-      f_app p tl'
+      ps_app p tl'
     | Fquant(q, b) ->
       let vl, tl, f1, cb = f_open_quant_cb b in
       let vsvar,vl = map_fold_left (conv_vs menv tvar) vsvar vl in
@@ -320,16 +320,16 @@ and rewrite_fmla menv tvar vsvar f =
       let f1 = fnF vsvar f1 in
       (* Ici un trigger qui ne match pas assez de variables
          peut être généré *)
-      let tl = tr_map (fnT vsvar) (fnF vsvar) tl in
+      let tl = TermTF.tr_map (fnT vsvar) (fnF vsvar) tl in
       f_quant q (cb vl tl f1)
     | Tlet (t1, b) -> let u,f2,cb = t_open_bound_cb b in
       let (vsvar',u) = conv_vs menv tvar vsvar u in
       let t1 = fnT vsvar t1 and f2 = fnF vsvar' f2 in
       (* Format.eprintf "u.vs_ty : %a == t1.t_ty : %a@." *)
       (*    Pretty.print_ty u.vs_ty Pretty.print_ty t1.t_ty; *)
-      check_ty_equal u.vs_ty (t_type t1);
+      ty_equal_check u.vs_ty (t_type t1);
       t_let t1 (cb u f2)
-    | _ -> t_map (fun _ -> assert false) (fnF vsvar) f
+    | _ -> TermTF.t_map (fun _ -> assert false) (fnF vsvar) f
 
 (* Generation of all the possible instantiation of a formula *)
 let gen_tvar env ts =

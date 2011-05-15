@@ -97,10 +97,9 @@ exception TypeMismatch of ty * ty
 
 val ty_match : ty Mtv.t -> ty -> ty -> ty Mtv.t
 val ty_inst  : ty Mtv.t -> ty -> ty
-
 val ty_freevars : Stv.t -> ty -> Stv.t
 
-val check_ty_equal : ty -> ty -> unit
+val ty_equal_check : ty -> ty -> unit
 
 (* built-in symbols *)
 
@@ -123,21 +122,15 @@ val is_ts_tuple : tysymbol -> bool
 
 (** {2 Operations on [ty option]} *)
 
-type oty = ty option
-
 exception UnexpectedProp
 
-val oty_equal : oty -> oty -> bool
-val oty_hash  : oty -> int
+val oty_equal : ty option -> ty option -> bool
+val oty_hash  : ty option -> int
 
-val oty_ty : oty -> ty
-val oty_map : (ty -> ty) -> oty -> oty
-val oty_iter : (ty -> unit) -> oty -> unit
-val oty_apply : 'a -> (ty -> 'a) -> oty -> 'a
-val oty_fold : ('a -> ty -> 'a) -> 'a -> oty -> 'a
-val oty_map_fold : ('a -> ty -> 'a * ty) -> 'a -> oty -> 'a * oty
+val oty_type : ty option -> ty
+val oty_cons : ty list -> ty option -> ty list
 
-val oty_match : ty Mtv.t -> oty -> oty -> ty Mtv.t
-val oty_inst  : ty Mtv.t -> oty -> oty
-val oty_freevars : Stv.t -> oty -> Stv.t
+val oty_match : ty Mtv.t -> ty option -> ty option -> ty Mtv.t
+val oty_inst  : ty Mtv.t -> ty option -> ty option
+val oty_freevars : Stv.t -> ty option -> Stv.t
 

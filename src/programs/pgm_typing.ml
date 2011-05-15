@@ -933,8 +933,8 @@ let mk_iexpr loc ty d = { iexpr_desc = d; iexpr_loc = loc; iexpr_type = ty }
 
 let mk_t_if gl f =
   let ty = ty_app (find_ts ~pure:true gl "bool") [] in
-  t_if f (t_app (find_ls ~pure:true gl "True")  [] ty) 
-         (t_app (find_ls ~pure:true gl "False") [] ty)
+  t_if f (fs_app (find_ls ~pure:true gl "True")  [] ty) 
+         (fs_app (find_ls ~pure:true gl "False") [] ty)
 
 (* apply ls to a list of expressions, introducing let's if necessary
 
@@ -951,9 +951,9 @@ let make_logic_app gl loc ty ls el =
     | [] ->
         begin match ls.ls_value with
           | Some _ -> 
-	      let t = t_app ls (List.rev args) (purify ty) in
+	      let t = fs_app ls (List.rev args) (purify ty) in
 	      IElogic t
-          | None -> IElogic (mk_t_if gl (f_app ls (List.rev args)))
+          | None -> IElogic (mk_t_if gl (ps_app ls (List.rev args)))
         end
     | ({ iexpr_desc = IElogic t }, _) :: r ->
 	make (t :: args) r
@@ -1094,9 +1094,9 @@ and iexpr_desc gl env loc ty = function
   | DElogic ls ->
       begin match ls.ls_args, ls.ls_value with
 	| [], Some _ ->
-	    IElogic (t_app ls [] (purify ty))
+	    IElogic (fs_app ls [] (purify ty))
 	| [], None ->
-            IElogic (mk_t_if gl (f_app ls []))
+            IElogic (mk_t_if gl (ps_app ls []))
 	| al, _ ->
 	    errorm ~loc "function symbol %s is expecting %d arguments"
 	      ls.ls_name.id_string (List.length al)
@@ -1278,14 +1278,14 @@ let declare_global ls pv =
   Hls.add globals ls pv
 
 let rec fmla_effect ef f = 
-  t_map_fold term_effect fmla_effect ef f
+  TermTF.t_map_fold term_effect fmla_effect ef f
 
 and term_effect ef t = match t.t_node with
   | Term.Tapp (ls, []) when Hls.mem globals ls ->
       let pv = Hls.find globals ls in
       E.add_glob pv ef, t_var pv.pv_pure
   | _ ->
-      t_map_fold term_effect fmla_effect ef t
+      TermTF.t_map_fold term_effect fmla_effect ef t
 
 let post_effect ef ((v, q), ql) =
   let exn_effect ef (e, (x, q)) = 
@@ -1418,7 +1418,8 @@ let mk_simple_expr loc ty d = mk_expr loc ty E.empty d
 
 let mk_bool_constant loc gl ls =
   let ty = ty_app (find_ts ~pure:true gl "bool") [] in
-  { expr_desc = Elogic (t_app ls [] ty); expr_type = ty; expr_type_v = tpure ty;
+  { expr_desc = Elogic (fs_app ls [] ty);
+    expr_type = ty; expr_type_v = tpure ty;
     expr_effect = E.empty; expr_loc = loc }
 
 let mk_false loc gl = mk_bool_constant loc gl (find_ls ~pure:true gl "False")
@@ -1553,7 +1554,7 @@ and expr_desc gl env loc ty = function
 	  in
 	  let v1 = create_pvsymbol_v (id_fresh "lazy") (tpure ty) in
 	  let v2 = create_pvsymbol_v (id_fresh "lazy") (tpure ty) in
-	  let t = t_app ls [t_var v1.pv_pure; t_var v2.pv_pure] ty in
+	  let t = fs_app ls [t_var v1.pv_pure; t_var v2.pv_pure] ty in
 	  Elet (v1, e1,
 		mk_expr loc ty ef
 		  (Elet (v2, e2, mk_simple_expr loc ty (Elogic t))))
@@ -1659,11 +1660,12 @@ and letrec gl env dl = (* : env * recfun list *)
 	| Some phi0, Some (_, phi, r) ->
 	    let decphi = match r with
 	      | None -> (* 0 <= phi0 and phi < phi0 *)
-		  f_and (f_app (find_ls ~pure:true gl "infix <=") 
-			   [t_int_const "0"; t_var phi0])
-		    (f_app (find_ls ~pure:true gl "infix <")  [phi; t_var phi0])
+		  f_and (ps_app (find_ls ~pure:true gl "infix <=")
+		        [t_int_const "0"; t_var phi0])
+                    (ps_app (find_ls ~pure:true gl "infix <")
+                        [phi;t_var phi0])
 	      | Some r -> 
-		  f_app r [phi; t_var phi0] 
+		  ps_app r [phi; t_var phi0] 
 	    in
 	    { c with c_pre = f_and decphi c.c_pre }
 	| _ ->

@@ -29,8 +29,8 @@ let is_func_ty t =
   | _ -> false
 
 type lambda_match =
-  | Flam of vsymbol list * trigger list * fmla
-  | Tlam of vsymbol list * trigger list * term
+  | Flam of vsymbol list * trigger * fmla
+  | Tlam of vsymbol list * trigger * term
   | LNone
 
 let destruct_lambda t =
@@ -76,11 +76,11 @@ let rec rewriteT t =
         (* apply epsilon-term to variables *)
         List.fold_left (fun acc x -> t_func_app acc (t_var x)) f fv
   | _ ->
-      t_map rewriteT rewriteF t
+      TermTF.t_map rewriteT rewriteF t
 
-and rewriteF f = t_map rewriteT rewriteF f
+and rewriteF f = TermTF.t_map rewriteT rewriteF f
 
-let close d = [decl_map rewriteT rewriteF d]
+let close d = [DeclTF.decl_map rewriteT rewriteF d]
 
 let close_epsilon =
   Trans.on_used_theory highord_theory (fun used ->

@@ -39,13 +39,9 @@ type ls_defn
 
 type logic_decl = lsymbol * ls_defn option
 
-val make_ls_defn : lsymbol -> vsymbol list -> expr -> logic_decl
-val make_fs_defn : lsymbol -> vsymbol list -> term -> logic_decl
-val make_ps_defn : lsymbol -> vsymbol list -> fmla -> logic_decl
+val make_ls_defn : lsymbol -> vsymbol list -> term -> logic_decl
 
-val open_ls_defn : ls_defn -> vsymbol list * expr
-val open_fs_defn : ls_defn -> vsymbol list * term
-val open_ps_defn : ls_defn -> vsymbol list * fmla
+val open_ls_defn : ls_defn -> vsymbol list * term
 
 val ls_defn_axiom : ls_defn -> fmla
 
@@ -133,12 +129,21 @@ exception EmptyIndDecl of lsymbol
 
 (** {2 Utilities} *)
 
+val decl_map : (term -> term) -> decl -> decl
+
+val decl_fold : ('a -> term -> 'a) -> 'a -> decl -> 'a
+
+val decl_map_fold : ('a -> term -> 'a * term) -> 'a -> decl -> 'a * decl
+
+module DeclTF : sig
+
 val decl_map : (term -> term) -> (fmla -> fmla) -> decl -> decl
+
 val decl_fold : ('a -> term -> 'a) -> ('a -> fmla -> 'a) -> 'a -> decl -> 'a
 
-val decl_map_fold :
-  ('a -> term -> 'a * term) -> ('a -> fmla -> 'a * fmla) ->
-      'a -> decl -> 'a * decl
+val decl_map_fold : ('a -> term -> 'a * term) ->
+                    ('a -> fmla -> 'a * fmla) -> 'a -> decl -> 'a * decl
+end
 
 (** {2 Known identifiers} *)
 
@@ -151,7 +156,7 @@ val merge_known : known_map -> known_map -> known_map
 exception KnownIdent of ident
 exception UnknownIdent of ident
 exception RedeclaredIdent of ident
-exception NonExhaustiveExpr of pattern list * expr
+exception NonExhaustiveCase of pattern list * term
 exception NonFoundedTypeDecl of tysymbol
 
 val find_constructors : known_map -> tysymbol -> lsymbol list

@@ -459,7 +459,7 @@ let cl_find_ls cl ls =
     cl.ls_table <- Mls.add ls ls' cl.ls_table;
     ls'
 
-let cl_trans_fmla cl f = t_s_map (cl_find_ts cl) (cl_find_ls cl) f
+let cl_trans_fmla cl f = t_s_map (cl_trans_ty cl) (cl_find_ls cl) f
 
 let cl_find_pr cl pr =
   if not (Sid.mem pr.pr_name cl.cl_local) then pr
@@ -532,18 +532,12 @@ let cl_type cl inst tdl =
   create_ty_decl (List.fold_right add_type tdl [])
 
 let extract_ls_defn f =
-  let vl, ef = f_open_forall f in
-  match ef.t_node with
-    | Tapp (s, [t1; t2]) when ls_equal s ps_equ ->
-        begin match t1.t_node with
-          | Tapp (fs, _) -> make_fs_defn fs vl t2
-          | _ -> assert false
-        end
-    | Fbinop (Fiff, f1, f2) ->
-        begin match f1.t_node with
-          | Tapp (ps, _) -> make_ps_defn ps vl f2
-          | _ -> assert false
-        end
+  let vl,_,f = match f.t_node with
+    | Fquant (Fforall,b) -> f_open_quant b
+    | _ -> [],[],f in
+  match f.t_node with
+    | Tapp (_, [{t_node = Tapp (ls,_)}; f])
+    | Fbinop (_, {t_node = Tapp (ls,_)}, f) -> make_ls_defn ls vl f
     | _ -> assert false
 
 let cl_logic cl inst ldl =

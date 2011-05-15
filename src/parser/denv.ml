@@ -199,7 +199,7 @@ let rec term env t = match t.dt_node with
   | Tconst c ->
       t_const c
   | Tapp (s, tl) ->
-      t_app s (List.map (term env) tl) (ty_of_dty t.dt_ty)
+      fs_app s (List.map (term env) tl) (ty_of_dty t.dt_ty)
   | Tif (f, t1, t2) ->
       t_if (fmla env f) (term env t1) (term env t2)
   | Tlet (e1, id, e2) ->
@@ -250,7 +250,7 @@ and fmla env = function
       let trl = List.map (List.map trigger) trl in
       f_quant_close q vl trl (fmla env f1)
   | Fapp (s, tl) ->
-      f_app s (List.map (term env) tl)
+      ps_app s (List.map (term env) tl)
   | Flet (e1, id, f2) ->
       let e1 = term env e1 in
       let v = create_user_vs id (t_type e1) in

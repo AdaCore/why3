@@ -53,7 +53,7 @@ let rec intros pr f = match f.t_node with
       let vsl,_trl,f = f_open_quant fq in
       let intro_var subst vs =
         let ls = create_lsymbol (id_clone vs.vs_name) [] (Some vs.vs_ty) in
-        Mvs.add vs (t_app ls [] vs.vs_ty) subst,
+        Mvs.add vs (fs_app ls [] vs.vs_ty) subst,
         create_logic_decl [ls,None]
       in
       let subst, dl = Util.map_fold_left intro_var Mvs.empty vsl in

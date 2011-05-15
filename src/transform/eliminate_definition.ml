@@ -85,13 +85,13 @@ let add_ld func pred axl d = match d with
       let vl,e = open_ls_defn ld in begin match e.t_ty with
         | Some _ when func ->
             let nm = ls.ls_name.id_string ^ "_def" in
-            let hd = e_app ls (List.map t_var vl) e.t_ty in
+            let hd = t_app ls (List.map t_var vl) e.t_ty in
             let ax = f_forall_close vl [] (t_insert hd e) in
             let pr = create_prsymbol (id_derive nm ls.ls_name) in
             create_prop_decl Paxiom pr ax :: axl, (ls, None)
         | None when pred ->
             let nm = ls.ls_name.id_string ^ "_def" in
-            let hd = f_app ls (List.map t_var vl) in
+            let hd = ps_app ls (List.map t_var vl) in
             let ax = f_forall_close vl [] (f_insert hd e) in
             let pr = create_prsymbol (id_derive nm ls.ls_name) in
             create_prop_decl Paxiom pr ax :: axl, (ls, None)

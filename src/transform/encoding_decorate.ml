@@ -35,19 +35,19 @@ let rec deco_arg kept tvar t =
   let t = deco_term kept tvar t in
   if Sty.mem (t_type t) kept then t else
   let tty = term_of_ty tvar (t_type t) in
-  e_app ls_poly_deco [tty;t] t.t_ty
+  t_app ls_poly_deco [tty;t] t.t_ty
 
 and deco_term kept tvar t = match t.t_node with
-  | Tapp (fs,tl) -> e_app fs (List.map (deco_arg kept tvar) tl) t.t_ty
-  | _ -> t_map (deco_term kept tvar) (deco_fmla kept tvar) t
+  | Tapp (fs,tl) -> t_app fs (List.map (deco_arg kept tvar) tl) t.t_ty
+  | _ -> TermTF.t_map (deco_term kept tvar) (deco_fmla kept tvar) t
 
 and deco_fmla kept tvar f = match f.t_node with
-  | Tapp (ps,tl) -> f_app ps (List.map (deco_arg kept tvar) tl)
+  | Tapp (ps,tl) -> ps_app ps (List.map (deco_arg kept tvar) tl)
   | Fquant (q,b) ->
       let vl,tl,f,close = f_open_quant_cb b in
-      let tl = tr_map (deco_arg kept tvar) (deco_fmla kept tvar) tl in
+      let tl = TermTF.tr_map (deco_arg kept tvar) (deco_fmla kept tvar) tl in
       f_quant q (close vl tl (deco_fmla kept tvar f))
-  | _ -> t_map (deco_term kept tvar) (deco_fmla kept tvar) f
+  | _ -> TermTF.t_map (deco_term kept tvar) (deco_fmla kept tvar) f
 
 let deco_decl kept d = match d.d_node with
   | Dtype tdl ->

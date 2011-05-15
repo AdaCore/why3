@@ -40,7 +40,7 @@ let lift kind =
         let acc = add_decl acc (Decl.create_logic_decl [xl,None]) in
         let axs =
           Decl.create_prsymbol (Ident.id_derive ("epsilon_def") x.vs_name) in
-        let xlapp = e_app xl (List.map t_var fv) t.t_ty in
+        let xlapp = t_app xl (List.map t_var fv) t.t_ty in
         let f =
           match kind with
           (* assume that lambdas always exist *)
@@ -52,13 +52,13 @@ let lift kind =
         in
         let acc = add_decl acc (Decl.create_prop_decl Decl.Paxiom axs f) in
         acc, xlapp
-    | _ -> t_map_fold term form acc t
-  and form acc f = t_map_fold term form acc f in
+    | _ -> TermTF.t_map_fold term form acc t
+  and form acc f = TermTF.t_map_fold term form acc f in
   fun th acc ->
     let th = th.task_decl in
     match th.td_node with
     | Decl d ->
-        let acc, d = Decl.decl_map_fold term form acc d in
+        let acc, d = Decl.DeclTF.decl_map_fold term form acc d in
         add_decl acc d
     | _ -> add_tdecl acc th
 

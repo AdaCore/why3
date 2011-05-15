@@ -35,21 +35,12 @@ let rec rewriteT kn t = match t.t_node with
       let mk_b (p,t) = ([p], rewriteT kn t) in
       let bl = List.map (fun b -> mk_b (t_open_branch b)) bl in
       Pattern.CompileTerm.compile (find_constructors kn) [t] bl
-  | _ -> t_map (rewriteT kn) (rewriteF kn) t
-
-and rewriteF kn f = match f.t_node with
-  | Tcase (t,bl) ->
-      let t = rewriteT kn t in
-      let mk_b (p,f) = ([p], rewriteF kn f) in
-      let bl = List.map (fun b -> mk_b (t_open_branch b)) bl in
-      Pattern.CompileTerm.compile (find_constructors kn) [t] bl
-  | _ -> t_map (rewriteT kn) (rewriteF kn) f
+  | _ -> t_map (rewriteT kn) t
 
 let comp t task =
-  let fnT = rewriteT t.task_known in
-  let fnF = rewriteF t.task_known in
+  let fn = rewriteT t.task_known in
   match t.task_decl.td_node with
-  | Decl d -> add_decl task (decl_map fnT fnF d)
+  | Decl d -> add_decl task (decl_map fn d)
   | _ -> add_tdecl task t.task_decl
 
 let compile_match = Trans.fold comp None
@@ -81,7 +72,7 @@ let rec rewriteT kn state t = match t.t_node with
         match p with
         | { pat_node = Papp (cs,pl) } ->
             let add_var e p pj = match p.pat_node with
-              | Pvar v -> t_let_close_simp v (t_app pj [t1] v.vs_ty) e
+              | Pvar v -> t_let_close_simp v (fs_app pj [t1] v.vs_ty) e
               | _ -> Printer.unsupportedTerm t uncompiled
             in
             let pjl = Mls.find cs state.pj_map in
@@ -99,10 +90,10 @@ let rec rewriteT kn state t = match t.t_node with
       in
       begin match List.map find (find_constructors kn ts) with
         | [t] -> t
-        | tl  -> e_app (Mts.find ts state.mt_map) (t1::tl) t.t_ty
+        | tl  -> t_app (Mts.find ts state.mt_map) (t1::tl) t.t_ty
       end
   | _ ->
-      t_map (rewriteT kn state) (rewriteF kn state Svs.empty true) t
+      TermTF.t_map (rewriteT kn state) (rewriteF kn state Svs.empty true) t
 
 and rewriteF kn state av sign f = match f.t_node with
   | Tcase (t1,bl) ->
@@ -129,7 +120,7 @@ and rewriteF kn state av sign f = match f.t_node with
           let get_var pj = var (t_type (t_app_infer pj [t1])) in
           List.map get_var (Mls.find cs state.pj_map), of_option w
         in
-        let hd = e_app cs (List.map t_var vl) t1.t_ty in
+        let hd = t_app cs (List.map t_var vl) t1.t_ty in
         match t1.t_node with
         | Tvar v when Svs.mem v av ->
             let hd = t_let_close_simp v hd e in if sign
@@ -148,18 +139,21 @@ and rewriteF kn state av sign f = match f.t_node with
       map_join_left find op (find_constructors kn ts)
   | Fquant (q, bf) when (q = Fforall && sign) || (q = Fexists && not sign) ->
       let vl, tr, f1, close = f_open_quant_cb bf in
-      let tr = tr_map (rewriteT kn state)
+      let tr = TermTF.tr_map (rewriteT kn state)
                       (rewriteF kn state Svs.empty sign) tr in
       let av = List.fold_left (fun s v -> Svs.add v s) av vl in
       let f1 = rewriteF kn state av sign f1 in
       f_quant_simp q (close vl tr f1)
   | Fbinop (o, _, _) when (o = Fand && sign) || (o = For && not sign) ->
-      f_map_sign (rewriteT kn state) (rewriteF kn state av) sign f
+      TermTF.t_map_sign (const (rewriteT kn state))
+        (rewriteF kn state av) sign f
   | Tlet (t1, _) ->
       let av = Svs.diff av (t_freevars Svs.empty t1) in
-      f_map_sign (rewriteT kn state) (rewriteF kn state av) sign f
+      TermTF.t_map_sign (const (rewriteT kn state))
+        (rewriteF kn state av) sign f
   | _ ->
-      f_map_sign (rewriteT kn state) (rewriteF kn state Svs.empty) sign f
+      TermTF.t_map_sign (const (rewriteT kn state))
+        (rewriteF kn state Svs.empty) sign f
 
 let add_selector (state,task) ts ty csl =
   (* declare the selector function *)
@@ -177,8 +171,8 @@ let add_selector (state,task) ts ty csl =
     let id = mt_ls.ls_name.id_string ^ "_" ^ cs.ls_name.id_string in
     let pr = create_prsymbol (id_derive id cs.ls_name) in
     let vl = List.rev_map (create_vsymbol (id_fresh "u")) cs.ls_args in
-    let hd = t_app cs (List.rev_map t_var vl) (of_option cs.ls_value) in
-    let hd = t_app mt_ls (hd::mt_tl) mt_ty in
+    let hd = fs_app cs (List.rev_map t_var vl) (of_option cs.ls_value) in
+    let hd = fs_app mt_ls (hd::mt_tl) mt_ty in
     let vl = List.rev_append mt_vl (List.rev vl) in
     let ax = f_forall_close vl [] (f_equ hd t) in
     add_decl tsk (create_prop_decl Paxiom pr ax)
@@ -202,9 +196,9 @@ let add_indexer (state,task) ts ty csl =
     let id = mt_ls.ls_name.id_string ^ "_" ^ cs.ls_name.id_string in
     let pr = create_prsymbol (id_derive id cs.ls_name) in
     let vl = List.rev_map (create_vsymbol (id_fresh "u")) cs.ls_args in
-    let hd = t_app cs (List.rev_map t_var vl) (of_option cs.ls_value) in
+    let hd = fs_app cs (List.rev_map t_var vl) (of_option cs.ls_value) in
     let ix = t_const (ConstInt (string_of_int !index)) in
-    let ax = f_equ (t_app mt_ls [hd] ty_int) ix in
+    let ax = f_equ (fs_app mt_ls [hd] ty_int) ix in
     let ax = f_forall_close (List.rev vl) [[hd]] ax in
     add_decl tsk (create_prop_decl Paxiom pr ax)
   in
@@ -217,8 +211,8 @@ let add_discriminator (state,task) ts ty csl =
     let pr = create_prsymbol (id_derive id ts.ts_name) in
     let ul = List.rev_map (create_vsymbol (id_fresh "u")) c1.ls_args in
     let vl = List.rev_map (create_vsymbol (id_fresh "v")) c2.ls_args in
-    let t1 = t_app c1 (List.rev_map t_var ul) ty in
-    let t2 = t_app c2 (List.rev_map t_var vl) ty in
+    let t1 = fs_app c1 (List.rev_map t_var ul) ty in
+    let t2 = fs_app c2 (List.rev_map t_var vl) ty in
     let ax = f_neq t1 t2 in
     let ax = f_forall_close (List.rev vl) [[t2]] ax in
     let ax = f_forall_close (List.rev ul) [[t1]] ax in
@@ -242,7 +236,7 @@ let add_projections (state,task) _ts _ty csl =
     let id = cs.ls_name.id_string ^ "_proj_" in
     let vl = List.rev_map (create_vsymbol (id_fresh "u")) cs.ls_args in
     let tl = List.rev_map t_var vl in
-    let hd = t_app cs tl (of_option cs.ls_value) in
+    let hd = fs_app cs tl (of_option cs.ls_value) in
     let c = ref 0 in
     let add (pjl,tsk) t =
       let id = id_derive (id ^ (incr c; string_of_int !c)) cs.ls_name in
@@ -250,7 +244,7 @@ let add_projections (state,task) _ts _ty csl =
       let tsk = add_decl tsk (create_logic_decl [ls, None]) in
       let id = id_derive (ls.ls_name.id_string ^ "_def") ls.ls_name in
       let pr = create_prsymbol id in
-      let hh = e_app ls [hd] t.t_ty in
+      let hh = t_app ls [hd] t.t_ty in
       let ax = f_forall_close (List.rev vl) [] (f_equ hh t) in
       ls::pjl, add_decl tsk (create_prop_decl Paxiom pr ax)
     in
@@ -269,7 +263,7 @@ let add_inversion (state,task) ts ty csl =
   let mk_cs cs =
     let pjl = Mls.find cs state.pj_map in
     let app pj = t_app_infer pj [ax_hd] in
-    f_equ ax_hd (t_app cs (List.map app pjl) ty)
+    f_equ ax_hd (fs_app cs (List.map app pjl) ty)
   in
   let ax_f = map_join_left mk_cs f_or csl in
   let ax_f = f_forall_close [ax_vs] [] ax_f in
@@ -306,7 +300,7 @@ let comp t (state,task) = match t.task_decl.td_node with
   | Decl d ->
       let fnT = rewriteT t.task_known state in
       let fnF = rewriteF t.task_known state Svs.empty true in
-      state, add_decl task (decl_map fnT fnF d)
+      state, add_decl task (DeclTF.decl_map fnT fnF d)
   | _ ->
       state, add_tdecl task t.task_decl
 

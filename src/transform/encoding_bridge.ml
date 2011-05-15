@@ -137,7 +137,7 @@ let conv_arg tenv t aty =
       let tylconv = Hty.find tenv.specials tty in
       match t.t_node with
       | Tapp (fs,[t']) when ls_equal fs tylconv.tb2t -> t'
-      | _ -> t_app tylconv.t2tb [t] tylconv.tb
+      | _ -> fs_app tylconv.t2tb [t] tylconv.tb
     with Not_found ->
       (* polymorph not specials *)
       t
@@ -148,14 +148,14 @@ let conv_res_app tenv p tl tty =
     (* tty is a special value *)
     let tylconv = Hty.find tenv.specials tty in
     let vty = Util.of_option p.ls_value in
-    if ty_equal vty tty then (* vty too *) t_app p tl tty
+    if ty_equal vty tty then (* vty too *) fs_app p tl tty
     else
       (* p is polymorph *)
-      let t = t_app p tl tylconv.tb in
-      t_app tylconv.tb2t [t] tty
+      let t = fs_app p tl tylconv.tb in
+      fs_app tylconv.tb2t [t] tty
   with Not_found ->
     let tty = ty_of_ty tenv tty in
-    t_app p tl tty
+    fs_app p tl tty
 
 let rec rewrite_term tenv vsvar t =
   (* Format.eprintf "@[<hov 2>Term : %a =>@\n@?" Pretty.print_term t; *)
@@ -203,7 +203,7 @@ and rewrite_fmla tenv vsvar f =
         let tl = List.map (fnT vsvar) tl in
         let p = Hls.find tenv.trans_lsymbol p in
         let tl = List.map2 (conv_arg tenv) tl p.ls_args in
-        f_app p tl
+        ps_app p tl
     | Fquant (q, b) ->
         let vl, tl, f1, close = f_open_quant_cb b in
         let conv_vs (vsvar,l) vs =
@@ -213,7 +213,7 @@ and rewrite_fmla tenv vsvar f =
         let f1 = fnF vsvar f1 in
         (* Ici un trigger qui ne match pas assez de variables
            peut être généré *)
-        let tl = tr_map (fnT vsvar) (fnF vsvar) tl in
+        let tl = TermTF.tr_map (fnT vsvar) (fnF vsvar) tl in
         let vl = List.rev vl in
         f_quant q (close vl tl f1)
     | Tlet (t1, b) ->

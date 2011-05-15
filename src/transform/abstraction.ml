@@ -32,11 +32,11 @@ let abstraction (keep : lsymbol -> bool) =
     match t.t_node with
     | Tconst _ | Tapp(_,[]) -> t
     | Tapp(ls,_) when keep ls ->
-        t_map abstract_term abstract_fmla t
+        TermTF.t_map abstract_term abstract_fmla t
     | _ ->
         let (ls, tabs) = try Hterm_alpha.find term_table t with Not_found ->
           let ls = create_lsymbol (id_fresh "abstr") [] t.t_ty in
-          let tabs = e_app ls [] t.t_ty in
+          let tabs = t_app ls [] t.t_ty in
           Hterm_alpha.add term_table t (ls, tabs);
           ls, tabs in
         extra_decls := ls :: !extra_decls;
@@ -46,20 +46,20 @@ let abstraction (keep : lsymbol -> bool) =
     match f.t_node with
     | Ftrue | Ffalse -> f
     | Fnot _ | Fbinop _ ->
-        t_map abstract_term abstract_fmla f
+        TermTF.t_map abstract_term abstract_fmla f
     | Tapp(ls,_) when keep ls ->
-        t_map abstract_term abstract_fmla f
+        TermTF.t_map abstract_term abstract_fmla f
     | _ ->
         let (ls, fabs) = try Hterm_alpha.find fmla_table f with Not_found ->
           let ls = create_psymbol (id_fresh "abstr") [] in
-          let fabs = f_app ls [] in
+          let fabs = ps_app ls [] in
           Hterm_alpha.add fmla_table f (ls, fabs);
           ls, fabs in
         extra_decls := ls :: !extra_decls;
         fabs in
 
   let abstract_decl (d : decl) : decl list =
-    let d = decl_map abstract_term abstract_fmla d in
+    let d = DeclTF.decl_map abstract_term abstract_fmla d in
     let l = List.fold_left
       (fun acc ls -> create_logic_decl [ls,None] :: acc)
       [d] !extra_decls in

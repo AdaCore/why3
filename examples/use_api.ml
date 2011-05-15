@@ -34,17 +34,17 @@ let fmla1 : Term.fmla = Term.f_or fmla_true fmla_false
 
 (* printing it *)
 open Format
-let () = printf "@[formula 1 is:@ %a@]@." Pretty.print_fmla fmla1
+let () = printf "@[formula 1 is:@ %a@]@." Pretty.print_term fmla1
 
 
 (* a propositional goal: A and B implies A *)
 
 let prop_var_A : Term.lsymbol = Term.create_psymbol (Ident.id_fresh "A") []
 let prop_var_B : Term.lsymbol = Term.create_psymbol (Ident.id_fresh "B") []
-let atom_A : Term.fmla = Term.f_app prop_var_A []
-let atom_B : Term.fmla = Term.f_app prop_var_B []
+let atom_A : Term.fmla = Term.ps_app prop_var_A []
+let atom_B : Term.fmla = Term.ps_app prop_var_B []
 let fmla2 : Term.fmla = Term.f_implies (Term.f_and atom_A atom_B) atom_A
-let () = printf "@[formula 2 is:@ %a@]@." Pretty.print_fmla fmla2
+let () = printf "@[formula 2 is:@ %a@]@." Pretty.print_term fmla2
 
 
 (* building the task for formula 1 alone *)
@@ -122,7 +122,7 @@ let int_theory : Theory.theory =
   Env.find_theory env ["int"] "Int"
 let plus_symbol : Term.lsymbol = 
   Theory.ns_find_ls int_theory.Theory.th_export ["infix +"]
-let two_plus_two : Term.term = Term.t_app plus_symbol [two;two] Ty.ty_int
+let two_plus_two : Term.term = Term.fs_app plus_symbol [two;two] Ty.ty_int
 let two_plus_two : Term.term = Term.t_app_infer plus_symbol [two;two] 
 let fmla3 : Term.fmla = Term.f_equ two_plus_two four
 
@@ -157,7 +157,7 @@ let x : Term.term = Term.t_var var_x
 let x_times_x : Term.term = 
   Term.t_app_infer mult_symbol [x;x] 
 let fmla4_aux : Term.fmla = 
-  Term.f_app ge_symbol [x_times_x;zero]
+  Term.ps_app ge_symbol [x_times_x;zero]
 let fmla4_quant : Term.fmla_quant = 
   Term.f_close_quant [var_x] [] fmla4_aux
 let fmla4 : Term.fmla =

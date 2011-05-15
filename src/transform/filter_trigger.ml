@@ -20,9 +20,9 @@
 open Term
 
 let make_rt_rf keep =
-  let rec rt t = t_map rt rf t
+  let rec rt t = TermTF.t_map rt rf t
   and rf f =
-    let f = t_map rt rf f in
+    let f = TermTF.t_map rt rf f in
     match f.t_node with
       | Fquant (Fforall,fq) ->
         let vsl,trl,f2 = f_open_quant fq in
@@ -41,7 +41,7 @@ let keep_no_trigger _ = false
 
 let remove_triggers =
     let rt,rf = make_rt_rf keep_no_trigger in
-    Trans.rewrite rt rf None
+    Trans.rewriteTF rt rf None
 
 let () = Trans.register_transform "remove_triggers" remove_triggers
 
@@ -50,7 +50,7 @@ let keep_no_predicate e = e.t_ty <> None
 
 let filter_trigger_no_predicate =
     let rt,rf = make_rt_rf keep_no_predicate in
-    Trans.rewrite rt rf None
+    Trans.rewriteTF rt rf None
 
 let () = Trans.register_transform "filter_trigger_no_predicate"
   filter_trigger_no_predicate
@@ -63,7 +63,7 @@ let keep_no_fmla = function
 
 let filter_trigger =
     let rt,rf = make_rt_rf keep_no_fmla in
-    Trans.rewrite rt rf None
+    Trans.rewriteTF rt rf None
 
 let () = Trans.register_transform "filter_trigger" filter_trigger
 
@@ -77,7 +77,7 @@ let keep_no_builtin rem_ls = function
 let filter_trigger_builtin =
   Trans.on_tagged_ls Printer.meta_syntax_logic (fun rem_ls ->
     let rt,rf = make_rt_rf (keep_no_builtin rem_ls) in
-    Trans.rewrite rt rf None)
+    Trans.rewriteTF rt rf None)
 
 let () = Trans.register_transform "filter_trigger_builtin"
   filter_trigger_builtin

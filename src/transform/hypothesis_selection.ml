@@ -137,7 +137,7 @@ module NF = struct (* add memoization, one day ? *)
   let create_fmla (vars:Term.vsymbol list) : Term.fmla =
     let pred = create_psymbol (id_fresh "temoin")
       (List.map (fun var -> var.vs_ty) vars) in
-    f_app pred (List.map t_var vars)
+    ps_app pred (List.map t_var vars)
 
 
   (** transforms a formulae into its Normal Form as a list of clauses.
@@ -275,7 +275,7 @@ module GraphConstant = struct
 	  (fun gc term_vertex -> GC.add_edge gc pred_vertex term_vertex)
 	  gc sub_vertices in
 	(gc, pred_vertex :: vertices)
-    | _ -> t_fold (analyse_term fTbl tTbl) (analyse_fmla fTbl tTbl)
+    | _ -> TermTF.t_fold (analyse_term fTbl tTbl) (analyse_fmla fTbl tTbl)
 	(gc,vertices) fmla
 
   (** explore terms. mutually recursive with the previous function *)
@@ -294,7 +294,7 @@ module GraphConstant = struct
 	  (fun gc term_vertex -> GC.add_edge gc func_vertex term_vertex)
 	  gc sub_vertices in
 	(gc, func_vertex :: vertices)
-    | _ -> t_fold (analyse_term fTbl tTbl) (analyse_fmla fTbl tTbl)
+    | _ -> TermTF.t_fold (analyse_term fTbl tTbl) (analyse_fmla fTbl tTbl)
 	(gc,vertices) term
 
 (** analyse a single clause by folding analyse_fmla_base over it *)
@@ -330,7 +330,7 @@ module GraphPredicate = struct
   let extract_symbol fmla =
     let rec search = function
       | { f_node = Tapp(p,_) } -> raise (Exit p)
-      | f -> t_map (fun t->t) search f in
+      | f -> TermTF.t_map (fun t->t) search f in
     try ignore (search fmla);
       Format.eprintf "invalid formula : ";
       Pretty.print_fmla Format.err_formatter fmla; assert false
@@ -401,7 +401,7 @@ module Select = struct
     let id acc _ = acc in
     let rec explore acc fmla = match fmla.t_node with
       | Tapp (pred,_) -> pred::acc
-      | _ -> t_fold id explore acc fmla
+      | _ -> TermTF.t_fold id explore acc fmla
     in explore [] fmla
 
   (** gets all predicate symbols from a clause *)
@@ -418,14 +418,14 @@ module Select = struct
       | Tapp (_,terms) ->
 	  let acc = List.fold_left (gather_sub_term fTbl tTbl) acc terms in
 	  GraphConstant.findF fTbl fmla :: acc
-      | _ -> t_fold (gather_sub_term fTbl tTbl)
+      | _ -> TermTF.t_fold (gather_sub_term fTbl tTbl)
 	  (gather_sub_fmla fTbl tTbl) acc fmla
     and gather_sub_term fTbl tTbl acc term = match term.t_node with
       | Tapp (_,terms) ->
 	  let acc = List.fold_left (gather_sub_term fTbl tTbl) acc terms in
 	  GraphConstant.findT tTbl term :: acc
       | Tconst _ | Tvar _ -> GraphConstant.findT tTbl term :: acc
-      | _ -> t_fold (gather_sub_term fTbl tTbl)
+      | _ -> TermTF.t_fold (gather_sub_term fTbl tTbl)
 	  (gather_sub_fmla fTbl tTbl) acc term in
     gather_sub_fmla fTbl tTbl [] fmla
 

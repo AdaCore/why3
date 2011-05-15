@@ -28,8 +28,8 @@
 open Term
 
 type lambda_match =
-  | Flam of vsymbol list * trigger list * fmla
-  | Tlam of vsymbol list * trigger list * term
+  | Flam of vsymbol list * trigger * fmla
+  | Tlam of vsymbol list * trigger * term
   | LNone
 
 

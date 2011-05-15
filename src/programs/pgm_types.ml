@@ -511,14 +511,14 @@ end = struct
     fprintf fmt "@[{ %a }@]" print_vs pv.pv_effect
 
   let print_pre fmt f =
-    fprintf fmt "@[{ %a }@]" Pretty.print_fmla f
+    fprintf fmt "@[{ %a }@]" Pretty.print_term f
 
   let print_post fmt ((v, q), el) =
     let print_exn_post fmt (l, (v, q)) =
       fprintf fmt "@[<hov 2>| %a %a->@ {%a}@]" 
-	print_ls l (print_option print_vs) v print_fmla q
+	print_ls l (print_option print_vs) v print_term q
     in
-    fprintf fmt "@[{%a | %a}@ %a@]" print_vsty v print_fmla q 
+    fprintf fmt "@[{%a | %a}@ %a@]" print_vsty v print_term q 
       (print_list space print_exn_post) el
       
   let rec print_type_v fmt = function
@@ -529,7 +529,7 @@ end = struct
 	  (print_list arrow print_binder) bl print_type_c c
 	  
   and print_type_c fmt c =
-    fprintf fmt "@[{%a}@ %a%a@ %a@]" print_fmla c.c_pre
+    fprintf fmt "@[{%a}@ %a%a@ %a@]" print_term c.c_pre
       print_type_v c.c_result_type E.print c.c_effect
       print_post c.c_post
       

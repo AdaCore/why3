@@ -68,7 +68,8 @@ val goal_l : (prsymbol -> fmla -> decl list list) -> task tlist
 val tgoal   : (prsymbol -> fmla -> tdecl list     ) -> task trans
 val tgoal_l : (prsymbol -> fmla -> tdecl list list) -> task tlist
 
-val rewrite : (term -> term) -> (fmla -> fmla) -> task -> task trans
+val rewrite : (term -> term) -> task -> task trans
+val rewriteTF : (term -> term) -> (fmla -> fmla) -> task -> task trans
 
 val add_decls  : decl list -> task trans
 val add_tdecls : tdecl list -> task trans

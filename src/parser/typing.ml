@@ -285,7 +285,7 @@ let is_projection uc ls =
       | Some def -> def
       | None -> (* no definition *) raise Exit
     in
-    let v, t = match Decl.open_fs_defn def with
+    let v, t = match Decl.open_ls_defn def with
       | [v], t -> v, t
       | _ -> assert false
     in
@@ -791,7 +791,7 @@ let add_projection cl p (fs,tyarg,tyval) th =
   in
   let vs = create_vsymbol (id_fresh "u") tyarg in
   let t = t_case (t_var vs) (List.map per_cs cl) in
-  let d = make_fs_defn fs [vs] t in
+  let d = make_ls_defn fs [vs] t in
   add_logic_decl th [d]
 
 let add_projections th d = match d.td_def with
@@ -997,7 +997,7 @@ let add_logics dl th =
                 | _ -> assert false
               in
 	      let env = env_of_vsymbol_list vl in
-              make_ps_defn ps vl (fmla env f)
+              make_ls_defn ps vl (fmla env f)
         end
     | Some ty -> (* function *)
 	let fs = Hashtbl.find fsymbols id in
@@ -1013,7 +1013,7 @@ let add_logics dl th =
                 | _ -> assert false
               in
 	      let env = env_of_vsymbol_list vl in
-	      make_fs_defn fs vl (term env t)
+	      make_ls_defn fs vl (term env t)
         end
   in
   add_logic_decls th (List.map type_decl dl)

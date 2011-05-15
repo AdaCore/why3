@@ -136,7 +136,7 @@ let unambig_fs fs =
     | Tyvar u when not (lookup u) -> false
     | _ -> ty_all inspect ty
   in
-  inspect (of_option fs.ls_value)
+  option_apply true inspect fs.ls_value
 
 (** Patterns, terms, and formulas *)
 
@@ -190,7 +190,6 @@ let print_ident_labels fmt id =
   else ()
 
 let rec print_term fmt t = print_lterm 0 fmt t
-and     print_fmla fmt f = print_lfmla 0 fmt f
 
 and print_lterm pri fmt t = match t.t_label with
   | _ when Debug.nottest_flag debug_print_labels
@@ -198,13 +197,6 @@ and print_lterm pri fmt t = match t.t_label with
   | [] -> print_tnode pri fmt t
   | ll -> fprintf fmt (protect_on (pri > 0) "%a %a")
       (print_list space print_label) ll (print_tnode 0) t
-
-and print_lfmla pri fmt f = match f.t_label with
-  | _ when Debug.nottest_flag debug_print_labels
-       -> print_fnode pri fmt f
-  | [] -> print_fnode pri fmt f
-  | ll -> fprintf fmt (protect_on (pri > 0) "%a %a")
-      (print_list space print_label) ll (print_fnode 0) f
 
 and print_app pri ls fmt tl = match extract_op ls, tl with
   | _, [] ->
@@ -236,7 +228,7 @@ and print_tnode pri fmt t = match t.t_node with
         (print_app 5 fs) tl print_ty (t_type t)
   | Tif (f,t1,t2) ->
       fprintf fmt (protect_on (pri > 0) "if @[%a@] then %a@ else %a")
-        print_fmla f print_term t1 print_term t2
+        print_term f print_term t1 print_term t2
   | Tlet (t1,tb) ->
       let v,t2 = t_open_bound tb in
       fprintf fmt (protect_on (pri > 0) "let %a = @[%a@] in@ %a")
@@ -248,17 +240,12 @@ and print_tnode pri fmt t = match t.t_node with
   | Teps fb ->
       let v,f = t_open_bound fb in
       fprintf fmt (protect_on (pri > 0) "epsilon %a.@ %a")
-        print_vsty v print_fmla f;
+        print_vsty v print_term f;
       forget_var v
-  | Fquant _ | Fbinop _ | Fnot _ | Ftrue | Ffalse -> raise (TermExpected t)
-
-and print_fnode pri fmt f = match f.t_node with
-  | Tapp (ps,tl) ->
-      print_app pri ps fmt tl
   | Fquant (q,fq) ->
       let vl,tl,f = f_open_quant fq in
       fprintf fmt (protect_on (pri > 0) "%a %a%a.@ %a") print_quant q
-        (print_list comma print_vsty) vl print_tl tl print_fmla f;
+        (print_list comma print_vsty) vl print_tl tl print_term f;
       List.iter forget_var vl
   | Ftrue ->
       fprintf fmt "true"
@@ -267,37 +254,18 @@ and print_fnode pri fmt f = match f.t_node with
   | Fbinop (b,f1,f2) ->
       let p = prio_binop b in
       fprintf fmt (protect_on (pri > p) "%a %a@ %a")
-        (print_lfmla (p + 1)) f1 print_binop b (print_lfmla p) f2
+        (print_lterm (p + 1)) f1 print_binop b (print_lterm p) f2
   | Fnot f ->
-      fprintf fmt (protect_on (pri > 4) "not %a") (print_lfmla 4) f
-  | Tif (f1,f2,f3) ->
-      fprintf fmt (protect_on (pri > 0) "if @[%a@] then %a@ else %a")
-        print_fmla f1 print_fmla f2 print_fmla f3
-  | Tlet (t,f) ->
-      let v,f = t_open_bound f in
-      fprintf fmt (protect_on (pri > 0) "let %a = @[%a@] in@ %a")
-        print_vs v (print_lterm 4) t print_fmla f;
-      forget_var v
-  | Tcase (t,bl) ->
-      fprintf fmt "match @[%a@] with@\n@[<hov>%a@]@\nend"
-        print_term t (print_list newline print_fbranch) bl
-  | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
+      fprintf fmt (protect_on (pri > 4) "not %a") (print_lterm 4) f
 
 and print_tbranch fmt br =
   let p,t = t_open_branch br in
   fprintf fmt "@[<hov 4>| %a ->@ %a@]" print_pat p print_term t;
   Svs.iter forget_var p.pat_vars
 
-and print_fbranch fmt br =
-  let p,f = t_open_branch br in
-  fprintf fmt "@[<hov 4>| %a ->@ %a@]" print_pat p print_fmla f;
-  Svs.iter forget_var p.pat_vars
-
 and print_tl fmt tl =
   if tl = [] then () else fprintf fmt "@ [%a]"
-    (print_list alt (print_list comma print_expr)) tl
-
-and print_expr fmt = e_map (print_term fmt) (print_fmla fmt)
+    (print_list alt (print_list comma print_term)) tl
 
 (** Declarations *)
 
@@ -340,7 +308,7 @@ let print_logic_decl fst fmt (ls,ld) = match ld with
       fprintf fmt "@[<hov 2>%s %a%a%a =@ %a@]"
         (if fst then "logic" else "with") print_ls ls
         (print_list nothing print_vs_arg) vl
-        (print_option print_ls_type) ls.ls_value print_expr e;
+        (print_option print_ls_type) ls.ls_value print_term e;
       List.iter forget_var vl
   | None ->
       fprintf fmt "@[<hov 2>%s %a%a%a@]"
@@ -352,7 +320,7 @@ let print_logic_decl fst fmt d = print_logic_decl fst fmt d; forget_tvs ()
 
 let print_ind fmt (pr,f) =
   fprintf fmt "@[<hov 4>| %a%a : %a@]"
-    print_pr pr print_ident_labels pr.pr_name print_fmla f
+    print_pr pr print_ident_labels pr.pr_name print_term f
 
 let print_ind_decl fst fmt (ps,bl) =
   fprintf fmt "@[<hov 2>%s %a%a =@ @[<hov>%a@]@]"
@@ -371,7 +339,7 @@ let print_pkind fmt k = pp_print_string fmt (sprint_pkind k)
 
 let print_prop_decl fmt (k,pr,f) =
   fprintf fmt "@[<hov 2>%a %a%a : %a@]" print_pkind k
-    print_pr pr print_ident_labels pr.pr_name print_fmla f;
+    print_pr pr print_ident_labels pr.pr_name print_term f;
   forget_tvs ()
 
 let print_list_next sep print fmt = function
@@ -513,7 +481,7 @@ let () = Exn_printer.register
   | Term.PredicateSymbolExpected ls ->
       fprintf fmt "Not a predicate symbol: %a" print_ls ls
   | Term.TermExpected t ->
-      fprintf fmt "Not a term: %a" print_fmla t
+      fprintf fmt "Not a term: %a" print_term t
   | Term.FmlaExpected t ->
       fprintf fmt "Not a formula: %a" print_term t
   | Term.NoMatch ->
@@ -563,9 +531,9 @@ let () = Exn_printer.register
         id.id_string
   | Decl.NoTerminationProof ls ->
       fprintf fmt "Cannot prove the termination of %a" print_ls ls
-  | Decl.NonExhaustiveExpr (pl, e) ->
+  | Decl.NonExhaustiveCase (pl, e) ->
       fprintf fmt "Pattern @[%a@] is not covered in expression:@\n  @[%a@]"
-        (print_list comma print_pat) pl print_expr e
+        (print_list comma print_pat) pl print_term e
   | _ -> raise exn
   end
 

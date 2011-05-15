@@ -44,7 +44,7 @@ let add_proj tenv ts =
 let proj tenv t ty = match ty.ty_node with
   | Tyapp (ts,_) when Sts.mem ts tenv.enum ->
       let fs = Hts.find tenv.projs ts in
-      e_app fs [t] t.t_ty
+      t_app fs [t] t.t_ty
   | _ when ty_s_any (fun ts -> Sts.mem ts tenv.enum) (t_type t) ->
       Printer.unsupportedType ty "complexe finite type"
   | _ -> t
@@ -61,18 +61,18 @@ let proj tenv t = match t.t_node with
 let rec rewrite_term tenv t = match t.t_node with
   | Tapp (fs,tl) ->
       let pin t = proj tenv (rewrite_term tenv t) in
-      e_app fs (List.map pin tl) t.t_ty
+      t_app fs (List.map pin tl) t.t_ty
   | Tcase _ ->
       Printer.unsupportedTerm t "use eliminate_algebraic"
-  | _ -> t_map (rewrite_term tenv) (rewrite_fmla tenv) t
+  | _ -> TermTF.t_map (rewrite_term tenv) (rewrite_fmla tenv) t
 
 and rewrite_fmla tenv f = match f.t_node with
   | Tapp (ps,tl) ->
       let pin t = proj tenv (rewrite_term tenv t) in
-      f_app ps (List.map pin tl)
+      ps_app ps (List.map pin tl)
   | Tcase _ ->
       Printer.unsupportedFmla f "use eliminate_algebraic"
-  | _ -> t_map (rewrite_term tenv) (rewrite_fmla tenv) f
+  | _ -> TermTF.t_map (rewrite_term tenv) (rewrite_fmla tenv) f
 
 let decl tenv d = match d.d_node with
   | Dtype tl ->
@@ -88,7 +88,7 @@ let decl tenv d = match d.d_node with
       in
       List.rev (List.fold_left add [] tl)
   | _ ->
-      [decl_map (rewrite_term tenv) (rewrite_fmla tenv) d]
+      [DeclTF.decl_map (rewrite_term tenv) (rewrite_fmla tenv) d]
 
 let encoding_enumeration =
   let projs = Hts.create 17 in

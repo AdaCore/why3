@@ -107,28 +107,28 @@ let add_binders = List.fold_right add_binder
 
 (* replace old(t) with at(t,lab) everywhere in formula f *)
 let rec old_label env lab f =
-  t_map (old_label_term env lab) (old_label env lab) f
+  TermTF.t_map (old_label_term env lab) (old_label env lab) f
 
 and old_label_term env lab t = match t.t_node with
   | Tapp (ls, [t]) when ls_equal ls (find_ls ~pure:true env "old") ->
       let t = old_label_term env lab t in (* NECESSARY? *)
-      e_app (find_ls ~pure:true env "at") [t; t_var lab] t.t_ty
+      t_app (find_ls ~pure:true env "at") [t; t_var lab] t.t_ty
   | _ ->
-      t_map (old_label_term env lab) (old_label env lab) t
+      TermTF.t_map (old_label_term env lab) (old_label env lab) t
 
 (* replace at(t,lab) with t everywhere in formula f *)
 let rec erase_label env lab f =
-  t_map (erase_label_term env lab) (erase_label env lab) f
+  TermTF.t_map (erase_label_term env lab) (erase_label env lab) f
 
 and erase_label_term env lab t = match t.t_node with
   | Tapp (ls, [t; {t_node = Tvar l}])
     when ls_equal ls (find_ls ~pure:true env "at") && vs_equal l lab ->
       erase_label_term env lab t
   | _ ->
-      t_map (erase_label_term env lab) (erase_label env lab) t
+      TermTF.t_map (erase_label_term env lab) (erase_label env lab) t
 
 let rec unref env s f =
-  t_map (unref_term env s) (unref env s) f
+  TermTF.t_map (unref_term env s) (unref env s) f
 
 and unref_term env s t = match t.t_node with
 (***
@@ -145,7 +145,7 @@ and unref_term env s t = match t.t_node with
       (* do not recurse in at(...) *)
       t
   | _ ->
-      t_map (unref_term env s) (unref env s) t
+      TermTF.t_map (unref_term env s) (unref env s) t
 
 let has_singleton_type pv = is_singleton_ty pv.pv_effect.vs_ty
 
@@ -309,7 +309,7 @@ let default_exns_post ef =
   List.map default_exn_post xs
 
 let term_at env lab t =
-  e_app (find_ls ~pure:true env "at") [t; t_var lab] t.t_ty
+  t_app (find_ls ~pure:true env "at") [t; t_var lab] t.t_ty
 
 let wp_expl l f =
   t_label ?loc:f.t_loc (("expl:"^l)::Split_goal.stop_split::f.t_label) f
@@ -321,11 +321,11 @@ let while_post_block env inv var lab e =
     | Some (phi, None) ->
 	let old_phi = term_at env lab phi in
 	(* 0 <= old_phi and phi < old_phi *)
-	wp_and (f_app (find_ls ~pure:true env "infix <=") 
+	wp_and (ps_app (find_ls ~pure:true env "infix <=") 
 		  [t_int_const "0"; old_phi])
-	       (f_app (find_ls ~pure:true env "infix <")  [phi; old_phi])
+	       (ps_app (find_ls ~pure:true env "infix <")  [phi; old_phi])
     | Some (phi, Some r) ->
-	f_app r [phi; term_at env lab phi]
+	ps_app r [phi; term_at env lab phi]
   in
   let decphi = wp_expl "loop variant decreases" decphi in
   let ql = default_exns_post e.expr_effect in
@@ -347,7 +347,7 @@ let wp_label ?loc f =
   else t_label ?loc ("WP"::f.t_label) f
 
 let t_True env =
-  t_app (find_ls ~pure:true env "True") [] 
+  fs_app (find_ls ~pure:true env "True") [] 
     (ty_app (find_ts ~pure:true env "bool") [])
 
 (*
@@ -368,8 +368,8 @@ let rec wp_expr env rm e q =
   let f = wp_label ~loc:e.expr_loc f in
   if Debug.test_flag debug then begin
     eprintf "@[--------@\n@[<hov 2>e = %a@]@\n" Pgm_pretty.print_expr e;
-    eprintf "@[<hov 2>q = %a@]@\n" Pretty.print_fmla (snd (fst q));
-    eprintf "@[<hov 2>f = %a@]@\n----@]@\n" Pretty.print_fmla f;
+    eprintf "@[<hov 2>q = %a@]@\n" Pretty.print_term (snd (fst q));
+    eprintf "@[<hov 2>f = %a@]@\n----@]@\n" Pretty.print_term f;
   end;
   f
 
@@ -490,12 +490,12 @@ and wp_desc env rm e q = match e.expr_desc with
 	    find_ls ~pure:true env "infix <", 
 	    find_ls ~pure:true env "infix >=", t_int_const "-1"
       in
-      let v1_gt_v2 = f_app gt [t_var v1.pv_pure; t_var v2.pv_pure] in
-      let v1_le_v2 = f_app le [t_var v1.pv_pure; t_var v2.pv_pure] in
+      let v1_gt_v2 = ps_app gt [t_var v1.pv_pure; t_var v2.pv_pure] in
+      let v1_le_v2 = ps_app le [t_var v1.pv_pure; t_var v2.pv_pure] in
       let inv = match inv with Some inv -> inv | None -> f_true in
       let add = find_ls~pure:true env "infix +" in
       let wp1 =
-	let xp1 = t_app add [t_var x.pv_pure; incr] ty_int in
+	let xp1 = fs_app add [t_var x.pv_pure; incr] ty_int in
 	let post = t_subst (subst1 x.pv_pure xp1) inv in
 	let q1 = saturate_post e1.expr_effect (res, post) q in
 	wp_expr env rm e1 q1
@@ -508,10 +508,10 @@ and wp_desc env rm e q = match e.expr_desc with
 	      (wp_expl "for loop preservation"
 		(wp_forall x.pv_pure
 	         (wp_implies 
-		    (wp_and (f_app le [t_var v1.pv_pure; t_var x.pv_pure])
-		            (f_app le [t_var x.pv_pure;  t_var v2.pv_pure]))
+		    (wp_and (ps_app le [t_var v1.pv_pure; t_var x.pv_pure])
+		            (ps_app le [t_var x.pv_pure;  t_var v2.pv_pure]))
                  (wp_implies inv wp1))))
-	      (let sv2 = t_app add [t_var v2.pv_pure; incr] ty_int in
+	      (let sv2 = fs_app add [t_var v2.pv_pure; incr] ty_int in
 	       wp_implies (t_subst (subst1 x.pv_pure sv2) inv) q1)))
       in
       wp_and ~sym:true (wp_implies v1_gt_v2 q1) (wp_implies v1_le_v2 f)
@@ -579,7 +579,7 @@ and f_btop env f = match f.t_node with
   | Tapp (ls, [{t_ty = Some {ty_node = Tyapp (ts, [])}} as l; r])
   when ls_equal ls ps_equ && ts_equal ts (find_ts ~pure:true env "bool") ->
       t_label_copy f (f_iff_simp (t_btop env l) (t_btop env r))
-  | _ -> t_map (fun t -> t) (f_btop env) f
+  | _ -> TermTF.t_map (fun t -> t) (f_btop env) f
 
 let add_wp_decl ps f uc =
   let name = ps.ps_impure.ls_name in
@@ -597,13 +597,13 @@ let decl uc = function
       Debug.dprintf debug "@[--effect %s-----@\n  %a@]@\n----------------@."
 	  ps.ps_impure.ls_name.id_string print_type_v e.expr_type_v;
       let f = wp uc e in
-      Debug.dprintf debug "wp = %a@\n----------------@." Pretty.print_fmla f;
+      Debug.dprintf debug "wp = %a@\n----------------@." Pretty.print_term f;
       add_wp_decl ps f uc
   | Pgm_ttree.Dletrec dl ->
       let add_one uc (ps, def) =
 	let f = wp_recfun uc Mreg.empty def in
 	Debug.dprintf debug "wp %s = %a@\n----------------@."
-	   ps.ps_impure.ls_name.id_string Pretty.print_fmla f;
+	   ps.ps_impure.ls_name.id_string Pretty.print_term f;
 	add_wp_decl ps f uc
       in
       List.fold_left add_one uc dl

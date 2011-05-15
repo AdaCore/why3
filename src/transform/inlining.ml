@@ -28,7 +28,7 @@ open Task
 let t_unfold env fs tl ty =
   match Mls.find_option fs env with
   | None ->
-      e_app fs tl ty
+      t_app fs tl ty
   | Some (vl,e) ->
       let add (mt,mv) x y = ty_match mt x.vs_ty (t_type y), Mvs.add x y mv in
       let (mt,mv) = List.fold_left2 add (Ty.Mtv.empty, Mvs.empty) vl tl in
@@ -38,7 +38,7 @@ let t_unfold env fs tl ty =
 let f_unfold env ps tl =
   match Mls.find_option ps env with
   | None ->
-      f_app ps tl
+      ps_app ps tl
   | Some (vs,e) ->
       let add (mt,mv) x y = ty_match mt x.vs_ty (t_type y), Mvs.add x y mv in
       let (mt,mv) = List.fold_left2 add (Ty.Mtv.empty, Mvs.empty) vs tl in
@@ -47,13 +47,13 @@ let f_unfold env ps tl =
 (* inline every symbol *)
 
 let rec t_replace_all env t =
-  let t = t_map (t_replace_all env) (f_replace_all env) t in
+  let t = TermTF.t_map (t_replace_all env) (f_replace_all env) t in
   match t.t_node with
   | Tapp (fs,tl) -> t_label_copy t (t_unfold env fs tl t.t_ty)
   | _ -> t
 
 and f_replace_all env f =
-  let f = t_map (t_replace_all env) (f_replace_all env) f in
+  let f = TermTF.t_map (t_replace_all env) (f_replace_all env) f in
   match f.t_node with
   | Tapp (ps,tl) -> t_label_copy f (f_unfold env ps tl)
   | _ -> f
@@ -70,18 +70,18 @@ let rec f_replace_top env f = match f.t_node with
   | Tapp (ps,tl) ->
       t_label_copy f (f_unfold env ps tl)
   | _ ->
-      t_map (fun t -> t) (f_replace_top env) f
+      TermTF.t_map (fun t -> t) (f_replace_top env) f
 
 (* treat a declaration *)
 
 let fold in_goal notdeft notdeff notls d (env, task) =
   let d = match d.d_node with
     | Dprop (Pgoal,_,_) when in_goal ->
-        decl_map (fun t -> t) (f_replace_top env) d
+        DeclTF.decl_map (fun t -> t) (f_replace_top env) d
     | _ when in_goal ->
         d
     | _ ->
-        decl_map (t_replace_all env) (f_replace_all env) d
+        DeclTF.decl_map (t_replace_all env) (f_replace_all env) d
   in
   match d.d_node with
     | Dlogic [ls,Some ld] when not (notls ls) ->
