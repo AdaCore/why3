@@ -172,8 +172,8 @@ let has_singleton_type pv = is_singleton_ty pv.pv_effect.vs_ty
 
 *)
 let quantify ?(all=false) env rm ef f =
-(*   eprintf "@[<hov 2>quantify: all=%b ef=%a f=@[%a@]@]@."  *)
-(*     all E.print ef Pretty.print_fmla f; *)
+  eprintf "@[<hov 2>quantify: all=%b ef=%a f=@[%a@]@]@."
+    all E.print ef Pretty.print_fmla f;
   let sreg = ef.E.writes in
   let sreg =
     if all then 
@@ -204,8 +204,10 @@ let quantify ?(all=false) env rm ef f =
 	let v = create_vsymbol (id_clone pv.pv_name) (purify r.R.r_ty) in
 	let mreg = Mreg.add r v mreg in
 	mreg, Mvs.add pv.pv_pure v s, vv'
-      end else
+      end else begin
+	eprintf "pv = %a@." print_pvsymbol pv;
 	assert false (*TODO*) 
+      end
     in
     Spv.fold add vars (mreg, Mvs.empty, Mpv.empty)
   in
@@ -543,7 +545,7 @@ and wp_triple env rm bl (p, e, q) =
   in
   let f = wp_expr env rm e q in
   let f = wp_implies p f in
-  let f = quantify ~all:true env rm e.expr_effect f in
+  let f = quantify (* ~all:true *) env rm e.expr_effect f in
   wp_binders bl f
 
 and wp_recfun env rm (_, bl, _var, t) =

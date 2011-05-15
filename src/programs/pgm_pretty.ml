@@ -41,8 +41,8 @@ let rec print_expr fmt e = match e.expr_desc with
       fprintf fmt "<todo: Elabel>"
   | Eassert (_, f) ->
       fprintf fmt "@[assert {%a}@]" print_fmla f
-  | Efor (_, _, _, _, _, _) ->
-      fprintf fmt "<todo: Efor>"
+  | Efor (_, _, _, _, _, e) ->
+      fprintf fmt "@[<hov 2>for ... do@ %a@ done@]" print_expr e
   | Etry (_, _) ->
       fprintf fmt "<todo: Etry>"
   | Eraise (_, _)  ->

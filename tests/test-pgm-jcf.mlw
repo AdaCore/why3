@@ -1,9 +1,15 @@
 
-module Alg
+module M
 
-  type t = A
+use import int.Int
+use import module stdlib.Ref
 
-  let foo () = match A with A -> () end
+let test1 () =
+  let x = ref 0 in
+  while True do
+    invariant { 0 <= x }
+    x := !x + 1
+  done
 
 end
 

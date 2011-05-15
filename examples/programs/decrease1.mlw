@@ -1,0 +1,42 @@
+
+(*
+  We look for the first occurrence of zero in an array of integers.
+  The values have the following property: they never decrease by more than one.
+  The code makes use of that property to speed up the search.
+*)
+
+module Decrease1
+
+  use import int.Int
+  use import module stdlib.Ref
+  use import module stdlib.Array
+
+  logic decrease1 (a: array int) =
+    forall i: int. 0 <= i < length a - 1 -> a[i+1] >= a[i] - 1    
+
+  lemma decrease1_induction:
+    forall a: array int. decrease1 a ->
+    forall i j: int. 0 <= i <= j < length a -> a[j] >= a[i] + i - j
+
+  exception Found int
+
+  let search (a: array int) =
+    { decrease1 a }
+    let i = ref 0 in
+    while !i < length a do
+      invariant { 0 <= i and forall j: int. 0 <= j < i -> a[j] <> 0 }
+      variant   { length a - i }
+      if get a !i = 0 then raise (Found !i);
+      if get a !i > 0 then i := !i + get a !i else i := !i + 1
+    done
+    { forall j: int. 0 <= j < length a -> a[j] <> 0 } 
+    | Found -> { 0 <= result < length a and a[result] = 0 and 
+                 forall j: int. 0 <= j < result -> a[j] <> 1 }
+
+end
+
+(*
+Local Variables: 
+compile-command: "unset LANG; make -C ../.. examples/programs/decrease1.gui"
+End: 
+*)
