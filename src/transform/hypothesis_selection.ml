@@ -46,19 +46,10 @@ module GP = Graph.Persistent.Digraph.ConcreteLabeled(
 
 (** a way to compare/hash expressions *)
 module ExprNode = struct
-    type t = Term.expr
-
-    let compare x y = match x,y with
-      | Term t1, Term t2 -> compare (t_hash t1) (t_hash t2)
-      | Fmla f1, Fmla f2 -> compare (t_hash f1) (t_hash f2)
-      | Term _, Fmla _ -> -1
-      | Fmla _, Term _ -> 1
-
-    let hash x = match x with
-      | Term t -> 2 * (t_hash t)
-      | Fmla f -> 2 * (t_hash f) + 1
-
-    let equal x y = compare x y == 0
+    type t = Term.term
+    let compare x y = compare (t_hash x) (t_hash y)
+    let hash = t_hash
+    let equal = t_equal
 end
 module GC = Graph.Persistent.Graph.Concrete(ExprNode)
 module Sls = Set.Make(GP.V)
@@ -74,9 +65,7 @@ let string_of_expr_node node =
     Buffer.contents b in
   let white_space = Str.regexp "[ ()]" in
   let translate x = Str.global_replace white_space "_" x in
-  let repr = match node with
-    | Term t -> print_in_buf Pretty.print_term t
-    | Fmla f -> print_in_buf Pretty.print_fmla f in
+  let repr = print_in_buf Pretty.print_term node in
   translate repr
 
 (* for debugging (graph printing) purposes *)
@@ -96,7 +85,7 @@ module Dot_ = Graph.Graphviz.Dot(struct
 (** some useful things *)
 module Util = struct
   let print_clause fmt = Format.fprintf fmt "@[[%a]@]"
-    (Pp.print_list Pp.comma Pretty.print_fmla)
+    (Pp.print_list Pp.comma Pretty.print_term)
   let print_clauses fmt = Format.fprintf fmt "[%a]@."
     (Pp.print_list Pp.comma print_clause)
 
@@ -130,7 +119,7 @@ module NF = struct (* add memoization, one day ? *)
   (* TODO ! *)
   (** all quantifiers in prenex form, currently just identity *)
   let prenex_fmla fmla =
-    Format.fprintf err "prenex_fmla : @[%a@]@." Pretty.print_fmla fmla;
+    Format.fprintf err "prenex_fmla : @[%a@]@." Pretty.print_term fmla;
     fmla
 
   (** creates a fresh non-quantified formula, representing a quantified formula *)
@@ -145,7 +134,7 @@ module NF = struct (* add memoization, one day ? *)
       A clause is a list of formulae, so this function returns a list
       of list of formulae. *)
   let rec transform fmlaTable fmla =
-    Format.fprintf err "transform : @[%a@]@." Pretty.print_fmla fmla;
+    Format.fprintf err "transform : @[%a@]@." Pretty.print_term fmla;
     match fmla.t_node with
     | Fquant (_,f_bound) ->
 	let var,_,f =  f_open_quant f_bound in
@@ -169,6 +158,7 @@ module NF = struct (* add memoization, one day ? *)
     | Tif (_,_,_) -> failwith "if formulae not handled"
     | Tlet (_,_) -> failwith "let formulae not handled"
     | Tcase (_,_) -> failwith "case formulae not handled"
+    | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected fmla)
 
   (** travers prefix quantifiers until it reaches a non-quantified formula,
       collecting bounded vars encountered *)
@@ -177,12 +167,12 @@ module NF = struct (* add memoization, one day ? *)
 	let var,_,f = f_open_quant f_bound in
 	traverse fmlaTable old_fmla (var@vars) f
     | _ ->
-	if Hfmla.mem fmlaTable fmla then
-	  [[Hfmla.find fmlaTable fmla]]
+	if Hterm.mem fmlaTable fmla then
+	  [[Hterm.find fmlaTable fmla]]
 	else
 	  let new_fmla = create_fmla vars in
-	  Hfmla.add fmlaTable old_fmla new_fmla;
-	  Hfmla.add fmlaTable new_fmla new_fmla;
+	  Hterm.add fmlaTable old_fmla new_fmla;
+	  Hterm.add fmlaTable new_fmla new_fmla;
 	  [[new_fmla]]
 
   (** skips prenex quantifiers *)
@@ -194,7 +184,7 @@ module NF = struct (* add memoization, one day ? *)
 
 (** logical binary operators splitting *)
   and split f = match f.t_node with
-    | Fbinop (Fimplies,{f_node = Fbinop (For, h1, h2)},f2) ->
+    | Fbinop (Fimplies,{t_node = Fbinop (For, h1, h2)},f2) ->
 	(split (f_binary Fimplies h1 f2)) @ (split (f_binary Fimplies h2 f2))
     | Fbinop (Fimplies,f1,f2) ->
 	let clauses = split f2 in
@@ -235,24 +225,22 @@ module GraphConstant = struct
 
   (** memoizing for formulae and terms, and then expressions *)
   let rec findF fTbl fmla = try
-    Hfmla.find fTbl fmla
+    Hterm.find fTbl fmla
   with Not_found ->
-    let new_v = GC.V.create (Fmla fmla) in
-    Hfmla.add fTbl fmla new_v;
+    let new_v = GC.V.create fmla in
+    Hterm.add fTbl fmla new_v;
     (* Format.eprintf "generating new vertex : %a@."
-      Pretty.print_fmla fmla; *)
+      Pretty.print_term fmla; *)
     new_v
   and findT tTbl term = try
     Hterm.find tTbl term
   with Not_found ->
-    let new_v = GC.V.create (Term term) in
+    let new_v = GC.V.create term in
     Hterm.add tTbl term new_v;
     (* Format.eprintf "generating new vertex : %a@."
-      Pretty.print_fmla fmla; *)
+      Pretty.print_term fmla; *)
     new_v
-  and find fTbl tTbl expr = match expr with
-    | Term t -> findT tTbl t
-    | Fmla f -> findF fTbl f
+  and find fTbl tTbl expr = e_map (findT tTbl) (findF fTbl) expr
 
   (** adds a symbol to the graph *)
   let add_symbol fTbl tTbl gc expr =
@@ -322,18 +310,18 @@ module GraphPredicate = struct
 
   (** test for negative formulae *)
   let is_negative = function
-    | { f_node = Fnot _ } -> true
+    | { t_node = Fnot _ } -> true
     | _ -> false
 
   (** assuming the formula looks like p(t1,t2...),
       returns the symbol p *)
   let extract_symbol fmla =
     let rec search = function
-      | { f_node = Tapp(p,_) } -> raise (Exit p)
+      | { t_node = Tapp(p,_) } -> raise (Exit p)
       | f -> TermTF.t_map (fun t->t) search f in
     try ignore (search fmla);
       Format.eprintf "invalid formula : ";
-      Pretty.print_fmla Format.err_formatter fmla; assert false
+      Pretty.print_term Format.err_formatter fmla; assert false
     with Exit p -> p
 
   let find symbTbl x = try
@@ -561,8 +549,8 @@ module Select = struct
     match decl.d_node with
       | Dtype _ | Dlogic _ | Dind _ -> [decl]
       | Dprop (Paxiom,_,fmla) -> (* filter only axioms *)
-	  Format.eprintf "filter : @[%a@]@." Pretty.print_fmla fmla;
-	  let goal_exprs = List.map (List.map (fun x -> Fmla x)) goal_clauses in
+	  Format.eprintf "filter : @[%a@]@." Pretty.print_term fmla;
+	  let goal_exprs = goal_clauses in
 	  let return_value =
 	    if is_pertinent_predicate symTbl goal_clauses gp fmla &&
 	      is_pertinent_dynamic fTbl tTbl goal_exprs gc fmla
@@ -610,8 +598,8 @@ let transformation fmlaTable fTbl tTbl symbTbl task =
 
 (** the transformation to be registered *)
 let hypothesis_selection = (* create lots of hashtables... *)
-  let fmlaTable = Hfmla.create 17 in
-  let fTbl = Hfmla.create 17 in
+  let fmlaTable = Hterm.create 17 in
+  let fTbl = Hterm.create 17 in
   let tTbl = Hterm.create 17 in
   let symbTbl = Hls.create 17 in
   Trans.store (transformation fmlaTable fTbl tTbl symbTbl)

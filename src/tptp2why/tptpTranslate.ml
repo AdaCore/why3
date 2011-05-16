@@ -194,11 +194,11 @@ module Translate = struct
 
   (** translation for terms *)
   let rec term2term = function
-  | TAtom x -> Term.t_app (EnvFunctor.find (x, [], Summary.Term)) [] t
-  | TConst x -> Term.t_app (EnvFunctor.find (x, [], Summary.Term)) [] t
+  | TAtom x -> Term.fs_app (EnvFunctor.find (x, [], Summary.Term)) [] t
+  | TConst x -> Term.fs_app (EnvFunctor.find (x, [], Summary.Term)) [] t
   | TVar x -> Term.t_var (EnvVar.find x)
   | TFunctor (f, terms) ->
-      Term.t_app
+      Term.fs_app
         (EnvFunctor.find (f, List.map (const t) terms, Summary.Term))
         (List.map term2term terms)
         t
@@ -229,7 +229,7 @@ module Translate = struct
     answer
   end
   | FPred (p, terms) ->
-    Term.f_app
+    Term.ps_app
       (EnvFunctor.find (p, List.map (const t) terms, Summary.Pred))
       (List.map term2term terms)
   | FTermBinop (op, t1, t2) ->
