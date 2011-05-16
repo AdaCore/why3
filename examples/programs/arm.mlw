@@ -3,8 +3,8 @@
 
 module M
 
-  use import module stdlib.Refint
-  use import module stdlib.Array
+  use import module ref.Refint
+  use import module array.Array
 
   parameter a : array int
 
@@ -44,7 +44,7 @@ module ARM
 
   use export int.Int
   use export map.Map
-  use export module stdlib.Ref
+  use export module ref.Ref
 
   (* memory *)
   parameter mem : ref (map int int)

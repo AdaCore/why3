@@ -4,7 +4,7 @@
 module M
 
   use import int.Int
-  use import module stdlib.Array
+  use import module array.Array
 
   logic eq_board (b1 b2 : map int) (pos : int) =
     forall q:int. 0 <= q < pos -> b1[q] = b2[q]

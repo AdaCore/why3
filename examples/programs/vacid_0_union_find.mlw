@@ -1,12 +1,8 @@
 module M
 
   use import int.Int
-  use import module stdlib.Ref
-  use array.ArrayLength as A
-
-  type array 'a = A.t int 'a
-
-  logic (#) (a : array 'a) (i : int) : 'a = A.get a i
+  use import module ref.Ref
+  use import module array.Array as A
 
   type uf = UF (link : array int)
                (dist : array int) (* distance to representative *)
@@ -15,43 +11,43 @@ module M
 
   logic inv (u : uf) =
     let UF l d s n = u in
-    (forall i:int. 0 <= i < s -> 0 <= l#i < s) and
-    (forall i:int. 0 <= i < s -> 
-       ((d#i = 0 and l#i = i) or (d#i > 0 and d#(l#i) < d#i)))
+    (forall i:int. 0 <= i < s -> 0 <= l[i] < s) and
+    (forall i:int. 0 <= i < s ->
+       ((d[i] = 0 and l[i] = i) or (d[i] > 0 and d[l[i]] < d[i])))
 
-  inductive repr (u:uf) (x:int) (r:int) = 
-  | Repr_root: forall u:uf. inv u -> 
-               forall x:int. 0 <= x < size u -> 
-               link u #x = x -> repr u x x
-  | Repr_link: forall u:uf. inv u -> 
-               forall x:int. 0 <= x < size u -> 
-               forall r:int. repr u (link u # x) r -> repr u x r
+  inductive repr (u:uf) (x:int) (r:int) =
+  | Repr_root: forall u:uf. inv u ->
+               forall x:int. 0 <= x < size u ->
+               (link u)[x] = x -> repr u x x
+  | Repr_link: forall u:uf. inv u ->
+               forall x:int. 0 <= x < size u ->
+               forall r:int. repr u (link u)[x] r -> repr u x r
 
   lemma Repr_bounds_2:
     forall u:uf, x y:int. repr u x y -> 0 <= y < size u
   lemma Repr_dist_1:
     forall u:uf, x y:int. repr u x y -> dist u # y = 0
 
-  logic same (u:uf) (x y:int) = 
+  logic same (u:uf) (x y:int) =
     forall r:int. repr u x r <-> repr u y r
 
-  logic same_reprs (u1 u2 : uf) = 
+  logic same_reprs (u1 u2 : uf) =
     forall x r:int. repr u1 x r <-> repr u2 x r
 
   axiom OneClass :
-    forall u:uf. num u = 1 -> 
+    forall u:uf. num u = 1 ->
     forall x y:int. 0 <= x < size u -> 0 <= y < size u -> same u x y
 
 let get_num_classes (u:ref uf) =
   {} num !u { result = num u }
 
 let create (n:int) =
-  { 0 <= n } 
+  { 0 <= n }
   let l = ref (A.create_const_length 0 n) in
   let i = ref 0 in
   while !i < n do
     invariant { 0 <= i <= n and
-                forall j:int. 0 <= j < i -> l#j = j } 
+                forall j:int. 0 <= j < i -> l#j = j }
     variant { n - i }
     l := A.set !l !i !i;
     i := !i + 1
@@ -67,11 +63,11 @@ let path_compression (u : ref uf) x r =
   let l = A.set l x r in
   let d = A.set d x 1 in
   u := UF l d s n
-  { inv u and size u = size (old u) and 
+  { inv u and size u = size (old u) and
     num u = num (old u) and same_reprs (old u) u }
- 
+
 let rec find (u:ref uf) (x:int) variant { dist u # x } =
-  { inv u and 0 <= x < size u } 
+  { inv u and 0 <= x < size u }
   let y = A.get (link !u) x in
   if y <> x then begin
     let r = find u y in
@@ -80,9 +76,9 @@ let rec find (u:ref uf) (x:int) variant { dist u # x } =
   end else
     x
   { inv u and
-    repr u x result and 
+    repr u x result and
     size u = size (old u) and num u = num (old u) and
-    same_reprs u (old u) } 
+    same_reprs u (old u) }
 
 (***
 
@@ -98,7 +94,7 @@ let increment u r =
   while !i < size !u do
     invariant { 0 <= !i <= size !u and
                 forall j:int. 0 <= j < size !u ->
-                !d#j = dist(!u)#j + 
+                !d#j = dist(!u)#j +
                        if repr !u j r and j < !i then 1 else 0 }
     variant { size !u - !i }
     if ghost_find u !i = r then
@@ -109,17 +105,17 @@ let increment u r =
       result#i = (dist !u)#i + if repr !u i r then 1 else 0 }
 
 let union u a b =
-  { inv !u and 
+  { inv !u and
     0 <= a < size !u and 0 <= b < size !u and not same !u a b }
   let ra = find u a in
   let rb = find u b in
   let l = link !u in
   let d = increment u ra in
   u := UF (A.set l ra rb) d (size !u) (num !u - 1)
-  { inv !u and 
+  { inv !u and
     same !u a b and
-    size !u = size (old !u) and num !u = num (old !u) - 1 and 
-    forall x y:int. 0 <= x < size !u -> 0 <= y < size !u -> 
+    size !u = size (old !u) and num !u = num (old !u) - 1 and
+    forall x y:int. 0 <= x < size !u -> 0 <= y < size !u ->
       same !u x y <->
       same (old !u) x y or
       same (old !u) x a and same (old !u) b y or
@@ -130,7 +126,7 @@ let union u a b =
 end
 
 (*
-Local Variables: 
+Local Variables:
 compile-command: "unset LANG; make -C ../.. examples/programs/vacid_0_union_find"
-End: 
+End:
 *)

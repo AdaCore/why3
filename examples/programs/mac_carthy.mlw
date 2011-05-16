@@ -17,7 +17,7 @@ module M
 
   (* non-recursive implementation using a while loop *)
 
-  use import module stdlib.Ref
+  use import module ref.Ref
 
   logic f (x: int) : int =
     if x >= 101 then x-10 else 91

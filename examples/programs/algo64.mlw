@@ -15,13 +15,13 @@ Pages: 321 - 322
 module Algo64
 
   use import int.Int
-  use import module stdlib.Ref
-  use import module stdlib.Array
-  use import module stdlib.ArrayPermut
+  use import module ref.Ref
+  use import module array.Array
+  use import module array.ArrayPermut
 
   logic sorted_sub (a: array int) (l u: int)
 (*
-  clone import module stdlib.ArraySorted with type elt = int, logic le = (<=)
+  clone import module array.ArraySorted with type elt = int, logic le = (<=)
 *)
  
   (* Algorithm 63 *)

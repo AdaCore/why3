@@ -8,8 +8,8 @@
 module Decrease1
 
   use import int.Int
-  use import module stdlib.Ref
-  use import module stdlib.Array
+  use import module ref.Ref
+  use import module array.Array
 
   logic decrease1 (a: array int) =
     forall i: int. 0 <= i < length a - 1 -> a[i+1] >= a[i] - 1    

@@ -2,8 +2,8 @@
 module Muller
 
   use import int.Int
-  use import module stdlib.Refint
-  use import module stdlib.Array
+  use import module ref.Refint
+  use import module array.Array
 
   type param = M.map int int
   logic pr (a : param) (n : int) = M.get a n <> 0

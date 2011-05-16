@@ -21,8 +21,8 @@ back  +-+-+-+-------------------+
 *)
 
   use import int.Int
-  use import module stdlib.Ref
-  use array.ArrayLength as A
+  use import module ref.Ref
+  use import module array.Array as A
 
   logic maxlen : int = 1000
 
@@ -31,31 +31,28 @@ back  +-+-+-+-------------------+
   logic c1 : elt
   logic c2 : elt
 
-  type array 'a = A.t int 'a
+  type sparse_array = {| val  : array elt;
+                         idx  : array int;
+                         back : array int;
+                 mutable card : int; |}
 
-  logic (#) (a : array 'a) (i : int) : 'a = A.get a i
+  logic length (a: sparse_array) : int = A.length a.val
 
-  type sparse_array = SA (sa_val  : array elt)
-                         (sa_idx  : array int)
-                         (sa_back : array int)
-                         (sa_sz   : int)
-                         (sa_n    : int)
-
-  logic is_elt (a : sparse_array) (i : int) =
-    let (SA val idx back _ n) = a in
-    0 <= idx#i < n and back#(idx#i) = i
+  logic is_elt (a: sparse_array) (i: int) =
+    0 <= a.idx[i] < a.card and a.back[a.idx[i]] = i
 
   logic model (a : sparse_array) (i : int) : elt =
     if is_elt a i then
-      (sa_val a)#i
+      a.val[i]
     else
       default
 
   logic invariant_ (a : sparse_array) =
-    let (SA val idx back sz n) = a in
-    0 <= n <= sz <= maxlen and
-    A.length val = sz and A.length idx = sz and A.length back = sz and
-    forall i : int. 0 <= i < n -> 0 <= back#i < sz and idx#(back#i) = i
+    0 <= a.card <= length a <= maxlen and
+    A.length a.val = A.length a.idx = A.length a.back and
+    forall i : int.
+      0 <= i < a.card ->
+      0 <= a.back[i] < length a and a.idx[a.back[i]] = i
 
   (*
     The following definitions and the axiom Dirichlet
@@ -64,9 +61,9 @@ back  +-+-+-+-------------------+
     the proof of WPs for the function [set] below.
   *)
 
-  logic permutation (n : int) (a : array int) =
-    (forall i : int. 0 <= i < n -> 0 <= a#i < n) and
-    (forall i j : int. 0 <= i < j < n -> a#i <> a#j)
+  logic permutation (n: int) (a: array int) =
+    (forall i : int. 0 <= i < n -> 0 <= a[i] < n) and
+    (forall i j : int. 0 <= i < j < n -> a[i] <> a[j])
 
   logic dirichlet (n : int) (a : array int) (i : int) : int
 
@@ -76,47 +73,42 @@ back  +-+-+-+-------------------+
         permutation n a ->
         (forall i : int. 0 <= i < n ->
             0 <= dirichlet n a i < n and
-            a # dirichlet n a i = i)
+            a[dirichlet n a i] = i)
 
   lemma Inter6 :
     forall a : sparse_array . invariant_ a ->
-        let (SA val idx back sz n) = a in
-        n = sz ->
-            permutation sz back &&
-            forall i : int. 0 <= i < sz ->
-                idx#i = dirichlet sz back i && is_elt a i
+      a.card = length a ->
+            permutation a.card a.back &&
+            forall i : int. 0 <= i < a.card ->
+                a.idx[i] = dirichlet a.card a.back i && is_elt a i
 
-(*
 parameter create :
   sz:int ->
   { 0 <= sz <= maxlen }
-  ref sparse_array
-  { sa_sz !result = sz and forall i:int. model !result i = default }
-*)
+  sparse_array
+  { invariant_ result and
+    result.card = 0 and
+    length result = sz and forall i:int. model result i = default }
 
+(*
 parameter malloc : n:int -> {} array 'a { A.length result = n }
 
 let create sz =
   { 0 <= sz <= maxlen }
-  ref (SA (malloc sz) (malloc sz) (malloc sz) sz 0)
+  Mk_sparse_array (malloc sz) (malloc sz) (malloc sz) 0
   { invariant_ result and
     sa_sz result = sz and forall i:int. model result i = default }
+*)
 
-let array_get (a : array 'a) i =
-  { 0 <= i < A.length a } A.get a i { result = A.get a i }
-
-let array_set (a : array 'a) i v =
-  { 0 <= i < A.length a } A.set a i v { result = A.set a i v }
-
-let test (a : ref sparse_array) i =
-  { 0 <= i < sa_sz a and invariant_ a }
-  let idx = sa_idx !a in
-  let back = sa_back !a in
-  let n = sa_n !a in
-  0 <= array_get idx i && array_get idx i < n &&
-  array_get back (array_get idx i) = i
+let test (a: sparse_array) i =
+  { 0 <= i < length a and invariant_ a }
+  let idx = idx a in
+  let back = back a in
+  let n = card a in
+  0 <= idx[i] && idx[i] < n && back[idx[i]] = i
   { result=True <-> is_elt a i }
 
+(***
 (*
 parameter get :
   a:ref sparse_array -> i:int ->
@@ -124,11 +116,10 @@ parameter get :
     elt reads a
     { result = model !a i }
 *)
-let get (a : ref sparse_array) i =
-  { 0 <= i < sa_sz a and invariant_ a }
-  let val = sa_val !a in
+let get (a: sparse_array) i =
+  { 0 <= i < length a and invariant_ a }
   if test a i then
-    array_get val i
+    array_get (val a) i
   else
     default
   { result = model a i }
@@ -179,6 +170,7 @@ let harness () =
   let get_a_0 = get a 0 in assert { get_a_0 = default };
   let get_b_0 = get b 0 in assert { get_b_0 = default };
   ()
+***)
 
 end
 

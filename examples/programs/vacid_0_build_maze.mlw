@@ -31,7 +31,7 @@ end
 module UnionFind_sig
 
   use import int.Int
-  use import module stdlib.Ref
+  use import module ref.Ref
 
   use export UnionFind
 
@@ -75,10 +75,8 @@ theory Graph
   type graph
 
   inductive path graph vertex vertex =
-    | Path_refl : 
-        forall g:graph, x:vertex. path g x x
-    | Path_sym  : 
-        forall g:graph, x y:vertex. path g x y -> path g y x
+    | Path_refl : forall g:graph, x:vertex. path g x x
+    | Path_sym  : forall g:graph, x y:vertex. path g x y -> path g y x
     | Path_trans:
         forall g:graph, x y z:vertex. path g x y -> path g y z -> path g x z
 
@@ -93,11 +91,10 @@ end
 module Graph_sig
 
   use import int.Int
-  use import module stdlib.Ref
+  use import module ref.Ref
 
-  clone export Graph with type vertex = int
-(*  use export Graph *)
-(*  use export Graph_int*)
+  (* clone export Graph with type vertex = int *)
+  use export Graph_int
 
   parameter graph : ref graph
 
@@ -119,7 +116,7 @@ end
 module BuildMaze
 
   use import int.Int
-  use import module stdlib.Ref
+  use import module ref.Ref
 
   use import module UnionFind_sig
   use import module Graph_sig
@@ -129,7 +126,7 @@ module BuildMaze
   lemma Ineq1 :
     forall n x y:int. 0 <= n -> 0 <= x < n -> 0 <= y < n -> 0 <= x*n+y < n*n
 
-  let add_edge_and_union u (a:int) (b:int) =
+  let add_edge_and_union (u: ref uf) (a:int) (b:int) =
     { 0 <= a < size u and 0 <= b < size u and
       not same u a b and not path graph a b and
       forall x y:int.

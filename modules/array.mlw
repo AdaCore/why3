@@ -1,29 +1,4 @@
 
-(* References *)
-
-module Ref
-
-  type ref 'a = {| mutable contents : 'a |}
-
-  parameter ref : v:'a -> {} ref 'a { result=v }
-
-  parameter (!) : r:ref 'a -> {} 'a reads r { result=r }
-
-  parameter (:=) : r:ref 'a -> v:'a -> {} unit writes r { r=v }
-
-end
-
-module Refint
-
-  use export int.Int
-  use export module Ref
-
-  parameter incr : r:ref int -> {} unit writes r { r = old r + 1 }
-
-  parameter decr : r:ref int -> {} unit writes r { r = old r - 1 }
-
-end
-
 (* Arrays *)
 
 module Array
@@ -49,9 +24,9 @@ module Array
 
   parameter length : a:array 'a -> {} int { result = a.length }
 
-  parameter make : n:int -> v:'a -> 
-    {} 
-    array 'a 
+  parameter make : n:int -> v:'a ->
+    {}
+    array 'a
     { length result = n and forall i:int. 0 <= i < n -> result[i] = v}
 
   parameter append : a1:array 'a -> a2:array 'a ->

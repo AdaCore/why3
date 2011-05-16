@@ -4,8 +4,8 @@
 module M
 
   use import int.Int
-  use import module stdlib.Ref
-  use import module stdlib.Array
+  use import module ref.Ref
+  use import module array.Array
 
   let max_sum a n =
   { n >= 0 and length a = n and forall i:int. 0 <= i < n -> a[i] >= 0 }

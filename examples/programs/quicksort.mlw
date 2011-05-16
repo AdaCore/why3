@@ -8,11 +8,11 @@
 module Quicksort
 
   use import int.Int
-  use import module stdlib.Ref
-  use import module stdlib.Array
-  use import module stdlib.ArraySorted
-  use import module stdlib.ArrayPermut
-  use import module stdlib.ArrayEq
+  use import module ref.Ref
+  use import module array.Array
+  use import module array.ArraySorted
+  use import module array.ArrayPermut
+  use import module array.ArrayEq
 
   let swap (t:array int) (i:int) (j:int) =
     { 0 <= i < length t and 0 <= j < length t }
