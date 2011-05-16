@@ -538,6 +538,7 @@ let info_window ?(callback=(fun () -> ())) mt s =
     ~message_type:mt
     ~buttons
     ~title:"Why3 info or error"
+    ~modal:true
     ~show:true ()
   in
   let (_ : GtkSignal.id) =
@@ -718,8 +719,22 @@ let exit_function () =
   let ret = Sys.command "xmllint --noout --dtdvalid share/why3session.dtd essai.xml" in
   if ret = 0 then eprintf "DTD validation succeeded, good!@.";
   *)
-  M.save_session ();
-  GMain.quit ()
+  let d = GWindow.message_dialog
+    ~message:"Do you want to save the session?"
+    ~message_type:`QUESTION
+    ~buttons:GWindow.Buttons.yes_no
+    ~title:"Why3 save"
+    ~modal:true
+    ~show:true ()
+  in
+  let (_ : GtkSignal.id) =
+    d#connect#response
+      ~callback:(function x -> d#destroy ();
+		   if x = `YES then M.save_session ();
+                   GMain.quit ()
+                )
+  in
+  ()
 
 let (_ : GtkSignal.id) = w#connect#destroy ~callback:exit_function
 
