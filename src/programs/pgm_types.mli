@@ -178,7 +178,7 @@ and E : sig
   val add_write : R.t -> t -> t
   val add_raise : T.esymbol -> t -> t
 
-  val remove_reference : R.t -> t -> t
+  val remove : Sreg.t -> t -> t
   val filter : (R.t -> bool) -> t -> t
 
   val remove_raise : T.esymbol -> t -> t

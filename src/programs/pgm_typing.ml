@@ -1516,7 +1516,7 @@ and expr_desc gl env loc ty = function
       let ef = E.union e1.expr_effect e2.expr_effect in
       if Sreg.exists (fun r -> occur_type_v r e2.expr_type_v) v.pv_regions then
 	errorm ~loc "local reference would escape its scope";
-(*       let ef = E.remove_reference r ef in *)
+      let ef = E.remove v.pv_regions ef in
       Elet (v, e1, e2), e2.expr_type_v, ef
   | IEletrec (dl, e1) ->
       let env, dl = letrec gl env dl in

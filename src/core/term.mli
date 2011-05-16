@@ -332,30 +332,30 @@ val tr_map_fold : ('a -> term -> 'a * term) -> 'a -> trigger -> 'a * trigger
 
 module TermTF : sig
 
-val t_map : (term -> term) -> (fmla -> fmla) -> term -> term
+  val t_map : (term -> term) -> (fmla -> fmla) -> term -> term
 
-val t_fold : ('a -> term -> 'a) -> ('a -> fmla -> 'a) -> 'a -> term -> 'a
+  val t_fold : ('a -> term -> 'a) -> ('a -> fmla -> 'a) -> 'a -> term -> 'a
+    
+  val t_map_fold : ('a -> term -> 'a * term) ->
+    ('a -> fmla -> 'a * fmla) -> 'a -> term -> 'a * term
+    
+  val t_all : (term -> bool) -> (fmla -> bool) -> term -> bool
+  val t_any : (term -> bool) -> (fmla -> bool) -> term -> bool
+    
+  val t_map_simp : (term -> term) -> (fmla -> fmla) -> term -> term
+    
+  val t_map_sign : (bool -> term -> term) ->
+    (bool -> fmla -> fmla) -> bool -> term -> term
+    
+  val t_map_cont : ((term -> 'a) -> term -> 'a) ->
+    ((fmla -> 'a) -> fmla -> 'a) -> (term -> 'a) -> term -> 'a
+    
+  val tr_map : (term -> term) -> (fmla -> fmla) -> trigger -> trigger
+    
+  val tr_fold : ('a -> term -> 'a) -> ('a -> fmla -> 'a) -> 'a -> trigger -> 'a
 
-val t_map_fold : ('a -> term -> 'a * term) ->
-                 ('a -> fmla -> 'a * fmla) -> 'a -> term -> 'a * term
-
-val t_all : (term -> bool) -> (fmla -> bool) -> term -> bool
-val t_any : (term -> bool) -> (fmla -> bool) -> term -> bool
-
-val t_map_simp : (term -> term) -> (fmla -> fmla) -> term -> term
-
-val t_map_sign : (bool -> term -> term) ->
-                 (bool -> fmla -> fmla) -> bool -> term -> term
-
-val t_map_cont : ((term -> 'a) -> term -> 'a) ->
-                 ((fmla -> 'a) -> fmla -> 'a) -> (term -> 'a) -> term -> 'a
-
-val tr_map : (term -> term) -> (fmla -> fmla) -> trigger -> trigger
-
-val tr_fold : ('a -> term -> 'a) -> ('a -> fmla -> 'a) -> 'a -> trigger -> 'a
-
-val tr_map_fold : ('a -> term -> 'a * term) ->
-                  ('a -> fmla -> 'a * fmla) -> 'a -> trigger -> 'a * trigger
+  val tr_map_fold : ('a -> term -> 'a * term) ->
+    ('a -> fmla -> 'a * fmla) -> 'a -> trigger -> 'a * trigger
 end
 
 (** Map/fold over free variables *)

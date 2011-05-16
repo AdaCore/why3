@@ -24,14 +24,15 @@ module Decrease1
     { decrease1 a }
     let i = ref 0 in
     while !i < length a do
-      invariant { 0 <= i and forall j: int. 0 <= j < i -> a[j] <> 0 }
+      invariant { 0 <= i and 
+                  forall j: int. 0 <= j < i -> j < length a -> a[j] <> 0 }
       variant   { length a - i }
       if get a !i = 0 then raise (Found !i);
       if get a !i > 0 then i := !i + get a !i else i := !i + 1
     done
     { forall j: int. 0 <= j < length a -> a[j] <> 0 } 
     | Found -> { 0 <= result < length a and a[result] = 0 and 
-                 forall j: int. 0 <= j < result -> a[j] <> 1 }
+                 forall j: int. 0 <= j < result -> a[j] <> 0 }
 
 end
 

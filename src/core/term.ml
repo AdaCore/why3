@@ -1398,16 +1398,16 @@ let t_map_simp fn = t_map_simp (fun t ->
 (** Traversal with separate functions for value-typed and prop-typed terms *)
 
 module TermTF = struct
-let t_map fnT fnF = t_map (e_map fnT fnF)
-let t_fold fnT fnF = t_fold (e_fold fnT fnF)
-let t_map_fold fnT fnF = t_map_fold (e_fold fnT fnF)
-let t_all prT prF = t_all (e_map prT prF)
-let t_any prT prF = t_any (e_map prT prF)
-let t_map_simp fnT fnF = t_map_simp (e_map fnT fnF)
-let t_map_sign fnT fnF = t_map_sign (e_fold fnT fnF)
-let t_map_cont fnT fnF = t_map_cont (e_fold fnT fnF)
-let tr_map fnT fnF = tr_map (e_map fnT fnF)
-let tr_fold fnT fnF = tr_fold (e_fold fnT fnF)
-let tr_map_fold fnT fnF = tr_map_fold (e_fold fnT fnF)
+  let t_map fnT fnF = t_map (e_map fnT fnF)
+  let t_fold fnT fnF = t_fold (e_fold fnT fnF)
+  let t_map_fold fnT fnF = t_map_fold (e_fold fnT fnF)
+  let t_all prT prF = t_all (e_map prT prF)
+  let t_any prT prF = t_any (e_map prT prF)
+  let t_map_simp fnT fnF = t_map_simp (e_map fnT fnF)
+  let t_map_sign fnT fnF = t_map_sign (e_fold fnT fnF)
+  let t_map_cont fnT fnF = t_map_cont (e_fold fnT fnF)
+  let tr_map fnT fnF = tr_map (e_map fnT fnF)
+  let tr_fold fnT fnF = tr_fold (e_fold fnT fnF)
+  let tr_map_fold fnT fnF = tr_map_fold (e_fold fnT fnF)
 end
 

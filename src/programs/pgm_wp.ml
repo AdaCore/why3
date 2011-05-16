@@ -172,8 +172,6 @@ let has_singleton_type pv = is_singleton_ty pv.pv_effect.vs_ty
 
 *)
 let quantify ?(all=false) env rm ef f =
-  eprintf "@[<hov 2>quantify: all=%b ef=%a f=@[%a@]@]@."
-    all E.print ef Pretty.print_term f;
   let sreg = ef.E.writes in
   let sreg =
     if all then 
@@ -192,7 +190,9 @@ let quantify ?(all=false) env rm ef f =
   in
   (* all program variables involving these regions *)
   let vars = 
-    let add r _ s = try Spv.union (Mreg.find r rm) s with Not_found -> s in
+    let add r _ s = 
+      try Spv.union (Mreg.find r rm) s with Not_found -> assert false
+    in
     Mreg.fold add mreg Spv.empty
   in
   (* s: v -> r'/v' and vars': pv -> v' *)
@@ -218,6 +218,12 @@ let quantify ?(all=false) env rm ef f =
   let f = Mpv.fold quantify_v' vv' f in
   let quantify_r _ r' f = wp_forall r' f in
   Mreg.fold quantify_r mreg f
+
+(* let quantify ?(all=false) env rm ef f = *)
+(*   let r = quantify ~all env rm ef f in *)
+(*   eprintf "@[<hov 2>quantify: all=%b ef=%a f=@[%a@] ==>@\n%a@]@." *)
+(*     all E.print ef Pretty.print_term f Pretty.print_term r; *)
+(*   r *)
 
 let abstract_wp env rm ef (q',ql') (q,ql) =
   assert (List.length ql' = List.length ql);
@@ -369,7 +375,7 @@ let rec wp_expr env rm e q =
   if Debug.test_flag debug then begin
     eprintf "@[--------@\n@[<hov 2>e = %a@]@\n" Pgm_pretty.print_expr e;
     eprintf "@[<hov 2>q = %a@]@\n" Pretty.print_term (snd (fst q));
-    eprintf "@[<hov 2>f = %a@]@\n----@]@\n" Pretty.print_term f;
+    eprintf "@[<hov 2>f = %a@]@\n----@]@." Pretty.print_term f;
   end;
   f
 
@@ -392,7 +398,10 @@ and wp_desc env rm e q = match e.expr_desc with
       let f = wp_triple env rm bl t in
       wp_and q f
   | Elet (x, e1, e2) ->
-      let w2 = wp_expr env rm e2 (filter_post e2.expr_effect q) in
+      let w2 = 
+	let rm = add_binder x rm in
+	wp_expr env rm e2 (filter_post e2.expr_effect q) 
+      in
       let v1 = v_result x.pv_pure.vs_ty in
       let t1 = t_label ~loc:e1.expr_loc ["let"] (t_var v1) in
       let q1 = v1, t_subst (subst1 x.pv_pure t1) w2 in

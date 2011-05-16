@@ -592,7 +592,7 @@ and E : sig
   val add_write : R.t -> t -> t
   val add_raise : T.esymbol -> t -> t
     
-  val remove_reference : R.t -> t -> t    
+  val remove : Sreg.t -> t -> t    
   val filter : (R.t -> bool) -> t -> t
 
   val remove_raise : T.esymbol -> t -> t
@@ -633,8 +633,8 @@ end = struct
   let add_raise e t = { t with raises = Sexn.add e t.raises }
   let add_glob  pv t = { t with globals = Spv.add pv t.globals }
     
-  let remove_reference r t =
-    { t with reads = Sreg.remove r t.reads; writes = Sreg.remove r t.writes }
+  let remove s t =
+    { t with reads = Sreg.diff t.reads s; writes = Sreg.diff t.writes s }
 
   let filter p t =
     { t with reads = Sreg.filter p t.reads; writes = Sreg.filter p t.writes }
