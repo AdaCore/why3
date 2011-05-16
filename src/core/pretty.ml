@@ -166,20 +166,20 @@ let print_vsty fmt v =
   fprintf fmt "%a:@,%a" print_vs v print_ty v.vs_ty
 
 let print_quant fmt = function
-  | Fforall -> fprintf fmt "forall"
-  | Fexists -> fprintf fmt "exists"
+  | Tforall -> fprintf fmt "forall"
+  | Texists -> fprintf fmt "exists"
 
 let print_binop fmt = function
-  | Fand -> fprintf fmt "and"
-  | For -> fprintf fmt "or"
-  | Fimplies -> fprintf fmt "->"
-  | Fiff -> fprintf fmt "<->"
+  | Tand -> fprintf fmt "and"
+  | Tor -> fprintf fmt "or"
+  | Timplies -> fprintf fmt "->"
+  | Tiff -> fprintf fmt "<->"
 
 let prio_binop = function
-  | Fand -> 3
-  | For -> 2
-  | Fimplies -> 1
-  | Fiff -> 1
+  | Tand -> 3
+  | Tor -> 2
+  | Timplies -> 1
+  | Tiff -> 1
 
 let print_label fmt l =
   if l = "" then () else fprintf fmt "\"%s\"" l
@@ -242,20 +242,20 @@ and print_tnode pri fmt t = match t.t_node with
       fprintf fmt (protect_on (pri > 0) "epsilon %a.@ %a")
         print_vsty v print_term f;
       forget_var v
-  | Fquant (q,fq) ->
-      let vl,tl,f = f_open_quant fq in
+  | Tquant (q,fq) ->
+      let vl,tl,f = t_open_quant fq in
       fprintf fmt (protect_on (pri > 0) "%a %a%a.@ %a") print_quant q
         (print_list comma print_vsty) vl print_tl tl print_term f;
       List.iter forget_var vl
-  | Ftrue ->
+  | Ttrue ->
       fprintf fmt "true"
-  | Ffalse ->
+  | Tfalse ->
       fprintf fmt "false"
-  | Fbinop (b,f1,f2) ->
+  | Tbinop (b,f1,f2) ->
       let p = prio_binop b in
       fprintf fmt (protect_on (pri > p) "%a %a@ %a")
         (print_lterm (p + 1)) f1 print_binop b (print_lterm p) f2
-  | Fnot f ->
+  | Tnot f ->
       fprintf fmt (protect_on (pri > 4) "not %a") (print_lterm 4) f
 
 and print_tbranch fmt br =

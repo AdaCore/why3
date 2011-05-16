@@ -67,7 +67,7 @@ let rec print_term info fmt t = match t.t_node with
       "tptp : you must eliminate match"
   | Teps _ -> unsupportedTerm t
       "tptp : you must eliminate epsilon"
-  | Fquant _ | Fbinop _ | Fnot _ | Ftrue | Ffalse -> raise (TermExpected t)
+  | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> raise (TermExpected t)
 
 and print_fmla info fmt f = match f.t_node with
   | Tapp ({ ls_name = id }, []) ->
@@ -77,35 +77,35 @@ and print_fmla info fmt f = match f.t_node with
       | None -> fprintf fmt "@[%a(%a)@]"
 	      print_symbol ls.ls_name (print_list comma (print_term info)) tl
       end
-  | Fquant (q, fq) ->
-      let q = match q with Fforall -> "!" | Fexists -> "?" in
-      let vl, _tl, f = f_open_quant fq in
+  | Tquant (q, fq) ->
+      let q = match q with Tforall -> "!" | Texists -> "?" in
+      let vl, _tl, f = t_open_quant fq in
       fprintf fmt "%s [%a] :@ %a" q (print_list comma print_var) vl (print_fmla info) f;
       List.iter forget_var vl
-  | Fbinop (Fand, f1, f2) ->
+  | Tbinop (Tand, f1, f2) ->
       fprintf fmt "@[(%a@ & %a)@]" (print_fmla info) f1 (print_fmla info) f2
-  | Fbinop (For, f1, f2) ->
+  | Tbinop (Tor, f1, f2) ->
       fprintf fmt "@[(%a@ | %a)@]" (print_fmla info) f1 (print_fmla info) f2
-  | Fbinop (Fimplies, f1, f2) ->
+  | Tbinop (Timplies, f1, f2) ->
       fprintf fmt "@[(%a@ => %a)@]"
         (print_fmla info) f1 (print_fmla info) f2
-  | Fbinop (Fiff, f1, f2) ->
+  | Tbinop (Tiff, f1, f2) ->
       fprintf fmt "@[(%a@ <=> %a)@]" (print_fmla info) f1 (print_fmla info) f2
-  | Fnot f ->
+  | Tnot f ->
       fprintf fmt "@[~@ (%a)@]" (print_fmla info) f
-  | Ftrue ->
+  | Ttrue ->
       fprintf fmt "$true"
-  | Ffalse ->
+  | Tfalse ->
       fprintf fmt "$false"
-  | Tif (_,_,_) -> unsupportedFmla f "Tif not supported"
+  | Tif (_,_,_) -> unsupportedTerm f "Tif not supported"
       (* fprintf fmt "@[(if_then_else %a@ %a@ %a)@]"
 	(print_fmla info) f1 (print_fmla info) f2 (print_fmla info) f3 *)
-  | Tlet (_, _) -> unsupportedFmla f "Tlet not supported"
+  | Tlet (_, _) -> unsupportedTerm f "Tlet not supported"
       (* let v, f2 = t_open_bound tb in
       fprintf fmt "@[(let (%a %a)@ %a)@]" print_var v
         (print_term info) t1 (print_fmla info) f2;
       forget_var v *)
-  | Tcase _ -> unsupportedFmla f
+  | Tcase _ -> unsupportedTerm f
       "tptp : you must eliminate match"
   | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
 

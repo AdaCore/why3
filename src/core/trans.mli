@@ -62,14 +62,14 @@ val decl_l : (decl -> decl list list) -> task -> task tlist
 val tdecl   : (decl -> tdecl list     ) -> task -> task trans
 val tdecl_l : (decl -> tdecl list list) -> task -> task tlist
 
-val goal   : (prsymbol -> fmla -> decl list     ) -> task trans
-val goal_l : (prsymbol -> fmla -> decl list list) -> task tlist
+val goal   : (prsymbol -> term -> decl list     ) -> task trans
+val goal_l : (prsymbol -> term -> decl list list) -> task tlist
 
-val tgoal   : (prsymbol -> fmla -> tdecl list     ) -> task trans
-val tgoal_l : (prsymbol -> fmla -> tdecl list list) -> task tlist
+val tgoal   : (prsymbol -> term -> tdecl list     ) -> task trans
+val tgoal_l : (prsymbol -> term -> tdecl list list) -> task tlist
 
 val rewrite : (term -> term) -> task -> task trans
-val rewriteTF : (term -> term) -> (fmla -> fmla) -> task -> task trans
+val rewriteTF : (term -> term) -> (term -> term) -> task -> task trans
 
 val add_decls  : decl list -> task trans
 val add_tdecls : tdecl list -> task trans

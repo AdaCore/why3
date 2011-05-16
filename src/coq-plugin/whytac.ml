@@ -747,7 +747,7 @@ and tr_formula dep tvm bv env f =
 	let ty = type_of env Evd.empty t in
 	if is_Set ty || is_Type ty then
 	  let _ = tr_type dep tvm env t in
-	  Term.f_equ (tr_term dep tvm bv env a) (tr_term dep tvm bv env b)
+	  Term.t_equ (tr_term dep tvm bv env a) (tr_term dep tvm bv env b)
 	else
 	  raise NotFO
     (* comparisons on integers *)
@@ -778,29 +778,29 @@ and tr_formula dep tvm bv env f =
 	Term.f_app ls [tr_term dep tvm bv env a; tr_term dep tvm bv env b]
     (* propositional logic *)
     | _, [] when c = build_coq_False () ->
-	Term.f_false
+	Term.t_false
     | _, [] when c = build_coq_True () ->
-	Term.f_true
+	Term.t_true
     | _, [a] when c = build_coq_not () ->
-	Term.f_not (tr_formula dep tvm bv env a)
+	Term.t_not (tr_formula dep tvm bv env a)
     | _, [a;b] when c = build_coq_and () ->
-	Term.f_and (tr_formula dep tvm bv env a) (tr_formula dep tvm bv env b)
+	Term.t_and (tr_formula dep tvm bv env a) (tr_formula dep tvm bv env b)
     | _, [a;b] when c = build_coq_or () ->
-	Term.f_or (tr_formula dep tvm bv env a) (tr_formula dep tvm bv env b)
+	Term.t_or (tr_formula dep tvm bv env a) (tr_formula dep tvm bv env b)
     | _, [a;b] when c = Lazy.force coq_iff ->
-	Term.f_iff (tr_formula dep tvm bv env a) (tr_formula dep tvm bv env b)
+	Term.t_iff (tr_formula dep tvm bv env a) (tr_formula dep tvm bv env b)
     | Prod (n, a, b), _ ->
 	if is_imp_term f && is_Prop (type_of env Evd.empty a) then
-	  Term.f_implies
+	  Term.t_implies
 	    (tr_formula dep tvm bv env a) (tr_formula dep tvm bv env b)
 	else
 	  let vs, _t, bv, env, b = quantifiers n a b dep tvm bv env in
-	  Term.f_forall_close [vs] [] (tr_formula dep tvm bv env b)
+	  Term.t_forall_close [vs] [] (tr_formula dep tvm bv env b)
     | _, [_; a] when c = build_coq_ex () ->
 	begin match kind_of_term a with
 	  | Lambda(n, a, b) ->
 	      let vs, _t, bv, env, b = quantifiers n a b dep tvm bv env in
-	      Term.f_exists_close [vs] [] (tr_formula dep tvm bv env b)
+	      Term.t_exists_close [vs] [] (tr_formula dep tvm bv env b)
 	  | _ ->
 	      (* unusual case of the shape (ex p) *)
 	      (* TODO: we could eta-expanse *)
@@ -856,10 +856,10 @@ let tr_goal gl =
 	    let ty = tr_type dep tvm env ty in (* DO NOT INLINE! *)
 	    let vs = Term.create_vsymbol (preid_of_id id) ty in
 	    let bv = Idmap.add id vs bv in
-	    Term.f_forall_close [vs] [] (tr_ctxt tvm bv ctxt)
+	    Term.t_forall_close [vs] [] (tr_ctxt tvm bv ctxt)
 	  else if is_Prop t then
 	    let h = tr_formula dep tvm bv env ty in (* DO NOT INLINE! *)
-	    Term.f_implies h (tr_ctxt tvm bv ctxt)
+	    Term.t_implies h (tr_ctxt tvm bv ctxt)
 	  else
 	    raise NotFO
 	with NotFO ->

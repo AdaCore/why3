@@ -99,7 +99,7 @@ let find_complex_type info fmt f =
   t_ty_fold (iter_complex_type info fmt) () f
 
 let find_complex_type_expr info fmt f =
-  e_fold
+  TermTF.t_selecti
     (t_ty_fold (iter_complex_type info fmt))
     (t_ty_fold (iter_complex_type info fmt))
     () f
@@ -163,7 +163,7 @@ let rec print_term info fmt t = match t.t_node with
       "smtv2 : you must eliminate match"
   | Teps _ -> unsupportedTerm t
       "smtv2 : you must eliminate epsilon"
-  | Fquant _ | Fbinop _ | Fnot _ | Ftrue | Ffalse -> raise (TermExpected t)
+  | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> raise (TermExpected t)
 
 and print_fmla info fmt f = match f.t_node with
   | Tapp ({ ls_name = id }, []) ->
@@ -176,9 +176,9 @@ and print_fmla info fmt f = match f.t_node with
           | _ -> fprintf fmt "(%a@ %a)"
 	      print_ident ls.ls_name (print_list space (print_term info)) tl
         end end
-  | Fquant (q, fq) ->
-      let q = match q with Fforall -> "forall" | Fexists -> "exists" in
-      let vl, tl, f = f_open_quant fq in
+  | Tquant (q, fq) ->
+      let q = match q with Tforall -> "forall" | Texists -> "exists" in
+      let vl, tl, f = t_open_quant fq in
       (* TODO trigger dépend des capacités du prover : 2 printers?
       smtwithtriggers/smtstrict *)
       if tl = [] then
@@ -193,20 +193,20 @@ and print_fmla info fmt f = match f.t_node with
           (print_fmla info) f
           (print_triggers info) tl;
       List.iter forget_var vl
-  | Fbinop (Fand, f1, f2) ->
+  | Tbinop (Tand, f1, f2) ->
       fprintf fmt "@[(and@ %a@ %a)@]" (print_fmla info) f1 (print_fmla info) f2
-  | Fbinop (For, f1, f2) ->
+  | Tbinop (Tor, f1, f2) ->
       fprintf fmt "@[(or@ %a@ %a)@]" (print_fmla info) f1 (print_fmla info) f2
-  | Fbinop (Fimplies, f1, f2) ->
+  | Tbinop (Timplies, f1, f2) ->
       fprintf fmt "@[(implies@ %a@ %a)@]"
         (print_fmla info) f1 (print_fmla info) f2
-  | Fbinop (Fiff, f1, f2) ->
+  | Tbinop (Tiff, f1, f2) ->
       fprintf fmt "@[(iff@ %a@ %a)@]" (print_fmla info) f1 (print_fmla info) f2
-  | Fnot f ->
+  | Tnot f ->
       fprintf fmt "@[(not@ %a)@]" (print_fmla info) f
-  | Ftrue ->
+  | Ttrue ->
       fprintf fmt "true"
-  | Ffalse ->
+  | Tfalse ->
       fprintf fmt "false"
   | Tif (f1, f2, f3) ->
       fprintf fmt "@[(if_then_else %a@ %a@ %a)@]"
@@ -216,11 +216,12 @@ and print_fmla info fmt f = match f.t_node with
       fprintf fmt "@[(let ((%a %a))@ %a)@]" print_var v
         (print_term info) t1 (print_fmla info) f2;
       forget_var v
-  | Tcase _ -> unsupportedFmla f
+  | Tcase _ -> unsupportedTerm f
       "smtv2 : you must eliminate match"
   | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
 
-and print_expr info fmt = e_map (print_term info fmt) (print_fmla info fmt)
+and print_expr info fmt =
+  TermTF.t_select (print_term info fmt) (print_fmla info fmt)
 
 and print_trigger info fmt e = fprintf fmt "(%a)" (print_expr info) e
 

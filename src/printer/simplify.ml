@@ -89,7 +89,7 @@ let rec print_term info fmt t = match t.t_node with
       unsupportedTerm t "simplify: you must eliminate match"
   | Teps _ ->
       unsupportedTerm t  "simplify: you must eliminate epsilon"
-  | Fquant _ | Fbinop _ | Fnot _ | Ftrue | Ffalse -> raise (TermExpected t)
+  | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> raise (TermExpected t)
 
 and print_fmla info fmt f = match f.t_node with
   | Tapp ({ ls_name = id }, []) ->
@@ -101,36 +101,37 @@ and print_fmla info fmt f = match f.t_node with
 	  fprintf fmt "(EQ (%a@ %a) |@@true|)"
 	    print_ident ls.ls_name (print_list space (print_term info)) tl
     end
-  | Fquant (q, fq) ->
-      let q = match q with Fforall -> "FORALL" | Fexists -> "EXISTS" in
-      let vl, tl, f = f_open_quant fq in
+  | Tquant (q, fq) ->
+      let q = match q with Tforall -> "FORALL" | Texists -> "EXISTS" in
+      let vl, tl, f = t_open_quant fq in
       fprintf fmt "@[(%s (%a)%a@ %a)@]" q (print_list space print_var) vl
 	(print_triggers info) tl (print_fmla info) f;
       List.iter forget_var vl
-  | Fbinop (Fand, f1, f2) ->
+  | Tbinop (Tand, f1, f2) ->
       fprintf fmt "@[(AND@ %a@ %a)@]" (print_fmla info) f1 (print_fmla info) f2
-  | Fbinop (For, f1, f2) ->
+  | Tbinop (Tor, f1, f2) ->
       fprintf fmt "@[(OR@ %a@ %a)@]" (print_fmla info) f1 (print_fmla info) f2
-  | Fbinop (Fimplies, f1, f2) ->
+  | Tbinop (Timplies, f1, f2) ->
       fprintf fmt "@[(IMPLIES@ %a@ %a)@]"
         (print_fmla info) f1 (print_fmla info) f2
-  | Fbinop (Fiff, f1, f2) ->
+  | Tbinop (Tiff, f1, f2) ->
       fprintf fmt "@[(IFF@ %a@ %a)@]" (print_fmla info) f1 (print_fmla info) f2
-  | Fnot f ->
+  | Tnot f ->
       fprintf fmt "@[(NOT@ %a)@]" (print_fmla info) f
-  | Ftrue ->
+  | Ttrue ->
       fprintf fmt "TRUE"
-  | Ffalse ->
+  | Tfalse ->
       fprintf fmt "FALSE"
   | Tif _ ->
-      unsupportedFmla f "simplify : you must eliminate if"
+      unsupportedTerm f "simplify : you must eliminate if"
   | Tlet _ ->
-      unsupportedFmla f "simplify : you must eliminate let"
+      unsupportedTerm f "simplify : you must eliminate let"
   | Tcase _ ->
-      unsupportedFmla f "simplify : you must eliminate match"
+      unsupportedTerm f "simplify : you must eliminate match"
   | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
 
-and print_expr info fmt = e_map (print_term info fmt) (print_fmla info fmt)
+and print_expr info fmt =
+  TermTF.t_select (print_term info fmt) (print_fmla info fmt)
 
 and print_trigger info fmt = function
   | [] -> ()

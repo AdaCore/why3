@@ -27,7 +27,7 @@ open Decl
 let rec elim_t func pred map t = match t.t_node with
   | Tvar vs ->
       (try Mvs.find vs map with Not_found -> t)
-  | Tlet (t1,tb) when e_map (const func) (const pred) t ->
+  | Tlet (t1,tb) when (if t.t_ty = None then pred else func) ->
       let vs,t2 = t_open_bound tb in
       let t1 = elim_t func pred map t1 in
       elim_t func pred (Mvs.add vs t1 map) t2

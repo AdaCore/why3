@@ -175,10 +175,10 @@ let print_vsty info fmt v =
   fprintf fmt "(%a)" (print_vsty_nopar info) v
 
 let print_binop fmt = function
-  | Fand -> fprintf fmt "/\\"
-  | For -> fprintf fmt "\\/"
-  | Fimplies -> fprintf fmt "->"
-  | Fiff -> fprintf fmt "<->"
+  | Tand -> fprintf fmt "/\\"
+  | Tor -> fprintf fmt "\\/"
+  | Timplies -> fprintf fmt "->"
+  | Tiff -> fprintf fmt "<->"
 
 let print_label fmt (l,_) = fprintf fmt "(*%s*)" l
 
@@ -243,17 +243,17 @@ and print_tnode opl opr info fmt t = match t.t_node with
           else fprintf fmt (protect_on opl "(%a%a:%a)") print_ls fs
             (print_paren_r (print_term info)) tl (print_ty info) (t_type t)
     end
-  | Fquant _ | Fbinop _ | Fnot _ | Ftrue | Ffalse -> raise (TermExpected t)
+  | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> raise (TermExpected t)
 
 and print_fnode opl opr info fmt f = match f.t_node with
-  | Fquant (Fforall,fq) ->
-      let vl,_tl,f = f_open_quant fq in
+  | Tquant (Tforall,fq) ->
+      let vl,_tl,f = t_open_quant fq in
       fprintf fmt (protect_on opr "forall %a,@ %a")
         (print_space_list (print_vsty info)) vl
         (* (print_tl info) tl *) (print_fmla info) f;
       List.iter forget_var vl
-  | Fquant (Fexists,fq) ->
-      let vl,_tl,f = f_open_quant fq in
+  | Tquant (Texists,fq) ->
+      let vl,_tl,f = t_open_quant fq in
       let rec aux fmt vl =
         match vl with
           | [] -> print_fmla info fmt f
@@ -264,14 +264,14 @@ and print_fnode opl opr info fmt f = match f.t_node with
       in
       aux fmt vl;
       List.iter forget_var vl
-  | Ftrue ->
+  | Ttrue ->
       fprintf fmt "True"
-  | Ffalse ->
+  | Tfalse ->
       fprintf fmt "False"
-  | Fbinop (b,f1,f2) ->
+  | Tbinop (b,f1,f2) ->
       fprintf fmt (protect_on (opl || opr) "%a %a@ %a")
         (print_opr_fmla info) f1 print_binop b (print_opl_fmla info) f2
-  | Fnot f ->
+  | Tnot f ->
       fprintf fmt (protect_on opr "~ %a") (print_opl_fmla info) f
   | Tlet (t,f) ->
       let v,f = t_open_bound f in
@@ -305,11 +305,8 @@ and print_fbranch info fmt br =
     (print_pat info) p (print_fmla info) f;
   Svs.iter forget_var p.pat_vars
 
-and print_tl info fmt tl =
-  if tl = [] then () else fprintf fmt "@ [%a]"
-    (print_list alt (print_list comma (print_expr info))) tl
-
-and print_expr info fmt = e_map (print_term info fmt) (print_fmla info fmt)
+let print_expr info fmt =
+  TermTF.t_select (print_term info fmt) (print_fmla info fmt)
 
 (** Declarations *)
 

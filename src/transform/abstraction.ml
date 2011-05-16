@@ -44,8 +44,8 @@ let abstraction (keep : lsymbol -> bool) =
 
   and abstract_fmla f =
     match f.t_node with
-    | Ftrue | Ffalse -> f
-    | Fnot _ | Fbinop _ ->
+    | Ttrue | Tfalse -> f
+    | Tnot _ | Tbinop _ ->
         TermTF.t_map abstract_term abstract_fmla f
     | Tapp(ls,_) when keep ls ->
         TermTF.t_map abstract_term abstract_fmla f

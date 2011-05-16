@@ -253,7 +253,7 @@ and print_fnode pri fmt f = match f.f_node with
   | Fapp (ps,tl) ->
       print_app pri ps fmt tl
   | Fquant (q,fq) ->
-      let vl,tl,f = f_open_quant fq in
+      let vl,tl,f = t_open_quant fq in
       fprintf fmt (protect_on (pri > 0) "%a %a%a.@ %a") print_quant q
         (print_list comma print_vsty) vl print_tl tl print_fmla f;
       List.iter forget_var vl
@@ -293,7 +293,7 @@ and print_tl fmt tl =
   if tl = [] then () else fprintf fmt "@ [%a]"
     (print_list alt (print_list comma print_expr)) tl
 
-and print_expr fmt = e_map (print_term fmt) (print_fmla fmt)
+and print_expr fmt = t_select (print_term fmt) (print_fmla fmt)
 
 (** Declarations *)
 

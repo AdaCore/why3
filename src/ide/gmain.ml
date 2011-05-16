@@ -729,9 +729,9 @@ let info_window ?(callback=(fun () -> ())) mt s =
 
   let rec get_labels f =
     (match f.Term.t_node with
-      | Term.Fbinop(Term.Fimplies,_,f) -> get_labels f
-      | Term.Fquant(Term.Fforall,fq) ->
-	  let (_,_,f) = Term.f_open_quant fq in get_labels f
+      | Term.Tbinop(Term.Timplies,_,f) -> get_labels f
+      | Term.Tquant(Term.Tforall,fq) ->
+	  let (_,_,f) = Term.t_open_quant fq in get_labels f
       | Term.Tlet(_,fb) ->
 	  let (_,f) = Term.t_open_bound fb in get_labels f
       | Term.Tcase(_,[fb]) ->

@@ -298,7 +298,7 @@ let rec rewrite_term menv tvar vsvar t =
     | Tcase _ | Teps _ ->
       Printer.unsupportedTerm t
         "Encoding instantiate : I can't encode this term"
-    | Fquant _ | Fbinop _ | Fnot _ | Ftrue | Ffalse -> raise (TermExpected t)
+    | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> raise (TermExpected t)
   in
   (* Format.eprintf "@[<hov 2>Term : => %a : %a@\n@?" *)
   (*   Pretty.print_term t Pretty.print_ty t.t_ty; *)
@@ -313,15 +313,15 @@ and rewrite_fmla menv tvar vsvar f =
       let tl' = List.map (fnT vsvar) tl in
       let p = find_logic menv tvar p tl None in
       ps_app p tl'
-    | Fquant(q, b) ->
-      let vl, tl, f1, cb = f_open_quant_cb b in
+    | Tquant(q, b) ->
+      let vl, tl, f1, cb = t_open_quant_cb b in
       let vsvar,vl = map_fold_left (conv_vs menv tvar) vsvar vl in
 
       let f1 = fnF vsvar f1 in
       (* Ici un trigger qui ne match pas assez de variables
          peut être généré *)
       let tl = TermTF.tr_map (fnT vsvar) (fnF vsvar) tl in
-      f_quant q (cb vl tl f1)
+      t_quant q (cb vl tl f1)
     | Tlet (t1, b) -> let u,f2,cb = t_open_bound_cb b in
       let (vsvar',u) = conv_vs menv tvar vsvar u in
       let t1 = fnT vsvar t1 and f2 = fnF vsvar' f2 in

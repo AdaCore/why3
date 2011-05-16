@@ -204,23 +204,26 @@ module Translate = struct
         t
 
   (** translation for formulae *)
-  let translate_binop = function | And -> Term.Fand | Or -> Term.For
-    | Implies -> Term.Fimplies | Equiv -> Term.Fiff
-  let translate_quant = function | Forall -> Term.Fforall | Exist -> Term.Fexists
+  let translate_binop = function
+    | And -> Term.Tand | Or -> Term.Tor
+    | Implies -> Term.Timplies | Equiv -> Term.Tiff
+
+  let translate_quant = function
+    | Forall -> Term.Tforall | Exist -> Term.Texists
 
   let rec fmla2fmla = function
   | FBinop (op, f1, f2) ->
-    Term.f_binary
+    Term.t_binary
       (translate_binop op)
       (fmla2fmla f1)
       (fmla2fmla f2)
   | FUnop (op, f) ->
     assert (op = Not);
-    Term.f_not_simp (fmla2fmla f)
+    Term.t_not_simp (fmla2fmla f)
   | FQuant (quant, vars, f) -> begin
     (* Format.printf "@[<hov 2>quantifier %s %s (depth %d)@]\n" (if quant=Forall then "forall" else "exists") (String.concat ", " vars) (EnvVar.depth ()); *)
     EnvVar.push_scope vars; (* new scope *)
-    let answer = Term.f_quant_close
+    let answer = Term.t_quant_close
       (translate_quant quant)
       (List.map EnvVar.find vars)
       [] (* no triggers *)
@@ -234,8 +237,8 @@ module Translate = struct
       (List.map term2term terms)
   | FTermBinop (op, t1, t2) ->
       ( match op with
-        | Equal -> Term.f_equ
-        | NotEqual -> Term.f_neq)
+        | Equal -> Term.t_equ
+        | NotEqual -> Term.t_neq)
       (term2term t1) (term2term t2)
 
   let translatePropKind = function
@@ -288,7 +291,7 @@ module Translate = struct
     let theory = List.fold_left addDecl theory
       (List.map hideNegatedConjecture decls) in
     Theory.add_decl theory (Decl.create_prop_decl Decl.Pgoal
-      (Decl.create_prsymbol (id_fresh "negated_goal")) Term.f_false)
+      (Decl.create_prsymbol (id_fresh "negated_goal")) Term.t_false)
 
 
 

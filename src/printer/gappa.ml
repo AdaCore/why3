@@ -152,7 +152,7 @@ let rec print_term info fmt t =
       "gappa: you must eliminate match"
   | Teps _ -> unsupportedTerm t
       "gappa : you must eliminate epsilon"
-  | Fquant _ | Fbinop _ | Fnot _ | Ftrue | Ffalse -> raise (TermExpected t)
+  | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> raise (TermExpected t)
 
 
 (* predicates *)
@@ -198,15 +198,15 @@ let rec print_fmla info fmt f =
       begin match query_syntax info.info_syn ls.ls_name with
 	| Some s -> syntax_arguments s term fmt tl
 	| None ->
-	    unsupportedFmla f
+	    unsupportedTerm f
               ("gappa: predicate '" ^ ls.ls_name.id_string ^ "' is not supported")
       end
-  | Fquant (_q, _fq) ->
-      unsupportedFmla f
+  | Tquant (_q, _fq) ->
+      unsupportedTerm f
         "gappa: quantifiers are not supported"
 (*
-      let q = match q with Fforall -> "forall" | Fexists -> "exists" in
-      let vl, tl, f = f_open_quant fq in
+      let q = match q with Tforall -> "forall" | Texists -> "exists" in
+      let vl, tl, f = t_open_quant fq in
       let forall fmt v =
 	fprintf fmt "%s %a:%a" q print_ident v.vs_name (print_type info) v.vs_ty
       in
@@ -214,27 +214,27 @@ let rec print_fmla info fmt f =
         (print_triggers info) tl (print_fmla info) f;
       List.iter forget_var vl
 *)
-  | Fbinop (Fand, f1, f2) ->
+  | Tbinop (Tand, f1, f2) ->
       fprintf fmt "(%a /\\@ %a)" fmla f1 fmla f2
-  | Fbinop (For, f1, f2) ->
+  | Tbinop (Tor, f1, f2) ->
       fprintf fmt "(%a \\/@ %a)" fmla f1 fmla f2
-  | Fbinop (Fimplies, f1, f2) ->
+  | Tbinop (Timplies, f1, f2) ->
       fprintf fmt "(%a ->@ %a)" fmla f1 fmla f2
-  | Fbinop (Fiff, _f1, _f2) ->
-      unsupportedFmla f
+  | Tbinop (Tiff, _f1, _f2) ->
+      unsupportedTerm f
         "gappa: connector <-> is not supported"
-  | Fnot f ->
+  | Tnot f ->
       fprintf fmt "not %a" fmla f
-  | Ftrue ->
+  | Ttrue ->
       fprintf fmt "(0 in [0,0])"
-  | Ffalse ->
+  | Tfalse ->
       fprintf fmt "(1 in [0,0])"
   | Tif (_f1, _f2, _f3) ->
-      unsupportedFmla f
+      unsupportedTerm f
         "gappa: you must eliminate if in formula"
-  | Tlet _ -> unsupportedFmla f
+  | Tlet _ -> unsupportedTerm f
       "gappa: you must eliminate let in formula"
-  | Tcase _ -> unsupportedFmla f
+  | Tcase _ -> unsupportedTerm f
       "gappa: you must eliminate match"
   | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
 
@@ -301,7 +301,7 @@ let filter_hyp info defs eqs hyps pr f =
   | _ -> (eqs,hyps)
 
 type filter_goal =
-  | Goal_good of Decl.prsymbol * fmla
+  | Goal_good of Decl.prsymbol * term
   | Goal_bad of string
   | Goal_none
 

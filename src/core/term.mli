@@ -53,7 +53,6 @@ module Hls : Hashtbl.S with type key = lsymbol
 module Wls : Hashweak.S with type key = lsymbol
 
 val ls_equal : lsymbol -> lsymbol -> bool
-  (** equality of function and predicate symbols *)
 val ls_hash : lsymbol -> int
 
 val create_lsymbol : preid -> ty list -> ty option -> lsymbol
@@ -108,14 +107,14 @@ val pat_any : (pattern -> bool) -> pattern -> bool
 (** {2 Terms and Formulas} *)
 
 type quant =
-  | Fforall
-  | Fexists
+  | Tforall
+  | Texists
 
 type binop =
-  | Fand
-  | For
-  | Fimplies
-  | Fiff
+  | Tand
+  | Tor
+  | Timplies
+  | Tiff
 
 type real_constant =
   | RConstDecimal of string * string * string option (* int / frac / exp *)
@@ -138,21 +137,19 @@ and term_node = private
   | Tvar of vsymbol
   | Tconst of constant
   | Tapp of lsymbol * term list
-  | Tif of fmla * term * term
+  | Tif of term * term * term
   | Tlet of term * term_bound
   | Tcase of term * term_branch list
-  | Teps of fmla_bound
-  | Fquant of quant * fmla_quant
-  | Fbinop of binop * fmla * fmla
-  | Fnot of fmla
-  | Ftrue
-  | Ffalse
+  | Teps of term_bound
+  | Tquant of quant * term_quant
+  | Tbinop of binop * term * term
+  | Tnot of term
+  | Ttrue
+  | Tfalse
 
-and fmla = term
 and term_bound
-and fmla_bound = term_bound
 and term_branch
-and fmla_quant
+and term_quant
 
 and trigger = term list list
 
@@ -169,13 +166,13 @@ val t_hash : term -> int
 
 val t_close_bound : vsymbol -> term -> term_bound
 val t_close_branch : pattern -> term -> term_branch
-val f_close_quant : vsymbol list -> trigger -> fmla -> fmla_quant
+val t_close_quant : vsymbol list -> trigger -> term -> term_quant
 
 (** open bindings *)
 
 val t_open_bound : term_bound -> vsymbol * term
 val t_open_branch : term_branch -> pattern * term
-val f_open_quant : fmla_quant -> vsymbol list * trigger * fmla
+val t_open_quant : term_quant -> vsymbol list * trigger * term
 
 (** open bindings with optimized closing callbacks *)
 
@@ -185,9 +182,9 @@ val t_open_bound_cb :
 val t_open_branch_cb :
   term_branch -> pattern * term * (pattern -> term -> term_branch)
 
-val f_open_quant_cb :
-  fmla_quant -> vsymbol list * trigger * fmla *
-              (vsymbol list -> trigger -> fmla -> fmla_quant)
+val t_open_quant_cb :
+  term_quant -> vsymbol list * trigger * term *
+              (vsymbol list -> trigger -> term -> term_quant)
 
 (** Type checking *)
 
@@ -203,15 +200,11 @@ val t_prop : term -> term
 val t_ty_check : term -> ty option -> unit
 (** [t_ty_check t ty] checks that the type of [t] is [ty] *)
 
-(** [e_map fnT fnF t] is [fnT t] if [t] is value-typed, [fnF t] otherwise *)
-val e_map : (term -> 'a) -> (fmla -> 'a) -> term -> 'a
-val e_fold : ('a -> term -> 'b) -> ('a -> fmla -> 'b) -> 'a -> term -> 'b
-
 (** Smart constructors for terms and formulas *)
 
 val t_app  : lsymbol -> term list -> ty option -> term
 val fs_app : lsymbol -> term list -> ty -> term
-val ps_app : lsymbol -> term list -> fmla
+val ps_app : lsymbol -> term list -> term
 
 val t_app_infer : lsymbol -> term list -> term
 val ls_arg_inst : lsymbol -> term list -> ty Mtv.t
@@ -221,27 +214,27 @@ val t_var : vsymbol -> term
 val t_const : constant -> term
 val t_int_const : string -> term
 val t_real_const : real_constant -> term
-val t_if : fmla -> term -> term -> term
+val t_if : term -> term -> term -> term
 val t_let : term -> term_bound -> term
 val t_case : term -> term_branch list -> term
-val t_eps : fmla_bound -> term
-val f_quant : quant -> fmla_quant -> fmla
-val f_forall : fmla_quant -> fmla
-val f_exists : fmla_quant -> fmla
-val f_binary : binop -> fmla -> fmla -> fmla
-val f_and : fmla -> fmla -> fmla
-val f_or : fmla -> fmla -> fmla
-val f_implies : fmla -> fmla -> fmla
-val f_iff : fmla -> fmla -> fmla
-val f_not : fmla -> fmla
-val f_true : fmla
-val f_false : fmla
+val t_eps : term_bound -> term
+val t_quant : quant -> term_quant -> term
+val t_forall : term_quant -> term
+val t_exists : term_quant -> term
+val t_binary : binop -> term -> term -> term
+val t_and : term -> term -> term
+val t_or : term -> term -> term
+val t_implies : term -> term -> term
+val t_iff : term -> term -> term
+val t_not : term -> term
+val t_true : term
+val t_false : term
 
 val t_let_close : vsymbol -> term -> term -> term
-val t_eps_close : vsymbol -> fmla -> term
-val f_quant_close : quant -> vsymbol list -> trigger -> fmla -> fmla
-val f_forall_close : vsymbol list -> trigger -> fmla -> fmla
-val f_exists_close : vsymbol list -> trigger -> fmla -> fmla
+val t_eps_close : vsymbol -> term -> term
+val t_quant_close : quant -> vsymbol list -> trigger -> term -> term
+val t_forall_close : vsymbol list -> trigger -> term -> term
+val t_exists_close : vsymbol list -> trigger -> term -> term
 
 val t_label : ?loc:Loc.position -> label list -> term -> term
 val t_label_add : label -> term -> term
@@ -249,26 +242,26 @@ val t_label_copy : term -> term -> term
 
 (** Constructors with propositional simplification *)
 
-val t_if_simp : fmla -> term -> term -> term
+val t_if_simp : term -> term -> term -> term
 val t_let_simp : term -> term_bound -> term
-val f_quant_simp : quant -> fmla_quant -> fmla
-val f_forall_simp : fmla_quant -> fmla
-val f_exists_simp : fmla_quant -> fmla
-val f_binary_simp : binop -> fmla -> fmla -> fmla
-val f_and_simp : fmla -> fmla -> fmla
-val f_and_simp_l : fmla list -> fmla
-val f_or_simp : fmla -> fmla -> fmla
-val f_or_simp_l : fmla list -> fmla
-val f_implies_simp : fmla -> fmla -> fmla
-val f_iff_simp : fmla -> fmla -> fmla
-val f_not_simp : fmla -> fmla
+val t_quant_simp : quant -> term_quant -> term
+val t_forall_simp : term_quant -> term
+val t_exists_simp : term_quant -> term
+val t_binary_simp : binop -> term -> term -> term
+val t_and_simp : term -> term -> term
+val t_and_simp_l : term list -> term
+val t_or_simp : term -> term -> term
+val t_or_simp_l : term list -> term
+val t_implies_simp : term -> term -> term
+val t_iff_simp : term -> term -> term
+val t_not_simp : term -> term
 
 val t_let_close_simp : vsymbol -> term -> term -> term
-val f_quant_close_simp : quant -> vsymbol list -> trigger -> fmla -> fmla
-val f_forall_close_simp : vsymbol list -> trigger -> fmla -> fmla
-val f_exists_close_simp : vsymbol list -> trigger -> fmla -> fmla
+val t_quant_close_simp : quant -> vsymbol list -> trigger -> term -> term
+val t_forall_close_simp : vsymbol list -> trigger -> term -> term
+val t_exists_close_simp : vsymbol list -> trigger -> term -> term
 
-val f_forall_close_merge : vsymbol list -> fmla -> fmla
+val t_forall_close_merge : vsymbol list -> term -> term
 (** [forall_close_merge vs f] puts a universal quantifier over [f];
     merges variable lists if [f] is already universally quantified;
     reuses triggers of [f], if any, otherwise puts no triggers. *)
@@ -277,11 +270,11 @@ val f_forall_close_merge : vsymbol list -> fmla -> fmla
 
 val ps_equ : lsymbol  (* equality predicate *)
 
-val f_equ : term -> term -> fmla
-val f_neq : term -> term -> fmla
+val t_equ : term -> term -> term
+val t_neq : term -> term -> term
 
-val f_equ_simp : term -> term -> fmla
-val f_neq_simp : term -> term -> fmla
+val t_equ_simp : term -> term -> term
+val t_neq_simp : term -> term -> term
 
 val fs_tuple : int -> lsymbol   (* n-tuple *)
 val t_tuple : term list -> term
@@ -292,10 +285,10 @@ val fs_func_app : lsymbol  (* value-typed higher-order application *)
 val ps_pred_app : lsymbol  (* prop-typed higher-order application *)
 
 val t_func_app : term -> term -> term
-val f_pred_app : term -> term -> fmla
+val t_pred_app : term -> term -> term
 
 val t_func_app_l : term -> term list -> term
-val f_pred_app_l : term -> term list -> fmla
+val t_pred_app_l : term -> term list -> term
 
 (** {2 Term library} *)
 
@@ -332,30 +325,38 @@ val tr_map_fold : ('a -> term -> 'a * term) -> 'a -> trigger -> 'a * trigger
 
 module TermTF : sig
 
-  val t_map : (term -> term) -> (fmla -> fmla) -> term -> term
+  val t_select : (term -> 'a) -> (term -> 'a) -> term -> 'a
+  (** [t_select fnT fnF t] is [fnT t] if [t] is a value, [fnF t] otherwise *)
 
-  val t_fold : ('a -> term -> 'a) -> ('a -> fmla -> 'a) -> 'a -> term -> 'a
-    
+  val t_selecti : ('a -> term -> 'b) -> ('a -> term -> 'b) -> 'a -> term -> 'b
+  (** [t_selecti fnT fnF acc t] is [t_select (fnT acc) (fnF acc) t] *)
+
+  val t_map : (term -> term) -> (term -> term) -> term -> term
+  (** [t_map fnT fnF = t_map (t_select fnT fnF) *)
+
+  val t_fold : ('a -> term -> 'a) -> ('a -> term -> 'a) -> 'a -> term -> 'a
+  (** [t_fold fnT fnF = t_fold (t_selecti fnT fnF) *)
+
   val t_map_fold : ('a -> term -> 'a * term) ->
-    ('a -> fmla -> 'a * fmla) -> 'a -> term -> 'a * term
-    
-  val t_all : (term -> bool) -> (fmla -> bool) -> term -> bool
-  val t_any : (term -> bool) -> (fmla -> bool) -> term -> bool
-    
-  val t_map_simp : (term -> term) -> (fmla -> fmla) -> term -> term
-    
+    ('a -> term -> 'a * term) -> 'a -> term -> 'a * term
+
+  val t_all : (term -> bool) -> (term -> bool) -> term -> bool
+  val t_any : (term -> bool) -> (term -> bool) -> term -> bool
+
+  val t_map_simp : (term -> term) -> (term -> term) -> term -> term
+
   val t_map_sign : (bool -> term -> term) ->
-    (bool -> fmla -> fmla) -> bool -> term -> term
-    
+    (bool -> term -> term) -> bool -> term -> term
+
   val t_map_cont : ((term -> 'a) -> term -> 'a) ->
-    ((fmla -> 'a) -> fmla -> 'a) -> (term -> 'a) -> term -> 'a
-    
-  val tr_map : (term -> term) -> (fmla -> fmla) -> trigger -> trigger
-    
-  val tr_fold : ('a -> term -> 'a) -> ('a -> fmla -> 'a) -> 'a -> trigger -> 'a
+    ((term -> 'a) -> term -> 'a) -> (term -> 'a) -> term -> 'a
+
+  val tr_map : (term -> term) -> (term -> term) -> trigger -> trigger
+
+  val tr_fold : ('a -> term -> 'a) -> ('a -> term -> 'a) -> 'a -> trigger -> 'a
 
   val tr_map_fold : ('a -> term -> 'a * term) ->
-    ('a -> fmla -> 'a * fmla) -> 'a -> trigger -> 'a * trigger
+    ('a -> term -> 'a * term) -> 'a -> trigger -> 'a * trigger
 end
 
 (** Map/fold over free variables *)

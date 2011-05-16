@@ -33,7 +33,7 @@ open Task
 
 
 let rec intros pr f = match f.t_node with
-  | Fbinop (Fimplies,f1,f2) ->
+  | Tbinop (Timplies,f1,f2) ->
       (* split f1 *)
       let l = Split_goal.split_pos f1 in
       List.fold_right
@@ -49,8 +49,8 @@ let rec intros pr f = match f.t_node with
 	let d = create_prop_decl Paxiom id f1 in
 	d :: intros pr f2
       *)
-  | Fquant (Fforall,fq) ->
-      let vsl,_trl,f = f_open_quant fq in
+  | Tquant (Tforall,fq) ->
+      let vsl,_trl,f = t_open_quant fq in
       let intro_var subst vs =
         let ls = create_lsymbol (id_clone vs.vs_name) [] (Some vs.vs_ty) in
         Mvs.add vs (fs_app ls [] vs.vs_ty) subst,

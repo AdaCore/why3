@@ -123,10 +123,10 @@ module Sexn = Term.Sls
 
 module rec T : sig
 
-  type pre = Term.fmla
+  type pre = Term.term
 
-  type post_fmla = Term.vsymbol (* result *) * Term.fmla
-  type exn_post_fmla = Term.vsymbol (* result *) option * Term.fmla
+  type post_fmla = Term.vsymbol (* result *) * Term.term
+  type exn_post_fmla = Term.vsymbol (* result *) option * Term.term
       
   type esymbol = lsymbol
 
@@ -203,7 +203,7 @@ module rec T : sig
   val v_result : ty -> vsymbol
   val exn_v_result : Why.Term.lsymbol -> Why.Term.vsymbol option
     
-  val post_map : (fmla -> fmla) -> post -> post
+  val post_map : (term -> term) -> post -> post
     
   val subst1 : vsymbol -> term -> term Mvs.t
     
@@ -219,10 +219,10 @@ module rec T : sig
 
 end = struct
 
-  type pre = Term.fmla
+  type pre = Term.term
 
-  type post_fmla = Term.vsymbol (* result *) * Term.fmla
-  type exn_post_fmla = Term.vsymbol (* result *) option * Term.fmla
+  type post_fmla = Term.vsymbol (* result *) * Term.term
+  type exn_post_fmla = Term.vsymbol (* result *) option * Term.term
 
   type esymbol = lsymbol
 
@@ -432,8 +432,8 @@ end = struct
 	let ty = trans_type_v ~pure:true v in
 	{ c_result_type = v;
 	  c_effect      = E.empty;
-	  c_pre         = f_true;
-	  c_post        = (v_result ty, f_true), []; }
+	  c_pre         = t_true;
+	  c_post        = (v_result ty, t_true), []; }
 	  
   let subst1 vs1 t2 = Mvs.add vs1 t2 Mvs.empty
     
@@ -722,9 +722,9 @@ let ps_ghost =
   let x = T.create_pvsymbol (id_fresh "x") (T.tpure (ty_var a)) in
   let ty = ty_app mt_ghost.mt_abstr [ty_var a] in
   let result = create_vsymbol (id_fresh "result") (ty_var a) in
-  let eq_result_x = f_equ (t_var result) (t_var x.T.pv_vs) in
+  let eq_result_x = t_equ (t_var result) (t_var x.T.pv_vs) in
   let c = { T.c_result_type = T.tpure ty;
-	    T.c_effect = E.empty; T.c_pre = f_true;
+	    T.c_effect = E.empty; T.c_pre = t_true;
 	    T.c_post = (result, eq_result_x), []; }
   in
   T.create_psymbol (id_fresh "ghost") (T.tarrow [x] c)
@@ -734,9 +734,9 @@ let ps_unghost =
   let ty = ty_app mt_ghost.mt_abstr [ty_var a] in
   let x = T.create_pvsymbol (id_fresh "x") (T.tpure ty) in
   let result = create_vsymbol (id_fresh "result") (ty_var a) in
-  let eq_result_x = f_equ (t_var result) (t_var x.T.pv_vs) in
+  let eq_result_x = t_equ (t_var result) (t_var x.T.pv_vs) in
   let c = { T.c_result_type = T.tpure (ty_var a);
-	    T.c_effect = E.empty; T.c_pre = f_true;
+	    T.c_effect = E.empty; T.c_pre = t_true;
 	    T.c_post = (result, eq_result_x), []; }
   in
   T.create_psymbol (id_fresh "unghost") (T.tarrow [x] c)

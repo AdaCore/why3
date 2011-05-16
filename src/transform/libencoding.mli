@@ -43,10 +43,10 @@ val ls_selects_of_ts : tysymbol -> lsymbol list
 val term_of_ty : term Mtv.t -> ty -> term
 
 (* rewrite a closed formula modulo the given free typevars *)
-val type_close : Stv.t -> (term Mtv.t -> 'a -> fmla) -> 'a -> fmla
+val type_close : Stv.t -> (term Mtv.t -> 'a -> term) -> 'a -> term
 
 (* rewrite a closed formula modulo its free typevars *)
-val f_type_close : (term Mtv.t -> fmla -> fmla) -> fmla -> fmla
+val t_type_close : (term Mtv.t -> term -> term) -> term -> term
 
 (* convert a type declaration to a list of lsymbol declarations *)
 val lsdecl_of_tydecl : ty_decl list -> decl list

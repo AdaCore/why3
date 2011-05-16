@@ -17,17 +17,16 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val fmla_simpl : Term.fmla -> Term.fmla
+val fmla_simpl : Term.term -> Term.term
 
 val simplify_formula :  Task.task Trans.trans
 val simplify_formula_and_task :  Task.task list Trans.trans
 
-val fmla_remove_quant : Term.fmla -> Term.fmla
+val fmla_remove_quant : Term.term -> Term.term
 (** transforms \exists x. x == y /\ F into F[y/x]
     and \forall x. x <> y \/ F into F[y/x] *)
 
-val fmla_cond_subst : (Term.term -> Term.term -> bool) ->
-  Term.fmla -> Term.fmla
+val fmla_cond_subst: (Term.term -> Term.term -> bool) -> Term.term -> Term.term
 (** given a formula [f] containing some equality or disequality [t1] ?= [t2]
     such that [filter t1 t2] (resp [filter t2 t1]) evaluates to true,
     [fmla_subst_cond filter f] performs the substitution [t1] -> [t2]

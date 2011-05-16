@@ -186,7 +186,7 @@ let rec rewrite_term tenv vsvar t =
         t_if (fnF vsvar f) (fnT vsvar t1) (fnT vsvar t2)
     | Tcase _ ->
         Printer.unsupportedTerm t "no match expressions at this point"
-    | Fquant _ | Fbinop _ | Fnot _ | Ftrue | Ffalse -> raise (TermExpected t)
+    | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> raise (TermExpected t)
   in
   (* Format.eprintf "@[<hov 2>Term : => %a : %a@\n@?" Pretty.print_term t *)
   (*   Pretty.print_ty t.t_ty; *)
@@ -198,14 +198,14 @@ and rewrite_fmla tenv vsvar f =
   let fnF = rewrite_fmla tenv in
   let f = match f.t_node with
     | Tapp(p, [t1;t2]) when ls_equal p ps_equ ->
-        f_equ (fnT vsvar t1) (fnT vsvar t2)
+        t_equ (fnT vsvar t1) (fnT vsvar t2)
     | Tapp(p, tl) ->
         let tl = List.map (fnT vsvar) tl in
         let p = Hls.find tenv.trans_lsymbol p in
         let tl = List.map2 (conv_arg tenv) tl p.ls_args in
         ps_app p tl
-    | Fquant (q, b) ->
-        let vl, tl, f1, close = f_open_quant_cb b in
+    | Tquant (q, b) ->
+        let vl, tl, f1, close = t_open_quant_cb b in
         let conv_vs (vsvar,l) vs =
           let vs' = conv_vs tenv vs in
           Mvs.add vs (t_var vs') vsvar,vs'::l in
@@ -215,7 +215,7 @@ and rewrite_fmla tenv vsvar f =
            peut être généré *)
         let tl = TermTF.tr_map (fnT vsvar) (fnF vsvar) tl in
         let vl = List.rev vl in
-        f_quant q (close vl tl f1)
+        t_quant q (close vl tl f1)
     | Tlet (t1, b) ->
         let u,f2,close = t_open_bound_cb b in
         let t1 = fnT vsvar t1 in
@@ -223,13 +223,13 @@ and rewrite_fmla tenv vsvar f =
         let vsvar = Mvs.add u (t_var u') vsvar in
         let f2 = fnF vsvar f2 in
         t_let t1 (close u' f2)
-    | Fbinop (op,f1,f2) -> f_binary op (fnF vsvar f1) (fnF vsvar f2)
-    | Fnot f1 -> f_not (fnF vsvar f1)
-    | Ftrue | Ffalse -> f
+    | Tbinop (op,f1,f2) -> t_binary op (fnF vsvar f1) (fnF vsvar f2)
+    | Tnot f1 -> t_not (fnF vsvar f1)
+    | Ttrue | Tfalse -> f
     | Tif (f1,f2,f3) ->
         t_if (fnF vsvar f1) (fnF vsvar f2) (fnF vsvar f3)
     | Tcase _ ->
-        Printer.unsupportedFmla f "no match expressions at this point"
+        Printer.unsupportedTerm f "no match expressions at this point"
     | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
   in
   (* Format.eprintf "@[<hov 2>Fmla : => %a@\n@?" Pretty.print_fmla f; *)

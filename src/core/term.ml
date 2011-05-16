@@ -239,14 +239,14 @@ let rec pat_gen_fold fnT fnL acc pat =
 (** Terms and formulas *)
 
 type quant =
-  | Fforall
-  | Fexists
+  | Tforall
+  | Texists
 
 type binop =
-  | Fand
-  | For
-  | Fimplies
-  | Fiff
+  | Tand
+  | Tor
+  | Timplies
+  | Tiff
 
 type real_constant =
   | RConstDecimal of string * string * string option (* int / frac / exp *)
@@ -269,21 +269,19 @@ and term_node =
   | Tvar of vsymbol
   | Tconst of constant
   | Tapp of lsymbol * term list
-  | Tif of fmla * term * term
+  | Tif of term * term * term
   | Tlet of term * term_bound
   | Tcase of term * term_branch list
-  | Teps of fmla_bound
-  | Fquant of quant * fmla_quant
-  | Fbinop of binop * fmla * fmla
-  | Fnot of fmla
-  | Ftrue
-  | Ffalse
+  | Teps of term_bound
+  | Tquant of quant * term_quant
+  | Tbinop of binop * term * term
+  | Tnot of term
+  | Ttrue
+  | Tfalse
 
-and fmla        = term
 and term_bound  = vsymbol * bind_info * term
-and fmla_bound  = term_bound
 and term_branch = pattern * bind_info * term
-and fmla_quant  = vsymbol list * bind_info * trigger * term
+and term_quant  = vsymbol list * bind_info * trigger * term
 
 and trigger = term list list
 
@@ -314,9 +312,6 @@ let t_ty_check t ty = match ty, t.t_ty with
   | Some _, None -> raise (TermExpected t)
   | None, Some _ -> raise (FmlaExpected t)
   | None, None -> ()
-
-let e_map fnT fnF e      = if e.t_ty = None then fnF e     else fnT e
-let e_fold fnT fnF acc e = if e.t_ty = None then fnF acc e else fnT acc e
 
 (* trigger equality and traversal *)
 
@@ -354,7 +349,7 @@ module Hsterm = Hashcons.Make (struct
   let t_eq_branch (p1,b1,t1) (p2,b2,t2) =
     pat_equal p1 p2 && bnd_equal b1 b2 && t_equal t1 t2
 
-  let f_eq_quant (vl1,b1,tl1,f1) (vl2,b2,tl2,f2) =
+  let t_eq_quant (vl1,b1,tl1,f1) (vl2,b2,tl2,f2) =
     t_equal f1 f2 && list_all2 vs_equal vl1 vl2 &&
     bnd_equal b1 b2 && tr_equal tl1 tl2
 
@@ -370,12 +365,12 @@ module Hsterm = Hashcons.Make (struct
     | Tcase (t1,bl1), Tcase (t2,bl2) ->
         t_equal t1 t2 && list_all2 t_eq_branch bl1 bl2
     | Teps f1, Teps f2 -> t_eq_bound f1 f2
-    | Fquant (q1,b1), Fquant (q2,b2) ->
-        q1 = q2 && f_eq_quant b1 b2
-    | Fbinop (op1,f1,g1), Fbinop (op2,f2,g2) ->
+    | Tquant (q1,b1), Tquant (q2,b2) ->
+        q1 = q2 && t_eq_quant b1 b2
+    | Tbinop (op1,f1,g1), Tbinop (op2,f2,g2) ->
         op1 = op2 && t_equal f1 f2 && t_equal g1 g2
-    | Fnot f1, Fnot f2 -> t_equal f1 f2
-    | Ftrue, Ftrue | Ffalse, Ffalse -> true
+    | Tnot f1, Tnot f2 -> t_equal f1 f2
+    | Ttrue, Ttrue | Tfalse, Tfalse -> true
     | _ -> false
 
   let equal t1 t2 =
@@ -402,12 +397,12 @@ module Hsterm = Hashcons.Make (struct
     | Tlet (t,bt) -> Hashcons.combine (t_hash t) (t_hash_bound bt)
     | Tcase (t,bl) -> Hashcons.combine_list t_hash_branch (t_hash t) bl
     | Teps f -> t_hash_bound f
-    | Fquant (q,bf) -> Hashcons.combine (Hashtbl.hash q) (t_hash_quant bf)
-    | Fbinop (op,f1,f2) ->
+    | Tquant (q,bf) -> Hashcons.combine (Hashtbl.hash q) (t_hash_quant bf)
+    | Tbinop (op,f1,f2) ->
         Hashcons.combine2 (Hashtbl.hash op) (t_hash f1) (t_hash f2)
-    | Fnot f -> Hashcons.combine 1 (t_hash f)
-    | Ftrue -> 0
-    | Ffalse -> 1
+    | Tnot f -> Hashcons.combine 1 (t_hash f)
+    | Ttrue -> 0
+    | Tfalse -> 1
 
   let hash t =
     Hashcons.combine (t_hash_node t.t_node)
@@ -424,10 +419,10 @@ module Hsterm = Hashcons.Make (struct
     | Tlet (t,bt) -> add_b_vars t.t_vars bt
     | Tcase (t,bl) -> List.fold_left add_b_vars t.t_vars bl
     | Teps (_,b,_) -> b.bv_vars
-    | Fquant (_,(_,b,_,_)) -> b.bv_vars
-    | Fbinop (_,f1,f2) -> Svs.union f1.t_vars f2.t_vars
-    | Fnot f -> f.t_vars
-    | Ftrue | Ffalse -> Svs.empty
+    | Tquant (_,(_,b,_,_)) -> b.bv_vars
+    | Tbinop (_,f1,f2) -> Svs.union f1.t_vars f2.t_vars
+    | Tnot f -> f.t_vars
+    | Ttrue | Tfalse -> Svs.empty
 
   let tag n t = { t with t_tag = n ; t_vars = t_vars_node t.t_node }
 
@@ -462,11 +457,11 @@ let t_if f t1 t2    = mk_term (Tif (f, t1, t2)) t2.t_ty
 let t_let t1 bt ty  = mk_term (Tlet (t1, bt)) ty
 let t_case t1 bl ty = mk_term (Tcase (t1, bl)) ty
 let t_eps bf ty     = mk_term (Teps bf) ty
-let f_quant q qf    = mk_term (Fquant (q, qf)) None
-let f_binary op f g = mk_term (Fbinop (op, f, g)) None
-let f_not f         = mk_term (Fnot f) None
-let f_true          = mk_term (Ftrue) None
-let f_false         = mk_term (Ffalse) None
+let t_quant q qf    = mk_term (Tquant (q, qf)) None
+let t_binary op f g = mk_term (Tbinop (op, f, g)) None
+let t_not f         = mk_term (Tnot f) None
+let t_true          = mk_term (Ttrue) None
+let t_false         = mk_term (Tfalse) None
 
 let t_label ?loc l t = Hsterm.hashcons { t with t_label = l; t_loc = loc }
 let t_label_add  l t = Hsterm.hashcons { t with t_label = l :: t.t_label }
@@ -486,11 +481,11 @@ let t_map_unsafe fn t = t_label_copy t (match t.t_node with
   | Tlet (e,b) -> t_let (fn e) (bound_map fn b) t.t_ty
   | Tcase (e,bl) -> t_case (fn e) (List.map (bound_map fn) bl) t.t_ty
   | Teps b -> t_eps (bound_map fn b) t.t_ty
-  | Fquant (q,(vl,b,tl,f1)) ->
-      f_quant q (vl, bnd_map fn b, tr_map fn tl, fn f1)
-  | Fbinop (op,f1,f2) -> f_binary op (fn f1) (fn f2)
-  | Fnot f1 -> f_not (fn f1)
-  | Ftrue | Ffalse -> t)
+  | Tquant (q,(vl,b,tl,f1)) ->
+      t_quant q (vl, bnd_map fn b, tr_map fn tl, fn f1)
+  | Tbinop (op,f1,f2) -> t_binary op (fn f1) (fn f2)
+  | Tnot f1 -> t_not (fn f1)
+  | Ttrue | Tfalse -> t)
 
 (* unsafe fold *)
 
@@ -503,10 +498,10 @@ let t_fold_unsafe fn acc t = match t.t_node with
   | Tlet (e,b) -> fn (bound_fold fn acc b) e
   | Tcase (e,bl) -> List.fold_left (bound_fold fn) (fn acc e) bl
   | Teps b -> bound_fold fn acc b
-  | Fquant (_,(_,b,tl,f1)) -> fn (tr_fold fn (bnd_fold fn acc b) tl) f1
-  | Fbinop (_,f1,f2) -> fn (fn acc f1) f2
-  | Fnot f1 -> fn acc f1
-  | Ftrue | Ffalse -> acc
+  | Tquant (_,(_,b,tl,f1)) -> fn (tr_fold fn (bnd_fold fn acc b) tl) f1
+  | Tbinop (_,f1,f2) -> fn (fn acc f1) f2
+  | Tnot f1 -> fn acc f1
+  | Ttrue | Tfalse -> acc
 
 (* unsafe map_fold *)
 
@@ -537,19 +532,19 @@ let t_map_fold_unsafe fn acc t = match t.t_node with
   | Teps b ->
       let acc, b = bound_map_fold fn acc b in
       acc, t_label_copy t (t_eps b t.t_ty)
-  | Fquant (q,(vl,b,tl,f1)) ->
+  | Tquant (q,(vl,b,tl,f1)) ->
       let acc, b = bnd_map_fold fn acc b in
       let acc, tl = tr_map_fold fn acc tl in
       let acc, f1 = fn acc f1 in
-      acc, t_label_copy t (f_quant q (vl,b,tl,f1))
-  | Fbinop (op,f1,f2) ->
+      acc, t_label_copy t (t_quant q (vl,b,tl,f1))
+  | Tbinop (op,f1,f2) ->
       let acc, f1 = fn acc f1 in
       let acc, f2 = fn acc f2 in
-      acc, t_label_copy t (f_binary op f1 f2)
-  | Fnot f1 ->
+      acc, t_label_copy t (t_binary op f1 f2)
+  | Tnot f1 ->
       let acc, f1 = fn acc f1 in
-      acc, t_label_copy t (f_not f1)
-  | Ftrue | Ffalse ->
+      acc, t_label_copy t (t_not f1)
+  | Ttrue | Tfalse ->
       acc, t
 
 (* type-unsafe term substitution *)
@@ -567,9 +562,9 @@ let rec t_subst_unsafe m t =
       t_label_copy t (t_case (t_subst e) bl t.t_ty)
   | Teps bf ->
       t_label_copy t (t_eps (b_subst bf) t.t_ty)
-  | Fquant (q, (vl,b,tl,f1)) ->
+  | Tquant (q, (vl,b,tl,f1)) ->
       let b = bv_subst_unsafe m b in
-      t_label_copy t (f_quant q (vl,b,tl,f1))
+      t_label_copy t (t_quant q (vl,b,tl,f1))
   | _ ->
       t_map_unsafe t_subst t
 
@@ -600,7 +595,7 @@ let t_close_bound v t = (v, bnd_new (Svs.remove v t.t_vars), t)
 
 let t_close_branch p t = (p, bnd_new (Svs.diff t.t_vars p.pat_vars), t)
 
-let f_close_quant vl tl f =
+let t_close_quant vl tl f =
   let del_v s v = Svs.remove v s in
   let add_t s t = Svs.union s t.t_vars in
   let s = tr_fold add_t f.t_vars tl in
@@ -638,7 +633,7 @@ let t_open_branch (p,b,t) =
   let m,p = pat_rename b.bv_subst p in
   p, t_subst_unsafe m t
 
-let f_open_quant (vl,b,tl,f) =
+let t_open_quant (vl,b,tl,f) =
   let m,vl = vl_rename b.bv_subst vl in
   let tl = tr_map (t_subst_unsafe m) tl in
   (vl, tl, t_subst_unsafe m f)
@@ -659,11 +654,11 @@ let t_open_branch_cb tbr =
   in
   p, t, close
 
-let f_open_quant_cb fq =
-  let vl, tl, f = f_open_quant fq in
+let t_open_quant_cb fq =
+  let vl, tl, f = t_open_quant fq in
   let close vl' tl' f' =
     if t_equal f f' && tr_equal tl tl' && list_all2 vs_equal vl vl'
-    then fq else f_close_quant vl' tl' f'
+    then fq else t_close_quant vl' tl' f'
   in
   vl, tl, f, close
 
@@ -723,26 +718,26 @@ let t_eps ((v,_,f) as bf) =
   ignore (t_prop f);
   t_eps bf (Some v.vs_ty)
 
-let f_quant q ((vl,_,_,f) as qf) =
-  if vl = [] then f else f_quant q qf
+let t_quant q ((vl,_,_,f) as qf) =
+  if vl = [] then f else t_quant q qf
 
-let f_binary op f1 f2 = f_binary op (t_prop f1) (t_prop f2)
-let f_not f = f_not (t_prop f)
+let t_binary op f1 f2 = t_binary op (t_prop f1) (t_prop f2)
+let t_not f = t_not (t_prop f)
 
-let f_forall  = f_quant Fforall
-let f_exists  = f_quant Fexists
-let f_and     = f_binary Fand
-let f_or      = f_binary For
-let f_implies = f_binary Fimplies
-let f_iff     = f_binary Fiff
+let t_forall  = t_quant Tforall
+let t_exists  = t_quant Texists
+let t_and     = t_binary Tand
+let t_or      = t_binary Tor
+let t_implies = t_binary Timplies
+let t_iff     = t_binary Tiff
 
 (* closing constructors *)
 
-let f_quant_close q vl tl f =
-  if vl = [] then t_prop f else f_quant q (f_close_quant vl tl f)
+let t_quant_close q vl tl f =
+  if vl = [] then t_prop f else t_quant q (t_close_quant vl tl f)
 
-let f_forall_close = f_quant_close Fforall
-let f_exists_close = f_quant_close Fexists
+let t_forall_close = t_quant_close Tforall
+let t_exists_close = t_quant_close Texists
 
 let t_let_close v t1 t2 = t_let t1 (t_close_bound v t2)
 
@@ -754,8 +749,8 @@ let ps_equ =
   let v = ty_var (create_tvsymbol (id_fresh "a")) in
   create_psymbol (id_fresh "infix =") [v; v]
 
-let f_equ t1 t2 = ps_app ps_equ [t1; t2]
-let f_neq t1 t2 = f_not (ps_app ps_equ [t1; t2])
+let t_equ t1 t2 = ps_app ps_equ [t1; t2]
+let t_neq t1 t2 = t_not (ps_app ps_equ [t1; t2])
 
 let fs_tuple = Util.memo_int 17 (fun n ->
   let ts = ts_tuple n in
@@ -779,13 +774,13 @@ let ps_pred_app =
   create_psymbol (id_fresh "infix @?") [ty_pred ty_a; ty_a]
 
 let t_func_app fn t = t_app_infer fs_func_app [fn; t]
-let f_pred_app pr t = ps_app ps_pred_app [pr; t]
+let t_pred_app pr t = ps_app ps_pred_app [pr; t]
 
 let t_func_app_l = List.fold_left t_func_app
 
-let f_pred_app_l pr tl = match List.rev tl with
-  | t::tl -> f_pred_app (t_func_app_l pr (List.rev tl)) t
-  | _ -> Pervasives.invalid_arg "f_pred_app_l"
+let t_pred_app_l pr tl = match List.rev tl with
+  | t::tl -> t_pred_app (t_func_app_l pr (List.rev tl)) t
+  | _ -> Pervasives.invalid_arg "t_pred_app_l"
 
 (** Term library *)
 
@@ -822,16 +817,16 @@ let rec t_gen_map fnT fnL m t =
         let m = gen_bnd_combine fn m b in
         let m,v = gen_vs_rename fnT m u in
         t_eps_close v (t_gen_map fnT fnL m f)
-    | Fquant (q, (vl,b,tl,f1)) ->
+    | Tquant (q, (vl,b,tl,f1)) ->
         let m = gen_bnd_combine fn m b in
         let m,vl = gen_vl_rename fnT m vl in
         let fn = t_gen_map fnT fnL m in
-        f_quant_close q vl (tr_map fn tl) (fn f1)
-    | Fbinop (op, f1, f2) ->
-        f_binary op (fn f1) (fn f2)
-    | Fnot f1 ->
-        f_not (fn f1)
-    | Ftrue | Ffalse ->
+        t_quant_close q vl (tr_map fn tl) (fn f1)
+    | Tbinop (op, f1, f2) ->
+        t_binary op (fn f1) (fn f2)
+    | Tnot f1 ->
+        t_not (fn f1)
+    | Ttrue | Tfalse ->
         t)
 
 let t_gen_map fnT fnL mapV t = t_gen_map (Wty.memoize 17 fnT) fnL mapV t
@@ -861,13 +856,13 @@ let rec t_gen_fold fnT fnL acc t =
         fn (pat_gen_fold fnT fnL (bnd_fold fn acc b) p) t in
       List.fold_left branch (fn acc t1) bl
   | Teps (_,b,f) -> fn (bnd_fold fn acc b) f
-  | Fquant (_, (vl,b,tl,f1)) ->
+  | Tquant (_, (vl,b,tl,f1)) ->
       (* these variables (and their types) may never appear below *)
       let acc = List.fold_left (fun a v -> fnT a v.vs_ty) acc vl in
       fn (tr_fold fn (bnd_fold fn acc b) tl) f1
-  | Fbinop (_, f1, f2) -> fn (fn acc f1) f2
-  | Fnot f1 -> fn acc f1
-  | Ftrue | Ffalse -> acc
+  | Tbinop (_, f1, f2) -> fn (fn acc f1) f2
+  | Tnot f1 -> fn acc f1
+  | Ttrue | Tfalse -> acc
 
 let t_s_fold = t_gen_fold
 
@@ -903,9 +898,9 @@ let t_map fn t = match t.t_node with
   | Teps b ->
       let u,t1,close = t_open_bound_cb b in
       t_label_copy t (t_eps (close u (fn t1)))
-  | Fquant (q, b) ->
-      let vl,tl,f1,close = f_open_quant_cb b in
-      t_label_copy t (f_quant q (close vl (tr_map fn tl) (fn f1)))
+  | Tquant (q, b) ->
+      let vl,tl,f1,close = t_open_quant_cb b in
+      t_label_copy t (t_quant q (close vl (tr_map fn tl) (fn f1)))
   | _ ->
       t_map_unsafe fn t
 
@@ -922,8 +917,8 @@ let t_fold fn acc t = match t.t_node with
       List.fold_left brn (fn acc t1) bl
   | Teps b ->
       let _,f = t_open_bound b in fn acc f
-  | Fquant (_, b) ->
-      let _, tl, f1 = f_open_quant b in tr_fold fn (fn acc f1) tl
+  | Tquant (_, b) ->
+      let _, tl, f1 = t_open_quant b in tr_fold fn (fn acc f1) tl
   | _ -> t_fold_unsafe fn acc t
 
 let t_all pr t = try t_fold (all_fn pr) true t with FoldSkip -> false
@@ -948,11 +943,11 @@ let t_map_fold fn acc t = match t.t_node with
       let u,t1,close = t_open_bound_cb b in
       let acc, t1 = fn acc t1 in
       acc, t_label_copy t (t_eps (close u t1))
-  | Fquant (q,b) ->
-      let vl,tl,f1,close = f_open_quant_cb b in
+  | Tquant (q,b) ->
+      let vl,tl,f1,close = t_open_quant_cb b in
       let acc, tl = tr_map_fold fn acc tl in
       let acc, f1 = fn acc f1 in
-      acc, t_label_copy t (f_quant q (close vl tl f1))
+      acc, t_label_copy t (t_quant q (close vl tl f1))
   | _ -> t_map_fold_unsafe fn acc t
 
 let t_map_fold fn = t_map_fold (fun acc t ->
@@ -961,23 +956,23 @@ let t_map_fold fn = t_map_fold (fun acc t ->
 (* polarity map *)
 
 let t_map_sign fn sign f = t_label_copy f (match f.t_node with
-  | Fbinop (Fimplies, f1, f2) ->
-      f_implies (fn (not sign) f1) (fn sign f2)
-  | Fbinop (Fiff, f1, f2) ->
+  | Tbinop (Timplies, f1, f2) ->
+      t_implies (fn (not sign) f1) (fn sign f2)
+  | Tbinop (Tiff, f1, f2) ->
       let f1p = fn sign f1 in let f1n = fn (not sign) f1 in
       let f2p = fn sign f2 in let f2n = fn (not sign) f2 in
-      if t_equal f1p f1n && t_equal f2p f2n then f_iff f1p f2p
+      if t_equal f1p f1n && t_equal f2p f2n then t_iff f1p f2p
       else if sign
-        then f_and (f_implies f1n f2p) (f_implies f2n f1p)
-        else f_implies (f_or f1n f2n) (f_and f1p f2p)
-  | Fnot f1 ->
-      f_not (fn (not sign) f1)
+        then t_and (t_implies f1n f2p) (t_implies f2n f1p)
+        else t_implies (t_or f1n f2n) (t_and f1p f2p)
+  | Tnot f1 ->
+      t_not (fn (not sign) f1)
   | Tif (f1, f2, f3) when f.t_ty = None ->
       let f1p = fn sign f1 in let f1n = fn (not sign) f1 in
       let f2 = fn sign f2 in let f3 = fn sign f3 in
       if t_equal f1p f1n then t_if f1p f2 f3 else if sign
-        then f_and (f_implies f1n f2) (f_implies (f_not f1p) f3)
-        else f_or (f_and f1p f2) (f_and (f_not f1n) f3)
+        then t_and (t_implies f1n f2) (t_implies (t_not f1p) f3)
+        else t_or (t_and f1p f2) (t_and (t_not f1n) f3)
   | Tif _
   | Teps _ -> failwith "t_map_sign: cannot determine polarity"
   | _ -> t_map (fn sign) f)
@@ -1021,19 +1016,19 @@ let t_map_cont fn contT t =
       let u,f,close = t_open_bound_cb b in
       let cont_eps f = contT (t_eps (close u f)) in
       fn cont_eps f
-  | Fquant (q, b) ->
-      let vl, tl, f1, close = f_open_quant_cb b in
-      let cont_dot tl f1 = contT (f_quant q (close vl tl f1)) in
+  | Tquant (q, b) ->
+      let vl, tl, f1, close = t_open_quant_cb b in
+      let cont_dot tl f1 = contT (t_quant q (close vl tl f1)) in
       let cont_quant tl = fn (cont_dot tl) f1 in
       list_map_cont (list_map_cont fn) cont_quant tl
-  | Fbinop (op, f1, f2) ->
-      let cont_r f1 f2 = contT (f_binary op f1 f2) in
+  | Tbinop (op, f1, f2) ->
+      let cont_r f1 f2 = contT (t_binary op f1 f2) in
       let cont_l f1 = fn (cont_r f1) f2 in
       fn cont_l f1
-  | Fnot f1 ->
-      let cont_not f1 = contT (f_not f1) in
+  | Tnot f1 ->
+      let cont_not f1 = contT (t_not f1) in
       fn cont_not f1
-  | Ftrue | Ffalse -> contT t
+  | Ttrue | Tfalse -> contT t
 
 let t_map_cont fn = t_map_cont (fun cont t ->
   fn (fun e -> t_ty_check e t.t_ty; cont e) t)
@@ -1130,19 +1125,19 @@ let rec t_equal_alpha c1 c2 m1 m2 t1 t2 =
         let m1 = vs_rename_alpha c1 m1 u1 in
         let m2 = vs_rename_alpha c2 m2 u2 in
         t_equal_alpha c1 c2 m1 m2 e1 e2
-    | Fquant (q1,((vl1,_,_,_) as b1)), Fquant (q2,((vl2,_,_,_) as b2)) ->
+    | Tquant (q1,((vl1,_,_,_) as b1)), Tquant (q2,((vl2,_,_,_) as b2)) ->
         q1 = q2 &&
         list_all2 (fun v1 v2 -> ty_equal v1.vs_ty v2.vs_ty) vl1 vl2 &&
-        let vl1,_,e1 = f_open_quant b1 in
-        let vl2,_,e2 = f_open_quant b2 in
+        let vl1,_,e1 = t_open_quant b1 in
+        let vl2,_,e2 = t_open_quant b2 in
         let m1 = vl_rename_alpha c1 m1 vl1 in
         let m2 = vl_rename_alpha c2 m2 vl2 in
         t_equal_alpha c1 c2 m1 m2 e1 e2
-    | Fbinop (a,f1,g1), Fbinop (b,f2,g2) ->
+    | Tbinop (a,f1,g1), Tbinop (b,f2,g2) ->
         a = b && t_eq f1 f2 && t_eq g1 g2
-    | Fnot f1, Fnot f2 ->
+    | Tnot f1, Tnot f2 ->
         t_eq f1 f2
-    | Ftrue, Ftrue | Ffalse, Ffalse ->
+    | Ttrue, Ttrue | Tfalse, Tfalse ->
         true
     | _ -> false
 
@@ -1190,20 +1185,20 @@ let rec t_hash_alpha c m t =
       let u,f = t_open_bound b in
       let m = vs_rename_alpha c m u in
       Hashcons.combine 6 (t_hash_alpha c m f)
-  | Fquant (q,b) ->
-      let vl,_,f1 = f_open_quant b in
+  | Tquant (q,b) ->
+      let vl,_,f1 = t_open_quant b in
       let m = vl_rename_alpha c m vl in
-      let hq = match q with Fforall -> 1 | Fexists -> 2 in
+      let hq = match q with Tforall -> 1 | Texists -> 2 in
       Hashcons.combine2 1 hq (t_hash_alpha c m f1)
-  | Fbinop (o,f,g) ->
+  | Tbinop (o,f,g) ->
       let ho = match o with
-        | Fand -> 3 | For -> 4 | Fimplies -> 5 | Fiff -> 7
+        | Tand -> 3 | Tor -> 4 | Timplies -> 5 | Tiff -> 7
       in
       Hashcons.combine3 2 ho (fn f) (fn g)
-  | Fnot f ->
+  | Tnot f ->
       Hashcons.combine 3 (fn f)
-  | Ftrue -> 4
-  | Ffalse -> 5
+  | Ttrue -> 4
+  | Tfalse -> 5
 
 let t_hash_alpha = t_hash_alpha (ref (-1)) Mvs.empty
 
@@ -1230,12 +1225,12 @@ let rec t_match s t1 t2 =
         List.fold_left2 t_match s l1 l2
     | Tif (f1,t1,e1), Tif (f2,t2,e2) ->
         t_match (t_match (t_match s f1 f2) t1 t2) e1 e2
-    | Fbinop (op1,f1,g1), Fbinop (op2,f2,g2) when op1 = op2 ->
+    | Tbinop (op1,f1,g1), Tbinop (op2,f2,g2) when op1 = op2 ->
         t_match (t_match s f1 f2) g1 g2
-    | Fnot f1, Fnot f2 ->
+    | Tnot f1, Tnot f2 ->
         t_match s f1 f2
-    | Ftrue, Ftrue
-    | Ffalse, Ffalse ->
+    | Ttrue, Ttrue
+    | Tfalse, Tfalse ->
         s
     | _ -> raise NoMatch
 
@@ -1265,67 +1260,67 @@ let t_subst_term_alpha t1 t2 t =
 
 (* constructors with propositional simplification *)
 
-let f_not_simp f = match f.t_node with
-  | Ftrue  -> f_false
-  | Ffalse -> f_true
-  | Fnot f -> f
-  | _      -> f_not f
+let t_not_simp f = match f.t_node with
+  | Ttrue  -> t_false
+  | Tfalse -> t_true
+  | Tnot f -> f
+  | _      -> t_not f
 
-let f_and_simp f1 f2 =
-  let f12 = f_and f1 f2 in
+let t_and_simp f1 f2 =
+  let f12 = t_and f1 f2 in
   match f1.t_node, f2.t_node with
-  | Ftrue, _  -> f2
-  | _, Ftrue  -> f1
-  | Ffalse, _ -> f1
-  | _, Ffalse -> f2
+  | Ttrue, _  -> f2
+  | _, Ttrue  -> f1
+  | Tfalse, _ -> f1
+  | _, Tfalse -> f2
   | _, _      -> if t_equal f1 f2 then f1 else f12
 
-let f_and_simp_l l = List.fold_left f_and_simp f_true l
+let t_and_simp_l l = List.fold_left t_and_simp t_true l
 
-let f_or_simp f1 f2 =
-  let f12 = f_or f1 f2 in
+let t_or_simp f1 f2 =
+  let f12 = t_or f1 f2 in
   match f1.t_node, f2.t_node with
-  | Ftrue, _  -> f1
-  | _, Ftrue  -> f2
-  | Ffalse, _ -> f2
-  | _, Ffalse -> f1
+  | Ttrue, _  -> f1
+  | _, Ttrue  -> f2
+  | Tfalse, _ -> f2
+  | _, Tfalse -> f1
   | _, _      -> if t_equal f1 f2 then f1 else f12
 
-let f_or_simp_l l = List.fold_left f_or_simp f_false l
+let t_or_simp_l l = List.fold_left t_or_simp t_false l
 
-let f_implies_simp f1 f2 =
-  let f12 = f_implies f1 f2 in
+let t_implies_simp f1 f2 =
+  let f12 = t_implies f1 f2 in
   match f1.t_node, f2.t_node with
-  | Ftrue, _  -> f2
-  | _, Ftrue  -> f2
-  | Ffalse, _ -> f_true
-  | _, Ffalse -> f_not_simp f1
-  | _, _      -> if t_equal f1 f2 then f_true else f12
+  | Ttrue, _  -> f2
+  | _, Ttrue  -> f2
+  | Tfalse, _ -> t_true
+  | _, Tfalse -> t_not_simp f1
+  | _, _      -> if t_equal f1 f2 then t_true else f12
 
-let f_iff_simp f1 f2 =
-  let f12 = f_iff f1 f2 in
+let t_iff_simp f1 f2 =
+  let f12 = t_iff f1 f2 in
   match f1.t_node, f2.t_node with
-  | Ftrue, _  -> f2
-  | _, Ftrue  -> f1
-  | Ffalse, _ -> f_not_simp f2
-  | _, Ffalse -> f_not_simp f1
-  | _, _      -> if t_equal f1 f2 then f_true else f12
+  | Ttrue, _  -> f2
+  | _, Ttrue  -> f1
+  | Tfalse, _ -> t_not_simp f2
+  | _, Tfalse -> t_not_simp f1
+  | _, _      -> if t_equal f1 f2 then t_true else f12
 
-let f_binary_simp op = match op with
-  | Fand     -> f_and_simp
-  | For      -> f_or_simp
-  | Fimplies -> f_implies_simp
-  | Fiff     -> f_iff_simp
+let t_binary_simp op = match op with
+  | Tand     -> t_and_simp
+  | Tor      -> t_or_simp
+  | Timplies -> t_implies_simp
+  | Tiff     -> t_iff_simp
 
 let t_if_simp f1 f2 f3 =
   let f123 = t_if f1 f2 f3 in
   match f1.t_node, f2.t_node, f3.t_node with
-  | Ftrue, _, _  -> f2
-  | Ffalse, _, _ -> f3
-  | _, Ftrue, _  -> f_implies_simp (f_not_simp f1) f3
-  | _, Ffalse, _ -> f_and_simp (f_not_simp f1) f3
-  | _, _, Ftrue  -> f_implies_simp f1 f2
-  | _, _, Ffalse -> f_and_simp f1 f2
+  | Ttrue, _, _  -> f2
+  | Tfalse, _, _ -> f3
+  | _, Ttrue, _  -> t_implies_simp (t_not_simp f1) f3
+  | _, Tfalse, _ -> t_and_simp (t_not_simp f1) f3
+  | _, _, Ttrue  -> t_implies_simp f1 f2
+  | _, _, Tfalse -> t_and_simp f1 f2
   | _, _, _      -> if t_equal f2 f3 then f2 else f123
 
 let t_let_simp e ((v,_,t) as bt) = match e.t_node with
@@ -1344,52 +1339,52 @@ let vl_filter f vl =
 let tr_filter f tl =
   List.filter (List.for_all (fun e -> Svs.subset e.t_vars f.t_vars)) tl
 
-let f_quant_simp q ((vl,_,_,f) as qf) =
+let t_quant_simp q ((vl,_,_,f) as qf) =
   if List.for_all (fun v -> Svs.mem v f.t_vars) vl then
-    f_quant q qf
+    t_quant q qf
   else
-    let vl,tl,f = f_open_quant qf in
+    let vl,tl,f = t_open_quant qf in
     let vl = vl_filter f vl in if vl = [] then f else
-    f_quant_close q vl (tr_filter f tl) f
+    t_quant_close q vl (tr_filter f tl) f
 
-let f_quant_close_simp q vl tl f =
+let t_quant_close_simp q vl tl f =
   if List.for_all (fun v -> Svs.mem v f.t_vars) vl then
-    f_quant_close q vl tl f
+    t_quant_close q vl tl f
   else
     let vl = vl_filter f vl in if vl = [] then f else
-    f_quant_close q vl (tr_filter f tl) f
+    t_quant_close q vl (tr_filter f tl) f
 
-let f_forall_simp = f_quant_simp Fforall
-let f_exists_simp = f_quant_simp Fexists
+let t_forall_simp = t_quant_simp Tforall
+let t_exists_simp = t_quant_simp Texists
 
-let f_forall_close_simp = f_quant_close_simp Fforall
-let f_exists_close_simp = f_quant_close_simp Fexists
+let t_forall_close_simp = t_quant_close_simp Tforall
+let t_exists_close_simp = t_quant_close_simp Texists
 
-let f_equ_simp t1 t2 = if t_equal t1 t2 then f_true  else f_equ t1 t2
-let f_neq_simp t1 t2 = if t_equal t1 t2 then f_false else f_neq t1 t2
+let t_equ_simp t1 t2 = if t_equal t1 t2 then t_true  else t_equ t1 t2
+let t_neq_simp t1 t2 = if t_equal t1 t2 then t_false else t_neq t1 t2
 
-let f_forall_close_merge vs f =
+let t_forall_close_merge vs f =
   match f.t_node with
-  | Fquant (Fforall, fq) ->
-      let vs', trs, f = f_open_quant fq in
-      f_forall_close (vs@vs') trs f
-  | _ -> f_forall_close vs [] f
+  | Tquant (Tforall, fq) ->
+      let vs', trs, f = t_open_quant fq in
+      t_forall_close (vs@vs') trs f
+  | _ -> t_forall_close vs [] f
 
 let t_map_simp fn f = t_label_copy f (match f.t_node with
   | Tapp (p, [t1;t2]) when ls_equal p ps_equ ->
-      f_equ_simp (fn t1) (fn t2)
+      t_equ_simp (fn t1) (fn t2)
   | Tif (f1, f2, f3) ->
       t_if_simp (fn f1) (fn f2) (fn f3)
   | Tlet (t, b) ->
       let u,t2,close = t_open_bound_cb b in
       t_let_simp (fn t) (close u (fn t2))
-  | Fquant (q, b) ->
-      let vl,tl,f1,close = f_open_quant_cb b in
-      f_quant_simp q (close vl (tr_map fn tl) (fn f1))
-  | Fbinop (op, f1, f2) ->
-      f_binary_simp op (fn f1) (fn f2)
-  | Fnot f1 ->
-      f_not_simp (fn f1)
+  | Tquant (q, b) ->
+      let vl,tl,f1,close = t_open_quant_cb b in
+      t_quant_simp q (close vl (tr_map fn tl) (fn f1))
+  | Tbinop (op, f1, f2) ->
+      t_binary_simp op (fn f1) (fn f2)
+  | Tnot f1 ->
+      t_not_simp (fn f1)
   | _ -> t_map fn f)
 
 let t_map_simp fn = t_map_simp (fun t ->
@@ -1398,16 +1393,22 @@ let t_map_simp fn = t_map_simp (fun t ->
 (** Traversal with separate functions for value-typed and prop-typed terms *)
 
 module TermTF = struct
-  let t_map fnT fnF = t_map (e_map fnT fnF)
-  let t_fold fnT fnF = t_fold (e_fold fnT fnF)
-  let t_map_fold fnT fnF = t_map_fold (e_fold fnT fnF)
-  let t_all prT prF = t_all (e_map prT prF)
-  let t_any prT prF = t_any (e_map prT prF)
-  let t_map_simp fnT fnF = t_map_simp (e_map fnT fnF)
-  let t_map_sign fnT fnF = t_map_sign (e_fold fnT fnF)
-  let t_map_cont fnT fnF = t_map_cont (e_fold fnT fnF)
-  let tr_map fnT fnF = tr_map (e_map fnT fnF)
-  let tr_fold fnT fnF = tr_fold (e_fold fnT fnF)
-  let tr_map_fold fnT fnF = tr_map_fold (e_fold fnT fnF)
+  let t_select fnT fnF e =
+    if e.t_ty = None then fnF e else fnT e
+
+  let t_selecti fnT fnF acc e =
+    if e.t_ty = None then fnF acc e else fnT acc e
+
+  let t_map fnT fnF = t_map (t_select fnT fnF)
+  let t_fold fnT fnF = t_fold (t_selecti fnT fnF)
+  let t_map_fold fnT fnF = t_map_fold (t_selecti fnT fnF)
+  let t_all prT prF = t_all (t_select prT prF)
+  let t_any prT prF = t_any (t_select prT prF)
+  let t_map_simp fnT fnF = t_map_simp (t_select fnT fnF)
+  let t_map_sign fnT fnF = t_map_sign (t_selecti fnT fnF)
+  let t_map_cont fnT fnF = t_map_cont (t_selecti fnT fnF)
+  let tr_map fnT fnF = tr_map (t_select fnT fnF)
+  let tr_fold fnT fnF = tr_fold (t_selecti fnT fnF)
+  let tr_map_fold fnT fnF = tr_map_fold (t_selecti fnT fnF)
 end
 

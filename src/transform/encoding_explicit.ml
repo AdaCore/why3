@@ -118,13 +118,13 @@ module Transform = struct
 
   (** transform an inductive declaration *)
   let ind_transform idl =
-    let iconv (pr,f) = pr, Libencoding.f_type_close fmla_transform f in
+    let iconv (pr,f) = pr, Libencoding.t_type_close fmla_transform f in
     let conv (ls,il) = findL ls, List.map iconv il in
     [Decl.create_ind_decl (List.map conv idl)]
 
   (** transforms a proposition into another (mostly a substitution) *)
   let prop_transform (prop_kind, prop_name, f) =
-    let quantified_fmla = Libencoding.f_type_close fmla_transform f in
+    let quantified_fmla = Libencoding.t_type_close fmla_transform f in
     [Decl.create_prop_decl prop_kind prop_name quantified_fmla]
 
 end
@@ -144,7 +144,10 @@ let meta_enum = Eliminate_algebraic.meta_enum
 let explicit =
   Trans.on_tagged_ts meta_enum (fun enum ->
     if Sts.is_empty enum then explicit
-    else Printer.unsupportedTysymbol (Sts.choose enum)
+    else 
+      let ts = Sts.choose enum in
+      let ty = ty_app ts (List.map ty_var ts.ts_args) in
+      Printer.unsupportedType ty
       "explicit is unsound in presence of type")
 
 

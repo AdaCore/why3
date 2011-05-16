@@ -78,7 +78,7 @@ val add_meta : task -> meta -> meta_arg list -> task
 val add_ty_decl : task -> ty_decl list -> task
 val add_logic_decl : task -> logic_decl list -> task
 val add_ind_decl : task -> ind_decl list -> task
-val add_prop_decl : task -> prop_kind -> prsymbol -> fmla -> task
+val add_prop_decl : task -> prop_kind -> prsymbol -> term -> task
 
 (** {2 utilities} *)
 
@@ -95,7 +95,7 @@ val task_tdecls : task -> tdecl list
 val task_decls  : task -> decl list
 
 val task_goal  : task -> prsymbol
-val task_goal_fmla  : task -> fmla
+val task_goal_fmla  : task -> term
 
 (** {2 selectors} *)
 

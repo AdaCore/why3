@@ -28,9 +28,9 @@ the alt-ergo prover to check them
 open Why
 
 (* a ground propositional goal: true or false *)
-let fmla_true : Term.fmla = Term.f_true
-let fmla_false : Term.fmla = Term.f_false
-let fmla1 : Term.fmla = Term.f_or fmla_true fmla_false
+let fmla_true : Term.term = Term.t_true
+let fmla_false : Term.term = Term.t_false
+let fmla1 : Term.term = Term.t_or fmla_true fmla_false
 
 (* printing it *)
 open Format
@@ -41,9 +41,9 @@ let () = printf "@[formula 1 is:@ %a@]@." Pretty.print_term fmla1
 
 let prop_var_A : Term.lsymbol = Term.create_psymbol (Ident.id_fresh "A") []
 let prop_var_B : Term.lsymbol = Term.create_psymbol (Ident.id_fresh "B") []
-let atom_A : Term.fmla = Term.ps_app prop_var_A []
-let atom_B : Term.fmla = Term.ps_app prop_var_B []
-let fmla2 : Term.fmla = Term.f_implies (Term.f_and atom_A atom_B) atom_A
+let atom_A : Term.term = Term.ps_app prop_var_A []
+let atom_B : Term.term = Term.ps_app prop_var_B []
+let fmla2 : Term.term = Term.t_implies (Term.t_and atom_A atom_B) atom_A
 let () = printf "@[formula 2 is:@ %a@]@." Pretty.print_term fmla2
 
 
@@ -124,7 +124,7 @@ let plus_symbol : Term.lsymbol =
   Theory.ns_find_ls int_theory.Theory.th_export ["infix +"]
 let two_plus_two : Term.term = Term.fs_app plus_symbol [two;two] Ty.ty_int
 let two_plus_two : Term.term = Term.t_app_infer plus_symbol [two;two] 
-let fmla3 : Term.fmla = Term.f_equ two_plus_two four
+let fmla3 : Term.term = Term.t_equ two_plus_two four
 
 let task3 = None
 let task3 = Task.use_export task3 int_theory
@@ -156,12 +156,12 @@ let var_x : Term.vsymbol =
 let x : Term.term = Term.t_var var_x
 let x_times_x : Term.term = 
   Term.t_app_infer mult_symbol [x;x] 
-let fmla4_aux : Term.fmla = 
+let fmla4_aux : Term.term = 
   Term.ps_app ge_symbol [x_times_x;zero]
-let fmla4_quant : Term.fmla_quant = 
-  Term.f_close_quant [var_x] [] fmla4_aux
-let fmla4 : Term.fmla =
-  Term.f_forall fmla4_quant
+let fmla4_quant : Term.term_quant = 
+  Term.t_close_quant [var_x] [] fmla4_aux
+let fmla4 : Term.term =
+  Term.t_forall fmla4_quant
 
 let task4 = None
 let task4 = Task.use_export task4 int_theory

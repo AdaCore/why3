@@ -57,8 +57,8 @@ let ls_selects_def_of_ts acc ts =
   let id = string_of_int (id_hash ts.ts_name) in
   let acc =
     let t = fs_app ls tvars ty_type in
-    let f = f_equ (fs_app ls_int_of_ty [t] ty_int) (t_int_const id) in
-    let f = f_forall_close vars [[t]] f in
+    let f = t_equ (fs_app ls_int_of_ty [t] ty_int) (t_int_const id) in
+    let f = t_forall_close vars [[t]] f in
     let prsymbol = create_prsymbol (id_clone ts.ts_name) in
     create_prop_decl Paxiom prsymbol f :: acc
   in
@@ -68,8 +68,8 @@ let ls_selects_def_of_ts acc ts =
     (fun ls_select value ->
       let t = fs_app ls tvars ty_type in
       let t = fs_app ls_select [t] ty_type in
-      let f = f_equ t value in
-      let f = f_forall_close vars [[t]] f in
+      let f = t_equ t value in
+      let f = t_forall_close vars [[t]] f in
       f)
     ls_selects tvars in
   let create_props ls_select fmla =
@@ -95,9 +95,9 @@ let type_close tvs fn f =
   let tvm = Mtv.mapi (fun v () -> get_vs v) tvs in
   let vl = Mtv.values tvm in
   let tvm = Mtv.map t_var tvm in
-  f_forall_close_simp vl [] (fn tvm f)
+  t_forall_close_simp vl [] (fn tvm f)
 
-let f_type_close fn f =
+let t_type_close fn f =
   let tvs = t_ty_freevars Stv.empty f in
   type_close tvs fn f
 
@@ -181,28 +181,28 @@ let rec t_monomorph ty_base kept lsmap consts vmap t =
         let v = vs_monomorph ty_base kept u in
         let f = f_mono (Mvs.add u (t_var v) vmap) f in
         t_eps (close v f)
-    | Fquant _ | Fbinop _ | Fnot _ | Ftrue | Ffalse -> raise (TermExpected t))
+    | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> raise (TermExpected t))
 
 and f_monomorph ty_base kept lsmap consts vmap f =
   let t_mono = t_monomorph ty_base kept lsmap consts in
   let f_mono = f_monomorph ty_base kept lsmap consts in
   t_label_copy f (match f.t_node with
     | Tapp (ps,[t1;t2]) when ls_equal ps ps_equ ->
-        f_equ (t_mono vmap t1) (t_mono vmap t2)
+        t_equ (t_mono vmap t1) (t_mono vmap t2)
     | Tapp (ps,tl) ->
         ps_app (lsmap ps) (List.map (t_mono vmap) tl)
-    | Fquant (q,b) ->
-        let ul,tl,f1,close = f_open_quant_cb b in
+    | Tquant (q,b) ->
+        let ul,tl,f1,close = t_open_quant_cb b in
         let vl = List.map (vs_monomorph ty_base kept) ul in
         let add acc u v = Mvs.add u (t_var v) acc in
         let vmap = List.fold_left2 add vmap ul vl in
         let tl = TermTF.tr_map (t_mono vmap) (f_mono vmap) tl in
-        f_quant q (close vl tl (f_mono vmap f1))
-    | Fbinop (op,f1,f2) ->
-        f_binary op (f_mono vmap f1) (f_mono vmap f2)
-    | Fnot f1 ->
-        f_not (f_mono vmap f1)
-    | Ftrue | Ffalse ->
+        t_quant q (close vl tl (f_mono vmap f1))
+    | Tbinop (op,f1,f2) ->
+        t_binary op (f_mono vmap f1) (f_mono vmap f2)
+    | Tnot f1 ->
+        t_not (f_mono vmap f1)
+    | Ttrue | Tfalse ->
         f
     | Tif (f1,f2,f3) ->
         t_if (f_mono vmap f1) (f_mono vmap f2) (f_mono vmap f3)
@@ -212,7 +212,7 @@ and f_monomorph ty_base kept lsmap consts vmap f =
         let f1 = f_mono (Mvs.add u (t_var v) vmap) f1 in
         t_let (t_mono vmap t) (close v f1)
     | Tcase _ ->
-        Printer.unsupportedFmla f "no match expressions at this point"
+        Printer.unsupportedTerm f "no match expressions at this point"
     | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f))
 
 let d_monomorph ty_base kept lsmap d =
@@ -241,7 +241,7 @@ let d_monomorph ty_base kept lsmap d =
               let vl = List.map (vs_monomorph ty_base kept) ul in
               let add acc u v = Mvs.add u (t_var v) acc in
               let vmap = List.fold_left2 add Mvs.empty ul vl in
-              let e = e_fold t_mono f_mono vmap e in
+              let e = TermTF.t_selecti t_mono f_mono vmap e in
               make_ls_defn ls vl e
           | None ->
               ls, None

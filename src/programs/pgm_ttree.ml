@@ -136,7 +136,7 @@ and dtriple = dpre * dexpr * dpost
 type variant = Term.term * Term.lsymbol option
 
 type loop_annotation = {
-  loop_invariant : Term.fmla option;
+  loop_invariant : Term.term option;
   loop_variant   : variant option;
 }
 
@@ -213,9 +213,9 @@ and iexpr_desc =
   | IEraise of esymbol * iexpr option
   | IEtry of iexpr * (esymbol * ivsymbol option * iexpr) list
   | IEfor of ivsymbol * ivsymbol * for_direction * ivsymbol *
-             Term.fmla option * iexpr
+             Term.term option * iexpr
 
-  | IEassert of assertion_kind * Term.fmla
+  | IEassert of assertion_kind * Term.term
   | IElabel of label * iexpr
   | IEany of itype_c
 
@@ -270,9 +270,9 @@ and expr_desc =
   | Eraise of esymbol * expr option
   | Etry of expr * (esymbol * pvsymbol option * expr) list
   | Efor of pvsymbol * pvsymbol * for_direction * pvsymbol *
-            Term.fmla option * expr
+            Term.term option * expr
 
-  | Eassert of assertion_kind * Term.fmla
+  | Eassert of assertion_kind * Term.term
   | Elabel of label * expr
   | Eany of type_c
 

@@ -346,10 +346,10 @@ let split_qualid = function
 (** Typing terms and formulas *)
 
 let binop = function
-  | PPand -> Fand
-  | PPor -> For
-  | PPimplies -> Fimplies
-  | PPiff -> Fiff
+  | PPand -> Tand
+  | PPor -> Tor
+  | PPimplies -> Timplies
+  | PPiff -> Tiff
 
 let check_pat_linearity p =
   let s = ref Sstr.empty in
@@ -601,9 +601,9 @@ and dterm_node ~localize loc uc env = function
               h uqu tyl
             in
             let u = { dt_node = Tvar uid.id ; dt_ty = uty } in
-            id, ty, Fbinop (Fiff, Fapp (ps_pred_app, [h;u]), f)
+            id, ty, Fbinop (Tiff, Fapp (ps_pred_app, [h;u]), f)
       in
-      Teps (id, ty, Fquant (Fforall, uqu, trl, f)), ty
+      Teps (id, ty, Fquant (Tforall, uqu, trl, f)), ty
   | PPrecord fl ->
       let _,cs,fl = list_fields uc fl in
       let tyl,ty = Denv.specialize_lsymbol ~loc cs in
@@ -692,8 +692,8 @@ and dfmla_node ~localize loc uc env = function
       in
       let trl = List.map (List.map trigger) trl in
       let q = match q with
-        | PPforall -> Fforall
-        | PPexists -> Fexists
+        | PPforall -> Tforall
+        | PPexists -> Texists
         | _ -> error ~loc PredicateExpected
       in
       Fquant (q, uqu, trl, dfmla ~localize uc env a)
@@ -710,7 +710,7 @@ and dfmla_node ~localize loc uc env = function
       begin match e12.pp_desc with
 	| PPinfix (_, op1, e2) when is_psymbol (Qident op1) uc ->
 	    let e23 = { pp_desc = PPinfix (e2, op2, e3); pp_loc = loc } in
-	    Fbinop (Fand, dfmla ~localize uc env e12, 
+	    Fbinop (Tand, dfmla ~localize uc env e12, 
 		    dfmla ~localize uc env e23)
 	| _ ->
 	    let s, tyl = specialize_psymbol (Qident op2) uc in

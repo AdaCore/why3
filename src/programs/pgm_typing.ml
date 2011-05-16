@@ -1467,7 +1467,7 @@ let saturation loc ef (a,al) =
       x, List.assoc x al
     with Not_found ->
       (* warning_no_post loc x; *)
-      x, (exn_v_result x, f_false)
+      x, (exn_v_result x, t_false)
   in
   (a, List.map set_post (Sexn.elements xs))
 
@@ -1670,14 +1670,14 @@ and letrec gl env dl = (* : env * recfun list *)
 	| Some phi0, Some (_, phi, r) ->
 	    let decphi = match r with
 	      | None -> (* 0 <= phi0 and phi < phi0 *)
-		  f_and (ps_app (find_ls ~pure:true gl "infix <=")
+		  t_and (ps_app (find_ls ~pure:true gl "infix <=")
 		        [t_int_const "0"; t_var phi0])
                     (ps_app (find_ls ~pure:true gl "infix <")
                         [phi;t_var phi0])
 	      | Some r -> 
 		  ps_app r [phi; t_var phi0] 
 	    in
-	    { c with c_pre = f_and decphi c.c_pre }
+	    { c with c_pre = t_and decphi c.c_pre }
 	| _ ->
 	    c
       in

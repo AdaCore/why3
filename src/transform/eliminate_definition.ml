@@ -62,7 +62,7 @@ let rec t_insert hd t = match t.t_node with
         t_close_branch pl (t_insert hd t1)
       in
       t_case tl (List.map br bl)
-  | _ -> f_equ_simp hd t
+  | _ -> t_equ_simp hd t
 
 let rec f_insert hd f = match f.t_node with
   | Tif (f1,f2,f3) ->
@@ -76,7 +76,7 @@ let rec f_insert hd f = match f.t_node with
         t_close_branch pl (f_insert hd f1)
       in
       t_case tl (List.map br bl)
-  | _ -> f_iff_simp hd f
+  | _ -> t_iff_simp hd f
 
 let add_ld func pred axl d = match d with
   | _, None ->
@@ -86,13 +86,13 @@ let add_ld func pred axl d = match d with
         | Some _ when func ->
             let nm = ls.ls_name.id_string ^ "_def" in
             let hd = t_app ls (List.map t_var vl) e.t_ty in
-            let ax = f_forall_close vl [] (t_insert hd e) in
+            let ax = t_forall_close vl [] (t_insert hd e) in
             let pr = create_prsymbol (id_derive nm ls.ls_name) in
             create_prop_decl Paxiom pr ax :: axl, (ls, None)
         | None when pred ->
             let nm = ls.ls_name.id_string ^ "_def" in
             let hd = ps_app ls (List.map t_var vl) in
-            let ax = f_forall_close vl [] (f_insert hd e) in
+            let ax = t_forall_close vl [] (f_insert hd e) in
             let pr = create_prsymbol (id_derive nm ls.ls_name) in
             create_prop_decl Paxiom pr ax :: axl, (ls, None)
         | _ -> axl, d

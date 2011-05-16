@@ -162,10 +162,10 @@ let print_quant = Pretty.print_quant
 let print_binop = Pretty.print_binop
 
 let prio_binop = function
-  | Fand -> 3
-  | For -> 2
-  | Fimplies -> 1
-  | Fiff -> 1
+  | Tand -> 3
+  | Tor -> 2
+  | Timplies -> 1
+  | Tiff -> 1
 
 let print_label = Pretty.print_label
 
@@ -217,7 +217,7 @@ and print_tnode pri fmt t = match t.t_node with
       fprintf fmt (protect_on (pri > 0) "epsilon %a.@ %a")
         print_vsty v print_fmla f;
       forget_var v
-  | Fquant _ | Fbinop _ | Fnot _ | Ftrue | Ffalse -> raise (TermExpected t)
+  | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> raise (TermExpected t)
 
 and print_fnode pri fmt f = match f.t_node with
   | Tapp (ps, tl) -> begin match query_syntax ps.ls_name with
@@ -228,20 +228,20 @@ and print_fnode pri fmt f = match f.t_node with
               print_ls ps (print_list space (print_lterm 5)) tl
           end
       end
-  | Fquant (q,fq) ->
-      let vl,tl,f = f_open_quant fq in
+  | Tquant (q,fq) ->
+      let vl,tl,f = t_open_quant fq in
       fprintf fmt (protect_on (pri > 0) "%a %a%a.@ %a") print_quant q
         (print_list comma print_vsty) vl print_tl tl print_fmla f;
       List.iter forget_var vl
-  | Ftrue ->
+  | Ttrue ->
       fprintf fmt "true"
-  | Ffalse ->
+  | Tfalse ->
       fprintf fmt "false"
-  | Fbinop (b,f1,f2) ->
+  | Tbinop (b,f1,f2) ->
       let p = prio_binop b in
       fprintf fmt (protect_on (pri > p) "%a %a@ %a")
         (print_lfmla (p + 1)) f1 print_binop b (print_lfmla p) f2
-  | Fnot f ->
+  | Tnot f ->
       fprintf fmt (protect_on (pri > 4) "not %a") (print_lfmla 4) f
   | Tif (f1,f2,f3) ->
       fprintf fmt (protect_on (pri > 0) "if @[%a@] then %a@ else %a")
@@ -270,7 +270,8 @@ and print_tl fmt tl =
   if tl = [] then () else fprintf fmt "@ [%a]"
     (print_list alt (print_list comma print_expr)) tl
 
-and print_expr fmt = e_map (print_term fmt) (print_fmla fmt)
+and print_expr fmt =
+  TermTF.t_select (print_term fmt) (print_fmla fmt)
 
 (** Declarations *)
 

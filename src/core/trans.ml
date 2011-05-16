@@ -132,7 +132,7 @@ let tgoal   = gen_goal   add_tdecl
 let tgoal_l = gen_goal_l add_tdecl
 
 let rewrite fn = decl (fun d -> [decl_map fn d])
-let rewriteTF fnT fnF = rewrite (e_map fnT fnF)
+let rewriteTF fnT fnF = rewrite (TermTF.t_select fnT fnF)
 
 let gen_add_decl add decls = function
   | Some { task_decl = { td_node = Decl d }; task_prev = prev } ->

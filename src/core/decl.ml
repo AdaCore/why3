@@ -33,7 +33,7 @@ type ty_decl = tysymbol * ty_def
 
 (** Logic declaration *)
 
-type ls_defn = lsymbol * fmla
+type ls_defn = lsymbol * term
 
 type logic_decl = lsymbol * ls_defn option
 
@@ -49,19 +49,19 @@ let check_tl ty t = ty_equal_check ty (t_type t)
 
 let make_ls_defn ls vl t =
   let hd = t_app ls (List.map t_var vl) t.t_ty in
-  let hd = e_fold f_equ f_iff hd t in
-  let fd = f_forall_close vl [] hd in
+  let hd = TermTF.t_selecti t_equ t_iff hd t in
+  let fd = t_forall_close vl [] hd in
   List.iter2 check_vl ls.ls_args vl;
   t_ty_check t ls.ls_value;
   ls, Some (ls, check_fvs fd)
 
 let open_ls_defn (_,f) =
   let vl,_,f = match f.t_node with
-    | Fquant (Fforall,b) -> f_open_quant b
+    | Tquant (Tforall,b) -> t_open_quant b
     | _ -> [],[],f in
   match f.t_node with
     | Tapp (_, [_; f])
-    | Fbinop (_, _, f) -> vl,f
+    | Tbinop (_, _, f) -> vl,f
     | _ -> assert false
 
 let ls_defn_axiom (_,f) = f
@@ -124,8 +124,8 @@ let build_call_graph cgr syms ls =
           let p,t = t_open_branch b in
           let vml = match_term vm e [vm] p in
           List.iter (fun vm -> term vm () t) vml) bl
-    | Fquant (_,b) ->
-        let _,_,f = f_open_quant b in term vm () f
+    | Tquant (_,b) ->
+        let _,_,f = t_open_quant b in term vm () f
     | _ -> t_fold (term vm) () t
   in
   fun (vl,e) ->
@@ -245,7 +245,7 @@ let pr_hash pr = id_hash pr.pr_name
 
 let create_prsymbol n = { pr_name = id_register n }
 
-type ind_decl = lsymbol * (prsymbol * fmla) list
+type ind_decl = lsymbol * (prsymbol * term) list
 
 (** Proposition declaration *)
 
@@ -255,7 +255,7 @@ type prop_kind =
   | Pgoal     (* prove, do not use as a premise *)
   | Pskip     (* do not prove, do not use as a premise *)
 
-type prop_decl = prop_kind * prsymbol * fmla
+type prop_decl = prop_kind * prsymbol * term
 
 (** Declaration type *)
 
@@ -431,11 +431,11 @@ let t_pos_ps sps = t_s_all (fun _ -> true) (fun s -> not (ls_mem s sps))
 let rec f_pos_ps sps pol f = match f.t_node, pol with
   | Tapp (s, _), Some false when ls_mem s sps -> false
   | Tapp (s, _), None when ls_mem s sps -> false
-  | Fbinop (Fiff, f, g), _ ->
+  | Tbinop (Tiff, f, g), _ ->
       f_pos_ps sps None f && f_pos_ps sps None g
-  | Fbinop (Fimplies, f, g), _ ->
+  | Tbinop (Timplies, f, g), _ ->
       f_pos_ps sps (option_map not pol) f && f_pos_ps sps pol g
-  | Fnot f, _ ->
+  | Tnot f, _ ->
       f_pos_ps sps (option_map not pol) f
   | Tif (f,g,h), _ ->
       f_pos_ps sps None f && f_pos_ps sps pol g && f_pos_ps sps pol h
@@ -447,9 +447,9 @@ let create_ind_decl idl =
   let sps = List.fold_left add Sls.empty idl in
   let check_ax ps (syms,news) (pr,f) =
     let rec clause acc f = match f.t_node with
-      | Fquant (Fforall, f) ->
-          let _,_,f = f_open_quant f in clause acc f
-      | Fbinop (Fimplies, g, f) -> clause (g::acc) f
+      | Tquant (Tforall, f) ->
+          let _,_,f = t_open_quant f in clause acc f
+      | Tbinop (Timplies, g, f) -> clause (g::acc) f
       | _ -> (acc, f)
     in
     let cls, f = clause [] (check_fvs f) in
@@ -532,9 +532,9 @@ let decl_map_fold fn acc d = match d.d_node with
       acc, create_prop_decl k pr f
 
 module DeclTF = struct
-let decl_map fnT fnF = decl_map (e_map fnT fnF)
-let decl_fold fnT fnF = decl_fold (e_fold fnT fnF)
-let decl_map_fold fnT fnF = decl_map_fold (e_fold fnT fnF)
+  let decl_map fnT fnF = decl_map (TermTF.t_select fnT fnF)
+  let decl_fold fnT fnF = decl_fold (TermTF.t_selecti fnT fnF)
+  let decl_map_fold fnT fnF = decl_map_fold (TermTF.t_selecti fnT fnF)
 end
 
 (** Known identifiers *)

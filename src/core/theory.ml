@@ -533,11 +533,11 @@ let cl_type cl inst tdl =
 
 let extract_ls_defn f =
   let vl,_,f = match f.t_node with
-    | Fquant (Fforall,b) -> f_open_quant b
+    | Tquant (Tforall,b) -> t_open_quant b
     | _ -> [],[],f in
   match f.t_node with
     | Tapp (_, [{t_node = Tapp (ls,_)}; f])
-    | Fbinop (_, {t_node = Tapp (ls,_)}, f) -> make_ls_defn ls vl f
+    | Tbinop (_, {t_node = Tapp (ls,_)}, f) -> make_ls_defn ls vl f
     | _ -> assert false
 
 let cl_logic cl inst ldl =

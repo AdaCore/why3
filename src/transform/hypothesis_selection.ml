@@ -123,7 +123,7 @@ module NF = struct (* add memoization, one day ? *)
     fmla
 
   (** creates a fresh non-quantified formula, representing a quantified formula *)
-  let create_fmla (vars:Term.vsymbol list) : Term.fmla =
+  let create_fmla (vars:Term.vsymbol list) : Term.term =
     let pred = create_psymbol (id_fresh "temoin")
       (List.map (fun var -> var.vs_ty) vars) in
     ps_app pred (List.map t_var vars)
@@ -136,15 +136,15 @@ module NF = struct (* add memoization, one day ? *)
   let rec transform fmlaTable fmla =
     Format.fprintf err "transform : @[%a@]@." Pretty.print_term fmla;
     match fmla.t_node with
-    | Fquant (_,f_bound) ->
-	let var,_,f =  f_open_quant f_bound in
+    | Tquant (_,f_bound) ->
+	let var,_,f =  t_open_quant f_bound in
 	traverse fmlaTable fmla var f
-    | Fbinop (_,_,_) ->
+    | Tbinop (_,_,_) ->
 	let clauses = split fmla in
 	Format.fprintf err "split : @[%a@]@." Util.print_clause clauses;
 	begin match clauses with
 	  | [f] -> begin match f.t_node with
-	      | Fbinop (For,f1,f2) ->
+	      | Tbinop (Tor,f1,f2) ->
 		  let left = transform fmlaTable f1 in
 		  let right = transform fmlaTable f2 in
 		  Util.map_complete List.append left right
@@ -152,9 +152,9 @@ module NF = struct (* add memoization, one day ? *)
 	    end
 	  | _ -> List.concat (List.map (transform fmlaTable) clauses)
 	end
-    | Fnot f -> handle_not fmlaTable fmla f
+    | Tnot f -> handle_not fmlaTable fmla f
     | Tapp (_,_) -> [[fmla]]
-    | Ftrue | Ffalse -> [[fmla]]
+    | Ttrue | Tfalse -> [[fmla]]
     | Tif (_,_,_) -> failwith "if formulae not handled"
     | Tlet (_,_) -> failwith "let formulae not handled"
     | Tcase (_,_) -> failwith "case formulae not handled"
@@ -163,8 +163,8 @@ module NF = struct (* add memoization, one day ? *)
   (** travers prefix quantifiers until it reaches a non-quantified formula,
       collecting bounded vars encountered *)
   and traverse fmlaTable old_fmla vars fmla = match fmla.t_node with
-    | Fquant (_,f_bound) ->
-	let var,_,f = f_open_quant f_bound in
+    | Tquant (_,f_bound) ->
+	let var,_,f = t_open_quant f_bound in
 	traverse fmlaTable old_fmla (var@vars) f
     | _ ->
 	if Hterm.mem fmlaTable fmla then
@@ -177,38 +177,38 @@ module NF = struct (* add memoization, one day ? *)
 
   (** skips prenex quantifiers *)
   and skipPrenex fmlaTable fmla = match fmla.t_node with
-    | Fquant (_,f_bound) ->
-	let _,_,f = f_open_quant f_bound in
+    | Tquant (_,f_bound) ->
+	let _,_,f = t_open_quant f_bound in
 	skipPrenex fmlaTable f
     | _ -> transform fmlaTable fmla
 
 (** logical binary operators splitting *)
   and split f = match f.t_node with
-    | Fbinop (Fimplies,{t_node = Fbinop (For, h1, h2)},f2) ->
-	(split (f_binary Fimplies h1 f2)) @ (split (f_binary Fimplies h2 f2))
-    | Fbinop (Fimplies,f1,f2) ->
+    | Tbinop (Timplies,{t_node = Tbinop (Tor, h1, h2)},f2) ->
+	(split (t_binary Timplies h1 f2)) @ (split (t_binary Timplies h2 f2))
+    | Tbinop (Timplies,f1,f2) ->
 	let clauses = split f2 in
 	if List.length clauses >= 2 then
 	  List.concat
-	    (List.map (fun f -> split (f_binary Fimplies f1 f)) clauses)
-	else split (f_or (f_not f1) f2)
-    | Fbinop (Fand,f1,f2) -> [f1; f2]
+	    (List.map (fun f -> split (t_binary Timplies f1 f)) clauses)
+	else split (t_or (t_not f1) f2)
+    | Tbinop (Tand,f1,f2) -> [f1; f2]
     | _ -> [f]
 
   (** negation operator handling (with de morgan rules) *)
   and handle_not fmlaTable old_f f = match f.t_node with
-    | Fquant (Fforall,f_bound) ->
-	let vars,triggers,f1 = f_open_quant f_bound in
-	transform fmlaTable (f_exists_close vars triggers (f_not f1))
-    | Fnot f1 -> transform fmlaTable f1
-    | Fbinop (Fand,f1,f2) ->
-	transform fmlaTable (f_or (f_not f1) (f_not f2))
-    | Fbinop (For,f1,f2) ->
-	transform fmlaTable (f_and (f_not f1) (f_not f2))
-    | Fbinop (Fimplies,f1,f2) ->
-	transform fmlaTable (f_and f1 (f_not f2))
-    | Fbinop (Fiff,f1,f2) ->
-	transform fmlaTable (f_or (f_and f1 (f_not f2)) (f_and (f_not f1) f2))
+    | Tquant (Tforall,f_bound) ->
+	let vars,triggers,f1 = t_open_quant f_bound in
+	transform fmlaTable (t_exists_close vars triggers (t_not f1))
+    | Tnot f1 -> transform fmlaTable f1
+    | Tbinop (Tand,f1,f2) ->
+	transform fmlaTable (t_or (t_not f1) (t_not f2))
+    | Tbinop (Tor,f1,f2) ->
+	transform fmlaTable (t_and (t_not f1) (t_not f2))
+    | Tbinop (Timplies,f1,f2) ->
+	transform fmlaTable (t_and f1 (t_not f2))
+    | Tbinop (Tiff,f1,f2) ->
+	transform fmlaTable (t_or (t_and f1 (t_not f2)) (t_and (t_not f1) f2))
     | _ -> [[old_f]] (* default case *)
 
   (** the function to use to effectively transform into a normal form *)
@@ -240,7 +240,7 @@ module GraphConstant = struct
     (* Format.eprintf "generating new vertex : %a@."
       Pretty.print_term fmla; *)
     new_v
-  and find fTbl tTbl expr = e_map (findT tTbl) (findF fTbl) expr
+  and find fTbl tTbl expr = TermTF.t_select (findT tTbl) (findF fTbl) expr
 
   (** adds a symbol to the graph *)
   let add_symbol fTbl tTbl gc expr =
@@ -310,7 +310,7 @@ module GraphPredicate = struct
 
   (** test for negative formulae *)
   let is_negative = function
-    | { t_node = Fnot _ } -> true
+    | { t_node = Tnot _ } -> true
     | _ -> false
 
   (** assuming the formula looks like p(t1,t2...),
@@ -395,7 +395,7 @@ module Select = struct
   (** gets all predicate symbols from a clause *)
   let get_clause_predicates acc clause =
     let rec fmla_get_pred ?(pos=true) acc fmla = match fmla.t_node with
-      | Fnot f -> fmla_get_pred ~pos:false acc f
+      | Tnot f -> fmla_get_pred ~pos:false acc f
       | Tapp (pred,_) -> (pred, (if pos then `Positive else `Negative))::acc
       | _ -> failwith "bad formula in get_predicates !"
     in List.fold_left fmla_get_pred acc clause

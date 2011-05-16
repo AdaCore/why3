@@ -138,7 +138,7 @@ val add_decl : theory_uc -> decl -> theory_uc
 val add_ty_decl : theory_uc -> ty_decl list -> theory_uc
 val add_logic_decl : theory_uc -> logic_decl list -> theory_uc
 val add_ind_decl : theory_uc -> ind_decl list -> theory_uc
-val add_prop_decl : theory_uc -> prop_kind -> prsymbol -> fmla -> theory_uc
+val add_prop_decl : theory_uc -> prop_kind -> prsymbol -> term -> theory_uc
 
 (** Use *)
 

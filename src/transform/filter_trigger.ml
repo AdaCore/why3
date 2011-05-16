@@ -24,13 +24,13 @@ let make_rt_rf keep =
   and rf f =
     let f = TermTF.t_map rt rf f in
     match f.t_node with
-      | Fquant (Fforall,fq) ->
-        let vsl,trl,f2 = f_open_quant fq in
+      | Tquant (Tforall,fq) ->
+        let vsl,trl,f2 = t_open_quant fq in
         let one_false = ref false in
         let keep x = let b = keep x in
                      if b then b else (one_false := true; b) in
         let trl = List.filter (List.for_all keep) trl in
-        if not (!one_false) then f else f_forall_close vsl trl f2
+        if not (!one_false) then f else t_forall_close vsl trl f2
       | _ -> f in
   rt,rf
 

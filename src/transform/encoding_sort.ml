@@ -98,7 +98,7 @@ let rec rewrite_term tenv ud vm t =
       t_let t1' (close u' t2')
   | Tcase _ | Teps _ ->
       Printer.unsupportedTerm t "unsupported term"
-  | Fquant _ | Fbinop _ | Fnot _ | Ftrue | Ffalse -> raise (TermExpected t)
+  | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> raise (TermExpected t)
 
 and rewrite_fmla tenv ud vm f =
   let fnT = rewrite_term tenv ud in
@@ -110,13 +110,13 @@ and rewrite_fmla tenv ud vm f =
       let ps = conv_ls tenv ud ps in
       let tl = List.map (fnT vm) tl in
       ps_app ps tl
-  | Fquant (q,b) ->
-      let vl, tl, f1, close = f_open_quant_cb b in
+  | Tquant (q,b) ->
+      let vl, tl, f1, close = t_open_quant_cb b in
       let add m v = let v' = conv_vs tenv ud v in Mvs.add v (t_var v') m, v' in
       let vm', vl' = Util.map_fold_left add vm vl in
       let tl' = TermTF.tr_map (fnT vm') (fnF vm') tl in
       let f1' = fnF vm' f1 in
-      f_quant q (close vl' tl' f1')
+      t_quant q (close vl' tl' f1')
   | Tlet (t1, b) ->
       let u,f1,close = t_open_bound_cb b in
       let u' = conv_vs tenv ud u in
@@ -124,7 +124,7 @@ and rewrite_fmla tenv ud vm f =
       let f1' = fnF (Mvs.add u (t_var u') vm) f1 in
       t_let t1' (close u' f1')
   | Tcase _ ->
-      Printer.unsupportedFmla f "unsupported formula"
+      Printer.unsupportedTerm f "unsupported formula"
   | _ -> TermTF.t_map (fnT vm) (fnF vm) f
 
 let decl_ud ud task =

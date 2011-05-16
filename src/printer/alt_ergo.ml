@@ -88,7 +88,7 @@ let rec print_term info fmt t = match t.t_node with
       "alt-ergo : you must eliminate match"
   | Teps _ -> unsupportedTerm t
       "alt-ergo : you must eliminate epsilon"
-  | Fquant _ | Fbinop _ | Fnot _ | Ftrue | Ffalse -> raise (TermExpected t)
+  | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> raise (TermExpected t)
 
 and print_tapp info fmt = function
   | [] -> ()
@@ -102,11 +102,11 @@ let rec print_fmla info fmt f = match f.t_node with
       | None -> fprintf fmt "%a(%a)" print_ident ls.ls_name
                     (print_list comma (print_term info)) tl
     end
-  | Fquant (q, fq) ->
-      let vl, tl, f = f_open_quant fq in
+  | Tquant (q, fq) ->
+      let vl, tl, f = t_open_quant fq in
       let q, tl = match q with 
-	| Fforall -> "forall", tl 
-	| Fexists -> "exists", [] (* Alt-ergo has no triggers for exists *)
+	| Tforall -> "forall", tl 
+	| Texists -> "exists", [] (* Alt-ergo has no triggers for exists *)
       in
       let forall fmt v =
 	fprintf fmt "%s %a:%a" q print_ident v.vs_name (print_type info) v.vs_ty
@@ -114,32 +114,32 @@ let rec print_fmla info fmt f = match f.t_node with
       fprintf fmt "@[(%a%a.@ %a)@]" (print_list dot forall) vl
         (print_triggers info) tl (print_fmla info) f;
       List.iter forget_var vl
-  | Fbinop (Fand, f1, f2) ->
+  | Tbinop (Tand, f1, f2) ->
       fprintf fmt "(%a and@ %a)" (print_fmla info) f1 (print_fmla info) f2
-  | Fbinop (For, f1, f2) ->
+  | Tbinop (Tor, f1, f2) ->
       fprintf fmt "(%a or@ %a)" (print_fmla info) f1 (print_fmla info) f2
-  | Fbinop (Fimplies, f1, f2) ->
+  | Tbinop (Timplies, f1, f2) ->
       fprintf fmt "(%a ->@ %a)" (print_fmla info) f1 (print_fmla info) f2
-  | Fbinop (Fiff, f1, f2) ->
+  | Tbinop (Tiff, f1, f2) ->
       fprintf fmt "(%a <->@ %a)" (print_fmla info) f1 (print_fmla info) f2
-  | Fnot f ->
+  | Tnot f ->
       fprintf fmt "(not %a)" (print_fmla info) f
-  | Ftrue ->
+  | Ttrue ->
       fprintf fmt "true"
-  | Ffalse ->
+  | Tfalse ->
       fprintf fmt "false"
   | Tif (f1, f2, f3) ->
       fprintf fmt "((%a and %a) or (not %a and %a))"
 	(print_fmla info) f1 (print_fmla info) f2 (print_fmla info)
         f1 (print_fmla info) f3
-  | Tlet _ -> unsupportedFmla f
+  | Tlet _ -> unsupportedTerm f
       "alt-ergo : you must eliminate let in formula"
-  | Tcase _ -> unsupportedFmla f
+  | Tcase _ -> unsupportedTerm f
       "alt-ergo : you must eliminate match"
   | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
 
-
-and print_expr info fmt = e_map (print_term info fmt) (print_fmla info fmt)
+and print_expr info fmt =
+  TermTF.t_select (print_term info fmt) (print_fmla info fmt)
 
 and print_triggers info fmt tl =
   let filter = function

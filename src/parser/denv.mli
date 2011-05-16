@@ -84,7 +84,7 @@ and dfmla =
   | Flet of dterm * ident * dfmla
   | Fmatch of dterm * (dpattern * dfmla) list
   | Fnamed of Ptree.label * dfmla
-  | Fvar of fmla
+  | Fvar of term
 
 and dtrigger =
   | TRterm of dterm
@@ -92,7 +92,7 @@ and dtrigger =
 
 val term : vsymbol Mstr.t -> dterm -> term
 
-val fmla : vsymbol Mstr.t -> dfmla -> fmla
+val fmla : vsymbol Mstr.t -> dfmla -> term
 
 (** Specialization *)
 
@@ -102,7 +102,7 @@ val specialize_lsymbol : loc:Ptree.loc -> lsymbol -> dty list * dty option
 
 val specialize_term : loc:Ptree.loc -> type_var Htv.t -> term -> dterm
 
-val specialize_fmla : loc:Ptree.loc -> type_var Htv.t -> fmla -> dfmla
+val specialize_fmla : loc:Ptree.loc -> type_var Htv.t -> term -> dfmla
 
 (** exported for programs *)
 

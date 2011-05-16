@@ -28,7 +28,7 @@
 open Term
 
 type lambda_match =
-  | Flam of vsymbol list * trigger * fmla
+  | Flam of vsymbol list * trigger * term
   | Tlam of vsymbol list * trigger * term
   | LNone
 

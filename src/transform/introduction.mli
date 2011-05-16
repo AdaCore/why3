@@ -35,6 +35,6 @@
 
 *)
 
-val intros :  Decl.prsymbol -> Term.fmla -> Decl.decl list
+val intros :  Decl.prsymbol -> Term.term -> Decl.decl list
  (** [intros G f] returns the declarations after introducing
      premises of [goal G : f] *)

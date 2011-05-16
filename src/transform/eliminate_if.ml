@@ -77,10 +77,10 @@ let add_ld axl d = match d with
             let nm = ls.ls_name.id_string ^ "_def" in
             let pr = create_prsymbol (id_derive nm ls.ls_name) in
             let hd = t_app ls (List.map t_var vl) e.t_ty in
-            let f = f_forall_close vl [] (elim_f (f_equ hd e)) in
+            let f = t_forall_close vl [] (elim_f (t_equ hd e)) in
             create_prop_decl Paxiom pr f :: axl, (ls, None)
         | _ ->
-            axl, make_ls_defn ls vl (e_map elim_t elim_f e)
+            axl, make_ls_defn ls vl (TermTF.t_select elim_t elim_f e)
       end
 
 let elim_d d = match d.d_node with
@@ -103,8 +103,8 @@ and elim_f sign f = match f.t_node with
       let f1n = elim_f (not sign) f1 in
       let f2 = elim_f sign f2 in
       let f3 = elim_f sign f3 in
-      if sign then f_and (f_implies f1n f2) (f_implies (f_not f1p) f3)
-              else f_or (f_and f1p f2) (f_and (f_not f1n) f3)
+      if sign then t_and (t_implies f1n f2) (t_implies (t_not f1p) f3)
+              else t_or (t_and f1p f2) (t_and (t_not f1n) f3)
   | _ ->
       TermTF.t_map_sign (const elim_t) elim_f sign f
 

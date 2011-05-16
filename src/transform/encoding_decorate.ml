@@ -43,10 +43,10 @@ and deco_term kept tvar t = match t.t_node with
 
 and deco_fmla kept tvar f = match f.t_node with
   | Tapp (ps,tl) -> ps_app ps (List.map (deco_arg kept tvar) tl)
-  | Fquant (q,b) ->
-      let vl,tl,f,close = f_open_quant_cb b in
+  | Tquant (q,b) ->
+      let vl,tl,f,close = t_open_quant_cb b in
       let tl = TermTF.tr_map (deco_arg kept tvar) (deco_fmla kept tvar) tl in
-      f_quant q (close vl tl (deco_fmla kept tvar f))
+      t_quant q (close vl tl (deco_fmla kept tvar f))
   | _ -> TermTF.t_map (deco_term kept tvar) (deco_fmla kept tvar) f
 
 let deco_decl kept d = match d.d_node with
@@ -61,7 +61,7 @@ let deco_decl kept d = match d.d_node with
       [d]
   | Dind _ -> Printer.unsupportedDecl d "eliminate inductives"
   | Dprop (k,pr,f) ->
-      let f = f_type_close (deco_fmla kept) f in
+      let f = t_type_close (deco_fmla kept) f in
       [create_prop_decl k pr f]
 
 let d_poly_deco = create_logic_decl [ls_poly_deco, None]

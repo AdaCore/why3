@@ -28,9 +28,9 @@ let decl_l d =
     | Dprop (k,pr,f) ->
         let f = fmla_simpl f in
         begin match f.t_node, k with
-          | Ftrue, Paxiom -> [[]]
-          | Ffalse, Paxiom -> []
-          | Ftrue, Pgoal -> []
+          | Ttrue, Paxiom -> [[]]
+          | Tfalse, Paxiom -> []
+          | Ttrue, Pgoal -> []
           | _ -> [[create_prop_decl k pr f]]
         end
     | _ -> [[DeclTF.decl_map (fun t -> t) fmla_simpl d]]
@@ -69,13 +69,13 @@ let rec fmla_find_subst boundvars var sign f =
         when sign && ls_equal ls ps_equ && vs_equal vs var
           && not (t_equal t tv) && not (t_boundvars_in boundvars t) ->
         raise (Subst_found t)
-    | Fbinop (For, f1, f2)  when not sign -> (fnF sign f1); (fnF sign f2)
-    | Fbinop (Fand, f1, f2) when sign ->  (fnF sign f1); (fnF sign f2)
-    | Fbinop (Fimplies, f1, f2) when not sign ->
+    | Tbinop (Tor, f1, f2)  when not sign -> (fnF sign f1); (fnF sign f2)
+    | Tbinop (Tand, f1, f2) when sign ->  (fnF sign f1); (fnF sign f2)
+    | Tbinop (Timplies, f1, f2) when not sign ->
         (fnF (not sign) f1); (fnF sign f2)
-    | Fnot f1 -> fnF (not sign) f1
-    | Fquant (_,fb) ->
-        let vsl,trl,f' = f_open_quant fb in
+    | Tnot f1 -> fnF (not sign) f1
+    | Tquant (_,fb) ->
+        let vsl,trl,f' = t_open_quant fb in
         if trl = []
         then
           let boundvars =
@@ -91,7 +91,7 @@ let rec fmla_find_subst boundvars var sign f =
           let boundvars = patl.pat_vars in
           fmla_find_subst boundvars var sign f in
         List.iter iter_fb fbs
-    | Fbinop (_, _, _) | Tif ( _, _, _) | Tapp _ | Ffalse | Ftrue-> ()
+    | Tbinop (_, _, _) | Tif ( _, _, _) | Tapp _ | Tfalse | Ttrue-> ()
     | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
 
 let rec fmla_quant sign f = function
@@ -107,16 +107,16 @@ let rec fmla_quant sign f = function
 
 let rec fmla_remove_quant f =
   match f.t_node with
-    | Fquant (k,fb) ->
-        let vsl,trl,f',close = f_open_quant_cb fb in
+    | Tquant (k,fb) ->
+        let vsl,trl,f',close = t_open_quant_cb fb in
           if trl <> []
           then f
           else
             let sign = match k with
-              | Fforall -> false | Fexists -> true in
+              | Tforall -> false | Texists -> true in
             let vsl, f' = fmla_quant sign f' vsl in
             let f' = fmla_remove_quant f' in
-            f_quant k (close vsl [] f')
+            t_quant k (close vsl [] f')
     | _ -> TermTF.t_map (fun t -> t) fmla_remove_quant f
 
 (*let fmla_remove_quant f =
@@ -146,12 +146,12 @@ let fmla_flatten conj f =
   let terms = ref [] in
   let rec aux sign f =
     match f.t_node with
-    | Fnot f -> aux (not sign) f
-    | Fbinop (For, f1, f2) when sign <> conj ->
+    | Tnot f -> aux (not sign) f
+    | Tbinop (Tor, f1, f2) when sign <> conj ->
         aux sign f2; aux sign f1
-    | Fbinop (Fand, f1, f2) when sign = conj ->
+    | Tbinop (Tand, f1, f2) when sign = conj ->
         aux sign f2; aux sign f1
-    | Fbinop (Fimplies, f1, f2) when sign <> conj ->
+    | Tbinop (Timplies, f1, f2) when sign <> conj ->
         aux sign f2; aux (not sign) f1
     | _ -> terms := (f, sign)::!terms in
   aux true f;
@@ -161,13 +161,13 @@ let fmla_flatten conj f =
 let fmla_unflatten conj f formulas =
   let i = ref 0 in
   let rec aux sign f = t_label_copy f (match f.t_node with
-    | Fnot f -> f_not (aux (not sign) f)
-    | Fbinop (For, f1, f2) when sign <> conj ->
-        let f1' = aux sign f1 in f_or f1' (aux sign f2)
-    | Fbinop (Fand, f1, f2) when sign = conj ->
-        let f1' = aux sign f1 in f_and f1' (aux sign f2)
-    | Fbinop (Fimplies, f1, f2) when sign <> conj ->
-        let f1' = aux (not sign) f1 in f_implies f1' (aux sign f2)
+    | Tnot f -> t_not (aux (not sign) f)
+    | Tbinop (Tor, f1, f2) when sign <> conj ->
+        let f1' = aux sign f1 in t_or f1' (aux sign f2)
+    | Tbinop (Tand, f1, f2) when sign = conj ->
+        let f1' = aux sign f1 in t_and f1' (aux sign f2)
+    | Tbinop (Timplies, f1, f2) when sign <> conj ->
+        let f1' = aux (not sign) f1 in t_implies f1' (aux sign f2)
     | _ ->
         let (t, s) = formulas.(!i) in
         assert (sign = s);
@@ -188,9 +188,9 @@ let fmla_unflatten conj f formulas =
 let rec fmla_cond_subst filter f =
   let rec aux f =
     match f.t_node with
-    | Fbinop (o, _, _) when o <> Fiff ->
+    | Tbinop (o, _, _) when o <> Tiff ->
         let conj = match o with
-          Fand -> true | For | Fimplies -> false | Fiff -> assert false in
+          Tand -> true | Tor | Timplies -> false | Tiff -> assert false in
         let subf = fmla_flatten conj f in
         let subl = Array.length subf in
         for i = 0 to subl - 1 do

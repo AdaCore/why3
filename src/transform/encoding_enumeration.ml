@@ -56,7 +56,7 @@ let proj tenv t = match t.t_node with
       proj tenv t (t_type t)
   | Tif _  | Tcase _  | Tlet _ ->
       t
-  | Fquant _ | Fbinop _ | Fnot _ | Ftrue | Ffalse -> raise (TermExpected t)
+  | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> raise (TermExpected t)
 
 let rec rewrite_term tenv t = match t.t_node with
   | Tapp (fs,tl) ->
@@ -71,7 +71,7 @@ and rewrite_fmla tenv f = match f.t_node with
       let pin t = proj tenv (rewrite_term tenv t) in
       ps_app ps (List.map pin tl)
   | Tcase _ ->
-      Printer.unsupportedFmla f "use eliminate_algebraic"
+      Printer.unsupportedTerm f "use eliminate_algebraic"
   | _ -> TermTF.t_map (rewrite_term tenv) (rewrite_fmla tenv) f
 
 let decl tenv d = match d.d_node with

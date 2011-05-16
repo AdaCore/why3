@@ -45,8 +45,8 @@ let lift kind =
           match kind with
           (* assume that lambdas always exist *)
           | Implied when not (is_lambda t) ->
-              f_forall_close_merge fv
-                (f_implies (f_exists_close [x] [] f)
+              t_forall_close_merge fv
+                (t_implies (t_exists_close [x] [] f)
                    (t_subst_single x xlapp f))
           | _ -> t_subst_single x xlapp f
         in

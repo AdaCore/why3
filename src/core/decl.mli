@@ -43,7 +43,7 @@ val make_ls_defn : lsymbol -> vsymbol list -> term -> logic_decl
 
 val open_ls_defn : ls_defn -> vsymbol list * term
 
-val ls_defn_axiom : ls_defn -> fmla
+val ls_defn_axiom : ls_defn -> term
 
 val check_termination : logic_decl list -> (int list) Mls.t
 (** [check_termination ldl] returns a mapping of every logical
@@ -69,7 +69,7 @@ val pr_equal : prsymbol -> prsymbol -> bool
 
 val pr_hash : prsymbol -> int
 
-type ind_decl = lsymbol * (prsymbol * fmla) list
+type ind_decl = lsymbol * (prsymbol * term) list
 
 (* Proposition declaration *)
 
@@ -79,7 +79,7 @@ type prop_kind =
   | Pgoal     (* prove, do not use as a premise *)
   | Pskip     (* do not prove, do not use as a premise *)
 
-type prop_decl = prop_kind * prsymbol * fmla
+type prop_decl = prop_kind * prsymbol * term
 
 (** {2 Declaration type} *)
 
@@ -108,7 +108,7 @@ val d_hash : decl -> int
 val create_ty_decl : ty_decl list -> decl
 val create_logic_decl : logic_decl list -> decl
 val create_ind_decl : ind_decl list -> decl
-val create_prop_decl : prop_kind -> prsymbol -> fmla -> decl
+val create_prop_decl : prop_kind -> prsymbol -> term -> decl
 
 (* exceptions *)
 
@@ -137,12 +137,12 @@ val decl_map_fold : ('a -> term -> 'a * term) -> 'a -> decl -> 'a * decl
 
 module DeclTF : sig
 
-val decl_map : (term -> term) -> (fmla -> fmla) -> decl -> decl
+  val decl_map : (term -> term) -> (term -> term) -> decl -> decl
 
-val decl_fold : ('a -> term -> 'a) -> ('a -> fmla -> 'a) -> 'a -> decl -> 'a
+  val decl_fold : ('a -> term -> 'a) -> ('a -> term -> 'a) -> 'a -> decl -> 'a
 
-val decl_map_fold : ('a -> term -> 'a * term) ->
-                    ('a -> fmla -> 'a * fmla) -> 'a -> decl -> 'a * decl
+  val decl_map_fold : ('a -> term -> 'a * term) ->
+                      ('a -> term -> 'a * term) -> 'a -> decl -> 'a * decl
 end
 
 (** {2 Known identifiers} *)
@@ -160,8 +160,8 @@ exception NonExhaustiveCase of pattern list * term
 exception NonFoundedTypeDecl of tysymbol
 
 val find_constructors : known_map -> tysymbol -> lsymbol list
-val find_inductive_cases : known_map -> lsymbol -> (prsymbol * fmla) list
+val find_inductive_cases : known_map -> lsymbol -> (prsymbol * term) list
 val find_logic_definition : known_map -> lsymbol -> ls_defn option
-val find_prop : known_map -> prsymbol -> fmla
-val find_prop_decl : known_map -> prsymbol -> prop_kind * fmla
+val find_prop : known_map -> prsymbol -> term
+val find_prop_decl : known_map -> prsymbol -> prop_kind * term
 

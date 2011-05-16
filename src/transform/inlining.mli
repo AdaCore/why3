@@ -27,7 +27,7 @@ val t :
   ?use_meta:bool ->
   ?in_goal:bool ->
   notdeft:(Term.term -> bool) ->
-  notdeff:(Term.fmla -> bool) ->
+  notdeff:(Term.term -> bool) ->
   notls  :(Term.lsymbol -> bool) ->
   Task.task Trans.trans
 
@@ -69,11 +69,11 @@ type env
 val empty_env : env
 
 val addfs : env -> Term.lsymbol -> Term.vsymbol list -> Term.term -> env
-val addps : env -> Term.lsymbol -> Term.vsymbol list -> Term.fmla -> env
+val addps : env -> Term.lsymbol -> Term.vsymbol list -> Term.term -> env
 (** [addls env ls vs t] trigger the inlining of [ls] by the definition
     [t] with the free variables [vs]. The variables of [vs] must have
     the same type as the arguments of [ls] *)
 
 val replacet : env -> Term.term -> Term.term
-val replacep : env -> Term.fmla -> Term.fmla
+val replacep : env -> Term.term -> Term.term
 *)

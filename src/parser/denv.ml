@@ -186,7 +186,7 @@ and dfmla =
   | Flet of dterm * ident * dfmla
   | Fmatch of dterm * (dpattern * dfmla) list
   | Fnamed of label * dfmla
-  | Fvar of fmla
+  | Fvar of term
 
 and dtrigger =
   | TRterm of dterm
@@ -228,13 +228,13 @@ let rec term env t = match t.dt_node with
 
 and fmla env = function
   | Ftrue ->
-      f_true
+      t_true
   | Ffalse ->
-      f_false
+      t_false
   | Fnot f ->
-      f_not (fmla env f)
+      t_not (fmla env f)
   | Fbinop (op, f1, f2) ->
-      f_binary op (fmla env f1) (fmla env f2)
+      t_binary op (fmla env f1) (fmla env f2)
   | Fif (f1, f2, f3) ->
       t_if (fmla env f1) (fmla env f2) (fmla env f3)
   | Fquant (q, uqu, trl, f1) ->
@@ -248,7 +248,7 @@ and fmla env = function
 	| TRfmla f -> fmla env f
       in
       let trl = List.map (List.map trigger) trl in
-      f_quant_close q vl trl (fmla env f1)
+      t_quant_close q vl trl (fmla env f1)
   | Fapp (s, tl) ->
       ps_app s (List.map (term env) tl)
   | Flet (e1, id, f2) ->
@@ -348,8 +348,8 @@ and specialize_term_node ~loc htv = function
       let v, f = t_open_bound fb in
       Teps (ident_of_vs ~loc v, specialize_ty ~loc htv v.vs_ty,
 	    specialize_fmla ~loc htv f)
-  | Term.Fquant _ | Term.Fbinop _ | Term.Fnot _
-  | Term.Ftrue | Term.Ffalse -> assert false
+  | Tquant _ | Tbinop _ | Tnot _
+  | Ttrue | Tfalse -> assert false
 
 and specialize_fmla ~loc htv f =
   let df = specialize_fmla_node ~loc htv f.t_node in
@@ -359,18 +359,18 @@ and specialize_fmla ~loc htv f =
 and specialize_fmla_node ~loc htv = function
   | Term.Tapp (ls, tl) ->
       Fapp (ls, List.map (specialize_term ~loc htv) tl)
-  | Term.Fquant (q, fq) ->
-      let vl, tl, f = f_open_quant fq in
+  | Tquant (q, fq) ->
+      let vl, tl, f = t_open_quant fq in
       let uquant v = ident_of_vs ~loc v, specialize_ty ~loc htv v.vs_ty in
       let tl = List.map (List.map (specialize_trigger ~loc htv)) tl in
       Fquant (q, List.map uquant vl, tl, specialize_fmla ~loc htv f)
-  | Term.Fbinop (b, f1, f2) ->
+  | Tbinop (b, f1, f2) ->
       Fbinop (b, specialize_fmla ~loc htv f1, specialize_fmla ~loc htv f2)
-  | Term.Fnot f1 ->
+  | Tnot f1 ->
       Fnot (specialize_fmla ~loc htv f1)
-  | Term.Ftrue ->
+  | Ttrue ->
       Ftrue
-  | Term.Ffalse ->
+  | Tfalse ->
       Ffalse
   | Term.Tif (f1, f2, f3) ->
       Fif (specialize_fmla ~loc htv f1,

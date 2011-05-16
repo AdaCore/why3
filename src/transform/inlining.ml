@@ -66,7 +66,7 @@ let t_replace_top env t = match t.t_node with
 
 let rec f_replace_top env f = match f.t_node with
   | Tapp (ps,[l;r]) when ls_equal ps ps_equ ->
-      t_label_copy f (f_equ (t_replace_top env l) (t_replace_top env r))
+      t_label_copy f (t_equ (t_replace_top env l) (t_replace_top env r))
   | Tapp (ps,tl) ->
       t_label_copy f (f_unfold env ps tl)
   | _ ->
@@ -142,7 +142,7 @@ let notdeft t = match t.t_node with
   | _ -> true
 
 let notdeff f = match f.t_node with
-  | Ftrue | Ffalse -> false
+  | Ttrue | Tfalse -> false
   | Tapp (_,tl) -> not (trivial tl)
   | _ -> true
 

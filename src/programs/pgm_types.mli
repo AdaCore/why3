@@ -47,10 +47,10 @@ val ty_exn : ty
 
 module rec T : sig
 
-  type pre = Term.fmla
+  type pre = Term.term
 
-  type post_fmla = Term.vsymbol (* result *) * Term.fmla
-  type exn_post_fmla = Term.vsymbol (* result *) option * Term.fmla
+  type post_fmla = Term.vsymbol (* result *) * Term.term
+  type exn_post_fmla = Term.vsymbol (* result *) option * Term.term
 
   type esymbol = lsymbol
 
@@ -125,7 +125,7 @@ module rec T : sig
   val v_result : ty -> vsymbol
   val exn_v_result : Why.Term.lsymbol -> Why.Term.vsymbol option
 
-  val post_map : (fmla -> fmla) -> post -> post
+  val post_map : (term -> term) -> post -> post
 
   val subst1 : vsymbol -> term -> term Mvs.t
 

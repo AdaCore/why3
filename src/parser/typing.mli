@@ -66,7 +66,7 @@ val find_var : string -> denv -> Denv.dty
 val add_var : string -> Denv.dty -> denv -> denv
 
 val type_term : theory_uc -> denv -> vsymbol Mstr.t -> Ptree.lexpr -> term
-val type_fmla : theory_uc -> denv -> vsymbol Mstr.t -> Ptree.lexpr -> fmla
+val type_fmla : theory_uc -> denv -> vsymbol Mstr.t -> Ptree.lexpr -> term
 
 val dty : theory_uc -> denv -> Ptree.pty -> Denv.dty
 val dterm : ?localize:bool -> theory_uc -> denv -> Ptree.lexpr -> Denv.dterm

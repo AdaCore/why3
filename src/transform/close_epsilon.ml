@@ -29,7 +29,7 @@ let is_func_ty t =
   | _ -> false
 
 type lambda_match =
-  | Flam of vsymbol list * trigger * fmla
+  | Flam of vsymbol list * trigger * term
   | Tlam of vsymbol list * trigger * term
   | LNone
 
@@ -39,10 +39,10 @@ let destruct_lambda t =
       let fn, f = t_open_bound fb in
       if is_func_ty fn.vs_ty then
         begin match f.t_node with
-        | Fquant (Fforall, fq) ->
-            let args, trs, f = f_open_quant fq in
+        | Tquant (Tforall, fq) ->
+            let args, trs, f = t_open_quant fq in
             begin match f.t_node with
-            | Fbinop (Fiff,_,body) -> Flam (args, trs, body)
+            | Tbinop (Tiff,_,body) -> Flam (args, trs, body)
             | Tapp (ls,[_;body]) when ls_equal ls ps_equ ->
                 Tlam (args, trs, body)
             | _ -> LNone end
@@ -71,7 +71,7 @@ let rec rewriteT t =
         (* substitute [magic] for [x] *)
         let f = t_subst_single x rx f in
         (* quantify over free variables and epsilon-close over [magic] *)
-        let f = f_forall_close_merge fv f in
+        let f = t_forall_close_merge fv f in
         let f = t_eps_close magic_fs f in
         (* apply epsilon-term to variables *)
         List.fold_left (fun acc x -> t_func_app acc (t_var x)) f fv
