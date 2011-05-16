@@ -1,0 +1,24 @@
+(* References *)
+
+module Ref
+
+  type ref 'a = {| mutable contents : 'a |}
+
+  parameter ref : v:'a -> {} ref 'a { result=v }
+
+  parameter (!) : r:ref 'a -> {} 'a reads r { result=r }
+
+  parameter (:=) : r:ref 'a -> v:'a -> {} unit writes r { r=v }
+
+end
+
+module Refint
+
+  use export int.Int
+  use export module Ref
+
+  parameter incr : r:ref int -> {} unit writes r { r = old r + 1 }
+
+  parameter decr : r:ref int -> {} unit writes r { r = old r - 1 }
+
+end
