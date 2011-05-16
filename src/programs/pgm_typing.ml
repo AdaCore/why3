@@ -215,6 +215,12 @@ and specialize_binder ~loc htv v =
 (*     | PSlogic -> *)
 (* 	ps,  *)
 
+let parameter x = "parameter " ^ x
+let rec parameter_q = function
+  | [] -> assert false
+  | [x] -> [parameter x]
+  | x :: q -> x :: parameter_q q
+
 let dot fmt () = pp_print_string fmt "."
 let print_qualids = print_list dot pp_print_string
 let print_qualid fmt q = 
@@ -427,8 +433,12 @@ and dexpr_desc ~ghost env loc = function
       region_vars := Htv.create 17 :: !region_vars;
       let x = Typing.string_list_of_qualid [] p in
       let ls = 
-	try ns_find_ls (get_namespace (impure_uc env.uc)) x 
-	with Not_found -> errorm ~loc "unbound symbol %a" print_qualid p
+	try 
+	  ns_find_ls (get_namespace (impure_uc env.uc)) x 
+	with Not_found -> try 
+	  ns_find_ls (get_namespace (impure_uc env.uc)) (parameter_q x)
+	with Not_found ->
+	  errorm ~loc "unbound symbol %a" print_qualid p
       in
       let ps = get_psymbol ls in
       begin match ps.ps_kind with
@@ -1800,6 +1810,7 @@ let add_impure_decl uc ls =
   Pgm_module.add_impure_decl (Decl.create_logic_decl [ls, None]) uc
 
 let add_global_fun loc x tyv uc =
+  let x = parameter x in
   try 
     let ps = create_psymbol_fun (id_user x loc) tyv in
     let d = Decl.create_logic_decl [ps.ps_impure, None] in

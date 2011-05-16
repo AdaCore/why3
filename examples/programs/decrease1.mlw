@@ -28,8 +28,8 @@ module Decrease1
         invariant { 0 <= i and 
                     forall j: int. 0 <= j < i -> j < length a -> a[j] <> 0 }
         variant   { length a - i }
-        if get a !i = 0 then raise Found;
-        if get a !i > 0 then i := !i + get a !i else i := !i + 1
+        if a[!i] = 0 then raise Found;
+        if a[!i] > 0 then i := !i + a[!i] else i := !i + 1
       done;
       -1
     with Found -> 
@@ -42,8 +42,8 @@ module Decrease1
   let rec search_rec (a: array int) (i : int) =
     { decrease1 a and 0 <= i }
     if i < length a then
-      if get a i = 0 then i
-      else if get a i > 0 then search_rec a (i + get a i) 
+      if a[i] = 0 then i
+      else if a[i] > 0 then search_rec a (i + a[i]) 
       else search_rec a (i + 1)
     else
       -1

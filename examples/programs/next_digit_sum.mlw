@@ -84,13 +84,13 @@ let search_safety () =
   label Init:
   let s = ref 0 in
   for i = 0 to m - 1 do (* could be n instead of m *)
-    s := !s + get x i
+    s := !s + x[i]
   done;
   for d = 0 to m - 1 do
     invariant { length x = m }
-    for c = get x d + 1 to 9 do
+    for c = x[d] + 1 to 9 do
       invariant { length x = m }
-      let delta = y - !s - c + get x d in
+      let delta = y - !s - c + x[d] in
       if 0 <= delta && delta <= 9 * d then begin
         set x d c;
 	let k = div delta 9 in
@@ -103,7 +103,7 @@ let search_safety () =
         raise Success
       end
     done;
-    s := !s - get x d
+    s := !s - x[d]
   done
   { true } | Success -> { true }
 
@@ -120,7 +120,7 @@ let search () =
   let s = ref 0 in
   for i = 0 to m - 1 do (* could be n instead of m *)
     invariant { s = sum x.elts 0 i }
-    s := !s + get x i
+    s := !s + x[i]
   done;
   assert { s = sum x.elts 0 m };
   for d = 0 to m - 1 do
@@ -128,9 +128,9 @@ let search () =
       x = at x Init and
       s = sum x.elts d m
     }
-    for c = get x d + 1 to 9 do
+    for c = x[d] + 1 to 9 do
       invariant { x = at x Init }
-      let delta = y - !s - c + get x d in
+      let delta = y - !s - c + x[d] in
       if 0 <= delta && delta <= 9 * d then begin
         set x d c;
         assert { sum x.elts d m = y - delta };
@@ -149,7 +149,7 @@ let search () =
         raise Success
       end
     done;
-    s := !s - get x d
+    s := !s - x[d]
   done
   { true }
   | Success -> { is_integer x.elts and sum x.elts 0 m = y }
@@ -244,7 +244,7 @@ let search_smallest () =
   let s = ref 0 in
   for i = 0 to m - 1 do (* could be n instead of m *)
     invariant { s = sum x.elts 0 i }
-    s := !s + get x i
+    s := !s + x[i]
   done;
   assert { s = sum x.elts 0 m };
   for d = 0 to m - 1 do
@@ -254,14 +254,14 @@ let search_smallest () =
       forall u : int.
          interp (at x.elts Init) 0 m < u <= interp9 x.elts d m -> sum_digits u <> y
     }
-    for c = get x d + 1 to 9 do
+    for c = x[d] + 1 to 9 do
       invariant {
         x = at x Init and
 	forall c' : int. x[d] < c' < c ->
           forall u : int.
           interp (at x.elts Init) 0 m < u <= interp9 (M.set x.elts d c') d m ->
   	  sum_digits u <> y }
-      let delta = y - !s - c + get x d in
+      let delta = y - !s - c + x[d] in
       if 0 <= delta && delta <= 9 * d then begin
         assert { smallest_size delta <= d };
         set x d c;
@@ -288,7 +288,7 @@ let search_smallest () =
         raise Success
       end
     done;
-    s := !s - get x d
+    s := !s - x[d]
   done
   { false }
   | Success -> { is_integer x.elts and sum x.elts 0 m = y and

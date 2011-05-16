@@ -35,9 +35,9 @@ module String
 
   use import int.Int
   use import module Char
-  use array.Array as S
+  use map.Map as S
 
-  type string model {| length : int; mutable chars : S.t int char |}
+  type string model {| length: int; mutable chars: S.t int char |}
 
   parameter create : len:int -> { len >= 0 } string { S.length result = len }
 

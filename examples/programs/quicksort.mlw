@@ -16,9 +16,9 @@ module Quicksort
 
   let swap (t:array int) (i:int) (j:int) =
     { 0 <= i < length t and 0 <= j < length t }
-    let v = get t i in
+    let v = t[i] in
     begin
-      set t i (get t j);
+      set t i t[j];
       set t j v
     end
     { exchange t (old t) i j }

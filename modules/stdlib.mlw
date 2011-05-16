@@ -34,8 +34,9 @@ module Array
   type array 'a model {| length : int; mutable elts : map int 'a |}
 
   logic ([]) (a: array 'a) (i :int) : 'a = M.([]) a.elts i
+  logic unsafe_get (a: array 'a) (i :int) : 'a = M.([]) a.elts i
 
-  parameter get : a:array 'a -> i:int ->
+  parameter ([]) : a:array 'a -> i:int ->
     { 0 <= i < length a } 'a reads a { result = a[i] }
 
   parameter set : a:array 'a -> i:int -> v:'a ->
