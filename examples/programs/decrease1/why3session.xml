@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session SYSTEM "why3session.dtd">
+<why3session name="examples/programs/decrease1/why3session.xml">
+ <file name="../decrease1.mlw" verified="true" expanded="true">
+  <theory name="Decrease1" verified="true" expanded="true">
+   <goal name="decrease1_induction" sum="8319c3299f6c5b391aec5943ca151429" proved="true" expanded="true">
+    <proof prover="coq" timelimit="10" edited="examples/programs/decrease1/decrease1.mlw_Decrease1_decrease1_induction_2.v" obsolete="false">
+     <result status="valid" time="0.75"/>
+    </proof>
+    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+     <result status="unknown" time="0.43"/>
+    </proof>
+   </goal>
+   <goal name="WP_search" expl="correctness of search" sum="5f9e29fcb501d5550c29bfbd1c8fd584" proved="true" expanded="true">
+    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="true">
+     <result status="timeout" time="10.12"/>
+    </proof>
+    <transf name="split_goal" proved="true" expanded="true">
+     <goal name="WP_search.1" expl="loop invariant init" sum="5d4fd28ee3c69be535f8ee535e6cb802" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_search.2" expl="precondition" sum="d315642af07745fcac77676c671ffee3" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_search.3" expl="normal postcondition" sum="fa8f0f929008e376cd5e388239a0320a" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+     </goal>
+     <goal name="WP_search.4" expl="precondition" sum="026ddab308389db6e2db01c19192eb40" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_search.5" expl="precondition" sum="3f6bcaf82657cc2a967502da8329005b" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_search.6" expl="loop invariant preservation" sum="5bce229f4e8d1fc1fc6e04c42e6e408b" proved="true" expanded="true">
+      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+       <result status="unknown" time="3.17"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="timeout" time="10.19"/>
+      </proof>
+      <proof prover="z3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.10"/>
+      </proof>
+     </goal>
+     <goal name="WP_search.7" expl="loop variant decreases" sum="996216bff5e7480e0a1fe0e3968b8ffb" proved="true" expanded="true">
+      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof prover="z3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <transf name="split_goal" proved="true" expanded="true">
+       <goal name="WP_search.7.1" expl="correctness of search" sum="d97f71408572fc6c730314dd5bebfe22" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_search.7.2" expl="correctness of search" sum="1f8eb20d029c95d115aa48530508032c" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof prover="z3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.03"/>
+        </proof>
+        <proof prover="yices" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.03"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal name="WP_search.8" expl="loop invariant preservation" sum="fc6718c43629f048e462fa6063b11410" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_search.9" expl="loop variant decreases" sum="14c9dd5d9133e195e8e688d19a5d7e19" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_search.10" expl="normal postcondition" sum="ff98d91de211d86ceddf8f37215c787c" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+   <goal name="WP_search_rec" expl="correctness of search_rec" sum="359800e7e063b55fb2e4665ffe6c7a62" proved="true" expanded="true">
+    <proof prover="cvc3" timelimit="10" edited="" obsolete="true">
+     <result status="unknown" time="0.21"/>
+    </proof>
+    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="true">
+     <result status="timeout" time="10.22"/>
+    </proof>
+    <proof prover="z3" timelimit="10" edited="" obsolete="true">
+     <result status="timeout" time="10.50"/>
+    </proof>
+    <transf name="split_goal" proved="true" expanded="true">
+     <goal name="WP_search_rec.1" expl="precondition" sum="b862eaa14642db1bca4cfd29e71dc85a" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_search_rec.2" expl="normal postcondition" sum="028a83456b4c241f325751fe75ff7cfe" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="true">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal name="WP_search_rec.3" expl="precondition" sum="58493f837aaa39a3890ba4c802e46109" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="true">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_search_rec.4" expl="precondition" sum="99a18ac863afa1e6b4acfb99b4d0dae6" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="true">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_search_rec.5" expl="precondition" sum="44a5c5d945aad7cfe2bcc7d4adf728f2" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="true">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_search_rec.6" expl="normal postcondition" sum="699e81654d2a303c491cfab413eb3501" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="timeout" time="10.08"/>
+      </proof>
+      <proof prover="z3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.24"/>
+      </proof>
+     </goal>
+     <goal name="WP_search_rec.7" expl="precondition" sum="9453d56ae3a433905973837d2fab5f11" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="true">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal name="WP_search_rec.8" expl="normal postcondition" sum="179d0569c8256c2c7e5e5730ab534329" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="true">
+       <result status="valid" time="0.05"/>
+      </proof>
+     </goal>
+     <goal name="WP_search_rec.9" expl="normal postcondition" sum="a5e3a9553c1dbb830d1064e70335f3a9" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="true">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+  </theory>
+ </file>
+</why3session>
