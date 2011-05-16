@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session SYSTEM "why3session.dtd">
+<why3session name="programs/power/why3session.xml">
+ <file name="../power.mlw" verified="false" expanded="true">
+  <theory name="Power" verified="false" expanded="true">
+   <goal name="Power_1" sum="1db7c130e0faaa3525077846831aadf3" proved="true" expanded="false">
+    <proof prover="cvc3" timelimit="2" edited="" obsolete="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof prover="simplify" timelimit="2" edited="" obsolete="false">
+     <result status="unknown" time="0.01"/>
+    </proof>
+    <proof prover="alt-ergo" timelimit="2" edited="" obsolete="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof prover="z3" timelimit="2" edited="" obsolete="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal name="Power_sum" sum="0222179599018e583f47a3d214f2e604" proved="false" expanded="true">
+    <proof prover="cvc3" timelimit="2" edited="" obsolete="false">
+     <result status="timeout" time="2.08"/>
+    </proof>
+    <proof prover="simplify" timelimit="2" edited="" obsolete="false">
+     <result status="unknown" time="0.01"/>
+    </proof>
+    <proof prover="alt-ergo" timelimit="2" edited="" obsolete="false">
+     <result status="timeout" time="2.09"/>
+    </proof>
+    <proof prover="z3" timelimit="2" edited="" obsolete="false">
+     <result status="timeout" time="2.07"/>
+    </proof>
+   </goal>
+   <goal name="Power_mult" sum="9d09d633adb75294ad19c24d7ad24bf4" proved="false" expanded="true">
+    <proof prover="cvc3" timelimit="2" edited="" obsolete="false">
+     <result status="unknown" time="1.50"/>
+    </proof>
+    <proof prover="simplify" timelimit="2" edited="" obsolete="false">
+     <result status="unknown" time="0.01"/>
+    </proof>
+    <proof prover="alt-ergo" timelimit="2" edited="" obsolete="false">
+     <result status="unknown" time="0.15"/>
+    </proof>
+    <proof prover="z3" timelimit="2" edited="" obsolete="false">
+     <result status="timeout" time="2.08"/>
+    </proof>
+   </goal>
+  </theory>
+  <theory name="M" verified="false" expanded="true">
+   <goal name="WP_parameter fast_exp" expl="correctness of parameter fast_exp" sum="ff0a5f4d7ce2252d7f09664075c560a8" proved="true" expanded="false">
+    <proof prover="cvc3" timelimit="2" edited="" obsolete="false">
+     <result status="timeout" time="2.08"/>
+    </proof>
+    <proof prover="simplify" timelimit="2" edited="" obsolete="false">
+     <result status="timeout" time="2.08"/>
+    </proof>
+    <proof prover="alt-ergo" timelimit="2" edited="" obsolete="false">
+     <result status="valid" time="0.10"/>
+    </proof>
+    <proof prover="z3" timelimit="2" edited="" obsolete="false">
+     <result status="timeout" time="2.08"/>
+    </proof>
+   </goal>
+   <goal name="WP_parameter fast_exp_imperative" expl="correctness of parameter fast_exp_imperative" sum="22f72b816b6021c98b7d03397cb1d7fd" proved="false" expanded="true">
+    <proof prover="cvc3" timelimit="2" edited="" obsolete="false">
+     <result status="timeout" time="2.09"/>
+    </proof>
+    <proof prover="simplify" timelimit="2" edited="" obsolete="false">
+     <result status="timeout" time="2.09"/>
+    </proof>
+    <proof prover="alt-ergo" timelimit="2" edited="" obsolete="false">
+     <result status="timeout" time="2.00"/>
+    </proof>
+    <proof prover="z3" timelimit="2" edited="" obsolete="false">
+     <result status="timeout" time="2.09"/>
+    </proof>
+   </goal>
+  </theory>
+ </file>
+</why3session>

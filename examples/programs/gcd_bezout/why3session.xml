@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session SYSTEM "why3session.dtd">
+<why3session name="programs/gcd_bezout/why3session.xml">
+ <file name="../gcd_bezout.mlw" verified="false" expanded="true">
+  <theory name="M" verified="false" expanded="true">
+   <goal name="WP_parameter gcd" expl="correctness of parameter gcd" sum="44c73ab6d7cb8f3f8241f534deb156f1" proved="false" expanded="true">
+    <proof prover="alt-ergo" timelimit="2" edited="" obsolete="false">
+     <result status="timeout" time="2.09"/>
+    </proof>
+    <proof prover="cvc3" timelimit="2" edited="" obsolete="false">
+     <result status="timeout" time="2.09"/>
+    </proof>
+    <proof prover="simplify" timelimit="2" edited="" obsolete="false">
+     <result status="timeout" time="2.09"/>
+    </proof>
+    <proof prover="z3" timelimit="2" edited="" obsolete="false">
+     <result status="highfailure" time="0.30"/>
+    </proof>
+    <transf name="split_goal" proved="false" expanded="true">
+     <goal name="WP_parameter gcd.1" expl="loop invariant init" sum="8566a02a986fda736b7f696339e845f1" proved="true" expanded="false">
+      <proof prover="simplify" timelimit="2" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof prover="cvc3" timelimit="2" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="2" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof prover="z3" timelimit="2" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter gcd.2" expl="loop invariant preservation" sum="6aa9c41319e3ce9cdb5c07f21e43fc1a" proved="false" expanded="true">
+      <proof prover="simplify" timelimit="2" edited="" obsolete="false">
+       <result status="timeout" time="2.08"/>
+      </proof>
+      <proof prover="cvc3" timelimit="2" edited="" obsolete="false">
+       <result status="timeout" time="2.06"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="2" edited="" obsolete="false">
+       <result status="timeout" time="2.11"/>
+      </proof>
+      <proof prover="z3" timelimit="2" edited="" obsolete="false">
+       <result status="timeout" time="2.09"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter gcd.3" expl="loop variant decreases" sum="cca2a902409976d7fe1249041e32fc6e" proved="true" expanded="false">
+      <proof prover="simplify" timelimit="2" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof prover="cvc3" timelimit="2" edited="" obsolete="false">
+       <result status="valid" time="0.09"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="2" edited="" obsolete="false">
+       <result status="timeout" time="2.02"/>
+      </proof>
+      <proof prover="z3" timelimit="2" edited="" obsolete="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter gcd.4" expl="normal postcondition" sum="70282398b1f17ace6b7f8ea5e5755ba1" proved="true" expanded="false">
+      <proof prover="simplify" timelimit="2" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof prover="cvc3" timelimit="2" edited="" obsolete="false">
+       <result status="unknown" time="0.72"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="2" edited="" obsolete="false">
+       <result status="valid" time="1.14"/>
+      </proof>
+      <proof prover="z3" timelimit="2" edited="" obsolete="false">
+       <result status="timeout" time="2.09"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+  </theory>
+ </file>
+</why3session>
