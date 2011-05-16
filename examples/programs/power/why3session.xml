@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
-<why3session name="programs/power/why3session.xml">
+<why3session name="power/why3session.xml">
  <file name="../power.mlw" verified="false" expanded="true">
-  <theory name="Power" verified="false" expanded="true">
+  <theory name="Power" verified="true" expanded="false">
    <goal name="Power_1" sum="1db7c130e0faaa3525077846831aadf3" proved="true" expanded="false">
     <proof prover="cvc3" timelimit="2" edited="" obsolete="false">
      <result status="valid" time="0.01"/>
@@ -17,7 +17,10 @@
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
-   <goal name="Power_sum" sum="0222179599018e583f47a3d214f2e604" proved="false" expanded="true">
+   <goal name="Power_sum" sum="0222179599018e583f47a3d214f2e604" proved="true" expanded="false">
+    <proof prover="coq" timelimit="2" edited="power/power.mlw_Power_Power_sum_1.v" obsolete="false">
+     <result status="valid" time="0.46"/>
+    </proof>
     <proof prover="cvc3" timelimit="2" edited="" obsolete="false">
      <result status="timeout" time="2.08"/>
     </proof>
@@ -31,7 +34,10 @@
      <result status="timeout" time="2.07"/>
     </proof>
    </goal>
-   <goal name="Power_mult" sum="9d09d633adb75294ad19c24d7ad24bf4" proved="false" expanded="true">
+   <goal name="Power_mult" sum="9d09d633adb75294ad19c24d7ad24bf4" proved="true" expanded="false">
+    <proof prover="coq" timelimit="2" edited="power/power.mlw_Power_Power_mult_1.v" obsolete="false">
+     <result status="valid" time="0.52"/>
+    </proof>
     <proof prover="cvc3" timelimit="2" edited="" obsolete="false">
      <result status="unknown" time="1.50"/>
     </proof>
