@@ -229,6 +229,13 @@ module Make(O: OBSERVER) : sig
         with result was 'valid'
     *)
 
+  val check_all: callback:(bool -> unit) -> unit
+    (** [check_all ()] reruns all the proofs of the session, and reports
+        all difference with the current state 
+        (does not change the session state)
+        When finished, calls the callback with argument true if there is at least one difference, false otherwise
+    *)
+
   val reload_all: prover_data Util.Mstr.t -> unit
     (** reloads all the files
         If for one of the file, the parsing or typing fails, then

@@ -221,17 +221,17 @@ let get_task g =
     | Some t -> t
 
 
-let rec set_goal_expanded g b = 
+let rec set_goal_expanded g b =
   g.goal_expanded <- b;
   if not b then
     Hashtbl.iter (fun _ tr -> set_transf_expanded tr b) g.transformations
 
-and set_transf_expanded tr b = 
+and set_transf_expanded tr b =
   tr.transf_expanded <- b;
   if not b then
     List.iter (fun g -> set_goal_expanded g b) tr.subgoals
 
-let set_theory_expanded t b = 
+let set_theory_expanded t b =
   t.theory_expanded <- b;
   if not b then
     List.iter (fun th -> set_goal_expanded th b) t.goals
@@ -368,6 +368,10 @@ let set_proof_state ~obsolete a res =
 
 (* timeout handler *)
 
+type timeout_action =
+  | Check_prover of (proof_attempt_status -> unit) * Call_provers.prover_call
+  | Any_timeout of (unit -> bool)
+
 let maximum_running_proofs = ref 2
 let running_proofs = ref []
 
@@ -380,12 +384,17 @@ let timeout_handler () =
   assert (not !timeout_handler_running);
   timeout_handler_running := true;
   let l = List.fold_left
-    (fun acc ((callback,call) as c) ->
-       match Call_provers.query_call call with
-	 | None -> c::acc
-	 | Some post ->
-	     let res = post () in callback (Done res);
-	     acc)
+    (fun acc c ->
+       match c with
+         | Check_prover(callback,call)  ->
+             (match Call_provers.query_call call with
+	       | None -> c::acc
+	       | Some post ->
+	           let res = post () in callback (Done res);
+	           acc)
+         | Any_timeout callback ->
+             let b = callback () in
+             if b then c::acc else acc)
     [] !running_proofs
   in
   let l =
@@ -394,7 +403,7 @@ let timeout_handler () =
 	let (callback,pre_call) = Queue.pop proof_attempts_queue in
 	callback Running;
 	let call = pre_call () in
-	(callback,call)::l
+	(Check_prover(callback,call))::l
       with Queue.Empty -> l
       end
     else l
@@ -423,6 +432,10 @@ let run_timeout_handler () =
 *)
       O.timeout ~ms:100 timeout_handler
     end
+
+let schedule_any_timeout callback =
+  running_proofs := (Any_timeout callback) :: ! running_proofs;
+  run_timeout_handler ()
 
 (* idle handler *)
 
@@ -487,7 +500,7 @@ let schedule_edition command callback =
       ~exitcodes:[(0,Call_provers.Unknown "")] ~filename:"" (Buffer.create 1)
   in
   callback Running;
-  running_proofs := (callback, precall ()) :: !running_proofs;
+  running_proofs := (Check_prover(callback, precall ())) :: !running_proofs;
   run_timeout_handler ()
 
 let schedule_delayed_action callback =
@@ -762,7 +775,7 @@ let reload_proof ~provers obsolete goal pid old_a =
     let obsolete = obsolete or old_a.proof_obsolete in
     (* eprintf "proof_obsolete : %b@." obsolete; *)
     let a =
-      raw_add_external_proof ~obsolete ~timelimit:old_a.timelimit 
+      raw_add_external_proof ~obsolete ~timelimit:old_a.timelimit
 	~edit:old_a.edited_as goal p old_res
     in
     !notify_fun (Goal a.proof_goal)
@@ -806,7 +819,7 @@ and reload_trans ~provers _goal_obsolete goal _ tr =
 
            old_subgoals = [s1,h1 ; s2, h2 ; ... ]
 
-       we first associate each new goals for which there is an old goal 
+       we first associate each new goals for which there is an old goal
        with the same checksum. E.g, imagine checksum of g2 is s1 :
 
        new_goals_map = [ (g1, None) ; (g2, Some h1) ; (g3, None) ; ]
@@ -841,9 +854,9 @@ and reload_trans ~provers _goal_obsolete goal _ tr =
     let remaining =
       List.sort (fun (s1,_) (s2,_) -> String.compare s1 s2) remaining
     in
-    (* we now associate to each new goal which does not have an 
-       associated old goal yet to an old goal in the same order 
-       (arbitrary choice) 
+    (* we now associate to each new goal which does not have an
+       associated old goal yet to an old goal in the same order
+       (arbitrary choice)
 
        new_new_goals_map = [ [ (g1, h2) ; (g2, h1) ; (g3, fresh) ; ]
 
@@ -860,7 +873,7 @@ and reload_trans ~provers _goal_obsolete goal _ tr =
                       | [] -> false,None,[]
                       | (_goal_name,g) :: rem -> true,Some g,rem
             in
-            associate_remaining_goals new_rem rem 
+            associate_remaining_goals new_rem rem
               ((id,subgoal_name,sum,subtask,old_goal,obsolete)::acc)
     in
     let goals =
@@ -868,10 +881,10 @@ and reload_trans ~provers _goal_obsolete goal _ tr =
     in
     let goals = List.fold_left
       (fun acc (id,subgoal_name,sum,subtask,old_g, subgoal_obsolete) ->
-         let mg = 
+         let mg =
            reload_any_goal ~provers
              (Parent_transf mtr) id
-             subgoal_name sum subtask old_g subgoal_obsolete 
+             subgoal_name sum subtask old_g subgoal_obsolete
          in mg::acc)
       [] goals
     in
@@ -994,7 +1007,7 @@ let load_result r =
 	  try float_of_string (List.assoc "time" r.Xml.attributes)
 	  with Not_found -> 0.0
 	in
-	Done { 
+	Done {
 	  Call_provers.pr_answer = answer;
 	  Call_provers.pr_time = time;
 	  Call_provers.pr_output = "";
@@ -1052,8 +1065,8 @@ and load_proof_or_transf ~env ~provers mg a =
 	in
         let obsolete = bool_attribute "obsolete" a true in
         let timelimit = int_attribute "timelimit" a 10 in
-	let (_ : proof_attempt) = 
-	  raw_add_external_proof ~obsolete ~timelimit ~edit mg p res 
+	let (_ : proof_attempt) =
+	  raw_add_external_proof ~obsolete ~timelimit ~edit mg p res
 	in
 	(* already done by raw_add_external_proof
 	   Hashtbl.add mg.external_proofs prover pa *)
@@ -1155,7 +1168,14 @@ let open_session ~env ~provers ~init ~notify dir =
 
 let save_session () =
   match !current_env with
-    | Some _ -> save (Filename.concat !project_dir db_filename)
+    | Some _ ->
+        let f = Filename.concat !project_dir db_filename in
+        begin if Sys.file_exists f then
+          let b = f ^ ".bak" in
+          if Sys.file_exists b then Sys.remove b ; 
+          Sys.rename f b
+        end;
+        save f
     | None ->
 	eprintf "Session.save_session: no session opened@.";
 	assert false
@@ -1208,7 +1228,7 @@ let rec prover_on_goal_or_children ~context_unproved_goals_only ~timelimit p g =
       Hashtbl.iter
 	(fun _ t ->
 	   r := false;
-           List.iter (prover_on_goal_or_children 
+           List.iter (prover_on_goal_or_children
 			~context_unproved_goals_only ~timelimit p)
              t.subgoals) g.transformations;
       if !r then prover_on_goal ~timelimit p g
@@ -1281,6 +1301,101 @@ let replay ~obsolete_only ~context_unproved_goals_only a =
 	  (replay_on_goal_or_children ~obsolete_only ~context_unproved_goals_only)
 	  tr.subgoals
 
+
+(*********************************)
+(* method: check existing proofs *)
+(*********************************)
+
+let check_failed = ref false
+let proofs_to_do = ref 0
+let proofs_done = ref 0
+
+let same_result r1 r2 =
+  match r1.Call_provers.pr_answer, r2.Call_provers.pr_answer with
+    | Call_provers.Valid, Call_provers.Valid -> true
+    | Call_provers.Invalid, Call_provers.Invalid -> true
+    | Call_provers.Timeout, Call_provers.Timeout -> true
+    | Call_provers.Unknown _, Call_provers.Unknown _-> true
+    | Call_provers.Failure _, Call_provers.Failure _-> true
+    | _ -> false
+
+let check_external_proof g a =
+  (* check that the state is not Scheduled or Running *)
+  let running = match a.proof_state with
+    | Scheduled | Running -> true
+    | Done _ | Undone | InternalFailure _ -> false
+  in
+  if running then ()
+  else
+    let p = a.prover in
+    let callback result =
+      match result with
+        | Scheduled | Running -> ()
+        | Undone -> assert false
+        | InternalFailure msg ->
+            Format.printf "goal '%s', prover '%s': internal failure '%a'@."
+              g.goal_name p.prover_id Exn_printer.exn_printer msg;
+            check_failed := true;
+            incr proofs_done
+        | Done new_res ->
+            incr proofs_done;
+            match a.proof_state with
+              | Done old_res ->
+                  if same_result old_res new_res then () else
+                    begin
+                      check_failed := true;
+                      Format.printf
+                        "goal '%s', prover '%s': %a instead of %a@."
+                        g.goal_name p.prover_id 
+                        Call_provers.print_prover_result new_res 
+                        Call_provers.print_prover_result old_res
+                    end
+              | _ ->
+                  check_failed := true;
+                  Format.printf
+                    "goal '%s', prover '%s': no former result available@."
+                    g.goal_name p.prover_id
+    in
+    let old = if a.edited_as = "" then None else
+      begin
+	(* Format.eprintf "Info: proving using edited file %s@." a.edited_as; *)
+	(Some (open_in a.edited_as))
+      end
+    in
+    incr proofs_to_do;
+    schedule_proof_attempt
+      ~debug:false ~timelimit:a.timelimit ~memlimit:0
+      ?old ~command:p.command ~driver:p.driver
+      ~callback
+      (get_task g)
+
+let rec check_goal_and_children g =
+  Hashtbl.iter (fun _ a -> check_external_proof g a) g.external_proofs;
+  Hashtbl.iter
+    (fun _ t ->
+       List.iter check_goal_and_children t.subgoals)
+    g.transformations
+
+let check_all ~callback =
+  check_failed := false;
+  proofs_to_do := 0;
+  proofs_done := 0;
+  List.iter
+    (fun file ->
+       List.iter
+         (fun th -> List.iter check_goal_and_children th.goals)
+         file.theories)
+    !all_files;
+  let timeout () =
+    Printf.eprintf "Progress: %d/%d\r%!" !proofs_done !proofs_to_do;
+    if !proofs_done = !proofs_to_do then 
+      begin
+        callback !check_failed; 
+        false
+      end
+    else true
+  in
+  schedule_any_timeout timeout
 
 (*****************************************************)
 (* method: split selected goals *)
@@ -1459,7 +1574,7 @@ let remove_proof_attempt a =
   Hashtbl.remove g.external_proofs a.prover.prover_id;
   check_goal_proved g
 
-let remove_transformation t = 
+let remove_transformation t =
   O.remove t.transf_key;
   let g = t.parent_goal in
   Hashtbl.remove g.transformations t.transf.transformation_name;

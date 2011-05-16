@@ -121,7 +121,7 @@ let main_loop () =
             begin
               let ms =
                 match !timeout_handler with
-                  | None -> raise Exit
+                  | None -> 100.0 (* raise Exit *)
                   | Some(ms,_) -> ms
               in
               usleep (ms -. time)
@@ -136,13 +136,19 @@ let main_loop () =
 
 open Format
 
+(*
 let model_index = Hashtbl.create 257
+*)
 
 let init =
+(*
   let cpt = ref 0 in
+*)
   fun _row any ->
+(*
     incr cpt;
     Hashtbl.add model_index !cpt any;
+*)
     let name =
       match any with
         | M.Goal g -> M.goal_expl g
@@ -152,7 +158,7 @@ let init =
 	  p.Session.prover_name ^ " " ^ p.Session.prover_version
         | M.Transformation tr -> Session.transformation_id tr.M.transf
     in
-    printf "Item '%s' loaded@." name
+    eprintf "Item '%s' loaded@." name
 
 let string_of_result result =
   match result with
@@ -177,7 +183,8 @@ let print_result fmt res =
   fprintf fmt "%s%s" (string_of_result res) t
 
 
-let notify any =
+let notify _any = ()
+(*
   match any with
     | M.Goal g ->
 	printf "Goal '%s' proved: %b@." (M.goal_expl g) (M.goal_proved g)
@@ -194,7 +201,7 @@ let notify any =
     | M.Transformation tr ->
 	printf "Transformation '%s' proved: %b@."
           (Session.transformation_id tr.M.transf) tr.M.transf_proved
-
+*)
 
 let project_dir =
   if Sys.file_exists fname then
@@ -225,12 +232,11 @@ let main () =
     M.maximum_running_proofs :=
       Whyconf.running_provers_max (Whyconf.get_main config);
     eprintf " done@.";
-    let files = M.get_all_files () in
-    List.iter
-      (fun f ->
-         eprintf "Replaying file '%s'@." f.M.file_name;
-         M.replay ~obsolete_only:false
-           ~context_unproved_goals_only:false (M.File f)) files;
+    let callback b =
+      if b then (eprintf "Check failed.@."; exit 1) 
+      else (eprintf "Everything OK.@.";exit 0)
+    in
+    M.check_all ~callback;
     try main_loop ()
     with Exit -> eprintf "Everything done@."
   with e ->
