@@ -153,6 +153,11 @@ pgml_options=--type-only
 bad_programs bench/programs/bad-typing
 echo ""
 
+echo "=== Type-checking modules ==="
+pgml_options=--type-only
+programs modules
+echo ""
+
 echo "=== Type-checking good programs ==="
 pgml_options=--type-only
 programs bench/programs/good

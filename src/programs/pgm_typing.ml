@@ -76,9 +76,9 @@ let dty_label uc = dty_app (find_ts ~pure:true uc "label_", [])
 (* note: local variables are simultaneously in locals (to type programs)
    and in denv (to type logic elements) *)
 type denv = {
-  uc         : uc;
-  locals     : Denv.dty Mstr.t;
-  denv  : Typing.denv; (* for user type variables only *)
+  uc     : uc;
+  locals : Denv.dty Mstr.t;
+  denv   : Typing.denv; (* for user type variables only *)
 }
 
 let create_denv uc = 
@@ -108,11 +108,12 @@ let dcurrying tyl ty =
 
 type region_policy = Region_var | Region_ret | Region_glob
 
-let rec create_regions n =
+let rec create_regions ~user n =
   if n = 0 then 
     []
   else 
-    tyvar (Typing.create_user_type_var "rho") :: create_regions (n - 1)
+    let tv = create_tvsymbol (id_fresh "rho") in
+    tyvar (create_ty_decl_var ~user tv) :: create_regions ~user (n - 1)
 
 let region_vars = ref []
 
@@ -167,54 +168,6 @@ let rec specialize_type_v ?(policy=Region_var) ~loc htv = function
 	(List.map (fun pv -> specialize_type_v ~loc htv pv.pv_tv) bl)
 	(specialize_type_v ~policy:Region_ret ~loc htv c.c_result_type)
 
-(***
-let specialize_effect ~loc htv e =
-  let region r acc = 
-    let tv = find_type_var ~loc htv r.R.r_tv in
-    let ty = specialize_ty ~loc htv r.R.r_ty in
-    { dr_tv = tv; dr_ty = ty } :: acc 
-  in
-  { de_reads  = Sreg.fold region e.E.reads  [];
-    de_writes = Sreg.fold region e.E.writes [];
-    de_raises = Sexn.elements e.E.raises; }
-
-let rec specialize_type_v ?(policy=Region_var) ~loc htv = function
-  | Tpure ty ->
-      DTpure (specialize_ty ~policy ~loc htv ty)
-  | Tarrow (bl, c) ->
-      DTarrow (List.map (specialize_binder ~loc htv) bl,
-	       specialize_type_c ~loc htv c)
-
-and specialize_type_c ~loc htv c =
-  { dc_result_type = 
-      specialize_type_v ~policy:Region_ret ~loc htv c.c_result_type;
-    dc_effect      = specialize_effect ~loc htv c.c_effect;
-    dc_pre         = specialize_fmla   ~loc htv c.c_pre;
-    dc_post        = specialize_post   ~loc htv c.c_post; }
-
-and specialize_binder ~loc htv v =
-  let id = {
-    id = v.pv_name.id_string;
-    id_lab = List.map (fun l -> Lstr l) v.pv_name.id_label;
-    (* FIXME? We do the same here as in Denv.ident_of_vs *)
-    id_loc = Util.default_option loc v.pv_name.Ident.id_loc }
-  in
-  let v = specialize_type_v ~loc htv v.pv_tv in
-  id, dpurify_type_v v, v
-***)
-
-(* let specialize_global loc x uc = *)
-(*   region_vars := Htv.create 17 :: !region_vars; *)
-(*   let ls = ns_find_ls (get_namespace (impure_uc uc)) x in *)
-(*   let ps = get_psymbol ls in *)
-(*   match ps.ps_kind with *)
-(*     | PSvar v -> *)
-(* 	ps, specialize_type_v ~loc ~policy:Region_glob (Htv.create 17) v.pv_tv *)
-(*     | PSfun tv -> *)
-(* 	ps, specialize_type_v ~loc (Htv.create 17) tv *)
-(*     | PSlogic -> *)
-(* 	ps,  *)
-
 let parameter x = "parameter " ^ x
 let rec parameter_q = function
   | [] -> assert false
@@ -266,14 +219,6 @@ let check_mutable_type loc dty = match view_dty dty with
 	"this expression has type %a, but is expected to have a mutable type"
 	print_dty dty
 
-(***
-let check_mutable_dtype_v loc = function
-  | DTpure dty -> check_mutable_type loc dty
-  | DTarrow _ -> 
-      errorm ~loc 
-	"this expression is a function, but is expected to have a mutable type"
-***)
-
 let dexception uc qid =
   let sl = Typing.string_list_of_qualid [] qid in
   let loc = Typing.qloc qid in
@@ -309,7 +254,8 @@ let rec dpurify_utype_v = function
       dcurrying (List.map (fun (_,ty,_) -> ty) bl)
 	(dpurify_utype_v c.duc_result_type)
 
-let rec dtype env = function
+(* user indicates whether region type variables can be instantiated *)
+let rec dtype ~user env = function
   | PPTtyvar {id=x} ->
       tyvar (Typing.find_user_type_var x env.denv)
   | PPTtyapp (p, x) ->
@@ -321,8 +267,8 @@ let rec dtype env = function
 	errorm ~loc "@[the type %a expects %d argument(s),@ 
                        but is applied to %d argument(s)@]"  
 	  print_qualid x (a - mt.mt_regions) np;
-      let tyl = List.map (dtype env) p in
-      let tyl = create_regions mt.mt_regions @ tyl in
+      let tyl = List.map (dtype ~user env) p in
+      let tyl = create_regions ~user mt.mt_regions @ tyl in
       begin match ts.ts_def with
 	| None ->
 	    tyapp (ts, tyl)
@@ -333,11 +279,11 @@ let rec dtype env = function
       end
   | PPTtuple tyl ->
       let ts = ts_tuple (List.length tyl) in
-      tyapp (ts, List.map (dtype env) tyl)
+      tyapp (ts, List.map (dtype ~user env) tyl)
 
 let rec dutype_v env = function
   | Ptree.Tpure pt ->
-      DUTpure (dtype env pt)
+      DUTpure (dtype ~user:true env pt)
   | Ptree.Tarrow (bl, c) ->
       let env, bl = map_fold_left dubinder env bl in
       let c = dutype_c env c in
@@ -434,9 +380,9 @@ and dexpr_desc ~ghost env loc = function
       let x = Typing.string_list_of_qualid [] p in
       let ls = 
 	try 
-	  ns_find_ls (get_namespace (impure_uc env.uc)) x 
-	with Not_found -> try 
 	  ns_find_ls (get_namespace (impure_uc env.uc)) (parameter_q x)
+	with Not_found -> try 
+	  ns_find_ls (get_namespace (impure_uc env.uc)) x 
 	with Not_found ->
 	  errorm ~loc "unbound symbol %a" print_qualid p
       in
@@ -495,7 +441,7 @@ and dexpr_desc ~ghost env loc = function
       let tyl = List.map (fun _ -> create_type_var loc) el in
       let ty = dty_app (Typing.ts_tuple n, tyl) in
       let create d ty =
-	{ dexpr_desc = d; (* dexpr_denv = env.denv; *)
+	{ dexpr_desc = d;
 	  dexpr_type = ty; dexpr_loc = loc }
       in
       let apply e1 e2 ty2 =
@@ -590,13 +536,12 @@ and dexpr_desc ~ghost env loc = function
       let e2 = dexpr ~ghost env e2 in
       expected_type e2 (dty_int env.uc);
       let env = add_local env x.id (dty_int env.uc) in
-      (* let inv = option_map (dfmla env.denv) inv in *)
       let e3 = dexpr ~ghost env e3 in
       expected_type e3 (dty_unit env.uc);
       DEfor (x, e1, d, e2, inv, e3), dty_unit env.uc
 
   | Ptree.Eassert (k, le) ->
-      DEassert (k, (* dfmla env.denv *) le), dty_unit env.uc
+      DEassert (k, le), dty_unit env.uc
   | Ptree.Elabel ({id=s}, e1) ->
       if Typing.mem_var s env.denv then
 	errorm ~loc "clash with previous label %s" s;
@@ -606,7 +551,7 @@ and dexpr_desc ~ghost env loc = function
       DElabel (s, e1), e1.dexpr_type
   | Ptree.Ecast (e1, ty) ->
       let e1 = dexpr ~ghost env e1 in
-      let ty = dtype env ty in
+      let ty = dtype ~user:false env ty in
       expected_type e1 ty;
       e1.dexpr_desc, ty
   | Ptree.Eany c ->
@@ -655,9 +600,9 @@ let declare_region_type ts i ty =
   Hashtbl.add h i ty
 
 let region_type ts i =
-(*   eprintf "region_type: ts=%a i=%d@." Pretty.print_ts ts i; *)
-(*   let mt = get_mtsymbol ts in *)
-(*   eprintf "%a@." print_mt_symbol mt; *)
+  (* eprintf "region_type: ts=%a i=%d@." Pretty.print_ts ts i; *)
+  (* let mt = get_mtsymbol ts in *)
+  (* eprintf "%a@." print_mt_symbol mt; *)
   Hashtbl.find (Hts.find region_types ts) i
 
 let mutable_fields = Hts.create 17 (* ts -> field:int -> region:int *)
@@ -717,9 +662,6 @@ let iadd_local env x ty =
     i_denv = 
       (let dty = dty_of_ty env.i_denv v.i_pure.vs_ty in
        add_pure_var s dty env.i_denv);
-(*     i_denv_effect =  *)
-(*       (let dty = dty_of_ty env.i_denv_effect v.i_effect.vs_ty in *)
-(*        add_pure_var s dty env.i_denv_effect); *)
     i_impures = Mstr.add s v env.i_impures;
     i_effects = Mstr.add s v.i_effect env.i_effects;
     i_pures = Mstr.add s v.i_pure env.i_pures; } 
@@ -787,27 +729,6 @@ let iuregion env ({ pp_loc = loc; pp_desc = d } as t) = match d with
 	    not_mutable ()
       end
 
-(***
-  | Qident id when Mstr.mem id.id env.locals ->
-      (* local variable *)
-      let ty = Mstr.find id.id env.locals in
-      check_mutable_type id.id_loc ty;
-      DRlocal id.id
-  | qid ->
-      let loc = Typing.qloc qid in
-      let sl = Typing.string_list_of_qualid [] qid in
-      try
-	let s, ty = specialize_global loc sl env.uc in
-	check_mutable_dtype_v loc ty;
-	DRglobal s
-      with Not_found ->
-	errorm ~loc "unbound variable %a" print_qualid qid
-***)
-(***
-  | DRlocal x -> IRlocal (Mstr.find x env.i_impures)
-  | DRglobal ls -> IRglobal ls
-***)
-
 let iueffect env e = {
   ie_reads  = List.map (iuregion env) e.du_reads;
   ie_writes = List.map (iuregion env) e.du_writes;
@@ -854,39 +775,6 @@ let ivariant env (t, ps) =
 	  Pretty.print_ty (t_type t) Pretty.print_ty t1
     | _ ->
 	assert false
-
-(***
-let iregion r = match view_dty (tyvar r.dr_tv) with
-  | Tyvar tv -> 
-      R.create (tvsymbol_of_type_var tv) (Denv.ty_of_dty r.dr_ty)
-  | Tyapp _  -> 
-      assert false
-
-let ieffect e = 
-  { ie_reads  = List.map iregion e.de_reads;
-    ie_writes = List.map iregion e.de_writes;
-    ie_raises = e.de_raises }
-
-let rec itype_v env = function
-  | DTpure ty ->
-      ITpure (Denv.ty_of_dty ty)
-  | DTarrow (bl, c) ->
-      let env, bl = map_fold_left ibinder env bl in
-      ITarrow (bl, itype_c env c)
-
-and itype_c env c =
-  let tyv = itype_v env c.dc_result_type in
-  { ic_result_type = tyv;
-    ic_effect      = ieffect c.dc_effect;
-    ic_pre         = pre env c.dc_pre;
-    ic_post        = post env c.dc_post; }
-
-and ibinder env (x, ty, tyv) =
-  let tyv = itype_v env tyv in
-  let ty = Denv.ty_of_dty ty in
-  let env, v = iadd_local env (id_user x.id x.id_loc) ty in
-  env, (v, tyv)
-***)
 
 let ifmla env l =
   let f = dfmla (pure_uc env.i_uc) env.i_denv l in
@@ -1504,10 +1392,10 @@ and expr_desc gl env loc ty = function
       let e1 = expr gl env e1 in
       let vs = Mvs.find v.i_impure env in
       (* TODO: alias detection *)
-(*       printf "e1 : %a@." print_type_v e1.expr_type_v; *)
-(*       printf "vs = %a@." T.print_pvsymbol vs; *)
-(*       if Sreg.exists (fun r -> occur_type_v r e1.expr_type_v) vs.pv_regions then *)
-(*   	errorm ~loc "this application would create an alias"; *)
+      (* printf "e1 : %a@." print_type_v e1.expr_type_v; *)
+      (* printf "vs = %a@." T.print_pvsymbol vs; *)
+      (* if Sreg.exists (fun r -> occur_type_v r e1.expr_type_v) vs.pv_regions then *)
+      (*   errorm ~loc "this application would create an alias"; *)
       let c = apply_type_v_var e1.expr_type_v vs in
       (*  printf "c = %a@." print_type_c c; *)
       make_apply loc e1 ty c
@@ -2243,7 +2131,7 @@ TODO:
 
 - exhaustivity of pattern-matching (in WP?)
 
-- do not add global references into the theory (add_global_if_pure)
+- do not add global references into the pure theory
 
 - polymorphic let?
 
