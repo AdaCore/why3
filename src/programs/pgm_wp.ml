@@ -173,7 +173,7 @@ let has_singleton_type pv = is_singleton_ty pv.pv_effect.vs_ty
 *)
 let quantify ?(all=false) env rm ef f =
   eprintf "@[<hov 2>quantify: all=%b ef=%a f=@[%a@]@]@."
-    all E.print ef Pretty.print_fmla f;
+    all E.print ef Pretty.print_term f;
   let sreg = ef.E.writes in
   let sreg =
     if all then 
