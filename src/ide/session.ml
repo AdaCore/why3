@@ -126,6 +126,7 @@ type proof_attempt =
       proof_goal : goal;
       proof_key : O.key;
       mutable proof_state : proof_attempt_status;
+      mutable timelimit : int;
       mutable proof_obsolete : bool;
       mutable edited_as : string;
     }
@@ -269,8 +270,8 @@ let save_status fmt s =
     | Done r -> save_result fmt r
 
 let save_proof_attempt fmt _key a =
-  fprintf fmt "@\n@[<v 1><proof prover=\"%s\" edited=\"%s\" obsolete=\"%b\">"
-    a.prover.prover_id a.edited_as a.proof_obsolete;
+  fprintf fmt "@\n@[<v 1><proof prover=\"%s\" timelimit=\"%d\" edited=\"%s\" obsolete=\"%b\">"
+    a.prover.prover_id a.timelimit a.edited_as a.proof_obsolete;
   save_status fmt a.proof_state;
   fprintf fmt "@]@\n</proof>"
 
@@ -585,13 +586,14 @@ let task_checksum t =
 (* raw additions to the model *)
 (******************************)
 
-let raw_add_external_proof ~obsolete ~edit (g:goal) p result =
+let raw_add_external_proof ~obsolete ~timelimit ~edit (g:goal) p result =
   let key = O.create ~parent:g.goal_key () in
   let a = { prover = p;
             proof_goal = g;
             proof_key = key;
             proof_obsolete = obsolete;
 	    proof_state = result;
+	    timelimit = timelimit;
             edited_as = edit;
           }
   in
@@ -760,7 +762,8 @@ let reload_proof ~provers obsolete goal pid old_a =
     let obsolete = obsolete or old_a.proof_obsolete in
     (* eprintf "proof_obsolete : %b@." obsolete; *)
     let a =
-      raw_add_external_proof ~obsolete ~edit:old_a.edited_as goal p old_res
+      raw_add_external_proof ~obsolete ~timelimit:old_a.timelimit 
+	~edit:old_a.edited_as goal p old_res
     in
     !notify_fun (Goal a.proof_goal)
   with Not_found ->
@@ -963,6 +966,11 @@ let bool_attribute field r def =
       | _ -> assert false
   with Not_found -> def
 
+let int_attribute field r def =
+  try
+    int_of_string (List.assoc field r.Xml.attributes)
+  with Not_found | Invalid_argument _ -> def
+
 let load_result r =
   match r.Xml.name with
     | "result" ->
@@ -1043,7 +1051,10 @@ and load_proof_or_transf ~env ~provers mg a =
 	  with Not_found -> assert false
 	in
         let obsolete = bool_attribute "obsolete" a true in
-	let _pa = raw_add_external_proof ~obsolete ~edit mg p res in
+        let timelimit = int_attribute "timelimit" a 10 in
+	let (_ : proof_attempt) = 
+	  raw_add_external_proof ~obsolete ~timelimit ~edit mg p res 
+	in
 	(* already done by raw_add_external_proof
 	   Hashtbl.add mg.external_proofs prover pa *)
 	()
@@ -1153,7 +1164,7 @@ let save_session () =
 (* method: run a given prover on each unproved goals *)
 (*****************************************************)
 
-let redo_external_proof g a =
+let redo_external_proof ~timelimit g a =
   (* check that the state is not Scheduled or Running *)
   let running = match a.proof_state with
     | Scheduled | Running -> true
@@ -1173,55 +1184,56 @@ let redo_external_proof g a =
       end
     in
     schedule_proof_attempt
-      ~debug:false ~timelimit:10 ~memlimit:0
+      ~debug:false ~timelimit ~memlimit:0
       ?old ~command:p.command ~driver:p.driver
       ~callback
       (get_task g)
 
-let rec prover_on_goal p g =
+let rec prover_on_goal ~timelimit p g =
   let id = p.prover_id in
   let a =
     try Hashtbl.find g.external_proofs id
     with Not_found ->
-      raw_add_external_proof ~obsolete:false ~edit:"" g p Undone
+      raw_add_external_proof ~obsolete:false ~timelimit ~edit:"" g p Undone
   in
-  let () = redo_external_proof g a in
+  let () = redo_external_proof ~timelimit g a in
   Hashtbl.iter
-    (fun _ t -> List.iter (prover_on_goal p) t.subgoals)
+    (fun _ t -> List.iter (prover_on_goal ~timelimit p) t.subgoals)
     g.transformations
 
-let rec prover_on_goal_or_children ~context_unproved_goals_only p g =
+let rec prover_on_goal_or_children ~context_unproved_goals_only ~timelimit p g =
   if not (g.proved && context_unproved_goals_only) then
     begin
       let r = ref true in
       Hashtbl.iter
 	(fun _ t ->
 	   r := false;
-           List.iter (prover_on_goal_or_children ~context_unproved_goals_only p)
+           List.iter (prover_on_goal_or_children 
+			~context_unproved_goals_only ~timelimit p)
              t.subgoals) g.transformations;
-      if !r then prover_on_goal p g
+      if !r then prover_on_goal ~timelimit p g
     end
 
-let run_prover ~context_unproved_goals_only pr a =
+let run_prover ~context_unproved_goals_only ~timelimit pr a =
   match a with
     | Goal g ->
-	prover_on_goal_or_children ~context_unproved_goals_only pr g
+	prover_on_goal_or_children ~context_unproved_goals_only ~timelimit pr g
     | Theory th ->
 	List.iter
-	  (prover_on_goal_or_children ~context_unproved_goals_only pr)
+	  (prover_on_goal_or_children ~context_unproved_goals_only ~timelimit pr)
 	  th.goals
     | File file ->
         List.iter
           (fun th ->
              List.iter
-	       (prover_on_goal_or_children ~context_unproved_goals_only pr)
+	       (prover_on_goal_or_children ~context_unproved_goals_only ~timelimit pr)
 	       th.goals)
           file.theories
     | Proof_attempt a ->
-        prover_on_goal_or_children ~context_unproved_goals_only pr a.proof_goal
+        prover_on_goal_or_children ~context_unproved_goals_only ~timelimit pr a.proof_goal
     | Transformation tr ->
         List.iter
-	  (prover_on_goal_or_children ~context_unproved_goals_only pr)
+	  (prover_on_goal_or_children ~context_unproved_goals_only ~timelimit pr)
 	  tr.subgoals
 
 (**********************************)
@@ -1238,7 +1250,7 @@ let rec replay_on_goal_or_children ~obsolete_only ~context_unproved_goals_only g
     (fun _ a ->
        if not obsolete_only || a.proof_obsolete then
          if not context_unproved_goals_only || proof_successful a
-         then redo_external_proof g a)
+         then redo_external_proof ~timelimit:a.timelimit g a)
     g.external_proofs;
   Hashtbl.iter
     (fun _ t ->

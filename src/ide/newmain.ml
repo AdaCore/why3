@@ -578,6 +578,7 @@ let prover_on_selected_goals pr =
        let a = get_any row in
         M.run_prover
           ~context_unproved_goals_only:!context_unproved_goals_only
+	  ~timelimit:gconfig.time_limit
           pr a)
     goals_view#selection#get_selected_rows
 

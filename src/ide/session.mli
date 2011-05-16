@@ -124,6 +124,7 @@ module Make(O: OBSERVER) : sig
         proof_goal : goal;
         proof_key : O.key;
         mutable proof_state : proof_attempt_status;
+	mutable timelimit : int;
         mutable proof_obsolete : bool;
         mutable edited_as : string;
       }
@@ -207,7 +208,7 @@ module Make(O: OBSERVER) : sig
     transformation_data -> Task.task -> unit
 
   val run_prover : context_unproved_goals_only:bool ->
-    prover_data -> any -> unit
+    timelimit:int -> prover_data -> any -> unit
     (** [run_prover p a] runs prover [p] on all goals under [a] *)
 
   val transform : context_unproved_goals_only:bool ->
