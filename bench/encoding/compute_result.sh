@@ -7,4 +7,4 @@ echo "CVC3:"
 ./diff_all2.sh cvc3 lines columns
 
 echo "Yices:"
-./diff_all2.sh yices lines_yices columns_yices
+./diff_all2.sh yices yices_lines yices_columns
