@@ -91,3 +91,9 @@ val is_projection : theory_uc -> lsymbol -> (tysymbol * lsymbol * int) option
       - [Some (ts, lsc, i)] if [ls] is the i-th projection of an
         algebraic datatype [ts] with only one constructor [lcs]
       - [None] otherwise *)
+
+val list_fields: theory_uc ->
+  (Ptree.qualid * 'a) list -> tysymbol * lsymbol * (Ptree.loc * 'a) option list
+  (** check that the given fields all belong to the same record type
+      and do not appear several times *)
+

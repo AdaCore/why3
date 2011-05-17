@@ -82,95 +82,72 @@ back  +-+-+-+-------------------+
             forall i : int. 0 <= i < a.card ->
                 a.idx[i] = dirichlet a.card a.back i && is_elt a i
 
-parameter create :
-  sz:int ->
-  { 0 <= sz <= maxlen }
-  sparse_array
-  { invariant_ result and
-    result.card = 0 and
-    length result = sz and forall i:int. model result i = default }
+  parameter create :
+    sz:int ->
+    { 0 <= sz <= maxlen }
+    sparse_array
+    { invariant_ result and
+      result.card = 0 and
+      length result = sz and forall i:int. model result i = default }
 
-(*
-parameter malloc : n:int -> {} array 'a { A.length result = n }
+  (*
+  parameter malloc : n:int -> {} array 'a { A.length result = n }
 
-let create sz =
-  { 0 <= sz <= maxlen }
-  Mk_sparse_array (malloc sz) (malloc sz) (malloc sz) 0
-  { invariant_ result and
+  let create sz =
+    { 0 <= sz <= maxlen }
+    Mk_sparse_array (malloc sz) (malloc sz) (malloc sz) 0
+    { invariant_ result and
     sa_sz result = sz and forall i:int. model result i = default }
-*)
+  *)
 
-let test (a: sparse_array) i =
-  { 0 <= i < length a and invariant_ a }
-  let idx = idx a in
-  let back = back a in
-  let n = card a in
-  0 <= idx[i] && idx[i] < n && back[idx[i]] = i
-  { result=True <-> is_elt a i }
+  let test (a: sparse_array) i =
+    { 0 <= i < length a and invariant_ a }
+    let idx = idx a in
+    let back = back a in
+    let n = card a in
+    0 <= idx[i] && idx[i] < n && back[idx[i]] = i
+    { result=True <-> is_elt a i }
 
-(***
-(*
-parameter get :
-  a:ref sparse_array -> i:int ->
-    { 0 <= i < sa_sz !a }
-    elt reads a
-    { result = model !a i }
-*)
-let get (a: sparse_array) i =
-  { 0 <= i < length a and invariant_ a }
-  if test a i then
-    array_get (val a) i
-  else
-    default
-  { result = model a i }
+  let get (a: sparse_array) i =
+    { 0 <= i < length a and invariant_ a }
+    if test a i then
+      (val a)[i]
+    else
+      default
+    { result = model a i }
 
-(*
-parameter set :
-  a:ref sparse_array -> i:int -> v:elt ->
-    { 0 <= i < sa_sz !a and invariant !a }
-    unit writes a
-    { invariant !a and
-      sa_sz !a = sa_sz (old !a) and
-      model !a i = v and
-      forall j:int. j <> i -> model !a j = model (old !a) j }
-*)
-let set (a : ref sparse_array) i v =
-  { 0 <= i < sa_sz a and invariant_ a }
-  (* let SA val idx back sz n = !a in *)
-  let val = sa_val !a in
-  let idx = sa_idx !a in
-  let back = sa_back !a in
-  let sz= sa_sz !a in
-  let n = sa_n !a in
-  let val = array_set val i v in
-  if test a i then
-    a := SA val idx back sz n
-  else begin
-    assert { n < sz };
-    let idx = array_set idx i n in
-    let back = array_set back n i in
-    a := SA val idx back sz (n+1)
-  end
-  { invariant_ a and
-    sa_sz a = sa_sz (old a) and
-    model a i = v and
-    forall j:int. j <> i -> model a j = model (old a) j }
+  let set (a: sparse_array) i v =
+    { 0 <= i < length a and invariant_ a }
+    (* let SA val idx back sz n = !a in *)
+    let val = val a in
+    let idx = idx a in
+    let back = back a in
+    let n = card a in
+    set val i v;
+    if not (test a i) then begin
+      assert { n < length a };
+      set idx i n;
+      set back n i;
+      () (*TODO a.card <- n+1 *)
+    end
+    { invariant_ a and
+      model a i = v and
+      forall j:int. j <> i -> model a j = model (old a) j }
 
-let harness () =
-  let a = create 10 in
-  let b = create 20 in
-  let get_a_5 = get a 5 in assert { get_a_5 = default };
-  let get_b_7 = get b 7 in assert { get_b_7 = default };
-  set a 5 c1;
-  set b 7 c2;
-  let get_a_5 = get a 5 in assert { get_a_5 = c1 };
-  let get_b_7 = get b 7 in assert { get_b_7 = c2 };
-  let get_a_7 = get a 7 in assert { get_a_7 = default };
-  let get_b_5 = get b 5 in assert { get_b_5 = default };
-  let get_a_0 = get a 0 in assert { get_a_0 = default };
-  let get_b_0 = get b 0 in assert { get_b_0 = default };
-  ()
-***)
+  let harness () =
+    let a = create 10 in
+    let b = create 20 in
+    let get_a_5 = get a 5 in assert { get_a_5 = default };
+    let get_b_7 = get b 7 in assert { get_b_7 = default };
+    set a 5 c1;
+    set b 7 c2;
+    let get_a_5 = get a 5 in assert { get_a_5 = c1 };
+    let get_b_7 = get b 7 in assert { get_b_7 = c2 };
+    let get_a_7 = get a 7 in assert { get_a_7 = default };
+    let get_b_5 = get b 5 in assert { get_b_5 = default };
+    let get_a_0 = get a 0 in assert { get_a_0 = default };
+    let get_b_0 = get b 0 in assert { get_b_0 = default };
+    ()
 
 end
 

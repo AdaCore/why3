@@ -2,14 +2,10 @@
 module M
 
   use import int.Int
-  
+
   type t = {| mutable a: int; mutable b: int |}
 
-  let test (x: t) =
-     a x = b x
-
-  let foo (x: t) =
-    test x
+  let foo () = {} let x = {| a = 1; b = 2 |} in a x { result=1 }
 
 end
 
@@ -41,9 +37,9 @@ module TestRef
 
   let bar () = { a=0 } a := 1 { a=1 }
 
-  (* TODO: 
-     le programme "let f n = n := 1" 
-     provoque "undefined type variable" (la région) 
+  (* TODO:
+     le programme "let f n = n := 1"
+     provoque "undefined type variable" (la région)
      problème : comment faire l'inférence du type de n
   *)
 
@@ -60,9 +56,9 @@ module TestArray
   use import module stdlib.Array
 
   (* TODO: update *)
-  let f (x: array int) = 
-    { x.length = 2 } 
-    set x 0 1; 
+  let f (x: array int) =
+    { x.length = 2 }
+    set x 0 1;
     set x 1 2
     { x[1] = 2 and x.length = 2 }
 
@@ -70,7 +66,7 @@ end
 **)
 
 (*
-Local Variables: 
+Local Variables:
 compile-command: "unset LANG; make -C .. testl-ide"
-End: 
+End:
 *)

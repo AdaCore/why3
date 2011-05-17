@@ -25,6 +25,7 @@ open Ident
 open Ty
 open Term
 open Theory
+open Pretty
 open Denv
 open Ptree
 open Pgm_ttree
@@ -103,7 +104,14 @@ let rec create_regions ~user n =
     let tv = create_tvsymbol (id_fresh "rho") in
     tyvar (create_ty_decl_var ~user tv) :: create_regions ~user (n - 1)
 
+(* region variables are collected in the following list of lists
+   so that we can check after typing that two region variables in the same
+   list (i.e. for the same symbol) are not mapped to the same region *)
+
 let region_vars = ref []
+
+let new_regions_vars () =
+  region_vars := Htv.create 17 :: !region_vars
 
 let push_region_var tv vloc = match !region_vars with
   | [] -> assert false
@@ -155,6 +163,10 @@ let rec specialize_type_v ?(policy=Region_var) ~loc htv = function
       dcurrying
 	(List.map (fun pv -> specialize_type_v ~loc htv pv.pv_tv) bl)
 	(specialize_type_v ~policy:Region_ret ~loc htv c.c_result_type)
+
+let specialize_lsymbol ?(policy=Region_var) ~loc htv s =
+  List.map (specialize_ty ~policy ~loc htv) s.ls_args,
+  option_map (specialize_ty ~policy:Region_ret ~loc htv) s.ls_value
 
 let parameter x = "parameter " ^ x
 let rec parameter_q = function
@@ -364,7 +376,7 @@ and dexpr_desc ~ghost env loc = function
       DElocal (x, tyv), tyv
   | Ptree.Eident p ->
       (* global variable *)
-      region_vars := Htv.create 17 :: !region_vars;
+      new_regions_vars ();
       let x = Typing.string_list_of_qualid [] p in
       let ls =
 	try
@@ -428,21 +440,39 @@ and dexpr_desc ~ghost env loc = function
       let s = Typing.fs_tuple n in
       let tyl = List.map (fun _ -> create_type_var loc) el in
       let ty = dty_app (Typing.ts_tuple n, tyl) in
-      let create d ty =
-	{ dexpr_desc = d;
-	  dexpr_type = ty; dexpr_loc = loc }
-      in
+      let create d ty = { dexpr_desc = d; dexpr_type = ty; dexpr_loc = loc } in
       let apply e1 e2 ty2 =
 	let e2 = dexpr ~ghost env e2 in
 	assert (Denv.unify e2.dexpr_type ty2);
 	let ty = create_type_var loc in
-	assert (Denv.unify e1.dexpr_type
-		  (dty_app (ts_arrow, [ty2; ty])));
+	assert (Denv.unify e1.dexpr_type (dty_app (ts_arrow, [ty2; ty])));
 	create (DEapply (e1, e2)) ty
       in
       let e = create (DElogic s) (dcurrying tyl ty) in
       let e = List.fold_left2 apply e el tyl in
       e.dexpr_desc, ty
+  | Ptree.Erecord fl ->
+      let _, cs, fl = Typing.list_fields (impure_uc env.uc) fl in
+      new_regions_vars ();
+      let tyl, ty = specialize_lsymbol ~loc (Htv.create 17) cs in
+      let ty = of_option ty in
+      let create d ty = { dexpr_desc = d; dexpr_type = ty; dexpr_loc = loc } in
+      let constructor d f tyf = match f with
+	| Some (_, f) ->
+	    let f = dexpr ~ghost env f in
+	    assert (Denv.unify f.dexpr_type tyf);
+	    let ty = create_type_var loc in
+	    assert (Denv.unify d.dexpr_type (dty_app (ts_arrow, [tyf; ty])));
+	    create (DEapply (d, f)) ty
+	| None ->
+	    errorm ~loc "some record fields are missing"
+      in
+      let d =
+	let ps = get_psymbol cs in
+	create (DElogic ps.ps_pure) (dcurrying tyl ty)
+      in
+      let d = List.fold_left2 constructor d fl tyl in
+      d.dexpr_desc, ty
 
   | Ptree.Esequence (e1, e2) ->
       let e1 = dexpr ~ghost env e1 in
@@ -1995,8 +2025,7 @@ let add_logics env ltm uc d =
   in
   let addi uc d =
     add uc { ld_loc = d.in_loc; ld_ident = d.in_ident;
-	     ld_params = List.map add_param d.in_params;
-	     ld_type = None; ld_def = None; }
+	     ld_params = d.in_params; ld_type = None; ld_def = None; }
   in
   match d with
     | LogicDecl dl -> List.fold_left add uc dl

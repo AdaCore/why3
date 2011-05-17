@@ -1119,6 +1119,8 @@ simple_expr:
     { $2 }
 | LEFTPAR RIGHTPAR
     { mk_expr Eskip }
+| LEFTREC list1_field_expr opt_semicolon RIGHTREC
+   { mk_expr (Erecord (List.rev $2)) }
 | BEGIN END
     { mk_expr Eskip }
 | OPPREF simple_expr
@@ -1127,6 +1129,15 @@ simple_expr:
     { mk_mixfix2 "[]" $1 $3 }
 | simple_expr LEFTSQ expr LARROW expr RIGHTSQ
     { mk_mixfix3 "[<-]" $1 $3 $5 }
+;
+
+list1_field_expr:
+| field_expr                            { [$1] }
+| list1_field_expr SEMICOLON field_expr { $3 :: $1 }
+;
+
+field_expr:
+| lqualid EQUAL expr { $1, $3 }
 ;
 
 list1_simple_expr:

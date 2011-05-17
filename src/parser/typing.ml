@@ -671,7 +671,7 @@ and dfmla_node ~localize loc uc env = function
   | PPbinop (a, (PPand | PPor | PPimplies | PPiff as op), b) ->
       Fbinop (binop op, dfmla ~localize uc env a, dfmla ~localize uc env b)
   | PPif (a, b, c) ->
-      Fif (dfmla ~localize uc env a, 
+      Fif (dfmla ~localize uc env a,
 	   dfmla ~localize uc env b, dfmla ~localize uc env c)
   | PPquant (q, uqu, trl, a) ->
       check_quant_linearity uqu;
@@ -710,7 +710,7 @@ and dfmla_node ~localize loc uc env = function
       begin match e12.pp_desc with
 	| PPinfix (_, op1, e2) when is_psymbol (Qident op1) uc ->
 	    let e23 = { pp_desc = PPinfix (e2, op2, e3); pp_loc = loc } in
-	    Fbinop (Tand, dfmla ~localize uc env e12, 
+	    Fbinop (Tand, dfmla ~localize uc env e12,
 		    dfmla ~localize uc env e23)
 	| _ ->
 	    let s, tyl = specialize_psymbol (Qident op2) uc in
@@ -921,8 +921,8 @@ let add_types dl th =
   in
   List.fold_left add_projections th dl
 
-let prepare_typedef td = 
-  if td.td_model then 
+let prepare_typedef td =
+  if td.td_model then
     errorm ~loc:td.td_loc "model types are not allowed in the logic";
   match td.td_def with
   | TDabstract | TDalgebraic _ | TDalias _ ->
@@ -972,7 +972,7 @@ let add_logics dl th =
     let id = d.ld_ident.id in
     let dadd_var denv (x, ty) = match x with
       | None -> denv
-      | Some id -> 
+      | Some id ->
 	  { denv with dvars = Mstr.add id.id (dty th' denv ty) denv.dvars }
     in
     let denv = Hashtbl.find denvs id in
