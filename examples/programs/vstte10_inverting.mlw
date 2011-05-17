@@ -6,33 +6,33 @@ module M
   use import int.Int
   use import module array.Array
 
-  logic injective (a : t int int) (n : int) =
-    forall i j : int. 0 <= i < n -> 0 <= j < n -> i <> j -> a[i] <> a[j]
+  logic injective (a: array int) (n: int) =
+    forall i j: int. 0 <= i < n -> 0 <= j < n -> i <> j -> a[i] <> a[j]
 
-  logic surjective (a : t int int) (n : int) =
-    forall i : int [i]. 0 <= i < n -> exists j : int. (0 <= j < n and a[j] = i)
+  logic surjective (a: array int) (n: int) =
+    forall i: int [i]. 0 <= i < n -> exists j: int. (0 <= j < n and a[j] = i)
 
-  logic range (a : t int int) (n : int) =
-    forall i : int. 0 <= i < n -> 0 <= a[i] < n
+  logic range (a: array int) (n: int) =
+    forall i: int. 0 <= i < n -> 0 <= a[i] < n
 
-  lemma Injective_surjective :
-    forall a : t int int, n : int.
+  lemma Injective_surjective:
+    forall a: array int, n: int.
     injective a n -> range a n -> surjective a n
 
-  let inverting (a : array int) (b : array int) n =
-    { n >= 0 and length a = n and length b = n and 
+  let inverting (a: array int) (b: array int) n =
+    { n >= 0 and length a = n and length b = n and
       injective a n and range a n }
     for i = 0 to n-1 do
-      invariant 
-        { length b = n and forall j : int. 0 <= j < i -> b[a[j]] = j }
-        b[a[i] <- i]
+      invariant
+        { length b = n and forall j: int. 0 <= j < i -> b[a[j]] = j }
+        set b a[i] i
     done
     { injective b n }
 
 end
 
 (*
-Local Variables: 
+Local Variables:
 compile-command: "unset LANG; make -C ../.. examples/programs/vstte10_inverting.gui"
-End: 
+End:
 *)

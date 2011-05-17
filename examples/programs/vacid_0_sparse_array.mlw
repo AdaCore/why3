@@ -82,6 +82,7 @@ back  +-+-+-+-------------------+
             forall i : int. 0 <= i < a.card ->
                 a.idx[i] = dirichlet a.card a.back i && is_elt a i
 
+  (*
   parameter create :
     sz:int ->
     { 0 <= sz <= maxlen }
@@ -89,16 +90,16 @@ back  +-+-+-+-------------------+
     { invariant_ result and
       result.card = 0 and
       length result = sz and forall i:int. model result i = default }
+  *)
 
-  (*
   parameter malloc : n:int -> {} array 'a { A.length result = n }
 
   let create sz =
     { 0 <= sz <= maxlen }
-    Mk_sparse_array (malloc sz) (malloc sz) (malloc sz) 0
+    {| val = malloc sz; idx = malloc sz; back = malloc sz; card = 0 |}
     { invariant_ result and
-    sa_sz result = sz and forall i:int. model result i = default }
-  *)
+      result.card = 0 and
+      length result = sz and forall i:int. model result i = default }
 
   let test (a: sparse_array) i =
     { 0 <= i < length a and invariant_ a }

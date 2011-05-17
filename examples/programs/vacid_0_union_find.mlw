@@ -48,26 +48,24 @@ module M
     { 0 <= n }
     let l = A.make n 0 in
     for i = 0 to n-1 do
-      invariant { forall j:int. 0 <= j < i -> u.link[j] = j }
+      invariant { forall j:int. 0 <= j < i -> l[j] = j }
       A.set l i i
     done;
-    mk_uf l (A.make n 0) n
+    {| link = l; dist = A.make n 0; num = n |}
     { inv result and
       num result = n and size result = n and
       forall x:int. 0 <= x < n -> repr result x x }
 
-  let path_compression (u : ref uf) x r =
-    { inv u and 0 <= x < size u and dist u # x > 0 and repr u x r }
-    let UF l d s n = !u in
-    let l = A.set l x r in
-    let d = A.set d x 1 in
-    u := UF l d s n
+  let path_compression (u: uf) x r =
+    { inv u and 0 <= x < size u and u.dist[x] > 0 and repr u x r }
+    A.set (link u) x r;
+    A.set (dist u) x 1
     { inv u and size u = size (old u) and
       num u = num (old u) and same_reprs (old u) u }
 
-  let rec find (u:ref uf) (x:int) variant { dist u # x } =
+  let rec find (u: uf) (x: int) variant { u.dist[x] } =
     { inv u and 0 <= x < size u }
-    let y = A.get (link !u) x in
+    let y = (link u)[x] in
     if y <> x then begin
       let r = find u y in
       path_compression u x r;
