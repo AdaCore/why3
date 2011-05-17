@@ -1,9 +1,10 @@
 #!/bin/sh
 # regression tests for why3
 
+TMP=$PWD/why3regtests.out
+
 cd `dirname $0`
 
-TMP=/tmp/why3regtests.out
 res=0
 
 run_dir () {
