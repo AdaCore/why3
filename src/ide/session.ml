@@ -1199,8 +1199,9 @@ let redo_external_proof ~timelimit g a =
     in
     let old = if a.edited_as = "" then None else
       begin
-	Format.eprintf "Info: proving using edited file %s@." a.edited_as;
-	(Some (open_in a.edited_as))
+	let f = Filename.concat !project_dir a.edited_as in
+	Format.eprintf "Info: proving using edited file %s@." f;
+	(Some (open_in f))
       end
     in
     schedule_proof_attempt
@@ -1358,8 +1359,9 @@ let check_external_proof g a =
     in
     let old = if a.edited_as = "" then None else
       begin
-	(* Format.eprintf "Info: proving using edited file %s@." a.edited_as; *)
-	(Some (open_in a.edited_as))
+	let f = Filename.concat !project_dir a.edited_as in
+	(* Format.eprintf "Info: proving using edited file %s@." f; *)
+	(Some (open_in f))
       end
     in
     incr proofs_to_do;
@@ -1390,6 +1392,7 @@ let check_all ~callback =
     Printf.eprintf "Progress: %d/%d\r%!" !proofs_done !proofs_to_do;
     if !proofs_done = !proofs_to_do then 
       begin
+	Printf.eprintf "\n%!";
         callback !check_failed; 
         false
       end
@@ -1542,10 +1545,12 @@ let edit_proof ~default_editor ~project_dir a =
 		incr i
 	    done;
 	    let file = name ^ "_" ^ (string_of_int !i) ^ ext in
+	    let file = Sysutil.relativize_filename project_dir file in
 	    a.edited_as <- file;
 	    file
 	| f -> f
     in
+    let file = Filename.concat project_dir file in
     let callback res =
       match res with
         | Done _ ->
@@ -1558,6 +1563,10 @@ let edit_proof ~default_editor ~project_dir a =
         | "" -> default_editor
         | s -> s
     in
+(*
+    eprintf "[Editing] goal %s with command %s %s@." g.Decl.pr_name.id_string editor file;
+*)
+    eprintf "[Editing] goal %s with command %s %s@." (Task.task_goal t).Decl.pr_name.Ident.id_string editor file;
     schedule_edit_proof ~debug:false ~editor
       ~file
       ~driver

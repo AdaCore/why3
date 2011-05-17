@@ -238,7 +238,7 @@ let main () =
     in
     M.check_all ~callback;
     try main_loop ()
-    with Exit -> eprintf "Everything done@."
+    with Exit -> eprintf "main replayer exited unexpectedly@."
   with e ->
     eprintf "Error while opening session with database '%s'@." project_dir;
     eprintf "Aborting...@.";

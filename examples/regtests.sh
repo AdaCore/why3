@@ -1,6 +1,8 @@
 #!/bin/sh
 # regression tests for why3
 
+chdir `dirname $0`
+
 TMP=/tmp/why3regtests.out
 
 LOGIC="hello_proof scottish-private-club einstein"
