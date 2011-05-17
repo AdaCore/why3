@@ -1334,8 +1334,9 @@ let check_external_proof g a =
         | Scheduled | Running -> ()
         | Undone -> assert false
         | InternalFailure msg ->
-            Format.printf "goal '%s', prover '%s': internal failure '%a'@."
-              g.goal_name p.prover_id Exn_printer.exn_printer msg;
+            Format.printf "goal '%s', prover '%s %s': internal failure '%a'@."
+              g.goal_name p.prover_name p.prover_version
+              Exn_printer.exn_printer msg;
             check_failed := true;
             incr proofs_done
         | Done new_res ->
@@ -1346,16 +1347,16 @@ let check_external_proof g a =
                     begin
                       check_failed := true;
                       Format.printf
-                        "goal '%s', prover '%s': %a instead of %a@."
-                        g.goal_name p.prover_id 
+                        "goal '%s', prover '%s %s': %a instead of %a@."
+                        g.goal_name p.prover_name p.prover_version
                         Call_provers.print_prover_result new_res 
                         Call_provers.print_prover_result old_res
                     end
               | _ ->
                   check_failed := true;
                   Format.printf
-                    "goal '%s', prover '%s': no former result available@."
-                    g.goal_name p.prover_id
+                    "goal '%s', prover '%s %s': no former result available@."
+                    g.goal_name p.prover_name p.prover_version
     in
     let old = if a.edited_as = "" then None else
       begin

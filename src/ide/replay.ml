@@ -158,7 +158,8 @@ let init =
 	  p.Session.prover_name ^ " " ^ p.Session.prover_version
         | M.Transformation tr -> Session.transformation_id tr.M.transf
     in
-    eprintf "Item '%s' loaded@." name
+    (* eprintf "Item '%s' loaded@." name *)
+    ()
 
 let string_of_result result =
   match result with

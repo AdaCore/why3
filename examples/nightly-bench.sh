@@ -4,8 +4,8 @@ OUT=$PWD/nightly-bench.out
 REPORT=$PWD/nightly-bench.report
 
 notify() {
-    mail -s "Why3 nightly bench" why3-commits@lists.gforge.inria.fr < $REPORT
-    # cat $REPORT
+    # mail -s "Why3 nightly bench" why3-commits@lists.gforge.inria.fr < $REPORT
+    cat $REPORT
     exit 0
 }
 
@@ -42,6 +42,9 @@ if test "$?" != "0" ; then
 else 
     echo "Prover detection succeeded. " >> $REPORT
 fi
+
+# increase number of cores used
+perl -pi -e 's/running_provers_max = 2/running_provers_max = 4/' why.conf
 
 # do we want to do "make bench" ?
 
