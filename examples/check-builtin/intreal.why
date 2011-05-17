@@ -9,4 +9,6 @@ theory IntReal
   goal G3 : ceil 1.5 = 2
   goal G4 : floor (-. 1.5) = -2
   goal G5 : ceil (-. 1.5) = -1
+  goal G6 : forall x : real. floor x <= ceil x
+  goal G7 : forall x : real. floor x < ceil x -> from_int (floor x) <> x
 end

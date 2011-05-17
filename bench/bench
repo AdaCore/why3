@@ -98,27 +98,6 @@ valid_goals () {
     done
 }
 
-
-test_provers () {
-    for f in $1/*.mlw; do
-	echo -n "  "$f"... "
-	if $pgml -L modules -P alt-ergo $f | grep -q -v Valid; then
-	    echo "valid test $f failed!"
-	    exit 1
-       else 
-	    echo "ok"
-	fi
-    done
-}
-
-test_prover () {
-    if $pgm -t 1 -P $1 $2 | grep -q -v Valid; then
-	echo "  $1 fails!"
-    else
-        true
-    fi
-}
-
 echo "=== Checking drivers ==="
 drivers drivers
 echo ""
@@ -173,34 +152,3 @@ echo ""
 echo "=== Checking valid goals ==="
 valid_goals bench/valid
 echo ""
-
-echo "=== Checking provers ==="
-echo -n "Test provers on true..."
-provers=$($pgm --list-provers | cut -d " " -f 3 |grep -v "^$")
-good_provers=""
-bad_provers=""
-for prover in $(echo $provers); do 
-    if $pgm -P $prover bench/true_goal.why | grep -q -v Valid; then
-        #echo "$i : Fail"
-        bad_provers="$bad_provers $prover"
-    else
-        #echo "$i : Ok"
-        good_provers="$good_provers $prover"
-    fi
-done
-echo "done"
-echo ""
-echo "On your installation the following provers can't prove \"true\":"
-echo "  $bad_provers"
-echo ""
-echo "So I will only test the following provers:"
-echo $good_provers
-echo ""
-echo "nb : If a prover can't prove a goal it's perhaps normal (ex: TPTP int)"
-
-for file in bench/valid/*.why; do
-    echo I test $file
-    for prover in $good_provers; do
-        test_prover $prover $file
-    done
-done
