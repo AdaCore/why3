@@ -4,20 +4,11 @@
  <file name="../decrease1.mlw" verified="true" expanded="true">
   <theory name="Decrease1" verified="true" expanded="true">
    <goal name="decrease1_induction" sum="8319c3299f6c5b391aec5943ca151429" proved="true" expanded="true">
-    <proof prover="coq" timelimit="10" edited="examples/programs/decrease1/decrease1.mlw_Decrease1_decrease1_induction_2.v" obsolete="false">
+    <proof prover="coq" timelimit="10" edited="decrease1.mlw_Decrease1_decrease1_induction_2.v" obsolete="false">
      <result status="valid" time="0.75"/>
-    </proof>
-    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-     <result status="unknown" time="0.45"/>
-    </proof>
-    <proof prover="z3" timelimit="10" edited="" obsolete="false">
-     <result status="timeout" time="10.12"/>
     </proof>
    </goal>
    <goal name="WP_parameter search" expl="correctness of parameter search" sum="46e3d9215dcd11606cc49de64a5a327f" proved="true" expanded="true">
-    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-     <result status="timeout" time="10.08"/>
-    </proof>
     <transf name="split_goal" proved="true" expanded="true">
      <goal name="WP_parameter search.1" expl="loop invariant init" sum="f5954e0aa354b70603e2561453b4ded0" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
@@ -60,9 +51,6 @@
       </proof>
      </goal>
      <goal name="WP_parameter search.6" expl="loop invariant preservation" sum="f4703704714fb12b1cfc7e1f7033703a" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="examples/programs/decrease1/decrease1.mlw-Decrease1-WP_parameter search_1.why" obsolete="false"><undone/>
-       
-      </proof>
       <proof prover="z3" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.10"/>
       </proof>
@@ -102,9 +90,6 @@
     </transf>
    </goal>
    <goal name="WP_parameter search_rec" expl="correctness of parameter search_rec" sum="9fb29a60c6f5cf8d6b537c46b8c3ba87" proved="true" expanded="true">
-    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-     <result status="timeout" time="10.17"/>
-    </proof>
     <transf name="split_goal" proved="true" expanded="true">
      <goal name="WP_parameter search_rec.1" expl="precondition" sum="e99d8b29c61d5561f42de7428f854f98" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
@@ -147,9 +132,6 @@
       </proof>
      </goal>
      <goal name="WP_parameter search_rec.6" expl="normal postcondition" sum="66a382fecdcc926c2651f0df8b934922" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="timeout" time="10.09"/>
-      </proof>
       <proof prover="z3" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.24"/>
       </proof>
