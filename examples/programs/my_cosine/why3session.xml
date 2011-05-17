@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session SYSTEM "why3session.dtd">
+<why3session name="examples/programs/my_cosine/why3session.xml">
+ <file name="../my_cosine.mlw" verified="true" expanded="true">
+  <theory name="M" verified="true" expanded="true">
+   <goal name="WP_parameter my_cosine" expl="correctness of parameter my_cosine" sum="986f977f7129151df7340d17164762c3" proved="true" expanded="true">
+    <transf name="split_goal" proved="true" expanded="true">
+     <goal name="WP_parameter my_cosine.1" expl="assertion" sum="42f9206597da619fa67e4871bf991914" proved="true" expanded="true">
+      <proof prover="coq" timelimit="2" edited="my_cosine.mlw_M_WP_parameter my_cosine_1.v" obsolete="false">
+       <result status="valid" time="3.82"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter my_cosine.2" expl="precondition" sum="be0701645667327c36cf66484840bf90" proved="true" expanded="true">
+      <proof prover="gappa" timelimit="2" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter my_cosine.3" expl="precondition" sum="3ad91864f24b8a31a628b48823b41ea2" proved="true" expanded="true">
+      <proof prover="gappa" timelimit="2" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter my_cosine.4" expl="precondition" sum="6a3e5463b9408c699f0550a24603937a" proved="true" expanded="true">
+      <proof prover="gappa" timelimit="2" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter my_cosine.5" expl="normal postcondition" sum="9148268517dc60d188ee0ee3565f9253" proved="true" expanded="true">
+      <proof prover="gappa" timelimit="2" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+  </theory>
+ </file>
+</why3session>
