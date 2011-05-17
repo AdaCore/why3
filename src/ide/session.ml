@@ -1434,7 +1434,9 @@ let transformation_on_goal g tr =
                 eprintf "addresses: %x %x@." (Obj.magic g.task) (Obj.magic task);
 	      *)
               s1 <> s2
-                (* task != g.task *)
+(*
+                task != (get_task g)
+*)
 	  | _ -> true
       in
       if b then

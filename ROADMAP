@@ -18,12 +18,16 @@
 * Coq realization of theories
   (Andrei)
 * more libraries (theories and modules)
+
 * IDE: edition, navigation
   (partially done)
+
 * HOL
 
-* IDE: custom model
+* IDE: reimplement "hide proved goals" feature
+  ** suggested solution: replace model + filter_model by a custom model
   (JC + ?)
+
 * why3bench sur examples/ dans make bench
   (Francois)
 
@@ -44,6 +48,11 @@
 === Roadmap for third release ==========================================
 
 * Check if doc is up-to-date
+
+* Add as many examples as possible in the regression tests
+
+* Distribution of examples: we should distribute those who have an xml file
+  under git, and distribute the XML and Coq proofs
 
 * DONE checkout frais, compilation (local ou non) et make bench chaque nuit sur moloch
   (?)
@@ -74,13 +83,9 @@
   ** DONE add replay of existing proofs in "make bench" to detect regression
   ** DONE add automatic recompilation, install and bench every night on moloch
 
-* IDE: implement "inline" (use transformation inline_goal)
-  ** partially done
+* DONE IDE: implement "inline" (use transformation inline_goal)
   ** problem 1: detect that transformation did nothing
   ** (DONE) problem 2: reimport from db does apply inline correctly
-
-* IDE: debug "hide proved goals" feature
-  ** suggested solution: replace model + filter_model by a custom model
 
 * DONE IDE: debug "remove" et "clean" qui provoquent des segfaults !!
 
