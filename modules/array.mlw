@@ -19,10 +19,19 @@ module Array
     { 0 <= i < length a } unit writes a { a = (old a)[i <- v] }
 
   (* unsafe get/set operations with no precondition *)
-  parameter unsafe_get : a:array 'a -> i:int ->
-    { } 'a reads a { result = a[i] }
-  parameter unsafe_set : a:array 'a -> i:int -> v:'a ->
-    { } unit writes a { a = (old a)[i <- v] }
+  exception OutOfBounds
+
+  parameter defensive_get: a:array 'a -> i:int ->
+    { }
+    'a reads a raises OutOfBounds
+    { 0 <= i < length a and result = a[i] }
+    | OutOfBounds -> { i < 0 or i >= length a }
+
+  parameter defensive_set : a:array 'a -> i:int -> v:'a ->
+    { }
+    unit writes a raises OutOfBounds
+    { 0 <= i < length a and a = (old a)[i <- v] }
+    | OutOfBounds -> { i < 0 or i >= length a }
 
   parameter length : a:array 'a -> {} int { result = a.length }
 
