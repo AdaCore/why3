@@ -1,7 +1,7 @@
 #!/bin/bash
 
-OUT=/tmp/nightly-bench.out
-REPORT=/tmp/nightly-bench.report
+OUT=$PWD/nightly-bench.out
+REPORT=$PWD/nightly-bench.report
 
 notify() {
     mail -s "Why3 nightly bench" why3-commits@lists.gforge.inria.fr < $REPORT
