@@ -4,8 +4,8 @@ OUT=$PWD/nightly-bench.out
 REPORT=$PWD/nightly-bench.report
 
 notify() {
-    # mail -s "Why3 nightly bench" why3-commits@lists.gforge.inria.fr < $REPORT
-    cat $REPORT
+    mail -s "Why3 nightly bench" why3-commits@lists.gforge.inria.fr < $REPORT
+    # cat $REPORT
     exit 0
 }
 
