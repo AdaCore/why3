@@ -1393,11 +1393,13 @@ let check_all ~callback =
     if !proofs_done = !proofs_to_do then 
       begin
 	Printf.eprintf "\n%!";
+	decr maximum_running_proofs;
         callback !check_failed; 
         false
       end
     else true
   in
+  incr maximum_running_proofs;
   schedule_any_timeout timeout
 
 (*****************************************************)
