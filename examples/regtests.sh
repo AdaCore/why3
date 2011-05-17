@@ -11,7 +11,7 @@ run_dir () {
     for f in `ls $1/*/why3session.xml`; do
         d=`dirname $f`
 	echo -n "Replaying "$d"... "
-	if ! ../bin/why3replayer $d 2>/dev/null > $TMP ; then
+	if ! ../bin/why3replayer.opt $d 2>/dev/null > $TMP ; then
 	    echo "FAILED:"
 	    cat $TMP
 	    res=1
@@ -23,6 +23,10 @@ run_dir () {
 
 echo "=== Logic ==="
 run_dir .
+echo ""
+
+echo "=== BTS ==="
+run_dir bts
 echo ""
 
 echo "=== Programs ==="

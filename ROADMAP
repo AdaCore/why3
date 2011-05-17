@@ -1,12 +1,12 @@
 
 
-= Roadmap for 2011 =========================================================
+=== Long-term Roadmap (see below for roadmap to next release) ===========
 
 * WhyML
   ** regions
   ** clone module
   ** ghost code
-  ** extraction of Ocaml code 
+  ** extraction of Ocaml code
 * Jessie3
 * traceability: Partially done
   (Claude)
@@ -18,39 +18,19 @@
 * Coq realization of theories
   (Andrei)
 * more libraries (theories and modules)
-* IDE: reload
-  (claude)
 * IDE: edition, navigation
-  (?)
+  (partially done)
 * HOL
 
 * IDE: custom model
   (JC + ?)
 * why3bench sur examples/ dans make bench
   (Francois)
-* checkout frais, compilation (local ou non) et make bench chaque nuit sur moloch
-  (?)
-* BD : se passer de sqlite3
-  (Claude)
-  Solution: un unique fichier XML, qui est ecrit mais pas
-  tres souvent (pas plus d'une fois par seconde)
-  ne pas oublier neanmoins de mettre une action dans Timeout
-  qui enregistre au bout d'un moment
-  pb: n'est pas independant de l'IDE, peut-on faire un module
-  independant de l'IDE ? qui serait utilisé par why3bench ?
-  
 
-* IDE: avoir des transformations non codees en dur
-  (Claude d'abord)
+* Papers to write
 
-* Bug des md5 
-  (Claude. pas reproductible ? Pb de duplication des buts ?)
-
-* Papers to write 
-
-  * Encodings and transformations (Andrei+Francois, CADE 2011, 
-    deadline January 2011) DONE
-  * Why presentation at the IVL workshop of CADE:
+  * Encodings and transformations (Andrei+Francois)
+  * DONE Why presentation at the IVL workshop of CADE:
     (http://research.microsoft.com/en-us/um/people/moskal/boogie2011/)
     deadline: May 1st
   * Caml code ?
@@ -61,16 +41,38 @@
   * rapports recherche ?
 
 
-=== Roadmap for third release =================================================
+=== Roadmap for third release ==========================================
 
-* (DONE) IDE: no more threads
-  
+* Check if doc is up-to-date
 
-* proof replay
-  ** (DONE) IDE: replay all obsolete but previously successful proofs
-  ** in whybench
-  ** add replay of existing proofs in "make bench" to detect regression
-  ** add automatic recompilation, install and bench every night on moloch
+* DONE checkout frais, compilation (local ou non) et make bench chaque nuit sur moloch
+  (?)
+
+* DONE IDE: reload
+  (claude)
+
+* DONE BD : se passer de sqlite3
+  (Claude)
+  Solution: un unique fichier XML, qui est ecrit mais pas
+  tres souvent (pas plus d'une fois par seconde)
+  ne pas oublier neanmoins de mettre une action dans Timeout
+  qui enregistre au bout d'un moment
+  pb: n'est pas independant de l'IDE, peut-on faire un module
+  independant de l'IDE ? qui serait utilisé par why3bench ?
+
+* DONE IDE: avoir des transformations non codees en dur
+  (Claude d'abord)
+
+* DONE Bug des md5
+  (Claude. pas reproductible ? Pb de duplication des buts ?)
+
+* DONE IDE: no more threads
+
+* DONE proof replay
+  ** DONE IDE: replay all obsolete but previously successful proofs
+  ** DONE in why3replay in whybench
+  ** DONE add replay of existing proofs in "make bench" to detect regression
+  ** DONE add automatic recompilation, install and bench every night on moloch
 
 * IDE: implement "inline" (use transformation inline_goal)
   ** partially done
@@ -80,14 +82,14 @@
 * IDE: debug "hide proved goals" feature
   ** suggested solution: replace model + filter_model by a custom model
 
-* IDE: debug "remove" et "clean" qui provoquent des segfaults !!
- 
+* DONE IDE: debug "remove" et "clean" qui provoquent des segfaults !!
+
 * IDE: ajouter "invalid" comme cas de resultats de preuve
   (utiliser call_provers.proof_result dans gmain)
   DONE
 
 
-=== Roadmap for second release 0.64 ================
+=== Roadmap for second release 0.64 ========================================
 
 * fix local installation
   ** fix local executables names (DONE)
@@ -99,11 +101,11 @@
              the user
   ** generally speaking, we should rethink the design of that .why.conf: avoid
      absolute paths,
-     Partially done - libdir, datadir, loadpath, ... are not written in 
+     Partially done - libdir, datadir, loadpath, ... are not written in
      why.conf if they correspond to the default value.
 
 
-* IDE, file names in DB: use only file names relative to the db file 
+* IDE, file names in DB: use only file names relative to the db file
   DONE
 
 === Roadmap for December 2010 ================================================
@@ -149,7 +151,7 @@
 ** semantics not clear, should be clarified, documented and
    implemented accordingly
 * add transf "inline goal" (to be done later)
-* add button "remove" 
+* add button "remove"
 ** removing goals: done
 ** removing transformation: done, but subgoals stay in db (not critical)
 * add button "replay" (to be done later)
@@ -183,7 +185,7 @@ as the Why platform next generation. It is a new project, independent
 from Why versions 2.xx.
 
 The home web page of Why3 is http://why3.gforge.inria.fr, where you
-can find the source distribution and the manual. See the manual for 
+can find the source distribution and the manual. See the manual for
 installation instructions and contact information.
 
 The main new features with respect to Why 2.xx are the following.
@@ -212,7 +214,7 @@ to allow access to Why3 features programmatically.
 * session save and restore
 * prover calls in parallel
 * splitting, and more generally applying task transformations, on demand
-* ability to edit proofs for interactive provers (Coq only for the moment) 
+* ability to edit proofs for interactive provers (Coq only for the moment)
   on any subtask
 
 5) Extensible architecture via plugins
@@ -255,7 +257,7 @@ Using the Why3 GUI on a C file is done as follows
   frama-c -jessie -jessie-atp why3ide <file>.c
 (You can also run it in batch mode using
   frama-c -jessie -jessie-atp why3 <file>.c
-and process the generated Why3 file "<file>.jessie/why/<file>_why3.why" 
+and process the generated Why3 file "<file>.jessie/why/<file>_why3.why"
 with Why3 batch tools).
 
 The main new features of interest in the GUI are
@@ -265,7 +267,7 @@ The main new features of interest in the GUI are
 * splitting on demand
 * ability to call Coq on a given VC to provide a proof script. Incidentally,
   this feature can be used to analyse the VC to understand why it is
-  not proved automatically.  
+  not proved automatically.
 * proof session saved and restored at startup
 
 Any question, remark or bug report concerning only Why3 should be done

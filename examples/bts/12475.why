@@ -1,0 +1,11 @@
+theory Stmt "some_statement"
+ 
+  use import real.Real
+  use import floating_point.Rounding
+  use import floating_point.Single
+  goal toto:
+       forall x : real. x < round Up x + 1.
+
+
+end
+
