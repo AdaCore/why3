@@ -92,13 +92,13 @@ let search_safety () =
       invariant { length x = m }
       let delta = y - !s - c + x[d] in
       if 0 <= delta && delta <= 9 * d then begin
-        set x d c;
+        x[d] <- c;
 	let k = div delta 9 in
         for i = 0 to d - 1 do
           invariant { length x = m }
-          if i < k then set x i 9
-	  else if i = k then set x i (mod delta 9)
-          else set x i 0
+          if i < k then x[i] <- 9
+	  else if i = k then x[i] <- mod delta 9
+          else x[i] <- 0
         done;
         raise Success
       end
@@ -132,7 +132,7 @@ let search () =
       invariant { x = at x Init }
       let delta = y - !s - c + x[d] in
       if 0 <= delta && delta <= 9 * d then begin
-        set x d c;
+        x[d] <- c;
         assert { sum x.elts d m = y - delta };
 	let k = div delta 9 in
         assert { k <= d };
@@ -140,9 +140,9 @@ let search () =
           invariant { length x = m and is_integer x.elts and
                       sum x.elts d m = y - delta and
                       sum x.elts 0 i = if i <= k then 9*i else delta }
-          if i < k then set x i 9
-	  else if i = k then set x i (mod delta 9)
-          else set x i 0
+          if i < k then x[i] <- 9
+	  else if i = k then x[i] <- (mod delta 9)
+          else x[i] <- 0
         done;
         (* assume { sum !x 0 d = delta }; *)
         assert { sum x.elts 0 d = delta };
@@ -264,7 +264,7 @@ let search_smallest () =
       let delta = y - !s - c + x[d] in
       if 0 <= delta && delta <= 9 * d then begin
         assert { smallest_size delta <= d };
-        set x d c;
+        x[d] <- c;
         assert { sum x.elts d m = y - delta };
         assert { gt_digit x.elts (at x.elts Init) d };
 	let k = div delta 9 in
@@ -278,9 +278,9 @@ let search_smallest () =
                 (j <  smallest_size delta -> x[j] = M.get (smallest delta) j) and
                 (j >= smallest_size delta -> x[j] = 0)) and
              gt_digit x.elts (at x.elts Init) d }
-          if i < k then set x i 9
-	  else if i = k then set x i (mod delta 9)
-          else set x i 0;
+          if i < k then x[i] <- 9
+	  else if i = k then x[i] <- mod delta 9
+          else x[i] <- 0;
           assert { is_integer x.elts }
         done;
         assert { sum x.elts 0 d = delta };

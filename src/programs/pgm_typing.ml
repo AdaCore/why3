@@ -473,6 +473,8 @@ and dexpr_desc ~ghost env loc = function
       in
       let d = List.fold_left2 constructor d fl tyl in
       d.dexpr_desc, ty
+  | Ptree.Eassign _ ->
+      assert false (*TODO*)
 
   | Ptree.Esequence (e1, e2) ->
       let e1 = dexpr ~ghost env e1 in

@@ -83,14 +83,14 @@ module Distance
       for i = 0 to n2 do
         invariant { length t = n2+1 and
                     forall j:int. 0 <= j < i -> t[j] = n2-j }
-        set t i (n2 - i)
+       t[i] <- n2 - i
       done;
       (* loop over w1 *)
       for i = n1-1 downto 0 do
         invariant { length t = n2+1
            and forall j:int. 0 <= j <= n2 -> min_suffix w1 w2 (i+1) j t[j] }
         o := t[n2];
-        set t n2 (t[n2] + 1);
+        t[n2] <- t[n2] + 1;
         (* loop over w2 *)
         for j = n2-1 downto 0 do
           invariant { length t = n2+1
@@ -101,9 +101,9 @@ module Distance
       	    let temp = !o in
             o := t[j];
 	    if w1[i] = w2[j] then
-	      set t j temp
+	      t[j] <- temp
 	    else
-	      set t j ((min t[j] t[j+1]) + 1)
+	      t[j] <- (min t[j] t[j+1]) + 1
           end
         done
       done;

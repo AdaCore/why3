@@ -1,5 +1,11 @@
 
-o syntactic sugar for postcondition: 
+o e <- e
+
+o {| e with x1 = e1; ...; xn = en |}
+
+o WP: update
+
+o syntactic sugar for postcondition:
   { pat | q } stands for { let pat = result in q }
 
   particular case { x | ... } to use x instead of result
@@ -12,8 +18,6 @@ o use of old in loop invariant should be reported as an error (correctly)
 o what about pervasives old, at, label, unit = ()
   in particular, how to prevent old and at from being used in programs?
   can we get rid of theories/programs.why?
-
-o fmla_effect
 
 o program alias, e.g.
 

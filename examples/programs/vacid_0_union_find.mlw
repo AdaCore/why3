@@ -2,17 +2,17 @@ module M
 
   use import int.Int
   use import module ref.Ref
-  use import module array.Array as A
+  use import module array.Array
 
   type uf = {| link : array int;
                dist : array int; (* distance to representative *)
                num  : int;       (* number of classes *) |}
 
-  logic size (u: uf) : int = A.length u.link
+  logic size (u: uf) : int = length u.link
 
   logic inv (u : uf) =
-    let s = A.length u.link in
-    A.length u.dist = s and
+    let s = length u.link in
+    length u.dist = s and
     (forall i:int. 0 <= i < s -> 0 <= u.link[i] < s) and
     (forall i:int. 0 <= i < s ->
        (  (u.dist[i] = 0 and u.link[i] = i)
@@ -46,20 +46,20 @@ module M
 
   let create (n:int) =
     { 0 <= n }
-    let l = A.make n 0 in
+    let l = make n 0 in
     for i = 0 to n-1 do
       invariant { forall j:int. 0 <= j < i -> l[j] = j }
-      A.set l i i
+      l[i] <- i
     done;
-    {| link = l; dist = A.make n 0; num = n |}
+    {| link = l; dist = make n 0; num = n |}
     { inv result and
       num result = n and size result = n and
       forall x:int. 0 <= x < n -> repr result x x }
 
   let path_compression (u: uf) x r =
     { inv u and 0 <= x < size u and u.dist[x] > 0 and repr u x r }
-    A.set (link u) x r;
-    A.set (dist u) x 1
+    u.link[x] <- r;
+    u.dist[x] <- 1
     { inv u and size u = size (old u) and
       num u = num (old u) and same_reprs (old u) u }
 

@@ -84,7 +84,7 @@ module M
         length board = n and eq_board board (at board Init) pos and
         forall b:array int. length b = n -> is_board b n ->
           eq_board board b pos -> 0 <= b[pos] < i -> not (solution b n) }
-      set board pos i;
+      board[pos] <- i;
       assert { eq_board board (at board Init) pos };
       if check_is_consistent board pos then bt_queens board n (pos+1)
     done

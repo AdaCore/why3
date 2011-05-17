@@ -15,7 +15,7 @@ module Array
   parameter ([]) : a:array 'a -> i:int ->
     { 0 <= i < length a } 'a reads a { result = a[i] }
 
-  parameter set : a:array 'a -> i:int -> v:'a ->
+  parameter ([]<-) : a:array 'a -> i:int -> v:'a ->
     { 0 <= i < length a } unit writes a { a = (old a)[i <- v] }
 
   (* unsafe get/set operations with no precondition *)

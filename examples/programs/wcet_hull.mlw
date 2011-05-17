@@ -24,7 +24,7 @@ module M
         j := !j - 1;
         t := !t + 1
       done;
-      set b !j a[i];
+      b[!j] <- a[i];
       j := !j + 1
     done;
     assert { 0 <= t <= n }

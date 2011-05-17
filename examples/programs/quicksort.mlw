@@ -1,5 +1,5 @@
 
-(* Sorting an array using quicksort, with partitioning a la Bentley. 
+(* Sorting an array using quicksort, with partitioning a la Bentley.
 
    We simply scan the segment l..r from left ro right, maintaining values
    smaller than t[l] on the left part of it (in l+1..m).
@@ -17,15 +17,13 @@ module Quicksort
   let swap (t:array int) (i:int) (j:int) =
     { 0 <= i < length t and 0 <= j < length t }
     let v = t[i] in
-    begin
-      set t i t[j];
-      set t j v
-    end
+    t[i] <- t[j];
+    t[j] <- v
     { exchange t (old t) i j }
 
   let rec quick_rec (t:array int) (l:int) (r:int) : unit variant { 1+r-l } =
     { 0 <= l and r < length t }
-    if l < r then begin 
+    if l < r then begin
       let v = t[l] in
       let m = ref l in
       label L: begin
@@ -44,15 +42,15 @@ module Quicksort
       (l > r and array_eq t (old t)) }
 
   let quicksort (t : array int) =
-    {} 
+    {}
     quick_rec t 0 (length t - 1)
     { sorted t and permut t (old t) }
 
 end
 
 (*
-Local Variables: 
+Local Variables:
 compile-command: "unset LANG; make -C ../.. examples/programs/quicksort.gui"
-End: 
+End:
 *)
 

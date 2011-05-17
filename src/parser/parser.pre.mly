@@ -180,14 +180,14 @@
 
 /* program keywords */
 
-%token ABSTRACT ABSURD ANY ASSERT ASSUME BEGIN CHECK DO DONE DOWNTO 
-%token EXCEPTION FOR 
-%token FUN INVARIANT LABEL LOOP MODEL MODULE MUTABLE PARAMETER RAISE 
+%token ABSTRACT ABSURD ANY ASSERT ASSUME BEGIN CHECK DO DONE DOWNTO
+%token EXCEPTION FOR
+%token FUN INVARIANT LABEL LOOP MODEL MODULE MUTABLE PARAMETER RAISE
 %token RAISES READS REC TO TRY VARIANT WHILE WRITES
 
 /* symbols */
 
-%token ARROW 
+%token ARROW
 %token BACKQUOTE BAR
 %token COLON COMMA
 %token DOT EQUAL FUNC LAMBDA LTGT
@@ -428,7 +428,7 @@ list1_record_field:
 ;
 
 record_field:
-| opt_mutable lident labels COLON primitive_type 
+| opt_mutable lident labels COLON primitive_type
    { floc (), $1, add_lab $2 $3, $5 }
 ;
 
@@ -1029,7 +1029,19 @@ expr:
    { let t = mk_infix $1 "=" $3 in
      mk_expr (mk_apply_id { id = "notb"; id_lab = []; id_loc = floc () } [t]) }
 | expr LARROW expr
-    { mk_infix $1 "<-" $3 }
+    { match $1.expr_desc with
+	| Eapply (e11, e12) -> begin match e11.expr_desc with
+	    | Eident x ->
+		mk_expr (Eassign (e12, x, $3))
+	    | Eapply ({ expr_desc = Eident (Qident x) }, e11)
+              when x.id = mixfix "[]" ->
+		mk_mixfix3 "[]<-" e11 e12 $3
+	    | _ ->
+		raise Parsing.Parse_error
+	  end
+	| _ ->
+	    raise Parsing.Parse_error
+    }
 | expr OP1 expr
    { mk_infix $1 $2 $3 }
 | expr OP2 expr

@@ -82,16 +82,6 @@ back  +-+-+-+-------------------+
             forall i : int. 0 <= i < a.card ->
                 a.idx[i] = dirichlet a.card a.back i && is_elt a i
 
-  (*
-  parameter create :
-    sz:int ->
-    { 0 <= sz <= maxlen }
-    sparse_array
-    { invariant_ result and
-      result.card = 0 and
-      length result = sz and forall i:int. model result i = default }
-  *)
-
   parameter malloc : n:int -> {} array 'a { A.length result = n }
 
   let create sz =
@@ -124,11 +114,11 @@ back  +-+-+-+-------------------+
     let idx = idx a in
     let back = back a in
     let n = card a in
-    set val i v;
+    val[i] <- v;
     if not (test a i) then begin
       assert { n < length a };
-      set idx i n;
-      set back n i;
+      idx[i] <- n;
+      back[n] <- i;
       () (*TODO a.card <- n+1 *)
     end
     { invariant_ a and

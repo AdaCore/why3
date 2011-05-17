@@ -211,6 +211,7 @@ and expr_desc =
   | Eletrec of (ident * binder list * variant option * triple) list * expr
   | Etuple of expr list
   | Erecord of (qualid * expr) list
+  | Eassign of expr * qualid * expr
   (* control *)
   | Esequence of expr * expr
   | Eif of expr * expr * expr

@@ -25,7 +25,7 @@ module M
     for i = 0 to n-1 do
       invariant
         { length b = n and forall j: int. 0 <= j < i -> b[a[j]] = j }
-        set b a[i] i
+        b[a[i]] <- i
     done
     { injective b n }
 

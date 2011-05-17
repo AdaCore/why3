@@ -16,12 +16,12 @@ module Flag
     { 0 <= i < length a and 0 <= j < length a }
     let v = a[i] in
     begin
-      set a i a[j];
-      set a j v
+      a[i] <- a[j];
+      a[j] <- v
     end
     { exchange a (old a) i j }
 
-  let dutch_flag (a:array color) (n:int) = 
+  let dutch_flag (a:array color) (n:int) =
     { 0 <= n and length a = n }
     let b = ref 0 in
     let i = ref 0 in
@@ -29,8 +29,8 @@ module Flag
     label Init:
     while !i < !r do
        invariant { 0 <= b <= i and i <= r <= n and
-  	         monochrome a 0 b Blue and 
-  	         monochrome a b i White and 
+  	         monochrome a 0 b Blue and
+  	         monochrome a b i White and
   	         monochrome a r n Red and
   		 length a = n and
   	         permut_sub a (at a Init) 0 (n-1) }
@@ -47,16 +47,16 @@ module Flag
          swap a !r !i
        end
     done
-    { (exists b:int. exists r:int.	
-        monochrome a 0 b Blue and 
-        monochrome a b r White and 
+    { (exists b:int. exists r:int.
+        monochrome a 0 b Blue and
+        monochrome a b r White and
         monochrome a r n Red)
       and permut_sub a (old a) 0 (n-1) }
 
 end
 
 (*
-Local Variables: 
+Local Variables:
 compile-command: "unset LANG; make -C ../.. examples/programs/flag.gui"
-End: 
+End:
 *)
