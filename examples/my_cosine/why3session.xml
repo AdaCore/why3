@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session SYSTEM "why3session.dtd">
+<why3session name="examples/my_cosine/why3session.xml">
+ <file name="../my_cosine.why" verified="false" expanded="true">
+  <theory name="CosineSingle" verified="false" expanded="true">
+   <goal name="MethodError" sum="03308e96177082a1d3da02e1d9af1b90" proved="true" expanded="true">
+    <proof prover="coq" timelimit="2" edited="my_cosine.why_CosineSingle_MethodError_1.v" obsolete="false">
+     <result status="valid" time="3.93"/>
+    </proof>
+   </goal>
+   <goal name="TotalErrorFullyExpanded" sum="2fc170302406d4bec35227d00816a288" proved="true" expanded="true">
+    <proof prover="gappa" timelimit="2" edited="" obsolete="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal name="TotalErrorExpanded" sum="aad0006d76fec58b87bf9c270f975fb4" proved="true" expanded="true">
+    <proof prover="alt-ergo" timelimit="2" edited="" obsolete="false">
+     <result status="valid" time="0.81"/>
+    </proof>
+    <proof prover="gappa" timelimit="2" edited="" obsolete="false">
+     <result status="unknown" time="0.01"/>
+    </proof>
+   </goal>
+   <goal name="TotalError" sum="0851711761327bfdfc8ed8a6b0c1fa03" proved="false" expanded="true">
+    <proof prover="alt-ergo" timelimit="2" edited="" obsolete="false">
+     <result status="timeout" time="2.08"/>
+    </proof>
+    <proof prover="gappa" timelimit="2" edited="" obsolete="false">
+     <result status="unknown" time="0.01"/>
+    </proof>
+   </goal>
+  </theory>
+ </file>
+</why3session>
