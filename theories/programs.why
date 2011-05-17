@@ -3,7 +3,7 @@ theory Prelude
   use export bool.Bool
 
   type unit = ()
-  logic ignore 'a : unit
+  logic ignore 'a : ()
 
   type  label_
   logic at  'a label_ : 'a
@@ -13,7 +13,7 @@ end
 
 
 (*
-Local Variables: 
-compile-command: "cd ..; bin/why.opt theories/programs.why"
-End: 
+Local Variables:
+compile-command: "make -C .. theories/programs"
+End:
 *)

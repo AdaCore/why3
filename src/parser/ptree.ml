@@ -217,7 +217,6 @@ and expr_desc =
   | Eloop of loop_annotation * expr
   | Elazy of lazy_op * expr * expr
   | Ematch of expr * (pattern * expr) list
-  | Eskip
   | Eabsurd
   | Eraise of qualid * expr option
   | Etry of expr * (qualid * ident option * expr) list

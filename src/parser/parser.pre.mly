@@ -143,8 +143,7 @@
 
   let exit_exn () = Qident (mk_id "%Exit" (floc ()))
   let id_anonymous () = mk_id "_" (floc ())
-  let id_unit () = mk_id "unit" (floc ())
-  let ty_unit () = Tpure (PPTtyapp ([], Qident (id_unit ())))
+  let ty_unit () = Tpure (PPTtuple [])
 
   let id_lt_nat () = Qident (mk_id "lt_nat" (floc ()))
 
@@ -1022,7 +1021,7 @@ recfun:
 ;
 
 expr:
-| simple_expr %prec prec_simple
+| expr_arg %prec prec_simple
    { $1 }
 | expr EQUAL expr
    { mk_infix $1 "=" $3 }
@@ -1043,12 +1042,12 @@ expr:
    { mk_expr (mk_apply_id { id = "notb"; id_lab = []; id_loc = floc () } [$2]) }
 | prefix_op expr %prec prec_prefix_op
    { mk_prefix $1 $2 }
-| simple_expr list1_simple_expr %prec prec_app
+| expr_arg list1_expr_arg %prec prec_app
    { mk_expr (mk_apply $1 $2) }
 | IF expr THEN expr ELSE expr
    { mk_expr (Eif ($2, $4, $6)) }
 | IF expr THEN expr %prec prec_no_else
-   { mk_expr (Eif ($2, $4, mk_expr Eskip)) }
+   { mk_expr (Eif ($2, $4, mk_expr (Etuple []))) }
 | expr SEMICOLON expr
    { mk_expr (Esequence ($1, $3)) }
 | assertion_kind annotation
@@ -1082,7 +1081,7 @@ expr:
 	     (Eloop ($4,
 		     mk_expr (Eif ($2, $5,
 				   mk_expr (Eraise (exit_exn (), None)))))),
-	   [exit_exn (), None, mk_expr Eskip])) }
+	   [exit_exn (), None, mk_expr (Etuple [])])) }
 | FOR lident EQUAL expr for_direction expr DO loop_invariant expr DONE
    { mk_expr (Efor ($2, $4, $5, $6, $8, $9)) }
 | ABSURD
@@ -1097,8 +1096,6 @@ expr:
    { mk_expr (Etry ($2, $5)) }
 | ANY simple_type_c
    { mk_expr (Eany $2) }
-| LEFTPAR expr COMMA list1_expr_sep_comma RIGHTPAR
-   { mk_expr (Etuple ($2 :: $4)) }
 ;
 
 triple:
@@ -1108,26 +1105,37 @@ triple:
   { mk_pp PPtrue, (* add_init_label *) $1, (mk_pp PPtrue, []) }
 ;
 
-simple_expr:
-| constant
-    { mk_expr (Econstant $1) }
-| qualid
-    { mk_expr (Eident $1) }
+expr_arg:
+| constant        { mk_expr (Econstant $1) }
+| qualid          { mk_expr (Eident $1) }
+| OPPREF expr_arg { mk_prefix $1 $2 }
+| expr_sub        { $1 }
+;
+
+expr_dot:
+| lqualid_copy    { mk_expr (Eident $1) }
+| OPPREF expr_dot { mk_prefix $1 $2 }
+| expr_sub        { $1 }
+;
+
+expr_sub:
+| expr_dot DOT lqualid_rich
+   { mk_expr (mk_apply (mk_expr_i 3 (Eident $3)) [$1]) }
 | LEFTPAR expr RIGHTPAR
     { $2 }
 | BEGIN expr END
     { $2 }
 | LEFTPAR RIGHTPAR
-    { mk_expr Eskip }
+    { mk_expr (Etuple []) }
+| LEFTPAR expr COMMA list1_expr_sep_comma RIGHTPAR
+   { mk_expr (Etuple ($2 :: $4)) }
 | LEFTREC list1_field_expr opt_semicolon RIGHTREC
    { mk_expr (Erecord (List.rev $2)) }
 | BEGIN END
-    { mk_expr Eskip }
-| OPPREF simple_expr
-    { mk_prefix $1 $2 }
-| simple_expr LEFTSQ expr RIGHTSQ
+    { mk_expr (Etuple []) }
+| expr_arg LEFTSQ expr RIGHTSQ
     { mk_mixfix2 "[]" $1 $3 }
-| simple_expr LEFTSQ expr LARROW expr RIGHTSQ
+| expr_arg LEFTSQ expr LARROW expr RIGHTSQ
     { mk_mixfix3 "[<-]" $1 $3 $5 }
 ;
 
@@ -1140,9 +1148,9 @@ field_expr:
 | lqualid EQUAL expr { $1, $3 }
 ;
 
-list1_simple_expr:
-| simple_expr %prec prec_simple { [$1] }
-| simple_expr list1_simple_expr { $1 :: $2 }
+list1_expr_arg:
+| expr_arg %prec prec_simple { [$1] }
+| expr_arg list1_expr_arg    { $1 :: $2 }
 ;
 
 list1_expr_sep_comma:

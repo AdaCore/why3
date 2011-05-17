@@ -504,8 +504,6 @@ and dexpr_desc ~ghost env loc = function
       in
       let bl = List.map branch bl in
       DEmatch (e1, bl), ty
-  | Ptree.Eskip ->
-      DElogic (fs_tuple 0), dty_unit env.uc
   | Ptree.Eabsurd ->
       DEabsurd, create_type_var loc
   | Ptree.Eraise (qid, e) ->

@@ -3,9 +3,14 @@ module M
 
   use import int.Int
 
-  type t = {| mutable a: int; mutable b: int |}
+  namespace N
+    type t = {| mutable a: int; mutable b: int |}
+  end
 
-  let foo () = {} let x = {| a = 1; b = 2 |} in a x { result=1 }
+  let foo () =
+    {}
+    let x = {| N.a = 1; N.b = 2 |} in x.N.a
+    { result=1 }
 
 end
 
