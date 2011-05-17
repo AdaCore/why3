@@ -86,18 +86,6 @@ let create_denv uc =
     locals = Mstr.empty;
     denv = Typing.create_denv (); }
 
-let specialize_post ~loc htv ((v, f), ql) =
-  assert (v.vs_name.id_string = "result"); (* TODO *)
-  let specialize_exn (l, (v, f)) =
-    assert
-      (match v with Some v -> v.vs_name.id_string = "result" | None -> true);
-    let ty = option_map (fun v -> Denv.specialize_ty ~loc htv v.vs_ty) v in
-    (l, (ty, specialize_fmla ~loc htv f))
-  in
-  let ty = Denv.specialize_ty ~loc htv v.vs_ty in
-  let f = specialize_fmla ~loc htv f in
-  (ty, f), List.map specialize_exn ql
-
 let loc_of_id id = Util.of_option id.Ident.id_loc
 
 let loc_of_ls ls = ls.ls_name.Ident.id_loc

@@ -100,10 +100,6 @@ val specialize_ty : loc:Ptree.loc -> type_var Htv.t -> ty -> dty
 
 val specialize_lsymbol : loc:Ptree.loc -> lsymbol -> dty list * dty option
 
-val specialize_term : loc:Ptree.loc -> type_var Htv.t -> term -> dterm
-
-val specialize_fmla : loc:Ptree.loc -> type_var Htv.t -> term -> dfmla
-
 (** exported for programs *)
 
 val tvsymbol_of_type_var : type_var -> tvsymbol
