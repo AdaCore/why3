@@ -208,7 +208,7 @@ let uncurrying ty =
 let expected_type e ty =
   if not (Denv.unify e.dexpr_type ty) then
     errorm ~loc:e.dexpr_loc
-      "this expression has type %a, but is expected to have type %a"
+      "@[this expression has type %a,@ but is expected to have type %a@]"
       print_dty e.dexpr_type print_dty ty
 
 let check_mutable_type loc dty = match view_dty dty with
@@ -216,7 +216,7 @@ let check_mutable_type loc dty = match view_dty dty with
       ()
   | _ ->
       errorm ~loc
-	"this expression has type %a, but is expected to have a mutable type"
+      "@[this expression has type %a,@ but is expected to have a mutable type@]"
 	print_dty dty
 
 let dexception uc qid =
@@ -226,7 +226,7 @@ let dexception uc qid =
   let ty_exn = dty_app (ts_exn, []) in
   if not (Denv.unify ty ty_exn) then
     errorm ~loc
-      "this expression has type %a, but is expected to be an exception"
+      "@[this expression has type %a,@ but is expected to be an exception@]"
       print_dty ty;
   r
 
@@ -575,7 +575,7 @@ and dletrec ~ghost env dl =
     let ty = dcurrying tyl e.dexpr_type in
     if not (Denv.unify ty tyres) then
       errorm ~loc:id.id_loc
-	"this expression has type %a, but is expected to have type %a"
+	"@[this expression has type %a,@ but is expected to have type %a@]"
 	print_dty ty print_dty tyres;
     ((id, tyres), bl, v, t)
   in
@@ -713,7 +713,7 @@ let iuregion env ({ pp_loc = loc; pp_desc = d } as t) = match d with
   | _ ->
       let ty = type_effect_term env t in
       let not_mutable () = errorm ~loc
-	"this expression has type %a,@ but is expected to have a mutable type@]"
+      "@[this expression has type %a,@ but is expected to have a mutable type@]"
 	Pretty.print_ty ty
       in
       begin match ty.ty_node with

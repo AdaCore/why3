@@ -1,15 +1,15 @@
 
 module M
 
-use import int.Int
-use import module stdlib.Ref
+  use import int.Int
+  
+  type t = {| mutable a: int; mutable b: int |}
 
-let test1 () =
-  let x = ref 0 in
-  while True do
-    invariant { 0 <= x }
-    x := !x + 1
-  done
+  let test (x: t) =
+     a x = b x
+
+  let foo (x: t) =
+    test x
 
 end
 

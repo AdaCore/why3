@@ -61,7 +61,7 @@ let rec print_dty fmt = function
   | Tyvar { type_val = Some t } ->
       print_dty fmt t
   | Tyvar { type_val = None; tvsymbol = v } ->
-      fprintf fmt "'%s" v.tv_name.id_string
+      Pretty.print_tv fmt v
   | Tyapp (s, []) ->
       fprintf fmt "%s" s.ts_name.id_string
   | Tyapp (s, [t]) ->
