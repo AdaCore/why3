@@ -9,11 +9,9 @@ module M
   logic eq_board (b1 b2: array int) (pos: int) =
     forall q:int. 0 <= q < pos -> b1[q] = b2[q]
 
-(*
   lemma eq_board_set:
     forall b: array int, pos q i: int.
     pos <= q -> eq_board b b[q <- i] pos
-*)
 
   lemma eq_board_sym:
     forall b1 b2: array int, pos: int.

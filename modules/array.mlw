@@ -9,18 +9,20 @@ module Array
   type array 'a model {| length : int; mutable elts : map int 'a |}
 
   logic ([]) (a: array 'a) (i :int) : 'a = M.([]) a.elts i
+  logic ([<-]) (a: array 'a) (i :int) (v: 'a) : array 'a =
+    {| a with elts = M.([<-]) a.elts i v |}
 
   parameter ([]) : a:array 'a -> i:int ->
     { 0 <= i < length a } 'a reads a { result = a[i] }
 
   parameter set : a:array 'a -> i:int -> v:'a ->
-    { 0 <= i < length a } unit writes a { a.elts = (old a.elts)[i <- v] }
+    { 0 <= i < length a } unit writes a { a = (old a)[i <- v] }
 
   (* unsafe get/set operations with no precondition *)
   parameter unsafe_get : a:array 'a -> i:int ->
     { } 'a reads a { result = a[i] }
   parameter unsafe_set : a:array 'a -> i:int -> v:'a ->
-    { } unit writes a { a.elts = (old a.elts)[i <- v] }
+    { } unit writes a { a = (old a)[i <- v] }
 
   parameter length : a:array 'a -> {} int { result = a.length }
 
@@ -160,6 +162,6 @@ end
 
 (*
 Local Variables:
-compile-command: "unset LANG; make -C .. modules/stdlib"
+compile-command: "unset LANG; make -C .. modules/array"
 End:
 *)
