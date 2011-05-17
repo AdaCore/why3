@@ -530,7 +530,7 @@ let schedule_edit_proof ~debug:_ ~editor ~file ~driver ~callback goal =
   Driver.print_task ?old driver fmt goal;
   Util.option_iter close_in old;
   close_out ch;
-  let command = editor ^ " " ^ file in
+  let command = editor ^ " \"" ^ file ^ "\"" in
   schedule_edition command callback
 
 
