@@ -42,9 +42,9 @@ echo ""
 # run_dir programs
 # echo ""
 
-echo "=== Check Builtin traduction ==="
-run_dir check-builtin
-echo ""
+# echo "=== Check Builtin traduction ==="
+# run_dir check-builtin
+# echo ""
 
 exit $res
 
