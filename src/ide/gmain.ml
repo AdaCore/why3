@@ -149,10 +149,12 @@ let gconfig =
   let c = Gconfig.config in
   let loadpath = (Whyconf.loadpath (get_main ())) @ List.rev !includes in
   c.env <- Lexer.create_env loadpath;
-  let provers = Whyconf.get_provers c.Gconfig.config in
-  c.provers <-
-    Util.Mstr.fold (Session.get_prover_data c.env) provers Util.Mstr.empty;
   c
+
+let provers = 
+  let c = gconfig.Gconfig.config in
+  Util.Mstr.fold (Session.get_prover_data gconfig.Gconfig.env) 
+    (Whyconf.get_provers c) Util.Mstr.empty
 
 let () =
   Whyconf.load_plugins (get_main ())
@@ -424,7 +426,7 @@ end
 module Model = struct
 
   type proof_attempt =
-      { prover : prover_data;
+      { prover : Session.prover_data;
         proof_goal : goal;
         proof_row : GTree.row_reference;
         proof_db : Db.proof_attempt;
@@ -1140,7 +1142,7 @@ let rec reimport_any_goal parent gid gname t db_goal goal_obsolete =
     (fun pid a ->
        let pname = Db.prover_name pid in
        try
-         let p = Util.Mstr.find pname gconfig.provers in
+         let p = Util.Mstr.find pname provers in
          let s,t,o,edit = Db.status_and_time a in
          if goal_obsolete && not o then Db.set_obsolete a;
          let obsolete = goal_obsolete or o in
@@ -1888,7 +1890,7 @@ let () =
            b#connect#pressed
              ~callback:(fun () -> prover_on_selected_goals p)
          in ())
-      gconfig.provers
+      provers
   in
   add_refresh_provers add_item_provers;
   add_item_provers ()

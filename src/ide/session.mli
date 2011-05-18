@@ -34,10 +34,12 @@ type prover_data = private
     }
     (** record of necessary data for a given external prover *)
 
+(* stays here until old IDE is deleted *)
 val get_prover_data :
   Env.env -> Util.Mstr.key -> Whyconf.config_prover ->
   prover_data Util.Mstr.t -> prover_data Util.Mstr.t
   (** loads all provers from the current configuration *)
+
 
 (** {2 Transformation's data} *)
 
@@ -119,8 +121,12 @@ module Make(O: OBSERVER) : sig
   val goal_expanded : goal -> bool
   val set_goal_expanded : goal -> bool -> unit
 
+  type prover_option =
+    | Detected_prover of prover_data
+    | Undetected_prover of string
+
   type proof_attempt = private
-      { prover : prover_data;
+      { prover : prover_option;
         proof_goal : goal;
         proof_key : O.key;
         mutable proof_state : proof_attempt_status;
@@ -165,7 +171,10 @@ module Make(O: OBSERVER) : sig
 
   val open_session :
     env:Env.env ->
+(*
     provers:prover_data Util.Mstr.t ->
+*)
+    config:Whyconf.config ->
     init:(O.key -> any -> unit) ->
     notify:(any -> unit) ->
     string -> unit
@@ -182,6 +191,8 @@ module Make(O: OBSERVER) : sig
 	creation of element of the state
 
     *)
+
+  val get_provers : unit -> prover_data Util.Mstr.t
 
   val maximum_running_proofs : int ref
 
@@ -236,7 +247,7 @@ module Make(O: OBSERVER) : sig
         When finished, calls the callback with argument true if there is at least one difference, false otherwise
     *)
 
-  val reload_all: prover_data Util.Mstr.t -> unit
+  val reload_all: unit -> unit
     (** reloads all the files
         If for one of the file, the parsing or typing fails, then
         the complete old session state is kept, and an exception

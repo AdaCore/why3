@@ -111,9 +111,11 @@ let gconfig =
   let c = Gconfig.config in
   let loadpath = (Whyconf.loadpath (get_main ())) @ List.rev !includes in
   c.env <- Lexer.create_env loadpath;
+(*
   let provers = Whyconf.get_provers c.Gconfig.config in
   c.provers <-
     Util.Mstr.fold (Session.get_prover_data c.env) provers Util.Mstr.empty;
+*)
   c
 
 let () =
@@ -480,8 +482,13 @@ let init =
 	 | M.Goal g -> M.goal_expl g
 	 | M.Theory th -> M.theory_name th
 	 | M.File f -> Filename.basename f.M.file_name
-	 | M.Proof_attempt a -> let p = a.M.prover in
-	   p.Session.prover_name ^ " " ^ p.Session.prover_version
+	 | M.Proof_attempt a -> 
+             begin
+               match a.M.prover with
+                 | M.Detected_prover p ->
+	             p.Session.prover_name ^ " " ^ p.Session.prover_version
+                 | M.Undetected_prover s -> s
+             end
 	 | M.Transformation tr -> Session.transformation_id tr.M.transf);
     notify any
 
@@ -526,7 +533,9 @@ let () =
 let () =
   try
     eprintf "Opening session...@?";
-    M.open_session ~env:gconfig.env ~provers:gconfig.provers
+    M.open_session ~env:gconfig.env 
+      (* ~provers:gconfig.provers *)
+      ~config:gconfig.Gconfig.config
       ~init ~notify project_dir;
     M.maximum_running_proofs := gconfig.max_running_processes;
     eprintf " done@."
@@ -921,7 +930,7 @@ let () =
            b#connect#pressed
              ~callback:(fun () -> prover_on_selected_goals p)
          in ())
-      gconfig.provers
+      (M.get_provers ())
   in
   add_refresh_provers add_item_provers;
   add_item_provers ()
@@ -1145,7 +1154,7 @@ let reload () =
   try
     erase_color_loc source_view;
     current_file := "";
-    M.reload_all gconfig.provers
+    M.reload_all ()
   with
     | e ->
         let e = match e with

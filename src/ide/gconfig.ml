@@ -24,16 +24,8 @@ open Rc
 open Whyconf
 
 
-type prover_data = Session.prover_data
 (*
-    { prover_id : string;
-      prover_name : string;
-      prover_version : string;
-      command : string;
-      driver_name : string;
-      driver : Driver.driver;
-      mutable editor : string;
-    }
+type prover_data = Session.prover_data
 *)
 
 type t =
@@ -45,7 +37,9 @@ type t =
       mutable mem_limit : int;
       mutable verbose : int;
       mutable max_running_processes : int;
+(*
       mutable provers : prover_data Util.Mstr.t;
+*)
       mutable default_editor : string;
       mutable show_labels : bool;
       mutable env : Env.env;
@@ -109,9 +103,8 @@ let load_config config =
     verbose       = ide.ide_verbose;
     max_running_processes = Whyconf.running_provers_max main;
 (*
-    provers = Mstr.fold (get_prover_data env) provers [];
-*)
     provers = Mstr.empty;
+*)
     default_editor = ide.ide_default_editor;
     show_labels = false;
     config         = config;
@@ -127,7 +120,7 @@ let read_config () =
     exit 1
 
 let save_config t =
-  let save_prover _ pr acc =
+  let _save_prover _ pr acc =
     Mstr.add pr.Session.prover_id
       {
         Whyconf.name    = pr.Session.prover_name;
@@ -149,8 +142,10 @@ let save_config t =
   let ide = set_int ide "verbose" t.verbose in
   let ide = set_string ide "default_editor" t.default_editor in
   let config = set_section config "ide" ide in
+(* TODO: store newly detected provers !
   let config = set_provers config
     (Mstr.fold save_prover t.provers Mstr.empty) in
+*)
   save_config config
 
 let config =
@@ -409,9 +404,11 @@ let preferences c =
 let run_auto_detection gconfig =
   let config = Autodetection.run_auto_detection gconfig.config in
   gconfig.config <- config;
-  let provers = get_provers config in
+  let _provers = get_provers config in
+(* TODO: store the result differently
   gconfig.provers <- Mstr.fold (Session.get_prover_data gconfig.env) provers Mstr.empty
-
+*)
+  ()
 
 let () = eprintf "end of configuration initialization@."
 

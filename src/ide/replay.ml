@@ -149,13 +149,18 @@ let init =
     incr cpt;
     Hashtbl.add model_index !cpt any;
 *)
-    let name =
+    let _name =
       match any with
         | M.Goal g -> M.goal_expl g
         | M.Theory th -> M.theory_name th
         | M.File f -> Filename.basename f.M.file_name
-        | M.Proof_attempt a -> let p = a.M.prover in
-	  p.Session.prover_name ^ " " ^ p.Session.prover_version
+        | M.Proof_attempt a -> 
+            begin
+              match a.M.prover with
+                | M.Detected_prover p ->
+	            p.Session.prover_name ^ " " ^ p.Session.prover_version
+                | M.Undetected_prover s -> s
+            end
         | M.Transformation tr -> Session.transformation_id tr.M.transf
     in
     (* eprintf "Item '%s' loaded@." name *)
@@ -229,7 +234,7 @@ let project_dir =
 let main () =
   try
     eprintf "Opening session...@?";
-    M.open_session ~env ~provers ~init ~notify project_dir;
+    M.open_session ~env ~config ~init ~notify project_dir;
     M.maximum_running_proofs :=
       Whyconf.running_provers_max (Whyconf.get_main config);
     eprintf " done@.";

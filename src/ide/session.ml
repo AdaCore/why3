@@ -40,13 +40,13 @@ let get_prover_data env id pr acc =
     let dr = Driver.load_driver env pr.Whyconf.driver in
     Util.Mstr.add id
       { prover_id = id ;
-      prover_name = pr.Whyconf.name;
-      prover_version = pr.Whyconf.version;
-      command = pr.Whyconf.command;
-      driver_name = pr.Whyconf.driver;
-      driver = dr;
-      editor = pr.Whyconf.editor;
-    }
+        prover_name = pr.Whyconf.name;
+        prover_version = pr.Whyconf.version;
+        command = pr.Whyconf.command;
+        driver_name = pr.Whyconf.driver;
+        driver = dr;
+        editor = pr.Whyconf.editor;
+      }
       acc
   with e ->
     eprintf "Failed to load driver %s for prover %s (%a). prover disabled@."
@@ -121,8 +121,16 @@ module Make(O : OBSERVER) = struct
 (*     session state       *)
 (***************************)
 
+type prover_option =
+  | Detected_prover of prover_data
+  | Undetected_prover of string
+
+let prover_id p = match p with
+  | Detected_prover p -> p.prover_id
+  | Undetected_prover s -> s
+
 type proof_attempt =
-    { prover : prover_data;
+    { prover : prover_option;
       proof_goal : goal;
       proof_key : O.key;
       mutable proof_state : proof_attempt_status;
@@ -271,7 +279,7 @@ let save_status fmt s =
 
 let save_proof_attempt fmt _key a =
   fprintf fmt "@\n@[<v 1><proof prover=\"%s\" timelimit=\"%d\" edited=\"%s\" obsolete=\"%b\">"
-    a.prover.prover_id a.timelimit a.edited_as a.proof_obsolete;
+    (prover_id a.prover) a.timelimit a.edited_as a.proof_obsolete;
   save_status fmt a.proof_state;
   fprintf fmt "@]@\n</proof>"
 
@@ -610,7 +618,7 @@ let raw_add_external_proof ~obsolete ~timelimit ~edit (g:goal) p result =
             edited_as = edit;
           }
   in
-  Hashtbl.add g.external_proofs p.prover_id a;
+  Hashtbl.add g.external_proofs (prover_id p) a;
   let any = Proof_attempt a in
   !init_fun key any;
   !notify_fun any;
@@ -721,7 +729,10 @@ let raw_add_file f exp =
   mfile
 
 let current_env = ref None
+let current_provers = ref Util.Mstr.empty
 let project_dir = ref ""
+
+let get_provers () = !current_provers
 
 let read_file fn =
   let fn = Filename.concat !project_dir fn in
@@ -768,23 +779,26 @@ let file_exists fn =
 (* reload a file                  *)
 (**********************************)
 
-let reload_proof ~provers obsolete goal pid old_a =
-  try
-    let p = Util.Mstr.find pid provers in
-    let old_res = old_a.proof_state in
-    let obsolete = obsolete or old_a.proof_obsolete in
-    (* eprintf "proof_obsolete : %b@." obsolete; *)
-    let a =
-      raw_add_external_proof ~obsolete ~timelimit:old_a.timelimit
-	~edit:old_a.edited_as goal p old_res
-    in
-    !notify_fun (Goal a.proof_goal)
-  with Not_found ->
-    eprintf
-      "Warning: prover %s appears in database but is not installed.@."
-      pid
+let reload_proof obsolete goal pid old_a =
+  let p = 
+    try
+      Detected_prover (Util.Mstr.find pid !current_provers)
+    with Not_found ->
+      eprintf
+        "Warning: prover %s appears in database but is not installed.@."
+        pid;
+      (Undetected_prover pid)
+  in
+  let old_res = old_a.proof_state in
+  let obsolete = obsolete or old_a.proof_obsolete in
+  (* eprintf "proof_obsolete : %b@." obsolete; *)
+  let a =
+    raw_add_external_proof ~obsolete ~timelimit:old_a.timelimit
+      ~edit:old_a.edited_as goal p old_res
+  in
+  !notify_fun (Goal a.proof_goal)
 
-let rec reload_any_goal ~provers parent gid gname sum t old_goal goal_obsolete =
+let rec reload_any_goal parent gid gname sum t old_goal goal_obsolete =
   let info = get_explanation gid (Task.task_goal_fmla t) in
   let exp = match old_goal with None -> true | Some g -> g.goal_expanded in
   let goal = raw_add_goal parent gname info sum (Some t) exp in
@@ -793,14 +807,14 @@ let rec reload_any_goal ~provers parent gid gname sum t old_goal goal_obsolete =
     match old_goal with
       | None -> ()
       | Some g ->
-          Hashtbl.iter (reload_proof ~provers goal_obsolete goal) g.external_proofs;
-          Hashtbl.iter (reload_trans ~provers goal_obsolete goal) g.transformations
+          Hashtbl.iter (reload_proof goal_obsolete goal) g.external_proofs;
+          Hashtbl.iter (reload_trans goal_obsolete goal) g.transformations
   end;
   check_goal_proved goal;
   goal
 
 
-and reload_trans ~provers _goal_obsolete goal _ tr =
+and reload_trans  _goal_obsolete goal _ tr =
   let trname = tr.transf.transformation_name in
   let gname = goal.goal_name in
   eprintf "[Reload] transformation %s for goal %s @." trname gname;
@@ -882,8 +896,7 @@ and reload_trans ~provers _goal_obsolete goal _ tr =
     let goals = List.fold_left
       (fun acc (id,subgoal_name,sum,subtask,old_g, subgoal_obsolete) ->
          let mg =
-           reload_any_goal ~provers
-             (Parent_transf mtr) id
+           reload_any_goal (Parent_transf mtr) id
              subgoal_name sum subtask old_g subgoal_obsolete
          in mg::acc)
       [] goals
@@ -895,7 +908,7 @@ and reload_trans ~provers _goal_obsolete goal _ tr =
 
 
 (* reloads the task [t] in theory mth (named tname) *)
-let reload_root_goal ~provers mth tname old_goals t : goal =
+let reload_root_goal mth tname old_goals t : goal =
   let id = (Task.task_goal t).Decl.pr_name in
   let gname = id.Ident.id_string in
   let sum = task_checksum t in
@@ -908,10 +921,10 @@ let reload_root_goal ~provers mth tname old_goals t : goal =
   in
   if goal_obsolete then
     eprintf "Goal %s.%s has changed@." tname gname;
-  reload_any_goal ~provers (Parent_theory mth) id gname sum t old_goal goal_obsolete
+  reload_any_goal (Parent_theory mth) id gname sum t old_goal goal_obsolete
 
 (* reloads a theory *)
-let reload_theory ~provers mfile old_theories (_,tname,th) =
+let reload_theory mfile old_theories (_,tname,th) =
   eprintf "[Reload] theory '%s'@."tname;
   let tasks = List.rev (Task.split_theory th None None) in
   let old_goals, old_exp =
@@ -928,7 +941,7 @@ let reload_theory ~provers mfile old_theories (_,tname,th) =
   !notify_fun (Theory mth);
   let new_goals = List.fold_left
     (fun acc t ->
-       let g = reload_root_goal ~provers mth tname goalsmap t in
+       let g = reload_root_goal mth tname goalsmap t in
        g::acc)
     [] tasks
   in
@@ -938,7 +951,7 @@ let reload_theory ~provers mfile old_theories (_,tname,th) =
 
 
 (* reloads a file *)
-let reload_file ~provers mf theories =
+let reload_file mf theories =
   let new_mf = raw_add_file mf.file_name mf.file_expanded in
   let old_theories = List.fold_left
     (fun acc t -> Util.Mstr.add t.theory_name t acc)
@@ -947,7 +960,7 @@ let reload_file ~provers mf theories =
   in
   !notify_fun (File new_mf);
   let mths = List.fold_left
-    (fun acc th -> reload_theory ~provers new_mf old_theories th :: acc)
+    (fun acc th -> reload_theory new_mf old_theories th :: acc)
     [] theories
   in
   new_mf.theories <- List.rev mths;
@@ -955,7 +968,7 @@ let reload_file ~provers mf theories =
 
 
 (* reloads all files *)
-let reload_all provers =
+let reload_all () =
   let files = !all_files in
   let all_theories =
     List.map (fun mf ->
@@ -965,7 +978,7 @@ let reload_all provers =
   in
   all_files := [];
   O.reset ();
-  List.iter (fun (mf,ths) -> reload_file ~provers mf ths) all_theories
+  List.iter (fun (mf,ths) -> reload_file mf ths) all_theories
 
 (****************************)
 (*     session opening      *)
@@ -1018,7 +1031,7 @@ let load_result r =
 	assert false
 
 
-let rec load_goal ~env ~provers parent acc g =
+let rec load_goal ~env parent acc g =
   match g.Xml.name with
     | "goal" ->
 	let gname =
@@ -1035,14 +1048,14 @@ let rec load_goal ~env ~provers parent acc g =
 	in
 	let exp = bool_attribute "expanded" g true in
 	let mg = raw_add_goal parent gname expl sum None exp in
-	List.iter (load_proof_or_transf ~env ~provers mg) g.Xml.elements;
+	List.iter (load_proof_or_transf ~env mg) g.Xml.elements;
 	mg::acc
     | s ->
 	eprintf "Session.load_goal: unexpected element '%s'@."  s;
 	assert false
 
 
-and load_proof_or_transf ~env ~provers mg a =
+and load_proof_or_transf ~env mg a =
   match a.Xml.name with
     | "proof" ->
 	let prover =
@@ -1051,8 +1064,9 @@ and load_proof_or_transf ~env ~provers mg a =
 	in
         let p =
 	  try
-	    Util.Mstr.find prover provers
-	  with Not_found -> assert false (* TODO *)
+	    Detected_prover (Util.Mstr.find prover !current_provers)
+	  with Not_found -> 
+            Undetected_prover prover
 	in
 	let res = match a.Xml.elements with
 	  | [r] -> load_result r
@@ -1090,7 +1104,7 @@ and load_proof_or_transf ~env ~provers mg a =
 	mtr.subgoals <-
 	  List.rev
 	  (List.fold_left
-	     (load_goal ~env ~provers (Parent_transf mtr))
+	     (load_goal ~env (Parent_transf mtr))
 	     [] a.Xml.elements);
 	(* already done by raw_add_transformation
 	   Hashtbl.add mg.transformations trname mtr *)
@@ -1099,7 +1113,7 @@ and load_proof_or_transf ~env ~provers mg a =
 	eprintf "Session.load_proof_or_transf: unexpected element '%s'@."  s;
 	assert false
 
-let load_theory ~env ~provers mf acc th =
+let load_theory ~env mf acc th =
   match th.Xml.name with
     | "theory" ->
 	let thname =
@@ -1111,14 +1125,14 @@ let load_theory ~env ~provers mf acc th =
 	mth.goals <-
 	  List.rev
 	  (List.fold_left
-	     (load_goal ~env ~provers (Parent_theory mth))
+	     (load_goal ~env (Parent_theory mth))
 	     [] th.Xml.elements);
 	mth::acc
     | s ->
 	eprintf "Session.load_theory: unexpected element '%s'@."  s;
 	assert false
 
-let load_file ~env ~provers f =
+let load_file ~env f =
   match f.Xml.name with
     | "file" ->
 	let fn =
@@ -1129,31 +1143,34 @@ let load_file ~env ~provers f =
 	let mf = raw_add_file fn exp in
 	mf.theories <-
 	  List.rev
-	  (List.fold_left (load_theory ~env ~provers mf) [] f.Xml.elements)
+	  (List.fold_left (load_theory ~env mf) [] f.Xml.elements)
     | s ->
 	eprintf "Session.load_file: unexpected element '%s'@."  s;
 	assert false
 
-let load_session ~env ~provers xml =
+let load_session ~env xml =
   let cont = xml.Xml.content in
   match cont.Xml.name with
     | "why3session" ->
-	List.iter (load_file ~env ~provers) cont.Xml.elements
+	List.iter (load_file ~env) cont.Xml.elements
     | s ->
 	eprintf "Session.load_session: unexpected element '%s'@."  s;
 	assert false
 
 let db_filename = "why3session.xml"
 
-let open_session ~env ~provers ~init ~notify dir =
+let open_session ~env ~config ~init ~notify dir =
   match !current_env with
     | None ->
 	init_fun := init; notify_fun := notify;
 	project_dir := dir; current_env := Some env;
 	begin try
 	  let xml = Xml.from_file (Filename.concat dir db_filename) in
-	  load_session ~env ~provers xml;
-	  reload_all provers
+          let provers = Whyconf.get_provers config in
+          current_provers := 
+            Util.Mstr.fold (get_prover_data env) provers Util.Mstr.empty;
+	  load_session ~env xml;
+	  reload_all ()
 	with
 	  | Sys_error _ ->
 	      (* xml does not exist yet *)
@@ -1193,29 +1210,32 @@ let redo_external_proof ~timelimit g a =
   if running then ()
     (* info_window `ERROR "Proof already in progress" *)
   else
-    let p = a.prover in
-    let callback result =
-      set_proof_state ~obsolete:false a result;
-    in
-    let old = if a.edited_as = "" then None else
-      begin
-	let f = Filename.concat !project_dir a.edited_as in
-	Format.eprintf "Info: proving using edited file %s@." f;
-	(Some (open_in f))
-      end
-    in
-    schedule_proof_attempt
-      ~debug:false ~timelimit ~memlimit:0
-      ?old ~command:p.command ~driver:p.driver
-      ~callback
-      (get_task g)
+    match a.prover with
+      | Undetected_prover _ -> ()
+      | Detected_prover p ->
+          let callback result =
+            set_proof_state ~obsolete:false a result;
+          in
+          let old = if a.edited_as = "" then None else
+            begin
+	      let f = Filename.concat !project_dir a.edited_as in
+	      Format.eprintf "Info: proving using edited file %s@." f;
+	      (Some (open_in f))
+            end
+          in
+          schedule_proof_attempt
+            ~debug:false ~timelimit ~memlimit:0
+            ?old ~command:p.command ~driver:p.driver
+            ~callback
+            (get_task g)
 
 let rec prover_on_goal ~timelimit p g =
   let id = p.prover_id in
   let a =
     try Hashtbl.find g.external_proofs id
     with Not_found ->
-      raw_add_external_proof ~obsolete:false ~timelimit ~edit:"" g p Undone
+      raw_add_external_proof ~obsolete:false ~timelimit ~edit:"" g 
+        (Detected_prover p) Undone
   in
   let () = redo_external_proof ~timelimit g a in
   Hashtbl.iter
@@ -1328,49 +1348,58 @@ let check_external_proof g a =
   in
   if running then ()
   else
-    let p = a.prover in
-    let callback result =
-      match result with
-        | Scheduled | Running -> ()
-        | Undone -> assert false
-        | InternalFailure msg ->
-            Format.printf "goal '%s', prover '%s %s': internal failure '%a'@."
-              g.goal_name p.prover_name p.prover_version
-              Exn_printer.exn_printer msg;
+    begin
+    incr proofs_to_do;
+      match a.prover with
+        | Undetected_prover s ->
+            Format.printf "goal '%s', prover '%s': not installed@."
+              g.goal_name s;
             check_failed := true;
             incr proofs_done
-        | Done new_res ->
-            incr proofs_done;
-            match a.proof_state with
-              | Done old_res ->
-                  if same_result old_res new_res then () else
-                    begin
-                      check_failed := true;
-                      Format.printf
-                        "goal '%s', prover '%s %s': %a instead of %a@."
-                        g.goal_name p.prover_name p.prover_version
-                        Call_provers.print_prover_result new_res 
-                        Call_provers.print_prover_result old_res
-                    end
-              | _ ->
-                  check_failed := true;
-                  Format.printf
-                    "goal '%s', prover '%s %s': no former result available@."
-                    g.goal_name p.prover_name p.prover_version
-    in
-    let old = if a.edited_as = "" then None else
-      begin
-	let f = Filename.concat !project_dir a.edited_as in
-	(* Format.eprintf "Info: proving using edited file %s@." f; *)
-	(Some (open_in f))
-      end
-    in
-    incr proofs_to_do;
-    schedule_proof_attempt
-      ~debug:false ~timelimit:a.timelimit ~memlimit:0
-      ?old ~command:p.command ~driver:p.driver
-      ~callback
-      (get_task g)
+        | Detected_prover p ->
+            let callback result =
+              match result with
+                | Scheduled | Running -> ()
+                | Undone -> assert false
+                | InternalFailure msg ->
+                    Format.printf 
+                      "goal '%s', prover '%s %s': internal failure '%a'@."
+                      g.goal_name p.prover_name p.prover_version
+                      Exn_printer.exn_printer msg;
+                    check_failed := true;
+                    incr proofs_done
+                | Done new_res ->
+                    incr proofs_done;
+                    match a.proof_state with
+                      | Done old_res ->
+                        if same_result old_res new_res then () else
+                          begin
+                            check_failed := true;
+                            Format.printf
+                              "goal '%s', prover '%s %s': %a instead of %a@."
+                              g.goal_name p.prover_name p.prover_version
+                              Call_provers.print_prover_result new_res 
+                              Call_provers.print_prover_result old_res
+                          end
+                    | _ ->
+                        check_failed := true;
+                        Format.printf
+                          "goal '%s', prover '%s %s': no former result available@."
+                          g.goal_name p.prover_name p.prover_version
+          in
+          let old = if a.edited_as = "" then None else
+            begin
+	      let f = Filename.concat !project_dir a.edited_as in
+	      (* Format.eprintf "Info: proving using edited file %s@." f; *)
+	      (Some (open_in f))
+            end
+          in
+          schedule_proof_attempt
+            ~debug:false ~timelimit:a.timelimit ~memlimit:0
+            ?old ~command:p.command ~driver:p.driver
+            ~callback
+            (get_task g)
+    end
 
 let rec check_goal_and_children g =
   Hashtbl.iter (fun _ a -> check_external_proof g a) g.external_proofs;
@@ -1527,56 +1556,59 @@ let edit_proof ~default_editor ~project_dir a =
     info_window `ERROR "Edition already in progress"
 *)
   else
-    let g = a.proof_goal in
-    let t = (get_task g) in
-    let driver = a.prover.driver in
-    let file =
-      match a.edited_as with
-        | "" ->
-	    let (fn,tn) = ft_of_pa a in
-	    let file = Driver.file_of_task driver
-              (Filename.concat project_dir fn) tn t
-	    in
-	    (* Uniquify the filename if it exists on disk *)
-	    let i =
-              try String.rindex file '.'
-              with _ -> String.length file
-	    in
-	    let name = String.sub file 0 i in
-	    let ext = String.sub file i (String.length file - i) in
-	    let i = ref 1 in
-	    while Sys.file_exists
-	      (name ^ "_" ^ (string_of_int !i) ^ ext) do
-		incr i
-	    done;
-	    let file = name ^ "_" ^ (string_of_int !i) ^ ext in
-	    let file = Sysutil.relativize_filename project_dir file in
-	    a.edited_as <- file;
-	    file
-	| f -> f
-    in
-    let file = Filename.concat project_dir file in
-    let callback res =
-      match res with
-        | Done _ ->
-            set_proof_state ~obsolete:false a Undone
-        | _ ->
-            set_proof_state ~obsolete:false a res
-    in
-    let editor =
-      match a.prover.editor with
-        | "" -> default_editor
-        | s -> s
-    in
-(*
-    eprintf "[Editing] goal %s with command %s %s@." g.Decl.pr_name.id_string editor file;
-*)
-    eprintf "[Editing] goal %s with command %s %s@." (Task.task_goal t).Decl.pr_name.Ident.id_string editor file;
-    schedule_edit_proof ~debug:false ~editor
-      ~file
-      ~driver
-      ~callback
-      t
+    match a.prover with
+      | Undetected_prover _ -> ()
+      | Detected_prover p ->
+          let g = a.proof_goal in
+          let t = (get_task g) in
+          let driver = p.driver in
+          let file =
+            match a.edited_as with
+              | "" ->
+	          let (fn,tn) = ft_of_pa a in
+	          let file = Driver.file_of_task driver
+                    (Filename.concat project_dir fn) tn t
+	          in
+	          (* Uniquify the filename if it exists on disk *)
+	          let i =
+                    try String.rindex file '.'
+                    with _ -> String.length file
+	          in
+	          let name = String.sub file 0 i in
+	          let ext = String.sub file i (String.length file - i) in
+	          let i = ref 1 in
+	          while Sys.file_exists
+	            (name ^ "_" ^ (string_of_int !i) ^ ext) do
+		      incr i
+	          done;
+	          let file = name ^ "_" ^ (string_of_int !i) ^ ext in
+	          let file = Sysutil.relativize_filename project_dir file in
+	          a.edited_as <- file;
+	          file
+	      | f -> f
+          in
+          let file = Filename.concat project_dir file in
+          let callback res =
+            match res with
+              | Done _ ->
+                  set_proof_state ~obsolete:false a Undone
+              | _ ->
+                  set_proof_state ~obsolete:false a res
+          in
+          let editor =
+            match p.editor with
+              | "" -> default_editor
+              | s -> s
+          in
+          (*
+            eprintf "[Editing] goal %s with command %s %s@." g.Decl.pr_name.id_string editor file;
+          *)
+          eprintf "[Editing] goal %s with command %s %s@." (Task.task_goal t).Decl.pr_name.Ident.id_string editor file;
+          schedule_edit_proof ~debug:false ~editor
+            ~file
+            ~driver
+            ~callback
+            t
 
 (*************)
 (* removing  *)
@@ -1585,7 +1617,7 @@ let edit_proof ~default_editor ~project_dir a =
 let remove_proof_attempt a =
   O.remove a.proof_key;
   let g = a.proof_goal in
-  Hashtbl.remove g.external_proofs a.prover.prover_id;
+  Hashtbl.remove g.external_proofs (prover_id a.prover);
   check_goal_proved g
 
 let remove_transformation t =

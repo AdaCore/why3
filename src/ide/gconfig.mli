@@ -19,16 +19,8 @@
 
 open Why
 
-type prover_data = Session.prover_data
 (*
-    { prover_id : string;
-      prover_name : string;
-      prover_version : string;
-      command : string;
-      driver_name : string;
-      driver : Driver.driver;
-      mutable editor : string;
-    }
+type prover_data = Session.prover_data
 *)
 
 type t =
@@ -40,7 +32,9 @@ type t =
       mutable mem_limit : int;
       mutable verbose : int;
       mutable max_running_processes : int;
+(*
       mutable provers : prover_data Util.Mstr.t;
+*)
       mutable default_editor : string;
       mutable show_labels : bool;
       mutable env : Why.Env.env;
