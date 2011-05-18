@@ -34,17 +34,17 @@ echo "=== Logic ==="
 run_dir .
 echo ""
 
-# echo "=== BTS ==="
-# run_dir bts
-# echo ""
+echo "=== BTS ==="
+run_dir bts
+echo ""
 
-# echo "=== Programs ==="
-# run_dir programs
-# echo ""
+echo "=== Programs ==="
+run_dir programs
+echo ""
 
-# echo "=== Check Builtin traduction ==="
-# run_dir check-builtin
-# echo ""
+echo "=== Check Builtin translation ==="
+run_dir check-builtin
+echo ""
 
 exit $res
 
