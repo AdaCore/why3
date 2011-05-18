@@ -370,14 +370,24 @@ let set_proof_state ~obsolete a =
 
 let model_index = Hashtbl.create 17
 
+
 let get_any_from_iter row = 
   try
     let idx = goals_model#get ~row ~column:index_column in
     Hashtbl.find model_index idx
   with Not_found -> invalid_arg "Gmain.get_any_from_iter"
 
+(*
 let get_any (row:Gtk.tree_path) : M.any =
   get_any_from_iter (goals_model#get_iter row)
+*)
+
+let get_any_from_row_reference r = get_any_from_iter r#iter
+
+let get_selected_row_references () =
+  List.map
+    (fun path -> goals_model#get_row_reference path)
+    goals_view#selection#get_selected_rows
 
 let row_expanded b iter _path = 
   match get_any_from_iter iter with
@@ -576,12 +586,12 @@ let () =
 let prover_on_selected_goals pr =
   List.iter
     (fun row ->
-       let a = get_any row in
+       let a = get_any_from_row_reference row in
         M.run_prover
           ~context_unproved_goals_only:!context_unproved_goals_only
 	  ~timelimit:gconfig.time_limit
           pr a)
-    goals_view#selection#get_selected_rows
+    (get_selected_row_references ())
 
 (**********************************)
 (* method: replay obsolete proofs *)
@@ -589,11 +599,11 @@ let prover_on_selected_goals pr =
 
 let replay_obsolete_proofs () =
   List.iter
-    (fun row ->
-       let a = get_any row in
+    (fun r ->
+       let a = get_any_from_row_reference r in
        M.replay ~obsolete_only:true
          ~context_unproved_goals_only:!context_unproved_goals_only a)
-    goals_view#selection#get_selected_rows
+    (get_selected_row_references ())
 
 
 
@@ -609,13 +619,13 @@ let intro_transformation = lookup_trans "introduce_premises"
 
 let apply_trans_on_selection tr =
   List.iter
-    (fun row ->
-       let a = get_any row in
+    (fun r ->
+       let a = get_any_from_row_reference r in
         M.transform
           ~context_unproved_goals_only:!context_unproved_goals_only
 	  tr
           a)
-    goals_view#selection#get_selected_rows
+    (get_selected_row_references ())
 
 
 (*********************************)
@@ -1175,39 +1185,6 @@ let (_ : GMenu.image_menu_item) =
     ~label:"_Save" ~callback:save_file
     ()
 
-(* to be run when a row in the tree view is selected *)
-let select_row p =
-  let a = get_any p in
-  match a with
-    | M.Goal g ->
-	let callback = function
-	  | [t] ->
-              let task_text = Pp.string_of Pretty.print_task t in
-              task_view#source_buffer#set_text task_text;
-              task_view#scroll_to_mark `INSERT;
-              scroll_to_source_goal g
-	  | _ -> assert false
-	in
-        M.apply_transformation ~callback intro_transformation (M.get_task g)
-
-    | M.Theory th ->
-        task_view#source_buffer#set_text "";
-        scroll_to_theory th
-    | M.File _file ->
-        task_view#source_buffer#set_text "";
-        (* scroll_to_file file *)
-    | M.Proof_attempt a ->
-	let o =
-          match a.M.proof_state with
-	    | Session.Done r -> r.Call_provers.pr_output;
-	    | _ -> "No information available"
-	in
-	task_view#source_buffer#set_text o;
-        scroll_to_source_goal a.M.proof_goal
-    | M.Transformation tr ->
-        task_view#source_buffer#set_text "";
-        scroll_to_source_goal tr.M.parent_goal
-
 
 
 
@@ -1215,8 +1192,8 @@ let select_row p =
 (* method: edit current goal *)
 (*****************************)
 
-let edit_selected_row p =
-  match get_any p with
+let edit_selected_row r =
+  match get_any_from_row_reference r with
     | M.Goal _g ->
         ()
     | M.Theory _th ->
@@ -1229,7 +1206,7 @@ let edit_selected_row p =
     | M.Transformation _ -> ()
 
 let edit_current_proof () =
-  match goals_view#selection#get_selected_rows with
+  match get_selected_row_references () with
     | [] -> ()
     | [r] -> edit_selected_row r
     | _ ->
@@ -1273,7 +1250,7 @@ let () =
 (*************)
 
 let confirm_remove_row r =
-  match get_any r with
+  match get_any_from_row_reference r with
     | M.Goal _g ->
 	info_window `ERROR "Cannot remove a goal"
     | M.Theory _th ->
@@ -1292,13 +1269,27 @@ let confirm_remove_row r =
 	  "Do you really want to remove the selected transformation
 and all its subgoals?"
 
+let remove_proof r =
+  match get_any_from_row_reference r with
+    | M.Goal _g -> ()
+    | M.Theory _th -> ()
+    | M.File _file -> ()
+    | M.Proof_attempt a -> M.remove_proof_attempt a
+    | M.Transformation _tr -> ()
+
 let confirm_remove_selection () =
-  match goals_view#selection#get_selected_rows with
+  match get_selected_row_references () with
     | [] -> ()
     | [r] -> confirm_remove_row r
+    | l ->
+        info_window
+	  ~callback:(fun () -> List.iter remove_proof l)
+	  `QUESTION
+	  "Do you really want to remove all the selected proofs?"
+(*
     | _ ->
         info_window `INFO "Please select exactly one item to remove"
-
+*)
 
 let () =
   let b = GButton.button ~packing:cleaning_box#add ~label:"Remove" () in
@@ -1310,8 +1301,8 @@ let () =
   in ()
 
 let clean_selection () =
-  List.iter (fun r -> M.clean (get_any r))
-    goals_view#selection#get_selected_rows
+  List.iter (fun r -> M.clean (get_any_from_row_reference r))
+    (get_selected_row_references ())
 
 let () =
   let b = GButton.button ~packing:cleaning_box#add ~label:"Clean" () in
@@ -1323,15 +1314,51 @@ let () =
   in ()
 
 
+
+
+
 (***************)
 (* Bind events *)
 (***************)
+
+(* to be run when a row in the tree view is selected *)
+let select_row r =
+  let a = get_any_from_row_reference r in
+  match a with
+    | M.Goal g ->
+	let callback = function
+	  | [t] ->
+              let task_text = Pp.string_of Pretty.print_task t in
+              task_view#source_buffer#set_text task_text;
+              task_view#scroll_to_mark `INSERT;
+              scroll_to_source_goal g
+	  | _ -> assert false
+	in
+        M.apply_transformation ~callback intro_transformation (M.get_task g)
+
+    | M.Theory th ->
+        task_view#source_buffer#set_text "";
+        scroll_to_theory th
+    | M.File _file ->
+        task_view#source_buffer#set_text "";
+        (* scroll_to_file file *)
+    | M.Proof_attempt a ->
+	let o =
+          match a.M.proof_state with
+	    | Session.Done r -> r.Call_provers.pr_output;
+	    | _ -> "No information available"
+	in
+	task_view#source_buffer#set_text o;
+        scroll_to_source_goal a.M.proof_goal
+    | M.Transformation tr ->
+        task_view#source_buffer#set_text "";
+        scroll_to_source_goal tr.M.parent_goal
 
 (* row selection on tree view on the left *)
 let (_ : GtkSignal.id) =
   goals_view#selection#connect#after#changed ~callback:
     begin fun () ->
-      match goals_view#selection#get_selected_rows with
+      match get_selected_row_references () with
         | [p] -> select_row p
         | [] -> ()
         | _ -> ()
