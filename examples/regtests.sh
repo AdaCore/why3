@@ -2,6 +2,7 @@
 # regression tests for why3
 
 TMP=$PWD/why3regtests.out
+TMPERR=$PWD/why3regtests.err
 
 cd `dirname $0`
 
@@ -11,9 +12,17 @@ run_dir () {
     for f in `ls $1/*/why3session.xml`; do
         d=`dirname $f`
 	echo -n "Replaying "$d"... "
-	if ! ../bin/why3replayer.opt $d 2>/dev/null > $TMP ; then
-	    echo "FAILED:"
-	    cat $TMP
+        ../bin/why3replayer.opt $d 2> $TMPERR > $TMP
+        ret=$?
+	if test "$ret" != "0"  ; then
+	    echo "FAILED (ret code=$ret):"
+            out=`head -1 $TMP`
+            if test -z "$out" ; then
+               echo "standard error: (standard output empty)"
+               cat $TMPERR
+            else
+	       cat $TMP
+            fi
 	    res=1
 	else
 	    echo "OK"
@@ -25,13 +34,13 @@ echo "=== Logic ==="
 run_dir .
 echo ""
 
-echo "=== BTS ==="
-run_dir bts
-echo ""
+# echo "=== BTS ==="
+# run_dir bts
+# echo ""
 
-echo "=== Programs ==="
-run_dir programs
-echo ""
+# echo "=== Programs ==="
+# run_dir programs
+# echo ""
 
 echo "=== Check Builtin traduction ==="
 run_dir check-builtin
