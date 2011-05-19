@@ -245,10 +245,11 @@ let main () =
     M.check_all ~callback;
     try main_loop ()
     with Exit -> eprintf "main replayer exited unexpectedly@."
-  with e ->
-    eprintf "Error while opening session with database '%s'@." project_dir;
+  with e when not (Debug.test_flag Debug.stack_trace) ->
+    eprintf "Error while opening session with database '%s' : %a@." project_dir
+      Exn_printer.exn_printer e;
     eprintf "Aborting...@.";
-    raise e
+    exit 1
 
 
-let () = Printexc.catch main ()
+let () = main ()
