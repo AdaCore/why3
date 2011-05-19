@@ -203,6 +203,10 @@ module M2
         forall next : next, p : pointer.
         p <> null -> is_list next (get next p) -> is_list next p
 
+  goal is_list_disjoint_case :
+      forall next : next, p : pointer.
+        p = null /\ p <> null /\ is_list next (get next p) -> false
+
   (** Frame for is_list *)
   type ft 'a
 
