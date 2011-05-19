@@ -1164,11 +1164,11 @@ let open_session ~env ~config ~init ~notify dir =
     | None ->
 	init_fun := init; notify_fun := notify;
 	project_dir := dir; current_env := Some env;
+        let provers = Whyconf.get_provers config in
+        current_provers := 
+          Util.Mstr.fold (get_prover_data env) provers Util.Mstr.empty;
 	begin try
 	  let xml = Xml.from_file (Filename.concat dir db_filename) in
-          let provers = Whyconf.get_provers config in
-          current_provers := 
-            Util.Mstr.fold (get_prover_data env) provers Util.Mstr.empty;
 	  load_session ~env xml;
 	  reload_all ()
 	with
