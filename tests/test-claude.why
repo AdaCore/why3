@@ -44,7 +44,7 @@ theory TestSplit
 
   logic bb int
 
-  goal G1 : ("stop_split" aa 0 and bb 1) and ("stop_split" aa 1 and bb 2)
+  goal G1 : (aa 5) and ("stop_split" aa 0 and bb 6) and ("stop_split" aa 1 and bb 2) 
 
   goal G2 : ("stop_split" aa 0 && bb 1) && ("stop_split" aa 1 && bb 2)
 

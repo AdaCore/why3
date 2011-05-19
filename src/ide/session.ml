@@ -840,7 +840,7 @@ and reload_trans  _goal_obsolete goal _ tr =
        remaining = [ s2, h2 ; ... ]
 
     *)
-    let new_goals_map,_remaining,_ =
+    let new_goals_map,old_subgoals,_ =
       List.fold_left
         (fun (new_goals_map,old_subgoals,count) subtask ->
            let id = (Task.task_goal subtask).Decl.pr_name in
@@ -850,8 +850,17 @@ and reload_trans  _goal_obsolete goal _ tr =
              try
 	       let g = Util.Mstr.find sum old_subgoals in
 	       (* an old subgoal has the same checksum *)
+(*
+               eprintf "Merge phase 1: old goal '%s' -> new goal '%s'@."
+                 g.goal_name subgoal_name;
+*)
 	       (Some g, Util.Mstr.remove sum old_subgoals)
-             with Not_found -> None,old_subgoals
+             with Not_found -> 
+(*
+               eprintf "Merge phase 1: no old goal -> new goal '%s'@."
+                 subgoal_name;
+*)
+               (None,old_subgoals)
            in
            ((count,id,subgoal_name,subtask,sum,old_subgoal) :: new_goals_map,
 	    old_subgoals, count+1))
@@ -877,15 +886,35 @@ and reload_trans  _goal_obsolete goal _ tr =
     *)
     let rec associate_remaining_goals new_goals_map remaining acc =
       match new_goals_map with
-        | [] -> acc
+        | [] -> 
+(*
+            eprintf "Merge phase 3: dropping %d old goals@."
+              (List.length remaining);
+*)
+            acc
         | (_,id,subgoal_name,subtask,sum,old_subgoal)::new_rem ->
             let ((obsolete,old_goal,rem) : bool * goal option * (string * goal) list) =
               match old_subgoal with
-                | Some _ -> false,old_subgoal,remaining
+                | Some _g -> 
+(*
+                    eprintf "Merge phase 2: old goal '%s' -> new goal '%s'@."
+                      g.goal_name subgoal_name;
+*)
+                    (false,old_subgoal,remaining)
                 | None ->
                     match remaining with
-                      | [] -> false,None,[]
-                      | (_goal_name,g) :: rem -> true,Some g,rem
+                      | [] -> 
+(*
+                          eprintf "Merge phase 2: no old goal -> new goal '%s'@."
+                            subgoal_name;
+*)
+                          (false,None,[])
+                      | (_goal_name,g) :: rem -> 
+(*
+                          eprintf "Merge phase 2: old goal '%s' -> new goal '%s'@."
+                            g.goal_name subgoal_name;
+*)
+                          (true,Some g,rem)
             in
             associate_remaining_goals new_rem rem
               ((id,subgoal_name,sum,subtask,old_goal,obsolete)::acc)
@@ -899,9 +928,9 @@ and reload_trans  _goal_obsolete goal _ tr =
            reload_any_goal (Parent_transf mtr) id
              subgoal_name sum subtask old_g subgoal_obsolete
          in mg::acc)
-      [] goals
+      [] (List.rev goals)
     in
-    mtr.subgoals <- goals;
+    mtr.subgoals <- (List.rev goals);
     check_transf_proved mtr
   in
   apply_transformation ~callback tr.transf (get_task goal)
