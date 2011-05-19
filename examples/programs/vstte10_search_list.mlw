@@ -10,65 +10,65 @@ module M
   use export list.Nth
 
   logic zero_at (l : list int) (i : int) =
-    nth i l = Some 0 and forall j:int. 0 <= j < i -> nth j l <> Some 0 
+    nth i l = Some 0 and forall j:int. 0 <= j < i -> nth j l <> Some 0
 
   logic no_zero (l : list int) =
     forall j:int. 0 <= j < length l -> nth j l <> Some 0
 
-let rec search i l variant { length l } = 
-  {}
-  match l with
-  | Nil -> i
-  | Cons x r -> if x = 0 then i else search (i+1) r
-  end
-  { (i <= result < i + length l and zero_at l (result - i)) 
-    or
-    (result = i + length l and no_zero l) }
+  let rec search i l variant { length l } =
+    {}
+    match l with
+    | Nil -> i
+    | Cons x r -> if x = 0 then i else search (i+1) r
+    end
+    { (i <= result < i + length l and zero_at l (result - i))
+      or
+      (result = i + length l and no_zero l) }
 
-let search_list l =
-  { }
-  search 0 l
-  { (0 <= result < length l and zero_at l result)
-    or 
-    (result = length l and no_zero l) }
+  let search_list l =
+    { }
+    search 0 l
+    { (0 <= result < length l and zero_at l result)
+      or
+      (result = length l and no_zero l) }
 
 
-(* imperative version, with a loop *)
+  (* imperative version, with a loop *)
 
   use import list.HdTl
 
-let head (l : list 'a) = 
-  { l <> Nil } 
-  match l with Nil -> absurd | Cons h _ -> h end 
-  { hd l = Some result }
+  let head (l : list 'a) =
+    { l <> Nil }
+    match l with Nil -> absurd | Cons h _ -> h end
+    { hd l = Some result }
 
-let tail (l : list 'a) = 
-  { l <> Nil } 
-  match l with Nil -> absurd | Cons _ t -> t end 
-  { tl l = Some result }
+  let tail (l : list 'a) =
+    { l <> Nil }
+    match l with Nil -> absurd | Cons _ t -> t end
+    { tl l = Some result }
 
-let search_loop l =
-  {}
-  let i = ref 0 in
-  let s = ref l in
-  while !s <> Nil && head !s <> 0 do
-    invariant { 
-      0 <= i and i + length s = length l and
-      (forall j:int. 0 <= j -> nth j s = nth (i + j) l) and
-      forall j:int. 0 <= j < i -> nth j l <> Some 0 }
-    variant { length s }
-    i := !i + 1;
-    s := tail !s
-  done;
-  !i
-  { (0 <= result < length l and zero_at l result)
-    or 
-    (result = length l and no_zero l) }
+  let search_loop l =
+    {}
+    let i = ref 0 in
+    let s = ref l in
+    while !s <> Nil && head !s <> 0 do
+      invariant {
+        0 <= !i and !i + length !s = length l and
+        (forall j:int. 0 <= j -> nth j !s = nth (!i + j) l) and
+        forall j:int. 0 <= j < !i -> nth j l <> Some 0 }
+      variant { length !s }
+      i := !i + 1;
+      s := tail !s
+    done;
+    !i
+    { (0 <= result < length l and zero_at l result)
+      or
+      (result = length l and no_zero l) }
 
 end
 
 (*
-Local Variables: 
+Local Variables:
 compile-command: "unset LANG; make -C ../.. examples/programs/vstte10_search_list.gui"
-End: 
+End:
 *)

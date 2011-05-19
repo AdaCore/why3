@@ -25,6 +25,7 @@ open Ty
 open Term
 open Decl
 open Theory
+open Eval_match
 open Pretty
 open Pgm_ttree
 open Pgm_types
@@ -55,7 +56,7 @@ let wp_implies f1 f2 = match f2.t_node with
   | Tfalse -> t_implies f1 f2
   | _ -> t_implies_simp f1 f2
 
-let find_ts ~pure uc s = 
+let find_ts ~pure uc s =
   ns_find_ts (get_namespace (if pure then pure_uc uc else impure_uc uc)) [s]
 let find_ls ~pure uc s =
   ns_find_ls (get_namespace (if pure then pure_uc uc else impure_uc uc)) [s]
@@ -66,21 +67,19 @@ let is_arrow_ty ty = match ty.ty_node with
 
 let wp_forall v f =
   if is_arrow_ty v.vs_ty then f else
-  if t_occurs_single v f then t_forall_close_simp [v] [] f else f
-(*
+  (* if t_occurs_single v f then t_forall_close_simp [v] [] f else f *)
   match f.t_node with
-    | Fbinop (Fimplies, {f_node = Fapp (s,[{t_node = Tvar u};r])},h)
+    | Tbinop (Timplies, {t_node = Tapp (s,[{t_node = Tvar u};r])},h)
       when ls_equal s ps_equ && vs_equal u v && not (t_occurs_single v r) ->
-        t_subst_single v r h
-    | Fbinop (Fimplies, {f_node = Fbinop (Fand, g,
-                        {f_node = Fapp (s,[{t_node = Tvar u};r])})},h)
+        t_let_close_simp v r h
+    | Tbinop (Timplies, {t_node = Tbinop (Tand, g,
+                        {t_node = Tapp (s,[{t_node = Tvar u};r])})},h)
       when ls_equal s ps_equ && vs_equal u v && not (t_occurs_single v r) ->
-        t_subst_single v r (t_implies_simp g h)
-    | _ when f_occurs_single v f ->
+        t_let_close_simp v r (t_implies_simp g h)
+    | _ when t_occurs_single v f ->
         t_forall_close_simp [v] [] f
     | _ ->
         f
-*)
 
 (* utility functions for building WPs *)
 
@@ -95,11 +94,11 @@ let wp_binder x f = match x.pv_tv with
 let wp_binders = List.fold_right wp_binder
 
 let add_binder x rm =
-  let add r rm = 
-    let spv = 
-      try Spv.add x (Mreg.find r rm) with Not_found -> Spv.singleton x 
+  let add r rm =
+    let spv =
+      try Spv.add x (Mreg.find r rm) with Not_found -> Spv.singleton x
     in
-    Mreg.add r spv rm 
+    Mreg.add r spv rm
   in
   Sreg.fold add x.pv_regions rm
 
@@ -141,15 +140,19 @@ and unref_term env s t = match t.t_node with
       begin try t_var (Mvs.find vs s) with Not_found -> t end
   | Tapp (ls, _) when ls_equal ls (find_ls ~pure:true env "old") ->
       assert false
-  | Tapp (ls, _) when ls_equal ls (find_ls ~pure:true env "at") -> 
+  | Tapp (ls, _) when ls_equal ls (find_ls ~pure:true env "at") ->
       (* do not recurse in at(...) *)
       t
   | _ ->
       TermTF.t_map (unref_term env s) (unref env s) t
 
-let has_singleton_type pv = is_singleton_ty pv.pv_effect.vs_ty
+let find_constructor env ts =
+  let km = get_known (pure_uc env) in
+  match find_constructors km ts with
+  | [ls] -> ls
+  | _ -> assert false
 
-(* quantify over all references in ef 
+(* quantify over all references in ef
    ef : effect
    rm : region -> pvsymbol set
    f  : formula
@@ -159,9 +162,9 @@ let has_singleton_type pv = is_singleton_ty pv.pv_effect.vs_ty
    let vars = { v1, ..., vm }
 
      forall r1:ty(rho1). ... forall rn:ty(rhon).
-     forall v'1. v'1 = update v1 r ->
+     let v'1 = update v1 r1...rn in
      ...
-     forall v'm. v'm = update vm r ->
+     let v'm = update vm r1...rn in
      f[vi <- v'i]
 
   an optimization is performed for singleton types
@@ -174,46 +177,56 @@ let has_singleton_type pv = is_singleton_ty pv.pv_effect.vs_ty
 let quantify ?(all=false) env rm ef f =
   let sreg = ef.E.writes in
   let sreg =
-    if all then 
+    if all then
       Spv.fold (fun pv s -> Sreg.union pv.pv_regions s)
-	ef.E.globals (Sreg.union ef.E.reads sreg) 
-    else 
-      sreg 
+	ef.E.globals (Sreg.union ef.E.reads sreg)
+    else
+      sreg
   in
   (* mreg: rho -> rho' *)
   let mreg =
-    let add r m = 
+    let add r m =
       let v = create_vsymbol (id_clone r.R.r_tv.tv_name) (purify r.R.r_ty) in
       Mreg.add r v m
     in
     Sreg.fold add sreg Mreg.empty
   in
   (* all program variables involving these regions *)
-  let vars = 
-    let add r _ s = 
+  let vars =
+    let add r _ s =
       try Spv.union (Mreg.find r rm) s with Not_found -> assert false
     in
     Mreg.fold add mreg Spv.empty
   in
-  (* s: v -> r'/v' and vars': pv -> v' *)
+  (* s: v -> v' and vv': pv -> v',update_v *)
   let mreg, s, vv' =
-    let add pv (mreg, s, vv') = 
-      if has_singleton_type pv then begin
-	assert (Sreg.cardinal pv.pv_regions = 1);
-	let r = Sreg.choose pv.pv_regions in
-	let v = create_vsymbol (id_clone pv.pv_name) (purify r.R.r_ty) in
-	let mreg = Mreg.add r v mreg in
-	mreg, Mvs.add pv.pv_pure v s, vv'
-      end else begin
-	eprintf "pv = %a@." print_pvsymbol pv;
-	assert false (*TODO*) 
-      end
+    let add pv (mreg, s, vv') = match pv.pv_effect.vs_ty.ty_node with
+      | Ty.Tyapp (ts, _) ->
+	  let mt = get_mtsymbol ts in
+	  if mt.mt_singleton then begin
+	    assert (Sreg.cardinal pv.pv_regions = 1);
+	    let r = Sreg.choose pv.pv_regions in
+	    (* a better name for r *)
+	    let r' = create_vsymbol (id_clone pv.pv_name) (purify r.R.r_ty) in
+	    let mreg = Mreg.add r r' mreg in
+	    let ty = pv.pv_pure.vs_ty in
+	    let v' = create_vsymbol (id_clone pv.pv_name) ty in
+	    let cs = find_constructor env mt.mt_pure in
+	    let update = fs_app cs [t_var r'] ty in
+	    let vv' = Mpv.add pv (v', update) vv' in
+	    mreg, Mvs.add pv.pv_pure v' s, vv'
+	  end else begin
+	    eprintf "pv = %a@." print_pvsymbol pv;
+	    assert false (*TODO*)
+	  end
+      | Ty.Tyvar _ ->
+	  assert false
     in
     Spv.fold add vars (mreg, Mvs.empty, Mpv.empty)
   in
   let f = unref env s f in
-  let quantify_v' _pv _v' _f = 
-    assert false (*TODO: update*)
+  let quantify_v' _pv (v', updatev) f =
+    t_let_close v' updatev f
   in
   let f = Mpv.fold quantify_v' vv' f in
   let quantify_r _ r' f = wp_forall r' f in
@@ -251,9 +264,9 @@ let abstract_wp env rm ef (q',ql') (q,ql) =
   in
   let f =
     let res, f = q and res', f' = q' in
-    let f' = 
-      if is_arrow_ty res'.vs_ty then f' 
-      else t_subst (subst1 res' (t_var res)) f' 
+    let f' =
+      if is_arrow_ty res'.vs_ty then f'
+      else t_subst (subst1 res' (t_var res)) f'
     in
     quantify_res f' f (Some res)
   in
@@ -327,7 +340,7 @@ let while_post_block env inv var lab e =
     | Some (phi, None) ->
 	let old_phi = term_at env lab phi in
 	(* 0 <= old_phi and phi < old_phi *)
-	wp_and (ps_app (find_ls ~pure:true env "infix <=") 
+	wp_and (ps_app (find_ls ~pure:true env "infix <=")
 		  [t_int_const "0"; old_phi])
 	       (ps_app (find_ls ~pure:true env "infix <")  [phi; old_phi])
     | Some (phi, Some r) ->
@@ -353,15 +366,15 @@ let wp_label ?loc f =
   else t_label ?loc ("WP"::f.t_label) f
 
 let t_True env =
-  fs_app (find_ls ~pure:true env "True") [] 
+  fs_app (find_ls ~pure:true env "True") []
     (ty_app (find_ts ~pure:true env "bool") [])
 
 (*
 let add_expl msg f =
-  t_label_add Split_goal.stop_split (t_label_add ("expl:"^msg) f) 
+  t_label_add Split_goal.stop_split (t_label_add ("expl:"^msg) f)
 *)
 
-(* 
+(*
   env : module_uc
   rm  : Spv.t Mreg.t (maps regions to pvsymbol sets)
 *)
@@ -398,9 +411,9 @@ and wp_desc env rm e q = match e.expr_desc with
       let f = wp_triple env rm bl t in
       wp_and q f
   | Elet (x, e1, e2) ->
-      let w2 = 
+      let w2 =
 	let rm = add_binder x rm in
-	wp_expr env rm e2 (filter_post e2.expr_effect q) 
+	wp_expr env rm e2 (filter_post e2.expr_effect q)
       in
       let v1 = v_result x.pv_pure.vs_ty in
       let t1 = t_label ~loc:e1.expr_loc ["let"] (t_var v1) in
@@ -444,7 +457,7 @@ and wp_desc env rm e q = match e.expr_desc with
       wp_expr env rm e (filter_post e.expr_effect q)
   | Ematch (x, bl) ->
       let branch (p, e) =
-        t_close_branch p.ppat_pat 
+        t_close_branch p.ppat_pat
 	  (wp_expr env rm e (filter_post e.expr_effect q))
       in
       let t = t_var x.pv_pure in
@@ -492,11 +505,11 @@ and wp_desc env rm e q = match e.expr_desc with
 	                               and I(v2+1) -> Q                    *)
       let (res, q1), _ = q in
       let gt, le, incr = match d with
-	| Ptree.To     -> 
-	    find_ls ~pure:true env "infix >", 
+	| Ptree.To     ->
+	    find_ls ~pure:true env "infix >",
 	    find_ls ~pure:true env "infix <=", t_int_const  "1"
-	| Ptree.Downto -> 
-	    find_ls ~pure:true env "infix <", 
+	| Ptree.Downto ->
+	    find_ls ~pure:true env "infix <",
 	    find_ls ~pure:true env "infix >=", t_int_const "-1"
       in
       let v1_gt_v2 = ps_app gt [t_var v1.pv_pure; t_var v2.pv_pure] in
@@ -516,7 +529,7 @@ and wp_desc env rm e q = match e.expr_desc with
 	   (wp_and ~sym:true
 	      (wp_expl "for loop preservation"
 		(wp_forall x.pv_pure
-	         (wp_implies 
+	         (wp_implies
 		    (wp_and (ps_app le [t_var v1.pv_pure; t_var x.pv_pure])
 		            (ps_app le [t_var x.pv_pure;  t_var v2.pv_pure]))
                  (wp_implies inv wp1))))
@@ -596,7 +609,9 @@ let add_wp_decl ps f uc =
   let label = ["expl:correctness of " ^ name.id_string] in
   let id = id_fresh ~label ?loc:name.id_loc s in
   let f = f_btop uc f in
-  (* printf "wp: f=%a@." print_fmla f; *)
+  let km = get_known (pure_uc uc) in
+  let f = eval_match ~inline:inline_nonrec_linear km f in
+  (* printf "wp: f=%a@." print_term f; *)
   let pr = create_prsymbol id in
   let d = create_prop_decl Pgoal pr f in
   add_pure_decl d uc

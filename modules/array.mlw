@@ -38,7 +38,8 @@ module Array
   parameter make : n:int -> v:'a ->
     {}
     array 'a
-    { length result = n and forall i:int. 0 <= i < n -> result[i] = v}
+    { result = {| length = n; elts = M.const v |} }
+    (* { length result = n and forall i:int. 0 <= i < n -> result[i] = v} *)
 
   parameter append : a1:array 'a -> a2:array 'a ->
     {}

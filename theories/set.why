@@ -1,7 +1,7 @@
 
 theory Set
 
-  type set 'a 
+  type set 'a
 
   logic mem 'a (set 'a)
 
@@ -13,7 +13,7 @@ theory Set
 
   logic add 'a (set 'a) : set 'a
 
-  axiom Add_def1 : 
+  axiom Add_def1 :
     forall x y : 'a. forall s : set 'a.
     mem x (add y s) <-> x = y or mem x s
 
@@ -25,19 +25,19 @@ theory Set
 
   logic union (set 'a) (set 'a) : set 'a
 
-  axiom Union_def1 : 
+  axiom Union_def1 :
     forall s1 s2 : set 'a. forall x : 'a.
     mem x (union s1 s2) <-> mem x s1 or mem x s2
 
   logic inter (set 'a) (set 'a) : set 'a
 
-  axiom Inter_def1 : 
+  axiom Inter_def1 :
     forall s1 s2 : set 'a. forall x : 'a.
     mem x (inter s1 s2) <-> mem x s1 and mem x s2
 
   logic diff (set 'a) (set 'a) : set 'a
 
-  axiom Diff_def1 : 
+  axiom Diff_def1 :
     forall s1 s2 : set 'a. forall x : 'a.
     mem x (diff s1 s2) <-> mem x s1 and not mem x s2
 
@@ -51,19 +51,19 @@ end
 theory Fset
   use import int.Int
   clone export Set
-  
+
   logic cardinal (set 'a) : int
 
   axiom Cardinal_nonneg : forall s : set 'a. cardinal s >= 0
 
   axiom Cardinal_empty : cardinal(empty : set 'a) = 0
 
-  axiom Cardinal_add : 
-    forall x : 'a. forall s : set 'a. 
+  axiom Cardinal_add :
+    forall x : 'a. forall s : set 'a.
     not mem x s -> cardinal (add x s) = 1 + cardinal s
 
-  axiom Cardinal_remove : 
-    forall x : 'a. forall s : set 'a. 
+  axiom Cardinal_remove :
+    forall x : 'a. forall s : set 'a.
     mem x s -> cardinal s = 1 + cardinal (remove x s)
 
   axiom Cardinal_subset :
@@ -72,7 +72,7 @@ theory Fset
 end
 
 theory FsetExt
- 
+
   use export Fset
 
   axiom ext: forall s1 s2 : set 'a.
@@ -88,7 +88,7 @@ theory SetMap
 
   logic mem (x:'a) (s:set 'a) = s[x] = True
 
-  logic empty : set 'a = create_const False
+  logic empty : set 'a = const False
 
   logic is_empty (s : set 'a) = forall x : 'a. not mem x s
 
@@ -132,7 +132,7 @@ end
 
 
 (*
-Local Variables: 
+Local Variables:
 compile-command: "make -C .. theories/set"
-End: 
+End:
 *)

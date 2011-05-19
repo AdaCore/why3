@@ -18,16 +18,16 @@ module M
     let j = ref 0 in
     let t = ref 0 in (* WCET *)
     for i = 0 to n-1 do
-      invariant { 0 <= j <= i <= n and i = j + t }
+      invariant { 0 <= !j <= i <= n and i = !j + !t }
       while !j > 0 && b[!j-1] > a[i] do
-        invariant { 0 <= j <= i and i = j + t } variant { j }
+        invariant { 0 <= !j <= i and i = !j + !t } variant { !j }
         j := !j - 1;
         t := !t + 1
       done;
       b[!j] <- a[i];
       j := !j + 1
     done;
-    assert { 0 <= t <= n }
+    assert { 0 <= !t <= n }
 
 end
 

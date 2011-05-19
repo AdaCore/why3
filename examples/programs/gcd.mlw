@@ -4,18 +4,18 @@ module M
   use import int.Gcd
   use import int.ComputerDivision
 
-let rec gcd u v variant { v } =
-  { u >= 0 and v >= 0 }
-  if v = 0 then
-    u
-  else 
-    gcd v (mod u v)
-  { gcd u v result }
+  let rec gcd u v variant { v } =
+    { u >= 0 and v >= 0 }
+    if v = 0 then
+      u
+    else
+      gcd v (mod u v)
+    { gcd u v result }
 
 end
 
 (*
-Local Variables: 
+Local Variables:
 compile-command: "unset LANG; make -C ../.. examples/programs/gcd"
-End: 
+End:
 *)

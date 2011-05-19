@@ -8,7 +8,7 @@ module Hashtbl
 
   type t 'a model {| mutable contents: map key (list 'a) |}
 
-  logic ([]) (h: t 'a) (k: key) : list 'a = get h k
+  logic ([]) (h: t 'a) (k: key) : list 'a = get h.contents k
 
   parameter create: n:int ->
     {} t 'a { forall k: key. result[k] = Nil }

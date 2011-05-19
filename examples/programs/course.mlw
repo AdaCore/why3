@@ -34,7 +34,7 @@ parameter new_pointer : tt:unit ->
   { }
   pointer
   writes alloc
-  { alloc = old alloc + 1 and result = old alloc }
+  { !alloc = old !alloc + 1 and result = old !alloc }
 
 (*
 record Student =
@@ -131,9 +131,9 @@ let createCourse (r: (ref (region course))) : pointer =
     let (rStud,student,count,sum) = M.get !r c in
     let newc = (rStud,student,0,0) in
     r := M.set !r c newc;
-    assert { invCourse alloc newc };
+    assert { invCourse !alloc newc };
     c
-  { valid alloc result }
+  { valid !alloc result }
 
 (*
 fun RegisterStudent(R:[Course], c: [R], name: string): [R.Rstud]
@@ -152,15 +152,15 @@ fun RegisterStudent(R:[Course], c: [R], name: string): [R.Rstud]
 
 let registerStudent
     (r: (ref (region course))) (c:pointer) (name:string) : pointer =
-{ valid alloc c and invCourse alloc (M.get r c) }
+{ valid !alloc c and invCourse !alloc (M.get !r c) }
   let s = new_pointer () in
   let (rStud,student,count,sum) = M.get !r c in
   let newstud = (name,0) in
   let newc = (M.set rStud s newstud,M.set student count s,count+1,sum) in
   r := M.set !r c newc;
-  assert { invCourse alloc newc };
+  assert { invCourse !alloc newc };
   s
-{ valid alloc result }
+{ valid !alloc result }
 
 (*
 

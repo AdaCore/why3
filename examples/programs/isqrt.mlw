@@ -13,8 +13,8 @@ module M
     let count = ref 0 in
     let sum = ref 1 in
     while !sum <= x do
-      invariant { count >= 0 and x >= sqr count and sum = sqr (count+1) }
-      variant   { x - count }
+      invariant { !count >= 0 and x >= sqr !count and !sum = sqr (!count+1) }
+      variant   { x - !count }
       count := !count + 1;
       sum := !sum + 2 * !count + 1
     done;
@@ -29,7 +29,7 @@ module M
 end
 
 (*
-Local Variables: 
+Local Variables:
 compile-command: "unset LANG; make -C ../.. examples/programs/isqrt.gui"
-End: 
+End:
 *)

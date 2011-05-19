@@ -14,11 +14,11 @@ module M
   parameter next : ref (next)
 
   inductive is_list (next : next) (p : pointer) =
-    | is_list_null: 
-        forall next : next, p : pointer. 
+    | is_list_null:
+        forall next : next, p : pointer.
         p = null -> is_list next p
-    | is_list_next: 
-        forall next : next, p : pointer. 
+    | is_list_next:
+        forall next : next, p : pointer.
         p <> null -> is_list next (get next p) -> is_list next p
 
   (** Frame for is_list *)
@@ -113,17 +113,18 @@ module M
     is_list next p -> is_list next q -> false
 
   let list_rev (p : ref pointer) =
-    { is_list next p }
+    { is_list !next !p }
     let q = ref null in
     while !p <> null do
-      invariant { is_list next p /\ is_list next q /\ sep_list_list next p q }
+      invariant
+        { is_list !next !p /\ is_list !next !q /\ sep_list_list !next !p !q }
       let tmp = get !next !p in
       next := set !next !p !q;
       q := !p;
       p:= tmp
     done;
     q
-    { is_list next result }
+    { is_list !next !result }
 
   (** behavior *)
 
@@ -153,26 +154,26 @@ module M
     -> model next p = model (set next q v) p
 
   let list_rev_behv (p : ref pointer) =
-    { is_list next p }
+    { is_list !next !p }
     let old_next = !next in
     let old_p = !p in
     let q = ref null in
     while !p <> null do
-      invariant { is_list next p /\ is_list next q
-                  /\ sep_list_list next p q /\
+      invariant { is_list !next !p /\ is_list !next !q
+                  /\ sep_list_list !next !p !q /\
       reverse (model (old_next) (old_p)) =
-       (reverse (model next p)) ++ (model next q)}
+       (reverse (model !next !p)) ++ (model !next !q)}
       let tmp = get !next !p in
       let bak_next = !next in
       next := set !next !p !q;
-      assert { (reverse (Cons p (model next tmp))) ++ (model next q) =
-               (reverse (model next tmp)) ++ (Cons p (model next q))};
+      assert { (reverse (Cons !p (model !next tmp))) ++ (model !next !q) =
+               (reverse (model !next tmp)) ++ (Cons !p (model !next !q))};
       q := !p;
       p:= tmp
     done;
     q
-    { is_list next result /\ reverse (model (old next) (old p)) =
-        model next result}
+    { is_list !next !result /\ reverse (model (old !next) (old !p)) =
+        model !next !result}
 
 
 end
@@ -281,17 +282,18 @@ module M2
     is_list next p -> is_list next q -> false
 
   let list_rev (p : ref pointer) =
-    { is_list next p }
+    { is_list !next !p }
     let q = ref null in
     while !p <> null do
-      invariant { is_list next p /\ is_list next q /\ sep_list_list next p q }
+      invariant
+        { is_list !next !p /\ is_list !next !q /\ sep_list_list !next !p !q }
       let tmp = get !next !p in
       next := set !next !p !q;
       q := !p;
       p:= tmp
     done;
     q
-    { is_list next result }
+    { is_list !next !result }
 
   (** behavior *)
 
@@ -324,32 +326,31 @@ module M2
     is_list next p -> is_list next q -> false
 
   let list_rev_behv (p : ref pointer) =
-    { is_list next p }
+    { is_list !next !p }
     let old_next = !next in
     let old_p = !p in
     let q = ref null in
     while !p <> null do
-      invariant { is_list next p /\ is_list next q
-                  /\ sep_list_list next p q /\
-      reverse (model (old_next) (old_p)) =
-       (reverse (model next p)) ++ (model next q)}
+      invariant { is_list !next !p /\ is_list !next !q
+                  /\ sep_list_list !next !p !q /\
+      reverse (model (old !next) (old_p)) =
+       (reverse (model !next !p)) ++ (model !next !q)}
       let tmp = get !next !p in
       let bak_next = !next in
       next := set !next !p !q;
-      (* assert { (reverse (Cons p (model next tmp))) ++ (model next q) = *)
-      (*          (reverse (model next tmp)) ++ (Cons p (model next q))}; *)
+      (* assert { (reverse (Cons p (model !next tmp))) ++ (model !next q) = *)
+      (*          (reverse (model !next tmp)) ++ (Cons p (model !next q))}; *)
       q := !p;
       p:= tmp
     done;
     q
-    { is_list next result /\ reverse (model (old next) (old p)) =
-        model next result}
-
+    { is_list !next !result /\ reverse (model (old !next) (old !p)) =
+        model !next !result}
 
 end
 
 (*
-Local Variables: 
+Local Variables:
 compile-command: "unset LANG; make -C ../.. examples/programs/list_rev.gui"
-End: 
+End:
 *)

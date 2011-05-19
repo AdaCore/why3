@@ -1,59 +1,90 @@
+module M
 
-(**
-module TestRef
+use import int.Int
+use import module ref.Ref
 
-  use import int.Int
-  use import module stdlib.Ref
+parameter incr : x:ref int -> { } unit writes x { !x = old !x + 1 }
 
-  let f1 (x : ref int) (y : ref int) =
-     {}
-     x := 1;
-     y := 2
-     { x = 1 and y = 2 }
+parameter x : ref int
 
-  let f2 (x: ref int) = {} x := 1 { x=1 }
+parameter id_not_0 : x:int -> { x <> 0 } int { result = x }
 
-  let g (n: ref int) =
-    n := 1;
-    assert { n = 1 };
-    n := 2;
-    assert { n = 2 }
+parameter id : x:int -> { } int { result = x }
 
-  parameter a : ref int
+let test_and_1 () =
+  { }
+  if (incr x; !x > 0) && id !x = 1 then !x else 0+1
+  { result = 1 }
 
-  parameter havoc : unit -> {} unit writes a {a=1}
+let test_and_2 () =
+  { !x <> 0 }
+  if id_not_0 !x >= 1 && !x <= 1 then !x else 0+1
+  { result = 1 }
 
-  let foo () = { a=0 } havoc(); 1 { a=1 and result=1 }
+let test_or_1 () =
+  { }
+  if (incr x; !x > 0) || !x < 0 then 1 else 2
+  { result = 1 -> !x <> 0 }
 
-  let bar () = { a=0 } a := 1 { a=1 }
+let test_or_2 () =
+  { }
+  if !x = 0 || !x = 1 then !x else 1
+  { 0 <= result <= 1 }
 
-  (* TODO:
-     le programme "let f n = n := 1"
-     provoque "undefined type variable" (la région)
-     problème : comment faire l'inférence du type de n
-  *)
+let test_not_1 () =
+  { }
+  if not (!x = 0) then x := 0
+  { !x = 0 }
 
-  type t2 = {| mutable fa : int; mutable fb : int |}
-  parameter ft2 : x:t2 -> {} unit writes x.fa x.fb {}
+let test_not_2 () =
+  { !x <= 0 }
+  while not (!x = 0) do invariant { !x <= 0 } incr x done
+  { !x = 0 }
+
+let test_all_1 () =
+  { }
+  (!x >= 0 && not (!x = 0) || !x >= 1)
+  { result=True <-> !x>=1 }
+
+(* from Cesar Munoz's CD3D *)
+
+  logic d : int
+
+parameter vx : ref int
+parameter vy : ref int
+
+parameter sq : x:int -> {} int { result = x*x }
+
+let test_cd3d () =
+ { true }
+ if !vx=0 && !vy=0 && sq !vx + sq !vy < sq d  then 1 else 2
+ { result=1 -> !vx=0 and !vy=0 }
 
 end
-**)
 
-(**
+(*
+Local Variables:
+compile-command: "unset LANG; make -C ../../.. bench/programs/good/booleans"
+End:
+*)
+
+
+
+(***
 module TestArray
 
   use import int.Int
-  use import module stdlib.Array
+  use import module array.Array
 
   (* TODO: update *)
   let f (x: array int) =
     { x.length = 2 }
-    set x 0 1;
-    set x 1 2
+    x[0] <- 1;
+    x[1] <- 2
     { x[1] = 2 and x.length = 2 }
 
 end
-**)
+***)
 
 (*
 Local Variables:

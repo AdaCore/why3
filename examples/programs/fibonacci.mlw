@@ -15,7 +15,7 @@ theory FibonacciTest
 
   use import Fibonacci
 
-  lemma isfib_2_1 : fib 2 = 1 
+  lemma isfib_2_1 : fib 2 = 1
   lemma isfib_6_8 : fib 6 = 8
 
   lemma not_isfib_2_2 : fib 2 <> 2
@@ -32,11 +32,10 @@ module FibonacciLinear
     { n >= 0 }
     let y = ref 0 in
     let x = ref 1 in
-
     for i = 0 to n - 1 do
-      invariant { 0 <= i <= n and fib (i+1) = x and fib i = y }
+      invariant { 0 <= i <= n and fib (i+1) = !x and fib i = !y }
       let aux = !y in
-      y := !x; 
+      y := !x;
       x := !x + aux
     done;
     !y
@@ -53,7 +52,7 @@ theory Mat22 "2x2 integer matrices"
   logic id : t = {| a11 = 1; a12 = 0; a21 = 0; a22 = 1 |}
 
   logic mult (x: t) (y: t) : t =
-    {| 
+    {|
     a11 = x.a11 * y.a11 + x.a12 * y.a21; a12 = x.a11 * y.a12 + x.a12 * y.a22;
     a21 = x.a21 * y.a11 + x.a22 * y.a21; a22 = x.a21 * y.a12 + x.a22 * y.a22;
     |}
@@ -61,10 +60,10 @@ theory Mat22 "2x2 integer matrices"
   (* holds, but not useful *)
   (* clone algebra.Assoc with type t = t, logic op = mult, lemma Assoc *)
 
-  clone export 
+  clone export
     int.Exponentiation with type t = t, logic one = id, logic (*) = mult
 
-  lemma power_sum : 
+  lemma power_sum :
     forall x: t, n m: int.
     n >= 0 -> m >= 0 -> power x (n + m) = mult (power x n) (power x m)
 
@@ -81,12 +80,12 @@ module FibonacciLogarithmic
 
   (* computes ((1 1) (1 0))^n in O(log(n)) time
 
-     since it is a matrix of the shape ((a+b b) (b a)), 
+     since it is a matrix of the shape ((a+b b) (b a)),
      we only return the pair (a, b) *)
 
   let rec logfib n variant { n } =
     { n >= 0 }
-    if n = 0 then 
+    if n = 0 then
       (1, 0)
     else begin
       let a, b = logfib (div n 2) in
@@ -96,7 +95,7 @@ module FibonacciLogarithmic
       else
         (b*(a + c), c*c + b*b)
     end
-    { let a, b = result in 
+    { let a, b = result in
       power m1110 n = {| a11 = a+b; a12 = b; a21 = b; a22 = a |} }
 
   (* by induction, we easily prove that
@@ -107,7 +106,7 @@ module FibonacciLogarithmic
     thus, we can compute F(n) in O(log(n)) using funtion logfib above
   *)
 
-  lemma fib_m : 
+  lemma fib_m :
     forall n: int. n >= 0 ->
     let p = power m1110 n in fib (n+1) = p.a11 and fib n = p.a21
 
@@ -119,7 +118,7 @@ module FibonacciLogarithmic
 end
 
 (*
-Local Variables: 
+Local Variables:
 compile-command: "unset LANG; make -C ../.. examples/programs/fibonacci.gui"
-End: 
+End:
 *)

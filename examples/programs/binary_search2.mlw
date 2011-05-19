@@ -14,9 +14,9 @@ module BinarySearch
     { f lo < target <= f hi }
     if lo < hi-1 then
       let mid = div (lo + hi) 2 in
-      if f mid < target then 
-        binary_search target mid hi 
-      else 
+      if f mid < target then
+        binary_search target mid hi
+      else
         binary_search target lo mid
     else
       hi
@@ -26,7 +26,7 @@ module BinarySearch
 end
 
 (*
-Local Variables: 
+Local Variables:
 compile-command: "unset LANG; make -C ../.. examples/programs/binary_search2.gui"
-End: 
+End:
 *)

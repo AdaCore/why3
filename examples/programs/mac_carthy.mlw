@@ -38,8 +38,8 @@ module M
     let e = ref 1 in
     let n = ref n0 in
     while !e > 0 do
-      invariant { e >= 0 and iter_f e n = f n0 }
-      variant   { (101 - n + 10 * e, e) } with lex 
+      invariant { !e >= 0 and iter_f !e !n = f n0 }
+      variant   { (101 - !n + 10 * !e, !e) } with lex
       if !n > 100 then begin
         n := !n - 10;
         e := !e - 1
@@ -54,7 +54,7 @@ module M
 end
 
 (*
-Local Variables: 
+Local Variables:
 compile-command: "unset LANG; make -C ../.. examples/programs/mac_carthy"
-End: 
+End:
 *)

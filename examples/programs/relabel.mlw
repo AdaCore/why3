@@ -20,7 +20,7 @@ module Relabel
     | Node l r -> labels l ++ labels r
   end
 
-  lemma labels_Leaf : 
+  lemma labels_Leaf :
     forall x y : 'a. mem x (labels (Leaf y)) <-> x=y
 
   lemma labels_Node :
@@ -28,35 +28,36 @@ module Relabel
       mem x (labels (Node l r)) <-> (mem x (labels l) or mem x (labels r))
 
   inductive same_shape (t1 : tree 'a) (t2 : tree 'b) =
-    | same_shape_Leaf : 
+    | same_shape_Leaf :
         forall x1 : 'a, x2 : 'b.
         same_shape (Leaf x1) (Leaf x2)
-    | same_shape_Node : 
+    | same_shape_Node :
         forall l1 r1 : tree 'a, l2 r2 : tree 'b.
         same_shape l1 l2 -> same_shape r1 r2 ->
         same_shape (Node l1 r1) (Node l2 r2)
 
   use import int.Int
   use import module ref.Ref
- 
+
   parameter r : ref int
 
-  let fresh () = 
-    {} r := !r + 1; !r { r = old r + 1 and result = r }
+  let fresh () =
+    {} r := !r + 1; !r { !r = old !r + 1 and result = !r }
 
-  let rec relabel (t : tree 'a) : tree int = 
+  let rec relabel (t : tree 'a) : tree int =
     {}
     match t with
     | Leaf _   -> Leaf (fresh ())
     | Node l r -> Node (relabel l) (relabel r)
-    end   
+    end
     { same_shape t result and distinct (labels result) and
-      old r <= r and (forall x:int. mem x (labels result) -> old r < x <= r) }
+      old !r <= !r and
+      (forall x:int. mem x (labels result) -> old !r < x <= !r) }
 
 end
 
 (*
-Local Variables: 
+Local Variables:
 compile-command: "unset LANG; make -C ../.. examples/programs/relabel.gui"
-End: 
+End:
 *)

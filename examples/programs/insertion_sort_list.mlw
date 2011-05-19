@@ -8,15 +8,15 @@ module M
   use import list.Sorted
   use import list.Permut
 
-  let rec insert x l variant { length l } = 
+  let rec insert x l variant { length l } =
     { sorted l }
     match l with
     | Nil -> Cons x Nil
     | Cons y r -> if x <= y then Cons x l else Cons y (insert x r)
     end
     { sorted result and permut (Cons x l) result }
-  
-  let rec insertion_sort l variant { length l } = 
+
+  let rec insertion_sort l variant { length l } =
     { }
     match l with
     | Nil -> Nil
@@ -25,9 +25,9 @@ module M
     { sorted result and permut l result }
 
 end
-  
+
 (*
-Local Variables: 
+Local Variables:
 compile-command: "unset LANG; make -C ../.. examples/programs/insertion_sort_list.gui"
-End: 
+End:
 *)

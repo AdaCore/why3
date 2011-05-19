@@ -7,25 +7,25 @@ module M
   parameter r : ref int
 
   parameter f1 : y:int ->
-             {} unit writes r { q1 r (old r) y }
+             {} unit writes r { q1 !r (old !r) y }
 
-  let g1 () = {} f1 !r { q1 r (old r) (old r) }
+  let g1 () = {} f1 !r { q1 !r (old !r) (old !r) }
 
   logic foo int : int
   logic q int int int
 
-  parameter f : t:ref int -> x:int -> 
-             {} unit writes t { q t (old t) x }
+  parameter f : t:ref int -> x:int ->
+             {} unit writes t { q !t (old !t) x }
 
   let g (t:ref int) =
     {}
     f t (foo !t)
-    { q t (old t) (foo (old t)) }
+    { q !t (old !t) (foo (old !t)) }
 
 end
 
 (*
-Local Variables: 
+Local Variables:
 compile-command: "unset LANG; make -C ../../.. bench/programs/good/oldify"
-End: 
+End:
 *)

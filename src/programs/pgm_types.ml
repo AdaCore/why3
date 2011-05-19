@@ -21,23 +21,23 @@ let mt_equal mt1 mt2 = ts_equal mt1.mt_impure mt2.mt_impure
 
 let mtypes = Hts.create 17
 
-let () = 
-  let add ts = 
-    let mt = 
-      { mt_impure = ts; mt_effect = ts; mt_pure = ts; 
-	mt_regions = 0; mt_singleton = false } 
+let () =
+  let add ts =
+    let mt =
+      { mt_impure = ts; mt_effect = ts; mt_pure = ts;
+	mt_regions = 0; mt_singleton = false }
     in
     Hts.add mtypes ts mt
   in
   add Ty.ts_int;
   add Ty.ts_real
 
-let create_mtsymbol ~impure ~effect ~pure ~singleton = 
-  let mt = 
+let create_mtsymbol ~impure ~effect ~pure ~singleton =
+  let mt =
     { mt_impure  = impure;
       mt_effect  = effect;
       mt_pure    = pure;
-      mt_regions = List.length impure.ts_args - List.length pure.ts_args; 
+      mt_regions = List.length impure.ts_args - List.length pure.ts_args;
       mt_singleton = singleton; }
   in
   Hts.add mtypes impure mt;
@@ -45,37 +45,37 @@ let create_mtsymbol ~impure ~effect ~pure ~singleton =
   Hts.add mtypes pure   mt;
   mt
 
-let is_mutable_ts ts = 
+let is_mutable_ts ts =
   try (Hts.find mtypes ts).mt_regions > 0 with Not_found -> false
 
 let is_mutable_ty ty = match ty.ty_node with
   | Ty.Tyapp (ts, _) -> is_mutable_ts ts
   | Ty.Tyvar _ -> false
 
-let is_singleton_ts ts = 
+let is_singleton_ts ts =
   try (Hts.find mtypes ts).mt_singleton with Not_found -> false
 
 let is_singleton_ty ty = match ty.ty_node with
   | Ty.Tyapp (ts, _) -> is_singleton_ts ts
   | Ty.Tyvar _ -> false
 
-let get_mtsymbol ts = 
+let get_mtsymbol ts =
   (* TODO: typles? *)
-  try 
-    Hts.find mtypes ts 
-  with Not_found -> 
+  try
+    Hts.find mtypes ts
+  with Not_found ->
     (* Format.eprintf "get_mtsymbol: %a@." Pretty.print_ts ts; *)
-    let mt = 
-      { mt_impure = ts; mt_effect = ts; mt_pure = ts; 
-	mt_regions = 0; mt_singleton = false } 
+    let mt =
+      { mt_impure = ts; mt_effect = ts; mt_pure = ts;
+	mt_regions = 0; mt_singleton = false }
     in
     Hts.add mtypes ts mt;
     mt
 
 let print_mt_symbol fmt mt =
-  Format.fprintf fmt 
+  Format.fprintf fmt
     "@[impure: %a;@\npure  : %a;@\neffect: %a;@\nregions: %d;@]"
-    Pretty.print_ts mt.mt_impure Pretty.print_ts mt.mt_pure 
+    Pretty.print_ts mt.mt_impure Pretty.print_ts mt.mt_pure
     Pretty.print_ts mt.mt_effect mt.mt_regions
 
 (* model type *************************************************************)
@@ -111,14 +111,14 @@ let ty_exn = Ty.ty_app ts_exn []
 
 (* let ts_label = Ty.create_tysymbol (id_fresh "label") [] None *)
 
-let ts_arrow = 
+let ts_arrow =
   let v = List.map (fun s -> create_tvsymbol (Ident.id_fresh s)) ["a"; "b"] in
   Ty.create_tysymbol (Ident.id_fresh "arrow") v None
 
 let make_arrow_type tyl ty =
   let arrow ty1 ty2 = Ty.ty_app ts_arrow [ty1; ty2] in
   List.fold_right arrow tyl ty
-      
+
 module Sexn = Term.Sls
 
 module rec T : sig
@@ -127,7 +127,7 @@ module rec T : sig
 
   type post_fmla = Term.vsymbol (* result *) * Term.term
   type exn_post_fmla = Term.vsymbol (* result *) option * Term.term
-      
+
   type esymbol = lsymbol
 
   type post = post_fmla * (esymbol * exn_post_fmla) list
@@ -136,13 +136,13 @@ module rec T : sig
   | Tpure    of ty
   | Tarrow   of pvsymbol list * type_c
 
-  and type_c = { 
+  and type_c = {
     c_result_type : type_v;
     c_effect      : E.t;
     c_pre         : pre;
-    c_post        : post; 
+    c_post        : post;
   }
-      
+
   and pvsymbol = private {
     pv_name : ident;
     pv_tv   : type_v;
@@ -154,8 +154,8 @@ module rec T : sig
   val tpure  : ty -> type_v
   val tarrow : pvsymbol list -> type_c -> type_v
 
-  val create_pvsymbol : 
-    preid -> type_v -> 
+  val create_pvsymbol :
+    preid -> type_v ->
     effect:vsymbol -> pure:vsymbol -> regions:Sreg.t -> pvsymbol
 
   val compare_pvsymbol : pvsymbol -> pvsymbol -> int
@@ -174,7 +174,7 @@ module rec T : sig
     ps_kind   : psymbol_kind;
   }
 
-  val create_psymbol: 
+  val create_psymbol:
     impure:lsymbol -> effect:lsymbol -> pure:lsymbol -> kind:psymbol_kind ->
     psymbol
   val create_psymbol_fun: preid -> type_v -> psymbol
@@ -191,22 +191,22 @@ module rec T : sig
   val effectify : ty -> ty
 
   val trans_type_v : ?effect:bool -> ?pure:bool -> type_v -> ty
-    
+
   (* operations on program types *)
-    
+
   val apply_type_v_var : type_v -> pvsymbol -> type_c
 
   val subst_type_v : ty Mtv.t -> term Mvs.t -> type_v -> type_v
-    
+
   val occur_type_v : R.t -> type_v -> bool
-    
+
   val v_result : ty -> vsymbol
   val exn_v_result : Why.Term.lsymbol -> Why.Term.vsymbol option
-    
+
   val post_map : (term -> term) -> post -> post
-    
+
   val subst1 : vsymbol -> term -> term Mvs.t
-    
+
   val eq_type_v : type_v -> type_v -> bool
 
   (* pretty-printers *)
@@ -227,16 +227,16 @@ end = struct
   type esymbol = lsymbol
 
   type post = post_fmla * (esymbol * exn_post_fmla) list
-      
+
   type type_v =
     | Tpure    of Ty.ty
     | Tarrow   of pvsymbol list * type_c
 
-  and type_c = { 
+  and type_c = {
     c_result_type : type_v;
     c_effect      : E.t;
     c_pre         : pre;
-    c_post        : post; 
+    c_post        : post;
   }
 
   and pvsymbol = {
@@ -247,18 +247,18 @@ end = struct
     pv_regions: Sreg.t;
   }
 
-  let create_pvsymbol name v ~effect ~pure ~regions = 
+  let create_pvsymbol name v ~effect ~pure ~regions =
     { pv_name = id_register name;
       pv_tv   = v;
       pv_effect = effect;
-      pv_pure   = pure; 
+      pv_pure   = pure;
       pv_regions = regions; }
 
   let compare_pvsymbol v1 v2 =
     compare (id_hash v1.pv_name) (id_hash v2.pv_name)
   let equal_pvsymbol v1 v2 =
     compare_pvsymbol v1 v2 = 0
-      
+
   (* purify: turns program types into logic types *)
 
   let purify = purify
@@ -268,22 +268,22 @@ end = struct
     | Tpure ty ->
 	[], if pure then purify ty else if effect then effectify ty else ty
     | Tarrow (bl, c) ->
-	let tyl1 = 
-	  List.map 
-	    (fun v -> 
-	       if pure then v.pv_pure.vs_ty 
+	let tyl1 =
+	  List.map
+	    (fun v ->
+	       if pure then v.pv_pure.vs_ty
 	       else if effect then v.pv_effect.vs_ty
-	       else trans_type_v ~effect ~pure v.pv_tv) 
-	    bl 
+	       else trans_type_v ~effect ~pure v.pv_tv)
+	    bl
 	in
 	let tyl2, ty = uncurry_type ~effect ~pure c.c_result_type in
 	tyl1 @ tyl2, ty (* TODO: improve efficiency? *)
-	  
+
   and trans_type_v ?(effect=false) ?(pure=false) v =
     if effect && pure then invalid_arg "trans_type_v";
     let tyl, ty = uncurry_type ~effect ~pure v in
     make_arrow_type tyl ty
-      
+
   (* symbols *)
 
   type psymbol_kind =
@@ -301,12 +301,12 @@ end = struct
   let psymbols = Hls.create 17
 
   let create_psymbol ~impure ~effect ~pure ~kind =
-    let ps = { 
+    let ps = {
       ps_impure = impure;
       ps_effect = effect;
       ps_pure   = pure;
       ps_kind   = kind;
-    } 
+    }
     in
     Hls.add psymbols impure ps;
     Hls.add psymbols effect ps;
@@ -336,8 +336,8 @@ end = struct
       Hls.find psymbols ls
     with Not_found ->
       (* Format.eprintf "ls = %a@." Pretty.print_ls ls; *)
-      let ps = { ps_impure = ls; ps_effect = ls; 
-		 ps_pure = ls; ps_kind = PSlogic } 
+      let ps = { ps_impure = ls; ps_effect = ls;
+		 ps_pure = ls; ps_kind = PSlogic }
       in
       Hls.add psymbols ls ps;
       ps
@@ -348,8 +348,8 @@ end = struct
 
   let subst_var ?(effect=false) ?(pure=false) ts s vs =
     if effect && pure then invalid_arg "subst_var";
-    let ts = 
-      if effect then Mtv.map effectify ts 
+    let ts =
+      if effect then Mtv.map effectify ts
       else if pure then Mtv.map purify ts
       else ts
     in
@@ -359,32 +359,32 @@ end = struct
     else
       let vs' = create_vsymbol (id_clone vs.vs_name) ty' in
       Mvs.add vs (t_var vs') s, vs'
-	
+
   let subst_post ts s ((v, q), ql) =
     let ts = Mtv.map purify ts in
     let vq = let s, v = subst_var ts s v in v, t_ty_subst ts s q in
     let handler (e, (v, q)) = match v with
-      | None -> 
+      | None ->
 	  e, (v, t_ty_subst ts s q)
-      | Some v -> 
-	  let s, v = subst_var ts s v in 
+      | Some v ->
+	  let s, v = subst_var ts s v in
 	  e, (Some v, t_ty_subst ts s q)
     in
     vq, List.map handler ql
-      
+
   let rec subst_type_c ts s c =
     { c_result_type = subst_type_v ts s c.c_result_type;
       c_effect      = E.subst ts c.c_effect;
       c_pre         = (let ts = Mtv.map purify ts in t_ty_subst ts s c.c_pre);
       c_post        = subst_post ts s c.c_post; }
-      
+
   and subst_type_v ts s = function
     | Tpure ty ->
 	Tpure (ty_inst ts ty)
     | Tarrow (bl, c) ->
 	let s, bl = Util.map_fold_left (subst_binder ts) s bl in
 	Tarrow (bl, subst_type_c ts s c)
-	  
+
   and subst_binder ts s pv =
     let v' = subst_type_v ts s pv.pv_tv in
     let s, effect = subst_var ~effect:true ts s pv.pv_effect in
@@ -394,20 +394,20 @@ end = struct
     s, pv'
 
   let tpure ty = Tpure ty
-    
+
   let tarrow bl c = match bl with
     | [] ->
 	invalid_arg "tarrow"
     | _ ->
 	let rename s v =
 	  let tv' = subst_type_v Mtv.empty s v.pv_tv in
-	  let effect = 
+	  let effect =
 	    create_vsymbol (id_clone v.pv_effect.vs_name) v.pv_effect.vs_ty in
-	  let pure = 
+	  let pure =
 	    create_vsymbol (id_clone v.pv_pure.vs_name) v.pv_pure.vs_ty in
 	  let regions = v.pv_regions in
-	  let v' = 
-	    create_pvsymbol (id_clone v.pv_name) tv' ~effect ~pure ~regions 
+	  let v' =
+	    create_pvsymbol (id_clone v.pv_name) tv' ~effect ~pure ~regions
 	  in
 	  let s' = Mvs.add v.pv_pure (t_var pure) s in
 	  s', v'
@@ -421,10 +421,10 @@ end = struct
     | [] -> None
     | [ty] -> Some (v_result ty)
     | _ -> assert false
-	
+
   let post_map f ((v, q), ql) =
     (v, f q), List.map (fun (e,(v,q)) -> e, (v, f q)) ql
-      
+
   let type_c_of_type_v = function
     | Tarrow ([], c) ->
 	c
@@ -434,9 +434,9 @@ end = struct
 	  c_effect      = E.empty;
 	  c_pre         = t_true;
 	  c_post        = (v_result ty, t_true), []; }
-	  
+
   let subst1 vs1 t2 = Mvs.add vs1 t2 Mvs.empty
-    
+
   let apply_type_v_var v pv = match v with
     | Tarrow (x :: bl, c) ->
 	let ts = ty_match Mtv.empty x.pv_effect.vs_ty pv.pv_effect.vs_ty in
@@ -444,7 +444,7 @@ end = struct
 	subst_type_c ts (subst1 x.pv_pure (t_var pv.pv_pure)) c
     | Tarrow ([], _) | Tpure _ ->
 	assert false
-	  
+
 (*   let apply_type_v_sym v s = match v with *)
 (*     | Tarrow (x :: bl, c) -> *)
 (* 	let ts = ty_match Mtv.empty x.pv_effect.vs_ty s.p_ty in *)
@@ -457,39 +457,39 @@ end = struct
 (*   let apply_type_v_ref v = function *)
 (*     | R.Rlocal pv -> apply_type_v_var v pv *)
 (*     | R.Rglobal s -> apply_type_v_sym v s *)
-	  
+
   let occur_formula r f = Stv.mem r.R.r_tv (Term.t_ty_freevars Stv.empty f)
-	
+
   let rec occur_type_v r = function
     | Tpure ty ->
 	R.occurs_ty r ty
     | Tarrow (bl, c) ->
 	occur_arrow r bl c
-	  
+
   and occur_arrow r bl c = match bl with
     | [] ->
 	occur_type_c r c
     | v :: bl ->
 	occur_type_v r v.pv_tv ||
 	  not (R.occurs_ty r v.pv_effect.vs_ty) && occur_arrow r bl c
-	  
+
   and occur_type_c r c =
     occur_type_v r c.c_result_type ||
       occur_formula r c.c_pre ||
       E.occur r c.c_effect ||
       occur_post r c.c_post
-      
+
   and occur_post r ((_, q), ql) =
     occur_formula r q ||
       List.exists (fun (_, (_, qe)) -> occur_formula r qe) ql
-      
+
   let rec eq_type_v v1 v2 = match v1, v2 with
     | Tpure ty1, Tpure ty2 ->
 	ty_equal ty1 ty2
     | Tarrow (bl1, c1), Tarrow (bl2, c2) ->
 	assert (List.length bl1 = List.length bl2); (* FIXME? *)
-	let ts = 
-	  List.fold_left2 
+	let ts =
+	  List.fold_left2
 	    (fun ts v1 v2 -> ty_match ts v1.pv_effect.vs_ty v2.pv_effect.vs_ty)
 	    Mtv.empty bl1 bl2
 	in
@@ -506,7 +506,7 @@ end = struct
   open Pp
   open Format
   open Pretty
-	  
+
   let print_pvsymbol fmt pv =
     fprintf fmt "@[{ %a }@]" print_vs pv.pv_effect
 
@@ -515,24 +515,24 @@ end = struct
 
   let print_post fmt ((v, q), el) =
     let print_exn_post fmt (l, (v, q)) =
-      fprintf fmt "@[<hov 2>| %a %a->@ {%a}@]" 
+      fprintf fmt "@[<hov 2>| %a %a->@ {%a}@]"
 	print_ls l (print_option print_vs) v print_term q
     in
-    fprintf fmt "@[{%a | %a}@ %a@]" print_vsty v print_term q 
+    fprintf fmt "@[{%a | %a}@ %a@]" print_vsty v print_term q
       (print_list space print_exn_post) el
-      
+
   let rec print_type_v fmt = function
     | Tpure ty ->
 	print_ty fmt ty
     | Tarrow (bl, c) ->
 	fprintf fmt "@[<hov 2>%a ->@ %a@]"
 	  (print_list arrow print_binder) bl print_type_c c
-	  
+
   and print_type_c fmt c =
     fprintf fmt "@[{%a}@ %a%a@ %a@]" print_term c.c_pre
       print_type_v c.c_result_type E.print c.c_effect
       print_post c.c_post
-      
+
   and print_binder fmt x =
     fprintf fmt "(%a:%a)" print_vs x.pv_effect print_type_v x.pv_tv
 
@@ -561,7 +561,7 @@ end = struct
   }
 
   let compare r1 r2 =
-    Pervasives.compare (id_hash r1.r_tv.tv_name) (id_hash r2.r_tv.tv_name) 
+    Pervasives.compare (id_hash r1.r_tv.tv_name) (id_hash r2.r_tv.tv_name)
 
   let create tv ty = {
     r_tv = tv;
@@ -571,12 +571,12 @@ end = struct
   (* FIXME: optimize *)
   let occurs_ty r ty = Stv.mem r.r_tv (Ty.ty_freevars Stv.empty ty)
 
-  let print fmt r = 
+  let print fmt r =
     Format.fprintf fmt "%a(%a)" Pretty.print_tv r.r_tv Pretty.print_ty r.r_ty
 
 end
 
-and E : sig 
+and E : sig
 
   type t = private {
     reads  : Sreg.t;
@@ -591,8 +591,8 @@ and E : sig
   val add_glob  : T.pvsymbol -> t -> t
   val add_write : R.t -> t -> t
   val add_raise : T.esymbol -> t -> t
-    
-  val remove : Sreg.t -> t -> t    
+
+  val remove : Sreg.t -> t -> t
   val filter : (R.t -> bool) -> t -> t
 
   val remove_raise : T.esymbol -> t -> t
@@ -600,9 +600,9 @@ and E : sig
   val union : t -> t -> t
 
   val equal : t -> t -> bool
-    
+
   val no_side_effect : t -> bool
-    
+
   val subst_set : Ty.ty Mtv.t -> Sreg.t -> Sreg.t
   val subst : Ty.ty Mtv.t -> t -> t
 
@@ -623,8 +623,8 @@ end = struct
   }
 
   let empty = {
-    reads = Sreg.empty; 
-    writes = Sreg.empty; 
+    reads = Sreg.empty;
+    writes = Sreg.empty;
     raises = Sexn.empty;
     globals = Spv.empty; }
 
@@ -632,32 +632,32 @@ end = struct
   let add_write r t = { t with writes = Sreg.add r t.writes }
   let add_raise e t = { t with raises = Sexn.add e t.raises }
   let add_glob  pv t = { t with globals = Spv.add pv t.globals }
-    
+
   let remove s t =
     { t with reads = Sreg.diff t.reads s; writes = Sreg.diff t.writes s }
 
   let filter p t =
     { t with reads = Sreg.filter p t.reads; writes = Sreg.filter p t.writes }
-      
+
   let remove_raise e t = { t with raises = Sexn.remove e t.raises }
-    
+
   let union t1 t2 =
     { reads  = Sreg.union t1.reads  t2.reads;
       writes = Sreg.union t1.writes t2.writes;
       raises = Sexn.union t1.raises t2.raises;
       globals = Spv.union t1.globals t2.globals; }
-      
+
   let equal t1 t2 =
     Sreg.equal t1.reads  t2.reads  &&
     Sreg.equal t1.writes t2.writes &&
     Sexn.equal t1.raises t2.raises
-      
+
   let no_side_effect t =
     Sreg.is_empty t.writes && Sls.is_empty t.raises
-      
+
   let subst_set ts s =
-    let add1 r s = 
-      let r' = 
+    let add1 r s =
+      let r' =
 	try begin match (Mtv.find r.r_tv ts).ty_node with
 	  | Tyvar r' -> R.create r' (ty_inst ts r.r_ty)
 	  | Tyapp _  -> assert false
@@ -668,18 +668,18 @@ end = struct
     Sreg.fold add1 s Sreg.empty
 
   let subst ts t =
-    { reads = subst_set ts t.reads; 
-      writes = subst_set ts t.writes; 
+    { reads = subst_set ts t.reads;
+      writes = subst_set ts t.writes;
       raises = t.raises;
       globals = t.globals; }
-      
+
   let occur r t =
     Sreg.mem r t.reads || Sreg.mem r t.writes
-      
+
   open Format
   open Pp
   open Pretty
-      
+
   let print_rset fmt s = print_list comma R.print  fmt (Sreg.elements s)
   let print_eset fmt s = print_list comma print_ls fmt (Sexn.elements s)
   let print_pvset fmt s = print_list comma T.print_pvsymbol fmt (Spv.elements s)
@@ -694,30 +694,30 @@ end = struct
     if not (Spv.is_empty e.globals) then
       fprintf fmt "@ globals %a" print_pvset e.globals
 
-end 
+end
 
-and Spv : sig include Set.S with type elt = T.pvsymbol end = 
+and Spv : sig include Set.S with type elt = T.pvsymbol end =
   Set.Make(struct type t = T.pvsymbol let compare = T.compare_pvsymbol end)
 
-and Mpv : sig include Map.S with type key = T.pvsymbol end = 
+and Mpv : sig include Map.S with type key = T.pvsymbol end =
   Map.Make(struct type t = T.pvsymbol let compare = T.compare_pvsymbol end)
 
 and Sreg : sig include Set.S with type elt = R.t end = Set.Make(R)
 
 and Mreg : sig include Map.S with type key = R.t end = Map.Make(R)
 
-(* ghost code 
+(* ghost code
 
   abstract type ghost_ 'a model 'a
   parameter ghost_ : x:'a -> {} ghost_ 'a {result=x}
   parameter unghost: x:ghost_ 'a -> {} 'a {result=x}
 *)
 (*****
-let mt_ghost = 
+let mt_ghost =
   let a = create_tvsymbol (id_fresh "a") in
   create_mtsymbol ~mut:false (id_fresh "ghost") [a] (Some (ty_var a))
 
-let ps_ghost = 
+let ps_ghost =
   let a = create_tvsymbol (id_fresh "a") in
   let x = T.create_pvsymbol (id_fresh "x") (T.tpure (ty_var a)) in
   let ty = ty_app mt_ghost.mt_abstr [ty_var a] in
@@ -728,7 +728,7 @@ let ps_ghost =
 	    T.c_post = (result, eq_result_x), []; }
   in
   T.create_psymbol (id_fresh "ghost") (T.tarrow [x] c)
-					 
+
 let ps_unghost =
   let a = create_tvsymbol (id_fresh "a") in
   let ty = ty_app mt_ghost.mt_abstr [ty_var a] in

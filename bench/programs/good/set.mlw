@@ -7,48 +7,48 @@ module M
 
   parameter x : ref int
 
-  parameter set_and_test_zero : 
-    v:int -> 
-      {} 
-      bool writes x 
-      { x = v and if result=True then x = 0 else x <> 0 }
+  parameter set_and_test_zero :
+    v:int ->
+      {}
+      bool writes x
+      { !x = v and if result=True then !x = 0 else !x <> 0 }
 
   let p () = {} if set_and_test_zero 0 then 1 else 2 { result = 1 }
 
-  parameter set_and_test_nzero : 
-    v:int -> 
-      {} 
-      bool writes x 
-      { x = v and if result=True then x <> 0 else x = 0 }
+  parameter set_and_test_nzero :
+    v:int ->
+      {}
+      bool writes x
+      { !x = v and if result=True then !x <> 0 else !x = 0 }
 
-  let p2 (y:ref int) = 
-    { y >= 0 } 
-    while set_and_test_nzero !y do 
-      invariant { y >= 0 } variant { y } 
-      y := !y - 1 
-    done 
-    { y = 0 }
+  let p2 (y:ref int) =
+    { !y >= 0 }
+    while set_and_test_nzero !y do
+      invariant { !y >= 0 } variant { !y }
+      y := !y - 1
+    done
+    { !y = 0 }
 
-  let p3 (y:ref int) = 
-    { y >= 0 } 
-    while let b = set_and_test_nzero !y in b do 
-      invariant { y >= 0 } variant { y } 
-      y := !y - 1 
-    done 
-    { y = 0 }
+  let p3 (y:ref int) =
+    { !y >= 0 }
+    while let b = set_and_test_nzero !y in b do
+      invariant { !y >= 0 } variant { !y }
+      y := !y - 1
+    done
+    { !y = 0 }
 
-  let p4 (y:ref int) = 
-    { y >= 1 } 
-    while begin y := !y - 1; (set_and_test_nzero !y) end do 
-      invariant { y >= 1 } variant { y } 
+  let p4 (y:ref int) =
+    { !y >= 1 }
+    while begin y := !y - 1; (set_and_test_nzero !y) end do
+      invariant { !y >= 1 } variant { !y }
       ()
-    done 
-    { y = 0 }
+    done
+    { !y = 0 }
 
 end
 
 (*
-Local Variables: 
+Local Variables:
 compile-command: "unset LANG; make -C ../../.. bench/programs/good/set"
-End: 
+End:
 *)

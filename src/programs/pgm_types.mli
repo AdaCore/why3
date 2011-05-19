@@ -70,7 +70,7 @@ module rec T : sig
   and pvsymbol = private {
     pv_name   : ident;
     pv_tv     : type_v;
-    pv_effect : vsymbol; 
+    pv_effect : vsymbol;
     pv_pure   : vsymbol;
     pv_regions: Sreg.t;
   }
@@ -78,8 +78,8 @@ module rec T : sig
   val tpure  : ty -> type_v
   val tarrow : pvsymbol list -> type_c -> type_v
 
-  val create_pvsymbol : 
-    preid -> type_v -> 
+  val create_pvsymbol :
+    preid -> type_v ->
     effect:vsymbol -> pure:vsymbol -> regions:Sreg.t -> pvsymbol
 
   (* program symbols *)
@@ -96,7 +96,7 @@ module rec T : sig
     ps_kind   : psymbol_kind;
   }
 
-  val create_psymbol: 
+  val create_psymbol:
     impure:lsymbol -> effect:lsymbol -> pure:lsymbol -> kind:psymbol_kind ->
     psymbol
   val create_psymbol_fun: preid -> type_v -> psymbol

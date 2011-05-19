@@ -7,37 +7,37 @@ use import module ref.Ref
 
 parameter i : ref int
 
-let loop1 (u:unit) = 
-  { i <= 10 }
+let loop1 (u:unit) =
+  { !i <= 10 }
   while !i < 10 do
-    invariant { i <= 10 } variant { 10 - i }
+    invariant { !i <= 10 } variant { 10 - !i }
     i := !i + 1
   done
-  { i = 10 }
+  { !i = 10 }
 
 
 (** 2. The same loop, followed by a function call. *)
 
 parameter x: ref int
 
-let negate (u:unit) = {} x := - !x { x = - (old x) }
+let negate (u:unit) = {} x := - !x { !x = - (old !x) }
 
-let loop2 (u:unit) = 
-  { x <= 10 }
+let loop2 (u:unit) =
+  { !x <= 10 }
   begin
-    while !x < 10 do invariant { x <= 10 } variant { 10 - x } 
+    while !x < 10 do invariant { !x <= 10 } variant { 10 - !x }
       x := !x + 1
     done;
-    assert { x = 10 };
+    assert { !x = 10 };
     if !x > 0 then (negate ());
-    assert { x = -10 }
+    assert { !x = -10 }
   end
   {}
 
 end
 
 (*
-Local Variables: 
+Local Variables:
 compile-command: "unset LANG; make -C ../../.. bench/programs/good/loops"
-End: 
+End:
 *)

@@ -1,14 +1,14 @@
 
 (***
-   	
+
 Algorithm 65
 
-C. A. R. Hoare 	 
+C. A. R. Hoare
 Elliott Brothers Ltd., Hertfordshire, England, U.K.
 
 Communications of the ACM  archive
 Volume 4 ,  Issue 7  (July 1961) table of contents
-Pages: 321 - 322   
+Pages: 321 - 322
 
 ***)
 
@@ -18,18 +18,18 @@ module Algo65
   use import module ref.Ref
   use import module array.Array
   use import module array.ArrayPermut
- 
+
   (* algorithm 63 *)
- 
-  parameter partition : 
+
+  parameter partition :
     a : array int -> m:int -> n:int -> i:ref int -> j:ref int ->
-    { 0 <= m < n < length a } 
+    { 0 <= m < n < length a }
     unit writes a i j
-    { m <= j < i <= n and permut_sub (old a) a m n and
+    { m <= !j < !i <= n and permut_sub (old a) a m n and
       exists x:int.
-        (forall r:int. m <= r <= j -> a[r] <= x) and
-        (forall r:int. j < r < i -> a[r] = x) and
-        (forall r:int. i <= r <= n -> a[r] >= x) }
+        (forall r:int. m <= r <= !j -> a[r] <= x) and
+        (forall r:int. !j < r < !i -> a[r] = x) and
+        (forall r:int. !i <= r <= n -> a[r] >= x) }
 
   (* Algorithm 65 (fixed version) *)
 
@@ -46,14 +46,14 @@ module Algo65
       assert { permut_sub (at a L2) a m n };
       if !i <= k then find a !i n k
     end
-    { permut_sub (old a) a m n and 
+    { permut_sub (old a) a m n and
       (forall r:int. m <= r <= k -> a[r] <= a[k]) and
       (forall r:int. k <= r <= n -> a[k] <= a[r]) }
 
 end
 
 (*
-Local Variables: 
+Local Variables:
 compile-command: "unset LANG; make -C ../.. examples/programs/algo65.gui"
-End: 
+End:
 *)

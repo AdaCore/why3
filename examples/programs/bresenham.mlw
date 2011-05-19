@@ -5,10 +5,10 @@ module M
   use import int.Int
   use import module ref.Ref
 
-  (*  Parameters. 
-      Without loss of generality, we can take [x1=0] and [y1=0]. 
+  (*  Parameters.
+      Without loss of generality, we can take [x1=0] and [y1=0].
       Thus the line to draw joins [(0,0)] to [(x2,y2)]
-      and we have [deltax = x2] and [deltay = y2]. 
+      and we have [deltax = x2] and [deltay = y2].
       Moreover we assume being in the first octant, i.e.
       [0 <= y2 <= x2]. The seven other cases can be easily
       deduced by symmetry. *)
@@ -22,27 +22,27 @@ module M
       possible point i.e. the closest to the real line (see the Coq file).
       The invariant relates [x], [y] and [e] and
       gives lower and upper bound for [e] (see the Coq file). *)
-  
+
   use import int.Abs
-  
+
   logic best (x y:int) =
     forall y':int. abs (x2 * y - x * y2) <= abs (x2 * y' - x * y2)
-  
+
   logic invariant_ (x y e:int) =
     e = 2 * (x + 1) * y2 - (2 * y + 1) * x2 and
     2 * (y2 - x2) <= e <= 2 * y2
-  
+
   lemma Invariant_is_ok : forall x y e:int. invariant_ x y e -> best x y
-  
+
   let bresenham () =
     let x = ref 0 in
     let y = ref 0 in
     let e = ref (2 * y2 - x2) in
     while !x <= x2 do
-      invariant {0 <= x and x <= x2 + 1 and invariant_ x y e }
-      variant   { x2 + 1 - x }
-      (* here we would plot (x, y) *) 
-      assert { best x y };
+      invariant { 0 <= !x <= x2 + 1 and invariant_ !x !y !e }
+      variant   { x2 + 1 - !x }
+      (* here we would plot (x, y) *)
+      assert { best !x !y };
       if !e < 0 then
         e := !e + 2 * y2
       else begin
@@ -55,7 +55,7 @@ module M
 end
 
 (*
-Local Variables: 
+Local Variables:
 compile-command: "unset LANG; make -C ../.. examples/programs/bresenham.gui"
-End: 
+End:
 *)

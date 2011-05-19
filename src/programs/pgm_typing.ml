@@ -1770,8 +1770,8 @@ let make_immutable_type td =
   let td = { td with td_model = false } in
   let make_immutable_field (loc, _, id, ty) = (loc, false, id, ty) in
   match td.td_def with
-    | TDrecord [_, _, _, ty] -> (* singleton record *)
-	{ td with td_def = TDalias ty }
+(*     | TDrecord [_, _, _, ty] -> (\* singleton record *\) *)
+(* 	{ td with td_def = TDalias ty } *)
     | TDrecord fl ->
 	{ td with td_def = TDrecord (List.map make_immutable_field fl) }
     | TDabstract | TDalias _ | TDalgebraic _ ->

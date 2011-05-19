@@ -119,14 +119,14 @@ let search () =
   label Init:
   let s = ref 0 in
   for i = 0 to m - 1 do (* could be n instead of m *)
-    invariant { s = sum x.elts 0 i }
+    invariant { !s = sum x.elts 0 i }
     s := !s + x[i]
   done;
-  assert { s = sum x.elts 0 m };
+  assert { !s = sum x.elts 0 m };
   for d = 0 to m - 1 do
     invariant {
       x = at x Init and
-      s = sum x.elts d m
+      !s = sum x.elts d m
     }
     for c = x[d] + 1 to 9 do
       invariant { x = at x Init }
@@ -243,14 +243,14 @@ let search_smallest () =
   label Init:
   let s = ref 0 in
   for i = 0 to m - 1 do (* could be n instead of m *)
-    invariant { s = sum x.elts 0 i }
+    invariant { !s = sum x.elts 0 i }
     s := !s + x[i]
   done;
-  assert { s = sum x.elts 0 m };
+  assert { !s = sum x.elts 0 m };
   for d = 0 to m - 1 do
     invariant {
       x = at x Init and
-      s = sum x.elts d m and
+      !s = sum x.elts d m and
       forall u : int.
          interp (at x.elts Init) 0 m < u <= interp9 x.elts d m -> sum_digits u <> y
     }

@@ -14,33 +14,33 @@ module HoareLogic
   (* Example: Slow Subtraction *)
 
   let slow_subtraction (x: ref int) (z: ref int) =
-    { x >= 0 }
+    { !x >= 0 }
     label Init:
     while !x <> 0 do
-      invariant { 0 <= x and z - x = at z Init - at x Init } variant { x }
+      invariant { 0 <= !x and !z - !x = at !z Init - at !x Init } variant { !x }
       z := !z - 1;
       x := !x - 1
     done
-    { z = old z - old x }
+    { !z = old !z - old !x }
 
   (* Example: Reduce to Zero *)
 
   let reduce_to_zero (x: ref int) =
-    { x >= 0 }
-    while !x <> 0 do invariant { x >= 0 } variant { x } x := !x - 1 done
-    { x = 0 }
+    { !x >= 0 }
+    while !x <> 0 do invariant { !x >= 0 } variant { !x } x := !x - 1 done
+    { !x = 0 }
 
   (* Exercise: Slow Addition *)
 
   let slow_addition (x: ref int) (z: ref int) =
-    { x >= 0 }
+    { !x >= 0 }
     label Init:
     while !x <> 0 do
-      invariant { 0 <= x and z + x = at z Init + at x Init } variant { x }
+      invariant { 0 <= !x and !z + !x = at !z Init + at !x Init } variant { !x }
       z := !z + 1;
       x := !x - 1
     done
-    { z = old z + old x }
+    { !z = old !z + old !x }
 
   (* Example: Parity *)
 
@@ -51,28 +51,28 @@ module HoareLogic
   lemma even_not_odd : forall x:int. even x -> even (x+1) -> false
 
   let parity (x: ref int) (y: ref int) =
-    { x >= 0 }
+    { !x >= 0 }
     y := 0;
     label Init:
     while !x <> 0 do
-      invariant { 0 <= x and (y=0 and even (at x Init - x) or
-                              y=1 and even (at x Init - x + 1)) }
-      variant { x }
+      invariant { 0 <= !x and (!y=0 and even (at !x Init - !x) or
+                               !y=1 and even (at !x Init - !x + 1)) }
+      variant { !x }
       y := 1 - !y;
       x := !x - 1
     done
-    { y=0 <-> even (old x) }
+    { !y=0 <-> even (old !x) }
 
   (* Example: Finding Square Roots *)
 
   let sqrt (x: ref int) (z: ref int) =
-    { x >= 0 }
+    { !x >= 0 }
     z := 0;
     while (!z + 1) * (!z + 1) <= !x do
-      invariant { 0 <= z and z*z <= x } variant { x - z*z }
+      invariant { 0 <= !z and !z * !z <= !x } variant { !x - !z * !z }
       z := !z + 1
     done
-    { z*z <= x < (z+1)*(z+1) } 
+    { !z * !z <= !x < (!z + 1) * (!z + 1) }
 
   (* Exercise: Factorial *)
 
@@ -81,15 +81,15 @@ module HoareLogic
   axiom fact_n : forall n:int. 0 < n -> fact n = n * fact (n-1)
 
   let factorial (x: ref int) (y: ref int) (z: ref int) =
-    { x >= 0 }
+    { !x >= 0 }
     y := 1;
     z := !x;
     while !z <> 0 do
-      invariant { 0 <= z and y * fact z = fact x } variant { z }
+      invariant { 0 <= !z and !y * fact !z = fact !x } variant { !z }
       y := !y * !z;
       z := !z - 1
     done
-    { y = fact x }
+    { !y = fact !x }
 
 end
 
@@ -114,13 +114,13 @@ module MoreHoareLogic
     y := 0;
     label Init:
     while !l <> Nil do
-      invariant { length l <= length (at l Init) and 
-                  y + sum l = sum (at l Init) } 
-      variant { length l }
+      invariant { length !l <= length (at !l Init) and
+                  !y + sum !l = sum (at !l Init) }
+      variant { length !l }
       y := !y + head !l;
       l := tail !l
     done
-    { y = sum (old l) }
+    { !y = sum (old !l) }
 
   use import list.Mem
   use import list.Append
@@ -131,20 +131,20 @@ module MoreHoareLogic
     z := 0;
     label Init:
     while !x <> Nil do
-      invariant { length x <= length (at x Init) and 
-                  (mem y x -> mem y (at x Init)) and
-                  (z=1 and mem y (at x Init) or
-                   z=0 and (mem y (at x Init) -> mem y x)) }
-      variant { length x }
+      invariant { length !x <= length (at !x Init) and
+                  (mem y !x -> mem y (at !x Init)) and
+                  (!z=1 and mem y (at !x Init) or
+                   !z=0 and (mem y (at !x Init) -> mem y !x)) }
+      variant { length !x }
       if y = head !x then z := 1;
       x := tail !x
     done
-    { z=1 <-> mem y (old x) }
+    { !z=1 <-> mem y (old !x) }
 
 end
 
 (*
-Local Variables: 
+Local Variables:
 compile-command: "unset LANG; make -C ../.. examples/programs/sf.gui"
-End: 
+End:
 *)

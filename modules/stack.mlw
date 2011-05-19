@@ -6,37 +6,40 @@ module Stack
   use import list.List
   use import list.Length
 
-  type t 'a model {| mutable contents: list 'a |}
+  type t 'a model {| mutable elts: list 'a |}
 
-  parameter create : unit -> {} t 'a { result = Nil }
+  parameter create : unit -> {} t 'a { result.elts = Nil }
 
-  parameter push : x:'a -> s:t 'a -> {} unit writes s { s = Cons x (old s) }
+  parameter push :
+    x:'a -> s:t 'a -> {} unit writes s { s.elts = Cons x (old s.elts) }
 
   exception Empty
 
-  parameter pop : 
-    s:t 'a -> 
-    {} 
-    'a 
+  parameter pop :
+    s:t 'a ->
+    {}
+    'a
     writes s raises Empty
-    { match old s with Nil -> false | Cons x t -> result = x and s = t end } 
-    | Empty -> { s = old s = Nil }
+    { match old s.elts with Nil -> false
+                          | Cons x t -> result = x and s.elts = t end }
+    | Empty -> { s.elts = old s.elts = Nil }
 
-  parameter top : 
-    s:t 'a -> 
-    {} 
-    'a 
+  parameter top :
+    s:t 'a ->
+    {}
+    'a
     reads s raises Empty
-    { match s with Nil -> false | Cons x _ -> result = x end } 
-    | Empty -> { s = Nil }
+    { match s.elts with Nil -> false | Cons x _ -> result = x end }
+    | Empty -> { s.elts = Nil }
 
-  parameter clear : s:t 'a -> {} unit writes s { s = Nil }
+  parameter clear : s:t 'a -> {} unit writes s { s.elts = Nil }
 
   parameter copy : s:t 'a -> {} t 'a { result = s }
 
-  parameter is_empty : s:t 'a -> {} bool reads s { result=True <-> s = Nil }
+  parameter is_empty :
+    s:t 'a -> {} bool reads s { result=True <-> s.elts = Nil }
 
-  parameter length : s:t 'a -> {} int reads s { result = length s }
+  parameter length : s:t 'a -> {} int reads s { result = length s.elts }
 
 end
 
@@ -44,11 +47,11 @@ module Test
 
   use import int.Int
   use import list.List
-  use module Stack
+  use import module Stack
 
   let test0 () =
     let s = Stack.create () : Stack.t 'a in
-    assert { s = Nil };
+    assert { s.elts = Nil };
     let b = Stack.is_empty s in
     assert { b = True };
     let n = Stack.length s in
@@ -65,7 +68,7 @@ module Test
 end
 
 (*
-Local Variables: 
+Local Variables:
 compile-command: "unset LANG; make -C .. modules/stack"
-End: 
+End:
 *)

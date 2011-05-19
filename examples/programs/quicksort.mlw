@@ -28,10 +28,10 @@ module Quicksort
       let m = ref l in
       label L: begin
       for i = l + 1 to r do
-	invariant { (forall j:int. l < j <= m -> t[j] < v) and
-                    (forall j:int. m < j <  i -> t[j] >= v) and
+	invariant { (forall j:int. l < j <= !m -> t[j] < v) and
+                    (forall j:int. !m < j <  i -> t[j] >= v) and
                     permut_sub t (at t L) l r and
-                    t[l] = v and l <= m < i }
+                    t[l] = v and l <= !m < i }
         if t[i] < v then begin m := !m + 1; swap t i !m end
       done;
       swap t l !m;

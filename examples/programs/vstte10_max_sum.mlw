@@ -12,7 +12,7 @@ module M
   let sum = ref 0 in
   let max = ref 0 in
   for i = 0 to n-1 do
-    invariant { sum <= i * max and forall j:int. 0 <= j < i -> a[j] <= max }
+    invariant { !sum <= i * !max and forall j:int. 0 <= j < i -> a[j] <= !max }
     if !max < a[i] then max := a[i];
     sum := !sum + a[i]
   done;

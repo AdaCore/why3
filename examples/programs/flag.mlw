@@ -28,13 +28,13 @@ module Flag
     let r = ref n in
     label Init:
     while !i < !r do
-       invariant { 0 <= b <= i and i <= r <= n and
-  	         monochrome a 0 b Blue and
-  	         monochrome a b i White and
-  	         monochrome a r n Red and
+       invariant { 0 <= !b <= !i <= !r <= n and
+  	         monochrome a 0  !b Blue and
+  	         monochrome a !b !i White and
+  	         monochrome a !r n  Red and
   		 length a = n and
   	         permut_sub a (at a Init) 0 (n-1) }
-       variant { r - i }
+       variant { !r - !i }
        match a[!i] with
        | Blue ->
          swap a !b !i;
