@@ -226,6 +226,13 @@ module type S =
       (key -> 'a -> 'acc -> 'acc * 'b) -> 'a t -> 'acc -> 'acc * 'b t
     (** fold and map at the same time *)
 
+    val fold2_inter: (key -> 'a -> 'b -> 'c -> 'c) -> 'a t -> 'b t -> 'c -> 'c
+    (** fold the common keys of two map at the same time *)
+
+    val fold2_union: (key -> 'a option -> 'b option -> 'c -> 'c)
+      -> 'a t -> 'b t -> 'c -> 'c
+    (** fold the keys which appear in one of the two map at the same time  *)
+
     val translate : (key -> key) -> 'a t -> 'a t
     (** [translate f m] translates the keys in the map [m] by the
         function [f]. [f] must be strictly monotone on the key of [m].
@@ -362,6 +369,11 @@ module type S =
 
       val diff : t -> t -> t
       (** [diss f s1 s2] computes the difference of two sets *)
+
+      val fold2:  (elt -> 'a -> 'a) -> t -> t -> 'a -> 'a
+      (** [fold f s1 s2 a] computes [(f eN ... (f e1 a)...)],
+          where [e1 ... eN] are the element of [s1] and [s2]
+          in increasing order. *)
 
       val translate : (elt -> elt) -> t -> t
       (** [translate f s] translates the elements in the set [s] by the

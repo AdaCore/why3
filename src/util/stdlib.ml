@@ -63,6 +63,9 @@ module type S =
     val mapi_filter: (key -> 'a -> 'b option) -> 'a t -> 'b t
     val mapi_fold:
       (key -> 'a -> 'acc -> 'acc * 'b) -> 'a t -> 'acc -> 'acc * 'b t
+    val fold2_inter: (key -> 'a -> 'b -> 'c -> 'c) -> 'a t -> 'b t -> 'c -> 'c
+    val fold2_union: (key -> 'a option -> 'b option -> 'c -> 'c) ->
+      'a t -> 'b t -> 'c -> 'c
     val translate : (key -> key) -> 'a t -> 'a t
     val mapi_filter_fold:
       (key -> 'a -> 'acc -> 'acc * 'b option) -> 'a t -> 'acc -> 'acc * 'b t
@@ -101,6 +104,7 @@ module type S =
       val union : t -> t -> t
       val inter : t -> t -> t
       val diff : t -> t -> t
+      val fold2:  (elt -> 'a -> 'a) -> t -> t -> 'a -> 'a
       val translate : (elt -> elt) -> t -> t
       val add_new : elt -> exn -> t -> t
     end
@@ -506,6 +510,40 @@ module Make(Ord: OrderedType) = struct
           let acc,r' = mapi_fold f r acc in
           acc,Node(l', v, d', r', h)
 
+    let fold2_inter f m1 m2 acc =
+      let rec aux acc e1_0 e2_0 =
+          match (e1_0, e2_0) with
+          (End, End) -> acc
+        | (End, _)  -> acc
+        | (_, End) -> acc
+        | (More(v1, d1, r1, e1), More(v2, d2, r2, e2)) ->
+          let c = Ord.compare v1 v2 in
+          if c = 0 then
+            aux (f v1 d1 d2 acc) (cons_enum r1 e1) (cons_enum r2 e2)
+          else if c < 0 then
+            aux acc (cons_enum r1 e1) e2_0
+          else
+            aux acc e1_0 (cons_enum r2 e2)
+      in aux acc (cons_enum m1 End) (cons_enum m2 End)
+
+    let fold2_union f m1 m2 acc =
+      let rec aux acc e1_0 e2_0 =
+          match (e1_0, e2_0) with
+          (End, End) -> acc
+        | (End, More(v2, d2, r2, e2)) ->
+          aux (f v2 None (Some d2) acc) End (cons_enum r2 e2)
+        | (More(v1, d1, r1, e1), End) ->
+          aux (f v1 (Some d1) None acc) (cons_enum r1 e1) End
+        | (More(v1, d1, r1, e1), More(v2, d2, r2, e2)) ->
+          let c = Ord.compare v1 v2 in
+          if c = 0 then
+            aux (f v1 (Some d1) (Some d2) acc)
+              (cons_enum r1 e1) (cons_enum r2 e2)
+          else if c < 0 then
+            aux (f v1 (Some d1) None acc) (cons_enum r1 e1) e2_0
+          else
+            aux (f v2 None (Some d2) acc) e1_0 (cons_enum r2 e2)
+      in aux acc (cons_enum m1 End) (cons_enum m2 End)
 
     let translate f m =
       let rec aux last = function
@@ -567,6 +605,7 @@ module Make(Ord: OrderedType) = struct
       val union : t -> t -> t
       val inter : t -> t -> t
       val diff : t -> t -> t
+      val fold2:  (elt -> 'a -> 'a) -> t -> t -> 'a -> 'a
       val translate : (elt -> elt) -> t -> t
       val add_new : elt -> exn -> t -> t
     end
@@ -608,6 +647,7 @@ module Make(Ord: OrderedType) = struct
         let union = union (fun _ _ _ -> Some ())
         let inter = inter (fun _ _ _ -> Some ())
         let diff = diff (fun _ _ _ -> None)
+        let fold2 f = fold2_union (fun k _ _ acc -> f k acc)
         let translate = translate
         let add_new x = add_new x ()
       end
