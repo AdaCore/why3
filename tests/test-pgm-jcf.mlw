@@ -46,20 +46,6 @@ let test_all_1 () =
   (!x >= 0 && not (!x = 0) || !x >= 1)
   { result=True <-> !x>=1 }
 
-(* from Cesar Munoz's CD3D *)
-
-  logic d : int
-
-parameter vx : ref int
-parameter vy : ref int
-
-parameter sq : x:int -> {} int { result = x*x }
-
-let test_cd3d () =
- { true }
- if !vx=0 && !vy=0 && sq !vx + sq !vy < sq d  then 1 else 2
- { result=1 -> !vx=0 and !vy=0 }
-
 end
 
 (*
@@ -67,6 +53,7 @@ Local Variables:
 compile-command: "unset LANG; make -C ../../.. bench/programs/good/booleans"
 End:
 *)
+
 
 
 

@@ -1181,6 +1181,8 @@ and itriple gl env (p, e, q) =
 let rec ty_effect ef ty = match ty.ty_node with
   | Ty.Tyvar _ ->
       ef
+  | Ty.Tyapp (ts, _) when ts_equal ts ts_arrow ->
+      ef
   | Ty.Tyapp (ts, tyl) ->
       let mt = get_mtsymbol ts in
       let rl = regions_tyapp ts mt.mt_regions tyl in
