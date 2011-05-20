@@ -71,7 +71,7 @@ let rec elim_t t = TermTF.t_map elim_t elim_f t
 let add_ld axl d = match d with
   | _, None -> axl, d
   | ls, Some ld ->
-      let vl,e = open_ls_defn ld in
+      let vl,e,close = open_ls_defn_cb ld in
       begin match e.t_ty with
         | Some _ when has_if e ->
             let nm = ls.ls_name.id_string ^ "_def" in
@@ -80,7 +80,7 @@ let add_ld axl d = match d with
             let f = t_forall_close vl [] (elim_f (t_equ hd e)) in
             create_prop_decl Paxiom pr f :: axl, (ls, None)
         | _ ->
-            axl, make_ls_defn ls vl (TermTF.t_select elim_t elim_f e)
+            axl, close ls vl (TermTF.t_select elim_t elim_f e)
       end
 
 let elim_d d = match d.d_node with

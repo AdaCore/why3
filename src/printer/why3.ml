@@ -128,7 +128,7 @@ let unambig_fs fs =
     | Tyvar u when not (lookup u) -> false
     | _ -> ty_all inspect ty
   in
-  inspect (of_option fs.ls_value)
+  option_apply true inspect fs.ls_value
 
 (** Patterns, terms, and formulas *)
 
@@ -170,17 +170,11 @@ let prio_binop = function
 let print_label = Pretty.print_label
 
 let rec print_term fmt t = print_lterm 0 fmt t
-and     print_fmla fmt f = print_lfmla 0 fmt f
 
 and print_lterm pri fmt t = match t.t_label with
   | [] -> print_tnode pri fmt t
   | ll -> fprintf fmt (protect_on (pri > 0) "%a %a")
       (print_list space print_label) ll (print_tnode 0) t
-
-and print_lfmla pri fmt f = match f.t_label with
-  | [] -> print_fnode pri fmt f
-  | ll -> fprintf fmt (protect_on (pri > 0) "%a %a")
-      (print_list space print_label) ll (print_fnode 0) f
 
 and print_tapp pri fs fmt tl =
   match query_syntax fs.ls_name with
@@ -203,7 +197,7 @@ and print_tnode pri fmt t = match t.t_node with
         (print_tapp 0 fs) tl print_ty (t_type t)
   | Tif (f,t1,t2) ->
       fprintf fmt (protect_on (pri > 0) "if @[%a@] then %a@ else %a")
-        print_fmla f print_term t1 print_term t2
+        print_term f print_term t1 print_term t2
   | Tlet (t1,tb) ->
       let v,t2 = t_open_bound tb in
       fprintf fmt (protect_on (pri > 0) "let %a = @[%a@] in@ %a")
@@ -215,63 +209,32 @@ and print_tnode pri fmt t = match t.t_node with
   | Teps fb ->
       let v,f = t_open_bound fb in
       fprintf fmt (protect_on (pri > 0) "epsilon %a.@ %a")
-        print_vsty v print_fmla f;
+        print_vsty v print_term f;
       forget_var v
-  | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> raise (TermExpected t)
-
-and print_fnode pri fmt f = match f.t_node with
-  | Tapp (ps, tl) -> begin match query_syntax ps.ls_name with
-      | Some s -> syntax_arguments s print_term fmt tl
-      | None -> begin match tl with
-          | [] -> print_ls fmt ps
-          | tl -> fprintf fmt (protect_on (pri > 4) "%a@ %a")
-              print_ls ps (print_list space (print_lterm 5)) tl
-          end
-      end
   | Tquant (q,fq) ->
       let vl,tl,f = t_open_quant fq in
       fprintf fmt (protect_on (pri > 0) "%a %a%a.@ %a") print_quant q
-        (print_list comma print_vsty) vl print_tl tl print_fmla f;
+        (print_list comma print_vsty) vl print_tl tl print_term f;
       List.iter forget_var vl
+  | Tbinop (b,f1,f2) ->
+      let p = prio_binop b in
+      fprintf fmt (protect_on (pri > p) "%a %a@ %a")
+        (print_lterm (p + 1)) f1 print_binop b (print_lterm p) f2
+  | Tnot f ->
+      fprintf fmt (protect_on (pri > 4) "not %a") (print_lterm 4) f
   | Ttrue ->
       fprintf fmt "true"
   | Tfalse ->
       fprintf fmt "false"
-  | Tbinop (b,f1,f2) ->
-      let p = prio_binop b in
-      fprintf fmt (protect_on (pri > p) "%a %a@ %a")
-        (print_lfmla (p + 1)) f1 print_binop b (print_lfmla p) f2
-  | Tnot f ->
-      fprintf fmt (protect_on (pri > 4) "not %a") (print_lfmla 4) f
-  | Tif (f1,f2,f3) ->
-      fprintf fmt (protect_on (pri > 0) "if @[%a@] then %a@ else %a")
-        print_fmla f1 print_fmla f2 print_fmla f3
-  | Tlet (t,f) ->
-      let v,f = t_open_bound f in
-      fprintf fmt (protect_on (pri > 0) "let %a = @[%a@] in@ %a")
-        print_vs v (print_lterm 4) t print_fmla f;
-      forget_var v
-  | Tcase (t,bl) ->
-      fprintf fmt "match @[%a@] with@\n@[<hov>%a@]@\nend"
-        print_term t (print_list newline print_fbranch) bl
-  | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
 
 and print_tbranch fmt br =
   let p,t = t_open_branch br in
   fprintf fmt "@[<hov 4>| %a ->@ %a@]" print_pat p print_term t;
   Svs.iter forget_var p.pat_vars
 
-and print_fbranch fmt br =
-  let p,f = t_open_branch br in
-  fprintf fmt "@[<hov 4>| %a ->@ %a@]" print_pat p print_fmla f;
-  Svs.iter forget_var p.pat_vars
-
 and print_tl fmt tl =
   if tl = [] then () else fprintf fmt "@ [%a]"
-    (print_list alt (print_list comma print_expr)) tl
-
-and print_expr fmt =
-  TermTF.t_select (print_term fmt) (print_fmla fmt)
+    (print_list alt (print_list comma print_term)) tl
 
 (** Declarations *)
 
@@ -320,7 +283,7 @@ let print_logic_decl fst fmt (ls,ld) = match ld with
       fprintf fmt "@[<hov 2>%s %a%a%a =@ %a@]@\n@\n"
         (if fst then "logic" else "with") print_ls ls
         (print_list nothing print_vs_arg) vl
-        (print_option print_ls_type) ls.ls_value print_expr e;
+        (print_option print_ls_type) ls.ls_value print_term e;
       List.iter forget_var vl
   | None ->
       fprintf fmt "@[<hov 2>%s %a%a%a@]@\n@\n"
@@ -333,7 +296,7 @@ let print_logic_decl first fmt d =
     (print_logic_decl first fmt d; forget_tvs ())
 
 let print_ind fmt (pr,f) =
-  fprintf fmt "@[<hov 4>| %a : %a@]" print_pr pr print_fmla f
+  fprintf fmt "@[<hov 4>| %a : %a@]" print_pr pr print_term f
 
 let print_ind_decl fst fmt (ps,bl) =
   fprintf fmt "@[<hov 2>%s %a%a =@ @[<hov>%a@]@]@\n@\n"
@@ -349,7 +312,7 @@ let print_pkind = Pretty.print_pkind
 
 let print_prop_decl fmt (k,pr,f) =
   fprintf fmt "@[<hov 2>%a %a : %a@]@\n@\n" print_pkind k
-    print_pr pr print_fmla f
+    print_pr pr print_term f
 
 let print_prop_decl fmt (k,pr,f) = match k with
   | Paxiom when query_remove pr.pr_name -> ()

@@ -67,20 +67,12 @@ module Transform = struct
 
   (** translation of terms *)
   let rec term_transform varM t = match t.t_node with
-    | Tapp(f, terms) ->
+      (* first case : predicate (not =), we must translate it and its args *)
+    | Tapp(f, terms) when not (ls_equal f ps_equ) ->
       let terms = args_transform varM f terms t.t_ty in
       t_app (findL f) terms t.t_ty
     | _ -> (* default case : traverse *)
-      TermTF.t_map (term_transform varM) (fmla_transform varM) t
-
-  (** translation of formulae *)
-  and fmla_transform varM f = match f.t_node with
-      (* first case : predicate (not =), we must translate it and its args *)
-    | Tapp(p,terms) when not (ls_equal p ps_equ) ->
-      let terms = args_transform varM p terms None in
-      ps_app (findL p) terms
-    | _ -> (* otherwise : just traverse and translate *)
-      TermTF.t_map (term_transform varM) (fmla_transform varM) f
+      t_map (term_transform varM) t
 
   and args_transform varM ls args ty =
     (* Debug.print_list Pretty.print_ty Format.std_formatter type_vars; *)
@@ -98,19 +90,14 @@ module Transform = struct
     let helper = function
     | (lsymbol, Some ldef) ->
       let new_lsymbol = findL lsymbol in (* new lsymbol *)
-      let vars,expr = open_ls_defn ldef in
+      let vars,expr,close = open_ls_defn_cb ldef in
       let add v (vl,vm) =
         let vs = Term.create_vsymbol (id_fresh "t") ty_type in
         vs :: vl, Mtv.add v (t_var vs) vm
       in
       let vars,varM = Stv.fold add (ls_ty_freevars lsymbol) (vars,Mtv.empty) in
-      (match expr.t_ty with
-      | Some _ ->
-          let t = term_transform varM expr in
-          Decl.make_ls_defn new_lsymbol vars t
-      | None ->
-          let f = fmla_transform varM expr in
-          Decl.make_ls_defn new_lsymbol vars f)
+      let t = term_transform varM expr in
+      close new_lsymbol vars t
     | (lsymbol, None) ->
       (findL lsymbol, None)
     in
@@ -118,13 +105,13 @@ module Transform = struct
 
   (** transform an inductive declaration *)
   let ind_transform idl =
-    let iconv (pr,f) = pr, Libencoding.t_type_close fmla_transform f in
+    let iconv (pr,f) = pr, Libencoding.t_type_close term_transform f in
     let conv (ls,il) = findL ls, List.map iconv il in
     [Decl.create_ind_decl (List.map conv idl)]
 
   (** transforms a proposition into another (mostly a substitution) *)
   let prop_transform (prop_kind, prop_name, f) =
-    let quantified_fmla = Libencoding.t_type_close fmla_transform f in
+    let quantified_fmla = Libencoding.t_type_close term_transform f in
     [Decl.create_prop_decl prop_kind prop_name quantified_fmla]
 
 end

@@ -153,7 +153,6 @@ let vs_monomorph ty_base kept vs =
 
 let rec t_monomorph ty_base kept lsmap consts vmap t =
   let t_mono = t_monomorph ty_base kept lsmap consts in
-  let f_mono = f_monomorph ty_base kept lsmap consts in
   t_label_copy t (match t.t_node with
     | Tvar v ->
         Mvs.find v vmap
@@ -163,12 +162,13 @@ let rec t_monomorph ty_base kept lsmap consts vmap t =
         let ls = ls_of_const ty_base t in
         consts := Sls.add ls !consts;
         fs_app ls [] ty_base
-    | Tapp (fs,tl) ->
-        let fs = lsmap fs in
-        let ty = of_option fs.ls_value in
-        fs_app fs (List.map (t_mono vmap) tl) ty
+    | Tapp (ps,[t1;t2]) when ls_equal ps ps_equ ->
+        t_equ (t_mono vmap t1) (t_mono vmap t2)
+    | Tapp (ls,tl) ->
+        let ls = lsmap ls in
+        t_app ls (List.map (t_mono vmap) tl) ls.ls_value
     | Tif (f,t1,t2) ->
-        t_if (f_mono vmap f) (t_mono vmap t1) (t_mono vmap t2)
+        t_if (t_mono vmap f) (t_mono vmap t1) (t_mono vmap t2)
     | Tlet (t1,b) ->
         let u,t2,close = t_open_bound_cb b in
         let v = vs_monomorph ty_base kept u in
@@ -179,47 +179,26 @@ let rec t_monomorph ty_base kept lsmap consts vmap t =
     | Teps b ->
         let u,f,close = t_open_bound_cb b in
         let v = vs_monomorph ty_base kept u in
-        let f = f_mono (Mvs.add u (t_var v) vmap) f in
+        let f = t_mono (Mvs.add u (t_var v) vmap) f in
         t_eps (close v f)
-    | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> raise (TermExpected t))
-
-and f_monomorph ty_base kept lsmap consts vmap f =
-  let t_mono = t_monomorph ty_base kept lsmap consts in
-  let f_mono = f_monomorph ty_base kept lsmap consts in
-  t_label_copy f (match f.t_node with
-    | Tapp (ps,[t1;t2]) when ls_equal ps ps_equ ->
-        t_equ (t_mono vmap t1) (t_mono vmap t2)
-    | Tapp (ps,tl) ->
-        ps_app (lsmap ps) (List.map (t_mono vmap) tl)
     | Tquant (q,b) ->
         let ul,tl,f1,close = t_open_quant_cb b in
         let vl = List.map (vs_monomorph ty_base kept) ul in
         let add acc u v = Mvs.add u (t_var v) acc in
         let vmap = List.fold_left2 add vmap ul vl in
-        let tl = TermTF.tr_map (t_mono vmap) (f_mono vmap) tl in
-        t_quant q (close vl tl (f_mono vmap f1))
+        let tl = tr_map (t_mono vmap) tl in
+        t_quant q (close vl tl (t_mono vmap f1))
     | Tbinop (op,f1,f2) ->
-        t_binary op (f_mono vmap f1) (f_mono vmap f2)
+        t_binary op (t_mono vmap f1) (t_mono vmap f2)
     | Tnot f1 ->
-        t_not (f_mono vmap f1)
+        t_not (t_mono vmap f1)
     | Ttrue | Tfalse ->
-        f
-    | Tif (f1,f2,f3) ->
-        t_if (f_mono vmap f1) (f_mono vmap f2) (f_mono vmap f3)
-    | Tlet (t,b) ->
-        let u,f1,close = t_open_bound_cb b in
-        let v = vs_monomorph ty_base kept u in
-        let f1 = f_mono (Mvs.add u (t_var v) vmap) f1 in
-        t_let (t_mono vmap t) (close v f1)
-    | Tcase _ ->
-        Printer.unsupportedTerm f "no match expressions at this point"
-    | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f))
+        t)
 
 let d_monomorph ty_base kept lsmap d =
   let kept = Sty.add ty_base kept in
   let consts = ref Sls.empty in
   let t_mono = t_monomorph ty_base kept lsmap consts in
-  let f_mono = f_monomorph ty_base kept lsmap consts in
   let dl = match d.d_node with
     | Dtype tdl ->
         let add td acc = match td with
@@ -237,22 +216,21 @@ let d_monomorph ty_base kept lsmap d =
           in
           match ld with
           | Some ld ->
-              let ul,e = open_ls_defn ld in
+              let ul,e,close = open_ls_defn_cb ld in
               let vl = List.map (vs_monomorph ty_base kept) ul in
               let add acc u v = Mvs.add u (t_var v) acc in
               let vmap = List.fold_left2 add Mvs.empty ul vl in
-              let e = TermTF.t_selecti t_mono f_mono vmap e in
-              make_ls_defn ls vl e
+              close ls vl (t_mono vmap e)
           | None ->
               ls, None
         in
         [create_logic_decl (List.map conv ldl)]
     | Dind idl ->
-        let iconv (pr,f) = pr, f_mono Mvs.empty f in
+        let iconv (pr,f) = pr, t_mono Mvs.empty f in
         let conv (ls,il) = lsmap ls, List.map iconv il in
         [create_ind_decl (List.map conv idl)]
     | Dprop (k,pr,f) ->
-        [create_prop_decl k pr (f_mono Mvs.empty f)]
+        [create_prop_decl k pr (t_mono Mvs.empty f)]
   in
   let add ls acc = create_logic_decl [ls,None] :: acc in
   Sls.fold add !consts dl

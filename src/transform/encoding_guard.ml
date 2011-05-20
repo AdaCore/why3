@@ -87,7 +87,7 @@ module Transform = struct
   (** creates a new logic symbol, with a different type if the
   given symbol was polymorphic *)
   let findL = Wls.memoize 63 (fun lsymbol ->
-    if ls_equal lsymbol ps_equ || lsymbol.ls_value = None then lsymbol else
+    if lsymbol.ls_value = None then lsymbol else
     let new_ty = type_variable_only_in_value lsymbol in
     (* as many t as type vars *)
     if Stv.is_empty new_ty then lsymbol (* same type *) else
@@ -113,30 +113,22 @@ module Transform = struct
   (** translation of terms *)
   let rec term_transform kept varM t =
     match t.t_node with
-    | Tapp(f, terms) ->
-      let terms = args_transform kept varM f terms (t_type t) in
-      t_app (findL f) terms t.t_ty
-    | _ -> (* default case : traverse *)
-      TermTF.t_map (term_transform kept varM) (fmla_transform kept varM) t
-
-  (** translation of formulae *)
-  and fmla_transform kept varM f =
-    match f.t_node with
       (* first case : predicate are not translated *)
-    | Tapp(p,terms) ->
+    | Tapp(p,terms) when t.t_ty = None ->
       let terms = List.map (term_transform kept varM) terms in
       ps_app (findL p) terms
+    | Tapp(f,terms) ->
+      let terms = args_transform kept varM f terms (t_type t) in
+      t_app (findL f) terms t.t_ty
     | Tquant(q,_) ->
-      let vsl,trl,fmla = f_open_all_quant q f in
-      let fmla = fmla_transform kept varM fmla in
+      let vsl,trl,fmla = f_open_all_quant q t in
+      let fmla = term_transform kept varM fmla in
       let fmla2 = guard q kept varM fmla vsl in
         (* TODO : how to modify the triggers? *)
-      let trl = TermTF.tr_map (term_transform kept varM)
-        (fmla_transform kept varM) trl in
+      let trl = tr_map (term_transform kept varM) trl in
       t_quant q (t_close_quant vsl trl fmla2)
-    | _ -> (* otherwise : just traverse and translate *)
-      TermTF.t_map (term_transform kept varM) (fmla_transform kept varM) f(*   in *)
-    (* Format.eprintf "fmla_to : %a@." Pretty.print_fmla f;f *)
+    | _ -> (* default case : traverse *)
+      t_map (term_transform kept varM) t
 
   and guard q kept varM fmla vsl =
     let aux fmla vs =
@@ -168,14 +160,13 @@ module Transform = struct
         let fn varM f =
           let fmla2 = guard q kept varM f vsl in
           (* TODO : how to modify the triggers? *)
-          let trl = TermTF.tr_map (term_transform kept varM)
-            (fmla_transform kept varM) trl in
+          let trl = tr_map (term_transform kept varM) trl in
           fn varM (t_quant q (t_close_quant vsl trl fmla2))
         in
-        let fn varM f = fn varM (fmla_transform kept varM f) in
+        let fn varM f = fn varM (term_transform kept varM f) in
         type_close_select tvs acc fn fmla
       | _ ->
-        let fn varM f = fn varM (fmla_transform kept varM f) in
+        let fn varM f = fn varM (term_transform kept varM f) in
         type_close_select tvs acc fn f in
     trans (fun _ f -> f) [] f'
 
@@ -214,7 +205,7 @@ module Transform = struct
     let helper = function
     | (lsymbol, Some ldef) ->
       let new_lsymbol = findL lsymbol in (* new lsymbol *)
-      let vars,expr = open_ls_defn ldef in
+      let vars,expr,close = open_ls_defn_cb ldef in
       let add v (vl,vm) =
         let vs = Term.create_vsymbol (id_fresh "t") ty_type in
         vs :: vl, Mtv.add v (t_var vs) vm
@@ -225,13 +216,8 @@ module Transform = struct
           | Some ty_value ->
             let new_ty = ty_freevars Stv.empty ty_value in
             Stv.fold add new_ty (vars,Mtv.empty) in
-      (match expr.t_ty with
-      | Some _ ->
-          let t = term_transform kept varM expr in
-          Decl.make_ls_defn new_lsymbol vars t
-      | None ->
-          let f = fmla_transform kept varM expr in
-          Decl.make_ls_defn new_lsymbol vars f)
+      let t = term_transform kept varM expr in
+      close new_lsymbol vars t
     | (lsymbol, None) ->
       (findL lsymbol, None)
     in

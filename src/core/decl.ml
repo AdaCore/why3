@@ -64,6 +64,15 @@ let open_ls_defn (_,f) =
     | Tbinop (_, _, f) -> vl,f
     | _ -> assert false
 
+let open_ls_defn_cb ld =
+  let ls,_ = ld in
+  let vl,t = open_ls_defn ld in
+  let close ls' vl' t' =
+    if t_equal t t' && list_all2 vs_equal vl vl' && ls_equal ls ls'
+    then ls, Some ld else make_ls_defn ls' vl' t'
+  in
+  vl,t,close
+
 let ls_defn_axiom (_,f) = f
 
 (** Termination checking for mutually recursive logic declarations *)
@@ -481,8 +490,8 @@ let decl_map fn d = match d.d_node with
   | Dlogic l ->
       let fn = function
         | ls, Some ld ->
-            let vl,e = open_ls_defn ld in
-            make_ls_defn ls vl (fn e)
+            let vl,e,close = open_ls_defn_cb ld in
+            close ls vl (fn e)
         | ld -> ld
       in
       create_logic_decl (List.map fn l)
@@ -510,25 +519,28 @@ let decl_fold fn acc d = match d.d_node with
   | Dprop (_,_,f) ->
       fn acc f
 
-let rpair_map_fold f acc (x1,x2) =
-  let acc, x2 = f acc x2 in acc, (x1, x2)
-
-let list_rpair_map_fold f = Util.map_fold_left (rpair_map_fold f)
+let list_rpair_map_fold fn =
+  let fn acc (x1,x2) =
+    let acc,x2 = fn acc x2 in acc,(x1,x2) in
+  Util.map_fold_left fn
 
 let decl_map_fold fn acc d = match d.d_node with
   | Dtype _ -> acc, d
   | Dlogic l ->
-      let acc, l =
-        list_rpair_map_fold (option_map_fold
-          (rpair_map_fold (t_map_fold fn))) acc l in
+      let fn acc = function
+        | ls, Some ld ->
+            let vl,e,close = open_ls_defn_cb ld in
+            let acc,e = fn acc e in
+            acc, close ls vl e
+        | ld -> acc, ld
+      in
+      let acc,l = Util.map_fold_left fn acc l in
       acc, create_logic_decl l
   | Dind l ->
-      let acc, l =
-        list_rpair_map_fold (list_rpair_map_fold
-          (t_map_fold fn)) acc l in
+      let acc, l = list_rpair_map_fold (list_rpair_map_fold fn) acc l in
       acc, create_ind_decl l
   | Dprop (k,pr,f) ->
-      let acc, f = t_map_fold fn acc f in
+      let acc, f = fn acc f in
       acc, create_prop_decl k pr f
 
 module DeclTF = struct

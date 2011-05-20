@@ -62,46 +62,22 @@ let rec t_insert hd t = match t.t_node with
         t_close_branch pl (t_insert hd t1)
       in
       t_case tl (List.map br bl)
-  | _ -> t_equ_simp hd t
+  | _ -> TermTF.t_selecti t_equ_simp t_iff_simp hd t
 
-let rec f_insert hd f = match f.t_node with
-  | Tif (f1,f2,f3) ->
-      t_if f1 (f_insert hd f2) (f_insert hd f3)
-  | Tlet (t1,bf) ->
-      let v,f2 = t_open_bound bf in
-      t_let_close v t1 (f_insert hd f2)
-  | Tcase (tl,bl) ->
-      let br b =
-        let pl,f1 = t_open_branch b in
-        t_close_branch pl (f_insert hd f1)
-      in
-      t_case tl (List.map br bl)
-  | _ -> t_iff_simp hd f
-
-let add_ld func pred axl d = match d with
-  | _, None ->
+let add_ld func pred axl = function
+  | ls, Some ld when (if ls.ls_value = None then pred else func) ->
+      let vl,e = open_ls_defn ld in
+      let nm = ls.ls_name.id_string ^ "_def" in
+      let hd = t_app ls (List.map t_var vl) e.t_ty in
+      let ax = t_forall_close vl [] (t_insert hd e) in
+      let pr = create_prsymbol (id_derive nm ls.ls_name) in
+      create_prop_decl Paxiom pr ax :: axl, (ls, None)
+  | d ->
       axl, d
-  | ls, Some ld ->
-      let vl,e = open_ls_defn ld in begin match e.t_ty with
-        | Some _ when func ->
-            let nm = ls.ls_name.id_string ^ "_def" in
-            let hd = t_app ls (List.map t_var vl) e.t_ty in
-            let ax = t_forall_close vl [] (t_insert hd e) in
-            let pr = create_prsymbol (id_derive nm ls.ls_name) in
-            create_prop_decl Paxiom pr ax :: axl, (ls, None)
-        | None when pred ->
-            let nm = ls.ls_name.id_string ^ "_def" in
-            let hd = ps_app ls (List.map t_var vl) in
-            let ax = t_forall_close vl [] (f_insert hd e) in
-            let pr = create_prsymbol (id_derive nm ls.ls_name) in
-            create_prop_decl Paxiom pr ax :: axl, (ls, None)
-        | _ -> axl, d
-      end
 
 let elim_decl func pred l =
   let axl, l = map_fold_left (add_ld func pred) [] l in
-  let d = create_logic_decl l in
-  d :: List.rev axl
+  create_logic_decl l :: List.rev axl
 
 let elim func pred d = match d.d_node with
   | Dlogic l -> elim_decl func pred l
@@ -112,10 +88,7 @@ let is_rec = function
   | [_, None] -> false
   | [ls, Some ld] ->
       let _, e = open_ls_defn ld in
-      begin match e.t_ty with
-        | Some _ -> t_s_any (const false) (ls_equal ls) e
-        | None   -> t_s_any (const false) (ls_equal ls) e
-      end
+      t_s_any Util.ffalse (ls_equal ls) e
   | _ -> true
 
 let elim_recursion d = match d.d_node with
@@ -143,5 +116,4 @@ let () =
     eliminate_recursion;
   Trans.register_transform "eliminate_mutual_recursion"
     eliminate_mutual_recursion
-
 
