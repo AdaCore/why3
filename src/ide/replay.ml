@@ -240,11 +240,11 @@ let goal_statistics (goals,n,m) g =
 
 let theory_statistics (ths,n,m) th =
   let goals,n1,m1 = List.fold_left goal_statistics ([],0,0) (M.goals th) in
-  ((th,goals,n1,m1)::ths,(if M.verified th then n+1 else n),m+1)
+  ((th,goals,n1,m1)::ths,n+n1,m+m1)
 
 let file_statistics (files,n,m) f =
   let ths,n1,m1 = List.fold_left theory_statistics ([],0,0) f.M.theories in
-  ((f,ths,n1,m1)::files,(if f.M.file_verified then n+1 else n),m+1)
+  ((f,ths,n1,m1)::files,n+n1,m+m1)
 
 let print_statistics files =
   List.iter 
@@ -297,11 +297,11 @@ let () =
       printf " %d/%d@." n m ;
       match report with
 	| [] -> 
+	    if !opt_stats && n<m then print_statistics files;
 	    eprintf "Everything OK.@.";
 	    exit 0
 	| _ ->
 	    List.iter print_report report;
-	    if !opt_stats && n<m then print_statistics files;
 	    eprintf "Check failed.@."; 
 	    exit 1 
     in
