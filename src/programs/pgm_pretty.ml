@@ -26,8 +26,8 @@ let rec print_expr fmt e = match e.expr_desc with
       fprintf fmt "@[<hov 2>fun %a ->@ %a@]" 
 	(print_list space print_pv) bl print_triple t
   | Elet (v, e1, e2) ->
-      fprintf fmt "@[<hv 0>@[<hov 2>let %a =@ %a in@]@ %a@]" 
-	print_vs v.pv_effect
+      fprintf fmt "@[<hv 0>@[<hov 2>let %a/%a =@ %a in@]@ %a@]" 
+	print_vs v.pv_effect print_vs v.pv_pure
 	print_expr e1 print_expr e2
 
   | Eif (e1, e2, e3) ->

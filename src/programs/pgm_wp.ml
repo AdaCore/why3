@@ -179,7 +179,7 @@ let quantify ?(all=false) env rm ef f =
   let sreg =
     if all then
       Spv.fold (fun pv s -> Sreg.union pv.pv_regions s)
-	ef.E.globals (Sreg.union ef.E.reads sreg)
+      	ef.E.globals (Sreg.union ef.E.reads sreg)
     else
       sreg
   in
@@ -567,7 +567,7 @@ and wp_triple env rm bl (p, e, q) =
   in
   let f = wp_expr env rm e q in
   let f = wp_implies p f in
-  let f = quantify (* ~all:true *) env rm e.expr_effect f in
+  let f = quantify ~all:true env rm e.expr_effect f in
   wp_binders bl f
 
 and wp_recfun env rm (_, bl, _var, t) =

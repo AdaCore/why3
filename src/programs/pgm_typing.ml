@@ -1399,6 +1399,8 @@ and expr_desc gl env loc ty = function
   | IElocal vs ->
       let vs = Mvs.find vs.i_impure env in
       Elocal vs, vs.pv_tv, E.empty
+  | IEglobal ({ ps_kind = PSvar pv } as s, tv) ->
+      Eglobal s, tv, E.add_glob pv E.empty
   | IEglobal (s, tv) ->
       Eglobal s, tv, E.empty
   | IEapply (e1, vs) ->

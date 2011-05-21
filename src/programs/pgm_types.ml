@@ -534,7 +534,8 @@ end = struct
       print_post c.c_post
 
   and print_binder fmt x =
-    fprintf fmt "(%a:%a)" print_vs x.pv_effect print_type_v x.pv_tv
+    fprintf fmt "(%a/%a:%a)" 
+      print_vs x.pv_effect print_vs x.pv_pure print_type_v x.pv_tv
 
 end
 
