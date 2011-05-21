@@ -6,6 +6,7 @@ open Why
 let includes = ref []
 let file = ref None
 let opt_version = ref false
+let opt_stats = ref true
 
 let spec = Arg.align [
   ("-I",
@@ -16,6 +17,9 @@ let spec = Arg.align [
    Arg.String (fun s -> input_files := s :: !input_files),
    "<f> add file f to the project (ignored if it is already there)") ;
 *)
+  ("-s",
+   Arg.Clear opt_stats,
+   " do not print statistics") ;
   ("-v",
    Arg.Set opt_version,
    " print version information") ;
@@ -52,7 +56,7 @@ let fname = match !file with
 let config = Whyconf.read_config None
 
 let loadpath = (Whyconf.loadpath (Whyconf.get_main config))
-  (* @ List.rev !includes *)
+  @ List.rev !includes 
 
 let env = Lexer.create_env loadpath
 
@@ -231,16 +235,75 @@ let project_dir =
   else
     failwith "file does not exist"
 
-let main () =
+let goal_statistics (goals,n,m) g =
+  if M.goal_proved g then (goals,n+1,m+1) else (g::goals,n,m+1)
+
+let theory_statistics (ths,n,m) th =
+  let goals,n1,m1 = List.fold_left goal_statistics ([],0,0) (M.goals th) in
+  ((th,goals,n1,m1)::ths,(if M.verified th then n+1 else n),m+1)
+
+let file_statistics (files,n,m) f =
+  let ths,n1,m1 = List.fold_left theory_statistics ([],0,0) f.M.theories in
+  ((f,ths,n1,m1)::files,(if f.M.file_verified then n+1 else n),m+1)
+
+let print_statistics files =
+  List.iter 
+    (fun (f,ths,n,m) ->
+       if n<m then
+	 begin
+	   printf "   +--file %s: %d/%d@." f.M.file_name n m;
+	   List.iter 
+	     (fun (th,goals,n,m) ->
+		if n<m then
+		  begin
+		    printf "      +--theory %s: %d/%d@." 
+		      (M.theory_name th) n m;
+		    List.iter 
+		      (fun g ->
+			 printf "         +--goal %s not proved@." (M.goal_name g)) 
+		      (List.rev goals)
+		  end)
+	     (List.rev ths)
+	 end)
+    (List.rev files)
+      
+let print_report (g,p,r) = 
+  printf "   goal '%s', prover '%s': " g p;
+  match r with
+  | M.Wrong_result(new_res,old_res) -> 
+      printf "%a instead of %a@."
+        Call_provers.print_prover_result new_res 
+        Call_provers.print_prover_result old_res
+  | M.No_former_result ->
+      printf "no former result available@."
+  | M.CallFailed msg ->
+      printf "internal failure '%a'@." Exn_printer.exn_printer msg;
+  | M.Prover_not_installed ->
+      printf "not installed@."
+
+	
+
+let () =
   try
     eprintf "Opening session...@?";
     M.open_session ~env ~config ~init ~notify project_dir;
     M.maximum_running_proofs :=
       Whyconf.running_provers_max (Whyconf.get_main config);
     eprintf " done@.";
-    let callback b =
-      if b then (eprintf "Check failed.@."; exit 1) 
-      else (eprintf "Everything OK.@.";exit 0)
+    let callback report =
+      let files,n,m = 
+	List.fold_left file_statistics ([],0,0) (M.get_all_files ()) 
+      in
+      printf " %d/%d@." n m ;
+      match report with
+	| [] -> 
+	    eprintf "Everything OK.@.";
+	    exit 0
+	| _ ->
+	    List.iter print_report report;
+	    if !opt_stats && n<m then print_statistics files;
+	    eprintf "Check failed.@."; 
+	    exit 1 
     in
     M.check_all ~callback;
     try main_loop ()
@@ -252,4 +315,8 @@ let main () =
     exit 1
 
 
-let () = main ()
+(*
+Local Variables:
+compile-command: "unset LANG; make -C ../.. bin/why3replayer.byte"
+End:
+*)

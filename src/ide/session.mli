@@ -240,11 +240,18 @@ module Make(O: OBSERVER) : sig
         with result was 'valid'
     *)
 
-  val check_all: callback:(bool -> unit) -> unit
+  type report =
+    | Wrong_result of Call_provers.prover_result * Call_provers.prover_result  
+    | CallFailed of exn
+    | Prover_not_installed 
+    | No_former_result 
+
+  val check_all: callback:((string * string * report) list -> unit) -> unit
     (** [check_all ()] reruns all the proofs of the session, and reports
         all difference with the current state 
         (does not change the session state)
-        When finished, calls the callback with argument true if there is at least one difference, false otherwise
+        When finished, calls the callback with the list of failed comparisons,
+	which are triples (goal name, prover, report)
     *)
 
   val reload_all: unit -> unit

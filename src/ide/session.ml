@@ -1356,7 +1356,17 @@ let replay ~obsolete_only ~context_unproved_goals_only a =
 (* method: check existing proofs *)
 (*********************************)
 
-let check_failed = ref false
+type report =
+  | Wrong_result of Call_provers.prover_result * Call_provers.prover_result  
+  | CallFailed of exn
+  | Prover_not_installed 
+  | No_former_result 
+
+let reports = ref []
+
+let push_report g p r =
+  reports := (g.goal_name,p,r) :: !reports
+
 let proofs_to_do = ref 0
 let proofs_done = ref 0
 
@@ -1378,43 +1388,33 @@ let check_external_proof g a =
   if running then ()
   else
     begin
-    incr proofs_to_do;
+      incr proofs_to_do;
       match a.prover with
         | Undetected_prover s ->
-            Format.printf "goal '%s', prover '%s': not installed@."
-              g.goal_name s;
-            check_failed := true;
-            incr proofs_done
+	    push_report g s Prover_not_installed;
+            incr proofs_done;
+	    set_proof_state ~obsolete:false a Undone
         | Detected_prover p ->
+	    let p_name = p.prover_name ^ " " ^ p.prover_version in
             let callback result =
               match result with
                 | Scheduled | Running -> ()
                 | Undone -> assert false
                 | InternalFailure msg ->
-                    Format.printf 
-                      "goal '%s', prover '%s %s': internal failure '%a'@."
-                      g.goal_name p.prover_name p.prover_version
-                      Exn_printer.exn_printer msg;
-                    check_failed := true;
-                    incr proofs_done
-                | Done new_res ->
+		    push_report g p_name (CallFailed msg);
                     incr proofs_done;
-                    match a.proof_state with
-                      | Done old_res ->
-                        if same_result old_res new_res then () else
-                          begin
-                            check_failed := true;
-                            Format.printf
-                              "goal '%s', prover '%s %s': %a instead of %a@."
-                              g.goal_name p.prover_name p.prover_version
-                              Call_provers.print_prover_result new_res 
-                              Call_provers.print_prover_result old_res
-                          end
-                    | _ ->
-                        check_failed := true;
-                        Format.printf
-                          "goal '%s', prover '%s %s': no former result available@."
-                          g.goal_name p.prover_name p.prover_version
+		    set_proof_state ~obsolete:false a result
+                | Done new_res ->
+                    begin
+		      match a.proof_state with
+			| Done old_res ->
+                            if same_result old_res new_res then () else
+			      push_report g p_name (Wrong_result(new_res,old_res))
+			| _ ->
+			    push_report g p_name No_former_result
+		    end;
+                    incr proofs_done;
+		    set_proof_state ~obsolete:false a result
           in
           let old = if a.edited_as = "" then None else
             begin
@@ -1438,7 +1438,7 @@ let rec check_goal_and_children g =
     g.transformations
 
 let check_all ~callback =
-  check_failed := false;
+  reports := [];
   proofs_to_do := 0;
   proofs_done := 0;
   List.iter
@@ -1453,7 +1453,7 @@ let check_all ~callback =
       begin
 	Printf.eprintf "\n%!";
 	decr maximum_running_proofs;
-        callback !check_failed; 
+        callback !reports; 
         false
       end
     else true

@@ -15,7 +15,7 @@ run_dir () {
         ../bin/why3replayer.opt $d 2> $TMPERR > $TMP
         ret=$?
 	if test "$ret" != "0"  ; then
-	    echo "FAILED (ret code=$ret):"
+	    echo -n "FAILED (ret code=$ret):"
             out=`head -1 $TMP`
             if test -z "$out" ; then
                echo "standard error: (standard output empty)"
@@ -25,7 +25,8 @@ run_dir () {
             fi
 	    res=1
 	else
-	    echo "OK"
+	    echo -n "OK"
+	    cat $TMP
 	fi
     done
 }
