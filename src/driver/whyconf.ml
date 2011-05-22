@@ -26,10 +26,11 @@ open Rc
   - 1 when no loadpath meant default loadpath
   - 2
   - 5 cvc3 native
+  - 6 driver renaming
 
 If a configuration doesn't contain the actual magic number we don't use it.*)
 
-let magicnumber = 5
+let magicnumber = 6
 
 exception WrongMagicNumber
 
