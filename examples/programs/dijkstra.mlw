@@ -5,7 +5,7 @@ module M
   use import int.Int
   use import module ref.Ref
   use set.Fset as S
-  use map.Map as M
+  use import map.Map as M
 
   (* iteration on a set *)
 
@@ -66,32 +66,32 @@ module M
       unit writes visited q d
       { S.is_empty !visited and
         !q = S.add src S.empty and
-        !d = M.set (old !d) src 0  }
+        !d = (old !d)[src <- 0] }
 
   let relax u v =
     {}
     if not (S.mem v !visited) then
-      let x = M.get !d u + weight u v in
+      let x = !d[u] + weight u v in
       if S.mem v !q then begin
-        if x < M.get !d v then d := M.set !d v x
+        if x < !d[v] then d := !d[v <- x]
       end else begin
         q := S.add v !q;
-        d := M.set !d v x
+        d := !d[v <- x]
       end
     { (S.mem v !visited and !q = old !q and !d = old !d)
       or
-      (S.mem v !q and M.get !d u + weight u v >= M.get !d v and
+      (S.mem v !q and !d[u] + weight u v >= !d[v] and
           !q = old !q and !d = old !d)
       or
-      (S.mem v !q  and M.get (old !d) u + weight u v < M.get (old !d) v and
-          !q = old !q and !d = M.set (old !d) v (M.get (old !d) u + weight u v))
+      (S.mem v !q and (old !d)[u] + weight u v < (old !d)[v] and
+          !q = old !q and !d = (old !d)[v <- (old !d)[u] + weight u v])
       or
       (not S.mem v !visited and not S.mem v (old !q) and !q = S.add v (old !q) and
-          !d = M.set (old !d) v (M.get (old !d) u + weight u v)) }
+          !d = (old !d)[v <- (old !d)[u] + weight u v]) }
 
   logic min (m:vertex) (q:S.set vertex) (d:M.map vertex int) =
     S.mem m q and
-    forall x:vertex. S.mem x q -> M.get d m <= M.get d x
+    forall x:vertex. S.mem x q -> d[m] <= d[x]
 
   parameter q_extract_min :
     unit ->
@@ -158,15 +158,15 @@ module M
     (forall v:vertex. S.mem v q -> S.mem v s -> false)
     (* we already found the shortest paths for vertices in S *)
     and
-    (forall v:vertex. S.mem v s -> shortest_path src v (M.get d v))
+    (forall v:vertex. S.mem v s -> shortest_path src v d[v])
     (* there are paths for vertices in Q *)
     and
-    (forall v:vertex. S.mem v q -> path src v (M.get d v))
+    (forall v:vertex. S.mem v q -> path src v d[v])
     (* vertices at distance < min(Q) are already in S *)
     and
     (forall m:vertex. min m q d ->
        forall x:vertex. forall dx:int. shortest_path src x dx ->
-         dx < M.get d m -> S.mem x s)
+         dx < d[m] -> S.mem x s)
 
   logic inv_succ (src:vertex) (s q : S.set vertex) =
     (* successors of vertices in S are either in S or in Q *)
@@ -190,7 +190,7 @@ module M
       invariant { inv src !visited !q !d and inv_succ src !visited !q }
       variant   { S.cardinal v - S.cardinal !visited }
       let u = q_extract_min () in
-      assert { shortest_path src u (M.get !d u) };
+      assert { shortest_path src u !d[u] };
       visited_add u;
       let su = ref (g_succ u) in
       while not (set_has_next su) do
@@ -203,7 +203,7 @@ module M
       done
     done
     { (forall v:vertex.
-         S.mem v !visited -> shortest_path src v (M.get !d v))
+         S.mem v !visited -> shortest_path src v !d[v])
       and
       (forall v:vertex.
          not S.mem v !visited -> forall dv:int. not path src v dv) }

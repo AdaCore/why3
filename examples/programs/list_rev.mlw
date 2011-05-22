@@ -19,7 +19,7 @@ module M
         p = null -> is_list next p
     | is_list_next:
         forall next : next, p : pointer.
-        p <> null -> is_list next (get next p) -> is_list next p
+        p <> null -> is_list next next[p] -> is_list next p
 
   (** Frame for is_list *)
   type ft 'a
@@ -28,9 +28,9 @@ module M
 
   axiom frame_list :
     forall next : next, p : pointer, q : pointer, v : pointer
-      [is_list (set next q v) p].
+      [is_list next[q <- v] p].
     (~ in_ft q (list_ft next p)) -> is_list next p
-      -> is_list (set next q v) p
+      -> is_list next[q <- v] p
 
   (** Definition of sep_node_list *)
   logic sep_node_list (next : next) (p1 p2 : pointer) =
@@ -42,27 +42,27 @@ module M
 
   axiom list_ft_node_next1 :
       forall next : next, q : pointer, p : pointer.
-      q<>null -> is_list next (get next q) ->
-      in_ft p (list_ft next (get next q)) ->
+      q<>null -> is_list next next[q] ->
+      in_ft p (list_ft next next[q]) ->
       in_ft p (list_ft next q)
 
   axiom list_ft_node_next2 :
       forall next : next, q : pointer.
-      q<>null -> is_list next (get next q) ->
+      q<>null -> is_list next next[q] ->
       in_ft q (list_ft next q)
 
   axiom list_ft_node_next_inv :
       forall next : next, q : pointer, p : pointer.
-      q<>null -> is_list next (get next q) ->
+      q<>null -> is_list next next[q] ->
       q <> p ->
       in_ft p (list_ft next q) ->
-      in_ft p (list_ft next (get next q))
+      in_ft p (list_ft next next[q])
 
   (** Frame for list_ft *)
   axiom frame_list_ft :
     forall next : next, p : pointer, q : pointer, v : pointer.
     (~ in_ft q (list_ft next p)) ->
-      list_ft next p = list_ft (set next q v) p
+      list_ft next p = list_ft next[q <- v] p
 
   (** Definition of sep_list_list *)
 
@@ -73,8 +73,8 @@ module M
         p=null -> list_disj ft next p
     | list_disj_next:
         forall ft : ft pointer, next : next, p : pointer.
-        p<>null -> is_list next (get next p) -> (~in_ft p ft) ->
-        list_disj ft next (get next p) -> list_disj ft next p
+        p<>null -> is_list next next[p] -> (~in_ft p ft) ->
+        list_disj ft next next[p] -> list_disj ft next p
 
   logic sep_list_list (next : next) (p1 p2 : pointer) =
     list_disj (list_ft next p1) next p2 /\ list_disj (list_ft next p2) next p1
@@ -85,29 +85,29 @@ module M
 
   axiom list_ft_disj_next :
       forall next : next, p : pointer, q : pointer.
-        q <> null -> is_list next (get next q) ->
+        q <> null -> is_list next next[q] ->
         (~in_ft q (list_ft next p)) ->
         q <> p ->
-        list_disj (list_ft next (get next q)) next p ->
+        list_disj (list_ft next next[q]) next p ->
         list_disj (list_ft next q) next p
 
   axiom list_ft_disj_next_inv :
       forall next : next, p : pointer, q : pointer.
-        q <> null -> is_list next (get next q) ->
+        q <> null -> is_list next next[q] ->
         list_disj (list_ft next q) next p ->
-        list_disj (list_ft next (get next q)) next p
+        list_disj (list_ft next next[q]) next p
 
   (** Frame for list_disj *)
   axiom frame_list_disj :
     forall ft : ft pointer, next : next,
         p1 : pointer, p2 : pointer, q : pointer, v : pointer
-        [list_disj (list_ft (set next q v) p1) (set next q v) p2].
+        [list_disj (list_ft next[q <- v] p1) next[q <- v] p2].
       (~ in_ft q (list_ft next p1)) -> (~ in_ft q (list_ft next p2))
       -> list_disj (list_ft next p1) next p2
-      -> list_disj (list_ft (set next q v) p1) (set next q v) p2
+      -> list_disj (list_ft next[q <- v] p1) next[q <- v] p2
 
   lemma acyclic_list : forall next : next, p : pointer.
-    p <> null -> is_list next p -> sep_node_list next p (get next p)
+    p <> null -> is_list next p -> sep_node_list next p next[p]
 
   goal consistent : forall next : next, p: pointer, q: pointer.
     is_list next p -> is_list next q -> false
@@ -118,8 +118,8 @@ module M
     while !p <> null do
       invariant
         { is_list !next !p /\ is_list !next !q /\ sep_list_list !next !p !q }
-      let tmp = get !next !p in
-      next := set !next !p !q;
+      let tmp = !next[!p] in
+      next := !next[!p <- !q];
       q := !p;
       p:= tmp
     done;
@@ -134,13 +134,13 @@ module M
   logic model (next : next) (p : pointer) : list pointer
   (* axiom model_def : forall next : next, p : pointer. *)
   (*   model next p = *)
-  (*       if p = null then Nil else Cons p (model next (get next p)) *)
+  (*       if p = null then Nil else Cons p (model next next[p]) *)
 
   axiom model_def1 : forall next : next, p : pointer[model next p].
     p = null -> model next p = Nil
 
   axiom model_def2 : forall next : next, p : pointer[model next p].
-    p <> null -> model next p = Cons p (model next (get next p))
+    p <> null -> model next p = Cons p (model next next[p])
 
   lemma reverse_append : forall l1 : list 'a, l2 : list 'a, x : 'a
     [(reverse (Cons x l1)) ++ l2|(reverse l1) ++ (Cons x l2)].
@@ -149,9 +149,9 @@ module M
   (** frame model *)
   axiom frame_model :
     forall ft : ft pointer, next : next,
-    p : pointer, q : pointer, v : pointer[model (set next q v) p].
+    p : pointer, q : pointer, v : pointer[model next[q <- v] p].
     (~ in_ft q (list_ft next p))
-    -> model next p = model (set next q v) p
+    -> model next p = model next[q <- v] p
 
   let list_rev_behv (p : ref pointer) =
     { is_list !next !p }
@@ -163,9 +163,9 @@ module M
                   /\ sep_list_list !next !p !q /\
       reverse (model (old_next) (old_p)) =
        (reverse (model !next !p)) ++ (model !next !q)}
-      let tmp = get !next !p in
+      let tmp = !next[!p] in
       let bak_next = !next in
-      next := set !next !p !q;
+      next := !next[!p <- !q];
       assert { (reverse (Cons !p (model !next tmp))) ++ (model !next !q) =
                (reverse (model !next tmp)) ++ (Cons !p (model !next !q))};
       q := !p;
@@ -202,11 +202,11 @@ module M2
         p = null -> is_list next p
     | is_list_next:
         forall next : next, p : pointer.
-        p <> null -> is_list next (get next p) -> is_list next p
+        p <> null -> is_list next next[p] -> is_list next p
 
   goal is_list_disjoint_case :
       forall next : next, p : pointer.
-        p = null /\ p <> null /\ is_list next (get next p) -> false
+        p = null /\ p <> null /\ is_list next next[p] -> false
 
   (** Frame for is_list *)
   type ft 'a
@@ -225,8 +225,8 @@ module M2
 
   (* axiom list_ft_node_next : *)
   (*     forall next : next, q : pointer. *)
-  (*     q<>null -> is_list next (get next q) -> *)
-  (*     S.add q (list_ft next (get next q)) =  (list_ft next q) *)
+  (*     q<>null -> is_list next next[q] -> *)
+  (*     S.add q (list_ft next next[q]) =  (list_ft next q) *)
 
   axiom list_ft_node_null_cor :
       forall next : next, q : pointer,p : pointer.
@@ -234,27 +234,27 @@ module M2
 
   axiom list_ft_node_next1 :
       forall next : next, q : pointer, p : pointer.
-      q<>null -> is_list next (get next q) ->
-      in_ft p (list_ft next (get next q)) ->
+      q<>null -> is_list next next[q] ->
+      in_ft p (list_ft next next[q]) ->
       in_ft p (list_ft next q)
 
   axiom list_ft_node_next2 :
       forall next : next, q : pointer.
-      q<>null -> is_list next (get next q) ->
+      q<>null -> is_list next next[q] ->
       in_ft q (list_ft next q)
 
   axiom list_ft_node_next_inv :
       forall next : next, q : pointer, p : pointer.
-      q<>null -> is_list next (get next q) ->
+      q<>null -> is_list next next[q] ->
       q <> p ->
       in_ft p (list_ft next q) ->
-      in_ft p (list_ft next (get next q))
+      in_ft p (list_ft next next[q])
 
   lemma frame_list :
     forall next : next, p : pointer, q : pointer, v : pointer
-      [is_list (set next q v) p].
+      [is_list next[q <- v] p].
     (~ in_ft q (list_ft next p)) -> is_list next p
-      -> is_list (set next q v) p
+      -> is_list next[q <- v] p
 
   (** Definition of sep_node_list *)
   logic sep_node_list (next : next) (p1 p2 : pointer) =
@@ -264,7 +264,7 @@ module M2
   lemma frame_list_ft :
     forall next : next, p : pointer, q : pointer, v : pointer.
     (~ in_ft q (list_ft next p)) -> is_list next p ->
-      list_ft next p = list_ft (set next q v) p
+      list_ft next p = list_ft next[q <- v] p
 
   (** Definition of sep_list_list *)
 
@@ -276,7 +276,7 @@ module M2
        (~ in_ft q (list_ft next p1)) \/ (~in_ft q (list_ft next p2))
 
   lemma acyclic_list : forall next : next, p : pointer.
-    p <> null -> is_list next p -> sep_node_list next p (get next p)
+    p <> null -> is_list next p -> sep_node_list next p next[p]
 
   goal consistent : forall next : next, p: pointer, q: pointer.
     is_list next p -> is_list next q -> false
@@ -287,8 +287,8 @@ module M2
     while !p <> null do
       invariant
         { is_list !next !p /\ is_list !next !q /\ sep_list_list !next !p !q }
-      let tmp = get !next !p in
-      next := set !next !p !q;
+      let tmp = !next[!p] in
+      next := !next[!p <- !q];
       q := !p;
       p:= tmp
     done;
@@ -306,21 +306,21 @@ module M2
   logic model (next : next) (p : pointer) : list pointer
   (* axiom model_def : forall next : next, p : pointer[model next p]. *)
   (*   model next p = *)
-  (*       if p = null then Nil else Cons p (model next (get next p)) *)
+  (*       if p = null then Nil else Cons p (model next next[p]) *)
 
   axiom model_def1 : forall next : next, p : pointer[model next p].
     p = null -> model next p = Nil
 
   axiom model_def2 : forall next : next, p : pointer[model next p].
-    p <> null -> model next p = Cons p (model next (get next p))
+    p <> null -> model next p = Cons p (model next next[p])
 
   (** frame model *)
   lemma frame_model :
     forall ft : ft pointer, next : next,
-    p : pointer, q : pointer, v : pointer[model (set next q v) p].
+    p : pointer, q : pointer, v : pointer[model next[q <- v] p].
     is_list next p ->
     (~ in_ft q (list_ft next p)) ->
-    model next p = model (set next q v) p
+    model next p = model next[q <- v] p
 
   goal consistent_behv : forall next : next, p: pointer, q: pointer.
     is_list next p -> is_list next q -> false
@@ -336,9 +336,9 @@ module M2
                   /\ sep_list_list !next !p !q /\
       reverse (model (at !next Init) (old_p)) =
        (reverse (model !next !p)) ++ (model !next !q)}
-      let tmp = get !next !p in
+      let tmp = !next[!p] in
       let bak_next = !next in
-      next := set !next !p !q;
+      next := !next[!p <- !q];
       (* assert { (reverse (Cons p (model !next tmp))) ++ (model !next q) = *)
       (*          (reverse (model !next tmp)) ++ (Cons p (model !next q))}; *)
       q := !p;

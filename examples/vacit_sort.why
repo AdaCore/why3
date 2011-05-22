@@ -9,17 +9,17 @@ theory Sorted
        logic n : int = 4
 
        logic sorted(m : array) =
-             forall x y:int. x<=y -> Real.(<=)(get m  x) (get m y)
+             forall x y:int. x<=y -> Real.(<=) m[x] m[y]
 
        logic count(m : array) (i j : int) (v : real) : int
   axiom Count :
   forall m : array. forall i j : int. forall v : real. count m i j v =
   (if i = j then 0 else
   let c = count m (i+1) j v in
-  (if get m i = v then c + 1 else c))
+  (if m[i] = v then c + 1 else c))
 
        logic model(m1 : array) (m2 : multi) =
-             forall v:real. count m1 1 (n+1) v = get m2 v
+             forall v:real. count m1 1 (n+1) v = m2[v]
 
 (*
        logic model_aux(m1 : array, i : int) : multi
@@ -43,32 +43,32 @@ theory Sorted
 
        goal G : 
             forall m1 : array.
-            get m1 1 = 42. ->
-            get m1 2 = 13. ->
-            get m1 3 = 42. ->
-            get m1 4 = 45. ->
+            m1[1] = 42. ->
+            m1[2] = 13. ->
+            m1[3] = 42. ->
+            m1[4] = 45. ->
             forall m2 : array.
             forall multi : multi.
             model m1 multi ->
             model m2 multi ->
             sorted m2 ->
-            get m2 1 = 13. and
-            get m2 2 = 42. and
-            get m2 3 = 42. and
-            get m2 4 = 45.
+            m2[1] = 13. and
+            m2[2] = 42. and
+            m2[3] = 42. and
+            m2[4] = 45.
 
 (*       goal G_false : 
             forall m1 : array.
-            get m1 1 = 42. ->
-            get m1 2 = 13. ->
-            get m1 3 = 42. ->
+            m1[1] = 42. ->
+            m1[2] = 13. ->
+            m1[3] = 42. ->
             forall m2 : array.
             forall multi : multi.
             model m1 multi ->
             model m2 multi ->
             sorted m2 ->
-            get m2 1 = 42. and
-            get m2 2 = 13. and
-            get m2 3 = 42.
+            m2[1] = 42. and
+            m2[2] = 13. and
+            m2[3] = 42.
 *)           
 end

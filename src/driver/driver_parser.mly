@@ -24,6 +24,7 @@
   let loc_i i = Loc.extract (rhs_start_pos i, rhs_end_pos i)
   let infix s = "infix " ^ s
   let prefix s = "prefix " ^ s
+  let mixfix s = "mixfix " ^ s
 %}
 
 %token <string> INPUT /* never reaches the parser */
@@ -37,6 +38,7 @@
 %token UNDERSCORE LEFTPAR RIGHTPAR CLONED DOT EOF
 %token LOGIC TYPE PROP FILENAME TRANSFORM PLUGIN
 %token LEFTPAR_STAR_RIGHTPAR COMMA
+%token LEFTSQ RIGHTSQ LARROW
 
 %type <Driver_ast.file> file
 %start file
@@ -142,9 +144,15 @@ ident:
 ;
 
 ident_rich:
-| ident                                 { $1 }
-| LEFTPAR_STAR_RIGHTPAR                 { infix "*" }
-| LEFTPAR OPERATOR RIGHTPAR             { infix  $2 }
-| LEFTPAR OPERATOR UNDERSCORE RIGHTPAR  { prefix $2 }
+| ident                     { $1 }
+| LEFTPAR_STAR_RIGHTPAR     { infix "*" }
+| LEFTPAR operator RIGHTPAR { $2 }
+;
+
+operator:
+| OPERATOR              { infix $1 }
+| OPERATOR UNDERSCORE   { prefix $1 }
+| LEFTSQ RIGHTSQ        { mixfix "[]" }
+| LEFTSQ LARROW RIGHTSQ { mixfix "[<-]" }
 ;
 

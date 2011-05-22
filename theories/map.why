@@ -3,12 +3,12 @@ theory Map "Theory of maps"
 
   type map 'a 'b
 
-  logic get (a : map 'a 'b) (i : 'a) : 'b
-  logic set (a : map 'a 'b) (i : 'a) (v : 'b) : map 'a 'b
+  logic ([]) (map 'a 'b) 'a : 'b
+  logic ([<-]) (map 'a 'b) 'a 'b : map 'a 'b
 
-  (* syntactic sugar *)
-  logic ([]) (a : map 'a 'b) (i : 'a) : 'b = get a i
-  logic ([<-]) (a : map 'a 'b) (i : 'a) (v : 'b) : map 'a 'b = set a i v
+  (* aliases to use under qualifiers *)
+  logic get (a : map 'a 'b) (i : 'a) : 'b = a[i]
+  logic set (a : map 'a 'b) (i : 'a) (v : 'b) : map 'a 'b = a[i <- v]
 
   axiom Select_eq :
     forall m : map 'a 'b. forall a1 a2 : 'a.

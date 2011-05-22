@@ -12,18 +12,18 @@ module M
 
   type option 'a = None | Some 'a
 
-  use map.Map as M
+  use import map.Map as M
 
   type table = M.map int (option int)
 
   logic inv (t : table) =
-    forall x y : int. M.get t x = Some y -> y = fib x
+    forall x y : int. t[x] = Some y -> y = fib x
 
   parameter table : ref table
 
   parameter add :
     x:int -> y:int ->
-      {} unit writes table { !table = M.set (old !table) x (Some y) }
+      {} unit writes table { !table = (old !table)[x <- Some y] }
 
   exception Not_found
 
@@ -31,8 +31,8 @@ module M
     x:int ->
      {}
      int reads table raises Not_found
-     { M.get !table x = Some result }
-     | Not_found -> { M.get !table x = None }
+     { !table[x] = Some result }
+     | Not_found -> { !table[x] = None }
 
   let rec fibo n =
     { 0 <= n and inv !table }
