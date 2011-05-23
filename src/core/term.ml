@@ -1326,12 +1326,20 @@ let t_if_simp f1 f2 f3 =
 let t_let_simp e ((v,_,t) as bt) = match e.t_node with
   | _ when not (Svs.mem v t.t_vars) -> snd (t_open_bound bt)
   | Tvar _ -> let v,t = t_open_bound bt in t_subst_single v e t
-  | _ -> t_let e bt
+  | _ ->
+    begin match t.t_node with
+      | Tvar v' when vs_equal v v' -> e
+      | _ -> t_let e bt
+    end
 
 let t_let_close_simp v e t = match e.t_node with
   | _ when not (Svs.mem v t.t_vars) -> t
   | Tvar _ -> t_subst_single v e t
-  | _ -> t_let_close v e t
+  | _ ->
+    begin match t.t_node with
+      | Tvar v' when vs_equal v v' -> e
+      | _ -> t_let_close v e t
+    end
 
 let vl_filter f vl =
   List.filter (fun v -> Svs.mem v f.t_vars) vl
