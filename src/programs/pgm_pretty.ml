@@ -23,10 +23,10 @@ let rec print_expr fmt e = match e.expr_desc with
   | Eglobal { ps_kind = PSlogic } ->
       assert false
   | Efun (bl, t) ->
-      fprintf fmt "@[<hov 2>fun %a ->@ %a@]" 
+      fprintf fmt "@[<hov 2>fun %a ->@ %a@]"
 	(print_list space print_pv) bl print_triple t
   | Elet (v, e1, e2) ->
-      fprintf fmt "@[<hv 0>@[<hov 2>let %a/%a =@ %a in@]@ %a@]" 
+      fprintf fmt "@[<hv 0>@[<hov 2>let %a/%a =@ %a in@]@ %a@]"
 	print_vs v.pv_effect print_vs v.pv_pure
 	print_expr e1 print_expr e2
 
@@ -64,12 +64,12 @@ and print_triple fmt (p, e, q) =
   fprintf fmt "@[<hv 0>%a@ %a@ %a@]" print_pre p print_expr e print_post q
 
 and print_recfun fmt (v, bl, _, t) =
-  fprintf fmt "@[<hov 2>rec %a@ %a =@ %a@]" 
+  fprintf fmt "@[<hov 2>rec %a@ %a =@ %a@]"
     print_pv v (print_list space print_pv) bl print_triple t
 
 and print_branch fmt (p, e) =
   fprintf fmt "@[<hov 4>| %a ->@ %a@]" print_pattern p print_expr e
 
-and print_pattern fmt p = 
+and print_pattern fmt p =
   Pretty.print_pat fmt p.ppat_pat
 

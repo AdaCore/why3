@@ -5,14 +5,9 @@ module M
 
   parameter x : ref int
 
-  let bar () = {} x := 1 { !x = 1 }
-
-  parameter foo : y:int -> { y <> 0 } int { true }
-
-  let test_and_2 () = { !x > 0 } foo !x {}
+  let rec f2 () : unit = {  } x := 1; f2 () {  }
 
 end
-
 
 (***
 module TestArray

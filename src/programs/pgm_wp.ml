@@ -152,6 +152,22 @@ let find_constructor env ts =
   | [ls] -> ls
   | _ -> assert false
 
+let wp_close rm ef f =
+  let sreg = ef.E.writes in
+  let sreg =
+    Spv.fold (fun pv s -> Sreg.union pv.pv_regions s)
+      ef.E.globals (Sreg.union ef.E.reads sreg)
+  in
+  (* all program variables involving these regions *)
+  let vars =
+    let add r s =
+      try Spv.union (Mreg.find r rm) s with Not_found -> assert false
+    in
+    Sreg.fold add sreg Spv.empty
+  in
+  let quantify_v v f = wp_forall v.pv_pure f in
+  Spv.fold quantify_v vars f
+
 (* quantify over all references in ef
    ef : effect
    rm : region -> pvsymbol set
@@ -174,15 +190,8 @@ let find_constructor env ts =
      forall v'. f[v <- v']
 
 *)
-let quantify ?(all=false) env rm ef f =
+let quantify env rm ef f =
   let sreg = ef.E.writes in
-  let sreg =
-    if all then
-      Spv.fold (fun pv s -> Sreg.union pv.pv_regions s)
-      	ef.E.globals (Sreg.union ef.E.reads sreg)
-    else
-      sreg
-  in
   (* mreg: rho -> rho' *)
   let mreg =
     let add r m =
@@ -217,7 +226,7 @@ let quantify ?(all=false) env rm ef f =
 	    mreg, Mvs.add pv.pv_pure v' s, vv'
 	  end else begin
 	    eprintf "pv = %a@." print_pvsymbol pv;
-	    assert false (*TODO*)
+	    failwith "WP: update not yet implemented" (* assert false *)
 	  end
       | Ty.Tyvar _ ->
 	  assert false
@@ -567,7 +576,7 @@ and wp_triple env rm bl (p, e, q) =
   in
   let f = wp_expr env rm e q in
   let f = wp_implies p f in
-  let f = quantify ~all:true env rm e.expr_effect f in
+  let f = wp_close rm e.expr_effect f in
   wp_binders bl f
 
 and wp_recfun env rm (_, bl, _var, t) =
@@ -625,7 +634,7 @@ let decl uc = function
       add_wp_decl ps f uc
   | Pgm_ttree.Dletrec dl ->
       let add_one uc (ps, def) =
-	let f = wp_recfun uc Mreg.empty def in
+	let f = wp_recfun uc !global_regions def in
 	Debug.dprintf debug "wp %s = %a@\n----------------@."
 	   ps.ps_impure.ls_name.id_string Pretty.print_term f;
 	add_wp_decl ps f uc

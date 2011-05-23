@@ -18,34 +18,43 @@ Parameter old: forall (a:Type), a  -> a.
 
 Implicit Arguments old.
 
-Definition ref (a:Type) := a.
+Inductive ref (a:Type) :=
+  | mk_ref : a -> ref a.
+Implicit Arguments mk_ref.
+
+Definition contents (a:Type)(u:(ref a)): a :=
+  match u with
+  | mk_ref contents1 => contents1
+  end.
+Implicit Arguments contents.
 
 Parameter map : forall (a:Type) (b:Type), Type.
 
-Parameter get: forall (a:Type) (b:Type), (map a b) -> a  -> b.
+Parameter mixfix_lbrb: forall (a:Type) (b:Type), (map a b) -> a  -> b.
 
-Implicit Arguments get.
+Implicit Arguments mixfix_lbrb.
 
-Parameter set: forall (a:Type) (b:Type), (map a b) -> a -> b  -> (map a b).
+Parameter mixfix_lblsmnrb: forall (a:Type) (b:Type), (map a b) -> a -> b  ->
+  (map a b).
 
-Implicit Arguments set.
+Implicit Arguments mixfix_lblsmnrb.
 
 Axiom Select_eq : forall (a:Type) (b:Type), forall (m:(map a b)),
-  forall (a1:a) (a2:a), forall (b1:b), (a1 = a2) -> ((get (set m a1 b1)
-  a2) = b1).
+  forall (a1:a) (a2:a), forall (b1:b), (a1 = a2) ->
+  ((mixfix_lbrb (mixfix_lblsmnrb m a1 b1) a2) = b1).
 
 Axiom Select_neq : forall (a:Type) (b:Type), forall (m:(map a b)),
-  forall (a1:a) (a2:a), forall (b1:b), (~ (a1 = a2)) -> ((get (set m a1 b1)
-  a2) = (get m a2)).
+  forall (a1:a) (a2:a), forall (b1:b), (~ (a1 = a2)) ->
+  ((mixfix_lbrb (mixfix_lblsmnrb m a1 b1) a2) = (mixfix_lbrb m a2)).
 
-Parameter create_const: forall (b:Type) (a:Type), b  -> (map a b).
+Parameter const: forall (b:Type) (a:Type), b  -> (map a b).
 
 Set Contextual Implicit.
-Implicit Arguments create_const.
+Implicit Arguments const.
 Unset Contextual Implicit.
 
 Axiom Const : forall (b:Type) (a:Type), forall (b1:b) (a1:a),
-  ((get (create_const(b1):(map a b)) a1) = b1).
+  ((mixfix_lbrb (const(b1):(map a b)) a1) = b1).
 
 Inductive array (a:Type) :=
   | mk_array : Z -> (map Z a) -> array a.
@@ -63,17 +72,24 @@ Definition length (a:Type)(u:(array a)): Z :=
   end.
 Implicit Arguments length.
 
-Definition mixfix_lbrb (a:Type)(a1:(array a)) (i:Z): a := (get (elts a1) i).
-Implicit Arguments mixfix_lbrb.
+Definition mixfix_lbrb1 (a:Type)(a1:(array a)) (i:Z): a :=
+  (mixfix_lbrb (elts a1) i).
+Implicit Arguments mixfix_lbrb1.
+
+Definition mixfix_lblsmnrb1 (a:Type)(a1:(array a)) (i:Z) (v:a): (array a) :=
+  match a1 with
+  | mk_array xcl0 _ => (mk_array xcl0 (mixfix_lblsmnrb (elts a1) i v))
+  end.
+Implicit Arguments mixfix_lblsmnrb1.
 
 Definition decrease1(a:(array Z)): Prop := forall (i:Z), ((0%Z <= i)%Z /\
-  (i <  ((length a) - 1%Z)%Z)%Z) -> (((mixfix_lbrb a
-  i) - 1%Z)%Z <= (mixfix_lbrb a (i + 1%Z)%Z))%Z.
+  (i <  ((length a) - 1%Z)%Z)%Z) -> (((mixfix_lbrb1 a
+  i) - 1%Z)%Z <= (mixfix_lbrb1 a (i + 1%Z)%Z))%Z.
 
 Theorem decrease1_induction : forall (a:(array Z)), (decrease1 a) ->
   forall (i:Z) (j:Z), (((0%Z <= i)%Z /\ (i <= j)%Z) /\
-  (j <  (length a))%Z) -> ((((mixfix_lbrb a
-  i) + i)%Z - j)%Z <= (mixfix_lbrb a j))%Z.
+  (j <  (length a))%Z) -> ((((mixfix_lbrb1 a
+  i) + i)%Z - j)%Z <= (mixfix_lbrb1 a j))%Z.
 (* YOU MAY EDIT THE PROOF BELOW *)
 unfold decrease1.
 intros a Ha i j Hij.
@@ -86,11 +102,11 @@ destruct H4.
 subst x.
 ring_simplify.
 omega.
-apply Zle_trans with (mixfix_lbrb a (x-1) - 1)%Z.
+apply Zle_trans with (mixfix_lbrb1 a (x-1) - 1)%Z.
 assert (i <= x-1 < x)%Z by omega.
 assert (0 <= i <= x-1 /\ x-1 < length a)%Z by omega.
 generalize (H (x-1)%Z H8 H9); clear H; intuition.
-apply Zle_trans with (mixfix_lbrb a (x-1+1))%Z.
+apply Zle_trans with (mixfix_lbrb1 a (x-1+1))%Z.
 apply (Ha (x-1)%Z); omega.
 ring_simplify (x-1+1)%Z.
 omega.
