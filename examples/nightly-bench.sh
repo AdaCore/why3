@@ -66,7 +66,7 @@ if test "$?" != "0" ; then
         echo "--------------- Diff with last bench --------------" >> $REPORT
         echo "" >> $REPORT
         cp $OUT $PREVIOUS
-        sed '2d' $DIFF >> $REPORT
+        sed '1,2d' $DIFF >> $REPORT
         echo "" >> $REPORT
         echo "-------------- Full current state --------------" >> $REPORT
         echo "" >> $REPORT
