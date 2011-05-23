@@ -1,62 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
-<why3session name="programs/gcd/why3session.xml">
+<why3session name="examples/programs/gcd/why3session.xml">
  <file name="../gcd.mlw" verified="false" expanded="true">
   <theory name="M" verified="false" expanded="true">
-   <goal name="WP_parameter gcd" expl="correctness of parameter gcd" sum="665cff5a35980903b7a8eb517c404e17" proved="false" expanded="true">
-    <proof prover="cvc3" timelimit="2" edited="" obsolete="false">
-     <result status="timeout" time="2.08"/>
-    </proof>
-    <proof prover="simplify" timelimit="2" edited="" obsolete="false">
-     <result status="timeout" time="2.09"/>
-    </proof>
-    <proof prover="alt-ergo" timelimit="2" edited="" obsolete="false">
-     <result status="unknown" time="0.34"/>
-    </proof>
-    <proof prover="z3" timelimit="2" edited="" obsolete="false">
-     <result status="timeout" time="2.09"/>
-    </proof>
+   <goal name="WP_parameter gcd" expl="correctness of parameter gcd" sum="13686aa7223ccd074e11892070fa497c" proved="false" expanded="true">
     <transf name="split_goal" proved="false" expanded="true">
-     <goal name="WP_parameter gcd.1" expl="normal postcondition" sum="d6c14b7052f661d1db3c5517270a214e" proved="true" expanded="true">
+     <goal name="WP_parameter gcd.1" expl="normal postcondition" sum="e04458a1deb8f46c32e2040984924ab2" proved="true" expanded="true">
       <proof prover="cvc3" timelimit="2" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof prover="alt-ergo" timelimit="2" edited="" obsolete="false">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="simplify" timelimit="2" edited="" obsolete="false">
+      <proof prover="alt-ergo" timelimit="2" edited="" obsolete="false">
        <result status="valid" time="0.02"/>
+      </proof>
+      <proof prover="simplify" timelimit="2" edited="" obsolete="false">
+       <result status="valid" time="0.00"/>
       </proof>
       <proof prover="z3" timelimit="2" edited="" obsolete="false">
-       <result status="valid" time="0.03"/>
+       <result status="valid" time="0.65"/>
       </proof>
      </goal>
-     <goal name="WP_parameter gcd.2" expl="precondition" sum="ac183d41241c6eaf028e3626e0097b97" proved="true" expanded="true">
+     <goal name="WP_parameter gcd.2" expl="precondition" sum="b1c7e0b73a7e08e9bfb9e73aa85762d7" proved="true" expanded="true">
       <proof prover="cvc3" timelimit="2" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof prover="alt-ergo" timelimit="2" edited="" obsolete="false">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="simplify" timelimit="2" edited="" obsolete="false">
+      <proof prover="alt-ergo" timelimit="2" edited="" obsolete="false">
        <result status="valid" time="0.02"/>
       </proof>
+      <proof prover="simplify" timelimit="2" edited="" obsolete="false">
+       <result status="valid" time="0.00"/>
+      </proof>
       <proof prover="z3" timelimit="2" edited="" obsolete="false">
-       <result status="valid" time="0.03"/>
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter gcd.3" expl="normal postcondition" sum="7e7d74481a07874402868ca8e73fb044" proved="false" expanded="true">
+     <goal name="WP_parameter gcd.3" expl="normal postcondition" sum="c0a0f540fca852dd68a554221754e076" proved="false" expanded="true">
       <proof prover="cvc3" timelimit="2" edited="" obsolete="false">
-       <result status="unknown" time="1.16"/>
+       <result status="unknown" time="1.08"/>
       </proof>
       <proof prover="alt-ergo" timelimit="2" edited="" obsolete="false">
-       <result status="unknown" time="0.42"/>
+       <result status="unknown" time="0.48"/>
       </proof>
       <proof prover="simplify" timelimit="2" edited="" obsolete="false">
-       <result status="timeout" time="2.08"/>
+       <result status="timeout" time="2.09"/>
       </proof>
       <proof prover="z3" timelimit="2" edited="" obsolete="false">
-       <result status="timeout" time="2.08"/>
+       <result status="timeout" time="2.09"/>
       </proof>
      </goal>
     </transf>

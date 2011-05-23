@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
 <why3session name="examples/programs/power/why3session.xml">
- <file name="../power.mlw" verified="false" expanded="true">
-  <theory name="Power" verified="true" expanded="false">
-   <goal name="Power_1" sum="1db7c130e0faaa3525077846831aadf3" proved="true" expanded="false">
+ <file name="../power.mlw" verified="true" expanded="true">
+  <theory name="Power" verified="true" expanded="true">
+   <goal name="Power_1" sum="1db7c130e0faaa3525077846831aadf3" proved="true" expanded="true">
     <proof prover="cvc3" timelimit="2" edited="" obsolete="false">
      <result status="valid" time="0.01"/>
     </proof>
@@ -14,69 +14,65 @@
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
-   <goal name="Power_sum" sum="0222179599018e583f47a3d214f2e604" proved="true" expanded="false">
+   <goal name="Power_sum" sum="0222179599018e583f47a3d214f2e604" proved="true" expanded="true">
     <proof prover="coq" timelimit="2" edited="power.mlw_Power_Power_sum_1.v" obsolete="false">
      <result status="valid" time="0.46"/>
     </proof>
    </goal>
-   <goal name="Power_mult" sum="9d09d633adb75294ad19c24d7ad24bf4" proved="true" expanded="false">
+   <goal name="Power_mult" sum="9d09d633adb75294ad19c24d7ad24bf4" proved="true" expanded="true">
     <proof prover="coq" timelimit="2" edited="power.mlw_Power_Power_mult_1.v" obsolete="false">
      <result status="valid" time="0.52"/>
     </proof>
    </goal>
+   <goal name="Power_mult2" sum="c37356cfaed29d43e8813ffc76d4ea37" proved="true" expanded="true">
+    <proof prover="coq" timelimit="5" edited="power.mlw_Power_Power_mult2_1.v" obsolete="false">
+     <result status="valid" time="0.52"/>
+    </proof>
+   </goal>
   </theory>
-  <theory name="M" verified="false" expanded="true">
-   <goal name="WP_parameter fast_exp" expl="correctness of parameter fast_exp" sum="ff0a5f4d7ce2252d7f09664075c560a8" proved="true" expanded="false">
+  <theory name="M" verified="true" expanded="true">
+   <goal name="WP_parameter fast_exp" expl="correctness of parameter fast_exp" sum="ada75a97b847f6c89f173745c047f4f6" proved="true" expanded="true">
     <proof prover="alt-ergo" timelimit="2" edited="" obsolete="false">
      <result status="valid" time="0.10"/>
     </proof>
    </goal>
-   <goal name="WP_parameter fast_exp_imperative" expl="correctness of parameter fast_exp_imperative" sum="22f72b816b6021c98b7d03397cb1d7fd" proved="false" expanded="true">
-    <transf name="split_goal" proved="false" expanded="true">
-     <goal name="WP_parameter fast_exp_imperative.1" expl="loop invariant init" sum="0bac504113a8f4e466cd5612d00220fa" proved="true" expanded="false">
+   <goal name="WP_parameter fast_exp_imperative" expl="correctness of parameter fast_exp_imperative" sum="e63feaa4075e2c29b1d2e508ef9a86bc" proved="true" expanded="true">
+    <transf name="split_goal" proved="true" expanded="true">
+     <goal name="WP_parameter fast_exp_imperative.1" expl="loop invariant init" sum="f0a22ad175a48b43773b37c4a2565beb" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.00"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal name="WP_parameter fast_exp_imperative.2" expl="loop invariant preservation" sum="5117e72c11ee204306335e1da3b9a5e7" proved="true" expanded="false">
+     <goal name="WP_parameter fast_exp_imperative.2" expl="loop invariant preservation" sum="d268dda056e1d709305e69a650f8bcba" proved="true" expanded="true">
       <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.06"/>
       </proof>
      </goal>
-     <goal name="WP_parameter fast_exp_imperative.3" expl="loop variant decreases" sum="80be8265c76399ff1ed013b560c05ac9" proved="true" expanded="false">
+     <goal name="WP_parameter fast_exp_imperative.3" expl="loop variant decreases" sum="b283152678ce6a261050e574e7fb72b1" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.11"/>
+       <result status="valid" time="0.08"/>
       </proof>
      </goal>
-     <goal name="WP_parameter fast_exp_imperative.4" expl="loop invariant preservation" sum="0c03c29f50e52bd5961ca54bd12cf4b9" proved="false" expanded="true">
-      <transf name="split_goal" proved="false" expanded="true">
-       <goal name="WP_parameter fast_exp_imperative.4.1" expl="correctness of parameter fast_exp_imperative" sum="7ab6e51299cce66c2e5f2754452a91db" proved="true" expanded="true">
+     <goal name="WP_parameter fast_exp_imperative.4" expl="loop invariant preservation" sum="e6449071b108723a7787ee383b863dd4" proved="true" expanded="true">
+      <transf name="split_goal" proved="true" expanded="true">
+       <goal name="WP_parameter fast_exp_imperative.4.1" expl="correctness of parameter fast_exp_imperative" sum="1d0c559d1a4eb1cfe9233489abfef5c8" proved="true" expanded="true">
         <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
          <result status="valid" time="0.02"/>
         </proof>
        </goal>
-       <goal name="WP_parameter fast_exp_imperative.4.2" expl="correctness of parameter fast_exp_imperative" sum="153686c76ecf6d6a9fa404474076db03" proved="false" expanded="true">
-        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-         <result status="unknown" time="7.32"/>
-        </proof>
-        <proof prover="simplify" timelimit="10" edited="" obsolete="false">
-         <result status="timeout" time="10.05"/>
-        </proof>
+       <goal name="WP_parameter fast_exp_imperative.4.2" expl="correctness of parameter fast_exp_imperative" sum="527141c097824f81888acae0b946cb2a" proved="true" expanded="true">
         <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="timeout" time="10.05"/>
-        </proof>
-        <proof prover="z3" timelimit="10" edited="" obsolete="false">
-         <result status="timeout" time="10.05"/>
+         <result status="valid" time="0.31"/>
         </proof>
        </goal>
       </transf>
      </goal>
-     <goal name="WP_parameter fast_exp_imperative.5" expl="loop variant decreases" sum="747a9ee60c2446165c15c68a77f30fa3" proved="true" expanded="false">
+     <goal name="WP_parameter fast_exp_imperative.5" expl="loop variant decreases" sum="064585d410b90974186e9784cd94e41b" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.06"/>
+       <result status="valid" time="0.04"/>
       </proof>
      </goal>
-     <goal name="WP_parameter fast_exp_imperative.6" expl="normal postcondition" sum="5b3b282549aa378cfe6033b144badb05" proved="true" expanded="false">
+     <goal name="WP_parameter fast_exp_imperative.6" expl="normal postcondition" sum="24d11413cfc8fe98bb6763d6a86c1ab1" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.02"/>
       </proof>
