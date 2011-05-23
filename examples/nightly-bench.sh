@@ -1,7 +1,11 @@
 #!/bin/bash
 
-OUT=$PWD/nightly-bench.out
-REPORT=$PWD/nightly-bench.report
+REPORTDIR=$PWD/..
+OUT=$REPORTDIR/nightly-bench.out
+PREVIOUS=$REPORTDIR/nightly-bench.previous
+DIFF=$REPORTDIR/nightly-bench.diff
+REPORT=$REPORTDIR/nightly-bench.report
+DATE=`date --utc +%Y-%m-%d`
 
 notify() {
     mail -s "Why3 nightly bench" why3-commits@lists.gforge.inria.fr < $REPORT
@@ -11,7 +15,7 @@ notify() {
 }
 
 
-echo "== Why3 bench on `date` ==" > $REPORT
+echo "== Why3 bench on $DATE ==" > $REPORT
 
 # configuration
 autoconf
@@ -20,7 +24,7 @@ if test "$?" != "0" ; then
     echo "Configure failed" >> $REPORT
     cat $OUT >> $REPORT
     notify
-else 
+else
     echo "Configuration succeeded. " >> $REPORT
 fi
 
@@ -30,7 +34,7 @@ if test "$?" != "0" ; then
     echo "Compilation failed" >> $REPORT
     tail -20 $OUT >> $REPORT
     notify
-else 
+else
     echo "Compilation succeeded. " >> $REPORT
 fi
 
@@ -40,7 +44,7 @@ if test "$?" != "0" ; then
     echo "Prover detection failed" >> $REPORT
     cat $OUT >> $REPORT
     notify
-else 
+else
     echo "Prover detection succeeded. " >> $REPORT
 fi
 
@@ -52,10 +56,24 @@ perl -pi -e 's/running_provers_max = 2/running_provers_max = 4/' why.conf
 # replay proofs
 examples/regtests.sh &> $OUT
 if test "$?" != "0" ; then
+    cp $OUT $REPORTDIR/regtests-$DATE
     echo "Proof replay failed" >> $REPORT
-    cat $OUT >> $REPORT
+    diff -u $PREVIOUS $OUT >> $DIFF
+    if test "$?" == 0 ; then
+        echo "---------- No difference with last bench ---------- " >> $REPORT
+    else
+        echo "" >> $REPORT
+        echo "--------------- Diff with last bench --------------" >> $REPORT
+        echo "" >> $REPORT
+        cp $OUT $PREVIOUS
+        sed '2d' $DIFF >> $REPORT
+        echo "" >> $REPORT
+        echo "-------------- Full current state --------------" >> $REPORT
+        echo "" >> $REPORT
+        cat $OUT >> $REPORT
+    fi
     notify
-else 
+else
     echo "Replay succeeded. " >> $REPORT
 fi
 

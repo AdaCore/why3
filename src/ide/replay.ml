@@ -56,7 +56,7 @@ let fname = match !file with
 let config = Whyconf.read_config None
 
 let loadpath = (Whyconf.loadpath (Whyconf.get_main config))
-  @ List.rev !includes 
+  @ List.rev !includes
 
 let env = Lexer.create_env loadpath
 
@@ -158,7 +158,7 @@ let init =
         | M.Goal g -> M.goal_expl g
         | M.Theory th -> M.theory_name th
         | M.File f -> Filename.basename f.M.file_name
-        | M.Proof_attempt a -> 
+        | M.Proof_attempt a ->
             begin
               match a.M.prover with
                 | M.Detected_prover p ->
@@ -170,6 +170,7 @@ let init =
     (* eprintf "Item '%s' loaded@." name *)
     ()
 
+(*
 let string_of_result result =
   match result with
     | Session.Undone -> "undone"
@@ -187,11 +188,19 @@ let string_of_result result =
 let print_result fmt res =
   let t = match res with
     | Session.Done { Call_provers.pr_time = time } ->
-	Format.sprintf "(%.2f)" time
+	Format.sprintf "(%.1f)" time
     | _ -> ""
   in
   fprintf fmt "%s%s" (string_of_result res) t
+*)
 
+
+let print_result fmt
+    {Call_provers.pr_answer=ans; Call_provers.pr_output=out;
+     Call_provers.pr_time=t} =
+  fprintf fmt "%a (%.1fs)" Call_provers.print_prover_answer ans t;
+  if ans == Call_provers.HighFailure then
+    fprintf fmt "@\nProver output:@\n%s@." out
 
 let notify _any = ()
 (*
@@ -247,41 +256,38 @@ let file_statistics (files,n,m) f =
   ((f,ths,n1,m1)::files,n+n1,m+m1)
 
 let print_statistics files =
-  List.iter 
+  List.iter
     (fun (f,ths,n,m) ->
        if n<m then
 	 begin
 	   printf "   +--file %s: %d/%d@." f.M.file_name n m;
-	   List.iter 
+	   List.iter
 	     (fun (th,goals,n,m) ->
 		if n<m then
 		  begin
-		    printf "      +--theory %s: %d/%d@." 
+		    printf "      +--theory %s: %d/%d@."
 		      (M.theory_name th) n m;
-		    List.iter 
+		    List.iter
 		      (fun g ->
-			 printf "         +--goal %s not proved@." (M.goal_name g)) 
+			 printf "         +--goal %s not proved@." (M.goal_name g))
 		      (List.rev goals)
 		  end)
 	     (List.rev ths)
 	 end)
     (List.rev files)
-      
-let print_report (g,p,r) = 
+
+let print_report (g,p,r) =
   printf "   goal '%s', prover '%s': " g p;
   match r with
-  | M.Wrong_result(new_res,old_res) -> 
+  | M.Wrong_result(new_res,old_res) ->
       printf "%a instead of %a@."
-        Call_provers.print_prover_result new_res 
-        Call_provers.print_prover_result old_res
+        print_result new_res print_result old_res
   | M.No_former_result ->
       printf "no former result available@."
   | M.CallFailed msg ->
       printf "internal failure '%a'@." Exn_printer.exn_printer msg;
   | M.Prover_not_installed ->
       printf "not installed@."
-
-	
 
 let () =
   try
@@ -291,19 +297,19 @@ let () =
       Whyconf.running_provers_max (Whyconf.get_main config);
     eprintf " done@.";
     let callback report =
-      let files,n,m = 
-	List.fold_left file_statistics ([],0,0) (M.get_all_files ()) 
+      let files,n,m =
+	List.fold_left file_statistics ([],0,0) (M.get_all_files ())
       in
       printf " %d/%d@." n m ;
       match report with
-	| [] -> 
+	| [] ->
 	    if !opt_stats && n<m then print_statistics files;
 	    eprintf "Everything OK.@.";
 	    exit 0
 	| _ ->
 	    List.iter print_report report;
-	    eprintf "Check failed.@."; 
-	    exit 1 
+	    eprintf "Check failed.@.";
+	    exit 1
     in
     M.check_all ~callback;
     try main_loop ()
