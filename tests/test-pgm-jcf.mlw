@@ -5,7 +5,7 @@ module M
 
   parameter x : ref int
 
-  let rec f2 () : unit = {  } x := 1; f2 () {  }
+  let rec f2 () : unit variant { !x } = x := !x - 1; f2 ()
 
 end
 

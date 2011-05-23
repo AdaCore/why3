@@ -1578,6 +1578,7 @@ and letrec gl env dl = (* : env * recfun list *)
       let c = Mvs.find i.i_impure m in
       let c = match decvar, var with
 	| Some phi0, Some (_, phi, r) ->
+	    let _, phi = term_effect E.empty phi in
 	    let decphi = match r with
 	      | None -> (* 0 <= phi0 and phi < phi0 *)
 		  t_and (ps_app (find_ls ~pure:true gl "infix <=")
