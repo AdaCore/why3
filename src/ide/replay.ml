@@ -197,8 +197,11 @@ let print_result fmt res =
 
 let print_result fmt
     {Call_provers.pr_answer=ans; Call_provers.pr_output=out;
-     Call_provers.pr_time=t} =
+     Call_provers.pr_time=_t} =
+(*
   fprintf fmt "%a (%.1fs)" Call_provers.print_prover_answer ans t;
+*)
+  fprintf fmt "%a" Call_provers.print_prover_answer ans;
   if ans == Call_provers.HighFailure then
     fprintf fmt "@\nProver output:@\n%s@." out
 

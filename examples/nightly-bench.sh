@@ -58,15 +58,19 @@ examples/regtests.sh &> $OUT
 if test "$?" != "0" ; then
     cp $OUT $REPORTDIR/regtests-$DATE
     echo "Proof replay failed" >> $REPORT
-    diff -u $PREVIOUS $OUT >> $DIFF
+    diff -u $PREVIOUS $OUT &> $DIFF
     if test "$?" == 0 ; then
         echo "---------- No difference with last bench ---------- " >> $REPORT
+        echo "" >> $REPORT
+        echo "-------------- Full current state --------------" >> $REPORT
+        echo "" >> $REPORT
+        cat $OUT >> $REPORT
     else
         echo "" >> $REPORT
         echo "--------------- Diff with last bench --------------" >> $REPORT
         echo "" >> $REPORT
-        cp $OUT $PREVIOUS
         sed '1,2d' $DIFF >> $REPORT
+        cp $OUT $PREVIOUS
         echo "" >> $REPORT
         echo "-------------- Full current state --------------" >> $REPORT
         echo "" >> $REPORT
