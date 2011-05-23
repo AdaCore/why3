@@ -25,11 +25,20 @@ let rec update kn t = match t.t_node with
   | Tlet (_, t) -> let _, t = t_open_bound t in update kn t
   | _ -> false
 
+let rec dive fn env t = match t.t_node with
+  | Tvar x when Mvs.mem x env ->
+      dive fn env (Mvs.find x env)
+  | Tlet (t1, tb) ->
+      let x, t2, close = t_open_bound_cb tb in
+      let t2 = dive fn (Mvs.add x t1 env) t2 in
+      t_label_copy t (t_let_simp t1 (close x t2))
+  | _ -> fn t
+
+let make_case kn fn t bl =
+  let mk_b b = let p,t = t_open_branch b in [p], fn t in
+  Pattern.CompileTerm.compile (find_constructors kn) [t] (List.map mk_b bl)
+
 let eval_match ~inline kn t =
-  let rec find_var env t = match t.t_node with
-    | Tvar x when Mvs.mem x env -> find_var env (Mvs.find x env)
-    | _ -> t
-  in
   let rec eval env t = match t.t_node with
     | Tapp (ls, tl) when inline kn ls ->
 	begin match find_logic_definition kn ls with
@@ -44,32 +53,20 @@ let eval_match ~inline kn t =
 	let t2 = eval (Mvs.add x t1 env) t2 in
 	t_label_copy t (t_let_simp t1 (close x t2))
     | Tcase (t1, bl) ->
-	let t1 = eval env t1 in
-	let t1 = find_var env t1 in
-	let mk_b (p,t) = ([p], t) in
-	let bl = List.map (fun b -> mk_b (t_open_branch b)) bl in
-	let r = Pattern.CompileTerm.compile (find_constructors kn) [t1] bl in
-	let eval_branch b =
-	  let p, t, close = t_open_branch_cb b in close p (eval env t)
-	in
-	let res = match r.t_node with
-	  | Tcase ({ t_node = Tcase (t1, bl1) }, bl2) ->
-	      let bl1 = List.map t_open_branch bl1 in
-	      if List.for_all (fun (_, t) -> update kn t) bl1 then
-		let branch (p, t) =
-		  t_close_branch p (eval env (t_case t bl2))
-		in
-		t_case t1 (List.map branch bl1)
-	      else
-		let branch (p, t) = t_close_branch p (eval env t) in
-		let bl2 = List.map eval_branch bl2 in
-		t_case (t_case t1 (List.map branch bl1)) bl2
-	  | Tcase (t1, bl) ->
-	      t_case t1 (List.map eval_branch bl)
-	  | _ ->
-	      eval env r
-	in
-	t_label_copy t res
+        let t1 = eval env t1 in
+        let process t1 =
+          let r = make_case kn (eval env) t1 bl in
+          match r.t_node with
+            | Tcase ({ t_node = Tcase (t1, bl1) }, bl2) ->
+                let branch b =
+                  let p,t,close = t_open_branch_cb b in
+                  if not (update kn t) then raise Exit;
+                  close p (make_case kn (fun x -> x) t bl2)
+                in
+                (try t_case t1 (List.map branch bl1) with Exit -> r)
+            | _ -> r
+        in
+        t_label_copy t (dive process env t1)
     | _ ->
 	t_map (eval env) t
   in
