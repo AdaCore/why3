@@ -626,6 +626,7 @@ let region_type ts i =
 let mutable_fields = Hts.create 17 (* ts -> field:int -> region:int *)
 
 let declare_mutable_field ts i j =
+  Pgm_wp.declare_mutable_field ts j i;
   let h =
     try
       Hts.find mutable_fields ts

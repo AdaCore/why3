@@ -1,13 +1,12 @@
 module M
 
   use import int.Int
-  use import module ref.Ref
+  use import module array.Array
 
-  logic id (x : 'a) : 'a = x
-
-  type e = A | B
-
-  let foo () = {} id A { result <> B }
+  let foo (a: array int) =
+    { true }
+    a[0] <- 1
+    { a[0] = 1 }
 
 end
 

@@ -34,6 +34,19 @@ open Pgm_module
 
 let debug = Debug.register_flag "program_wp"
 
+(* mutable fields *)
+
+let mutable_fields = Hts.create 17 (* ts -> region:int -> field:int *)
+
+let declare_mutable_field ts i j =
+  let h =
+    try
+      Hts.find mutable_fields ts
+    with Not_found ->
+      let h = Hashtbl.create 17 in Hts.add mutable_fields ts h; h
+  in
+  Hashtbl.add h i j
+
 (* phase 4: weakest preconditions *******************************************)
 
 (* smart constructors for building WPs
@@ -74,13 +87,13 @@ let rec wp_forall env v f =
   in
   match cl with
     | [ls] ->
-	let s = ty_match Mtv.empty (of_option ls.ls_value) ty in
-	let mk_v ty = create_vsymbol (id_fresh "x") (ty_inst s ty) in
-	let vl = List.map mk_v ls.ls_args in
-	let t = fs_app ls (List.map t_var vl) ty in
-	List.fold_right (wp_forall env) vl (t_let_close_simp v t f)
+        let s = ty_match Mtv.empty (of_option ls.ls_value) ty in
+        let mk_v ty = create_vsymbol (id_fresh "x") (ty_inst s ty) in
+        let vl = List.map mk_v ls.ls_args in
+        let t = fs_app ls (List.map t_var vl) ty in
+        List.fold_right (wp_forall env) vl (t_let_close_simp v t f)
     | _ ->
-	t_forall_close_simp [v] [] f
+        t_forall_close_simp [v] [] f
 
 let wp_forall env v f =
   if is_arrow_ty v.vs_ty then f else
@@ -199,21 +212,14 @@ let wp_close kn rm ef f =
      ...
      let v'm = update vm r1...rn in
      f[vi <- v'i]
-
-  an optimization is performed for singleton types
-  instead of
-     forall r. forall v'. v' = r -> f[v <- v']
-  we build
-     forall v'. f[v <- v']
-
 *)
 let quantify env rm ef f =
   let sreg = ef.E.writes in
   (* mreg: rho -> rho' *)
   let mreg =
     let add r m =
-      let v = create_vsymbol (id_clone r.R.r_tv.tv_name) (purify r.R.r_ty) in
-      Mreg.add r v m
+      let r' = create_vsymbol (id_clone r.R.r_tv.tv_name) (purify r.R.r_ty) in
+      Mreg.add r r' m
     in
     Sreg.fold add sreg Mreg.empty
   in
@@ -224,29 +230,29 @@ let quantify env rm ef f =
     in
     Mreg.fold add mreg Spv.empty
   in
-  (* s: v -> v' and vv': pv -> v',update_v *)
+  (* s: v -> v' and vv': pv -> v', update_v *)
   let mreg, s, vv' =
     let add pv (mreg, s, vv') = match pv.pv_effect.vs_ty.ty_node with
       | Ty.Tyapp (ts, _) ->
-	  let mt = get_mtsymbol ts in
-	  if mt.mt_singleton then begin (* singleton type *)
-	    assert (Sreg.cardinal pv.pv_regions = 1);
-	    let r = Sreg.choose pv.pv_regions in
-	    (* a better name for r *)
-	    let r' = create_vsymbol (id_clone pv.pv_name) (purify r.R.r_ty) in
-	    let mreg = Mreg.add r r' mreg in
-	    let ty = pv.pv_pure.vs_ty in
-	    let v' = create_vsymbol (id_clone pv.pv_name) ty in
-	    let cs = find_constructor env mt.mt_pure in
-	    let update = fs_app cs [t_var r'] ty in
-	    let vv' = Mpv.add pv (v', update) vv' in
-	    mreg, Mvs.add pv.pv_pure v' s, vv'
-	  end else begin
-	    eprintf "pv = %a@." print_pvsymbol pv;
-	    failwith "WP: update not yet implemented" (* assert false *)
-	  end
+          let mt = get_mtsymbol ts in
+          if mt.mt_singleton then begin (* singleton type *)
+            assert (Sreg.cardinal pv.pv_regions = 1);
+            let r = Sreg.choose pv.pv_regions in
+            (* a better name for r' *)
+            let r' = create_vsymbol (id_clone pv.pv_name) (purify r.R.r_ty) in
+            let mreg = Mreg.add r r' mreg in
+            let ty = pv.pv_pure.vs_ty in
+            let v' = create_vsymbol (id_clone pv.pv_name) ty in
+            let cs = find_constructor env mt.mt_pure in
+            let update = fs_app cs [t_var r'] ty in
+            let vv' = Mpv.add pv (v', update) vv' in
+            mreg, Mvs.add pv.pv_pure v' s, vv'
+          end else begin
+            eprintf "pv = %a@." print_pvsymbol pv;
+            failwith "WP: update not yet implemented" (* assert false *)
+          end
       | Ty.Tyvar _ ->
-	  assert false
+          assert false
     in
     Spv.fold add vars (mreg, Mvs.empty, Mpv.empty)
   in
@@ -270,12 +276,12 @@ let abstract_wp env rm ef (q',ql') (q,ql) =
     let f = wp_implies f' f in
     let f = match res with
       (* | Some v when is_mutable_ty v.vs_ty -> *)
-      (* 	  let v' = create_vsymbol (id_clone v.vs_name) (unref_ty env v.vs_ty) in *)
-      (* 	  wp_forall v' (unref env (R.Rlocal v) v' f) *)
+      (*          let v' = create_vsymbol (id_clone v.vs_name) (unref_ty env v.vs_ty) in *)
+      (*          wp_forall v' (unref env (R.Rlocal v) v' f) *)
       | Some v ->
-	  wp_forall env v f
+          wp_forall env v f
       | None ->
-	  f
+          f
     in
     quantify env rm ef f
   in
@@ -362,24 +368,24 @@ let wp_expl l f =
 let while_post_block env inv var lab e =
   let decphi = match var with
     | None ->
-	t_true
+        t_true
     | Some (phi, None) ->
-	let old_phi = term_at env lab phi in
-	(* 0 <= old_phi and phi < old_phi *)
-	wp_and (ps_app (find_ls ~pure:true env "infix <=")
-		  [t_int_const "0"; old_phi])
-	       (ps_app (find_ls ~pure:true env "infix <")  [phi; old_phi])
+        let old_phi = term_at env lab phi in
+        (* 0 <= old_phi and phi < old_phi *)
+        wp_and (ps_app (find_ls ~pure:true env "infix <=")
+                  [t_int_const "0"; old_phi])
+               (ps_app (find_ls ~pure:true env "infix <")  [phi; old_phi])
     | Some (phi, Some r) ->
-	ps_app r [phi; term_at env lab phi]
+        ps_app r [phi; term_at env lab phi]
   in
   let decphi = wp_expl "loop variant decreases" decphi in
   let ql = default_exns_post e.expr_effect in
   let res = v_result e.expr_type in
   match inv with
     | None ->
-	(res, decphi), ql
+        (res, decphi), ql
     | Some i ->
-	(res, wp_and (wp_expl "loop invariant preservation" i) decphi), ql
+        (res, wp_and (wp_expl "loop invariant preservation" i) decphi), ql
 
 let well_founded_rel = function
   | None -> t_true
@@ -438,8 +444,8 @@ and wp_desc env rm e q = match e.expr_desc with
       wp_and q f
   | Elet (x, e1, e2) ->
       let w2 =
-	let rm = add_binder x rm in
-	wp_expr env rm e2 (filter_post e2.expr_effect q)
+        let rm = add_binder x rm in
+        wp_expr env rm e2 (filter_post e2.expr_effect q)
       in
       let v1 = v_result x.pv_pure.vs_ty in
       let t1 = t_label ~loc:e1.expr_loc ["let"] (t_var v1) in
@@ -454,11 +460,11 @@ and wp_desc env rm e q = match e.expr_desc with
       let w2 = wp_expr env rm e2 (filter_post e2.expr_effect q) in
       let w3 = wp_expr env rm e3 (filter_post e3.expr_effect q) in
       let q1 = (* if result=True then w2 else w3 *)
-	let res = v_result e1.expr_type in
-	let test = t_equ (t_var res) (t_True env) in
-	let test = wp_label ~loc:e1.expr_loc test in
-	let q1 = t_if test w2 w3 in
-	saturate_post e1.expr_effect (res, q1) q
+        let res = v_result e1.expr_type in
+        let test = t_equ (t_var res) (t_True env) in
+        let test = wp_label ~loc:e1.expr_loc test in
+        let q1 = t_if test w2 w3 in
+        saturate_post e1.expr_effect (res, q1) q
       in
       wp_expr env rm e1 q1
   | Eloop ({ loop_invariant = inv; loop_variant = var }, e1) ->
@@ -469,22 +475,22 @@ and wp_desc env rm e q = match e.expr_desc with
       let we = wp_expr env rm e1 q1 in
       let we = erase_label env lab we in
       let w = match inv with
-	| None ->
-	    wp_and wfr (quantify env rm e.expr_effect we)
-	| Some i ->
-	    wp_and wfr
-	      (wp_and ~sym:true
-		 (wp_expl "loop invariant init" i)
-		 (quantify env rm e.expr_effect (wp_implies i we)))
-	in
-	w
+        | None ->
+            wp_and wfr (quantify env rm e.expr_effect we)
+        | Some i ->
+            wp_and wfr
+              (wp_and ~sym:true
+                 (wp_expl "loop invariant init" i)
+                 (quantify env rm e.expr_effect (wp_implies i we)))
+        in
+        w
   (* optimization for the particular case let _ = y in e *)
   | Ematch (_, [{ppat_pat = {pat_node = Term.Pwild}}, e]) ->
       wp_expr env rm e (filter_post e.expr_effect q)
   | Ematch (x, bl) ->
       let branch (p, e) =
         t_close_branch p.ppat_pat
-	  (wp_expr env rm e (filter_post e.expr_effect q))
+          (wp_expr env rm e (filter_post e.expr_effect q))
       in
       let t = t_var x.pv_pure in
       t_case t (List.map branch bl)
@@ -498,26 +504,26 @@ and wp_desc env rm e q = match e.expr_desc with
       (* $wp(raise (E e1), _, R) = wp(e1, R, R)$ *)
       let _, ql = q in
       let q1 = match assoc_handler x ql with
-	| Some v, r -> (v, r), ql
-	| None, _ -> assert false
+        | Some v, r -> (v, r), ql
+        | None, _ -> assert false
       in
       let q1 = filter_post e1.expr_effect q1 in
       wp_expr env rm e1 q1
   | Etry (e1, hl) ->
       (* $wp(try e1 with E -> e2, Q, R) = wp(e1, Q, wp(e2, Q, R))$ *)
       let hwl =
-	List.map
-	  (fun (x, v, h) ->
-	     let w = wp_expr env rm h (filter_post h.expr_effect q) in
-	     let v = option_map (fun v -> v.pv_pure) v in
-	     x, (v, w))
-	  hl
+        List.map
+          (fun (x, v, h) ->
+             let w = wp_expr env rm h (filter_post h.expr_effect q) in
+             let v = option_map (fun v -> v.pv_pure) v in
+             x, (v, w))
+          hl
       in
       let make_post (q, ql) =
-	let hpost (x, r) =
-	  x, try assoc_handler x hwl with Not_found -> r
-	in
-	q, List.map hpost ql
+        let hpost (x, r) =
+          x, try assoc_handler x hwl with Not_found -> r
+        in
+        q, List.map hpost ql
       in
       let q1 = saturate_post e1.expr_effect (fst q) q in
       let q1 = filter_post e1.expr_effect (make_post q1) in
@@ -528,39 +534,39 @@ and wp_desc env rm e q = match e.expr_desc with
          and v1 <= v2 ->     I(v1)
                          and forall S. forall i. v1 <= i <= v2 ->
                                                  I(i) -> wp(e1, I(i+1), R)
-	                               and I(v2+1) -> Q                    *)
+                                       and I(v2+1) -> Q                    *)
       let (res, q1), _ = q in
       let gt, le, incr = match d with
-	| Ptree.To     ->
-	    find_ls ~pure:true env "infix >",
-	    find_ls ~pure:true env "infix <=", t_int_const  "1"
-	| Ptree.Downto ->
-	    find_ls ~pure:true env "infix <",
-	    find_ls ~pure:true env "infix >=", t_int_const "-1"
+        | Ptree.To     ->
+            find_ls ~pure:true env "infix >",
+            find_ls ~pure:true env "infix <=", t_int_const  "1"
+        | Ptree.Downto ->
+            find_ls ~pure:true env "infix <",
+            find_ls ~pure:true env "infix >=", t_int_const "-1"
       in
       let v1_gt_v2 = ps_app gt [t_var v1.pv_pure; t_var v2.pv_pure] in
       let v1_le_v2 = ps_app le [t_var v1.pv_pure; t_var v2.pv_pure] in
       let inv = match inv with Some inv -> inv | None -> t_true in
       let add = find_ls~pure:true env "infix +" in
       let wp1 =
-	let xp1 = fs_app add [t_var x.pv_pure; incr] ty_int in
-	let post = t_subst (subst1 x.pv_pure xp1) inv in
-	let q1 = saturate_post e1.expr_effect (res, post) q in
-	wp_expr env rm e1 q1
+        let xp1 = fs_app add [t_var x.pv_pure; incr] ty_int in
+        let post = t_subst (subst1 x.pv_pure xp1) inv in
+        let q1 = saturate_post e1.expr_effect (res, post) q in
+        wp_expr env rm e1 q1
       in
       let f = wp_and ~sym:true
-	(wp_expl "for loop initialization"
-	   (t_subst (subst1 x.pv_pure (t_var v1.pv_pure)) inv))
-	(quantify env rm e.expr_effect
-	   (wp_and ~sym:true
-	      (wp_expl "for loop preservation"
-		(wp_forall env x.pv_pure
-	         (wp_implies
-		    (wp_and (ps_app le [t_var v1.pv_pure; t_var x.pv_pure])
-		            (ps_app le [t_var x.pv_pure;  t_var v2.pv_pure]))
+        (wp_expl "for loop initialization"
+           (t_subst (subst1 x.pv_pure (t_var v1.pv_pure)) inv))
+        (quantify env rm e.expr_effect
+           (wp_and ~sym:true
+              (wp_expl "for loop preservation"
+                (wp_forall env x.pv_pure
+                 (wp_implies
+                    (wp_and (ps_app le [t_var v1.pv_pure; t_var x.pv_pure])
+                            (ps_app le [t_var x.pv_pure;  t_var v2.pv_pure]))
                  (wp_implies inv wp1))))
-	      (let sv2 = fs_app add [t_var v2.pv_pure; incr] ty_int in
-	       wp_implies (t_subst (subst1 x.pv_pure sv2) inv) q1)))
+              (let sv2 = fs_app add [t_var v2.pv_pure; incr] ty_int in
+               wp_implies (t_subst (subst1 x.pv_pure sv2) inv) q1)))
       in
       wp_and ~sym:true (wp_implies v1_gt_v2 q1) (wp_implies v1_le_v2 f)
 
@@ -645,16 +651,16 @@ let add_wp_decl ps f uc =
 let decl uc = function
   | Pgm_ttree.Dlet (ps, e) ->
       Debug.dprintf debug "@[--effect %s-----@\n  %a@]@\n----------------@."
-	  ps.ps_impure.ls_name.id_string print_type_v e.expr_type_v;
+          ps.ps_impure.ls_name.id_string print_type_v e.expr_type_v;
       let f = wp uc e in
       Debug.dprintf debug "wp = %a@\n----------------@." Pretty.print_term f;
       add_wp_decl ps f uc
   | Pgm_ttree.Dletrec dl ->
       let add_one uc (ps, def) =
-	let f = wp_recfun uc !global_regions def in
-	Debug.dprintf debug "wp %s = %a@\n----------------@."
-	   ps.ps_impure.ls_name.id_string Pretty.print_term f;
-	add_wp_decl ps f uc
+        let f = wp_recfun uc !global_regions def in
+        Debug.dprintf debug "wp %s = %a@\n----------------@."
+           ps.ps_impure.ls_name.id_string Pretty.print_term f;
+        add_wp_decl ps f uc
       in
       List.fold_left add_one uc dl
   | Pgm_ttree.Dparam _ ->
