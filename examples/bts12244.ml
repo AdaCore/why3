@@ -50,7 +50,7 @@ let two : Term.term = Term.t_const (Term.ConstInt "2")
 let fmla : Term.term = Term.t_equ one two
 
 let task = Task.use_export None int_theory
-let goal_id = Decl.create_prsymbol (Ident.id_fresh "G") 
+let goal_id = Decl.create_prsymbol (Ident.id_fresh "G")
 let task = Task.add_prop_decl task Decl.Pgoal goal_id fmla
 
 (*
@@ -63,12 +63,26 @@ let split = Trans.lookup_transform_l "split_goal" env
 
 let task_inline = Trans.apply inline task
 
-let () = printf "@[task == task_inline ? %b@]@." (task == task_inline)
-
-let task_split = 
+let task_split =
   match Trans.apply split task with
     | [t] -> t
     | _ -> assert false
 
-let () = printf "@[task == task_split ? %b@]@." (task == task_split)
+let task_checksum t =
+  fprintf str_formatter "%a@." Pretty.print_task t;
+  let s = flush_str_formatter () in
+  Digest.to_hex (Digest.string s)
+
+let sum = task_checksum task
+
+let sum_inline = task_checksum task_inline
+
+let sum_split = task_checksum task_split
+
+let () = printf "@[task == task_inline ? %b   same checksums ? %b@]@."
+  (task == task_inline) (sum = sum_inline)
+
+let () = printf "@[task == task_split ? %b    same checksums ? %b@]@."
+  (task == task_split) (sum = sum_split)
+
 

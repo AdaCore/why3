@@ -109,6 +109,8 @@ theory TestReal
 
    goal RealAbs1: forall x:real. 100.0 >= abs x >= 1.0 -> x*x >= 1.0
 
+   goal T: forall x y:real. abs x <= 1.0 and abs y <= 1.0 -> x - y <= 2.0
+
 end
 
 theory TestFloat
