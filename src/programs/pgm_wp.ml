@@ -229,7 +229,7 @@ let quantify env rm ef f =
     let add pv (mreg, s, vv') = match pv.pv_effect.vs_ty.ty_node with
       | Ty.Tyapp (ts, _) ->
 	  let mt = get_mtsymbol ts in
-	  if mt.mt_singleton then begin
+	  if mt.mt_singleton then begin (* singleton type *)
 	    assert (Sreg.cardinal pv.pv_regions = 1);
 	    let r = Sreg.choose pv.pv_regions in
 	    (* a better name for r *)

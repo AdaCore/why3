@@ -1,8 +1,9 @@
 
+open Ty
 open Term
 open Decl
 
-type inline = known_map -> lsymbol -> bool
+type inline = known_map -> lsymbol -> ty list -> ty option -> bool
 
 val eval_match: inline:inline -> known_map -> term -> term
 

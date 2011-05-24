@@ -6,7 +6,7 @@ open Term
 open Decl
 open Pretty
 
-type inline = known_map -> lsymbol -> bool
+type inline = known_map -> lsymbol -> ty list -> ty option -> bool
 
 let unfold def tl ty =
   let vl, e = open_ls_defn def in
@@ -40,7 +40,7 @@ let make_case kn fn t bl =
 
 let eval_match ~inline kn t =
   let rec eval env t = match t.t_node with
-    | Tapp (ls, tl) when inline kn ls ->
+    | Tapp (ls, tl) when inline kn ls (List.map t_type tl) t.t_ty ->
 	begin match find_logic_definition kn ls with
 	  | None ->
 	      t_map (eval env) t
@@ -83,8 +83,15 @@ let rec linear vars t = match t.t_node with
 let linear t =
   try ignore (linear Svs.empty t); true with Exit -> false
 
-let inline_nonrec_linear kn ls =
+let is_algebraic_type kn ty = match ty.ty_node with
+  | Tyapp (ts, _) -> find_constructors kn ts <> []
+  | Tyvar _ -> false
+
+let inline_nonrec_linear kn ls tyl ty =
   let d = Mid.find ls.ls_name kn in
+  (* at least one actual parameter (or the result) has an algebraic type *)
+  List.exists (is_algebraic_type kn) (oty_cons tyl ty) &&
+  (* and ls is not recursively defined and is linear *)
   match d.d_node with
     | Dlogic dl ->
 	let no_occ (ls', def) = match def with

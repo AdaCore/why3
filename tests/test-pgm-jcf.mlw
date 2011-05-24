@@ -3,9 +3,11 @@ module M
   use import int.Int
   use import module ref.Ref
 
-  parameter x : ref int
+  logic id (x : 'a) : 'a = x
 
-  let rec f2 () : unit variant { !x } = x := !x - 1; f2 ()
+  type e = A | B
+
+  let foo () = {} id A { result <> B }
 
 end
 
