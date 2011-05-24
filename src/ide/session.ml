@@ -1486,16 +1486,15 @@ let transformation_on_goal g tr =
       let b =
  	match subgoals with
 	  | [task] ->
-              let s1 = task_checksum (get_task g) in
-              let s2 = task_checksum task in
-	      (*
-                eprintf "Transformation returned only one task. sum before = %s, sum after = %s@." (task_checksum g.task) (task_checksum task);
-                eprintf "addresses: %x %x@." (Obj.magic g.task) (Obj.magic task);
-	      *)
-              s1 <> s2
-(*
+              (* let s1 = task_checksum (get_task g) in *)
+              (* let s2 = task_checksum task in *)
+	      (* (\* *)
+              (*   eprintf "Transformation returned only one task. sum before = %s, sum after = %s@." (task_checksum g.task) (task_checksum task); *)
+              (*   eprintf "addresses: %x %x@." (Obj.magic g.task) (Obj.magic task); *)
+	      (* *\) *)
+              (* s1 <> s2 *)
+
                 task != (get_task g)
-*)
 	  | _ -> true
       in
       if b then

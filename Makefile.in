@@ -933,6 +933,9 @@ test-api: src/why.cma
 	ocaml $(EXTCMA)	src/why.cma -I src examples/use_api.ml \
 	|| (printf "Test of Why API calls failed. Please fix it"; exit 2)
 
+bts12244: src/why.cma
+	ocaml $(EXTCMA)	src/why.cma -I src examples/bts12244.ml 
+
 
 ## Examples : Plugins ##
 
