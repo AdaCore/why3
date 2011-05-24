@@ -1,6 +1,6 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  Copyright (C) 2010-                                                   *)
+(*  Copyright (C) 2010-2011                                               *)
 (*    François Bobot                                                     *)
 (*    Jean-Christophe Filliâtre                                          *)
 (*    Claude Marché                                                      *)
@@ -301,7 +301,7 @@ and value key = parse
         record lexbuf }
   | '"'
       { Buffer.clear buf;
-	string_val key lexbuf }
+        string_val key lexbuf }
   | "true"
       { push_field key (RCbool true);
         record lexbuf }
@@ -319,7 +319,7 @@ and value key = parse
 and string_val key = parse
   | '"'
       { push_field key (RCstring (Buffer.contents buf));
-	record lexbuf
+        record lexbuf
       }
   | [^ '\\' '"'] as c
       { Buffer.add_char buf c;

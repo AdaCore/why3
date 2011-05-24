@@ -1,6 +1,6 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  Copyright (C) 2010-                                                   *)
+(*  Copyright (C) 2010-2011                                               *)
 (*    François Bobot                                                     *)
 (*    Jean-Christophe Filliâtre                                          *)
 (*    Claude Marché                                                      *)
@@ -52,11 +52,11 @@ end = struct
 
   let var_of_reference env = function
     | E.Rlocal vs ->
-	create_vsymbol (id_fresh vs.vs_name.id_string) (unref_ty env vs.vs_ty)
+        create_vsymbol (id_fresh vs.vs_name.id_string) (unref_ty env vs.vs_ty)
     | E.Rglobal { ls_name = id; ls_value = Some ty } ->
-	create_vsymbol (id_fresh id.id_string) (unref_ty env ty)
+        create_vsymbol (id_fresh id.id_string) (unref_ty env ty)
     | E.Rglobal { ls_value = None } ->
-	assert false
+        assert false
 
   let havoc1 env r m =
     let v = var_of_reference env r in
@@ -90,11 +90,11 @@ end = struct
      cur = label for current state, if any *)
   let rec term_at env old cur s t = match t.t_node with
     | Tapp (ls, [t]) when ls_equal ls (ls_bang env) ->
-	let r = reference_of_term t in
-	t_var (ref_at cur s r)
+        let r = reference_of_term t in
+        t_var (ref_at cur s r)
     (* TODO: old, at *)
     | _ ->
-	t_map (term_at env old cur s) (fmla_at env old cur s) t
+        t_map (term_at env old cur s) (fmla_at env old cur s) t
 
   and fmla_at env old cur s f =
     t_map (term_at env old cur s) (fmla_at env old cur s) f

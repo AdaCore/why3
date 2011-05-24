@@ -1,6 +1,6 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  Copyright (C) 2010-                                                   *)
+(*  Copyright (C) 2010-2011                                               *)
 (*    François Bobot                                                     *)
 (*    Jean-Christophe Filliâtre                                          *)
 (*    Claude Marché                                                      *)
@@ -34,19 +34,19 @@
     List.iter
       (fun (x,y) -> Hashtbl.add keywords x y)
       [ "theory", THEORY;
-	"end", END;
-	"syntax", SYNTAX;
-	"remove", REMOVE;
-	"meta", META;
-	"cloned", CLONED;
-	"prelude", PRELUDE;
-	"printer", PRINTER;
-	"valid", VALID;
-	"invalid", INVALID;
+        "end", END;
+        "syntax", SYNTAX;
+        "remove", REMOVE;
+        "meta", META;
+        "cloned", CLONED;
+        "prelude", PRELUDE;
+        "printer", PRINTER;
+        "valid", VALID;
+        "invalid", INVALID;
         "timeout", TIMEOUT;
         "time",    TIME;
-	"unknown", UNKNOWN;
-	"fail", FAIL;
+        "unknown", UNKNOWN;
+        "fail", FAIL;
         "logic", LOGIC;
         "type", TYPE;
         "prop", PROP;

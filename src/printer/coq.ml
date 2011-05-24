@@ -1,6 +1,6 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  Copyright (C) 2010-                                                   *)
+(*  Copyright (C) 2010-2011                                               *)
 (*    François Bobot                                                     *)
 (*    Jean-Christophe Filliâtre                                          *)
 (*    Claude Marché                                                      *)
@@ -30,7 +30,7 @@ open Printer
 
 let iprinter =
   let bl = [ "at"; "cofix"; "exists2"; "fix"; "IF"; "mod"; "Prop";
-	     "return"; "Set"; "Type"; "using"; "where"]
+             "return"; "Set"; "Type"; "using"; "where"]
   in
   let isanitize = sanitizer char_to_alpha char_to_alnumus in
   create_ident_printer bl ~sanitizer:isanitize
@@ -213,7 +213,7 @@ and print_tnode opl opr info fmt t = match t.t_node with
   | Tconst (ConstInt n) -> fprintf fmt "%s%%Z" n
   | Tconst (ConstReal c) ->
       Print_real.print_with_integers
-	"(%s)%%R" "(%s * %s)%%R" "(%s / %s)%%R" fmt c
+        "(%s)%%R" "(%s * %s)%%R" "(%s / %s)%%R" fmt c
   | Tif (f,t1,t2) ->
       fprintf fmt (protect_on opr "if %a@ then %a@ else %a")
         (print_fmla info) f (print_term info) t1 (print_opl_term info) t2
@@ -378,13 +378,13 @@ let produce_remaining_proofs ~old fmt =
           try while true do
             let s = input_line ch in
             if s = proof_end then 
-	      begin
-		fprintf fmt "(* END OF OBSOLETE PROOF *)@\n@\n";
-		raise Exit
-	      end;
+              begin
+                fprintf fmt "(* END OF OBSOLETE PROOF *)@\n@\n";
+                raise Exit
+              end;
             fprintf fmt "%s@\n" s;
           done
-	  with Exit -> ()
+          with Exit -> ()
         end
     done
   with
@@ -406,13 +406,13 @@ let print_type_decl ~old info fmt (ts,def) =
     | Tabstract -> begin match ts.ts_def with
         | None ->
             fprintf fmt "@[<hov 2>%a %a : %aType.@]@\n%a"
-	      definition info
+              definition info
               print_ts ts print_params_list ts.ts_args
-	      (realization ~old ~def:true) info.realization
+              (realization ~old ~def:true) info.realization
         | Some ty ->
             fprintf fmt "@[<hov 2>Definition %a %a :=@ %a.@]@\n@\n"
               print_ts ts (print_arrow_list print_tv_binder) ts.ts_args
-	      (print_ty info) ty
+              (print_ty info) ty
       end
     | Talgebraic csl ->
         fprintf fmt "@[<hov 2>Inductive %a %a :=@\n@[<hov>%a@].@]@\n"
@@ -450,12 +450,12 @@ let print_logic_decl ~old info fmt (ls,ld) =
           List.iter forget_var vl
       | None ->
           fprintf fmt "@[<hov 2>%a %a: %a%a@ %a.@]@\n%a"
-	    definition info
+            definition info
             print_ls ls
             print_params all_ty_params
             (print_arrow_list (print_ty info)) ls.ls_args
             (print_ls_type ~arrow:(ls.ls_args <> []) info) ls.ls_value
-	    (realization ~old ~def:true) info.realization
+            (realization ~old ~def:true) info.realization
   end;
   print_implicits fmt ls ty_vars_args ty_vars_value all_ty_params;
   fprintf fmt "@\n"
@@ -484,9 +484,9 @@ let print_ind_decl info fmt d =
 let print_pkind info fmt = function
   | Paxiom -> 
       if info.realization then
-	fprintf fmt "Lemma"
+        fprintf fmt "Lemma"
       else
-	fprintf fmt "Axiom"
+        fprintf fmt "Axiom"
   | Plemma -> fprintf fmt "Lemma"
   | Pgoal  -> fprintf fmt "Theorem"
   | Pskip  -> assert false (* impossible *)

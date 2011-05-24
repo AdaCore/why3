@@ -1,6 +1,6 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  Copyright (C) 2010-                                                   *)
+(*  Copyright (C) 2010-2011                                               *)
 (*    François Bobot                                                     *)
 (*    Jean-Christophe Filliâtre                                          *)
 (*    Claude Marché                                                      *)
@@ -44,69 +44,69 @@
     List.iter
       (fun (x,y) -> Hashtbl.add keywords x y)
       [
-	"and", AND;
-	"as", AS;
-	"axiom", AXIOM;
-	"clone", CLONE;
-	"else", ELSE;
-	"end", END;
-	"epsilon", EPSILON;
-	"exists", EXISTS;
-	"export", EXPORT;
+        "and", AND;
+        "as", AS;
+        "axiom", AXIOM;
+        "clone", CLONE;
+        "else", ELSE;
+        "end", END;
+        "epsilon", EPSILON;
+        "exists", EXISTS;
+        "export", EXPORT;
         "false", FALSE;
-	"forall", FORALL;
-	"goal", GOAL;
-	"if", IF;
-	"iff", IFF;
-	"implies", IMPLIES;
-	"import", IMPORT;
-	"in", IN;
-	"inductive", INDUCTIVE;
-	"lemma", LEMMA;
-	"let", LET;
-	"logic", LOGIC;
-	"match", MATCH;
-	"meta", META;
-	"namespace", NAMESPACE;
-	"not", NOT;
-	"or", OR;
+        "forall", FORALL;
+        "goal", GOAL;
+        "if", IF;
+        "iff", IFF;
+        "implies", IMPLIES;
+        "import", IMPORT;
+        "in", IN;
+        "inductive", INDUCTIVE;
+        "lemma", LEMMA;
+        "let", LET;
+        "logic", LOGIC;
+        "match", MATCH;
+        "meta", META;
+        "namespace", NAMESPACE;
+        "not", NOT;
+        "or", OR;
         "prop", PROP;
-	"then", THEN;
-	"theory", THEORY;
-	"true", TRUE;
-	"type", TYPE;
-	"use", USE;
-	"with", WITH;
-	(* programs *)
-	"abstract", ABSTRACT;
-	"absurd", ABSURD;
-	"any", ANY;
-	"assert", ASSERT;
-	"assume", ASSUME;
-	"begin", BEGIN;
+        "then", THEN;
+        "theory", THEORY;
+        "true", TRUE;
+        "type", TYPE;
+        "use", USE;
+        "with", WITH;
+        (* programs *)
+        "abstract", ABSTRACT;
+        "absurd", ABSURD;
+        "any", ANY;
+        "assert", ASSERT;
+        "assume", ASSUME;
+        "begin", BEGIN;
         "check", CHECK;
-	"do", DO;
-	"done", DONE;
- 	"downto", DOWNTO;
-	"exception", EXCEPTION;
-	"for", FOR;
-	"fun", FUN;
-	(* "ghost", GHOST; *)
-	"invariant", INVARIANT;
-	"label", LABEL;
-	"loop", LOOP;
-	"model", MODEL;
-	"module", MODULE;
-	"mutable", MUTABLE;
-	"parameter", PARAMETER;
-	"raise", RAISE;
-	"raises", RAISES;
-	"reads", READS;
-	"rec", REC;
-	"to", TO;
-	"try", TRY;
-	"variant", VARIANT;
-	"while", WHILE;
+        "do", DO;
+        "done", DONE;
+         "downto", DOWNTO;
+        "exception", EXCEPTION;
+        "for", FOR;
+        "fun", FUN;
+        (* "ghost", GHOST; *)
+        "invariant", INVARIANT;
+        "label", LABEL;
+        "loop", LOOP;
+        "model", MODEL;
+        "module", MODULE;
+        "mutable", MUTABLE;
+        "parameter", PARAMETER;
+        "raise", RAISE;
+        "raises", RAISES;
+        "reads", READS;
+        "rec", REC;
+        "to", TO;
+        "try", TRY;
+        "variant", VARIANT;
+        "while", WHILE;
         "writes", WRITES;
       ]
 
@@ -130,9 +130,9 @@
     let new_file = match file with None -> pos.pos_fname | Some s -> s in
     lexbuf.lex_curr_p <-
       { pos with
-	  pos_fname = new_file;
-	  pos_lnum = int_of_string line;
-	  pos_bol = pos.pos_cnum - int_of_string chars;
+          pos_fname = new_file;
+          pos_lnum = int_of_string line;
+          pos_bol = pos.pos_cnum - int_of_string chars;
       }
 
   let remove_leading_plus s =
@@ -200,7 +200,7 @@ rule token = parse
       { FLOAT (RConstDecimal (i, f, Util.option_map remove_leading_plus e)) }
   | '0' ['x' 'X'] ((hexadigit* as i) '.' (hexadigit+ as f)
                   |(hexadigit+ as i) '.' (hexadigit* as f)
-		  |(hexadigit+ as i) ("" as f))
+                  |(hexadigit+ as i) ("" as f))
     ['p' 'P'] (['-' '+']? digit+ as e)
       { FLOAT (RConstHexa (i, f, remove_leading_plus e)) }
   | "(*)"
@@ -297,8 +297,8 @@ and comment = parse
 and string = parse
   | "\""
       { let s = Buffer.contents string_buf in
-	Buffer.clear string_buf;
-	s }
+        Buffer.clear string_buf;
+        s }
   | "\\" (_ as c)
       { Buffer.add_char string_buf (char_for_backslash c); string lexbuf }
   | newline
@@ -348,11 +348,11 @@ and string = parse
       let file = locate_file lp f in
       let c = open_in file in
       try
-	let tl = read_channel env file c in
-	close_in c;
-	tl
+        let tl = read_channel env file c in
+        close_in c;
+        tl
       with
-	| e -> close_in c; raise e
+        | e -> close_in c; raise e
     in
     Env.create_env ret_chan retrieve
 

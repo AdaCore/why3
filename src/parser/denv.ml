@@ -1,6 +1,6 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  Copyright (C) 2010-                                                   *)
+(*  Copyright (C) 2010-2011                                               *)
 (*    François Bobot                                                     *)
 (*    Jean-Christophe Filliâtre                                          *)
 (*    Claude Marché                                                      *)
@@ -93,17 +93,17 @@ let rec unify t1 t2 = match t1, t2 with
       unify t1 t2
   | Tyvar v1, Tyvar v2 when v1.tag = v2.tag ->
       true
-	(* instantiable variables *)
+        (* instantiable variables *)
   | Tyvar ({user=false} as v), t
   | t, Tyvar ({user=false} as v) ->
       not (occurs v t) && (v.type_val <- Some t; true)
-	(* recursive types *)
+        (* recursive types *)
   | Tyapp (s1, l1), Tyapp (s2, l2) ->
       ts_equal s1 s2 && List.length l1 = List.length l2 &&
-	  List.for_all2 unify l1 l2
+          List.for_all2 unify l1 l2
   | Tyapp _, _ | _, Tyapp _ ->
       false
-	(* other cases *)
+        (* other cases *)
   | Tyvar {user=true; tag=t1}, Tyvar {user=true; tag=t2} ->
       t1 = t2
 
@@ -244,8 +244,8 @@ and fmla env = function
       in
       let env, vl = map_fold_left uquant env uqu in
       let trigger = function
-	| TRterm t -> term env t
-	| TRfmla f -> fmla env f
+        | TRterm t -> term env t
+        | TRfmla f -> fmla env f
       in
       let trl = List.map (List.map trigger) trl in
       t_quant_close q vl trl (fmla env f1)

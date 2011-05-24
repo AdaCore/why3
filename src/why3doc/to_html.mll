@@ -1,3 +1,21 @@
+(**************************************************************************)
+(*                                                                        *)
+(*  Copyright (C) 2010-2011                                               *)
+(*    François Bobot                                                     *)
+(*    Jean-Christophe Filliâtre                                          *)
+(*    Claude Marché                                                      *)
+(*    Andrei Paskevich                                                    *)
+(*                                                                        *)
+(*  This software is free software; you can redistribute it and/or        *)
+(*  modify it under the terms of the GNU Library General Public           *)
+(*  License version 2.1, with the special exception on linking            *)
+(*  described in file LICENSE.                                            *)
+(*                                                                        *)
+(*  This software is distributed in the hope that it will be useful,      *)
+(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
+(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
+(*                                                                        *)
+(**************************************************************************)
 
 (* Why3 to HTML *)
 
@@ -38,13 +56,13 @@
     List.iter
       (fun s -> Hashtbl.add ht s ())
       [ "theory"; "end"; 
-	"type"; "logic"; "clone"; "use"; "import"; "export";
-	"axiom"; "inductive"; "goal"; "lemma";
-	
-	"match"; "with"; "let"; "in"; "if"; "then"; "else";
-	"forall"; "exists"; "and"; "or";
+        "type"; "logic"; "clone"; "use"; "import"; "export";
+        "axiom"; "inductive"; "goal"; "lemma";
+        
+        "match"; "with"; "let"; "in"; "if"; "then"; "else";
+        "forall"; "exists"; "and"; "or";
 
-	"as"; "assert"; "begin";
+        "as"; "assert"; "begin";
         "do"; "done"; "downto"; "else";
         "exception"; "parameter"; "for"; "fun";
         "if"; "in"; 
@@ -152,7 +170,7 @@ div.sig_block {margin-left: 2em}";
     begin match css with
       | None -> ()
       | Some f -> fprintf fmt 
-	  "<link rel=\"stylesheet\" href=\"%s\" type=\"text/css\">@\n" f
+          "<link rel=\"stylesheet\" href=\"%s\" type=\"text/css\">@\n" f
     end;
     fprintf fmt "<title>%s</title>@\n" title;
     fprintf fmt "</head>@\n<body>@\n"
@@ -168,8 +186,8 @@ div.sig_block {margin-left: 2em}";
     let f = Filename.basename fname in
     let base = 
       match !opt_output with
-	| None -> f
-	| Some dir -> Filename.concat dir f
+        | None -> f
+        | Some dir -> Filename.concat dir f
     in
     let fhtml = base ^ ".html" in
     let cout = open_out fhtml in

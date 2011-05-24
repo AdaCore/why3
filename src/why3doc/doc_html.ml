@@ -1,6 +1,6 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  Copyright (C) 2010-                                                   *)
+(*  Copyright (C) 2010-2011                                               *)
 (*    François Bobot                                                     *)
 (*    Jean-Christophe Filliâtre                                          *)
 (*    Claude Marché                                                      *)
@@ -445,7 +445,7 @@ let print_header fmt ?(title="") ?css () =
   begin match css with
     | None -> ()
     | Some f -> fprintf fmt 
-	"<link rel=\"stylesheet\" href=\"%s\" type=\"text/css\">@\n" f
+        "<link rel=\"stylesheet\" href=\"%s\" type=\"text/css\">@\n" f
   end;
   fprintf fmt "<title>%s</title>@\n" title;
   fprintf fmt "</head>@\n<body>@\n<pre>@\n"

@@ -1,6 +1,6 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  Copyright (C) 2010-                                                   *)
+(*  Copyright (C) 2010-2011                                               *)
 (*    François Bobot                                                     *)
 (*    Jean-Christophe Filliâtre                                          *)
 (*    Claude Marché                                                      *)
@@ -75,7 +75,7 @@ and print_fmla info fmt f = match f.t_node with
   | Tapp (ls, tl) -> begin match query_syntax info.info_syn ls.ls_name with
       | Some s -> syntax_arguments s (print_term info) fmt tl
       | None -> fprintf fmt "@[%a(%a)@]"
-	      print_symbol ls.ls_name (print_list comma (print_term info)) tl
+              print_symbol ls.ls_name (print_list comma (print_term info)) tl
       end
   | Tquant (q, fq) ->
       let q = match q with Tforall -> "!" | Texists -> "?" in
@@ -99,7 +99,7 @@ and print_fmla info fmt f = match f.t_node with
       fprintf fmt "$false"
   | Tif (_,_,_) -> unsupportedTerm f "Tif not supported"
       (* fprintf fmt "@[(if_then_else %a@ %a@ %a)@]"
-	(print_fmla info) f1 (print_fmla info) f2 (print_fmla info) f3 *)
+        (print_fmla info) f1 (print_fmla info) f2 (print_fmla info) f3 *)
   | Tlet (_, _) -> unsupportedTerm f "Tlet not supported"
       (* let v, f2 = t_open_bound tb in
       fprintf fmt "@[(let (%a %a)@ %a)@]" print_var v

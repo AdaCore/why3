@@ -1,6 +1,6 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  Copyright (C) 2010-                                                   *)
+(*  Copyright (C) 2010-2011                                               *)
 (*    François Bobot                                                     *)
 (*    Jean-Christophe Filliâtre                                          *)
 (*    Claude Marché                                                      *)
@@ -63,11 +63,11 @@ type info = {
 let rec print_term info fmt t = match t.t_node with
   | Tconst (ConstInt n) ->
       begin try
-	let n64 = Int64.of_string n in
-	if n64 < 0L || n64 > simplify_max_int then raise Exit;
-	fprintf fmt "%s" n
+        let n64 = Int64.of_string n in
+        if n64 < 0L || n64 > simplify_max_int then raise Exit;
+        fprintf fmt "%s" n
       with _ -> (* the constant is too large for Simplify *)
-	fprintf fmt "constant_too_large_%s" n
+        fprintf fmt "constant_too_large_%s" n
       end
   | Tconst (ConstReal c) ->
       fprintf fmt "real_constant_%a" print_real c
@@ -75,11 +75,11 @@ let rec print_term info fmt t = match t.t_node with
       print_var fmt v
   | Tapp (ls, tl) -> begin match query_syntax info.info_syn ls.ls_name with
       | Some s ->
-	  syntax_arguments s (print_term info) fmt tl
+          syntax_arguments s (print_term info) fmt tl
       | None -> begin match tl with (* for cvc3 wich doesn't accept (toto ) *)
           | [] -> fprintf fmt "@[%a@]" print_ident ls.ls_name
           | _ -> fprintf fmt "@[(%a@ %a)@]"
-	      print_ident ls.ls_name (print_list space (print_term info)) tl
+              print_ident ls.ls_name (print_list space (print_term info)) tl
         end end
   | Tlet _ ->
       unsupportedTerm t "simplify: you must eliminate let"
@@ -96,16 +96,16 @@ and print_fmla info fmt f = match f.t_node with
       print_ident fmt id
   | Tapp (ls, tl) -> begin match query_syntax info.info_syn ls.ls_name with
       | Some s ->
-	  syntax_arguments s (print_term info) fmt tl
+          syntax_arguments s (print_term info) fmt tl
       | None ->
-	  fprintf fmt "(EQ (%a@ %a) |@@true|)"
-	    print_ident ls.ls_name (print_list space (print_term info)) tl
+          fprintf fmt "(EQ (%a@ %a) |@@true|)"
+            print_ident ls.ls_name (print_list space (print_term info)) tl
     end
   | Tquant (q, fq) ->
       let q = match q with Tforall -> "FORALL" | Texists -> "EXISTS" in
       let vl, tl, f = t_open_quant fq in
       fprintf fmt "@[(%s (%a)%a@ %a)@]" q (print_list space print_var) vl
-	(print_triggers info) tl (print_fmla info) f;
+        (print_triggers info) tl (print_fmla info) f;
       List.iter forget_var vl
   | Tbinop (Tand, f1, f2) ->
       fprintf fmt "@[(AND@ %a@ %a)@]" (print_fmla info) f1 (print_fmla info) f2

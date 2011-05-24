@@ -1,6 +1,6 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  Copyright (C) 2010-                                                   *)
+(*  Copyright (C) 2010-2011                                               *)
 (*    François Bobot                                                     *)
 (*    Jean-Christophe Filliâtre                                          *)
 (*    Claude Marché                                                      *)
@@ -147,8 +147,8 @@ let print_prelude fmt pl =
 
 let print_prelude_of_theories th_used fmt pm =
   List.iter (fun th ->
-	       let prel = Mid.find_default th.th_name [] pm in
-	       print_prelude fmt prel) th_used
+               let prel = Mid.find_default th.th_name [] pm in
+               print_prelude fmt prel) th_used
 
 let print_th_prelude task fmt pm =
   let th_used = task_fold (fun acc -> function

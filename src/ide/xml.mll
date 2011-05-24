@@ -1,3 +1,21 @@
+(**************************************************************************)
+(*                                                                        *)
+(*  Copyright (C) 2010-2011                                               *)
+(*    François Bobot                                                     *)
+(*    Jean-Christophe Filliâtre                                          *)
+(*    Claude Marché                                                      *)
+(*    Andrei Paskevich                                                    *)
+(*                                                                        *)
+(*  This software is free software; you can redistribute it and/or        *)
+(*  modify it under the terms of the GNU Library General Public           *)
+(*  License version 2.1, with the special exception on linking            *)
+(*  described in file LICENSE.                                            *)
+(*                                                                        *)
+(*  This software is distributed in the hope that it will be useful,      *)
+(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
+(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
+(*                                                                        *)
+(**************************************************************************)
 
 
 {
@@ -12,10 +30,10 @@
 
   type t =
       { version : string;
-	encoding : string;
-	doctype : string;
-	dtd : string;
-	content : element;
+        encoding : string;
+        doctype : string;
+        dtd : string;
+        content : element;
       }
 
   let buf = Buffer.create 17
@@ -24,12 +42,12 @@
     match group_stack with
       | [] -> element_stack
       | (elem,att,elems)::g ->
-	  let e = {
-	    name = elem;
-	    attributes = att;
-	    elements = List.rev element_stack;
-	  }
-	  in pop_all g (e::elems)
+          let e = {
+            name = elem;
+            attributes = att;
+            elements = List.rev element_stack;
+          }
+          in pop_all g (e::elems)
 
   exception Parse_error of string
 
@@ -94,11 +112,11 @@ and elements group_stack element_stack = parse
                Format.eprintf 
                  "[Xml warning] Xml element `%s' closed by `%s'@." 
                  elem celem;
-	     let e = {
-	        name = elem;
-	        attributes = att;
-	        elements = List.rev element_stack;
-	     }
+             let e = {
+                name = elem;
+                attributes = att;
+                elements = List.rev element_stack;
+             }
              in elements g (e::stack) lexbuf            
        }
   | '<'
@@ -138,7 +156,7 @@ and value = parse
       { value lexbuf }
   | '"' 
       { Buffer.clear buf;
-	string_val lexbuf } 
+        string_val lexbuf } 
   | _ as c
       { parse_error ("invalid value starting with " ^ String.make 1 c) }
   | eof

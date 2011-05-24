@@ -1,6 +1,6 @@
 /**************************************************************************/
 /*                                                                        */
-/*  Copyright (C) 2010-                                                   */
+/*  Copyright (C) 2010-2011                                               */
 /*    François Bobot                                                     */
 /*    Jean-Christophe Filliâtre                                          */
 /*    Claude Marché                                                      */
@@ -112,12 +112,12 @@
 
   let rec mk_apply f = function
     | [] ->
-	assert false
+        assert false
     | [a] ->
-	Eapply (f, a)
+        Eapply (f, a)
     | a :: l ->
-	let loc = Loc.join f.expr_loc a.expr_loc in
-	mk_apply { expr_loc = loc; expr_desc = Eapply (f, a) } l
+        let loc = Loc.join f.expr_loc a.expr_loc in
+        mk_apply { expr_loc = loc; expr_desc = Eapply (f, a) } l
 
   let mk_apply_id id =
     let e =
@@ -1030,17 +1030,17 @@ expr:
      mk_expr (mk_apply_id { id = "notb"; id_lab = []; id_loc = floc () } [t]) }
 | expr LARROW expr
     { match $1.expr_desc with
-	| Eapply (e11, e12) -> begin match e11.expr_desc with
-	    | Eident x ->
-		mk_expr (Eassign (e12, x, $3))
-	    | Eapply ({ expr_desc = Eident (Qident x) }, e11)
+        | Eapply (e11, e12) -> begin match e11.expr_desc with
+            | Eident x ->
+                mk_expr (Eassign (e12, x, $3))
+            | Eapply ({ expr_desc = Eident (Qident x) }, e11)
               when x.id = mixfix "[]" ->
-		mk_mixfix3 "[]<-" e11 e12 $3
-	    | _ ->
-		raise Parsing.Parse_error
-	  end
-	| _ ->
-	    raise Parsing.Parse_error
+                mk_mixfix3 "[]<-" e11 e12 $3
+            | _ ->
+                raise Parsing.Parse_error
+          end
+        | _ ->
+            raise Parsing.Parse_error
     }
 | expr OP1 expr
    { mk_infix $1 $2 $3 }
@@ -1089,11 +1089,11 @@ expr:
 | WHILE expr DO loop_annotation expr DONE
    { mk_expr
        (Etry
-	  (mk_expr
-	     (Eloop ($4,
-		     mk_expr (Eif ($2, $5,
-				   mk_expr (Eraise (exit_exn (), None)))))),
-	   [exit_exn (), None, mk_expr (Etuple [])])) }
+          (mk_expr
+             (Eloop ($4,
+                     mk_expr (Eif ($2, $5,
+                                   mk_expr (Eraise (exit_exn (), None)))))),
+           [exit_exn (), None, mk_expr (Etuple [])])) }
 | FOR lident EQUAL expr for_direction expr DO loop_invariant expr DONE
    { mk_expr (Efor ($2, $4, $5, $6, $8, $9)) }
 | ABSURD

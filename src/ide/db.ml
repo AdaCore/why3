@@ -1,6 +1,6 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  Copyright (C) 2010-                                                   *)
+(*  Copyright (C) 2010-2011                                               *)
 (*    François Bobot                                                     *)
 (*    Jean-Christophe Filliâtre                                          *)
 (*    Claude Marché                                                      *)
@@ -296,7 +296,7 @@ module ProverId = struct
          db_must_done db (fun () -> Sqlite3.step stmt);
          let new_id = Sqlite3.last_insert_rowid db.raw_db in
          { prover_id = new_id ;
-	   prover_name = name }
+           prover_name = name }
       )
 
   let from_name db name =
@@ -308,7 +308,7 @@ module ProverId = struct
     (* convert statement into record *)
     let of_stmt stmt =
       { prover_id = stmt_column_INT stmt 0 "ProverId.get: bad prover id";
-	prover_name = name;
+        prover_name = name;
       }
     in
     (* execute the SQL query *)
@@ -326,7 +326,7 @@ module ProverId = struct
     (* convert statement into record *)
     let of_stmt stmt =
       { prover_id = id ;
-	prover_name = stmt_column_string stmt 0
+        prover_name = stmt_column_string stmt 0
           "ProverId.from_id: bad prover_name";
       }
     in
@@ -406,7 +406,7 @@ module TransfId = struct
          db_must_done db (fun () -> Sqlite3.step stmt);
          let new_id = Sqlite3.last_insert_rowid db.raw_db in
          { transformation_id = new_id ;
-	   transformation_name = name }
+           transformation_name = name }
       )
 
   let from_name db name =
@@ -418,7 +418,7 @@ module TransfId = struct
     (* convert statement into record *)
     let of_stmt stmt =
       { transformation_id = stmt_column_INT stmt 0 "TransfId.from_name: bad transformation id";
-	transformation_name = name;
+        transformation_name = name;
       }
     in
     (* execute the SQL query *)
@@ -436,7 +436,7 @@ module TransfId = struct
     (* convert statement into record *)
     let of_stmt stmt =
       { transformation_id = id ;
-	transformation_name = stmt_column_string stmt 0
+        transformation_name = stmt_column_string stmt 0
           "TransfId.from_id: bad transformation name";
       }
     in
@@ -516,8 +516,8 @@ module External_proof = struct
   let add db (g : goal) (p: prover_id) =
     transaction db
       (fun () ->
-	 let sql = "INSERT INTO external_proofs VALUES(NULL,?,?,0,0,0.0,\"\")" in
-	 let stmt = bind db sql [
+         let sql = "INSERT INTO external_proofs VALUES(NULL,?,?,0,0,0.0,\"\")" in
+         let stmt = bind db sql [
            Sqlite3.Data.INT g;
            Sqlite3.Data.INT p.prover_id;
 (*
@@ -534,47 +534,47 @@ module External_proof = struct
 *)
          ]
          in
-	 db_must_done db (fun () -> Sqlite3.step stmt);
-	 Sqlite3.last_insert_rowid db.raw_db)
+         db_must_done db (fun () -> Sqlite3.step stmt);
+         Sqlite3.last_insert_rowid db.raw_db)
 
   let set_status db e stat time =
     transaction db
       (fun () ->
-	 let sql =
-	   "UPDATE external_proofs SET status=?,obsolete=0,time=? WHERE external_proof_id=?"
-	 in
-	 let stmt = bind db sql [
+         let sql =
+           "UPDATE external_proofs SET status=?,obsolete=0,time=? WHERE external_proof_id=?"
+         in
+         let stmt = bind db sql [
            Sqlite3.Data.INT (int64_from_status stat);
            Sqlite3.Data.FLOAT time;
            Sqlite3.Data.INT e;
          ]
          in
-	 db_must_done db (fun () -> Sqlite3.step stmt))
+         db_must_done db (fun () -> Sqlite3.step stmt))
 
   let set_obsolete db e =
     transaction db
       (fun () ->
-	 let sql =
-	   "UPDATE external_proofs SET obsolete=1 WHERE external_proof_id=?"
-	 in
-	 let stmt = bind db sql [
+         let sql =
+           "UPDATE external_proofs SET obsolete=1 WHERE external_proof_id=?"
+         in
+         let stmt = bind db sql [
            Sqlite3.Data.INT e;
          ]
          in
-	 db_must_done db (fun () -> Sqlite3.step stmt))
+         db_must_done db (fun () -> Sqlite3.step stmt))
 
   let set_edited_as db e f =
     transaction db
       (fun () ->
-	 let sql =
-	   "UPDATE external_proofs SET edited_as=? WHERE external_proof_id=?"
-	 in
-	 let stmt = bind db sql [
+         let sql =
+           "UPDATE external_proofs SET edited_as=? WHERE external_proof_id=?"
+         in
+         let stmt = bind db sql [
            Sqlite3.Data.TEXT f;
            Sqlite3.Data.INT e;
          ]
          in
-	 db_must_done db (fun () -> Sqlite3.step stmt))
+         db_must_done db (fun () -> Sqlite3.step stmt))
 
   let of_goal db g =
     let sql="SELECT prover_id,external_proof_id FROM external_proofs \
@@ -647,32 +647,32 @@ module Goal = struct
   let add db (th:theory) (name : string) (sum:string) =
     transaction db
       (fun () ->
-	 let sql =
-	   "INSERT INTO goals VALUES(NULL,?,0,?,?,0)"
-	 in
-	 let stmt = bind db sql [
+         let sql =
+           "INSERT INTO goals VALUES(NULL,?,0,?,?,0)"
+         in
+         let stmt = bind db sql [
            Sqlite3.Data.INT th;
            Sqlite3.Data.TEXT name;
            Sqlite3.Data.TEXT sum;
          ]
          in
-	 db_must_done db (fun () -> Sqlite3.step stmt);
-	 Sqlite3.last_insert_rowid db.raw_db)
+         db_must_done db (fun () -> Sqlite3.step stmt);
+         Sqlite3.last_insert_rowid db.raw_db)
 
   let add_as_subgoal db (tr:transf) (name : string) (sum:string) =
     transaction db
       (fun () ->
-	 let sql =
-	   "INSERT INTO goals VALUES(NULL,0,?,?,?,0)"
-	 in
-	 let stmt = bind db sql [
+         let sql =
+           "INSERT INTO goals VALUES(NULL,0,?,?,?,0)"
+         in
+         let stmt = bind db sql [
            Sqlite3.Data.INT tr;
            Sqlite3.Data.TEXT name;
            Sqlite3.Data.TEXT sum;
          ]
          in
-	 db_must_done db (fun () -> Sqlite3.step stmt);
-	 Sqlite3.last_insert_rowid db.raw_db)
+         db_must_done db (fun () -> Sqlite3.step stmt);
+         Sqlite3.last_insert_rowid db.raw_db)
 
   let delete db e =
     let sql = "DELETE FROM goals WHERE goal_id=?" in
@@ -683,15 +683,15 @@ module Goal = struct
   let set_task_checksum db g s =
     transaction db
       (fun () ->
-	 let sql =
-	   "UPDATE goals SET task_checksum=? WHERE goal_id=?"
-	 in
-	 let stmt = bind db sql [
+         let sql =
+           "UPDATE goals SET task_checksum=? WHERE goal_id=?"
+         in
+         let stmt = bind db sql [
            Sqlite3.Data.TEXT s;
            Sqlite3.Data.INT g;
          ]
          in
-	 db_must_done db (fun () -> Sqlite3.step stmt))
+         db_must_done db (fun () -> Sqlite3.step stmt))
 
 
   let name db g =
@@ -781,16 +781,16 @@ module Transf = struct
   let add db root_goal tr_id =
     transaction db
       (fun () ->
-	 let sql =
-	   "INSERT INTO transformations VALUES(NULL,?,?)"
-	 in
-	 let stmt = bind db sql [
+         let sql =
+           "INSERT INTO transformations VALUES(NULL,?,?)"
+         in
+         let stmt = bind db sql [
            Sqlite3.Data.INT tr_id.transformation_id;
            Sqlite3.Data.INT root_goal;
          ]
          in
-	 db_must_done db (fun () -> Sqlite3.step stmt);
-	 Sqlite3.last_insert_rowid db.raw_db)
+         db_must_done db (fun () -> Sqlite3.step stmt);
+         Sqlite3.last_insert_rowid db.raw_db)
 
   let delete db t =
     let sql = "DELETE FROM transformations WHERE transf_id=?" in
@@ -864,7 +864,7 @@ module Theory = struct
          in
          db_must_done db (fun () -> Sqlite3.step stmt);
          let new_id = Sqlite3.last_insert_rowid db.raw_db in
-	 new_id)
+         new_id)
 end
 
 let theory_name th = Theory.name (current()) th
@@ -895,7 +895,7 @@ module Main = struct
          let stmt = bind db sql [ Sqlite3.Data.TEXT name ] in
          db_must_done db (fun () -> Sqlite3.step stmt);
          let new_id = Sqlite3.last_insert_rowid db.raw_db in
-	 new_id)
+         new_id)
 end
 
 
@@ -903,21 +903,21 @@ let init_db ?(busyfn=default_busyfn) ?(mode=Immediate) db_name =
   match !current_db with
     | None ->
         let db = {
-	  raw_db = Sqlite3.db_open db_name;
-	  in_transaction = 0;
-	  mode = mode;
-	  busyfn = busyfn;
+          raw_db = Sqlite3.db_open db_name;
+          in_transaction = 0;
+          mode = mode;
+          busyfn = busyfn;
           db_name = db_name;
         }
-	in
-	current_db := Some db;
-	ProverId.init db;
-	TransfId.init db;
-	External_proof.init db;
-	Goal.init db;
+        in
+        current_db := Some db;
+        ProverId.init db;
+        TransfId.init db;
+        External_proof.init db;
+        Goal.init db;
         Transf.init db;
-	Theory.init db;
-	Main.init db
+        Theory.init db;
+        Main.init db
 
     | Some _ -> failwith "Db.init_db: already opened"
 

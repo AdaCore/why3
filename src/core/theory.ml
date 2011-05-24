@@ -1,6 +1,6 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  Copyright (C) 2010-                                                   *)
+(*  Copyright (C) 2010-2011                                               *)
 (*    François Bobot                                                     *)
 (*    Jean-Christophe Filliâtre                                          *)
 (*    Claude Marché                                                      *)
@@ -728,8 +728,8 @@ let on_meta _meta fn acc theory =
   List.fold_left
     (fun acc td ->
        match td.td_node with
-	 | Meta (_,ma) -> fn acc ma
-	 | _ -> acc)
+         | Meta (_,ma) -> fn acc ma
+         | _ -> acc)
     acc tdecls
 
 

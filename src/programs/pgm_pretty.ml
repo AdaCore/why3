@@ -1,3 +1,21 @@
+(**************************************************************************)
+(*                                                                        *)
+(*  Copyright (C) 2010-2011                                               *)
+(*    François Bobot                                                     *)
+(*    Jean-Christophe Filliâtre                                          *)
+(*    Claude Marché                                                      *)
+(*    Andrei Paskevich                                                    *)
+(*                                                                        *)
+(*  This software is free software; you can redistribute it and/or        *)
+(*  modify it under the terms of the GNU Library General Public           *)
+(*  License version 2.1, with the special exception on linking            *)
+(*  described in file LICENSE.                                            *)
+(*                                                                        *)
+(*  This software is distributed in the hope that it will be useful,      *)
+(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
+(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
+(*                                                                        *)
+(**************************************************************************)
 
 open Format
 open Why
@@ -13,7 +31,7 @@ open Pgm_ttree
 let rec print_expr fmt e = match e.expr_desc with
   | Elogic t ->
       fprintf fmt "@[<hov 2><term %a : %a>@]" Pretty.print_term t
-	Pretty.print_ty (t_type t)
+        Pretty.print_ty (t_type t)
   | Elocal v ->
       fprintf fmt "%a" print_pv v
   | Eglobal { ps_kind = PSvar v } ->
@@ -24,15 +42,15 @@ let rec print_expr fmt e = match e.expr_desc with
       assert false
   | Efun (bl, t) ->
       fprintf fmt "@[<hov 2>fun %a ->@ %a@]"
-	(print_list space print_pv) bl print_triple t
+        (print_list space print_pv) bl print_triple t
   | Elet (v, e1, e2) ->
       fprintf fmt "@[<hv 0>@[<hov 2>let %a/%a =@ %a in@]@ %a@]"
-	print_vs v.pv_effect print_vs v.pv_pure
-	print_expr e1 print_expr e2
+        print_vs v.pv_effect print_vs v.pv_pure
+        print_expr e1 print_expr e2
 
   | Eif (e1, e2, e3) ->
       fprintf fmt "@[if %a@ then@ %a else@ %a@]"
-	print_expr e1 print_expr e2 print_expr e3
+        print_expr e1 print_expr e2 print_expr e3
 
   | Eany c ->
       fprintf fmt "@[[any %a]@]" print_type_c c
@@ -49,7 +67,7 @@ let rec print_expr fmt e = match e.expr_desc with
       fprintf fmt "<todo: Eraise>"
   | Ematch (v, cl) ->
       fprintf fmt "@[<hov 2>match %a with@ %a@]" print_pv v
-	(print_list newline print_branch) cl
+        (print_list newline print_branch) cl
   | Eloop (_, _) ->
       fprintf fmt "<todo: Eloop>"
   | Eletrec (_, _)  ->

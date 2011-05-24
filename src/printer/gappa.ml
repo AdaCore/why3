@@ -1,10 +1,9 @@
 (**************************************************************************)
 (*                                                                        *)
 (*  Copyright (C) 2010-2011                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
+(*    François Bobot                                                     *)
+(*    Jean-Christophe Filliâtre                                          *)
+(*    Claude Marché                                                      *)
 (*    Andrei Paskevich                                                    *)
 (*                                                                        *)
 (*  This software is free software; you can redistribute it and/or        *)
@@ -115,12 +114,12 @@ let constant_value t =
     | Tconst (ConstReal r) -> sprintf "%a" Pretty.print_const r
 *)
     | Tconst c ->
-	fprintf str_formatter "%a" Pretty.print_const c;
-	flush_str_formatter ()
+        fprintf str_formatter "%a" Pretty.print_const c;
+        flush_str_formatter ()
     | Tapp(ls, [{ t_node = Tconst c}])
         when ls_equal ls !int_minus || ls_equal ls !real_minus ->
-	fprintf str_formatter "-%a" Pretty.print_const c;
-	flush_str_formatter ()
+        fprintf str_formatter "-%a" Pretty.print_const c;
+        flush_str_formatter ()
     | _ -> raise Not_found
 
 (* terms *)
@@ -139,9 +138,9 @@ let rec print_term info fmt t =
     end
   | Tapp (ls, tl) ->
       begin match query_syntax info.info_syn ls.ls_name with
-	| Some s -> syntax_arguments s term fmt tl
-	| None ->
-	    unsupportedTerm t
+        | Some s -> syntax_arguments s term fmt tl
+        | None ->
+            unsupportedTerm t
               ("gappa: function '" ^ ls.ls_name.id_string ^ "' is not supported")
       end
   | Tlet _ -> unsupportedTerm t
@@ -182,7 +181,7 @@ let rec print_fmla info fmt f =
       end
   | Tapp (ls, [t1;t2]) when Mls.mem ls info.info_ops_of_rel ->
       let s,op,rev_op = try Mls.find ls info.info_ops_of_rel
-	with Not_found -> assert false
+        with Not_found -> assert false
       in
       begin try
         let c1 = constant_value t1 in
@@ -196,9 +195,9 @@ let rec print_fmla info fmt f =
       end
   | Tapp (ls, tl) ->
       begin match query_syntax info.info_syn ls.ls_name with
-	| Some s -> syntax_arguments s term fmt tl
-	| None ->
-	    unsupportedTerm f
+        | Some s -> syntax_arguments s term fmt tl
+        | None ->
+            unsupportedTerm f
               ("gappa: predicate '" ^ ls.ls_name.id_string ^ "' is not supported")
       end
   | Tquant (_q, _fq) ->
@@ -208,7 +207,7 @@ let rec print_fmla info fmt f =
       let q = match q with Tforall -> "forall" | Texists -> "exists" in
       let vl, tl, f = t_open_quant fq in
       let forall fmt v =
-	fprintf fmt "%s %a:%a" q print_ident v.vs_name (print_type info) v.vs_ty
+        fprintf fmt "%s %a:%a" q print_ident v.vs_name (print_type info) v.vs_ty
       in
       fprintf fmt "@[(%a%a.@ %a)@]" (print_list dot forall) vl
         (print_triggers info) tl (print_fmla info) f;
@@ -308,7 +307,7 @@ type filter_goal =
 let filter_goal pr f =
   match f.t_node with
     | Tapp(ps,[]) -> Goal_bad ("symbol " ^ ps.ls_name.Ident.id_string ^ " unknown")
-	(* todo: filter more goals *)
+        (* todo: filter more goals *)
     | _ -> Goal_good(pr,f)
 
 let prepare info defs ((eqs,hyps,goal) as acc) d =
@@ -316,18 +315,18 @@ let prepare info defs ((eqs,hyps,goal) as acc) d =
     | Dtype _ -> acc
     | Dlogic _ -> acc
     | Dind _ ->
-	unsupportedDecl d
-	  "please remove inductive definitions before calling gappa printer"
+        unsupportedDecl d
+          "please remove inductive definitions before calling gappa printer"
     | Dprop (Paxiom, pr, f) ->
-	let (eqs,hyps) = filter_hyp info defs eqs hyps pr f in (eqs,hyps,goal)
+        let (eqs,hyps) = filter_hyp info defs eqs hyps pr f in (eqs,hyps,goal)
     | Dprop (Pgoal, pr, f) ->
-	begin
-	  match goal with
-	    | Goal_none -> (eqs,hyps,filter_goal pr f)
-	    | _ -> assert false
-	end
+        begin
+          match goal with
+            | Goal_none -> (eqs,hyps,filter_goal pr f)
+            | _ -> assert false
+        end
     | Dprop ((Plemma|Pskip), _, _) ->
-	unsupportedDecl d
+        unsupportedDecl d
           "gappa: lemmas are not supported"
 
 let print_equation info fmt (pr,t1,t2) =
@@ -341,14 +340,14 @@ let print_hyp info fmt (pr,f) =
 let print_goal info fmt g =
   match g with
     | Goal_good(pr,f) ->
-	fprintf fmt "# goal '%a'@\n" print_ident pr.pr_name;
-	fprintf fmt "%a@\n" (print_fmla info) f
+        fprintf fmt "# goal '%a'@\n" print_ident pr.pr_name;
+        fprintf fmt "%a@\n" (print_fmla info) f
     | Goal_bad msg ->
-	fprintf fmt "# (unsupported kind of goal: %s)@\n" msg;
-	fprintf fmt "1 in [0,0]@\n"
+        fprintf fmt "# (unsupported kind of goal: %s)@\n" msg;
+        fprintf fmt "1 in [0,0]@\n"
     | Goal_none ->
-	fprintf fmt "# (no goal at all ??)@\n";
-	fprintf fmt "1 in [0,0]@\n"
+        fprintf fmt "# (no goal at all ??)@\n";
+        fprintf fmt "1 in [0,0]@\n"
 
 let print_task env pr thpr ?old:_ fmt task =
   forget_all ident_printer;

@@ -1,3 +1,21 @@
+(**************************************************************************)
+(*                                                                        *)
+(*  Copyright (C) 2010-2011                                               *)
+(*    François Bobot                                                     *)
+(*    Jean-Christophe Filliâtre                                          *)
+(*    Claude Marché                                                      *)
+(*    Andrei Paskevich                                                    *)
+(*                                                                        *)
+(*  This software is free software; you can redistribute it and/or        *)
+(*  modify it under the terms of the GNU Library General Public           *)
+(*  License version 2.1, with the special exception on linking            *)
+(*  described in file LICENSE.                                            *)
+(*                                                                        *)
+(*  This software is distributed in the hope that it will be useful,      *)
+(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
+(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
+(*                                                                        *)
+(**************************************************************************)
 
 
 open Why
@@ -162,7 +180,7 @@ let init =
             begin
               match a.M.prover with
                 | M.Detected_prover p ->
-	            p.Session.prover_name ^ " " ^ p.Session.prover_version
+                    p.Session.prover_name ^ " " ^ p.Session.prover_version
                 | M.Undetected_prover s -> s
             end
         | M.Transformation tr -> Session.transformation_id tr.M.transf
@@ -178,17 +196,17 @@ let string_of_result result =
     | Session.Running -> "running"
     | Session.InternalFailure _ -> "internal failure"
     | Session.Done r -> match r.Call_provers.pr_answer with
-	| Call_provers.Valid -> "valid"
-	| Call_provers.Invalid -> "invalid"
-	| Call_provers.Timeout -> "timeout"
-	| Call_provers.Unknown _ -> "unknown"
-	| Call_provers.Failure _ -> "failure"
-	| Call_provers.HighFailure -> "high failure"
+        | Call_provers.Valid -> "valid"
+        | Call_provers.Invalid -> "invalid"
+        | Call_provers.Timeout -> "timeout"
+        | Call_provers.Unknown _ -> "unknown"
+        | Call_provers.Failure _ -> "failure"
+        | Call_provers.HighFailure -> "high failure"
 
 let print_result fmt res =
   let t = match res with
     | Session.Done { Call_provers.pr_time = time } ->
-	Format.sprintf "(%.1f)" time
+        Format.sprintf "(%.1f)" time
     | _ -> ""
   in
   fprintf fmt "%s%s" (string_of_result res) t
@@ -209,19 +227,19 @@ let notify _any = ()
 (*
   match any with
     | M.Goal g ->
-	printf "Goal '%s' proved: %b@." (M.goal_expl g) (M.goal_proved g)
+        printf "Goal '%s' proved: %b@." (M.goal_expl g) (M.goal_proved g)
     | M.Theory th ->
-	printf "Theory '%s' verified: %b@." (M.theory_name th) (M.verified th)
+        printf "Theory '%s' verified: %b@." (M.theory_name th) (M.verified th)
     | M.File file ->
-	printf "File '%s' verified: %b@." (Filename.basename file.M.file_name)
+        printf "File '%s' verified: %b@." (Filename.basename file.M.file_name)
           file.M.file_verified
     | M.Proof_attempt a ->
         let p = a.M.prover in
-	printf "Proof with '%s %s' gives %a@."
-	  p.Session.prover_name p.Session.prover_version
+        printf "Proof with '%s %s' gives %a@."
+          p.Session.prover_name p.Session.prover_version
           print_result a.M.proof_state
     | M.Transformation tr ->
-	printf "Transformation '%s' proved: %b@."
+        printf "Transformation '%s' proved: %b@."
           (Session.transformation_id tr.M.transf) tr.M.transf_proved
 *)
 
@@ -262,21 +280,21 @@ let print_statistics files =
   List.iter
     (fun (f,ths,n,m) ->
        if n<m then
-	 begin
-	   printf "   +--file %s: %d/%d@." f.M.file_name n m;
-	   List.iter
-	     (fun (th,goals,n,m) ->
-		if n<m then
-		  begin
-		    printf "      +--theory %s: %d/%d@."
-		      (M.theory_name th) n m;
-		    List.iter
-		      (fun g ->
-			 printf "         +--goal %s not proved@." (M.goal_name g))
-		      (List.rev goals)
-		  end)
-	     (List.rev ths)
-	 end)
+         begin
+           printf "   +--file %s: %d/%d@." f.M.file_name n m;
+           List.iter
+             (fun (th,goals,n,m) ->
+                if n<m then
+                  begin
+                    printf "      +--theory %s: %d/%d@."
+                      (M.theory_name th) n m;
+                    List.iter
+                      (fun g ->
+                         printf "         +--goal %s not proved@." (M.goal_name g))
+                      (List.rev goals)
+                  end)
+             (List.rev ths)
+         end)
     (List.rev files)
 
 let print_report (g,p,r) =
@@ -301,18 +319,18 @@ let () =
     eprintf " done@.";
     let callback report =
       let files,n,m =
-	List.fold_left file_statistics ([],0,0) (M.get_all_files ())
+        List.fold_left file_statistics ([],0,0) (M.get_all_files ())
       in
       printf " %d/%d@." n m ;
       match report with
-	| [] ->
-	    if !opt_stats && n<m then print_statistics files;
-	    eprintf "Everything OK.@.";
-	    exit 0
-	| _ ->
-	    List.iter print_report report;
-	    eprintf "Check failed.@.";
-	    exit 1
+        | [] ->
+            if !opt_stats && n<m then print_statistics files;
+            eprintf "Everything OK.@.";
+            exit 0
+        | _ ->
+            List.iter print_report report;
+            eprintf "Check failed.@.";
+            exit 1
     in
     M.check_all ~callback;
     try main_loop ()

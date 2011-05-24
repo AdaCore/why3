@@ -1,6 +1,6 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  Copyright (C) 2010-                                                   *)
+(*  Copyright (C) 2010-2011                                               *)
 (*    François Bobot                                                     *)
 (*    Jean-Christophe Filliâtre                                          *)
 (*    Claude Marché                                                      *)
@@ -105,11 +105,11 @@ let rec print_fmla info fmt f = match f.t_node with
   | Tquant (q, fq) ->
       let vl, tl, f = t_open_quant fq in
       let q, tl = match q with 
-	| Tforall -> "forall", tl 
-	| Texists -> "exists", [] (* Alt-ergo has no triggers for exists *)
+        | Tforall -> "forall", tl 
+        | Texists -> "exists", [] (* Alt-ergo has no triggers for exists *)
       in
       let forall fmt v =
-	fprintf fmt "%s %a:%a" q print_ident v.vs_name (print_type info) v.vs_ty
+        fprintf fmt "%s %a:%a" q print_ident v.vs_name (print_type info) v.vs_ty
       in
       fprintf fmt "@[(%a%a.@ %a)@]" (print_list dot forall) vl
         (print_triggers info) tl (print_fmla info) f;
@@ -130,7 +130,7 @@ let rec print_fmla info fmt f = match f.t_node with
       fprintf fmt "false"
   | Tif (f1, f2, f3) ->
       fprintf fmt "((%a and %a) or (not %a and %a))"
-	(print_fmla info) f1 (print_fmla info) f2 (print_fmla info)
+        (print_fmla info) f1 (print_fmla info) f2 (print_fmla info)
         f1 (print_fmla info) f3
   | Tlet _ -> unsupportedTerm f
       "alt-ergo : you must eliminate let in formula"

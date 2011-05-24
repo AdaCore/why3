@@ -1,6 +1,6 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  Copyright (C) 2010-                                                   *)
+(*  Copyright (C) 2010-2011                                               *)
 (*    François Bobot                                                     *)
 (*    Jean-Christophe Filliâtre                                          *)
 (*    Claude Marché                                                      *)
@@ -103,8 +103,8 @@ let elt d =
         let mem = Hid.create 16 in
         List.iter (fun ((ts,_) as a) -> Hid.add mem ts.ts_name a) l;
         let tyoccurences acc ts =
-	  if Hid.mem mem ts.ts_name then Sid.add ts.ts_name acc else acc
-	in
+          if Hid.mem mem ts.ts_name then Sid.add ts.ts_name acc else acc
+        in
         let m = List.fold_left
           (fun m (ts,def) ->
              let s = match def with
@@ -119,11 +119,11 @@ let elt d =
                         let ty = of_option ty in
                         List.fold_left
                           (fun acc ty -> ty_s_fold tyoccurences acc ty)
-			  acc (ty::tyl)
+                          acc (ty::tyl)
                      ) Sid.empty l
-	     in
+             in
              Mid.add ts.ts_name s m) Mid.empty l
-	in
+        in
         let l = connexe m in
         List.map (fun e -> create_ty_decl (List.map (Hid.find mem) e)) l
     | Dind _ -> [d] (* TODO *)

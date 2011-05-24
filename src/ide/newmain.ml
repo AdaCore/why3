@@ -1,6 +1,6 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  Copyright (C) 2010-                                                   *)
+(*  Copyright (C) 2010-2011                                               *)
 (*    François Bobot                                                     *)
 (*    Jean-Christophe Filliâtre                                          *)
 (*    Claude Marché                                                      *)
@@ -308,18 +308,18 @@ let image_of_result ~obsolete result =
     | Session.Running -> !image_running
     | Session.InternalFailure _ -> !image_failure
     | Session.Done r -> match r.Call_provers.pr_answer with
-	| Call_provers.Valid ->
-	    if obsolete then !image_valid_obs else !image_valid
-	| Call_provers.Invalid ->
-	    if obsolete then !image_invalid_obs else !image_invalid
-	| Call_provers.Timeout ->
-	    if obsolete then !image_timeout_obs else !image_timeout
-	| Call_provers.Unknown _ ->
-	    if obsolete then !image_unknown_obs else !image_unknown
-	| Call_provers.Failure _ ->
-	    if obsolete then !image_failure_obs else !image_failure
-	| Call_provers.HighFailure ->
-	    if obsolete then !image_failure_obs else !image_failure
+        | Call_provers.Valid ->
+            if obsolete then !image_valid_obs else !image_valid
+        | Call_provers.Invalid ->
+            if obsolete then !image_invalid_obs else !image_invalid
+        | Call_provers.Timeout ->
+            if obsolete then !image_timeout_obs else !image_timeout
+        | Call_provers.Unknown _ ->
+            if obsolete then !image_unknown_obs else !image_unknown
+        | Call_provers.Failure _ ->
+            if obsolete then !image_failure_obs else !image_failure
+        | Call_provers.HighFailure ->
+            if obsolete then !image_failure_obs else !image_failure
 
 (* connecting to the Session model *)
 
@@ -364,7 +364,7 @@ let set_proof_state ~obsolete a =
     (image_of_result ~obsolete res);
   let t = match res with
     | Session.Done { Call_provers.pr_time = time } ->
-	Format.sprintf "%.2f" time
+        Format.sprintf "%.2f" time
     | _ -> ""
   in
   let t = if obsolete then t ^ " (obsolete)" else t in
@@ -395,24 +395,24 @@ let row_expanded b iter _path =
   match get_any_from_iter iter with
     | M.File f -> 
 (*
-	eprintf "file_expanded <- %b@." b;
+        eprintf "file_expanded <- %b@." b;
 *)
-	M.set_file_expanded f b
+        M.set_file_expanded f b
     | M.Theory t -> 
 (*
-	eprintf "theory_expanded <- %b@." b;
+        eprintf "theory_expanded <- %b@." b;
 *)
-	M.set_theory_expanded t b
+        M.set_theory_expanded t b
     | M.Goal g ->
 (*
-	eprintf "goal_expanded <- %b@." b;
+        eprintf "goal_expanded <- %b@." b;
 *)
-	M.set_goal_expanded g b
+        M.set_goal_expanded g b
     | M.Transformation tr ->
 (*
-	eprintf "transf_expanded <- %b@." b;
+        eprintf "transf_expanded <- %b@." b;
 *)
-	M.set_transf_expanded tr b
+        M.set_transf_expanded tr b
     | M.Proof_attempt _ -> ()
 
 
@@ -445,16 +445,16 @@ let notify any =
     goals_view#collapse_row row#path;
   match any with
     | M.Goal g ->
-	set_row_status row (M.goal_proved g)
+        set_row_status row (M.goal_proved g)
     | M.Theory th ->
-	set_row_status row (M.verified th)
+        set_row_status row (M.verified th)
     | M.File file ->
-	set_row_status row file.M.file_verified
+        set_row_status row file.M.file_verified
     | M.Proof_attempt a ->
-	set_proof_state ~obsolete:a.M.proof_obsolete a
+        set_proof_state ~obsolete:a.M.proof_obsolete a
     | M.Transformation tr ->
-	set_row_status row tr.M.transf_proved
-	  
+        set_row_status row tr.M.transf_proved
+          
 let init =
   let cpt = ref (-1) in
   fun row any ->
@@ -472,24 +472,24 @@ let init =
     (* useless since it has no child: goals_view#expand_row row#path; *)
     goals_model#set ~row:row#iter ~column:icon_column
       (match any with
-	 | M.Goal _ -> !image_file
-	 | M.Theory _
-	 | M.File _ -> !image_directory
-	 | M.Proof_attempt _ -> !image_prover
-	 | M.Transformation _ -> !image_transf);
+         | M.Goal _ -> !image_file
+         | M.Theory _
+         | M.File _ -> !image_directory
+         | M.Proof_attempt _ -> !image_prover
+         | M.Transformation _ -> !image_transf);
     goals_model#set ~row:row#iter ~column:name_column
       (match any with
-	 | M.Goal g -> M.goal_expl g
-	 | M.Theory th -> M.theory_name th
-	 | M.File f -> Filename.basename f.M.file_name
-	 | M.Proof_attempt a -> 
+         | M.Goal g -> M.goal_expl g
+         | M.Theory th -> M.theory_name th
+         | M.File f -> Filename.basename f.M.file_name
+         | M.Proof_attempt a -> 
              begin
                match a.M.prover with
                  | M.Detected_prover p ->
-	             p.Session.prover_name ^ " " ^ p.Session.prover_version
+                     p.Session.prover_name ^ " " ^ p.Session.prover_version
                  | M.Undetected_prover s -> s
              end
-	 | M.Transformation tr -> Session.transformation_id tr.M.transf);
+         | M.Transformation tr -> Session.transformation_id tr.M.transf);
     notify any
 
 
@@ -515,7 +515,7 @@ let project_dir, file_to_read =
           in
           eprintf "Info: using '%s' as directory for the project@." d;
           d, Some (Filename.concat Filename.parent_dir_name
-		     (Filename.basename fname))
+                     (Filename.basename fname))
         end
     end
   else
@@ -563,7 +563,7 @@ let info_window ?(callback=(fun () -> ())) mt s =
   let (_ : GtkSignal.id) =
     d#connect#response
       ~callback:(function x -> d#destroy ();
-		   if x = `OK then callback ())
+                   if x = `OK then callback ())
   in ()
 
 
@@ -581,9 +581,9 @@ let () =
           try
             M.add_file fn
           with e ->
-	    eprintf "@[Error while reading file@ '%s':@ %a@.@]" fn
+            eprintf "@[Error while reading file@ '%s':@ %a@.@]" fn
               Exn_printer.exn_printer e;
-	    exit 1
+            exit 1
 
 
 
@@ -598,7 +598,7 @@ let prover_on_selected_goals pr =
        let a = get_any_from_row_reference row in
         M.run_prover
           ~context_unproved_goals_only:!context_unproved_goals_only
-	  ~timelimit:gconfig.time_limit
+          ~timelimit:gconfig.time_limit
           pr a)
     (get_selected_row_references ())
 
@@ -632,7 +632,7 @@ let apply_trans_on_selection tr =
        let a = get_any_from_row_reference r in
         M.transform
           ~context_unproved_goals_only:!context_unproved_goals_only
-	  tr
+          tr
           a)
     (get_selected_row_references ())
 
@@ -666,16 +666,16 @@ let select_file () =
         match d#filename with
           | None -> ()
           | Some f ->
-	      let f = Sysutil.relativize_filename project_dir f in
+              let f = Sysutil.relativize_filename project_dir f in
               eprintf "Adding file '%s'@." f;
               try
                 M.add_file f
               with e ->
-	        fprintf str_formatter
+                fprintf str_formatter
                   "@[Error while reading file@ '%s':@ %a@]" f
                   Exn_printer.exn_printer e;
-	        let msg = flush_str_formatter () in
-	        info_window `ERROR msg
+                let msg = flush_str_formatter () in
+                info_window `ERROR msg
       end
   | `DELETE_EVENT | `CANCEL -> ()
   end ;
@@ -727,10 +727,10 @@ let exit_function () =
       let l = M.test_load () in
       eprintf "reloaded successfully %d elements@." (List.length l);
       match l with
-	| [] -> ()
-	| f :: _ ->
-	    eprintf "first element is a '%s' with %d sub-elements@."
-	      f.Xml.name (List.length f.Xml.elements);
+        | [] -> ()
+        | f :: _ ->
+            eprintf "first element is a '%s' with %d sub-elements@."
+              f.Xml.name (List.length f.Xml.elements);
 
     with e -> eprintf "test reloading failed with exception %s@."
       (Printexc.to_string e)
@@ -749,7 +749,7 @@ let exit_function () =
   let (_ : GtkSignal.id) =
     d#connect#response
       ~callback:(function x -> d#destroy ();
-		   if x = `YES then M.save_session ();
+                   if x = `YES then M.save_session ();
                    GMain.quit ()
                 )
   in
@@ -1162,12 +1162,12 @@ let reload () =
               scroll_to_loc ~color:error_tag ~yalign:0.5 loc; e
           | e -> e
         in
-	fprintf str_formatter
-	  "@[Error:@ %a@]" Exn_printer.exn_printer e;
-	let msg = flush_str_formatter () in
+        fprintf str_formatter
+          "@[Error:@ %a@]" Exn_printer.exn_printer e;
+        let msg = flush_str_formatter () in
         file_info#set_text msg
 (*
-	info_window `ERROR msg
+        info_window `ERROR msg
 *)
 
 let (_ : GMenu.image_menu_item) =
@@ -1219,7 +1219,7 @@ let edit_current_proof () =
     | [] -> ()
     | [r] -> edit_selected_row r
     | _ ->
-	info_window `INFO "Please select exactly one proof to edit"
+        info_window `INFO "Please select exactly one proof to edit"
 
 
 let add_item_edit () =
@@ -1261,21 +1261,21 @@ let () =
 let confirm_remove_row r =
   match get_any_from_row_reference r with
     | M.Goal _g ->
-	info_window `ERROR "Cannot remove a goal"
+        info_window `ERROR "Cannot remove a goal"
     | M.Theory _th ->
-	info_window `ERROR "Cannot remove a theory"
+        info_window `ERROR "Cannot remove a theory"
     | M.File _file ->
-	info_window `ERROR "Cannot remove a file"
+        info_window `ERROR "Cannot remove a file"
     | M.Proof_attempt a ->
-	info_window
-	  ~callback:(fun () -> M.remove_proof_attempt a)
-	  `QUESTION
-	  "Do you really want to remove the selected proof attempt?"
+        info_window
+          ~callback:(fun () -> M.remove_proof_attempt a)
+          `QUESTION
+          "Do you really want to remove the selected proof attempt?"
     | M.Transformation tr ->
-	info_window
-	  ~callback:(fun () -> M.remove_transformation tr)
-	  `QUESTION
-	  "Do you really want to remove the selected transformation
+        info_window
+          ~callback:(fun () -> M.remove_transformation tr)
+          `QUESTION
+          "Do you really want to remove the selected transformation
 and all its subgoals?"
 
 let remove_proof r =
@@ -1292,9 +1292,9 @@ let confirm_remove_selection () =
     | [r] -> confirm_remove_row r
     | l ->
         info_window
-	  ~callback:(fun () -> List.iter remove_proof l)
-	  `QUESTION
-	  "Do you really want to remove all the selected proofs?"
+          ~callback:(fun () -> List.iter remove_proof l)
+          `QUESTION
+          "Do you really want to remove all the selected proofs?"
 (*
     | _ ->
         info_window `INFO "Please select exactly one item to remove"
@@ -1335,14 +1335,14 @@ let select_row r =
   let a = get_any_from_row_reference r in
   match a with
     | M.Goal g ->
-	let callback = function
-	  | [t] ->
+        let callback = function
+          | [t] ->
               let task_text = Pp.string_of Pretty.print_task t in
               task_view#source_buffer#set_text task_text;
               task_view#scroll_to_mark `INSERT;
               scroll_to_source_goal g
-	  | _ -> assert false
-	in
+          | _ -> assert false
+        in
         M.apply_transformation ~callback intro_transformation (M.get_task g)
 
     | M.Theory th ->
@@ -1352,12 +1352,12 @@ let select_row r =
         task_view#source_buffer#set_text "";
         (* scroll_to_file file *)
     | M.Proof_attempt a ->
-	let o =
+        let o =
           match a.M.proof_state with
-	    | Session.Done r -> r.Call_provers.pr_output;
-	    | _ -> "No information available"
-	in
-	task_view#source_buffer#set_text o;
+            | Session.Done r -> r.Call_provers.pr_output;
+            | _ -> "No information available"
+        in
+        task_view#source_buffer#set_text o;
         scroll_to_source_goal a.M.proof_goal
     | M.Transformation tr ->
         task_view#source_buffer#set_text "";

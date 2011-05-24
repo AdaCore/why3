@@ -1,6 +1,6 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  Copyright (C) 2010-                                                   *)
+(*  Copyright (C) 2010-2011                                               *)
 (*    François Bobot                                                     *)
 (*    Jean-Christophe Filliâtre                                          *)
 (*    Claude Marché                                                      *)
@@ -136,8 +136,8 @@ let path_of_file f =
     else
       let b = Filename.basename f in
       if b=Filename.current_dir_name then acc else
-	if f=b then b::acc else
-	  aux (b::acc) d
+        if f=b then b::acc else
+          aux (b::acc) d
   in
   aux [] f
 
@@ -157,14 +157,14 @@ let p1 = path_of_file "../src/f.why"
 
 let relativize_filename base f =
   let rec aux ab af =
-    match ab,af with	
+    match ab,af with        
       | x::rb, y::rf when x=y -> aux rb rf
       | _ -> 
-	  let rec aux2 acc p =
-	    match p with
-	      | [] -> acc
-	      | _::rb -> aux2 (Filename.parent_dir_name::acc) rb
-	  in aux2 af ab
+          let rec aux2 acc p =
+            match p with
+              | [] -> acc
+              | _::rb -> aux2 (Filename.parent_dir_name::acc) rb
+          in aux2 af ab
   in
   let rec rebuild l =
     match l with

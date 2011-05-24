@@ -1,3 +1,21 @@
+(**************************************************************************)
+(*                                                                        *)
+(*  Copyright (C) 2010-2011                                               *)
+(*    François Bobot                                                     *)
+(*    Jean-Christophe Filliâtre                                          *)
+(*    Claude Marché                                                      *)
+(*    Andrei Paskevich                                                    *)
+(*                                                                        *)
+(*  This software is free software; you can redistribute it and/or        *)
+(*  modify it under the terms of the GNU Library General Public           *)
+(*  License version 2.1, with the special exception on linking            *)
+(*  described in file LICENSE.                                            *)
+(*                                                                        *)
+(*  This software is distributed in the hope that it will be useful,      *)
+(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
+(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
+(*                                                                        *)
+(**************************************************************************)
 
 open Format
 open Ident
@@ -41,17 +59,17 @@ let make_case kn fn t bl =
 let eval_match ~inline kn t =
   let rec eval env t = match t.t_node with
     | Tapp (ls, tl) when inline kn ls (List.map t_type tl) t.t_ty ->
-	begin match find_logic_definition kn ls with
-	  | None ->
-	      t_map (eval env) t
-	  | Some def ->
-	      t_label_copy t (eval env (unfold def tl t.t_ty))
-	end
+        begin match find_logic_definition kn ls with
+          | None ->
+              t_map (eval env) t
+          | Some def ->
+              t_label_copy t (eval env (unfold def tl t.t_ty))
+        end
     | Tlet (t1, tb2) ->
-	let t1 = eval env t1 in
-	let x, t2, close = t_open_bound_cb tb2 in
-	let t2 = eval (Mvs.add x t1 env) t2 in
-	t_label_copy t (t_let_simp t1 (close x t2))
+        let t1 = eval env t1 in
+        let x, t2, close = t_open_bound_cb tb2 in
+        let t2 = eval (Mvs.add x t1 env) t2 in
+        t_label_copy t (t_let_simp t1 (close x t2))
     | Tcase (t1, bl) ->
         let t1 = eval env t1 in
         let process t1 =
@@ -68,7 +86,7 @@ let eval_match ~inline kn t =
         in
         t_label_copy t (dive process env t1)
     | _ ->
-	t_map (eval env) t
+        t_map (eval env) t
   in
   eval Mvs.empty t
 
@@ -94,14 +112,14 @@ let inline_nonrec_linear kn ls tyl ty =
   (* and ls is not recursively defined and is linear *)
   match d.d_node with
     | Dlogic dl ->
-	let no_occ (ls', def) = match def with
-	  | None ->
-	      true
-	  | Some def ->
-	      let _, t = open_ls_defn def in
-	      not (t_s_any Util.ffalse (ls_equal ls) t) &&
+        let no_occ (ls', def) = match def with
+          | None ->
+              true
+          | Some def ->
+              let _, t = open_ls_defn def in
+              not (t_s_any Util.ffalse (ls_equal ls) t) &&
               (not (ls_equal ls ls') || linear t)
-	in
-	List.for_all no_occ dl
+        in
+        List.for_all no_occ dl
     | _ ->
-	false
+        false

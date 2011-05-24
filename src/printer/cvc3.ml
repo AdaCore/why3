@@ -1,6 +1,6 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  Copyright (C) 2010-                                                   *)
+(*  Copyright (C) 2010-2011                                               *)
 (*    François Bobot                                                     *)
 (*    Jean-Christophe Filliâtre                                          *)
 (*    Claude Marché                                                      *)
@@ -136,7 +136,7 @@ let rec print_term info fmt t = match t.t_node with
   | Tconst (ConstInt n) -> fprintf fmt "%s" n
   | Tconst (ConstReal c) ->
       Print_real.print_with_integers
-	"%s" "(%s * %s)" "(%s / %s)" fmt c
+        "%s" "(%s * %s)" "(%s / %s)" fmt c
   | Tvar v -> print_var fmt v
   | Tapp (ls, tl) -> begin match query_syntax info.info_syn ls.ls_name with
       | Some s -> syntax_arguments_typed s (print_term info)
@@ -144,7 +144,7 @@ let rec print_term info fmt t = match t.t_node with
       | None -> begin match tl with (* for cvc3 wich doesn't accept (toto ) *)
           | [] -> fprintf fmt "%a" print_ident ls.ls_name
           | _ -> fprintf fmt "@,%a(%a)"
-	      print_ident ls.ls_name (print_list comma (print_term info)) tl
+              print_ident ls.ls_name (print_list comma (print_term info)) tl
         end end
   | Tlet (t1, tb) ->
       let v, t2 = t_open_bound tb in
@@ -169,7 +169,7 @@ and print_fmla info fmt f = match f.t_node with
       | None -> begin match tl with
           | [] -> fprintf fmt "%a" print_ident ls.ls_name
           | _ -> fprintf fmt "(%a(%a))"
-	      print_ident ls.ls_name (print_list comma (print_term info)) tl
+              print_ident ls.ls_name (print_list comma (print_term info)) tl
         end end
   | Tquant (q, fq) ->
       let q = match q with Tforall -> "FORALL" | Texists -> "EXISTS" in
@@ -205,7 +205,7 @@ and print_fmla info fmt f = match f.t_node with
       fprintf fmt "FALSE"
   | Tif (f1, f2, f3) ->
       fprintf fmt "@[(IF %a@ THEN %a@ ELSE %a ENDIF)@]"
-	(print_fmla info) f1 (print_fmla info) f2 (print_fmla info) f3
+        (print_fmla info) f1 (print_fmla info) f2 (print_fmla info) f3
   | Tlet (t1, tb) ->
       let v, f2 = t_open_bound tb in
       fprintf fmt "@[(LET %a =@ %a IN@ %a)@]" print_var v

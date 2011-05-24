@@ -1,3 +1,21 @@
+(**************************************************************************)
+(*                                                                        *)
+(*  Copyright (C) 2010-2011                                               *)
+(*    François Bobot                                                     *)
+(*    Jean-Christophe Filliâtre                                          *)
+(*    Claude Marché                                                      *)
+(*    Andrei Paskevich                                                    *)
+(*                                                                        *)
+(*  This software is free software; you can redistribute it and/or        *)
+(*  modify it under the terms of the GNU Library General Public           *)
+(*  License version 2.1, with the special exception on linking            *)
+(*  described in file LICENSE.                                            *)
+(*                                                                        *)
+(*  This software is distributed in the hope that it will be useful,      *)
+(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
+(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
+(*                                                                        *)
+(**************************************************************************)
 
 open Why
 open Util
@@ -103,7 +121,7 @@ let close_namespace uc import s =
       let eth = Theory.close_namespace uc.uc_effect import s in
       let pth = Theory.close_namespace uc.uc_pure   import s in
       { uc with uc_impure = ith; uc_effect = eth; uc_pure = pth;
-	        uc_import = i1 :: sti; uc_export = e1 :: ste; }
+                uc_import = i1 :: sti; uc_export = e1 :: ste; }
   | [_], [_] -> raise NoOpenedNamespace
   | _ -> assert false
 
@@ -177,11 +195,11 @@ exception CloseModule
 let close_module uc = match uc.uc_export with
   | [e] ->
       { m_name = uc.uc_name;
-	m_decls = List.rev uc.uc_decls;
-	m_export = e;
-	m_impure = close_theory uc.uc_impure; 
-	m_effect = close_theory uc.uc_effect; 
-	m_pure = close_theory uc.uc_pure; 
+        m_decls = List.rev uc.uc_decls;
+        m_export = e;
+        m_impure = close_theory uc.uc_impure; 
+        m_effect = close_theory uc.uc_effect; 
+        m_pure = close_theory uc.uc_pure; 
       }
   | _ ->
       raise CloseModule
@@ -201,9 +219,9 @@ let use_export uc m =
 let use_export_theory uc th =
   let uc =
     { uc with 
-	uc_impure = Theory.use_export uc.uc_impure th;
-	uc_effect = Theory.use_export uc.uc_effect th;
-	uc_pure   = Theory.use_export uc.uc_pure   th; }
+        uc_impure = Theory.use_export uc.uc_impure th;
+        uc_effect = Theory.use_export uc.uc_effect th;
+        uc_pure   = Theory.use_export uc.uc_pure   th; }
   in
   (* all type symbols from th are added as (pure) mtsymbols *)
   let add_ts _ ts = 

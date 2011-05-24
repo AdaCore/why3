@@ -1,6 +1,6 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  Copyright (C) 2010-                                                   *)
+(*  Copyright (C) 2010-2011                                               *)
 (*    François Bobot                                                     *)
 (*    Jean-Christophe Filliâtre                                          *)
 (*    Claude Marché                                                      *)
@@ -37,17 +37,17 @@ let rec intros pr f = match f.t_node with
       (* split f1 *)
       let l = Split_goal.split_pos f1 in
       List.fold_right
-	(fun f acc ->
-	   let id = create_prsymbol (id_fresh "H") in
-	   let d = create_prop_decl Paxiom id f in
-	   d :: acc)
-	l
-	(intros pr f2)
+        (fun f acc ->
+           let id = create_prsymbol (id_fresh "H") in
+           let d = create_prop_decl Paxiom id f in
+           d :: acc)
+        l
+        (intros pr f2)
       (* old version, f1 not splitted *)
       (*
-	let id = create_prsymbol (id_fresh "H") in
-	let d = create_prop_decl Paxiom id f1 in
-	d :: intros pr f2
+        let id = create_prsymbol (id_fresh "H") in
+        let d = create_prop_decl Paxiom id f1 in
+        d :: intros pr f2
       *)
   | Tquant (Tforall,fq) ->
       let vsl,_trl,f = t_open_quant fq in

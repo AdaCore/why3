@@ -1,6 +1,6 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  Copyright (C) 2010-                                                   *)
+(*  Copyright (C) 2010-2011                                               *)
 (*    François Bobot                                                     *)
 (*    Jean-Christophe Filliâtre                                          *)
 (*    Claude Marché                                                      *)
@@ -129,7 +129,7 @@ let detect_exec main data com =
         let ch = open_in out in
         let c = Sysutil.channel_contents ch in
         close_in ch;
-	Sys.remove out;
+        Sys.remove out;
         c
       with Not_found | End_of_file  -> ""
     in
@@ -142,7 +142,7 @@ let detect_exec main data com =
         None
       else begin
         if List.mem ver data.versions_ok then
-	  eprintf "Found prover %s version %s, OK.@." nam ver
+          eprintf "Found prover %s version %s, OK.@." nam ver
         else
           begin
             prover_tips_info := true;
@@ -164,11 +164,11 @@ let detect_exec main data com =
     with Not_found ->
       begin
         prover_tips_info := true;
-	eprintf "Warning: found prover %s but name/version not \
+        eprintf "Warning: found prover %s but name/version not \
                        recognized by regexp `%s'@."
           data.prover_name data.version_regexp;
-	eprintf "Answer was `%s'@." s;
-	None
+        eprintf "Answer was `%s'@." s;
+        None
       end
 
 let detect_prover main acc l =

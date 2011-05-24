@@ -1,6 +1,6 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  Copyright (C) 2010-                                                   *)
+(*  Copyright (C) 2010-2011                                               *)
 (*    François Bobot                                                     *)
 (*    Jean-Christophe Filliâtre                                          *)
 (*    Claude Marché                                                      *)
@@ -67,8 +67,8 @@ module type OBSERVER = sig
 
   type key
     (** type key allowing to uniquely identify an element of
-	of session: a goal, a transformation, a proof attempt,
-	a theory or a file. See type [any] below *)
+        of session: a goal, a transformation, a proof attempt,
+        a theory or a file. See type [any] below *)
 
   val create: ?parent:key -> unit -> key
     (** returns a fresh key, a new child of the given parent if any *)
@@ -81,13 +81,13 @@ module type OBSERVER = sig
 
   val timeout: ms:int -> (unit -> bool) -> unit
     (** a handler for functions that must be called after a given time
-	elapsed, in milliseconds. When the given function returns
-	true, it must be rescheduled *)
+        elapsed, in milliseconds. When the given function returns
+        true, it must be rescheduled *)
 
   val idle: (unit -> bool) -> unit
     (** a handler for a delayed function, that can be called when
-	there is nothing else to do. When the given function returns
-	true, it must be rescheduled *)
+        there is nothing else to do. When the given function returns
+        true, it must be rescheduled *)
 
 end
 
@@ -102,8 +102,8 @@ module Make(O: OBSERVER) : sig
 
   type transf = private
       { transf : transformation_data;
-	parent_goal : goal;
-	mutable transf_proved : bool;
+        parent_goal : goal;
+        mutable transf_proved : bool;
         transf_key : O.key;
         mutable subgoals : goal list;
         mutable transf_expanded : bool;
@@ -130,7 +130,7 @@ module Make(O: OBSERVER) : sig
         proof_goal : goal;
         proof_key : O.key;
         mutable proof_state : proof_attempt_status;
-	mutable timelimit : int;
+        mutable timelimit : int;
         mutable proof_obsolete : bool;
         mutable edited_as : string;
       }
@@ -154,7 +154,7 @@ module Make(O: OBSERVER) : sig
         file_key : O.key;
         mutable theories: theory list;
         mutable file_verified : bool;
-	mutable file_expanded : bool;
+        mutable file_expanded : bool;
       }
 
   val set_file_expanded : file -> bool -> unit
@@ -184,11 +184,11 @@ module Make(O: OBSERVER) : sig
         Opening a session must be done prior to any other actions.
         And it cannot be done twice.
 
-	the [notify] function is a function that will be called at each
-	update of element of the state
+        the [notify] function is a function that will be called at each
+        update of element of the state
 
-	the [init] function is a function that will be called at each
-	creation of element of the state
+        the [init] function is a function that will be called at each
+        creation of element of the state
 
     *)
 
@@ -198,16 +198,16 @@ module Make(O: OBSERVER) : sig
 
   val save_session : unit -> unit
     (** enforces to save the session state on disk.
-	this it supposed to be called only at exit,
-	since the session manager also performs automatic saving
-	some time to time *)
+        this it supposed to be called only at exit,
+        since the session manager also performs automatic saving
+        some time to time *)
 
   val file_exists : string -> bool
 
   val add_file : string -> unit
     (** [add_file f] adds the file [f] in the proof session,
-	the file name must be given relatively to the session dir
-	given to [open_session] *)
+        the file name must be given relatively to the session dir
+        given to [open_session] *)
 
 
   val get_all_files : unit -> file list
@@ -225,7 +225,7 @@ module Make(O: OBSERVER) : sig
   val transform : context_unproved_goals_only:bool ->
     transformation_data -> any -> unit
     (** [apply_transformation tr a] applies transformation [trp]
-	on all goals under [a] *)
+        on all goals under [a] *)
 
   val edit_proof :
     default_editor:string -> project_dir:string -> proof_attempt -> unit
@@ -251,14 +251,14 @@ module Make(O: OBSERVER) : sig
         all difference with the current state 
         (does not change the session state)
         When finished, calls the callback with the list of failed comparisons,
-	which are triples (goal name, prover, report)
+        which are triples (goal name, prover, report)
     *)
 
   val reload_all: unit -> unit
     (** reloads all the files
         If for one of the file, the parsing or typing fails, then
         the complete old session state is kept, and an exception
-	is raised
+        is raised
     *)
 
   val remove_proof_attempt : proof_attempt -> unit
