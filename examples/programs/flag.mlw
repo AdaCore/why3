@@ -33,7 +33,7 @@ module Flag
   	         monochrome a !b !i White and
   	         monochrome a !r n  Red and
   		 length a = n and
-  	         permut_sub a (at a Init) 0 (n-1) }
+  	         permut_sub a (at a Init) 0 n }
        variant { !r - !i }
        match a[!i] with
        | Blue ->
@@ -51,7 +51,7 @@ module Flag
         monochrome a 0 b Blue and
         monochrome a b r White and
         monochrome a r n Red)
-      and permut_sub a (old a) 0 (n-1) }
+      and permut a (old a) }
 
 end
 
