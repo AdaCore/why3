@@ -30,7 +30,7 @@ module Quicksort
       for i = l + 1 to r do
 	invariant { (forall j:int. l < j <= !m -> t[j] < v) and
                     (forall j:int. !m < j <  i -> t[j] >= v) and
-                    permut_sub t (at t L) l r and
+                    permut_sub t (at t L) l (r+1) and
                     t[l] = v and l <= !m < i }
         if t[i] < v then begin m := !m + 1; swap t i !m end
       done;
@@ -38,11 +38,11 @@ module Quicksort
       quick_rec t l (!m - 1);
       quick_rec t (!m + 1) r
     end end
-    { (l <= r and sorted_sub t l r and permut_sub t (old t) l r) or
+    { (l <= r and sorted_sub t l (r+1) and permut_sub t (old t) l (r+1)) or
       (l > r and array_eq t (old t)) }
 
   let quicksort (t : array int) =
-    {}
+    { }
     quick_rec t 0 (length t - 1)
     { sorted t and permut t (old t) }
 

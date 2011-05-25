@@ -131,9 +131,18 @@ module ArrayPermut
   logic permut (a1 a2: array 'a) =
     a1.length = a2.length and M.permut_sub a1.elts a2.elts 0 a1.length
 
+  use import module ArrayEq
+
+  lemma array_eq_sub_permut:
+    forall a1 a2: array 'a, l u: int.
+    array_eq_sub a1 a2 l u -> permut_sub a1 a2 l u
+
+  lemma array_eq_permut:
+    forall a1 a2: array 'a.
+    array_eq a1 a2 -> permut a1 a2
+
 end
 
-(***
 module TestArray
 
   use import int.Int
@@ -142,7 +151,7 @@ module TestArray
   let test_append () =
     let a1 = make 17 2 in
     assert { a1[3] = 2 };
-    set a1 3 4;
+    a1[3] <- 4;
     assert { a1[3] = 4 };
     let a2 = make 25 3 in
     assert { a2[0] = 3 }; (* needed to prove a[17]=3 below *)
@@ -168,7 +177,6 @@ module TestArray
     assert { a2[24] = False }
 
 end
-***)
 
 (*
 Local Variables:

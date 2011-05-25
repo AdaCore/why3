@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session SYSTEM "why3session.dtd">
+<why3session name="examples/programs/insertion_sort_list/why3session.xml">
+ <file name="../insertion_sort_list.mlw" verified="true" expanded="true">
+  <theory name="M" verified="true" expanded="true">
+   <goal name="WP_parameter insert" expl="correctness of parameter insert" sum="1ab3de41db4f19ec372372833aaeb2c0" proved="true" expanded="true">
+    <transf name="split_goal" proved="true" expanded="true">
+     <goal name="WP_parameter insert.1" expl="correctness of parameter insert" sum="76ce5493fcb11812e4e0e2698821a9c7" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter insert.2" expl="correctness of parameter insert" sum="ba3b39ae8e0a43555fed2cbd3108f3b6" proved="true" expanded="true">
+      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter insert.3" expl="correctness of parameter insert" sum="ff85e099c9e0bf62cd804ace872aefc3" proved="true" expanded="true">
+      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.25"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter insert.4" expl="correctness of parameter insert" sum="eecdbeb9ac4fb34fe11cdb3681c32bf4" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+   <goal name="WP_parameter insertion_sort" expl="correctness of parameter insertion_sort" sum="43755e483026796b703bffb5d4046c34" proved="true" expanded="true">
+    <transf name="split_goal" proved="true" expanded="true">
+     <goal name="WP_parameter insertion_sort.1" expl="correctness of parameter insertion_sort" sum="f1743569992089d7a7adee34e760d448" proved="true" expanded="true">
+      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter insertion_sort.2" expl="correctness of parameter insertion_sort" sum="de6677511339e34ead245491d373655e" proved="true" expanded="true">
+      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter insertion_sort.3" expl="correctness of parameter insertion_sort" sum="3e193c91b649ab35cae9b3555ee4c05b" proved="true" expanded="true">
+      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.09"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.20"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter insertion_sort.4" expl="correctness of parameter insertion_sort" sum="2aec1cc621d57570ae9049fc6be1fb0c" proved="true" expanded="true">
+      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+  </theory>
+ </file>
+</why3session>
