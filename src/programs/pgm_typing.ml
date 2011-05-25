@@ -1196,21 +1196,18 @@ let declare_global ls pv =
   Pgm_wp.declare_global_regions pv;
   Hls.add globals ls pv
 
-let rec fmla_effect ef f =
-  TermTF.t_map_fold term_effect fmla_effect ef f
-
-and term_effect ef t = match t.t_node with
+let rec term_effect ef t = match t.t_node with
   | Term.Tapp (ls, []) when Hls.mem globals ls ->
       let pv = Hls.find globals ls in
       E.add_glob pv ef, t_var pv.pv_pure
   | _ ->
-      TermTF.t_map_fold term_effect fmla_effect ef t
+      t_map_fold term_effect ef t
 
 let post_effect ef ((v, q), ql) =
   let exn_effect ef (e, (x, q)) =
-    let ef, q = fmla_effect ef q in ef, (e, (x, q))
+    let ef, q = term_effect ef q in ef, (e, (x, q))
   in
-  let ef, q = fmla_effect ef q in
+  let ef, q = term_effect ef q in
   let ef, ql = map_fold_left exn_effect ef ql in
   ef, ((v, q), ql)
 (* TODO? *)
@@ -1254,7 +1251,7 @@ let rec type_v env = function
 
 and type_c env c =
   let ef = effect c.ic_effect in
-  let ef, p = fmla_effect ef c.ic_pre in
+  let ef, p = term_effect ef c.ic_pre in
   let ef, q = post_effect ef c.ic_post in
   (* saturate effect with exceptions appearing in q *)
   let ef = List.fold_left (fun ef (e, _) -> E.add_raise e ef) ef (snd q) in
@@ -1456,7 +1453,7 @@ and expr_desc gl env loc ty = function
   | IEloop (a, e1) ->
       let e1 = expr gl env e1 in
       let ef = e1.expr_effect in
-      let ef, inv = option_map_fold fmla_effect ef a.loop_invariant in
+      let ef, inv = option_map_fold term_effect ef a.loop_invariant in
       let ef, var = match a.loop_variant with
         | Some (t, ls) -> let ef, t = term_effect ef t in ef, Some (t, ls)
         | None         -> ef, None
@@ -1532,11 +1529,11 @@ and expr_desc gl env loc ty = function
       let env, x = add_local env x (tpure v1.pv_pure.vs_ty) in
       let e3 = expr gl env e3 in
       let ef = e3.expr_effect in
-      let ef, inv = option_map_fold fmla_effect ef inv in
+      let ef, inv = option_map_fold term_effect ef inv in
       Efor (x, v1, d, v2, inv, e3), type_v_unit gl, ef
 
   | IEassert (k, f) ->
-      let ef, f = fmla_effect E.empty f in
+      let ef, f = term_effect E.empty f in
       Eassert (k, f), tpure ty, ef
   | IElabel (lab, e1) ->
       let e1 = expr gl env e1 in
@@ -1549,7 +1546,7 @@ and triple gl env (p, e, q) =
   let e = expr gl env e in
   let q = saturation e.expr_loc e.expr_effect q in
   let ef = e.expr_effect in
-  let ef, p = fmla_effect ef p in
+  let ef, p = term_effect ef p in
   let ef, q = post_effect ef q in
   (* eprintf "triple: p = %a ef = %a@." Pretty.print_fmla p E.print ef; *)
   let e = { e with expr_effect = ef } in

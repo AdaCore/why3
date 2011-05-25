@@ -91,7 +91,7 @@ let rec wp_forall env v f =
   match cl with
     | [ls] ->
         let s = ty_match Mtv.empty (of_option ls.ls_value) ty in
-        let mk_v ty = create_vsymbol (id_fresh "x") (ty_inst s ty) in
+        let mk_v ty = create_vsymbol (id_clone v.vs_name) (ty_inst s ty) in
         let vl = List.map mk_v ls.ls_args in
         let t = fs_app ls (List.map t_var vl) ty in
         List.fold_right (wp_forall env) vl (t_let_close_simp v t f)
@@ -267,22 +267,33 @@ let rec update env mreg x ty =
 *)
 let quantify env rm ef f =
   let sreg = ef.E.writes in
+  (* all program variables involving these regions *)
+  let vars =
+    let add r s =
+      try Spv.union (Mreg.find r rm) s with Not_found -> assert false
+    in
+    Sreg.fold add sreg Spv.empty
+  in
   (* mreg: rho -> rho' *)
   let mreg =
     let add r m =
-      let r' = create_vsymbol (id_clone r.R.r_tv.tv_name) (purify r.R.r_ty) in
-      Mreg.add r r' m
+      let vars = Mreg.find r rm in
+      let test x acc = match x.pv_effect.vs_ty.ty_node with
+        | Tyapp (ts,{ ty_node = Tyvar tv }::_) when tv_equal tv r.R.r_tv ->
+            let mt = get_mtsymbol ts in
+            if mt.mt_regions = 1 then
+              Some x.pv_effect.vs_name
+            else acc
+        | Tyapp _ -> acc
+        | Tyvar _ -> assert false
+      in
+      let id = Spv.fold test vars None in
+      let id = id_clone (default_option r.R.r_tv.tv_name id) in
+      let r' = create_vsymbol id (purify r.R.r_ty) in
+      Mtv.add r.R.r_tv r' m
     in
-    Sreg.fold add sreg Mreg.empty
+    Sreg.fold add sreg Mtv.empty
   in
-  (* all program variables involving these regions *)
-  let vars =
-    let add r _ s =
-      try Spv.union (Mreg.find r rm) s with Not_found -> assert false
-    in
-    Mreg.fold add mreg Spv.empty
-  in
-  let mreg = Mreg.fold (fun r x -> Mtv.add r.R.r_tv x) mreg Mtv.empty in
   (* s: v -> v' and vv': pv -> v', update_v *)
   (****
   let mreg, s, vv' =
