@@ -81,24 +81,7 @@ let is_arrow_ty ty = match ty.ty_node with
   | Tyapp (ts, _) -> ts_equal ts ts_arrow
   | _ -> false
 
-let rec wp_forall env v f =
-  let kn = get_known (pure_uc env) in
-  let ty = v.vs_ty in
-  let cl = match ty.ty_node with
-    | Tyapp (ts, _) -> find_constructors kn ts
-    | _ -> []
-  in
-  match cl with
-    | [ls] ->
-        let s = ty_match Mtv.empty (of_option ls.ls_value) ty in
-        let mk_v ty = create_vsymbol (id_clone v.vs_name) (ty_inst s ty) in
-        let vl = List.map mk_v ls.ls_args in
-        let t = fs_app ls (List.map t_var vl) ty in
-        List.fold_right (wp_forall env) vl (t_let_close_simp v t f)
-    | _ ->
-        t_forall_close_simp [v] [] f
-
-let wp_forall env v f =
+let wp_forall v f =
   if is_arrow_ty v.vs_ty then f else
   (* if t_occurs_single v f then t_forall_close_simp [v] [] f else f *)
   match f.t_node with
@@ -110,7 +93,7 @@ let wp_forall env v f =
       when ls_equal s ps_equ && vs_equal u v && not (t_occurs_single v r) ->
         t_let_close_simp v r (t_implies_simp g h)
     | _ when t_occurs_single v f ->
-        wp_forall env v f
+        t_forall_close_simp [v] [] f
     | _ ->
         f
 
@@ -120,11 +103,11 @@ let fresh_label env =
   let ty = ty_app (find_ts ~pure:true env "label_") [] in
   create_vsymbol (id_fresh "label") ty
 
-let wp_binder env x f = match x.pv_tv with
-  | Tpure _ -> wp_forall env x.pv_pure f
+let wp_binder x f = match x.pv_tv with
+  | Tpure _ -> wp_forall x.pv_pure f
   | Tarrow _ -> f
 
-let wp_binders env = List.fold_right (wp_binder env)
+let wp_binders = List.fold_right wp_binder
 
 let add_binder x rm =
   let add r rm =
@@ -185,7 +168,7 @@ let find_constructor env ts =
   | [ls] -> ls
   | _ -> assert false
 
-let wp_close kn rm ef f =
+let wp_close rm ef f =
   let sreg = ef.E.writes in
   let sreg =
     Spv.fold (fun pv s -> Sreg.union pv.pv_regions s)
@@ -198,7 +181,7 @@ let wp_close kn rm ef f =
     in
     Sreg.fold add sreg Spv.empty
   in
-  let quantify_v v f = wp_forall kn v.pv_pure f in
+  let quantify_v v f = wp_forall v.pv_pure f in
   Spv.fold quantify_v vars f
 
 let get_ty_subst ty = match ty.ty_node with
@@ -339,7 +322,7 @@ let quantify env rm ef f =
     in
     Spv.fold add_update vars f
   in
-  let quantify_r _ r' f = wp_forall env r' f in
+  let quantify_r _ r' f = wp_forall r' f in
   Mtv.fold quantify_r mreg f
 
 (* let quantify ?(all=false) env rm ef f = *)
@@ -357,7 +340,7 @@ let abstract_wp env rm ef (q',ql') (q,ql) =
       (*          let v' = create_vsymbol (id_clone v.vs_name) (unref_ty env v.vs_ty) in *)
       (*          wp_forall v' (unref env (R.Rlocal v) v' f) *)
       | Some v ->
-          wp_forall env v f
+          wp_forall v f
       | None ->
           f
     in
@@ -638,7 +621,7 @@ and wp_desc env rm e q = match e.expr_desc with
         (quantify env rm e.expr_effect
            (wp_and ~sym:true
               (wp_expl "for loop preservation"
-                (wp_forall env x.pv_pure
+                (wp_forall x.pv_pure
                  (wp_implies
                     (wp_and (ps_app le [t_var v1.pv_pure; t_var x.pv_pure])
                             (ps_app le [t_var x.pv_pure;  t_var v2.pv_pure]))
@@ -677,8 +660,8 @@ and wp_triple env rm bl (p, e, q) =
   in
   let f = wp_expr env rm e q in
   let f = wp_implies p f in
-  let f = wp_close env rm e.expr_effect f in
-  wp_binders env bl f
+  let f = wp_close rm e.expr_effect f in
+  wp_binders bl f
 
 and wp_recfun env rm (_, bl, _var, t) =
   wp_triple env rm bl t
