@@ -63,7 +63,7 @@ val use_export_theory : uc -> Theory.theory -> uc
 
 exception ClashSymbol of string
 
-val add_psymbol : psymbol -> uc -> uc
+(* val add_psymbol : psymbol -> uc -> uc *)
 val add_esymbol : esymbol -> uc -> uc
 (* val add_mtsymbol : mtsymbol -> uc -> uc *)
 val add_decl : Pgm_ttree.decl -> uc -> uc

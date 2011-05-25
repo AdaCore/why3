@@ -397,7 +397,7 @@ and dexpr_desc ~ghost env loc = function
             let dty = specialize_type_v ~loc htv tv in
             DEglobal (ps, tv, htv), dty
         | PSlogic ->
-            let tyl, ty = Denv.specialize_lsymbol ~loc ps.ps_impure in
+            let tyl, ty = Denv.specialize_lsymbol ~loc ls in
             let ty = match ty with
               | Some ty -> ty
               | None -> dty_bool env.uc
@@ -626,7 +626,7 @@ let region_type ts i =
 let mutable_fields = Hts.create 17 (* ts -> field:int -> region:int *)
 
 let declare_mutable_field ts i j =
-  Pgm_wp.declare_mutable_field ts j i;
+  Pgm_wp.declare_mutable_field ts i j;
   let h =
     try
       Hts.find mutable_fields ts
@@ -966,7 +966,7 @@ let rec print_iexpr fmt e = match e.iexpr_desc with
   | IEglobal ({ ps_kind = PSvar v }, _) ->
       fprintf fmt "<global var %a>" print_vs v.pv_effect
   | IEglobal ({ ps_kind = PSfun v } as ps, _) ->
-      fprintf fmt "<global %a : %a>" print_ls ps.ps_impure T.print_type_v v
+      fprintf fmt "<global %a : %a>" print_ls ps.ps_effect T.print_type_v v
   | IEapply (e, v) ->
       fprintf fmt "@[((%a) %a)@]" print_iexpr e print_vs v.i_impure
   | IEapply_var (e, v) ->
@@ -1724,8 +1724,8 @@ let add_impure_decl uc ls =
 let add_global_fun loc x tyv uc =
   let x = parameter x in
   try
-    let ps = create_psymbol_fun (id_user x loc) tyv in
-    let d = Decl.create_logic_decl [ps.ps_impure, None] in
+    let ls, ps = create_psymbol_fun (id_user x loc) tyv in
+    let d = Decl.create_logic_decl [ls, None] in
     ps, Pgm_module.add_impure_decl d uc
   with Pgm_module.ClashSymbol _ ->
     errorm ~loc "clash with previous symbol %s" x
@@ -1786,10 +1786,10 @@ let make_immutable_type td =
 let add_logic_ps ?(nofail=false) uc x =
   try
     let get th = ns_find_ls (get_namespace th) [x] in
-    let impure = get (impure_uc uc) in
-    let effect = get (effect_uc uc) in
     let pure   = get (pure_uc   uc) in
-    ignore (create_psymbol ~impure ~effect ~pure ~kind:PSlogic)
+    let effect = get (effect_uc uc) in
+    let impure = try Some (get (impure_uc uc)) with Not_found -> None in
+    ignore (create_psymbol ?impure ~effect ~pure ~kind:PSlogic)
   with Not_found ->
     (* can fail if x is a constructor of a model type (record or algebraic) *)
     assert nofail
@@ -2092,10 +2092,10 @@ let rec decl ~wp env penv ltm lmod uc = function
         | Tpure _ ->
             let id = id_user id.id loc in
             let pv = create_pvsymbol_v id tyv in
-            let ps = create_psymbol_var pv in
+            let ls, ps = create_psymbol_var pv in
             let uc = add_pure_decl   uc ~loc ps.ps_pure in
             let uc = add_effect_decl uc ps.ps_effect in
-            let uc = add_impure_decl uc ps.ps_impure in
+            let uc = add_impure_decl uc ls in
             declare_global ps.ps_pure pv;
             ps, uc
       in

@@ -152,11 +152,13 @@ let add_pure_decl d uc =
   let th = Typing.with_tuples Theory.add_decl uc.uc_pure d in
   { uc with uc_pure = th }
 
+(**
 let add_psymbol ps uc =
   let uc = add_impure_decl (Decl.create_logic_decl [ps.ps_impure, None]) uc in
   let uc = add_effect_decl (Decl.create_logic_decl [ps.ps_effect, None]) uc in
   let uc = add_pure_decl   (Decl.create_logic_decl [ps.ps_pure,   None]) uc in
   uc
+**)
 
 let ls_Exit = create_lsymbol (id_fresh "%Exit") [] (Some ty_exn)
 

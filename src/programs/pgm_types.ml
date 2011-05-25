@@ -139,6 +139,48 @@ let make_arrow_type tyl ty =
 
 module Sexn = Term.Sls
 
+module R : sig
+
+  type t = private {
+    r_tv : tvsymbol;
+    r_ty : Ty.ty;
+  }
+
+  val compare : t -> t -> int
+
+  val create : tvsymbol -> Ty.ty -> t
+
+  val occurs_ty : t -> ty -> bool
+
+  val print : Format.formatter -> t -> unit
+
+end = struct
+
+  type t = {
+    r_tv : tvsymbol;
+    r_ty : Ty.ty;
+  }
+
+  let compare r1 r2 =
+    Pervasives.compare (id_hash r1.r_tv.tv_name) (id_hash r2.r_tv.tv_name)
+
+  let create tv ty = {
+    r_tv = tv;
+    r_ty = ty;
+  }
+
+  (* FIXME: optimize *)
+  let occurs_ty r ty = Stv.mem r.r_tv (Ty.ty_freevars Stv.empty ty)
+
+  let print fmt r =
+    Format.fprintf fmt "%a(%a)" Pretty.print_tv r.r_tv Pretty.print_ty r.r_ty
+
+end
+
+module Mreg = Stdlib.Map.Make(R)
+
+module Sreg = Mreg.Set
+
 module rec T : sig
 
   type pre = Term.term
@@ -186,17 +228,17 @@ module rec T : sig
     | PSlogic
 
   type psymbol = {
-    ps_impure : lsymbol;
+    (* ps_impure : lsymbol; *)
     ps_effect : lsymbol;
     ps_pure   : lsymbol;
     ps_kind   : psymbol_kind;
   }
 
   val create_psymbol:
-    impure:lsymbol -> effect:lsymbol -> pure:lsymbol -> kind:psymbol_kind ->
+    ?impure:lsymbol -> effect:lsymbol -> pure:lsymbol -> kind:psymbol_kind ->
     psymbol
-  val create_psymbol_fun: preid -> type_v -> psymbol
-  val create_psymbol_var: pvsymbol -> psymbol
+  val create_psymbol_fun: preid -> type_v -> lsymbol * psymbol
+  val create_psymbol_var: pvsymbol -> lsymbol * psymbol
 
   val get_psymbol: lsymbol -> psymbol
 
@@ -310,7 +352,7 @@ end = struct
     | PSlogic
 
   type psymbol = {
-    ps_impure : lsymbol;
+    (* ps_impure : lsymbol; *)
     ps_effect : lsymbol;
     ps_pure   : lsymbol;
     ps_kind   : psymbol_kind;
@@ -318,15 +360,14 @@ end = struct
 
   let psymbols = Hls.create 17
 
-  let create_psymbol ~impure ~effect ~pure ~kind =
+  let create_psymbol ?impure ~effect ~pure ~kind =
     let ps = {
-      ps_impure = impure;
       ps_effect = effect;
       ps_pure   = pure;
       ps_kind   = kind;
     }
     in
-    Hls.add psymbols impure ps;
+    begin match impure with Some ls -> Hls.add psymbols ls ps | None -> () end;
     Hls.add psymbols effect ps;
     Hls.add psymbols pure   ps;
     ps
@@ -339,7 +380,7 @@ end = struct
     let impure = create              v in
     let effect = create ~effect:true v in
     let pure   = create ~pure:  true v in
-    create_psymbol ~impure ~effect ~pure ~kind:(PSfun v)
+    impure, create_psymbol ~impure ~effect ~pure ~kind:(PSfun v)
 
   let create_psymbol_var pv =
     let name = pv.pv_name in
@@ -347,22 +388,22 @@ end = struct
     let impure = create_lsymbol (id_clone name) [] (Some tv) in
     let effect = create_lsymbol (id_clone name) [] (Some pv.pv_effect.vs_ty) in
     let pure   = create_lsymbol (id_clone name) [] (Some pv.pv_pure.vs_ty) in
-    create_psymbol ~impure ~effect ~pure ~kind:(PSvar pv)
+    impure, create_psymbol ~impure ~effect ~pure ~kind:(PSvar pv)
 
   let get_psymbol ls =
     try
       Hls.find psymbols ls
     with Not_found ->
-      (* Format.eprintf "ls = %a@." Pretty.print_ls ls; *)
-      let ps = { ps_impure = ls; ps_effect = ls;
+      (* Format.eprintf "get_psymbol: ls = %a@." Pretty.print_ls ls; *)
+      let ps = { ps_effect = ls;
                  ps_pure = ls; ps_kind = PSlogic }
       in
       Hls.add psymbols ls ps;
       ps
 
-  let ps_name ps = ps.ps_impure.ls_name
+  let ps_name ps = ps.ps_pure.ls_name
 
-  let ps_equal ps1 ps2 = ls_equal ps1.ps_impure ps2.ps_impure
+  let ps_equal ps1 ps2 = ls_equal ps1.ps_pure ps2.ps_pure
 
   let subst_var ?(effect=false) ?(pure=false) ts s vs =
     if effect && pure then invalid_arg "subst_var";
@@ -557,43 +598,6 @@ end = struct
 
 end
 
-and R : sig
-
-  type t = private {
-    r_tv : tvsymbol;
-    r_ty : Ty.ty;
-  }
-
-  val compare : t -> t -> int
-
-  val create : tvsymbol -> Ty.ty -> t
-
-  val occurs_ty : t -> ty -> bool
-
-  val print : Format.formatter -> t -> unit
-
-end = struct
-
-  type t = {
-    r_tv : tvsymbol;
-    r_ty : Ty.ty;
-  }
-
-  let compare r1 r2 =
-    Pervasives.compare (id_hash r1.r_tv.tv_name) (id_hash r2.r_tv.tv_name)
-
-  let create tv ty = {
-    r_tv = tv;
-    r_ty = ty;
-  }
-
-  (* FIXME: optimize *)
-  let occurs_ty r ty = Stv.mem r.r_tv (Ty.ty_freevars Stv.empty ty)
-
-  let print fmt r =
-    Format.fprintf fmt "%a(%a)" Pretty.print_tv r.r_tv Pretty.print_ty r.r_ty
-
-end
 
 and E : sig
 
@@ -720,10 +724,6 @@ and Spv : sig include Set.S with type elt = T.pvsymbol end =
 
 and Mpv : sig include Map.S with type key = T.pvsymbol end =
   Map.Make(struct type t = T.pvsymbol let compare = T.compare_pvsymbol end)
-
-and Sreg : sig include Set.S with type elt = R.t end = Set.Make(R)
-
-and Mreg : sig include Map.S with type key = R.t end = Map.Make(R)
 
 (* ghost code
 

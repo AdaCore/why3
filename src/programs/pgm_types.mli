@@ -61,6 +61,27 @@ val ty_exn : ty
 
 (* val ts_label : tysymbol *)
 
+(* regions *)
+module R : sig
+
+  type t = private {
+    r_tv : tvsymbol;
+    r_ty : Ty.ty;    (* effect type *)
+  }
+
+  val create : tvsymbol -> Ty.ty -> t
+
+  val print : Format.formatter -> t -> unit
+
+end
+
+module Mreg : Stdlib.Map.S with type key = R.t
+
+module Sreg : Mreg.Set
+
+(* exception sets *)
+module Sexn : Set.S with type elt = lsymbol
+
 (* program types *)
 
 module rec T : sig
@@ -108,17 +129,17 @@ module rec T : sig
     | PSlogic
 
   type psymbol = {
-    ps_impure : lsymbol;
+    (* ps_impure : lsymbol; *)
     ps_effect : lsymbol;
     ps_pure   : lsymbol;
     ps_kind   : psymbol_kind;
   }
 
   val create_psymbol:
-    impure:lsymbol -> effect:lsymbol -> pure:lsymbol -> kind:psymbol_kind ->
+    ?impure:lsymbol -> effect:lsymbol -> pure:lsymbol -> kind:psymbol_kind ->
     psymbol
-  val create_psymbol_fun: preid -> type_v -> psymbol
-  val create_psymbol_var: pvsymbol -> psymbol
+  val create_psymbol_fun: preid -> type_v -> lsymbol * psymbol
+  val create_psymbol_var: pvsymbol -> lsymbol * psymbol
 
   val get_psymbol: lsymbol -> psymbol
 
@@ -161,23 +182,6 @@ end
 
 and Spv :  sig include Set.S with type elt = T.pvsymbol end
 and Mpv :  sig include Map.S with type key = T.pvsymbol end
-
-(* regions *)
-and R : sig
-
-  type t = private {
-    r_tv : tvsymbol;
-    r_ty : Ty.ty;    (* effect type *)
-  }
-
-  val create : tvsymbol -> Ty.ty -> t
-
-  val print : Format.formatter -> t -> unit
-
-end
-and Sreg : sig include Set.S with type elt = R.t end
-and Mreg : sig include Map.S with type key = R.t end
-and Sexn : sig include Set.S with type elt = T.esymbol end
 
 (* effects *)
 and E : sig

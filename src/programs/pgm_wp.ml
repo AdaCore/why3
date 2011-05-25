@@ -36,7 +36,7 @@ let debug = Debug.register_flag "program_wp"
 
 (* mutable fields *)
 
-let mutable_fields = Hts.create 17 (* ts -> region:int -> field:int *)
+let mutable_fields = Hts.create 17 (* ts -> field:int -> region:int *)
 
 let declare_mutable_field ts i j =
   let h =
@@ -46,6 +46,9 @@ let declare_mutable_field ts i j =
       let h = Hashtbl.create 17 in Hts.add mutable_fields ts h; h
   in
   Hashtbl.add h i j
+
+let get_mutable_field ts i =
+  Hashtbl.find (Hts.find mutable_fields ts) i
 
 (* phase 4: weakest preconditions *******************************************)
 
@@ -198,6 +201,55 @@ let wp_close kn rm ef f =
   let quantify_v v f = wp_forall kn v.pv_pure f in
   Spv.fold quantify_v vars f
 
+let get_ty_subst ty = match ty.ty_node with
+  | Tyapp (ts, tyl) ->
+      let add s tv ty = Mtv.add tv ty s in
+      List.fold_left2 add Mtv.empty ts.ts_args tyl
+  | Tyvar _ ->
+      assert false
+
+(* x is pure, ty is effect *)
+let rec update env mreg x ty =
+  if Mtv.is_empty mreg then
+    t_var x
+  else match ty.ty_node with
+  | Tyapp (ts, tyl) ->
+      let cl = find_constructors (get_known (effect_uc env)) ts in
+      if cl = [] then failwith "WP: cannot update a value of this type";
+      (* TODO: print the type *)
+      let s = get_ty_subst ty in
+      let branch cs =
+        let cs_pure = (get_psymbol cs).ps_pure in
+        let mk_var ty =
+          let ty = ty_inst s ty in
+          let ty_pure = purify ty in
+          create_vsymbol (id_fresh "y") ty_pure, ty
+        in
+        let vars = List.map mk_var cs.ls_args in
+        let pat_vars = List.map (fun (y, _) -> pat_var y) vars in
+        let pat = pat_app cs_pure pat_vars x.vs_ty in
+        let mk_arg i (y, ty) =
+          let y =
+            try
+              let j = get_mutable_field ts i in
+              begin match (List.nth tyl j).ty_node with
+                | Tyvar tv -> Mtv.find tv mreg
+                | Tyapp _ -> assert false
+              end
+            with Not_found ->
+              y
+          in
+          let keep tv _ = Stv.mem tv (ty_freevars Stv.empty ty) in
+          let mreg = Mtv.filter keep mreg in
+          update env mreg y ty
+        in
+        let t = fs_app cs_pure (list_mapi mk_arg vars) x.vs_ty in
+        t_close_branch pat t
+      in
+      t_case (t_var x) (List.map branch cl)
+  | Tyvar _ ->
+      assert false
+
 (* quantify over all references in ef
    ef : effect
    rm : region -> pvsymbol set
@@ -230,7 +282,9 @@ let quantify env rm ef f =
     in
     Mreg.fold add mreg Spv.empty
   in
+  let mreg = Mreg.fold (fun r x -> Mtv.add r.R.r_tv x) mreg Mtv.empty in
   (* s: v -> v' and vv': pv -> v', update_v *)
+  (****
   let mreg, s, vv' =
     let add pv (mreg, s, vv') = match pv.pv_effect.vs_ty.ty_node with
       | Ty.Tyapp (ts, _) ->
@@ -256,13 +310,26 @@ let quantify env rm ef f =
     in
     Spv.fold add vars (mreg, Mvs.empty, Mpv.empty)
   in
-  let f = unref env s f in
-  let quantify_v' _pv (v', updatev) f =
-    t_let_close v' updatev f
+  ****)
+  let vv' =
+    let add pv s =
+      let v = pv.pv_pure in
+      let v' = create_vsymbol (id_clone v.vs_name) v.vs_ty in
+      Mvs.add v v' s
+    in
+    Spv.fold add vars Mvs.empty
   in
-  let f = Mpv.fold quantify_v' vv' f in
+  let f = unref env vv' f in
+  let f =
+    let add_update x f =
+      let v' = Mvs.find x.pv_pure vv' in
+      let updatev = update env mreg x.pv_pure x.pv_effect.vs_ty in
+      t_let_close_simp v' updatev f
+    in
+    Spv.fold add_update vars f
+  in
   let quantify_r _ r' f = wp_forall env r' f in
-  Mreg.fold quantify_r mreg f
+  Mtv.fold quantify_r mreg f
 
 (* let quantify ?(all=false) env rm ef f = *)
 (*   let r = quantify ~all env rm ef f in *)
@@ -636,7 +703,7 @@ and f_btop env f = match f.t_node with
   | _ -> TermTF.t_map (fun t -> t) (f_btop env) f
 
 let add_wp_decl ps f uc =
-  let name = ps.ps_impure.ls_name in
+  let name = ps.ps_pure.ls_name in
   let s = "WP_" ^ name.id_string in
   let label = ["expl:correctness of " ^ name.id_string] in
   let id = id_fresh ~label ?loc:name.id_loc s in
@@ -651,7 +718,7 @@ let add_wp_decl ps f uc =
 let decl uc = function
   | Pgm_ttree.Dlet (ps, e) ->
       Debug.dprintf debug "@[--effect %s-----@\n  %a@]@\n----------------@."
-          ps.ps_impure.ls_name.id_string print_type_v e.expr_type_v;
+          ps.ps_pure.ls_name.id_string print_type_v e.expr_type_v;
       let f = wp uc e in
       Debug.dprintf debug "wp = %a@\n----------------@." Pretty.print_term f;
       add_wp_decl ps f uc
@@ -659,7 +726,7 @@ let decl uc = function
       let add_one uc (ps, def) =
         let f = wp_recfun uc !global_regions def in
         Debug.dprintf debug "wp %s = %a@\n----------------@."
-           ps.ps_impure.ls_name.id_string Pretty.print_term f;
+           ps.ps_pure.ls_name.id_string Pretty.print_term f;
         add_wp_decl ps f uc
       in
       List.fold_left add_one uc dl

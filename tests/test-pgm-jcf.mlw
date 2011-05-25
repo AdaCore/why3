@@ -4,7 +4,7 @@ module M
   use import module array.Array
 
   let foo (a: array int) =
-    { true }
+    { 1 <= a.length }
     a[0] <- 1
     { a[0] = 1 }
 
