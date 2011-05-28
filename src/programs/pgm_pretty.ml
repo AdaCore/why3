@@ -76,7 +76,7 @@ let rec print_expr fmt e = match e.expr_desc with
       fprintf fmt "absurd"
 
 and print_pv fmt v =
-  fprintf fmt "<@[%a : %a@]>" print_vs v.pv_effect print_ty v.pv_pure.vs_ty
+  fprintf fmt "<@[%a@]>" print_vsty v.pv_effect
 
 and print_triple fmt (p, e, q) =
   fprintf fmt "@[<hv 0>%a@ %a@ %a@]" print_pre p print_expr e print_post q

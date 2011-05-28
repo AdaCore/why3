@@ -1,12 +1,18 @@
+
 module M
 
-  use import int.Int
-  use import module array.Array
+  use import module ref.Ref
 
-  let foo (a: array int) =
-    { 1 <= a.length }
-    a[0] <- 1
-    { a[0] = 1 }
+  let test (x: ref int) =
+    { !x = 0 }
+    !x
+    { result = 0 }
+
+  (* BUG *)
+  (* 
+  let foo (a: ref int) = let x = a in fun () -> {} x := 0 { !x = 0 }
+  let test () = let x = ref 0 in begin foo x (); assert { !x = 0 } end 
+  *)  
 
 end
 

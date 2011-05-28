@@ -6,11 +6,14 @@ module Ref
 
   logic (!) (x: ref 'a) : 'a = x.contents
 
-  parameter ref : v:'a -> {} ref 'a { result = {| contents = v |} }
+  (* parameter ref : v:'a -> {} ref 'a { result = {| contents = v |} } *)
+  let ref (v: 'a) = {} {| contents = v |} { result = {| contents = v |} }
 
-  parameter (!) : r:ref 'a -> {} 'a reads r { result = !r }
+  (* parameter (!) : r:ref 'a -> {} 'a reads r { result = !r } *)
+  let (!) (r:ref 'a) = {} r.contents { result = !r }
 
-  parameter (:=) : r:ref 'a -> v:'a -> {} unit writes r { !r = v }
+  (* parameter (:=) : r:ref 'a -> v:'a -> {} unit writes r { !r = v } *)
+  let (:=) (r:ref 'a) (v:'a) = {} r.contents <- v { !r = v }
 
 end
 
@@ -24,3 +27,9 @@ module Refint
   parameter decr : r:ref int -> {} unit writes r { !r = old !r - 1 }
 
 end
+
+(*
+Local Variables:
+compile-command: "unset LANG; make -C .. modules/ref"
+End:
+*)

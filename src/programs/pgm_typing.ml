@@ -59,6 +59,25 @@ let () = Exn_printer.register (fun fmt e -> match e with
 
 let id_result = "result"
 
+(* Table of record mutable fields ******************************************)
+
+let mutable_fields = Hts.create 17 (* ts -> field:int -> region:int *)
+
+let declare_mutable_field ts i j =
+  Pgm_wp.declare_mutable_field ts i j;
+  let h =
+    try
+      Hts.find mutable_fields ts
+    with Not_found ->
+      let h = Hashtbl.create 17 in Hts.add mutable_fields ts h; h
+  in
+  Hashtbl.add h i j
+
+let mutable_field ts i =
+  Hashtbl.find (Hts.find mutable_fields ts) i
+let is_mutable_field ts i =
+  Hashtbl.mem (Hts.find mutable_fields ts) i
+
 (* phase 1: typing programs (using destructive type inference) **************)
 
 let dty_app (ts, tyl) = assert (ts.ts_def = None); tyapp (ts, tyl)
@@ -135,6 +154,9 @@ let check_region_vars () =
   List.iter (fun h -> Htv.clear values; Htv.iter check h) !region_vars;
   region_vars := []
 
+let is_fresh_region r =
+  r.R.r_tv.tv_name.id_string = "fresh"
+
 let rec specialize_ty ?(policy=Region_var) ~loc htv ty = match ty.ty_node with
   | Ty.Tyvar _ ->
       Denv.specialize_ty ~loc htv ty
@@ -142,7 +164,7 @@ let rec specialize_ty ?(policy=Region_var) ~loc htv ty = match ty.ty_node with
       let n = (get_mtsymbol ts).mt_regions in
       let mk_region ty = match ty.ty_node with
         | Ty.Tyvar _ when policy = Region_ret ->
-            tyvar (Typing.create_user_type_var "rho")
+            tyvar (Typing.create_user_type_var "fresh")
         | Ty.Tyvar tv when policy = Region_var ->
             let v = Denv.find_type_var ~loc htv tv in
             push_region_var tv (v, loc);
@@ -473,9 +495,56 @@ and dexpr_desc ~ghost env loc = function
       in
       let d = List.fold_left2 constructor d fl tyl in
       d.dexpr_desc, ty
-  | Ptree.Eassign _ ->
-      assert false (*TODO*)
-
+  | Ptree.Eaccess (e1, q) ->
+      let e1 = dexpr ~ghost env e1 in
+      let x = Typing.string_list_of_qualid [] q in
+      let ls =
+	try ns_find_ls (get_namespace (impure_uc env.uc)) x
+	with Not_found -> errorm ~loc "unbound record field %a" print_qualid q
+      in
+      new_regions_vars ();
+      let ty2 = match specialize_lsymbol ~loc (Htv.create 17) ls with
+	| [ty1], Some ty2 -> expected_type e1 ty1; ty2
+	| _ -> assert false
+      in
+      begin match Typing.is_projection (impure_uc env.uc) ls with
+	| Some (ts, _, i)  ->
+	    let mt = get_mtsymbol ts in
+	    let j = 
+	      try Some (mutable_field mt.mt_effect i) with Not_found -> None
+	    in
+	    DEaccess (e1, ls, j), ty2
+	| _ ->
+	    errorm ~loc "unbound record field %a" print_qualid q
+      end
+  | Ptree.Eassign (e1, q, e2) ->
+      let e1 = dexpr ~ghost env e1 in
+      let e2 = dexpr ~ghost env e2 in
+      let x = Typing.string_list_of_qualid [] q in
+      let ls =
+	try ns_find_ls (get_namespace (impure_uc env.uc)) x
+	with Not_found -> errorm ~loc "unbound record field %a" print_qualid q
+      in
+      new_regions_vars ();
+      begin match specialize_lsymbol ~loc (Htv.create 17) ls with
+	| [ty1], Some ty2 ->
+	    expected_type e1 ty1;
+	    expected_type e2 ty2
+	| _ ->
+	    assert false
+      end;
+      begin match Typing.is_projection (impure_uc env.uc) ls with
+	| Some (ts, _, i)  ->
+	    let mt = get_mtsymbol ts in
+	    let j = 
+	      try mutable_field mt.mt_effect i 
+	      with Not_found -> errorm ~loc "not a mutable field"
+	    in
+	    DEassign (e1, ls, j, e2), dty_unit env.uc
+	| None ->
+	    errorm ~loc "unbound record field %a" print_qualid q
+      end
+ 
   | Ptree.Esequence (e1, e2) ->
       let e1 = dexpr ~ghost env e1 in
       expected_type e1 (dty_unit env.uc);
@@ -622,21 +691,6 @@ let region_type ts i =
   (* let mt = get_mtsymbol ts in *)
   (* eprintf "%a@." print_mt_symbol mt; *)
   Hashtbl.find (Hts.find region_types ts) i
-
-let mutable_fields = Hts.create 17 (* ts -> field:int -> region:int *)
-
-let declare_mutable_field ts i j =
-  Pgm_wp.declare_mutable_field ts i j;
-  let h =
-    try
-      Hts.find mutable_fields ts
-    with Not_found ->
-      let h = Hashtbl.create 17 in Hts.add mutable_fields ts h; h
-  in
-  Hashtbl.add h i j
-
-let mutable_field ts i =
-  Hashtbl.find (Hts.find mutable_fields ts) i
 
 let regions_tyapp ts nregions tyl =
   let tymatch s tv ty = Ty.ty_match s (ty_var tv) ty in
@@ -1043,6 +1097,49 @@ and iexpr_desc gl env loc ty = function
       let env, dl = iletrec gl env dl in
       let e1 = iexpr gl env e1 in
       IEletrec (dl, e1)
+  | DEaccess (e1, ls, j) ->
+      let e1 = iexpr gl env e1 in
+      let x1 = create_ivsymbol (id_fresh "x") e1.iexpr_type in
+      let r = match e1.iexpr_type.ty_node, j with
+	| Ty.Tyapp (ts, tyl), Some j -> 
+	    let mt = get_mtsymbol ts in
+            let r = regions_tyapp mt.mt_effect mt.mt_regions tyl in
+            Some (List.nth r j)
+	| Ty.Tyapp _, None ->
+	    None
+	| Ty.Tyvar _, _ -> 
+	    assert false
+      in
+      IElet (x1, e1, mk_iexpr loc ty (
+      IEaccess (x1, ls, r)))
+  | DEassign (e1, ls, j, e2) ->
+      (* e1.f <- e2 is syntactic sugar for 
+         let x1 = e1 in let x2 = e2 in any {} writes f { x1.f = x2 } *)
+      let e1 = iexpr gl env e1 in
+      let e2 = iexpr gl env e2 in
+      let x1 = create_ivsymbol (id_fresh "x") e1.iexpr_type in
+      let x2 = create_ivsymbol (id_fresh "x") e2.iexpr_type in
+      let r = match e1.iexpr_type.ty_node with
+	| Ty.Tyapp (ts, tyl) -> 
+	    let mt = get_mtsymbol ts in
+            let r = regions_tyapp mt.mt_effect mt.mt_regions tyl in
+            List.nth r j
+	| Ty.Tyvar _ -> 
+	    assert false
+      in
+      let ef = { ie_reads = []; ie_writes = [r]; ie_raises = [] } in
+      let q = 
+	let ls = (get_psymbol ls).ps_pure in
+	t_equ (fs_app ls [t_var x1.i_pure] x2.i_pure.vs_ty) (t_var x2.i_pure)
+      in
+      let q = (create_vsymbol (id_fresh "result") ty, q), [] in
+      let c = { 
+	ic_result_type = ITpure ty; ic_effect = ef;
+	ic_pre = t_true; ic_post = q }
+      in
+      IElet (x1, e1, mk_iexpr loc ty (
+      IElet (x2, e2, mk_iexpr loc ty (
+      IEany c))))
 
   | DEsequence (e1, e2) ->
       let vs = create_ivsymbol (id_fresh "_") (ty_app (ts_tuple 0) []) in
@@ -1432,14 +1529,21 @@ and expr_desc gl env loc ty = function
       let env, v = add_local env v e1.expr_type_v in
       let e2 = expr gl env e2 in
       let ef = E.union e1.expr_effect e2.expr_effect in
-      if Sreg.exists (fun r -> occur_type_v r e2.expr_type_v) v.pv_regions then
+      let s = Sreg.filter is_fresh_region v.pv_regions in
+      if Sreg.exists (fun r -> occur_type_v r e2.expr_type_v) s then
         errorm ~loc "local reference would escape its scope";
-      let ef = E.remove v.pv_regions ef in
+      let ef = E.remove s ef in
       Elet (v, e1, e2), e2.expr_type_v, ef
   | IEletrec (dl, e1) ->
       let env, dl = letrec gl env dl in
       let e1 = expr gl env e1 in
       Eletrec (dl, e1), e1.expr_type_v, e1.expr_effect
+  | IEaccess (i, ls, r) ->
+      let ef = option_apply E.empty (fun r -> E.add_read r E.empty) r in
+      let ls = (get_psymbol ls).ps_pure in
+      let v = Mvs.find i.i_impure env in
+      let t = fs_app ls [t_var v.pv_pure] (purify ty) in
+      Elogic t, tpure ty, ef
 
   | IEif (e1, e2, e3) ->
       let e1 = expr gl env e1 in
@@ -1698,7 +1802,7 @@ let type_expr gl e =
   let e = iexpr gl ienv e in
   let e = expr gl Mvs.empty e in
   check_region_vars ();
-  fresh_expr gl ~term:true Spv.empty e;
+  (* fresh_expr gl ~term:true Spv.empty e; *)
   e
 
 let type_type uc ty =
@@ -2082,6 +2186,9 @@ let rec decl ~wp env penv ltm lmod uc = function
       let tyv = iutype_v uc (create_ienv denv) tyv in
       let tyv = type_v Mvs.empty tyv in
       if cannot_be_generalized tyv then errorm ~loc "cannot be generalized";
+      if Debug.test_flag debug then
+        eprintf "@[--parameter %s-----@\n  %a@]@."
+          id.id print_type_v tyv;
       let ps, uc = match tyv with
         | Tarrow _ ->
             let ps, uc = add_global_fun loc id.id tyv uc in

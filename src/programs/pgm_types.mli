@@ -129,7 +129,6 @@ module rec T : sig
     | PSlogic
 
   type psymbol = {
-    (* ps_impure : lsymbol; *)
     ps_effect : lsymbol;
     ps_pure   : lsymbol;
     ps_kind   : psymbol_kind;

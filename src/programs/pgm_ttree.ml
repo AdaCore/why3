@@ -111,6 +111,8 @@ and dexpr_desc =
   | DEfun of dubinder list * dtriple
   | DElet of ident * dexpr * dexpr
   | DEletrec of drecfun list * dexpr
+  | DEaccess of dexpr * Term.lsymbol * int option
+  | DEassign of dexpr * Term.lsymbol * int * dexpr
 
   | DEsequence of dexpr * dexpr
   | DEif of dexpr * dexpr * dexpr
@@ -204,6 +206,7 @@ and iexpr_desc =
   | IEfun of ibinder list * itriple
   | IElet of ivsymbol * iexpr * iexpr
   | IEletrec of irecfun list * iexpr
+  | IEaccess of ivsymbol * Term.lsymbol * R.t option
 
   | IEif of iexpr * iexpr * iexpr
   | IEloop of loop_annotation * iexpr
