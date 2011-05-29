@@ -1030,9 +1030,9 @@ expr:
      mk_expr (mk_apply_id { id = "notb"; id_lab = []; id_loc = floc () } [t]) }
 | expr LARROW expr
     { match $1.expr_desc with
-        | Eaccess (e1, x) -> 
-            mk_expr (Eassign (e1, x, $3))
-	| Eapply (e11, e12) -> begin match e11.expr_desc with
+        | Eapply (e11, e12) -> begin match e11.expr_desc with
+            | Eident x ->
+                mk_expr (Eassign (e12, x, $3))
             | Eapply ({ expr_desc = Eident (Qident x) }, e11)
       	      when x.id = mixfix "[]" ->
                 mk_mixfix3 "[]<-" e11 e12 $3
@@ -1132,7 +1132,7 @@ expr_dot:
 
 expr_sub:
 | expr_dot DOT lqualid_rich
-   { mk_expr (Eaccess ($1, $3)) }
+   { mk_expr (mk_apply (mk_expr_i 3 (Eident $3)) [$1]) }
 | LEFTPAR expr RIGHTPAR
     { $2 }
 | BEGIN expr END

@@ -111,7 +111,6 @@ and dexpr_desc =
   | DEfun of dubinder list * dtriple
   | DElet of ident * dexpr * dexpr
   | DEletrec of drecfun list * dexpr
-  | DEaccess of dexpr * Term.lsymbol * int option
   | DEassign of dexpr * Term.lsymbol * int * dexpr
 
   | DEsequence of dexpr * dexpr
@@ -198,6 +197,7 @@ type iexpr = {
 
 and iexpr_desc =
   | IElogic of Term.term (* pure *)
+      * Term.Svs.t (* local impure variables *) * Spv.t (* globals *)
   | IElocal of ivsymbol
   | IEglobal of psymbol * type_v
   | IEapply of iexpr * ivsymbol
@@ -206,7 +206,6 @@ and iexpr_desc =
   | IEfun of ibinder list * itriple
   | IElet of ivsymbol * iexpr * iexpr
   | IEletrec of irecfun list * iexpr
-  | IEaccess of ivsymbol * Term.lsymbol * R.t option
 
   | IEif of iexpr * iexpr * iexpr
   | IEloop of loop_annotation * iexpr

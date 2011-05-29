@@ -260,34 +260,6 @@ let quantify env rm sreg f =
     in
     Sreg.fold add sreg Mtv.empty
   in
-  (* s: v -> v' and vv': pv -> v', update_v *)
-  (****
-  let mreg, s, vv' =
-    let add pv (mreg, s, vv') = match pv.pv_effect.vs_ty.ty_node with
-      | Ty.Tyapp (ts, _) ->
-          let mt = get_mtsymbol ts in
-          if mt.mt_singleton then begin (* singleton type *)
-            assert (Sreg.cardinal pv.pv_regions = 1);
-            let r = Sreg.choose pv.pv_regions in
-            (* a better name for r' *)
-            let r' = create_vsymbol (id_clone pv.pv_name) (purify r.R.r_ty) in
-            let mreg = Mreg.add r r' mreg in
-            let ty = pv.pv_pure.vs_ty in
-            let v' = create_vsymbol (id_clone pv.pv_name) ty in
-            let cs = find_constructor env mt.mt_pure in
-            let update = fs_app cs [t_var r'] ty in
-            let vv' = Mpv.add pv (v', update) vv' in
-            mreg, Mvs.add pv.pv_pure v' s, vv'
-          end else begin
-            eprintf "pv = %a@." print_pvsymbol pv;
-            failwith "WP: update not yet implemented" (* assert false *)
-          end
-      | Ty.Tyvar _ ->
-          assert false
-    in
-    Spv.fold add vars (mreg, Mvs.empty, Mpv.empty)
-  in
-  ****)
   let vv' =
     let add pv s =
       let v = pv.pv_pure in
@@ -309,19 +281,12 @@ let quantify env rm sreg f =
   Mtv.fold quantify_r mreg f
 
 let wp_close_state env rm ef f =
-  let sreg =
-    (* Spv.fold (fun pv s -> Sreg.union pv.pv_regions s) *)
-    (*   ef.E.globals *) (Sreg.union ef.E.reads ef.E.writes)
-  in
+  let sreg = Sreg.union ef.E.reads ef.E.writes in
   quantify env rm sreg f
 
 let wp_close rm ef f =
   let sreg = ef.E.writes in
-  let sreg =
-    (* Spv.fold (fun pv s -> Sreg.union pv.pv_regions s) *)
-    (*   ef.E.globals *) (Sreg.union ef.E.reads sreg)
-  in
-  (* eprintf "wp_close: ef=%a@." E.print ef; *)
+  let sreg = Sreg.union ef.E.reads sreg in
   (* all program variables involving these regions *)
   let vars =
     let add r s =
@@ -331,7 +296,6 @@ let wp_close rm ef f =
   in
   let quantify_v v f = wp_forall v.pv_pure f in
   Spv.fold quantify_v vars f
-
 
 (* let quantify ?(all=false) env rm ef f = *)
 (*   let r = quantify ~all env rm ef f in *)
