@@ -1296,7 +1296,7 @@ let declare_global ls pv =
 let rec term_effect ef t = match t.t_node with
   | Term.Tapp (ls, []) when Hls.mem globals ls ->
       let pv = Hls.find globals ls in
-      E.add_glob pv ef, t_var pv.pv_pure
+      E.add_var pv ef, t_var pv.pv_pure
   | _ ->
       t_map_fold term_effect ef t
 
@@ -1476,6 +1476,10 @@ let saturation loc ef (a,al) =
 
 let type_v_unit _env = tpure (ty_app (ts_tuple 0) [])
 
+let remove_bl_effects bl ef =
+  let remove ef pv = E.remove pv.pv_regions ef in
+  List.fold_left remove ef bl
+
 (* [expr] translates iexpr into expr
    [env : type_v Mvs.t] maps local variables to their types *)
 
@@ -1493,9 +1497,9 @@ and expr_desc gl env loc ty = function
       Elogic t, tpure ty, ef
   | IElocal vs ->
       let vs = Mvs.find vs.i_impure env in
-      Elocal vs, vs.pv_tv, E.empty
+      Elocal vs, vs.pv_tv, E.add_var vs E.empty
   | IEglobal ({ ps_kind = PSvar pv } as s, tv) ->
-      Eglobal s, tv, E.add_glob pv E.empty
+      Eglobal s, tv, E.add_var pv E.empty
   | IEglobal (s, tv) ->
       Eglobal s, tv, E.empty
   | IEapply (e1, vs) ->
@@ -1522,8 +1526,9 @@ and expr_desc gl env loc ty = function
       make_apply loc e1 ty c
   | IEfun (bl, t) ->
       let env, bl = add_binders env bl in
-      let t, c = triple gl env t in
-      Efun (bl, t), tarrow bl c, E.empty
+      let (_,e,_) as t, c = triple gl env t in
+      let ef = remove_bl_effects bl e.expr_effect in
+      Efun (bl, t), tarrow bl c, ef
   | IElet (v, e1, e2) ->
       let e1 = expr gl env e1 in
       let env, v = add_local env v e1.expr_type_v in
@@ -1537,7 +1542,9 @@ and expr_desc gl env loc ty = function
   | IEletrec (dl, e1) ->
       let env, dl = letrec gl env dl in
       let e1 = expr gl env e1 in
-      Eletrec (dl, e1), e1.expr_type_v, e1.expr_effect
+      let add_effect ef (_,_,_,_,ef') = E.union ef ef' in
+      let ef = List.fold_left add_effect e1.expr_effect dl in
+      Eletrec (dl, e1), e1.expr_type_v, ef
   | IEaccess (i, ls, r) ->
       let ef = option_apply E.empty (fun r -> E.add_read r E.empty) r in
       let ls = (get_psymbol ls).ps_pure in
@@ -1734,7 +1741,10 @@ and letrec gl env dl = (* : env * recfun list *)
   in
   let m0 = List.fold_left add_empty_effect Mvs.empty dl in
   let m, dl = fixpoint m0 in
-  make_env env m, dl
+  let add_effect (pv, bl, var, (_,e,_ as t)) =
+    pv, bl, var, t, remove_bl_effects bl e.expr_effect
+  in
+  make_env env m, List.map add_effect dl
 
 (* freshness analysis
 
@@ -1754,7 +1764,7 @@ let rec fresh_expr gl ~term locals e = match e.expr_desc with
       fresh_expr gl ~term:false locals              e1;
       fresh_expr gl ~term       (Spv.add vs locals) e2
   | Eletrec (fl, e1) ->
-      List.iter (fun (_, _, _, t) -> fresh_triple gl t) fl;
+      List.iter (fun (_, _, _, t, _) -> fresh_triple gl t) fl;
       fresh_expr gl ~term locals e1
 
   | Eif (e1, e2, e3) ->
@@ -2165,7 +2175,7 @@ let rec decl ~wp env penv ltm lmod uc = function
       let _, dl = dletrec ~ghost:false denv dl in
       let _, dl = iletrec uc (create_ienv denv) dl in
       let _, dl = letrec uc Mvs.empty dl in
-      let one uc (v, _, _, _ as d) =
+      let one uc (v, _, _, _, _ as d) =
         let tyv = v.pv_tv in
         let loc = loc_of_id v.pv_name in
         let id = v.pv_name.id_string in

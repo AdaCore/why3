@@ -279,7 +279,7 @@ and expr_desc =
   | Elabel of label * expr
   | Eany of type_c
 
-and recfun = pvsymbol * pvsymbol list * rec_variant option * triple
+and recfun = pvsymbol * pvsymbol list * rec_variant option * triple * E.t
 
 and triple = pre * expr * post
 

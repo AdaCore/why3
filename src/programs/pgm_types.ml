@@ -603,15 +603,16 @@ and E : sig
     reads  : Sreg.t;
     writes : Sreg.t;
     raises : Sexn.t;
-    globals : Spv.t;
+    (* globals : Spv.t; *)
   }
 
   val empty : t
 
   val add_read  : R.t -> t -> t
-  val add_glob  : T.pvsymbol -> t -> t
+  (* val add_glob  : T.pvsymbol -> t -> t *)
   val add_write : R.t -> t -> t
   val add_raise : T.esymbol -> t -> t
+  val add_var   : T.pvsymbol -> t -> t (* add all regions for x, in reads *)
 
   val remove : Sreg.t -> t -> t
   val filter : (R.t -> bool) -> t -> t
@@ -640,19 +641,20 @@ end = struct
     reads  : Sreg.t;
     writes : Sreg.t;
     raises : Sexn.t;
-    globals: Spv.t;
+    (* globals: Spv.t; *)
   }
 
   let empty = {
     reads = Sreg.empty;
     writes = Sreg.empty;
     raises = Sexn.empty;
-    globals = Spv.empty; }
+    (* globals = Spv.empty; *) }
 
   let add_read  r t = { t with reads  = Sreg.add r t.reads  }
   let add_write r t = { t with writes = Sreg.add r t.writes }
   let add_raise e t = { t with raises = Sexn.add e t.raises }
-  let add_glob  pv t = { t with globals = Spv.add pv t.globals }
+  (* let add_glob  pv t = { t with globals = Spv.add pv t.globals } *)
+  let add_var pv ef = Sreg.fold add_read pv.pv_regions ef
 
   let remove s t =
     { t with reads = Sreg.diff t.reads s; writes = Sreg.diff t.writes s }
@@ -666,7 +668,7 @@ end = struct
     { reads  = Sreg.union t1.reads  t2.reads;
       writes = Sreg.union t1.writes t2.writes;
       raises = Sexn.union t1.raises t2.raises;
-      globals = Spv.union t1.globals t2.globals; }
+      (* globals = Spv.union t1.globals t2.globals; *) }
 
   let equal t1 t2 =
     Sreg.equal t1.reads  t2.reads  &&
@@ -692,7 +694,7 @@ end = struct
     { reads = subst_set ts t.reads;
       writes = subst_set ts t.writes;
       raises = t.raises;
-      globals = t.globals; }
+      (* globals = t.globals;  *)}
 
   let occur r t =
     Sreg.mem r t.reads || Sreg.mem r t.writes
@@ -711,9 +713,9 @@ end = struct
     if not (Sreg.is_empty e.writes) then
       fprintf fmt "@ writes %a" print_rset e.writes;
     if not (Sexn.is_empty e.raises) then
-      fprintf fmt "@ raises %a" print_eset e.raises;
-    if not (Spv.is_empty e.globals) then
-      fprintf fmt "@ globals %a" print_pvset e.globals
+      fprintf fmt "@ raises %a" print_eset e.raises
+    (* if not (Spv.is_empty e.globals) then *)
+    (*   fprintf fmt "@ globals %a" print_pvset e.globals *)
 
 end
 

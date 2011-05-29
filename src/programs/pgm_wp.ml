@@ -168,22 +168,6 @@ let find_constructor env ts =
   | [ls] -> ls
   | _ -> assert false
 
-let wp_close rm ef f =
-  let sreg = ef.E.writes in
-  let sreg =
-    Spv.fold (fun pv s -> Sreg.union pv.pv_regions s)
-      ef.E.globals (Sreg.union ef.E.reads sreg)
-  in
-  (* all program variables involving these regions *)
-  let vars =
-    let add r s =
-      try Spv.union (Mreg.find r rm) s with Not_found -> assert false
-    in
-    Sreg.fold add sreg Spv.empty
-  in
-  let quantify_v v f = wp_forall v.pv_pure f in
-  Spv.fold quantify_v vars f
-
 let get_ty_subst ty = match ty.ty_node with
   | Tyapp (ts, tyl) ->
       let add s tv ty = Mtv.add tv ty s in
@@ -248,8 +232,7 @@ let rec update env mreg x ty =
      let v'm = update vm r1...rn in
      f[vi <- v'i]
 *)
-let quantify env rm ef f =
-  let sreg = ef.E.writes in
+let quantify env rm sreg f =
   (* all program variables involving these regions *)
   let vars =
     let add r s =
@@ -324,6 +307,31 @@ let quantify env rm ef f =
   in
   let quantify_r _ r' f = wp_forall r' f in
   Mtv.fold quantify_r mreg f
+
+let wp_close_state env rm ef f =
+  let sreg =
+    (* Spv.fold (fun pv s -> Sreg.union pv.pv_regions s) *)
+    (*   ef.E.globals *) (Sreg.union ef.E.reads ef.E.writes)
+  in
+  quantify env rm sreg f
+
+let wp_close rm ef f =
+  let sreg = ef.E.writes in
+  let sreg =
+    (* Spv.fold (fun pv s -> Sreg.union pv.pv_regions s) *)
+    (*   ef.E.globals *) (Sreg.union ef.E.reads sreg)
+  in
+  (* eprintf "wp_close: ef=%a@." E.print ef; *)
+  (* all program variables involving these regions *)
+  let vars =
+    let add r s =
+      try Spv.union (Mreg.find r rm) s with Not_found -> assert false
+    in
+    Sreg.fold add sreg Spv.empty
+  in
+  let quantify_v v f = wp_forall v.pv_pure f in
+  Spv.fold quantify_v vars f
+
 
 (* let quantify ?(all=false) env rm ef f = *)
 (*   let r = quantify ~all env rm ef f in *)
@@ -535,14 +543,15 @@ and wp_desc env rm e q = match e.expr_desc with
       let q1 = sup q1 q in (* exc. posts taken from [q] *)
       let we = wp_expr env rm e1 q1 in
       let we = erase_label env lab we in
+      let sreg = e.expr_effect.E.writes in
       let w = match inv with
         | None ->
-            wp_and wfr (quantify env rm e.expr_effect we)
+            wp_and wfr (quantify env rm sreg we)
         | Some i ->
             wp_and wfr
               (wp_and ~sym:true
                  (wp_expl "loop invariant init" i)
-                 (quantify env rm e.expr_effect (wp_implies i we)))
+                 (quantify env rm sreg (wp_implies i we)))
         in
         w
   (* optimization for the particular case let _ = y in e *)
@@ -618,7 +627,7 @@ and wp_desc env rm e q = match e.expr_desc with
       let f = wp_and ~sym:true
         (wp_expl "for loop initialization"
            (t_subst (subst1 x.pv_pure (t_var v1.pv_pure)) inv))
-        (quantify env rm e.expr_effect
+        (quantify env rm e.expr_effect.E.writes
            (wp_and ~sym:true
               (wp_expl "for loop preservation"
                 (wp_forall x.pv_pure
@@ -645,7 +654,7 @@ and wp_desc env rm e q = match e.expr_desc with
       erase_label env lab w1
   | Eany c ->
       (* TODO: propagate call labels into c.c_post *)
-      let w = opaque_wp env rm c.c_effect c.c_post q in
+      let w = opaque_wp env rm c.c_effect.E.writes c.c_post q in
       let p = wp_expl "precondition" c.c_pre in
       let p = t_label ~loc:e.expr_loc p.t_label p in
       wp_and p w
@@ -660,19 +669,27 @@ and wp_triple env rm bl (p, e, q) =
   in
   let f = wp_expr env rm e q in
   let f = wp_implies p f in
-  let f = wp_close rm e.expr_effect f in
+  let f = wp_close_state env rm e.expr_effect f in
   wp_binders bl f
 
-and wp_recfun env rm (_, bl, _var, t) =
+and wp_recfun env rm (_, bl, _var, t, _) =
   wp_triple env rm bl t
 
 let global_regions = ref Mreg.empty
 
 let declare_global_regions pv = global_regions := add_binder pv !global_regions
 
+(* WP functions with quantification over global variables *)
+
 let wp env e =
   let rm = !global_regions in
-  wp_expr env rm e (default_post e.expr_type e.expr_effect)
+  let f = wp_expr env rm e (default_post e.expr_type e.expr_effect) in
+  wp_close rm e.expr_effect f
+
+let wp_rec env (_,_,_,_,ef as def) =
+  let rm = !global_regions in
+  let f = wp_recfun env rm def in
+  wp_close rm ef f
 
 let rec t_btop env t = match t.t_node with
   | Tif (f,t1,t2) -> let f = f_btop env f in
@@ -718,7 +735,7 @@ let decl uc = function
       add_wp_decl ps f uc
   | Pgm_ttree.Dletrec dl ->
       let add_one uc (ps, def) =
-        let f = wp_recfun uc !global_regions def in
+        let f = wp_rec uc def in
         Debug.dprintf debug "wp %s = %a@\n----------------@."
            ps.ps_pure.ls_name.id_string Pretty.print_term f;
         add_wp_decl ps f uc

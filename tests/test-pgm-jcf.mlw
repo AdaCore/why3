@@ -1,18 +1,27 @@
 
 module M
 
+  use import int.Int
   use import module ref.Ref
 
-  let test (x: ref int) =
-    { !x = 0 }
-    !x
-    { result = 0 }
+  parameter r : ref int
 
-  (* BUG *)
-  (* 
-  let foo (a: ref int) = let x = a in fun () -> {} x := 0 { !x = 0 }
-  let test () = let x = ref 0 in begin foo x (); assert { !x = 0 } end 
-  *)  
+  let test1 () =
+    let x = ref 0 in
+    let f (y: int) = {} x := !x + y { !x = old !x + y } in
+    f 2;
+    assert { !x = 2 }
+
+  let rec test2 () =
+    { }
+    r := 0
+    { !r = 0 }
+
+  (* BUG: x escapes its scope (in the postcondition) => should be an error *)
+  (* let foo (a: ref int) = let x = a in fun () -> {} x := 0 { !x = 0 } *)
+
+  let foo (a: ref int) = let x = a in fun () -> {} x := 0 { !a = 0 }
+  let test3 () = let x = ref 0 in begin foo x (); assert { !x = 0 } end 
 
 end
 

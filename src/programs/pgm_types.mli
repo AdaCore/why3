@@ -189,15 +189,16 @@ and E : sig
     reads  : Sreg.t;
     writes : Sreg.t;
     raises : Sexn.t;
-    globals: Spv.t;
+    (* globals: Spv.t; *)
   }
 
   val empty : t
 
   val add_read  : R.t -> t -> t
-  val add_glob  : T.pvsymbol -> t -> t
+  (* val add_glob  : T.pvsymbol -> t -> t *)
   val add_write : R.t -> t -> t
   val add_raise : T.esymbol -> t -> t
+  val add_var   : T.pvsymbol -> t -> t
 
   val remove : Sreg.t -> t -> t
   val filter : (R.t -> bool) -> t -> t
