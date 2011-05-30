@@ -20,6 +20,8 @@
 open Why
 open Util
 open Ident
+open Ty
+open Decl
 open Theory
 open Term
 
@@ -93,8 +95,8 @@ let pure_uc   uc = uc.uc_pure
 
 let add_pervasives uc =
   (* type unit = () *)
-  let ts = 
-    Ty.create_tysymbol 
+  let ts =
+    Ty.create_tysymbol
       (id_fresh "unit") [] (Some (Ty.ty_app (Ty.ts_tuple 0) []))
   in
   add_ty_decl uc [ts, Decl.Tabstract]
@@ -162,15 +164,41 @@ let add_psymbol ps uc =
 
 let ls_Exit = create_lsymbol (id_fresh "%Exit") [] (Some ty_exn)
 
-let create_module n =
-  let m = { 
+(* type unit = () *)
+let ty_unit = ty_tuple []
+let ts_unit = create_tysymbol (id_fresh "unit") [] (Some ty_unit)
+
+(* logic ignore 'a : () *)
+
+let ts_label = create_tysymbol (id_fresh "label") [] None
+let ty_label = ty_app ts_label []
+
+let fs_at =
+  let ty = ty_var (create_tvsymbol (id_fresh "a")) in
+  create_lsymbol (id_fresh "at") [ty; ty_label] (Some ty)
+
+let fs_old =
+  let ty = ty_var (create_tvsymbol (id_fresh "a")) in
+  create_lsymbol (id_fresh "old") [ty] (Some ty)
+
+let th_prelude =
+  let uc = create_theory (id_fresh "Prelude") in
+  let uc = use_export uc (tuple_theory 0) in
+  let uc = add_ty_decl uc [ts_unit, Tabstract] in
+  let uc = add_ty_decl uc [ts_label, Tabstract] in
+  let uc = add_logic_decl uc [fs_at, None] in
+  let uc = add_logic_decl uc [fs_old, None] in
+  close_theory uc
+
+let empty_module n =
+  let m = {
     uc_name = id_register n;
     uc_impure = Theory.create_theory n;
     uc_effect = Theory.create_theory n;
     uc_pure = Theory.create_theory n;
     uc_decls = [];
     uc_import = [empty_ns];
-    uc_export = [empty_ns]; } 
+    uc_export = [empty_ns]; }
   in
   (* pervasives *)
   let m = add_esymbol  ls_Exit    m in
@@ -199,9 +227,9 @@ let close_module uc = match uc.uc_export with
       { m_name = uc.uc_name;
         m_decls = List.rev uc.uc_decls;
         m_export = e;
-        m_impure = close_theory uc.uc_impure; 
-        m_effect = close_theory uc.uc_effect; 
-        m_pure = close_theory uc.uc_pure; 
+        m_impure = close_theory uc.uc_impure;
+        m_effect = close_theory uc.uc_effect;
+        m_pure = close_theory uc.uc_pure;
       }
   | _ ->
       raise CloseModule
@@ -213,21 +241,21 @@ let use_export uc m =
   | i0 :: sti, e0 :: ste -> { uc with
       uc_import = merge_ns false m.m_export i0 :: sti;
       uc_export = merge_ns true  m.m_export e0 :: ste;
-      uc_impure = Theory.use_export uc.uc_impure m.m_impure; 
-      uc_effect = Theory.use_export uc.uc_effect m.m_effect; 
+      uc_impure = Theory.use_export uc.uc_impure m.m_impure;
+      uc_effect = Theory.use_export uc.uc_effect m.m_effect;
       uc_pure   = Theory.use_export uc.uc_pure   m.m_pure; }
   | _ -> assert false
 
 let use_export_theory uc th =
   let uc =
-    { uc with 
+    { uc with
         uc_impure = Theory.use_export uc.uc_impure th;
         uc_effect = Theory.use_export uc.uc_effect th;
         uc_pure   = Theory.use_export uc.uc_pure   th; }
   in
   (* all type symbols from th are added as (pure) mtsymbols *)
-  let add_ts _ ts = 
-    ignore 
+  let add_ts _ ts =
+    ignore
       (create_mtsymbol ~impure:ts ~effect:ts ~pure:ts ~singleton:false)
   in
   let rec add_ns ns uc =
@@ -235,6 +263,10 @@ let use_export_theory uc th =
     Mnm.fold (fun _ -> add_ns) ns.Theory.ns_ns uc
   in
   add_ns th.th_export uc
+
+let create_module id =
+  let uc = empty_module id in
+  use_export_theory uc th_prelude
 
 let add_impure_pdecl env ltm d uc =
   { uc with uc_impure = Typing.add_decl env ltm uc.uc_impure d }
@@ -246,14 +278,14 @@ let add_pure_pdecl env ltm d uc =
   { uc with uc_pure = Typing.add_decl env ltm uc.uc_pure d; }
 
 let add_pdecl env ltm d uc =
-  { uc with 
+  { uc with
       uc_impure = Typing.add_decl env ltm uc.uc_impure d;
       uc_effect = Typing.add_decl env ltm uc.uc_effect d;
       uc_pure   = Typing.add_decl env ltm uc.uc_pure   d; }
 
 
 (*
-Local Variables: 
+Local Variables:
 compile-command: "unset LANG; make -C ../.. testl"
-End: 
+End:
 *)

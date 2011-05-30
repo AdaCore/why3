@@ -198,10 +198,6 @@ let add_ind_decls = with_tuples ~reset:true add_ind_decl
 
 let add_prop_decl = with_tuples ~reset:true add_prop_decl
 
-let rec type_inst s ty = match ty.ty_node with
-  | Ty.Tyvar n -> Mtv.find n s
-  | Ty.Tyapp (ts, tyl) -> tyapp (ts, List.map (type_inst s) tyl)
-
 let rec dty uc env = function
   | PPTtyvar {id=x} ->
       tyvar (find_user_type_var x env)
@@ -211,17 +207,10 @@ let rec dty uc env = function
       let np = List.length p in
       if np <> a then error ~loc (TypeArity (x, a, np));
       let tyl = List.map (dty uc env) p in
-      begin match ts.ts_def with
-        | None ->
-            tyapp (ts, tyl)
-        | Some ty ->
-            let add m v t = Mtv.add v t m in
-            let s = List.fold_left2 add Mtv.empty ts.ts_args tyl in
-            type_inst s ty
-      end
+      tyapp ts tyl
   | PPTtuple tyl ->
       let ts = ts_tuple (List.length tyl) in
-      tyapp (ts, List.map (dty uc env) tyl)
+      tyapp ts (List.map (dty uc env) tyl)
 
 let find_ns find p ns =
   let loc = qloc p in
@@ -407,7 +396,7 @@ and dpat_node loc uc env = function
       let s = fs_tuple n in
       let tyl = List.map (fun _ -> fresh_type_var loc) pl in
       let env, pl = dpat_args s.ls_name loc uc env tyl pl in
-      let ty = tyapp (ts_tuple n, tyl) in
+      let ty = tyapp (ts_tuple n) tyl in
       env, Papp (s, pl), ty
   | PPpas (p, x) ->
       let env, p = dpat uc env p in
@@ -493,16 +482,16 @@ and dterm_node ~localize loc uc env = function
       let s = fs_tuple n in
       let tyl = List.map (fun _ -> fresh_type_var loc) tl in
       let tl = dtype_args s.ls_name loc uc env tyl tl in
-      let ty = tyapp (ts_tuple n, tyl) in
+      let ty = tyapp (ts_tuple n) tyl in
       Tapp (s, tl), ty
   | PPinfix (e1, x, e2) ->
       let s, tyl, ty = specialize_fsymbol (Qident x) uc in
       let tl = dtype_args s.ls_name loc uc env tyl [e1; e2] in
       Tapp (s, tl), ty
   | PPconst (ConstInt _ as c) ->
-      Tconst c, tyapp (Ty.ts_int, [])
+      Tconst c, tyapp Ty.ts_int []
   | PPconst (ConstReal _ as c) ->
-      Tconst c, tyapp (Ty.ts_real, [])
+      Tconst c, tyapp Ty.ts_real []
   | PPlet (x, e1, e2) ->
       let e1 = dterm ~localize uc env e1 in
       let ty = e1.dt_ty in
@@ -574,7 +563,7 @@ and dterm_node ~localize loc uc env = function
         | TRterm t ->
             let id = { id = "fc"; id_lab = []; id_loc = loc } in
             let tyl,ty = List.fold_right (fun (_,uty) (tyl,ty) ->
-              let nty = tyapp (ts_func, [uty;ty]) in ty :: tyl, nty)
+              let nty = tyapp ts_func [uty;ty] in ty :: tyl, nty)
               uqu ([],t.dt_ty)
             in
             let h = { dt_node = Tvar id.id ; dt_ty = ty } in
@@ -591,8 +580,8 @@ and dterm_node ~localize loc uc env = function
               | [] -> assert false
             in
             let tyl,ty = List.fold_right (fun (_,uty) (tyl,ty) ->
-              let nty = tyapp (ts_func, [uty;ty]) in ty :: tyl, nty)
-              uqu ([],tyapp (ts_pred, [uty]))
+              let nty = tyapp ts_func [uty;ty] in ty :: tyl, nty)
+              uqu ([], tyapp ts_pred [uty])
             in
             let h = { dt_node = Tvar id.id ; dt_ty = ty } in
             let h = List.fold_left2 (fun h (uid,uty) ty ->

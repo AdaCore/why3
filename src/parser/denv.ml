@@ -51,7 +51,18 @@ and type_var = {
 }
 
 let tyvar v = Tyvar v
-let tyapp (s, tyl) = Tyapp (s, tyl)
+
+let rec type_inst s ty = match ty.ty_node with
+  | Ty.Tyvar n -> Mtv.find n s
+  | Ty.Tyapp (ts, tyl) -> Tyapp (ts, List.map (type_inst s) tyl)
+
+let tyapp ts tyl = match ts.ts_def with
+  | None ->
+      Tyapp (ts, tyl)
+  | Some ty ->
+      let add m v t = Mtv.add v t m in
+      let s = List.fold_left2 add Mtv.empty ts.ts_args tyl in
+      type_inst s ty
 
 type dty = dty_view
 

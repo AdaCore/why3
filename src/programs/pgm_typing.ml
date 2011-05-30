@@ -80,18 +80,16 @@ let is_mutable_field ts i =
 
 (* phase 1: typing programs (using destructive type inference) **************)
 
-let dty_app (ts, tyl) = assert (ts.ts_def = None); tyapp (ts, tyl)
-
 let find_ts ~pure uc s =
   ns_find_ts (get_namespace (if pure then pure_uc uc else impure_uc uc)) [s]
 let find_ls ~pure uc s =
   ns_find_ls (get_namespace (if pure then pure_uc uc else impure_uc uc)) [s]
 
 (* TODO: improve efficiency *)
-let dty_bool uc = dty_app (find_ts ~pure:true uc "bool", [])
-let dty_int _uc = dty_app (Ty.ts_int, [])
-let dty_unit _uc = dty_app (ts_tuple 0, [])
-let dty_label uc = dty_app (find_ts ~pure:true uc "label_", [])
+let dty_bool uc = tyapp (find_ts ~pure:true uc "bool") []
+let dty_int _uc = tyapp Ty.ts_int []
+let dty_unit _uc = tyapp (ts_tuple 0) []
+let dty_label _uc = tyapp ts_label []
 
 (* note: local variables are simultaneously in locals (to type programs)
    and in denv (to type logic elements) *)
@@ -111,7 +109,7 @@ let loc_of_id id = Util.of_option id.Ident.id_loc
 let loc_of_ls ls = ls.ls_name.Ident.id_loc
 
 let dcurrying tyl ty =
-  let make_arrow_type ty1 ty2 = dty_app (ts_arrow, [ty1; ty2]) in
+  let make_arrow_type ty1 ty2 = tyapp ts_arrow [ty1; ty2] in
   List.fold_right make_arrow_type tyl ty
 
 type region_policy = Region_var | Region_ret | Region_glob
@@ -176,7 +174,7 @@ let rec specialize_ty ?(policy=Region_var) ~loc htv ty = match ty.ty_node with
       in
       let regions = List.map mk_region (Util.prefix n tl) in
       let tl = List.map (specialize_ty ~policy ~loc htv) (Util.chop n tl) in
-      tyapp (ts, regions @ tl)
+      tyapp ts (regions @ tl)
 
 let rec specialize_type_v ?(policy=Region_var) ~loc htv = function
   | Tpure ty ->
@@ -245,7 +243,7 @@ let dexception uc qid =
   let sl = Typing.string_list_of_qualid [] qid in
   let loc = Typing.qloc qid in
   let _, _, ty as r = specialize_exception loc sl uc in
-  let ty_exn = dty_app (ts_exn, []) in
+  let ty_exn = tyapp ts_exn [] in
   if not (Denv.unify ty ty_exn) then
     errorm ~loc
       "@[this expression has type %a,@ but is expected to be an exception@]"
@@ -291,17 +289,10 @@ let rec dtype ~user env = function
           print_qualid x (a - mt.mt_regions) np;
       let tyl = List.map (dtype ~user env) p in
       let tyl = create_regions ~user mt.mt_regions @ tyl in
-      begin match ts.ts_def with
-        | None ->
-            tyapp (ts, tyl)
-        | Some ty ->
-            let add m v t = Mtv.add v t m in
-            let s = List.fold_left2 add Mtv.empty ts.ts_args tyl in
-            Typing.type_inst s ty
-      end
+      tyapp ts tyl
   | PPTtuple tyl ->
       let ts = ts_tuple (List.length tyl) in
-      tyapp (ts, List.map (dtype ~user env) tyl)
+      tyapp ts (List.map (dtype ~user env) tyl)
 
 let rec dutype_v env = function
   | Ptree.Tpure pt ->
@@ -389,9 +380,9 @@ let rec dexpr ~ghost env e =
 
 and dexpr_desc ~ghost env loc = function
   | Ptree.Econstant (ConstInt _ as c) ->
-      DEconstant c, dty_app (Ty.ts_int, [])
+      DEconstant c, tyapp Ty.ts_int []
   | Ptree.Econstant (ConstReal _ as c) ->
-      DEconstant c, dty_app (Ty.ts_real, [])
+      DEconstant c, tyapp Ty.ts_real []
   | Ptree.Eident (Qident {id=x}) when Mstr.mem x env.locals ->
       (* local variable *)
       let tyv = Mstr.find x env.locals in
@@ -437,7 +428,7 @@ and dexpr_desc ~ghost env loc = function
       let ghost = ghost (* || is_ps_ghost e1 *) in
       let e2 = dexpr ~ghost env e2 in
       let ty2 = create_type_var loc and ty = create_type_var loc in
-      if not (Denv.unify e1.dexpr_type (dty_app (ts_arrow, [ty2; ty]))) then
+      if not (Denv.unify e1.dexpr_type (tyapp ts_arrow [ty2; ty])) then
         errorm ~loc:e1.dexpr_loc "this expression is not a function";
       expected_type e2 ty2;
       DEapply (e1, e2), ty
@@ -461,13 +452,13 @@ and dexpr_desc ~ghost env loc = function
       let n = List.length el in
       let s = Typing.fs_tuple n in
       let tyl = List.map (fun _ -> create_type_var loc) el in
-      let ty = dty_app (Typing.ts_tuple n, tyl) in
+      let ty = tyapp (Typing.ts_tuple n) tyl in
       let create d ty = { dexpr_desc = d; dexpr_type = ty; dexpr_loc = loc } in
       let apply e1 e2 ty2 =
         let e2 = dexpr ~ghost env e2 in
         assert (Denv.unify e2.dexpr_type ty2);
         let ty = create_type_var loc in
-        assert (Denv.unify e1.dexpr_type (dty_app (ts_arrow, [ty2; ty])));
+        assert (Denv.unify e1.dexpr_type (tyapp ts_arrow [ty2; ty]));
         create (DEapply (e1, e2)) ty
       in
       let e = create (DElogic s) (dcurrying tyl ty) in
@@ -484,7 +475,7 @@ and dexpr_desc ~ghost env loc = function
             let f = dexpr ~ghost env f in
             assert (Denv.unify f.dexpr_type tyf);
             let ty = create_type_var loc in
-            assert (Denv.unify d.dexpr_type (dty_app (ts_arrow, [tyf; ty])));
+            assert (Denv.unify d.dexpr_type (tyapp ts_arrow [tyf; ty]));
             create (DEapply (d, f)) ty
         | None ->
             errorm ~loc "some record fields are missing"
@@ -704,7 +695,7 @@ let rec dty_of_ty denv ty = match ty.ty_node with
   | Ty.Tyvar v ->
       Denv.tyvar (Typing.find_user_type_var v.tv_name.id_string denv)
   | Ty.Tyapp (ts, tyl) ->
-      Denv.tyapp (ts, List.map (dty_of_ty denv) tyl)
+      Denv.tyapp ts (List.map (dty_of_ty denv) tyl)
 
 let iadd_local env x ty =
   let v = create_ivsymbol x ty in
@@ -1165,8 +1156,7 @@ and iexpr_desc gl env loc ty = function
       let f = ifmla env f in
       IEassert (k, f)
   | DElabel (s, e1) ->
-      let ty = Ty.ty_app (find_ts ~pure:true gl "label_") [] in
-      let env, v = iadd_local env (id_fresh s) ty in
+      let env, v = iadd_local env (id_fresh s) ty_label in
       IElabel (v.i_impure, iexpr gl env e1)
   | DEany c ->
       let c = iutype_c gl env c in
@@ -1408,7 +1398,7 @@ let mk_false loc gl = mk_bool_constant loc gl (find_ls ~pure:true gl "False")
 let mk_true  loc gl = mk_bool_constant loc gl (find_ls ~pure:true gl "True")
 
 (* check that variables occurring in 'old' and 'at' are not local variables *)
-let check_at_fmla f =
+let check_at_fmla _f =
   assert false (*TODO*)
 
 (* Saturation of postconditions: a postcondition must be set for

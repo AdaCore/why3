@@ -59,8 +59,6 @@ val create_denv : unit -> denv
 val create_user_type_var : string -> Denv.type_var
 val find_user_type_var : string -> denv -> Denv.type_var
 
-val type_inst : Denv.dty Ty.Mtv.t -> Ty.ty -> Denv.dty
-
 val mem_var : string -> denv -> bool
 val find_var : string -> denv -> Denv.dty
 val add_var : string -> Denv.dty -> denv -> denv

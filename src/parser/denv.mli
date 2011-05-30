@@ -32,7 +32,7 @@ val create_ty_decl_var : ?loc:Ptree.loc -> user:bool -> tvsymbol -> type_var
 type dty
 
 val tyvar : type_var -> dty
-val tyapp : tysymbol * dty list -> dty
+val tyapp : tysymbol -> dty list -> dty
 
 type dty_view =
   | Tyvar of type_var
