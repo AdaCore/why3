@@ -274,7 +274,18 @@ fi
 
 # checking for libmenhir
 if test "$enable_menhirlib" = yes ; then
-AC_CHECK_FILE($OCAMLLIB/menhirLib,,enable_menhirlib=no)
+   if test "$USEOCAMLFIND" = yes; then
+     MENHIRLIB=$(ocamlfind query menhirLib)
+   fi
+   if test -n "$MENHIRLIB"; then
+     echo "ocamlfind found menhir library in $MENHIRLIB"
+   else
+     MENHIRLIB="+menhirLib"
+     AC_CHECK_FILE($OCAMLLIB/menhirLib,,enable_menhirlib=no)
+     if test "$enable_menhirlib" = no; then
+       AC_MSG_WARN(Lib menhir not found.)
+     fi
+   fi
 fi
 
 # checking for rubber
@@ -288,7 +299,7 @@ fi
 
 # checking for lablgtk2
 if test "$enable_ide" = yes ; then
-   if test "$USEOCAMLFIND" == yes; then
+   if test "$USEOCAMLFIND" = yes; then
       LABLGTK2LIB=$(ocamlfind query lablgtk2)
    fi
    if test -n "$LABLGTK2LIB";then
@@ -311,7 +322,7 @@ fi
 
 # checking for sqlite3
 if test "$enable_ide" = yes ; then
-   if test "$USEOCAMLFIND" == yes; then
+   if test "$USEOCAMLFIND" = yes; then
       SQLITE3LIB=$(ocamlfind query sqlite3)
    fi
    if test -n "$SQLITE3LIB";then
@@ -328,9 +339,17 @@ fi
 
 # checking for sqlite3
 if test "$enable_bench" = yes ; then
-   AC_CHECK_FILE($OCAMLLIB/sqlite3/sqlite3.cma,,enable_bench=no)
-   if test "$enable_bench" = no; then
-     AC_MSG_WARN(Lib sqlite3 not found, why3bench disabled.)
+   if test "$USEOCAMLFIND" = yes; then
+      SQLITE3LIB=$(ocamlfind query sqlite3)
+   fi
+   if test -n "$SQLITE3LIB"; then
+      echo "ocamlfind found sqlite3 in $SQLITE3LIB"
+   else
+      SQLITE3LIB="+sqlite3"
+      AC_CHECK_FILE($OCAMLLIB/sqlite3/sqlite3.cma,,enable_bench=no)
+      if test "$enable_bench" = no; then
+        AC_MSG_WARN(Lib sqlite3 not found, why3bench disabled.)
+      fi
    fi
 fi
 
@@ -387,7 +406,18 @@ reason_coq_support=" (not yet implemented)"
 # hypothesis_selection
 
 if test "$enable_hypothesis_selection" = yes; then
-  AC_CHECK_FILE($OCAMLLIB/ocamlgraph/,,enable_hypothesis_selection=no)
+   if test "$USEOCAMLFIND" = yes; then
+     OCAMLGRAPHLIB=$(ocamlfind query ocamlgraph)
+   fi
+   if test -n "$OCAMLGRAPHLIB"; then
+     echo "ocamlfind found ocamlgraph in $OCAMLGRAPHLIB"
+   else
+     OCAMLGRAPHLIB="+ocamlgraph"
+     AC_CHECK_FILE($OCAMLLIB/ocamlgraph/,,enable_hypothesis_selection=no)
+     if test "$enable_hypothesis_selection" = no; then
+       AC_MSG_WARN(Lib ocamlgraph not found, hypothesis selection disabled.)
+     fi
+   fi
 fi
 
 if test "$enable_local" = no; then
@@ -442,7 +472,7 @@ AC_SUBST(OCAMLVERSION)
 AC_SUBST(OCAMLLIB)
 dnl AC_SUBST(OCAMLV)
 dnl AC_SUBST(FORPACK)
-dnl AC_SUBST(OCAMLGRAPHLIB)
+AC_SUBST(OCAMLGRAPHLIB)
 dnl AC_SUBST(OCAMLWEB)
 
 AC_SUBST(enable_profiling)
@@ -450,6 +480,7 @@ AC_SUBST(enable_profiling)
 AC_SUBST(CAMLP5O)
 
 AC_SUBST(enable_ide)
+AC_SUBST(MENHIRLIB)
 AC_SUBST(LABLGTK2LIB)
 AC_SUBST(SQLITE3LIB)
 AC_SUBST(enable_bench)
