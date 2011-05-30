@@ -672,6 +672,19 @@ let regions_tyapp ts nregions tyl =
 
 (* phase 2: remove destructive types and type annotations *****************)
 
+(* check that variables occurring in 'old' and 'at' are not local variables *)
+let check_at_fmla loc f0 =
+  let v = ref None in
+  let rec check f = match f.t_node with
+    | Term.Tapp (ls, _) when ls_equal ls fs_at || ls_equal ls fs_old ->
+        let d = Svs.diff f.t_vars f0.t_vars in
+        Svs.is_empty d || (v := Some (Svs.choose d); false)
+    | _ ->
+        t_all check f
+  in
+  if not (check f0) then
+    errorm ~loc "locally bound variable %a under `at'" print_vs (of_option !v)
+
 let dterm env l = Typing.dterm ~localize:true env l
 let dfmla env l = Typing.dfmla ~localize:true env l
 
@@ -819,24 +832,30 @@ let ivariant env (t, ps) =
         assert false
 
 let ifmla env l =
+  let loc = l.pp_loc in
   let f = dfmla (pure_uc env.i_uc) env.i_denv l in
-  Denv.fmla env.i_pures f
+  let f = Denv.fmla env.i_pures f in
+  check_at_fmla loc f;
+  f
 
 let id_result loc = id_user id_result loc
 
 let iupost env ty (q, ql) =
   let dexn (s, l) =
+    let loc = l.pp_loc in
     let v, env = match s.ls_args with
       | [] ->
               None, env
       | [ty] ->
-          let env, v = iadd_local env (id_result l.pp_loc) ty in
-              Some v.i_pure, env
+          let env, v = iadd_local env (id_result loc) ty in
+          Some v.i_pure, env
       | _ -> assert false
     in
-    s, (v, ifmla env l)
+    let f = ifmla env l in
+    s, (v, f)
   in
-  let env, v = iadd_local env (id_result q.pp_loc) ty in
+  let loc = q.pp_loc in
+  let env, v = iadd_local env (id_result loc) ty in
   let q = ifmla env q in
   (v.i_pure, q), List.map dexn ql
 
@@ -1154,6 +1173,7 @@ and iexpr_desc gl env loc ty = function
 
   | DEassert (k, f) ->
       let f = ifmla env f in
+      check_at_fmla loc f;
       IEassert (k, f)
   | DElabel (s, e1) ->
       let env, v = iadd_local env (id_fresh s) ty_label in
@@ -1266,12 +1286,6 @@ let post_effect ef ((v, q), ql) =
   let ef, q = term_effect ef q in
   let ef, ql = map_fold_left exn_effect ef ql in
   ef, ((v, q), ql)
-(* TODO? *)
-(*   let not_result = function *)
-(*     | R.Rlocal vs -> not (vs_equal vs.pv_vs v) *)
-(*     | R.Rglobal _ -> true *)
-(*   in *)
-(*   E.filter not_result ef *)
 
 let effect e =
   let reads ef r = E.add_read r ef in
@@ -1396,10 +1410,6 @@ let mk_bool_constant loc gl ls =
 
 let mk_false loc gl = mk_bool_constant loc gl (find_ls ~pure:true gl "False")
 let mk_true  loc gl = mk_bool_constant loc gl (find_ls ~pure:true gl "True")
-
-(* check that variables occurring in 'old' and 'at' are not local variables *)
-let check_at_fmla _f =
-  assert false (*TODO*)
 
 (* Saturation of postconditions: a postcondition must be set for
    any possibly raised exception *)

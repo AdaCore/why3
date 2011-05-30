@@ -20,7 +20,9 @@ module M
 
   (* BUG *)
   let incr_fst (a: (ref int, int)) =
-    {} let (r,_) = a in r := !r + 1 { !(fst a) = (old !(fst a)) + 1 }
+    {}
+    let (r,_) = a in r := !r + 1
+    { let (x,_) = a in !x = (old !x) + 1 }
 
   let test4 () =
     let r = ref 0 in
