@@ -7,7 +7,9 @@
 
 module SameFringe
 
+  use import int.Int
   use import list.List
+  use import list.Length
   use import list.Append
 
   (* binary trees with elements at the nodes *)
@@ -36,7 +38,14 @@ module SameFringe
 
   (* the enum of a tree [t], prepended to a given enum [e] *)
 
-  let rec enum t e =
+  logic leftlen (t: tree) : int = match t with
+    | Empty -> 0
+    | Node l _ _ -> 1 + leftlen l
+  end
+
+  lemma leftlen_nonneg: forall t: tree. leftlen t >= 0
+
+  let rec enum t e variant { leftlen t } =
     { }
     match t with
     | Empty -> e
@@ -44,7 +53,7 @@ module SameFringe
     end
     { enum_elements result = elements t ++ enum_elements e }
 
-  let rec eq_enum e1 e2 =
+  let rec eq_enum e1 e2 variant { length (enum_elements e1) } =
     { }
     match e1, e2 with
     | Done, Done ->

@@ -1,4 +1,10 @@
 
+o bug in test-pgm-jcf: incr_fst
+
+o bug in test-pgm-jcf: scope
+
+o old(...) should not contain any local logical variable (let / match)
+
 o freshness analysis
 
 o no `old' in loop invariants
@@ -12,6 +18,8 @@ o syntactic sugar for postcondition:
   but also { a,b | ... }, etc.
 
 o automatically add a label pre_f at entrance of each function f
+  and then replace (old t) by (at t pre_f)
+  (so that there is no more 'old' in the abstract syntax)
 
 o use of old in loop invariant should be reported as an error (correctly)
 

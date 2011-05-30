@@ -1407,17 +1407,9 @@ let mk_bool_constant loc gl ls =
 let mk_false loc gl = mk_bool_constant loc gl (find_ls ~pure:true gl "False")
 let mk_true  loc gl = mk_bool_constant loc gl (find_ls ~pure:true gl "True")
 
-(* types do not contain inner reference types *)
-
-let rec check_type ?(noref=false) gl loc ty = match ty.ty_node with
-  | Ty.Tyapp (ts, tyl) when ts_equal ts ts_arrow ->
-      List.iter (check_type gl loc) tyl
-  | Ty.Tyapp (ts, _) when noref && is_mutable_ts ts ->
-      errorm ~loc "inner reference types are not allowed"
-  | Ty.Tyapp (_, tyl) ->
-      List.iter (check_type ~noref:true gl loc) tyl
-  | Ty.Tyvar _ ->
-      ()
+(* check that variables occurring in 'old' and 'at' are not local variables *)
+let check_at_fmla f =
+  assert false (*TODO*)
 
 (* Saturation of postconditions: a postcondition must be set for
    any possibly raised exception *)
@@ -1456,7 +1448,6 @@ let rec expr gl env e =
   let ty = e.iexpr_type in
   let loc = e.iexpr_loc in
   let d, v, ef = expr_desc gl env loc ty e.iexpr_desc in
-  check_type gl loc ty; (* TODO: improve efficiency *)
   { expr_desc = d; expr_type = ty;
     expr_type_v = v; expr_effect = ef; expr_loc = loc }
 

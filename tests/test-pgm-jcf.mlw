@@ -16,11 +16,23 @@ module M
     r := 0
     { !r = 0 }
 
+  logic fst (x: ('a, 'b)) : 'a = let (x1, _) = x in x1
+
+  (* BUG *)
+  let incr_fst (a: (ref int, int)) =
+    {} let (r,_) = a in r := !r + 1 { !(fst a) = (old !(fst a)) + 1 }
+
+  let test4 () =
+    let r = ref 0 in
+    let a = (r, 0) in
+    incr_fst a;
+    assert { !(fst a) = 1 }
+
   (* BUG: x escapes its scope (in the postcondition) => should be an error *)
-  (* let foo (a: ref int) = let x = a in fun () -> {} x := 0 { !x = 0 } *)
+  (* let scope (a: ref int) = let x = a in fun () -> {} x := 0 { !x = 0 } *)
 
   let foo (a: ref int) = let x = a in fun () -> {} x := 0 { !a = 0 }
-  let test3 () = let x = ref 0 in begin foo x (); assert { !x = 0 } end 
+  let test3 () = let x = ref 0 in begin foo x (); assert { !x = 0 } end
 
 end
 

@@ -47,7 +47,7 @@ back  +-+-+-+-------------------+
     else
       default
 
-  logic invariant_ (a : sparse_array) =
+  logic sa_invariant (a : sparse_array) =
     0 <= a.card <= length a <= maxlen and
     A.length a.val = A.length a.idx = A.length a.back and
     forall i : int.
@@ -76,7 +76,7 @@ back  +-+-+-+-------------------+
             a[dirichlet n a i] = i)
 
   lemma Inter6 :
-    forall a : sparse_array . invariant_ a ->
+    forall a : sparse_array . sa_invariant a ->
       a.card = length a ->
             permutation a.card a.back &&
             forall i : int. 0 <= i < a.card ->
@@ -87,17 +87,17 @@ back  +-+-+-+-------------------+
   let create sz =
     { 0 <= sz <= maxlen }
     {| val = malloc sz; idx = malloc sz; back = malloc sz; card = 0 |}
-    { invariant_ result and
+    { sa_invariant result and
       result.card = 0 and
       length result = sz and forall i:int. model result i = default }
 
   let test (a: sparse_array) i =
-    { 0 <= i < length a and invariant_ a }
+    { 0 <= i < length a and sa_invariant a }
     0 <= a.idx[i] && a.idx[i] < a.card && a.back[a.idx[i]] = i
     { result=True <-> is_elt a i }
 
   let get (a: sparse_array) i =
-    { 0 <= i < length a and invariant_ a }
+    { 0 <= i < length a and sa_invariant a }
     if test a i then
       (val a)[i]
     else
@@ -105,7 +105,7 @@ back  +-+-+-+-------------------+
     { result = model a i }
 
   let set (a: sparse_array) i v =
-    { 0 <= i < length a and invariant_ a }
+    { 0 <= i < length a and sa_invariant a }
     a.val[i] <- v;
     if not (test a i) then begin
       assert { a.card < length a };
@@ -113,7 +113,7 @@ back  +-+-+-+-------------------+
       a.back[a.card] <- i;
       a.card <- a.card + 1
     end
-    { invariant_ a and
+    { sa_invariant a and
       model a i = v and
       forall j:int. j <> i -> model a j = model (old a) j }
 
