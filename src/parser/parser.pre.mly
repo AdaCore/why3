@@ -1034,7 +1034,7 @@ expr:
             | Eident x ->
                 mk_expr (Eassign (e12, x, $3))
             | Eapply ({ expr_desc = Eident (Qident x) }, e11)
-      	      when x.id = mixfix "[]" ->
+            when x.id = mixfix "[]" ->
                 mk_mixfix3 "[]<-" e11 e12 $3
             | _ ->
                 raise Parsing.Parse_error
