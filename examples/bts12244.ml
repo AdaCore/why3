@@ -80,9 +80,9 @@ let sum_inline = task_checksum task_inline
 let sum_split = task_checksum task_split
 
 let () = printf "@[task == task_inline ? %b   same checksums ? %b@]@."
-  (task == task_inline) (sum = sum_inline)
+  (Task.task_equal task task_inline) (sum = sum_inline)
 
 let () = printf "@[task == task_split ? %b    same checksums ? %b@]@."
-  (task == task_split) (sum = sum_split)
+  (Task.task_equal task task_split) (sum = sum_split)
 
 
