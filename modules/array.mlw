@@ -8,15 +8,20 @@ module Array
 
   type array 'a model {| length : int; mutable elts : map int 'a |}
 
-  logic ([]) (a: array 'a) (i :int) : 'a = M.([]) a.elts i
-  logic ([<-]) (a: array 'a) (i :int) (v: 'a) : array 'a =
-    {| a with elts = M.([<-]) a.elts i v |}
+  logic get (a: array 'a) (i: int) : 'a = M.get a.elts i
+
+  logic set (a: array 'a) (i: int) (v: 'a) : array 'a =
+    {| a with elts = M.set a.elts i v |}
+
+  (* syntactic sugar *)
+  logic ([]) (a: array 'a) (i: int) : 'a = get a i
+  logic ([<-]) (a: array 'a) (i: int) (v: 'a) : array 'a = set a i v
 
   parameter ([]) : a:array 'a -> i:int ->
     { 0 <= i < length a } 'a reads a { result = a[i] }
 
   parameter ([]<-) : a:array 'a -> i:int -> v:'a ->
-    { 0 <= i < length a } unit writes a { a.elts = M.([<-]) (old a.elts) i v }
+    { 0 <= i < length a } unit writes a { a.elts = M.set (old a.elts) i v }
 
   (* unsafe get/set operations with no precondition *)
   exception OutOfBounds

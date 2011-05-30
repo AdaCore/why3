@@ -150,13 +150,13 @@ end
 
 theory map.Map
   syntax type map "(Array %1 %2)"
-  meta "encoding : lskept" logic ([])
-  meta "encoding : lskept" logic ([<-])
+  meta "encoding : lskept" logic get
+  meta "encoding : lskept" logic set
   meta "encoding : lskept" logic const
 
-  syntax logic ([])   "(select %1 %2)"
-  syntax logic ([<-]) "(store %1 %2 %3)"
-  syntax logic const  "(const[%t0] %1)"
+  syntax logic get   "(select %1 %2)"
+  syntax logic set   "(store %1 %2 %3)"
+  syntax logic const "(const[%t0] %1)"
 end
 
 
