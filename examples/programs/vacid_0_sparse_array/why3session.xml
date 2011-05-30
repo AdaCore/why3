@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session SYSTEM "why3session.dtd">
+<why3session name="examples/programs/vacid_0_sparse_array/why3session.xml">
+ <file name="../vacid_0_sparse_array.mlw" verified="true" expanded="true">
+  <theory name="M" verified="true" expanded="true">
+   <goal name="Inter6" sum="0727b5a4a322503f1341f4fbd4411a08" proved="true" expanded="true">
+    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+     <result status="valid" time="0.07"/>
+    </proof>
+   </goal>
+   <goal name="WP_parameter create" expl="normal postcondition" sum="a72f8526348fcdf26ba9f3c960e50161" proved="true" expanded="true">
+    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+     <result status="valid" time="0.11"/>
+    </proof>
+   </goal>
+   <goal name="WP_parameter test" expl="correctness of parameter test" sum="46b3233ebb601f30c1048306394e9fae" proved="true" expanded="true">
+    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+     <result status="valid" time="0.55"/>
+    </proof>
+   </goal>
+   <goal name="WP_parameter get" expl="correctness of parameter get" sum="c274083105ab3c9b6d8c5ed773227cfe" proved="true" expanded="true">
+    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+     <result status="valid" time="0.09"/>
+    </proof>
+   </goal>
+   <goal name="WP_parameter set" expl="correctness of parameter set" sum="abc4fbc70002208565dc51236d9434eb" proved="true" expanded="true">
+    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+     <result status="timeout" time="10.32"/>
+    </proof>
+    <transf name="split_goal" proved="true" expanded="true">
+     <goal name="WP_parameter set.1" expl="precondition" sum="e97e9180e4686a3a0621e79128b8756c" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter set.2" expl="precondition" sum="f8ba3eb882368987dc3e24fdedc87779" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.61"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter set.3" expl="assertion" sum="717c232a57062bc91e4ecc2a714c0930" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.14"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter set.4" expl="precondition" sum="f818511062f21645e10c65e596841e52" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.08"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter set.5" expl="precondition" sum="f184dce4ff165fdd818097d0f450cc57" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.11"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter set.6" expl="normal postcondition" sum="b59d8de2bc15422d729dec7fc7c3aa19" proved="true" expanded="true">
+      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="5.92"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="timeout" time="10.07"/>
+      </proof>
+      <proof prover="z3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.82"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter set.7" expl="normal postcondition" sum="71fd27d9c63afe486a3891e68e6381b1" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.59"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+   <goal name="WP_parameter harness" expl="correctness of parameter harness" sum="2fb6b907ff76117a129f96aa79af8cc4" proved="true" expanded="true">
+    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+     <result status="valid" time="4.44"/>
+    </proof>
+   </goal>
+  </theory>
+ </file>
+</why3session>

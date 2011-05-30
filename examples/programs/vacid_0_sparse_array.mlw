@@ -93,10 +93,7 @@ back  +-+-+-+-------------------+
 
   let test (a: sparse_array) i =
     { 0 <= i < length a and invariant_ a }
-    let idx = idx a in
-    let back = back a in
-    let n = card a in
-    0 <= idx[i] && idx[i] < n && back[idx[i]] = i
+    0 <= a.idx[i] && a.idx[i] < a.card && a.back[a.idx[i]] = i
     { result=True <-> is_elt a i }
 
   let get (a: sparse_array) i =
@@ -109,17 +106,12 @@ back  +-+-+-+-------------------+
 
   let set (a: sparse_array) i v =
     { 0 <= i < length a and invariant_ a }
-    (* let SA val idx back sz n = !a in *)
-    let val = val a in
-    let idx = idx a in
-    let back = back a in
-    let n = card a in
-    val[i] <- v;
+    a.val[i] <- v;
     if not (test a i) then begin
-      assert { n < length a };
-      idx[i] <- n;
-      back[n] <- i;
-      () (*TODO a.card <- n+1 *)
+      assert { a.card < length a };
+      a.idx[i] <- a.card;
+      a.back[a.card] <- i;
+      a.card <- a.card + 1
     end
     { invariant_ a and
       model a i = v and
