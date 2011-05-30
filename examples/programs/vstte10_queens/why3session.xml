@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session SYSTEM "why3session.dtd">
+<why3session name="examples/programs/vstte10_queens/why3session.xml">
+ <file name="../vstte10_queens.mlw" verified="true" expanded="true">
+  <theory name="M" verified="true" expanded="true">
+   <goal name="eq_board_set" sum="5a0d75d0eac71d57f1acabc952568bfa" proved="true" expanded="true">
+    <proof prover="alt-ergo" timelimit="25" edited="" obsolete="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal name="eq_board_sym" sum="405f7d6fa7f1cd214d57be56a03a90c6" proved="true" expanded="true">
+    <proof prover="alt-ergo" timelimit="25" edited="" obsolete="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+   </goal>
+   <goal name="eq_board_trans" sum="4f4b4df9a06df487228e3b7a5e299786" proved="true" expanded="true">
+    <proof prover="alt-ergo" timelimit="25" edited="" obsolete="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal name="eq_board_extension" sum="b146f07adfca2961090acaf226f1472b" proved="true" expanded="true">
+    <proof prover="alt-ergo" timelimit="25" edited="" obsolete="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal name="consistent_row_eq" sum="5cdbdd0e4d2d069953d7d298438e53eb" proved="true" expanded="true">
+    <proof prover="alt-ergo" timelimit="25" edited="" obsolete="false">
+     <result status="valid" time="0.05"/>
+    </proof>
+   </goal>
+   <goal name="is_consistent_eq" sum="0cdac2dc0783cb8971d9b2bc165b1dbb" proved="true" expanded="true">
+    <proof prover="alt-ergo" timelimit="25" edited="" obsolete="false">
+     <result status="valid" time="0.15"/>
+    </proof>
+   </goal>
+   <goal name="WP_parameter check_is_consistent" expl="correctness of parameter check_is_consistent" sum="650b8d34506ab14116907ee9a6c5293a" proved="true" expanded="true">
+    <transf name="split_goal" proved="true" expanded="true">
+     <goal name="WP_parameter check_is_consistent.1" expl="normal postcondition" sum="4cc7de5ca077c383b2e8c319e5fe2772" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter check_is_consistent.2" expl="for loop initialization" sum="80722d6f340ea1606df6b1de6a061b02" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter check_is_consistent.3" expl="for loop preservation" sum="1e68880955d1ba458aaac7db11bfadf1" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.10"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter check_is_consistent.4" expl="normal postcondition" sum="19580c6a17a5572d4a5e3517d7284f33" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+   <goal name="solution_eq_board" sum="d370041b6257114a528593f9179b707e" proved="true" expanded="true">
+    <transf name="split_goal" proved="true" expanded="true">
+     <goal name="solution_eq_board.1" sum="d370041b6257114a528593f9179b707e" proved="true" expanded="true">
+      <proof prover="z3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.06"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+   <goal name="WP_parameter bt_queens" expl="correctness of parameter bt_queens" sum="efdafb18184a557c0bd125c5402c13b4" proved="true" expanded="true">
+    <transf name="split_goal" proved="true" expanded="true">
+     <goal name="WP_parameter bt_queens.1" expl="exceptional postcondition" sum="2a6ac1e487ce8b58509cbc4b3ca2a6ad" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter bt_queens.2" expl="normal postcondition" sum="d310f725c1974ea14c328be34508ffdc" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter bt_queens.3" expl="for loop initialization" sum="dd318c0d700fee0e567d4f117338842f" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter bt_queens.4" expl="for loop preservation" sum="78dd8b8c60afd7e97ffcd6f038cdda81" proved="true" expanded="true">
+      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="1.08"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter bt_queens.5" expl="normal postcondition" sum="4394063341332481cf8bfa9f973e760d" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.12"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+   <goal name="WP_parameter queens" expl="correctness of parameter queens" sum="1518431140950e60159267f1ed47140d" proved="true" expanded="true">
+    <transf name="split_goal" proved="true" expanded="true">
+     <goal name="WP_parameter queens.1" expl="precondition" sum="9176784c479b4a2ff97029b001dad298" proved="true" expanded="true">
+      <transf name="split_goal" proved="true" expanded="true">
+       <goal name="WP_parameter queens.1.1" expl="correctness of parameter queens" sum="8539b23d3510fd4f1de63ea1997ce50d" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="true">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter queens.1.2" expl="correctness of parameter queens" sum="8ade4db49784f57307243eebbcb198d5" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="true">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter queens.1.3" expl="correctness of parameter queens" sum="3de11924bbf3959c8f7fdc4cdf27f0cb" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter queens.1.4" expl="correctness of parameter queens" sum="2d57043056ef40059532b1cb570c9882" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="true">
+         <result status="valid" time="0.03"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal name="WP_parameter queens.2" expl="normal postcondition" sum="36d4e9c3b144d3d58c150fa7126ef877" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="true">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter queens.3" expl="exceptional postcondition" sum="0bb3a16f6adf6b874b658f9dea10cbdb" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="true">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+  </theory>
+ </file>
+</why3session>

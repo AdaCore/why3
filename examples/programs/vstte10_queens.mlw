@@ -97,7 +97,7 @@ module M
       solution board n }
 
   let queens (board: array int) n =
-    { length board = n }
+    { 0 <= length board = n }
     bt_queens board n 0
     { forall b:array int. length b = n -> is_board b n -> not (solution b n) }
     | Solution -> { solution board n }

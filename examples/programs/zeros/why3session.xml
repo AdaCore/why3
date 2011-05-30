@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session SYSTEM "why3session.dtd">
+<why3session name="examples/programs/zeros/why3session.xml">
+ <file name="../zeros.mlw" verified="true" expanded="true">
+  <theory name="SetZeros" verified="true" expanded="true">
+   <goal name="WP_parameter set_zeros" expl="correctness of parameter set_zeros" sum="738a61fe56ee3528c88f7f6ad392b4ec" proved="true" expanded="true">
+    <transf name="split_goal" proved="true" expanded="true">
+     <goal name="WP_parameter set_zeros.1" expl="normal postcondition" sum="5ebaf8196c461842d3818d0f00c7b897" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter set_zeros.2" expl="for loop initialization" sum="262d92c8877fa84a114fda64ce36167b" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter set_zeros.3" expl="for loop preservation" sum="db37970e847fa3b97df4a7062a16ffea" proved="true" expanded="true">
+      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="10" edited="zeros.mlw-SetZeros-WP_parameter set_zeros_1.why" obsolete="false">
+       <result status="unknown" time="0.02"/>
+      </proof>
+      <proof prover="z3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter set_zeros.4" expl="normal postcondition" sum="e37d7aade59a72a7fadbab4f042fdec6" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+   <goal name="WP_parameter harness" expl="correctness of parameter harness" sum="063941a2fece0c3d9083e25e9187d847" proved="true" expanded="true">
+    <transf name="split_goal" proved="true" expanded="true">
+     <goal name="WP_parameter harness.1" expl="assertion" sum="d48c1f007a0cb3fcb8c7c2072af4f1b2" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter harness.2" expl="assertion" sum="6cd977227d738cbea667ca77e1839b1c" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+  </theory>
+ </file>
+</why3session>
