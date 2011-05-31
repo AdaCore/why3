@@ -208,6 +208,15 @@ module type S =
     (** [submap pr m1 m2] verifies that all the keys in m1 are in m2
         and that for each such binding pr is verified. *)
 
+    val set_inter : 'a t -> 'b t -> 'a t
+    (** [set_inter = inter (fun _ x _ -> Some x)] *)
+
+    val set_diff : 'a t -> 'b t -> 'a t
+    (** [set_diff = diff (fun _ _ _ -> None)] *)
+
+    val set_submap : 'a t -> 'b t -> bool
+    (** [set_submap = submap (fun _ _ _ -> true)] *)
+
     val find_default : key -> 'a -> 'a t -> 'a
     (** [find_default x d m] returns the current binding of [x] in [m],
         or return [d] if no such binding exists. *)

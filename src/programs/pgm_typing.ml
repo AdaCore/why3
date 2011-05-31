@@ -677,8 +677,8 @@ let check_at_fmla loc f0 =
   let v = ref None in
   let rec check f = match f.t_node with
     | Term.Tapp (ls, _) when ls_equal ls fs_at || ls_equal ls fs_old ->
-        let d = Svs.diff f.t_vars f0.t_vars in
-        Svs.is_empty d || (v := Some (Svs.choose d); false)
+        let d = Mvs.set_diff f.t_vars f0.t_vars in
+        Mvs.is_empty d || (v := Some (fst (Mvs.choose d)); false)
     | _ ->
         t_all check f
   in

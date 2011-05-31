@@ -86,13 +86,13 @@ let wp_forall v f =
   (* if t_occurs_single v f then t_forall_close_simp [v] [] f else f *)
   match f.t_node with
     | Tbinop (Timplies, {t_node = Tapp (s,[{t_node = Tvar u};r])},h)
-      when ls_equal s ps_equ && vs_equal u v && not (t_occurs_single v r) ->
+      when ls_equal s ps_equ && vs_equal u v && not (Mvs.mem v r.t_vars) ->
         t_let_close_simp v r h
     | Tbinop (Timplies, {t_node = Tbinop (Tand, g,
                         {t_node = Tapp (s,[{t_node = Tvar u};r])})},h)
-      when ls_equal s ps_equ && vs_equal u v && not (t_occurs_single v r) ->
+      when ls_equal s ps_equ && vs_equal u v && not (Mvs.mem v r.t_vars) ->
         t_let_close_simp v r (t_implies_simp g h)
-    | _ when t_occurs_single v f ->
+    | _ when Mvs.mem v f.t_vars ->
         t_forall_close_simp [v] [] f
     | _ ->
         f

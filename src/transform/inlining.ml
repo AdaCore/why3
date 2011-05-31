@@ -111,7 +111,7 @@ let trivial tl =
   let add vs t = match t.t_node with
     | Tvar v when Mvs.mem v vs -> raise Util.FoldSkip
     | Tvar v -> Svs.add v vs
-    | _ when Svs.is_empty (t_freevars Svs.empty t) -> vs
+    | _ when Mvs.is_empty t.t_vars -> vs
     | _ -> raise Util.FoldSkip
   in
   try ignore (List.fold_left add Svs.empty tl); true

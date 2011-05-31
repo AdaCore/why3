@@ -261,7 +261,7 @@ type term = {
   t_ty    : ty option;
   t_label : label list;
   t_loc   : Loc.position option;
-  t_vars  : Svs.t;
+  t_vars  : int Mvs.t;
   t_tag   : int;
 }
 
@@ -286,7 +286,7 @@ and term_quant  = vsymbol list * bind_info * trigger * term
 and trigger = term list list
 
 and bind_info = {
-  bv_vars  : Svs.t;       (* free variables *)
+  bv_vars  : int Mvs.t;   (* free variables *)
   bv_subst : term Mvs.t   (* deferred substitution *)
 }
 
@@ -338,6 +338,10 @@ let bnd_map_fold fn acc bv =
   acc, { bv with bv_subst = s }
 
 (* hash-consing for terms and formulas *)
+
+let some_plus _ m n = Some (m + n)
+let add_t_vars s t = Mvs.union some_plus s t.t_vars
+let add_b_vars s (_,b,_) = Mvs.union some_plus s b.bv_vars
 
 module Hsterm = Hashcons.Make (struct
 
@@ -408,21 +412,18 @@ module Hsterm = Hashcons.Make (struct
     Hashcons.combine (t_hash_node t.t_node)
       (Hashcons.combine_list Hashtbl.hash (oty_hash t.t_ty) t.t_label)
 
-  let add_t_vars s t = Svs.union s t.t_vars
-  let add_b_vars s (_,b,_) = Svs.union s b.bv_vars
-
   let t_vars_node = function
-    | Tvar v -> Svs.singleton v
-    | Tconst _ -> Svs.empty
-    | Tapp (_,tl) -> List.fold_left add_t_vars Svs.empty tl
+    | Tvar v -> Mvs.singleton v 1
+    | Tconst _ -> Mvs.empty
+    | Tapp (_,tl) -> List.fold_left add_t_vars Mvs.empty tl
     | Tif (f,t,e) -> add_t_vars (add_t_vars f.t_vars t) e
     | Tlet (t,bt) -> add_b_vars t.t_vars bt
     | Tcase (t,bl) -> List.fold_left add_b_vars t.t_vars bl
     | Teps (_,b,_) -> b.bv_vars
     | Tquant (_,(_,b,_,_)) -> b.bv_vars
-    | Tbinop (_,f1,f2) -> Svs.union f1.t_vars f2.t_vars
+    | Tbinop (_,f1,f2) -> add_t_vars f1.t_vars f2
     | Tnot f -> f.t_vars
-    | Ttrue | Tfalse -> Svs.empty
+    | Ttrue | Tfalse -> Mvs.empty
 
   let tag n t = { t with t_tag = n ; t_vars = t_vars_node t.t_node }
 
@@ -443,7 +444,7 @@ let mk_term n ty = Hsterm.hashcons {
   t_node  = n;
   t_label = [];
   t_loc   = None;
-  t_vars  = Svs.empty;
+  t_vars  = Mvs.empty;
   t_ty    = ty;
   t_tag   = -1
 }
@@ -570,13 +571,15 @@ let rec t_subst_unsafe m t =
 
 and bv_subst_unsafe m b =
   (* restrict m to the variables free in b *)
-  let m = Mvs.inter (fun _ t () -> Some t) m b.bv_vars in
+  let m = Mvs.set_inter m b.bv_vars in
   (* if m is empty, return early *)
   if Mvs.is_empty m then b else
   (* remove from b.bv_vars the variables replaced by m *)
-  let s = Mvs.diff (fun _ () _ -> None) b.bv_vars m in
+  let s = Mvs.set_diff b.bv_vars m in
   (* add to b.bv_vars the free variables added by m *)
-  let s = Mvs.fold (fun _ t -> Svs.union t.t_vars) m s in
+  let mult n s = if n = 1 then s else Mvs.map (fun i -> i * n) s in
+  let join _ n t s = Mvs.union some_plus (mult n t.t_vars) s in
+  let s = Mvs.fold2_inter join b.bv_vars m s in
   (* apply m to the terms in b.bv_subst *)
   let h = Mvs.map (t_subst_unsafe m) b.bv_subst in
   (* join m to b.bv_subst *)
@@ -591,14 +594,13 @@ let t_subst_unsafe m t =
 
 let bnd_new s = { bv_vars = s ; bv_subst = Mvs.empty }
 
-let t_close_bound v t = (v, bnd_new (Svs.remove v t.t_vars), t)
+let t_close_bound v t = (v, bnd_new (Mvs.remove v t.t_vars), t)
 
-let t_close_branch p t = (p, bnd_new (Svs.diff t.t_vars p.pat_vars), t)
+let t_close_branch p t = (p, bnd_new (Mvs.set_diff t.t_vars p.pat_vars), t)
 
 let t_close_quant vl tl f =
-  let del_v s v = Svs.remove v s in
-  let add_t s t = Svs.union s t.t_vars in
-  let s = tr_fold add_t f.t_vars tl in
+  let del_v s v = Mvs.remove v s in
+  let s = tr_fold add_t_vars f.t_vars tl in
   let s = List.fold_left del_v s vl in
   (vl, bnd_new s, tl, t_prop f)
 
@@ -833,7 +835,7 @@ let t_gen_map fnT fnL mapV t = t_gen_map (Wty.memoize 17 fnT) fnL mapV t
 
 (* map over type and logic symbols *)
 
-let gen_mapV fnT = Mvs.mapi (fun v () -> t_var (gen_fresh_vsymbol fnT v))
+let gen_mapV fnT = Mvs.mapi (fun v _ -> t_var (gen_fresh_vsymbol fnT v))
 
 let t_s_map fnT fnL t = t_gen_map fnT fnL (gen_mapV fnT t.t_vars) t
 
@@ -1040,16 +1042,10 @@ let t_v_map fn t =
     let res = fn v in ty_equal_check v.vs_ty (t_type res); res in
   t_subst_unsafe (Mvs.mapi fn t.t_vars) t
 
-let t_v_fold fn acc t = Svs.fold (fun v a -> fn a v) t.t_vars acc
+let t_v_fold fn acc t = Mvs.fold (fun v _ a -> fn a v) t.t_vars acc
 
-let t_v_all pr t = Svs.for_all pr t.t_vars
-let t_v_any pr t = Svs.exists  pr t.t_vars
-
-(* looks for occurrence of a variable from set [s] in a term [t] *)
-
-let t_occurs s t = not (Svs.is_empty (Svs.inter s t.t_vars))
-
-let t_occurs_single v t = Svs.mem v t.t_vars
+let t_v_all pr t = Mvs.for_all (fun v _ -> pr v) t.t_vars
+let t_v_any pr t = Mvs.exists  (fun v _ -> pr v) t.t_vars
 
 (* replaces variables with terms in term [t] using map [m] *)
 
@@ -1061,7 +1057,7 @@ let t_subst_single v t1 t = t_subst (Mvs.singleton v t1) t
 
 (* set of free variables *)
 
-let t_freevars s t = Svs.union s t.t_vars
+let t_freevars = add_t_vars
 
 (* alpha-equality *)
 
@@ -1323,32 +1319,36 @@ let t_if_simp f1 f2 f3 =
   | _, _, Tfalse -> t_and_simp f1 f2
   | _, _, _      -> if t_equal f2 f3 then f2 else f123
 
-let t_let_simp e ((v,_,t) as bt) = match e.t_node with
-  | _ when not (Svs.mem v t.t_vars) -> snd (t_open_bound bt)
-  | Tvar _ -> let v,t = t_open_bound bt in t_subst_single v e t
-  | _ ->
-    begin match t.t_node with
-      | Tvar v' when vs_equal v v' -> e
-      | _ -> t_let e bt
-    end
+let small t = match t.t_node with
+  | Tvar _ | Tconst _ -> true
+  | _ -> false
 
-let t_let_close_simp v e t = match e.t_node with
-  | _ when not (Svs.mem v t.t_vars) -> t
-  | Tvar _ -> t_subst_single v e t
-  | _ ->
-    begin match t.t_node with
-      | Tvar v' when vs_equal v v' -> e
-      | _ -> t_let_close v e t
-    end
+let t_let_simp e ((v,b,t) as bt) =
+  let n = Mvs.find_default v 0 t.t_vars in
+  if n = 0 then
+    t_subst_unsafe b.bv_subst t else
+  if n = 1 || small e then begin
+    ty_equal_check v.vs_ty (t_type e);
+    t_subst_unsafe (Mvs.add v e b.bv_subst) t
+  end else
+    t_let e bt
 
-let vl_filter f vl =
-  List.filter (fun v -> Svs.mem v f.t_vars) vl
+let t_let_close_simp v e t =
+  let n = Mvs.find_default v 0 t.t_vars in
+  if n = 0 then t else
+  if n = 1 || small e then
+    t_subst_single v e t
+  else
+    t_let_close v e t
 
-let tr_filter f tl =
-  List.filter (List.for_all (fun e -> Svs.subset e.t_vars f.t_vars)) tl
+let v_occurs f v = Mvs.mem v f.t_vars
+let v_subset f e = Mvs.set_submap e.t_vars f.t_vars
+
+let vl_filter f vl = List.filter (v_occurs f) vl
+let tr_filter f tl = List.filter (List.for_all (v_subset f)) tl
 
 let t_quant_simp q ((vl,_,_,f) as qf) =
-  if List.for_all (fun v -> Svs.mem v f.t_vars) vl then
+  if List.for_all (v_occurs f) vl then
     t_quant q qf
   else
     let vl,tl,f = t_open_quant qf in
@@ -1356,7 +1356,7 @@ let t_quant_simp q ((vl,_,_,f) as qf) =
     t_quant_close q vl (tr_filter f tl) f
 
 let t_quant_close_simp q vl tl f =
-  if List.for_all (fun v -> Svs.mem v f.t_vars) vl then
+  if List.for_all (v_occurs f) vl then
     t_quant_close q vl tl f
   else
     let vl = vl_filter f vl in if vl = [] then f else

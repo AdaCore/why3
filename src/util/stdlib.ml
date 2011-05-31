@@ -57,6 +57,9 @@ module type S =
     val inter : (key -> 'a -> 'b -> 'c option) -> 'a t -> 'b t -> 'c t
     val diff : (key -> 'a -> 'b -> 'a option) -> 'a t -> 'b t -> 'a t
     val submap : (key -> 'a -> 'b -> bool) -> 'a t -> 'b t -> bool
+    val set_inter : 'a t -> 'b t -> 'a t
+    val set_diff : 'a t -> 'b t -> 'a t
+    val set_submap : 'a t -> 'b t -> bool
     val find_default : key -> 'a -> 'a t -> 'a
     val find_option : key -> 'a t -> 'a option
     val map_filter: ('a -> 'b option) -> 'a t -> 'b t
@@ -475,6 +478,11 @@ module Make(Ord: OrderedType) = struct
             submap pr (Node (l1, v1, d1, Empty, 0)) l2 && submap pr r1 t2
           else
             submap pr (Node (Empty, v1, d1, r1, 0)) r2 && submap pr l1 t2
+
+
+    let set_inter m1 m2 = inter (fun _ x _ -> Some x) m1 m2
+    let set_diff m1 m2 = diff (fun _ _ _ -> None) m1 m2
+    let set_submap m1 m2 = submap (fun _ _ _ -> true) m1 m2
 
 
     let rec find_default x def = function

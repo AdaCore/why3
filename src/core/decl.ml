@@ -40,9 +40,8 @@ type logic_decl = lsymbol * ls_defn option
 exception UnboundVar of vsymbol
 
 let check_fvs f =
-  let fvs = t_freevars Svs.empty (t_prop f) in
-  Svs.iter (fun vs -> raise (UnboundVar vs)) fvs;
-  f
+  Mvs.iter (fun vs _ -> raise (UnboundVar vs)) f.t_vars;
+  t_prop f
 
 let check_vl ty v = ty_equal_check ty v.vs_ty
 let check_tl ty t = ty_equal_check ty (t_type t)
@@ -568,14 +567,14 @@ let merge_known kn1 kn2 =
   Mid.union check_known kn1 kn2
 
 let known_add_decl kn0 decl =
-  let kn = Mid.map (fun _ -> decl) decl.d_news in
+  let kn = Mid.map (const decl) decl.d_news in
   let check id decl0 _ =
     if d_equal decl0 decl
     then raise (KnownIdent id)
     else raise (RedeclaredIdent id)
   in
   let kn = Mid.union check kn0 kn in
-  let unk = Mid.diff (fun _ _ _ -> None) decl.d_syms kn in
+  let unk = Mid.set_diff decl.d_syms kn in
   if Sid.is_empty unk then kn
   else raise (UnknownIdent (Sid.choose unk))
 

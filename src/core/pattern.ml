@@ -128,7 +128,7 @@ module Compile (X : Action) = struct
             if Mls.mem cs types then comp_cases cs al else comp_wilds ()
         | _ ->
             let base =
-              if Mls.submap (const3 true) css types then []
+              if Mls.set_submap css types then []
               else [mk_branch (pat_wild ty) (comp_wilds ())]
             in
             let add cs ql acc =

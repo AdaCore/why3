@@ -70,7 +70,7 @@ module Transform = struct
   let type_close_select tvs ts fn f =
     let fold acc t = extract_tvar acc (app_type t) (t_type t) in
     let tvm = List.fold_left fold Mtv.empty ts in
-    let tvs = Mtv.diff (const3 None) tvs tvm in
+    let tvs = Mtv.set_diff tvs tvm in
     let get_vs tv = create_vsymbol (id_clone tv.tv_name) ty_type in
     let tvm' = Mtv.mapi (fun v () -> get_vs v) tvs in
     let vl = Mtv.values tvm' in
@@ -143,7 +143,7 @@ module Transform = struct
     (* Debug.print_list Pretty.print_ty Format.std_formatter type_vars; *)
     let tv_to_ty = ty_match Mtv.empty (of_option lsymbol.ls_value) ty in
     let new_ty = type_variable_only_in_value lsymbol in
-    let tv_to_ty = Mtv.inter (fun _ tv () -> Some tv) tv_to_ty new_ty in
+    let tv_to_ty = Mtv.set_inter tv_to_ty new_ty in
     (* Debug.print_mtv Pretty.print_ty Format.err_formatter tv_to_ty; *)
     let args = List.map (term_transform kept varM) args in
     (* fresh args to be added at the beginning of the list of arguments *)

@@ -129,7 +129,7 @@ type term = private {
   t_ty    : ty option;
   t_label : label list;
   t_loc   : Loc.position option;
-  t_vars  : Svs.t;
+  t_vars  : int Mvs.t;
   t_tag   : int;
 }
 
@@ -366,10 +366,7 @@ val t_v_fold : ('a -> vsymbol -> 'a) -> 'a -> term -> 'a
 val t_v_all : (vsymbol -> bool) -> term -> bool
 val t_v_any : (vsymbol -> bool) -> term -> bool
 
-(** Variable occurrence check and substitution *)
-
-val t_occurs : Svs.t -> term -> bool
-val t_occurs_single : vsymbol -> term -> bool
+(** Variable substitution *)
 
 val t_subst : term Mvs.t -> term -> term
 val t_subst_single : vsymbol -> term -> term -> term
@@ -378,7 +375,7 @@ val t_ty_subst : ty Mtv.t -> term Mvs.t -> term -> term
 
 (** Find free variables and type variables *)
 
-val t_freevars    : Svs.t -> term -> Svs.t
+val t_freevars    : int Mvs.t -> term -> int Mvs.t
 val t_ty_freevars : Stv.t -> term -> Stv.t
 
 (** Map/fold over types and logical symbols *)
