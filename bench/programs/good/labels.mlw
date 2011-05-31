@@ -1,0 +1,19 @@
+module Labels
+
+  use import int.Int
+  use import module ref.Ref
+
+  logic fst (x: ('a, 'b)) : 'a = let (x1, _) = x in x1
+
+  let test (a: (ref int, int)) =
+    {}
+    let (r,_) = a in r := !r + 1
+    { !(fst a) = (old !(fst a)) + 1 }
+
+end
+
+(*
+Local Variables:
+compile-command: "unset LANG; make -C ../../.. bench/programs/good/labels"
+End:
+*)
