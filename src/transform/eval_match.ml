@@ -130,22 +130,27 @@ let is_algebraic_type kn ty = match ty.ty_node with
   | Tyapp (ts, _) -> find_constructors kn ts <> []
   | Tyvar _ -> false
 
+(* The following memoization by function definition is unsafe,
+   since the same definition can be used in different contexts.
+   If we could produce the record updates {| x with field = v |}
+   that were linear (by eliminating occurrences of x.field in v),
+   inline_nonrec_linear might not call eval_match at all and so
+   be independent of the context. FIXME/TODO *)
+
+let inline_cache = Wdecl.create 17
+
 let rec inline_nonrec_linear kn ls tyl ty =
-  let d = Mid.find ls.ls_name kn in
   (* at least one actual parameter (or the result) has an algebraic type *)
   List.exists (is_algebraic_type kn) (oty_cons tyl ty) &&
   (* and ls is not recursively defined and is linear *)
+  let d = Mid.find ls.ls_name kn in
   match d.d_node with
-    | Dlogic dl ->
-        let no_occ (ls', def) = match def with
-          | None ->
-              true
-          | Some def ->
-              let _, t = open_ls_defn def in
-              let eval = eval_match ~inline:inline_nonrec_linear in
-              not (t_s_any Util.ffalse (ls_equal ls) t) &&
-              (not (ls_equal ls ls') || linear (eval kn t))
-        in
-        List.for_all no_occ dl
-    | _ ->
-        false
+    | Dlogic [_, Some def] ->
+        begin try Wdecl.find inline_cache d with Not_found ->
+          let _, t = open_ls_defn def in
+          let res = not (t_s_any Util.ffalse (ls_equal ls) t) &&
+            linear (eval_match ~inline:inline_nonrec_linear kn t) in
+          Wdecl.set inline_cache d res;
+          res
+        end
+    | _ -> false
