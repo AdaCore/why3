@@ -65,15 +65,23 @@ module Array
     { length result = length a and
       forall i:int. 0 <= i < length result -> result[i] = a[i] }
 
-  parameter fill : a:array 'a -> ofs:int -> len:int -> v:'a ->
-   { 0 <= ofs and ofs + len <= length a }
-   unit
-   writes a
-   { (forall i:int.
-       (0 <= i < ofs or ofs + len <= i < length a) -> a[i] = (old a)[i])
-     and
-     (forall i:int.
-       ofs <= i < ofs + len -> a[i] = v) }
+  let fill (a:array 'a) (ofs:int) (len:int) (v:'a) =
+    { 0 <= ofs and ofs + len <= length a }
+    label Init:
+    for k = 0 to len - 1 do
+      invariant {
+        (forall i:int.
+        (0 <= i < ofs or ofs + len <= i < length a) -> a[i] = (at a Init)[i])
+        and
+        (forall i:int. ofs <= i < ofs + k -> a[i] = v)
+      }
+      a[ofs + k] <- v
+    done
+    { (forall i:int.
+        (0 <= i < ofs or ofs + len <= i < length a) -> a[i] = (old a)[i])
+      and
+      (forall i:int.
+        ofs <= i < ofs + len -> a[i] = v) }
 
   parameter blit :
    a1:array 'a -> ofs1:int -> a2:array 'a -> ofs2:int -> len:int ->
@@ -169,7 +177,9 @@ module TestArray
   let test_fill () =
     let a = make 17 True in
     fill a 10 4 False;
-    assert { a[10] = False }
+    assert { a[9] = True };
+    assert { a[10] = False };
+    assert { a[14] = True }
 
   let test_blit () =
     let a1 = make 17 True in
