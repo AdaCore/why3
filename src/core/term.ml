@@ -577,6 +577,7 @@ and bv_subst_unsafe m b =
   (* remove from b.bv_vars the variables replaced by m *)
   let s = Mvs.set_diff b.bv_vars m in
   (* add to b.bv_vars the free variables added by m *)
+  (* if you are tempted to inline mult into some_plus, think better *)
   let mult n s = if n = 1 then s else Mvs.map (fun i -> i * n) s in
   let join _ n t s = Mvs.union some_plus (mult n t.t_vars) s in
   let s = Mvs.fold2_inter join b.bv_vars m s in
