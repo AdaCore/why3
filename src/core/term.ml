@@ -1232,27 +1232,27 @@ let rec t_match s t1 t2 =
 
 (* occurrence check *)
 
-let rec t_occurs_term r t =
-  t_equal r t || t_any (t_occurs_term r) t
+let rec t_occurs r t =
+  t_equal r t || t_any (t_occurs r) t
 
-let rec t_occurs_term_alpha r t =
-  t_equal_alpha r t || t_any (t_occurs_term_alpha r) t
+let rec t_occurs_alpha r t =
+  t_equal_alpha r t || t_any (t_occurs_alpha r) t
 
 (* substitutes term [t2] for term [t1] in term [t] *)
 
-let rec t_subst_term t1 t2 t =
-  if t_equal t t1 then t2 else t_map (t_subst_term t1 t2) t
+let rec t_replace t1 t2 t =
+  if t_equal t t1 then t2 else t_map (t_replace t1 t2) t
 
-let t_subst_term t1 t2 t =
+let t_replace t1 t2 t =
   t_ty_check t2 t1.t_ty;
-  t_subst_term t1 t2 t
+  t_replace t1 t2 t
 
-let rec t_subst_term_alpha t1 t2 t =
-  if t_equal_alpha t t1 then t2 else t_map (t_subst_term_alpha t1 t2) t
+let rec t_replace_alpha t1 t2 t =
+  if t_equal_alpha t t1 then t2 else t_map (t_replace_alpha t1 t2) t
 
-let t_subst_term_alpha t1 t2 t =
+let t_replace_alpha t1 t2 t =
   t_ty_check t2 t1.t_ty;
-  t_subst_term_alpha t1 t2 t
+  t_replace_alpha t1 t2 t
 
 (* constructors with propositional simplification *)
 

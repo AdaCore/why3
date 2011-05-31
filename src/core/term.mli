@@ -401,11 +401,11 @@ module Hterm_alpha : Hashtbl.S with type key = term
 
 (** Subterm occurrence check and replacement *)
 
-val t_occurs_term : term -> term -> bool
-val t_occurs_term_alpha : term -> term -> bool
+val t_occurs : term -> term -> bool
+val t_occurs_alpha : term -> term -> bool
 
-val t_subst_term : term -> term -> term -> term
-val t_subst_term_alpha : term -> term -> term -> term
+val t_replace : term -> term -> term -> term
+val t_replace_alpha : term -> term -> term -> term
 
 (** Binder-free term matching *)
 
