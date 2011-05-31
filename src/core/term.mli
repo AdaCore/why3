@@ -332,10 +332,10 @@ module TermTF : sig
   (** [t_selecti fnT fnF acc t] is [t_select (fnT acc) (fnF acc) t] *)
 
   val t_map : (term -> term) -> (term -> term) -> term -> term
-  (** [t_map fnT fnF = t_map (t_select fnT fnF) *)
+  (** [t_map fnT fnF = t_map (t_select fnT fnF)] *)
 
   val t_fold : ('a -> term -> 'a) -> ('a -> term -> 'a) -> 'a -> term -> 'a
-  (** [t_fold fnT fnF = t_fold (t_selecti fnT fnF) *)
+  (** [t_fold fnT fnF = t_fold (t_selecti fnT fnF)] *)
 
   val t_map_fold : ('a -> term -> 'a * term) ->
     ('a -> term -> 'a * term) -> 'a -> term -> 'a * term

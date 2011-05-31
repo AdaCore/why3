@@ -1,0 +1,53 @@
+\begin{syntax}
+  expr ::= integer                                ; integer constant
+       | real 			                  ; real constant
+       | lqualid 		                  ; symbol
+       | prefix-op expr 	                  ;
+       | expr infix-op expr 	                  ;
+       | expr "[" expr "]"                        ; brackets
+       | expr "[" expr "]" "<-" expr              ; brackets assignment
+       | expr "[" expr infix-op-1 expr "]" 	  ; ternary brackets
+       | expr expr+ 		                  ; function application
+       | "fun" type-v-param+ "->" triple          ; lambda abstraction
+       | "let" "rec" recfun ("with" recfun)*      ; recursive functions
+       | "if" expr "then" expr ("else" expr)?     ; conditional
+       | expr ";" expr                            ; sequence
+       | "label" uident ":" expr                  ; label
+       | "loop" loop-annot "end"                  ; infinite loop
+       | "while" expr "do" loop-annot expr "done" ; while loop
+       | "for" lident "=" expr to-downto expr     ; for loop
+         "do" loop-inv expr "done"                ;
+       | assert annotation                        ; assertion
+       | "absurd"                                 ;
+       | "raise" uqualid                          ; exception raising
+       | "raise" "(" uqualid expr ")"             ;
+       | "try" expr "with" ("|" handler)+ "end"   ; exception catching
+       | "any" type-c                             ; 
+       | "let" pattern "=" expr "in" expr         ; local binding
+       | "match" expr ("," expr)* "with"          ; pattern matching
+         ("|" expr-case)+ "end"                   ;
+       | "(" expr ("," expr)+ ")"                 ; tuple
+       | "{|" field-value+ "|}"                   ; record
+       | exopr "." lqualid                        ; field access
+       | expr "." lqualid "<-" expr               ; field assignment
+       | "{|" expr "with" field-value+ "|}"       ; field update
+       | expr ":" type 	                          ; cast
+       | "(" expr ")" 	      	                  ; parentheses
+  \
+  expr-case ::= pattern "->" expr                 ;
+  \
+  field-value ::= lqualid "=" expr                ;
+  \
+  triple ::= expr                                 ;
+    | pre expr post                               ; Hoare triple
+  \
+  assert ::= "assert" | "assume" | "check"
+  \
+  to-downto ::= "to" | "downto"
+  \
+  loop-annot ::= loop-inv? variant?
+  \
+  loop-inv ::= "invariant" annotation
+  \
+  variant ::= "variant" "{" term "}" ("with" lqualid)?
+\end{syntax}

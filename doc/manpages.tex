@@ -137,7 +137,7 @@ provers and to replace them in the configuration file. The option
 \label{sec:why3ref}
 
 \why\ is primarily used to call provers on goals contained in an
-input file. By default, such a file must be written in \why language
+input file. By default, such a file must be written in \why\ language
 and have the extension \texttt{.why}. However, a dynamically loaded
 plugin can register a parser for some other format of logical problems,
 \eg{} TPTP or SMTlib.
@@ -295,16 +295,20 @@ The preferences window allows you customize
 
 \section{The \texttt{why3ml} tool}
 
-The \texttt{why3ml} is an additional layer on \why\ library for
-generating verification conditions from WhyML programs. This tool and
-the syntax of WhyML programs is intentionally left undocumented since
-it might evolve significantly in the near future.
+\texttt{why3ml} is an additional layer on \why\ library for
+generating verification conditions from \whyml\ programs.
+The command-line of \texttt{why3ml} is identical to that of
+\texttt{why3}, but also accepts files with extension \texttt{.mlw} as
+input files containing \whyml\ modules (see chapter~\ref{chap:whyml}
+and section~\ref{sec:syntax:whyml}). Modules are turned into
+theories containing verification conditions as goals, and then
+\texttt{why3ml} behaves exactly as \texttt{why3} for the remaining of
+the process.
+Note that files with extension \texttt{.mlw} can also be loaded in
+\texttt{why3ide}.
 
-For those who want to experiment with it, examples are provided in
-\texttt{examples/\ programs}. The files \texttt{*.mlw} can be loaded in
-the GUI.
-
-[TO BE COMPLETED LATER]
+For those who want to experiment with \whyml, many examples are provided in
+\texttt{examples/programs}.
 
 \section{The \texttt{why3bench} tool}
 

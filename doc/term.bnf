@@ -15,6 +15,9 @@
        | "match" term ("," term)* "with" ;
          ("|" term-case)+ "end"          ; pattern matching
        | "(" term ("," term)+ ")" ; tuple
+       | "{|" field-value+ "|}"   ; record 
+       | term "." lqualid         ; field access
+       | "{|" term "with" field-value+ "|}"    ; field update
        | term ":" type 	          ; cast
        | label term 	      	  ; label
        | "(" term ")" 	      	  ; parentheses
@@ -27,5 +30,7 @@
 	    | lident              ; variable
 	    | uident pattern*     ; constructor
 	    | "(" pattern ")" 	  ; parentheses
-	    | pattern "as" lident ; binding %
+	    | pattern "as" lident ; binding
+  \
+  field-value ::= lqualid "=" term
 \end{syntax}

@@ -1,7 +1,11 @@
 \chapter{Syntax Reference}
 \label{chap:syntaxref}
 
-This chapter gives the grammar for \why\ input files.
+This chapter gives the grammar for \why\ and \whyml\ input files.
+
+\section{Lexical conventions}
+
+Lexical conventions are common to \why\ and \whyml.
 
 % TODO: blanks
 
@@ -48,6 +52,9 @@ characters they are built from:
  \textit{op-char-4};
 \item level 1: all other operators (non-terminal \textit{infix-op-1}).
 \end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Why3 Language}
 
 \paragraph{Terms.}
 The syntax for terms is given in Figure~\ref{fig:bnf:term}.
@@ -133,6 +140,43 @@ The syntax for theories is given Figure~\ref{fig:bnf:theory}.
   \caption{Syntax for theories.}
 \label{fig:bnf:theory}
 \end{figure}
+
+\paragraph{Files.}
+A \why\ input file is a (possibly empty) list of theories.
+\begin{center}\framebox{\input{./why_file_bnf.tex}}\end{center}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Why3ML Language}\label{sec:syntax:whyml}
+
+\paragraph{Types.}
+The syntax for program types is given in figure~\ref{fig:bnf:typev}.
+\begin{figure}[p]
+  \begin{center}\framebox{\input{./typev_bnf.tex}}\end{center}
+  \caption{Syntax for program types.}
+\label{fig:bnf:typev}
+\end{figure}
+
+\paragraph{Expressions.}
+The syntax for program expressions is given in figure~\ref{fig:bnf:expr}.
+\begin{figure}[p]
+  \begin{center}\framebox{\input{./expr_bnf.tex}}\end{center}
+  \caption{Syntax for program expressions.}
+\label{fig:bnf:expr}
+\end{figure}
+
+\paragraph{Modules.}
+The syntax for modules is given in figure~\ref{fig:bnf:module}.
+\begin{figure}[p]
+  \begin{center}\framebox{\input{./module_bnf.tex}}\end{center}
+  \caption{Syntax for modules.}
+\label{fig:bnf:module}
+\end{figure}
+
+\paragraph{Files.}
+A \whyml\ input file is a (possibly empty) list of theories and modules.
+\begin{center}\framebox{\input{./whyml_file_bnf.tex}}\end{center}
+
 
 %%% Local Variables:
 %%% mode: latex

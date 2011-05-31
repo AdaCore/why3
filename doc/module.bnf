@@ -1,0 +1,27 @@
+\begin{syntax}
+  module ::= "module" uident label* mdecl* "end"
+  \
+  mdecl ::= decl                                ; theory declaration
+    | "type" mtype-decl ("with" mtype-decl)*    ; mutable types
+    | "let" lident label* pgm-defn              ;
+    | "let" "rec" recfun ("with" recfun)*  ;
+    | "parameter" lident label* pgm-decl        ;
+    | "exception" lident label* type?           ;
+    | "use" imp-exp "module" tqualid ("as" uident-opt)?     ;
+    | "namespace" "import"? uident-opt mdecl* "end" ;
+  \
+  mtype-decl ::= lident label* ("'" lident label*)* mtype-defn;
+  \
+  mtype-defn ::=                                     ; abstract type
+    | "=" type                                       ; alias type
+    | "=" "|"? type-case ("|" type-case)*            ; algebraic type
+    | "=" "{|" mrecord-field (";" mrecord-field)* "|}" ; record type
+  \
+  mrecord-field ::= "mutable"? lident label* ":" type
+  \
+  pgm-decl ::= ":" type-v    ;
+    | type-v-param+ ":" type-c    ;
+  \
+  pgm-defn ::= type-v-param+ (":" type)? "=" triple ;
+    | "=" "fun" type-v-param+ "->" triple ;
+\end{syntax}
