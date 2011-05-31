@@ -177,6 +177,7 @@ type label = Term.vsymbol
 
 type irec_variant = ivsymbol * Term.term * Term.lsymbol option
 
+(* FIXME: get rid of ipattern *)
 type ipattern = {
   ipat_pat  : Term.pattern; (* program variables *)
   ipat_node : ipat_node;
@@ -242,7 +243,7 @@ type pattern = {
   ppat_node : ppat_node;
 }
 
-and ppat_node = 
+and ppat_node =
   | Pwild
   | Pvar  of pvsymbol
   | Papp  of Term.lsymbol * pattern list

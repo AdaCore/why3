@@ -625,6 +625,15 @@ and dterm_node ~localize loc uc env = function
       let p = { dp_node = Papp (cs,pl) ; dp_ty = e.dt_ty } in
       (* prepare the result *)
       let tyl,ty = Denv.specialize_lsymbol ~loc cs in
+      let set_pat_var_ty f tyf = match f with
+        | Some _ ->
+            ()
+        | None ->
+            let _, xty as v = Queue.take q in
+            assert (Denv.unify xty tyf);
+            Queue.push v q
+      in
+      List.iter2 set_pat_var_ty fl tyl;
       let al = List.map2 (fun f ty -> match f with
         | Some (_,e) ->
             let loc = e.pp_loc in
@@ -632,8 +641,7 @@ and dterm_node ~localize loc uc env = function
             unify_raise ~loc:loc e.dt_ty ty;
             e
         | None ->
-            let (x,xty) = Queue.take q in
-            unify_raise ~loc xty ty;
+            let (x, _) = Queue.take q in
             { dt_node = Tvar x ; dt_ty = ty }) fl tyl
       in
       let t = { dt_node = Tapp (cs,al) ; dt_ty = Util.of_option ty } in

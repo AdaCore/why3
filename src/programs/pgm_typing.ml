@@ -473,7 +473,7 @@ and dexpr_desc ~ghost env loc = function
       let constructor d f tyf = match f with
         | Some (_, f) ->
             let f = dexpr ~ghost env f in
-            assert (Denv.unify f.dexpr_type tyf);
+            expected_type f tyf;
             let ty = create_type_var loc in
             assert (Denv.unify d.dexpr_type (tyapp ts_arrow [tyf; ty]));
             create (DEapply (d, f)) ty
@@ -486,6 +486,60 @@ and dexpr_desc ~ghost env loc = function
       in
       let d = List.fold_left2 constructor d fl tyl in
       d.dexpr_desc, ty
+  | Ptree.Eupdate (e1, fl) ->
+      let e1 = dexpr ~ghost env e1 in
+      let _, cs, fl = Typing.list_fields (impure_uc env.uc) fl in
+      let tyl, ty = Denv.specialize_lsymbol ~loc cs in
+      let ty = of_option ty in
+      expected_type e1 ty;
+      let n = ref (-1) in
+      let q = Queue.create () in
+      (* prepare the pattern *)
+      let pl = List.map2 (fun f ty -> match f with
+        | Some _ ->
+            { dp_node = Denv.Pwild ; dp_ty = ty }
+        | None ->
+            let x = incr n; "x:" ^ string_of_int !n in
+            let i = { id = x ; id_lab = []; id_loc = loc } in
+            Queue.add (x,ty) q;
+            { dp_node = Denv.Pvar i ; dp_ty = ty }) fl tyl
+      in
+      let p = { dp_node = Denv.Papp (cs,pl) ; dp_ty = ty } in
+      (* prepare the result *)
+      new_regions_vars ();
+      let tyl, ty = specialize_lsymbol ~loc (Htv.create 17) cs in
+      let ty = of_option ty in
+      (* unify pattern variable types with expected types *)
+      let set_pat_var_ty f tyf = match f with
+        | Some _ ->
+            ()
+        | None ->
+            let _, xty as v = Queue.take q in
+            assert (Denv.unify xty tyf);
+            Queue.push v q
+      in
+      List.iter2 set_pat_var_ty fl tyl;
+      let create d ty = { dexpr_desc = d; dexpr_type = ty; dexpr_loc = loc } in
+      let apply t f tyf = match f with
+        | Some (_,e) ->
+            let e = dexpr ~ghost env e in
+            expected_type e tyf;
+            let ty = create_type_var loc in
+            assert (Denv.unify t.dexpr_type (tyapp ts_arrow [tyf; ty]));
+            create (DEapply (t, e)) ty
+        | None ->
+            let x, _ = Queue.take q in
+            let v = create (DElocal (x, tyf)) tyf in
+            let ty = create_type_var loc in
+            assert (Denv.unify t.dexpr_type (tyapp ts_arrow [tyf; ty]));
+            create (DEapply (t, v)) ty
+      in
+      let t =
+        let ps = get_psymbol cs in
+        create (DElogic ps.ps_pure) (dcurrying tyl ty)
+      in
+      let t = List.fold_left2 apply t fl tyl in
+      DEmatch (e1, [p, t]), ty
   | Ptree.Eassign (e1, q, e2) ->
       let e1 = dexpr ~ghost env e1 in
       let e2 = dexpr ~ghost env e2 in
@@ -1563,8 +1617,6 @@ and expr_desc gl env loc ty = function
       in
       d, tpure ty, ef
   | IEmatch (i, bl) ->
-      if is_mutable_ty i.i_impure.vs_ty then
-              errorm ~loc "cannot match over a reference";
       let v = Mvs.find i.i_impure env in
       let branch ef (p, e) =
         let env, p = pattern env p in

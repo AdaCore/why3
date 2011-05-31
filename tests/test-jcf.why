@@ -1,4 +1,15 @@
 
+theory Test
+
+  use import bool.Bool
+
+  type t 'a = {| a: 'a; b: bool; c: 'a |}
+
+  goal G: forall x: t bool.
+    {| x with a = 0 |}.a = 0
+
+end
+
 theory Order
   type t
   logic (<=) t t

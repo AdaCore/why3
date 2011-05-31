@@ -1146,6 +1146,8 @@ expr_sub:
    { mk_expr (Etuple ($2 :: $4)) }
 | LEFTREC list1_field_expr opt_semicolon RIGHTREC
    { mk_expr (Erecord (List.rev $2)) }
+| LEFTREC expr_arg WITH list1_field_expr opt_semicolon RIGHTREC
+   { mk_expr (Eupdate ($2, List.rev $4)) }
 | BEGIN END
     { mk_expr (Etuple []) }
 | expr_arg LEFTSQ expr RIGHTSQ

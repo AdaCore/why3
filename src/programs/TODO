@@ -1,4 +1,6 @@
 
+o get rid of types Pgm_ttree.{ipattern, pattern} (use logical patterns instead)
+
 o bug in test-pgm-jcf: scope
 
 o freshness analysis
@@ -6,13 +8,13 @@ o freshness analysis
 o no `old' in loop invariants
 o use of old in loop invariant should be reported as an error (correctly)
 
-o {| e with x1 = e1; ...; xn = en |}
-
 o syntactic sugar for postcondition:
   { pat | q } stands for { let pat = result in q }
 
   particular case { x | ... } to use x instead of result
   but also { a,b | ... }, etc.
+
+  Andrei: bad idea
 
 o automatically add a label pre_f at entrance of each function f
   and then replace (old t) by (at t pre_f)

@@ -3,35 +3,26 @@ module M
   use import int.Int
   use import module ref.Ref
 
-  parameter r : ref int
+  type t 'a = {| a: 'a; b: bool; c: 'a |}
 
-  let test1 () =
-    let x = ref 0 in
-    let f (y: int) = {} x := !x + y { !x = old !x + y } in
-    f 2;
-    assert { !x = 2 }
+  let test1 (x: t (ref int)) =
+    {}
+    let y = {| x with a = 0; c = 0 |} in
+    x = y
+    { result = True }
 
-  let rec test2 () =
-    { }
-    r := 0
-    { !r = 0 }
-
+(***
   use import option.Option
 
   parameter clear (o : option (ref int)) :
     {} unit writes (match o with Some r -> r end).contents { !r = 0 }
-
-  let test4 () =
-    let r = ref 0 in
-    let a = (r, 0) in
-    incr_fst a;
-    assert { !(fst a) = 1 }
+***)
 
   (* BUG: x escapes its scope (in the postcondition) => should be an error *)
   (* let scope (a: ref int) = let x = a in fun () -> {} x := 0 { !x = 0 } *)
 
-  let foo (a: ref int) = let x = a in fun () -> {} x := 0 { !a = 0 }
-  let test3 () = let x = ref 0 in begin foo x (); assert { !x = 0 } end
+(*   let foo (a: ref int) = let x = a in fun () -> {} x := 0 { !a = 0 } *)
+(*   let test3 () = let x = ref 0 in begin foo x (); assert { !x = 0 } end *)
 
 end
 
