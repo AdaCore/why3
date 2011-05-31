@@ -976,6 +976,9 @@ program_decl:
     { Dletrec $3 }
 | PARAMETER lident_rich_pgm labels COLON type_v
     { Dparam (add_lab $2 $3, $5) }
+| PARAMETER lident_rich_pgm labels list1_type_v_param COLON type_c
+    { let tv = Tarrow ($4, $6) in
+      Dparam (add_lab $2 $3, tv) }
 | EXCEPTION uident labels
     { Dexn (add_lab $2 $3, None) }
 | EXCEPTION uident labels pure_type
@@ -1274,6 +1277,20 @@ type_v:
    { Tarrow ([add_lab $1 $2, Some $4], $6) }
    /* TODO: we could alllow lidents instead, e.g. x y : int -> ... */
    /*{ Tarrow (List.map (fun x -> x, Some $3) $1, $5) }*/
+;
+
+type_v_param:
+/* TODO
+| simple_type_v
+   { [id_anonymous (), Some $1] }
+*/
+| LEFTPAR lidents_lab COLON type_v RIGHTPAR
+   { List.map (fun i -> (i, Some $4)) $2 }
+;
+
+list1_type_v_param:
+| type_v_param                    { $1 }
+| type_v_param list1_type_v_param { $1 @ $2 }
 ;
 
 simple_type_v:
