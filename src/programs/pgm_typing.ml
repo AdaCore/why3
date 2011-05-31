@@ -723,7 +723,9 @@ let iadd_local env x ty =
   in
   env, v
 
-let rec type_effect_term env { pp_loc = loc; pp_desc = d } = match d with
+let rec type_effect_term env t =
+  let loc = t.pp_loc in
+  match t.pp_desc with
   | PPvar (Qident x) when Mstr.mem x.id env.i_effects ->
       let v = Mstr.find x.id env.i_effects in
       v.vs_ty
@@ -735,6 +737,15 @@ let rec type_effect_term env { pp_loc = loc; pp_desc = d } = match d with
       with Not_found ->
         errorm ~loc "unbound symbol %a" print_qualid q
       end
+(***
+  | _ ->
+      let uc = effect_uc env.i_uc in
+      let t = Typing.type_term uc env.i_denv env.i_effects t in
+      begin match t.t_ty with
+        | Some ty -> ty
+        | None -> errorm ~loc "term expected"
+      end
+***)
   | _ ->
       errorm ~loc "unsupported effect syntax"
 

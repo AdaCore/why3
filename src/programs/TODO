@@ -1,13 +1,10 @@
 
-o bug in test-pgm-jcf: incr_fst
-
 o bug in test-pgm-jcf: scope
-
-o old(...) should not contain any local logical variable (let / match)
 
 o freshness analysis
 
 o no `old' in loop invariants
+o use of old in loop invariant should be reported as an error (correctly)
 
 o {| e with x1 = e1; ...; xn = en |}
 
@@ -20,8 +17,6 @@ o syntactic sugar for postcondition:
 o automatically add a label pre_f at entrance of each function f
   and then replace (old t) by (at t pre_f)
   (so that there is no more 'old' in the abstract syntax)
-
-o use of old in loop invariant should be reported as an error (correctly)
 
 o what about pervasives old, at, label, unit = ()
   in particular, how to prevent old and at from being used in programs?

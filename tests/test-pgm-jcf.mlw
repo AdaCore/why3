@@ -16,13 +16,10 @@ module M
     r := 0
     { !r = 0 }
 
-  logic fst (x: ('a, 'b)) : 'a = let (x1, _) = x in x1
+  use import option.Option
 
-  (* BUG *)
-  let incr_fst (a: (ref int, int)) =
-    {}
-    let (r,_) = a in r := !r + 1
-    { let (x,_) = a in !x = (old !x) + 1 }
+  parameter clear (o : option (ref int)) :
+    {} unit writes (match o with Some r -> r end).contents { !r = 0 }
 
   let test4 () =
     let r = ref 0 in

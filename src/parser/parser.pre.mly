@@ -1322,12 +1322,22 @@ annotation:
 | LEFTBRC lexpr RIGHTBRC { $2 }
 ;
 
+annotation_post:
+| LEFTBRC RIGHTBRC       { mk_pp PPtrue }
+| LEFTBRC lexpr RIGHTBRC { $2 }
+/*
+| LEFTBRC pat_conj BAR lexpr RIGHTBRC
+    { let id = { id = "result"; id_lab = []; id_loc = floc (); } in
+      mk_pp (PPmatch (mk_pp (PPvar (Qident id)), [$2, $4])) }
+*/
+;
+
 pre:
 | annotation { $1 }
 ;
 
 post:
-| annotation list0_post_exn { $1, $2 }
+| annotation_post list0_post_exn { $1, $2 }
 ;
 
 list0_post_exn:
