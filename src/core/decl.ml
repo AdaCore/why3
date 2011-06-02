@@ -47,12 +47,20 @@ let check_vl ty v = ty_equal_check ty v.vs_ty
 let check_tl ty t = ty_equal_check ty (t_type t)
 
 let make_ls_defn ls vl t =
+  (* build the definition axiom *)
   let hd = t_app ls (List.map t_var vl) t.t_ty in
-  let hd = TermTF.t_selecti t_equ t_iff hd t in
-  let fd = t_forall_close vl [] hd in
+  let bd = TermTF.t_selecti t_equ t_iff hd t in
+  let fd = check_fvs (t_forall_close vl [] bd) in
+  (* check for unbound type variables *)
+  let htv = t_ty_freevars Stv.empty hd in
+  let ttv = t_ty_freevars Stv.empty t in
+  if not (Stv.subset ttv htv) then
+    raise (UnboundTypeVar (Stv.choose (Stv.diff ttv htv)));
+  (* check correspondence with the type signature of ls *)
   List.iter2 check_vl ls.ls_args vl;
   t_ty_check t ls.ls_value;
-  ls, Some (ls, check_fvs fd)
+  (* return the definition *)
+  ls, Some (ls, fd)
 
 let open_ls_defn (_,f) =
   let vl,_,f = match f.t_node with
@@ -460,12 +468,17 @@ let create_ind_decl idl =
       | Tbinop (Timplies, g, f) -> clause (g::acc) f
       | _ -> (acc, f)
     in
-    let cls, f = clause [] (check_fvs f) in
-    match f.t_node with
+    let cls, g = clause [] (check_fvs f) in
+    match g.t_node with
       | Tapp (s, tl) when ls_equal s ps ->
           List.iter2 check_tl ps.ls_args tl;
           (try ignore (List.for_all (f_pos_ps sps (Some true)) cls)
           with Found ls -> raise (NonPositiveIndDecl (ps, pr, ls)));
+          (* check for unbound type variables *)
+          let gtv = t_ty_freevars Stv.empty g in
+          let ftv = t_ty_freevars Stv.empty f in
+          if not (Stv.subset ftv gtv) then
+            raise (UnboundTypeVar (Stv.choose (Stv.diff ftv gtv)));
           syms_term syms f, news_id news pr.pr_name
       | _ -> raise (InvalidIndDecl (ps, pr))
   in
