@@ -47,6 +47,9 @@ let check_vl ty v = ty_equal_check ty v.vs_ty
 let check_tl ty t = ty_equal_check ty (t_type t)
 
 let make_ls_defn ls vl t =
+  (* check for duplicate arguments *)
+  let add_v s v = Svs.add_new v (DuplicateVar v) s in
+  ignore (List.fold_left add_v Svs.empty vl);
   (* build the definition axiom *)
   let hd = t_app ls (List.map t_var vl) t.t_ty in
   let bd = TermTF.t_selecti t_equ t_iff hd t in
