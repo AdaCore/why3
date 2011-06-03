@@ -4,13 +4,9 @@ Require Import ZArith.
 Require Import Rbase.
 Definition unit  := unit.
 
-Parameter ignore: forall (a:Type), a  -> unit.
+Parameter label : Type.
 
-Implicit Arguments ignore.
-
-Parameter label_ : Type.
-
-Parameter at1: forall (a:Type), a -> label_  -> a.
+Parameter at1: forall (a:Type), a -> label  -> a.
 
 Implicit Arguments at1.
 
@@ -30,22 +26,21 @@ Implicit Arguments contents.
 
 Parameter map : forall (a:Type) (b:Type), Type.
 
-Parameter mixfix_lbrb: forall (a:Type) (b:Type), (map a b) -> a  -> b.
+Parameter get: forall (a:Type) (b:Type), (map a b) -> a  -> b.
 
-Implicit Arguments mixfix_lbrb.
+Implicit Arguments get.
 
-Parameter mixfix_lblsmnrb: forall (a:Type) (b:Type), (map a b) -> a -> b  ->
-  (map a b).
+Parameter set: forall (a:Type) (b:Type), (map a b) -> a -> b  -> (map a b).
 
-Implicit Arguments mixfix_lblsmnrb.
+Implicit Arguments set.
 
 Axiom Select_eq : forall (a:Type) (b:Type), forall (m:(map a b)),
-  forall (a1:a) (a2:a), forall (b1:b), (a1 = a2) ->
-  ((mixfix_lbrb (mixfix_lblsmnrb m a1 b1) a2) = b1).
+  forall (a1:a) (a2:a), forall (b1:b), (a1 = a2) -> ((get (set m a1 b1)
+  a2) = b1).
 
 Axiom Select_neq : forall (a:Type) (b:Type), forall (m:(map a b)),
-  forall (a1:a) (a2:a), forall (b1:b), (~ (a1 = a2)) ->
-  ((mixfix_lbrb (mixfix_lblsmnrb m a1 b1) a2) = (mixfix_lbrb m a2)).
+  forall (a1:a) (a2:a), forall (b1:b), (~ (a1 = a2)) -> ((get (set m a1 b1)
+  a2) = (get m a2)).
 
 Parameter const: forall (b:Type) (a:Type), b  -> (map a b).
 
@@ -53,8 +48,8 @@ Set Contextual Implicit.
 Implicit Arguments const.
 Unset Contextual Implicit.
 
-Axiom Const : forall (b:Type) (a:Type), forall (b1:b) (a1:a),
-  ((mixfix_lbrb (const(b1):(map a b)) a1) = b1).
+Axiom Const : forall (b:Type) (a:Type), forall (b1:b) (a1:a), ((get (const(
+  b1):(map a b)) a1) = b1).
 
 Parameter pointer : Type.
 
@@ -76,8 +71,8 @@ Inductive is_list : (map pointer pointer) -> pointer -> Prop :=
   | is_list_null : forall (next2:(map pointer pointer)) (p:pointer),
       (p = (null )) -> (is_list next2 p)
   | is_list_next : forall (next2:(map pointer pointer)) (p:pointer),
-      (~ (p = (null ))) -> ((is_list next2 (mixfix_lbrb next2 p)) ->
-      (is_list next2 p)).
+      (~ (p = (null ))) -> ((is_list next2 (get next2 p)) -> (is_list next2
+      p)).
 
 Parameter ft : forall (a:Type), Type.
 
@@ -94,29 +89,28 @@ Axiom list_ft_node_null_cor : forall (next2:(map pointer pointer))
   (q:pointer) (p:pointer), (q = (null )) -> ~ (in_ft p (list_ft next2 q)).
 
 Axiom list_ft_node_next1 : forall (next2:(map pointer pointer)) (q:pointer)
-  (p:pointer), (~ (q = (null ))) -> ((is_list next2 (mixfix_lbrb next2 q)) ->
-  ((in_ft p (list_ft next2 (mixfix_lbrb next2 q))) -> (in_ft p (list_ft next2
-  q)))).
+  (p:pointer), (~ (q = (null ))) -> ((is_list next2 (get next2 q)) ->
+  ((in_ft p (list_ft next2 (get next2 q))) -> (in_ft p (list_ft next2 q)))).
 
 Axiom list_ft_node_next2 : forall (next2:(map pointer pointer)) (q:pointer),
-  (~ (q = (null ))) -> ((is_list next2 (mixfix_lbrb next2 q)) -> (in_ft q
+  (~ (q = (null ))) -> ((is_list next2 (get next2 q)) -> (in_ft q
   (list_ft next2 q))).
 
 Axiom list_ft_node_next_inv : forall (next2:(map pointer pointer))
-  (q:pointer) (p:pointer), (~ (q = (null ))) -> ((is_list next2
-  (mixfix_lbrb next2 q)) -> ((~ (q = p)) -> ((in_ft p (list_ft next2 q)) ->
-  (in_ft p (list_ft next2 (mixfix_lbrb next2 q)))))).
+  (q:pointer) (p:pointer), (~ (q = (null ))) -> ((is_list next2 (get next2
+  q)) -> ((~ (q = p)) -> ((in_ft p (list_ft next2 q)) -> (in_ft p
+  (list_ft next2 (get next2 q)))))).
 
 Axiom frame_list : forall (next2:(map pointer pointer)) (p:pointer)
   (q:pointer) (v:pointer), (~ (in_ft q (list_ft next2 p))) -> ((is_list next2
-  p) -> (is_list (mixfix_lblsmnrb next2 q v) p)).
+  p) -> (is_list (set next2 q v) p)).
 
 Definition sep_node_list(next2:(map pointer pointer)) (p1:pointer)
   (p2:pointer): Prop := ~ (in_ft p1 (list_ft next2 p2)).
 
 Theorem frame_list_ft : forall (next2:(map pointer pointer)) (p:pointer)
   (q:pointer) (v:pointer), (~ (in_ft q (list_ft next2 p))) -> ((is_list next2
-  p) -> ((list_ft next2 p) = (list_ft (mixfix_lblsmnrb next2 q v) p))).
+  p) -> ((list_ft next2 p) = (list_ft (set next2 q v) p))).
 (* YOU MAY EDIT THE PROOF BELOW *)
 intros.
 apply set_eq.
@@ -127,7 +121,7 @@ induction H0.
 apply (list_ft_node_null_cor _ _ _ H0) in H1;contradiction.
 (* some asserts *)
 assert (q<>p) by (intro eq;apply H;rewrite eq;clear eq;apply (list_ft_node_next2 _ _ H0 H2)).
-assert  (H2' : is_list (mixfix_lblsmnrb next2 q v) (mixfix_lbrb (mixfix_lblsmnrb next2 q v) p))
+assert  (H2' : is_list (set next2 q v) (get (set next2 q v) p))
 by (rewrite (Select_neq _ _ _ _ _ v H3);refine (frame_list _ _ _ _ _ H2);contradict H;exact (list_ft_node_next1 _ _ _ H0 H2 H)).
 (* *)
 destruct (pointer_dec p q0).
@@ -144,7 +138,7 @@ induction H0.
 apply (list_ft_node_null_cor _ _ _ H0) in H1;contradiction.
 (* some asserts *)
 assert (q<>p) by (intro eq;apply H;rewrite eq;clear eq;apply (list_ft_node_next2 _ _ H0 H2)).
-assert  (H2' : is_list (mixfix_lblsmnrb next2 q v) (mixfix_lbrb (mixfix_lblsmnrb next2 q v) p))
+assert  (H2' : is_list (set next2 q v) (get (set next2 q v) p))
 by (rewrite (Select_neq _ _ _ _ _ v H3);refine (frame_list _ _ _ _ _ H2);contradict H;exact (list_ft_node_next1 _ _ _ H0 H2 H)).
 (* *)
 destruct (pointer_dec p q0).

@@ -4,13 +4,9 @@ Require Import ZArith.
 Require Import Rbase.
 Definition unit  := unit.
 
-Parameter ignore: forall (a:Type), a  -> unit.
+Parameter label : Type.
 
-Implicit Arguments ignore.
-
-Parameter label_ : Type.
-
-Parameter at1: forall (a:Type), a -> label_  -> a.
+Parameter at1: forall (a:Type), a -> label  -> a.
 
 Implicit Arguments at1.
 
@@ -18,52 +14,64 @@ Parameter old: forall (a:Type), a  -> a.
 
 Implicit Arguments old.
 
-Parameter ref : forall (a:Type), Type.
+Inductive ref (a:Type) :=
+  | mk_ref : a -> ref a.
+Implicit Arguments mk_ref.
 
-Parameter t : forall (a:Type) (b:Type), Type.
+Definition contents (a:Type)(u:(ref a)): a :=
+  match u with
+  | mk_ref contents1 => contents1
+  end.
+Implicit Arguments contents.
 
-Parameter get: forall (a:Type) (b:Type), (t a b) -> a  -> b.
+Parameter map : forall (a:Type) (b:Type), Type.
+
+Parameter get: forall (a:Type) (b:Type), (map a b) -> a  -> b.
 
 Implicit Arguments get.
 
-Parameter set: forall (a:Type) (b:Type), (t a b) -> a -> b  -> (t a b).
+Parameter set: forall (a:Type) (b:Type), (map a b) -> a -> b  -> (map a b).
 
 Implicit Arguments set.
 
-Axiom Select_eq : forall (a:Type) (b:Type), forall (m:(t a b)), forall (a1:a)
-  (a2:a), forall (b1:b), (a1 = a2) -> ((get (set m a1 b1) a2) = b1).
+Axiom Select_eq : forall (a:Type) (b:Type), forall (m:(map a b)),
+  forall (a1:a) (a2:a), forall (b1:b), (a1 = a2) -> ((get (set m a1 b1)
+  a2) = b1).
 
-Axiom Select_neq : forall (a:Type) (b:Type), forall (m:(t a b)),
+Axiom Select_neq : forall (a:Type) (b:Type), forall (m:(map a b)),
   forall (a1:a) (a2:a), forall (b1:b), (~ (a1 = a2)) -> ((get (set m a1 b1)
   a2) = (get m a2)).
 
-Parameter create_const: forall (b:Type) (a:Type), b  -> (t a b).
+Parameter const: forall (b:Type) (a:Type), b  -> (map a b).
 
 Set Contextual Implicit.
-Implicit Arguments create_const.
+Implicit Arguments const.
 Unset Contextual Implicit.
 
-Axiom Const : forall (b:Type) (a:Type), forall (b1:b) (a1:a),
-  ((get (create_const(b1):(t a b)) a1) = b1).
+Axiom Const : forall (b:Type) (a:Type), forall (b1:b) (a1:a), ((get (const(
+  b1):(map a b)) a1) = b1).
 
 Parameter pointer : Type.
 
-Definition next  := (t pointer pointer).
+Axiom pointer_dec : forall (p1:pointer) (p2:pointer), (p1 = p2) \/
+  ~ (p1 = p2).
+
+Definition next  := (map pointer pointer).
 
 Parameter null:  pointer.
 
 
-Parameter value:  (t pointer Z).
+Parameter value:  (ref (map pointer Z)).
 
 
-Parameter next1:  (t pointer pointer).
+Parameter next1:  (ref (map pointer pointer)).
 
 
-Inductive is_list : (t pointer pointer) -> pointer -> Prop :=
-  | is_list_null : forall (next2:(t pointer pointer)) (p:pointer),
+Inductive is_list : (map pointer pointer) -> pointer -> Prop :=
+  | is_list_null : forall (next2:(map pointer pointer)) (p:pointer),
       (p = (null )) -> (is_list next2 p)
-  | is_list_next : forall (next3:(t pointer pointer)) (p:pointer),
-      (~ (p = (null ))) -> ((is_list next3 (get next3 p)) -> (is_list next3
+  | is_list_next : forall (next2:(map pointer pointer)) (p:pointer),
+      (~ (p = (null ))) -> ((is_list next2 (get next2 p)) -> (is_list next2
       p)).
 
 Parameter ft : forall (a:Type), Type.
@@ -71,43 +79,46 @@ Parameter ft : forall (a:Type), Type.
 Parameter in_ft: pointer -> (ft pointer)  -> Prop.
 
 
-Parameter list_ft: (t pointer pointer) -> pointer  -> (ft pointer).
+Axiom set_eq : forall (ft1:(ft pointer)) (ft2:(ft pointer)),
+  (forall (q:pointer), (in_ft q ft1) <-> (in_ft q ft2)) -> (ft1 = ft2).
+
+Parameter list_ft: (map pointer pointer) -> pointer  -> (ft pointer).
 
 
-Axiom list_ft_node_null_cor : forall (next4:(t pointer pointer)) (q:pointer)
-  (p:pointer), (q = (null )) -> ~ (in_ft p (list_ft next4 q)).
+Axiom list_ft_node_null_cor : forall (next2:(map pointer pointer))
+  (q:pointer) (p:pointer), (q = (null )) -> ~ (in_ft p (list_ft next2 q)).
 
-Axiom list_ft_node_next1 : forall (next5:(t pointer pointer)) (q:pointer)
-  (p:pointer), (~ (q = (null ))) -> ((is_list next5 (get next5 q)) ->
-  ((in_ft p (list_ft next5 (get next5 q))) -> (in_ft p (list_ft next5 q)))).
+Axiom list_ft_node_next1 : forall (next2:(map pointer pointer)) (q:pointer)
+  (p:pointer), (~ (q = (null ))) -> ((is_list next2 (get next2 q)) ->
+  ((in_ft p (list_ft next2 (get next2 q))) -> (in_ft p (list_ft next2 q)))).
 
-Axiom list_ft_node_next2 : forall (next6:(t pointer pointer)) (q:pointer),
-  (~ (q = (null ))) -> ((is_list next6 (get next6 q)) -> (in_ft q
-  (list_ft next6 q))).
+Axiom list_ft_node_next2 : forall (next2:(map pointer pointer)) (q:pointer),
+  (~ (q = (null ))) -> ((is_list next2 (get next2 q)) -> (in_ft q
+  (list_ft next2 q))).
 
-Axiom list_ft_node_next_inv : forall (next7:(t pointer pointer)) (q:pointer)
-  (p:pointer), (~ (q = (null ))) -> ((is_list next7 (get next7 q)) ->
-  ((~ (q = p)) -> ((in_ft p (list_ft next7 q)) -> (in_ft p (list_ft next7
-  (get next7 q)))))).
+Axiom list_ft_node_next_inv : forall (next2:(map pointer pointer))
+  (q:pointer) (p:pointer), (~ (q = (null ))) -> ((is_list next2 (get next2
+  q)) -> ((~ (q = p)) -> ((in_ft p (list_ft next2 q)) -> (in_ft p
+  (list_ft next2 (get next2 q)))))).
 
-Axiom frame_list : forall (next8:(t pointer pointer)) (p:pointer) (q:pointer)
-  (v:pointer), (~ (in_ft q (list_ft next8 p))) -> ((is_list next8 p) ->
-  (is_list (set next8 q v) p)).
+Axiom frame_list : forall (next2:(map pointer pointer)) (p:pointer)
+  (q:pointer) (v:pointer), (~ (in_ft q (list_ft next2 p))) -> ((is_list next2
+  p) -> (is_list (set next2 q v) p)).
 
-Definition sep_node_list(next9:(t pointer pointer)) (p1:pointer)
-  (p2:pointer): Prop := ~ (in_ft p1 (list_ft next9 p2)).
+Definition sep_node_list(next2:(map pointer pointer)) (p1:pointer)
+  (p2:pointer): Prop := ~ (in_ft p1 (list_ft next2 p2)).
 
-Axiom frame_list_ft : forall (next10:(t pointer pointer)) (p:pointer)
-  (q:pointer) (v:pointer), (~ (in_ft q (list_ft next10 p))) ->
-  ((list_ft next10 p) = (list_ft (set next10 q v) p)).
+Axiom frame_list_ft : forall (next2:(map pointer pointer)) (p:pointer)
+  (q:pointer) (v:pointer), (~ (in_ft q (list_ft next2 p))) -> ((is_list next2
+  p) -> ((list_ft next2 p) = (list_ft (set next2 q v) p))).
 
-Definition sep_list_list(next11:(t pointer pointer)) (p1:pointer)
-  (p2:pointer): Prop := forall (q:pointer), (~ (in_ft q (list_ft next11
-  p1))) \/ ~ (in_ft q (list_ft next11 p2)).
+Definition sep_list_list(next2:(map pointer pointer)) (p1:pointer)
+  (p2:pointer): Prop := forall (q:pointer), (~ (in_ft q (list_ft next2
+  p1))) \/ ~ (in_ft q (list_ft next2 p2)).
 
-Axiom acyclic_list : forall (next12:(t pointer pointer)) (p:pointer),
-  (~ (p = (null ))) -> ((is_list next12 p) -> (sep_node_list next12 p
-  (get next12 p))).
+Axiom acyclic_list : forall (next2:(map pointer pointer)) (p:pointer),
+  (~ (p = (null ))) -> ((is_list next2 p) -> (sep_node_list next2 p
+  (get next2 p))).
 
 Inductive list (a:Type) :=
   | Nil : list a
@@ -184,19 +195,19 @@ Axiom reverse_append : forall (a:Type), forall (l1:(list a)) (l2:(list a))
 Axiom Reverse_length : forall (a:Type), forall (l:(list a)),
   ((length (reverse l)) = (length l)).
 
-Parameter model: (t pointer pointer) -> pointer  -> (list pointer).
+Parameter model: (map pointer pointer) -> pointer  -> (list pointer).
 
 
-Axiom model_def1 : forall (next13:(t pointer pointer)) (p:pointer),
-  (p = (null )) -> ((model next13 p) = (Nil:(list pointer))).
+Axiom model_def1 : forall (next2:(map pointer pointer)) (p:pointer),
+  (p = (null )) -> ((model next2 p) = (Nil:(list pointer))).
 
-Axiom model_def2 : forall (next14:(t pointer pointer)) (p:pointer),
-  (~ (p = (null ))) -> ((model next14 p) = (Cons p (model next14 (get next14
+Axiom model_def2 : forall (next2:(map pointer pointer)) (p:pointer),
+  (~ (p = (null ))) -> ((model next2 p) = (Cons p (model next2 (get next2
   p)))).
 
-Theorem frame_model : forall (next15:(t pointer pointer)) (p:pointer)
-  (q:pointer) (v:pointer), (is_list next15 p) -> ((~ (in_ft q (list_ft next15
-  p))) -> ((model next15 p) = (model (set next15 q v) p))).
+Theorem frame_model : forall (next2:(map pointer pointer)) (p:pointer)
+  (q:pointer) (v:pointer), (is_list next2 p) -> ((~ (in_ft q (list_ft next2
+  p))) -> ((model next2 p) = (model (set next2 q v) p))).
 (* YOU MAY EDIT THE PROOF BELOW *)
 intros.
 induction H.
