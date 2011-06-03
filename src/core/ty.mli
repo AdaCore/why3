@@ -86,6 +86,13 @@ val ty_fold : ('a -> ty -> 'a) -> 'a -> ty -> 'a
 val ty_all : (ty -> bool) -> ty -> bool
 val ty_any : (ty -> bool) -> ty -> bool
 
+(** {3 variable-wise map/fold} *)
+(** visits every variable of the type *)
+val ty_v_map : (tvsymbol -> ty) -> ty -> ty
+val ty_v_fold : ('a -> tvsymbol -> 'a) -> 'a -> ty -> 'a
+val ty_v_all : (tvsymbol -> bool) -> ty -> bool
+val ty_v_any : (tvsymbol -> bool) -> ty -> bool
+
 (** {3 symbol-wise map/fold} *)
 (** visits every symbol of the type *)
 val ty_s_map : (tysymbol -> tysymbol) -> ty -> ty
@@ -98,6 +105,7 @@ exception TypeMismatch of ty * ty
 val ty_match : ty Mtv.t -> ty -> ty -> ty Mtv.t
 val ty_inst  : ty Mtv.t -> ty -> ty
 val ty_freevars : Stv.t -> ty -> Stv.t
+val ty_closed : ty -> bool
 
 val ty_equal_check : ty -> ty -> unit
 

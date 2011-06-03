@@ -1,0 +1,5 @@
+theory Main
+    type option 'a = Some 'a | None
+
+    type test4 'a = Test4 (option (test4 'a))
+end

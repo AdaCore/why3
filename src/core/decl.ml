@@ -372,7 +372,7 @@ exception EmptyDecl
 exception EmptyAlgDecl of tysymbol
 exception EmptyIndDecl of lsymbol
 
-exception NonPositiveTypeDecl of tysymbol * lsymbol * tysymbol
+exception NonPositiveTypeDecl of tysymbol * lsymbol * ty
 
 let news_id s id = Sid.add_new id (ClashIdent id) s
 
@@ -399,7 +399,7 @@ let create_ty_decl tdl =
       | Tyapp (ts,_) ->
           let now = Sts.mem ts tss in
           if seen && now then
-            raise (NonPositiveTypeDecl (tys,fs,ts))
+            raise (NonPositiveTypeDecl (tys,fs,ty))
           else
             let s = ty_fold (check (seen || now)) s ty in
             Sid.add ts.ts_name s
@@ -669,8 +669,55 @@ let rec check_foundness kn d =
       List.fold_left check () tdl
   | _ -> ()
 
+let rec ts_extract_pos kn sts ts =
+  if ts_equal ts ts_func then [false;true] else
+  if ts_equal ts ts_pred then [false] else
+  if Sts.mem ts sts then List.map Util.ttrue ts.ts_args else
+  match (Mid.find ts.ts_name kn).d_node with
+  | Dtype tdl -> begin match List.assq ts tdl with
+      | Tabstract -> List.map Util.ffalse ts.ts_args
+      | Talgebraic csl ->
+          let sts = Sts.add ts sts in
+          let rec get_ty stv ty = match ty.ty_node with
+            | Tyvar _ -> stv
+            | Tyapp (ts,tl) ->
+                let get acc pos =
+                  if pos then get_ty acc else ty_freevars Stv.empty in
+                List.fold_left2 get stv (ts_extract_pos kn sts ts) tl
+          in
+          let get_cs acc ls = List.fold_left get_ty acc ls.ls_args in
+          let negs = List.fold_left get_cs Stv.empty csl in
+          List.map (fun v -> not (Stv.mem v negs)) ts.ts_args
+      end
+  | _ -> assert false
+
+let check_positivity kn d = match d.d_node with
+  | Dtype tdl ->
+      let add s (ts,_) = Sts.add ts s in
+      let tss = List.fold_left add Sts.empty tdl in
+      let check_constr tys cs =
+        let rec check_ty ty = match ty.ty_node with
+          | Tyvar _ -> ()
+          | Tyapp (ts,tl) ->
+              let check pos ty =
+                if pos then check_ty ty else
+                if ty_s_any (fun ts -> Sts.mem ts tss) ty
+                then raise (NonPositiveTypeDecl (tys,cs,ty))
+              in
+              List.iter2 check (ts_extract_pos kn Sts.empty ts) tl
+        in
+        List.iter check_ty cs.ls_args
+      in
+      let check_decl (ts,td) = match td with
+        | Tabstract -> ()
+        | Talgebraic cl -> List.iter (check_constr ts) cl
+      in
+      List.iter check_decl tdl
+  | _ -> ()
+
 let known_add_decl kn d =
   let kn = known_add_decl kn d in
+  check_positivity kn d;
   check_foundness kn d;
   check_match kn d;
   kn

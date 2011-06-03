@@ -498,10 +498,10 @@ let () = Exn_printer.register
         print_ts ts
   | Decl.NonFoundedTypeDecl ts ->
       fprintf fmt "Cannot construct a value of type %a" print_ts ts
-  | Decl.NonPositiveTypeDecl (_ts, ls, ts1) ->
+  | Decl.NonPositiveTypeDecl (_ts, ls, ty) ->
       fprintf fmt "Constructor %a \
-          contains a non strictly positive occurrence of type symbol %a"
-        print_ls ls print_ts ts1
+          contains a non strictly positive occurrence of type %a"
+        print_ls ls print_ty ty
   | Decl.InvalidIndDecl (_ls, pr) ->
       fprintf fmt "Ill-formed inductive clause %a"
         print_pr pr

@@ -75,12 +75,10 @@ let ts_hash ts = id_hash ts.ts_name
 let ty_hash ty = Hashweak.tag_hash ty.ty_tag
 
 let mk_ts name args def = {
-  ts_name = name;
+  ts_name = id_register name;
   ts_args = args;
   ts_def  = def;
 }
-
-let create_tysymbol name args def = mk_ts (id_register name) args def
 
 module Hsty = Hashcons.Make (struct
   type t = ty
@@ -132,6 +130,26 @@ let ty_all pr ty =
 let ty_any pr ty =
   try ty_fold (any_fn pr) false ty with FoldSkip -> true
 
+(* traversal functions on type variables *)
+
+let rec ty_v_map fn ty = match ty.ty_node with
+  | Tyvar v -> fn v
+  | Tyapp (f, tl) -> ty_app f (List.map (ty_v_map fn) tl)
+
+let rec ty_v_fold fn acc ty = match ty.ty_node with
+  | Tyvar v -> fn acc v
+  | Tyapp (_, tl) -> List.fold_left (ty_v_fold fn) acc tl
+
+let ty_v_all pr ty =
+  try ty_v_fold (all_fn pr) true ty with FoldSkip -> false
+
+let ty_v_any pr ty =
+  try ty_v_fold (any_fn pr) false ty with FoldSkip -> true
+
+let ty_full_inst m ty = ty_v_map (fun v -> Mtv.find v m) ty
+let ty_freevars s ty = ty_v_fold (fun s v -> Stv.add v s) s ty
+let ty_closed ty = ty_v_all Util.ffalse ty
+
 (* smart constructors *)
 
 exception BadTypeArity of tysymbol * int * int
@@ -141,20 +159,9 @@ exception UnboundTypeVar of tvsymbol
 let create_tysymbol name args def =
   let add s v = Stv.add_new v (DuplicateTypeVar v) s in
   let s = List.fold_left add Stv.empty args in
-  let rec vars () ty = match ty.ty_node with
-    | Tyvar v when not (Stv.mem v s) -> raise (UnboundTypeVar v)
-    | _ -> ty_fold vars () ty
-  in
-  option_iter (vars ()) def;
-  create_tysymbol name args def
-
-let rec tv_inst m ty = match ty.ty_node with
-  | Tyvar n -> Mtv.find n m
-  | _ -> ty_map (tv_inst m) ty
-
-let rec ty_freevars s ty = match ty.ty_node with
-  | Tyvar n -> Stv.add n s
-  | _ -> ty_fold ty_freevars s ty
+  let check v = Stv.mem v s || raise (UnboundTypeVar v) in
+  ignore (option_map (ty_v_all check) def);
+  mk_ts name args def
 
 let ty_app s tl =
   let tll = List.length tl in
@@ -164,7 +171,7 @@ let ty_app s tl =
     | Some ty ->
         let add m v t = Mtv.add v t m in
         let m = List.fold_left2 add Mtv.empty s.ts_args tl in
-        tv_inst m ty
+        ty_full_inst m ty
     | _ ->
         ty_app s tl
 
