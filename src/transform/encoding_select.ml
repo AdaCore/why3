@@ -26,7 +26,7 @@ open Decl
 open Theory
 open Task
 open Encoding
-open Encoding_distinction
+open Discriminate
 
 let register pr l = List.iter (fun (n,f) -> Hashtbl.replace pr n (const f)) l
 
