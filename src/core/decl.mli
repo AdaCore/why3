@@ -27,11 +27,11 @@ open Term
 
 (** {2 Type declaration} *)
 
-type ty_def =
+type ty_defn =
   | Tabstract
   | Talgebraic of lsymbol list
 
-type ty_decl = tysymbol * ty_def
+type ty_decl = tysymbol * ty_defn
 
 (** {2 Logic symbols declaration} *)
 
@@ -162,6 +162,7 @@ exception RedeclaredIdent of ident
 exception NonExhaustiveCase of pattern list * term
 exception NonFoundedTypeDecl of tysymbol
 
+val find_type_definition : known_map -> tysymbol -> ty_defn
 val find_constructors : known_map -> tysymbol -> lsymbol list
 val find_inductive_cases : known_map -> lsymbol -> (prsymbol * term) list
 val find_logic_definition : known_map -> lsymbol -> ls_defn option

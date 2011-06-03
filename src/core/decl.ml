@@ -25,11 +25,11 @@ open Term
 
 (** Type declaration *)
 
-type ty_def =
+type ty_defn =
   | Tabstract
   | Talgebraic of lsymbol list
 
-type ty_decl = tysymbol * ty_def
+type ty_decl = tysymbol * ty_defn
 
 (** Logic declaration *)
 
@@ -388,23 +388,18 @@ let create_ty_decl tdl =
   let tss = List.fold_left add Sts.empty tdl in
   let check_constr tys ty (syms,news) fs =
     ty_equal_check ty (of_option fs.ls_value);
-    let add s ty = match ty.ty_node with
-      | Tyvar v -> Stv.add v s
-      | _ -> assert false
-    in
-    let vs = ty_fold add Stv.empty ty in
-    let rec check seen s ty = match ty.ty_node with
-      | Tyvar v when Stv.mem v vs -> s
+    let vs = ty_freevars Stv.empty ty in
+    let rec check seen ty = match ty.ty_node with
+      | Tyvar v when Stv.mem v vs -> ()
       | Tyvar v -> raise (UnboundTypeVar v)
-      | Tyapp (ts,_) ->
+      | Tyapp (ts,tl) ->
           let now = Sts.mem ts tss in
-          if seen && now then
-            raise (NonPositiveTypeDecl (tys,fs,ty))
-          else
-            let s = ty_fold (check (seen || now)) s ty in
-            Sid.add ts.ts_name s
+          if seen && now
+            then raise (NonPositiveTypeDecl (tys,fs,ty))
+            else List.iter (check (seen || now)) tl
     in
-    let syms = List.fold_left (check false) syms fs.ls_args in
+    List.iter (check false) fs.ls_args;
+    let syms = List.fold_left syms_ty syms fs.ls_args in
     syms, news_id news fs.ls_name
   in
   let check_decl (syms,news) (ts,td) = match td with
@@ -426,8 +421,10 @@ let create_logic_decl ldl =
   let check_decl (syms,news) (ls,ld) = match ld with
     | Some (s,_) when not (ls_equal s ls) ->
         raise (BadLogicDecl (ls, s))
-    | Some (_,f) ->
-        syms_term syms f, news_id news ls.ls_name
+    | Some ld ->
+        let _, e = open_ls_defn ld in
+        let syms = List.fold_left syms_ty syms ls.ls_args in
+        syms_term syms e, news_id news ls.ls_name
     | None ->
         let syms = option_apply syms (syms_ty syms) ls.ls_value in
         let syms = List.fold_left syms_ty syms ls.ls_args in
@@ -591,14 +588,15 @@ let known_add_decl kn0 decl =
   if Sid.is_empty unk then kn
   else raise (UnknownIdent (Sid.choose unk))
 
-let find_constructors kn ts =
+let find_type_definition kn ts =
   match (Mid.find ts.ts_name kn).d_node with
-  | Dtype dl ->
-      begin match List.assq ts dl with
-        | Talgebraic cl -> cl
-        | Tabstract -> []
-      end
+  | Dtype dl -> List.assq ts dl
   | _ -> assert false
+
+let find_constructors kn ts =
+  match find_type_definition kn ts with
+  | Talgebraic cl -> cl
+  | Tabstract -> []
 
 let find_inductive_cases kn ps =
   match (Mid.find ps.ls_name kn).d_node with
@@ -673,23 +671,21 @@ let rec ts_extract_pos kn sts ts =
   if ts_equal ts ts_func then [false;true] else
   if ts_equal ts ts_pred then [false] else
   if Sts.mem ts sts then List.map Util.ttrue ts.ts_args else
-  match (Mid.find ts.ts_name kn).d_node with
-  | Dtype tdl -> begin match List.assq ts tdl with
-      | Tabstract -> List.map Util.ffalse ts.ts_args
-      | Talgebraic csl ->
-          let sts = Sts.add ts sts in
-          let rec get_ty stv ty = match ty.ty_node with
-            | Tyvar _ -> stv
-            | Tyapp (ts,tl) ->
-                let get acc pos =
-                  if pos then get_ty acc else ty_freevars Stv.empty in
-                List.fold_left2 get stv (ts_extract_pos kn sts ts) tl
-          in
-          let get_cs acc ls = List.fold_left get_ty acc ls.ls_args in
-          let negs = List.fold_left get_cs Stv.empty csl in
-          List.map (fun v -> not (Stv.mem v negs)) ts.ts_args
-      end
-  | _ -> assert false
+  match find_type_definition kn ts with
+    | Tabstract ->
+        List.map Util.ffalse ts.ts_args
+    | Talgebraic csl ->
+        let sts = Sts.add ts sts in
+        let rec get_ty stv ty = match ty.ty_node with
+          | Tyvar _ -> stv
+          | Tyapp (ts,tl) ->
+              let get acc pos =
+                if pos then get_ty acc else ty_freevars Stv.empty in
+              List.fold_left2 get stv (ts_extract_pos kn sts ts) tl
+        in
+        let get_cs acc ls = List.fold_left get_ty acc ls.ls_args in
+        let negs = List.fold_left get_cs Stv.empty csl in
+        List.map (fun v -> not (Stv.mem v negs)) ts.ts_args
 
 let check_positivity kn d = match d.d_node with
   | Dtype tdl ->

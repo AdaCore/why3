@@ -144,12 +144,13 @@ let rec inline_nonrec_linear kn ls tyl ty =
   List.exists (is_algebraic_type kn) (oty_cons tyl ty) &&
   (* and ls is not recursively defined and is linear *)
   let d = Mid.find ls.ls_name kn in
+  if Mid.mem ls.ls_name d.d_syms then false else
   match d.d_node with
     | Dlogic [_, Some def] ->
         begin try Wdecl.find inline_cache d with Not_found ->
           let _, t = open_ls_defn def in
-          let res = not (t_s_any Util.ffalse (ls_equal ls) t) &&
-            linear (eval_match ~inline:inline_nonrec_linear kn t) in
+          let t = eval_match ~inline:inline_nonrec_linear kn t in
+          let res = linear t in
           Wdecl.set inline_cache d res;
           res
         end

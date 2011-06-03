@@ -83,16 +83,10 @@ let elim func pred d = match d.d_node with
   | Dlogic l -> elim_decl func pred l
   | _ -> [d]
 
-let is_rec = function
-  | [] -> assert false
-  | [_, None] -> false
-  | [ls, Some ld] ->
-      let _, e = open_ls_defn ld in
-      t_s_any Util.ffalse (ls_equal ls) e
-  | _ -> true
-
 let elim_recursion d = match d.d_node with
-  | Dlogic l when is_rec l -> elim_decl true true l
+  | Dlogic ([s,_] as l)
+    when Sid.mem s.ls_name d.d_syms -> elim_decl true true l
+  | Dlogic l when List.length l > 1 -> elim_decl true true l
   | _ -> [d]
 
 let elim_mutual d = match d.d_node with
