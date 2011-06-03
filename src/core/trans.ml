@@ -38,7 +38,6 @@ let identity   x =  x
 let identity_l x = [x]
 
 let return x = fun _ -> x
-let bind f g task = g (f task) task
 
 let conv_res c f x = c (f x)
 
@@ -56,6 +55,8 @@ module Wtask = Hashweak.Make (struct
 end)
 
 let store fn = Wtask.memoize_option 63 fn
+
+let bind f g = store (fun task -> g (f task) task)
 
 let fold fn v =
   let h = Wtask.create 63 in
@@ -85,9 +86,8 @@ let fold fn v =
 let fold_l fn v = fold (fun task -> list_apply (fn task)) [v]
 
 let fold_map   fn v t = conv_res snd            (fold   fn (v, t))
-(* We keep the order is important for the user. So we use
-   List.map is instead of List.map_rev *)
 let fold_map_l fn v t = conv_res (List.map snd) (fold_l fn (v, t))
+(* we use List.map instead of List.map_rev to preserve the order *)
 
 let gen_decl add fn =
   let fn = Wdecl.memoize 63 fn in
@@ -136,7 +136,7 @@ let rewriteTF fnT fnF = rewrite (TermTF.t_select fnT fnF)
 
 let gen_add_decl add decls = function
   | Some { task_decl = { td_node = Decl d }; task_prev = prev } ->
-    add_decl (List.fold_left add prev decls) d
+      add_decl (List.fold_left add prev decls) d
   | _ -> assert false
 
 let add_decls  = gen_add_decl add_decl

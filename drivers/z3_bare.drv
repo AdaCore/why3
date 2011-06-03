@@ -12,7 +12,7 @@ time "why3cpulimit time : %s s"
 
 
 (* À discuter *)
-transformation "simplify_recursive_definition"
+(*transformation "simplify_recursive_definition"*)
 transformation "inline_trivial"
 
 transformation "eliminate_builtin"
@@ -22,6 +22,8 @@ transformation "eliminate_algebraic_smt"
 
 transformation "simplify_formula"
 (*transformation "simplify_trivial_quantification"*)
+
+transformation "discriminate"
 transformation "encoding_smt"
 
 theory BuiltIn

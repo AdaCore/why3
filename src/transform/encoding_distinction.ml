@@ -25,36 +25,45 @@ open Decl
 open Theory
 open Task
 
-
-(** Transformation "distinction" *)
-
+let meta_inst   = register_meta "encoding : inst"   [MTty]
+let meta_lskept = register_meta "encoding : lskept" [MTlsymbol]
 let meta_lsinst = register_meta "encoding : lsinst" [MTlsymbol;MTlsymbol]
-let meta_kept   = register_meta "encoding : kept"   [MTty]
 
-module Env = struct
+let meta_select_inst   = register_meta_excl "select_inst"   [MTstring]
+let meta_select_lskept = register_meta_excl "select_lskept" [MTstring]
+let meta_select_lsinst = register_meta_excl "select_lsinst" [MTstring]
 
+module OHTy = OrderedHash(struct
+  type t = ty
+  let tag = ty_hash
+end)
+
+module OHTyl = OrderedHashList(struct
+  type t = ty
+  let tag = ty_hash
+end)
+
+module Mtyl = Stdlib.Map.Make(OHTyl)
+
+module Lsmap = struct
 
 (* TODO : transmettre les tags des logiques polymorphe vers les logiques
    instantié. Un tag sur un logique polymorphe doit être un tag sur toute
    la famille de fonctions *)
 
-  module OHTy = OrderedHash(struct
-    type t = ty
-    let tag = ty_hash
-  end)
+  type t = lsymbol Mtyl.t Mls.t
 
-  module OHTyl = OrderedHashList(struct
-    type t = ty
-    let tag = ty_hash
-  end)
+  let empty = Mls.empty
 
-  module Mtyl = Map.Make(OHTyl)
-  module Htyl = Hashtbl.Make(OHTyl)
-
-  (* The environnement of the transformation between two decl *)
-  type env = lsymbol Mtyl.t Mls.t
-
-  let empty_env = Mls.empty
+  let add ls tyl tyv lsmap =
+    if ls_equal ls ps_equ then lsmap else
+    if not (List.for_all Ty.ty_closed tyl) then lsmap else
+    let newls = function
+      | None -> Some (create_lsymbol (id_clone ls.ls_name) tyl tyv)
+      | nls  -> nls
+    in
+    let insts = Mls.find_default ls Mtyl.empty lsmap in
+    Mls.add ls (Mtyl.change (oty_cons tyl tyv) newls insts) lsmap
 
   let print_env fmt menv =
     Format.fprintf fmt "defined_lsymbol (%a)@."
@@ -64,22 +73,18 @@ module Env = struct
             Pretty.print_ls)) menv
 
   (** From/To metas *)
-  let metas_of_env env decls =
-    let fold_ls ls insts metas =
-      let fold_inst _ lsinst metas =
-        create_meta meta_lsinst [Theory.MAls ls;Theory.MAls lsinst] :: metas
-      in
-      Mtyl.fold fold_inst insts metas
-    in
-    Mls.fold fold_ls env decls
+  let metas lsmap =
+    let fold_inst ls _ lsinst decls =
+      create_meta meta_lsinst [MAls ls; MAls lsinst] :: decls in
+    let fold_ls ls insts decls = Mtyl.fold (fold_inst ls) insts decls in
+    Mls.fold fold_ls lsmap []
 
-  let env_of_metas metas =
+  let of_metas metas =
     let fold env args =
       match args with
-        | [MAls ls;MAls lsinst] ->
-          let tydisl = option_apply lsinst.ls_args (fun e -> e::lsinst.ls_args)
-            lsinst.ls_value
-          in
+        | [MAls ls; MAls lsinst] ->
+          let tydisl = oty_cons lsinst.ls_args lsinst.ls_value in
+          if not (List.for_all Ty.ty_closed tydisl) then env else
           let insts = Mls.find_default ls Mtyl.empty env in
           Mls.add ls (Mtyl.add tydisl lsinst insts) env
         | _ -> assert false
@@ -88,91 +93,22 @@ module Env = struct
 
 end
 
-open Env
-
-(* Ce type est utiliser pour indiquer un underscore *)
-let tv_dumb = create_tvsymbol (id_fresh "Dumb")
-let ty_dumb = ty_var tv_dumb
-
-let find_logic env p tl tyv =
-  if ls_equal p ps_equ then p else
-    try
-      let insts = Mls.find p env in
-      let inst = option_apply tl (fun e -> e::tl) tyv in
-      Mtyl.find inst insts
-    with Not_found -> p
-
-let conv_vs tvar vsvar vs =
-  let ty = ty_inst tvar vs.vs_ty in
-  let vs' = if ty_equal ty vs.vs_ty then vs else
-      create_vsymbol (id_clone vs.vs_name) ty in
-  Mvs.add vs (t_var vs') vsvar,vs'
-
-(* The convertion of term and formula *)
-let rec rewrite_term env tvar vsvar t =
-  let fnT = rewrite_term env tvar in
-  let fnF = rewrite_fmla env tvar in
-  (* Format.eprintf "@[<hov 2>Term : %a =>@\n@?" Pretty.print_term t; *)
-  let t = match t.t_node with
-    | Tconst _ -> t
-    | Tvar x -> Mvs.find x vsvar
-    | Tapp(p,tl) ->
-      let tl = List.map (fnT vsvar) tl in
-      let ty = oty_inst tvar t.t_ty in
-      let p = find_logic env p (List.map t_type tl) ty in
-      t_app p tl ty
-    | Tif(f, t1, t2) ->
-      t_if (fnF vsvar f) (fnT vsvar t1) (fnT vsvar t2)
-    | Tlet (t1, b) ->
-      let u,t2,cb = t_open_bound_cb b in
-      let (vsvar',u) = conv_vs tvar vsvar u in
-      let t1 = fnT vsvar t1 in let t2 = fnT vsvar' t2 in
-      t_let t1 (cb u t2)
-    | Tcase _ | Teps _ ->
-      Printer.unsupportedTerm t
-        "Encoding arrays : I can't encode this term"
-    | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> raise (TermExpected t)
-  in
-  (* Format.eprintf "@[<hov 2>Term : => %a : %a@\n@?" *)
-  (*   Pretty.print_term t Pretty.print_ty t.t_ty; *)
-  t
-
-and rewrite_fmla env tvar vsvar f =
-  let fnT = rewrite_term env tvar in
-  let fnF = rewrite_fmla env tvar in
-  (* Format.eprintf "@[<hov 2>Fmla : %a =>@\n@?" Pretty.print_fmla f; *)
-  match f.t_node with
-    | Tapp(p, tl) ->
-      let tl = List.map (fnT vsvar) tl in
-      let p = find_logic env p (List.map t_type tl) None in
-      ps_app p tl
-    | Tquant(q, b) ->
-      let vl, tl, f1, cb = t_open_quant_cb b in
-      let vsvar,vl = map_fold_left (conv_vs tvar) vsvar vl in
-      let f1 = fnF vsvar f1 in
-      let tl = TermTF.tr_map (fnT vsvar) (fnF vsvar) tl in
-      t_quant q (cb vl tl f1)
-    | Tlet (t1, b) -> let u,f2,cb = t_open_bound_cb b in
-      let (vsvar',u) = conv_vs tvar vsvar u in
-      let t1 = fnT vsvar t1 and f2 = fnF vsvar' f2 in
-      (* Format.eprintf "u.vs_ty : %a == t1.t_ty : %a@." *)
-      (*    Pretty.print_ty u.vs_ty Pretty.print_ty t1.t_ty; *)
-      Ty.ty_equal_check u.vs_ty (t_type t1);
-      t_let t1 (cb u f2)
-    | _ -> TermTF.t_map (fun _ -> assert false) (fnF vsvar) f
-
+let find_logic env ls tyl tyv =
+  if ls_equal ls ps_equ then ls else
+  try Mtyl.find (oty_cons tyl tyv) (Mls.find ls env)
+  with Not_found -> ls
 
 module Ssubst =
   Set.Make(struct type t = ty Mtv.t
                   let compare = Mtv.compare OHTy.compare end)
 
 (* find all the possible instantiation which can create a kept instantiation *)
-let ty_quant env =
+let ty_quant env t =
   let rec add_vs acc0 ls tyl tyv =
     if ls_equal ls ps_equ then acc0 else
       try
         let insts = Mls.find ls env in
-        let tyl = option_apply tyl (fun e -> e::tyl) tyv in
+        let tyl = oty_cons tyl tyv in
         let fold_inst inst _ acc =
           let fold_subst subst acc =
             try
@@ -186,36 +122,64 @@ let ty_quant env =
         Mtyl.fold fold_inst insts acc0
       with Not_found (* no such p *) -> acc0
   in
-  t_app_fold add_vs (Ssubst.singleton (Mtv.empty))
+  t_app_fold add_vs (Ssubst.singleton (Mtv.empty)) t
+
+let ts_of_ls env ls decls =
+  if ls_equal ls ps_equ then decls else
+  let add_ts sts ts = Sts.add ts sts in
+  let add_ty sts ty = ty_s_fold add_ts sts ty in
+  let add_tyl tyl _ sts = List.fold_left add_ty sts tyl in
+  let insts = Mls.find_default ls Mtyl.empty env in
+  let sts = Mtyl.fold add_tyl insts Sts.empty in
+  let add_ts ts dl = create_ty_decl [ts,Tabstract] :: dl in
+  Sts.fold add_ts sts decls
 
 (* The Core of the transformation *)
-let map env d =
-    match d.d_node with
-    | Dtype [_,Tabstract] -> [d]
-    | Dtype _ -> Printer.unsupportedDecl
-        d "encoding_decorate : I can work only on abstract\
-            type which are not in recursive bloc."
-    | Dlogic l ->
-        let fn = function
-          | _, Some _ ->
-              Printer.unsupportedDecl
-                d "encoding_decorate : I can't encode definition. \
-Perhaps you could use eliminate_definition"
-          | _, None -> () in
-            List.iter fn l; [d]
-    | Dind _ -> Printer.unsupportedDecl
-        d "encoding_decorate : I can't work on inductive"
-        (* let fn (pr,f) = pr, fnF f in *)
-        (* let fn (ps,l) = ps, List.map fn l in *)
-        (* [create_ind_decl (List.map fn l)] *)
-    | Dprop (k,pr,f) ->
+let map env d = match d.d_node with
+  | Dtype [_,Tabstract] -> [d]
+  | Dtype _ -> Printer.unsupportedDecl d
+      "Algebraic and recursively-defined types are \
+            not supported, run eliminate_algebraic"
+  | Dlogic [ls, None] ->
+      let lls = Mtyl.values (Mls.find_default ls Mtyl.empty env) in
+      let lds = List.map (fun ls -> create_logic_decl [ls,None]) lls in
+      ts_of_ls env ls (d::lds)
+  | Dlogic [ls, Some ld] when not (Sid.mem ls.ls_name d.d_syms) ->
+      let f = ls_defn_axiom ld in
+      let substs = ty_quant env f in
+      let conv_f tvar (defns,axioms) =
+        let f = t_ty_subst tvar Mvs.empty f in
+        let f = t_app_map (find_logic env) f in
+        let vl,_,e = match f.t_node with
+          | Tquant (Tforall,b) -> t_open_quant b
+          | _ -> [],[],f in
+        let ls,e = match e.t_node with
+          | Tapp (_, [{t_node = Tapp (ls,_)}; e])
+          | Tbinop (_, {t_node = Tapp (ls,_)}, e) -> ls,e
+          | _ -> assert false in
+        if List.for_all2 (fun ty v -> ty_equal ty v.vs_ty) ls.ls_args vl
+                                && option_eq ty_equal ls.ls_value e.t_ty
+        then create_logic_decl [make_ls_defn ls vl e] :: defns, axioms
+        else let id = id_fresh (ls.ls_name.id_string ^ "_inst") in
+          defns, create_prop_decl Paxiom (create_prsymbol id) f :: axioms
+      in
+      let defns,axioms = Ssubst.fold conv_f substs ([],[]) in
+      ts_of_ls env ls (List.rev_append defns axioms)
+  | Dlogic _ -> Printer.unsupportedDecl d
+      "Recursively-defined symbols are not supported, \
+            run eliminate_recursion"
+  | Dind _ -> Printer.unsupportedDecl d
+      "Inductive predicates are not supported, \
+            run eliminate_inductive"
+  | Dprop (k,pr,f) ->
       let substs = ty_quant env f in
       let substs_len = Ssubst.cardinal substs in
       let conv_f tvar task =
         (* Format.eprintf "f0 : %a@. env : %a@." Pretty.print_fmla *)
         (*   (t_ty_subst tvar Mvs.empty f) *)
         (*   print_env env; *)
-        let f = rewrite_fmla env tvar Mvs.empty f in
+        let f = t_ty_subst tvar Mvs.empty f in
+        let f = t_app_map (find_logic env) f in
         (* Format.eprintf "f : %a@. env : %a@." Pretty.print_fmla f *)
         (*   print_env menv; *)
         let pr =
@@ -231,23 +195,77 @@ Perhaps you could use eliminate_definition"
       let task = Ssubst.fold conv_f substs [] in
       task
 
-let definition_of_env env =
-  let fold_ls _ insts task =
-    let fold_inst inst lsinst task =
-      let fold_ty task ty =
-        let add_ts task ts = add_ty_decl task ([ts,Tabstract]) in
-        ty_s_fold add_ts task ty in
-      let task = List.fold_left fold_ty task inst in
-      add_logic_decl task [lsinst,None]
+
+let ft_select_inst =
+  ((Hashtbl.create 17) : (Env.env,Sty.t) Trans.flag_trans)
+
+let ft_select_lskept =
+  ((Hashtbl.create 17) : (Env.env,Sls.t) Trans.flag_trans)
+
+let ft_select_lsinst =
+  ((Hashtbl.create 17) : (Env.env,Lsmap.t) Trans.flag_trans)
+
+let metas_from_env env =
+  let fold_inst tyl _ s = List.fold_left (fun s ty -> Sty.add ty s) s tyl in
+  let fold_ls _ insts s = Mtyl.fold fold_inst insts s in
+  let sty = Mls.fold fold_ls env Sty.empty in
+  let add ty decls = create_meta Encoding.meta_kept [MAty ty] :: decls in
+  Sty.fold add sty (Lsmap.metas env)
+
+let lsinst_completion kept lskept env =
+  let fold_ls ls env =
+    let rec aux env tydisl subst = function
+      | [] ->
+          let tydisl = List.rev tydisl in
+          let tyl,tyv = match tydisl, ls.ls_value with
+            | tyv::tyl, Some _ -> tyl, Some tyv
+            | tyl, None -> tyl, None
+            | _ -> assert false in
+          Lsmap.add ls tyl tyv env
+      | ty::tyl ->
+          let fold_ty tykept env =
+            try
+              let subst = ty_match subst ty tykept in
+              aux env (tykept::tydisl) subst tyl
+            with TypeMismatch _ -> env
+          in
+          Sty.fold fold_ty kept env
     in
-    Mtyl.fold fold_inst insts task
+    aux env [] Mtv.empty (oty_cons ls.ls_args ls.ls_value)
   in
-  Mls.fold fold_ls env (Task.use_export None (Theory.builtin_theory))
+  Sls.fold fold_ls lskept env
+
+let select_lsinst env =
+  let inst   = Trans.on_flag meta_select_inst   ft_select_inst   "none" env in
+  let lskept = Trans.on_flag meta_select_lskept ft_select_lskept "none" env in
+  let lsinst = Trans.on_flag meta_select_lsinst ft_select_lsinst "none" env in
+  let trans task =
+    let inst   = Trans.apply inst   task in
+    let lskept = Trans.apply lskept task in
+    let lsinst = Trans.apply lsinst task in
+    let inst   = Sty.union inst   (Task.on_tagged_ty meta_inst   task) in
+    let lskept = Sls.union lskept (Task.on_tagged_ls meta_lskept task) in
+    (* we currently ignore the existing lsinst metas (though we shouldn't),
+       but we don't ignore them in lsymbol_distinction (though we should). *)
+    let env = lsinst_completion inst lskept lsinst in
+    Trans.apply (Trans.add_tdecls (metas_from_env env)) task
+  in
+  Trans.store trans
 
 let lsymbol_distinction =
   Trans.on_meta meta_lsinst (fun metas ->
     if metas = [] then Trans.identity
     else
-      let env = env_of_metas metas in
+      let env = Lsmap.of_metas metas in
       (* Format.eprintf "instantiate %a@." print_env env; *)
-      Trans.decl (map env) (definition_of_env env))
+      Trans.decl (map env) None)
+
+let discriminate env = Trans.seq [
+  Encoding.monomorphise_goal;
+  select_lsinst env;
+  Trans.print_meta Encoding.debug meta_lsinst;
+  lsymbol_distinction;
+]
+
+let () = Trans.register_env_transform "discriminate" discriminate
+

@@ -49,14 +49,11 @@ val seq_l : task tlist list -> task tlist
 val fold   : (task_hd -> 'a -> 'a     ) -> 'a -> 'a trans
 val fold_l : (task_hd -> 'a -> 'a list) -> 'a -> 'a tlist
 
-val fold_map   : (task_hd -> 'a * task -> ('a * task)) ->
-                                      'a -> task -> task trans
+val fold_map   : (task_hd -> 'a * 'b -> ('a * 'b)     ) -> 'a -> 'b -> 'b trans
+val fold_map_l : (task_hd -> 'a * 'b -> ('a * 'b) list) -> 'a -> 'b -> 'b tlist
 
-val fold_map_l : (task_hd -> 'a * task -> ('a * task) list) ->
-                                      'a -> task -> task tlist
-
-val decl   : (decl -> decl list     ) -> task -> task trans
 (** [decl f acc [d1;..;dn]] returns acc@f d1@..@f dn *)
+val decl   : (decl -> decl list     ) -> task -> task trans
 val decl_l : (decl -> decl list list) -> task -> task tlist
 
 val tdecl   : (decl -> tdecl list     ) -> task -> task trans

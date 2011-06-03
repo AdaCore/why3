@@ -23,52 +23,52 @@ theory Poly_deco
   meta "enco_poly" "decorate"
 end
 
-theory Inst_nothing
-  meta "select_inst" "nothing"
+theory Inst_none
+  meta "select_inst" "none"
 end
 
 theory Inst_goal
   meta "select_inst" "goal"
 end
 
-theory Inst_context
+theory Inst_all
   meta "select_inst" "all"
 end
 
-theory Kept_nothing
-  meta "select_kept" "nothing"
-end
-
-theory Kept_goal
-  meta "select_kept" "goal"
-end
-
-theory Kept_context
-  meta "select_kept" "all"
-end
-
-theory Lskept_nothing
-  meta "select_lskept" "nothing"
+theory Lskept_none
+  meta "select_lskept" "none"
 end
 
 theory Lskept_goal
   meta "select_lskept" "goal"
 end
 
-theory Lskept_context
+theory Lskept_all
   meta "select_lskept" "all"
 end
 
-theory Product_nothing
-  meta "completion_mode" "nothing"
+theory Lsinst_none
+  meta "select_lsinst" "none"
 end
 
-theory Product_only_kept
-  meta "completion_mode" "only_kept"
+theory Lsinst_goal
+  meta "select_lsinst" "goal"
 end
 
-theory Product_some_kept
-  meta "completion_mode" "some_kept"
+theory Lsinst_all
+  meta "select_lsinst" "all"
+end
+
+theory Kept_none
+  meta "select_kept" "none"
+end
+
+theory Kept_goal
+  meta "select_kept" "goal"
+end
+
+theory Kept_all
+  meta "select_kept" "all"
 end
 
 theory KeptIntReal

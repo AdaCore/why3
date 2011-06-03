@@ -17,25 +17,16 @@
 (*                                                                        *)
 (**************************************************************************)
 
-
+val meta_inst   : Theory.meta
+val meta_lskept : Theory.meta
 val meta_lsinst : Theory.meta
-val meta_kept   : Theory.meta
 
-module Env : sig
-  module Mtyl : Map.S with type key = Ty.ty list
-  module Htyl : Hashtbl.S with type key = Ty.ty list
-
-  type env = Term.lsymbol Mtyl.t Term.Mls.t
-
-  val empty_env : env
-
-  val print_env : Format.formatter -> env -> unit
-
-  val metas_of_env :
-    Term.lsymbol Mtyl.t Term.Mls.t -> Theory.tdecl list -> Theory.tdecl list
-  val env_of_metas :
-    Theory.meta_arg list list -> Term.lsymbol Mtyl.t Term.Mls.t
-
+module Lsmap : sig
+  type t
+  val empty : t
+  val add : Term.lsymbol -> Ty.ty list -> Ty.ty option -> t -> t
 end
 
-val lsymbol_distinction : Task.task Trans.trans
+val ft_select_inst   : (Env.env,Ty.Sty.t) Trans.flag_trans
+val ft_select_lskept : (Env.env,Term.Sls.t) Trans.flag_trans
+val ft_select_lsinst : (Env.env,Lsmap.t) Trans.flag_trans

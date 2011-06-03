@@ -17,27 +17,17 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Env
-open Theory
-open Task
-open Trans
-
 val debug : Debug.flag
 
-val meta_base          : Theory.meta
-val meta_lsinst        : Theory.meta
-val meta_kept          : Theory.meta
-val meta_lskept        : Theory.meta
+val meta_base : Theory.meta
+val meta_kept : Theory.meta
 
-val ft_select_lsinst    : (env,task) Trans.flag_trans
-val ft_select_kept      : (env,task) Trans.flag_trans
-val ft_select_lskept    : (env,task) Trans.flag_trans
-val ft_completion_mode  : (env,task) Trans.flag_trans
-
-val ft_enco_kept : (env,task) Trans.flag_trans
-val ft_enco_poly : (env,task) Trans.flag_trans
+val ft_select_kept : (Env.env,Ty.Sty.t)  Trans.flag_trans
+val ft_enco_kept   : (Env.env,Task.task) Trans.flag_trans
+val ft_enco_poly   : (Env.env,Task.task) Trans.flag_trans
 
 val monomorphise_goal : Task.task Trans.trans
 
 val encoding_smt  : Env.env -> Task.task Trans.trans
 val encoding_tptp : Env.env -> Task.task Trans.trans
+
