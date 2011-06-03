@@ -215,6 +215,13 @@ let pat_or p q =
   ty_equal_check p.pat_ty q.pat_ty;
   pat_or p q
 
+(* rename all variables in a pattern *)
+
+let rec pat_rename_all m p = match p.pat_node with
+  | Pvar v -> pat_var (Mvs.find v m)
+  | Pas (p, v) -> pat_as (pat_rename_all m p) (Mvs.find v m)
+  | _ -> pat_map (pat_rename_all m) p
+
 (* symbol-wise map/fold *)
 
 let rec pat_gen_map fnT fnL m pat =
@@ -312,6 +319,8 @@ let t_ty_check t ty = match ty, t.t_ty with
   | Some _, None -> raise (TermExpected t)
   | None, Some _ -> raise (FmlaExpected t)
   | None, None -> ()
+
+let vs_check v t = ty_equal_check v.vs_ty (t_type t)
 
 (* trigger equality and traversal *)
 
@@ -607,26 +616,21 @@ let t_close_quant vl tl f =
 
 (* open bindings *)
 
-let gen_fresh_vsymbol fnT v =
-  create_vsymbol (id_clone v.vs_name) (fnT v.vs_ty)
+let fresh_vsymbol v =
+  create_vsymbol (id_clone v.vs_name) v.vs_ty
 
-let gen_vs_rename fnT h v =
-  let u = gen_fresh_vsymbol fnT v in
+let vs_rename h v =
+  let u = fresh_vsymbol v in
   Mvs.add v (t_var u) h, u
 
-let gen_vl_rename fnT h vl =
-  Util.map_fold_left (gen_vs_rename fnT) h vl
+let vl_rename h vl =
+  Util.map_fold_left vs_rename h vl
 
-let gen_pat_rename fnT fnL h p =
-  let add_vs v () = gen_fresh_vsymbol fnT v in
+let pat_rename h p =
+  let add_vs v () = fresh_vsymbol v in
   let m = Mvs.mapi add_vs p.pat_vars in
-  let p = pat_gen_map fnT fnL m p in
+  let p = pat_rename_all m p in
   Mvs.union (fun _ _ t -> Some t) h (Mvs.map t_var m), p
-
-let fresh_vsymbol = gen_fresh_vsymbol (fun ty -> ty)
-let vs_rename = gen_vs_rename (fun ty -> ty)
-let vl_rename = gen_vl_rename (fun ty -> ty)
-let pat_rename = gen_pat_rename (fun ty -> ty) (fun ls -> ls)
 
 let t_open_bound (v,b,t) =
   let m,v = vs_rename b.bv_subst v in
@@ -699,7 +703,7 @@ let t_if f t1 t2 =
   t_if (t_prop f) t1 t2
 
 let t_let t1 ((v,_,t2) as bt) =
-  ty_equal_check v.vs_ty (t_type t1);
+  vs_check v t1;
   t_let t1 bt t2.t_ty
 
 exception EmptyCase
@@ -789,16 +793,41 @@ let t_pred_app_l pr tl = match List.rev tl with
 
 (* generic map over types, symbols and variables *)
 
-let gen_bnd_combine fn m { bv_subst = h } =
-  Mvs.union (fun _ _ t -> Some t) m (Mvs.map fn h)
+let gen_fresh_vsymbol fnT v =
+  let ty = fnT v.vs_ty in
+  if ty_equal ty v.vs_ty then v else
+  create_vsymbol (id_clone v.vs_name) ty
+
+let gen_vs_rename fnT h v =
+  let u = gen_fresh_vsymbol fnT v in
+  Mvs.add v u h, u
+
+let gen_vl_rename fnT h vl =
+  Util.map_fold_left (gen_vs_rename fnT) h vl
+
+let gen_pat_rename fnT fnL h p =
+  let add_vs v () = gen_fresh_vsymbol fnT v in
+  let m = Mvs.mapi add_vs p.pat_vars in
+  let p = pat_gen_map fnT fnL m p in
+  Mvs.union (fun _ _ t -> Some t) h m, p
+
+let gen_bnd_rename fnT fnE h b =
+  let add_bv v n m = Mvs.add (Mvs.find v h) n m in
+  let bvs = Mvs.fold add_bv b.bv_vars Mvs.empty in
+  let add_bs v t (nh, m) =
+    let nh,v = gen_vs_rename fnT nh v in
+    nh, Mvs.add v (fnE t) m
+  in
+  let h,bsb = Mvs.fold add_bs b.bv_subst (h,Mvs.empty) in
+  h, { bv_vars = bvs ; bv_subst = bsb }
 
 let rec t_gen_map fnT fnL m t =
   let fn = t_gen_map fnT fnL m in
   t_label_copy t (match t.t_node with
     | Tvar v ->
-        let r = Mvs.find_default v t m in
-        ty_equal_check (fnT (t_type t)) (t_type r);
-        r
+        let u = Mvs.find_default v v m in
+        ty_equal_check (fnT v.vs_ty) u.vs_ty;
+        t_var u
     | Tconst _ ->
         t
     | Tapp (fs, tl) ->
@@ -806,25 +835,25 @@ let rec t_gen_map fnT fnL m t =
     | Tif (f, t1, t2) ->
         t_if (fn f) (fn t1) (fn t2)
     | Tlet (t1, (u,b,t2)) ->
-        let m = gen_bnd_combine fn m b in
-        let m,v = gen_vs_rename fnT m u in
-        t_let_close v (fn t1) (t_gen_map fnT fnL m t2)
+        let m,b = gen_bnd_rename fnT fn m b in
+        let m,u = gen_vs_rename fnT m u in
+        t_let (fn t1) (u, b, t_gen_map fnT fnL m t2)
     | Tcase (t1, bl) ->
         let fn_br (p,b,t2) =
-          let m = gen_bnd_combine fn m b in
+          let m,b = gen_bnd_rename fnT fn m b in
           let m,p = gen_pat_rename fnT fnL m p in
-          t_close_branch p (t_gen_map fnT fnL m t2)
+          (p, b, t_gen_map fnT fnL m t2)
         in
         t_case (fn t1) (List.map fn_br bl)
     | Teps (u,b,f) ->
-        let m = gen_bnd_combine fn m b in
-        let m,v = gen_vs_rename fnT m u in
-        t_eps_close v (t_gen_map fnT fnL m f)
-    | Tquant (q, (vl,b,tl,f1)) ->
-        let m = gen_bnd_combine fn m b in
+        let m,b = gen_bnd_rename fnT fn m b in
+        let m,u = gen_vs_rename fnT m u in
+        t_eps (u, b, t_gen_map fnT fnL m f)
+    | Tquant (q, (vl,b,tl,f)) ->
+        let m,b = gen_bnd_rename fnT fn m b in
         let m,vl = gen_vl_rename fnT m vl in
         let fn = t_gen_map fnT fnL m in
-        t_quant_close q vl (tr_map fn tl) (fn f1)
+        t_quant q (vl, b, tr_map fn tl, fn f)
     | Tbinop (op, f1, f2) ->
         t_binary op (fn f1) (fn f2)
     | Tnot f1 ->
@@ -836,13 +865,19 @@ let t_gen_map fnT fnL mapV t = t_gen_map (Wty.memoize 17 fnT) fnL mapV t
 
 (* map over type and logic symbols *)
 
-let gen_mapV fnT = Mvs.mapi (fun v _ -> t_var (gen_fresh_vsymbol fnT v))
+let gen_mapV fnT = Mvs.mapi (fun v _ -> gen_fresh_vsymbol fnT v)
 
 let t_s_map fnT fnL t = t_gen_map fnT fnL (gen_mapV fnT t.t_vars) t
 
 (* simultaneous substitution into types and terms *)
 
-let t_ty_subst mapT mapV t = t_gen_map (ty_inst mapT) (fun ls -> ls) mapV t
+let t_ty_subst mapT mapV t =
+  let fnT = ty_inst mapT in
+  let m = gen_mapV fnT t.t_vars in
+  let t = t_gen_map fnT (fun ls -> ls) m t in
+  let add _ v t m = vs_check v t; Mvs.add v t m in
+  let m = Mvs.fold2_inter add m mapV Mvs.empty in
+  t_subst_unsafe m t
 
 (* fold over symbols *)
 
@@ -875,13 +910,23 @@ let t_s_all prT prL t =
 let t_s_any prT prL t =
   try t_s_fold (any_fn prT) (any_fn prL) false t with FoldSkip -> true
 
-(* fold over types in terms and formulas *)
+(* map/fold over types in terms and formulas *)
 
-let t_ty_fold fn acc t = t_gen_fold fn Util.const acc t
+let t_ty_map fn t = t_s_map fn (fun ls -> ls) t
+
+let t_ty_fold fn acc t = t_s_fold fn Util.const acc t
 
 let t_ty_freevars = t_ty_fold ty_freevars
 
-(* fold over applications in terms and formulas (but not in patterns!) *)
+(* map/fold over applications in terms and formulas (but not in patterns!) *)
+
+let rec t_app_map fn t =
+  let t = t_map_unsafe (t_app_map fn) t in
+  match t.t_node with
+    | Tapp (ls,tl) ->
+        let ls = fn ls (List.map t_type tl) t.t_ty in
+        t_label_copy t (t_app ls tl t.t_ty)
+    | _ -> t
 
 let rec t_app_fold fn acc t =
   let acc = t_fold_unsafe (t_app_fold fn) acc t in
@@ -1039,8 +1084,7 @@ let t_map_cont fn = t_map_cont (fun cont t ->
 (* map/fold over free variables *)
 
 let t_v_map fn t =
-  let fn v _ =
-    let res = fn v in ty_equal_check v.vs_ty (t_type res); res in
+  let fn v _ = let res = fn v in vs_check v res; res in
   t_subst_unsafe (Mvs.mapi fn t.t_vars) t
 
 let t_v_fold fn acc t = Mvs.fold (fun v _ a -> fn a v) t.t_vars acc
@@ -1050,9 +1094,7 @@ let t_v_any pr t = Mvs.exists  (fun v _ -> pr v) t.t_vars
 
 (* replaces variables with terms in term [t] using map [m] *)
 
-let t_subst m t =
-  Mvs.iter (fun v t -> ty_equal_check v.vs_ty (t_type t)) m;
-  t_subst_unsafe m t
+let t_subst m t = Mvs.iter vs_check m; t_subst_unsafe m t
 
 let t_subst_single v t1 t = t_subst (Mvs.singleton v t1) t
 
@@ -1329,7 +1371,7 @@ let t_let_simp e ((v,b,t) as bt) =
   if n = 0 then
     t_subst_unsafe b.bv_subst t else
   if n = 1 || small e then begin
-    ty_equal_check v.vs_ty (t_type e);
+    vs_check v e;
     t_subst_unsafe (Mvs.add v e b.bv_subst) t
   end else
     t_let e bt

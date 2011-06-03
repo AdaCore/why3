@@ -378,7 +378,7 @@ val t_ty_subst : ty Mtv.t -> term Mvs.t -> term -> term
 val t_freevars    : int Mvs.t -> term -> int Mvs.t
 val t_ty_freevars : Stv.t -> term -> Stv.t
 
-(** Map/fold over types and logical symbols *)
+(** Map/fold over types and logical symbols in terms and patterns *)
 
 val t_s_map : (ty -> ty) -> (lsymbol -> lsymbol) -> term -> term
 val t_s_fold : ('a -> ty -> 'a) -> ('a -> lsymbol -> 'a) -> 'a -> term -> 'a
@@ -386,9 +386,13 @@ val t_s_fold : ('a -> ty -> 'a) -> ('a -> lsymbol -> 'a) -> 'a -> term -> 'a
 val t_s_all : (ty -> bool) -> (lsymbol -> bool) -> term -> bool
 val t_s_any : (ty -> bool) -> (lsymbol -> bool) -> term -> bool
 
+val t_ty_map : (ty -> ty) -> term -> term
 val t_ty_fold : ('a -> ty -> 'a) -> 'a -> term -> 'a
 
-(* Fold over applications in terms (but not in patterns!) *)
+(* Map/fold over applications in terms (but not in patterns!) *)
+
+val t_app_map :
+  (lsymbol -> ty list -> ty option -> lsymbol) -> term -> term
 
 val t_app_fold :
   ('a -> lsymbol -> ty list -> ty option -> 'a) -> 'a -> term -> 'a
