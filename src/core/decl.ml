@@ -85,6 +85,28 @@ let open_ls_defn_cb ld =
 
 let ls_defn_axiom (_,f) = f
 
+let ls_defn_of_axiom f =
+  let _,_,f = match f.t_node with
+    | Tquant (Tforall,b) -> t_open_quant b
+    | _ -> [],[],f in
+  let hd,e = match f.t_node with
+    | Tapp (ls, [hd; t]) when ls_equal ls ps_equ -> hd,t
+    | Tbinop (Tiff, hd, f) -> hd,f
+    | _ -> raise Exit in
+  let ls,tl = match hd.t_node with
+    | Tapp (ls,tl) -> ls,tl
+    | _ -> raise Exit in
+  let vs_of_t t = match t.t_node with
+    | Tvar v -> v
+    | _ -> raise Exit in
+  let vl = List.map vs_of_t tl in
+  make_ls_defn ls vl e
+
+let ls_defn_of_axiom f =
+  try Some (ls_defn_of_axiom f) with
+    | Exit | UnboundVar _ | UnboundTypeVar _
+    | DuplicateVar _ | TypeMismatch _ -> None
+
 (** Termination checking for mutually recursive logic declarations *)
 
 type descent =

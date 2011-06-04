@@ -48,6 +48,11 @@ val open_ls_defn_cb : ls_defn -> vsymbol list * term *
 
 val ls_defn_axiom : ls_defn -> term
 
+val ls_defn_of_axiom : term -> logic_decl option
+(** tries to reconstruct a definition from a defining axiom. Do not apply
+    this to recursive definitions: it may successfully build a logic_decl,
+    which will fail later because of non-assured termination *)
+
 val check_termination : logic_decl list -> (int list) Mls.t
 (** [check_termination ldl] returns a mapping of every logical
     symbol defined in [ldl] to a list of its argument positions

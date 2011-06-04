@@ -57,5 +57,9 @@ val lsdecl_of_tydecl_select : ty_decl list -> decl list
 (* monomorphise wrt the base type, the set of kept types, and a symbol map *)
 val d_monomorph : ty -> Sty.t -> (lsymbol -> lsymbol) -> decl -> decl list
 
-(* Close by subtype the set of type tagged by the meta "kept" *)
+(* close by subtype the set of type tagged by the meta "kept" *)
 val close_kept : Task.task Trans.trans
+
+(* reconstruct a definition of an lsymbol or make a defining axiom *)
+val defn_or_axiom : lsymbol -> term -> decl list
+

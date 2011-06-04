@@ -150,18 +150,13 @@ let map env d = match d.d_node with
       let conv_f tvar (defns,axioms) =
         let f = t_ty_subst tvar Mvs.empty f in
         let f = t_app_map (find_logic env) f in
-        let vl,_,e = match f.t_node with
-          | Tquant (Tforall,b) -> t_open_quant b
-          | _ -> [],[],f in
-        let ls,e = match e.t_node with
-          | Tapp (_, [{t_node = Tapp (ls,_)}; e])
-          | Tbinop (_, {t_node = Tapp (ls,_)}, e) -> ls,e
-          | _ -> assert false in
-        if List.for_all2 (fun ty v -> ty_equal ty v.vs_ty) ls.ls_args vl
-                                && option_eq ty_equal ls.ls_value e.t_ty
-        then create_logic_decl [make_ls_defn ls vl e] :: defns, axioms
-        else let id = id_fresh (ls.ls_name.id_string ^ "_inst") in
-          defns, create_prop_decl Paxiom (create_prsymbol id) f :: axioms
+        match ls_defn_of_axiom f with
+          | Some ld ->
+              create_logic_decl [ld] :: defns, axioms
+          | None ->
+              let nm = ls.ls_name.id_string ^ "_inst" in
+              let pr = create_prsymbol (id_derive nm ls.ls_name) in
+              defns, create_prop_decl Paxiom pr f :: axioms
       in
       let defns,axioms = Ssubst.fold conv_f substs ([],[]) in
       ts_of_ls env ls (List.rev_append defns axioms)

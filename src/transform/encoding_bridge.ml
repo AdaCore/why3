@@ -159,116 +159,83 @@ let conv_res_app tenv p tl tty =
 
 let rec rewrite_term tenv vsvar t =
   (* Format.eprintf "@[<hov 2>Term : %a =>@\n@?" Pretty.print_term t; *)
-  let fnT = rewrite_term tenv in
-  let fnF = rewrite_fmla tenv in
+  let fn = rewrite_term tenv in
   let t = match t.t_node with
     | Tvar vs -> Mvs.find vs vsvar
     | Tconst _ -> t
-    | Tapp(p,tl) ->
-        let tl = List.map (fnT vsvar) tl in
+    | Tapp(p, [t1;t2]) when ls_equal p ps_equ ->
+        t_equ (fn vsvar t1) (fn vsvar t2)
+    | Tapp(p, tl) ->
+        let tl = List.map (fn vsvar) tl in
         let p = Hls.find tenv.trans_lsymbol p in
         let tl = List.map2 (conv_arg tenv) tl p.ls_args in
+        if t.t_ty = None then ps_app p tl else
         conv_res_app tenv p tl (t_type t)
     | Tlet (t1, b) ->
         let u,t2,close = t_open_bound_cb b in
-        let t1 = fnT vsvar t1 in
+        let t1 = fn vsvar t1 in
         let u' = conv_vs tenv u in
         let vsvar = Mvs.add u (t_var u') vsvar in
-        let t2 = fnT vsvar t2 in
+        let t2 = fn vsvar t2 in
         t_let t1 (close u' t2)
     | Teps b ->
         let u,f,close = t_open_bound_cb b in
         let u' = conv_vs tenv u in
         let vsvar = Mvs.add u (t_var u') vsvar in
-        let f = fnF vsvar f in
+        let f = fn vsvar f in
         t_eps (close u' f)
     | Tif (f,t1,t2) ->
-        t_if (fnF vsvar f) (fnT vsvar t1) (fnT vsvar t2)
+        t_if (fn vsvar f) (fn vsvar t1) (fn vsvar t2)
     | Tcase _ ->
         Printer.unsupportedTerm t "no match expressions at this point"
-    | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> raise (TermExpected t)
-  in
-  (* Format.eprintf "@[<hov 2>Term : => %a : %a@\n@?" Pretty.print_term t *)
-  (*   Pretty.print_ty t.t_ty; *)
-  t
-
-and rewrite_fmla tenv vsvar f =
-  (* Format.eprintf "@[<hov 2>Fmla : %a =>@\n@?" Pretty.print_fmla f; *)
-  let fnT = rewrite_term tenv in
-  let fnF = rewrite_fmla tenv in
-  let f = match f.t_node with
-    | Tapp(p, [t1;t2]) when ls_equal p ps_equ ->
-        t_equ (fnT vsvar t1) (fnT vsvar t2)
-    | Tapp(p, tl) ->
-        let tl = List.map (fnT vsvar) tl in
-        let p = Hls.find tenv.trans_lsymbol p in
-        let tl = List.map2 (conv_arg tenv) tl p.ls_args in
-        ps_app p tl
     | Tquant (q, b) ->
         let vl, tl, f1, close = t_open_quant_cb b in
         let conv_vs (vsvar,l) vs =
           let vs' = conv_vs tenv vs in
           Mvs.add vs (t_var vs') vsvar,vs'::l in
         let (vsvar,vl) = List.fold_left conv_vs (vsvar,[]) vl in
-        let f1 = fnF vsvar f1 in
+        let f1 = fn vsvar f1 in
         (* Ici un trigger qui ne match pas assez de variables
            peut être généré *)
-        let tl = TermTF.tr_map (fnT vsvar) (fnF vsvar) tl in
+        let tl = tr_map (fn vsvar) tl in
         let vl = List.rev vl in
         t_quant q (close vl tl f1)
-    | Tlet (t1, b) ->
-        let u,f2,close = t_open_bound_cb b in
-        let t1 = fnT vsvar t1 in
-        let u' = conv_vs tenv u in
-        let vsvar = Mvs.add u (t_var u') vsvar in
-        let f2 = fnF vsvar f2 in
-        t_let t1 (close u' f2)
-    | Tbinop (op,f1,f2) -> t_binary op (fnF vsvar f1) (fnF vsvar f2)
-    | Tnot f1 -> t_not (fnF vsvar f1)
-    | Ttrue | Tfalse -> f
-    | Tif (f1,f2,f3) ->
-        t_if (fnF vsvar f1) (fnF vsvar f2) (fnF vsvar f3)
-    | Tcase _ ->
-        Printer.unsupportedTerm f "no match expressions at this point"
-    | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
+    | Tbinop (op,f1,f2) -> t_binary op (fn vsvar f1) (fn vsvar f2)
+    | Tnot f1 -> t_not (fn vsvar f1)
+    | Ttrue | Tfalse -> t
   in
   (* Format.eprintf "@[<hov 2>Fmla : => %a@\n@?" Pretty.print_fmla f; *)
-  f
+  t
 
+let ls_of_tenv tenv ls =
+  try Hls.find tenv.trans_lsymbol ls
+  with Not_found ->
+    let ls_conv = conv_ls tenv ls in
+    Hls.add tenv.trans_lsymbol ls ls_conv;
+    ls_conv
 
-let decl (tenv:tenv) d =
-  (* let fnT = rewrite_term tenv in *)
-  let fnF = rewrite_fmla tenv in
-  match d.d_node with
+let decl (tenv:tenv) d = match d.d_node with
     (* | Dtype [ts,Tabstract] when is_kept tenv ts ->  *)
     (*     tenv.clone_builtin ts *)
-    | Dtype [_,Tabstract] -> [create_decl d]
-    | Dtype _ -> Printer.unsupportedDecl
-        d "encoding_decorate : I can work only on abstract \
-            type which are not in recursive bloc."
-    | Dlogic l ->
-        let fn = function
-          | _ls, Some _ ->
-              Printer.unsupportedDecl
-                d "encoding_decorate : I can't encode definition. \
-                    Perhaps you could use eliminate_definition"
-          | ls, None ->
-              try
-                let ls = Hls.find tenv.trans_lsymbol ls in
-                ls,None
-              with Not_found ->
-                let ls_conv = conv_ls tenv ls in
-                Hls.add tenv.trans_lsymbol ls ls_conv;
-                ls_conv,None in
-        [create_decl (create_logic_decl (List.map fn l))]
-    | Dind _ -> Printer.unsupportedDecl
-        d "encoding_decorate : I can't work on inductive"
-        (* let fn (pr,f) = pr, fnF f in *)
-        (* let fn (ps,l) = ps, List.map fn l in *)
-        (* [create_ind_decl (List.map fn l)] *)
-    | Dprop (k,pr,f) ->
-        let f = fnF Mvs.empty f in
-        [create_decl (create_prop_decl k pr f)]
+  | Dtype [_,Tabstract] -> [d]
+  | Dtype _ -> Printer.unsupportedDecl d
+      "Algebraic and recursively-defined types are \
+            not supported, run eliminate_algebraic"
+  | Dlogic [ls, None] ->
+      [create_logic_decl [ls_of_tenv tenv ls, None]]
+  | Dlogic [ls, Some ld] when not (Sid.mem ls.ls_name d.d_syms) ->
+      let ls = ls_of_tenv tenv ls in
+      let f = rewrite_term tenv Mvs.empty (ls_defn_axiom ld) in
+      Libencoding.defn_or_axiom ls f
+  | Dlogic _ -> Printer.unsupportedDecl d
+      "Recursively-defined symbols are not supported, run eliminate_recursion"
+  | Dind _ -> Printer.unsupportedDecl d
+      "Inductive predicates are not supported, run eliminate_inductive"
+      (* let fn (pr,f) = pr, fnF f in *)
+      (* let fn (ps,l) = ps, List.map fn l in *)
+      (* [create_ind_decl (List.map fn l)] *)
+  | Dprop (k,pr,f) ->
+      [create_prop_decl k pr (rewrite_term tenv Mvs.empty f)]
 
 (*
 let decl tenv d =
@@ -283,7 +250,7 @@ let t env =
   Trans.compose Libencoding.close_kept
   (Trans.on_tagged_ty meta_kept (fun s ->
     let init_task,tenv = load_prelude s env in
-    Trans.tdecl (decl tenv) init_task))
+    Trans.decl (decl tenv) init_task))
 
 let () = Hashtbl.replace Encoding.ft_enco_kept "bridge" t
 

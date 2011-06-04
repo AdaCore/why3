@@ -248,3 +248,11 @@ let close_kept =
       let fold ty acc =
         Theory.create_meta Encoding.meta_kept [Theory.MAty ty] :: acc in
       Trans.add_tdecls (Sty.fold fold kept' []))
+
+let defn_or_axiom ls f =
+  match Decl.ls_defn_of_axiom f with
+    | Some ld -> [create_logic_decl [ld]]
+    | None ->
+        let nm = ls.ls_name.id_string ^ "_def" in
+        let pr = create_prsymbol (id_derive nm ls.ls_name) in
+        [create_logic_decl [ls,None]; create_prop_decl Paxiom pr f]

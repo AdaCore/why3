@@ -39,30 +39,25 @@ let rec deco_arg kept tvar t =
 
 and deco_term kept tvar t = match t.t_node with
   | Tapp (fs,tl) -> t_app fs (List.map (deco_arg kept tvar) tl) t.t_ty
-  | _ -> TermTF.t_map (deco_term kept tvar) (deco_fmla kept tvar) t
-
-and deco_fmla kept tvar f = match f.t_node with
-  | Tapp (ps,tl) -> ps_app ps (List.map (deco_arg kept tvar) tl)
   | Tquant (q,b) ->
       let vl,tl,f,close = t_open_quant_cb b in
-      let tl = TermTF.tr_map (deco_arg kept tvar) (deco_fmla kept tvar) tl in
-      t_quant q (close vl tl (deco_fmla kept tvar f))
-  | _ -> TermTF.t_map (deco_term kept tvar) (deco_fmla kept tvar) f
+      let tl = TermTF.tr_map (deco_arg kept tvar) (deco_term kept tvar) tl in
+      t_quant q (close vl tl (deco_term kept tvar f))
+  | _ -> t_map (deco_term kept tvar) t
 
 let deco_decl kept d = match d.d_node with
   | Dtype tdl ->
       d :: lsdecl_of_tydecl tdl
-  | Dlogic ldl ->
-      let check = function
-        | _, Some _ -> Printer.unsupportedDecl d "eliminate definitions"
-        | _ -> ()
-      in
-      List.iter check ldl;
-      [d]
-  | Dind _ -> Printer.unsupportedDecl d "eliminate inductives"
+  | Dlogic [_, None] -> [d]
+  | Dlogic [ls, Some ld] when not (Sid.mem ls.ls_name d.d_syms) ->
+      let f = t_type_close (deco_term kept) (ls_defn_axiom ld) in
+      defn_or_axiom ls f
+  | Dlogic _ -> Printer.unsupportedDecl d
+      "Recursively-defined symbols are not supported, run eliminate_recursion"
+  | Dind _ -> Printer.unsupportedDecl d
+      "Inductive predicates are not supported, run eliminate_inductive"
   | Dprop (k,pr,f) ->
-      let f = t_type_close (deco_fmla kept) f in
-      [create_prop_decl k pr f]
+      [create_prop_decl k pr (t_type_close (deco_term kept) f)]
 
 let d_poly_deco = create_logic_decl [ls_poly_deco, None]
 
