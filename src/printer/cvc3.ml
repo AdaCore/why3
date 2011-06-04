@@ -258,7 +258,8 @@ let print_logic_decl info fmt (ls,ld) =
       (print_lsargs info) ls.ls_args
       (print_type_value info) ls.ls_value
       (print_var_list info) vsl
-      (print_expr info) expr
+      (print_expr info) expr;
+    List.iter forget_var vsl
 
 let print_logic_decl info fmt d =
   if Sid.mem (fst d).ls_name info.info_rem then
