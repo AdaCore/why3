@@ -4,11 +4,13 @@ printer "why3"
 filename "%f-%t-%g.why"
 
 transformation "inline_trivial"
+
 transformation "eliminate_builtin"
-transformation "eliminate_definition"
+transformation "eliminate_recursion"
 transformation "eliminate_inductive"
 transformation "eliminate_algebraic_smt"
 
+transformation "discriminate"
 transformation "encoding_smt"
 
 theory BuiltIn
@@ -18,6 +20,12 @@ theory BuiltIn
 
   meta "encoding : kept" type int
   meta "encoding : kept" type real
+end
+
+theory map.Map
+  meta "encoding : lskept" logic get
+  meta "encoding : lskept" logic set
+  meta "encoding : lskept" logic const
 end
 
 import "discrimination.gen"

@@ -230,6 +230,15 @@ let lsinst_completion kept lskept env =
   in
   Sls.fold fold_ls lskept env
 
+let add_user_lsinst env = function
+  | [MAls ls; MAls nls] -> Lsmap.add ls nls.ls_args nls.ls_value env
+  | _ -> assert false
+
+let clear_metas = Trans.fold (fun hd task ->
+  match hd.task_decl.td_node with
+    | Meta (m,_) when meta_equal m meta_lsinst -> task
+    | _ -> add_tdecl task hd.task_decl) None
+
 let select_lsinst env =
   let inst   = Trans.on_flag meta_select_inst   ft_select_inst   "none" env in
   let lskept = Trans.on_flag meta_select_lskept ft_select_lskept "none" env in
@@ -240,10 +249,10 @@ let select_lsinst env =
     let lsinst = Trans.apply lsinst task in
     let inst   = Sty.union inst   (Task.on_tagged_ty meta_inst   task) in
     let lskept = Sls.union lskept (Task.on_tagged_ls meta_lskept task) in
-    (* we currently ignore the existing lsinst metas (though we shouldn't),
-       but we don't ignore them in lsymbol_distinction (though we should). *)
-    let env = lsinst_completion inst lskept lsinst in
-    Trans.apply (Trans.add_tdecls (metas_from_env env)) task
+    let lsinst = Task.on_meta meta_lsinst add_user_lsinst lsinst task in
+    let lsinst = lsinst_completion inst lskept lsinst in
+    let task   = Trans.apply clear_metas task in
+    Trans.apply (Trans.add_tdecls (metas_from_env lsinst)) task
   in
   Trans.store trans
 
