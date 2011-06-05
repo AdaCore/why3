@@ -19,7 +19,6 @@
 
 val debug : Debug.flag
 
-val meta_base : Theory.meta
 val meta_kept : Theory.meta
 
 val ft_select_kept : (Env.env,Ty.Sty.t)  Trans.flag_trans

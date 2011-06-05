@@ -259,11 +259,10 @@ let guard =
 
 (** {2 monomorphise task } *)
 
-let ts_base = create_tysymbol (id_fresh "uni") [] None
-let ty_base = ty_app ts_base []
+open Libencoding
 
-let lsmap tyb kept = Wls.memoize 63 (fun ls ->
-  let tymap ty = if Sty.mem ty kept then ty else tyb in
+let lsmap kept = Wls.memoize 63 (fun ls ->
+  let tymap ty = if Sty.mem ty kept then ty else ty_base in
   let ty_res = Util.option_map tymap ls.ls_value in
   let ty_arg = List.map tymap ls.ls_args in
   if Util.option_eq ty_equal ty_res ls.ls_value &&
@@ -272,25 +271,10 @@ let lsmap tyb kept = Wls.memoize 63 (fun ls ->
 
 let d_ts_base = create_ty_decl [ts_base, Tabstract]
 
-let monomorph tyb = Trans.on_tagged_ty Encoding.meta_kept (fun kept ->
+let monomorph = Trans.on_tagged_ty Encoding.meta_kept (fun kept ->
   let kept = Sty.add ty_type kept in
-  let tyb = match tyb.ty_node with
-    | Tyapp (_,[]) when not (Sty.mem tyb kept) -> tyb
-    | _ -> ty_base
-  in
-  let decl = Libencoding.d_monomorph tyb kept (lsmap tyb kept) in
+  let decl = d_monomorph kept (lsmap kept) in
   Trans.decl decl (Task.add_decl None d_ts_base))
-
-let monomorph = Trans.on_meta_excl Encoding.meta_base (fun alo ->
-  let tyb = match alo with
-    | Some [Theory.MAts ts] when ts.ts_args = [] ->
-        begin match ts.ts_def with
-          | Some ty -> ty
-          | None -> ty_app ts []
-        end
-    | _ -> ty_base
-  in
-  monomorph tyb)
 
 let () = Hashtbl.replace Encoding.ft_enco_poly "guard"
     (fun _ -> Trans.compose guard monomorph)

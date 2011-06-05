@@ -28,8 +28,7 @@ open Trans
 
 let debug = Debug.register_flag "encoding"
 
-let meta_kept = register_meta      "encoding : kept" [MTty]
-let meta_base = register_meta_excl "encoding : base" [MTtysymbol]
+let meta_kept = register_meta "encoding : kept" [MTty]
 
 let meta_select_kept = register_meta_excl "select_kept" [MTstring]
 let meta_enco_kept   = register_meta_excl "enco_kept"   [MTstring]

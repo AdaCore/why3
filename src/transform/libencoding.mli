@@ -21,6 +21,15 @@ open Ty
 open Term
 open Decl
 
+(* sort symbol of the "universal" type *)
+val ts_base : tysymbol
+
+(* "universal" sort *)
+val ty_base : ty
+
+(* ts_base type declaration *)
+val d_ts_base : decl
+
 (* sort symbol of (polymorphic) types *)
 val ts_type : tysymbol
 
@@ -54,8 +63,8 @@ val lsdecl_of_tydecl : ty_decl list -> decl list
 (* convert a type declaration to a list of lsymbol declarations *)
 val lsdecl_of_tydecl_select : ty_decl list -> decl list
 
-(* monomorphise wrt the base type, the set of kept types, and a symbol map *)
-val d_monomorph : ty -> Sty.t -> (lsymbol -> lsymbol) -> decl -> decl list
+(* monomorphise wrt the set of kept types, and a symbol map *)
+val d_monomorph : Sty.t -> (lsymbol -> lsymbol) -> decl -> decl list
 
 (* close by subtype the set of type tagged by the meta "kept" *)
 val close_kept : Task.task Trans.trans

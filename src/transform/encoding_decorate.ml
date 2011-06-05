@@ -70,9 +70,6 @@ let deco kept = Trans.decl (deco_decl kept) deco_init
 
 (** Monomorphisation *)
 
-let ts_base = create_tysymbol (id_fresh "uni") [] None
-let ty_base = ty_app ts_base []
-
 let ts_deco = create_tysymbol (id_fresh "deco") [] None
 let ty_deco = ty_app ts_deco []
 let ls_deco = create_fsymbol (id_fresh "sort") [ty_type;ty_base] ty_deco
@@ -97,10 +94,10 @@ let mono_init =
   init
 
 let mono kept =
-  Trans.decl (d_monomorph ty_base kept (lsmap kept)) mono_init
+  let kept = Sty.add ty_type kept in
+  Trans.decl (d_monomorph kept (lsmap kept)) mono_init
 
 let t = Trans.on_tagged_ty Encoding.meta_kept (fun kept ->
-  let kept = Sty.add ty_type kept in
   Trans.compose (deco kept) (mono kept))
 
 let () = Hashtbl.replace Encoding.ft_enco_poly "decorate" (const t)
