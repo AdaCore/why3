@@ -4,20 +4,21 @@
 module M
 
   use import int.Int
-  use import module ref.Ref
+  use import module ref.Refint
   use import module array.Array
 
   let max_sum (a: array int) (n: int) =
-  { n >= 0 and length a = n and forall i:int. 0 <= i < n -> a[i] >= 0 }
-  let sum = ref 0 in
-  let max = ref 0 in
-  for i = 0 to n-1 do
-    invariant { !sum <= i * !max and forall j:int. 0 <= j < i -> a[j] <= !max }
-    if !max < a[i] then max := a[i];
-    sum := !sum + a[i]
-  done;
-  (!sum, !max)
-  { let (sum, max) = result in sum <= n * max }
+    { n >= 0 and length a = n and forall i:int. 0 <= i < n -> a[i] >= 0 }
+    let sum = ref 0 in
+    let max = ref 0 in
+    for i = 0 to n-1 do
+      invariant 
+        { !sum <= i * !max and forall j:int. 0 <= j < i -> a[j] <= !max }
+      if !max < a[i] then max := a[i];
+      sum += a[i]
+    done;
+    (!sum, !max)
+    { let (sum, max) = result in sum <= n * max }
 
 end
 

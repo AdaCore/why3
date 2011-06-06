@@ -23,10 +23,12 @@ module Refint
   use export module Ref
 
   (* parameter incr : r:ref int -> {} unit writes r { !r = old !r + 1 } *)
-  let incr (r:ref int) = {} r := !r + 1 { !r = old !r + 1 }
+  let incr (r: ref int) = {} r := !r + 1 { !r = old !r + 1 }
 
   (* parameter decr : r:ref int -> {} unit writes r { !r = old !r - 1 } *)
-  let decr (r:ref int) = {} r := !r - 1 { !r = old !r - 1 }
+  let decr (r: ref int) = {} r := !r - 1 { !r = old !r - 1 }
+
+  let (+=) (r: ref int) (v: int) = {} r := !r + v { !r = old !r + v }
 
 end
 

@@ -171,28 +171,44 @@ is inspired by~\cite{ayad10ijcar}.
 \section{Library \texttt{array}}
 
 \begin{description}
-\item[Array] 
-\item[ArraySorted] 
-\item[ArrayEq] 
-\item[ArrayPermut] 
+\item[Array]polymorphic arrays (type \texttt{array 'a}, infix
+  syntax $a[i]$ for access and $a[i] \leftarrow e$ for update,
+  functions \texttt{length}, \texttt{make}, \texttt{append},
+  \texttt{sub}, \texttt{copy}, \texttt{fill}, and \texttt{blit})
+\item[ArraySorted] an array of integers is sorted
+  (\verb|array_sorted_sub| and \verb|array_sorted|)
+\item[ArrayEq] two arrays are identical
+  (\verb|array_eq_sub| and \verb|array_eq|)
+\item[ArrayPermut] two arrays are permutation of each other
+  (\verb|permut_sub| and \verb|permut|)
 \end{description}
 
 \section{Library \texttt{queue}}
 
 \begin{description}
-\item[Queue] 
+\item[Queue] polymorphic mutable queues (type \texttt{t 'a} and
+  functions \texttt{create}, \texttt{push}, \texttt{pop},
+  \texttt{top}, \texttt{clear}, \texttt{copy}, \texttt{is\_empty},
+  \texttt{length})
 \end{description}
 
 \section{Library \texttt{stack}}
 
 \begin{description}
-\item[Stack] 
+\item[Stack] polymorphic mutable stacks (type \texttt{t 'a} and
+  functions \texttt{create}, \texttt{push}, \texttt{pop},
+  \texttt{top}, \texttt{clear}, \texttt{copy}, \texttt{is\_empty},
+  \texttt{length})
 \end{description}
 
 \section{Library \texttt{hashtbl}}
 
 \begin{description}
-\item[Hashtbl] 
+\item[Hashtbl] hash tables with monomorphic keys (type \texttt{key})
+  and polymorphic values (type \texttt{t 'a} of hash tables, syntax
+  $h[k]$ for access, functions \texttt{create}, \texttt{clear},
+  \texttt{add}, \texttt{mem}, \texttt{find}, \texttt{find\_all},
+  \texttt{copy}, \texttt{remove}, and \texttt{replace})
 \end{description}
 
 \section{Library \texttt{string}}

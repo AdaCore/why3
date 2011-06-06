@@ -2,12 +2,32 @@
 \label{chap:whyml}
 
 This chapter describes the \whyml\ programming language.
-
-% simple message = all Why3 language + mutable record fields + model
+A \whyml\ input text contains a list of theories (see
+chapter~\ref{chap:syntax}) and/or modules.
+Modules extend theories with \emph{programs}.
+Programs can use all types, symbols, and constructs from the logic.
+They also provide extra features:
+\begin{itemize}
+\item In a record type declaration, some fields can be declared
+  \texttt{mutable}.
+\item There are programming constructs with no counterpart in the logic:
+  \begin{itemize}
+  \item mutable field assignment;
+  \item sequence;
+  \item loops;
+  \item exceptions;
+  \item local and anonymous functions;
+  \item annotations: pre- and postconditions, assertions, loop invariants.
+  \end{itemize}
+\item A program function can be non-terminating or can be proved
+  to be terminating using a variant (a term together with a well-founded
+  order relation).
+\end{itemize}
+% TODO: model types
 
 % files .mlw
 % command line
-% tutorial with an example (same fringe)
+% tutorial with examples: same fringe, max/sum
 
 %%% Local Variables:
 %%% mode: latex
