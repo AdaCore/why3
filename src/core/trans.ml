@@ -233,7 +233,7 @@ let print_meta f m task =
     Pp.print_iter1 Stdecl.iter Pp.newline Pretty.print_tdecl fmt
       (find_meta_tds task m).tds_set
   in
-  Debug.dprintf f "meta %s : %a@." m.Theory.meta_name print_tds m;
+  Debug.dprintf f "@[<hov 2>meta %s :@\n%a@]@." m.Theory.meta_name print_tds m;
   task
 
 (** register transformations *)
