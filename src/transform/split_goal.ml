@@ -141,9 +141,10 @@ let split_goal ro pr f =
 let split_axiom ro pr f =
   let make_prop f =
     let pr = create_prsymbol (id_clone pr.pr_name) in
-    create_prop_decl Paxiom pr f
-  in
-  List.map make_prop (split_pos ro [] f)
+    create_prop_decl Paxiom pr f in
+  match split_pos ro [] f with
+    | [f] -> [create_prop_decl Paxiom pr f]
+    | fl  -> List.map make_prop fl
 
 let split_all ro d = match d.d_node with
   | Dprop (Pgoal, pr,f) ->  split_goal  ro pr f

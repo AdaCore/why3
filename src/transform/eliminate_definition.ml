@@ -32,7 +32,7 @@ let add_id q (ld,id) = function
   | ls, _ when Sls.mem ls q -> (ls, None)::ld, id
   | d -> ld, d::id
 
-let elim q d = match d.d_node with
+let elim q spr d = match d.d_node with
   | Dlogic l ->
       [create_logic_decl (List.map (add_ld q) l)]
   | Dind l ->
@@ -40,11 +40,13 @@ let elim q d = match d.d_node with
       let ld = if ld = [] then [] else [create_logic_decl (List.rev ld)] in
       let id = if id = [] then [] else [create_ind_decl   (List.rev id)] in
       ld @ id
+  | Dprop (Paxiom,pr,_) when Spr.mem pr spr -> []
   | _ -> [d]
 
 let eliminate_builtin =
-  Trans.on_tagged_ls Printer.meta_syntax_logic
-    (fun rem_ls -> Trans.decl (elim rem_ls) None)
+  Trans.on_tagged_ls Printer.meta_syntax_logic (fun rem_ls ->
+  Trans.on_tagged_pr Printer.meta_remove_prop  (fun rem_pr ->
+  Trans.decl (elim rem_ls rem_pr) None))
 
 let () = Trans.register_transform "eliminate_builtin" eliminate_builtin
 
