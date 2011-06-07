@@ -57,7 +57,7 @@ module Lsmap = struct
 
   let add ls tyl tyv lsmap =
     if ls_equal ls ps_equ then lsmap else
-    if not (List.for_all Ty.ty_closed tyl) then lsmap else
+    if not (List.for_all Ty.ty_closed (oty_cons tyl tyv)) then lsmap else
     let newls = function
       | None -> Some (create_lsymbol (id_clone ls.ls_name) tyl tyv)
       | nls  -> nls
