@@ -3,59 +3,59 @@
 <why3session name="examples/programs/same_fringe/why3session.xml">
  <file name="../same_fringe.mlw" verified="true" expanded="true">
   <theory name="SameFringe" verified="true" expanded="true">
-   <goal name="leftlen_nonneg" sum="9e80575f6e2af3d97ea15e644db5db14" proved="true" expanded="true">
+   <goal name="leftlen_nonneg" sum="d2d87a3927713430311330ea3f872f8d" proved="true" expanded="true">
     <proof prover="coq" timelimit="10" edited="same_fringe.mlw_SameFringe_leftlen_nonneg_1.v" obsolete="false">
      <result status="valid" time="0.59"/>
     </proof>
    </goal>
-   <goal name="WP_parameter enum" expl="correctness of parameter enum" sum="400dbb18200455814ca6e566343047e6" proved="true" expanded="true">
+   <goal name="WP_parameter enum" expl="correctness of parameter enum" sum="2dde99e9e4d7639b161a3faf6e97bf47" proved="true" expanded="true">
     <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.84"/>
+     <result status="valid" time="0.87"/>
     </proof>
    </goal>
-   <goal name="WP_parameter eq_enum" expl="correctness of parameter eq_enum" sum="70b74c191411efdf762cca0c55ea9f7c" proved="true" expanded="true">
+   <goal name="WP_parameter eq_enum" expl="correctness of parameter eq_enum" sum="cb0dc47b965bccbbddec9afc19d506a6" proved="true" expanded="true">
     <transf name="split_goal" proved="true" expanded="true">
-     <goal name="WP_parameter eq_enum.1" expl="correctness of parameter eq_enum" sum="8efd103daf9ddccb43746a8d352ad0e5" proved="true" expanded="true">
+     <goal name="WP_parameter eq_enum.1" expl="correctness of parameter eq_enum" sum="22293cfa748a377a7ef45ef9c269e46e" proved="true" expanded="true">
       <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.03"/>
+       <result status="valid" time="0.11"/>
       </proof>
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="timeout" time="10.07"/>
-      </proof>
-      <proof prover="z3" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="1.06"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter eq_enum.2" expl="correctness of parameter eq_enum" sum="55ffebc1aea30da2b2cadc0dd6637f0c" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.05"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter eq_enum.3" expl="correctness of parameter eq_enum" sum="b53fbfedc75c5b5ec5ac70d08cf8b227" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter eq_enum.4" expl="correctness of parameter eq_enum" sum="6c0281f01c50610cb3cd19d653d1d708" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter eq_enum.5" expl="correctness of parameter eq_enum" sum="ccebd2695c718ca0752b3d797f508b10" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter eq_enum.6" expl="correctness of parameter eq_enum" sum="36c65fbebc64ad2a8e593310f4a5bc27" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.04"/>
+      </proof>
+      <proof prover="z3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="3.11"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter eq_enum.2" expl="correctness of parameter eq_enum" sum="026769b58a16abea86cafcb8c45b893d" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.07"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter eq_enum.3" expl="correctness of parameter eq_enum" sum="84a8181acf56c883f3115292701baf53" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter eq_enum.4" expl="correctness of parameter eq_enum" sum="e5c26d89e960ac60062a2bbf332f621f" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter eq_enum.5" expl="correctness of parameter eq_enum" sum="72994225ed86ff50a7c92f47f77407a6" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter eq_enum.6" expl="correctness of parameter eq_enum" sum="79a1095a08a00d64512e15170f9d196b" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
       </proof>
      </goal>
     </transf>
    </goal>
-   <goal name="WP_parameter same_fringe" expl="normal postcondition" sum="84928bdc563afca8c3391397c48ceba3" proved="true" expanded="true">
+   <goal name="WP_parameter same_fringe" expl="normal postcondition" sum="78714b83a0adc89473a2d8ca868bb95e" proved="true" expanded="true">
     <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.02"/>
+     <result status="valid" time="0.03"/>
     </proof>
    </goal>
   </theory>
