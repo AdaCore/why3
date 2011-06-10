@@ -97,7 +97,7 @@ let mono kept =
   let kept = Sty.add ty_type kept in
   Trans.decl (d_monomorph kept (lsmap kept)) mono_init
 
-let t = Trans.on_tagged_ty Encoding.meta_kept (fun kept ->
+let t = Trans.on_tagged_ty Libencoding.meta_kept (fun kept ->
   Trans.compose (deco kept) (mono kept))
 
 let () = Hashtbl.replace Encoding.ft_enco_poly "decorate" (const t)

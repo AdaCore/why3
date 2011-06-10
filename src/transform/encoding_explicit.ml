@@ -126,16 +126,17 @@ let decl d = match d.d_node with
 
 let explicit = Trans.decl decl (Task.add_decl None d_ts_type)
 
-let meta_enum = Eliminate_algebraic.meta_enum
-
 let explicit =
-  Trans.on_tagged_ts meta_enum (fun enum ->
+  Trans.on_tagged_ty Libencoding.meta_kept (fun kept ->
+  Trans.on_tagged_ts Eliminate_algebraic.meta_enum (fun enum ->
+    let check ts = ts.ts_args = [] && Sty.mem (ty_app ts []) kept in
+    let enum = Sts.filter check enum in
     if Sts.is_empty enum then explicit
     else
       let ts = Sts.choose enum in
       let ty = ty_app ts (List.map ty_var ts.ts_args) in
       Printer.unsupportedType ty
-      "explicit is unsound in presence of type")
+      "explicit is unsound in presence of type"))
 
 
 (** {2 monomorphise task } *)
@@ -152,7 +153,7 @@ let lsmap kept = Wls.memoize 63 (fun ls ->
 
 let d_ts_base = create_ty_decl [ts_base, Tabstract]
 
-let monomorph = Trans.on_tagged_ty Encoding.meta_kept (fun kept ->
+let monomorph = Trans.on_tagged_ty Libencoding.meta_kept (fun kept ->
   let kept = Sty.add ty_type kept in
   let decl = d_monomorph kept (lsmap kept) in
   Trans.decl decl (Task.add_decl None d_ts_base))

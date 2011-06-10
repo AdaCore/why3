@@ -21,6 +21,11 @@ open Ty
 open Term
 open Decl
 
+val debug : Debug.flag
+
+(* meta to tag the protected types *)
+val meta_kept : Theory.meta
+
 (* sort symbol of the "universal" type *)
 val ts_base : tysymbol
 
@@ -66,7 +71,10 @@ val lsdecl_of_tydecl_select : ty_decl list -> decl list
 (* monomorphise wrt the set of kept types, and a symbol map *)
 val d_monomorph : Sty.t -> (lsymbol -> lsymbol) -> decl -> decl list
 
-(* close by subtype the set of type tagged by the meta "kept" *)
+(* replace type variables in a goal with fresh type constants *)
+val monomorphise_goal : Task.task Trans.trans
+
+(* close by subtype the set of types tagged by meta_kept *)
 val close_kept : Task.task Trans.trans
 
 (* reconstruct a definition of an lsymbol or make a defining axiom *)

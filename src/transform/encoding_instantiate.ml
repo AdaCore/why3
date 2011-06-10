@@ -531,7 +531,7 @@ let create_trans_complete kept complete =
 
 let encoding_instantiate =
   Trans.compose Libencoding.close_kept
-  (Trans.on_tagged_ty meta_kept (fun kept ->
+  (Trans.on_tagged_ty Libencoding.meta_kept (fun kept ->
     Trans.on_meta_excl meta_complete (fun complete ->
       create_trans_complete kept complete)))
 
@@ -549,7 +549,7 @@ let create_trans_complete create_env kept complete =
   Trans.fold_map fold_map env init_task
 
 let t create_env =
-  Trans.on_tagged_ty Encoding.meta_kept (fun kept ->
+  Trans.on_tagged_ty Libencoding.meta_kept (fun kept ->
   Trans.on_meta_excl meta_complete (fun complete ->
       create_trans_complete create_env kept complete))
 

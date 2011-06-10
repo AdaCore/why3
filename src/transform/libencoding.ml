@@ -22,6 +22,12 @@ open Ident
 open Ty
 open Term
 open Decl
+open Theory
+
+let debug = Debug.register_flag "encoding"
+
+(* meta to tag the protected types *)
+let meta_kept = register_meta "encoding : kept" [MTty]
 
 (* sort symbol of the "universal" type *)
 let ts_base = create_tysymbol (id_fresh "uni") [] None
@@ -90,7 +96,6 @@ let ls_selects_def_of_ts acc ts =
   let add acc fs = create_logic_decl [fs,None] :: acc in
   List.fold_left add props ls_selects
 
-
 (* convert a type to a term of type ty_type *)
 let rec term_of_ty tvmap ty = match ty.ty_node with
   | Tyvar tv ->
@@ -117,8 +122,6 @@ let lsdecl_of_tydecl acc td = match td with
         Printer.unsupportedType ty "no algebraic types at this point"
     | { ts_def = Some _ }, _ -> acc
     | ts, _ -> create_logic_decl [ls_of_ts ts, None] :: acc
-
-
 
 (* convert a type declaration to a list of lsymbol declarations *)
 let lsdecl_of_tydecl_select tdl =
@@ -237,20 +240,30 @@ let d_monomorph kept lsmap d =
   let add ls acc = create_logic_decl [ls,None] :: acc in
   Sls.fold add !consts dl
 
-(** close by subterm *)
+(* replace type variables in a goal with fresh type constants *)
+let monomorphise_goal = Trans.goal (fun pr f ->
+  let stv = t_ty_freevars Stv.empty f in
+  if Stv.is_empty stv then [create_prop_decl Pgoal pr f] else
+  let mty,ltv = Stv.fold (fun tv (mty,ltv) ->
+    let ts = create_tysymbol (id_clone tv.tv_name) [] None in
+    Mtv.add tv (ty_app ts []) mty, ts::ltv) stv (Mtv.empty,[]) in
+  let f = t_ty_subst mty Mvs.empty f in
+  List.fold_left
+    (fun acc ts -> create_ty_decl [ts,Tabstract] :: acc)
+    [create_prop_decl Pgoal pr f] ltv)
+
+(* close by subtype the set of types tagged by meta_kept *)
 let close_kept =
-  Trans.on_tagged_ty Encoding.meta_kept (fun kept ->
-    let fold ty acc =
-      let rec add acc ty = ty_fold add (Sty.add ty acc) ty in
-      add acc ty in
-    let kept' = Sty.fold fold kept kept in
+  Trans.on_tagged_ty meta_kept (fun kept ->
+    let rec add acc ty = ty_fold add (Sty.add ty acc) ty in
+    let kept' = Sty.fold (Util.flip add) kept kept in
     if kept == kept' then Trans.identity
     else
       let kept' = Sty.diff kept' kept in
-      let fold ty acc =
-        Theory.create_meta Encoding.meta_kept [Theory.MAty ty] :: acc in
+      let fold ty acc = create_meta meta_kept [MAty ty] :: acc in
       Trans.add_tdecls (Sty.fold fold kept' []))
 
+(* reconstruct a definition of an lsymbol or make a defining axiom *)
 let defn_or_axiom ls f =
   match Decl.ls_defn_of_axiom f with
     | Some ld -> [create_logic_decl [ld]]

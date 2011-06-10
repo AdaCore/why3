@@ -248,7 +248,7 @@ let decl tenv d =
 
 let t env =
   Trans.compose Libencoding.close_kept
-  (Trans.on_tagged_ty meta_kept (fun s ->
+  (Trans.on_tagged_ty Libencoding.meta_kept (fun s ->
     let init_task,tenv = load_prelude s env in
     Trans.decl (decl tenv) init_task))
 

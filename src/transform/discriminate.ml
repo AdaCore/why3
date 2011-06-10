@@ -161,11 +161,9 @@ let map env d = match d.d_node with
       let defns,axioms = Ssubst.fold conv_f substs ([],[]) in
       ts_of_ls env ls (List.rev_append defns axioms)
   | Dlogic _ -> Printer.unsupportedDecl d
-      "Recursively-defined symbols are not supported, \
-            run eliminate_recursion"
+      "Recursively-defined symbols are not supported, run eliminate_recursion"
   | Dind _ -> Printer.unsupportedDecl d
-      "Inductive predicates are not supported, \
-            run eliminate_inductive"
+      "Inductive predicates are not supported, run eliminate_inductive"
   | Dprop (k,pr,f) ->
       let substs = ty_quant env f in
       let substs_len = Ssubst.cardinal substs in
@@ -204,7 +202,7 @@ let metas_from_env env =
   let fold_inst tyl _ s = List.fold_left (fun s ty -> Sty.add ty s) s tyl in
   let fold_ls _ insts s = Mtyl.fold fold_inst insts s in
   let sty = Mls.fold fold_ls env Sty.empty in
-  let add ty decls = create_meta Encoding.meta_kept [MAty ty] :: decls in
+  let add ty decls = create_meta Libencoding.meta_kept [MAty ty] :: decls in
   Sty.fold add sty (Lsmap.metas env)
 
 let lsinst_completion kept lskept env =
@@ -265,9 +263,9 @@ let lsymbol_distinction =
       Trans.decl (map env) None)
 
 let discriminate env = Trans.seq [
-  Encoding.monomorphise_goal;
+  Libencoding.monomorphise_goal;
   select_lsinst env;
-  Trans.print_meta Encoding.debug meta_lsinst;
+  Trans.print_meta Libencoding.debug meta_lsinst;
   lsymbol_distinction;
 ]
 

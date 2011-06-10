@@ -19,4 +19,8 @@
 
 val compile_match : Task.task Trans.trans
 
-val meta_enum : Theory.meta
+(* a type constructor tagged "enumeration" generates a finite type
+   if and only if all of its non-phantom arguments are finite types *)
+
+val meta_enum : Theory.meta (* [MTtysymbol] *)
+val meta_phantom : Theory.meta (* [MTtysymbol; MTint] *)

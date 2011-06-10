@@ -25,7 +25,32 @@ open Decl
 open Theory
 open Task
 
-let meta_enum = Theory.register_meta "enumeration" [Theory.MTtysymbol]
+(* a type constructor tagged "enumeration" generates a finite type
+   if and only if all of its non-phantom arguments are finite types *)
+
+let meta_enum = Theory.register_meta "enumeration_type" [Theory.MTtysymbol]
+
+let meta_phantom =
+  Theory.register_meta "phantom_type_arg" [Theory.MTtysymbol;Theory.MTint]
+
+let rec enum_ts kn sts ts =
+  assert (ts.ts_def = None);
+  if Sts.mem ts sts then raise Exit else
+  match find_type_definition kn ts with
+    | Tabstract -> raise Exit
+    | Talgebraic csl ->
+        let sts = Sts.add ts sts in
+        let rec finite_ty stv ty = match ty.ty_node with
+          | Tyvar tv -> Stv.add tv stv
+          | Tyapp (ts,tl) ->
+              let check acc ph ty = if ph then acc else finite_ty acc ty in
+              List.fold_left2 check stv (enum_ts kn sts ts) tl
+        in
+        let check_cs acc ls = List.fold_left finite_ty acc ls.ls_args in
+        let stv = List.fold_left check_cs Stv.empty csl in
+        List.map (fun v -> not (Stv.mem v stv)) ts.ts_args
+
+let enum_ts kn ts = try Some (enum_ts kn Sts.empty ts) with Exit -> None
 
 (** Compile match patterns *)
 
@@ -270,7 +295,7 @@ let add_inversion (state,task) ts ty csl =
   let task = add_decl task (create_prop_decl Paxiom ax_pr ax_f) in
   state, task
 
-let add_type (state,task) ts csl =
+let add_type kn (state,task) ts csl =
   (* declare constructors as abstract functions *)
   let cs_add tsk cs = add_decl tsk (create_logic_decl [cs, None]) in
   let task = List.fold_left cs_add task csl in
@@ -280,9 +305,19 @@ let add_type (state,task) ts csl =
   let state,task = add_indexer (state,task) ts ty csl in
   let state,task = add_projections (state,task) ts ty csl in
   let state,task = add_inversion (state,task) ts ty csl in
-  (* add the tag for enumeration if the type is one *)
-  let enum = List.for_all (fun ls -> ls.ls_args = []) csl in
-  let task = if enum then add_meta task meta_enum [MAts ts] else task in
+  (* add the tags for enumeration if the type is one *)
+  let task = match enum_ts kn ts with
+    | None -> task
+    | Some phs ->
+        let task = add_meta task meta_enum [MAts ts] in
+        let cpt = ref (-1) in
+        let add task ph =
+          incr cpt;
+          if ph then
+            add_meta task meta_phantom [MAts ts; MAint !cpt]
+          else task in
+        List.fold_left add task phs
+  in
   (* return the updated state and task *)
   state, task
 
@@ -294,7 +329,7 @@ let comp t (state,task) = match t.task_decl.td_node with
       (* add needed functions and axioms *)
       let add acc (ts,df) = match df with
         | Tabstract      -> acc
-        | Talgebraic csl -> add_type acc ts csl
+        | Talgebraic csl -> add_type t.task_known acc ts csl
       in
       List.fold_left add (state,task) dl
   | Decl d ->
@@ -312,7 +347,7 @@ let comp t (state,task) = match t.task_decl.td_node with
       let rstate,rtask = ref state, ref task in
       let add _ (ts,csl) () =
         let task = add_ty_decl !rtask [ts,Tabstract] in
-        let state,task = add_type (!rstate,task) ts csl in
+        let state,task = add_type t.task_known (!rstate,task) ts csl in
         rstate := state ; rtask := task ; None
       in
       let tp_map = Mid.diff add state.tp_map d.d_syms in

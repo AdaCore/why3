@@ -17,4 +17,4 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val encoding_enumeration : Task.task Trans.trans
+val protect_enumeration : Task.task Trans.trans

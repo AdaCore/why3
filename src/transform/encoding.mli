@@ -17,15 +17,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val debug : Debug.flag
-
-val meta_kept : Theory.meta
-
 val ft_select_kept : (Env.env,Ty.Sty.t)  Trans.flag_trans
 val ft_enco_kept   : (Env.env,Task.task) Trans.flag_trans
 val ft_enco_poly   : (Env.env,Task.task) Trans.flag_trans
-
-val monomorphise_goal : Task.task Trans.trans
 
 val encoding_smt  : Env.env -> Task.task Trans.trans
 val encoding_tptp : Env.env -> Task.task Trans.trans
