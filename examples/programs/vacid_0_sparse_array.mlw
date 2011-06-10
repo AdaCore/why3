@@ -1,4 +1,4 @@
-module M
+module SparseArray
 
 (*
       If the sparse array contains three elements x y z, at index
@@ -25,28 +25,24 @@ back  +-+-+-+-------------------+
 
   logic maxlen : int = 1000
 
-  type elt
-  logic default : elt
-  logic c1 : elt
-  logic c2 : elt
+  type sparse_array 'a = {| val  : array 'a;
+                            idx  : array int;
+                            back : array int;
+                    mutable card : int;
+                         default : 'a; |}
 
-  type sparse_array = {| val  : array elt;
-                         idx  : array int;
-                         back : array int;
-                 mutable card : int; |}
+  logic length (a: sparse_array 'a) : int = A.length a.val
 
-  logic length (a: sparse_array) : int = A.length a.val
-
-  logic is_elt (a: sparse_array) (i: int) =
+  logic is_elt (a: sparse_array 'a) (i: int) =
     0 <= a.idx[i] < a.card and a.back[a.idx[i]] = i
 
-  logic model (a : sparse_array) (i : int) : elt =
+  logic model (a : sparse_array 'a) (i : int) : 'a =
     if is_elt a i then
       a.val[i]
     else
-      default
+      a.default
 
-  logic sa_invariant (a : sparse_array) =
+  logic sa_invariant (a : sparse_array 'a) =
     0 <= a.card <= length a <= maxlen and
     A.length a.val = A.length a.idx = A.length a.back and
     forall i : int.
@@ -60,50 +56,53 @@ back  +-+-+-+-------------------+
     the proof of WPs for the function [set] below.
   *)
 
-  logic permutation (n: int) (a: array int) =
-    (forall i : int. 0 <= i < n -> 0 <= a[i] < n) and
-    (forall i j : int. 0 <= i < j < n -> a[i] <> a[j])
+  logic permutation (a: array int) =
+    (forall i : int. 0 <= i < a.A.length -> 0 <= a[i] < a.A.length) and
+    (forall i j : int. 0 <= i < j < a.A.length -> a[i] <> a[j])
 
-  logic dirichlet (n : int) (a : array int) (i : int) : int
+  logic dirichlet (a: array int) (i : int) : int
 
   axiom Dirichlet :
-    forall n : int.
     forall a : array int.
-        permutation n a ->
-        (forall i : int. 0 <= i < n ->
-            0 <= dirichlet n a i < n and
-            a[dirichlet n a i] = i)
+        permutation a ->
+        (forall i : int. 0 <= i < a.A.length ->
+            0 <= dirichlet a i < a.A.length and
+            a[dirichlet a i] = i)
 
   lemma Inter6 :
-    forall a : sparse_array . sa_invariant a ->
-      a.card = length a ->
-            permutation a.card a.back &&
-            forall i : int. 0 <= i < a.card ->
-                a.idx[i] = dirichlet a.card a.back i && is_elt a i
+    forall a : sparse_array 'a. sa_invariant a ->
+      a.card = a.length ->
+            permutation a.back &&
+            forall i : int. 0 <= i < a.length ->
+                a.idx[i] = dirichlet a.back i && is_elt a i
 
   parameter malloc : n:int -> {} array 'a { A.length result = n }
 
-  let create sz =
+  let create (sz: int) (d: 'a) =
     { 0 <= sz <= maxlen }
-    {| val = malloc sz; idx = malloc sz; back = malloc sz; card = 0 |}
+    {| val = malloc sz; 
+       idx = malloc sz; 
+       back = malloc sz; 
+       card = 0; 
+       default = d |}
     { sa_invariant result and
-      result.card = 0 and
-      length result = sz and forall i:int. model result i = default }
+      result.card = 0 and result.default = d and
+      length result = sz and forall i:int. model result i = d }
 
-  let test (a: sparse_array) i =
+  let test (a: sparse_array 'a) i =
     { 0 <= i < length a and sa_invariant a }
     0 <= a.idx[i] && a.idx[i] < a.card && a.back[a.idx[i]] = i
     { result=True <-> is_elt a i }
 
-  let get (a: sparse_array) i =
+  let get (a: sparse_array 'a) i =
     { 0 <= i < length a and sa_invariant a }
     if test a i then
-      (val a)[i]
+      a.val[i]
     else
-      default
+      a.default
     { result = model a i }
 
-  let set (a: sparse_array) i v =
+  let set (a: sparse_array 'a) i v =
     { 0 <= i < length a and sa_invariant a }
     a.val[i] <- v;
     if not (test a i) then begin
@@ -116,9 +115,21 @@ back  +-+-+-+-------------------+
       model a i = v and
       forall j:int. j <> i -> model a j = model (old a) j }
 
+end
+
+module Harness
+
+  use import module SparseArray
+
+  type elt
+  logic default : elt
+
+  logic c1 : elt
+  logic c2 : elt
+
   let harness () =
-    let a = create 10 in
-    let b = create 20 in
+    let a = create 10 default in
+    let b = create 20 default in
     let get_a_5 = get a 5 in assert { get_a_5 = default };
     let get_b_7 = get b 7 in assert { get_b_7 = default };
     set a 5 c1;

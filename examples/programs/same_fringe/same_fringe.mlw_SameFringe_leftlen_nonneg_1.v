@@ -4,13 +4,9 @@ Require Import ZArith.
 Require Import Rbase.
 Definition unit  := unit.
 
-Parameter ignore: forall (a:Type), a  -> unit.
+Parameter label : Type.
 
-Implicit Arguments ignore.
-
-Parameter label_ : Type.
-
-Parameter at1: forall (a:Type), a -> label_  -> a.
+Parameter at1: forall (a:Type), a -> label  -> a.
 
 Implicit Arguments at1.
 
@@ -25,6 +21,22 @@ Set Contextual Implicit.
 Implicit Arguments Nil.
 Unset Contextual Implicit.
 Implicit Arguments Cons.
+
+Parameter length: forall (a:Type), (list a)  -> Z.
+
+Implicit Arguments length.
+
+Axiom length_def : forall (a:Type), forall (l:(list a)),
+  match l with
+  | Nil  => ((length l) = 0%Z)
+  | Cons _ r => ((length l) = (1%Z + (length r))%Z)
+  end.
+
+Axiom Length_nonnegative : forall (a:Type), forall (l:(list a)),
+  (0%Z <= (length l))%Z.
+
+Axiom Length_nil : forall (a:Type), forall (l:(list a)),
+  ((length l) = 0%Z) <-> (l = (Nil:(list a))).
 
 Parameter infix_plpl: forall (a:Type), (list a) -> (list a)  -> (list a).
 
@@ -42,22 +54,6 @@ Axiom Append_assoc : forall (a:Type), forall (l1:(list a)) (l2:(list a))
 
 Axiom Append_l_nil : forall (a:Type), forall (l:(list a)), ((infix_plpl l
   (Nil:(list a))) = l).
-
-Parameter length: forall (a:Type), (list a)  -> Z.
-
-Implicit Arguments length.
-
-Axiom length_def : forall (a:Type), forall (l:(list a)),
-  match l with
-  | Nil  => ((length l) = 0%Z)
-  | Cons _ r => ((length l) = (1%Z + (length r))%Z)
-  end.
-
-Axiom Length_nonnegative : forall (a:Type), forall (l:(list a)),
-  (0%Z <= (length l))%Z.
-
-Axiom Length_nil : forall (a:Type), forall (l:(list a)),
-  ((length l) = 0%Z) <-> (l = (Nil:(list a))).
 
 Axiom Append_length : forall (a:Type), forall (l1:(list a)) (l2:(list a)),
   ((length (infix_plpl l1 l2)) = ((length l1) + (length l2))%Z).
