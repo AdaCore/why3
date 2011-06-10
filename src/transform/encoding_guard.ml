@@ -196,34 +196,14 @@ module Transform = struct
         Decl.create_prop_decl Paxiom
           (create_prsymbol (id_clone lsymbol.ls_name)) fmla::acc
 
-  (** transforms a list of logic declarations into another.
-      Declares new lsymbols with explicit polymorphic signatures,
-      with guards only the type that appear in the return value type.
-      *)
-  let logic_transform kept decls =
-    (* if there is a definition, we must take it into account *)
-    let helper = function
-    | (lsymbol, Some ldef) ->
-      let new_lsymbol = findL lsymbol in (* new lsymbol *)
-      let vars,expr,close = open_ls_defn_cb ldef in
-      let add v (vl,vm) =
-        let vs = Term.create_vsymbol (id_fresh "t") ty_type in
-        vs :: vl, Mtv.add v (t_var vs) vm
-      in
-      let vars,varM =
-        match lsymbol.ls_value with
-          | None -> vars,Mtv.empty
-          | Some ty_value ->
-            let new_ty = ty_freevars Stv.empty ty_value in
-            Stv.fold add new_ty (vars,Mtv.empty) in
-      let t = term_transform kept varM expr in
-      close new_lsymbol vars t
-    | (lsymbol, None) ->
-      (findL lsymbol, None)
-    in
-    let l = List.fold_left
-      (fun acc (lsymbol,_) -> logic_guard kept acc lsymbol) [] decls in
-    (Decl.create_logic_decl (List.map helper decls))::l
+  let logic_transform kept d = function
+    | [ls, None] ->
+        Decl.create_logic_decl [findL ls, None] :: logic_guard kept [] ls
+    | [ls, Some ld] when not (Sid.mem ls.ls_name d.d_syms) ->
+        let f = f_type_close_select kept (ls_defn_axiom ld) in
+        Libencoding.defn_or_axiom (findL ls) f @ logic_guard kept [] ls
+    | _ -> Printer.unsupportedDecl d
+        "Recursively-defined symbols are not supported, run eliminate_recursion"
 
   (** transform an inductive declaration *)
   let ind_transform kept idl =
@@ -242,7 +222,7 @@ end
 
 let decl kept d = match d.d_node with
   | Dtype tdl -> d :: Libencoding.lsdecl_of_tydecl_select tdl
-  | Dlogic ldl -> Transform.logic_transform kept ldl
+  | Dlogic ldl -> Transform.logic_transform kept d ldl
   | Dind idl -> Transform.ind_transform kept idl
   | Dprop prop -> Transform.prop_transform kept prop
 
