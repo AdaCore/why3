@@ -49,32 +49,11 @@ back  +-+-+-+-------------------+
       0 <= i < a.card ->
       0 <= a.back[i] < length a and a.idx[a.back[i]] = i
 
-  (*
-    The following definitions and the axiom Dirichlet
-    (provable by natural induction) are necessary to
-    prove the lemma Inter6, which is sufficient for
-    the proof of WPs for the function [set] below.
-  *)
-
-  logic permutation (a: array int) =
-    (forall i : int. 0 <= i < a.A.length -> 0 <= a[i] < a.A.length) and
-    (forall i j : int. 0 <= i < j < a.A.length -> a[i] <> a[j])
-
-  logic dirichlet (a: array int) (i : int) : int
-
-  axiom Dirichlet :
-    forall a : array int.
-        permutation a ->
-        (forall i : int. 0 <= i < a.A.length ->
-            0 <= dirichlet a i < a.A.length and
-            a[dirichlet a i] = i)
-
-  lemma Inter6 :
+  lemma permutation :
     forall a : sparse_array 'a. sa_invariant a ->
       a.card = a.length ->
-            permutation a.back &&
-            forall i : int. 0 <= i < a.length ->
-                a.idx[i] = dirichlet a.back i && is_elt a i
+        forall i : int. 0 <= i < a.length ->
+          0 <= a.idx[i] < a.length && a.back[a.idx[i]] = i
 
   parameter malloc : n:int -> {} array 'a { A.length result = n }
 
