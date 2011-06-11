@@ -1481,7 +1481,6 @@ let task_checksum t =
   sum
 
 let transformation_on_goal g tr =
-  if not g.proved then
     let callback subgoals =
       let b =
          match subgoals with
@@ -1493,8 +1492,7 @@ let transformation_on_goal g tr =
               (*   eprintf "addresses: %x %x@." (Obj.magic g.task) (Obj.magic task); *)
               (* *\) *)
               (* s1 <> s2 *)
-
-                task != (get_task g)
+              not (Task.task_equal task (get_task g))
           | _ -> true
       in
       if b then
@@ -1523,7 +1521,7 @@ let transformation_on_goal g tr =
     apply_transformation ~callback tr (get_task g)
 
 let rec transform_goal_or_children ~context_unproved_goals_only tr g =
-  if not g.proved then
+  if not (g.proved && context_unproved_goals_only) then
     begin
       let r = ref true in
       Hashtbl.iter
