@@ -247,16 +247,11 @@ let update_task drv task =
   add_tdecl task goal
 
 let prepare_task drv task =
-  let lookup_transform t = t, lookup_transform t drv.drv_env in
+  let lookup_transform t = lookup_transform t drv.drv_env in
   let transl = List.map lookup_transform drv.drv_transform in
-  let apply task (_t, tr) =
-(*  Format.printf "@\n@\n[%f] %s@." (Sys.time ()) t; *)
-    Trans.apply tr task
-  in
-(*Format.printf "@\n@\nTASK";*)
+  let apply task tr = Trans.apply tr task in
   let task = update_task drv task in
-  let task = List.fold_left apply task transl in
-  task
+  List.fold_left apply task transl
 
 
 let print_task_prepared ?old drv fmt task =

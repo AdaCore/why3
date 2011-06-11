@@ -40,16 +40,6 @@
     ref_drop env_ref;
     res
 
-  let inside_uc env lenv uc rule lexer lexbuf =
-    ref_push env_ref env;
-      ref_push lenv_ref lenv;
-        ref_push uc_ref uc;
-    let res = rule lexer lexbuf in
-        ref_drop uc_ref;
-      ref_drop lenv_ref;
-    ref_drop env_ref;
-    res
-
   open Ptree
   open Parsing
 
@@ -236,26 +226,14 @@
 
 /* Entry points */
 
-%type <Ptree.lexpr> lexpr_eof
-%start lexpr_eof
-%type <Theory.theory_uc> list0_decl_eof
-%start list0_decl_eof
-%type <Theory.theory Theory.Mnm.t> logic_file_eof
-%start logic_file_eof
+%type <Theory.theory Theory.Mnm.t> logic_file
+%start logic_file
 %type <Ptree.program_file> program_file
 %start program_file
 %%
 
-logic_file_eof:
+logic_file:
 | list0_theory EOF  { ref_get lenv_ref }
-;
-
-list0_decl_eof:
-| list0_decl EOF  { ref_get uc_ref }
-;
-
-lexpr_eof:
-| lexpr EOF  { $1 }
 ;
 
 /* File, theory, namespace */

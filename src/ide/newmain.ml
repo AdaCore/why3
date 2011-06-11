@@ -110,7 +110,7 @@ let source_text fname =
 let gconfig =
   let c = Gconfig.config in
   let loadpath = (Whyconf.loadpath (get_main ())) @ List.rev !includes in
-  c.env <- Lexer.create_env loadpath;
+  c.env <- Env.create_env_of_loadpath loadpath;
 (*
   let provers = Whyconf.get_provers c.Gconfig.config in
   c.provers <-

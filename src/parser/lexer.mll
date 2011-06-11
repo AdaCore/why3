@@ -315,12 +315,7 @@ and string = parse
       | Loc.Located _ as e -> raise e
       | e -> raise (Loc.Located (loc lb, e))
 
-  let parse_logic_file env = with_location (logic_file_eof env token)
-
-  let parse_list0_decl env lenv uc =
-    with_location (list0_decl_eof env lenv uc token)
-
-  let parse_lexpr = with_location (lexpr_eof token)
+  let parse_logic_file env = with_location (logic_file env token)
 
   let parse_program_file = with_location (program_file token)
 
@@ -328,33 +323,6 @@ and string = parse
     let lb = Lexing.from_channel c in
     Loc.set_file file lb;
     parse_logic_file env lb
-
-  (* searches file [f] in loadpath [lp] *)
-  let locate_file lp f =
-    let fl = List.map (fun dir -> Filename.concat dir f) lp in
-    match List.filter Sys.file_exists fl with
-      | [] -> raise Not_found
-      | [file] -> file
-      | file1 :: file2 :: _ -> raise (AmbiguousPath (file1, file2))
-
-  let create_env lp =
-    let ret_chan sl = 
-      let f = List.fold_left Filename.concat "" sl in
-      let file = locate_file lp f in
-      file, open_in file
-    in
-    let retrieve env sl =
-      let f = List.fold_left Filename.concat "" sl ^ ".why" in
-      let file = locate_file lp f in
-      let c = open_in file in
-      try
-        let tl = read_channel env file c in
-        close_in c;
-        tl
-      with
-        | e -> close_in c; raise e
-    in
-    Env.create_env ret_chan retrieve
 
   let () = Env.register_format "why" ["why"] read_channel
 }

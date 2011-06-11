@@ -93,7 +93,7 @@ let load_config config =
   let env = Lexer.create_env main.loadpath in
 *)
   (* temporary sets env to empty *)
-  let env = Lexer.create_env [] in
+  let env = Env.create_env_of_loadpath [] in
   { window_height = ide.ide_window_height;
     window_width  = ide.ide_window_width;
     tree_width    = ide.ide_tree_width;

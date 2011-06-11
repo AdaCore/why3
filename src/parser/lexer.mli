@@ -17,17 +17,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Theory
-
 (** parsing entry points *)
 
-val create_env : string list -> Env.env
-  (** creates a new typing environment for a given loadpath *)
-
-val parse_list0_decl :
-  Env.env -> theory Mnm.t -> theory_uc -> Lexing.lexbuf -> theory_uc
-
-val parse_lexpr : Lexing.lexbuf -> Ptree.lexpr
+val parse_logic_file : Env.env -> Lexing.lexbuf -> Theory.theory Theory.Mnm.t
 
 val parse_program_file : Lexing.lexbuf -> Ptree.program_file
 

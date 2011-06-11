@@ -17,9 +17,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Access to Environment, Load Path *)
-
-open Theory
+(** Library environment *)
 
 type env
 
@@ -27,54 +25,79 @@ val env_tag : env -> Hashweak.tag
 
 module Wenv : Hashweak.S with type key = env
 
-type retrieve_channel = string list -> string * in_channel
-  (** retrieves a channel from a given path; a filename is also returned,
-      for printing purposes only *)
+(** Local type aliases and exceptions *)
 
-type retrieve_theory  = env -> string list -> theory Mnm.t
+type fformat = string (* format name *)
+type filename = string (* file name *)
+type extension = string (* file extension *)
+type pathname = string list (* path in an environment *)
 
-val create_env : retrieve_channel -> retrieve_theory -> env
+exception KnownFormat of fformat
+exception UnknownFormat of fformat
+exception UnknownExtension of extension
+exception UnspecifiedFormat
 
-exception TheoryNotFound of string list * string
+exception ChannelNotFound of pathname
+exception TheoryNotFound of pathname * string
 
-val find_theory : env -> string list -> string -> theory
-  (** [find_theory e p n] finds the theory named [p.n] in environment [e]
-      @raise TheoryNotFound if theory not present in env [e] *)
+(** Input formats *)
 
-val find_channel : env -> string list -> string * in_channel
+open Theory
 
-(** Parsers *)
+type read_channel = env -> filename -> in_channel -> theory Mnm.t
+(** a function of type [read_channel] parses a channel using
+    its own syntax. The string argument indicates the origin of
+    the stream (e.g. file name) to be used in error messages. *)
 
-type read_channel = env -> string -> in_channel -> theory Mnm.t
-  (** a function of type [read_channel] parses the given channel using
-      its own syntax. The string argument indicates the origin of the stream
-      (e.g. file name) to be used in error messages *)
+val register_format : fformat -> extension list -> read_channel -> unit
+(** [register_format name extensions fn] registers a new format
+    called [name], for files with extensions in the string list
+    [extensions] (separating dot not included);
+    [fn] is the function to perform parsing.
 
-val register_format : string -> string list -> read_channel -> unit
-  (** [register_format name extensions f] registers a new format
-      under name [name], for files with extensions in list [extensions];
-      [f] is the function to perform parsing *)
+    @raise KnownFormat [name] if the format is already registered *)
 
-exception NoFormat
-exception UnknownExtension of string
-exception UnknownFormat of string (* format name *)
+val read_channel : ?format:fformat -> read_channel
+(** [read_channel ?format env file ch] returns the theories in [ch].
+    When given, [format] enforces the format, otherwise we choose
+    the format according to [file]'s extension. Nothing ensures
+    that [ch] corresponds to the contents of [f].
 
-val read_channel : ?format:string -> read_channel
-(** [read_channel ?format env f c] returns the map of theories
-    in channel [c]. When given, [format] enforces the format, otherwise
-    the format is chosen according to [f]'s extension.
-    Beware that nothing ensures that [c] corresponds to the contents of [f]
+    @raise UnknownFormat [format] if the format is not registered
+    @raise UnknownExtension [s] if the extension [s] is not known
+      to any registered parser
+    @raise UnspecifiedFormat if format is not given and [file]
+      has no extension *)
 
-    @raise NoFormat if [format] is not given and [f] has no extension
-    @raise UnknownExtension [s] if the extension [s] is not known in
-      any registered parser
-    @raise UnknownFormat [f] if the [format] is not registered
-*)
+val read_file : ?format:fformat -> env -> filename -> theory Mnm.t
+(** [read_file ?format env file] returns the theories in [file].
+    When given, [format] enforces the format, otherwise we choose
+    the format according to [file]'s extension. *)
 
-val read_file : ?format:string -> env -> string -> theory Mnm.t
-(** [read_file ?format env f] returns the map of theories
-    in file [f]. When given, [format] enforces the format, otherwise
-    the format is chosen according to [f]'s extension. *)
+val list_formats : unit -> (fformat * extension list) list
 
-val list_formats : unit -> (string * string list) list
+(** Environment construction and utilisation *)
 
+type find_channel = fformat -> pathname -> filename * in_channel
+(** a function of type [find_channel] retrieves an input channel,
+    knowing its format and its name (presented as a list of strings);
+    a filename is also returned, to be used in logs or error messages. *)
+
+val create_env : find_channel -> env
+(** creates an environment of input library channels *)
+
+val create_env_of_loadpath : filename list -> env
+(** a special case of [init_environment] that looks for files in
+    the given list of directories *)
+
+val find_channel : env -> find_channel
+(** finds an input channel in a given environment
+
+    @raise ChannelNotFound [sl] if the channel [sl] was not found
+    @raise UnknownFormat [f] if the format is not registered *)
+
+val find_theory : env -> pathname -> string -> theory
+(** a special case of [find_channel] that returns a particular theory,
+    using the format ["why"]
+
+    @raise TheoryNotFound if the theory was not found in a channel *)

@@ -41,17 +41,12 @@ let create env retrieve = {
 
 exception ModuleNotFound of string list * string
 
-let rec add_suffix = function
-  | [] -> assert false
-  | [f] -> [f ^ ".mlw"]
-  | p :: f -> p :: add_suffix f
-
 let find_library penv sl =
   try 
     Hashtbl.find penv.memo sl
   with Not_found ->
     Hashtbl.add penv.memo sl (Mnm.empty, Mnm.empty);
-    let file, c = Env.find_channel penv.env (add_suffix sl) in
+    let file, c = Env.find_channel penv.env "whyml" sl in
     let r = penv.retrieve penv file c in
     close_in c;
     Hashtbl.replace penv.memo sl r;

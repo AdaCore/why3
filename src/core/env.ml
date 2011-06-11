@@ -20,31 +20,127 @@
 open Ident
 open Theory
 
-(** Environment *)
+(** Library environment *)
 
-type retrieve_channel = string list -> string * in_channel
+type fformat = string (* format name *)
+type filename = string (* file name *)
+type extension = string (* file extension *)
+type pathname = string list (* path in an environment *)
+
+exception KnownFormat of fformat
+exception UnknownFormat of fformat
+exception UnknownExtension of extension
+exception UnspecifiedFormat
+
+exception ChannelNotFound of pathname
+exception TheoryNotFound of pathname * string
+exception AmbiguousPath of filename * filename
+
+type find_channel = fformat -> pathname -> filename * in_channel
 
 type env = {
-  env_ret_chan : retrieve_channel;
-  env_retrieve : retrieve_theory;
-  env_memo     : (string list, theory Mnm.t) Hashtbl.t;
-  env_tag      : Hashweak.tag;
+  env_find : find_channel;
+  env_memo : (string list, theory Mnm.t) Hashtbl.t;
+  env_tag  : Hashweak.tag;
 }
 
-and retrieve_theory = env -> string list -> theory Mnm.t
+let env_tag env = env.env_tag
 
-let create_memo () =
-  let ht = Hashtbl.create 17 in
-  Hashtbl.add ht [] Mnm.empty;
-  ht
+module Wenv = Hashweak.Make(struct type t = env let tag = env_tag end)
 
-let create_env = let c = ref (-1) in fun ret_chan retrieve -> {
-  env_ret_chan = ret_chan;
-  env_retrieve = retrieve;
-  env_memo     = create_memo ();
-  env_tag      = (incr c; Hashweak.create_tag !c) }
+(** Input formats *)
 
-exception TheoryNotFound of string list * string
+type read_channel = env -> filename -> in_channel -> theory Mnm.t
+
+let read_channel_table = Hashtbl.create 17 (* format name -> read_channel *)
+let extensions_table   = Hashtbl.create 17 (* suffix -> format name *)
+
+let register_format name exts rc =
+  if Hashtbl.mem read_channel_table name then raise (KnownFormat name);
+  Hashtbl.add read_channel_table name (rc,exts);
+  List.iter (fun s -> Hashtbl.replace extensions_table ("." ^ s) name) exts
+
+let lookup_format name =
+  try Hashtbl.find read_channel_table name
+  with Not_found -> raise (UnknownFormat name)
+
+let get_extension file =
+  let s = try Filename.chop_extension file
+    with Invalid_argument _ -> raise UnspecifiedFormat in
+  let n = String.length s in
+  String.sub file n (String.length file - n)
+
+let get_format file =
+  let ext = get_extension file in
+  try Hashtbl.find extensions_table ext
+  with Not_found -> raise (UnknownExtension ext)
+
+let read_channel ?format env file ic =
+  let name = match format with
+    | Some name -> name
+    | None -> get_format file in
+  let rc,_ = lookup_format name in
+  rc env file ic
+
+let read_file ?format env file =
+  let ic = open_in file in
+  try
+    let mth = read_channel ?format env file ic in
+    close_in ic;
+    mth
+  with e -> close_in ic; raise e
+
+let list_formats () =
+  let add n (_,l) acc = (n,l)::acc in
+  Hashtbl.fold add read_channel_table []
+
+
+(** Environment construction and utilisation *)
+
+let create_env = let c = ref (-1) in fun fc -> {
+  env_find = fc;
+  env_memo = Hashtbl.create 17;
+  env_tag  = (incr c; Hashweak.create_tag !c)
+}
+
+(* looks for file [file] of format [name] in loadpath [lp] *)
+let locate_file name lp file =
+  let _,sl = lookup_format name in
+  let add_sf sf = file ^ "." ^ sf in
+  let fl = if sl = [] then [file] else List.map add_sf sl in
+  let add_dir dir = List.map (Filename.concat dir) fl in
+  let fl = List.concat (List.map add_dir lp) in
+  match List.filter Sys.file_exists fl with
+  | [] -> raise Not_found
+  | [file] -> file
+  | file1 :: file2 :: _ -> raise (AmbiguousPath (file1, file2))
+
+let create_env_of_loadpath lp =
+  let fc f sl =
+    let file = List.fold_left Filename.concat "" sl in
+    let file = locate_file f lp file in
+    file, open_in file
+  in
+  create_env fc
+
+let find_channel env = env.env_find
+
+let find_library env sl =
+  let file, ic = env.env_find "why" sl in
+  try
+    Hashtbl.replace env.env_memo sl Mnm.empty;
+    let mth = read_channel ~format:"why" env file ic in
+    Hashtbl.replace env.env_memo sl mth;
+    close_in ic;
+    mth
+  with e ->
+    Hashtbl.remove env.env_memo sl;
+    close_in ic;
+    raise e
+
+let find_library env sl =
+  try Hashtbl.find env.env_memo sl
+  with Not_found -> find_library env sl
 
 let get_builtin s =
   if s = builtin_theory.th_name.id_string then builtin_theory else
@@ -53,98 +149,32 @@ let get_builtin s =
   | Some n -> tuple_theory n
   | None -> raise (TheoryNotFound ([],s))
 
-let find_builtin env s =
-  let m = Hashtbl.find env.env_memo [] in
-  try Mnm.find s m with Not_found ->
-    let th = get_builtin s in
-    let m = Mnm.add s th m in
-    Hashtbl.replace env.env_memo [] m;
-    th
-
-let find_library env sl =
-  try Hashtbl.find env.env_memo sl
-  with Not_found ->
-    Hashtbl.add env.env_memo sl Mnm.empty;
-    let m = env.env_retrieve env sl in
-    Hashtbl.replace env.env_memo sl m;
-    m
-
 let find_theory env sl s =
-  if sl = [] then find_builtin env s
-  else try Mnm.find s (find_library env sl)
-  with Not_found -> raise (TheoryNotFound (sl, s))
-
-let find_channel env = env.env_ret_chan
-
-let env_tag env = env.env_tag
-
-module Wenv = Hashweak.Make(struct type t = env let tag = env_tag end)
-
-(** Parsers *)
-
-type read_channel = env -> string -> in_channel -> theory Mnm.t
-
-let read_channel_table = Hashtbl.create 17 (* parser name -> read_channel *)
-let suffixes_table     = Hashtbl.create 17 (* suffix -> parser name *)
-
-let register_format name suffixes rc =
-  Hashtbl.add read_channel_table name rc;
-  List.iter (fun s -> Hashtbl.add suffixes_table ("." ^ s) name) suffixes
-
-exception NoFormat
-exception UnknownExtension of string
-exception UnknownFormat of string (* parser name *)
-
-let parser_for_file ?format file = match format with
-  | None ->
-      begin try
-        let ext =
-          let s = Filename.chop_extension file in
-          let n = String.length s in
-          String.sub file n (String.length file - n)
-        in
-        try Hashtbl.find suffixes_table ext
-        with Not_found -> raise (UnknownExtension ext)
-      with Invalid_argument _ -> raise NoFormat end
-  | Some n -> n
-
-let find_parser table n =
-  try Hashtbl.find table n
-  with Not_found -> raise (UnknownFormat n)
-
-let read_channel ?format env file ic =
-  let n = parser_for_file ?format file in
-  let rc = find_parser read_channel_table n in
-  rc env file ic
-
-let read_file ?format env file =
-  let cin = open_in file in
-  let m = read_channel ?format env file cin in
-  close_in cin;
-  m
-
-let list_formats () =
-  let h = Hashtbl.create 17 in
-  let add s p =
-    let l = try Hashtbl.find h p with Not_found -> [] in
-    Hashtbl.replace h p (s :: l)
-  in
-  Hashtbl.iter add suffixes_table;
-  Hashtbl.fold (fun p l acc -> (p, l) :: acc) h []
+  if sl = [] then get_builtin s else
+  let mth = find_library env sl in
+  try Mnm.find s mth with Not_found ->
+  raise (TheoryNotFound (sl,s))
 
 (* Exception reporting *)
 
 let () = Exn_printer.register
   begin fun fmt exn -> match exn with
-  | TheoryNotFound (sl, s) ->
+  | ChannelNotFound sl ->
+      Format.fprintf fmt "Library not found: %a"
+        (Pp.print_list (Pp.constant_string ".") Format.pp_print_string) sl
+  | TheoryNotFound (sl,s) ->
       Format.fprintf fmt "Theory not found: %a.%s"
         (Pp.print_list (Pp.constant_string ".") Format.pp_print_string) sl s
+  | KnownFormat s ->
+      Format.fprintf fmt "Format %s is already registered" s
   | UnknownFormat s ->
       Format.fprintf fmt "Unknown input format: %s" s
   | UnknownExtension s ->
-      Format.fprintf fmt "Unknown file extension: %s" s
-  | NoFormat ->
-      Format.fprintf fmt "No input format given"
+      Format.fprintf fmt "Unknown file extension: `%s'" s
+  | UnspecifiedFormat ->
+      Format.fprintf fmt "Format not specified"
+  | AmbiguousPath (f1,f2) ->
+      Format.fprintf fmt "Ambiguous path:@ both `%s'@ and `%s'@ match" f1 f2
   | _ -> raise exn
   end
 

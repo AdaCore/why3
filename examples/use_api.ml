@@ -49,7 +49,7 @@ let () = printf "@[formula 2 is:@ %a@]@." Pretty.print_term fmla2
 
 (* building the task for formula 1 alone *)
 let task1 : Task.task = None (* empty task *)
-let goal_id1 : Decl.prsymbol = Decl.create_prsymbol (Ident.id_fresh "goal1") 
+let goal_id1 : Decl.prsymbol = Decl.create_prsymbol (Ident.id_fresh "goal1")
 let task1 : Task.task = Task.add_prop_decl task1 Decl.Pgoal goal_id1 fmla1
 
 (* printing the task *)
@@ -57,9 +57,9 @@ let () = printf "@[task 1 is:@\n%a@]@." Pretty.print_task task1
 
 (* task for formula 2 *)
 let task2 = None
-let task2 = Task.add_logic_decl task2 [prop_var_A, None] 
-let task2 = Task.add_logic_decl task2 [prop_var_B, None] 
-let goal_id2 = Decl.create_prsymbol (Ident.id_fresh "goal2") 
+let task2 = Task.add_logic_decl task2 [prop_var_A, None]
+let task2 = Task.add_logic_decl task2 [prop_var_B, None]
+let goal_id2 = Decl.create_prsymbol (Ident.id_fresh "goal2")
 let task2 = Task.add_prop_decl task2 Decl.Pgoal goal_id2 fmla2
 
 let () = printf "@[task 2 created:@\n%a@]@." Pretty.print_task task2
@@ -76,17 +76,20 @@ let main : Whyconf.main = Whyconf.get_main config
 let provers : Whyconf.config_prover Util.Mstr.t = Whyconf.get_provers config
 
 (* the [prover alt-ergo] section of the config file *)
-let alt_ergo : Whyconf.config_prover = 
+let alt_ergo : Whyconf.config_prover =
   try
-    Util.Mstr.find "alt-ergo" provers 
+    Util.Mstr.find "alt-ergo" provers
   with Not_found ->
     eprintf "Prover alt-ergo not installed or not configured@.";
     exit 0
 
 (* builds the environment from the [loadpath] *)
-let env : Env.env = Lexer.create_env (Whyconf.loadpath main)
+let env : Env.env =
+  Env.create_env_of_loadpath (Whyconf.loadpath main)
+
 (* loading the Alt-Ergo driver *)
-let alt_ergo_driver : Driver.driver = Driver.load_driver env alt_ergo.Whyconf.driver
+let alt_ergo_driver : Driver.driver =
+  Driver.load_driver env alt_ergo.Whyconf.driver
 
 (* call Alt-Ergo *)
 let result1 : Call_provers.prover_result =
@@ -98,7 +101,7 @@ let result1 : Call_provers.prover_result =
 let () = printf "@[On task 1, alt-ergo answers %a@."
   Call_provers.print_prover_result result1
 
-let result2 : Call_provers.prover_result = 
+let result2 : Call_provers.prover_result =
   Call_provers.wait_on_call
     (Driver.prove_task ~command:alt_ergo.Whyconf.command
     ~timelimit:10
@@ -118,25 +121,25 @@ An arithmetic goal: 2+2 = 4
 
 let two : Term.term = Term.t_const (Term.ConstInt "2")
 let four : Term.term = Term.t_const (Term.ConstInt "4")
-let int_theory : Theory.theory = 
+let int_theory : Theory.theory =
   Env.find_theory env ["int"] "Int"
-let plus_symbol : Term.lsymbol = 
+let plus_symbol : Term.lsymbol =
   Theory.ns_find_ls int_theory.Theory.th_export ["infix +"]
 let two_plus_two : Term.term = Term.fs_app plus_symbol [two;two] Ty.ty_int
-let two_plus_two : Term.term = Term.t_app_infer plus_symbol [two;two] 
+let two_plus_two : Term.term = Term.t_app_infer plus_symbol [two;two]
 let fmla3 : Term.term = Term.t_equ two_plus_two four
 
 let task3 = None
 let task3 = Task.use_export task3 int_theory
-let goal_id3 = Decl.create_prsymbol (Ident.id_fresh "goal3") 
+let goal_id3 = Decl.create_prsymbol (Ident.id_fresh "goal3")
 let task3 = Task.add_prop_decl task3 Decl.Pgoal goal_id3 fmla3
 
 (*
 let () = printf "@[task 3 created:@\n%a@]@." Pretty.print_task task3
 *)
-let () = printf "@[task 3 created@]@." 
+let () = printf "@[task 3 created@]@."
 
-let result3 = 
+let result3 =
   Call_provers.wait_on_call
     (Driver.prove_task ~command:alt_ergo.Whyconf.command
     alt_ergo_driver task3 ()) ()
@@ -146,29 +149,29 @@ let () = printf "@[On task 3, alt-ergo answers %a@."
 
 (* quantifiers: let's build "forall x:int. x*x >= 0" *)
 let zero : Term.term = Term.t_const (Term.ConstInt "0")
-let mult_symbol : Term.lsymbol = 
+let mult_symbol : Term.lsymbol =
   Theory.ns_find_ls int_theory.Theory.th_export ["infix *"]
-let ge_symbol : Term.lsymbol = 
+let ge_symbol : Term.lsymbol =
   Theory.ns_find_ls int_theory.Theory.th_export ["infix >="]
 
-let var_x : Term.vsymbol = 
+let var_x : Term.vsymbol =
   Term.create_vsymbol (Ident.id_fresh "x") Ty.ty_int
 let x : Term.term = Term.t_var var_x
-let x_times_x : Term.term = 
-  Term.t_app_infer mult_symbol [x;x] 
-let fmla4_aux : Term.term = 
+let x_times_x : Term.term =
+  Term.t_app_infer mult_symbol [x;x]
+let fmla4_aux : Term.term =
   Term.ps_app ge_symbol [x_times_x;zero]
-let fmla4_quant : Term.term_quant = 
+let fmla4_quant : Term.term_quant =
   Term.t_close_quant [var_x] [] fmla4_aux
 let fmla4 : Term.term =
   Term.t_forall fmla4_quant
 
 let task4 = None
 let task4 = Task.use_export task4 int_theory
-let goal_id4 = Decl.create_prsymbol (Ident.id_fresh "goal4") 
+let goal_id4 = Decl.create_prsymbol (Ident.id_fresh "goal4")
 let task4 = Task.add_prop_decl task4 Decl.Pgoal goal_id4 fmla4
 
-let result4 = 
+let result4 =
   Call_provers.wait_on_call
     (Driver.prove_task ~command:alt_ergo.Whyconf.command
     alt_ergo_driver task4 ()) ()
