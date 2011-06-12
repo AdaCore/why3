@@ -160,12 +160,6 @@ LIBCMX = $(addsuffix .cmx, $(LIBMODULES))
 $(LIBCMO) $(LIBCMX): INCLUDES += $(LIBINCLUDES)
 $(LIBCMX): OFLAGS += -for-pack Why
 
-src/parser/parser.ml: src/parser/parser.pre.ml
-	cp $^ $@
-
-src/parser/parser.mli: src/parser/parser.pre.mli
-	cp $^ $@
-
 # build targets
 
 byte: src/why.cma
