@@ -171,7 +171,7 @@ let () =
   let b1 = GButton.radio_button
     ~packing:context_box#add ~label:"Unproved goals" ()
   in
-  b1#misc#set_tooltip_markup "When selected, tools below are applied\nonly on <b>unproved</b> goals";
+  b1#misc#set_tooltip_markup "When selected, tools below are applied only to <b>unproved</b> goals";
   let (_ : GtkSignal.id) =
     b1#connect#clicked
       ~callback:(fun () -> context_unproved_goals_only := true)
@@ -179,7 +179,7 @@ let () =
   let b2 = GButton.radio_button
     ~group:b1#group ~packing:context_box#add ~label:"All goals" ()
   in
-  b2#misc#set_tooltip_markup "When selected, tools below are applied\nto all goals";
+  b2#misc#set_tooltip_markup "When selected, tools below are applied to all goals";
   let (_ : GtkSignal.id) =
     b2#connect#clicked
       ~callback:(fun () -> context_unproved_goals_only := false)
@@ -614,6 +614,16 @@ let replay_obsolete_proofs () =
          ~context_unproved_goals_only:!context_unproved_goals_only a)
     (get_selected_row_references ())
 
+(***********************************)
+(* method: mark proofs as obsolete *)
+(***********************************)
+
+let cancel_proofs () =
+  List.iter
+    (fun r ->
+       let a = get_any_from_row_reference r in
+       M.cancel a)
+    (get_selected_row_references ())
 
 
 (*****************************************************)
@@ -920,7 +930,8 @@ let () =
              ()
          in
          let b = GButton.button ~packing:provers_box#add ~label:n () in
-         b#misc#set_tooltip_markup "Click to start this prover\non the <b>selected</b> goal(s)";
+         b#misc#set_tooltip_markup ("Start <tt>" ^ p.Session.prover_name ^
+           "</tt> on the <b>selected goals</b>");
 
 (* prend de la place pour rien
          let i = GMisc.image ~pixbuf:(!image_prover) () in
@@ -953,7 +964,7 @@ let () =
 
 let () =
   let b = GButton.button ~packing:transf_box#add ~label:"Split" () in
-  b#misc#set_tooltip_markup "Click to apply transformation <tt>split_goal</tt> to the <b>selected goals</b>";
+  b#misc#set_tooltip_markup "Apply the transformation <tt>split_goal</tt> to the <b>selected goals</b>";
 
   let i = GMisc.image ~pixbuf:(!image_transf) () in
   let () = b#set_image i#coerce in
@@ -964,7 +975,7 @@ let () =
 
 let () =
   let b = GButton.button ~packing:transf_box#add ~label:"Inline" () in
-  b#misc#set_tooltip_markup "Click to apply transformation <tt>inline_goal</tt> to the <b>selected goals</b>";
+  b#misc#set_tooltip_markup "Apply the transformation <tt>inline_goal</tt> to the <b>selected goals</b>";
   let i = GMisc.image ~pixbuf:(!image_transf) () in
   let () = b#set_image i#coerce in
   let (_ : GtkSignal.id) =
@@ -1235,7 +1246,7 @@ let () =
 
 let () =
   let b = GButton.button ~packing:tools_box#add ~label:"Edit" () in
-  b#misc#set_tooltip_markup "Click to edit the <b>selected proof</b>\nwith the appropriate editor";
+  b#misc#set_tooltip_markup "Edit the <b>selected proof</b> with the appropriate editor";
 
   let i = GMisc.image ~pixbuf:(!image_editor) () in
   let () = b#set_image i#coerce in
@@ -1245,12 +1256,21 @@ let () =
 
 let () =
   let b = GButton.button ~packing:tools_box#add ~label:"Replay" () in
-  b#misc#set_tooltip_markup "Replay all the <b>successful</b> but <b>obsolete</b> proofs below the current selection";
+  b#misc#set_tooltip_markup "Replay <b>obsolete</b> proofs below the current selection";
 
   let i = GMisc.image ~pixbuf:(!image_replay) () in
   let () = b#set_image i#coerce in
   let (_ : GtkSignal.id) =
     b#connect#pressed ~callback:replay_obsolete_proofs
+  in ()
+
+let () =
+  let b = GButton.button ~packing:tools_box#add ~label:"Cancel" () in
+  b#misc#set_tooltip_markup "Mark all proofs below the current selection as <b>obsolete</b>";
+  let i = GMisc.image ~pixbuf:(!image_cancel) () in
+  let () = b#set_image i#coerce in
+  let (_ : GtkSignal.id) =
+    b#connect#pressed ~callback:cancel_proofs
   in ()
 
 
@@ -1294,7 +1314,7 @@ let confirm_remove_selection () =
         info_window
           ~callback:(fun () -> List.iter remove_proof l)
           `QUESTION
-          "Do you really want to remove all the selected proofs?"
+          "Do you really want to remove the selected proof attempts?"
 (*
     | _ ->
         info_window `INFO "Please select exactly one item to remove"
@@ -1302,7 +1322,7 @@ let confirm_remove_selection () =
 
 let () =
   let b = GButton.button ~packing:cleaning_box#add ~label:"Remove" () in
-  b#misc#set_tooltip_markup "Removes the selected\n<b>proof</b> or <b>transformation</b>";
+  b#misc#set_tooltip_markup "Remove selected <b>proof attempts</b> and <b>transformations</b>";
   let i = GMisc.image ~pixbuf:(!image_remove) () in
   let () = b#set_image i#coerce in
   let (_ : GtkSignal.id) =
@@ -1315,7 +1335,7 @@ let clean_selection () =
 
 let () =
   let b = GButton.button ~packing:cleaning_box#add ~label:"Clean" () in
-  b#misc#set_tooltip_markup "Removes non successful proof_attempts\nassociated to a proved goal";
+  b#misc#set_tooltip_markup "Remove unsuccessful <b>proof attempts</b> associated to proved goals";
   let i = GMisc.image ~pixbuf:(!image_cleaning) () in
   let () = b#set_image i#coerce in
   let (_ : GtkSignal.id) =

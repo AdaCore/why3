@@ -240,6 +240,9 @@ module Make(O: OBSERVER) : sig
         with result was 'valid'
     *)
 
+  val cancel : any -> unit
+    (** [cancel a] marks all proofs under [a] as obsolete *)
+
   type report =
     | Wrong_result of Call_provers.prover_result * Call_provers.prover_result  
     | CallFailed of exn

@@ -344,6 +344,7 @@ let check_theory_proved t =
 let rec check_goal_proved g =
   let b1 = Hashtbl.fold
     (fun _ a acc -> acc ||
+       not a.proof_obsolete &&
        match a.proof_state with
          | Done { Call_provers.pr_answer = Call_provers.Valid} -> true
          | _ -> false) g.external_proofs false
@@ -790,7 +791,7 @@ let reload_proof obsolete goal pid old_a =
       (Undetected_prover pid)
   in
   let old_res = old_a.proof_state in
-  let obsolete = obsolete or old_a.proof_obsolete in
+  let obsolete = obsolete || old_a.proof_obsolete in
   (* eprintf "proof_obsolete : %b@." obsolete; *)
   let a =
     raw_add_external_proof ~obsolete ~timelimit:old_a.timelimit
@@ -1351,6 +1352,32 @@ let replay ~obsolete_only ~context_unproved_goals_only a =
           (replay_on_goal_or_children ~obsolete_only ~context_unproved_goals_only)
           tr.subgoals
 
+(***********************************)
+(* method: mark proofs as obsolete *)
+(***********************************)
+
+let cancel_proof a = set_proof_state ~obsolete:true a a.proof_state
+
+let rec cancel_goal_or_children g =
+  Hashtbl.iter (fun _ a -> cancel_proof a) g.external_proofs;
+  Hashtbl.iter
+    (fun _ t -> List.iter cancel_goal_or_children t.subgoals)
+    g.transformations
+
+let cancel a =
+  match a with
+    | Goal g ->
+        cancel_goal_or_children g
+    | Theory th ->
+        List.iter cancel_goal_or_children th.goals
+    | File file ->
+        List.iter
+          (fun th -> List.iter cancel_goal_or_children th.goals)
+          file.theories
+    | Proof_attempt a ->
+        cancel_goal_or_children a.proof_goal
+    | Transformation tr ->
+        List.iter cancel_goal_or_children tr.subgoals
 
 (*********************************)
 (* method: check existing proofs *)
@@ -1663,7 +1690,9 @@ let rec clean_goal g =
       Hashtbl.iter
         (fun _ t ->
            if not t.transf_proved then
-             remove_transformation t)
+             remove_transformation t
+           else
+             List.iter clean_goal t.subgoals)
         g.transformations
     end
   else
