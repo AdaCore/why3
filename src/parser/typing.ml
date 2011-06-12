@@ -735,9 +735,11 @@ and dfmla_node ~localize loc uc env = function
       in
       let f1 = dfmla ~localize uc env f1 in
       Fnamed (x, f1)
+(*
   | PPvar (Qident s | Qdot (_,s) as x) when is_uppercase s.id.[0] ->
       let pr = find_prop x uc in
       Fvar (Decl.find_prop (Theory.get_known uc) pr)
+*)
   | PPvar x ->
       let s, tyl = specialize_psymbol x uc in
       let tl = dtype_args s.ls_name loc uc env tyl [] in
@@ -1194,10 +1196,12 @@ let add_decl env lenv th d =
   if Debug.test_flag debug_parse_only then th else
   add_decl env lenv th d
 
-let close_theory lenv { id = id ; id_loc = loc } th =
-  if Mnm.mem id lenv then error ~loc (ClashTheory id);
+let close_theory loc lenv th =
   if Debug.test_flag debug_parse_only then lenv else
-  Mnm.add id (close_theory th) lenv
+  let th = close_theory th in
+  let id = th.th_name.id_string in
+  if Mnm.mem id lenv then error ~loc (ClashTheory id);
+  Mnm.add id th lenv
 
 let close_namespace loc import name th =
   let id = option_map (fun id -> id.id) name in

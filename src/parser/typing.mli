@@ -34,7 +34,7 @@ val add_decl : Env.env -> theory Mnm.t -> theory_uc -> Ptree.decl -> theory_uc
 val close_namespace :
   Loc.position -> bool -> Ptree.ident option -> theory_uc -> theory_uc
 
-val close_theory : theory Mnm.t -> Ptree.ident -> theory_uc -> theory Mnm.t
+val close_theory : Loc.position -> theory Mnm.t -> theory_uc -> theory Mnm.t
 
 (******************************************************************************)
 (** The following is exported for program typing (src/programs/pgm_typing.ml) *)
@@ -70,7 +70,8 @@ val dty : theory_uc -> denv -> Ptree.pty -> Denv.dty
 val dterm : ?localize:bool -> theory_uc -> denv -> Ptree.lexpr -> Denv.dterm
 val dfmla : ?localize:bool -> theory_uc -> denv -> Ptree.lexpr -> Denv.dfmla
 val dpat : theory_uc -> denv -> Ptree.pattern -> denv * Denv.dpattern
-val dpat_list : theory_uc -> denv -> Denv.dty -> Ptree.pattern -> denv * Denv.dpattern
+val dpat_list :
+  theory_uc -> denv -> Denv.dty -> Ptree.pattern -> denv * Denv.dpattern
 
 val print_denv : Format.formatter -> denv -> unit
 

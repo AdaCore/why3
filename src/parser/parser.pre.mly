@@ -18,8 +18,7 @@
 /**************************************************************************/
 
 %{
-  open Theory
-
+module Incremental = struct
   let env_ref  = ref []
   let lenv_ref = ref []
   let uc_ref   = ref []
@@ -32,13 +31,29 @@
   let ref_push ref v = ref := v :: !ref
   let ref_set  ref v = ref := v :: ref_tail ref
 
-  let inside_env env rule lexer lexbuf =
-    ref_push env_ref env;
-      ref_push lenv_ref Mnm.empty;
-    let res = rule lexer lexbuf in
-      ref_drop lenv_ref;
-    ref_drop env_ref;
-    res
+  let open_logic_file env =
+    ref_push env_ref env; ref_push lenv_ref Theory.Mnm.empty
+
+  let close_logic_file () =
+    ref_drop env_ref; ref_pop lenv_ref
+
+  let open_theory id =
+    ref_push uc_ref (Theory.create_theory (Denv.create_user_id id))
+
+  let close_theory loc =
+    let uc = ref_pop uc_ref in
+    ref_set lenv_ref (Typing.close_theory loc (ref_get lenv_ref) uc)
+
+  let open_namespace () =
+    ref_set uc_ref (Theory.open_namespace (ref_get uc_ref))
+
+  let close_namespace loc import name =
+    ref_set uc_ref (Typing.close_namespace loc import name (ref_get uc_ref))
+
+  let new_decl d =
+    let env = ref_get env_ref in let lenv = ref_get lenv_ref in
+    ref_set uc_ref (Typing.add_decl env lenv (ref_get uc_ref) d)
+end
 
   open Ptree
   open Parsing
@@ -226,14 +241,20 @@
 
 /* Entry points */
 
+%type <Env.env -> unit> pre_logic_file
+%start pre_logic_file
 %type <Theory.theory Theory.Mnm.t> logic_file
 %start logic_file
 %type <Ptree.program_file> program_file
 %start program_file
 %%
 
+pre_logic_file:
+| /* epsilon */  { Incremental.open_logic_file }
+;
+
 logic_file:
-| list0_theory EOF  { ref_get lenv_ref }
+| list0_theory EOF  { Incremental.close_logic_file () }
 ;
 
 /* File, theory, namespace */
@@ -244,16 +265,11 @@ list0_theory:
 ;
 
 theory_head:
-| THEORY uident labels
-   { let id = add_lab $2 $3 in
-     let name = Denv.create_user_id id in
-     ref_push uc_ref (create_theory name); id }
+| THEORY uident labels  { Incremental.open_theory (add_lab $2 $3) }
 ;
 
 theory:
-| theory_head list0_decl END
-   { let uc = ref_pop uc_ref in
-     ref_set lenv_ref (Typing.close_theory (ref_get lenv_ref) $1 uc) }
+| theory_head list0_decl END  { Incremental.close_theory (floc_i 1) }
 ;
 
 list0_decl:
@@ -263,15 +279,13 @@ list0_decl:
 
 new_decl:
 | decl
-   { let env = ref_get env_ref in let lenv = ref_get lenv_ref in
-     ref_set uc_ref (Typing.add_decl env lenv (ref_get uc_ref) $1) }
+   { Incremental.new_decl $1 }
 | namespace_head namespace_import namespace_name list0_decl END
-   { ref_set uc_ref (Typing.close_namespace (floc ()) $2 $3 (ref_get uc_ref)) }
+   { Incremental.close_namespace (floc_i 3) $2 $3 }
 ;
 
 namespace_head:
-| NAMESPACE
-   { ref_set uc_ref (open_namespace (ref_get uc_ref)) }
+| NAMESPACE  { Incremental.open_namespace () }
 ;
 
 namespace_import:

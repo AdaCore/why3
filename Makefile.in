@@ -160,15 +160,11 @@ LIBCMX = $(addsuffix .cmx, $(LIBMODULES))
 $(LIBCMO) $(LIBCMX): INCLUDES += $(LIBINCLUDES)
 $(LIBCMX): OFLAGS += -for-pack Why
 
-LIB_PARSER_POSTLUDE  = "let logic_file env = inside_env env logic_file\n"
-LIB_PARSER_INTERFACE = "s/^val  *logic_file *:/val logic_file : Env.env ->/"
-
 src/parser/parser.ml: src/parser/parser.pre.ml
 	cp $^ $@
-	printf $(LIB_PARSER_POSTLUDE) >> $@
 
 src/parser/parser.mli: src/parser/parser.pre.mli
-	sed -e $(LIB_PARSER_INTERFACE) $^ > $@
+	cp $^ $@
 
 # build targets
 

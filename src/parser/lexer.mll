@@ -315,7 +315,9 @@ and string = parse
       | Loc.Located _ as e -> raise e
       | e -> raise (Loc.Located (loc lb, e))
 
-  let parse_logic_file env = with_location (logic_file env token)
+  let parse_logic_file env lb =
+    pre_logic_file token (Lexing.from_string "") env;
+    with_location (logic_file token) lb
 
   let parse_program_file = with_location (program_file token)
 
