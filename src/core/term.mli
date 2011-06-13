@@ -280,6 +280,7 @@ val fs_tuple : int -> lsymbol   (* n-tuple *)
 val t_tuple : term list -> term
 
 val is_fs_tuple : lsymbol -> bool
+val is_fs_tuple_id : ident -> int option
 
 val fs_func_app : lsymbol  (* value-typed higher-order application *)
 val ps_pred_app : lsymbol  (* prop-typed higher-order application *)

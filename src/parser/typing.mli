@@ -79,12 +79,6 @@ val split_qualid : Ptree.qualid -> string list * string
 val string_list_of_qualid : string list -> Ptree.qualid -> string list
 val qloc : Ptree.qualid -> Loc.position
 
-val ts_tuple : int -> tysymbol
-val fs_tuple : int -> lsymbol
-
-val with_tuples :
-  ?reset:bool -> (theory_uc -> 'a -> 'b) -> theory_uc -> 'a -> 'b
-
 val is_projection : theory_uc -> lsymbol -> (tysymbol * lsymbol * int) option
   (** [is_projection uc ls] returns
       - [Some (ts, lsc, i)] if [ls] is the i-th projection of an

@@ -733,7 +733,6 @@ let on_meta _meta fn acc theory =
     acc tdecls
 
 
-
 (** Base theories *)
 
 let builtin_theory =
@@ -768,6 +767,15 @@ let tuple_theory_name s =
   (* we only accept the decimal notation *)
   if q <> string_of_int i then None else
   Some i
+
+let add_decl_with_tuples uc d =
+  let ids = Mid.set_diff d.d_syms uc.uc_known in
+  let add id s = match is_ts_tuple_id id with
+    | Some n -> Sint.add n s
+    | None -> s in
+  let ixs = Sid.fold add ids Sint.empty in
+  let add n uc = use_export uc (tuple_theory n) in
+  add_decl (Sint.fold add ixs uc) d
 
 (* Exception reporting *)
 

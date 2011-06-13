@@ -173,30 +173,10 @@ let specialize_tysymbol loc p uc =
 
 (* lazy declaration of tuples *)
 
-let tuples_needed = Hashtbl.create 17
-
-let ts_tuple n = Hashtbl.replace tuples_needed n (); ts_tuple n
-let fs_tuple n = Hashtbl.replace tuples_needed n (); fs_tuple n
-
-let add_tuple_decls uc =
-  Hashtbl.fold (fun n _ uc -> Theory.use_export uc (tuple_theory n))
-    tuples_needed uc
-
-let with_tuples ?(reset=false) f uc x =
-  let uc = f (add_tuple_decls uc) x in
-  if reset then Hashtbl.clear tuples_needed;
-  uc
-
-let add_ty_decl  = with_tuples add_ty_decl
-let add_ty_decls = with_tuples ~reset:true add_ty_decl
-
-let add_logic_decl  = with_tuples add_logic_decl
-let add_logic_decls = with_tuples ~reset:true add_logic_decl
-
-let add_ind_decl  = with_tuples add_ind_decl
-let add_ind_decls = with_tuples ~reset:true add_ind_decl
-
-let add_prop_decl = with_tuples ~reset:true add_prop_decl
+let add_ty_decl uc dl = add_decl_with_tuples uc (create_ty_decl dl)
+let add_logic_decl uc dl = add_decl_with_tuples uc (create_logic_decl dl)
+let add_ind_decl uc dl = add_decl_with_tuples uc (create_ind_decl dl)
+let add_prop_decl uc k p f = add_decl_with_tuples uc (create_prop_decl k p f)
 
 let rec dty uc env = function
   | PPTtyvar {id=x} ->
@@ -915,7 +895,7 @@ let add_types dl th =
     in
     ts, d
   in
-  let th = try add_ty_decls th (List.map decl dl)
+  let th = try add_ty_decl th (List.map decl dl)
     with ClashSymbol s -> error ~loc:(Hashtbl.find csymbols s) (Clash s)
   in
   List.fold_left add_projections th dl
@@ -1015,7 +995,7 @@ let add_logics dl th =
               make_ls_defn fs vl (term env t)
         end
   in
-  add_logic_decls th (List.map type_decl dl)
+  add_logic_decl th (List.map type_decl dl)
 
 let type_term uc denv env t =
   let t = dterm uc denv t in
@@ -1059,7 +1039,7 @@ let add_inductives dl th =
     in
     ps, List.map clause d.in_def
   in
-  try add_ind_decls th (List.map type_decl dl)
+  try add_ind_decl th (List.map type_decl dl)
   with
   | ClashSymbol s -> error ~loc:(Hashtbl.find propsyms s) (Clash s)
   | InvalidIndDecl (_,pr) -> errorm ~loc:(loc_of_id pr.pr_name)

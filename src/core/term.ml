@@ -759,13 +759,20 @@ let ps_equ =
 let t_equ t1 t2 = ps_app ps_equ [t1; t2]
 let t_neq t1 t2 = t_not (ps_app ps_equ [t1; t2])
 
+let fs_tuple_ids = Hid.create 17
+
 let fs_tuple = Util.memo_int 17 (fun n ->
   let ts = ts_tuple n in
   let tl = List.map ty_var ts.ts_args in
   let ty = ty_app ts tl in
-  create_fsymbol (id_fresh ("Tuple" ^ string_of_int n)) tl ty)
+  let fs = create_fsymbol (id_fresh ("Tuple" ^ string_of_int n)) tl ty in
+  Hid.add fs_tuple_ids fs.ls_name n;
+  fs)
 
 let is_fs_tuple fs = ls_equal fs (fs_tuple (List.length fs.ls_args))
+
+let is_fs_tuple_id id =
+  try Some (Hid.find fs_tuple_ids id) with Not_found -> None
 
 let t_tuple tl =
   let ty = ty_tuple (List.map t_type tl) in

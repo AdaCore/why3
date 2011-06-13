@@ -235,14 +235,21 @@ let ts_pred =
 let ty_func ty_a ty_b = ty_app ts_func [ty_a;ty_b]
 let ty_pred ty_a = ty_app ts_pred [ty_a]
 
+let ts_tuple_ids = Hid.create 17
+
 let ts_tuple = Util.memo_int 17 (fun n ->
   let vl = ref [] in
   for i = 1 to n do vl := create_tvsymbol (id_fresh "a") :: !vl done;
-  create_tysymbol (id_fresh ("tuple" ^ string_of_int n)) !vl None)
+  let ts = create_tysymbol (id_fresh ("tuple" ^ string_of_int n)) !vl None in
+  Hid.add ts_tuple_ids ts.ts_name n;
+  ts)
 
 let ty_tuple tyl = ty_app (ts_tuple (List.length tyl)) tyl
 
 let is_ts_tuple ts = ts_equal ts (ts_tuple (List.length ts.ts_args))
+
+let is_ts_tuple_id id =
+  try Some (Hid.find ts_tuple_ids id) with Not_found -> None
 
 (** {2 Operations on [ty option]} *)
 

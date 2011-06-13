@@ -450,9 +450,9 @@ and dexpr_desc ~ghost env loc = function
       DEletrec (dl, e1), e1.dexpr_type
   | Ptree.Etuple el ->
       let n = List.length el in
-      let s = Typing.fs_tuple n in
+      let s = fs_tuple n in
       let tyl = List.map (fun _ -> create_type_var loc) el in
-      let ty = tyapp (Typing.ts_tuple n) tyl in
+      let ty = tyapp (ts_tuple n) tyl in
       let create d ty = { dexpr_desc = d; dexpr_type = ty; dexpr_loc = loc } in
       let apply e1 e2 ty2 =
         let e2 = dexpr ~ghost env e2 in

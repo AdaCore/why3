@@ -127,6 +127,7 @@ val ts_tuple : int -> tysymbol
 val ty_tuple : ty list -> ty
 
 val is_ts_tuple : tysymbol -> bool
+val is_ts_tuple_id : ident -> int option
 
 (** {2 Operations on [ty option]} *)
 

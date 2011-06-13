@@ -143,15 +143,15 @@ let add_decl d uc =
   { uc with uc_decls = d :: uc.uc_decls }
 
 let add_impure_decl d uc =
-  let th = Typing.with_tuples Theory.add_decl uc.uc_impure d in
+  let th = Theory.add_decl_with_tuples uc.uc_impure d in
   { uc with uc_impure = th }
 
 let add_effect_decl d uc =
-  let th = Typing.with_tuples Theory.add_decl uc.uc_effect d in
+  let th = Theory.add_decl_with_tuples uc.uc_effect d in
   { uc with uc_effect = th }
 
 let add_pure_decl d uc =
-  let th = Typing.with_tuples Theory.add_decl uc.uc_pure d in
+  let th = Theory.add_decl_with_tuples uc.uc_pure d in
   { uc with uc_pure = th }
 
 (**
