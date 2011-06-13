@@ -134,7 +134,11 @@ and dtriple = dpre * dexpr * dpost
 (*****************************************************************************)
 (* phase 2: removal of destructive types *)
 
-type variant = Term.term * Term.lsymbol option
+type variant_rel =
+  | Vuser of Term.lsymbol
+  | Vint  of Term.lsymbol (* <= *) * Term.lsymbol (* < *)
+
+type variant = Term.term * variant_rel
 
 type loop_annotation = {
   loop_invariant : Term.term option;
@@ -175,7 +179,7 @@ and ibinder = ivsymbol * itype_v
 
 type label = Term.vsymbol
 
-type irec_variant = ivsymbol * Term.term * Term.lsymbol option
+type irec_variant = ivsymbol * Term.term * variant_rel
 
 (* FIXME: get rid of ipattern *)
 type ipattern = {
@@ -236,8 +240,6 @@ type pre = T.pre
 
 type post = T.post
 
-type rec_variant = pvsymbol * Term.term * Term.lsymbol option
-
 type pattern = {
   ppat_pat  : Term.pattern; (* logic variables *)
   ppat_node : ppat_node;
@@ -279,7 +281,7 @@ and expr_desc =
   | Elabel of label * expr
   | Eany of type_c
 
-and recfun = pvsymbol * pvsymbol list * rec_variant option * triple * E.t
+and recfun = pvsymbol * pvsymbol list * triple * E.t
 
 and triple = pre * expr * post
 

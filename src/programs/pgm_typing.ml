@@ -879,6 +879,13 @@ let iterm env l =
   let t = dterm (pure_uc env.i_uc) env.i_denv l in
   Denv.term env.i_pures t
 
+let variant_rel_int env loc =
+  let find s = 
+    try find_ls ~pure:true env s
+    with Not_found -> errorm ~loc "cannot find symbol %s" s
+  in
+  Vint (find "infix <=", find "infix <")
+
 (* TODO: should we admit an instance of a polymorphic order relation? *)
 let ivariant env (t, ps) =
   let loc = t.pp_loc in
@@ -887,9 +894,9 @@ let ivariant env (t, ps) =
     | None ->
         if not (Ty.ty_equal ty_int (t_type t)) then
           errorm ~loc "variant should have type int";
-        t, ps
-    | Some { ls_args = [t1; _] } when Ty.ty_equal t1 (t_type t) ->
-        t, ps
+        t, variant_rel_int env.i_uc loc
+    | Some ({ ls_args = [t1; _] } as ps) when Ty.ty_equal t1 (t_type t) ->
+        t, Vuser ps
     | Some { ls_args = [t1; _] } ->
         errorm ~loc "@[variant has type %a, but is expected to have type %a@]"
           Pretty.print_ty (t_type t) Pretty.print_ty t1
@@ -1297,8 +1304,8 @@ and iletrec gl env dl =
         List.iter check_no_variant r
     | (_, _, Some (_, _, ps), _) :: r ->
         let r_equal r1 r2 = match r1, r2 with
-          | None, None -> true
-          | Some ls1, Some ls2 -> ls_equal ls1 ls2
+          | Vint _, Vint _ -> true
+          | Vuser ls1, Vuser ls2 -> ls_equal ls1 ls2
           | _ -> false
         in
         let check_variant (_,_,var,(_,e,_)) = match var with
@@ -1570,7 +1577,7 @@ and expr_desc gl env loc ty = function
   | IEletrec (dl, e1) ->
       let env, dl = letrec gl env dl in
       let e1 = expr gl env e1 in
-      let add_effect ef (_,_,_,_,ef') = E.union ef ef' in
+      let add_effect ef (_,_,_,ef') = E.union ef ef' in
       let ef = List.fold_left add_effect e1.expr_effect dl in
       Eletrec (dl, e1), e1.expr_type_v, ef
 
@@ -1588,8 +1595,10 @@ and expr_desc gl env loc ty = function
       let ef = e1.expr_effect in
       let ef, inv = option_map_fold term_effect ef a.loop_invariant in
       let ef, var = match a.loop_variant with
-        | Some (t, ls) -> let ef, t = term_effect ef t in ef, Some (t, ls)
-        | None         -> ef, None
+        | Some (t, ls) -> 
+	    let ef, t = term_effect ef t in ef, Some (t, ls)
+        | None -> 
+	    ef, None
       in
       let a = { loop_invariant = inv; loop_variant = var } in
       Eloop (a, e1), type_v_unit gl, ef
@@ -1709,13 +1718,8 @@ and letrec gl env dl = (* : env * recfun list *)
         | Some phi0, Some (_, phi, r) ->
             let _, phi = term_effect E.empty phi in
             let decphi = match r with
-              | None -> (* 0 <= phi0 and phi < phi0 *)
-                  t_and (ps_app (find_ls ~pure:true gl "infix <=")
-                        [t_int_const "0"; t_var phi0])
-                    (ps_app (find_ls ~pure:true gl "infix <")
-                        [phi;t_var phi0])
-              | Some r ->
-                  ps_app r [phi; t_var phi0]
+              | Vint (le, lt) -> Pgm_wp.default_variant le lt phi (t_var phi0)
+              | Vuser r -> ps_app r [phi; t_var phi0]
             in
             { c with c_pre = t_and decphi c.c_pre }
         | _ ->
@@ -1761,8 +1765,8 @@ and letrec gl env dl = (* : env * recfun list *)
   in
   let m0 = List.fold_left add_empty_effect Mvs.empty dl in
   let m, dl = fixpoint m0 in
-  let add_effect (pv, bl, var, (_,e,_ as t)) =
-    pv, bl, var, t, remove_bl_effects bl e.expr_effect
+  let add_effect (pv, bl, _, (_,e,_ as t)) =
+    pv, bl, t, remove_bl_effects bl e.expr_effect
   in
   make_env env m, List.map add_effect dl
 
@@ -1784,7 +1788,7 @@ let rec fresh_expr gl ~term locals e = match e.expr_desc with
       fresh_expr gl ~term:false locals              e1;
       fresh_expr gl ~term       (Spv.add vs locals) e2
   | Eletrec (fl, e1) ->
-      List.iter (fun (_, _, _, t, _) -> fresh_triple gl t) fl;
+      List.iter (fun (_, _, t, _) -> fresh_triple gl t) fl;
       fresh_expr gl ~term locals e1
 
   | Eif (e1, e2, e3) ->
@@ -2195,7 +2199,7 @@ let rec decl ~wp env penv ltm lmod uc = function
       let _, dl = dletrec ~ghost:false denv dl in
       let _, dl = iletrec uc (create_ienv denv) dl in
       let _, dl = letrec uc Mvs.empty dl in
-      let one uc (v, _, _, _, _ as d) =
+      let one uc (v, _, _, _ as d) =
         let tyv = v.pv_tv in
         let loc = loc_of_id v.pv_name in
         let id = v.pv_name.id_string in

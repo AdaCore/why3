@@ -3,13 +3,9 @@ module M
   use import int.Int
   use import module ref.Ref
 
-  type t 'a = {| a: 'a; b: bool; c: 'a |}
-
-  let test1 (x: t (ref int)) =
-    {}
-    let y = {| x with a = 0; c = 0 |} in
-    x = y
-    { result = True }
+  let test1 () =
+    let x = ref 0 in
+    while !x = 0 do variant { !x } () done
 
 (***
   use import option.Option

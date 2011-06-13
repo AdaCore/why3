@@ -18,6 +18,7 @@
 (**************************************************************************)
 
 open Why
+open Term
 
 val debug : Debug.flag
 
@@ -31,3 +32,7 @@ val declare_global_regions : Pgm_types.T.pvsymbol -> unit
 val declare_mutable_field : Ty.tysymbol -> int -> int -> unit
   (* [declare_mutable_field ts i j] indicates that region [i] in
      [ts] args correspond to the mutable field [j] of [ts] *)
+
+val default_variant : lsymbol -> lsymbol -> term -> term -> term
+  (* [default_variant le lt phi phi0] = 0 <= phi0 and phi < phi0 *)
+

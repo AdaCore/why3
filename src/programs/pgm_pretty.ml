@@ -81,7 +81,7 @@ and print_pv fmt v =
 and print_triple fmt (p, e, q) =
   fprintf fmt "@[<hv 0>%a@ %a@ %a@]" print_pre p print_expr e print_post q
 
-and print_recfun fmt (v, bl, _, t, _) =
+and print_recfun fmt (v, bl, t, _) =
   fprintf fmt "@[<hov 2>rec %a@ %a =@ %a@]"
     print_pv v (print_list space print_pv) bl print_triple t
 

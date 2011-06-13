@@ -376,24 +376,27 @@ let default_exns_post ef =
   let xs = Sexn.elements ef.E.raises in
   List.map default_exn_post xs
 
-let term_at env lab t =
-  t_app (find_ls ~pure:true env "at") [t; t_var lab] t.t_ty
+let term_at lab t =
+  t_app fs_at [t; t_var lab] t.t_ty
 
 let wp_expl l f =
   t_label ?loc:f.t_loc (("expl:"^l)::Split_goal.stop_split::f.t_label) f
 
-let while_post_block env inv var lab e =
+(* 0 <= phi0 and phi < phi0 *)
+let default_variant le lt phi phi0 =
+  t_and 
+    (ps_app le [t_int_const "0"; phi0])
+    (ps_app lt  [phi; phi0])
+
+let while_post_block inv var lab e =
   let decphi = match var with
     | None ->
         t_true
-    | Some (phi, None) ->
-        let old_phi = term_at env lab phi in
-        (* 0 <= old_phi and phi < old_phi *)
-        wp_and (ps_app (find_ls ~pure:true env "infix <=")
-                  [t_int_const "0"; old_phi])
-               (ps_app (find_ls ~pure:true env "infix <")  [phi; old_phi])
-    | Some (phi, Some r) ->
-        ps_app r [phi; term_at env lab phi]
+    | Some (phi, Vint (le, lt)) ->
+        let old_phi = term_at lab phi in
+ 	default_variant le lt phi old_phi
+    | Some (phi, Vuser r) ->
+        ps_app r [phi; term_at lab phi]
   in
   let decphi = wp_expl "loop variant decreases" decphi in
   let ql = default_exns_post e.expr_effect in
@@ -406,7 +409,7 @@ let while_post_block env inv var lab e =
 
 let well_founded_rel = function
   | None -> t_true
-  | Some (_,_r) -> t_true (* TODO: Papp (well_founded, [Tvar r], []) *)
+  | Some _ -> t_true (* TODO: Papp (well_founded, [Tvar r], []) *)
 
 (* Recursive computation of the weakest precondition *)
 
@@ -487,7 +490,7 @@ and wp_desc env rm e q = match e.expr_desc with
   | Eloop ({ loop_invariant = inv; loop_variant = var }, e1) ->
       let wfr = well_founded_rel var in
       let lab = fresh_label () in
-      let q1 = while_post_block env inv var lab e1 in
+      let q1 = while_post_block inv var lab e1 in
       let q1 = sup q1 q in (* exc. posts taken from [q] *)
       let we = wp_expr env rm e1 q1 in
       let we = erase_label lab we in
@@ -620,7 +623,7 @@ and wp_triple env rm bl (p, e, q) =
   let f = wp_close_state env rm e.expr_effect f in
   wp_binders bl f
 
-and wp_recfun env rm (_, bl, _var, t, _) =
+and wp_recfun env rm (_, bl, t, _) =
   wp_triple env rm bl t
 
 let global_regions = ref Mreg.empty
@@ -634,7 +637,7 @@ let wp env e =
   let f = wp_expr env rm e (default_post e.expr_type e.expr_effect) in
   wp_close rm e.expr_effect f
 
-let wp_rec env (_,_,_,_,ef as def) =
+let wp_rec env (_,_,_,ef as def) =
   let rm = !global_regions in
   let f = wp_recfun env rm def in
   wp_close rm ef f
