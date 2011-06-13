@@ -36,13 +36,13 @@ back  +-+-+-+-------------------+
   logic is_elt (a: sparse_array 'a) (i: int) =
     0 <= a.idx[i] < a.card and a.back[a.idx[i]] = i
 
-  logic model (a : sparse_array 'a) (i : int) : 'a =
+  logic value (a: sparse_array 'a) (i: int) : 'a =
     if is_elt a i then
       a.val[i]
     else
       a.default
 
-  logic sa_invariant (a : sparse_array 'a) =
+  logic sa_invariant (a: sparse_array 'a) =
     0 <= a.card <= length a <= maxlen and
     A.length a.val = A.length a.idx = A.length a.back and
     forall i : int.
@@ -50,9 +50,9 @@ back  +-+-+-+-------------------+
       0 <= a.back[i] < length a and a.idx[a.back[i]] = i
 
   lemma permutation :
-    forall a : sparse_array 'a. sa_invariant a ->
+    forall a: sparse_array 'a. sa_invariant a ->
       a.card = a.length ->
-        forall i : int. 0 <= i < a.length ->
+        forall i: int. 0 <= i < a.length ->
           0 <= a.idx[i] < a.length && a.back[a.idx[i]] = i
 
   parameter malloc : n:int -> {} array 'a { A.length result = n }
@@ -64,9 +64,8 @@ back  +-+-+-+-------------------+
        back = malloc sz; 
        card = 0; 
        default = d |}
-    { sa_invariant result and
-      result.card = 0 and result.default = d and
-      length result = sz and forall i:int. model result i = d }
+    { sa_invariant result and result.card = 0 and 
+      result.default = d and length result = sz }
 
   let test (a: sparse_array 'a) i =
     { 0 <= i < length a and sa_invariant a }
@@ -79,7 +78,7 @@ back  +-+-+-+-------------------+
       a.val[i]
     else
       a.default
-    { result = model a i }
+    { result = value a i }
 
   let set (a: sparse_array 'a) i v =
     { 0 <= i < length a and sa_invariant a }
@@ -91,8 +90,8 @@ back  +-+-+-+-------------------+
       a.card <- a.card + 1
     end
     { sa_invariant a and
-      model a i = v and
-      forall j:int. j <> i -> model a j = model (old a) j }
+      value a i = v and
+      forall j:int. j <> i -> value a j = value (old a) j }
 
 end
 
