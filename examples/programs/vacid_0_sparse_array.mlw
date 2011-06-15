@@ -23,15 +23,11 @@ back  +-+-+-+-------------------+
   use import int.Int
   use import module array.Array as A
 
-  logic maxlen : int = 1000
-
   type sparse_array 'a = {| val  : array 'a;
                             idx  : array int;
                             back : array int;
                     mutable card : int;
                          default : 'a; |}
-
-  logic length (a: sparse_array 'a) : int = A.length a.val
 
   logic is_elt (a: sparse_array 'a) (i: int) =
     0 <= a.idx[i] < a.card and a.back[a.idx[i]] = i
@@ -42,18 +38,20 @@ back  +-+-+-+-------------------+
     else
       a.default
 
-  logic sa_invariant (a: sparse_array 'a) =
+  (* invariant *)
+
+  logic maxlen : int = 1000
+
+  logic length (a: sparse_array 'a) : int = A.length a.val
+
+  logic sa_inv (a: sparse_array 'a) =
     0 <= a.card <= length a <= maxlen and
     A.length a.val = A.length a.idx = A.length a.back and
     forall i : int.
       0 <= i < a.card ->
       0 <= a.back[i] < length a and a.idx[a.back[i]] = i
 
-  lemma permutation :
-    forall a: sparse_array 'a. sa_invariant a ->
-      a.card = a.length ->
-        forall i: int. 0 <= i < a.length ->
-          0 <= a.idx[i] < a.length && a.back[a.idx[i]] = i
+  (* creation *)
 
   parameter malloc : n:int -> {} array 'a { A.length result = n }
 
@@ -64,24 +62,33 @@ back  +-+-+-+-------------------+
        back = malloc sz; 
        card = 0; 
        default = d |}
-    { sa_invariant result and result.card = 0 and 
+    { sa_inv result and result.card = 0 and 
       result.default = d and length result = sz }
 
+  (* access *)
+
   let test (a: sparse_array 'a) i =
-    { 0 <= i < length a and sa_invariant a }
+    { 0 <= i < length a and sa_inv a }
     0 <= a.idx[i] && a.idx[i] < a.card && a.back[a.idx[i]] = i
     { result=True <-> is_elt a i }
 
   let get (a: sparse_array 'a) i =
-    { 0 <= i < length a and sa_invariant a }
+    { 0 <= i < length a and sa_inv a }
     if test a i then
       a.val[i]
     else
       a.default
     { result = value a i }
 
+  (* assignment *)
+
+  lemma permutation :
+    forall a: sparse_array 'a. sa_inv a ->
+    a.card = a.length ->
+    forall i: int. 0 <= i < a.length -> is_elt a i
+
   let set (a: sparse_array 'a) i v =
-    { 0 <= i < length a and sa_invariant a }
+    { 0 <= i < length a and sa_inv a }
     a.val[i] <- v;
     if not (test a i) then begin
       assert { a.card < length a };
@@ -89,7 +96,7 @@ back  +-+-+-+-------------------+
       a.back[a.card] <- i;
       a.card <- a.card + 1
     end
-    { sa_invariant a and
+    { sa_inv a and
       value a i = v and
       forall j:int. j <> i -> value a j = value (old a) j }
 

@@ -1,13 +1,17 @@
 
-theory Test
+theory Bijection
+  use export int.Int
+  logic n : int
+  logic f int : int
+  axiom dom_f : forall i: int. 0 <= i < n -> 0 <= f i < n
+  logic g int : int
+  axiom gf : forall i: int. 0 <= i < n -> g (f i) = i
+end
 
-  use import bool.Bool
-
-  type t 'a = {| a: 'a; b: bool; c: 'a |}
-
-  goal G: forall x: t bool.
-    {| x with a = 0 |}.a = 0
-
+theory Test1
+  logic id (i: int) : int = i
+  clone import Bijection with logic f = id, lemma dom_f
+  goal G: n > 4 -> g (id 4) = 4
 end
 
 theory Order
@@ -17,41 +21,6 @@ theory Order
   axiom le_refl : forall x : t. x <= x
   axiom le_asym : forall x y : t. x <= y -> y <= x -> x = y
   axiom le_trans: forall x y z : t. x <= y -> y <= z -> x <= z
-end
-
-theory List
-  type list 'a = Nil | Cons 'a (list 'a)
-
-  logic mem (x: 'a) (l: list 'a) = match l with
-    | Nil -> false
-    | Cons y r -> x = y \/ mem x r
-  end
-end
-
-theory SortedList
-  use import List
-  clone import Order as O
-
-  inductive sorted (l : list t) =
-    | sorted_nil :
-        sorted Nil
-    | sorted_one :
-        forall x:t. sorted (Cons x Nil)
-    | sorted_two :
-        forall x y : t, l : list t.
-        x <= y -> sorted (Cons y l) -> sorted (Cons x (Cons y l))
-
-  lemma sorted_Cons: 
-    forall x: t, l: list t. sorted (Cons x l) -> 
-    forall y: t. mem y l -> x <= y
-end
-
-theory SortedIntList
-  use import int.Int
-  use import List
-  clone import SortedList with type O.t = int, logic O.(<=) = (<=)
-
-  goal sorted123: sorted (Cons 1 (Cons 2 (Cons 3 Nil)))
 end
 
 (*

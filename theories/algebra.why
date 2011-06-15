@@ -82,15 +82,6 @@ theory OrderedUnitaryCommutativeRing
     forall x y z : t. x <= y -> x + z <= y + z
   axiom CompatOrderMult : 
     forall x y z : t. x <= y -> zero <= z -> x * z <= y * z
-
-(*
-  lemma InvMult : forall x y : t. (-x) * y = - (x * y) = x * (-y)
-  lemma InvSquare : forall x : t. x * x = (-x) * (-x)
-  lemma ZeroMult : forall x : t. x * zero = zero = zero * x
-  lemma SquareNonNeg1 : forall x : t. x <= zero -> zero <= x * x
-  lemma SquareNonNeg : forall x : t. zero <= x * x
-  lemma ZeroLessOne : zero <= one
-*)
 end
 
 theory Field
@@ -110,4 +101,17 @@ theory OrderedField
   axiom CompatOrderAdd  : forall x y z : t. x <= y -> x + z <= y + z
   axiom CompatOrderMult : forall x y z : t. x <= y -> zero <= z -> x * z <= y * z
 end
+
+
+
+(* to be discussed: should we add the following lemmas, and where
+
+  lemma InvMult : forall x y : t. (-x) * y = - (x * y) = x * (-y)
+  lemma InvSquare : forall x : t. x * x = (-x) * (-x)
+  lemma ZeroMult : forall x : t. x * zero = zero = zero * x
+  lemma SquareNonNeg1 : forall x : t. x <= zero -> zero <= x * x
+  lemma SquareNonNeg : forall x : t. zero <= x * x
+  lemma ZeroLessOne : zero <= one
+*)
+
 

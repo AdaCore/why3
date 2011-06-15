@@ -1,3 +1,23 @@
+
+module PoorArrays
+
+  use import int.Int
+  use import module ref.Ref
+  use import map.Map as M
+
+  type array_contents 'a = {| length: int; elts : map int 'a |}
+  type array 'a = ref (array_contents 'a)
+
+  parameter get (a: array 'a) (i: int) :
+    { 0 <= i < length !a } 'a { result = M.get !a.elts i }
+
+  parameter set (a: array 'a) (i: int) (v: 'a) :
+    { 0 <= i < length !a } 
+    unit writes a 
+    { !a.length = !(old a).length and !a.elts = M.set !(old a).elts i v }
+
+end
+
 module M
 
   use import int.Int
