@@ -38,14 +38,7 @@ module SameFringe
 
   (* the enum of a tree [t], prepended to a given enum [e] *)
 
-  logic leftlen (t: tree) : int = match t with
-    | Empty -> 0
-    | Node l _ _ -> 1 + leftlen l
-  end
-
-  lemma leftlen_nonneg: forall t: tree. leftlen t >= 0
-
-  let rec enum t e variant { leftlen t } =
+  let rec enum t e variant { length (elements t) } =
     { }
     match t with
     | Empty -> e
