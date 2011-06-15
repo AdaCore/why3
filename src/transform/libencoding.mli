@@ -68,6 +68,18 @@ val lsdecl_of_tydecl : ty_decl list -> decl list
 (* convert a type declaration to a list of lsymbol declarations *)
 val lsdecl_of_tydecl_select : ty_decl list -> decl list
 
+(* a pre-id for vsymbols and lsymbols that produce non-kept values *)
+val id_unprotected : string -> Ident.preid
+val is_protected_id : Ident.ident -> bool
+
+(* a pre-id for lsymbols that treat their arguments as non-kept *)
+val id_unprotecting : string -> Ident.preid
+val is_protecting_id : Ident.ident -> bool
+
+(* the value type is in kept and the ident is not unprotected *)
+val is_protected_vs : Sty.t -> vsymbol -> bool
+val is_protected_ls : Sty.t -> lsymbol -> bool
+
 (* monomorphise wrt the set of kept types, and a symbol map *)
 val d_monomorph : Sty.t -> (lsymbol -> lsymbol) -> decl -> decl list
 

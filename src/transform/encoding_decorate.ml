@@ -31,19 +31,30 @@ let ls_poly_deco =
   let tyvar = ty_var (create_tvsymbol (id_fresh "a")) in
   create_fsymbol (id_fresh "sort") [ty_type;tyvar] tyvar
 
-let rec deco_arg kept tvar t =
-  let t = deco_term kept tvar t in
-  if Sty.mem (t_type t) kept then t else
+let decorate tvar t =
   let tty = term_of_ty tvar (t_type t) in
   t_app ls_poly_deco [tty;t] t.t_ty
 
-and deco_term kept tvar t = match t.t_node with
-  | Tapp (fs,tl) -> t_app fs (List.map (deco_arg kept tvar) tl) t.t_ty
-  | Tquant (q,b) ->
-      let vl,tl,f,close = t_open_quant_cb b in
-      let tl = TermTF.tr_map (deco_arg kept tvar) (deco_term kept tvar) tl in
-      t_quant q (close vl tl (deco_term kept tvar f))
-  | _ -> t_map (deco_term kept tvar) t
+let deco_term kept tvar =
+  let rec deco t = match t.t_node with
+    | Tvar v ->
+        if is_protected_vs kept v
+        then t else decorate tvar t
+    | Tapp (ls,_) ->
+        let t = t_map deco t in
+        if ls.ls_value = None || is_protected_ls kept ls
+        then t else decorate tvar t
+    | Tlet (t1,tb) ->
+        let v,e,close = t_open_bound_cb tb in
+        t_let (t_map deco t1) (close v (deco e))
+    | Teps tb ->
+        let v,f,close = t_open_bound_cb tb in
+        let t = t_eps (close v (deco f)) in
+        if is_protected_vs kept v
+        then t else decorate tvar t
+    | _ -> t_map deco t
+  in
+  deco
 
 let deco_decl kept d = match d.d_node with
   | Dtype tdl ->
@@ -77,8 +88,10 @@ let ls_deco = create_fsymbol (id_fresh "sort") [ty_type;ty_base] ty_deco
 (* monomorphise a logical symbol *)
 let lsmap kept = Wls.memoize 63 (fun ls ->
   if ls_equal ls ls_poly_deco then ls_deco else
-  let neg ty = if Sty.mem ty kept then ty else ty_deco in
-  let pos ty = if Sty.mem ty kept then ty else ty_base in
+  let prot_arg = is_protecting_id ls.ls_name in
+  let prot_val = is_protected_id ls.ls_name in
+  let neg ty = if prot_arg && Sty.mem ty kept then ty else ty_deco in
+  let pos ty = if prot_val && Sty.mem ty kept then ty else ty_base in
   let tyl = List.map neg ls.ls_args in
   let tyr = Util.option_map pos ls.ls_value in
   if Util.option_eq ty_equal tyr ls.ls_value

@@ -31,11 +31,11 @@ let meta_enco_kept   = register_meta_excl "enco_kept"   [MTstring]
 let meta_enco_poly   = register_meta_excl "enco_poly"   [MTstring]
 
 let def_enco_select_smt  = "none"
-let def_enco_kept_smt    = "bridge"
+let def_enco_kept_smt    = "twin"
 let def_enco_poly_smt    = "decorate"
 
 let def_enco_select_tptp = "none"
-let def_enco_kept_tptp   = "bridge"
+let def_enco_kept_tptp   = "twin"
 let def_enco_poly_tptp   = "decorate"
 
 let ft_select_kept = ((Hashtbl.create 17) : (Env.env,Sty.t) Trans.flag_trans)

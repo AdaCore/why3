@@ -150,10 +150,27 @@ let ls_of_const =
         end
     | _ -> assert false
 
+(* unprotected and unprotecting idents *)
+
+let unprotected_label = "encoding : unprotected"
+let unprotecting_label = "encoding : unprotecting"
+
+let id_unprotected n = id_fresh ~label:[unprotected_label] n
+let id_unprotecting n = id_fresh ~label:[unprotecting_label] n
+
+let is_protected_id id = not (List.mem unprotected_label id.id_label)
+let is_protecting_id id = not (List.mem unprotecting_label id.id_label)
+
+let is_protected_vs kept vs =
+  is_protected_id vs.vs_name && Sty.mem vs.vs_ty kept
+
+let is_protected_ls kept ls =
+  is_protected_id ls.ls_name && Sty.mem (of_option ls.ls_value) kept
+
 (* monomorphise modulo the set of kept types * and an lsymbol map *)
 
 let vs_monomorph kept vs =
-  if Sty.mem vs.vs_ty kept then vs else
+  if is_protected_vs kept vs then vs else
   create_vsymbol (id_clone vs.vs_name) ty_base
 
 let rec t_monomorph kept lsmap consts vmap t =

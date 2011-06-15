@@ -144,9 +144,12 @@ let explicit =
 open Libencoding
 
 let lsmap kept = Wls.memoize 63 (fun ls ->
-  let tymap ty = if Sty.mem ty kept then ty else ty_base in
-  let ty_res = Util.option_map tymap ls.ls_value in
-  let ty_arg = List.map tymap ls.ls_args in
+  let prot_arg = is_protecting_id ls.ls_name in
+  let prot_val = is_protected_id ls.ls_name in
+  let neg ty = if prot_arg && Sty.mem ty kept then ty else ty_base in
+  let pos ty = if prot_val && Sty.mem ty kept then ty else ty_base in
+  let ty_arg = List.map neg ls.ls_args in
+  let ty_res = Util.option_map pos ls.ls_value in
   if Util.option_eq ty_equal ty_res ls.ls_value &&
      List.for_all2 ty_equal ty_arg ls.ls_args then ls
   else create_lsymbol (id_clone ls.ls_name) ty_arg ty_res)
@@ -160,4 +163,3 @@ let monomorph = Trans.on_tagged_ty Libencoding.meta_kept (fun kept ->
 
 let () = Hashtbl.replace Encoding.ft_enco_poly "explicit"
     (fun _ -> Trans.compose explicit monomorph)
-

@@ -132,7 +132,7 @@ module Transform = struct
 
   and guard q kept varM fmla vsl =
     let aux fmla vs =
-      if Sty.mem vs.vs_ty kept then fmla else
+      if Libencoding.is_protected_vs kept vs then fmla else
         let g = t_equ (app_type (t_var vs)) (term_of_ty varM vs.vs_ty) in
         match q with
           | Tforall -> t_implies g fmla
@@ -173,10 +173,11 @@ module Transform = struct
   let logic_guard kept acc lsymbol =
     match lsymbol.ls_value with
       | None -> acc
-      | Some ty_val when Sty.mem ty_val kept -> acc
+      | Some _ when Libencoding.is_protected_ls kept lsymbol -> acc
       | Some ty_val ->
-        let varl = List.map (fun v -> create_vsymbol (id_fresh "x") v)
-          lsymbol.ls_args in
+        let v_id = if Libencoding.is_protecting_id lsymbol.ls_name
+          then id_fresh "x" else Libencoding.id_unprotected "j" in
+        let varl = List.map (create_vsymbol v_id) lsymbol.ls_args in
         let trans varM () =
           let terms = List.map t_var varl in
           let terms = args_transform kept varM lsymbol terms ty_val in
@@ -184,7 +185,7 @@ module Transform = struct
             t_equ (app_type (fs_app (findL lsymbol) terms ty_val))
               (term_of_ty varM ty_val) in
           let guard fmla vs =
-            if Sty.mem vs.vs_ty kept then fmla else
+            if Libencoding.is_protected_vs kept vs then fmla else
               let g = t_equ (app_type (t_var vs)) (term_of_ty varM vs.vs_ty) in
               t_implies g fmla in
           let fmla = List.fold_left guard fmla varl in
@@ -242,9 +243,12 @@ let guard =
 open Libencoding
 
 let lsmap kept = Wls.memoize 63 (fun ls ->
-  let tymap ty = if Sty.mem ty kept then ty else ty_base in
-  let ty_res = Util.option_map tymap ls.ls_value in
-  let ty_arg = List.map tymap ls.ls_args in
+  let prot_arg = is_protecting_id ls.ls_name in
+  let prot_val = is_protected_id ls.ls_name in
+  let neg ty = if prot_arg && Sty.mem ty kept then ty else ty_base in
+  let pos ty = if prot_val && Sty.mem ty kept then ty else ty_base in
+  let ty_arg = List.map neg ls.ls_args in
+  let ty_res = Util.option_map pos ls.ls_value in
   if Util.option_eq ty_equal ty_res ls.ls_value &&
      List.for_all2 ty_equal ty_arg ls.ls_args then ls
   else create_lsymbol (id_clone ls.ls_name) ty_arg ty_res)
