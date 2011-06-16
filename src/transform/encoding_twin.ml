@@ -52,7 +52,7 @@ let make_tenv kept = {
   next = Hty.create 7 }
 
 let add_decls tenv ty () decls =
-  if Hty.mem tenv.seen ty then decls else
+(*  if Hty.mem tenv.seen ty then decls else*)
   let () = Hty.add tenv.seen ty () in
   let (t2tb,tb2t) = Mty.find ty tenv.pont in
   let t2tb_def = create_logic_decl [t2tb,None] in
