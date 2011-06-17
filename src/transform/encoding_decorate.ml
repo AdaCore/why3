@@ -44,6 +44,9 @@ let deco_term kept tvar =
         let t = t_map deco t in
         if ls.ls_value = None || is_protected_ls kept ls
         then t else decorate tvar t
+    | Tconst _ ->
+        if Sty.mem (t_type t) kept
+        then t else decorate tvar t
     | Tlet (t1,tb) ->
         let v,e,close = t_open_bound_cb tb in
         t_let (t_map deco t1) (close v (deco e))
