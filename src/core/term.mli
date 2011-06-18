@@ -412,9 +412,3 @@ val t_occurs_alpha : term -> term -> bool
 val t_replace : term -> term -> term -> term
 val t_replace_alpha : term -> term -> term -> term
 
-(** Binder-free term matching *)
-
-exception NoMatch
-
-val t_match : term Mvs.t -> term -> term -> term Mvs.t
-

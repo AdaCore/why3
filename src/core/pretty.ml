@@ -484,8 +484,6 @@ let () = Exn_printer.register
       fprintf fmt "Not a term: %a" print_term t
   | Term.FmlaExpected t ->
       fprintf fmt "Not a formula: %a" print_term t
-  | Term.NoMatch ->
-      fprintf fmt "Uncatched Term.NoMatch exception: [tf]_match failed"
   | Pattern.ConstructorExpected ls ->
       fprintf fmt "The symbol %a is not a constructor"
         print_ls ls

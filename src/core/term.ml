@@ -351,6 +351,8 @@ let bnd_map_fold fn acc bv =
 let some_plus _ m n = Some (m + n)
 let add_t_vars s t = Mvs.union some_plus s t.t_vars
 let add_b_vars s (_,b,_) = Mvs.union some_plus s b.bv_vars
+let add_nt_vars _ n t s = Mvs.union some_plus s
+  (if n = 1 then t.t_vars else Mvs.map (( * ) n) t.t_vars)
 
 module Hsterm = Hashcons.Make (struct
 
@@ -586,10 +588,7 @@ and bv_subst_unsafe m b =
   (* remove from b.bv_vars the variables replaced by m *)
   let s = Mvs.set_diff b.bv_vars m in
   (* add to b.bv_vars the free variables added by m *)
-  (* if you are tempted to inline mult into some_plus, think better *)
-  let mult n s = if n = 1 then s else Mvs.map (fun i -> i * n) s in
-  let join _ n t s = Mvs.union some_plus (mult n t.t_vars) s in
-  let s = Mvs.fold2_inter join b.bv_vars m s in
+  let s = Mvs.fold2_inter add_nt_vars b.bv_vars m s in
   (* apply m to the terms in b.bv_subst *)
   let h = Mvs.map (t_subst_unsafe m) b.bv_subst in
   (* join m to b.bv_subst *)
@@ -1253,32 +1252,6 @@ module Hterm_alpha = Hashtbl.Make (struct
   let equal = t_equal_alpha
   let hash = t_hash_alpha
 end)
-
-(* binder-free term/formula matching *)
-
-exception NoMatch
-
-let rec t_match s t1 t2 =
-  if not (oty_equal t1.t_ty t2.t_ty) then raise NoMatch else
-  match t1.t_node, t2.t_node with
-    | Tconst c1, Tconst c2 when c1 = c2 -> s
-    | Tvar v1, _ ->
-        Mvs.change v1 (function
-          | None -> Some t2
-          | Some t1 as r when t_equal t1 t2 -> r
-          | _ -> raise NoMatch) s
-    | Tapp (s1,l1), Tapp (s2,l2) when ls_equal s1 s2 ->
-        List.fold_left2 t_match s l1 l2
-    | Tif (f1,t1,e1), Tif (f2,t2,e2) ->
-        t_match (t_match (t_match s f1 f2) t1 t2) e1 e2
-    | Tbinop (op1,f1,g1), Tbinop (op2,f2,g2) when op1 = op2 ->
-        t_match (t_match s f1 f2) g1 g2
-    | Tnot f1, Tnot f2 ->
-        t_match s f1 f2
-    | Ttrue, Ttrue
-    | Tfalse, Tfalse ->
-        s
-    | _ -> raise NoMatch
 
 (* occurrence check *)
 
