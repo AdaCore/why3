@@ -23,19 +23,24 @@ a piece of OCaml code for building the formula $true \lor false$.
 open Why
 
 (* a ground propositional goal: true or false *)
-let fmla_true : Term.fmla = Term.f_true
-let fmla_false : Term.fmla = Term.f_false
-let fmla1 : Term.fmla = Term.f_or fmla_true fmla_false
+let fmla_true : Term.term = Term.t_true
+let fmla_false : Term.term = Term.t_false
+let fmla1 : Term.term = Term.t_or fmla_true fmla_false
 \end{verbatim}
-As one can guess, the type \texttt{fmla} is the type of formulas in
-the library.
+The library uses the common type \texttt{term} both for terms
+(i.e.~expressions that produce a value of some particular type)
+and formulas (i.e.~boolean-valued expressions).
+% To distinguish terms from formulas, one can look at the
+% \texttt{t_ty} field of the \texttt{term} record: in formulas,
+% this field has the value \texttt{None}, and in terms,
+% \texttt{Some t}, where \texttt{t} is of type \texttt{Ty.ty}.
 
 Such a formula can be printed using the module \texttt{Pretty}
 providing pretty-printers.
 \begin{verbatim}
-(* printing the formula *)
+(* printing it *)
 open Format
-let () = printf "@[formula 1 is:@ %a@]@." Pretty.print_fmla fmla1
+let () = printf "@[formula 1 is:@ %a@]@." Pretty.print_term fmla1
 \end{verbatim}
 
 Assuming the lines above are written in a file \texttt{f.ml}, it can
@@ -58,14 +63,16 @@ let prop_var_A : Term.lsymbol =
 let prop_var_B : Term.lsymbol =
   Term.create_psymbol (Ident.id_fresh "B") []
 \end{verbatim}
-The type \texttt{lsymbol} is the type of logic symbols. Then the atoms $A$ and $B$
-must be built by the general function for applying a predicate symbol to a list of terms. Here we just need the empty list of arguments.
+The type \texttt{lsymbol} is the type of function and predicate symbols (which
+we call logic symbols for brevity). Then the atoms $A$ and $B$ must be built
+by the general function for applying a predicate symbol to a list of terms.
+Here we just need the empty list of arguments.
 \begin{verbatim}
-let atom_A : Term.fmla = Term.f_app prop_var_A []
-let atom_B : Term.fmla = Term.f_app prop_var_B []
-let fmla2 : Term.fmla =
-  Term.f_implies (Term.f_and atom_A atom_B) atom_A
-let () = printf "@[formula 2 is:@ %a@]@." Pretty.print_fmla fmla2
+let atom_A : Term.term = Term.ps_app prop_var_A []
+let atom_B : Term.term = Term.ps_app prop_var_B []
+let fmla2 : Term.term =
+  Term.t_implies (Term.t_and atom_A atom_B) atom_A
+let () = printf "@[formula 2 is:@ %a@]@." Pretty.print_term fmla2
 \end{verbatim}
 
 As expected, the output is as follows.
@@ -175,7 +182,7 @@ loaded first.
 \begin{verbatim}
 (* builds the environment from the [loadpath] *)
 let env : Env.env =
-  Lexer.create_env (Whyconf.loadpath main)
+  Env.create_env_of_loadpath (Whyconf.loadpath main)
 (* loading the Alt-Ergo driver *)
 let alt_ergo_driver : Driver.driver =
   Driver.load_driver env alt_ergo.Whyconf.driver
@@ -262,7 +269,7 @@ let plus_symbol : Term.lsymbol =
   Theory.ns_find_ls int_theory.Theory.th_export ["infix +"]
 let two_plus_two : Term.term =
   Term.t_app_infer plus_symbol [two;two]
-let fmla3 : Term.fmla = Term.f_equ two_plus_two four
+let fmla3 : Term.term = Term.t_equ two_plus_two four
 \end{verbatim}
 An important point to notice as that when building the application of
 $+$ to the arguments, it is checked that the types are correct. Indeed
@@ -270,7 +277,7 @@ the constructor \texttt{t\_app\_infer} infers the type of the resulting
 term. One could also provide the expected type as follows.
 \begin{verbatim}
 let two_plus_two : Term.term =
-  Term.t_app plus_symbol [two;two] Ty.ty_int
+  Term.fs_app plus_symbol [two;two] Ty.ty_int
 \end{verbatim}
 
 When building a task with this formula, we need to declare that we use
@@ -303,20 +310,20 @@ The formula $x*x \geq 0$ is obtained as in the previous example.
 \begin{verbatim}
 let x : Term.term = Term.t_var var_x
 let x_times_x : Term.term = Term.t_app_infer mult_symbol [x;x]
-let fmla4_aux : Term.fmla = Term.f_app ge_symbol [x_times_x;zero]
+let fmla4_aux : Term.term = Term.ps_app ge_symbol [x_times_x;zero]
 \end{verbatim}
 To quantify on $x$, one can first build an intermediate
-value of type \texttt{fmla\_quant}, representing a closure
+value of type \texttt{term\_quant}, representing a closure
 under a quantifier:
 \begin{verbatim}
-let fmla4_quant : Term.fmla_quant = Term.f_close_quant [var_x] [] fmla4_aux
-let fmla4 : Term.fmla = Term.f_forall fmla4_quant
+let fmla4_quant : Term.term_quant = Term.t_close_quant [var_x] [] fmla4_aux
+let fmla4 : Term.term = Term.t_forall fmla4_quant
 \end{verbatim}
-The second argument of \texttt{f\_close\_quant} is a list of triggers.
+The second argument of \texttt{t\_close\_quant} is a list of triggers.
 
 A simpler method would be to use an appropriate function:
 \begin{verbatim}
-let fmla4bis : Term.fmla = Term.f_forall_close [var_x] [] fmla4_aux
+let fmla4bis : Term.term = Term.t_forall_close [var_x] [] fmla4_aux
 \end{verbatim}
 
 \section{Building Theories}
