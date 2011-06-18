@@ -151,7 +151,7 @@ let file whyconf env (dbf,wf) =
         "Error : No sketch of proof for the theory %s of file %s.@."
         thname wf
   in
-  Theory.Mnm.iter iter wths
+  Util.Mstr.iter iter wths
 
 
 let db whyconf env =

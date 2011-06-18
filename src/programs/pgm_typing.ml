@@ -2176,7 +2176,7 @@ let add_logics env ltm uc d =
 let find_module penv lmod q id = match q with
   | [] ->
       (* local module *)
-      Mnm.find id lmod
+      Mstr.find id lmod
   | _ :: _ ->
       (* theory in file f *)
       Pgm_env.find_module penv q id

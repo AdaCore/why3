@@ -742,7 +742,7 @@ let read_file fn =
   in
   let theories = Env.read_file env fn in
   let theories =
-    Theory.Mnm.fold
+    Util.Mstr.fold
       (fun name th acc ->
          match th.Theory.th_name.Ident.id_loc with
            | Some l -> (l,name,th)::acc

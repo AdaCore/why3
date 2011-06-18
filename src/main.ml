@@ -461,14 +461,14 @@ let do_global_theory env drv (tname,p,t,glist) =
   do_theory env drv "lib" tname th glist
 
 let do_local_theory env drv fname m (tname,_,t,glist) =
-  let th = try Mnm.find t m with Not_found ->
+  let th = try Mstr.find t m with Not_found ->
     eprintf "Theory '%s' not found in file '%s'.@." tname fname;
     exit 1
   in
   do_theory env drv fname tname th glist
 
 let do_coq_realize_theory env _drv oldf fname m (tname,_,t,_glist) =
-  let th = try Mnm.find t m with Not_found ->
+  let th = try Mstr.find t m with Not_found ->
     eprintf "Theory '%s' not found in file '%s'.@." tname fname;
     exit 1
   in
@@ -509,7 +509,7 @@ let do_input env drv = function
 		let glist = Queue.create () in
 		let add_th t th mi = Ident.Mid.add th.th_name (t,th) mi in
 		let do_th _ (t,th) = do_theory env drv fname t th glist in
-		Ident.Mid.iter do_th (Mnm.fold add_th m Ident.Mid.empty)
+		Ident.Mid.iter do_th (Mstr.fold add_th m Ident.Mid.empty)
 	      else
 		Queue.iter (do_local_theory env drv fname m) tlist
 

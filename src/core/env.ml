@@ -17,6 +17,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Util
 open Ident
 open Theory
 
@@ -40,7 +41,7 @@ type find_channel = fformat -> pathname -> filename * in_channel
 
 type env = {
   env_find : find_channel;
-  env_memo : (string list, theory Mnm.t) Hashtbl.t;
+  env_memo : (string list, theory Mstr.t) Hashtbl.t;
   env_tag  : Hashweak.tag;
 }
 
@@ -50,7 +51,7 @@ module Wenv = Hashweak.Make(struct type t = env let tag = env_tag end)
 
 (** Input formats *)
 
-type read_channel = env -> filename -> in_channel -> theory Mnm.t
+type read_channel = env -> filename -> in_channel -> theory Mstr.t
 
 let read_channel_table = Hashtbl.create 17 (* format name -> read_channel *)
 let extensions_table   = Hashtbl.create 17 (* suffix -> format name *)
@@ -128,7 +129,7 @@ let find_channel env = env.env_find
 let find_library env sl =
   let file, ic = env.env_find "why" sl in
   try
-    Hashtbl.replace env.env_memo sl Mnm.empty;
+    Hashtbl.replace env.env_memo sl Mstr.empty;
     let mth = read_channel ~format:"why" env file ic in
     Hashtbl.replace env.env_memo sl mth;
     close_in ic;
@@ -152,7 +153,7 @@ let get_builtin s =
 let find_theory env sl s =
   if sl = [] then get_builtin s else
   let mth = find_library env sl in
-  try Mnm.find s mth with Not_found ->
+  try Mstr.find s mth with Not_found ->
   raise (TheoryNotFound (sl,s))
 
 (* Exception reporting *)

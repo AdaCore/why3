@@ -134,7 +134,7 @@ let gen_from_file ~format ~prob_name ~file_path ~file_name env lth =
         in
         let m = Env.read_channel ?format:format env file_name cin in
         close_in cin;
-        Mnm.bindings m in
+        Mstr.bindings m in
       let file_id = if Db.is_initialized () then
           let file_db = Sysutil.relativize_filename
             (Filename.dirname (Db.db_name ())) file_path in

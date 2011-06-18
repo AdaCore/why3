@@ -434,10 +434,10 @@ module NsTree = struct
       if s = "real" && ts_equal ts ts_real then acc else
         Leaf ("type " ^ s) :: acc
     in
-    let acc = Mnm.fold add_ns ns.ns_ns []  in
-    let acc = Mnm.fold add_pr ns.ns_pr acc in
-    let acc = Mnm.fold add_ls ns.ns_ls acc in
-    let acc = Mnm.fold add_ts ns.ns_ts acc in acc
+    let acc = Mstr.fold add_ns ns.ns_ns []  in
+    let acc = Mstr.fold add_pr ns.ns_pr acc in
+    let acc = Mstr.fold add_ls ns.ns_ls acc in
+    let acc = Mstr.fold add_ts ns.ns_ts acc in acc
 
   let decomp = function
     | Namespace (s,ns,kn) -> s, contents ns kn

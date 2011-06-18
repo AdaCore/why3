@@ -73,7 +73,7 @@ let do_file env fname =
     Doc_html.print_footer fmt ();
     close_out c
   in
-  Mnm.iter print_theory m
+  Mstr.iter print_theory m
 
 let () =
   try

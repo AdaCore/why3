@@ -26,21 +26,18 @@ open Decl
 
 (** Namespace *)
 
-module Snm = Sstr
-module Mnm = Mstr
-
 type namespace = {
-  ns_ts : tysymbol Mnm.t;   (* type symbols *)
-  ns_ls : lsymbol Mnm.t;    (* logic symbols *)
-  ns_pr : prsymbol Mnm.t;   (* propositions *)
-  ns_ns : namespace Mnm.t;  (* inner namespaces *)
+  ns_ts : tysymbol Mstr.t;   (* type symbols *)
+  ns_ls : lsymbol Mstr.t;    (* logic symbols *)
+  ns_pr : prsymbol Mstr.t;   (* propositions *)
+  ns_ns : namespace Mstr.t;  (* inner namespaces *)
 }
 
 let empty_ns = {
-  ns_ts = Mnm.empty;
-  ns_ls = Mnm.empty;
-  ns_pr = Mnm.empty;
-  ns_ns = Mnm.empty;
+  ns_ts = Mstr.empty;
+  ns_ls = Mstr.empty;
+  ns_pr = Mstr.empty;
+  ns_ns = Mstr.empty;
 }
 
 exception ClashSymbol of string
@@ -51,20 +48,20 @@ let ns_replace eq chk x vo vn =
   raise (ClashSymbol x)
 
 let ns_union eq chk =
-  Mnm.union (fun x vn vo -> Some (ns_replace eq chk x vo vn))
+  Mstr.union (fun x vn vo -> Some (ns_replace eq chk x vo vn))
 
 let rec merge_ns chk ns1 ns2 =
   let fusion _ ns1 ns2 = Some (merge_ns chk ns1 ns2) in
   { ns_ts = ns_union ts_equal chk ns1.ns_ts ns2.ns_ts;
     ns_ls = ns_union ls_equal chk ns1.ns_ls ns2.ns_ls;
     ns_pr = ns_union pr_equal chk ns1.ns_pr ns2.ns_pr;
-    ns_ns = Mnm.union fusion      ns1.ns_ns ns2.ns_ns; }
+    ns_ns = Mstr.union fusion     ns1.ns_ns ns2.ns_ns; }
 
-let nm_add chk x ns m = Mnm.change x (function
+let nm_add chk x ns m = Mstr.change x (function
   | None -> Some ns
   | Some os -> Some (merge_ns chk ns os)) m
 
-let ns_add eq chk x v m = Mnm.change x (function
+let ns_add eq chk x v m = Mstr.change x (function
   | None -> Some v
   | Some vo -> Some (ns_replace eq chk x vo v)) m
 
@@ -79,8 +76,8 @@ let add_ns chk x nn ns = { ns with ns_ns = nm_add chk x nn ns.ns_ns }
 
 let rec ns_find get_map ns = function
   | []   -> assert false
-  | [a]  -> Mnm.find a (get_map ns)
-  | a::l -> ns_find get_map (Mnm.find a ns.ns_ns) l
+  | [a]  -> Mstr.find a (get_map ns)
+  | a::l -> ns_find get_map (Mstr.find a ns.ns_ns) l
 
 let ns_find_ts = ns_find (fun ns -> ns.ns_ts)
 let ns_find_ls = ns_find (fun ns -> ns.ns_ls)
@@ -631,10 +628,10 @@ let clone_export uc th inst =
   let f_pr pr = Mpr.find_default pr pr cl.pr_table in
 
   let rec f_ns ns = {
-    ns_ts = Mnm.map f_ts (Mnm.filter g_ts ns.ns_ts);
-    ns_ls = Mnm.map f_ls (Mnm.filter g_ls ns.ns_ls);
-    ns_pr = Mnm.map f_pr ns.ns_pr;
-    ns_ns = Mnm.map f_ns ns.ns_ns; } in
+    ns_ts = Mstr.map f_ts (Mstr.filter g_ts ns.ns_ts);
+    ns_ls = Mstr.map f_ls (Mstr.filter g_ls ns.ns_ls);
+    ns_pr = Mstr.map f_pr ns.ns_pr;
+    ns_ns = Mstr.map f_ns ns.ns_ns; } in
 
   let ns = f_ns th.th_export in
 

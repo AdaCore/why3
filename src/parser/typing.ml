@@ -1057,7 +1057,7 @@ let prop_kind = function
 let find_theory env lenv q id = match q with
   | [] ->
       (* local theory *)
-      begin try Mnm.find id lenv
+      begin try Mstr.find id lenv
       with Not_found -> find_theory env [] id end
   | _ :: _ ->
       (* theory in file f *)
@@ -1065,23 +1065,23 @@ let find_theory env lenv q id = match q with
 
 let rec clone_ns loc sl ns2 ns1 s =
   let clash id = error ~loc (Clash id.id_string) in
-  let s = Mnm.fold (fun nm ns1 acc ->
-    if not (Mnm.mem nm ns2.ns_ns) then acc else
-    let ns2 = Mnm.find nm ns2.ns_ns in
+  let s = Mstr.fold (fun nm ns1 acc ->
+    if not (Mstr.mem nm ns2.ns_ns) then acc else
+    let ns2 = Mstr.find nm ns2.ns_ns in
     clone_ns loc sl ns2 ns1 acc) ns1.ns_ns s
   in
-  let inst_ts = Mnm.fold (fun nm ts1 acc ->
-    if not (Mnm.mem nm ns2.ns_ts) then acc else
+  let inst_ts = Mstr.fold (fun nm ts1 acc ->
+    if not (Mstr.mem nm ns2.ns_ts) then acc else
     if not (Sid.mem ts1.ts_name sl) then acc else
     if Mts.mem ts1 acc then clash ts1.ts_name else
-    let ts2 = Mnm.find nm ns2.ns_ts in
+    let ts2 = Mstr.find nm ns2.ns_ts in
     Mts.add ts1 ts2 acc) ns1.ns_ts s.inst_ts
   in
-  let inst_ls = Mnm.fold (fun nm ls1 acc ->
-    if not (Mnm.mem nm ns2.ns_ls) then acc else
+  let inst_ls = Mstr.fold (fun nm ls1 acc ->
+    if not (Mstr.mem nm ns2.ns_ls) then acc else
     if not (Sid.mem ls1.ls_name sl) then acc else
     if Mls.mem ls1 acc then clash ls1.ls_name else
-    let ls2 = Mnm.find nm ns2.ns_ls in
+    let ls2 = Mstr.find nm ns2.ns_ls in
     Mls.add ls1 ls2 acc) ns1.ns_ls s.inst_ls
   in
   { s with inst_ts = inst_ts; inst_ls = inst_ls }
@@ -1180,8 +1180,8 @@ let close_theory loc lenv th =
   if Debug.test_flag debug_parse_only then lenv else
   let th = close_theory th in
   let id = th.th_name.id_string in
-  if Mnm.mem id lenv then error ~loc (ClashTheory id);
-  Mnm.add id th lenv
+  if Mstr.mem id lenv then error ~loc (ClashTheory id);
+  Mstr.add id th lenv
 
 let close_namespace loc import name th =
   let id = option_map (fun id -> id.id) name in

@@ -26,8 +26,8 @@ open Pgm_types
 open Pgm_types.T
 
 type namespace = private {
-  ns_ex : esymbol   Mnm.t;  (* exception symbols *)
-  ns_ns : namespace Mnm.t;  (* inner namespaces *)
+  ns_ex : esymbol   Util.Mstr.t;  (* exception symbols *)
+  ns_ns : namespace Util.Mstr.t;  (* inner namespaces *)
 }
 
 val ns_find_ex : namespace -> string list -> esymbol
@@ -74,14 +74,14 @@ val add_effect_decl : Decl.decl -> uc -> uc
 val add_pure_decl : Decl.decl -> uc -> uc
 
 val add_impure_pdecl :
-  Env.env -> Theory.theory Theory.Mnm.t -> Ptree.decl -> uc -> uc
+  Env.env -> Theory.theory Util.Mstr.t -> Ptree.decl -> uc -> uc
 val add_effect_pdecl :
-  Env.env -> Theory.theory Theory.Mnm.t -> Ptree.decl -> uc -> uc
+  Env.env -> Theory.theory Util.Mstr.t -> Ptree.decl -> uc -> uc
 val add_pure_pdecl :
-  Env.env -> Theory.theory Theory.Mnm.t -> Ptree.decl -> uc -> uc
+  Env.env -> Theory.theory Util.Mstr.t -> Ptree.decl -> uc -> uc
 
 val add_pdecl :
-  Env.env -> Theory.theory Theory.Mnm.t -> Ptree.decl -> uc -> uc
+  Env.env -> Theory.theory Util.Mstr.t -> Ptree.decl -> uc -> uc
   (** add in impure, effect and pure *)
 
 (** builtins *)

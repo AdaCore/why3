@@ -32,7 +32,7 @@ module Incremental = struct
   let ref_set  ref v = ref := v :: ref_tail ref
 
   let open_logic_file env =
-    ref_push env_ref env; ref_push lenv_ref Theory.Mnm.empty
+    ref_push env_ref env; ref_push lenv_ref Util.Mstr.empty
 
   let close_logic_file () =
     ref_drop env_ref; ref_pop lenv_ref
@@ -243,7 +243,7 @@ end
 
 %type <Env.env -> unit> pre_logic_file
 %start pre_logic_file
-%type <Theory.theory Theory.Mnm.t> logic_file
+%type <Theory.theory Util.Mstr.t> logic_file
 %start logic_file
 %type <Ptree.program_file> program_file
 %start program_file

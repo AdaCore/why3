@@ -19,7 +19,7 @@
 
 (** parsing entry points *)
 
-val parse_logic_file : Env.env -> Lexing.lexbuf -> Theory.theory Theory.Mnm.t
+val parse_logic_file : Env.env -> Lexing.lexbuf -> Theory.theory Util.Mstr.t
 
 val parse_program_file : Lexing.lexbuf -> Ptree.program_file
 

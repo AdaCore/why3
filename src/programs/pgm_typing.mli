@@ -18,12 +18,11 @@
 (**************************************************************************)
 
 open Why
-open Util
 
 val debug : Debug.flag
 
 val decl :
   wp:bool -> Env.env -> Pgm_env.t ->
-  Theory.theory Theory.Mnm.t ->
-  Pgm_module.t Theory.Mnm.t ->
+  Theory.theory Util.Mstr.t ->
+  Pgm_module.t Util.Mstr.t ->
   Pgm_module.uc -> Ptree.program_decl -> Pgm_module.uc

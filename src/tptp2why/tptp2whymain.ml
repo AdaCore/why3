@@ -72,10 +72,10 @@ end = struct
     let decls = getDeclsFromChan c in
     if Debug.test_flag Typing.debug_parse_only ||
        Debug.test_flag Typing.debug_type_only
-    then Theory.Mnm.empty
+    then Util.Mstr.empty
     else
       let my_theory = theory_of_decls file decls in
-      Theory.Mnm.add "Tptp" my_theory Theory.Mnm.empty
+      Util.Mstr.add "Tptp" my_theory Util.Mstr.empty
 
 end
 

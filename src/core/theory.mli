@@ -18,6 +18,7 @@
 (**************************************************************************)
 
 open Stdlib
+open Util
 
 (** Theories and Namespaces *)
 
@@ -26,14 +27,11 @@ open Ty
 open Term
 open Decl
 
-module Mnm : Map.S with type key = string
-module Snm : Mnm.Set
-
 type namespace = private {
-  ns_ts : tysymbol Mnm.t;   (* type symbols *)
-  ns_ls : lsymbol Mnm.t;    (* logic symbols *)
-  ns_pr : prsymbol Mnm.t;   (* propositions *)
-  ns_ns : namespace Mnm.t;  (* inner namespaces *)
+  ns_ts : tysymbol Mstr.t;   (* type symbols *)
+  ns_ls : lsymbol Mstr.t;    (* logic symbols *)
+  ns_pr : prsymbol Mstr.t;   (* propositions *)
+  ns_ns : namespace Mstr.t;  (* inner namespaces *)
 }
 
 val ns_find_ts : namespace -> string list -> tysymbol

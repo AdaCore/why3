@@ -30,13 +30,13 @@ open Pgm_types.T
 open Pgm_ttree
 
 type namespace = {
-  ns_ex : esymbol   Mnm.t;  (* exceptions*)
-  ns_ns : namespace Mnm.t;  (* inner namespaces *)
+  ns_ex : esymbol   Mstr.t;  (* exceptions*)
+  ns_ns : namespace Mstr.t;  (* inner namespaces *)
 }
 
 let empty_ns = {
-  ns_ex = Mnm.empty;
-  ns_ns = Mnm.empty;
+  ns_ex = Mstr.empty;
+  ns_ns = Mstr.empty;
 }
 
 exception ClashSymbol of string
@@ -47,18 +47,18 @@ let ns_replace eq chk x vo vn =
   raise (ClashSymbol x)
 
 let ns_union eq chk =
-  Mnm.union (fun x vn vo -> Some (ns_replace eq chk x vo vn))
+  Mstr.union (fun x vn vo -> Some (ns_replace eq chk x vo vn))
 
 let rec merge_ns chk ns1 ns2 =
   let fusion _ ns1 ns2 = Some (merge_ns chk ns1 ns2) in
   { ns_ex = ns_union ls_equal chk ns1.ns_ex ns2.ns_ex;
-    ns_ns = Mnm.union fusion      ns1.ns_ns ns2.ns_ns; }
+    ns_ns = Mstr.union fusion      ns1.ns_ns ns2.ns_ns; }
 
-let nm_add chk x ns m = Mnm.change x (function
+let nm_add chk x ns m = Mstr.change x (function
   | None -> Some ns
   | Some os -> Some (merge_ns chk ns os)) m
 
-let ns_add eq chk x v m = Mnm.change x (function
+let ns_add eq chk x v m = Mstr.change x (function
   | None -> Some v
   | Some vo -> Some (ns_replace eq chk x vo v)) m
 
@@ -70,8 +70,8 @@ let add_ns chk x nn ns = { ns with ns_ns = nm_add chk x nn ns.ns_ns }
 
 let rec ns_find get_map ns = function
   | []   -> assert false
-  | [a]  -> Mnm.find a (get_map ns)
-  | a::l -> ns_find get_map (Mnm.find a ns.ns_ns) l
+  | [a]  -> Mstr.find a (get_map ns)
+  | a::l -> ns_find get_map (Mstr.find a ns.ns_ns) l
 
 let ns_find_ex = ns_find (fun ns -> ns.ns_ex)
 let ns_find_ns = ns_find (fun ns -> ns.ns_ns)
@@ -259,8 +259,8 @@ let use_export_theory uc th =
       (create_mtsymbol ~impure:ts ~effect:ts ~pure:ts ~singleton:false)
   in
   let rec add_ns ns uc =
-    Mnm.iter add_ts ns.Theory.ns_ts;
-    Mnm.fold (fun _ -> add_ns) ns.Theory.ns_ns uc
+    Mstr.iter add_ts ns.Theory.ns_ts;
+    Mstr.fold (fun _ -> add_ns) ns.Theory.ns_ns uc
   in
   add_ns th.th_export uc
 

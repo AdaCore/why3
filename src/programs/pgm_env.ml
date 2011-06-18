@@ -18,10 +18,11 @@
 (**************************************************************************)
 
 open Why
+open Util
 open Theory
 open Pgm_module
 
-type module_file = Theory.theory Mnm.t * Pgm_module.t Mnm.t
+type module_file = Theory.theory Mstr.t * Pgm_module.t Mstr.t
 
 type t = {
   env      : Env.env;
@@ -45,7 +46,7 @@ let find_library penv sl =
   try 
     Hashtbl.find penv.memo sl
   with Not_found ->
-    Hashtbl.add penv.memo sl (Mnm.empty, Mnm.empty);
+    Hashtbl.add penv.memo sl (Mstr.empty, Mstr.empty);
     let file, c = Env.find_channel penv.env "whyml" sl in
     let r = penv.retrieve penv file c in
     close_in c;
@@ -53,5 +54,5 @@ let find_library penv sl =
     r
 
 let find_module penv sl s =
-  try Mnm.find s (snd (find_library penv sl))
+  try Mstr.find s (snd (find_library penv sl))
   with Not_found -> raise (ModuleNotFound (sl, s))

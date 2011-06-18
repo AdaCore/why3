@@ -29,12 +29,12 @@ val debug_type_only : Debug.flag
 
 (** incremental parsing *)
 
-val add_decl : Env.env -> theory Mnm.t -> theory_uc -> Ptree.decl -> theory_uc
+val add_decl : Env.env -> theory Mstr.t -> theory_uc -> Ptree.decl -> theory_uc
 
 val close_namespace :
   Loc.position -> bool -> Ptree.ident option -> theory_uc -> theory_uc
 
-val close_theory : Loc.position -> theory Mnm.t -> theory_uc -> theory Mnm.t
+val close_theory : Loc.position -> theory Mstr.t -> theory_uc -> theory Mstr.t
 
 (******************************************************************************)
 (** The following is exported for program typing (src/programs/pgm_typing.ml) *)
