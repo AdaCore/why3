@@ -31,7 +31,9 @@ module Quicksort
           { i <= !min < j && forall k: int. i <= k < j -> a[!min] <= a[k] }
         if a[j] < a[!min] then min := j
       done;
-      if !min <> i then swap a !min i
+      label L1:
+      if !min <> i then swap a !min i;
+      assert { permut a (at a L1) }
     done
     { sorted a and permut a (old a) }
 
