@@ -1,0 +1,42 @@
+
+(* Insertion sort. *)
+
+module InsertionSort
+
+  use import int.Int
+  use import module ref.Ref
+  use import module array.Array
+  use import module array.ArraySorted
+  use import module array.ArrayPermut
+  use import module array.ArrayEq
+
+  let insertion_sort (a: array int) =
+    { }
+    label L:
+    for i = 1 to length a - 1 do
+      (* a[0..i[ is sorted; now insert a[i] *)
+      invariant { sorted_sub a 0 i and permut a (at a L) }
+      let v = a[i] in
+      let j = ref i in
+      while !j > 0 && a[!j - 1] > v do
+        invariant {
+          0 <= !j <= i and permut a[!j <- v] (at a L) and
+          (forall k1 k2: int.
+             0 <= k1 <= k2 <= i -> k1 <> !j -> k2 <> !j -> a[k1] <= a[k2]) and
+          (forall k: int. !j+1 <= k <= i -> v < a[k]) }
+        variant { !j }
+        a[!j] <- a[!j - 1];
+        j := !j - 1
+      done;
+      a[!j] <- v
+    done
+    { sorted a and permut a (old a) }
+
+end
+
+(*
+Local Variables:
+compile-command: "unset LANG; make -C ../.. examples/programs/insertion_sort.gui"
+End:
+*)
+

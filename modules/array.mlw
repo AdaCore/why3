@@ -106,8 +106,9 @@ end
 
 module ArraySorted
 
+  use import int.Int
   use import module Array
-  clone import map.MapSorted as M with type elt = int
+  clone import map.MapSorted as M with type elt = int, logic le = (<=)
 
   logic sorted_sub (a : array int) (l u : int) =
     M.sorted_sub a.elts l u
