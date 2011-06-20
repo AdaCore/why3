@@ -134,6 +134,7 @@ end
 
 module ArrayPermut
 
+  use import int.Int
   use import module Array
   clone import map.MapPermut as M
 
@@ -145,6 +146,12 @@ module ArrayPermut
 
   logic permut (a1 a2: array 'a) =
     a1.length = a2.length and M.permut_sub a1.elts a2.elts 0 a1.length
+
+  lemma exchange_permut:
+    forall a1 a2: array 'a, i j: int.
+    exchange a1 a2 i j -> a1.length = a2.length ->
+    0 <= i < a1.length -> 0 <= j < a1.length ->
+    permut a1 a2
 
   use import module ArrayEq
 
