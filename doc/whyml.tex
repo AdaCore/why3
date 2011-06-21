@@ -147,7 +147,7 @@ keyword \texttt{invariant}, immediately after the keyword \texttt{do}.
       done
 \end{verbatim}
 There is no need to introduce a variant, as the termination of a
-\texttt{for} loop is automatically guaranteed. 
+\texttt{for} loop is automatically guaranteed.
 This completes module \texttt{MaxAndSum}.
 Figure~\ref{fig:MaxAndSum} shows the whole code.
 \begin{figure}
@@ -294,9 +294,116 @@ end
 
 \subsection{Problem 3: Searching a Linked List}
 
+The third problem is stated as follows:
+\begin{quote}
+  Given a linked list representation of a list of integers,
+  find the index of the first element that is equal to 0.
+\end{quote}
+More precisely, the specification says
+\begin{quote}
+  You have to show that the program returns an index $i$ equal to the
+  length of the list if there is no such element. Otherwise, the $i$-th
+  element of the list must be equal to 0, and all the preceding
+  elements must be non-zero.
+\end{quote}
+Since the list is not mutated, we can use the algebraic data type of
+polymorphic lists from \why's standard library, defined in theory
+\texttt{list.List}. It comes with other handy theories:
+\texttt{list.Length}, which provides a function \texttt{length}, and
+\texttt{list.Nth}, which provides a function \texttt{nth}
+for the $n$-th element of a list. The latter returns an option type,
+depending on whether the index is meaningful or not.
+\begin{verbatim}
+  module SearchingALinkedList
+    use import int.Int
+    use export list.List
+    use export list.Length
+    use export list.Nth
+\end{verbatim}
+It is helpful to introduce two predicates: a first one
+for a successful search,
+\begin{verbatim}
+    logic zero_at (l: list int) (i: int) =
+      nth i l = Some 0 and forall j:int. 0 <= j < i -> nth j l <> Some 0
+\end{verbatim}
+and a another for a non-successful search,
+\begin{verbatim}
+    logic no_zero (l: list int) =
+      forall j:int. 0 <= j < length l -> nth j l <> Some 0
+\end{verbatim}
+We are now in position to give the code for the search function.
+We write it as a recursive function \texttt{search} which scans a list
+for the first zero value:
+\begin{verbatim}
+    let rec search (i: int) (l: list int) = match l with
+      | Nil      -> i
+      | Cons x r -> if x = 0 then i else search (i+1) r
+      end
+\end{verbatim}
+Passing an index \texttt{i} as first argument allows to perform a tail
+call. A simpler code (yet less efficient) would return 0 in the first
+branch and \texttt{1 + search ...} in the second one, avoiding the
+extra argument \texttt{i}.
+
+We first prove the termination of this recursive function. It amounts
+to give it a \emph{variant}, that is an term integer term which stays
+non-negative and strictly decreases at each recursive call. Here it is
+as simple as the length of \texttt{l}:
+\begin{verbatim}
+    let rec search (i: int) (l: list int) variant { length l } = ...
+\end{verbatim}
+(It is worth pointing out that variants are not limited to natural
+numbers. Any other type equipped with a well-founded order relation
+can be used instead.)
+There is no precondition for function \texttt{search}.
+The postcondition expresses that either a zero value is found, and
+consequently the value returned is bounded accordingly,
+\begin{verbatim}
+  i <= result < i + length l and zero_at l (result - i)
+\end{verbatim}
+or no zero value was found, and thus the returned value is exactly
+\texttt{i} plus the length of \texttt{l}:
+\begin{verbatim}
+  result = i + length l and no_zero l
+\end{verbatim}
+Solving the problem is simply a matter of calling \texttt{search} with
+0 as first argument.
+The code is given Figure~\ref{fig:LinkedList}. The verification
+conditions are all discharged automatically.
 \begin{figure}
   \centering
 \begin{verbatim}
+module SearchingALinkedList
+
+  use import int.Int
+  use export list.List
+  use export list.Length
+  use export list.Nth
+
+  logic zero_at (l: list int) (i: int) =
+    nth i l = Some 0 and forall j:int. 0 <= j < i -> nth j l <> Some 0
+
+  logic no_zero (l: list int) =
+    forall j:int. 0 <= j < length l -> nth j l <> Some 0
+
+  let rec search (i: int) (l: list int) variant { length l } =
+    {}
+    match l with
+    | Nil -> i
+    | Cons x r -> if x = 0 then i else search (i+1) r
+    end
+    { (i <= result < i + length l and zero_at l (result - i))
+      or
+      (result = i + length l and no_zero l) }
+
+  let search_list (l: list int) =
+    { }
+    search 0 l
+    { (0 <= result < length l and zero_at l result)
+      or
+      (result = length l and no_zero l) }
+
+end
 \end{verbatim}
 \hrulefill
   \caption{Solution for VSTTE'10 competition problem 3.}

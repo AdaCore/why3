@@ -1,21 +1,20 @@
 (* VSTTE'10 competition http://www.macs.hw.ac.uk/vstte10/Competition.html
    Problem 3: searching a linked list *)
 
-module M
+module SearchingALinkedList
 
   use import int.Int
-  use import module ref.Ref
   use export list.List
   use export list.Length
   use export list.Nth
 
-  logic zero_at (l : list int) (i : int) =
+  logic zero_at (l: list int) (i: int) =
     nth i l = Some 0 and forall j:int. 0 <= j < i -> nth j l <> Some 0
 
-  logic no_zero (l : list int) =
+  logic no_zero (l: list int) =
     forall j:int. 0 <= j < length l -> nth j l <> Some 0
 
-  let rec search i l variant { length l } =
+  let rec search (i: int) (l: list int) variant { length l } =
     {}
     match l with
     | Nil -> i
@@ -25,7 +24,7 @@ module M
       or
       (result = i + length l and no_zero l) }
 
-  let search_list l =
+  let search_list (l: list int) =
     { }
     search 0 l
     { (0 <= result < length l and zero_at l result)
@@ -35,6 +34,7 @@ module M
 
   (* imperative version, with a loop *)
 
+  use import module ref.Ref
   use import list.HdTl
 
   let head (l : list 'a) =
