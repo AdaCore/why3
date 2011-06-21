@@ -49,6 +49,8 @@ See Chapter~\ref{chap:manpages} for more details regarding command lines.
 \medskip
 As an introduction to \whyml, we use the five problems from the VSTTE
 2010 verification competition~\cite{vstte10comp}.
+The source code for all these examples is contained in \why's
+distribution, in dub-directory \texttt{examples/programs/}.
 
 \subsection{Problem 1: Sum and Maximum}
 
@@ -192,9 +194,98 @@ Coq, and thus completes the verification.
 
 \subsection{Problem 2: Inverting an Injection}
 
+The second problem is stated as follows:
+\begin{quote}
+  Invert an injective array $A$ on $N$ elements in the
+  subrange from $0$ to $N - 1$, i.e., the output array $B$ must be
+  such that $B[A[i]] = i$ for $0 \le i < N$.
+\end{quote}
+We may assume that $A$ is surjective and we have to prove
+that the resulting array is also injective.
+The code is immediate, since it is as simple as
+\begin{verbatim}
+    for i = 0 to n - 1 do b[a[i]] <- i done
+\end{verbatim}
+so it is more a matter of specification and of getting the proof done
+with as much automation as possible. In a new file, we start a new
+module and we import arithmetic and arrays:
+\begin{verbatim}
+  module InvertingAnInjection
+    use import int.Int
+    use import module array.Array
+\end{verbatim}
+It is convenient to introduce predicate definitions for the properties
+of being injective and surjective. These are purely logical
+declarations:
+\begin{verbatim}
+    logic injective (a: array int) (n: int) =
+      forall i j: int. 0 <= i < n -> 0 <= j < n -> i <> j -> a[i] <> a[j]
+
+    logic surjective (a: array int) (n: int) =
+      forall i: int. 0 <= i < n -> exists j: int. (0 <= j < n and a[j] = i)
+\end{verbatim}
+It is also convenient to introduce the predicate ``being in the
+subrange from 0 to $n-1$'':
+\begin{verbatim}
+    logic range (a: array int) (n: int) =
+      forall i: int. 0 <= i < n -> 0 <= a[i] < n
+\end{verbatim}
+Using these predicates, we can formulate the assumption that any
+injective array of size $n$ within the range $0..n-1$ is also surjective:
+\begin{verbatim}
+    lemma injective_surjective:
+      forall a: array int, n: int.
+      injective a n -> range a n -> surjective a n
+\end{verbatim}
+We declare it as a lemma rather than as an axiom, since it is actually
+provable. It requires induction and can be proved using the Coq proof
+assistant for instance.
+Finally we can give the code a specification, with a loop invariant
+which simply expresses the values assigned to array \texttt{b} so far:
+\begin{verbatim}
+    let inverting (a: array int) (b: array int) (n: int) =
+      { 0 <= n = length a = length b and injective a n and range a n }
+      for i = 0 to n - 1 do
+        invariant { forall j: int. 0 <= j < i -> b[a[j]] = j }
+        b[a[i]] <- i
+      done
+      { injective b n }
+\end{verbatim}
+Here we chose to have array \texttt{b} as argument; returning a
+freshly allocated array would be equally simple.
+The whole module is given Figure~\ref{fig:Inverting}.
+The verification conditions for function \texttt{inverting} are easily
+discharged automatically, thanks to the lemma.
 \begin{figure}
   \centering
 \begin{verbatim}
+module InvertingAnInjection
+
+  use import int.Int
+  use import module array.Array
+
+  logic injective (a: array int) (n: int) =
+    forall i j: int. 0 <= i < n -> 0 <= j < n -> i <> j -> a[i] <> a[j]
+
+  logic surjective (a: array int) (n: int) =
+    forall i: int. 0 <= i < n -> exists j: int. (0 <= j < n and a[j] = i)
+
+  logic range (a: array int) (n: int) =
+    forall i: int. 0 <= i < n -> 0 <= a[i] < n
+
+  lemma injective_surjective:
+    forall a: array int, n: int.
+    injective a n -> range a n -> surjective a n
+
+  let inverting (a: array int) (b: array int) (n: int) =
+    { 0 <= n = length a = length b and injective a n and range a n }
+    for i = 0 to n - 1 do
+      invariant { forall j: int. 0 <= j < i -> b[a[j]] = j }
+      b[a[i]] <- i
+    done
+    { injective b n }
+
+end
 \end{verbatim}
 \hrulefill
   \caption{Solution for VSTTE'10 competition problem 2.}
@@ -237,7 +328,10 @@ Coq, and thus completes the verification.
 % other examples: same fringe ?
 
 %%% Local Variables:
+%%% compile-command: "make -C .. doc"
 %%% mode: latex
 %%% TeX-PDF-mode: t
 %%% TeX-master: "manual"
 %%% End:
+
+% LocalWords:  surjective

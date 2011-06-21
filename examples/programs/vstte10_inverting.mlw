@@ -1,7 +1,7 @@
 (* VSTTE'10 competition http://www.macs.hw.ac.uk/vstte10/Competition.html
    Problem 2: inverting an injection *)
 
-module M
+module InvertingAnInjection
 
   use import int.Int
   use import module array.Array
@@ -10,24 +10,80 @@ module M
     forall i j: int. 0 <= i < n -> 0 <= j < n -> i <> j -> a[i] <> a[j]
 
   logic surjective (a: array int) (n: int) =
-    forall i: int [i]. 0 <= i < n -> exists j: int. (0 <= j < n and a[j] = i)
+    forall i: int. 0 <= i < n -> exists j: int. (0 <= j < n and a[j] = i)
 
   logic range (a: array int) (n: int) =
     forall i: int. 0 <= i < n -> 0 <= a[i] < n
 
-  lemma Injective_surjective:
+  lemma injective_surjective:
     forall a: array int, n: int.
     injective a n -> range a n -> surjective a n
 
-  let inverting (a: array int) (b: array int) n =
-    { n >= 0 and length a = n and length b = n and
-      injective a n and range a n }
-    for i = 0 to n-1 do
-      invariant
-        { length b = n and forall j: int. 0 <= j < i -> b[a[j]] = j }
-        b[a[i]] <- i
+  let inverting (a: array int) (b: array int) (n: int) =
+    { 0 <= n = length a = length b and injective a n and range a n }
+    for i = 0 to n - 1 do
+      invariant { forall j: int. 0 <= j < i -> b[a[j]] = j }
+      b[a[i]] <- i
     done
     { injective b n }
+
+  (* variant where array b is returned and with additional post *)
+
+  let inverting2 (a: array int) (n: int) =
+    { 0 <= n = length a and injective a n and range a n }
+    let b = make n 0 in
+    for i = 0 to n - 1 do
+      invariant { forall j: int. 0 <= j < i -> b[a[j]] = j }
+      b[a[i]] <- i
+    done;
+    b
+    { length result = n and injective result n and
+      forall i: int. 0 <= i < n -> result[a[i]] = i }
+
+end
+
+module Test
+
+  use import module array.Array
+  use import module InvertingAnInjection
+
+  let test () =
+    let a = make 10 0 in
+    a[0] <- 9;
+    a[1] <- 3;
+    a[2] <- 8;
+    a[3] <- 2;
+    a[4] <- 7;
+    a[5] <- 4;
+    a[6] <- 0;
+    a[7] <- 1;
+    a[8] <- 5;
+    a[9] <- 6;
+    assert {
+      a[0] = 9 &&
+      a[1] = 3 &&
+      a[2] = 8 &&
+      a[3] = 2 &&
+      a[4] = 7 &&
+      a[5] = 4 &&
+      a[6] = 0 &&
+      a[7] = 1 &&
+      a[8] = 5 &&
+      a[9] = 6
+    };
+    let b = inverting2 a 10 in
+    assert {
+      b[0] = 6 &&
+      b[1] = 7 &&
+      b[2] = 3 &&
+      b[3] = 1 &&
+      b[4] = 5 &&
+      b[5] = 8 &&
+      b[6] = 9 &&
+      b[7] = 4 &&
+      b[8] = 2 &&
+      b[9] = 0
+    }
 
 end
 
