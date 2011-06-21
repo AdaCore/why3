@@ -63,15 +63,176 @@ and we have to prove the following postcondition:
 \begin{displaymath}
   sum \le N \times max.
 \end{displaymath}
+In a file \verb|max_sum.mlw|, we start a new module:
+\begin{verbatim}
+  module MaxAndSum
+\end{verbatim}
+We are obviously needing arithmetic, so we import the corresponding
+theory, exactly as we would do within a theory definition:
+\begin{verbatim}
+    use import int.Int
+\end{verbatim}
+We are also going to use references and arrays from \whyml's standard
+library, so we import the corresponding modules, with a similar
+declaration:
+\begin{verbatim}
+    use import module ref.Ref
+    use import module array.Array
+\end{verbatim}
+The additional keyword \texttt{module} means that we are looking for
+\texttt{.mlw} files from the standard library (namely \texttt{ref.mlw}
+and \texttt{array.mlw} here), instead of \texttt{.why} files.
+Modules \texttt{Ref} and \texttt{Array} respectively provide a type
+\texttt{ref 'a} for references and a type \texttt{array 'a} for
+arrays (see Chapter~\ref{chap:mllibrary}), together with useful
+operations and traditional syntax.
 
+We are now in position to define a program function
+\verb|max\_sum|. A function definition is introduced with the keyword
+\texttt{let}. In our case, it introduces a function with two argument,
+an array \texttt{a} and its size \texttt{n}:
+\begin{verbatim}
+    let max_sum (a: array int) (n: int) = ...
+\end{verbatim}
+(There is a function \texttt{length} to get the size of an array but
+we add this extra parameter \texttt{n} to stay close to the original
+problem statement.) The function body is a Hoare triple, that is a
+precondition, a program expression, and a postcondition.
+\begin{verbatim}
+    let max_sum (a: array int) (n: int) =
+      { 0 <= n = length a and forall i:int. 0 <= i < n -> a[i] >= 0 }
+       ... expression ...
+      { let (sum, max) = result in sum <= n * max }
+\end{verbatim}
+The precondition expresses that \texttt{n} is non-negative and is
+equal to the length of \texttt{a} (this will be needed for
+verification conditions related to array bound checking), and that all
+elements of \texttt{a} are non-negative.
+The postcondition assumes that the value returned by the function,
+denoted \texttt{result}, is a pair of integers, and decomposes it as
+the pair \texttt{(sum, max)} to expresse the required property.
+
+We are now left with the function body itself, that is a code
+computing the sum and the maximum of all elements in \texttt{a}. With
+no surpise, it is as simple as introducing two local references
+\begin{verbatim}
+    let sum = ref 0 in
+    let max = ref 0 in
+\end{verbatim}
+scanning the array with a \texttt{for} loop, updating \texttt{max}
+and \texttt{sum}
+\begin{verbatim}
+    for i = 0 to n - 1 do
+      if !max < a[i] then max := a[i];
+      sum := !sum + a[i]
+    done;
+\end{verbatim}
+and finally returning the pair of the values contained in \texttt{sum}
+and \texttt{max}:
+\begin{verbatim}
+    (!sum, !max)
+\end{verbatim}
+This completes the code for function \texttt{max\_sum}.
+As such, it cannot be proved correct, since the loop is still lacking
+a loop invariant. In this case, the loop invariant is as simple as
+\verb|!sum <= i * !max|, since the postcondition only requires to prove
+\verb|sum <= n * max|. The loop invariant is introduced with the
+keyword \texttt{invariant}, immediately after the keyword \texttt{do}.
+\begin{verbatim}
+      for i = 0 to n - 1 do
+        invariant { !sum <= i * !max }
+        ...
+      done
+\end{verbatim}
+There is no need to introduce a variant, as the termination of a
+\texttt{for} loop is automatically guaranteed. 
+This completes module \texttt{MaxAndSum}.
+Figure~\ref{fig:MaxAndSum} shows the whole code.
+\begin{figure}
+  \centering
+\begin{verbatim}
+module MaxAndSum
+
+  use import int.Int
+  use import module ref.Ref
+  use import module array.Array
+
+  let max_sum (a: array int) (n: int) =
+    { 0 <= n = length a and forall i:int. 0 <= i < n -> a[i] >= 0 }
+    let sum = ref 0 in
+    let max = ref 0 in
+    for i = 0 to n - 1 do
+      invariant { !sum <= i * !max }
+      if !max < a[i] then max := a[i];
+      sum := !sum + a[i]
+    done;
+    (!sum, !max)
+    { let (sum, max) = result in sum <= n * max }
+
+end
+\end{verbatim}
+\hrulefill
+  \caption{Solution for VSTTE'10 competition problem 1.}
+  \label{fig:MaxAndSum}
+\end{figure}
+We can now proceed to its verification.
+Running \texttt{why3ml}, or better \texttt{why3ide}, on file
+\verb|max_sum.mlw| will show a single verification condition with name
+\verb|WP_parameter_max_sum|.
+Discharging this verification condition with an automated theorem
+prover will not succeed, most likely, as it involves non-linear
+arithmetic. Repeated applications of goal splitting and calls to
+SMT solvers (within \texttt{why3ide}) will typically leave a single,
+unsolved goal, which reduces to proving the following sequent:
+\begin{displaymath}
+  s \le i \times max, ~ max < a[i] \vdash s + a[i] \le (i+1) \times a[i].
+\end{displaymath}
+This is easily discharged using an interactive proof assistant such as
+Coq, and thus completes the verification.
 
 \subsection{Problem 2: Inverting an Injection}
 
+\begin{figure}
+  \centering
+\begin{verbatim}
+\end{verbatim}
+\hrulefill
+  \caption{Solution for VSTTE'10 competition problem 2.}
+  \label{fig:Inverting}
+\end{figure}
+
 \subsection{Problem 3: Searching a Linked List}
+
+\begin{figure}
+  \centering
+\begin{verbatim}
+\end{verbatim}
+\hrulefill
+  \caption{Solution for VSTTE'10 competition problem 3.}
+  \label{fig:LinkedList}
+\end{figure}
 
 \subsection{Problem 4: N-Queens}
 
+\begin{figure}
+  \centering
+\begin{verbatim}
+\end{verbatim}
+\hrulefill
+  \caption{Solution for VSTTE'10 competition problem 4.}
+  \label{fig:NQueens}
+\end{figure}
+
 \subsection{Problem 5: Amortized Queue}
+
+\begin{figure}
+  \centering
+\begin{verbatim}
+\end{verbatim}
+\hrulefill
+  \caption{Solution for VSTTE'10 competition problem 5.}
+  \label{fig:AQueue}
+\end{figure}
 
 % other examples: same fringe ?
 

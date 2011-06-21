@@ -106,13 +106,14 @@ Definition is_max(a:(array Z)) (l:Z) (h:Z) (m:Z): Prop := (forall (k:Z),
   (m = (get1 a k)))).
 
 Theorem WP_parameter_max_sum : forall (a:Z), forall (n:Z), forall (a1:(map Z
-  Z)), ((((0%Z <= n)%Z /\ (n = a)) /\ (a = n)) /\ forall (i:Z),
-  ((0%Z <= i)%Z /\ (i <  n)%Z) -> (0%Z <= (get a1 i))%Z) ->
-  ((0%Z <= (n - 1%Z)%Z)%Z -> forall (m:Z), forall (s:Z), forall (i:Z),
-  ((0%Z <= i)%Z /\ (i <= (n - 1%Z)%Z)%Z) -> (((s = (sum a1 0%Z i)) /\
-  ((is_max (mk_array a a1) 0%Z i m) /\ (s <= (i * m)%Z)%Z)) ->
-  (((0%Z <= i)%Z /\ (i <  a)%Z) -> ((~ (m <  (get a1 i))%Z) ->
-  ((0%Z <= i)%Z /\ (i <  a)%Z))))).
+  Z)), (((0%Z <= n)%Z /\ (n = a)) /\ forall (i:Z), ((0%Z <= i)%Z /\
+  (i <  n)%Z) -> (0%Z <= (get a1 i))%Z) -> ((0%Z <= (n - 1%Z)%Z)%Z ->
+  forall (m:Z), forall (s:Z), forall (i:Z), ((0%Z <= i)%Z /\
+  (i <= (n - 1%Z)%Z)%Z) -> (((s = (sum a1 0%Z i)) /\ ((is_max (mk_array a a1)
+  0%Z i m) /\ (s <= (i * m)%Z)%Z)) -> (((0%Z <= i)%Z /\ (i <  a)%Z) ->
+  ((m <  (get a1 i))%Z -> (((0%Z <= i)%Z /\ (i <  a)%Z) -> forall (m1:Z),
+  (m1 = (get a1 i)) -> (((0%Z <= i)%Z /\ (i <  a)%Z) -> forall (s1:Z),
+  (s1 = (s + (get a1 i))%Z) -> (s1 <= ((i + 1%Z)%Z * m1)%Z)%Z)))))).
 (* YOU MAY EDIT THE PROOF BELOW *)
 intuition.
 ring_simplify.
