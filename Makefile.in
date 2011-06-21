@@ -928,7 +928,7 @@ DOC = api glossary ide intro library macros manpages \
 
 DOCTEX = $(addprefix doc/, $(addsuffix .tex, $(DOC)))
 
-doc/manual.pdf: $(BNFTEX) $(DOCTEX)
+doc/manual.pdf: $(BNFTEX) $(DOCTEX) doc/manual.bib
 	cd doc; $(RUBBER) -d manual.tex
 
 # doc/manual.html: doc/manual.tex doc/version.tex

@@ -78,9 +78,9 @@ theory OrderedUnitaryCommutativeRing
   logic (>=) (x y : t) = y <= x
   clone export relations.TotalOrder with type t = t, logic rel = (<=)
 
-  axiom CompatOrderAdd  : 
+  axiom CompatOrderAdd  :
     forall x y z : t. x <= y -> x + z <= y + z
-  axiom CompatOrderMult : 
+  axiom CompatOrderMult :
     forall x y z : t. x <= y -> zero <= z -> x * z <= y * z
 end
 

@@ -8,9 +8,11 @@ Modules extend theories with \emph{programs}.
 Programs can use all types, symbols, and constructs from the logic.
 They also provide extra features:
 \begin{itemize}
-\item In a record type declaration, some fields can be declared
+\item
+  In a record type declaration, some fields can be declared
   \texttt{mutable}.
-\item There are programming constructs with no counterpart in the logic:
+\item
+  There are programming constructs with no counterpart in the logic:
   \begin{itemize}
   \item mutable field assignment;
   \item sequence;
@@ -19,15 +21,59 @@ They also provide extra features:
   \item local and anonymous functions;
   \item annotations: pre- and postconditions, assertions, loop invariants.
   \end{itemize}
-\item A program function can be non-terminating or can be proved
+\item
+  A program function can be non-terminating or can be proved
   to be terminating using a variant (a term together with a well-founded
   order relation).
+\item
+  An abstract program type $t$ can be introduced with a logical
+  \emph{model} $\tau$: inside programs, $t$ is abstract, and inside
+  annotations, $t$ is an alias for $\tau$.
 \end{itemize}
-% TODO: model types
+%
+Programs are contained in files with suffix \verb|.mlw|.
+They are handled by the tool \texttt{why3ml}, which has a command line
+similar to \texttt{why3}. For instance
+\begin{verbatim}
+  % why3ml myfile.mlw
+\end{verbatim}
+will display the verification conditions extracted from modules in
+file \texttt{myfile.mlw}, as a set of corresponding theories, and
+\begin{verbatim}
+  % why3ml -P alt-ergo myfile.mlw
+\end{verbatim}
+will run the SMT solver Alt-Ergo on these verification conditions.
+Program files are also handled by the GUI tool \texttt{why3ide}.
+See Chapter~\ref{chap:manpages} for more details regarding command lines.
 
-% files .mlw
-% command line
-% tutorial with examples: same fringe, max/sum
+\medskip
+As an introduction to \whyml, we use the five problems from the VSTTE
+2010 verification competition~\cite{vstte10comp}.
+
+\subsection{Problem 1: Sum and Maximum}
+
+The first problem is stated as follows:
+\begin{quote}
+  Given an $N$-element array of natural numbers,
+  write a program to compute the sum and the maximum of the
+  elements in the array.
+\end{quote}
+We  assume $N \ge 0$ and $a[i] \ge 0$ for $0 \le i < N$, as precondition,
+and we have to prove the following postcondition:
+\begin{displaymath}
+  sum \le N \times max.
+\end{displaymath}
+
+
+\subsection{Problem 2: Inverting an Injection}
+
+\subsection{Problem 3: Searching a Linked List}
+
+\subsection{Problem 4: N-Queens}
+
+\subsection{Problem 5: Amortized Queue}
+
+% other examples: same fringe ?
 
 %%% Local Variables:
 %%% mode: latex

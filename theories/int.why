@@ -93,11 +93,11 @@ theory ComputerDivision
 
   lemma Mod_inf: forall x y:int. 0 <= x < y -> mod x y = x
 
-  lemma Div_mult: forall x y z:int [div (x * y + z) x]. 
+  lemma Div_mult: forall x y z:int [div (x * y + z) x].
           x > 0 /\ y >= 0 /\ z >= 0 ->
           div (x * y + z) x = y + div z x
 
-  lemma Mod_mult: forall x y z:int [mod (x * y + z) x]. 
+  lemma Mod_mult: forall x y z:int [mod (x * y + z) x].
           x > 0 /\ y >= 0 /\ z >= 0 ->
           mod (x * y + z) x = mod z x
 
@@ -109,7 +109,7 @@ theory Exponentiation
   type t
   logic one : t
   logic (*) t t : t
-  
+
   logic power t int : t
 
   axiom Power_0 : forall x: t. power x 0 = one
@@ -122,7 +122,7 @@ theory Power
 
   use import Int
 
-  clone export 
+  clone export
     Exponentiation with type t = int, logic one = one, logic (*) = (*)
 
   lemma Power_1 : forall x : int. power x 1 = x
@@ -213,9 +213,9 @@ theory Divisibility
 
   logic divides (a b : int) = exists q : int. b = q * a
 
-  lemma Divides_x_zero: forall x:int. divides x 0 
+  lemma Divides_x_zero: forall x:int. divides x 0
 
-  lemma Divides_one_x: forall x:int. divides 1 x 
+  lemma Divides_one_x: forall x:int. divides 1 x
 
   (* todo: divides x y <-> if y=0 then true else x mod y = 0 *)
 end
@@ -238,14 +238,14 @@ theory Gcd
 
   use ComputerDivision
 
-  lemma Gcd_computer_mod : 
-    forall a b g : int [gcd a (ComputerDivision.mod a b) g]. 
+  lemma Gcd_computer_mod :
+    forall a b g : int [gcd a (ComputerDivision.mod a b) g].
       b <> 0 -> gcd a (ComputerDivision.mod a b) g -> gcd a b g
 
   use EuclideanDivision
 
-  lemma Gcd_euclidean_mod : 
-    forall a b g : int [gcd a (EuclideanDivision.mod a b) g]. 
+  lemma Gcd_euclidean_mod :
+    forall a b g : int [gcd a (EuclideanDivision.mod a b) g].
       b <> 0 -> gcd a (EuclideanDivision.mod a b) g -> gcd a b g
 
 end
@@ -262,7 +262,7 @@ theory Induction
   logic bound : int
 
   lemma Induction_bound :
-    (forall n:int. bound <= n -> 
+    (forall n:int. bound <= n ->
       (forall k:int. bound <= k < n -> p k) -> p n) ->
     forall n:int. bound <= n -> p n
 

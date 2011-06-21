@@ -96,6 +96,18 @@ theory MapPermut
 
 end
 
+theory MapSum
+
+  use import int.Int
+  use export Map
+
+  (* [sum m l h] is the sum of m[i] for l <= i < h *)
+
+  type container = map int int
+  clone export sum.Sum with type container = container, logic f = get
+
+end
+
 theory BitVector
 
   use export bool.Bool
