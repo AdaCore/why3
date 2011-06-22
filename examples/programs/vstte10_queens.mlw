@@ -1,7 +1,7 @@
 (* VSTTE'10 competition http://www.macs.hw.ac.uk/vstte10/Competition.html
    Problem 4: N-queens *)
 
-module M
+module NQueens
 
   use import int.Int
   use import module array.Array
@@ -47,7 +47,7 @@ module M
   let check_is_consistent (board: array int) pos =
     { 0 <= pos < length board }
     try
-      for q = 0 to pos-1 do
+      for q = 0 to pos - 1 do
         invariant { forall j:int. 0 <= j < q -> consistent_row board pos j }
         let bq   = board[q]   in
         let bpos = board[pos] in
