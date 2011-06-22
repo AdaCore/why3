@@ -49,7 +49,7 @@ module NQueens
 
   exception Inconsistent int
 
-  let check_is_consistent (board: array int) pos =
+  let check_is_consistent (board: array int) (pos: int) =
     { 0 <= pos < length board }
     try
       for q = 0 to pos - 1 do
@@ -80,28 +80,27 @@ module NQueens
 
   exception Solution
 
-  let rec bt_queens (board: array int) n pos variant { n - pos } =
+  let rec bt_queens (board: array int) (n: int) (pos: int) variant { n - pos } =
     { length board = n and 0 <= pos <= n and solution board pos }
     label Init:
     if pos = n then raise Solution;
     for i = 0 to n - 1 do
       invariant {
-        length board = n and eq_board board (at board Init) pos and
+        eq_board board (at board Init) pos and
         forall b:array int. length b = n -> is_board b n ->
           eq_board board b pos -> 0 <= b[pos] < i -> not (solution b n) }
       board[pos] <- i;
-      assert { eq_board board (at board Init) pos };
       if check_is_consistent board pos then bt_queens board n (pos+1)
     done
     { (* no solution *)
-      length board = n and eq_board board (old board) pos and
+      eq_board board (old board) pos and
       forall b:array int. length b = n -> is_board b n ->
         eq_board board b pos -> not (solution b n) }
     | Solution ->
     { (* a solution *)
       solution board n }
 
-  let queens (board: array int) n =
+  let queens (board: array int) (n: int) =
     { 0 <= length board = n }
     bt_queens board n 0
     { forall b:array int. length b = n -> is_board b n -> not (solution b n) }

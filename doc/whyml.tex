@@ -466,14 +466,258 @@ the loop invariant.
 
 \subsection{Problem 4: N-Queens}
 
+The fourth problem is probably the most challenging one.
+We have to verify the implementation of a program which solves the
+$N$-queens puzzle: place $N$ queens on an $N \times N$
+chess board so that no queen can capture another one with a
+legal move.
+The program should return a placement if there is a solution and
+indicates that there is no solution otherwise. A placement is a
+$N$-element array which assigns the queen on row $i$ to its column.
+Thus we start our module by importing arithmetic and arrays:
+\begin{verbatim}
+  module NQueens
+    use import int.Int
+    use import module array.Array
+\end{verbatim}
+The code is a simple backtracking algorithm, which tries to put a queen
+on each row of the chess board, one by one (there is basically no
+better way to solve the $N$-queens puzzle).
+A building block is a function which checks whether the queen on a
+given row may attack another queen on a previous row. To verify this
+function, we first define a more elementary predicate, which expresses
+that queens on row \texttt{pos} and \texttt{q} do no attack each other:
+\begin{verbatim}
+    logic consistent_row (board: array int) (pos: int) (q: int) =
+      board[q] <> board[pos] and
+      board[q] - board[pos] <> pos - q and
+      board[pos] - board[q] <> pos - q
+\end{verbatim}
+Then it is possible to define the consistency of row \texttt{pos}
+with respect to all previous rows:
+\begin{verbatim}
+    logic is_consistent (board: array int) (pos: int) =
+      forall q:int. 0 <= q < pos -> consistent_row board pos q
+\end{verbatim}
+Implementing a function which decides this predicate is another
+matter. In order for it to be efficient, we want to return
+\texttt{False} as soon as a queen attacks the queen on row
+\texttt{pos}. We use an exception for this purpose and it carries the
+row of the attacking queen:
+\begin{verbatim}
+    exception Inconsistent int
+\end{verbatim}
+The check is implemented by a function \verb|check_is_consistent|,
+which takes the board and the row \texttt{pos} as arguments, and scans
+rows from 0 to \texttt{pos-1} looking for an attacking queen. As soon
+as one is found, the exception is raised. It is caught immediately
+outside the loop and \texttt{False} is returned. Whenever the end of
+the loop is reached, \texttt{True} is returned.
+\begin{verbatim}
+    let check_is_consistent (board: array int) (pos: int) =
+      { 0 <= pos < length board }
+      try
+        for q = 0 to pos - 1 do
+          invariant { forall j:int. 0 <= j < q -> consistent_row board pos j }
+          let bq   = board[q]   in
+          let bpos = board[pos] in
+          if bq        = bpos    then raise (Inconsistent q);
+          if bq - bpos = pos - q then raise (Inconsistent q);
+          if bpos - bq = pos - q then raise (Inconsistent q)
+        done;
+        True
+      with Inconsistent q ->
+        assert { not (consistent_row board pos q) };
+        False
+      end
+      { result=True <-> is_consistent board pos }
+\end{verbatim}
+The assertion in the exception handler is a cut for SMT solvers.
+This first part of the solution is given Figure~\ref{fig:NQueens1}.
 \begin{figure}
   \centering
 \begin{verbatim}
+module NQueens
+  use import int.Int
+  use import module array.Array
+
+  logic consistent_row (board: array int) (pos: int) (q: int) =
+    board[q] <> board[pos] and
+    board[q] - board[pos] <> pos - q and
+    board[pos] - board[q] <> pos - q
+
+  logic is_consistent (board: array int) (pos: int) =
+    forall q:int. 0 <= q < pos -> consistent_row board pos q
+
+  exception Inconsistent int
+
+  let check_is_consistent (board: array int) (pos: int) =
+    { 0 <= pos < length board }
+    try
+      for q = 0 to pos - 1 do
+        invariant { forall j:int. 0 <= j < q -> consistent_row board pos j }
+        let bq   = board[q]   in
+        let bpos = board[pos] in
+        if bq        = bpos    then raise (Inconsistent q);
+        if bq - bpos = pos - q then raise (Inconsistent q);
+        if bpos - bq = pos - q then raise (Inconsistent q)
+      done;
+      True
+    with Inconsistent q ->
+      assert { not (consistent_row board pos q) };
+      False
+    end
+    { result=True <-> is_consistent board pos }
 \end{verbatim}
 \vspace*{-2em}\hrulefill
-  \caption{Solution for VSTTE'10 competition problem 4.}
-  \label{fig:NQueens}
+  \caption{Solution for VSTTE'10 competition problem 4 (1/2).}
+  \label{fig:NQueens1}
 \end{figure}
+
+We now proceed with the verification of the backtracking algorithm.
+The specification requires us to define the notion of solution, which
+is straightforward using the predicate \verb|is_consistent| above.
+However, since the algorithm will try to complete a given partial
+solution, it is more convenient to define the notion of partial
+solution, up to a given row. It is even more convenient to split it in
+two predicates, one related to legal column values and another to
+consistency of rows:
+\begin{verbatim}
+    logic is_board (board: array int) (pos: int) =
+      forall q:int. 0 <= q < pos -> 0 <= board[q] < length board
+
+    logic solution (board: array int) (pos: int) =
+      is_board board pos and
+      forall q:int. 0 <= q < pos -> is_consistent board q
+\end{verbatim}
+The algorithm will not mutate the partial solution it is given and,
+in case of a search failure, will claim that there is no solution
+extending this prefix. For this reason, we introduce a predicate
+comparing two chess boards for equality up to a given row:
+\begin{verbatim}
+    logic eq_board (b1 b2: array int) (pos: int) =
+      forall q:int. 0 <= q < pos -> b1[q] = b2[q]
+\end{verbatim}
+The search itself makes use of an exception to signal a successful search:
+\begin{verbatim}
+    exception Solution
+\end{verbatim}
+The backtracking code is a recursive function \verb|bt_queens| which
+takes the chess board, its size, and the starting row for the search.
+The termination is ensured by the obvious variant \texttt{n-pos}.
+\begin{verbatim}
+    let rec bt_queens (board: array int) (n: int) (pos: int) variant {n-pos} =
+\end{verbatim}
+The precondition relates \texttt{board}, \texttt{pos}, and \texttt{n}
+and requires \texttt{board} to be a solution up to \texttt{pos}:
+\begin{verbatim}
+      { length board = n and 0 <= pos <= n and solution board pos }
+      label Init:
+\end{verbatim}
+We place a label \texttt{Init} immediately after the precondition to
+be able to refer to the value of \texttt{board} in the pre-state.
+Whenever we reach the end of the chess board, we have found a solution
+and we signal it using exception \texttt{Solution}:
+\begin{verbatim}
+      if pos = n then raise Solution;
+\end{verbatim}
+Otherwise we scan all possible positions for the queen on row
+\texttt{pos} with a \texttt{for} loop:
+\begin{verbatim}
+      for i = 0 to n - 1 do
+\end{verbatim}
+The loop invariant states that we have not modified the solution
+prefix so far, and that we have not found any solution that would
+extend this prefix with a queen on row \texttt{pos} at a column below
+\texttt{i}:
+\begin{verbatim}
+        invariant {
+          eq_board board (at board Init) pos and
+          forall b:array int. length b = n -> is_board b n ->
+            eq_board board b pos -> 0 <= b[pos] < i -> not (solution b n) }
+\end{verbatim}
+Then we assign column \texttt{i} to the queen on row \texttt{pos} and
+we check for a possible attack with \verb|check_is_consistent|. If
+not, we call \verb|bt_queens| recursively on the next row.
+\begin{verbatim}
+        board[pos] <- i;
+        if check_is_consistent board pos then bt_queens board n (pos + 1)
+      done
+\end{verbatim}
+This completes the loop and function \verb|bt_queens| as well.
+The postcondition is twofold: either the function exits normally and
+then there is no solution extending the prefix in \texttt{board},
+which has not been modified;
+or the function raises \texttt{Solution} and we have a solution in
+\texttt{board}.
+\begin{verbatim}
+      { eq_board board (old board) pos and
+        forall b:array int. length b = n -> is_board b n ->
+          eq_board board b pos -> not (solution b n) }
+      | Solution ->
+      { solution board n }
+\end{verbatim}
+Solving the puzzle is a simple call to \verb|bt_queens|, starting the
+search on row 0. The postcondition is also twofold, as for
+\verb|bt_queens|, yet slightly simpler.
+\begin{verbatim}
+    let queens (board: array int) (n: int) =
+      { 0 <= length board = n }
+      bt_queens board n 0
+      { forall b:array int. length b = n -> is_board b n -> not (solution b n) }
+      | Solution -> { solution board n }
+\end{verbatim}
+This second part of the solution is given Figure~\ref{fig:NQueens2}.
+With the help of a few auxiliary lemmas --- not given here but available
+from \why's sources --- the verification conditions are all discharged
+automatically, including the verification of the lemmas themselves.
+\begin{figure}
+  \centering
+\begin{verbatim}
+  logic is_board (board: array int) (pos: int) =
+    forall q:int. 0 <= q < pos -> 0 <= board[q] < length board
+
+  logic solution (board: array int) (pos: int) =
+    is_board board pos and
+    forall q:int. 0 <= q < pos -> is_consistent board q
+
+  logic eq_board (b1 b2: array int) (pos: int) =
+    forall q:int. 0 <= q < pos -> b1[q] = b2[q]
+
+  exception Solution
+
+  let rec bt_queens (board: array int) (n: int) (pos: int) variant { n - pos } =
+    { length board = n and 0 <= pos <= n and solution board pos }
+    label Init:
+    if pos = n then raise Solution;
+    for i = 0 to n - 1 do
+      invariant {
+        eq_board board (at board Init) pos and
+        forall b:array int. length b = n -> is_board b n ->
+          eq_board board b pos -> 0 <= b[pos] < i -> not (solution b n) }
+      board[pos] <- i;
+      if check_is_consistent board pos then bt_queens board n (pos + 1)
+    done
+    { (* no solution *)
+      eq_board board (old board) pos and
+      forall b:array int. length b = n -> is_board b n ->
+        eq_board board b pos -> not (solution b n) }
+    | Solution ->
+    { (* a solution *)
+      solution board n }
+
+  let queens (board: array int) (n: int) =
+    { 0 <= length board = n }
+    bt_queens board n 0
+    { forall b:array int. length b = n -> is_board b n -> not (solution b n) }
+    | Solution -> { solution board n }
+end
+\end{verbatim}
+\vspace*{-2em}\hrulefill
+  \caption{Solution for VSTTE'10 competition problem 4 (2/2).}
+  \label{fig:NQueens2}
+\end{figure}
+
 
 \subsection{Problem 5: Amortized Queue}
 
