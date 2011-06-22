@@ -9,22 +9,22 @@ theory Length
   use import int.Int
   use import List
 
-  logic length (l : list 'a) : int =
+  logic length (l: list 'a) : int =
     match l with
     | Nil      -> 0
     | Cons _ r -> 1 + length r
     end
 
-  lemma Length_nonnegative : forall l:list 'a. length(l) >= 0
+  lemma Length_nonnegative: forall l: list 'a. length(l) >= 0
 
-  lemma Length_nil : forall l:list 'a. length l = 0 <-> l = Nil
+  lemma Length_nil: forall l: list 'a. length l = 0 <-> l = Nil
 
 end
 
 theory Mem
   use export List
 
-  logic mem (x: 'a) (l : list 'a) = match l with
+  logic mem (x: 'a) (l: list 'a) = match l with
     | Nil      -> false
     | Cons y r -> x = y or mem x r
     end
@@ -36,8 +36,8 @@ theory Nth
   use export option.Option
   use import int.Int
 
-  logic nth (n : int) (l : list 'a) : option 'a = match l with
-    | Nil -> None
+  logic nth (n: int) (l: list 'a) : option 'a = match l with
+    | Nil      -> None
     | Cons x r -> if n = 0 then Some x else nth (n - 1) r
   end
 
@@ -48,13 +48,13 @@ theory HdTl "head and tail"
   use export List
   use export option.Option
 
-  logic hd (l : list 'a) : option 'a = match l with
-    | Nil -> None
+  logic hd (l: list 'a) : option 'a = match l with
+    | Nil      -> None
     | Cons h _ -> Some h
   end
 
-  logic tl (l : list 'a) : option (list 'a) = match l with
-    | Nil -> None
+  logic tl (l: list 'a) : option (list 'a) = match l with
+    | Nil      -> None
     | Cons _ t -> Some t
   end
 
@@ -66,12 +66,12 @@ theory NthHdTl
   use import Nth
   use import HdTl
 
-  lemma Nth_tl :
-    forall l1 l2 : list 'a. tl l1 = Some l2 ->
-    forall i : int. nth i l2 = nth (i+1) l1
+  lemma Nth_tl:
+    forall l1 l2: list 'a. tl l1 = Some l2 ->
+    forall i: int. nth i l2 = nth (i+1) l1
 
   lemma Nth0_head:
-    forall l : list 'a. nth 0 l = hd l
+    forall l: list 'a. nth 0 l = hd l
 
 end
 
@@ -79,28 +79,28 @@ end
 theory Append
   use export List
 
-  logic (++) (l1 l2 : list 'a) : list 'a = match l1 with
+  logic (++) (l1 l2: list 'a) : list 'a = match l1 with
     | Nil -> l2
     | Cons x1 r1 -> Cons x1 (r1 ++ l2)
   end
 
-  lemma Append_assoc :
-    forall l1 l2 l3 : list 'a.
+  lemma Append_assoc:
+    forall l1 l2 l3: list 'a.
     l1 ++ (l2 ++ l3) = (l1 ++ l2) ++ l3
 
-  lemma Append_l_nil :
-    forall l : list 'a. l ++ Nil = l
+  lemma Append_l_nil:
+    forall l: list 'a. l ++ Nil = l
 
   use import Length
   use import int.Int
 
-  lemma Append_length :
-    forall l1 l2 : list 'a. length (l1 ++ l2) = length l1 + length l2
+  lemma Append_length:
+    forall l1 l2: list 'a. length (l1 ++ l2) = length l1 + length l2
 
   use import Mem
 
-  lemma mem_append :
-    forall x : 'a, l1 l2 : list 'a.
+  lemma mem_append:
+    forall x: 'a, l1 l2: list 'a.
     mem x (l1 ++ l2) <-> mem x l1 or mem x l2
 
 end
@@ -110,18 +110,18 @@ theory Reverse
   use export List
   use import Append
 
-  logic reverse (l : list 'a) : list 'a = match l with
-    | Nil -> Nil
+  logic reverse (l: list 'a) : list 'a = match l with
+    | Nil      -> Nil
     | Cons x r -> reverse r ++ Cons x Nil
   end
 
-  lemma reverse_append : forall l1 : list 'a, l2 : list 'a, x : 'a.
+  lemma reverse_append: forall l1 l2: list 'a, x: 'a.
   (reverse (Cons x l1)) ++ l2 = (reverse l1) ++ (Cons x l2)
 
   use import Length
 
-  lemma Reverse_length :
-    forall l : list 'a. length (reverse l) = length l
+  lemma Reverse_length:
+    forall l: list 'a. length (reverse l) = length l
 
 end
 
@@ -130,20 +130,20 @@ theory Sorted
   use export List
   use import int.Int
 
-  inductive sorted (l : list int) =
-    | Sorted_Nil :
+  inductive sorted (l: list int) =
+    | Sorted_Nil:
         sorted Nil
-    | Sorted_One :
-        forall x:int. sorted (Cons x Nil)
-    | Sorted_Two :
-        forall x y : int, l : list int.
+    | Sorted_One:
+        forall x: int. sorted (Cons x Nil)
+    | Sorted_Two:
+        forall x y: int, l: list int.
         x <= y -> sorted (Cons y l) -> sorted (Cons x (Cons y l))
 
   use import Mem
 
-  lemma Sorted_mem :
-    forall x : int, l : list int.
-    (forall y : int. mem y l -> x <= y) and sorted l <-> sorted (Cons x l)
+  lemma Sorted_mem:
+    forall x: int, l: list int.
+    (forall y: int. mem y l -> x <= y) and sorted l <-> sorted (Cons x l)
 
 end
 
@@ -153,16 +153,16 @@ theory NumOcc
   use import List
 
   (* number of occurence of x in l *)
-  logic num_occ (x : 'a) (l : list 'a) : int =
+  logic num_occ (x: 'a) (l: list 'a) : int =
     match l with
-    | Nil -> 0
+    | Nil      -> 0
     | Cons y r -> (if x = y then 1 else 0) + num_occ x r
    end
 
   use import Mem
 
   lemma Mem_Num_Occ :
-    forall x:'a, l:list 'a. mem x l <-> num_occ x l > 0
+    forall x: 'a, l: list 'a. mem x l <-> num_occ x l > 0
 
 end
 
@@ -171,32 +171,32 @@ theory Permut
   use import NumOcc
   use import List
 
-  logic permut (l1 : list 'a) (l2 : list 'a) =
-    forall x : 'a. num_occ x l1 = num_occ x l2
+  logic permut (l1: list 'a) (l2: list 'a) =
+    forall x: 'a. num_occ x l1 = num_occ x l2
 
-  lemma Permut_refl : forall l : list 'a. permut l l
+  lemma Permut_refl: forall l: list 'a. permut l l
 
-  lemma Permut_sym : forall l1 l2 : list 'a. permut l1 l2 -> permut l2 l1
+  lemma Permut_sym: forall l1 l2: list 'a. permut l1 l2 -> permut l2 l1
 
-  lemma Permut_trans :
-    forall l1 l2 l3 : list 'a. permut l1 l2 -> permut l2 l3 -> permut l1 l3
+  lemma Permut_trans:
+    forall l1 l2 l3: list 'a. permut l1 l2 -> permut l2 l3 -> permut l1 l3
 
-  lemma Permut_cons :
-    forall x : 'a, l1 l2 : list 'a.
+  lemma Permut_cons:
+    forall x: 'a, l1 l2: list 'a.
     permut l1 l2 -> permut (Cons x l1) (Cons x l2)
 
-  lemma Permut_swap :
-    forall x y : 'a, l : list 'a. permut (Cons x (Cons y l)) (Cons y (Cons x l))
+  lemma Permut_swap:
+    forall x y: 'a, l: list 'a. permut (Cons x (Cons y l)) (Cons y (Cons x l))
 
   use import Mem
 
-  lemma Permut_mem :
-    forall x : 'a, l1 l2 : list 'a. permut l1 l2 -> mem x l1 -> mem x l2
+  lemma Permut_mem:
+    forall x: 'a, l1 l2: list 'a. permut l1 l2 -> mem x l1 -> mem x l2
 
   use import Length
 
-  lemma Permut_length :
-    forall l1 l2 : list 'a. permut l1 l2 -> length l1 = length l2
+  lemma Permut_length:
+    forall l1 l2: list 'a. permut l1 l2 -> length l1 = length l2
 
 end
 
@@ -205,17 +205,17 @@ theory Distinct
   use import List
   use import Mem
 
-  inductive distinct (l : list 'a) =
-    | distinct_zero : distinct (Nil : list 'a)
-    | distinct_one  : forall x:'a. distinct (Cons x Nil)
-    | distinct_many : 
-        forall x :'a, l : list 'a. 
+  inductive distinct (l: list 'a) =
+    | distinct_zero: distinct (Nil: list 'a)
+    | distinct_one : forall x:'a. distinct (Cons x Nil)
+    | distinct_many:
+        forall x:'a, l: list 'a.
         not (mem x l) -> distinct l -> distinct (Cons x l)
 
   use import Append
 
-  lemma distinct_append :
-    forall l1 l2 : list 'a.
+  lemma distinct_append:
+    forall l1 l2: list 'a.
     distinct l1 -> distinct l2 -> (forall x:'a. mem x l1 -> not (mem x l2)) ->
     distinct (l1 ++ l2)
 
@@ -228,8 +228,8 @@ theory Induction
 
   logic p (list elt)
 
-  axiom Induction :
-    p (Nil : list elt) ->
+  axiom Induction:
+    p (Nil: list elt) ->
     (forall x:elt. forall l:list elt. p l -> p (Cons x l)) ->
     forall l:list elt. p l
 
@@ -242,7 +242,7 @@ theory Map
   type b
   logic f a : b
 
-  logic map(l : list a) : list b =
+  logic map(l: list a) : list b =
     match l with
     | Nil      -> Nil
     | Cons x r -> Cons (f x) (map r)

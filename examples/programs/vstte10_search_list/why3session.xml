@@ -1,88 +1,104 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
 <why3session name="examples/programs/vstte10_search_list/why3session.xml">
- <file name="../vstte10_search_list.mlw" verified="false" expanded="true">
-  <theory name="SearchingALinkedList" verified="false" expanded="true">
-   <goal name="WP_parameter search" expl="correctness of parameter search" sum="0f056b7e2d8ac0af82fd9fa38702f209" proved="true" expanded="false">
+ <file name="../vstte10_search_list.mlw" verified="true" expanded="true">
+  <theory name="SearchingALinkedList" verified="true" expanded="true">
+   <goal name="WP_parameter search" expl="correctness of parameter search" sum="0f056b7e2d8ac0af82fd9fa38702f209" proved="true" expanded="true">
     <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
      <result status="valid" time="0.09"/>
     </proof>
    </goal>
-   <goal name="WP_parameter search_list" expl="normal postcondition" sum="9e1415eb87291fae526a464eef8b7f8c" proved="true" expanded="false">
+   <goal name="WP_parameter search_list" expl="normal postcondition" sum="9e1415eb87291fae526a464eef8b7f8c" proved="true" expanded="true">
     <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
      <result status="valid" time="0.04"/>
     </proof>
    </goal>
-   <goal name="WP_parameter head" expl="correctness of parameter head" sum="cdcac13c1814691e488082e128de305f" proved="true" expanded="false">
+   <goal name="WP_parameter head" expl="correctness of parameter head" sum="cdcac13c1814691e488082e128de305f" proved="true" expanded="true">
     <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
-   <goal name="WP_parameter tail" expl="correctness of parameter tail" sum="c8d4a6c630e6f2e6c1c583712e86297c" proved="true" expanded="false">
+   <goal name="WP_parameter tail" expl="correctness of parameter tail" sum="c8d4a6c630e6f2e6c1c583712e86297c" proved="true" expanded="true">
     <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
-   <goal name="WP_parameter search_loop" expl="correctness of parameter search_loop" sum="bed538740c5efbe540217617f91af77f" proved="false" expanded="true">
-    <proof prover="alt-ergo" timelimit="20" edited="" obsolete="true">
-     <result status="unknown" time="1.31"/>
-    </proof>
-    <transf name="split_goal" proved="false" expanded="true">
-     <goal name="WP_parameter search_loop.1" expl="loop invariant init" sum="bd0b0078bb630c57cd14044638c9c0cc" proved="true" expanded="false">
+   <goal name="WP_parameter search_loop" expl="correctness of parameter search_loop" sum="bed538740c5efbe540217617f91af77f" proved="true" expanded="true">
+    <transf name="split_goal" proved="true" expanded="true">
+     <goal name="WP_parameter search_loop.1" expl="loop invariant init" sum="bd0b0078bb630c57cd14044638c9c0cc" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter search_loop.2" expl="precondition" sum="00d6259354783962f481093aa81e5e4d" proved="true" expanded="false">
+     <goal name="WP_parameter search_loop.2" expl="precondition" sum="00d6259354783962f481093aa81e5e4d" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
        <result status="valid" time="0.03"/>
       </proof>
      </goal>
-     <goal name="WP_parameter search_loop.3" expl="precondition" sum="d3d6320ebf6ee20ecd580a675d8610b2" proved="true" expanded="false">
+     <goal name="WP_parameter search_loop.3" expl="precondition" sum="d3d6320ebf6ee20ecd580a675d8610b2" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter search_loop.4" expl="loop invariant preservation" sum="aa15309cc5737a6281b66d9f01ff51d7" proved="false" expanded="true">
-      <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-       <result status="unknown" time="0.92"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter search_loop.5" expl="loop variant decreases" sum="fc86b9ce14a19d940300c547eec9a8e1" proved="true" expanded="false">
-      <transf name="split_goal" proved="true" expanded="false">
-       <goal name="WP_parameter search_loop.5.1" expl="correctness of parameter search_loop" sum="95d0f5d73a20a5cd7333750c975d2c2c" proved="true" expanded="false">
+     <goal name="WP_parameter search_loop.4" expl="loop invariant preservation" sum="aa15309cc5737a6281b66d9f01ff51d7" proved="true" expanded="true">
+      <transf name="split_goal" proved="true" expanded="true">
+       <goal name="WP_parameter search_loop.4.1" expl="correctness of parameter search_loop" sum="1402799a864f33e341e507456ca0c743" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter search_loop.4.2" expl="correctness of parameter search_loop" sum="f98f1dfc0bdfd30683ce8840c5cae83e" proved="true" expanded="true">
         <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
          <result status="valid" time="0.03"/>
         </proof>
        </goal>
-       <goal name="WP_parameter search_loop.5.2" expl="correctness of parameter search_loop" sum="82cd009cc290bbeb5f7ebd291a2dfc42" proved="true" expanded="false">
+       <goal name="WP_parameter search_loop.4.3" expl="correctness of parameter search_loop" sum="4c9df428be6e041e1b2ed5ddb9cfb1e4" proved="true" expanded="true">
+        <proof prover="coq" timelimit="20" edited="vstte10_search_list.mlw_SearchingALinkedList_WP_parameter search_loop_2.v" obsolete="false">
+         <result status="valid" time="0.57"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter search_loop.4.4" expl="correctness of parameter search_loop" sum="8e048cf7dd305548e46d0c0624828372" proved="true" expanded="true">
+        <proof prover="coq" timelimit="20" edited="vstte10_search_list.mlw_SearchingALinkedList_WP_parameter search_loop_3.v" obsolete="false">
+         <result status="valid" time="0.68"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal name="WP_parameter search_loop.5" expl="loop variant decreases" sum="fc86b9ce14a19d940300c547eec9a8e1" proved="true" expanded="true">
+      <transf name="split_goal" proved="true" expanded="true">
+       <goal name="WP_parameter search_loop.5.1" expl="correctness of parameter search_loop" sum="95d0f5d73a20a5cd7333750c975d2c2c" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
+         <result status="valid" time="0.03"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter search_loop.5.2" expl="correctness of parameter search_loop" sum="82cd009cc290bbeb5f7ebd291a2dfc42" proved="true" expanded="true">
         <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
          <result status="valid" time="0.02"/>
         </proof>
        </goal>
       </transf>
      </goal>
-     <goal name="WP_parameter search_loop.6" expl="normal postcondition" sum="d01b1212c0ab3708ed70ad837bb1929c" proved="false" expanded="true">
-      <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-       <result status="unknown" time="0.13"/>
+     <goal name="WP_parameter search_loop.6" expl="normal postcondition" sum="d01b1212c0ab3708ed70ad837bb1929c" proved="true" expanded="true">
+      <proof prover="coq" timelimit="20" edited="vstte10_search_list.mlw_SearchingALinkedList_WP_parameter search_loop_4.v" obsolete="false">
+       <result status="valid" time="0.63"/>
       </proof>
      </goal>
-     <goal name="WP_parameter search_loop.7" expl="precondition" sum="08abb0e6f24d0611e8508cd7c0d2fe64" proved="true" expanded="false">
+     <goal name="WP_parameter search_loop.7" expl="precondition" sum="08abb0e6f24d0611e8508cd7c0d2fe64" proved="true" expanded="true">
       <proof prover="cvc3" timelimit="20" edited="" obsolete="false">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter search_loop.8" expl="loop invariant preservation" sum="b2299f8763b01027943b66ab59813853" proved="true" expanded="false">
+     <goal name="WP_parameter search_loop.8" expl="loop invariant preservation" sum="b2299f8763b01027943b66ab59813853" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
        <result status="valid" time="0.03"/>
       </proof>
      </goal>
-     <goal name="WP_parameter search_loop.9" expl="loop variant decreases" sum="24359c547c53547ed5631c8c5ba2e811" proved="true" expanded="false">
+     <goal name="WP_parameter search_loop.9" expl="loop variant decreases" sum="24359c547c53547ed5631c8c5ba2e811" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter search_loop.10" expl="normal postcondition" sum="0c5ffbc474072205a10fd50af67f1bec" proved="true" expanded="false">
+     <goal name="WP_parameter search_loop.10" expl="normal postcondition" sum="0c5ffbc474072205a10fd50af67f1bec" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
        <result status="valid" time="0.04"/>
       </proof>

@@ -410,6 +410,60 @@ end
   \label{fig:LinkedList}
 \end{figure}
 
+Alternatively, we can implement the search with a \texttt{while} loop.
+To do this, we need to import references from the standard library,
+together with theory \texttt{list.HdTl} which defines function
+\texttt{hd} and \texttt{tl} over lists.
+\begin{verbatim}
+    use import module ref.Ref
+    use import list.HdTl
+\end{verbatim}
+Being partial functions, \texttt{hd} and \texttt{tl} return options.
+For the purpose of our code, though, it is simpler to have functions
+which do not return options, but have preconditions instead. Such a
+function \texttt{head} is defined as follows:
+\begin{verbatim}
+    let head (l: list 'a) =
+      { l <> Nil }
+      match l with Nil -> absurd | Cons h _ -> h end
+      { hd l = Some result }
+\end{verbatim}
+The program construct \texttt{absurd} denotes an unreachable piece of
+code. It generates the verification condition \texttt{false}, which is
+here provable using the precondition (the list cannot be \texttt{Nil}).
+Function \texttt{tail} is defined similarly:
+\begin{verbatim}
+    let tail (l : list 'a) =
+      { l <> Nil }
+      match l with Nil -> absurd | Cons _ t -> t end
+      { tl l = Some result }
+\end{verbatim}
+Using \texttt{head} and \texttt{tail}, it is straightforward to
+implement the search as a \texttt{while} loop.
+It uses a local reference \texttt{i} to store the index and another
+local reference \texttt{s} to store the list being scanned.
+As long as \texttt{s} is not empty and its head is not zero, it
+increments \texttt{i} and advances in \texttt{s} using function \texttt{tail}.
+\begin{verbatim}
+    let search_loop l =
+      { }
+      let i = ref 0 in
+      let s = ref l in
+      while !s <> Nil && head !s <> 0 do
+        invariant { ... }
+        variant   { length !s }
+        i := !i + 1;
+        s := tail !s
+      done;
+      !i
+      { ... same postcondition as search_list ... }
+\end{verbatim}
+The postcondition is exactly the same as for function \verb|search_list|.
+The termination of the \texttt{while} loop is ensured using a variant,
+exactly as for a recursive function. Such a variant must strictly decrease at
+each execution of the loop body. The reader is invited to figure out
+the loop invariant.
+
 \subsection{Problem 4: N-Queens}
 
 \begin{figure}
