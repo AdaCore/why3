@@ -173,7 +173,7 @@ module MaxAndSum
 
 end
 \end{verbatim}
-\hrulefill
+\vspace*{-2em}\hrulefill
   \caption{Solution for VSTTE'10 competition problem 1.}
   \label{fig:MaxAndSum}
 \end{figure}
@@ -287,7 +287,7 @@ module InvertingAnInjection
 
 end
 \end{verbatim}
-\hrulefill
+\vspace*{-2em}\hrulefill
   \caption{Solution for VSTTE'10 competition problem 2.}
   \label{fig:Inverting}
 \end{figure}
@@ -405,7 +405,7 @@ module SearchingALinkedList
 
 end
 \end{verbatim}
-\hrulefill
+\vspace*{-2em}\hrulefill
   \caption{Solution for VSTTE'10 competition problem 3.}
   \label{fig:LinkedList}
 \end{figure}
@@ -470,18 +470,186 @@ the loop invariant.
   \centering
 \begin{verbatim}
 \end{verbatim}
-\hrulefill
+\vspace*{-2em}\hrulefill
   \caption{Solution for VSTTE'10 competition problem 4.}
   \label{fig:NQueens}
 \end{figure}
 
 \subsection{Problem 5: Amortized Queue}
 
+The last problem consists in verifying the implementation of a
+well-known purely applicative data structure for queues.
+A queue is composed of two lists, \textit{front} and \textit{rear}.
+We push elements at the head of list \textit{rear} and pop them off
+the head of list \textit{front}. We maintain that the length of
+\textit{front} is always greater or equal to the length of \textit{rear}.
+(See for instance Okasaki's \emph{Purely Functional Data
+  Structures}~\cite{okasaki98} for more details.)
+
+We have to implement operations \texttt{empty}, \texttt{head},
+\texttt{tail}, and \texttt{enqueue} over this data type,
+to show that the invariant over lengths is maintained, and finally
+\begin{quote}
+  to show that a client invoking these operations
+  observes an abstract queue given by a sequence.
+\end{quote}
+In a new module, we import arithmetic and theory
+\texttt{list.ListRich}, a combo theory which imports all list
+operations we will require: length, reversal, and concatenation.
+\begin{verbatim}
+  module AmortizedQueue
+    use import int.Int
+    use export list.ListRich
+\end{verbatim}
+The queue data type is naturally introduced as a polymorphic record type.
+The two list lengths are explicitly stored, for better efficiency.
+\begin{verbatim}
+    type queue 'a = {| front: list 'a; lenf: int;
+                       rear : list 'a; lenr: int; |}
+\end{verbatim}
+We start with the definition of the data type invariant, as a
+predicate \texttt{inv}. It makes use of the ability to chain
+several equalities and inequalities.
+\begin{verbatim}
+    logic inv (q: queue 'a) =
+      length q.front = q.lenf >= length q.rear = q.lenr
+\end{verbatim}
+For the purpose of the specification, it is convenient to introduce a function
+\texttt{sequence} which builds the sequence of a queue elements, that
+is the front list concatenated to reversed rear list.
+\begin{verbatim}
+    logic sequence (q: queue 'a) : list 'a =
+      q.front ++ reverse q.rear
+\end{verbatim}
+It is worth pointing out that this function will only be used in
+specifications.
+We start with the easiest operation: building the empty queue.
+\begin{verbatim}
+  let empty () =
+    {}
+    {| front = Nil; lenf = 0; rear = Nil; lenr = 0 |} : queue 'a
+    { inv result and sequence result = Nil }
+\end{verbatim}
+The postcondition is twofold: the returned queue satisfies its
+invariant and represents the empty sequence.
+Note the cast to type \texttt{queue 'a}. It is required, for the
+type checker not to complain about an undefined type variable.
+
+The next operation is \texttt{head}, which returns the first element from
+a given queue \texttt{q}. It naturally requires the queue to be non
+empty, which is conveniently expressed as \texttt{sequence q} not
+being \texttt{Nil}.
+\begin{verbatim}
+  let head (q: queue 'a) =
+    { inv q and sequence q <> Nil }
+    match q.front with
+      | Nil      -> absurd
+      | Cons x _ -> x
+    end
+    { hd (sequence q) = Some result }
+\end{verbatim}
+Note the presence of the invariant in the precondition, which is
+required to prove the absurdity of the first branch (if
+\texttt{q.front} is \texttt{Nil}, then so should be \texttt{sequence q}).
+
+The next operation is \texttt{tail}, which removes the first element
+from a given queue. This is more subtle than \texttt{head}, since we
+may have to re-structure the queue to maintain the invariant.
+Since we will have to perform a similar operation when implementation
+operation \texttt{enqueue}, it is a good idea to introduce a smart
+constructor \texttt{create} which builds a queue from two lists, while
+ensuring the invariant. The list lengths are also passed as arguments,
+to avoid unnecessary computations.
+\begin{verbatim}
+    let create (f: list 'a) (lf: int) (r: list 'a) (lr: int) =
+      { lf = length f and lr = length r }
+      if lf >= lr then
+        {| front = f; lenf = lf; rear = r; lenr = lr |}
+      else
+        let f = f ++ reverse r in
+        {| front = f; lenf = lf + lr; rear = Nil; lenr = 0 |}
+      { inv result and sequence result = f ++ reverse r }
+\end{verbatim}
+If the invariant already holds, it is simply a matter of building the
+record. Otherwise, we empty the rear list and build a new front list
+as the concatenation of list \texttt{f} and the reversal of list \texttt{r}.
+The principle of this implementation is that the cost of this reversal
+will be amortized over all queue operations. Implementing function
+\texttt{tail} is now straightforward and follows the structure of
+function \texttt{head}.
+\begin{verbatim}
+    let tail (q: queue 'a) =
+      { inv q and sequence q <> Nil }
+      match q.front with
+        | Nil      -> absurd
+        | Cons _ r -> create r (q.lenf - 1) q.rear q.lenr
+      end
+      { inv result and tl (sequence q) = Some (sequence result) }
+\end{verbatim}
+The last operation is \texttt{enqueue}, which pushes a new element in
+a given queue. Reusing the smart constructor \texttt{create} makes it
+a one line code.
+\begin{verbatim}
+    let enqueue (x: 'a) (q: queue 'a) =
+      { inv q }
+      create q.front q.lenf (Cons x q.rear) (q.lenr + 1)
+      { inv result and sequence result = sequence q ++ Cons x Nil }
+\end{verbatim}
+The code is given Figure~\ref{fig:AQueue}. The verification conditions
+are all discharged automatically.
 \begin{figure}
   \centering
 \begin{verbatim}
+module AmortizedQueue
+  use import int.Int
+  use export list.ListRich
+
+  type queue 'a = {| front: list 'a; lenf: int;
+                     rear : list 'a; lenr: int; |}
+
+  logic inv (q: queue 'a) =
+    length q.front = q.lenf >= length q.rear = q.lenr
+
+  logic sequence (q: queue 'a) : list 'a =
+    q.front ++ reverse q.rear
+
+  let empty () =
+    {}
+    {| front = Nil; lenf = 0; rear = Nil; lenr = 0 |} : queue 'a
+    { inv result and sequence result = Nil }
+
+  let head (q: queue 'a) =
+    { inv q and sequence q <> Nil }
+    match q.front with
+      | Nil      -> absurd
+      | Cons x _ -> x
+    end
+    { hd (sequence q) = Some result }
+
+  let create (f: list 'a) (lf: int) (r: list 'a) (lr: int) =
+    { lf = length f and lr = length r }
+    if lf >= lr then
+      {| front = f; lenf = lf; rear = r; lenr = lr |}
+    else
+      let f = f ++ reverse r in
+      {| front = f; lenf = lf + lr; rear = Nil; lenr = 0 |}
+    { inv result and sequence result = f ++ reverse r }
+
+  let tail (q: queue 'a) =
+    { inv q and sequence q <> Nil }
+    match q.front with
+      | Nil      -> absurd
+      | Cons _ r -> create r (q.lenf - 1) q.rear q.lenr
+    end
+    { inv result and tl (sequence q) = Some (sequence result) }
+
+  let enqueue (x: 'a) (q: queue 'a) =
+    { inv q }
+    create q.front q.lenf (Cons x q.rear) (q.lenr + 1)
+    { inv result and sequence result = sequence q ++ Cons x Nil }
+end
 \end{verbatim}
-\hrulefill
+\vspace*{-2em}\hrulefill
   \caption{Solution for VSTTE'10 competition problem 5.}
   \label{fig:AQueue}
 \end{figure}

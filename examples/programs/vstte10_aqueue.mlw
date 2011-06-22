@@ -1,62 +1,59 @@
-module M
-
 (* VSTTE'10 competition http://www.macs.hw.ac.uk/vstte10/Competition.html
    Problem 5: amortized queue *)
+
+module AmortizedQueue
 
   use import int.Int
   use export list.ListRich
 
-  type queue 'a = Q (front : list 'a) (lenf : int)
-                    (rear  : list 'a) (lenr : int)
+  type queue 'a = {| front: list 'a; lenf: int;
+                     rear : list 'a; lenr: int; |}
 
-  logic inv (q : queue 'a) =
-    length (front q) = lenf q and
-    length (rear  q) = lenr q and
-    lenf q >= lenr q
+  logic inv (q: queue 'a) =
+    length q.front = q.lenf >= length q.rear = q.lenr
 
-  logic model (q : queue 'a) : list 'a =
-    front q ++ reverse (rear q)
+  logic sequence (q: queue 'a) : list 'a =
+    q.front ++ reverse q.rear
 
-let create f lf r lr =
-  { lf = length f and lr = length r }
-  if lf >= lr then
-    Q f lf r lr
-  else
-    let f = f ++ reverse r in
-    Q f (lf + lr) Nil 0
-  : queue 'a
-  { inv result and model result = f ++ reverse r }
+  let empty () =
+    {}
+    {| front = Nil; lenf = 0; rear = Nil; lenr = 0 |} : queue 'a
+    { inv result and sequence result = Nil }
 
-let empty () =
-  {}
-  Q Nil 0 Nil 0 : queue 'a
-  { inv result and model result = Nil }
+  let head (q: queue 'a) =
+    { inv q and sequence q <> Nil }
+    match q.front with
+      | Nil      -> absurd
+      | Cons x _ -> x
+    end
+    { hd (sequence q) = Some result }
 
-let head (q : queue 'a) =
-  { inv q and model q <> Nil }
-  match front q with
-    | Nil -> absurd
-    | Cons x _ -> x
-  end
-  { hd (model q) = Some result }
+  let create (f: list 'a) (lf: int) (r: list 'a) (lr: int) =
+    { lf = length f and lr = length r }
+    if lf >= lr then
+      {| front = f; lenf = lf; rear = r; lenr = lr |}
+    else
+      let f = f ++ reverse r in
+      {| front = f; lenf = lf + lr; rear = Nil; lenr = 0 |}
+    { inv result and sequence result = f ++ reverse r }
 
-let tail (q : queue 'a) =
-  { inv q and model q <> Nil }
-  match front q with
-    | Nil -> absurd
-    | Cons _ r -> create r (lenf q - 1) (rear q) (lenr q)
-  end
-  { inv result and tl (model q) = Some (model result) }
+  let tail (q: queue 'a) =
+    { inv q and sequence q <> Nil }
+    match q.front with
+      | Nil      -> absurd
+      | Cons _ r -> create r (q.lenf - 1) q.rear q.lenr
+    end
+    { inv result and tl (sequence q) = Some (sequence result) }
 
-let enqueue (x : 'a) (q : queue 'a) =
-  { inv q }
-  create (front q) (lenf q) (Cons x (rear q)) (lenr q + 1) 
-  { inv result and model result = model q ++ Cons x Nil }
+  let enqueue (x: 'a) (q: queue 'a) =
+    { inv q }
+    create q.front q.lenf (Cons x q.rear) (q.lenr + 1)
+    { inv result and sequence result = sequence q ++ Cons x Nil }
 
 end
 
 (*
-Local Variables: 
+Local Variables:
 compile-command: "unset LANG; make -C ../.. examples/programs/vstte10_aqueue.gui"
-End: 
+End:
 *)
