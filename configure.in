@@ -320,22 +320,22 @@ if test "$enable_ide" = yes ; then
    fi
 fi
 
-# checking for sqlite3
-if test "$enable_ide" = yes ; then
-   if test "$USEOCAMLFIND" = yes; then
-      SQLITE3LIB=$(ocamlfind query sqlite3)
-   fi
-   if test -n "$SQLITE3LIB";then
-      echo "ocamlfind found sqlite3 in $SQLITE3LIB"
-   else
-      SQLITE3LIB="+sqlite3"
-      AC_CHECK_FILE($OCAMLLIB/sqlite3/sqlite3.cma,,enable_ide=no)
-      if test "$enable_ide" = no; then
-        AC_MSG_WARN(Lib sqlite3 not found, IDE disabled.)
-   	reason_ide=" (sqlite3 not found)"
-      fi
-   fi
-fi
+dnl # checking for sqlite3
+dnl if test "$enable_ide" = yes ; then
+dnl    if test "$USEOCAMLFIND" = yes; then
+dnl       SQLITE3LIB=$(ocamlfind query sqlite3)
+dnl    fi
+dnl    if test -n "$SQLITE3LIB";then
+dnl       echo "ocamlfind found sqlite3 in $SQLITE3LIB"
+dnl    else
+dnl       SQLITE3LIB="+sqlite3"
+dnl       AC_CHECK_FILE($OCAMLLIB/sqlite3/sqlite3.cma,,enable_ide=no)
+dnl       if test "$enable_ide" = no; then
+dnl         AC_MSG_WARN(Lib sqlite3 not found, IDE disabled.)
+dnl    	reason_ide=" (sqlite3 not found)"
+dnl       fi
+dnl    fi
+dnl fi
 
 # checking for sqlite3
 if test "$enable_bench" = yes ; then

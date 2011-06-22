@@ -799,6 +799,26 @@ let reload_proof obsolete goal pid old_a =
   in
   !notify_fun (Goal a.proof_goal)
 
+
+
+(*
+let reload_proof ~provers obsolete goal pid old_a =
+  try
+    let p = Util.Mstr.find pid provers in
+    let old_res = old_a.proof_state in
+    let obsolete = obsolete or old_a.proof_obsolete in
+    (* eprintf "proof_obsolete : %b@." obsolete; *)
+    let a =
+      raw_add_external_proof ~obsolete ~timelimit:old_a.timelimit
+	~edit:old_a.edited_as goal p old_res
+    in
+    !notify_fun (Goal a.proof_goal)
+  with Not_found ->
+    eprintf
+      "Warning: prover %s appears in database but is not installed.@."
+      pid
+*)
+
 let rec reload_any_goal parent gid gname sum t old_goal goal_obsolete =
   let info = get_explanation gid (Task.task_goal_fmla t) in
   let exp = match old_goal with None -> true | Some g -> g.goal_expanded in
@@ -883,6 +903,52 @@ and reload_trans  _goal_obsolete goal _ tr =
        (arbitrary choice)
 
        new_new_goals_map = [ [ (g1, h2) ; (g2, h1) ; (g3, fresh) ; ]
+
+       TODO: use the distance Term.t_dist to obtain a better match
+
+       other solution: sort in some arbitrary total order
+
+       g1 < g2 < ... <
+
+       h1 < h2 < ... <
+
+       then identical goals can be detected by a merge_like algorithm :
+
+       if merged list starts with g :
+
+       g1 < ... gk <= h1 < ... < 
+
+       then g1 .. g{k-1} are new and gk associated to h1, and then 
+       recursively merge g{k+1} ... and h2 ...
+
+       otherwise, list starts
+
+       h1 < ... hk <= g1 <= ... < 
+
+       ....
+
+       Another formulation :
+
+       if merged list starts with
+       
+       1) g1 g2 ... 
+       
+       associate g1 to nothing and recursively process g2 ...
+
+       2) g1 h1 g2 ... with d(g1,h1) < d(h1,g2)
+
+       associate g1 to h1 and recursively process g2 ...
+
+       3) g1 h1 g2 ... with d(g1,h1) > d(h1,g2)
+       
+       ?
+
+       4) g1 h1 h2 ...
+
+       
+       PRELIMINARY: store the shape of the conclusion of the goal in the XML
+       file. 
+
 
     *)
     let rec associate_remaining_goals new_goals_map remaining acc =

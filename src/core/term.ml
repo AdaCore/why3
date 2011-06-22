@@ -1253,6 +1253,32 @@ module Hterm_alpha = Hashtbl.Make (struct
   let hash = t_hash_alpha
 end)
 
+(* binder-free term/formula matching *)
+
+(* exception NoMatch *)
+
+(* let rec t_match s t1 t2 = *)
+(*   if not (oty_equal t1.t_ty t2.t_ty) then raise NoMatch else *)
+(*   match t1.t_node, t2.t_node with *)
+(*     | Tconst c1, Tconst c2 when c1 = c2 -> s *)
+(*     | Tvar v1, _ -> *)
+(*         Mvs.change v1 (function *)
+(*           | None -> Some t2 *)
+(*           | Some t1 as r when t_equal t1 t2 -> r *)
+(*           | _ -> raise NoMatch) s *)
+(*     | Tapp (s1,l1), Tapp (s2,l2) when ls_equal s1 s2 -> *)
+(*         List.fold_left2 t_match s l1 l2 *)
+(*     | Tif (f1,t1,e1), Tif (f2,t2,e2) -> *)
+(*         t_match (t_match (t_match s f1 f2) t1 t2) e1 e2 *)
+(*     | Tbinop (op1,f1,g1), Tbinop (op2,f2,g2) when op1 = op2 -> *)
+(*         t_match (t_match s f1 f2) g1 g2 *)
+(*     | Tnot f1, Tnot f2 -> *)
+(*         t_match s f1 f2 *)
+(*     | Ttrue, Ttrue *)
+(*     | Tfalse, Tfalse -> *)
+(*         s *)
+(*     | _ -> raise NoMatch *)
+
 (* occurrence check *)
 
 let rec t_occurs r t =
