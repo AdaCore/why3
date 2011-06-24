@@ -90,8 +90,8 @@ arrays (see Chapter~\ref{chap:mllibrary}), together with useful
 operations and traditional syntax.
 
 We are now in position to define a program function
-\verb|max\_sum|. A function definition is introduced with the keyword
-\texttt{let}. In our case, it introduces a function with two argument,
+\verb|max_sum|. A function definition is introduced with the keyword
+\texttt{let}. In our case, it introduces a function with two arguments,
 an array \texttt{a} and its size \texttt{n}:
 \begin{verbatim}
     let max_sum (a: array int) (n: int) = ...
@@ -112,7 +112,7 @@ verification conditions related to array bound checking), and that all
 elements of \texttt{a} are non-negative.
 The postcondition assumes that the value returned by the function,
 denoted \texttt{result}, is a pair of integers, and decomposes it as
-the pair \texttt{(sum, max)} to expresse the required property.
+the pair \texttt{(sum, max)} to express the required property.
 
 We are now left with the function body itself, that is a code
 computing the sum and the maximum of all elements in \texttt{a}. With
@@ -326,13 +326,13 @@ for a successful search,
     logic zero_at (l: list int) (i: int) =
       nth i l = Some 0 and forall j:int. 0 <= j < i -> nth j l <> Some 0
 \end{verbatim}
-and a another for a non-successful search,
+and another for a non-successful search,
 \begin{verbatim}
     logic no_zero (l: list int) =
       forall j:int. 0 <= j < length l -> nth j l <> Some 0
 \end{verbatim}
 We are now in position to give the code for the search function.
-We write it as a recursive function \texttt{search} which scans a list
+We write it as a recursive function \texttt{search} that scans a list
 for the first zero value:
 \begin{verbatim}
     let rec search (i: int) (l: list int) = match l with
@@ -515,7 +515,7 @@ several equalities and inequalities.
       length q.front = q.lenf >= length q.rear = q.lenr
 \end{verbatim}
 For the purpose of the specification, it is convenient to introduce a function
-\texttt{sequence} which builds the sequence of a queue elements, that
+\texttt{sequence} which builds the sequence of elements of a queue, that
 is the front list concatenated to reversed rear list.
 \begin{verbatim}
     logic sequence (q: queue 'a) : list 'a =
