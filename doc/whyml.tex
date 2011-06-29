@@ -50,9 +50,9 @@ See Chapter~\ref{chap:manpages} for more details regarding command lines.
 As an introduction to \whyml, we use the five problems from the VSTTE
 2010 verification competition~\cite{vstte10comp}.
 The source code for all these examples is contained in \why's
-distribution, in dub-directory \texttt{examples/programs/}.
+distribution, in sub-directory \texttt{examples/programs/}.
 
-\subsection{Problem 1: Sum and Maximum}
+\section{Problem 1: Sum and Maximum}
 
 The first problem is stated as follows:
 \begin{quote}
@@ -192,7 +192,7 @@ unsolved goal, which reduces to proving the following sequent:
 This is easily discharged using an interactive proof assistant such as
 Coq, and thus completes the verification.
 
-\subsection{Problem 2: Inverting an Injection}
+\section{Problem 2: Inverting an Injection}
 
 The second problem is stated as follows:
 \begin{quote}
@@ -292,7 +292,7 @@ end
   \label{fig:Inverting}
 \end{figure}
 
-\subsection{Problem 3: Searching a Linked List}
+\section{Problem 3: Searching a Linked List}
 
 The third problem is stated as follows:
 \begin{quote}
@@ -464,7 +464,7 @@ exactly as for a recursive function. Such a variant must strictly decrease at
 each execution of the loop body. The reader is invited to figure out
 the loop invariant.
 
-\subsection{Problem 4: N-Queens}
+\section{Problem 4: N-Queens}
 
 The fourth problem is probably the most challenging one.
 We have to verify the implementation of a program which solves the
@@ -719,7 +719,7 @@ end
 \end{figure}
 
 
-\subsection{Problem 5: Amortized Queue}
+\section{Problem 5: Amortized Queue}
 
 The last problem consists in verifying the implementation of a
 well-known purely applicative data structure for queues.
