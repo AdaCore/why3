@@ -37,6 +37,8 @@ exception TypeArity of qualid * int * int
 exception Clash of string
 exception PredicateExpected
 exception TermExpected
+exception FSymExpected of lsymbol
+exception PSymExpected of lsymbol
 exception BadNumberOfArguments of Ident.ident * int * int
 exception ClashTheory of string
 exception UnboundTheory of qualid
@@ -78,6 +80,10 @@ let () = Exn_printer.register (fun fmt e -> match e with
       fprintf fmt "syntax error: predicate expected"
   | TermExpected ->
       fprintf fmt "syntax error: term expected"
+  | FSymExpected ls ->
+      fprintf fmt "%a is not a function symbol" Pretty.print_ls ls
+  | PSymExpected ls ->
+      fprintf fmt "%a is not a predicate symbol" Pretty.print_ls ls
   | BadNumberOfArguments (s, n, m) ->
       fprintf fmt "@[Symbol `%s' is applied to %d terms,@ " s.id_string n;
       fprintf fmt "but is expecting %d arguments@]" m
@@ -206,6 +212,17 @@ let find_tysymbol q uc = find_tysymbol_ns q (get_namespace uc)
 
 let find_lsymbol_ns = find_ns ns_find_ls
 let find_lsymbol q uc = find_lsymbol_ns q (get_namespace uc)
+
+let find_fsymbol_ns q ns =
+  let ls = find_lsymbol_ns q ns in
+  if ls.ls_value = None then error ~loc:(qloc q) (FSymExpected ls) else ls
+
+let find_psymbol_ns q ns =
+  let ls = find_lsymbol_ns q ns in
+  if ls.ls_value <> None then error ~loc:(qloc q) (PSymExpected ls) else ls
+
+let find_fsymbol q uc = find_fsymbol_ns q (get_namespace uc)
+let find_psymbol q uc = find_psymbol_ns q (get_namespace uc)
 
 let find_namespace_ns = find_ns ns_find_ns
 let find_namespace q uc = find_namespace_ns q (get_namespace uc)
@@ -1119,9 +1136,15 @@ let add_decl env lenv th = function
                   if Mts.mem ts1 s.inst_ts
                   then error ~loc (Clash ts1.ts_name.id_string);
                   { s with inst_ts = Mts.add ts1 ts2 s.inst_ts }
-              | CSlsym (p,q) ->
-                  let ls1 = find_lsymbol_ns p t.th_export in
-                  let ls2 = find_lsymbol q th in
+              | CSfsym (p,q) ->
+                  let ls1 = find_fsymbol_ns p t.th_export in
+                  let ls2 = find_fsymbol q th in
+                  if Mls.mem ls1 s.inst_ls
+                  then error ~loc (Clash ls1.ls_name.id_string);
+                  { s with inst_ls = Mls.add ls1 ls2 s.inst_ls }
+              | CSpsym (p,q) ->
+                  let ls1 = find_psymbol_ns p t.th_export in
+                  let ls2 = find_psymbol q th in
                   if Mls.mem ls1 s.inst_ls
                   then error ~loc (Clash ls1.ls_name.id_string);
                   { s with inst_ls = Mls.add ls1 ls2 s.inst_ls }
@@ -1163,7 +1186,8 @@ let add_decl env lenv th = function
       let s = id.id in
       let convert = function
         | PMAts q  -> MAts (find_tysymbol q th)
-        | PMAls q  -> MAls (find_lsymbol q th)
+        | PMAfs q  -> MAls (find_fsymbol q th)
+        | PMAps q  -> MAls (find_psymbol q th)
         | PMApr q  -> MApr (find_prop q th)
         | PMAstr s -> MAstr s
         | PMAint i -> MAint (int_of_string i)

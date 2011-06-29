@@ -355,8 +355,8 @@ list1_comma_subst:
 subst:
 | NAMESPACE ns     EQUAL ns     { CSns   ($2, $4) }
 | TYPE      qualid EQUAL qualid { CStsym ($2, $4) }
-| FUNCTION  qualid EQUAL qualid { CSlsym ($2, $4) }
-| PREDICATE qualid EQUAL qualid { CSlsym ($2, $4) }
+| FUNCTION  qualid EQUAL qualid { CSfsym ($2, $4) }
+| PREDICATE qualid EQUAL qualid { CSpsym ($2, $4) }
 | LEMMA     qualid              { CSlemma $2 }
 | GOAL      qualid              { CSgoal  $2 }
 ;
@@ -375,8 +375,8 @@ list1_meta_arg_sep_comma:
 
 meta_arg:
 | TYPE      qualid { PMAts  $2 }
-| FUNCTION  qualid { PMAls  $2 }
-| PREDICATE qualid { PMAls  $2 }
+| FUNCTION  qualid { PMAfs  $2 }
+| PREDICATE qualid { PMAps  $2 }
 | PROP      qualid { PMApr  $2 }
 | STRING           { PMAstr $1 }
 | INTEGER          { PMAint $1 }

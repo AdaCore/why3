@@ -105,7 +105,8 @@ type use = {
 type clone_subst =
   | CSns    of qualid option * qualid option
   | CStsym  of qualid * qualid
-  | CSlsym  of qualid * qualid
+  | CSfsym  of qualid * qualid
+  | CSpsym  of qualid * qualid
   | CSlemma of qualid
   | CSgoal  of qualid
 
@@ -145,7 +146,8 @@ type prop_kind =
 
 type metarg =
   | PMAts  of qualid
-  | PMAls  of qualid
+  | PMAfs  of qualid
+  | PMAps  of qualid
   | PMApr  of qualid
   | PMAstr of string
   | PMAint of string
