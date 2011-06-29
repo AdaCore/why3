@@ -3,8 +3,8 @@ module M
   use import int.Int
   use import int.EuclideanDivision
 
-  logic even (x : int) = x = 2 * (div x 2)
-  logic odd  (x : int) = x = 2 * (div x 2) + 1
+  predicate even (x : int) = x = 2 * (div x 2)
+  predicate odd  (x : int) = x = 2 * (div x 2) + 1
 
 let rec is_even x : bool variant {x} =
   { 0 <= x }

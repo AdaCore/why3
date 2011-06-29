@@ -3,7 +3,7 @@ theory Fibonacci "Fibonacci numbers"
 
   use export int.Int
 
-  logic fib int : int
+  function fib int : int
 
   axiom fib0: fib 0 = 0
   axiom fib1: fib 1 = 1
@@ -33,7 +33,7 @@ module FibonacciLinear
     let y = ref 0 in
     let x = ref 1 in
     for i = 0 to n - 1 do
-      invariant { 0 <= i <= n and fib (i+1) = !x and fib i = !y }
+      invariant { 0 <= i <= n /\ fib (i+1) = !x /\ fib i = !y }
       let aux = !y in
       y := !x;
       x := !x + aux
@@ -49,19 +49,19 @@ theory Mat22 "2x2 integer matrices"
 
   type t = {| a11: int; a12: int; a21: int; a22: int |}
 
-  logic id : t = {| a11 = 1; a12 = 0; a21 = 0; a22 = 1 |}
+  function id : t = {| a11 = 1; a12 = 0; a21 = 0; a22 = 1 |}
 
-  logic mult (x: t) (y: t) : t =
+  function mult (x: t) (y: t) : t =
     {|
     a11 = x.a11 * y.a11 + x.a12 * y.a21; a12 = x.a11 * y.a12 + x.a12 * y.a22;
     a21 = x.a21 * y.a11 + x.a22 * y.a21; a22 = x.a21 * y.a12 + x.a22 * y.a22;
     |}
 
   (* holds, but not useful *)
-  (* clone algebra.Assoc with type t = t, logic op = mult, lemma Assoc *)
+  (* clone algebra.Assoc with type t = t, function op = mult, lemma Assoc *)
 
   clone export
-    int.Exponentiation with type t = t, logic one = id, logic (*) = mult
+    int.Exponentiation with type t = t, function one = id, function (*) = mult
 
   lemma power_sum :
     forall x: t, n m: int.
@@ -75,7 +75,7 @@ module FibonacciLogarithmic
   use import int.EuclideanDivision
   use import Mat22
 
-  logic m1110 : t = {| a11 = 1; a12 = 1;
+  function m1110 : t = {| a11 = 1; a12 = 1;
                        a21 = 1; a22 = 0 |}
 
   (* computes ((1 1) (1 0))^n in O(log(n)) time
@@ -108,7 +108,7 @@ module FibonacciLogarithmic
 
   lemma fib_m :
     forall n: int. n >= 0 ->
-    let p = power m1110 n in fib (n+1) = p.a11 and fib n = p.a21
+    let p = power m1110 n in fib (n+1) = p.a11 /\ fib n = p.a21
 
   let fibo n =
     { n >= 0 }

@@ -8,8 +8,8 @@ theory Bijection
   type t
   type u
 
-  logic of t : u
-  logic to_ u : t
+  function of t : u
+  function to_ u : t
 
   axiom To_of : forall x : t. to_ (of x) = x
   axiom Of_to : forall y : u. of (to_ y) = y
@@ -34,7 +34,7 @@ theory Einstein "Einstein's problem"
   clone Bijection as Pet   with type t = person, type u = pet
 
   (* Relative positions of the houses *)
-  logic leftof (h1 h2 : house) =
+  predicate leftof (h1 h2 : house) =
     match h1, h2 with
     | H1, H2 
     | H2, H3 
@@ -42,10 +42,10 @@ theory Einstein "Einstein's problem"
     | H4, H5 -> true
     | _      -> false
     end
-  logic rightof (h1 h2 : house) =
+  predicate rightof (h1 h2 : house) =
     leftof h2 h1
-  logic neighbour (h1 h2 : house) =
-    leftof h1 h2 or rightof h1 h2
+  predicate neighbour (h1 h2 : house) =
+    leftof h1 h2 \/ rightof h1 h2
 end
 
 theory EinsteinClues "Clues"

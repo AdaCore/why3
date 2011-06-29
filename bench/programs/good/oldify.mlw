@@ -2,7 +2,7 @@ module M
 
   use import module ref.Ref
 
-  logic q1 int int int
+  predicate q1 int int int
 
   parameter r : ref int
 
@@ -11,8 +11,8 @@ module M
 
   let g1 () = {} f1 !r { q1 !r (old !r) (old !r) }
 
-  logic foo int : int
-  logic q int int int
+  function foo int : int
+  predicate q int int int
 
   parameter f : t:ref int -> x:int ->
              {} unit writes t { q !t (old !t) x }

@@ -53,12 +53,12 @@ let p7 () =
 let p8 () =
   {}
   begin x := 1; raise (F !x); x := 2 end
-  { false } | F -> { !x = 1 and result = 1 }
+  { false } | F -> { !x = 1 /\ result = 1 }
 
 let p9 () =
   {}
   (raise (F begin x := 1; !x end) : unit)
-  { false } | F -> { !x = 1 and result = 1 }
+  { false } | F -> { !x = 1 /\ result = 1 }
 
 (* try / with *)
 
@@ -107,7 +107,7 @@ let p14 () =
     raise E : unit
   end
   { false } | E1 -> {  !x = 1 } | E2 -> {  !x = 2 } | E3 -> { !x = 3 }
-  | E -> { !x <> 1 and !x <> 2 and !x <> 3 }
+  | E -> { !x <> 1 /\ !x <> 2 /\ !x <> 3 }
 
 let p15 () =
   {}

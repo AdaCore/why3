@@ -2,8 +2,8 @@ theory Sig
   type t
   type elt
 
-  logic mem elt t
-  logic add elt t : t
+  predicate mem elt t
+  function add elt t : t
 
   axiom AddMem : forall e:elt, s:t. mem e (add e s)
 end
@@ -12,12 +12,12 @@ theory Struct
   type elt
   type t = Empty | Holds elt
 
-  logic mem (e:elt) (s:t) = match s with
+  predicate mem (e:elt) (s:t) = match s with
     | Holds d -> e = d
     | Empty -> false
   end
 
-  logic add (e:elt) (s:t) : t = Holds e
+  function add (e:elt) (s:t) : t = Holds e
 
   (* this is the equivalent of Struct : Sig *)
   clone Sig with namespace . = ., lemma AddMem
@@ -31,7 +31,7 @@ theory AbstractUser
   use export Shared
   clone import Sig with type elt = obj
 
-  logic program (s : t) : t = add Roses (add Violets s)
+  function program (s : t) : t = add Roses (add Violets s)
 end
 
 theory ConcreteUser

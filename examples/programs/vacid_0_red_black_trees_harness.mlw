@@ -5,21 +5,21 @@ module M
   type key = int
   type value = int
   type rbt
-  logic default rbt : value
-  logic mem rbt key value
+  function default rbt : value
+  predicate mem rbt key value
 
   parameter create :
     d:value ->
     {}
     ref rbt
-    { default !result = d and
+    { default !result = d /\
       forall k:key, v:value. mem !result k v <-> v = d }
 
   parameter replace :
     m:ref rbt -> k:key -> v:value ->
     {}
     unit writes m
-    { default !m = default (old !m) and
+    { default !m = default (old !m) /\
       forall k':key, v':value.
       mem !m k' v' <-> if k' = k then v' = v else mem (old !m) k' v' }
 
@@ -33,7 +33,7 @@ module M
     m:ref rbt -> k:key ->
     {}
     unit writes m
-    { default !m = default (old !m) and
+    { default !m = default (old !m) /\
       forall k':key, v':value.
       mem !m k' v' <-> if k' = k then v' = default !m else mem (old !m) k' v' }
 

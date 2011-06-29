@@ -4,62 +4,62 @@ theory Why2
   use int.ComputerDivision
   use real.Real
   use bool_inf.Bool
-  logic eq_unit Unit.unit Unit.unit
+  predicate eq_unit Unit.unit Unit.unit
 
-  logic neq_unit Unit.unit Unit.unit
+  predicate neq_unit Unit.unit Unit.unit
 
-  logic eq_bool Bool.bool Bool.bool
+  predicate eq_bool Bool.bool Bool.bool
 
-  logic neq_bool Bool.bool Bool.bool
+  predicate neq_bool Bool.bool Bool.bool
 
-  logic lt_int int int
+  predicate lt_int int int
 
-  logic le_int int int
+  predicate le_int int int
 
-  logic gt_int int int
+  predicate gt_int int int
 
-  logic ge_int int int
+  predicate ge_int int int
 
-  logic eq_int int int
+  predicate eq_int int int
 
-  logic neq_int int int
+  predicate neq_int int int
 
-  logic add_int int int : int
+  function add_int int int : int
 
-  logic sub_int int int : int
+  function sub_int int int : int
 
-  logic mul_int int int : int
+  function mul_int int int : int
 
-  logic div_int int int : int
+  function div_int int int : int
 
-  logic mod_int int int : int
+  function mod_int int int : int
 
-  logic neg_int int : int
+  function neg_int int : int
 
-  logic zwf_zero (a : int) (b : int) = ((Int.(<=) 0 b) and (Int.(<) a b))
+  predicate zwf_zero (a : int) (b : int) = ((Int.(<=) 0 b) /\ (Int.(<) a b))
 
   goal F1_po_1:
-    (false and
+    (false /\
      (forall x:int.
        (forall variant1:int.
          ((Int.(>=) x 0) ->
           ((variant1 = x) ->
-           ((true and
+           ((true /\
              ((Int.(>) x 0) ->
-              (((Int.(<=) 0 variant1) and
-                (Int.(<) (Int.(-) x 1 : int) variant1)) and
-               (Int.(>=) (Int.(-) x 1 : int) 0)))) and
+              (((Int.(<=) 0 variant1) /\
+                (Int.(<) (Int.(-) x 1 : int) variant1)) /\
+               (Int.(>=) (Int.(-) x 1 : int) 0)))) /\
             (forall result:int.
-              ((((Int.(>) x 0) and
-                 ((((Int.(<=) 0 variant1) and
-                    (Int.(<) (Int.(-) x 1 : int) variant1)) and
-                   (Int.(>=) (Int.(-) x 1 : int) 0)) and
-                  (result = 0))) or
-                ((Int.(<=) x 0) and (result = x))) ->
+              ((((Int.(>) x 0) /\
+                 ((((Int.(<=) 0 variant1) /\
+                    (Int.(<) (Int.(-) x 1 : int) variant1)) /\
+                   (Int.(>=) (Int.(-) x 1 : int) 0)) /\
+                  (result = 0))) \/
+                ((Int.(<=) x 0) /\ (result = x))) ->
                (result = 0)))))))))
 
   goal F2_po_1:
-    (false and
+    (false /\
      (forall variant1_0:int.
        (forall x:int.
          (forall x0:int.
@@ -67,25 +67,25 @@ theory Why2
              (forall x2:int.
                ((Int.(>=) x 0) ->
                 ((variant1_0 = x) ->
-                 ((true and
+                 ((true /\
                    ((Int.(>) x 0) ->
-                    (true and
+                    (true /\
                      ((x0 = (Int.(-) x 1 : int)) ->
-                      (((Int.(<=) 0 variant1_0) and (Int.(<) x0 variant1_0)) and
-                       (Int.(>=) x0 0)))))) and
+                      (((Int.(<=) 0 variant1_0) /\ (Int.(<) x0 variant1_0)) /\
+                       (Int.(>=) x0 0)))))) /\
                   (forall result:Unit.unit.
-                    (((((Int.(>) x 0) and
-                        ((x0 = (Int.(-) x 1 : int)) and
-                         ((((Int.(<=) 0 variant1_0) and
-                            (Int.(<) x0 variant1_0)) and
-                           (Int.(>=) x0 0)) and
-                          (x1 = 0)))) and
-                       (x2 = x1)) or
-                      ((Int.(<=) x 0) and (x2 = x))) ->
+                    (((((Int.(>) x 0) /\
+                        ((x0 = (Int.(-) x 1 : int)) /\
+                         ((((Int.(<=) 0 variant1_0) /\
+                            (Int.(<) x0 variant1_0)) /\
+                           (Int.(>=) x0 0)) /\
+                          (x1 = 0)))) /\
+                       (x2 = x1)) \/
+                      ((Int.(<=) x 0) /\ (x2 = x))) ->
                      (x2 = 0))))))))))))
 
   goal F3_po_1:
-    (false and
+    (false /\
      (forall a:int.
        (forall variant1_1:int.
          (forall x:int.
@@ -94,26 +94,26 @@ theory Why2
                (forall x5:int.
                  ((Int.(>=) a 0) ->
                   ((variant1_1 = a) ->
-                   ((true and
+                   ((true /\
                      ((Int.(>) a 0) ->
-                      (true and
+                      (true /\
                        ((x3 = (Int.(+) x 1 : int)) ->
-                        (((Int.(<=) 0 variant1_1) and
-                          (Int.(<) (Int.(-) a 1 : int) variant1_1)) and
-                         (Int.(>=) (Int.(-) a 1 : int) 0)))))) and
+                        (((Int.(<=) 0 variant1_1) /\
+                          (Int.(<) (Int.(-) a 1 : int) variant1_1)) /\
+                         (Int.(>=) (Int.(-) a 1 : int) 0)))))) /\
                     (forall result:Unit.unit.
-                      (((((Int.(>) a 0) and
-                          ((x3 = (Int.(+) x 1 : int)) and
-                           ((((Int.(<=) 0 variant1_1) and
-                              (Int.(<) (Int.(-) a 1 : int) variant1_1)) and
-                             (Int.(>=) (Int.(-) a 1 : int) 0)) and
-                            (x4 = (Int.(+) x3 (Int.(-) a 1 : int) : int))))) and
-                         (x5 = x4)) or
-                        ((Int.(<=) a 0) and (x5 = x))) ->
+                      (((((Int.(>) a 0) /\
+                          ((x3 = (Int.(+) x 1 : int)) /\
+                           ((((Int.(<=) 0 variant1_1) /\
+                              (Int.(<) (Int.(-) a 1 : int) variant1_1)) /\
+                             (Int.(>=) (Int.(-) a 1 : int) 0)) /\
+                            (x4 = (Int.(+) x3 (Int.(-) a 1 : int) : int))))) /\
+                         (x5 = x4)) \/
+                        ((Int.(<=) a 0) /\ (x5 = x))) ->
                        (x5 = (Int.(+) x a : int))))))))))))))
 
   goal F4_po_1:
-    (false and
+    (false /\
      (forall a:int.
        (forall a0:int.
          (forall a1:int.
@@ -125,25 +125,25 @@ theory Why2
                      (forall x8:int.
                        ((Int.(>=) a 0) ->
                         ((variant1_2 = a) ->
-                         ((true and
+                         ((true /\
                            ((Int.(>) a 0) ->
-                            (true and
+                            (true /\
                              ((x6 = (Int.(+) x 1 : int)) ->
-                              (true and
+                              (true /\
                                ((a0 = (Int.(-) a 1 : int)) ->
-                                (((Int.(<=) 0 variant1_2) and
-                                  (Int.(<) a0 variant1_2)) and
-                                 (Int.(>=) a0 0)))))))) and
+                                (((Int.(<=) 0 variant1_2) /\
+                                  (Int.(<) a0 variant1_2)) /\
+                                 (Int.(>=) a0 0)))))))) /\
                           (forall result:Unit.unit.
-                            (((((Int.(>) a 0) and
-                                ((x6 = (Int.(+) x 1 : int)) and
-                                 ((a0 = (Int.(-) a 1 : int)) and
-                                  ((((Int.(<=) 0 variant1_2) and
-                                     (Int.(<) a0 variant1_2)) and
-                                    (Int.(>=) a0 0)) and
-                                   (x7 = (Int.(+) x6 a0 : int)))))) and
-                               ((a2 = a1) and (x8 = x7))) or
-                              ((Int.(<=) a 0) and ((a2 = a) and (x8 = x)))) ->
+                            (((((Int.(>) a 0) /\
+                                ((x6 = (Int.(+) x 1 : int)) /\
+                                 ((a0 = (Int.(-) a 1 : int)) /\
+                                  ((((Int.(<=) 0 variant1_2) /\
+                                     (Int.(<) a0 variant1_2)) /\
+                                    (Int.(>=) a0 0)) /\
+                                   (x7 = (Int.(+) x6 a0 : int)))))) /\
+                               ((a2 = a1) /\ (x8 = x7))) \/
+                              ((Int.(<=) a 0) /\ ((a2 = a) /\ (x8 = x)))) ->
                              (x8 = (Int.(+) x a : int)))))))))))))))))
 
 

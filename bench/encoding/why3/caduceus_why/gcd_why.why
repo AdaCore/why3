@@ -4,41 +4,41 @@ theory Why2
   use int.ComputerDivision
   use real.Real
   use bool_inf.Bool
-  logic eq_unit Unit.unit Unit.unit
+  predicate eq_unit Unit.unit Unit.unit
 
-  logic neq_unit Unit.unit Unit.unit
+  predicate neq_unit Unit.unit Unit.unit
 
-  logic eq_bool Bool.bool Bool.bool
+  predicate eq_bool Bool.bool Bool.bool
 
-  logic neq_bool Bool.bool Bool.bool
+  predicate neq_bool Bool.bool Bool.bool
 
-  logic lt_int int int
+  predicate lt_int int int
 
-  logic le_int int int
+  predicate le_int int int
 
-  logic gt_int int int
+  predicate gt_int int int
 
-  logic ge_int int int
+  predicate ge_int int int
 
-  logic eq_int int int
+  predicate eq_int int int
 
-  logic neq_int int int
+  predicate neq_int int int
 
-  logic add_int int int : int
+  function add_int int int : int
 
-  logic sub_int int int : int
+  function sub_int int int : int
 
-  logic mul_int int int : int
+  function mul_int int int : int
 
-  logic div_int int int : int
+  function div_int int int : int
 
-  logic mod_int int int : int
+  function mod_int int int : int
 
-  logic neg_int int : int
+  function neg_int int : int
 
-  logic zwf_zero (a : int) (b : int) = ((Int.(<=) 0 b) and (Int.(<) a b))
+  predicate zwf_zero (a : int) (b : int) = ((Int.(<=) 0 b) /\ (Int.(<) a b))
 
-  logic gcd int int : int
+  function gcd int int : int
 
   axiom Gcd_asubb_b:
     (forall a:int.
@@ -52,30 +52,30 @@ theory Why2
 
   axiom Gcd_a_0: (forall a:int. ((gcd a 0 : int) = a))
 
-  logic max int int : int
+  function max int int : int
 
   axiom Max_def:
     (forall x:int.
       (forall y:int.
-        ((((max x y : int) = x) or ((max x y : int) = y)) and
-         ((Int.(>=) (max x y : int) x) and (Int.(>=) (max x y : int) y)))))
+        ((((max x y : int) = x) \/ ((max x y : int) = y)) /\
+         ((Int.(>=) (max x y : int) x) /\ (Int.(>=) (max x y : int) y)))))
 
   goal Gcd1_po_1:
     (forall a:int.
-      (forall b:int. (((Int.(>) a 0) and (Int.(>) b 0)) -> (Int.(<) 0 a))))
+      (forall b:int. (((Int.(>) a 0) /\ (Int.(>) b 0)) -> (Int.(<) 0 a))))
 
   goal Gcd1_po_2:
     (forall a:int.
-      (forall b:int. (((Int.(>) a 0) and (Int.(>) b 0)) -> (Int.(<) 0 b))))
+      (forall b:int. (((Int.(>) a 0) /\ (Int.(>) b 0)) -> (Int.(<) 0 b))))
 
   goal Gcd1_po_3:
     (forall a:int.
       (forall b:int.
-        (((Int.(>) a 0) and (Int.(>) b 0)) ->
+        (((Int.(>) a 0) /\ (Int.(>) b 0)) ->
          (forall x:int.
            (forall y:int.
-             (((Int.(<) 0 x) and
-               ((Int.(<) 0 y) and ((gcd x y : int) = (gcd a b : int)))) ->
+             (((Int.(<) 0 x) /\
+               ((Int.(<) 0 y) /\ ((gcd x y : int) = (gcd a b : int)))) ->
               ((x <> y) ->
                ((Int.(>) x y) ->
                 (forall x0:int.
@@ -84,11 +84,11 @@ theory Why2
   goal Gcd1_po_4:
     (forall a:int.
       (forall b:int.
-        (((Int.(>) a 0) and (Int.(>) b 0)) ->
+        (((Int.(>) a 0) /\ (Int.(>) b 0)) ->
          (forall x:int.
            (forall y:int.
-             (((Int.(<) 0 x) and
-               ((Int.(<) 0 y) and ((gcd x y : int) = (gcd a b : int)))) ->
+             (((Int.(<) 0 x) /\
+               ((Int.(<) 0 y) /\ ((gcd x y : int) = (gcd a b : int)))) ->
               ((x <> y) ->
                ((Int.(>) x y) ->
                 (forall x0:int.
@@ -97,11 +97,11 @@ theory Why2
   goal Gcd1_po_5:
     (forall a:int.
       (forall b:int.
-        (((Int.(>) a 0) and (Int.(>) b 0)) ->
+        (((Int.(>) a 0) /\ (Int.(>) b 0)) ->
          (forall x:int.
            (forall y:int.
-             (((Int.(<) 0 x) and
-               ((Int.(<) 0 y) and ((gcd x y : int) = (gcd a b : int)))) ->
+             (((Int.(<) 0 x) /\
+               ((Int.(<) 0 y) /\ ((gcd x y : int) = (gcd a b : int)))) ->
               ((x <> y) ->
                ((Int.(>) x y) ->
                 (forall x0:int.
@@ -111,11 +111,11 @@ theory Why2
   goal Gcd1_po_6:
     (forall a:int.
       (forall b:int.
-        (((Int.(>) a 0) and (Int.(>) b 0)) ->
+        (((Int.(>) a 0) /\ (Int.(>) b 0)) ->
          (forall x:int.
            (forall y:int.
-             (((Int.(<) 0 x) and
-               ((Int.(<) 0 y) and ((gcd x y : int) = (gcd a b : int)))) ->
+             (((Int.(<) 0 x) /\
+               ((Int.(<) 0 y) /\ ((gcd x y : int) = (gcd a b : int)))) ->
               ((x <> y) ->
                ((Int.(>) x y) ->
                 (forall x0:int.
@@ -124,11 +124,11 @@ theory Why2
   goal Gcd1_po_7:
     (forall a:int.
       (forall b:int.
-        (((Int.(>) a 0) and (Int.(>) b 0)) ->
+        (((Int.(>) a 0) /\ (Int.(>) b 0)) ->
          (forall x:int.
            (forall y:int.
-             (((Int.(<) 0 x) and
-               ((Int.(<) 0 y) and ((gcd x y : int) = (gcd a b : int)))) ->
+             (((Int.(<) 0 x) /\
+               ((Int.(<) 0 y) /\ ((gcd x y : int) = (gcd a b : int)))) ->
               ((x <> y) ->
                ((Int.(>) x y) ->
                 (forall x0:int.
@@ -138,11 +138,11 @@ theory Why2
   goal Gcd1_po_8:
     (forall a:int.
       (forall b:int.
-        (((Int.(>) a 0) and (Int.(>) b 0)) ->
+        (((Int.(>) a 0) /\ (Int.(>) b 0)) ->
          (forall x:int.
            (forall y:int.
-             (((Int.(<) 0 x) and
-               ((Int.(<) 0 y) and ((gcd x y : int) = (gcd a b : int)))) ->
+             (((Int.(<) 0 x) /\
+               ((Int.(<) 0 y) /\ ((gcd x y : int) = (gcd a b : int)))) ->
               ((x <> y) ->
                ((Int.(<=) x y) ->
                 (forall y0:int.
@@ -151,11 +151,11 @@ theory Why2
   goal Gcd1_po_9:
     (forall a:int.
       (forall b:int.
-        (((Int.(>) a 0) and (Int.(>) b 0)) ->
+        (((Int.(>) a 0) /\ (Int.(>) b 0)) ->
          (forall x:int.
            (forall y:int.
-             (((Int.(<) 0 x) and
-               ((Int.(<) 0 y) and ((gcd x y : int) = (gcd a b : int)))) ->
+             (((Int.(<) 0 x) /\
+               ((Int.(<) 0 y) /\ ((gcd x y : int) = (gcd a b : int)))) ->
               ((x <> y) ->
                ((Int.(<=) x y) ->
                 (forall y0:int.
@@ -165,11 +165,11 @@ theory Why2
   goal Gcd1_po_10:
     (forall a:int.
       (forall b:int.
-        (((Int.(>) a 0) and (Int.(>) b 0)) ->
+        (((Int.(>) a 0) /\ (Int.(>) b 0)) ->
          (forall x:int.
            (forall y:int.
-             (((Int.(<) 0 x) and
-               ((Int.(<) 0 y) and ((gcd x y : int) = (gcd a b : int)))) ->
+             (((Int.(<) 0 x) /\
+               ((Int.(<) 0 y) /\ ((gcd x y : int) = (gcd a b : int)))) ->
               ((x <> y) ->
                ((Int.(<=) x y) ->
                 (forall y0:int.
@@ -178,11 +178,11 @@ theory Why2
   goal Gcd1_po_11:
     (forall a:int.
       (forall b:int.
-        (((Int.(>) a 0) and (Int.(>) b 0)) ->
+        (((Int.(>) a 0) /\ (Int.(>) b 0)) ->
          (forall x:int.
            (forall y:int.
-             (((Int.(<) 0 x) and
-               ((Int.(<) 0 y) and ((gcd x y : int) = (gcd a b : int)))) ->
+             (((Int.(<) 0 x) /\
+               ((Int.(<) 0 y) /\ ((gcd x y : int) = (gcd a b : int)))) ->
               ((x <> y) ->
                ((Int.(<=) x y) ->
                 (forall y0:int.
@@ -192,11 +192,11 @@ theory Why2
   goal Gcd1_po_12:
     (forall a:int.
       (forall b:int.
-        (((Int.(>) a 0) and (Int.(>) b 0)) ->
+        (((Int.(>) a 0) /\ (Int.(>) b 0)) ->
          (forall x:int.
            (forall y:int.
-             (((Int.(<) 0 x) and
-               ((Int.(<) 0 y) and ((gcd x y : int) = (gcd a b : int)))) ->
+             (((Int.(<) 0 x) /\
+               ((Int.(<) 0 y) /\ ((gcd x y : int) = (gcd a b : int)))) ->
               ((x = y) -> (x = (gcd a b : int)))))))))
 
   axiom Gcd_a_amodb:
@@ -207,25 +207,25 @@ theory Why2
   axiom Mod_lt:
     (forall a:int.
       (forall b:int.
-        ((Int.(<=) 0 (ComputerDivision.mod a b : int)) and
+        ((Int.(<=) 0 (ComputerDivision.mod a b : int)) /\
          (Int.(<) (ComputerDivision.mod a b : int) b))))
 
   goal Gcd2_po_1:
     (forall a:int.
-      (forall b:int. (((Int.(>=) a 0) and (Int.(>=) b 0)) -> (Int.(<=) 0 a))))
+      (forall b:int. (((Int.(>=) a 0) /\ (Int.(>=) b 0)) -> (Int.(<=) 0 a))))
 
   goal Gcd2_po_2:
     (forall a:int.
-      (forall b:int. (((Int.(>=) a 0) and (Int.(>=) b 0)) -> (Int.(<=) 0 b))))
+      (forall b:int. (((Int.(>=) a 0) /\ (Int.(>=) b 0)) -> (Int.(<=) 0 b))))
 
   goal Gcd2_po_3:
     (forall a:int.
       (forall b:int.
-        (((Int.(>=) a 0) and (Int.(>=) b 0)) ->
+        (((Int.(>=) a 0) /\ (Int.(>=) b 0)) ->
          (forall x:int.
            (forall y:int.
-             (((Int.(<=) 0 x) and
-               ((Int.(<=) 0 y) and ((gcd x y : int) = (gcd a b : int)))) ->
+             (((Int.(<=) 0 x) /\
+               ((Int.(<=) 0 y) /\ ((gcd x y : int) = (gcd a b : int)))) ->
               ((y <> 0) ->
                (forall x0:int.
                  ((x0 = y) ->
@@ -236,11 +236,11 @@ theory Why2
   goal Gcd2_po_4:
     (forall a:int.
       (forall b:int.
-        (((Int.(>=) a 0) and (Int.(>=) b 0)) ->
+        (((Int.(>=) a 0) /\ (Int.(>=) b 0)) ->
          (forall x:int.
            (forall y:int.
-             (((Int.(<=) 0 x) and
-               ((Int.(<=) 0 y) and ((gcd x y : int) = (gcd a b : int)))) ->
+             (((Int.(<=) 0 x) /\
+               ((Int.(<=) 0 y) /\ ((gcd x y : int) = (gcd a b : int)))) ->
               ((y <> 0) ->
                (forall x0:int.
                  ((x0 = y) ->
@@ -251,11 +251,11 @@ theory Why2
   goal Gcd2_po_5:
     (forall a:int.
       (forall b:int.
-        (((Int.(>=) a 0) and (Int.(>=) b 0)) ->
+        (((Int.(>=) a 0) /\ (Int.(>=) b 0)) ->
          (forall x:int.
            (forall y:int.
-             (((Int.(<=) 0 x) and
-               ((Int.(<=) 0 y) and ((gcd x y : int) = (gcd a b : int)))) ->
+             (((Int.(<=) 0 x) /\
+               ((Int.(<=) 0 y) /\ ((gcd x y : int) = (gcd a b : int)))) ->
               ((y <> 0) ->
                (forall x0:int.
                  ((x0 = y) ->
@@ -266,11 +266,11 @@ theory Why2
   goal Gcd2_po_6:
     (forall a:int.
       (forall b:int.
-        (((Int.(>=) a 0) and (Int.(>=) b 0)) ->
+        (((Int.(>=) a 0) /\ (Int.(>=) b 0)) ->
          (forall x:int.
            (forall y:int.
-             (((Int.(<=) 0 x) and
-               ((Int.(<=) 0 y) and ((gcd x y : int) = (gcd a b : int)))) ->
+             (((Int.(<=) 0 x) /\
+               ((Int.(<=) 0 y) /\ ((gcd x y : int) = (gcd a b : int)))) ->
               ((y <> 0) ->
                (forall x0:int.
                  ((x0 = y) ->
@@ -281,11 +281,11 @@ theory Why2
   goal Gcd2_po_7:
     (forall a:int.
       (forall b:int.
-        (((Int.(>=) a 0) and (Int.(>=) b 0)) ->
+        (((Int.(>=) a 0) /\ (Int.(>=) b 0)) ->
          (forall x:int.
            (forall y:int.
-             (((Int.(<=) 0 x) and
-               ((Int.(<=) 0 y) and ((gcd x y : int) = (gcd a b : int)))) ->
+             (((Int.(<=) 0 x) /\
+               ((Int.(<=) 0 y) /\ ((gcd x y : int) = (gcd a b : int)))) ->
               ((y <> 0) ->
                (forall x0:int.
                  ((x0 = y) ->
@@ -296,11 +296,11 @@ theory Why2
   goal Gcd2_po_8:
     (forall a:int.
       (forall b:int.
-        (((Int.(>=) a 0) and (Int.(>=) b 0)) ->
+        (((Int.(>=) a 0) /\ (Int.(>=) b 0)) ->
          (forall x:int.
            (forall y:int.
-             (((Int.(<=) 0 x) and
-               ((Int.(<=) 0 y) and ((gcd x y : int) = (gcd a b : int)))) ->
+             (((Int.(<=) 0 x) /\
+               ((Int.(<=) 0 y) /\ ((gcd x y : int) = (gcd a b : int)))) ->
               ((y = 0) -> (x = (gcd a b : int)))))))))
 
 

@@ -4,53 +4,53 @@ theory Why2
   use int.ComputerDivision
   use real.Real
   use bool_inf.Bool
-  logic eq_unit Unit.unit Unit.unit
+  predicate eq_unit Unit.unit Unit.unit
 
-  logic neq_unit Unit.unit Unit.unit
+  predicate neq_unit Unit.unit Unit.unit
 
-  logic eq_bool Bool.bool Bool.bool
+  predicate eq_bool Bool.bool Bool.bool
 
-  logic neq_bool Bool.bool Bool.bool
+  predicate neq_bool Bool.bool Bool.bool
 
-  logic lt_int int int
+  predicate lt_int int int
 
-  logic le_int int int
+  predicate le_int int int
 
-  logic gt_int int int
+  predicate gt_int int int
 
-  logic ge_int int int
+  predicate ge_int int int
 
-  logic eq_int int int
+  predicate eq_int int int
 
-  logic neq_int int int
+  predicate neq_int int int
 
-  logic add_int int int : int
+  function add_int int int : int
 
-  logic sub_int int int : int
+  function sub_int int int : int
 
-  logic mul_int int int : int
+  function mul_int int int : int
 
-  logic div_int int int : int
+  function div_int int int : int
 
-  logic mod_int int int : int
+  function mod_int int int : int
 
-  logic neg_int int : int
+  function neg_int int : int
 
-  logic zwf_zero (a : int) (b : int) = ((Int.(<=) 0 b) and (Int.(<) a b))
+  predicate zwf_zero (a : int) (b : int) = ((Int.(<=) 0 b) /\ (Int.(<) a b))
 
   type set 'a
 
-  logic set_empty  : (set 'a1)
+  function set_empty  : (set 'a1)
 
-  logic set_add 'a1 (set 'a1) : (set 'a1)
+  function set_add 'a1 (set 'a1) : (set 'a1)
 
-  logic set_rmv 'a1 (set 'a1) : (set 'a1)
+  function set_rmv 'a1 (set 'a1) : (set 'a1)
 
-  logic why3_In 'a1 (set 'a1)
+  predicate why3_In 'a1 (set 'a1)
 
-  logic why3_Is_empty (s : (set 'a1)) = (forall x:'a1. (not (why3_In x s)))
+  predicate why3_Is_empty (s : (set 'a1)) = (forall x:'a1. (not (why3_In x s)))
 
-  logic why3_Incl (s1 : (set 'a1)) (s2 : (set 'a1)) =
+  predicate why3_Incl (s1 : (set 'a1)) (s2 : (set 'a1)) =
     (forall x:'a1. ((why3_In x s1) -> (why3_In x s2)))
 
   axiom Set_empty_def: (why3_Is_empty (set_empty : (set 'a1)))
@@ -60,16 +60,16 @@ theory Why2
       (forall y:'a1.
         (forall s:(set 'a1).
           ((why3_In x (set_add y s : (set 'a1))) <->
-           ((x = y) or (why3_In x s))))))
+           ((x = y) \/ (why3_In x s))))))
 
   axiom Set_rmv_def:
     (forall x:'a1.
       (forall y:'a1.
         (forall s:(set 'a1).
           ((why3_In x (set_rmv y s : (set 'a1))) <->
-           ((x <> y) and (why3_In x s))))))
+           ((x <> y) /\ (why3_In x s))))))
 
-  logic set_card (set 'a1) : int
+  function set_card (set 'a1) : int
 
   axiom Card_nonneg: (forall s:(set 'a1). (Int.(>=) (set_card s : int) 0))
 
@@ -93,9 +93,9 @@ theory Why2
 
   type map 'a 'b
 
-  logic map_get (map 'a2 'a1) 'a2 : 'a1
+  function map_get (map 'a2 'a1) 'a2 : 'a1
 
-  logic map_set (map 'a1 'a2) 'a1 'a2 : (map 'a1 'a2)
+  function map_set (map 'a1 'a2) 'a1 'a2 : (map 'a1 'a2)
 
   axiom Map_get_set_eq:
     (forall m:(map 'a1 'a2).
@@ -113,26 +113,26 @@ theory Why2
 
   type vertex
 
-  logic why3_V  : (set vertex)
+  function why3_V  : (set vertex)
 
-  logic g_succ vertex : (set vertex)
+  function g_succ vertex : (set vertex)
 
   axiom G_succ_sound:
     (forall x:vertex.
       (why3_Incl (g_succ x : (set vertex)) (why3_V : (set vertex))))
 
-  logic weight vertex vertex : int
+  function weight vertex vertex : int
 
   axiom Weight_nonneg:
     (forall x:vertex. (forall y:vertex. (Int.(>=) (weight x y : int) 0)))
 
-  logic why3_Min (m : vertex) (why3_Q : (set vertex)) (d : (map vertex int)) =
-    ((why3_In m why3_Q) and
+  predicate why3_Min (m : vertex) (why3_Q : (set vertex)) (d : (map vertex int)) =
+    ((why3_In m why3_Q) /\
      (forall x:vertex.
        ((why3_In x why3_Q) ->
         (Int.(<=) (map_get d x : int) (map_get d m : int)))))
 
-  logic path vertex vertex int
+  predicate path vertex vertex int
 
   axiom Path_nil: (forall x:vertex. (path x x 0))
 
@@ -149,17 +149,17 @@ theory Why2
     (forall x:vertex.
       (forall y:vertex. (forall d:int. ((path x y d) -> (Int.(>=) d 0)))))
 
-  logic shortest_path (x : vertex) (y : vertex) (d : int) =
-    ((path x y d) and (forall d':int. ((path x y d') -> (Int.(<=) d d'))))
+  predicate shortest_path (x : vertex) (y : vertex) (d : int) =
+    ((path x y d) /\ (forall d':int. ((path x y d') -> (Int.(<=) d d'))))
 
   axiom Path_inversion:
     (forall src:vertex.
       (forall v:vertex.
         (forall d:int.
           ((path src v d) ->
-           (((v = src) and (d = 0)) or
+           (((v = src) /\ (d = 0)) \/
             (exists v':vertex.
-              ((path src v' (Int.(-) d (weight v' v : int) : int)) and
+              ((path src v' (Int.(-) d (weight v' v : int) : int)) /\
                (why3_In v (g_succ v' : (set vertex))))))))))
 
   axiom Path_shortest_path:
@@ -167,7 +167,7 @@ theory Why2
       (forall v:vertex.
         (forall d:int.
           ((path src v d) ->
-           (exists d':int. ((shortest_path src v d') and (Int.(<=) d' d)))))))
+           (exists d':int. ((shortest_path src v d') /\ (Int.(<=) d' d)))))))
 
   axiom Main_lemma:
     (forall src:vertex.
@@ -177,8 +177,8 @@ theory Why2
            ((not (shortest_path src v d)) ->
             (exists v':vertex.
               (exists d':int.
-                ((shortest_path src v' d') and
-                 ((why3_In v (g_succ v' : (set vertex))) and
+                ((shortest_path src v' d') /\
+                 ((why3_In v (g_succ v' : (set vertex))) /\
                   (Int.(<) (Int.(+) d' (weight v' v : int) : int) d))))))))))
 
   axiom Completeness_lemma:
@@ -192,19 +192,19 @@ theory Why2
                   ((why3_In w (g_succ v : (set vertex))) -> (why3_In w s))))) ->
              ((why3_In src s) -> ((path src dst d) -> (why3_In dst s))))))))
 
-  logic why3_Inv_src (src : vertex) (why3_S : (set vertex)) (why3_Q : (set vertex)) =
-    ((why3_In src why3_S) or (why3_In src why3_Q))
+  predicate why3_Inv_src (src : vertex) (why3_S : (set vertex)) (why3_Q : (set vertex)) =
+    ((why3_In src why3_S) \/ (why3_In src why3_Q))
 
-  logic why3_Inv (src : vertex) (why3_S : (set vertex)) (why3_Q : (set vertex)) (d : (map vertex int)) =
-    ((why3_Inv_src src why3_S why3_Q) and
-     ((why3_Incl why3_S (why3_V : (set vertex))) and
-      ((why3_Incl why3_Q (why3_V : (set vertex))) and
+  predicate why3_Inv (src : vertex) (why3_S : (set vertex)) (why3_Q : (set vertex)) (d : (map vertex int)) =
+    ((why3_Inv_src src why3_S why3_Q) /\
+     ((why3_Incl why3_S (why3_V : (set vertex))) /\
+      ((why3_Incl why3_Q (why3_V : (set vertex))) /\
        ((forall v:vertex.
-          ((why3_In v why3_Q) -> ((why3_In v why3_S) -> false))) and
+          ((why3_In v why3_Q) -> ((why3_In v why3_S) -> false))) /\
         ((forall v:vertex.
-           ((why3_In v why3_S) -> (shortest_path src v (map_get d v : int)))) and
+           ((why3_In v why3_S) -> (shortest_path src v (map_get d v : int)))) /\
          ((forall v:vertex.
-            ((why3_In v why3_Q) -> (path src v (map_get d v : int)))) and
+            ((why3_In v why3_Q) -> (path src v (map_get d v : int)))) /\
           (forall m:vertex.
             ((why3_Min m why3_Q d) ->
              (forall x:vertex.
@@ -212,32 +212,32 @@ theory Why2
                  ((shortest_path src x dx) ->
                   ((Int.(<) dx (map_get d m : int)) -> (why3_In x why3_S)))))))))))))
 
-  logic why3_InvSucc (src : vertex) (why3_S : (set vertex)) (why3_Q : (set vertex)) =
+  predicate why3_InvSucc (src : vertex) (why3_S : (set vertex)) (why3_Q : (set vertex)) =
     (forall x:vertex.
       ((why3_In x why3_S) ->
        (forall y:vertex.
          ((why3_In y (g_succ x : (set vertex))) ->
-          ((why3_In y why3_S) or (why3_In y why3_Q))))))
+          ((why3_In y why3_S) \/ (why3_In y why3_Q))))))
 
-  logic why3_InvSucc2 (src : vertex) (why3_S : (set vertex)) (why3_Q : (set vertex)) (u : vertex) (su : (set vertex)) =
+  predicate why3_InvSucc2 (src : vertex) (why3_S : (set vertex)) (why3_Q : (set vertex)) (u : vertex) (su : (set vertex)) =
     (forall x:vertex.
       ((why3_In x why3_S) ->
        (forall y:vertex.
          ((why3_In y (g_succ x : (set vertex))) ->
-          (((x <> u) or ((x = u) and (not (why3_In y su)))) ->
-           ((why3_In y why3_S) or (why3_In y why3_Q)))))))
+          (((x <> u) \/ ((x = u) /\ (not (why3_In y su)))) ->
+           ((why3_In y why3_S) \/ (why3_In y why3_Q)))))))
 
   goal Shortest_path_po_1:
     (forall src:vertex.
       (forall dst:vertex.
         (forall d:(map vertex int).
-          (((why3_In src (why3_V : (set vertex))) and
+          (((why3_In src (why3_V : (set vertex))) /\
             (why3_In dst (why3_V : (set vertex)))) ->
            (forall why3_Q:(set vertex).
              (forall why3_S:(set vertex).
                (forall d0:(map vertex int).
-                 (((why3_Is_empty why3_S) and
-                   ((why3_Q = (set_add src (set_empty : (set vertex)) : (set vertex))) and
+                 (((why3_Is_empty why3_S) /\
+                   ((why3_Q = (set_add src (set_empty : (set vertex)) : (set vertex))) /\
                     (d0 = (map_set d src 0 : (map vertex int))))) ->
                   (why3_Inv src why3_S why3_Q d0)))))))))
 
@@ -245,13 +245,13 @@ theory Why2
     (forall src:vertex.
       (forall dst:vertex.
         (forall d:(map vertex int).
-          (((why3_In src (why3_V : (set vertex))) and
+          (((why3_In src (why3_V : (set vertex))) /\
             (why3_In dst (why3_V : (set vertex)))) ->
            (forall why3_Q:(set vertex).
              (forall why3_S:(set vertex).
                (forall d0:(map vertex int).
-                 (((why3_Is_empty why3_S) and
-                   ((why3_Q = (set_add src (set_empty : (set vertex)) : (set vertex))) and
+                 (((why3_Is_empty why3_S) /\
+                   ((why3_Q = (set_add src (set_empty : (set vertex)) : (set vertex))) /\
                     (d0 = (map_set d src 0 : (map vertex int))))) ->
                   (why3_InvSucc src why3_S why3_Q)))))))))
 
@@ -259,23 +259,23 @@ theory Why2
     (forall src:vertex.
       (forall dst:vertex.
         (forall d:(map vertex int).
-          (((why3_In src (why3_V : (set vertex))) and
+          (((why3_In src (why3_V : (set vertex))) /\
             (why3_In dst (why3_V : (set vertex)))) ->
            (forall why3_Q:(set vertex).
              (forall why3_S:(set vertex).
                (forall d0:(map vertex int).
-                 (((why3_Is_empty why3_S) and
-                   ((why3_Q = (set_add src (set_empty : (set vertex)) : (set vertex))) and
+                 (((why3_Is_empty why3_S) /\
+                   ((why3_Q = (set_add src (set_empty : (set vertex)) : (set vertex))) /\
                     (d0 = (map_set d src 0 : (map vertex int))))) ->
                   (forall why3_Q0:(set vertex).
                     (forall why3_S0:(set vertex).
                       (forall d1:(map vertex int).
-                        (((why3_Inv src why3_S0 why3_Q0 d1) and
+                        (((why3_Inv src why3_S0 why3_Q0 d1) /\
                           (why3_InvSucc src why3_S0 why3_Q0)) ->
                          ((not (why3_Is_empty why3_Q0)) ->
                           (forall result:vertex.
                             (forall why3_Q1:(set vertex).
-                              (((why3_Min result why3_Q0 d1) and
+                              (((why3_Min result why3_Q0 d1) /\
                                 (why3_Q1 = (set_rmv result why3_Q0 : (set vertex)))) ->
                                (shortest_path src result (map_get d1 result : int))))))))))))))))))
 
@@ -283,23 +283,23 @@ theory Why2
     (forall src:vertex.
       (forall dst:vertex.
         (forall d:(map vertex int).
-          (((why3_In src (why3_V : (set vertex))) and
+          (((why3_In src (why3_V : (set vertex))) /\
             (why3_In dst (why3_V : (set vertex)))) ->
            (forall why3_Q:(set vertex).
              (forall why3_S:(set vertex).
                (forall d0:(map vertex int).
-                 (((why3_Is_empty why3_S) and
-                   ((why3_Q = (set_add src (set_empty : (set vertex)) : (set vertex))) and
+                 (((why3_Is_empty why3_S) /\
+                   ((why3_Q = (set_add src (set_empty : (set vertex)) : (set vertex))) /\
                     (d0 = (map_set d src 0 : (map vertex int))))) ->
                   (forall why3_Q0:(set vertex).
                     (forall why3_S0:(set vertex).
                       (forall d1:(map vertex int).
-                        (((why3_Inv src why3_S0 why3_Q0 d1) and
+                        (((why3_Inv src why3_S0 why3_Q0 d1) /\
                           (why3_InvSucc src why3_S0 why3_Q0)) ->
                          ((not (why3_Is_empty why3_Q0)) ->
                           (forall result:vertex.
                             (forall why3_Q1:(set vertex).
-                              (((why3_Min result why3_Q0 d1) and
+                              (((why3_Min result why3_Q0 d1) /\
                                 (why3_Q1 = (set_rmv result why3_Q0 : (set vertex)))) ->
                                ((shortest_path src result (map_get d1 result : int)) ->
                                 (forall why3_S1:(set vertex).
@@ -310,23 +310,23 @@ theory Why2
     (forall src:vertex.
       (forall dst:vertex.
         (forall d:(map vertex int).
-          (((why3_In src (why3_V : (set vertex))) and
+          (((why3_In src (why3_V : (set vertex))) /\
             (why3_In dst (why3_V : (set vertex)))) ->
            (forall why3_Q:(set vertex).
              (forall why3_S:(set vertex).
                (forall d0:(map vertex int).
-                 (((why3_Is_empty why3_S) and
-                   ((why3_Q = (set_add src (set_empty : (set vertex)) : (set vertex))) and
+                 (((why3_Is_empty why3_S) /\
+                   ((why3_Q = (set_add src (set_empty : (set vertex)) : (set vertex))) /\
                     (d0 = (map_set d src 0 : (map vertex int))))) ->
                   (forall why3_Q0:(set vertex).
                     (forall why3_S0:(set vertex).
                       (forall d1:(map vertex int).
-                        (((why3_Inv src why3_S0 why3_Q0 d1) and
+                        (((why3_Inv src why3_S0 why3_Q0 d1) /\
                           (why3_InvSucc src why3_S0 why3_Q0)) ->
                          ((not (why3_Is_empty why3_Q0)) ->
                           (forall result:vertex.
                             (forall why3_Q1:(set vertex).
-                              (((why3_Min result why3_Q0 d1) and
+                              (((why3_Min result why3_Q0 d1) /\
                                 (why3_Q1 = (set_rmv result why3_Q0 : (set vertex)))) ->
                                ((shortest_path src result (map_get d1 result : int)) ->
                                 (forall why3_S1:(set vertex).
@@ -337,23 +337,23 @@ theory Why2
     (forall src:vertex.
       (forall dst:vertex.
         (forall d:(map vertex int).
-          (((why3_In src (why3_V : (set vertex))) and
+          (((why3_In src (why3_V : (set vertex))) /\
             (why3_In dst (why3_V : (set vertex)))) ->
            (forall why3_Q:(set vertex).
              (forall why3_S:(set vertex).
                (forall d0:(map vertex int).
-                 (((why3_Is_empty why3_S) and
-                   ((why3_Q = (set_add src (set_empty : (set vertex)) : (set vertex))) and
+                 (((why3_Is_empty why3_S) /\
+                   ((why3_Q = (set_add src (set_empty : (set vertex)) : (set vertex))) /\
                     (d0 = (map_set d src 0 : (map vertex int))))) ->
                   (forall why3_Q0:(set vertex).
                     (forall why3_S0:(set vertex).
                       (forall d1:(map vertex int).
-                        (((why3_Inv src why3_S0 why3_Q0 d1) and
+                        (((why3_Inv src why3_S0 why3_Q0 d1) /\
                           (why3_InvSucc src why3_S0 why3_Q0)) ->
                          ((not (why3_Is_empty why3_Q0)) ->
                           (forall result:vertex.
                             (forall why3_Q1:(set vertex).
-                              (((why3_Min result why3_Q0 d1) and
+                              (((why3_Min result why3_Q0 d1) /\
                                 (why3_Q1 = (set_rmv result why3_Q0 : (set vertex)))) ->
                                ((shortest_path src result (map_get d1 result : int)) ->
                                 (forall why3_S1:(set vertex).
@@ -364,23 +364,23 @@ theory Why2
     (forall src:vertex.
       (forall dst:vertex.
         (forall d:(map vertex int).
-          (((why3_In src (why3_V : (set vertex))) and
+          (((why3_In src (why3_V : (set vertex))) /\
             (why3_In dst (why3_V : (set vertex)))) ->
            (forall why3_Q:(set vertex).
              (forall why3_S:(set vertex).
                (forall d0:(map vertex int).
-                 (((why3_Is_empty why3_S) and
-                   ((why3_Q = (set_add src (set_empty : (set vertex)) : (set vertex))) and
+                 (((why3_Is_empty why3_S) /\
+                   ((why3_Q = (set_add src (set_empty : (set vertex)) : (set vertex))) /\
                     (d0 = (map_set d src 0 : (map vertex int))))) ->
                   (forall why3_Q0:(set vertex).
                     (forall why3_S0:(set vertex).
                       (forall d1:(map vertex int).
-                        (((why3_Inv src why3_S0 why3_Q0 d1) and
+                        (((why3_Inv src why3_S0 why3_Q0 d1) /\
                           (why3_InvSucc src why3_S0 why3_Q0)) ->
                          ((not (why3_Is_empty why3_Q0)) ->
                           (forall result:vertex.
                             (forall why3_Q1:(set vertex).
-                              (((why3_Min result why3_Q0 d1) and
+                              (((why3_Min result why3_Q0 d1) /\
                                 (why3_Q1 = (set_rmv result why3_Q0 : (set vertex)))) ->
                                ((shortest_path src result (map_get d1 result : int)) ->
                                 (forall why3_S1:(set vertex).
@@ -388,31 +388,31 @@ theory Why2
                                    (forall why3_Q2:(set vertex).
                                      (forall d2:(map vertex int).
                                        (forall su:(set vertex).
-                                         (((why3_Incl su (g_succ result : (set vertex))) and
-                                           ((why3_Inv src why3_S1 why3_Q2 d2) and
+                                         (((why3_Incl su (g_succ result : (set vertex))) /\
+                                           ((why3_Inv src why3_S1 why3_Q2 d2) /\
                                             (why3_InvSucc2 src why3_S1 why3_Q2 result su))) ->
                                           ((not (why3_Is_empty su)) ->
                                            ((not (why3_Is_empty su)) ->
                                             (forall result0:vertex.
                                               (forall su0:(set vertex).
-                                                (((why3_In result0 su) and
+                                                (((why3_In result0 su) /\
                                                   (su0 = (set_rmv result0 su : (set vertex)))) ->
                                                  (forall why3_Q3:(set vertex).
                                                    (forall d3:(map vertex int).
-                                                     ((((why3_In result0 why3_S1) and
-                                                        ((why3_Q3 = why3_Q2) and
-                                                         (d3 = d2))) or
-                                                       (((why3_In result0 why3_Q3) and
-                                                         ((Int.(>=) (Int.(+) (map_get d3 result : int) (weight result result0 : int) : int) (map_get d3 result0 : int)) and
-                                                          ((why3_Q3 = why3_Q2) and
-                                                           (d3 = d2)))) or
-                                                        (((why3_In result0 why3_Q3) and
-                                                          ((Int.(<) (Int.(+) (map_get d3 result : int) (weight result result0 : int) : int) (map_get d3 result0 : int)) and
-                                                           ((why3_Q3 = why3_Q2) and
-                                                            (d3 = (map_set d2 result0 (Int.(+) (map_get d3 result : int) (weight result result0 : int) : int) : (map vertex int)))))) or
-                                                         ((not (why3_In result0 why3_S1)) and
-                                                          ((not (why3_In result0 why3_Q3)) and
-                                                           ((why3_Q3 = (set_add result0 why3_Q2 : (set vertex))) and
+                                                     ((((why3_In result0 why3_S1) /\
+                                                        ((why3_Q3 = why3_Q2) /\
+                                                         (d3 = d2))) \/
+                                                       (((why3_In result0 why3_Q3) /\
+                                                         ((Int.(>=) (Int.(+) (map_get d3 result : int) (weight result result0 : int) : int) (map_get d3 result0 : int)) /\
+                                                          ((why3_Q3 = why3_Q2) /\
+                                                           (d3 = d2)))) \/
+                                                        (((why3_In result0 why3_Q3) /\
+                                                          ((Int.(<) (Int.(+) (map_get d3 result : int) (weight result result0 : int) : int) (map_get d3 result0 : int)) /\
+                                                           ((why3_Q3 = why3_Q2) /\
+                                                            (d3 = (map_set d2 result0 (Int.(+) (map_get d3 result : int) (weight result result0 : int) : int) : (map vertex int)))))) \/
+                                                         ((not (why3_In result0 why3_S1)) /\
+                                                          ((not (why3_In result0 why3_Q3)) /\
+                                                           ((why3_Q3 = (set_add result0 why3_Q2 : (set vertex))) /\
                                                             (d3 = (map_set d2 result0 (Int.(+) (map_get d3 result : int) (weight result result0 : int) : int) : (map vertex int))))))))) ->
                                                       (why3_Incl su0 (g_succ result : (set vertex))))))))))))))))))))))))))))))))))
 
@@ -420,23 +420,23 @@ theory Why2
     (forall src:vertex.
       (forall dst:vertex.
         (forall d:(map vertex int).
-          (((why3_In src (why3_V : (set vertex))) and
+          (((why3_In src (why3_V : (set vertex))) /\
             (why3_In dst (why3_V : (set vertex)))) ->
            (forall why3_Q:(set vertex).
              (forall why3_S:(set vertex).
                (forall d0:(map vertex int).
-                 (((why3_Is_empty why3_S) and
-                   ((why3_Q = (set_add src (set_empty : (set vertex)) : (set vertex))) and
+                 (((why3_Is_empty why3_S) /\
+                   ((why3_Q = (set_add src (set_empty : (set vertex)) : (set vertex))) /\
                     (d0 = (map_set d src 0 : (map vertex int))))) ->
                   (forall why3_Q0:(set vertex).
                     (forall why3_S0:(set vertex).
                       (forall d1:(map vertex int).
-                        (((why3_Inv src why3_S0 why3_Q0 d1) and
+                        (((why3_Inv src why3_S0 why3_Q0 d1) /\
                           (why3_InvSucc src why3_S0 why3_Q0)) ->
                          ((not (why3_Is_empty why3_Q0)) ->
                           (forall result:vertex.
                             (forall why3_Q1:(set vertex).
-                              (((why3_Min result why3_Q0 d1) and
+                              (((why3_Min result why3_Q0 d1) /\
                                 (why3_Q1 = (set_rmv result why3_Q0 : (set vertex)))) ->
                                ((shortest_path src result (map_get d1 result : int)) ->
                                 (forall why3_S1:(set vertex).
@@ -444,31 +444,31 @@ theory Why2
                                    (forall why3_Q2:(set vertex).
                                      (forall d2:(map vertex int).
                                        (forall su:(set vertex).
-                                         (((why3_Incl su (g_succ result : (set vertex))) and
-                                           ((why3_Inv src why3_S1 why3_Q2 d2) and
+                                         (((why3_Incl su (g_succ result : (set vertex))) /\
+                                           ((why3_Inv src why3_S1 why3_Q2 d2) /\
                                             (why3_InvSucc2 src why3_S1 why3_Q2 result su))) ->
                                           ((not (why3_Is_empty su)) ->
                                            ((not (why3_Is_empty su)) ->
                                             (forall result0:vertex.
                                               (forall su0:(set vertex).
-                                                (((why3_In result0 su) and
+                                                (((why3_In result0 su) /\
                                                   (su0 = (set_rmv result0 su : (set vertex)))) ->
                                                  (forall why3_Q3:(set vertex).
                                                    (forall d3:(map vertex int).
-                                                     ((((why3_In result0 why3_S1) and
-                                                        ((why3_Q3 = why3_Q2) and
-                                                         (d3 = d2))) or
-                                                       (((why3_In result0 why3_Q3) and
-                                                         ((Int.(>=) (Int.(+) (map_get d3 result : int) (weight result result0 : int) : int) (map_get d3 result0 : int)) and
-                                                          ((why3_Q3 = why3_Q2) and
-                                                           (d3 = d2)))) or
-                                                        (((why3_In result0 why3_Q3) and
-                                                          ((Int.(<) (Int.(+) (map_get d3 result : int) (weight result result0 : int) : int) (map_get d3 result0 : int)) and
-                                                           ((why3_Q3 = why3_Q2) and
-                                                            (d3 = (map_set d2 result0 (Int.(+) (map_get d3 result : int) (weight result result0 : int) : int) : (map vertex int)))))) or
-                                                         ((not (why3_In result0 why3_S1)) and
-                                                          ((not (why3_In result0 why3_Q3)) and
-                                                           ((why3_Q3 = (set_add result0 why3_Q2 : (set vertex))) and
+                                                     ((((why3_In result0 why3_S1) /\
+                                                        ((why3_Q3 = why3_Q2) /\
+                                                         (d3 = d2))) \/
+                                                       (((why3_In result0 why3_Q3) /\
+                                                         ((Int.(>=) (Int.(+) (map_get d3 result : int) (weight result result0 : int) : int) (map_get d3 result0 : int)) /\
+                                                          ((why3_Q3 = why3_Q2) /\
+                                                           (d3 = d2)))) \/
+                                                        (((why3_In result0 why3_Q3) /\
+                                                          ((Int.(<) (Int.(+) (map_get d3 result : int) (weight result result0 : int) : int) (map_get d3 result0 : int)) /\
+                                                           ((why3_Q3 = why3_Q2) /\
+                                                            (d3 = (map_set d2 result0 (Int.(+) (map_get d3 result : int) (weight result result0 : int) : int) : (map vertex int)))))) \/
+                                                         ((not (why3_In result0 why3_S1)) /\
+                                                          ((not (why3_In result0 why3_Q3)) /\
+                                                           ((why3_Q3 = (set_add result0 why3_Q2 : (set vertex))) /\
                                                             (d3 = (map_set d2 result0 (Int.(+) (map_get d3 result : int) (weight result result0 : int) : int) : (map vertex int))))))))) ->
                                                       (why3_Inv src why3_S1 why3_Q3 d3))))))))))))))))))))))))))))))))
 
@@ -476,23 +476,23 @@ theory Why2
     (forall src:vertex.
       (forall dst:vertex.
         (forall d:(map vertex int).
-          (((why3_In src (why3_V : (set vertex))) and
+          (((why3_In src (why3_V : (set vertex))) /\
             (why3_In dst (why3_V : (set vertex)))) ->
            (forall why3_Q:(set vertex).
              (forall why3_S:(set vertex).
                (forall d0:(map vertex int).
-                 (((why3_Is_empty why3_S) and
-                   ((why3_Q = (set_add src (set_empty : (set vertex)) : (set vertex))) and
+                 (((why3_Is_empty why3_S) /\
+                   ((why3_Q = (set_add src (set_empty : (set vertex)) : (set vertex))) /\
                     (d0 = (map_set d src 0 : (map vertex int))))) ->
                   (forall why3_Q0:(set vertex).
                     (forall why3_S0:(set vertex).
                       (forall d1:(map vertex int).
-                        (((why3_Inv src why3_S0 why3_Q0 d1) and
+                        (((why3_Inv src why3_S0 why3_Q0 d1) /\
                           (why3_InvSucc src why3_S0 why3_Q0)) ->
                          ((not (why3_Is_empty why3_Q0)) ->
                           (forall result:vertex.
                             (forall why3_Q1:(set vertex).
-                              (((why3_Min result why3_Q0 d1) and
+                              (((why3_Min result why3_Q0 d1) /\
                                 (why3_Q1 = (set_rmv result why3_Q0 : (set vertex)))) ->
                                ((shortest_path src result (map_get d1 result : int)) ->
                                 (forall why3_S1:(set vertex).
@@ -500,31 +500,31 @@ theory Why2
                                    (forall why3_Q2:(set vertex).
                                      (forall d2:(map vertex int).
                                        (forall su:(set vertex).
-                                         (((why3_Incl su (g_succ result : (set vertex))) and
-                                           ((why3_Inv src why3_S1 why3_Q2 d2) and
+                                         (((why3_Incl su (g_succ result : (set vertex))) /\
+                                           ((why3_Inv src why3_S1 why3_Q2 d2) /\
                                             (why3_InvSucc2 src why3_S1 why3_Q2 result su))) ->
                                           ((not (why3_Is_empty su)) ->
                                            ((not (why3_Is_empty su)) ->
                                             (forall result0:vertex.
                                               (forall su0:(set vertex).
-                                                (((why3_In result0 su) and
+                                                (((why3_In result0 su) /\
                                                   (su0 = (set_rmv result0 su : (set vertex)))) ->
                                                  (forall why3_Q3:(set vertex).
                                                    (forall d3:(map vertex int).
-                                                     ((((why3_In result0 why3_S1) and
-                                                        ((why3_Q3 = why3_Q2) and
-                                                         (d3 = d2))) or
-                                                       (((why3_In result0 why3_Q3) and
-                                                         ((Int.(>=) (Int.(+) (map_get d3 result : int) (weight result result0 : int) : int) (map_get d3 result0 : int)) and
-                                                          ((why3_Q3 = why3_Q2) and
-                                                           (d3 = d2)))) or
-                                                        (((why3_In result0 why3_Q3) and
-                                                          ((Int.(<) (Int.(+) (map_get d3 result : int) (weight result result0 : int) : int) (map_get d3 result0 : int)) and
-                                                           ((why3_Q3 = why3_Q2) and
-                                                            (d3 = (map_set d2 result0 (Int.(+) (map_get d3 result : int) (weight result result0 : int) : int) : (map vertex int)))))) or
-                                                         ((not (why3_In result0 why3_S1)) and
-                                                          ((not (why3_In result0 why3_Q3)) and
-                                                           ((why3_Q3 = (set_add result0 why3_Q2 : (set vertex))) and
+                                                     ((((why3_In result0 why3_S1) /\
+                                                        ((why3_Q3 = why3_Q2) /\
+                                                         (d3 = d2))) \/
+                                                       (((why3_In result0 why3_Q3) /\
+                                                         ((Int.(>=) (Int.(+) (map_get d3 result : int) (weight result result0 : int) : int) (map_get d3 result0 : int)) /\
+                                                          ((why3_Q3 = why3_Q2) /\
+                                                           (d3 = d2)))) \/
+                                                        (((why3_In result0 why3_Q3) /\
+                                                          ((Int.(<) (Int.(+) (map_get d3 result : int) (weight result result0 : int) : int) (map_get d3 result0 : int)) /\
+                                                           ((why3_Q3 = why3_Q2) /\
+                                                            (d3 = (map_set d2 result0 (Int.(+) (map_get d3 result : int) (weight result result0 : int) : int) : (map vertex int)))))) \/
+                                                         ((not (why3_In result0 why3_S1)) /\
+                                                          ((not (why3_In result0 why3_Q3)) /\
+                                                           ((why3_Q3 = (set_add result0 why3_Q2 : (set vertex))) /\
                                                             (d3 = (map_set d2 result0 (Int.(+) (map_get d3 result : int) (weight result result0 : int) : int) : (map vertex int))))))))) ->
                                                       (why3_InvSucc2 src why3_S1 why3_Q3 result su0))))))))))))))))))))))))))))))))
 
@@ -532,23 +532,23 @@ theory Why2
     (forall src:vertex.
       (forall dst:vertex.
         (forall d:(map vertex int).
-          (((why3_In src (why3_V : (set vertex))) and
+          (((why3_In src (why3_V : (set vertex))) /\
             (why3_In dst (why3_V : (set vertex)))) ->
            (forall why3_Q:(set vertex).
              (forall why3_S:(set vertex).
                (forall d0:(map vertex int).
-                 (((why3_Is_empty why3_S) and
-                   ((why3_Q = (set_add src (set_empty : (set vertex)) : (set vertex))) and
+                 (((why3_Is_empty why3_S) /\
+                   ((why3_Q = (set_add src (set_empty : (set vertex)) : (set vertex))) /\
                     (d0 = (map_set d src 0 : (map vertex int))))) ->
                   (forall why3_Q0:(set vertex).
                     (forall why3_S0:(set vertex).
                       (forall d1:(map vertex int).
-                        (((why3_Inv src why3_S0 why3_Q0 d1) and
+                        (((why3_Inv src why3_S0 why3_Q0 d1) /\
                           (why3_InvSucc src why3_S0 why3_Q0)) ->
                          ((not (why3_Is_empty why3_Q0)) ->
                           (forall result:vertex.
                             (forall why3_Q1:(set vertex).
-                              (((why3_Min result why3_Q0 d1) and
+                              (((why3_Min result why3_Q0 d1) /\
                                 (why3_Q1 = (set_rmv result why3_Q0 : (set vertex)))) ->
                                ((shortest_path src result (map_get d1 result : int)) ->
                                 (forall why3_S1:(set vertex).
@@ -556,31 +556,31 @@ theory Why2
                                    (forall why3_Q2:(set vertex).
                                      (forall d2:(map vertex int).
                                        (forall su:(set vertex).
-                                         (((why3_Incl su (g_succ result : (set vertex))) and
-                                           ((why3_Inv src why3_S1 why3_Q2 d2) and
+                                         (((why3_Incl su (g_succ result : (set vertex))) /\
+                                           ((why3_Inv src why3_S1 why3_Q2 d2) /\
                                             (why3_InvSucc2 src why3_S1 why3_Q2 result su))) ->
                                           ((not (why3_Is_empty su)) ->
                                            ((not (why3_Is_empty su)) ->
                                             (forall result0:vertex.
                                               (forall su0:(set vertex).
-                                                (((why3_In result0 su) and
+                                                (((why3_In result0 su) /\
                                                   (su0 = (set_rmv result0 su : (set vertex)))) ->
                                                  (forall why3_Q3:(set vertex).
                                                    (forall d3:(map vertex int).
-                                                     ((((why3_In result0 why3_S1) and
-                                                        ((why3_Q3 = why3_Q2) and
-                                                         (d3 = d2))) or
-                                                       (((why3_In result0 why3_Q3) and
-                                                         ((Int.(>=) (Int.(+) (map_get d3 result : int) (weight result result0 : int) : int) (map_get d3 result0 : int)) and
-                                                          ((why3_Q3 = why3_Q2) and
-                                                           (d3 = d2)))) or
-                                                        (((why3_In result0 why3_Q3) and
-                                                          ((Int.(<) (Int.(+) (map_get d3 result : int) (weight result result0 : int) : int) (map_get d3 result0 : int)) and
-                                                           ((why3_Q3 = why3_Q2) and
-                                                            (d3 = (map_set d2 result0 (Int.(+) (map_get d3 result : int) (weight result result0 : int) : int) : (map vertex int)))))) or
-                                                         ((not (why3_In result0 why3_S1)) and
-                                                          ((not (why3_In result0 why3_Q3)) and
-                                                           ((why3_Q3 = (set_add result0 why3_Q2 : (set vertex))) and
+                                                     ((((why3_In result0 why3_S1) /\
+                                                        ((why3_Q3 = why3_Q2) /\
+                                                         (d3 = d2))) \/
+                                                       (((why3_In result0 why3_Q3) /\
+                                                         ((Int.(>=) (Int.(+) (map_get d3 result : int) (weight result result0 : int) : int) (map_get d3 result0 : int)) /\
+                                                          ((why3_Q3 = why3_Q2) /\
+                                                           (d3 = d2)))) \/
+                                                        (((why3_In result0 why3_Q3) /\
+                                                          ((Int.(<) (Int.(+) (map_get d3 result : int) (weight result result0 : int) : int) (map_get d3 result0 : int)) /\
+                                                           ((why3_Q3 = why3_Q2) /\
+                                                            (d3 = (map_set d2 result0 (Int.(+) (map_get d3 result : int) (weight result result0 : int) : int) : (map vertex int)))))) \/
+                                                         ((not (why3_In result0 why3_S1)) /\
+                                                          ((not (why3_In result0 why3_Q3)) /\
+                                                           ((why3_Q3 = (set_add result0 why3_Q2 : (set vertex))) /\
                                                             (d3 = (map_set d2 result0 (Int.(+) (map_get d3 result : int) (weight result result0 : int) : int) : (map vertex int))))))))) ->
                                                       (Int.(<=) 0 (set_card su : int)))))))))))))))))))))))))))))))))
 
@@ -588,23 +588,23 @@ theory Why2
     (forall src:vertex.
       (forall dst:vertex.
         (forall d:(map vertex int).
-          (((why3_In src (why3_V : (set vertex))) and
+          (((why3_In src (why3_V : (set vertex))) /\
             (why3_In dst (why3_V : (set vertex)))) ->
            (forall why3_Q:(set vertex).
              (forall why3_S:(set vertex).
                (forall d0:(map vertex int).
-                 (((why3_Is_empty why3_S) and
-                   ((why3_Q = (set_add src (set_empty : (set vertex)) : (set vertex))) and
+                 (((why3_Is_empty why3_S) /\
+                   ((why3_Q = (set_add src (set_empty : (set vertex)) : (set vertex))) /\
                     (d0 = (map_set d src 0 : (map vertex int))))) ->
                   (forall why3_Q0:(set vertex).
                     (forall why3_S0:(set vertex).
                       (forall d1:(map vertex int).
-                        (((why3_Inv src why3_S0 why3_Q0 d1) and
+                        (((why3_Inv src why3_S0 why3_Q0 d1) /\
                           (why3_InvSucc src why3_S0 why3_Q0)) ->
                          ((not (why3_Is_empty why3_Q0)) ->
                           (forall result:vertex.
                             (forall why3_Q1:(set vertex).
-                              (((why3_Min result why3_Q0 d1) and
+                              (((why3_Min result why3_Q0 d1) /\
                                 (why3_Q1 = (set_rmv result why3_Q0 : (set vertex)))) ->
                                ((shortest_path src result (map_get d1 result : int)) ->
                                 (forall why3_S1:(set vertex).
@@ -612,31 +612,31 @@ theory Why2
                                    (forall why3_Q2:(set vertex).
                                      (forall d2:(map vertex int).
                                        (forall su:(set vertex).
-                                         (((why3_Incl su (g_succ result : (set vertex))) and
-                                           ((why3_Inv src why3_S1 why3_Q2 d2) and
+                                         (((why3_Incl su (g_succ result : (set vertex))) /\
+                                           ((why3_Inv src why3_S1 why3_Q2 d2) /\
                                             (why3_InvSucc2 src why3_S1 why3_Q2 result su))) ->
                                           ((not (why3_Is_empty su)) ->
                                            ((not (why3_Is_empty su)) ->
                                             (forall result0:vertex.
                                               (forall su0:(set vertex).
-                                                (((why3_In result0 su) and
+                                                (((why3_In result0 su) /\
                                                   (su0 = (set_rmv result0 su : (set vertex)))) ->
                                                  (forall why3_Q3:(set vertex).
                                                    (forall d3:(map vertex int).
-                                                     ((((why3_In result0 why3_S1) and
-                                                        ((why3_Q3 = why3_Q2) and
-                                                         (d3 = d2))) or
-                                                       (((why3_In result0 why3_Q3) and
-                                                         ((Int.(>=) (Int.(+) (map_get d3 result : int) (weight result result0 : int) : int) (map_get d3 result0 : int)) and
-                                                          ((why3_Q3 = why3_Q2) and
-                                                           (d3 = d2)))) or
-                                                        (((why3_In result0 why3_Q3) and
-                                                          ((Int.(<) (Int.(+) (map_get d3 result : int) (weight result result0 : int) : int) (map_get d3 result0 : int)) and
-                                                           ((why3_Q3 = why3_Q2) and
-                                                            (d3 = (map_set d2 result0 (Int.(+) (map_get d3 result : int) (weight result result0 : int) : int) : (map vertex int)))))) or
-                                                         ((not (why3_In result0 why3_S1)) and
-                                                          ((not (why3_In result0 why3_Q3)) and
-                                                           ((why3_Q3 = (set_add result0 why3_Q2 : (set vertex))) and
+                                                     ((((why3_In result0 why3_S1) /\
+                                                        ((why3_Q3 = why3_Q2) /\
+                                                         (d3 = d2))) \/
+                                                       (((why3_In result0 why3_Q3) /\
+                                                         ((Int.(>=) (Int.(+) (map_get d3 result : int) (weight result result0 : int) : int) (map_get d3 result0 : int)) /\
+                                                          ((why3_Q3 = why3_Q2) /\
+                                                           (d3 = d2)))) \/
+                                                        (((why3_In result0 why3_Q3) /\
+                                                          ((Int.(<) (Int.(+) (map_get d3 result : int) (weight result result0 : int) : int) (map_get d3 result0 : int)) /\
+                                                           ((why3_Q3 = why3_Q2) /\
+                                                            (d3 = (map_set d2 result0 (Int.(+) (map_get d3 result : int) (weight result result0 : int) : int) : (map vertex int)))))) \/
+                                                         ((not (why3_In result0 why3_S1)) /\
+                                                          ((not (why3_In result0 why3_Q3)) /\
+                                                           ((why3_Q3 = (set_add result0 why3_Q2 : (set vertex))) /\
                                                             (d3 = (map_set d2 result0 (Int.(+) (map_get d3 result : int) (weight result result0 : int) : int) : (map vertex int))))))))) ->
                                                       (Int.(<) (set_card su0 : int) (set_card su : int)))))))))))))))))))))))))))))))))
 
@@ -644,23 +644,23 @@ theory Why2
     (forall src:vertex.
       (forall dst:vertex.
         (forall d:(map vertex int).
-          (((why3_In src (why3_V : (set vertex))) and
+          (((why3_In src (why3_V : (set vertex))) /\
             (why3_In dst (why3_V : (set vertex)))) ->
            (forall why3_Q:(set vertex).
              (forall why3_S:(set vertex).
                (forall d0:(map vertex int).
-                 (((why3_Is_empty why3_S) and
-                   ((why3_Q = (set_add src (set_empty : (set vertex)) : (set vertex))) and
+                 (((why3_Is_empty why3_S) /\
+                   ((why3_Q = (set_add src (set_empty : (set vertex)) : (set vertex))) /\
                     (d0 = (map_set d src 0 : (map vertex int))))) ->
                   (forall why3_Q0:(set vertex).
                     (forall why3_S0:(set vertex).
                       (forall d1:(map vertex int).
-                        (((why3_Inv src why3_S0 why3_Q0 d1) and
+                        (((why3_Inv src why3_S0 why3_Q0 d1) /\
                           (why3_InvSucc src why3_S0 why3_Q0)) ->
                          ((not (why3_Is_empty why3_Q0)) ->
                           (forall result:vertex.
                             (forall why3_Q1:(set vertex).
-                              (((why3_Min result why3_Q0 d1) and
+                              (((why3_Min result why3_Q0 d1) /\
                                 (why3_Q1 = (set_rmv result why3_Q0 : (set vertex)))) ->
                                ((shortest_path src result (map_get d1 result : int)) ->
                                 (forall why3_S1:(set vertex).
@@ -668,8 +668,8 @@ theory Why2
                                    (forall why3_Q2:(set vertex).
                                      (forall d2:(map vertex int).
                                        (forall su:(set vertex).
-                                         (((why3_Incl su (g_succ result : (set vertex))) and
-                                           ((why3_Inv src why3_S1 why3_Q2 d2) and
+                                         (((why3_Incl su (g_succ result : (set vertex))) /\
+                                           ((why3_Inv src why3_S1 why3_Q2 d2) /\
                                             (why3_InvSucc2 src why3_S1 why3_Q2 result su))) ->
                                           ((why3_Is_empty su) ->
                                            (why3_Inv src why3_S1 why3_Q2 d2)))))))))))))))))))))))))
@@ -678,23 +678,23 @@ theory Why2
     (forall src:vertex.
       (forall dst:vertex.
         (forall d:(map vertex int).
-          (((why3_In src (why3_V : (set vertex))) and
+          (((why3_In src (why3_V : (set vertex))) /\
             (why3_In dst (why3_V : (set vertex)))) ->
            (forall why3_Q:(set vertex).
              (forall why3_S:(set vertex).
                (forall d0:(map vertex int).
-                 (((why3_Is_empty why3_S) and
-                   ((why3_Q = (set_add src (set_empty : (set vertex)) : (set vertex))) and
+                 (((why3_Is_empty why3_S) /\
+                   ((why3_Q = (set_add src (set_empty : (set vertex)) : (set vertex))) /\
                     (d0 = (map_set d src 0 : (map vertex int))))) ->
                   (forall why3_Q0:(set vertex).
                     (forall why3_S0:(set vertex).
                       (forall d1:(map vertex int).
-                        (((why3_Inv src why3_S0 why3_Q0 d1) and
+                        (((why3_Inv src why3_S0 why3_Q0 d1) /\
                           (why3_InvSucc src why3_S0 why3_Q0)) ->
                          ((not (why3_Is_empty why3_Q0)) ->
                           (forall result:vertex.
                             (forall why3_Q1:(set vertex).
-                              (((why3_Min result why3_Q0 d1) and
+                              (((why3_Min result why3_Q0 d1) /\
                                 (why3_Q1 = (set_rmv result why3_Q0 : (set vertex)))) ->
                                ((shortest_path src result (map_get d1 result : int)) ->
                                 (forall why3_S1:(set vertex).
@@ -702,8 +702,8 @@ theory Why2
                                    (forall why3_Q2:(set vertex).
                                      (forall d2:(map vertex int).
                                        (forall su:(set vertex).
-                                         (((why3_Incl su (g_succ result : (set vertex))) and
-                                           ((why3_Inv src why3_S1 why3_Q2 d2) and
+                                         (((why3_Incl su (g_succ result : (set vertex))) /\
+                                           ((why3_Inv src why3_S1 why3_Q2 d2) /\
                                             (why3_InvSucc2 src why3_S1 why3_Q2 result su))) ->
                                           ((why3_Is_empty su) ->
                                            (why3_InvSucc src why3_S1 why3_Q2)))))))))))))))))))))))))
@@ -712,23 +712,23 @@ theory Why2
     (forall src:vertex.
       (forall dst:vertex.
         (forall d:(map vertex int).
-          (((why3_In src (why3_V : (set vertex))) and
+          (((why3_In src (why3_V : (set vertex))) /\
             (why3_In dst (why3_V : (set vertex)))) ->
            (forall why3_Q:(set vertex).
              (forall why3_S:(set vertex).
                (forall d0:(map vertex int).
-                 (((why3_Is_empty why3_S) and
-                   ((why3_Q = (set_add src (set_empty : (set vertex)) : (set vertex))) and
+                 (((why3_Is_empty why3_S) /\
+                   ((why3_Q = (set_add src (set_empty : (set vertex)) : (set vertex))) /\
                     (d0 = (map_set d src 0 : (map vertex int))))) ->
                   (forall why3_Q0:(set vertex).
                     (forall why3_S0:(set vertex).
                       (forall d1:(map vertex int).
-                        (((why3_Inv src why3_S0 why3_Q0 d1) and
+                        (((why3_Inv src why3_S0 why3_Q0 d1) /\
                           (why3_InvSucc src why3_S0 why3_Q0)) ->
                          ((not (why3_Is_empty why3_Q0)) ->
                           (forall result:vertex.
                             (forall why3_Q1:(set vertex).
-                              (((why3_Min result why3_Q0 d1) and
+                              (((why3_Min result why3_Q0 d1) /\
                                 (why3_Q1 = (set_rmv result why3_Q0 : (set vertex)))) ->
                                ((shortest_path src result (map_get d1 result : int)) ->
                                 (forall why3_S1:(set vertex).
@@ -736,8 +736,8 @@ theory Why2
                                    (forall why3_Q2:(set vertex).
                                      (forall d2:(map vertex int).
                                        (forall su:(set vertex).
-                                         (((why3_Incl su (g_succ result : (set vertex))) and
-                                           ((why3_Inv src why3_S1 why3_Q2 d2) and
+                                         (((why3_Incl su (g_succ result : (set vertex))) /\
+                                           ((why3_Inv src why3_S1 why3_Q2 d2) /\
                                             (why3_InvSucc2 src why3_S1 why3_Q2 result su))) ->
                                           ((why3_Is_empty su) ->
                                            (Int.(<=) 0 (Int.(-) (set_card (why3_V : (set vertex)) : int) (set_card why3_S0 : int) : int))))))))))))))))))))))))))
@@ -746,23 +746,23 @@ theory Why2
     (forall src:vertex.
       (forall dst:vertex.
         (forall d:(map vertex int).
-          (((why3_In src (why3_V : (set vertex))) and
+          (((why3_In src (why3_V : (set vertex))) /\
             (why3_In dst (why3_V : (set vertex)))) ->
            (forall why3_Q:(set vertex).
              (forall why3_S:(set vertex).
                (forall d0:(map vertex int).
-                 (((why3_Is_empty why3_S) and
-                   ((why3_Q = (set_add src (set_empty : (set vertex)) : (set vertex))) and
+                 (((why3_Is_empty why3_S) /\
+                   ((why3_Q = (set_add src (set_empty : (set vertex)) : (set vertex))) /\
                     (d0 = (map_set d src 0 : (map vertex int))))) ->
                   (forall why3_Q0:(set vertex).
                     (forall why3_S0:(set vertex).
                       (forall d1:(map vertex int).
-                        (((why3_Inv src why3_S0 why3_Q0 d1) and
+                        (((why3_Inv src why3_S0 why3_Q0 d1) /\
                           (why3_InvSucc src why3_S0 why3_Q0)) ->
                          ((not (why3_Is_empty why3_Q0)) ->
                           (forall result:vertex.
                             (forall why3_Q1:(set vertex).
-                              (((why3_Min result why3_Q0 d1) and
+                              (((why3_Min result why3_Q0 d1) /\
                                 (why3_Q1 = (set_rmv result why3_Q0 : (set vertex)))) ->
                                ((shortest_path src result (map_get d1 result : int)) ->
                                 (forall why3_S1:(set vertex).
@@ -770,8 +770,8 @@ theory Why2
                                    (forall why3_Q2:(set vertex).
                                      (forall d2:(map vertex int).
                                        (forall su:(set vertex).
-                                         (((why3_Incl su (g_succ result : (set vertex))) and
-                                           ((why3_Inv src why3_S1 why3_Q2 d2) and
+                                         (((why3_Incl su (g_succ result : (set vertex))) /\
+                                           ((why3_Inv src why3_S1 why3_Q2 d2) /\
                                             (why3_InvSucc2 src why3_S1 why3_Q2 result su))) ->
                                           ((why3_Is_empty su) ->
                                            (Int.(<) (Int.(-) (set_card (why3_V : (set vertex)) : int) (set_card why3_S1 : int) : int) (Int.(-) (set_card (why3_V : (set vertex)) : int) (set_card why3_S0 : int) : int))))))))))))))))))))))))))
@@ -780,18 +780,18 @@ theory Why2
     (forall src:vertex.
       (forall dst:vertex.
         (forall d:(map vertex int).
-          (((why3_In src (why3_V : (set vertex))) and
+          (((why3_In src (why3_V : (set vertex))) /\
             (why3_In dst (why3_V : (set vertex)))) ->
            (forall why3_Q:(set vertex).
              (forall why3_S:(set vertex).
                (forall d0:(map vertex int).
-                 (((why3_Is_empty why3_S) and
-                   ((why3_Q = (set_add src (set_empty : (set vertex)) : (set vertex))) and
+                 (((why3_Is_empty why3_S) /\
+                   ((why3_Q = (set_add src (set_empty : (set vertex)) : (set vertex))) /\
                     (d0 = (map_set d src 0 : (map vertex int))))) ->
                   (forall why3_Q0:(set vertex).
                     (forall why3_S0:(set vertex).
                       (forall d1:(map vertex int).
-                        (((why3_Inv src why3_S0 why3_Q0 d1) and
+                        (((why3_Inv src why3_S0 why3_Q0 d1) /\
                           (why3_InvSucc src why3_S0 why3_Q0)) ->
                          ((why3_Is_empty why3_Q0) ->
                           (forall v:vertex.
@@ -802,18 +802,18 @@ theory Why2
     (forall src:vertex.
       (forall dst:vertex.
         (forall d:(map vertex int).
-          (((why3_In src (why3_V : (set vertex))) and
+          (((why3_In src (why3_V : (set vertex))) /\
             (why3_In dst (why3_V : (set vertex)))) ->
            (forall why3_Q:(set vertex).
              (forall why3_S:(set vertex).
                (forall d0:(map vertex int).
-                 (((why3_Is_empty why3_S) and
-                   ((why3_Q = (set_add src (set_empty : (set vertex)) : (set vertex))) and
+                 (((why3_Is_empty why3_S) /\
+                   ((why3_Q = (set_add src (set_empty : (set vertex)) : (set vertex))) /\
                     (d0 = (map_set d src 0 : (map vertex int))))) ->
                   (forall why3_Q0:(set vertex).
                     (forall why3_S0:(set vertex).
                       (forall d1:(map vertex int).
-                        (((why3_Inv src why3_S0 why3_Q0 d1) and
+                        (((why3_Inv src why3_S0 why3_Q0 d1) /\
                           (why3_InvSucc src why3_S0 why3_Q0)) ->
                          ((why3_Is_empty why3_Q0) ->
                           (forall v:vertex.

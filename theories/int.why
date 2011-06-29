@@ -1,15 +1,15 @@
 
 theory Int
 
-  logic zero : int = 0
-  logic one  : int = 1
+  function zero : int = 0
+  function one  : int = 1
 
-  logic (< ) int int
-  logic (> ) (x y : int) = y < x
-  logic (<=) (x y : int) = x < y \/ x = y
+  predicate (< ) int int
+  predicate (> ) (x y : int) = y < x
+  predicate (<=) (x y : int) = x < y \/ x = y
 
-  clone export algebra.OrderedUnitaryCommutativeRing with
-     type t = int, logic zero = zero, logic one = one, logic (<=) = (<=)
+  clone export algebra.OrderedUnitaryCommutativeRing with type t = int,
+    function zero = zero, function one = one, predicate (<=) = (<=)
 
 end
 
@@ -17,7 +17,7 @@ theory Abs
 
   use import Int
 
-  logic abs (x:int) : int = if x >= 0 then x else -x
+  function abs (x:int) : int = if x >= 0 then x else -x
 
   lemma Abs_pos: forall x:int. abs x >= 0
 
@@ -26,7 +26,7 @@ end
 theory MinMax
 
   use import Int
-  clone export comparison.MinMax with type t = int, logic ge = (>=)
+  clone export comparison.MinMax with type t = int, predicate ge = (>=)
 
 end
 
@@ -35,8 +35,8 @@ theory EuclideanDivision
   use import Int
   use import Abs
 
-  logic div int int : int
-  logic mod int int : int
+  function div int int : int
+  function mod int int : int
 
   axiom Div_mod:
     forall x y:int. y <> 0 -> x = y * div x y + mod x y
@@ -58,8 +58,8 @@ theory ComputerDivision
   use import Int
   use import Abs
 
-  logic div int int : int
-  logic mod int int : int
+  function div int int : int
+  function mod int int : int
 
   axiom Div_mod:
     forall x y:int. y <> 0 -> x = y * div x y + mod x y
@@ -107,10 +107,10 @@ theory Exponentiation
   use import Int
 
   type t
-  logic one : t
-  logic (*) t t : t
+  function one : t
+  function (*) t t : t
 
-  logic power t int : t
+  function power t int : t
 
   axiom Power_0 : forall x: t. power x 0 = one
 
@@ -123,7 +123,7 @@ theory Power
   use import Int
 
   clone export
-    Exponentiation with type t = int, logic one = one, logic (*) = (*)
+    Exponentiation with type t = int, function one = one, function (*) = (*)
 
   lemma Power_1 : forall x : int. power x 1 = x
 
@@ -142,10 +142,10 @@ theory NumOfParam
 
   use import Int
 
-  logic pr param int
+  predicate pr param int
 
   (** number of [n] such that [a <= n < b] and [pr(p,n)] *)
-  logic num_of (p : param) (a b : int) : int
+  function num_of (p : param) (a b : int) : int
 
   axiom Num_of_empty :
     forall p : param, a b : int.
@@ -195,13 +195,13 @@ end
 
 theory NumOf
 
-  logic pr int
+  predicate pr int
 
-  logic pr0 () (n : int) = pr n
+  predicate pr0 () (n : int) = pr n
 
-  clone NumOfParam as N with type param = tuple0, logic pr = pr0
+  clone NumOfParam as N with type param = tuple0, predicate pr = pr0
 
-  logic num_of (a b : int) : int = N.num_of () a b
+  function num_of (a b : int) : int = N.num_of () a b
 
 end
 
@@ -211,7 +211,7 @@ theory Divisibility
 
   use import Int
 
-  logic divides (a b : int) = exists q : int. b = q * a
+  predicate divides (a b : int) = exists q : int. b = q * a
 
   lemma Divides_x_zero: forall x:int. divides x 0
 
@@ -225,7 +225,7 @@ theory Gcd
   use import Int
   use import Divisibility
 
-  logic gcd (a b g : int) =
+  predicate gcd (a b g : int) =
     divides g a /\
     divides g b /\
     forall x : int. divides x a -> divides x b -> divides x g
@@ -253,13 +253,13 @@ end
 theory Induction
   use import Int
 
-  logic p int
+  predicate p int
 
   lemma Induction :
     (forall n:int. 0 <= n -> (forall k:int. 0 <= k < n -> p k) -> p n) ->
     forall n:int. 0 <= n -> p n
 
-  logic bound : int
+  function bound : int
 
   lemma Induction_bound :
     (forall n:int. bound <= n ->

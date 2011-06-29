@@ -11,7 +11,7 @@ module Quicksort
   use import module array.ArrayEq
 
   let swap (a: array int) (i: int) (j: int) =
-    { 0 <= i < length a and 0 <= j < length a }
+    { 0 <= i < length a /\ 0 <= j < length a }
     let v = a[i] in
     a[i] <- a[j];
     a[j] <- v
@@ -23,7 +23,7 @@ module Quicksort
     for i = 0 to length a - 1 do
       (* a[0..i[ is sorted; now find minimum of a[i..n[ *)
       invariant
-        { sorted_sub a 0 i and permut a (at a L) and
+        { sorted_sub a 0 i /\ permut a (at a L) /\
           forall k1 k2: int. 0 <= k1 < i <= k2 < length a -> a[k1] <= a[k2] }
       let min = ref i in
       for j = i + 1 to length a - 1 do
@@ -35,7 +35,7 @@ module Quicksort
       if !min <> i then swap a !min i;
       assert { permut a (at a L1) }
     done
-    { sorted a and permut a (old a) }
+    { sorted a /\ permut a (old a) }
 
 end
 

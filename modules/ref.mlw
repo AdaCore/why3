@@ -4,7 +4,7 @@ module Ref
 
   type ref 'a = {| mutable contents : 'a |}
 
-  logic (!) (x: ref 'a) : 'a = x.contents
+  function (!) (x: ref 'a) : 'a = x.contents
 
   (* parameter ref : v:'a -> {} ref 'a { result = {| contents = v |} } *)
   let ref (v: 'a) = {} {| contents = v |} { result = {| contents = v |} }

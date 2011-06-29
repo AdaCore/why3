@@ -3,7 +3,7 @@ theory Power
 
   use import int.Int
 
-  logic power int int : int
+  function power int int : int
 
   axiom Power_0 : forall x : int. power x 0 = 1
 
@@ -50,7 +50,7 @@ module M
     let p = ref x in
     let e = ref n in
     while !e > 0 do
-      invariant { 0 <= !e and !r * power !p !e = power x n }
+      invariant { 0 <= !e /\ !r * power !p !e = power x n }
       variant   { !e }
       if mod !e 2 = 1 then r := !r * !p;
       p := !p * !p;

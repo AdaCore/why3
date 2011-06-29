@@ -20,28 +20,28 @@ module M
   let split l0 =
     {  length l0 >= 2 }
     let rec split_aux (l1 : list 'a) l2 l variant { length l } =
-      { length l2 = length l1 or length l2 = length l1 + 1 }
+      { length l2 = length l1 \/ length l2 = length l1 + 1 }
       match l with
       | Nil -> (l1, l2)
       | Cons x r -> split_aux l2 (Cons x l1) r
       end
       { let r1, r2 = result in
-        (length r2 = length r1 or length r2 = length r1 + 1) and
+        (length r2 = length r1 \/ length r2 = length r1 + 1) /\
         permut (r1 ++ r2) (l1 ++ (l2 ++ l)) }
     in
     split_aux Nil Nil l0
     { let (l1, l2) = result in
-      1 <= length l1 and 1 <= length l2 and permut l0 (l1 ++ l2) }
+      1 <= length l1 /\ 1 <= length l2 /\ permut l0 (l1 ++ l2) }
 
   let rec merge l1 l2 variant { length l1 + length l2 } =
-    { sorted l1 and sorted l2 }
+    { sorted l1 /\ sorted l2 }
     match l1, l2 with
     | Nil, _ -> l2
     | _, Nil -> l1
     | Cons x1 r1, Cons x2 r2 ->
        if x1 <= x2 then Cons x1 (merge r1 l2) else Cons x2 (merge l1 r2)
     end
-    { sorted result and permut result (l1 ++ l2) }
+    { sorted result /\ permut result (l1 ++ l2) }
 
   let rec mergesort l variant { length l } =
     { }
@@ -49,7 +49,7 @@ module M
       | Nil | Cons _ Nil -> l
       | _ -> let l1, l2 = split l in merge (mergesort l1) (mergesort l2)
     end
-    { sorted result and permut l result }
+    { sorted result /\ permut l result }
 
 end
 

@@ -11,7 +11,7 @@ module Decrease1
   use import module ref.Ref
   use import module array.Array
 
-  logic decrease1 (a: array int) =
+  predicate decrease1 (a: array int) =
     forall i: int. 0 <= i < length a - 1 -> a[i+1] >= a[i] - 1
 
   lemma decrease1_induction:
@@ -25,7 +25,7 @@ module Decrease1
     let i = ref 0 in
     try
       while !i < length a do
-        invariant { 0 <= !i and
+        invariant { 0 <= !i /\
                     forall j: int. 0 <= j < !i -> j < length a -> a[j] <> 0 }
         variant   { length a - !i }
         if a[!i] = 0 then raise Found;
@@ -35,20 +35,20 @@ module Decrease1
     with Found ->
       !i
     end
-    {  (result = -1 and forall j: int. 0 <= j < length a -> a[j] <> 0)
-    or (0 <= result < length a and a[result] = 0 and
+    {  (result = -1 /\ forall j: int. 0 <= j < length a -> a[j] <> 0)
+    \/ (0 <= result < length a /\ a[result] = 0 /\
         forall j: int. 0 <= j < result -> a[j] <> 0) }
 
   let rec search_rec (a: array int) (i : int) =
-    { decrease1 a and 0 <= i }
+    { decrease1 a /\ 0 <= i }
     if i < length a then
       if a[i] = 0 then i
       else if a[i] > 0 then search_rec a (i + a[i])
       else search_rec a (i + 1)
     else
       -1
-    {  (result = -1 and forall j: int. i <= j < length a -> a[j] <> 0)
-    or (i <= result < length a and a[result] = 0 and
+    {  (result = -1 /\ forall j: int. i <= j < length a -> a[j] <> 0)
+    \/ (i <= result < length a /\ a[result] = 0 /\
         forall j: int. i <= j < result -> a[j] <> 0) }
 
 end

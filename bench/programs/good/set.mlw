@@ -11,7 +11,7 @@ module M
     v:int ->
       {}
       bool writes x
-      { !x = v and if result=True then !x = 0 else !x <> 0 }
+      { !x = v /\ if result=True then !x = 0 else !x <> 0 }
 
   let p () = {} if set_and_test_zero 0 then 1 else 2 { result = 1 }
 
@@ -19,7 +19,7 @@ module M
     v:int ->
       {}
       bool writes x
-      { !x = v and if result=True then !x <> 0 else !x = 0 }
+      { !x = v /\ if result=True then !x <> 0 else !x = 0 }
 
   let p2 (y:ref int) =
     { !y >= 0 }

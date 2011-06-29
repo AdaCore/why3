@@ -38,12 +38,12 @@ lemma TotalErrorExpanded:
 
 (* the same as above, under the form of a logic function *)
 
-logic round_single (m:mode) (x:real) : single
+function round_single (m:mode) (x:real) : single
 
 axiom RoundSingle: forall m:mode, x:real.
   value (round_single m x) = round m x
 
-logic cos_single (x:single) : single =
+function cos_single (x:single) : single =
   let x2 = round_single NearestTiesToEven (value x * value x) in
   let x2o2 = round_single NearestTiesToEven (0.5 * value x2) in
   round_single NearestTiesToEven (1.0 - value x2o2) 

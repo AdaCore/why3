@@ -48,7 +48,7 @@ let test_all_1 () =
 
 (* from Cesar Munoz's CD3D *)
 
-  logic d : int
+  function d : int
 
 parameter vx : ref int
 parameter vy : ref int
@@ -58,7 +58,7 @@ parameter sq : x:int -> {} int { result = x*x }
 let test_cd3d () =
  { true }
  if !vx=0 && !vy=0 && sq !vx + sq !vy < sq d  then 1 else 2
- { result=1 -> !vx=0 and !vy=0 }
+ { result=1 -> !vx=0 /\ !vy=0 }
 
 end
 

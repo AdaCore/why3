@@ -14,19 +14,19 @@ module AmortizedQueue
   type queue 'a = {| front: list 'a; lenf: int;
                      rear : list 'a; lenr: int; |}
 
-  logic inv (q: queue 'a) =
+  predicate inv (q: queue 'a) =
     length q.front = q.lenf >= length q.rear = q.lenr
 
-  logic sequence (q: queue 'a) : list 'a =
+  function sequence (q: queue 'a) : list 'a =
     q.front ++ reverse q.rear
 
   let empty () =
     {}
     {| front = Nil; lenf = 0; rear = Nil; lenr = 0 |} : queue 'a
-    { inv result and sequence result = Nil }
+    { inv result /\ sequence result = Nil }
 
   let head (q: queue 'a) =
-    { inv q and sequence q <> Nil }
+    { inv q /\ sequence q <> Nil }
     match q.front with
       | Nil      -> absurd
       | Cons x _ -> x
@@ -34,26 +34,26 @@ module AmortizedQueue
     { hd (sequence q) = Some result }
 
   let create (f: list 'a) (lf: int) (r: list 'a) (lr: int) =
-    { lf = length f and lr = length r }
+    { lf = length f /\ lr = length r }
     if lf >= lr then
       {| front = f; lenf = lf; rear = r; lenr = lr |}
     else
       let f = f ++ reverse r in
       {| front = f; lenf = lf + lr; rear = Nil; lenr = 0 |}
-    { inv result and sequence result = f ++ reverse r }
+    { inv result /\ sequence result = f ++ reverse r }
 
   let tail (q: queue 'a) =
-    { inv q and sequence q <> Nil }
+    { inv q /\ sequence q <> Nil }
     match q.front with
       | Nil      -> absurd
       | Cons _ r -> create r (q.lenf - 1) q.rear q.lenr
     end
-    { inv result and tl (sequence q) = Some (sequence result) }
+    { inv result /\ tl (sequence q) = Some (sequence result) }
 
   let enqueue (x: 'a) (q: queue 'a) =
     { inv q }
     create q.front q.lenf (Cons x q.rear) (q.lenr + 1)
-    { inv result and sequence result = sequence q ++ Cons x Nil }
+    { inv result /\ sequence result = sequence q ++ Cons x Nil }
 
 end
 

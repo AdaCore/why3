@@ -16,12 +16,12 @@ theory LambdaCalc
 
 
 (** The problem is this shift no? *)
-  logic shift (x:term 'a) : term 'a = match x with
+  function shift (x:term 'a) : term 'a = match x with
   | Var i -> Var (S i)
   | Lambda l -> Lambda (shift l)
   end
 
-  logic subst (term 'a) nat (term 'b) : term 'a
+  function subst (term 'a) nat (term 'b) : term 'a
 
 (*
   axiom Subst_def : forall t1 : term 'a. forall i : nat.
@@ -45,7 +45,7 @@ theory LambdaCalc
   subst (Lambda t1) i t2 = Lambda (subst t1 (S i) (shift t2))
 
 
-  logic app (t1 : term 'a) (t2 : term 'b) : term 'a
+  function app (t1 : term 'a) (t2 : term 'b) : term 'a
 
   axiom App_def :
   forall t1 : term 'a. forall i : nat. forall t2 : term 'b.
@@ -68,19 +68,19 @@ theory Example
   type tt
   type t =  term tt
 
-  logic a : t
+  function a : t
   axiom Shift_a : shift a = a
   axiom Subst_a : forall t : term 'a. forall i : nat. subst a i t = a
 
   goal G1 : app (Lambda (Var Zero : t)) a = a
 
-  logic b : t
+  function b : t
   axiom Shift_b : shift b = b
   axiom Subst_b : forall t : term 'a. forall i : nat. subst b i t = b
 
   goal G2 : app (Lambda (Var Zero : t)) a = b
 
-  logic id : term 'a = (Lambda (Var Zero))
+  function id : term 'a = (Lambda (Var Zero))
 
   goal G5b :
   let t1 = Lambda (subst (Var (S Zero) : t) (S Zero) a) in
@@ -119,16 +119,16 @@ theory LambdaCalc2
 
   type app 'a 'b
 
-  logic var nat : 'a
+  function var nat : 'a
 
-  logic lambda 'a : app 'b 'a
+  function lambda 'a : app 'b 'a
 
-  logic shift (x:'a) : 'a
+  function shift (x:'a) : 'a
 
   axiom Shift_var : forall i : nat. shift (var i : 'a) = var (S i)
   axiom Shift_lambda : forall t : 'b. shift (lambda t) : app 'a 'b = lambda (shift t)
 
-  logic subst ('a) nat ('b) : 'a
+  function subst ('a) nat ('b) : 'a
 
   axiom Subst_def0 : forall i j : nat.
   forall t : 'a.
@@ -139,7 +139,7 @@ theory LambdaCalc2
   subst (lambda t1) i t2 : app 'a 'b = lambda (subst t1 (S i) (shift t2))
 
 
-  logic app (t1 : app 'b 'a) (t2 : 'b) : 'a
+  function app (t1 : app 'b 'a) (t2 : 'b) : 'a
 
   axiom App_def :
   forall t1 : 'a. forall i : nat. forall t2 : 'b.
@@ -161,19 +161,19 @@ theory Example2
 
   type t
 
-  logic a : t
+  function a : t
   axiom Shift_a : shift a = a
   axiom Subst_a : forall t : 'a. forall i : nat. subst a i t = a
 
   goal G1 : app (lambda (var Zero : t)) a = a
 
-  logic b : t
+  function b : t
   axiom Shift_b : shift b = b
   axiom Subst_b : forall t : 'a. forall i : nat. subst b i t = b
 
   goal G2 : app (lambda (var Zero : t)) a = b
 
-  logic id : app 'a 'a = (lambda (var Zero))
+  function id : app 'a 'a = (lambda (var Zero))
 
   goal G5b :
   let t1 = lambda (subst (var (S Zero) : t) (S Zero) a) in

@@ -25,7 +25,7 @@ module M1
 
   type pointer
   type memory
-  logic get memory pointer int : int
+  function get memory pointer int : int
 
   parameter mem : ref memory
 
@@ -38,7 +38,7 @@ module M1
       let l = ref 0 in
       let u = ref (n-1) in
       while !l <= !u do
-        invariant { 0 <= !l and !u <= n-1 and
+        invariant { 0 <= !l /\ !u <= n-1 /\
             forall k:int. 0 <= k < n -> get !mem t k = v -> !l <= k <= !u }
   	variant { !u - !l }
         let m = div (!l + !u) 2 in
@@ -50,8 +50,8 @@ module M1
     with Return r ->
       r
     end
-    { (result >= 0 and get !mem t result = v) or
-      (result = -1 and forall k:int. 0<=k<n -> get !mem t k <> v) }
+    { (result >= 0 /\ get !mem t result = v) \/
+      (result = -1 /\ forall k:int. 0<=k<n -> get !mem t k <> v) }
 
 end
 
@@ -71,11 +71,11 @@ module M2
 
   type pointer
   type memory
-  logic get memory pointer int : int
+  function get memory pointer int : int
 
   parameter mem : ref memory
 
-  logic block_size memory pointer : int
+  function block_size memory pointer : int
 
   parameter get_ :p : pointer -> ofs : int ->
     { 0 <= ofs < block_size !mem p }
@@ -85,14 +85,14 @@ module M2
   exception Return int
 
   let binary_search (t : pointer) (n : int) (v : int) =
-    { n <= block_size !mem t and
+    { n <= block_size !mem t /\
       forall k1 k2:int.
         0 <= k1 <= k2 <= n-1 -> get !mem t k1 <= get !mem t k2 }
     try
       let l = ref 0 in
       let u = ref (n-1) in
       while !l <= !u do
-        invariant { 0 <= !l and !u <= n-1 and
+        invariant { 0 <= !l /\ !u <= n-1 /\
             forall k:int. 0 <= k < n -> get !mem t k = v -> !l <= k <= !u }
   	variant { !u - !l }
         let m = div (!l + !u) 2 in
@@ -104,8 +104,8 @@ module M2
     with Return r ->
       r
     end
-    { (result >= 0 and get !mem t result = v) or
-      (result = -1 and forall k:int. 0<=k<n -> get !mem t k <> v) }
+    { (result >= 0 /\ get !mem t result = v) \/
+      (result = -1 /\ forall k:int. 0<=k<n -> get !mem t k <> v) }
 end
 
 (* Finally, let us prove the absence of arithmetic overflow
@@ -118,7 +118,7 @@ module M3
   use import module ref.Ref
 
   type int32
-  logic to_int int32 : int
+  function to_int int32 : int
 
   axiom int32_domain : forall x:int32. -2147483648 <= to_int x <= 2147483647
 
@@ -127,11 +127,11 @@ module M3
 
   type pointer
   type memory
-  logic get memory pointer int : int32
+  function get memory pointer int : int32
 
   parameter mem : ref memory
 
-  logic block_size memory pointer : int
+  function block_size memory pointer : int
 
   parameter get_ : p:pointer -> ofs:int32 ->
     { 0 <= to_int ofs < block_size !mem p }
@@ -141,7 +141,7 @@ module M3
   exception Return int32
 
   let binary_search (t : pointer) (n : int32) (v : int32) =
-    { 0 <= to_int n <= block_size !mem t and
+    { 0 <= to_int n <= block_size !mem t /\
       forall k1 k2:int.
         0 <= k1 <= k2 <= to_int n - 1 ->
         to_int (get !mem t k1) <= to_int (get !mem t k2) }
@@ -149,7 +149,7 @@ module M3
       let l = ref (of_int 0) in
       let u = ref (of_int (to_int n - to_int (of_int 1))) in
       while to_int !l <= to_int !u do
-        invariant { 0 <= to_int !l and to_int !u <= to_int n - 1 and
+        invariant { 0 <= to_int !l /\ to_int !u <= to_int n - 1 /\
             forall k:int. 0 <= k < to_int n ->
               to_int (get !mem t k) = to_int v -> to_int !l <= k <= to_int !u }
   	variant { to_int !u - to_int !l }
@@ -168,10 +168,10 @@ module M3
     with Return r ->
       r
     end
-    { (to_int result >= 0 and
+    { (to_int result >= 0 /\
        to_int (get !mem t (to_int result)) = to_int v)
-      or
-      (to_int result = -1 and
+      \/
+      (to_int result = -1 /\
        forall k:int. 0<=k<to_int n -> to_int (get !mem t k) <> to_int v) }
 end
 

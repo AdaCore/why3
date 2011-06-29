@@ -19,9 +19,10 @@ module Algo64
   use import module array.Array
   use import module array.ArrayPermut
 
-  logic sorted_sub (a: array int) (l u: int)
+  predicate sorted_sub (a: array int) (l u: int)
 (*
-  clone import module array.ArraySorted with type elt = int, logic le = (<=)
+  clone import module array.ArraySorted with
+    type elt = int, predicate le = (<=)
 *)
 
   (* Algorithm 63 *)
@@ -30,10 +31,10 @@ module Algo64
     a:array int -> m:int -> n:int -> i:ref int -> j:ref int ->
     { 0 <= m < n < length a }
     unit writes a i j
-    { m <= !j < !i <= n and permut_sub (old a) a m n and
+    { m <= !j < !i <= n /\ permut_sub (old a) a m n /\
       exists x:int.
-        (forall r:int. m <= r <= !j -> a[r] <= x) and
-        (forall r:int. !j < r < !i -> a[r] = x) and
+        (forall r:int. m <= r <= !j -> a[r] <= x) /\
+        (forall r:int. !j < r < !i -> a[r] = x) /\
         (forall r:int. !i <= r <= n -> a[r] >= x) }
 
   (* Algorithm 64 *)
@@ -52,7 +53,7 @@ module Algo64
       quicksort a !i n;
       assert { permut_sub (at a L2) a m n }
     end
-    { permut_sub (old a) a m n and sorted_sub a m n }
+    { permut_sub (old a) a m n /\ sorted_sub a m n }
 
 end
 

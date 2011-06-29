@@ -3,8 +3,8 @@ theory Misfix
 
   type t
 
-  logic ([])   (a: t) (i: int) : int
-  logic ([<-]) (a: t) (i: int) (v: int) : t
+  function ([])   (a: t) (i: int) : int
+  function ([<-]) (a: t) (i: int) (v: int) : t
 
   axiom a1 : forall a: t, i v: int. a[i <- v][i] = v
   axiom a2 : forall a: t, i j v: int. i<>j -> a[i <- v][j] = a[j]

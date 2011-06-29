@@ -15,7 +15,7 @@ theory Fib "Definition of Fibonacci sequence"
 
   use export int.Int
 
-  logic fib int : int
+  function fib int : int
 
   axiom fib0: fib 0 = 1
   axiom fib1: fib 1 = 2
@@ -38,7 +38,7 @@ theory FibSumEven "sum of even-valued Fibonacci numbers"
 
   *)
 
-  logic fib_sum_even_lt_from int int : int
+  function fib_sum_even_lt_from int int : int
 
   axiom SumTooLarge: forall m n:int.
      n >= 0 -> (fib n) >= m -> fib_sum_even_lt_from m n = 0
@@ -53,7 +53,7 @@ theory FibSumEven "sum of even-valued Fibonacci numbers"
      n >= 0 -> mod (fib n) 2 <> 0 ->
        fib_sum_even_lt_from m n = fib_sum_even_lt_from m (n+1)
 
-  logic fib_sum_even_lt (m:int) : int = fib_sum_even_lt_from m 0
+  function fib_sum_even_lt (m:int) : int = fib_sum_even_lt_from m 0
 
 end
 
@@ -73,7 +73,7 @@ theory FibOnlyEven
      x_0 = 2, x_1 = 8, x_{n+2} = 4 x_{n+1} + x_n
   *)
 
-  logic fib_even int : int
+  function fib_even int : int
 
   axiom fib_even0: fib_even 0 = 2
   axiom fib_even1: fib_even 1 = 8

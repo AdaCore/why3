@@ -4,24 +4,25 @@ theory Bidule
   type a
   type s = set a
 
-  logic a : s
-  logic b : s
-  logic c : s
+  function a : s
+  function b : s
+  function c : s
 
   goal Union : forall s1 s2 : s. forall x : a.
-  mem x (union s1 s2) -> (mem x s1 or mem x s2)
+    mem x (union s1 s2) -> (mem x s1 \/ mem x s2)
 
   goal Inter : forall s1 s2 : s. forall x : a.
-  mem x (inter s1 s2) -> (mem x s1 and mem x s2)
+    mem x (inter s1 s2) -> (mem x s1 /\ mem x s2)
 
   goal Union_inter : forall s1 s2 s3 : s. forall x : a.
-  equal (inter (union s1 s2) s3) (union (inter s1 s3) (inter s2 s3))
+    equal (inter (union s1 s2) s3) (union (inter s1 s3) (inter s2 s3))
 
   lemma Union_assoc : forall s1 s2 s3 : s. forall x : a.
-  equal (union (union s1 s2) s3) (union s1 (union s2 s3))
+    equal (union (union s1 s2) s3) (union s1 (union s2 s3))
 
-  clone algebra.Assoc with type t = s, logic op = union, goal Assoc
+  clone algebra.Assoc with type t = s, function op = union, goal Assoc
 
-  clone algebra.AC with type t = s, logic op = union, goal Assoc.Assoc, goal Comm.Comm
+  clone algebra.AC with type t = s, function op = union,
+    goal Assoc.Assoc, goal Comm.Comm
 
 end

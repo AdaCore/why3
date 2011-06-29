@@ -4,61 +4,61 @@ theory Why2
   use int.ComputerDivision
   use real.Real
   use bool_inf.Bool
-  logic eq_unit Unit.unit Unit.unit
+  predicate eq_unit Unit.unit Unit.unit
 
-  logic neq_unit Unit.unit Unit.unit
+  predicate neq_unit Unit.unit Unit.unit
 
-  logic eq_bool Bool.bool Bool.bool
+  predicate eq_bool Bool.bool Bool.bool
 
-  logic neq_bool Bool.bool Bool.bool
+  predicate neq_bool Bool.bool Bool.bool
 
-  logic lt_int int int
+  predicate lt_int int int
 
-  logic le_int int int
+  predicate le_int int int
 
-  logic gt_int int int
+  predicate gt_int int int
 
-  logic ge_int int int
+  predicate ge_int int int
 
-  logic eq_int int int
+  predicate eq_int int int
 
-  logic neq_int int int
+  predicate neq_int int int
 
-  logic add_int int int : int
+  function add_int int int : int
 
-  logic sub_int int int : int
+  function sub_int int int : int
 
-  logic mul_int int int : int
+  function mul_int int int : int
 
-  logic div_int int int : int
+  function div_int int int : int
 
-  logic mod_int int int : int
+  function mod_int int int : int
 
-  logic neg_int int : int
+  function neg_int int : int
 
-  logic zwf_zero (a : int) (b : int) = ((Int.(<=) 0 b) and (Int.(<) a b))
+  predicate zwf_zero (a : int) (b : int) = ((Int.(<=) 0 b) /\ (Int.(<) a b))
 
-  logic x2  : int
+  function x2  : int
 
-  logic y2  : int
+  function y2  : int
 
   axiom First_octant:
-    ((Int.(<=) 0 (y2 : int)) and (Int.(<=) (y2 : int) (x2 : int)))
+    ((Int.(<=) 0 (y2 : int)) /\ (Int.(<=) (y2 : int) (x2 : int)))
 
-  logic abs int : int
+  function abs int : int
 
   axiom Abs_def:
     (forall x:int.
-      (((Int.(>=) x 0) and ((abs x : int) = x)) or
-       ((Int.(<=) x 0) and ((abs x : int) = (Int.(-_) x : int)))))
+      (((Int.(>=) x 0) /\ ((abs x : int) = x)) \/
+       ((Int.(<=) x 0) /\ ((abs x : int) = (Int.(-_) x : int)))))
 
-  logic best (x : int) (y : int) =
+  predicate best (x : int) (y : int) =
     (forall y':int.
       (Int.(<=) (abs (Int.(-) (Int.(*) (x2 : int) y : int) (Int.(*) x (y2 : int) : int) : int) : int) (abs (Int.(-) (Int.(*) (x2 : int) y' : int) (Int.(*) x (y2 : int) : int) : int) : int)))
 
-  logic why3_Invariant (x : int) (y : int) (e : int) =
-    ((e = (Int.(-) (Int.(*) (Int.(*) 2 (Int.(+) x 1 : int) : int) (y2 : int) : int) (Int.(*) (Int.(+) (Int.(*) 2 y : int) 1 : int) (x2 : int) : int) : int)) and
-     ((Int.(<=) (Int.(*) 2 (Int.(-) (y2 : int) (x2 : int) : int) : int) e) and
+  predicate why3_Invariant (x : int) (y : int) (e : int) =
+    ((e = (Int.(-) (Int.(*) (Int.(*) 2 (Int.(+) x 1 : int) : int) (y2 : int) : int) (Int.(*) (Int.(+) (Int.(*) 2 y : int) 1 : int) (x2 : int) : int) : int)) /\
+     ((Int.(<=) (Int.(*) 2 (Int.(-) (y2 : int) (x2 : int) : int) : int) e) /\
       (Int.(<=) e (Int.(*) 2 (y2 : int) : int))))
 
   axiom Invariant_is_ok:
@@ -102,8 +102,8 @@ theory Why2
              (forall e0:int.
                (forall x0:int.
                  (forall y0:int.
-                   ((((Int.(<=) 0 x0) and
-                      (Int.(<=) x0 (Int.(+) (x2 : int) 1 : int))) and
+                   ((((Int.(<=) 0 x0) /\
+                      (Int.(<=) x0 (Int.(+) (x2 : int) 1 : int))) /\
                      (why3_Invariant x0 y0 e0)) ->
                     ((Int.(<=) x0 (x2 : int)) -> (best x0 y0))))))))))))
 
@@ -117,8 +117,8 @@ theory Why2
              (forall e0:int.
                (forall x0:int.
                  (forall y0:int.
-                   ((((Int.(<=) 0 x0) and
-                      (Int.(<=) x0 (Int.(+) (x2 : int) 1 : int))) and
+                   ((((Int.(<=) 0 x0) /\
+                      (Int.(<=) x0 (Int.(+) (x2 : int) 1 : int))) /\
                      (why3_Invariant x0 y0 e0)) ->
                     ((Int.(<=) x0 (x2 : int)) ->
                      ((best x0 y0) ->
@@ -138,8 +138,8 @@ theory Why2
              (forall e0:int.
                (forall x0:int.
                  (forall y0:int.
-                   ((((Int.(<=) 0 x0) and
-                      (Int.(<=) x0 (Int.(+) (x2 : int) 1 : int))) and
+                   ((((Int.(<=) 0 x0) /\
+                      (Int.(<=) x0 (Int.(+) (x2 : int) 1 : int))) /\
                      (why3_Invariant x0 y0 e0)) ->
                     ((Int.(<=) x0 (x2 : int)) ->
                      ((best x0 y0) ->
@@ -160,8 +160,8 @@ theory Why2
              (forall e0:int.
                (forall x0:int.
                  (forall y0:int.
-                   ((((Int.(<=) 0 x0) and
-                      (Int.(<=) x0 (Int.(+) (x2 : int) 1 : int))) and
+                   ((((Int.(<=) 0 x0) /\
+                      (Int.(<=) x0 (Int.(+) (x2 : int) 1 : int))) /\
                      (why3_Invariant x0 y0 e0)) ->
                     ((Int.(<=) x0 (x2 : int)) ->
                      ((best x0 y0) ->
@@ -182,8 +182,8 @@ theory Why2
              (forall e0:int.
                (forall x0:int.
                  (forall y0:int.
-                   ((((Int.(<=) 0 x0) and
-                      (Int.(<=) x0 (Int.(+) (x2 : int) 1 : int))) and
+                   ((((Int.(<=) 0 x0) /\
+                      (Int.(<=) x0 (Int.(+) (x2 : int) 1 : int))) /\
                      (why3_Invariant x0 y0 e0)) ->
                     ((Int.(<=) x0 (x2 : int)) ->
                      ((best x0 y0) ->
@@ -204,8 +204,8 @@ theory Why2
              (forall e0:int.
                (forall x0:int.
                  (forall y0:int.
-                   ((((Int.(<=) 0 x0) and
-                      (Int.(<=) x0 (Int.(+) (x2 : int) 1 : int))) and
+                   ((((Int.(<=) 0 x0) /\
+                      (Int.(<=) x0 (Int.(+) (x2 : int) 1 : int))) /\
                      (why3_Invariant x0 y0 e0)) ->
                     ((Int.(<=) x0 (x2 : int)) ->
                      ((best x0 y0) ->
@@ -226,8 +226,8 @@ theory Why2
              (forall e0:int.
                (forall x0:int.
                  (forall y0:int.
-                   ((((Int.(<=) 0 x0) and
-                      (Int.(<=) x0 (Int.(+) (x2 : int) 1 : int))) and
+                   ((((Int.(<=) 0 x0) /\
+                      (Int.(<=) x0 (Int.(+) (x2 : int) 1 : int))) /\
                      (why3_Invariant x0 y0 e0)) ->
                     ((Int.(<=) x0 (x2 : int)) ->
                      ((best x0 y0) ->
@@ -250,8 +250,8 @@ theory Why2
              (forall e0:int.
                (forall x0:int.
                  (forall y0:int.
-                   ((((Int.(<=) 0 x0) and
-                      (Int.(<=) x0 (Int.(+) (x2 : int) 1 : int))) and
+                   ((((Int.(<=) 0 x0) /\
+                      (Int.(<=) x0 (Int.(+) (x2 : int) 1 : int))) /\
                      (why3_Invariant x0 y0 e0)) ->
                     ((Int.(<=) x0 (x2 : int)) ->
                      ((best x0 y0) ->
@@ -274,8 +274,8 @@ theory Why2
              (forall e0:int.
                (forall x0:int.
                  (forall y0:int.
-                   ((((Int.(<=) 0 x0) and
-                      (Int.(<=) x0 (Int.(+) (x2 : int) 1 : int))) and
+                   ((((Int.(<=) 0 x0) /\
+                      (Int.(<=) x0 (Int.(+) (x2 : int) 1 : int))) /\
                      (why3_Invariant x0 y0 e0)) ->
                     ((Int.(<=) x0 (x2 : int)) ->
                      ((best x0 y0) ->
@@ -298,8 +298,8 @@ theory Why2
              (forall e0:int.
                (forall x0:int.
                  (forall y0:int.
-                   ((((Int.(<=) 0 x0) and
-                      (Int.(<=) x0 (Int.(+) (x2 : int) 1 : int))) and
+                   ((((Int.(<=) 0 x0) /\
+                      (Int.(<=) x0 (Int.(+) (x2 : int) 1 : int))) /\
                      (why3_Invariant x0 y0 e0)) ->
                     ((Int.(<=) x0 (x2 : int)) ->
                      ((best x0 y0) ->
@@ -322,8 +322,8 @@ theory Why2
              (forall e0:int.
                (forall x0:int.
                  (forall y0:int.
-                   ((((Int.(<=) 0 x0) and
-                      (Int.(<=) x0 (Int.(+) (x2 : int) 1 : int))) and
+                   ((((Int.(<=) 0 x0) /\
+                      (Int.(<=) x0 (Int.(+) (x2 : int) 1 : int))) /\
                      (why3_Invariant x0 y0 e0)) ->
                     ((Int.(<=) x0 (x2 : int)) ->
                      ((best x0 y0) ->

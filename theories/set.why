@@ -3,47 +3,47 @@ theory Set
 
   type set 'a
 
-  logic mem 'a (set 'a)
+  predicate mem 'a (set 'a)
 
-  logic empty : set 'a
+  function empty : set 'a
 
-  logic is_empty (s : set 'a) = forall x : 'a. not mem x s
+  predicate is_empty (s : set 'a) = forall x : 'a. not mem x s
 
   axiom Empty_def1 : is_empty(empty : set 'a)
 
-  logic add 'a (set 'a) : set 'a
+  function add 'a (set 'a) : set 'a
 
   axiom Add_def1 :
     forall x y : 'a. forall s : set 'a.
-    mem x (add y s) <-> x = y or mem x s
+    mem x (add y s) <-> x = y \/ mem x s
 
-  logic remove 'a (set 'a) : set 'a
+  function remove 'a (set 'a) : set 'a
 
   axiom Remove_def1 :
     forall x y : 'a. forall s : set 'a.
-    mem x (remove y s) <-> x <> y and mem x s
+    mem x (remove y s) <-> x <> y /\ mem x s
 
-  logic union (set 'a) (set 'a) : set 'a
+  function union (set 'a) (set 'a) : set 'a
 
   axiom Union_def1 :
     forall s1 s2 : set 'a. forall x : 'a.
-    mem x (union s1 s2) <-> mem x s1 or mem x s2
+    mem x (union s1 s2) <-> mem x s1 \/ mem x s2
 
-  logic inter (set 'a) (set 'a) : set 'a
+  function inter (set 'a) (set 'a) : set 'a
 
   axiom Inter_def1 :
     forall s1 s2 : set 'a. forall x : 'a.
-    mem x (inter s1 s2) <-> mem x s1 and mem x s2
+    mem x (inter s1 s2) <-> mem x s1 /\ mem x s2
 
-  logic diff (set 'a) (set 'a) : set 'a
+  function diff (set 'a) (set 'a) : set 'a
 
   axiom Diff_def1 :
     forall s1 s2 : set 'a. forall x : 'a.
-    mem x (diff s1 s2) <-> mem x s1 and not mem x s2
+    mem x (diff s1 s2) <-> mem x s1 /\ not mem x s2
 
-  logic equal(s1 s2 : set 'a) = forall x : 'a. mem x s1 <-> mem x s2
+  predicate equal(s1 s2 : set 'a) = forall x : 'a. mem x s1 <-> mem x s2
 
-  logic subset(s1 s2 : set 'a) = forall x : 'a. mem x s1 -> mem x s2
+  predicate subset(s1 s2 : set 'a) = forall x : 'a. mem x s1 -> mem x s2
 
 end
 
@@ -52,7 +52,7 @@ theory Fset
   use import int.Int
   clone export Set
 
-  logic cardinal (set 'a) : int
+  function cardinal (set 'a) : int
 
   axiom Cardinal_nonneg : forall s : set 'a. cardinal s >= 0
 
@@ -86,43 +86,43 @@ theory SetMap
 
   type set 'a = map 'a bool
 
-  logic mem (x:'a) (s:set 'a) = s[x] = True
+  predicate mem (x:'a) (s:set 'a) = s[x] = True
 
-  logic empty : set 'a = const False
+  function empty : set 'a = const False
 
-  logic is_empty (s : set 'a) = forall x : 'a. not mem x s
+  predicate is_empty (s : set 'a) = forall x : 'a. not mem x s
 
   goal Empty_def1 : is_empty(empty : set 'a)
 
-  logic add (x:'a) (s:set 'a) : set 'a = s[x <- True]
+  function add (x:'a) (s:set 'a) : set 'a = s[x <- True]
 
-  logic remove (x:'a) (s:set 'a) : set 'a =  s[x <- False]
+  function remove (x:'a) (s:set 'a) : set 'a =  s[x <- False]
 
-  logic union (set 'a) (set 'a) : set 'a
+  function union (set 'a) (set 'a) : set 'a
 
   axiom Union_def :
     forall s1 s2 : set 'a. forall x : 'a.
     (union s1 s2)[x] = orb s1[x] s2[x]
 
-  logic inter (set 'a) (set 'a) : set 'a
+  function inter (set 'a) (set 'a) : set 'a
 
   axiom Inter_def :
     forall s1 s2 : set 'a. forall x : 'a.
     (inter s1 s2)[x] = andb s1[x] s2[x]
 
-  logic diff (set 'a) (set 'a) : set 'a
+  function diff (set 'a) (set 'a) : set 'a
 
   axiom Diff_def1 :
     forall s1 s2 : set 'a. forall x : 'a.
     (diff s1 s2)[x] = andb s1[x] (notb s2[x])
 
-  logic equal(s1 s2 : set 'a) = forall x : 'a. s1[x] = s2[x]
+  predicate equal(s1 s2 : set 'a) = forall x : 'a. s1[x] = s2[x]
 
   axiom Equal_is_eq : forall s1 s2 : set 'a. equal s1 s2 -> s1 = s2
 
-  logic subset(s1 s2 : set 'a) = forall x : 'a. mem x s1 -> mem x s2
+  predicate subset(s1 s2 : set 'a) = forall x : 'a. mem x s1 -> mem x s2
 
-  logic complement (set 'a) : set 'a
+  function complement (set 'a) : set 'a
 
   axiom Complement_def :
     forall s : set 'a. forall x : 'a.

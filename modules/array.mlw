@@ -8,14 +8,14 @@ module Array
 
   type array 'a model {| length : int; mutable elts : map int 'a |}
 
-  logic get (a: array 'a) (i: int) : 'a = M.get a.elts i
+  function get (a: array 'a) (i: int) : 'a = M.get a.elts i
 
-  logic set (a: array 'a) (i: int) (v: 'a) : array 'a =
+  function set (a: array 'a) (i: int) (v: 'a) : array 'a =
     {| a with elts = M.set a.elts i v |}
 
   (* syntactic sugar *)
-  logic ([]) (a: array 'a) (i: int) : 'a = get a i
-  logic ([<-]) (a: array 'a) (i: int) (v: 'a) : array 'a = set a i v
+  function ([]) (a: array 'a) (i: int) : 'a = get a i
+  function ([<-]) (a: array 'a) (i: int) (v: 'a) : array 'a = set a i v
 
   parameter ([]) (a: array 'a) (i: int) :
     { 0 <= i < length a } 'a reads a { result = a[i] }
@@ -32,68 +32,68 @@ module Array
     { }
     if i < 0 || i >= length a then raise OutOfBounds;
     a[i]
-    { 0 <= i < length a and result = a[i] }
-    | OutOfBounds -> { i < 0 or i >= length a }
+    { 0 <= i < length a /\ result = a[i] }
+    | OutOfBounds -> { i < 0 \/ i >= length a }
 
   let defensive_set (a: array 'a) (i: int) (v: 'a) =
     { }
     if i < 0 || i >= length a then raise OutOfBounds;
     a[i] <- v
-    { 0 <= i < length a and a = (old a)[i <- v] }
-    | OutOfBounds -> { i < 0 or i >= length a }
+    { 0 <= i < length a /\ a = (old a)[i <- v] }
+    | OutOfBounds -> { i < 0 \/ i >= length a }
 
   parameter make (n: int) (v: 'a) :
     {}
     array 'a
     { result = {| length = n; elts = M.const v |} }
-    (* { length result = n and forall i:int. 0 <= i < n -> result[i] = v} *)
+    (* { length result = n /\ forall i:int. 0 <= i < n -> result[i] = v} *)
 
   parameter append (a1: array 'a) (a2: array 'a) :
     {}
     array 'a
-    { length result = length a1 + length a2 and
-      (forall i:int. 0 <= i < length a1 -> result[i] = a1[i]) and
+    { length result = length a1 + length a2 /\
+      (forall i:int. 0 <= i < length a1 -> result[i] = a1[i]) /\
       (forall i:int. 0 <= i < length a2 -> result[length a1 + i] = a2[i]) }
 
   parameter sub (a: array 'a) (ofs: int) (len: int) :
-    { 0 <= ofs and ofs + len <= length a }
+    { 0 <= ofs /\ ofs + len <= length a }
     array 'a
-    { length result = len and
+    { length result = len /\
       forall i:int. 0 <= i < len -> result[i] = a[ofs + i] }
 
   parameter copy (a: array 'a) :
     {}
     array 'a
-    { length result = length a and
+    { length result = length a /\
       forall i:int. 0 <= i < length result -> result[i] = a[i] }
 
   let fill (a: array 'a) (ofs: int) (len: int) (v: 'a) =
-    { 0 <= ofs and ofs + len <= length a }
+    { 0 <= ofs /\ ofs + len <= length a }
     label Init:
     for k = 0 to len - 1 do
       invariant {
         (forall i:int.
-        (0 <= i < ofs or ofs + len <= i < length a) -> a[i] = (at a Init)[i])
-        and
+        (0 <= i < ofs \/ ofs + len <= i < length a) -> a[i] = (at a Init)[i])
+        /\
         (forall i:int. ofs <= i < ofs + k -> a[i] = v)
       }
       a[ofs + k] <- v
     done
     { (forall i:int.
-        (0 <= i < ofs or ofs + len <= i < length a) -> a[i] = (old a)[i])
-      and
+        (0 <= i < ofs \/ ofs + len <= i < length a) -> a[i] = (old a)[i])
+      /\
       (forall i:int.
         ofs <= i < ofs + len -> a[i] = v) }
 
   parameter blit (a1: array 'a) (ofs1: int)
                  (a2: array 'a) (ofs2: int) (len: int) :
-    { 0 <= ofs1 and ofs1 + len <= length a1 and
-      0 <= ofs2 and ofs2 + len <= length a2 }
+    { 0 <= ofs1 /\ ofs1 + len <= length a1 /\
+      0 <= ofs2 /\ ofs2 + len <= length a2 }
     unit
     writes a2
     { (forall i:int.
-        (0 <= i < ofs2 or ofs2 + len <= i < length a2) -> a2[i] = (old a2)[i])
-      and
+        (0 <= i < ofs2 \/ ofs2 + len <= i < length a2) -> a2[i] = (old a2)[i])
+      /\
       (forall i:int.
         ofs2 <= i < ofs2 + len -> a2[i] = a1[ofs1 + i - ofs2]) }
 
@@ -109,12 +109,12 @@ module ArraySorted
 
   use import int.Int
   use import module Array
-  clone import map.MapSorted as M with type elt = int, logic le = (<=)
+  clone import map.MapSorted as M with type elt = int, predicate le = (<=)
 
-  logic sorted_sub (a : array int) (l u : int) =
+  predicate sorted_sub (a : array int) (l u : int) =
     M.sorted_sub a.elts l u
 
-  logic sorted (a : array int) =
+  predicate sorted (a : array int) =
     M.sorted_sub a.elts 0 a.length
 
 end
@@ -124,11 +124,11 @@ module ArrayEq
   use import module Array
   use import map.MapEq as M
 
-  logic array_eq_sub (a1 a2: array 'a) (l u: int) =
+  predicate array_eq_sub (a1 a2: array 'a) (l u: int) =
     map_eq_sub a1.elts a2.elts l u
 
-  logic array_eq (a1 a2: array 'a) =
-    a1.length = a2.length and
+  predicate array_eq (a1 a2: array 'a) =
+    a1.length = a2.length /\
     array_eq_sub a1 a2 0 a1.length
 
 end
@@ -139,14 +139,14 @@ module ArrayPermut
   use import module Array
   clone import map.MapPermut as M
 
-  logic exchange (a1 a2: array 'a) (i j: int) =
+  predicate exchange (a1 a2: array 'a) (i j: int) =
     M.exchange a1.elts a2.elts i j
 
-  logic permut_sub (a1 a2: array 'a) (l u: int) =
+  predicate permut_sub (a1 a2: array 'a) (l u: int) =
     M.permut_sub a1.elts a2.elts l u
 
-  logic permut (a1 a2: array 'a) =
-    a1.length = a2.length and M.permut_sub a1.elts a2.elts 0 a1.length
+  predicate permut (a1 a2: array 'a) =
+    a1.length = a2.length /\ M.permut_sub a1.elts a2.elts 0 a1.length
 
   lemma exchange_permut:
     forall a1 a2: array 'a, i j: int.
@@ -173,7 +173,7 @@ module ArraySum
 
   (* [sum a l h] is the sum of a[i] for l <= i < h *)
 
-  logic sum (a: array int) (l h: int) : int = M.sum a.elts l h
+  function sum (a: array int) (l h: int) : int = M.sum a.elts l h
 
 end
 

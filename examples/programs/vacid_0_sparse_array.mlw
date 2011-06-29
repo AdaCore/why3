@@ -29,10 +29,10 @@ back  +-+-+-+-------------------+
                     mutable card : int;
                          default : 'a; |}
 
-  logic is_elt (a: sparse_array 'a) (i: int) =
-    0 <= a.idx[i] < a.card and a.back[a.idx[i]] = i
+  predicate is_elt (a: sparse_array 'a) (i: int) =
+    0 <= a.idx[i] < a.card /\ a.back[a.idx[i]] = i
 
-  logic value (a: sparse_array 'a) (i: int) : 'a =
+  function value (a: sparse_array 'a) (i: int) : 'a =
     if is_elt a i then
       a.val[i]
     else
@@ -40,16 +40,16 @@ back  +-+-+-+-------------------+
 
   (* invariant *)
 
-  logic maxlen : int = 1000
+  function maxlen : int = 1000
 
-  logic length (a: sparse_array 'a) : int = A.length a.val
+  function length (a: sparse_array 'a) : int = A.length a.val
 
-  logic sa_inv (a: sparse_array 'a) =
-    0 <= a.card <= length a <= maxlen and
-    A.length a.val = A.length a.idx = A.length a.back and
+  predicate sa_inv (a: sparse_array 'a) =
+    0 <= a.card <= length a <= maxlen /\
+    A.length a.val = A.length a.idx = A.length a.back /\
     forall i : int.
       0 <= i < a.card ->
-      0 <= a.back[i] < length a and a.idx[a.back[i]] = i
+      0 <= a.back[i] < length a /\ a.idx[a.back[i]] = i
 
   (* creation *)
 
@@ -62,18 +62,18 @@ back  +-+-+-+-------------------+
        back = malloc sz; 
        card = 0; 
        default = d |}
-    { sa_inv result and result.card = 0 and 
-      result.default = d and length result = sz }
+    { sa_inv result /\ result.card = 0 /\ 
+      result.default = d /\ length result = sz }
 
   (* access *)
 
   let test (a: sparse_array 'a) i =
-    { 0 <= i < length a and sa_inv a }
+    { 0 <= i < length a /\ sa_inv a }
     0 <= a.idx[i] && a.idx[i] < a.card && a.back[a.idx[i]] = i
     { result=True <-> is_elt a i }
 
   let get (a: sparse_array 'a) i =
-    { 0 <= i < length a and sa_inv a }
+    { 0 <= i < length a /\ sa_inv a }
     if test a i then
       a.val[i]
     else
@@ -88,7 +88,7 @@ back  +-+-+-+-------------------+
     forall i: int. 0 <= i < a.length -> is_elt a i
 
   let set (a: sparse_array 'a) i v =
-    { 0 <= i < length a and sa_inv a }
+    { 0 <= i < length a /\ sa_inv a }
     a.val[i] <- v;
     if not (test a i) then begin
       assert { a.card < length a };
@@ -96,8 +96,8 @@ back  +-+-+-+-------------------+
       a.back[a.card] <- i;
       a.card <- a.card + 1
     end
-    { sa_inv a and
-      value a i = v and
+    { sa_inv a /\
+      value a i = v /\
       forall j:int. j <> i -> value a j = value (old a) j }
 
 end
@@ -107,10 +107,10 @@ module Harness
   use import module SparseArray
 
   type elt
-  logic default : elt
+  function default : elt
 
-  logic c1 : elt
-  logic c2 : elt
+  function c1 : elt
+  function c2 : elt
 
   let harness () =
     let a = create 10 default in

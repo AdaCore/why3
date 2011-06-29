@@ -44,7 +44,6 @@
     List.iter
       (fun (x,y) -> Hashtbl.add keywords x y)
       [
-        "and", AND;
         "as", AS;
         "axiom", AXIOM;
         "clone", CLONE;
@@ -55,21 +54,19 @@
         "export", EXPORT;
         "false", FALSE;
         "forall", FORALL;
+        "function", FUNCTION;
         "goal", GOAL;
         "if", IF;
-        "iff", IFF;
-        "implies", IMPLIES;
         "import", IMPORT;
         "in", IN;
         "inductive", INDUCTIVE;
         "lemma", LEMMA;
         "let", LET;
-        "logic", LOGIC;
         "match", MATCH;
         "meta", META;
         "namespace", NAMESPACE;
         "not", NOT;
-        "or", OR;
+        "predicate", PREDICATE;
         "prop", PROP;
         "then", THEN;
         "theory", THEORY;
@@ -87,7 +84,7 @@
         "check", CHECK;
         "do", DO;
         "done", DONE;
-         "downto", DOWNTO;
+        "downto", DOWNTO;
         "exception", EXCEPTION;
         "for", FOR;
         "fun", FUN;
@@ -261,8 +258,6 @@ rule token = parse
       { LEFTSQ }
   | "]"
       { RIGHTSQ }
-  | "~"
-      { TILDE }
   | op_char_pref op_char_4* as s
       { OPPREF s }
   | op_char_1234* op_char_1 op_char_1234* as s

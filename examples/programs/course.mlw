@@ -9,7 +9,7 @@ module M
 
   type array 'a = M.map int 'a
 
-  logic injective (n:int) (m:int) (a:array 'a) =
+  predicate injective (n:int) (m:int) (a:array 'a) =
     forall i j:int. n <= i <= m -> n <= j <= m ->
        a[i] = a[j] -> i = j
 
@@ -23,9 +23,9 @@ module M
 
   type first_free_addr = int
 
-  logic valid (a:first_free_addr) (p:pointer) = p < a
+  predicate valid (a:first_free_addr) (p:pointer) = p < a
 
-  logic valid_array (a:first_free_addr) (n:int) (m:int) (r:array pointer) =
+  predicate valid_array (a:first_free_addr) (n:int) (m:int) (r:array pointer) =
      forall i:int. n <= i <= m -> valid a (r[i])
 
 parameter alloc : ref first_free_addr
@@ -34,7 +34,7 @@ parameter new_pointer : tt:unit ->
   { }
   pointer
   writes alloc
-  { !alloc = old !alloc + 1 and result = old !alloc }
+  { !alloc = old !alloc + 1 /\ result = old !alloc }
 
 (*
 record Student =
@@ -46,7 +46,7 @@ end
 
   type student = (string, int)
 
-  logic invStudent (this:student) =
+  predicate invStudent (this:student) =
      let (_,m) = this in 0 <= m <= 100
 
 (*
@@ -57,9 +57,9 @@ record Course =
   sum: int
   inv(this) {
     count >= 0
-    and
+    /\
     injective(0, count-1, this.students)
-    and
+    /\
     this.sum = mark_sum(0,this.count-1,this.students)
   }
 end
@@ -67,7 +67,7 @@ end
 
   type course = (region student, array pointer, int, int)
 
-  logic markSum (region student) int int (array pointer) : int
+  function markSum (region student) int int (array pointer) : int
 
   axiom MarkSumEmpty :
     forall r:region student, i j:int, a : array pointer.
@@ -83,7 +83,7 @@ end
   lemma MarkSumFootprint:
   forall n:int. forall s1: array(Student [R1]).
   forall s2: array(Student [R2]).
-  (forall i:int. [0] <= [i] and [i] < [n] ==>
+  (forall i:int. [0] <= [i] /\ [i] < [n] ==>
      [!(select(s1,i) : Student[R1]).mark] =
        [!(select(s2,i) : Student[R2]).mark])
   ==> [MarkSum(n, s1)] = [MarkSum(n,s2)]
@@ -103,14 +103,14 @@ end
 
 
 
-  logic invCourse (alloc:first_free_addr) (this:course) =
+  predicate invCourse (alloc:first_free_addr) (this:course) =
      let (rStud,students,count,sum) = this in
      count >= 0
-     and 
+     /\ 
      valid_array alloc 0 (count - 1) students
-     and
+     /\
      injective 0 (count - 1) students
-     and
+     /\
      sum = markSum rStud 0 (count-1) students
 
 (*
@@ -152,7 +152,7 @@ fun RegisterStudent(R:[Course], c: [R], name: string): [R.Rstud]
 
 let registerStudent
     (r: (ref (region course))) (c:pointer) (name:string) : pointer =
-{ valid !alloc c and invCourse !alloc !r[c] }
+{ valid !alloc c /\ invCourse !alloc !r[c] }
   let s = new_pointer () in
   let (rStud,student,count,sum) = !r[c] in
   let newstud = (name,0) in

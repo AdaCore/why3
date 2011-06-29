@@ -5,65 +5,65 @@ use array.Array as A
   use int.ComputerDivision
   use real.Real
   use bool_inf.Bool
-  logic eq_unit Unit.unit Unit.unit
+  predicate eq_unit Unit.unit Unit.unit
 
-  logic neq_unit Unit.unit Unit.unit
+  predicate neq_unit Unit.unit Unit.unit
 
-  logic eq_bool Bool.bool Bool.bool
+  predicate eq_bool Bool.bool Bool.bool
 
-  logic neq_bool Bool.bool Bool.bool
+  predicate neq_bool Bool.bool Bool.bool
 
-  logic lt_int int int
+  predicate lt_int int int
 
-  logic le_int int int
+  predicate le_int int int
 
-  logic gt_int int int
+  predicate gt_int int int
 
-  logic ge_int int int
+  predicate ge_int int int
 
-  logic eq_int int int
+  predicate eq_int int int
 
-  logic neq_int int int
+  predicate neq_int int int
 
-  logic add_int int int : int
+  function add_int int int : int
 
-  logic sub_int int int : int
+  function sub_int int int : int
 
-  logic mul_int int int : int
+  function mul_int int int : int
 
-  logic div_int int int : int
+  function div_int int int : int
 
-  logic mod_int int int : int
+  function mod_int int int : int
 
-  logic neg_int int : int
+  function neg_int int : int
 
-  logic zwf_zero (a : int) (b : int) = ((Int.(<=) 0 b) and (Int.(<) a b))
+  predicate zwf_zero (a : int) (b : int) = ((Int.(<=) 0 b) /\ (Int.(<) a b))
 
   type farray 'a = A.t int 'a
 
-  logic access (m:farray 'a1) (k:int) : 'a1 = A.get m k
+  function access (m:farray 'a1) (k:int) : 'a1 = A.get m k
 
-  logic update (m:farray 'a1) (k:int) (v:'a1) : (farray 'a1) = A.set m k v
+  function update (m:farray 'a1) (k:int) (v:'a1) : (farray 'a1) = A.set m k v
 
 
 
-  logic array_length (farray 'a1) : int
+  function array_length (farray 'a1) : int
 
-  logic sorted_array (t : (farray int)) (i : int) (j : int) =
+  predicate sorted_array (t : (farray int)) (i : int) (j : int) =
     (forall k1:int.
       (forall k2:int.
-        ((((Int.(<=) i k1) and (Int.(<=) k1 k2)) and (Int.(<=) k2 j)) ->
+        ((((Int.(<=) i k1) /\ (Int.(<=) k1 k2)) /\ (Int.(<=) k2 j)) ->
          (Int.(<=) (access t k1 : int) (access t k2 : int)))))
 
-  logic exchange (a1 : (farray 'a1)) (a2 : (farray 'a1)) (i : int) (j : int) =
-    (((array_length a1 : int) = (array_length a2 : int)) and
-     (((access a1 i : 'a1) = (access a2 j : 'a1)) and
-      (((access a2 i : 'a1) = (access a1 j : 'a1)) and
+  predicate exchange (a1 : (farray 'a1)) (a2 : (farray 'a1)) (i : int) (j : int) =
+    (((array_length a1 : int) = (array_length a2 : int)) /\
+     (((access a1 i : 'a1) = (access a2 j : 'a1)) /\
+      (((access a2 i : 'a1) = (access a1 j : 'a1)) /\
        (forall k:int.
-         (((k <> i) and (k <> j)) ->
+         (((k <> i) /\ (k <> j)) ->
           ((access a1 k : 'a1) = (access a2 k : 'a1)))))))
 
-  logic permut (farray 'a1) (farray 'a1) int int
+  predicate permut (farray 'a1) (farray 'a1) int int
 
   axiom Permut_refl:
     (forall t:(farray 'a1). (forall l:int. (forall u:int. (permut t t l u))))
@@ -90,8 +90,8 @@ use array.Array as A
           (forall u:int.
             (forall i:int.
               (forall j:int.
-                (((Int.(<=) l i) and (Int.(<=) i u)) ->
-                 (((Int.(<=) l j) and (Int.(<=) j u)) ->
+                (((Int.(<=) l i) /\ (Int.(<=) i u)) ->
+                 (((Int.(<=) l j) /\ (Int.(<=) j u)) ->
                   ((exchange a1 a2 i j) -> (permut a1 a2 l u))))))))))
 
   axiom Exchange_upd:
@@ -107,7 +107,7 @@ use array.Array as A
           (forall r1:int.
             (forall l2:int.
               (forall r2:int.
-                ((((Int.(<=) l1 l2) and (Int.(<=) l2 r2)) and
+                ((((Int.(<=) l1 l2) /\ (Int.(<=) l2 r2)) /\
                   (Int.(<=) r2 r1)) ->
                  ((permut a1 a2 l2 r2) -> (permut a1 a2 l1 r1)))))))))
 
@@ -119,10 +119,10 @@ use array.Array as A
             ((Int.(<=) l u) ->
              ((permut a1 a2 l u) ->
               (forall i:int.
-                (((Int.(<) i l) or (Int.(<) u i)) ->
+                (((Int.(<) i l) \/ (Int.(<) u i)) ->
                  ((access a2 i : 'a1) = (access a1 i : 'a1))))))))))
 
-  logic permutation (a1 : (farray 'a1)) (a2 : (farray 'a1)) =
+  predicate permutation (a1 : (farray 'a1)) (a2 : (farray 'a1)) =
     (permut a1 a2 0 (Int.(-) (array_length a1 : int) 1 : int))
 
   axiom Array_length_update:
@@ -143,25 +143,25 @@ use array.Array as A
     (forall i:int.
       (forall j:int.
         (forall t:(farray int).
-          ((((Int.(<=) 0 i) and (Int.(<) i (array_length t : int))) and
-            ((Int.(<=) 0 j) and (Int.(<) j (array_length t : int)))) ->
+          ((((Int.(<=) 0 i) /\ (Int.(<) i (array_length t : int))) /\
+            ((Int.(<=) 0 j) /\ (Int.(<) j (array_length t : int)))) ->
            (Int.(<=) 0 i)))))
 
   goal Swap_po_2:
     (forall i:int.
       (forall j:int.
         (forall t:(farray int).
-          ((((Int.(<=) 0 i) and (Int.(<) i (array_length t : int))) and
-            ((Int.(<=) 0 j) and (Int.(<) j (array_length t : int)))) ->
+          ((((Int.(<=) 0 i) /\ (Int.(<) i (array_length t : int))) /\
+            ((Int.(<=) 0 j) /\ (Int.(<) j (array_length t : int)))) ->
            (Int.(<) i (array_length t : int))))))
 
   goal Swap_po_3:
     (forall i:int.
       (forall j:int.
         (forall t:(farray int).
-          ((((Int.(<=) 0 i) and (Int.(<) i (array_length t : int))) and
-            ((Int.(<=) 0 j) and (Int.(<) j (array_length t : int)))) ->
-           (((Int.(<=) 0 i) and (Int.(<) i (array_length t : int))) ->
+          ((((Int.(<=) 0 i) /\ (Int.(<) i (array_length t : int))) /\
+            ((Int.(<=) 0 j) /\ (Int.(<) j (array_length t : int)))) ->
+           (((Int.(<=) 0 i) /\ (Int.(<) i (array_length t : int))) ->
             (forall result:int.
               ((result = (access t i : int)) -> (Int.(<=) 0 j))))))))
 
@@ -169,9 +169,9 @@ use array.Array as A
     (forall i:int.
       (forall j:int.
         (forall t:(farray int).
-          ((((Int.(<=) 0 i) and (Int.(<) i (array_length t : int))) and
-            ((Int.(<=) 0 j) and (Int.(<) j (array_length t : int)))) ->
-           (((Int.(<=) 0 i) and (Int.(<) i (array_length t : int))) ->
+          ((((Int.(<=) 0 i) /\ (Int.(<) i (array_length t : int))) /\
+            ((Int.(<=) 0 j) /\ (Int.(<) j (array_length t : int)))) ->
+           (((Int.(<=) 0 i) /\ (Int.(<) i (array_length t : int))) ->
             (forall result:int.
               ((result = (access t i : int)) ->
                (Int.(<) j (array_length t : int)))))))))
@@ -180,15 +180,15 @@ use array.Array as A
     (forall i:int.
       (forall j:int.
         (forall t:(farray int).
-          ((((Int.(<=) 0 i) and (Int.(<) i (array_length t : int))) and
-            ((Int.(<=) 0 j) and (Int.(<) j (array_length t : int)))) ->
-           (((Int.(<=) 0 i) and (Int.(<) i (array_length t : int))) ->
+          ((((Int.(<=) 0 i) /\ (Int.(<) i (array_length t : int))) /\
+            ((Int.(<=) 0 j) /\ (Int.(<) j (array_length t : int)))) ->
+           (((Int.(<=) 0 i) /\ (Int.(<) i (array_length t : int))) ->
             (forall result:int.
               ((result = (access t i : int)) ->
-               (((Int.(<=) 0 j) and (Int.(<) j (array_length t : int))) ->
+               (((Int.(<=) 0 j) /\ (Int.(<) j (array_length t : int))) ->
                 (forall result0:int.
                   ((result0 = (access t j : int)) ->
-                   (((Int.(<=) 0 i) and (Int.(<) i (array_length t : int))) ->
+                   (((Int.(<=) 0 i) /\ (Int.(<) i (array_length t : int))) ->
                     (forall t0:(farray int).
                       ((t0 = (update t i result0 : (farray int))) ->
                        (Int.(<) j (array_length t0 : int)))))))))))))))
@@ -197,18 +197,18 @@ use array.Array as A
     (forall i:int.
       (forall j:int.
         (forall t:(farray int).
-          ((((Int.(<=) 0 i) and (Int.(<) i (array_length t : int))) and
-            ((Int.(<=) 0 j) and (Int.(<) j (array_length t : int)))) ->
-           (((Int.(<=) 0 i) and (Int.(<) i (array_length t : int))) ->
+          ((((Int.(<=) 0 i) /\ (Int.(<) i (array_length t : int))) /\
+            ((Int.(<=) 0 j) /\ (Int.(<) j (array_length t : int)))) ->
+           (((Int.(<=) 0 i) /\ (Int.(<) i (array_length t : int))) ->
             (forall result:int.
               ((result = (access t i : int)) ->
-               (((Int.(<=) 0 j) and (Int.(<) j (array_length t : int))) ->
+               (((Int.(<=) 0 j) /\ (Int.(<) j (array_length t : int))) ->
                 (forall result0:int.
                   ((result0 = (access t j : int)) ->
-                   (((Int.(<=) 0 i) and (Int.(<) i (array_length t : int))) ->
+                   (((Int.(<=) 0 i) /\ (Int.(<) i (array_length t : int))) ->
                     (forall t0:(farray int).
                       ((t0 = (update t i result0 : (farray int))) ->
-                       (((Int.(<=) 0 j) and
+                       (((Int.(<=) 0 j) /\
                          (Int.(<) j (array_length t0 : int))) ->
                         (forall t1:(farray int).
                           ((t1 = (update t0 j result : (farray int))) ->
@@ -218,42 +218,42 @@ use array.Array as A
     (forall l:int.
       (forall r:int.
         (forall t:(farray int).
-          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+          (((Int.(<=) 0 l) /\ (Int.(<) r (array_length t : int))) ->
            ((Int.(<) l r) -> (Int.(<) l (array_length t : int)))))))
 
   goal Quick_rec_po_2:
     (forall l:int.
       (forall r:int.
         (forall t:(farray int).
-          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+          (((Int.(<=) 0 l) /\ (Int.(<) r (array_length t : int))) ->
            ((Int.(<) l r) ->
-            (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (((Int.(<=) 0 l) /\ (Int.(<) l (array_length t : int))) ->
              (forall result:int.
                ((result = (access t l : int)) ->
                 (forall j:int.
-                  (((Int.(<) l j) and (Int.(<=) j l)) ->
+                  (((Int.(<) l j) /\ (Int.(<=) j l)) ->
                    (Int.(<) (access t j : int) result)))))))))))
 
   goal Quick_rec_po_3:
     (forall l:int.
       (forall r:int.
         (forall t:(farray int).
-          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+          (((Int.(<=) 0 l) /\ (Int.(<) r (array_length t : int))) ->
            ((Int.(<) l r) ->
-            (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (((Int.(<=) 0 l) /\ (Int.(<) l (array_length t : int))) ->
              (forall result:int.
                ((result = (access t l : int)) ->
                 (forall j:int.
-                  (((Int.(<) l j) and (Int.(<) j (Int.(+) l 1 : int))) ->
+                  (((Int.(<) l j) /\ (Int.(<) j (Int.(+) l 1 : int))) ->
                    (Int.(>=) (access t j : int) result)))))))))))
 
   goal Quick_rec_po_4:
     (forall l:int.
       (forall r:int.
         (forall t:(farray int).
-          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+          (((Int.(<=) 0 l) /\ (Int.(<) r (array_length t : int))) ->
            ((Int.(<) l r) ->
-            (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (((Int.(<=) 0 l) /\ (Int.(<) l (array_length t : int))) ->
              (forall result:int.
                ((result = (access t l : int)) -> (permut t t l r)))))))))
 
@@ -261,9 +261,9 @@ use array.Array as A
     (forall l:int.
       (forall r:int.
         (forall t:(farray int).
-          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+          (((Int.(<=) 0 l) /\ (Int.(<) r (array_length t : int))) ->
            ((Int.(<) l r) ->
-            (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (((Int.(<=) 0 l) /\ (Int.(<) l (array_length t : int))) ->
              (forall result:int.
                ((result = (access t l : int)) ->
                 ((access t l : int) = result)))))))))
@@ -272,9 +272,9 @@ use array.Array as A
     (forall l:int.
       (forall r:int.
         (forall t:(farray int).
-          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+          (((Int.(<=) 0 l) /\ (Int.(<) r (array_length t : int))) ->
            ((Int.(<) l r) ->
-            (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (((Int.(<=) 0 l) /\ (Int.(<) l (array_length t : int))) ->
              (forall result:int.
                ((result = (access t l : int)) -> (Int.(<=) l l)))))))))
 
@@ -282,9 +282,9 @@ use array.Array as A
     (forall l:int.
       (forall r:int.
         (forall t:(farray int).
-          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+          (((Int.(<=) 0 l) /\ (Int.(<) r (array_length t : int))) ->
            ((Int.(<) l r) ->
-            (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (((Int.(<=) 0 l) /\ (Int.(<) l (array_length t : int))) ->
              (forall result:int.
                ((result = (access t l : int)) ->
                 (Int.(<) l (Int.(+) l 1 : int))))))))))
@@ -293,9 +293,9 @@ use array.Array as A
     (forall l:int.
       (forall r:int.
         (forall t:(farray int).
-          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+          (((Int.(<=) 0 l) /\ (Int.(<) r (array_length t : int))) ->
            ((Int.(<) l r) ->
-            (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (((Int.(<=) 0 l) /\ (Int.(<) l (array_length t : int))) ->
              (forall result:int.
                ((result = (access t l : int)) ->
                 (Int.(<=) (Int.(+) l 1 : int) (Int.(+) r 1 : int))))))))))
@@ -304,23 +304,23 @@ use array.Array as A
     (forall l:int.
       (forall r:int.
         (forall t:(farray int).
-          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+          (((Int.(<=) 0 l) /\ (Int.(<) r (array_length t : int))) ->
            ((Int.(<) l r) ->
-            (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (((Int.(<=) 0 l) /\ (Int.(<) l (array_length t : int))) ->
              (forall result:int.
                ((result = (access t l : int)) ->
                 (forall i:int.
                   (forall m:int.
                     (forall t0:(farray int).
                       (((forall j:int.
-                          (((Int.(<) l j) and (Int.(<=) j m)) ->
-                           (Int.(<) (access t0 j : int) result))) and
+                          (((Int.(<) l j) /\ (Int.(<=) j m)) ->
+                           (Int.(<) (access t0 j : int) result))) /\
                         ((forall j:int.
-                           (((Int.(<) m j) and (Int.(<) j i)) ->
-                            (Int.(>=) (access t0 j : int) result))) and
-                         ((permut t0 t l r) and
-                          (((access t0 l : int) = result) and
-                           (((Int.(<=) l m) and (Int.(<) m i)) and
+                           (((Int.(<) m j) /\ (Int.(<) j i)) ->
+                            (Int.(>=) (access t0 j : int) result))) /\
+                         ((permut t0 t l r) /\
+                          (((access t0 l : int) = result) /\
+                           (((Int.(<=) l m) /\ (Int.(<) m i)) /\
                             (Int.(<=) i (Int.(+) r 1 : int))))))) ->
                        ((Int.(<=) i r) -> (Int.(<=) 0 i))))))))))))))
 
@@ -328,23 +328,23 @@ use array.Array as A
     (forall l:int.
       (forall r:int.
         (forall t:(farray int).
-          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+          (((Int.(<=) 0 l) /\ (Int.(<) r (array_length t : int))) ->
            ((Int.(<) l r) ->
-            (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (((Int.(<=) 0 l) /\ (Int.(<) l (array_length t : int))) ->
              (forall result:int.
                ((result = (access t l : int)) ->
                 (forall i:int.
                   (forall m:int.
                     (forall t0:(farray int).
                       (((forall j:int.
-                          (((Int.(<) l j) and (Int.(<=) j m)) ->
-                           (Int.(<) (access t0 j : int) result))) and
+                          (((Int.(<) l j) /\ (Int.(<=) j m)) ->
+                           (Int.(<) (access t0 j : int) result))) /\
                         ((forall j:int.
-                           (((Int.(<) m j) and (Int.(<) j i)) ->
-                            (Int.(>=) (access t0 j : int) result))) and
-                         ((permut t0 t l r) and
-                          (((access t0 l : int) = result) and
-                           (((Int.(<=) l m) and (Int.(<) m i)) and
+                           (((Int.(<) m j) /\ (Int.(<) j i)) ->
+                            (Int.(>=) (access t0 j : int) result))) /\
+                         ((permut t0 t l r) /\
+                          (((access t0 l : int) = result) /\
+                           (((Int.(<=) l m) /\ (Int.(<) m i)) /\
                             (Int.(<=) i (Int.(+) r 1 : int))))))) ->
                        ((Int.(<=) i r) -> (Int.(<) i (array_length t0 : int)))))))))))))))
 
@@ -352,26 +352,26 @@ use array.Array as A
     (forall l:int.
       (forall r:int.
         (forall t:(farray int).
-          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+          (((Int.(<=) 0 l) /\ (Int.(<) r (array_length t : int))) ->
            ((Int.(<) l r) ->
-            (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (((Int.(<=) 0 l) /\ (Int.(<) l (array_length t : int))) ->
              (forall result:int.
                ((result = (access t l : int)) ->
                 (forall i:int.
                   (forall m:int.
                     (forall t0:(farray int).
                       (((forall j:int.
-                          (((Int.(<) l j) and (Int.(<=) j m)) ->
-                           (Int.(<) (access t0 j : int) result))) and
+                          (((Int.(<) l j) /\ (Int.(<=) j m)) ->
+                           (Int.(<) (access t0 j : int) result))) /\
                         ((forall j:int.
-                           (((Int.(<) m j) and (Int.(<) j i)) ->
-                            (Int.(>=) (access t0 j : int) result))) and
-                         ((permut t0 t l r) and
-                          (((access t0 l : int) = result) and
-                           (((Int.(<=) l m) and (Int.(<) m i)) and
+                           (((Int.(<) m j) /\ (Int.(<) j i)) ->
+                            (Int.(>=) (access t0 j : int) result))) /\
+                         ((permut t0 t l r) /\
+                          (((access t0 l : int) = result) /\
+                           (((Int.(<=) l m) /\ (Int.(<) m i)) /\
                             (Int.(<=) i (Int.(+) r 1 : int))))))) ->
                        ((Int.(<=) i r) ->
-                        (((Int.(<=) 0 i) and
+                        (((Int.(<=) 0 i) /\
                           (Int.(<) i (array_length t0 : int))) ->
                          (forall result0:int.
                            ((result0 = (access t0 i : int)) ->
@@ -383,26 +383,26 @@ use array.Array as A
     (forall l:int.
       (forall r:int.
         (forall t:(farray int).
-          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+          (((Int.(<=) 0 l) /\ (Int.(<) r (array_length t : int))) ->
            ((Int.(<) l r) ->
-            (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (((Int.(<=) 0 l) /\ (Int.(<) l (array_length t : int))) ->
              (forall result:int.
                ((result = (access t l : int)) ->
                 (forall i:int.
                   (forall m:int.
                     (forall t0:(farray int).
                       (((forall j:int.
-                          (((Int.(<) l j) and (Int.(<=) j m)) ->
-                           (Int.(<) (access t0 j : int) result))) and
+                          (((Int.(<) l j) /\ (Int.(<=) j m)) ->
+                           (Int.(<) (access t0 j : int) result))) /\
                         ((forall j:int.
-                           (((Int.(<) m j) and (Int.(<) j i)) ->
-                            (Int.(>=) (access t0 j : int) result))) and
-                         ((permut t0 t l r) and
-                          (((access t0 l : int) = result) and
-                           (((Int.(<=) l m) and (Int.(<) m i)) and
+                           (((Int.(<) m j) /\ (Int.(<) j i)) ->
+                            (Int.(>=) (access t0 j : int) result))) /\
+                         ((permut t0 t l r) /\
+                          (((access t0 l : int) = result) /\
+                           (((Int.(<=) l m) /\ (Int.(<) m i)) /\
                             (Int.(<=) i (Int.(+) r 1 : int))))))) ->
                        ((Int.(<=) i r) ->
-                        (((Int.(<=) 0 i) and
+                        (((Int.(<=) 0 i) /\
                           (Int.(<) i (array_length t0 : int))) ->
                          (forall result0:int.
                            ((result0 = (access t0 i : int)) ->
@@ -415,119 +415,119 @@ use array.Array as A
     (forall l:int.
       (forall r:int.
         (forall t:(farray int).
-          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+          (((Int.(<=) 0 l) /\ (Int.(<) r (array_length t : int))) ->
            ((Int.(<) l r) ->
-            (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (((Int.(<=) 0 l) /\ (Int.(<) l (array_length t : int))) ->
              (forall result:int.
                ((result = (access t l : int)) ->
                 (forall i:int.
                   (forall m:int.
                     (forall t0:(farray int).
                       (((forall j:int.
-                          (((Int.(<) l j) and (Int.(<=) j m)) ->
-                           (Int.(<) (access t0 j : int) result))) and
+                          (((Int.(<) l j) /\ (Int.(<=) j m)) ->
+                           (Int.(<) (access t0 j : int) result))) /\
                         ((forall j:int.
-                           (((Int.(<) m j) and (Int.(<) j i)) ->
-                            (Int.(>=) (access t0 j : int) result))) and
-                         ((permut t0 t l r) and
-                          (((access t0 l : int) = result) and
-                           (((Int.(<=) l m) and (Int.(<) m i)) and
+                           (((Int.(<) m j) /\ (Int.(<) j i)) ->
+                            (Int.(>=) (access t0 j : int) result))) /\
+                         ((permut t0 t l r) /\
+                          (((access t0 l : int) = result) /\
+                           (((Int.(<=) l m) /\ (Int.(<) m i)) /\
                             (Int.(<=) i (Int.(+) r 1 : int))))))) ->
                        ((Int.(<=) i r) ->
-                        (((Int.(<=) 0 i) and
+                        (((Int.(<=) 0 i) /\
                           (Int.(<) i (array_length t0 : int))) ->
                          (forall result0:int.
                            ((result0 = (access t0 i : int)) ->
                             ((Int.(<) result0 result) ->
                              (forall m0:int.
                                ((m0 = (Int.(+) m 1 : int)) ->
-                                ((((Int.(<=) 0 i) and
-                                   (Int.(<) i (array_length t0 : int))) and
-                                  ((Int.(<=) 0 m0) and
+                                ((((Int.(<=) 0 i) /\
+                                   (Int.(<) i (array_length t0 : int))) /\
+                                  ((Int.(<=) 0 m0) /\
                                    (Int.(<) m0 (array_length t0 : int)))) ->
                                  (forall t1:(farray int).
                                    ((exchange t1 t0 i m0) ->
                                     (forall i0:int.
                                       ((i0 = (Int.(+) i 1 : int)) ->
                                        (forall j:int.
-                                         (((Int.(<) l j) and (Int.(<=) j m0)) ->
+                                         (((Int.(<) l j) /\ (Int.(<=) j m0)) ->
                                           (Int.(<) (access t1 j : int) result)))))))))))))))))))))))))))
 
   goal Quick_rec_po_14:
     (forall l:int.
       (forall r:int.
         (forall t:(farray int).
-          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+          (((Int.(<=) 0 l) /\ (Int.(<) r (array_length t : int))) ->
            ((Int.(<) l r) ->
-            (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (((Int.(<=) 0 l) /\ (Int.(<) l (array_length t : int))) ->
              (forall result:int.
                ((result = (access t l : int)) ->
                 (forall i:int.
                   (forall m:int.
                     (forall t0:(farray int).
                       (((forall j:int.
-                          (((Int.(<) l j) and (Int.(<=) j m)) ->
-                           (Int.(<) (access t0 j : int) result))) and
+                          (((Int.(<) l j) /\ (Int.(<=) j m)) ->
+                           (Int.(<) (access t0 j : int) result))) /\
                         ((forall j:int.
-                           (((Int.(<) m j) and (Int.(<) j i)) ->
-                            (Int.(>=) (access t0 j : int) result))) and
-                         ((permut t0 t l r) and
-                          (((access t0 l : int) = result) and
-                           (((Int.(<=) l m) and (Int.(<) m i)) and
+                           (((Int.(<) m j) /\ (Int.(<) j i)) ->
+                            (Int.(>=) (access t0 j : int) result))) /\
+                         ((permut t0 t l r) /\
+                          (((access t0 l : int) = result) /\
+                           (((Int.(<=) l m) /\ (Int.(<) m i)) /\
                             (Int.(<=) i (Int.(+) r 1 : int))))))) ->
                        ((Int.(<=) i r) ->
-                        (((Int.(<=) 0 i) and
+                        (((Int.(<=) 0 i) /\
                           (Int.(<) i (array_length t0 : int))) ->
                          (forall result0:int.
                            ((result0 = (access t0 i : int)) ->
                             ((Int.(<) result0 result) ->
                              (forall m0:int.
                                ((m0 = (Int.(+) m 1 : int)) ->
-                                ((((Int.(<=) 0 i) and
-                                   (Int.(<) i (array_length t0 : int))) and
-                                  ((Int.(<=) 0 m0) and
+                                ((((Int.(<=) 0 i) /\
+                                   (Int.(<) i (array_length t0 : int))) /\
+                                  ((Int.(<=) 0 m0) /\
                                    (Int.(<) m0 (array_length t0 : int)))) ->
                                  (forall t1:(farray int).
                                    ((exchange t1 t0 i m0) ->
                                     (forall i0:int.
                                       ((i0 = (Int.(+) i 1 : int)) ->
                                        (forall j:int.
-                                         (((Int.(<) m0 j) and (Int.(<) j i0)) ->
+                                         (((Int.(<) m0 j) /\ (Int.(<) j i0)) ->
                                           (Int.(>=) (access t1 j : int) result)))))))))))))))))))))))))))
 
   goal Quick_rec_po_15:
     (forall l:int.
       (forall r:int.
         (forall t:(farray int).
-          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+          (((Int.(<=) 0 l) /\ (Int.(<) r (array_length t : int))) ->
            ((Int.(<) l r) ->
-            (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (((Int.(<=) 0 l) /\ (Int.(<) l (array_length t : int))) ->
              (forall result:int.
                ((result = (access t l : int)) ->
                 (forall i:int.
                   (forall m:int.
                     (forall t0:(farray int).
                       (((forall j:int.
-                          (((Int.(<) l j) and (Int.(<=) j m)) ->
-                           (Int.(<) (access t0 j : int) result))) and
+                          (((Int.(<) l j) /\ (Int.(<=) j m)) ->
+                           (Int.(<) (access t0 j : int) result))) /\
                         ((forall j:int.
-                           (((Int.(<) m j) and (Int.(<) j i)) ->
-                            (Int.(>=) (access t0 j : int) result))) and
-                         ((permut t0 t l r) and
-                          (((access t0 l : int) = result) and
-                           (((Int.(<=) l m) and (Int.(<) m i)) and
+                           (((Int.(<) m j) /\ (Int.(<) j i)) ->
+                            (Int.(>=) (access t0 j : int) result))) /\
+                         ((permut t0 t l r) /\
+                          (((access t0 l : int) = result) /\
+                           (((Int.(<=) l m) /\ (Int.(<) m i)) /\
                             (Int.(<=) i (Int.(+) r 1 : int))))))) ->
                        ((Int.(<=) i r) ->
-                        (((Int.(<=) 0 i) and
+                        (((Int.(<=) 0 i) /\
                           (Int.(<) i (array_length t0 : int))) ->
                          (forall result0:int.
                            ((result0 = (access t0 i : int)) ->
                             ((Int.(<) result0 result) ->
                              (forall m0:int.
                                ((m0 = (Int.(+) m 1 : int)) ->
-                                ((((Int.(<=) 0 i) and
-                                   (Int.(<) i (array_length t0 : int))) and
-                                  ((Int.(<=) 0 m0) and
+                                ((((Int.(<=) 0 i) /\
+                                   (Int.(<) i (array_length t0 : int))) /\
+                                  ((Int.(<=) 0 m0) /\
                                    (Int.(<) m0 (array_length t0 : int)))) ->
                                  (forall t1:(farray int).
                                    ((exchange t1 t0 i m0) ->
@@ -539,35 +539,35 @@ use array.Array as A
     (forall l:int.
       (forall r:int.
         (forall t:(farray int).
-          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+          (((Int.(<=) 0 l) /\ (Int.(<) r (array_length t : int))) ->
            ((Int.(<) l r) ->
-            (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (((Int.(<=) 0 l) /\ (Int.(<) l (array_length t : int))) ->
              (forall result:int.
                ((result = (access t l : int)) ->
                 (forall i:int.
                   (forall m:int.
                     (forall t0:(farray int).
                       (((forall j:int.
-                          (((Int.(<) l j) and (Int.(<=) j m)) ->
-                           (Int.(<) (access t0 j : int) result))) and
+                          (((Int.(<) l j) /\ (Int.(<=) j m)) ->
+                           (Int.(<) (access t0 j : int) result))) /\
                         ((forall j:int.
-                           (((Int.(<) m j) and (Int.(<) j i)) ->
-                            (Int.(>=) (access t0 j : int) result))) and
-                         ((permut t0 t l r) and
-                          (((access t0 l : int) = result) and
-                           (((Int.(<=) l m) and (Int.(<) m i)) and
+                           (((Int.(<) m j) /\ (Int.(<) j i)) ->
+                            (Int.(>=) (access t0 j : int) result))) /\
+                         ((permut t0 t l r) /\
+                          (((access t0 l : int) = result) /\
+                           (((Int.(<=) l m) /\ (Int.(<) m i)) /\
                             (Int.(<=) i (Int.(+) r 1 : int))))))) ->
                        ((Int.(<=) i r) ->
-                        (((Int.(<=) 0 i) and
+                        (((Int.(<=) 0 i) /\
                           (Int.(<) i (array_length t0 : int))) ->
                          (forall result0:int.
                            ((result0 = (access t0 i : int)) ->
                             ((Int.(<) result0 result) ->
                              (forall m0:int.
                                ((m0 = (Int.(+) m 1 : int)) ->
-                                ((((Int.(<=) 0 i) and
-                                   (Int.(<) i (array_length t0 : int))) and
-                                  ((Int.(<=) 0 m0) and
+                                ((((Int.(<=) 0 i) /\
+                                   (Int.(<) i (array_length t0 : int))) /\
+                                  ((Int.(<=) 0 m0) /\
                                    (Int.(<) m0 (array_length t0 : int)))) ->
                                  (forall t1:(farray int).
                                    ((exchange t1 t0 i m0) ->
@@ -579,35 +579,35 @@ use array.Array as A
     (forall l:int.
       (forall r:int.
         (forall t:(farray int).
-          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+          (((Int.(<=) 0 l) /\ (Int.(<) r (array_length t : int))) ->
            ((Int.(<) l r) ->
-            (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (((Int.(<=) 0 l) /\ (Int.(<) l (array_length t : int))) ->
              (forall result:int.
                ((result = (access t l : int)) ->
                 (forall i:int.
                   (forall m:int.
                     (forall t0:(farray int).
                       (((forall j:int.
-                          (((Int.(<) l j) and (Int.(<=) j m)) ->
-                           (Int.(<) (access t0 j : int) result))) and
+                          (((Int.(<) l j) /\ (Int.(<=) j m)) ->
+                           (Int.(<) (access t0 j : int) result))) /\
                         ((forall j:int.
-                           (((Int.(<) m j) and (Int.(<) j i)) ->
-                            (Int.(>=) (access t0 j : int) result))) and
-                         ((permut t0 t l r) and
-                          (((access t0 l : int) = result) and
-                           (((Int.(<=) l m) and (Int.(<) m i)) and
+                           (((Int.(<) m j) /\ (Int.(<) j i)) ->
+                            (Int.(>=) (access t0 j : int) result))) /\
+                         ((permut t0 t l r) /\
+                          (((access t0 l : int) = result) /\
+                           (((Int.(<=) l m) /\ (Int.(<) m i)) /\
                             (Int.(<=) i (Int.(+) r 1 : int))))))) ->
                        ((Int.(<=) i r) ->
-                        (((Int.(<=) 0 i) and
+                        (((Int.(<=) 0 i) /\
                           (Int.(<) i (array_length t0 : int))) ->
                          (forall result0:int.
                            ((result0 = (access t0 i : int)) ->
                             ((Int.(<) result0 result) ->
                              (forall m0:int.
                                ((m0 = (Int.(+) m 1 : int)) ->
-                                ((((Int.(<=) 0 i) and
-                                   (Int.(<) i (array_length t0 : int))) and
-                                  ((Int.(<=) 0 m0) and
+                                ((((Int.(<=) 0 i) /\
+                                   (Int.(<) i (array_length t0 : int))) /\
+                                  ((Int.(<=) 0 m0) /\
                                    (Int.(<) m0 (array_length t0 : int)))) ->
                                  (forall t1:(farray int).
                                    ((exchange t1 t0 i m0) ->
@@ -619,35 +619,35 @@ use array.Array as A
     (forall l:int.
       (forall r:int.
         (forall t:(farray int).
-          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+          (((Int.(<=) 0 l) /\ (Int.(<) r (array_length t : int))) ->
            ((Int.(<) l r) ->
-            (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (((Int.(<=) 0 l) /\ (Int.(<) l (array_length t : int))) ->
              (forall result:int.
                ((result = (access t l : int)) ->
                 (forall i:int.
                   (forall m:int.
                     (forall t0:(farray int).
                       (((forall j:int.
-                          (((Int.(<) l j) and (Int.(<=) j m)) ->
-                           (Int.(<) (access t0 j : int) result))) and
+                          (((Int.(<) l j) /\ (Int.(<=) j m)) ->
+                           (Int.(<) (access t0 j : int) result))) /\
                         ((forall j:int.
-                           (((Int.(<) m j) and (Int.(<) j i)) ->
-                            (Int.(>=) (access t0 j : int) result))) and
-                         ((permut t0 t l r) and
-                          (((access t0 l : int) = result) and
-                           (((Int.(<=) l m) and (Int.(<) m i)) and
+                           (((Int.(<) m j) /\ (Int.(<) j i)) ->
+                            (Int.(>=) (access t0 j : int) result))) /\
+                         ((permut t0 t l r) /\
+                          (((access t0 l : int) = result) /\
+                           (((Int.(<=) l m) /\ (Int.(<) m i)) /\
                             (Int.(<=) i (Int.(+) r 1 : int))))))) ->
                        ((Int.(<=) i r) ->
-                        (((Int.(<=) 0 i) and
+                        (((Int.(<=) 0 i) /\
                           (Int.(<) i (array_length t0 : int))) ->
                          (forall result0:int.
                            ((result0 = (access t0 i : int)) ->
                             ((Int.(<) result0 result) ->
                              (forall m0:int.
                                ((m0 = (Int.(+) m 1 : int)) ->
-                                ((((Int.(<=) 0 i) and
-                                   (Int.(<) i (array_length t0 : int))) and
-                                  ((Int.(<=) 0 m0) and
+                                ((((Int.(<=) 0 i) /\
+                                   (Int.(<) i (array_length t0 : int))) /\
+                                  ((Int.(<=) 0 m0) /\
                                    (Int.(<) m0 (array_length t0 : int)))) ->
                                  (forall t1:(farray int).
                                    ((exchange t1 t0 i m0) ->
@@ -659,35 +659,35 @@ use array.Array as A
     (forall l:int.
       (forall r:int.
         (forall t:(farray int).
-          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+          (((Int.(<=) 0 l) /\ (Int.(<) r (array_length t : int))) ->
            ((Int.(<) l r) ->
-            (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (((Int.(<=) 0 l) /\ (Int.(<) l (array_length t : int))) ->
              (forall result:int.
                ((result = (access t l : int)) ->
                 (forall i:int.
                   (forall m:int.
                     (forall t0:(farray int).
                       (((forall j:int.
-                          (((Int.(<) l j) and (Int.(<=) j m)) ->
-                           (Int.(<) (access t0 j : int) result))) and
+                          (((Int.(<) l j) /\ (Int.(<=) j m)) ->
+                           (Int.(<) (access t0 j : int) result))) /\
                         ((forall j:int.
-                           (((Int.(<) m j) and (Int.(<) j i)) ->
-                            (Int.(>=) (access t0 j : int) result))) and
-                         ((permut t0 t l r) and
-                          (((access t0 l : int) = result) and
-                           (((Int.(<=) l m) and (Int.(<) m i)) and
+                           (((Int.(<) m j) /\ (Int.(<) j i)) ->
+                            (Int.(>=) (access t0 j : int) result))) /\
+                         ((permut t0 t l r) /\
+                          (((access t0 l : int) = result) /\
+                           (((Int.(<=) l m) /\ (Int.(<) m i)) /\
                             (Int.(<=) i (Int.(+) r 1 : int))))))) ->
                        ((Int.(<=) i r) ->
-                        (((Int.(<=) 0 i) and
+                        (((Int.(<=) 0 i) /\
                           (Int.(<) i (array_length t0 : int))) ->
                          (forall result0:int.
                            ((result0 = (access t0 i : int)) ->
                             ((Int.(<) result0 result) ->
                              (forall m0:int.
                                ((m0 = (Int.(+) m 1 : int)) ->
-                                ((((Int.(<=) 0 i) and
-                                   (Int.(<) i (array_length t0 : int))) and
-                                  ((Int.(<=) 0 m0) and
+                                ((((Int.(<=) 0 i) /\
+                                   (Int.(<) i (array_length t0 : int))) /\
+                                  ((Int.(<=) 0 m0) /\
                                    (Int.(<) m0 (array_length t0 : int)))) ->
                                  (forall t1:(farray int).
                                    ((exchange t1 t0 i m0) ->
@@ -699,35 +699,35 @@ use array.Array as A
     (forall l:int.
       (forall r:int.
         (forall t:(farray int).
-          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+          (((Int.(<=) 0 l) /\ (Int.(<) r (array_length t : int))) ->
            ((Int.(<) l r) ->
-            (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (((Int.(<=) 0 l) /\ (Int.(<) l (array_length t : int))) ->
              (forall result:int.
                ((result = (access t l : int)) ->
                 (forall i:int.
                   (forall m:int.
                     (forall t0:(farray int).
                       (((forall j:int.
-                          (((Int.(<) l j) and (Int.(<=) j m)) ->
-                           (Int.(<) (access t0 j : int) result))) and
+                          (((Int.(<) l j) /\ (Int.(<=) j m)) ->
+                           (Int.(<) (access t0 j : int) result))) /\
                         ((forall j:int.
-                           (((Int.(<) m j) and (Int.(<) j i)) ->
-                            (Int.(>=) (access t0 j : int) result))) and
-                         ((permut t0 t l r) and
-                          (((access t0 l : int) = result) and
-                           (((Int.(<=) l m) and (Int.(<) m i)) and
+                           (((Int.(<) m j) /\ (Int.(<) j i)) ->
+                            (Int.(>=) (access t0 j : int) result))) /\
+                         ((permut t0 t l r) /\
+                          (((access t0 l : int) = result) /\
+                           (((Int.(<=) l m) /\ (Int.(<) m i)) /\
                             (Int.(<=) i (Int.(+) r 1 : int))))))) ->
                        ((Int.(<=) i r) ->
-                        (((Int.(<=) 0 i) and
+                        (((Int.(<=) 0 i) /\
                           (Int.(<) i (array_length t0 : int))) ->
                          (forall result0:int.
                            ((result0 = (access t0 i : int)) ->
                             ((Int.(<) result0 result) ->
                              (forall m0:int.
                                ((m0 = (Int.(+) m 1 : int)) ->
-                                ((((Int.(<=) 0 i) and
-                                   (Int.(<) i (array_length t0 : int))) and
-                                  ((Int.(<=) 0 m0) and
+                                ((((Int.(<=) 0 i) /\
+                                   (Int.(<) i (array_length t0 : int))) /\
+                                  ((Int.(<=) 0 m0) /\
                                    (Int.(<) m0 (array_length t0 : int)))) ->
                                  (forall t1:(farray int).
                                    ((exchange t1 t0 i m0) ->
@@ -739,35 +739,35 @@ use array.Array as A
     (forall l:int.
       (forall r:int.
         (forall t:(farray int).
-          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+          (((Int.(<=) 0 l) /\ (Int.(<) r (array_length t : int))) ->
            ((Int.(<) l r) ->
-            (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (((Int.(<=) 0 l) /\ (Int.(<) l (array_length t : int))) ->
              (forall result:int.
                ((result = (access t l : int)) ->
                 (forall i:int.
                   (forall m:int.
                     (forall t0:(farray int).
                       (((forall j:int.
-                          (((Int.(<) l j) and (Int.(<=) j m)) ->
-                           (Int.(<) (access t0 j : int) result))) and
+                          (((Int.(<) l j) /\ (Int.(<=) j m)) ->
+                           (Int.(<) (access t0 j : int) result))) /\
                         ((forall j:int.
-                           (((Int.(<) m j) and (Int.(<) j i)) ->
-                            (Int.(>=) (access t0 j : int) result))) and
-                         ((permut t0 t l r) and
-                          (((access t0 l : int) = result) and
-                           (((Int.(<=) l m) and (Int.(<) m i)) and
+                           (((Int.(<) m j) /\ (Int.(<) j i)) ->
+                            (Int.(>=) (access t0 j : int) result))) /\
+                         ((permut t0 t l r) /\
+                          (((access t0 l : int) = result) /\
+                           (((Int.(<=) l m) /\ (Int.(<) m i)) /\
                             (Int.(<=) i (Int.(+) r 1 : int))))))) ->
                        ((Int.(<=) i r) ->
-                        (((Int.(<=) 0 i) and
+                        (((Int.(<=) 0 i) /\
                           (Int.(<) i (array_length t0 : int))) ->
                          (forall result0:int.
                            ((result0 = (access t0 i : int)) ->
                             ((Int.(<) result0 result) ->
                              (forall m0:int.
                                ((m0 = (Int.(+) m 1 : int)) ->
-                                ((((Int.(<=) 0 i) and
-                                   (Int.(<) i (array_length t0 : int))) and
-                                  ((Int.(<=) 0 m0) and
+                                ((((Int.(<=) 0 i) /\
+                                   (Int.(<) i (array_length t0 : int))) /\
+                                  ((Int.(<=) 0 m0) /\
                                    (Int.(<) m0 (array_length t0 : int)))) ->
                                  (forall t1:(farray int).
                                    ((exchange t1 t0 i m0) ->
@@ -779,26 +779,26 @@ use array.Array as A
     (forall l:int.
       (forall r:int.
         (forall t:(farray int).
-          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+          (((Int.(<=) 0 l) /\ (Int.(<) r (array_length t : int))) ->
            ((Int.(<) l r) ->
-            (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (((Int.(<=) 0 l) /\ (Int.(<) l (array_length t : int))) ->
              (forall result:int.
                ((result = (access t l : int)) ->
                 (forall i:int.
                   (forall m:int.
                     (forall t0:(farray int).
                       (((forall j:int.
-                          (((Int.(<) l j) and (Int.(<=) j m)) ->
-                           (Int.(<) (access t0 j : int) result))) and
+                          (((Int.(<) l j) /\ (Int.(<=) j m)) ->
+                           (Int.(<) (access t0 j : int) result))) /\
                         ((forall j:int.
-                           (((Int.(<) m j) and (Int.(<) j i)) ->
-                            (Int.(>=) (access t0 j : int) result))) and
-                         ((permut t0 t l r) and
-                          (((access t0 l : int) = result) and
-                           (((Int.(<=) l m) and (Int.(<) m i)) and
+                           (((Int.(<) m j) /\ (Int.(<) j i)) ->
+                            (Int.(>=) (access t0 j : int) result))) /\
+                         ((permut t0 t l r) /\
+                          (((access t0 l : int) = result) /\
+                           (((Int.(<=) l m) /\ (Int.(<) m i)) /\
                             (Int.(<=) i (Int.(+) r 1 : int))))))) ->
                        ((Int.(<=) i r) ->
-                        (((Int.(<=) 0 i) and
+                        (((Int.(<=) 0 i) /\
                           (Int.(<) i (array_length t0 : int))) ->
                          (forall result0:int.
                            ((result0 = (access t0 i : int)) ->
@@ -806,33 +806,33 @@ use array.Array as A
                              (forall i0:int.
                                ((i0 = (Int.(+) i 1 : int)) ->
                                 (forall j:int.
-                                  (((Int.(<) l j) and (Int.(<=) j m)) ->
+                                  (((Int.(<) l j) /\ (Int.(<=) j m)) ->
                                    (Int.(<) (access t0 j : int) result))))))))))))))))))))))
 
   goal Quick_rec_po_23:
     (forall l:int.
       (forall r:int.
         (forall t:(farray int).
-          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+          (((Int.(<=) 0 l) /\ (Int.(<) r (array_length t : int))) ->
            ((Int.(<) l r) ->
-            (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (((Int.(<=) 0 l) /\ (Int.(<) l (array_length t : int))) ->
              (forall result:int.
                ((result = (access t l : int)) ->
                 (forall i:int.
                   (forall m:int.
                     (forall t0:(farray int).
                       (((forall j:int.
-                          (((Int.(<) l j) and (Int.(<=) j m)) ->
-                           (Int.(<) (access t0 j : int) result))) and
+                          (((Int.(<) l j) /\ (Int.(<=) j m)) ->
+                           (Int.(<) (access t0 j : int) result))) /\
                         ((forall j:int.
-                           (((Int.(<) m j) and (Int.(<) j i)) ->
-                            (Int.(>=) (access t0 j : int) result))) and
-                         ((permut t0 t l r) and
-                          (((access t0 l : int) = result) and
-                           (((Int.(<=) l m) and (Int.(<) m i)) and
+                           (((Int.(<) m j) /\ (Int.(<) j i)) ->
+                            (Int.(>=) (access t0 j : int) result))) /\
+                         ((permut t0 t l r) /\
+                          (((access t0 l : int) = result) /\
+                           (((Int.(<=) l m) /\ (Int.(<) m i)) /\
                             (Int.(<=) i (Int.(+) r 1 : int))))))) ->
                        ((Int.(<=) i r) ->
-                        (((Int.(<=) 0 i) and
+                        (((Int.(<=) 0 i) /\
                           (Int.(<) i (array_length t0 : int))) ->
                          (forall result0:int.
                            ((result0 = (access t0 i : int)) ->
@@ -840,33 +840,33 @@ use array.Array as A
                              (forall i0:int.
                                ((i0 = (Int.(+) i 1 : int)) ->
                                 (forall j:int.
-                                  (((Int.(<) m j) and (Int.(<) j i0)) ->
+                                  (((Int.(<) m j) /\ (Int.(<) j i0)) ->
                                    (Int.(>=) (access t0 j : int) result))))))))))))))))))))))
 
   goal Quick_rec_po_24:
     (forall l:int.
       (forall r:int.
         (forall t:(farray int).
-          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+          (((Int.(<=) 0 l) /\ (Int.(<) r (array_length t : int))) ->
            ((Int.(<) l r) ->
-            (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (((Int.(<=) 0 l) /\ (Int.(<) l (array_length t : int))) ->
              (forall result:int.
                ((result = (access t l : int)) ->
                 (forall i:int.
                   (forall m:int.
                     (forall t0:(farray int).
                       (((forall j:int.
-                          (((Int.(<) l j) and (Int.(<=) j m)) ->
-                           (Int.(<) (access t0 j : int) result))) and
+                          (((Int.(<) l j) /\ (Int.(<=) j m)) ->
+                           (Int.(<) (access t0 j : int) result))) /\
                         ((forall j:int.
-                           (((Int.(<) m j) and (Int.(<) j i)) ->
-                            (Int.(>=) (access t0 j : int) result))) and
-                         ((permut t0 t l r) and
-                          (((access t0 l : int) = result) and
-                           (((Int.(<=) l m) and (Int.(<) m i)) and
+                           (((Int.(<) m j) /\ (Int.(<) j i)) ->
+                            (Int.(>=) (access t0 j : int) result))) /\
+                         ((permut t0 t l r) /\
+                          (((access t0 l : int) = result) /\
+                           (((Int.(<=) l m) /\ (Int.(<) m i)) /\
                             (Int.(<=) i (Int.(+) r 1 : int))))))) ->
                        ((Int.(<=) i r) ->
-                        (((Int.(<=) 0 i) and
+                        (((Int.(<=) 0 i) /\
                           (Int.(<) i (array_length t0 : int))) ->
                          (forall result0:int.
                            ((result0 = (access t0 i : int)) ->
@@ -879,26 +879,26 @@ use array.Array as A
     (forall l:int.
       (forall r:int.
         (forall t:(farray int).
-          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+          (((Int.(<=) 0 l) /\ (Int.(<) r (array_length t : int))) ->
            ((Int.(<) l r) ->
-            (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (((Int.(<=) 0 l) /\ (Int.(<) l (array_length t : int))) ->
              (forall result:int.
                ((result = (access t l : int)) ->
                 (forall i:int.
                   (forall m:int.
                     (forall t0:(farray int).
                       (((forall j:int.
-                          (((Int.(<) l j) and (Int.(<=) j m)) ->
-                           (Int.(<) (access t0 j : int) result))) and
+                          (((Int.(<) l j) /\ (Int.(<=) j m)) ->
+                           (Int.(<) (access t0 j : int) result))) /\
                         ((forall j:int.
-                           (((Int.(<) m j) and (Int.(<) j i)) ->
-                            (Int.(>=) (access t0 j : int) result))) and
-                         ((permut t0 t l r) and
-                          (((access t0 l : int) = result) and
-                           (((Int.(<=) l m) and (Int.(<) m i)) and
+                           (((Int.(<) m j) /\ (Int.(<) j i)) ->
+                            (Int.(>=) (access t0 j : int) result))) /\
+                         ((permut t0 t l r) /\
+                          (((access t0 l : int) = result) /\
+                           (((Int.(<=) l m) /\ (Int.(<) m i)) /\
                             (Int.(<=) i (Int.(+) r 1 : int))))))) ->
                        ((Int.(<=) i r) ->
-                        (((Int.(<=) 0 i) and
+                        (((Int.(<=) 0 i) /\
                           (Int.(<) i (array_length t0 : int))) ->
                          (forall result0:int.
                            ((result0 = (access t0 i : int)) ->
@@ -911,26 +911,26 @@ use array.Array as A
     (forall l:int.
       (forall r:int.
         (forall t:(farray int).
-          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+          (((Int.(<=) 0 l) /\ (Int.(<) r (array_length t : int))) ->
            ((Int.(<) l r) ->
-            (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (((Int.(<=) 0 l) /\ (Int.(<) l (array_length t : int))) ->
              (forall result:int.
                ((result = (access t l : int)) ->
                 (forall i:int.
                   (forall m:int.
                     (forall t0:(farray int).
                       (((forall j:int.
-                          (((Int.(<) l j) and (Int.(<=) j m)) ->
-                           (Int.(<) (access t0 j : int) result))) and
+                          (((Int.(<) l j) /\ (Int.(<=) j m)) ->
+                           (Int.(<) (access t0 j : int) result))) /\
                         ((forall j:int.
-                           (((Int.(<) m j) and (Int.(<) j i)) ->
-                            (Int.(>=) (access t0 j : int) result))) and
-                         ((permut t0 t l r) and
-                          (((access t0 l : int) = result) and
-                           (((Int.(<=) l m) and (Int.(<) m i)) and
+                           (((Int.(<) m j) /\ (Int.(<) j i)) ->
+                            (Int.(>=) (access t0 j : int) result))) /\
+                         ((permut t0 t l r) /\
+                          (((access t0 l : int) = result) /\
+                           (((Int.(<=) l m) /\ (Int.(<) m i)) /\
                             (Int.(<=) i (Int.(+) r 1 : int))))))) ->
                        ((Int.(<=) i r) ->
-                        (((Int.(<=) 0 i) and
+                        (((Int.(<=) 0 i) /\
                           (Int.(<) i (array_length t0 : int))) ->
                          (forall result0:int.
                            ((result0 = (access t0 i : int)) ->
@@ -942,26 +942,26 @@ use array.Array as A
     (forall l:int.
       (forall r:int.
         (forall t:(farray int).
-          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+          (((Int.(<=) 0 l) /\ (Int.(<) r (array_length t : int))) ->
            ((Int.(<) l r) ->
-            (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (((Int.(<=) 0 l) /\ (Int.(<) l (array_length t : int))) ->
              (forall result:int.
                ((result = (access t l : int)) ->
                 (forall i:int.
                   (forall m:int.
                     (forall t0:(farray int).
                       (((forall j:int.
-                          (((Int.(<) l j) and (Int.(<=) j m)) ->
-                           (Int.(<) (access t0 j : int) result))) and
+                          (((Int.(<) l j) /\ (Int.(<=) j m)) ->
+                           (Int.(<) (access t0 j : int) result))) /\
                         ((forall j:int.
-                           (((Int.(<) m j) and (Int.(<) j i)) ->
-                            (Int.(>=) (access t0 j : int) result))) and
-                         ((permut t0 t l r) and
-                          (((access t0 l : int) = result) and
-                           (((Int.(<=) l m) and (Int.(<) m i)) and
+                           (((Int.(<) m j) /\ (Int.(<) j i)) ->
+                            (Int.(>=) (access t0 j : int) result))) /\
+                         ((permut t0 t l r) /\
+                          (((access t0 l : int) = result) /\
+                           (((Int.(<=) l m) /\ (Int.(<) m i)) /\
                             (Int.(<=) i (Int.(+) r 1 : int))))))) ->
                        ((Int.(<=) i r) ->
-                        (((Int.(<=) 0 i) and
+                        (((Int.(<=) 0 i) /\
                           (Int.(<) i (array_length t0 : int))) ->
                          (forall result0:int.
                            ((result0 = (access t0 i : int)) ->
@@ -973,26 +973,26 @@ use array.Array as A
     (forall l:int.
       (forall r:int.
         (forall t:(farray int).
-          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+          (((Int.(<=) 0 l) /\ (Int.(<) r (array_length t : int))) ->
            ((Int.(<) l r) ->
-            (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (((Int.(<=) 0 l) /\ (Int.(<) l (array_length t : int))) ->
              (forall result:int.
                ((result = (access t l : int)) ->
                 (forall i:int.
                   (forall m:int.
                     (forall t0:(farray int).
                       (((forall j:int.
-                          (((Int.(<) l j) and (Int.(<=) j m)) ->
-                           (Int.(<) (access t0 j : int) result))) and
+                          (((Int.(<) l j) /\ (Int.(<=) j m)) ->
+                           (Int.(<) (access t0 j : int) result))) /\
                         ((forall j:int.
-                           (((Int.(<) m j) and (Int.(<) j i)) ->
-                            (Int.(>=) (access t0 j : int) result))) and
-                         ((permut t0 t l r) and
-                          (((access t0 l : int) = result) and
-                           (((Int.(<=) l m) and (Int.(<) m i)) and
+                           (((Int.(<) m j) /\ (Int.(<) j i)) ->
+                            (Int.(>=) (access t0 j : int) result))) /\
+                         ((permut t0 t l r) /\
+                          (((access t0 l : int) = result) /\
+                           (((Int.(<=) l m) /\ (Int.(<) m i)) /\
                             (Int.(<=) i (Int.(+) r 1 : int))))))) ->
                        ((Int.(<=) i r) ->
-                        (((Int.(<=) 0 i) and
+                        (((Int.(<=) 0 i) /\
                           (Int.(<) i (array_length t0 : int))) ->
                          (forall result0:int.
                            ((result0 = (access t0 i : int)) ->
@@ -1005,26 +1005,26 @@ use array.Array as A
     (forall l:int.
       (forall r:int.
         (forall t:(farray int).
-          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+          (((Int.(<=) 0 l) /\ (Int.(<) r (array_length t : int))) ->
            ((Int.(<) l r) ->
-            (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (((Int.(<=) 0 l) /\ (Int.(<) l (array_length t : int))) ->
              (forall result:int.
                ((result = (access t l : int)) ->
                 (forall i:int.
                   (forall m:int.
                     (forall t0:(farray int).
                       (((forall j:int.
-                          (((Int.(<) l j) and (Int.(<=) j m)) ->
-                           (Int.(<) (access t0 j : int) result))) and
+                          (((Int.(<) l j) /\ (Int.(<=) j m)) ->
+                           (Int.(<) (access t0 j : int) result))) /\
                         ((forall j:int.
-                           (((Int.(<) m j) and (Int.(<) j i)) ->
-                            (Int.(>=) (access t0 j : int) result))) and
-                         ((permut t0 t l r) and
-                          (((access t0 l : int) = result) and
-                           (((Int.(<=) l m) and (Int.(<) m i)) and
+                           (((Int.(<) m j) /\ (Int.(<) j i)) ->
+                            (Int.(>=) (access t0 j : int) result))) /\
+                         ((permut t0 t l r) /\
+                          (((access t0 l : int) = result) /\
+                           (((Int.(<=) l m) /\ (Int.(<) m i)) /\
                             (Int.(<=) i (Int.(+) r 1 : int))))))) ->
                        ((Int.(<=) i r) ->
-                        (((Int.(<=) 0 i) and
+                        (((Int.(<=) 0 i) /\
                           (Int.(<) i (array_length t0 : int))) ->
                          (forall result0:int.
                            ((result0 = (access t0 i : int)) ->
@@ -1037,26 +1037,26 @@ use array.Array as A
     (forall l:int.
       (forall r:int.
         (forall t:(farray int).
-          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+          (((Int.(<=) 0 l) /\ (Int.(<) r (array_length t : int))) ->
            ((Int.(<) l r) ->
-            (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (((Int.(<=) 0 l) /\ (Int.(<) l (array_length t : int))) ->
              (forall result:int.
                ((result = (access t l : int)) ->
                 (forall i:int.
                   (forall m:int.
                     (forall t0:(farray int).
                       (((forall j:int.
-                          (((Int.(<) l j) and (Int.(<=) j m)) ->
-                           (Int.(<) (access t0 j : int) result))) and
+                          (((Int.(<) l j) /\ (Int.(<=) j m)) ->
+                           (Int.(<) (access t0 j : int) result))) /\
                         ((forall j:int.
-                           (((Int.(<) m j) and (Int.(<) j i)) ->
-                            (Int.(>=) (access t0 j : int) result))) and
-                         ((permut t0 t l r) and
-                          (((access t0 l : int) = result) and
-                           (((Int.(<=) l m) and (Int.(<) m i)) and
+                           (((Int.(<) m j) /\ (Int.(<) j i)) ->
+                            (Int.(>=) (access t0 j : int) result))) /\
+                         ((permut t0 t l r) /\
+                          (((access t0 l : int) = result) /\
+                           (((Int.(<=) l m) /\ (Int.(<) m i)) /\
                             (Int.(<=) i (Int.(+) r 1 : int))))))) ->
                        ((Int.(<=) i r) ->
-                        (((Int.(<=) 0 i) and
+                        (((Int.(<=) 0 i) /\
                           (Int.(<) i (array_length t0 : int))) ->
                          (forall result0:int.
                            ((result0 = (access t0 i : int)) ->
@@ -1069,23 +1069,23 @@ use array.Array as A
     (forall l:int.
       (forall r:int.
         (forall t:(farray int).
-          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+          (((Int.(<=) 0 l) /\ (Int.(<) r (array_length t : int))) ->
            ((Int.(<) l r) ->
-            (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (((Int.(<=) 0 l) /\ (Int.(<) l (array_length t : int))) ->
              (forall result:int.
                ((result = (access t l : int)) ->
                 (forall i:int.
                   (forall m:int.
                     (forall t0:(farray int).
                       (((forall j:int.
-                          (((Int.(<) l j) and (Int.(<=) j m)) ->
-                           (Int.(<) (access t0 j : int) result))) and
+                          (((Int.(<) l j) /\ (Int.(<=) j m)) ->
+                           (Int.(<) (access t0 j : int) result))) /\
                         ((forall j:int.
-                           (((Int.(<) m j) and (Int.(<) j i)) ->
-                            (Int.(>=) (access t0 j : int) result))) and
-                         ((permut t0 t l r) and
-                          (((access t0 l : int) = result) and
-                           (((Int.(<=) l m) and (Int.(<) m i)) and
+                           (((Int.(<) m j) /\ (Int.(<) j i)) ->
+                            (Int.(>=) (access t0 j : int) result))) /\
+                         ((permut t0 t l r) /\
+                          (((access t0 l : int) = result) /\
+                           (((Int.(<=) l m) /\ (Int.(<) m i)) /\
                             (Int.(<=) i (Int.(+) r 1 : int))))))) ->
                        ((Int.(>) i r) -> (Int.(<) l (array_length t0 : int)))))))))))))))
 
@@ -1093,23 +1093,23 @@ use array.Array as A
     (forall l:int.
       (forall r:int.
         (forall t:(farray int).
-          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+          (((Int.(<=) 0 l) /\ (Int.(<) r (array_length t : int))) ->
            ((Int.(<) l r) ->
-            (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (((Int.(<=) 0 l) /\ (Int.(<) l (array_length t : int))) ->
              (forall result:int.
                ((result = (access t l : int)) ->
                 (forall i:int.
                   (forall m:int.
                     (forall t0:(farray int).
                       (((forall j:int.
-                          (((Int.(<) l j) and (Int.(<=) j m)) ->
-                           (Int.(<) (access t0 j : int) result))) and
+                          (((Int.(<) l j) /\ (Int.(<=) j m)) ->
+                           (Int.(<) (access t0 j : int) result))) /\
                         ((forall j:int.
-                           (((Int.(<) m j) and (Int.(<) j i)) ->
-                            (Int.(>=) (access t0 j : int) result))) and
-                         ((permut t0 t l r) and
-                          (((access t0 l : int) = result) and
-                           (((Int.(<=) l m) and (Int.(<) m i)) and
+                           (((Int.(<) m j) /\ (Int.(<) j i)) ->
+                            (Int.(>=) (access t0 j : int) result))) /\
+                         ((permut t0 t l r) /\
+                          (((access t0 l : int) = result) /\
+                           (((Int.(<=) l m) /\ (Int.(<) m i)) /\
                             (Int.(<=) i (Int.(+) r 1 : int))))))) ->
                        ((Int.(>) i r) -> (Int.(<=) 0 m))))))))))))))
 
@@ -1117,23 +1117,23 @@ use array.Array as A
     (forall l:int.
       (forall r:int.
         (forall t:(farray int).
-          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+          (((Int.(<=) 0 l) /\ (Int.(<) r (array_length t : int))) ->
            ((Int.(<) l r) ->
-            (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (((Int.(<=) 0 l) /\ (Int.(<) l (array_length t : int))) ->
              (forall result:int.
                ((result = (access t l : int)) ->
                 (forall i:int.
                   (forall m:int.
                     (forall t0:(farray int).
                       (((forall j:int.
-                          (((Int.(<) l j) and (Int.(<=) j m)) ->
-                           (Int.(<) (access t0 j : int) result))) and
+                          (((Int.(<) l j) /\ (Int.(<=) j m)) ->
+                           (Int.(<) (access t0 j : int) result))) /\
                         ((forall j:int.
-                           (((Int.(<) m j) and (Int.(<) j i)) ->
-                            (Int.(>=) (access t0 j : int) result))) and
-                         ((permut t0 t l r) and
-                          (((access t0 l : int) = result) and
-                           (((Int.(<=) l m) and (Int.(<) m i)) and
+                           (((Int.(<) m j) /\ (Int.(<) j i)) ->
+                            (Int.(>=) (access t0 j : int) result))) /\
+                         ((permut t0 t l r) /\
+                          (((access t0 l : int) = result) /\
+                           (((Int.(<=) l m) /\ (Int.(<) m i)) /\
                             (Int.(<=) i (Int.(+) r 1 : int))))))) ->
                        ((Int.(>) i r) -> (Int.(<) m (array_length t0 : int)))))))))))))))
 
@@ -1141,28 +1141,28 @@ use array.Array as A
     (forall l:int.
       (forall r:int.
         (forall t:(farray int).
-          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+          (((Int.(<=) 0 l) /\ (Int.(<) r (array_length t : int))) ->
            ((Int.(<) l r) ->
-            (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (((Int.(<=) 0 l) /\ (Int.(<) l (array_length t : int))) ->
              (forall result:int.
                ((result = (access t l : int)) ->
                 (forall i:int.
                   (forall m:int.
                     (forall t0:(farray int).
                       (((forall j:int.
-                          (((Int.(<) l j) and (Int.(<=) j m)) ->
-                           (Int.(<) (access t0 j : int) result))) and
+                          (((Int.(<) l j) /\ (Int.(<=) j m)) ->
+                           (Int.(<) (access t0 j : int) result))) /\
                         ((forall j:int.
-                           (((Int.(<) m j) and (Int.(<) j i)) ->
-                            (Int.(>=) (access t0 j : int) result))) and
-                         ((permut t0 t l r) and
-                          (((access t0 l : int) = result) and
-                           (((Int.(<=) l m) and (Int.(<) m i)) and
+                           (((Int.(<) m j) /\ (Int.(<) j i)) ->
+                            (Int.(>=) (access t0 j : int) result))) /\
+                         ((permut t0 t l r) /\
+                          (((access t0 l : int) = result) /\
+                           (((Int.(<=) l m) /\ (Int.(<) m i)) /\
                             (Int.(<=) i (Int.(+) r 1 : int))))))) ->
                        ((Int.(>) i r) ->
-                        ((((Int.(<=) 0 l) and
-                           (Int.(<) l (array_length t0 : int))) and
-                          ((Int.(<=) 0 m) and
+                        ((((Int.(<=) 0 l) /\
+                           (Int.(<) l (array_length t0 : int))) /\
+                          ((Int.(<=) 0 m) /\
                            (Int.(<) m (array_length t0 : int)))) ->
                          (forall t1:(farray int).
                            ((exchange t1 t0 l m) ->
@@ -1172,28 +1172,28 @@ use array.Array as A
     (forall l:int.
       (forall r:int.
         (forall t:(farray int).
-          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+          (((Int.(<=) 0 l) /\ (Int.(<) r (array_length t : int))) ->
            ((Int.(<) l r) ->
-            (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (((Int.(<=) 0 l) /\ (Int.(<) l (array_length t : int))) ->
              (forall result:int.
                ((result = (access t l : int)) ->
                 (forall i:int.
                   (forall m:int.
                     (forall t0:(farray int).
                       (((forall j:int.
-                          (((Int.(<) l j) and (Int.(<=) j m)) ->
-                           (Int.(<) (access t0 j : int) result))) and
+                          (((Int.(<) l j) /\ (Int.(<=) j m)) ->
+                           (Int.(<) (access t0 j : int) result))) /\
                         ((forall j:int.
-                           (((Int.(<) m j) and (Int.(<) j i)) ->
-                            (Int.(>=) (access t0 j : int) result))) and
-                         ((permut t0 t l r) and
-                          (((access t0 l : int) = result) and
-                           (((Int.(<=) l m) and (Int.(<) m i)) and
+                           (((Int.(<) m j) /\ (Int.(<) j i)) ->
+                            (Int.(>=) (access t0 j : int) result))) /\
+                         ((permut t0 t l r) /\
+                          (((access t0 l : int) = result) /\
+                           (((Int.(<=) l m) /\ (Int.(<) m i)) /\
                             (Int.(<=) i (Int.(+) r 1 : int))))))) ->
                        ((Int.(>) i r) ->
-                        ((((Int.(<=) 0 l) and
-                           (Int.(<) l (array_length t0 : int))) and
-                          ((Int.(<=) 0 m) and
+                        ((((Int.(<=) 0 l) /\
+                           (Int.(<) l (array_length t0 : int))) /\
+                          ((Int.(<=) 0 m) /\
                            (Int.(<) m (array_length t0 : int)))) ->
                          (forall t1:(farray int).
                            ((exchange t1 t0 l m) ->
@@ -1203,32 +1203,32 @@ use array.Array as A
     (forall l:int.
       (forall r:int.
         (forall t:(farray int).
-          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+          (((Int.(<=) 0 l) /\ (Int.(<) r (array_length t : int))) ->
            ((Int.(<) l r) ->
-            (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (((Int.(<=) 0 l) /\ (Int.(<) l (array_length t : int))) ->
              (forall result:int.
                ((result = (access t l : int)) ->
                 (forall i:int.
                   (forall m:int.
                     (forall t0:(farray int).
                       (((forall j:int.
-                          (((Int.(<) l j) and (Int.(<=) j m)) ->
-                           (Int.(<) (access t0 j : int) result))) and
+                          (((Int.(<) l j) /\ (Int.(<=) j m)) ->
+                           (Int.(<) (access t0 j : int) result))) /\
                         ((forall j:int.
-                           (((Int.(<) m j) and (Int.(<) j i)) ->
-                            (Int.(>=) (access t0 j : int) result))) and
-                         ((permut t0 t l r) and
-                          (((access t0 l : int) = result) and
-                           (((Int.(<=) l m) and (Int.(<) m i)) and
+                           (((Int.(<) m j) /\ (Int.(<) j i)) ->
+                            (Int.(>=) (access t0 j : int) result))) /\
+                         ((permut t0 t l r) /\
+                          (((access t0 l : int) = result) /\
+                           (((Int.(<=) l m) /\ (Int.(<) m i)) /\
                             (Int.(<=) i (Int.(+) r 1 : int))))))) ->
                        ((Int.(>) i r) ->
-                        ((((Int.(<=) 0 l) and
-                           (Int.(<) l (array_length t0 : int))) and
-                          ((Int.(<=) 0 m) and
+                        ((((Int.(<=) 0 l) /\
+                           (Int.(<) l (array_length t0 : int))) /\
+                          ((Int.(<=) 0 m) /\
                            (Int.(<) m (array_length t0 : int)))) ->
                          (forall t1:(farray int).
                            ((exchange t1 t0 l m) ->
-                            (((Int.(<=) 0 (Int.(-) (Int.(+) 1 r : int) l : int)) and
+                            (((Int.(<=) 0 (Int.(-) (Int.(+) 1 r : int) l : int)) /\
                               (Int.(<) (Int.(-) (Int.(+) 1 (Int.(-) m 1 : int) : int) l : int) (Int.(-) (Int.(+) 1 r : int) l : int))) ->
                              (Int.(<) (Int.(-) m 1 : int) (array_length t1 : int)))))))))))))))))))
 
@@ -1236,37 +1236,37 @@ use array.Array as A
     (forall l:int.
       (forall r:int.
         (forall t:(farray int).
-          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+          (((Int.(<=) 0 l) /\ (Int.(<) r (array_length t : int))) ->
            ((Int.(<) l r) ->
-            (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (((Int.(<=) 0 l) /\ (Int.(<) l (array_length t : int))) ->
              (forall result:int.
                ((result = (access t l : int)) ->
                 (forall i:int.
                   (forall m:int.
                     (forall t0:(farray int).
                       (((forall j:int.
-                          (((Int.(<) l j) and (Int.(<=) j m)) ->
-                           (Int.(<) (access t0 j : int) result))) and
+                          (((Int.(<) l j) /\ (Int.(<=) j m)) ->
+                           (Int.(<) (access t0 j : int) result))) /\
                         ((forall j:int.
-                           (((Int.(<) m j) and (Int.(<) j i)) ->
-                            (Int.(>=) (access t0 j : int) result))) and
-                         ((permut t0 t l r) and
-                          (((access t0 l : int) = result) and
-                           (((Int.(<=) l m) and (Int.(<) m i)) and
+                           (((Int.(<) m j) /\ (Int.(<) j i)) ->
+                            (Int.(>=) (access t0 j : int) result))) /\
+                         ((permut t0 t l r) /\
+                          (((access t0 l : int) = result) /\
+                           (((Int.(<=) l m) /\ (Int.(<) m i)) /\
                             (Int.(<=) i (Int.(+) r 1 : int))))))) ->
                        ((Int.(>) i r) ->
-                        ((((Int.(<=) 0 l) and
-                           (Int.(<) l (array_length t0 : int))) and
-                          ((Int.(<=) 0 m) and
+                        ((((Int.(<=) 0 l) /\
+                           (Int.(<) l (array_length t0 : int))) /\
+                          ((Int.(<=) 0 m) /\
                            (Int.(<) m (array_length t0 : int)))) ->
                          (forall t1:(farray int).
                            ((exchange t1 t0 l m) ->
-                            (((Int.(<=) 0 (Int.(-) (Int.(+) 1 r : int) l : int)) and
+                            (((Int.(<=) 0 (Int.(-) (Int.(+) 1 r : int) l : int)) /\
                               (Int.(<) (Int.(-) (Int.(+) 1 (Int.(-) m 1 : int) : int) l : int) (Int.(-) (Int.(+) 1 r : int) l : int))) ->
-                             (((Int.(<=) 0 l) and
+                             (((Int.(<=) 0 l) /\
                                (Int.(<) (Int.(-) m 1 : int) (array_length t1 : int))) ->
                               (forall t2:(farray int).
-                                (((sorted_array t2 l (Int.(-) m 1 : int)) and
+                                (((sorted_array t2 l (Int.(-) m 1 : int)) /\
                                   (permut t2 t1 l (Int.(-) m 1 : int))) ->
                                  (Int.(<=) 0 (Int.(-) (Int.(+) 1 r : int) l : int))))))))))))))))))))))
 
@@ -1274,37 +1274,37 @@ use array.Array as A
     (forall l:int.
       (forall r:int.
         (forall t:(farray int).
-          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+          (((Int.(<=) 0 l) /\ (Int.(<) r (array_length t : int))) ->
            ((Int.(<) l r) ->
-            (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (((Int.(<=) 0 l) /\ (Int.(<) l (array_length t : int))) ->
              (forall result:int.
                ((result = (access t l : int)) ->
                 (forall i:int.
                   (forall m:int.
                     (forall t0:(farray int).
                       (((forall j:int.
-                          (((Int.(<) l j) and (Int.(<=) j m)) ->
-                           (Int.(<) (access t0 j : int) result))) and
+                          (((Int.(<) l j) /\ (Int.(<=) j m)) ->
+                           (Int.(<) (access t0 j : int) result))) /\
                         ((forall j:int.
-                           (((Int.(<) m j) and (Int.(<) j i)) ->
-                            (Int.(>=) (access t0 j : int) result))) and
-                         ((permut t0 t l r) and
-                          (((access t0 l : int) = result) and
-                           (((Int.(<=) l m) and (Int.(<) m i)) and
+                           (((Int.(<) m j) /\ (Int.(<) j i)) ->
+                            (Int.(>=) (access t0 j : int) result))) /\
+                         ((permut t0 t l r) /\
+                          (((access t0 l : int) = result) /\
+                           (((Int.(<=) l m) /\ (Int.(<) m i)) /\
                             (Int.(<=) i (Int.(+) r 1 : int))))))) ->
                        ((Int.(>) i r) ->
-                        ((((Int.(<=) 0 l) and
-                           (Int.(<) l (array_length t0 : int))) and
-                          ((Int.(<=) 0 m) and
+                        ((((Int.(<=) 0 l) /\
+                           (Int.(<) l (array_length t0 : int))) /\
+                          ((Int.(<=) 0 m) /\
                            (Int.(<) m (array_length t0 : int)))) ->
                          (forall t1:(farray int).
                            ((exchange t1 t0 l m) ->
-                            (((Int.(<=) 0 (Int.(-) (Int.(+) 1 r : int) l : int)) and
+                            (((Int.(<=) 0 (Int.(-) (Int.(+) 1 r : int) l : int)) /\
                               (Int.(<) (Int.(-) (Int.(+) 1 (Int.(-) m 1 : int) : int) l : int) (Int.(-) (Int.(+) 1 r : int) l : int))) ->
-                             (((Int.(<=) 0 l) and
+                             (((Int.(<=) 0 l) /\
                                (Int.(<) (Int.(-) m 1 : int) (array_length t1 : int))) ->
                               (forall t2:(farray int).
-                                (((sorted_array t2 l (Int.(-) m 1 : int)) and
+                                (((sorted_array t2 l (Int.(-) m 1 : int)) /\
                                   (permut t2 t1 l (Int.(-) m 1 : int))) ->
                                  (Int.(<) (Int.(-) (Int.(+) 1 r : int) (Int.(+) m 1 : int) : int) (Int.(-) (Int.(+) 1 r : int) l : int))))))))))))))))))))))
 
@@ -1312,39 +1312,39 @@ use array.Array as A
     (forall l:int.
       (forall r:int.
         (forall t:(farray int).
-          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+          (((Int.(<=) 0 l) /\ (Int.(<) r (array_length t : int))) ->
            ((Int.(<) l r) ->
-            (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (((Int.(<=) 0 l) /\ (Int.(<) l (array_length t : int))) ->
              (forall result:int.
                ((result = (access t l : int)) ->
                 (forall i:int.
                   (forall m:int.
                     (forall t0:(farray int).
                       (((forall j:int.
-                          (((Int.(<) l j) and (Int.(<=) j m)) ->
-                           (Int.(<) (access t0 j : int) result))) and
+                          (((Int.(<) l j) /\ (Int.(<=) j m)) ->
+                           (Int.(<) (access t0 j : int) result))) /\
                         ((forall j:int.
-                           (((Int.(<) m j) and (Int.(<) j i)) ->
-                            (Int.(>=) (access t0 j : int) result))) and
-                         ((permut t0 t l r) and
-                          (((access t0 l : int) = result) and
-                           (((Int.(<=) l m) and (Int.(<) m i)) and
+                           (((Int.(<) m j) /\ (Int.(<) j i)) ->
+                            (Int.(>=) (access t0 j : int) result))) /\
+                         ((permut t0 t l r) /\
+                          (((access t0 l : int) = result) /\
+                           (((Int.(<=) l m) /\ (Int.(<) m i)) /\
                             (Int.(<=) i (Int.(+) r 1 : int))))))) ->
                        ((Int.(>) i r) ->
-                        ((((Int.(<=) 0 l) and
-                           (Int.(<) l (array_length t0 : int))) and
-                          ((Int.(<=) 0 m) and
+                        ((((Int.(<=) 0 l) /\
+                           (Int.(<) l (array_length t0 : int))) /\
+                          ((Int.(<=) 0 m) /\
                            (Int.(<) m (array_length t0 : int)))) ->
                          (forall t1:(farray int).
                            ((exchange t1 t0 l m) ->
-                            (((Int.(<=) 0 (Int.(-) (Int.(+) 1 r : int) l : int)) and
+                            (((Int.(<=) 0 (Int.(-) (Int.(+) 1 r : int) l : int)) /\
                               (Int.(<) (Int.(-) (Int.(+) 1 (Int.(-) m 1 : int) : int) l : int) (Int.(-) (Int.(+) 1 r : int) l : int))) ->
-                             (((Int.(<=) 0 l) and
+                             (((Int.(<=) 0 l) /\
                                (Int.(<) (Int.(-) m 1 : int) (array_length t1 : int))) ->
                               (forall t2:(farray int).
-                                (((sorted_array t2 l (Int.(-) m 1 : int)) and
+                                (((sorted_array t2 l (Int.(-) m 1 : int)) /\
                                   (permut t2 t1 l (Int.(-) m 1 : int))) ->
-                                 (((Int.(<=) 0 (Int.(-) (Int.(+) 1 r : int) l : int)) and
+                                 (((Int.(<=) 0 (Int.(-) (Int.(+) 1 r : int) l : int)) /\
                                    (Int.(<) (Int.(-) (Int.(+) 1 r : int) (Int.(+) m 1 : int) : int) (Int.(-) (Int.(+) 1 r : int) l : int))) ->
                                   (Int.(<=) 0 (Int.(+) m 1 : int)))))))))))))))))))))))
 
@@ -1352,39 +1352,39 @@ use array.Array as A
     (forall l:int.
       (forall r:int.
         (forall t:(farray int).
-          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+          (((Int.(<=) 0 l) /\ (Int.(<) r (array_length t : int))) ->
            ((Int.(<) l r) ->
-            (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (((Int.(<=) 0 l) /\ (Int.(<) l (array_length t : int))) ->
              (forall result:int.
                ((result = (access t l : int)) ->
                 (forall i:int.
                   (forall m:int.
                     (forall t0:(farray int).
                       (((forall j:int.
-                          (((Int.(<) l j) and (Int.(<=) j m)) ->
-                           (Int.(<) (access t0 j : int) result))) and
+                          (((Int.(<) l j) /\ (Int.(<=) j m)) ->
+                           (Int.(<) (access t0 j : int) result))) /\
                         ((forall j:int.
-                           (((Int.(<) m j) and (Int.(<) j i)) ->
-                            (Int.(>=) (access t0 j : int) result))) and
-                         ((permut t0 t l r) and
-                          (((access t0 l : int) = result) and
-                           (((Int.(<=) l m) and (Int.(<) m i)) and
+                           (((Int.(<) m j) /\ (Int.(<) j i)) ->
+                            (Int.(>=) (access t0 j : int) result))) /\
+                         ((permut t0 t l r) /\
+                          (((access t0 l : int) = result) /\
+                           (((Int.(<=) l m) /\ (Int.(<) m i)) /\
                             (Int.(<=) i (Int.(+) r 1 : int))))))) ->
                        ((Int.(>) i r) ->
-                        ((((Int.(<=) 0 l) and
-                           (Int.(<) l (array_length t0 : int))) and
-                          ((Int.(<=) 0 m) and
+                        ((((Int.(<=) 0 l) /\
+                           (Int.(<) l (array_length t0 : int))) /\
+                          ((Int.(<=) 0 m) /\
                            (Int.(<) m (array_length t0 : int)))) ->
                          (forall t1:(farray int).
                            ((exchange t1 t0 l m) ->
-                            (((Int.(<=) 0 (Int.(-) (Int.(+) 1 r : int) l : int)) and
+                            (((Int.(<=) 0 (Int.(-) (Int.(+) 1 r : int) l : int)) /\
                               (Int.(<) (Int.(-) (Int.(+) 1 (Int.(-) m 1 : int) : int) l : int) (Int.(-) (Int.(+) 1 r : int) l : int))) ->
-                             (((Int.(<=) 0 l) and
+                             (((Int.(<=) 0 l) /\
                                (Int.(<) (Int.(-) m 1 : int) (array_length t1 : int))) ->
                               (forall t2:(farray int).
-                                (((sorted_array t2 l (Int.(-) m 1 : int)) and
+                                (((sorted_array t2 l (Int.(-) m 1 : int)) /\
                                   (permut t2 t1 l (Int.(-) m 1 : int))) ->
-                                 (((Int.(<=) 0 (Int.(-) (Int.(+) 1 r : int) l : int)) and
+                                 (((Int.(<=) 0 (Int.(-) (Int.(+) 1 r : int) l : int)) /\
                                    (Int.(<) (Int.(-) (Int.(+) 1 r : int) (Int.(+) m 1 : int) : int) (Int.(-) (Int.(+) 1 r : int) l : int))) ->
                                   (Int.(<) r (array_length t2 : int)))))))))))))))))))))))
 
@@ -1392,44 +1392,44 @@ use array.Array as A
     (forall l:int.
       (forall r:int.
         (forall t:(farray int).
-          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+          (((Int.(<=) 0 l) /\ (Int.(<) r (array_length t : int))) ->
            ((Int.(<) l r) ->
-            (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (((Int.(<=) 0 l) /\ (Int.(<) l (array_length t : int))) ->
              (forall result:int.
                ((result = (access t l : int)) ->
                 (forall i:int.
                   (forall m:int.
                     (forall t0:(farray int).
                       (((forall j:int.
-                          (((Int.(<) l j) and (Int.(<=) j m)) ->
-                           (Int.(<) (access t0 j : int) result))) and
+                          (((Int.(<) l j) /\ (Int.(<=) j m)) ->
+                           (Int.(<) (access t0 j : int) result))) /\
                         ((forall j:int.
-                           (((Int.(<) m j) and (Int.(<) j i)) ->
-                            (Int.(>=) (access t0 j : int) result))) and
-                         ((permut t0 t l r) and
-                          (((access t0 l : int) = result) and
-                           (((Int.(<=) l m) and (Int.(<) m i)) and
+                           (((Int.(<) m j) /\ (Int.(<) j i)) ->
+                            (Int.(>=) (access t0 j : int) result))) /\
+                         ((permut t0 t l r) /\
+                          (((access t0 l : int) = result) /\
+                           (((Int.(<=) l m) /\ (Int.(<) m i)) /\
                             (Int.(<=) i (Int.(+) r 1 : int))))))) ->
                        ((Int.(>) i r) ->
-                        ((((Int.(<=) 0 l) and
-                           (Int.(<) l (array_length t0 : int))) and
-                          ((Int.(<=) 0 m) and
+                        ((((Int.(<=) 0 l) /\
+                           (Int.(<) l (array_length t0 : int))) /\
+                          ((Int.(<=) 0 m) /\
                            (Int.(<) m (array_length t0 : int)))) ->
                          (forall t1:(farray int).
                            ((exchange t1 t0 l m) ->
-                            (((Int.(<=) 0 (Int.(-) (Int.(+) 1 r : int) l : int)) and
+                            (((Int.(<=) 0 (Int.(-) (Int.(+) 1 r : int) l : int)) /\
                               (Int.(<) (Int.(-) (Int.(+) 1 (Int.(-) m 1 : int) : int) l : int) (Int.(-) (Int.(+) 1 r : int) l : int))) ->
-                             (((Int.(<=) 0 l) and
+                             (((Int.(<=) 0 l) /\
                                (Int.(<) (Int.(-) m 1 : int) (array_length t1 : int))) ->
                               (forall t2:(farray int).
-                                (((sorted_array t2 l (Int.(-) m 1 : int)) and
+                                (((sorted_array t2 l (Int.(-) m 1 : int)) /\
                                   (permut t2 t1 l (Int.(-) m 1 : int))) ->
-                                 (((Int.(<=) 0 (Int.(-) (Int.(+) 1 r : int) l : int)) and
+                                 (((Int.(<=) 0 (Int.(-) (Int.(+) 1 r : int) l : int)) /\
                                    (Int.(<) (Int.(-) (Int.(+) 1 r : int) (Int.(+) m 1 : int) : int) (Int.(-) (Int.(+) 1 r : int) l : int))) ->
-                                  (((Int.(<=) 0 (Int.(+) m 1 : int)) and
+                                  (((Int.(<=) 0 (Int.(+) m 1 : int)) /\
                                     (Int.(<) r (array_length t2 : int))) ->
                                    (forall t3:(farray int).
-                                     (((sorted_array t3 (Int.(+) m 1 : int) r) and
+                                     (((sorted_array t3 (Int.(+) m 1 : int) r) /\
                                        (permut t3 t2 (Int.(+) m 1 : int) r)) ->
                                       (sorted_array t3 l r)))))))))))))))))))))))))
 
@@ -1437,44 +1437,44 @@ use array.Array as A
     (forall l:int.
       (forall r:int.
         (forall t:(farray int).
-          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+          (((Int.(<=) 0 l) /\ (Int.(<) r (array_length t : int))) ->
            ((Int.(<) l r) ->
-            (((Int.(<=) 0 l) and (Int.(<) l (array_length t : int))) ->
+            (((Int.(<=) 0 l) /\ (Int.(<) l (array_length t : int))) ->
              (forall result:int.
                ((result = (access t l : int)) ->
                 (forall i:int.
                   (forall m:int.
                     (forall t0:(farray int).
                       (((forall j:int.
-                          (((Int.(<) l j) and (Int.(<=) j m)) ->
-                           (Int.(<) (access t0 j : int) result))) and
+                          (((Int.(<) l j) /\ (Int.(<=) j m)) ->
+                           (Int.(<) (access t0 j : int) result))) /\
                         ((forall j:int.
-                           (((Int.(<) m j) and (Int.(<) j i)) ->
-                            (Int.(>=) (access t0 j : int) result))) and
-                         ((permut t0 t l r) and
-                          (((access t0 l : int) = result) and
-                           (((Int.(<=) l m) and (Int.(<) m i)) and
+                           (((Int.(<) m j) /\ (Int.(<) j i)) ->
+                            (Int.(>=) (access t0 j : int) result))) /\
+                         ((permut t0 t l r) /\
+                          (((access t0 l : int) = result) /\
+                           (((Int.(<=) l m) /\ (Int.(<) m i)) /\
                             (Int.(<=) i (Int.(+) r 1 : int))))))) ->
                        ((Int.(>) i r) ->
-                        ((((Int.(<=) 0 l) and
-                           (Int.(<) l (array_length t0 : int))) and
-                          ((Int.(<=) 0 m) and
+                        ((((Int.(<=) 0 l) /\
+                           (Int.(<) l (array_length t0 : int))) /\
+                          ((Int.(<=) 0 m) /\
                            (Int.(<) m (array_length t0 : int)))) ->
                          (forall t1:(farray int).
                            ((exchange t1 t0 l m) ->
-                            (((Int.(<=) 0 (Int.(-) (Int.(+) 1 r : int) l : int)) and
+                            (((Int.(<=) 0 (Int.(-) (Int.(+) 1 r : int) l : int)) /\
                               (Int.(<) (Int.(-) (Int.(+) 1 (Int.(-) m 1 : int) : int) l : int) (Int.(-) (Int.(+) 1 r : int) l : int))) ->
-                             (((Int.(<=) 0 l) and
+                             (((Int.(<=) 0 l) /\
                                (Int.(<) (Int.(-) m 1 : int) (array_length t1 : int))) ->
                               (forall t2:(farray int).
-                                (((sorted_array t2 l (Int.(-) m 1 : int)) and
+                                (((sorted_array t2 l (Int.(-) m 1 : int)) /\
                                   (permut t2 t1 l (Int.(-) m 1 : int))) ->
-                                 (((Int.(<=) 0 (Int.(-) (Int.(+) 1 r : int) l : int)) and
+                                 (((Int.(<=) 0 (Int.(-) (Int.(+) 1 r : int) l : int)) /\
                                    (Int.(<) (Int.(-) (Int.(+) 1 r : int) (Int.(+) m 1 : int) : int) (Int.(-) (Int.(+) 1 r : int) l : int))) ->
-                                  (((Int.(<=) 0 (Int.(+) m 1 : int)) and
+                                  (((Int.(<=) 0 (Int.(+) m 1 : int)) /\
                                     (Int.(<) r (array_length t2 : int))) ->
                                    (forall t3:(farray int).
-                                     (((sorted_array t3 (Int.(+) m 1 : int) r) and
+                                     (((sorted_array t3 (Int.(+) m 1 : int) r) /\
                                        (permut t3 t2 (Int.(+) m 1 : int) r)) ->
                                       (permut t3 t l r)))))))))))))))))))))))))
 
@@ -1482,14 +1482,14 @@ use array.Array as A
     (forall l:int.
       (forall r:int.
         (forall t:(farray int).
-          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+          (((Int.(<=) 0 l) /\ (Int.(<) r (array_length t : int))) ->
            ((Int.(>=) l r) -> (sorted_array t l r))))))
 
   goal Quick_rec_po_44:
     (forall l:int.
       (forall r:int.
         (forall t:(farray int).
-          (((Int.(<=) 0 l) and (Int.(<) r (array_length t : int))) ->
+          (((Int.(<=) 0 l) /\ (Int.(<) r (array_length t : int))) ->
            ((Int.(>=) l r) -> (permut t t l r))))))
 
   goal Quicksort_po_1:
@@ -1507,10 +1507,10 @@ use array.Array as A
     (forall t:(farray int).
       (forall result:int.
         ((result = (array_length t : int)) ->
-         (((Int.(<=) 0 0) and
+         (((Int.(<=) 0 0) /\
            (Int.(<) (Int.(-) result 1 : int) (array_length t : int))) ->
           (forall t0:(farray int).
-            (((sorted_array t0 0 (Int.(-) result 1 : int)) and
+            (((sorted_array t0 0 (Int.(-) result 1 : int)) /\
               (permut t0 t 0 (Int.(-) result 1 : int))) ->
              (sorted_array t0 0 (Int.(-) (array_length t0 : int) 1 : int))))))))
 
@@ -1518,10 +1518,10 @@ use array.Array as A
     (forall t:(farray int).
       (forall result:int.
         ((result = (array_length t : int)) ->
-         (((Int.(<=) 0 0) and
+         (((Int.(<=) 0 0) /\
            (Int.(<) (Int.(-) result 1 : int) (array_length t : int))) ->
           (forall t0:(farray int).
-            (((sorted_array t0 0 (Int.(-) result 1 : int)) and
+            (((sorted_array t0 0 (Int.(-) result 1 : int)) /\
               (permut t0 t 0 (Int.(-) result 1 : int))) ->
              (permutation t0 t)))))))
 

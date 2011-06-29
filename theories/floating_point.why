@@ -11,8 +11,8 @@ end
 
 (* handling of IEEE-754 special values +\infty, -\infty, NaN, +0, -0 *)
 theory SpecialValues
- 
-  type class = Finite | Infinite | NaN 
+
+  type class = Finite | Infinite | NaN
 
   type sign = Neg | Pos
 
@@ -34,19 +34,19 @@ theory GenFloat
 
   type t
 
-  logic round mode real : real
-  logic round_logic mode real : t
+  function round mode real : real
+  function round_logic mode real : t
 
-  logic value t : real
-  logic exact t : real
-  logic model t : real
+  function value t : real
+  function exact t : real
+  function model t : real
 
-  logic round_error (x : t) : real = abs (value x - exact x)
-  logic total_error (x : t) : real = abs (value x - model x)
+  function round_error (x : t) : real = abs (value x - exact x)
+  function total_error (x : t) : real = abs (value x - model x)
 
-  logic max : real
+  function max : real
 
-  logic no_overflow (m:mode) (x:real) = abs (round m x) <= max
+  predicate no_overflow (m:mode) (x:real) = abs (round m x) <= max
 
   axiom Bounded_real_no_overflow :
     forall m:mode, x:real. abs x <= max -> no_overflow m x
@@ -54,20 +54,20 @@ theory GenFloat
   axiom Round_monotonic :
     forall m:mode, x y:real. x <= y -> round m x <= round m y
 
-  logic max_representable_integer : int
+  function max_representable_integer : int
 
   axiom Exact_rounding_for_integers:
     forall m:mode,i:int.
-      Int.(<=) (Int.(-_) max_representable_integer) i and 
+      Int.(<=) (Int.(-_) max_representable_integer) i /\
       Int.(<=) i max_representable_integer ->
         round m (from_int i) = from_int i
 
   (* rounding up and down *)
-  axiom Round_down_le: 
+  axiom Round_down_le:
     forall x:real. round Down x <= x
-  axiom Round_up_ge: 
+  axiom Round_up_ge:
     forall x:real. round Up x >= x
-  axiom Round_down_neg: 
+  axiom Round_down_neg:
     forall x:real. round Down (-x) = - round Up x
   axiom Round_up_neg:
     forall x:real. round Up (-x) = - round Down x
@@ -80,8 +80,8 @@ theory GenFloatFull
   use import SpecialValues
 
   (* special values *)
-  logic class t : class
-  logic sign t  : sign
+  function class t : class
+  function sign t  : sign
 
 end
 
@@ -89,13 +89,13 @@ theory Single
 
   type single
 
-  logic max_single : real = 0x1.FFFFFEp127
-  logic max_int : int = 16777216 (* 2^24 *)
+  function max_single : real = 0x1.FFFFFEp127
+  function max_int : int = 16777216 (* 2^24 *)
 
-  clone export GenFloat with 
-    type t = single, 
-    logic max = max_single, 
-    logic max_representable_integer = max_int
+  clone export GenFloat with
+    type t = single,
+    function max = max_single,
+    function max_representable_integer = max_int
 
 end
 
@@ -105,13 +105,13 @@ theory Double
 
   type double
 
-  logic max_double : real = 0x1.FFFFFFFFFFFFFp1023
-  logic max_int : int = 9007199254740992 (* 2^23 *)
+  function max_double : real = 0x1.FFFFFFFFFFFFFp1023
+  function max_int : int = 9007199254740992 (* 2^23 *)
 
-  clone export GenFloat with 
-    type t = double, 
-    logic max = max_double,
-    logic max_representable_integer = max_int
+  clone export GenFloat with
+    type t = double,
+    function max = max_double,
+    function max_representable_integer = max_int
 
 end
 

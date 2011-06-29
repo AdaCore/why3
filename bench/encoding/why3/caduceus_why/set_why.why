@@ -4,45 +4,45 @@ theory Why2
   use int.ComputerDivision
   use real.Real
   use bool_inf.Bool
-  logic eq_unit Unit.unit Unit.unit
+  predicate eq_unit Unit.unit Unit.unit
 
-  logic neq_unit Unit.unit Unit.unit
+  predicate neq_unit Unit.unit Unit.unit
 
-  logic eq_bool Bool.bool Bool.bool
+  predicate eq_bool Bool.bool Bool.bool
 
-  logic neq_bool Bool.bool Bool.bool
+  predicate neq_bool Bool.bool Bool.bool
 
-  logic lt_int int int
+  predicate lt_int int int
 
-  logic le_int int int
+  predicate le_int int int
 
-  logic gt_int int int
+  predicate gt_int int int
 
-  logic ge_int int int
+  predicate ge_int int int
 
-  logic eq_int int int
+  predicate eq_int int int
 
-  logic neq_int int int
+  predicate neq_int int int
 
-  logic add_int int int : int
+  function add_int int int : int
 
-  logic sub_int int int : int
+  function sub_int int int : int
 
-  logic mul_int int int : int
+  function mul_int int int : int
 
-  logic div_int int int : int
+  function div_int int int : int
 
-  logic mod_int int int : int
+  function mod_int int int : int
 
-  logic neg_int int : int
+  function neg_int int : int
 
-  logic zwf_zero (a : int) (b : int) = ((Int.(<=) 0 b) and (Int.(<) a b))
+  predicate zwf_zero (a : int) (b : int) = ((Int.(<=) 0 b) /\ (Int.(<) a b))
 
   goal P_po_1:
     (forall x0:int.
       (forall result:int.
-        (((((x0 = 0) and (x0 = 0)) and (result = 1)) or
-          (((x0 = 0) and (x0 <> 0)) and (result = 2))) ->
+        (((((x0 = 0) /\ (x0 = 0)) /\ (result = 1)) \/
+          (((x0 = 0) /\ (x0 <> 0)) /\ (result = 2))) ->
          (result = 1))))
 
   goal P2_po_1:
@@ -53,7 +53,7 @@ theory Why2
             (forall y2:int.
               ((Int.(>=) y 0) ->
                ((Int.(>=) y0 0) ->
-                (((((x2 = y0) and (x2 <> 0)) and (y1 = (Int.(-) y0 1 : int))) and
+                (((((x2 = y0) /\ (x2 <> 0)) /\ (y1 = (Int.(-) y0 1 : int))) /\
                   (y2 = y1)) ->
                  (Int.(>=) y2 0)))))))))
 
@@ -65,9 +65,9 @@ theory Why2
             (forall y2:int.
               ((Int.(>=) y 0) ->
                ((Int.(>=) y0 0) ->
-                (((((x2 = y0) and (x2 <> 0)) and (y1 = (Int.(-) y0 1 : int))) and
+                (((((x2 = y0) /\ (x2 <> 0)) /\ (y1 = (Int.(-) y0 1 : int))) /\
                   (y2 = y1)) ->
-                 ((Int.(<=) 0 y0) and (Int.(<) y2 y0))))))))))
+                 ((Int.(<=) 0 y0) /\ (Int.(<) y2 y0))))))))))
 
   goal P2_po_3:
     (forall x2:int.
@@ -77,9 +77,9 @@ theory Why2
             (forall y0:int.
               (forall y3:int.
                 ((Int.(>=) y 0) ->
-                 ((((Int.(>=) y0 0) and
-                    (((x2 = y0) and (x2 = 0)) and (x3 = x2))) and
-                   ((x4 = x3) and (y3 = y0))) ->
+                 ((((Int.(>=) y0 0) /\
+                    (((x2 = y0) /\ (x2 = 0)) /\ (x3 = x2))) /\
+                   ((x4 = x3) /\ (y3 = y0))) ->
                   (y3 = 0)))))))))
 
   goal P3_po_1:
@@ -91,10 +91,10 @@ theory Why2
               (forall y6:int.
                 ((Int.(>=) y 0) ->
                  ((Int.(>=) y4 0) ->
-                  ((((((x6 = y4) and
-                       (if b = Bool.ttrue then (x6 <> 0) else (x6 = 0))) and
-                      (Bool.ttrue = b)) and
-                     (y5 = (Int.(-) y4 1 : int))) and
+                  ((((((x6 = y4) /\
+                       (if b = Bool.ttrue then (x6 <> 0) else (x6 = 0))) /\
+                      (Bool.ttrue = b)) /\
+                     (y5 = (Int.(-) y4 1 : int))) /\
                     (y6 = y5)) ->
                    (Int.(>=) y6 0))))))))))
 
@@ -107,12 +107,12 @@ theory Why2
               (forall y6:int.
                 ((Int.(>=) y 0) ->
                  ((Int.(>=) y4 0) ->
-                  ((((((x6 = y4) and
-                       (if b = Bool.ttrue then (x6 <> 0) else (x6 = 0))) and
-                      (Bool.ttrue = b)) and
-                     (y5 = (Int.(-) y4 1 : int))) and
+                  ((((((x6 = y4) /\
+                       (if b = Bool.ttrue then (x6 <> 0) else (x6 = 0))) /\
+                      (Bool.ttrue = b)) /\
+                     (y5 = (Int.(-) y4 1 : int))) /\
                     (y6 = y5)) ->
-                   ((Int.(<=) 0 y4) and (Int.(<) y6 y4)))))))))))
+                   ((Int.(<=) 0 y4) /\ (Int.(<) y6 y4)))))))))))
 
   goal P3_po_3:
     (forall b:Bool.bool.
@@ -123,12 +123,12 @@ theory Why2
               (forall y4:int.
                 (forall y7:int.
                   ((Int.(>=) y 0) ->
-                   ((((Int.(>=) y4 0) and
-                      ((((x6 = y4) and
-                         (if b = Bool.ttrue then (x6 <> 0) else (x6 = 0))) and
-                        (Bool.ffalse = b)) and
-                       (x7 = x6))) and
-                     ((x8 = x7) and (y7 = y4))) ->
+                   ((((Int.(>=) y4 0) /\
+                      ((((x6 = y4) /\
+                         (if b = Bool.ttrue then (x6 <> 0) else (x6 = 0))) /\
+                        (Bool.ffalse = b)) /\
+                       (x7 = x6))) /\
+                     ((x8 = x7) /\ (y7 = y4))) ->
                     (y7 = 0))))))))))
 
   goal P4_po_1:
@@ -138,7 +138,7 @@ theory Why2
           (forall y9:int.
             ((Int.(>=) y 1) ->
              ((Int.(>=) y8 1) ->
-              (((y9 = (Int.(-) y8 1 : int)) and ((x10 = y9) and (x10 <> 0))) ->
+              (((y9 = (Int.(-) y8 1 : int)) /\ ((x10 = y9) /\ (x10 <> 0))) ->
                (Int.(>=) y9 1))))))))
 
   goal P4_po_2:
@@ -148,8 +148,8 @@ theory Why2
           (forall y9:int.
             ((Int.(>=) y 1) ->
              ((Int.(>=) y8 1) ->
-              (((y9 = (Int.(-) y8 1 : int)) and ((x10 = y9) and (x10 <> 0))) ->
-               ((Int.(<=) 0 y8) and (Int.(<) y9 y8)))))))))
+              (((y9 = (Int.(-) y8 1 : int)) /\ ((x10 = y9) /\ (x10 <> 0))) ->
+               ((Int.(<=) 0 y8) /\ (Int.(<) y9 y8)))))))))
 
   goal P4_po_3:
     (forall x10:int.
@@ -161,11 +161,11 @@ theory Why2
                 (forall y8:int.
                   (forall y9:int.
                     ((Int.(>=) y 1) ->
-                     ((((Int.(>=) y8 1) and
-                        (((y9 = (Int.(-) y8 1 : int)) and
-                          ((x10 = y9) and (x10 = 0))) and
-                         ((x11 = x10) and (y10 = y9)))) and
-                       ((x12 = x11) and (y11 = y10))) ->
+                     ((((Int.(>=) y8 1) /\
+                        (((y9 = (Int.(-) y8 1 : int)) /\
+                          ((x10 = y9) /\ (x10 = 0))) /\
+                         ((x11 = x10) /\ (y10 = y9)))) /\
+                       ((x12 = x11) /\ (y11 = y10))) ->
                       (y11 = 0)))))))))))
 
 

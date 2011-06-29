@@ -30,13 +30,11 @@ open Printer
 open Theory
 
 let iprinter,tprinter,pprinter =
-  let bl = ["theory"; "type"; "logic"; "inductive"; "meta";
-            "axiom"; "lemma"; "goal"; "use"; "clone"; "prop";
+  let bl = ["theory"; "type"; "function"; "predicate"; "inductive";
+            "axiom"; "lemma"; "goal"; "use"; "clone"; "prop"; "meta";
             "namespace"; "import"; "export"; "end";
-            "forall"; "exists"; "and"; "or"; "not";
-            "true"; "false"; "if"; "then"; "else";
-            "let"; "in"; "match"; "with"; "as"; "epsilon" ]
-  in
+            "forall"; "exists"; "not"; "true"; "false"; "if"; "then"; "else";
+            "let"; "in"; "match"; "with"; "as"; "epsilon" ] in
   let isanitize = sanitizer char_to_alpha char_to_alnumus in
   let lsanitize = sanitizer char_to_lalpha char_to_alnumus in
   create_ident_printer bl ~sanitizer:isanitize,
@@ -277,17 +275,19 @@ let print_type_decl first fmt d =
 
 let print_ls_type fmt = fprintf fmt " :@ %a" print_ty
 
+let ls_kind ls = if ls.ls_value = None then "predicate" else "function"
+
 let print_logic_decl fst fmt (ls,ld) = match ld with
   | Some ld ->
       let vl,e = open_ls_defn ld in
       fprintf fmt "@[<hov 2>%s %a%a%a =@ %a@]@\n@\n"
-        (if fst then "logic" else "with") print_ls ls
+        (if fst then ls_kind ls else "with") print_ls ls
         (print_list nothing print_vs_arg) vl
         (print_option print_ls_type) ls.ls_value print_term e;
       List.iter forget_var vl
   | None ->
       fprintf fmt "@[<hov 2>%s %a%a%a@]@\n@\n"
-        (if fst then "logic" else "with") print_ls ls
+        (if fst then ls_kind ls else "with") print_ls ls
         (print_list nothing print_ty_arg) ls.ls_args
         (print_option print_ls_type) ls.ls_value
 
@@ -334,7 +334,7 @@ let print_inst_ts fmt (ts1,ts2) =
   fprintf fmt "type %a = %a" print_ts ts1 print_ts ts2
 
 let print_inst_ls fmt (ls1,ls2) =
-  fprintf fmt "logic %a = %a" print_ls ls1 print_ls ls2
+  fprintf fmt "%s %a = %a" (ls_kind ls1) print_ls ls1 print_ls ls2
 
 let print_inst_pr fmt (pr1,pr2) =
   fprintf fmt "prop %a = %a" print_pr pr1 print_pr pr2
@@ -342,7 +342,7 @@ let print_inst_pr fmt (pr1,pr2) =
 let print_meta_arg fmt = function
   | MAty ty -> fprintf fmt "type %a" print_ty ty
   | MAts ts -> fprintf fmt "type %a" print_ts ts
-  | MAls ls -> fprintf fmt "logic %a" print_ls ls
+  | MAls ls -> fprintf fmt "%s %a" (ls_kind ls) print_ls ls
   | MApr pr -> fprintf fmt "prop %a" print_pr pr
   | MAstr s -> fprintf fmt "\"%s\"" s
   | MAint i -> fprintf fmt "%d" i

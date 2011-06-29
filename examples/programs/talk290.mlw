@@ -10,10 +10,10 @@ module M
   use import int.Power
 
 (*
-  logic sum_digits (n:int) : int =
+  function sum_digits (n:int) : int =
     if n = 0 then 0 else sum_digits (div n 10) + mod n 10
 *)
-  logic sum_digits int : int
+  function sum_digits int : int
 
   axiom Sum_digits_def : forall n : int. sum_digits n =
     if n <= 0 then 0 else sum_digits (div n 10) + mod n 10
@@ -22,17 +22,17 @@ module M
 
   type int3 = (int,int,int)
 
-  logic p (d:int3) (n:int) =
+  predicate p (d:int3) (n:int) =
     let (a,b,c) = d in
-    0 <= mod n 10 < c and sum_digits n = sum_digits (137 * n + a) + b
+    0 <= mod n 10 < c /\ sum_digits n = sum_digits (137 * n + a) + b
 
-  clone int.NumOfParam as P with type param = int3, logic pr = p
+  clone int.NumOfParam as P with type param = int3, predicate pr = p
 
-  logic solution(a b m : int) : int = P.num_of (a,b,10) 0 (power 10 m)
+  function solution(a b m : int) : int = P.num_of (a,b,10) 0 (power 10 m)
 
   (* short cut for the number of n st n mod 10 = c and ... *)
 
-  logic num_of_modc (d:int3) (x y:int) : int =
+  function num_of_modc (d:int3) (x y:int) : int =
     let (a,b,c) = d in
     P.num_of (a,b,c+1) x y - P.num_of (a,b,c) x y
 
@@ -62,7 +62,7 @@ let rec sd n =
 (* f(m,a,b) = the number of 0 <= n < 10^m such that
    digitsum(137n+a) + b = digitsum(n). *)
 let rec f m a b =
-  { 0 <= m and 0 <= a }
+  { 0 <= m /\ 0 <= a }
   if m = 0 then begin
     (* only n = 0 is possible *)
     if sd a + b = 0 then 1 else 0
@@ -70,7 +70,7 @@ let rec f m a b =
     let sum = ref 0 in
     let c = ref 0 in
     while !c <= 9 do (* n = 10n' + c *)
-      invariant { 0 <= !c <= 10 and !sum = P.num_of (a,b,!c) 0 (power 10 m) }
+      invariant { 0 <= !c <= 10 /\ !sum = P.num_of (a,b,!c) 0 (power 10 m) }
       variant   { 10 - !c }
       let x = 137 * !c + a in
       let q = div x 10 in

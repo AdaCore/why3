@@ -177,10 +177,10 @@ end
 
 /* keywords */
 
-%token AND AS AXIOM CLONE
-%token ELSE END EPSILON EXISTS EXPORT FALSE FORALL
-%token GOAL IF IFF IMPLIES IMPORT IN INDUCTIVE LEMMA
-%token LET LOGIC MATCH META NAMESPACE NOT PROP OR
+%token AS AXIOM CLONE
+%token ELSE END EPSILON EXISTS EXPORT FALSE FORALL FUNCTION
+%token GOAL IF IMPORT IN INDUCTIVE LEMMA
+%token LET MATCH META NAMESPACE NOT PROP PREDICATE
 %token THEN THEORY TRUE TYPE USE WITH
 
 /* program keywords */
@@ -192,15 +192,15 @@ end
 
 /* symbols */
 
-%token ARROW
+%token AND ARROW
 %token BACKQUOTE BAR
 %token COLON COMMA
 %token DOT EQUAL FUNC LAMBDA LTGT
 %token LEFTPAR LEFTPAR_STAR_RIGHTPAR LEFTREC LEFTSQ
 %token LARROW LRARROW
-%token PRED QUOTE
+%token OR PRED QUOTE
 %token RIGHTPAR RIGHTREC RIGHTSQ
-%token TILDE UNDERSCORE
+%token UNDERSCORE
 
 %token EOF
 
@@ -224,10 +224,10 @@ end
 %nonassoc prec_named
 %nonassoc COLON
 
-%right ARROW IMPLIES LRARROW IFF
+%right ARROW LRARROW
 %right OR BARBAR
 %right AND AMPAMP
-%nonassoc NOT TILDE
+%nonassoc NOT
 %left EQUAL LTGT OP1
 %nonassoc LARROW
 %nonassoc RIGHTSQ    /* stronger than <- for e1[e2 <- e3] */
@@ -303,7 +303,9 @@ namespace_name:
 decl:
 | TYPE list1_type_decl
     { TypeDecl $2 }
-| LOGIC list1_logic_decl
+| FUNCTION list1_logic_decl_function
+    { LogicDecl $2 }
+| PREDICATE list1_logic_decl_predicate
     { LogicDecl $2 }
 | INDUCTIVE list1_inductive_decl
     { IndDecl $2 }
@@ -351,11 +353,12 @@ list1_comma_subst:
 ;
 
 subst:
-| NAMESPACE ns EQUAL ns     { CSns   ($2, $4) }
-| TYPE  qualid EQUAL qualid { CStsym ($2, $4) }
-| LOGIC qualid EQUAL qualid { CSlsym ($2, $4) }
-| LEMMA qualid              { CSlemma $2 }
-| GOAL  qualid              { CSgoal  $2 }
+| NAMESPACE ns     EQUAL ns     { CSns   ($2, $4) }
+| TYPE      qualid EQUAL qualid { CStsym ($2, $4) }
+| FUNCTION  qualid EQUAL qualid { CSlsym ($2, $4) }
+| PREDICATE qualid EQUAL qualid { CSlsym ($2, $4) }
+| LEMMA     qualid              { CSlemma $2 }
+| GOAL      qualid              { CSgoal  $2 }
 ;
 
 ns:
@@ -371,11 +374,12 @@ list1_meta_arg_sep_comma:
 ;
 
 meta_arg:
-| TYPE  qualid { PMAts  $2 }
-| LOGIC qualid { PMAls  $2 }
-| PROP  qualid { PMApr  $2 }
-| STRING       { PMAstr $1 }
-| INTEGER      { PMAint $1 }
+| TYPE      qualid { PMAts  $2 }
+| FUNCTION  qualid { PMAls  $2 }
+| PREDICATE qualid { PMAls  $2 }
+| PROP      qualid { PMApr  $2 }
+| STRING           { PMAstr $1 }
+| INTEGER          { PMAint $1 }
 ;
 
 /* Type declarations */
@@ -435,9 +439,31 @@ typecase:
 
 /* Logic declarations */
 
+list1_logic_decl_function:
+| logic_decl_function                        { [$1] }
+| logic_decl_function WITH list1_logic_decl  { $1 :: $3 }
+;
+
+list1_logic_decl_predicate:
+| logic_decl_predicate                        { [$1] }
+| logic_decl_predicate WITH list1_logic_decl  { $1 :: $3 }
+;
+
 list1_logic_decl:
 | logic_decl                        { [$1] }
 | logic_decl WITH list1_logic_decl  { $1 :: $3 }
+;
+
+logic_decl_function:
+| lident_rich labels params COLON primitive_type logic_def_option
+  { { ld_loc = floc (); ld_ident = add_lab $1 $2;
+      ld_params = $3; ld_type = Some $5; ld_def = $6 } }
+;
+
+logic_decl_predicate:
+| lident_rich labels params logic_def_option
+  { { ld_loc = floc (); ld_ident = add_lab $1 $2;
+      ld_params = $3; ld_type = None; ld_def = $4 } }
 ;
 
 logic_decl:
@@ -532,11 +558,7 @@ type_var:
 lexpr:
 | lexpr ARROW lexpr
    { infix_pp $1 PPimplies $3 }
-| lexpr IMPLIES lexpr
-   { infix_pp $1 PPimplies $3 }
 | lexpr LRARROW lexpr
-   { infix_pp $1 PPiff $3 }
-| lexpr IFF lexpr
    { infix_pp $1 PPiff $3 }
 | lexpr OR lexpr
    { infix_pp $1 PPor $3 }
@@ -546,8 +568,6 @@ lexpr:
    { infix_pp $1 PPand $3 }
 | lexpr AMPAMP lexpr
    { mk_pp (PPnamed (Lstr "asym_split", infix_pp $1 PPand $3)) }
-| TILDE lexpr
-   { prefix_pp PPnot $2 }
 | NOT lexpr
    { prefix_pp PPnot $2 }
 | lexpr EQUAL lexpr

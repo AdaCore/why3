@@ -8,15 +8,15 @@ module M
                dist : array int; (* distance to representative *)
                num  : int;       (* number of classes *) |}
 
-  logic size (u: uf) : int = length u.link
+  function size (u: uf) : int = length u.link
 
-  logic inv (u : uf) =
+  predicate inv (u : uf) =
     let s = length u.link in
-    length u.dist = s and
-    (forall i:int. 0 <= i < s -> 0 <= u.link[i] < s) and
+    length u.dist = s /\
+    (forall i:int. 0 <= i < s -> 0 <= u.link[i] < s) /\
     (forall i:int. 0 <= i < s ->
-       (  (u.dist[i] = 0 and u.link[i] = i)
-       or (u.dist[i] > 0 and u.dist[u.link[i]] < u.dist[i])))
+       (  (u.dist[i] = 0 /\ u.link[i] = i)
+       \/ (u.dist[i] > 0 /\ u.dist[u.link[i]] < u.dist[i])))
 
   inductive repr (u:uf) (x:int) (r:int) =
   | Repr_root: forall u:uf. inv u ->
@@ -31,10 +31,10 @@ module M
   lemma Repr_dist_1:
     forall u:uf, x y:int. repr u x y -> u.dist[y] = 0
 
-  logic same (u:uf) (x y:int) =
+  predicate same (u:uf) (x y:int) =
     forall r:int. repr u x r <-> repr u y r
 
-  logic same_reprs (u1 u2 : uf) =
+  predicate same_reprs (u1 u2 : uf) =
     forall x r:int. repr u1 x r <-> repr u2 x r
 
   axiom OneClass :
@@ -52,19 +52,19 @@ module M
       l[i] <- i
     done;
     {| link = l; dist = make n 0; num = n |}
-    { inv result and
-      num result = n and size result = n and
+    { inv result /\
+      num result = n /\ size result = n /\
       forall x:int. 0 <= x < n -> repr result x x }
 
   let path_compression (u: uf) x r =
-    { inv u and 0 <= x < size u and u.dist[x] > 0 and repr u x r }
+    { inv u /\ 0 <= x < size u /\ u.dist[x] > 0 /\ repr u x r }
     u.link[x] <- r;
     u.dist[x] <- 1
-    { inv u and size u = size (old u) and
-      num u = num (old u) and same_reprs (old u) u }
+    { inv u /\ size u = size (old u) /\
+      num u = num (old u) /\ same_reprs (old u) u }
 
   let rec find (u: uf) (x: int) variant { u.dist[x] } =
-    { inv u and 0 <= x < size u }
+    { inv u /\ 0 <= x < size u }
     let y = (link u)[x] in
     if y <> x then begin
       let r = find u y in
@@ -72,27 +72,27 @@ module M
       r
     end else
       x
-    { inv u and
-      repr u x result and
-      size u = size (old u) and num u = num (old u) and
+    { inv u /\
+      repr u x result /\
+      size u = size (old u) /\ num u = num (old u) /\
       same_reprs u (old u) }
 
   (***
 
   parameter ghost_find : u:ref uf -> x:int ->
-    { inv !u and 0 <= x < size !u }
+    { inv !u /\ 0 <= x < size !u }
     int reads u
     { repr !u x result }
 
   let increment u r =
-    { inv !u and 0 <= r < size !u }
+    { inv !u /\ 0 <= r < size !u }
     let i = ref 0 in
     let d = ref (dist !u) in
     while !i < size !u do
-      invariant { 0 <= !i <= size !u and
+      invariant { 0 <= !i <= size !u /\
                   forall j:int. 0 <= j < size !u ->
                   !d#j = dist(!u)#j +
-                         if repr !u j r and j < !i then 1 else 0 }
+                         if repr !u j r /\ j < !i then 1 else 0 }
       variant { size !u - !i }
       if ghost_find u !i = r then
         d := A.set !d !i (A.get !d !i + 1)
@@ -102,21 +102,21 @@ module M
         result#i = (dist !u)#i + if repr !u i r then 1 else 0 }
 
   let union u a b =
-    { inv !u and
-      0 <= a < size !u and 0 <= b < size !u and not same !u a b }
+    { inv !u /\
+      0 <= a < size !u /\ 0 <= b < size !u /\ not same !u a b }
     let ra = find u a in
     let rb = find u b in
     let l = link !u in
     let d = increment u ra in
     u := UF (A.set l ra rb) d (size !u) (num !u - 1)
-    { inv !u and
-      same !u a b and
-      size !u = size (old !u) and num !u = num (old !u) - 1 and
+    { inv !u /\
+      same !u a b /\
+      size !u = size (old !u) /\ num !u = num (old !u) - 1 /\
       forall x y:int. 0 <= x < size !u -> 0 <= y < size !u ->
         same !u x y <->
-        same (old !u) x y or
-        same (old !u) x a and same (old !u) b y or
-        same (old !u) x b and same (old !u) a y }
+        same (old !u) x y \/
+        same (old !u) x a /\ same (old !u) b y \/
+        same (old !u) x b /\ same (old !u) a y }
 
   ***)
 

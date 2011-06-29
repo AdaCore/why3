@@ -8,7 +8,7 @@ module Hashtbl
 
   type t 'a model {| mutable contents: map key (list 'a) |}
 
-  logic ([]) (h: t 'a) (k: key) : list 'a = Map.([]) h.contents k
+  function ([]) (h: t 'a) (k: key) : list 'a = Map.([]) h.contents k
 
   parameter create (n:int) :
     {} t 'a { forall k: key. result[k] = Nil }
@@ -19,7 +19,7 @@ module Hashtbl
   parameter add (h: t 'a) (k: key) (v: 'a) :
     {}
     unit writes h
-    { h[k] = Cons v (old h)[k] and
+    { h[k] = Cons v (old h)[k] /\
       forall k': key. k' <> k -> h[k'] = (old h)[k'] }
 
   parameter mem (h: t 'a) (k: key) :
@@ -53,14 +53,14 @@ module Hashtbl
   parameter remove (h: t 'a) (k: key) :
     { h[k] <> Nil }
     unit writes h
-    { (match (old h)[k] with Nil -> false | Cons _ l -> h[k] =l end) and
+    { (match (old h)[k] with Nil -> false | Cons _ l -> h[k] =l end) /\
       forall k': key. k' <> k -> h[k'] = (old h)[k'] }
 
   parameter replace (h: t 'a) (k: key) (v: 'a) :
     {}
     unit writes h
     { (h[k] = Cons v (match (old h)[k] with Nil -> Nil | Cons _ l -> l end))
-      and
+      /\
       forall k': key. k' <> k -> h[k'] = (old h)[k'] }
 
   parameter length (h: t 'a) :
@@ -81,10 +81,10 @@ module TestHashtbl
   use import list.List
   use import module Hashtbl
 
-  logic k1: key
-  logic k2: key
-  logic k3: key
-  axiom kdiff : k1 <> k2 and k1 <> k3 and k2 <> k3
+  function k1: key
+  function k2: key
+  function k3: key
+  axiom kdiff : k1 <> k2 /\ k1 <> k3 /\ k2 <> k3
 
   let test1 () =
     let h = create 17 in

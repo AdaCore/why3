@@ -22,7 +22,7 @@ module Queue
     'a
     writes s raises Empty
     { match old s.elts with Nil -> false
-                          | Cons x t -> result = x and s.elts = t end }
+                          | Cons x t -> result = x /\ s.elts = t end }
     | Empty -> { s.elts = old s.elts = Nil }
 
   parameter top :

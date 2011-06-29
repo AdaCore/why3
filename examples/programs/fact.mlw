@@ -3,7 +3,7 @@ theory Fact "Factorial"
 
   use export int.Int
 
-  logic fact int : int
+  function fact int : int
 
   axiom fact0: fact 0 = 1
   axiom factn: forall n:int. n >= 1 -> fact n = fact (n-1) * n
@@ -33,7 +33,7 @@ module FactImperative
     let y = ref 0 in
     let r = ref 1 in
     while !y < x do
-      invariant { 0 <= !y <= x and !r = fact !y }
+      invariant { 0 <= !y <= x /\ !r = fact !y }
       y := !y + 1;
       r := !r * !y
     done;

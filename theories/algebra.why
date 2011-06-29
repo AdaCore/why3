@@ -1,82 +1,82 @@
 
 theory Assoc
   type t
-  logic op t t : t
+  function op t t : t
   axiom Assoc : forall x y z : t. op (op x y) z = op x (op y z)
 end
 
 theory Comm
   type t
-  logic op t t : t
+  function op t t : t
   axiom Comm : forall x y : t. op x y = op y x
 end
 
 theory AC
   type t
-  logic op t t : t
-  clone Assoc with type t = t, logic op = op
-  clone Comm  with type t = t, logic op = op
-  meta AC logic op (*, prop Assoc.Assoc, prop Comm.Comm*)
+  function op t t : t
+  clone Assoc with type t = t, function op = op
+  clone Comm  with type t = t, function op = op
+  meta AC function op (*, prop Assoc.Assoc, prop Comm.Comm*)
 end
 
 theory Group
   type t
 
-  logic unit : t
+  function unit : t
 
-  logic op t t : t
-  logic inv t : t
+  function op t t : t
+  function inv t : t
 
   axiom Unit_def : forall x:t. op x unit = x
 
-  clone Assoc with type t = t, logic op = op
+  clone Assoc with type t = t, function op = op
 
   axiom Inv_def : forall x:t. op x (inv x) = unit
 end
 
 theory CommutativeGroup
   clone export Group
-  clone Comm with type t = t, logic op = op
-  meta AC logic op (*, prop Assoc.Assoc, prop Comm.Comm*)
+  clone Comm with type t = t, function op = op
+  meta AC function op (*, prop Assoc.Assoc, prop Comm.Comm*)
 end
 
 theory Ring
   type t
-  logic zero : t
-  logic (+) t t : t
-  logic (-_) t : t
-  logic (*) t t : t
+  function zero : t
+  function (+) t t : t
+  function (-_) t : t
+  function (*) t t : t
 
   clone CommutativeGroup with type t = t,
-                              logic unit = zero,
-                              logic op = (+),
-                              logic inv = (-_)
+                              function unit = zero,
+                              function op = (+),
+                              function inv = (-_)
 
-  clone Assoc with type t = t, logic op = (*)
+  clone Assoc with type t = t, function op = (*)
 
   axiom Mul_distr: forall x y z : t. x * (y + z) = x * y + x * z
 
-  logic (-) (x y : t) : t = x + -y
+  function (-) (x y : t) : t = x + -y
 end
 
 theory CommutativeRing
   clone export Ring
-  clone Comm with type t = t, logic op = (*)
-  meta AC logic (*) (*, prop Assoc.Assoc, prop Comm.Comm*)
+  clone Comm with type t = t, function op = (*)
+  meta AC function (*) (*, prop Assoc.Assoc, prop Comm.Comm*)
 end
 
 theory UnitaryCommutativeRing
   clone export CommutativeRing
-  logic one : t
+  function one : t
   axiom Unitary : forall x:t. one * x = x
   axiom NonTrivialRing : zero <> one
 end
 
 theory OrderedUnitaryCommutativeRing
   clone export UnitaryCommutativeRing
-  logic (<=) t t
-  logic (>=) (x y : t) = y <= x
-  clone export relations.TotalOrder with type t = t, logic rel = (<=)
+  predicate (<=) t t
+  predicate (>=) (x y : t) = y <= x
+  clone export relations.TotalOrder with type t = t, predicate rel = (<=)
 
   axiom CompatOrderAdd  :
     forall x y z : t. x <= y -> x + z <= y + z
@@ -86,23 +86,22 @@ end
 
 theory Field
   clone export UnitaryCommutativeRing
-  logic inv t : t
+  function inv t : t
   axiom Inverse : forall x:t. x <> zero -> x * inv x = one
-  logic (/) (x y : t) : t = x * inv y
+  function (/) (x y : t) : t = x * inv y
 end
 
 theory OrderedField
   clone export Field
 
-  logic (<=) t t
-  logic (>=) (x y : t) = y <= x
-  clone export relations.TotalOrder with type t = t, logic rel = (<=)
+  predicate (<=) t t
+  predicate (>=) (x y : t) = y <= x
+  clone export relations.TotalOrder with type t = t, predicate rel = (<=)
 
   axiom CompatOrderAdd  : forall x y z : t. x <= y -> x + z <= y + z
-  axiom CompatOrderMult : forall x y z : t. x <= y -> zero <= z -> x * z <= y * z
+  axiom CompatOrderMult :
+    forall x y z : t. x <= y -> zero <= z -> x * z <= y * z
 end
-
-
 
 (* to be discussed: should we add the following lemmas, and where
 
@@ -113,5 +112,4 @@ end
   lemma SquareNonNeg : forall x : t. zero <= x * x
   lemma ZeroLessOne : zero <= one
 *)
-
 

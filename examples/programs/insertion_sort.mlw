@@ -15,14 +15,14 @@ module InsertionSort
     label L:
     for i = 1 to length a - 1 do
       (* a[0..i[ is sorted; now insert a[i] *)
-      invariant { sorted_sub a 0 i and permut a (at a L) }
+      invariant { sorted_sub a 0 i /\ permut a (at a L) }
       let v = a[i] in
       let j = ref i in
       while !j > 0 && a[!j - 1] > v do
         invariant {
-          0 <= !j <= i and permut a[!j <- v] (at a L) and
+          0 <= !j <= i /\ permut a[!j <- v] (at a L) /\
           (forall k1 k2: int.
-             0 <= k1 <= k2 <= i -> k1 <> !j -> k2 <> !j -> a[k1] <= a[k2]) and
+             0 <= k1 <= k2 <= i -> k1 <> !j -> k2 <> !j -> a[k1] <= a[k2]) /\
           (forall k: int. !j+1 <= k <= i -> v < a[k]) }
         variant { !j }
         label L1:
@@ -33,7 +33,7 @@ module InsertionSort
       assert { forall k: int. 0 <= k < !j -> a[k] <= v };
       a[!j] <- v
     done
-    { sorted a and permut a (old a) }
+    { sorted a /\ permut a (old a) }
 
 end
 

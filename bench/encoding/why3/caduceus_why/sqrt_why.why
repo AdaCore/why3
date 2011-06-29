@@ -4,39 +4,39 @@ theory Why2
   use int.ComputerDivision
   use real.Real
   use bool_inf.Bool
-  logic eq_unit Unit.unit Unit.unit
+  predicate eq_unit Unit.unit Unit.unit
 
-  logic neq_unit Unit.unit Unit.unit
+  predicate neq_unit Unit.unit Unit.unit
 
-  logic eq_bool Bool.bool Bool.bool
+  predicate eq_bool Bool.bool Bool.bool
 
-  logic neq_bool Bool.bool Bool.bool
+  predicate neq_bool Bool.bool Bool.bool
 
-  logic lt_int int int
+  predicate lt_int int int
 
-  logic le_int int int
+  predicate le_int int int
 
-  logic gt_int int int
+  predicate gt_int int int
 
-  logic ge_int int int
+  predicate ge_int int int
 
-  logic eq_int int int
+  predicate eq_int int int
 
-  logic neq_int int int
+  predicate neq_int int int
 
-  logic add_int int int : int
+  function add_int int int : int
 
-  logic sub_int int int : int
+  function sub_int int int : int
 
-  logic mul_int int int : int
+  function mul_int int int : int
 
-  logic div_int int int : int
+  function div_int int int : int
 
-  logic mod_int int int : int
+  function mod_int int int : int
 
-  logic neg_int int : int
+  function neg_int int : int
 
-  logic zwf_zero (a : int) (b : int) = ((Int.(<=) 0 b) and (Int.(<) a b))
+  predicate zwf_zero (a : int) (b : int) = ((Int.(<=) 0 b) /\ (Int.(<) a b))
 
   goal Sqrt_po_1:
     (forall x:int.
@@ -124,10 +124,10 @@ theory Why2
             ((result = (ComputerDivision.div (Int.(+) x 1 : int) 2 : int)) ->
              (forall y:int.
                (forall z:int.
-                 (((Int.(>) z 0) and
-                   ((Int.(>) y 0) and
-                    ((z = (ComputerDivision.div (Int.(+) (ComputerDivision.div x y : int) y : int) 2 : int)) and
-                     ((Int.(<) x (Int.(*) (Int.(+) y 1 : int) (Int.(+) y 1 : int) : int)) and
+                 (((Int.(>) z 0) /\
+                   ((Int.(>) y 0) /\
+                    ((z = (ComputerDivision.div (Int.(+) (ComputerDivision.div x y : int) y : int) 2 : int)) /\
+                     ((Int.(<) x (Int.(*) (Int.(+) y 1 : int) (Int.(+) y 1 : int) : int)) /\
                       (Int.(<) x (Int.(*) (Int.(+) z 1 : int) (Int.(+) z 1 : int) : int)))))) ->
                   ((Int.(<) z y) -> (forall y0:int. ((y0 = z) -> (z <> 0))))))))))))))
 
@@ -141,10 +141,10 @@ theory Why2
             ((result = (ComputerDivision.div (Int.(+) x 1 : int) 2 : int)) ->
              (forall y:int.
                (forall z:int.
-                 (((Int.(>) z 0) and
-                   ((Int.(>) y 0) and
-                    ((z = (ComputerDivision.div (Int.(+) (ComputerDivision.div x y : int) y : int) 2 : int)) and
-                     ((Int.(<) x (Int.(*) (Int.(+) y 1 : int) (Int.(+) y 1 : int) : int)) and
+                 (((Int.(>) z 0) /\
+                   ((Int.(>) y 0) /\
+                    ((z = (ComputerDivision.div (Int.(+) (ComputerDivision.div x y : int) y : int) 2 : int)) /\
+                     ((Int.(<) x (Int.(*) (Int.(+) y 1 : int) (Int.(+) y 1 : int) : int)) /\
                       (Int.(<) x (Int.(*) (Int.(+) z 1 : int) (Int.(+) z 1 : int) : int)))))) ->
                   ((Int.(<) z y) ->
                    (forall y0:int.
@@ -168,10 +168,10 @@ theory Why2
             ((result = (ComputerDivision.div (Int.(+) x 1 : int) 2 : int)) ->
              (forall y:int.
                (forall z:int.
-                 (((Int.(>) z 0) and
-                   ((Int.(>) y 0) and
-                    ((z = (ComputerDivision.div (Int.(+) (ComputerDivision.div x y : int) y : int) 2 : int)) and
-                     ((Int.(<) x (Int.(*) (Int.(+) y 1 : int) (Int.(+) y 1 : int) : int)) and
+                 (((Int.(>) z 0) /\
+                   ((Int.(>) y 0) /\
+                    ((z = (ComputerDivision.div (Int.(+) (ComputerDivision.div x y : int) y : int) 2 : int)) /\
+                     ((Int.(<) x (Int.(*) (Int.(+) y 1 : int) (Int.(+) y 1 : int) : int)) /\
                       (Int.(<) x (Int.(*) (Int.(+) z 1 : int) (Int.(+) z 1 : int) : int)))))) ->
                   ((Int.(<) z y) ->
                    (forall y0:int.
@@ -195,10 +195,10 @@ theory Why2
             ((result = (ComputerDivision.div (Int.(+) x 1 : int) 2 : int)) ->
              (forall y:int.
                (forall z:int.
-                 (((Int.(>) z 0) and
-                   ((Int.(>) y 0) and
-                    ((z = (ComputerDivision.div (Int.(+) (ComputerDivision.div x y : int) y : int) 2 : int)) and
-                     ((Int.(<) x (Int.(*) (Int.(+) y 1 : int) (Int.(+) y 1 : int) : int)) and
+                 (((Int.(>) z 0) /\
+                   ((Int.(>) y 0) /\
+                    ((z = (ComputerDivision.div (Int.(+) (ComputerDivision.div x y : int) y : int) 2 : int)) /\
+                     ((Int.(<) x (Int.(*) (Int.(+) y 1 : int) (Int.(+) y 1 : int) : int)) /\
                       (Int.(<) x (Int.(*) (Int.(+) z 1 : int) (Int.(+) z 1 : int) : int)))))) ->
                   ((Int.(<) z y) ->
                    (forall y0:int.
@@ -223,10 +223,10 @@ theory Why2
             ((result = (ComputerDivision.div (Int.(+) x 1 : int) 2 : int)) ->
              (forall y:int.
                (forall z:int.
-                 (((Int.(>) z 0) and
-                   ((Int.(>) y 0) and
-                    ((z = (ComputerDivision.div (Int.(+) (ComputerDivision.div x y : int) y : int) 2 : int)) and
-                     ((Int.(<) x (Int.(*) (Int.(+) y 1 : int) (Int.(+) y 1 : int) : int)) and
+                 (((Int.(>) z 0) /\
+                   ((Int.(>) y 0) /\
+                    ((z = (ComputerDivision.div (Int.(+) (ComputerDivision.div x y : int) y : int) 2 : int)) /\
+                     ((Int.(<) x (Int.(*) (Int.(+) y 1 : int) (Int.(+) y 1 : int) : int)) /\
                       (Int.(<) x (Int.(*) (Int.(+) z 1 : int) (Int.(+) z 1 : int) : int)))))) ->
                   ((Int.(<) z y) ->
                    (forall y0:int.
@@ -251,10 +251,10 @@ theory Why2
             ((result = (ComputerDivision.div (Int.(+) x 1 : int) 2 : int)) ->
              (forall y:int.
                (forall z:int.
-                 (((Int.(>) z 0) and
-                   ((Int.(>) y 0) and
-                    ((z = (ComputerDivision.div (Int.(+) (ComputerDivision.div x y : int) y : int) 2 : int)) and
-                     ((Int.(<) x (Int.(*) (Int.(+) y 1 : int) (Int.(+) y 1 : int) : int)) and
+                 (((Int.(>) z 0) /\
+                   ((Int.(>) y 0) /\
+                    ((z = (ComputerDivision.div (Int.(+) (ComputerDivision.div x y : int) y : int) 2 : int)) /\
+                     ((Int.(<) x (Int.(*) (Int.(+) y 1 : int) (Int.(+) y 1 : int) : int)) /\
                       (Int.(<) x (Int.(*) (Int.(+) z 1 : int) (Int.(+) z 1 : int) : int)))))) ->
                   ((Int.(<) z y) ->
                    (forall y0:int.
@@ -279,10 +279,10 @@ theory Why2
             ((result = (ComputerDivision.div (Int.(+) x 1 : int) 2 : int)) ->
              (forall y:int.
                (forall z:int.
-                 (((Int.(>) z 0) and
-                   ((Int.(>) y 0) and
-                    ((z = (ComputerDivision.div (Int.(+) (ComputerDivision.div x y : int) y : int) 2 : int)) and
-                     ((Int.(<) x (Int.(*) (Int.(+) y 1 : int) (Int.(+) y 1 : int) : int)) and
+                 (((Int.(>) z 0) /\
+                   ((Int.(>) y 0) /\
+                    ((z = (ComputerDivision.div (Int.(+) (ComputerDivision.div x y : int) y : int) 2 : int)) /\
+                     ((Int.(<) x (Int.(*) (Int.(+) y 1 : int) (Int.(+) y 1 : int) : int)) /\
                       (Int.(<) x (Int.(*) (Int.(+) z 1 : int) (Int.(+) z 1 : int) : int)))))) ->
                   ((Int.(<) z y) ->
                    (forall y0:int.
@@ -306,10 +306,10 @@ theory Why2
             ((result = (ComputerDivision.div (Int.(+) x 1 : int) 2 : int)) ->
              (forall y:int.
                (forall z:int.
-                 (((Int.(>) z 0) and
-                   ((Int.(>) y 0) and
-                    ((z = (ComputerDivision.div (Int.(+) (ComputerDivision.div x y : int) y : int) 2 : int)) and
-                     ((Int.(<) x (Int.(*) (Int.(+) y 1 : int) (Int.(+) y 1 : int) : int)) and
+                 (((Int.(>) z 0) /\
+                   ((Int.(>) y 0) /\
+                    ((z = (ComputerDivision.div (Int.(+) (ComputerDivision.div x y : int) y : int) 2 : int)) /\
+                     ((Int.(<) x (Int.(*) (Int.(+) y 1 : int) (Int.(+) y 1 : int) : int)) /\
                       (Int.(<) x (Int.(*) (Int.(+) z 1 : int) (Int.(+) z 1 : int) : int)))))) ->
                   ((Int.(<) z y) ->
                    (forall y0:int.
@@ -333,10 +333,10 @@ theory Why2
             ((result = (ComputerDivision.div (Int.(+) x 1 : int) 2 : int)) ->
              (forall y:int.
                (forall z:int.
-                 (((Int.(>) z 0) and
-                   ((Int.(>) y 0) and
-                    ((z = (ComputerDivision.div (Int.(+) (ComputerDivision.div x y : int) y : int) 2 : int)) and
-                     ((Int.(<) x (Int.(*) (Int.(+) y 1 : int) (Int.(+) y 1 : int) : int)) and
+                 (((Int.(>) z 0) /\
+                   ((Int.(>) y 0) /\
+                    ((z = (ComputerDivision.div (Int.(+) (ComputerDivision.div x y : int) y : int) 2 : int)) /\
+                     ((Int.(<) x (Int.(*) (Int.(+) y 1 : int) (Int.(+) y 1 : int) : int)) /\
                       (Int.(<) x (Int.(*) (Int.(+) z 1 : int) (Int.(+) z 1 : int) : int)))))) ->
                   ((Int.(>=) z y) -> (Int.(<=) (Int.(*) y y : int) x))))))))))))
 
@@ -350,10 +350,10 @@ theory Why2
             ((result = (ComputerDivision.div (Int.(+) x 1 : int) 2 : int)) ->
              (forall y:int.
                (forall z:int.
-                 (((Int.(>) z 0) and
-                   ((Int.(>) y 0) and
-                    ((z = (ComputerDivision.div (Int.(+) (ComputerDivision.div x y : int) y : int) 2 : int)) and
-                     ((Int.(<) x (Int.(*) (Int.(+) y 1 : int) (Int.(+) y 1 : int) : int)) and
+                 (((Int.(>) z 0) /\
+                   ((Int.(>) y 0) /\
+                    ((z = (ComputerDivision.div (Int.(+) (ComputerDivision.div x y : int) y : int) 2 : int)) /\
+                     ((Int.(<) x (Int.(*) (Int.(+) y 1 : int) (Int.(+) y 1 : int) : int)) /\
                       (Int.(<) x (Int.(*) (Int.(+) z 1 : int) (Int.(+) z 1 : int) : int)))))) ->
                   ((Int.(>=) z y) ->
                    (Int.(<) x (Int.(*) (Int.(+) y 1 : int) (Int.(+) y 1 : int) : int)))))))))))))

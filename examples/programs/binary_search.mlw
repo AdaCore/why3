@@ -21,7 +21,7 @@ module M
       let u = ref (length a - 1) in
       while !l <= !u do
         invariant {
-	  0 <= !l and !u < length a and
+	  0 <= !l /\ !u < length a /\
           forall i : int. 0 <= i < length a -> a[i] = v -> !l <= i <= !u }
         variant { !u - !l }
         let m = !l + div (!u - !l) 2 in
@@ -37,7 +37,7 @@ module M
     with Break i ->
       i
     end
-    { 0 <= result < length a and a[result] = v }
+    { 0 <= result < length a /\ a[result] = v }
     | Not_found -> { forall i:int. 0 <= i < length a -> a[i] <> v }
 
 end

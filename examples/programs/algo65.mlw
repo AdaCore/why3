@@ -25,10 +25,10 @@ module Algo65
     a : array int -> m:int -> n:int -> i:ref int -> j:ref int ->
     { 0 <= m < n < length a }
     unit writes a i j
-    { m <= !j < !i <= n and permut_sub (old a) a m n and
+    { m <= !j < !i <= n /\ permut_sub (old a) a m n /\
       exists x:int.
-        (forall r:int. m <= r <= !j -> a[r] <= x) and
-        (forall r:int. !j < r < !i -> a[r] = x) and
+        (forall r:int. m <= r <= !j -> a[r] <= x) /\
+        (forall r:int. !j < r < !i -> a[r] = x) /\
         (forall r:int. !i <= r <= n -> a[r] >= x) }
 
   (* Algorithm 65 (fixed version) *)
@@ -46,8 +46,8 @@ module Algo65
       assert { permut_sub (at a L2) a m n };
       if !i <= k then find a !i n k
     end
-    { permut_sub (old a) a m n and
-      (forall r:int. m <= r <= k -> a[r] <= a[k]) and
+    { permut_sub (old a) a m n /\
+      (forall r:int. m <= r <= k -> a[r] <= a[k]) /\
       (forall r:int. k <= r <= n -> a[k] <= a[r]) }
 
 end

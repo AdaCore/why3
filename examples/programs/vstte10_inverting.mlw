@@ -11,13 +11,13 @@ module InvertingAnInjection
   use import int.Int
   use import module array.Array
 
-  logic injective (a: array int) (n: int) =
+  predicate injective (a: array int) (n: int) =
     forall i j: int. 0 <= i < n -> 0 <= j < n -> i <> j -> a[i] <> a[j]
 
-  logic surjective (a: array int) (n: int) =
-    forall i: int. 0 <= i < n -> exists j: int. (0 <= j < n and a[j] = i)
+  predicate surjective (a: array int) (n: int) =
+    forall i: int. 0 <= i < n -> exists j: int. (0 <= j < n /\ a[j] = i)
 
-  logic range (a: array int) (n: int) =
+  predicate range (a: array int) (n: int) =
     forall i: int. 0 <= i < n -> 0 <= a[i] < n
 
   lemma injective_surjective:
@@ -25,24 +25,24 @@ module InvertingAnInjection
     injective a n -> range a n -> surjective a n
 
   let inverting (a: array int) (b: array int) (n: int) =
-    { 0 <= n = length a = length b and injective a n and range a n }
+    { 0 <= n = length a = length b /\ injective a n /\ range a n }
     for i = 0 to n - 1 do
       invariant { forall j: int. 0 <= j < i -> b[a[j]] = j }
       b[a[i]] <- i
     done
     { injective b n }
 
-  (* variant where array b is returned and with additional post *)
+  (* variant where array b is returned /\ with additional post *)
 
   let inverting2 (a: array int) (n: int) =
-    { 0 <= n = length a and injective a n and range a n }
+    { 0 <= n = length a /\ injective a n /\ range a n }
     let b = make n 0 in
     for i = 0 to n - 1 do
       invariant { forall j: int. 0 <= j < i -> b[a[j]] = j }
       b[a[i]] <- i
     done;
     b
-    { length result = n and injective result n and
+    { length result = n /\ injective result n /\
       forall i: int. 0 <= i < n -> result[a[i]] = i }
 
 end

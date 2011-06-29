@@ -1,6 +1,6 @@
 theory Order
   type t
-  logic (<=) t t
+  predicate (<=) t t
 
   axiom le_refl : forall x : t. x <= x
   axiom le_asym : forall x y : t. x <= y -> y <= x -> x = y
@@ -10,7 +10,7 @@ end
 theory List
   type list 'a = Nil | Cons 'a (list 'a)
 
-  logic mem (x: 'a) (l: list 'a) = match l with
+  predicate mem (x: 'a) (l: list 'a) = match l with
     | Nil -> false
     | Cons y r -> x = y \/ mem x r
   end
@@ -37,7 +37,7 @@ end
 theory SortedIntList
   use import int.Int
   use import List
-  clone import SortedList with type O.t = int, logic O.(<=) = (<=)
+  clone import SortedList with type O.t = int, predicate O.(<=) = (<=)
 
   goal sorted123: sorted (Cons 1 (Cons 2 (Cons 3 Nil)))
 end

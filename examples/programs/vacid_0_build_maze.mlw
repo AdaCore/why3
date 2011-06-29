@@ -5,21 +5,21 @@ theory UnionFind
 
   type uf
 
-  logic repr uf int int
-  logic size uf : int
-  logic num uf : int
+  predicate repr uf int int
+  function size uf : int
+  function num uf : int
 
   axiom Repr_function_1:
     forall u:uf, x:int.
-    0 <= x < size u -> exists y:int. 0 <= y < size u and repr u x y
+    0 <= x < size u -> exists y:int. 0 <= y < size u /\ repr u x y
   axiom Repr_function_2:
     forall u:uf, x y z:int.
     0 <= x < size u -> repr u x y -> repr u x z -> y = z
 
-  logic same (u:uf) (x y:int) =
+  predicate same (u:uf) (x y:int) =
      forall r:int. repr u x r <-> repr u y r
 
-  logic same_reprs (u1 u2 : uf) =
+  predicate same_reprs (u1 u2 : uf) =
      forall x r:int. repr u1 x r <-> repr u2 x r
 
   axiom OneClass :
@@ -39,28 +39,28 @@ module UnionFind_sig
     n:int ->
       { 0 <= n }
       ref uf
-      { num !result = n and size !result = n and
+      { num !result = n /\ size !result = n /\
         forall x:int. 0 <= x < n -> repr !result x x }
 
   parameter find :
     u:ref uf -> x:int ->
       { 0 <= x < size !u }
       int writes u
-      { repr !u x result and
-        size !u = size (old !u) and num !u = num (old !u) and
+      { repr !u x result /\
+        size !u = size (old !u) /\ num !u = num (old !u) /\
         same_reprs !u (old !u) }
 
   parameter union :
     u:ref uf -> a:int -> b:int ->
-      { 0 <= a < size !u and 0 <= b < size !u and not same !u a b }
+      { 0 <= a < size !u /\ 0 <= b < size !u /\ not same !u a b }
       unit writes u
-      { same !u a b and
-        size !u = size (old !u) and num !u = num (old !u) - 1 and
+      { same !u a b /\
+        size !u = size (old !u) /\ num !u = num (old !u) - 1 /\
         forall x y:int. 0 <= x < size !u -> 0 <= y < size !u ->
            same !u x y <->
-           same (old !u) x y or
-           same (old !u) x a and same (old !u) b y or
-           same (old !u) x b and same (old !u) a y }
+           same (old !u) x y \/
+           same (old !u) x a /\ same (old !u) b y \/
+           same (old !u) x b /\ same (old !u) a y }
 
   parameter get_num_classes :
     u:ref uf -> {} int reads u { result = num !u }
@@ -102,12 +102,12 @@ module Graph_sig
   parameter add_edge : a:int -> b:int ->
     { not path !graph a b }
     unit writes num_edges graph
-    { !num_edges = old !num_edges + 1 and
+    { !num_edges = old !num_edges + 1 /\
       (forall x y:int.
           path !graph x y <->
-          path (old !graph) x y or
-          path (old !graph) x a and path (old !graph) b y or
-          path (old !graph) x b and path (old !graph) a y)
+          path (old !graph) x y \/
+          path (old !graph) x a /\ path (old !graph) b y \/
+          path (old !graph) x b /\ path (old !graph) a y)
    }
 
 end
@@ -126,25 +126,25 @@ module BuildMaze
     forall n x y:int. 0 <= n -> 0 <= x < n -> 0 <= y < n -> 0 <= x*n+y < n*n
 
   let add_edge_and_union (u: ref uf) (a:int) (b:int) =
-    { 0 <= a < size !u and 0 <= b < size !u and
-      not same !u a b and not path !graph a b and
+    { 0 <= a < size !u /\ 0 <= b < size !u /\
+      not same !u a b /\ not path !graph a b /\
       forall x y:int.
         0 <= x < size !u -> 0 <= y < size !u ->
         same !u x y <-> path !graph x y
     }
     add_edge a b;
     union u a b
-    { !num_edges = old !num_edges + 1 and
-      same !u a b and
-      size !u = size (old !u) and num !u = num (old !u) - 1 and
+    { !num_edges = old !num_edges + 1 /\
+      same !u a b /\
+      size !u = size (old !u) /\ num !u = num (old !u) - 1 /\
       (forall x y:int.
          0 <= x < size !u -> 0 <= y < size !u ->
          same !u x y <-> path !graph x y)
     }
 
 let build_maze (n:int) =
-  { 1 <= n and
-    !num_edges = 0 and
+  { 1 <= n /\
+    !num_edges = 0 /\
     forall x y:int. x=y <-> path !graph x y
   }
     let u = create (n*n) in
@@ -152,7 +152,7 @@ let build_maze (n:int) =
              same !u x y -> (repr !u x y && repr !u x x && x = y) };
     while get_num_classes u > 1 do
       invariant
-        { 1 <= num !u and num !u + !num_edges = size !u = n*n and
+        { 1 <= num !u /\ num !u + !num_edges = size !u = n*n /\
           forall x y:int. 0 <= x < n*n -> 0 <= y < n*n ->
                           (same !u x y <-> path !graph x y)
         }
@@ -170,7 +170,7 @@ let build_maze (n:int) =
           add_edge_and_union u a b
       end
     done
-  { !num_edges = n*n-1 and
+  { !num_edges = n*n-1 /\
     forall x y:int. 0 <= x < n*n -> 0 <= y < n*n ->
       path !graph x y }
 

@@ -5,7 +5,7 @@ theory TreeForest
 
   use import int.Int
 
-  logic count_forest (f : forest int) : int =
+  function count_forest (f : forest int) : int =
     match f, 10 with
     | Nil, i -> i
     | Cons t' f', _ -> count_tree t' + count_forest f'
@@ -19,7 +19,7 @@ theory TreeForest
 
   type nat = Zero | Succ nat
 
-  logic ack (m n : nat) : nat = match m, n with
+  function ack (m n : nat) : nat = match m, n with
     | Zero, _ -> Succ n
     | Succ m', Zero -> ack' m' (Succ Zero)
     | Succ m', Succ n' -> ack' m' (ack' m n')

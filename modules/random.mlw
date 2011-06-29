@@ -12,7 +12,7 @@
 
    The following modules provide slightly more: pseudo-random generators
    which are deterministic according to a state. The state is either
-   explicit (module State) or global (module Random). Functions init allow
+   explicit (module State) \/ global (module Random). Functions init allow
    to reset the generators according to a given seed.
  *)
 
@@ -25,13 +25,13 @@ theory Generator
 
   type generator
 
-  logic create int : generator
+  function create int : generator
 
-  logic next generator : generator
+  function next generator : generator
 
-  logic get_bool generator : bool
+  function get_bool generator : bool
 
-  logic get_int  generator int : int
+  function get_int  generator int : int
 
   axiom get_int_def:
     forall g: generator, n : int.
@@ -61,12 +61,12 @@ module State
   parameter random_bool (s: state) :
     {}
     bool writes s
-    { s.state = next (old s.state) and result = get_bool s.state }
+    { s.state = next (old s.state) /\ result = get_bool s.state }
 
   parameter random_int (s: state) (n: int) :
     { 0 < n }
     int writes s
-    { s.state = next (old s.state) and result = get_int s.state n and
+    { s.state = next (old s.state) /\ result = get_int s.state n /\
       0 <= result < n }
 
 end
@@ -89,12 +89,12 @@ module Random
   let random_bool () =
     {}
     random_bool s
-    { s.state = next (old s.state) and result = get_bool s.state }
+    { s.state = next (old s.state) /\ result = get_bool s.state }
 
   let random_int (n: int) =
     { 0 < n }
     random_int s n
-    { s.state = next (old s.state) and result = get_int s.state n and
+    { s.state = next (old s.state) /\ result = get_int s.state n /\
       0 <= result < n }
 
 end

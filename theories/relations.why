@@ -1,6 +1,6 @@
 theory EndoRelation
   type t
-  logic rel t t
+  predicate rel t t
 end
 
 theory Reflexive
@@ -35,48 +35,48 @@ end
 
 theory Total
   clone export EndoRelation
-  axiom Total : forall x y:t. rel x y or rel y x
+  axiom Total : forall x y:t. rel x y \/ rel y x
 end
 
 theory PreOrder
   clone export Reflexive
-  clone export Transitive with type t = t, logic rel = rel
+  clone export Transitive with type t = t, predicate rel = rel
 end
 
 theory Equivalence
   clone export PreOrder
-  clone export Asymmetric with type t = t, logic rel = rel
+  clone export Asymmetric with type t = t, predicate rel = rel
 end
 
 theory TotalPreOrder
   clone export PreOrder
-  clone export Total with type t = t, logic rel = rel
+  clone export Total with type t = t, predicate rel = rel
 end
 
 theory PartialOrder
   clone export PreOrder
-  clone export Antisymmetric with type t = t, logic rel = rel
+  clone export Antisymmetric with type t = t, predicate rel = rel
 end
 
 theory TotalOrder
   clone export PartialOrder
-  clone export Total with type t = t, logic rel = rel
+  clone export Total with type t = t, predicate rel = rel
 end
 
 theory PartialStrictOrder
   clone export Transitive
-  clone export Asymmetric with type t = t, logic rel = rel
+  clone export Asymmetric with type t = t, predicate rel = rel
 end
 
 theory TotalStrictOrder
   clone export PartialStrictOrder
-  axiom Trichotomy : forall x y:t. rel x y or rel y x or x = y
+  axiom Trichotomy : forall x y:t. rel x y \/ rel y x \/ x = y
 end
 
 theory Inverse
   clone export EndoRelation
 
-  logic inv_rel (x y : t) = rel y x
+  predicate inv_rel (x y : t) = rel y x
 end
 
 theory ReflClosure
@@ -107,9 +107,9 @@ end
 theory PreOrder
 
   type t
-  logic le t t
+  predicate le t t
   axiom Refl : forall x:t. le(x,x)
-  axiom Trans : forall x y z:t. le x y and le y z -> le x z
+  axiom Trans : forall x y z:t. le x y /\ le y z -> le x z
 
 end
 
@@ -117,9 +117,9 @@ theory Equiv
 
   type t
 
-  logic eq t t
+  predicate eq t t
 
-  clone PreOrder with type t = t, logic le = eq
+  clone PreOrder with type t = t, predicate le = eq
 
   axiom Symm : forall x y:t. eq x y -> eq y x
 
@@ -128,11 +128,11 @@ end
 theory TotalPreOrder
 
   type t
-  logic le t t
+  predicate le t t
 
-  clone export PreOrder with type t = t, logic le = le
+  clone export PreOrder with type t = t, predicate le = le
 
-  axiom Totality: forall x y:t. le x y or le y x
+  axiom Totality: forall x y:t. le x y \/ le y x
 
 end
 *)
@@ -143,21 +143,21 @@ theory TotalOrder
 
   type t
 
-  logic eq t t
-  clone Equiv with type t = t, logic eq = eq
+  predicate eq t t
+  clone Equiv with type t = t, predicate eq = eq
 
-  logic le t t
-  clone PreOrder with type t = t, logic le = le
+  predicate le t t
+  clone PreOrder with type t = t, predicate le = le
 
 
-  axiom Totality: forall x y:t. eq x y or le x y or le y x
+  axiom Totality: forall x y:t. eq x y \/ le x y \/ le y x
 
-  logic lt (x y : t) = le x y and not eq x y
+  predicate lt (x y : t) = le x y /\ not eq x y
 
   lemma Lt_antirefl: forall x:t. not lt x x
-  lemma Lt_trans: forall x y z:t. lt x y and lt y z -> lt x z
-  lemma Le_lt_trans: forall x y z:t. le x y and lt y z -> lt x z
-  lemma Lt_le_trans: forall x y z:t. lt x y and le y z -> lt x z
+  lemma Lt_trans: forall x y z:t. lt x y /\ lt y z -> lt x z
+  lemma Le_lt_trans: forall x y z:t. le x y /\ lt y z -> lt x z
+  lemma Lt_le_trans: forall x y z:t. lt x y /\ le y z -> lt x z
 
 end
 *)
@@ -166,12 +166,12 @@ theory Lex
 
   type t1
   type t2
- 
-  logic rel1 t1 t1
-  logic rel2 t2 t2
+
+  predicate rel1 t1 t1
+  predicate rel2 t2 t2
 
   inductive lex (t1, t2) (t1, t2) =
-  | Lex_1: forall x1 x2 : t1, y1 y2 : t2. 
+  | Lex_1: forall x1 x2 : t1, y1 y2 : t2.
        rel1 x1 x2 -> lex (x1,y1) (x2,y2)
   | Lex_2: forall x : t1, y1 y2 : t2.
        rel2 y1 y2 -> lex (x,y1) (x,y2)
@@ -183,8 +183,8 @@ theory MinMax
 
   clone export TotalOrder
 
-  logic min t t : t
-  logic max t t : t
+  function min t t : t
+  function max t t : t
 
 end
 *)

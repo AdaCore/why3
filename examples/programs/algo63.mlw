@@ -23,10 +23,10 @@ module Algo63
     a : array int -> m:int -> n:int -> i:ref int -> j:ref int ->
     { m < n }
     unit writes a i j
-    { m <= !j and !j < !i and !i <= n and permut_sub (old a) a m n and
+    { m <= !j /\ !j < !i /\ !i <= n /\ permut_sub (old a) a m n /\
       exists x:int.
-        (forall r:int. m <= r <= !j -> a[r] <= x) and
-        (forall r:int. !j < r < !i -> a[r] = x) and
+        (forall r:int. m <= r <= !j -> a[r] <= x) /\
+        (forall r:int. !j < r < !i -> a[r] = x) /\
         (forall r:int. !i <= r <= n -> a[r] >= x) }
 
 end

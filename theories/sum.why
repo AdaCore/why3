@@ -6,10 +6,10 @@ theory Sum "Sum of the elements of an indexed container"
   type container
 
   (* [f c i] is the [i]-th element in the container [c] *)
-  logic f container int : int
+  function f container int : int
 
   (* [sum c i j] is the sum Sum_{i <= k < j} f c k *)
-  logic sum container int int : int
+  function sum container int int : int
 
   axiom Sum_def_empty :
     forall c : container, i j : int. j <= i -> sum c i j = 0

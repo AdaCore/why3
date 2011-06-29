@@ -14,7 +14,7 @@ module M
     | Nil -> Cons x Nil
     | Cons y r -> if x <= y then Cons x l else Cons y (insert x r)
     end
-    { sorted result and permut (Cons x l) result }
+    { sorted result /\ permut (Cons x l) result }
 
   let rec insertion_sort l variant { length l } =
     { }
@@ -22,7 +22,7 @@ module M
     | Nil -> Nil
     | Cons x r -> insert x (insertion_sort r)
     end
-    { sorted result and permut l result }
+    { sorted result /\ permut l result }
 
 end
 

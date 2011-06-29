@@ -3,21 +3,21 @@ theory Agatha
 
   type person = Agatha | Butler | Charles
 
-  logic hates person person
-  logic richer person person
-  logic lives person
-  logic killed person person
+  predicate hates person person
+  predicate richer person person
+  predicate lives person
+  predicate killed person person
 
   axiom Lives1 : lives Agatha
   axiom Lives2 : lives Charles
   axiom Lives3 : lives Butler
   axiom NoOneLivesForever :
     forall x:person.
-    lives x -> x = Agatha or x = Charles or x = Butler
+    lives x -> x = Agatha \/ x = Charles \/ x = Butler
 
   axiom MURDER :
     exists x:person.
-    lives x and killed x Agatha
+    lives x /\ killed x Agatha
 
   axiom Hate_and_killed :
     forall p1 p2:person. killed p1 p2 -> hates p1 p2

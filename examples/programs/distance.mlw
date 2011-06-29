@@ -23,8 +23,8 @@ module Distance
   (* Parameters. Input of the program is composed of two arrays
      of characters, [w1] of size [n1] and [w2] of size [n2]. *)
 
-  logic n1 : int
-  logic n2 : int
+  function n1 : int
+  function n2 : int
 
   type a
 
@@ -58,10 +58,10 @@ module Distance
       forall w1 w2: word, n:int.
       dist w1 w2 n -> forall a:a. dist (Cons a w1) (Cons a w2) n
 
-  logic min_dist (w1 w2:word) (n:int) =
-    dist w1 w2 n and forall m:int. dist w1 w2 m -> n <= m
+  predicate min_dist (w1 w2:word) (n:int) =
+    dist w1 w2 n /\ forall m:int. dist w1 w2 m -> n <= m
 
-  logic suffix (array a) int : word
+  function suffix (array a) int : word
 
   axiom suffix_def_1:
     forall m: array a. suffix m (length m) = Nil
@@ -69,34 +69,34 @@ module Distance
     forall m: array a, i: int.
     0 <= i < length m -> suffix m i = Cons m[i] (suffix m (i+1))
 
-  logic min_suffix (w1 w2: array a) (i j n: int) =
+  predicate min_suffix (w1 w2: array a) (i j n: int) =
     min_dist (suffix w1 i) (suffix w2 j) n
 
-  logic word_of_array (m: array a) : word = suffix m 0
+  function word_of_array (m: array a) : word = suffix m 0
 
   (* The code. *)
 
   let distance () =
-    { length w1 = n1 and length w2 = n2 and length t = n2+1 }
+    { length w1 = n1 /\ length w2 = n2 /\ length t = n2+1 }
     begin
       (* initialization of t *)
       for i = 0 to n2 do
-        invariant { length t = n2+1 and
+        invariant { length t = n2+1 /\
                     forall j:int. 0 <= j < i -> t[j] = n2-j }
        t[i] <- n2 - i
       done;
       (* loop over w1 *)
       for i = n1-1 downto 0 do
         invariant { length t = n2+1
-           and forall j:int. 0 <= j <= n2 -> min_suffix w1 w2 (i+1) j t[j] }
+           /\ forall j:int. 0 <= j <= n2 -> min_suffix w1 w2 (i+1) j t[j] }
         o := t[n2];
         t[n2] <- t[n2] + 1;
         (* loop over w2 *)
         for j = n2-1 downto 0 do
           invariant { length t = n2+1
-              and (forall k:int. j < k <= n2 -> min_suffix w1 w2 i k t[k])
-              and (forall k:int. 0 <= k <= j -> min_suffix w1 w2 (i+1) k t[k])
-              and min_suffix w1 w2 (i+1) (j+1) !o }
+              /\ (forall k:int. j < k <= n2 -> min_suffix w1 w2 i k t[k])
+              /\ (forall k:int. 0 <= k <= j -> min_suffix w1 w2 (i+1) k t[k])
+              /\ min_suffix w1 w2 (i+1) (j+1) !o }
           begin
       	    let temp = !o in
             o := t[j];

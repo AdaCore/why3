@@ -15,10 +15,10 @@ module M
 
   (* occurrence of a key/value pair in a tree *)
 
-  logic memt (t : tree) (k : key) (v : value) =
+  predicate memt (t : tree) (k : key) (v : value) =
     match t with
     | Leaf -> false
-    | Node _ l k' v' r -> (k = k' and v = v') or memt l k v or memt r k v
+    | Node _ l k' v' r -> (k = k' /\ v = v') \/ memt l k v \/ memt r k v
     end
 
   lemma memt_color :
@@ -29,16 +29,16 @@ module M
 
   use import int.Int
 
-  logic lt_tree (x : key) (t : tree) =
+  predicate lt_tree (x : key) (t : tree) =
     forall k : key. forall v : value. memt t k v -> k < x
 
-  logic gt_tree (x : key) (t : tree) =
+  predicate gt_tree (x : key) (t : tree) =
     forall k : key. forall v : value. memt t k v -> x < k
 
-  logic bst (t : tree) =
+  predicate bst (t : tree) =
     match t with
     | Leaf -> true
-    | Node _ l k v r -> bst l and bst r and lt_tree k l and gt_tree k r
+    | Node _ l k v r -> bst l /\ bst r /\ lt_tree k l /\ gt_tree k r
     end
 
   lemma bst_Leaf : bst Leaf
@@ -50,20 +50,20 @@ module M
       - any path from the root to a leaf has exactly [n] black nodes
    *)
 
-  logic is_not_red (t : tree) =
+  predicate is_not_red (t : tree) =
     match t with
     | Node Red _ _ _ _ -> false
     | Leaf | Node Black _ _ _ _ -> true
     end
 
-  logic rbtree (n : int) (t : tree) =
+  predicate rbtree (n : int) (t : tree) =
     match t with
     | Leaf ->
         n = 0
     | Node Red   l _ _ r ->
-        rbtree n l and rbtree n r and is_not_red l and is_not_red r
+        rbtree n l /\ rbtree n r /\ is_not_red l /\ is_not_red r
     | Node Black l _ _ r ->
-        rbtree (n-1) l and rbtree (n-1) r
+        rbtree (n-1) l /\ rbtree (n-1) r
     end
 
   lemma rbtree_Leaf   : rbtree 0 Leaf
@@ -91,14 +91,14 @@ module M
   (** [almost_rbtree n t]: [t] may have one red-red conflict at its root;
       it satisfies [rbtree n] everywhere else *)
 
-  logic almost_rbtree (n : int) (t : tree) =
+  predicate almost_rbtree (n : int) (t : tree) =
     match t with
     | Leaf ->
         n = 0
     | Node Red   l _ _ r ->
-        rbtree n l and rbtree n r
+        rbtree n l /\ rbtree n r
     | Node Black l _ _ r ->
-        rbtree (n-1) l and rbtree (n-1) r
+        rbtree (n-1) l /\ rbtree (n-1) r
     end
 
   (** [lbalance c x l r] acts as a black node constructor,
@@ -112,7 +112,7 @@ module M
       The result is not necessarily a black node. *)
 
   let lbalance (l : tree) (k : key) (v : value) (r : tree) =
-    { lt_tree k l and gt_tree k r and bst l and bst r }
+    { lt_tree k l /\ gt_tree k r /\ bst l /\ bst r }
     match l with
     | Node Red (Node Red a kx vx b) ky vy c
     | Node Red a kx vx (Node Red b ky vy c) ->
@@ -120,12 +120,12 @@ module M
     | _ ->
 	Node Black l k v r
     end
-    { bst result and
+    { bst result /\
       (forall n : int. almost_rbtree n l -> rbtree n r -> rbtree (n+1) result)
-      and
+      /\
       forall k':key, v':value.
         memt result k' v' <->
-        if k' = k then v' = v else (memt l k' v' or memt r k' v')
+        if k' = k then v' = v else (memt l k' v' \/ memt r k' v')
     }
 
   (** [rbalance l x r] is similar to [lbalance], solving a possible red-red
@@ -137,7 +137,7 @@ module M
    *)
 
   let rbalance (l : tree) (k : key) (v : value) (r : tree) =
-    { lt_tree k l and gt_tree k r and bst l and bst r }
+    { lt_tree k l /\ gt_tree k r /\ bst l /\ bst r }
     match r with
     | Node Red (Node Red b ky vy c) kz vz d
     | Node Red b ky vy (Node Red c kz vz d) ->
@@ -145,12 +145,12 @@ module M
     | _ ->
 	Node Black l k v r
     end
-    { bst result and
+    { bst result /\
       (forall n : int. almost_rbtree n r -> rbtree n l -> rbtree (n+1) result)
-      and
+      /\
       forall k':key, v':value.
         memt result k' v' <->
-        if k' = k then v' = v else (memt l k' v' or memt r k' v')
+        if k' = k then v' = v else (memt l k' v' \/ memt r k' v')
     }
 
   (* [insert x s] inserts [x] in tree [s], resulting in a possible top red-red
@@ -170,23 +170,23 @@ module M
         else if k' < k then rbalance l k' v' (insert r k v)
         else (* k = k' *) Node Black l k' v r
     end
-    { bst result and
-      (forall n : int. rbtree n t -> almost_rbtree n result and
-         (is_not_red t -> rbtree n result)) and
-      memt result k v and
+    { bst result /\
+      (forall n : int. rbtree n t -> almost_rbtree n result /\
+         (is_not_red t -> rbtree n result)) /\
+      memt result k v /\
       forall k':key, v':value.
       memt result k' v' <-> if k' = k then v' = v else memt t k' v' }
 
   (* finally [add x s] calls [insert] and recolors the root as black *)
 
   let add (t : tree) (k : key) (v : value) : tree =
-    { bst t and exists n:int. rbtree n t }
+    { bst t /\ exists n:int. rbtree n t }
     match insert t k v with
     | Node _ l k' v' r -> Node Black l k' v' r
     | Leaf -> absurd
     end
-    { bst result and (exists n:int. rbtree n result) and
-      memt result k v and
+    { bst result /\ (exists n:int. rbtree n result) /\
+      memt result k v /\
       forall k':key, v':value.
       memt result k' v' <-> if k' = k then v' = v else memt t k' v' }
 
@@ -194,29 +194,29 @@ module M
 
   type rbt = (value, tree)
 
-  logic inv (r : rbt) =
-    let (_, t) = r in bst t and exists n : int. rbtree n t
+  predicate inv (r : rbt) =
+    let (_, t) = r in bst t /\ exists n : int. rbtree n t
 
-  logic default (r : rbt) : value =
+  function default (r : rbt) : value =
     let (d, _) = r in d
 
-  logic mem (r : rbt) (k : key) (v : value) =
+  predicate mem (r : rbt) (k : key) (v : value) =
     let (d, t) = r in
-    memt t k v or (v = d and forall v':value. not (memt t k v'))
+    memt t k v \/ (v = d /\ forall v':value. not (memt t k v'))
 
   let create (d : int) =
     { }
     let x = (d, Leaf) in ref x (* BUG: ref (d, Leaf) *)
-    { inv !result and
-      default !result = d and
+    { inv !result /\
+      default !result = d /\
       forall k:key, v:value. mem !result k v <-> v = d }
 
   let replace (m : ref rbt) k v =
     { inv !m }
     let (d, t) = !m in
     m := (d, add t k v)
-    { inv !m and
-      default !m = default (old !m) and
+    { inv !m /\
+      default !m = default (old !m) /\
       forall k':key, v':value.
       mem !m k' v' <-> if k' = k then v' = v else mem (old !m) k' v' }
 
@@ -230,8 +230,8 @@ module M
   let remove (m : ref rbt) k =
     { inv !m }
     replace m k (default !m)
-    { inv !m and
-      default !m = default (old !m) and
+    { inv !m /\
+      default !m = default (old !m) /\
       forall k':key, v':value.
       mem !m k' v' <-> if k' = k then v' = default !m else mem (old !m) k' v' }
 

@@ -5,51 +5,51 @@ use array.Array as A
   use int.ComputerDivision
   use real.Real
   use bool_inf.Bool
-  logic eq_unit Unit.unit Unit.unit
+  predicate eq_unit Unit.unit Unit.unit
 
-  logic neq_unit Unit.unit Unit.unit
+  predicate neq_unit Unit.unit Unit.unit
 
-  logic eq_bool Bool.bool Bool.bool
+  predicate eq_bool Bool.bool Bool.bool
 
-  logic neq_bool Bool.bool Bool.bool
+  predicate neq_bool Bool.bool Bool.bool
 
-  logic lt_int int int
+  predicate lt_int int int
 
-  logic le_int int int
+  predicate le_int int int
 
-  logic gt_int int int
+  predicate gt_int int int
 
-  logic ge_int int int
+  predicate ge_int int int
 
-  logic eq_int int int
+  predicate eq_int int int
 
-  logic neq_int int int
+  predicate neq_int int int
 
-  logic add_int int int : int
+  function add_int int int : int
 
-  logic sub_int int int : int
+  function sub_int int int : int
 
-  logic mul_int int int : int
+  function mul_int int int : int
 
-  logic div_int int int : int
+  function div_int int int : int
 
-  logic mod_int int int : int
+  function mod_int int int : int
 
-  logic neg_int int : int
+  function neg_int int : int
 
-  logic zwf_zero (a : int) (b : int) = ((Int.(<=) 0 b) and (Int.(<) a b))
+  predicate zwf_zero (a : int) (b : int) = ((Int.(<=) 0 b) /\ (Int.(<) a b))
 
-  logic bw_compl int : int
+  function bw_compl int : int
 
-  logic bw_and int int : int
+  function bw_and int int : int
 
-  logic bw_xor int int : int
+  function bw_xor int int : int
 
-  logic bw_or int int : int
+  function bw_or int int : int
 
-  logic lsl int int : int
+  function lsl int int : int
 
-  logic lsr int int : int
+  function lsr int int : int
 
   type pointer 'z
 
@@ -57,42 +57,42 @@ use array.Array as A
 
   type alloc_table
 
-  logic block_length alloc_table (pointer 'a1) : int
+  function block_length alloc_table (pointer 'a1) : int
 
-  logic base_addr (pointer 'a1) : (addr 'a1)
+  function base_addr (pointer 'a1) : (addr 'a1)
 
-  logic offset (pointer 'a1) : int
+  function offset (pointer 'a1) : int
 
-  logic shift (pointer 'a1) int : (pointer 'a1)
+  function shift (pointer 'a1) int : (pointer 'a1)
 
-  logic sub_pointer (pointer 'a1) (pointer 'a1) : int
+  function sub_pointer (pointer 'a1) (pointer 'a1) : int
 
-  logic lt_pointer (p1 : (pointer 'a1)) (p2 : (pointer 'a1)) =
-    (((base_addr p1 : (addr 'a1)) = (base_addr p2 : (addr 'a1))) and
+  predicate lt_pointer (p1 : (pointer 'a1)) (p2 : (pointer 'a1)) =
+    (((base_addr p1 : (addr 'a1)) = (base_addr p2 : (addr 'a1))) /\
      (Int.(<) (offset p1 : int) (offset p2 : int)))
 
-  logic le_pointer (p1 : (pointer 'a1)) (p2 : (pointer 'a1)) =
-    (((base_addr p1 : (addr 'a1)) = (base_addr p2 : (addr 'a1))) and
+  predicate le_pointer (p1 : (pointer 'a1)) (p2 : (pointer 'a1)) =
+    (((base_addr p1 : (addr 'a1)) = (base_addr p2 : (addr 'a1))) /\
      (Int.(<=) (offset p1 : int) (offset p2 : int)))
 
-  logic gt_pointer (p1 : (pointer 'a1)) (p2 : (pointer 'a1)) =
-    (((base_addr p1 : (addr 'a1)) = (base_addr p2 : (addr 'a1))) and
+  predicate gt_pointer (p1 : (pointer 'a1)) (p2 : (pointer 'a1)) =
+    (((base_addr p1 : (addr 'a1)) = (base_addr p2 : (addr 'a1))) /\
      (Int.(>) (offset p1 : int) (offset p2 : int)))
 
-  logic ge_pointer (p1 : (pointer 'a1)) (p2 : (pointer 'a1)) =
-    (((base_addr p1 : (addr 'a1)) = (base_addr p2 : (addr 'a1))) and
+  predicate ge_pointer (p1 : (pointer 'a1)) (p2 : (pointer 'a1)) =
+    (((base_addr p1 : (addr 'a1)) = (base_addr p2 : (addr 'a1))) /\
      (Int.(>=) (offset p1 : int) (offset p2 : int)))
 
-  logic valid (a : alloc_table) (p : (pointer 'a1)) =
-    ((Int.(<=) 0 (offset p : int)) and
+  predicate valid (a : alloc_table) (p : (pointer 'a1)) =
+    ((Int.(<=) 0 (offset p : int)) /\
      (Int.(<) (offset p : int) (block_length a p : int)))
 
-  logic valid_index (a : alloc_table) (p : (pointer 'a1)) (i : int) =
-    ((Int.(<=) 0 (Int.(+) (offset p : int) i : int)) and
+  predicate valid_index (a : alloc_table) (p : (pointer 'a1)) (i : int) =
+    ((Int.(<=) 0 (Int.(+) (offset p : int) i : int)) /\
      (Int.(<) (Int.(+) (offset p : int) i : int) (block_length a p : int)))
 
-  logic valid_range (a : alloc_table) (p : (pointer 'a1)) (i : int) (j : int) =
-    ((Int.(<=) 0 (Int.(+) (offset p : int) i : int)) and
+  predicate valid_range (a : alloc_table) (p : (pointer 'a1)) (i : int) (j : int) =
+    ((Int.(<=) 0 (Int.(+) (offset p : int) i : int)) /\
      (Int.(<) (Int.(+) (offset p : int) j : int) (block_length a p : int)))
 
   axiom Offset_shift:
@@ -131,7 +131,7 @@ use array.Array as A
   axiom Pointer_pair_1:
     (forall p1:(pointer 'a1).
       (forall p2:(pointer 'a1).
-        ((((base_addr p1 : (addr 'a1)) = (base_addr p2 : (addr 'a1))) and
+        ((((base_addr p1 : (addr 'a1)) = (base_addr p2 : (addr 'a1))) /\
           ((offset p1 : int) = (offset p2 : int))) ->
          (p1 = p2))))
 
@@ -139,7 +139,7 @@ use array.Array as A
     (forall p1:(pointer 'a1).
       (forall p2:(pointer 'a1).
         ((p1 = p2) ->
-         (((base_addr p1 : (addr 'a1)) = (base_addr p2 : (addr 'a1))) and
+         (((base_addr p1 : (addr 'a1)) = (base_addr p2 : (addr 'a1))) /\
           ((offset p1 : int) = (offset p2 : int))))))
 
   axiom Neq_base_addr_neq_shift:
@@ -180,7 +180,7 @@ use array.Array as A
           (forall j:int.
             (forall k:int.
               ((valid_range a p i j) ->
-               (((Int.(<=) i k) and (Int.(<=) k j)) ->
+               (((Int.(<=) i k) /\ (Int.(<=) k j)) ->
                 (valid a (shift p k : (pointer 'a1))))))))))
 
   axiom Valid_range_valid:
@@ -189,7 +189,7 @@ use array.Array as A
         (forall i:int.
           (forall j:int.
             ((valid_range a p i j) ->
-             (((Int.(<=) i 0) and (Int.(<=) 0 j)) -> (valid a p)))))))
+             (((Int.(<=) i 0) /\ (Int.(<=) 0 j)) -> (valid a p)))))))
 
   axiom Valid_range_valid_index:
     (forall a:alloc_table.
@@ -198,7 +198,7 @@ use array.Array as A
           (forall j:int.
             (forall k:int.
               ((valid_range a p i j) ->
-               (((Int.(<=) i k) and (Int.(<=) k j)) -> (valid_index a p k))))))))
+               (((Int.(<=) i k) /\ (Int.(<=) k j)) -> (valid_index a p k))))))))
 
   axiom Sub_pointer_def:
     (forall p1:(pointer 'a1).
@@ -208,9 +208,9 @@ use array.Array as A
 
   type memory 'a 'z = A.t (pointer 'z) 'a
 
-  logic acc (m:memory 'a1 'a2) (k:pointer 'a2) : 'a1 = A.get m k
+  function acc (m:memory 'a1 'a2) (k:pointer 'a2) : 'a1 = A.get m k
 
-  logic upd (m:memory 'a1 'a2) (k:pointer 'a2) (v:'a1) : (memory 'a1 'a2) = A.set m k v
+  function upd (m:memory 'a1 'a2) (k:pointer 'a2) (v:'a1) : (memory 'a1 'a2) = A.set m k v
 
 
 
@@ -218,33 +218,33 @@ use array.Array as A
 
   type pset 'z
 
-  logic pset_empty  : (pset 'a1)
+  function pset_empty  : (pset 'a1)
 
-  logic pset_singleton (pointer 'a1) : (pset 'a1)
+  function pset_singleton (pointer 'a1) : (pset 'a1)
 
-  logic pset_star (pset 'a2) (memory (pointer 'a1) 'a2) : (pset 'a1)
+  function pset_star (pset 'a2) (memory (pointer 'a1) 'a2) : (pset 'a1)
 
-  logic pset_all (pset 'a1) : (pset 'a1)
+  function pset_all (pset 'a1) : (pset 'a1)
 
-  logic pset_range (pset 'a1) int int : (pset 'a1)
+  function pset_range (pset 'a1) int int : (pset 'a1)
 
-  logic pset_range_left (pset 'a1) int : (pset 'a1)
+  function pset_range_left (pset 'a1) int : (pset 'a1)
 
-  logic pset_range_right (pset 'a1) int : (pset 'a1)
+  function pset_range_right (pset 'a1) int : (pset 'a1)
 
-  logic pset_acc_all (pset 'a2) (memory (pointer 'a1) 'a2) : (pset 'a1)
+  function pset_acc_all (pset 'a2) (memory (pointer 'a1) 'a2) : (pset 'a1)
 
-  logic pset_acc_range (pset 'a2) (memory (pointer 'a1) 'a2) int int : (pset 'a1)
+  function pset_acc_range (pset 'a2) (memory (pointer 'a1) 'a2) int int : (pset 'a1)
 
-  logic pset_acc_range_left (pset 'a2) (memory (pointer 'a1) 'a2) int : (pset 'a1)
+  function pset_acc_range_left (pset 'a2) (memory (pointer 'a1) 'a2) int : (pset 'a1)
 
-  logic pset_acc_range_right (pset 'a2) (memory (pointer 'a1) 'a2) int : (pset 'a1)
+  function pset_acc_range_right (pset 'a2) (memory (pointer 'a1) 'a2) int : (pset 'a1)
 
-  logic pset_union (pset 'a1) (pset 'a1) : (pset 'a1)
+  function pset_union (pset 'a1) (pset 'a1) : (pset 'a1)
 
-  logic not_in_pset (pointer 'a1) (pset 'a1)
+  predicate not_in_pset (pointer 'a1) (pset 'a1)
 
-  logic not_assigns (a : alloc_table) (m1 : (memory 'a1 'a2)) (m2 : (memory 'a1 'a2)) (l : (pset 'a2)) =
+  predicate not_assigns (a : alloc_table) (m1 : (memory 'a1 'a2)) (m2 : (memory 'a1 'a2)) (l : (pset 'a2)) =
     (forall p:(pointer 'a2).
       ((valid a p) ->
        ((not_in_pset p l) -> ((acc m2 p : 'a1) = (acc m1 p : 'a1)))))
@@ -270,7 +270,7 @@ use array.Array as A
     (forall l1:(pset 'a1).
       (forall l2:(pset 'a1).
         (forall p:(pointer 'a1) [(not_in_pset p (pset_union l1 l2 : (pset 'a1)))].
-          (((not_in_pset p l1) and (not_in_pset p l2)) ->
+          (((not_in_pset p l1) /\ (not_in_pset p l2)) ->
            (not_in_pset p (pset_union l1 l2 : (pset 'a1)))))))
 
   axiom Pset_union_elim1:
@@ -325,9 +325,9 @@ use array.Array as A
         (forall a:int.
           (forall b:int [(not_in_pset p (pset_range l a b : (pset 'a1)))].
             ((forall p1:(pointer 'a1).
-               ((not_in_pset p1 l) or
+               ((not_in_pset p1 l) \/
                 (forall i:int.
-                  (((Int.(<=) a i) and (Int.(<=) i b)) ->
+                  (((Int.(<=) a i) /\ (Int.(<=) i b)) ->
                    (p <> (shift p1 i : (pointer 'a1))))))) ->
              (not_in_pset p (pset_range l a b : (pset 'a1))))))))
 
@@ -340,7 +340,7 @@ use array.Array as A
              (forall p1:(pointer 'a1).
                ((not (not_in_pset p1 l)) ->
                 (forall i:int.
-                  (((Int.(<=) a i) and (Int.(<=) i b)) ->
+                  (((Int.(<=) a i) /\ (Int.(<=) i b)) ->
                    ((shift p1 i : (pointer 'a1)) <> p))))))))))
 
   axiom Pset_range_left_intro:
@@ -348,7 +348,7 @@ use array.Array as A
       (forall l:(pset 'a1).
         (forall a:int [(not_in_pset p (pset_range_left l a : (pset 'a1)))].
           ((forall p1:(pointer 'a1).
-             ((not_in_pset p1 l) or
+             ((not_in_pset p1 l) \/
               (forall i:int.
                 ((Int.(<=) i a) -> (p <> (shift p1 i : (pointer 'a1))))))) ->
            (not_in_pset p (pset_range_left l a : (pset 'a1)))))))
@@ -368,7 +368,7 @@ use array.Array as A
       (forall l:(pset 'a1).
         (forall a:int [(not_in_pset p (pset_range_right l a : (pset 'a1)))].
           ((forall p1:(pointer 'a1).
-             ((not_in_pset p1 l) or
+             ((not_in_pset p1 l) \/
               (forall i:int.
                 ((Int.(<=) a i) -> (p <> (shift p1 i : (pointer 'a1))))))) ->
            (not_in_pset p (pset_range_right l a : (pset 'a1)))))))
@@ -412,7 +412,7 @@ use array.Array as A
               ((forall p1:(pointer 'a2).
                  ((not (not_in_pset p1 l)) ->
                   (forall i:int.
-                    (((Int.(<=) a i) and (Int.(<=) i b)) ->
+                    (((Int.(<=) a i) /\ (Int.(<=) i b)) ->
                      (p <> (acc m (shift p1 i : (pointer 'a2)) : (pointer 'a1))))))) ->
                (not_in_pset p (pset_acc_range l m a b : (pset 'a1)))))))))
 
@@ -426,7 +426,7 @@ use array.Array as A
                (forall p1:(pointer 'a2).
                  ((not (not_in_pset p1 l)) ->
                   (forall i:int.
-                    (((Int.(<=) a i) and (Int.(<=) i b)) ->
+                    (((Int.(<=) a i) /\ (Int.(<=) i b)) ->
                      ((acc m (shift p1 i : (pointer 'a2)) : (pointer 'a1)) <> p)))))))))))
 
   axiom Pset_acc_range_left_intro:
@@ -491,12 +491,12 @@ use array.Array as A
       (forall l:(pset 'a1).
         (forall m:(memory 'a2 'a1). (not_assigns a m m l))))
 
-  logic valid_acc (m1 : (memory (pointer 'a1) 'a2)) =
+  predicate valid_acc (m1 : (memory (pointer 'a1) 'a2)) =
     (forall p:(pointer 'a2).
       (forall a:alloc_table.
         ((valid a p) -> (valid a (acc m1 p : (pointer 'a1))))))
 
-  logic valid_acc_range (m1 : (memory (pointer 'a1) 'a2)) (size : int) =
+  predicate valid_acc_range (m1 : (memory (pointer 'a1) 'a2)) (size : int) =
     (forall p:(pointer 'a2).
       (forall a:alloc_table.
         ((valid a p) ->
@@ -510,49 +510,49 @@ use array.Array as A
             ((valid_acc_range m1 size) ->
              ((valid a p) -> (valid a (acc m1 p : (pointer 'a1)))))))))
 
-  logic separation1 (m1 : (memory (pointer 'a1) 'a2)) (m2 : (memory (pointer 'a1) 'a2)) =
+  predicate separation1 (m1 : (memory (pointer 'a1) 'a2)) (m2 : (memory (pointer 'a1) 'a2)) =
     (forall p:(pointer 'a2).
       (forall a:alloc_table.
         ((valid a p) ->
          ((base_addr (acc m1 p : (pointer 'a1)) : (addr 'a1)) <> (base_addr (acc m2 p : (pointer 'a1)) : (addr 'a1))))))
 
-  logic separation1_range1 (m1 : (memory (pointer 'a1) 'a2)) (m2 : (memory (pointer 'a1) 'a2)) (size : int) =
+  predicate separation1_range1 (m1 : (memory (pointer 'a1) 'a2)) (m2 : (memory (pointer 'a1) 'a2)) (size : int) =
     (forall p:(pointer 'a2).
       (forall a:alloc_table.
         ((valid a p) ->
          (forall i1:int.
            (forall i2:int.
-             (((Int.(<=) 0 i1) and (Int.(<) i1 size)) ->
-              (((Int.(<=) 0 i2) and (Int.(<) i2 size)) ->
+             (((Int.(<=) 0 i1) /\ (Int.(<) i1 size)) ->
+              (((Int.(<=) 0 i2) /\ (Int.(<) i2 size)) ->
                ((base_addr (acc m1 (shift p i1 : (pointer 'a2)) : (pointer 'a1)) : (addr 'a1)) <> (base_addr (acc m2 (shift p i2 : (pointer 'a2)) : (pointer 'a1)) : (addr 'a1))))))))))
 
-  logic separation1_range (m : (memory (pointer 'a1) 'a2)) (size : int) =
+  predicate separation1_range (m : (memory (pointer 'a1) 'a2)) (size : int) =
     (forall p:(pointer 'a2).
       (forall a:alloc_table.
         ((valid a p) ->
          (forall i1:int.
-           (((Int.(<=) 0 i1) and (Int.(<) i1 size)) ->
+           (((Int.(<=) 0 i1) /\ (Int.(<) i1 size)) ->
             ((base_addr (acc m (shift p i1 : (pointer 'a2)) : (pointer 'a1)) : (addr 'a1)) <> (base_addr (acc m p : (pointer 'a1)) : (addr 'a1))))))))
 
-  logic separation2 (m1 : (memory (pointer 'a1) 'a2)) (m2 : (memory (pointer 'a1) 'a2)) =
+  predicate separation2 (m1 : (memory (pointer 'a1) 'a2)) (m2 : (memory (pointer 'a1) 'a2)) =
     (forall p1:(pointer 'a2).
       (forall p2:(pointer 'a2).
         ((p1 <> p2) ->
          ((base_addr (acc m1 p1 : (pointer 'a1)) : (addr 'a1)) <> (base_addr (acc m2 p2 : (pointer 'a1)) : (addr 'a1))))))
 
-  logic separation2_range1 (m1 : (memory (pointer 'a1) 'a2)) (m2 : (memory (pointer 'a1) 'a2)) (size : int) =
+  predicate separation2_range1 (m1 : (memory (pointer 'a1) 'a2)) (m2 : (memory (pointer 'a1) 'a2)) (size : int) =
     (forall p:(pointer 'a2).
       (forall q:(pointer 'a2).
         (forall a:alloc_table.
           (forall i:int.
-            (((Int.(<=) 0 i) and (Int.(<) i size)) ->
+            (((Int.(<=) 0 i) /\ (Int.(<) i size)) ->
              ((base_addr (acc m1 (shift p i : (pointer 'a2)) : (pointer 'a1)) : (addr 'a1)) <> (base_addr (acc m2 q : (pointer 'a1)) : (addr 'a1))))))))
 
-  logic on_heap alloc_table (pointer 'a1)
+  predicate on_heap alloc_table (pointer 'a1)
 
-  logic on_stack alloc_table (pointer 'a1)
+  predicate on_stack alloc_table (pointer 'a1)
 
-  logic fresh alloc_table (pointer 'a1)
+  predicate fresh alloc_table (pointer 'a1)
 
   axiom Fresh_not_valid:
     (forall a:alloc_table.
@@ -564,7 +564,7 @@ use array.Array as A
         ((fresh a p) ->
          (forall i:int. (not (valid a (shift p i : (pointer 'a1))))))))
 
-  logic alloc_extends alloc_table alloc_table
+  predicate alloc_extends alloc_table alloc_table
 
   axiom Alloc_extends_valid:
     (forall a1:alloc_table.
@@ -598,7 +598,7 @@ use array.Array as A
           ((alloc_extends a1 a2) ->
            ((alloc_extends a2 a3) -> (alloc_extends a1 a3))))))
 
-  logic free_stack alloc_table alloc_table alloc_table
+  predicate free_stack alloc_table alloc_table alloc_table
 
   axiom Free_stack_heap:
     (forall a1:alloc_table.
@@ -616,7 +616,7 @@ use array.Array as A
            (forall p:(pointer 'a1).
              ((valid a1 p) -> ((on_stack a1 p) -> (valid a3 p))))))))
 
-  logic null  : (pointer 'a1)
+  function null  : (pointer 'a1)
 
   axiom Null_not_valid:
     (forall a:alloc_table. (not (valid a (null : (pointer 'a1)))))
@@ -656,7 +656,7 @@ use array.Array as A
         (forall b:int.
           (forall c:int.
             (forall f:(pointer f_2).
-              ((("CADUCEUS_6" (((b = 0) and (c = 2800)) and (a = 10000))) and
+              ((("CADUCEUS_6" (((b = 0) /\ (c = 2800)) /\ (a = 10000))) /\
                 ("CADUCEUS_7" (valid_range alloc f 0 2800))) ->
                ("CADUCEUS_18" (Int.(<=) 0 b))))))))
 
@@ -666,7 +666,7 @@ use array.Array as A
         (forall b:int.
           (forall c:int.
             (forall f:(pointer f_2).
-              ((("CADUCEUS_6" (((b = 0) and (c = 2800)) and (a = 10000))) and
+              ((("CADUCEUS_6" (((b = 0) /\ (c = 2800)) /\ (a = 10000))) /\
                 ("CADUCEUS_7" (valid_range alloc f 0 2800))) ->
                ("CADUCEUS_18" (Int.(<=) b 2800))))))))
 
@@ -677,10 +677,10 @@ use array.Array as A
           (forall c:int.
             (forall f:(pointer f_2).
               (forall intM_f_2:(memory int f_2).
-                ((("CADUCEUS_6" (((b = 0) and (c = 2800)) and (a = 10000))) and
+                ((("CADUCEUS_6" (((b = 0) /\ (c = 2800)) /\ (a = 10000))) /\
                   ("CADUCEUS_7" (valid_range alloc f 0 2800))) ->
                  (forall i_0:int.
-                   (((Int.(<=) 0 i_0) and (Int.(<) i_0 b)) ->
+                   (((Int.(<=) 0 i_0) /\ (Int.(<) i_0 b)) ->
                     ("CADUCEUS_18"
                     ((acc intM_f_2 (shift f i_0 : (pointer f_2)) : int) = 2000)))))))))))
 
@@ -690,14 +690,14 @@ use array.Array as A
         (forall b:int.
           (forall c:int.
             (forall f:(pointer f_2).
-              ((("CADUCEUS_6" (((b = 0) and (c = 2800)) and (a = 10000))) and
+              ((("CADUCEUS_6" (((b = 0) /\ (c = 2800)) /\ (a = 10000))) /\
                 ("CADUCEUS_7" (valid_range alloc f 0 2800))) ->
                (forall b0:int.
                  (forall intM_f_2_0:(memory int f_2).
                    (("CADUCEUS_18"
-                    (((Int.(<=) 0 b0) and (Int.(<=) b0 2800)) and
+                    (((Int.(<=) 0 b0) /\ (Int.(<=) b0 2800)) /\
                      (forall i_0:int.
-                       (((Int.(<=) 0 i_0) and (Int.(<) i_0 b0)) ->
+                       (((Int.(<=) 0 i_0) /\ (Int.(<) i_0 b0)) ->
                         ((acc intM_f_2_0 (shift f i_0 : (pointer f_2)) : int) = 2000))))) ->
                     (((Int.(-) b0 c : int) <> 0) ->
                      (forall result:(pointer f_2).
@@ -713,14 +713,14 @@ use array.Array as A
         (forall b:int.
           (forall c:int.
             (forall f:(pointer f_2).
-              ((("CADUCEUS_6" (((b = 0) and (c = 2800)) and (a = 10000))) and
+              ((("CADUCEUS_6" (((b = 0) /\ (c = 2800)) /\ (a = 10000))) /\
                 ("CADUCEUS_7" (valid_range alloc f 0 2800))) ->
                (forall b0:int.
                  (forall intM_f_2_0:(memory int f_2).
                    (("CADUCEUS_18"
-                    (((Int.(<=) 0 b0) and (Int.(<=) b0 2800)) and
+                    (((Int.(<=) 0 b0) /\ (Int.(<=) b0 2800)) /\
                      (forall i_0:int.
-                       (((Int.(<=) 0 i_0) and (Int.(<) i_0 b0)) ->
+                       (((Int.(<=) 0 i_0) /\ (Int.(<) i_0 b0)) ->
                         ((acc intM_f_2_0 (shift f i_0 : (pointer f_2)) : int) = 2000))))) ->
                     (((Int.(-) b0 c : int) <> 0) ->
                      (forall result:(pointer f_2).
@@ -741,14 +741,14 @@ use array.Array as A
         (forall b:int.
           (forall c:int.
             (forall f:(pointer f_2).
-              ((("CADUCEUS_6" (((b = 0) and (c = 2800)) and (a = 10000))) and
+              ((("CADUCEUS_6" (((b = 0) /\ (c = 2800)) /\ (a = 10000))) /\
                 ("CADUCEUS_7" (valid_range alloc f 0 2800))) ->
                (forall b0:int.
                  (forall intM_f_2_0:(memory int f_2).
                    (("CADUCEUS_18"
-                    (((Int.(<=) 0 b0) and (Int.(<=) b0 2800)) and
+                    (((Int.(<=) 0 b0) /\ (Int.(<=) b0 2800)) /\
                      (forall i_0:int.
-                       (((Int.(<=) 0 i_0) and (Int.(<) i_0 b0)) ->
+                       (((Int.(<=) 0 i_0) /\ (Int.(<) i_0 b0)) ->
                         ((acc intM_f_2_0 (shift f i_0 : (pointer f_2)) : int) = 2000))))) ->
                     (((Int.(-) b0 c : int) <> 0) ->
                      (forall result:(pointer f_2).
@@ -769,14 +769,14 @@ use array.Array as A
         (forall b:int.
           (forall c:int.
             (forall f:(pointer f_2).
-              ((("CADUCEUS_6" (((b = 0) and (c = 2800)) and (a = 10000))) and
+              ((("CADUCEUS_6" (((b = 0) /\ (c = 2800)) /\ (a = 10000))) /\
                 ("CADUCEUS_7" (valid_range alloc f 0 2800))) ->
                (forall b0:int.
                  (forall intM_f_2_0:(memory int f_2).
                    (("CADUCEUS_18"
-                    (((Int.(<=) 0 b0) and (Int.(<=) b0 2800)) and
+                    (((Int.(<=) 0 b0) /\ (Int.(<=) b0 2800)) /\
                      (forall i_0:int.
-                       (((Int.(<=) 0 i_0) and (Int.(<) i_0 b0)) ->
+                       (((Int.(<=) 0 i_0) /\ (Int.(<) i_0 b0)) ->
                         ((acc intM_f_2_0 (shift f i_0 : (pointer f_2)) : int) = 2000))))) ->
                     (((Int.(-) b0 c : int) <> 0) ->
                      (forall result:(pointer f_2).
@@ -790,7 +790,7 @@ use array.Array as A
                                 (forall b1:int.
                                   ((b1 = (Int.(+) b0 1 : int)) ->
                                    (forall i_0:int.
-                                     (((Int.(<=) 0 i_0) and (Int.(<) i_0 b1)) ->
+                                     (((Int.(<=) 0 i_0) /\ (Int.(<) i_0 b1)) ->
                                       ("CADUCEUS_18"
                                       ((acc intM_f_2_1 (shift f i_0 : (pointer f_2)) : int) = 2000))))))))))))))))))))))))
 
@@ -800,14 +800,14 @@ use array.Array as A
         (forall b:int.
           (forall c:int.
             (forall f:(pointer f_2).
-              ((("CADUCEUS_6" (((b = 0) and (c = 2800)) and (a = 10000))) and
+              ((("CADUCEUS_6" (((b = 0) /\ (c = 2800)) /\ (a = 10000))) /\
                 ("CADUCEUS_7" (valid_range alloc f 0 2800))) ->
                (forall b0:int.
                  (forall intM_f_2_0:(memory int f_2).
                    (("CADUCEUS_18"
-                    (((Int.(<=) 0 b0) and (Int.(<=) b0 2800)) and
+                    (((Int.(<=) 0 b0) /\ (Int.(<=) b0 2800)) /\
                      (forall i_0:int.
-                       (((Int.(<=) 0 i_0) and (Int.(<) i_0 b0)) ->
+                       (((Int.(<=) 0 i_0) /\ (Int.(<) i_0 b0)) ->
                         ((acc intM_f_2_0 (shift f i_0 : (pointer f_2)) : int) = 2000))))) ->
                     (((Int.(-) b0 c : int) <> 0) ->
                      (forall result:(pointer f_2).
@@ -829,14 +829,14 @@ use array.Array as A
         (forall b:int.
           (forall c:int.
             (forall f:(pointer f_2).
-              ((("CADUCEUS_6" (((b = 0) and (c = 2800)) and (a = 10000))) and
+              ((("CADUCEUS_6" (((b = 0) /\ (c = 2800)) /\ (a = 10000))) /\
                 ("CADUCEUS_7" (valid_range alloc f 0 2800))) ->
                (forall b0:int.
                  (forall intM_f_2_0:(memory int f_2).
                    (("CADUCEUS_18"
-                    (((Int.(<=) 0 b0) and (Int.(<=) b0 2800)) and
+                    (((Int.(<=) 0 b0) /\ (Int.(<=) b0 2800)) /\
                      (forall i_0:int.
-                       (((Int.(<=) 0 i_0) and (Int.(<) i_0 b0)) ->
+                       (((Int.(<=) 0 i_0) /\ (Int.(<) i_0 b0)) ->
                         ((acc intM_f_2_0 (shift f i_0 : (pointer f_2)) : int) = 2000))))) ->
                     (((Int.(-) b0 c : int) <> 0) ->
                      (forall result:(pointer f_2).
@@ -859,14 +859,14 @@ use array.Array as A
         (forall b:int.
           (forall c:int.
             (forall f:(pointer f_2).
-              ((("CADUCEUS_6" (((b = 0) and (c = 2800)) and (a = 10000))) and
+              ((("CADUCEUS_6" (((b = 0) /\ (c = 2800)) /\ (a = 10000))) /\
                 ("CADUCEUS_7" (valid_range alloc f 0 2800))) ->
                (forall b0:int.
                  (forall intM_f_2_0:(memory int f_2).
                    (("CADUCEUS_18"
-                    (((Int.(<=) 0 b0) and (Int.(<=) b0 2800)) and
+                    (((Int.(<=) 0 b0) /\ (Int.(<=) b0 2800)) /\
                      (forall i_0:int.
-                       (((Int.(<=) 0 i_0) and (Int.(<) i_0 b0)) ->
+                       (((Int.(<=) 0 i_0) /\ (Int.(<) i_0 b0)) ->
                         ((acc intM_f_2_0 (shift f i_0 : (pointer f_2)) : int) = 2000))))) ->
                     (((Int.(-) b0 c : int) = 0) ->
                      ("CADUCEUS_8" (Int.(<=) 0 c))))))))))))
@@ -877,14 +877,14 @@ use array.Array as A
         (forall b:int.
           (forall c:int.
             (forall f:(pointer f_2).
-              ((("CADUCEUS_6" (((b = 0) and (c = 2800)) and (a = 10000))) and
+              ((("CADUCEUS_6" (((b = 0) /\ (c = 2800)) /\ (a = 10000))) /\
                 ("CADUCEUS_7" (valid_range alloc f 0 2800))) ->
                (forall b0:int.
                  (forall intM_f_2_0:(memory int f_2).
                    (("CADUCEUS_18"
-                    (((Int.(<=) 0 b0) and (Int.(<=) b0 2800)) and
+                    (((Int.(<=) 0 b0) /\ (Int.(<=) b0 2800)) /\
                      (forall i_0:int.
-                       (((Int.(<=) 0 i_0) and (Int.(<) i_0 b0)) ->
+                       (((Int.(<=) 0 i_0) /\ (Int.(<) i_0 b0)) ->
                         ((acc intM_f_2_0 (shift f i_0 : (pointer f_2)) : int) = 2000))))) ->
                     (((Int.(-) b0 c : int) = 0) ->
                      ("CADUCEUS_8" (Int.(<=) c 2800))))))))))))
@@ -895,14 +895,14 @@ use array.Array as A
         (forall b:int.
           (forall c:int.
             (forall f:(pointer f_2).
-              ((("CADUCEUS_6" (((b = 0) and (c = 2800)) and (a = 10000))) and
+              ((("CADUCEUS_6" (((b = 0) /\ (c = 2800)) /\ (a = 10000))) /\
                 ("CADUCEUS_7" (valid_range alloc f 0 2800))) ->
                (forall b0:int.
                  (forall intM_f_2_0:(memory int f_2).
                    (("CADUCEUS_18"
-                    (((Int.(<=) 0 b0) and (Int.(<=) b0 2800)) and
+                    (((Int.(<=) 0 b0) /\ (Int.(<=) b0 2800)) /\
                      (forall i_0:int.
-                       (((Int.(<=) 0 i_0) and (Int.(<) i_0 b0)) ->
+                       (((Int.(<=) 0 i_0) /\ (Int.(<) i_0 b0)) ->
                         ((acc intM_f_2_0 (shift f i_0 : (pointer f_2)) : int) = 2000))))) ->
                     (((Int.(-) b0 c : int) = 0) ->
                      ("CADUCEUS_8" ((ComputerDivision.mod c 14 : int) = 0))))))))))))
@@ -913,19 +913,19 @@ use array.Array as A
         (forall b:int.
           (forall c:int.
             (forall f:(pointer f_2).
-              ((("CADUCEUS_6" (((b = 0) and (c = 2800)) and (a = 10000))) and
+              ((("CADUCEUS_6" (((b = 0) /\ (c = 2800)) /\ (a = 10000))) /\
                 ("CADUCEUS_7" (valid_range alloc f 0 2800))) ->
                (forall b0:int.
                  (forall intM_f_2_0:(memory int f_2).
                    (("CADUCEUS_18"
-                    (((Int.(<=) 0 b0) and (Int.(<=) b0 2800)) and
+                    (((Int.(<=) 0 b0) /\ (Int.(<=) b0 2800)) /\
                      (forall i_0:int.
-                       (((Int.(<=) 0 i_0) and (Int.(<) i_0 b0)) ->
+                       (((Int.(<=) 0 i_0) /\ (Int.(<) i_0 b0)) ->
                         ((acc intM_f_2_0 (shift f i_0 : (pointer f_2)) : int) = 2000))))) ->
                     (((Int.(-) b0 c : int) = 0) ->
                      (forall c0:int.
                        (("CADUCEUS_8"
-                        (((Int.(<=) 0 c0) and (Int.(<=) c0 2800)) and
+                        (((Int.(<=) 0 c0) /\ (Int.(<=) c0 2800)) /\
                          ((ComputerDivision.mod c0 14 : int) = 0))) ->
                         (forall d:int.
                           ((d = 0) ->
@@ -942,19 +942,19 @@ use array.Array as A
         (forall b:int.
           (forall c:int.
             (forall f:(pointer f_2).
-              ((("CADUCEUS_6" (((b = 0) and (c = 2800)) and (a = 10000))) and
+              ((("CADUCEUS_6" (((b = 0) /\ (c = 2800)) /\ (a = 10000))) /\
                 ("CADUCEUS_7" (valid_range alloc f 0 2800))) ->
                (forall b0:int.
                  (forall intM_f_2_0:(memory int f_2).
                    (("CADUCEUS_18"
-                    (((Int.(<=) 0 b0) and (Int.(<=) b0 2800)) and
+                    (((Int.(<=) 0 b0) /\ (Int.(<=) b0 2800)) /\
                      (forall i_0:int.
-                       (((Int.(<=) 0 i_0) and (Int.(<) i_0 b0)) ->
+                       (((Int.(<=) 0 i_0) /\ (Int.(<) i_0 b0)) ->
                         ((acc intM_f_2_0 (shift f i_0 : (pointer f_2)) : int) = 2000))))) ->
                     (((Int.(-) b0 c : int) = 0) ->
                      (forall c0:int.
                        (("CADUCEUS_8"
-                        (((Int.(<=) 0 c0) and (Int.(<=) c0 2800)) and
+                        (((Int.(<=) 0 c0) /\ (Int.(<=) c0 2800)) /\
                          ((ComputerDivision.mod c0 14 : int) = 0))) ->
                         (forall d:int.
                           ((d = 0) ->
@@ -971,19 +971,19 @@ use array.Array as A
         (forall b:int.
           (forall c:int.
             (forall f:(pointer f_2).
-              ((("CADUCEUS_6" (((b = 0) and (c = 2800)) and (a = 10000))) and
+              ((("CADUCEUS_6" (((b = 0) /\ (c = 2800)) /\ (a = 10000))) /\
                 ("CADUCEUS_7" (valid_range alloc f 0 2800))) ->
                (forall b0:int.
                  (forall intM_f_2_0:(memory int f_2).
                    (("CADUCEUS_18"
-                    (((Int.(<=) 0 b0) and (Int.(<=) b0 2800)) and
+                    (((Int.(<=) 0 b0) /\ (Int.(<=) b0 2800)) /\
                      (forall i_0:int.
-                       (((Int.(<=) 0 i_0) and (Int.(<) i_0 b0)) ->
+                       (((Int.(<=) 0 i_0) /\ (Int.(<) i_0 b0)) ->
                         ((acc intM_f_2_0 (shift f i_0 : (pointer f_2)) : int) = 2000))))) ->
                     (((Int.(-) b0 c : int) = 0) ->
                      (forall c0:int.
                        (("CADUCEUS_8"
-                        (((Int.(<=) 0 c0) and (Int.(<=) c0 2800)) and
+                        (((Int.(<=) 0 c0) /\ (Int.(<=) c0 2800)) /\
                          ((ComputerDivision.mod c0 14 : int) = 0))) ->
                         (forall d:int.
                           ((d = 0) ->
@@ -1000,19 +1000,19 @@ use array.Array as A
         (forall b:int.
           (forall c:int.
             (forall f:(pointer f_2).
-              ((("CADUCEUS_6" (((b = 0) and (c = 2800)) and (a = 10000))) and
+              ((("CADUCEUS_6" (((b = 0) /\ (c = 2800)) /\ (a = 10000))) /\
                 ("CADUCEUS_7" (valid_range alloc f 0 2800))) ->
                (forall b0:int.
                  (forall intM_f_2_0:(memory int f_2).
                    (("CADUCEUS_18"
-                    (((Int.(<=) 0 b0) and (Int.(<=) b0 2800)) and
+                    (((Int.(<=) 0 b0) /\ (Int.(<=) b0 2800)) /\
                      (forall i_0:int.
-                       (((Int.(<=) 0 i_0) and (Int.(<) i_0 b0)) ->
+                       (((Int.(<=) 0 i_0) /\ (Int.(<) i_0 b0)) ->
                         ((acc intM_f_2_0 (shift f i_0 : (pointer f_2)) : int) = 2000))))) ->
                     (((Int.(-) b0 c : int) = 0) ->
                      (forall c0:int.
                        (("CADUCEUS_8"
-                        (((Int.(<=) 0 c0) and (Int.(<=) c0 2800)) and
+                        (((Int.(<=) 0 c0) /\ (Int.(<=) c0 2800)) /\
                          ((ComputerDivision.mod c0 14 : int) = 0))) ->
                         (forall d:int.
                           ((d = 0) ->
@@ -1024,7 +1024,7 @@ use array.Array as A
                                   (forall b2:int.
                                     (forall g0:int.
                                       (("CADUCEUS_12"
-                                       (((Int.(<=) 1 b2) and (Int.(<=) b2 c0)) and
+                                       (((Int.(<=) 1 b2) /\ (Int.(<=) b2 c0)) /\
                                         (g0 = (Int.(*) b2 2 : int)))) ->
                                        ((1 <> 0) ->
                                         (forall result:(pointer f_2).
@@ -1037,19 +1037,19 @@ use array.Array as A
         (forall b:int.
           (forall c:int.
             (forall f:(pointer f_2).
-              ((("CADUCEUS_6" (((b = 0) and (c = 2800)) and (a = 10000))) and
+              ((("CADUCEUS_6" (((b = 0) /\ (c = 2800)) /\ (a = 10000))) /\
                 ("CADUCEUS_7" (valid_range alloc f 0 2800))) ->
                (forall b0:int.
                  (forall intM_f_2_0:(memory int f_2).
                    (("CADUCEUS_18"
-                    (((Int.(<=) 0 b0) and (Int.(<=) b0 2800)) and
+                    (((Int.(<=) 0 b0) /\ (Int.(<=) b0 2800)) /\
                      (forall i_0:int.
-                       (((Int.(<=) 0 i_0) and (Int.(<) i_0 b0)) ->
+                       (((Int.(<=) 0 i_0) /\ (Int.(<) i_0 b0)) ->
                         ((acc intM_f_2_0 (shift f i_0 : (pointer f_2)) : int) = 2000))))) ->
                     (((Int.(-) b0 c : int) = 0) ->
                      (forall c0:int.
                        (("CADUCEUS_8"
-                        (((Int.(<=) 0 c0) and (Int.(<=) c0 2800)) and
+                        (((Int.(<=) 0 c0) /\ (Int.(<=) c0 2800)) /\
                          ((ComputerDivision.mod c0 14 : int) = 0))) ->
                         (forall d:int.
                           ((d = 0) ->
@@ -1063,8 +1063,8 @@ use array.Array as A
                                       (forall g0:int.
                                         (forall intM_f_2_1:(memory int f_2).
                                           (("CADUCEUS_12"
-                                           (((Int.(<=) 1 b2) and
-                                             (Int.(<=) b2 c0)) and
+                                           (((Int.(<=) 1 b2) /\
+                                             (Int.(<=) b2 c0)) /\
                                             (g0 = (Int.(*) b2 2 : int)))) ->
                                            ((1 <> 0) ->
                                             (forall result:(pointer f_2).
@@ -1086,19 +1086,19 @@ use array.Array as A
         (forall b:int.
           (forall c:int.
             (forall f:(pointer f_2).
-              ((("CADUCEUS_6" (((b = 0) and (c = 2800)) and (a = 10000))) and
+              ((("CADUCEUS_6" (((b = 0) /\ (c = 2800)) /\ (a = 10000))) /\
                 ("CADUCEUS_7" (valid_range alloc f 0 2800))) ->
                (forall b0:int.
                  (forall intM_f_2_0:(memory int f_2).
                    (("CADUCEUS_18"
-                    (((Int.(<=) 0 b0) and (Int.(<=) b0 2800)) and
+                    (((Int.(<=) 0 b0) /\ (Int.(<=) b0 2800)) /\
                      (forall i_0:int.
-                       (((Int.(<=) 0 i_0) and (Int.(<) i_0 b0)) ->
+                       (((Int.(<=) 0 i_0) /\ (Int.(<) i_0 b0)) ->
                         ((acc intM_f_2_0 (shift f i_0 : (pointer f_2)) : int) = 2000))))) ->
                     (((Int.(-) b0 c : int) = 0) ->
                      (forall c0:int.
                        (("CADUCEUS_8"
-                        (((Int.(<=) 0 c0) and (Int.(<=) c0 2800)) and
+                        (((Int.(<=) 0 c0) /\ (Int.(<=) c0 2800)) /\
                          ((ComputerDivision.mod c0 14 : int) = 0))) ->
                         (forall d:int.
                           ((d = 0) ->
@@ -1112,8 +1112,8 @@ use array.Array as A
                                       (forall g0:int.
                                         (forall intM_f_2_1:(memory int f_2).
                                           (("CADUCEUS_12"
-                                           (((Int.(<=) 1 b2) and
-                                             (Int.(<=) b2 c0)) and
+                                           (((Int.(<=) 1 b2) /\
+                                             (Int.(<=) b2 c0)) /\
                                             (g0 = (Int.(*) b2 2 : int)))) ->
                                            ((1 <> 0) ->
                                             (forall result:(pointer f_2).
@@ -1138,19 +1138,19 @@ use array.Array as A
         (forall b:int.
           (forall c:int.
             (forall f:(pointer f_2).
-              ((("CADUCEUS_6" (((b = 0) and (c = 2800)) and (a = 10000))) and
+              ((("CADUCEUS_6" (((b = 0) /\ (c = 2800)) /\ (a = 10000))) /\
                 ("CADUCEUS_7" (valid_range alloc f 0 2800))) ->
                (forall b0:int.
                  (forall intM_f_2_0:(memory int f_2).
                    (("CADUCEUS_18"
-                    (((Int.(<=) 0 b0) and (Int.(<=) b0 2800)) and
+                    (((Int.(<=) 0 b0) /\ (Int.(<=) b0 2800)) /\
                      (forall i_0:int.
-                       (((Int.(<=) 0 i_0) and (Int.(<) i_0 b0)) ->
+                       (((Int.(<=) 0 i_0) /\ (Int.(<) i_0 b0)) ->
                         ((acc intM_f_2_0 (shift f i_0 : (pointer f_2)) : int) = 2000))))) ->
                     (((Int.(-) b0 c : int) = 0) ->
                      (forall c0:int.
                        (("CADUCEUS_8"
-                        (((Int.(<=) 0 c0) and (Int.(<=) c0 2800)) and
+                        (((Int.(<=) 0 c0) /\ (Int.(<=) c0 2800)) /\
                          ((ComputerDivision.mod c0 14 : int) = 0))) ->
                         (forall d:int.
                           ((d = 0) ->
@@ -1164,8 +1164,8 @@ use array.Array as A
                                       (forall g0:int.
                                         (forall intM_f_2_1:(memory int f_2).
                                           (("CADUCEUS_12"
-                                           (((Int.(<=) 1 b2) and
-                                             (Int.(<=) b2 c0)) and
+                                           (((Int.(<=) 1 b2) /\
+                                             (Int.(<=) b2 c0)) /\
                                             (g0 = (Int.(*) b2 2 : int)))) ->
                                            ((1 <> 0) ->
                                             (forall result:(pointer f_2).
@@ -1205,19 +1205,19 @@ use array.Array as A
         (forall b:int.
           (forall c:int.
             (forall f:(pointer f_2).
-              ((("CADUCEUS_6" (((b = 0) and (c = 2800)) and (a = 10000))) and
+              ((("CADUCEUS_6" (((b = 0) /\ (c = 2800)) /\ (a = 10000))) /\
                 ("CADUCEUS_7" (valid_range alloc f 0 2800))) ->
                (forall b0:int.
                  (forall intM_f_2_0:(memory int f_2).
                    (("CADUCEUS_18"
-                    (((Int.(<=) 0 b0) and (Int.(<=) b0 2800)) and
+                    (((Int.(<=) 0 b0) /\ (Int.(<=) b0 2800)) /\
                      (forall i_0:int.
-                       (((Int.(<=) 0 i_0) and (Int.(<) i_0 b0)) ->
+                       (((Int.(<=) 0 i_0) /\ (Int.(<) i_0 b0)) ->
                         ((acc intM_f_2_0 (shift f i_0 : (pointer f_2)) : int) = 2000))))) ->
                     (((Int.(-) b0 c : int) = 0) ->
                      (forall c0:int.
                        (("CADUCEUS_8"
-                        (((Int.(<=) 0 c0) and (Int.(<=) c0 2800)) and
+                        (((Int.(<=) 0 c0) /\ (Int.(<=) c0 2800)) /\
                          ((ComputerDivision.mod c0 14 : int) = 0))) ->
                         (forall d:int.
                           ((d = 0) ->
@@ -1231,8 +1231,8 @@ use array.Array as A
                                       (forall g0:int.
                                         (forall intM_f_2_1:(memory int f_2).
                                           (("CADUCEUS_12"
-                                           (((Int.(<=) 1 b2) and
-                                             (Int.(<=) b2 c0)) and
+                                           (((Int.(<=) 1 b2) /\
+                                             (Int.(<=) b2 c0)) /\
                                             (g0 = (Int.(*) b2 2 : int)))) ->
                                            ((1 <> 0) ->
                                             (forall result:(pointer f_2).
@@ -1281,19 +1281,19 @@ use array.Array as A
         (forall b:int.
           (forall c:int.
             (forall f:(pointer f_2).
-              ((("CADUCEUS_6" (((b = 0) and (c = 2800)) and (a = 10000))) and
+              ((("CADUCEUS_6" (((b = 0) /\ (c = 2800)) /\ (a = 10000))) /\
                 ("CADUCEUS_7" (valid_range alloc f 0 2800))) ->
                (forall b0:int.
                  (forall intM_f_2_0:(memory int f_2).
                    (("CADUCEUS_18"
-                    (((Int.(<=) 0 b0) and (Int.(<=) b0 2800)) and
+                    (((Int.(<=) 0 b0) /\ (Int.(<=) b0 2800)) /\
                      (forall i_0:int.
-                       (((Int.(<=) 0 i_0) and (Int.(<) i_0 b0)) ->
+                       (((Int.(<=) 0 i_0) /\ (Int.(<) i_0 b0)) ->
                         ((acc intM_f_2_0 (shift f i_0 : (pointer f_2)) : int) = 2000))))) ->
                     (((Int.(-) b0 c : int) = 0) ->
                      (forall c0:int.
                        (("CADUCEUS_8"
-                        (((Int.(<=) 0 c0) and (Int.(<=) c0 2800)) and
+                        (((Int.(<=) 0 c0) /\ (Int.(<=) c0 2800)) /\
                          ((ComputerDivision.mod c0 14 : int) = 0))) ->
                         (forall d:int.
                           ((d = 0) ->
@@ -1307,8 +1307,8 @@ use array.Array as A
                                       (forall g0:int.
                                         (forall intM_f_2_1:(memory int f_2).
                                           (("CADUCEUS_12"
-                                           (((Int.(<=) 1 b2) and
-                                             (Int.(<=) b2 c0)) and
+                                           (((Int.(<=) 1 b2) /\
+                                             (Int.(<=) b2 c0)) /\
                                             (g0 = (Int.(*) b2 2 : int)))) ->
                                            ((1 <> 0) ->
                                             (forall result:(pointer f_2).
@@ -1357,19 +1357,19 @@ use array.Array as A
         (forall b:int.
           (forall c:int.
             (forall f:(pointer f_2).
-              ((("CADUCEUS_6" (((b = 0) and (c = 2800)) and (a = 10000))) and
+              ((("CADUCEUS_6" (((b = 0) /\ (c = 2800)) /\ (a = 10000))) /\
                 ("CADUCEUS_7" (valid_range alloc f 0 2800))) ->
                (forall b0:int.
                  (forall intM_f_2_0:(memory int f_2).
                    (("CADUCEUS_18"
-                    (((Int.(<=) 0 b0) and (Int.(<=) b0 2800)) and
+                    (((Int.(<=) 0 b0) /\ (Int.(<=) b0 2800)) /\
                      (forall i_0:int.
-                       (((Int.(<=) 0 i_0) and (Int.(<) i_0 b0)) ->
+                       (((Int.(<=) 0 i_0) /\ (Int.(<) i_0 b0)) ->
                         ((acc intM_f_2_0 (shift f i_0 : (pointer f_2)) : int) = 2000))))) ->
                     (((Int.(-) b0 c : int) = 0) ->
                      (forall c0:int.
                        (("CADUCEUS_8"
-                        (((Int.(<=) 0 c0) and (Int.(<=) c0 2800)) and
+                        (((Int.(<=) 0 c0) /\ (Int.(<=) c0 2800)) /\
                          ((ComputerDivision.mod c0 14 : int) = 0))) ->
                         (forall d:int.
                           ((d = 0) ->
@@ -1383,8 +1383,8 @@ use array.Array as A
                                       (forall g0:int.
                                         (forall intM_f_2_1:(memory int f_2).
                                           (("CADUCEUS_12"
-                                           (((Int.(<=) 1 b2) and
-                                             (Int.(<=) b2 c0)) and
+                                           (((Int.(<=) 1 b2) /\
+                                             (Int.(<=) b2 c0)) /\
                                             (g0 = (Int.(*) b2 2 : int)))) ->
                                            ((1 <> 0) ->
                                             (forall result:(pointer f_2).
@@ -1433,19 +1433,19 @@ use array.Array as A
         (forall b:int.
           (forall c:int.
             (forall f:(pointer f_2).
-              ((("CADUCEUS_6" (((b = 0) and (c = 2800)) and (a = 10000))) and
+              ((("CADUCEUS_6" (((b = 0) /\ (c = 2800)) /\ (a = 10000))) /\
                 ("CADUCEUS_7" (valid_range alloc f 0 2800))) ->
                (forall b0:int.
                  (forall intM_f_2_0:(memory int f_2).
                    (("CADUCEUS_18"
-                    (((Int.(<=) 0 b0) and (Int.(<=) b0 2800)) and
+                    (((Int.(<=) 0 b0) /\ (Int.(<=) b0 2800)) /\
                      (forall i_0:int.
-                       (((Int.(<=) 0 i_0) and (Int.(<) i_0 b0)) ->
+                       (((Int.(<=) 0 i_0) /\ (Int.(<) i_0 b0)) ->
                         ((acc intM_f_2_0 (shift f i_0 : (pointer f_2)) : int) = 2000))))) ->
                     (((Int.(-) b0 c : int) = 0) ->
                      (forall c0:int.
                        (("CADUCEUS_8"
-                        (((Int.(<=) 0 c0) and (Int.(<=) c0 2800)) and
+                        (((Int.(<=) 0 c0) /\ (Int.(<=) c0 2800)) /\
                          ((ComputerDivision.mod c0 14 : int) = 0))) ->
                         (forall d:int.
                           ((d = 0) ->
@@ -1459,8 +1459,8 @@ use array.Array as A
                                       (forall g0:int.
                                         (forall intM_f_2_1:(memory int f_2).
                                           (("CADUCEUS_12"
-                                           (((Int.(<=) 1 b2) and
-                                             (Int.(<=) b2 c0)) and
+                                           (((Int.(<=) 1 b2) /\
+                                             (Int.(<=) b2 c0)) /\
                                             (g0 = (Int.(*) b2 2 : int)))) ->
                                            ((1 <> 0) ->
                                             (forall result:(pointer f_2).
@@ -1510,19 +1510,19 @@ use array.Array as A
         (forall b:int.
           (forall c:int.
             (forall f:(pointer f_2).
-              ((("CADUCEUS_6" (((b = 0) and (c = 2800)) and (a = 10000))) and
+              ((("CADUCEUS_6" (((b = 0) /\ (c = 2800)) /\ (a = 10000))) /\
                 ("CADUCEUS_7" (valid_range alloc f 0 2800))) ->
                (forall b0:int.
                  (forall intM_f_2_0:(memory int f_2).
                    (("CADUCEUS_18"
-                    (((Int.(<=) 0 b0) and (Int.(<=) b0 2800)) and
+                    (((Int.(<=) 0 b0) /\ (Int.(<=) b0 2800)) /\
                      (forall i_0:int.
-                       (((Int.(<=) 0 i_0) and (Int.(<) i_0 b0)) ->
+                       (((Int.(<=) 0 i_0) /\ (Int.(<) i_0 b0)) ->
                         ((acc intM_f_2_0 (shift f i_0 : (pointer f_2)) : int) = 2000))))) ->
                     (((Int.(-) b0 c : int) = 0) ->
                      (forall c0:int.
                        (("CADUCEUS_8"
-                        (((Int.(<=) 0 c0) and (Int.(<=) c0 2800)) and
+                        (((Int.(<=) 0 c0) /\ (Int.(<=) c0 2800)) /\
                          ((ComputerDivision.mod c0 14 : int) = 0))) ->
                         (forall d:int.
                           ((d = 0) ->
@@ -1536,8 +1536,8 @@ use array.Array as A
                                       (forall g0:int.
                                         (forall intM_f_2_1:(memory int f_2).
                                           (("CADUCEUS_12"
-                                           (((Int.(<=) 1 b2) and
-                                             (Int.(<=) b2 c0)) and
+                                           (((Int.(<=) 1 b2) /\
+                                             (Int.(<=) b2 c0)) /\
                                             (g0 = (Int.(*) b2 2 : int)))) ->
                                            ((1 <> 0) ->
                                             (forall result:(pointer f_2).
@@ -1589,19 +1589,19 @@ use array.Array as A
         (forall b:int.
           (forall c:int.
             (forall f:(pointer f_2).
-              ((("CADUCEUS_6" (((b = 0) and (c = 2800)) and (a = 10000))) and
+              ((("CADUCEUS_6" (((b = 0) /\ (c = 2800)) /\ (a = 10000))) /\
                 ("CADUCEUS_7" (valid_range alloc f 0 2800))) ->
                (forall b0:int.
                  (forall intM_f_2_0:(memory int f_2).
                    (("CADUCEUS_18"
-                    (((Int.(<=) 0 b0) and (Int.(<=) b0 2800)) and
+                    (((Int.(<=) 0 b0) /\ (Int.(<=) b0 2800)) /\
                      (forall i_0:int.
-                       (((Int.(<=) 0 i_0) and (Int.(<) i_0 b0)) ->
+                       (((Int.(<=) 0 i_0) /\ (Int.(<) i_0 b0)) ->
                         ((acc intM_f_2_0 (shift f i_0 : (pointer f_2)) : int) = 2000))))) ->
                     (((Int.(-) b0 c : int) = 0) ->
                      (forall c0:int.
                        (("CADUCEUS_8"
-                        (((Int.(<=) 0 c0) and (Int.(<=) c0 2800)) and
+                        (((Int.(<=) 0 c0) /\ (Int.(<=) c0 2800)) /\
                          ((ComputerDivision.mod c0 14 : int) = 0))) ->
                         (forall d:int.
                           ((d = 0) ->
@@ -1615,8 +1615,8 @@ use array.Array as A
                                       (forall g0:int.
                                         (forall intM_f_2_1:(memory int f_2).
                                           (("CADUCEUS_12"
-                                           (((Int.(<=) 1 b2) and
-                                             (Int.(<=) b2 c0)) and
+                                           (((Int.(<=) 1 b2) /\
+                                             (Int.(<=) b2 c0)) /\
                                             (g0 = (Int.(*) b2 2 : int)))) ->
                                            ((1 <> 0) ->
                                             (forall result:(pointer f_2).
@@ -1657,19 +1657,19 @@ use array.Array as A
         (forall b:int.
           (forall c:int.
             (forall f:(pointer f_2).
-              ((("CADUCEUS_6" (((b = 0) and (c = 2800)) and (a = 10000))) and
+              ((("CADUCEUS_6" (((b = 0) /\ (c = 2800)) /\ (a = 10000))) /\
                 ("CADUCEUS_7" (valid_range alloc f 0 2800))) ->
                (forall b0:int.
                  (forall intM_f_2_0:(memory int f_2).
                    (("CADUCEUS_18"
-                    (((Int.(<=) 0 b0) and (Int.(<=) b0 2800)) and
+                    (((Int.(<=) 0 b0) /\ (Int.(<=) b0 2800)) /\
                      (forall i_0:int.
-                       (((Int.(<=) 0 i_0) and (Int.(<) i_0 b0)) ->
+                       (((Int.(<=) 0 i_0) /\ (Int.(<) i_0 b0)) ->
                         ((acc intM_f_2_0 (shift f i_0 : (pointer f_2)) : int) = 2000))))) ->
                     (((Int.(-) b0 c : int) = 0) ->
                      (forall c0:int.
                        (("CADUCEUS_8"
-                        (((Int.(<=) 0 c0) and (Int.(<=) c0 2800)) and
+                        (((Int.(<=) 0 c0) /\ (Int.(<=) c0 2800)) /\
                          ((ComputerDivision.mod c0 14 : int) = 0))) ->
                         (forall d:int.
                           ((d = 0) ->
@@ -1683,8 +1683,8 @@ use array.Array as A
                                       (forall g0:int.
                                         (forall intM_f_2_1:(memory int f_2).
                                           (("CADUCEUS_12"
-                                           (((Int.(<=) 1 b2) and
-                                             (Int.(<=) b2 c0)) and
+                                           (((Int.(<=) 1 b2) /\
+                                             (Int.(<=) b2 c0)) /\
                                             (g0 = (Int.(*) b2 2 : int)))) ->
                                            ((1 <> 0) ->
                                             (forall result:(pointer f_2).
@@ -1725,19 +1725,19 @@ use array.Array as A
         (forall b:int.
           (forall c:int.
             (forall f:(pointer f_2).
-              ((("CADUCEUS_6" (((b = 0) and (c = 2800)) and (a = 10000))) and
+              ((("CADUCEUS_6" (((b = 0) /\ (c = 2800)) /\ (a = 10000))) /\
                 ("CADUCEUS_7" (valid_range alloc f 0 2800))) ->
                (forall b0:int.
                  (forall intM_f_2_0:(memory int f_2).
                    (("CADUCEUS_18"
-                    (((Int.(<=) 0 b0) and (Int.(<=) b0 2800)) and
+                    (((Int.(<=) 0 b0) /\ (Int.(<=) b0 2800)) /\
                      (forall i_0:int.
-                       (((Int.(<=) 0 i_0) and (Int.(<) i_0 b0)) ->
+                       (((Int.(<=) 0 i_0) /\ (Int.(<) i_0 b0)) ->
                         ((acc intM_f_2_0 (shift f i_0 : (pointer f_2)) : int) = 2000))))) ->
                     (((Int.(-) b0 c : int) = 0) ->
                      (forall c0:int.
                        (("CADUCEUS_8"
-                        (((Int.(<=) 0 c0) and (Int.(<=) c0 2800)) and
+                        (((Int.(<=) 0 c0) /\ (Int.(<=) c0 2800)) /\
                          ((ComputerDivision.mod c0 14 : int) = 0))) ->
                         (forall d:int.
                           ((d = 0) ->
@@ -1751,8 +1751,8 @@ use array.Array as A
                                       (forall g0:int.
                                         (forall intM_f_2_1:(memory int f_2).
                                           (("CADUCEUS_12"
-                                           (((Int.(<=) 1 b2) and
-                                             (Int.(<=) b2 c0)) and
+                                           (((Int.(<=) 1 b2) /\
+                                             (Int.(<=) b2 c0)) /\
                                             (g0 = (Int.(*) b2 2 : int)))) ->
                                            ((1 <> 0) ->
                                             (forall result:(pointer f_2).
@@ -1793,19 +1793,19 @@ use array.Array as A
         (forall b:int.
           (forall c:int.
             (forall f:(pointer f_2).
-              ((("CADUCEUS_6" (((b = 0) and (c = 2800)) and (a = 10000))) and
+              ((("CADUCEUS_6" (((b = 0) /\ (c = 2800)) /\ (a = 10000))) /\
                 ("CADUCEUS_7" (valid_range alloc f 0 2800))) ->
                (forall b0:int.
                  (forall intM_f_2_0:(memory int f_2).
                    (("CADUCEUS_18"
-                    (((Int.(<=) 0 b0) and (Int.(<=) b0 2800)) and
+                    (((Int.(<=) 0 b0) /\ (Int.(<=) b0 2800)) /\
                      (forall i_0:int.
-                       (((Int.(<=) 0 i_0) and (Int.(<) i_0 b0)) ->
+                       (((Int.(<=) 0 i_0) /\ (Int.(<) i_0 b0)) ->
                         ((acc intM_f_2_0 (shift f i_0 : (pointer f_2)) : int) = 2000))))) ->
                     (((Int.(-) b0 c : int) = 0) ->
                      (forall c0:int.
                        (("CADUCEUS_8"
-                        (((Int.(<=) 0 c0) and (Int.(<=) c0 2800)) and
+                        (((Int.(<=) 0 c0) /\ (Int.(<=) c0 2800)) /\
                          ((ComputerDivision.mod c0 14 : int) = 0))) ->
                         (forall d:int.
                           ((d = 0) ->
@@ -1819,8 +1819,8 @@ use array.Array as A
                                       (forall g0:int.
                                         (forall intM_f_2_1:(memory int f_2).
                                           (("CADUCEUS_12"
-                                           (((Int.(<=) 1 b2) and
-                                             (Int.(<=) b2 c0)) and
+                                           (((Int.(<=) 1 b2) /\
+                                             (Int.(<=) b2 c0)) /\
                                             (g0 = (Int.(*) b2 2 : int)))) ->
                                            ((1 <> 0) ->
                                             (forall result:(pointer f_2).
@@ -1862,19 +1862,19 @@ use array.Array as A
         (forall b:int.
           (forall c:int.
             (forall f:(pointer f_2).
-              ((("CADUCEUS_6" (((b = 0) and (c = 2800)) and (a = 10000))) and
+              ((("CADUCEUS_6" (((b = 0) /\ (c = 2800)) /\ (a = 10000))) /\
                 ("CADUCEUS_7" (valid_range alloc f 0 2800))) ->
                (forall b0:int.
                  (forall intM_f_2_0:(memory int f_2).
                    (("CADUCEUS_18"
-                    (((Int.(<=) 0 b0) and (Int.(<=) b0 2800)) and
+                    (((Int.(<=) 0 b0) /\ (Int.(<=) b0 2800)) /\
                      (forall i_0:int.
-                       (((Int.(<=) 0 i_0) and (Int.(<) i_0 b0)) ->
+                       (((Int.(<=) 0 i_0) /\ (Int.(<) i_0 b0)) ->
                         ((acc intM_f_2_0 (shift f i_0 : (pointer f_2)) : int) = 2000))))) ->
                     (((Int.(-) b0 c : int) = 0) ->
                      (forall c0:int.
                        (("CADUCEUS_8"
-                        (((Int.(<=) 0 c0) and (Int.(<=) c0 2800)) and
+                        (((Int.(<=) 0 c0) /\ (Int.(<=) c0 2800)) /\
                          ((ComputerDivision.mod c0 14 : int) = 0))) ->
                         (forall d:int.
                           ((d = 0) ->
@@ -1888,8 +1888,8 @@ use array.Array as A
                                       (forall g0:int.
                                         (forall intM_f_2_1:(memory int f_2).
                                           (("CADUCEUS_12"
-                                           (((Int.(<=) 1 b2) and
-                                             (Int.(<=) b2 c0)) and
+                                           (((Int.(<=) 1 b2) /\
+                                             (Int.(<=) b2 c0)) /\
                                             (g0 = (Int.(*) b2 2 : int)))) ->
                                            ((1 <> 0) ->
                                             (forall result:(pointer f_2).
@@ -1933,19 +1933,19 @@ use array.Array as A
         (forall b:int.
           (forall c:int.
             (forall f:(pointer f_2).
-              ((("CADUCEUS_6" (((b = 0) and (c = 2800)) and (a = 10000))) and
+              ((("CADUCEUS_6" (((b = 0) /\ (c = 2800)) /\ (a = 10000))) /\
                 ("CADUCEUS_7" (valid_range alloc f 0 2800))) ->
                (forall b0:int.
                  (forall intM_f_2_0:(memory int f_2).
                    (("CADUCEUS_18"
-                    (((Int.(<=) 0 b0) and (Int.(<=) b0 2800)) and
+                    (((Int.(<=) 0 b0) /\ (Int.(<=) b0 2800)) /\
                      (forall i_0:int.
-                       (((Int.(<=) 0 i_0) and (Int.(<) i_0 b0)) ->
+                       (((Int.(<=) 0 i_0) /\ (Int.(<) i_0 b0)) ->
                         ((acc intM_f_2_0 (shift f i_0 : (pointer f_2)) : int) = 2000))))) ->
                     (((Int.(-) b0 c : int) = 0) ->
                      (forall c0:int.
                        (("CADUCEUS_8"
-                        (((Int.(<=) 0 c0) and (Int.(<=) c0 2800)) and
+                        (((Int.(<=) 0 c0) /\ (Int.(<=) c0 2800)) /\
                          ((ComputerDivision.mod c0 14 : int) = 0))) ->
                         (forall d:int.
                           ((d = 0) ->
@@ -1957,7 +1957,7 @@ use array.Array as A
                                   (forall b2:int.
                                     (forall g0:int.
                                       (("CADUCEUS_12"
-                                       (((Int.(<=) 1 b2) and (Int.(<=) b2 c0)) and
+                                       (((Int.(<=) 1 b2) /\ (Int.(<=) b2 c0)) /\
                                         (g0 = (Int.(*) b2 2 : int)))) ->
                                        ((1 = 0) ->
                                         (forall c1:int.
@@ -1970,19 +1970,19 @@ use array.Array as A
         (forall b:int.
           (forall c:int.
             (forall f:(pointer f_2).
-              ((("CADUCEUS_6" (((b = 0) and (c = 2800)) and (a = 10000))) and
+              ((("CADUCEUS_6" (((b = 0) /\ (c = 2800)) /\ (a = 10000))) /\
                 ("CADUCEUS_7" (valid_range alloc f 0 2800))) ->
                (forall b0:int.
                  (forall intM_f_2_0:(memory int f_2).
                    (("CADUCEUS_18"
-                    (((Int.(<=) 0 b0) and (Int.(<=) b0 2800)) and
+                    (((Int.(<=) 0 b0) /\ (Int.(<=) b0 2800)) /\
                      (forall i_0:int.
-                       (((Int.(<=) 0 i_0) and (Int.(<) i_0 b0)) ->
+                       (((Int.(<=) 0 i_0) /\ (Int.(<) i_0 b0)) ->
                         ((acc intM_f_2_0 (shift f i_0 : (pointer f_2)) : int) = 2000))))) ->
                     (((Int.(-) b0 c : int) = 0) ->
                      (forall c0:int.
                        (("CADUCEUS_8"
-                        (((Int.(<=) 0 c0) and (Int.(<=) c0 2800)) and
+                        (((Int.(<=) 0 c0) /\ (Int.(<=) c0 2800)) /\
                          ((ComputerDivision.mod c0 14 : int) = 0))) ->
                         (forall d:int.
                           ((d = 0) ->
@@ -1995,8 +1995,8 @@ use array.Array as A
                                     (forall d0:int.
                                       (forall g0:int.
                                         (("CADUCEUS_12"
-                                         (((Int.(<=) 1 b2) and
-                                           (Int.(<=) b2 c0)) and
+                                         (((Int.(<=) 1 b2) /\
+                                           (Int.(<=) b2 c0)) /\
                                           (g0 = (Int.(*) b2 2 : int)))) ->
                                          ((1 = 0) ->
                                           (forall c1:int.
@@ -2018,19 +2018,19 @@ use array.Array as A
         (forall b:int.
           (forall c:int.
             (forall f:(pointer f_2).
-              ((("CADUCEUS_6" (((b = 0) and (c = 2800)) and (a = 10000))) and
+              ((("CADUCEUS_6" (((b = 0) /\ (c = 2800)) /\ (a = 10000))) /\
                 ("CADUCEUS_7" (valid_range alloc f 0 2800))) ->
                (forall b0:int.
                  (forall intM_f_2_0:(memory int f_2).
                    (("CADUCEUS_18"
-                    (((Int.(<=) 0 b0) and (Int.(<=) b0 2800)) and
+                    (((Int.(<=) 0 b0) /\ (Int.(<=) b0 2800)) /\
                      (forall i_0:int.
-                       (((Int.(<=) 0 i_0) and (Int.(<) i_0 b0)) ->
+                       (((Int.(<=) 0 i_0) /\ (Int.(<) i_0 b0)) ->
                         ((acc intM_f_2_0 (shift f i_0 : (pointer f_2)) : int) = 2000))))) ->
                     (((Int.(-) b0 c : int) = 0) ->
                      (forall c0:int.
                        (("CADUCEUS_8"
-                        (((Int.(<=) 0 c0) and (Int.(<=) c0 2800)) and
+                        (((Int.(<=) 0 c0) /\ (Int.(<=) c0 2800)) /\
                          ((ComputerDivision.mod c0 14 : int) = 0))) ->
                         (forall d:int.
                           ((d = 0) ->
@@ -2043,8 +2043,8 @@ use array.Array as A
                                     (forall d0:int.
                                       (forall g0:int.
                                         (("CADUCEUS_12"
-                                         (((Int.(<=) 1 b2) and
-                                           (Int.(<=) b2 c0)) and
+                                         (((Int.(<=) 1 b2) /\
+                                           (Int.(<=) b2 c0)) /\
                                           (g0 = (Int.(*) b2 2 : int)))) ->
                                          ((1 = 0) ->
                                           (forall c1:int.
@@ -2066,19 +2066,19 @@ use array.Array as A
         (forall b:int.
           (forall c:int.
             (forall f:(pointer f_2).
-              ((("CADUCEUS_6" (((b = 0) and (c = 2800)) and (a = 10000))) and
+              ((("CADUCEUS_6" (((b = 0) /\ (c = 2800)) /\ (a = 10000))) /\
                 ("CADUCEUS_7" (valid_range alloc f 0 2800))) ->
                (forall b0:int.
                  (forall intM_f_2_0:(memory int f_2).
                    (("CADUCEUS_18"
-                    (((Int.(<=) 0 b0) and (Int.(<=) b0 2800)) and
+                    (((Int.(<=) 0 b0) /\ (Int.(<=) b0 2800)) /\
                      (forall i_0:int.
-                       (((Int.(<=) 0 i_0) and (Int.(<) i_0 b0)) ->
+                       (((Int.(<=) 0 i_0) /\ (Int.(<) i_0 b0)) ->
                         ((acc intM_f_2_0 (shift f i_0 : (pointer f_2)) : int) = 2000))))) ->
                     (((Int.(-) b0 c : int) = 0) ->
                      (forall c0:int.
                        (("CADUCEUS_8"
-                        (((Int.(<=) 0 c0) and (Int.(<=) c0 2800)) and
+                        (((Int.(<=) 0 c0) /\ (Int.(<=) c0 2800)) /\
                          ((ComputerDivision.mod c0 14 : int) = 0))) ->
                         (forall d:int.
                           ((d = 0) ->
@@ -2091,8 +2091,8 @@ use array.Array as A
                                     (forall d0:int.
                                       (forall g0:int.
                                         (("CADUCEUS_12"
-                                         (((Int.(<=) 1 b2) and
-                                           (Int.(<=) b2 c0)) and
+                                         (((Int.(<=) 1 b2) /\
+                                           (Int.(<=) b2 c0)) /\
                                           (g0 = (Int.(*) b2 2 : int)))) ->
                                          ((1 = 0) ->
                                           (forall c1:int.
@@ -2114,19 +2114,19 @@ use array.Array as A
         (forall b:int.
           (forall c:int.
             (forall f:(pointer f_2).
-              ((("CADUCEUS_6" (((b = 0) and (c = 2800)) and (a = 10000))) and
+              ((("CADUCEUS_6" (((b = 0) /\ (c = 2800)) /\ (a = 10000))) /\
                 ("CADUCEUS_7" (valid_range alloc f 0 2800))) ->
                (forall b0:int.
                  (forall intM_f_2_0:(memory int f_2).
                    (("CADUCEUS_18"
-                    (((Int.(<=) 0 b0) and (Int.(<=) b0 2800)) and
+                    (((Int.(<=) 0 b0) /\ (Int.(<=) b0 2800)) /\
                      (forall i_0:int.
-                       (((Int.(<=) 0 i_0) and (Int.(<) i_0 b0)) ->
+                       (((Int.(<=) 0 i_0) /\ (Int.(<) i_0 b0)) ->
                         ((acc intM_f_2_0 (shift f i_0 : (pointer f_2)) : int) = 2000))))) ->
                     (((Int.(-) b0 c : int) = 0) ->
                      (forall c0:int.
                        (("CADUCEUS_8"
-                        (((Int.(<=) 0 c0) and (Int.(<=) c0 2800)) and
+                        (((Int.(<=) 0 c0) /\ (Int.(<=) c0 2800)) /\
                          ((ComputerDivision.mod c0 14 : int) = 0))) ->
                         (forall d:int.
                           ((d = 0) ->
@@ -2139,8 +2139,8 @@ use array.Array as A
                                     (forall d0:int.
                                       (forall g0:int.
                                         (("CADUCEUS_12"
-                                         (((Int.(<=) 1 b2) and
-                                           (Int.(<=) b2 c0)) and
+                                         (((Int.(<=) 1 b2) /\
+                                           (Int.(<=) b2 c0)) /\
                                           (g0 = (Int.(*) b2 2 : int)))) ->
                                          ((1 = 0) ->
                                           (forall c1:int.
@@ -2162,19 +2162,19 @@ use array.Array as A
         (forall b:int.
           (forall c:int.
             (forall f:(pointer f_2).
-              ((("CADUCEUS_6" (((b = 0) and (c = 2800)) and (a = 10000))) and
+              ((("CADUCEUS_6" (((b = 0) /\ (c = 2800)) /\ (a = 10000))) /\
                 ("CADUCEUS_7" (valid_range alloc f 0 2800))) ->
                (forall b0:int.
                  (forall intM_f_2_0:(memory int f_2).
                    (("CADUCEUS_18"
-                    (((Int.(<=) 0 b0) and (Int.(<=) b0 2800)) and
+                    (((Int.(<=) 0 b0) /\ (Int.(<=) b0 2800)) /\
                      (forall i_0:int.
-                       (((Int.(<=) 0 i_0) and (Int.(<) i_0 b0)) ->
+                       (((Int.(<=) 0 i_0) /\ (Int.(<) i_0 b0)) ->
                         ((acc intM_f_2_0 (shift f i_0 : (pointer f_2)) : int) = 2000))))) ->
                     (((Int.(-) b0 c : int) = 0) ->
                      (forall c0:int.
                        (("CADUCEUS_8"
-                        (((Int.(<=) 0 c0) and (Int.(<=) c0 2800)) and
+                        (((Int.(<=) 0 c0) /\ (Int.(<=) c0 2800)) /\
                          ((ComputerDivision.mod c0 14 : int) = 0))) ->
                         (forall d:int.
                           ((d = 0) ->
@@ -2187,8 +2187,8 @@ use array.Array as A
                                     (forall d0:int.
                                       (forall g0:int.
                                         (("CADUCEUS_12"
-                                         (((Int.(<=) 1 b2) and
-                                           (Int.(<=) b2 c0)) and
+                                         (((Int.(<=) 1 b2) /\
+                                           (Int.(<=) b2 c0)) /\
                                           (g0 = (Int.(*) b2 2 : int)))) ->
                                          ((1 = 0) ->
                                           (forall c1:int.

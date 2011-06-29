@@ -3,7 +3,7 @@ module Labels
   use import int.Int
   use import module ref.Ref
 
-  logic fst (x: ('a, 'b)) : 'a = let (x1, _) = x in x1
+  function fst (x: ('a, 'b)) : 'a = let (x1, _) = x in x1
 
   let test (a: (ref int, int)) =
     {}

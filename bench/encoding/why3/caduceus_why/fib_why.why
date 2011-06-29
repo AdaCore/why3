@@ -5,41 +5,41 @@ use array.Array as A
   use int.ComputerDivision
   use real.Real
   use bool_inf.Bool
-  logic eq_unit Unit.unit Unit.unit
+  predicate eq_unit Unit.unit Unit.unit
 
-  logic neq_unit Unit.unit Unit.unit
+  predicate neq_unit Unit.unit Unit.unit
 
-  logic eq_bool Bool.bool Bool.bool
+  predicate eq_bool Bool.bool Bool.bool
 
-  logic neq_bool Bool.bool Bool.bool
+  predicate neq_bool Bool.bool Bool.bool
 
-  logic lt_int int int
+  predicate lt_int int int
 
-  logic le_int int int
+  predicate le_int int int
 
-  logic gt_int int int
+  predicate gt_int int int
 
-  logic ge_int int int
+  predicate ge_int int int
 
-  logic eq_int int int
+  predicate eq_int int int
 
-  logic neq_int int int
+  predicate neq_int int int
 
-  logic add_int int int : int
+  function add_int int int : int
 
-  logic sub_int int int : int
+  function sub_int int int : int
 
-  logic mul_int int int : int
+  function mul_int int int : int
 
-  logic div_int int int : int
+  function div_int int int : int
 
-  logic mod_int int int : int
+  function mod_int int int : int
 
-  logic neg_int int : int
+  function neg_int int : int
 
-  logic zwf_zero (a : int) (b : int) = ((Int.(<=) 0 b) and (Int.(<) a b))
+  predicate zwf_zero (a : int) (b : int) = ((Int.(<=) 0 b) /\ (Int.(<) a b))
 
-  logic why3_F int : int
+  function why3_F int : int
 
   axiom F_0: ((why3_F 0 : int) = 1)
 
@@ -65,14 +65,14 @@ use array.Array as A
     (forall n:int.
       ((Int.(>=) n 0) ->
        ((Int.(>) n 1) ->
-        (((Int.(<=) 0 n) and (Int.(<) (Int.(-) n 1 : int) n)) ->
+        (((Int.(<=) 0 n) /\ (Int.(<) (Int.(-) n 1 : int) n)) ->
          (Int.(>=) (Int.(-) n 1 : int) 0)))))
 
   goal Fib1_po_5:
     (forall n:int.
       ((Int.(>=) n 0) ->
        ((Int.(>) n 1) ->
-        (((Int.(<=) 0 n) and (Int.(<) (Int.(-) n 1 : int) n)) ->
+        (((Int.(<=) 0 n) /\ (Int.(<) (Int.(-) n 1 : int) n)) ->
          ((Int.(>=) (Int.(-) n 1 : int) 0) ->
           (forall result:int.
             ((result = (why3_F (Int.(-) n 1 : int) : int)) -> (Int.(<=) 0 n))))))))
@@ -81,7 +81,7 @@ use array.Array as A
     (forall n:int.
       ((Int.(>=) n 0) ->
        ((Int.(>) n 1) ->
-        (((Int.(<=) 0 n) and (Int.(<) (Int.(-) n 1 : int) n)) ->
+        (((Int.(<=) 0 n) /\ (Int.(<) (Int.(-) n 1 : int) n)) ->
          ((Int.(>=) (Int.(-) n 1 : int) 0) ->
           (forall result:int.
             ((result = (why3_F (Int.(-) n 1 : int) : int)) ->
@@ -91,22 +91,22 @@ use array.Array as A
     (forall n:int.
       ((Int.(>=) n 0) ->
        ((Int.(>) n 1) ->
-        (((Int.(<=) 0 n) and (Int.(<) (Int.(-) n 1 : int) n)) ->
+        (((Int.(<=) 0 n) /\ (Int.(<) (Int.(-) n 1 : int) n)) ->
          ((Int.(>=) (Int.(-) n 1 : int) 0) ->
           (forall result:int.
             ((result = (why3_F (Int.(-) n 1 : int) : int)) ->
-             (((Int.(<=) 0 n) and (Int.(<) (Int.(-) n 2 : int) n)) ->
+             (((Int.(<=) 0 n) /\ (Int.(<) (Int.(-) n 2 : int) n)) ->
               (Int.(>=) (Int.(-) n 2 : int) 0)))))))))
 
   goal Fib1_po_8:
     (forall n:int.
       ((Int.(>=) n 0) ->
        ((Int.(>) n 1) ->
-        (((Int.(<=) 0 n) and (Int.(<) (Int.(-) n 1 : int) n)) ->
+        (((Int.(<=) 0 n) /\ (Int.(<) (Int.(-) n 1 : int) n)) ->
          ((Int.(>=) (Int.(-) n 1 : int) 0) ->
           (forall result:int.
             ((result = (why3_F (Int.(-) n 1 : int) : int)) ->
-             (((Int.(<=) 0 n) and (Int.(<) (Int.(-) n 2 : int) n)) ->
+             (((Int.(<=) 0 n) /\ (Int.(<) (Int.(-) n 2 : int) n)) ->
               ((Int.(>=) (Int.(-) n 2 : int) 0) ->
                (forall result0:int.
                  ((result0 = (why3_F (Int.(-) n 2 : int) : int)) ->
@@ -117,8 +117,8 @@ use array.Array as A
       (forall x:int.
         (forall fx:int.
           (forall fx_1:int.
-            ((((Int.(<=) 1 x) and (Int.(<=) x n)) and
-              ((fx = (why3_F x : int)) and
+            ((((Int.(<=) 1 x) /\ (Int.(<=) x n)) /\
+              ((fx = (why3_F x : int)) /\
                (fx_1 = (why3_F (Int.(-) x 1 : int) : int)))) ->
              ((x = n) -> (fx = (why3_F n : int))))))))
 
@@ -127,8 +127,8 @@ use array.Array as A
       (forall x:int.
         (forall fx:int.
           (forall fx_1:int.
-            ((((Int.(<=) 1 x) and (Int.(<=) x n)) and
-              ((fx = (why3_F x : int)) and
+            ((((Int.(<=) 1 x) /\ (Int.(<=) x n)) /\
+              ((fx = (why3_F x : int)) /\
                (fx_1 = (why3_F (Int.(-) x 1 : int) : int)))) ->
              ((x <> n) -> (Int.(<=) 0 (Int.(-) n x : int))))))))
 
@@ -137,8 +137,8 @@ use array.Array as A
       (forall x:int.
         (forall fx:int.
           (forall fx_1:int.
-            ((((Int.(<=) 1 x) and (Int.(<=) x n)) and
-              ((fx = (why3_F x : int)) and
+            ((((Int.(<=) 1 x) /\ (Int.(<=) x n)) /\
+              ((fx = (why3_F x : int)) /\
                (fx_1 = (why3_F (Int.(-) x 1 : int) : int)))) ->
              ((x <> n) ->
               (Int.(<) (Int.(-) n (Int.(+) x 1 : int) : int) (Int.(-) n x : int))))))))
@@ -148,11 +148,11 @@ use array.Array as A
       (forall x:int.
         (forall fx:int.
           (forall fx_1:int.
-            ((((Int.(<=) 1 x) and (Int.(<=) x n)) and
-              ((fx = (why3_F x : int)) and
+            ((((Int.(<=) 1 x) /\ (Int.(<=) x n)) /\
+              ((fx = (why3_F x : int)) /\
                (fx_1 = (why3_F (Int.(-) x 1 : int) : int)))) ->
              ((x <> n) ->
-              (((Int.(<=) 0 (Int.(-) n x : int)) and
+              (((Int.(<=) 0 (Int.(-) n x : int)) /\
                 (Int.(<) (Int.(-) n (Int.(+) x 1 : int) : int) (Int.(-) n x : int))) ->
                (Int.(<=) 1 (Int.(+) x 1 : int)))))))))
 
@@ -161,11 +161,11 @@ use array.Array as A
       (forall x:int.
         (forall fx:int.
           (forall fx_1:int.
-            ((((Int.(<=) 1 x) and (Int.(<=) x n)) and
-              ((fx = (why3_F x : int)) and
+            ((((Int.(<=) 1 x) /\ (Int.(<=) x n)) /\
+              ((fx = (why3_F x : int)) /\
                (fx_1 = (why3_F (Int.(-) x 1 : int) : int)))) ->
              ((x <> n) ->
-              (((Int.(<=) 0 (Int.(-) n x : int)) and
+              (((Int.(<=) 0 (Int.(-) n x : int)) /\
                 (Int.(<) (Int.(-) n (Int.(+) x 1 : int) : int) (Int.(-) n x : int))) ->
                (Int.(<=) (Int.(+) x 1 : int) n))))))))
 
@@ -174,11 +174,11 @@ use array.Array as A
       (forall x:int.
         (forall fx:int.
           (forall fx_1:int.
-            ((((Int.(<=) 1 x) and (Int.(<=) x n)) and
-              ((fx = (why3_F x : int)) and
+            ((((Int.(<=) 1 x) /\ (Int.(<=) x n)) /\
+              ((fx = (why3_F x : int)) /\
                (fx_1 = (why3_F (Int.(-) x 1 : int) : int)))) ->
              ((x <> n) ->
-              (((Int.(<=) 0 (Int.(-) n x : int)) and
+              (((Int.(<=) 0 (Int.(-) n x : int)) /\
                 (Int.(<) (Int.(-) n (Int.(+) x 1 : int) : int) (Int.(-) n x : int))) ->
                ((Int.(+) fx fx_1 : int) = (why3_F (Int.(+) x 1 : int) : int)))))))))
 
@@ -187,11 +187,11 @@ use array.Array as A
       (forall x:int.
         (forall fx:int.
           (forall fx_1:int.
-            ((((Int.(<=) 1 x) and (Int.(<=) x n)) and
-              ((fx = (why3_F x : int)) and
+            ((((Int.(<=) 1 x) /\ (Int.(<=) x n)) /\
+              ((fx = (why3_F x : int)) /\
                (fx_1 = (why3_F (Int.(-) x 1 : int) : int)))) ->
              ((x <> n) ->
-              (((Int.(<=) 0 (Int.(-) n x : int)) and
+              (((Int.(<=) 0 (Int.(-) n x : int)) /\
                 (Int.(<) (Int.(-) n (Int.(+) x 1 : int) : int) (Int.(-) n x : int))) ->
                (fx = (why3_F (Int.(-) (Int.(+) x 1 : int) 1 : int) : int)))))))))
 
@@ -235,8 +235,8 @@ use array.Array as A
       (forall x:int.
         (forall fx:int.
           (forall fx_1:int.
-            ((((Int.(<=) 0 x) and (Int.(<) x n)) and
-              ((fx = (why3_F (Int.(-) n x : int) : int)) and
+            ((((Int.(<=) 0 x) /\ (Int.(<) x n)) /\
+              ((fx = (why3_F (Int.(-) n x : int) : int)) /\
                (fx_1 = (why3_F (Int.(-) (Int.(-) n x : int) 1 : int) : int)))) ->
              ((x = 0) -> (fx = (why3_F n : int))))))))
 
@@ -245,8 +245,8 @@ use array.Array as A
       (forall x:int.
         (forall fx:int.
           (forall fx_1:int.
-            ((((Int.(<=) 0 x) and (Int.(<) x n)) and
-              ((fx = (why3_F (Int.(-) n x : int) : int)) and
+            ((((Int.(<=) 0 x) /\ (Int.(<) x n)) /\
+              ((fx = (why3_F (Int.(-) n x : int) : int)) /\
                (fx_1 = (why3_F (Int.(-) (Int.(-) n x : int) 1 : int) : int)))) ->
              ((x <> 0) -> (Int.(<=) 0 x)))))))
 
@@ -255,8 +255,8 @@ use array.Array as A
       (forall x:int.
         (forall fx:int.
           (forall fx_1:int.
-            ((((Int.(<=) 0 x) and (Int.(<) x n)) and
-              ((fx = (why3_F (Int.(-) n x : int) : int)) and
+            ((((Int.(<=) 0 x) /\ (Int.(<) x n)) /\
+              ((fx = (why3_F (Int.(-) n x : int) : int)) /\
                (fx_1 = (why3_F (Int.(-) (Int.(-) n x : int) 1 : int) : int)))) ->
              ((x <> 0) -> (Int.(<) (Int.(-) x 1 : int) x)))))))
 
@@ -265,11 +265,11 @@ use array.Array as A
       (forall x:int.
         (forall fx:int.
           (forall fx_1:int.
-            ((((Int.(<=) 0 x) and (Int.(<) x n)) and
-              ((fx = (why3_F (Int.(-) n x : int) : int)) and
+            ((((Int.(<=) 0 x) /\ (Int.(<) x n)) /\
+              ((fx = (why3_F (Int.(-) n x : int) : int)) /\
                (fx_1 = (why3_F (Int.(-) (Int.(-) n x : int) 1 : int) : int)))) ->
              ((x <> 0) ->
-              (((Int.(<=) 0 x) and (Int.(<) (Int.(-) x 1 : int) x)) ->
+              (((Int.(<=) 0 x) /\ (Int.(<) (Int.(-) x 1 : int) x)) ->
                (Int.(<=) 0 (Int.(-) x 1 : int)))))))))
 
   goal Fib2b_po_9:
@@ -277,11 +277,11 @@ use array.Array as A
       (forall x:int.
         (forall fx:int.
           (forall fx_1:int.
-            ((((Int.(<=) 0 x) and (Int.(<) x n)) and
-              ((fx = (why3_F (Int.(-) n x : int) : int)) and
+            ((((Int.(<=) 0 x) /\ (Int.(<) x n)) /\
+              ((fx = (why3_F (Int.(-) n x : int) : int)) /\
                (fx_1 = (why3_F (Int.(-) (Int.(-) n x : int) 1 : int) : int)))) ->
              ((x <> 0) ->
-              (((Int.(<=) 0 x) and (Int.(<) (Int.(-) x 1 : int) x)) ->
+              (((Int.(<=) 0 x) /\ (Int.(<) (Int.(-) x 1 : int) x)) ->
                (Int.(<) (Int.(-) x 1 : int) n))))))))
 
   goal Fib2b_po_10:
@@ -289,11 +289,11 @@ use array.Array as A
       (forall x:int.
         (forall fx:int.
           (forall fx_1:int.
-            ((((Int.(<=) 0 x) and (Int.(<) x n)) and
-              ((fx = (why3_F (Int.(-) n x : int) : int)) and
+            ((((Int.(<=) 0 x) /\ (Int.(<) x n)) /\
+              ((fx = (why3_F (Int.(-) n x : int) : int)) /\
                (fx_1 = (why3_F (Int.(-) (Int.(-) n x : int) 1 : int) : int)))) ->
              ((x <> 0) ->
-              (((Int.(<=) 0 x) and (Int.(<) (Int.(-) x 1 : int) x)) ->
+              (((Int.(<=) 0 x) /\ (Int.(<) (Int.(-) x 1 : int) x)) ->
                ((Int.(+) fx fx_1 : int) = (why3_F (Int.(-) n (Int.(-) x 1 : int) : int) : int)))))))))
 
   goal Fib2b_po_11:
@@ -301,11 +301,11 @@ use array.Array as A
       (forall x:int.
         (forall fx:int.
           (forall fx_1:int.
-            ((((Int.(<=) 0 x) and (Int.(<) x n)) and
-              ((fx = (why3_F (Int.(-) n x : int) : int)) and
+            ((((Int.(<=) 0 x) /\ (Int.(<) x n)) /\
+              ((fx = (why3_F (Int.(-) n x : int) : int)) /\
                (fx_1 = (why3_F (Int.(-) (Int.(-) n x : int) 1 : int) : int)))) ->
              ((x <> 0) ->
-              (((Int.(<=) 0 x) and (Int.(<) (Int.(-) x 1 : int) x)) ->
+              (((Int.(<=) 0 x) /\ (Int.(<) (Int.(-) x 1 : int) x)) ->
                (fx = (why3_F (Int.(-) (Int.(-) n (Int.(-) x 1 : int) : int) 1 : int) : int)))))))))
 
   goal Fib2c_aux_po_1:
@@ -328,7 +328,7 @@ use array.Array as A
     (forall n:int.
       ((Int.(<=) 0 n) ->
        ((n <> 0) ->
-        (((Int.(<=) 0 n) and (Int.(<) (Int.(-) n 1 : int) n)) ->
+        (((Int.(<=) 0 n) /\ (Int.(<) (Int.(-) n 1 : int) n)) ->
          (Int.(<=) 0 (Int.(-) n 1 : int))))))
 
   goal Fib2c_aux_po_4:
@@ -337,7 +337,7 @@ use array.Array as A
         (forall fx_1:int.
           ((Int.(<=) 0 n) ->
            ((n <> 0) ->
-            (((Int.(<=) 0 n) and (Int.(<) (Int.(-) n 1 : int) n)) ->
+            (((Int.(<=) 0 n) /\ (Int.(<) (Int.(-) n 1 : int) n)) ->
              ((Int.(<=) 0 (Int.(-) n 1 : int)) ->
               (forall result:int.
                 ((forall x:int.
@@ -394,8 +394,8 @@ use array.Array as A
         (forall k:int.
           (forall x:int.
             (forall y:int.
-              ((((Int.(<=) 1 k) and (Int.(<=) k n)) and
-                ((x = (why3_F k : int)) and
+              ((((Int.(<=) 1 k) /\ (Int.(<=) k n)) /\
+                ((x = (why3_F k : int)) /\
                  (y = (why3_F (Int.(-) k 1 : int) : int)))) ->
                ((Int.(<) k n) ->
                 (forall y0:int.
@@ -412,8 +412,8 @@ use array.Array as A
         (forall k:int.
           (forall x:int.
             (forall y:int.
-              ((((Int.(<=) 1 k) and (Int.(<=) k n)) and
-                ((x = (why3_F k : int)) and
+              ((((Int.(<=) 1 k) /\ (Int.(<=) k n)) /\
+                ((x = (why3_F k : int)) /\
                  (y = (why3_F (Int.(-) k 1 : int) : int)))) ->
                ((Int.(<) k n) ->
                 (forall y0:int.
@@ -430,8 +430,8 @@ use array.Array as A
         (forall k:int.
           (forall x:int.
             (forall y:int.
-              ((((Int.(<=) 1 k) and (Int.(<=) k n)) and
-                ((x = (why3_F k : int)) and
+              ((((Int.(<=) 1 k) /\ (Int.(<=) k n)) /\
+                ((x = (why3_F k : int)) /\
                  (y = (why3_F (Int.(-) k 1 : int) : int)))) ->
                ((Int.(<) k n) ->
                 (forall y0:int.
@@ -449,8 +449,8 @@ use array.Array as A
         (forall k:int.
           (forall x:int.
             (forall y:int.
-              ((((Int.(<=) 1 k) and (Int.(<=) k n)) and
-                ((x = (why3_F k : int)) and
+              ((((Int.(<=) 1 k) /\ (Int.(<=) k n)) /\
+                ((x = (why3_F k : int)) /\
                  (y = (why3_F (Int.(-) k 1 : int) : int)))) ->
                ((Int.(<) k n) ->
                 (forall y0:int.
@@ -468,8 +468,8 @@ use array.Array as A
         (forall k:int.
           (forall x:int.
             (forall y:int.
-              ((((Int.(<=) 1 k) and (Int.(<=) k n)) and
-                ((x = (why3_F k : int)) and
+              ((((Int.(<=) 1 k) /\ (Int.(<=) k n)) /\
+                ((x = (why3_F k : int)) /\
                  (y = (why3_F (Int.(-) k 1 : int) : int)))) ->
                ((Int.(<) k n) ->
                 (forall y0:int.
@@ -487,8 +487,8 @@ use array.Array as A
         (forall k:int.
           (forall x:int.
             (forall y:int.
-              ((((Int.(<=) 1 k) and (Int.(<=) k n)) and
-                ((x = (why3_F k : int)) and
+              ((((Int.(<=) 1 k) /\ (Int.(<=) k n)) /\
+                ((x = (why3_F k : int)) /\
                  (y = (why3_F (Int.(-) k 1 : int) : int)))) ->
                ((Int.(<) k n) ->
                 (forall y0:int.
@@ -506,8 +506,8 @@ use array.Array as A
         (forall k:int.
           (forall x:int.
             (forall y:int.
-              ((((Int.(<=) 1 k) and (Int.(<=) k n)) and
-                ((x = (why3_F k : int)) and
+              ((((Int.(<=) 1 k) /\ (Int.(<=) k n)) /\
+                ((x = (why3_F k : int)) /\
                  (y = (why3_F (Int.(-) k 1 : int) : int)))) ->
                ((Int.(>=) k n) -> (x = (why3_F n : int))))))))))
 
@@ -517,29 +517,29 @@ use array.Array as A
 
   type farray 'a = A.t int 'a
 
-  logic access (m:farray 'a1) (k:int) : 'a1 = A.get m k
+  function access (m:farray 'a1) (k:int) : 'a1 = A.get m k
 
-  logic update (m:farray 'a1) (k:int) (v:'a1) : (farray 'a1) = A.set m k v
+  function update (m:farray 'a1) (k:int) (v:'a1) : (farray 'a1) = A.set m k v
 
 
 
-  logic array_length (farray 'a1) : int
+  function array_length (farray 'a1) : int
 
-  logic sorted_array (t : (farray int)) (i : int) (j : int) =
+  predicate sorted_array (t : (farray int)) (i : int) (j : int) =
     (forall k1:int.
       (forall k2:int.
-        ((((Int.(<=) i k1) and (Int.(<=) k1 k2)) and (Int.(<=) k2 j)) ->
+        ((((Int.(<=) i k1) /\ (Int.(<=) k1 k2)) /\ (Int.(<=) k2 j)) ->
          (Int.(<=) (access t k1 : int) (access t k2 : int)))))
 
-  logic exchange (a1 : (farray 'a1)) (a2 : (farray 'a1)) (i : int) (j : int) =
-    (((array_length a1 : int) = (array_length a2 : int)) and
-     (((access a1 i : 'a1) = (access a2 j : 'a1)) and
-      (((access a2 i : 'a1) = (access a1 j : 'a1)) and
+  predicate exchange (a1 : (farray 'a1)) (a2 : (farray 'a1)) (i : int) (j : int) =
+    (((array_length a1 : int) = (array_length a2 : int)) /\
+     (((access a1 i : 'a1) = (access a2 j : 'a1)) /\
+      (((access a2 i : 'a1) = (access a1 j : 'a1)) /\
        (forall k:int.
-         (((k <> i) and (k <> j)) ->
+         (((k <> i) /\ (k <> j)) ->
           ((access a1 k : 'a1) = (access a2 k : 'a1)))))))
 
-  logic permut (farray 'a1) (farray 'a1) int int
+  predicate permut (farray 'a1) (farray 'a1) int int
 
   axiom Permut_refl:
     (forall t:(farray 'a1). (forall l:int. (forall u:int. (permut t t l u))))
@@ -566,8 +566,8 @@ use array.Array as A
           (forall u:int.
             (forall i:int.
               (forall j:int.
-                (((Int.(<=) l i) and (Int.(<=) i u)) ->
-                 (((Int.(<=) l j) and (Int.(<=) j u)) ->
+                (((Int.(<=) l i) /\ (Int.(<=) i u)) ->
+                 (((Int.(<=) l j) /\ (Int.(<=) j u)) ->
                   ((exchange a1 a2 i j) -> (permut a1 a2 l u))))))))))
 
   axiom Exchange_upd:
@@ -583,7 +583,7 @@ use array.Array as A
           (forall r1:int.
             (forall l2:int.
               (forall r2:int.
-                ((((Int.(<=) l1 l2) and (Int.(<=) l2 r2)) and
+                ((((Int.(<=) l1 l2) /\ (Int.(<=) l2 r2)) /\
                   (Int.(<=) r2 r1)) ->
                  ((permut a1 a2 l2 r2) -> (permut a1 a2 l1 r1)))))))))
 
@@ -595,10 +595,10 @@ use array.Array as A
             ((Int.(<=) l u) ->
              ((permut a1 a2 l u) ->
               (forall i:int.
-                (((Int.(<) i l) or (Int.(<) u i)) ->
+                (((Int.(<) i l) \/ (Int.(<) u i)) ->
                  ((access a2 i : 'a1) = (access a1 i : 'a1))))))))))
 
-  logic permutation (a1 : (farray 'a1)) (a2 : (farray 'a1)) =
+  predicate permutation (a1 : (farray 'a1)) (a2 : (farray 'a1)) =
     (permut a1 a2 0 (Int.(-) (array_length a1 : int) 1 : int))
 
   axiom Array_length_update:
@@ -618,36 +618,36 @@ use array.Array as A
   goal Fib4_po_1:
     (forall n:int.
       (forall t:(farray int).
-        (((Int.(<=) 0 n) and (Int.(<) n (array_length t : int))) ->
+        (((Int.(<=) 0 n) /\ (Int.(<) n (array_length t : int))) ->
          ((Int.(<=) n 1) -> (1 = (why3_F n : int))))))
 
   goal Fib4_po_2:
     (forall n:int.
       (forall t:(farray int).
-        (((Int.(<=) 0 n) and (Int.(<) n (array_length t : int))) ->
+        (((Int.(<=) 0 n) /\ (Int.(<) n (array_length t : int))) ->
          ((Int.(>) n 1) -> (Int.(<=) 0 0)))))
 
   goal Fib4_po_3:
     (forall n:int.
       (forall t:(farray int).
-        (((Int.(<=) 0 n) and (Int.(<) n (array_length t : int))) ->
+        (((Int.(<=) 0 n) /\ (Int.(<) n (array_length t : int))) ->
          ((Int.(>) n 1) -> (Int.(<) 0 (array_length t : int))))))
 
   goal Fib4_po_4:
     (forall n:int.
       (forall t:(farray int).
-        (((Int.(<=) 0 n) and (Int.(<) n (array_length t : int))) ->
+        (((Int.(<=) 0 n) /\ (Int.(<) n (array_length t : int))) ->
          ((Int.(>) n 1) ->
-          (((Int.(<=) 0 0) and (Int.(<) 0 (array_length t : int))) ->
+          (((Int.(<=) 0 0) /\ (Int.(<) 0 (array_length t : int))) ->
            (forall t0:(farray int).
              ((t0 = (update t 0 1 : (farray int))) -> (Int.(<=) 0 1))))))))
 
   goal Fib4_po_5:
     (forall n:int.
       (forall t:(farray int).
-        (((Int.(<=) 0 n) and (Int.(<) n (array_length t : int))) ->
+        (((Int.(<=) 0 n) /\ (Int.(<) n (array_length t : int))) ->
          ((Int.(>) n 1) ->
-          (((Int.(<=) 0 0) and (Int.(<) 0 (array_length t : int))) ->
+          (((Int.(<=) 0 0) /\ (Int.(<) 0 (array_length t : int))) ->
            (forall t0:(farray int).
              ((t0 = (update t 0 1 : (farray int))) ->
               (Int.(<) 1 (array_length t0 : int)))))))))
@@ -655,24 +655,24 @@ use array.Array as A
   goal Fib4_po_6:
     (forall n:int.
       (forall t:(farray int).
-        (((Int.(<=) 0 n) and (Int.(<) n (array_length t : int))) ->
+        (((Int.(<=) 0 n) /\ (Int.(<) n (array_length t : int))) ->
          ((Int.(>) n 1) ->
-          (((Int.(<=) 0 0) and (Int.(<) 0 (array_length t : int))) ->
+          (((Int.(<=) 0 0) /\ (Int.(<) 0 (array_length t : int))) ->
            (forall t0:(farray int).
              ((t0 = (update t 0 1 : (farray int))) ->
-              (((Int.(<=) 0 1) and (Int.(<) 1 (array_length t0 : int))) ->
+              (((Int.(<=) 0 1) /\ (Int.(<) 1 (array_length t0 : int))) ->
                (forall t1:(farray int).
                  ((t1 = (update t0 1 1 : (farray int))) -> (Int.(<=) 2 2)))))))))))
 
   goal Fib4_po_7:
     (forall n:int.
       (forall t:(farray int).
-        (((Int.(<=) 0 n) and (Int.(<) n (array_length t : int))) ->
+        (((Int.(<=) 0 n) /\ (Int.(<) n (array_length t : int))) ->
          ((Int.(>) n 1) ->
-          (((Int.(<=) 0 0) and (Int.(<) 0 (array_length t : int))) ->
+          (((Int.(<=) 0 0) /\ (Int.(<) 0 (array_length t : int))) ->
            (forall t0:(farray int).
              ((t0 = (update t 0 1 : (farray int))) ->
-              (((Int.(<=) 0 1) and (Int.(<) 1 (array_length t0 : int))) ->
+              (((Int.(<=) 0 1) /\ (Int.(<) 1 (array_length t0 : int))) ->
                (forall t1:(farray int).
                  ((t1 = (update t0 1 1 : (farray int))) ->
                   (Int.(<=) 2 (Int.(+) n 1 : int))))))))))))
@@ -680,12 +680,12 @@ use array.Array as A
   goal Fib4_po_8:
     (forall n:int.
       (forall t:(farray int).
-        (((Int.(<=) 0 n) and (Int.(<) n (array_length t : int))) ->
+        (((Int.(<=) 0 n) /\ (Int.(<) n (array_length t : int))) ->
          ((Int.(>) n 1) ->
-          (((Int.(<=) 0 0) and (Int.(<) 0 (array_length t : int))) ->
+          (((Int.(<=) 0 0) /\ (Int.(<) 0 (array_length t : int))) ->
            (forall t0:(farray int).
              ((t0 = (update t 0 1 : (farray int))) ->
-              (((Int.(<=) 0 1) and (Int.(<) 1 (array_length t0 : int))) ->
+              (((Int.(<=) 0 1) /\ (Int.(<) 1 (array_length t0 : int))) ->
                (forall t1:(farray int).
                  ((t1 = (update t0 1 1 : (farray int))) ->
                   ((array_length t1 : int) = (array_length t : int))))))))))))
@@ -693,55 +693,55 @@ use array.Array as A
   goal Fib4_po_9:
     (forall n:int.
       (forall t:(farray int).
-        (((Int.(<=) 0 n) and (Int.(<) n (array_length t : int))) ->
+        (((Int.(<=) 0 n) /\ (Int.(<) n (array_length t : int))) ->
          ((Int.(>) n 1) ->
-          (((Int.(<=) 0 0) and (Int.(<) 0 (array_length t : int))) ->
+          (((Int.(<=) 0 0) /\ (Int.(<) 0 (array_length t : int))) ->
            (forall t0:(farray int).
              ((t0 = (update t 0 1 : (farray int))) ->
-              (((Int.(<=) 0 1) and (Int.(<) 1 (array_length t0 : int))) ->
+              (((Int.(<=) 0 1) /\ (Int.(<) 1 (array_length t0 : int))) ->
                (forall t1:(farray int).
                  ((t1 = (update t0 1 1 : (farray int))) ->
                   (forall i:int.
-                    (((Int.(<=) 0 i) and (Int.(<) i 2)) ->
+                    (((Int.(<=) 0 i) /\ (Int.(<) i 2)) ->
                      ((access t1 i : int) = (why3_F i : int))))))))))))))
 
   goal Fib4_po_10:
     (forall n:int.
       (forall t:(farray int).
-        (((Int.(<=) 0 n) and (Int.(<) n (array_length t : int))) ->
+        (((Int.(<=) 0 n) /\ (Int.(<) n (array_length t : int))) ->
          ((Int.(>) n 1) ->
-          (((Int.(<=) 0 0) and (Int.(<) 0 (array_length t : int))) ->
+          (((Int.(<=) 0 0) /\ (Int.(<) 0 (array_length t : int))) ->
            (forall t0:(farray int).
              ((t0 = (update t 0 1 : (farray int))) ->
-              (((Int.(<=) 0 1) and (Int.(<) 1 (array_length t0 : int))) ->
+              (((Int.(<=) 0 1) /\ (Int.(<) 1 (array_length t0 : int))) ->
                (forall t1:(farray int).
                  ((t1 = (update t0 1 1 : (farray int))) ->
                   (forall k:int.
                     (forall t2:(farray int).
-                      ((((Int.(<=) 2 k) and (Int.(<=) k (Int.(+) n 1 : int))) and
-                        (((array_length t2 : int) = (array_length t : int)) and
+                      ((((Int.(<=) 2 k) /\ (Int.(<=) k (Int.(+) n 1 : int))) /\
+                        (((array_length t2 : int) = (array_length t : int)) /\
                          (forall i:int.
-                           (((Int.(<=) 0 i) and (Int.(<) i k)) ->
+                           (((Int.(<=) 0 i) /\ (Int.(<) i k)) ->
                             ((access t2 i : int) = (why3_F i : int)))))) ->
                        ((Int.(<=) k n) -> (Int.(<=) 0 (Int.(-) k 1 : int))))))))))))))))
 
   goal Fib4_po_11:
     (forall n:int.
       (forall t:(farray int).
-        (((Int.(<=) 0 n) and (Int.(<) n (array_length t : int))) ->
+        (((Int.(<=) 0 n) /\ (Int.(<) n (array_length t : int))) ->
          ((Int.(>) n 1) ->
-          (((Int.(<=) 0 0) and (Int.(<) 0 (array_length t : int))) ->
+          (((Int.(<=) 0 0) /\ (Int.(<) 0 (array_length t : int))) ->
            (forall t0:(farray int).
              ((t0 = (update t 0 1 : (farray int))) ->
-              (((Int.(<=) 0 1) and (Int.(<) 1 (array_length t0 : int))) ->
+              (((Int.(<=) 0 1) /\ (Int.(<) 1 (array_length t0 : int))) ->
                (forall t1:(farray int).
                  ((t1 = (update t0 1 1 : (farray int))) ->
                   (forall k:int.
                     (forall t2:(farray int).
-                      ((((Int.(<=) 2 k) and (Int.(<=) k (Int.(+) n 1 : int))) and
-                        (((array_length t2 : int) = (array_length t : int)) and
+                      ((((Int.(<=) 2 k) /\ (Int.(<=) k (Int.(+) n 1 : int))) /\
+                        (((array_length t2 : int) = (array_length t : int)) /\
                          (forall i:int.
-                           (((Int.(<=) 0 i) and (Int.(<) i k)) ->
+                           (((Int.(<=) 0 i) /\ (Int.(<) i k)) ->
                             ((access t2 i : int) = (why3_F i : int)))))) ->
                        ((Int.(<=) k n) ->
                         (Int.(<) (Int.(-) k 1 : int) (array_length t2 : int))))))))))))))))
@@ -749,23 +749,23 @@ use array.Array as A
   goal Fib4_po_12:
     (forall n:int.
       (forall t:(farray int).
-        (((Int.(<=) 0 n) and (Int.(<) n (array_length t : int))) ->
+        (((Int.(<=) 0 n) /\ (Int.(<) n (array_length t : int))) ->
          ((Int.(>) n 1) ->
-          (((Int.(<=) 0 0) and (Int.(<) 0 (array_length t : int))) ->
+          (((Int.(<=) 0 0) /\ (Int.(<) 0 (array_length t : int))) ->
            (forall t0:(farray int).
              ((t0 = (update t 0 1 : (farray int))) ->
-              (((Int.(<=) 0 1) and (Int.(<) 1 (array_length t0 : int))) ->
+              (((Int.(<=) 0 1) /\ (Int.(<) 1 (array_length t0 : int))) ->
                (forall t1:(farray int).
                  ((t1 = (update t0 1 1 : (farray int))) ->
                   (forall k:int.
                     (forall t2:(farray int).
-                      ((((Int.(<=) 2 k) and (Int.(<=) k (Int.(+) n 1 : int))) and
-                        (((array_length t2 : int) = (array_length t : int)) and
+                      ((((Int.(<=) 2 k) /\ (Int.(<=) k (Int.(+) n 1 : int))) /\
+                        (((array_length t2 : int) = (array_length t : int)) /\
                          (forall i:int.
-                           (((Int.(<=) 0 i) and (Int.(<) i k)) ->
+                           (((Int.(<=) 0 i) /\ (Int.(<) i k)) ->
                             ((access t2 i : int) = (why3_F i : int)))))) ->
                        ((Int.(<=) k n) ->
-                        (((Int.(<=) 0 (Int.(-) k 1 : int)) and
+                        (((Int.(<=) 0 (Int.(-) k 1 : int)) /\
                           (Int.(<) (Int.(-) k 1 : int) (array_length t2 : int))) ->
                          (forall result:int.
                            ((result = (access t2 (Int.(-) k 1 : int) : int)) ->
@@ -774,23 +774,23 @@ use array.Array as A
   goal Fib4_po_13:
     (forall n:int.
       (forall t:(farray int).
-        (((Int.(<=) 0 n) and (Int.(<) n (array_length t : int))) ->
+        (((Int.(<=) 0 n) /\ (Int.(<) n (array_length t : int))) ->
          ((Int.(>) n 1) ->
-          (((Int.(<=) 0 0) and (Int.(<) 0 (array_length t : int))) ->
+          (((Int.(<=) 0 0) /\ (Int.(<) 0 (array_length t : int))) ->
            (forall t0:(farray int).
              ((t0 = (update t 0 1 : (farray int))) ->
-              (((Int.(<=) 0 1) and (Int.(<) 1 (array_length t0 : int))) ->
+              (((Int.(<=) 0 1) /\ (Int.(<) 1 (array_length t0 : int))) ->
                (forall t1:(farray int).
                  ((t1 = (update t0 1 1 : (farray int))) ->
                   (forall k:int.
                     (forall t2:(farray int).
-                      ((((Int.(<=) 2 k) and (Int.(<=) k (Int.(+) n 1 : int))) and
-                        (((array_length t2 : int) = (array_length t : int)) and
+                      ((((Int.(<=) 2 k) /\ (Int.(<=) k (Int.(+) n 1 : int))) /\
+                        (((array_length t2 : int) = (array_length t : int)) /\
                          (forall i:int.
-                           (((Int.(<=) 0 i) and (Int.(<) i k)) ->
+                           (((Int.(<=) 0 i) /\ (Int.(<) i k)) ->
                             ((access t2 i : int) = (why3_F i : int)))))) ->
                        ((Int.(<=) k n) ->
-                        (((Int.(<=) 0 (Int.(-) k 1 : int)) and
+                        (((Int.(<=) 0 (Int.(-) k 1 : int)) /\
                           (Int.(<) (Int.(-) k 1 : int) (array_length t2 : int))) ->
                          (forall result:int.
                            ((result = (access t2 (Int.(-) k 1 : int) : int)) ->
@@ -799,27 +799,27 @@ use array.Array as A
   goal Fib4_po_14:
     (forall n:int.
       (forall t:(farray int).
-        (((Int.(<=) 0 n) and (Int.(<) n (array_length t : int))) ->
+        (((Int.(<=) 0 n) /\ (Int.(<) n (array_length t : int))) ->
          ((Int.(>) n 1) ->
-          (((Int.(<=) 0 0) and (Int.(<) 0 (array_length t : int))) ->
+          (((Int.(<=) 0 0) /\ (Int.(<) 0 (array_length t : int))) ->
            (forall t0:(farray int).
              ((t0 = (update t 0 1 : (farray int))) ->
-              (((Int.(<=) 0 1) and (Int.(<) 1 (array_length t0 : int))) ->
+              (((Int.(<=) 0 1) /\ (Int.(<) 1 (array_length t0 : int))) ->
                (forall t1:(farray int).
                  ((t1 = (update t0 1 1 : (farray int))) ->
                   (forall k:int.
                     (forall t2:(farray int).
-                      ((((Int.(<=) 2 k) and (Int.(<=) k (Int.(+) n 1 : int))) and
-                        (((array_length t2 : int) = (array_length t : int)) and
+                      ((((Int.(<=) 2 k) /\ (Int.(<=) k (Int.(+) n 1 : int))) /\
+                        (((array_length t2 : int) = (array_length t : int)) /\
                          (forall i:int.
-                           (((Int.(<=) 0 i) and (Int.(<) i k)) ->
+                           (((Int.(<=) 0 i) /\ (Int.(<) i k)) ->
                             ((access t2 i : int) = (why3_F i : int)))))) ->
                        ((Int.(<=) k n) ->
-                        (((Int.(<=) 0 (Int.(-) k 1 : int)) and
+                        (((Int.(<=) 0 (Int.(-) k 1 : int)) /\
                           (Int.(<) (Int.(-) k 1 : int) (array_length t2 : int))) ->
                          (forall result:int.
                            ((result = (access t2 (Int.(-) k 1 : int) : int)) ->
-                            (((Int.(<=) 0 (Int.(-) k 2 : int)) and
+                            (((Int.(<=) 0 (Int.(-) k 2 : int)) /\
                               (Int.(<) (Int.(-) k 2 : int) (array_length t2 : int))) ->
                              (forall result0:int.
                                ((result0 = (access t2 (Int.(-) k 2 : int) : int)) ->
@@ -828,27 +828,27 @@ use array.Array as A
   goal Fib4_po_15:
     (forall n:int.
       (forall t:(farray int).
-        (((Int.(<=) 0 n) and (Int.(<) n (array_length t : int))) ->
+        (((Int.(<=) 0 n) /\ (Int.(<) n (array_length t : int))) ->
          ((Int.(>) n 1) ->
-          (((Int.(<=) 0 0) and (Int.(<) 0 (array_length t : int))) ->
+          (((Int.(<=) 0 0) /\ (Int.(<) 0 (array_length t : int))) ->
            (forall t0:(farray int).
              ((t0 = (update t 0 1 : (farray int))) ->
-              (((Int.(<=) 0 1) and (Int.(<) 1 (array_length t0 : int))) ->
+              (((Int.(<=) 0 1) /\ (Int.(<) 1 (array_length t0 : int))) ->
                (forall t1:(farray int).
                  ((t1 = (update t0 1 1 : (farray int))) ->
                   (forall k:int.
                     (forall t2:(farray int).
-                      ((((Int.(<=) 2 k) and (Int.(<=) k (Int.(+) n 1 : int))) and
-                        (((array_length t2 : int) = (array_length t : int)) and
+                      ((((Int.(<=) 2 k) /\ (Int.(<=) k (Int.(+) n 1 : int))) /\
+                        (((array_length t2 : int) = (array_length t : int)) /\
                          (forall i:int.
-                           (((Int.(<=) 0 i) and (Int.(<) i k)) ->
+                           (((Int.(<=) 0 i) /\ (Int.(<) i k)) ->
                             ((access t2 i : int) = (why3_F i : int)))))) ->
                        ((Int.(<=) k n) ->
-                        (((Int.(<=) 0 (Int.(-) k 1 : int)) and
+                        (((Int.(<=) 0 (Int.(-) k 1 : int)) /\
                           (Int.(<) (Int.(-) k 1 : int) (array_length t2 : int))) ->
                          (forall result:int.
                            ((result = (access t2 (Int.(-) k 1 : int) : int)) ->
-                            (((Int.(<=) 0 (Int.(-) k 2 : int)) and
+                            (((Int.(<=) 0 (Int.(-) k 2 : int)) /\
                               (Int.(<) (Int.(-) k 2 : int) (array_length t2 : int))) ->
                              (forall result0:int.
                                ((result0 = (access t2 (Int.(-) k 2 : int) : int)) ->
@@ -857,31 +857,31 @@ use array.Array as A
   goal Fib4_po_16:
     (forall n:int.
       (forall t:(farray int).
-        (((Int.(<=) 0 n) and (Int.(<) n (array_length t : int))) ->
+        (((Int.(<=) 0 n) /\ (Int.(<) n (array_length t : int))) ->
          ((Int.(>) n 1) ->
-          (((Int.(<=) 0 0) and (Int.(<) 0 (array_length t : int))) ->
+          (((Int.(<=) 0 0) /\ (Int.(<) 0 (array_length t : int))) ->
            (forall t0:(farray int).
              ((t0 = (update t 0 1 : (farray int))) ->
-              (((Int.(<=) 0 1) and (Int.(<) 1 (array_length t0 : int))) ->
+              (((Int.(<=) 0 1) /\ (Int.(<) 1 (array_length t0 : int))) ->
                (forall t1:(farray int).
                  ((t1 = (update t0 1 1 : (farray int))) ->
                   (forall k:int.
                     (forall t2:(farray int).
-                      ((((Int.(<=) 2 k) and (Int.(<=) k (Int.(+) n 1 : int))) and
-                        (((array_length t2 : int) = (array_length t : int)) and
+                      ((((Int.(<=) 2 k) /\ (Int.(<=) k (Int.(+) n 1 : int))) /\
+                        (((array_length t2 : int) = (array_length t : int)) /\
                          (forall i:int.
-                           (((Int.(<=) 0 i) and (Int.(<) i k)) ->
+                           (((Int.(<=) 0 i) /\ (Int.(<) i k)) ->
                             ((access t2 i : int) = (why3_F i : int)))))) ->
                        ((Int.(<=) k n) ->
-                        (((Int.(<=) 0 (Int.(-) k 1 : int)) and
+                        (((Int.(<=) 0 (Int.(-) k 1 : int)) /\
                           (Int.(<) (Int.(-) k 1 : int) (array_length t2 : int))) ->
                          (forall result:int.
                            ((result = (access t2 (Int.(-) k 1 : int) : int)) ->
-                            (((Int.(<=) 0 (Int.(-) k 2 : int)) and
+                            (((Int.(<=) 0 (Int.(-) k 2 : int)) /\
                               (Int.(<) (Int.(-) k 2 : int) (array_length t2 : int))) ->
                              (forall result0:int.
                                ((result0 = (access t2 (Int.(-) k 2 : int) : int)) ->
-                                (((Int.(<=) 0 k) and
+                                (((Int.(<=) 0 k) /\
                                   (Int.(<) k (array_length t2 : int))) ->
                                  (forall t3:(farray int).
                                    ((t3 = (update t2 k (Int.(+) result result0 : int) : (farray int))) ->
@@ -892,31 +892,31 @@ use array.Array as A
   goal Fib4_po_17:
     (forall n:int.
       (forall t:(farray int).
-        (((Int.(<=) 0 n) and (Int.(<) n (array_length t : int))) ->
+        (((Int.(<=) 0 n) /\ (Int.(<) n (array_length t : int))) ->
          ((Int.(>) n 1) ->
-          (((Int.(<=) 0 0) and (Int.(<) 0 (array_length t : int))) ->
+          (((Int.(<=) 0 0) /\ (Int.(<) 0 (array_length t : int))) ->
            (forall t0:(farray int).
              ((t0 = (update t 0 1 : (farray int))) ->
-              (((Int.(<=) 0 1) and (Int.(<) 1 (array_length t0 : int))) ->
+              (((Int.(<=) 0 1) /\ (Int.(<) 1 (array_length t0 : int))) ->
                (forall t1:(farray int).
                  ((t1 = (update t0 1 1 : (farray int))) ->
                   (forall k:int.
                     (forall t2:(farray int).
-                      ((((Int.(<=) 2 k) and (Int.(<=) k (Int.(+) n 1 : int))) and
-                        (((array_length t2 : int) = (array_length t : int)) and
+                      ((((Int.(<=) 2 k) /\ (Int.(<=) k (Int.(+) n 1 : int))) /\
+                        (((array_length t2 : int) = (array_length t : int)) /\
                          (forall i:int.
-                           (((Int.(<=) 0 i) and (Int.(<) i k)) ->
+                           (((Int.(<=) 0 i) /\ (Int.(<) i k)) ->
                             ((access t2 i : int) = (why3_F i : int)))))) ->
                        ((Int.(<=) k n) ->
-                        (((Int.(<=) 0 (Int.(-) k 1 : int)) and
+                        (((Int.(<=) 0 (Int.(-) k 1 : int)) /\
                           (Int.(<) (Int.(-) k 1 : int) (array_length t2 : int))) ->
                          (forall result:int.
                            ((result = (access t2 (Int.(-) k 1 : int) : int)) ->
-                            (((Int.(<=) 0 (Int.(-) k 2 : int)) and
+                            (((Int.(<=) 0 (Int.(-) k 2 : int)) /\
                               (Int.(<) (Int.(-) k 2 : int) (array_length t2 : int))) ->
                              (forall result0:int.
                                ((result0 = (access t2 (Int.(-) k 2 : int) : int)) ->
-                                (((Int.(<=) 0 k) and
+                                (((Int.(<=) 0 k) /\
                                   (Int.(<) k (array_length t2 : int))) ->
                                  (forall t3:(farray int).
                                    ((t3 = (update t2 k (Int.(+) result result0 : int) : (farray int))) ->
@@ -927,31 +927,31 @@ use array.Array as A
   goal Fib4_po_18:
     (forall n:int.
       (forall t:(farray int).
-        (((Int.(<=) 0 n) and (Int.(<) n (array_length t : int))) ->
+        (((Int.(<=) 0 n) /\ (Int.(<) n (array_length t : int))) ->
          ((Int.(>) n 1) ->
-          (((Int.(<=) 0 0) and (Int.(<) 0 (array_length t : int))) ->
+          (((Int.(<=) 0 0) /\ (Int.(<) 0 (array_length t : int))) ->
            (forall t0:(farray int).
              ((t0 = (update t 0 1 : (farray int))) ->
-              (((Int.(<=) 0 1) and (Int.(<) 1 (array_length t0 : int))) ->
+              (((Int.(<=) 0 1) /\ (Int.(<) 1 (array_length t0 : int))) ->
                (forall t1:(farray int).
                  ((t1 = (update t0 1 1 : (farray int))) ->
                   (forall k:int.
                     (forall t2:(farray int).
-                      ((((Int.(<=) 2 k) and (Int.(<=) k (Int.(+) n 1 : int))) and
-                        (((array_length t2 : int) = (array_length t : int)) and
+                      ((((Int.(<=) 2 k) /\ (Int.(<=) k (Int.(+) n 1 : int))) /\
+                        (((array_length t2 : int) = (array_length t : int)) /\
                          (forall i:int.
-                           (((Int.(<=) 0 i) and (Int.(<) i k)) ->
+                           (((Int.(<=) 0 i) /\ (Int.(<) i k)) ->
                             ((access t2 i : int) = (why3_F i : int)))))) ->
                        ((Int.(<=) k n) ->
-                        (((Int.(<=) 0 (Int.(-) k 1 : int)) and
+                        (((Int.(<=) 0 (Int.(-) k 1 : int)) /\
                           (Int.(<) (Int.(-) k 1 : int) (array_length t2 : int))) ->
                          (forall result:int.
                            ((result = (access t2 (Int.(-) k 1 : int) : int)) ->
-                            (((Int.(<=) 0 (Int.(-) k 2 : int)) and
+                            (((Int.(<=) 0 (Int.(-) k 2 : int)) /\
                               (Int.(<) (Int.(-) k 2 : int) (array_length t2 : int))) ->
                              (forall result0:int.
                                ((result0 = (access t2 (Int.(-) k 2 : int) : int)) ->
-                                (((Int.(<=) 0 k) and
+                                (((Int.(<=) 0 k) /\
                                   (Int.(<) k (array_length t2 : int))) ->
                                  (forall t3:(farray int).
                                    ((t3 = (update t2 k (Int.(+) result result0 : int) : (farray int))) ->
@@ -962,68 +962,68 @@ use array.Array as A
   goal Fib4_po_19:
     (forall n:int.
       (forall t:(farray int).
-        (((Int.(<=) 0 n) and (Int.(<) n (array_length t : int))) ->
+        (((Int.(<=) 0 n) /\ (Int.(<) n (array_length t : int))) ->
          ((Int.(>) n 1) ->
-          (((Int.(<=) 0 0) and (Int.(<) 0 (array_length t : int))) ->
+          (((Int.(<=) 0 0) /\ (Int.(<) 0 (array_length t : int))) ->
            (forall t0:(farray int).
              ((t0 = (update t 0 1 : (farray int))) ->
-              (((Int.(<=) 0 1) and (Int.(<) 1 (array_length t0 : int))) ->
+              (((Int.(<=) 0 1) /\ (Int.(<) 1 (array_length t0 : int))) ->
                (forall t1:(farray int).
                  ((t1 = (update t0 1 1 : (farray int))) ->
                   (forall k:int.
                     (forall t2:(farray int).
-                      ((((Int.(<=) 2 k) and (Int.(<=) k (Int.(+) n 1 : int))) and
-                        (((array_length t2 : int) = (array_length t : int)) and
+                      ((((Int.(<=) 2 k) /\ (Int.(<=) k (Int.(+) n 1 : int))) /\
+                        (((array_length t2 : int) = (array_length t : int)) /\
                          (forall i:int.
-                           (((Int.(<=) 0 i) and (Int.(<) i k)) ->
+                           (((Int.(<=) 0 i) /\ (Int.(<) i k)) ->
                             ((access t2 i : int) = (why3_F i : int)))))) ->
                        ((Int.(<=) k n) ->
-                        (((Int.(<=) 0 (Int.(-) k 1 : int)) and
+                        (((Int.(<=) 0 (Int.(-) k 1 : int)) /\
                           (Int.(<) (Int.(-) k 1 : int) (array_length t2 : int))) ->
                          (forall result:int.
                            ((result = (access t2 (Int.(-) k 1 : int) : int)) ->
-                            (((Int.(<=) 0 (Int.(-) k 2 : int)) and
+                            (((Int.(<=) 0 (Int.(-) k 2 : int)) /\
                               (Int.(<) (Int.(-) k 2 : int) (array_length t2 : int))) ->
                              (forall result0:int.
                                ((result0 = (access t2 (Int.(-) k 2 : int) : int)) ->
-                                (((Int.(<=) 0 k) and
+                                (((Int.(<=) 0 k) /\
                                   (Int.(<) k (array_length t2 : int))) ->
                                  (forall t3:(farray int).
                                    ((t3 = (update t2 k (Int.(+) result result0 : int) : (farray int))) ->
                                     (forall k0:int.
                                       ((k0 = (Int.(+) k 1 : int)) ->
                                        (forall i:int.
-                                         (((Int.(<=) 0 i) and (Int.(<) i k0)) ->
+                                         (((Int.(<=) 0 i) /\ (Int.(<) i k0)) ->
                                           ((access t3 i : int) = (why3_F i : int)))))))))))))))))))))))))))))
 
   goal Fib4_po_20:
     (forall n:int.
       (forall t:(farray int).
-        (((Int.(<=) 0 n) and (Int.(<) n (array_length t : int))) ->
+        (((Int.(<=) 0 n) /\ (Int.(<) n (array_length t : int))) ->
          ((Int.(>) n 1) ->
-          (((Int.(<=) 0 0) and (Int.(<) 0 (array_length t : int))) ->
+          (((Int.(<=) 0 0) /\ (Int.(<) 0 (array_length t : int))) ->
            (forall t0:(farray int).
              ((t0 = (update t 0 1 : (farray int))) ->
-              (((Int.(<=) 0 1) and (Int.(<) 1 (array_length t0 : int))) ->
+              (((Int.(<=) 0 1) /\ (Int.(<) 1 (array_length t0 : int))) ->
                (forall t1:(farray int).
                  ((t1 = (update t0 1 1 : (farray int))) ->
                   (forall k:int.
                     (forall t2:(farray int).
-                      ((((Int.(<=) 2 k) and (Int.(<=) k (Int.(+) n 1 : int))) and
-                        (((array_length t2 : int) = (array_length t : int)) and
+                      ((((Int.(<=) 2 k) /\ (Int.(<=) k (Int.(+) n 1 : int))) /\
+                        (((array_length t2 : int) = (array_length t : int)) /\
                          (forall i:int.
-                           (((Int.(<=) 0 i) and (Int.(<) i k)) ->
+                           (((Int.(<=) 0 i) /\ (Int.(<) i k)) ->
                             ((access t2 i : int) = (why3_F i : int)))))) ->
                        ((Int.(<=) k n) ->
-                        (((Int.(<=) 0 (Int.(-) k 1 : int)) and
+                        (((Int.(<=) 0 (Int.(-) k 1 : int)) /\
                           (Int.(<) (Int.(-) k 1 : int) (array_length t2 : int))) ->
                          (forall result:int.
                            ((result = (access t2 (Int.(-) k 1 : int) : int)) ->
-                            (((Int.(<=) 0 (Int.(-) k 2 : int)) and
+                            (((Int.(<=) 0 (Int.(-) k 2 : int)) /\
                               (Int.(<) (Int.(-) k 2 : int) (array_length t2 : int))) ->
                              (forall result0:int.
                                ((result0 = (access t2 (Int.(-) k 2 : int) : int)) ->
-                                (((Int.(<=) 0 k) and
+                                (((Int.(<=) 0 k) /\
                                   (Int.(<) k (array_length t2 : int))) ->
                                  (forall t3:(farray int).
                                    ((t3 = (update t2 k (Int.(+) result result0 : int) : (farray int))) ->
@@ -1034,31 +1034,31 @@ use array.Array as A
   goal Fib4_po_21:
     (forall n:int.
       (forall t:(farray int).
-        (((Int.(<=) 0 n) and (Int.(<) n (array_length t : int))) ->
+        (((Int.(<=) 0 n) /\ (Int.(<) n (array_length t : int))) ->
          ((Int.(>) n 1) ->
-          (((Int.(<=) 0 0) and (Int.(<) 0 (array_length t : int))) ->
+          (((Int.(<=) 0 0) /\ (Int.(<) 0 (array_length t : int))) ->
            (forall t0:(farray int).
              ((t0 = (update t 0 1 : (farray int))) ->
-              (((Int.(<=) 0 1) and (Int.(<) 1 (array_length t0 : int))) ->
+              (((Int.(<=) 0 1) /\ (Int.(<) 1 (array_length t0 : int))) ->
                (forall t1:(farray int).
                  ((t1 = (update t0 1 1 : (farray int))) ->
                   (forall k:int.
                     (forall t2:(farray int).
-                      ((((Int.(<=) 2 k) and (Int.(<=) k (Int.(+) n 1 : int))) and
-                        (((array_length t2 : int) = (array_length t : int)) and
+                      ((((Int.(<=) 2 k) /\ (Int.(<=) k (Int.(+) n 1 : int))) /\
+                        (((array_length t2 : int) = (array_length t : int)) /\
                          (forall i:int.
-                           (((Int.(<=) 0 i) and (Int.(<) i k)) ->
+                           (((Int.(<=) 0 i) /\ (Int.(<) i k)) ->
                             ((access t2 i : int) = (why3_F i : int)))))) ->
                        ((Int.(<=) k n) ->
-                        (((Int.(<=) 0 (Int.(-) k 1 : int)) and
+                        (((Int.(<=) 0 (Int.(-) k 1 : int)) /\
                           (Int.(<) (Int.(-) k 1 : int) (array_length t2 : int))) ->
                          (forall result:int.
                            ((result = (access t2 (Int.(-) k 1 : int) : int)) ->
-                            (((Int.(<=) 0 (Int.(-) k 2 : int)) and
+                            (((Int.(<=) 0 (Int.(-) k 2 : int)) /\
                               (Int.(<) (Int.(-) k 2 : int) (array_length t2 : int))) ->
                              (forall result0:int.
                                ((result0 = (access t2 (Int.(-) k 2 : int) : int)) ->
-                                (((Int.(<=) 0 k) and
+                                (((Int.(<=) 0 k) /\
                                   (Int.(<) k (array_length t2 : int))) ->
                                  (forall t3:(farray int).
                                    ((t3 = (update t2 k (Int.(+) result result0 : int) : (farray int))) ->
@@ -1069,43 +1069,43 @@ use array.Array as A
   goal Fib4_po_22:
     (forall n:int.
       (forall t:(farray int).
-        (((Int.(<=) 0 n) and (Int.(<) n (array_length t : int))) ->
+        (((Int.(<=) 0 n) /\ (Int.(<) n (array_length t : int))) ->
          ((Int.(>) n 1) ->
-          (((Int.(<=) 0 0) and (Int.(<) 0 (array_length t : int))) ->
+          (((Int.(<=) 0 0) /\ (Int.(<) 0 (array_length t : int))) ->
            (forall t0:(farray int).
              ((t0 = (update t 0 1 : (farray int))) ->
-              (((Int.(<=) 0 1) and (Int.(<) 1 (array_length t0 : int))) ->
+              (((Int.(<=) 0 1) /\ (Int.(<) 1 (array_length t0 : int))) ->
                (forall t1:(farray int).
                  ((t1 = (update t0 1 1 : (farray int))) ->
                   (forall k:int.
                     (forall t2:(farray int).
-                      ((((Int.(<=) 2 k) and (Int.(<=) k (Int.(+) n 1 : int))) and
-                        (((array_length t2 : int) = (array_length t : int)) and
+                      ((((Int.(<=) 2 k) /\ (Int.(<=) k (Int.(+) n 1 : int))) /\
+                        (((array_length t2 : int) = (array_length t : int)) /\
                          (forall i:int.
-                           (((Int.(<=) 0 i) and (Int.(<) i k)) ->
+                           (((Int.(<=) 0 i) /\ (Int.(<) i k)) ->
                             ((access t2 i : int) = (why3_F i : int)))))) ->
                        ((Int.(>) k n) -> (Int.(<) n (array_length t2 : int))))))))))))))))
 
   goal Fib4_po_23:
     (forall n:int.
       (forall t:(farray int).
-        (((Int.(<=) 0 n) and (Int.(<) n (array_length t : int))) ->
+        (((Int.(<=) 0 n) /\ (Int.(<) n (array_length t : int))) ->
          ((Int.(>) n 1) ->
-          (((Int.(<=) 0 0) and (Int.(<) 0 (array_length t : int))) ->
+          (((Int.(<=) 0 0) /\ (Int.(<) 0 (array_length t : int))) ->
            (forall t0:(farray int).
              ((t0 = (update t 0 1 : (farray int))) ->
-              (((Int.(<=) 0 1) and (Int.(<) 1 (array_length t0 : int))) ->
+              (((Int.(<=) 0 1) /\ (Int.(<) 1 (array_length t0 : int))) ->
                (forall t1:(farray int).
                  ((t1 = (update t0 1 1 : (farray int))) ->
                   (forall k:int.
                     (forall t2:(farray int).
-                      ((((Int.(<=) 2 k) and (Int.(<=) k (Int.(+) n 1 : int))) and
-                        (((array_length t2 : int) = (array_length t : int)) and
+                      ((((Int.(<=) 2 k) /\ (Int.(<=) k (Int.(+) n 1 : int))) /\
+                        (((array_length t2 : int) = (array_length t : int)) /\
                          (forall i:int.
-                           (((Int.(<=) 0 i) and (Int.(<) i k)) ->
+                           (((Int.(<=) 0 i) /\ (Int.(<) i k)) ->
                             ((access t2 i : int) = (why3_F i : int)))))) ->
                        ((Int.(>) k n) ->
-                        (((Int.(<=) 0 n) and
+                        (((Int.(<=) 0 n) /\
                           (Int.(<) n (array_length t2 : int))) ->
                          (forall result:int.
                            ((result = (access t2 n : int)) ->

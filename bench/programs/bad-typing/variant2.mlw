@@ -5,7 +5,7 @@ module M
  
   use import int.Int
 
-  logic rel int int
+  predicate rel int int
 
   let rec even (x:int) : int variant {x} with rel =
     odd (x-1) 

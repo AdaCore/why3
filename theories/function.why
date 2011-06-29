@@ -1,8 +1,8 @@
 theory Injective
   type a
   type v
-  logic to_ a : v
-  logic from v : a
+  function to_ a : v
+  function from v : a
 
   axiom Inj : forall x : a. from(to_ x) = x
 
@@ -14,11 +14,11 @@ end
 theory Surjective
   type a
   type v
-  logic to_ a : v
-  logic from v : a
+  function to_ a : v
+  function from v : a
 
   clone import Injective with type v = a, type a = v,
-    logic to_ = from, logic from = to_
+    function to_ = from, function from = to_
 
 end
 
