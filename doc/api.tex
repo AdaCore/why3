@@ -51,7 +51,7 @@ ocamlc str.cma unix.cma nums.cma dynlink.cma \
 \end{verbatim}
 Running the generated executable \texttt{f} results in the following output.
 \begin{verbatim}
-formula 1 is: true or false
+formula 1 is: true \/ false
 \end{verbatim}
 
 Let's now build a formula with propositional variables: $A \land B
@@ -77,7 +77,7 @@ let () = printf "@[formula 2 is:@ %a@]@." Pretty.print_term fmla2
 
 As expected, the output is as follows.
 \begin{verbatim}
-formula 2 is: A and B -> A
+formula 2 is: A /\ B -> A
 \end{verbatim}
 Notice that the concrete syntax of \why\ forbids predicate identifiers
 to start with a capital letter. This constraint does not exist when
@@ -133,16 +133,16 @@ Execution of our OCaml program now outputs:
 \begin{verbatim}
 task 1 is:
 theory Task
-  goal Goal1 : true or false
+  goal Goal1 : true \/ false
 end
 
 task 2 is:
 theory Task
-  logic A
+  predicate A
 
-  logic B
+  predicate B
 
-  goal Goal2 : A and B -> A
+  goal Goal2 : A /\ B -> A
 end
 \end{verbatim}
 

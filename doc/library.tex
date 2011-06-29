@@ -10,10 +10,10 @@ corresponding file, or alternatively, use the \verb|why3| with option
 > why3 -T bool.Ite
 theory Ite
   (* use BuiltIn *)
-  
+
   (* use Bool *)
-  
-  logic ite (b:bool) (x:'a) (y:'a) : 'a =
+
+  function ite (b:bool) (x:'a) (y:'a) : 'a =
     match b with
     | True -> x
     | False -> y
@@ -214,8 +214,8 @@ is inspired by~\cite{ayad10ijcar}.
 \section{Library \texttt{string}}
 
 \begin{description}
-\item[Char] 
-\item[String] 
+\item[Char]
+\item[String]
 \end{description}
 
 %%% Local Variables:

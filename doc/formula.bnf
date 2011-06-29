@@ -2,9 +2,9 @@
   formula ::= "true" | "false" ;
        | formula "->"  formula ; implication
        | formula "<->" formula ; equivalence
-       | formula "and" formula ; conjunction
+       | formula "/\" formula ; conjunction
        | formula "&&"  formula ; asymmetric conjunction
-       | formula "or"  formula ; disjunction
+       | formula "\/"  formula ; disjunction
        | formula "||"  formula ; asymmetric disjunction
        | "not" formula         ; negation
        | lqualid 	       ; symbol

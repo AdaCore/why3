@@ -1,8 +1,9 @@
 \begin{syntax}
   theory ::= "theory" uident label* decl* "end" 
   \
-  decl ::= "type" type-decl ("with" type-decl)*	   ;
-    | "logic" logic-decl ("with" logic-decl)*         ;
+  decl ::= "type" type-decl ("with" type-decl)* ;
+    | "function" function-decl ("with" logic-decl)* ;
+    | "predicate" predicate-decl ("with" logic-decl)* ;
     | "inductive" inductive-decl ("with" inductive-decl)* ;
     | "axiom" ident ":" formula 	   ;
     | "lemma" ident ":" formula 	   ;
@@ -22,9 +23,13 @@
   \
   record-field ::= lident label* ":" type
   \
-  logic-decl ::= lident label* type-param* ":" type ;
-    | lident label* type-param* ":" type "=" term   ;
-    | lident label* type-param*                     ;
+  logic-decl ::= function-decl ;
+    | predicate-decl
+  \
+  function-decl ::= lident label* type-param* ":" type ;
+    | lident label* type-param* ":" type "=" term
+  \
+  predicate-decl ::= lident label* type-param* ;
     | lident label* type-param* "=" formula
   \
   type-param ::= "'" lident   ;
@@ -45,7 +50,8 @@
   subst ::= "with" ("," subst-elt)+
   \
   subst-elt ::= "type" lqualid "=" lqualid ;
-    | "logic" lqualid "=" lqualid          ;
+    | "function" lqualid "=" lqualid          ;
+    | "predicate" lqualid "=" lqualid         ;
     | "namespace" (uqualid | ".") "=" (uqualid | ".")  ;
     | "lemma" uqualid 	  		   ;
     | "goal"  uqualid			   ;

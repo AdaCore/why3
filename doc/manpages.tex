@@ -69,7 +69,7 @@ make install_lib
 \why\ can use a wide range of external theorem provers. These need to
 be installed separately, and then \why\ needs to be configured to use
 them. There is no need to install these provers before compiling and
-installing Why. 
+installing Why.
 
 For installation of external provers, please look at the Why provers
 tips page \url{http://why.lri.fr/provers.en.html}.
@@ -101,9 +101,9 @@ tracking system).
 
 The result of provers detection is stored in the user's
 configuration file (\verb+~/.why.conf+ or, in the case of local
-installation, \verb+why.conf+ in Why3 sources top directory). This file 
+installation, \verb+why.conf+ in Why3 sources top directory). This file
 is also human-readable, and advanced users may modify it in order to
-experiment with different ways of calling provers, \eg{} different 
+experiment with different ways of calling provers, \eg{} different
 versions of the same prover, or with different options.
 
 The provers which are typically looked for are
@@ -127,7 +127,7 @@ printer, as explained in the corresponding section.
 
 If the user's configuration file is already present,
 \texttt{why3config} will only reset unset variables to default value,
-but will not try to detect provers. 
+but will not try to detect provers.
 The option \texttt{--detect-provers} should be used to force
 \why\ to detect again the available
 provers and to replace them in the configuration file. The option
@@ -152,9 +152,9 @@ The \texttt{why3} tool executes the following steps:
 \item Parse and typecheck the given files using the correct parser in order
   to obtain a set of \why\ theories for each file. It uses
   the filename extension or the \texttt{--format} option to choose
-  among the available parsers. The \texttt{--list-format} option gives 
+  among the available parsers. The \texttt{--list-format} option gives
   the list of registered parsers.
-\item Extract the selected goals inside each of the selected theories 
+\item Extract the selected goals inside each of the selected theories
   into tasks. The goals and theories are selected using the options
   \texttt{-G/--goal} and \texttt{-T/--theory}. The option
   \texttt{-T/--theory} applies to the last file appearing on the
@@ -248,7 +248,7 @@ the actions of the various menus and buttons of the interface.
 
 \item[Replay] replay all obsolete proofs [NOT YET AVAILABLE]
 
-\item[Remove] Removes a proof attempt or a transformation. 
+\item[Remove] Removes a proof attempt or a transformation.
 
 \end{description}
 
@@ -286,7 +286,7 @@ The preferences window allows you customize
   pressed. This might be overidden for a specific prover (the only way
   to do that for the moment is to manually edit the config file)
 \item the time limit given to provers, in seconds
-\item the maximal number of simultaneous provers allowed to run in parallel. 
+\item the maximal number of simultaneous provers allowed to run in parallel.
 \end{itemize}
 
 \subsection{Structure of the database file}
@@ -497,7 +497,7 @@ definitions~\cite{paskevich09rr}
 
 \item[eliminate\_if\_fmla] replaces formulas of the form \texttt{if f1 then f2
   else f3} by an equivalent formula using implications and other
-  connectives. 
+  connectives.
 
 \item[eliminate\_if]
   Apply both transformations above.
@@ -544,7 +544,8 @@ definitions~\cite{paskevich09rr}
   removes definitions of the form
 
 \begin{verbatim}
-logic f x_1 .. x_n = (g e_1 .. e_k)
+function  f x_1 .. x_n = (g e_1 .. e_k)
+predicate p x_1 .. x_n = (q e_1 .. e_k)
 \end{verbatim}
 when each $e_i$ is either a ground term or one of the $x_j$, and
 each $x_1$ .. $x_n$ occur at most once in the $e_i$
@@ -565,14 +566,14 @@ each $x_1$ .. $x_n$ occur at most once in the $e_i$
 \item[simplify\_recursive\_definition] reduces mutually recursive
   definitions if they are not really mutually recursive, e.g.:
 \begin{verbatim}
-logic f : ... = .... g ...
+function f : ... = .... g ...
 
 with g : .. = e
 \end{verbatim}
 becomes
 \begin{verbatim}
-logic g : .. = e
-logic f : ... = .... g ...
+function g : .. = e
+function f : ... = .... g ...
 \end{verbatim}
 if f does not occur in e
 
@@ -586,13 +587,13 @@ or
   forall x, t=x -> P(x)
 \end{verbatim}
   when x does not occur in t
-  into 
+  into
 \begin{verbatim}
 P(t)
 \end{verbatim}
   More generally, it applies this simplification whenever x=t appear
   in a negative position.
-  
+
 \item[simplify\_trivial\_quantification\_in\_goal]
   same as above but applies only in the goal.
 

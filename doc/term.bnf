@@ -6,7 +6,7 @@
        | bang-op term 	  ;
        | term infix-op term 	  ;
        | term "[" term "]"	  ; brackets
-       | term "[" term infix-op-1 term "]" 	  ; ternary brackets
+       | term "[" term "<-" term "]" 	  ; ternary brackets
        | lqualid term+ 		  ; function application
        | "if" formula "then" term ;
          "else" term              ; conditional
@@ -15,7 +15,7 @@
        | "match" term ("," term)* "with" ;
          ("|" term-case)+ "end"          ; pattern matching
        | "(" term ("," term)+ ")" ; tuple
-       | "{|" field-value+ "|}"   ; record 
+       | "{|" field-value+ "|}"   ; record
        | term "." lqualid         ; field access
        | "{|" term "with" field-value+ "|}"    ; field update
        | term ":" type 	          ; cast
@@ -32,5 +32,5 @@
 	    | "(" pattern ")" 	  ; parentheses
 	    | pattern "as" lident ; binding
   \
-  field-value ::= lqualid "=" term
+  field-value ::= lqualid "=" term ";"
 \end{syntax}

@@ -8,7 +8,7 @@ A \why\ text contains a list of \emph{theories}.
 A theory is a list of \emph{declarations}. Declarations introduce new
 types, functions and predicates, state axioms, lemmas and goals.
 These declarations can be directly written in the theory or taken from
-existing theories. The base logic of \why\ is a first-order
+existing theories. The base logic of \why\ is first-order
 logic with polymorphic types.
 
 \subsection{Example 1: lists}
@@ -35,7 +35,7 @@ theory Length
   use import List
   use import int.Int
 
-  logic length (l : list 'a) : int =
+  function length (l : list 'a) : int =
     match l with
     | Nil      -> 0
     | Cons _ r -> 1 + length r
@@ -77,8 +77,9 @@ either appear earlier in the current file, \eg\ \texttt{List}, or are
 predefined.
 
 The next declaration defines a recursive function, \texttt{length},
-which computes the length of a list. The \texttt{logic} keyword is
-used to introduce or define both function and predicate symbols.
+which computes the length of a list. The \texttt{function} and
+\texttt{predicate} keywords are used to introduce function and
+predicate symbols, respectively.
 \why\ checks every recursive, or mutually recursive, definition for
 termination. Basically, we require a lexicographic and structural
 descent for every recursive call for some reordering of arguments.
@@ -122,7 +123,7 @@ abstract (\emph{i.e.}~declared but not defined) symbols.
 \begin{verbatim}
 theory Order
   type t
-  logic (<=) t t
+  predicate (<=) t t
 
   axiom Le_refl : forall x : t. x <= x
   axiom Le_asym : forall x y : t. x <= y -> y <= x -> x = y
@@ -145,7 +146,7 @@ end
 
 theory SortedIntList
   use import int.Int
-  clone SortedGen with type O.t = int, logic O.(<=) = (<=)
+  clone SortedGen with type O.t = int, predicate O.(<=) = (<=)
 end
 \end{verbatim}
 \caption{Example of Why3 text (continued).}
@@ -238,7 +239,7 @@ theory SortedIntList
   axiom Le_trans : forall x:int, y:int, z:int. x <= y -> y <= z
     -> x <= z
 
-  (* clone Order with type t = int, logic (<=) = (<=),
+  (* clone Order with type t = int, predicate (<=) = (<=),
     prop Le_trans1 = Le_trans, prop Le_asym1 = Le_asym,
     prop Le_refl1 = Le_refl *)
 
@@ -248,8 +249,8 @@ theory SortedIntList
     | Sorted_Two : forall x:int, y:int, l:list int. x <= y ->
         sorted (Cons y l) -> sorted (Cons x (Cons y l))
 
-  (* clone SortedGen with type t1 = int, logic sorted1 = sorted,
-    logic (<=) = (<=), prop Sorted_Two1 = Sorted_Two,
+  (* clone SortedGen with type t1 = int, predicate sorted1 = sorted,
+    predicate (<=) = (<=), prop Sorted_Two1 = Sorted_Two,
     prop Sorted_One1 = Sorted_One, prop Sorted_Nil1 = Sorted_Nil,
     prop Le_trans2 = Le_trans, prop Le_asym2 = Le_asym,
     prop Le_refl2 = Le_refl *)
@@ -347,8 +348,8 @@ theory Bijection
   type t
   type u
 
-  logic of t : u
-  logic to u : t
+  function of t : u
+  function to u : t
 
   axiom To_of : forall x : t. to (of x) = x
   axiom Of_to : forall y : u. of (to y) = y
@@ -392,7 +393,7 @@ and that drinks, cigars and pets are all associated bijectively to persons:
 Next we need a way to state that a person lives next to another. We
 first define a predicate \texttt{leftof} over two houses.
 \begin{verbatim}
-  logic leftof (h1 h2 : house) =
+  predicate leftof (h1 h2 : house) =
     match h1, h2 with
     | H1, H2
     | H2, H3
@@ -406,10 +407,10 @@ for the four positive cases and a universal pattern for the remaining
 21 cases. It is then immediate to define a \texttt{neighbour}
 predicate over two houses, which completes theory \texttt{Einstein}.
 \begin{verbatim}
-  logic rightof (h1 h2 : house) =
+  predicate rightof (h1 h2 : house) =
     leftof h2 h1
-  logic neighbour (h1 h2 : house) =
-    leftof h1 h2 or rightof h1 h2
+  predicate neighbour (h1 h2 : house) =
+    leftof h1 h2 \/ rightof h1 h2
 end
 \end{verbatim}
 

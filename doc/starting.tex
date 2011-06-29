@@ -6,7 +6,7 @@
 The first and basic step in using \why\ is to write a suitable input
 file. When one wants to learn a programming language, you start by
 writing a basic program. Here we start by writing a file containing a
-basic set of goals. 
+basic set of goals.
 
 Here is our first \why\ file, which is the file
 \texttt{examples/hello\_proof.why} of the distribution.
@@ -24,7 +24,7 @@ We don't give more details here about the syntax and refer to
 Chapter~\ref{chap:syntax} for detailed explanations. In the following,
 we show how this file is handled in the \why\ GUI
 (Section~\ref{sec:gui}) then in batch mode using the \texttt{why3}
-executable (Section~\ref{sec:batch}). 
+executable (Section~\ref{sec:batch}).
 
 
 \section{Getting Started with the GUI}
@@ -73,7 +73,7 @@ file is shown on the bottom right part.
 Notice also that three provers were detected, and are now shown
 in the ``provers'' section of the left toolbar. In this example,
 detected provers are Alt-Ergo~\cite{ergo}, Coq~\cite{CoqArt} and
-Simplify~\cite{simplify05}. 
+Simplify~\cite{simplify05}.
 
 \subsection{Calling provers on goals}
 
@@ -99,7 +99,7 @@ are not proved, they are marked with an orange question mark.
 
 You can immediately attempt to prove the remaining goals using another
 prover, {\eg} Alt-Ergo, by clicking on the corresponding button. The
-goal $G_3$ should be proved now, but not $G_2$. 
+goal $G_3$ should be proved now, but not $G_2$.
 
 \subsection{Applying transformations}
 
@@ -130,7 +130,7 @@ Please take care of the comments of this file. Only the part between
 the two last comments can be modified. Moreover, these comments
 themselves should not be modified at all, they are used to mark the
 part you modify, in order to regenerate the file if the goal is
-changed. 
+changed.
 
 \begin{figure}[tbp]
   \includegraphics[width=\textwidth]{coqide.png}
@@ -147,7 +147,7 @@ explained below.
 Currently, the GUI does not allow to modify the input file. You must
 exit the GUI and modify the file by some editor of your choice. Let's assume we change the goal $G_2$ by replacing the first occurrence of true by false, \eg
 \begin{verbatim}
-  goal G2 : (false -> false) and (true or false)
+  goal G2 : (false -> false) /\ (true \/ false)
 \end{verbatim}
 Starting the IDE on the modified file and expanding everything with
 \textsf{Ctrl-E}, we get the tree view shown on Figure~\ref{fig:gui5}.
@@ -194,7 +194,7 @@ Known provers:
 \end{verbatim}
 The first word of each line is a unique identifier for the associated prover. We thus
 have now the three provers Alt-Ergo~\cite{ergo}, Coq~\cite{CoqArt} and
-Simplify~\cite{simplify05}. 
+Simplify~\cite{simplify05}.
 
 Let's assume now we want to run Simplify on the HelloProof
 example. The command to type and its output are as follows, where the
