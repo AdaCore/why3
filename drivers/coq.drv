@@ -30,38 +30,38 @@ theory BuiltIn
 
   syntax type   int   "Z"
   syntax type   real  "R"
-  syntax logic  (=)   "(%1 = %2)"
+  syntax predicate  (=)   "(%1 = %2)"
 end
 
 theory bool.Bool
 
   syntax type bool   "bool"
 
-  syntax logic True  "true"
-  syntax logic False "false"
+  syntax function True  "true"
+  syntax function False "false"
 
-  syntax logic andb  "(andb %1 %2)"
-  syntax logic orb   "(orb %1 %2)"
-  syntax logic xorb  "(xorb %1 %2)"
-  syntax logic notb  "(negb %1)"
+  syntax function andb  "(andb %1 %2)"
+  syntax function orb   "(orb %1 %2)"
+  syntax function xorb  "(xorb %1 %2)"
+  syntax function notb  "(negb %1)"
 
 end
 
 
 theory int.Int
 
-  syntax logic zero "0%Z"
-  syntax logic one  "1%Z"
+  syntax function zero "0%Z"
+  syntax function one  "1%Z"
 
-  syntax logic (+)  "(%1 + %2)%Z"
-  syntax logic (-)  "(%1 - %2)%Z"
-  syntax logic (*)  "(%1 * %2)%Z"
-  syntax logic (-_) "(-%1)%Z"
+  syntax function (+)  "(%1 + %2)%Z"
+  syntax function (-)  "(%1 - %2)%Z"
+  syntax function (*)  "(%1 * %2)%Z"
+  syntax function (-_) "(-%1)%Z"
 
-  syntax logic (<=) "(%1 <= %2)%Z"
-  syntax logic (<)  "(%1 <  %2)%Z"
-  syntax logic (>=) "(%1 >= %2)%Z"
-  syntax logic (>)  "(%1 >  %2)%Z"
+  syntax predicate (<=) "(%1 <= %2)%Z"
+  syntax predicate (<)  "(%1 <  %2)%Z"
+  syntax predicate (>=) "(%1 >= %2)%Z"
+  syntax predicate (>)  "(%1 >  %2)%Z"
 
   remove prop CommutativeGroup.Comm.Comm
   remove prop CommutativeGroup.Assoc.Assoc
@@ -83,14 +83,14 @@ end
 
 theory int.Abs
 
-  syntax logic abs "(Zabs %1)"
+  syntax function abs "(Zabs %1)"
 
 end
 
 theory int.MinMax
 
-  syntax logic min "(Zmin %1 %2)"
-  syntax logic max "(Zmax %1 %2)"
+  syntax function min "(Zmin %1 %2)"
+  syntax function max "(Zmax %1 %2)"
 
 end
 
@@ -98,8 +98,8 @@ theory int.EuclideanDivision
 
   prelude "Require Import Zdiv."
 
-  syntax logic div "(Zdiv %1 %2)"
-  syntax logic mod "(Zmod %1 %2)"
+  syntax function div "(Zdiv %1 %2)"
+  syntax function mod "(Zmod %1 %2)"
 
 end
 
@@ -107,28 +107,28 @@ theory int.ComputerDivision
 
   prelude "Require Import ZOdiv."
 
-  syntax logic div "(ZOdiv %1 %2)"
-  syntax logic mod "(ZOmod %1 %2)"
+  syntax function div "(ZOdiv %1 %2)"
+  syntax function mod "(ZOmod %1 %2)"
 
 end
 
 
 theory real.Real
 
-  syntax logic zero "0%R"
-  syntax logic one  "1%R"
+  syntax function zero "0%R"
+  syntax function one  "1%R"
 
-  syntax logic (+)  "(%1 + %2)%R"
-  syntax logic (-)  "(%1 - %2)%R"
-  syntax logic (-_) "(-%1)%R"
-  syntax logic (*)  "(%1 * %2)%R"
-  syntax logic (/)  "(Rdiv %1 %2)%R"
-  syntax logic inv  "(Rinv %1)"
+  syntax function (+)  "(%1 + %2)%R"
+  syntax function (-)  "(%1 - %2)%R"
+  syntax function (-_) "(-%1)%R"
+  syntax function (*)  "(%1 * %2)%R"
+  syntax function (/)  "(Rdiv %1 %2)%R"
+  syntax function inv  "(Rinv %1)"
 
-  syntax logic (<=) "(%1 <= %2)%R"
-  syntax logic (<)  "(%1 <  %2)%R"
-  syntax logic (>=) "(%1 >= %2)%R"
-  syntax logic (>)  "(%1 >  %2)%R"
+  syntax predicate (<=) "(%1 <= %2)%R"
+  syntax predicate (<)  "(%1 <  %2)%R"
+  syntax predicate (>=) "(%1 >= %2)%R"
+  syntax predicate (>)  "(%1 >  %2)%R"
 
   remove prop CommutativeGroup.Comm.Comm
   remove prop CommutativeGroup.Assoc.Assoc
@@ -151,16 +151,16 @@ end
 
 theory real.RealInfix
 
-  syntax logic (+.)  "(%1 + %2)%R"
-  syntax logic (-.)  "(%1 - %2)%R"
-  syntax logic (-._) "(-%1)%R"
-  syntax logic ( *.) "(%1 * %2)%R"
-  syntax logic (/.)  "(%1 / %2)%R"
+  syntax function (+.)  "(%1 + %2)%R"
+  syntax function (-.)  "(%1 - %2)%R"
+  syntax function (-._) "(-%1)%R"
+  syntax function ( *.) "(%1 * %2)%R"
+  syntax function (/.)  "(%1 / %2)%R"
 
-  syntax logic (<=.) "(%1 <= %2)%R"
-  syntax logic (<.)  "(%1 <  %2)%R"
-  syntax logic (>=.) "(%1 >= %2)%R"
-  syntax logic (>.)  "(%1 >  %2)%R"
+  syntax predicate (<=.) "(%1 <= %2)%R"
+  syntax predicate (<.)  "(%1 <  %2)%R"
+  syntax predicate (>=.) "(%1 >= %2)%R"
+  syntax predicate (>.)  "(%1 >  %2)%R"
 
 end
 
@@ -168,7 +168,7 @@ theory real.Abs
 
   prelude "Require Import Rbasic_fun."
 
-  syntax logic abs "(Rabs %1)"
+  syntax function abs "(Rabs %1)"
 
   remove prop Abs_pos
 
@@ -176,7 +176,7 @@ end
 
 theory real.FromInt
 
-  syntax logic from_int "(IZR %1)"
+  syntax function from_int "(IZR %1)"
 
 end
 
@@ -184,8 +184,8 @@ theory real.Square
 
   prelude "Require Import R_sqrt."
 
-  syntax logic sqr  "(Rsqr %1)"
-  syntax logic sqrt "(sqrt %1)"  (* and not Rsqrt *)
+  syntax function sqr  "(Rsqr %1)"
+  syntax function sqrt "(sqrt %1)"  (* and not Rsqrt *)
 
 end
 
@@ -195,8 +195,8 @@ theory real.ExpLog
   prelude "Require Import Rtrigo_def."
   prelude "Require Import Rpower."
 
-  syntax logic exp "(exp %1)"
-  syntax logic log "(ln %1)"
+  syntax function exp "(exp %1)"
+  syntax function log "(ln %1)"
 
   remove prop Exp_zero
   remove prop Exp_sum
@@ -220,12 +220,12 @@ theory real.Trigonometry
   prelude "Require Import Rtrigo."
   prelude "Require Import AltSeries. (* for def of pi *)"
 
-  syntax logic cos "(Rtrigo_def.cos %1)"
-  syntax logic sin "(Rtrigo_def.sin %1)"
+  syntax function cos "(Rtrigo_def.cos %1)"
+  syntax function sin "(Rtrigo_def.sin %1)"
 
-  syntax logic pi "PI"
+  syntax function pi "PI"
 
-  syntax logic tan "(Rtrigo.tan %1)"
-  (* syntax logic atan "atan not defined in Coq ?" *)
+  syntax function tan "(Rtrigo.tan %1)"
+  (* syntax function atan "atan not defined in Coq ?" *)
 
 end

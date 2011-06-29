@@ -2,8 +2,9 @@ import "alt_ergo.drv"
 
 theory map.Map
   syntax type  map "(%1,%2) farray"
-  syntax logic get "(%1[%2])"
-  syntax logic set "(%1[%2 <- %3])"
+
+  syntax function get "(%1[%2])"
+  syntax function set "(%1[%2 <- %3])"
 end
 
 (*

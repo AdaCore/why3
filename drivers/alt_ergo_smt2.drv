@@ -25,7 +25,8 @@ transformation "encoding_smt"
 theory BuiltIn
   syntax type int   "Int"
   syntax type real  "Real"
-  syntax logic (=)  "(= %1 %2)"
+
+  syntax predicate (=)  "(= %1 %2)"
 
   meta "encoding : kept" type int
 end
@@ -34,18 +35,18 @@ theory int.Int
 
   prelude ";;; this is a prelude for Alt-Ergo integer arithmetic"
 
-  syntax logic zero "0"
-  syntax logic one  "1"
+  syntax function zero "0"
+  syntax function one  "1"
 
-  syntax logic (+)  "(+ %1 %2)"
-  syntax logic (-)  "(- %1 %2)"
-  syntax logic (*)  "(* %1 %2)"
-  syntax logic (-_) "(- %1)"
+  syntax function (+)  "(+ %1 %2)"
+  syntax function (-)  "(- %1 %2)"
+  syntax function (*)  "(* %1 %2)"
+  syntax function (-_) "(- %1)"
 
-  syntax logic (<=) "(<= %1 %2)"
-  syntax logic (<)  "(< %1 %2)"
-  syntax logic (>=) "(>= %1 %2)"
-  syntax logic (>)  "(> %1 %2)"
+  syntax predicate (<=) "(<= %1 %2)"
+  syntax predicate (<)  "(< %1 %2)"
+  syntax predicate (>=) "(>= %1 %2)"
+  syntax predicate (>)  "(> %1 %2)"
 
   remove prop CommutativeGroup.Comm.Comm
   remove prop CommutativeGroup.Assoc.Assoc
@@ -66,8 +67,8 @@ end
 
 theory int.EuclideanDivision
 
-  syntax logic div "(div %1 %2)"
-  syntax logic mod "(mod %1 %2)"
+  syntax function div "(div %1 %2)"
+  syntax function mod "(mod %1 %2)"
 
 end
 
@@ -75,20 +76,20 @@ theory real.Real
 
   prelude ";;; this is a prelude for Alt-Ergo real arithmetic"
 
-  syntax logic zero "0.0"
-  syntax logic one  "1.0"
+  syntax function zero "0.0"
+  syntax function one  "1.0"
 
-  syntax logic (+)  "(+ %1 %2)"
-  syntax logic (-)  "(- %1 %2)"
-  syntax logic (*)  "(* %1 %2)"
-  syntax logic (/)  "(/ %1 %2)"
-  syntax logic (-_) "(- %1)"
-  syntax logic inv  "(/ 1.0 %1)"
+  syntax function (+)  "(+ %1 %2)"
+  syntax function (-)  "(- %1 %2)"
+  syntax function (*)  "(* %1 %2)"
+  syntax function (/)  "(/ %1 %2)"
+  syntax function (-_) "(- %1)"
+  syntax function inv  "(/ 1.0 %1)"
 
-  syntax logic (<=) "(<= %1 %2)"
-  syntax logic (<)  "(< %1 %2)"
-  syntax logic (>=) "(>= %1 %2)"
-  syntax logic (>)  "(> %1 %2)"
+  syntax predicate (<=) "(<= %1 %2)"
+  syntax predicate (<)  "(< %1 %2)"
+  syntax predicate (>=) "(>= %1 %2)"
+  syntax predicate (>)  "(> %1 %2)"
 
   remove prop CommutativeGroup.Comm.Comm
   remove prop CommutativeGroup.Assoc.Assoc

@@ -25,7 +25,8 @@ type cloned = bool
 
 type metarg =
   | PMAts  of qualid
-  | PMAls  of qualid
+  | PMAfs  of qualid
+  | PMAps  of qualid
   | PMApr  of qualid
   | PMAstr of string
   | PMAint of int
@@ -33,7 +34,8 @@ type metarg =
 type th_rule =
   | Rprelude  of string
   | Rsyntaxts of cloned * qualid * string
-  | Rsyntaxls of cloned * qualid * string
+  | Rsyntaxfs of cloned * qualid * string
+  | Rsyntaxps of cloned * qualid * string
   | Rremovepr of cloned * qualid
   | Rmeta     of cloned * string * metarg list
 

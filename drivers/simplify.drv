@@ -31,7 +31,7 @@ trigger they can't appear since = can't appear *)
 transformation "encoding_tptp"
 
 theory BuiltIn
-  syntax logic (=)  "(EQ %1 %2)"
+  syntax predicate (=)  "(EQ %1 %2)"
 
   meta "enco_poly" "decorate"
   meta "encoding : kept" type int
@@ -42,18 +42,18 @@ theory int.Int
 
   prelude ";;; this is a prelude for Simplify integer arithmetic"
 
-  syntax logic zero "0"
-  syntax logic one  "1"
+  syntax function zero "0"
+  syntax function one  "1"
 
-  syntax logic (+)  "(+ %1 %2)"
-  syntax logic (-)  "(- %1 %2)"
-  syntax logic (*)  "(* %1 %2)"
-  syntax logic (-_) "(- 0 %1)"
+  syntax function (+)  "(+ %1 %2)"
+  syntax function (-)  "(- %1 %2)"
+  syntax function (*)  "(* %1 %2)"
+  syntax function (-_) "(- 0 %1)"
 
-  syntax logic (<=) "(<= %1 %2)"
-  syntax logic (<)  "(< %1 %2)"
-  syntax logic (>=) "(>= %1 %2)"
-  syntax logic (>)  "(> %1 %2)"
+  syntax predicate (<=) "(<= %1 %2)"
+  syntax predicate (<)  "(< %1 %2)"
+  syntax predicate (>=) "(>= %1 %2)"
+  syntax predicate (>)  "(> %1 %2)"
 
   remove prop CommutativeGroup.Comm.Comm
   remove prop CommutativeGroup.Assoc.Assoc

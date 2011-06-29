@@ -1,7 +1,7 @@
 (* Why driver for SMT syntax *)
 
 prelude ";;; this is a prelude for Z3"
-prelude "(set-logic AUFNIRA)"
+prelude "(set-function AUFNIRA)"
 
 printer "smtv2"
 filename "%f-%t-%g.smt"
@@ -29,7 +29,7 @@ transformation "encoding_smt"
 theory BuiltIn
   syntax type int   "Int"
   syntax type real  "Real"
-  syntax logic (=)  "(= %1 %2)"
+  syntax predicate (=)  "(= %1 %2)"
 
   meta "encoding : kept" type int
 end
@@ -38,18 +38,18 @@ theory int.Int
 
   prelude ";;; this is a prelude for Z3 integer arithmetic"
 
-  syntax logic zero "0"
-  syntax logic one  "1"
+  syntax function zero "0"
+  syntax function one  "1"
 
-  syntax logic (+)  "(+ %1 %2)"
-  syntax logic (-)  "(- %1 %2)"
-  syntax logic (*)  "(* %1 %2)"
-  syntax logic (-_) "(- %1)"
+  syntax function (+)  "(+ %1 %2)"
+  syntax function (-)  "(- %1 %2)"
+  syntax function (*)  "(* %1 %2)"
+  syntax function (-_) "(- %1)"
 
-  syntax logic (<=) "(<= %1 %2)"
-  syntax logic (<)  "(< %1 %2)"
-  syntax logic (>=) "(>= %1 %2)"
-  syntax logic (>)  "(> %1 %2)"
+  syntax predicate (<=) "(<= %1 %2)"
+  syntax predicate (<)  "(< %1 %2)"
+  syntax predicate (>=) "(>= %1 %2)"
+  syntax predicate (>)  "(> %1 %2)"
 
   remove prop CommutativeGroup.Comm.Comm
   remove prop CommutativeGroup.Assoc.Assoc
@@ -73,20 +73,20 @@ theory real.Real
 
   prelude ";;; this is a prelude for Z3 real arithmetic"
 
-  syntax logic zero "0.0"
-  syntax logic one  "1.0"
+  syntax function zero "0.0"
+  syntax function one  "1.0"
 
-  syntax logic (+)  "(+ %1 %2)"
-  syntax logic (-)  "(- %1 %2)"
-  syntax logic (*)  "(* %1 %2)"
-  syntax logic (/)  "(/ %1 %2)"
-  syntax logic (-_) "(- %1)"
-  syntax logic inv  "(/ 1.0 %1)"
+  syntax function (+)  "(+ %1 %2)"
+  syntax function (-)  "(- %1 %2)"
+  syntax function (*)  "(* %1 %2)"
+  syntax function (/)  "(/ %1 %2)"
+  syntax function (-_) "(- %1)"
+  syntax function inv  "(/ 1.0 %1)"
 
-  syntax logic (<=) "(<= %1 %2)"
-  syntax logic (<)  "(< %1 %2)"
-  syntax logic (>=) "(>= %1 %2)"
-  syntax logic (>)  "(> %1 %2)"
+  syntax predicate (<=) "(<= %1 %2)"
+  syntax predicate (<)  "(< %1 %2)"
+  syntax predicate (>=) "(>= %1 %2)"
+  syntax predicate (>)  "(> %1 %2)"
 
   remove prop CommutativeGroup.Comm.Comm
   remove prop CommutativeGroup.Assoc.Assoc
@@ -112,20 +112,20 @@ end
 (* L'encodage des types sommes bloquent cette théorie builtin *)
 theory bool.Bool
    syntax type bool   "bool"
-   syntax logic True  "true"
-   syntax logic False "false"
-   syntax logic andb  "(and %1 %2)"
-   syntax logic orb   "(or %1 %2)"
-   syntax logic xorb  "(xor %1 %2)"
-   syntax logic notb  "(not %1)"
+   syntax function True  "true"
+   syntax function False "false"
+   syntax function andb  "(and %1 %2)"
+   syntax function orb   "(or %1 %2)"
+   syntax function xorb  "(xor %1 %2)"
+   syntax function notb  "(not %1)"
    meta cloned "encoding_decorate : kept" type bool
 end
 *)
 
 
 theory int.EuclideanDivision
-   syntax logic div "(div %1 %2)"
-   syntax logic mod "(mod %1 %2)"
+   syntax function div "(div %1 %2)"
+   syntax function mod "(mod %1 %2)"
    remove prop Mod_bound
    remove prop Div_mod
    remove prop Mod_1
@@ -134,7 +134,7 @@ end
 
 (*
 theory real.FromInt
-  syntax logic from_int "(from_int %1)"
+  syntax function from_int "(from_int %1)"
   remove prop Add
   remove prop Sub
   remove prop Mul
@@ -144,7 +144,7 @@ end
 
 (*
 theory real.Truncate
-  syntax logic floor "(to_int %1)"
+  syntax function floor "(to_int %1)"
   remove prop Floor_down
   remove prop Floor_monotonic
 end
@@ -152,13 +152,13 @@ end
 
 theory map.Map
   syntax type map "(Array %1 %2)"
-  meta "encoding : lskept" logic get
-  meta "encoding : lskept" logic set
-  meta "encoding : lskept" logic const
+  meta "encoding : lskept" function get
+  meta "encoding : lskept" function set
+  meta "encoding : lskept" function const
 
-  syntax logic get   "(select %1 %2)"
-  syntax logic set   "(store %1 %2 %3)"
-  syntax logic const "(const[%t0] %1)"
+  syntax function get   "(select %1 %2)"
+  syntax function set   "(store %1 %2 %3)"
+  syntax function const "(const[%t0] %1)"
 end
 
 

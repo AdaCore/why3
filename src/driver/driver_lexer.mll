@@ -47,7 +47,8 @@
         "time",    TIME;
         "unknown", UNKNOWN;
         "fail", FAIL;
-        "logic", LOGIC;
+        "function", FUNCTION;
+        "predicate", PREDICATE;
         "type", TYPE;
         "prop", PROP;
         "filename", FILENAME;

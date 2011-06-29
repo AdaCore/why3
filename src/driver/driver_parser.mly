@@ -36,7 +36,7 @@
 %token THEORY END SYNTAX REMOVE META PRELUDE PRINTER
 %token VALID INVALID TIMEOUT UNKNOWN FAIL TIME
 %token UNDERSCORE LEFTPAR RIGHTPAR CLONED DOT EOF
-%token LOGIC TYPE PROP FILENAME TRANSFORM PLUGIN
+%token FUNCTION PREDICATE TYPE PROP FILENAME TRANSFORM PLUGIN
 %token LEFTPAR_STAR_RIGHTPAR COMMA
 %token LEFTSQ RIGHTSQ LARROW
 
@@ -88,12 +88,13 @@ list0_trule:
 ;
 
 trule:
-| PRELUDE STRING                      { Rprelude  ($2) }
-| SYNTAX cloned TYPE qualid STRING    { Rsyntaxts ($2, $4, $5) }
-| SYNTAX cloned LOGIC qualid STRING   { Rsyntaxls ($2, $4, $5) }
-| REMOVE cloned PROP qualid           { Rremovepr ($2, $4) }
-| META cloned ident meta_args         { Rmeta     ($2, $3, $4) }
-| META cloned STRING meta_args        { Rmeta     ($2, $3, $4) }
+| PRELUDE STRING                          { Rprelude  ($2) }
+| SYNTAX cloned TYPE      qualid STRING   { Rsyntaxts ($2, $4, $5) }
+| SYNTAX cloned FUNCTION  qualid STRING   { Rsyntaxfs ($2, $4, $5) }
+| SYNTAX cloned PREDICATE qualid STRING   { Rsyntaxps ($2, $4, $5) }
+| REMOVE cloned PROP qualid               { Rremovepr ($2, $4) }
+| META cloned ident meta_args             { Rmeta     ($2, $3, $4) }
+| META cloned STRING meta_args            { Rmeta     ($2, $3, $4) }
 ;
 
 meta_args:
@@ -102,11 +103,12 @@ meta_args:
 ;
 
 meta_arg:
-| TYPE  qualid { PMAts  $2 }
-| LOGIC qualid { PMAls  $2 }
-| PROP  qualid { PMApr  $2 }
-| STRING       { PMAstr $1 }
-| INTEGER      { PMAint $1 }
+| TYPE      qualid { PMAts  $2 }
+| FUNCTION  qualid { PMAfs  $2 }
+| PREDICATE qualid { PMAps  $2 }
+| PROP      qualid { PMApr  $2 }
+| STRING           { PMAstr $1 }
+| INTEGER          { PMAint $1 }
 ;
 
 cloned:

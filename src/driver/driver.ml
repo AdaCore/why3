@@ -79,6 +79,8 @@ exception Duplicate    of string
 exception UnknownType  of (string list * string list)
 exception UnknownLogic of (string list * string list)
 exception UnknownProp  of (string list * string list)
+exception FSymExpected of lsymbol
+exception PSymExpected of lsymbol
 
 let load_driver = let driver_tag = ref (-1) in fun env file ->
   let prelude   = ref [] in
@@ -129,6 +131,12 @@ let load_driver = let driver_tag = ref (-1) in fun env file ->
   let find_ts th (loc,q) = try ns_find_ts th.th_export q
     with Not_found -> raise (Loc.Located (loc, UnknownType (!qualid,q)))
   in
+  let find_fs th q =
+    let ls = find_ls th q in
+    if ls.ls_value = None then raise (FSymExpected ls) else ls in
+  let find_ps th q =
+    let ls = find_ls th q in
+    if ls.ls_value <> None then raise (PSymExpected ls) else ls in
   let add_meta th td m =
     let s = try snd (Mid.find th.th_name !m) with Not_found -> Stdecl.empty in
     m := Mid.add th.th_name (th, Stdecl.add td s) !m
@@ -140,8 +148,11 @@ let load_driver = let driver_tag = ref (-1) in fun env file ->
     | Rsyntaxts (c,q,s) ->
         let td = syntax_type (find_ts th q) s in
         add_meta th td (if c then meta_cl else meta)
-    | Rsyntaxls (c,q,s) ->
-        let td = syntax_logic (find_ls th q) s in
+    | Rsyntaxfs (c,q,s) ->
+        let td = syntax_logic (find_fs th q) s in
+        add_meta th td (if c then meta_cl else meta)
+    | Rsyntaxps (c,q,s) ->
+        let td = syntax_logic (find_ps th q) s in
         add_meta th td (if c then meta_cl else meta)
     | Rremovepr (c,q) ->
         let td = remove_prop (find_pr th q) in
@@ -149,7 +160,8 @@ let load_driver = let driver_tag = ref (-1) in fun env file ->
     | Rmeta (c,s,al) ->
         let convert = function
           | PMAts q  -> MAts (find_ts th q)
-          | PMAls q  -> MAls (find_ls th q)
+          | PMAfs q  -> MAls (find_fs th q)
+          | PMAps q  -> MAls (find_ps th q)
           | PMApr q  -> MApr (find_pr th q)
           | PMAstr s -> MAstr s
           | PMAint i -> MAint i
@@ -302,5 +314,9 @@ let () = Exn_printer.register (fun fmt exn -> match exn with
       "Unknown proposition %s" (string_of_qualid thl idl)
   | UnknownSpec s -> Format.fprintf fmt
       "Unknown format specifier '%%%s', use %%f, %%t or %%g" s
+  | FSymExpected ls -> Format.fprintf fmt
+      "%a is not a function symbol" Pretty.print_ls ls
+  | PSymExpected ls -> Format.fprintf fmt
+      "%a is not a predicate symbol" Pretty.print_ls ls
   | e -> raise e)
 

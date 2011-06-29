@@ -16,16 +16,16 @@ transformation "encoding_smt"
 theory BuiltIn
   syntax type  int  "int"
   syntax type  real "real"
-  syntax logic (=)  "(%1 = %2)"
+  syntax predicate (=)  "(%1 = %2)"
 
   meta "encoding : kept" type int
   meta "encoding : kept" type real
 end
 
 theory map.Map
-  meta "encoding : lskept" logic get
-  meta "encoding : lskept" logic set
-  meta "encoding : lskept" logic const
+  meta "encoding : lskept" function get
+  meta "encoding : lskept" function set
+  meta "encoding : lskept" function const
 end
 
 import "discrimination.gen"
