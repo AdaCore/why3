@@ -36,8 +36,6 @@ val join : position -> position -> position
 
 exception Located of position * exn
 
-val string : position -> string
-
 val dummy_position : position
 
 val user_position : string -> int -> int -> int -> position
@@ -48,4 +46,5 @@ val compare : position -> position -> int
 
 val gen_report_position : formatter -> position -> unit
 
+val report_position : formatter -> position -> unit
 

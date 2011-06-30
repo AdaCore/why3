@@ -102,6 +102,9 @@ let opt_command = ref None
 let opt_task = ref None
 let opt_bisect = ref false
 
+let opt_print_libdir = ref false
+let opt_print_datadir = ref false
+
 let opt_print_theory = ref false
 let opt_print_namespace = ref false
 let opt_list_transforms = ref false
@@ -199,15 +202,26 @@ let option_list = Arg.align [
       " Set all debug flags (except parse_only and type_only)";
   "--debug", Arg.String add_opt_debug,
       "<flag> Set a debug flag";
+  "--print-libdir", Arg.Set opt_print_libdir,
+      " Print location of binary components (plugins, etc)";
+  "--print-datadir", Arg.Set opt_print_datadir,
+      " Print location of non-binary data (theories, modules, etc)";
   "--version", Arg.Set opt_version,
       " Print version information" ]
 
-let () =
-  try
+let () = try
   Arg.parse option_list add_opt_file usage_msg;
 
   if !opt_version then begin
     printf "%s@." version_msg;
+    exit 0
+  end;
+  if !opt_print_libdir then begin
+    printf "%s@." Config.libdir;
+    exit 0
+  end;
+  if !opt_print_datadir then begin
+    printf "%s@." Config.datadir;
     exit 0
   end;
 
@@ -322,7 +336,6 @@ let () =
     exit 1
   end;
 
-
   opt_loadpath := List.rev_append !opt_loadpath (Whyconf.loadpath main);
   if !opt_timelimit = None then opt_timelimit := Some (Whyconf.timelimit main);
   if !opt_memlimit  = None then opt_memlimit  := Some (Whyconf.memlimit main);
@@ -341,6 +354,7 @@ let () =
     add_meta task meta [MAstr s]
   in
   opt_task := List.fold_left add_meta !opt_task !opt_metas
+
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1
@@ -500,7 +514,7 @@ let do_input env drv = function
       close_in cin;
       if !opt_type_only then
         ()
-      else 
+      else
 	match !opt_coq_realization with
 	  | Some f ->
 	      Queue.iter (do_coq_realize_theory env drv f fname m) tlist

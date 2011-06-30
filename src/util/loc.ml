@@ -76,22 +76,13 @@ let compare (_,l1,b1,e1) (_,l2,b2,e2) =
   Pervasives.compare e1 e2
 
 let gen_report_position fmt (f,l,b,e) =
-  fprintf fmt "File \"%s\", " f;
-  fprintf fmt "line %d, characters %d-%d" l b e
+  fprintf fmt "File \"%s\", line %d, characters %d-%d" f l b e
 
-let string =
-  let buf = Buffer.create 1024 in
-  fun loc ->
-    let fmt = Format.formatter_of_buffer buf in
-    Format.fprintf fmt "%a@?" gen_report_position loc;
-    let s = Buffer.contents buf in
-    Buffer.reset buf;
-    s
+let report_position fmt = fprintf fmt "%a:@\n" gen_report_position
 
 let () = Exn_printer.register
   (fun fmt exn -> match exn with
     | Located (loc,e) ->
-      fprintf fmt "%a:@\n%a@\n" gen_report_position loc
-        Exn_printer.exn_printer e
+        fprintf fmt "%a%a" report_position loc Exn_printer.exn_printer e
     | _ -> raise exn)
 
