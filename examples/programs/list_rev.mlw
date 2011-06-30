@@ -10,8 +10,8 @@ module M
   type next = map pointer pointer
   function null : pointer
 
-  parameter value : ref (map pointer int)
-  parameter next : ref (next)
+  val value : ref (map pointer int)
+  val next : ref (next)
 
   inductive is_list (next : next) (p : pointer) =
     | is_list_null:
@@ -193,8 +193,8 @@ module M2
   type next = map pointer pointer
   function null : pointer
 
-  parameter value : ref (map pointer int)
-  parameter next : ref (next)
+  val value : ref (map pointer int)
+  val next : ref (next)
 
   inductive is_list (next : next) (p : pointer) =
     | is_list_null:

@@ -3,8 +3,8 @@ module M
 
   use import module ref.Ref
 
-  parameter foo : int -> int
+  val foo : int -> int
 
-  parameter f : x:int -> {} unit writes foo.contents {}
+  val f : x:int -> {} unit writes foo.contents {}
 
 end

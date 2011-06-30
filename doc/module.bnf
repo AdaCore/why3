@@ -5,7 +5,7 @@
     | "type" mtype-decl ("with" mtype-decl)*    ; mutable types
     | "let" lident label* pgm-defn              ;
     | "let" "rec" recfun ("with" recfun)*  ;
-    | "parameter" lident label* pgm-decl        ;
+    | "val" lident label* pgm-decl        ;
     | "exception" lident label* type?           ;
     | "use" imp-exp "module" tqualid ("as" uident-opt)?     ;
     | "namespace" "import"? uident-opt mdecl* "end" ;

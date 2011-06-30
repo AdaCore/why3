@@ -4,9 +4,9 @@ module M
 
   predicate q1 int int int
 
-  parameter r : ref int
+  val r : ref int
 
-  parameter f1 : y:int ->
+  val f1 : y:int ->
              {} unit writes r { q1 !r (old !r) y }
 
   let g1 () = {} f1 !r { q1 !r (old !r) (old !r) }
@@ -14,7 +14,7 @@ module M
   function foo int : int
   predicate q int int int
 
-  parameter f : t:ref int -> x:int ->
+  val f : t:ref int -> x:int ->
              {} unit writes t { q !t (old !t) x }
 
   let g (t:ref int) =

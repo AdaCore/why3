@@ -9,13 +9,13 @@ module M
 
   (* iteration on a set *)
 
-  parameter set_has_next :
+  val set_has_next :
     s:ref (S.set 'a) ->
       {}
       bool reads s
       { if result=True then S.is_empty !s else not S.is_empty !s }
 
-  parameter set_next :
+  val set_next :
     s:ref (S.set 'a) ->
       { not S.is_empty !s }
       'a writes s
@@ -36,31 +36,31 @@ module M
 
   axiom Weight_nonneg : forall x y:vertex. weight x y >= 0
 
-  parameter eq_vertex :
+  val eq_vertex :
     x:vertex -> y:vertex -> {} bool { if result=True then x=y else x<>y }
 
   (* visited vertices *)
 
-  parameter visited : ref (S.set vertex)
+  val visited : ref (S.set vertex)
 
-  parameter visited_add :
+  val visited_add :
     x:vertex -> {} unit writes visited { !visited = S.add x (old !visited) }
 
   (* current distances *)
 
-  parameter d : ref (M.map vertex int)
+  val d : ref (M.map vertex int)
 
   (* priority queue *)
 
-  parameter q : ref (S.set vertex)
+  val q : ref (S.set vertex)
 
-  parameter q_is_empty :
+  val q_is_empty :
     unit ->
       {}
       bool reads q
       { if result=True then S.is_empty !q else not S.is_empty !q }
 
-  parameter init :
+  val init :
     src:vertex ->
       {}
       unit writes visited q d
@@ -93,7 +93,7 @@ module M
     S.mem m q /\
     forall x:vertex. S.mem x q -> d[m] <= d[x]
 
-  parameter q_extract_min :
+  val q_extract_min :
     unit ->
       { not S.is_empty !q }
       vertex reads d writes q

@@ -95,13 +95,13 @@
         "model", MODEL;
         "module", MODULE;
         "mutable", MUTABLE;
-        "parameter", PARAMETER;
         "raise", RAISE;
         "raises", RAISES;
         "reads", READS;
         "rec", REC;
         "to", TO;
         "try", TRY;
+        "val", VAL;
         "variant", VARIANT;
         "while", WHILE;
         "writes", WRITES;

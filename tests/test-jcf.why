@@ -1,22 +1,22 @@
 
 theory Bijection
   use export int.Int
-  logic n : int
-  logic f int : int
+  function n : int
+  function f int : int
   axiom dom_f : forall i: int. 0 <= i < n -> 0 <= f i < n
-  logic g int : int
+  function g int : int
   axiom gf : forall i: int. 0 <= i < n -> g (f i) = i
 end
 
 theory Test1
-  logic id (i: int) : int = i
-  clone import Bijection with logic f = id, lemma dom_f
+  function id (i: int) : int = i
+  clone import Bijection with function f = id, lemma dom_f
   goal G: n > 4 -> g (id 4) = 4
 end
 
 theory Order
   type t
-  logic (<=) t t
+  predicate (<=) t t
 
   axiom le_refl : forall x : t. x <= x
   axiom le_asym : forall x y : t. x <= y -> y <= x -> x = y

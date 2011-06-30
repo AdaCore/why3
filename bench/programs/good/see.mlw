@@ -5,9 +5,9 @@ use import module ref.Ref
 
 (* Side effect in expressions (Bart Jacobs' tricky example) *)
 
-parameter b  : ref int
-parameter b1 : ref int
-parameter b2 : ref int
+val b  : ref int
+val b1 : ref int
+val b2 : ref int
 
 let f () =
   {} b := 1 - !b; !b { result = !b /\ !b = 1 - old !b }

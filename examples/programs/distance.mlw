@@ -30,18 +30,18 @@ module Distance
 
   type word = list a
 
-  parameter w1 : array a
-  parameter w2 : array a
+  val w1 : array a
+  val w2 : array a
 
   (* Global variables of the program. The program uses an auxiliary
      array [t] of integers of size [n2+1] and three auxiliary
      integer variables [i], [j] and [old]. *)
 
-  parameter t : array int
+  val t : array int
 
-  parameter i : ref int
-  parameter j : ref int
-  parameter o : ref int
+  val i : ref int
+  val j : ref int
+  val o : ref int
 
   (* Auxiliary definitions for the program and its specification. *)
 

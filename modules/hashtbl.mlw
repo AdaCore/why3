@@ -10,60 +10,60 @@ module Hashtbl
 
   function ([]) (h: t 'a) (k: key) : list 'a = Map.([]) h.contents k
 
-  parameter create (n:int) :
+  val create (n:int) :
     {} t 'a { forall k: key. result[k] = Nil }
 
-  parameter clear (h: t 'a) :
+  val clear (h: t 'a) :
     {} unit writes h { forall k: key. h[k] = Nil }
 
-  parameter add (h: t 'a) (k: key) (v: 'a) :
+  val add (h: t 'a) (k: key) (v: 'a) :
     {}
     unit writes h
     { h[k] = Cons v (old h)[k] /\
       forall k': key. k' <> k -> h[k'] = (old h)[k'] }
 
-  parameter mem (h: t 'a) (k: key) :
+  val mem (h: t 'a) (k: key) :
     {}
     bool reads h
     { result=True <-> h[k] <> Nil }
 
-  parameter find (h: t 'a) (k: key) :
+  val find (h: t 'a) (k: key) :
     { h[k] <> Nil }
     'a reads h
     { match h[k] with Nil -> false | Cons v _ -> result = v end }
 
-  parameter find_all (h: t 'a) (k: key) :
+  val find_all (h: t 'a) (k: key) :
     {}
     list 'a reads h
     { result = h[k] }
 
   exception NotFound
 
-  parameter defensive_find (h: t 'a) (k: key) :
+  val defensive_find (h: t 'a) (k: key) :
     {}
     'a reads h raises NotFound
     { match h[k] with Nil -> false | Cons v _ -> result = v end }
     | NotFound -> { h[k] = Nil }
 
-  parameter copy (h: t 'a) :
+  val copy (h: t 'a) :
     {}
     t 'a reads h
     { forall k: key. result[k] = h[k] }
 
-  parameter remove (h: t 'a) (k: key) :
+  val remove (h: t 'a) (k: key) :
     { h[k] <> Nil }
     unit writes h
     { (match (old h)[k] with Nil -> false | Cons _ l -> h[k] =l end) /\
       forall k': key. k' <> k -> h[k'] = (old h)[k'] }
 
-  parameter replace (h: t 'a) (k: key) (v: 'a) :
+  val replace (h: t 'a) (k: key) (v: 'a) :
     {}
     unit writes h
     { (h[k] = Cons v (match (old h)[k] with Nil -> Nil | Cons _ l -> l end))
       /\
       forall k': key. k' <> k -> h[k'] = (old h)[k'] }
 
-  parameter length (h: t 'a) :
+  val length (h: t 'a) :
     {}
     int reads h
     {} (* = the number of distinct keys *)

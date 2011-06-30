@@ -187,8 +187,8 @@ end
 
 %token ABSTRACT ABSURD ANY ASSERT ASSUME BEGIN CHECK DO DONE DOWNTO
 %token EXCEPTION FOR
-%token FUN INVARIANT LABEL LOOP MODEL MODULE MUTABLE PARAMETER RAISE
-%token RAISES READS REC TO TRY VARIANT WHILE WRITES
+%token FUN INVARIANT LABEL LOOP MODEL MODULE MUTABLE RAISE
+%token RAISES READS REC TO TRY VAL VARIANT WHILE WRITES
 
 /* symbols */
 
@@ -986,9 +986,9 @@ program_decl:
     { Dlet (add_lab $2 $3, mk_expr_i 8 (Efun ($6, $8))) }
 | LET REC list1_recfun_sep_and
     { Dletrec $3 }
-| PARAMETER lident_rich_pgm labels COLON type_v
+| VAL lident_rich_pgm labels COLON type_v
     { Dparam (add_lab $2 $3, $5) }
-| PARAMETER lident_rich_pgm labels list1_type_v_param COLON type_c
+| VAL lident_rich_pgm labels list1_type_v_param COLON type_c
     { let tv = Tarrow ($4, $6) in
       Dparam (add_lab $2 $3, tv) }
 | EXCEPTION uident labels

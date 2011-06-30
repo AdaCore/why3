@@ -19,15 +19,15 @@ module M
   predicate inv (t : table) =
     forall x y : int. t[x] = Some y -> y = fib x
 
-  parameter table : ref table
+  val table : ref table
 
-  parameter add :
+  val add :
     x:int -> y:int ->
       {} unit writes table { !table = (old !table)[x <- Some y] }
 
   exception Not_found
 
-  parameter find :
+  val find :
     x:int ->
      {}
      int reads table raises Not_found

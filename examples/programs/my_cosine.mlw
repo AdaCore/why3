@@ -6,22 +6,22 @@ module M
   use import floating_point.Rounding
   use import floating_point.Single
 
-parameter single_of_real_exact : x:real ->
+val single_of_real_exact : x:real ->
   { }
   single
   { value result = x }
 
-parameter add : x:single -> y:single ->
+val add : x:single -> y:single ->
   { no_overflow NearestTiesToEven ((value x) +. (value y)) }
   single
   { value result = round NearestTiesToEven ((value x) +. (value y))}
 
-parameter sub : x:single -> y:single ->
+val sub : x:single -> y:single ->
   { no_overflow NearestTiesToEven ((value x) -. (value y)) }
   single
   { value result = round NearestTiesToEven ((value x) -. (value y))}
 
-parameter mul : x:single -> y:single ->
+val mul : x:single -> y:single ->
   { no_overflow NearestTiesToEven ((value x) *. (value y)) }
   single
   { value result = round NearestTiesToEven ((value x) *. (value y))}

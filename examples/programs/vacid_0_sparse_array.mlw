@@ -4,80 +4,80 @@ module SparseArray
       If the sparse array contains three elements x y z, at index
       a b c respectively, then the three arrays look like this:
 
-             b     a      c
-val   +-----+-+---+-+----+-+----+
-      |     |y|   |x|    |z|    |
-      +-----+-+---+-+----+-+----+
+              b     a      c
+values +-----+-+---+-+----+-+----+
+       |     |y|   |x|    |z|    |
+       +-----+-+---+-+----+-+----+
 
-idx   +-----+-+---+-+----+-+----+
-      |     |1|   |0|    |2|    |
-      +-----+-+---+-+----+-+----+
+index  +-----+-+---+-+----+-+----+
+       |     |1|   |0|    |2|    |
+       +-----+-+---+-+----+-+----+
 
-       0 1 2  n=3
-back  +-+-+-+-------------------+
-      |a|b|c|                   |
-      +-+-+-+-------------------+
+        0 1 2  n=3
+back   +-+-+-+-------------------+
+       |a|b|c|                   |
+       +-+-+-+-------------------+
 
 *)
 
   use import int.Int
   use import module array.Array as A
 
-  type sparse_array 'a = {| val  : array 'a;
-                            idx  : array int;
-                            back : array int;
-                    mutable card : int;
-                         default : 'a; |}
+  type sparse_array 'a = {| values : array 'a;
+                            index  : array int;
+                            back   : array int;
+                    mutable card   : int;
+                            def    : 'a; |}
 
   predicate is_elt (a: sparse_array 'a) (i: int) =
-    0 <= a.idx[i] < a.card /\ a.back[a.idx[i]] = i
+    0 <= a.index[i] < a.card /\ a.back[a.index[i]] = i
 
   function value (a: sparse_array 'a) (i: int) : 'a =
     if is_elt a i then
-      a.val[i]
+      a.values[i]
     else
-      a.default
+      a.def
 
   (* invariant *)
 
   function maxlen : int = 1000
 
-  function length (a: sparse_array 'a) : int = A.length a.val
+  function length (a: sparse_array 'a) : int = A.length a.values
 
   predicate sa_inv (a: sparse_array 'a) =
     0 <= a.card <= length a <= maxlen /\
-    A.length a.val = A.length a.idx = A.length a.back /\
+    A.length a.values = A.length a.index = A.length a.back /\
     forall i : int.
       0 <= i < a.card ->
-      0 <= a.back[i] < length a /\ a.idx[a.back[i]] = i
+      0 <= a.back[i] < length a /\ a.index[a.back[i]] = i
 
   (* creation *)
 
-  parameter malloc : n:int -> {} array 'a { A.length result = n }
+  val malloc : n:int -> {} array 'a { A.length result = n }
 
   let create (sz: int) (d: 'a) =
     { 0 <= sz <= maxlen }
-    {| val = malloc sz; 
-       idx = malloc sz; 
-       back = malloc sz; 
-       card = 0; 
-       default = d |}
-    { sa_inv result /\ result.card = 0 /\ 
-      result.default = d /\ length result = sz }
+    {| values = malloc sz;
+       index  = malloc sz;
+       back   = malloc sz;
+       card   = 0;
+       def    = d |}
+    { sa_inv result /\ result.card = 0 /\
+      result.def = d /\ length result = sz }
 
   (* access *)
 
   let test (a: sparse_array 'a) i =
     { 0 <= i < length a /\ sa_inv a }
-    0 <= a.idx[i] && a.idx[i] < a.card && a.back[a.idx[i]] = i
+    0 <= a.index[i] && a.index[i] < a.card && a.back[a.index[i]] = i
     { result=True <-> is_elt a i }
 
   let get (a: sparse_array 'a) i =
     { 0 <= i < length a /\ sa_inv a }
     if test a i then
-      a.val[i]
+      a.values[i]
     else
-      a.default
+      a.def
     { result = value a i }
 
   (* assignment *)
@@ -89,10 +89,10 @@ back  +-+-+-+-------------------+
 
   let set (a: sparse_array 'a) i v =
     { 0 <= i < length a /\ sa_inv a }
-    a.val[i] <- v;
+    a.values[i] <- v;
     if not (test a i) then begin
       assert { a.card < length a };
-      a.idx[i] <- a.card;
+      a.index[i] <- a.card;
       a.back[a.card] <- i;
       a.card <- a.card + 1
     end
@@ -107,24 +107,24 @@ module Harness
   use import module SparseArray
 
   type elt
-  function default : elt
+  function def : elt
 
   function c1 : elt
   function c2 : elt
 
   let harness () =
-    let a = create 10 default in
-    let b = create 20 default in
-    let get_a_5 = get a 5 in assert { get_a_5 = default };
-    let get_b_7 = get b 7 in assert { get_b_7 = default };
+    let a = create 10 def in
+    let b = create 20 def in
+    let get_a_5 = get a 5 in assert { get_a_5 = def };
+    let get_b_7 = get b 7 in assert { get_b_7 = def };
     set a 5 c1;
     set b 7 c2;
     let get_a_5 = get a 5 in assert { get_a_5 = c1 };
     let get_b_7 = get b 7 in assert { get_b_7 = c2 };
-    let get_a_7 = get a 7 in assert { get_a_7 = default };
-    let get_b_5 = get b 5 in assert { get_b_5 = default };
-    let get_a_0 = get a 0 in assert { get_a_0 = default };
-    let get_b_0 = get b 0 in assert { get_b_0 = default };
+    let get_a_7 = get a 7 in assert { get_a_7 = def };
+    let get_b_5 = get b 5 in assert { get_b_5 = def };
+    let get_a_0 = get a 0 in assert { get_a_0 = def };
+    let get_b_0 = get b 0 in assert { get_b_0 = def };
     ()
 
 end

@@ -5,7 +5,7 @@
    is to take advantage of the non-determinism of Hoare triples.
    Simply declaring a function
 
-      parameter random_int: unit -> {} int {}
+      val random_int: unit -> {} int {}
 
    is typically enough. Two calls to random_int return values that can not
    be proved equal, which is exactly what we need.
@@ -49,21 +49,21 @@ module State
 
   type state model {| mutable state: generator |}
 
-  parameter create (seed: int) :
+  val create (seed: int) :
     {} state { result.state = create seed }
 
-  parameter init (s: state) (seed: int) :
+  val init (s: state) (seed: int) :
     {} unit writes s { s.state = create seed }
 
-  parameter self_init (s: state) :
+  val self_init (s: state) :
     {} unit writes s {}
 
-  parameter random_bool (s: state) :
+  val random_bool (s: state) :
     {}
     bool writes s
     { s.state = next (old s.state) /\ result = get_bool s.state }
 
-  parameter random_int (s: state) (n: int) :
+  val random_int (s: state) (n: int) :
     { 0 < n }
     int writes s
     { s.state = next (old s.state) /\ result = get_int s.state n /\
@@ -78,7 +78,7 @@ module Random
   use import int.Int
   use import module State
 
-  parameter s: state
+  val s: state
 
   let init (seed: int) =
     {} init s seed { s.state = create seed }

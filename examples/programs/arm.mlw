@@ -6,13 +6,13 @@ module M
   use import module ref.Refint
   use import module array.Array
 
-  parameter a : array int
+  val a : array int
 
   predicate inv (a : array int) =
     a[0] = 0 /\ length a = 11 /\ forall k:int. 1 <= k <= 10 -> 0 < a[k]
 
-  parameter loop1 : ref int
-  parameter loop2 : ref int
+  val loop1 : ref int
+  val loop2 : ref int
 
   let insertion_sort () =
     { inv a /\
@@ -47,37 +47,37 @@ module ARM
   use export module ref.Ref
 
   (* memory *)
-  parameter mem : ref (map int int)
-  parameter mem_ldr : a:int -> {} int reads mem.contents { result = !mem[a] }
-  parameter mem_str : a:int -> v:int ->
+  val mem : ref (map int int)
+  val mem_ldr : a:int -> {} int reads mem.contents { result = !mem[a] }
+  val mem_str : a:int -> v:int ->
     {} int writes mem.contents { !mem = (old !mem)[a <- v] }
 
   (* data segment *)
   (*
-  parameter data : ref (t int int)
-  parameter data_ldr : a:int -> {} int reads data { result = data[a] }
-  parameter data_str :
+  val data : ref (t int int)
+  val data_ldr : a:int -> {} int reads data { result = data[a] }
+  val data_str :
     a:int -> v:int -> {} int writes data { data = (old data)[a <- v] }
   *)
 
   (* registers *)
-  parameter r0 : ref int
-  parameter r1 : ref int
-  parameter r2 : ref int
-  parameter r3 : ref int
+  val r0 : ref int
+  val r1 : ref int
+  val r2 : ref int
+  val r3 : ref int
   (* ... *)
-  parameter fp : ref int
-  parameter pc : ref int (* pc *)
+  val fp : ref int
+  val pc : ref int (* pc *)
 
-  parameter ldr :
+  val ldr :
     r:ref int -> a:int -> {} unit reads mem.contents writes r.contents { !r = !mem[a] }
-  parameter str :
+  val str :
     r:ref int -> a:int -> {} unit reads r.contents writes mem.contents { !mem = (old !mem)[a <- !r] }
 
   (* condition flags *)
-  parameter le : ref bool
+  val le : ref bool
 
-  parameter cmp : r:ref int -> v:int ->
+  val cmp : r:ref int -> v:int ->
     {}
     unit reads r.contents writes le.contents
     { !le=True <-> !r <= v }
@@ -106,8 +106,8 @@ module InsertionSortExample
      j = fp-20
      temp = fp-24 *)
 
-  parameter l4 : ref int
-  parameter l7 : ref int
+  val l4 : ref int
+  val l7 : ref int
 
   function a : int
 

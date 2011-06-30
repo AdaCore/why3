@@ -3,13 +3,13 @@ module M
 use import int.Int
 use import module ref.Ref
 
-parameter incr : x:ref int -> { } unit writes x { !x = old !x + 1 }
+val incr : x:ref int -> { } unit writes x { !x = old !x + 1 }
 
-parameter x : ref int
+val x : ref int
 
-parameter id_not_0 : x:int -> { x <> 0 } int { result = x }
+val id_not_0 : x:int -> { x <> 0 } int { result = x }
 
-parameter id : x:int -> { } int { result = x }
+val id : x:int -> { } int { result = x }
 
 let test_and_1 () =
   { }
@@ -50,10 +50,10 @@ let test_all_1 () =
 
   function d : int
 
-parameter vx : ref int
-parameter vy : ref int
+val vx : ref int
+val vy : ref int
 
-parameter sq : x:int -> {} int { result = x*x }
+val sq : x:int -> {} int { result = x*x }
 
 let test_cd3d () =
  { true }

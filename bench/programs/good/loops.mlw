@@ -5,7 +5,7 @@ use import module ref.Ref
 
 (** 1. A loop increasing [i] up to 10. *)
 
-parameter i : ref int
+val i : ref int
 
 let loop1 (u:unit) =
   { !i <= 10 }
@@ -18,7 +18,7 @@ let loop1 (u:unit) =
 
 (** 2. The same loop, followed by a function call. *)
 
-parameter x: ref int
+val x: ref int
 
 let negate (u:unit) = {} x := - !x { !x = - (old !x) }
 

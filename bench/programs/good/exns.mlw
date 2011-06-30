@@ -45,7 +45,7 @@ let p6 () =
 
 use import module ref.Ref
 
-parameter x : ref int
+val x : ref int
 
 let p7 () =
   {} begin x := 1; raise E; x := 2 end { false } | E -> { !x = 1 }

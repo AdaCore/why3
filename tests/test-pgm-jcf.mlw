@@ -22,10 +22,10 @@ module PoorArrays
   type array_contents 'a = {| length: int; elts : map int 'a |}
   type array 'a = ref (array_contents 'a)
 
-  parameter get (a: array 'a) (i: int) :
+  val get (a: array 'a) (i: int) :
     { 0 <= i < length !a } 'a { result = M.get !a.elts i }
 
-  parameter set (a: array 'a) (i: int) (v: 'a) :
+  val set (a: array 'a) (i: int) (v: 'a) :
     { 0 <= i < length !a } 
     unit writes a 
     { !a.length = !(old a).length && !a.elts = M.set !(old a).elts i v }
@@ -44,7 +44,7 @@ module M
 (***
   use import option.Option
 
-  parameter clear (o : option (ref int)) :
+  val clear (o : option (ref int)) :
     {} unit writes (match o with Some r -> r end).contents { !r = 0 }
 ***)
 

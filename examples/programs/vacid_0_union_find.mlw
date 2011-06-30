@@ -79,7 +79,7 @@ module M
 
   (***
 
-  parameter ghost_find : u:ref uf -> x:int ->
+  val ghost_find : u:ref uf -> x:int ->
     { inv !u /\ 0 <= x < size !u }
     int reads u
     { repr !u x result }

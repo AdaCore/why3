@@ -5,7 +5,7 @@ use import module ref.Ref
 
 (* Tests for proof obligations. *)
 
-parameter x : ref int
+val x : ref int
 
 predicate q int
 
@@ -39,7 +39,7 @@ let p9a () = {} begin x := 1; 1 end + 1 { result = 2 /\ !x = 1 }
 
 (* function with a post-condition *)
 
-parameter fsucc : x:int -> { } int { result = x + 1 }
+val fsucc : x:int -> { } int { result = x + 1 }
 
 let p10 () = {} fsucc 0 { result = 1 }
 
@@ -49,7 +49,7 @@ let p11a () = {} let a = (fsucc 1) in a + a { result = 4 }
 
 (* function with a post-condition and side-effects *)
 
-parameter incrx : unit -> { } unit writes x { !x = (old !x) + 1 }
+val incrx : unit -> { } unit writes x { !x = (old !x) + 1 }
 
 let p12 () = { !x = 0 } incrx () { !x = 1 }
 
@@ -59,7 +59,7 @@ let p13a () = {} incrx (incrx ()) { !x = (old !x) + 2 }
 
 (* function with side-effects, result and post-condition *)
 
-parameter incrx2 : unit -> { } int writes x { !x = old !x + 1 /\ result = !x }
+val incrx2 : unit -> { } int writes x { !x = old !x + 1 /\ result = !x }
 
 let p14 () = { !x = 0 } incrx2 () { result = 1 }
 

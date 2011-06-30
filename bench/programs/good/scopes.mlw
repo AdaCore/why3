@@ -11,7 +11,7 @@ module LocalFunctions
     f 2;
     assert { !x = 2 }
 
-  parameter r: ref int
+  val r: ref int
 
   (* recursive function accessing a global reference *)
   let rec test2 () =

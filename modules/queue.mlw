@@ -9,14 +9,14 @@ module Queue
 
   type t 'a model {| mutable elts: list 'a |}
 
-  parameter create : unit -> {} t 'a { result.elts = Nil }
+  val create : unit -> {} t 'a { result.elts = Nil }
 
-  parameter push :
+  val push :
     x:'a -> s:t 'a -> {} unit writes s { s.elts = old s.elts ++ Cons x Nil }
 
   exception Empty
 
-  parameter pop :
+  val pop :
     s:t 'a ->
     {}
     'a
@@ -25,7 +25,7 @@ module Queue
                           | Cons x t -> result = x /\ s.elts = t end }
     | Empty -> { s.elts = old s.elts = Nil }
 
-  parameter top :
+  val top :
     s:t 'a ->
     {}
     'a
@@ -33,14 +33,14 @@ module Queue
     { match s.elts with Nil -> false | Cons x _ -> result = x end }
     | Empty -> { s.elts = Nil }
 
-  parameter clear : s:t 'a -> {} unit writes s { s.elts = Nil }
+  val clear : s:t 'a -> {} unit writes s { s.elts = Nil }
 
-  parameter copy : s:t 'a -> {} t 'a { result = s }
+  val copy : s:t 'a -> {} t 'a { result = s }
 
-  parameter is_empty :
+  val is_empty :
     s:t 'a -> {} bool reads s { result=True <-> s.elts = Nil }
 
-  parameter length : s:t 'a -> {} int reads s { result = length s.elts }
+  val length : s:t 'a -> {} int reads s { result = length s.elts }
 
 end
 

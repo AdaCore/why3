@@ -35,14 +35,14 @@ module UnionFind_sig
 
   use export UnionFind
 
-  parameter create :
+  val create :
     n:int ->
       { 0 <= n }
       ref uf
       { num !result = n /\ size !result = n /\
         forall x:int. 0 <= x < n -> repr !result x x }
 
-  parameter find :
+  val find :
     u:ref uf -> x:int ->
       { 0 <= x < size !u }
       int writes u
@@ -50,7 +50,7 @@ module UnionFind_sig
         size !u = size (old !u) /\ num !u = num (old !u) /\
         same_reprs !u (old !u) }
 
-  parameter union :
+  val union :
     u:ref uf -> a:int -> b:int ->
       { 0 <= a < size !u /\ 0 <= b < size !u /\ not same !u a b }
       unit writes u
@@ -62,7 +62,7 @@ module UnionFind_sig
            same (old !u) x a /\ same (old !u) b y \/
            same (old !u) x b /\ same (old !u) a y }
 
-  parameter get_num_classes :
+  val get_num_classes :
     u:ref uf -> {} int reads u { result = num !u }
 
 end
@@ -95,11 +95,11 @@ module Graph_sig
   (* clone export Graph with type vertex = int *)
   use export Graph_int
 
-  parameter graph : ref graph
+  val graph : ref graph
 
-  parameter num_edges : ref int
+  val num_edges : ref int
 
-  parameter add_edge : a:int -> b:int ->
+  val add_edge : a:int -> b:int ->
     { not path !graph a b }
     unit writes num_edges graph
     { !num_edges = old !num_edges + 1 /\
@@ -120,7 +120,7 @@ module BuildMaze
   use import module UnionFind_sig
   use import module Graph_sig
 
-  parameter rand : s:int -> { 0 < s } int { 0 <= result < s }
+  val rand : s:int -> { 0 < s } int { 0 <= result < s }
 
   lemma Ineq1 :
     forall n x y:int. 0 <= n -> 0 <= x < n -> 0 <= y < n -> 0 <= x*n+y < n*n

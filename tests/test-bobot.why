@@ -3,8 +3,8 @@
 
 theory Test_inline_trivial
   type t
-  logic c : t
-  logic eq (x y :'a) = x=y
+  function c : t
+  predicate eq (x y :'a) = x=y
   goal G : eq c c
 end
 
@@ -17,15 +17,15 @@ end
 (*
 theory Test_encoding
   use import int.Int
-  logic id(x: int) : int = x
-  logic id2(x: int) : int = id(x)
-  logic succ(x:int) : int = id(x+1)
+  function id(x: int) : int = x
+  function id2(x: int) : int = id(x)
+  function succ(x:int) : int = id(x+1)
 
   type myt
-  logic f (int) : myt
+  function f (int) : myt
   clone transform.encoding_decorate.Kept with type t = myt
 
-  goal G : (forall x:int.f(x)=f(x)) or
+  goal G : (forall x:int.f(x)=f(x)) \/
     (forall x:int. x=x+1)
   goal G2 : forall x:int. let x = 0 + 1 in x = let y = 0 + 1 + 0 in y
 end
@@ -33,49 +33,49 @@ end
 
 theory Test_simplify_array
   use import int.Int
-  use import array.Array
-  goal G1 : forall x y:int. forall m: t int int.
+  use import map.Map
+  goal G1 : forall x y:int. forall m: map int int.
     get (set m y x) y = x
-  goal G2 : forall x y:int. forall m: t int int.
+  goal G2 : forall x y:int. forall m: map int int.
     get (set m y x) y = y
-  goal G3 : forall x y:int. forall m: t int int.
-    get (create_const x) y = x
+  goal G3 : forall x y:int. forall m: map int int.
+    get (const x) y = x
 end
 
 theory Test_simplify_array2
   use import int.Int
-  use import array.Array
+  use import map.Map
   type t2 'a
-  goal G1 : forall y:int. forall x:t2 int. forall m: t int (t2 int).
+  goal G1 : forall y:int. forall x:t2 int. forall m: map int (t2 int).
     get (set m y x) y = x
 end
 
 theory Test_guard
   type t
-  logic f t : t
-  logic a : t
-  logic b : t
+  function f t : t
+  function a : t
+  function b : t
   goal G : forall x:t. f a = x
 end
 
 theory Test_conjunction
   use import int.Int
-  axiom Trivial : 2 * 2 = 4 and 4 * 2 = 8
+  axiom Trivial : 2 * 2 = 4 /\ 4 * 2 = 8
   goal G : 
-    forall x:int. x*x=4 -> ((x*x*x=8 or x*x*x = -8) and x*x*2 = 8)
+    forall x:int. x*x=4 -> ((x*x*x=8 \/ x*x*x = -8) /\ x*x*2 = 8)
   goal G2 : 
     forall x:int. 
-    (x+x=4 or x*x=4) -> ((x*x*x=8 or x*x*x = -8) and x*x*2 = 8)
+    (x+x=4 \/ x*x=4) -> ((x*x*x=8 \/ x*x*x = -8) /\ x*x*2 = 8)
 end
 
 theory Split_conj
-  logic p(x:int)
-    (*goal G : forall x,y,z:int. ((p(x) -> p(y)) and ((not p(x)) -> p(z))) -> ((p(x) and p(y)) or ((not p(x)) and p(z)))*)
-    (*goal G : forall x,y,z:int. (if p(x) then p(y) else p(z)) <-> ((p(x) and p(y)) or ((not p(x)) and p(z)))*)
+  predicate p(x:int)
+    (*goal G : forall x,y,z:int. ((p(x) -> p(y)) /\ ((not p(x)) -> p(z))) -> ((p(x) /\ p(y)) \/ ((not p(x)) /\ p(z)))*)
+    (*goal G : forall x,y,z:int. (if p(x) then p(y) else p(z)) <-> ((p(x) /\ p(y)) \/ ((not p(x)) /\ p(z)))*)
     (*goal G : forall x,y,z:int. (if p(x) then p(y) else p(z)) -> (if p(x) then p(y) else p(z))*)
   goal G : forall x y z:int. (p(x) <-> p(z)) -> (p(x) <-> p(z))
-    (*goal G : forall x,y,z:int. (p(z) <-> p(x)) -> (((not p(z)) and (not p(x))  or  ((p(z)) and (p(x))))) *)
-    (*goal G : forall x,y,z:int. (p(x) or p(y)) -> p(z)*)
+    (*goal G : forall x,y,z:int. (p(z) <-> p(x)) -> (((not p(z)) /\ (not p(x))  \/  ((p(z)) /\ (p(x))))) *)
+    (*goal G : forall x,y,z:int. (p(x) \/ p(y)) -> p(z)*)
 end
 
 
@@ -85,19 +85,19 @@ theory TestEnco
   use import int.Int
   meta "encoding : kept" type int
   type mytype 'a
-  logic id(x: int) : int = x
-  logic id2(x: int) : int = id(x)
-  logic succ(x:int) : int = id(x+1)
+  function id(x: int) : int = x
+  function id2(x: int) : int = id(x)
+  function succ(x:int) : int = id(x+1)
 
-  goal G : (forall x:int. x=x) or
+  goal G : (forall x:int. x=x) \/
     (forall x:int. x=x+1)
-  logic p('a ) : mytype 'a
-  logic p2(mytype 'a) : 'a
+  function p('a ) : mytype 'a
+  function p2(mytype 'a) : 'a
   type toto
-  logic f (toto) : mytype toto
+  function f (toto) : mytype toto
   axiom A0 : forall x : toto. f(x) = p(x)
-  logic g (mytype int) : toto
-  logic h (int) : toto
+  function g (mytype int) : toto
+  function h (int) : toto
   axiom A05 : forall x : int. g(p(x)) = h(x)
   axiom A1 : forall x : mytype 'a. p(p2(x)) = x
   goal G2 : forall x:mytype toto. f(p2(x)) = x
@@ -107,7 +107,7 @@ theory TestIte
   use import int.Int
   use list.Length
   use list.Mem
-  logic abs(x:int) : int = if x >= 0 then x else -x 
+  function abs(x:int) : int = if x >= 0 then x else -x 
   goal G : forall x:int. abs(x) >= 0
   goal G2 : forall x:int. if x>=0 then x >= 0 else -x>=0 
 end
@@ -127,10 +127,10 @@ end
 
 theory TestEncodingEnumerate
   type t = A | B | C
-  goal G : forall x : t. (x = A or x = B) ->  x<>C
+  goal G : forall x : t. (x = A \/ x = B) ->  x<>C
   goal G1 : forall x : t. B <> A
-  goal G2 : forall x : t. x = A or x = B or x=C
-  goal G3 : forall x : t. x = A or x = B or x <> C
+  goal G2 : forall x : t. x = A \/ x = B \/ x=C
+  goal G3 : forall x : t. x = A \/ x = B \/ x <> C
 end
 
 (*

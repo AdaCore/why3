@@ -4,11 +4,11 @@ theory TestProp
 
   goal Test0_5 : true -> false
 
-  logic a
+  predicate a
 
-  logic b
+  predicate b
 
-  goal Test1: a and b -> a
+  goal Test1: a /\ b -> a
 
 end
 
@@ -26,29 +26,29 @@ theory TestInt
 
    goal Test5: forall x:int. x <> 0 -> x*x > 0
 
-   goal Test6: 2+3 = 5 and (forall x:int. x*x >= 0)
+   goal Test6: 2+3 = 5 /\ (forall x:int. x*x >= 0)
 
-   goal Test7: 0 = 2 and 2 = 3 and 4 = 5 and 6 = 7
+   goal Test7: 0 = 2 /\ 2 = 3 /\ 4 = 5 /\ 6 = 7
 
-   goal Test8: 2+2=4 and 3+3=6
+   goal Test8: 2+2=4 /\ 3+3=6
 
    axiom A : 1 = 2
 
-   goal Test9: 2+2=5 and 3+3=8
+   goal Test9: 2+2=5 /\ 3+3=8
 
 end
 
 theory TestSplit
 
-  logic aa int
+  predicate aa int
 
-  logic bb int
+  predicate bb int
 
-  goal G1 : (aa 5) and ("stop_split" aa 0 and bb 6) and ("stop_split" aa 1 and bb 2) 
+  goal G1 : (aa 5) /\ ("stop_split" aa 0 /\ bb 6) /\ ("stop_split" aa 1 /\ bb 2) 
 
   goal G2 : ("stop_split" aa 0 && bb 1) && ("stop_split" aa 1 && bb 2)
 
-  goal G3 : forall x:int. ("stop_split" aa x and bb 1) and ("stop_split" aa 1 and bb 2)
+  goal G3 : forall x:int. ("stop_split" aa x /\ bb 1) /\ ("stop_split" aa 1 /\ bb 2)
 
   goal G4 : forall x:int. ("stop_split" aa x && bb 1) && ("stop_split" aa 1 && bb 2)
 
@@ -85,13 +85,13 @@ theory TestList
   use import int.Int
   use import list.List
 
-  logic x : list int
+  function x : list int
 
 (*
   goal Test1: 
      match x with 
-     | Nil -> 1 = 0 and 2 = 3
-     | Cons _ Nil -> 4 = 5 and 6 = 7
+     | Nil -> 1 = 0 /\ 2 = 3
+     | Cons _ Nil -> 4 = 5 /\ 6 = 7
      | Cons _ _ -> 8 = 9 /\ 10 = 11
      end  
 *)
@@ -109,7 +109,7 @@ theory TestReal
 
    goal RealAbs1: forall x:real. 100.0 >= abs x >= 1.0 -> x*x >= 1.0
 
-   goal T: forall x y:real. abs x <= 1.0 and abs y <= 1.0 -> x - y <= 2.0
+   goal T: forall x y:real. abs x <= 1.0 /\ abs y <= 1.0 -> x - y <= 2.0
 
 end
 
@@ -128,14 +128,14 @@ theory TestRealize
 
   type t
 
-  logic p t t
+  predicate p t t
 
   axiom P_arefl: forall x:t. not (p x x)
 
 (*
-  axiom P_total: forall x y:t. p x y or p y x or x=y
+  axiom P_total: forall x y:t. p x y \/ p y x \/ x=y
 
-  logic f t : t
+  function f t : t
 
   axiom A : forall x:t. p (f x) x
 
@@ -151,7 +151,7 @@ theory TestRealizeUse
 
   use import TestRealize
 
-  logic q t : t
+  function q t : t
 
   axiom C : forall x:t. p (q x) x 
 
@@ -163,7 +163,7 @@ theory TestInline
 
   goal T : 1 = 2
 
-  logic p (x:int) (y:int) = x <= 3 and y <= 7
+  predicate p (x:int) (y:int) = x <= 3 /\ y <= 7
 
   goal G : p 4 4
 

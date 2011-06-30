@@ -19,7 +19,7 @@ module Algo63
   use import module array.Array
   use import module array.ArrayPermut
 
-  parameter partition :
+  val partition :
     a : array int -> m:int -> n:int -> i:ref int -> j:ref int ->
     { m < n }
     unit writes a i j

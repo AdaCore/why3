@@ -6,13 +6,13 @@ module Ref
 
   function (!) (x: ref 'a) : 'a = x.contents
 
-  (* parameter ref : v:'a -> {} ref 'a { result = {| contents = v |} } *)
+  (* val ref : v:'a -> {} ref 'a { result = {| contents = v |} } *)
   let ref (v: 'a) = {} {| contents = v |} { result = {| contents = v |} }
 
-  (* parameter (!) : r:ref 'a -> {} 'a reads r { result = !r } *)
+  (* val (!) : r:ref 'a -> {} 'a reads r { result = !r } *)
   let (!) (r:ref 'a) = {} r.contents { result = !r }
 
-  (* parameter (:=) : r:ref 'a -> v:'a -> {} unit writes r { !r = v } *)
+  (* val (:=) : r:ref 'a -> v:'a -> {} unit writes r { !r = v } *)
   let (:=) (r:ref 'a) (v:'a) = {} r.contents <- v { !r = v }
 
 end
@@ -22,10 +22,10 @@ module Refint
   use export int.Int
   use export module Ref
 
-  (* parameter incr : r:ref int -> {} unit writes r { !r = old !r + 1 } *)
+  (* val incr : r:ref int -> {} unit writes r { !r = old !r + 1 } *)
   let incr (r: ref int) = {} r := !r + 1 { !r = old !r + 1 }
 
-  (* parameter decr : r:ref int -> {} unit writes r { !r = old !r - 1 } *)
+  (* val decr : r:ref int -> {} unit writes r { !r = old !r - 1 } *)
   let decr (r: ref int) = {} r := !r - 1 { !r = old !r - 1 }
 
   let (+=) (r: ref int) (v: int) = {} r := !r + v { !r = old !r + v }

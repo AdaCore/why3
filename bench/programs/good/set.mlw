@@ -5,9 +5,9 @@ module M
 
   (* side effects in tests *)
 
-  parameter x : ref int
+  val x : ref int
 
-  parameter set_and_test_zero :
+  val set_and_test_zero :
     v:int ->
       {}
       bool writes x
@@ -15,7 +15,7 @@ module M
 
   let p () = {} if set_and_test_zero 0 then 1 else 2 { result = 1 }
 
-  parameter set_and_test_nzero :
+  val set_and_test_nzero :
     v:int ->
       {}
       bool writes x

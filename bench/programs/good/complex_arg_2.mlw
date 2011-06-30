@@ -4,9 +4,9 @@ exception Exception int
 
 use import module ref.Ref
 
-parameter t : ref int
+val t : ref int
 
-parameter m : a:int -> b:int ->
+val m : a:int -> b:int ->
     { }
     unit reads t raises Exception
     { true } | Exception -> { true }

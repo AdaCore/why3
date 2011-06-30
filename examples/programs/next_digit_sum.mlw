@@ -62,7 +62,7 @@ module M
     forall x : M.map int int, i j : int.
     i < j -> interp9 (M.set x i 9) i j = interp9 x (i+1) j
 
-  parameter x : array int
+  val x : array int
 
   (* the number of digits of X *)
   function n : int

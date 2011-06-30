@@ -8,14 +8,14 @@ module M
   function default rbt : value
   predicate mem rbt key value
 
-  parameter create :
+  val create :
     d:value ->
     {}
     ref rbt
     { default !result = d /\
       forall k:key, v:value. mem !result k v <-> v = d }
 
-  parameter replace :
+  val replace :
     m:ref rbt -> k:key -> v:value ->
     {}
     unit writes m
@@ -23,13 +23,13 @@ module M
       forall k':key, v':value.
       mem !m k' v' <-> if k' = k then v' = v else mem (old !m) k' v' }
 
-  parameter lookup :
+  val lookup :
     m:ref rbt -> k:key ->
     {}
     value reads m
     { mem !m k result }
 
-  parameter remove :
+  val remove :
     m:ref rbt -> k:key ->
     {}
     unit writes m

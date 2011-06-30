@@ -28,9 +28,9 @@ module M
   predicate valid_array (a:first_free_addr) (n:int) (m:int) (r:array pointer) =
      forall i:int. n <= i <= m -> valid a (r[i])
 
-parameter alloc : ref first_free_addr
+val alloc : ref first_free_addr
 
-parameter new_pointer : tt:unit ->
+val new_pointer : tt:unit ->
   { }
   pointer
   writes alloc

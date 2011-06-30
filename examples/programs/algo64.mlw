@@ -27,7 +27,7 @@ module Algo64
 
   (* Algorithm 63 *)
 
-  parameter partition :
+  val partition :
     a:array int -> m:int -> n:int -> i:ref int -> j:ref int ->
     { 0 <= m < n < length a }
     unit writes a i j

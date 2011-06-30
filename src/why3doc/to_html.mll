@@ -56,15 +56,15 @@
     List.iter
       (fun s -> Hashtbl.add ht s ())
       [ "theory"; "end"; 
-        "type"; "logic"; "clone"; "use"; "import"; "export";
-        "axiom"; "inductive"; "goal"; "lemma";
+        "type"; "function"; "predicate"; "clone"; "use";
+        "import"; "export"; "axiom"; "inductive"; "goal"; "lemma";
         
         "match"; "with"; "let"; "in"; "if"; "then"; "else";
-        "forall"; "exists"; "and"; "or";
+        "forall"; "exists";
 
         "as"; "assert"; "begin";
         "do"; "done"; "downto"; "else";
-        "exception"; "parameter"; "for"; "fun";
+        "exception"; "val"; "for"; "fun";
         "if"; "in"; 
         "module"; "mutable";
         "rec"; "then"; "to"; 

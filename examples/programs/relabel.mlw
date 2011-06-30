@@ -39,7 +39,7 @@ module Relabel
   use import int.Int
   use import module ref.Ref
 
-  parameter r : ref int
+  val r : ref int
 
   let fresh () =
     {} r := !r + 1; !r { !r = old !r + 1 /\ result = !r }

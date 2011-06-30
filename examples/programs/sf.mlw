@@ -106,8 +106,8 @@ module MoreHoareLogic
   | Cons x r -> x + sum r
   end
 
-  parameter head : l:list 'a -> { l<>Nil } 'a { Some result = hd l }
-  parameter tail : l:list 'a -> { l<>Nil } list 'a { Some result = tl l }
+  val head : l:list 'a -> { l<>Nil } 'a { Some result = hd l }
+  val tail : l:list 'a -> { l<>Nil } list 'a { Some result = tl l }
 
   let list_sum (l: ref (list int)) (y: ref int) =
     {}
