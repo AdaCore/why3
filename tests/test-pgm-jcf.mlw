@@ -1,4 +1,18 @@
 
+module MutualRec
+
+  use import int.Int
+
+  let rec f (x1 x2: int) : int variant { x1+x2 } =
+    { x1 >= 0 && x2 >= 0 } if x1 <= 1 then 0 else g (x1-1) x2 { result = 0 }
+
+  with g (y1: int) variant { y1 } =
+    { y1 >= 0  }
+    f (y1-1)
+    { 0 = 0 }
+
+end
+
 module PoorArrays
 
   use import int.Int
@@ -14,7 +28,7 @@ module PoorArrays
   parameter set (a: array 'a) (i: int) (v: 'a) :
     { 0 <= i < length !a } 
     unit writes a 
-    { !a.length = !(old a).length and !a.elts = M.set !(old a).elts i v }
+    { !a.length = !(old a).length && !a.elts = M.set !(old a).elts i v }
 
 end
 
