@@ -89,7 +89,12 @@ let env : Env.env =
 
 (* loading the Alt-Ergo driver *)
 let alt_ergo_driver : Driver.driver =
-  Driver.load_driver env alt_ergo.Whyconf.driver
+  try
+    Driver.load_driver env alt_ergo.Whyconf.driver
+  with e ->
+    eprintf "Failed to load driver for alt-ergo: %a@."
+      Exn_printer.exn_printer e;
+    exit 1
 
 (* call Alt-Ergo *)
 let result1 : Call_provers.prover_result =
