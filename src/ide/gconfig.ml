@@ -349,10 +349,21 @@ let preferences c =
     GPack.vbox ~homogeneous:false ~packing:
       (fun w -> ignore(notebook#append_page ~tab_label:label1#coerce w)) ()
   in
+  (* external processes frame *)
+  let external_processes_frame =
+    GBin.frame ~label:"External processes"
+      ~packing:page1#add ()
+  in
   (* editor *)
- let hb = GPack.hbox ~homogeneous:false ~packing:page1#add () in
- let _ = GMisc.label ~text:"Default editor: " ~packing:(hb#pack ~expand:false) () in
- let editor_entry = GEdit.entry ~text:c.default_editor ~packing:hb#add () in
+ let hb = 
+   GPack.hbox ~homogeneous:false ~packing:external_processes_frame#add () 
+ in
+ let _ = 
+   GMisc.label ~text:"Default editor: " ~packing:(hb#pack ~expand:false) () 
+ in
+ let editor_entry = 
+   GEdit.entry ~text:c.default_editor ~packing:hb#add () 
+ in
  let (_ : GtkSignal.id) =
     editor_entry#connect#changed ~callback:
       (fun () -> c.default_editor <- editor_entry#text)
@@ -396,31 +407,61 @@ let preferences c =
     ~packing:(fun w -> ignore(notebook#append_page
                                 ~tab_label:label2#coerce w)) ()
   in
-  (** page 3 **)
+  (** page 1 **)
+  let display_options_frame =
+    GBin.frame ~label:"Display options"
+      ~packing:page1#add ()
+  in
+  let display_options_box =
+    GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
+      ~packing:display_options_frame#add ()
+  in
+  (* toggle show labels in formulas *)
+
+  let showlabels =
+    GButton.check_button ~label:"show labels in formulas" 
+      ~packing:display_options_box#add ()
+      ~active:(set_labels_flag c.show_labels;c.show_labels)
+  in
+  let (_ : GtkSignal.id) =
+    showlabels#connect#toggled ~callback:
+      (fun () -> c.show_labels <- not c.show_labels;
+         set_labels_flag c.show_labels)
+  in
   let set_saving_policy n () = c.saving_policy <- n in
+(*
   let label3 = GMisc.label ~text:"IDE" () in
   let page3 =
     GPack.vbox ~homogeneous:false ~packing:
       (fun w -> ignore(notebook#append_page ~tab_label:label3#coerce w)) ()
   in
+*)
   (* session saving policy *)
+  let saving_policy_frame =
+    GBin.frame ~label:"Session saving policy"
+      ~packing:page1#add ()
+  in
+  let saving_policy_box =
+    GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
+      ~packing:saving_policy_frame#add ()
+  in
   let choice0 =
     GButton.radio_button
       ~label:"Always save on exit"
       ~active:(c.saving_policy = 0)
-      ~packing:page3#add ()
+      ~packing:saving_policy_box#add ()
   in
   let choice1 =
     GButton.radio_button
       ~label:"Never save on exit" ~group:choice0#group
       ~active:(c.saving_policy = 1)
-      ~packing:page3#add ()
+      ~packing:saving_policy_box#add ()
   in
   let choice2 =
     GButton.radio_button
       ~label:"ask whether to save on exit" ~group:choice0#group
       ~active:(c.saving_policy = 2)
-      ~packing:page3#add ()
+      ~packing:saving_policy_box#add ()
   in
   let (_ : GtkSignal.id) =
     choice0#connect#toggled ~callback:(set_saving_policy 0)
@@ -430,16 +471,6 @@ let preferences c =
   in
   let (_ : GtkSignal.id) =
     choice2#connect#toggled ~callback:(set_saving_policy 2)
-  in
-  (* toggle show labels in formulas *)
-  let showlabels =
-    GButton.check_button ~label:"show labels in formulas" ~packing:page3#add ()
-      ~active:(set_labels_flag c.show_labels;c.show_labels)
-  in
-  let (_ : GtkSignal.id) =
-    showlabels#connect#toggled ~callback:
-      (fun () -> c.show_labels <- not c.show_labels;
-         set_labels_flag c.show_labels)
   in
   (* buttons *)
   dialog#add_button "Close" `CLOSE ;
