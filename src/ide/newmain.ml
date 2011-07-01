@@ -765,12 +765,6 @@ let exit_function () =
   in
   ()
 
-let (_ : GtkSignal.id) = w#connect#destroy ~callback:exit_function
-
-let (_ : GMenu.image_menu_item) =
-  file_factory#add_image_item ~key:GdkKeysyms._Q ~label:"_Quit"
-    ~callback:exit_function ()
-
 (*************)
 (* View menu *)
 (*************)
@@ -1064,6 +1058,7 @@ let source_view =
     ~show_line_numbers:true
     ~right_margin_position:80 ~show_right_margin:true
     (* ~smart_home_end:true *)
+    ~editable:false
     ~packing:scrolled_source_view#add
     ()
 
@@ -1186,6 +1181,19 @@ let (_ : GMenu.image_menu_item) =
     ~label:"_Reload" ~callback:reload
     ()
 
+
+(* Saving the session *)
+
+let (_ : GMenu.image_menu_item) =
+  file_factory#add_image_item (* no shortcut ~key:GdkKeysyms._S *)
+    ~label:"_Save session" ~callback:M.save_session
+    ()
+
+
+(*
+
+Saving the source_view: deactivated for the moment
+
 let save_file () =
   let f = !current_file in
   if f <> "" then
@@ -1204,8 +1212,13 @@ let (_ : GMenu.image_menu_item) =
   file_factory#add_image_item ~key:GdkKeysyms._S
     ~label:"_Save" ~callback:save_file
     ()
+*)
 
+let (_ : GtkSignal.id) = w#connect#destroy ~callback:exit_function
 
+let (_ : GMenu.image_menu_item) =
+  file_factory#add_image_item ~key:GdkKeysyms._Q ~label:"_Quit"
+    ~callback:exit_function ()
 
 
 (*****************************)
