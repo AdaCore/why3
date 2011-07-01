@@ -3,10 +3,11 @@
 === Long-term Roadmap (see below for roadmap to next release) ===========
 
 * WhyML
-  ** regions
+  ** regions : strong update
   ** clone module
   ** ghost code
   ** extraction of Ocaml code
+  ** logic symbols used in programs
 * Jessie3
 * traceability: Partially done
   (Claude)
@@ -28,12 +29,11 @@
   ** suggested solution: replace model + filter_model by a custom model
   (JC + ?)
 
-* why3bench sur examples/ dans make bench
-  (Francois)
+* Add as many examples as possible in the regression tests
 
 * Papers to write
 
-  * Encodings and transformations (Andrei+Francois)
+  * DONE Encodings and transformations (Andrei+Francois)
   * DONE Why presentation at the IVL workshop of CADE:
     (http://research.microsoft.com/en-us/um/people/moskal/boogie2011/)
     deadline: May 1st
@@ -44,15 +44,42 @@
   * system description (e.g. at CAD, TACAS)
   * rapports recherche ?
 
+* Why3ide: saving session
+   * add a "cancel" choice
+   * add "ctrl-S" to save the session explicitly
+
+* choisir un logo
 
 === Roadmap for third release ==========================================
 
-* Check if doc is up-to-date
+* enlever les caracteres de tab des sources
+  et les caracteres latin1 (A)
 
-* Add as many examples as possible in the regression tests
+* faire tourner headache pour refabriquer les headers (A)
+  ** dans gappa.ml : ajouter Guillaume en dessous de l'entete
+
+* desactiver "Save" (et editable=false dans la fenetre)
+  et mettre "Quit" en dernier (C)
+
+* remettre le use_api dans la doc (C)
+
+* deplacer le bouton "Cancel" dans le menu "tools",
+  le renommer en "make obsolete" et le documenter (A)
+
+* Rendre optionel la question "would you like to save the session ?"
+   (C) -> 3-state options (Yes/No/ask) dans la config
+  + dans le menu "file" : "save session" sans raccourci clavier
+
+* documenter les options de Why (A)
 
 * Distribution of examples: we should distribute those who have an xml file
   under git, and distribute the XML and Coq proofs
+    (JC)
+
+* update doc
+ - why3replay (C) parler des examples distribues ci dessus
+
+* distribute bench files (A + F)
 
 * DONE checkout frais, compilation (local ou non) et make bench chaque nuit sur moloch
   (?)
@@ -85,7 +112,7 @@
 
 * DONE IDE: implement "inline" (use transformation inline_goal)
   ** problem 1: detect that transformation did nothing
-  ** (DONE) problem 2: reimport from db does apply inline correctly
+  ** DONE problem 2: reimport from db does apply inline correctly
 
 * DONE IDE: debug "remove" et "clean" qui provoquent des segfaults !!
 
