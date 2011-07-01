@@ -105,21 +105,21 @@ let create_env = let c = ref (-1) in fun fc -> {
 }
 
 (* looks for file [file] of format [name] in loadpath [lp] *)
-let locate_file name lp file =
+let locate_file name lp path =
+  let file = List.fold_left Filename.concat "" path in
   let _,sl = lookup_format name in
   let add_sf sf = file ^ "." ^ sf in
   let fl = if sl = [] then [file] else List.map add_sf sl in
   let add_dir dir = List.map (Filename.concat dir) fl in
   let fl = List.concat (List.map add_dir lp) in
   match List.filter Sys.file_exists fl with
-  | [] -> raise Not_found
+  | [] -> raise (ChannelNotFound path)
   | [file] -> file
   | file1 :: file2 :: _ -> raise (AmbiguousPath (file1, file2))
 
 let create_env_of_loadpath lp =
   let fc f sl =
-    let file = List.fold_left Filename.concat "" sl in
-    let file = locate_file f lp file in
+    let file = locate_file f lp sl in
     file, open_in file
   in
   create_env fc
