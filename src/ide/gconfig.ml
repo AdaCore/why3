@@ -404,24 +404,24 @@ let preferences c =
       (fun w -> ignore(notebook#append_page ~tab_label:label3#coerce w)) ()
   in
   (* session saving policy *)
-  let choice0 = 
-    GButton.radio_button 
+  let choice0 =
+    GButton.radio_button
       ~label:"Always save on exit"
       ~active:(c.saving_policy = 0)
-      ~packing:page3#add () 
-  in 
-  let choice1 = 
-    GButton.radio_button 
+      ~packing:page3#add ()
+  in
+  let choice1 =
+    GButton.radio_button
       ~label:"Never save on exit" ~group:choice0#group
       ~active:(c.saving_policy = 1)
-      ~packing:page3#add () 
-  in 
-  let choice2 = 
-    GButton.radio_button 
+      ~packing:page3#add ()
+  in
+  let choice2 =
+    GButton.radio_button
       ~label:"ask whether to save on exit" ~group:choice0#group
       ~active:(c.saving_policy = 2)
-      ~packing:page3#add () 
-  in 
+      ~packing:page3#add ()
+  in
   let (_ : GtkSignal.id) =
     choice0#connect#toggled ~callback:(set_saving_policy 0)
   in

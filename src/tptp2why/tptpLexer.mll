@@ -2,6 +2,7 @@
 (*                                                                        *)
 (*  Copyright (C) 2010-2011                                               *)
 (*    François Bobot                                                      *)
+(*    Simon Cruanes                                                       *)
 (*    Jean-Christophe Filliâtre                                           *)
 (*    Claude Marché                                                       *)
 (*    Andrei Paskevich                                                    *)

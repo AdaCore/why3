@@ -3,6 +3,7 @@
 (*  Copyright (C) 2010-2011                                               *)
 (*    François Bobot                                                      *)
 (*    Jean-Christophe Filliâtre                                           *)
+(*    Johannes Kanig                                                      *)
 (*    Claude Marché                                                       *)
 (*    Andrei Paskevich                                                    *)
 (*                                                                        *)

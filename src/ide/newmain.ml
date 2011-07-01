@@ -772,7 +772,7 @@ let exit_function () =
                       )
         in
         ()
-    | _ -> 
+    | _ ->
         eprintf "unexpected value for saving_policy@.";
         GMain.quit ()
 
