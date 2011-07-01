@@ -781,7 +781,7 @@ let file_exists fn =
 (**********************************)
 
 let reload_proof obsolete goal pid old_a =
-  let p = 
+  let p =
     try
       Detected_prover (Util.Mstr.find pid !current_provers)
     with Not_found ->
@@ -810,7 +810,7 @@ let reload_proof ~provers obsolete goal pid old_a =
     (* eprintf "proof_obsolete : %b@." obsolete; *)
     let a =
       raw_add_external_proof ~obsolete ~timelimit:old_a.timelimit
-	~edit:old_a.edited_as goal p old_res
+        ~edit:old_a.edited_as goal p old_res
     in
     !notify_fun (Goal a.proof_goal)
   with Not_found ->
@@ -876,7 +876,7 @@ and reload_trans  _goal_obsolete goal _ tr =
                  g.goal_name subgoal_name;
 *)
                (Some g, Util.Mstr.remove sum old_subgoals)
-             with Not_found -> 
+             with Not_found ->
 (*
                eprintf "Merge phase 1: no old goal -> new goal '%s'@."
                  subgoal_name;
@@ -916,23 +916,23 @@ and reload_trans  _goal_obsolete goal _ tr =
 
        if merged list starts with g :
 
-       g1 < ... gk <= h1 < ... < 
+       g1 < ... gk <= h1 < ... <
 
-       then g1 .. g{k-1} are new and gk associated to h1, and then 
+       then g1 .. g{k-1} are new and gk associated to h1, and then
        recursively merge g{k+1} ... and h2 ...
 
        otherwise, list starts
 
-       h1 < ... hk <= g1 <= ... < 
+       h1 < ... hk <= g1 <= ... <
 
        ....
 
        Another formulation :
 
        if merged list starts with
-       
-       1) g1 g2 ... 
-       
+
+       1) g1 g2 ...
+
        associate g1 to nothing and recursively process g2 ...
 
        2) g1 h1 g2 ... with d(g1,h1) < d(h1,g2)
@@ -940,20 +940,20 @@ and reload_trans  _goal_obsolete goal _ tr =
        associate g1 to h1 and recursively process g2 ...
 
        3) g1 h1 g2 ... with d(g1,h1) > d(h1,g2)
-       
+
        ?
 
        4) g1 h1 h2 ...
 
-       
+
        PRELIMINARY: store the shape of the conclusion of the goal in the XML
-       file. 
+       file.
 
 
     *)
     let rec associate_remaining_goals new_goals_map remaining acc =
       match new_goals_map with
-        | [] -> 
+        | [] ->
 (*
             eprintf "Merge phase 3: dropping %d old goals@."
               (List.length remaining);
@@ -962,7 +962,7 @@ and reload_trans  _goal_obsolete goal _ tr =
         | (_,id,subgoal_name,subtask,sum,old_subgoal)::new_rem ->
             let ((obsolete,old_goal,rem) : bool * goal option * (string * goal) list) =
               match old_subgoal with
-                | Some _g -> 
+                | Some _g ->
 (*
                     eprintf "Merge phase 2: old goal '%s' -> new goal '%s'@."
                       g.goal_name subgoal_name;
@@ -970,13 +970,13 @@ and reload_trans  _goal_obsolete goal _ tr =
                     (false,old_subgoal,remaining)
                 | None ->
                     match remaining with
-                      | [] -> 
+                      | [] ->
 (*
                           eprintf "Merge phase 2: no old goal -> new goal '%s'@."
                             subgoal_name;
 *)
                           (false,None,[])
-                      | (_goal_name,g) :: rem -> 
+                      | (_goal_name,g) :: rem ->
 (*
                           eprintf "Merge phase 2: old goal '%s' -> new goal '%s'@."
                             g.goal_name subgoal_name;
@@ -1161,7 +1161,7 @@ and load_proof_or_transf ~env mg a =
         let p =
           try
             Detected_prover (Util.Mstr.find prover !current_provers)
-          with Not_found -> 
+          with Not_found ->
             Undetected_prover prover
         in
         let res = match a.Xml.elements with
@@ -1261,7 +1261,7 @@ let open_session ~env ~config ~init ~notify dir =
         init_fun := init; notify_fun := notify;
         project_dir := dir; current_env := Some env;
         let provers = Whyconf.get_provers config in
-        current_provers := 
+        current_provers :=
           Util.Mstr.fold (get_prover_data env) provers Util.Mstr.empty;
         begin try
           let xml = Xml.from_file (Filename.concat dir db_filename) in
@@ -1285,7 +1285,7 @@ let save_session () =
         let f = Filename.concat !project_dir db_filename in
         begin if Sys.file_exists f then
           let b = f ^ ".bak" in
-          if Sys.file_exists b then Sys.remove b ; 
+          if Sys.file_exists b then Sys.remove b ;
           Sys.rename f b
         end;
         save f
@@ -1330,7 +1330,7 @@ let rec prover_on_goal ~timelimit p g =
   let a =
     try Hashtbl.find g.external_proofs id
     with Not_found ->
-      raw_add_external_proof ~obsolete:false ~timelimit ~edit:"" g 
+      raw_add_external_proof ~obsolete:false ~timelimit ~edit:"" g
         (Detected_prover p) Undone
   in
   let () = redo_external_proof ~timelimit g a in
@@ -1450,10 +1450,10 @@ let cancel a =
 (*********************************)
 
 type report =
-  | Wrong_result of Call_provers.prover_result * Call_provers.prover_result  
+  | Wrong_result of Call_provers.prover_result * Call_provers.prover_result
   | CallFailed of exn
-  | Prover_not_installed 
-  | No_former_result 
+  | Prover_not_installed
+  | No_former_result
 
 let reports = ref []
 
@@ -1542,11 +1542,11 @@ let check_all ~callback =
     !all_files;
   let timeout () =
     Printf.eprintf "Progress: %d/%d\r%!" !proofs_done !proofs_to_do;
-    if !proofs_done = !proofs_to_do then 
+    if !proofs_done = !proofs_to_do then
       begin
         Printf.eprintf "\n%!";
         decr maximum_running_proofs;
-        callback !reports; 
+        callback !reports;
         false
       end
     else true

@@ -42,7 +42,7 @@ let option_list = Arg.align [
 
 let add_opt_file x = Queue.add x opt_queue
 
-let () = 
+let () =
   Arg.parse option_list add_opt_file usage_msg;
   let config = Whyconf.read_config None in
   let main = Whyconf.get_main config in
@@ -58,7 +58,7 @@ let css =
 
 let do_file env fname =
   let m = Env.read_file env fname in
-  let base = 
+  let base =
     let f = Filename.basename fname in
     match !opt_output with
       | None -> f

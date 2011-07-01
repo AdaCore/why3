@@ -373,7 +373,7 @@ let set_proof_state ~obsolete a =
 let model_index = Hashtbl.create 17
 
 
-let get_any_from_iter row = 
+let get_any_from_iter row =
   try
     let idx = goals_model#get ~row ~column:index_column in
     Hashtbl.find model_index idx
@@ -391,14 +391,14 @@ let get_selected_row_references () =
     (fun path -> goals_model#get_row_reference path)
     goals_view#selection#get_selected_rows
 
-let row_expanded b iter _path = 
+let row_expanded b iter _path =
   match get_any_from_iter iter with
-    | M.File f -> 
+    | M.File f ->
 (*
         eprintf "file_expanded <- %b@." b;
 *)
         M.set_file_expanded f b
-    | M.Theory t -> 
+    | M.Theory t ->
 (*
         eprintf "theory_expanded <- %b@." b;
 *)
@@ -416,20 +416,20 @@ let row_expanded b iter _path =
     | M.Proof_attempt _ -> ()
 
 
-let (_:GtkSignal.id) = 
+let (_:GtkSignal.id) =
   goals_view#connect#row_collapsed ~callback:(row_expanded false)
 
-let (_:GtkSignal.id) = 
+let (_:GtkSignal.id) =
   goals_view#connect#row_expanded ~callback:(row_expanded true)
 
 let notify any =
   let row,exp =
     match any with
-      | M.Goal g -> 
+      | M.Goal g ->
 (*
           if M.goal_expanded g then
             begin
-              let n = 
+              let n =
                 Hashtbl.fold (fun _ _ acc -> acc+1) (M.external_proofs g) 0
               in
               eprintf "expand_row on a goal with %d proofs@." n;
@@ -441,7 +441,7 @@ let notify any =
       | M.Proof_attempt a -> a.M.proof_key,false
       | M.Transformation tr -> tr.M.transf_key,tr.M.transf_expanded
   in
-  if exp then goals_view#expand_to_path row#path else 
+  if exp then goals_view#expand_to_path row#path else
     goals_view#collapse_row row#path;
   match any with
     | M.Goal g ->
@@ -454,7 +454,7 @@ let notify any =
         set_proof_state ~obsolete:a.M.proof_obsolete a
     | M.Transformation tr ->
         set_row_status row tr.M.transf_proved
-          
+
 let init =
   let cpt = ref (-1) in
   fun row any ->
@@ -482,7 +482,7 @@ let init =
          | M.Goal g -> M.goal_expl g
          | M.Theory th -> M.theory_name th
          | M.File f -> Filename.basename f.M.file_name
-         | M.Proof_attempt a -> 
+         | M.Proof_attempt a ->
              begin
                match a.M.prover with
                  | M.Detected_prover p ->
@@ -533,14 +533,14 @@ let () =
 let () =
   try
     eprintf "[Info] Opening session...@\n@[<v 2>  ";
-    M.open_session ~env:gconfig.env 
+    M.open_session ~env:gconfig.env
       (* ~provers:gconfig.provers *)
       ~config:gconfig.Gconfig.config
       ~init ~notify project_dir;
     M.maximum_running_proofs := gconfig.max_running_processes;
     eprintf "@]@\n[Info] Opening session: done@."
   with e ->
-    eprintf "@[Error while opening session:@ %a@.@]" 
+    eprintf "@[Error while opening session:@ %a@.@]"
       Exn_printer.exn_printer e;
     exit 1
 
@@ -1175,7 +1175,7 @@ let reload () =
   with
     | e ->
         let e = match e with
-          | Loc.Located(loc,e) -> 
+          | Loc.Located(loc,e) ->
               scroll_to_loc ~color:error_tag ~yalign:0.5 loc; e
           | e -> e
         in

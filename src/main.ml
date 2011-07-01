@@ -490,7 +490,7 @@ let do_coq_realize_theory env _drv oldf fname m (tname,_,t,_glist) =
     if Sys.file_exists oldf
     then
       begin
-	let backup = oldf ^ ".bak" in
+        let backup = oldf ^ ".bak" in
         Sys.rename oldf backup;
         Some(open_in backup)
       end
@@ -515,17 +515,17 @@ let do_input env drv = function
       if !opt_type_only then
         ()
       else
-	match !opt_coq_realization with
-	  | Some f ->
-	      Queue.iter (do_coq_realize_theory env drv f fname m) tlist
-	  | None ->
-	      if Queue.is_empty tlist then
-		let glist = Queue.create () in
-		let add_th t th mi = Ident.Mid.add th.th_name (t,th) mi in
-		let do_th _ (t,th) = do_theory env drv fname t th glist in
-		Ident.Mid.iter do_th (Mstr.fold add_th m Ident.Mid.empty)
-	      else
-		Queue.iter (do_local_theory env drv fname m) tlist
+        match !opt_coq_realization with
+          | Some f ->
+              Queue.iter (do_coq_realize_theory env drv f fname m) tlist
+          | None ->
+              if Queue.is_empty tlist then
+                let glist = Queue.create () in
+                let add_th t th mi = Ident.Mid.add th.th_name (t,th) mi in
+                let do_th _ (t,th) = do_theory env drv fname t th glist in
+                Ident.Mid.iter do_th (Mstr.fold add_th m Ident.Mid.empty)
+              else
+                Queue.iter (do_local_theory env drv fname m) tlist
 
 let () =
   try

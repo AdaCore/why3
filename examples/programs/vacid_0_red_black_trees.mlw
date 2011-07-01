@@ -116,9 +116,9 @@ module M
     match l with
     | Node Red (Node Red a kx vx b) ky vy c
     | Node Red a kx vx (Node Red b ky vy c) ->
-	Node Red (Node Black a kx vx b) ky vy (Node Black c k v r)
+        Node Red (Node Black a kx vx b) ky vy (Node Black c k v r)
     | _ ->
-	Node Black l k v r
+        Node Black l k v r
     end
     { bst result /\
       (forall n : int. almost_rbtree n l -> rbtree n r -> rbtree (n+1) result)
@@ -141,9 +141,9 @@ module M
     match r with
     | Node Red (Node Red b ky vy c) kz vz d
     | Node Red b ky vy (Node Red c kz vz d) ->
-	Node Red (Node Black l k v b) ky vy (Node Black c kz vz d)
+        Node Red (Node Black l k v b) ky vy (Node Black c kz vz d)
     | _ ->
-	Node Black l k v r
+        Node Black l k v r
     end
     { bst result /\
       (forall n : int. almost_rbtree n r -> rbtree n l -> rbtree (n+1) result)

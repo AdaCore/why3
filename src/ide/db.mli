@@ -161,7 +161,7 @@ val add_proof_attempt : goal -> prover_id -> proof_attempt
 
 val remove_proof_attempt : proof_attempt -> unit
 (** removes a proof attempt from the database *)
- 
+
 val set_obsolete : proof_attempt -> unit
 (** marks this proof as obsolete *)
 
@@ -180,7 +180,7 @@ val add_transformation : goal -> transf_id -> transf
     @raise AlreadyExist if a transformation with the same id
     is already there *)
 
-val remove_transformation : transf -> unit 
+val remove_transformation : transf -> unit
   (** Removes a proof attempt from the database.  Beware that the
       subgoals are not removed by this function, you must remove them
       first using [remove_subgoal]. In other words, this function

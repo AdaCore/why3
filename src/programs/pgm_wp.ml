@@ -384,7 +384,7 @@ let wp_expl l f =
 
 (* 0 <= phi0 and phi < phi0 *)
 let default_variant le lt phi phi0 =
-  t_and 
+  t_and
     (ps_app le [t_int_const "0"; phi0])
     (ps_app lt  [phi; phi0])
 
@@ -394,7 +394,7 @@ let while_post_block inv var lab e =
         t_true
     | Some (phi, Vint (le, lt)) ->
         let old_phi = term_at lab phi in
- 	default_variant le lt phi old_phi
+        default_variant le lt phi old_phi
     | Some (phi, Vuser r) ->
         ps_app r [phi; term_at lab phi]
   in

@@ -433,7 +433,7 @@ let print_tdecl fmt td = match td.td_node with
         m.meta_name (print_list comma print_meta_arg) al
 
 let print_theory fmt th =
-  fprintf fmt "@[<hov 2>%a %a@\n%a@]@\n%a@." 
+  fprintf fmt "@[<hov 2>%a %a@\n%a@]@\n%a@."
     keyword "theory"
     print_th th (print_list newline2 print_tdecl) th.th_decls
     keyword "end"
@@ -444,7 +444,7 @@ let print_header fmt ?(title="") ?css () =
   fprintf fmt "<html>@\n<head>@\n";
   begin match css with
     | None -> ()
-    | Some f -> fprintf fmt 
+    | Some f -> fprintf fmt
         "<link rel=\"stylesheet\" href=\"%s\" type=\"text/css\">@\n" f
   end;
   fprintf fmt "<title>%s</title>@\n" title;

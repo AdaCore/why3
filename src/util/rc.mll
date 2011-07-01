@@ -354,16 +354,16 @@ let from_file f =
   let c =
     try open_in f with Sys_error s -> raise (CannotOpen (f, s))
   in
-  try 
+  try
     let r = from_channel c in close_in c; r
-  with 
+  with
     | SyntaxError s -> close_in c; raise (SyntaxErrorFile (f, s))
     | e -> close_in c; raise e
 
 let () = Exn_printer.register (fun fmt e -> match e with
-  | CannotOpen (_, s) -> 
+  | CannotOpen (_, s) ->
       Format.fprintf fmt "system error: `%s'" s
-  | SyntaxErrorFile (f, s) -> 
+  | SyntaxErrorFile (f, s) ->
       Format.fprintf fmt "syntax error in %s: %s" f s
   | _ -> raise e)
 

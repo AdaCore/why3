@@ -545,27 +545,27 @@ and dexpr_desc ~ghost env loc = function
       let e2 = dexpr ~ghost env e2 in
       let x = Typing.string_list_of_qualid [] q in
       let ls =
-	try ns_find_ls (get_namespace (impure_uc env.uc)) x
-	with Not_found -> errorm ~loc "unbound record field %a" print_qualid q
+        try ns_find_ls (get_namespace (impure_uc env.uc)) x
+        with Not_found -> errorm ~loc "unbound record field %a" print_qualid q
       in
       new_regions_vars ();
       begin match specialize_lsymbol ~loc (Htv.create 17) ls with
-	| [ty1], Some ty2 ->
-	    expected_type e1 ty1;
-	    expected_type e2 ty2
-	| _ ->
-	    assert false
+        | [ty1], Some ty2 ->
+            expected_type e1 ty1;
+            expected_type e2 ty2
+        | _ ->
+            assert false
       end;
       begin match Typing.is_projection (impure_uc env.uc) ls with
-	| Some (ts, _, i)  ->
-	    let mt = get_mtsymbol ts in
-	    let j =
-	      try mutable_field mt.mt_effect i
-	      with Not_found -> errorm ~loc "not a mutable field"
-	    in
-	    DEassign (e1, ls, j, e2), dty_unit env.uc
-	| None ->
-	    errorm ~loc "unbound record field %a" print_qualid q
+        | Some (ts, _, i)  ->
+            let mt = get_mtsymbol ts in
+            let j =
+              try mutable_field mt.mt_effect i
+              with Not_found -> errorm ~loc "not a mutable field"
+            in
+            DEassign (e1, ls, j, e2), dty_unit env.uc
+        | None ->
+            errorm ~loc "unbound record field %a" print_qualid q
       end
 
   | Ptree.Esequence (e1, e2) ->
@@ -880,7 +880,7 @@ let iterm env l =
   Denv.term env.i_pures t
 
 let variant_rel_int env loc =
-  let find s = 
+  let find s =
     try find_ls ~pure:true env s
     with Not_found -> errorm ~loc "cannot find symbol %s" s
   in
@@ -985,7 +985,7 @@ let make_logic_app gl loc ty ls el =
               let t = fs_app ls (List.rev args) (purify ty) in
               IElogic (t, lvars, gvars)
           | None ->
-	      IElogic (mk_t_if gl (ps_app ls (List.rev args)), lvars, gvars)
+              IElogic (mk_t_if gl (ps_app ls (List.rev args)), lvars, gvars)
         end
     | ({ iexpr_desc = IElogic (t, lvt, gvt) }, _) :: r ->
         make (Svs.union lvars lvt) (Spv.union gvars gvt) (t :: args) r
@@ -995,7 +995,7 @@ let make_logic_app gl loc ty ls el =
         make lvars (Spv.add v gvars) (t_var v.pv_pure :: args) r
     | (e, _) :: r ->
         let v = create_ivsymbol (id_user "x" loc) e.iexpr_type in
-	let lvars = Svs.add v.i_impure lvars in
+        let lvars = Svs.add v.i_impure lvars in
         let d = mk_iexpr loc ty (make lvars gvars (t_var v.i_pure :: args) r) in
         IElet (v, e, d)
   in
@@ -1167,22 +1167,22 @@ and iexpr_desc gl env loc ty = function
       let x1 = create_ivsymbol (id_fresh "x") e1.iexpr_type in
       let x2 = create_ivsymbol (id_fresh "x") e2.iexpr_type in
       let r = match e1.iexpr_type.ty_node with
-	| Ty.Tyapp (ts, tyl) ->
-	    let mt = get_mtsymbol ts in
+        | Ty.Tyapp (ts, tyl) ->
+            let mt = get_mtsymbol ts in
             let r = regions_tyapp mt.mt_effect mt.mt_regions tyl in
             List.nth r j
-	| Ty.Tyvar _ ->
-	    assert false
+        | Ty.Tyvar _ ->
+            assert false
       in
       let ef = { ie_reads = []; ie_writes = [r]; ie_raises = [] } in
       let q =
-	let ls = (get_psymbol ls).ps_pure in
-	t_equ (fs_app ls [t_var x1.i_pure] x2.i_pure.vs_ty) (t_var x2.i_pure)
+        let ls = (get_psymbol ls).ps_pure in
+        t_equ (fs_app ls [t_var x1.i_pure] x2.i_pure.vs_ty) (t_var x2.i_pure)
       in
       let q = (create_vsymbol (id_fresh "result") ty, q), [] in
       let c = {
-	ic_result_type = ITpure ty; ic_effect = ef;
-	ic_pre = t_true; ic_post = q }
+        ic_result_type = ITpure ty; ic_effect = ef;
+        ic_pre = t_true; ic_post = q }
       in
       IElet (x1, e1, mk_iexpr loc ty (
       IElet (x2, e2, mk_iexpr loc ty (
@@ -1281,11 +1281,11 @@ and iletrec gl env dl =
           let p, e, q = t in
           let phi0 = create_ivsymbol (id_fresh "variant") (t_type phi) in
           let e_phi = {
-	    iexpr_desc = IElogic (phi, Svs.empty, Spv.empty);
-         	    (* FIXME: vars(phi) *)
-	    iexpr_type = t_type phi;
+            iexpr_desc = IElogic (phi, Svs.empty, Spv.empty);
+                     (* FIXME: vars(phi) *)
+            iexpr_type = t_type phi;
             iexpr_loc = e.iexpr_loc }
-	  in
+          in
           let e = { e with iexpr_desc = IElet (phi0, e_phi, e) } in
           Some (phi0, phi, r), (p, e, q)
     in
@@ -1595,10 +1595,10 @@ and expr_desc gl env loc ty = function
       let ef = e1.expr_effect in
       let ef, inv = option_map_fold term_effect ef a.loop_invariant in
       let ef, var = match a.loop_variant with
-        | Some (t, ls) -> 
-	    let ef, t = term_effect ef t in ef, Some (t, ls)
-        | None -> 
-	    ef, None
+        | Some (t, ls) ->
+            let ef, t = term_effect ef t in ef, Some (t, ls)
+        | None ->
+            ef, None
       in
       let a = { loop_invariant = inv; loop_variant = var } in
       Eloop (a, e1), type_v_unit gl, ef

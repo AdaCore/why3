@@ -104,8 +104,8 @@ let rec print_fmla info fmt f = match f.t_node with
     end
   | Tquant (q, fq) ->
       let vl, tl, f = t_open_quant fq in
-      let q, tl = match q with 
-        | Tforall -> "forall", tl 
+      let q, tl = match q with
+        | Tforall -> "forall", tl
         | Texists -> "exists", [] (* Alt-ergo has no triggers for exists *)
       in
       let forall fmt v =

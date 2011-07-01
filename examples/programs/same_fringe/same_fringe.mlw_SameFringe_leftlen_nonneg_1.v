@@ -74,7 +74,7 @@ Axiom mem_append : forall (a:Type), forall (x:a) (l1:(list a)) (l2:(list a)),
 Parameter elt : Type.
 
 Inductive tree  :=
-  | Empty : tree 
+  | Empty : tree
   | Node : tree -> elt -> tree -> tree .
 
 Parameter elements: tree  -> (list elt).
@@ -88,7 +88,7 @@ Axiom elements_def : forall (t:tree),
   end.
 
 Inductive enum  :=
-  | Done : enum 
+  | Done : enum
   | Next : elt -> tree -> enum -> enum .
 
 Parameter enum_elements: enum  -> (list elt).
@@ -112,7 +112,7 @@ Axiom leftlen_def : forall (t:tree),
 
 Theorem leftlen_nonneg : forall (t:tree), (0%Z <= (leftlen t))%Z.
 (* YOU MAY EDIT THE PROOF BELOW *)
-induction t; 
+induction t;
 intuition.
 rewrite (leftlen_def Empty).
 omega.

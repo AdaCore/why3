@@ -101,9 +101,9 @@ module M
 
   (* paths and shortest paths
      path x y d =
-  	there is a path from x to y of length d
+        there is a path from x to y of length d
      shortest_path x y d =
-  	there is a path from x to y of length d, and no shorter path *)
+        there is a path from x to y of length d, and no shorter path *)
 
   inductive path vertex vertex int =
     | Path_nil  :
@@ -195,8 +195,8 @@ module M
       let su = ref (g_succ u) in
       while not (set_has_next su) do
         invariant
-  	{  S.subset !su (g_succ u) /\
-   	   inv src !visited !q !d /\ inv_succ2 src !visited !q u !su }
+        {  S.subset !su (g_succ u) /\
+           inv src !visited !q !d /\ inv_succ2 src !visited !q u !su }
         variant { S.cardinal !su }
         let v = set_next su in
         relax u v

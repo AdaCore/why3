@@ -43,7 +43,7 @@ theory FibSumEven "sum of even-valued Fibonacci numbers"
   axiom SumTooLarge: forall m n:int.
      n >= 0 -> (fib n) >= m -> fib_sum_even_lt_from m n = 0
      (* Note: we take for granted that [fib] is an
-	increasing sequence *)
+        increasing sequence *)
 
   axiom SumYes: forall n m s:int.
      n >= 0 -> (fib n) < m -> mod (fib n) 2 = 0 ->

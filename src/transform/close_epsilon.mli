@@ -18,12 +18,11 @@
 (**************************************************************************)
 
 (** The aim of this translation is to obtain terms where all epsilon
- * abstractions are closed *)
+    abstractions are closed *)
 
 (** We do this by applying the following rewriting rule:
-  εx.P(x) => εF.(P(F@y₁@...@y_n)) where y₁...y_n are the free variable in P and
-  @ is the higher-order application symbol.
-  *)
+  eps x.P(x) => eps F.(P(F@y_1@...@y_n)) where y_1...y_n are
+  the free variables in P and @ is the higher-order application symbol. *)
 
 open Term
 

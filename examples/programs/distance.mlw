@@ -1,6 +1,6 @@
 
 (* Correctness of a program computing the minimal distance between
-   two words (code by Claude Marché).
+   two words (code by Claude MarchÃ©).
 
    This program computes a variant of the Levenshtein distance. Given
    two strings [w1] and [w2] of respective lengths [n1] and [n2], it
@@ -98,12 +98,12 @@ module Distance
               /\ (forall k:int. 0 <= k <= j -> min_suffix w1 w2 (i+1) k t[k])
               /\ min_suffix w1 w2 (i+1) (j+1) !o }
           begin
-      	    let temp = !o in
+            let temp = !o in
             o := t[j];
-	    if w1[i] = w2[j] then
-	      t[j] <- temp
-	    else
-	      t[j] <- (min t[j] t[j+1]) + 1
+            if w1[i] = w2[j] then
+              t[j] <- temp
+            else
+              t[j] <- (min t[j] t[j+1]) + 1
           end
         done
       done;

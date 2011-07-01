@@ -28,7 +28,7 @@ module Quicksort
       let m = ref l in
       label L: begin
       for i = l + 1 to r do
-	invariant { (forall j:int. l < j <= !m -> t[j] < v) /\
+        invariant { (forall j:int. l < j <= !m -> t[j] < v) /\
                     (forall j:int. !m < j <  i -> t[j] >= v) /\
                     permut_sub t (at t L) l (r+1) /\
                     t[l] = v /\ l <= !m < i }

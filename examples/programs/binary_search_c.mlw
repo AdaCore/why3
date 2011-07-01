@@ -40,7 +40,7 @@ module M1
       while !l <= !u do
         invariant { 0 <= !l /\ !u <= n-1 /\
             forall k:int. 0 <= k < n -> get !mem t k = v -> !l <= k <= !u }
-  	variant { !u - !l }
+        variant { !u - !l }
         let m = div (!l + !u) 2 in
         if get !mem t m < v then l := m + 1
         else if get !mem t m > v then u := m - 1
@@ -94,7 +94,7 @@ module M2
       while !l <= !u do
         invariant { 0 <= !l /\ !u <= n-1 /\
             forall k:int. 0 <= k < n -> get !mem t k = v -> !l <= k <= !u }
-  	variant { !u - !l }
+        variant { !u - !l }
         let m = div (!l + !u) 2 in
         if get_ t m < v then l := m + 1
         else if get_ t m > v then u := m - 1
@@ -152,7 +152,7 @@ module M3
         invariant { 0 <= to_int !l /\ to_int !u <= to_int n - 1 /\
             forall k:int. 0 <= k < to_int n ->
               to_int (get !mem t k) = to_int v -> to_int !l <= k <= to_int !u }
-  	variant { to_int !u - to_int !l }
+        variant { to_int !u - to_int !l }
         let m = of_int (to_int !l
                         +
                         to_int

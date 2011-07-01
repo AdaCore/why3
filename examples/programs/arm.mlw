@@ -20,14 +20,14 @@ module M
     let i = ref 2 in
     while !i <= 10 do
       invariant { 2 <= !i <= 11 /\ inv a /\
-		  (* ghost *) !loop1 = !i - 2 /\ 2 * !loop2 <= (!i-2) * (!i-1) }
+                  (* ghost *) !loop1 = !i - 2 /\ 2 * !loop2 <= (!i-2) * (!i-1) }
       variant { 10 - !i }
       (* ghost *) incr loop1;
       let j = ref !i in
       while a[!j] < a[!j - 1] do
         invariant { 1 <= !j <= !i /\ inv a /\
-		    (* ghost *) 2 * !loop2 <= (!i-2) * (!i-1) + 2*(!i - !j) }
-	variant { !j }
+                    (* ghost *) 2 * !loop2 <= (!i-2) * (!i-1) + 2*(!i - !j) }
+        variant { !j }
         (* ghost *) incr loop2;
         let temp = a[!j] in
         a[!j] <- a[!j - 1];

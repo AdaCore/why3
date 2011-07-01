@@ -334,7 +334,7 @@ let show_about_window () =
   let ( _ : GWindow.Buttons.about) = about_dialog#run () in
   about_dialog#destroy ()
 
-let set_labels_flag = 
+let set_labels_flag =
   let fl = Debug.lookup_flag "print_labels" in
   fun b ->
     (if b then Debug.set_flag else Debug.unset_flag) fl

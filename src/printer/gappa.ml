@@ -166,7 +166,7 @@ let rec print_fmla info fmt f =
       | None -> print_ident fmt id
     end
   | Tapp (ls, [t1;t2]) when ls_equal ls ps_equ ->
-      (* TODO: distinguish between type of t1 and t2 
+      (* TODO: distinguish between type of t1 and t2
          the following is OK only for real of integer
       *)
       begin try

@@ -39,7 +39,7 @@ type for_direction = Ptree.for_direction
 (* phase 1: introduction of destructive types *)
 
 (***
-type dregion = { 
+type dregion = {
   dr_tv : Denv.type_var;
   dr_ty : Denv.dty;
 }
@@ -58,7 +58,7 @@ and dtype_c =
   { dc_result_type : dtype_v;
     dc_effect      : deffect;
     dc_pre         : Denv.dfmla;
-    dc_post        : (Denv.dty * Denv.dfmla) * 
+    dc_post        : (Denv.dty * Denv.dfmla) *
                      (Term.lsymbol * (Denv.dty option * Denv.dfmla)) list; }
 
 and dbinder = ident * Denv.dty * dtype_v
@@ -67,7 +67,7 @@ and dbinder = ident * Denv.dty * dtype_v
 (* user type_v *)
 
 type dpre = Ptree.pre
-type dpost_fmla = Ptree.lexpr 
+type dpost_fmla = Ptree.lexpr
 type dexn_post_fmla = Ptree.lexpr
 type dpost = dpost_fmla * (Term.lsymbol * dexn_post_fmla) list
 

@@ -80,7 +80,7 @@ rewrite <- (Z_div_exact_full_2 n 3).
 
 assert (h: (n mod 5 = 0 \/ n mod 5 <> 0)%Z) by omega.
 destruct h.
-   
+
 rewrite Zdiv0.
 Qed.
 (* DO NOT EDIT BELOW *)

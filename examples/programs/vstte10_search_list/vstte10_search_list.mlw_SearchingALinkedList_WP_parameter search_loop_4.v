@@ -109,7 +109,7 @@ discriminate H8.
 injection H8; intros; subst; clear H8.
 clear H4 H5.
 left.
-split. 
+split.
 rewrite (length_def _ (Cons 0%Z s)) in H2.
 generalize (Length_nonnegative _ s).
 omega.

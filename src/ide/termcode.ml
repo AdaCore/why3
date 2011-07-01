@@ -1,3 +1,22 @@
+(**************************************************************************)
+(*                                                                        *)
+(*  Copyright (C) 2010-2011                                               *)
+(*    François Bobot                                                     *)
+(*    Jean-Christophe Filliâtre                                          *)
+(*    Claude Marché                                                      *)
+(*    Andrei Paskevich                                                    *)
+(*                                                                        *)
+(*  This software is free software; you can redistribute it and/or        *)
+(*  modify it under the terms of the GNU Library General Public           *)
+(*  License version 2.1, with the special exception on linking            *)
+(*  described in file LICENSE.                                            *)
+(*                                                                        *)
+(*  This software is distributed in the hope that it will be useful,      *)
+(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
+(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
+(*                                                                        *)
+(**************************************************************************)
+
 (* distance of two terms *)
 
 let dist_bool b = if b then 0.0 else 1.0
@@ -11,30 +30,30 @@ let rec pat_dist p1 p2 =
     match p1.pat_node, p2.pat_node with
       | Pwild, Pwild | Pvar _, Pvar _ -> 0.0
       | Papp (f1, l1), Papp (f2, l2) ->
-	  if ls_equal f1 f2 then
-	    0.5 *. average (List.map2 pat_dist l1 l2)
-	  else 1.0
+          if ls_equal f1 f2 then
+            0.5 *. average (List.map2 pat_dist l1 l2)
+          else 1.0
       | Pas (p1, _), Pas (p2, _) -> pat_dist p1 p2
       | Por (p1, q1), Por (p2, q2) ->
-	  0.5 *. average [pat_dist p1 p2 ; pat_dist q1 q2 ]
+          0.5 *. average [pat_dist p1 p2 ; pat_dist q1 q2 ]
       | _ -> 1.0
   else 1.0
 
-let rec t_dist c1 c2 m1 m2 e1 e2 = 
+let rec t_dist c1 c2 m1 m2 e1 e2 =
   let t_d = t_dist c1 c2 m1 m2 in
   match e1.t_node, e2.t_node with
-    | Tvar v1, Tvar v2 -> 
-	begin 
-	  try dist_bool (Mvs.find v1 m1 = Mvs.find v2 m2)
-	  with Not_found -> 1.0
-	end
+    | Tvar v1, Tvar v2 ->
+        begin
+          try dist_bool (Mvs.find v1 m1 = Mvs.find v2 m2)
+          with Not_found -> 1.0
+        end
     | Tconst c1, Tconst c2 -> 0.5 *. dist_bool (c1 = c2)
     | Tapp(ls1,tl1), Tapp(ls2,tl2) ->
-	if ls_equal ls1 ls2 then
-	  0.5 *. average (List.map2 t_d tl1 tl2)
-	else 1.0 
+        if ls_equal ls1 ls2 then
+          0.5 *. average (List.map2 t_d tl1 tl2)
+        else 1.0
     | Tif(c1,t1,e1), Tif(c2,t2,e2) ->
-	0.5 *. average [t_d c1 c2 ; t_d t1 t2 ; t_d e1 e2]
+        0.5 *. average [t_d c1 c2 ; t_d t1 t2 ; t_d e1 e2]
     | Tlet(t1,b1), Tlet(t2,b2) ->
         let u1,e1 = t_open_bound b1 in
         let u2,e2 = t_open_bound b2 in
@@ -42,7 +61,7 @@ let rec t_dist c1 c2 m1 m2 e1 e2 =
         let m2 = vs_rename_alpha c2 m2 u2 in
         0.5 *. average [t_d t1 t2; t_dist c1 c2 m1 m2 e1 e2]
     | Tcase (t1,bl1), Tcase (t2,bl2) ->
-	if List.length bl1 = List.length bl2 then
+        if List.length bl1 = List.length bl2 then
           let br_dist ((pat1,_,_) as b1) ((pat2,_,_) as b2) =
             let p1,e1 = t_open_branch b1 in
             let p2,e2 = t_open_branch b2 in
@@ -51,8 +70,8 @@ let rec t_dist c1 c2 m1 m2 e1 e2 =
             average [pat_dist pat1 pat2 ; t_dist c1 c2 m1 m2 e1 e2]
           in
           0.5 *. average (t_d t1 t2 :: List.map2 br_dist bl1 bl2)
-	else
-	  1.0
+        else
+          1.0
     | Teps b1, Teps b2 ->
         let u1,e1 = t_open_bound b1 in
         let u2,e2 = t_open_bound b2 in
@@ -61,18 +80,18 @@ let rec t_dist c1 c2 m1 m2 e1 e2 =
         0.5 *. t_dist c1 c2 m1 m2 e1 e2
     | Tquant (q1,((vl1,_,_,_) as b1)), Tquant (q2,((vl2,_,_,_) as b2)) ->
         if q1 = q2 &&
-          list_all2 (fun v1 v2 -> ty_equal v1.vs_ty v2.vs_ty) vl1 vl2 
-	then
+          list_all2 (fun v1 v2 -> ty_equal v1.vs_ty v2.vs_ty) vl1 vl2
+        then
           let vl1,_,e1 = t_open_quant b1 in
           let vl2,_,e2 = t_open_quant b2 in
           let m1 = vl_rename_alpha c1 m1 vl1 in
           let m2 = vl_rename_alpha c2 m2 vl2 in
           0.5 *. t_dist c1 c2 m1 m2 e1 e2
-	else
-	  1.0
+        else
+          1.0
     | Tbinop (a,f1,g1), Tbinop (b,f2,g2) ->
         if a = b then 0.5 *. average [ t_d f1 f2 ; t_d g1 g2]
-	else 1.0
+        else 1.0
     | Tnot f1, Tnot f2 -> 0.5 *. t_d f1 f2
     | Ttrue, Ttrue | Tfalse, Tfalse -> 0.0
     | _ -> 1.0
@@ -80,22 +99,22 @@ let rec t_dist c1 c2 m1 m2 e1 e2 =
 
 let t_dist t1 t2 = t_dist (ref (-1)) (ref (-1)) Mvs.empty Mvs.empty t1 t2
 
-(* similarity code of terms, or of "shapes" 
+(* similarity code of terms, or of "shapes"
 
-example: 
+example:
 
   shape(forall x:int, x * x >= 0) =
          Forall(Int,App(infix_gteq,App(infix_st,Tvar 0,Tvar 0),Const(0)))
        i.e: de bruijn indexes, first-order term
 
- code of a shape: maps shapes into real numbers in [0..1], such that 
+ code of a shape: maps shapes into real numbers in [0..1], such that
 
         compare t1 t2 = code (shape t1) -. code (shape t2)
 
        is a good comparison operator
 
        code(n:int) = 1 / (1+abs(n))
-            so code(0) = 1, code(1) = 0.5, 
+            so code(0) = 1, code(1) = 0.5,
 
        code(x:real) = 1 / (1+abs x)
 
@@ -104,17 +123,17 @@ example:
 
        more generally, for any type t = C0 x | ... | Cn x
            code(Ci x) = (2i + h(x)) / (2n+1)
-         
+
 *)
 
 
-    
+
 
 (* not good ?
        for any type t = t0 x ... x tn
            hash((x0,..,x_n)) = (2i + h(x)) / (2n+1)
     *)
- 
+
 
 let const_code = function
   | ConstInt n -> 1.0 /. (1.0 +. abs (float_of_string n)) /. 3.0
@@ -124,7 +143,7 @@ let rec t_code c m t =
   let fn = t_code c m in
   let divide i c = (float(i+i) +. c) /. 23.0 in
   (* 12 constructors -> divide by 23 *)
-  match t.t_node with 
+  match t.t_node with
   | Tconst c -> divide 0 (const_code c)
   | Tvar v -> divide 1 (Mvs.find_default v (var_code v) m)
   | Tapp (s,l) ->

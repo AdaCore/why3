@@ -26,8 +26,8 @@ module PoorArrays
     { 0 <= i < length !a } 'a { result = M.get !a.elts i }
 
   val set (a: array 'a) (i: int) (v: 'a) :
-    { 0 <= i < length !a } 
-    unit writes a 
+    { 0 <= i < length !a }
+    unit writes a
     { !a.length = !(old a).length && !a.elts = M.set !(old a).elts i v }
 
 end

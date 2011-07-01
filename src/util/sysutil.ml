@@ -157,9 +157,9 @@ let p1 = path_of_file "../src/f.why"
 
 let relativize_filename base f =
   let rec aux ab af =
-    match ab,af with        
+    match ab,af with
       | x::rb, y::rf when x=y -> aux rb rf
-      | _ -> 
+      | _ ->
           let rec aux2 acc p =
             match p with
               | [] -> acc

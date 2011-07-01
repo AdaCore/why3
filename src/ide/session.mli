@@ -236,7 +236,7 @@ module Make(O: OBSERVER) : sig
     context_unproved_goals_only:bool -> any -> unit
     (** [replay a] reruns proofs under [a]
         if obsolete_only is set then does not rerun non-obsolete proofs
-        if context_unproved_goals_only is set then reruns only proofs 
+        if context_unproved_goals_only is set then reruns only proofs
         with result was 'valid'
     *)
 
@@ -244,14 +244,14 @@ module Make(O: OBSERVER) : sig
     (** [cancel a] marks all proofs under [a] as obsolete *)
 
   type report =
-    | Wrong_result of Call_provers.prover_result * Call_provers.prover_result  
+    | Wrong_result of Call_provers.prover_result * Call_provers.prover_result
     | CallFailed of exn
-    | Prover_not_installed 
-    | No_former_result 
+    | Prover_not_installed
+    | No_former_result
 
   val check_all: callback:((string * string * report) list -> unit) -> unit
     (** [check_all ()] reruns all the proofs of the session, and reports
-        all difference with the current state 
+        all difference with the current state
         (does not change the session state)
         When finished, calls the callback with the list of failed comparisons,
         which are triples (goal name, prover, report)

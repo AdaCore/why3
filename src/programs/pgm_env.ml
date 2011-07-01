@@ -43,7 +43,7 @@ let create env retrieve = {
 exception ModuleNotFound of string list * string
 
 let find_library penv sl =
-  try 
+  try
     Hashtbl.find penv.memo sl
   with Not_found ->
     Hashtbl.add penv.memo sl (Mstr.empty, Mstr.empty);

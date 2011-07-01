@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
   for (i = 2; i < argc; i++)
     s += strlen(argv[i]) + 1;
   // CreateProcess does not allow more than 32767 bytes for command line parameter
-  if (s > 32767) { 
+  if (s > 32767) {
     printf("%s: Error: parameter's length exceeds CreateProcess limits\n", argv[0]);
     return -1;
   }
@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
   }
   *p = '\0';
   for (i = 2; i < argc; i++) {
-    strncat(p, argv[i], strlen(argv[i])); 
+    strncat(p, argv[i], strlen(argv[i]));
     if (i < argc - 1) strcat(p, " ");
   }
   // launches "child" process with command line parameter
@@ -70,4 +70,4 @@ int main(int argc, char *argv[]) {
 }
 
 // How to compile under Cygwin (needs make, gcc and win32api):
-// 		gcc -Wall -o cpulimit cpulimit.c
+//                 gcc -Wall -o cpulimit cpulimit.c

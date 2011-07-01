@@ -82,10 +82,10 @@ Parameter atan: R  -> R.
 Axiom Tan_atan : forall (x:R), ((Rtrigo.tan (atan x)) = x).
 
 Inductive mode  :=
-  | NearestTiesToEven : mode 
-  | ToZero : mode 
-  | Up : mode 
-  | Down : mode 
+  | NearestTiesToEven : mode
+  | ToZero : mode
+  | Up : mode
+  | Down : mode
   | NearTiesToAway : mode .
 
 Parameter single : Type.

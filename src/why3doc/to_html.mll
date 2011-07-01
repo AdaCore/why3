@@ -55,19 +55,19 @@
     let ht = Hashtbl.create 97 in
     List.iter
       (fun s -> Hashtbl.add ht s ())
-      [ "theory"; "end"; 
+      [ "theory"; "end";
         "type"; "function"; "predicate"; "clone"; "use";
         "import"; "export"; "axiom"; "inductive"; "goal"; "lemma";
-        
+
         "match"; "with"; "let"; "in"; "if"; "then"; "else";
         "forall"; "exists";
 
         "as"; "assert"; "begin";
         "do"; "done"; "downto"; "else";
         "exception"; "val"; "for"; "fun";
-        "if"; "in"; 
+        "if"; "in";
         "module"; "mutable";
-        "rec"; "then"; "to"; 
+        "rec"; "then"; "to";
         "try"; "while"; "invariant"; "variant"; "raise"; "label";
       ];
     fun s -> Hashtbl.mem ht s
@@ -78,22 +78,22 @@ let ident = ['A'-'Z' 'a'-'z' '_'] ['A'-'Z' 'a'-'z' '0'-'9' '_']*
 
 rule scan fmt = parse
   | "(*)"  { fprintf fmt "(*)"; scan fmt lexbuf }
-  | "(*"   { fprintf fmt "<font color=\"990000\">(*"; 
-             comment fmt lexbuf; 
+  | "(*"   { fprintf fmt "<font color=\"990000\">(*";
+             comment fmt lexbuf;
              fprintf fmt "</font>";
              scan fmt lexbuf }
   | eof    { () }
-  | ident as s 
+  | ident as s
            { if is_keyword s then begin
                fprintf fmt "<font color=\"green\">%s</font>" s
-             end else 
-               fprintf fmt "%s" s; 
+             end else
+               fprintf fmt "%s" s;
              scan fmt lexbuf }
   | "<"    { fprintf fmt "&lt;"; scan fmt lexbuf }
   | "&"    { fprintf fmt "&amp;"; scan fmt lexbuf }
   | "\n"   { newline fmt (); scan fmt lexbuf }
   | '"'    { fprintf fmt "\""; string fmt lexbuf; scan fmt lexbuf }
-  | "'\"'" 
+  | "'\"'"
   | _ as s { fprintf fmt "%s" s; scan fmt lexbuf }
 
 and comment fmt = parse
@@ -104,7 +104,7 @@ and comment fmt = parse
   | '"'    { fprintf fmt "\""; string fmt lexbuf; comment fmt lexbuf }
   | "<"    { fprintf fmt "&lt;"; comment fmt lexbuf }
   | "&"    { fprintf fmt "&amp;"; comment fmt lexbuf }
-  | "'\"'" 
+  | "'\"'"
   | _ as s { fprintf fmt "%s" s; comment fmt lexbuf }
 
 and string fmt = parse
@@ -164,12 +164,12 @@ div.sig_block {margin-left: 2em}";
       if not (Sys.file_exists css_fname) then style_css css_fname;
       Some css_fname
     end
-      
+
   let print_header fmt ?(title="") () =
     fprintf fmt "<html>@\n<head>@\n";
     begin match css with
       | None -> ()
-      | Some f -> fprintf fmt 
+      | Some f -> fprintf fmt
           "<link rel=\"stylesheet\" href=\"%s\" type=\"text/css\">@\n" f
     end;
     fprintf fmt "<title>%s</title>@\n" title;
@@ -184,7 +184,7 @@ div.sig_block {margin-left: 2em}";
     let lb = Lexing.from_channel cin in
     (* output *)
     let f = Filename.basename fname in
-    let base = 
+    let base =
       match !opt_output with
         | None -> f
         | Some dir -> Filename.concat dir f

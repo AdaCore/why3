@@ -37,7 +37,7 @@ module M
      interpretation on the left (or on the right); requires induction *)
   lemma Interp_eq:
     forall x1 x2 : M.map int int, i j : int.
-    (forall k : int. i <= k < j -> M.get x1 k = M.get x2 k) -> 
+    (forall k : int. i <= k < j -> M.get x1 k = M.get x2 k) ->
     interp x1 i j = interp x2 i j
 
   (* the sum of the elements of x[i..j[ *)
@@ -93,11 +93,11 @@ let search_safety () =
       let delta = y - !s - c + x[d] in
       if 0 <= delta && delta <= 9 * d then begin
         x[d] <- c;
-	let k = div delta 9 in
+        let k = div delta 9 in
         for i = 0 to d - 1 do
           invariant { length x = m }
           if i < k then x[i] <- 9
-	  else if i = k then x[i] <- mod delta 9
+          else if i = k then x[i] <- mod delta 9
           else x[i] <- 0
         done;
         raise Success
@@ -134,14 +134,14 @@ let search () =
       if 0 <= delta && delta <= 9 * d then begin
         x[d] <- c;
         assert { sum x.elts d m = y - delta };
-	let k = div delta 9 in
+        let k = div delta 9 in
         assert { k <= d };
         for i = 0 to d - 1 do
           invariant { length x = m /\ is_integer x.elts /\
                       sum x.elts d m = y - delta /\
                       sum x.elts 0 i = if i <= k then 9*i else delta }
           if i < k then x[i] <- 9
-	  else if i = k then x[i] <- (mod delta 9)
+          else if i = k then x[i] <- (mod delta 9)
           else x[i] <- 0
         done;
         (* assume { sum !x 0 d = delta }; *)
@@ -257,21 +257,21 @@ let search_smallest () =
     for c = x[d] + 1 to 9 do
       invariant {
         x = at x Init /\
-	forall c' : int. x[d] < c' < c ->
+        forall c' : int. x[d] < c' < c ->
           forall u : int.
           interp (at x.elts Init) 0 m < u <= interp9 (M.set x.elts d c') d m ->
-  	  sum_digits u <> y }
+            sum_digits u <> y }
       let delta = y - !s - c + x[d] in
       if 0 <= delta && delta <= 9 * d then begin
         assert { smallest_size delta <= d };
         x[d] <- c;
         assert { sum x.elts d m = y - delta };
         assert { gt_digit x.elts (at x.elts Init) d };
-	let k = div delta 9 in
+        let k = div delta 9 in
         assert { k <= d };
         for i = 0 to d - 1 do
           invariant {
-	     length x = m /\ is_integer x.elts /\
+             length x = m /\ is_integer x.elts /\
              sum x.elts d m = y - delta /\
              sum x.elts 0 i = (if i <= k then 9*i else delta) /\
              (forall j : int. 0 <= j < i ->
@@ -279,7 +279,7 @@ let search_smallest () =
                 (j >= smallest_size delta -> x[j] = 0)) /\
              gt_digit x.elts (at x.elts Init) d }
           if i < k then x[i] <- 9
-	  else if i = k then x[i] <- mod delta 9
+          else if i = k then x[i] <- mod delta 9
           else x[i] <- 0;
           assert { is_integer x.elts }
         done;
@@ -327,14 +327,14 @@ let () =
     for c = x.(d) + 1 to 9 do
       let delta = y - !s - c + x.(d) in
       if 0 <= delta && delta <= 9 * d then begin
-	x.(d) <- c;
-	let k = delta / 9 in
-	for i = 0 to d-1 do
-	  x.(i) <- if i < k then 9 else if i = k then delta mod 9 else 0
-	done;
-	for i = max d (n-1) downto 0 do Format.printf "%d" x.(i) done;
-	Format.printf "@.";
-	exit 0
+        x.(d) <- c;
+        let k = delta / 9 in
+        for i = 0 to d-1 do
+          x.(i) <- if i < k then 9 else if i = k then delta mod 9 else 0
+        done;
+        for i = max d (n-1) downto 0 do Format.printf "%d" x.(i) done;
+        Format.printf "@.";
+        exit 0
       end
     done;
     s := !s - x.(d)

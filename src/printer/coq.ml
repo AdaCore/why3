@@ -377,7 +377,7 @@ let produce_remaining_proofs ~old fmt =
           fprintf fmt "(* OBSOLETE PROOF *)@\n";
           try while true do
             let s = input_line ch in
-            if s = proof_end then 
+            if s = proof_end then
               begin
                 fprintf fmt "(* END OF OBSOLETE PROOF *)@\n@\n";
                 raise Exit
@@ -482,7 +482,7 @@ let print_ind_decl info fmt d =
     (print_ind_decl info fmt d; forget_tvs ())
 
 let print_pkind info fmt = function
-  | Paxiom -> 
+  | Paxiom ->
       if info.realization then
         fprintf fmt "Lemma"
       else
@@ -495,7 +495,7 @@ let print_proof ~old info fmt = function
   | Plemma | Pgoal ->
       realization ~old fmt true
   | Paxiom ->
-      realization ~old fmt info.realization 
+      realization ~old fmt info.realization
   | Pskip -> ()
 
 let print_decl ~old info fmt d = match d.d_node with
@@ -560,7 +560,7 @@ let print_theory _env pr thpr ~old fmt th =
     info_syn = Mid.empty (* get_syntax_map_of_theory th *);
     info_rem = Mid.empty;
     realization = true;
-  } 
+  }
   in
   print_tdecls ~old info fmt th.th_decls;
   produce_remaining_proofs ~old fmt

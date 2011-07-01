@@ -59,14 +59,14 @@ rewrite fibn; auto with zarith.
 rewrite Zplus_mod.
 assert (h: (0 <= (n mod 3) < 3)%Z).
   apply Z_mod_lt; auto with zarith.
-assert (h':( n mod 3 = 0 \/ n mod 3 = 1 \/ n mod 3 = 2)%Z) 
+assert (h':( n mod 3 = 0 \/ n mod 3 = 1 \/ n mod 3 = 2)%Z)
   by omega.
-clear h. 
+clear h.
 destruct h' as [h0|[h1|h2]].
 split; auto with zarith.
-  
+
 SearchAbout Zmod.
-assert 
+assert
 Qed.
 (* DO NOT EDIT BELOW *)
 

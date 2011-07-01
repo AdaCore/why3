@@ -325,7 +325,7 @@ let () =
     && (not !opt_redo)
   then
     begin
-      eprintf "At least one bench is required or one prover and one file or 
+      eprintf "At least one bench is required or one prover and one file or
       the verification of a database .@.";
       Arg.usage option_list usage_msg;
       exit 1

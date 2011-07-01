@@ -58,32 +58,32 @@
 let space = [' ' '\t' '\r' '\n']
 let digit = ['0'-'9']
 let letter = ['a'-'z' 'A'-'Z']
-let ident = (letter | digit | '_') + 
-let sign = '-' | '+' 
+let ident = (letter | digit | '_') +
+let sign = '-' | '+'
 let integer = sign? digit+
 let mantissa = ['e''E'] sign? digit+
 let real = sign? digit* '.' digit* mantissa?
-let escape = ['\\''"''n''t''r'] 
+let escape = ['\\''"''n''t''r']
 
 rule xml_prolog = parse
-| space+ 
+| space+
     { xml_prolog lexbuf }
 | "<?xml" space+ "version=\"1.0\"" space+ "?>"
     { xml_doctype "1.0" "" lexbuf }
 | "<?xml" space+ "version=\"1.0\"" space+ "encoding=\"UTF-8\"" space+ "?>"
     { xml_doctype "1.0" "" lexbuf }
-| "<?xml" ([^'?']|'?'[^'>'])* "?>" 
+| "<?xml" ([^'?']|'?'[^'>'])* "?>"
     { Format.eprintf "[Xml warning] prolog ignored@\n";
       xml_doctype "1.0" "" lexbuf }
-| _ 
+| _
     { parse_error "wrong prolog" }
-      
+
 and xml_doctype version encoding = parse
-| space+ 
+| space+
     { xml_doctype version encoding lexbuf }
-| "<!DOCTYPE" space+ (ident as doctype) space+ [^'>']* ">" 
-    { match elements [] [] lexbuf with 
-         | [x] -> 
+| "<!DOCTYPE" space+ (ident as doctype) space+ [^'>']* ">"
+    { match elements [] [] lexbuf with
+         | [x] ->
             { version = version;
               encoding = encoding;
               doctype = doctype;
@@ -92,37 +92,37 @@ and xml_doctype version encoding = parse
             }
          | _ -> parse_error "there should be exactly one root element"
     }
-| _ 
+| _
     { parse_error "wrong DOCTYPE" }
-      
+
 and elements group_stack element_stack = parse
-  | space+ 
+  | space+
       { elements group_stack element_stack lexbuf }
-  | '<' (ident as elem)   
+  | '<' (ident as elem)
       { attributes group_stack element_stack elem [] lexbuf }
   | "</" (ident as celem) space* '>'
       { match group_stack with
-         | [] -> 
-             Format.eprintf 
-               "[Xml warning] unexpected closing Xml element `%s'@\n" 
+         | [] ->
+             Format.eprintf
+               "[Xml warning] unexpected closing Xml element `%s'@\n"
                celem;
              elements group_stack element_stack lexbuf
          | (elem,att,stack)::g ->
              if celem <> elem then
-               Format.eprintf 
-                 "[Xml warning] Xml element `%s' closed by `%s'@\n" 
+               Format.eprintf
+                 "[Xml warning] Xml element `%s' closed by `%s'@\n"
                  elem celem;
              let e = {
                 name = elem;
                 attributes = att;
                 elements = List.rev element_stack;
              }
-             in elements g (e::stack) lexbuf            
+             in elements g (e::stack) lexbuf
        }
   | '<'
       { Format.eprintf "[Xml warning] unexpected '<'@\n";
-        elements group_stack element_stack lexbuf }      
-  | eof 
+        elements group_stack element_stack lexbuf }
+  | eof
       { match group_stack with
          | [] -> element_stack
          | (elem,_,_)::_ ->
@@ -135,13 +135,13 @@ and elements group_stack element_stack = parse
 and attributes groupe_stack element_stack elem acc = parse
   | space+
       { attributes groupe_stack element_stack elem acc lexbuf }
-  | (ident as key) space* '=' 
+  | (ident as key) space* '='
       { let v = value lexbuf in
         attributes groupe_stack element_stack elem ((key,v)::acc) lexbuf }
-  | '>' 
+  | '>'
       { elements ((elem,acc,element_stack)::groupe_stack) [] lexbuf }
   | "/>"
-      { let e = { name = elem ; 
+      { let e = { name = elem ;
                   attributes = acc;
                   elements = [] }
         in
@@ -152,23 +152,23 @@ and attributes groupe_stack element_stack elem acc = parse
       { parse_error "unclosed element, `>' expected" }
 
 and value = parse
-  | space+ 
+  | space+
       { value lexbuf }
-  | '"' 
+  | '"'
       { Buffer.clear buf;
-        string_val lexbuf } 
+        string_val lexbuf }
   | _ as c
       { parse_error ("invalid value starting with " ^ String.make 1 c) }
   | eof
       { parse_error "unterminated keyval pair" }
 
-and string_val = parse 
-  | '"' 
+and string_val = parse
+  | '"'
       { Buffer.contents buf }
   | [^ '\\' '"'] as c
       { Buffer.add_char buf c;
         string_val lexbuf }
-  | '\\' (['\\''\"'] as c)   
+  | '\\' (['\\''\"'] as c)
       { Buffer.add_char buf c;
         string_val lexbuf }
   | '\\' 'n'
