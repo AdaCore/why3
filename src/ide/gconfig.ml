@@ -42,6 +42,8 @@ type t =
 *)
       mutable default_editor : string;
       mutable show_labels : bool;
+      mutable saving_policy : int;
+        (** 0 = always, 1 = never, 2 = ask *)
       mutable env : Env.env;
       mutable config : Whyconf.config;
     }
@@ -53,6 +55,7 @@ type ide = {
   ide_tree_width : int;
   ide_task_height : int;
   ide_verbose : int;
+  ide_saving_policy : int;
   ide_default_editor : string;
 }
 
@@ -62,6 +65,7 @@ let default_ide =
     ide_tree_width = 512;
     ide_task_height = 384;
     ide_verbose = 0;
+    ide_saving_policy = 0;
     ide_default_editor = try Sys.getenv "EDITOR" with Not_found -> "editor";
   }
 
@@ -76,6 +80,8 @@ let load_ide section =
       get_int section ~default:default_ide.ide_task_height "task_height";
     ide_verbose =
       get_int section ~default:default_ide.ide_verbose "verbose";
+    ide_saving_policy =
+      get_int section ~default:default_ide.ide_saving_policy "saving_policy";
     ide_default_editor =
       get_string section ~default:default_ide.ide_default_editor
         "default_editor";
@@ -101,6 +107,7 @@ let load_config config =
     time_limit    = Whyconf.timelimit main;
     mem_limit     = Whyconf.memlimit main;
     verbose       = ide.ide_verbose;
+    saving_policy = ide.ide_saving_policy ;
     max_running_processes = Whyconf.running_provers_max main;
 (*
     provers = Mstr.empty;
@@ -140,6 +147,7 @@ let save_config t =
   let ide = set_int ide "tree_width" t.tree_width in
   let ide = set_int ide "task_height" t.task_height in
   let ide = set_int ide "verbose" t.verbose in
+  let ide = set_int ide "saving_policy" t.saving_policy in
   let ide = set_string ide "default_editor" t.default_editor in
   let config = set_section config "ide" ide in
 (* TODO: store newly detected provers !
@@ -149,7 +157,7 @@ let save_config t =
   save_config config
 
 let config =
-  eprintf "reading IDE config file...@?";
+  eprintf "[Info] reading IDE config file...@?";
   let c = read_config () in
   eprintf " done.@.";
   c
@@ -259,7 +267,7 @@ let resize_images size =
   ()
 
 let () =
-  eprintf "reading icons...@?";
+  eprintf "[Info] reading icons...@?";
   resize_images 20;
   eprintf " done.@."
 
@@ -341,16 +349,6 @@ let preferences c =
     GPack.vbox ~homogeneous:false ~packing:
       (fun w -> ignore(notebook#append_page ~tab_label:label1#coerce w)) ()
   in
-  (* toggle show labels in formulas *)
-  let showlabels =
-    GButton.check_button ~label:"show labels in formulas" ~packing:page1#add ()
-      ~active:(set_labels_flag c.show_labels;c.show_labels)
-  in
-  let (_ : GtkSignal.id) =
-    showlabels#connect#toggled ~callback:
-      (fun () -> c.show_labels <- not c.show_labels;
-         set_labels_flag c.show_labels)
-  in
   (* editor *)
  let hb = GPack.hbox ~homogeneous:false ~packing:page1#add () in
  let _ = GMisc.label ~text:"Default editor: " ~packing:(hb#pack ~expand:false) () in
@@ -398,6 +396,52 @@ let preferences c =
     ~packing:(fun w -> ignore(notebook#append_page
                                 ~tab_label:label2#coerce w)) ()
   in
+  (** page 3 **)
+  let set_saving_policy n () = c.saving_policy <- n in
+  let label3 = GMisc.label ~text:"IDE" () in
+  let page3 =
+    GPack.vbox ~homogeneous:false ~packing:
+      (fun w -> ignore(notebook#append_page ~tab_label:label3#coerce w)) ()
+  in
+  (* session saving policy *)
+  let choice0 = 
+    GButton.radio_button 
+      ~label:"Always save on exit"
+      ~active:(c.saving_policy = 0)
+      ~packing:page3#add () 
+  in 
+  let choice1 = 
+    GButton.radio_button 
+      ~label:"Never save on exit" ~group:choice0#group
+      ~active:(c.saving_policy = 1)
+      ~packing:page3#add () 
+  in 
+  let choice2 = 
+    GButton.radio_button 
+      ~label:"ask whether to save on exit" ~group:choice0#group
+      ~active:(c.saving_policy = 2)
+      ~packing:page3#add () 
+  in 
+  let (_ : GtkSignal.id) =
+    choice0#connect#toggled ~callback:(set_saving_policy 0)
+  in
+  let (_ : GtkSignal.id) =
+    choice1#connect#toggled ~callback:(set_saving_policy 1)
+  in
+  let (_ : GtkSignal.id) =
+    choice2#connect#toggled ~callback:(set_saving_policy 2)
+  in
+  (* toggle show labels in formulas *)
+  let showlabels =
+    GButton.check_button ~label:"show labels in formulas" ~packing:page3#add ()
+      ~active:(set_labels_flag c.show_labels;c.show_labels)
+  in
+  let (_ : GtkSignal.id) =
+    showlabels#connect#toggled ~callback:
+      (fun () -> c.show_labels <- not c.show_labels;
+         set_labels_flag c.show_labels)
+  in
+  (* buttons *)
   dialog#add_button "Close" `CLOSE ;
   let ( _ : GWindow.Buttons.about) = dialog#run () in
   eprintf "saving IDE config file@.";
@@ -413,7 +457,7 @@ let run_auto_detection gconfig =
 *)
   ()
 
-let () = eprintf "end of configuration initialization@."
+let () = eprintf "[Info] end of configuration initialization@."
 
 (*
 Local Variables:

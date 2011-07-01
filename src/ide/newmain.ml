@@ -21,7 +21,7 @@
 open Format
 
 let () =
-  eprintf "Init the GTK interface...@?";
+  eprintf "[Info] Init the GTK interface...@?";
   ignore (GtkMain.Main.init ());
   eprintf " done.@."
 
@@ -288,7 +288,7 @@ let () =
   view_time_column#set_visible true
 
 let goals_model,goals_view =
-  eprintf "Creating tree model...@?";
+  eprintf "[Info] Creating tree model...@?";
   let model = GTree.tree_store cols in
   let view = GTree.view ~model ~packing:scrollview#add () in
   let () = view#selection#set_mode (* `SINGLE *) `MULTIPLE in
@@ -503,17 +503,17 @@ let project_dir, file_to_read =
     begin
       if Sys.is_directory fname then
         begin
-          eprintf "Info: found directory '%s' for the project@." fname;
+          eprintf "[Info] found directory '%s' for the project@." fname;
           fname, None
         end
       else
         begin
-          eprintf "Info: found regular file '%s'@." fname;
+          eprintf "[Info] found regular file '%s'@." fname;
           let d =
             try Filename.chop_extension fname
             with Invalid_argument _ -> fname
           in
-          eprintf "Info: using '%s' as directory for the project@." d;
+          eprintf "[Info] using '%s' as directory for the project@." d;
           d, Some (Filename.concat Filename.parent_dir_name
                      (Filename.basename fname))
         end
@@ -524,7 +524,7 @@ let project_dir, file_to_read =
 let () =
   if not (Sys.file_exists project_dir) then
     begin
-      eprintf "Info: '%s' does not exists. Creating directory of that name \
+      eprintf "[Info] '%s' does not exists. Creating directory of that name \
  for the project@." project_dir;
       Unix.mkdir project_dir 0o777
     end
@@ -532,13 +532,13 @@ let () =
 
 let () =
   try
-    eprintf "Opening session...@?";
+    eprintf "[Info] Opening session...@\n@[<v 2>  ";
     M.open_session ~env:gconfig.env 
       (* ~provers:gconfig.provers *)
       ~config:gconfig.Gconfig.config
       ~init ~notify project_dir;
     M.maximum_running_proofs := gconfig.max_running_processes;
-    eprintf " done@."
+    eprintf "@]@\n[Info] Opening session: done@."
   with e ->
     eprintf "@[Error while opening session:@ %a@.@]" 
       Exn_printer.exn_printer e;
@@ -576,7 +576,7 @@ let () =
     | None -> ()
     | Some fn ->
         if M.file_exists fn then
-          eprintf "Info: file %s already in database@." fn
+          eprintf "[Info] file %s already in database@." fn
         else
           try
             M.add_file fn
@@ -726,8 +726,12 @@ let (_ : GMenu.image_menu_item) =
     (fun () -> Gconfig.run_auto_detection gconfig; !refresh_provers () )
     ()
 
+let save_session () =
+  eprintf "[Info] saving session@.";
+  M.save_session ()
+
 let exit_function () =
-  eprintf "saving IDE config file@.";
+  eprintf "[Info] saving IDE config file@.";
   save_config ();
   (*
   eprintf "saving session (testing only)@.";
@@ -748,22 +752,29 @@ let exit_function () =
   let ret = Sys.command "xmllint --noout --dtdvalid share/why3session.dtd essai.xml" in
   if ret = 0 then eprintf "DTD validation succeeded, good!@.";
   *)
-  let d = GWindow.message_dialog
-    ~message:"Do you want to save the session?"
-    ~message_type:`QUESTION
-    ~buttons:GWindow.Buttons.yes_no
-    ~title:"Why3 save"
-    ~modal:true
-    ~show:true ()
-  in
-  let (_ : GtkSignal.id) =
-    d#connect#response
-      ~callback:(function x -> d#destroy ();
-                   if x = `YES then M.save_session ();
-                   GMain.quit ()
-                )
-  in
-  ()
+  match config.saving_policy with
+    | 0 -> save_session (); GMain.quit ()
+    | 1 -> GMain.quit ()
+    | 2 ->
+        let d = GWindow.message_dialog
+          ~message:"Do you want to save the session?"
+          ~message_type:`QUESTION
+          ~buttons:GWindow.Buttons.yes_no
+          ~title:"Why3 save"
+          ~modal:true
+          ~show:true ()
+        in
+        let (_ : GtkSignal.id) =
+          d#connect#response
+            ~callback:(function x -> d#destroy ();
+                         if x = `YES then save_session ();
+                         GMain.quit ()
+                      )
+        in
+        ()
+    | _ -> 
+        eprintf "unexpected value for saving_policy@.";
+        GMain.quit ()
 
 (*************)
 (* View menu *)
@@ -1186,7 +1197,7 @@ let (_ : GMenu.image_menu_item) =
 
 let (_ : GMenu.image_menu_item) =
   file_factory#add_image_item (* no shortcut ~key:GdkKeysyms._S *)
-    ~label:"_Save session" ~callback:M.save_session
+    ~label:"_Save session" ~callback:save_session
     ()
 
 
@@ -1198,7 +1209,7 @@ let save_file () =
   let f = !current_file in
   if f <> "" then
     begin
-      M.save_session ();
+      save_session ();
       let s = source_view#source_buffer#get_text () in
       let c = open_out f in
       output_string c s;

@@ -37,6 +37,7 @@ type t =
 *)
       mutable default_editor : string;
       mutable show_labels : bool;
+      mutable saving_policy : int;
       mutable env : Why.Env.env;
       mutable config : Whyconf.config;
     }

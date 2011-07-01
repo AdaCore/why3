@@ -838,7 +838,7 @@ let rec reload_any_goal parent gid gname sum t old_goal goal_obsolete =
 and reload_trans  _goal_obsolete goal _ tr =
   let trname = tr.transf.transformation_name in
   let gname = goal.goal_name in
-  eprintf "[Reload] transformation %s for goal %s @." trname gname;
+  eprintf "[Reload] transformation %s for goal %s @\n" trname gname;
   let mtr = raw_add_transformation goal tr.transf tr.transf_expanded in
   let old_subgoals =
     List.fold_left
@@ -1021,7 +1021,7 @@ let reload_root_goal mth tname old_goals t : goal =
 
 (* reloads a theory *)
 let reload_theory mfile old_theories (_,tname,th) =
-  eprintf "[Reload] theory '%s'@."tname;
+  eprintf "[Reload] theory '%s'@\n"tname;
   let tasks = List.rev (Task.split_theory th None None) in
   let old_goals, old_exp =
     try
@@ -1068,7 +1068,7 @@ let reload_all () =
   let files = !all_files in
   let all_theories =
     List.map (fun mf ->
-                eprintf "[Reload] file '%s'@." mf.file_name;
+                eprintf "[Reload] file '%s'@\n" mf.file_name;
                 (mf,read_file mf.file_name))
       files
   in

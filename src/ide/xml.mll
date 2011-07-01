@@ -73,7 +73,7 @@ rule xml_prolog = parse
 | "<?xml" space+ "version=\"1.0\"" space+ "encoding=\"UTF-8\"" space+ "?>"
     { xml_doctype "1.0" "" lexbuf }
 | "<?xml" ([^'?']|'?'[^'>'])* "?>" 
-    { Format.eprintf "[Xml warning] prolog ignored@.";
+    { Format.eprintf "[Xml warning] prolog ignored@\n";
       xml_doctype "1.0" "" lexbuf }
 | _ 
     { parse_error "wrong prolog" }
@@ -104,13 +104,13 @@ and elements group_stack element_stack = parse
       { match group_stack with
          | [] -> 
              Format.eprintf 
-               "[Xml warning] unexpected closing Xml element `%s'@." 
+               "[Xml warning] unexpected closing Xml element `%s'@\n" 
                celem;
              elements group_stack element_stack lexbuf
          | (elem,att,stack)::g ->
              if celem <> elem then
                Format.eprintf 
-                 "[Xml warning] Xml element `%s' closed by `%s'@." 
+                 "[Xml warning] Xml element `%s' closed by `%s'@\n" 
                  elem celem;
              let e = {
                 name = elem;
@@ -120,13 +120,13 @@ and elements group_stack element_stack = parse
              in elements g (e::stack) lexbuf            
        }
   | '<'
-      { Format.eprintf "[Xml warning] unexpected '<'@.";
+      { Format.eprintf "[Xml warning] unexpected '<'@\n";
         elements group_stack element_stack lexbuf }      
   | eof 
       { match group_stack with
          | [] -> element_stack
          | (elem,_,_)::_ ->
-             Format.eprintf "[Xml warning] unclosed Xml element `%s'@." elem;
+             Format.eprintf "[Xml warning] unclosed Xml element `%s'@\n" elem;
              pop_all group_stack element_stack
       }
   | _ as c
