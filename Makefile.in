@@ -1,9 +1,9 @@
 ##########################################################################
 #                                                                        #
 #  Copyright (C) 2010-2011                                               #
-#    François Bobot                                                     #
-#    Jean-Christophe Filliâtre                                          #
-#    Claude Marché                                                      #
+#    François Bobot                                                      #
+#    Jean-Christophe Filliâtre                                           #
+#    Claude Marché                                                       #
 #    Andrei Paskevich                                                    #
 #                                                                        #
 #  This software is free software; you can redistribute it and/or        #
@@ -1153,7 +1153,7 @@ $(DISTRIB_TAR): doc/manual.pdf
 ###############
 
 headers:
-	headache -c misc/headache_config.txt -h misc/header.txt \
+	misc/headache.sh \
 	    Makefile.in configure.in src/*.ml* src/*/*.ml* \
 	    src/tools/cpulimit.c
 

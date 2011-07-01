@@ -1,9 +1,9 @@
 (**************************************************************************)
 (*                                                                        *)
 (*  Copyright (C) 2010-2011                                               *)
-(*    François Bobot                                                     *)
-(*    Jean-Christophe Filliâtre                                          *)
-(*    Claude Marché                                                      *)
+(*    François Bobot                                                      *)
+(*    Jean-Christophe Filliâtre                                           *)
+(*    Claude Marché                                                       *)
 (*    Andrei Paskevich                                                    *)
 (*                                                                        *)
 (*  This software is free software; you can redistribute it and/or        *)
@@ -20,7 +20,7 @@
 (*
 
   This module was poorly designed by Claude Marché, with the
-  enormous help of Jean-Christophe Filliatre and Andrei Paskevich
+  enormous help of Jean-Christophe Filliâtre and Andrei Paskevich
   for finding the right function in the Why3 API
 
 *)
