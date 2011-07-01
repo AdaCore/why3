@@ -90,15 +90,15 @@ theory Field
   axiom Inverse : forall x:t. x <> zero -> x * inv x = one
   function (/) (x y : t) : t = x * inv y
 
-  lemma assoc_mul_div: forall x y z:real.
+  lemma assoc_mul_div: forall x y z:t.
     (* todo: discard the hypothesis ? *)
      z <> zero -> (x*y)/z = x*(y/z)
 
-  lemma assoc_div_mul: forall x y z:real.
+  lemma assoc_div_mul: forall x y z:t.
     (* todo: discard the hypothesis ? *)
      y <> zero /\ z <> zero -> (x/y)/z = x/(y*z)
 
-  lemma assoc_div_div: forall x y z:real.
+  lemma assoc_div_div: forall x y z:t.
     (* todo: discard the hypothesis ? *)
      y <> zero /\ z <> zero -> x/(y/z) = (x*z)/y
 
