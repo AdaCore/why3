@@ -1,5 +1,5 @@
 theory Why2
-use array.Array as A
+use map.Map as A
   use unit_inf.Unit
   use int.Int
   use int.ComputerDivision
@@ -542,7 +542,7 @@ use array.Array as A
         (((base_addr p1 : (addr 'a1)) = (base_addr p2 : (addr 'a1))) ->
          ((sub_pointer p1 p2 : int) = (Int.(-) (offset p1 : int) (offset p2 : int) : int)))))
 
-  type memory 'a 'z = A.t (pointer 'z) 'a
+  type memory 'a 'z = A.map (pointer 'z) 'a
 
   function acc (m:memory 'a1 'a2) (k:pointer 'a2) : 'a1 = A.get m k
 

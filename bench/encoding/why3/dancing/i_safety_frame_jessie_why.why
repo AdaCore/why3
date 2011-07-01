@@ -1,5 +1,5 @@
 theory Why2
-use array.Array as A
+use map.Map as A
   use unit_inf.Unit
   use int.Int
   use int.ComputerDivision
@@ -464,7 +464,7 @@ use array.Array as A
         (forall i:int [(sub_pointer p (shift q i : (pointer 'a1)) : int)].
           ((sub_pointer p (shift q i : (pointer 'a1)) : int) = (Int.(-) (sub_pointer p q : int) i : int)))))
 
-  type memory 't 'v = A.t (pointer 't) 'v
+  type memory 't 'v = A.map (pointer 't) 'v
 
   function select (m:memory 'a1 'a2) (k:pointer 'a1) : 'a2 = A.get m k
 

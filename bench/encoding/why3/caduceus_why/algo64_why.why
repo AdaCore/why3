@@ -1,5 +1,5 @@
 theory Why2
-use array.Array as A
+use map.Map as A
   use unit_inf.Unit
   use int.Int
   use int.ComputerDivision
@@ -39,7 +39,7 @@ use array.Array as A
 
   predicate zwf_zero (a : int) (b : int) = ((Int.(<=) 0 b) /\ (Int.(<) a b))
 
-  type farray 'a = A.t int 'a
+  type farray 'a = A.map int 'a
 
   function access (m:farray 'a1) (k:int) : 'a1 = A.get m k
 

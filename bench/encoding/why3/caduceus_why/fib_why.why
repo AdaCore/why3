@@ -1,5 +1,5 @@
 theory Why2
-use array.Array as A
+use map.Map as A
   use unit_inf.Unit
   use int.Int
   use int.ComputerDivision
@@ -515,7 +515,7 @@ use array.Array as A
     (forall n:int.
       ((Int.(>=) n 0) -> ((Int.(<=) n 0) -> (1 = (why3_F n : int)))))
 
-  type farray 'a = A.t int 'a
+  type farray 'a = A.map int 'a
 
   function access (m:farray 'a1) (k:int) : 'a1 = A.get m k
 
