@@ -207,7 +207,7 @@ clean::
 
 install_no_local::
 	mkdir -p $(BINDIR)
-	mkdir -p $(LIBDIR)/why3/plugins
+	mkdir -p $(LIBDIR)/why3
 	mkdir -p $(DATADIR)/why3/images
 	mkdir -p $(DATADIR)/why3/emacs
 	mkdir -p $(DATADIR)/why3/lang
@@ -691,7 +691,7 @@ plugins/whytptp.cmo: $(TPTPCMO)
 	    $(OCAMLC) $(BFLAGS) -pack -o $@ $^
 
 install_no_local::
-	cp -f plugins/whytptp.cm* $(LIBDIR)/why3/plugins
+	cp -f plugins/whytptp.cm* $(LIBDIR)/why3/
 
 # depend and clean targets
 
@@ -727,7 +727,7 @@ clean::
 	rm -f bin/why3-cpulimit src/tools/*~
 
 install_no_local::
-	cp -f bin/why3-cpulimit $(BINDIR)
+	cp -f bin/why3-cpulimit $(BINDIR)/why3-cpulimit
 
 #########
 # why3doc

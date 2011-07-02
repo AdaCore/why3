@@ -109,7 +109,7 @@ let add_plugin m p =
   then m
   else { m with plugins = List.rev (p::(List.rev m.plugins))}
 
-let pluginsdir m = Filename.concat m.libdir "plugins"
+let pluginsdir m = m.libdir
 let load_plugins m =
   let load x =
     try Plugin.load x
