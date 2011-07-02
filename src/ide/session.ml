@@ -1649,12 +1649,9 @@ let transform ~context_unproved_goals_only tr a =
 
 
 let ft_of_th th =
-  (Filename.basename th.theory_parent.file_name,
-   (*
-     th.theory.Theory.th_name.Ident.id_string
-   *)
-   th.theory_name
-  )
+  let fn = Filename.basename th.theory_parent.file_name in
+  let fn = try Filename.chop_extension fn with Invalid_argument _ -> fn in
+  (fn, (* th.theory.Theory.th_name.Ident.id_string *) th.theory_name)
 
 let rec ft_of_goal g =
   match g.parent with
@@ -1685,9 +1682,8 @@ let edit_proof ~default_editor ~project_dir a =
             match a.edited_as with
               | "" ->
                   let (fn,tn) = ft_of_pa a in
-                  let file = Driver.file_of_task driver
-                    (Filename.concat project_dir fn) tn t
-                  in
+                  let file = Driver.file_of_task driver fn tn t in
+                  let file = Filename.concat project_dir file in
                   (* Uniquify the filename if it exists on disk *)
                   let i =
                     try String.rindex file '.'

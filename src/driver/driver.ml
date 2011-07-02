@@ -204,15 +204,17 @@ exception UnknownSpec of string
 let filename_regexp = Str.regexp "%\\(.\\)"
 
 let get_filename drv input_file theory_name goal_name =
+  let sanitize = Ident.sanitizer
+    Ident.char_to_alnumus Ident.char_to_alnumus in
   let file = match drv.drv_filename with
     | Some f -> f
     | None -> "%f-%t-%g.dump"
   in
   let replace s = match Str.matched_group 1 s with
     | "%" -> "%"
-    | "f" -> input_file
-    | "t" -> theory_name
-    | "g" -> goal_name
+    | "f" -> sanitize input_file
+    | "t" -> sanitize theory_name
+    | "g" -> sanitize goal_name
     | s   -> raise (UnknownSpec s)
   in
   Str.global_substitute filename_regexp replace file
