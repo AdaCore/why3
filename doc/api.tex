@@ -80,9 +80,10 @@ As expected, the output is as follows.
 \begin{verbatim}
 formula 2 is: A /\ B -> A
 \end{verbatim}
-\todo{Check: Notice that the concrete syntax of \why forbids predicate identifiers
-to start with a capital letter. This constraint does not exist when
-building those directly using library calls.}
+Notice that the concrete syntax of \why forbids function and predicate
+names to start with a capital letter (except for the algebraic type
+constructors which must start with one). This constraint is not enforced
+when building those directly using library calls.
 
 \section{Building Tasks}
 
