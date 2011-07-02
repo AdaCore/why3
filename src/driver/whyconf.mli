@@ -39,8 +39,8 @@ val read_config : string option -> config
     raised.
     - If "$WHY3CONFIG" is given and the file doesn't exist Rc.CannotOpen
     is raised
-    - otherwise we try reading "$HOME/.why.conf" (or
-    "$USERPROFILE/.why.conf" under Windows) and, if not present, we return
+    - otherwise we try reading "$HOME/.why3.conf" (or
+    "$USERPROFILE/.why3.conf" under Windows) and, if not present, we return
     the built-in default_config with default configuration filename *)
 
 val save_config : config -> unit

@@ -37,7 +37,7 @@ prover = altergo
 driver = "..."
 command = "..."
 
-loadpath = "..." #added to the one in why.conf
+loadpath = "..." #added to the one in why3.conf
 loadpath = "..."
 
 timelimit = 30

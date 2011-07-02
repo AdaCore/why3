@@ -42,8 +42,8 @@ let default_loadpath =
 
 let default_conf_file =
   match Config.localdir with
-    | None -> Filename.concat (Rc.get_home_dir ()) ".why.conf"
-    | Some d -> Filename.concat d "why.conf"
+    | None -> Filename.concat (Rc.get_home_dir ()) ".why3.conf"
+    | Some d -> Filename.concat d "why3.conf"
 
 (* Configuration file *)
 
@@ -119,7 +119,7 @@ let load_plugins m =
   List.iter load m.plugins
 
 type config = {
-  conf_file : string;       (* "/home/innocent_user/.why.conf" *)
+  conf_file : string;       (* "/home/innocent_user/.why3.conf" *)
   config    : Rc.t;
   main      : main;
   provers   : config_prover Mstr.t;
