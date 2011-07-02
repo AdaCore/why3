@@ -1,15 +1,15 @@
-\chapter{The \why\ API}
+\chapter{The \why API}
 \label{chap:api}
 
 This chapter is a tutorial for the users who want to link their own
-OCaml code with the \why\ library. We progressively introduce the way
+OCaml code with the \why library. We progressively introduce the way
 one can use the library to build terms, formulas, theories, proof
 tasks, call external provers on tasks, and apply transformations on
 tasks. The complete documentation for API calls is given
 at URL~\url{http://why3.lri.fr/api/}.
 
 We assume the reader has a fair knowledge of the OCaml
-language. Notice that the \why\ library must be installed, see
+language. Notice that the \why library must be installed, see
 Section~\ref{sec:installlib}. The OCaml code given below is available in
 the source distribution as \url{examples/use_api.ml}.
 
@@ -80,7 +80,7 @@ As expected, the output is as follows.
 \begin{verbatim}
 formula 2 is: A /\ B -> A
 \end{verbatim}
-\todo{Check: Notice that the concrete syntax of \why\ forbids predicate identifiers
+\todo{Check: Notice that the concrete syntax of \why forbids predicate identifiers
 to start with a capital letter. This constraint does not exist when
 building those directly using library calls.}
 
@@ -102,7 +102,7 @@ let task1 : Task.task =
 To make the formula a goal, we must give a name to it, here "goal1". A
 goal name has type \texttt{prsymbol}, for identifiers denoting
 propositions in a theory or a task. Notice again that the concrete
-syntax of \why\ requires these symbols to be capitalized, but it is not
+syntax of \why requires these symbols to be capitalized, but it is not
 mandatory when using the library. The second argument of
 \texttt{add\_prop\_decl} is the kind of the proposition:
 \texttt{Paxiom}, \texttt{Plemma} or \texttt{Pgoal}

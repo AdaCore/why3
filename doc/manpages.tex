@@ -1,10 +1,10 @@
-\chapter{Reference manuals for the \why\ tools}
+\chapter{Reference manuals for the \why tools}
 \label{chap:manpages}
 
 \section{Compilation, Installation}
 \label{sec:install}
 
-Compilation of \why\ must start with a configuration phase which is run as
+Compilation of \why must start with a configuration phase which is run as
 \begin{verbatim}
 ./configure
 \end{verbatim}
@@ -21,17 +21,18 @@ It is also installable from sources, downloadable from the site
 \url{http://caml.inria.fr/ocaml/}
 \end{itemize}
 
-For the IDE, additional OCaml libraries are needed:
+For some tools, additional OCaml libraries are needed:
 \begin{itemize}
-\item The Lablgtk2 library for OCaml bindings of the gtk2 graphical library.
-For Debian-based Linux distributions, you can install the packages
+\item For the IDE: the Lablgtk2 library for OCaml bindings of the gtk2
+  graphical library. For Debian-based Linux distributions, you can
+  install the packages
 \begin{verbatim}
 liblablgtk2-ocaml-dev liblablgtksourceview2-ocaml-dev
 \end{verbatim}
 It is also installable from sources, available from the site
 \url{http://wwwfun.kurims.kyoto-u.ac.jp/soft/olabl/lablgtk.html}
 
-\item The OCaml bindings of the sqlite3 library.
+\item For \texttt{why3bench}: The OCaml bindings of the sqlite3 library.
 For Debian-based Linux distributions, you can install the package
 \begin{verbatim}
 libsqlite3-ocaml-dev
@@ -47,18 +48,18 @@ make
 
 \subsection{Local use, without installation}
 
-It is not mandatory to install \why\ into system directories.
-\why\ can be configured and compiled for local use as follows:
+It is not mandatory to install \why into system directories.
+\why can be configured and compiled for local use as follows:
 \begin{verbatim}
 ./configure --enable-local
 make
 \end{verbatim}
-The \why\ executables are then available in the subdirectory \texttt{bin/}.
+The \why executables are then available in the subdirectory \texttt{bin/}.
 
-\subsection{Installation of the \why\ library}
+\subsection{Installation of the \why library}
 \label{sec:installlib}
 
-By default, the \why\ library is not installed. It can be installed using
+By default, the \why library is not installed. It can be installed using
 \begin{verbatim}
 make byte opt
 make install_lib
@@ -66,21 +67,21 @@ make install_lib
 
 \section{Installation of external provers}
 
-\why\ can use a wide range of external theorem provers. These need to
-be installed separately, and then \why\ needs to be configured to use
+\why can use a wide range of external theorem provers. These need to
+be installed separately, and then \why needs to be configured to use
 them. There is no need to install these provers before compiling and
 installing Why.
 
 For installation of external provers, please look at the Why provers
 tips page \url{http://why.lri.fr/provers.en.html}.
 
-For configuring \why\ to use the provers, follow instructions given in
+For configuring \why to use the provers, follow instructions given in
 Section~\ref{sec:why3config}.
 
 \section{The \texttt{why3config} command-line tool}
 \label{sec:why3config}.
 
-\why\ must be configured to access external provers. Typically, this is done
+\why must be configured to access external provers. Typically, this is done
 by running either the command line tool
 \begin{verbatim}
 why3config
@@ -91,9 +92,9 @@ File/Detect provers
 \end{verbatim}
 of the IDE. This must be redone each time a new prover is installed.
 
-The provers which \why\ attempts to detect are described in
+The provers which \why attempts to detect are described in
 the readable configuration file \texttt{provers-detection-data.conf}
-of the \why\ data directory (\eg{}
+of the \why data directory (\eg{}
 \texttt{/usr/local/share/why3}). Advanced users may try to modify this
 file to add support for detection of other provers. (In that case,
 please consider submitting a new prover configuration on the bug
@@ -114,13 +115,14 @@ The provers which are typically looked for are
 \item Eprover~\cite{schulz04ijcar}: \url{http://www4.informatik.tu-muenchen.de/~schulz/WORK/eprover.html}
 \item Gappa~\cite{melquiond08rnc}: \url{http://gappa.gforge.inria.fr/}
 \item Simplify~\cite{simplify05}: \url{http://secure.ucd.ie/products/opensource/Simplify/}
-\item Spass~: \url{http://www.spass-prover.org/}
-\item veriT~: \url{http://www.verit-solver.org/}
-\item Yices~\cite{DM06}: \url{http://yices.csl.sri.com/}
+\item Spass: \url{http://www.spass-prover.org/}
+\item Vampire: \url{http://www.voronkov.com/vampire.cgi}
+\item VeriT: \url{http://www.verit-solver.org/}
+\item Yices~\cite{DM06}: \url{http://yices.csl.sri.com/}, only versions 1.xx since versions 2.xx do not support quantifiers
 \item Z3~\cite{z3}: \url{http://research.microsoft.com/en-us/um/redmond/projects/z3/}
 \end{itemize}
 
-\texttt{why3config} also detects the plugins installed in the \why\
+\texttt{why3config} also detects the plugins installed in the \why
 plugins directory (\eg{} \texttt{/usr/local/lib/why3/plugins}). A
 plugin must register itself as a parser, a transformation or a
 printer, as explained in the corresponding section.
@@ -129,15 +131,15 @@ If the user's configuration file is already present,
 \texttt{why3config} will only reset unset variables to default value,
 but will not try to detect provers.
 The option \texttt{--detect-provers} should be used to force
-\why\ to detect again the available
+\why to detect again the available
 provers and to replace them in the configuration file. The option
 \texttt{--detect-plugins} will do the same for plugins.
 
 \section{The \texttt{why3} command-line tool}
 \label{sec:why3ref}
 
-\why\ is primarily used to call provers on goals contained in an
-input file. By default, such a file must be written in \why\ language
+\why is primarily used to call provers on goals contained in an
+input file. By default, such a file must be written in \why language
 and have the extension \texttt{.why}. However, a dynamically loaded
 plugin can register a parser for some other format of logical problems,
 \eg{} TPTP or SMTlib.
@@ -150,7 +152,7 @@ The \texttt{why3} tool executes the following steps:
 \item Load the plugins mentioned in the configuration. It will not
   stop if some plugin fails to load.
 \item Parse and typecheck the given files using the correct parser in order
-  to obtain a set of \why\ theories for each file. It uses
+  to obtain a set of \why theories for each file. It uses
   the filename extension or the \texttt{--format} option to choose
   among the available parsers. The \texttt{--list-format} option gives
   the list of registered parsers.
@@ -187,7 +189,7 @@ The provers can answer the following output:
 \item[Failure] an error occured,
 \item[Invalid] the prover know the goal can't be proved
 \end{description}
-% \why\ can also be *)
+% \why can also be *)
 % used to provide other informations : *)
 % \begin{itemize} *)
 % \item \texttt{print-namespace} print the namespace of the selected *)
@@ -295,11 +297,11 @@ The preferences window allows you customize
 
 \section{The \texttt{why3ml} tool}
 
-\texttt{why3ml} is an additional layer on \why\ library for
-generating verification conditions from \whyml\ programs.
+\texttt{why3ml} is an additional layer on \why library for
+generating verification conditions from \whyml programs.
 The command-line of \texttt{why3ml} is identical to that of
 \texttt{why3}, but also accepts files with extension \texttt{.mlw} as
-input files containing \whyml\ modules (see chapter~\ref{chap:whyml}
+input files containing \whyml modules (see chapter~\ref{chap:whyml}
 and section~\ref{sec:syntax:whyml}). Modules are turned into
 theories containing verification conditions as goals, and then
 \texttt{why3ml} behaves exactly as \texttt{why3} for the remaining of
@@ -312,7 +314,7 @@ For those who want to experiment with \whyml, many examples are provided in
 
 \section{The \texttt{why3bench} tool}
 
-The \texttt{why3bench} tool adds a scheduler on top of the \why\
+The \texttt{why3bench} tool adds a scheduler on top of the \why
 library. \texttt{why3bench} is designed to compare various components
 of automatic proofs: automatic provers, transformations, definitions
 of a theory. For that goal it tries to prove predefined goals using

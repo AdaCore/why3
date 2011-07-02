@@ -3,12 +3,12 @@
 
 \section{Hello Proofs}
 
-The first and basic step in using \why\ is to write a suitable input
+The first and basic step in using \why is to write a suitable input
 file. When one wants to learn a programming language, you start by
 writing a basic program. Here we start by writing a file containing a
 basic set of goals.
 
-Here is our first \why\ file, which is the file
+Here is our first \why file, which is the file
 \texttt{examples/hello\_proof.why} of the distribution.
 \verbatiminput{../examples/hello_proof.why}
 
@@ -17,12 +17,12 @@ inside a theory, which is in that example called TheoryProof and
 labelled with a comment inside double quotes. It contains three goals
 named $G_1,G_2,G_3$. The first two are basic propositional goals,
 whereas the third involves some integer arithmetic, and thus it
-requires to import the theory of integer arithmetic from the \why\
+requires to import the theory of integer arithmetic from the \why
 standard library, which is done by the \texttt{use} declaration above.
 
 We don't give more details here about the syntax and refer to
 Chapter~\ref{chap:syntax} for detailed explanations. In the following,
-we show how this file is handled in the \why\ GUI
+we show how this file is handled in the \why GUI
 (Section~\ref{sec:gui}) then in batch mode using the \texttt{why3}
 executable (Section~\ref{sec:batch}).
 
@@ -160,7 +160,7 @@ Starting the IDE on the modified file and expanding everything with
 
 The important feature to notice first is that all the previous proof
 attempts and transformations were saved in a database --- an SQLite3
-file created when the \why\ file was opened in the GUI for the first
+file created when the \why file was opened in the GUI for the first
 time. Then, for
 all the goals that remain unchanged, the previous proofs are shown
 again. For the parts that changed, the previous proofs attempts are
@@ -168,7 +168,7 @@ shown but marked with "(obsolete)" so that you know the results are
 not accurate. You can now retry to prove all what remains unproved
 using any of the provers, using the button ``Replay''.
 
-\section{Getting Started with the \why\ Command}
+\section{Getting Started with the \why Command}
 \label{sec:batch}
 
 The why3 command allows to check the validity of goals with external
@@ -178,7 +178,7 @@ description of this tool and all its command-line options.
 
 The very first time you want to use Why, you should proceed with
 autodetection of external provers. We have already seen how to do
-it in the \why\ GUI. On the command line, this is done as follows
+it in the \why GUI. On the command line, this is done as follows
 (here ``\texttt{>}'' is the prompt):
 \begin{verbatim}
 > why3config --detect

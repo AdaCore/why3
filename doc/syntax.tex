@@ -1,19 +1,19 @@
-\chapter{The \why\ Language}
+\chapter{The \why Language}
 \label{chap:syntax}
 
 This chapter describes the input syntax, and informally gives its semantics,
 illustrated by examples.
 
-A \why\ text contains a list of \emph{theories}.
+A \why text contains a list of \emph{theories}.
 A theory is a list of \emph{declarations}. Declarations introduce new
 types, functions and predicates, state axioms, lemmas and goals.
 These declarations can be directly written in the theory or taken from
-existing theories. The base logic of \why\ is first-order
+existing theories. The base logic of \why is first-order
 logic with polymorphic types.
 
 \subsection{Example 1: lists}
 
-The Figure~\ref{fig:tutorial1} contains an example of \why\ input
+The Figure~\ref{fig:tutorial1} contains an example of \why input
 text, containing three theories. The first theory, \texttt{List},
 declares a new algebraic type for polymorphic lists, \texttt{list 'a}.
 As in ML, \texttt{'a} stands for a type variable.
@@ -80,13 +80,13 @@ The next declaration defines a recursive function, \texttt{length},
 which computes the length of a list. The \texttt{function} and
 \texttt{predicate} keywords are used to introduce function and
 predicate symbols, respectively.
-\why\ checks every recursive, or mutually recursive, definition for
+\why checks every recursive, or mutually recursive, definition for
 termination. Basically, we require a lexicographic and structural
 descent for every recursive call for some reordering of arguments.
 Notice that matching must be exhaustive and that every \texttt{match}
 expression must be terminated by the \texttt{end} keyword.
 
-Despite using higher-order ``curried'' syntax, \why\ does not permit
+Despite using higher-order ``curried'' syntax, \why does not permit
 partial application: function and predicate arities must be respected.
 
 The last declaration in theory \texttt{Length} is a lemma stating that
@@ -172,7 +172,7 @@ Consider theory \texttt{SortedGen}. In the beginning, we
 make a simple \texttt{clone} theory \texttt{Order}.
 This is pretty much equivalent to copy-pasting every
 declaration from \texttt{Order} to \texttt{SortedGen};
-the only difference is that \why\ traces the history
+the only difference is that \why traces the history
 of cloning and transformations and drivers often make
 use of it (see Section~\ref{sec:drivers}).
 
@@ -198,7 +198,7 @@ ordered type, without having to retype the definition of
 makes \texttt{clone} of \texttt{SortedGen} (\emph{i.e.}~copies its
 declarations) substituting type \texttt{int} for type
 \texttt{O.t} of \texttt{SortedGen} and the default order
-on integers for predicate \texttt{O.(<=)}. \why\ will
+on integers for predicate \texttt{O.(<=)}. \why will
 control that the result of cloning is well-typed.
 
 Several remarks ought to be made here. First of all, why should
@@ -215,8 +215,8 @@ is not copied from the theory being cloned. Thus, we will not create
 a second declaration of type \texttt{int} in \texttt{SortedIntList}.
 
 The mechanism of cloning bears some resemblance to modules and functors
-of ML-like languages. Unlike those languages, \why\ makes no distinction
-between modules and module signatures, modules and functors. Any \why\
+of ML-like languages. Unlike those languages, \why makes no distinction
+between modules and module signatures, modules and functors. Any \why
 theory can be \texttt{use}'d directly or instantiated in any of its
 abstract symbols.
 
@@ -283,7 +283,7 @@ is later used under the name \texttt{T}, the name of the symbol
 would be \texttt{T.$s$}.
 \end{itemize}
 
-\why\ allows to open new namespaces explicitly in the text. In particular,
+\why allows to open new namespaces explicitly in the text. In particular,
 the instruction ``\texttt{clone import Order as O}'' can be equivalently
 written as:
 \begin{verbatim}
@@ -291,15 +291,15 @@ written as:
       clone export Order
     end
 \end{verbatim}
-However, since \why\ favours short theories over long and complex ones,
+However, since \why favours short theories over long and complex ones,
 this feature is rarely used.
 
 \subsection{Example 2: Einstein's problem}
 \index{Einstein's logic problem}
 
-We now consider another, slightly more complex example: how to use \why\
+We now consider another, slightly more complex example: how to use \why
 to solve a little puzzle known as ``Einstein's logic
-problem''\footnote{This \why\ example was contributed by St\'ephane Lescuyer.}.
+problem''\footnote{This \why example was contributed by St\'ephane Lescuyer.}.
 The problem is stated as follows. Five persons, of five
 different nationalities, live in five houses in a row, all
 painted with different colors.
@@ -444,7 +444,7 @@ theory Problem "Goal of Einstein's problem"
   goal G: Pet.to Fish = German
 end
 \end{verbatim}
-and we are ready to use \why\ to discharge this goal with any prover
+and we are ready to use \why to discharge this goal with any prover
 of our choice.
 
 %%% Local Variables:
