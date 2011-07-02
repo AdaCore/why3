@@ -6,11 +6,12 @@ OCaml code with the \why\ library. We progressively introduce the way
 one can use the library to build terms, formulas, theories, proof
 tasks, call external provers on tasks, and apply transformations on
 tasks. The complete documentation for API calls is given
-[TODO in Chapter~ref{chap:apidoc}.]
+at URL~\url{http://why3.lri.fr/api/}.
 
 We assume the reader has a fair knowledge of the OCaml
-language. Notice that the \why\ library must be installed,
-see Section~\ref{sec:installlib}.
+language. Notice that the \why\ library must be installed, see
+Section~\ref{sec:installlib}. The OCaml code given below is available in
+the source distribution as \url{examples/use_api.ml}.
 
 
 \section{Building Propositional Formulas}
@@ -79,9 +80,9 @@ As expected, the output is as follows.
 \begin{verbatim}
 formula 2 is: A /\ B -> A
 \end{verbatim}
-Notice that the concrete syntax of \why\ forbids predicate identifiers
+\todo{Check: Notice that the concrete syntax of \why\ forbids predicate identifiers
 to start with a capital letter. This constraint does not exist when
-building those directly using library calls.
+building those directly using library calls.}
 
 \section{Building Tasks}
 
@@ -185,7 +186,12 @@ let env : Env.env =
   Env.create_env_of_loadpath (Whyconf.loadpath main)
 (* loading the Alt-Ergo driver *)
 let alt_ergo_driver : Driver.driver =
-  Driver.load_driver env alt_ergo.Whyconf.driver
+  try
+    Driver.load_driver env alt_ergo.Whyconf.driver
+  with e ->
+    eprintf "Failed to load driver for alt-ergo: %a@."
+      Exn_printer.exn_printer e;
+    exit 1
 \end{verbatim}
 
 We are now ready to call the prover on the tasks. This is done by a
@@ -312,18 +318,9 @@ let x : Term.term = Term.t_var var_x
 let x_times_x : Term.term = Term.t_app_infer mult_symbol [x;x]
 let fmla4_aux : Term.term = Term.ps_app ge_symbol [x_times_x;zero]
 \end{verbatim}
-To quantify on $x$, one can first build an intermediate
-value of type \texttt{term\_quant}, representing a closure
-under a quantifier:
+To quantify on $x$, we use the appropriate smart constructor as follows.
 \begin{verbatim}
-let fmla4_quant : Term.term_quant = Term.t_close_quant [var_x] [] fmla4_aux
-let fmla4 : Term.term = Term.t_forall fmla4_quant
-\end{verbatim}
-The second argument of \texttt{t\_close\_quant} is a list of triggers.
-
-A simpler method would be to use an appropriate function:
-\begin{verbatim}
-let fmla4bis : Term.term = Term.t_forall_close [var_x] [] fmla4_aux
+let fmla4 : Term.term = Term.t_forall_close [var_x] [] fmla4_aux
 \end{verbatim}
 
 \section{Building Theories}

@@ -96,7 +96,7 @@ let alt_ergo_driver : Driver.driver =
       Exn_printer.exn_printer e;
     exit 1
 
-(* call Alt-Ergo *)
+(* calls Alt-Ergo *)
 let result1 : Call_provers.prover_result =
   Call_provers.wait_on_call
     (Driver.prove_task ~command:alt_ergo.Whyconf.command
@@ -166,10 +166,7 @@ let x_times_x : Term.term =
   Term.t_app_infer mult_symbol [x;x]
 let fmla4_aux : Term.term =
   Term.ps_app ge_symbol [x_times_x;zero]
-let fmla4_quant : Term.term_quant =
-  Term.t_close_quant [var_x] [] fmla4_aux
-let fmla4 : Term.term =
-  Term.t_forall fmla4_quant
+let fmla4 : Term.term = Term.t_forall_close [var_x] [] fmla4_aux
 
 let task4 = None
 let task4 = Task.use_export task4 int_theory
@@ -186,4 +183,4 @@ let () = printf "@[On task 4, alt-ergo answers %a@."
 
 (* build a theory with all these goals *)
 
-
+(* TODO *)
