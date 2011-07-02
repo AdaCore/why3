@@ -18,7 +18,7 @@
 (**************************************************************************)
 
 open Format
-open Why
+open Why3
 open Util
 open Whyconf
 open Theory
@@ -406,7 +406,7 @@ let output_task_prepared drv fname _tname th task dir =
   close_out cout
 
 
-let do_task drv fname tname (th : Why.Theory.theory) (task : Task.task) =
+let do_task drv fname tname (th : Theory.theory) (task : Task.task) =
   match !opt_output, !opt_command with
     | Some dir, Some command when !opt_bisect ->
       let test task =

@@ -47,7 +47,7 @@
       s (pos.pos_lnum) (pos.pos_cnum-pos.pos_bol)
 
   (** report errors *)
-  let () = Why.Exn_printer.register (fun fmt exn -> match exn with
+  let () = Why3.Exn_printer.register (fun fmt exn -> match exn with
     | TptpParser.Error ->
       Format.fprintf fmt "syntax error.@."
     | LexicalError (s, pos) ->

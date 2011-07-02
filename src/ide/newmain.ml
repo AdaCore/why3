@@ -26,7 +26,7 @@ let () =
   eprintf " done.@."
 
 
-open Why
+open Why3
 open Whyconf
 open Gconfig
 

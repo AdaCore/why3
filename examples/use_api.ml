@@ -25,7 +25,7 @@ the alt-ergo prover to check them
 ******************)
 
 (* opening the Why3 library *)
-open Why
+open Why3
 
 (* a ground propositional goal: true or false *)
 let fmla_true : Term.term = Term.t_true

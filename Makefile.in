@@ -159,23 +159,23 @@ LIBCMO = $(addsuffix .cmo, $(LIBMODULES))
 LIBCMX = $(addsuffix .cmx, $(LIBMODULES))
 
 $(LIBCMO) $(LIBCMX): INCLUDES += $(LIBINCLUDES)
-$(LIBCMX): OFLAGS += -for-pack Why
+$(LIBCMX): OFLAGS += -for-pack Why3
 
 # build targets
 
-byte: src/why.cma
-opt:  src/why.cmxa
+byte: src/why3.cma
+opt:  src/why3.cmxa
 
-src/why.cma: src/why.cmo
+src/why3.cma: src/why3.cmo
 	$(OCAMLC) -a $(BFLAGS) -o $@ $^
 
-src/why.cmxa: src/why.cmx
+src/why3.cmxa: src/why3.cmx
 	$(OCAMLOPT) -a $(OFLAGS) -o $@ $^
 
-src/why.cmo: $(LIBCMO)
+src/why3.cmo: $(LIBCMO)
 	$(OCAMLC) $(BFLAGS) -pack -o $@ $^
 
-src/why.cmx: $(LIBCMX)
+src/why3.cmx: $(LIBCMX)
 	$(OCAMLOPT) $(OFLAGS) -pack -o $@ $^
 
 # depend target
@@ -199,7 +199,7 @@ LIBCLEAN = $(addsuffix /*.cm[iox], $(LIBSDIRS)) \
 
 clean::
 	rm -f $(LIBCLEAN) $(LIBGENERATED)
-	rm -f src/why.cm[iox] src/why.[ao] src/why.cma src/why.cmxa
+	rm -f src/why3.cm[aiox] src/why3.[ao] src/why3.cmxa
 	rm -f .depend.lib
 
 ###############
@@ -227,9 +227,9 @@ install_no_local::
 
 install_no_local_lib::
 	mkdir -p $(OCAMLLIB)/why3
-	cp -f src/why.cm* $(OCAMLLIB)/why3
+	cp -f src/why3.cm* $(OCAMLLIB)/why3
 	cp -f META $(OCAMLLIB)/why3
-	if test -f src/why.a; then cp -f src/why.a $(OCAMLLIB)/why3; fi
+	if test -f src/why3.a; then cp -f src/why3.a $(OCAMLLIB)/why3; fi
 
 ifeq (@enable_local@,yes)
 install install-lib:
@@ -250,20 +250,20 @@ install-all: install install-lib
 byte: bin/why3.byte
 opt:  bin/why3.opt
 
-bin/why3.opt: src/why.cmxa src/main.cmx
+bin/why3.opt: src/why3.cmxa src/main.cmx
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
 	$(STRIP) $@
 
-bin/why3.byte: src/why.cma src/main.cmo
+bin/why3.byte: src/why3.cma src/main.cmo
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
 
 bin/why3: bin/why3.@OCAMLBEST@
 	ln -sf why3.@OCAMLBEST@ $@
 
-src/main.cmo: src/why.cma
-src/main.cmx: src/why.cmxa
+src/main.cmo: src/why3.cma
+src/main.cmx: src/why3.cmxa
 
 clean::
 	rm -f src/main.cm[iox] src/main.annot src/main.o
@@ -295,12 +295,12 @@ $(PGMCMO) $(PGMCMX): INCLUDES += -I src/programs
 byte: bin/why3ml.byte
 opt:  bin/why3ml.opt
 
-bin/why3ml.opt: src/why.cmxa $(PGMCMX) src/main.cmx
+bin/why3ml.opt: src/why3.cmxa $(PGMCMX) src/main.cmx
 	$(if $(QUIET), @echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
 	$(STRIP) $@
 
-bin/why3ml.byte: src/why.cma $(PGMCMO) src/main.cmo
+bin/why3ml.byte: src/why3.cma $(PGMCMO) src/main.cmo
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
 
@@ -385,12 +385,12 @@ $(CONFIGCMO) $(CONFIGCMX): INCLUDES += -I src/programs
 byte: bin/why3config.byte
 opt:  bin/why3config.opt
 
-bin/why3config.opt: src/why.cmxa $(CONFIGCMX)
+bin/why3config.opt: src/why3.cmxa $(CONFIGCMX)
 	$(if $(QUIET), @echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
 	$(STRIP) $@
 
-bin/why3config.byte: src/why.cma $(CONFIGCMO)
+bin/why3config.byte: src/why3.cma $(CONFIGCMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
 
@@ -449,12 +449,12 @@ bin/why3ide.opt bin/why3ide.byte: INCLUDES += -I @LABLGTK2LIB@
 bin/why3ide.opt bin/why3ide.byte: EXTOBJS +=
 bin/why3ide.opt bin/why3ide.byte: EXTLIBS += lablgtk lablgtksourceview2
 
-bin/why3ide.opt: src/why.cmxa $(PGMCMX) $(IDECMX)
+bin/why3ide.opt: src/why3.cmxa $(PGMCMX) $(IDECMX)
 	$(if $(QUIET), @echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
 	$(STRIP) $@
 
-bin/why3ide.byte: src/why.cma $(PGMCMO) $(IDECMO)
+bin/why3ide.byte: src/why3.cma $(PGMCMO) $(IDECMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
 
@@ -505,12 +505,12 @@ $(REPLAYERCMO) $(REPLAYERCMX): INCLUDES += -I src/ide
 byte: bin/why3replayer.byte
 opt:  bin/why3replayer.opt
 
-bin/why3replayer.opt: src/why.cmxa $(PGMCMX) $(REPLAYERCMX)
+bin/why3replayer.opt: src/why3.cmxa $(PGMCMX) $(REPLAYERCMX)
 	$(if $(QUIET), @echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
 	$(STRIP) $@
 
-bin/why3replayer.byte: src/why.cma $(PGMCMO) $(REPLAYERCMO)
+bin/why3replayer.byte: src/why3.cma $(PGMCMO) $(REPLAYERCMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
 
@@ -566,12 +566,12 @@ opt:  bin/why3bench.opt
 bin/why3bench.opt bin/why3bench.byte: INCLUDES += -thread -I +threads -I @SQLITE3LIB@
 bin/why3bench.opt bin/why3bench.byte: EXTLIBS += threads sqlite3
 
-bin/why3bench.opt: src/why.cmxa $(PGMCMX) $(BENCHCMX)
+bin/why3bench.opt: src/why3.cmxa $(PGMCMX) $(BENCHCMX)
 	$(if $(QUIET), @echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
 	$(STRIP) $@
 
-bin/why3bench.byte: src/why.cma  $(PGMCMO) $(BENCHCMO)
+bin/why3bench.byte: src/why3.cma  $(PGMCMO) $(BENCHCMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
 
@@ -627,10 +627,10 @@ opt:  src/coq-plugin/whytac.cmxs
 src/coq-plugin/whytac.cma:  BFLAGS+=-rectypes -I +camlp5
 src/coq-plugin/whytac.cmxs: OFLAGS+=-rectypes -I +camlp5
 
-src/coq-plugin/whytac.cmxs: src/why.cmxa $(COQCMX)
+src/coq-plugin/whytac.cmxs: src/why3.cmxa $(COQCMX)
 	$(OCAMLOPT) $(OFLAGS) -o $@ -shared $^
 
-src/coq-plugin/whytac.cma: src/why.cma $(COQCMO)
+src/coq-plugin/whytac.cma: src/why3.cma $(COQCMO)
 	$(OCAMLC) -a $(BFLAGS) -o $@ $^
 
 src/coq-plugin/g_whytac.ml: src/coq-plugin/g_whytac.ml4
@@ -751,12 +751,12 @@ $(WHY3DOCCMO) $(WHY3DOCCMX): INCLUDES += -I src/why3doc
 byte: bin/why3doc.byte
 opt:  bin/why3doc.opt
 
-bin/why3doc.opt: src/why.cmxa $(WHY3DOCCMX)
+bin/why3doc.opt: src/why3.cmxa $(WHY3DOCCMX)
 	$(if $(QUIET), @echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
 	$(STRIP) $@
 
-bin/why3doc.byte: src/why.cma $(WHY3DOCCMO)
+bin/why3doc.byte: src/why3.cma $(WHY3DOCCMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
 
@@ -807,7 +807,7 @@ comp_bench_plugins:: $(BENCH_PLUGINS_CMO) $(BENCH_PLUGINS_CMXS)
 # bench_plugins:: $(BENCH_PLUGINS_CMO) $(BENCH_PLUGINS_CMXS) byte $(TOOLS)
 # 	bin/why3.byte -D bench/plugins/helloworld.drv \
 # 	tests/test-jcf.why -T Test -G G
-# 	bin/why.$(OCAMLBEST) -D bench/plugins/helloworld.drv  \
+# 	bin/why3.$(OCAMLBEST) -D bench/plugins/helloworld.drv  \
 # 	tests/test-jcf.why -T Test -G G
 
 ###############
@@ -849,12 +849,12 @@ testl-ide: bin/why3ide.opt
 testl-type: bin/why3ml.byte
 	ocamlrun -bt bin/why3ml.byte --type-only tests/test-pgm-jcf.mlw
 
-test-api: src/why.cma
-	ocaml -I src/ $(INCLUDES) $(EXTCMA) src/why.cma examples/use_api.ml \
+test-api: src/why3.cma
+	ocaml -I src/ $(INCLUDES) $(EXTCMA) src/why3.cma examples/use_api.ml \
 	|| (printf "Test of Why API calls failed. Please fix it"; exit 2)
 
-bts12244: src/why.cma
-	ocaml -I src/ $(INCLUDES) $(EXTCMA) src/why.cma examples/bts12244.ml
+bts12244: src/why3.cma
+	ocaml -I src/ $(INCLUDES) $(EXTCMA) src/why3.cma examples/bts12244.ml
 
 
 ## Examples : Plugins ##
@@ -876,8 +876,8 @@ PLUGCMXS = $(addsuffix .cmxs, $(PLUGMODULES))
 # opt:  src/plug-plugin/whytac.cmxs
 # endif
 
-# $(PLUGCMO):  src/why.cma
-# $(PLUGCMXS): src/why.cmxa
+# $(PLUGCMO):  src/why3.cma
+# $(PLUGCMXS): src/why3.cmxa
 
 .PHONY: examples_plugins.byte examples_plugins.opt
 

@@ -30,7 +30,7 @@ open Libnames
 open Declarations
 open Pp
 
-open Why
+open Why3
 open Call_provers
 open Whyconf
 open Ty
@@ -62,10 +62,10 @@ let get_prover s =
 let print_constr fmt c = pp_with fmt (Termops.print_constr c)
 let print_tvm fmt m =
   Idmap.iter (fun id tv -> Format.fprintf fmt "%s->%a@ "
-                 (string_of_id id) Why.Pretty.print_tv tv) m
+                 (string_of_id id) Why3.Pretty.print_tv tv) m
 let print_bv fmt m =
   Idmap.iter (fun id vs -> Format.fprintf fmt "%s->%a@ "
-                 (string_of_id id) Why.Pretty.print_vsty vs) m
+                 (string_of_id id) Why3.Pretty.print_vsty vs) m
 
 (* Coq constants *)
 let logic_dir = ["Coq";"Logic";"Decidable"]

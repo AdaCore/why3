@@ -18,7 +18,7 @@
 (**************************************************************************)
 
 open Format
-open Why
+open Why3
 open Util
 open Rc
 open Whyconf
@@ -272,7 +272,7 @@ let () =
   eprintf " done.@."
 
 let show_legend_window () =
-  let dialog = GWindow.dialog ~title:"Why: legend of icons" () in
+  let dialog = GWindow.dialog ~title:"Why3: legend of icons" () in
   let vbox = dialog#vbox in
   let text = GText.view ~packing:vbox#add
     ~editable:false ~cursor_visible:false () in
@@ -340,7 +340,7 @@ let set_labels_flag =
     (if b then Debug.set_flag else Debug.unset_flag) fl
 
 let preferences c =
-  let dialog = GWindow.dialog ~title:"Why: preferences" () in
+  let dialog = GWindow.dialog ~title:"Why3: preferences" () in
   let vbox = dialog#vbox in
   let notebook = GPack.notebook ~packing:vbox#add () in
   (** page 1 **)

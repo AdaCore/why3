@@ -20,7 +20,7 @@
 (* CURRENTLY DEAD CODE; FOR LATER USE... *)
 
 open Format
-open Why
+open Why3
 open Ident
 open Ty
 open Term

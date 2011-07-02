@@ -305,7 +305,7 @@ let () = Exn_printer.register (fun fmt exn -> match exn with
   | NoPrinter -> Format.fprintf fmt
       "No printer specified in the driver file"
   | NoPlugins -> Format.fprintf fmt
-      "Plugins are not supported, recomplie Why"
+      "Plugins are not supported, recomplie Why3"
   | Duplicate s -> Format.fprintf fmt
       "Duplicate %s specification" s
   | UnknownType (thl,idl) -> Format.fprintf fmt

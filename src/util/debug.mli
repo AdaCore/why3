@@ -18,7 +18,7 @@
 (**************************************************************************)
 
 type flag
-(* Flag used for debugging only part of Why *)
+(* Flag used for debugging only part of Why3 *)
 
 val register_flag : string -> flag
 (** Register a new flag. If someone try to register two times the same

@@ -19,7 +19,7 @@
 
 (** Proof sessions *)
 
-open Why
+open Why3
 
 (** {2 Prover's data} *)
 

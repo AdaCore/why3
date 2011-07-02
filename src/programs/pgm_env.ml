@@ -17,7 +17,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Why
+open Why3
 open Util
 open Theory
 open Pgm_module

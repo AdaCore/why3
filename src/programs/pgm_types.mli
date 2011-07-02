@@ -17,7 +17,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Why
+open Why3
 open Util
 open Ident
 open Ty
@@ -161,7 +161,7 @@ module rec T : sig
   val occur_type_v : R.t -> type_v -> bool
 
   val v_result : ty -> vsymbol
-  val exn_v_result : Why.Term.lsymbol -> Why.Term.vsymbol option
+  val exn_v_result : Why3.Term.lsymbol -> Why3.Term.vsymbol option
 
   val post_map : (term -> term) -> post -> post
 

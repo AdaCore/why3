@@ -19,6 +19,6 @@
 
 (** run benchs from the database *)
 
-open Why
+open Why3
 
 val db : Whyconf.config -> Env.env -> unit

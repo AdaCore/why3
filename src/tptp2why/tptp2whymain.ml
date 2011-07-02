@@ -22,7 +22,7 @@
 
 open TptpTree
 
-open Why
+open Why3
 
 open Lexing
 

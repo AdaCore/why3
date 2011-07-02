@@ -18,7 +18,7 @@
 (**************************************************************************)
 
 open Thread
-open Why
+open Why3
 open Util
 open Env
 open Theory

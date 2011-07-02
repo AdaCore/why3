@@ -17,7 +17,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Why
+open Why3
 
 (*
 type prover_data = Session.prover_data
@@ -38,14 +38,14 @@ type t =
       mutable default_editor : string;
       mutable show_labels : bool;
       mutable saving_policy : int;
-      mutable env : Why.Env.env;
+      mutable env : Why3.Env.env;
       mutable config : Whyconf.config;
     }
 
 (*
-val get_prover_data : Why.Env.env -> string ->
-  Why.Whyconf.config_prover ->
-  prover_data Why.Util.Mstr.t -> prover_data Why.Util.Mstr.t
+val get_prover_data : Why3.Env.env -> string ->
+  Why3.Whyconf.config_prover ->
+  prover_data Why3.Util.Mstr.t -> prover_data Why3.Util.Mstr.t
 *)
 
 val save_config : unit -> unit

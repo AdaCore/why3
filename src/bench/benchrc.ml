@@ -19,7 +19,7 @@
 
 open Format
 open Bench
-open Why
+open Why3
 open Util
 open Theory
 

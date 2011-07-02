@@ -58,7 +58,7 @@ csv = "prgbench.csv"
 *)
 
 open Bench
-open Why
+open Why3
 open Util
 
 

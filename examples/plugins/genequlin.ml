@@ -21,7 +21,7 @@
 *)
 
 
-open Why
+open Why3
 open Format
 
 (***************

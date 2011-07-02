@@ -17,7 +17,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Managing the configuration of Why *)
+(** Managing the configuration of Why3 *)
 
 open Util
 

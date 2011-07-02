@@ -23,8 +23,8 @@ to a proper why internal representation to be pretty-printed *)
 
 open TptpTree
 
-open Why
-open Why.Ident
+open Why3
+open Why3.Ident
 
 module S = Set.Make(String)
 module M = Map.Make(String)

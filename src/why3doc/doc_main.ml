@@ -18,7 +18,7 @@
 (**************************************************************************)
 
 open Format
-open Why
+open Why3
 open Theory
 
 (* command line parsing *)

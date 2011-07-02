@@ -20,7 +20,7 @@
 (** run benchs from the database *)
 
 open Format
-open Why
+open Why3
 open Util
 module BenchUtil = Bench.BenchUtil
 
