@@ -498,7 +498,7 @@ let do_coq_realize_theory env _drv oldf fname m (tname,_,t,_glist) =
   in
   let ch = open_out oldf in
   let fmt = formatter_of_out_channel ch in
-  Coq.print_theory ~old env [] Ident.Mid.empty fmt th
+  Coq.print_theory ?old env [] Ident.Mid.empty fmt th
 
 let do_input env drv = function
   | None, _ when !opt_parse_only || !opt_type_only ->

@@ -547,7 +547,7 @@ let print_tdecl ~old info fmt d = match d.td_node with
 let print_tdecls ~old info fmt dl =
   fprintf fmt "@[<hov>%a@\n@]" (print_list nothing (print_tdecl ~old info)) dl
 
-let print_theory _env pr thpr ~old fmt th =
+let print_theory _env pr thpr ?old fmt th =
   forget_all ();
   print_prelude fmt pr;
   print_prelude_for_theory th fmt thpr;
