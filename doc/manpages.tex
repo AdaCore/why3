@@ -101,8 +101,8 @@ please consider submitting a new prover configuration on the bug
 tracking system).
 
 The result of provers detection is stored in the user's
-configuration file (\verb+~/.why.conf+ or, in the case of local
-installation, \verb+why.conf+ in Why3 sources top directory). This file
+configuration file (\verb+~/.why3.conf+ or, in the case of local
+installation, \verb+why3.conf+ in Why3 sources top directory). This file
 is also human-readable, and advanced users may modify it in order to
 experiment with different ways of calling provers, \eg{} different
 versions of the same prover, or with different options.
@@ -353,7 +353,7 @@ generally a bench configuration file:
    driver = "..."
    command = "..."
 
-   loadpath = "..." #added to the one in why.conf
+   loadpath = "..." #added to the one in why3.conf
    loadpath = "..."
 
    timelimit = 30
@@ -388,7 +388,7 @@ One can run all the bench given in one bench configuration file with
 why3bench -B path_to_my_bench.rc
 \end{verbatim}
 
-\section{The \texttt{why.conf} configuration file}
+\section{The \texttt{why3.conf} configuration file}
 \label{sec:whyconffile}
 One can use a custom configuration file. \texttt{why3config}
 and other \texttt{why3} tools use priorities for which
@@ -397,9 +397,9 @@ user's configuration file to consider:
 \item the file specified by the \texttt{-C} or \texttt{-{}-config} options,
 \item the file specified by the environment variable
   \texttt{WHY3CONFIG} if set.
-\item the file \texttt{\$HOME/.why.conf}
-  (\texttt{\$USERPROFILE/.why.conf} under Windows) or, in the case of
-  local installation, \texttt{why.conf} in Why3 sources top directory.
+\item the file \texttt{\$HOME/.why3.conf}
+  (\texttt{\$USERPROFILE/.why3.conf} under Windows) or, in the case of
+  local installation, \texttt{why3.conf} in Why3 sources top directory.
 \end{itemize}
 If none of these files exists, a built-in default configuration is used.
 

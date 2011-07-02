@@ -21,7 +21,7 @@ module \texttt{Term} gives a few functions for building these. Here is
 a piece of OCaml code for building the formula $true \lor false$.
 \begin{verbatim}
 (* opening the Why3 library *)
-open Why
+open Why3
 
 (* a ground propositional goal: true or false *)
 let fmla_true : Term.term = Term.t_true
@@ -150,7 +150,7 @@ end
 \section{Calling External Provers}
 
 To call an external prover, we need to access the Why configuration
-file \texttt{why.conf}, as it was build using the \texttt{why3config}
+file \texttt{why3.conf}, as it was built using the \texttt{why3config}
 command line tool or the \textsf{Detect Provers} menu of the graphical
 IDE. The following API calls allow to access the content of this
 configuration file.
@@ -217,7 +217,7 @@ is the maximum allowed memory in megabytes.  The type
 \item \texttt{pr\_answer}: the prover answer, explained below;
 \item \texttt{pr\_output}: the output of the prover, i.e. both
   standard output and the standard error of the process
-  (a redirection in \texttt{why.conf} is required);
+  (a redirection in \texttt{why3.conf} is required);
 \item \texttt{pr\_time} : the time taken by the prover, in seconds.
 \end{itemize}
 A \texttt{pr\_answer} is a sum of several kind of answers:
