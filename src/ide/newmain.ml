@@ -958,13 +958,25 @@ let inline_selected_goals () =
   apply_trans_on_selection inline_transformation
 
 let () =
+  let add_separator () =
+    ignore(tools_factory#add_separator
+             () : GMenu.menu_item) in
   let add_item_split () =
     ignore(tools_factory#add_image_item
-             ~label:"Split selection"
+             ~label:"Split in selection"
              ~callback:split_selected_goals
              () : GMenu.image_menu_item) in
+  let add_item_inline () =
+    ignore(tools_factory#add_image_item
+             ~label:"Inline in selection"
+             ~callback:inline_selected_goals
+             () : GMenu.image_menu_item) in
+  add_refresh_provers add_separator;
   add_refresh_provers add_item_split;
-  add_item_split ()
+  add_refresh_provers add_item_inline;
+  add_separator ();
+  add_item_split ();
+  add_item_inline ()
 
 
 let () =
@@ -1256,17 +1268,33 @@ let edit_current_proof () =
     | _ ->
         info_window `INFO "Please select exactly one proof to edit"
 
-
-let add_item_edit () =
-  ignore (tools_factory#add_image_item
-            ~label:"Edit current proof"
-            ~callback:edit_current_proof
-            () : GMenu.image_menu_item)
-
 let () =
+  let add_separator () =
+    ignore(tools_factory#add_separator
+             () : GMenu.menu_item) in
+  let add_item_edit () =
+    ignore (tools_factory#add_image_item
+              ~label:"Edit current proof"
+              ~callback:edit_current_proof
+              () : GMenu.image_menu_item) in
+  let add_item_replay () =
+    ignore (tools_factory#add_image_item
+              ~label:"Replay selection"
+              ~callback:replay_obsolete_proofs
+              () : GMenu.image_menu_item) in
+  let add_item_cancel () =
+    ignore (tools_factory#add_image_item
+              ~label:"Mark as obsolete"
+              ~callback:cancel_proofs
+              () : GMenu.image_menu_item) in
+  add_refresh_provers add_separator;
   add_refresh_provers add_item_edit;
-  add_item_edit ()
-
+  add_refresh_provers add_item_replay;
+  add_refresh_provers add_item_cancel;
+  add_separator ();
+  add_item_edit ();
+  add_item_replay ();
+  add_item_cancel ()
 
 let () =
   let b = GButton.button ~packing:tools_box#add ~label:"Edit" () in
@@ -1288,6 +1316,7 @@ let () =
     b#connect#pressed ~callback:replay_obsolete_proofs
   in ()
 
+(*
 let () =
   let b = GButton.button ~packing:tools_box#add ~label:"Cancel" () in
   b#misc#set_tooltip_markup "Mark all proofs below the current selection as <b>obsolete</b>";
@@ -1296,7 +1325,7 @@ let () =
   let (_ : GtkSignal.id) =
     b#connect#pressed ~callback:cancel_proofs
   in ()
-
+*)
 
 (*************)
 (* removing  *)
@@ -1344,6 +1373,31 @@ let confirm_remove_selection () =
         info_window `INFO "Please select exactly one item to remove"
 *)
 
+let clean_selection () =
+  List.iter (fun r -> M.clean (get_any_from_row_reference r))
+    (get_selected_row_references ())
+
+let () =
+  let add_separator () =
+    ignore(tools_factory#add_separator
+             () : GMenu.menu_item) in
+  let add_item_remove () =
+    ignore(tools_factory#add_image_item
+             ~label:"Remove current proof"
+             ~callback:confirm_remove_selection
+             () : GMenu.image_menu_item) in
+  let add_item_clean () =
+    ignore(tools_factory#add_image_item
+             ~label:"Clean selection"
+             ~callback:clean_selection
+             () : GMenu.image_menu_item) in
+  add_refresh_provers add_separator;
+  add_refresh_provers add_item_remove;
+  add_refresh_provers add_item_clean;
+  add_separator ();
+  add_item_remove ();
+  add_item_clean ()
+
 let () =
   let b = GButton.button ~packing:cleaning_box#add ~label:"Remove" () in
   b#misc#set_tooltip_markup "Remove selected <b>proof attempts</b> and <b>transformations</b>";
@@ -1353,10 +1407,6 @@ let () =
     b#connect#pressed ~callback:confirm_remove_selection
   in ()
 
-let clean_selection () =
-  List.iter (fun r -> M.clean (get_any_from_row_reference r))
-    (get_selected_row_references ())
-
 let () =
   let b = GButton.button ~packing:cleaning_box#add ~label:"Clean" () in
   b#misc#set_tooltip_markup "Remove unsuccessful <b>proof attempts</b> associated to proved goals";
@@ -1365,9 +1415,6 @@ let () =
   let (_ : GtkSignal.id) =
     b#connect#pressed ~callback:clean_selection
   in ()
-
-
-
 
 
 (***************)

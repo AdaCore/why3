@@ -355,14 +355,14 @@ let preferences c =
       ~packing:page1#add ()
   in
   (* editor *)
- let hb = 
-   GPack.hbox ~homogeneous:false ~packing:external_processes_frame#add () 
+ let hb =
+   GPack.hbox ~homogeneous:false ~packing:external_processes_frame#add ()
  in
- let _ = 
-   GMisc.label ~text:"Default editor: " ~packing:(hb#pack ~expand:false) () 
+ let _ =
+   GMisc.label ~text:"Default editor: " ~packing:(hb#pack ~expand:false) ()
  in
- let editor_entry = 
-   GEdit.entry ~text:c.default_editor ~packing:hb#add () 
+ let editor_entry =
+   GEdit.entry ~text:c.default_editor ~packing:hb#add ()
  in
  let (_ : GtkSignal.id) =
     editor_entry#connect#changed ~callback:
@@ -419,7 +419,7 @@ let preferences c =
   (* toggle show labels in formulas *)
 
   let showlabels =
-    GButton.check_button ~label:"show labels in formulas" 
+    GButton.check_button ~label:"show labels in formulas"
       ~packing:display_options_box#add ()
       ~active:(set_labels_flag c.show_labels;c.show_labels)
   in
@@ -447,13 +447,13 @@ let preferences c =
   in
   let choice0 =
     GButton.radio_button
-      ~label:"Always save on exit"
+      ~label:"always save on exit"
       ~active:(c.saving_policy = 0)
       ~packing:saving_policy_box#add ()
   in
   let choice1 =
     GButton.radio_button
-      ~label:"Never save on exit" ~group:choice0#group
+      ~label:"never save on exit" ~group:choice0#group
       ~active:(c.saving_policy = 1)
       ~packing:saving_policy_box#add ()
   in
