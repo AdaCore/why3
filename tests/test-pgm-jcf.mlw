@@ -1,4 +1,5 @@
 
+(*
 module MutualRec
 
   use import int.Int
@@ -12,6 +13,7 @@ module MutualRec
     { 0 = 0 }
 
 end
+*)
 
 module PoorArrays
 
@@ -29,6 +31,22 @@ module PoorArrays
     { 0 <= i < length !a }
     unit writes a
     { !a.length = !(old a).length && !a.elts = M.set !(old a).elts i v }
+
+end
+
+module Alias
+
+  use import int.Int
+  use import module ref.Ref
+
+  val r : ref int
+
+  let deref (x: ref int) =
+    !x + !r
+
+  (* TODO: should be rejected *)
+  let test1 () =
+    deref r
 
 end
 
