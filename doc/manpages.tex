@@ -388,6 +388,57 @@ One can run all the bench given in one bench configuration file with
 why3bench -B path_to_my_bench.rc
 \end{verbatim}
 
+\section{The \texttt{why3replayer} tool}
+
+The purpose of the \texttt{why3replayer} tool is to execute the proofs
+stored in a \why session file, as the one produced by the IDE. Its
+main goal is to play non-regression tests.
+
+The tool is inkoved in a terminal or a script using
+\begin{flushleft}\ttfamily
+  why3replayer \textsl{[options] <project directory>}
+\end{flushleft}
+The session file \texttt{why3session.xml} stored in the given
+directory is loaded and all the proofs it contains are rerun. Then,
+any difference between the information stored in the session file and
+the new run are shown. 
+
+Nothing is shown when there is no change in the results, independently
+of the fact the considered goal is proved or not. When all the proof
+runs are done, a summary of what is proved or not is displayed using a
+tree-shape pretty print, similar to the IDE tree view after doing
+``Collapse proved goals'', that is when a goal, a theory or a file is
+fully proved the subtree is not shown.
+
+For example, running the replayer on the \texttt{hello\_proof} example
+of Section~\ref{chap:starting} is as follows.
+\begin{verbatim}
+$ why3replayer hello_proof
+Info: found directory 'hello_proof' for the project
+Opening session...[Xml warning] prolog ignored
+[Reload] file '../hello_proof.why'
+[Reload] theory 'HelloProof'
+[Reload] transformation split_goal for goal G2
+ done
+Progress: 9/9
+ 2/3
+   +--file ../hello_proof.why: 2/3
+      +--theory HelloProof: 2/3
+         +--goal G2 not proved
+Everything OK.
+\end{verbatim}
+The last line tells us that no difference was detected between the
+current run and the informations in the XML file. The tree above
+reminds us that the G2 is not proved.
+
+\paragraph{Exit code and options}
+\begin{itemize}
+\item The exit code is 0 if no difference was detected, 1 if there
+  was. Other exit codes mean some failure in running the replay.
+\item option \texttt{-s}: suppresses the output of the final tree view
+\item option \texttt{-I \textsl{<path>}}: suppresses the output of the final tree view
+\end{itemize}
+
 \section{The \texttt{why3.conf} configuration file}
 \label{sec:whyconffile}
 One can use a custom configuration file. \texttt{why3config}

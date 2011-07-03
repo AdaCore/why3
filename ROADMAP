@@ -55,30 +55,37 @@
 
 * rename andb, orb, xorb and notb into and, or, xor and not
 
-=== Roadmap for third release 0.70 =======================================
+=== Roadmap for third release 0.70, july 2011 ========================
 
 * Final preparation: put on the web page
 ** why3-0.70.tar.gz
 ** manual in PDF
 ** API doc in HTML (suggestion: http://why3.lri.fr/api/)
    Note: check that URL of API doc is correct in doc/api.tex line 9.
+** What to put in the annoucement
+   - WhyML VC generator to prove programs
+   - new tool why3replayer
+   - incompatible changes in syntax: function, predicate, and, or
+   - session database in XML format instead of sqlite3
+   - threads problem in IDE solved (by not using threads anymore)
+** as soon as possible: update why3 output of Why2, release Why 2.30
 
 * doc: citer l'article Boogie 2011 quelque part
 
 * increment the magic number in config (A)
-
-* Distribution of examples: we should distribute those who have an xml file
-  under git, and distribute the XML and Coq proofs
-    (JC)
-
-* update doc
- - why3replay (C) parler des examples distribues ci dessus
 
 * distribute bench files (A + F)
 
 * document new IDE features (C)
 
 * document "Make obsolete" (A)
+
+* Distribution of examples: we should distribute those who have an xml file
+  under git, and distribute the XML and Coq proofs
+    (JC)
+
+* (done) update doc for why3replayer
+ - not done: parler des examples distribues ci dessus
 
 * DONE deplacer le bouton "Cancel" dans le menu "tools",
   le renommer en "make obsolete"
