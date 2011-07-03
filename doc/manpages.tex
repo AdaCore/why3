@@ -237,7 +237,7 @@ the actions of the various menus and buttons of the interface.
   conjunction of two or more goals.
 
 \item[Inline] If the goal is headed by a defined predicate symbol,
-  expands it with this definition. [NOT YET AVAILABLE]
+  expands it with this definition.
 
 \item[Edit] Start an editor on the selected task.
 
@@ -248,9 +248,16 @@ the actions of the various menus and buttons of the interface.
   corresponding proof script. The modifications are saved, and can be
   retrieved later even if the goal was modified.
 
-\item[Replay] replay all obsolete proofs [NOT YET AVAILABLE]
+\item[Replay] Replay all obsolete proofs
+
+  If ``only unproved goals'' is selected, only formerly successful
+  proofs are rerun. If ``all goals'', then all obsolete proofs are
+  rerun, successful or not.
 
 \item[Remove] Removes a proof attempt or a transformation.
+
+\item[Clean] Removes any unsuccessful proof attempt for which there is
+  another successful proof attempt for the same goal
 
 \end{description}
 
@@ -259,9 +266,11 @@ the actions of the various menus and buttons of the interface.
 \paragraph{Menu \textsf{File}}
 \begin{description}
 \item[Add File] adds a file in the GUI
-\item[Detect provers] runs provers auto-detection
+%\item[Detect provers] runs provers auto-detection
 \item[Preferences] opens a window for modifying preferred
   configuration, see details below
+\item[Reload] \todo{}
+\item[Save session] \todo{}
 \item[Quit] exits the GUI
 \end{description}
 
@@ -270,8 +279,8 @@ the actions of the various menus and buttons of the interface.
 \item[Expand All] expands all the rows of the tree view
 \item[Collapse proved goals] closes all the rows of the tree view
   which are proved.
-\item[Hide proved goals] completely hides the proved rows of the tree
-  view [EXPERIMENTAL]
+% \item[Hide proved goals] completely hides the proved rows of the tree
+%   view [EXPERIMENTAL]
 \end{description}
 
 \paragraph{Menu \textsf{Tools}}
@@ -289,11 +298,12 @@ The preferences window allows you customize
   to do that for the moment is to manually edit the config file)
 \item the time limit given to provers, in seconds
 \item the maximal number of simultaneous provers allowed to run in parallel.
+\item The policy for saving session \todo{}
 \end{itemize}
 
 \subsection{Structure of the database file}
 
-[TO BE COMPLETED LATER]
+\todo{[TO BE COMPLETED LATER]}
 
 \section{The \texttt{why3ml} tool}
 

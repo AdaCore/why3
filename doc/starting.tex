@@ -36,7 +36,7 @@ friendly way. This section presents the basic use of this GUI. Please
 refer to Section~\ref{sec:ideref} for a more complete description.
 
 \begin{figure}[tbp]
-\includegraphics[width=\textwidth]{gui-0-70-1.png}
+  \includegraphics[width=\textwidth]{gui-0-70-1.png}
   \caption{The GUI when started the very first time}
   \label{fig:gui1}
 \end{figure}
@@ -89,15 +89,15 @@ click on the \textsf{Simplify} button. After a short time, you should
 get the display of Figure~\ref{fig:gui3}.
 
 \begin{figure}[tbp]
-\todo{update   \includegraphics[width=\textwidth]{gui3.png}}
+\includegraphics[width=\textwidth]{gui-0-70-3.png}
   \caption{The GUI after Simplify prover is run on each goal}
   \label{fig:gui3}
 \end{figure}
 
-The row corresponding to goal $G_1$ is now closed, and marked with
-green ``checked'' icon in the status column. This means that the goal
-is proved by the Simplify prover. On the contrary, the two other goals
-are not proved, they are marked with an orange question mark.
+The goal $G_1$ is now marked with a green ``checked'' icon in the
+status column. This means that the goal is proved by the Simplify
+prover. On the contrary, the two other goals are not proved, they remain
+marked with an orange question mark.
 
 You can immediately attempt to prove the remaining goals using another
 prover, {\eg} Alt-Ergo, by clicking on the corresponding button. The
@@ -110,12 +110,12 @@ to it.  Since $G_2$ is a conjunction, a possibility is to split it
 into subgoals. You can do that by clicking on the \textsf{Split}
 button of section ``Transformations'' of the left toolbar. Now you
 have two subgoals, and you can try again a prover on them, for example
-Simplify. Assuming we expand everything again, you should see now what
-is displayed on Figure~\ref{fig:gui4}.
+Simplify. We already have a lot of goals and proof attempts, so it is a good idea to close the sub-trees which are already proved: this can be done by the menu \textsf{View/Collapse proved goals}, or even better by its shortcut ``Ctrl-C''.
+You should see now what is displayed on Figure~\ref{fig:gui4}.
 
 \begin{figure}[tbp]
-\todo{update   \includegraphics[width=\textwidth]{gui4.png}}
-  \caption{The GUI after splitting goal $G_2$}
+ \includegraphics[width=\textwidth]{gui-0-70-4.png}
+  \caption{The GUI after splitting goal $G_2$ and collapsing proved goals}
   \label{fig:gui4}
 \end{figure}
 
@@ -127,7 +127,7 @@ now is editing the proof: select that row and then click on the
 \textsf{Edit} button in section ``Tools'' of the toolbar. This should
 launch the Coq proof editor, which is \texttt{coqide} by default (see
 Section~\ref{sec:ideref} for details on how to configure this). You get
-now a regular Coq file fo fill in, as shown on Figure~\ref{fig:coqide}.
+now a regular Coq file to fill in, as shown on Figure~\ref{fig:coqide}.
 Please take care of the comments of this file. Only the part between
 the two last comments can be modified. Moreover, these comments
 themselves should not be modified at all, they are used to mark the
@@ -135,7 +135,7 @@ part you modify, in order to regenerate the file if the goal is
 changed.
 
 \begin{figure}[tbp]
-\todo{update   \includegraphics[width=\textwidth]{coqide.png}}
+  \includegraphics[width=\textwidth]{coqide-0-70.png}
   \caption{CoqIDE on subgoal 1 of $G_2$}
   \label{fig:coqide}
 \end{figure}
@@ -147,28 +147,35 @@ explained below.
 \subsection{Modifying the input}
 
 Currently, the GUI does not allow to modify the input file. You must
-exit the GUI and modify the file by some editor of your choice. Let's assume we change the goal $G_2$ by replacing the first occurrence of true by false, \eg
+edit the file external by some editor of your choice. Let's assume we
+change the goal $G_2$ by replacing the first occurrence of true by
+false, \eg
 \begin{verbatim}
   goal G2 : (false -> false) /\ (true \/ false)
 \end{verbatim}
-Starting the IDE on the modified file and expanding everything with
-\textsf{Ctrl-E}, we get the tree view shown on Figure~\ref{fig:gui5}.
+We can reload the modified file in the IDE using menu \textsf{File/Reload}, or the shortcut ``Ctrl-R''. We get the tree view shown on Figure~\ref{fig:gui5}.
 
 \begin{figure}[tbp]
-\todo{update   \includegraphics[width=\textwidth]{gui5.png}}
-  \caption{The GUI restarted after modifying goal $G_2$}
+  \includegraphics[width=\textwidth]{gui-0-70-5.png}
+  \caption{File reloaded after modifying goal $G_2$}
   \label{fig:gui5}
 \end{figure}
 
 The important feature to notice first is that all the previous proof
-attempts and transformations were saved in a database --- an SQLite3
-file created when the \why file was opened in the GUI for the first
-time. Then, for
-all the goals that remain unchanged, the previous proofs are shown
-again. For the parts that changed, the previous proofs attempts are
-shown but marked with "(obsolete)" so that you know the results are
-not accurate. You can now retry to prove all what remains unproved
-using any of the provers, using the button ``Replay''.
+attempts and transformations were saved in a database --- an XML file
+created when the \why file was opened in the GUI for the first
+time. Then, for all the goals that remain unchanged, the previous
+proofs are shown again. For the parts that changed, the previous
+proofs attempts are shown but marked with "(obsolete)" so that you
+know the results are not accurate. You can now retry to prove all what
+remains unproved using any of the provers, using the button
+``Replay''. \todo{Il faut selectioner all goals pour cela}
+
+\subsection{Cleaning}
+
+\todo{expliquer Clean et Remove}
+
+See also: why3replayer
 
 \section{Getting Started with the \why Command}
 \label{sec:batch}
