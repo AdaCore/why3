@@ -2,34 +2,47 @@
 
 === Long-term Roadmap (see below for roadmap to next release) ===========
 
+* Logic language
+** support for higher-order logic
+** rename andb, orb, xorb and notb into and, or, xor and not
+
+* more libraries (theories and modules)
+
 * WhyML
   ** regions : strong update
   ** clone module
   ** ghost code
   ** extraction of Ocaml code
   ** logic symbols used in programs
+
 * Jessie3
+
 * traceability: Partially done
   (Claude)
   TODO: traceability des hyp comme path dans le prog (depuis
   Frama-C en particulier)
   afficher les explications dans les outils en ligne de
   commande why3 et why3bench + le path
+
 * Coq plugin
+
 * Coq realization of theories
   (Andrei)
-* more libraries (theories and modules)
 
-* IDE: edition, navigation
-  (partially done)
-
-* HOL
-
-* IDE: reimplement "hide proved goals" feature
-  ** suggested solution: replace model + filter_model by a custom model
+* IDE:
+** edition, navigation (partially done)
+** restore provers detection in the middle of a session.
+  + todo: run detection immediately at start up if conf file absent or
+    outdated
+** reimplement "hide proved goals" feature
+  + suggested solution: replace model + filter_model by a custom model
   (JC + ?)
+** saving session
+   * add a "cancel" choice in the "ask" window
+   * add "ctrl-S" to save the session explicitly
+     (partially done, but no shortcut)
 
-* Add as many examples as possible in the regression tests
+* Add more examples in the regression tests and in the proval gallery
 
 * Papers to write
 
@@ -44,16 +57,11 @@
   * system description (e.g. at CAD, TACAS)
   * rapports recherche ?
 
-* Why3ide: saving session
-   * add a "cancel" choice
-   * add "ctrl-S" to save the session explicitly
-
-* choisir un logo
+* choose a logo -> done ?
 
 * complete doc/api.tex: explain how to build theories, apply
   transformations, write new functions on terms (A)
 
-* rename andb, orb, xorb and notb into and, or, xor and not
 
 === Roadmap for third release 0.70, july 2011 ========================
 
@@ -70,8 +78,6 @@
    - threads problem in IDE solved (by not using threads anymore)
 ** as soon as possible: update why3 output of Why2, release Why 2.30
 
-* doc: citer l'article Boogie 2011 quelque part
-
 * increment the magic number in config (A)
 
 * distribute bench files (A + F)
@@ -86,6 +92,8 @@
 
 * (done) update doc for why3replayer
  - not done: parler des examples distribues ci dessus
+
+* DONE doc: citer l'article Boogie 2011 quelque part
 
 * DONE deplacer le bouton "Cancel" dans le menu "tools",
   le renommer en "make obsolete"

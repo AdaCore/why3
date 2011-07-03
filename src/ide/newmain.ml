@@ -530,6 +530,38 @@ let () =
     end
 
 
+let info_window ?(callback=(fun () -> ())) mt s =
+  let buttons = match mt with
+    | `INFO -> GWindow.Buttons.close
+    | `WARNING -> GWindow.Buttons.close
+    | `QUESTION -> GWindow.Buttons.ok_cancel
+    | `ERROR -> GWindow.Buttons.close
+  in
+  let d = GWindow.message_dialog
+    ~message:s
+    ~message_type:mt
+    ~buttons
+    ~title:"Why3IDE"
+    ~modal:true
+    ~show:true ()
+  in
+  let (_ : GtkSignal.id) =
+    d#connect#response
+      ~callback:(function x -> 
+                   d#destroy ();
+                   if mt <> `QUESTION || x = `OK then callback ())
+  in ()
+
+(* check if provers are present *)
+let () =
+  if Util.Mstr.is_empty (Whyconf.get_provers gconfig.Gconfig.config) then
+    begin
+      info_window `ERROR "No prover configured.\nPlease run 'why3config --detect-provers' first" 
+        ~callback:GMain.quit;
+      GMain.main ();
+      exit 2;
+    end
+
 let () =
   try
     eprintf "[Info] Opening session...@\n@[<v 2>  ";
@@ -544,27 +576,6 @@ let () =
       Exn_printer.exn_printer e;
     exit 1
 
-
-let info_window ?(callback=(fun () -> ())) mt s =
-  let buttons = match mt with
-    | `INFO -> GWindow.Buttons.close
-    | `WARNING -> GWindow.Buttons.close
-    | `QUESTION -> GWindow.Buttons.ok_cancel
-    | `ERROR -> GWindow.Buttons.close
-  in
-  let d = GWindow.message_dialog
-    ~message:s
-    ~message_type:mt
-    ~buttons
-    ~title:"Why3 info or error"
-    ~modal:true
-    ~show:true ()
-  in
-  let (_ : GtkSignal.id) =
-    d#connect#response
-      ~callback:(function x -> d#destroy ();
-                   if x = `OK then callback ())
-  in ()
 
 
 (**********************************)
@@ -717,14 +728,17 @@ let (_ : GMenu.image_menu_item) =
 
 let refresh_provers = ref (fun () -> ())
 
-let add_refresh_provers f =
+let add_refresh_provers f msg =
+  eprintf "[Info] recording '%s' for refresh provers@." msg;
   let rp = !refresh_provers in
   refresh_provers := (fun () -> rp (); f ())
 
+(*
 let (_ : GMenu.image_menu_item) =
   file_factory#add_image_item ~label:"_Detect provers" ~callback:
     (fun () -> Gconfig.run_auto_detection gconfig; !refresh_provers () )
     ()
+*)
 
 let save_session () =
   eprintf "[Info] saving session@.";
@@ -917,12 +931,14 @@ let (_ : GMenu.check_menu_item) = view_factory#add_check_item
 
 let () = add_refresh_provers (fun () ->
   List.iter (fun item -> item#destroy ()) provers_box#all_children)
+  "remove from provers box"
 
 let tools_menu = factory#add_submenu "_Tools"
 let tools_factory = new GMenu.factory tools_menu ~accel_group
 
 let () = add_refresh_provers (fun () ->
   List.iter (fun item -> item#destroy ()) tools_menu#all_children)
+  "remove from tools menu"
 
 let () =
   let add_item_provers () =
@@ -948,7 +964,7 @@ let () =
          in ())
       (M.get_provers ())
   in
-  add_refresh_provers add_item_provers;
+  add_refresh_provers add_item_provers "Add in tools menu and provers box";
   add_item_provers ()
 
 let split_selected_goals () =
@@ -971,9 +987,9 @@ let () =
              ~label:"Inline in selection"
              ~callback:inline_selected_goals
              () : GMenu.image_menu_item) in
-  add_refresh_provers add_separator;
-  add_refresh_provers add_item_split;
-  add_refresh_provers add_item_inline;
+  add_refresh_provers add_separator "add separator in tools menu";
+  add_refresh_provers add_item_split "add split in tools menu";
+  add_refresh_provers add_item_inline  "add inline in tools menu";
   add_separator ();
   add_item_split ();
   add_item_inline ()
@@ -1287,10 +1303,10 @@ let () =
               ~label:"Mark as obsolete"
               ~callback:cancel_proofs
               () : GMenu.image_menu_item) in
-  add_refresh_provers add_separator;
-  add_refresh_provers add_item_edit;
-  add_refresh_provers add_item_replay;
-  add_refresh_provers add_item_cancel;
+  add_refresh_provers add_separator "add sep in tools menu";
+  add_refresh_provers add_item_edit "add edit in tools menu";
+  add_refresh_provers add_item_replay "add replay in tools menu";
+  add_refresh_provers add_item_cancel "add cancel in tools menu";
   add_separator ();
   add_item_edit ();
   add_item_replay ();
@@ -1391,9 +1407,9 @@ let () =
              ~label:"Clean selection"
              ~callback:clean_selection
              () : GMenu.image_menu_item) in
-  add_refresh_provers add_separator;
-  add_refresh_provers add_item_remove;
-  add_refresh_provers add_item_clean;
+  add_refresh_provers add_separator "add sep in tools menu";
+  add_refresh_provers add_item_remove "add remove in tools menu";
+  add_refresh_provers add_item_clean "add clean in tools menu";
   add_separator ();
   add_item_remove ();
   add_item_clean ()

@@ -479,6 +479,7 @@ let preferences c =
   save_config ();
   dialog#destroy ()
 
+(*
 let run_auto_detection gconfig =
   let config = Autodetection.run_auto_detection gconfig.config in
   gconfig.config <- config;
@@ -487,6 +488,7 @@ let run_auto_detection gconfig =
   gconfig.provers <- Mstr.fold (Session.get_prover_data gconfig.env) provers Mstr.empty
 *)
   ()
+*)
 
 let () = eprintf "[Info] end of configuration initialization@."
 

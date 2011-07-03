@@ -32,9 +32,6 @@ type t =
       mutable mem_limit : int;
       mutable verbose : int;
       mutable max_running_processes : int;
-(*
-      mutable provers : prover_data Util.Mstr.t;
-*)
       mutable default_editor : string;
       mutable show_labels : bool;
       mutable saving_policy : int;
@@ -95,7 +92,9 @@ val show_legend_window : unit -> unit
 val show_about_window : unit -> unit
 val preferences : t -> unit
 
+(* buggy
 val run_auto_detection : t -> unit
+*)
 
 (*
 Local Variables:
