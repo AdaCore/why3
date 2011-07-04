@@ -228,7 +228,7 @@ let rec term env t = match t.dt_node with
       let rec collect p ll e = match e.dt_node with
         | Tnamed (Lstr l, e) -> collect p (l::ll) e
         | Tnamed (Lpos p, e) -> collect (Some p) ll e
-        | _ -> t_label ?loc:p ll (term env e)
+        | _ -> t_label ?loc:p (List.rev ll) (term env e)
       in
       collect None [] t
   | Teps (id, ty, e1) ->
@@ -277,7 +277,7 @@ and fmla env = function
       let rec collect p ll = function
         | Fnamed (Lstr l, e) -> collect p (l::ll) e
         | Fnamed (Lpos p, e) -> collect (Some p) ll e
-        | e -> t_label ?loc:p ll (fmla env e)
+        | e -> t_label ?loc:p (List.rev ll) (fmla env e)
       in
       collect None [] f
   | Fvar f ->

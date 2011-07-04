@@ -18,6 +18,7 @@
 (**************************************************************************)
 
 open Why3
+open Ident
 open Denv
 open Ty
 open Pgm_types
@@ -37,32 +38,6 @@ type for_direction = Ptree.for_direction
 
 (*****************************************************************************)
 (* phase 1: introduction of destructive types *)
-
-(***
-type dregion = {
-  dr_tv : Denv.type_var;
-  dr_ty : Denv.dty;
-}
-
-type deffect = {
-  de_reads  : dregion list;
-  de_writes : dregion list;
-  de_raises : esymbol list;
-}
-
-type dtype_v =
-  | DTpure  of Denv.dty
-  | DTarrow of dbinder list * dtype_c
-
-and dtype_c =
-  { dc_result_type : dtype_v;
-    dc_effect      : deffect;
-    dc_pre         : Denv.dfmla;
-    dc_post        : (Denv.dty * Denv.dfmla) *
-                     (Term.lsymbol * (Denv.dty option * Denv.dfmla)) list; }
-
-and dbinder = ident * Denv.dty * dtype_v
-***)
 
 (* user type_v *)
 
@@ -126,6 +101,7 @@ and dexpr_desc =
   | DEassert of assertion_kind * Ptree.lexpr
   | DElabel of string * dexpr
   | DEany of dutype_c
+  | DEnamed of Ptree.label * dexpr
 
 and drecfun = (ident * Denv.dty) * dubinder list * dvariant option * dtriple
 
@@ -225,6 +201,7 @@ and iexpr_desc =
   | IEassert of assertion_kind * Term.term
   | IElabel of label * iexpr
   | IEany of itype_c
+  | IEnamed of Ptree.label * iexpr
 
 and irecfun = ivsymbol * ibinder list * irec_variant option * itriple
 
@@ -257,6 +234,7 @@ type expr = {
   expr_type  : ty;
   expr_type_v: type_v;
   expr_effect: E.t;
+  expr_lab   : Ident.label list;
   expr_loc   : loc;
 }
 

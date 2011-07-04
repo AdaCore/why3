@@ -413,9 +413,11 @@ let well_founded_rel = function
 
 (* Recursive computation of the weakest precondition *)
 
-let wp_label ?loc f =
-  if List.mem "WP" f.t_label then f
-  else t_label ?loc ("WP"::f.t_label) f
+let wp_label ?loc ?(lab=[]) f =
+  let loc = option_apply f.t_loc (fun x -> Some x) loc in
+  let lab = lab @ f.t_label in
+  let lab = if List.mem "WP" lab then lab else "WP" :: lab in
+  t_label ?loc lab f
 
 let t_True env =
   fs_app (find_ls ~pure:true env "True") []
@@ -436,7 +438,7 @@ let rec wp_expr env rm e q =
   let q = post_map (old_label lab) q in
   let f = wp_desc env rm e q in
   let f = erase_label lab f in
-  let f = wp_label ~loc:e.expr_loc f in
+  let f = wp_label ~loc:e.expr_loc ~lab:e.expr_lab f in
   if Debug.test_flag debug then begin
     eprintf "@[--------@\n@[<hov 2>e = %a@]@\n" Pgm_pretty.print_expr e;
     eprintf "@[<hov 2>q = %a@]@\n" Pretty.print_term (snd (fst q));
@@ -482,7 +484,6 @@ and wp_desc env rm e q = match e.expr_desc with
       let q1 = (* if result=True then w2 else w3 *)
         let res = v_result e1.expr_type in
         let test = t_equ (t_var res) (t_True env) in
-        let test = wp_label ~loc:e1.expr_loc test in
         let q1 = t_if test w2 w3 in
         saturate_post e1.expr_effect (res, q1) q
       in

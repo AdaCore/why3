@@ -230,6 +230,7 @@ and expr_desc =
   | Elabel of ident * expr
   | Ecast of expr * pty
   | Eany of type_c
+  | Enamed of label * expr
 
   (* TODO: ghost *)
 

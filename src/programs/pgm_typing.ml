@@ -366,7 +366,7 @@ let rec dexpr ~ghost env e =
   let loc = e.Ptree.expr_loc in
   let e = {
     dexpr_desc = d; dexpr_loc = loc;
-    (* dexpr_denv = env.denv;  *)dexpr_type = ty; }
+    dexpr_type = ty; }
   in
   (****
   match view_dty ty with
@@ -678,6 +678,9 @@ and dexpr_desc ~ghost env loc = function
   | Ptree.Eany c ->
       let c = dutype_c env c in
       DEany c, dpurify_utype_v c.duc_result_type
+  | Ptree.Enamed (l, e1) ->
+      let e1 = dexpr ~ghost env e1 in
+      DEnamed (l, e1), e1.dexpr_type
 
 and dletrec ~ghost env dl =
   (* add all functions into environment *)
@@ -1264,6 +1267,8 @@ and iexpr_desc gl env loc ty = function
   | DEany c ->
       let c = iutype_c gl env c in
       IEany c
+  | DEnamed (l, e1) ->
+      IEnamed (l, iexpr gl env e1)
 
 and decompose_app gl env e args = match e.dexpr_desc with
   | DEapply (e1, e2) ->
@@ -1448,10 +1453,11 @@ and pattern_node env ty p =
       let env, p = pattern env p in
       env, (pat_as p.ppat_pat v.pv_pure, Pas (p, v))
 
-let make_apply loc e1 ty c =
+let make_apply ~userloc loc e1 ty c =
   let x = create_pvsymbol_v (id_fresh "f") (tpure e1.expr_type) in
   let v = c.c_result_type and ef = c.c_effect in
-  let any_c = { expr_desc = Eany c; expr_type = ty;
+  let loc = default_option loc userloc in
+  let any_c = { expr_desc = Eany c; expr_type = ty; expr_lab = [];
                 expr_type_v = v; expr_effect = ef; expr_loc = loc } in
   Elet (x, e1, any_c), v, ef
 
@@ -1479,20 +1485,24 @@ let rec is_pure_expr e =
   | Eloop _ | Eletrec _ | Efun _
   | Eglobal _ | Eabsurd -> false (* TODO: improve *)
 
-let mk_expr loc ty ef d =
+let mk_expr ?(lab=[]) ~userloc loc ty ef d =
+  let loc = default_option loc userloc in
   { expr_desc = d; expr_type = ty; expr_type_v = tpure ty;
-    expr_effect = ef; expr_loc = loc }
+    expr_effect = ef; expr_lab = lab; expr_loc = loc }
 
-let mk_simple_expr loc ty d = mk_expr loc ty E.empty d
+let mk_simple_expr ~userloc loc ty d = mk_expr ~userloc loc ty E.empty d
 
-let mk_bool_constant loc gl ls =
+let mk_bool_constant ~userloc loc gl ls =
+  let loc = default_option loc userloc in
   let ty = ty_app (find_ts ~pure:true gl "bool") [] in
   { expr_desc = Elogic (fs_app ls [] ty);
     expr_type = ty; expr_type_v = tpure ty;
-    expr_effect = E.empty; expr_loc = loc }
+    expr_effect = E.empty; expr_lab = []; expr_loc = loc }
 
-let mk_false loc gl = mk_bool_constant loc gl (find_ls ~pure:true gl "False")
-let mk_true  loc gl = mk_bool_constant loc gl (find_ls ~pure:true gl "True")
+let mk_false ~userloc loc gl =
+  mk_bool_constant ~userloc loc gl (find_ls ~pure:true gl "False")
+let mk_true  ~userloc loc gl =
+  mk_bool_constant ~userloc loc gl (find_ls ~pure:true gl "True")
 
 (* Saturation of postconditions: a postcondition must be set for
    any possibly raised exception *)
@@ -1524,17 +1534,27 @@ let remove_bl_effects bl ef =
   let remove ef pv = E.remove pv.pv_regions ef in
   List.fold_left remove ef bl
 
+let extract_labels loc d =
+  let rec extract labs loc = function
+    | IEnamed (Lstr s, e) -> extract (s :: labs) loc e.iexpr_desc
+    | IEnamed (Lpos p, e) -> extract labs (Some p) e.iexpr_desc
+    | d -> List.rev labs, loc, d
+  in
+  extract [] loc d
+
 (* [expr] translates iexpr into expr
    [env : type_v Mvs.t] maps local variables to their types *)
 
-let rec expr gl env e =
+let rec expr ~userloc gl env e =
   let ty = e.iexpr_type in
   let loc = e.iexpr_loc in
-  let d, v, ef = expr_desc gl env loc ty e.iexpr_desc in
-  { expr_desc = d; expr_type = ty;
+  let labs, userloc, d = extract_labels userloc e.iexpr_desc in
+  let d, v, ef = expr_desc ~userloc gl env loc ty d in
+  let loc = default_option loc userloc in
+  { expr_desc = d; expr_type = ty; expr_lab = labs;
     expr_type_v = v; expr_effect = ef; expr_loc = loc }
 
-and expr_desc gl env loc ty = function
+and expr_desc ~userloc gl env loc ty = function
   | IElogic (t, lvars, gvars) ->
       let ef, t = term_effect E.empty t in
       let add_lvar v ef = let v = Mvs.find v env in E.add_var v ef in
@@ -1549,31 +1569,31 @@ and expr_desc gl env loc ty = function
   | IEglobal (s, tv) ->
       Eglobal s, tv, E.empty
   | IEapply (e1, vs) ->
-      let e1 = expr gl env e1 in
+      let e1 = expr ~userloc gl env e1 in
       (* printf "e1 : %a@." print_type_v e1.expr_type_v; *)
       let vs = Mvs.find vs.i_impure env in
       let c = apply_type_v_var e1.expr_type_v vs in
       (* printf "c : %a / ty = %a@." print_type_c c print_ty ty; *)
-      make_apply loc e1 ty c
+      make_apply ~userloc loc e1 ty c
   | IEapply_var (e1, v) ->
-      let e1 = expr gl env e1 in
+      let e1 = expr ~userloc gl env e1 in
       let vs = Mvs.find v.i_impure env in
       let c = apply_type_v_var e1.expr_type_v vs in
       (*  printf "c = %a@." print_type_c c; *)
-      make_apply loc e1 ty c
+      make_apply ~userloc loc e1 ty c
   | IEapply_glob (e1, v) ->
-      let e1 = expr gl env e1 in
+      let e1 = expr ~userloc gl env e1 in
       let c = apply_type_v_var e1.expr_type_v v in
-      make_apply loc e1 ty c
+      make_apply ~userloc loc e1 ty c
   | IEfun (bl, t) ->
       let env, bl = add_binders env bl in
-      let (_,e,_) as t, c = triple gl env t in
+      let (_,e,_) as t, c = triple ~userloc gl env t in
       let ef = remove_bl_effects bl e.expr_effect in
       Efun (bl, t), tarrow bl c, ef
   | IElet (v, e1, e2) ->
-      let e1 = expr gl env e1 in
+      let e1 = expr ~userloc gl env e1 in
       let env, v = add_local env v e1.expr_type_v in
-      let e2 = expr gl env e2 in
+      let e2 = expr ~userloc gl env e2 in
       let ef = E.union e1.expr_effect e2.expr_effect in
       let s = Sreg.filter is_fresh_region v.pv_regions in
       if Sreg.exists (fun r -> occur_type_v r e2.expr_type_v) s then
@@ -1581,23 +1601,23 @@ and expr_desc gl env loc ty = function
       let ef = E.remove s ef in
       Elet (v, e1, e2), e2.expr_type_v, ef
   | IEletrec (dl, e1) ->
-      let env, dl = letrec gl env dl in
-      let e1 = expr gl env e1 in
+      let env, dl = letrec ~userloc gl env dl in
+      let e1 = expr ~userloc gl env e1 in
       let add_effect ef (_,_,_,ef') = E.union ef ef' in
       let ef = List.fold_left add_effect e1.expr_effect dl in
       Eletrec (dl, e1), e1.expr_type_v, ef
 
   | IEif (e1, e2, e3) ->
-      let e1 = expr gl env e1 in
-      let e2 = expr gl env e2 in
-      let e3 = expr gl env e3 in
+      let e1 = expr ~userloc gl env e1 in
+      let e2 = expr ~userloc gl env e2 in
+      let e3 = expr ~userloc gl env e3 in
       let ef = E.union e1.expr_effect e2.expr_effect in
       let ef = E.union ef             e3.expr_effect in
       if not (eq_type_v e2.expr_type_v e3.expr_type_v) then
         errorm ~loc "cannot branch on functions";
       Eif (e1, e2, e3), e2.expr_type_v, ef
   | IEloop (a, e1) ->
-      let e1 = expr gl env e1 in
+      let e1 = expr ~userloc gl env e1 in
       let ef = e1.expr_effect in
       let ef, inv = option_map_fold term_effect ef a.loop_invariant in
       let ef, var = match a.loop_variant with
@@ -1609,8 +1629,8 @@ and expr_desc gl env loc ty = function
       let a = { loop_invariant = inv; loop_variant = var } in
       Eloop (a, e1), type_v_unit gl, ef
   | IElazy (op, e1, e2) ->
-      let e1 = expr gl env e1 in
-      let e2 = expr gl env e2 in
+      let e1 = expr ~userloc gl env e1 in
+      let e2 = expr ~userloc gl env e2 in
       let ef = E.union e1.expr_effect e2.expr_effect in
       let d =
         if is_pure_expr e2 then
@@ -1622,20 +1642,20 @@ and expr_desc gl env loc ty = function
           let v2 = create_pvsymbol_v (id_fresh "lazy") (tpure ty) in
           let t = fs_app ls [t_var v1.pv_pure; t_var v2.pv_pure] ty in
           Elet (v1, e1,
-                mk_expr loc ty ef
-                  (Elet (v2, e2, mk_simple_expr loc ty (Elogic t))))
+                mk_expr ~userloc loc ty ef
+                  (Elet (v2, e2, mk_simple_expr ~userloc loc ty (Elogic t))))
         else match op with
           | Ptree.LazyAnd ->
-              Eif (e1, e2, mk_false loc gl)
+              Eif (e1, e2, mk_false ~userloc loc gl)
           | Ptree.LazyOr ->
-              Eif (e1, mk_true loc gl, e2)
+              Eif (e1, mk_true ~userloc loc gl, e2)
       in
       d, tpure ty, ef
   | IEmatch (i, bl) ->
       let v = Mvs.find i.i_impure env in
       let branch ef (p, e) =
         let env, p = pattern env p in
-        let e = expr gl env e in
+        let e = expr ~userloc gl env e in
         let ef = E.union ef e.expr_effect in
         ef, (p, e)
       in
@@ -1644,12 +1664,12 @@ and expr_desc gl env loc ty = function
   | IEabsurd ->
       Eabsurd, tpure ty, E.empty
   | IEraise (x, e1) ->
-      let e1 = option_map (expr gl env) e1 in
+      let e1 = option_map (expr ~userloc gl env) e1 in
       let ef = match e1 with Some e1 -> e1.expr_effect | None -> E.empty in
       let ef = E.add_raise x ef in
       Eraise (x, e1), tpure ty, ef
   | IEtry (e1, hl) ->
-      let e1 = expr gl env e1 in
+      let e1 = expr ~userloc gl env e1 in
       let ef = e1.expr_effect in
       let handler (x, v, h) =
         if not (Sexn.mem x ef.E.raises) && !exn_check then
@@ -1661,7 +1681,7 @@ and expr_desc gl env loc ty = function
               env, None
           | _ -> assert false
         in
-        x, v, expr gl env h
+        x, v, expr ~userloc gl env h
       in
       let ef = List.fold_left (fun e (x,_,_) -> E.remove_raise x e) ef hl in
       let hl = List.map handler hl in
@@ -1673,7 +1693,7 @@ and expr_desc gl env loc ty = function
       let v1 = Mvs.find v1.i_impure env in
       let v2 = Mvs.find v2.i_impure env in
       let env, x = add_local env x (tpure v1.pv_pure.vs_ty) in
-      let e3 = expr gl env e3 in
+      let e3 = expr ~userloc gl env e3 in
       let ef = e3.expr_effect in
       let ef, inv = option_map_fold term_effect ef inv in
       Efor (x, v1, d, v2, inv, e3), type_v_unit gl, ef
@@ -1682,14 +1702,16 @@ and expr_desc gl env loc ty = function
       let ef, f = term_effect E.empty f in
       Eassert (k, f), tpure ty, ef
   | IElabel (lab, e1) ->
-      let e1 = expr gl env e1 in
+      let e1 = expr ~userloc gl env e1 in
       Elabel (lab, e1), e1.expr_type_v, e1.expr_effect
   | IEany c ->
       let c = type_c env c in
       Eany c, c.c_result_type, c.c_effect
+  | IEnamed _ ->
+      assert false
 
-and triple gl env (p, e, q) =
-  let e = expr gl env e in
+and triple ~userloc gl env (p, e, q) =
+  let e = expr ~userloc gl env e in
   let q = saturation e.expr_loc e.expr_effect q in
   let ef = e.expr_effect in
   let ef, p = term_effect ef p in
@@ -1704,7 +1726,7 @@ and triple gl env (p, e, q) =
   in
   (p, e, q), c
 
-and letrec gl env dl = (* : env * recfun list *)
+and letrec ~userloc gl env dl = (* : env * recfun list *)
   let binders (i, bl, var, t) =
     let env, bl = add_binders env bl in
     let variant (i, t, ls) =
@@ -1740,7 +1762,7 @@ and letrec gl env dl = (* : env * recfun list *)
     let type1 m (i, bl, env, var, t) =
       let decvar = option_map (fun (v,_,_) -> v.pv_pure) var in
       let env = make_env env ?decvar m0 in
-      let t, c = triple gl env t in
+      let t, c = triple ~userloc gl env t in
       let v = create_pvsymbol (id_clone i.i_impure.vs_name) (tarrow bl c)
         ~effect:i.i_effect ~pure:i.i_pure
       in
@@ -2185,7 +2207,7 @@ let rec decl ~wp env penv ltm lmod uc = function
       let denv = create_denv uc in
       let e = dexpr ~ghost:false denv e in
       let e = iexpr uc (create_ienv denv) e in
-      let e = expr uc Mvs.empty e in
+      let e = expr ~userloc:None uc Mvs.empty e in
       check_region_vars ();
       if Debug.test_flag debug then
         eprintf "@[--typing %s-----@\n  @[<hov 2>%a@]@\n@[<hov 2>: %a@]@]@."
@@ -2198,7 +2220,7 @@ let rec decl ~wp env penv ltm lmod uc = function
       let denv = create_denv uc in
       let _, dl = dletrec ~ghost:false denv dl in
       let _, dl = iletrec uc (create_ienv denv) dl in
-      let _, dl = letrec uc Mvs.empty dl in
+      let _, dl = letrec ~userloc:None uc Mvs.empty dl in
       check_region_vars ();
       let one uc (v, _, _, _ as d) =
         let tyv = v.pv_tv in
