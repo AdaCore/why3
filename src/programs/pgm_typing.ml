@@ -295,8 +295,8 @@ let rec dtype ~user env = function
       let mt = get_mtsymbol ts in
       let np = List.length p in
       if np <> a - mt.mt_regions then
-        errorm ~loc "@[the type %a expects %d argument(s),@
-                       but is applied to %d argument(s)@]"
+        errorm ~loc
+        "@[type %a expects %d argument(s),@ but is applied to %d argument(s)@]"
           print_qualid x (a - mt.mt_regions) np;
       let tyl = List.map (dtype ~user env) p in
       let tyl = create_regions ~user mt.mt_regions @ tyl in

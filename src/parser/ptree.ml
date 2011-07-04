@@ -245,11 +245,19 @@ type program_decl =
   | Duse    of qualid * imp_exp * (*as:*) ident option
   | Dnamespace of loc * ident option * (* import: *) bool * program_decl list
 
+type theory = {
+  pth_name   : ident;
+  pth_decl   : program_decl list;
+}
+
 type module_ = {
   mod_name   : ident;
-  mod_labels : label list;
   mod_decl   : program_decl list;
 }
 
-type program_file = module_ list
+type theory_module =
+  | Ptheory of theory
+  | Pmodule of module_
+
+type program_file = theory_module list
 

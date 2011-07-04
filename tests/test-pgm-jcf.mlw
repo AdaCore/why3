@@ -1,3 +1,11 @@
+theory M1
+  type t 'a = {| a : 'a |}
+end
+
+module M2
+  use import M1
+  let f (x: t int) = x.a
+end
 
 (*
 module MutualRec
@@ -15,28 +23,6 @@ module MutualRec
 end
 *)
 
-(*
-module PoorArrays
-
-  use import int.Int
-  use import module ref.Ref
-  use import map.Map as M
-
-  type array_contents 'a = {| length: int; elts : map int 'a |}
-  type array 'a = ref (array_contents 'a)
-
-  val get (a: array 'a) (i: int) :
-    { 0 <= i < length !a } 'a { result = M.get !a.elts i }
-
-  val set (a: array 'a) (i: int) (v: 'a) :
-    { 0 <= i < length !a }
-    unit writes a
-    { !a.length = !(old a).length && !a.elts = M.set !(old a).elts i v }
-
-end
-*)
-
-(*
 module M
 
   use import int.Int
@@ -60,8 +46,6 @@ module M
 (*   let test3 () = let x = ref 0 in begin foo x (); assert { !x = 0 } end *)
 
 end
-*)
-
 
 (*
 Local Variables:

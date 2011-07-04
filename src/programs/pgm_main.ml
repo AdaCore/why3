@@ -24,6 +24,7 @@ open Why3
 open Util
 open Ident
 open Theory
+open Typing
 open Ptree
 open Pgm_module
 
@@ -32,6 +33,22 @@ exception ClashModule of string
 let () = Exn_printer.register (fun fmt e -> match e with
   | ClashModule m -> fprintf fmt "clash with previous module %s" m
   | _ -> raise e)
+
+let add_theory env lenv m =
+  let id = m.pth_name in
+  let loc = id.id_loc in
+  let th = Theory.create_theory (Denv.create_user_id id) in
+  let rec add_decl th = function
+    | Dlogic d ->
+        Typing.add_decl env lenv th d
+    | Dnamespace (loc, name, import, dl) ->
+        let th = Theory.open_namespace th in
+        let th = List.fold_left add_decl th dl in
+        Typing.close_namespace loc import name th
+    | Dlet _ | Dletrec _ | Dparam _ | Dexn _ | Duse _ -> assert false
+  in
+  let th = List.fold_left add_decl th m.pth_decl in
+  close_theory loc lenv th
 
 let add_module ?(type_only=false) env penv (ltm, lmod) m =
   let id = m.mod_name in
@@ -44,9 +61,13 @@ let add_module ?(type_only=false) env penv (ltm, lmod) m =
   let uc =
     List.fold_left (Pgm_typing.decl ~wp env penv ltm lmod) uc m.mod_decl
   in
-  let m = close_module uc in
-  Mstr.add id.id m.m_pure ltm,
-  Mstr.add id.id m lmod
+  let md = close_module uc in
+  Mstr.add ("WP " ^ id.id) md.m_pure ltm, (* avoids a theory/module clash *)
+  Mstr.add id.id md lmod
+
+let add_theory_module ?(type_only=false) env penv (ltm, lmod) = function
+  | Ptheory t -> add_theory env ltm t, lmod
+  | Pmodule m -> add_module ~type_only env penv (ltm, lmod) m
 
 let retrieve penv file c =
   let lb = Lexing.from_channel c in
@@ -57,7 +78,7 @@ let retrieve penv file c =
   else
     let type_only = Debug.test_flag Typing.debug_type_only in
     let env = Pgm_env.get_env penv in
-    List.fold_left (add_module ~type_only env penv)
+    List.fold_left (add_theory_module ~type_only env penv)
       (Mstr.empty, Mstr.empty) ml
 
 let pgm_env_of_env =

@@ -937,9 +937,9 @@ list1_theory_or_module_:
 
 theory_or_module_:
 | THEORY uident labels list0_full_decl END
-   { { mod_name = $2; mod_labels = $3; mod_decl = $4 } }
+   { Ptheory { pth_name = add_lab $2 $3; pth_decl = $4; } }
 | MODULE uident labels list0_program_decl END
-   { { mod_name = $2; mod_labels = $3; mod_decl = $4 } }
+   { Pmodule { mod_name = add_lab $2 $3; mod_decl = $4; } }
 ;
 
 list0_full_decl:
