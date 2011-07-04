@@ -1,7 +1,7 @@
-\chapter{Syntax Reference}
+\chapter{Language Reference}
 \label{chap:syntaxref}
 
-This chapter gives the grammar for \why and \whyml input files.
+This chapter gives the grammar and semantics for \why and \whyml input files.
 
 \section{Lexical conventions}
 
@@ -90,9 +90,12 @@ application is not allowed (rejected at typing).
 \label{fig:bnf:term}
 \end{figure}
 
-\paragraph{Type Expressions.} The syntax for type
-expressions notably differs from the usual ML syntax.
+\paragraph{Type Expressions.} The syntax for type expressions is the following:
 \begin{center}\framebox{\input{./type_bnf.tex}}\end{center}
+Built-in types are \texttt{int}, \texttt{real}, and tuple types.
+Note that the syntax for type
+expressions notably differs from the usual ML syntax (\emph{e.g.} the
+type of polymorphic lists is written \texttt{list 'a}, not \texttt{'a list}).
 
 \paragraph{Formulas.}
 The syntax for formulas is given Figure~\ref{fig:bnf:formula}.
@@ -174,11 +177,17 @@ The syntax for modules is given in figure~\ref{fig:bnf:module}.
   \caption{Syntax for modules.}
 \label{fig:bnf:module}
 \end{figure}
+Any declaration which is accepted in a theory is also accepted in a
+module. Additionally, modules can introduce record types with mutable
+fields and declarations which are specific to programs (global
+variables, functions, exceptions).
 
 \paragraph{Files.}
 A \whyml input file is a (possibly empty) list of theories and modules.
 \begin{center}\framebox{\input{./whyml_file_bnf.tex}}\end{center}
-
+A theory defined in a \whyml\ file can only be used within that
+file. If a theory is supposed to be reused from other files, be they
+\why\ or \whyml\ files, it should be defined in a \why\ file.
 
 %%% Local Variables:
 %%% mode: latex
