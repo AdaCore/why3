@@ -728,8 +728,10 @@ let (_ : GMenu.image_menu_item) =
 
 let refresh_provers = ref (fun () -> ())
 
-let add_refresh_provers f msg =
+let add_refresh_provers f _msg =
+(*
   eprintf "[Info] recording '%s' for refresh provers@." msg;
+*)
   let rp = !refresh_provers in
   refresh_provers := (fun () -> rp (); f ())
 
