@@ -46,7 +46,7 @@ The GUI is launched on the file above as follows.
 why3ide hello_proof.why
 \end{verbatim}
 When the GUI is started for the first time, you should get a window
-which looks like the screenshot of Figure~\ref{fig:gui1}. 
+which looks like the screenshot of Figure~\ref{fig:gui1}.
 
 The left column is a tool bar which provides different actions to
 apply on goals. The section ``Provers'' displays the provers that were
@@ -57,13 +57,13 @@ these are Alt-Ergo~\cite{ergo}, Coq~\cite{CoqArt} and
 Simplify~\cite{simplify05}.
 
 The middle part is a tree view that
-allows to browse inside the theories. 
+allows to browse inside the theories.
 % Initially, the item of this tree
 % are closed. We can expand this view using the menu \textsf{View/Expand
 %   all} or its shortcut \textsf{Ctrl-E}. This will result is something
 % like the screenshot of Figure~\ref{fig:gui2}.
 In this tree view, we have a structured view of the file: this file
-contains one theory, itself containg three goals. 
+contains one theory, itself containg three goals.
 
 
 \begin{figure}[tbp]
@@ -168,14 +168,53 @@ time. Then, for all the goals that remain unchanged, the previous
 proofs are shown again. For the parts that changed, the previous
 proofs attempts are shown but marked with "(obsolete)" so that you
 know the results are not accurate. You can now retry to prove all what
-remains unproved using any of the provers, using the button
-``Replay''. \todo{Il faut selectioner all goals pour cela}
+remains unproved using any of the provers.
+
+\subsection{Replaying obsolete proofs}
+
+Instead of pushing a prover's button to rerun its proofs, you can
+\emph{replay} the existing but obsolete proof attempts, by clicking on
+the \textsf{Replay} button. By default, \textsf{Replay} only replays
+proofs that were successful before. If you want to replay all of them,
+you must select the context \textsf{all goals} at the top of the left
+tool bar.
+
+Notice that replaying can be done in batch mode, using the
+\texttt{why3replayer} tool (see Section~\ref{sec:why3replayer}) For
+example, running the replayer on the \texttt{hello\_proof} example is
+as follows (assuming $G_2$ still is \texttt{(true -> false) /\ (true
+  \/ false)}).
+\begin{verbatim}
+$ why3replayer hello_proof
+Info: found directory 'hello_proof' for the project
+Opening session...[Xml warning] prolog ignored
+[Reload] file '../hello_proof.why'
+[Reload] theory 'HelloProof'
+[Reload] transformation split_goal for goal G2
+ done
+Progress: 9/9
+ 2/3
+   +--file ../hello_proof.why: 2/3
+      +--theory HelloProof: 2/3
+         +--goal G2 not proved
+Everything OK.
+\end{verbatim}
+The last line tells us that no difference was detected between the
+current run and the informations in the XML file. The tree above
+reminds us that the G2 is not proved.
 
 \subsection{Cleaning}
 
-\todo{expliquer Clean et Remove}
+You may want to clean some the proof attempts, \eg removing the
+unsuccessful ones when a project is finally fully proved.
 
-See also: why3replayer
+A proof or a transformation can be removed by selecting it and
+clicking on button \textsf{Remove}. You must confirm the
+removal. Beware that there is no way to undo such a removal.
+
+The \textsf{Clean} button performs an automatic removal of all proofs
+attempts that are unsuccessful, while there exists a successful proof
+attempt for the same goal.
 
 \section{Getting Started with the \why Command}
 \label{sec:batch}
