@@ -411,7 +411,7 @@ let print_type_decl ~old info fmt (ts,def) =
               (realization ~old ~def:true) info.realization
         | Some ty ->
             fprintf fmt "@[<hov 2>Definition %a %a :=@ %a.@]@\n@\n"
-              print_ts ts (print_arrow_list print_tv_binder) ts.ts_args
+              print_ts ts (print_list space print_tv_binder) ts.ts_args
               (print_ty info) ty
       end
     | Talgebraic csl ->
