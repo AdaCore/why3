@@ -214,6 +214,7 @@ and E : sig
   val occur : R.t -> t -> bool
 
   val print : Format.formatter -> t -> unit
+  val print_rset : Format.formatter -> Sreg.t -> unit
 
 end
 

@@ -15,6 +15,7 @@ module MutualRec
 end
 *)
 
+(*
 module PoorArrays
 
   use import int.Int
@@ -33,23 +34,9 @@ module PoorArrays
     { !a.length = !(old a).length && !a.elts = M.set !(old a).elts i v }
 
 end
+*)
 
-module Alias
-
-  use import int.Int
-  use import module ref.Ref
-
-  val r : ref int
-
-  let deref (x: ref int) =
-    !x + !r
-
-  (* TODO: should be rejected *)
-  let test1 () =
-    deref r
-
-end
-
+(*
 module M
 
   use import int.Int
@@ -73,22 +60,8 @@ module M
 (*   let test3 () = let x = ref 0 in begin foo x (); assert { !x = 0 } end *)
 
 end
+*)
 
-(***
-module TestArray
-
-  use import int.Int
-  use import module array.Array
-
-  (* TODO: update *)
-  let f (x: array int) =
-    { x.length = 2 }
-    x[0] <- 1;
-    x[1] <- 2
-    { x[1] = 2 and x.length = 2 }
-
-end
-***)
 
 (*
 Local Variables:

@@ -180,6 +180,17 @@ let rec specialize_type_v ?(policy=Region_var) ~loc htv = function
   | Tpure ty ->
       specialize_ty ~policy ~loc htv ty
   | Tarrow (bl, c) ->
+      (* global regions must be different from local regions *)
+      let globals =
+        List.fold_left
+          (fun acc pv -> Sreg.diff acc pv.pv_regions)
+          (Sreg.union c.c_effect.E.reads c.c_effect.E.writes) bl
+      in
+      Sreg.iter
+        (fun r ->
+           let v = create_ty_decl_var ~user:true r.R.r_tv in
+           push_region_var r.R.r_tv (v, loc))
+        globals;
       dcurrying
         (List.map (fun pv -> specialize_type_v ~loc htv pv.pv_tv) bl)
         (specialize_type_v ~policy:Region_ret ~loc htv c.c_result_type)
@@ -1547,11 +1558,6 @@ and expr_desc gl env loc ty = function
   | IEapply_var (e1, v) ->
       let e1 = expr gl env e1 in
       let vs = Mvs.find v.i_impure env in
-      (* TODO: alias detection *)
-      (* printf "e1 : %a@." print_type_v e1.expr_type_v; *)
-      (* printf "vs = %a@." T.print_pvsymbol vs; *)
-      (* if Sreg.exists (fun r -> occur_type_v r e1.expr_type_v) vs.pv_regions then *)
-      (*   errorm ~loc "this application would create an alias"; *)
       let c = apply_type_v_var e1.expr_type_v vs in
       (*  printf "c = %a@." print_type_c c; *)
       make_apply loc e1 ty c
@@ -1828,16 +1834,6 @@ let create_ienv denv = {
   i_pures = Hls.fold (fun _ pv m -> Mstr.add pv.pv_name.id_string pv.pv_pure m)
     globals Mstr.empty;
 }
-
-let type_expr gl e =
-  let denv = create_denv gl in
-  let e = dexpr ~ghost:false denv e in
-  let ienv = create_ienv denv in
-  let e = iexpr gl ienv e in
-  let e = expr gl Mvs.empty e in
-  check_region_vars ();
-  (* fresh_expr gl ~term:true Spv.empty e; *)
-  e
 
 let type_type uc ty =
   let denv = create_denv uc in
@@ -2186,7 +2182,11 @@ let find_module penv lmod q id = match q with
    lmod = local modules *)
 let rec decl ~wp env penv ltm lmod uc = function
   | Ptree.Dlet (id, e) ->
-      let e = type_expr uc e in
+      let denv = create_denv uc in
+      let e = dexpr ~ghost:false denv e in
+      let e = iexpr uc (create_ienv denv) e in
+      let e = expr uc Mvs.empty e in
+      check_region_vars ();
       if Debug.test_flag debug then
         eprintf "@[--typing %s-----@\n  @[<hov 2>%a@]@\n@[<hov 2>: %a@]@]@."
           id.id Pgm_pretty.print_expr e print_type_v e.expr_type_v;
@@ -2199,6 +2199,7 @@ let rec decl ~wp env penv ltm lmod uc = function
       let _, dl = dletrec ~ghost:false denv dl in
       let _, dl = iletrec uc (create_ienv denv) dl in
       let _, dl = letrec uc Mvs.empty dl in
+      check_region_vars ();
       let one uc (v, _, _, _ as d) =
         let tyv = v.pv_tv in
         let loc = loc_of_id v.pv_name in
