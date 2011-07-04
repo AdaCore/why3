@@ -1,24 +1,36 @@
+<!ELEMENT why3session (file*)>
+<!ATTLIST why3session name CDATA #REQUIRED>
+
 <!ELEMENT file (theory*)>
 <!ATTLIST file name CDATA #REQUIRED>
 <!ATTLIST file verified CDATA #REQUIRED>
+<!ATTLIST file expanded CDATA #IMPLIED>
 
 <!ELEMENT theory (goal*)>
 <!ATTLIST theory name CDATA #REQUIRED>
 <!ATTLIST theory verified CDATA #REQUIRED>
+<!ATTLIST theory expanded CDATA #IMPLIED>
 
 <!ELEMENT goal (proof*, transf*)>
 <!ATTLIST goal name CDATA #REQUIRED>
 <!ATTLIST goal expl CDATA #IMPLIED>
 <!ATTLIST goal proved CDATA #REQUIRED>
+<!ATTLIST goal sum CDATA #REQUIRED>
+<!ATTLIST goal expanded CDATA #IMPLIED>
 
-<!ELEMENT proof (result)>
+<!ELEMENT proof (result|undone)>
 <!ATTLIST proof prover CDATA #REQUIRED>
+<!ATTLIST proof timelimit CDATA #REQUIRED>
+<!ATTLIST proof edited CDATA #IMPLIED>
+<!ATTLIST proof obsolete CDATA #IMPLIED>
 
 <!ELEMENT result EMPTY>
 <!ATTLIST result status (valid|invalid|unknown|timeout|failure) #REQUIRED>
 <!ATTLIST result time CDATA #IMPLIED>
 
+<!ELEMENT undone EMPTY>
+
 <!ELEMENT transf (goal*)>
 <!ATTLIST transf name CDATA #REQUIRED>
 <!ATTLIST transf proved CDATA #REQUIRED>
-
+<!ATTLIST transf expanded CDATA #IMPLIED>

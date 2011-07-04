@@ -268,9 +268,9 @@ the actions of the various menus and buttons of the interface.
 \item[Add File] adds a file in the GUI
 %\item[Detect provers] runs provers auto-detection
 \item[Preferences] opens a window for modifying preferred
-  configuration, see details below
-\item[Reload] \todo{}
-\item[Save session] \todo{}
+  configuration parameters, see details below
+\item[Reload] reloads the input files from disk, and update the session state accordingly
+\item[Save session] Save current session state on disk. The policy to decide when to save the session is configurable, as described in the preferences below.
 \item[Quit] exits the GUI
 \end{description}
 
@@ -298,12 +298,23 @@ The preferences window allows you customize
   to do that for the moment is to manually edit the config file)
 \item the time limit given to provers, in seconds
 \item the maximal number of simultaneous provers allowed to run in parallel.
-\item The policy for saving session \todo{}
+\item The policy for saving session:
+  \begin{itemize}
+  \item always save on exit (default): the current state of the proof session is saving on exit
+  \item never save on exit: the current state of the session is never save automatically, you must use menu \textsf{File/Save session} to save when wanted
+  \item ask whether to save: on exit, a popup window ask whether you
+    want to save or not.
+  \end{itemize}
 \end{itemize}
 
 \subsection{Structure of the database file}
 
-\todo{[TO BE COMPLETED LATER]}
+The session state is stored in an XML file named
+\texttt{\textsl{<dir>}/why3session.xml}, where \texttt{\textsl{<dir>}}
+is the directory of the project.
+
+The XML file follows the DTD given in \texttt{share/why3session.dtd} and reproduced below.
+\verbatiminput{../share/why3session.dtd}
 
 \section{The \texttt{why3ml} tool}
 
