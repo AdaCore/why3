@@ -1,0 +1,41 @@
+=== Developer userguide ===
+
+This file summarizes the guidelines used for the developpement of why3
+that each one must try to follow.
+
+=== Commiting ===
+ Every commit must :
+  * compile, make bench must run until the end
+  * doesn't contain trailing whitespace
+   ** in emacs : (setq-default show-trailing-whitespace t)
+  * doesn't use tab for indentation
+   ** in emacs : (setq-default indent-tabs-mode nil)
+  * doesn't contain files with lines wider than 79 characters
+   ** in emacs lineker mode can be used
+
+Currently no hooks inforce those rules.
+
+=== Nightly Bench ===
+ Every why3 sessions added in examples, examples/bts, examples/programs,
+ examples/check-builtin (cf examples/regtest.sh) are replayed every night
+ on the computer named moloch.lri.fr. So the sessions must be created on this
+ computer in order to be accurate according to the version of the installed
+ provers.
+
+=== Major Release ===
+ At each major releases :
+  * every one must take care of what they commit,
+  * a tag, named with the current version number, must be added at the commit
+    used for the tarball,
+  * a commit which increases the version number must be added just after.
+
+=== Fixes Against a Major Release ===
+
+    (** Currently we are still in beta version so the fixes are done
+    in the trunk and we release often *)
+
+    The fixes which apply to the last major release must be done in a
+  specific branch for the last major release. This branch start at the
+  commit tagged for this realease. Afterward one merge the fixes into
+  the master branch and make a minor release from the last release
+  branch.
