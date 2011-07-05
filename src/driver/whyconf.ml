@@ -27,10 +27,11 @@ open Rc
   - 2
   - 5 cvc3 native
   - 6 driver renaming
+  - 7 yices native
 
 If a configuration doesn't contain the actual magic number we don't use it.*)
 
-let magicnumber = 6
+let magicnumber = 7
 
 exception WrongMagicNumber
 

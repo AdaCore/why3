@@ -2,8 +2,8 @@
 
 prelude ";;; this is a prelude for Yices "
 
-printer "smtv1"
-filename "%f-%t-%g.smt"
+printer "yices"
+filename "%f-%t-%g.ycs"
 
 valid "\\bunsat\\b"
 unknown "\\bunknown\\b\\|\\bsat\\b\\|feature not supported: non linear problem" "Unknown"
@@ -23,11 +23,10 @@ transformation "simplify_formula"
 
 transformation "discriminate"
 transformation "encoding_smt"
-transformation "encoding_sort"
 
 theory BuiltIn
-  syntax type int   "Int"
-  syntax type real  "Real"
+  syntax type int   "int"
+  syntax type real  "real"
   syntax predicate (=)  "(= %1 %2)"
 
   meta "encoding : kept" type int
@@ -115,13 +114,12 @@ theory bool.Bool
    syntax function False "false"
    syntax function andb  "(and %1 %2)"
    syntax function orb   "(or %1 %2)"
-   syntax function xorb  "(xor %1 %2)"
    syntax function notb  "(not %1)"
    meta cloned "encoding_decorate : kept" type bool
 end
 *)
 
-(*
+
 theory int.EuclideanDivision
    syntax function div "(div %1 %2)"
    syntax function mod "(mod %1 %2)"
@@ -130,7 +128,20 @@ theory int.EuclideanDivision
    remove prop Mod_1
    remove prop Div_1
 end
-*)
+
+
+
+theory map.Map
+  syntax type map "(-> %1 %2)"
+  meta "encoding : lskept" function get
+  meta "encoding : lskept" function set
+  meta "encoding : lskept" function const
+
+  syntax function get   "(%1 %2)"
+  syntax function set   "(update %1 (%2) %3)"
+end
+
+
 (*
 Local Variables:
 mode: why
