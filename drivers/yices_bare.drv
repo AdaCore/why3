@@ -71,15 +71,15 @@ theory real.Real
 
   prelude ";;; this is a prelude for Yices real arithmetic"
 
-  syntax function zero "0.0"
-  syntax function one  "1.0"
+  syntax function zero "0"
+  syntax function one  "1"
 
   syntax function (+)  "(+ %1 %2)"
   syntax function (-)  "(- %1 %2)"
   syntax function (*)  "(* %1 %2)"
   syntax function (/)  "(/ %1 %2)"
   syntax function (-_) "(- %1)"
-  syntax function inv  "(/ 1.0 %1)"
+  syntax function inv  "(/ 1 %1)"
 
   syntax predicate (<=) "(<= %1 %2)"
   syntax predicate (<)  "(< %1 %2)"
