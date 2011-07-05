@@ -77,9 +77,11 @@ theory real.Real
   syntax function (+)  "(+ %1 %2)"
   syntax function (-)  "(- %1 %2)"
   syntax function (*)  "(* %1 %2)"
-  syntax function (/)  "(/ %1 %2)"
+  (* Yices division doesn't accept anything else than constant on
+  denominator so we don't use it (except for constant cf printer) *)
+  (* syntax function (/)  "(/ %1 %2)" *)
   syntax function (-_) "(- %1)"
-  syntax function inv  "(/ 1 %1)"
+  (* syntax function inv  "(/ 1 %1)" *)
 
   syntax predicate (<=) "(<= %1 %2)"
   syntax predicate (<)  "(< %1 %2)"
