@@ -81,7 +81,7 @@ exception Success
 
 let search_safety () =
   { length x = m }
-  label Init:
+'Init:
   let s = ref 0 in
   for i = 0 to m - 1 do (* could be n instead of m *)
     s := !s + x[i]
@@ -116,7 +116,7 @@ let search_safety () =
 
 let search () =
   { length x = m /\ is_integer x.elts }
-  label Init:
+'Init:
   let s = ref 0 in
   for i = 0 to m - 1 do (* could be n instead of m *)
     invariant { !s = sum x.elts 0 i }
@@ -125,11 +125,11 @@ let search () =
   assert { !s = sum x.elts 0 m };
   for d = 0 to m - 1 do
     invariant {
-      x = at x Init /\
+      x = at x 'Init /\
       !s = sum x.elts d m
     }
     for c = x[d] + 1 to 9 do
-      invariant { x = at x Init }
+      invariant { x = at x 'Init }
       let delta = y - !s - c + x[d] in
       if 0 <= delta && delta <= 9 * d then begin
         x[d] <- c;
@@ -240,7 +240,7 @@ let search_smallest () =
     (* x has at most n digits *)
     forall k : int. n <= k < m -> x[k] = 0
   }
-  label Init:
+'Init:
   let s = ref 0 in
   for i = 0 to m - 1 do (* could be n instead of m *)
     invariant { !s = sum x.elts 0 i }
@@ -249,24 +249,24 @@ let search_smallest () =
   assert { !s = sum x.elts 0 m };
   for d = 0 to m - 1 do
     invariant {
-      x = at x Init /\
+      x = at x 'Init /\
       !s = sum x.elts d m /\
       forall u : int.
-         interp (at x.elts Init) 0 m < u <= interp9 x.elts d m -> sum_digits u <> y
+         interp (at x.elts 'Init) 0 m < u <= interp9 x.elts d m -> sum_digits u <> y
     }
     for c = x[d] + 1 to 9 do
       invariant {
-        x = at x Init /\
+        x = at x 'Init /\
         forall c' : int. x[d] < c' < c ->
           forall u : int.
-          interp (at x.elts Init) 0 m < u <= interp9 (M.set x.elts d c') d m ->
+          interp (at x.elts 'Init) 0 m < u <= interp9 (M.set x.elts d c') d m ->
             sum_digits u <> y }
       let delta = y - !s - c + x[d] in
       if 0 <= delta && delta <= 9 * d then begin
         assert { smallest_size delta <= d };
         x[d] <- c;
         assert { sum x.elts d m = y - delta };
-        assert { gt_digit x.elts (at x.elts Init) d };
+        assert { gt_digit x.elts (at x.elts 'Init) d };
         let k = div delta 9 in
         assert { k <= d };
         for i = 0 to d - 1 do
@@ -277,7 +277,7 @@ let search_smallest () =
              (forall j : int. 0 <= j < i ->
                 (j <  smallest_size delta -> x[j] = M.get (smallest delta) j) /\
                 (j >= smallest_size delta -> x[j] = 0)) /\
-             gt_digit x.elts (at x.elts Init) d }
+             gt_digit x.elts (at x.elts 'Init) d }
           if i < k then x[i] <- 9
           else if i = k then x[i] <- mod delta 9
           else x[i] <- 0;

@@ -90,7 +90,6 @@
         "fun", FUN;
         (* "ghost", GHOST; *)
         "invariant", INVARIANT;
-        "label", LABEL;
         "loop", LOOP;
         "model", MODEL;
         "module", MODULE;
@@ -206,8 +205,6 @@ rule token = parse
       { comment_start_loc := loc lexbuf; comment lexbuf; token lexbuf }
   | "'"
       { QUOTE }
-  | "`"
-      { BACKQUOTE }
   | ","
       { COMMA }
   | "("

@@ -38,12 +38,12 @@ module Algo65
     if m < n then begin
       let i = ref 0 in
       let j = ref 0 in
-      label L1:
+'L1:
       partition a m n i j;
-      assert { permut_sub (at a L1) a m n };
-      label L2:
+      assert { permut_sub (at a 'L1) a m n };
+'L2:
       if k <= !j then find a m !j k;
-      assert { permut_sub (at a L2) a m n };
+      assert { permut_sub (at a 'L2) a m n };
       if !i <= k then find a !i n k
     end
     { permut_sub (old a) a m n /\

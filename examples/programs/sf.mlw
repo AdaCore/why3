@@ -15,9 +15,9 @@ module HoareLogic
 
   let slow_subtraction (x: ref int) (z: ref int) =
     { !x >= 0 }
-    label Init:
+'Init:
     while !x <> 0 do
-      invariant { 0 <= !x /\ !z - !x = at !z Init - at !x Init } variant { !x }
+      invariant { 0 <= !x /\ !z - !x = at !z 'Init - at !x 'Init } variant { !x }
       z := !z - 1;
       x := !x - 1
     done
@@ -34,9 +34,9 @@ module HoareLogic
 
   let slow_addition (x: ref int) (z: ref int) =
     { !x >= 0 }
-    label Init:
+'Init:
     while !x <> 0 do
-      invariant { 0 <= !x /\ !z + !x = at !z Init + at !x Init } variant { !x }
+      invariant { 0 <= !x /\ !z + !x = at !z 'Init + at !x 'Init } variant { !x }
       z := !z + 1;
       x := !x - 1
     done
@@ -53,10 +53,10 @@ module HoareLogic
   let parity (x: ref int) (y: ref int) =
     { !x >= 0 }
     y := 0;
-    label Init:
+'Init:
     while !x <> 0 do
-      invariant { 0 <= !x /\ (!y=0 /\ even (at !x Init - !x) \/
-                               !y=1 /\ even (at !x Init - !x + 1)) }
+      invariant { 0 <= !x /\ (!y=0 /\ even (at !x 'Init - !x) \/
+                               !y=1 /\ even (at !x 'Init - !x + 1)) }
       variant { !x }
       y := 1 - !y;
       x := !x - 1
@@ -112,10 +112,10 @@ module MoreHoareLogic
   let list_sum (l: ref (list int)) (y: ref int) =
     {}
     y := 0;
-    label Init:
+'Init:
     while !l <> Nil do
-      invariant { length !l <= length (at !l Init) /\
-                  !y + sum !l = sum (at !l Init) }
+      invariant { length !l <= length (at !l 'Init) /\
+                  !y + sum !l = sum (at !l 'Init) }
       variant { length !l }
       y := !y + head !l;
       l := tail !l
@@ -129,12 +129,12 @@ module MoreHoareLogic
   let list_member (x : ref (list 'a)) (y: 'a) (z: ref int) =
     {}
     z := 0;
-    label Init:
+'Init:
     while !x <> Nil do
-      invariant { length !x <= length (at !x Init) /\
-                  (mem y !x -> mem y (at !x Init)) /\
-                  (!z=1 /\ mem y (at !x Init) \/
-                   !z=0 /\ (mem y (at !x Init) -> mem y !x)) }
+      invariant { length !x <= length (at !x 'Init) /\
+                  (mem y !x -> mem y (at !x 'Init)) /\
+                  (!z=1 /\ mem y (at !x 'Init) \/
+                   !z=0 /\ (mem y (at !x 'Init) -> mem y !x)) }
       variant { length !x }
       if y = head !x then z := 1;
       x := tail !x

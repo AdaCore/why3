@@ -69,11 +69,11 @@ module Array
 
   let fill (a: array 'a) (ofs: int) (len: int) (v: 'a) =
     { 0 <= ofs /\ ofs + len <= length a }
-    label Init:
+'Init:
     for k = 0 to len - 1 do
       invariant {
         (forall i:int.
-        (0 <= i < ofs \/ ofs + len <= i < length a) -> a[i] = (at a Init)[i])
+        (0 <= i < ofs \/ ofs + len <= i < length a) -> a[i] = (at a 'Init)[i])
         /\
         (forall i:int. ofs <= i < ofs + k -> a[i] = v)
       }

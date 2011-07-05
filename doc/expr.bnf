@@ -12,7 +12,6 @@
        | "let" "rec" recfun ("with" recfun)*      ; recursive functions
        | "if" expr "then" expr ("else" expr)?     ; conditional
        | expr ";" expr                            ; sequence
-       | "label" uident ":" expr                  ; label
        | "loop" loop-annot "end"                  ; infinite loop
        | "while" expr "do" loop-annot expr "done" ; while loop
        | "for" lident "=" expr to-downto expr     ; for loop
@@ -32,6 +31,8 @@
        | expr "." lqualid "<-" expr               ; field assignment
        | "{|" expr "with" field-value+ "|}"       ; field update
        | expr ":" type 	                          ; cast
+       | label expr 	                          ; label
+       | "'" uident ":" expr                      ; code mark
        | "(" expr ")" 	      	                  ; parentheses
   \
   expr-case ::= pattern "->" expr                 ;

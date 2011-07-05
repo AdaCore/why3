@@ -82,6 +82,8 @@ end
   let prefix s = "prefix " ^ s
   let mixfix s = "mixfix " ^ s
 
+  let quote id = { id with id = "'" ^ id.id }
+
   let mk_id id loc = { id = id; id_lab = []; id_loc = loc }
 
   let add_lab id l = { id with id_lab = l }
@@ -160,9 +162,9 @@ end
       pc_pre         = p;
       pc_post        = q; }
 
-  let add_init_label e =
+  let add_init_mark e =
     let init = { id = "Init"; id_lab = []; id_loc = e.expr_loc } in
-    { e with expr_desc = Elabel (init, e) }
+    { e with expr_desc = Emark (init, e) }
 
 %}
 
@@ -187,13 +189,13 @@ end
 
 %token ABSTRACT ABSURD ANY ASSERT ASSUME BEGIN CHECK DO DONE DOWNTO
 %token EXCEPTION FOR
-%token FUN INVARIANT LABEL LOOP MODEL MODULE MUTABLE RAISE
+%token FUN INVARIANT LOOP MODEL MODULE MUTABLE RAISE
 %token RAISES READS REC TO TRY VAL VARIANT WHILE WRITES
 
 /* symbols */
 
 %token AND ARROW
-%token BACKQUOTE BAR
+%token BAR
 %token COLON COMMA
 %token DOT EQUAL FUNC LAMBDA LTGT
 %token LEFTPAR LEFTPAR_STAR_RIGHTPAR LEFTREC LEFTSQ
@@ -210,7 +212,7 @@ end
 
 /* Precedences */
 
-%nonassoc prec_label
+%nonassoc prec_mark
 %nonassoc prec_post
 %nonassoc BAR
 
@@ -550,7 +552,7 @@ list1_primitive_type_sep_comma:
 ;
 
 type_var:
-| QUOTE ident { $2 }
+| QUOTE lident { $2 }
 ;
 
 /* Logic expressions */
@@ -634,6 +636,7 @@ lexpr_arg:
 | FALSE             { mk_pp PPfalse }
 | OPPREF lexpr_arg  { mk_l_prefix $1 $2 }
 | lexpr_sub         { $1 }
+| QUOTE uident      { mk_pp (PPvar (Qident (quote $2))) }
 ;
 
 lexpr_dot:
@@ -1097,8 +1100,8 @@ expr:
    { mk_expr (Ematch ($2, $5)) }
 | MATCH expr COMMA list1_expr_sep_comma WITH bar_ program_match_cases END
    { mk_expr (Ematch (mk_expr (Etuple ($2::$4)), $7)) }
-| LABEL uident COLON expr %prec prec_label
-   { mk_expr (Elabel ($2, $4)) }
+| QUOTE uident COLON expr %prec prec_mark
+   { mk_expr (Emark (quote $2, $4)) }
 | LOOP loop_annotation expr END
    { mk_expr (Eloop ($2, $3)) }
 | WHILE expr DO loop_annotation expr DONE

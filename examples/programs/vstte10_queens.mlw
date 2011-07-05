@@ -82,11 +82,11 @@ module NQueens
 
   let rec bt_queens (board: array int) (n: int) (pos: int) variant { n - pos } =
     { length board = n /\ 0 <= pos <= n /\ solution board pos }
-    label Init:
+'Init:
     if pos = n then raise Solution;
     for i = 0 to n - 1 do
       invariant {
-        eq_board board (at board Init) pos /\
+        eq_board board (at board 'Init) pos /\
         forall b:array int. length b = n -> is_board b n ->
           eq_board board b pos -> 0 <= b[pos] < i -> not (solution b n) }
       board[pos] <- i;

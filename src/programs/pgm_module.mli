@@ -86,8 +86,8 @@ val add_pdecl :
 
 (** builtins *)
 
-val ts_label : tysymbol
-val ty_label : ty
+val ts_mark : tysymbol
+val ty_mark : ty
 
 val ts_unit : tysymbol
 val ty_unit : ty

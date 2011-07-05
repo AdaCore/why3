@@ -55,8 +55,8 @@ let rec print_expr fmt e = match e.expr_desc with
   | Eany c ->
       fprintf fmt "@[[any %a]@]" print_type_c c
 
-  | Elabel (_, _)  ->
-      fprintf fmt "<todo: Elabel>"
+  | Emark (_, _)  ->
+      fprintf fmt "<todo: Emark>"
   | Eassert (_, f) ->
       fprintf fmt "@[assert {%a}@]" print_term f
   | Efor (_, _, _, _, _, e) ->

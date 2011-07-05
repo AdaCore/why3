@@ -99,8 +99,8 @@ let wp_forall v f =
 
 (* utility functions for building WPs *)
 
-let fresh_label () =
-  create_vsymbol (id_fresh "label") ty_label
+let fresh_mark () =
+  create_vsymbol (id_fresh "mark") ty_mark
 
 let wp_binder x f = match x.pv_tv with
   | Tpure _ -> wp_forall x.pv_pure f
@@ -120,20 +120,20 @@ let add_binder x rm =
 let add_binders = List.fold_right add_binder
 
 (* replace old(t) with at(t,lab) everywhere in formula f *)
-let rec old_label lab t = match t.t_node with
+let rec old_mark lab t = match t.t_node with
   | Tapp (ls, [t]) when ls_equal ls fs_old ->
-      let t = old_label lab t in (* NECESSARY? *)
+      let t = old_mark lab t in (* NECESSARY? *)
       t_app fs_at [t; t_var lab] t.t_ty
   | _ ->
-      t_map (old_label lab) t
+      t_map (old_mark lab) t
 
 (* replace at(t,lab) with t everywhere in formula f *)
-let rec erase_label lab t = match t.t_node with
+let rec erase_mark lab t = match t.t_node with
   | Tapp (ls, [t; {t_node = Tvar l}])
     when ls_equal ls fs_at && vs_equal l lab ->
-      erase_label lab t
+      erase_mark lab t
   | _ ->
-      t_map (erase_label lab) t
+      t_map (erase_mark lab) t
 
 let rec unref s t = match t.t_node with
   | Tvar vs ->
@@ -322,10 +322,10 @@ let abstract_wp env rm ef (q',ql') (q,ql) =
   wp_ands (f :: List.map2 quantify_h ql' ql)
 
 let opaque_wp env rm ef q' q =
-  let lab = fresh_label () in
-  let q' = post_map (old_label lab) q' in
+  let lab = fresh_mark () in
+  let q' = post_map (old_mark lab) q' in
   let f = abstract_wp env rm ef q' q in
-  erase_label lab f
+  erase_mark lab f
 
 (*s [filter_post k q] removes exc. postconditions from [q] which do not
     appear in effect [ef] *)
@@ -434,10 +434,10 @@ let add_expl msg f =
 *)
 
 let rec wp_expr env rm e q =
-  let lab = fresh_label () in
-  let q = post_map (old_label lab) q in
+  let lab = fresh_mark () in
+  let q = post_map (old_mark lab) q in
   let f = wp_desc env rm e q in
-  let f = erase_label lab f in
+  let f = erase_mark lab f in
   let f = wp_label ~loc:e.expr_loc ~lab:e.expr_lab f in
   if Debug.test_flag debug then begin
     eprintf "@[--------@\n@[<hov 2>e = %a@]@\n" Pgm_pretty.print_expr e;
@@ -490,11 +490,11 @@ and wp_desc env rm e q = match e.expr_desc with
       wp_expr env rm e1 q1
   | Eloop ({ loop_invariant = inv; loop_variant = var }, e1) ->
       let wfr = well_founded_rel var in
-      let lab = fresh_label () in
+      let lab = fresh_mark () in
       let q1 = while_post_block inv var lab e1 in
       let q1 = sup q1 q in (* exc. posts taken from [q] *)
       let we = wp_expr env rm e1 q1 in
-      let we = erase_label lab we in
+      let we = erase_mark lab we in
       let sreg = e.expr_effect.E.writes in
       let w = match inv with
         | None ->
@@ -601,9 +601,9 @@ and wp_desc env rm e q = match e.expr_desc with
   | Eassert (Ptree.Aassume, f) ->
       let (_, q), _ = q in
       wp_implies f q
-  | Elabel (lab, e1) ->
+  | Emark (lab, e1) ->
       let w1 = wp_expr env rm e1 q in
-      erase_label lab w1
+      erase_mark lab w1
   | Eany c ->
       (* TODO: propagate call labels into c.c_post *)
       let w = opaque_wp env rm c.c_effect.E.writes c.c_post q in

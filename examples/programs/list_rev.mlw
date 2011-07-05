@@ -330,11 +330,11 @@ module M2
     let old_next = !next in
     let old_p = !p in
     let q = ref null in
-    label Init:
+'Init:
     while !p <> null do
       invariant { is_list !next !p /\ is_list !next !q
                   /\ sep_list_list !next !p !q /\
-      reverse (model (at !next Init) (old_p)) =
+      reverse (model (at !next 'Init) (old_p)) =
        (reverse (model !next !p)) ++ (model !next !q)}
       let tmp = !next[!p] in
       let bak_next = !next in

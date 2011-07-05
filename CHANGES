@@ -1,9 +1,10 @@
 * marks an incompatible change
 
+  o [WhyML] programs labels with new syntax 'L: (instead of label L:)
   o [Coq output] fixed bug 12934: type def with several type params
   o [IDE] interactive detection of provers disabled because incompatible
     with session. Detection must be done with why3config --detect-provers
-  o WhyML with mutable record fields and type models
+  o [WhyML] mutable record fields and type models
   o why3replayer
   * "parameter" keyword renamed to "val"
   * new syntax for conjunction (/\) and disjunction (\/)
@@ -18,7 +19,7 @@
   o [IDE] displays explanations using labels of the form "expl:..."
   o fixed Coq output for polymorphic inductive predicates
   o [IDE] dropped dependence on Sqlite
-  * calls to prover can now be asynchronous 
+  * calls to prover can now be asynchronous
     Driver.prove_task now returns some intermediate value (of type
     prover_call), which can be queried in two ways:
     - blocking way with Call_provers.wait_on_call
@@ -41,7 +42,7 @@ version 0.64, Feb 16, 2011
   * syntax: /\ renamed into && and \/ into ||
   o accept lowercase names for axioms, lemmas, goals, and cases in
     inductive predicates
-  o labels in terms and formulas are not printed by default. 
+  o labels in terms and formulas are not printed by default.
   o transformation split-goal does not split under disjunction anymore
   o fixed --enable-local
   o why.conf is no more looked for in the current directory; use -C or

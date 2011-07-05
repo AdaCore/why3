@@ -99,7 +99,7 @@ and dexpr_desc =
   | DEfor of ident * dexpr * for_direction * dexpr * Ptree.lexpr option * dexpr
 
   | DEassert of assertion_kind * Ptree.lexpr
-  | DElabel of string * dexpr
+  | DEmark of string * dexpr
   | DEany of dutype_c
   | DEnamed of Ptree.label * dexpr
 
@@ -153,7 +153,7 @@ and itype_c =
 
 and ibinder = ivsymbol * itype_v
 
-type label = Term.vsymbol
+type mark = Term.vsymbol
 
 type irec_variant = ivsymbol * Term.term * variant_rel
 
@@ -199,7 +199,7 @@ and iexpr_desc =
              Term.term option * iexpr
 
   | IEassert of assertion_kind * Term.term
-  | IElabel of label * iexpr
+  | IEmark of mark * iexpr
   | IEany of itype_c
   | IEnamed of Ptree.label * iexpr
 
@@ -256,7 +256,7 @@ and expr_desc =
             Term.term option * expr
 
   | Eassert of assertion_kind * Term.term
-  | Elabel of label * expr
+  | Emark of mark * expr
   | Eany of type_c
 
 and recfun = pvsymbol * pvsymbol list * triple * E.t

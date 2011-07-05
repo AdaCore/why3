@@ -19,11 +19,11 @@ module Quicksort
 
   let selection_sort (a: array int) =
     { }
-    label L:
+'L:
     for i = 0 to length a - 1 do
       (* a[0..i[ is sorted; now find minimum of a[i..n[ *)
       invariant
-        { sorted_sub a 0 i /\ permut a (at a L) /\
+        { sorted_sub a 0 i /\ permut a (at a 'L) /\
           forall k1 k2: int. 0 <= k1 < i <= k2 < length a -> a[k1] <= a[k2] }
       let min = ref i in
       for j = i + 1 to length a - 1 do
@@ -31,9 +31,9 @@ module Quicksort
           { i <= !min < j && forall k: int. i <= k < j -> a[!min] <= a[k] }
         if a[j] < a[!min] then min := j
       done;
-      label L1:
+'L1:
       if !min <> i then swap a !min i;
-      assert { permut a (at a L1) }
+      assert { permut a (at a 'L1) }
     done
     { sorted a /\ permut a (old a) }
 

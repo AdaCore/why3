@@ -612,9 +612,9 @@ The precondition relates \texttt{board}, \texttt{pos}, and \texttt{n}
 and requires \texttt{board} to be a solution up to \texttt{pos}:
 \begin{verbatim}
       { length board = n /\ 0 <= pos <= n /\ solution board pos }
-      label Init:
+      'Init:
 \end{verbatim}
-We place a label \texttt{Init} immediately after the precondition to
+We place a code mark \texttt{'Init} immediately after the precondition to
 be able to refer to the value of \texttt{board} in the pre-state.
 Whenever we reach the end of the chess board, we have found a solution
 and we signal it using exception \texttt{Solution}:
@@ -632,7 +632,7 @@ extend this prefix with a queen on row \texttt{pos} at a column below
 \texttt{i}:
 \begin{verbatim}
         invariant {
-          eq_board board (at board Init) pos /\
+          eq_board board (at board 'Init) pos /\
           forall b:array int. length b = n -> is_board b n ->
             eq_board board b pos -> 0 <= b[pos] < i -> not (solution b n) }
 \end{verbatim}
@@ -688,11 +688,11 @@ automatically, including the verification of the lemmas themselves.
 
   let rec bt_queens (board: array int) (n: int) (pos: int) variant { n - pos } =
     { length board = n /\ 0 <= pos <= n /\ solution board pos }
-    label Init:
+    'Init:
     if pos = n then raise Solution;
     for i = 0 to n - 1 do
       invariant {
-        eq_board board (at board Init) pos /\
+        eq_board board (at board 'Init) pos /\
         forall b:array int. length b = n -> is_board b n ->
           eq_board board b pos -> 0 <= b[pos] < i -> not (solution b n) }
       board[pos] <- i;

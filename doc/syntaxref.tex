@@ -15,6 +15,8 @@ Comments are enclosed by \texttt{(*} and \texttt{*)} and can be nested.
 \paragraph{Strings.}
 Strings are enclosed in double quotes (\verb!"!). Double quotes can be
 inserted in strings using the backslash character (\verb!\!).
+In the following, strings are referred to with the non-terminal
+\nonterm{string}{}.
 
 % TODO: escape sequences for strings
 
@@ -52,6 +54,12 @@ characters they are built from:
  \textit{op-char-4};
 \item level 1: all other operators (non-terminal \textit{infix-op-1}).
 \end{itemize}
+
+\paragraph{Labels.} Identifiers, terms, formulas, program expressions
+can all be labeled, either with a string, or with a location tag.
+\begin{center}\framebox{\input{./label_bnf.tex}}\end{center}
+A location tag consists of a file name, a line number, and starting
+and ending characters.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

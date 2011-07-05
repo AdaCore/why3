@@ -41,17 +41,15 @@ module Algo64
 
   let rec quicksort (a:array int) (m:int) (n:int) : unit variant { n-m } =
     { 0 <= m <= n < length a }
-    label Init:
+'Init:
     if m < n then begin
       let i = ref 0 in
       let j = ref 0 in
       partition a m n i j;
-      label L1:
-      quicksort a m !j;
-      assert { permut_sub (at a L1) a m n };
-      label L2:
-      quicksort a !i n;
-      assert { permut_sub (at a L2) a m n }
+'L1:  quicksort a m !j;
+      assert { permut_sub (at a 'L1) a m n };
+'L2:  quicksort a !i n;
+      assert { permut_sub (at a 'L2) a m n }
     end
     { permut_sub (old a) a m n /\ sorted_sub a m n }
 

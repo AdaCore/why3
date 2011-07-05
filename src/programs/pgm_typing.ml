@@ -89,7 +89,7 @@ let find_ls ~pure uc s =
 let dty_bool uc = tyapp (find_ts ~pure:true uc "bool") []
 let dty_int _uc = tyapp Ty.ts_int []
 let dty_unit _uc = tyapp (ts_tuple 0) []
-let dty_label _uc = tyapp ts_label []
+let dty_mark _uc = tyapp ts_mark []
 
 (* note: local variables are simultaneously in locals (to type programs)
    and in denv (to type logic elements) *)
@@ -663,13 +663,13 @@ and dexpr_desc ~ghost env loc = function
 
   | Ptree.Eassert (k, le) ->
       DEassert (k, le), dty_unit env.uc
-  | Ptree.Elabel ({id=s}, e1) ->
+  | Ptree.Emark ({id=s}, e1) ->
       if Typing.mem_var s env.denv then
-        errorm ~loc "clash with previous label %s" s;
-      let ty = dty_label env.uc in
+        errorm ~loc "clash with previous mark %s" s;
+      let ty = dty_mark env.uc in
       let env = { env with denv = add_pure_var s ty env.denv } in
       let e1 = dexpr ~ghost env e1 in
-      DElabel (s, e1), e1.dexpr_type
+      DEmark (s, e1), e1.dexpr_type
   | Ptree.Ecast (e1, ty) ->
       let e1 = dexpr ~ghost env e1 in
       let ty = dtype ~user:false env ty in
@@ -1261,9 +1261,9 @@ and iexpr_desc gl env loc ty = function
       let f = ifmla env f in
       check_at_fmla loc f;
       IEassert (k, f)
-  | DElabel (s, e1) ->
-      let env, v = iadd_local env (id_fresh s) ty_label in
-      IElabel (v.i_impure, iexpr gl env e1)
+  | DEmark (s, e1) ->
+      let env, v = iadd_local env (id_fresh s) ty_mark in
+      IEmark (v.i_impure, iexpr gl env e1)
   | DEany c ->
       let c = iutype_c gl env c in
       IEany c
@@ -1479,7 +1479,7 @@ let rec is_pure_expr e =
   | Elocal _ | Elogic _ -> true
   | Eif (e1, e2, e3) -> is_pure_expr e1 && is_pure_expr e2 && is_pure_expr e3
   | Elet (_, e1, e2) -> is_pure_expr e1 && is_pure_expr e2
-  | Elabel (_, e1) -> is_pure_expr e1
+  | Emark (_, e1) -> is_pure_expr e1
   | Eany c -> E.no_side_effect c.c_effect
   | Eassert _ | Etry _ | Efor _ | Eraise _ | Ematch _
   | Eloop _ | Eletrec _ | Efun _
@@ -1701,9 +1701,9 @@ and expr_desc ~userloc gl env loc ty = function
   | IEassert (k, f) ->
       let ef, f = term_effect E.empty f in
       Eassert (k, f), tpure ty, ef
-  | IElabel (lab, e1) ->
+  | IEmark (m, e1) ->
       let e1 = expr ~userloc gl env e1 in
-      Elabel (lab, e1), e1.expr_type_v, e1.expr_effect
+      Emark (m, e1), e1.expr_type_v, e1.expr_effect
   | IEany c ->
       let c = type_c env c in
       Eany c, c.c_result_type, c.c_effect
@@ -1838,7 +1838,7 @@ let rec fresh_expr gl ~term locals e = match e.expr_desc with
   | Efor (_, _, _, _, _, e1) ->
       fresh_expr gl ~term:false locals e1
 
-  | Elabel (_, e) ->
+  | Emark (_, e) ->
       fresh_expr gl ~term locals e
   | Eassert _ | Eany _ ->
       ()

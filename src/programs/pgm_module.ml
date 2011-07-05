@@ -170,12 +170,12 @@ let ts_unit = create_tysymbol (id_fresh "unit") [] (Some ty_unit)
 
 (* logic ignore 'a : () *)
 
-let ts_label = create_tysymbol (id_fresh "label") [] None
-let ty_label = ty_app ts_label []
+let ts_mark = create_tysymbol (id_fresh "mark") [] None
+let ty_mark = ty_app ts_mark []
 
 let fs_at =
   let ty = ty_var (create_tvsymbol (id_fresh "a")) in
-  create_lsymbol (id_fresh "at") [ty; ty_label] (Some ty)
+  create_lsymbol (id_fresh "at") [ty; ty_mark] (Some ty)
 
 let fs_old =
   let ty = ty_var (create_tvsymbol (id_fresh "a")) in
@@ -185,7 +185,7 @@ let th_prelude =
   let uc = create_theory (id_fresh "Prelude") in
   let uc = use_export uc (tuple_theory 0) in
   let uc = add_ty_decl uc [ts_unit, Tabstract] in
-  let uc = add_ty_decl uc [ts_label, Tabstract] in
+  let uc = add_ty_decl uc [ts_mark, Tabstract] in
   let uc = add_logic_decl uc [fs_at, None] in
   let uc = add_logic_decl uc [fs_old, None] in
   close_theory uc

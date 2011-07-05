@@ -227,7 +227,7 @@ and expr_desc =
   | Efor of ident * expr * for_direction * expr * lexpr option * expr
   (* annotations *)
   | Eassert of assertion_kind * lexpr
-  | Elabel of ident * expr
+  | Emark of ident * expr
   | Ecast of expr * pty
   | Eany of type_c
   | Enamed of label * expr

@@ -20,6 +20,7 @@
        | "{|" term "with" field-value+ "|}"    ; field update
        | term ":" type 	          ; cast
        | label term 	      	  ; label
+       | "'" uident    	      	  ; code mark
        | "(" term ")" 	      	  ; parentheses
   \
   term-case ::= pattern "->" term ; 
