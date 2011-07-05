@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session SYSTEM "why3session.dtd">
+<why3session name="examples/programs/sf/why3session.xml">
+ <file name="../sf.mlw" verified="true" expanded="true">
+  <theory name="WP HoareLogic" verified="true" expanded="true">
+   <goal name="WP_parameter slow_subtraction" expl="correctness of parameter slow_subtraction" sum="458f2e6c9d1bbc6a9d6cdddba40fd1d5" proved="true" expanded="true">
+    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal name="WP_parameter reduce_to_zero" expl="correctness of parameter reduce_to_zero" sum="45e7a1303fcca8e459e15eca9d92bccd" proved="true" expanded="true">
+    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal name="WP_parameter slow_addition" expl="correctness of parameter slow_addition" sum="f19498eb4d9626d1453e5ecf3f3f0abc" proved="true" expanded="true">
+    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal name="even_not_odd" sum="53e6bf87df0a78f77396dc37febf9ad4" proved="true" expanded="true">
+    <proof prover="coq" timelimit="10" edited="sf_WP_HoareLogic_even_not_odd_1.v" obsolete="false">
+     <result status="valid" time="0.65"/>
+    </proof>
+   </goal>
+   <goal name="WP_parameter parity" expl="correctness of parameter parity" sum="f6d9f277eb9aef02765d7c85c0442161" proved="true" expanded="true">
+    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+     <result status="valid" time="0.13"/>
+    </proof>
+   </goal>
+   <goal name="WP_parameter sqrt" expl="correctness of parameter sqrt" sum="cf2cff74151b7962afd722bedeef6915" proved="true" expanded="true">
+    <proof prover="z3" timelimit="10" edited="" obsolete="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+   </goal>
+   <goal name="WP_parameter factorial" expl="correctness of parameter factorial" sum="9ea847303a87e605060c175e0d0e09e4" proved="true" expanded="true">
+    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+     <result status="valid" time="0.04"/>
+    </proof>
+   </goal>
+  </theory>
+  <theory name="WP MoreHoareLogic" verified="true" expanded="true">
+   <goal name="WP_parameter list_sum" expl="correctness of parameter list_sum" sum="3e6044f1b8cf49c626655c2cd6cc12a0" proved="true" expanded="true">
+    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+     <result status="valid" time="0.08"/>
+    </proof>
+   </goal>
+   <goal name="WP_parameter list_member" expl="correctness of parameter list_member" sum="5f5617227f186b821f84ef28ca6c0dbd" proved="true" expanded="true">
+    <proof prover="yices" timelimit="10" edited="" obsolete="false">
+     <result status="valid" time="0.09"/>
+    </proof>
+   </goal>
+  </theory>
+ </file>
+</why3session>

@@ -1,25 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
 <why3session name="examples/programs/gcd/why3session.xml">
- <file name="../gcd.mlw" verified="false" expanded="true">
-  <theory name="WP M" verified="false" expanded="true">
-   <goal name="WP_parameter gcd" expl="correctness of parameter gcd" sum="13686aa7223ccd074e11892070fa497c" proved="false" expanded="true">
-    <transf name="split_goal" proved="false" expanded="true">
-     <goal name="WP_parameter gcd.1" expl="normal postcondition" sum="e04458a1deb8f46c32e2040984924ab2" proved="true" expanded="true">
-      <proof prover="cvc3" timelimit="2" edited="" obsolete="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof prover="alt-ergo" timelimit="2" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof prover="simplify" timelimit="2" edited="" obsolete="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-      <proof prover="z3" timelimit="2" edited="" obsolete="false">
-       <result status="valid" time="0.65"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter gcd.2" expl="precondition" sum="b1c7e0b73a7e08e9bfb9e73aa85762d7" proved="true" expanded="true">
+ <file name="../gcd.mlw" verified="true" expanded="true">
+  <theory name="WP EuclideanAlgorithm" verified="true" expanded="true">
+   <goal name="WP_parameter gcd" expl="correctness of parameter gcd" sum="bfbae7b37de6ad9ac15a7666cdb75bce" proved="true" expanded="true">
+    <transf name="split_goal" proved="true" expanded="true">
+     <goal name="WP_parameter gcd.1" expl="normal postcondition" sum="3893c6278b0c6d2e8a61ff8df2953fcb" proved="true" expanded="true">
       <proof prover="cvc3" timelimit="2" edited="" obsolete="false">
        <result status="valid" time="0.01"/>
       </proof>
@@ -33,18 +19,23 @@
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter gcd.3" expl="normal postcondition" sum="c0a0f540fca852dd68a554221754e076" proved="false" expanded="true">
+     <goal name="WP_parameter gcd.2" expl="precondition" sum="af7096cc1cd7bdcb9f88d52ad341c488" proved="true" expanded="true">
       <proof prover="cvc3" timelimit="2" edited="" obsolete="false">
-       <result status="unknown" time="1.08"/>
+       <result status="valid" time="0.02"/>
       </proof>
       <proof prover="alt-ergo" timelimit="2" edited="" obsolete="false">
-       <result status="unknown" time="0.48"/>
+       <result status="valid" time="0.06"/>
       </proof>
       <proof prover="simplify" timelimit="2" edited="" obsolete="false">
-       <result status="timeout" time="2.09"/>
+       <result status="valid" time="0.00"/>
       </proof>
       <proof prover="z3" timelimit="2" edited="" obsolete="false">
-       <result status="timeout" time="2.09"/>
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter gcd.3" expl="normal postcondition" sum="9ac7a295784dbed7c5dfdb55575495d7" proved="true" expanded="true">
+      <proof prover="z3" timelimit="2" edited="" obsolete="false">
+       <result status="valid" time="6.84"/>
       </proof>
      </goal>
     </transf>

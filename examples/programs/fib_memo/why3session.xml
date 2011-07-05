@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session SYSTEM "why3session.dtd">
+<why3session name="examples/programs/fib_memo/why3session.xml">
+ <file name="../fib_memo.mlw" verified="true" expanded="true">
+  <theory name="WP M" verified="true" expanded="true">
+   <goal name="WP_parameter fibo" expl="correctness of parameter fibo" sum="75546b1b867d7e220a43a0f9c16568a2" proved="true" expanded="true">
+    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+   </goal>
+   <goal name="WP_parameter memo_fibo" expl="correctness of parameter memo_fibo" sum="743b19a4394b2b79b9ef838a624045c7" proved="true" expanded="true">
+    <transf name="split_goal" proved="true" expanded="true">
+     <goal name="WP_parameter memo_fibo.1" expl="normal postcondition" sum="935d25dee5b707cf0bd087e131e709da" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter memo_fibo.2" expl="precondition" sum="2efb9e3e13eeb740e06fe133ea0ed5da" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter memo_fibo.3" expl="normal postcondition" sum="12383032cf9410a6d7547ff592884006" proved="true" expanded="true">
+      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+  </theory>
+ </file>
+</why3session>
