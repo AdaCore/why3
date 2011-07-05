@@ -55,7 +55,7 @@ let ident_printer =
       "bool";"unsat";"sat";"true";"false";
       "true";"check";"assert";"TYPE";"SUBTYPE";
       "scalar";"select";"update";"int";"real";"subtype";"subrange";"mk-bv";
-      "bv-concat";"bv-extract";"bv-shift-right0";
+      "bv-concat";"bv-extract";"bv-shift-right0";"div";"mod";"bitvector";
 ]
   in
   let san = sanitizer char_to_alpha char_to_alnumus in
@@ -199,7 +199,7 @@ and print_fmla info fmt f = match f.t_node with
       fprintf fmt "@[(=> %a@ %a)@]"
         (print_fmla info) f1 (print_fmla info) f2
   | Tbinop (Tiff, f1, f2) ->
-      fprintf fmt "@[(and (=> %a@ %a) (=> %a@ %a@))]"
+      fprintf fmt "@[(and (=> %a@ %a) (=> %a@ %a))@]"
          (print_fmla info) f1 (print_fmla info) f2
          (print_fmla info) f2 (print_fmla info) f1
   | Tnot f ->
@@ -243,7 +243,7 @@ let print_type_decl info fmt = function
     "yices : algebraic type are not supported"
 
 let print_logic_decl info fmt (ls,ld) =
-  if not (Mid.mem ls.ls_name info.info_syn) then
+  if not (Mid.mem ls.ls_name info.info_syn) then begin
   List.iter (iter_complex_type info fmt ()) ls.ls_args;
   Util.option_iter (iter_complex_type info fmt ()) ls.ls_value;
   match ld, ls.ls_args with
@@ -258,6 +258,7 @@ let print_logic_decl info fmt (ls,ld) =
       (print_type_value info) ls.ls_value
   | Some _,_ ->
     unsupported "yices : function and predicate definitions are not supported"
+  end
 
 let print_logic_decl info fmt d =
   if Sid.mem (fst d).ls_name info.info_rem then
