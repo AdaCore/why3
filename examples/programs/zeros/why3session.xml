@@ -3,46 +3,43 @@
 <why3session name="examples/programs/zeros/why3session.xml">
  <file name="../zeros.mlw" verified="true" expanded="true">
   <theory name="WP SetZeros" verified="true" expanded="true">
-   <goal name="WP_parameter set_zeros" expl="correctness of parameter set_zeros" sum="073f2175118a01f71b9d611d5b46b881" proved="true" expanded="true">
+   <goal name="WP_parameter set_zeros" expl="correctness of parameter set_zeros" sum="608a2ce58877f53e9321cbda96aef314" proved="true" expanded="true">
     <transf name="split_goal" proved="true" expanded="true">
-     <goal name="WP_parameter set_zeros.1" expl="normal postcondition" sum="8f2cf2592df2b5cf5827ca059b2c741c" proved="true" expanded="true">
+     <goal name="WP_parameter set_zeros.1" expl="normal postcondition" sum="a431d4701cdb317ba9ec6e8ce36fd903" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal name="WP_parameter set_zeros.2" expl="for loop initialization" sum="21624731d70695d4156acede0eeffffd" proved="true" expanded="true">
+     <goal name="WP_parameter set_zeros.2" expl="for loop initialization" sum="4fdcef61de7fd0dbce171e29c6a6c2c2" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter set_zeros.3" expl="for loop preservation" sum="a10e5df95a810ea60757bc69e3dfd9ac" proved="true" expanded="true">
-      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof prover="z3" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter set_zeros.4" expl="normal postcondition" sum="92b3401acb16489815b172129c602e30" proved="true" expanded="true">
+     <goal name="WP_parameter set_zeros.3" expl="for loop preservation" sum="c3bc7e2f309687b6496a3c2155d9f105" proved="true" expanded="true">
+      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof prover="z3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter set_zeros.4" expl="normal postcondition" sum="09ba19838fab192b5d1170a3f4919eb9" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
     </transf>
    </goal>
-   <goal name="WP_parameter harness" expl="correctness of parameter harness" sum="86e3646719139ac2c16631cbce764b98" proved="true" expanded="true">
+   <goal name="WP_parameter harness" expl="correctness of parameter harness" sum="8b2c1c4d3f56fe06ca4a205415f845d4" proved="true" expanded="true">
     <transf name="split_goal" proved="true" expanded="true">
-     <goal name="WP_parameter harness.1" expl="assertion" sum="d460e49ab087d3163f7b52c04785c0ce" proved="true" expanded="true">
+     <goal name="WP_parameter harness.1" expl="assertion" sum="b735fa2a3c6fa671c6808c9041b35167" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal name="WP_parameter harness.2" expl="assertion" sum="7684b00aabb5af1e63994f0c261eadd6" proved="true" expanded="true">
+     <goal name="WP_parameter harness.2" expl="assertion" sum="46ac9370d2a274ae1e500a9d26ecb501" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
     </transf>

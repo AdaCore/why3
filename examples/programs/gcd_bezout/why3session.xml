@@ -1,60 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
 <why3session name="examples/programs/gcd_bezout/why3session.xml">
- <file name="../gcd_bezout.mlw" verified="false" expanded="true">
-  <theory name="WP M" verified="false" expanded="true">
-   <goal name="WP_parameter gcd" expl="correctness of parameter gcd" sum="66a8795f899d84ac0583a005fe89ce0a" proved="false" expanded="true">
-    <transf name="split_goal" proved="false" expanded="true">
-     <goal name="WP_parameter gcd.1" expl="loop invariant init" sum="131bc5920f4ba44c45ffaa828fa737f7" proved="true" expanded="true">
+ <file name="../gcd_bezout.mlw" verified="true" expanded="true">
+  <theory name="WP M" verified="true" expanded="true">
+   <goal name="WP_parameter gcd" expl="correctness of parameter gcd" sum="24b81661726d80251f271d9638c0fba4" proved="true" expanded="true">
+    <transf name="split_goal" proved="true" expanded="true">
+     <goal name="WP_parameter gcd.1" expl="loop invariant init" sum="f091ff5ed7f20de51efc707bf3edb472" proved="true" expanded="false">
       <proof prover="cvc3" timelimit="2" edited="" obsolete="false">
        <result status="valid" time="0.00"/>
       </proof>
       <proof prover="alt-ergo" timelimit="2" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.00"/>
       </proof>
       <proof prover="z3" timelimit="2" edited="" obsolete="false">
        <result status="valid" time="0.00"/>
       </proof>
      </goal>
-     <goal name="WP_parameter gcd.2" expl="loop invariant preservation" sum="40aa1567edcd01c99aa5393619f44a10" proved="false" expanded="true">
-      <transf name="split_goal" proved="false" expanded="true">
-       <goal name="WP_parameter gcd.2.1" expl="correctness of parameter gcd" sum="387342c4c6c376ec84db024d590eb931" proved="true" expanded="true">
+     <goal name="WP_parameter gcd.2" expl="loop invariant preservation" sum="194d6679b8d1936227e26e71d84cc1eb" proved="true" expanded="true">
+      <transf name="split_goal" proved="true" expanded="true">
+       <goal name="WP_parameter gcd.2.1" expl="correctness of parameter gcd" sum="7b31292c9cd3255805cf747c01cb6160" proved="true" expanded="false">
         <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
          <result status="valid" time="0.02"/>
         </proof>
        </goal>
-       <goal name="WP_parameter gcd.2.2" expl="correctness of parameter gcd" sum="e481d13a9bd5964ad8928b356e7918b2" proved="true" expanded="true">
+       <goal name="WP_parameter gcd.2.2" expl="correctness of parameter gcd" sum="6942a8f0fce1d6ee7a462c74d6b6df76" proved="true" expanded="false">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.04"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter gcd.2.3" expl="correctness of parameter gcd" sum="2f1a146ca229cb1bf05611a79b59797a" proved="true" expanded="true">
+        <proof prover="coq" timelimit="10" edited="gcd_bezout_WP_M_WP_parameter_gcd_1.v" obsolete="false">
+         <result status="valid" time="0.62"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter gcd.2.4" expl="correctness of parameter gcd" sum="90165147f8d016875a7c618a23eac063" proved="true" expanded="false">
         <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
          <result status="valid" time="0.02"/>
         </proof>
        </goal>
-       <goal name="WP_parameter gcd.2.3" expl="correctness of parameter gcd" sum="6e74075706d766eaefd70566ef1c7992" proved="false" expanded="true">
-        <proof prover="simplify" timelimit="3" edited="" obsolete="false">
-         <result status="timeout" time="3.08"/>
-        </proof>
-        <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
-         <result status="unknown" time="0.11"/>
-        </proof>
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="timeout" time="10.03"/>
-        </proof>
-        <proof prover="z3" timelimit="3" edited="" obsolete="false">
-         <result status="timeout" time="3.08"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter gcd.2.4" expl="correctness of parameter gcd" sum="dd3ce062113c8bf7e99d5842826cbef3" proved="true" expanded="true">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.03"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter gcd.2.5" expl="correctness of parameter gcd" sum="393a23c2dbe93d5227c05add6207598a" proved="true" expanded="true">
+       <goal name="WP_parameter gcd.2.5" expl="correctness of parameter gcd" sum="afa8d8802b85f4e6c8fc652fbeb1890c" proved="true" expanded="false">
         <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
          <result status="valid" time="0.02"/>
         </proof>
        </goal>
       </transf>
      </goal>
-     <goal name="WP_parameter gcd.3" expl="loop variant decreases" sum="365b0eb4709478b597d2122a5c3c67c1" proved="true" expanded="true">
+     <goal name="WP_parameter gcd.3" expl="loop variant decreases" sum="753ad46886883bd93e9cdf0278094b34" proved="true" expanded="false">
       <proof prover="cvc3" timelimit="2" edited="" obsolete="false">
        <result status="valid" time="0.06"/>
       </proof>
@@ -62,9 +53,9 @@
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter gcd.4" expl="normal postcondition" sum="b99571221c54c860bd5407d585fc8cdd" proved="true" expanded="true">
+     <goal name="WP_parameter gcd.4" expl="normal postcondition" sum="4d87a14f4a17e9cbd282f6b5c5dc83c0" proved="true" expanded="false">
       <proof prover="alt-ergo" timelimit="2" edited="" obsolete="false">
-       <result status="valid" time="0.49"/>
+       <result status="valid" time="0.07"/>
       </proof>
      </goal>
     </transf>

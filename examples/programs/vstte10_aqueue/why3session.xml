@@ -3,43 +3,43 @@
 <why3session name="examples/programs/vstte10_aqueue/why3session.xml">
  <file name="../vstte10_aqueue.mlw" verified="true" expanded="true">
   <theory name="WP AmortizedQueue" verified="true" expanded="true">
-   <goal name="WP_parameter create" expl="correctness of parameter create" sum="94603ee07e585f398458946ecc7a0f0b" proved="true" expanded="true">
+   <goal name="WP_parameter empty" expl="normal postcondition" sum="909ab0d6f233b4d2efe8d20c0f817588" proved="true" expanded="true">
     <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-     <result status="valid" time="0.50"/>
+     <result status="valid" time="0.03"/>
     </proof>
    </goal>
-   <goal name="WP_parameter empty" expl="normal postcondition" sum="3612f3c6fbb172a8f7bb557de13fd5b0" proved="true" expanded="true">
+   <goal name="WP_parameter head" expl="correctness of parameter head" sum="df279e0806f4697dfb52c16a7712fd6c" proved="true" expanded="true">
     <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-     <result status="valid" time="0.06"/>
+     <result status="valid" time="0.04"/>
     </proof>
    </goal>
-   <goal name="WP_parameter head" expl="correctness of parameter head" sum="9cf1d7ca07c9a4889ad2822b0d4f8851" proved="true" expanded="true">
+   <goal name="WP_parameter create" expl="correctness of parameter create" sum="5c6dc68135163c32716581f63366d671" proved="true" expanded="true">
     <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-     <result status="valid" time="0.07"/>
+     <result status="valid" time="0.36"/>
     </proof>
    </goal>
-   <goal name="WP_parameter tail" expl="correctness of parameter tail" sum="7b2a5c6b28da9c887812b2ba52dd88bc" proved="true" expanded="true">
+   <goal name="WP_parameter tail" expl="correctness of parameter tail" sum="e064c80f5f1ee95e0e494e4c080b5029" proved="true" expanded="true">
     <transf name="split_goal" proved="true" expanded="true">
-     <goal name="WP_parameter tail.1" expl="correctness of parameter tail" sum="cb15b2861f2bd1dc0448b73df780ef7d" proved="true" expanded="true">
+     <goal name="WP_parameter tail.1" expl="correctness of parameter tail" sum="8b9ca2a529eaada80a407300a55e20d0" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-       <result status="valid" time="0.04"/>
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter tail.2" expl="correctness of parameter tail" sum="bc0304b50128f3903bde1f29727f0e10" proved="true" expanded="true">
+     <goal name="WP_parameter tail.2" expl="correctness of parameter tail" sum="a83fd8e5c78ad764dc9652839a39c57b" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-       <result status="valid" time="0.06"/>
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter tail.3" expl="correctness of parameter tail" sum="5fa5c35fd62cc45245331750d880c0c9" proved="true" expanded="true">
+     <goal name="WP_parameter tail.3" expl="correctness of parameter tail" sum="f7542b33f71df9da29bb7e21b8e1311d" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-       <result status="valid" time="0.17"/>
+       <result status="valid" time="0.12"/>
       </proof>
      </goal>
     </transf>
    </goal>
-   <goal name="WP_parameter enqueue" expl="correctness of parameter enqueue" sum="942866fdebad37c06e3ffcf86fc15a92" proved="true" expanded="true">
+   <goal name="WP_parameter enqueue" expl="correctness of parameter enqueue" sum="940fa98f53cd4fbeb614fd48b2922378" proved="true" expanded="true">
     <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-     <result status="valid" time="0.14"/>
+     <result status="valid" time="0.09"/>
     </proof>
    </goal>
   </theory>
