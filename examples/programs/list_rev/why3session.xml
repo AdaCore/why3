@@ -3,67 +3,76 @@
 <why3session name="examples/programs/list_rev/why3session.xml">
  <file name="../list_rev.mlw" verified="false" expanded="true">
   <theory name="WP M" verified="false" expanded="true">
-   <goal name="acyclic_list" sum="05ff1ad20f5af90fc986f7d1deb8acbf" proved="false" expanded="true">
+   <goal name="acyclic_list" sum="7db83a937373a8239579a364820ee4d2" proved="false" expanded="true">
    </goal>
-   <goal name="consistent" sum="678d57b4a5464ed1788c9284cd3deb14" proved="false" expanded="true">
+   <goal name="consistent" sum="590df07cf83264b32e414a773bbd0a39" proved="false" expanded="true">
    </goal>
-   <goal name="WP_parameter list_rev" expl="correctness of parameter list_rev" sum="1ed3408e037f1f79e9735208d22637d9" proved="true" expanded="true">
+   <goal name="WP_parameter list_rev" expl="correctness of parameter list_rev" sum="57202003173952c9ba4cc18145406ac0" proved="true" expanded="false">
     <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
      <result status="valid" time="0.12"/>
     </proof>
    </goal>
-   <goal name="reverse_append" sum="95eaedbd88c6733c31f6f90543952407" proved="false" expanded="true">
+   <goal name="reverse_append" sum="5e1e29aaddde77691465057e4c33dc3b" proved="true" expanded="false">
+    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+     <result status="valid" time="0.02"/>
+    </proof>
    </goal>
-   <goal name="WP_parameter list_rev_behv" expl="correctness of parameter list_rev_behv" sum="4087cd4ed78b8c5468550eec66d4564d" proved="false" expanded="true">
+   <goal name="WP_parameter list_rev_behv" expl="correctness of parameter list_rev_behv" sum="6165c919ade606c3dae98f331b0e999f" proved="false" expanded="true">
    </goal>
   </theory>
   <theory name="WP M2" verified="false" expanded="true">
-   <goal name="is_list_disjoint_case" sum="db8d14254ea7d12f7f7bbb446ee006eb" proved="true" expanded="true">
+   <goal name="is_list_disjoint_case" sum="68e81e53620d2aa65d9c0628265ca99b" proved="true" expanded="false">
     <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.00"/>
     </proof>
    </goal>
-   <goal name="frame_list" sum="bb671f60ef471cba398e52a876544a54" proved="true" expanded="true">
+   <goal name="frame_list" sum="25b6e77de519460237f6947621f25a0d" proved="true" expanded="false">
     <proof prover="coq" timelimit="10" edited="list_rev_M2_frame_list_1.v" obsolete="false">
      <result status="valid" time="0.50"/>
     </proof>
    </goal>
-   <goal name="frame_list_ft" sum="d0c0dd407e6667c967cd37f14169af5e" proved="true" expanded="true">
+   <goal name="frame_list_ft" sum="4db7a9d330284b5bd6ca63f01f9a8120" proved="true" expanded="false">
     <proof prover="coq" timelimit="10" edited="list_rev_M2_frame_list_ft_1.v" obsolete="false">
-     <result status="valid" time="0.54"/>
+     <result status="valid" time="0.52"/>
     </proof>
    </goal>
-   <goal name="acyclic_list" sum="9beb2427d92c0d05c7ab34738d84fb20" proved="false" expanded="true">
+   <goal name="acyclic_list" sum="394041341bfca1932823e503c766930a" proved="false" expanded="true">
    </goal>
-   <goal name="consistent" sum="c4812a324be896e9f0a42c752b48a304" proved="false" expanded="true">
-    <proof prover="z3" timelimit="10" edited="" obsolete="false">
+   <goal name="consistent" sum="a65f10bfef659ef89fea02a802b02814" proved="false" expanded="true">
+    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+     <result status="unknown" time="0.10"/>
+    </proof>
+    <proof prover="z3" timelimit="10" edited="" obsolete="true">
      <result status="unknown" time="0.03"/>
     </proof>
-    <proof prover="spass" timelimit="10" edited="" obsolete="false">
+    <proof prover="spass" timelimit="10" edited="" obsolete="true">
      <result status="timeout" time="10.11"/>
     </proof>
    </goal>
-   <goal name="WP_parameter list_rev" expl="correctness of parameter list_rev" sum="2cf5c0afcc43f0a5bf2667c7c738c555" proved="true" expanded="true">
+   <goal name="WP_parameter list_rev" expl="correctness of parameter list_rev" sum="17367e075517f9d5ea5ccf101b9e17ae" proved="true" expanded="false">
     <proof prover="z3" timelimit="10" edited="" obsolete="false">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
-   <goal name="frame_model" sum="d5fd36bbd6e0e2aebeea5703bbf7b4d7" proved="true" expanded="true">
+   <goal name="frame_model" sum="0110aae7bb2d45d63dfe5adf4ca21c97" proved="true" expanded="false">
     <proof prover="coq" timelimit="10" edited="list_rev_M2_frame_model_1.v" obsolete="false">
      <result status="valid" time="0.53"/>
     </proof>
    </goal>
-   <goal name="consistent_behv" sum="f9e3c4ba36897ccd68e9407e528ff384" proved="false" expanded="true">
-    <proof prover="z3" timelimit="10" edited="" obsolete="false">
+   <goal name="consistent_behv" sum="241d74963c5ce2c9219d0047e431cd78" proved="false" expanded="true">
+    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+     <result status="unknown" time="0.10"/>
+    </proof>
+    <proof prover="z3" timelimit="10" edited="" obsolete="true">
      <result status="timeout" time="10.04"/>
     </proof>
-    <proof prover="spass" timelimit="10" edited="" obsolete="false">
+    <proof prover="spass" timelimit="10" edited="" obsolete="true">
      <result status="timeout" time="10.05"/>
     </proof>
    </goal>
-   <goal name="WP_parameter list_rev_behv" expl="correctness of parameter list_rev_behv" sum="52a60a766a87079ec4ccbf52ed6012eb" proved="true" expanded="true">
+   <goal name="WP_parameter list_rev_behv" expl="correctness of parameter list_rev_behv" sum="44044f62ee75d1bc2024edb4518ff0d5" proved="true" expanded="false">
     <proof prover="z3" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.18"/>
+     <result status="valid" time="0.14"/>
     </proof>
    </goal>
   </theory>

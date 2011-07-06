@@ -87,6 +87,9 @@ back   +-+-+-+-------------------+
     a.card = a.length ->
     forall i: int. 0 <= i < a.length -> is_elt a i
 
+  lemma permutation2 :
+    false
+
   let set (a: sparse_array 'a) i v =
     { 0 <= i < length a /\ sa_inv a }
     a.values[i] <- v;
