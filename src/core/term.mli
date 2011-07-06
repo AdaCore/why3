@@ -230,6 +230,10 @@ val t_not : term -> term
 val t_true : term
 val t_false : term
 
+val asym_label : label
+val t_and_asym : term -> term -> term
+val t_or_asym : term -> term -> term
+
 val t_let_close : vsymbol -> term -> term -> term
 val t_eps_close : vsymbol -> term -> term
 val t_quant_close : quant -> vsymbol list -> trigger -> term -> term
@@ -255,6 +259,11 @@ val t_or_simp_l : term list -> term
 val t_implies_simp : term -> term -> term
 val t_iff_simp : term -> term -> term
 val t_not_simp : term -> term
+
+val t_and_asym_simp : term -> term -> term
+val t_and_asym_simp_l : term list -> term
+val t_or_asym_simp : term -> term -> term
+val t_or_asym_simp_l : term list -> term
 
 val t_let_close_simp : vsymbol -> term -> term -> term
 val t_quant_close_simp : quant -> vsymbol list -> trigger -> term -> term

@@ -17,7 +17,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val asym_split : Ident.label
 val stop_split : Ident.label
 
 val split_pos : Term.term -> Term.term list

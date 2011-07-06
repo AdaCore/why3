@@ -53,20 +53,13 @@ let get_mutable_field ts i =
 (* phase 4: weakest preconditions *******************************************)
 
 (* smart constructors for building WPs
-   TODO: use simp forms / tag with label "WP" *)
+   TODO: tag with label "WP" *)
 
 let wp_and ?(sym=false) f1 f2 =
-(*   if sym then t_and_simp f1 f2 else t_and_simp f1 (t_implies_simp f1 f2)  *)
-  let f = t_and_simp f1 f2 in
-(* experiment, but does not work
-  let f = t_label_add Split_goal.stop_split f in
-*)
-  match f.t_node with
-    | Tbinop (Tand, _, _) when not sym -> t_label_add Split_goal.asym_split f
-    | _ -> f
+  if sym then t_and_simp f1 f2 else t_and_asym_simp f1 f2
 
 let wp_ands ?(sym=false) fl =
-  List.fold_left (wp_and ~sym) t_true fl
+  if sym then t_and_simp_l fl else t_and_asym_simp_l fl
 
 let wp_implies f1 f2 = match f2.t_node with
   | Tfalse -> t_implies f1 f2

@@ -41,7 +41,7 @@ val print_ty : formatter -> ty -> unit            (* type *)
 val print_vsty : formatter -> vsymbol -> unit     (* variable : type *)
 
 val print_quant : formatter -> quant -> unit      (* quantifier *)
-val print_binop : formatter -> binop -> unit      (* binary operator *)
+val print_binop : asym:bool -> formatter -> binop -> unit (* binary operator *)
 val print_const : formatter -> constant -> unit   (* int/real constant *)
 val print_pat : formatter -> pattern -> unit      (* pattern *)
 val print_term : formatter -> term -> unit        (* term *)

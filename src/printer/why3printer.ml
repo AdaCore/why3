@@ -215,9 +215,10 @@ and print_tnode pri fmt t = match t.t_node with
         (print_list comma print_vsty) vl print_tl tl print_term f;
       List.iter forget_var vl
   | Tbinop (b,f1,f2) ->
+      let asym = List.mem Term.asym_label t.t_label in
       let p = prio_binop b in
       fprintf fmt (protect_on (pri > p) "%a %a@ %a")
-        (print_lterm (p + 1)) f1 print_binop b (print_lterm p) f2
+        (print_lterm (p + 1)) f1 (print_binop ~asym) b (print_lterm p) f2
   | Tnot f ->
       fprintf fmt (protect_on (pri > 4) "not %a") (print_lterm 4) f
   | Ttrue ->

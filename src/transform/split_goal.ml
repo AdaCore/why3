@@ -40,7 +40,7 @@ let split_case forig spl c acc tl bl =
   let fn bl = t_label_copy forig (t_case tl bl) in
   apply_append fn acc bll
 
-let asym_split = "asym_split"
+let asym_split = Term.asym_label
 let stop_split = "stop_split"
 
 let asym f = List.mem asym_split f.t_label

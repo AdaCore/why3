@@ -170,7 +170,9 @@ let print_quant fmt = function
   | Tforall -> fprintf fmt "forall"
   | Texists -> fprintf fmt "exists"
 
-let print_binop fmt = function
+let print_binop ~asym fmt = function
+  | Tand when asym -> fprintf fmt "&&"
+  | Tor when asym -> fprintf fmt "||"
   | Tand -> fprintf fmt "/\\"
   | Tor -> fprintf fmt "\\/"
   | Timplies -> fprintf fmt "->"
@@ -259,9 +261,10 @@ and print_tnode pri fmt t = match t.t_node with
   | Tfalse ->
       fprintf fmt "false"
   | Tbinop (b,f1,f2) ->
+      let asym = List.mem Term.asym_label t.t_label in
       let p = prio_binop b in
       fprintf fmt (protect_on (pri > p) "%a %a@ %a")
-        (print_lterm (p + 1)) f1 print_binop b (print_lterm p) f2
+        (print_lterm (p + 1)) f1 (print_binop ~asym) b (print_lterm p) f2
   | Tnot f ->
       fprintf fmt (protect_on (pri > 4) "not %a") (print_lterm 4) f
 

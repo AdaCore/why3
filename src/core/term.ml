@@ -737,6 +737,10 @@ let t_or      = t_binary Tor
 let t_implies = t_binary Timplies
 let t_iff     = t_binary Tiff
 
+let asym_label = "asym_split"
+let t_and_asym t1 t2 = t_label [asym_label] (t_and t1 t2)
+let t_or_asym  t1 t2 = t_label [asym_label] (t_or  t1 t2)
+
 (* closing constructors *)
 
 let t_quant_close q vl tl f =
@@ -1311,45 +1315,55 @@ let t_not_simp f = match f.t_node with
   | Tnot f -> f
   | _      -> t_not f
 
-let t_and_simp f1 f2 =
-  let f12 = t_and f1 f2 in
-  match f1.t_node, f2.t_node with
+let t_and_simp f1 f2 = match f1.t_node, f2.t_node with
   | Ttrue, _  -> f2
   | _, Ttrue  -> f1
   | Tfalse, _ -> f1
   | _, Tfalse -> f2
-  | _, _      -> if t_equal f1 f2 then f1 else f12
+  | _, _      -> if t_equal f1 f2 then f1 else t_and f1 f2
 
 let t_and_simp_l l = List.fold_left t_and_simp t_true l
 
-let t_or_simp f1 f2 =
-  let f12 = t_or f1 f2 in
-  match f1.t_node, f2.t_node with
+let t_or_simp f1 f2 = match f1.t_node, f2.t_node with
   | Ttrue, _  -> f1
   | _, Ttrue  -> f2
   | Tfalse, _ -> f2
   | _, Tfalse -> f1
-  | _, _      -> if t_equal f1 f2 then f1 else f12
+  | _, _      -> if t_equal f1 f2 then f1 else t_or f1 f2
 
 let t_or_simp_l l = List.fold_left t_or_simp t_false l
 
-let t_implies_simp f1 f2 =
-  let f12 = t_implies f1 f2 in
-  match f1.t_node, f2.t_node with
+let t_and_asym_simp f1 f2 = match f1.t_node, f2.t_node with
+  | Ttrue, _  -> f2
+  | _, Ttrue  -> f1
+  | Tfalse, _ -> f1
+  | _, Tfalse -> f2
+  | _, _      -> if t_equal f1 f2 then f1 else t_and_asym f1 f2
+
+let t_and_asym_simp_l l = List.fold_left t_and_asym_simp t_true l
+
+let t_or_asym_simp f1 f2 = match f1.t_node, f2.t_node with
+  | Ttrue, _  -> f1
+  | _, Ttrue  -> f2
+  | Tfalse, _ -> f2
+  | _, Tfalse -> f1
+  | _, _      -> if t_equal f1 f2 then f1 else t_or_asym f1 f2
+
+let t_or_asym_simp_l l = List.fold_left t_or_asym_simp t_false l
+
+let t_implies_simp f1 f2 = match f1.t_node, f2.t_node with
   | Ttrue, _  -> f2
   | _, Ttrue  -> f2
   | Tfalse, _ -> t_true
   | _, Tfalse -> t_not_simp f1
-  | _, _      -> if t_equal f1 f2 then t_true else f12
+  | _, _      -> if t_equal f1 f2 then t_true else t_implies f1 f2
 
-let t_iff_simp f1 f2 =
-  let f12 = t_iff f1 f2 in
-  match f1.t_node, f2.t_node with
+let t_iff_simp f1 f2 = match f1.t_node, f2.t_node with
   | Ttrue, _  -> f2
   | _, Ttrue  -> f1
   | Tfalse, _ -> t_not_simp f2
   | _, Tfalse -> t_not_simp f1
-  | _, _      -> if t_equal f1 f2 then t_true else f12
+  | _, _      -> if t_equal f1 f2 then t_true else t_iff f1 f2
 
 let t_binary_simp op = match op with
   | Tand     -> t_and_simp
@@ -1357,16 +1371,14 @@ let t_binary_simp op = match op with
   | Timplies -> t_implies_simp
   | Tiff     -> t_iff_simp
 
-let t_if_simp f1 f2 f3 =
-  let f123 = t_if f1 f2 f3 in
-  match f1.t_node, f2.t_node, f3.t_node with
+let t_if_simp f1 f2 f3 = match f1.t_node, f2.t_node, f3.t_node with
   | Ttrue, _, _  -> f2
   | Tfalse, _, _ -> f3
   | _, Ttrue, _  -> t_implies_simp (t_not_simp f1) f3
   | _, Tfalse, _ -> t_and_simp (t_not_simp f1) f3
   | _, _, Ttrue  -> t_implies_simp f1 f2
   | _, _, Tfalse -> t_and_simp f1 f2
-  | _, _, _      -> if t_equal f2 f3 then f2 else f123
+  | _, _, _      -> if t_equal f2 f3 then f2 else t_if f1 f2 f3
 
 let small t = match t.t_node with
   | Tvar _ | Tconst _ -> true
