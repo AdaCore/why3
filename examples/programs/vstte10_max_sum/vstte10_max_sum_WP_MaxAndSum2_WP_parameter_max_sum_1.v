@@ -4,9 +4,9 @@ Require Import ZArith.
 Require Import Rbase.
 Definition unit  := unit.
 
-Parameter label : Type.
+Parameter mark : Type.
 
-Parameter at1: forall (a:Type), a -> label  -> a.
+Parameter at1: forall (a:Type), a -> mark  -> a.
 
 Implicit Arguments at1.
 

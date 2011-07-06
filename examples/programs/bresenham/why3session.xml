@@ -5,41 +5,41 @@
   <theory name="WP M" verified="false" expanded="true">
    <goal name="Invariant_is_ok" sum="390f64d8a0d8118b5ecd73b966e91e83" proved="false" expanded="true">
    </goal>
-   <goal name="WP_parameter bresenham" expl="correctness of parameter bresenham" sum="6d68a3113e31069fe7080c7ab2bfdb70" proved="true" expanded="true">
+   <goal name="WP_parameter bresenham" expl="correctness of parameter bresenham" sum="7137b9a89e80cd74f02528f954bd7767" proved="true" expanded="true">
     <transf name="split_goal" proved="true" expanded="true">
      <goal name="WP_parameter bresenham.1" expl="loop invariant init" sum="37b77c77cba7d3b5f341f0e4f308cb16" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter bresenham.2" expl="assertion" sum="261b58b58e5e484e392100c7ae9d46de" proved="true" expanded="true">
+     <goal name="WP_parameter bresenham.2" expl="assertion" sum="26e0bdc12b640e71e7a5e9e6fe918505" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.28"/>
+       <result status="valid" time="0.10"/>
       </proof>
      </goal>
-     <goal name="WP_parameter bresenham.3" expl="loop invariant preservation" sum="759d37f0de1364d96fb2692fd67ebb58" proved="true" expanded="true">
+     <goal name="WP_parameter bresenham.3" expl="loop invariant preservation" sum="396be0c229aea0c570cd8b725a241ec7" proved="true" expanded="true">
       <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.03"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal name="WP_parameter bresenham.4" expl="loop variant decreases" sum="59657e5a7dd65c09ea874478e0b9dece" proved="true" expanded="true">
+     <goal name="WP_parameter bresenham.4" expl="loop variant decreases" sum="61896fe87096af22bf4d875b7b64fae6" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal name="WP_parameter bresenham.5" expl="loop invariant preservation" sum="770bc300939ef2bcd62424a5d711ad03" proved="true" expanded="true">
+     <goal name="WP_parameter bresenham.5" expl="loop invariant preservation" sum="fe62d534b8c709778059913e84a3aa95" proved="true" expanded="true">
       <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.04"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter bresenham.6" expl="loop variant decreases" sum="37037d827452040cc8d6b2b51285c2a2" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter bresenham.7" expl="normal postcondition" sum="7ac7b0b6bcb369354660f76821cacb1a" proved="true" expanded="true">
+     <goal name="WP_parameter bresenham.6" expl="loop variant decreases" sum="4ba25dd13f98e0aa80af58d01101b63a" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter bresenham.7" expl="normal postcondition" sum="4a8331e536c125e86e9ddd1c02da8eed" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
     </transf>
