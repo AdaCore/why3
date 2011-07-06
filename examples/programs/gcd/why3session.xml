@@ -3,9 +3,23 @@
 <why3session name="examples/programs/gcd/why3session.xml">
  <file name="../gcd.mlw" verified="true" expanded="true">
   <theory name="WP EuclideanAlgorithm" verified="true" expanded="true">
-   <goal name="WP_parameter gcd" expl="correctness of parameter gcd" sum="bfbae7b37de6ad9ac15a7666cdb75bce" proved="true" expanded="true">
+   <goal name="WP_parameter gcd" expl="correctness of parameter gcd" sum="322244ca4eb191447c5e003581d46441" proved="true" expanded="true">
     <transf name="split_goal" proved="true" expanded="true">
      <goal name="WP_parameter gcd.1" expl="normal postcondition" sum="3893c6278b0c6d2e8a61ff8df2953fcb" proved="true" expanded="true">
+      <proof prover="cvc3" timelimit="2" edited="" obsolete="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="2" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof prover="simplify" timelimit="2" edited="" obsolete="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof prover="z3" timelimit="2" edited="" obsolete="false">
+       <result status="valid" time="1.12"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter gcd.2" expl="precondition" sum="af7096cc1cd7bdcb9f88d52ad341c488" proved="true" expanded="true">
       <proof prover="cvc3" timelimit="2" edited="" obsolete="false">
        <result status="valid" time="0.01"/>
       </proof>
@@ -19,23 +33,9 @@
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter gcd.2" expl="precondition" sum="af7096cc1cd7bdcb9f88d52ad341c488" proved="true" expanded="true">
-      <proof prover="cvc3" timelimit="2" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof prover="alt-ergo" timelimit="2" edited="" obsolete="false">
-       <result status="valid" time="0.06"/>
-      </proof>
-      <proof prover="simplify" timelimit="2" edited="" obsolete="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-      <proof prover="z3" timelimit="2" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
      <goal name="WP_parameter gcd.3" expl="normal postcondition" sum="9ac7a295784dbed7c5dfdb55575495d7" proved="true" expanded="true">
-      <proof prover="z3" timelimit="2" edited="" obsolete="false">
-       <result status="valid" time="6.84"/>
+      <proof prover="coq" timelimit="10" edited="gcd_WP_EuclideanAlgorithm_WP_parameter_gcd_1.v" obsolete="false">
+       <result status="valid" time="0.63"/>
       </proof>
      </goal>
     </transf>
