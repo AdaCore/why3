@@ -1,132 +1,132 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
 <why3session name="examples/programs/selection_sort/why3session.xml">
- <file name="../selection_sort.mlw" verified="true" expanded="true">
-  <theory name="WP Quicksort" verified="true" expanded="true">
-   <goal name="WP_parameter swap" expl="correctness of parameter swap" sum="c4e2099b76e6218e14497a80c67ee8b1" proved="true" expanded="true">
+ <file name="../selection_sort.mlw" verified="true" expanded="false">
+  <theory name="WP Quicksort" verified="true" expanded="false">
+   <goal name="WP_parameter swap" expl="correctness of parameter swap" sum="f3c5d9d4f0bee2e3a859ce9ee3052bcc" proved="true" expanded="false">
     <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.04"/>
+     <result status="valid" time="0.03"/>
     </proof>
    </goal>
-   <goal name="WP_parameter selection_sort" expl="correctness of parameter selection_sort" sum="fe1cd1b47feeb0ae3809694b5181ee80" proved="true" expanded="true">
-    <transf name="split_goal" proved="true" expanded="true">
-     <goal name="WP_parameter selection_sort.1" expl="normal postcondition" sum="2b0c2302cfdd16f5a6458e573ee4929f" proved="true" expanded="true">
+   <goal name="WP_parameter selection_sort" expl="correctness of parameter selection_sort" sum="ea7c27f1228bfe6da1c80c9b58603576" proved="true" expanded="false">
+    <transf name="split_goal" proved="true" expanded="false">
+     <goal name="WP_parameter selection_sort.1" expl="normal postcondition" sum="1ae852d9e2fe9181528e054546740333" proved="true" expanded="false">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.04"/>
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter selection_sort.2" expl="for loop initialization" sum="6566a25b45d6ff5af1749f38f419b7c9" proved="true" expanded="true">
+     <goal name="WP_parameter selection_sort.2" expl="for loop initialization" sum="29a9a92c4b329241b917ddb8ec31f738" proved="true" expanded="false">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.03"/>
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter selection_sort.3" expl="for loop preservation" sum="eb5013c23f31c134ba08ca062686984e" proved="true" expanded="true">
-      <transf name="split_goal" proved="true" expanded="true">
-       <goal name="WP_parameter selection_sort.3.1" expl="for loop preservation" sum="ba14d9e56be4df6a4857c6e4bd546186" proved="true" expanded="true">
+     <goal name="WP_parameter selection_sort.3" expl="for loop preservation" sum="dc0dc9a51c343b5bf5ca9a13f4adbe55" proved="true" expanded="false">
+      <transf name="split_goal" proved="true" expanded="false">
+       <goal name="WP_parameter selection_sort.3.1" expl="for loop preservation" sum="36491ebcf42af5dde3a5f3a4844dcbeb" proved="true" expanded="false">
         <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
          <result status="valid" time="0.02"/>
         </proof>
        </goal>
-       <goal name="WP_parameter selection_sort.3.2" expl="for loop preservation" sum="00466a01789dab2720a99ca89698bd39" proved="true" expanded="true">
+       <goal name="WP_parameter selection_sort.3.2" expl="for loop preservation" sum="1e8f791e6267d56305702f2bb26cec72" proved="true" expanded="false">
         <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.03"/>
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
-       <goal name="WP_parameter selection_sort.3.3" expl="for loop preservation" sum="c707491be4ab5917899db51764de68a9" proved="true" expanded="true">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter selection_sort.3.4" expl="for loop preservation" sum="65a04c15b9c186e076799133e97990c7" proved="true" expanded="true">
+       <goal name="WP_parameter selection_sort.3.3" expl="for loop preservation" sum="6fd9127cc5e9c6e942d945f651d5f834" proved="true" expanded="false">
         <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
          <result status="valid" time="0.02"/>
         </proof>
        </goal>
-       <goal name="WP_parameter selection_sort.3.5" expl="for loop preservation" sum="1088f3648ec0c396ee78bfa66461c2c2" proved="true" expanded="true">
+       <goal name="WP_parameter selection_sort.3.4" expl="for loop preservation" sum="4853c43564a08ad5daf4947b1888e8bb" proved="true" expanded="false">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter selection_sort.3.5" expl="for loop preservation" sum="0c8d0ac7ce9cdbf2ab766ba3a7b95778" proved="true" expanded="false">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter selection_sort.3.6" expl="for loop preservation" sum="cb1b6158fea4a537b535e99348fe38ed" proved="true" expanded="false">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter selection_sort.3.7" expl="for loop preservation" sum="24308a65cb55ef2e45a2e989c2bca5c7" proved="true" expanded="false">
         <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
          <result status="valid" time="0.02"/>
         </proof>
        </goal>
-       <goal name="WP_parameter selection_sort.3.6" expl="for loop preservation" sum="48e51c862477d9b9bb7d9949ba1d7622" proved="true" expanded="true">
+       <goal name="WP_parameter selection_sort.3.8" expl="for loop preservation" sum="67aa7cd06e64947a5b5c42db4a59e2c1" proved="true" expanded="false">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter selection_sort.3.9" expl="for loop preservation" sum="f6b6aa95cefce4de2617147719dfd2e2" proved="true" expanded="false">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter selection_sort.3.10" expl="for loop preservation" sum="8f2897c801cadff0608fcab6d31d0155" proved="true" expanded="false">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter selection_sort.3.11" expl="for loop preservation" sum="c216a5675a4a34a74be0addc04c66a41" proved="true" expanded="false">
         <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
          <result status="valid" time="0.04"/>
         </proof>
        </goal>
-       <goal name="WP_parameter selection_sort.3.7" expl="for loop preservation" sum="f16e3d3731417a5ba19f3c0e905a35d7" proved="true" expanded="true">
+       <goal name="WP_parameter selection_sort.3.12" expl="for loop preservation" sum="0a8ddfb0dde609f627f5053cf1bbe6d4" proved="true" expanded="false">
         <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.03"/>
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
-       <goal name="WP_parameter selection_sort.3.8" expl="for loop preservation" sum="663cc124cde1784b5df9d1726248f0f0" proved="true" expanded="true">
+       <goal name="WP_parameter selection_sort.3.13" expl="for loop preservation" sum="0f8de50605882d2481904ed6f5101758" proved="true" expanded="false">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="1.56"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter selection_sort.3.14" expl="for loop preservation" sum="11bcdb7a4b5c9af0efb310e0ae9b9529" proved="true" expanded="false">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.08"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter selection_sort.3.15" expl="for loop preservation" sum="ccbfd1defedcda9c65b8e2b67aa651fb" proved="true" expanded="false">
         <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
          <result status="valid" time="0.02"/>
         </proof>
        </goal>
-       <goal name="WP_parameter selection_sort.3.9" expl="for loop preservation" sum="5914e160c4b2042d8ea1ec0cfa66b855" proved="true" expanded="true">
+       <goal name="WP_parameter selection_sort.3.16" expl="for loop preservation" sum="239b28c5359cfc37ea55f0261208fbc9" proved="true" expanded="false">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.08"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter selection_sort.3.17" expl="for loop preservation" sum="360fc34ac0457a1147fcc1d66296867e" proved="true" expanded="false">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter selection_sort.3.18" expl="for loop preservation" sum="3cc2bcbc71096a0bbc567c4b193b2189" proved="true" expanded="false">
         <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
          <result status="valid" time="0.02"/>
         </proof>
        </goal>
-       <goal name="WP_parameter selection_sort.3.10" expl="for loop preservation" sum="aa1e8d1771330da0b312586be8b12fca" proved="true" expanded="true">
+       <goal name="WP_parameter selection_sort.3.19" expl="for loop preservation" sum="21b616b131a62f7acf9f8114f44111d3" proved="true" expanded="false">
         <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.03"/>
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
-       <goal name="WP_parameter selection_sort.3.11" expl="for loop preservation" sum="148822fa93fae4de0add9ab295d0002d" proved="true" expanded="true">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.07"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter selection_sort.3.12" expl="for loop preservation" sum="eab8745b368bae03988bac1294dc158f" proved="true" expanded="true">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.03"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter selection_sort.3.13" expl="for loop preservation" sum="8c5db9d37ed048e705792760575cd7c1" proved="true" expanded="true">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="2.42"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter selection_sort.3.14" expl="for loop preservation" sum="93854214f1088a4e0917e0fa83e10b35" proved="true" expanded="true">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.13"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter selection_sort.3.15" expl="for loop preservation" sum="fa0684d84aa66def1fb43b34cdead866" proved="true" expanded="true">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.04"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter selection_sort.3.16" expl="for loop preservation" sum="862b60c702f220d485e30f4ca674ac3b" proved="true" expanded="true">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.14"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter selection_sort.3.17" expl="for loop preservation" sum="1e3c5b5646a30d3cb0df12fdaa23603a" proved="true" expanded="true">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.03"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter selection_sort.3.18" expl="for loop preservation" sum="bc71a112cc02c7096c0de72bd7b7ef9e" proved="true" expanded="true">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.03"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter selection_sort.3.19" expl="for loop preservation" sum="906f276802fea718e3505c7953f0ff22" proved="true" expanded="true">
+       <goal name="WP_parameter selection_sort.3.20" expl="for loop preservation" sum="32b78ed8093a62f5bd5f396a5cb4ec01" proved="true" expanded="false">
         <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
          <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter selection_sort.3.20" expl="for loop preservation" sum="37f0e9b766195456932095dc24ce6dd6" proved="true" expanded="true">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.03"/>
         </proof>
        </goal>
       </transf>
      </goal>
-     <goal name="WP_parameter selection_sort.4" expl="normal postcondition" sum="d12a58f049b11ba9f992e578446a9dd0" proved="true" expanded="true">
+     <goal name="WP_parameter selection_sort.4" expl="normal postcondition" sum="5513e1179f6bb650cdb12544b8d9d888" proved="true" expanded="false">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.04"/>
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
     </transf>

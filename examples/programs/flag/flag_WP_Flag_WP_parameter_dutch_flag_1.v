@@ -4,9 +4,9 @@ Require Import ZArith.
 Require Import Rbase.
 Definition unit  := unit.
 
-Parameter label : Type.
+Parameter mark : Type.
 
-Parameter at1: forall (a:Type), a -> label  -> a.
+Parameter at1: forall (a:Type), a -> mark  -> a.
 
 Implicit Arguments at1.
 
@@ -75,15 +75,6 @@ Definition set1 (a:Type)(a1:(array a)) (i:Z) (v:a): (array a) :=
   | mk_array xcl0 _ => (mk_array xcl0 (set (elts a1) i v))
   end.
 Implicit Arguments set1.
-
-Definition sorted_sub(a:(map Z Z)) (l:Z) (u:Z): Prop := forall (i1:Z) (i2:Z),
-  (((l <= i1)%Z /\ (i1 <= i2)%Z) /\ (i2 <  u)%Z) -> ((get a i1) <= (get a
-  i2))%Z.
-
-Definition sorted_sub1(a:(array Z)) (l:Z) (u:Z): Prop := (sorted_sub (elts a)
-  l u).
-
-Definition sorted(a:(array Z)): Prop := (sorted_sub (elts a) 0%Z (length a)).
 
 Definition map_eq_sub (a:Type)(a1:(map Z a)) (a2:(map Z a)) (l:Z)
   (u:Z): Prop := forall (i:Z), ((l <= i)%Z /\ (i <  u)%Z) -> ((get a1
@@ -156,47 +147,42 @@ Axiom array_eq_sub_permut : forall (a:Type), forall (a1:(array a)) (a2:(array
 Axiom array_eq_permut : forall (a:Type), forall (a1:(array a)) (a2:(array
   a)), (array_eq a1 a2) -> (permut a1 a2).
 
-Theorem WP_parameter_insertion_sort : forall (a:Z), forall (a1:(map Z Z)),
-  let a2 := (mk_array a a1) in ((1%Z <= (a - 1%Z)%Z)%Z -> forall (a3:(map Z
-  Z)), let a4 := (mk_array a a3) in forall (i:Z), ((1%Z <= i)%Z /\
-  (i <= (a - 1%Z)%Z)%Z) -> (((sorted_sub a3 0%Z i) /\ (permut a4 a2)) ->
-  (((0%Z <= i)%Z /\ (i <  a)%Z) -> let result := (get a3 i) in
-  ((((0%Z <= i)%Z /\ (i <= i)%Z) /\ ((permut (set1 a4 i result) a2) /\
-  ((forall (k1:Z) (k2:Z), (((0%Z <= k1)%Z /\ (k1 <= k2)%Z) /\ (k2 <= i)%Z) ->
-  ((~ (k1 = i)) -> ((~ (k2 = i)) -> ((get a3 k1) <= (get a3 k2))%Z))) /\
-  forall (k:Z), (((i + 1%Z)%Z <= k)%Z /\ (k <= i)%Z) -> (result <  (get a3
-  k))%Z))) -> forall (j:Z), forall (a5:(map Z Z)), let a6 := (mk_array a
-  a5) in ((((0%Z <= j)%Z /\ (j <= i)%Z) /\ ((permut (set1 a6 j result) a2) /\
-  ((forall (k1:Z) (k2:Z), (((0%Z <= k1)%Z /\ (k1 <= k2)%Z) /\ (k2 <= i)%Z) ->
-  ((~ (k1 = j)) -> ((~ (k2 = j)) -> ((get a5 k1) <= (get a5 k2))%Z))) /\
-  forall (k:Z), (((j + 1%Z)%Z <= k)%Z /\ (k <= i)%Z) -> (result <  (get a5
-  k))%Z))) -> ((0%Z <  j)%Z -> (((0%Z <= (j - 1%Z)%Z)%Z /\
-  ((j - 1%Z)%Z <  a)%Z) -> ((result <  (get a5 (j - 1%Z)%Z))%Z ->
-  (((0%Z <= (j - 1%Z)%Z)%Z /\ ((j - 1%Z)%Z <  a)%Z) -> (((0%Z <= j)%Z /\
-  (j <  a)%Z) -> forall (a7:(map Z Z)), let a8 := (mk_array a a7) in
-  ((a7 = (set a5 j (get a5 (j - 1%Z)%Z))) -> ((exchange match (set1 a8
-  (j - 1%Z)%Z result) with
-  | mk_array _ elts1 => elts1
-  end match (set1 a6 j result) with
-  | mk_array _ elts1 => elts1
-  end (j - 1%Z)%Z j) -> forall (j1:Z), (j1 = (j - 1%Z)%Z) -> (permut (set1 a8
-  j1 result) a2))))))))))))).
+Inductive color  :=
+  | Blue : color 
+  | White : color 
+  | Red : color .
+
+Definition monochrome(a:(array color)) (i:Z) (j:Z) (c:color): Prop :=
+  forall (k:Z), ((i <= k)%Z /\ (k <  j)%Z) -> ((get1 a k) = c).
+
+Theorem WP_parameter_dutch_flag : forall (a:Z), forall (n:Z), forall (a1:(map
+  Z color)), ((0%Z <= n)%Z /\ (a = n)) -> forall (r:Z), forall (i:Z),
+  forall (b:Z), forall (a2:(map Z color)), let a3 := (mk_array a a2) in
+  ((((((0%Z <= b)%Z /\ (b <= i)%Z) /\ (i <= r)%Z) /\ (r <= n)%Z) /\
+  ((monochrome a3 0%Z b (Blue )) /\ ((monochrome a3 b i (White )) /\
+  ((monochrome a3 r n (Red )) /\ ((a = n) /\ (permut_sub a2 a1 0%Z n)))))) ->
+  ((i <  r)%Z -> (((0%Z <= i)%Z /\ (i <  a)%Z) -> match (get a2
+  i) with
+  | Blue  => True
+  | White  => True
+  | Red  => forall (r1:Z), (r1 = (r - 1%Z)%Z) -> ((((0%Z <= r1)%Z /\
+      (r1 <  a)%Z) /\ ((0%Z <= i)%Z /\ (i <  a)%Z)) -> forall (a4:(map Z
+      color)), (exchange a4 a2 r1 i) -> (monochrome (mk_array a a4) r1 n
+      (Red )))
+  end))).
 (* YOU MAY EDIT THE PROOF BELOW *)
-intuition.
-intuition.
-unfold set1.
-unfold permut.
-split.
-simpl.
+unfold exchange; intuition.
+destruct (get a2 i); intuition.
+red; intros.
+subst r1.
+assert (h: (k = r-1 \/ r <= k < n)%Z) by omega.
+destruct h.
+subst k.
+unfold get1.
 auto.
-apply permut_trans with (elts (set1 (mk_array a a5) j (get a3 i))); auto.
-subst j1.
-apply permut_exchange with (j-1)%Z j.
-simpl; omega.
-simpl; omega.
-assumption.
-unfold permut in H17.
-intuition.
+unfold get1; simpl.
+rewrite H21; try omega.
+apply H5; omega.
 Qed.
 (* DO NOT EDIT BELOW *)
 

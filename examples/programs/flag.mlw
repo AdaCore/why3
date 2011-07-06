@@ -10,7 +10,7 @@ module Flag
   type color = Blue | White | Red
 
   predicate monochrome (a:array color) (i:int) (j:int) (c:color) =
-    forall k:int. i<=k<j -> a[k]=c
+    forall k:int. i <= k < j -> a[k]=c
 
   let swap (a:array color) (i:int) (j:int) =
     { 0 <= i < length a /\ 0 <= j < length a }
