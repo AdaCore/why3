@@ -11,7 +11,11 @@ version 0.70, July 6, 2011
       actually syntactic sugar for "type t = `mk t' (a:int) (b:bool)"
       i.e. an algebraic with one constructor and projection functions
     - a record expression is written {| a = 1; b = True |}
+    - access to field a with syntax x.a
+    - update with syntax {| x with b = False |}
+    - record patterns
   o new tool why3replayer: batch replay of a Why3 session created in IDE
+  o [Alt-Ergo/Z3/CVC3/Yices output] support for built-in theory of arrays
 
   Fixes and other changes
 
