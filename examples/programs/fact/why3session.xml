@@ -5,17 +5,58 @@
   <theory name="Fact" verified="true" expanded="true">
   </theory>
   <theory name="WP FactRecursive" verified="true" expanded="true">
-   <goal name="WP_parameter fact_rec" expl="correctness of parameter fact_rec" sum="26ddbd98b20d38d8cc8174af1ddddb03" proved="true" expanded="true">
+   <goal name="WP_parameter fact_rec" expl="correctness of parameter fact_rec" sum="1117c3559da060f6ec9ac783d99c0d1b" proved="true" expanded="true">
     <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
   </theory>
   <theory name="WP FactImperative" verified="true" expanded="true">
-   <goal name="WP_parameter fact_imp" expl="correctness of parameter fact_imp" sum="e351701b7425629858770982d2abae90" proved="true" expanded="true">
+   <goal name="WP_parameter fact_imp" expl="correctness of parameter fact_imp" sum="5a3dec0b98b32ea14e04a5cdc91a245c" proved="true" expanded="true">
     <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.03"/>
+     <result status="valid" time="0.02"/>
     </proof>
+   </goal>
+  </theory>
+  <theory name="WP CheckingALargRoutine" verified="true" expanded="true">
+   <goal name="WP_parameter routine" expl="correctness of parameter routine" sum="8ff7c5f56f6c843793a6ab7586cce14c" proved="true" expanded="true">
+    <transf name="split_goal" proved="true" expanded="true">
+     <goal name="WP_parameter routine.1" expl="loop invariant init" sum="9a5b92f18bf024980c5dd8bdcfdfba50" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter routine.2" expl="loop invariant init" sum="bfd2f3a1175c534766c7ba4c01aa2919" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter routine.3" expl="loop invariant preservation" sum="3bf213f943a40012815223222d443f8f" proved="true" expanded="true">
+      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter routine.4" expl="loop variant decreases" sum="21d06667ca405a1992ceaf9811355605" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter routine.5" expl="loop invariant preservation" sum="f4a1cca6ef604333a9bfcf1ba0302fce" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter routine.6" expl="loop variant decreases" sum="ea43f13390128bda3ea16a832c1fd6f4" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter routine.7" expl="normal postcondition" sum="6625bdd4dd9086efed66e19ea54c2b59" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+    </transf>
    </goal>
   </theory>
  </file>
