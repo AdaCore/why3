@@ -194,7 +194,7 @@ and print_fmla info fmt f = match f.t_node with
   | Tbinop (Tand, f1, f2) ->
       fprintf fmt "@[(and %a@ %a)@]" (print_fmla info) f1 (print_fmla info) f2
   | Tbinop (Tor, f1, f2) ->
-      fprintf fmt "@[(and %a@ %a)@]" (print_fmla info) f1 (print_fmla info) f2
+      fprintf fmt "@[(or %a@ %a)@]" (print_fmla info) f1 (print_fmla info) f2
   | Tbinop (Timplies, f1, f2) ->
       fprintf fmt "@[(=> %a@ %a)@]"
         (print_fmla info) f1 (print_fmla info) f2
