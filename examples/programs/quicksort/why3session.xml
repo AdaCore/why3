@@ -3,149 +3,149 @@
 <why3session name="examples/programs/quicksort/why3session.xml">
  <file name="../quicksort.mlw" verified="false" expanded="true">
   <theory name="WP Quicksort" verified="false" expanded="true">
-   <goal name="WP_parameter swap" expl="correctness of parameter swap" sum="6177fbb045afcf4dbfe918aa3a4337ee" proved="true" expanded="false">
+   <goal name="WP_parameter swap" expl="correctness of parameter swap" sum="6177fbb045afcf4dbfe918aa3a4337ee" proved="true" expanded="true">
     <proof prover="alt-ergo" timelimit="29" edited="" obsolete="false">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
    <goal name="WP_parameter quick_rec" expl="correctness of parameter quick_rec" sum="33da4af0e03d306ea4861ba8983ee47a" proved="false" expanded="true">
     <transf name="split_goal" proved="false" expanded="true">
-     <goal name="WP_parameter quick_rec.1" expl="precondition" sum="406d10654eb3a0e3153a5154e1416295" proved="true" expanded="false">
+     <goal name="WP_parameter quick_rec.1" expl="precondition" sum="406d10654eb3a0e3153a5154e1416295" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="29" edited="" obsolete="false">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter quick_rec.2" expl="precondition" sum="f2219051933746e17a42c36018543678" proved="true" expanded="false">
+     <goal name="WP_parameter quick_rec.2" expl="precondition" sum="f2219051933746e17a42c36018543678" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="29" edited="" obsolete="false">
-       <result status="valid" time="0.00"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal name="WP_parameter quick_rec.3" expl="precondition" sum="10ef2a9d59686b359aa70d47cff8a53c" proved="true" expanded="false">
+     <goal name="WP_parameter quick_rec.3" expl="precondition" sum="10ef2a9d59686b359aa70d47cff8a53c" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter quick_rec.4" expl="precondition" sum="a318468fc8062152bff539867913bb29" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter quick_rec.4" expl="precondition" sum="a318468fc8062152bff539867913bb29" proved="true" expanded="false">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter quick_rec.5" expl="normal postcondition" sum="effb9ac6c1ee8132f333e6b98224f429" proved="true" expanded="false">
-      <transf name="split_goal" proved="true" expanded="false">
-       <goal name="WP_parameter quick_rec.5.1" expl="normal postcondition" sum="effb9ac6c1ee8132f333e6b98224f429" proved="true" expanded="false">
+     <goal name="WP_parameter quick_rec.5" expl="normal postcondition" sum="effb9ac6c1ee8132f333e6b98224f429" proved="true" expanded="true">
+      <transf name="split_goal" proved="true" expanded="true">
+       <goal name="WP_parameter quick_rec.5.1" expl="normal postcondition" sum="effb9ac6c1ee8132f333e6b98224f429" proved="true" expanded="true">
         <proof prover="alt-ergo" timelimit="5" edited="" obsolete="false">
          <result status="valid" time="0.02"/>
         </proof>
        </goal>
       </transf>
      </goal>
-     <goal name="WP_parameter quick_rec.6" expl="for loop initialization" sum="427cf244289471467b5d4eeb83987f39" proved="true" expanded="false">
-      <proof prover="alt-ergo" timelimit="29" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter quick_rec.7" expl="for loop preservation" sum="07ab46cd0c0ee28eb4d1f08cc02f2c8d" proved="true" expanded="false">
-      <transf name="split_goal" proved="true" expanded="false">
-       <goal name="WP_parameter quick_rec.7.1" expl="for loop preservation" sum="4ea12c8c31265a91a505243d49d45967" proved="true" expanded="false">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.01"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter quick_rec.7.2" expl="for loop preservation" sum="18ad8cb0f70f2f58845a2e754bdccf9d" proved="true" expanded="false">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.01"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter quick_rec.7.3" expl="for loop preservation" sum="911ce471e4e03d6d518859114b506ad1" proved="true" expanded="false">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter quick_rec.7.4" expl="for loop preservation" sum="b450261e5bd6ca2d661e97802ff609af" proved="true" expanded="false">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.03"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter quick_rec.7.5" expl="for loop preservation" sum="08076db715ad6104e661bba5924b914d" proved="true" expanded="false">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.24"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter quick_rec.7.6" expl="for loop preservation" sum="9b73c6a9f6e082107f9baebb2c8eed55" proved="true" expanded="false">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter quick_rec.7.7" expl="for loop preservation" sum="41c7cd211f59e59e68518f917d9f7701" proved="true" expanded="false">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.01"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter quick_rec.7.8" expl="for loop preservation" sum="858a8d8e1012e8548515b56508208231" proved="true" expanded="false">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter quick_rec.7.9" expl="for loop preservation" sum="95e2e45c6127a7271638547bcfb5e046" proved="true" expanded="false">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.01"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter quick_rec.7.10" expl="for loop preservation" sum="929c3b1abcacff2aede569f8b49f7b4f" proved="true" expanded="false">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.01"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter quick_rec.7.11" expl="for loop preservation" sum="ee911edbd6e4c05aa8f2ed082f7b1b22" proved="true" expanded="false">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter quick_rec.7.12" expl="for loop preservation" sum="66f69655c8bf2711379369eb6821d574" proved="true" expanded="false">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.01"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter quick_rec.7.13" expl="for loop preservation" sum="b089bc56dc2ed0cdd184619815c8845e" proved="true" expanded="false">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.01"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter quick_rec.7.14" expl="for loop preservation" sum="1a88a3685706218b200f35ea848bd4c6" proved="true" expanded="false">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.01"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter quick_rec.8" expl="precondition" sum="9190ad77db4576960cadd05a2499cb61" proved="true" expanded="false">
+     <goal name="WP_parameter quick_rec.6" expl="for loop initialization" sum="427cf244289471467b5d4eeb83987f39" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="29" edited="" obsolete="false">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal name="WP_parameter quick_rec.9" expl="precondition" sum="e37d265f6cba539592d2bd29fc4fcc17" proved="true" expanded="false">
-      <proof prover="alt-ergo" timelimit="29" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter quick_rec.10" expl="precondition" sum="49966da3f6ce0f3a491a4b8853960bbf" proved="true" expanded="false">
-      <transf name="split_goal" proved="true" expanded="false">
-       <goal name="WP_parameter quick_rec.10.1" expl="correctness of parameter quick_rec" sum="cfbbf230a65e5d494b3562815841ed69" proved="true" expanded="false">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter quick_rec.10.2" expl="correctness of parameter quick_rec" sum="e3d82586cc9da3bf50ca6fbd07f1744c" proved="true" expanded="false">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter quick_rec.10.3" expl="correctness of parameter quick_rec" sum="fa2f9f5a725f918d0d710645cac645b1" proved="true" expanded="false">
+     <goal name="WP_parameter quick_rec.7" expl="for loop preservation" sum="07ab46cd0c0ee28eb4d1f08cc02f2c8d" proved="true" expanded="true">
+      <transf name="split_goal" proved="true" expanded="true">
+       <goal name="WP_parameter quick_rec.7.1" expl="for loop preservation" sum="4ea12c8c31265a91a505243d49d45967" proved="true" expanded="true">
         <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
          <result status="valid" time="0.01"/>
         </proof>
        </goal>
-       <goal name="WP_parameter quick_rec.10.4" expl="correctness of parameter quick_rec" sum="1d6a7b2f1f81b8ef6ab988d51b850faf" proved="true" expanded="false">
+       <goal name="WP_parameter quick_rec.7.2" expl="for loop preservation" sum="18ad8cb0f70f2f58845a2e754bdccf9d" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter quick_rec.7.3" expl="for loop preservation" sum="911ce471e4e03d6d518859114b506ad1" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter quick_rec.7.4" expl="for loop preservation" sum="b450261e5bd6ca2d661e97802ff609af" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.04"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter quick_rec.7.5" expl="for loop preservation" sum="08076db715ad6104e661bba5924b914d" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.24"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter quick_rec.7.6" expl="for loop preservation" sum="9b73c6a9f6e082107f9baebb2c8eed55" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter quick_rec.7.7" expl="for loop preservation" sum="41c7cd211f59e59e68518f917d9f7701" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter quick_rec.7.8" expl="for loop preservation" sum="858a8d8e1012e8548515b56508208231" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter quick_rec.7.9" expl="for loop preservation" sum="95e2e45c6127a7271638547bcfb5e046" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter quick_rec.7.10" expl="for loop preservation" sum="929c3b1abcacff2aede569f8b49f7b4f" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter quick_rec.7.11" expl="for loop preservation" sum="ee911edbd6e4c05aa8f2ed082f7b1b22" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter quick_rec.7.12" expl="for loop preservation" sum="66f69655c8bf2711379369eb6821d574" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter quick_rec.7.13" expl="for loop preservation" sum="b089bc56dc2ed0cdd184619815c8845e" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter quick_rec.7.14" expl="for loop preservation" sum="1a88a3685706218b200f35ea848bd4c6" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal name="WP_parameter quick_rec.8" expl="precondition" sum="9190ad77db4576960cadd05a2499cb61" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="29" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter quick_rec.9" expl="precondition" sum="e37d265f6cba539592d2bd29fc4fcc17" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="29" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter quick_rec.10" expl="precondition" sum="49966da3f6ce0f3a491a4b8853960bbf" proved="true" expanded="true">
+      <transf name="split_goal" proved="true" expanded="true">
+       <goal name="WP_parameter quick_rec.10.1" expl="correctness of parameter quick_rec" sum="cfbbf230a65e5d494b3562815841ed69" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter quick_rec.10.2" expl="correctness of parameter quick_rec" sum="e3d82586cc9da3bf50ca6fbd07f1744c" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter quick_rec.10.3" expl="correctness of parameter quick_rec" sum="fa2f9f5a725f918d0d710645cac645b1" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter quick_rec.10.4" expl="correctness of parameter quick_rec" sum="1d6a7b2f1f81b8ef6ab988d51b850faf" proved="true" expanded="true">
         <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
          <result status="valid" time="0.01"/>
         </proof>
@@ -153,34 +153,22 @@
       </transf>
      </goal>
      <goal name="WP_parameter quick_rec.11" expl="normal postcondition" sum="36e6ec9c499a1e91838afe1b8b2e0eaa" proved="false" expanded="true">
-      <proof prover="coq" timelimit="10" edited="quicksort_WP_Quicksort_WP_parameter_quick_rec_1.v" obsolete="false"><undone/>
-       
-      </proof>
-      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-       <result status="timeout" time="10.02"/>
-      </proof>
-      <proof prover="alt-ergo" timelimit="29" edited="" obsolete="false">
-       <result status="timeout" time="29.03"/>
-      </proof>
-      <proof prover="z3" timelimit="10" edited="" obsolete="false">
-       <result status="timeout" time="10.05"/>
-      </proof>
      </goal>
-     <goal name="WP_parameter quick_rec.12" expl="normal postcondition" sum="25de8b5856d6ddd6e4d28d31313ffcb9" proved="true" expanded="false">
+     <goal name="WP_parameter quick_rec.12" expl="normal postcondition" sum="25de8b5856d6ddd6e4d28d31313ffcb9" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="29" edited="" obsolete="false">
-       <result status="valid" time="0.04"/>
+       <result status="valid" time="0.03"/>
       </proof>
      </goal>
     </transf>
    </goal>
-   <goal name="WP_parameter quicksort" expl="correctness of parameter quicksort" sum="fb3352351bc2938392247b070b73ab2b" proved="true" expanded="false">
-    <transf name="split_goal" proved="true" expanded="false">
-     <goal name="WP_parameter quicksort.1" expl="precondition" sum="b99a9c90c7ca121192728f342615c25d" proved="true" expanded="false">
+   <goal name="WP_parameter quicksort" expl="correctness of parameter quicksort" sum="fb3352351bc2938392247b070b73ab2b" proved="true" expanded="true">
+    <transf name="split_goal" proved="true" expanded="true">
+     <goal name="WP_parameter quicksort.1" expl="precondition" sum="b99a9c90c7ca121192728f342615c25d" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter quicksort.2" expl="normal postcondition" sum="e6fb9fda57d1131f269e8a2450335abc" proved="true" expanded="false">
+     <goal name="WP_parameter quicksort.2" expl="normal postcondition" sum="e6fb9fda57d1131f269e8a2450335abc" proved="true" expanded="true">
       <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.02"/>
       </proof>
@@ -188,7 +176,7 @@
        <result status="valid" time="0.05"/>
       </proof>
       <proof prover="z3" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.03"/>
+       <result status="valid" time="0.04"/>
       </proof>
      </goal>
     </transf>

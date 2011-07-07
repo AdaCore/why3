@@ -5,130 +5,138 @@
   <theory name="WP InvertingAnInjection" verified="false" expanded="true">
    <goal name="injective_surjective" sum="1d0a82374cddc10b6a8824e55ce9bf40" proved="false" expanded="true">
    </goal>
-   <goal name="WP_parameter inverting" expl="correctness of parameter inverting" sum="4e3e908fda2b32656c06bff143dee92a" proved="true" expanded="false">
-    <transf name="split_goal" proved="true" expanded="false">
-     <goal name="WP_parameter inverting.1" expl="normal postcondition" sum="9c80462ee05e31574ed3fa2c0f9d5a0d" proved="true" expanded="false">
+   <goal name="WP_parameter inverting" expl="correctness of parameter inverting" sum="4e3e908fda2b32656c06bff143dee92a" proved="false" expanded="true">
+    <transf name="split_goal" proved="false" expanded="true">
+     <goal name="WP_parameter inverting.1" expl="normal postcondition" sum="9c80462ee05e31574ed3fa2c0f9d5a0d" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter inverting.2" expl="for loop initialization" sum="2c5d6b17bf0bc5c1581da6bb1f4b8cd3" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal name="WP_parameter inverting.2" expl="for loop initialization" sum="2c5d6b17bf0bc5c1581da6bb1f4b8cd3" proved="true" expanded="false">
-      <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter inverting.3" expl="for loop preservation" sum="d902b5e04caee2a64c3261263af418b3" proved="true" expanded="false">
+     <goal name="WP_parameter inverting.3" expl="for loop preservation" sum="d902b5e04caee2a64c3261263af418b3" proved="true" expanded="true">
       <proof prover="cvc3" timelimit="20" edited="" obsolete="false">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter inverting.4" expl="normal postcondition" sum="284dcab29dd989d7edbf19df702da0d4" proved="true" expanded="false">
-      <proof prover="z3" timelimit="20" edited="" obsolete="false">
-       <result status="valid" time="0.03"/>
-      </proof>
+     <goal name="WP_parameter inverting.4" expl="normal postcondition" sum="284dcab29dd989d7edbf19df702da0d4" proved="false" expanded="true">
      </goal>
     </transf>
    </goal>
-   <goal name="WP_parameter inverting2" expl="correctness of parameter inverting2" sum="db2b99c1ab654d757ebfbe176afe2aed" proved="true" expanded="false">
-    <transf name="split_goal" proved="true" expanded="false">
-     <goal name="WP_parameter inverting2.1" expl="normal postcondition" sum="ba4351b73824c7cbab8812b4dc656c4b" proved="true" expanded="false">
+   <goal name="WP_parameter inverting2" expl="correctness of parameter inverting2" sum="db2b99c1ab654d757ebfbe176afe2aed" proved="false" expanded="true">
+    <transf name="split_goal" proved="false" expanded="true">
+     <goal name="WP_parameter inverting2.1" expl="normal postcondition" sum="ba4351b73824c7cbab8812b4dc656c4b" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter inverting2.2" expl="for loop initialization" sum="1dba9f18d5aed75915a7c26b5485bbab" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal name="WP_parameter inverting2.2" expl="for loop initialization" sum="1dba9f18d5aed75915a7c26b5485bbab" proved="true" expanded="false">
+     <goal name="WP_parameter inverting2.3" expl="for loop preservation" sum="876fc9bd89bb683e84ef31eeb8da5039" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.05"/>
       </proof>
      </goal>
-     <goal name="WP_parameter inverting2.3" expl="for loop preservation" sum="876fc9bd89bb683e84ef31eeb8da5039" proved="true" expanded="false">
-      <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-       <result status="valid" time="0.04"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter inverting2.4" expl="normal postcondition" sum="9d74362206a7072ff74a83da616e144e" proved="true" expanded="false">
-      <proof prover="z3" timelimit="20" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
+     <goal name="WP_parameter inverting2.4" expl="normal postcondition" sum="9d74362206a7072ff74a83da616e144e" proved="false" expanded="true">
+      <transf name="split_goal" proved="false" expanded="true">
+       <goal name="WP_parameter inverting2.4.1" expl="correctness of parameter inverting2" sum="59a5d588d8049a4a1b4e847eb05dfeb8" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter inverting2.4.2" expl="correctness of parameter inverting2" sum="3773f85cb23c8f06500d5cc29f0c0fb4" proved="false" expanded="true">
+       </goal>
+       <goal name="WP_parameter inverting2.4.3" expl="correctness of parameter inverting2" sum="e551b00d12207bd183c4994aacc5e579" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.00"/>
+        </proof>
+       </goal>
+      </transf>
      </goal>
     </transf>
    </goal>
   </theory>
-  <theory name="WP Test" verified="true" expanded="false">
-   <goal name="WP_parameter test" expl="correctness of parameter test" sum="7c038390b81ad0bfc09da96433df1e95" proved="true" expanded="false">
-    <transf name="split_goal" proved="true" expanded="false">
-     <goal name="WP_parameter test.1" expl="precondition" sum="3f00d7e40e211a4f81ed9f149cc61192" proved="true" expanded="false">
+  <theory name="WP Test" verified="true" expanded="true">
+   <goal name="WP_parameter test" expl="correctness of parameter test" sum="7c038390b81ad0bfc09da96433df1e95" proved="true" expanded="true">
+    <transf name="split_goal" proved="true" expanded="true">
+     <goal name="WP_parameter test.1" expl="precondition" sum="3f00d7e40e211a4f81ed9f149cc61192" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
-     <goal name="WP_parameter test.2" expl="precondition" sum="b52a5dbb1265dde5fd833660d797b299" proved="true" expanded="false">
+     <goal name="WP_parameter test.2" expl="precondition" sum="b52a5dbb1265dde5fd833660d797b299" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter test.3" expl="precondition" sum="847593422a945cd30e6a1865d1cae393" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal name="WP_parameter test.3" expl="precondition" sum="847593422a945cd30e6a1865d1cae393" proved="true" expanded="false">
-      <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter test.4" expl="precondition" sum="fde12469d4b4c58622438b4312702630" proved="true" expanded="false">
-      <transf name="split_goal" proved="true" expanded="false">
-       <goal name="WP_parameter test.4.1" expl="correctness of parameter test" sum="9ed6b1d30346032b36f51d7da4ef3f4f" proved="true" expanded="false">
+     <goal name="WP_parameter test.4" expl="precondition" sum="fde12469d4b4c58622438b4312702630" proved="true" expanded="true">
+      <transf name="split_goal" proved="true" expanded="true">
+       <goal name="WP_parameter test.4.1" expl="correctness of parameter test" sum="9ed6b1d30346032b36f51d7da4ef3f4f" proved="true" expanded="true">
         <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
          <result status="valid" time="0.01"/>
         </proof>
        </goal>
-       <goal name="WP_parameter test.4.2" expl="correctness of parameter test" sum="2cbf3edf5cee2ecf59212b9b1e00d1ca" proved="true" expanded="false">
+       <goal name="WP_parameter test.4.2" expl="correctness of parameter test" sum="2cbf3edf5cee2ecf59212b9b1e00d1ca" proved="true" expanded="true">
         <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
          <result status="valid" time="0.01"/>
         </proof>
        </goal>
       </transf>
      </goal>
-     <goal name="WP_parameter test.5" expl="precondition" sum="2451a4ff2c72dcde03ad1dfb75861a9a" proved="true" expanded="false">
+     <goal name="WP_parameter test.5" expl="precondition" sum="2451a4ff2c72dcde03ad1dfb75861a9a" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal name="WP_parameter test.6" expl="precondition" sum="3d876c7c2872b49b43f5e0f94075b49e" proved="true" expanded="false">
+     <goal name="WP_parameter test.6" expl="precondition" sum="3d876c7c2872b49b43f5e0f94075b49e" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal name="WP_parameter test.7" expl="precondition" sum="fb389a1ac5f34fbff4a3296e22660473" proved="true" expanded="false">
+     <goal name="WP_parameter test.7" expl="precondition" sum="fb389a1ac5f34fbff4a3296e22660473" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter test.8" expl="precondition" sum="76fd8e0d4862def7d1710171adaba94b" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter test.9" expl="precondition" sum="0cfd814524b536e9b0cd19e84bf937c0" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter test.10" expl="precondition" sum="f16a64ad5c6b6b04d61ad794f96813b3" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter test.8" expl="precondition" sum="76fd8e0d4862def7d1710171adaba94b" proved="true" expanded="false">
+     <goal name="WP_parameter test.11" expl="assertion" sum="f742c2848f5a6d052f9c179d25963a36" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.11"/>
       </proof>
      </goal>
-     <goal name="WP_parameter test.9" expl="precondition" sum="0cfd814524b536e9b0cd19e84bf937c0" proved="true" expanded="false">
+     <goal name="WP_parameter test.12" expl="precondition" sum="fd2c2fe16830a5e799f97e343e2a84a9" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.24"/>
       </proof>
      </goal>
-     <goal name="WP_parameter test.10" expl="precondition" sum="f16a64ad5c6b6b04d61ad794f96813b3" proved="true" expanded="false">
+     <goal name="WP_parameter test.13" expl="assertion" sum="8cb64a7011ec63158d72a56f5cd3e5cc" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter test.11" expl="assertion" sum="f742c2848f5a6d052f9c179d25963a36" proved="true" expanded="false">
-      <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-       <result status="valid" time="0.12"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter test.12" expl="precondition" sum="fd2c2fe16830a5e799f97e343e2a84a9" proved="true" expanded="false">
-      <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-       <result status="valid" time="0.22"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter test.13" expl="assertion" sum="8cb64a7011ec63158d72a56f5cd3e5cc" proved="true" expanded="false">
-      <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-       <result status="valid" time="0.08"/>
+       <result status="valid" time="0.07"/>
       </proof>
      </goal>
     </transf>

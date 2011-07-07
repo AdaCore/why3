@@ -1,56 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
-<why3session name="my_cosine/why3session.xml">
+<why3session name="examples/my_cosine/why3session.xml">
  <file name="../my_cosine.why" verified="true" expanded="true">
   <theory name="CosineSingle" verified="true" expanded="true">
    <goal name="MethodError" sum="04d7ba2ad67e6273c77266e812fe0b5d" proved="true" expanded="true">
     <proof prover="coq" timelimit="2" edited="my_cosine_CosineSingle_MethodError_1.v" obsolete="false">
-     <result status="valid" time="4.29"/>
-    </proof>
-    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-     <result status="timeout" time="10.04"/>
-    </proof>
-    <proof prover="simplify" timelimit="10" edited="" obsolete="false">
-     <result status="timeout" time="10.06"/>
-    </proof>
-    <proof prover="z3" timelimit="10" edited="" obsolete="false">
-     <result status="timeout" time="10.06"/>
+     <result status="valid" time="3.63"/>
     </proof>
    </goal>
    <goal name="TotalErrorFullyExpanded" sum="86136c1aa7501342a2789f26b4088e3b" proved="true" expanded="true">
-    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-     <result status="timeout" time="10.01"/>
-    </proof>
-    <proof prover="simplify" timelimit="10" edited="" obsolete="false">
-     <result status="timeout" time="10.09"/>
-    </proof>
     <proof prover="gappa" timelimit="2" edited="" obsolete="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof prover="z3" timelimit="10" edited="" obsolete="false">
-     <result status="timeout" time="10.06"/>
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal name="TotalErrorExpanded" sum="1d2075874f81d542bc1500ae6147faec" proved="true" expanded="true">
     <proof prover="alt-ergo" timelimit="2" edited="" obsolete="false">
-     <result status="valid" time="0.98"/>
-    </proof>
-    <proof prover="simplify" timelimit="10" edited="" obsolete="false">
-     <result status="timeout" time="10.11"/>
-    </proof>
-    <proof prover="z3" timelimit="2" edited="" obsolete="false">
-     <result status="valid" time="0.12"/>
+     <result status="valid" time="0.72"/>
     </proof>
    </goal>
    <goal name="TotalError" sum="84d328c047b191246fda42eaa2ab5255" proved="true" expanded="true">
     <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="2.73"/>
-    </proof>
-    <proof prover="simplify" timelimit="10" edited="" obsolete="false">
-     <result status="timeout" time="10.03"/>
-    </proof>
-    <proof prover="z3" timelimit="10" edited="" obsolete="false">
-     <result status="timeout" time="10.12"/>
+     <result status="valid" time="2.06"/>
     </proof>
    </goal>
   </theory>

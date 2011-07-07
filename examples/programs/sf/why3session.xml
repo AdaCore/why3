@@ -20,7 +20,7 @@
    </goal>
    <goal name="even_not_odd" sum="53e6bf87df0a78f77396dc37febf9ad4" proved="true" expanded="true">
     <proof prover="coq" timelimit="10" edited="sf_WP_HoareLogic_even_not_odd_1.v" obsolete="false">
-     <result status="valid" time="0.65"/>
+     <result status="valid" time="0.52"/>
     </proof>
    </goal>
    <goal name="WP_parameter parity" expl="correctness of parameter parity" sum="f0ebcfc44576c91bca3ab0d6fc1ea8de" proved="true" expanded="true">
@@ -46,9 +46,53 @@
     </proof>
    </goal>
    <goal name="WP_parameter list_member" expl="correctness of parameter list_member" sum="b4187b983e65459b73a851378ae0705f" proved="true" expanded="true">
-    <proof prover="yices" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.04"/>
-    </proof>
+    <transf name="split_goal" proved="true" expanded="true">
+     <goal name="WP_parameter list_member.1" expl="loop invariant init" sum="31f4e55cabffdd4d63e20199d1a77867" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter list_member.2" expl="precondition" sum="edfdcfe23487d8d0453cb4a42accae64" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter list_member.3" expl="precondition" sum="58f178b2f8c525bf8edc57ed7808237d" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter list_member.4" expl="loop invariant preservation" sum="927d4cc123030bc09cf89d7be84c6724" proved="true" expanded="true">
+      <proof prover="z3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.67"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter list_member.5" expl="loop variant decreases" sum="6bbef49de1a1b1573727678eefae860e" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter list_member.6" expl="precondition" sum="0e12c88f2567c5f0aea89a6304cd0642" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter list_member.7" expl="loop invariant preservation" sum="7f5d2ee098045d0c9285ac28dfa83a7d" proved="true" expanded="true">
+      <proof prover="z3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.67"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter list_member.8" expl="loop variant decreases" sum="c067362f1067ed1aaabae3ef66460a35" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter list_member.9" expl="normal postcondition" sum="911c750ca19f35b9e7d64137fb7d7a4a" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+    </transf>
    </goal>
   </theory>
  </file>
