@@ -1099,6 +1099,7 @@ $(DISTRIB_TAR): doc/manual.pdf
 	ln -s ../modules $(DISTRIB_DIR)/share/modules
 	ln -s ../theories $(DISTRIB_DIR)/share/theories
 	cp --parents $(DISTRIB_FILES) $(DISTRIB_DIR)
+	rm -f $(DISTRIB_DIR)/src/config.ml
 	cd distrib; tar cf $(NAME).tar $(NAME); gzip -f --best $(NAME).tar
 
 # distrib export: source export-doc export-www export-examples export-examples-c linux
@@ -1185,6 +1186,9 @@ src/config.sh: src/config.sh.in config.status
 
 src/config.ml: src/config.sh
 	LIBDIR=$(LIBDIR) DATADIR=$(DATADIR) src/config.sh
+
+clean::
+	rm -f src/config.ml
 
 doc/version.tex: doc/version.tex.in config.status
 	./config.status chmod --file $@

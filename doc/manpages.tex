@@ -45,6 +45,40 @@ When configuration is finished, you can compile \why.
 \begin{verbatim}
 make
 \end{verbatim}
+Installation is performed (as super-user if needed) using
+\begin{verbatim}
+make install
+\end{verbatim}
+Installation can be tested as follows: 
+\begin{enumerate}
+\item install some external provers (see~Section\ref{provers} below)
+\item run \texttt{why3config --detect}
+\item run some examples from the distribution, \emph{e.g.} you should
+obtain the following:
+\begin{verbatim}
+$ cd examples
+$ why3replayer scottish-private-club
+Info: found directory 'scottish-private-club' for the project
+Opening session...[Xml warning] prolog ignored
+[Reload] file '../scottish-private-club.why'
+[Reload] theory 'ScottishClubProblem'
+ done
+Progress: 4/4
+ 1/1
+Everything OK.
+$ why3replayer programs/same_fringe
+Info: found directory 'programs/same_fringe' for the project
+Opening session...[Xml warning] prolog ignored
+[Reload] file '../same_fringe.mlw'
+[Reload] theory 'WP SameFringe'
+[Reload] transformation split_goal for goal WP_parameter enum 
+[Reload] transformation split_goal for goal WP_parameter eq_enum 
+ done
+Progress: 12/12
+ 3/3
+Everything OK.
+\end{verbatim}
+\end{enumerate}
 
 \subsection{Local use, without installation}
 
@@ -65,7 +99,7 @@ make byte opt
 make install_lib
 \end{verbatim}
 
-\section{Installation of external provers}
+\section{Installation of external provers}\label{provers}
 
 \why can use a wide range of external theorem provers. These need to
 be installed separately, and then \why needs to be configured to use
