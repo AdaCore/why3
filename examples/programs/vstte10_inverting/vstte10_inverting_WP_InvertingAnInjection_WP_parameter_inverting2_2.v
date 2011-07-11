@@ -82,10 +82,10 @@ Axiom injective_surjective : forall (a:(array Z)) (n:Z), (injective a n) ->
 
 Theorem WP_parameter_inverting2 : forall (a:Z), forall (n:Z), forall (a1:(map
   Z Z)), let a2 := (mk_array a a1) in ((((0%Z <= n)%Z /\ (n = a)) /\
-  ((injective a2 n) /\ (range a2 n))) -> ((0%Z <= (n - 1%Z)%Z)%Z ->
-  forall (b:(map Z Z)), (forall (j:Z), ((0%Z <= j)%Z /\
-  (j <  ((n - 1%Z)%Z + 1%Z)%Z)%Z) -> ((get b (get a1 j)) = j)) ->
-  (injective (mk_array n b) n))).
+  ((injective a2 n) /\ (range a2 n))) -> ((0%Z <= n)%Z ->
+  ((0%Z <= (n - 1%Z)%Z)%Z -> forall (b:(map Z Z)), (forall (j:Z),
+  ((0%Z <= j)%Z /\ (j <  ((n - 1%Z)%Z + 1%Z)%Z)%Z) -> ((get b (get a1
+  j)) = j)) -> (injective (mk_array n b) n)))).
 (* YOU MAY EDIT THE PROOF BELOW *)
 intuition.
 intuition.
@@ -93,14 +93,14 @@ red; intros.
 unfold get1; simpl.
 assert (surjective (mk_array a a1) n).
 apply injective_surjective; assumption.
-generalize (H8 i H5); unfold get1; simpl; intros (i1, (Hi1,Hi2)).
-generalize (H8 j H6); unfold get1; simpl; intros (j1, (Hj1,Hj2)).
+generalize (H9 i H6); unfold get1; simpl; intros (i1, (Hi1,Hi2)).
+generalize (H9 j H7); unfold get1; simpl; intros (j1, (Hj1,Hj2)).
 rewrite <- Hi2.
 rewrite <- Hj2.
-rewrite H2; try omega.
-rewrite H2; try omega.
+rewrite H3; try omega.
+rewrite H3; try omega.
 intro.
-apply H7.
+apply H8.
 subst.
 auto.
 Qed.
