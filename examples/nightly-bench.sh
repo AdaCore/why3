@@ -49,7 +49,7 @@ else
 fi
 
 # increase number of cores used
-perl -pi -e 's/running_provers_max = 2/running_provers_max = 4/' why.conf
+perl -pi -e 's/running_provers_max = 2/running_provers_max = 4/' why3.conf
 
 # do we want to do "make bench" ?
 
@@ -78,7 +78,12 @@ if test "$?" != "0" ; then
     fi
     notify
 else
+    cp $OUT $REPORTDIR/regtests-$DATE
     echo "Replay succeeded. " >> $REPORT
+    echo "" >> $REPORT
+    echo "-------------- Full current state --------------" >> $REPORT
+    echo "" >> $REPORT
+    cat $OUT >> $REPORT
 fi
 
 # final notification if everything is OK
