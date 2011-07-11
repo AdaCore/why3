@@ -443,14 +443,14 @@ and wp_desc env rm e q = match e.expr_desc with
   | Elogic t ->
       let (v, q), _ = q in
       t_subst_single v t q
-  | Elocal v ->
-      let (res, q), _ = q in
-      t_subst (subst1 res (t_var v.pv_pure)) q
-  | Eglobal { ps_kind = PSfun _ } ->
-      let (_, q), _ = q in q
+  | Elocal pv ->
+      let (v, q), _ = q in
+      t_subst_single v (t_var pv.pv_pure) q
   | Eglobal { ps_kind = PSvar pv } ->
       let (v, q), _ = q in
       t_subst_single v (t_var pv.pv_pure) q
+  | Eglobal { ps_kind = PSfun _ } ->
+      let (_, q), _ = q in q
   | Eglobal { ps_kind = PSlogic } ->
       assert false
   | Efun (bl, t) ->
@@ -472,14 +472,29 @@ and wp_desc env rm e q = match e.expr_desc with
       let wl = List.map (wp_recfun env rm) dl in
       wp_ands ~sym:true (w1 :: wl)
   | Eif (e1, e2, e3) ->
-      let w2 = wp_expr env rm e2 (filter_post e2.expr_effect q) in
-      let w3 = wp_expr env rm e3 (filter_post e3.expr_effect q) in
-      let q1 = (* if result=True then w2 else w3 *)
-        let res = v_result e1.expr_type in
-        let test = t_equ (t_var res) (t_True env) in
-        let q1 = t_if test w2 w3 in
-        saturate_post e1.expr_effect (res, q1) q
+      let res = v_result e1.expr_type in
+      let test = t_equ (t_var res) (t_True env) in
+      (* if the both branches are pure, do not split *)
+      let q1 =
+        try
+          let r2 = match e2.expr_desc with
+            | Elogic t -> t
+            | Elocal pv -> t_var pv.pv_pure
+            | Eglobal { ps_kind = PSvar pv } -> t_var pv.pv_pure
+            | _ -> raise Exit in
+          let r3 = match e3.expr_desc with
+            | Elogic t -> t
+            | Elocal pv -> t_var pv.pv_pure
+            | Eglobal { ps_kind = PSvar pv } -> t_var pv.pv_pure
+            | _ -> raise Exit in
+          let (v, q), _ = q in
+          t_subst_single v (t_if test r2 r3) q
+        with Exit ->
+          let w2 = wp_expr env rm e2 (filter_post e2.expr_effect q) in
+          let w3 = wp_expr env rm e3 (filter_post e3.expr_effect q) in
+          t_if test w2 w3
       in
+      let q1 = saturate_post e1.expr_effect (res, q1) q in
       wp_expr env rm e1 q1
   | Eloop ({ loop_invariant = inv; loop_variant = var }, e1) ->
       let wfr = well_founded_rel var in
