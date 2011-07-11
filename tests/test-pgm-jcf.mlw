@@ -1,11 +1,3 @@
-theory M1
-  type t 'a = {| a : 'a |}
-end
-
-module M2
-  use import M1
-  let f (x: t int) = x.a
-end
 
 (*
 module MutualRec

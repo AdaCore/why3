@@ -740,10 +740,15 @@ let regions_tyapp ts nregions tyl =
 
 (* phase 2: remove destructive types and type annotations *****************)
 
-(* check that variables occurring in 'old' and 'at' are not local variables *)
-let check_at_fmla loc f0 =
+(* check
+   1. that variables occurring in 'old' and 'at' are not local variables
+   2. that 'old' is used only when old is true
+*)
+let check_at_fmla ?(old=false) loc f0 =
   let v = ref None in
   let rec check f = match f.t_node with
+    | Term.Tapp (ls, _) when ls_equal ls fs_old && not old ->
+        errorm ~loc "use of `old' not allowed here"
     | Term.Tapp (ls, _) when ls_equal ls fs_at || ls_equal ls fs_old ->
         let d = Mvs.set_diff f.t_vars f0.t_vars in
         Mvs.is_empty d || (v := Some (fst (Mvs.choose d)); false)
@@ -917,11 +922,11 @@ let ivariant env (t, ps) =
     | _ ->
         assert false
 
-let ifmla env l =
+let ifmla ?old env l =
   let loc = l.pp_loc in
   let f = dfmla (pure_uc env.i_uc) env.i_denv l in
   let f = Denv.fmla env.i_pures f in
-  check_at_fmla loc f;
+  check_at_fmla ?old loc f;
   f
 
 let id_result loc = id_user id_result loc
@@ -937,12 +942,12 @@ let iupost env ty (q, ql) =
           Some v.i_pure, env
       | _ -> assert false
     in
-    let f = ifmla env l in
+    let f = ifmla ~old:true env l in
     s, (v, f)
   in
   let loc = q.pp_loc in
   let env, v = iadd_local env (id_result loc) ty in
-  let q = ifmla env q in
+  let q = ifmla ~old:true env q in
   (v.i_pure, q), List.map dexn ql
 
 let rec purify_itype_v  = function
@@ -1259,7 +1264,6 @@ and iexpr_desc gl env loc ty = function
 
   | DEassert (k, f) ->
       let f = ifmla env f in
-      check_at_fmla loc f;
       IEassert (k, f)
   | DEmark (s, e1) ->
       let env, v = iadd_local env (id_fresh s) ty_mark in
