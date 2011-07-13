@@ -166,6 +166,15 @@ end
     let init = { id = "Init"; id_lab = []; id_loc = e.expr_loc } in
     { e with expr_desc = Emark (init, e) }
 
+  let small_integer i =
+    try
+      match i with
+      | Term.IConstDecimal s -> int_of_string s
+      | Term.IConstHexa    s -> int_of_string ("0x"^s)
+      | Term.IConstOctal   s -> int_of_string ("0o"^s)
+      | Term.IConstBinary  s -> int_of_string ("0b"^s)
+    with Failure _ -> raise Parsing.Parse_error
+
 %}
 
 /* Tokens */
@@ -381,7 +390,7 @@ meta_arg:
 | PREDICATE qualid { PMAps  $2 }
 | PROP      qualid { PMApr  $2 }
 | STRING           { PMAstr $1 }
-| INTEGER          { PMAint (match $1 with Term.IConstDecimal s -> int_of_string s) }
+| INTEGER          { PMAint (small_integer $1) }
 ;
 
 /* Type declarations */
