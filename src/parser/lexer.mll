@@ -137,6 +137,17 @@
 
   let loc lb = Loc.extract (lexeme_start_p lb, lexeme_end_p lb)
 
+  let remove_underscores s =
+    if String.contains s '_' then begin
+      let count =
+        let nb = ref 0 in
+        String.iter (fun c -> if c = '_' then incr nb) s;
+        !nb in
+      let t = String.create (String.length s - count) in
+      let i = ref 0 in
+      String.iter (fun c -> if c <> '_' then (t.[!i] <-c; incr i)) s;
+      t
+    end else s
 }
 
 let newline = '\n'
@@ -147,16 +158,6 @@ let alpha = lalpha | ualpha
 let digit = ['0'-'9']
 let lident = lalpha (alpha | digit | '\'')*
 let uident = ualpha (alpha | digit | '\'')*
-let decimal_literal =
-  ['0'-'9'] ['0'-'9' '_']*
-let hex_literal =
-  '0' ['x' 'X'] ['0'-'9' 'A'-'F' 'a'-'f']['0'-'9' 'A'-'F' 'a'-'f' '_']*
-let oct_literal =
-  '0' ['o' 'O'] ['0'-'7'] ['0'-'7' '_']*
-let bin_literal =
-  '0' ['b' 'B'] ['0'-'1'] ['0'-'1' '_']*
-let int_literal =
-  decimal_literal | hex_literal | oct_literal | bin_literal
 let hexadigit = ['0'-'9' 'a'-'f' 'A'-'F']
 
 let op_char_1 = ['=' '<' '>' '~']
@@ -188,8 +189,14 @@ rule token = parse
       { try Hashtbl.find keywords id with Not_found -> LIDENT id }
   | uident as id
       { UIDENT id }
-  | int_literal as s
-      { INTEGER s }
+  | ['0'-'9'] ['0'-'9' '_']* as s
+      { INTEGER (IConstDecimal (remove_underscores s)) }
+  | '0' ['x' 'X'] (['0'-'9' 'A'-'F' 'a'-'f']['0'-'9' 'A'-'F' 'a'-'f' '_']* as s)
+      { INTEGER (IConstHexa (remove_underscores s)) }
+  | '0' ['o' 'O'] (['0'-'7'] ['0'-'7' '_']* as s)
+      { INTEGER (IConstOctal (remove_underscores s)) }
+  | '0' ['b' 'B'] (['0'-'1'] ['0'-'1' '_']* as s)
+      { INTEGER (IConstBinary (remove_underscores s)) }
   | (digit+ as i) ("" as f) ['e' 'E'] (['-' '+']? digit+ as e)
   | (digit+ as i) '.' (digit* as f) (['e' 'E'] (['-' '+']? digit+ as e))?
   | (digit* as i) '.' (digit+ as f) (['e' 'E'] (['-' '+']? digit+ as e))?

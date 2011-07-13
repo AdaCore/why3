@@ -1190,7 +1190,7 @@ let add_decl env lenv th = function
         | PMAps q  -> MAls (find_psymbol q th)
         | PMApr q  -> MApr (find_prop q th)
         | PMAstr s -> MAstr s
-        | PMAint i -> MAint (int_of_string i)
+        | PMAint i -> MAint i
       in
       let al = List.map convert al in
       begin try add_meta th (lookup_meta s) al

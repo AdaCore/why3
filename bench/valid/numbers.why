@@ -1,0 +1,14 @@
+theory Number
+
+use import int.Int
+use import real.RealInfix
+
+goal dec : 123 = 100 + 23
+goal hex : 0x7b = 100 + 23
+goal oct : 0o173 = 100 + 23
+goal bin : 0b1111011 = 100 + 23
+
+goal real : 1.23e2 = 100. +. 23.
+goal hexa : 0x7.bp4 = 100. +. 23.
+
+end

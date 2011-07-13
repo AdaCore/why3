@@ -210,10 +210,21 @@ and print_lrfmla opl opr info fmt f = match f.t_label with
 and print_tnode opl opr info fmt t = match t.t_node with
   | Tvar v ->
       print_vs fmt v
-  | Tconst (ConstInt n) -> fprintf fmt "%s%%Z" n
-  | Tconst (ConstReal c) ->
-      Print_real.print_with_integers
-        "(%s)%%R" "(%s * %s)%%R" "(%s / %s)%%R" fmt c
+  | Tconst c ->
+      let number_format = {
+          Print_number.long_int_support = true;
+          Print_number.dec_int_support = Print_number.Number_custom "%s%%Z";
+          Print_number.hex_int_support = Print_number.Number_unsupported;
+          Print_number.oct_int_support = Print_number.Number_unsupported;
+          Print_number.bin_int_support = Print_number.Number_unsupported;
+          Print_number.def_int_support = Print_number.Number_unsupported;
+          Print_number.dec_real_support = Print_number.Number_unsupported;
+          Print_number.hex_real_support = Print_number.Number_unsupported;
+          Print_number.frac_real_support = Print_number.Number_custom
+            (Print_number.PrintFracReal ("(%s)%%R", "(%s * %s)%%R", "(%s / %s)%%R"));
+          Print_number.def_real_support = Print_number.Number_unsupported;
+        } in
+      Print_number.print number_format fmt c
   | Tif (f,t1,t2) ->
       fprintf fmt (protect_on opr "if %a@ then %a@ else %a")
         (print_fmla info) f (print_term info) t1 (print_opl_term info) t2

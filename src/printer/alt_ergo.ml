@@ -73,7 +73,19 @@ and print_tyapp info fmt = function
 
 let rec print_term info fmt t = match t.t_node with
   | Tconst c ->
-      Pretty.print_const fmt c
+      let number_format = {
+          Print_number.long_int_support = true;
+          Print_number.dec_int_support = Print_number.Number_default;
+          Print_number.hex_int_support = Print_number.Number_unsupported;
+          Print_number.oct_int_support = Print_number.Number_unsupported;
+          Print_number.bin_int_support = Print_number.Number_unsupported;
+          Print_number.def_int_support = Print_number.Number_unsupported;
+          Print_number.dec_real_support = Print_number.Number_default;
+          Print_number.hex_real_support = Print_number.Number_default;
+          Print_number.frac_real_support = Print_number.Number_unsupported;
+          Print_number.def_real_support = Print_number.Number_unsupported;
+        } in
+      Print_number.print number_format fmt c
   | Tvar { vs_name = id } ->
       print_ident fmt id
   | Tapp (ls, tl) -> begin match query_syntax info.info_syn ls.ls_name with

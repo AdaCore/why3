@@ -171,7 +171,7 @@ end
 /* Tokens */
 
 %token <string> LIDENT UIDENT
-%token <string> INTEGER
+%token <Ptree.integer_constant> INTEGER
 %token <string> OP1 OP2 OP3 OP4 OPPREF
 %token <Ptree.real_constant> FLOAT
 %token <string> STRING
@@ -381,7 +381,7 @@ meta_arg:
 | PREDICATE qualid { PMAps  $2 }
 | PROP      qualid { PMApr  $2 }
 | STRING           { PMAstr $1 }
-| INTEGER          { PMAint $1 }
+| INTEGER          { PMAint (match $1 with Term.IConstDecimal s -> int_of_string s) }
 ;
 
 /* Type declarations */

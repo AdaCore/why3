@@ -116,12 +116,18 @@ type binop =
   | Timplies
   | Tiff
 
+type integer_constant =
+  | IConstDecimal of string
+  | IConstHexa of string
+  | IConstOctal of string
+  | IConstBinary of string
+
 type real_constant =
   | RConstDecimal of string * string * string option (* int / frac / exp *)
   | RConstHexa of string * string * string
 
 type constant =
-  | ConstInt of string
+  | ConstInt of integer_constant
   | ConstReal of real_constant
 
 type term = private {

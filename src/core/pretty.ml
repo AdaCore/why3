@@ -121,7 +121,10 @@ let rec print_ty_node inn fmt ty = match ty.ty_node with
 let print_ty = print_ty_node false
 
 let print_const fmt = function
-  | ConstInt s -> fprintf fmt "%s" s
+  | ConstInt (IConstDecimal s) -> fprintf fmt "%s" s
+  | ConstInt (IConstHexa s) -> fprintf fmt "0x%s" s
+  | ConstInt (IConstOctal s) -> fprintf fmt "0o%s" s
+  | ConstInt (IConstBinary s) -> fprintf fmt "0b%s" s
   | ConstReal (RConstDecimal (i,f,None)) -> fprintf fmt "%s.%s" i f
   | ConstReal (RConstDecimal (i,f,Some e)) -> fprintf fmt "%s.%se%s" i f e
   | ConstReal (RConstHexa (i,f,e)) -> fprintf fmt "0x%s.%sp%s" i f e

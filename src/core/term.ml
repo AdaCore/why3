@@ -255,12 +255,18 @@ type binop =
   | Timplies
   | Tiff
 
+type integer_constant =
+  | IConstDecimal of string
+  | IConstHexa of string
+  | IConstOctal of string
+  | IConstBinary of string
+
 type real_constant =
   | RConstDecimal of string * string * string option (* int / frac / exp *)
   | RConstHexa of string * string * string
 
 type constant =
-  | ConstInt of string
+  | ConstInt of integer_constant
   | ConstReal of real_constant
 
 type term = {
@@ -462,7 +468,7 @@ let mk_term n ty = Hsterm.hashcons {
 
 let t_var v         = mk_term (Tvar v) (Some v.vs_ty)
 let t_const c ty    = mk_term (Tconst c) (Some ty)
-let t_int_const s   = mk_term (Tconst (ConstInt s)) (Some Ty.ty_int)
+let t_int_const s   = mk_term (Tconst (ConstInt (IConstDecimal s))) (Some Ty.ty_int)
 let t_real_const r  = mk_term (Tconst (ConstReal r)) (Some Ty.ty_real)
 let t_app f tl ty   = mk_term (Tapp (f, tl)) ty
 let t_if f t1 t2    = mk_term (Tif (f, t1, t2)) t2.t_ty

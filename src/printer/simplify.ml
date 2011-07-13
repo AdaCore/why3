@@ -40,37 +40,26 @@ let forget_var v = forget_id ident_printer v.vs_name
 
 let print_var fmt {vs_name = id} = print_ident fmt id
 
-let simplify_max_int = Int64.of_string "2147483646"
-
-let pp_exp fmt e =
-  if e="" then () else
-    if e.[0] = '-' then
-      fprintf fmt "minus%s" (String.sub e 1 (String.length e - 1))
-    else
-      fprintf fmt "%s" e
-
-let print_real fmt = function
-  | RConstDecimal (i, f, e) ->
-      fprintf fmt "%s_%se%a" i f (Pp.print_option pp_exp) e
-  | RConstHexa (i, f, e) ->
-      fprintf fmt "0x%s_%sp%a" i f pp_exp e
-
 type info = {
   info_syn : string Mid.t;
   info_rem : Sid.t;
 }
 
 let rec print_term info fmt t = match t.t_node with
-  | Tconst (ConstInt n) ->
-      begin try
-        let n64 = Int64.of_string n in
-        if n64 < 0L || n64 > simplify_max_int then raise Exit;
-        fprintf fmt "%s" n
-      with _ -> (* the constant is too large for Simplify *)
-        fprintf fmt "constant_too_large_%s" n
-      end
-  | Tconst (ConstReal c) ->
-      fprintf fmt "real_constant_%a" print_real c
+  | Tconst c ->
+      let number_format = {
+          Print_number.long_int_support = false;
+          Print_number.dec_int_support = Print_number.Number_default;
+          Print_number.hex_int_support = Print_number.Number_unsupported;
+          Print_number.oct_int_support = Print_number.Number_unsupported;
+          Print_number.bin_int_support = Print_number.Number_unsupported;
+          Print_number.def_int_support = Print_number.Number_custom "constant_too_large_%s";
+          Print_number.dec_real_support = Print_number.Number_unsupported;
+          Print_number.hex_real_support = Print_number.Number_unsupported;
+          Print_number.frac_real_support = Print_number.Number_unsupported;
+          Print_number.def_real_support = Print_number.Number_custom "real_constant_%s";
+        } in
+      Print_number.print number_format fmt c
   | Tvar v ->
       print_var fmt v
   | Tapp (ls, tl) -> begin match query_syntax info.info_syn ls.ls_name with

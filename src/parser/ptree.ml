@@ -23,6 +23,7 @@ type loc = Loc.position
 
 (*s Logical expressions (for both terms and predicates) *)
 
+type integer_constant = Term.integer_constant
 type real_constant = Term.real_constant
 type constant = Term.constant
 
@@ -150,7 +151,7 @@ type metarg =
   | PMAps  of qualid
   | PMApr  of qualid
   | PMAstr of string
-  | PMAint of string
+  | PMAint of int
 
 type decl =
   | TypeDecl of type_decl list
