@@ -108,18 +108,26 @@ let ident_printer =
 let print_ident fmt id =
   fprintf fmt "%s" (id_unique ident_printer id)
 
-let constant_value t =
-  match t.t_node with
-(*
-    | Tconst (ConstInt s) -> s
-    | Tconst (ConstReal r) -> sprintf "%a" Pretty.print_const r
-*)
+let constant_value =
+  let number_format = {
+      Print_number.long_int_support = true;
+      Print_number.dec_int_support = Print_number.Number_default;
+      Print_number.hex_int_support = Print_number.Number_default;
+      Print_number.oct_int_support = Print_number.Number_unsupported;
+      Print_number.bin_int_support = Print_number.Number_unsupported;
+      Print_number.def_int_support = Print_number.Number_unsupported;
+      Print_number.dec_real_support = Print_number.Number_default;
+      Print_number.hex_real_support = Print_number.Number_default;
+      Print_number.frac_real_support = Print_number.Number_unsupported;
+      Print_number.def_real_support = Print_number.Number_unsupported;
+    } in
+  fun t -> match t.t_node with
     | Tconst c ->
-        fprintf str_formatter "%a" Pretty.print_const c;
+        fprintf str_formatter "%a" (Print_number.print number_format) c;
         flush_str_formatter ()
     | Tapp(ls, [{ t_node = Tconst c}])
         when ls_equal ls !int_minus || ls_equal ls !real_minus ->
-        fprintf str_formatter "-%a" Pretty.print_const c;
+        fprintf str_formatter "-%a" (Print_number.print number_format) c;
         flush_str_formatter ()
     | _ -> raise Not_found
 
