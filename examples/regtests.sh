@@ -11,8 +11,8 @@ res=0
 run_dir () {
     for f in `ls $1/*/why3session.xml`; do
         d=`dirname $f`
-	echo -n "Replaying "$d"... "
-        ../bin/why3replayer.opt $d 2> $TMPERR > $TMP
+	echo -n "Replaying $d ... "
+        ../bin/why3replayer.opt $2 $d 2> $TMPERR > $TMP
         ret=$?
 	if test "$ret" != "0"  ; then
 	    echo -n "FAILED (ret code=$ret):"
@@ -31,21 +31,25 @@ run_dir () {
     done
 }
 
-echo "=== Logic ==="
-run_dir .
+# echo "=== Logic ==="
+# run_dir .
+# echo ""
+
+# echo "=== BTS ==="
+# run_dir bts
+# echo ""
+
+# echo "=== Programs ==="
+# run_dir programs
+# echo ""
+
+echo "=== Programs in their own subdir ==="
+run_dir programs/vacid_0_binary_heaps "-I programs/vacid_0_binary_heaps"
 echo ""
 
-echo "=== BTS ==="
-run_dir bts
-echo ""
-
-echo "=== Programs ==="
-run_dir programs
-echo ""
-
-echo "=== Check Builtin translation ==="
-run_dir check-builtin
-echo ""
+# echo "=== Check Builtin translation ==="
+# run_dir check-builtin
+# echo ""
 
 exit $res
 

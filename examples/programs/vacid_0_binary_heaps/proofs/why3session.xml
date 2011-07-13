@@ -1,0 +1,428 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session SYSTEM "why3session.dtd">
+<why3session name="proofs/why3session.xml">
+ <file name="../bag.why" verified="true" expanded="false">
+  <theory name="Bag" verified="true" expanded="false">
+   <goal name="is_empty" sum="3aa189ea6ce04dd769abb163f200b109" proved="true" expanded="false">
+    <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof prover="z3" timelimit="3" edited="" obsolete="false">
+     <result status="valid" time="0.04"/>
+    </proof>
+   </goal>
+   <goal name="occ_singleton_eq" sum="a456562b2d9140aa3d0408f260f3b153" proved="true" expanded="false">
+    <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof prover="z3" timelimit="3" edited="" obsolete="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+   </goal>
+   <goal name="occ_singleton_neq" sum="1bb1349605ce59338303a5bc286cd48a" proved="true" expanded="false">
+    <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof prover="z3" timelimit="3" edited="" obsolete="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+   </goal>
+   <goal name="Union_comm" sum="5ebc4990adca08855cf4777c1b490a17" proved="true" expanded="false">
+    <proof prover="coq" timelimit="3" edited="bag_Bag_Union_comm_1.v" obsolete="false">
+     <result status="valid" time="0.44"/>
+    </proof>
+   </goal>
+   <goal name="Union_identity" sum="df255b3efee8484fbcd0a56774c6b09a" proved="true" expanded="false">
+    <proof prover="coq" timelimit="3" edited="bag_Bag_Union_identity_1.v" obsolete="false">
+     <result status="valid" time="0.67"/>
+    </proof>
+   </goal>
+   <goal name="Union_assoc" sum="953591b02d70ba9b542a21afa121e8ec" proved="true" expanded="false">
+    <proof prover="coq" timelimit="3" edited="bag_Bag_Union_assoc_1.v" obsolete="false">
+     <result status="valid" time="0.46"/>
+    </proof>
+   </goal>
+   <goal name="bag_simpl" sum="2e53a70a338e54f9df5ad3b16a14394f" proved="true" expanded="false">
+    <proof prover="coq" timelimit="3" edited="bag_Bag_bag_simpl_1.v" obsolete="false">
+     <result status="valid" time="0.48"/>
+    </proof>
+   </goal>
+   <goal name="occ_add_eq" sum="aa9f5af291d61a5c09421a93661b694c" proved="true" expanded="false">
+    <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof prover="z3" timelimit="3" edited="" obsolete="false">
+     <result status="valid" time="0.04"/>
+    </proof>
+   </goal>
+   <goal name="occ_add_neq" sum="017324a353d8bed4f0819671a3b6e436" proved="true" expanded="false">
+    <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+    <proof prover="z3" timelimit="3" edited="" obsolete="false">
+     <result status="valid" time="0.04"/>
+    </proof>
+   </goal>
+  </theory>
+ </file>
+ <file name="../bag_of_integers.why" verified="true" expanded="false">
+  <theory name="Bag_integers" verified="true" expanded="false">
+   <goal name="Min_bag_union1" sum="fa569f1a28a80cac8f6047e35a9337d3" proved="true" expanded="false">
+    <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+    <proof prover="z3" timelimit="3" edited="" obsolete="false">
+     <result status="valid" time="0.04"/>
+    </proof>
+   </goal>
+   <goal name="Min_bag_union2" sum="04a7f763207b8e399f2edf38f3c410dc" proved="true" expanded="false">
+    <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+    <proof prover="z3" timelimit="3" edited="" obsolete="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+   </goal>
+  </theory>
+ </file>
+ <file name="../elements.why" verified="true" expanded="false">
+  <theory name="Elements" verified="true" expanded="false">
+   <goal name="Elements_union1" sum="6b4b94ff0f0abe34d185561b6d2898a1" proved="true" expanded="false">
+    <proof prover="coq" timelimit="3" edited="elements_Elements_Elements_union1_1.v" obsolete="false">
+     <result status="valid" time="0.45"/>
+    </proof>
+   </goal>
+   <goal name="Elements_union2" sum="694092720c0afdd2eab4252e97217886" proved="true" expanded="false">
+    <proof prover="coq" timelimit="3" edited="elements_Elements_Elements_union2_1.v" obsolete="false">
+     <result status="valid" time="0.57"/>
+    </proof>
+   </goal>
+   <goal name="Elements_set" sum="31bc228c16d3834ad82b80a445650046" proved="true" expanded="false">
+    <proof prover="coq" timelimit="3" edited="elements_Elements_Elements_set_1.v" obsolete="false">
+     <result status="valid" time="0.69"/>
+    </proof>
+   </goal>
+   <goal name="Elements_union3" sum="3161be19e36fb70e1d86565197db1960" proved="true" expanded="false">
+    <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal name="Elements_set2" sum="e8aea153581739442e27a22160ca6b9b" proved="true" expanded="false">
+    <proof prover="coq" timelimit="3" edited="elements_Elements_Elements_set2_1.v" obsolete="false">
+     <result status="valid" time="0.65"/>
+    </proof>
+   </goal>
+  </theory>
+ </file>
+ <file name="../abstract_heap.mlw" verified="true" expanded="false">
+  <theory name="WP AbstractHeap" verified="true" expanded="false">
+  </theory>
+ </file>
+ <file name="../heapsort.mlw" verified="true" expanded="false">
+  <theory name="WP HeapSort" verified="true" expanded="false">
+   <goal name="Min_of_sorted" sum="d2f3720d599856fe0b67a99b147ec6de" proved="true" expanded="false">
+    <proof prover="coq" timelimit="3" edited="heapsort_WP_HeapSort_Min_of_sorted_1.v" obsolete="false">
+     <result status="valid" time="0.64"/>
+    </proof>
+   </goal>
+   <goal name="WP_parameter heapSort" expl="correctness of parameter heapSort" sum="89bf61d9e6983975a89ffd6f7a8d15b1" proved="true" expanded="false">
+    <transf name="split_goal" proved="true" expanded="false">
+     <goal name="WP_parameter heapSort.1" expl="precondition" sum="ce72ea7daeecd5fc8b2375c59c169a18" proved="true" expanded="false">
+      <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof prover="z3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter heapSort.2" expl="normal postcondition" sum="b8c026ff789d307238c1c5c5dcfb4ddb" proved="true" expanded="false">
+      <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.15"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof prover="z3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.06"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter heapSort.3" expl="for loop initialization" sum="a7a486d3e7ebaaa379febafe820804b1" proved="true" expanded="false">
+      <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof prover="z3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter heapSort.4" expl="for loop preservation" sum="716b791a6573ca32efc15ad306cbf6b7" proved="true" expanded="false">
+      <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof prover="z3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter heapSort.5" expl="normal postcondition" sum="d4d10a91594d1530da43b242eb714632" proved="true" expanded="false">
+      <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof prover="z3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter heapSort.6" expl="for loop initialization" sum="bc1c65aaa01e6cfd128ace12a5ce4169" proved="true" expanded="false">
+      <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof prover="z3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.06"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter heapSort.7" expl="for loop preservation" sum="0a1662f7db5d204f5bdd6633282f90fd" proved="true" expanded="false">
+      <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.11"/>
+      </proof>
+      <proof prover="z3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.12"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter heapSort.8" expl="normal postcondition" sum="79425ea5be36fd110e6c461533662b51" proved="true" expanded="false">
+      <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof prover="z3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter heapSort.9" expl="for loop initialization" sum="6fa67011891043a57a402eb804ab5f6a" proved="true" expanded="false">
+      <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.09"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof prover="z3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="1.03"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter heapSort.10" expl="for loop preservation" sum="8ca39cfe6dabd029282bac7eb0ecd0da" proved="true" expanded="false">
+      <transf name="split_goal" proved="true" expanded="false">
+       <goal name="WP_parameter heapSort.10.1" expl="for loop preservation" sum="cf2180ff6ce7f7bf1786e6d482f45c19" proved="true" expanded="false">
+        <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
+         <result status="valid" time="0.05"/>
+        </proof>
+        <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
+         <result status="valid" time="0.04"/>
+        </proof>
+        <proof prover="z3" timelimit="3" edited="" obsolete="false">
+         <result status="valid" time="0.06"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter heapSort.10.2" expl="for loop preservation" sum="86391881474db34b31abf0a4a5e4fb85" proved="true" expanded="false">
+        <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
+         <result status="valid" time="0.06"/>
+        </proof>
+        <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
+         <result status="valid" time="0.04"/>
+        </proof>
+        <proof prover="z3" timelimit="3" edited="" obsolete="false">
+         <result status="valid" time="0.05"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter heapSort.10.3" expl="for loop preservation" sum="8c1c80c2d936db183ef3e70fde577017" proved="true" expanded="false">
+        <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
+         <result status="valid" time="1.79"/>
+        </proof>
+        <proof prover="z3" timelimit="3" edited="" obsolete="false">
+         <result status="valid" time="0.07"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter heapSort.10.4" expl="for loop preservation" sum="b293e744313f042ea47e1524837806df" proved="true" expanded="false">
+        <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
+         <result status="valid" time="0.06"/>
+        </proof>
+        <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
+         <result status="valid" time="0.04"/>
+        </proof>
+        <proof prover="z3" timelimit="3" edited="" obsolete="false">
+         <result status="valid" time="0.06"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter heapSort.10.5" expl="for loop preservation" sum="efd8b5f74f8293938110a8c5607e190c" proved="true" expanded="false">
+        <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
+         <result status="valid" time="0.06"/>
+        </proof>
+        <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof prover="z3" timelimit="3" edited="" obsolete="false">
+         <result status="valid" time="0.05"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter heapSort.10.6" expl="for loop preservation" sum="73a45b11af62d2f1bf85c3f974e9c7dc" proved="true" expanded="false">
+        <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
+         <result status="valid" time="0.06"/>
+        </proof>
+        <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
+         <result status="valid" time="0.03"/>
+        </proof>
+        <proof prover="z3" timelimit="3" edited="" obsolete="false">
+         <result status="valid" time="0.05"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter heapSort.10.7" expl="for loop preservation" sum="2b3aca129428ead34d4e51a3ccaa82af" proved="true" expanded="false">
+        <proof prover="z3" timelimit="3" edited="" obsolete="false">
+         <result status="valid" time="0.08"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter heapSort.10.8" expl="for loop preservation" sum="c3f107ee9472dd05145736bf4613ff84" proved="true" expanded="false">
+        <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
+         <result status="valid" time="0.66"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter heapSort.10.9" expl="for loop preservation" sum="daeca8d30273a2e0c9a337c0a53142b8" proved="true" expanded="false">
+        <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
+         <result status="valid" time="0.07"/>
+        </proof>
+        <proof prover="z3" timelimit="3" edited="" obsolete="false">
+         <result status="valid" time="1.86"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal name="WP_parameter heapSort.11" expl="normal postcondition" sum="7fb86a3904ad83c23ebef14c0a07ca23" proved="true" expanded="false">
+      <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.10"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.06"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+  </theory>
+ </file>
+ <file name="../test_harness.mlw" verified="true" expanded="true">
+  <theory name="WP TestHarness" verified="true" expanded="true">
+   <goal name="WP_parameter testHarness" expl="correctness of parameter testHarness" sum="9bf9a58ff02f674f4f5f98ccdc628cd5" proved="true" expanded="true">
+    <transf name="split_goal" proved="true" expanded="true">
+     <goal name="WP_parameter testHarness.1" expl="precondition" sum="3577cf310d4189b1fc0c281686e58579" proved="true" expanded="true">
+      <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof prover="z3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter testHarness.2" expl="precondition" sum="29678ad56aabcb17bfc46d5cd6bd6024" proved="true" expanded="true">
+      <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof prover="z3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter testHarness.3" expl="precondition" sum="b5eadc88e6559ff1b43cbdb32693ff09" proved="true" expanded="true">
+      <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof prover="z3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter testHarness.4" expl="precondition" sum="433c12e9a0093e7e91ffd4ee623cd741" proved="true" expanded="true">
+      <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof prover="z3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter testHarness.5" expl="assertion" sum="683bb822fa2a4014ab8cb16db12d7b81" proved="true" expanded="true">
+      <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.17"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.06"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter testHarness.6" expl="assertion" sum="4a3a0f1d71d49f31290e456cf87de55f" proved="true" expanded="true">
+      <proof prover="z3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.13"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter testHarness.7" expl="assertion" sum="23bbaf2815454f81e91cf2f622f7386c" proved="true" expanded="true">
+      <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.06"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter testHarness.8" expl="assertion" sum="87ad0f8f7d5ba7eb903c8ee9cf6a1c88" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.58"/>
+      </proof>
+      <proof prover="z3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.13"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter testHarness.9" expl="assertion" sum="831517ebd729bfff55c0b23345b79dad" proved="true" expanded="true">
+      <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter testHarness.10" expl="assertion" sum="17707e1eb34cf6c5a7ca8cfbab478cc6" proved="true" expanded="true">
+      <proof prover="z3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="1.51"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter testHarness.11" expl="assertion" sum="69ff549c83f05f201976a49f23c7da67" proved="true" expanded="true">
+      <proof prover="z3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.15"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+  </theory>
+ </file>
+</why3session>

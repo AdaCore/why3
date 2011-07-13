@@ -1,0 +1,51 @@
+theory Elements
+
+use import int.Int
+use import bag.Bag
+use map.Map as A
+
+type array 'a = A.map int 'a
+
+(* [elements a i j] is the bag of elements in a[i..j[ *)
+
+function elements (a:array 'a) (i j:int) : bag 'a
+
+axiom Elements_empty : forall a:array int, i j:int.
+     i >= j -> (elements a i j) = empty_bag
+
+axiom Elements_singleton : forall a:array int, i j:int.
+     j = i + 1 ->
+       (elements a i j) = (singleton (A.get a i))
+
+axiom Elements_union : forall a:array int, i j k:int.
+     i <= j <= k  ->
+      (elements a i k) = (union (elements a i j) (elements a j k))
+
+lemma Elements_union1 : forall a:array int, i j :int.
+      i < j ->
+      (elements a i j) = (add (A.get a i) (elements a (i+1) j))
+
+lemma Elements_union2 : forall a:array int, i j :int.
+       i < j ->
+       (elements a i j) = (add (A.get a (j-1)) (elements a i (j-1)))
+
+lemma Elements_set : forall a:array int, i j:int.
+       i <= j -> forall k : int. (k < i || k >= j) ->
+       forall e:int. (elements (A.set a k e) i j) = (elements a i j)
+
+lemma Elements_union3 : forall a:array int, i j k:int.
+       i <= j ->
+       (add k (elements a i j)) = (elements (A.set a j k) i (j+1))
+
+lemma Elements_set2 : forall a:array int, i j k:int.
+       i <= k < j ->
+       forall e:int. (add (A.get a k) (elements (A.set a k e) i j)) =
+       	      	     (add e (elements a i j))
+
+end
+
+(*
+Local Variables:
+compile-command: "why3ide -I . proofs"
+End:
+*)

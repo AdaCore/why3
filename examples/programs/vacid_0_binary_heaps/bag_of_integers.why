@@ -1,0 +1,29 @@
+theory Bag_integers
+
+(* minimum element of a bag of integers *)
+
+use import int.Int
+clone import comparison.MinMax with type t = int, predicate ge = Int.(>=)
+
+use export bag.Bag
+
+function min_bag (bag int) : int
+
+axiom Min_bag_singleton : forall x:int. min_bag (singleton x) = x
+
+axiom Min_bag_union : forall x y:bag int.
+      min_bag (union x y) = min (min_bag x) (min_bag y)
+
+lemma Min_bag_union1 : forall x y: bag int, a: int.
+     x = (add a y) -> min_bag x = min a (min_bag y)
+
+lemma Min_bag_union2 : forall x : bag int, a: int.
+     a <= min_bag x -> a <= min_bag (add a x)
+
+end
+
+(*
+Local Variables:
+compile-command: "why3ide -I . proofs"
+End:
+*)

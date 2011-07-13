@@ -1,0 +1,44 @@
+
+module TestHarness
+
+(**** logic declarations *****)
+
+use import int.Int
+use import bag.Bag
+use import bag_of_integers.Bag_integers
+use import elements.Elements
+
+use import module ref.Ref
+use import module heapsort.HeapSort
+use import module array.Array
+
+let testHarness () =
+  let arr = Array.make 3 0 in
+  arr[0] <- 42;
+  arr[1] <- 13;
+  arr[2] <- 42;
+
+  heapSort arr;
+
+  assert { arr[0] <= arr[1] <= arr[2] };
+
+  assert { (elements arr.elts 0 3) =
+        union (singleton 13) (union (singleton 42) (singleton 42)) };
+
+  assert { arr[0] = min_bag (elements arr.elts 0 3) };
+
+  assert { arr[0] = 13 };
+
+  assert { arr[1] = min_bag (elements arr.elts 1 3) };
+
+  assert { arr[1] = 42 };
+
+  assert { arr[2] = 42 }
+
+end
+
+(*
+Local Variables:
+compile-command: "why3ide -I . proofs"
+End:
+*)

@@ -1,0 +1,67 @@
+
+module HeapSort
+
+(**** logic declarations *****)
+use import int.Int
+use import elements.Elements
+use import bag.Bag
+use import bag_of_integers.Bag_integers
+
+use import module ref.Ref
+use import module array.Array
+use import module array.ArraySorted
+use import module abstract_heap.AbstractHeap
+
+lemma Min_of_sorted:
+  forall a:M.map int int, i n :int.
+    0 <= i < n -> (M.sorted_sub a 0 n) ->
+      min_bag (elements a i n) = M.get a i
+
+(* heap sort *)
+
+let heapSort (a : array int) =
+  { length a >= 0 }
+  'Init:
+  let len = length a in
+  let h = create len in
+
+   for i = 0 to len-1 do
+    invariant
+      { 0 <= i <= len /\
+        card (model !h) = i /\
+	model !h = elements a.elts 0 i }
+  insert h a[i]
+  done;
+
+  for i = 0 to len-1 do
+   invariant
+     { 0 <= i <= len /\
+       card (model !h) = len - i /\
+       elements (at a.elts 'Init) 0 len =
+         union (model !h) (elements a.elts 0 i) /\
+       sorted_sub a 0 i /\
+       forall j:int. 0 <= j < i -> a[j] <= min_bag (model !h)
+     }
+   a[i] <- extractMin h;
+   assert { a[i] <=  min_bag (model !h) }
+  done
+  { sorted a /\
+    elements a.elts 0 (length a) =
+      elements (old a.elts) 0 (length a) }
+
+end
+
+(*
+Local Variables:
+compile-command: "why3ide -I . proofs"
+End:
+*)
+
+
+
+
+
+
+
+
+
