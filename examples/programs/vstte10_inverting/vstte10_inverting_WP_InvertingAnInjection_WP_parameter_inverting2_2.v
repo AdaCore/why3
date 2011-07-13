@@ -66,32 +66,40 @@ Definition set1 (a:Type)(a1:(array a)) (i:Z) (v:a): (array a) :=
   end.
 Implicit Arguments set1.
 
-Definition injective(a:(array Z)) (n:Z): Prop := forall (i:Z) (j:Z),
+Definition injective(a:(map Z Z)) (n:Z): Prop := forall (i:Z) (j:Z),
   ((0%Z <= i)%Z /\ (i <  n)%Z) -> (((0%Z <= j)%Z /\ (j <  n)%Z) ->
-  ((~ (i = j)) -> ~ ((get1 a i) = (get1 a j)))).
+  ((~ (i = j)) -> ~ ((get a i) = (get a j)))).
 
-Definition surjective(a:(array Z)) (n:Z): Prop := forall (i:Z),
+Definition surjective(a:(map Z Z)) (n:Z): Prop := forall (i:Z),
   ((0%Z <= i)%Z /\ (i <  n)%Z) -> exists j:Z, ((0%Z <= j)%Z /\ (j <  n)%Z) /\
-  ((get1 a j) = i).
+  ((get a j) = i).
 
-Definition range(a:(array Z)) (n:Z): Prop := forall (i:Z), ((0%Z <= i)%Z /\
-  (i <  n)%Z) -> ((0%Z <= (get1 a i))%Z /\ ((get1 a i) <  n)%Z).
+Definition range(a:(map Z Z)) (n:Z): Prop := forall (i:Z), ((0%Z <= i)%Z /\
+  (i <  n)%Z) -> ((0%Z <= (get a i))%Z /\ ((get a i) <  n)%Z).
 
-Axiom injective_surjective : forall (a:(array Z)) (n:Z), (injective a n) ->
+Axiom injective_surjective : forall (a:(map Z Z)) (n:Z), (injective a n) ->
   ((range a n) -> (surjective a n)).
 
+Definition injective1(a:(array Z)) (n:Z): Prop := (injective (elts a) n).
+
+Definition surjective1(a:(array Z)) (n:Z): Prop := (surjective (elts a) n).
+
+Definition range1(a:(array Z)) (n:Z): Prop := (range (elts a) n).
+
+Axiom injective_surjective1 : forall (a:(array Z)) (n:Z), (injective1 a n) ->
+  ((range1 a n) -> (surjective1 a n)).
+
 Theorem WP_parameter_inverting2 : forall (a:Z), forall (n:Z), forall (a1:(map
-  Z Z)), let a2 := (mk_array a a1) in ((((0%Z <= n)%Z /\ (n = a)) /\
-  ((injective a2 n) /\ (range a2 n))) -> ((0%Z <= n)%Z ->
-  ((0%Z <= (n - 1%Z)%Z)%Z -> forall (b:(map Z Z)), (forall (j:Z),
-  ((0%Z <= j)%Z /\ (j <  ((n - 1%Z)%Z + 1%Z)%Z)%Z) -> ((get b (get a1
-  j)) = j)) -> (injective (mk_array n b) n)))).
+  Z Z)), (((0%Z <= n)%Z /\ (n = a)) /\ ((injective a1 n) /\ (range a1 n))) ->
+  ((0%Z <= n)%Z -> ((0%Z <= (n - 1%Z)%Z)%Z -> forall (b:(map Z Z)),
+  (forall (j:Z), ((0%Z <= j)%Z /\ (j <  ((n - 1%Z)%Z + 1%Z)%Z)%Z) -> ((get b
+  (get a1 j)) = j)) -> (injective b n))).
 (* YOU MAY EDIT THE PROOF BELOW *)
 intuition.
 intuition.
 red; intros.
 unfold get1; simpl.
-assert (surjective (mk_array a a1) n).
+assert (surjective a1 n).
 apply injective_surjective; assumption.
 generalize (H9 i H6); unfold get1; simpl; intros (i1, (Hi1,Hi2)).
 generalize (H9 j H7); unfold get1; simpl; intros (j1, (Hj1,Hj2)).

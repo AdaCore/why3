@@ -51,6 +51,27 @@ theory MapEq
 
 end
 
+theory MapInjection
+
+  use import int.Int
+  use export Map
+
+  predicate injective (a: map int int) (n: int) =
+    forall i j: int. 0 <= i < n -> 0 <= j < n -> i <> j -> a[i] <> a[j]
+
+  predicate surjective (a: map int int) (n: int) =
+    forall i: int. 0 <= i < n -> exists j: int. (0 <= j < n /\ a[j] = i)
+
+  predicate range (a: map int int) (n: int) =
+    forall i: int. 0 <= i < n -> 0 <= a[i] < n
+
+  lemma injective_surjective:
+    forall a: map int int, n: int.
+    injective a n -> range a n -> surjective a n
+
+end
+
+
 theory MapPermut
 
   use import int.Int

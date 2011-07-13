@@ -10,19 +10,13 @@ module InvertingAnInjection
 
   use import int.Int
   use import module array.Array
+  use map.MapInjection as M
 
-  predicate injective (a: array int) (n: int) =
-    forall i j: int. 0 <= i < n -> 0 <= j < n -> i <> j -> a[i] <> a[j]
+  predicate injective (a: array int) (n: int) = M.injective a.elts n
 
-  predicate surjective (a: array int) (n: int) =
-    forall i: int. 0 <= i < n -> exists j: int. (0 <= j < n /\ a[j] = i)
+  predicate surjective (a: array int) (n: int) = M.surjective a.elts n
 
-  predicate range (a: array int) (n: int) =
-    forall i: int. 0 <= i < n -> 0 <= a[i] < n
-
-  lemma injective_surjective:
-    forall a: array int, n: int.
-    injective a n -> range a n -> surjective a n
+  predicate range (a: array int) (n: int) = M.range a.elts n
 
   let inverting (a: array int) (b: array int) (n: int) =
     { 0 <= n = length a = length b /\ injective a n /\ range a n }
