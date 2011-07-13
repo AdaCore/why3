@@ -31,25 +31,25 @@ run_dir () {
     done
 }
 
-# echo "=== Logic ==="
-# run_dir .
-# echo ""
+echo "=== Logic ==="
+run_dir .
+echo ""
 
-# echo "=== BTS ==="
-# run_dir bts
-# echo ""
+echo "=== BTS ==="
+run_dir bts
+echo ""
 
-# echo "=== Programs ==="
-# run_dir programs
-# echo ""
+echo "=== Programs ==="
+run_dir programs
+echo ""
 
 echo "=== Programs in their own subdir ==="
 run_dir programs/vacid_0_binary_heaps "-I programs/vacid_0_binary_heaps"
 echo ""
 
-# echo "=== Check Builtin translation ==="
-# run_dir check-builtin
-# echo ""
+echo "=== Check Builtin translation ==="
+run_dir check-builtin
+echo ""
 
 exit $res
 
