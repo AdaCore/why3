@@ -1,13 +1,10 @@
-(* find a value in a sorted list *)
+(* Find a value in a sorted list of integers *)
 
-module M
+module FindInSortedList
 
   use import int.Int
   use import list.Mem
   use import list.Sorted
-
-  (* FIXME *)
-  lemma Nil_not_Cons : forall x:int, l:list int. Nil <> Cons x l
 
   lemma Sorted_not_mem:
     forall x y : int, l : list int.
@@ -25,6 +22,6 @@ end
 
 (*
 Local Variables:
-compile-command: "unset LANG; make -C ../.. examples/programs/sorted_list"
+compile-command: "unset LANG; make -C ../.. examples/programs/sorted_list.gui"
 End:
 *)
