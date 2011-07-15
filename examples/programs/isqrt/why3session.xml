@@ -2,7 +2,7 @@
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
 <why3session name="examples/programs/isqrt/why3session.xml">
  <file name="../isqrt.mlw" verified="true" expanded="true">
-  <theory name="WP M" verified="true" expanded="true">
+  <theory name="WP Simple" verified="true" expanded="true">
    <goal name="WP_parameter isqrt" expl="correctness of parameter isqrt" sum="71cc23114951a4ecb6b4f3257d65e891" proved="true" expanded="true">
     <proof prover="cvc3" timelimit="2" edited="" obsolete="false">
      <result status="valid" time="0.01"/>
@@ -15,6 +15,42 @@
     <proof prover="z3" timelimit="2" edited="" obsolete="false">
      <result status="valid" time="0.01"/>
     </proof>
+   </goal>
+  </theory>
+  <theory name="WP NewtonMethod" verified="true" expanded="true">
+   <goal name="WP_parameter sqrt" expl="correctness of parameter sqrt" sum="60eaaec813247c8c0f5a815d8255a1ad" proved="true" expanded="true">
+    <transf name="split_goal" proved="true" expanded="true">
+     <goal name="WP_parameter sqrt.1" expl="normal postcondition" sum="bb87fe0b8434e8d093943f1210b71ec5" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter sqrt.2" expl="normal postcondition" sum="84710358cd8ada1454c80929dd0b421a" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter sqrt.3" expl="loop invariant init" sum="c11b288394dbf06ca63d6f183eed8902" proved="true" expanded="true">
+      <proof prover="z3" timelimit="20" edited="" obsolete="false">
+       <result status="valid" time="0.55"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter sqrt.4" expl="loop invariant preservation" sum="635d4755b940a642f5f361e72d63b2ad" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
+       <result status="valid" time="11.31"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter sqrt.5" expl="loop variant decreases" sum="0e4fa9a7a38870c021afae8a4e42ba92" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter sqrt.6" expl="normal postcondition" sum="ee09cf3d584c24c45c524135e3d35bf3" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
+       <result status="valid" time="0.22"/>
+      </proof>
+     </goal>
+    </transf>
    </goal>
   </theory>
  </file>
