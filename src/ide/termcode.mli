@@ -17,7 +17,19 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Why3
+
+(*
 val t_dist : term -> term -> float
   (** returns an heuristic distance between the two given terms. The
       result is always between 0.0 and 1.0. It is guaranteed that if
       the result is 0.0 then the terms are equal modulo alpha *)
+*)
+
+val t_shape_buf : Term.term -> string
+  (** returns a shape of the given term *)
+
+val t_shape_list : Term.term -> string list
+  (** returns a shape of the given term *)
+
+val pr_shape_list : Format.formatter -> Term.term -> unit

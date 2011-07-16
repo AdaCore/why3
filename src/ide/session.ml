@@ -253,6 +253,12 @@ let all_files : file list ref = ref []
 
 let get_all_files () = !all_files
 
+let current_env = ref None
+let current_provers = ref Util.Mstr.empty
+let project_dir = ref ""
+
+let get_provers () = !current_provers
+
 (************************)
 (* saving state on disk *)
 (************************)
@@ -288,8 +294,9 @@ let opt lab fmt = function
   | Some s -> fprintf fmt "%s=\"%s\" " lab s
 
 let rec save_goal fmt g =
-  fprintf fmt "@\n@[<v 1><goal name=\"%s\" %asum=\"%s\" proved=\"%b\" expanded=\"%b\">"
-    g.goal_name (opt "expl") g.goal_expl g.checksum g.proved  g.goal_expanded;
+  fprintf fmt "@\n@[<v 1><goal name=\"%s\" %asum=\"%s\" proved=\"%b\" expanded=\"%b\" shape=\"%s\">"
+    g.goal_name (opt "expl") g.goal_expl g.checksum g.proved  g.goal_expanded
+    (Termcode.t_shape_buf (Task.task_goal_fmla (get_task g)));
   Hashtbl.iter (save_proof_attempt fmt) g.external_proofs;
   Hashtbl.iter (save_trans fmt) g.transformations;
   fprintf fmt "@]@\n</goal>"
@@ -307,9 +314,14 @@ let save_theory fmt t =
   fprintf fmt "@]@\n</theory>"
 
 let save_file fmt f =
-  fprintf fmt "@\n@[<v 1><file name=\"%s\" verified=\"%b\" expanded=\"%b\">" f.file_name f.file_verified f.file_expanded;
+  fprintf fmt "@\n@[<v 1><file name=\"%s\" verified=\"%b\" expanded=\"%b\">"
+    f.file_name f.file_verified f.file_expanded;
   List.iter (save_theory fmt) f.theories;
   fprintf fmt "@]@\n</file>"
+
+let save_prover fmt p =
+  fprintf fmt "@\n@[<v 1><prover id=\"%s\" name=\"%s\" version=\"%s\"/>@]"
+    p.prover_id p.prover_name p.prover_version
 
 let save fname =
   let ch = open_out fname in
@@ -317,6 +329,7 @@ let save fname =
   fprintf fmt "<?xml version=\"1.0\" encoding=\"UTF-8\"?>@\n";
   fprintf fmt "<!DOCTYPE why3session SYSTEM \"why3session.dtd\">@\n";
   fprintf fmt "@[<v 1><why3session name=\"%s\">" fname;
+  Util.Mstr.iter (fun _ d -> save_prover fmt d) (get_provers ());
   List.iter (save_file fmt) (get_all_files());
   fprintf fmt "@]@\n</why3session>";
   fprintf fmt "@.";
@@ -729,11 +742,6 @@ let raw_add_file f exp =
   !notify_fun any;
   mfile
 
-let current_env = ref None
-let current_provers = ref Util.Mstr.empty
-let project_dir = ref ""
-
-let get_provers () = !current_provers
 
 let read_file fn =
   let fn = Filename.concat !project_dir fn in
@@ -1093,13 +1101,18 @@ let int_attribute field r def =
     int_of_string (List.assoc field r.Xml.attributes)
   with Not_found | Invalid_argument _ -> def
 
+let string_attribute field r =
+  try
+    List.assoc field r.Xml.attributes
+  with Not_found ->
+    eprintf "[Error] missing required attribute '%s' from element '%s'@."
+      field r.Xml.name;
+    assert false
+
 let load_result r =
   match r.Xml.name with
     | "result" ->
-        let status =
-          try List.assoc "status" r.Xml.attributes
-          with Not_found -> assert false
-        in
+        let status = string_attribute "status" r in
         let answer =
           match status with
             | "valid" -> Call_provers.Valid
@@ -1109,8 +1122,9 @@ let load_result r =
             | "failure" -> Call_provers.Failure ""
             | "highfailure" -> Call_provers.Failure ""
             | s ->
-                eprintf "Session.load_result: unexpected status '%s'@."  s;
-                assert false
+                eprintf
+                  "[Warning] Session.load_result: unexpected status '%s'@." s;
+                Call_provers.Failure ""
         in
         let time =
           try float_of_string (List.assoc "time" r.Xml.attributes)
@@ -1123,11 +1137,10 @@ let load_result r =
         }
     | "undone" -> Undone
     | s ->
-        eprintf "Session.load_result: unexpected element '%s'@."  s;
-        assert false
+        eprintf "[Warning] Session.load_result: unexpected element '%s'@." s;
+        Undone
 
-
-let rec load_goal ~env parent acc g =
+let rec load_goal ~env ~old_provers parent acc g =
   match g.Xml.name with
     | "goal" ->
         let gname =
@@ -1144,25 +1157,29 @@ let rec load_goal ~env parent acc g =
         in
         let exp = bool_attribute "expanded" g true in
         let mg = raw_add_goal parent gname expl sum None exp in
-        List.iter (load_proof_or_transf ~env mg) g.Xml.elements;
+        List.iter (load_proof_or_transf ~env ~old_provers mg) g.Xml.elements;
         mg::acc
     | s ->
-        eprintf "Session.load_goal: unexpected element '%s'@."  s;
-        assert false
+        eprintf "[Warning] Session.load_goal: unexpected element '%s'@." s;
+        acc
 
-
-and load_proof_or_transf ~env mg a =
+and load_proof_or_transf ~env ~old_provers mg a =
   match a.Xml.name with
     | "proof" ->
         let prover =
           try List.assoc "prover" a.Xml.attributes
           with Not_found -> assert false
         in
-        let p =
+        let prover_obsolete,p =
           try
-            Detected_prover (Util.Mstr.find prover !current_provers)
+            let p = Util.Mstr.find prover !current_provers in
+            try
+              let (n,v) = Util.Mstr.find prover old_provers in
+              (p.prover_name <> n || p.prover_version <> v), Detected_prover p
+            with Not_found ->
+              true, Detected_prover p
           with Not_found ->
-            Undetected_prover prover
+            true, Undetected_prover prover
         in
         let res = match a.Xml.elements with
           | [r] -> load_result r
@@ -1174,6 +1191,7 @@ and load_proof_or_transf ~env mg a =
           with Not_found -> assert false
         in
         let obsolete = bool_attribute "obsolete" a true in
+        let obsolete = obsolete || prover_obsolete in
         let timelimit = int_attribute "timelimit" a 10 in
         let (_ : proof_attempt) =
           raw_add_external_proof ~obsolete ~timelimit ~edit mg p res
@@ -1200,16 +1218,17 @@ and load_proof_or_transf ~env mg a =
         mtr.subgoals <-
           List.rev
           (List.fold_left
-             (load_goal ~env (Parent_transf mtr))
+             (load_goal ~env ~old_provers (Parent_transf mtr))
              [] a.Xml.elements);
         (* already done by raw_add_transformation
            Hashtbl.add mg.transformations trname mtr *)
         ()
     | s ->
-        eprintf "Session.load_proof_or_transf: unexpected element '%s'@."  s;
-        assert false
+        eprintf
+          "[Warning] Session.load_proof_or_transf: unexpected element '%s'@."
+          s
 
-let load_theory ~env mf acc th =
+let load_theory ~env ~old_provers mf acc th =
   match th.Xml.name with
     | "theory" ->
         let thname =
@@ -1221,14 +1240,14 @@ let load_theory ~env mf acc th =
         mth.goals <-
           List.rev
           (List.fold_left
-             (load_goal ~env (Parent_theory mth))
+             (load_goal ~env ~old_provers (Parent_theory mth))
              [] th.Xml.elements);
         mth::acc
     | s ->
-        eprintf "Session.load_theory: unexpected element '%s'@."  s;
-        assert false
+        eprintf "[Warning] Session.load_theory: unexpected element '%s'@." s;
+        acc
 
-let load_file ~env f =
+let load_file ~env old_provers f =
   match f.Xml.name with
     | "file" ->
         let fn =
@@ -1239,19 +1258,38 @@ let load_file ~env f =
         let mf = raw_add_file fn exp in
         mf.theories <-
           List.rev
-          (List.fold_left (load_theory ~env mf) [] f.Xml.elements)
+          (List.fold_left (load_theory ~env ~old_provers mf) [] f.Xml.elements);
+        old_provers
+    | "prover" ->
+        let id = string_attribute "id" f in
+        let name = string_attribute "name" f in
+        let version = string_attribute "version" f in
+        begin
+          try
+            let p = Util.Mstr.find id !current_provers in
+            if p.prover_name <> name || p.prover_version <> version then
+              eprintf
+                "[Warning] Database prover id '%s' = '%s %s' but on this computer '%s' = '%s %s'@."
+                id name version id p.prover_name p.prover_version
+          with Not_found ->
+            eprintf
+              "[Warning] Database has prover %s (%s %s) which is not available on this computer@."
+              id name version;
+        end;
+        Util.Mstr.add id (name,version) old_provers
     | s ->
-        eprintf "Session.load_file: unexpected element '%s'@."  s;
-        assert false
+        eprintf "[Warning] Session.load_file: unexpected element '%s'@." s;
+        old_provers
 
 let load_session ~env xml =
   let cont = xml.Xml.content in
   match cont.Xml.name with
     | "why3session" ->
-        List.iter (load_file ~env) cont.Xml.elements
+        let _old_provers =
+          List.fold_left (load_file ~env) Util.Mstr.empty cont.Xml.elements
+        in ()
     | s ->
-        eprintf "Session.load_session: unexpected element '%s'@."  s;
-        assert false
+        eprintf "[Warning] Session.load_session: unexpected element '%s'@." s
 
 let db_filename = "why3session.xml"
 

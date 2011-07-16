@@ -1,5 +1,10 @@
-<!ELEMENT why3session (file*)>
+<!ELEMENT why3session (prover*, file*)>
 <!ATTLIST why3session name CDATA #REQUIRED>
+
+<!ELEMENT prover EMPTY>
+<!ATTLIST prover id CDATA #REQUIRED>
+<!ATTLIST prover name CDATA #REQUIRED>
+<!ATTLIST prover version CDATA #REQUIRED>
 
 <!ELEMENT file (theory*)>
 <!ATTLIST file name CDATA #REQUIRED>
@@ -16,6 +21,7 @@
 <!ATTLIST goal expl CDATA #IMPLIED>
 <!ATTLIST goal proved CDATA #REQUIRED>
 <!ATTLIST goal sum CDATA #REQUIRED>
+<!ATTLIST goal shape CDATA #IMPLIED>
 <!ATTLIST goal expanded CDATA #IMPLIED>
 
 <!ELEMENT proof (result|undone)>

@@ -1,20 +1,70 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
-<why3session name="proofs/why3session.xml">
+<why3session name="examples/programs/vacid_0_binary_heaps/proofs/why3session.xml">
+ <prover id="alt-ergo" name="Alt-Ergo" version="0.93"/>
+ <prover id="coq" name="Coq" version="8.2pl1"/>
+ <prover id="cvc3" name="CVC3" version="2.2"/>
+ <prover id="gappa" name="Gappa" version="0.13.0"/>
+ <prover id="simplify" name="Simplify" version="1.5.4"/>
+ <prover id="z3" name="Z3" version="2.19"/>
  <file name="../bag.why" verified="true" expanded="false">
   <theory name="Bag" verified="true" expanded="false">
-   <goal name="is_empty" sum="3aa189ea6ce04dd769abb163f200b109" proved="true" expanded="false">
+   <goal name="is_empty" sum="3aa189ea6ce04dd769abb163f200b109" proved="true" expanded="false" shape="Yinfix =V0Yempty_bagIYinfix =Ynb_occV1V0C0WW">
     <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
      <result status="valid" time="0.02"/>
     </proof>
     <proof prover="z3" timelimit="3" edited="" obsolete="false">
-     <result status="valid" time="0.04"/>
+     <result status="valid" time="0.03"/>
     </proof>
    </goal>
-   <goal name="occ_singleton_eq" sum="a456562b2d9140aa3d0408f260f3b153" proved="true" expanded="false">
+   <goal name="occ_singleton_eq" sum="a456562b2d9140aa3d0408f260f3b153" proved="true" expanded="false" shape="Yinfix =Ynb_occV1YsingletonV0C1IYinfix =V0V1W">
+    <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+    <proof prover="z3" timelimit="3" edited="" obsolete="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal name="occ_singleton_neq" sum="1bb1349605ce59338303a5bc286cd48a" proved="true" expanded="false" shape="Yinfix =Ynb_occV1YsingletonV0C0IYinfix =V0V1NW">
     <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
      <result status="valid" time="0.01"/>
     </proof>
+    <proof prover="z3" timelimit="3" edited="" obsolete="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal name="Union_comm" sum="5ebc4990adca08855cf4777c1b490a17" proved="true" expanded="false" shape="Yinfix =YunionV0V1YunionV1V0W">
+    <proof prover="coq" timelimit="3" edited="bag_Bag_Union_comm_1.v" obsolete="false">
+     <result status="valid" time="0.83"/>
+    </proof>
+   </goal>
+   <goal name="Union_identity" sum="df255b3efee8484fbcd0a56774c6b09a" proved="true" expanded="false" shape="Yinfix =YunionV0Yempty_bagV0W">
+    <proof prover="coq" timelimit="3" edited="bag_Bag_Union_identity_1.v" obsolete="false">
+     <result status="valid" time="0.86"/>
+    </proof>
+   </goal>
+   <goal name="Union_assoc" sum="953591b02d70ba9b542a21afa121e8ec" proved="true" expanded="false" shape="Yinfix =YunionV0YunionV1V2YunionYunionV0V1V2W">
+    <proof prover="coq" timelimit="3" edited="bag_Bag_Union_assoc_1.v" obsolete="false">
+     <result status="valid" time="0.85"/>
+    </proof>
+   </goal>
+   <goal name="bag_simpl" sum="2e53a70a338e54f9df5ad3b16a14394f" proved="true" expanded="false" shape="Yinfix =V0V2IYinfix =YunionV0V1YunionV2V1W">
+    <proof prover="coq" timelimit="3" edited="bag_Bag_bag_simpl_1.v" obsolete="false">
+     <result status="valid" time="0.88"/>
+    </proof>
+   </goal>
+   <goal name="occ_add_eq" sum="aa9f5af291d61a5c09421a93661b694c" proved="true" expanded="false" shape="Yinfix =Ynb_occV1YaddV1V0Yinfix +Ynb_occV1V0C1IYinfix =V1V2W">
+    <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof prover="z3" timelimit="3" edited="" obsolete="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+   </goal>
+   <goal name="occ_add_neq" sum="017324a353d8bed4f0819671a3b6e436" proved="true" expanded="false" shape="Yinfix =Ynb_occV2YaddV1V0Ynb_occV2V0IYinfix =V1V2NW">
     <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
      <result status="valid" time="0.00"/>
     </proof>
@@ -22,68 +72,24 @@
      <result status="valid" time="0.03"/>
     </proof>
    </goal>
-   <goal name="occ_singleton_neq" sum="1bb1349605ce59338303a5bc286cd48a" proved="true" expanded="false">
-    <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof prover="z3" timelimit="3" edited="" obsolete="false">
-     <result status="valid" time="0.03"/>
-    </proof>
-   </goal>
-   <goal name="Union_comm" sum="5ebc4990adca08855cf4777c1b490a17" proved="true" expanded="false">
-    <proof prover="coq" timelimit="3" edited="bag_Bag_Union_comm_1.v" obsolete="false">
-     <result status="valid" time="0.44"/>
-    </proof>
-   </goal>
-   <goal name="Union_identity" sum="df255b3efee8484fbcd0a56774c6b09a" proved="true" expanded="false">
-    <proof prover="coq" timelimit="3" edited="bag_Bag_Union_identity_1.v" obsolete="false">
-     <result status="valid" time="0.67"/>
-    </proof>
-   </goal>
-   <goal name="Union_assoc" sum="953591b02d70ba9b542a21afa121e8ec" proved="true" expanded="false">
-    <proof prover="coq" timelimit="3" edited="bag_Bag_Union_assoc_1.v" obsolete="false">
-     <result status="valid" time="0.46"/>
-    </proof>
-   </goal>
-   <goal name="bag_simpl" sum="2e53a70a338e54f9df5ad3b16a14394f" proved="true" expanded="false">
-    <proof prover="coq" timelimit="3" edited="bag_Bag_bag_simpl_1.v" obsolete="false">
-     <result status="valid" time="0.48"/>
-    </proof>
-   </goal>
-   <goal name="occ_add_eq" sum="aa9f5af291d61a5c09421a93661b694c" proved="true" expanded="false">
-    <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof prover="z3" timelimit="3" edited="" obsolete="false">
-     <result status="valid" time="0.04"/>
-    </proof>
-   </goal>
-   <goal name="occ_add_neq" sum="017324a353d8bed4f0819671a3b6e436" proved="true" expanded="false">
-    <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
-     <result status="valid" time="0.03"/>
-    </proof>
-    <proof prover="z3" timelimit="3" edited="" obsolete="false">
-     <result status="valid" time="0.04"/>
-    </proof>
-   </goal>
   </theory>
  </file>
  <file name="../bag_of_integers.why" verified="true" expanded="false">
   <theory name="Bag_integers" verified="true" expanded="false">
-   <goal name="Min_bag_union1" sum="fa569f1a28a80cac8f6047e35a9337d3" proved="true" expanded="false">
+   <goal name="Min_bag_union1" sum="fa569f1a28a80cac8f6047e35a9337d3" proved="true" expanded="false" shape="Yinfix =Ymin_bagV0YminV2Ymin_bagV1IYinfix =V0YaddV2V1W">
     <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
-     <result status="valid" time="0.03"/>
+     <result status="valid" time="0.02"/>
     </proof>
     <proof prover="z3" timelimit="3" edited="" obsolete="false">
-     <result status="valid" time="0.04"/>
+     <result status="valid" time="0.03"/>
     </proof>
    </goal>
-   <goal name="Min_bag_union2" sum="04a7f763207b8e399f2edf38f3c410dc" proved="true" expanded="false">
+   <goal name="Min_bag_union2" sum="04a7f763207b8e399f2edf38f3c410dc" proved="true" expanded="false" shape="Yinfix <=V1Ymin_bagYaddV1V0IYinfix <=V1Ymin_bagV0W">
     <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
      <result status="valid" time="0.02"/>
     </proof>
     <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
-     <result status="valid" time="0.03"/>
+     <result status="valid" time="0.01"/>
     </proof>
     <proof prover="z3" timelimit="3" edited="" obsolete="false">
      <result status="valid" time="0.03"/>
@@ -93,29 +99,29 @@
  </file>
  <file name="../elements.why" verified="true" expanded="false">
   <theory name="Elements" verified="true" expanded="false">
-   <goal name="Elements_union1" sum="6b4b94ff0f0abe34d185561b6d2898a1" proved="true" expanded="false">
+   <goal name="Elements_union1" sum="6b4b94ff0f0abe34d185561b6d2898a1" proved="true" expanded="false" shape="Yinfix =YelementsV0V1V2YaddYgetV0V1YelementsV0Yinfix +V1C1V2IYinfix <V1V2W">
     <proof prover="coq" timelimit="3" edited="elements_Elements_Elements_union1_1.v" obsolete="false">
-     <result status="valid" time="0.45"/>
+     <result status="valid" time="0.60"/>
     </proof>
    </goal>
-   <goal name="Elements_union2" sum="694092720c0afdd2eab4252e97217886" proved="true" expanded="false">
+   <goal name="Elements_union2" sum="694092720c0afdd2eab4252e97217886" proved="true" expanded="false" shape="Yinfix =YelementsV0V1V2YaddYgetV0Yinfix -V2C1YelementsV0V1Yinfix -V2C1IYinfix <V1V2W">
     <proof prover="coq" timelimit="3" edited="elements_Elements_Elements_union2_1.v" obsolete="false">
-     <result status="valid" time="0.57"/>
+     <result status="valid" time="0.60"/>
     </proof>
    </goal>
-   <goal name="Elements_set" sum="31bc228c16d3834ad82b80a445650046" proved="true" expanded="false">
+   <goal name="Elements_set" sum="31bc228c16d3834ad82b80a445650046" proved="true" expanded="false" shape="Yinfix =YelementsYsetV0V3V4V1V2YelementsV0V1V2WIYinfix >=V3V2OYinfix <V3V1WIYinfix <=V1V2W">
     <proof prover="coq" timelimit="3" edited="elements_Elements_Elements_set_1.v" obsolete="false">
-     <result status="valid" time="0.69"/>
+     <result status="valid" time="0.75"/>
     </proof>
    </goal>
-   <goal name="Elements_union3" sum="3161be19e36fb70e1d86565197db1960" proved="true" expanded="false">
+   <goal name="Elements_union3" sum="3161be19e36fb70e1d86565197db1960" proved="true" expanded="false" shape="Yinfix =YaddV3YelementsV0V1V2YelementsYsetV0V2V3V1Yinfix +V2C1IYinfix <=V1V2W">
     <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
-     <result status="valid" time="0.02"/>
+     <result status="valid" time="0.03"/>
     </proof>
    </goal>
-   <goal name="Elements_set2" sum="e8aea153581739442e27a22160ca6b9b" proved="true" expanded="false">
+   <goal name="Elements_set2" sum="e8aea153581739442e27a22160ca6b9b" proved="true" expanded="false" shape="Yinfix =YaddYgetV0V3YelementsYsetV0V3V4V1V2YaddV4YelementsV0V1V2WIYinfix <V3V2AYinfix <=V1V3W">
     <proof prover="coq" timelimit="3" edited="elements_Elements_Elements_set2_1.v" obsolete="false">
-     <result status="valid" time="0.65"/>
+     <result status="valid" time="0.62"/>
     </proof>
    </goal>
   </theory>
@@ -126,16 +132,16 @@
  </file>
  <file name="../heapsort.mlw" verified="true" expanded="false">
   <theory name="WP HeapSort" verified="true" expanded="false">
-   <goal name="Min_of_sorted" sum="d2f3720d599856fe0b67a99b147ec6de" proved="true" expanded="false">
+   <goal name="Min_of_sorted" sum="d2f3720d599856fe0b67a99b147ec6de" proved="true" expanded="false" shape="Yinfix =Ymin_bagYelementsV0V1V2YgetV0V1IYsorted_subV0C0V2IYinfix <V1V2AYinfix <=C0V1W">
     <proof prover="coq" timelimit="3" edited="heapsort_WP_HeapSort_Min_of_sorted_1.v" obsolete="false">
-     <result status="valid" time="0.64"/>
+     <result status="valid" time="0.91"/>
     </proof>
    </goal>
-   <goal name="WP_parameter heapSort" expl="correctness of parameter heapSort" sum="89bf61d9e6983975a89ffd6f7a8d15b1" proved="true" expanded="false">
+   <goal name="WP_parameter heapSort" expl="correctness of parameter heapSort" sum="89bf61d9e6983975a89ffd6f7a8d15b1" proved="true" expanded="false" shape="LYmk arrayV0V1Yinfix =YelementsV6C0V0YelementsV1C0V0AYsortedYmk arrayV0V6IYinfix <=YgetV6V7Ymin_bagYmodelV5IYinfix <V7Yinfix +Yinfix -V0C1C1AYinfix <=C0V7WAYsorted_subV6C0Yinfix +Yinfix -V0C1C1AYinfix =YelementsV1C0V0YunionYmodelV5YelementsV6C0Yinfix +Yinfix -V0C1C1AYinfix =YcardYmodelV5Yinfix -V0Yinfix +Yinfix -V0C1C1AYinfix <=Yinfix +Yinfix -V0C1C1V0AYinfix <=C0Yinfix +Yinfix -V0C1C1AYinfix <=YgetV11V12Ymin_bagYmodelV9IYinfix <V12Yinfix +V8C1AYinfix <=C0V12WAYsorted_subV11C0Yinfix +V8C1AYinfix =YelementsV1C0V0YunionYmodelV9YelementsV11C0Yinfix +V8C1AYinfix =YcardYmodelV9Yinfix -V0Yinfix +V8C1AYinfix <=Yinfix +V8C1V0AYinfix <=C0Yinfix +V8C1AYinfix <=YgetV11V8Ymin_bagYmodelV9IYinfix =V11YsetV6V8V10WAYinfix <V8V0AYinfix <=C0V8IYinfix =YcardYmodelV5Yinfix +YcardYmodelV9C1AYinfix =YmodelV5YaddV10YmodelV9AYinfix =V10Ymin_bagYmodelV5WWAYinfix =YmodelV5Yempty_bagNIYinfix <=YgetV6V13Ymin_bagYmodelV5IYinfix <V13V8AYinfix <=C0V13WAYsorted_subV6C0V8AYinfix =YelementsV1C0V0YunionYmodelV5YelementsV6C0V8AYinfix =YcardYmodelV5Yinfix -V0V8AYinfix <=V8V0AYinfix <=C0V8IYinfix <=V8Yinfix -V0C1AYinfix <=C0V8WWWAYinfix <=YgetV1V14Ymin_bagYmodelV4IYinfix <V14C0AYinfix <=C0V14WAYsorted_subV1C0C0AYinfix =YelementsV1C0V0YunionYmodelV4YelementsV1C0C0AYinfix =YcardYmodelV4Yinfix -V0C0AYinfix <=C0V0AYinfix <=C0C0IYinfix <=C0Yinfix -V0C1AYinfix =YelementsV1C0V0YelementsV1C0V0AYsortedV2IYinfix >C0Yinfix -V0C1IYinfix =YmodelV4YelementsV1C0Yinfix +Yinfix -V0C1C1AYinfix =YcardYmodelV4Yinfix +Yinfix -V0C1C1AYinfix <=Yinfix +Yinfix -V0C1C1V0AYinfix <=C0Yinfix +Yinfix -V0C1C1AYinfix =YmodelV16YelementsV1C0Yinfix +V15C1AYinfix =YcardYmodelV16Yinfix +V15C1AYinfix <=Yinfix +V15C1V0AYinfix <=C0Yinfix +V15C1IYinfix =YmodelV16YaddYgetV1V15YmodelV4WAYinfix <V15V0AYinfix <=C0V15IYinfix =YmodelV4YelementsV1C0V15AYinfix =YcardYmodelV4V15AYinfix <=V15V0AYinfix <=C0V15IYinfix <=V15Yinfix -V0C1AYinfix <=C0V15WWAYinfix =YmodelV3YelementsV1C0C0AYinfix =YcardYmodelV3C0AYinfix <=C0V0AYinfix <=C0C0IYinfix <=C0Yinfix -V0C1AYinfix =YelementsV18C0V0YelementsV1C0V0AYsortedYmk arrayV0V18IYinfix <=YgetV18V19Ymin_bagYmodelV17IYinfix <V19Yinfix +Yinfix -V0C1C1AYinfix <=C0V19WAYsorted_subV18C0Yinfix +Yinfix -V0C1C1AYinfix =YelementsV1C0V0YunionYmodelV17YelementsV18C0Yinfix +Yinfix -V0C1C1AYinfix =YcardYmodelV17Yinfix -V0Yinfix +Yinfix -V0C1C1AYinfix <=Yinfix +Yinfix -V0C1C1V0AYinfix <=C0Yinfix +Yinfix -V0C1C1AYinfix <=YgetV23V24Ymin_bagYmodelV21IYinfix <V24Yinfix +V20C1AYinfix <=C0V24WAYsorted_subV23C0Yinfix +V20C1AYinfix =YelementsV1C0V0YunionYmodelV21YelementsV23C0Yinfix +V20C1AYinfix =YcardYmodelV21Yinfix -V0Yinfix +V20C1AYinfix <=Yinfix +V20C1V0AYinfix <=C0Yinfix +V20C1AYinfix <=YgetV23V20Ymin_bagYmodelV21IYinfix =V23YsetV18V20V22WAYinfix <V20V0AYinfix <=C0V20IYinfix =YcardYmodelV17Yinfix +YcardYmodelV21C1AYinfix =YmodelV17YaddV22YmodelV21AYinfix =V22Ymin_bagYmodelV17WWAYinfix =YmodelV17Yempty_bagNIYinfix <=YgetV18V25Ymin_bagYmodelV17IYinfix <V25V20AYinfix <=C0V25WAYsorted_subV18C0V20AYinfix =YelementsV1C0V0YunionYmodelV17YelementsV18C0V20AYinfix =YcardYmodelV17Yinfix -V0V20AYinfix <=V20V0AYinfix <=C0V20IYinfix <=V20Yinfix -V0C1AYinfix <=C0V20WWWAYinfix <=YgetV1V26Ymin_bagYmodelV3IYinfix <V26C0AYinfix <=C0V26WAYsorted_subV1C0C0AYinfix =YelementsV1C0V0YunionYmodelV3YelementsV1C0C0AYinfix =YcardYmodelV3Yinfix -V0C0AYinfix <=C0V0AYinfix <=C0C0IYinfix <=C0Yinfix -V0C1AYinfix =YelementsV1C0V0YelementsV1C0V0AYsortedV2IYinfix >C0Yinfix -V0C1IYinfix >C0Yinfix -V0C1IYinfix =YmodelV3Yempty_bagWAYinfix <=C0V0IYinfix >=V0C0WW">
     <transf name="split_goal" proved="true" expanded="false">
-     <goal name="WP_parameter heapSort.1" expl="precondition" sum="ce72ea7daeecd5fc8b2375c59c169a18" proved="true" expanded="false">
+     <goal name="WP_parameter heapSort.1" expl="precondition" sum="ce72ea7daeecd5fc8b2375c59c169a18" proved="true" expanded="false" shape="LYmk arrayV0V1Yinfix <=C0V0IYinfix >=V0C0WW">
       <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
-       <result status="valid" time="0.03"/>
+       <result status="valid" time="0.02"/>
       </proof>
       <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
        <result status="valid" time="0.02"/>
@@ -144,107 +150,96 @@
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal name="WP_parameter heapSort.2" expl="normal postcondition" sum="b8c026ff789d307238c1c5c5dcfb4ddb" proved="true" expanded="false">
-      <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
-       <result status="valid" time="0.15"/>
-      </proof>
-      <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof prover="z3" timelimit="3" edited="" obsolete="false">
-       <result status="valid" time="0.06"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter heapSort.3" expl="for loop initialization" sum="a7a486d3e7ebaaa379febafe820804b1" proved="true" expanded="false">
-      <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
-       <result status="valid" time="0.04"/>
-      </proof>
-      <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
-       <result status="valid" time="0.03"/>
-      </proof>
-      <proof prover="z3" timelimit="3" edited="" obsolete="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter heapSort.4" expl="for loop preservation" sum="716b791a6573ca32efc15ad306cbf6b7" proved="true" expanded="false">
-      <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
-       <result status="valid" time="0.04"/>
-      </proof>
-      <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof prover="z3" timelimit="3" edited="" obsolete="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter heapSort.5" expl="normal postcondition" sum="d4d10a91594d1530da43b242eb714632" proved="true" expanded="false">
-      <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
-       <result status="valid" time="0.03"/>
-      </proof>
-      <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof prover="z3" timelimit="3" edited="" obsolete="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter heapSort.6" expl="for loop initialization" sum="bc1c65aaa01e6cfd128ace12a5ce4169" proved="true" expanded="false">
-      <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
-       <result status="valid" time="0.03"/>
-      </proof>
-      <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof prover="z3" timelimit="3" edited="" obsolete="false">
-       <result status="valid" time="0.06"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter heapSort.7" expl="for loop preservation" sum="0a1662f7db5d204f5bdd6633282f90fd" proved="true" expanded="false">
-      <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
-       <result status="valid" time="0.11"/>
-      </proof>
-      <proof prover="z3" timelimit="3" edited="" obsolete="false">
-       <result status="valid" time="0.12"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter heapSort.8" expl="normal postcondition" sum="79425ea5be36fd110e6c461533662b51" proved="true" expanded="false">
-      <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
-       <result status="valid" time="0.04"/>
-      </proof>
-      <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
-       <result status="valid" time="0.03"/>
-      </proof>
-      <proof prover="z3" timelimit="3" edited="" obsolete="false">
-       <result status="valid" time="0.05"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter heapSort.9" expl="for loop initialization" sum="6fa67011891043a57a402eb804ab5f6a" proved="true" expanded="false">
+     <goal name="WP_parameter heapSort.2" expl="normal postcondition" sum="b8c026ff789d307238c1c5c5dcfb4ddb" proved="true" expanded="false" shape="LYmk arrayV0V1Yinfix =YelementsV1C0V0YelementsV1C0V0AYsortedV2IYinfix >C0Yinfix -V0C1IYinfix >C0Yinfix -V0C1IYinfix =YmodelV3Yempty_bagWIYinfix <=C0V0IYinfix >=V0C0WW">
       <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
        <result status="valid" time="0.09"/>
       </proof>
       <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof prover="z3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter heapSort.3" expl="for loop initialization" sum="a7a486d3e7ebaaa379febafe820804b1" proved="true" expanded="false" shape="LYmk arrayV0V1Yinfix <=YgetV1V4Ymin_bagYmodelV3IYinfix <V4C0AYinfix <=C0V4WAYsorted_subV1C0C0AYinfix =YelementsV1C0V0YunionYmodelV3YelementsV1C0C0AYinfix =YcardYmodelV3Yinfix -V0C0AYinfix <=C0V0AYinfix <=C0C0IYinfix <=C0Yinfix -V0C1IYinfix >C0Yinfix -V0C1IYinfix =YmodelV3Yempty_bagWIYinfix <=C0V0IYinfix >=V0C0WW">
+      <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof prover="z3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter heapSort.4" expl="for loop preservation" sum="716b791a6573ca32efc15ad306cbf6b7" proved="true" expanded="false" shape="LYmk arrayV0V1Yinfix <=YgetV9V10Ymin_bagYmodelV7IYinfix <V10Yinfix +V6C1AYinfix <=C0V10WAYsorted_subV9C0Yinfix +V6C1AYinfix =YelementsV1C0V0YunionYmodelV7YelementsV9C0Yinfix +V6C1AYinfix =YcardYmodelV7Yinfix -V0Yinfix +V6C1AYinfix <=Yinfix +V6C1V0AYinfix <=C0Yinfix +V6C1AYinfix <=YgetV9V6Ymin_bagYmodelV7IYinfix =V9YsetV5V6V8WAYinfix <V6V0AYinfix <=C0V6IYinfix =YcardYmodelV4Yinfix +YcardYmodelV7C1AYinfix =YmodelV4YaddV8YmodelV7AYinfix =V8Ymin_bagYmodelV4WWAYinfix =YmodelV4Yempty_bagNIYinfix <=YgetV5V11Ymin_bagYmodelV4IYinfix <V11V6AYinfix <=C0V11WAYsorted_subV5C0V6AYinfix =YelementsV1C0V0YunionYmodelV4YelementsV5C0V6AYinfix =YcardYmodelV4Yinfix -V0V6AYinfix <=V6V0AYinfix <=C0V6IYinfix <=V6Yinfix -V0C1AYinfix <=C0V6WWWIYinfix <=C0Yinfix -V0C1IYinfix >C0Yinfix -V0C1IYinfix =YmodelV3Yempty_bagWIYinfix <=C0V0IYinfix >=V0C0WW">
+      <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof prover="z3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter heapSort.5" expl="normal postcondition" sum="d4d10a91594d1530da43b242eb714632" proved="true" expanded="false" shape="LYmk arrayV0V1Yinfix =YelementsV5C0V0YelementsV1C0V0AYsortedYmk arrayV0V5IYinfix <=YgetV5V6Ymin_bagYmodelV4IYinfix <V6Yinfix +Yinfix -V0C1C1AYinfix <=C0V6WAYsorted_subV5C0Yinfix +Yinfix -V0C1C1AYinfix =YelementsV1C0V0YunionYmodelV4YelementsV5C0Yinfix +Yinfix -V0C1C1AYinfix =YcardYmodelV4Yinfix -V0Yinfix +Yinfix -V0C1C1AYinfix <=Yinfix +Yinfix -V0C1C1V0AYinfix <=C0Yinfix +Yinfix -V0C1C1WWIYinfix <=C0Yinfix -V0C1IYinfix >C0Yinfix -V0C1IYinfix =YmodelV3Yempty_bagWIYinfix <=C0V0IYinfix >=V0C0WW">
+      <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof prover="z3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter heapSort.6" expl="for loop initialization" sum="bc1c65aaa01e6cfd128ace12a5ce4169" proved="true" expanded="false" shape="LYmk arrayV0V1Yinfix =YmodelV3YelementsV1C0C0AYinfix =YcardYmodelV3C0AYinfix <=C0V0AYinfix <=C0C0IYinfix <=C0Yinfix -V0C1IYinfix =YmodelV3Yempty_bagWIYinfix <=C0V0IYinfix >=V0C0WW">
+      <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof prover="z3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter heapSort.7" expl="for loop preservation" sum="0a1662f7db5d204f5bdd6633282f90fd" proved="true" expanded="false" shape="LYmk arrayV0V1Yinfix =YmodelV6YelementsV1C0Yinfix +V5C1AYinfix =YcardYmodelV6Yinfix +V5C1AYinfix <=Yinfix +V5C1V0AYinfix <=C0Yinfix +V5C1IYinfix =YmodelV6YaddYgetV1V5YmodelV4WAYinfix <V5V0AYinfix <=C0V5IYinfix =YmodelV4YelementsV1C0V5AYinfix =YcardYmodelV4V5AYinfix <=V5V0AYinfix <=C0V5IYinfix <=V5Yinfix -V0C1AYinfix <=C0V5WWIYinfix <=C0Yinfix -V0C1IYinfix =YmodelV3Yempty_bagWIYinfix <=C0V0IYinfix >=V0C0WW">
+      <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.11"/>
+      </proof>
+      <proof prover="z3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.07"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter heapSort.8" expl="normal postcondition" sum="79425ea5be36fd110e6c461533662b51" proved="true" expanded="false" shape="LYmk arrayV0V1Yinfix =YelementsV1C0V0YelementsV1C0V0AYsortedV2IYinfix >C0Yinfix -V0C1IYinfix =YmodelV4YelementsV1C0Yinfix +Yinfix -V0C1C1AYinfix =YcardYmodelV4Yinfix +Yinfix -V0C1C1AYinfix <=Yinfix +Yinfix -V0C1C1V0AYinfix <=C0Yinfix +Yinfix -V0C1C1WIYinfix <=C0Yinfix -V0C1IYinfix =YmodelV3Yempty_bagWIYinfix <=C0V0IYinfix >=V0C0WW">
+      <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof prover="z3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter heapSort.9" expl="for loop initialization" sum="6fa67011891043a57a402eb804ab5f6a" proved="true" expanded="false" shape="LYmk arrayV0V1Yinfix <=YgetV1V5Ymin_bagYmodelV4IYinfix <V5C0AYinfix <=C0V5WAYsorted_subV1C0C0AYinfix =YelementsV1C0V0YunionYmodelV4YelementsV1C0C0AYinfix =YcardYmodelV4Yinfix -V0C0AYinfix <=C0V0AYinfix <=C0C0IYinfix <=C0Yinfix -V0C1IYinfix =YmodelV4YelementsV1C0Yinfix +Yinfix -V0C1C1AYinfix =YcardYmodelV4Yinfix +Yinfix -V0C1C1AYinfix <=Yinfix +Yinfix -V0C1C1V0AYinfix <=C0Yinfix +Yinfix -V0C1C1WIYinfix <=C0Yinfix -V0C1IYinfix =YmodelV3Yempty_bagWIYinfix <=C0V0IYinfix >=V0C0WW">
+      <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.06"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
        <result status="valid" time="0.04"/>
       </proof>
       <proof prover="z3" timelimit="3" edited="" obsolete="false">
-       <result status="valid" time="1.03"/>
+       <result status="valid" time="0.69"/>
       </proof>
      </goal>
-     <goal name="WP_parameter heapSort.10" expl="for loop preservation" sum="8ca39cfe6dabd029282bac7eb0ecd0da" proved="true" expanded="false">
+     <goal name="WP_parameter heapSort.10" expl="for loop preservation" sum="8ca39cfe6dabd029282bac7eb0ecd0da" proved="true" expanded="false" shape="LYmk arrayV0V1Yinfix <=YgetV10V11Ymin_bagYmodelV8IYinfix <V11Yinfix +V7C1AYinfix <=C0V11WAYsorted_subV10C0Yinfix +V7C1AYinfix =YelementsV1C0V0YunionYmodelV8YelementsV10C0Yinfix +V7C1AYinfix =YcardYmodelV8Yinfix -V0Yinfix +V7C1AYinfix <=Yinfix +V7C1V0AYinfix <=C0Yinfix +V7C1AYinfix <=YgetV10V7Ymin_bagYmodelV8IYinfix =V10YsetV6V7V9WAYinfix <V7V0AYinfix <=C0V7IYinfix =YcardYmodelV5Yinfix +YcardYmodelV8C1AYinfix =YmodelV5YaddV9YmodelV8AYinfix =V9Ymin_bagYmodelV5WWAYinfix =YmodelV5Yempty_bagNIYinfix <=YgetV6V12Ymin_bagYmodelV5IYinfix <V12V7AYinfix <=C0V12WAYsorted_subV6C0V7AYinfix =YelementsV1C0V0YunionYmodelV5YelementsV6C0V7AYinfix =YcardYmodelV5Yinfix -V0V7AYinfix <=V7V0AYinfix <=C0V7IYinfix <=V7Yinfix -V0C1AYinfix <=C0V7WWWIYinfix <=C0Yinfix -V0C1IYinfix =YmodelV4YelementsV1C0Yinfix +Yinfix -V0C1C1AYinfix =YcardYmodelV4Yinfix +Yinfix -V0C1C1AYinfix <=Yinfix +Yinfix -V0C1C1V0AYinfix <=C0Yinfix +Yinfix -V0C1C1WIYinfix <=C0Yinfix -V0C1IYinfix =YmodelV3Yempty_bagWIYinfix <=C0V0IYinfix >=V0C0WW">
       <transf name="split_goal" proved="true" expanded="false">
-       <goal name="WP_parameter heapSort.10.1" expl="for loop preservation" sum="cf2180ff6ce7f7bf1786e6d482f45c19" proved="true" expanded="false">
+       <goal name="WP_parameter heapSort.10.1" expl="for loop preservation" sum="cf2180ff6ce7f7bf1786e6d482f45c19" proved="true" expanded="false" shape="LYmk arrayV0V1Yinfix =YmodelV5Yempty_bagNIYinfix <=YgetV6V8Ymin_bagYmodelV5IYinfix <V8V7AYinfix <=C0V8WAYsorted_subV6C0V7AYinfix =YelementsV1C0V0YunionYmodelV5YelementsV6C0V7AYinfix =YcardYmodelV5Yinfix -V0V7AYinfix <=V7V0AYinfix <=C0V7IYinfix <=V7Yinfix -V0C1AYinfix <=C0V7WWWIYinfix <=C0Yinfix -V0C1IYinfix =YmodelV4YelementsV1C0Yinfix +Yinfix -V0C1C1AYinfix =YcardYmodelV4Yinfix +Yinfix -V0C1C1AYinfix <=Yinfix +Yinfix -V0C1C1V0AYinfix <=C0Yinfix +Yinfix -V0C1C1WIYinfix <=C0Yinfix -V0C1IYinfix =YmodelV3Yempty_bagWIYinfix <=C0V0IYinfix >=V0C0WW">
         <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
          <result status="valid" time="0.05"/>
-        </proof>
-        <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
-         <result status="valid" time="0.04"/>
-        </proof>
-        <proof prover="z3" timelimit="3" edited="" obsolete="false">
-         <result status="valid" time="0.06"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter heapSort.10.2" expl="for loop preservation" sum="86391881474db34b31abf0a4a5e4fb85" proved="true" expanded="false">
-        <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
-         <result status="valid" time="0.06"/>
         </proof>
         <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
          <result status="valid" time="0.04"/>
@@ -253,73 +248,84 @@
          <result status="valid" time="0.05"/>
         </proof>
        </goal>
-       <goal name="WP_parameter heapSort.10.3" expl="for loop preservation" sum="8c1c80c2d936db183ef3e70fde577017" proved="true" expanded="false">
+       <goal name="WP_parameter heapSort.10.2" expl="for loop preservation" sum="86391881474db34b31abf0a4a5e4fb85" proved="true" expanded="false" shape="LYmk arrayV0V1Yinfix <V7V0AYinfix <=C0V7IYinfix =YcardYmodelV5Yinfix +YcardYmodelV8C1AYinfix =YmodelV5YaddV9YmodelV8AYinfix =V9Ymin_bagYmodelV5WWIYinfix =YmodelV5Yempty_bagNIYinfix <=YgetV6V10Ymin_bagYmodelV5IYinfix <V10V7AYinfix <=C0V10WAYsorted_subV6C0V7AYinfix =YelementsV1C0V0YunionYmodelV5YelementsV6C0V7AYinfix =YcardYmodelV5Yinfix -V0V7AYinfix <=V7V0AYinfix <=C0V7IYinfix <=V7Yinfix -V0C1AYinfix <=C0V7WWWIYinfix <=C0Yinfix -V0C1IYinfix =YmodelV4YelementsV1C0Yinfix +Yinfix -V0C1C1AYinfix =YcardYmodelV4Yinfix +Yinfix -V0C1C1AYinfix <=Yinfix +Yinfix -V0C1C1V0AYinfix <=C0Yinfix +Yinfix -V0C1C1WIYinfix <=C0Yinfix -V0C1IYinfix =YmodelV3Yempty_bagWIYinfix <=C0V0IYinfix >=V0C0WW">
         <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
-         <result status="valid" time="1.79"/>
-        </proof>
-        <proof prover="z3" timelimit="3" edited="" obsolete="false">
-         <result status="valid" time="0.07"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter heapSort.10.4" expl="for loop preservation" sum="b293e744313f042ea47e1524837806df" proved="true" expanded="false">
-        <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
-         <result status="valid" time="0.06"/>
-        </proof>
-        <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
-         <result status="valid" time="0.04"/>
-        </proof>
-        <proof prover="z3" timelimit="3" edited="" obsolete="false">
-         <result status="valid" time="0.06"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter heapSort.10.5" expl="for loop preservation" sum="efd8b5f74f8293938110a8c5607e190c" proved="true" expanded="false">
-        <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
-         <result status="valid" time="0.06"/>
+         <result status="valid" time="0.03"/>
         </proof>
         <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
          <result status="valid" time="0.02"/>
         </proof>
         <proof prover="z3" timelimit="3" edited="" obsolete="false">
-         <result status="valid" time="0.05"/>
+         <result status="valid" time="0.04"/>
         </proof>
        </goal>
-       <goal name="WP_parameter heapSort.10.6" expl="for loop preservation" sum="73a45b11af62d2f1bf85c3f974e9c7dc" proved="true" expanded="false">
+       <goal name="WP_parameter heapSort.10.3" expl="for loop preservation" sum="8c1c80c2d936db183ef3e70fde577017" proved="true" expanded="false" shape="LYmk arrayV0V1Yinfix <=YgetV10V7Ymin_bagYmodelV8IYinfix =V10YsetV6V7V9WIYinfix <V7V0AYinfix <=C0V7IYinfix =YcardYmodelV5Yinfix +YcardYmodelV8C1AYinfix =YmodelV5YaddV9YmodelV8AYinfix =V9Ymin_bagYmodelV5WWIYinfix =YmodelV5Yempty_bagNIYinfix <=YgetV6V11Ymin_bagYmodelV5IYinfix <V11V7AYinfix <=C0V11WAYsorted_subV6C0V7AYinfix =YelementsV1C0V0YunionYmodelV5YelementsV6C0V7AYinfix =YcardYmodelV5Yinfix -V0V7AYinfix <=V7V0AYinfix <=C0V7IYinfix <=V7Yinfix -V0C1AYinfix <=C0V7WWWIYinfix <=C0Yinfix -V0C1IYinfix =YmodelV4YelementsV1C0Yinfix +Yinfix -V0C1C1AYinfix =YcardYmodelV4Yinfix +Yinfix -V0C1C1AYinfix <=Yinfix +Yinfix -V0C1C1V0AYinfix <=C0Yinfix +Yinfix -V0C1C1WIYinfix <=C0Yinfix -V0C1IYinfix =YmodelV3Yempty_bagWIYinfix <=C0V0IYinfix >=V0C0WW">
         <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
+         <result status="valid" time="1.41"/>
+        </proof>
+        <proof prover="z3" timelimit="3" edited="" obsolete="false">
+         <result status="valid" time="0.07"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter heapSort.10.4" expl="for loop preservation" sum="b293e744313f042ea47e1524837806df" proved="true" expanded="false" shape="LYmk arrayV0V1Yinfix <=C0Yinfix +V7C1IYinfix <=YgetV10V7Ymin_bagYmodelV8IYinfix =V10YsetV6V7V9WIYinfix <V7V0AYinfix <=C0V7IYinfix =YcardYmodelV5Yinfix +YcardYmodelV8C1AYinfix =YmodelV5YaddV9YmodelV8AYinfix =V9Ymin_bagYmodelV5WWIYinfix =YmodelV5Yempty_bagNIYinfix <=YgetV6V11Ymin_bagYmodelV5IYinfix <V11V7AYinfix <=C0V11WAYsorted_subV6C0V7AYinfix =YelementsV1C0V0YunionYmodelV5YelementsV6C0V7AYinfix =YcardYmodelV5Yinfix -V0V7AYinfix <=V7V0AYinfix <=C0V7IYinfix <=V7Yinfix -V0C1AYinfix <=C0V7WWWIYinfix <=C0Yinfix -V0C1IYinfix =YmodelV4YelementsV1C0Yinfix +Yinfix -V0C1C1AYinfix =YcardYmodelV4Yinfix +Yinfix -V0C1C1AYinfix <=Yinfix +Yinfix -V0C1C1V0AYinfix <=C0Yinfix +Yinfix -V0C1C1WIYinfix <=C0Yinfix -V0C1IYinfix =YmodelV3Yempty_bagWIYinfix <=C0V0IYinfix >=V0C0WW">
+        <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
+         <result status="valid" time="0.05"/>
+        </proof>
+        <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
+         <result status="valid" time="0.05"/>
+        </proof>
+        <proof prover="z3" timelimit="3" edited="" obsolete="false">
          <result status="valid" time="0.06"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter heapSort.10.5" expl="for loop preservation" sum="efd8b5f74f8293938110a8c5607e190c" proved="true" expanded="false" shape="LYmk arrayV0V1Yinfix <=Yinfix +V7C1V0IYinfix <=YgetV10V7Ymin_bagYmodelV8IYinfix =V10YsetV6V7V9WIYinfix <V7V0AYinfix <=C0V7IYinfix =YcardYmodelV5Yinfix +YcardYmodelV8C1AYinfix =YmodelV5YaddV9YmodelV8AYinfix =V9Ymin_bagYmodelV5WWIYinfix =YmodelV5Yempty_bagNIYinfix <=YgetV6V11Ymin_bagYmodelV5IYinfix <V11V7AYinfix <=C0V11WAYsorted_subV6C0V7AYinfix =YelementsV1C0V0YunionYmodelV5YelementsV6C0V7AYinfix =YcardYmodelV5Yinfix -V0V7AYinfix <=V7V0AYinfix <=C0V7IYinfix <=V7Yinfix -V0C1AYinfix <=C0V7WWWIYinfix <=C0Yinfix -V0C1IYinfix =YmodelV4YelementsV1C0Yinfix +Yinfix -V0C1C1AYinfix =YcardYmodelV4Yinfix +Yinfix -V0C1C1AYinfix <=Yinfix +Yinfix -V0C1C1V0AYinfix <=C0Yinfix +Yinfix -V0C1C1WIYinfix <=C0Yinfix -V0C1IYinfix =YmodelV3Yempty_bagWIYinfix <=C0V0IYinfix >=V0C0WW">
+        <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
+         <result status="valid" time="0.04"/>
         </proof>
         <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
          <result status="valid" time="0.03"/>
         </proof>
         <proof prover="z3" timelimit="3" edited="" obsolete="false">
+         <result status="valid" time="0.04"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter heapSort.10.6" expl="for loop preservation" sum="73a45b11af62d2f1bf85c3f974e9c7dc" proved="true" expanded="false" shape="LYmk arrayV0V1Yinfix =YcardYmodelV8Yinfix -V0Yinfix +V7C1IYinfix <=YgetV10V7Ymin_bagYmodelV8IYinfix =V10YsetV6V7V9WIYinfix <V7V0AYinfix <=C0V7IYinfix =YcardYmodelV5Yinfix +YcardYmodelV8C1AYinfix =YmodelV5YaddV9YmodelV8AYinfix =V9Ymin_bagYmodelV5WWIYinfix =YmodelV5Yempty_bagNIYinfix <=YgetV6V11Ymin_bagYmodelV5IYinfix <V11V7AYinfix <=C0V11WAYsorted_subV6C0V7AYinfix =YelementsV1C0V0YunionYmodelV5YelementsV6C0V7AYinfix =YcardYmodelV5Yinfix -V0V7AYinfix <=V7V0AYinfix <=C0V7IYinfix <=V7Yinfix -V0C1AYinfix <=C0V7WWWIYinfix <=C0Yinfix -V0C1IYinfix =YmodelV4YelementsV1C0Yinfix +Yinfix -V0C1C1AYinfix =YcardYmodelV4Yinfix +Yinfix -V0C1C1AYinfix <=Yinfix +Yinfix -V0C1C1V0AYinfix <=C0Yinfix +Yinfix -V0C1C1WIYinfix <=C0Yinfix -V0C1IYinfix =YmodelV3Yempty_bagWIYinfix <=C0V0IYinfix >=V0C0WW">
+        <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
+         <result status="valid" time="0.04"/>
+        </proof>
+        <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof prover="z3" timelimit="3" edited="" obsolete="false">
+         <result status="valid" time="0.04"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter heapSort.10.7" expl="for loop preservation" sum="2b3aca129428ead34d4e51a3ccaa82af" proved="true" expanded="false" shape="LYmk arrayV0V1Yinfix =YelementsV1C0V0YunionYmodelV8YelementsV10C0Yinfix +V7C1IYinfix <=YgetV10V7Ymin_bagYmodelV8IYinfix =V10YsetV6V7V9WIYinfix <V7V0AYinfix <=C0V7IYinfix =YcardYmodelV5Yinfix +YcardYmodelV8C1AYinfix =YmodelV5YaddV9YmodelV8AYinfix =V9Ymin_bagYmodelV5WWIYinfix =YmodelV5Yempty_bagNIYinfix <=YgetV6V11Ymin_bagYmodelV5IYinfix <V11V7AYinfix <=C0V11WAYsorted_subV6C0V7AYinfix =YelementsV1C0V0YunionYmodelV5YelementsV6C0V7AYinfix =YcardYmodelV5Yinfix -V0V7AYinfix <=V7V0AYinfix <=C0V7IYinfix <=V7Yinfix -V0C1AYinfix <=C0V7WWWIYinfix <=C0Yinfix -V0C1IYinfix =YmodelV4YelementsV1C0Yinfix +Yinfix -V0C1C1AYinfix =YcardYmodelV4Yinfix +Yinfix -V0C1C1AYinfix <=Yinfix +Yinfix -V0C1C1V0AYinfix <=C0Yinfix +Yinfix -V0C1C1WIYinfix <=C0Yinfix -V0C1IYinfix =YmodelV3Yempty_bagWIYinfix <=C0V0IYinfix >=V0C0WW">
+        <proof prover="z3" timelimit="3" edited="" obsolete="false">
          <result status="valid" time="0.05"/>
         </proof>
        </goal>
-       <goal name="WP_parameter heapSort.10.7" expl="for loop preservation" sum="2b3aca129428ead34d4e51a3ccaa82af" proved="true" expanded="false">
-        <proof prover="z3" timelimit="3" edited="" obsolete="false">
-         <result status="valid" time="0.08"/>
+       <goal name="WP_parameter heapSort.10.8" expl="for loop preservation" sum="c3f107ee9472dd05145736bf4613ff84" proved="true" expanded="false" shape="LYmk arrayV0V1Ysorted_subV10C0Yinfix +V7C1IYinfix <=YgetV10V7Ymin_bagYmodelV8IYinfix =V10YsetV6V7V9WIYinfix <V7V0AYinfix <=C0V7IYinfix =YcardYmodelV5Yinfix +YcardYmodelV8C1AYinfix =YmodelV5YaddV9YmodelV8AYinfix =V9Ymin_bagYmodelV5WWIYinfix =YmodelV5Yempty_bagNIYinfix <=YgetV6V11Ymin_bagYmodelV5IYinfix <V11V7AYinfix <=C0V11WAYsorted_subV6C0V7AYinfix =YelementsV1C0V0YunionYmodelV5YelementsV6C0V7AYinfix =YcardYmodelV5Yinfix -V0V7AYinfix <=V7V0AYinfix <=C0V7IYinfix <=V7Yinfix -V0C1AYinfix <=C0V7WWWIYinfix <=C0Yinfix -V0C1IYinfix =YmodelV4YelementsV1C0Yinfix +Yinfix -V0C1C1AYinfix =YcardYmodelV4Yinfix +Yinfix -V0C1C1AYinfix <=Yinfix +Yinfix -V0C1C1V0AYinfix <=C0Yinfix +Yinfix -V0C1C1WIYinfix <=C0Yinfix -V0C1IYinfix =YmodelV3Yempty_bagWIYinfix <=C0V0IYinfix >=V0C0WW">
+        <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
+         <result status="valid" time="0.57"/>
         </proof>
        </goal>
-       <goal name="WP_parameter heapSort.10.8" expl="for loop preservation" sum="c3f107ee9472dd05145736bf4613ff84" proved="true" expanded="false">
+       <goal name="WP_parameter heapSort.10.9" expl="for loop preservation" sum="daeca8d30273a2e0c9a337c0a53142b8" proved="true" expanded="false" shape="LYmk arrayV0V1Yinfix <=YgetV10V11Ymin_bagYmodelV8IYinfix <V11Yinfix +V7C1AYinfix <=C0V11WIYinfix <=YgetV10V7Ymin_bagYmodelV8IYinfix =V10YsetV6V7V9WIYinfix <V7V0AYinfix <=C0V7IYinfix =YcardYmodelV5Yinfix +YcardYmodelV8C1AYinfix =YmodelV5YaddV9YmodelV8AYinfix =V9Ymin_bagYmodelV5WWIYinfix =YmodelV5Yempty_bagNIYinfix <=YgetV6V12Ymin_bagYmodelV5IYinfix <V12V7AYinfix <=C0V12WAYsorted_subV6C0V7AYinfix =YelementsV1C0V0YunionYmodelV5YelementsV6C0V7AYinfix =YcardYmodelV5Yinfix -V0V7AYinfix <=V7V0AYinfix <=C0V7IYinfix <=V7Yinfix -V0C1AYinfix <=C0V7WWWIYinfix <=C0Yinfix -V0C1IYinfix =YmodelV4YelementsV1C0Yinfix +Yinfix -V0C1C1AYinfix =YcardYmodelV4Yinfix +Yinfix -V0C1C1AYinfix <=Yinfix +Yinfix -V0C1C1V0AYinfix <=C0Yinfix +Yinfix -V0C1C1WIYinfix <=C0Yinfix -V0C1IYinfix =YmodelV3Yempty_bagWIYinfix <=C0V0IYinfix >=V0C0WW">
         <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
-         <result status="valid" time="0.66"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter heapSort.10.9" expl="for loop preservation" sum="daeca8d30273a2e0c9a337c0a53142b8" proved="true" expanded="false">
-        <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
-         <result status="valid" time="0.07"/>
+         <result status="valid" time="0.06"/>
         </proof>
         <proof prover="z3" timelimit="3" edited="" obsolete="false">
-         <result status="valid" time="1.86"/>
+         <result status="valid" time="1.48"/>
         </proof>
        </goal>
       </transf>
      </goal>
-     <goal name="WP_parameter heapSort.11" expl="normal postcondition" sum="7fb86a3904ad83c23ebef14c0a07ca23" proved="true" expanded="false">
+     <goal name="WP_parameter heapSort.11" expl="normal postcondition" sum="7fb86a3904ad83c23ebef14c0a07ca23" proved="true" expanded="false" shape="LYmk arrayV0V1Yinfix =YelementsV6C0V0YelementsV1C0V0AYsortedYmk arrayV0V6IYinfix <=YgetV6V7Ymin_bagYmodelV5IYinfix <V7Yinfix +Yinfix -V0C1C1AYinfix <=C0V7WAYsorted_subV6C0Yinfix +Yinfix -V0C1C1AYinfix =YelementsV1C0V0YunionYmodelV5YelementsV6C0Yinfix +Yinfix -V0C1C1AYinfix =YcardYmodelV5Yinfix -V0Yinfix +Yinfix -V0C1C1AYinfix <=Yinfix +Yinfix -V0C1C1V0AYinfix <=C0Yinfix +Yinfix -V0C1C1WWIYinfix <=C0Yinfix -V0C1IYinfix =YmodelV4YelementsV1C0Yinfix +Yinfix -V0C1C1AYinfix =YcardYmodelV4Yinfix +Yinfix -V0C1C1AYinfix <=Yinfix +Yinfix -V0C1C1V0AYinfix <=C0Yinfix +Yinfix -V0C1C1WIYinfix <=C0Yinfix -V0C1IYinfix =YmodelV3Yempty_bagWIYinfix <=C0V0IYinfix >=V0C0WW">
       <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
-       <result status="valid" time="0.10"/>
+       <result status="valid" time="0.07"/>
       </proof>
       <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
-       <result status="valid" time="0.06"/>
+       <result status="valid" time="0.07"/>
       </proof>
      </goal>
     </transf>
@@ -328,11 +334,22 @@
  </file>
  <file name="../test_harness.mlw" verified="true" expanded="false">
   <theory name="WP TestHarness" verified="true" expanded="false">
-   <goal name="WP_parameter testHarness" expl="correctness of parameter testHarness" sum="f02720f70bcb802728fa773feb0c1ae0" proved="true" expanded="false">
+   <goal name="WP_parameter testHarness" expl="correctness of parameter testHarness" sum="f02720f70bcb802728fa773feb0c1ae0" proved="true" expanded="false" shape="Yinfix =YgetV3C2C42AYinfix =YgetV3C1C42AYinfix =YgetV3C1Ymin_bagYelementsV3C1C3AYinfix =YgetV3C0C13AYinfix =YgetV3C0Ymin_bagYelementsV3C0C3AYinfix =YelementsV3C0C3YunionYsingletonC13YunionYsingletonC42YsingletonC42AYinfix <=YgetV3C1YgetV3C2AYinfix <=YgetV3C0YgetV3C1IYinfix =YelementsV3C0C3YelementsV2C0C3AYsortedYmk arrayC3V3WAYinfix >=C3C0IYinfix =V2YsetV1C2C42WAYinfix <C2C3AYinfix <=C0C2IYinfix =V1YsetV0C1C13WAYinfix <C1C3AYinfix <=C0C1IYinfix =V0YsetYconstC0C0C42WAYinfix <C0C3AYinfix <=C0C0AYinfix >=C3C0">
     <transf name="split_goal" proved="true" expanded="false">
-     <goal name="WP_parameter testHarness.1" expl="precondition" sum="eb63d9e9f3585d807610d9f6beac9bb1" proved="true" expanded="false">
+     <goal name="WP_parameter testHarness.1" expl="precondition" sum="eb63d9e9f3585d807610d9f6beac9bb1" proved="true" expanded="false" shape="Yinfix >=C3C0">
       <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
-       <result status="valid" time="0.04"/>
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof prover="z3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter testHarness.2" expl="precondition" sum="692fb1c3ceba7a0d7b2259138bdde378" proved="true" expanded="false" shape="Yinfix <C0C3AYinfix <=C0C0IYinfix >=C3C0">
+      <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
       </proof>
       <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
        <result status="valid" time="0.02"/>
@@ -341,9 +358,20 @@
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal name="WP_parameter testHarness.2" expl="precondition" sum="692fb1c3ceba7a0d7b2259138bdde378" proved="true" expanded="false">
+     <goal name="WP_parameter testHarness.3" expl="precondition" sum="f3469d84de5cabe46004f8661a8b2b9c" proved="true" expanded="false" shape="Yinfix <C1C3AYinfix <=C0C1IYinfix =V0YsetYconstC0C0C42WIYinfix <C0C3AYinfix <=C0C0IYinfix >=C3C0">
       <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
-       <result status="valid" time="0.04"/>
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof prover="z3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter testHarness.4" expl="precondition" sum="446680484efa46e51716fbe5de7a8fba" proved="true" expanded="false" shape="Yinfix <C2C3AYinfix <=C0C2IYinfix =V1YsetV0C1C13WIYinfix <C1C3AYinfix <=C0C1IYinfix =V0YsetYconstC0C0C42WIYinfix <C0C3AYinfix <=C0C0IYinfix >=C3C0">
+      <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
       </proof>
       <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
        <result status="valid" time="0.02"/>
@@ -352,9 +380,9 @@
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal name="WP_parameter testHarness.3" expl="precondition" sum="f3469d84de5cabe46004f8661a8b2b9c" proved="true" expanded="false">
+     <goal name="WP_parameter testHarness.5" expl="precondition" sum="edb204133fe560539e6ed5514bd6f4f4" proved="true" expanded="false" shape="Yinfix >=C3C0IYinfix =V2YsetV1C2C42WIYinfix <C2C3AYinfix <=C0C2IYinfix =V1YsetV0C1C13WIYinfix <C1C3AYinfix <=C0C1IYinfix =V0YsetYconstC0C0C42WIYinfix <C0C3AYinfix <=C0C0IYinfix >=C3C0">
       <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
-       <result status="valid" time="0.04"/>
+       <result status="valid" time="0.03"/>
       </proof>
       <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
        <result status="valid" time="0.02"/>
@@ -363,71 +391,49 @@
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal name="WP_parameter testHarness.4" expl="precondition" sum="446680484efa46e51716fbe5de7a8fba" proved="true" expanded="false">
+     <goal name="WP_parameter testHarness.6" expl="assertion" sum="31226dc65dfdbefea1542f0c08af62a8" proved="true" expanded="false" shape="Yinfix <=YgetV3C1YgetV3C2AYinfix <=YgetV3C0YgetV3C1IYinfix =YelementsV3C0C3YelementsV2C0C3AYsortedYmk arrayC3V3WIYinfix >=C3C0IYinfix =V2YsetV1C2C42WIYinfix <C2C3AYinfix <=C0C2IYinfix =V1YsetV0C1C13WIYinfix <C1C3AYinfix <=C0C1IYinfix =V0YsetYconstC0C0C42WIYinfix <C0C3AYinfix <=C0C0IYinfix >=C3C0">
+      <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.11"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.07"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter testHarness.7" expl="assertion" sum="fcd970a315e129a50f4a1dfd79ade5c3" proved="true" expanded="false" shape="Yinfix =YelementsV3C0C3YunionYsingletonC13YunionYsingletonC42YsingletonC42IYinfix <=YgetV3C1YgetV3C2AYinfix <=YgetV3C0YgetV3C1IYinfix =YelementsV3C0C3YelementsV2C0C3AYsortedYmk arrayC3V3WIYinfix >=C3C0IYinfix =V2YsetV1C2C42WIYinfix <C2C3AYinfix <=C0C2IYinfix =V1YsetV0C1C13WIYinfix <C1C3AYinfix <=C0C1IYinfix =V0YsetYconstC0C0C42WIYinfix <C0C3AYinfix <=C0C0IYinfix >=C3C0">
+      <proof prover="z3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.08"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter testHarness.8" expl="assertion" sum="7aa05a6097354f0613236a4092b830bb" proved="true" expanded="false" shape="Yinfix =YgetV3C0Ymin_bagYelementsV3C0C3IYinfix =YelementsV3C0C3YunionYsingletonC13YunionYsingletonC42YsingletonC42IYinfix <=YgetV3C1YgetV3C2AYinfix <=YgetV3C0YgetV3C1IYinfix =YelementsV3C0C3YelementsV2C0C3AYsortedYmk arrayC3V3WIYinfix >=C3C0IYinfix =V2YsetV1C2C42WIYinfix <C2C3AYinfix <=C0C2IYinfix =V1YsetV0C1C13WIYinfix <C1C3AYinfix <=C0C1IYinfix =V0YsetYconstC0C0C42WIYinfix <C0C3AYinfix <=C0C0IYinfix >=C3C0">
       <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
        <result status="valid" time="0.04"/>
       </proof>
       <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof prover="z3" timelimit="3" edited="" obsolete="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.05"/>
       </proof>
      </goal>
-     <goal name="WP_parameter testHarness.5" expl="precondition" sum="edb204133fe560539e6ed5514bd6f4f4" proved="true" expanded="false">
+     <goal name="WP_parameter testHarness.9" expl="assertion" sum="b3573f6b21552e59421b359c792866e3" proved="true" expanded="false" shape="Yinfix =YgetV3C0C13IYinfix =YgetV3C0Ymin_bagYelementsV3C0C3IYinfix =YelementsV3C0C3YunionYsingletonC13YunionYsingletonC42YsingletonC42IYinfix <=YgetV3C1YgetV3C2AYinfix <=YgetV3C0YgetV3C1IYinfix =YelementsV3C0C3YelementsV2C0C3AYsortedYmk arrayC3V3WIYinfix >=C3C0IYinfix =V2YsetV1C2C42WIYinfix <C2C3AYinfix <=C0C2IYinfix =V1YsetV0C1C13WIYinfix <C1C3AYinfix <=C0C1IYinfix =V0YsetYconstC0C0C42WIYinfix <C0C3AYinfix <=C0C0IYinfix >=C3C0">
+      <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.52"/>
+      </proof>
+      <proof prover="z3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.12"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter testHarness.10" expl="assertion" sum="b8e76c18e73c31dabc1732a65a66b464" proved="true" expanded="false" shape="Yinfix =YgetV3C1Ymin_bagYelementsV3C1C3IYinfix =YgetV3C0C13IYinfix =YgetV3C0Ymin_bagYelementsV3C0C3IYinfix =YelementsV3C0C3YunionYsingletonC13YunionYsingletonC42YsingletonC42IYinfix <=YgetV3C1YgetV3C2AYinfix <=YgetV3C0YgetV3C1IYinfix =YelementsV3C0C3YelementsV2C0C3AYsortedYmk arrayC3V3WIYinfix >=C3C0IYinfix =V2YsetV1C2C42WIYinfix <C2C3AYinfix <=C0C2IYinfix =V1YsetV0C1C13WIYinfix <C1C3AYinfix <=C0C1IYinfix =V0YsetYconstC0C0C42WIYinfix <C0C3AYinfix <=C0C0IYinfix >=C3C0">
       <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
        <result status="valid" time="0.04"/>
       </proof>
       <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.05"/>
       </proof>
+     </goal>
+     <goal name="WP_parameter testHarness.11" expl="assertion" sum="622210295d298e88d2e0bb451fda108d" proved="true" expanded="false" shape="Yinfix =YgetV3C1C42IYinfix =YgetV3C1Ymin_bagYelementsV3C1C3IYinfix =YgetV3C0C13IYinfix =YgetV3C0Ymin_bagYelementsV3C0C3IYinfix =YelementsV3C0C3YunionYsingletonC13YunionYsingletonC42YsingletonC42IYinfix <=YgetV3C1YgetV3C2AYinfix <=YgetV3C0YgetV3C1IYinfix =YelementsV3C0C3YelementsV2C0C3AYsortedYmk arrayC3V3WIYinfix >=C3C0IYinfix =V2YsetV1C2C42WIYinfix <C2C3AYinfix <=C0C2IYinfix =V1YsetV0C1C13WIYinfix <C1C3AYinfix <=C0C1IYinfix =V0YsetYconstC0C0C42WIYinfix <C0C3AYinfix <=C0C0IYinfix >=C3C0">
       <proof prover="z3" timelimit="3" edited="" obsolete="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.84"/>
       </proof>
      </goal>
-     <goal name="WP_parameter testHarness.6" expl="assertion" sum="31226dc65dfdbefea1542f0c08af62a8" proved="true" expanded="false">
-      <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
-       <result status="valid" time="0.19"/>
-      </proof>
-      <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
-       <result status="valid" time="0.06"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter testHarness.7" expl="assertion" sum="fcd970a315e129a50f4a1dfd79ade5c3" proved="true" expanded="false">
-      <proof prover="z3" timelimit="3" edited="" obsolete="false">
-       <result status="valid" time="0.13"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter testHarness.8" expl="assertion" sum="7aa05a6097354f0613236a4092b830bb" proved="true" expanded="false">
-      <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
-       <result status="valid" time="0.06"/>
-      </proof>
-      <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
-       <result status="valid" time="0.09"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter testHarness.9" expl="assertion" sum="b3573f6b21552e59421b359c792866e3" proved="true" expanded="false">
-      <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
-       <result status="valid" time="0.70"/>
-      </proof>
-      <proof prover="z3" timelimit="3" edited="" obsolete="false">
-       <result status="valid" time="0.13"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter testHarness.10" expl="assertion" sum="b8e76c18e73c31dabc1732a65a66b464" proved="true" expanded="false">
-      <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
-       <result status="valid" time="0.06"/>
-      </proof>
-      <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
-       <result status="valid" time="0.04"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter testHarness.11" expl="assertion" sum="622210295d298e88d2e0bb451fda108d" proved="true" expanded="false">
-      <proof prover="z3" timelimit="3" edited="" obsolete="false">
-       <result status="valid" time="1.48"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter testHarness.12" expl="assertion" sum="98396ad9599534f76d993608b45c8b04" proved="true" expanded="false">
+     <goal name="WP_parameter testHarness.12" expl="assertion" sum="98396ad9599534f76d993608b45c8b04" proved="true" expanded="false" shape="Yinfix =YgetV3C2C42IYinfix =YgetV3C1C42IYinfix =YgetV3C1Ymin_bagYelementsV3C1C3IYinfix =YgetV3C0C13IYinfix =YgetV3C0Ymin_bagYelementsV3C0C3IYinfix =YelementsV3C0C3YunionYsingletonC13YunionYsingletonC42YsingletonC42IYinfix <=YgetV3C1YgetV3C2AYinfix <=YgetV3C0YgetV3C1IYinfix =YelementsV3C0C3YelementsV2C0C3AYsortedYmk arrayC3V3WIYinfix >=C3C0IYinfix =V2YsetV1C2C42WIYinfix <C2C3AYinfix <=C0C2IYinfix =V1YsetV0C1C13WIYinfix <C1C3AYinfix <=C0C1IYinfix =V0YsetYconstC0C0C42WIYinfix <C0C3AYinfix <=C0C0IYinfix >=C3C0">
       <proof prover="z3" timelimit="3" edited="" obsolete="false">
        <result status="valid" time="0.10"/>
       </proof>

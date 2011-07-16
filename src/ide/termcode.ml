@@ -17,7 +17,231 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Why3
+open Ty
+open Term
+
+
+(* similarity code of terms, or of "shapes"
+
+example:
+
+  shape(forall x:int, x * x >= 0) =
+         Forall(Int,App(infix_gteq,App(infix_st,Tvar 0,Tvar 0),Const(0)))
+       i.e: de bruijn indexes, first-order term
+
+*)
+
+let const_shape ~push acc c =
+  let b = Buffer.create 17 in
+  Format.bprintf b "%a" Pretty.print_const c;
+  push (Buffer.contents b) acc
+
+let var_shape _v : string = assert false
+
+let vs_rename_alpha c h vs = incr c; Mvs.add vs !c h
+let vl_rename_alpha c h vl = List.fold_left (vs_rename_alpha c) h vl
+
+let pat_shape _c _m _acc _p = assert false
+
+let tag_and = "A"
+let tag_if = "B"
+let tag_const = "C"
+let tag_eps = "E"
+let tag_false = "F"
+let tag_impl = "I"
+let tag_let = "L"
+let tag_not = "N"
+let tag_or = "O"
+let tag_iff = "Q"
+let tag_case = "S"
+let tag_true = "T"
+let tag_var = "V"
+let tag_forall = "W"
+let tag_exists = "X"
+let tag_app = "Y"
+
+(*
+
+  [t_shape t] provides a traversal of the term structure, generally
+  in the order root-left-right, except for nodes Tquant and Tbin
+  which are traversed in the order right-root-left, so that in "A ->
+  B" we see B first, and if "Forall x,A" we see A first
+
+*)
+
+let rec t_shape ~(push:string->'a->'a) c m (acc:'a) t : 'a =
+  let fn = t_shape ~push c m in
+  match t.t_node with
+    | Tconst c -> const_shape ~push (push tag_const acc) c
+    | Tvar v ->
+        let x =
+          try
+            string_of_int (Mvs.find v m)
+          with Not_found -> var_shape v
+        in
+        push x (push tag_var acc)
+    | Tapp (s,l) ->
+        List.fold_left fn
+          (push (s.ls_name.Ident.id_string) (push tag_app acc))
+          l
+    | Tif (f,t1,t2) -> fn (fn (fn (push tag_if acc) f) t1) t2
+    | Tlet (t1,b) ->
+        let u,t2 = t_open_bound b in
+        let m = vs_rename_alpha c m u in
+        t_shape ~push c m (fn (push tag_let acc) t1) t2
+    | Tcase (t1,bl) ->
+        let br_shape acc b =
+          let p,t2 = t_open_branch b in
+          let m = pat_shape c m acc p in
+          t_shape ~push c m acc t2
+        in
+        List.fold_left br_shape (fn (push tag_case acc) t1) bl
+    | Teps b ->
+        let u,f = t_open_bound b in
+        let m = vs_rename_alpha c m u in
+        t_shape ~push c m (push tag_eps acc) f
+    | Tquant (q,b) ->
+        let vl,_,f1 = t_open_quant b in
+        let m = vl_rename_alpha c m vl in
+        let hq = match q with Tforall -> tag_forall | Texists -> tag_exists in
+        push hq (t_shape ~push c m acc f1)
+          (* argument first, intentionally, to give more weight on A in
+             forall x,A *)
+  | Tbinop (o,f,g) ->
+      let tag = match o with
+        | Tand -> tag_and
+        | Tor -> tag_or
+        | Timplies -> tag_impl
+        | Tiff -> tag_iff
+      in
+      fn (push tag (fn acc g)) f
+        (* g first, intentionally, to give more weight on B in A->B *)
+  | Tnot f -> push tag_not (fn acc f)
+  | Ttrue -> push tag_true acc
+  | Tfalse -> push tag_false acc
+
+let t_shape_buf t =
+  let b = Buffer.create 17 in
+  let push t () = Buffer.add_string b t in
+  let () = t_shape ~push (ref (-1)) Mvs.empty () t in
+  Buffer.contents b
+
+let t_shape_list t =
+  let push t l = t::l in
+  List.rev (t_shape ~push (ref (-1)) Mvs.empty [] t)
+
+let pr_shape_list fmt t =
+  List.iter (fun s -> Format.fprintf fmt "%s" s) (t_shape_list t)
+
+
+
+(*
+
+  shape = list of string, ordered lexicographically
+
+  shape (forall x:t, P) = code(forall) :: shape (P)
+
+  shape (P -> Q) = code(->) :: shape(P) @ shape(Q)
+
+  shape (App(f,[t1,..,tn] ) =
+      code(app) :: code(f) @ code (t1) ... @ code (tn)
+
+  code(f) = user name (not unique but it is not a problem)
+
+  code(Var x) = code(Var) :: code(debruijn x)
+
+  code(Const n) = n (en tant que string ?)
+
+*)
+
+(*
+ code of a shape: maps shapes into real numbers in [0..1], such that
+
+        compare t1 t2 = code (shape t1) -. code (shape t2)
+
+       is a good comparison operator
+
+       code(n:int) = 1 / (1+abs(n))
+            so code(0) = 1, code(1) = 0.5,
+
+       code(x:real) = 1 / (1+abs x)
+
+       code(ConstInt n) = h (n) / 3
+       code(ConstReal x) = (2 + h (x)) / 3
+
+       more generally, for any type t = C0 x | ... | Cn x
+           code(Ci x) = (2i + h(x)) / (2n+1)
+
+*)
+
+
+
+
+(* not good ?
+       for any type t = t0 x ... x tn
+           hash((x0,..,x_n)) = (2i + h(x)) / (2n+1)
+    *)
+
+
+(*
+
+let const_code = function
+  | ConstInt n -> 1.0 /. (1.0 +. abs (float_of_string n)) /. 3.0
+  | ConstReal n -> (2.0 + 1.0 /. (1.0 +. abs (float_of_string x)) /. 3.0
+
+let rec t_code c m t =
+  let fn = t_code c m in
+  let divide i c = (float(i+i) +. c) /. 23.0 in
+  (* 12 constructors -> divide by 23 *)
+  match t.t_node with
+  | Tconst c -> divide 0 (const_code c)
+  | Tvar v -> divide 1 (Mvs.find_default v (var_code v) m)
+  | Tapp (s,l) ->
+      let acc = Hashcons.combine 2 (ls_hash s) in
+      Hashcons.combine_list fn acc l
+  | Tif (f,t1,t2) ->
+      Hashcons.combine3 3 (fn f) (fn t1) (fn t2)
+  | Tlet (t1,b) ->
+      let u,t2 = t_open_bound b in
+      let m = vs_rename_alpha c m u in
+      Hashcons.combine2 4 (fn t1) (t_hash_alpha c m t2)
+  | Tcase (t1,bl) ->
+      let hash_br b =
+        let p,t2 = t_open_branch b in
+        let m = pat_rename_alpha c m p in
+        t_hash_alpha c m t2
+      in
+      let acc = Hashcons.combine 5 (fn t1) in
+      Hashcons.combine_list hash_br acc bl
+  | Teps b ->
+      let u,f = t_open_bound b in
+      let m = vs_rename_alpha c m u in
+      Hashcons.combine 6 (t_hash_alpha c m f)
+  | Tquant (q,b) ->
+      let vl,_,f1 = t_open_quant b in
+      let m = vl_rename_alpha c m vl in
+      let hq = match q with Tforall -> 1 | Texists -> 2 in
+      Hashcons.combine2 1 hq (t_hash_alpha c m f1)
+  | Tbinop (o,f,g) ->
+      let ho = match o with
+        | Tand -> 3 | Tor -> 4 | Timplies -> 5 | Tiff -> 7
+      in
+      Hashcons.combine3 2 ho (fn f) (fn g)
+  | Tnot f ->
+      Hashcons.combine 3 (fn f)
+  | Ttrue -> 4
+  | Tfalse -> 5
+
+let t_hash_alpha = t_hash_alpha (ref (-1)) Mvs.empty
+
+
+*)
+
+
 (* distance of two terms *)
+
+(*
 
 let dist_bool b = if b then 0.0 else 1.0
 
@@ -78,7 +302,7 @@ let rec t_dist c1 c2 m1 m2 e1 e2 =
         let m1 = vs_rename_alpha c1 m1 u1 in
         let m2 = vs_rename_alpha c2 m2 u2 in
         0.5 *. t_dist c1 c2 m1 m2 e1 e2
-    | Tquant (q1,((vl1,_,_,_) as b1)), Tquant (q2,((vl2,_,_,_) as b2)) ->
+    | Tquant (q1,b1), Tquant (q2,b2) ->
         if q1 = q2 &&
           list_all2 (fun v1 v2 -> ty_equal v1.vs_ty v2.vs_ty) vl1 vl2
         then
@@ -99,89 +323,4 @@ let rec t_dist c1 c2 m1 m2 e1 e2 =
 
 let t_dist t1 t2 = t_dist (ref (-1)) (ref (-1)) Mvs.empty Mvs.empty t1 t2
 
-(* similarity code of terms, or of "shapes"
-
-example:
-
-  shape(forall x:int, x * x >= 0) =
-         Forall(Int,App(infix_gteq,App(infix_st,Tvar 0,Tvar 0),Const(0)))
-       i.e: de bruijn indexes, first-order term
-
- code of a shape: maps shapes into real numbers in [0..1], such that
-
-        compare t1 t2 = code (shape t1) -. code (shape t2)
-
-       is a good comparison operator
-
-       code(n:int) = 1 / (1+abs(n))
-            so code(0) = 1, code(1) = 0.5,
-
-       code(x:real) = 1 / (1+abs x)
-
-       code(ConstInt n) = h (n) / 3
-       code(ConstReal x) = (2 + h (x)) / 3
-
-       more generally, for any type t = C0 x | ... | Cn x
-           code(Ci x) = (2i + h(x)) / (2n+1)
-
 *)
-
-
-
-
-(* not good ?
-       for any type t = t0 x ... x tn
-           hash((x0,..,x_n)) = (2i + h(x)) / (2n+1)
-    *)
-
-
-let const_code = function
-  | ConstInt n -> 1.0 /. (1.0 +. abs (float_of_string n)) /. 3.0
-  | ConstReal n -> (2.0 + 1.0 /. (1.0 +. abs (float_of_string x)) /. 3.0
-
-let rec t_code c m t =
-  let fn = t_code c m in
-  let divide i c = (float(i+i) +. c) /. 23.0 in
-  (* 12 constructors -> divide by 23 *)
-  match t.t_node with
-  | Tconst c -> divide 0 (const_code c)
-  | Tvar v -> divide 1 (Mvs.find_default v (var_code v) m)
-  | Tapp (s,l) ->
-      let acc = Hashcons.combine 2 (ls_hash s) in
-      Hashcons.combine_list fn acc l
-  | Tif (f,t1,t2) ->
-      Hashcons.combine3 3 (fn f) (fn t1) (fn t2)
-  | Tlet (t1,b) ->
-      let u,t2 = t_open_bound b in
-      let m = vs_rename_alpha c m u in
-      Hashcons.combine2 4 (fn t1) (t_hash_alpha c m t2)
-  | Tcase (t1,bl) ->
-      let hash_br b =
-        let p,t2 = t_open_branch b in
-        let m = pat_rename_alpha c m p in
-        t_hash_alpha c m t2
-      in
-      let acc = Hashcons.combine 5 (fn t1) in
-      Hashcons.combine_list hash_br acc bl
-  | Teps b ->
-      let u,f = t_open_bound b in
-      let m = vs_rename_alpha c m u in
-      Hashcons.combine 6 (t_hash_alpha c m f)
-  | Tquant (q,b) ->
-      let vl,_,f1 = t_open_quant b in
-      let m = vl_rename_alpha c m vl in
-      let hq = match q with Tforall -> 1 | Texists -> 2 in
-      Hashcons.combine2 1 hq (t_hash_alpha c m f1)
-  | Tbinop (o,f,g) ->
-      let ho = match o with
-        | Tand -> 3 | Tor -> 4 | Timplies -> 5 | Tiff -> 7
-      in
-      Hashcons.combine3 2 ho (fn f) (fn g)
-  | Tnot f ->
-      Hashcons.combine 3 (fn f)
-  | Ttrue -> 4
-  | Tfalse -> 5
-
-let t_hash_alpha = t_hash_alpha (ref (-1)) Mvs.empty
-
-

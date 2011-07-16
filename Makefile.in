@@ -430,7 +430,7 @@ install_local: bin/why3config
 
 ifeq (@enable_ide@,yes)
 
-IDE_FILES = xml session gconfig newmain
+IDE_FILES = xml termcode session gconfig newmain
 
 IDEMODULES = $(addprefix src/ide/, $(IDE_FILES))
 
@@ -490,7 +490,7 @@ endif
 # Replayer
 ###############
 
-REPLAYER_FILES = xml session replay
+REPLAYER_FILES = xml termcode session replay
 
 REPLAYERMODULES = $(addprefix src/ide/, $(REPLAYER_FILES))
 
@@ -853,6 +853,9 @@ testl-type: bin/why3ml.byte
 test-api: src/why3.cma
 	ocaml -I src/ $(INCLUDES) $(EXTCMA) src/why3.cma examples/use_api.ml \
 	|| (printf "Test of Why API calls failed. Please fix it"; exit 2)
+
+test-shape: src/why3.cma src/ide/termcode.cmo
+	ocaml -I src/ -I src/ide/ $(INCLUDES) $(EXTCMA) $? examples/test_shape.ml 
 
 bts12244: src/why3.cma
 	ocaml -I src/ $(INCLUDES) $(EXTCMA) src/why3.cma examples/bts12244.ml
