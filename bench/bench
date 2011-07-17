@@ -58,10 +58,10 @@ drivers () {
 programs () {
     for f in $1/*.mlw; do
 	echo -n "  "$f"... "
-	if ! $pgml -L modules $pgml_options $f > /dev/null 2>&1; then 
+	if ! $pgml -L modules $pgml_options $f $2 > /dev/null 2>&1; then 
 	    echo 
-	    echo "$pgml $pgml_options $f"
-	    $pgml -L modules $pgml_options $f
+	    echo "$pgml $pgml_options $f $2"
+	    $pgml -L modules $pgml_options $f $2
 	    echo "FAILED!"
 	    exit 1 
         else 
@@ -147,6 +147,7 @@ echo "=== VC generation on good programs ==="
 pgml_options=
 programs bench/programs/good
 programs examples/programs
+programs examples/programs/vacid_0_binary_heaps "-I examples/programs/vacid_0_binary_heaps"
 echo ""
 
 echo "=== Checking valid goals ==="

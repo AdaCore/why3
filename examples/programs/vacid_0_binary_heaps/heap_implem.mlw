@@ -1,0 +1,116 @@
+
+module Implementation
+
+use import int.Int
+use import int.ComputerDivision
+use import heap.Heap
+use import heap_model.Model
+use import bag_of_integers.Bag_integers
+
+lemma Is_heap_min:
+  forall a:map, n :int. n > 0 ->
+    is_heap_array a 0 n -> A.get a 0 = min_bag (model (a, n))
+
+use import module ref.Ref
+
+(* implementation of heaps *)
+let create () : ref logic_heap =
+  { true }
+    let x = (A.const 0, 0) in ref x
+  { is_heap !result /\
+    model !result = empty_bag }
+
+exception Break
+
+let insert (this : ref logic_heap) (e : int) : unit  =
+{ is_heap !this }
+  let (a, n) = !this in
+  let arr = ref a in
+  let i = ref n in
+  try
+  while (!i > 0) do
+    invariant {
+      0 <= !i <= n /\
+      (!i = n ->
+         is_heap_array !arr 0 n  /\
+         model (!arr, n) = model (a, n)) /\
+      (!i < n -> 
+         is_heap_array !arr 0 (n + 1) /\
+         A.get !arr !i > e /\
+         model (!arr, n+1) = add (A.get !arr !i) (model (a, n)))
+    }
+    variant { !i }
+    let parent = div (!i - 1) 2 in
+    let p = A.get !arr parent in
+    if (e >= p) then raise Break;
+    arr := A.set !arr !i p;
+    i := parent;
+    assert { is_heap_array !arr 0 (n + 1) }
+  done
+  with Break -> ()
+  end;
+  arr := A.set !arr !i e;
+  this := (!arr, n + 1);
+  assert { !i = n -> is_heap !this };
+  assert { !i < n -> is_heap !this }
+{ is_heap !this /\
+    model !this = add e (model (old !this)) }
+
+let extractMin (this : ref logic_heap) : int =
+{ model !this <> empty_bag /\ is_heap !this }
+  let (a, n) = !this in
+  assert {n > 0};
+  let arr = ref a in
+  let min = A.get !arr 0 in
+  let n' = n-1 in
+  let last = A.get !arr n' in
+  let i = ref 0 in
+  try
+    while ( !i < n') do
+      invariant {
+        !i >= 0 /\
+        is_heap_array !arr 0 n' /\
+        (!i = 0 ->
+           a = !arr /\
+           (model !this) = add last (model (a, n')))  /\
+        (0 < !i < n' ->
+           add (A.get !arr !i) (model !this) =
+             add last (add min (model (!arr, n'))))  /\
+        (!i > 0 -> A.get !arr (parent !i) < last) }
+      variant {n' - !i}
+      let left = 2 * !i + 1 in
+      let right = 2 * !i + 2 in
+      if (left >= n') then raise Break;
+      let smaller = ref left in
+      if right < n' then
+        if A.get !arr left > A.get !arr right
+          then smaller := right;
+      if (last <= (A.get !arr !smaller)) then raise Break;
+      assert {last > (A.get !arr !smaller)};
+      arr := A.set !arr !i (A.get !arr !smaller);
+      i := !smaller
+    done;
+    assert { model !this = add min (model (!arr,n')) }
+  with Break ->
+    assert { add (A.get !arr !i) (model !this) =
+              add last (add min (model (!arr, n'))) }
+  end;
+  if (!i < n') then
+    begin
+      arr := A.set !arr !i last;
+      assert { is_heap_array !arr 0 n' };
+      assert { model !this = add min (model (!arr,n')) }
+    end;
+  this := (!arr, n');
+  min
+{ is_heap !this /\
+  result = min_bag (model (old !this)) /\
+  model (old !this) = add result (model !this) }
+
+end
+
+(*
+Local Variables:
+compile-command: "why3ide -I . vacid0_binary_heaps"
+End:
+*)
