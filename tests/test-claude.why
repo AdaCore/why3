@@ -17,7 +17,7 @@ theory TestInt
    use import int.Int
 
    goal Test1: 2+2 = 4
-   
+
    goal Test2: forall x:int. x*x >= 0
 
    goal Test3: 1<>0
@@ -44,7 +44,7 @@ theory TestSplit
 
   predicate bb int
 
-  goal G1 : (aa 5) /\ ("stop_split" aa 0 /\ bb 6) /\ ("stop_split" aa 1 /\ bb 2) 
+  goal G1 : (aa 5) /\ ("stop_split" aa 0 /\ bb 6) /\ ("stop_split" aa 1 /\ bb 2)
 
   goal G2 : ("stop_split" aa 0 && bb 1) && ("stop_split" aa 1 && bb 2)
 
@@ -87,16 +87,14 @@ theory TestList
 
   function x : list int
 
-(*
-  goal Test1: 
-     match x with 
+  goal Test1:
+     match x with
      | Nil -> 1 = 0 /\ 2 = 3
      | Cons _ Nil -> 4 = 5 /\ 6 = 7
      | Cons _ _ -> 8 = 9 /\ 10 = 11
-     end  
-*)
+     end
 
-end  
+end
 
 
 theory TestReal
@@ -153,13 +151,13 @@ theory TestRealizeUse
 
   function q t : t
 
-  axiom C : forall x:t. p (q x) x 
+  axiom C : forall x:t. p (q x) x
 
 end
 
-theory TestInline 
+theory TestInline
 
-  use import int.Int 
+  use import int.Int
 
   goal T : 1 = 2
 
@@ -167,4 +165,4 @@ theory TestInline
 
   goal G : p 4 4
 
-end    
+end

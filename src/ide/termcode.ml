@@ -32,43 +32,52 @@ example:
 
 *)
 
+let vs_rename_alpha c h vs = incr c; Mvs.add vs !c h
+
+let vl_rename_alpha c h vl = List.fold_left (vs_rename_alpha c) h vl
+
+let rec pat_rename_alpha c h p = match p.pat_node with
+  | Pvar v -> vs_rename_alpha c h v
+  | Pas (p, v) -> pat_rename_alpha c (vs_rename_alpha c h v) p
+  | Por (p, _) -> pat_rename_alpha c h p
+  | _ -> Term.pat_fold (pat_rename_alpha c) h p
+
+
+let tag_and = "A"
+let tag_app = "a"
+let tag_case = "C"
+let tag_const = "c"
+let tag_exists = "E"
+let tag_eps = "e"
+let tag_forall = "F"
+let tag_false = "f"
+let tag_impl = "I"
+let tag_if = "i"
+let tag_let = "L"
+let tag_not = "N"
+let tag_or = "O"
+let tag_iff = "q"
+let tag_true = "t"
+let tag_var = "V"
+let tag_wild = "w"
+let tag_as = "z"
+
 let const_shape ~push acc c =
   let b = Buffer.create 17 in
   Format.bprintf b "%a" Pretty.print_const c;
   push (Buffer.contents b) acc
 
-let var_shape _v : string = assert false
-
-let vs_rename_alpha c h vs = incr c; Mvs.add vs !c h
-let vl_rename_alpha c h vl = List.fold_left (vs_rename_alpha c) h vl
-
-let pat_shape _c _m _acc _p = assert false
-
-let tag_and = "A"
-let tag_if = "B"
-let tag_const = "C"
-let tag_eps = "E"
-let tag_false = "F"
-let tag_impl = "I"
-let tag_let = "L"
-let tag_not = "N"
-let tag_or = "O"
-let tag_iff = "Q"
-let tag_case = "S"
-let tag_true = "T"
-let tag_var = "V"
-let tag_forall = "W"
-let tag_exists = "X"
-let tag_app = "Y"
-
-(*
-
-  [t_shape t] provides a traversal of the term structure, generally
-  in the order root-left-right, except for nodes Tquant and Tbin
-  which are traversed in the order right-root-left, so that in "A ->
-  B" we see B first, and if "Forall x,A" we see A first
-
-*)
+let rec pat_shape ~(push:string->'a->'a) c m (acc:'a) p : 'a =
+  match p.pat_node with
+    | Pwild -> push tag_wild acc
+    | Pvar _ -> push tag_var acc
+    | Papp (f, l) ->
+        List.fold_left (pat_shape ~push c m)
+          (push (f.ls_name.Ident.id_string) (push tag_app acc))
+          l
+    | Pas (p, _) -> push tag_as (pat_shape ~push c m acc p)
+    | Por (p, q) ->
+        pat_shape ~push c m (push tag_or (pat_shape ~push c m acc q)) p
 
 let rec t_shape ~(push:string->'a->'a) c m (acc:'a) t : 'a =
   let fn = t_shape ~push c m in
@@ -76,9 +85,8 @@ let rec t_shape ~(push:string->'a->'a) c m (acc:'a) t : 'a =
     | Tconst c -> const_shape ~push (push tag_const acc) c
     | Tvar v ->
         let x =
-          try
-            string_of_int (Mvs.find v m)
-          with Not_found -> var_shape v
+          try string_of_int (Mvs.find v m)
+          with Not_found -> v.vs_name.Ident.id_string
         in
         push x (push tag_var acc)
     | Tapp (s,l) ->
@@ -93,7 +101,8 @@ let rec t_shape ~(push:string->'a->'a) c m (acc:'a) t : 'a =
     | Tcase (t1,bl) ->
         let br_shape acc b =
           let p,t2 = t_open_branch b in
-          let m = pat_shape c m acc p in
+          let acc = pat_shape ~push c m acc p in
+          let m = pat_rename_alpha c m p in
           t_shape ~push c m acc t2
         in
         List.fold_left br_shape (fn (push tag_case acc) t1) bl
@@ -108,18 +117,18 @@ let rec t_shape ~(push:string->'a->'a) c m (acc:'a) t : 'a =
         push hq (t_shape ~push c m acc f1)
           (* argument first, intentionally, to give more weight on A in
              forall x,A *)
-  | Tbinop (o,f,g) ->
-      let tag = match o with
-        | Tand -> tag_and
-        | Tor -> tag_or
-        | Timplies -> tag_impl
-        | Tiff -> tag_iff
-      in
-      fn (push tag (fn acc g)) f
-        (* g first, intentionally, to give more weight on B in A->B *)
-  | Tnot f -> push tag_not (fn acc f)
-  | Ttrue -> push tag_true acc
-  | Tfalse -> push tag_false acc
+    | Tbinop (o,f,g) ->
+        let tag = match o with
+          | Tand -> tag_and
+          | Tor -> tag_or
+          | Timplies -> tag_impl
+          | Tiff -> tag_iff
+        in
+        fn (push tag (fn acc g)) f
+          (* g first, intentionally, to give more weight on B in A->B *)
+    | Tnot f -> push tag_not (fn acc f)
+    | Ttrue -> push tag_true acc
+    | Tfalse -> push tag_false acc
 
 let t_shape_buf t =
   let b = Buffer.create 17 in

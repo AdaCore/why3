@@ -26,6 +26,17 @@ val t_dist : term -> term -> float
       the result is 0.0 then the terms are equal modulo alpha *)
 *)
 
+
+(*
+
+  [t_shape t] provides a traversal of the term structure, generally
+  in the order root-left-right, except for nodes Tquant and Tbin
+  which are traversed in the order right-root-left, so that in "A ->
+  B" we see B first, and if "Forall x,A" we see A first
+
+*)
+
+
 val t_shape_buf : Term.term -> string
   (** returns a shape of the given term *)
 

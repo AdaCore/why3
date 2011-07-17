@@ -149,6 +149,7 @@ and goal =
       parent : goal_parent;
       mutable task: Task.task option;
       mutable checksum : string;
+      goal_shape : string;
       goal_key : O.key;
       mutable proved : bool;
       mutable goal_expanded : bool;
@@ -294,9 +295,10 @@ let opt lab fmt = function
   | Some s -> fprintf fmt "%s=\"%s\" " lab s
 
 let rec save_goal fmt g =
+  assert (g.goal_shape <> "");
   fprintf fmt "@\n@[<v 1><goal name=\"%s\" %asum=\"%s\" proved=\"%b\" expanded=\"%b\" shape=\"%s\">"
     g.goal_name (opt "expl") g.goal_expl g.checksum g.proved  g.goal_expanded
-    (Termcode.t_shape_buf (Task.task_goal_fmla (get_task g)));
+    g.goal_shape;
   Hashtbl.iter (save_proof_attempt fmt) g.external_proofs;
   Hashtbl.iter (save_trans fmt) g.transformations;
   fprintf fmt "@]@\n</goal>"
@@ -557,9 +559,8 @@ let schedule_edit_proof ~debug:_ ~editor ~file ~driver ~callback goal =
 
 
 (*******************************)
-(* explanations *)
-(****************)
-
+(*          explanations       *)
+(*******************************)
 
   let expl_regexp = Str.regexp "expl:\\(.*\\)"
 
@@ -642,21 +643,23 @@ let raw_add_external_proof ~obsolete ~timelimit ~edit (g:goal) p result =
 (* [raw_add_goal parent name expl sum t] adds a goal to the given parent
    DOES NOT record the new goal in its parent, thus this should not be exported
 *)
-let raw_add_goal parent name expl sum topt exp =
+let raw_add_goal parent name expl sum shape topt exp =
   let parent_key = match parent with
     | Parent_theory mth -> mth.theory_key
     | Parent_transf mtr -> mtr.transf_key
   in
   let key = O.create ~parent:parent_key () in
-  let sum = match topt with
-    | None -> sum
-    | Some t -> task_checksum t
+  let sum,shape = match topt with
+    | None -> sum,shape
+    | Some t -> (task_checksum t,
+                 Termcode.t_shape_buf (Task.task_goal_fmla t))
   in
   let goal = { goal_name = name;
                goal_expl = expl;
                parent = parent;
                task = topt ;
                checksum = sum;
+               goal_shape = shape;
                goal_key = key;
                external_proofs = Hashtbl.create 7;
                transformations = Hashtbl.create 3;
@@ -718,7 +721,7 @@ let add_theory mfile name th =
          let id = (Task.task_goal t).Decl.pr_name in
          let name = id.Ident.id_string in
          let expl = get_explanation id (Task.task_goal_fmla t) in
-         let goal = raw_add_goal (Parent_theory mth) name expl "" (Some t) true in
+         let goal = raw_add_goal (Parent_theory mth) name expl "" "" (Some t) true in
          goal :: acc)
       []
       tasks
@@ -784,9 +787,157 @@ let file_exists fn =
 
 
 
+(*************************************************************)
+(* pairing of new and old subgoals of a given transformation *)
+(*************************************************************)
+
+(* we have an ordered list of new subgoals
+
+           subgoals = [g1; g2; g3; ...]
+
+   and a list of old subgoals
+
+          old_subgoals = [h1 ; h2 ; ... ]
+
+   we build a map from each new subgoal g to tuples
+       (id,subgoal_name,subtask,sum,old_subgoal)
+
+   where
+     id = name of the goal of g
+     subgoal_name = name of parent goal with "dot n" added
+     subtask = the corresponding task
+     sum = the checksum of that task
+     old_subgoal = ref to an optional old subgoal which is paired with g
+
+*)
+
+
+type any_goal =
+  | New_goal of Ident.ident * string * Task.task * string * goal option ref
+  | Old_goal of goal
+
+let merge_subgoals gname old_subgoals subgoals =
+
+  (* we first associate each new goals for which there is an old goal
+       with the same checksum. E.g, imagine checksum of g2 is s1 :
+
+       new_goals_map = [ (g1, ref None) ; (g2, ref (Some h1)) ;
+                         (g3, ref None) ; ]
+       remaining = [ h2 ; ... ]
+
+  *)
+  let old_subgoals_map =
+    List.fold_left
+      (fun acc g -> Util.Mstr.add g.checksum g acc)
+      Util.Mstr.empty old_subgoals
+  in
+  let new_goals_map,old_subgoals_map,_ =
+    List.fold_left
+      (fun (new_goals_map,old_subgoals_map,count) subtask ->
+         let id = (Task.task_goal subtask).Decl.pr_name in
+         let subgoal_name = gname ^ "." ^ (string_of_int count) in
+         let sum = task_checksum subtask in
+         let old_subgoal,old_subgoals_map =
+           try
+             let g = Util.Mstr.find sum old_subgoals_map in
+             (* an old subgoal has the same checksum *)
+             (*
+               eprintf "Merge phase 1: old goal '%s' -> new goal '%s'@."
+               g.goal_name subgoal_name;
+             *)
+             (Some g, Util.Mstr.remove sum old_subgoals_map)
+           with Not_found ->
+             (*
+               eprintf "Merge phase 1: no old goal -> new goal '%s'@."
+               subgoal_name;
+             *)
+             (None,old_subgoals_map)
+         in
+         ((id,subgoal_name,subtask,sum,ref old_subgoal) ::
+            new_goals_map,
+          old_subgoals_map, count+1))
+      ([],old_subgoals_map,1) subgoals
+  in
+  (* be careful : new_goals_map is now in reverse order *)
+
+  (* Phase 2: we now build a list of all remaining new and old goals, 
+     ordered by shapes, then by name *)
+  let new_goals_no_pairing =
+    List.fold_left
+      (fun acc (id,subgoal_name, subtask, sum, o) ->
+         match !o with
+           | Some _ -> acc
+           | None -> (Termcode.t_shape_buf (Task.task_goal_fmla subtask),
+                      subgoal_name,
+                      New_goal(id,subgoal_name, subtask, sum, o))::acc)
+      []
+      new_goals_map
+  in
+  let _all_goals =
+      Util.Mstr.fold
+        (fun _ g acc -> (g.goal_shape,g.goal_name,Old_goal g)::acc)
+        old_subgoals_map
+        new_goals_no_pairing
+  in
+
+  (* we now turn remaining goals back into a list in the
+     same order as original *)
+  let remaining =
+    Util.Mstr.fold
+      (fun _ g acc -> (g.goal_name,g)::acc)
+      old_subgoals_map
+      []
+  in
+  let remaining =
+    List.sort (fun (s1,_) (s2,_) -> String.compare s1 s2) remaining
+  in
+  (* we now associate to each new goal which does not have an
+     associated old goal yet to an old goal in the same order
+     (arbitrary choice)
+     new_new_goals_map = [ [ (g1, h2) ; (g2, h1) ; (g3, fresh) ; ]
+  *)
+  let rec associate_remaining_goals new_goals_map remaining acc =
+    match new_goals_map with
+      | [] ->
+          (*
+            eprintf "Merge phase 3: dropping %d old goals@."
+            (List.length remaining);
+          *)
+          acc
+      | (id,subgoal_name,subtask,sum,old_subgoal)::new_rem ->
+          let ((obsolete,old_goal,rem) : bool * goal option * (string * goal) list) =
+            match !old_subgoal with
+              | Some _ as g ->
+                  (*
+                    eprintf "Merge phase 2: old goal '%s' -> new goal '%s'@."
+                    g.goal_name subgoal_name;
+                  *)
+                  (false,g,remaining)
+              | None ->
+                  match remaining with
+                    | [] ->
+                        (*
+                          eprintf "Merge phase 2: no old goal -> new goal '%s'@."
+                          subgoal_name;
+                        *)
+                        (false,None,[])
+                    | (_goal_name,g) :: rem ->
+                        (*
+                          eprintf "Merge phase 2: old goal '%s' -> new goal '%s'@."
+                          g.goal_name subgoal_name;
+                        *)
+                        (true,Some g,rem)
+          in
+          associate_remaining_goals new_rem rem
+            ((id,subgoal_name,sum,"",subtask,old_goal,obsolete)::acc)
+  in
+  associate_remaining_goals (List.rev new_goals_map) remaining []
+    
+    
 (**********************************)
 (* reload a file                  *)
 (**********************************)
+
 
 let reload_proof obsolete goal pid old_a =
   let p =
@@ -827,10 +978,10 @@ let reload_proof ~provers obsolete goal pid old_a =
       pid
 *)
 
-let rec reload_any_goal parent gid gname sum t old_goal goal_obsolete =
+let rec reload_any_goal parent gid gname sum shape t old_goal goal_obsolete =
   let info = get_explanation gid (Task.task_goal_fmla t) in
   let exp = match old_goal with None -> true | Some g -> g.goal_expanded in
-  let goal = raw_add_goal parent gname info sum (Some t) exp in
+  let goal = raw_add_goal parent gname info sum shape (Some t) exp in
   goal.task <- Some t;
   begin
     match old_goal with
@@ -848,160 +999,13 @@ and reload_trans  _goal_obsolete goal _ tr =
   let gname = goal.goal_name in
   eprintf "[Reload] transformation %s for goal %s @\n" trname gname;
   let mtr = raw_add_transformation goal tr.transf tr.transf_expanded in
-  let old_subgoals =
-    List.fold_left
-      (fun acc g -> Util.Mstr.add g.checksum g acc)
-      Util.Mstr.empty tr.subgoals
-  in
   let callback subgoals =
-    (* we have an ordered list of new subgoals
-
-           subgoals = [g1; g2; g3; ...]
-
-       and a map of old subgoals indexed by their checksum
-
-           old_subgoals = [s1,h1 ; s2, h2 ; ... ]
-
-       we first associate each new goals for which there is an old goal
-       with the same checksum. E.g, imagine checksum of g2 is s1 :
-
-       new_goals_map = [ (g1, None) ; (g2, Some h1) ; (g3, None) ; ]
-       remaining = [ s2, h2 ; ... ]
-
-    *)
-    let new_goals_map,old_subgoals,_ =
-      List.fold_left
-        (fun (new_goals_map,old_subgoals,count) subtask ->
-           let id = (Task.task_goal subtask).Decl.pr_name in
-           let subgoal_name = gname ^ "." ^ (string_of_int count) in
-           let sum = task_checksum subtask in
-           let old_subgoal,old_subgoals =
-             try
-               let g = Util.Mstr.find sum old_subgoals in
-               (* an old subgoal has the same checksum *)
-(*
-               eprintf "Merge phase 1: old goal '%s' -> new goal '%s'@."
-                 g.goal_name subgoal_name;
-*)
-               (Some g, Util.Mstr.remove sum old_subgoals)
-             with Not_found ->
-(*
-               eprintf "Merge phase 1: no old goal -> new goal '%s'@."
-                 subgoal_name;
-*)
-               (None,old_subgoals)
-           in
-           ((count,id,subgoal_name,subtask,sum,old_subgoal) :: new_goals_map,
-            old_subgoals, count+1))
-        ([],old_subgoals,1) subgoals
-    in
-    (* careful : new_goals is now in reverse order *)
-    (* we now turn remaining back into a list in the same order as original *)
-    let remaining =
-      Util.Mstr.fold
-        (fun _ g acc -> (g.goal_name,g)::acc)
-        old_subgoals
-        []
-    in
-    let remaining =
-      List.sort (fun (s1,_) (s2,_) -> String.compare s1 s2) remaining
-    in
-    (* we now associate to each new goal which does not have an
-       associated old goal yet to an old goal in the same order
-       (arbitrary choice)
-
-       new_new_goals_map = [ [ (g1, h2) ; (g2, h1) ; (g3, fresh) ; ]
-
-       TODO: use the distance Term.t_dist to obtain a better match
-
-       other solution: sort in some arbitrary total order
-
-       g1 < g2 < ... <
-
-       h1 < h2 < ... <
-
-       then identical goals can be detected by a merge_like algorithm :
-
-       if merged list starts with g :
-
-       g1 < ... gk <= h1 < ... <
-
-       then g1 .. g{k-1} are new and gk associated to h1, and then
-       recursively merge g{k+1} ... and h2 ...
-
-       otherwise, list starts
-
-       h1 < ... hk <= g1 <= ... <
-
-       ....
-
-       Another formulation :
-
-       if merged list starts with
-
-       1) g1 g2 ...
-
-       associate g1 to nothing and recursively process g2 ...
-
-       2) g1 h1 g2 ... with d(g1,h1) < d(h1,g2)
-
-       associate g1 to h1 and recursively process g2 ...
-
-       3) g1 h1 g2 ... with d(g1,h1) > d(h1,g2)
-
-       ?
-
-       4) g1 h1 h2 ...
-
-
-       PRELIMINARY: store the shape of the conclusion of the goal in the XML
-       file.
-
-
-    *)
-    let rec associate_remaining_goals new_goals_map remaining acc =
-      match new_goals_map with
-        | [] ->
-(*
-            eprintf "Merge phase 3: dropping %d old goals@."
-              (List.length remaining);
-*)
-            acc
-        | (_,id,subgoal_name,subtask,sum,old_subgoal)::new_rem ->
-            let ((obsolete,old_goal,rem) : bool * goal option * (string * goal) list) =
-              match old_subgoal with
-                | Some _g ->
-(*
-                    eprintf "Merge phase 2: old goal '%s' -> new goal '%s'@."
-                      g.goal_name subgoal_name;
-*)
-                    (false,old_subgoal,remaining)
-                | None ->
-                    match remaining with
-                      | [] ->
-(*
-                          eprintf "Merge phase 2: no old goal -> new goal '%s'@."
-                            subgoal_name;
-*)
-                          (false,None,[])
-                      | (_goal_name,g) :: rem ->
-(*
-                          eprintf "Merge phase 2: old goal '%s' -> new goal '%s'@."
-                            g.goal_name subgoal_name;
-*)
-                          (true,Some g,rem)
-            in
-            associate_remaining_goals new_rem rem
-              ((id,subgoal_name,sum,subtask,old_goal,obsolete)::acc)
-    in
-    let goals =
-      associate_remaining_goals (List.rev new_goals_map) remaining []
-    in
+    let goals = merge_subgoals gname tr.subgoals subgoals in
     let goals = List.fold_left
-      (fun acc (id,subgoal_name,sum,subtask,old_g, subgoal_obsolete) ->
+      (fun acc (id,subgoal_name,sum,shape,subtask,old_g, subgoal_obsolete) ->
          let mg =
            reload_any_goal (Parent_transf mtr) id
-             subgoal_name sum subtask old_g subgoal_obsolete
+             subgoal_name sum shape subtask old_g subgoal_obsolete
          in mg::acc)
       [] (List.rev goals)
     in
@@ -1025,7 +1029,7 @@ let reload_root_goal mth tname old_goals t : goal =
   in
   if goal_obsolete then
     eprintf "Goal %s.%s has changed@." tname gname;
-  reload_any_goal (Parent_theory mth) id gname sum t old_goal goal_obsolete
+  reload_any_goal (Parent_theory mth) id gname sum "" t old_goal goal_obsolete
 
 (* reloads a theory *)
 let reload_theory mfile old_theories (_,tname,th) =
@@ -1101,6 +1105,11 @@ let int_attribute field r def =
     int_of_string (List.assoc field r.Xml.attributes)
   with Not_found | Invalid_argument _ -> def
 
+let string_attribute_def field r def=
+  try
+    List.assoc field r.Xml.attributes
+  with Not_found -> def
+
 let string_attribute field r =
   try
     List.assoc field r.Xml.attributes
@@ -1143,20 +1152,15 @@ let load_result r =
 let rec load_goal ~env ~old_provers parent acc g =
   match g.Xml.name with
     | "goal" ->
-        let gname =
-          try List.assoc "name" g.Xml.attributes
-          with Not_found -> assert false
-        in
+        let gname = string_attribute "name" g in
         let expl =
           try Some (List.assoc "expl" g.Xml.attributes)
           with Not_found -> None
         in
-        let sum =
-          try List.assoc "sum" g.Xml.attributes
-          with Not_found -> ""
-        in
+        let sum = string_attribute_def "sum" g "" in
+        let shape = string_attribute_def "shape" g "" in
         let exp = bool_attribute "expanded" g true in
-        let mg = raw_add_goal parent gname expl sum None exp in
+        let mg = raw_add_goal parent gname expl sum shape None exp in
         List.iter (load_proof_or_transf ~env ~old_provers mg) g.Xml.elements;
         mg::acc
     | s ->
@@ -1166,10 +1170,7 @@ let rec load_goal ~env ~old_provers parent acc g =
 and load_proof_or_transf ~env ~old_provers mg a =
   match a.Xml.name with
     | "proof" ->
-        let prover =
-          try List.assoc "prover" a.Xml.attributes
-          with Not_found -> assert false
-        in
+        let prover = string_attribute "prover" a in
         let prover_obsolete,p =
           try
             let p = Util.Mstr.find prover !current_provers in
@@ -1186,10 +1187,7 @@ and load_proof_or_transf ~env ~old_provers mg a =
           | [] -> Undone
           | _ -> assert false
         in
-        let edit =
-          try List.assoc "edited" a.Xml.attributes
-          with Not_found -> assert false
-        in
+        let edit = string_attribute "edited" a in
         let obsolete = bool_attribute "obsolete" a true in
         let obsolete = obsolete || prover_obsolete in
         let timelimit = int_attribute "timelimit" a 10 in
@@ -1200,18 +1198,11 @@ and load_proof_or_transf ~env ~old_provers mg a =
            Hashtbl.add mg.external_proofs prover pa *)
         ()
     | "transf" ->
-        let trname =
-          try List.assoc "name" a.Xml.attributes
-          with Not_found -> assert false
-        in
+        let trname = string_attribute "name" a in
         let tr =
           try
             lookup_transformation env trname
           with Not_found -> assert false (* TODO *)
-        in
-        let _proved =
-          try List.assoc "proved" a.Xml.attributes
-          with Not_found -> assert false
         in
         let exp = bool_attribute "expanded" a true in
         let mtr = raw_add_transformation mg tr exp in
@@ -1231,10 +1222,7 @@ and load_proof_or_transf ~env ~old_provers mg a =
 let load_theory ~env ~old_provers mf acc th =
   match th.Xml.name with
     | "theory" ->
-        let thname =
-          try List.assoc "name" th.Xml.attributes
-          with Not_found -> assert false
-        in
+        let thname = string_attribute "name" th in
         let exp = bool_attribute "expanded" th true in
         let mth = raw_add_theory mf None thname exp in
         mth.goals <-
@@ -1250,10 +1238,7 @@ let load_theory ~env ~old_provers mf acc th =
 let load_file ~env old_provers f =
   match f.Xml.name with
     | "file" ->
-        let fn =
-          try List.assoc "name" f.Xml.attributes
-          with Not_found -> assert false
-        in
+        let fn = string_attribute "name" f in
         let exp = bool_attribute "expanded" f true in
         let mf = raw_add_file fn exp in
         mf.theories <-
@@ -1640,7 +1625,7 @@ let transformation_on_goal g tr =
             in
             let goal =
               raw_add_goal (Parent_transf tr)
-                subgoal_name expl "" (Some subtask) true
+                subgoal_name expl "" "" (Some subtask) true
             in
             (goal :: acc, count+1)
         in
