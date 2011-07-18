@@ -800,7 +800,7 @@ let file_exists fn =
           old_subgoals = [h1 ; h2 ; ... ]
 
    we build a map from each new subgoal g to tuples
-       (id,subgoal_name,subtask,sum,old_subgoal)
+       (id,subgoal_name,subtask,sum,old_subgoal,obsolete)
 
    where
      id = name of the goal of g
@@ -808,132 +808,213 @@ let file_exists fn =
      subtask = the corresponding task
      sum = the checksum of that task
      old_subgoal = ref to an optional old subgoal which is paired with g
+     obsolete = true when paired to an old goal with different checksum
 
 *)
 
 
 type any_goal =
-  | New_goal of Ident.ident * string * Task.task * string * goal option ref
+  | New_goal of int
   | Old_goal of goal
 
-let merge_subgoals gname old_subgoals subgoals =
+let array_map_list f l =
+  let r = ref l in
+  Array.init (List.length l)
+    (fun i ->
+       match !r with
+         | [] -> assert false
+         | x::rem -> r := rem; f i x)
 
-  (* we first associate each new goals for which there is an old goal
-       with the same checksum. E.g, imagine checksum of g2 is s1 :
-
-       new_goals_map = [ (g1, ref None) ; (g2, ref (Some h1)) ;
-                         (g3, ref None) ; ]
-       remaining = [ h2 ; ... ]
-
+let associate_subgoals gname old_goals new_goals =
+  (*
+     we make a map of old goals indexed by their checksums
   *)
-  let old_subgoals_map =
-    List.fold_left
-      (fun acc g -> Util.Mstr.add g.checksum g acc)
-      Util.Mstr.empty old_subgoals
+  let old_goals_map = ref
+    (List.fold_left
+       (fun acc g -> Util.Mstr.add g.checksum g acc)
+       Util.Mstr.empty old_goals)
   in
-  let new_goals_map,old_subgoals_map,_ =
-    List.fold_left
-      (fun (new_goals_map,old_subgoals_map,count) subtask ->
-         let id = (Task.task_goal subtask).Decl.pr_name in
-         let subgoal_name = gname ^ "." ^ (string_of_int count) in
-         let sum = task_checksum subtask in
-         let old_subgoal,old_subgoals_map =
-           try
-             let g = Util.Mstr.find sum old_subgoals_map in
-             (* an old subgoal has the same checksum *)
-             (*
-               eprintf "Merge phase 1: old goal '%s' -> new goal '%s'@."
-               g.goal_name subgoal_name;
-             *)
-             (Some g, Util.Mstr.remove sum old_subgoals_map)
-           with Not_found ->
-             (*
-               eprintf "Merge phase 1: no old goal -> new goal '%s'@."
-               subgoal_name;
-             *)
-             (None,old_subgoals_map)
-         in
-         ((id,subgoal_name,subtask,sum,ref old_subgoal) ::
-            new_goals_map,
-          old_subgoals_map, count+1))
-      ([],old_subgoals_map,1) subgoals
+  (*
+     we make an array of new goals with their numbers and checksums 
+  *)
+  let new_goals_array =
+    array_map_list
+      (fun i g ->
+         let id = (Task.task_goal g).Decl.pr_name in
+         let goal_name = gname ^ "." ^ (string_of_int (i+1)) in
+         let sum = task_checksum g in
+         (i,id,goal_name,g,sum))
+      new_goals
   in
-  (* be careful : new_goals_map is now in reverse order *)
-
-  (* Phase 2: we now build a list of all remaining new and old goals, 
+  let pairing_array =
+    Array.make (Array.length new_goals_array) None
+  in
+  let shape_array =
+    Array.make (Array.length new_goals_array) ""
+  in
+  let obsolete_array =
+    Array.make (Array.length new_goals_array) false
+  in
+  (*
+     Phase 1: we first associate each new goal for which there is an
+     old goal with the same checksum.
+  *)
+  let associate_goals ~obsolete i g =
+    pairing_array.(i) <- Some g;
+    obsolete_array.(i) <- obsolete;
+    old_goals_map := Util.Mstr.remove g.checksum !old_goals_map
+  in
+  Array.iter
+    (fun (i,_,_goal_name,_,sum) ->
+       try
+         let h = Util.Mstr.find sum !old_goals_map in
+         (* an old goal has the same checksum *)
+         (*
+           eprintf "Merge phase 1: old goal '%s' -> new goal '%s'@."
+           h.goal_name goal_name;
+         *)
+         shape_array.(i) <- h.goal_shape;
+         associate_goals ~obsolete:false i h
+       with Not_found ->
+         (*
+           eprintf "Merge phase 1: no old goal -> new goal '%s'@."
+           subgoal_name;
+         *)
+         ())
+    new_goals_array;
+  (* Phase 2: we now build a list of all remaining new and old goals,
      ordered by shapes, then by name *)
-  let new_goals_no_pairing =
-    List.fold_left
-      (fun acc (id,subgoal_name, subtask, sum, o) ->
-         match !o with
-           | Some _ -> acc
-           | None -> (Termcode.t_shape_buf (Task.task_goal_fmla subtask),
-                      subgoal_name,
-                      New_goal(id,subgoal_name, subtask, sum, o))::acc)
+  let old_goals_without_pairing =
+    Util.Mstr.fold
+      (fun _ g acc -> (g.goal_shape,Old_goal g)::acc)
+      !old_goals_map
       []
-      new_goals_map
   in
-  let _all_goals =
-      Util.Mstr.fold
-        (fun _ g acc -> (g.goal_shape,g.goal_name,Old_goal g)::acc)
-        old_subgoals_map
-        new_goals_no_pairing
+  let all_goals_without_pairing =
+    Array.fold_left
+      (fun acc (i,_,_, g, _) ->
+         match pairing_array.(i) with
+           | Some _ -> acc
+           | None ->
+               let shape = 
+                 Termcode.t_shape_buf (Task.task_goal_fmla g)
+               in
+               shape_array.(i) <- shape;
+               (shape,New_goal i)::acc)
+      old_goals_without_pairing
+      new_goals_array
   in
-
-  (* we now turn remaining goals back into a list in the
-     same order as original *)
-  let remaining =
+  let sort_by_shape =
+    List.sort (fun (s1,_) (s2,_) -> String.compare s1 s2) 
+      all_goals_without_pairing
+  in
+  eprintf "[Merge] pairing the following shapes:@.";
+  List.iter
+    (fun (s,g) ->
+       match g with
+         | New_goal _ ->
+             eprintf "new: %s@." s
+         | Old_goal _ ->
+             eprintf "old: %s@." s)
+    sort_by_shape;
+  let rec similarity_shape n s1 s2 =
+    if String.length s1 <= n || String.length s2 <= n then n else
+      if s1.[n] = s2.[n] then similarity_shape (n+1) s1 s2
+      else n
+  in
+  let rec match_shape (opt:int option) goals : bool =
+    (* when [opt] is [Some n] then it means [goals] starts with a goal g
+       which is already claimed to be associated by the former goal h.
+       We return a boolean which is true when that first goal g was also
+       claimed by the next goal, with a proximity measure larger than n,
+       meaning that the former goal h cannot associate with g
+    *)
+    match goals with
+      | [] -> false
+      | (si,New_goal i)::rem ->
+          begin match rem with
+            | [] -> false
+            | (_,New_goal _)::_ ->
+                let (_:bool) = match_shape None rem in false
+            | (sh,Old_goal h)::_ ->
+                try_associate si i sh h opt rem
+          end
+      | (sh,Old_goal h)::rem ->
+          begin match rem with
+            | [] -> false
+            | (_,Old_goal _)::_ ->
+                let (_:bool) = match_shape None rem in false
+            | (si,New_goal i)::_ ->
+                try_associate si i sh h opt rem
+          end
+  and try_associate si i sh h opt rem =
+    let n = similarity_shape 0 si sh in
+    eprintf "[Merge] try_associate: claiming similarity %d for new shape@\n%s@\nand old shape@\n%s@." n si sh;
+    if (match opt with
+      | None ->
+          eprintf "[Merge] try_associate: no previous claim@.";
+          true
+      | Some m ->
+          eprintf "[Merge] try_associate: previous claim was %d@." m;
+          m < n)
+    then
+      (* try to associate i with h *)
+      let b = match_shape (Some n) rem in
+      if b then
+        begin
+          (* h or i was already paired in rem *)
+          eprintf "[Merge] try_associate: failed because claimed further@.";
+          false
+        end
+      else
+        begin
+          eprintf "[Merge] try_associate: succeeded to associate new goal@\n%s@\nwith old goal@\n%s@." si sh;
+          associate_goals ~obsolete:true i h;
+          true
+        end
+    else
+      (* no need to try to associate i with h *)
+      begin
+        eprintf "[Merge] try_associate: no claim further attempted@.";
+        let (_:bool) = match_shape None rem in
+        false
+      end
+  in
+  let (_:bool) = match_shape None sort_by_shape in
+  (*
+     Phase 3: we now associate remaining new goals to the remaining
+     old goals in the same order as original
+  *)
+  eprintf "[Merge] phase 3: associate remaining goals@.";
+  let remaining_old_goals =
     Util.Mstr.fold
       (fun _ g acc -> (g.goal_name,g)::acc)
-      old_subgoals_map
+      !old_goals_map
       []
   in
-  let remaining =
-    List.sort (fun (s1,_) (s2,_) -> String.compare s1 s2) remaining
+  let remaining_old_goals =
+    ref (List.sort (fun (s1,_) (s2,_) -> String.compare s1 s2)
+           remaining_old_goals)
   in
-  (* we now associate to each new goal which does not have an
-     associated old goal yet to an old goal in the same order
-     (arbitrary choice)
-     new_new_goals_map = [ [ (g1, h2) ; (g2, h1) ; (g3, fresh) ; ]
-  *)
-  let rec associate_remaining_goals new_goals_map remaining acc =
-    match new_goals_map with
-      | [] ->
-          (*
-            eprintf "Merge phase 3: dropping %d old goals@."
-            (List.length remaining);
-          *)
-          acc
-      | (id,subgoal_name,subtask,sum,old_subgoal)::new_rem ->
-          let ((obsolete,old_goal,rem) : bool * goal option * (string * goal) list) =
-            match !old_subgoal with
-              | Some _ as g ->
-                  (*
-                    eprintf "Merge phase 2: old goal '%s' -> new goal '%s'@."
-                    g.goal_name subgoal_name;
-                  *)
-                  (false,g,remaining)
-              | None ->
-                  match remaining with
-                    | [] ->
-                        (*
-                          eprintf "Merge phase 2: no old goal -> new goal '%s'@."
-                          subgoal_name;
-                        *)
-                        (false,None,[])
-                    | (_goal_name,g) :: rem ->
-                        (*
-                          eprintf "Merge phase 2: old goal '%s' -> new goal '%s'@."
-                          g.goal_name subgoal_name;
-                        *)
-                        (true,Some g,rem)
-          in
-          associate_remaining_goals new_rem rem
-            ((id,subgoal_name,sum,"",subtask,old_goal,obsolete)::acc)
-  in
-  associate_remaining_goals (List.rev new_goals_map) remaining []
-    
-    
+  Array.iteri
+    (fun i opt ->
+       match opt with
+         | Some _ -> ()
+         | None ->
+             match !remaining_old_goals with
+               | [] -> ()
+               | (_,h) :: rem ->
+                   remaining_old_goals := rem;
+                   associate_goals ~obsolete:true i h)
+    pairing_array;
+  let res = ref [] in
+  Array.iter
+    (fun (i,id,goal_name,g,sum) ->
+       res := (id,goal_name,g,sum,shape_array.(i),pairing_array.(i),
+               obsolete_array.(i)) :: !res)
+    new_goals_array;
+  List.rev !res
+
 (**********************************)
 (* reload a file                  *)
 (**********************************)
@@ -1000,14 +1081,14 @@ and reload_trans  _goal_obsolete goal _ tr =
   eprintf "[Reload] transformation %s for goal %s @\n" trname gname;
   let mtr = raw_add_transformation goal tr.transf tr.transf_expanded in
   let callback subgoals =
-    let goals = merge_subgoals gname tr.subgoals subgoals in
+    let goals = associate_subgoals gname tr.subgoals subgoals in
     let goals = List.fold_left
-      (fun acc (id,subgoal_name,sum,shape,subtask,old_g, subgoal_obsolete) ->
+      (fun acc (id,subgoal_name,subtask,sum,shape,old_g,subgoal_obsolete) ->
          let mg =
            reload_any_goal (Parent_transf mtr) id
              subgoal_name sum shape subtask old_g subgoal_obsolete
          in mg::acc)
-      [] (List.rev goals)
+      [] goals
     in
     mtr.subgoals <- (List.rev goals);
     check_transf_proved mtr
