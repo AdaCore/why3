@@ -320,14 +320,16 @@ let ls_kind ls = if ls.ls_value = None then "predicate" else "function"
 let print_logic_decl fst fmt (ls,ld) = match ld with
   | Some ld ->
       let vl,e = open_ls_defn ld in
-      fprintf fmt "@[<hov 2>%s %a%a%a =@ %a@]"
+      fprintf fmt "@[<hov 2>%s %a%a%a%a =@ %a@]"
         (if fst then ls_kind ls else "with") print_ls ls
+        print_ident_labels ls.ls_name
         (print_list nothing print_vs_arg) vl
         (print_option print_ls_type) ls.ls_value print_term e;
       List.iter forget_var vl
   | None ->
-      fprintf fmt "@[<hov 2>%s %a%a%a@]"
+      fprintf fmt "@[<hov 2>%s %a%a%a%a@]"
         (if fst then ls_kind ls else "with") print_ls ls
+        print_ident_labels ls.ls_name
         (print_list nothing print_ty_arg) ls.ls_args
         (print_option print_ls_type) ls.ls_value
 
