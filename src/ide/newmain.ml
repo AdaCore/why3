@@ -133,6 +133,9 @@ let w = GWindow.window
   ~height:gconfig.window_height
   ~title:"Why3 Interactive Proof Session" ()
 
+let () =
+  w#set_icon (Some !Gconfig.why_icon)
+
 let (_ : GtkSignal.id) =
   w#misc#connect#size_allocate
     ~callback:

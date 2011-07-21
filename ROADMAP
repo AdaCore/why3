@@ -24,33 +24,7 @@
   afficher les explications dans les outils en ligne de
   commande why3 et why3bench + le path
 
-* Coq plugin
-
-* Coq realization of theories
-  (Andrei)
-
-* IDE:
-** edition, navigation (partially done)
-** restore provers detection in the middle of a session.
-  + todo: run detection immediately at start up if conf file absent or
-    outdated
-** reimplement "hide proved goals" feature
-  + suggested solution: replace model + filter_model by a custom model
-  (JC + ?)
-** saving session
-   * add a "cancel" choice in the "ask" window
-   * add "ctrl-S" to save the session explicitly
-     (partially done, but no shortcut)
-
-* reload: improve matching of new and old goals by use a kind a distance
-  between some notion of shape of a goal
-
 * Add more examples in the regression tests and in the proval gallery
-
-* prover support
-** avoid bug of CVC3, e.g in examples/my_cosine.why
-** test/debug TPTP output, make Vampire work
-** understand bug reports 12792-12794 and 12907
 
 * Papers to write
 
@@ -71,6 +45,37 @@
 ** complete api.tex: explain how to build theories, apply
    transformations, write new functions on terms (A)
 ** complete manpages.tex: section "Drivers of external provers" (A+F)
+
+=== Roadmap for fourth release ========================
+
+* Coq plugin
+
+* Coq realization of theories
+  (Andrei)
+
+* prover support
+** avoid bug of CVC3, e.g in examples/my_cosine.why
+** test/debug TPTP output, make Vampire work
+** understand bug reports 12792-12794 and 12907
+
+* IDE:
+** edition, navigation (partially done)
+** restore provers detection in the middle of a session.
+  + todo: run detection immediately at start up if conf file absent or
+    outdated
+** reimplement "hide proved goals" feature
+  + suggested solution: replace model + filter_model by a custom model
+  (JC + ?)
+** saving session
+   * add a "cancel" choice in the "ask" window
+   * add "ctrl-S" to save the session explicitly
+     (partially done, but no shortcut)
+
+* replayer: don't replay a goal that has changed, just display as an
+  unsuccessful replay
+
+* DONE reload: improve matching of new and old goals by use a kind a distance
+  between some notion of shape of a goal
 
 === Roadmap for third release 0.70, july 2011 ========================
 

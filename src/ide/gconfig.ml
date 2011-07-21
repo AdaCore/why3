@@ -24,10 +24,6 @@ open Rc
 open Whyconf
 
 
-(*
-type prover_data = Session.prover_data
-*)
-
 type t =
     { mutable window_width : int;
       mutable window_height : int;
@@ -37,9 +33,6 @@ type t =
       mutable mem_limit : int;
       mutable verbose : int;
       mutable max_running_processes : int;
-(*
-      mutable provers : prover_data Util.Mstr.t;
-*)
       mutable default_editor : string;
       mutable show_labels : bool;
       mutable saving_policy : int;
@@ -92,12 +85,6 @@ let load_config config =
   let ide  = match get_section config "ide" with
     | None -> default_ide
     | Some s -> load_ide s in
-(*
-  let provers = get_provers config in
-*)
-(*
-  let env = Lexer.create_env main.loadpath in
-*)
   (* temporary sets env to empty *)
   let env = Env.create_env_of_loadpath [] in
   { window_height = ide.ide_window_height;
@@ -109,9 +96,6 @@ let load_config config =
     verbose       = ide.ide_verbose;
     saving_policy = ide.ide_saving_policy ;
     max_running_processes = Whyconf.running_provers_max main;
-(*
-    provers = Mstr.empty;
-*)
     default_editor = ide.ide_default_editor;
     show_labels = false;
     config         = config;
@@ -169,7 +153,7 @@ let get_main () = (get_main config.config)
 
 (*
 
-  boomy icons
+  images, icons
 
 *)
 
@@ -237,6 +221,8 @@ let image_reload = ref !image_default
 let image_remove = ref !image_default
 let image_cleaning = ref !image_default
 
+let why_icon = ref !image_default
+
 let resize_images size =
   image_default := image ~size iconname_default;
   image_undone := image ~size iconname_undone;
@@ -268,6 +254,7 @@ let resize_images size =
 
 let () =
   eprintf "[Info] reading icons...@?";
+  why_icon := image "logo-why";
   resize_images 20;
   eprintf " done.@."
 

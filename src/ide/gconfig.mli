@@ -19,10 +19,6 @@
 
 open Why3
 
-(*
-type prover_data = Session.prover_data
-*)
-
 type t =
     { mutable window_width : int;
       mutable window_height : int;
@@ -39,21 +35,17 @@ type t =
       mutable config : Whyconf.config;
     }
 
-(*
-val get_prover_data : Why3.Env.env -> string ->
-  Why3.Whyconf.config_prover ->
-  prover_data Why3.Util.Mstr.t -> prover_data Why3.Util.Mstr.t
-*)
-
 val save_config : unit -> unit
 
 val config : t
 
 val get_main : unit -> Whyconf.main
 
-(***************)
-(* boomy icons *)
-(***************)
+(*****************)
+(* images, icons *)
+(*****************)
+
+val why_icon : GdkPixbuf.pixbuf ref
 
 val image_yes : GdkPixbuf.pixbuf ref
 
@@ -91,10 +83,6 @@ val image_failure_obs : GdkPixbuf.pixbuf ref
 val show_legend_window : unit -> unit
 val show_about_window : unit -> unit
 val preferences : t -> unit
-
-(* buggy
-val run_auto_detection : t -> unit
-*)
 
 (*
 Local Variables:
