@@ -908,6 +908,7 @@ let associate_subgoals gname old_goals new_goals =
     List.sort (fun (s1,_) (s2,_) -> String.compare s1 s2) 
       all_goals_without_pairing
   in
+(*
   eprintf "[Merge] pairing the following shapes:@.";
   List.iter
     (fun (s,g) ->
@@ -917,12 +918,13 @@ let associate_subgoals gname old_goals new_goals =
          | Old_goal _ ->
              eprintf "old: %s@." s)
     sort_by_shape;
+*)
   let rec similarity_shape n s1 s2 =
     if String.length s1 <= n || String.length s2 <= n then n else
       if s1.[n] = s2.[n] then similarity_shape (n+1) s1 s2
       else n
   in
-  let rec match_shape (opt:int option) goals : bool =
+(*  let rec match_shape (opt:int option) goals : bool =
     (* when [opt] is [Some n] then it means [goals] starts with a goal g
        which is already claimed to be associated by the former goal h.
        We return a boolean which is true when that first goal g was also
@@ -981,6 +983,70 @@ let associate_subgoals gname old_goals new_goals =
       end
   in
   let (_:bool) = match_shape None sort_by_shape in
+*)
+  let rec match_shape (min:int) goals : bool * (string * any_goal) list =
+    (* try to associate in [goals] each pair of old and new goal whose
+       similarity is at least [min]. Returns a pair [(b,rem)] where
+       [rem] is the sublist of [goals] made of goals which have not
+       been paired, and [b] is a boolean telling that the head of
+       [rem] is the same has the head of [goals] *)
+    match goals with
+      | [] -> (true, goals)
+      | ((si,New_goal i) as hd)::rem ->
+          begin match rem with
+            | [] -> (true, goals)
+            | (_,New_goal _)::_ ->
+                let (b,rem2) = match_shape min rem in
+                if b then
+                  (true, hd::rem2)
+                else
+                  match_shape min (hd::rem2)
+            | (sh,Old_goal h)::_ ->
+                try_associate min si i sh h hd rem
+          end
+      | ((sh,Old_goal h) as hd)::rem ->
+          begin match rem with
+            | [] -> (true, goals)
+            | (_,Old_goal _)::_ ->
+                let (b,rem2) = match_shape min rem in
+                if b then
+                  (true, hd::rem2)
+                else
+                  match_shape min (hd::rem2)
+            | (si,New_goal i)::_ ->
+                try_associate min si i sh h hd rem
+          end
+  and try_associate min si i sh h hd rem =
+    let n = similarity_shape 0 si sh in
+(*
+    eprintf "[Merge] try_associate: claiming similarity %d for new shape@\n%s@\nand old shape@\n%s@." n si sh;
+*)
+    if n < min then
+      begin
+(*
+        eprintf "[Merge] try_associate: claiming dropped because similarity lower than min = %d@." min;
+*)
+        let (b,rem2) = match_shape min rem in
+        if b then
+          (true, hd::rem2)
+        else
+          match_shape min (hd::rem2)
+      end
+    else
+      match match_shape n rem with
+        | false, rem2 ->
+            eprintf "[Merge] try_associate: claiming dropped because head was consumed by larger similarity@.";
+            match_shape min (hd::rem2)
+        | true, [] -> assert false
+        | true, _::rem2 ->
+(*
+            eprintf "[Merge] try_associate: claiming succeeded (similarity %d) for new shape@\n%s@\nand old shape@\n%s@." n si sh;
+*)
+            associate_goals ~obsolete:true i h;
+            let (_,rem3) = match_shape min rem2 in
+            (false, rem3)
+  in
+  let (_b,_rem) = match_shape 0 sort_by_shape in
   (*
      Phase 3: we now associate remaining new goals to the remaining
      old goals in the same order as original
