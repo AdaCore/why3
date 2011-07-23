@@ -1105,26 +1105,6 @@ let reload_proof obsolete goal pid old_a =
   in
   !notify_fun (Goal a.proof_goal)
 
-
-
-(*
-let reload_proof ~provers obsolete goal pid old_a =
-  try
-    let p = Util.Mstr.find pid provers in
-    let old_res = old_a.proof_state in
-    let obsolete = obsolete or old_a.proof_obsolete in
-    (* eprintf "proof_obsolete : %b@." obsolete; *)
-    let a =
-      raw_add_external_proof ~obsolete ~timelimit:old_a.timelimit
-        ~edit:old_a.edited_as goal p old_res
-    in
-    !notify_fun (Goal a.proof_goal)
-  with Not_found ->
-    eprintf
-      "Warning: prover %s appears in database but is not installed.@."
-      pid
-*)
-
 let rec reload_any_goal parent gid gname sum shape t old_goal goal_obsolete =
   let info = get_explanation gid (Task.task_goal_fmla t) in
   let exp = match old_goal with None -> true | Some g -> g.goal_expanded in
