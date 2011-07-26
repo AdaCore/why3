@@ -39,6 +39,59 @@ theory Word
   predicate min_dist (w1 w2: word) (n: int) =
     dist w1 w2 n /\ forall m: int. dist w1 w2 m -> n <= m
 
+  (* intermediate lemmas *)
+
+  (* TODO: prove the following lemmas in Coq (proofs are in Why2
+     repository, in examples/edit-distance/words.v)
+     It would be really  helpful to have recursive definitions output
+     as such in Coq when possible *)
+(***
+  use export list.Append
+
+  function last_char (a: char) (u: word) : char = match u with
+    | Nil -> a
+    | Cons c u' -> last_char c u'
+  end
+
+  function but_last (a: char) (u: word) : word = match u with
+    | Nil -> Nil
+    | Cons c u' -> Cons a (but_last c u')
+  end
+
+  lemma first_last_explicit:
+    forall u: word, a: char.
+    but_last a u ++ Cons (last_char a u) Nil = Cons a u
+
+  lemma first_last:
+     forall a: char, u: word. exists v: word, b: char.
+     v ++ Cons b Nil = Cons a u /\ length v = length u
+
+  lemma key_lemma_right:
+    forall w1 w'2: word, m: int, a: char.
+    dist w1 w'2 m ->
+    forall w2: word. w'2 = Cons a w2 ->
+    exists u1 v1: word, k: int.
+    w1 = u1 ++ v1 /\ dist v1 w2 k /\ k + length u1 <= m + 1
+
+  lemma dist_symetry:
+    forall w1 w2: word, n: int. dist w1 w2 n -> dist w2 w1 n
+
+  lemma key_lemma_left:
+    forall w1 w2: word, m: int, a: char.
+    dist (Cons a w1) w2 m ->
+    exists u2 v2: word, k: int.
+    w2 = u2 ++ v2 /\ dist w1 v2 k /\ k + length u2 <= m + 1
+
+  lemma dist_concat_left:
+    forall u v w: word, n: int.
+    dist v w n -> dist (u ++ v) w (length u + n)
+
+  lemma dist_concat_right:
+    forall u v w: word, n: int.
+    dist v w n -> dist v (u ++ w) (length u + n)
+***)
+  (* end of intermediate lemmas *)
+
   lemma min_dist_equal:
     forall w1 w2: word, a: char, n: int.
      min_dist w1 w2 n -> min_dist (Cons a w1) (Cons a w2) n
