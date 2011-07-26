@@ -91,6 +91,19 @@ let elim_recursion d = match d.d_node with
   | Dlogic l when List.length l > 1 -> elim_decl true true l
   | _ -> [d]
 
+let is_struct dl =
+  try
+    Mls.for_all (fun _ il -> List.length il = 1) (check_termination dl)
+  with NoTerminationProof _ ->
+    false
+
+let elim_non_struct_recursion d = match d.d_node with
+  | Dlogic ((s,_) :: _ as dl)
+    when Sid.mem s.ls_name d.d_syms && not (is_struct dl) ->
+      elim_decl true true dl
+  | _ ->
+      [d]
+
 let elim_mutual d = match d.d_node with
   | Dlogic l when List.length l > 1 -> elim_decl true true l
   | _ -> [d]
@@ -99,6 +112,7 @@ let eliminate_definition_func  = Trans.decl (elim true false) None
 let eliminate_definition_pred  = Trans.decl (elim false true) None
 let eliminate_definition       = Trans.decl (elim true true) None
 let eliminate_recursion        = Trans.decl elim_recursion None
+let eliminate_non_struct_recursion = Trans.decl elim_non_struct_recursion None
 let eliminate_mutual_recursion = Trans.decl elim_mutual None
 
 let () =
@@ -110,6 +124,8 @@ let () =
     eliminate_definition;
   Trans.register_transform "eliminate_recursion"
     eliminate_recursion;
+  Trans.register_transform "eliminate_non_struct_recursion"
+    eliminate_non_struct_recursion;
   Trans.register_transform "eliminate_mutual_recursion"
     eliminate_mutual_recursion
 

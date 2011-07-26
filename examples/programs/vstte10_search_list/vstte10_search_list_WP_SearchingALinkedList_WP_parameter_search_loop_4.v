@@ -22,15 +22,13 @@ Implicit Arguments Nil.
 Unset Contextual Implicit.
 Implicit Arguments Cons.
 
-Parameter length: forall (a:Type), (list a)  -> Z.
-
-Implicit Arguments length.
-
-Axiom length_def : forall (a:Type), forall (l:(list a)),
+Set Implicit Arguments.
+Fixpoint length (a:Type)(l:(list a)) {struct l}: Z :=
   match l with
-  | Nil  => ((length l) = 0%Z)
-  | Cons _ r => ((length l) = (1%Z + (length r))%Z)
+  | Nil  => 0%Z
+  | Cons _ r => (1%Z + (length r))%Z
   end.
+Unset Implicit Arguments.
 
 Axiom Length_nonnegative : forall (a:Type), forall (l:(list a)),
   (0%Z <= (length l))%Z.
@@ -111,7 +109,7 @@ destruct s.
 discriminate H9.
 injection H9; intros; subst; clear H9.
 injection H4; intros; subst; clear H4.
-rewrite (length_def _ (Cons result result1)) in H.
+replace (length (Cons result result1)) with (1 + length result1)%Z in H by auto.
 assert (h: (j < i \/ j= i)%Z) by omega; destruct h.
 apply (H5 j); auto with *.
 subst j.

@@ -1,4 +1,11 @@
 
+theory TestCoq
+  use import list.List
+  use import list.Append
+
+  lemma append_nil: forall l: list 'a. Nil ++ l = l
+end
+
 theory Bijection
   use export int.Int
   function n : int

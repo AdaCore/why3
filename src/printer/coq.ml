@@ -471,10 +471,41 @@ let print_logic_decl ~old info fmt (ls,ld) =
   print_implicits fmt ls ty_vars_args ty_vars_value all_ty_params;
   fprintf fmt "@\n"
 
-
 let print_logic_decl ~old info fmt d =
   if not (Sid.mem (fst d).ls_name info.info_rem) then
     (print_logic_decl ~old info fmt d; forget_tvs ())
+
+let print_recursive_decl info tm fmt (ls,ld) =
+  let _, _, all_ty_params = ls_ty_vars ls in
+  let il = try Mls.find ls tm with Not_found -> assert false in
+  let i = match il with [i] -> i | _ -> assert false in
+  begin match ld with
+    | Some ld ->
+        let vl,e = open_ls_defn ld in
+        fprintf fmt "%a%a%a {struct %a}: %a :=@ %a.@]@\n"
+          print_ls ls
+          print_ne_params all_ty_params
+          (print_space_list (print_vsty info)) vl
+          print_vs (List.nth vl i)
+          (print_ls_type info) ls.ls_value
+          (print_expr info) e;
+        List.iter forget_var vl
+    | None ->
+        assert false
+  end
+
+let print_recursive_decl info fmt dl =
+  let tm = check_termination dl in
+  let d, dl = match dl with d :: dl -> d, dl | [] -> assert false in
+  fprintf fmt "Set Implicit Arguments.@\n";
+  fprintf fmt "@[<hov 2>Fixpoint ";
+  print_recursive_decl info tm fmt d; forget_tvs ();
+  List.iter
+    (fun d ->
+       fprintf fmt "@[<hov 2>with ";
+       print_recursive_decl info tm fmt d; forget_tvs ())
+    dl;
+  fprintf fmt "Unset Implicit Arguments.@\n@\n"
 
 let print_ind info fmt (pr,f) =
   fprintf fmt "@[<hov 4>| %a : %a@]" print_pr pr (print_fmla info) f
@@ -510,10 +541,16 @@ let print_proof ~old info fmt = function
   | Pskip -> ()
 
 let print_decl ~old info fmt d = match d.d_node with
-  | Dtype tl  -> print_list nothing (print_type_decl ~old info) fmt tl
-  | Dlogic ll -> print_list nothing (print_logic_decl ~old info) fmt ll
-  | Dind il   -> print_list nothing (print_ind_decl info) fmt il
-  | Dprop (_,pr,_) when Sid.mem pr.pr_name info.info_rem -> ()
+  | Dtype tl  ->
+      print_list nothing (print_type_decl ~old info) fmt tl
+  | Dlogic [s,_ as ld] when not (Sid.mem s.ls_name d.d_syms) ->
+      print_logic_decl ~old info fmt ld
+  | Dlogic ll ->
+      print_recursive_decl info fmt ll
+  | Dind il   ->
+      print_list nothing (print_ind_decl info) fmt il
+  | Dprop (_,pr,_) when Sid.mem pr.pr_name info.info_rem ->
+      ()
   | Dprop (k,pr,f) ->
       let params = t_ty_freevars Stv.empty f in
       fprintf fmt "@[<hov 2>%a %a : %a%a.@]@\n%a"
