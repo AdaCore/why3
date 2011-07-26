@@ -3,43 +3,43 @@
 <why3session name="examples/programs/bresenham/why3session.xml">
  <file name="../bresenham.mlw" verified="false" expanded="true">
   <theory name="WP M" verified="false" expanded="true">
-   <goal name="Invariant_is_ok" sum="390f64d8a0d8118b5ecd73b966e91e83" proved="false" expanded="true">
+   <goal name="invariant_is_ok" sum="a18992b264d84141d8761ca70ad6be8d" proved="false" expanded="true">
    </goal>
-   <goal name="WP_parameter bresenham" expl="correctness of parameter bresenham" sum="7137b9a89e80cd74f02528f954bd7767" proved="true" expanded="true">
+   <goal name="WP_parameter bresenham" expl="correctness of parameter bresenham" sum="e21d55e7ef3bbb885c18d91e544577f6" proved="true" expanded="true">
     <transf name="split_goal" proved="true" expanded="true">
-     <goal name="WP_parameter bresenham.1" expl="loop invariant init" sum="37b77c77cba7d3b5f341f0e4f308cb16" proved="true" expanded="true">
+     <goal name="WP_parameter bresenham.1" expl="loop invariant init" sum="17124999e917b5c053f6e76b259bcb7c" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter bresenham.2" expl="assertion" sum="26e0bdc12b640e71e7a5e9e6fe918505" proved="true" expanded="true">
+     <goal name="WP_parameter bresenham.2" expl="assertion" sum="6a4211d9f59e4c91dd774b5f26851c4a" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.10"/>
+       <result status="valid" time="0.14"/>
       </proof>
      </goal>
-     <goal name="WP_parameter bresenham.3" expl="loop invariant preservation" sum="396be0c229aea0c570cd8b725a241ec7" proved="true" expanded="true">
+     <goal name="WP_parameter bresenham.3" expl="loop invariant preservation" sum="cc7e4371357729bd73f6d31bb228d35e" proved="true" expanded="true">
       <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.03"/>
       </proof>
      </goal>
-     <goal name="WP_parameter bresenham.4" expl="loop variant decreases" sum="61896fe87096af22bf4d875b7b64fae6" proved="true" expanded="true">
+     <goal name="WP_parameter bresenham.4" expl="loop variant decreases" sum="38653e4347933a962e5aa5d8faf55aaf" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.03"/>
       </proof>
      </goal>
-     <goal name="WP_parameter bresenham.5" expl="loop invariant preservation" sum="fe62d534b8c709778059913e84a3aa95" proved="true" expanded="true">
+     <goal name="WP_parameter bresenham.5" expl="loop invariant preservation" sum="694c94aaa6e82005f68c8636fcf6fa15" proved="true" expanded="true">
       <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter bresenham.6" expl="loop variant decreases" sum="169f4e236bbdd35bc03b2b6daf8f3b7f" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter bresenham.6" expl="loop variant decreases" sum="4ba25dd13f98e0aa80af58d01101b63a" proved="true" expanded="true">
+     <goal name="WP_parameter bresenham.7" expl="normal postcondition" sum="bd112799fb9e847a8546c1fac8ba4617" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter bresenham.7" expl="normal postcondition" sum="4a8331e536c125e86e9ddd1c02da8eed" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
     </transf>

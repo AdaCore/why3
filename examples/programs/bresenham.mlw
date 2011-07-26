@@ -13,9 +13,9 @@ module M
       [0 <= y2 <= x2]. The seven other cases can be easily
       deduced by symmetry. *)
 
-  function x2 : int
-  function y2 : int
-  axiom First_octant : 0 <= y2 <= x2
+  function x2: int
+  function y2: int
+  axiom first_octant: 0 <= y2 <= x2
 
   (* The code.
       [(best x y)] expresses that the point [(x,y)] is the best
@@ -25,14 +25,14 @@ module M
 
   use import int.Abs
 
-  predicate best (x y:int) =
-    forall y':int. abs (x2 * y - x * y2) <= abs (x2 * y' - x * y2)
+  predicate best (x y: int) =
+    forall y': int. abs (x2 * y - x * y2) <= abs (x2 * y' - x * y2)
 
-  predicate invariant_ (x y e:int) =
+  predicate invariant_ (x y e: int) =
     e = 2 * (x + 1) * y2 - (2 * y + 1) * x2 /\
     2 * (y2 - x2) <= e <= 2 * y2
 
-  lemma Invariant_is_ok : forall x y e:int. invariant_ x y e -> best x y
+  lemma invariant_is_ok: forall x y e: int. invariant_ x y e -> best x y
 
   let bresenham () =
     let x = ref 0 in
