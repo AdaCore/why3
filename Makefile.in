@@ -342,6 +342,32 @@ install_no_local::
 
 install_local: bin/why3ml
 
+########
+# GNATWhy3
+########
+
+$(PGMCMO) $(PGMCMX): INCLUDES += -I src/programs
+
+# build targets
+
+byte: bin/gnat3why.byte
+opt:  bin/gnat3why.opt
+
+bin/gnat3why.opt: src/why3.cmxa $(PGMCMX) src/gnatmain.cmx
+	$(if $(QUIET), @echo 'Linking  $@' &&) \
+	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
+	$(STRIP) $@
+
+bin/gnat3why.byte: src/why3.cma $(PGMCMO) src/gnatmain.cmo
+	$(if $(QUIET),@echo 'Linking  $@' &&) \
+	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
+
+bin/gnat3why: bin/gnat3why.@OCAMLBEST@
+	ln -sf gnat3why.@OCAMLBEST@ $@
+
+install_no_local::
+	cp -f bin/gnat3why.@OCAMLBEST@ $(BINDIR)/gnat3why
+
 ##########
 # gallery
 ##########
