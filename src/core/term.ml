@@ -397,7 +397,8 @@ module Hsterm = Hashcons.Make (struct
   let equal t1 t2 =
     oty_equal t1.t_ty t2.t_ty &&
     t_equal_node t1.t_node t2.t_node &&
-    list_all2 (=) t1.t_label t2.t_label
+    list_all2 (=) t1.t_label t2.t_label &&
+    option_eq Loc.equal t1.t_loc t2.t_loc
 
   let t_hash_bound (v,b,t) =
     Hashcons.combine (vs_hash v) (bnd_hash b (t_hash t))
@@ -426,7 +427,8 @@ module Hsterm = Hashcons.Make (struct
     | Tfalse -> 1
 
   let hash t =
-    Hashcons.combine (t_hash_node t.t_node)
+    Hashcons.combine2 (t_hash_node t.t_node)
+      (Hashcons.combine_option Loc.hash t.t_loc)
       (Hashcons.combine_list Hashtbl.hash (oty_hash t.t_ty) t.t_label)
 
   let t_vars_node = function

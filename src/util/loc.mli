@@ -43,6 +43,8 @@ val user_position : string -> int -> int -> int -> position
 val get : position -> string * int * int * int
 
 val compare : position -> position -> int
+val equal : position -> position -> bool
+val hash : position -> int
 
 val gen_report_position : formatter -> position -> unit
 
