@@ -32,15 +32,13 @@ Implicit Arguments Nil.
 Unset Contextual Implicit.
 Implicit Arguments Cons.
 
-Parameter length: forall (a:Type), (list a)  -> Z.
-
-Implicit Arguments length.
-
-Axiom length_def : forall (a:Type), forall (l:(list a)),
+Set Implicit Arguments.
+Fixpoint length (a:Type)(l:(list a)) {struct l}: Z :=
   match l with
-  | Nil  => ((length l) = 0%Z)
-  | Cons _ r => ((length l) = (1%Z + (length r))%Z)
+  | Nil  => 0%Z
+  | Cons _ r => (1%Z + (length r))%Z
   end.
+Unset Implicit Arguments.
 
 Axiom Length_nonnegative : forall (a:Type), forall (l:(list a)),
   (0%Z <= (length l))%Z.
@@ -80,21 +78,17 @@ Theorem min_dist_eps_length : forall (w:(list char)), (min_dist (Nil:(list
   char)) w (length w)).
 (* YOU MAY EDIT THE PROOF BELOW *)
 intros w; unfold min_dist; intuition.
-induction w; simpl; intros.
-generalize (length_def _ (@Nil char)).
-intro h; rewrite h.
+induction w; intros.
 exact dist_eps.
-generalize (length_def _ (Cons a w)).
-intro h; rewrite h.
+unfold length; fold length.
 replace (1 + length w)%Z with (length w + 1)%Z by omega.
 apply dist_add_right; assumption.
 generalize m H.
  clear m H.
-induction w; intros m H; inversion H; simpl.
-generalize (length_def _ (@Nil char)).
-omega.
+induction w; intros m H; inversion H.
+simpl; omega.
 generalize (IHw n H4); intro; try omega.
-generalize (length_def _ (Cons a w)).
+unfold length; fold length.
 omega.
 Qed.
 (* DO NOT EDIT BELOW *)

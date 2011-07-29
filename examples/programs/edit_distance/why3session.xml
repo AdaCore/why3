@@ -7,246 +7,246 @@
    </goal>
    <goal name="min_dist_diff" sum="4015bdb0b34c4343107f056d5e1ed1f9" proved="false" expanded="true">
    </goal>
-   <goal name="min_dist_eps" sum="0b1723159f9fb8ec3f503bb7e0cb16f4" proved="true" expanded="false">
+   <goal name="min_dist_eps" sum="0b1723159f9fb8ec3f503bb7e0cb16f4" proved="true" expanded="true">
     <proof prover="coq" timelimit="20" edited="edit_distance_Word_min_dist_eps_1.v" obsolete="false">
-     <result status="valid" time="0.70"/>
+     <result status="valid" time="0.50"/>
     </proof>
    </goal>
-   <goal name="min_dist_eps_length" sum="c2c90d9dc7c409bb88ee27f06189633f" proved="true" expanded="false">
+   <goal name="min_dist_eps_length" sum="c2c90d9dc7c409bb88ee27f06189633f" proved="true" expanded="true">
     <proof prover="coq" timelimit="20" edited="edit_distance_Word_min_dist_eps_length_1.v" obsolete="false">
-     <result status="valid" time="0.75"/>
+     <result status="valid" time="0.57"/>
     </proof>
    </goal>
   </theory>
-  <theory name="WP EditDistance" verified="true" expanded="false">
-   <goal name="suffix_length" sum="4d219c5494bb9a132e2bcd56ccd675e4" proved="true" expanded="false">
+  <theory name="WP EditDistance" verified="true" expanded="true">
+   <goal name="suffix_length" sum="4d219c5494bb9a132e2bcd56ccd675e4" proved="true" expanded="true">
     <proof prover="coq" timelimit="20" edited="edit_distance_WP_EditDistance_suffix_length_1.v" obsolete="false">
-     <result status="valid" time="1.00"/>
+     <result status="valid" time="0.63"/>
     </proof>
    </goal>
-   <goal name="WP_parameter distance" expl="correctness of parameter distance" sum="8a605e9a5c20c02132987dd701850a28" proved="true" expanded="false">
-    <transf name="split_goal" proved="true" expanded="false">
-     <goal name="WP_parameter distance.1" expl="precondition" sum="482ce4a63d91491d0b2069818a38675d" proved="true" expanded="false">
+   <goal name="WP_parameter distance" expl="correctness of parameter distance" sum="8a605e9a5c20c02132987dd701850a28" proved="true" expanded="true">
+    <transf name="split_goal" proved="true" expanded="true">
+     <goal name="WP_parameter distance.1" expl="precondition" sum="482ce4a63d91491d0b2069818a38675d" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="30" edited="" obsolete="false">
-       <result status="valid" time="0.03"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal name="WP_parameter distance.2" expl="precondition" sum="057f96a39d96bcce1b7f7b65e718f669" proved="true" expanded="false">
+     <goal name="WP_parameter distance.2" expl="precondition" sum="057f96a39d96bcce1b7f7b65e718f669" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="30" edited="" obsolete="false">
-       <result status="valid" time="0.04"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal name="WP_parameter distance.3" expl="normal postcondition" sum="9ae036c1975202482cc0a54e929de0be" proved="true" expanded="false">
-      <proof prover="alt-ergo" timelimit="30" edited="" obsolete="false">
-       <result status="valid" time="0.04"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter distance.4" expl="for loop initialization" sum="2525bcb1b12a7360b21c9e62a3313747" proved="true" expanded="false">
+     <goal name="WP_parameter distance.3" expl="normal postcondition" sum="9ae036c1975202482cc0a54e929de0be" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="30" edited="" obsolete="false">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter distance.5" expl="for loop preservation" sum="28bfb31792785bf04a6307d5a0a0f00c" proved="true" expanded="false">
-      <transf name="split_goal" proved="true" expanded="false">
-       <goal name="WP_parameter distance.5.1" expl="for loop preservation" sum="173e25f2fbfb94fd4f27e448346cab7e" proved="true" expanded="false">
-        <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter distance.5.2" expl="for loop preservation" sum="a58536bd9183d46f98b7415c7a2a1b29" proved="true" expanded="false">
+     <goal name="WP_parameter distance.4" expl="for loop initialization" sum="2525bcb1b12a7360b21c9e62a3313747" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="30" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter distance.5" expl="for loop preservation" sum="28bfb31792785bf04a6307d5a0a0f00c" proved="true" expanded="true">
+      <transf name="split_goal" proved="true" expanded="true">
+       <goal name="WP_parameter distance.5.1" expl="for loop preservation" sum="173e25f2fbfb94fd4f27e448346cab7e" proved="true" expanded="true">
         <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
          <result status="valid" time="0.01"/>
         </proof>
        </goal>
-       <goal name="WP_parameter distance.5.3" expl="for loop preservation" sum="a7c38461dc9744059ae56f0b75d5a310" proved="true" expanded="false">
+       <goal name="WP_parameter distance.5.2" expl="for loop preservation" sum="a58536bd9183d46f98b7415c7a2a1b29" proved="true" expanded="true">
         <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-         <result status="valid" time="0.03"/>
+         <result status="valid" time="0.02"/>
         </proof>
        </goal>
-       <goal name="WP_parameter distance.5.4" expl="for loop preservation" sum="f6adcd2670c299f9ef50fdbca89cde90" proved="true" expanded="false">
+       <goal name="WP_parameter distance.5.3" expl="for loop preservation" sum="a7c38461dc9744059ae56f0b75d5a310" proved="true" expanded="true">
         <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-         <result status="valid" time="0.04"/>
+         <result status="valid" time="0.00"/>
         </proof>
        </goal>
-       <goal name="WP_parameter distance.5.5" expl="for loop preservation" sum="df16b3564e58b7a2f4bd746b5402f818" proved="true" expanded="false">
+       <goal name="WP_parameter distance.5.4" expl="for loop preservation" sum="f6adcd2670c299f9ef50fdbca89cde90" proved="true" expanded="true">
         <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-         <result status="valid" time="0.03"/>
+         <result status="valid" time="0.02"/>
         </proof>
        </goal>
-       <goal name="WP_parameter distance.5.6" expl="for loop preservation" sum="9a917f603e7affca11b5496af3c7c3b4" proved="true" expanded="false">
+       <goal name="WP_parameter distance.5.5" expl="for loop preservation" sum="df16b3564e58b7a2f4bd746b5402f818" proved="true" expanded="true">
         <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-         <result status="valid" time="0.03"/>
+         <result status="valid" time="0.02"/>
         </proof>
        </goal>
-       <goal name="WP_parameter distance.5.7" expl="for loop preservation" sum="890c1087e856e6784bea7f7fb6d782b2" proved="true" expanded="false">
+       <goal name="WP_parameter distance.5.6" expl="for loop preservation" sum="9a917f603e7affca11b5496af3c7c3b4" proved="true" expanded="true">
         <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-         <result status="valid" time="0.03"/>
+         <result status="valid" time="0.01"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter distance.5.7" expl="for loop preservation" sum="890c1087e856e6784bea7f7fb6d782b2" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
       </transf>
      </goal>
-     <goal name="WP_parameter distance.6" expl="precondition" sum="66f368b6b047a3a0a26224ef1c6c506b" proved="true" expanded="false">
+     <goal name="WP_parameter distance.6" expl="precondition" sum="66f368b6b047a3a0a26224ef1c6c506b" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="30" edited="" obsolete="false">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter distance.7" expl="normal postcondition" sum="0ecee843c99e1c903413c7ed8150429d" proved="true" expanded="false">
+     <goal name="WP_parameter distance.7" expl="normal postcondition" sum="0ecee843c99e1c903413c7ed8150429d" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="30" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal name="WP_parameter distance.8" expl="for loop initialization" sum="22677abb3494ce245a35b8ad386715bf" proved="true" expanded="false">
+     <goal name="WP_parameter distance.8" expl="for loop initialization" sum="22677abb3494ce245a35b8ad386715bf" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="30" edited="" obsolete="false">
-       <result status="valid" time="0.03"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal name="WP_parameter distance.9" expl="for loop preservation" sum="7c79fe48346041308ffbe873b5aca0c7" proved="true" expanded="false">
-      <transf name="split_goal" proved="true" expanded="false">
-       <goal name="WP_parameter distance.9.1" expl="for loop preservation" sum="43072d487fae532066ce52468729be3a" proved="true" expanded="false">
+     <goal name="WP_parameter distance.9" expl="for loop preservation" sum="7c79fe48346041308ffbe873b5aca0c7" proved="true" expanded="true">
+      <transf name="split_goal" proved="true" expanded="true">
+       <goal name="WP_parameter distance.9.1" expl="for loop preservation" sum="43072d487fae532066ce52468729be3a" proved="true" expanded="true">
         <proof prover="alt-ergo" timelimit="30" edited="" obsolete="false">
-         <result status="valid" time="0.04"/>
+         <result status="valid" time="0.02"/>
         </proof>
        </goal>
-       <goal name="WP_parameter distance.9.2" expl="for loop preservation" sum="60596c4c51f7b5944b196b73caa95f2d" proved="true" expanded="false">
+       <goal name="WP_parameter distance.9.2" expl="for loop preservation" sum="60596c4c51f7b5944b196b73caa95f2d" proved="true" expanded="true">
         <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-         <result status="valid" time="0.04"/>
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
       </transf>
      </goal>
-     <goal name="WP_parameter distance.10" expl="precondition" sum="c32b5bb92aa006791797cac1a9c1a5f4" proved="true" expanded="false">
+     <goal name="WP_parameter distance.10" expl="precondition" sum="c32b5bb92aa006791797cac1a9c1a5f4" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="30" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal name="WP_parameter distance.11" expl="normal postcondition" sum="3bb84f4ea560aa03da294943cd3ee8ac" proved="true" expanded="false">
-      <transf name="split_goal" proved="true" expanded="false">
-       <goal name="WP_parameter distance.11.1" expl="normal postcondition" sum="3bb84f4ea560aa03da294943cd3ee8ac" proved="true" expanded="false">
+     <goal name="WP_parameter distance.11" expl="normal postcondition" sum="3bb84f4ea560aa03da294943cd3ee8ac" proved="true" expanded="true">
+      <transf name="split_goal" proved="true" expanded="true">
+       <goal name="WP_parameter distance.11.1" expl="normal postcondition" sum="3bb84f4ea560aa03da294943cd3ee8ac" proved="true" expanded="true">
         <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-         <result status="valid" time="0.05"/>
+         <result status="valid" time="0.02"/>
         </proof>
        </goal>
       </transf>
      </goal>
-     <goal name="WP_parameter distance.12" expl="for loop initialization" sum="18ec0864fb86b0a3434bc020019c24c1" proved="true" expanded="false">
-      <proof prover="alt-ergo" timelimit="30" edited="" obsolete="false">
-       <result status="valid" time="0.08"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter distance.13" expl="for loop preservation" sum="af7d941a7e0cc4e4e5cd74be029995fd" proved="true" expanded="false">
-      <transf name="split_goal" proved="true" expanded="false">
-       <goal name="WP_parameter distance.13.1" expl="for loop preservation" sum="d009d3edbe03cedf1623a8677c8106cd" proved="true" expanded="false">
-        <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-         <result status="valid" time="0.03"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter distance.13.2" expl="for loop preservation" sum="b44bdcf4f1c706accce3c64a4390087f" proved="true" expanded="false">
-        <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-         <result status="valid" time="0.03"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter distance.13.3" expl="for loop preservation" sum="02aefcc18f2bc6ed080dd9db43f48d06" proved="true" expanded="false">
-        <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-         <result status="valid" time="0.03"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter distance.13.4" expl="for loop preservation" sum="4925e9033ca9cbd374c42be6f9374902" proved="true" expanded="false">
-        <proof prover="z3" timelimit="20" edited="" obsolete="false">
-         <result status="valid" time="0.05"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter distance.13.5" expl="for loop preservation" sum="6bdbe13e9dd586420f3199ab5d880fa2" proved="true" expanded="false">
-        <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-         <result status="valid" time="5.74"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter distance.13.6" expl="for loop preservation" sum="3942c2e4de6f646ae6841c4d57654c23" proved="true" expanded="false">
-        <transf name="split_goal" proved="true" expanded="false">
-         <goal name="WP_parameter distance.13.6.1" expl="for loop preservation" sum="f05ee215abf0219e2703812c14165121" proved="true" expanded="false">
-          <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-           <result status="valid" time="0.04"/>
-          </proof>
-         </goal>
-         <goal name="WP_parameter distance.13.6.2" expl="for loop preservation" sum="8e8b91bc77444d3a61565c4c5ed196da" proved="true" expanded="false">
-          <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-           <result status="valid" time="0.02"/>
-          </proof>
-         </goal>
-         <goal name="WP_parameter distance.13.6.3" expl="for loop preservation" sum="68f01bfc90ab9dab8e39e5cc194d73ba" proved="true" expanded="false">
-          <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-           <result status="valid" time="0.03"/>
-          </proof>
-         </goal>
-         <goal name="WP_parameter distance.13.6.4" expl="for loop preservation" sum="e70c8ff8846d98fbc7438a3d26994dc8" proved="true" expanded="false">
-          <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-           <result status="valid" time="0.03"/>
-          </proof>
-         </goal>
-         <goal name="WP_parameter distance.13.6.5" expl="for loop preservation" sum="31bc2c9553d93894df1c33a2b8c54ae6" proved="true" expanded="false">
-          <proof prover="coq" timelimit="20" edited="edit_distance_WP_EditDistance_WP_parameter_distance_1.v" obsolete="false">
-           <result status="valid" time="1.00"/>
-          </proof>
-         </goal>
-         <goal name="WP_parameter distance.13.6.6" expl="for loop preservation" sum="5fd710c81355838704937a9350ddd2a3" proved="true" expanded="false">
-          <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-           <result status="valid" time="0.06"/>
-          </proof>
-         </goal>
-         <goal name="WP_parameter distance.13.6.7" expl="for loop preservation" sum="746b7e0c280424bbae1b73ad4d9a2b65" proved="true" expanded="false">
-          <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-           <result status="valid" time="0.03"/>
-          </proof>
-         </goal>
-         <goal name="WP_parameter distance.13.6.8" expl="for loop preservation" sum="950da5869d435191a418c461607c327e" proved="true" expanded="false">
-          <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-           <result status="valid" time="0.04"/>
-          </proof>
-         </goal>
-         <goal name="WP_parameter distance.13.6.9" expl="for loop preservation" sum="0d8e8ef8aa43aa53ea831ef7327165c3" proved="true" expanded="false">
-          <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-           <result status="valid" time="0.04"/>
-          </proof>
-         </goal>
-         <goal name="WP_parameter distance.13.6.10" expl="for loop preservation" sum="6ca44d456711451c05ce36cf06ebabac" proved="true" expanded="false">
-          <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-           <result status="valid" time="0.03"/>
-          </proof>
-         </goal>
-         <goal name="WP_parameter distance.13.6.11" expl="for loop preservation" sum="ccec34f13c891c12bbab90bbd8f07bcc" proved="true" expanded="false">
-          <proof prover="coq" timelimit="20" edited="edit_distance_WP_EditDistance_WP_parameter_distance_2.v" obsolete="false">
-           <result status="valid" time="1.16"/>
-          </proof>
-         </goal>
-         <goal name="WP_parameter distance.13.6.12" expl="for loop preservation" sum="3ed2c027f8d658fcf3e07a22184101e1" proved="true" expanded="false">
-          <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-           <result status="valid" time="0.04"/>
-          </proof>
-         </goal>
-         <goal name="WP_parameter distance.13.6.13" expl="for loop preservation" sum="c13f7295bd436f956b2412339c52d207" proved="true" expanded="false">
-          <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-           <result status="valid" time="0.04"/>
-          </proof>
-         </goal>
-        </transf>
-       </goal>
-       <goal name="WP_parameter distance.13.7" expl="for loop preservation" sum="6e74242d528e537ca658725785512266" proved="true" expanded="false">
-        <proof prover="cvc3" timelimit="20" edited="" obsolete="false">
-         <result status="valid" time="0.06"/>
-        </proof>
-        <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-         <result status="valid" time="0.03"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter distance.14" expl="precondition" sum="463c47d3f59963fef73eb5bcd28e40aa" proved="true" expanded="false">
+     <goal name="WP_parameter distance.12" expl="for loop initialization" sum="18ec0864fb86b0a3434bc020019c24c1" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="30" edited="" obsolete="false">
        <result status="valid" time="0.04"/>
       </proof>
      </goal>
-     <goal name="WP_parameter distance.15" expl="normal postcondition" sum="82371112879afafab69b2118ca585ea9" proved="true" expanded="false">
+     <goal name="WP_parameter distance.13" expl="for loop preservation" sum="af7d941a7e0cc4e4e5cd74be029995fd" proved="true" expanded="true">
+      <transf name="split_goal" proved="true" expanded="true">
+       <goal name="WP_parameter distance.13.1" expl="for loop preservation" sum="d009d3edbe03cedf1623a8677c8106cd" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter distance.13.2" expl="for loop preservation" sum="b44bdcf4f1c706accce3c64a4390087f" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter distance.13.3" expl="for loop preservation" sum="02aefcc18f2bc6ed080dd9db43f48d06" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter distance.13.4" expl="for loop preservation" sum="4925e9033ca9cbd374c42be6f9374902" proved="true" expanded="true">
+        <proof prover="z3" timelimit="20" edited="" obsolete="false">
+         <result status="valid" time="0.04"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter distance.13.5" expl="for loop preservation" sum="6bdbe13e9dd586420f3199ab5d880fa2" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
+         <result status="valid" time="2.76"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter distance.13.6" expl="for loop preservation" sum="3942c2e4de6f646ae6841c4d57654c23" proved="true" expanded="true">
+        <transf name="split_goal" proved="true" expanded="true">
+         <goal name="WP_parameter distance.13.6.1" expl="for loop preservation" sum="f05ee215abf0219e2703812c14165121" proved="true" expanded="true">
+          <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
+           <result status="valid" time="0.01"/>
+          </proof>
+         </goal>
+         <goal name="WP_parameter distance.13.6.2" expl="for loop preservation" sum="8e8b91bc77444d3a61565c4c5ed196da" proved="true" expanded="true">
+          <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
+           <result status="valid" time="0.02"/>
+          </proof>
+         </goal>
+         <goal name="WP_parameter distance.13.6.3" expl="for loop preservation" sum="68f01bfc90ab9dab8e39e5cc194d73ba" proved="true" expanded="true">
+          <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
+           <result status="valid" time="0.01"/>
+          </proof>
+         </goal>
+         <goal name="WP_parameter distance.13.6.4" expl="for loop preservation" sum="e70c8ff8846d98fbc7438a3d26994dc8" proved="true" expanded="true">
+          <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
+           <result status="valid" time="0.01"/>
+          </proof>
+         </goal>
+         <goal name="WP_parameter distance.13.6.5" expl="for loop preservation" sum="31bc2c9553d93894df1c33a2b8c54ae6" proved="true" expanded="true">
+          <proof prover="coq" timelimit="20" edited="edit_distance_WP_EditDistance_WP_parameter_distance_1.v" obsolete="false">
+           <result status="valid" time="0.74"/>
+          </proof>
+         </goal>
+         <goal name="WP_parameter distance.13.6.6" expl="for loop preservation" sum="5fd710c81355838704937a9350ddd2a3" proved="true" expanded="true">
+          <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
+           <result status="valid" time="0.02"/>
+          </proof>
+         </goal>
+         <goal name="WP_parameter distance.13.6.7" expl="for loop preservation" sum="746b7e0c280424bbae1b73ad4d9a2b65" proved="true" expanded="true">
+          <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
+           <result status="valid" time="0.02"/>
+          </proof>
+         </goal>
+         <goal name="WP_parameter distance.13.6.8" expl="for loop preservation" sum="950da5869d435191a418c461607c327e" proved="true" expanded="true">
+          <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
+           <result status="valid" time="0.01"/>
+          </proof>
+         </goal>
+         <goal name="WP_parameter distance.13.6.9" expl="for loop preservation" sum="0d8e8ef8aa43aa53ea831ef7327165c3" proved="true" expanded="true">
+          <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
+           <result status="valid" time="0.02"/>
+          </proof>
+         </goal>
+         <goal name="WP_parameter distance.13.6.10" expl="for loop preservation" sum="6ca44d456711451c05ce36cf06ebabac" proved="true" expanded="true">
+          <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
+           <result status="valid" time="0.02"/>
+          </proof>
+         </goal>
+         <goal name="WP_parameter distance.13.6.11" expl="for loop preservation" sum="ccec34f13c891c12bbab90bbd8f07bcc" proved="true" expanded="true">
+          <proof prover="coq" timelimit="20" edited="edit_distance_WP_EditDistance_WP_parameter_distance_2.v" obsolete="false">
+           <result status="valid" time="0.84"/>
+          </proof>
+         </goal>
+         <goal name="WP_parameter distance.13.6.12" expl="for loop preservation" sum="3ed2c027f8d658fcf3e07a22184101e1" proved="true" expanded="true">
+          <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
+           <result status="valid" time="0.02"/>
+          </proof>
+         </goal>
+         <goal name="WP_parameter distance.13.6.13" expl="for loop preservation" sum="c13f7295bd436f956b2412339c52d207" proved="true" expanded="true">
+          <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
+           <result status="valid" time="0.02"/>
+          </proof>
+         </goal>
+        </transf>
+       </goal>
+       <goal name="WP_parameter distance.13.7" expl="for loop preservation" sum="6e74242d528e537ca658725785512266" proved="true" expanded="true">
+        <proof prover="cvc3" timelimit="20" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal name="WP_parameter distance.14" expl="precondition" sum="463c47d3f59963fef73eb5bcd28e40aa" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="30" edited="" obsolete="false">
-       <result status="valid" time="0.03"/>
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter distance.15" expl="normal postcondition" sum="82371112879afafab69b2118ca585ea9" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="30" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
     </transf>

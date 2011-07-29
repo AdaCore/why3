@@ -44,15 +44,13 @@ Implicit Arguments Nil.
 Unset Contextual Implicit.
 Implicit Arguments Cons.
 
-Parameter length: forall (a:Type), (list a)  -> Z.
-
-Implicit Arguments length.
-
-Axiom length_def : forall (a:Type), forall (l:(list a)),
+Set Implicit Arguments.
+Fixpoint length (a:Type)(l:(list a)) {struct l}: Z :=
   match l with
-  | Nil  => ((length l) = 0%Z)
-  | Cons _ r => ((length l) = (1%Z + (length r))%Z)
+  | Nil  => 0%Z
+  | Cons _ r => (1%Z + (length r))%Z
   end.
+Unset Implicit Arguments.
 
 Axiom Length_nonnegative : forall (a:Type), forall (l:(list a)),
   (0%Z <= (length l))%Z.
@@ -176,18 +174,17 @@ pattern (n - i)%Z; apply natlike_ind.
 (* base case *)
 intros; replace (n - 0)%Z with n.
 rewrite suffix_nil; simpl.
-generalize (length_def _ (@Nil char)); intuition.
+omega.
 omega.
 (* induction case *)
 intros.
 rewrite suffix_cons.
-2: unfold length1; simpl; omega.
-unfold get1; simpl.
-generalize (length_def _ (Cons(get a (n - Zsucc x)%Z) (suffix (mk_array n a) (n - Zsucc x + 1)))); intuition.
-rewrite H1.
+2: unfold length; simpl; omega.
+unfold get1.
+unfold length; fold length.
 unfold Zsucc; ring_simplify.
 replace (n - (x + 1) + 1)%Z with (n - x)%Z; [ idtac | ring ].
-rewrite H6; omega.
+rewrite H0; omega.
 omega.
 omega.
 omega.
