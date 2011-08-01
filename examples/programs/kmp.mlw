@@ -84,9 +84,7 @@ module KnuthMorrisPratt
   lemma next_1_0:
     forall p: array char. 1 <= length p -> is_next p 1 0
 
-  predicate lt_nat (x y: int) = 0 <= y /\ x < y
-  clone import relations.Lex with type t1 = int, type t2 = int,
-    predicate rel1 = lt_nat, predicate rel2 = lt_nat
+  use import int.Lex2
 
   (* The pattern *)
 

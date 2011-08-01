@@ -30,6 +30,17 @@ theory MinMax
 
 end
 
+theory Lex2
+
+  use import Int
+
+  predicate lt_nat (x y: int) = 0 <= y /\ x < y
+
+  clone export relations.Lex with type t1 = int, type t2 = int,
+    predicate rel1 = lt_nat, predicate rel2 = lt_nat
+
+end
+
 theory EuclideanDivision
 
   use import Int

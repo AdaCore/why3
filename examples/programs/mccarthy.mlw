@@ -28,10 +28,7 @@ module McCarthy91
   axiom iter_f_0: forall x: int. iter_f 0 x = x
   axiom iter_f_s: forall k x: int. 0 < k -> iter_f k x = iter_f (k-1) (f x)
 
-  predicate lt_nat (x y: int) = 0 <= y /\ x < y
-
-  clone import relations.Lex with type t1 = int, type t2 = int,
-    predicate rel1 = lt_nat, predicate rel2 = lt_nat
+  use import int.Lex2
 
   let f91_nonrec (n0: int) =
     { }
