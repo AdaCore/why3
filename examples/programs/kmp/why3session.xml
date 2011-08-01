@@ -94,16 +94,56 @@
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter initnext.6" expl="loop invariant preservation" sum="30d44d6330328364944ed659a0813add" proved="false" expanded="false">
-      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-       <result status="unknown" time="2.16"/>
-      </proof>
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="timeout" time="10.12"/>
-      </proof>
-      <proof prover="z3" timelimit="10" edited="" obsolete="false">
-       <result status="timeout" time="10.24"/>
-      </proof>
+     <goal name="WP_parameter initnext.6" expl="loop invariant preservation" sum="30d44d6330328364944ed659a0813add" proved="false" expanded="true">
+      <transf name="split_goal" proved="false" expanded="true">
+       <goal name="WP_parameter initnext.6.1" expl="correctness of parameter initnext" sum="4ccdb8b3b0e1540aeed3223499c57d4f" proved="true" expanded="false">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.03"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter initnext.6.2" expl="correctness of parameter initnext" sum="f93cdfc5669cb674ca1ae290fc1331d4" proved="true" expanded="false">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.03"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter initnext.6.3" expl="correctness of parameter initnext" sum="09f6fa63093ccff23c6a6e268ca9d9f9" proved="true" expanded="false">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.03"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter initnext.6.4" expl="correctness of parameter initnext" sum="c8b72addaa20143058745539f27eab57" proved="true" expanded="false">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.03"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter initnext.6.5" expl="correctness of parameter initnext" sum="e0f2a2ca9751b8464299ee8ac84b3e8f" proved="true" expanded="false">
+        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.05"/>
+        </proof>
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="4.35"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter initnext.6.6" expl="correctness of parameter initnext" sum="5a7db9cfa81d5bb670deb9aa80d7a032" proved="false" expanded="true">
+        <proof prover="coq" timelimit="10" edited="kmp_WP_KnuthMorrisPratt_WP_parameter_initnext_1.v" obsolete="false"><undone/>
+         
+        </proof>
+        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+         <result status="unknown" time="3.20"/>
+        </proof>
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="timeout" time="10.10"/>
+        </proof>
+        <proof prover="z3" timelimit="10" edited="" obsolete="false">
+         <result status="timeout" time="10.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter initnext.6.7" expl="correctness of parameter initnext" sum="ecf3b06606f3a9e7adce26fe58783bfd" proved="true" expanded="false">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="5.19"/>
+        </proof>
+       </goal>
+      </transf>
      </goal>
      <goal name="WP_parameter initnext.7" expl="loop variant decreases" sum="fd63551876460009add6b997d0e9fac3" proved="true" expanded="false">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
@@ -115,16 +155,50 @@
        <result status="valid" time="0.03"/>
       </proof>
      </goal>
-     <goal name="WP_parameter initnext.9" expl="loop invariant preservation" sum="1e0418bef822e1a76bcd3d94498d6a52" proved="false" expanded="false">
-      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-       <result status="unknown" time="2.79"/>
-      </proof>
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="timeout" time="10.93"/>
-      </proof>
-      <proof prover="z3" timelimit="10" edited="" obsolete="false">
-       <result status="timeout" time="11.00"/>
-      </proof>
+     <goal name="WP_parameter initnext.9" expl="loop invariant preservation" sum="1e0418bef822e1a76bcd3d94498d6a52" proved="false" expanded="true">
+      <transf name="split_goal" proved="false" expanded="true">
+       <goal name="WP_parameter initnext.9.1" expl="correctness of parameter initnext" sum="54a5851daf80e2e99d2c3acbdc9a2d01" proved="true" expanded="false">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.03"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter initnext.9.2" expl="correctness of parameter initnext" sum="40c74d7a1832f57442d4111ceb7fecbf" proved="true" expanded="false">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter initnext.9.3" expl="correctness of parameter initnext" sum="a7b9f4ad3bd71a27628b9910293337dc" proved="true" expanded="false">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter initnext.9.4" expl="correctness of parameter initnext" sum="700ef7340a7deae4112572d854f9aad0" proved="true" expanded="false">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter initnext.9.5" expl="correctness of parameter initnext" sum="f338346a9fbc55baff9c8e16fc8e27a0" proved="true" expanded="false">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.06"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter initnext.9.6" expl="correctness of parameter initnext" sum="94b97e669193d37f0d519f036f753ffd" proved="false" expanded="true">
+        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+         <result status="unknown" time="2.29"/>
+        </proof>
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="timeout" time="10.10"/>
+        </proof>
+        <proof prover="z3" timelimit="10" edited="" obsolete="false">
+         <result status="timeout" time="10.03"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter initnext.9.7" expl="correctness of parameter initnext" sum="028b0a3702aa0852de2313677fa72d47" proved="true" expanded="false">
+        <proof prover="z3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.29"/>
+        </proof>
+       </goal>
+      </transf>
      </goal>
      <goal name="WP_parameter initnext.10" expl="loop variant decreases" sum="cca350e48ed9f2d6e6bfd1e516655036" proved="true" expanded="false">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
@@ -136,8 +210,8 @@
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter initnext.12" expl="loop invariant preservation" sum="af8fc3f533a17a307d87903d6dd46035" proved="false" expanded="false">
-      <transf name="split_goal" proved="false" expanded="false">
+     <goal name="WP_parameter initnext.12" expl="loop invariant preservation" sum="af8fc3f533a17a307d87903d6dd46035" proved="false" expanded="true">
+      <transf name="split_goal" proved="false" expanded="true">
        <goal name="WP_parameter initnext.12.1" expl="correctness of parameter initnext" sum="42db1a8315d2167d40ea0763139efe3d" proved="true" expanded="false">
         <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
          <result status="valid" time="0.06"/>
@@ -163,7 +237,7 @@
          <result status="valid" time="1.11"/>
         </proof>
        </goal>
-       <goal name="WP_parameter initnext.12.6" expl="correctness of parameter initnext" sum="c44a60846c156fb868033d1c8cebb9f0" proved="false" expanded="false">
+       <goal name="WP_parameter initnext.12.6" expl="correctness of parameter initnext" sum="c44a60846c156fb868033d1c8cebb9f0" proved="false" expanded="true">
         <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
          <result status="timeout" time="10.14"/>
         </proof>
@@ -202,73 +276,17 @@
      </goal>
     </transf>
    </goal>
-   <goal name="WP_parameter kmp" expl="correctness of parameter kmp" sum="3ea7bafcea60971d1305a63249d55329" proved="false" expanded="true">
-    <transf name="split_goal" proved="false" expanded="true">
+   <goal name="WP_parameter kmp" expl="correctness of parameter kmp" sum="3ea7bafcea60971d1305a63249d55329" proved="true" expanded="false">
+    <transf name="split_goal" proved="true" expanded="false">
      <goal name="WP_parameter kmp.1" expl="precondition" sum="061409c5a332cdf4323d8020687b1d26" proved="true" expanded="false">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter kmp.2" expl="loop invariant init" sum="68ff401a62d3fe05a8d127509cb1e5b6" proved="true" expanded="false">
-      <transf name="inline_goal" proved="true" expanded="false">
-       <goal name="WP_parameter kmp.2.1" expl="loop invariant init" sum="26ec7b72e58e63cc556cc91ed2f1743b" proved="true" expanded="false">
-        <transf name="split_goal" proved="true" expanded="false">
-         <goal name="WP_parameter kmp.2.1.1" expl="correctness of parameter kmp" sum="4793508eae94f41396d5ee277f00bed9" proved="true" expanded="false">
-          <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-           <result status="valid" time="0.03"/>
-          </proof>
-         </goal>
-         <goal name="WP_parameter kmp.2.1.2" expl="correctness of parameter kmp" sum="7edb65827e04c4c5bd643388967bfd99" proved="true" expanded="false">
-          <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-           <result status="valid" time="0.02"/>
-          </proof>
-          <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-           <result status="valid" time="0.03"/>
-          </proof>
-         </goal>
-         <goal name="WP_parameter kmp.2.1.3" expl="correctness of parameter kmp" sum="4793508eae94f41396d5ee277f00bed9" proved="true" expanded="false">
-          <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-           <result status="valid" time="0.02"/>
-          </proof>
-         </goal>
-         <goal name="WP_parameter kmp.2.1.4" expl="correctness of parameter kmp" sum="6f93320fd5c9d568a30d249a18da35ae" proved="true" expanded="false">
-          <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-           <result status="valid" time="0.02"/>
-          </proof>
-         </goal>
-         <goal name="WP_parameter kmp.2.1.5" expl="correctness of parameter kmp" sum="d0f2ceb3e69760d2c64899f9966eec19" proved="true" expanded="false">
-          <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-           <result status="valid" time="0.02"/>
-          </proof>
-         </goal>
-         <goal name="WP_parameter kmp.2.1.6" expl="correctness of parameter kmp" sum="3ac60e0ca5c1837067448511664ca51d" proved="true" expanded="false">
-          <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-           <result status="valid" time="0.02"/>
-          </proof>
-         </goal>
-         <goal name="WP_parameter kmp.2.1.7" expl="correctness of parameter kmp" sum="a9b63c7da0dbe47734ee2a441f7dbedc" proved="true" expanded="false">
-          <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-           <result status="valid" time="0.03"/>
-          </proof>
-         </goal>
-         <goal name="WP_parameter kmp.2.1.8" expl="correctness of parameter kmp" sum="e5b4af281baae4cafc3292d63d4669cc" proved="true" expanded="false">
-          <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-           <result status="valid" time="0.03"/>
-          </proof>
-         </goal>
-         <goal name="WP_parameter kmp.2.1.9" expl="correctness of parameter kmp" sum="f7008c3e408ae1bc9ae004cf2bc02bad" proved="true" expanded="false">
-          <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-           <result status="valid" time="0.02"/>
-          </proof>
-         </goal>
-         <goal name="WP_parameter kmp.2.1.10" expl="correctness of parameter kmp" sum="914cdf0d092982e819d398303907f2aa" proved="true" expanded="false">
-          <proof prover="z3" timelimit="10" edited="" obsolete="false">
-           <result status="valid" time="0.04"/>
-          </proof>
-         </goal>
-        </transf>
-       </goal>
-      </transf>
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.05"/>
+      </proof>
      </goal>
      <goal name="WP_parameter kmp.3" expl="precondition" sum="575d6b91409f9a6370fbe5561cb8a6bd" proved="true" expanded="false">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
@@ -311,13 +329,39 @@
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter kmp.10" expl="loop invariant preservation" sum="5ab1a22e61c0329a65732b6862762367" proved="false" expanded="false">
-      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-       <result status="timeout" time="10.11"/>
-      </proof>
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="timeout" time="10.09"/>
-      </proof>
+     <goal name="WP_parameter kmp.10" expl="loop invariant preservation" sum="5ab1a22e61c0329a65732b6862762367" proved="true" expanded="false">
+      <transf name="split_goal" proved="true" expanded="false">
+       <goal name="WP_parameter kmp.10.1" expl="correctness of parameter kmp" sum="40f896133a97da5d0110d51213728569" proved="true" expanded="false">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.06"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter kmp.10.2" expl="correctness of parameter kmp" sum="20556320e6329a86e679257c648663a5" proved="true" expanded="false">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.06"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter kmp.10.3" expl="correctness of parameter kmp" sum="a652f18631d2e5b8a5567375a7dbae2b" proved="true" expanded="false">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.06"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter kmp.10.4" expl="correctness of parameter kmp" sum="83492e47adfe69d4333d05c67968dd18" proved="true" expanded="false">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.03"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter kmp.10.5" expl="correctness of parameter kmp" sum="3200af3b0e66477cc0083ff361168a22" proved="true" expanded="false">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="1.75"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter kmp.10.6" expl="correctness of parameter kmp" sum="91b8494f8ff46b5bd3fc63afc10e03cf" proved="true" expanded="false">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="3.73"/>
+        </proof>
+       </goal>
+      </transf>
      </goal>
      <goal name="WP_parameter kmp.11" expl="loop variant decreases" sum="8abf9584aab429b16efe2ff0001760e8" proved="true" expanded="false">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
