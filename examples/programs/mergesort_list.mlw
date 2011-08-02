@@ -9,13 +9,13 @@ module M
   use import list.Append
   use import list.Permut
 
-  lemma Permut_append:
-    forall l1 l2 k1 k2 : list 'a.
-    permut l1 k1 -> permut l2 k2 -> permut (l1 ++ l2) (k1 ++ k2)
-
   lemma Permut_cons_append:
     forall x : 'a, l1 l2 : list 'a.
     permut (Cons x l1 ++ l2) (l1 ++ Cons x l2)
+
+  lemma Permut_append:
+    forall l1 l2 k1 k2 : list 'a.
+    permut l1 k1 -> permut l2 k2 -> permut (l1 ++ l2) (k1 ++ k2)
 
   let split l0 =
     {  length l0 >= 2 }

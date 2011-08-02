@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session SYSTEM "why3session.dtd">
+<why3session name="examples/programs/mergesort_list/why3session.xml">
+ <file name="../mergesort_list.mlw" verified="true" expanded="true">
+  <theory name="WP M" verified="true" expanded="true">
+   <goal name="Permut_cons_append" sum="0df043e8309df0e1689f1f7a88d0d180" proved="true" expanded="true">
+    <proof prover="coq" timelimit="10" edited="mergesort_list_WP_M_Permut_cons_append_1.v" obsolete="false">
+     <result status="valid" time="0.61"/>
+    </proof>
+   </goal>
+   <goal name="Permut_append" sum="d4e21514e0240fc5a8bd445d2283b9bf" proved="true" expanded="true">
+    <proof prover="coq" timelimit="10" edited="mergesort_list_WP_M_Permut_append_1.v" obsolete="false">
+     <result status="valid" time="1.22"/>
+    </proof>
+   </goal>
+   <goal name="WP_parameter split" expl="correctness of parameter split" sum="9ff7c8dbe7d79e1015cb9368a03c1daf" proved="true" expanded="true">
+    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+     <result status="valid" time="6.84"/>
+    </proof>
+   </goal>
+   <goal name="WP_parameter merge" expl="correctness of parameter merge" sum="71611dbb934bd53af15c4a8a78858ad6" proved="true" expanded="true">
+    <transf name="split_goal" proved="true" expanded="true">
+     <goal name="WP_parameter merge.1" expl="correctness of parameter merge" sum="fe8bc9f9df8d9a6921a7196e1d60e387" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter merge.2" expl="correctness of parameter merge" sum="9fa15d85897c3aa78c4380dbaf90ebc6" proved="true" expanded="true">
+      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="1.57"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter merge.3" expl="correctness of parameter merge" sum="d16c4bd22b087a32b97aee68e2501bed" proved="true" expanded="true">
+      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.07"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter merge.4" expl="correctness of parameter merge" sum="020cc4887c52566b6403bdfa06601ab1" proved="true" expanded="true">
+      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="7.53"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter merge.5" expl="correctness of parameter merge" sum="fd637999f4d66653db893dca4f5c92b2" proved="true" expanded="true">
+      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter merge.6" expl="correctness of parameter merge" sum="75fd590235fcb4f15729660f43f7a752" proved="true" expanded="true">
+      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter merge.7" expl="correctness of parameter merge" sum="72e65cedafc98047e6ecb81d4eaa9ffe" proved="true" expanded="true">
+      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+   <goal name="WP_parameter mergesort" expl="correctness of parameter mergesort" sum="5f4885e9f401b40502a2e0d9345496aa" proved="true" expanded="true">
+    <transf name="split_goal" proved="true" expanded="true">
+     <goal name="WP_parameter mergesort.1" expl="correctness of parameter mergesort" sum="5d04401ec7eba9af0405180837439499" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter mergesort.2" expl="correctness of parameter mergesort" sum="0ee613aaf02d097f3831905d71ecf617" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.58"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter mergesort.3" expl="correctness of parameter mergesort" sum="0bcc5da55f2144e02064f3bc161146e7" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter mergesort.4" expl="correctness of parameter mergesort" sum="9112f2883b791fdb9a930833c95a5d59" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter mergesort.5" expl="correctness of parameter mergesort" sum="373dd0ea919f1e26bad2eed80d46fffa" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter mergesort.6" expl="correctness of parameter mergesort" sum="f5c5275c34f9944f6ee03bbf8548a67e" proved="true" expanded="true">
+      <transf name="split_goal" proved="true" expanded="true">
+       <goal name="WP_parameter mergesort.6.1" expl="correctness of parameter mergesort" sum="743e45f9bf536ddd5da2fe6b550656e3" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter mergesort.6.2" expl="correctness of parameter mergesort" sum="a5fdc432b28f1622e6a1095d7dd4bb3f" proved="true" expanded="true">
+        <proof prover="coq" timelimit="10" edited="mergesort_list_WP_M_WP_parameter_mergesort_1.v" obsolete="false">
+         <result status="valid" time="0.64"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+    </transf>
+   </goal>
+  </theory>
+ </file>
+</why3session>

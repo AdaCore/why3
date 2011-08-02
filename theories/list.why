@@ -103,6 +103,10 @@ theory Append
     forall x: 'a, l1 l2: list 'a.
     mem x (l1 ++ l2) <-> mem x l1 \/ mem x l2
 
+  lemma mem_decomp:
+    forall x: 'a, l: list 'a.
+    mem x l -> exists l1 l2: list 'a. l = l1 ++ Cons x l2
+
 end
 
 theory Reverse
