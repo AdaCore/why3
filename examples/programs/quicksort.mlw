@@ -38,8 +38,10 @@ module Quicksort
       quick_rec t l (!m - 1);
       quick_rec t (!m + 1) r
     end end
-    { (l <= r /\ sorted_sub t l (r+1) /\ permut_sub t (old t) l (r+1)) \/
-      (l > r /\ array_eq t (old t)) }
+    { sorted_sub t l (r+1) /\ permut_sub t (old t) l (r+1)
+      (***
+      (l <= r /\ sorted_sub t l (r+1) /\ permut_sub t (old t) l (r+1)) \/
+      (l > r /\ array_eq t (old t)) ***) }
 
   let quicksort (t : array int) =
     { }

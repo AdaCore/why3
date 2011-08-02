@@ -106,7 +106,7 @@ theory MapPermut
 
   lemma permut_eq :
     forall a1 a2 : map int 'a. forall l u : int.
-    l <= u -> permut_sub a1 a2 l u ->
+    permut_sub a1 a2 l u ->
     forall i:int. (i < l \/ u <= i) -> a2[i] = a1[i]
 
   lemma permut_exists :
