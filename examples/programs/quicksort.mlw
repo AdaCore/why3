@@ -26,8 +26,7 @@ module Quicksort
     if l < r then begin
       let v = t[l] in
       let m = ref l in
-'L:   begin
-      for i = l + 1 to r do
+'L:   for i = l + 1 to r do
         invariant { (forall j:int. l < j <= !m -> t[j] < v) /\
                     (forall j:int. !m < j <  i -> t[j] >= v) /\
                     permut_sub t (at t 'L) l (r+1) /\
@@ -37,7 +36,7 @@ module Quicksort
       swap t l !m;
       quick_rec t l (!m - 1);
       quick_rec t (!m + 1) r
-    end end
+    end
     { sorted_sub t l (r+1) /\ permut_sub t (old t) l (r+1) }
 
   let quicksort (t : array int) =
