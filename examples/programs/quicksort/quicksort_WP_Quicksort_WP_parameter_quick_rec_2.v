@@ -186,26 +186,16 @@ split.
 (* sorted *)
 red; intros.
 assert (h: (l <= i1 < m \/ m <= i1 <= r)%Z) by omega. destruct h.
-assert (h: (l <= i2 < m \/ m <= i2 <= r)%Z) by omega. destruct h.
+(* l <= i1 < m *)
 assert (eq: get t4 i1 = get t5 i1).
 apply permut_eq with (m+1)%Z (r+1)%Z; auto.
-omega.
-rewrite <- eq; clear eq.
-assert (eq: get t4 i2 = get t5 i2).
-apply permut_eq with (m+1)%Z (r+1)%Z; auto.
-omega.
-rewrite <- eq; clear eq.
-apply lsorted; omega.
-assert (vi1: (get t5 i1 < v)%Z).
-assert (eq: get t4 i1 = get t5 i1).
-apply permut_eq with (m+1)%Z (r+1)%Z; auto.
-omega.
-rewrite <- eq; clear eq.
+omega. rewrite <- eq; clear eq.
+assert (vi1: (get t4 i1 < v)%Z).
 assert (exists i3:Z, l <= i3 < m-1+1 /\ get t4 i1 = get t3 i3)%Z.
 apply permut_exists.
 apply permut_sym; auto.
 omega.
-destruct H2 as (i3, (hi3, eq3)).
+destruct H1 as (i3, (hi3, eq3)).
 rewrite eq3; clear eq3.
 assert (case: (i3 = l \/ l < i3)%Z) by omega. destruct case.
 subst i3.
@@ -213,9 +203,107 @@ destruct exch as (h,_). rewrite h.
 apply inv1; omega.
 destruct exch as (_,(_,h)). rewrite h; try omega.
 apply inv1; omega.
-assert (vi2: (v <= get t5 i2)%Z).
 
-(* TODO*) admit. admit. admit.
+assert (h: (l <= i2 < m \/ m <= i2 <= r)%Z) by omega. destruct h.
+(* l <= i2 < m *)
+assert (eq: get t4 i2 = get t5 i2).
+apply permut_eq with (m+1)%Z (r+1)%Z; auto.
+omega.
+rewrite <- eq; clear eq.
+apply lsorted; omega.
+
+(* m <= i2 <= r *)
+assert (vi2: (v <= get t5 i2)%Z).
+assert (h: (i2 = m \/ m < i2)%Z) by omega. destruct h.
+(* i2 = m *)
+subst i2.
+replace (get t5 m) with (get t3 m).
+replace (get t3 m) with (get t2 l).
+omega.
+red in exch; intuition.
+transitivity (get t4 m).
+apply permut_eq with l (m-1+1)%Z; auto.
+omega.
+apply permut_eq with (m+1)%Z (r+1)%Z; auto.
+omega.
+(* m < i2 *)
+assert (exists i3:Z, m+1 <= i3 < r+1 /\ get t5 i2 = get t4 i3)%Z.
+apply permut_exists.
+apply permut_sym; auto.
+omega.
+destruct H3 as (i3, (hi3, eq3)).
+rewrite eq3; clear eq3.
+replace (get t4 i3) with (get t3 i3).
+destruct exch as (_,(_,hex)). rewrite hex.
+apply inv2; omega.
+omega.
+apply permut_eq with l (m-1+1)%Z; auto.
+omega.
+omega.
+
+(* m <= i1 <= r *)
+assert (vi1: (v <= get t5 i1)%Z).
+assert (h: (i1 = m \/ m < i1)%Z) by omega. destruct h.
+(* i1 = m *)
+subst i1.
+replace (get t5 m) with (get t3 m).
+replace (get t3 m) with (get t2 l).
+omega.
+red in exch; intuition.
+transitivity (get t4 m).
+apply permut_eq with l (m-1+1)%Z; auto.
+omega.
+apply permut_eq with (m+1)%Z (r+1)%Z; auto.
+omega.
+(* m < i1 *)
+assert (exists i3:Z, m+1 <= i3 < r+1 /\ get t5 i1 = get t4 i3)%Z.
+apply permut_exists.
+apply permut_sym; auto.
+omega.
+destruct H2 as (i3, (hi3, eq3)).
+rewrite eq3; clear eq3.
+replace (get t4 i3) with (get t3 i3).
+destruct exch as (_,(_,hex)). rewrite hex.
+apply inv2; omega.
+omega.
+apply permut_eq with l (m-1+1)%Z; auto.
+omega.
+
+assert (h: (l <= i2 < m \/ m <= i2 <= r)%Z) by omega. destruct h.
+(* l <= i2 < m: absurd *)
+omega.
+(* m <= i2 <= r *)
+assert (h: (i2 = m \/ m < i2)%Z) by omega. destruct h.
+(* i2 = m *)
+assert (eq: i1 = m) by omega.
+subst; omega.
+(* m < i2 *)
+assert (h: (i1 = m \/ m < i1)%Z) by omega. destruct h.
+(* i1 = m *)
+subst i1.
+assert (exists i3:Z, m+1 <= i3 < r+1 /\ get t5 i2 = get t4 i3)%Z.
+apply permut_exists.
+apply permut_sym; auto.
+omega.
+destruct H3 as (i3, (hi3, eq3)).
+rewrite eq3; clear eq3.
+replace (get t4 i3) with (get t3 i3).
+destruct exch as (ex1,(ex2,hex)). rewrite hex.
+replace (get t5 m) with v.
+apply inv2; omega.
+replace (get t5 m) with (get t3 m).
+replace (get t3 m) with (get t2 l).
+omega.
+transitivity (get t4 m).
+apply permut_eq with l (m-1+1)%Z; auto.
+omega.
+apply permut_eq with (m+1)%Z (r+1)%Z; auto.
+omega.
+omega.
+apply permut_eq with l (m-1+1)%Z; auto.
+omega.
+(* m < i1 *)
+apply rsorted; try omega.
 
 (* permut *)
 apply permut_trans with t4.
