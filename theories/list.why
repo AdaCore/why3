@@ -15,7 +15,7 @@ theory Length
     | Cons _ r -> 1 + length r
     end
 
-  lemma Length_nonnegative: forall l: list 'a. length(l) >= 0
+  lemma Length_nonnegative: forall l: list 'a. length l >= 0
 
   lemma Length_nil: forall l: list 'a. length l = 0 <-> l = Nil
 
@@ -246,16 +246,39 @@ theory Map
   type b
   function f a : b
 
-  function map(l: list a) : list b =
+  function map (l: list a) : list b =
     match l with
     | Nil      -> Nil
     | Cons x r -> Cons (f x) (map r)
     end
-
 end
 
-theory Fold
-  (* TODO (a la Map) *)
+theory FoldLeft
+  use import List
+
+  type a
+  type b
+  function f b a : b
+
+  function fold_left (acc: b) (l: list a) : b =
+    match l with
+    | Nil      -> acc
+    | Cons x r -> fold_left (f acc x) r
+    end
+end
+
+theory FoldRight
+  use import List
+
+  type a
+  type b
+  function f a b : b
+
+  function fold_right (l: list a) (acc: b) : b =
+    match l with
+    | Nil      -> acc
+    | Cons x r -> f x (fold_right r acc)
+    end
 end
 
 theory ListRich
