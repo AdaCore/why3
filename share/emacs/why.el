@@ -27,7 +27,7 @@
 (defconst why-font-lock-keywords-1
   (list
    ;; Note: comment font-lock is guaranteed by suitable syntax entries
-   ;; '("(\\*\\([^*)]\\([^*]\\|\\*[^)]\\)*\\)?\\*)" . font-lock-comment-face)
+   '("(\\*\\([^*)]\\([^*]\\|\\*[^)]\\)*\\)?\\*)" . font-lock-comment-face)
    '("{}\\|{[^|]\\([^}]*\\)}" . font-lock-type-face)
    `(,(why-regexp-opt '("use" "clone" "namespace" "import" "export" "inductive" "external" "function" "predicate" "val" "exception" "axiom" "lemma" "goal" "type" "mutable" "model" "abstract" "reads" "writes" "raises")) . font-lock-builtin-face)
    `(,(why-regexp-opt '("any" "match" "let" "rec" "in" "if" "then" "else" "begin" "end" "while" "invariant" "variant" "for" "to" "downto" "do" "done" "label" "loop" "assert" "absurd" "assume" "check" "ghost" "try" "with" "theory" "uses" "module")) . font-lock-keyword-face)
@@ -250,7 +250,7 @@
   (make-local-variable 'indent-line-function)
   (setq indent-line-function 'why-indent-line)
   ; OCaml style comments for comment-region, comment-dwim, etc.
-  (setq comment-start "(*" comment-end "*)")
+  ; (setq comment-start "(\\*" comment-end "\\*)")
   ; menu
   ; providing the mode
   (setq major-mode 'why-mode)
