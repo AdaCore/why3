@@ -9,6 +9,7 @@ module CheckingALargeRoutine
   use import int.Fact
   use import module ref.Ref
 
+  (* using 'while' loops, to keep close to Turing's flowchart *)
   let routine (n: int) =
     { n >= 0 }
     let r = ref 0 in
@@ -25,6 +26,19 @@ module CheckingALargeRoutine
         s := !s + 1
       done;
       r := !r + 1
+    done;
+    !u
+    { result = fact n }
+
+  (* using 'for' loops, for clearer code and annotations *)
+  let routine2 (n: int) =
+    { n >= 0 }
+    let u = ref 1 in
+    for r = 0 to n-1 do invariant { !u = fact r }
+      let v = !u in
+      for s = 1 to r do invariant { !u = s * fact r }
+        u := !u + v
+      done
     done;
     !u
     { result = fact n }
