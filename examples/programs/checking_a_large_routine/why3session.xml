@@ -1,21 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
-<why3session name="examples/programs/fact/why3session.xml">
- <file name="../fact.mlw" verified="true" expanded="true">
-  <theory name="WP FactRecursive" verified="true" expanded="true">
-   <goal name="WP_parameter fact_rec" expl="correctness of parameter fact_rec" sum="9f6baede150e73fa6e0ed1159fe37404" proved="true" expanded="true">
-    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-   </goal>
-  </theory>
-  <theory name="WP FactImperative" verified="true" expanded="true">
-   <goal name="WP_parameter fact_imp" expl="correctness of parameter fact_imp" sum="e31ce81a222a20fd268e4969688b6dfb" proved="true" expanded="true">
-    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-   </goal>
-  </theory>
+<why3session name="examples/programs/checking_a_large_routine/why3session.xml">
+ <file name="../checking_a_large_routine.mlw" verified="true" expanded="true">
   <theory name="WP CheckingALargeRoutine" verified="true" expanded="true">
    <goal name="WP_parameter routine" expl="correctness of parameter routine" sum="1a0cf6427e5788cffb6e08acc3d9f854" proved="true" expanded="true">
     <transf name="split_goal" proved="true" expanded="true">
@@ -36,7 +22,7 @@
      </goal>
      <goal name="WP_parameter routine.4" expl="loop variant decreases" sum="d90372dd9d9ac09e304c5b72ae826f54" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.03"/>
       </proof>
      </goal>
      <goal name="WP_parameter routine.5" expl="loop invariant preservation" sum="85ac06138a1caf9b62fe9f27784d8207" proved="true" expanded="true">
@@ -51,7 +37,7 @@
      </goal>
      <goal name="WP_parameter routine.7" expl="normal postcondition" sum="b5595a595985a84708bb85f6e9cc9749" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
     </transf>

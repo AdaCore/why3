@@ -216,6 +216,17 @@ theory NumOf
 
 end
 
+theory Fact "Factorial"
+
+  use export Int
+
+  function fact int : int
+
+  axiom fact0: fact 0 = 1
+  axiom factn: forall n:int. n >= 1 -> fact n = n * fact (n-1)
+
+end
+
 (* number theory *)
 
 theory Divisibility
