@@ -3,246 +3,264 @@
 <why3session name="examples/programs/flag/why3session.xml">
  <file name="../flag.mlw" verified="true" expanded="true">
   <theory name="WP Flag" verified="true" expanded="true">
-   <goal name="WP_parameter swap" expl="correctness of parameter swap" sum="3fe28196cb8513c9625d3aaa40e527a5" proved="true" expanded="false">
+   <goal name="WP_parameter swap" expl="correctness of parameter swap" sum="57952bfe7c7360743d0f0102996ac86f" proved="true" expanded="true">
     <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.02"/>
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
-   <goal name="WP_parameter dutch_flag" expl="correctness of parameter dutch_flag" sum="1e2f96159bddb80c8882f1cd44f404ad" proved="true" expanded="true">
+   <goal name="WP_parameter dutch_flag" expl="correctness of parameter dutch_flag" sum="b1e45240b530a8f41beb99d5e66e52f6" proved="true" expanded="true">
     <transf name="split_goal" proved="true" expanded="true">
-     <goal name="WP_parameter dutch_flag.1" expl="loop invariant init" sum="8c1e81c5572f08198f02b07d40a1d6fe" proved="true" expanded="false">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter dutch_flag.2" expl="precondition" sum="7b0425583e8ffa9e79d983382ff46a5e" proved="true" expanded="false">
+     <goal name="WP_parameter dutch_flag.1" expl="loop invariant init" sum="10209b9343c7272c86f3817137cfc8b1" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter dutch_flag.3" expl="correctness of parameter dutch_flag" sum="f8585b8792b6be777c53870a67e8e3f5" proved="true" expanded="false">
-      <transf name="split_goal" proved="true" expanded="false">
-       <goal name="WP_parameter dutch_flag.3.1" expl="correctness of parameter dutch_flag" sum="9ab826c5cb37c389d5e8053ab6b268a6" proved="true" expanded="false">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter dutch_flag.3.2" expl="correctness of parameter dutch_flag" sum="16c4096d7b59b750fbaea6a44b04fdfd" proved="true" expanded="false">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.01"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter dutch_flag.3.3" expl="correctness of parameter dutch_flag" sum="2dc16fce187be0636cd5bbea1d6f2855" proved="true" expanded="false">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.01"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter dutch_flag.3.4" expl="correctness of parameter dutch_flag" sum="a8ffb521201022a36843219fb40435e4" proved="true" expanded="false">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.01"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter dutch_flag.4" expl="correctness of parameter dutch_flag" sum="7974ad87589be0ca9a690e757294e818" proved="true" expanded="true">
-      <transf name="split_goal" proved="true" expanded="true">
-       <goal name="WP_parameter dutch_flag.4.1" expl="correctness of parameter dutch_flag" sum="bfe6a9a90086062179389e5c49c4f5da" proved="true" expanded="false">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter dutch_flag.4.2" expl="correctness of parameter dutch_flag" sum="71515bc105b8a9874eef384b730ff3f5" proved="true" expanded="false">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.01"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter dutch_flag.4.3" expl="correctness of parameter dutch_flag" sum="a70d4599695f370a273413315b953c57" proved="true" expanded="false">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter dutch_flag.4.4" expl="correctness of parameter dutch_flag" sum="fe77c4dd6be251650ce17a8fe5cc86da" proved="true" expanded="false">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.01"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter dutch_flag.4.5" expl="correctness of parameter dutch_flag" sum="3fb17f9ef829ff74a638197a68a25d2c" proved="true" expanded="false">
-        <proof prover="coq" timelimit="10" edited="flag_WP_Flag_WP_parameter_dutch_flag_2.v" obsolete="false">
-         <result status="valid" time="0.63"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter dutch_flag.4.6" expl="correctness of parameter dutch_flag" sum="1a63d510ea323c00368271c0673c3535" proved="true" expanded="true">
-        <proof prover="coq" timelimit="10" edited="flag_WP_Flag_WP_parameter_dutch_flag_3.v" obsolete="false">
-         <result status="valid" time="0.63"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter dutch_flag.4.7" expl="correctness of parameter dutch_flag" sum="e450be104ffea5155ce85d1b0445cf33" proved="true" expanded="false">
-        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.50"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter dutch_flag.4.8" expl="correctness of parameter dutch_flag" sum="001e3231c96c9e18608e55c484613876" proved="true" expanded="false">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter dutch_flag.4.9" expl="correctness of parameter dutch_flag" sum="19ebf2feffa444079f1d3d4ac5401d74" proved="true" expanded="false">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.03"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter dutch_flag.5" expl="correctness of parameter dutch_flag" sum="f9101ec108342109c285dbc202e75543" proved="true" expanded="false">
-      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
+     <goal name="WP_parameter dutch_flag.2" expl="precondition" sum="a11e5e768ab95f9ec8e7121cd08ad067" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal name="WP_parameter dutch_flag.6" expl="correctness of parameter dutch_flag" sum="053e345b9a8d1588e355c4aae58684bf" proved="true" expanded="false">
-      <transf name="split_goal" proved="true" expanded="false">
-       <goal name="WP_parameter dutch_flag.6.1" expl="correctness of parameter dutch_flag" sum="b1d417b10128b0db648364d8279d465b" proved="true" expanded="false">
+     <goal name="WP_parameter dutch_flag.3" expl="correctness of parameter dutch_flag" sum="5bfad2270a8b86a9b24e014cc4ae319d" proved="true" expanded="true">
+      <transf name="split_goal" proved="true" expanded="true">
+       <goal name="WP_parameter dutch_flag.3.1" expl="correctness of parameter dutch_flag" sum="e365accc2a42a0cc8f12c193fe6f7bdd" proved="true" expanded="true">
         <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
          <result status="valid" time="0.01"/>
         </proof>
        </goal>
-       <goal name="WP_parameter dutch_flag.6.2" expl="correctness of parameter dutch_flag" sum="d20fbeae43aec4d04a964c14f26c8058" proved="true" expanded="false">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.01"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter dutch_flag.6.3" expl="correctness of parameter dutch_flag" sum="e462397c4cb4cffcc4112a3909956420" proved="true" expanded="false">
+       <goal name="WP_parameter dutch_flag.3.2" expl="correctness of parameter dutch_flag" sum="ce9d01a78e25db4f793de493f69d4848" proved="true" expanded="true">
         <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
          <result status="valid" time="0.02"/>
         </proof>
        </goal>
-       <goal name="WP_parameter dutch_flag.6.4" expl="correctness of parameter dutch_flag" sum="f59dbcc00c79dda1ab3886efa3f57844" proved="true" expanded="false">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.01"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter dutch_flag.6.5" expl="correctness of parameter dutch_flag" sum="ae8f5123cfa1c458fa94bc97e274fe72" proved="true" expanded="false">
+       <goal name="WP_parameter dutch_flag.3.3" expl="correctness of parameter dutch_flag" sum="83c17a5ddc696601ff5c3048b3dc5253" proved="true" expanded="true">
         <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
          <result status="valid" time="0.02"/>
         </proof>
        </goal>
-       <goal name="WP_parameter dutch_flag.6.6" expl="correctness of parameter dutch_flag" sum="581e9e6ce0f0d3ecc3b8847a6fb4df63" proved="true" expanded="false">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter dutch_flag.6.7" expl="correctness of parameter dutch_flag" sum="92bc37efa4a300ae0a6d4454551b904c" proved="true" expanded="false">
-        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter dutch_flag.6.8" expl="correctness of parameter dutch_flag" sum="6c992956f38558f8a08ceff53467c6a9" proved="true" expanded="false">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter dutch_flag.6.9" expl="correctness of parameter dutch_flag" sum="d472cb6525d8773dff4b305fca1ac5d7" proved="true" expanded="false">
+       <goal name="WP_parameter dutch_flag.3.4" expl="correctness of parameter dutch_flag" sum="73666daa26642b49f28ded67a3ddbea7" proved="true" expanded="true">
         <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
          <result status="valid" time="0.01"/>
         </proof>
        </goal>
       </transf>
      </goal>
-     <goal name="WP_parameter dutch_flag.7" expl="correctness of parameter dutch_flag" sum="6b92f4120aa5f9dedc95573bc7f7e5e8" proved="true" expanded="false">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter dutch_flag.8" expl="correctness of parameter dutch_flag" sum="0460ff04ec8b59bbaa4fbd142aad07fd" proved="true" expanded="false">
-      <transf name="split_goal" proved="true" expanded="false">
-       <goal name="WP_parameter dutch_flag.8.1" expl="correctness of parameter dutch_flag" sum="d9ab9b727db42650a75401a92eede016" proved="true" expanded="false">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter dutch_flag.8.2" expl="correctness of parameter dutch_flag" sum="b763f1996be84e527c845914bb2d47fc" proved="true" expanded="false">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter dutch_flag.8.3" expl="correctness of parameter dutch_flag" sum="d8258a5195d93bfcb5cd36e893723d65" proved="true" expanded="false">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter dutch_flag.8.4" expl="correctness of parameter dutch_flag" sum="b739c5e5713cb5aac855a74be7498bdb" proved="true" expanded="false">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter dutch_flag.9" expl="correctness of parameter dutch_flag" sum="9e9978b1440ebf851f690b9e80778195" proved="true" expanded="false">
-      <transf name="split_goal" proved="true" expanded="false">
-       <goal name="WP_parameter dutch_flag.9.1" expl="correctness of parameter dutch_flag" sum="80fadac72ad541348eba431a99bbf001" proved="true" expanded="false">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter dutch_flag.9.2" expl="correctness of parameter dutch_flag" sum="ac527df3fb8b37dadeea162b7977be3a" proved="true" expanded="false">
+     <goal name="WP_parameter dutch_flag.4" expl="correctness of parameter dutch_flag" sum="ef8df83bc44b7e045168774b45c6637c" proved="true" expanded="true">
+      <transf name="split_goal" proved="true" expanded="true">
+       <goal name="WP_parameter dutch_flag.4.1" expl="correctness of parameter dutch_flag" sum="35757aa4277435b9ae980a003d1a65ff" proved="true" expanded="true">
         <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
          <result status="valid" time="0.01"/>
         </proof>
        </goal>
-       <goal name="WP_parameter dutch_flag.9.3" expl="correctness of parameter dutch_flag" sum="22e03a9d17abaa7749b1ed6e3945166a" proved="true" expanded="false">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter dutch_flag.9.4" expl="correctness of parameter dutch_flag" sum="78c36b282907c05fbb6a615ca34b0f58" proved="true" expanded="false">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter dutch_flag.9.5" expl="correctness of parameter dutch_flag" sum="b1dc76e844aa9168473e95e309d964e1" proved="true" expanded="false">
-        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.53"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter dutch_flag.9.6" expl="correctness of parameter dutch_flag" sum="23eed8cd0b30a50b80ae0247aad99c17" proved="true" expanded="false">
-        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="3.49"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter dutch_flag.9.7" expl="correctness of parameter dutch_flag" sum="07cb4619e43df2932c6c80372de1fe60" proved="true" expanded="false">
-        <proof prover="coq" timelimit="10" edited="flag_WP_Flag_WP_parameter_dutch_flag_1.v" obsolete="false">
-         <result status="valid" time="0.63"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter dutch_flag.9.8" expl="correctness of parameter dutch_flag" sum="0e6937aa98696f940faa5079323f573b" proved="true" expanded="false">
+       <goal name="WP_parameter dutch_flag.4.2" expl="correctness of parameter dutch_flag" sum="f753bfe1fa112f6e791618323cd37965" proved="true" expanded="true">
         <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
          <result status="valid" time="0.01"/>
         </proof>
        </goal>
-       <goal name="WP_parameter dutch_flag.9.9" expl="correctness of parameter dutch_flag" sum="030607f650ca5c24468efdbf319afa27" proved="true" expanded="false">
+       <goal name="WP_parameter dutch_flag.4.3" expl="correctness of parameter dutch_flag" sum="f919562ee0d7304d6b06771668481e10" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter dutch_flag.4.4" expl="correctness of parameter dutch_flag" sum="15ea5ac504638ca34edcf967f7c24cc0" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter dutch_flag.4.5" expl="correctness of parameter dutch_flag" sum="f60750ed59aee12bd5acd2943c46a3e8" proved="true" expanded="true">
+        <proof prover="coq" timelimit="10" edited="flag_WP_Flag_WP_parameter_dutch_flag_2.v" obsolete="false">
+         <result status="valid" time="0.58"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter dutch_flag.4.6" expl="correctness of parameter dutch_flag" sum="36f0b4873f192708a089d11d5c148ad1" proved="true" expanded="true">
+        <proof prover="coq" timelimit="10" edited="flag_WP_Flag_WP_parameter_dutch_flag_3.v" obsolete="false">
+         <result status="valid" time="0.61"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter dutch_flag.4.7" expl="correctness of parameter dutch_flag" sum="646336e39c8c6b60f2520d7c0c00a14a" proved="true" expanded="true">
+        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.45"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter dutch_flag.4.8" expl="correctness of parameter dutch_flag" sum="0fd49c97da41be8f7638b1729e2b04e2" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter dutch_flag.4.9" expl="correctness of parameter dutch_flag" sum="83fbea912642a969c0d141567c40cb1b" proved="true" expanded="true">
         <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
          <result status="valid" time="0.04"/>
         </proof>
        </goal>
       </transf>
      </goal>
-     <goal name="WP_parameter dutch_flag.10" expl="correctness of parameter dutch_flag" sum="a875a75abd1421c3447b58c96df2ecce" proved="true" expanded="false">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.01"/>
-      </proof>
+     <goal name="WP_parameter dutch_flag.5" expl="correctness of parameter dutch_flag" sum="77724cc8047f6dc4f6afeffe144cb11c" proved="true" expanded="true">
+      <transf name="split_goal" proved="true" expanded="true">
+       <goal name="WP_parameter dutch_flag.5.1" expl="correctness of parameter dutch_flag" sum="5bce3e7ac9b26ba9e67f1c8f172e0257" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter dutch_flag.5.2" expl="correctness of parameter dutch_flag" sum="09bac77f1bffcacf491e890b6bad0211" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+      </transf>
      </goal>
-     <goal name="WP_parameter dutch_flag.11" expl="normal postcondition" sum="2525ca7276341120382f9e15521d4916" proved="true" expanded="false">
-      <transf name="split_goal" proved="true" expanded="false">
-       <goal name="WP_parameter dutch_flag.11.1" expl="correctness of parameter dutch_flag" sum="0ef8683f4ba32123c2efff0a8b96b103" proved="true" expanded="false">
+     <goal name="WP_parameter dutch_flag.6" expl="correctness of parameter dutch_flag" sum="970aa25f73a013b430b622f7e0c26ab2" proved="true" expanded="true">
+      <transf name="split_goal" proved="true" expanded="true">
+       <goal name="WP_parameter dutch_flag.6.1" expl="correctness of parameter dutch_flag" sum="8699caf714abbc0726cf16c3fcfb0dbd" proved="true" expanded="true">
         <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
          <result status="valid" time="0.01"/>
         </proof>
        </goal>
-       <goal name="WP_parameter dutch_flag.11.2" expl="correctness of parameter dutch_flag" sum="2770d9f6e0f300150506098d09227cc2" proved="true" expanded="false">
+       <goal name="WP_parameter dutch_flag.6.2" expl="correctness of parameter dutch_flag" sum="92196be47ac01d2fe2c45542cce6c76d" proved="true" expanded="true">
         <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
          <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter dutch_flag.6.3" expl="correctness of parameter dutch_flag" sum="7bdc6a40841de2cb245af36e55bf2827" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter dutch_flag.6.4" expl="correctness of parameter dutch_flag" sum="0f3449004ef97d92d8b7b831179422d6" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter dutch_flag.6.5" expl="correctness of parameter dutch_flag" sum="86c2699f065ce166644577162e6dd6d4" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter dutch_flag.6.6" expl="correctness of parameter dutch_flag" sum="39826dae0f79175ec6205f97ef85c310" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter dutch_flag.6.7" expl="correctness of parameter dutch_flag" sum="cabe5449551ddd530e25123a1c30301d" proved="true" expanded="true">
+        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter dutch_flag.6.8" expl="correctness of parameter dutch_flag" sum="862009249acca5160389dc0e65d91e82" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter dutch_flag.6.9" expl="correctness of parameter dutch_flag" sum="a11a18266ac7142130bec6fc052868fc" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal name="WP_parameter dutch_flag.7" expl="correctness of parameter dutch_flag" sum="5d313f7e708a49bb02dfbfb3f014fe65" proved="true" expanded="true">
+      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter dutch_flag.8" expl="correctness of parameter dutch_flag" sum="c19e32a860e2bdd2ba38080926a80a81" proved="true" expanded="true">
+      <transf name="split_goal" proved="true" expanded="true">
+       <goal name="WP_parameter dutch_flag.8.1" expl="correctness of parameter dutch_flag" sum="70653263241f4634353aa223a2ffcefb" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter dutch_flag.8.2" expl="correctness of parameter dutch_flag" sum="cd67e4a1a6c84699516c5db1b7347785" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter dutch_flag.8.3" expl="correctness of parameter dutch_flag" sum="3758f35139af4e8342637878f2c8ab59" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter dutch_flag.8.4" expl="correctness of parameter dutch_flag" sum="0ece914657ffa0b344b2ae918182b759" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal name="WP_parameter dutch_flag.9" expl="correctness of parameter dutch_flag" sum="d64172095ebb3d759538db0ede8c7593" proved="true" expanded="true">
+      <transf name="split_goal" proved="true" expanded="true">
+       <goal name="WP_parameter dutch_flag.9.1" expl="correctness of parameter dutch_flag" sum="a53ceb5c48071ede890abf09e7182b1a" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter dutch_flag.9.2" expl="correctness of parameter dutch_flag" sum="e1b284cbb88305ef09dafd4b4b16ef0e" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter dutch_flag.9.3" expl="correctness of parameter dutch_flag" sum="1e269d9f5a4b4f6656e89f156b3898a6" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter dutch_flag.9.4" expl="correctness of parameter dutch_flag" sum="ab2afec3b7e546f974dce97efffb8db0" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter dutch_flag.9.5" expl="correctness of parameter dutch_flag" sum="7e5e8e71286fe761ce391e080a827737" proved="true" expanded="true">
+        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.47"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter dutch_flag.9.6" expl="correctness of parameter dutch_flag" sum="8416039e9162b9fce1ab87e9af97d2a1" proved="true" expanded="true">
+        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="3.14"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter dutch_flag.9.7" expl="correctness of parameter dutch_flag" sum="ea103d0691939ee2575adfc7edece289" proved="true" expanded="true">
+        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="7.09"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter dutch_flag.9.8" expl="correctness of parameter dutch_flag" sum="c956b0af1f9308957c2aaffe6cbff3b4" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter dutch_flag.9.9" expl="correctness of parameter dutch_flag" sum="e40d758487ea8901ea1f712101f57dd7" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.03"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal name="WP_parameter dutch_flag.10" expl="correctness of parameter dutch_flag" sum="63a177c9c9b0ea88df565f801042a727" proved="true" expanded="true">
+      <transf name="split_goal" proved="true" expanded="true">
+       <goal name="WP_parameter dutch_flag.10.1" expl="correctness of parameter dutch_flag" sum="09e807d3e04b806e735203eae25addbf" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter dutch_flag.10.2" expl="correctness of parameter dutch_flag" sum="23a3f7254a090d0aa0064c7d88b08ba8" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal name="WP_parameter dutch_flag.11" expl="normal postcondition" sum="6b45fc37879bcd1f1d723881ade0af44" proved="true" expanded="true">
+      <transf name="split_goal" proved="true" expanded="true">
+       <goal name="WP_parameter dutch_flag.11.1" expl="correctness of parameter dutch_flag" sum="4828a18939c093434a4ac86228097128" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter dutch_flag.11.2" expl="correctness of parameter dutch_flag" sum="ba5e12bab53f12e1e00201a76675c9c7" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.03"/>
         </proof>
        </goal>
       </transf>

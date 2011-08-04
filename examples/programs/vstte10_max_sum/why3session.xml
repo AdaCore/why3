@@ -5,7 +5,7 @@
   <theory name="WP MaxAndSum" verified="true" expanded="true">
    <goal name="WP_parameter max_sum" expl="correctness of parameter max_sum" sum="4385c731695d5dfaf677a2e64e525aa3" proved="true" expanded="true">
     <transf name="split_goal" proved="true" expanded="true">
-     <goal name="WP_parameter max_sum.1" expl="normal postcondition" sum="50bff07f8e225489792e93970faf39bd" proved="true" expanded="true">
+     <goal name="WP_parameter max_sum.1" expl="correctness of parameter max_sum" sum="50bff07f8e225489792e93970faf39bd" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.01"/>
       </proof>
@@ -49,7 +49,7 @@
        </goal>
       </transf>
      </goal>
-     <goal name="WP_parameter max_sum.4" expl="normal postcondition" sum="24085f97178d85b4b3755974f802c949" proved="true" expanded="true">
+     <goal name="WP_parameter max_sum.4" expl="correctness of parameter max_sum" sum="24085f97178d85b4b3755974f802c949" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.00"/>
       </proof>
@@ -60,71 +60,91 @@
   <theory name="WP MaxAndSum2" verified="true" expanded="true">
    <goal name="WP_parameter max_sum" expl="correctness of parameter max_sum" sum="511e229ad52d526ab7b61ac3af286c3c" proved="true" expanded="true">
     <transf name="split_goal" proved="true" expanded="true">
-     <goal name="WP_parameter max_sum.1" expl="normal postcondition" sum="a25d062c03fcef01c886de12151b080f" proved="true" expanded="true">
+     <goal name="WP_parameter max_sum.1" expl="correctness of parameter max_sum" sum="1527d45f4103d912473c45e5e2b3f0e0" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter max_sum.2" expl="correctness of parameter max_sum" sum="143fefd325b72380610c6bfbffc4ccb0" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter max_sum.3" expl="correctness of parameter max_sum" sum="5495206725253d17db0a9c6da1b6cb38" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter max_sum.4" expl="for loop initialization" sum="8caeb1a833d416f694a005a932abe777" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter max_sum.2" expl="for loop initialization" sum="8caeb1a833d416f694a005a932abe777" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter max_sum.3" expl="for loop preservation" sum="e45a4c12cbe159c4cca2b20fd6080eb4" proved="true" expanded="true">
+     <goal name="WP_parameter max_sum.5" expl="for loop preservation" sum="e45a4c12cbe159c4cca2b20fd6080eb4" proved="true" expanded="true">
       <transf name="split_goal" proved="true" expanded="true">
-       <goal name="WP_parameter max_sum.3.1" expl="for loop preservation" sum="5566197fe481ee398c1e0ef64bb27d3a" proved="true" expanded="true">
+       <goal name="WP_parameter max_sum.5.1" expl="for loop preservation" sum="5566197fe481ee398c1e0ef64bb27d3a" proved="true" expanded="true">
         <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
          <result status="valid" time="0.01"/>
         </proof>
        </goal>
-       <goal name="WP_parameter max_sum.3.2" expl="for loop preservation" sum="0c2c8880ec9b27febd20b2ecd3a3da72" proved="true" expanded="true">
+       <goal name="WP_parameter max_sum.5.2" expl="for loop preservation" sum="0c2c8880ec9b27febd20b2ecd3a3da72" proved="true" expanded="true">
         <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
          <result status="valid" time="0.01"/>
         </proof>
        </goal>
-       <goal name="WP_parameter max_sum.3.3" expl="for loop preservation" sum="b15a83238f0ea600621af5d1a44afb8a" proved="true" expanded="true">
+       <goal name="WP_parameter max_sum.5.3" expl="for loop preservation" sum="b15a83238f0ea600621af5d1a44afb8a" proved="true" expanded="true">
         <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
          <result status="valid" time="0.01"/>
         </proof>
        </goal>
-       <goal name="WP_parameter max_sum.3.4" expl="for loop preservation" sum="09ca5a9d1398021c4ba6f825df439fe3" proved="true" expanded="true">
+       <goal name="WP_parameter max_sum.5.4" expl="for loop preservation" sum="09ca5a9d1398021c4ba6f825df439fe3" proved="true" expanded="true">
         <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
          <result status="valid" time="0.02"/>
         </proof>
        </goal>
-       <goal name="WP_parameter max_sum.3.5" expl="for loop preservation" sum="7335e42f5decf90d49f1442b357f406c" proved="true" expanded="true">
+       <goal name="WP_parameter max_sum.5.5" expl="for loop preservation" sum="7335e42f5decf90d49f1442b357f406c" proved="true" expanded="true">
         <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
          <result status="valid" time="2.64"/>
         </proof>
        </goal>
-       <goal name="WP_parameter max_sum.3.6" expl="for loop preservation" sum="adf41663cf84c9358f711e3637519b08" proved="true" expanded="true">
+       <goal name="WP_parameter max_sum.5.6" expl="for loop preservation" sum="adf41663cf84c9358f711e3637519b08" proved="true" expanded="true">
         <proof prover="coq" timelimit="10" edited="vstte10_max_sum_WP_MaxAndSum2_WP_parameter_max_sum_1.v" obsolete="false">
          <result status="valid" time="0.53"/>
         </proof>
        </goal>
-       <goal name="WP_parameter max_sum.3.7" expl="for loop preservation" sum="c30585e9b2d7dc9a6d0d8dde76234da8" proved="true" expanded="true">
+       <goal name="WP_parameter max_sum.5.7" expl="for loop preservation" sum="c30585e9b2d7dc9a6d0d8dde76234da8" proved="true" expanded="true">
         <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
          <result status="valid" time="0.01"/>
         </proof>
        </goal>
-       <goal name="WP_parameter max_sum.3.8" expl="for loop preservation" sum="e4b7609936b9cd892823a97620480b7c" proved="true" expanded="true">
+       <goal name="WP_parameter max_sum.5.8" expl="for loop preservation" sum="e4b7609936b9cd892823a97620480b7c" proved="true" expanded="true">
         <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
          <result status="valid" time="0.01"/>
         </proof>
        </goal>
-       <goal name="WP_parameter max_sum.3.9" expl="for loop preservation" sum="c4505d8f6cb52b4b905329203cf5649a" proved="true" expanded="true">
+       <goal name="WP_parameter max_sum.5.9" expl="for loop preservation" sum="c4505d8f6cb52b4b905329203cf5649a" proved="true" expanded="true">
         <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
          <result status="valid" time="0.19"/>
         </proof>
        </goal>
-       <goal name="WP_parameter max_sum.3.10" expl="for loop preservation" sum="17c5a5d1b87d361eed5e30bc1a36b5db" proved="true" expanded="true">
+       <goal name="WP_parameter max_sum.5.10" expl="for loop preservation" sum="17c5a5d1b87d361eed5e30bc1a36b5db" proved="true" expanded="true">
         <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
          <result status="valid" time="0.01"/>
         </proof>
        </goal>
       </transf>
      </goal>
-     <goal name="WP_parameter max_sum.4" expl="normal postcondition" sum="9bf5213f1615e43e16b0ab849accd79a" proved="true" expanded="true">
+     <goal name="WP_parameter max_sum.6" expl="correctness of parameter max_sum" sum="b99a381d2b187c2ba33e05bc8d402b64" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter max_sum.7" expl="correctness of parameter max_sum" sum="60fa78928763c03210ea758c19d964e6" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter max_sum.8" expl="correctness of parameter max_sum" sum="2fceeac4cee78cabd72a4dc083d2883e" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.01"/>
       </proof>

@@ -22,22 +22,46 @@
     <transf name="split_goal" proved="true" expanded="true">
      <goal name="WP_parameter sqrt.1" expl="normal postcondition" sum="bb87fe0b8434e8d093943f1210b71ec5" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter sqrt.2" expl="normal postcondition" sum="84710358cd8ada1454c80929dd0b421a" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-       <result status="valid" time="0.03"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal name="WP_parameter sqrt.3" expl="loop invariant init" sum="c11b288394dbf06ca63d6f183eed8902" proved="true" expanded="true">
-      <proof prover="z3" timelimit="20" edited="" obsolete="false">
-       <result status="valid" time="0.55"/>
-      </proof>
+      <transf name="split_goal" proved="true" expanded="true">
+       <goal name="WP_parameter sqrt.3.1" expl="correctness of parameter sqrt" sum="e2c9e9d55c1fb96ff6927b0bf7ea08c3" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter sqrt.3.2" expl="correctness of parameter sqrt" sum="89a7b5a1daf6b4e2519b771a686341ed" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter sqrt.3.3" expl="correctness of parameter sqrt" sum="1e7292150fa5b3ff64df1f967aa339dd" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.34"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter sqrt.3.4" expl="correctness of parameter sqrt" sum="7c4b5c925e20094d1a40d385f8888899" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter sqrt.3.5" expl="correctness of parameter sqrt" sum="6ecbaf6ffa704b33dd36c7a1db072d41" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+      </transf>
      </goal>
      <goal name="WP_parameter sqrt.4" expl="loop invariant preservation" sum="635d4755b940a642f5f361e72d63b2ad" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-       <result status="valid" time="11.31"/>
+       <result status="valid" time="9.22"/>
       </proof>
      </goal>
      <goal name="WP_parameter sqrt.5" expl="loop variant decreases" sum="0e4fa9a7a38870c021afae8a4e42ba92" proved="true" expanded="true">
@@ -47,7 +71,7 @@
      </goal>
      <goal name="WP_parameter sqrt.6" expl="normal postcondition" sum="ee09cf3d584c24c45c524135e3d35bf3" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-       <result status="valid" time="0.22"/>
+       <result status="valid" time="0.18"/>
       </proof>
      </goal>
     </transf>

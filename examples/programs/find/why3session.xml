@@ -3,259 +3,254 @@
 <why3session name="examples/programs/find/why3session.xml">
  <file name="../find.mlw" verified="true" expanded="true">
   <theory name="WP FIND" verified="true" expanded="true">
-   <goal name="WP_parameter find" expl="correctness of parameter find" sum="d57e863351634883ca7a213ffee202fd" proved="true" expanded="true">
+   <goal name="WP_parameter find" expl="correctness of parameter find" sum="376262bd2ce0fe37a1d2c4dc727804fa" proved="true" expanded="true">
     <transf name="split_goal" proved="true" expanded="true">
-     <goal name="WP_parameter find.1" expl="loop invariant init" sum="fd52d79c3985ed564c9ef8ac3efd87ff" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.2" expl="precondition" sum="9c79fb9a4f4b2eaa90216ea6214a3a7b" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.3" expl="loop invariant init" sum="97b57dd7c4493eea3e55d81a29d42349" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.27"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.4" expl="loop invariant init" sum="b07388cca54b0bda91dbe7f27adf552f" proved="true" expanded="true">
+     <goal name="WP_parameter find.1" expl="loop invariant init" sum="454b3bf075354fe09bedf8ad1165d164" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter find.5" expl="precondition" sum="a4657e59034d12cb12d2128f262cd1aa" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.6" expl="loop invariant preservation" sum="c150dda6c899c2723848773f3546a625" proved="true" expanded="true">
+     <goal name="WP_parameter find.2" expl="precondition" sum="5bfe0a7a0aa2471bf2dbb4937aa29551" proved="true" expanded="true">
       <transf name="split_goal" proved="true" expanded="true">
-       <goal name="WP_parameter find.6.1" expl="correctness of parameter find" sum="f4f32648584a173e7ab9cbdce630d2ce" proved="true" expanded="true">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="4.06"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter find.6.2" expl="correctness of parameter find" sum="8abcf56f63f3f47f3adbd75297fd8029" proved="true" expanded="true">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.03"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter find.6.3" expl="correctness of parameter find" sum="55230f13ad04c7aff30c907adfd2d2de" proved="true" expanded="true">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="1.04"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter find.6.4" expl="correctness of parameter find" sum="192fca08197fef4a3503d93766ab3ff9" proved="true" expanded="true">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="1.85"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter find.7" expl="loop variant decreases" sum="5e47c654bfa03c653fb613c9dc8fe529" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.8" expl="loop invariant init" sum="4d5f7604c656b40da49b723f1a5b7483" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.04"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.9" expl="precondition" sum="949052e8577415d72086d89f7c934686" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.04"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.10" expl="loop invariant preservation" sum="343de90a4dddeb6f28088159a0550ee0" proved="true" expanded="true">
-      <transf name="split_goal" proved="true" expanded="true">
-       <goal name="WP_parameter find.10.1" expl="correctness of parameter find" sum="f405468b8102071db357f277d20ba322" proved="true" expanded="true">
+       <goal name="WP_parameter find.2.1" expl="correctness of parameter find" sum="0e89c10bd8c66e80757d5e2a7b0b100e" proved="true" expanded="true">
         <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.10"/>
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
-       <goal name="WP_parameter find.10.2" expl="correctness of parameter find" sum="7cda741f3bcb7bd1410eac644470f8ef" proved="true" expanded="true">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.04"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter find.10.3" expl="correctness of parameter find" sum="9b081d7586bfb741b8c299c3342e8d2b" proved="true" expanded="true">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="4.78"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter find.10.4" expl="correctness of parameter find" sum="5ad2d11c14df4fb75657de8e4b7cd5af" proved="true" expanded="true">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="5.02"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter find.11" expl="loop variant decreases" sum="37ffc2cbfbb8f68a03def0ab4355e91b" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.04"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.12" expl="assertion" sum="e15a08b2487b9f7721595e429e0a3e3e" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.13" expl="precondition" sum="59ded7c147805dc3688d7b3d0daed0ca" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.14" expl="precondition" sum="4409fde0e420e5d34bd6e58fb26bd6e8" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.15" expl="precondition" sum="caccdbd0276960f2bad0dd0ea4cabefa" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.16" expl="precondition" sum="7ada9a011284b077473cd3bb719a440d" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.17" expl="assertion" sum="566bf65a2856c901bea35563694eb819" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.10"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.18" expl="assertion" sum="c54374497d7e9e7572b785466eea1d21" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.19" expl="assertion" sum="37629673ba33df9be7226c2b64d1a0a7" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.04"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.20" expl="loop invariant preservation" sum="94cd01b0b2b306b2ffcbd8111a943605" proved="true" expanded="true">
-      <proof prover="coq" timelimit="30" edited="find_WP_FIND_WP_parameter_find_3.v" obsolete="false">
-       <result status="valid" time="7.08"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.21" expl="loop variant decreases" sum="ff9fdb525e374e212d98b54ed18aff26" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.04"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.22" expl="loop invariant preservation" sum="6fca5bbd391be8794037c64ab384a0ea" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.04"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.23" expl="loop variant decreases" sum="e0f1594900254810c7d74e2bd9e40a08" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.04"/>
-      </proof>
-      <transf name="split_goal" proved="true" expanded="true">
-       <goal name="WP_parameter find.23.1" expl="correctness of parameter find" sum="ba8b30334d1aaa3f472c7cc907c2bac2" proved="true" expanded="true">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter find.23.2" expl="correctness of parameter find" sum="3cac8be8f25299b525474f7cd508719e" proved="true" expanded="true">
-        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.05"/>
-        </proof>
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.03"/>
-        </proof>
-        <proof prover="z3" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter find.24" expl="assertion" sum="b335dde7ac677f74c0e80b64bf4b193a" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.06"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.25" expl="loop invariant preservation" sum="dc71f5c56cb9bd74be4b806c499a7127" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="3.34"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.26" expl="loop variant decreases" sum="ba36ba03102dd913d9e64baf7cbcc2f0" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.27" expl="loop invariant preservation" sum="fff4cb4606f830a2a2e1186d924e24fc" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="1.45"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.28" expl="loop variant decreases" sum="f2a28fbacf02ab377c964833563b6dc9" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.04"/>
-      </proof>
-      <transf name="split_goal" proved="true" expanded="true">
-       <goal name="WP_parameter find.28.1" expl="correctness of parameter find" sum="ef18e5136722965d0a592087d800fd14" proved="true" expanded="true">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.03"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter find.28.2" expl="correctness of parameter find" sum="ba13295f4e534104b581f17fdf1e5350" proved="true" expanded="true">
-        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.04"/>
-        </proof>
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.03"/>
-        </proof>
-        <proof prover="z3" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter find.29" expl="loop invariant preservation" sum="450960f9863708f8f4a29c39f9e71fe9" proved="true" expanded="true">
-      <transf name="split_goal" proved="true" expanded="true">
-       <goal name="WP_parameter find.29.1" expl="correctness of parameter find" sum="3a860b606feb247c6c8be822dc99710a" proved="true" expanded="true">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.24"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter find.29.2" expl="correctness of parameter find" sum="6cb0926580c2af83821df1098953e209" proved="true" expanded="true">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.18"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter find.29.3" expl="correctness of parameter find" sum="3a3ae3501078fb91e011963ad321525b" proved="true" expanded="true">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.03"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter find.29.4" expl="correctness of parameter find" sum="647b3a2f2b76c7dd402922dd303d1141" proved="true" expanded="true">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter find.29.5" expl="correctness of parameter find" sum="068c4d99cb04d54b5ef4db0d1fa02f73" proved="true" expanded="true">
+       <goal name="WP_parameter find.2.2" expl="correctness of parameter find" sum="23dd8f6c9c6368d436e9bfbbf7076737" proved="true" expanded="true">
         <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
          <result status="valid" time="0.01"/>
         </proof>
        </goal>
       </transf>
      </goal>
-     <goal name="WP_parameter find.30" expl="loop variant decreases" sum="30764d676faa7db9913422014f653879" proved="true" expanded="true">
+     <goal name="WP_parameter find.3" expl="loop invariant init" sum="0e24f3f824f9a736257b81d9d07640d3" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.18"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter find.4" expl="loop invariant init" sum="d999ea5bbf3a7dfa4539cbb2cce2bf67" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter find.5" expl="precondition" sum="f2d128cafe69733a0ad36c7293a28829" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter find.6" expl="loop invariant preservation" sum="7c97fda071078ae384d60eab00bdc410" proved="true" expanded="true">
+      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.06"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter find.7" expl="loop variant decreases" sum="b403c4965a0be748027458b1d20e930f" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter find.8" expl="loop invariant init" sum="59ca7e1df28b64169ee27afe193b29dc" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter find.9" expl="precondition" sum="880357adf680762f9bd342e68b42194e" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal name="WP_parameter find.31" expl="normal postcondition" sum="c9c06bde4069f83bd35ea2b3dc657070" proved="true" expanded="true">
+     <goal name="WP_parameter find.10" expl="loop invariant preservation" sum="8973b302c2a28680a8428a805d3d96cb" proved="true" expanded="true">
+      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.07"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter find.11" expl="loop variant decreases" sum="2b1ae54582fbf7a46a8a3e870a96f9cd" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.23"/>
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter find.12" expl="assertion" sum="774e1d890193acd9fe7d1a27eed25363" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter find.13" expl="precondition" sum="1ac1e3242120ba63306d4e0d56d8bf87" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter find.14" expl="precondition" sum="e2eb3f5e94bdce3c8af80895634f0200" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter find.15" expl="precondition" sum="948acc914a933e72fa729d7e15936836" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter find.16" expl="precondition" sum="7c82855ea72879a1504befb67aafbb58" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <transf name="split_goal" proved="true" expanded="true">
+       <goal name="WP_parameter find.16.1" expl="correctness of parameter find" sum="dde4697b5a4f94ed40dbe85e8605e6bb" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter find.16.2" expl="correctness of parameter find" sum="fb6bcb78bb64f24071e14f1665d87212" proved="true" expanded="true">
+        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.03"/>
+        </proof>
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof prover="z3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.03"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal name="WP_parameter find.17" expl="assertion" sum="0ffe8d071d9226c1f09584c5e28d325e" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.08"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter find.18" expl="assertion" sum="9d6400d2baa6b739b3fc005b84100669" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter find.19" expl="assertion" sum="de79c8b97cf3312d463bb177a54ece58" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter find.20" expl="loop invariant preservation" sum="f384bd98da18df5456f37eb9717b2393" proved="true" expanded="true">
+      <proof prover="coq" timelimit="10" edited="find_WP_FIND_WP_parameter_find_3.v" obsolete="false">
+       <result status="valid" time="7.08"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter find.21" expl="loop variant decreases" sum="ff6952e67790c8229f2f759710b8c4b4" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <transf name="split_goal" proved="true" expanded="true">
+       <goal name="WP_parameter find.21.1" expl="correctness of parameter find" sum="34bc1d588e2b012dc14c7f5a30d6c92e" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.03"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter find.21.2" expl="correctness of parameter find" sum="500812ba6d36c4746022a493d76f949d" proved="true" expanded="true">
+        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.04"/>
+        </proof>
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.03"/>
+        </proof>
+        <proof prover="z3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.03"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal name="WP_parameter find.22" expl="loop invariant preservation" sum="2d5ca6fd10edc2c3044dcd949bf4449b" proved="true" expanded="true">
+      <transf name="split_goal" proved="true" expanded="true">
+       <goal name="WP_parameter find.22.1" expl="correctness of parameter find" sum="e936b101a2d07b80cda3b9f819e10698" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter find.22.2" expl="correctness of parameter find" sum="9b65cfce52992be21ff51f2cc1d6d40b" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter find.22.3" expl="correctness of parameter find" sum="4e0afab51a5c2bbd33e2d760dd96da54" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter find.22.4" expl="correctness of parameter find" sum="2cfb0b2282a9cee9a69a77a50fee768d" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter find.22.5" expl="correctness of parameter find" sum="e934da17684109d74b4fd38c138d150a" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter find.22.6" expl="correctness of parameter find" sum="95c5e5d8dbdc452c3703e3580a1233f4" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter find.22.7" expl="correctness of parameter find" sum="7a70d82852eef1db07ad0253bf23e5b0" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter find.22.8" expl="correctness of parameter find" sum="57ec91ee3907a6e8edca53bf49bdf8e5" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal name="WP_parameter find.23" expl="loop variant decreases" sum="6880f80eba44f87f8b5eeb8482e66cb4" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter find.24" expl="assertion" sum="78f03bf2e0f9d5618e810dde55efeabd" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter find.25" expl="loop invariant preservation" sum="850788d6d90ca3e4c719ea2e362e2bc7" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="2.24"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter find.26" expl="loop variant decreases" sum="af0ff0777031544c7734621a6d68e51f" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter find.27" expl="loop invariant preservation" sum="dd2ece47c835d3d10f260a87ce3e4a30" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.80"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter find.28" expl="loop variant decreases" sum="dda501adbf00183b5f6cdd8adce7c76e" proved="true" expanded="true">
+      <transf name="split_goal" proved="true" expanded="true">
+       <goal name="WP_parameter find.28.1" expl="correctness of parameter find" sum="dd3b5f04854f8368b7971fa8c8d24335" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter find.28.2" expl="correctness of parameter find" sum="b0399c366aa0cc38bd8f0f0bb8ff206f" proved="true" expanded="true">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal name="WP_parameter find.29" expl="loop invariant preservation" sum="ad3b0cf872fecac8f084ba28f81c07ad" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="6.97"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter find.30" expl="loop variant decreases" sum="f8fff79ae11296c59ce4cf65f9143158" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter find.31" expl="normal postcondition" sum="fa3df7fbc5a7e715512d1633198a8aa7" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.12"/>
       </proof>
      </goal>
     </transf>
