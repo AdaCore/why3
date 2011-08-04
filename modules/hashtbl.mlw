@@ -63,12 +63,8 @@ module Hashtbl
       /\
       forall k': key. k' <> k -> h[k'] = (old h)[k'] }
 
-  val length (h: t 'a) :
-    {}
-    int reads h
-    {} (* = the number of distinct keys *)
-
   (* TODO
+     - val length: t 'a -> int (the number of distinct key)
      - val iter : ('a -> 'b -> unit) -> ('a, 'b) t -> unit
      - val fold : ('a -> 'b -> 'c -> 'c) -> ('a, 'b) t -> 'c -> 'c
   *)

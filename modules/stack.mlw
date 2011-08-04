@@ -8,15 +8,15 @@ module Stack
 
   type t 'a model {| mutable elts: list 'a |}
 
-  val create : unit -> {} t 'a { result.elts = Nil }
+  val create: unit -> {} t 'a { result.elts = Nil }
 
-  val push :
-    x:'a -> s:t 'a -> {} unit writes s { s.elts = Cons x (old s.elts) }
+  val push:
+    x: 'a -> s: t 'a -> {} unit writes s { s.elts = Cons x (old s.elts) }
 
   exception Empty
 
-  val pop :
-    s:t 'a ->
+  val pop:
+    s: t 'a ->
     {}
     'a
     writes s raises Empty
@@ -24,22 +24,22 @@ module Stack
                           | Cons x t -> result = x /\ s.elts = t end }
     | Empty -> { s.elts = old s.elts = Nil }
 
-  val top :
-    s:t 'a ->
+  val top:
+    s: t 'a ->
     {}
     'a
     reads s raises Empty
     { match s.elts with Nil -> false | Cons x _ -> result = x end }
     | Empty -> { s.elts = Nil }
 
-  val clear : s:t 'a -> {} unit writes s { s.elts = Nil }
+  val clear: s: t 'a -> {} unit writes s { s.elts = Nil }
 
-  val copy : s:t 'a -> {} t 'a { result = s }
+  val copy: s: t 'a -> {} t 'a { result = s }
 
-  val is_empty :
-    s:t 'a -> {} bool reads s { result=True <-> s.elts = Nil }
+  val is_empty:
+    s: t 'a -> {} bool reads s { result=True <-> s.elts = Nil }
 
-  val length : s:t 'a -> {} int reads s { result = length s.elts }
+  val length: s: t 'a -> {} int reads s { result = length s.elts }
 
 end
 

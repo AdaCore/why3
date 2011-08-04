@@ -9,38 +9,38 @@ module Queue
 
   type t 'a model {| mutable elts: list 'a |}
 
-  val create : unit -> {} t 'a { result.elts = Nil }
+  val create: unit -> {} t 'a { result.elts = Nil }
 
-  val push :
-    x:'a -> s:t 'a -> {} unit writes s { s.elts = old s.elts ++ Cons x Nil }
+  val push:
+    x: 'a -> q: t 'a -> {} unit writes q { q.elts = old q.elts ++ Cons x Nil }
 
   exception Empty
 
-  val pop :
-    s:t 'a ->
+  val pop:
+    q: t 'a ->
     {}
     'a
-    writes s raises Empty
-    { match old s.elts with Nil -> false
-                          | Cons x t -> result = x /\ s.elts = t end }
-    | Empty -> { s.elts = old s.elts = Nil }
+    writes q raises Empty
+    { match old q.elts with Nil -> false
+                          | Cons x t -> result = x /\ q.elts = t end }
+    | Empty -> { q.elts = old q.elts = Nil }
 
-  val top :
-    s:t 'a ->
+  val top:
+    q: t 'a ->
     {}
     'a
-    reads s raises Empty
-    { match s.elts with Nil -> false | Cons x _ -> result = x end }
-    | Empty -> { s.elts = Nil }
+    reads q raises Empty
+    { match q.elts with Nil -> false | Cons x _ -> result = x end }
+    | Empty -> { q.elts = Nil }
 
-  val clear : s:t 'a -> {} unit writes s { s.elts = Nil }
+  val clear: q: t 'a -> {} unit writes q {q.elts = Nil }
 
-  val copy : s:t 'a -> {} t 'a { result = s }
+  val copy: q: t 'a -> {} t 'a { result = q }
 
-  val is_empty :
-    s:t 'a -> {} bool reads s { result=True <-> s.elts = Nil }
+  val is_empty:
+    q: t 'a -> {} bool reads q { result=True <-> q.elts = Nil }
 
-  val length : s:t 'a -> {} int reads s { result = length s.elts }
+  val length: q: t 'a -> {} int reads q { result = length q.elts }
 
 end
 

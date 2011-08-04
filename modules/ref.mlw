@@ -1,4 +1,12 @@
-(* References *)
+
+(* References.
+
+   A mutable variable, or ``reference'' in ML terminology, is simply a
+   record with a single mutable field 'contents'.
+
+   Creation, access, and assignment are provided as 'ref', prefix '!', and
+   infix ':=', respectively.
+*)
 
 module Ref
 
@@ -6,29 +14,27 @@ module Ref
 
   function (!) (x: ref 'a) : 'a = x.contents
 
-  (* val ref : v:'a -> {} ref 'a { result = {| contents = v |} } *)
   let ref (v: 'a) = {} {| contents = v |} { result = {| contents = v |} }
 
-  (* val (!) : r:ref 'a -> {} 'a reads r { result = !r } *)
   let (!) (r:ref 'a) = {} r.contents { result = !r }
 
-  (* val (:=) : r:ref 'a -> v:'a -> {} unit writes r { !r = v } *)
   let (:=) (r:ref 'a) (v:'a) = {} r.contents <- v { !r = v }
 
 end
+
+(* Module Refint adds a few operations specific to integer references. *)
 
 module Refint
 
   use export int.Int
   use export module Ref
 
-  (* val incr : r:ref int -> {} unit writes r { !r = old !r + 1 } *)
   let incr (r: ref int) = {} r := !r + 1 { !r = old !r + 1 }
-
-  (* val decr : r:ref int -> {} unit writes r { !r = old !r - 1 } *)
   let decr (r: ref int) = {} r := !r - 1 { !r = old !r - 1 }
 
-  let (+=) (r: ref int) (v: int) = {} r := !r + v { !r = old !r + v }
+  let (+=)   (r: ref int) (v: int) = {} r := !r + v { !r = old !r + v }
+  let (-=)   (r: ref int) (v: int) = {} r := !r - v { !r = old !r - v }
+  let ( *= ) (r: ref int) (v: int) = {} r := !r * v { !r = old !r * v }
 
 end
 
