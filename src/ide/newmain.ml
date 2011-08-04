@@ -545,6 +545,7 @@ let info_window ?(callback=(fun () -> ())) mt s =
     ~message_type:mt
     ~buttons
     ~title:"Why3IDE"
+    ~icon:(!Gconfig.why_icon)
     ~modal:true
     ~show:true ()
   in
@@ -749,7 +750,7 @@ let save_session () =
   eprintf "[Info] saving session@.";
   M.save_session ()
 
-let exit_function () =
+let exit_function ?(destroy=false) () =
   eprintf "[Info] saving IDE config file@.";
   save_config ();
   (*
@@ -775,22 +776,18 @@ let exit_function () =
     | 0 -> save_session (); GMain.quit ()
     | 1 -> GMain.quit ()
     | 2 ->
-        let d = GWindow.message_dialog
-          ~message:"Do you want to save the session?"
-          ~message_type:`QUESTION
-          ~buttons:GWindow.Buttons.yes_no
-          ~title:"Why3 save"
-          ~modal:true
-          ~show:true ()
+        let answer =
+          GToolbox.question_box
+            ~title:"Why3 saving session"
+            ~buttons:(["Yes"; "No"] @ (if destroy then [] else ["Cancel"]))
+            "Do you want to save the session?"
         in
-        let (_ : GtkSignal.id) =
-          d#connect#response
-            ~callback:(function x -> d#destroy ();
-                         if x = `YES then save_session ();
-                         GMain.quit ()
-                      )
-        in
-        ()
+        begin
+          match answer with
+            | 1 -> save_session (); GMain.quit ()
+            | 2 -> GMain.quit ()
+            | _ -> if destroy then GMain.quit () else ()
+        end
     | _ ->
         eprintf "unexpected value for saving_policy@.";
         GMain.quit ()
@@ -1258,7 +1255,8 @@ let (_ : GMenu.image_menu_item) =
     ()
 *)
 
-let (_ : GtkSignal.id) = w#connect#destroy ~callback:exit_function
+let (_ : GtkSignal.id) = w#connect#destroy 
+  ~callback:(exit_function ~destroy:true)
 
 let (_ : GMenu.image_menu_item) =
   file_factory#add_image_item ~key:GdkKeysyms._Q ~label:"_Quit"
