@@ -1,0 +1,12 @@
+
+(* missing int.Int *)
+
+module M
+  let foo () = for i = 1 to 3 do () done
+end
+
+(*
+Local Variables:
+compile-command: "unset LANG; make -C ../../.. bench/programs/bad-typing/for1"
+End:
+*)

@@ -898,12 +898,13 @@ let iterm env l =
   let t = dterm (pure_uc env.i_uc) env.i_denv l in
   Denv.term env.i_pures t
 
-let variant_rel_int env loc =
-  let find s =
-    try find_ls ~pure:true env s
-    with Not_found -> errorm ~loc "cannot find symbol %s" s
-  in
-  Vint (find "infix <=", find "infix <")
+(* FIXME: ensure that symbol comes from theory int.Int *)
+let find_int_ls ~loc env s =
+  try find_ls ~pure:true env s
+  with Not_found -> errorm ~loc "cannot find symbol %s; please import int.Int" s
+
+let variant_rel_int ~loc env =
+  Vint (find_int_ls ~loc env "infix <=", find_int_ls ~loc env "infix <")
 
 (* TODO: should we admit an instance of a polymorphic order relation? *)
 let ivariant env (t, ps) =
@@ -913,7 +914,7 @@ let ivariant env (t, ps) =
     | None ->
         if not (Ty.ty_equal ty_int (t_type t)) then
           errorm ~loc "variant should have type int";
-        t, variant_rel_int env.i_uc loc
+        t, variant_rel_int ~loc env.i_uc
     | Some ({ ls_args = [t1; _] } as ps) when Ty.ty_equal t1 (t_type t) ->
         t, Vuser ps
     | Some { ls_args = [t1; _] } ->
@@ -1251,6 +1252,8 @@ and iexpr_desc gl env loc ty = function
       in
       IEtry (iexpr gl env e, List.map handler hl)
   | DEfor (x, e1, d, e2, inv, e3) ->
+      List.iter
+        (fun s -> ignore (find_int_ls ~loc env.i_uc s)) ["infix <"; "infix +"];
       let e1 = iexpr gl env e1 in
       let e2 = iexpr gl env e2 in
       let env, vx = iadd_local env (id_user x.id x.id_loc) e1.iexpr_type in
