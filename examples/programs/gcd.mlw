@@ -4,7 +4,7 @@
 module EuclideanAlgorithm
 
   use import int.Int
-  use import int.Gcd
+  use import number.Gcd
   use import int.ComputerDivision
 
   let rec gcd u v variant { v } =
@@ -13,12 +13,12 @@ module EuclideanAlgorithm
       u
     else
       gcd v (mod u v)
-    { gcd u v result }
+    { result = gcd u v }
 
 end
 
 (*
 Local Variables:
-compile-command: "unset LANG; make -C ../.. examples/programs/gcd"
+compile-command: "unset LANG; make -C ../.. examples/programs/gcd.gui"
 End:
 *)

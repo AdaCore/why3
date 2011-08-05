@@ -1,8 +1,11 @@
-module M
+
+(* Greatest common divisor, with Bézout coefficients *)
+
+module GcdBezout
 
   use import int.Int
   use import int.ComputerDivision
-  use import int.Gcd
+  use import number.Gcd
   use import module ref.Ref
 
   let gcd (x:int) (y:int) =
@@ -13,7 +16,7 @@ module M
     let c = ref 0 in let d = ref 1 in
     while (!y > 0) do
        invariant { !x >= 0 /\ !y >= 0 /\
-          (forall d:int. gcd !x !y d -> gcd (at !x 'Pre) (at !y 'Pre) d) /\
+          gcd !x !y = gcd (at !x 'Pre) (at !y 'Pre) /\
           !a * (at !x 'Pre) + !b * (at !y 'Pre) = !x /\
           !c * (at !x 'Pre) + !d * (at !y 'Pre) = !y }
        variant { !y }
@@ -24,13 +27,13 @@ module M
        c := ta - !c * q; d := tb - !d * q
     done;
     !x
-    { gcd x y result /\
+    { result = gcd x y /\
       exists a b:int. a*x+b*y = result }
 
 end
 
 (*
 Local Variables:
-compile-command: "unset LANG; make -C ../.. examples/programs/gcd_bezout"
+compile-command: "unset LANG; make -C ../.. examples/programs/gcd_bezout.gui"
 End:
 *)

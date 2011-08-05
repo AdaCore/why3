@@ -1,0 +1,67 @@
+
+(* Knuth's algorithm for prime numbers.
+   The Art of Computer Programming, vol 1, page 147.
+
+   The following code computes a table of the first m prime numbers.
+   Though there are more efficient ways of computing prime numbers,
+   the nice thing about this code is that it requires not less than
+   Bertrand's postulate (for n > 1, there is always a prime p such that
+   n < p < 2n) to be proved correct.
+
+   This program had been proved correct using Coq and an early version of
+   Why back in 2003, by Laurent Théry (INRIA Sophia-Antipolis).
+
+     Laurent Théry.
+     Proving Pearl: Knuth's Algorithm for Prime Numbers.
+     TPHOLs 2003
+
+   A truly tour de force, this proof included the full proof of Bertrand's
+   postulate in Coq. Here, we simply focus on the program verification part,
+   assuming Bertrand's postulate as an axiom.
+
+   Note: Knuth's code is entering the loop where a new prime number is
+   added, thus resulting into the immediate addition of 3 as prime[1].
+   It allows subsequent division tests to start at prime[1]=3, thus
+   saving the division by prime[0]=2. We did something similar in the
+   code below, though the use of a while loop looks like we did a
+   special case for 3 as well.  *)
+
+module PrimeNumbers
+
+  use import int.Int
+  use import int.ComputerDivision
+  use import number.Prime
+  use import module ref.Refint
+  use import module array.Array
+  use import module array.ArraySorted
+
+  (* returns an array containing the first m prime numbers *)
+
+  let prime_numbers (m: int) =
+    { m >= 2 }
+    let prime = make m 0 in
+    prime[0] <- 2;
+    prime[1] <- 3;
+    let n = ref 5 in (* candidate for next prime *)
+    for j = 2 to m - 1 do
+      invariant { sorted_sub prime 0 j /\ !n > prime[j-1] }
+      let rec test (k: int) =
+        { 0 <= k < j }
+        if mod !n prime[k] = 0 then begin n += 2; test 1 end
+        else if div !n prime[k] > prime[k] then test (k + 1)
+        { !n >= old !n }
+      in
+      test 1;
+      prime[j] <- !n;
+      n += 2
+    done;
+    prime
+    { sorted_sub result 0 m }
+
+end
+
+(*
+Local Variables:
+compile-command: "unset LANG; make -C ../.. examples/programs/knuth_prime_numbers.gui"
+End:
+*)

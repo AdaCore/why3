@@ -58,24 +58,57 @@ Axiom Div_mult : forall (x:Z) (y:Z) (z:Z), ((0%Z <  x)%Z /\ ((0%Z <= y)%Z /\
 Axiom Mod_mult : forall (x:Z) (y:Z) (z:Z), ((0%Z <  x)%Z /\ ((0%Z <= y)%Z /\
   (0%Z <= z)%Z)) -> ((ZOmod ((x * y)%Z + z)%Z x) = (ZOmod z x)).
 
-Definition divides(a:Z) (b:Z): Prop := exists q:Z, (b = (q * a)%Z).
+Definition divides(d:Z) (n:Z): Prop := exists q:Z, (n = (q * d)%Z).
 
-Axiom Divides_x_zero : forall (x:Z), (divides x 0%Z).
+Axiom divides_refl : forall (n:Z), (divides n n).
 
-Axiom Divides_one_x : forall (x:Z), (divides 1%Z x).
+Axiom divides_1 : forall (n:Z), (divides 1%Z n).
 
-Definition gcd(a:Z) (b:Z) (g:Z): Prop := (divides g a) /\ ((divides g b) /\
-  forall (x:Z), (divides x a) -> ((divides x b) -> (divides x g))).
+Axiom divides_0 : forall (n:Z), (divides n 0%Z).
 
-Axiom Gcd_sym : forall (a:Z) (b:Z) (g:Z), (gcd a b g) -> (gcd b a g).
+Axiom divides_left : forall (a:Z) (b:Z) (c:Z), (divides a b) ->
+  (divides (c * a)%Z (c * b)%Z).
 
-Axiom Gcd_0 : forall (a:Z), (gcd a 0%Z a).
+Axiom divides_right : forall (a:Z) (b:Z) (c:Z), (divides a b) ->
+  (divides (a * c)%Z (b * c)%Z).
 
-Axiom Gcd_euclid : forall (a:Z) (b:Z) (q:Z) (g:Z), (gcd a (b - (q * a)%Z)%Z
-  g) -> (gcd a b g).
+Axiom divides_oppr : forall (a:Z) (b:Z), (divides a b) -> (divides a (-b)%Z).
 
-Axiom Gcd_computer_mod : forall (a:Z) (b:Z) (g:Z), (~ (b = 0%Z)) -> ((gcd a
-  (ZOmod a b) g) -> (gcd a b g)).
+Axiom divides_oppl : forall (a:Z) (b:Z), (divides a b) -> (divides (-a)%Z b).
+
+Axiom divides_oppr_rev : forall (a:Z) (b:Z), (divides (-a)%Z b) -> (divides a
+  b).
+
+Axiom divides_oppl_rev : forall (a:Z) (b:Z), (divides a (-b)%Z) -> (divides a
+  b).
+
+Axiom divides_plusr : forall (a:Z) (b:Z) (c:Z), (divides a b) -> ((divides a
+  c) -> (divides a (b + c)%Z)).
+
+Axiom divides_minusr : forall (a:Z) (b:Z) (c:Z), (divides a b) -> ((divides a
+  c) -> (divides a (b - c)%Z)).
+
+Axiom divides_multl : forall (a:Z) (b:Z) (c:Z), (divides a b) -> (divides a
+  (c * b)%Z).
+
+Axiom divides_multr : forall (a:Z) (b:Z) (c:Z), (divides a b) -> (divides a
+  (b * c)%Z).
+
+Axiom divides_factorl : forall (a:Z) (b:Z), (divides a (b * a)%Z).
+
+Axiom divides_factorr : forall (a:Z) (b:Z), (divides a (a * b)%Z).
+
+Axiom divides1 : forall (x:Z), (divides x 1%Z) -> ((x = 1%Z) \/
+  (x = (-1%Z)%Z)).
+
+Axiom divides_antisym : forall (a:Z) (b:Z), (divides a b) -> ((divides b
+  a) -> ((a = b) \/ (a = (-b)%Z))).
+
+Axiom divides_trans : forall (a:Z) (b:Z) (c:Z), (divides a b) -> ((divides b
+  c) -> (divides a c)).
+
+Axiom divides_bounds : forall (a:Z) (b:Z), (divides a b) -> ((~ (b = 0%Z)) ->
+  ((Zabs a) <= (Zabs b))%Z).
 
 Axiom Div_mod1 : forall (x:Z) (y:Z), (~ (y = 0%Z)) ->
   (x = ((y * (Zdiv x y))%Z + (Zmod x y))%Z).
@@ -90,8 +123,39 @@ Axiom Mod_11 : forall (x:Z), ((Zmod x 1%Z) = 0%Z).
 
 Axiom Div_11 : forall (x:Z), ((Zdiv x 1%Z) = x).
 
-Axiom Gcd_euclidean_mod : forall (a:Z) (b:Z) (g:Z), (~ (b = 0%Z)) -> ((gcd a
-  (Zmod a b) g) -> (gcd a b g)).
+Axiom mod_divides : forall (a:Z) (b:Z), (~ (b = 0%Z)) ->
+  (((Zmod a b) = 0%Z) -> (divides b a)).
+
+Axiom divides_mod : forall (a:Z) (b:Z), (~ (b = 0%Z)) -> ((divides b a) ->
+  ((Zmod a b) = 0%Z)).
+
+Parameter gcd: Z -> Z  -> Z.
+
+
+Axiom gcd_nonneg : forall (a:Z) (b:Z), (0%Z <= (gcd a b))%Z.
+
+Axiom gcd_def1 : forall (a:Z) (b:Z), (divides (gcd a b) a).
+
+Axiom gcd_def2 : forall (a:Z) (b:Z), (divides (gcd a b) b).
+
+Axiom gcd_def3 : forall (a:Z) (b:Z) (x:Z), (divides x a) -> ((divides x b) ->
+  (divides x (gcd a b))).
+
+Axiom Assoc : forall (x:Z) (y:Z) (z:Z), ((gcd (gcd x y) z) = (gcd x (gcd y
+  z))).
+
+Axiom Comm : forall (x:Z) (y:Z), ((gcd x y) = (gcd y x)).
+
+Axiom gcd_0 : forall (a:Z), ((gcd a 0%Z) = a).
+
+Axiom gcd_euclid : forall (a:Z) (b:Z) (q:Z), ((gcd a b) = (gcd a
+  (b - (q * a)%Z)%Z)).
+
+Axiom Gcd_computer_mod : forall (a:Z) (b:Z), (~ (b = 0%Z)) -> ((gcd a
+  (ZOmod a b)) = (gcd a b)).
+
+Axiom Gcd_euclidean_mod : forall (a:Z) (b:Z), (~ (b = 0%Z)) -> ((gcd a
+  (Zmod a b)) = (gcd a b)).
 
 Inductive ref (a:Type) :=
   | mk_ref : a -> ref a.
@@ -105,26 +169,25 @@ Implicit Arguments contents.
 
 Theorem WP_parameter_gcd : forall (x:Z), forall (y:Z), ((0%Z <= x)%Z /\
   (0%Z <= y)%Z) -> forall (d:Z), forall (c:Z), forall (b:Z), forall (a:Z),
-  forall (y1:Z), forall (x1:Z), ((0%Z <= x1)%Z /\ ((0%Z <= y1)%Z /\
-  ((forall (d1:Z), (gcd x1 y1 d1) -> (gcd x y d1)) /\
-  ((((a * x)%Z + (b * y)%Z)%Z = x1) /\
+  forall (y1:Z), forall (x1:Z), ((0%Z <= x1)%Z /\ ((0%Z <= y1)%Z /\ (((gcd x1
+  y1) = (gcd x y)) /\ ((((a * x)%Z + (b * y)%Z)%Z = x1) /\
   (((c * x)%Z + (d * y)%Z)%Z = y1))))) -> ((0%Z <  y1)%Z -> forall (x2:Z),
   (x2 = y1) -> forall (y2:Z), (y2 = (ZOmod x1 y1)) -> forall (a1:Z),
   (a1 = c) -> forall (b1:Z), (b1 = d) -> forall (c1:Z),
   (c1 = (a - (c * (ZOdiv x1 y1))%Z)%Z) -> forall (d1:Z),
-  (d1 = (b - (d * (ZOdiv x1 y1))%Z)%Z) -> forall (d2:Z), (gcd x2 y2 d2) ->
-  (gcd x y d2)).
+  (d1 = (b - (d * (ZOdiv x1 y1))%Z)%Z) -> ((gcd x2 y2) = (gcd x y))).
 (* YOU MAY EDIT THE PROOF BELOW *)
 intuition.
-apply H4.
+rewrite <- H4.
 subst x2 y2.
-apply Gcd_sym.
-apply Gcd_euclid with (q:=(ZOdiv x1 y1)).
+symmetry.
+rewrite Comm.
+rewrite gcd_euclid with (q:=(ZOdiv x1 y1)).
 assert (x1 - (ZOdiv x1 y1) * y1 = ZOmod x1 y1)%Z.
 generalize (Div_mod x1 y1); intuition.
 replace ((ZOdiv x1 y1) * y1) with (y1 * (ZOdiv x1 y1)) by ring.
 omega.
-rewrite H6; assumption.
+rewrite H6; auto.
 Qed.
 (* DO NOT EDIT BELOW *)
 
