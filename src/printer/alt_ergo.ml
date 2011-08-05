@@ -32,7 +32,7 @@ let meta_ac = Theory.register_meta "AC" [Theory.MTlsymbol]
 
 let ident_printer =
   let bls = [
-    "ac"; "and"; "array"; "as"; "axiom"; "bool"; "else"; "exists";
+    "ac"; "and"; "array"; "as"; "axiom"; "bool"; "distinct"; "else"; "exists";
     "false"; "forall"; "function"; "goal"; "if"; "int"; "bitv";
     "logic"; "not"; "or"; "parameter"; "predicate";
     "prop"; "real"; "then"; "true"; "type"; "unit"; "void";
