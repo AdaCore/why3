@@ -1,0 +1,71 @@
+
+(* Floyd's cycle detection, also known as ``tortoise and hare'' algorithm.
+
+   See The Art of Computer Programming, vol 2, exercise 6 page 7. *)
+
+module TortoiseAndHare
+
+  use import int.Int
+
+  (* let f be a function from 0..m-1 to 0..m-1 *)
+  function f int : int
+  function m : int
+  axiom dom_f: forall x: int. 0 <= x < m -> 0 <= f x < m
+
+  (* let x0 be in 0..m-1 *)
+  function x0: int
+  axiom x0_range: 0 <= x0 < m
+
+  (* let x_{i+1} = f(x_i) *)
+  clone import int.Iter with type t = int, function f = f
+  function x (i: int): int = iter i x0
+
+  (* lambda and mu are skomlemized *)
+  function mu     : int
+  function lambda : int
+
+  (* they are defined as follows *)
+  axiom mu_range: 0 <= mu
+  axiom lambda_range: 1 <= lambda
+
+  (* values x0 ... x_{mu+lambda-1} are all distinct *)
+  axiom distinct:
+    forall i j: int. 0 <= i < mu+lambda -> 0 <= j < mu+lambda ->
+    i <> j -> x i <> x j
+
+  (* cycle is lambda-long *)
+  axiom cycle: forall n: int. mu <= n -> x (n + lambda) = x n
+
+  (* Now comes the code.
+     Two references, tortoise and hare, traverses the xi at speed 1 and 2.
+
+     The challenge is to prove termination.
+     Actually, we even prove that the code runs in time O(lambda + mu). *)
+
+  use import module ref.Ref
+
+  predicate rel (t2 t1: int) =
+    exists i: int. t1 = x i /\ t2 = x (i+1) /\ 1 <= i <= lambda + mu
+
+  let tortoise_hare () =
+    let tortoise = ref (f x0) in
+    let hare = ref (f (f x0)) in
+    while !tortoise <> !hare do
+      invariant {
+        exists t: int.
+        1 <= t <= lambda+mu /\ !tortoise = x t /\ !hare = x (2 * t) /\
+        forall i: int. 1 <= i < t -> x i <> x (2*i) }
+      variant { !tortoise } with rel
+      tortoise := f !tortoise;
+      hare     := f (f !hare)
+    done
+
+  (* TODO: code to find out lambda and mu. See wikipedia.  *)
+
+end
+
+(*
+Local Variables:
+compile-command: "unset LANG; make -C ../.. examples/programs/tortoise_and_hare.gui"
+End:
+*)
