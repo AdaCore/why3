@@ -468,22 +468,22 @@ and dterm_node ~localize loc uc env = function
   | PPapp (x, tl) when check_highord uc env x tl ->
       let tl = apply_highord loc x tl in
       let atyl, aty = Denv.specialize_lsymbol ~loc fs_func_app in
-      let tl = dtype_args fs_func_app.ls_name loc uc env atyl tl in
+      let tl = dtype_args ~localize fs_func_app.ls_name loc uc env atyl tl in
       Tapp (fs_func_app, tl), Util.of_option aty
   | PPapp (x, tl) ->
       let s, tyl, ty = specialize_fsymbol x uc in
-      let tl = dtype_args s.ls_name loc uc env tyl tl in
+      let tl = dtype_args ~localize s.ls_name loc uc env tyl tl in
       Tapp (s, tl), ty
   | PPtuple tl ->
       let n = List.length tl in
       let s = fs_tuple n in
       let tyl = List.map (fun _ -> fresh_type_var loc) tl in
-      let tl = dtype_args s.ls_name loc uc env tyl tl in
+      let tl = dtype_args ~localize s.ls_name loc uc env tyl tl in
       let ty = tyapp (ts_tuple n) tyl in
       Tapp (s, tl), ty
   | PPinfix (e1, x, e2) ->
       let s, tyl, ty = specialize_fsymbol (Qident x) uc in
-      let tl = dtype_args s.ls_name loc uc env tyl [e1; e2] in
+      let tl = dtype_args ~localize s.ls_name loc uc env tyl [e1; e2] in
       Tapp (s, tl), ty
   | PPconst (ConstInt _ as c) ->
       Tconst c, tyapp Ty.ts_int []
@@ -511,7 +511,7 @@ and dterm_node ~localize loc uc env = function
   | PPnamed (x, e1) ->
       let localize = match x with
         | Lpos _ -> false
-        | Lstr _ -> true
+        | Lstr _ -> localize
       in
       let e1 = dterm ~localize uc env e1 in
       Tnamed (x, e1), e1.dt_ty
@@ -694,11 +694,11 @@ and dfmla_node ~localize loc uc env = function
   | PPapp (x, tl) when check_highord uc env x tl ->
       let tl = apply_highord loc x tl in
       let atyl, _ = Denv.specialize_lsymbol ~loc ps_pred_app in
-      let tl = dtype_args ps_pred_app.ls_name loc uc env atyl tl in
+      let tl = dtype_args ~localize ps_pred_app.ls_name loc uc env atyl tl in
       Fapp (ps_pred_app, tl)
   | PPapp (x, tl) ->
       let s, tyl = specialize_psymbol x uc in
-      let tl = dtype_args s.ls_name loc uc env tyl tl in
+      let tl = dtype_args ~localize s.ls_name loc uc env tyl tl in
       Fapp (s, tl)
   | PPinfix (e12, op2, e3) ->
       begin match e12.pp_desc with
@@ -708,7 +708,7 @@ and dfmla_node ~localize loc uc env = function
                     dfmla ~localize uc env e23)
         | _ ->
             let s, tyl = specialize_psymbol (Qident op2) uc in
-            let tl = dtype_args s.ls_name loc uc env tyl [e12; e3] in
+            let tl = dtype_args ~localize s.ls_name loc uc env tyl [e12;e3] in
             Fapp (s, tl)
       end
   | PPlet (x, e1, e2) ->
@@ -728,7 +728,7 @@ and dfmla_node ~localize loc uc env = function
   | PPnamed (x, f1) ->
       let localize = match x with
         | Lpos _ -> false
-        | Lstr _ -> true
+        | Lstr _ -> localize
       in
       let f1 = dfmla ~localize uc env f1 in
       Fnamed (x, f1)
@@ -739,7 +739,7 @@ and dfmla_node ~localize loc uc env = function
 *)
   | PPvar x ->
       let s, tyl = specialize_psymbol x uc in
-      let tl = dtype_args s.ls_name loc uc env tyl [] in
+      let tl = dtype_args ~localize s.ls_name loc uc env tyl [] in
       Fapp (s, tl)
   | PPeps _ | PPconst _ | PPcast _ | PPtuple _ | PPrecord _ | PPupdate _ ->
       error ~loc PredicateExpected
@@ -751,7 +751,7 @@ and dpat_list uc env ty p =
   unify_raise ~loc p.dp_ty ty;
   env, p
 
-and dtype_args s loc uc env el tl =
+and dtype_args ~localize s loc uc env el tl =
   let n = List.length el and m = List.length tl in
   if n <> m then error ~loc (BadNumberOfArguments (s, m, n));
   let rec check_arg = function
@@ -759,7 +759,7 @@ and dtype_args s loc uc env el tl =
         []
     | a :: al, t :: bl ->
         let loc = t.pp_loc in
-        let t = dterm uc env t in
+        let t = dterm ~localize uc env t in
         unify_raise ~loc t.dt_ty a;
         t :: check_arg (al, bl)
     | _ ->
