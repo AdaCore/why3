@@ -144,7 +144,6 @@ theory Power
   lemma Power_mult : forall x n m : int. 0 <= n -> 0 <= m ->
     power x (n * m) = power (power x n) m
 
-
 end
 
 theory NumOfParam
@@ -227,7 +226,25 @@ theory Fact "Factorial"
 
 end
 
+theory Iter
+
+  use import Int
+
+  type t
+  function f t : t
+
+  function iter int t : t
+
+  axiom iter_0: forall x: t. iter 0 x = x
+  axiom iter_s: forall k: int, x: t. 0 < k -> iter k x = iter (k-1) (f x)
+
+  lemma iter_1: forall x: t. iter 1 x = f x
+  lemma iter_s2: forall k: int, x: t. 0 < k -> iter k x = f (iter (k-1) x)
+
+end
+
 theory Induction
+
   use import Int
 
   predicate p int

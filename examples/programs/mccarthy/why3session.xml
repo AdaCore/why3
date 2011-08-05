@@ -17,13 +17,39 @@
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
-   <goal name="WP_parameter f91_nonrec" expl="correctness of parameter f91_nonrec" sum="fbd734e7f0f402db73a779f18601e0e7" proved="true" expanded="true">
-    <proof prover="alt-ergo" timelimit="2" edited="" obsolete="false">
-     <result status="valid" time="0.96"/>
-    </proof>
-    <proof prover="z3" timelimit="2" edited="" obsolete="false">
-     <result status="valid" time="0.04"/>
-    </proof>
+   <goal name="WP_parameter f91_nonrec" expl="correctness of parameter f91_nonrec" sum="8a179e2a9c0c5871f3ca4b30c9454518" proved="true" expanded="true">
+    <transf name="split_goal" proved="true" expanded="true">
+     <goal name="WP_parameter f91_nonrec.1" expl="loop invariant init" sum="9d9dcf6019190aebc6117e2ad022ca91" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter f91_nonrec.2" expl="loop invariant preservation" sum="62ae258e98f5b11457ce053d1d8bcdd4" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter f91_nonrec.3" expl="loop variant decreases" sum="983071e6f0190dc9996c9a6ee090539f" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter f91_nonrec.4" expl="loop invariant preservation" sum="3e41e45cc79f11b87e69def8b23716d8" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.22"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter f91_nonrec.5" expl="loop variant decreases" sum="b1410dd32953d682df07e83b9b631efa" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter f91_nonrec.6" expl="normal postcondition" sum="13bd62c6208881320a98d3cc26ac5b18" proved="true" expanded="true">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+    </transf>
    </goal>
   </theory>
  </file>
