@@ -56,6 +56,7 @@ let ident_printer =
       "true";"check";"assert";"TYPE";"SUBTYPE";
       "scalar";"select";"update";"int";"real";"subtype";"subrange";"mk-bv";
       "bv-concat";"bv-extract";"bv-shift-right0";"div";"mod";"bitvector";
+      "lambda";
 ]
   in
   let san = sanitizer char_to_alpha char_to_alnumus in
