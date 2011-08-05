@@ -14,31 +14,25 @@ Parameter old: forall (a:Type), a  -> a.
 
 Implicit Arguments old.
 
-Parameter f: Z  -> Z.
+Parameter t : Type.
+
+Parameter f: t  -> t.
 
 
-Parameter m:  Z.
+Parameter x0:  t.
 
 
-Axiom dom_f : forall (x:Z), ((0%Z <= x)%Z /\ (x <  (m ))%Z) ->
-  ((0%Z <= (f x))%Z /\ ((f x) <  (m ))%Z).
-
-Parameter x0:  Z.
+Parameter iter: Z -> t  -> t.
 
 
-Axiom x0_range : (0%Z <= (x0 ))%Z /\ ((x0 ) <  (m ))%Z.
+Axiom iter_0 : forall (x:t), ((iter 0%Z x) = x).
 
-Parameter iter: Z -> Z  -> Z.
-
-
-Axiom iter_0 : forall (x:Z), ((iter 0%Z x) = x).
-
-Axiom iter_s : forall (k:Z) (x:Z), (0%Z <  k)%Z -> ((iter k
+Axiom iter_s : forall (k:Z) (x:t), (0%Z <  k)%Z -> ((iter k
   x) = (iter (k - 1%Z)%Z (f x))).
 
-Axiom iter_1 : forall (x:Z), ((iter 1%Z x) = (f x)).
+Axiom iter_1 : forall (x:t), ((iter 1%Z x) = (f x)).
 
-Axiom iter_s2 : forall (k:Z) (x:Z), (0%Z <  k)%Z -> ((iter k
+Axiom iter_s2 : forall (k:Z) (x:t), (0%Z <  k)%Z -> ((iter k
   x) = (f (iter (k - 1%Z)%Z x))).
 
 Parameter mu:  Z.
@@ -69,34 +63,35 @@ Definition contents (a:Type)(u:(ref a)): a :=
   end.
 Implicit Arguments contents.
 
-Definition rel(t2:Z) (t1:Z): Prop := exists i:Z, (t1 = (iter i (x0 ))) /\
+Definition rel(t2:t) (t1:t): Prop := exists i:Z, (t1 = (iter i (x0 ))) /\
   ((t2 = (iter (i + 1%Z)%Z (x0 ))) /\ ((1%Z <= i)%Z /\
   (i <= ((lambda ) + (mu ))%Z)%Z)).
 
-Theorem WP_parameter_tortoise_hare : forall (hare:Z), forall (tortoise:Z),
-  (exists t:Z, ((1%Z <= t)%Z /\ (t <= ((lambda ) + (mu ))%Z)%Z) /\
-  ((tortoise = (iter t (x0 ))) /\ ((hare = (iter (2%Z * t)%Z (x0 ))) /\
-  forall (i:Z), ((1%Z <= i)%Z /\ (i <  t)%Z) -> ~ ((iter i
+Theorem WP_parameter_tortoise_hare : forall (hare:t), forall (tortoise:t),
+  (exists t1:Z, ((1%Z <= t1)%Z /\ (t1 <= ((lambda ) + (mu ))%Z)%Z) /\
+  ((tortoise = (iter t1 (x0 ))) /\ ((hare = (iter (2%Z * t1)%Z (x0 ))) /\
+  forall (i:Z), ((1%Z <= i)%Z /\ (i <  t1)%Z) -> ~ ((iter i
   (x0 )) = (iter (2%Z * i)%Z (x0 )))))) -> ((~ (tortoise = hare)) ->
-  forall (tortoise1:Z), (tortoise1 = (f tortoise)) -> forall (hare1:Z),
-  (hare1 = (f (f hare))) -> exists t:Z, ((1%Z <= t)%Z /\
-  (t <= ((lambda ) + (mu ))%Z)%Z) /\ ((tortoise1 = (iter t (x0 ))) /\
-  ((hare1 = (iter (2%Z * t)%Z (x0 ))) /\ forall (i:Z), ((1%Z <= i)%Z /\
-  (i <  t)%Z) -> ~ ((iter i (x0 )) = (iter (2%Z * i)%Z (x0 )))))).
+  forall (tortoise1:t), (tortoise1 = (f tortoise)) -> forall (hare1:t),
+  (hare1 = (f (f hare))) -> exists t1:Z, ((1%Z <= t1)%Z /\
+  (t1 <= ((lambda ) + (mu ))%Z)%Z) /\ ((tortoise1 = (iter t1 (x0 ))) /\
+  ((hare1 = (iter (2%Z * t1)%Z (x0 ))) /\ forall (i:Z), ((1%Z <= i)%Z /\
+  (i <  t1)%Z) -> ~ ((iter i (x0 )) = (iter (2%Z * i)%Z (x0 )))))).
 (* YOU MAY EDIT THE PROOF BELOW *)
-intros hare tortoise (t, (ht, (eqt, (eqh, h)))).
+intros hare tortoise (t0, (ht, (eqt, (eqh, h)))).
 intros; subst.
-assert (dis: forall i : Z, (1 <= i <= t)%Z -> iter i x0 <> iter (2 * i) x0).
+assert (dis: forall i : Z, (1 <= i <= t0)%Z -> iter i x0 <> iter (2 * i) x0).
 intros i hi.
-assert (case: (i < t \/ i = t)%Z) by omega. destruct case.
+assert (case: (i < t0 \/ i = t0)%Z) by omega. destruct case.
 apply (h i); omega.
-subst; omega. clear h H.
+subst; auto.
 
-exists (t + 1)%Z; intuition.
-assert (case: (t+1 <= lambda + mu \/ t+1> lambda+mu)%Z) by omega.
+clear h H.
+exists (t0 + 1)%Z; intuition.
+assert (case: (t0+1 <= lambda + mu \/ t0+1> lambda+mu)%Z) by omega.
   destruct case.
 assumption.
-assert (t = lambda+mu)%Z by omega. subst.
+assert (t0 = lambda+mu)%Z by omega. subst.
 clear H0 H1.
 pose (i := (lambda+mu-(lambda+mu) mod lambda)%Z).
 generalize lambda_range mu_range. intros hlam hmu.
@@ -122,13 +117,14 @@ symmetry. apply ind.
 apply Z_div_pos; omega.
 subst i; omega.
 
-rewrite (iter_s2 (t+1)%Z); intuition.
-ring_simplify (t+1-1)%Z; auto.
-rewrite (iter_s2 (2*(t+1))%Z); intuition.
-ring_simplify (2 * (t + 1) - 1) %Z.
-rewrite (iter_s2 (2*t+1)%Z); intuition.
-ring_simplify (2 * t + 1 - 1) %Z; auto.
-apply (dis i); omega.
+rewrite (iter_s2 (t0+1)%Z); intuition.
+ring_simplify (t0+1-1)%Z; auto.
+rewrite (iter_s2 (2*(t0+1))%Z); intuition.
+ring_simplify (2 * (t0 + 1) - 1) %Z.
+rewrite (iter_s2 (2*t0+1)%Z); intuition.
+ring_simplify (2 * t0 + 1 - 1) %Z; auto.
+apply (dis i); auto.
+omega.
 Qed.
 (* DO NOT EDIT BELOW *)
 

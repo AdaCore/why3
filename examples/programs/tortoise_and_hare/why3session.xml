@@ -3,26 +3,26 @@
 <why3session name="examples/programs/tortoise_and_hare/why3session.xml">
  <file name="../tortoise_and_hare.mlw" verified="true" expanded="true">
   <theory name="WP TortoiseAndHare" verified="true" expanded="true">
-   <goal name="WP_parameter tortoise_hare" expl="correctness of parameter tortoise_hare" sum="91ac7ea5fd1fbbcfbed05554d037d955" proved="true" expanded="true">
+   <goal name="WP_parameter tortoise_hare" expl="correctness of parameter tortoise_hare" sum="d5a56a7802fc97e6280f47f1c2d8afe7" proved="true" expanded="true">
     <transf name="split_goal" proved="true" expanded="true">
-     <goal name="WP_parameter tortoise_hare.1" expl="loop invariant init" sum="0e9d405eb4b310f9ee22eb3505ef5db9" proved="true" expanded="true">
+     <goal name="WP_parameter tortoise_hare.1" expl="loop invariant init" sum="deb426b7e212bb8c372f84e4cbe445ba" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.07"/>
+       <result status="valid" time="0.04"/>
       </proof>
      </goal>
-     <goal name="WP_parameter tortoise_hare.2" expl="loop invariant preservation" sum="f343cf215fbafc7b514fb7822f857df9" proved="true" expanded="true">
+     <goal name="WP_parameter tortoise_hare.2" expl="loop invariant preservation" sum="8861467ffe89e37d79041a71a3e4d6cc" proved="true" expanded="true">
       <proof prover="coq" timelimit="10" edited="tortoise_and_hare_WP_TortoiseAndHare_WP_parameter_tortoise_hare_2.v" obsolete="false">
-       <result status="valid" time="1.08"/>
+       <result status="valid" time="1.05"/>
       </proof>
      </goal>
-     <goal name="WP_parameter tortoise_hare.3" expl="loop variant decreases" sum="fe982931e3cc2f7497132a090909caa0" proved="true" expanded="true">
+     <goal name="WP_parameter tortoise_hare.3" expl="loop variant decreases" sum="09ff6193cd3690e166b5e69416afaf84" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="1.61"/>
+       <result status="valid" time="0.96"/>
       </proof>
      </goal>
-     <goal name="WP_parameter tortoise_hare.4" expl="normal postcondition" sum="ba0632d0db74b0437824be9335f09621" proved="true" expanded="true">
+     <goal name="WP_parameter tortoise_hare.4" expl="normal postcondition" sum="81ae997284c95f6b1196e9b2a49fb968" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.03"/>
       </proof>
      </goal>
     </transf>

@@ -7,44 +7,50 @@ module TortoiseAndHare
 
   use import int.Int
 
-  (* let f be a function from 0..m-1 to 0..m-1 *)
-  function f int : int
-  function m : int
-  axiom dom_f: forall x: int. 0 <= x < m -> 0 <= f x < m
+  (* let f be a function from t to t *)
+  type t
+  function f t : t
 
-  (* let x0 be in 0..m-1 *)
-  function x0: int
-  axiom x0_range: 0 <= x0 < m
+  (* given some initial value x0 *)
+  function x0: t
 
-  (* let x_{i+1} = f(x_i) *)
-  clone import int.Iter with type t = int, function f = f
-  function x (i: int): int = iter i x0
+  (* we can build the infinite sequence defined by x{i+1} = f(xi) *)
+  clone import int.Iter with type t = t, function f = f
+  function x (i: int): t = iter i x0
+
+  (* let use assume now that the sequence (x_i) has finitely many distinct
+     values (e.g. f is an integer function with values in 0..m)
+
+     it means that there exists values lambda and mu such that
+     (1) x0, x1, ... x{mu+lambda-1} are all distinct,
+     and
+     (2) x{n+lambda} = x_n when n >= mu. *)
 
   (* lambda and mu are skomlemized *)
   function mu     : int
   function lambda : int
 
-  (* they are defined as follows *)
+  (* they are axiomatized as follows *)
   axiom mu_range: 0 <= mu
+
   axiom lambda_range: 1 <= lambda
 
-  (* values x0 ... x_{mu+lambda-1} are all distinct *)
   axiom distinct:
     forall i j: int. 0 <= i < mu+lambda -> 0 <= j < mu+lambda ->
     i <> j -> x i <> x j
 
-  (* cycle is lambda-long *)
   axiom cycle: forall n: int. mu <= n -> x (n + lambda) = x n
 
   (* Now comes the code.
-     Two references, tortoise and hare, traverses the xi at speed 1 and 2.
+     Two references, tortoise and hare, traverses the sequence (xi)
+     at speed 1 and 2 respectively. We stop whenever they are equal.
 
      The challenge is to prove termination.
      Actually, we even prove that the code runs in time O(lambda + mu). *)
 
   use import module ref.Ref
 
-  predicate rel (t2 t1: int) =
+  predicate rel (t2 t1: t) =
     exists i: int. t1 = x i /\ t2 = x (i+1) /\ 1 <= i <= lambda + mu
 
   let tortoise_hare () =
