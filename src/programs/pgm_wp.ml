@@ -407,9 +407,11 @@ let well_founded_rel = function
 (* Recursive computation of the weakest precondition *)
 
 let wp_label ?loc ?(lab=[]) f =
-  let loc = option_apply f.t_loc (fun x -> Some x) loc in
+  let loc = option_apply loc (fun x -> Some x) f.t_loc in
   let lab = lab @ f.t_label in
+(*
   let lab = if List.mem "WP" lab then lab else "WP" :: lab in
+*)
   t_label ?loc lab f
 
 let t_True env =
