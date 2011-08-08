@@ -346,19 +346,27 @@ install_local: bin/why3ml
 # GNATWhy3
 ########
 
-$(PGMCMO) $(PGMCMX): INCLUDES += -I src/programs
+GNAT_FILES = gnat_expl gnat_main
+
+GNATMODULES = $(addprefix src/gnat/, $(GNAT_FILES))
+
+GNATML  = $(addsuffix .ml,  $(GNATMODULES))
+GNATMLI = $(addsuffix .mli, $(GNATMODULES))
+GNATCMO = $(addsuffix .cmo, $(GNATMODULES))
+GNATCMX = $(addsuffix .cmx, $(GNATMODULES))
+$(GNATCMO) $(GNATCMX): INCLUDES += -I src/programs -I src/gnat -I src/util
 
 # build targets
 
 byte: bin/gnat3why.byte
 opt:  bin/gnat3why.opt
 
-bin/gnat3why.opt: src/why3.cmxa $(PGMCMX) src/gnatmain.cmx
+bin/gnat3why.opt: src/why3.cmxa $(PGMCMX) $(GNATCMX)
 	$(if $(QUIET), @echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
 	$(STRIP) $@
 
-bin/gnat3why.byte: src/why3.cma $(PGMCMO) src/gnatmain.cmo
+bin/gnat3why.byte: src/why3.cma $(PGMCMO) $(GNATCMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
 
@@ -367,6 +375,19 @@ bin/gnat3why: bin/gnat3why.@OCAMLBEST@
 
 install_no_local::
 	cp -f bin/gnat3why.@OCAMLBEST@ $(BINDIR)/gnat3why
+
+include .depend.gnat
+
+.depend.gnat:
+	$(OCAMLDEP) -slash -I src -I src/util -I src/gnat $(GNATML) $(GNATMLI) > $@
+
+depend: .depend.gnat
+
+clean::
+	rm -f src/gnat/*.cm[iox] src/gnat/*.o
+	rm -f src/gnat/*.annot src/gnat/*~
+	rm -f bin/gnat3why.byte bin/gnat3why.opt bin/gnat3why
+	rm -f .depend.gnat
 
 ##########
 # gallery

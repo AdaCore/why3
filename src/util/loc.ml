@@ -83,3 +83,5 @@ let () = Exn_printer.register
         fprintf fmt "%a%a" report_position loc Exn_printer.exn_printer e
     | _ -> raise exn)
 
+
+let get_file (f,_,_,_) = f
