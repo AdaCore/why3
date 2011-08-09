@@ -706,7 +706,7 @@ let rec ts_extract_pos kn sts ts =
           | Tyvar _ -> stv
           | Tyapp (ts,tl) ->
               let get acc pos =
-                if pos then get_ty acc else ty_freevars Stv.empty in
+                if pos then get_ty acc else ty_freevars acc in
               List.fold_left2 get stv (ts_extract_pos kn sts ts) tl
         in
         let get_cs acc ls = List.fold_left get_ty acc ls.ls_args in
