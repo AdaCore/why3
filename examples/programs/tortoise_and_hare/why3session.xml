@@ -1,31 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
 <why3session name="examples/programs/tortoise_and_hare/why3session.xml">
+ <prover id="alt-ergo" name="Alt-Ergo" version="0.93"/>
+ <prover id="coq" name="Coq" version="8.2pl1"/>
+ <prover id="cvc3" name="CVC3" version="2.2"/>
+ <prover id="eprover" name="Eprover" version="1.0-004 Temi"/>
+ <prover id="gappa" name="Gappa" version="0.14.0"/>
+ <prover id="simplify" name="Simplify" version="1.5.4"/>
+ <prover id="spass" name="Spass" version="3.5"/>
+ <prover id="yices" name="Yices" version="1.0.27"/>
+ <prover id="z3" name="Z3" version="2.19"/>
  <file name="../tortoise_and_hare.mlw" verified="true" expanded="true">
   <theory name="WP TortoiseAndHare" verified="true" expanded="true">
-   <goal name="cycle_induction" sum="8659f3dab2f3a5008349cef96ac38e76" proved="true" expanded="true">
+   <goal name="cycle_induction" sum="8659f3dab2f3a5008349cef96ac38e76" proved="true" expanded="true" shape="ainfix =axainfix +V0ainfix *alambdaV1axV0Iainfix <=c0V1FIainfix <=amuV0F">
     <proof prover="coq" timelimit="10" edited="tortoise_and_hare_WP_TortoiseAndHare_cycle_induction_1.v" obsolete="false">
-     <result status="valid" time="0.61"/>
+     <result status="valid" time="0.62"/>
     </proof>
    </goal>
-   <goal name="WP_parameter tortoise_hare" expl="correctness of parameter tortoise_hare" sum="3b8223899a3507ff2191c4d541bd6b68" proved="true" expanded="true">
+   <goal name="WP_parameter tortoise_hare" expl="correctness of parameter tortoise_hare" sum="d6e9d75196256880a379574cca2ebe20" proved="true" expanded="true" shape="iainfix =V1V0NarelV2V1Aainfix =axV5axainfix *c2V5NIainfix <V5V4Aainfix <=c1V5FAainfix =V3axainfix *c2V4Aainfix =V2axV4Aainfix <=V4ainfix +amualambdaAainfix <=c1V4EIainfix =V3afafV0FIainfix =V2afV1FtIainfix =axV7axainfix *c2V7NIainfix <V7V6Aainfix <=c1V7FAainfix =V0axainfix *c2V6Aainfix =V1axV6Aainfix <=V6ainfix +amualambdaAainfix <=c1V6EFFAainfix =axV9axainfix *c2V9NIainfix <V9V8Aainfix <=c1V9FAainfix =afafax0axainfix *c2V8Aainfix =afax0axV8Aainfix <=V8ainfix +amualambdaAainfix <=c1V8E">
     <transf name="split_goal" proved="true" expanded="true">
-     <goal name="WP_parameter tortoise_hare.1" expl="loop invariant init" sum="01ab8eb4fc1286d62c9ac669eafd74ab" proved="true" expanded="true">
+     <goal name="WP_parameter tortoise_hare.1" expl="loop invariant init" sum="07f80d0dfb5985b1b01f74251c85ab1e" proved="true" expanded="true" shape="ainfix =axV1axainfix *c2V1NIainfix <V1V0Aainfix <=c1V1FAainfix =afafax0axainfix *c2V0Aainfix =afax0axV0Aainfix <=V0ainfix +amualambdaAainfix <=c1V0E">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.05"/>
       </proof>
      </goal>
-     <goal name="WP_parameter tortoise_hare.2" expl="loop invariant preservation" sum="3cfb58d4bd4498e2b72ee3004fe49be2" proved="true" expanded="true">
+     <goal name="WP_parameter tortoise_hare.2" expl="loop invariant preservation" sum="521036be3a2083ccb50ee29dd1609b3a" proved="true" expanded="true" shape="ainfix =axV5axainfix *c2V5NIainfix <V5V4Aainfix <=c1V5FAainfix =V3axainfix *c2V4Aainfix =V2axV4Aainfix <=V4ainfix +amualambdaAainfix <=c1V4EIainfix =V3afafV0FIainfix =V2afV1FIainfix =V1V0NIainfix =axV7axainfix *c2V7NIainfix <V7V6Aainfix <=c1V7FAainfix =V0axainfix *c2V6Aainfix =V1axV6Aainfix <=V6ainfix +amualambdaAainfix <=c1V6EFF">
       <proof prover="coq" timelimit="10" edited="tortoise_and_hare_WP_TortoiseAndHare_WP_parameter_tortoise_hare_2.v" obsolete="false">
-       <result status="valid" time="0.95"/>
+       <result status="valid" time="0.94"/>
       </proof>
      </goal>
-     <goal name="WP_parameter tortoise_hare.3" expl="loop variant decreases" sum="15ca1bc4cde2b54b14d6e9adc5d5ca67" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="1.34"/>
+     <goal name="WP_parameter tortoise_hare.3" expl="loop variant decreases" sum="890862abe98aa7ebf28c819b14028671" proved="true" expanded="true" shape="arelV2V1Iainfix =axV5axainfix *c2V5NIainfix <V5V4Aainfix <=c1V5FAainfix =V3axainfix *c2V4Aainfix =V2axV4Aainfix <=V4ainfix +amualambdaAainfix <=c1V4EIainfix =V3afafV0FIainfix =V2afV1FIainfix =V1V0NIainfix =axV7axainfix *c2V7NIainfix <V7V6Aainfix <=c1V7FAainfix =V0axainfix *c2V6Aainfix =V1axV6Aainfix <=V6ainfix +amualambdaAainfix <=c1V6EFF">
+      <proof prover="coq" timelimit="10" edited="tortoise_and_hare_WP_TortoiseAndHare_WP_parameter_tortoise_hare_1.v" obsolete="false">
+       <result status="valid" time="0.81"/>
       </proof>
      </goal>
-     <goal name="WP_parameter tortoise_hare.4" expl="normal postcondition" sum="e698959e67b54437dd880cff04dfdaca" proved="true" expanded="true">
+     <goal name="WP_parameter tortoise_hare.4" expl="normal postcondition" sum="1d9481e1562156fe54c6a0d1f99ef4c8" proved="true" expanded="true" shape="tIainfix =V1V0NNIainfix =axV3axainfix *c2V3NIainfix <V3V2Aainfix <=c1V3FAainfix =V0axainfix *c2V2Aainfix =V1axV2Aainfix <=V2ainfix +amualambdaAainfix <=c1V2EFF">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.02"/>
       </proof>

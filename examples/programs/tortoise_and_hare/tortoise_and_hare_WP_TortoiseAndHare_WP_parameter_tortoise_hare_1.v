@@ -85,47 +85,46 @@ Theorem WP_parameter_tortoise_hare : forall (hare:t), forall (tortoise:t),
   forall (i:Z), ((1%Z <= i)%Z /\ (i <  t1)%Z) -> ~ ((iter i
   (x0 )) = (iter (2%Z * i)%Z (x0 )))))) -> ((~ (tortoise = hare)) ->
   forall (tortoise1:t), (tortoise1 = (f tortoise)) -> forall (hare1:t),
-  (hare1 = (f (f hare))) -> exists t1:Z, ((1%Z <= t1)%Z /\
+  (hare1 = (f (f hare))) -> ((exists t1:Z, ((1%Z <= t1)%Z /\
   (t1 <= ((mu ) + (lambda ))%Z)%Z) /\ ((tortoise1 = (iter t1 (x0 ))) /\
   ((hare1 = (iter (2%Z * t1)%Z (x0 ))) /\ forall (i:Z), ((1%Z <= i)%Z /\
-  (i <  t1)%Z) -> ~ ((iter i (x0 )) = (iter (2%Z * i)%Z (x0 )))))).
+  (i <  t1)%Z) -> ~ ((iter i (x0 )) = (iter (2%Z * i)%Z (x0 )))))) ->
+  (rel tortoise1 tortoise))).
 (* YOU MAY EDIT THE PROOF BELOW *)
-intros hare tortoise (t0, (ht, (eqt, (eqh, h)))).
-intros; subst.
-assert (dis: forall i : Z, (1 <= i <= t0)%Z -> iter i x0 <> iter (2 * i) x0).
-intros i hi.
-assert (case: (i < t0 \/ i = t0)%Z) by omega. destruct case.
-apply (h i); omega.
-subst; auto.
-
-clear h H.
-exists (t0 + 1)%Z; intuition.
-assert (case: (t0+1 <= mu+lambda \/ t0+1> mu+lambda)%Z) by omega.
-  destruct case.
-assumption.
-assert (t0 = mu+lambda)%Z by omega. subst.
-clear H0 H1.
-pose (i := (mu+lambda-(mu+lambda) mod lambda)%Z).
-generalize lambda_range mu_range. intros hlam hmu.
-assert (lambda_pos: (lambda > 0)%Z) by omega.
-generalize (Z_mod_lt (mu+lambda) lambda lambda_pos)%Z. intro hr.
-generalize (Z_div_mod_eq (mu+lambda) lambda lambda_pos)%Z. intro hq.
-absurd (iter i x0 = iter (2*i) x0).
-red; intro; apply (dis i); auto.
-subst i; omega.
-assert (hi: (mu <= i)%Z) by (subst i; omega).
-replace (2*i)%Z with (i + lambda * ((mu+lambda) / lambda))%Z.
-symmetry. apply cycle_induction; auto.
-apply Z_div_pos; omega.
-subst i; omega.
-
-rewrite (iter_s2 (t0+1)%Z); intuition.
-ring_simplify (t0+1-1)%Z; auto.
-rewrite (iter_s2 (2*(t0+1))%Z); intuition.
-ring_simplify (2 * (t0 + 1) - 1) %Z.
-rewrite (iter_s2 (2*t0+1)%Z); intuition.
-ring_simplify (2 * t0 + 1 - 1) %Z; auto.
-apply (dis i); auto.
+intuition.
+clear H3.
+destruct H as (i, (h1, (h2, (h3, h4)))).
+red.
+exists i; intuition.
+subst.
+rewrite iter_s2 with (k := (i+1)%Z).
+apply f_equal.
+ring_simplify (i+1-1)%Z; auto.
+omega.
+assert (mu1: (mu <= 2*i+2)%Z) by omega.
+assert (mu2: (mu <= i+1)%Z) by omega.
+generalize (dist_def (2*i+2) (i+1) mu1 mu2)%Z.
+intros (d1, (d2, d3)).
+clear mu1 mu2.
+assert (mu1: (mu <= 2*i)%Z) by omega.
+generalize (dist_def (2*i) i mu1 H4)%Z.
+intros (d'1, (d'2, d'3)).
+apply Zle_lt_trans with (dist (2 * i) i - 1)%Z.
+apply d3.
+assert (case: (dist (2*i) i = 0 \/ dist (2*i) i > 0)%Z) by omega. destruct case.
+rewrite H5 in d'2.
+subst.
+absurd (iter i x0 = iter (2 * i) x0)%Z; auto.
+symmetry.
+ring_simplify (2*i+0)%Z in d'2.
+auto.
+omega.
+rewrite iter_s2; try omega.
+rewrite iter_s2 with (k:=(i+1)%Z); try omega.
+apply f_equal.
+ring_simplify (i+1-1)%Z.
+ring_simplify (2 * i + 2 + (dist (2 * i) i - 1) - 1)%Z.
+auto.
 omega.
 Qed.
 (* DO NOT EDIT BELOW *)

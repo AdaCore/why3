@@ -53,8 +53,18 @@ module TortoiseAndHare
 
   use import module ref.Ref
 
+  (* the minimal distance between x i and x j *)
+  function dist int int : int
+
+  (* it is defined as soon as i,j >= mu *)
+  axiom dist_def: forall i j: int. mu <= i -> mu <= j ->
+    dist i j >= 0 /\
+    x (i + dist i j) = x j /\
+    forall k: int. 0 <= k -> x (i + k) = x j -> dist i j <= k
+
   predicate rel (t2 t1: t) =
-    exists i: int. t1 = x i /\ t2 = x (i+1) /\ 1 <= i <= mu + lambda
+    exists i: int. t1 = x i /\ t2 = x (i+1) /\ 1 <= i <= mu + lambda /\
+                   (i >= mu -> dist (2*i+2) (i+1) < dist (2*i) i)
 
   let tortoise_hare () =
     let tortoise = ref (f x0) in
