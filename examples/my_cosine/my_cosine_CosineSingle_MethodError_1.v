@@ -6,6 +6,15 @@ Require Import Rbasic_fun.
 Require Import R_sqrt.
 Require Import Rtrigo.
 Require Import AltSeries. (* for def of pi *)
+Axiom assoc_mul_div : forall (x:R) (y:R) (z:R), (~ (z = (0)%R)) ->
+  ((Rdiv (x * y)%R z)%R = (x * (Rdiv y z)%R)%R).
+
+Axiom assoc_div_mul : forall (x:R) (y:R) (z:R), ((~ (y = (0)%R)) /\
+  ~ (z = (0)%R)) -> ((Rdiv (Rdiv x y)%R z)%R = (Rdiv x (y * z)%R)%R).
+
+Axiom assoc_div_div : forall (x:R) (y:R) (z:R), ((~ (y = (0)%R)) /\
+  ~ (z = (0)%R)) -> ((Rdiv x (Rdiv y z)%R)%R = (Rdiv (x * z)%R y)%R).
+
 Axiom Abs_le : forall (x:R) (y:R), ((Rabs x) <= y)%R <-> (((-y)%R <= x)%R /\
   (x <= y)%R).
 
@@ -129,11 +138,14 @@ Axiom Round_down_neg : forall (x:R), ((round (Down ) (-x)%R) = (-(round (Up )
 Axiom Round_up_neg : forall (x:R), ((round (Up ) (-x)%R) = (-(round (Down )
   x))%R).
 
+(* YOU MAY EDIT THE CONTEXT BELOW *)
+Require Import Interval_tactic.
+(* DO NOT EDIT BELOW *)
+
 Theorem MethodError : forall (x:R), ((Rabs x) <= (1 / 32)%R)%R ->
   ((Rabs (((1)%R - ((05 / 10)%R * (x * x)%R)%R)%R - (Rtrigo_def.cos x))%R) <= (1 / 16777216)%R)%R.
 (* YOU MAY EDIT THE PROOF BELOW *)
 intros x H.
-Require Import Interval_tactic.
 interval with (i_bisect_diff x).
 Qed.
 (* DO NOT EDIT BELOW *)

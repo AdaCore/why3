@@ -348,8 +348,57 @@ let print_implicits fmt ls ty_vars_args ty_vars_value all_ty_params =
 let definition fmt info =
   fprintf fmt "%s" (if info.realization then "Definition" else "Parameter")
 
+(*
+
+  copy of old user scripts
+
+*)
+
+let copy_user_script begin_string end_string ch fmt =
+  fprintf fmt "%s@\n" begin_string;
+  try
+    while true do
+      let s = input_line ch in
+      fprintf fmt "%s@\n" s;
+      if s = end_string then raise Exit
+    done
+  with
+    | Exit -> fprintf fmt "@\n"
+    | End_of_file -> fprintf fmt "%s@\n@\n" end_string
+
 let proof_begin = "(* YOU MAY EDIT THE PROOF BELOW *)"
 let proof_end = "(* DO NOT EDIT BELOW *)"
+let context_begin = "(* YOU MAY EDIT THE CONTEXT BELOW *)"
+let context_end = "(* DO NOT EDIT BELOW *)"
+
+(* current kind of script in an old file *)
+type old_file_state = InContext | InProof | NoWhere
+
+let copy_proof s ch fmt = 
+  copy_user_script proof_begin proof_end ch fmt;
+  s := NoWhere
+
+let copy_context s ch fmt = 
+  copy_user_script context_begin context_end ch fmt;
+  s := NoWhere
+
+let lookup_context_or_proof old_state old_channel =
+  match !old_state with
+    | InProof | InContext -> ()
+    | NoWhere ->
+        let rec loop () =
+          let s = input_line old_channel in
+          if s = proof_begin then old_state := InProof else
+            if s = context_begin then old_state := InContext else
+              loop ()
+        in
+        try loop ()
+        with End_of_file -> ()
+
+let print_empty_context fmt =
+  fprintf fmt "%s@\n" context_begin;
+  fprintf fmt "@\n";
+  fprintf fmt "%s@\n@\n" context_end
 
 let print_empty_proof ?(def=false) fmt =
   fprintf fmt "%s@\n" proof_begin;
@@ -358,6 +407,7 @@ let print_empty_proof ?(def=false) fmt =
   fprintf fmt "%s.@\n" (if def then "Defined" else "Qed");
   fprintf fmt "%s@\n@\n" proof_end
 
+(*
 let print_next_proof ?def ch fmt =
   try
     while true do
@@ -375,7 +425,40 @@ let print_next_proof ?def ch fmt =
   with
     | End_of_file -> print_empty_proof ?def fmt
     | Exit -> fprintf fmt "@\n"
+*)
 
+let print_context ~old fmt =
+  match old with
+    | None -> print_empty_context fmt
+    | Some(s,ch) ->
+        lookup_context_or_proof s ch;
+        match !s with
+          | InProof | NoWhere -> print_empty_context fmt
+          | InContext -> copy_context s ch fmt
+
+let print_proof ~old ?def fmt =
+  match old with
+    | None -> print_empty_proof ?def fmt
+    | Some(s,ch) ->
+        lookup_context_or_proof s ch;
+        match !s with
+          | InContext | NoWhere -> print_empty_proof ?def fmt
+          | InProof -> copy_proof s ch fmt
+
+let produce_remaining_contexts_and_proofs ~old fmt =
+  match old with
+    | None -> ()
+    | Some(s,ch) ->
+        let rec loop () =
+          lookup_context_or_proof s ch;
+          match !s with
+            | NoWhere -> ()
+            | InContext -> copy_context s ch fmt; loop ()
+            | InProof -> copy_proof s ch fmt; loop ()
+        in
+        loop ()
+
+(*
 let produce_remaining_proofs ~old fmt =
   match old with
     | None -> ()
@@ -400,16 +483,19 @@ let produce_remaining_proofs ~old fmt =
     done
   with
     | End_of_file -> fprintf fmt "@\n"
+*)
 
 let realization ~old ?def fmt produce_realization =
   if produce_realization then
+    print_proof ~old ?def fmt
+(*
     begin match old with
       | None -> print_empty_proof ?def fmt
       | Some ch -> print_next_proof ?def ch fmt
     end
+*)
   else
     fprintf fmt "@\n"
-
 
 let print_type_decl ~old info fmt (ts,def) =
   if is_ts_tuple ts then () else
@@ -540,6 +626,13 @@ let print_proof ~old info fmt = function
       realization ~old fmt info.realization
   | Pskip -> ()
 
+let print_proof_context ~old info fmt = function
+  | Plemma | Pgoal ->
+      print_context ~old fmt
+  | Paxiom ->
+      if info.realization then print_context ~old fmt
+  | Pskip -> ()
+
 let print_decl ~old info fmt d = match d.d_node with
   | Dtype tl  ->
       print_list nothing (print_type_decl ~old info) fmt tl
@@ -552,6 +645,7 @@ let print_decl ~old info fmt d = match d.d_node with
   | Dprop (_,pr,_) when Sid.mem pr.pr_name info.info_rem ->
       ()
   | Dprop (k,pr,f) ->
+      print_proof_context ~old info fmt k;
       let params = t_ty_freevars Stv.empty f in
       fprintf fmt "@[<hov 2>%a %a : %a%a.@]@\n%a"
         (print_pkind info) k
@@ -572,6 +666,10 @@ let print_task _env pr thpr ?old fmt task =
     info_rem = get_remove_set task;
     realization = false;
   } in
+  let old = match old with
+    | None -> None
+    | Some ch -> Some(ref NoWhere,ch)
+  in
   print_decls ~old info fmt (Task.task_decls task)
 
 let () = register_printer "coq" print_task
@@ -610,8 +708,12 @@ let print_theory _env pr thpr ?old fmt th =
     realization = true;
   }
   in
+  let old = match old with
+    | None -> None
+    | Some ch -> Some(ref NoWhere,ch)
+  in
   print_tdecls ~old info fmt th.th_decls;
-  produce_remaining_proofs ~old fmt
+  produce_remaining_contexts_and_proofs ~old fmt
 
 
 (*
