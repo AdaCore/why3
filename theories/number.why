@@ -6,8 +6,18 @@ theory Parity
   use import int.Int
 
   predicate even (n: int) = exists k: int. n = 2 * k
-
   predicate odd (n: int) = exists k: int. n = 2 * k + 1
+
+  lemma even_or_odd: forall n: int. even n \/ odd n
+
+  lemma even_not_odd: forall n: int. even n -> not (odd n)
+  lemma odd_not_even: forall n: int. odd n -> not (even n)
+
+  lemma even_odd: forall n: int. even n -> odd (n + 1)
+  lemma odd_even: forall n: int. odd n -> even (n + 1)
+
+  lemma even_even: forall n: int. even n -> even (n + 2)
+  lemma odd_odd: forall n: int. odd n -> odd (n + 2)
 
   lemma even_2k: forall k: int. even (2 * k)
   lemma odd_2k1: forall k: int. odd (2 * k + 1)
@@ -57,12 +67,24 @@ theory Divisibility
   lemma divides_bounds:
     forall a b: int. divides a b -> b <> 0 -> abs a <= abs b
 
-  use import int.EuclideanDivision
+  use int.EuclideanDivision
 
-  lemma mod_divides:
-    forall a b: int. b <> 0 -> mod a b = 0 -> divides b a
-  lemma divides_mod:
-    forall a b: int. b <> 0 -> divides b a -> mod a b = 0
+  lemma mod_divides_euclidean:
+    forall a b: int. b <> 0 -> EuclideanDivision.mod a b = 0 -> divides b a
+  lemma divides_mod_euclidean:
+    forall a b: int. b <> 0 -> divides b a -> EuclideanDivision.mod a b = 0
+
+  use int.ComputerDivision
+
+  lemma mod_divides_computer:
+    forall a b: int. b <> 0 -> ComputerDivision.mod a b = 0 -> divides b a
+  lemma divides_mod_computer:
+    forall a b: int. b <> 0 -> divides b a -> ComputerDivision.mod a b = 0
+
+  use import Parity
+
+  lemma even_divides: forall a: int. even a <-> divides 2 a
+  lemma odd_divides: forall a: int. odd a <-> not (divides 2 a)
 
 end
 
@@ -119,7 +141,7 @@ theory Prime
   use import Divisibility
 
   predicate prime (p: int) =
-    2 <= p /\ forall n: int. 1 < n <p -> not (divides n p)
+    2 <= p /\ forall n: int. 1 < n < p -> not (divides n p)
 
   lemma not_prime_1: not (prime 1)
   lemma prime_2    : prime 2
@@ -128,6 +150,12 @@ theory Prime
   lemma prime_divisors:
     forall p: int. prime p ->
     forall d: int. divides d p -> d = 1 \/ d = -1 \/ d = p \/ d = -p
+
+  use import Parity
+
+  lemma even_prime: forall p: int. prime p -> even p -> p = 2
+
+  lemma odd_prime: forall p: int. prime p -> p >= 3 -> odd p
 
 end
 
