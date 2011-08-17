@@ -8,7 +8,7 @@
    perform in one of the strings to get the other one.  (The
    traditional edit distance also includes substitutions.)
 
-   The nice point about this algorithm, due to Claude March\'e, is to
+   The nice point about this algorithm, due to Claude Marché, is to
    work in linear space, in an array of min(n1,n2) integers. Time
    complexity is O(n1 * n2), as usual.
 *)
@@ -40,11 +40,6 @@ theory Word
     dist w1 w2 n /\ forall m: int. dist w1 w2 m -> n <= m
 
   (* intermediate lemmas *)
-
-  (* TODO: prove the following lemmas in Coq (proofs are in Why2
-     repository, in examples/edit-distance/words.v)
-     It would be really  helpful to have recursive definitions output
-     as such in Coq when possible *)
 
   use export list.Append
 
@@ -90,7 +85,7 @@ theory Word
     forall u v w: word, n: int.
     dist v w n -> dist v (u ++ w) (length u + n)
 
-  (* end of intermediate lemmas *)
+  (* main lemmas *)
 
   lemma min_dist_equal:
     forall w1 w2: word, a: char, n: int.
