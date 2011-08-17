@@ -1,43 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
 <why3session name="examples/programs/bresenham/why3session.xml">
- <file name="../bresenham.mlw" verified="false" expanded="true">
-  <theory name="WP M" verified="false" expanded="true">
-   <goal name="invariant_is_ok" sum="a18992b264d84141d8761ca70ad6be8d" proved="false" expanded="true">
+ <prover id="alt-ergo" name="Alt-Ergo" version="0.93"/>
+ <prover id="coq" name="Coq" version="8.2pl1"/>
+ <prover id="cvc3" name="CVC3" version="2.2"/>
+ <prover id="eprover" name="Eprover" version="1.0-004 Temi"/>
+ <prover id="gappa" name="Gappa" version="0.14.0"/>
+ <prover id="simplify" name="Simplify" version="1.5.4"/>
+ <prover id="spass" name="Spass" version="3.5"/>
+ <prover id="yices" name="Yices" version="1.0.27"/>
+ <prover id="z3" name="Z3" version="2.19"/>
+ <file name="../bresenham.mlw" verified="true" expanded="true">
+  <theory name="WP M" verified="true" expanded="true">
+   <goal name="invariant_is_ok" sum="a18992b264d84141d8761ca70ad6be8d" proved="true" expanded="true" shape="abestV0V1Iainvariant_V0V1V2F">
+    <proof prover="coq" timelimit="10" edited="bresenham_WP_M_invariant_is_ok_1.v" obsolete="false">
+     <result status="valid" time="1.75"/>
+    </proof>
    </goal>
-   <goal name="WP_parameter bresenham" expl="correctness of parameter bresenham" sum="e21d55e7ef3bbb885c18d91e544577f6" proved="true" expanded="true">
+   <goal name="WP_parameter bresenham" expl="correctness of parameter bresenham" sum="e21d55e7ef3bbb885c18d91e544577f6" proved="true" expanded="true" shape="iainfix <=V2ax2iainfix <V0c0ainfix <ainfix -ainfix +ax2c1V4ainfix -ainfix +ax2c1V2Aainfix <=c0ainfix -ainfix +ax2c1V2Aainvariant_V4V1V3Aainfix <=V4ainfix +ax2c1Aainfix <=c0V4Iainfix =V4ainfix +V2c1FIainfix =V3ainfix +V0ainfix *c2ay2Fainfix <ainfix -ainfix +ax2c1V7ainfix -ainfix +ax2c1V2Aainfix <=c0ainfix -ainfix +ax2c1V2Aainvariant_V7V5V6Aainfix <=V7ainfix +ax2c1Aainfix <=c0V7Iainfix =V7ainfix +V2c1FIainfix =V6ainfix +V0ainfix *c2ainfix -ay2ax2FIainfix =V5ainfix +V1c1FAabestV2V1tIainvariant_V2V1V0Aainfix <=V2ainfix +ax2c1Aainfix <=c0V2FFFAainvariant_c0c0ainfix -ainfix *c2ay2ax2Aainfix <=c0ainfix +ax2c1Aainfix <=c0c0">
     <transf name="split_goal" proved="true" expanded="true">
-     <goal name="WP_parameter bresenham.1" expl="loop invariant init" sum="17124999e917b5c053f6e76b259bcb7c" proved="true" expanded="true">
+     <goal name="WP_parameter bresenham.1" expl="loop invariant init" sum="17124999e917b5c053f6e76b259bcb7c" proved="true" expanded="true" shape="ainvariant_c0c0ainfix -ainfix *c2ay2ax2Aainfix <=c0ainfix +ax2c1Aainfix <=c0c0">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter bresenham.2" expl="assertion" sum="6a4211d9f59e4c91dd774b5f26851c4a" proved="true" expanded="true">
+     <goal name="WP_parameter bresenham.2" expl="assertion" sum="6a4211d9f59e4c91dd774b5f26851c4a" proved="true" expanded="true" shape="abestV2V1Iainfix <=V2ax2Iainvariant_V2V1V0Aainfix <=V2ainfix +ax2c1Aainfix <=c0V2FFF">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.14"/>
+       <result status="valid" time="0.16"/>
       </proof>
      </goal>
-     <goal name="WP_parameter bresenham.3" expl="loop invariant preservation" sum="cc7e4371357729bd73f6d31bb228d35e" proved="true" expanded="true">
+     <goal name="WP_parameter bresenham.3" expl="loop invariant preservation" sum="cc7e4371357729bd73f6d31bb228d35e" proved="true" expanded="true" shape="ainvariant_V4V1V3Aainfix <=V4ainfix +ax2c1Aainfix <=c0V4Iainfix =V4ainfix +V2c1FIainfix =V3ainfix +V0ainfix *c2ay2FIainfix <V0c0IabestV2V1Iainfix <=V2ax2Iainvariant_V2V1V0Aainfix <=V2ainfix +ax2c1Aainfix <=c0V2FFF">
       <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.03"/>
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter bresenham.4" expl="loop variant decreases" sum="38653e4347933a962e5aa5d8faf55aaf" proved="true" expanded="true">
+     <goal name="WP_parameter bresenham.4" expl="loop variant decreases" sum="38653e4347933a962e5aa5d8faf55aaf" proved="true" expanded="true" shape="ainfix <ainfix -ainfix +ax2c1V4ainfix -ainfix +ax2c1V2Aainfix <=c0ainfix -ainfix +ax2c1V2Iainvariant_V4V1V3Aainfix <=V4ainfix +ax2c1Aainfix <=c0V4Iainfix =V4ainfix +V2c1FIainfix =V3ainfix +V0ainfix *c2ay2FIainfix <V0c0IabestV2V1Iainfix <=V2ax2Iainvariant_V2V1V0Aainfix <=V2ainfix +ax2c1Aainfix <=c0V2FFF">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.03"/>
       </proof>
      </goal>
-     <goal name="WP_parameter bresenham.5" expl="loop invariant preservation" sum="694c94aaa6e82005f68c8636fcf6fa15" proved="true" expanded="true">
+     <goal name="WP_parameter bresenham.5" expl="loop invariant preservation" sum="694c94aaa6e82005f68c8636fcf6fa15" proved="true" expanded="true" shape="ainvariant_V5V3V4Aainfix <=V5ainfix +ax2c1Aainfix <=c0V5Iainfix =V5ainfix +V2c1FIainfix =V4ainfix +V0ainfix *c2ainfix -ay2ax2FIainfix =V3ainfix +V1c1FIainfix <V0c0NIabestV2V1Iainfix <=V2ax2Iainvariant_V2V1V0Aainfix <=V2ainfix +ax2c1Aainfix <=c0V2FFF">
       <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.03"/>
+       <result status="valid" time="0.04"/>
       </proof>
      </goal>
-     <goal name="WP_parameter bresenham.6" expl="loop variant decreases" sum="169f4e236bbdd35bc03b2b6daf8f3b7f" proved="true" expanded="true">
+     <goal name="WP_parameter bresenham.6" expl="loop variant decreases" sum="169f4e236bbdd35bc03b2b6daf8f3b7f" proved="true" expanded="true" shape="ainfix <ainfix -ainfix +ax2c1V5ainfix -ainfix +ax2c1V2Aainfix <=c0ainfix -ainfix +ax2c1V2Iainvariant_V5V3V4Aainfix <=V5ainfix +ax2c1Aainfix <=c0V5Iainfix =V5ainfix +V2c1FIainfix =V4ainfix +V0ainfix *c2ainfix -ay2ax2FIainfix =V3ainfix +V1c1FIainfix <V0c0NIabestV2V1Iainfix <=V2ax2Iainvariant_V2V1V0Aainfix <=V2ainfix +ax2c1Aainfix <=c0V2FFF">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter bresenham.7" expl="normal postcondition" sum="bd112799fb9e847a8546c1fac8ba4617" proved="true" expanded="true">
+     <goal name="WP_parameter bresenham.7" expl="normal postcondition" sum="bd112799fb9e847a8546c1fac8ba4617" proved="true" expanded="true" shape="tIainfix <=V2ax2NIainvariant_V2V1V0Aainfix <=V2ainfix +ax2c1Aainfix <=c0V2FFF">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.02"/>
       </proof>
