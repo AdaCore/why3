@@ -45,7 +45,7 @@ theory Word
      repository, in examples/edit-distance/words.v)
      It would be really  helpful to have recursive definitions output
      as such in Coq when possible *)
-(***
+
   use export list.Append
 
   function last_char (a: char) (u: word) : char = match u with
@@ -89,7 +89,7 @@ theory Word
   lemma dist_concat_right:
     forall u v w: word, n: int.
     dist v w n -> dist v (u ++ w) (length u + n)
-***)
+
   (* end of intermediate lemmas *)
 
   lemma min_dist_equal:
