@@ -1,33 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
-<why3session name="examples/programs/my_cosine/why3session.xml">
+<why3session name="my_cosine/why3session.xml">
+ <prover id="alt-ergo" name="Alt-Ergo" version="0.93"/>
+ <prover id="coq" name="Coq" version="8.2pl1"/>
+ <prover id="cvc3" name="CVC3" version="2.2"/>
+ <prover id="eprover" name="Eprover" version="1.0-004 Temi"/>
+ <prover id="gappa" name="Gappa" version="0.13.0"/>
+ <prover id="simplify" name="Simplify" version="1.5.4"/>
+ <prover id="vampire" name="Vampire" version="0.6"/>
+ <prover id="verit" name="veriT" version="200907"/>
+ <prover id="yices" name="Yices" version="1.0.11"/>
+ <prover id="z3" name="Z3" version="2.19"/>
  <file name="../my_cosine.mlw" verified="true" expanded="true">
   <theory name="WP M" verified="true" expanded="true">
-   <goal name="WP_parameter my_cosine" expl="correctness of parameter my_cosine" sum="8917f8b8fafa070df7c50f12f5f2ffdc" proved="true" expanded="true">
+   <goal name="WP_parameter my_cosine" expl="correctness of parameter my_cosine" sum="8917f8b8fafa070df7c50f12f5f2ffdc" proved="true" expanded="true" shape="ainfix <=.aabsainfix -.avalueV5acosavalueV0c0x1.p-23Iainfix =avalueV5aroundaNearestTiesToEvenainfix -.avalueV1avalueV4FAainfix <=aabsaroundaNearestTiesToEvenainfix -.avalueV1avalueV4amax_singleIainfix =avalueV4aroundaNearestTiesToEvenainfix *.avalueV2avalueV3FAainfix <=aabsaroundaNearestTiesToEvenainfix *.avalueV2avalueV3amax_singleIainfix =avalueV3c0.5FIainfix =avalueV2aroundaNearestTiesToEvenainfix *.avalueV0avalueV0FAainfix <=aabsaroundaNearestTiesToEvenainfix *.avalueV0avalueV0amax_singleIainfix =avalueV1c1.0FAainfix <=.aabsainfix -.ainfix -.c1.0ainfix *.ainfix *.avalueV0avalueV0c0.5acosavalueV0c0x1.p-24Iainfix <=.aabsavalueV0c0x1.p-5F">
     <transf name="split_goal" proved="true" expanded="true">
-     <goal name="WP_parameter my_cosine.1" expl="assertion" sum="6f92398fe46b35b067b387d190c5416a" proved="true" expanded="true">
+     <goal name="WP_parameter my_cosine.1" expl="assertion" sum="6f92398fe46b35b067b387d190c5416a" proved="true" expanded="true" shape="ainfix <=.aabsainfix -.ainfix -.c1.0ainfix *.ainfix *.avalueV0avalueV0c0.5acosavalueV0c0x1.p-24Iainfix <=.aabsavalueV0c0x1.p-5F">
       <proof prover="coq" timelimit="2" edited="my_cosine_M_WP_parameter_my_cosine_1.v" obsolete="false">
-       <result status="valid" time="3.59"/>
+       <result status="valid" time="3.86"/>
       </proof>
      </goal>
-     <goal name="WP_parameter my_cosine.2" expl="precondition" sum="f19dc2becd59bbba14c5ca96b76e2290" proved="true" expanded="true">
-      <proof prover="gappa" timelimit="2" edited="" obsolete="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter my_cosine.3" expl="precondition" sum="e5aa3eded8b53ca61fd7ab1e2266e079" proved="true" expanded="true">
-      <proof prover="gappa" timelimit="2" edited="" obsolete="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter my_cosine.4" expl="precondition" sum="c3d55a84a06c89ca74c45f43116d5a34" proved="true" expanded="true">
-      <proof prover="gappa" timelimit="2" edited="" obsolete="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter my_cosine.5" expl="normal postcondition" sum="1e1226c0230f4a9f70f9f653fc8b090a" proved="true" expanded="true">
+     <goal name="WP_parameter my_cosine.2" expl="precondition" sum="f19dc2becd59bbba14c5ca96b76e2290" proved="true" expanded="true" shape="ainfix <=aabsaroundaNearestTiesToEvenainfix *.avalueV0avalueV0amax_singleIainfix =avalueV1c1.0FIainfix <=.aabsainfix -.ainfix -.c1.0ainfix *.ainfix *.avalueV0avalueV0c0.5acosavalueV0c0x1.p-24Iainfix <=.aabsavalueV0c0x1.p-5F">
       <proof prover="gappa" timelimit="2" edited="" obsolete="false">
        <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter my_cosine.3" expl="precondition" sum="e5aa3eded8b53ca61fd7ab1e2266e079" proved="true" expanded="true" shape="ainfix <=aabsaroundaNearestTiesToEvenainfix *.avalueV2avalueV3amax_singleIainfix =avalueV3c0.5FIainfix =avalueV2aroundaNearestTiesToEvenainfix *.avalueV0avalueV0FIainfix <=aabsaroundaNearestTiesToEvenainfix *.avalueV0avalueV0amax_singleIainfix =avalueV1c1.0FIainfix <=.aabsainfix -.ainfix -.c1.0ainfix *.ainfix *.avalueV0avalueV0c0.5acosavalueV0c0x1.p-24Iainfix <=.aabsavalueV0c0x1.p-5F">
+      <proof prover="gappa" timelimit="2" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter my_cosine.4" expl="precondition" sum="c3d55a84a06c89ca74c45f43116d5a34" proved="true" expanded="true" shape="ainfix <=aabsaroundaNearestTiesToEvenainfix -.avalueV1avalueV4amax_singleIainfix =avalueV4aroundaNearestTiesToEvenainfix *.avalueV2avalueV3FIainfix <=aabsaroundaNearestTiesToEvenainfix *.avalueV2avalueV3amax_singleIainfix =avalueV3c0.5FIainfix =avalueV2aroundaNearestTiesToEvenainfix *.avalueV0avalueV0FIainfix <=aabsaroundaNearestTiesToEvenainfix *.avalueV0avalueV0amax_singleIainfix =avalueV1c1.0FIainfix <=.aabsainfix -.ainfix -.c1.0ainfix *.ainfix *.avalueV0avalueV0c0.5acosavalueV0c0x1.p-24Iainfix <=.aabsavalueV0c0x1.p-5F">
+      <proof prover="gappa" timelimit="2" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter my_cosine.5" expl="normal postcondition" sum="1e1226c0230f4a9f70f9f653fc8b090a" proved="true" expanded="true" shape="ainfix <=.aabsainfix -.avalueV5acosavalueV0c0x1.p-23Iainfix =avalueV5aroundaNearestTiesToEvenainfix -.avalueV1avalueV4FIainfix <=aabsaroundaNearestTiesToEvenainfix -.avalueV1avalueV4amax_singleIainfix =avalueV4aroundaNearestTiesToEvenainfix *.avalueV2avalueV3FIainfix <=aabsaroundaNearestTiesToEvenainfix *.avalueV2avalueV3amax_singleIainfix =avalueV3c0.5FIainfix =avalueV2aroundaNearestTiesToEvenainfix *.avalueV0avalueV0FIainfix <=aabsaroundaNearestTiesToEvenainfix *.avalueV0avalueV0amax_singleIainfix =avalueV1c1.0FIainfix <=.aabsainfix -.ainfix -.c1.0ainfix *.ainfix *.avalueV0avalueV0c0.5acosavalueV0c0x1.p-24Iainfix <=.aabsavalueV0c0x1.p-5F">
+      <proof prover="gappa" timelimit="2" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
     </transf>

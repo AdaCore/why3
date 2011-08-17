@@ -8,19 +8,24 @@ Require Import Rtrigo.
 Require Import AltSeries. (* for def of pi *)
 Definition unit  := unit.
 
-Parameter ignore: forall (a:Type), a  -> unit.
+Parameter mark : Type.
 
-Implicit Arguments ignore.
-
-Parameter label_ : Type.
-
-Parameter at1: forall (a:Type), a -> label_  -> a.
+Parameter at1: forall (a:Type), a -> mark  -> a.
 
 Implicit Arguments at1.
 
 Parameter old: forall (a:Type), a  -> a.
 
 Implicit Arguments old.
+
+Axiom assoc_mul_div : forall (x:R) (y:R) (z:R), (~ (z = (0)%R)) ->
+  ((Rdiv (x * y)%R z)%R = (x * (Rdiv y z)%R)%R).
+
+Axiom assoc_div_mul : forall (x:R) (y:R) (z:R), ((~ (y = (0)%R)) /\
+  ~ (z = (0)%R)) -> ((Rdiv (Rdiv x y)%R z)%R = (Rdiv x (y * z)%R)%R).
+
+Axiom assoc_div_div : forall (x:R) (y:R) (z:R), ((~ (y = (0)%R)) /\
+  ~ (z = (0)%R)) -> ((Rdiv x (Rdiv y z)%R)%R = (Rdiv (x * z)%R y)%R).
 
 Axiom Abs_le : forall (x:R) (y:R), ((Rabs x) <= y)%R <-> (((-y)%R <= x)%R /\
   (x <= y)%R).
@@ -82,10 +87,10 @@ Parameter atan: R  -> R.
 Axiom Tan_atan : forall (x:R), ((Rtrigo.tan (atan x)) = x).
 
 Inductive mode  :=
-  | NearestTiesToEven : mode
-  | ToZero : mode
-  | Up : mode
-  | Down : mode
+  | NearestTiesToEven : mode 
+  | ToZero : mode 
+  | Up : mode 
+  | Down : mode 
   | NearTiesToAway : mode .
 
 Parameter single : Type.
@@ -145,12 +150,17 @@ Axiom Round_down_neg : forall (x:R), ((round (Down ) (-x)%R) = (-(round (Up )
 Axiom Round_up_neg : forall (x:R), ((round (Up ) (-x)%R) = (-(round (Down )
   x))%R).
 
+(* YOU MAY EDIT THE CONTEXT BELOW *)
+
+Require Import Interval_tactic.
+
+(* DO NOT EDIT BELOW *)
+
 Theorem WP_parameter_my_cosine : forall (x:single),
   ((Rabs (value x)) <= (1 / 32)%R)%R ->
   ((Rabs (((1)%R - (((value x) * (value x))%R * (05 / 10)%R)%R)%R - (Rtrigo_def.cos (value x)))%R) <= (1 / 16777216)%R)%R.
 (* YOU MAY EDIT THE PROOF BELOW *)
 intros x H.
-Require Import Interval_tactic.
 interval with (i_bisect_diff (value x)).
 Qed.
 (* DO NOT EDIT BELOW *)
