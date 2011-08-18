@@ -55,7 +55,7 @@ module PrimeNumbers
     forall d: int. 2 <= d <= p[u-1] -> prime d ->
     exists i: int. 0 <= i < u /\ d = p[i]
 
-  lemma Bertrand_postulate:
+  axiom Bertrand_postulate:
     forall p: int. prime p -> not (no_prime_in p (2*p))
 
   (* returns an array containing the first m prime numbers *)
