@@ -1,0 +1,88 @@
+
+(* Verification of the following 2-lines C program solving the N-queens puzzle:
+
+   t(a,b,c){int d=0,e=a&~b&~c,f=1;if(a)for(f=0;d=(e-=d)&-e;f+=t(a-d,(b+d)*2,(
+   c+d)/2));return f;}main(q){scanf("%d",&q);printf("%d\n",t(~(~0<<q),0,0));}
+*)
+
+theory BitwiseArithmetic
+
+  use export int.Int
+
+  (* logical and *)
+  function (&) int int : int
+
+  (* logical shift left *)
+  function (<<) int int : int
+
+  (* logical negation *)
+  function (~_) int : int
+
+end
+
+theory Bits "the bits of an integer, as a set of integers"
+
+  use export set.Fsetint
+
+  function bits int : set int
+
+  axiom bits_0:
+    forall x: int. is_empty (bits x) <-> x = 0
+
+  axiom bits_remove_singleton:
+    forall x a b: int. bits b = singleton x -> mem x (bits a) ->
+    bits (a - b) = remove x (bits a)
+
+  use export BitwiseArithmetic
+
+  axiom bits_diff:
+    forall a b: int. bits (a & ~b) = diff (bits a) (bits b)
+
+  axiom rightmost_bit_trick:
+    forall x: int. x <> 0 -> bits (x & -x) = singleton (min_elt (bits x))
+
+end
+
+module NQueens
+
+  use import Bits
+  use import module arith.Int
+  use import module ref.Refint
+  use import module array.Array
+
+  (* warmup 1: termination of the loop *)
+  let rec t1 (a b c : int) =
+    if a <> 0 then begin
+      let e = ref (a & ~b & ~c) in
+      let f = ref 0 in
+      while !e <> 0 do variant { cardinal (bits !e) }
+        let d = !e & (- !e) in
+        f += t1 (a - d) ((b+d) * 2) ((c+d)/2);
+        e -= d
+      done;
+      !f
+    end else
+      1
+
+  (* warmup 2: termination of the recursive function *)
+  let rec t2 (a b c : int) variant { cardinal (bits a) } =
+    if a <> 0 then begin
+      let e = ref (a & ~b & ~c) in
+      let f = ref 0 in
+      while !e <> 0 do invariant { subset (bits !e) (bits a) }
+        let d = !e & (- !e) in
+        assert { bits d = singleton (min_elt (bits !e)) };
+        f += t2 (a - d) ((b+d) * 2) ((c+d)/2);
+        e -= d
+      done;
+      !f
+    end else
+      1
+
+end
+
+(*
+Local Variables:
+compile-command: "unset LANG; make -C ../.. examples/programs/queens.gui"
+End:
+*)

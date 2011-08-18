@@ -3,47 +3,70 @@ theory Set
 
   type set 'a
 
+  (* membership *)
   predicate mem 'a (set 'a)
 
+  (* equality *)
+  predicate (==) (s1 s2: set 'a) = forall x : 'a. mem x s1 <-> mem x s2
+
+  axiom extensionality:
+    forall s1 s2: set 'a. s1 == s2 -> s1 = s2
+
+  (* inclusion *)
+  predicate subset (s1 s2: set 'a) = forall x : 'a. mem x s1 -> mem x s2
+
+  lemma subset_trans:
+    forall s1 s2 s3: set 'a. subset s1 s2 -> subset s2 s3 -> subset s1 s3
+
+  (* empty set *)
   function empty : set 'a
 
-  predicate is_empty (s : set 'a) = forall x : 'a. not mem x s
+  predicate is_empty (s: set 'a) = forall x: 'a. not (mem x s)
 
-  axiom Empty_def1 : is_empty(empty : set 'a)
+  axiom empty_def1: is_empty (empty : set 'a)
 
+  (* addition *)
   function add 'a (set 'a) : set 'a
 
-  axiom Add_def1 :
-    forall x y : 'a. forall s : set 'a.
+  axiom add_def1:
+    forall x y: 'a. forall s: set 'a.
     mem x (add y s) <-> x = y \/ mem x s
 
+  function singleton (x: 'a) : set 'a = add x empty
+
+  (* removal *)
   function remove 'a (set 'a) : set 'a
 
-  axiom Remove_def1 :
-    forall x y : 'a. forall s : set 'a.
+  axiom remove_def1:
+    forall x y : 'a, s : set 'a.
     mem x (remove y s) <-> x <> y /\ mem x s
 
+  lemma subset_remove:
+    forall x: 'a, s: set 'a. subset (remove x s) s
+
+  (* union *)
   function union (set 'a) (set 'a) : set 'a
 
-  axiom Union_def1 :
-    forall s1 s2 : set 'a. forall x : 'a.
+  axiom union_def1:
+    forall s1 s2: set 'a, x: 'a.
     mem x (union s1 s2) <-> mem x s1 \/ mem x s2
 
+  (* intersection *)
   function inter (set 'a) (set 'a) : set 'a
 
-  axiom Inter_def1 :
-    forall s1 s2 : set 'a. forall x : 'a.
+  axiom inter_def1:
+    forall s1 s2: set 'a, x: 'a.
     mem x (inter s1 s2) <-> mem x s1 /\ mem x s2
 
+  (* difference *)
   function diff (set 'a) (set 'a) : set 'a
 
-  axiom Diff_def1 :
-    forall s1 s2 : set 'a. forall x : 'a.
-    mem x (diff s1 s2) <-> mem x s1 /\ not mem x s2
+  axiom diff_def1:
+    forall s1 s2: set 'a, x: 'a.
+    mem x (diff s1 s2) <-> mem x s1 /\ not (mem x s2)
 
-  predicate equal(s1 s2 : set 'a) = forall x : 'a. mem x s1 <-> mem x s2
-
-  predicate subset(s1 s2 : set 'a) = forall x : 'a. mem x s1 -> mem x s2
+  lemma subset_diff:
+    forall s1 s2: set 'a. subset (diff s1 s2) s1
 
 end
 
@@ -54,20 +77,50 @@ theory Fset
 
   function cardinal (set 'a) : int
 
-  axiom Cardinal_nonneg : forall s : set 'a. cardinal s >= 0
+  axiom cardinal_nonneg: forall s: set 'a. cardinal s >= 0
 
-  axiom Cardinal_empty : cardinal(empty : set 'a) = 0
+  axiom cardinal_empty:
+    forall s: set 'a. cardinal s = 0 <-> is_empty s
 
-  axiom Cardinal_add :
+  axiom cardinal_add:
     forall x : 'a. forall s : set 'a.
-    not mem x s -> cardinal (add x s) = 1 + cardinal s
+    not (mem x s) -> cardinal (add x s) = 1 + cardinal s
 
-  axiom Cardinal_remove :
+  axiom cardinal_remove:
     forall x : 'a. forall s : set 'a.
     mem x s -> cardinal s = 1 + cardinal (remove x s)
 
-  axiom Cardinal_subset :
+  axiom cardinal_subset:
     forall s1 s2 : set 'a. subset s1 s2 -> cardinal s1 <= cardinal s2
+
+end
+
+(* finite sets of integers *)
+theory Fsetint
+
+  use export int.Int
+  use export Fset
+
+  function min_elt (set int) : int
+
+  axiom min_elt_def1:
+    forall s: set int. not (is_empty s) -> mem (min_elt s) s
+  axiom min_elt_def2:
+    forall s: set int. not (is_empty s) ->
+    forall x: int. mem x s -> min_elt s <= x
+
+  function max_elt (set int) : int
+
+  axiom max_elt_def1:
+    forall s: set int. not (is_empty s) -> mem (max_elt s) s
+  axiom max_elt_def2:
+    forall s: set int. not (is_empty s) ->
+    forall x: int. mem x s -> x <= max_elt s
+
+  (* the set {0,1,...,n-1} *)
+  function below int : set int
+
+  axiom below_def: forall x n: int. mem x (below n) <-> 0 <= x < n
 
 end
 
@@ -90,7 +143,7 @@ theory SetMap
 
   function empty : set 'a = const False
 
-  predicate is_empty (s : set 'a) = forall x : 'a. not mem x s
+  predicate is_empty (s : set 'a) = forall x : 'a. not (mem x s)
 
   goal Empty_def1 : is_empty(empty : set 'a)
 
