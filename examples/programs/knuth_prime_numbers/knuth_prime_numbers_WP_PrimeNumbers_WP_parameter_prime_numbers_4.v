@@ -181,6 +181,10 @@ Axiom prime_3 : (prime 3%Z).
 Axiom prime_divisors : forall (p:Z), (prime p) -> forall (d:Z), (divides d
   p) -> ((d = 1%Z) \/ ((d = (-1%Z)%Z) \/ ((d = p) \/ (d = (-p)%Z)))).
 
+Axiom small_divisors : forall (p:Z), (2%Z <= p)%Z -> ((forall (d:Z),
+  (2%Z <= d)%Z -> ((prime d) -> (((1%Z <  (d * d)%Z)%Z /\
+  ((d * d)%Z <= p)%Z) -> ~ (divides d p)))) -> (prime p)).
+
 Axiom even_prime : forall (p:Z), (prime p) -> ((even p) -> (p = 2%Z)).
 
 Axiom odd_prime : forall (p:Z), (prime p) -> ((3%Z <= p)%Z -> (odd p)).
@@ -247,32 +251,22 @@ Definition set1 (a:Type)(a1:(array a)) (i:Z) (v:a): (array a) :=
   end.
 Implicit Arguments set1.
 
-Definition sorted(p:(array Z)) (u:Z): Prop := forall (i:Z) (j:Z),
-  (((0%Z <= i)%Z /\ (i <  j)%Z) /\ (j <  u)%Z) -> ((get1 p i) <  (get1 p
-  j))%Z.
-
-Definition only_primes(p:(array Z)) (u:Z): Prop := forall (i:Z),
-  ((0%Z <= i)%Z /\ (i <  u)%Z) -> (prime (get1 p i)).
-
 Definition no_prime_in(l:Z) (u:Z): Prop := forall (x:Z), ((l <  x)%Z /\
   (x <  u)%Z) -> ~ (prime x).
 
-Definition all_primes(p:(array Z)) (u:Z): Prop := forall (i:Z),
-  ((0%Z <= i)%Z /\ (i <  (u - 1%Z)%Z)%Z) -> (no_prime_in (get1 p i) (get1 p
-  (i + 1%Z)%Z)).
+Definition first_primes(p:(array Z)) (u:Z): Prop := ((get1 p 0%Z) = 2%Z) /\
+  ((forall (i:Z) (j:Z), (((0%Z <= i)%Z /\ (i <  j)%Z) /\ (j <  u)%Z) ->
+  ((get1 p i) <  (get1 p j))%Z) /\ ((forall (i:Z), ((0%Z <= i)%Z /\
+  (i <  u)%Z) -> (prime (get1 p i))) /\ forall (i:Z), ((0%Z <= i)%Z /\
+  (i <  (u - 1%Z)%Z)%Z) -> (no_prime_in (get1 p i) (get1 p (i + 1%Z)%Z)))).
 
-Axiom exists_prime : forall (p:(array Z)) (u:Z), (1%Z <= u)%Z -> (((get1 p
-  0%Z) = 2%Z) -> ((sorted p u) -> ((only_primes p u) -> ((all_primes p u) ->
-  forall (d:Z), ((2%Z <= d)%Z /\ (d <= (get1 p (u - 1%Z)%Z))%Z) ->
-  ((prime d) -> exists i:Z, ((0%Z <= i)%Z /\ (i <  u)%Z) /\ (d = (get1 p
-  i))))))).
+Axiom exists_prime : forall (p:(array Z)) (u:Z), (1%Z <= u)%Z ->
+  ((first_primes p u) -> forall (d:Z), ((2%Z <= d)%Z /\ (d <= (get1 p
+  (u - 1%Z)%Z))%Z) -> ((prime d) -> exists i:Z, ((0%Z <= i)%Z /\
+  (i <  u)%Z) /\ (d = (get1 p i)))).
 
 Axiom Bertrand_postulate : forall (p:Z), (prime p) -> ~ (no_prime_in p
   (2%Z * p)%Z).
-
-Axiom small_divisors : forall (p:Z), (2%Z <= p)%Z -> ((forall (d:Z),
-  (2%Z <= d)%Z -> ((prime d) -> (((1%Z <  (d * d)%Z)%Z /\
-  ((d * d)%Z <= p)%Z) -> ~ (divides d p)))) -> (prime p)).
 
 (* YOU MAY EDIT THE CONTEXT BELOW *)
 Lemma Zle_sqrt: forall x y, (0 <= x)%Z -> (0 <= y)%Z ->  x*x < y*y -> x<y.
@@ -284,60 +278,60 @@ Theorem WP_parameter_prime_numbers : forall (m:Z), (2%Z <= m)%Z ->
   ((0%Z <= m)%Z -> (((0%Z <= 0%Z)%Z /\ (0%Z <  m)%Z) -> forall (p:(map Z Z)),
   (p = (set (const(0%Z):(map Z Z)) 0%Z 2%Z)) -> (((0%Z <= 1%Z)%Z /\
   (1%Z <  m)%Z) -> forall (p1:(map Z Z)), (p1 = (set p 1%Z 3%Z)) ->
-  ((2%Z <= (m - 1%Z)%Z)%Z -> forall (n:Z), forall (p2:(map Z Z)), let p3 :=
-  (mk_array m p2) in forall (j:Z), ((2%Z <= j)%Z /\ (j <= (m - 1%Z)%Z)%Z) ->
-  ((((get p2 0%Z) = 2%Z) /\ ((sorted p3 j) /\ ((only_primes p3 j) /\
-  ((all_primes p3 j) /\ ((((get p2 (j - 1%Z)%Z) <  n)%Z /\
+  ((2%Z <= (m - 1%Z)%Z)%Z -> forall (n:Z), forall (p2:(map Z Z)),
+  forall (j:Z), ((2%Z <= j)%Z /\ (j <= (m - 1%Z)%Z)%Z) ->
+  (((first_primes (mk_array m p2) j) /\ ((((get p2 (j - 1%Z)%Z) <  n)%Z /\
   (n <  (2%Z * (get p2 (j - 1%Z)%Z))%Z)%Z) /\ ((odd n) /\
-  (no_prime_in (get p2 (j - 1%Z)%Z) n))))))) -> forall (k:Z), forall (n1:Z),
-  forall (p4:(map Z Z)), let p5 := (mk_array m p4) in ((((1%Z <= k)%Z /\
-  (k <  j)%Z) /\ (((get p4 0%Z) = 2%Z) /\ ((sorted p5 j) /\ ((only_primes p5
-  j) /\ ((all_primes p5 j) /\ ((((get p4 (j - 1%Z)%Z) <  n1)%Z /\
-  (n1 <  (2%Z * (get p4 (j - 1%Z)%Z))%Z)%Z) /\ ((odd n1) /\
-  ((no_prime_in (get p4 (j - 1%Z)%Z) n1) /\ forall (i:Z), ((0%Z <= i)%Z /\
-  (i <  k)%Z) -> ~ (divides (get p4 i) n1))))))))) -> (((0%Z <= k)%Z /\
-  (k <  m)%Z) -> ((~ ((ZOmod n1 (get p4 k)) = 0%Z)) -> (((0%Z <= k)%Z /\
-  (k <  m)%Z) -> (((0%Z <= k)%Z /\ (k <  m)%Z) -> ((~ ((get p4
-  k) <  (ZOdiv n1 (get p4 k)))%Z) -> (prime n1)))))))))))).
+  (no_prime_in (get p2 (j - 1%Z)%Z) n)))) -> forall (k:Z), forall (n1:Z),
+  forall (p3:(map Z Z)), (((1%Z <= k)%Z /\ (k <  j)%Z) /\
+  ((first_primes (mk_array m p3) j) /\ ((((get p3 (j - 1%Z)%Z) <  n1)%Z /\
+  (n1 <  (2%Z * (get p3 (j - 1%Z)%Z))%Z)%Z) /\ ((odd n1) /\
+  ((no_prime_in (get p3 (j - 1%Z)%Z) n1) /\ forall (i:Z), ((0%Z <= i)%Z /\
+  (i <  k)%Z) -> ~ (divides (get p3 i) n1)))))) -> (((0%Z <= k)%Z /\
+  (k <  m)%Z) -> ((~ ((ZOmod n1 (get p3 k)) = 0%Z)) -> (((0%Z <= k)%Z /\
+  (k <  m)%Z) -> (((0%Z <= k)%Z /\ (k <  m)%Z) -> ((~ ((get p3
+  k) <  (ZOdiv n1 (get p3 k)))%Z) -> (prime n1))))))))))).
 (* YOU MAY EDIT THE PROOF BELOW *)
-intros. clear H7 H2 H4 p p1 p2 p3.
-intuition. clear H0 H5 H2 H4 H1 H7 H9 H17 H11 H18.
-assert (h2: 2 < get p4 k%Z).
-rewrite <- H6. apply H15; omega.
+intros. clear H0 H1 H2 p H4 p1 H7 p2.
+intuition. clear H0 H1 H9 H14 H11 H15 H7.
+red in H4. destruct H4 as (p0, (sorted, (only_primes, all_primes))).
+assert (h2: 2 < get p3 k%Z).
+rewrite <- p0. apply sorted; omega.
 apply small_divisors; auto.
 omega.
 intros.
-assert (ne0: (get p4 k <> 0)%Z) by omega.
-generalize (Div_mod n1 (get p4 k)%Z ne0). intro div.
-assert (ne1: (0 <= n1 /\ get p4 k <> 0)%Z) by omega.
-generalize (Mod_sign_pos n1 (get p4 k)%Z ne1). intro mod1.
-generalize (Mod_bound n1 (get p4 k)%Z ne0). 
+assert (ne0: (get p3 k <> 0)%Z) by omega.
+generalize (Div_mod n1 (get p3 k)%Z ne0). intro div.
+assert (ne1: (0 <= n1 /\ get p3 k <> 0)%Z) by omega.
+generalize (Mod_sign_pos n1 (get p3 k)%Z ne1). intro mod1.
+generalize (Mod_bound n1 (get p3 k)%Z ne0). 
 rewrite Zabs_eq; try omega.
 intros (_, mod2).
-assert (d <= get p4 k)%Z.
-assert (d < get p4 k+1)%Z. 2: omega.
+assert (d <= get p3 k)%Z.
+assert (d < get p3 k+1)%Z. 2: omega.
 apply Zle_sqrt; try omega.
-assert (2 < get p4 k)%Z. 
-rewrite <- H6. apply H15; omega.
+assert (2 < get p3 k)%Z. 
+rewrite <- p0. apply sorted; omega.
 apply Zle_lt_trans with n1; try omega.
-assert (get p4 k * (ZOdiv n1 (get p4 k)) <= get p4 k * get p4 k)%Z.
+assert (get p3 k * (ZOdiv n1 (get p3 k)) <= get p3 k * get p3 k)%Z.
 apply Zmult_le_compat_l; try omega.
-replace ((get p4 k + 1) * (get p4 k + 1))%Z with (get p4 k * get p4 k + 2 * get p4 k + 1)%Z by ring.
+replace ((get p3 k + 1) * (get p3 k + 1))%Z with (get p3 k * get p3 k + 2 * get p3 k + 1)%Z by ring.
 omega.
-destruct (exists_prime p5 (k+1))%Z with (d := d) as (i, (hi1, hi2)); auto.
+destruct (exists_prime (mk_array m p3) (k+1))%Z with (d := d) as (i, (hi1, hi2)); auto.
 omega.
-red; intros.
-apply H15; omega.
-red; intros.
-apply H20; omega.
-red; intros.
-apply H21; omega.
+red; split; intros.
+auto.
+split; intros.
+apply sorted; omega.
+split; intros.
+apply only_primes; omega.
+apply all_primes; omega.
 unfold get1; simpl.
 replace (k+1-1)%Z with k by omega.
 auto.
 unfold get1 in hi2; simpl in hi2. subst d.
 assert (case: (i < k \/i = k)%Z) by omega. destruct case.
-red; intro; apply H27 with i; try omega.
+red; intro; apply H21 with i; try omega.
 auto.
 subst i.
 intro. apply H10.

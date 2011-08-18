@@ -58,6 +58,14 @@ Axiom Div_mult : forall (x:Z) (y:Z) (z:Z), ((0%Z <  x)%Z /\ ((0%Z <= y)%Z /\
 Axiom Mod_mult : forall (x:Z) (y:Z) (z:Z), ((0%Z <  x)%Z /\ ((0%Z <= y)%Z /\
   (0%Z <= z)%Z)) -> ((ZOmod ((x * y)%Z + z)%Z x) = (ZOmod z x)).
 
+Definition lt_nat(x:Z) (y:Z): Prop := (0%Z <= y)%Z /\ (x <  y)%Z.
+
+Inductive lex : (Z* Z)%type -> (Z* Z)%type -> Prop :=
+  | Lex_1 : forall (x1:Z) (x2:Z) (y1:Z) (y2:Z), (lt_nat x1 x2) -> (lex (x1,
+      y1) (x2, y2))
+  | Lex_2 : forall (x:Z) (y1:Z) (y2:Z), (lt_nat y1 y2) -> (lex (x, y1) (x,
+      y2)).
+
 Definition even(n:Z): Prop := exists k:Z, (n = (2%Z * k)%Z).
 
 Definition odd(n:Z): Prop := exists k:Z, (n = ((2%Z * k)%Z + 1%Z)%Z).
@@ -145,11 +153,17 @@ Axiom Mod_11 : forall (x:Z), ((Zmod x 1%Z) = 0%Z).
 
 Axiom Div_11 : forall (x:Z), ((Zdiv x 1%Z) = x).
 
-Axiom mod_divides : forall (a:Z) (b:Z), (~ (b = 0%Z)) ->
+Axiom mod_divides_euclidean : forall (a:Z) (b:Z), (~ (b = 0%Z)) ->
   (((Zmod a b) = 0%Z) -> (divides b a)).
 
-Axiom divides_mod : forall (a:Z) (b:Z), (~ (b = 0%Z)) -> ((divides b a) ->
-  ((Zmod a b) = 0%Z)).
+Axiom divides_mod_euclidean : forall (a:Z) (b:Z), (~ (b = 0%Z)) ->
+  ((divides b a) -> ((Zmod a b) = 0%Z)).
+
+Axiom mod_divides_computer : forall (a:Z) (b:Z), (~ (b = 0%Z)) ->
+  (((ZOmod a b) = 0%Z) -> (divides b a)).
+
+Axiom divides_mod_computer : forall (a:Z) (b:Z), (~ (b = 0%Z)) -> ((divides b
+  a) -> ((ZOmod a b) = 0%Z)).
 
 Axiom even_divides : forall (a:Z), (even a) <-> (divides 2%Z a).
 
@@ -166,6 +180,10 @@ Axiom prime_3 : (prime 3%Z).
 
 Axiom prime_divisors : forall (p:Z), (prime p) -> forall (d:Z), (divides d
   p) -> ((d = 1%Z) \/ ((d = (-1%Z)%Z) \/ ((d = p) \/ (d = (-p)%Z)))).
+
+Axiom small_divisors : forall (p:Z), (2%Z <= p)%Z -> ((forall (d:Z),
+  (2%Z <= d)%Z -> ((prime d) -> (((1%Z <  (d * d)%Z)%Z /\
+  ((d * d)%Z <= p)%Z) -> ~ (divides d p)))) -> (prime p)).
 
 Axiom even_prime : forall (p:Z), (prime p) -> ((even p) -> (p = 2%Z)).
 
@@ -247,6 +265,15 @@ Definition all_primes(p:(array Z)) (u:Z): Prop := forall (i:Z),
   ((0%Z <= i)%Z /\ (i <  (u - 1%Z)%Z)%Z) -> (no_prime_in (get1 p i) (get1 p
   (i + 1%Z)%Z)).
 
+Axiom exists_prime : forall (p:(array Z)) (u:Z), (1%Z <= u)%Z -> (((get1 p
+  0%Z) = 2%Z) -> ((sorted p u) -> ((only_primes p u) -> ((all_primes p u) ->
+  forall (d:Z), ((2%Z <= d)%Z /\ (d <= (get1 p (u - 1%Z)%Z))%Z) ->
+  ((prime d) -> exists i:Z, ((0%Z <= i)%Z /\ (i <  u)%Z) /\ (d = (get1 p
+  i))))))).
+
+Axiom Bertrand_postulate : forall (p:Z), (prime p) -> ~ (no_prime_in p
+  (2%Z * p)%Z).
+
 (* YOU MAY EDIT THE CONTEXT BELOW *)
 
 (* DO NOT EDIT BELOW *)
@@ -258,14 +285,18 @@ Theorem WP_parameter_prime_numbers : forall (m:Z), (2%Z <= m)%Z ->
   ((2%Z <= (m - 1%Z)%Z)%Z -> forall (n:Z), forall (p2:(map Z Z)), let p3 :=
   (mk_array m p2) in forall (j:Z), ((2%Z <= j)%Z /\ (j <= (m - 1%Z)%Z)%Z) ->
   ((((get p2 0%Z) = 2%Z) /\ ((sorted p3 j) /\ ((only_primes p3 j) /\
-  ((all_primes p3 j) /\ (((get p2 (j - 1%Z)%Z) <  n)%Z /\ ((odd n) /\
+  ((all_primes p3 j) /\ ((((get p2 (j - 1%Z)%Z) <  n)%Z /\
+  (n <  (2%Z * (get p2 (j - 1%Z)%Z))%Z)%Z) /\ ((odd n) /\
   (no_prime_in (get p2 (j - 1%Z)%Z) n))))))) -> ((((1%Z <= 1%Z)%Z /\
-  (1%Z <  j)%Z) /\ (((get p2 (j - 1%Z)%Z) <  n)%Z /\ ((odd n) /\
-  (no_prime_in (get p2 (j - 1%Z)%Z) n)))) -> forall (n1:Z), (((get p2
-  (j - 1%Z)%Z) <  n1)%Z /\ ((prime n1) /\ (no_prime_in (get p2 (j - 1%Z)%Z)
-  n1))) -> (((0%Z <= j)%Z /\ (j <  m)%Z) -> forall (p4:(map Z Z)),
-  (p4 = (set p2 j n1)) -> forall (n2:Z), (n2 = (n1 + 2%Z)%Z) ->
-  (sorted (mk_array m p4) (j + 1%Z)%Z)))))))).
+  (1%Z <  j)%Z) /\ (((get p2 0%Z) = 2%Z) /\ ((sorted p3 j) /\
+  ((only_primes p3 j) /\ ((all_primes p3 j) /\ ((((get p2
+  (j - 1%Z)%Z) <  n)%Z /\ (n <  (2%Z * (get p2 (j - 1%Z)%Z))%Z)%Z) /\
+  ((odd n) /\ ((no_prime_in (get p2 (j - 1%Z)%Z) n) /\ forall (i:Z),
+  ((0%Z <= i)%Z /\ (i <  1%Z)%Z) -> ~ (divides (get p2 i) n))))))))) ->
+  forall (n1:Z), (((get p2 (j - 1%Z)%Z) <  n1)%Z /\ ((prime n1) /\
+  (no_prime_in (get p2 (j - 1%Z)%Z) n1))) -> (((0%Z <= j)%Z /\ (j <  m)%Z) ->
+  forall (p4:(map Z Z)), (p4 = (set p2 j n1)) -> forall (n2:Z),
+  (n2 = (n1 + 2%Z)%Z) -> (sorted (mk_array m p4) (j + 1%Z)%Z)))))))).
 (* YOU MAY EDIT THE PROOF BELOW *)
 unfold sorted, get1; simpl; intuition.
 assert (case: (j0 < j \/ j0 = j)%Z) by omega. destruct case.

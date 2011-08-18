@@ -151,6 +151,11 @@ theory Prime
     forall p: int. prime p ->
     forall d: int. divides d p -> d = 1 \/ d = -1 \/ d = p \/ d = -p
 
+  lemma small_divisors:
+    forall p: int. 2 <= p ->
+    (forall d: int. 2 <= d -> prime d -> 1 < d*d <= p -> not (divides d p)) ->
+    prime p
+
   use import Parity
 
   lemma even_prime: forall p: int. prime p -> even p -> p = 2
