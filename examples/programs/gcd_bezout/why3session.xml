@@ -1,62 +1,81 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
 <why3session name="examples/programs/gcd_bezout/why3session.xml">
+ <prover id="alt-ergo" name="Alt-Ergo" version="0.93"/>
+ <prover id="coq" name="Coq" version="8.3pl2"/>
+ <prover id="cvc3" name="CVC3" version="2.2"/>
+ <prover id="eprover" name="Eprover" version="0.8 Steinthal"/>
+ <prover id="gappa" name="Gappa" version="0.15.0"/>
+ <prover id="simplify" name="Simplify" version="1.5.4"/>
+ <prover id="spass" name="Spass" version="3.7"/>
+ <prover id="vampire" name="Vampire" version="0.6"/>
+ <prover id="yices" name="Yices" version="1.0.27"/>
+ <prover id="z3" name="Z3" version="2.19"/>
  <file name="../gcd_bezout.mlw" verified="true" expanded="true">
   <theory name="WP GcdBezout" verified="true" expanded="true">
-   <goal name="WP_parameter gcd" expl="correctness of parameter gcd" sum="0fd714786263b647d7092c43fe9130f8" proved="true" expanded="true">
+   <goal name="WP_parameter gcd" expl="correctness of parameter gcd" sum="e708de1061369396b2ff1f4113f30e00" proved="true" expanded="true" shape="iainfix >V6c0ainfix <V9V6Aainfix <=c0V6Aainfix =ainfix +ainfix *V12V0ainfix *V13V1V9Aainfix =ainfix +ainfix *V10V0ainfix *V11V1V8Aainfix =agcdV8V9agcdV0V1Aainfix >=V9c0Aainfix >=V8c0Iainfix =V13ainfix -V4ainfix *V2adivV7V6FIainfix =V12ainfix -V5ainfix *V3adivV7V6FIainfix =V11V2FIainfix =V10V3FIainfix =V9amodV7V6FIainfix =V8V6Fainfix =ainfix +ainfix *V14V0ainfix *V15V1V7EAainfix =V7agcdV0V1Iainfix =ainfix +ainfix *V3V0ainfix *V2V1V6Aainfix =ainfix +ainfix *V5V0ainfix *V4V1V7Aainfix =agcdV7V6agcdV0V1Aainfix >=V6c0Aainfix >=V7c0FFFFFFAainfix =ainfix +ainfix *c0V0ainfix *c1V1V1Aainfix =ainfix +ainfix *c1V0ainfix *c0V1V0Aainfix =agcdV0V1agcdV0V1Aainfix >=V1c0Aainfix >=V0c0Iainfix >=V1c0Aainfix >=V0c0FF">
     <transf name="split_goal" proved="true" expanded="true">
-     <goal name="WP_parameter gcd.1" expl="loop invariant init" sum="17d25f35ef473e3427180dd08103cf55" proved="true" expanded="false">
-      <proof prover="cvc3" timelimit="2" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof prover="alt-ergo" timelimit="2" edited="" obsolete="false">
-       <result status="valid" time="0.03"/>
-      </proof>
-      <proof prover="z3" timelimit="2" edited="" obsolete="false">
-       <result status="valid" time="0.00"/>
+     <goal name="WP_parameter gcd.1" expl="loop invariant init" sum="44ff89a72fcf725343c0157cb7a7faf8" proved="true" expanded="true" shape="ainfix =ainfix +ainfix *c0V0ainfix *c1V1V1Aainfix =ainfix +ainfix *c1V0ainfix *c0V1V0Aainfix =agcdV0V1agcdV0V1Aainfix >=V1c0Aainfix >=V0c0Iainfix >=V1c0Aainfix >=V0c0FF">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal name="WP_parameter gcd.2" expl="loop invariant preservation" sum="82475812596a513e9a0cc4da9e33016d" proved="true" expanded="true">
+     <goal name="WP_parameter gcd.2" expl="loop invariant preservation" sum="838c6f08305500896b8e79edc0ff580f" proved="true" expanded="true" shape="ainfix =ainfix +ainfix *V12V0ainfix *V13V1V9Aainfix =ainfix +ainfix *V10V0ainfix *V11V1V8Aainfix =agcdV8V9agcdV0V1Aainfix >=V9c0Aainfix >=V8c0Iainfix =V13ainfix -V4ainfix *V2adivV7V6FIainfix =V12ainfix -V5ainfix *V3adivV7V6FIainfix =V11V2FIainfix =V10V3FIainfix =V9amodV7V6FIainfix =V8V6FIainfix >V6c0Iainfix =ainfix +ainfix *V3V0ainfix *V2V1V6Aainfix =ainfix +ainfix *V5V0ainfix *V4V1V7Aainfix =agcdV7V6agcdV0V1Aainfix >=V6c0Aainfix >=V7c0FFFFFFIainfix >=V1c0Aainfix >=V0c0FF">
       <transf name="split_goal" proved="true" expanded="true">
-       <goal name="WP_parameter gcd.2.1" expl="correctness of parameter gcd" sum="976821da4ae5ccad609c3d2287c80fe0" proved="true" expanded="false">
+       <goal name="WP_parameter gcd.2.1" expl="correctness of parameter gcd" sum="b046d3dcd5fbba79c535695efd558e94" proved="true" expanded="true" shape="ainfix >=V8c0Iainfix =V13ainfix -V4ainfix *V2adivV7V6FIainfix =V12ainfix -V5ainfix *V3adivV7V6FIainfix =V11V2FIainfix =V10V3FIainfix =V9amodV7V6FIainfix =V8V6FIainfix >V6c0Iainfix =ainfix +ainfix *V3V0ainfix *V2V1V6Aainfix =ainfix +ainfix *V5V0ainfix *V4V1V7Aainfix =agcdV7V6agcdV0V1Aainfix >=V6c0Aainfix >=V7c0FFFFFFIainfix >=V1c0Aainfix >=V0c0FF">
+        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
         <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.04"/>
+         <result status="valid" time="0.02"/>
         </proof>
        </goal>
-       <goal name="WP_parameter gcd.2.2" expl="correctness of parameter gcd" sum="9920d86d6b752a310cd0cacc278dd381" proved="true" expanded="false">
+       <goal name="WP_parameter gcd.2.2" expl="correctness of parameter gcd" sum="080da6996a2bd84d0819ab2c8db3ce4e" proved="true" expanded="true" shape="ainfix >=V9c0Iainfix =V13ainfix -V4ainfix *V2adivV7V6FIainfix =V12ainfix -V5ainfix *V3adivV7V6FIainfix =V11V2FIainfix =V10V3FIainfix =V9amodV7V6FIainfix =V8V6FIainfix >V6c0Iainfix =ainfix +ainfix *V3V0ainfix *V2V1V6Aainfix =ainfix +ainfix *V5V0ainfix *V4V1V7Aainfix =agcdV7V6agcdV0V1Aainfix >=V6c0Aainfix >=V7c0FFFFFFIainfix >=V1c0Aainfix >=V0c0FF">
+        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
         <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.06"/>
+         <result status="valid" time="0.07"/>
         </proof>
        </goal>
-       <goal name="WP_parameter gcd.2.3" expl="correctness of parameter gcd" sum="c877b4e476cb6894559421a2c631c1fe" proved="true" expanded="true">
-        <proof prover="coq" timelimit="10" edited="gcd_bezout_WP_M_WP_parameter_gcd_1.v" obsolete="false">
-         <result status="valid" time="0.78"/>
+       <goal name="WP_parameter gcd.2.3" expl="correctness of parameter gcd" sum="6e974266fad2cd4dc4e4778c9da314d4" proved="true" expanded="true" shape="ainfix =agcdV8V9agcdV0V1Iainfix =V13ainfix -V4ainfix *V2adivV7V6FIainfix =V12ainfix -V5ainfix *V3adivV7V6FIainfix =V11V2FIainfix =V10V3FIainfix =V9amodV7V6FIainfix =V8V6FIainfix >V6c0Iainfix =ainfix +ainfix *V3V0ainfix *V2V1V6Aainfix =ainfix +ainfix *V5V0ainfix *V4V1V7Aainfix =agcdV7V6agcdV0V1Aainfix >=V6c0Aainfix >=V7c0FFFFFFIainfix >=V1c0Aainfix >=V0c0FF">
+        <proof prover="coq" timelimit="10" edited="gcd_bezout_WP_GcdBezout_WP_parameter_gcd_1.v" obsolete="false">
+         <result status="valid" time="0.70"/>
         </proof>
        </goal>
-       <goal name="WP_parameter gcd.2.4" expl="correctness of parameter gcd" sum="0aa20dc3fd2383fb1f18175fd306a4ff" proved="true" expanded="false">
+       <goal name="WP_parameter gcd.2.4" expl="correctness of parameter gcd" sum="bb890d60feb115367a6f034ea18e068e" proved="true" expanded="true" shape="ainfix =ainfix +ainfix *V10V0ainfix *V11V1V8Iainfix =V13ainfix -V4ainfix *V2adivV7V6FIainfix =V12ainfix -V5ainfix *V3adivV7V6FIainfix =V11V2FIainfix =V10V3FIainfix =V9amodV7V6FIainfix =V8V6FIainfix >V6c0Iainfix =ainfix +ainfix *V3V0ainfix *V2V1V6Aainfix =ainfix +ainfix *V5V0ainfix *V4V1V7Aainfix =agcdV7V6agcdV0V1Aainfix >=V6c0Aainfix >=V7c0FFFFFFIainfix >=V1c0Aainfix >=V0c0FF">
+        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
         <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.05"/>
+         <result status="valid" time="0.02"/>
         </proof>
        </goal>
-       <goal name="WP_parameter gcd.2.5" expl="correctness of parameter gcd" sum="aabf483908c2b613f2697262172db1d8" proved="true" expanded="false">
-        <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
-         <result status="valid" time="0.04"/>
+       <goal name="WP_parameter gcd.2.5" expl="correctness of parameter gcd" sum="af06cf21d1578e0cf266716c7f811f36" proved="true" expanded="true" shape="ainfix =ainfix +ainfix *V12V0ainfix *V13V1V9Iainfix =V13ainfix -V4ainfix *V2adivV7V6FIainfix =V12ainfix -V5ainfix *V3adivV7V6FIainfix =V11V2FIainfix =V10V3FIainfix =V9amodV7V6FIainfix =V8V6FIainfix >V6c0Iainfix =ainfix +ainfix *V3V0ainfix *V2V1V6Aainfix =ainfix +ainfix *V5V0ainfix *V4V1V7Aainfix =agcdV7V6agcdV0V1Aainfix >=V6c0Aainfix >=V7c0FFFFFFIainfix >=V1c0Aainfix >=V0c0FF">
+        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
         </proof>
        </goal>
       </transf>
      </goal>
-     <goal name="WP_parameter gcd.3" expl="loop variant decreases" sum="b46a0daa9ac9fd8b9a204c389b2c55ee" proved="true" expanded="false">
-      <proof prover="cvc3" timelimit="2" edited="" obsolete="false">
-       <result status="valid" time="0.20"/>
-      </proof>
-      <proof prover="z3" timelimit="2" edited="" obsolete="false">
-       <result status="valid" time="0.05"/>
+     <goal name="WP_parameter gcd.3" expl="loop variant decreases" sum="d4abfa67a7bde89abc856c1564c1aa3d" proved="true" expanded="true" shape="ainfix <V9V6Aainfix <=c0V6Iainfix =ainfix +ainfix *V12V0ainfix *V13V1V9Aainfix =ainfix +ainfix *V10V0ainfix *V11V1V8Aainfix =agcdV8V9agcdV0V1Aainfix >=V9c0Aainfix >=V8c0Iainfix =V13ainfix -V4ainfix *V2adivV7V6FIainfix =V12ainfix -V5ainfix *V3adivV7V6FIainfix =V11V2FIainfix =V10V3FIainfix =V9amodV7V6FIainfix =V8V6FIainfix >V6c0Iainfix =ainfix +ainfix *V3V0ainfix *V2V1V6Aainfix =ainfix +ainfix *V5V0ainfix *V4V1V7Aainfix =agcdV7V6agcdV0V1Aainfix >=V6c0Aainfix >=V7c0FFFFFFIainfix >=V1c0Aainfix >=V0c0FF">
+      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.10"/>
       </proof>
      </goal>
-     <goal name="WP_parameter gcd.4" expl="normal postcondition" sum="0ea8c622bb67d0b961c102d4d481b9ac" proved="true" expanded="false">
-      <proof prover="alt-ergo" timelimit="2" edited="" obsolete="false">
-       <result status="valid" time="0.08"/>
-      </proof>
+     <goal name="WP_parameter gcd.4" expl="normal postcondition" sum="f519c8644e350bf6b4879e17ab8d1f45" proved="true" expanded="true" shape="ainfix =ainfix +ainfix *V8V0ainfix *V9V1V7EAainfix =V7agcdV0V1Iainfix >V6c0NIainfix =ainfix +ainfix *V3V0ainfix *V2V1V6Aainfix =ainfix +ainfix *V5V0ainfix *V4V1V7Aainfix =agcdV7V6agcdV0V1Aainfix >=V6c0Aainfix >=V7c0FFFFFFIainfix >=V1c0Aainfix >=V0c0FF">
+      <transf name="split_goal" proved="true" expanded="true">
+       <goal name="WP_parameter gcd.4.1" expl="correctness of parameter gcd" sum="bb06bfcff41f64c10ab670f8e609fa11" proved="true" expanded="true" shape="ainfix =V7agcdV0V1Iainfix >V6c0NIainfix =ainfix +ainfix *V3V0ainfix *V2V1V6Aainfix =ainfix +ainfix *V5V0ainfix *V4V1V7Aainfix =agcdV7V6agcdV0V1Aainfix >=V6c0Aainfix >=V7c0FFFFFFIainfix >=V1c0Aainfix >=V0c0FF">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.04"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter gcd.4.2" expl="correctness of parameter gcd" sum="e7a614e3d26579b68ee56a56869bee59" proved="true" expanded="true" shape="ainfix =ainfix +ainfix *V8V0ainfix *V9V1V7EIainfix >V6c0NIainfix =ainfix +ainfix *V3V0ainfix *V2V1V6Aainfix =ainfix +ainfix *V5V0ainfix *V4V1V7Aainfix =agcdV7V6agcdV0V1Aainfix >=V6c0Aainfix >=V7c0FFFFFFIainfix >=V1c0Aainfix >=V0c0FF">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.03"/>
+        </proof>
+       </goal>
+      </transf>
      </goal>
     </transf>
    </goal>
