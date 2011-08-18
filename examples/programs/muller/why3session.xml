@@ -1,48 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
 <why3session name="examples/programs/muller/why3session.xml">
+ <prover id="alt-ergo" name="Alt-Ergo" version="0.93"/>
+ <prover id="coq" name="Coq" version="8.2pl1"/>
+ <prover id="cvc3" name="CVC3" version="2.2"/>
+ <prover id="eprover" name="Eprover" version="1.0-004 Temi"/>
+ <prover id="gappa" name="Gappa" version="0.14.0"/>
+ <prover id="simplify" name="Simplify" version="1.5.4"/>
+ <prover id="spass" name="Spass" version="3.5"/>
+ <prover id="yices" name="Yices" version="1.0.27"/>
+ <prover id="z3" name="Z3" version="2.19"/>
  <file name="../muller.mlw" verified="true" expanded="true">
   <theory name="WP Muller" verified="true" expanded="true">
-   <goal name="WP_parameter compact" expl="correctness of parameter compact" sum="e0d9de9cbb5be379c4a4b699abf1a591" proved="true" expanded="true">
+   <goal name="WP_parameter compact" expl="correctness of parameter compact" sum="575477ba237807b1bdc6273424ac9032" proved="true" expanded="true" shape="iainfix =agetV1V6c0Nainfix <=anum_ofV1c0ainfix +V6c1ainfix +V6c1Aainfix =V8anum_ofV1c0ainfix +V6c1Aainfix <=c0V8Iainfix =V8ainfix +V5c1FIainfix =V7asetV4V5agetV1V6FAainfix <V5V2Aainfix <=c0V5Aainfix <V6V0Aainfix <=c0V6ainfix <=anum_ofV1c0ainfix +V6c1ainfix +V6c1Aainfix =V5anum_ofV1c0ainfix +V6c1Aainfix <=c0V5Aainfix <V6V0Aainfix <=c0V6Iainfix <=anum_ofV1c0V6V6Aainfix =V5anum_ofV1c0V6Aainfix <=c0V5Iainfix <=V6ainfix -V0c1Aainfix <=c0V6FFFAainfix <=anum_ofV1c0c0c0Aainfix =V3anum_ofV1c0c0Aainfix <=c0V3Iainfix <=c0ainfix -V0c1Iainfix =V3c0FAainfix >=V2c0Iainfix <=anum_ofV1c0ainfix +ainfix -V0c1c1ainfix +ainfix -V0c1c1Aainfix =V2anum_ofV1c0ainfix +ainfix -V0c1c1Aainfix <=c0V2Aiainfix =agetV1V9c0Nainfix <=anum_ofV1c0ainfix +V9c1ainfix +V9c1Aainfix =V10anum_ofV1c0ainfix +V9c1Aainfix <=c0V10Iainfix =V10ainfix +V2c1Fainfix <=anum_ofV1c0ainfix +V9c1ainfix +V9c1Aainfix =V2anum_ofV1c0ainfix +V9c1Aainfix <=c0V2Aainfix <V9V0Aainfix <=c0V9Iainfix <=anum_ofV1c0V9V9Aainfix =V2anum_ofV1c0V9Aainfix <=c0V2Iainfix <=V9ainfix -V0c1Aainfix <=c0V9FFAainfix <=anum_ofV1c0c0c0Aainfix =c0anum_ofV1c0c0Aainfix <=c0c0Iainfix <=c0ainfix -V0c1Aiainfix =agetV1V14c0Nainfix <=anum_ofV1c0ainfix +V14c1ainfix +V14c1Aainfix =V16anum_ofV1c0ainfix +V14c1Aainfix <=c0V16Iainfix =V16ainfix +V13c1FIainfix =V15asetV12V13agetV1V14FAainfix <V13c0Aainfix <=c0V13Aainfix <V14V0Aainfix <=c0V14ainfix <=anum_ofV1c0ainfix +V14c1ainfix +V14c1Aainfix =V13anum_ofV1c0ainfix +V14c1Aainfix <=c0V13Aainfix <V14V0Aainfix <=c0V14Iainfix <=anum_ofV1c0V14V14Aainfix =V13anum_ofV1c0V14Aainfix <=c0V13Iainfix <=V14ainfix -V0c1Aainfix <=c0V14FFFAainfix <=anum_ofV1c0c0c0Aainfix =V11anum_ofV1c0c0Aainfix <=c0V11Iainfix <=c0ainfix -V0c1Iainfix =V11c0FAainfix >=c0c0Iainfix >c0ainfix -V0c1FF">
     <transf name="split_goal" proved="true" expanded="true">
-     <goal name="WP_parameter compact.1" expl="precondition" sum="8d7dd66c74645ad012bcb4ba69b4e9c5" proved="true" expanded="true">
+     <goal name="WP_parameter compact.1" expl="precondition" sum="8d7dd66c74645ad012bcb4ba69b4e9c5" proved="true" expanded="true" shape="ainfix >=c0c0Iainfix >c0ainfix -V0c1FF">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter compact.2" expl="for loop initialization" sum="298245d5916edcd2a81a00c9a9672d29" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter compact.3" expl="for loop preservation" sum="c8e091485b0cb29d289366398dd24982" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter compact.4" expl="for loop initialization" sum="c0e3d5971e572acd3db62fb9e102a17c" proved="true" expanded="true">
+     <goal name="WP_parameter compact.2" expl="for loop initialization" sum="03fd0c9f0990b675ae4c9900f71ae387" proved="true" expanded="true" shape="ainfix <=anum_ofV1c0c0c0Aainfix =V2anum_ofV1c0c0Aainfix <=c0V2Iainfix <=c0ainfix -V0c1Iainfix =V2c0FIainfix >=c0c0Iainfix >c0ainfix -V0c1FF">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.03"/>
       </proof>
      </goal>
-     <goal name="WP_parameter compact.5" expl="for loop preservation" sum="4eac813b68d3b337fe13742d52c581ec" proved="true" expanded="true">
+     <goal name="WP_parameter compact.3" expl="for loop preservation" sum="827e0ca995f60293b5d5e0adbd67f154" proved="true" expanded="true" shape="iainfix =agetV1V5c0Nainfix <=anum_ofV1c0ainfix +V5c1ainfix +V5c1Aainfix =V7anum_ofV1c0ainfix +V5c1Aainfix <=c0V7Iainfix =V7ainfix +V4c1FIainfix =V6asetV3V4agetV1V5FAainfix <V4c0Aainfix <=c0V4Aainfix <V5V0Aainfix <=c0V5ainfix <=anum_ofV1c0ainfix +V5c1ainfix +V5c1Aainfix =V4anum_ofV1c0ainfix +V5c1Aainfix <=c0V4Aainfix <V5V0Aainfix <=c0V5Iainfix <=anum_ofV1c0V5V5Aainfix =V4anum_ofV1c0V5Aainfix <=c0V4Iainfix <=V5ainfix -V0c1Aainfix <=c0V5FFFIainfix <=c0ainfix -V0c1Iainfix =V2c0FIainfix >=c0c0Iainfix >c0ainfix -V0c1FF">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter compact.4" expl="for loop initialization" sum="c0e3d5971e572acd3db62fb9e102a17c" proved="true" expanded="true" shape="ainfix <=anum_ofV1c0c0c0Aainfix =c0anum_ofV1c0c0Aainfix <=c0c0Iainfix <=c0ainfix -V0c1FF">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.03"/>
       </proof>
      </goal>
-     <goal name="WP_parameter compact.6" expl="precondition" sum="ac8613151f21c8de359a74b14fe8d685" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter compact.7" expl="for loop initialization" sum="3e2510029b7c8c85e870ea4845346dca" proved="true" expanded="true">
+     <goal name="WP_parameter compact.5" expl="for loop preservation" sum="4eac813b68d3b337fe13742d52c581ec" proved="true" expanded="true" shape="iainfix =agetV1V3c0Nainfix <=anum_ofV1c0ainfix +V3c1ainfix +V3c1Aainfix =V4anum_ofV1c0ainfix +V3c1Aainfix <=c0V4Iainfix =V4ainfix +V2c1Fainfix <=anum_ofV1c0ainfix +V3c1ainfix +V3c1Aainfix =V2anum_ofV1c0ainfix +V3c1Aainfix <=c0V2Aainfix <V3V0Aainfix <=c0V3Iainfix <=anum_ofV1c0V3V3Aainfix =V2anum_ofV1c0V3Aainfix <=c0V2Iainfix <=V3ainfix -V0c1Aainfix <=c0V3FFIainfix <=c0ainfix -V0c1FF">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.05"/>
       </proof>
      </goal>
-     <goal name="WP_parameter compact.8" expl="for loop preservation" sum="952c11e9ad48698d16b735d95d2079dc" proved="true" expanded="true">
+     <goal name="WP_parameter compact.6" expl="precondition" sum="ac8613151f21c8de359a74b14fe8d685" proved="true" expanded="true" shape="ainfix >=V2c0Iainfix <=anum_ofV1c0ainfix +ainfix -V0c1c1ainfix +ainfix -V0c1c1Aainfix =V2anum_ofV1c0ainfix +ainfix -V0c1c1Aainfix <=c0V2FIainfix <=c0ainfix -V0c1FF">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.08"/>
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter compact.7" expl="for loop initialization" sum="91b3b71e3aa4085f46b334874ed43523" proved="true" expanded="true" shape="ainfix <=anum_ofV1c0c0c0Aainfix =V3anum_ofV1c0c0Aainfix <=c0V3Iainfix <=c0ainfix -V0c1Iainfix =V3c0FIainfix >=V2c0Iainfix <=anum_ofV1c0ainfix +ainfix -V0c1c1ainfix +ainfix -V0c1c1Aainfix =V2anum_ofV1c0ainfix +ainfix -V0c1c1Aainfix <=c0V2FIainfix <=c0ainfix -V0c1FF">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter compact.8" expl="for loop preservation" sum="2d023239305c16adcd550f8e1e0ab414" proved="true" expanded="true" shape="iainfix =agetV1V6c0Nainfix <=anum_ofV1c0ainfix +V6c1ainfix +V6c1Aainfix =V8anum_ofV1c0ainfix +V6c1Aainfix <=c0V8Iainfix =V8ainfix +V5c1FIainfix =V7asetV4V5agetV1V6FAainfix <V5V2Aainfix <=c0V5Aainfix <V6V0Aainfix <=c0V6ainfix <=anum_ofV1c0ainfix +V6c1ainfix +V6c1Aainfix =V5anum_ofV1c0ainfix +V6c1Aainfix <=c0V5Aainfix <V6V0Aainfix <=c0V6Iainfix <=anum_ofV1c0V6V6Aainfix =V5anum_ofV1c0V6Aainfix <=c0V5Iainfix <=V6ainfix -V0c1Aainfix <=c0V6FFFIainfix <=c0ainfix -V0c1Iainfix =V3c0FIainfix >=V2c0Iainfix <=anum_ofV1c0ainfix +ainfix -V0c1c1ainfix +ainfix -V0c1c1Aainfix =V2anum_ofV1c0ainfix +ainfix -V0c1c1Aainfix <=c0V2FIainfix <=c0ainfix -V0c1FF">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.12"/>
       </proof>
      </goal>
     </transf>
