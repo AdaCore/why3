@@ -15,84 +15,96 @@
   </theory>
   <theory name="Bits" verified="true" expanded="true">
   </theory>
+  <theory name="Solution" verified="true" expanded="true">
+   <goal name="partial_solution_eq_prefix" sum="3e68e4fbac16d9f4474522cdd502774d" proved="true" expanded="true" shape="apartial_solutionV2V0Iaeq_prefixV1V0V2Iapartial_solutionV2V1F">
+    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+     <result status="valid" time="0.04"/>
+    </proof>
+   </goal>
+  </theory>
   <theory name="WP NQueens" verified="true" expanded="true">
-   <goal name="WP_parameter t1" expl="correctness of parameter t1" sum="9844cd8c7f55016fd45ae33278e8d93f" proved="true" expanded="true" shape="iainfix =V0c0Niainfix =V2c0Nainfix <acardinalabitsV5acardinalabitsV2Aainfix <=c0acardinalabitsV2Iainfix =V5ainfix -V2ainfix &V2aprefix -V2FIainfix =V4ainfix +V1V3FFAainfix =c2c0NtFFtF">
+   <goal name="WP_parameter t1" expl="correctness of parameter t1" sum="fff0f7dc33d7ddbd9c08c0c2b5703ede" proved="true" expanded="true" shape="iainfix =V0c0Niainfix =V2c0Nainfix <acardinalabitsV5acardinalabitsV2Aainfix <=c0acardinalabitsV2Iainfix =V5ainfix -V2ainfix &V2aprefix -V2FIainfix =V4ainfix +V1V3FFAainfix =c2c0NtFFtF">
     <transf name="split_goal" proved="true" expanded="true">
-     <goal name="WP_parameter t1.1" expl="precondition" sum="7d8a8971a03ce57a28f3e4a1fddda896" proved="true" expanded="true" shape="ainfix =c2c0NIainfix =V2c0NFFIainfix =V0c0NF">
+     <goal name="WP_parameter t1.1" expl="precondition" sum="9642637e17a734889e86664b4527e4c3" proved="true" expanded="true" shape="ainfix =c2c0NIainfix =V2c0NFFIainfix =V0c0NF">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter t1.2" expl="loop variant decreases" sum="098c3a0d333c7dfc3bc02c6d833e7a60" proved="true" expanded="true" shape="ainfix <acardinalabitsV5acardinalabitsV2Aainfix <=c0acardinalabitsV2Iainfix =V5ainfix -V2ainfix &V2aprefix -V2FIainfix =V4ainfix +V1V3FFIainfix =c2c0NIainfix =V2c0NFFIainfix =V0c0NF">
+     <goal name="WP_parameter t1.2" expl="loop variant decreases" sum="77186d130b4402ab1c813051a4069446" proved="true" expanded="true" shape="ainfix <acardinalabitsV5acardinalabitsV2Aainfix <=c0acardinalabitsV2Iainfix =V5ainfix -V2ainfix &V2aprefix -V2FIainfix =V4ainfix +V1V3FFIainfix =c2c0NIainfix =V2c0NFFIainfix =V0c0NF">
       <transf name="split_goal" proved="true" expanded="true">
-       <goal name="WP_parameter t1.2.1" expl="correctness of parameter t1" sum="7c572289b8be1ace3edf8a30024b9aaa" proved="true" expanded="true" shape="ainfix <=c0acardinalabitsV2Iainfix =V5ainfix -V2ainfix &V2aprefix -V2FIainfix =V4ainfix +V1V3FFIainfix =c2c0NIainfix =V2c0NFFIainfix =V0c0NF">
+       <goal name="WP_parameter t1.2.1" expl="correctness of parameter t1" sum="995c810acabe6c4a2ba037b7c48129cf" proved="true" expanded="true" shape="ainfix <=c0acardinalabitsV2Iainfix =V5ainfix -V2ainfix &V2aprefix -V2FIainfix =V4ainfix +V1V3FFIainfix =c2c0NIainfix =V2c0NFFIainfix =V0c0NF">
         <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
          <result status="valid" time="0.03"/>
         </proof>
        </goal>
-       <goal name="WP_parameter t1.2.2" expl="correctness of parameter t1" sum="7754973086bdc451d97dc36dee15942c" proved="true" expanded="true" shape="ainfix <acardinalabitsV5acardinalabitsV2Iainfix =V5ainfix -V2ainfix &V2aprefix -V2FIainfix =V4ainfix +V1V3FFIainfix =c2c0NIainfix =V2c0NFFIainfix =V0c0NF">
+       <goal name="WP_parameter t1.2.2" expl="correctness of parameter t1" sum="c5f664f2058f9553d388bfd044ac791c" proved="true" expanded="true" shape="ainfix <acardinalabitsV5acardinalabitsV2Iainfix =V5ainfix -V2ainfix &V2aprefix -V2FIainfix =V4ainfix +V1V3FFIainfix =c2c0NIainfix =V2c0NFFIainfix =V0c0NF">
         <proof prover="z3" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.08"/>
+         <result status="valid" time="1.44"/>
         </proof>
        </goal>
       </transf>
      </goal>
-     <goal name="WP_parameter t1.3" expl="normal postcondition" sum="08539b7da399a7e2c76a2cfbd846123b" proved="true" expanded="true" shape="tIainfix =V2c0NNFFIainfix =V0c0NF">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter t1.4" expl="normal postcondition" sum="9aef56a481bc1b058d23bb09449d3f22" proved="true" expanded="true" shape="tIainfix =V0c0NNF">
+     <goal name="WP_parameter t1.3" expl="normal postcondition" sum="49163fa77de7fbd5b6e10f5a7b94aa66" proved="true" expanded="true" shape="tIainfix =V2c0NNFFIainfix =V0c0NF">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter t1.4" expl="normal postcondition" sum="6820ef55c1877e731c6594e4557ef3be" proved="true" expanded="true" shape="tIainfix =V0c0NNF">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
     </transf>
    </goal>
-   <goal name="WP_parameter t2" expl="correctness of parameter t2" sum="ae1c369ef635350b8f5302d7f17894c6" proved="true" expanded="true" shape="iainfix =V0c0Niainfix =V4c0NasubsetabitsV7abitsV0Iainfix =V7ainfix -V4ainfix &V4aprefix -V4FIainfix =V6ainfix +V3V5FFAtAainfix <acardinalabitsainfix -V0ainfix &V4aprefix -V4acardinalabitsV0Aainfix <=c0acardinalabitsV0Aainfix =c2c0NAainfix =abitsainfix &V4aprefix -V4asingletonamin_eltabitsV4tIasubsetabitsV4abitsV0FFAasubsetabitsainfix &ainfix &V0aprefix ~V1aprefix ~V2abitsV0tFFF">
+   <goal name="WP_parameter t2" expl="correctness of parameter t2" sum="4907e86e436ac539575d3d3bbad346d0" proved="true" expanded="true" shape="iainfix =V0c0Niainfix =V4c0NasubsetabitsV7abitsV0Iainfix =V7ainfix -V4ainfix &V4aprefix -V4FIainfix =V6ainfix +V3V5FFAtAainfix <acardinalabitsainfix -V0ainfix &V4aprefix -V4acardinalabitsV0Aainfix <=c0acardinalabitsV0Aainfix =c2c0NAainfix =abitsainfix -V0ainfix &V4aprefix -V4aremoveamin_eltabitsV4abitsV0Aainfix =abitsainfix &V4aprefix -V4asingletonamin_eltabitsV4tIasubsetabitsV4abitsV0FFAasubsetabitsainfix &ainfix &V0aprefix ~V1aprefix ~V2abitsV0tFFF">
     <transf name="split_goal" proved="true" expanded="true">
-     <goal name="WP_parameter t2.1" expl="loop invariant init" sum="84fd7f60ba18cd77c2a67d40008804bd" proved="true" expanded="true" shape="asubsetabitsainfix &ainfix &V0aprefix ~V1aprefix ~V2abitsV0Iainfix =V0c0NFFF">
+     <goal name="WP_parameter t2.1" expl="loop invariant init" sum="744d31a30702e6960ab85fa741e50e0f" proved="true" expanded="true" shape="asubsetabitsainfix &ainfix &V0aprefix ~V1aprefix ~V2abitsV0Iainfix =V0c0NFFF">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.05"/>
+       <result status="valid" time="0.04"/>
       </proof>
      </goal>
-     <goal name="WP_parameter t2.2" expl="assertion" sum="2a54a03011dd0ce17358573a065d9a09" proved="true" expanded="true" shape="ainfix =abitsainfix &V4aprefix -V4asingletonamin_eltabitsV4Iainfix =V4c0NIasubsetabitsV4abitsV0FFIainfix =V0c0NFFF">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter t2.3" expl="precondition" sum="4f12ace363f89ac270a1ba8a478b1011" proved="true" expanded="true" shape="ainfix =c2c0NIainfix =abitsainfix &V4aprefix -V4asingletonamin_eltabitsV4Iainfix =V4c0NIasubsetabitsV4abitsV0FFIainfix =V0c0NFFF">
+     <goal name="WP_parameter t2.2" expl="assertion" sum="8b2d1d0bef60752ad5ce17498f5b36b5" proved="true" expanded="true" shape="ainfix =abitsainfix &V4aprefix -V4asingletonamin_eltabitsV4Iainfix =V4c0NIasubsetabitsV4abitsV0FFIainfix =V0c0NFFF">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.03"/>
       </proof>
      </goal>
-     <goal name="WP_parameter t2.4" expl="precondition" sum="0a21712328585890a3798a6e17b698c7" proved="true" expanded="true" shape="tAainfix <acardinalabitsainfix -V0ainfix &V4aprefix -V4acardinalabitsV0Aainfix <=c0acardinalabitsV0Iainfix =c2c0NIainfix =abitsainfix &V4aprefix -V4asingletonamin_eltabitsV4Iainfix =V4c0NIasubsetabitsV4abitsV0FFIainfix =V0c0NFFF">
+     <goal name="WP_parameter t2.3" expl="assertion" sum="d1ab2fd854b846a3f991ff4996b8ff58" proved="true" expanded="true" shape="ainfix =abitsainfix -V0ainfix &V4aprefix -V4aremoveamin_eltabitsV4abitsV0Iainfix =abitsainfix &V4aprefix -V4asingletonamin_eltabitsV4Iainfix =V4c0NIasubsetabitsV4abitsV0FFIainfix =V0c0NFFF">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter t2.4" expl="precondition" sum="3dd3ca9312aab76f0ce501b7742a82aa" proved="true" expanded="true" shape="ainfix =c2c0NIainfix =abitsainfix -V0ainfix &V4aprefix -V4aremoveamin_eltabitsV4abitsV0Iainfix =abitsainfix &V4aprefix -V4asingletonamin_eltabitsV4Iainfix =V4c0NIasubsetabitsV4abitsV0FFIainfix =V0c0NFFF">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter t2.5" expl="precondition" sum="ada42886a62ab66bd7e12b3420b788a9" proved="true" expanded="true" shape="tAainfix <acardinalabitsainfix -V0ainfix &V4aprefix -V4acardinalabitsV0Aainfix <=c0acardinalabitsV0Iainfix =c2c0NIainfix =abitsainfix -V0ainfix &V4aprefix -V4aremoveamin_eltabitsV4abitsV0Iainfix =abitsainfix &V4aprefix -V4asingletonamin_eltabitsV4Iainfix =V4c0NIasubsetabitsV4abitsV0FFIainfix =V0c0NFFF">
       <transf name="split_goal" proved="true" expanded="true">
-       <goal name="WP_parameter t2.4.1" expl="correctness of parameter t2" sum="9ad392c07fcdd8f70b7e8ee3841ef5ef" proved="true" expanded="true" shape="ainfix <=c0acardinalabitsV0Iainfix =c2c0NIainfix =abitsainfix &V4aprefix -V4asingletonamin_eltabitsV4Iainfix =V4c0NIasubsetabitsV4abitsV0FFIainfix =V0c0NFFF">
+       <goal name="WP_parameter t2.5.1" expl="correctness of parameter t2" sum="09638aeda3ebdd6e33f4da0e0ae89ffa" proved="true" expanded="true" shape="ainfix <=c0acardinalabitsV0Iainfix =c2c0NIainfix =abitsainfix -V0ainfix &V4aprefix -V4aremoveamin_eltabitsV4abitsV0Iainfix =abitsainfix &V4aprefix -V4asingletonamin_eltabitsV4Iainfix =V4c0NIasubsetabitsV4abitsV0FFIainfix =V0c0NFFF">
         <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.02"/>
+         <result status="valid" time="0.03"/>
         </proof>
        </goal>
-       <goal name="WP_parameter t2.4.2" expl="correctness of parameter t2" sum="9adbc8e82df5a12fef6630e780b3861c" proved="true" expanded="true" shape="ainfix <acardinalabitsainfix -V0ainfix &V4aprefix -V4acardinalabitsV0Iainfix =c2c0NIainfix =abitsainfix &V4aprefix -V4asingletonamin_eltabitsV4Iainfix =V4c0NIasubsetabitsV4abitsV0FFIainfix =V0c0NFFF">
-        <proof prover="z3" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="7.86"/>
+       <goal name="WP_parameter t2.5.2" expl="correctness of parameter t2" sum="c86ed5b842be11cfe8395fcab63a3abd" proved="true" expanded="true" shape="ainfix <acardinalabitsainfix -V0ainfix &V4aprefix -V4acardinalabitsV0Iainfix =c2c0NIainfix =abitsainfix -V0ainfix &V4aprefix -V4aremoveamin_eltabitsV4abitsV0Iainfix =abitsainfix &V4aprefix -V4asingletonamin_eltabitsV4Iainfix =V4c0NIasubsetabitsV4abitsV0FFIainfix =V0c0NFFF">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.04"/>
         </proof>
        </goal>
       </transf>
      </goal>
-     <goal name="WP_parameter t2.5" expl="loop invariant preservation" sum="638feec51a96015020e77cb80f359a29" proved="true" expanded="true" shape="asubsetabitsV7abitsV0Iainfix =V7ainfix -V4ainfix &V4aprefix -V4FIainfix =V6ainfix +V3V5FFItAainfix <acardinalabitsainfix -V0ainfix &V4aprefix -V4acardinalabitsV0Aainfix <=c0acardinalabitsV0Iainfix =c2c0NIainfix =abitsainfix &V4aprefix -V4asingletonamin_eltabitsV4Iainfix =V4c0NIasubsetabitsV4abitsV0FFIainfix =V0c0NFFF">
+     <goal name="WP_parameter t2.6" expl="loop invariant preservation" sum="07f652eedd178f393b456a9e752327a9" proved="true" expanded="true" shape="asubsetabitsV7abitsV0Iainfix =V7ainfix -V4ainfix &V4aprefix -V4FIainfix =V6ainfix +V3V5FFItAainfix <acardinalabitsainfix -V0ainfix &V4aprefix -V4acardinalabitsV0Aainfix <=c0acardinalabitsV0Iainfix =c2c0NIainfix =abitsainfix -V0ainfix &V4aprefix -V4aremoveamin_eltabitsV4abitsV0Iainfix =abitsainfix &V4aprefix -V4asingletonamin_eltabitsV4Iainfix =V4c0NIasubsetabitsV4abitsV0FFIainfix =V0c0NFFF">
       <proof prover="coq" timelimit="10" edited="queens_WP_NQueens_WP_parameter_t2_1.v" obsolete="false">
-       <result status="valid" time="0.68"/>
+       <result status="valid" time="0.67"/>
       </proof>
      </goal>
-     <goal name="WP_parameter t2.6" expl="normal postcondition" sum="4903c9b24c965c6cefaddad3cd9820ec" proved="true" expanded="true" shape="tIainfix =V4c0NNIasubsetabitsV4abitsV0FFIainfix =V0c0NFFF">
+     <goal name="WP_parameter t2.7" expl="normal postcondition" sum="8374ebacd91b6da8240b51590c457d26" proved="true" expanded="true" shape="tIainfix =V4c0NNIasubsetabitsV4abitsV0FFIainfix =V0c0NFFF">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter t2.7" expl="normal postcondition" sum="a17d91fc3e9e97cdfbc4dbce099c0c9a" proved="true" expanded="true" shape="tIainfix =V0c0NNFFF">
+     <goal name="WP_parameter t2.8" expl="normal postcondition" sum="4d466d182c3c19e8b6e9be08b76bcf2e" proved="true" expanded="true" shape="tIainfix =V0c0NNFFF">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.03"/>
       </proof>
      </goal>
     </transf>

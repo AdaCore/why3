@@ -135,24 +135,19 @@ Parameter bits: Z  -> (set Z).
 
 Axiom bits_0 : forall (x:Z), (is_empty (bits x)) <-> (x = 0%Z).
 
-Axiom bits_remove_singleton : forall (x:Z) (a:Z) (b:Z), ((bits b) = (add x
-  (empty:(set Z)))) -> ((mem x (bits a)) -> ((bits (a - b)%Z) = (remove x
+Axiom bits_remove_singleton : forall (i:Z) (a:Z) (b:Z), ((bits b) = (add i
+  (empty:(set Z)))) -> ((mem i (bits a)) -> ((bits (a - b)%Z) = (remove i
   (bits a)))).
 
-Parameter infix_et: Z -> Z  -> Z.
+Axiom bits_add_singleton : forall (i:Z) (a:Z) (b:Z), ((bits b) = (add i
+  (empty:(set Z)))) -> ((~ (mem i (bits a))) -> ((bits (a + b)%Z) = (add i
+  (bits a)))).
 
+Axiom bits_mul2_1 : forall (a:Z) (i:Z), (mem (i - 1%Z)%Z (bits a)) -> (mem i
+  (bits (a * 2%Z)%Z)).
 
-Parameter infix_lsls: Z -> Z  -> Z.
-
-
-Parameter prefix_tl: Z  -> Z.
-
-
-Axiom bits_diff : forall (a:Z) (b:Z), ((bits (infix_et a
-  (prefix_tl b))) = (diff (bits a) (bits b))).
-
-Axiom rightmost_bit_trick : forall (x:Z), (~ (x = 0%Z)) -> ((bits (infix_et x
-  (-x)%Z)) = (add (min_elt (bits x)) (empty:(set Z)))).
+Axiom bits_mul2_2 : forall (a:Z) (i:Z), (mem i (bits (a * 2%Z)%Z)) ->
+  ((1%Z <= i)%Z -> (mem (i - 1%Z)%Z (bits a))).
 
 Axiom Abs_pos : forall (x:Z), (0%Z <= (Zabs x))%Z.
 
@@ -195,6 +190,30 @@ Axiom Div_mult : forall (x:Z) (y:Z) (z:Z), ((0%Z <  x)%Z /\ ((0%Z <= y)%Z /\
 
 Axiom Mod_mult : forall (x:Z) (y:Z) (z:Z), ((0%Z <  x)%Z /\ ((0%Z <= y)%Z /\
   (0%Z <= z)%Z)) -> ((ZOmod ((x * y)%Z + z)%Z x) = (ZOmod z x)).
+
+Axiom bits_div2_1 : forall (a:Z) (i:Z), (mem (i + 1%Z)%Z (bits a)) ->
+  ((0%Z <= i)%Z -> (mem i (bits (ZOdiv a 2%Z)))).
+
+Axiom bits_div2_2 : forall (a:Z) (i:Z), (mem i (bits (ZOdiv a 2%Z))) ->
+  (mem (i + 1%Z)%Z (bits a)).
+
+Parameter infix_et: Z -> Z  -> Z.
+
+
+Parameter infix_lsls: Z -> Z  -> Z.
+
+
+Parameter prefix_tl: Z  -> Z.
+
+
+Axiom bits_diff : forall (a:Z) (b:Z), ((bits (infix_et a
+  (prefix_tl b))) = (diff (bits a) (bits b))).
+
+Axiom rightmost_bit_trick : forall (x:Z), (~ (x = 0%Z)) -> ((bits (infix_et x
+  (-x)%Z)) = (add (min_elt (bits x)) (empty:(set Z)))).
+
+Axiom bits_below : forall (n:Z), (0%Z <= n)%Z ->
+  ((bits (prefix_tl (infix_lsls (prefix_tl 0%Z) n))) = (below n)).
 
 Inductive ref (a:Type) :=
   | mk_ref : a -> ref a.
@@ -265,11 +284,12 @@ Implicit Arguments set2.
 Theorem WP_parameter_t2 : forall (a:Z), (~ (a = 0%Z)) -> forall (f:Z),
   forall (e:Z), (subset (bits e) (bits a)) -> ((~ (e = 0%Z)) ->
   (((bits (infix_et e (-e)%Z)) = (add (min_elt (bits e)) (empty:(set Z)))) ->
-  ((~ (2%Z = 0%Z)) -> (((0%Z <= (cardinal (bits a)))%Z /\
+  (((bits (a - (infix_et e (-e)%Z))%Z) = (remove (min_elt (bits e))
+  (bits a))) -> ((~ (2%Z = 0%Z)) -> (((0%Z <= (cardinal (bits a)))%Z /\
   ((cardinal (bits (a - (infix_et e
   (-e)%Z))%Z)) <  (cardinal (bits a)))%Z) -> forall (result:Z),
   forall (f1:Z), (f1 = (f + result)%Z) -> forall (e1:Z),
-  (e1 = (e - (infix_et e (-e)%Z))%Z) -> (subset (bits e1) (bits a)))))).
+  (e1 = (e - (infix_et e (-e)%Z))%Z) -> (subset (bits e1) (bits a))))))).
 (* YOU MAY EDIT THE PROOF BELOW *)
 intuition.
 assert (bits e1 = remove (min_elt (bits e)) (bits e)).
@@ -280,7 +300,7 @@ omega.
 apply min_elt_def1.
 generalize (bits_0 e); intuition.
 apply subset_trans with (bits e); auto.
-rewrite H8.
+rewrite H9.
 apply subset_remove; auto.
 Qed.
 (* DO NOT EDIT BELOW *)
