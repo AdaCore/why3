@@ -4,6 +4,14 @@ syntaxe
 
   - open
 
+  - infix symbols as constructors, e.g.
+
+       type list 'a = Nil | (::) 'a (list 'a)
+
+  - constants in patterns, e.g.
+
+       match ... with 0 :: r -> ... | ...
+
 
 sémantique
 ----------
