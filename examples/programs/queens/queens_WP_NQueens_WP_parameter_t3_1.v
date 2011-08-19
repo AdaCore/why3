@@ -256,44 +256,72 @@ Unset Contextual Implicit.
 Axiom Const : forall (b:Type) (a:Type), forall (b1:b) (a1:a), ((get (const(
   b1):(map a b)) a1) = b1).
 
-Inductive array (a:Type) :=
-  | mk_array : Z -> (map Z a) -> array a.
-Implicit Arguments mk_array.
+Parameter n:  Z.
 
-Definition elts (a:Type)(u:(array a)): (map Z a) :=
-  match u with
-  | mk_array _ elts1 => elts1
-  end.
-Implicit Arguments elts.
 
-Definition length (a:Type)(u:(array a)): Z :=
-  match u with
-  | mk_array length1 _ => length1
-  end.
-Implicit Arguments length.
+Definition solution  := (map Z Z).
 
-Definition get1 (a:Type)(a1:(array a)) (i:Z): a := (get (elts a1) i).
-Implicit Arguments get1.
+Definition eq_prefix(t:(map Z Z)) (u:(map Z Z)) (i:Z): Prop := forall (k:Z),
+  ((0%Z <= k)%Z /\ (k <  i)%Z) -> ((get t k) = (get u k)).
 
-Definition set2 (a:Type)(a1:(array a)) (i:Z) (v:a): (array a) :=
-  match a1 with
-  | mk_array xcl0 _ => (mk_array xcl0 (set1 (elts a1) i v))
-  end.
-Implicit Arguments set2.
+Definition partial_solution(k:Z) (s:(map Z Z)): Prop := forall (i:Z),
+  ((0%Z <= i)%Z /\ (i <  k)%Z) -> (((0%Z <= (get s i))%Z /\ ((get s
+  i) <  (n ))%Z) /\ forall (j:Z), ((0%Z <= j)%Z /\ (j <  i)%Z) -> ((~ ((get s
+  i) = (get s j))) /\ ((~ (((get s i) - (get s j))%Z = (i - j)%Z)) /\
+  ~ (((get s i) - (get s j))%Z = (j - i)%Z)))).
+
+Axiom partial_solution_eq_prefix : forall (u:(map Z Z)) (t:(map Z Z)) (k:Z),
+  (partial_solution k t) -> ((eq_prefix t u k) -> (partial_solution k u)).
+
+Definition lt_sol(s1:(map Z Z)) (s2:(map Z Z)): Prop := exists i:Z,
+  ((0%Z <= i)%Z /\ (i <  (n ))%Z) /\ ((eq_prefix s1 s2 i) /\ ((get s1
+  i) <  (get s2 i))%Z).
+
+Definition solutions  := (map Z (map Z Z)).
+
+Definition sorted(s:(map Z (map Z Z))) (a:Z) (b:Z): Prop := forall (i:Z)
+  (j:Z), (((a <= i)%Z /\ (i <  j)%Z) /\ (j <  b)%Z) -> (lt_sol (get s i)
+  (get s j)).
+
+Parameter sol:  (ref (map Z (map Z Z))).
+
+
+Parameter s:  (ref Z).
+
+
+Parameter k:  (ref Z).
+
 
 (* YOU MAY EDIT THE CONTEXT BELOW *)
 
 (* DO NOT EDIT BELOW *)
 
-Theorem WP_parameter_t2 : forall (a:Z), (~ (a = 0%Z)) -> forall (f:Z),
-  forall (e:Z), (subset (bits e) (bits a)) -> ((~ (e = 0%Z)) ->
-  (((bits (infix_et e (-e)%Z)) = (add (min_elt (bits e)) (empty:(set Z)))) ->
+Theorem WP_parameter_t3 : forall (a:Z), forall (b:Z), forall (c:Z),
+  forall (k1:Z), forall (s1:Z), forall (sol1:(map Z (map Z Z))),
+  ((0%Z <= k1)%Z /\ (((k1 + (cardinal (bits a)))%Z = (n )) /\
+  ((0%Z <= s1)%Z /\ forall (i:Z), (mem i (bits a)) <-> (((0%Z <= i)%Z /\
+  (i <  (n ))%Z) /\ forall (j:Z), ((0%Z <= j)%Z /\ (j <  k1)%Z) ->
+  ~ (i = (get (get sol1 s1) j)))))) -> ((~ (a = 0%Z)) -> forall (f:Z),
+  forall (e:Z), forall (k2:Z), forall (s2:Z), forall (sol2:(map Z (map Z
+  Z))), (((f = (s2 - s1)%Z) /\ (0%Z <= (s2 - s1)%Z)%Z) /\ ((k2 = k1) /\
+  (subset (bits e) (bits (infix_et (infix_et a (prefix_tl b))
+  (prefix_tl c)))))) -> ((~ (e = 0%Z)) -> (((bits (infix_et e
+  (-e)%Z)) = (add (min_elt (bits e)) (empty:(set Z)))) ->
   (((bits (a - (infix_et e (-e)%Z))%Z) = (remove (min_elt (bits e))
-  (bits a))) -> ((~ (2%Z = 0%Z)) -> (((0%Z <= (cardinal (bits a)))%Z /\
-  ((cardinal (bits (a - (infix_et e
-  (-e)%Z))%Z)) <  (cardinal (bits a)))%Z) -> forall (result:Z),
-  forall (f1:Z), (f1 = (f + result)%Z) -> forall (e1:Z),
-  (e1 = (e - (infix_et e (-e)%Z))%Z) -> (subset (bits e1) (bits a))))))).
+  (bits a))) -> ((~ ((infix_et e (-e)%Z) = 0%Z)) -> forall (sol3:(map Z (map
+  Z Z))), (sol3 = (set1 sol2 s2 (set1 (get sol2 s2) k2
+  (min_elt (bits (infix_et e (-e)%Z)))))) -> forall (k3:Z),
+  (k3 = (k2 + 1%Z)%Z) -> ((~ (2%Z = 0%Z)) -> (((0%Z <= k3)%Z /\
+  (((k3 + (cardinal (bits (a - (infix_et e (-e)%Z))%Z)))%Z = (n )) /\
+  ((0%Z <= s2)%Z /\ forall (i:Z), (mem i (bits (a - (infix_et e
+  (-e)%Z))%Z)) <-> (((0%Z <= i)%Z /\ (i <  (n ))%Z) /\ forall (j:Z),
+  ((0%Z <= j)%Z /\ (j <  k3)%Z) -> ~ (i = (get (get sol3 s2) j)))))) ->
+  forall (k4:Z), forall (s3:Z), forall (result:Z),
+  (((result = (s3 - s2)%Z) /\ (0%Z <= (s3 - s2)%Z)%Z) /\ (k4 = k3)) ->
+  forall (f1:Z), (f1 = (f + result)%Z) -> forall (k5:Z),
+  (k5 = (k4 - 1%Z)%Z) -> forall (e1:Z), (e1 = (e - (infix_et e (-e)%Z))%Z) ->
+  (subset (bits e1) (bits (infix_et (infix_et a (prefix_tl b))
+  (prefix_tl c))))))))))).
 (* YOU MAY EDIT THE PROOF BELOW *)
 intuition.
 assert (bits e1 = remove (min_elt (bits e)) (bits e)).
@@ -304,7 +332,7 @@ omega.
 apply min_elt_def1.
 generalize (bits_0 e); intuition.
 apply subset_trans with (bits e); auto.
-rewrite H9.
+rewrite H25.
 apply subset_remove; auto.
 Qed.
 (* DO NOT EDIT BELOW *)
