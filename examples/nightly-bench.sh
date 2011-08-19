@@ -7,9 +7,11 @@ DIFF=$REPORTDIR/nightly-bench.diff
 REPORT=$REPORTDIR/nightly-bench.report
 DATE=`date --utc +%Y-%m-%d`
 
+SUBJECT="Why3 nightly bench:"
+
 notify() {
-    mail -s "Why3 nightly bench" why3-commits@lists.gforge.inria.fr < $REPORT
-    # mail -s "test Why3 nightly bench" Claude.Marche@inria.fr < $REPORT
+    mail -s "$SUBJECT" why3-commits@lists.gforge.inria.fr < $REPORT
+    # mail -s "$SUBJECT" Claude.Marche@inria.fr < $REPORT
     # cat $REPORT
     exit 0
 }
@@ -23,6 +25,7 @@ autoconf
 if test "$?" != "0" ; then
     echo "Configure failed" >> $REPORT
     cat $OUT >> $REPORT
+    SUBJECT="$SUBJECT configure failed"
     notify
 else
     echo "Configuration succeeded. " >> $REPORT
@@ -33,6 +36,7 @@ make -j4 &> $OUT
 if test "$?" != "0" ; then
     echo "Compilation failed" >> $REPORT
     tail -20 $OUT >> $REPORT
+    SUBJECT="$SUBJECT compilation failed"
     notify
 else
     echo "Compilation succeeded. " >> $REPORT
@@ -43,6 +47,7 @@ bin/why3config --detect-provers &> $OUT
 if test "$?" != "0" ; then
     echo "Prover detection failed" >> $REPORT
     cat $OUT >> $REPORT
+    SUBJECT="$SUBJECT prover detection failed"
     notify
 else
     echo "Prover detection succeeded. " >> $REPORT
@@ -56,36 +61,34 @@ perl -pi -e 's/running_provers_max = 2/running_provers_max = 4/' why3.conf
 # replay proofs
 examples/regtests.sh &> $OUT
 if test "$?" != "0" ; then
-    cp $OUT $REPORTDIR/regtests-$DATE
+    SUBJECT="$SUBJECT failed"
     echo "Proof replay failed" >> $REPORT
-    diff -u $PREVIOUS $OUT &> $DIFF
-    if test "$?" == 0 ; then
-        echo "---------- No difference with last bench ---------- " >> $REPORT
-        echo "" >> $REPORT
-        echo "-------------- Full current state --------------" >> $REPORT
-        echo "" >> $REPORT
-        cat $OUT >> $REPORT
-    else
-        echo "" >> $REPORT
-        echo "--------------- Diff with last bench --------------" >> $REPORT
-        echo "" >> $REPORT
-        sed '1,2d' $DIFF >> $REPORT
-        cp $OUT $PREVIOUS
-        echo "" >> $REPORT
-        echo "-------------- Full current state --------------" >> $REPORT
-        echo "" >> $REPORT
-        cat $OUT >> $REPORT
-    fi
-    notify
 else
-    cp $OUT $REPORTDIR/regtests-$DATE
-    echo "Replay succeeded. " >> $REPORT
-    echo "" >> $REPORT
-    echo "-------------- Full current state --------------" >> $REPORT
-    echo "" >> $REPORT
-    cat $OUT >> $REPORT
+    SUBJECT="$SUBJECT successful"
+    echo " !!! REPLAY SUCCEEDED !!!  YAHOOOO !!! " >> $REPORT
 fi
 
-# final notification if everything is OK
+# store the state for this day
+cp $OUT $REPORTDIR/regtests-$DATE
+
+# output the diff against previous run
+diff -u $PREVIOUS $OUT &> $DIFF
+if test "$?" == 0 ; then
+    echo "---------- No difference with last bench ---------- " >> $REPORT
+else
+    echo "" >> $REPORT
+    echo "--------------- Diff with last bench --------------" >> $REPORT
+    echo "" >> $REPORT
+    sed '1,2d' $DIFF >> $REPORT
+    cp $OUT $PREVIOUS
+fi
+
+# finally print the full state
+echo "" >> $REPORT
+echo "-------------- Full current state --------------" >> $REPORT
+echo "" >> $REPORT
+cat $OUT >> $REPORT
+
+# final notification after the replay
 notify
 
