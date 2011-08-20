@@ -80,7 +80,7 @@ let fname = match !file with
   | Some f ->
       f
 
-let lang =
+let (why_lang, any_lang) =
   let main = get_main () in
   let load_path = Filename.concat (datadir main) "lang" in
   let languages_manager =
@@ -88,12 +88,18 @@ let lang =
   in
   languages_manager#set_search_path
     (load_path :: languages_manager#search_path);
-  match languages_manager#language "why" with
+  let why_lang =
+    match languages_manager#language "why" with
     | None ->
         Format.eprintf "language file for 'why' not found in directory %s@."
           load_path;
         exit 1
-    | Some _ as l -> l
+    | Some _ as l -> l in
+  let any_lang filename =
+    match languages_manager#guess_language ~filename () with
+    | None -> why_lang
+    | Some _ as l -> l in
+  (why_lang, any_lang)
 
 let source_text fname =
   let ic = open_in fname in
@@ -1078,7 +1084,7 @@ let task_view =
     ~height:gconfig.task_height
     ()
 
-let () = task_view#source_buffer#set_language lang
+let () = task_view#source_buffer#set_language why_lang
 let () = task_view#set_highlight_current_line true
 
 (***************)
@@ -1108,7 +1114,7 @@ let source_view =
 (*
   source_view#misc#modify_font_by_name font_name;
 *)
-let () = source_view#source_buffer#set_language lang
+let () = source_view#source_buffer#set_language None
 let () = source_view#set_highlight_current_line true
 (*
 let () = source_view#source_buffer#set_text (source_text fname)
@@ -1155,6 +1161,7 @@ let scroll_to_loc ?(yalign=0.0) ~color loc =
   let (f,l,b,e) = Loc.get loc in
   if f <> !current_file then
     begin
+      source_view#source_buffer#set_language (any_lang f);
       source_view#source_buffer#set_text (source_text f);
       set_current_file f;
     end;
