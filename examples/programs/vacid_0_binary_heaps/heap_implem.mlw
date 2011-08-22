@@ -97,6 +97,7 @@ let extractMin (this : ref logic_heap) : int =
   if (!i < n') then
     begin
       arr := A.set !arr !i last;
+      assert { !i > 0 -> is_heap_array !arr 0 n' };
       assert { is_heap_array !arr 0 n' };
       assert { model !this = add min (model (!arr,n')) }
     end;

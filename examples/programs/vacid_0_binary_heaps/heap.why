@@ -50,13 +50,12 @@ lemma Is_heap_sub2 :
      forall j: int.  0 <= j <= n -> is_heap_array a j n
 
 lemma Is_heap_when_node_modified :
-  forall a:map, n e idx:int.
-     is_heap_array a idx n
-    -> forall i : int. 0 <= i < n
-    -> (i > 0 -> A.get a (parent i) <= e )
-    -> (left i < n -> e <= A.get a (left i))
-    -> (right i < n -> e <= A.get a (right i))
-    -> is_heap_array (A.set a i e) idx n
+  forall a:map, n e idx i:int. 0 <= i < n ->
+     is_heap_array a idx n ->
+     (i > 0 -> A.get a (parent i) <= e ) ->
+     (left i < n -> e <= A.get a (left i)) ->
+     (right i < n -> e <= A.get a (right i)) ->
+     is_heap_array (A.set a i e) idx n
 
 lemma Is_heap_add_last :
   forall a:map, n e:int. n > 0 ->
