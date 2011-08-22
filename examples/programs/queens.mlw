@@ -5,59 +5,23 @@
    c+d)/2));return f;}main(q){scanf("%d",&q);printf("%d\n",t(~(~0<<q),0,0));}
 *)
 
-theory BitwiseArithmetic
-
-  use export int.Int
-
-  (* logical and *)
-  function (&) int int : int
-
-  (* logical shift left *)
-  function (<<) int int : int
-
-  (* logical negation *)
-  function (~_) int : int
-
-end
-
-theory Bits "the 1-bits of an integer, as a set of integers"
+theory S "finite sets of with succ and pred operations"
 
   use export set.Fsetint
 
-  function bits int : set int
+  function succ (set int) : set int
 
-  axiom bits_0:
-    forall x: int. is_empty (bits x) <-> x = 0
+  axiom succ_def_1:
+    forall s: set int, i: int. mem (i-1) s -> mem i (succ s)
+  axiom succ_def_2:
+    forall s: set int, i: int. mem i (succ s) -> i >= 1 -> mem (i-1) s
 
-  axiom bits_remove_singleton:
-    forall i a b: int. bits b = singleton i -> mem i (bits a) ->
-    bits (a - b) = remove i (bits a)
+  function pred (set int) : set int
 
-  axiom bits_add_singleton:
-    forall i a b: int. bits b = singleton i -> not (mem i (bits a)) ->
-    bits (a + b) = add i (bits a)
-
-  axiom bits_mul2_1:
-    forall a i: int. mem (i-1) (bits a) -> mem i (bits (a*2))
-  axiom bits_mul2_2:
-    forall a i: int. mem i (bits (a*2)) -> i >= 1 -> mem (i-1) (bits a)
-
-  use export int.ComputerDivision
-
-  axiom bits_div2_1:
-    forall a i: int. mem (i+1) (bits a) -> i >= 0 -> mem i (bits (div a 2))
-  axiom bits_div2_2:
-    forall a i: int. mem i (bits (div a 2)) -> mem (i+1) (bits a)
-
-  use export BitwiseArithmetic
-
-  axiom bits_diff:
-    forall a b: int. bits (a & ~b) = diff (bits a) (bits b)
-
-  axiom rightmost_bit_trick:
-    forall x: int. x <> 0 -> bits (x & -x) = singleton (min_elt (bits x))
-
-  axiom bits_below: forall n: int. n >= 0 -> bits (~(~0<<n)) = below n
+  axiom pred_def_1:
+    forall s: set int, i: int. mem (i+1) s -> i >= 0 -> mem i (pred s)
+  axiom pred_def__2:
+    forall s: set int, i: int. mem i (pred s) -> mem (i+1) s
 
 end
 
@@ -99,6 +63,138 @@ theory Solution
   (* s[a..b[ is sorted for lt_sol *)
   predicate sorted (s: solutions) (a b: int) =
     forall i j: int. a <= i < j < b -> lt_sol s[i] s[j]
+
+end
+
+(* 1. Abstract version of the code using sets (not ints) *******************)
+
+module NQueensSets
+
+  use import S
+  use import module ref.Refint
+  use import Solution
+
+  val col: ref solution  (* solution under construction *)
+  val k  : ref int       (* current row in the current solution *)
+
+  val sol: ref solutions (* all solutions *)
+  val s  : ref int       (* next slot for a solution = number of solutions *)
+
+  let store_solution () =
+    { solution !col }
+    sol := !sol[!s <- !col];
+    incr s
+    { !s = old !s + 1 /\
+      eq_prefix (old !sol) !sol (old !s) /\
+      !sol[old !s] = !col }
+
+  let rec t3 (a b c : set int) variant { cardinal a } =
+    { 0 <= !k /\ !k + cardinal a = n /\
+      "pre_a" (forall i: int. mem i a <->
+              (0<=i<n /\ forall j: int. 0 <= j < !k -> i <> !col[j])) /\
+      "pre_b" (forall i: int. i>=0 -> mem i b <->
+              (exists j: int. 0 <= j < !k /\ !col[j] = i + j - !k)) /\
+      "pre_c" (forall i: int. i>=0 -> mem i c <->
+              (exists j: int. 0 <= j < !k /\ !col[j] = i + !k - j)) /\
+     partial_solution !k !col }
+    if not (is_empty a) then begin
+      let e = ref (diff (diff a b) c) in
+   'L:let f = ref 0 in
+      while not (is_empty !e) do
+        invariant {
+          !f = !s - at !s 'L >= 0 /\ !k = at !k 'L /\
+          subset !e (at !e 'L) /\
+          partial_solution !k !col /\
+          sorted !sol (at !s 'L) !s /\
+          (forall t: solution.
+            (solution t /\ eq_prefix !col t !k /\
+             exists di: int. mem di (diff (at !e 'L) !e) /\ t[!k] = di)
+            <->
+            (exists i: int. (at !s 'L) <= i < !s /\ eq_sol t !sol[i])) /\
+          (* assigns *)
+          eq_prefix (at !col 'L) !col (at !k 'L) /\
+          eq_prefix (at !sol 'L) !sol (at !s 'L) }
+        let d = min_elt !e in
+        (* ghost *) col := !col[!k <- d];
+        (* ghost *) incr k;
+        f += t3 (remove d a) (succ (add d b)) (pred (add d c));
+        (* ghost *) decr k;
+        e := remove d !e
+      done;
+      !f
+    end else begin
+      (* ghost *) store_solution ();
+      1
+    end
+    { result = !s - old !s >= 0 /\ !k = old !k /\
+      sorted !sol (old !s) !s /\
+      (forall t: solution.
+         ((solution t /\ eq_prefix !col t !k) <->
+          (exists i: int. old !s <= i < !s /\ eq_sol t !sol[i]))) /\
+      (* assigns *)
+      eq_prefix (old !col) !col !k /\
+      eq_prefix (old !sol) !sol (old !s) }
+
+  let queens3 (q: int) =
+    { 0 <= q = n /\ !s = 0 /\ !k = 0 }
+    t3 (below q) empty empty
+    { result = !s /\ sorted !sol 0 !s /\
+      forall t: solution.
+        solution t <-> (exists i: int. 0 <= i < result /\ eq_sol t !sol[i]) }
+
+end
+
+(* 2. More realistic code with bitwise operations **************************)
+
+theory BitwiseArithmetic
+
+  use export int.Int
+
+  (* logical and *)
+  function (&) int int : int
+
+  (* logical shift left *)
+  function (<<) int int : int
+
+  (* logical negation *)
+  function (~_) int : int
+
+end
+
+theory Bits "the 1-bits of an integer, as a set of integers"
+
+  use export S
+
+  function bits int : set int
+
+  axiom bits_0:
+    forall x: int. is_empty (bits x) <-> x = 0
+
+  axiom bits_remove_singleton:
+    forall i a b: int. bits b = singleton i -> mem i (bits a) ->
+    bits (a - b) = remove i (bits a)
+
+  axiom bits_add_singleton:
+    forall i a b: int. bits b = singleton i -> not (mem i (bits a)) ->
+    bits (a + b) = add i (bits a)
+
+  axiom bits_mul2:
+    forall a: int. bits (a*2) = succ (bits a)
+
+  use export int.ComputerDivision
+
+  axiom bits_div2:
+    forall a: int. bits (div a 2) = pred (bits a)
+
+  use export BitwiseArithmetic
+
+  axiom bits_diff:
+    forall a b: int. bits (a & ~b) = diff (bits a) (bits b)
+
+  axiom rightmost_bit_trick:
+    forall x: int. x <> 0 -> bits (x & -x) = singleton (min_elt (bits x))
+
+  axiom bits_below: forall n: int. n >= 0 -> bits (~(~0<<n)) = below n
 
 end
 
