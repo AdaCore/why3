@@ -5,6 +5,8 @@ prelude "%%% this is a prelude for CVC3 "
 printer "cvc3"
 filename "%f-%t-%g.cvc"
 
+(* 'fail' must be before 'valid'; otherwise it is ignored *)
+fail "Parse Error: \\(.*\\)" "\\1"
 valid "Valid."
 unknown "Unknown." ""
 time "why3cpulimit time : %s s"
