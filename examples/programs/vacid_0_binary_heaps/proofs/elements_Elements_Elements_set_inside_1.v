@@ -78,6 +78,9 @@ Axiom Union_assoc : forall (a:Type), forall (a1:(map a Z)) (b:(map a Z))
 Axiom bag_simpl : forall (a:Type), forall (a1:(map a Z)) (b:(map a Z))
   (c:(map a Z)), ((union a1 b) = (union c b)) -> (a1 = c).
 
+Axiom bag_simpl_left : forall (a:Type), forall (a1:(map a Z)) (b:(map a Z))
+  (c:(map a Z)), ((union a1 b) = (union a1 c)) -> (b = c).
+
 Definition add (a:Type)(x:a) (b:(map a Z)): (map a Z) :=
   (union (set (empty_bag:(map a Z)) x 1%Z) b).
 Implicit Arguments add.
@@ -124,21 +127,56 @@ Axiom Elements_union1 : forall (a:Type), forall (a1:(map Z a)) (i:Z) (j:Z),
   (i <  j)%Z -> ((elements a1 i j) = (add (get a1 i) (elements a1 (i + 1%Z)%Z
   j))).
 
+Axiom Elements_union2 : forall (a:Type), forall (a1:(map Z a)) (i:Z) (j:Z),
+  (i <  j)%Z -> ((elements a1 i j) = (add (get a1 (j - 1%Z)%Z) (elements a1 i
+  (j - 1%Z)%Z))).
+
+Axiom Elements_set_outside : forall (a:Type), forall (a1:(map Z a)) (i:Z)
+  (j:Z), (i <= j)%Z -> forall (k:Z), ((k <  i)%Z \/ (j <= k)%Z) ->
+  forall (e:a), ((elements (set a1 k e) i j) = (elements a1 i j)).
+
+Axiom Elements_union3 : forall (a:Type), forall (a1:(map Z a)) (i:Z) (j:Z)
+  (e:a), (i <= j)%Z -> ((add e (elements a1 i j)) = (elements (set a1 j e) i
+  (j + 1%Z)%Z)).
+
+Axiom Elements_set2 : forall (a:Type), forall (a1:(map Z a)) (i:Z) (j:Z)
+  (k:Z), ((i <= k)%Z /\ (k <  j)%Z) -> forall (e:a), ((add (get a1 k)
+  (elements (set a1 k e) i j)) = (add e (elements a1 i j))).
+
 (* YOU MAY EDIT THE CONTEXT BELOW *)
 
 (* DO NOT EDIT BELOW *)
 
-Theorem Elements_union2 : forall (a:Type), forall (a1:(map Z a)) (i:Z) (j:Z),
-  (i <  j)%Z -> ((elements a1 i j) = (add (get a1 (j - 1%Z)%Z) (elements a1 i
-  (j - 1%Z)%Z))).
+Theorem Elements_set_inside : forall (a:Type), forall (a1:(map Z a)) (i:Z)
+  (j:Z) (n:Z) (e:a) (b:(map a Z)), ((i <= j)%Z /\ (j <  n)%Z) ->
+  (((elements a1 i n) = (add (get a1 j) b)) -> ((elements (set a1 j e) i
+  n) = (add e b))).
 (* YOU MAY EDIT THE PROOF BELOW *)
-intros X a i j Hij.
-rewrite Elements_union with (j:= (j-1)%Z); 
-  auto with zarith.
+intros X a i j n e b Hi H.
+apply bag_simpl_left with (a1:=(add (get a j) empty_bag)).
+replace (add e b) with (union b (add e empty_bag)).
+2: rewrite Union_comm ; unfold add ; rewrite Union_identity; auto.
+rewrite Union_assoc.
+unfold add; rewrite Union_identity.
+unfold add in H; rewrite <- H; clear H.
+rewrite Elements_union with (j:=j); auto with zarith.
+rewrite Elements_set_outside; auto with zarith.
+pattern (elements (set a j e) j n); rewrite Elements_union1; auto with zarith.
+rewrite Select_eq; auto.
+rewrite Elements_set_outside; auto with zarith.
+rewrite Elements_union with (i:=i) (j:=j) (k:=n); auto with zarith.
+pattern (elements a j n); rewrite Elements_union1; auto with zarith.
+(* AC1 equality *)
+rewrite Union_identity.
+rewrite Union_assoc.
+pattern (union (set empty_bag (get a j) 1%Z) (elements a i j)); rewrite Union_comm.
+rewrite <- Union_assoc.
+rewrite <- Union_assoc.
+apply f_equal.
 unfold add.
-pattern (elements a (j - 1) j); 
-  rewrite Elements_singleton; auto with zarith.
-rewrite Union_comm; auto.
+rewrite <- Union_assoc.
+apply f_equal.
+apply Union_comm.
 Qed.
 (* DO NOT EDIT BELOW *)
 

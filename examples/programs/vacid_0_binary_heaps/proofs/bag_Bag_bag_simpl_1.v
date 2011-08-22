@@ -75,6 +75,10 @@ Axiom Union_identity : forall (a:Type), forall (a1:(map a Z)), ((union a1
 Axiom Union_assoc : forall (a:Type), forall (a1:(map a Z)) (b:(map a Z))
   (c:(map a Z)), ((union a1 (union b c)) = (union (union a1 b) c)).
 
+(* YOU MAY EDIT THE CONTEXT BELOW *)
+
+(* DO NOT EDIT BELOW *)
+
 Theorem bag_simpl : forall (a:Type), forall (a1:(map a Z)) (b:(map a Z))
   (c:(map a Z)), ((union a1 b) = (union c b)) -> (a1 = c).
 (* YOU MAY EDIT THE PROOF BELOW *)

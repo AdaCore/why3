@@ -44,6 +44,9 @@ lemma Union_assoc : forall a b c:bag 'a.
 lemma bag_simpl : forall a b c: bag 'a.
       (union a b) = (union c b) -> a = c
 
+lemma bag_simpl_left : forall a b c: bag 'a.
+      (union a b) = (union a c) -> b = c
+
 (* add operation *)
 function add (x : 'a) (b: bag 'a) : bag 'a =  union (singleton x) b
 

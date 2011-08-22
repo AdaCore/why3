@@ -44,15 +44,14 @@ let insert (this : ref logic_heap) (e : int) : unit  =
     let p = A.get !arr parent in
     if (e >= p) then raise Break;
     arr := A.set !arr !i p;
-    i := parent;
-    assert { is_heap_array !arr 0 (n + 1) }
+    i := parent
   done
   with Break -> ()
   end;
   arr := A.set !arr !i e;
   this := (!arr, n + 1);
-  assert { !i = n -> is_heap !this };
-  assert { !i < n -> is_heap !this }
+  assert { 0 < !i < n -> is_heap !this };
+  assert { !i < n -> model !this = add e (model (a,n)) } 
 { is_heap !this /\
     model !this = add e (model (old !this)) }
 

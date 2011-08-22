@@ -78,67 +78,18 @@ Axiom Union_assoc : forall (a:Type), forall (a1:(map a Z)) (b:(map a Z))
 Axiom bag_simpl : forall (a:Type), forall (a1:(map a Z)) (b:(map a Z))
   (c:(map a Z)), ((union a1 b) = (union c b)) -> (a1 = c).
 
-Definition add (a:Type)(x:a) (b:(map a Z)): (map a Z) :=
-  (union (set (empty_bag:(map a Z)) x 1%Z) b).
-Implicit Arguments add.
-
-Axiom occ_add_eq : forall (a:Type), forall (b:(map a Z)) (x:a) (y:a),
-  (x = y) -> ((get (add x b) x) = ((get b x) + 1%Z)%Z).
-
-Axiom occ_add_neq : forall (a:Type), forall (b:(map a Z)) (x:a) (y:a),
-  (~ (x = y)) -> ((get (add x b) y) = (get b y)).
-
-Parameter card: forall (a:Type), (map a Z)  -> Z.
-
-Implicit Arguments card.
-
-Axiom Card_empty : forall (a:Type), ((card (empty_bag:(map a Z))) = 0%Z).
-
-Axiom Card_singleton : forall (a:Type), forall (x:a),
-  ((card (set (empty_bag:(map a Z)) x 1%Z)) = 1%Z).
-
-Axiom Card_union : forall (a:Type), forall (x:(map a Z)) (y:(map a Z)),
-  ((card (union x y)) = ((card x) + (card y))%Z).
-
-Axiom Card_zero_empty : forall (a:Type), forall (x:(map a Z)),
-  ((card x) = 0%Z) -> (x = (empty_bag:(map a Z))).
-
-Definition array (a:Type) := (map Z a).
-
-Parameter elements: forall (a:Type), (map Z a) -> Z -> Z  -> (map a Z).
-
-Implicit Arguments elements.
-
-Axiom Elements_empty : forall (a:Type), forall (a1:(map Z a)) (i:Z) (j:Z),
-  (j <= i)%Z -> ((elements a1 i j) = (empty_bag:(map a Z))).
-
-Axiom Elements_singleton : forall (a:Type), forall (a1:(map Z a)) (i:Z)
-  (j:Z), (j = (i + 1%Z)%Z) -> ((elements a1 i j) = (set (empty_bag:(map a Z))
-  (get a1 i) 1%Z)).
-
-Axiom Elements_union : forall (a:Type), forall (a1:(map Z a)) (i:Z) (j:Z)
-  (k:Z), ((i <= j)%Z /\ (j <= k)%Z) -> ((elements a1 i
-  k) = (union (elements a1 i j) (elements a1 j k))).
-
-Axiom Elements_union1 : forall (a:Type), forall (a1:(map Z a)) (i:Z) (j:Z),
-  (i <  j)%Z -> ((elements a1 i j) = (add (get a1 i) (elements a1 (i + 1%Z)%Z
-  j))).
-
 (* YOU MAY EDIT THE CONTEXT BELOW *)
 
 (* DO NOT EDIT BELOW *)
 
-Theorem Elements_union2 : forall (a:Type), forall (a1:(map Z a)) (i:Z) (j:Z),
-  (i <  j)%Z -> ((elements a1 i j) = (add (get a1 (j - 1%Z)%Z) (elements a1 i
-  (j - 1%Z)%Z))).
+Theorem bag_simpl_left : forall (a:Type), forall (a1:(map a Z)) (b:(map a Z))
+  (c:(map a Z)), ((union a1 b) = (union a1 c)) -> (b = c).
 (* YOU MAY EDIT THE PROOF BELOW *)
-intros X a i j Hij.
-rewrite Elements_union with (j:= (j-1)%Z); 
-  auto with zarith.
-unfold add.
-pattern (elements a (j - 1) j); 
-  rewrite Elements_singleton; auto with zarith.
-rewrite Union_comm; auto.
+intros X a b c H_union.
+apply bag_extensionality; intro x.
+assert (h: (get (union a b) x) =  (get (union a c) x))
+  by (rewrite H_union; auto).
+do 2 rewrite occ_union in h; auto with zarith.
 Qed.
 (* DO NOT EDIT BELOW *)
 

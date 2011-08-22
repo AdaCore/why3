@@ -124,21 +124,37 @@ Axiom Elements_union1 : forall (a:Type), forall (a1:(map Z a)) (i:Z) (j:Z),
   (i <  j)%Z -> ((elements a1 i j) = (add (get a1 i) (elements a1 (i + 1%Z)%Z
   j))).
 
+Axiom Elements_union2 : forall (a:Type), forall (a1:(map Z a)) (i:Z) (j:Z),
+  (i <  j)%Z -> ((elements a1 i j) = (add (get a1 (j - 1%Z)%Z) (elements a1 i
+  (j - 1%Z)%Z))).
+
 (* YOU MAY EDIT THE CONTEXT BELOW *)
 
 (* DO NOT EDIT BELOW *)
 
-Theorem Elements_union2 : forall (a:Type), forall (a1:(map Z a)) (i:Z) (j:Z),
-  (i <  j)%Z -> ((elements a1 i j) = (add (get a1 (j - 1%Z)%Z) (elements a1 i
-  (j - 1%Z)%Z))).
+Theorem Elements_set_outside : forall (a:Type), forall (a1:(map Z a)) (i:Z)
+  (j:Z), (i <= j)%Z -> forall (k:Z), ((k <  i)%Z \/ (j <= k)%Z) ->
+  forall (e:a), ((elements (set a1 k e) i j) = (elements a1 i j)).
 (* YOU MAY EDIT THE PROOF BELOW *)
-intros X a i j Hij.
-rewrite Elements_union with (j:= (j-1)%Z); 
-  auto with zarith.
-unfold add.
-pattern (elements a (j - 1) j); 
-  rewrite Elements_singleton; auto with zarith.
-rewrite Union_comm; auto.
+intros X a i.
+apply 
+ (Zlt_lower_bound_rec (fun j => forall k : Z,
+   k < i \/ j <= k -> forall e : X, 
+    elements (set a k e) i j = elements a i j) i)%Z.
+intros j H_induc H_j k H_k e.
+assert (h: (i=j \/ i<j)%Z) by omega.
+destruct h.
+ (* case i=j *)
+ subst.
+ do 2 (rewrite Elements_empty; auto).
+ (*case i < j*)
+ generalize (H_induc (j-1))%Z.
+ clear H_induc; intro H_induc.
+ rewrite Elements_union2; auto with *.
+ pattern (elements a i j); rewrite Elements_union2; auto with *.
+ rewrite Select_neq; auto with zarith.
+ apply f_equal2; auto.
+ apply H_induc;intuition.
 Qed.
 (* DO NOT EDIT BELOW *)
 

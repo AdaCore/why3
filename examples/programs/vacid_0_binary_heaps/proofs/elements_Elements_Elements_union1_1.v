@@ -109,21 +109,26 @@ Parameter elements: forall (a:Type), (map Z a) -> Z -> Z  -> (map a Z).
 
 Implicit Arguments elements.
 
-Axiom Elements_empty : forall (a:(map Z Z)) (i:Z) (j:Z), (j <= i)%Z ->
-  ((elements a i j) = (empty_bag:(map Z Z))).
+Axiom Elements_empty : forall (a:Type), forall (a1:(map Z a)) (i:Z) (j:Z),
+  (j <= i)%Z -> ((elements a1 i j) = (empty_bag:(map a Z))).
 
-Axiom Elements_singleton : forall (a:(map Z Z)) (i:Z) (j:Z),
-  (j = (i + 1%Z)%Z) -> ((elements a i j) = (set (empty_bag:(map Z Z)) (get a
-  i) 1%Z)).
+Axiom Elements_singleton : forall (a:Type), forall (a1:(map Z a)) (i:Z)
+  (j:Z), (j = (i + 1%Z)%Z) -> ((elements a1 i j) = (set (empty_bag:(map a Z))
+  (get a1 i) 1%Z)).
 
-Axiom Elements_union : forall (a:(map Z Z)) (i:Z) (j:Z) (k:Z), ((i <= j)%Z /\
-  (j <= k)%Z) -> ((elements a i k) = (union (elements a i j) (elements a j
-  k))).
+Axiom Elements_union : forall (a:Type), forall (a1:(map Z a)) (i:Z) (j:Z)
+  (k:Z), ((i <= j)%Z /\ (j <= k)%Z) -> ((elements a1 i
+  k) = (union (elements a1 i j) (elements a1 j k))).
 
-Theorem Elements_union1 : forall (a:(map Z Z)) (i:Z) (j:Z), (i <  j)%Z ->
-  ((elements a i j) = (add (get a i) (elements a (i + 1%Z)%Z j))).
+(* YOU MAY EDIT THE CONTEXT BELOW *)
+
+(* DO NOT EDIT BELOW *)
+
+Theorem Elements_union1 : forall (a:Type), forall (a1:(map Z a)) (i:Z) (j:Z),
+  (i <  j)%Z -> ((elements a1 i j) = (add (get a1 i) (elements a1 (i + 1%Z)%Z
+  j))).
 (* YOU MAY EDIT THE PROOF BELOW *)
-intros.
+intros X a i j Hij.
 unfold add.
 pattern (elements a i j); 
   rewrite Elements_union with (j:= (i+1)%Z); 

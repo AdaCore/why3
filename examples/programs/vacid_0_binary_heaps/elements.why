@@ -10,37 +10,42 @@ type array 'a = A.map int 'a
 
 function elements (a:array 'a) (i j:int) : bag 'a
 
-axiom Elements_empty : forall a:array int, i j:int.
+axiom Elements_empty : forall a:array 'a, i j:int.
      i >= j -> (elements a i j) = empty_bag
 
-axiom Elements_singleton : forall a:array int, i j:int.
+axiom Elements_singleton : forall a:array 'a, i j:int.
      j = i + 1 ->
        (elements a i j) = (singleton (A.get a i))
 
-axiom Elements_union : forall a:array int, i j k:int.
+axiom Elements_union : forall a:array 'a, i j k:int.
      i <= j <= k  ->
       (elements a i k) = (union (elements a i j) (elements a j k))
 
-lemma Elements_union1 : forall a:array int, i j :int.
+lemma Elements_union1 : forall a:array 'a, i j :int.
       i < j ->
       (elements a i j) = (add (A.get a i) (elements a (i+1) j))
 
-lemma Elements_union2 : forall a:array int, i j :int.
+lemma Elements_union2 : forall a:array 'a, i j :int.
        i < j ->
        (elements a i j) = (add (A.get a (j-1)) (elements a i (j-1)))
 
-lemma Elements_set : forall a:array int, i j:int.
+lemma Elements_set_outside : forall a:array 'a, i j:int.
        i <= j -> forall k : int. (k < i || k >= j) ->
-       forall e:int. (elements (A.set a k e) i j) = (elements a i j)
+       forall e:'a. (elements (A.set a k e) i j) = (elements a i j)
 
-lemma Elements_union3 : forall a:array int, i j k:int.
+lemma Elements_union3 : forall a:array 'a, i j:int, e:'a.
        i <= j ->
-       (add k (elements a i j)) = (elements (A.set a j k) i (j+1))
+       (add e (elements a i j)) = (elements (A.set a j e) i (j+1))
 
-lemma Elements_set2 : forall a:array int, i j k:int.
+lemma Elements_set2 : forall a:array 'a, i j k:int.
        i <= k < j ->
-       forall e:int. (add (A.get a k) (elements (A.set a k e) i j)) =
+       forall e:'a. (add (A.get a k) (elements (A.set a k e) i j)) =
        	      	     (add e (elements a i j))
+
+lemma Elements_set_inside : forall a:array 'a, i j n: int, e:'a, b:bag 'a.
+       i <= j < n ->
+       (elements a i n) = add (A.get a j) b ->
+       (elements (A.set a j e) i n) = add e b
 
 end
 

@@ -1051,7 +1051,9 @@ let associate_subgoals gname old_goals new_goals =
      Phase 3: we now associate remaining new goals to the remaining
      old goals in the same order as original
   *)
+(*
   eprintf "[Merge] phase 3: associate remaining goals@.";
+*)
   let remaining_old_goals =
     Util.Mstr.fold
       (fun _ g acc -> (g.goal_name,g)::acc)

@@ -109,44 +109,51 @@ Parameter elements: forall (a:Type), (map Z a) -> Z -> Z  -> (map a Z).
 
 Implicit Arguments elements.
 
-Axiom Elements_empty : forall (a:(map Z Z)) (i:Z) (j:Z), (j <= i)%Z ->
-  ((elements a i j) = (empty_bag:(map Z Z))).
+Axiom Elements_empty : forall (a:Type), forall (a1:(map Z a)) (i:Z) (j:Z),
+  (j <= i)%Z -> ((elements a1 i j) = (empty_bag:(map a Z))).
 
-Axiom Elements_singleton : forall (a:(map Z Z)) (i:Z) (j:Z),
-  (j = (i + 1%Z)%Z) -> ((elements a i j) = (set (empty_bag:(map Z Z)) (get a
-  i) 1%Z)).
+Axiom Elements_singleton : forall (a:Type), forall (a1:(map Z a)) (i:Z)
+  (j:Z), (j = (i + 1%Z)%Z) -> ((elements a1 i j) = (set (empty_bag:(map a Z))
+  (get a1 i) 1%Z)).
 
-Axiom Elements_union : forall (a:(map Z Z)) (i:Z) (j:Z) (k:Z), ((i <= j)%Z /\
-  (j <= k)%Z) -> ((elements a i k) = (union (elements a i j) (elements a j
-  k))).
+Axiom Elements_union : forall (a:Type), forall (a1:(map Z a)) (i:Z) (j:Z)
+  (k:Z), ((i <= j)%Z /\ (j <= k)%Z) -> ((elements a1 i
+  k) = (union (elements a1 i j) (elements a1 j k))).
 
-Axiom Elements_union1 : forall (a:(map Z Z)) (i:Z) (j:Z), (i <  j)%Z ->
-  ((elements a i j) = (add (get a i) (elements a (i + 1%Z)%Z j))).
+Axiom Elements_union1 : forall (a:Type), forall (a1:(map Z a)) (i:Z) (j:Z),
+  (i <  j)%Z -> ((elements a1 i j) = (add (get a1 i) (elements a1 (i + 1%Z)%Z
+  j))).
 
-Axiom Elements_union2 : forall (a:(map Z Z)) (i:Z) (j:Z), (i <  j)%Z ->
-  ((elements a i j) = (add (get a (j - 1%Z)%Z) (elements a i (j - 1%Z)%Z))).
+Axiom Elements_union2 : forall (a:Type), forall (a1:(map Z a)) (i:Z) (j:Z),
+  (i <  j)%Z -> ((elements a1 i j) = (add (get a1 (j - 1%Z)%Z) (elements a1 i
+  (j - 1%Z)%Z))).
 
-Axiom Elements_set : forall (a:(map Z Z)) (i:Z) (j:Z), (i <= j)%Z ->
-  forall (k:Z), ((k <  i)%Z \/ (j <= k)%Z) -> forall (e:Z), ((elements (set a
-  k e) i j) = (elements a i j)).
+Axiom Elements_set_outside : forall (a:Type), forall (a1:(map Z a)) (i:Z)
+  (j:Z), (i <= j)%Z -> forall (k:Z), ((k <  i)%Z \/ (j <= k)%Z) ->
+  forall (e:a), ((elements (set a1 k e) i j) = (elements a1 i j)).
 
-Axiom Elements_union3 : forall (a:(map Z Z)) (i:Z) (j:Z) (k:Z), (i <= j)%Z ->
-  ((add k (elements a i j)) = (elements (set a j k) i (j + 1%Z)%Z)).
+Axiom Elements_union3 : forall (a:Type), forall (a1:(map Z a)) (i:Z) (j:Z)
+  (e:a), (i <= j)%Z -> ((add e (elements a1 i j)) = (elements (set a1 j e) i
+  (j + 1%Z)%Z)).
 
-Theorem Elements_set2 : forall (a:(map Z Z)) (i:Z) (j:Z) (k:Z),
-  ((i <= k)%Z /\ (k <  j)%Z) -> forall (e:Z), ((add (get a k)
-  (elements (set a k e) i j)) = (add e (elements a i j))).
+(* YOU MAY EDIT THE CONTEXT BELOW *)
+
+(* DO NOT EDIT BELOW *)
+
+Theorem Elements_set2 : forall (a:Type), forall (a1:(map Z a)) (i:Z) (j:Z)
+  (k:Z), ((i <= k)%Z /\ (k <  j)%Z) -> forall (e:a), ((add (get a1 k)
+  (elements (set a1 k e) i j)) = (add e (elements a1 i j))).
 (* YOU MAY EDIT THE PROOF BELOW *)
-intros.
+intros A a i j k Hijk e.
 pattern (elements (set a k e) i j); 
   rewrite Elements_union with (j := k); auto with zarith.
 pattern (elements (set a k e) i k); 
-  rewrite Elements_set; auto with zarith.
+  rewrite Elements_set_outside; auto with zarith.
 pattern (elements (set a k e) k j); 
   rewrite Elements_union1; auto with zarith.
 pattern (get (set a k e) k); rewrite Select_eq; auto.
 pattern (elements (set a k e) (k + 1) j); 
-  rewrite Elements_set; auto with zarith.
+  rewrite Elements_set_outside; auto with zarith.
 unfold add.
 pattern (union (elements a i k) 
         (union (set empty_bag e 1%Z) 
