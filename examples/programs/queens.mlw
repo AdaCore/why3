@@ -11,17 +11,13 @@ theory S "finite sets of with succ and pred operations"
 
   function succ (set int) : set int
 
-  axiom succ_def_1:
-    forall s: set int, i: int. mem (i-1) s -> mem i (succ s)
-  axiom succ_def_2:
-    forall s: set int, i: int. mem i (succ s) -> i >= 1 -> mem (i-1) s
+  axiom succ_def:
+    forall s: set int, i: int. mem i (succ s) <-> i >= 1 /\ mem (i-1) s
 
   function pred (set int) : set int
 
-  axiom pred_def_1:
-    forall s: set int, i: int. mem (i+1) s -> i >= 0 -> mem i (pred s)
-  axiom pred_def__2:
-    forall s: set int, i: int. mem i (pred s) -> mem (i+1) s
+  axiom pred_def:
+    forall s: set int, i: int. mem i (pred s) <-> i >= 0 /\ mem (i+1) s
 
 end
 
@@ -46,7 +42,7 @@ theory Solution
     forall i: int. 0 <= i < k ->
       0 <= s[i] < n /\
       (forall j: int. 0 <= j < i -> s[i]      <> s[j] /\
-                                    s[i]-s[j] <> i-j /\
+                                    s[i]-s[j] <> i-j  /\
                                     s[i]-s[j] <> j-i)
 
   predicate solution (s: solution) = partial_solution n s
@@ -89,13 +85,13 @@ module NQueensSets
       !sol[old !s] = !col }
 
   let rec t3 (a b c : set int) variant { cardinal a } =
-    { 0 <= !k /\ !k + cardinal a = n /\
+    { 0 <= !k /\ !k + cardinal a = n /\ !s >= 0 /\
       "pre_a" (forall i: int. mem i a <->
-              (0<=i<n /\ forall j: int. 0 <= j < !k -> i <> !col[j])) /\
-      "pre_b" (forall i: int. i>=0 -> mem i b <->
-              (exists j: int. 0 <= j < !k /\ !col[j] = i + j - !k)) /\
-      "pre_c" (forall i: int. i>=0 -> mem i c <->
-              (exists j: int. 0 <= j < !k /\ !col[j] = i + !k - j)) /\
+              (0<=i<n /\ forall j: int. 0 <= j < !k ->  !col[j] <> i)) /\
+      "pre_b" (forall i: int. i>=0 -> not (mem i b) <->
+              (forall j: int. 0 <= j < !k -> !col[j] <> i + j - !k)) /\
+      "pre_c" (forall i: int. i>=0 -> not (mem i c) <->
+              (forall j: int. 0 <= j < !k -> !col[j] <> i + !k - j)) /\
      partial_solution !k !col }
     if not (is_empty a) then begin
       let e = ref (diff (diff a b) c) in
@@ -106,14 +102,15 @@ module NQueensSets
           subset !e (at !e 'L) /\
           partial_solution !k !col /\
           sorted !sol (at !s 'L) !s /\
+          (forall i j: int. mem i (diff (at !e 'L) !e) -> mem j !e -> i < j) /\
           (forall t: solution.
-            (solution t /\ eq_prefix !col t !k /\
-             exists di: int. mem di (diff (at !e 'L) !e) /\ t[!k] = di)
-            <->
-            (exists i: int. (at !s 'L) <= i < !s /\ eq_sol t !sol[i])) /\
+           (solution t /\ eq_prefix !col t !k /\ mem t[!k] (diff (at !e 'L) !e))
+           <->
+           (exists i: int. (at !s 'L) <= i < !s /\ eq_sol t !sol[i])) /\
           (* assigns *)
           eq_prefix (at !col 'L) !col (at !k 'L) /\
           eq_prefix (at !sol 'L) !sol (at !s 'L) }
+        variant { cardinal !e }
         let d = min_elt !e in
         (* ghost *) col := !col[!k <- d];
         (* ghost *) incr k;
@@ -198,6 +195,8 @@ theory Bits "the 1-bits of an integer, as a set of integers"
 
 end
 
+(****
+
 module NQueens
 
   use import Bits
@@ -270,6 +269,9 @@ module NQueens
           subset (bits !e) (at (bits !e) 'L) /\
           partial_solution !k !col /\
           sorted !sol (at !s 'L) !s /\
+          (forall i j: int.
+             mem i (diff (at (bits !e) 'L) (bits !e)) -> mem j (bits !e) ->
+             i < j) /\
           (forall t: solution.
             (solution t /\
              exists di: int. mem di (diff (at (bits !e) 'L) (bits !e)) /\
@@ -311,6 +313,8 @@ module NQueens
         solution t <-> (exists i: int. 0 <= i < result /\ eq_sol t !sol[i]) }
 
 end
+
+****)
 
 (*
 Local Variables:

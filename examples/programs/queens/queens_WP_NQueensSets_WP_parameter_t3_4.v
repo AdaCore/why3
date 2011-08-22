@@ -246,57 +246,23 @@ Theorem WP_parameter_t3 : forall (a:(set Z)), forall (b:(set Z)),
   k2) /\ (mem (get t k2) (diff (diff (diff a b) c) e)))) <-> exists i:Z,
   ((s1 <= i)%Z /\ (i <  s2)%Z) /\ (eq_prefix t (get sol2 i) (n ))) /\
   ((eq_prefix col1 col2 k1) /\ (eq_prefix sol1 sol2 s1))))))))) ->
-  ((is_empty e) -> forall (t:(map Z Z)), ((partial_solution (n ) t) /\
-  (eq_prefix col2 t k2)) -> exists i:Z, ((s1 <= i)%Z /\ (i <  s2)%Z) /\
-  (eq_prefix t (get sol2 i) (n )))).
+  ((~ (is_empty e)) -> forall (col3:(map Z Z)), (col3 = (set1 col2 k2
+  (min_elt e))) -> forall (k3:Z), (k3 = (k2 + 1%Z)%Z) -> forall (i:Z),
+  (0%Z <= i)%Z -> ((forall (j:Z), ((0%Z <= j)%Z /\ (j <  k3)%Z) ->
+  ~ ((get col3 j) = ((i + k3)%Z - j)%Z)) -> ~ (mem i (pred (add (min_elt e)
+  c)))))).
 (* YOU MAY EDIT THE PROOF BELOW *)
 intuition.
-subst k2. rename k1 into k.
-assert (k < n)%Z.
-generalize (cardinal_nonneg _ a).
-generalize (cardinal_empty _ a).
-intuition.
-assert (case: (cardinal a = 0 \/ cardinal a > 0)%Z) by omega. destruct case.
-absurd (is_empty a); auto.
-omega.
-destruct (H15 t) as (h1,_).
-apply h1; intuition.
-destruct (diff_def1 _ (diff (diff a b) c) e (get t k)) as (_, h); apply h; clear h; split.
-destruct (diff_def1 _ (diff a b) c (get t k)) as (_, h); apply h; clear h; split.
-destruct (diff_def1 _ a b (get t k)) as (_, h); apply h; clear h; split.
-(* mem .. a *)
-destruct (H3 (get t k)) as (_,h); apply h; clear h.
-split.
-destruct (H19 k) as (h,_).
-omega.
-assumption.
-intros j hj.
-rewrite H16.
-rewrite H20.
-destruct (H19 k) as (_,h). omega.
-destruct (h j); intuition.
-assumption.
-assumption.
-(* not (mem ... b) *)
-destruct (H4 (get t k)) as (_,h).
-destruct (H19 k); omega.
-red; intro h1; apply h; clear h; auto.
-intros j hj.
-rewrite H16; try omega.
-rewrite H20; try omega.
-destruct (H19 k); intuition.
-destruct (H22 j); intuition.
-(* not (mem ... c) *)
-destruct (H5 (get t k)) as (_,h).
-destruct (H19 k); omega.
-red; intro h1; apply h; clear h; auto.
-intros j hj.
-rewrite H16; try omega.
-rewrite H20; try omega.
-destruct (H19 k); intuition.
-destruct (H22 j); intuition.
-(* not (mem ... e) *)
-apply H8.
+generalize (pred_def (add (min_elt e) c) i); intuition.
+clear H23.
+generalize (add_def1 _ (i+1)%Z (min_elt e) c); intuition.
+apply H21 with k2; try omega.
+subst col3; rewrite Select_eq; omega.
+destruct (H5 (i+1)%Z) as (_,h); try omega.
+apply h; intuition.
+apply (H21 j); try omega.
+subst col3; rewrite Select_neq; try omega.
+rewrite <- H16; try omega.
 Qed.
 (* DO NOT EDIT BELOW *)
 

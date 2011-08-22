@@ -246,57 +246,49 @@ Theorem WP_parameter_t3 : forall (a:(set Z)), forall (b:(set Z)),
   k2) /\ (mem (get t k2) (diff (diff (diff a b) c) e)))) <-> exists i:Z,
   ((s1 <= i)%Z /\ (i <  s2)%Z) /\ (eq_prefix t (get sol2 i) (n ))) /\
   ((eq_prefix col1 col2 k1) /\ (eq_prefix sol1 sol2 s1))))))))) ->
-  ((is_empty e) -> forall (t:(map Z Z)), ((partial_solution (n ) t) /\
-  (eq_prefix col2 t k2)) -> exists i:Z, ((s1 <= i)%Z /\ (i <  s2)%Z) /\
-  (eq_prefix t (get sol2 i) (n )))).
+  ((~ (is_empty e)) -> forall (col3:(map Z Z)), (col3 = (set1 col2 k2
+  (min_elt e))) -> forall (k3:Z), (k3 = (k2 + 1%Z)%Z) ->
+  ((((0%Z <= (cardinal a))%Z /\ ((cardinal (remove (min_elt e)
+  a)) <  (cardinal a))%Z) /\ ((0%Z <= k3)%Z /\
+  (((k3 + (cardinal (remove (min_elt e) a)))%Z = (n )) /\ ((0%Z <= s2)%Z /\
+  ((forall (i:Z), (mem i (remove (min_elt e) a)) <-> (((0%Z <= i)%Z /\
+  (i <  (n ))%Z) /\ forall (j:Z), ((0%Z <= j)%Z /\ (j <  k3)%Z) ->
+  ~ ((get col3 j) = i))) /\ ((forall (i:Z), (0%Z <= i)%Z -> ((~ (mem i
+  (succ (add (min_elt e) b)))) <-> forall (j:Z), ((0%Z <= j)%Z /\
+  (j <  k3)%Z) -> ~ ((get col3 j) = ((i + j)%Z - k3)%Z))) /\ ((forall (i:Z),
+  (0%Z <= i)%Z -> ((~ (mem i (pred (add (min_elt e) c)))) <-> forall (j:Z),
+  ((0%Z <= j)%Z /\ (j <  k3)%Z) -> ~ ((get col3 j) = ((i + k3)%Z - j)%Z))) /\
+  (partial_solution k3 col3)))))))) -> forall (s3:Z), forall (sol3:(map Z
+  (map Z Z))), forall (k4:Z), forall (col4:(map Z Z)), forall (result:Z),
+  (((result = (s3 - s2)%Z) /\ (0%Z <= (s3 - s2)%Z)%Z) /\ ((k4 = k3) /\
+  ((sorted sol3 s2 s3) /\ ((forall (t:(map Z Z)), ((partial_solution (n )
+  t) /\ (eq_prefix col4 t k4)) <-> exists i:Z, ((s2 <= i)%Z /\
+  (i <  s3)%Z) /\ (eq_prefix t (get sol3 i) (n ))) /\ ((eq_prefix col3 col4
+  k4) /\ (eq_prefix sol2 sol3 s2)))))) -> forall (f1:Z),
+  (f1 = (f + result)%Z) -> forall (k5:Z), (k5 = (k4 - 1%Z)%Z) ->
+  forall (e1:(set Z)), (e1 = (remove (min_elt e) e)) -> forall (i:Z) (j:Z),
+  (mem i (diff (diff (diff a b) c) e1)) -> ((mem j e1) -> (i <  j)%Z)))).
 (* YOU MAY EDIT THE PROOF BELOW *)
+intros a b c. generalize (diff (diff a b) c) as abc.
 intuition.
-subst k2. rename k1 into k.
-assert (k < n)%Z.
-generalize (cardinal_nonneg _ a).
-generalize (cardinal_empty _ a).
-intuition.
-assert (case: (cardinal a = 0 \/ cardinal a > 0)%Z) by omega. destruct case.
-absurd (is_empty a); auto.
+clear H3 H4 H5 H33 H15 H25 H26 H27.
+assert (not (mem i e1)).
+generalize (diff_def1 _ abc e1 i); intuition.
+subst e1.
+generalize (remove_def1 _ i (min_elt e) e).
+intros (h1, h2).
+assert (case: i = min_elt e \/ i <> min_elt e) by omega. destruct case.
+subst i.
+assert (min_elt e <= j)%Z.
+apply min_elt_def2; auto.
+generalize (remove_def1 _ j (min_elt e) e). intuition.
+assert (j <> min_elt e)%Z.
+generalize (remove_def1 _ j (min_elt e) e). intuition.
 omega.
-destruct (H15 t) as (h1,_).
-apply h1; intuition.
-destruct (diff_def1 _ (diff (diff a b) c) e (get t k)) as (_, h); apply h; clear h; split.
-destruct (diff_def1 _ (diff a b) c (get t k)) as (_, h); apply h; clear h; split.
-destruct (diff_def1 _ a b (get t k)) as (_, h); apply h; clear h; split.
-(* mem .. a *)
-destruct (H3 (get t k)) as (_,h); apply h; clear h.
-split.
-destruct (H19 k) as (h,_).
-omega.
-assumption.
-intros j hj.
-rewrite H16.
-rewrite H20.
-destruct (H19 k) as (_,h). omega.
-destruct (h j); intuition.
-assumption.
-assumption.
-(* not (mem ... b) *)
-destruct (H4 (get t k)) as (_,h).
-destruct (H19 k); omega.
-red; intro h1; apply h; clear h; auto.
-intros j hj.
-rewrite H16; try omega.
-rewrite H20; try omega.
-destruct (H19 k); intuition.
-destruct (H22 j); intuition.
-(* not (mem ... c) *)
-destruct (H5 (get t k)) as (_,h).
-destruct (H19 k); omega.
-red; intro h1; apply h; clear h; auto.
-intros j hj.
-rewrite H16; try omega.
-rewrite H20; try omega.
-destruct (H19 k); intuition.
-destruct (H22 j); intuition.
-(* not (mem ... e) *)
-apply H8.
+apply H14.
+generalize (diff_def1 _ abc e i); intuition.
+generalize (diff_def1 _ abc (remove (min_elt e) e) i); intuition.
+generalize (remove_def1 _ j (min_elt e) e). intuition.
 Qed.
 (* DO NOT EDIT BELOW *)
 
