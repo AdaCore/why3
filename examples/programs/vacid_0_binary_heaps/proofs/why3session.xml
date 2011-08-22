@@ -4,12 +4,8 @@
  <prover id="alt-ergo" name="Alt-Ergo" version="0.93"/>
  <prover id="coq" name="Coq" version="8.2pl1"/>
  <prover id="cvc3" name="CVC3" version="2.2"/>
- <prover id="eprover" name="Eprover" version="1.0-004 Temi"/>
  <prover id="gappa" name="Gappa" version="0.13.0"/>
  <prover id="simplify" name="Simplify" version="1.5.4"/>
- <prover id="vampire" name="Vampire" version="0.6"/>
- <prover id="verit" name="veriT" version="200907"/>
- <prover id="yices" name="Yices" version="1.0.11"/>
  <prover id="z3" name="Z3" version="2.19"/>
  <file name="../bag.why" verified="true" expanded="false">
   <theory name="Bag" verified="true" expanded="false">
@@ -463,8 +459,8 @@
      <result status="valid" time="0.74"/>
     </proof>
    </goal>
-   <goal name="WP_parameter create" expl="normal postcondition" sum="44a2c5f0459dd60b75690043be59a32d" proved="false" expanded="false" shape="ainfix =aelementsaconstc0c0c0aempty_bagAais_heapaTuple2aconstc0c0">
-    <proof prover="alt-ergo" timelimit="5" edited="heap_implem-WP_Implementation-WP_parameter_create_1.why" obsolete="true">
+   <goal name="WP_parameter create" expl="normal postcondition" sum="44a2c5f0459dd60b75690043be59a32d" proved="true" expanded="false" shape="ainfix =aelementsaconstc0c0c0aempty_bagAais_heapaTuple2aconstc0c0">
+    <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
      <result status="valid" time="0.04"/>
     </proof>
    </goal>
@@ -670,17 +666,11 @@
        <result status="valid" time="0.03"/>
       </proof>
      </goal>
-     <goal name="WP_parameter extractMin.6" expl="assertion" sum="fa6e9786e2cf1c858436efe3c91328a3" proved="false" expanded="false" shape="ainfix =aelementsV0c0V1aaddagetV0c0aelementsV4c0ainfix -V1c1Iais_heap_arrayV4c0ainfix -V1c1Iais_heap_arrayV4c0ainfix -V1c1Iainfix >V2c0Iainfix =V4asetV3V2agetV0ainfix -V1c1FIainfix <V2ainfix -V1c1Iainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1Iainfix <V2ainfix -V1c1Iainfix <agetV3aparentV2agetV0ainfix -V1c1Iainfix >V2c0Aainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <V2ainfix -V1c1Aainfix <c0V2Aainfix =aelementsV0c0V1aaddagetV0ainfix -V1c1aelementsV0c0ainfix -V1c1Aainfix =V0V3Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix >=V2c0FFIainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
-      <proof prover="alt-ergo" timelimit="5" edited="" obsolete="false">
-       <result status="timeout" time="5.21"/>
-      </proof>
+     <goal name="WP_parameter extractMin.6" expl="assertion" sum="fa6e9786e2cf1c858436efe3c91328a3" proved="false" expanded="true" shape="ainfix =aelementsV0c0V1aaddagetV0c0aelementsV4c0ainfix -V1c1Iais_heap_arrayV4c0ainfix -V1c1Iais_heap_arrayV4c0ainfix -V1c1Iainfix >V2c0Iainfix =V4asetV3V2agetV0ainfix -V1c1FIainfix <V2ainfix -V1c1Iainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1Iainfix <V2ainfix -V1c1Iainfix <agetV3aparentV2agetV0ainfix -V1c1Iainfix >V2c0Aainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <V2ainfix -V1c1Aainfix <c0V2Aainfix =aelementsV0c0V1aaddagetV0ainfix -V1c1aelementsV0c0ainfix -V1c1Aainfix =V0V3Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix >=V2c0FFIainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
      </goal>
-     <goal name="WP_parameter extractMin.7" expl="normal postcondition" sum="3df72f28aff592c7f71b53b9e833d16e" proved="false" expanded="false" shape="ainfix =aelementsV0c0V1aaddagetV0c0aelementsV5c0V6Aainfix =agetV0c0amin_bagaelementsV0c0V1Aais_heapaTuple2V5V6Iainfix =aTuple2V5V6aTuple2V4ainfix -V1c1FIainfix =aelementsV0c0V1aaddagetV0c0aelementsV4c0ainfix -V1c1Iais_heap_arrayV4c0ainfix -V1c1Iais_heap_arrayV4c0ainfix -V1c1Iainfix >V2c0Iainfix =V4asetV3V2agetV0ainfix -V1c1FIainfix <V2ainfix -V1c1Iainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1Iainfix <V2ainfix -V1c1Iainfix <agetV3aparentV2agetV0ainfix -V1c1Iainfix >V2c0Aainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <V2ainfix -V1c1Aainfix <c0V2Aainfix =aelementsV0c0V1aaddagetV0ainfix -V1c1aelementsV0c0ainfix -V1c1Aainfix =V0V3Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix >=V2c0FFIainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
-      <proof prover="alt-ergo" timelimit="47" edited="" obsolete="false">
-       <result status="timeout" time="5.10"/>
-      </proof>
-      <proof prover="cvc3" timelimit="5" edited="" obsolete="false"><undone/>
-       
+     <goal name="WP_parameter extractMin.7" expl="normal postcondition" sum="3df72f28aff592c7f71b53b9e833d16e" proved="true" expanded="false" shape="ainfix =aelementsV0c0V1aaddagetV0c0aelementsV5c0V6Aainfix =agetV0c0amin_bagaelementsV0c0V1Aais_heapaTuple2V5V6Iainfix =aTuple2V5V6aTuple2V4ainfix -V1c1FIainfix =aelementsV0c0V1aaddagetV0c0aelementsV4c0ainfix -V1c1Iais_heap_arrayV4c0ainfix -V1c1Iais_heap_arrayV4c0ainfix -V1c1Iainfix >V2c0Iainfix =V4asetV3V2agetV0ainfix -V1c1FIainfix <V2ainfix -V1c1Iainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1Iainfix <V2ainfix -V1c1Iainfix <agetV3aparentV2agetV0ainfix -V1c1Iainfix >V2c0Aainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <V2ainfix -V1c1Aainfix <c0V2Aainfix =aelementsV0c0V1aaddagetV0ainfix -V1c1aelementsV0c0ainfix -V1c1Aainfix =V0V3Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix >=V2c0FFIainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
+      <proof prover="cvc3" timelimit="5" edited="" obsolete="false">
+       <result status="valid" time="0.16"/>
       </proof>
      </goal>
      <goal name="WP_parameter extractMin.8" expl="normal postcondition" sum="c05686e3522d061cdd0ffe19e560c9c4" proved="true" expanded="false" shape="ainfix =aelementsV0c0V1aaddagetV0c0aelementsV4c0V5Aainfix =agetV0c0amin_bagaelementsV0c0V1Aais_heapaTuple2V4V5Iainfix =aTuple2V4V5aTuple2V3ainfix -V1c1FIainfix <V2ainfix -V1c1NIainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1Iainfix <V2ainfix -V1c1Iainfix <agetV3aparentV2agetV0ainfix -V1c1Iainfix >V2c0Aainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <V2ainfix -V1c1Aainfix <c0V2Aainfix =aelementsV0c0V1aaddagetV0ainfix -V1c1aelementsV0c0ainfix -V1c1Aainfix =V0V3Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix >=V2c0FFIainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
@@ -688,10 +678,7 @@
        <result status="valid" time="0.04"/>
       </proof>
      </goal>
-     <goal name="WP_parameter extractMin.9" expl="assertion" sum="71a6d6a4d150ae980f9debdf41af8258" proved="false" expanded="false" shape="ainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <=agetV0ainfix -V1c1agetV3V4Iainfix =V4ainfix +ainfix *c2V2c2FIainfix >agetV3ainfix +ainfix *c2V2c1agetV3ainfix +ainfix *c2V2c2Iainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <agetV3aparentV2agetV0ainfix -V1c1Iainfix >V2c0Aainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <V2ainfix -V1c1Aainfix <c0V2Aainfix =aelementsV0c0V1aaddagetV0ainfix -V1c1aelementsV0c0ainfix -V1c1Aainfix =V0V3Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix >=V2c0FFIainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
-      <proof prover="alt-ergo" timelimit="5" edited="" obsolete="false">
-       <result status="timeout" time="5.02"/>
-      </proof>
+     <goal name="WP_parameter extractMin.9" expl="assertion" sum="71a6d6a4d150ae980f9debdf41af8258" proved="false" expanded="true" shape="ainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <=agetV0ainfix -V1c1agetV3V4Iainfix =V4ainfix +ainfix *c2V2c2FIainfix >agetV3ainfix +ainfix *c2V2c1agetV3ainfix +ainfix *c2V2c2Iainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <agetV3aparentV2agetV0ainfix -V1c1Iainfix >V2c0Aainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <V2ainfix -V1c1Aainfix <c0V2Aainfix =aelementsV0c0V1aaddagetV0ainfix -V1c1aelementsV0c0ainfix -V1c1Aainfix =V0V3Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix >=V2c0FFIainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
      </goal>
      <goal name="WP_parameter extractMin.10" expl="assertion" sum="2dd91835cc5601331bb4dd294666e61a" proved="true" expanded="false" shape="ais_heap_arrayV5c0ainfix -V1c1Iainfix >V2c0Iainfix =V5asetV3V2agetV0ainfix -V1c1FIainfix <V2ainfix -V1c1Iainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <=agetV0ainfix -V1c1agetV3V4Iainfix =V4ainfix +ainfix *c2V2c2FIainfix >agetV3ainfix +ainfix *c2V2c1agetV3ainfix +ainfix *c2V2c2Iainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <agetV3aparentV2agetV0ainfix -V1c1Iainfix >V2c0Aainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <V2ainfix -V1c1Aainfix <c0V2Aainfix =aelementsV0c0V1aaddagetV0ainfix -V1c1aelementsV0c0ainfix -V1c1Aainfix =V0V3Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix >=V2c0FFIainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
       <proof prover="alt-ergo" timelimit="30" edited="" obsolete="false">
@@ -706,10 +693,7 @@
        <result status="valid" time="0.14"/>
       </proof>
      </goal>
-     <goal name="WP_parameter extractMin.12" expl="assertion" sum="3e0027aefaafc63d2175e20a55006dbf" proved="false" expanded="false" shape="ainfix =aelementsV0c0V1aaddagetV0c0aelementsV5c0ainfix -V1c1Iais_heap_arrayV5c0ainfix -V1c1Iais_heap_arrayV5c0ainfix -V1c1Iainfix >V2c0Iainfix =V5asetV3V2agetV0ainfix -V1c1FIainfix <V2ainfix -V1c1Iainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <=agetV0ainfix -V1c1agetV3V4Iainfix =V4ainfix +ainfix *c2V2c2FIainfix >agetV3ainfix +ainfix *c2V2c1agetV3ainfix +ainfix *c2V2c2Iainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <agetV3aparentV2agetV0ainfix -V1c1Iainfix >V2c0Aainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <V2ainfix -V1c1Aainfix <c0V2Aainfix =aelementsV0c0V1aaddagetV0ainfix -V1c1aelementsV0c0ainfix -V1c1Aainfix =V0V3Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix >=V2c0FFIainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
-      <proof prover="alt-ergo" timelimit="5" edited="" obsolete="false">
-       <result status="timeout" time="5.29"/>
-      </proof>
+     <goal name="WP_parameter extractMin.12" expl="assertion" sum="3e0027aefaafc63d2175e20a55006dbf" proved="false" expanded="true" shape="ainfix =aelementsV0c0V1aaddagetV0c0aelementsV5c0ainfix -V1c1Iais_heap_arrayV5c0ainfix -V1c1Iais_heap_arrayV5c0ainfix -V1c1Iainfix >V2c0Iainfix =V5asetV3V2agetV0ainfix -V1c1FIainfix <V2ainfix -V1c1Iainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <=agetV0ainfix -V1c1agetV3V4Iainfix =V4ainfix +ainfix *c2V2c2FIainfix >agetV3ainfix +ainfix *c2V2c1agetV3ainfix +ainfix *c2V2c2Iainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <agetV3aparentV2agetV0ainfix -V1c1Iainfix >V2c0Aainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <V2ainfix -V1c1Aainfix <c0V2Aainfix =aelementsV0c0V1aaddagetV0ainfix -V1c1aelementsV0c0ainfix -V1c1Aainfix =V0V3Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix >=V2c0FFIainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
      </goal>
      <goal name="WP_parameter extractMin.13" expl="normal postcondition" sum="4b3337a0dbff2d4f2f2b4f4589c34797" proved="true" expanded="false" shape="ainfix =aelementsV0c0V1aaddagetV0c0aelementsV6c0V7Aainfix =agetV0c0amin_bagaelementsV0c0V1Aais_heapaTuple2V6V7Iainfix =aTuple2V6V7aTuple2V5ainfix -V1c1FIainfix =aelementsV0c0V1aaddagetV0c0aelementsV5c0ainfix -V1c1Iais_heap_arrayV5c0ainfix -V1c1Iais_heap_arrayV5c0ainfix -V1c1Iainfix >V2c0Iainfix =V5asetV3V2agetV0ainfix -V1c1FIainfix <V2ainfix -V1c1Iainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <=agetV0ainfix -V1c1agetV3V4Iainfix =V4ainfix +ainfix *c2V2c2FIainfix >agetV3ainfix +ainfix *c2V2c1agetV3ainfix +ainfix *c2V2c2Iainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <agetV3aparentV2agetV0ainfix -V1c1Iainfix >V2c0Aainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <V2ainfix -V1c1Aainfix <c0V2Aainfix =aelementsV0c0V1aaddagetV0ainfix -V1c1aelementsV0c0ainfix -V1c1Aainfix =V0V3Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix >=V2c0FFIainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
       <proof prover="cvc3" timelimit="5" edited="" obsolete="false">
@@ -720,9 +704,6 @@
       <proof prover="alt-ergo" timelimit="30" edited="" obsolete="false">
        <result status="valid" time="0.03"/>
       </proof>
-      <proof prover="z3" timelimit="5" edited="" obsolete="true">
-       <result status="valid" time="0.05"/>
-      </proof>
      </goal>
      <goal name="WP_parameter extractMin.15" expl="assertion" sum="dfa98e09413d6ba925b039a671771d80" proved="true" expanded="false" shape="ainfix >agetV0ainfix -V1c1agetV3V4Iainfix <=agetV0ainfix -V1c1agetV3V4NIainfix =V4ainfix +ainfix *c2V2c2FIainfix >agetV3ainfix +ainfix *c2V2c1agetV3ainfix +ainfix *c2V2c2Iainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <agetV3aparentV2agetV0ainfix -V1c1Iainfix >V2c0Aainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <V2ainfix -V1c1Aainfix <c0V2Aainfix =aelementsV0c0V1aaddagetV0ainfix -V1c1aelementsV0c0ainfix -V1c1Aainfix =V0V3Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix >=V2c0FFIainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
       <proof prover="alt-ergo" timelimit="30" edited="" obsolete="false">
@@ -730,15 +711,6 @@
       </proof>
      </goal>
      <goal name="WP_parameter extractMin.16" expl="loop invariant preservation" sum="c926e5265251f1eed8539e2f4cf8d4cd" proved="false" expanded="false" shape="ainfix <agetV5aparentV6agetV0ainfix -V1c1Iainfix >V6c0Aainfix =aaddagetV5V6aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV5c0ainfix -V1c1Iainfix <V6ainfix -V1c1Aainfix <c0V6Aainfix =aelementsV0c0V1aaddagetV0ainfix -V1c1aelementsV0c0ainfix -V1c1Aainfix =V0V5Iainfix =V6c0Aais_heap_arrayV5c0ainfix -V1c1Aainfix >=V6c0Iainfix =V6V4FIainfix =V5asetV3V2agetV3V4FIainfix >agetV0ainfix -V1c1agetV3V4Iainfix <=agetV0ainfix -V1c1agetV3V4NIainfix =V4ainfix +ainfix *c2V2c2FIainfix >agetV3ainfix +ainfix *c2V2c1agetV3ainfix +ainfix *c2V2c2Iainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <agetV3aparentV2agetV0ainfix -V1c1Iainfix >V2c0Aainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <V2ainfix -V1c1Aainfix <c0V2Aainfix =aelementsV0c0V1aaddagetV0ainfix -V1c1aelementsV0c0ainfix -V1c1Aainfix =V0V3Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix >=V2c0FFIainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
-      <proof prover="alt-ergo" timelimit="30" edited="" obsolete="true">
-       <result status="timeout" time="5.10"/>
-      </proof>
-      <proof prover="cvc3" timelimit="5" edited="" obsolete="true">
-       <result status="timeout" time="5.10"/>
-      </proof>
-      <proof prover="z3" timelimit="5" edited="" obsolete="true">
-       <result status="timeout" time="5.04"/>
-      </proof>
       <transf name="split_goal" proved="false" expanded="false">
        <goal name="WP_parameter extractMin.16.1" expl="correctness of parameter extractMin" sum="48cbca44facec73a8fd1de43c896a948" proved="true" expanded="false" shape="ainfix >=V6c0Iainfix =V6V4FIainfix =V5asetV3V2agetV3V4FIainfix >agetV0ainfix -V1c1agetV3V4Iainfix <=agetV0ainfix -V1c1agetV3V4NIainfix =V4ainfix +ainfix *c2V2c2FIainfix >agetV3ainfix +ainfix *c2V2c1agetV3ainfix +ainfix *c2V2c2Iainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <agetV3aparentV2agetV0ainfix -V1c1Iainfix >V2c0Aainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <V2ainfix -V1c1Aainfix <c0V2Aainfix =aelementsV0c0V1aaddagetV0ainfix -V1c1aelementsV0c0ainfix -V1c1Aainfix =V0V3Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix >=V2c0FFIainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
         <proof prover="alt-ergo" timelimit="5" edited="" obsolete="false">
@@ -761,15 +733,6 @@
         </proof>
        </goal>
        <goal name="WP_parameter extractMin.16.5" expl="correctness of parameter extractMin" sum="e1b850adbc241a6a1d251f529564f652" proved="false" expanded="false" shape="ainfix =aaddagetV5V6aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV5c0ainfix -V1c1Iainfix <V6ainfix -V1c1Aainfix <c0V6Iainfix =V6V4FIainfix =V5asetV3V2agetV3V4FIainfix >agetV0ainfix -V1c1agetV3V4Iainfix <=agetV0ainfix -V1c1agetV3V4NIainfix =V4ainfix +ainfix *c2V2c2FIainfix >agetV3ainfix +ainfix *c2V2c1agetV3ainfix +ainfix *c2V2c2Iainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <agetV3aparentV2agetV0ainfix -V1c1Iainfix >V2c0Aainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <V2ainfix -V1c1Aainfix <c0V2Aainfix =aelementsV0c0V1aaddagetV0ainfix -V1c1aelementsV0c0ainfix -V1c1Aainfix =V0V3Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix >=V2c0FFIainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
-        <proof prover="alt-ergo" timelimit="5" edited="" obsolete="false">
-         <result status="timeout" time="5.19"/>
-        </proof>
-        <proof prover="cvc3" timelimit="5" edited="" obsolete="true">
-         <result status="timeout" time="5.07"/>
-        </proof>
-        <proof prover="z3" timelimit="5" edited="" obsolete="true">
-         <result status="timeout" time="5.10"/>
-        </proof>
        </goal>
        <goal name="WP_parameter extractMin.16.6" expl="correctness of parameter extractMin" sum="ceefbb3a3f6af0feb0ba24199836c169" proved="true" expanded="false" shape="ainfix <agetV5aparentV6agetV0ainfix -V1c1Iainfix >V6c0Iainfix =V6V4FIainfix =V5asetV3V2agetV3V4FIainfix >agetV0ainfix -V1c1agetV3V4Iainfix <=agetV0ainfix -V1c1agetV3V4NIainfix =V4ainfix +ainfix *c2V2c2FIainfix >agetV3ainfix +ainfix *c2V2c1agetV3ainfix +ainfix *c2V2c2Iainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <agetV3aparentV2agetV0ainfix -V1c1Iainfix >V2c0Aainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <V2ainfix -V1c1Aainfix <c0V2Aainfix =aelementsV0c0V1aaddagetV0ainfix -V1c1aelementsV0c0ainfix -V1c1Aainfix =V0V3Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix >=V2c0FFIainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
         <proof prover="alt-ergo" timelimit="5" edited="" obsolete="false">
@@ -783,15 +746,9 @@
        <result status="valid" time="0.07"/>
       </proof>
      </goal>
-     <goal name="WP_parameter extractMin.18" expl="assertion" sum="76d8677624733ba3c9248cbc9d26aea4" proved="false" expanded="false" shape="ainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <=agetV0ainfix -V1c1agetV3ainfix +ainfix *c2V2c1Iainfix >agetV3ainfix +ainfix *c2V2c1agetV3ainfix +ainfix *c2V2c2NIainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <agetV3aparentV2agetV0ainfix -V1c1Iainfix >V2c0Aainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <V2ainfix -V1c1Aainfix <c0V2Aainfix =aelementsV0c0V1aaddagetV0ainfix -V1c1aelementsV0c0ainfix -V1c1Aainfix =V0V3Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix >=V2c0FFIainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
-      <proof prover="alt-ergo" timelimit="30" edited="" obsolete="false">
-       <result status="timeout" time="5.19"/>
-      </proof>
+     <goal name="WP_parameter extractMin.18" expl="assertion" sum="76d8677624733ba3c9248cbc9d26aea4" proved="false" expanded="true" shape="ainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <=agetV0ainfix -V1c1agetV3ainfix +ainfix *c2V2c1Iainfix >agetV3ainfix +ainfix *c2V2c1agetV3ainfix +ainfix *c2V2c2NIainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <agetV3aparentV2agetV0ainfix -V1c1Iainfix >V2c0Aainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <V2ainfix -V1c1Aainfix <c0V2Aainfix =aelementsV0c0V1aaddagetV0ainfix -V1c1aelementsV0c0ainfix -V1c1Aainfix =V0V3Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix >=V2c0FFIainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
      </goal>
      <goal name="WP_parameter extractMin.19" expl="assertion" sum="21224c565d70b850b9a816f2db656d88" proved="true" expanded="false" shape="ais_heap_arrayV4c0ainfix -V1c1Iainfix >V2c0Iainfix =V4asetV3V2agetV0ainfix -V1c1FIainfix <V2ainfix -V1c1Iainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <=agetV0ainfix -V1c1agetV3ainfix +ainfix *c2V2c1Iainfix >agetV3ainfix +ainfix *c2V2c1agetV3ainfix +ainfix *c2V2c2NIainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <agetV3aparentV2agetV0ainfix -V1c1Iainfix >V2c0Aainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <V2ainfix -V1c1Aainfix <c0V2Aainfix =aelementsV0c0V1aaddagetV0ainfix -V1c1aelementsV0c0ainfix -V1c1Aainfix =V0V3Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix >=V2c0FFIainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
-      <proof prover="coq" timelimit="47" edited="heap_implem_WP_Implementation_WP_parameter_extractMin_1.v" obsolete="false">
-       <result status="valid" time="0.86"/>
-      </proof>
       <proof prover="alt-ergo" timelimit="30" edited="" obsolete="false">
        <result status="valid" time="5.08"/>
       </proof>
@@ -800,24 +757,12 @@
       <proof prover="alt-ergo" timelimit="47" edited="" obsolete="false">
        <result status="valid" time="4.86"/>
       </proof>
-      <proof prover="cvc3" timelimit="47" edited="" obsolete="true">
-       <result status="valid" time="0.19"/>
-      </proof>
      </goal>
-     <goal name="WP_parameter extractMin.21" expl="assertion" sum="3608e9517e1460540c1759c7223d874d" proved="false" expanded="false" shape="ainfix =aelementsV0c0V1aaddagetV0c0aelementsV4c0ainfix -V1c1Iais_heap_arrayV4c0ainfix -V1c1Iais_heap_arrayV4c0ainfix -V1c1Iainfix >V2c0Iainfix =V4asetV3V2agetV0ainfix -V1c1FIainfix <V2ainfix -V1c1Iainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <=agetV0ainfix -V1c1agetV3ainfix +ainfix *c2V2c1Iainfix >agetV3ainfix +ainfix *c2V2c1agetV3ainfix +ainfix *c2V2c2NIainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <agetV3aparentV2agetV0ainfix -V1c1Iainfix >V2c0Aainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <V2ainfix -V1c1Aainfix <c0V2Aainfix =aelementsV0c0V1aaddagetV0ainfix -V1c1aelementsV0c0ainfix -V1c1Aainfix =V0V3Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix >=V2c0FFIainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
-      <proof prover="alt-ergo" timelimit="30" edited="" obsolete="false">
-       <result status="timeout" time="5.07"/>
-      </proof>
+     <goal name="WP_parameter extractMin.21" expl="assertion" sum="3608e9517e1460540c1759c7223d874d" proved="false" expanded="true" shape="ainfix =aelementsV0c0V1aaddagetV0c0aelementsV4c0ainfix -V1c1Iais_heap_arrayV4c0ainfix -V1c1Iais_heap_arrayV4c0ainfix -V1c1Iainfix >V2c0Iainfix =V4asetV3V2agetV0ainfix -V1c1FIainfix <V2ainfix -V1c1Iainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <=agetV0ainfix -V1c1agetV3ainfix +ainfix *c2V2c1Iainfix >agetV3ainfix +ainfix *c2V2c1agetV3ainfix +ainfix *c2V2c2NIainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <agetV3aparentV2agetV0ainfix -V1c1Iainfix >V2c0Aainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <V2ainfix -V1c1Aainfix <c0V2Aainfix =aelementsV0c0V1aaddagetV0ainfix -V1c1aelementsV0c0ainfix -V1c1Aainfix =V0V3Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix >=V2c0FFIainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
      </goal>
-     <goal name="WP_parameter extractMin.22" expl="normal postcondition" sum="376b5e84beae4d0e86472d1d66207bc0" proved="false" expanded="false" shape="ainfix =aelementsV0c0V1aaddagetV0c0aelementsV5c0V6Aainfix =agetV0c0amin_bagaelementsV0c0V1Aais_heapaTuple2V5V6Iainfix =aTuple2V5V6aTuple2V4ainfix -V1c1FIainfix =aelementsV0c0V1aaddagetV0c0aelementsV4c0ainfix -V1c1Iais_heap_arrayV4c0ainfix -V1c1Iais_heap_arrayV4c0ainfix -V1c1Iainfix >V2c0Iainfix =V4asetV3V2agetV0ainfix -V1c1FIainfix <V2ainfix -V1c1Iainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <=agetV0ainfix -V1c1agetV3ainfix +ainfix *c2V2c1Iainfix >agetV3ainfix +ainfix *c2V2c1agetV3ainfix +ainfix *c2V2c2NIainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <agetV3aparentV2agetV0ainfix -V1c1Iainfix >V2c0Aainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <V2ainfix -V1c1Aainfix <c0V2Aainfix =aelementsV0c0V1aaddagetV0ainfix -V1c1aelementsV0c0ainfix -V1c1Aainfix =V0V3Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix >=V2c0FFIainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
-      <proof prover="alt-ergo" timelimit="30" edited="" obsolete="false">
-       <result status="timeout" time="5.11"/>
-      </proof>
-      <proof prover="cvc3" timelimit="47" edited="" obsolete="true">
-       <result status="valid" time="0.22"/>
-      </proof>
-      <proof prover="z3" timelimit="47" edited="" obsolete="true"><undone/>
-       
+     <goal name="WP_parameter extractMin.22" expl="normal postcondition" sum="376b5e84beae4d0e86472d1d66207bc0" proved="true" expanded="false" shape="ainfix =aelementsV0c0V1aaddagetV0c0aelementsV5c0V6Aainfix =agetV0c0amin_bagaelementsV0c0V1Aais_heapaTuple2V5V6Iainfix =aTuple2V5V6aTuple2V4ainfix -V1c1FIainfix =aelementsV0c0V1aaddagetV0c0aelementsV4c0ainfix -V1c1Iais_heap_arrayV4c0ainfix -V1c1Iais_heap_arrayV4c0ainfix -V1c1Iainfix >V2c0Iainfix =V4asetV3V2agetV0ainfix -V1c1FIainfix <V2ainfix -V1c1Iainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <=agetV0ainfix -V1c1agetV3ainfix +ainfix *c2V2c1Iainfix >agetV3ainfix +ainfix *c2V2c1agetV3ainfix +ainfix *c2V2c2NIainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <agetV3aparentV2agetV0ainfix -V1c1Iainfix >V2c0Aainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <V2ainfix -V1c1Aainfix <c0V2Aainfix =aelementsV0c0V1aaddagetV0ainfix -V1c1aelementsV0c0ainfix -V1c1Aainfix =V0V3Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix >=V2c0FFIainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
+      <proof prover="cvc3" timelimit="47" edited="" obsolete="false">
+       <result status="valid" time="0.16"/>
       </proof>
      </goal>
      <goal name="WP_parameter extractMin.23" expl="normal postcondition" sum="58dc1bd63483897ed90a6d1de0850e14" proved="true" expanded="false" shape="ainfix =aelementsV0c0V1aaddagetV0c0aelementsV4c0V5Aainfix =agetV0c0amin_bagaelementsV0c0V1Aais_heapaTuple2V4V5Iainfix =aTuple2V4V5aTuple2V3ainfix -V1c1FIainfix <V2ainfix -V1c1NIainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <=agetV0ainfix -V1c1agetV3ainfix +ainfix *c2V2c1Iainfix >agetV3ainfix +ainfix *c2V2c1agetV3ainfix +ainfix *c2V2c2NIainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <agetV3aparentV2agetV0ainfix -V1c1Iainfix >V2c0Aainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <V2ainfix -V1c1Aainfix <c0V2Aainfix =aelementsV0c0V1aaddagetV0ainfix -V1c1aelementsV0c0ainfix -V1c1Aainfix =V0V3Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix >=V2c0FFIainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
@@ -830,10 +775,7 @@
        <result status="valid" time="0.03"/>
       </proof>
      </goal>
-     <goal name="WP_parameter extractMin.25" expl="loop invariant preservation" sum="64e61fc9ffa5983ca2f91b4538b0afbb" proved="false" expanded="false" shape="ainfix <agetV4aparentV5agetV0ainfix -V1c1Iainfix >V5c0Aainfix =aaddagetV4V5aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV4c0ainfix -V1c1Iainfix <V5ainfix -V1c1Aainfix <c0V5Aainfix =aelementsV0c0V1aaddagetV0ainfix -V1c1aelementsV0c0ainfix -V1c1Aainfix =V0V4Iainfix =V5c0Aais_heap_arrayV4c0ainfix -V1c1Aainfix >=V5c0Iainfix =V5ainfix +ainfix *c2V2c1FIainfix =V4asetV3V2agetV3ainfix +ainfix *c2V2c1FIainfix >agetV0ainfix -V1c1agetV3ainfix +ainfix *c2V2c1Iainfix <=agetV0ainfix -V1c1agetV3ainfix +ainfix *c2V2c1NIainfix >agetV3ainfix +ainfix *c2V2c1agetV3ainfix +ainfix *c2V2c2NIainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <agetV3aparentV2agetV0ainfix -V1c1Iainfix >V2c0Aainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <V2ainfix -V1c1Aainfix <c0V2Aainfix =aelementsV0c0V1aaddagetV0ainfix -V1c1aelementsV0c0ainfix -V1c1Aainfix =V0V3Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix >=V2c0FFIainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
-      <proof prover="alt-ergo" timelimit="30" edited="" obsolete="true">
-       <result status="timeout" time="5.08"/>
-      </proof>
+     <goal name="WP_parameter extractMin.25" expl="loop invariant preservation" sum="64e61fc9ffa5983ca2f91b4538b0afbb" proved="false" expanded="true" shape="ainfix <agetV4aparentV5agetV0ainfix -V1c1Iainfix >V5c0Aainfix =aaddagetV4V5aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV4c0ainfix -V1c1Iainfix <V5ainfix -V1c1Aainfix <c0V5Aainfix =aelementsV0c0V1aaddagetV0ainfix -V1c1aelementsV0c0ainfix -V1c1Aainfix =V0V4Iainfix =V5c0Aais_heap_arrayV4c0ainfix -V1c1Aainfix >=V5c0Iainfix =V5ainfix +ainfix *c2V2c1FIainfix =V4asetV3V2agetV3ainfix +ainfix *c2V2c1FIainfix >agetV0ainfix -V1c1agetV3ainfix +ainfix *c2V2c1Iainfix <=agetV0ainfix -V1c1agetV3ainfix +ainfix *c2V2c1NIainfix >agetV3ainfix +ainfix *c2V2c1agetV3ainfix +ainfix *c2V2c2NIainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <agetV3aparentV2agetV0ainfix -V1c1Iainfix >V2c0Aainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <V2ainfix -V1c1Aainfix <c0V2Aainfix =aelementsV0c0V1aaddagetV0ainfix -V1c1aelementsV0c0ainfix -V1c1Aainfix =V0V3Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix >=V2c0FFIainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
       <transf name="split_goal" proved="false" expanded="false">
        <goal name="WP_parameter extractMin.25.1" expl="correctness of parameter extractMin" sum="7d338a2150f4245a5c3d7917f9b7beb1" proved="true" expanded="false" shape="ainfix >=V5c0Iainfix =V5ainfix +ainfix *c2V2c1FIainfix =V4asetV3V2agetV3ainfix +ainfix *c2V2c1FIainfix >agetV0ainfix -V1c1agetV3ainfix +ainfix *c2V2c1Iainfix <=agetV0ainfix -V1c1agetV3ainfix +ainfix *c2V2c1NIainfix >agetV3ainfix +ainfix *c2V2c1agetV3ainfix +ainfix *c2V2c2NIainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <agetV3aparentV2agetV0ainfix -V1c1Iainfix >V2c0Aainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <V2ainfix -V1c1Aainfix <c0V2Aainfix =aelementsV0c0V1aaddagetV0ainfix -V1c1aelementsV0c0ainfix -V1c1Aainfix =V0V3Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix >=V2c0FFIainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
         <proof prover="alt-ergo" timelimit="47" edited="" obsolete="false">
@@ -856,9 +798,6 @@
         </proof>
        </goal>
        <goal name="WP_parameter extractMin.25.5" expl="correctness of parameter extractMin" sum="a99a23cf07e9990e19cd57b27ba5c897" proved="false" expanded="false" shape="ainfix =aaddagetV4V5aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV4c0ainfix -V1c1Iainfix <V5ainfix -V1c1Aainfix <c0V5Iainfix =V5ainfix +ainfix *c2V2c1FIainfix =V4asetV3V2agetV3ainfix +ainfix *c2V2c1FIainfix >agetV0ainfix -V1c1agetV3ainfix +ainfix *c2V2c1Iainfix <=agetV0ainfix -V1c1agetV3ainfix +ainfix *c2V2c1NIainfix >agetV3ainfix +ainfix *c2V2c1agetV3ainfix +ainfix *c2V2c2NIainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <agetV3aparentV2agetV0ainfix -V1c1Iainfix >V2c0Aainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <V2ainfix -V1c1Aainfix <c0V2Aainfix =aelementsV0c0V1aaddagetV0ainfix -V1c1aelementsV0c0ainfix -V1c1Aainfix =V0V3Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix >=V2c0FFIainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
-        <proof prover="alt-ergo" timelimit="47" edited="" obsolete="false">
-         <result status="timeout" time="5.08"/>
-        </proof>
        </goal>
        <goal name="WP_parameter extractMin.25.6" expl="correctness of parameter extractMin" sum="db2978b4e262c5218548817e2cd172cf" proved="true" expanded="false" shape="ainfix <agetV4aparentV5agetV0ainfix -V1c1Iainfix >V5c0Iainfix =V5ainfix +ainfix *c2V2c1FIainfix =V4asetV3V2agetV3ainfix +ainfix *c2V2c1FIainfix >agetV0ainfix -V1c1agetV3ainfix +ainfix *c2V2c1Iainfix <=agetV0ainfix -V1c1agetV3ainfix +ainfix *c2V2c1NIainfix >agetV3ainfix +ainfix *c2V2c1agetV3ainfix +ainfix *c2V2c2NIainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <agetV3aparentV2agetV0ainfix -V1c1Iainfix >V2c0Aainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <V2ainfix -V1c1Aainfix <c0V2Aainfix =aelementsV0c0V1aaddagetV0ainfix -V1c1aelementsV0c0ainfix -V1c1Aainfix =V0V3Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix >=V2c0FFIainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
         <proof prover="alt-ergo" timelimit="47" edited="" obsolete="false">
@@ -872,47 +811,23 @@
        <result status="valid" time="0.08"/>
       </proof>
      </goal>
-     <goal name="WP_parameter extractMin.27" expl="assertion" sum="82def93a658b8d84c036ed46c9617549" proved="false" expanded="false" shape="ainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <=agetV0ainfix -V1c1agetV3ainfix +ainfix *c2V2c1Iainfix <ainfix +ainfix *c2V2c2ainfix -V1c1NIainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <agetV3aparentV2agetV0ainfix -V1c1Iainfix >V2c0Aainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <V2ainfix -V1c1Aainfix <c0V2Aainfix =aelementsV0c0V1aaddagetV0ainfix -V1c1aelementsV0c0ainfix -V1c1Aainfix =V0V3Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix >=V2c0FFIainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
-      <proof prover="alt-ergo" timelimit="30" edited="" obsolete="false">
-       <result status="timeout" time="5.20"/>
+     <goal name="WP_parameter extractMin.27" expl="assertion" sum="82def93a658b8d84c036ed46c9617549" proved="true" expanded="false" shape="ainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <=agetV0ainfix -V1c1agetV3ainfix +ainfix *c2V2c1Iainfix <ainfix +ainfix *c2V2c2ainfix -V1c1NIainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <agetV3aparentV2agetV0ainfix -V1c1Iainfix >V2c0Aainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <V2ainfix -V1c1Aainfix <c0V2Aainfix =aelementsV0c0V1aaddagetV0ainfix -V1c1aelementsV0c0ainfix -V1c1Aainfix =V0V3Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix >=V2c0FFIainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
+      <proof prover="z3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.09"/>
       </proof>
      </goal>
-     <goal name="WP_parameter extractMin.28" expl="assertion" sum="8b8d79f97f2cb8d3199cb0765e83df40" proved="false" expanded="false" shape="ais_heap_arrayV4c0ainfix -V1c1Iainfix >V2c0Iainfix =V4asetV3V2agetV0ainfix -V1c1FIainfix <V2ainfix -V1c1Iainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <=agetV0ainfix -V1c1agetV3ainfix +ainfix *c2V2c1Iainfix <ainfix +ainfix *c2V2c2ainfix -V1c1NIainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <agetV3aparentV2agetV0ainfix -V1c1Iainfix >V2c0Aainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <V2ainfix -V1c1Aainfix <c0V2Aainfix =aelementsV0c0V1aaddagetV0ainfix -V1c1aelementsV0c0ainfix -V1c1Aainfix =V0V3Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix >=V2c0FFIainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
-      <proof prover="alt-ergo" timelimit="30" edited="" obsolete="false">
-       <result status="timeout" time="5.22"/>
-      </proof>
-      <proof prover="cvc3" timelimit="47" edited="" obsolete="false">
-       <result status="timeout" time="5.10"/>
-      </proof>
-      <proof prover="z3" timelimit="47" edited="" obsolete="false">
-       <result status="timeout" time="5.06"/>
-      </proof>
+     <goal name="WP_parameter extractMin.28" expl="assertion" sum="8b8d79f97f2cb8d3199cb0765e83df40" proved="false" expanded="true" shape="ais_heap_arrayV4c0ainfix -V1c1Iainfix >V2c0Iainfix =V4asetV3V2agetV0ainfix -V1c1FIainfix <V2ainfix -V1c1Iainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <=agetV0ainfix -V1c1agetV3ainfix +ainfix *c2V2c1Iainfix <ainfix +ainfix *c2V2c2ainfix -V1c1NIainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <agetV3aparentV2agetV0ainfix -V1c1Iainfix >V2c0Aainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <V2ainfix -V1c1Aainfix <c0V2Aainfix =aelementsV0c0V1aaddagetV0ainfix -V1c1aelementsV0c0ainfix -V1c1Aainfix =V0V3Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix >=V2c0FFIainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
      </goal>
      <goal name="WP_parameter extractMin.29" expl="assertion" sum="01affcd6bb5c6d349e3c7e6c7cf37940" proved="true" expanded="false" shape="ais_heap_arrayV4c0ainfix -V1c1Iais_heap_arrayV4c0ainfix -V1c1Iainfix >V2c0Iainfix =V4asetV3V2agetV0ainfix -V1c1FIainfix <V2ainfix -V1c1Iainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <=agetV0ainfix -V1c1agetV3ainfix +ainfix *c2V2c1Iainfix <ainfix +ainfix *c2V2c2ainfix -V1c1NIainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <agetV3aparentV2agetV0ainfix -V1c1Iainfix >V2c0Aainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <V2ainfix -V1c1Aainfix <c0V2Aainfix =aelementsV0c0V1aaddagetV0ainfix -V1c1aelementsV0c0ainfix -V1c1Aainfix =V0V3Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix >=V2c0FFIainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
       <proof prover="alt-ergo" timelimit="30" edited="" obsolete="false">
        <result status="valid" time="0.06"/>
       </proof>
      </goal>
-     <goal name="WP_parameter extractMin.30" expl="assertion" sum="7f4c52d9e63da66b337c009f0bbf0504" proved="false" expanded="false" shape="ainfix =aelementsV0c0V1aaddagetV0c0aelementsV4c0ainfix -V1c1Iais_heap_arrayV4c0ainfix -V1c1Iais_heap_arrayV4c0ainfix -V1c1Iainfix >V2c0Iainfix =V4asetV3V2agetV0ainfix -V1c1FIainfix <V2ainfix -V1c1Iainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <=agetV0ainfix -V1c1agetV3ainfix +ainfix *c2V2c1Iainfix <ainfix +ainfix *c2V2c2ainfix -V1c1NIainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <agetV3aparentV2agetV0ainfix -V1c1Iainfix >V2c0Aainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <V2ainfix -V1c1Aainfix <c0V2Aainfix =aelementsV0c0V1aaddagetV0ainfix -V1c1aelementsV0c0ainfix -V1c1Aainfix =V0V3Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix >=V2c0FFIainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
-      <proof prover="cvc3" timelimit="5" edited="" obsolete="false">
-       <result status="timeout" time="5.03"/>
-      </proof>
-      <proof prover="alt-ergo" timelimit="30" edited="" obsolete="false">
-       <result status="timeout" time="5.15"/>
-      </proof>
-      <proof prover="z3" timelimit="5" edited="" obsolete="false">
-       <result status="timeout" time="5.09"/>
-      </proof>
+     <goal name="WP_parameter extractMin.30" expl="assertion" sum="7f4c52d9e63da66b337c009f0bbf0504" proved="false" expanded="true" shape="ainfix =aelementsV0c0V1aaddagetV0c0aelementsV4c0ainfix -V1c1Iais_heap_arrayV4c0ainfix -V1c1Iais_heap_arrayV4c0ainfix -V1c1Iainfix >V2c0Iainfix =V4asetV3V2agetV0ainfix -V1c1FIainfix <V2ainfix -V1c1Iainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <=agetV0ainfix -V1c1agetV3ainfix +ainfix *c2V2c1Iainfix <ainfix +ainfix *c2V2c2ainfix -V1c1NIainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <agetV3aparentV2agetV0ainfix -V1c1Iainfix >V2c0Aainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <V2ainfix -V1c1Aainfix <c0V2Aainfix =aelementsV0c0V1aaddagetV0ainfix -V1c1aelementsV0c0ainfix -V1c1Aainfix =V0V3Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix >=V2c0FFIainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
      </goal>
      <goal name="WP_parameter extractMin.31" expl="normal postcondition" sum="3f8b9f56a81746eefee9bdce90e4ad99" proved="true" expanded="false" shape="ainfix =aelementsV0c0V1aaddagetV0c0aelementsV5c0V6Aainfix =agetV0c0amin_bagaelementsV0c0V1Aais_heapaTuple2V5V6Iainfix =aTuple2V5V6aTuple2V4ainfix -V1c1FIainfix =aelementsV0c0V1aaddagetV0c0aelementsV4c0ainfix -V1c1Iais_heap_arrayV4c0ainfix -V1c1Iais_heap_arrayV4c0ainfix -V1c1Iainfix >V2c0Iainfix =V4asetV3V2agetV0ainfix -V1c1FIainfix <V2ainfix -V1c1Iainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <=agetV0ainfix -V1c1agetV3ainfix +ainfix *c2V2c1Iainfix <ainfix +ainfix *c2V2c2ainfix -V1c1NIainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <agetV3aparentV2agetV0ainfix -V1c1Iainfix >V2c0Aainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <V2ainfix -V1c1Aainfix <c0V2Aainfix =aelementsV0c0V1aaddagetV0ainfix -V1c1aelementsV0c0ainfix -V1c1Aainfix =V0V3Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix >=V2c0FFIainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
-      <proof prover="alt-ergo" timelimit="30" edited="" obsolete="false">
-       <result status="timeout" time="5.07"/>
-      </proof>
       <proof prover="cvc3" timelimit="47" edited="" obsolete="false">
        <result status="valid" time="0.19"/>
-      </proof>
-      <proof prover="z3" timelimit="47" edited="" obsolete="false">
-       <result status="timeout" time="47.15"/>
       </proof>
      </goal>
      <goal name="WP_parameter extractMin.32" expl="normal postcondition" sum="3cad36e5ab876ee9cad6bbc10f0d9f15" proved="true" expanded="false" shape="ainfix =aelementsV0c0V1aaddagetV0c0aelementsV4c0V5Aainfix =agetV0c0amin_bagaelementsV0c0V1Aais_heapaTuple2V4V5Iainfix =aTuple2V4V5aTuple2V3ainfix -V1c1FIainfix <V2ainfix -V1c1NIainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <=agetV0ainfix -V1c1agetV3ainfix +ainfix *c2V2c1Iainfix <ainfix +ainfix *c2V2c2ainfix -V1c1NIainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <agetV3aparentV2agetV0ainfix -V1c1Iainfix >V2c0Aainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <V2ainfix -V1c1Aainfix <c0V2Aainfix =aelementsV0c0V1aaddagetV0ainfix -V1c1aelementsV0c0ainfix -V1c1Aainfix =V0V3Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix >=V2c0FFIainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
@@ -926,9 +841,6 @@
       </proof>
      </goal>
      <goal name="WP_parameter extractMin.34" expl="loop invariant preservation" sum="a8b12b86d0217916ae3fa32ecb9b32dd" proved="true" expanded="false" shape="ainfix <agetV4aparentV5agetV0ainfix -V1c1Iainfix >V5c0Aainfix =aaddagetV4V5aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV4c0ainfix -V1c1Iainfix <V5ainfix -V1c1Aainfix <c0V5Aainfix =aelementsV0c0V1aaddagetV0ainfix -V1c1aelementsV0c0ainfix -V1c1Aainfix =V0V4Iainfix =V5c0Aais_heap_arrayV4c0ainfix -V1c1Aainfix >=V5c0Iainfix =V5ainfix +ainfix *c2V2c1FIainfix =V4asetV3V2agetV3ainfix +ainfix *c2V2c1FIainfix >agetV0ainfix -V1c1agetV3ainfix +ainfix *c2V2c1Iainfix <=agetV0ainfix -V1c1agetV3ainfix +ainfix *c2V2c1NIainfix <ainfix +ainfix *c2V2c2ainfix -V1c1NIainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <agetV3aparentV2agetV0ainfix -V1c1Iainfix >V2c0Aainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <V2ainfix -V1c1Aainfix <c0V2Aainfix =aelementsV0c0V1aaddagetV0ainfix -V1c1aelementsV0c0ainfix -V1c1Aainfix =V0V3Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix >=V2c0FFIainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
-      <proof prover="alt-ergo" timelimit="30" edited="" obsolete="false">
-       <result status="timeout" time="5.09"/>
-      </proof>
       <transf name="split_goal" proved="true" expanded="false">
        <goal name="WP_parameter extractMin.34.1" expl="correctness of parameter extractMin" sum="2fbee133ba3b118e89f2fef904b69655" proved="true" expanded="false" shape="ainfix >=V5c0Iainfix =V5ainfix +ainfix *c2V2c1FIainfix =V4asetV3V2agetV3ainfix +ainfix *c2V2c1FIainfix >agetV0ainfix -V1c1agetV3ainfix +ainfix *c2V2c1Iainfix <=agetV0ainfix -V1c1agetV3ainfix +ainfix *c2V2c1NIainfix <ainfix +ainfix *c2V2c2ainfix -V1c1NIainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <agetV3aparentV2agetV0ainfix -V1c1Iainfix >V2c0Aainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <V2ainfix -V1c1Aainfix <c0V2Aainfix =aelementsV0c0V1aaddagetV0ainfix -V1c1aelementsV0c0ainfix -V1c1Aainfix =V0V3Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix >=V2c0FFIainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
         <proof prover="alt-ergo" timelimit="5" edited="" obsolete="false">
@@ -967,16 +879,7 @@
        <result status="valid" time="0.06"/>
       </proof>
      </goal>
-     <goal name="WP_parameter extractMin.36" expl="assertion" sum="99674856859bc446160133b8e174e0c9" proved="false" expanded="false" shape="ainfix =aelementsV0c0V1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <V2ainfix -V1c1NIainfix <agetV3aparentV2agetV0ainfix -V1c1Iainfix >V2c0Aainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <V2ainfix -V1c1Aainfix <c0V2Aainfix =aelementsV0c0V1aaddagetV0ainfix -V1c1aelementsV0c0ainfix -V1c1Aainfix =V0V3Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix >=V2c0FFIainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
-      <proof prover="cvc3" timelimit="5" edited="" obsolete="false">
-       <result status="timeout" time="5.06"/>
-      </proof>
-      <proof prover="alt-ergo" timelimit="30" edited="" obsolete="false">
-       <result status="timeout" time="5.05"/>
-      </proof>
-      <proof prover="z3" timelimit="5" edited="" obsolete="false">
-       <result status="timeout" time="5.08"/>
-      </proof>
+     <goal name="WP_parameter extractMin.36" expl="assertion" sum="99674856859bc446160133b8e174e0c9" proved="false" expanded="true" shape="ainfix =aelementsV0c0V1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <V2ainfix -V1c1NIainfix <agetV3aparentV2agetV0ainfix -V1c1Iainfix >V2c0Aainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <V2ainfix -V1c1Aainfix <c0V2Aainfix =aelementsV0c0V1aaddagetV0ainfix -V1c1aelementsV0c0ainfix -V1c1Aainfix =V0V3Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix >=V2c0FFIainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
      </goal>
      <goal name="WP_parameter extractMin.37" expl="assertion" sum="e8190f2d957fb56f7a859a135039a514" proved="true" expanded="false" shape="ais_heap_arrayV4c0ainfix -V1c1Iainfix >V2c0Iainfix =V4asetV3V2agetV0ainfix -V1c1FIainfix <V2ainfix -V1c1Iainfix =aelementsV0c0V1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <V2ainfix -V1c1NIainfix <agetV3aparentV2agetV0ainfix -V1c1Iainfix >V2c0Aainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <V2ainfix -V1c1Aainfix <c0V2Aainfix =aelementsV0c0V1aaddagetV0ainfix -V1c1aelementsV0c0ainfix -V1c1Aainfix =V0V3Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix >=V2c0FFIainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
       <proof prover="alt-ergo" timelimit="30" edited="" obsolete="false">
@@ -999,9 +902,6 @@
       </proof>
      </goal>
      <goal name="WP_parameter extractMin.41" expl="normal postcondition" sum="ce13a24da61529846336bf022fe7c0e3" proved="true" expanded="false" shape="ainfix =aelementsV0c0V1aaddagetV0c0aelementsV4c0V5Aainfix =agetV0c0amin_bagaelementsV0c0V1Aais_heapaTuple2V4V5Iainfix =aTuple2V4V5aTuple2V3ainfix -V1c1FIainfix <V2ainfix -V1c1NIainfix =aelementsV0c0V1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <V2ainfix -V1c1NIainfix <agetV3aparentV2agetV0ainfix -V1c1Iainfix >V2c0Aainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <V2ainfix -V1c1Aainfix <c0V2Aainfix =aelementsV0c0V1aaddagetV0ainfix -V1c1aelementsV0c0ainfix -V1c1Aainfix =V0V3Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix >=V2c0FFIainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
-      <proof prover="alt-ergo" timelimit="30" edited="" obsolete="false">
-       <result status="timeout" time="5.04"/>
-      </proof>
       <transf name="split_goal" proved="true" expanded="false">
        <goal name="WP_parameter extractMin.41.1" expl="correctness of parameter extractMin" sum="18ecb3a5a33556514f618d13aad70801" proved="true" expanded="false" shape="ais_heapaTuple2V4V5Iainfix =aTuple2V4V5aTuple2V3ainfix -V1c1FIainfix <V2ainfix -V1c1NIainfix =aelementsV0c0V1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <V2ainfix -V1c1NIainfix <agetV3aparentV2agetV0ainfix -V1c1Iainfix >V2c0Aainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <V2ainfix -V1c1Aainfix <c0V2Aainfix =aelementsV0c0V1aaddagetV0ainfix -V1c1aelementsV0c0ainfix -V1c1Aainfix =V0V3Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix >=V2c0FFIainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
         <proof prover="alt-ergo" timelimit="5" edited="" obsolete="false">
@@ -1009,9 +909,6 @@
         </proof>
        </goal>
        <goal name="WP_parameter extractMin.41.2" expl="correctness of parameter extractMin" sum="53b63fd08d20134dd1092914f8f3143c" proved="true" expanded="false" shape="ainfix =agetV0c0amin_bagaelementsV0c0V1Iainfix =aTuple2V4V5aTuple2V3ainfix -V1c1FIainfix <V2ainfix -V1c1NIainfix =aelementsV0c0V1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <V2ainfix -V1c1NIainfix <agetV3aparentV2agetV0ainfix -V1c1Iainfix >V2c0Aainfix =aaddagetV3V2aelementsV0c0V1aaddagetV0ainfix -V1c1aaddagetV0c0aelementsV3c0ainfix -V1c1Iainfix <V2ainfix -V1c1Aainfix <c0V2Aainfix =aelementsV0c0V1aaddagetV0ainfix -V1c1aelementsV0c0ainfix -V1c1Aainfix =V0V3Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix >=V2c0FFIainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
-        <proof prover="alt-ergo" timelimit="5" edited="" obsolete="false">
-         <result status="timeout" time="5.00"/>
-        </proof>
         <proof prover="z3" timelimit="5" edited="" obsolete="false">
          <result status="valid" time="0.29"/>
         </proof>
