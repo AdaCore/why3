@@ -54,6 +54,15 @@ theory GenFloat
   axiom Round_monotonic :
     forall m:mode, x y:real. x <= y -> round m x <= round m y
 
+  axiom Round_idempotent :
+    forall m1 m2:mode, x:real. round m1 (round m2 x) = round m2 x
+
+  axiom Round_value :
+    forall m:mode, x:t. round m (value x) = value x
+
+  axiom Bounded_value :
+    forall x:t. abs (value x) <= max
+
   function max_representable_integer : int
 
   axiom Exact_rounding_for_integers:
