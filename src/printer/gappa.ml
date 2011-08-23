@@ -172,7 +172,7 @@ let rec print_fmla info fmt f =
   | Tapp ({ ls_name = id }, []) ->
     begin match query_syntax info.info_syn id with
       | Some s -> syntax_arguments s term fmt []
-      | None -> print_ident fmt id
+      | None -> fprintf fmt "%a in [0,0]" print_ident id
     end
   | Tapp (ls, [t1;t2]) when ls_equal ls ps_equ ->
       (* TODO: distinguish between type of t1 and t2
