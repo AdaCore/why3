@@ -3,8 +3,7 @@ theory Bag_integers
 (* minimum element of a bag of integers *)
 
 use import int.Int
-clone import comparison.MinMax with type t = int, predicate ge = Int.(>=)
-
+use import int.MinMax
 use export bag.Bag
 
 function min_bag (bag int) : int

@@ -66,6 +66,26 @@ axiom Card_union: forall x y: bag 'a. card (union x y) = (card x) + (card y)
 
 axiom Card_zero_empty : forall x: bag 'a. card (x) = 0 -> x = empty_bag
 
+(* bag difference *)
+
+use import int.MinMax
+
+function diff (bag 'a) (bag 'a) : bag 'a
+
+axiom Diff_occ: forall b1 b2:bag 'a, x:'a.
+  nb_occ x (diff b1 b2) = max 0 (nb_occ x b1 - nb_occ x b2)
+
+lemma Diff_empty_right: forall b:bag 'a. diff b empty_bag = b
+lemma Diff_empty_left: forall b:bag 'a. diff empty_bag b = empty_bag
+
+lemma Diff_add: forall b:bag 'a, x:'a. diff (add x b) (singleton x) = b
+
+lemma Diff_comm: forall b b1 b2:bag 'a.
+   diff (diff b b1) b2 = diff (diff b b2) b1
+
+lemma Add_diff: forall b:bag 'a, x:'a.
+  nb_occ x b > 0 -> add x (diff b (singleton x)) = b
+
 end
 
 (*

@@ -2,7 +2,7 @@ theory Elements
 
 use import int.Int
 use import bag.Bag
-use map.Map as A
+use import map.Map as A
 
 type array 'a = A.map int 'a
 
@@ -29,23 +29,27 @@ lemma Elements_union2 : forall a:array 'a, i j :int.
        i < j ->
        (elements a i j) = (add (A.get a (j-1)) (elements a i (j-1)))
 
+lemma Elements_remove_last: forall a:array 'a, i j :int.
+      i < j-1 ->
+      (elements a i (j-1)) = diff (elements a i j) (singleton (A.get a (j-1)))
+
+lemma Occ_elements: forall a:array 'a, i j n:int.
+       i <= j < n ->
+         nb_occ a[j] (elements a i n) > 0
+
 lemma Elements_set_outside : forall a:array 'a, i j:int.
        i <= j -> forall k : int. (k < i || k >= j) ->
        forall e:'a. (elements (A.set a k e) i j) = (elements a i j)
-
-lemma Elements_union3 : forall a:array 'a, i j:int, e:'a.
-       i <= j ->
-       (add e (elements a i j)) = (elements (A.set a j e) i (j+1))
-
-lemma Elements_set2 : forall a:array 'a, i j k:int.
-       i <= k < j ->
-       forall e:'a. (add (A.get a k) (elements (A.set a k e) i j)) =
-       	      	     (add e (elements a i j))
 
 lemma Elements_set_inside : forall a:array 'a, i j n: int, e:'a, b:bag 'a.
        i <= j < n ->
        (elements a i n) = add (A.get a j) b ->
        (elements (A.set a j e) i n) = add e b
+
+lemma Elements_set_inside2 : forall a:array 'a, i j n: int, e:'a.
+       i <= j < n ->
+       elements (A.set a j e) i n =
+          add e (diff (elements a i n) (singleton (a[j])))
 
 end
 

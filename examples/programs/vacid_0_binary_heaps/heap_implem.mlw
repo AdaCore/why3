@@ -3,13 +3,16 @@ module Implementation
 
 use import int.Int
 use import int.ComputerDivision
+use import map.Map
+
 use import heap.Heap
 use import heap_model.Model
 use import bag_of_integers.Bag_integers
+use import elements.Elements
 
 lemma Is_heap_min:
   forall a:map, n :int. n > 0 ->
-    is_heap_array a 0 n -> A.get a 0 = min_bag (model (a, n))
+    is_heap_array a 0 n -> a[0] = min_bag (model (a, n))
 
 use import module ref.Ref
 
@@ -34,9 +37,9 @@ let insert (this : ref logic_heap) (e : int) : unit  =
       (!i = n ->
          is_heap_array !arr 0 n  /\
          model (!arr, n) = model (a, n)) /\
-      (!i < n -> 
+      (!i < n ->
          is_heap_array !arr 0 (n + 1) /\
-         A.get !arr !i > e /\
+         !arr[!i] > e /\
          model (!arr, n+1) = add (A.get !arr !i) (model (a, n)))
     }
     variant { !i }
@@ -51,7 +54,7 @@ let insert (this : ref logic_heap) (e : int) : unit  =
   arr := A.set !arr !i e;
   this := (!arr, n + 1);
   assert { 0 < !i < n -> is_heap !this };
-  assert { !i < n -> model !this = add e (model (a,n)) } 
+  assert { !i < n -> model !this = add e (model (a,n)) }
 { is_heap !this /\
     model !this = add e (model (old !this)) }
 
@@ -59,47 +62,48 @@ let extractMin (this : ref logic_heap) : int =
 { model !this <> empty_bag /\ is_heap !this }
   let (a, n) = !this in
   assert {n > 0};
-  let arr = ref a in
-  let min = A.get !arr 0 in
+  let min = a[0] in
   let n' = n-1 in
-  let last = A.get !arr n' in
+  let last = a[n'] in
+  assert { n' > 0 -> nb_occ last (diff (model (a,n))
+                        (singleton min)) > 0 } ;
+  let arr = ref a in
   let i = ref 0 in
   try
     while ( !i < n') do
       invariant {
-        !i >= 0 /\
+        0 <= !i /\
+        (n' > 0 -> !i < n') /\
         is_heap_array !arr 0 n' /\
-        (!i = 0 ->
-           a = !arr /\
-           (model !this) = add last (model (a, n')))  /\
-        (0 < !i < n' ->
-           add (A.get !arr !i) (model !this) =
-             add last (add min (model (!arr, n'))))  /\
-        (!i > 0 -> A.get !arr (parent !i) < last) }
+        (!i = 0 -> !arr = a) /\
+        (n' > 0 ->
+          elements !arr 0 n' =
+            add !arr[!i] (diff (diff (model (a,n))
+                 (singleton last))
+               (singleton min))) /\
+        (!i > 0 -> !arr[parent !i] < last) }
       variant {n' - !i}
       let left = 2 * !i + 1 in
       let right = 2 * !i + 2 in
       if (left >= n') then raise Break;
       let smaller = ref left in
       if right < n' then
-        if A.get !arr left > A.get !arr right
+        if !arr[left] > !arr[right]
           then smaller := right;
-      if (last <= (A.get !arr !smaller)) then raise Break;
-      assert {last > (A.get !arr !smaller)};
-      arr := A.set !arr !i (A.get !arr !smaller);
+      if last <= !arr[!smaller] then raise Break;
+      arr := !arr[!i <- !arr[!smaller]];
       i := !smaller
     done;
-    assert { model !this = add min (model (!arr,n')) }
-  with Break ->
-    assert { add (A.get !arr !i) (model !this) =
-              add last (add min (model (!arr, n'))) }
+    assert { n' = 0 }
+  with Break -> ()
   end;
-  if (!i < n') then
+  if !i < n' then
     begin
-      arr := A.set !arr !i last;
+      arr := !arr[!i <- last];
       assert { !i > 0 -> is_heap_array !arr 0 n' };
       assert { is_heap_array !arr 0 n' };
-      assert { model !this = add min (model (!arr,n')) }
+      assert { n' > 0 -> elements !arr 0 n' =
+                  (diff (model (a,n)) (singleton min)) }
     end;
   this := (!arr, n');
   min
