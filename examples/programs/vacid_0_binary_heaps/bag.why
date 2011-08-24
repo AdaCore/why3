@@ -2,13 +2,12 @@
 theory Bag
 
 use import int.Int
-use import map.Map as A
 
-type bag 'a = A.map 'a int
+type bag 'a 
 
 (* the most basic operation is the number of occurences *)
 
-function nb_occ (x: 'a) (b: bag 'a): int = A.get b x
+function nb_occ (x: 'a) (b: bag 'a): int 
 
 axiom occ_non_negative : forall b: bag 'a, x: 'a. nb_occ x b >= 0
 
@@ -26,7 +25,12 @@ axiom occ_empty : forall x: 'a. nb_occ x empty_bag = 0
 lemma is_empty : forall b: bag 'a.
       (forall x: 'a. nb_occ x b = 0) -> b = empty_bag
 
-function singleton (x: 'a) : bag 'a = A.set empty_bag x 1
+function singleton (x: 'a) : bag 'a 
+
+axiom occ_singleton: forall x y: 'a. 
+  (x = y /\ (nb_occ y (singleton x)) = 1) \/
+  (x <> y /\ (nb_occ y (singleton x)) = 0)
+
 lemma occ_singleton_eq : forall x y: 'a. x = y -> (nb_occ y (singleton x)) = 1
 lemma occ_singleton_neq : forall x y: 'a. x <> y -> (nb_occ y (singleton x)) = 0
 

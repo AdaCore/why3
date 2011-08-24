@@ -115,21 +115,29 @@ Implicit Arguments diff.
 Axiom Diff_occ : forall (a:Type), forall (b1:(bag a)) (b2:(bag a)) (x:a),
   ((nb_occ x (diff b1 b2)) = (Zmax 0%Z ((nb_occ x b1) - (nb_occ x b2))%Z)).
 
+Axiom Diff_empty_right : forall (a:Type), forall (b:(bag a)), ((diff b
+  (empty_bag:(bag a))) = b).
+
+Axiom Diff_empty_left : forall (a:Type), forall (b:(bag a)),
+  ((diff (empty_bag:(bag a)) b) = (empty_bag:(bag a))).
+
 (* YOU MAY EDIT THE CONTEXT BELOW *)
 
 (* DO NOT EDIT BELOW *)
 
-Theorem Diff_empty_right : forall (a:Type), forall (b:(bag a)), ((diff b
-  (empty_bag:(bag a))) = b).
+Theorem Diff_add : forall (a:Type), forall (b:(bag a)) (x:a), ((diff (add x
+  b) (singleton x)) = b).
 (* YOU MAY EDIT THE PROOF BELOW *)
-intros X b.
+intros X b x.
 apply bag_extensionality.
-intro x.
+intros y.
 rewrite Diff_occ.
-rewrite occ_empty.
-generalize (occ_non_negative X b x).
-generalize (Zmax_spec 0 (nb_occ x b - 0))%Z.
-auto with zarith.
+unfold add; rewrite occ_union.
+replace (nb_occ y (singleton x) + nb_occ y b - 
+           nb_occ y (singleton x))%Z with (nb_occ y b) by omega.
+generalize (Zmax_spec 0 (nb_occ y b)).
+generalize (occ_non_negative X b y).
+intuition.
 Qed.
 (* DO NOT EDIT BELOW *)
 

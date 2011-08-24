@@ -34,6 +34,10 @@ Parameter singleton: forall (a:Type), a  -> (bag a).
 
 Implicit Arguments singleton.
 
+Axiom occ_singleton : forall (a:Type), forall (x:a) (y:a), ((x = y) /\
+  ((nb_occ y (singleton x)) = 1%Z)) \/ ((~ (x = y)) /\ ((nb_occ y
+  (singleton x)) = 0%Z)).
+
 Axiom occ_singleton_eq : forall (a:Type), forall (x:a) (y:a), (x = y) ->
   ((nb_occ y (singleton x)) = 1%Z).
 
@@ -115,21 +119,36 @@ Implicit Arguments diff.
 Axiom Diff_occ : forall (a:Type), forall (b1:(bag a)) (b2:(bag a)) (x:a),
   ((nb_occ x (diff b1 b2)) = (Zmax 0%Z ((nb_occ x b1) - (nb_occ x b2))%Z)).
 
+Axiom Diff_empty_right : forall (a:Type), forall (b:(bag a)), ((diff b
+  (empty_bag:(bag a))) = b).
+
+Axiom Diff_empty_left : forall (a:Type), forall (b:(bag a)),
+  ((diff (empty_bag:(bag a)) b) = (empty_bag:(bag a))).
+
+Axiom Diff_add : forall (a:Type), forall (b:(bag a)) (x:a), ((diff (add x b)
+  (singleton x)) = b).
+
+Axiom Diff_comm : forall (a:Type), forall (b:(bag a)) (b1:(bag a)) (b2:(bag
+  a)), ((diff (diff b b1) b2) = (diff (diff b b2) b1)).
+
 (* YOU MAY EDIT THE CONTEXT BELOW *)
 
 (* DO NOT EDIT BELOW *)
 
-Theorem Diff_empty_right : forall (a:Type), forall (b:(bag a)), ((diff b
-  (empty_bag:(bag a))) = b).
+Theorem Add_diff : forall (a:Type), forall (b:(bag a)) (x:a),
+  (0%Z <  (nb_occ x b))%Z -> ((add x (diff b (singleton x))) = b).
 (* YOU MAY EDIT THE PROOF BELOW *)
-intros X b.
+intros X b x H.
 apply bag_extensionality.
-intro x.
+intro y.
+unfold add; rewrite occ_union.
 rewrite Diff_occ.
-rewrite occ_empty.
-generalize (occ_non_negative X b x).
-generalize (Zmax_spec 0 (nb_occ x b - 0))%Z.
-auto with zarith.
+destruct (Zmax_spec 0 (nb_occ y b - nb_occ y (singleton x)))
+  as [(Ha,R)|(Ha,R)]; auto with zarith.
+destruct (occ_singleton X x y) as [(H1,H2)|(H1,H2)].
+subst; intuition.
+generalize (occ_non_negative X b y).
+omega.
 Qed.
 (* DO NOT EDIT BELOW *)
 

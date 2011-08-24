@@ -2,92 +2,73 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import ZArith.
 Require Import Rbase.
-Parameter map : forall (a:Type) (b:Type), Type.
+Parameter bag : forall (a:Type), Type.
 
-Parameter get: forall (a:Type) (b:Type), (map a b) -> a  -> b.
+Parameter nb_occ: forall (a:Type), a -> (bag a)  -> Z.
 
-Implicit Arguments get.
+Implicit Arguments nb_occ.
 
-Parameter set: forall (a:Type) (b:Type), (map a b) -> a -> b  -> (map a b).
+Axiom occ_non_negative : forall (a:Type), forall (b:(bag a)) (x:a),
+  (0%Z <= (nb_occ x b))%Z.
 
-Implicit Arguments set.
-
-Axiom Select_eq : forall (a:Type) (b:Type), forall (m:(map a b)),
-  forall (a1:a) (a2:a), forall (b1:b), (a1 = a2) -> ((get (set m a1 b1)
-  a2) = b1).
-
-Axiom Select_neq : forall (a:Type) (b:Type), forall (m:(map a b)),
-  forall (a1:a) (a2:a), forall (b1:b), (~ (a1 = a2)) -> ((get (set m a1 b1)
-  a2) = (get m a2)).
-
-Parameter const: forall (b:Type) (a:Type), b  -> (map a b).
-
-Set Contextual Implicit.
-Implicit Arguments const.
-Unset Contextual Implicit.
-
-Axiom Const : forall (b:Type) (a:Type), forall (b1:b) (a1:a), ((get (const(
-  b1):(map a b)) a1) = b1).
-
-Definition bag (a:Type) := (map a Z).
-
-Axiom occ_non_negative : forall (a:Type), forall (b:(map a Z)) (x:a),
-  (0%Z <= (get b x))%Z.
-
-Definition eq_bag (a:Type)(a1:(map a Z)) (b:(map a Z)): Prop := forall (x:a),
-  ((get a1 x) = (get b x)).
+Definition eq_bag (a:Type)(a1:(bag a)) (b:(bag a)): Prop := forall (x:a),
+  ((nb_occ x a1) = (nb_occ x b)).
 Implicit Arguments eq_bag.
 
-Axiom bag_extensionality : forall (a:Type), forall (a1:(map a Z)) (b:(map a
-  Z)), (eq_bag a1 b) -> (a1 = b).
+Axiom bag_extensionality : forall (a:Type), forall (a1:(bag a)) (b:(bag a)),
+  (eq_bag a1 b) -> (a1 = b).
 
-Parameter empty_bag: forall (a:Type),  (map a Z).
+Parameter empty_bag: forall (a:Type),  (bag a).
 
 Set Contextual Implicit.
 Implicit Arguments empty_bag.
 Unset Contextual Implicit.
 
-Axiom occ_empty : forall (a:Type), forall (x:a), ((get (empty_bag:(map a Z))
-  x) = 0%Z).
+Axiom occ_empty : forall (a:Type), forall (x:a), ((nb_occ x (empty_bag:(bag
+  a))) = 0%Z).
 
-Axiom is_empty : forall (a:Type), forall (b:(map a Z)), (forall (x:a),
-  ((get b x) = 0%Z)) -> (b = (empty_bag:(map a Z))).
+Axiom is_empty : forall (a:Type), forall (b:(bag a)), (forall (x:a),
+  ((nb_occ x b) = 0%Z)) -> (b = (empty_bag:(bag a))).
+
+Parameter singleton: forall (a:Type), a  -> (bag a).
+
+Implicit Arguments singleton.
 
 Axiom occ_singleton_eq : forall (a:Type), forall (x:a) (y:a), (x = y) ->
-  ((get (set (empty_bag:(map a Z)) x 1%Z) y) = 1%Z).
+  ((nb_occ y (singleton x)) = 1%Z).
 
 Axiom occ_singleton_neq : forall (a:Type), forall (x:a) (y:a), (~ (x = y)) ->
-  ((get (set (empty_bag:(map a Z)) x 1%Z) y) = 0%Z).
+  ((nb_occ y (singleton x)) = 0%Z).
 
-Parameter union: forall (a:Type), (map a Z) -> (map a Z)  -> (map a Z).
+Parameter union: forall (a:Type), (bag a) -> (bag a)  -> (bag a).
 
 Implicit Arguments union.
 
-Axiom occ_union : forall (a:Type), forall (x:a) (a1:(map a Z)) (b:(map a Z)),
-  ((get (union a1 b) x) = ((get a1 x) + (get b x))%Z).
+Axiom occ_union : forall (a:Type), forall (x:a) (a1:(bag a)) (b:(bag a)),
+  ((nb_occ x (union a1 b)) = ((nb_occ x a1) + (nb_occ x b))%Z).
 
-Axiom Union_comm : forall (a:Type), forall (a1:(map a Z)) (b:(map a Z)),
+Axiom Union_comm : forall (a:Type), forall (a1:(bag a)) (b:(bag a)),
   ((union a1 b) = (union b a1)).
 
-Axiom Union_identity : forall (a:Type), forall (a1:(map a Z)), ((union a1
-  (empty_bag:(map a Z))) = a1).
+Axiom Union_identity : forall (a:Type), forall (a1:(bag a)), ((union a1
+  (empty_bag:(bag a))) = a1).
 
-Axiom Union_assoc : forall (a:Type), forall (a1:(map a Z)) (b:(map a Z))
-  (c:(map a Z)), ((union a1 (union b c)) = (union (union a1 b) c)).
+Axiom Union_assoc : forall (a:Type), forall (a1:(bag a)) (b:(bag a)) (c:(bag
+  a)), ((union a1 (union b c)) = (union (union a1 b) c)).
 
-Axiom bag_simpl : forall (a:Type), forall (a1:(map a Z)) (b:(map a Z))
-  (c:(map a Z)), ((union a1 b) = (union c b)) -> (a1 = c).
+Axiom bag_simpl : forall (a:Type), forall (a1:(bag a)) (b:(bag a)) (c:(bag
+  a)), ((union a1 b) = (union c b)) -> (a1 = c).
 
 (* YOU MAY EDIT THE CONTEXT BELOW *)
 
 (* DO NOT EDIT BELOW *)
 
-Theorem bag_simpl_left : forall (a:Type), forall (a1:(map a Z)) (b:(map a Z))
-  (c:(map a Z)), ((union a1 b) = (union a1 c)) -> (b = c).
+Theorem bag_simpl_left : forall (a:Type), forall (a1:(bag a)) (b:(bag a))
+  (c:(bag a)), ((union a1 b) = (union a1 c)) -> (b = c).
 (* YOU MAY EDIT THE PROOF BELOW *)
 intros X a b c H_union.
 apply bag_extensionality; intro x.
-assert (h: (get (union a b) x) =  (get (union a c) x))
+assert (h: (nb_occ x (union a b)) =  (nb_occ x (union a c)))
   by (rewrite H_union; auto).
 do 2 rewrite occ_union in h; auto with zarith.
 Qed.

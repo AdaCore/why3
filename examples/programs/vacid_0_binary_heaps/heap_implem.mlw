@@ -54,7 +54,7 @@ let insert (this : ref logic_heap) (e : int) : unit  =
   arr := A.set !arr !i e;
   this := (!arr, n + 1);
   assert { 0 < !i < n -> is_heap !this };
-  assert { !i < n -> model !this = add e (model (a,n)) }
+  assert { !i < n -> model !this = add e (model (a,n)) } 
 { is_heap !this /\
     model !this = add e (model (old !this)) }
 
@@ -110,6 +110,57 @@ let extractMin (this : ref logic_heap) : int =
 { is_heap !this /\
   result = min_bag (model (old !this)) /\
   model (old !this) = add result (model !this) }
+
+(*
+
+let extractMin0 (this : ref logic_heap) : int =
+{ model !this <> empty_bag }
+  let (a, n) = !this in
+  assert {n > 0};
+  let min = a[0] in
+  let n' = n-1 in
+  let last = a[n'] in
+  assert { n' > 0 -> nb_occ last (diff (model (a,n))
+                        (singleton min)) > 0 } ;
+  let arr = ref a in
+  let i = ref 0 in
+  try
+    while ( !i < n') do
+      invariant {
+        0 <= !i /\
+        (n' > 0 -> !i < n') /\
+        (!i = 0 -> !arr = a) /\
+        (n' > 0 ->
+          elements !arr 0 n' =
+            add !arr[!i] (diff (diff (model (a,n))
+                 (singleton last))
+               (singleton min))) /\
+        (!i > 0 -> !arr[parent !i] < last) }
+      variant {n' - !i}
+      let left = 2 * !i + 1 in
+      let right = 2 * !i + 2 in
+      if (left >= n') then raise Break;
+      let smaller = ref left in
+      if right < n' then
+        if !arr[left] > !arr[right]
+          then smaller := right;
+      if last <= !arr[!smaller] then raise Break;
+      arr := !arr[!i <- !arr[!smaller]];
+      i := !smaller
+    done;
+    assert { n' = 0 }
+  with Break -> ()
+  end;
+  if !i < n' then
+    begin
+      arr := !arr[!i <- last];
+      assert { n' > 0 -> elements !arr 0 n' =
+                  (diff (model (a,n)) (singleton min)) }
+    end;
+  this := (!arr, n');
+  min
+{ model !this = diff (model (old !this)) (singleton result) }
+*)
 
 end
 
