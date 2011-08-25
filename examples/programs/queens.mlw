@@ -21,6 +21,28 @@ theory S "finite sets of with succ and pred operations"
 
 end
 
+module NQueensSetsTermination
+
+  use import S
+  use import module ref.Refint
+
+  let rec t (a b c : set int) variant { cardinal a } =
+    if not (is_empty a) then begin
+      let e = ref (diff (diff a b) c) in
+      let f = ref 0 in
+   'L:while not (is_empty !e) do
+        invariant { subset !e (diff (diff a b) c) }
+        variant { cardinal !e }
+        let d = min_elt !e in
+        f += t (remove d a) (succ (add d b)) (pred (add d c));
+        e := remove d !e
+      done;
+      !f
+    end else
+      1
+
+end
+
 theory Solution
 
   use import int.Int
@@ -86,20 +108,20 @@ module NQueensSets
 
   let rec t3 (a b c : set int) variant { cardinal a } =
     { 0 <= !k /\ !k + cardinal a = n /\ !s >= 0 /\
-      "pre_a" (forall i: int. mem i a <->
-              (0<=i<n /\ forall j: int. 0 <= j < !k ->  !col[j] <> i)) /\
-      "pre_b" (forall i: int. i>=0 -> not (mem i b) <->
-              (forall j: int. 0 <= j < !k -> !col[j] <> i + j - !k)) /\
-      "pre_c" (forall i: int. i>=0 -> not (mem i c) <->
-              (forall j: int. 0 <= j < !k -> !col[j] <> i + !k - j)) /\
+      (forall i: int. mem i a <->
+        (0<=i<n /\ forall j: int. 0 <= j < !k ->  !col[j] <> i)) /\
+      (forall i: int. i>=0 -> not (mem i b) <->
+        (forall j: int. 0 <= j < !k -> !col[j] <> i + j - !k)) /\
+      (forall i: int. i>=0 -> not (mem i c) <->
+        (forall j: int. 0 <= j < !k -> !col[j] <> i + !k - j)) /\
      partial_solution !k !col }
     if not (is_empty a) then begin
       let e = ref (diff (diff a b) c) in
-   'L:let f = ref 0 in
-      while not (is_empty !e) do
+      let f = ref 0 in
+   'L:while not (is_empty !e) do
         invariant {
           !f = !s - at !s 'L >= 0 /\ !k = at !k 'L /\
-          subset !e (at !e 'L) /\
+          subset !e (diff (diff a b) c) /\
           partial_solution !k !col /\
           sorted !sol (at !s 'L) !s /\
           (forall i j: int. mem i (diff (at !e 'L) !e) -> mem j !e -> i < j) /\
