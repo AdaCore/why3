@@ -130,7 +130,7 @@ module NQueensSets
            <->
            (exists i: int. (at !s 'L) <= i < !s /\ eq_sol t !sol[i])) /\
           (* assigns *)
-          eq_prefix (at !col 'L) !col (at !k 'L) /\
+          eq_prefix (at !col 'L) !col !k /\
           eq_prefix (at !sol 'L) !sol (at !s 'L) }
         variant { cardinal !e }
         let d = min_elt !e in
@@ -217,47 +217,14 @@ theory Bits "the 1-bits of an integer, as a set of integers"
 
 end
 
-(****
-
-module NQueens
+module NQueensBits
 
   use import Bits
   use import module arith.Int
   use import module ref.Refint
-
-  (* warmup 1: termination of the loop *)
-  let rec t1 (a b c : int) =
-    if a <> 0 then begin
-      let e = ref (a & ~b & ~c) in
-      let f = ref 0 in
-      while !e <> 0 do variant { cardinal (bits !e) }
-        let d = !e & (- !e) in
-        f += t1 (a - d) ((b+d) * 2) ((c+d)/2);
-        e -= d
-      done;
-      !f
-    end else
-      1
-
-  (* warmup 2: termination of the recursive function *)
-  let rec t2 (a b c : int) variant { cardinal (bits a) } =
-    if a <> 0 then begin
-      let e = ref (a & ~b & ~c) in
-      let f = ref 0 in
-      while !e <> 0 do invariant { subset (bits !e) (bits a) }
-        let d = !e & (- !e) in
-        assert { bits d = singleton (min_elt (bits !e)) };
-        assert { bits (a-d) = remove (min_elt (bits !e)) (bits a) };
-        f += t2 (a - d) ((b+d) * 2) ((c+d)/2);
-        e -= d
-      done;
-      !f
-    end else
-      1
+  use import Solution
 
   val min_elt (x: int) : { x <> 0 } int { result = min_elt (bits x) }
-
-  use import Solution
 
   val col: ref solution  (* solution under construction *)
   val k  : ref int       (* current row in the current solution *)
@@ -273,43 +240,39 @@ module NQueens
       eq_prefix (old !sol) !sol (old !s) /\
       !sol[old !s] = !col }
 
-  let rec t3 (a b c : int) =
-    { 0 <= !k /\ !k + cardinal (bits a) = n /\ 0 <= !s /\
-      "pre_a" (forall i: int. mem i (bits a) <->
-              (0<=i< n /\ forall j: int. 0 <= j < !k -> i <> !col[j])) /\
-      "pre_b" (forall i: int. i>=0 -> mem i (bits b) <->
-              (exists j: int. 0 <= j < !k /\ !col[j] = i + j - !k)) /\
-      "pre_c" (forall i: int. i>=0 -> mem i (bits c) <->
-              (exists j: int. 0 <= j < !k /\ !col[j] = i + !k - j)) /\
+  let rec t (a b c: int) variant { cardinal (bits a) } =
+    { 0 <= !k /\ !k + cardinal (bits a) = n /\ !s >= 0 /\
+      (forall i: int. mem i (bits a) <->
+        (0<=i<n /\ forall j: int. 0 <= j < !k ->  !col[j] <> i)) /\
+      (forall i: int. i>=0 -> not (mem i (bits b)) <->
+        (forall j: int. 0 <= j < !k -> !col[j] <> i + j - !k)) /\
+      (forall i: int. i>=0 -> not (mem i (bits c)) <->
+        (forall j: int. 0 <= j < !k -> !col[j] <> i + !k - j)) /\
      partial_solution !k !col }
     if a <> 0 then begin
       let e = ref (a & ~b & ~c) in
-   'L:let f = ref 0 in
-      while !e <> 0 do
+      let f = ref 0 in
+   'L:while !e <> 0 do
         invariant {
           !f = !s - at !s 'L >= 0 /\ !k = at !k 'L /\
-          subset (bits !e) (at (bits !e) 'L) /\
+          subset (bits !e) (diff (diff (bits a) (bits b)) (bits c)) /\
           partial_solution !k !col /\
           sorted !sol (at !s 'L) !s /\
-          (forall i j: int.
-             mem i (diff (at (bits !e) 'L) (bits !e)) -> mem j (bits !e) ->
-             i < j) /\
+          (forall i j: int. mem i (diff (at (bits !e) 'L) (bits !e)) ->
+             mem j (bits !e) -> i < j) /\
           (forall t: solution.
-            (solution t /\
-             exists di: int. mem di (diff (at (bits !e) 'L) (bits !e)) /\
-                eq_prefix !col t !k /\ t[!k] = di)
-            <->
-            (exists i: int. (at !s 'L) <= i < !s /\ eq_sol t !sol[i])) /\
+           (solution t /\ eq_prefix !col t !k /\
+            mem t[!k] (diff (at (bits !e) 'L) (bits !e)))
+           <->
+           (exists i: int. (at !s 'L) <= i < !s /\ eq_sol t !sol[i])) /\
           (* assigns *)
-          eq_prefix (at !col 'L) !col (at !k 'L) /\
+          eq_prefix (at !col 'L) !col !k /\
           eq_prefix (at !sol 'L) !sol (at !s 'L) }
+        variant { cardinal (bits !e) }
         let d = !e & (- !e) in
-        (* assert \exists int x; iset(d) == singleton(x) && in_(x,iset(a)) *)
-        assert { bits d = singleton (min_elt (bits !e)) };
-        assert { bits (a-d) = remove (min_elt (bits !e)) (bits a) };
         (* ghost *) col := !col[!k <- min_elt d];
         (* ghost *) incr k;
-        f += t3 (a - d) ((b+d) * 2) ((c+d)/2);
+        f += t (a - d) ((b+d) * 2) ((c+d)/2);
         (* ghost *) decr k;
         e -= d
       done;
@@ -327,16 +290,14 @@ module NQueens
       eq_prefix (old !col) !col !k /\
       eq_prefix (old !sol) !sol (old !s) }
 
-  let queens3 (q: int) =
+  let queens (q: int) =
     { 0 <= q = n /\ !s = 0 /\ !k = 0 }
-    t3 (~(~0 << q)) 0 0
+    t (~(~0 << q)) 0 0
     { result = !s /\ sorted !sol 0 !s /\
       forall t: solution.
         solution t <-> (exists i: int. 0 <= i < result /\ eq_sol t !sol[i]) }
 
 end
-
-****)
 
 (*
 Local Variables:
