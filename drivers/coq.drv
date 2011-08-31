@@ -85,6 +85,8 @@ theory int.Abs
 
   syntax function abs "(Zabs %1)"
 
+  remove prop Abs_pos
+
 end
 
 theory int.MinMax
@@ -101,6 +103,12 @@ theory int.EuclideanDivision
   syntax function div "(Zdiv %1 %2)"
   syntax function mod "(Zmod %1 %2)"
 
+  remove prop Div_mod
+  remove prop Div_bound
+  remove prop Mod_bound
+  remove prop Mod_1
+  remove prop Div_1
+
 end
 
 theory int.ComputerDivision
@@ -109,6 +117,21 @@ theory int.ComputerDivision
 
   syntax function div "(ZOdiv %1 %2)"
   syntax function mod "(ZOmod %1 %2)"
+
+  remove prop Div_mod
+  remove prop Div_bound
+  remove prop Mod_bound
+  remove prop Div_sign_pos
+  remove prop Div_sign_neg
+  remove prop Mod_sign_pos
+  remove prop Mod_sign_neg
+  remove prop Rounds_toward_zero
+  remove prop Div_1
+  remove prop Mod_1
+  remove prop Div_inf
+  remove prop Mod_inf
+  remove prop Div_mult
+  remove prop Mod_mult
 
 end
 
@@ -146,6 +169,9 @@ theory real.Real
   remove prop Trans
   remove prop Antisymm
   remove prop Total
+  remove prop assoc_mul_div
+  remove prop assoc_div_mul
+  remove prop assoc_div_div
 
 end
 
@@ -170,6 +196,7 @@ theory real.Abs
 
   syntax function abs "(Rabs %1)"
 
+  remove prop Abs_le
   remove prop Abs_pos
 
 end
@@ -177,6 +204,13 @@ end
 theory real.FromInt
 
   syntax function from_int "(IZR %1)"
+
+  remove prop Zero
+  remove prop One
+  remove prop Add
+  remove prop Sub
+  remove prop Mul
+  remove prop Neg
 
 end
 
@@ -186,6 +220,10 @@ theory real.Square
 
   syntax function sqr  "(Rsqr %1)"
   syntax function sqrt "(sqrt %1)"  (* and not Rsqrt *)
+
+  remove prop Sqrt_positive
+  remove prop Sqrt_square
+  remove prop Square_sqrt
 
 end
 
@@ -227,5 +265,15 @@ theory real.Trigonometry
 
   syntax function tan "(Rtrigo.tan %1)"
   (* syntax function atan "atan not defined in Coq ?" *)
+
+  remove prop Pythagorean_identity
+  remove prop Cos_le_one
+  remove prop Sin_le_one
+  remove prop Cos_0
+  remove prop Sin_0
+  remove prop Cos_pi
+  remove prop Sin_pi
+  remove prop Cos_pi2
+  remove prop Sin_pi2
 
 end
