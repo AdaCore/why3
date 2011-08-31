@@ -1855,10 +1855,11 @@ let edit_proof ~default_editor ~project_dir a =
               | f -> f
           in
           let file = Filename.concat project_dir file in
+          let old_res = a.proof_state in
           let callback res =
             match res with
               | Done _ ->
-                  set_proof_state ~obsolete:false a Undone
+                  set_proof_state ~obsolete:true a old_res
               | _ ->
                   set_proof_state ~obsolete:false a res
           in
