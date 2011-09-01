@@ -548,7 +548,7 @@ let print_logic_decl ~old info fmt (ls,ld) =
             (print_expr info) e;
           List.iter forget_var vl
       | None ->
-          fprintf fmt "@[<hov 2>%a %a: %a%a@ %a.@]@\n%a"
+          fprintf fmt "@[<hov 2>%a %a: %a%a%a.@]@\n%a"
             definition info
             print_ls ls
             print_params all_ty_params
