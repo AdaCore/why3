@@ -15,48 +15,6 @@ Parameter old: forall (a:Type), a  -> a.
 
 Implicit Arguments old.
 
-Axiom Abs_pos : forall (x:Z), (0%Z <= (Zabs x))%Z.
-
-Axiom Div_mod : forall (x:Z) (y:Z), (~ (y = 0%Z)) ->
-  (x = ((y * (ZOdiv x y))%Z + (ZOmod x y))%Z).
-
-Axiom Div_bound : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (0%Z <  y)%Z) ->
-  ((0%Z <= (ZOdiv x y))%Z /\ ((ZOdiv x y) <= x)%Z).
-
-Axiom Mod_bound : forall (x:Z) (y:Z), (~ (y = 0%Z)) ->
-  (((-(Zabs y))%Z <  (ZOmod x y))%Z /\ ((ZOmod x y) <  (Zabs y))%Z).
-
-Axiom Div_sign_pos : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (0%Z <  y)%Z) ->
-  (0%Z <= (ZOdiv x y))%Z.
-
-Axiom Div_sign_neg : forall (x:Z) (y:Z), ((x <= 0%Z)%Z /\ (0%Z <  y)%Z) ->
-  ((ZOdiv x y) <= 0%Z)%Z.
-
-Axiom Mod_sign_pos : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ ~ (y = 0%Z)) ->
-  (0%Z <= (ZOmod x y))%Z.
-
-Axiom Mod_sign_neg : forall (x:Z) (y:Z), ((x <= 0%Z)%Z /\ ~ (y = 0%Z)) ->
-  ((ZOmod x y) <= 0%Z)%Z.
-
-Axiom Rounds_toward_zero : forall (x:Z) (y:Z), (~ (y = 0%Z)) ->
-  ((Zabs ((ZOdiv x y) * y)%Z) <= (Zabs x))%Z.
-
-Axiom Div_1 : forall (x:Z), ((ZOdiv x 1%Z) = x).
-
-Axiom Mod_1 : forall (x:Z), ((ZOmod x 1%Z) = 0%Z).
-
-Axiom Div_inf : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (x <  y)%Z) ->
-  ((ZOdiv x y) = 0%Z).
-
-Axiom Mod_inf : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (x <  y)%Z) ->
-  ((ZOmod x y) = x).
-
-Axiom Div_mult : forall (x:Z) (y:Z) (z:Z), ((0%Z <  x)%Z /\ ((0%Z <= y)%Z /\
-  (0%Z <= z)%Z)) -> ((ZOdiv ((x * y)%Z + z)%Z x) = (y + (ZOdiv z x))%Z).
-
-Axiom Mod_mult : forall (x:Z) (y:Z) (z:Z), ((0%Z <  x)%Z /\ ((0%Z <= y)%Z /\
-  (0%Z <= z)%Z)) -> ((ZOmod ((x * y)%Z + z)%Z x) = (ZOmod z x)).
-
 Parameter power: Z -> Z  -> Z.
 
 
@@ -86,6 +44,10 @@ Definition contents (a:Type)(u:(ref a)): a :=
   end.
 Implicit Arguments contents.
 
+(* YOU MAY EDIT THE CONTEXT BELOW *)
+
+(* DO NOT EDIT BELOW *)
+
 Theorem WP_parameter_fast_exp_imperative : forall (x:Z), forall (n:Z),
   (0%Z <= n)%Z -> forall (e:Z), forall (p:Z), forall (r:Z), ((0%Z <= e)%Z /\
   ((r * (power p e))%Z = (power x n))) -> ((0%Z <  e)%Z ->
@@ -99,17 +61,9 @@ apply f_equal.
 subst.
 assert ((e = e/2 + e/2)%Z).
 assert (e mod 2 = 0).
-assert (0 <= e mod 2)%Z.
-apply Mod_sign_pos.
-intuition.
-assert (-(Zabs 2) < e mod 2 < (Zabs 2)).
-apply Mod_bound.
-omega.
-assert (Zabs 2 = 2).
-auto.
-rewrite H6 in H5; omega.
-assert (e = 2 * (e/2) + e mod 2).
-apply Div_mod; omega.
+generalize (ZOmod_lt_pos e 2).
+unfold Zabs; omega.
+rewrite (ZO_div_mod_eq e 2) at 1.
 omega.
 rewrite Power_mult2.
 rewrite H0 at 3.

@@ -16,48 +16,6 @@ Parameter old: forall (a:Type), a  -> a.
 
 Implicit Arguments old.
 
-Axiom Abs_pos : forall (x:Z), (0%Z <= (Zabs x))%Z.
-
-Axiom Div_mod : forall (x:Z) (y:Z), (~ (y = 0%Z)) ->
-  (x = ((y * (ZOdiv x y))%Z + (ZOmod x y))%Z).
-
-Axiom Div_bound : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (0%Z <  y)%Z) ->
-  ((0%Z <= (ZOdiv x y))%Z /\ ((ZOdiv x y) <= x)%Z).
-
-Axiom Mod_bound : forall (x:Z) (y:Z), (~ (y = 0%Z)) ->
-  (((-(Zabs y))%Z <  (ZOmod x y))%Z /\ ((ZOmod x y) <  (Zabs y))%Z).
-
-Axiom Div_sign_pos : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (0%Z <  y)%Z) ->
-  (0%Z <= (ZOdiv x y))%Z.
-
-Axiom Div_sign_neg : forall (x:Z) (y:Z), ((x <= 0%Z)%Z /\ (0%Z <  y)%Z) ->
-  ((ZOdiv x y) <= 0%Z)%Z.
-
-Axiom Mod_sign_pos : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ ~ (y = 0%Z)) ->
-  (0%Z <= (ZOmod x y))%Z.
-
-Axiom Mod_sign_neg : forall (x:Z) (y:Z), ((x <= 0%Z)%Z /\ ~ (y = 0%Z)) ->
-  ((ZOmod x y) <= 0%Z)%Z.
-
-Axiom Rounds_toward_zero : forall (x:Z) (y:Z), (~ (y = 0%Z)) ->
-  ((Zabs ((ZOdiv x y) * y)%Z) <= (Zabs x))%Z.
-
-Axiom Div_1 : forall (x:Z), ((ZOdiv x 1%Z) = x).
-
-Axiom Mod_1 : forall (x:Z), ((ZOmod x 1%Z) = 0%Z).
-
-Axiom Div_inf : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (x <  y)%Z) ->
-  ((ZOdiv x y) = 0%Z).
-
-Axiom Mod_inf : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (x <  y)%Z) ->
-  ((ZOmod x y) = x).
-
-Axiom Div_mult : forall (x:Z) (y:Z) (z:Z), ((0%Z <  x)%Z /\ ((0%Z <= y)%Z /\
-  (0%Z <= z)%Z)) -> ((ZOdiv ((x * y)%Z + z)%Z x) = (y + (ZOdiv z x))%Z).
-
-Axiom Mod_mult : forall (x:Z) (y:Z) (z:Z), ((0%Z <  x)%Z /\ ((0%Z <= y)%Z /\
-  (0%Z <= z)%Z)) -> ((ZOmod ((x * y)%Z + z)%Z x) = (ZOmod z x)).
-
 Definition lt_nat(x:Z) (y:Z): Prop := (0%Z <= y)%Z /\ (x <  y)%Z.
 
 Inductive lex : (Z* Z)%type -> (Z* Z)%type -> Prop :=
@@ -139,19 +97,6 @@ Axiom divides_trans : forall (a:Z) (b:Z) (c:Z), (divides a b) -> ((divides b
 
 Axiom divides_bounds : forall (a:Z) (b:Z), (divides a b) -> ((~ (b = 0%Z)) ->
   ((Zabs a) <= (Zabs b))%Z).
-
-Axiom Div_mod1 : forall (x:Z) (y:Z), (~ (y = 0%Z)) ->
-  (x = ((y * (Zdiv x y))%Z + (Zmod x y))%Z).
-
-Axiom Div_bound1 : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (0%Z <  y)%Z) ->
-  ((0%Z <= (Zdiv x y))%Z /\ ((Zdiv x y) <= x)%Z).
-
-Axiom Mod_bound1 : forall (x:Z) (y:Z), (~ (y = 0%Z)) ->
-  ((0%Z <= (Zmod x y))%Z /\ ((Zmod x y) <  (Zabs y))%Z).
-
-Axiom Mod_11 : forall (x:Z), ((Zmod x 1%Z) = 0%Z).
-
-Axiom Div_11 : forall (x:Z), ((Zdiv x 1%Z) = x).
 
 Axiom mod_divides_euclidean : forall (a:Z) (b:Z), (~ (b = 0%Z)) ->
   (((Zmod a b) = 0%Z) -> (divides b a)).
@@ -300,13 +245,14 @@ rewrite <- p0. apply sorted; omega.
 apply small_divisors; auto.
 omega.
 intros.
-assert (ne0: (get p3 k <> 0)%Z) by omega.
-generalize (Div_mod n1 (get p3 k)%Z ne0). intro div.
+generalize (ZO_div_mod_eq n1 (get p3 k)). intro div.
 assert (ne1: (0 <= n1 /\ get p3 k <> 0)%Z) by omega.
-generalize (Mod_sign_pos n1 (get p3 k)%Z ne1). intro mod1.
-generalize (Mod_bound n1 (get p3 k)%Z ne0). 
-rewrite Zabs_eq; try omega.
-intros (_, mod2).
+assert (mod1: (0 <= ZOmod n1 (get p3 k))%Z).
+destruct (not_Zeq_inf _ _ (proj2 ne1)) as [Zm|Zm].
+now apply ZOmod_lt_pos_neg.
+now apply ZOmod_lt_pos_pos.
+assert (mod2: (ZOmod n1 (get p3 k) < get p3 k)%Z).
+apply ZOmod_lt_pos_pos ; omega.
 assert (d <= get p3 k)%Z.
 assert (d < get p3 k+1)%Z. 2: omega.
 apply Zle_sqrt; try omega.
@@ -335,7 +281,7 @@ red; intro; apply H21 with i; try omega.
 auto.
 subst i.
 intro. apply H10.
-apply divides_mod_computer; auto.
+apply divides_mod_computer; auto; omega.
 Qed.
 (* DO NOT EDIT BELOW *)
 
