@@ -221,7 +221,7 @@ and print_tnode opl opr info fmt t = match t.t_node with
           Print_number.dec_real_support = Print_number.Number_unsupported;
           Print_number.hex_real_support = Print_number.Number_unsupported;
           Print_number.frac_real_support = Print_number.Number_custom
-            (Print_number.PrintFracReal ("(%s)%%R", "(%s * %s)%%R", "(%s / %s)%%R"));
+            (Print_number.PrintFracReal ("%s%%R", "(%s * %s)%%R", "(%s / %s)%%R"));
           Print_number.def_real_support = Print_number.Number_unsupported;
         } in
       Print_number.print number_format fmt c
