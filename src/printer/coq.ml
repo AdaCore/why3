@@ -249,8 +249,10 @@ and print_tnode opl opr info fmt t = match t.t_node with
       | Some s ->
           syntax_arguments s (print_term info) fmt tl
       | _ -> if unambig_fs fs
-          then fprintf fmt "(%a %a)" print_ls fs
-            (print_space_list (print_term info)) tl
+          then
+            if tl = [] then fprintf fmt "%a" print_ls fs
+            else fprintf fmt "(%a %a)" print_ls fs
+              (print_space_list (print_term info)) tl
           else fprintf fmt (protect_on opl "(%a%a:%a)") print_ls fs
             (print_paren_r (print_term info)) tl (print_ty info) (t_type t)
     end
