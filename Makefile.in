@@ -127,7 +127,7 @@ LIB_TRANSFORM = simplify_recursive_definition simplify_formula \
 		eliminate_inductive eliminate_let eliminate_if \
 		libencoding discriminate protect_enumeration \
 		encoding encoding_select \
-		encoding_decorate encoding_bridge encoding_twin \
+		encoding_decorate encoding_twin \
 		encoding_explicit encoding_guard encoding_sort \
 		encoding_instantiate simplify_array filter_trigger \
 		introduction abstraction close_epsilon lift_epsilon \
@@ -855,7 +855,7 @@ test-api: src/why3.cma
 	|| (printf "Test of Why API calls failed. Please fix it"; exit 2)
 
 test-shape: src/why3.cma src/ide/termcode.cmo
-	ocaml -I src/ -I src/ide/ $(INCLUDES) $(EXTCMA) $? examples/test_shape.ml 
+	ocaml -I src/ -I src/ide/ $(INCLUDES) $(EXTCMA) $? examples/test_shape.ml
 
 bts12244: src/why3.cma
 	ocaml -I src/ $(INCLUDES) $(EXTCMA) src/why3.cma examples/bts12244.ml
