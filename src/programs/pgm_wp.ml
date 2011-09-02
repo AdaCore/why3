@@ -55,6 +55,11 @@ let get_mutable_field ts i =
 (* smart constructors for building WPs
    TODO: tag with label "WP" *)
 
+let wp_label e f =
+  let loc = if f.t_loc = None then Some e.expr_loc else f.t_loc in
+  let lab = e.expr_lab @ f.t_label in
+  t_label ?loc lab f
+
 let wp_and ?(sym=false) f1 f2 =
   if sym then t_and_simp f1 f2 else t_and_asym_simp f1 f2
 
@@ -406,14 +411,6 @@ let well_founded_rel = function
 
 (* Recursive computation of the weakest precondition *)
 
-let wp_label ?loc ?(lab=[]) f =
-  let loc = option_apply loc (fun x -> Some x) f.t_loc in
-  let lab = lab @ f.t_label in
-(*
-  let lab = if List.mem "WP" lab then lab else "WP" :: lab in
-*)
-  t_label ?loc lab f
-
 let t_True env =
   fs_app (find_ls ~pure:true env "True") []
     (ty_app (find_ts ~pure:true env "bool") [])
@@ -433,7 +430,7 @@ let rec wp_expr env rm e q =
   let q = post_map (old_mark lab) q in
   let f = wp_desc env rm e q in
   let f = erase_mark lab f in
-  let f = wp_label ~loc:e.expr_loc ~lab:e.expr_lab f in
+  let f = wp_label e f in
   if Debug.test_flag debug then begin
     eprintf "@[--------@\n@[<hov 2>e = %a@]@\n" Pgm_pretty.print_expr e;
     eprintf "@[<hov 2>q = %a@]@\n" Pretty.print_term (snd (fst q));

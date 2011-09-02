@@ -67,6 +67,10 @@ let rec add_quant kn (vl,tl,f) v =
     | _ ->
         (v::vl, tl, f)
 
+let t_label_merge { t_label = l; t_loc = p } t =
+  let p = if t.t_loc = None then p else t.t_loc in
+  t_label ?loc:p (l @ t.t_label) t
+
 let eval_match ~inline kn t =
   let rec eval env t = match t.t_node with
     | Tapp (ls, tl) when inline kn ls (List.map t_type tl) t.t_ty ->
@@ -74,13 +78,13 @@ let eval_match ~inline kn t =
           | None ->
               t_map (eval env) t
           | Some def ->
-              t_label_copy t (eval env (unfold def tl t.t_ty))
+              t_label_merge t (eval env (unfold def tl t.t_ty))
         end
     | Tlet (t1, tb2) ->
         let t1 = eval env t1 in
         let x, t2, close = t_open_bound_cb tb2 in
         let t2 = eval (Mvs.add x t1 env) t2 in
-        t_label_copy t (t_let_simp t1 (close x t2))
+        t_label_merge t (t_let_simp t1 (close x t2))
     | Tcase (t1, bl1) ->
         let t1 = eval env t1 in
         let t1flat = dive env t1 in
@@ -105,11 +109,11 @@ let eval_match ~inline kn t =
               in
               t_case t1 (List.map mk_b bl1)
         in
-        t_label_copy t r
+        t_label_merge t r
     | Tquant (q, qf) ->
         let vl,tl,f,close = t_open_quant_cb qf in
         let vl,tl,f = List.fold_left (add_quant kn) ([],tl,f) vl in
-        t_label_copy t (t_quant_simp q (close (List.rev vl) tl (eval env f)))
+        t_label_merge t (t_quant_simp q (close (List.rev vl) tl (eval env f)))
     | _ ->
         t_map (eval env) t
   in

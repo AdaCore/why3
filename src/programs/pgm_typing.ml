@@ -660,7 +660,6 @@ and dexpr_desc ~ghost env loc = function
       let e3 = dexpr ~ghost env e3 in
       expected_type e3 (dty_unit env.uc);
       DEfor (x, e1, d, e2, inv, e3), dty_unit env.uc
-
   | Ptree.Eassert (k, le) ->
       DEassert (k, le), dty_unit env.uc
   | Ptree.Emark ({id=s}, e1) ->
@@ -1613,7 +1612,6 @@ and expr_desc ~userloc gl env loc ty = function
       let add_effect ef (_,_,_,ef') = E.union ef ef' in
       let ef = List.fold_left add_effect e1.expr_effect dl in
       Eletrec (dl, e1), e1.expr_type_v, ef
-
   | IEif (e1, e2, e3) ->
       let e1 = expr ~userloc gl env e1 in
       let e2 = expr ~userloc gl env e2 in
@@ -1704,7 +1702,6 @@ and expr_desc ~userloc gl env loc ty = function
       let ef = e3.expr_effect in
       let ef, inv = option_map_fold term_effect ef inv in
       Efor (x, v1, d, v2, inv, e3), type_v_unit gl, ef
-
   | IEassert (k, f) ->
       let ef, f = term_effect E.empty f in
       Eassert (k, f), tpure ty, ef
