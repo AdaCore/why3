@@ -758,8 +758,8 @@ let check_at_fmla ?(old=false) loc f0 =
   if not (check f0) then
     errorm ~loc "locally bound variable %a under `at'" print_vs (of_option !v)
 
-let dterm env l = Typing.dterm ~localize:true env l
-let dfmla env l = Typing.dfmla ~localize:true env l
+let dterm env l = Typing.dterm ~localize:(Some None) env l
+let dfmla env l = Typing.dfmla ~localize:(Some None) env l
 
 type ienv = {
   i_uc      : uc;

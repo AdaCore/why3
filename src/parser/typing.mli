@@ -67,8 +67,10 @@ val type_term : theory_uc -> denv -> vsymbol Mstr.t -> Ptree.lexpr -> term
 val type_fmla : theory_uc -> denv -> vsymbol Mstr.t -> Ptree.lexpr -> term
 
 val dty : theory_uc -> denv -> Ptree.pty -> Denv.dty
-val dterm : ?localize:bool -> theory_uc -> denv -> Ptree.lexpr -> Denv.dterm
-val dfmla : ?localize:bool -> theory_uc -> denv -> Ptree.lexpr -> Denv.dfmla
+val dterm : ?localize:(Ptree.loc option option) ->
+  theory_uc -> denv -> Ptree.lexpr -> Denv.dterm
+val dfmla : ?localize:(Ptree.loc option option) ->
+  theory_uc -> denv -> Ptree.lexpr -> Denv.dfmla
 val dpat : theory_uc -> denv -> Ptree.pattern -> denv * Denv.dpattern
 val dpat_list :
   theory_uc -> denv -> Denv.dty -> Ptree.pattern -> denv * Denv.dpattern

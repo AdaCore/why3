@@ -444,15 +444,18 @@ let apply_highord loc x tl = match List.rev tl with
   | a::tl -> [{pp_loc = loc; pp_desc = PPapp (x, List.rev tl)}; a]
   | [] -> assert false
 
-let rec dterm ?(localize=false) uc env { pp_loc = loc; pp_desc = t } =
+let rec dterm ?(localize=None) uc env { pp_loc = loc; pp_desc = t } =
   let n, ty = dterm_node ~localize loc uc env t in
   let t = { dt_node = n; dt_ty = ty } in
-  let rec down e = match e.dt_node with
-    | Tnamed (Lstr _, e) -> down e
+  let rec down loc e = match e.dt_node with
+    | Tnamed (Lstr _, e) -> down loc e
     | Tnamed (Lpos _, _) -> t
     | _ -> { dt_node = Tnamed (Lpos loc, t); dt_ty = ty }
   in
-  if localize then down t else t
+  match localize with
+    | Some (Some loc) -> down loc t
+    | Some None -> down loc t
+    | None -> t
 
 and dterm_node ~localize loc uc env = function
   | PPvar (Qident {id=x}) when Mstr.mem x env.dvars ->
@@ -510,7 +513,7 @@ and dterm_node ~localize loc uc env = function
       Tmatch (t1, bl), tb
   | PPnamed (x, e1) ->
       let localize = match x with
-        | Lpos _ -> false
+        | Lpos l -> Some (Some l)
         | Lstr _ -> localize
       in
       let e1 = dterm ~localize uc env e1 in
@@ -646,14 +649,17 @@ and dterm_node ~localize loc uc env = function
   | PPquant _ | PPbinop _ | PPunop _ | PPfalse | PPtrue ->
       error ~loc TermExpected
 
-and dfmla ?(localize=false) uc env { pp_loc = loc; pp_desc = f } =
+and dfmla ?(localize=None) uc env { pp_loc = loc; pp_desc = f } =
   let f = dfmla_node ~localize loc uc env f in
-  let rec down e = match e with
-    | Fnamed (Lstr _, e) -> down e
+  let rec down loc e = match e with
+    | Fnamed (Lstr _, e) -> down loc e
     | Fnamed (Lpos _, _) -> f
     | _ -> Fnamed (Lpos loc, f)
   in
-  if localize then down f else f
+  match localize with
+    | Some (Some loc) -> down loc f
+    | Some None -> down loc f
+    | None -> f
 
 and dfmla_node ~localize loc uc env = function
   | PPtrue ->
@@ -727,7 +733,7 @@ and dfmla_node ~localize loc uc env = function
       Fmatch (t1, List.map branch bl)
   | PPnamed (x, f1) ->
       let localize = match x with
-        | Lpos _ -> false
+        | Lpos l -> Some (Some l)
         | Lstr _ -> localize
       in
       let f1 = dfmla ~localize uc env f1 in
