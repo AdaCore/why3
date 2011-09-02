@@ -106,19 +106,16 @@ theory real.Real
 
 end
 
-(*
-(* L'encodage des types sommes bloquent cette théorie builtin *)
 theory bool.Bool
-   syntax type bool   "bool"
+   syntax type bool      "bool"
    syntax function True  "true"
    syntax function False "false"
    syntax function andb  "(and %1 %2)"
    syntax function orb   "(or %1 %2)"
    syntax function xorb  "(xor %1 %2)"
    syntax function notb  "(not %1)"
-   meta cloned "encoding_decorate : kept" type bool
+   meta "encoding : kept" type bool
 end
-*)
 
 
 theory int.EuclideanDivision

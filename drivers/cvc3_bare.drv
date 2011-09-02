@@ -108,19 +108,16 @@ theory real.Real
 
 end
 
-(*
-(* L'encodage des types sommes bloquent cette théorie builtin *)
 theory bool.Bool
-   syntax type bool   "BITVECTOR(1)"
+   syntax type     bool  "BITVECTOR(1)"
    syntax function True  "0bin1"
    syntax function False "0bin0"
    syntax function andb  "(%1 & %2)"
    syntax function orb   "(%1 | %2)"
    syntax function xorb  "(BVXOR(%1,%2))"
    syntax function notb  "(~ %1)"
-   meta cloned "encoding_decorate : kept" type bool
+   meta "encoding : kept" type bool
 end
-*)
 
 (*
 theory int.EuclideanDivision
