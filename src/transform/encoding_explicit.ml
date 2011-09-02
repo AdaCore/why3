@@ -129,14 +129,14 @@ let explicit = Trans.decl decl (Task.add_decl None d_ts_type)
 let explicit =
   Trans.on_tagged_ty Libencoding.meta_kept (fun kept ->
   Trans.on_tagged_ts Eliminate_algebraic.meta_enum (fun enum ->
-    let check ts = ts.ts_args = [] && Sty.mem (ty_app ts []) kept in
+    let check ts = not (ts.ts_args = [] && Sty.mem (ty_app ts []) kept) in
     let enum = Sts.filter check enum in
     if Sts.is_empty enum then explicit
     else
       let ts = Sts.choose enum in
       let ty = ty_app ts (List.map ty_var ts.ts_args) in
       Printer.unsupportedType ty
-      "explicit is unsound in presence of type"))
+      "Encoding_explicit is unsound in presence of unprotected finite types"))
 
 
 (** {2 monomorphise task } *)

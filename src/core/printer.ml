@@ -269,13 +269,13 @@ let () = Exn_printer.register (fun fmt exn -> match exn with
   | Unsupported s ->
       fprintf fmt "@[<hov 3> Uncatched exception 'Unsupported %s'@]" s
   | UnsupportedType (e,s) ->
-      fprintf fmt "@[<hov 3> This type isn't supported:@\n%a@\n%s@]"
+      fprintf fmt "@[@[<hov 3> This type isn't supported:@\n%a@]@\n %s@]"
         Pretty.print_ty e s
   | UnsupportedTerm (e,s) ->
-      fprintf fmt "@[<hov 3> This expression isn't supported:@\n%a@\n%s@]"
+      fprintf fmt "@[@[<hov 3> This expression isn't supported:@\n%a@]@\n %s@]"
         Pretty.print_term e s
   | UnsupportedDecl (d,s) ->
-      fprintf fmt "@[<hov 3> This declaration isn't supported:@\n%a@\n%s@]"
+      fprintf fmt "@[@[<hov 3> This declaration isn't supported:@\n%a@]@\n %s@]"
         Pretty.print_decl d s
   | NotImplemented (s) ->
       fprintf fmt "@[<hov 3> Unimplemented feature:@\n%s@]" s
