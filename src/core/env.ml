@@ -117,8 +117,21 @@ let locate_file name lp path =
   | [file] -> file
   | file1 :: file2 :: _ -> raise (AmbiguousPath (file1, file2))
 
+exception InvalidQualifier of string
+
+let check_qualifier s =
+  let find_dir_sep s =
+    let re = Str.regexp_string Filename.dir_sep in
+    try ignore (Str.search_forward re s 0); true
+    with Not_found -> false in
+  if (s = Filename.parent_dir_name ||
+      s = Filename.current_dir_name ||
+      find_dir_sep s)
+  then raise (InvalidQualifier s)
+
 let create_env_of_loadpath lp =
   let fc f sl =
+    List.iter check_qualifier sl;
     let file = locate_file f lp sl in
     file, open_in file
   in
@@ -176,6 +189,8 @@ let () = Exn_printer.register
       Format.fprintf fmt "Format not specified"
   | AmbiguousPath (f1,f2) ->
       Format.fprintf fmt "Ambiguous path:@ both `%s'@ and `%s'@ match" f1 f2
+  | InvalidQualifier s ->
+      Format.fprintf fmt "Invalid qualifier `%s'" s
   | _ -> raise exn
   end
 

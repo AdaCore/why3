@@ -330,10 +330,8 @@ decl:
     { UseClone (floc (), $2, None) }
 | CLONE use clone_subst
     { UseClone (floc (), $2, Some $3) }
-| META ident list1_meta_arg_sep_comma
+| META sident list1_meta_arg_sep_comma
     { Meta (floc (), $2, $3) }
-| META STRING list1_meta_arg_sep_comma
-    { Meta (floc (), mk_id $2 (floc_i 2), $3) }
 ;
 
 /* Use and clone */
@@ -906,8 +904,13 @@ tqualid:
 ;
 
 any_qualid:
-| ident                 { Qident $1 }
-| any_qualid DOT ident  { Qdot ($1, $3) }
+| sident                { Qident $1 }
+| any_qualid DOT sident { Qdot ($1, $3) }
+;
+
+sident:
+| ident   { $1 }
+| STRING  { mk_id $1 (floc ()) }
 ;
 
 /* Misc */
