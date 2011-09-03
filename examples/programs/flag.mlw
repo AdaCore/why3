@@ -19,7 +19,7 @@ module Flag
       a[i] <- a[j];
       a[j] <- v
     end
-    { exchange a (old a) i j }
+    { exchange (old a) a i j }
 
   let dutch_flag (a:array color) (n:int) =
     { 0 <= n /\ length a = n }
@@ -33,7 +33,7 @@ module Flag
                    monochrome a !b !i White /\
                    monochrome a !r n  Red /\
                    length a = n /\
-                   permut_sub a (at a 'Init) 0 n }
+                   permut_sub (at a 'Init) a 0 n }
        variant { !r - !i }
        match a[!i] with
        | Blue ->
@@ -51,7 +51,7 @@ module Flag
         monochrome a 0 b Blue /\
         monochrome a b r White /\
         monochrome a r n Red)
-      /\ permut a (old a) }
+      /\ permut (old a) a }
 
 end
 
