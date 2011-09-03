@@ -8,11 +8,11 @@ Definition unit  := unit.
 
 Parameter mark : Type.
 
-Parameter at1: forall (a:Type), a -> mark  -> a.
+Parameter at1: forall (a:Type), a -> mark -> a.
 
 Implicit Arguments at1.
 
-Parameter old: forall (a:Type), a  -> a.
+Parameter old: forall (a:Type), a -> a.
 
 Implicit Arguments old.
 
@@ -65,69 +65,14 @@ Axiom divides_antisym : forall (a:Z) (b:Z), (divides a b) -> ((divides b
 Axiom divides_trans : forall (a:Z) (b:Z) (c:Z), (divides a b) -> ((divides b
   c) -> (divides a c)).
 
-Axiom Abs_pos : forall (x:Z), (0%Z <= (Zabs x))%Z.
-
 Axiom divides_bounds : forall (a:Z) (b:Z), (divides a b) -> ((~ (b = 0%Z)) ->
   ((Zabs a) <= (Zabs b))%Z).
-
-Axiom Div_mod : forall (x:Z) (y:Z), (~ (y = 0%Z)) ->
-  (x = ((y * (Zdiv x y))%Z + (Zmod x y))%Z).
-
-Axiom Div_bound : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (0%Z <  y)%Z) ->
-  ((0%Z <= (Zdiv x y))%Z /\ ((Zdiv x y) <= x)%Z).
-
-Axiom Mod_bound : forall (x:Z) (y:Z), (~ (y = 0%Z)) ->
-  ((0%Z <= (Zmod x y))%Z /\ ((Zmod x y) <  (Zabs y))%Z).
-
-Axiom Mod_1 : forall (x:Z), ((Zmod x 1%Z) = 0%Z).
-
-Axiom Div_1 : forall (x:Z), ((Zdiv x 1%Z) = x).
 
 Axiom mod_divides_euclidean : forall (a:Z) (b:Z), (~ (b = 0%Z)) ->
   (((Zmod a b) = 0%Z) -> (divides b a)).
 
 Axiom divides_mod_euclidean : forall (a:Z) (b:Z), (~ (b = 0%Z)) ->
   ((divides b a) -> ((Zmod a b) = 0%Z)).
-
-Axiom Div_mod1 : forall (x:Z) (y:Z), (~ (y = 0%Z)) ->
-  (x = ((y * (ZOdiv x y))%Z + (ZOmod x y))%Z).
-
-Axiom Div_bound1 : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (0%Z <  y)%Z) ->
-  ((0%Z <= (ZOdiv x y))%Z /\ ((ZOdiv x y) <= x)%Z).
-
-Axiom Mod_bound1 : forall (x:Z) (y:Z), (~ (y = 0%Z)) ->
-  (((-(Zabs y))%Z <  (ZOmod x y))%Z /\ ((ZOmod x y) <  (Zabs y))%Z).
-
-Axiom Div_sign_pos : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (0%Z <  y)%Z) ->
-  (0%Z <= (ZOdiv x y))%Z.
-
-Axiom Div_sign_neg : forall (x:Z) (y:Z), ((x <= 0%Z)%Z /\ (0%Z <  y)%Z) ->
-  ((ZOdiv x y) <= 0%Z)%Z.
-
-Axiom Mod_sign_pos : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ ~ (y = 0%Z)) ->
-  (0%Z <= (ZOmod x y))%Z.
-
-Axiom Mod_sign_neg : forall (x:Z) (y:Z), ((x <= 0%Z)%Z /\ ~ (y = 0%Z)) ->
-  ((ZOmod x y) <= 0%Z)%Z.
-
-Axiom Rounds_toward_zero : forall (x:Z) (y:Z), (~ (y = 0%Z)) ->
-  ((Zabs ((ZOdiv x y) * y)%Z) <= (Zabs x))%Z.
-
-Axiom Div_11 : forall (x:Z), ((ZOdiv x 1%Z) = x).
-
-Axiom Mod_11 : forall (x:Z), ((ZOmod x 1%Z) = 0%Z).
-
-Axiom Div_inf : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (x <  y)%Z) ->
-  ((ZOdiv x y) = 0%Z).
-
-Axiom Mod_inf : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (x <  y)%Z) ->
-  ((ZOmod x y) = x).
-
-Axiom Div_mult : forall (x:Z) (y:Z) (z:Z), ((0%Z <  x)%Z /\ ((0%Z <= y)%Z /\
-  (0%Z <= z)%Z)) -> ((ZOdiv ((x * y)%Z + z)%Z x) = (y + (ZOdiv z x))%Z).
-
-Axiom Mod_mult : forall (x:Z) (y:Z) (z:Z), ((0%Z <  x)%Z /\ ((0%Z <= y)%Z /\
-  (0%Z <= z)%Z)) -> ((ZOmod ((x * y)%Z + z)%Z x) = (ZOmod z x)).
 
 Axiom mod_divides_computer : forall (a:Z) (b:Z), (~ (b = 0%Z)) ->
   (((ZOmod a b) = 0%Z) -> (divides b a)).
@@ -161,7 +106,7 @@ Axiom even_divides : forall (a:Z), (even a) <-> (divides 2%Z a).
 
 Axiom odd_divides : forall (a:Z), (odd a) <-> ~ (divides 2%Z a).
 
-Parameter gcd: Z -> Z  -> Z.
+Parameter gcd: Z -> Z -> Z.
 
 
 Axiom gcd_nonneg : forall (a:Z) (b:Z), (0%Z <= (gcd a b))%Z.
@@ -205,18 +150,17 @@ Axiom gcd_mult : forall (a:Z) (b:Z) (c:Z), (0%Z <= c)%Z -> ((gcd (c * a)%Z
 (* DO NOT EDIT BELOW *)
 
 Theorem WP_parameter_gcd : forall (u:Z), forall (v:Z), ((0%Z <= u)%Z /\
-  (0%Z <= v)%Z) -> ((~ (v = 0%Z)) -> (((0%Z <= v)%Z /\
-  ((ZOmod u v) <  v)%Z) /\ ((0%Z <= v)%Z /\ (0%Z <= (ZOmod u v))%Z))).
+  (0%Z <= v)%Z) -> ((~ (v = 0%Z)) -> ((((0%Z <= v)%Z /\
+  ((ZOmod u v) <  v)%Z) /\ ((0%Z <= v)%Z /\ (0%Z <= (ZOmod u v))%Z)) ->
+  ((gcd v (ZOmod u v)) = (gcd u v)))).
 (* YOU MAY EDIT THE PROOF BELOW *)
 intuition.
 symmetry.
 rewrite Comm.
 rewrite gcd_euclid with (q:=(ZOdiv u v)).
-assert (u - (ZOdiv u v) * v = ZOmod u v)%Z.
-generalize (Div_mod1 u v); intuition.
-replace ((ZOdiv u v) * v) with (v * (ZOdiv u v)) by ring.
-omega.
-rewrite H4; auto.
+apply f_equal.
+rewrite (ZO_div_mod_eq u v) at 1.
+ring.
 Qed.
 (* DO NOT EDIT BELOW *)
 
