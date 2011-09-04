@@ -32,6 +32,9 @@ theory Group
   clone Assoc with type t = t, function op = op
 
   axiom Inv_def : forall x:t. op x (inv x) = unit
+
+  lemma Inv_unit : forall x y:t. op x (inv y) = unit -> x = y
+
 end
 
 theory CommutativeGroup

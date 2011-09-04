@@ -11,6 +11,8 @@ theory Real
   clone export algebra.OrderedField with type t = real,
     function zero = zero, function one = one, predicate (<=) = (<=)
 
+  lemma sub_zero: forall x y:real. x - y = 0.0 -> x = y
+
 end
 
 theory RealInfix
@@ -39,6 +41,8 @@ theory Abs
   lemma Abs_le: forall x y:real. abs x <= y <-> -y <= x <= y
 
   lemma Abs_pos: forall x:real. abs x >= 0.0
+
+  lemma Abs_zero: forall x:real. abs x = 0.0 -> x = 0.0
 
 end
 
