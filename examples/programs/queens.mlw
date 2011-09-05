@@ -186,24 +186,30 @@ theory Bits "the 1-bits of an integer, as a set of integers"
 
   function bits int : set int
 
+  function size : int (* word size, e.g. 32 *)
+
   axiom bits_0:
     forall x: int. is_empty (bits x) <-> x = 0
 
   axiom bits_remove_singleton:
-    forall i a b: int. bits b = singleton i -> mem i (bits a) ->
+    forall a b: int. forall i: int. 0 <= i < size ->
+    bits b = singleton i -> mem i (bits a) ->
     bits (a - b) = remove i (bits a)
 
   axiom bits_add_singleton:
-    forall i a b: int. bits b = singleton i -> not (mem i (bits a)) ->
+    forall a b: int. forall i: int. 0 <= i < size ->
+    bits b = singleton i -> not (mem i (bits a)) ->
     bits (a + b) = add i (bits a)
 
   axiom bits_mul2:
-    forall a: int. bits (a*2) = succ (bits a)
+    forall a: int. forall i: int. 0 <= i < size ->
+    mem i (bits (a*2)) <-> mem i (succ (bits a))
 
   use export int.ComputerDivision
 
   axiom bits_div2:
-    forall a: int. bits (div a 2) = pred (bits a)
+    forall a: int. forall i: int. 0 <= i < size ->
+    mem i (bits (div a 2)) <-> mem i (pred (bits a))
 
   use export BitwiseArithmetic
 
@@ -211,9 +217,11 @@ theory Bits "the 1-bits of an integer, as a set of integers"
     forall a b: int. bits (a & ~b) = diff (bits a) (bits b)
 
   axiom rightmost_bit_trick:
-    forall x: int. x <> 0 -> bits (x & -x) = singleton (min_elt (bits x))
+    forall x: int. x <> 0 -> 0 <= min_elt (bits x) < size ->
+    bits (x & -x) = singleton (min_elt (bits x))
 
-  axiom bits_below: forall n: int. n >= 0 -> bits (~(~0<<n)) = below n
+  axiom bits_below:
+    forall n: int. 0 <= n < size -> bits (~(~0<<n)) = below n
 
 end
 
@@ -291,7 +299,7 @@ module NQueensBits
       eq_prefix (old !sol) !sol (old !s) }
 
   let queens (q: int) =
-    { 0 <= q = n /\ !s = 0 /\ !k = 0 }
+    { 0 <= q = n <= size /\ !s = 0 /\ !k = 0 }
     t (~(~0 << q)) 0 0
     { result = !s /\ sorted !sol 0 !s /\
       forall t: solution.
