@@ -169,7 +169,7 @@ theory NumOfParam
 
   axiom Num_of_right_no_add :
     forall p : param, a b : int.
-    a < b -> not pr p (b-1) -> num_of p a b = num_of p a (b-1)
+    a < b -> not (pr p (b-1)) -> num_of p a b = num_of p a (b-1)
   axiom Num_of_right_add :
     forall p : param, a b : int.
     a < b -> pr p (b-1) -> num_of p a b = 1 + num_of p a (b-1)
@@ -203,9 +203,20 @@ theory NumOfParam
     (* by Num_of_append and Num_of_non_negative *)
 
   lemma num_of_strictly_increasing:
-    forall p : param, i j k l : int.
+    forall p: param, i j k l: int.
     i <= j <= k < l -> pr p k -> num_of p i j < num_of p i l
     (* by Num_of_append and num_of_increasing *)
+
+  lemma num_of_change_any:
+    forall p1 p2: param, a b: int.
+    (forall j: int. a <= j < b -> pr p1 j -> pr p2 j) ->
+    num_of p2 a b >= num_of p1 a b
+
+  lemma num_of_change_some:
+    forall p1 p2: param, a b i: int. a <= i < b ->
+    (forall j: int. a <= j < b -> pr p1 j -> pr p2 j) ->
+    not (pr p1 i) -> pr p2 i ->
+    num_of p2 a b > num_of p1 a b
 
 end
 
