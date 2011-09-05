@@ -82,6 +82,11 @@ theory Solution
   predicate sorted (s: solutions) (a b: int) =
     forall i j: int. a <= i < j < b -> lt_sol s[i] s[j]
 
+  (* a sorted array of solutions contains no duplicate *)
+  lemma no_duplicate:
+    forall s: solutions, a b: int. sorted s a b ->
+    forall i j: int. a <= i < j < b -> not (eq_sol s[i] s[j])
+
 end
 
 (* 1. Abstract version of the code using sets (not ints) *******************)
@@ -97,14 +102,6 @@ module NQueensSets
 
   val sol: ref solutions (* all solutions *)
   val s  : ref int       (* next slot for a solution = number of solutions *)
-
-  let store_solution () =
-    { solution !col }
-    sol := !sol[!s <- !col];
-    incr s
-    { !s = old !s + 1 /\
-      eq_prefix (old !sol) !sol (old !s) /\
-      !sol[old !s] = !col }
 
   let rec t3 (a b c : set int) variant { cardinal a } =
     { 0 <= !k /\ !k + cardinal a = n /\ !s >= 0 /\
@@ -142,7 +139,8 @@ module NQueensSets
       done;
       !f
     end else begin
-      (* ghost *) store_solution ();
+      (* ghost *) sol := !sol[!s <- !col];
+      (* ghost *) incr s;
       1
     end
     { result = !s - old !s >= 0 /\ !k = old !k /\
@@ -240,14 +238,6 @@ module NQueensBits
   val sol: ref solutions (* all solutions *)
   val s  : ref int       (* next slot for a solution = number of solutions *)
 
-  let store_solution () =
-    { solution !col }
-    sol := !sol[!s <- !col];
-    incr s
-    { !s = old !s + 1 /\
-      eq_prefix (old !sol) !sol (old !s) /\
-      !sol[old !s] = !col }
-
   let rec t (a b c: int) variant { cardinal (bits a) } =
     { 0 <= !k /\ !k + cardinal (bits a) = n /\ !s >= 0 /\
       (forall i: int. mem i (bits a) <->
@@ -286,7 +276,8 @@ module NQueensBits
       done;
       !f
     end else begin
-      (* ghost *) store_solution ();
+      (* ghost *) sol := !sol[!s <- !col];
+      (* ghost *) incr s;
       1
     end
     { result = !s - old !s >= 0 /\ !k = old !k /\
