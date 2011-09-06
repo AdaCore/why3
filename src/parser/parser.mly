@@ -995,9 +995,9 @@ list1_program_decl:
 program_decl:
 | decl
     { Dlogic $1 }
-| LET lident_rich labels list1_type_v_binder opt_cast EQUAL triple
+| LET lident_rich_pgm labels list1_type_v_binder opt_cast EQUAL triple
     { Dlet (add_lab $2 $3, mk_expr_i 7 (Efun ($4, cast_body $5 $7))) }
-| LET lident_rich labels EQUAL FUN list1_type_v_binder ARROW triple
+| LET lident_rich_pgm labels EQUAL FUN list1_type_v_binder ARROW triple
     { Dlet (add_lab $2 $3, mk_expr_i 8 (Efun ($6, $8))) }
 | LET REC list1_recfun_sep_and
     { Dletrec $3 }
@@ -1008,7 +1008,7 @@ program_decl:
       Dparam (add_lab $2 $3, tv) }
 | EXCEPTION uident labels
     { Dexn (add_lab $2 $3, None) }
-| EXCEPTION uident labels pure_type
+| EXCEPTION uident labels primitive_type
     { Dexn (add_lab $2 $3, Some $4) }
 | USE use_module
     { $2 }
@@ -1046,7 +1046,7 @@ list1_recfun_sep_and:
 ;
 
 recfun:
-| lident_rich labels list1_type_v_binder opt_cast opt_variant EQUAL triple
+| lident_rich_pgm labels list1_type_v_binder opt_cast opt_variant EQUAL triple
    { add_lab $1 $2, $3, $5, cast_body $4 $7 }
 ;
 
@@ -1128,7 +1128,7 @@ expr:
    { mk_expr (Efor ($2, $4, $5, $6, $8, $9)) }
 | ABSURD
    { mk_expr Eabsurd }
-| expr COLON pure_type
+| expr COLON primitive_type
    { mk_expr (Ecast ($1, $3)) }
 | RAISE uqualid
    { mk_expr (Eraise ($2, None)) }
@@ -1244,51 +1244,24 @@ loop_invariant:
 | /* epsilon */        { None    }
 ;
 
-/* TODO: We should be able to reuse primitive_type for pure_type
-pure_type:
-| primitive_type { $1 }
-;
-*/
-
-pure_type:
-| pure_type_arg_no_paren { $1 }
-| lqualid pure_type_args { PPTtyapp ($2, $1) }
-;
-
-pure_type_args:
-| pure_type_arg                { [$1] }
-| pure_type_arg pure_type_args { $1 :: $2 }
-;
-
-pure_type_arg:
-| LEFTPAR pure_type RIGHTPAR { $2 }
-| pure_type_arg_no_paren     { $1 }
-;
-
-pure_type_arg_no_paren:
-| type_var
-   { PPTtyvar $1 }
-| lqualid
-   { PPTtyapp ([], $1) }
-| LEFTPAR pure_type COMMA list1_pure_type_sep_comma RIGHTPAR
-   { PPTtuple ($2 :: $4) }
-| LEFTPAR RIGHTPAR
-   { PPTtuple ([]) }
-;
-
-list1_pure_type_sep_comma:
-| pure_type                                 { [$1] }
-| pure_type COMMA list1_pure_type_sep_comma { $1 :: $3 }
-;
-
 list1_type_v_binder:
 | type_v_binder                     { $1 }
 | type_v_binder list1_type_v_binder { $1 @ $2 }
 ;
 
+list1_type_v_param:
+| type_v_param                    { $1 }
+| type_v_param list1_type_v_param { $1 @ $2 }
+;
+
 type_v_binder:
 | lident labels
    { [add_lab $1 $2, None] }
+| type_v_param
+   { $1 }
+;
+
+type_v_param:
 | LEFTPAR RIGHTPAR
    { [id_anonymous (), Some (ty_unit ())] }
 | LEFTPAR lidents_lab COLON type_v RIGHTPAR
@@ -1302,6 +1275,11 @@ lidents_lab:
 type_v:
 | simple_type_v
    { $1 }
+| arrow_type_v
+   { $1 }
+;
+
+arrow_type_v:
 | simple_type_v ARROW type_c
    { Tarrow ([id_anonymous (), Some $1], $3) }
 | lident labels COLON simple_type_v ARROW type_c
@@ -1310,24 +1288,10 @@ type_v:
    /*{ Tarrow (List.map (fun x -> x, Some $3) $1, $5) }*/
 ;
 
-type_v_param:
-/* TODO ???
-| simple_type_v
-   { [id_anonymous (), Some $1] }
-*/
-| LEFTPAR lidents_lab COLON type_v RIGHTPAR
-   { List.map (fun i -> (i, Some $4)) $2 }
-;
-
-list1_type_v_param:
-| type_v_param                    { $1 }
-| type_v_param list1_type_v_param { $1 @ $2 }
-;
-
 simple_type_v:
-| pure_type
+| primitive_type
     { Tpure $1 }
-| LEFTPAR type_v RIGHTPAR
+| LEFTPAR arrow_type_v RIGHTPAR
     { $2 }
 ;
 
@@ -1340,10 +1304,8 @@ type_c:
 
 /* for ANY */
 simple_type_c:
-| pure_type
-    { type_c (mk_pp PPtrue) (Tpure $1) empty_effect (mk_pp PPtrue, []) }
-| LEFTPAR type_v RIGHTPAR
-    { type_c (mk_pp PPtrue) $2 empty_effect (mk_pp PPtrue, []) }
+| simple_type_v
+    { type_c (mk_pp PPtrue) $1 empty_effect (mk_pp PPtrue, []) }
 | pre type_v effects post
     { type_c $1 $2 $3 $4 }
 ;
@@ -1403,7 +1365,7 @@ opt_variant:
 
 opt_cast:
 | /* epsilon */   { None }
-| COLON pure_type { Some $2 }
+| COLON primitive_type { Some $2 }
 ;
 
 list1_uqualid:
