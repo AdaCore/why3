@@ -1010,8 +1010,6 @@ program_decl:
     { Dexn (add_lab $2 $3, None) }
 | EXCEPTION uident labels primitive_type
     { Dexn (add_lab $2 $3, Some $4) }
-| EXCEPTION uident labels LEFTPAR pure_type RIGHTPAR
-    { Dexn (add_lab $2 $3, Some $5) }
 | USE use_module
     { $2 }
 | NAMESPACE namespace_import namespace_name list0_program_decl END
