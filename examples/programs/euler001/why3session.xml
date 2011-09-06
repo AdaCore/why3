@@ -1,60 +1,80 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
 <why3session name="examples/programs/euler001/why3session.xml">
+ <prover id="alt-ergo" name="Alt-Ergo" version="0.93"/>
+ <prover id="coq" name="Coq" version="8.2pl1"/>
+ <prover id="cvc3" name="CVC3" version="2.2"/>
+ <prover id="gappa" name="Gappa" version="0.13.0"/>
+ <prover id="simplify" name="Simplify" version="1.5.4"/>
+ <prover id="z3" name="Z3" version="2.19"/>
  <file name="../euler001.mlw" verified="false" expanded="true">
   <theory name="SumMultiple" verified="false" expanded="true">
-   <goal name="div_minus1_1" sum="799200a5112f46b45ab595bbe99aa9fe" proved="false" expanded="true">
-   </goal>
-   <goal name="div_minus1_2" sum="7b0639aa2f9bead033faaeae5c5303fe" proved="false" expanded="true">
-   </goal>
-   <goal name="mod_15" sum="e5478c4f7dd1e8e51f1b59c6f48d52b7" proved="true" expanded="true">
-    <proof prover="cvc3" timelimit="2" edited="" obsolete="false">
-     <result status="valid" time="0.04"/>
-    </proof>
-    <proof prover="alt-ergo" timelimit="2" edited="" obsolete="false">
-     <result status="valid" time="0.11"/>
-    </proof>
-    <proof prover="z3" timelimit="2" edited="" obsolete="false">
-     <result status="valid" time="0.02"/>
+   <goal name="div_minus1_1" sum="5266791566cb9e131f79837e51b72de8" proved="true" expanded="true" shape="ainfix =adivainfix +V0c1V1ainfix +adivV0V1c1Iainfix =amodainfix +V0c1V1c0Iainfix >V1c0Aainfix >=V0c0F">
+    <proof prover="coq" timelimit="5" edited="euler001_SumMultiple_div_minus1_1_1.v" obsolete="false">
+     <result status="valid" time="0.48"/>
     </proof>
    </goal>
-   <goal name="Closed_formula_0" sum="a49fafd7dea8767fc52287a6d759cc28" proved="true" expanded="true">
-    <proof prover="cvc3" timelimit="2" edited="" obsolete="false">
-     <result status="valid" time="0.03"/>
+   <goal name="div_minus1_2" sum="b75e15f7119a97ac29920a7a789b8e15" proved="false" expanded="true" shape="ainfix =adivainfix +V0c1V1adivV0V1Iainfix =amodainfix +V0c1V1c0NIainfix >V1c0Aainfix >=V0c0F">
+    <proof prover="simplify" timelimit="5" edited="" obsolete="false">
+     <result status="unknown" time="0.05"/>
     </proof>
-    <proof prover="alt-ergo" timelimit="2" edited="" obsolete="false">
-     <result status="valid" time="0.01"/>
+    <proof prover="cvc3" timelimit="5" edited="" obsolete="false">
+     <result status="timeout" time="5.01"/>
     </proof>
-    <proof prover="z3" timelimit="2" edited="" obsolete="false">
-     <result status="valid" time="0.00"/>
+    <proof prover="alt-ergo" timelimit="5" edited="" obsolete="false">
+     <result status="unknown" time="0.23"/>
+    </proof>
+    <proof prover="z3" timelimit="5" edited="" obsolete="false">
+     <result status="timeout" time="5.06"/>
     </proof>
    </goal>
-   <goal name="Closed_formula_n_1" sum="53f650c14f94ca7656e6b83261ea0a3d" proved="true" expanded="true">
+   <goal name="Closed_formula_0" sum="9d635abb360eeba223e62aea7d54449e" proved="true" expanded="true" shape="apc0">
     <proof prover="cvc3" timelimit="2" edited="" obsolete="false">
      <result status="valid" time="0.12"/>
     </proof>
-    <proof prover="simplify" timelimit="2" edited="" obsolete="false">
-     <result status="valid" time="0.00"/>
+    <proof prover="alt-ergo" timelimit="2" edited="" obsolete="false">
+     <result status="valid" time="0.02"/>
     </proof>
-   </goal>
-   <goal name="Closed_formula_n_2" sum="ce02a5758f2253ac1e0edc7f916ce957" proved="false" expanded="true">
-   </goal>
-   <goal name="Closed_formula" sum="aa724d9368ec95db9867b2ea2062c3a0" proved="true" expanded="true">
-    <proof prover="cvc3" timelimit="2" edited="" obsolete="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof prover="simplify" timelimit="2" edited="" obsolete="false">
+    <proof prover="z3" timelimit="2" edited="" obsolete="false">
      <result status="valid" time="0.03"/>
+    </proof>
+   </goal>
+   <goal name="Closed_formula_n" sum="14a06794c39f504fc3c7c61434c31a89" proved="true" expanded="true" shape="apV0Iainfix =amodV0c5c0NAainfix =amodV0c3c0NIapainfix -V0c1Iainfix >V0c0F">
+    <proof prover="cvc3" timelimit="5" edited="" obsolete="false">
+     <result status="valid" time="0.23"/>
+    </proof>
+   </goal>
+   <goal name="Closed_formula_n_3" sum="759e99918260c7a3c5b1f4b5c33f42dd" proved="true" expanded="true" shape="apV0Iainfix =amodV0c5c0NAainfix =amodV0c3c0Iapainfix -V0c1Iainfix >V0c0F">
+    <proof prover="alt-ergo" timelimit="5" edited="" obsolete="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal name="Closed_formula_n_5" sum="380bc8b386b3035b1711cb23fa17a9da" proved="true" expanded="true" shape="apV0Iainfix =amodV0c5c0Aainfix =amodV0c3c0NIapainfix -V0c1Iainfix >V0c0F">
+    <proof prover="alt-ergo" timelimit="5" edited="" obsolete="false">
+     <result status="valid" time="0.05"/>
+    </proof>
+   </goal>
+   <goal name="Closed_formula_n_15" sum="cc0a4b0b292325909c6a8a65262645c3" proved="true" expanded="true" shape="apV0Iainfix =amodV0c5c0Aainfix =amodV0c3c0Iapainfix -V0c1Iainfix >V0c0F">
+    <proof prover="alt-ergo" timelimit="5" edited="" obsolete="false">
+     <result status="valid" time="0.04"/>
+    </proof>
+   </goal>
+   <goal name="Closed_formula" sum="8e356511ca2b540b119a8650fd1519c4" proved="true" expanded="true" shape="apV0Iainfix <=c0V0F">
+    <proof prover="cvc3" timelimit="2" edited="" obsolete="false">
+     <result status="valid" time="0.10"/>
+    </proof>
+    <proof prover="simplify" timelimit="2" edited="" obsolete="false">
+     <result status="valid" time="0.13"/>
     </proof>
    </goal>
   </theory>
   <theory name="WP Euler001" verified="true" expanded="true">
-   <goal name="WP_parameter solve" expl="normal postcondition" sum="1d462fc3346a429205b44caaf3f0a839" proved="true" expanded="true">
-    <proof prover="cvc3" timelimit="2" edited="" obsolete="false">
-     <result status="valid" time="0.51"/>
+   <goal name="WP_parameter solve" expl="normal postcondition" sum="76b404cbe7788d104d79907f50ebed27" proved="true" expanded="true" shape="ainfix =adivainfix -ainfix +ainfix *ainfix *c3adivainfix -V0c1c3ainfix +adivainfix -V0c1c3c1ainfix *ainfix *c5adivainfix -V0c1c5ainfix +adivainfix -V0c1c5c1ainfix *ainfix *c15adivainfix -V0c1c15ainfix +adivainfix -V0c1c15c1c2asum_multiple_3_5_ltV0Iainfix >=V0c1F">
+    <proof prover="cvc3" timelimit="5" edited="" obsolete="false">
+     <result status="valid" time="2.63"/>
     </proof>
     <proof prover="simplify" timelimit="2" edited="" obsolete="false">
-     <result status="valid" time="0.10"/>
+     <result status="valid" time="0.13"/>
     </proof>
    </goal>
   </theory>

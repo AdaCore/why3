@@ -43,21 +43,31 @@ theory SumMultiple
          5 * n5 * (n5+1) -
          15 * n15 * (n15+1)) 2
 
+(*
   lemma mod_15 :
     forall n:int. n >= 0 ->
       mod n 15 = 0 <-> (mod n 3 = 0 /\ mod n 5 = 0)
+*)
 
   predicate p (n:int) = sum_multiple_3_5_lt (n+1) = closed_formula n
 
   lemma Closed_formula_0: p 0
 
-  lemma Closed_formula_n_1:
+  lemma Closed_formula_n:
     forall n:int. n > 0 -> p (n-1) ->
       mod n 3 <> 0 /\ mod n 5 <> 0 -> p n
 
-  lemma Closed_formula_n_2:
+  lemma Closed_formula_n_3:
     forall n:int. n > 0 -> p (n-1) ->
-      mod n 3 = 0 \/ mod n 5 = 0 -> p n
+      mod n 3 = 0 /\ mod n 5 <> 0 -> p n
+
+  lemma Closed_formula_n_5:
+    forall n:int. n > 0 -> p (n-1) ->
+      mod n 3 <> 0 /\ mod n 5 = 0 -> p n
+
+  lemma Closed_formula_n_15:
+    forall n:int. n > 0 -> p (n-1) ->
+      mod n 3 = 0 /\ mod n 5 = 0 -> p n
 
   clone int.Induction as I with predicate p = p
 
