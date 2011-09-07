@@ -575,8 +575,8 @@ let () =
 let () =
   try
     eprintf "[Info] Opening session...@\n@[<v 2>  ";
-    M.open_session ~env:gconfig.env
-      (* ~provers:gconfig.provers *)
+    M.open_session ~allow_obsolete:true
+      ~env:gconfig.env
       ~config:gconfig.Gconfig.config
       ~init ~notify project_dir;
     M.maximum_running_proofs := gconfig.max_running_processes;
@@ -1208,7 +1208,7 @@ let reload () =
   try
     erase_color_loc source_view;
     current_file := "";
-    M.reload_all ()
+    M.reload_all true
   with
     | e ->
         let e = match e with

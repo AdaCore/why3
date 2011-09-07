@@ -10,9 +10,9 @@ DATE=`date --utc +%Y-%m-%d`
 SUBJECT="Why3 nightly bench:"
 
 notify() {
-    mail -s "$SUBJECT" why3-commits@lists.gforge.inria.fr < $REPORT
+    # mail -s "$SUBJECT" why3-commits@lists.gforge.inria.fr < $REPORT
     # mail -s "$SUBJECT" Claude.Marche@inria.fr < $REPORT
-    # cat $REPORT
+    cat $REPORT
     exit 0
 }
 

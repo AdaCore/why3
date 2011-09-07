@@ -169,11 +169,11 @@ module Make(O: OBSERVER) : sig
 
 (** {2 Save and load a state}      *)
 
+  exception OutdatedSession
+
   val open_session :
+    allow_obsolete:bool ->
     env:Env.env ->
-(*
-    provers:prover_data Util.Mstr.t ->
-*)
     config:Whyconf.config ->
     init:(O.key -> any -> unit) ->
     notify:(any -> unit) ->
@@ -190,6 +190,8 @@ module Make(O: OBSERVER) : sig
         the [init] function is a function that will be called at each
         creation of element of the state
 
+        raises [OutdatedSession] if [allow_obsolete] is false and any obsolete
+        data for a goal is found in the session database
     *)
 
   val get_provers : unit -> prover_data Util.Mstr.t
@@ -257,11 +259,15 @@ module Make(O: OBSERVER) : sig
         which are triples (goal name, prover, report)
     *)
 
-  val reload_all: unit -> unit
+  val reload_all: bool -> unit
     (** reloads all the files
         If for one of the file, the parsing or typing fails, then
         the complete old session state is kept, and an exception
         is raised
+
+        raises [OutdatedSession] if [allow_obsolete] is false and any obsolete
+        data for a goal is found in the session database
+        
     *)
 
   val remove_proof_attempt : proof_attempt -> unit

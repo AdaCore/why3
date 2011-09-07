@@ -1107,7 +1107,8 @@ let reload_proof obsolete goal pid old_a =
   in
   !notify_fun (Goal a.proof_goal)
 
-let rec reload_any_goal parent gid gname sum shape t old_goal goal_obsolete =
+let rec reload_any_goal parent gid gname sum shape t 
+    old_goal goal_obsolete =
   let info = get_explanation gid (Task.task_goal_fmla t) in
   let exp = match old_goal with None -> true | Some g -> g.goal_expanded in
   let goal = raw_add_goal parent gname info sum shape (Some t) exp in
@@ -1123,7 +1124,7 @@ let rec reload_any_goal parent gid gname sum shape t old_goal goal_obsolete =
   goal
 
 
-and reload_trans  _goal_obsolete goal _ tr =
+and reload_trans _goal_obsolete goal _ tr =
   let trname = tr.transf.transformation_name in
   let gname = goal.goal_name in
   eprintf "[Reload] transformation %s for goal %s @\n" trname gname;
@@ -1143,9 +1144,10 @@ and reload_trans  _goal_obsolete goal _ tr =
   in
   apply_transformation ~callback tr.transf (get_task goal)
 
+exception OutdatedSession
 
 (* reloads the task [t] in theory mth (named tname) *)
-let reload_root_goal mth tname old_goals t : goal =
+let reload_root_goal ~allow_obsolete mth tname old_goals t : goal =
   let id = (Task.task_goal t).Decl.pr_name in
   let gname = id.Ident.id_string in
   let sum = task_checksum t in
@@ -1157,11 +1159,14 @@ let reload_root_goal mth tname old_goals t : goal =
     with Not_found -> (None,false)
   in
   if goal_obsolete then
-    eprintf "Goal %s.%s has changed@." tname gname;
+    begin
+      eprintf "[Reload] Goal %s.%s has changed@." tname gname;
+      if not allow_obsolete then raise OutdatedSession
+    end;
   reload_any_goal (Parent_theory mth) id gname sum "" t old_goal goal_obsolete
 
 (* reloads a theory *)
-let reload_theory mfile old_theories (_,tname,th) =
+let reload_theory ~allow_obsolete mfile old_theories (_,tname,th) =
   eprintf "[Reload] theory '%s'@\n"tname;
   let tasks = List.rev (Task.split_theory th None None) in
   let old_goals, old_exp =
@@ -1178,7 +1183,7 @@ let reload_theory mfile old_theories (_,tname,th) =
   !notify_fun (Theory mth);
   let new_goals = List.fold_left
     (fun acc t ->
-       let g = reload_root_goal mth tname goalsmap t in
+       let g = reload_root_goal ~allow_obsolete mth tname goalsmap t in
        g::acc)
     [] tasks
   in
@@ -1188,7 +1193,7 @@ let reload_theory mfile old_theories (_,tname,th) =
 
 
 (* reloads a file *)
-let reload_file mf theories =
+let reload_file ~allow_obsolete mf theories =
   let new_mf = raw_add_file mf.file_name mf.file_expanded in
   let old_theories = List.fold_left
     (fun acc t -> Util.Mstr.add t.theory_name t acc)
@@ -1197,7 +1202,7 @@ let reload_file mf theories =
   in
   !notify_fun (File new_mf);
   let mths = List.fold_left
-    (fun acc th -> reload_theory new_mf old_theories th :: acc)
+    (fun acc th -> reload_theory ~allow_obsolete new_mf old_theories th :: acc)
     [] theories
   in
   new_mf.theories <- List.rev mths;
@@ -1205,7 +1210,7 @@ let reload_file mf theories =
 
 
 (* reloads all files *)
-let reload_all () =
+let reload_all allow_obsolete =
   let files = !all_files in
   let all_theories =
     List.map (fun mf ->
@@ -1215,7 +1220,7 @@ let reload_all () =
   in
   all_files := [];
   O.reset ();
-  List.iter (fun (mf,ths) -> reload_file mf ths) all_theories
+  List.iter (fun (mf,ths) -> reload_file ~allow_obsolete mf ths) all_theories
 
 (****************************)
 (*     session opening      *)
@@ -1407,7 +1412,7 @@ let load_session ~env xml =
 
 let db_filename = "why3session.xml"
 
-let open_session ~env ~config ~init ~notify dir =
+let open_session ~allow_obsolete ~env ~config ~init ~notify dir =
   match !current_env with
     | None ->
         init_fun := init; notify_fun := notify;
@@ -1418,7 +1423,7 @@ let open_session ~env ~config ~init ~notify dir =
         begin try
           let xml = Xml.from_file (Filename.concat dir db_filename) in
           load_session ~env xml;
-          reload_all ()
+          reload_all allow_obsolete
         with
           | Sys_error _ ->
               (* xml does not exist yet *)

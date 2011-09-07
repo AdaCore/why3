@@ -313,7 +313,8 @@ let print_report (g,p,r) =
 let () =
   try
     eprintf "Opening session...@?";
-    M.open_session ~env ~config ~init ~notify project_dir;
+    M.open_session ~allow_obsolete:false
+      ~env ~config ~init ~notify project_dir;
     M.maximum_running_proofs :=
       Whyconf.running_provers_max (Whyconf.get_main config);
     eprintf " done@.";
@@ -335,11 +336,18 @@ let () =
     M.check_all ~callback;
     try main_loop ()
     with Exit -> eprintf "main replayer exited unexpectedly@."
-  with e when not (Debug.test_flag Debug.stack_trace) ->
-    eprintf "Error while opening session with database '%s' : %a@." project_dir
-      Exn_printer.exn_printer e;
-    eprintf "Aborting...@.";
-    exit 1
+  with
+    | M.OutdatedSession ->
+        eprintf "The session database '%s' is outdated, cannot replay@." 
+          project_dir;
+        eprintf "Aborting...@.";
+        exit 1
+    | e when not (Debug.test_flag Debug.stack_trace) ->
+        eprintf "Error while opening session with database '%s' : %a@." 
+          project_dir
+          Exn_printer.exn_printer e;
+        eprintf "Aborting...@.";
+        exit 1
 
 
 (*
