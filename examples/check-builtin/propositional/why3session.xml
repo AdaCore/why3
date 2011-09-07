@@ -1,34 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
 <why3session name="examples/check-builtin/propositional/why3session.xml">
+ <prover id="alt-ergo" name="Alt-Ergo" version="0.93"/>
+ <prover id="coq" name="Coq" version="8.3pl2"/>
+ <prover id="cvc3" name="CVC3" version="2.2"/>
+ <prover id="gappa" name="Gappa" version="0.15.0"/>
+ <prover id="simplify" name="Simplify" version="1.5.4"/>
+ <prover id="spass" name="Spass" version="3.7"/>
+ <prover id="vampire" name="Vampire" version="0.6"/>
+ <prover id="yices" name="Yices" version="1.0.25"/>
+ <prover id="z3" name="Z3" version="2.19"/>
  <file name="../propositional.why" verified="true" expanded="true">
   <theory name="Prop" verified="true" expanded="true">
-   <goal name="G" sum="471c261cd7f9ce63dea0b35f7d68e893" proved="true" expanded="true">
+   <goal name="G" sum="9206fc807c83873441f3de41147b4839" proved="true" expanded="true" shape="aaIabAaa">
     <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof prover="z3" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof prover="spass" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.03"/>
-    </proof>
-   </goal>
-   <goal name="G2" sum="a457f032770d60c5eab69f1f59f5af96" proved="true" expanded="true">
-    <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof prover="z3" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof prover="spass" timelimit="10" edited="" obsolete="false">
      <result status="valid" time="0.02"/>
+    </proof>
+    <proof prover="z3" timelimit="10" edited="" obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof prover="spass" timelimit="10" edited="" obsolete="false">
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
   </theory>

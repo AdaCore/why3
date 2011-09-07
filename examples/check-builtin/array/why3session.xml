@@ -1,51 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
 <why3session name="examples/check-builtin/array/why3session.xml">
+ <prover id="alt-ergo" name="Alt-Ergo" version="0.93"/>
+ <prover id="coq" name="Coq" version="8.3pl2"/>
+ <prover id="cvc3" name="CVC3" version="2.2"/>
+ <prover id="gappa" name="Gappa" version="0.15.0"/>
+ <prover id="simplify" name="Simplify" version="1.5.4"/>
+ <prover id="spass" name="Spass" version="3.7"/>
+ <prover id="vampire" name="Vampire" version="0.6"/>
+ <prover id="yices" name="Yices" version="1.0.25"/>
+ <prover id="z3" name="Z3" version="2.19"/>
  <file name="../array.why" verified="true" expanded="true">
   <theory name="Test_simplify_array" verified="true" expanded="true">
-   <goal name="G1" sum="6ba9acd1575b0f736753d499a8efa246" proved="true" expanded="true">
-    <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof prover="z3" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof prover="spass" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.04"/>
-    </proof>
-   </goal>
-   <goal name="G2" sum="ba915c2a50e7cb9f66307625030ee440" proved="true" expanded="true">
-    <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof prover="z3" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof prover="spass" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.03"/>
-    </proof>
-   </goal>
-   <goal name="G3" sum="b23fa0a82a81a38100f4990bc5abb06e" proved="true" expanded="true">
-    <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof prover="z3" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof prover="spass" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.26"/>
-    </proof>
-   </goal>
-   <goal name="G4" sum="d3736da01102cfb2b3afd57824a993b6" proved="true" expanded="true">
+   <goal name="G1" sum="4b1f56125aaf6794df037dfd2cbfea62" proved="true" expanded="true" shape="ainfix =agetasetV2V1V0V1V0FF">
     <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
      <result status="valid" time="0.00"/>
     </proof>
@@ -56,7 +23,49 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof prover="spass" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.33"/>
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+   <goal name="G2" sum="dc80f74d142de8dda00f0aef8deca6c0" proved="true" expanded="true" shape="ainfix =agetasetV5V0V4V3V1Iainfix =agetV5V3V1Iainfix =V3V0NFF">
+    <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof prover="z3" timelimit="10" edited="" obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof prover="spass" timelimit="10" edited="" obsolete="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+   <goal name="G3" sum="4aea5336be3a1feb8cf653e610e1d89a" proved="true" expanded="true" shape="ainfix =agetasetV2c1V1c0V0Iainfix =agetV2c0V0FF">
+    <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof prover="z3" timelimit="10" edited="" obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof prover="spass" timelimit="10" edited="" obsolete="false">
+     <result status="valid" time="0.15"/>
+    </proof>
+   </goal>
+   <goal name="G4" sum="5751bd67cfa24e03534046070269e911" proved="true" expanded="true" shape="ainfix =agetasetasetV2c1V1c0V0c1V1FF">
+    <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof prover="z3" timelimit="10" edited="" obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof prover="spass" timelimit="10" edited="" obsolete="false">
+     <result status="valid" time="0.19"/>
     </proof>
    </goal>
   </theory>
