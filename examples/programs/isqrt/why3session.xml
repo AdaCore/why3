@@ -1,9 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
 <why3session name="examples/programs/isqrt/why3session.xml">
+ <prover id="alt-ergo" name="Alt-Ergo" version="0.93"/>
+ <prover id="coq" name="Coq" version="8.3pl2"/>
+ <prover id="cvc3" name="CVC3" version="2.2"/>
+ <prover id="gappa" name="Gappa" version="0.15.0"/>
+ <prover id="simplify" name="Simplify" version="1.5.4"/>
+ <prover id="spass" name="Spass" version="3.7"/>
+ <prover id="vampire" name="Vampire" version="0.6"/>
+ <prover id="yices" name="Yices" version="1.0.25"/>
+ <prover id="z3" name="Z3" version="2.19"/>
  <file name="../isqrt.mlw" verified="true" expanded="true">
   <theory name="WP Simple" verified="true" expanded="true">
-   <goal name="WP_parameter isqrt" expl="correctness of parameter isqrt" sum="71cc23114951a4ecb6b4f3257d65e891" proved="true" expanded="true">
+   <goal name="WP_parameter isqrt" expl="correctness of parameter isqrt" sum="71cc23114951a4ecb6b4f3257d65e891" proved="true" expanded="false" shape="iainfix <=V1V0ainfix <ainfix -V0V3ainfix -V0V2Aainfix <=c0ainfix -V0V2Aainfix =V4asqrainfix +V3c1Aainfix >=V0asqrV3Aainfix >=V3c0Iainfix =V4ainfix +ainfix +V1ainfix *c2V3c1FIainfix =V3ainfix +V2c1Fainfix <V0asqrainfix +V2c1Aainfix <=asqrV2V0Aainfix >=V2c0Iainfix =V1asqrainfix +V2c1Aainfix >=V0asqrV2Aainfix >=V2c0FFAainfix =c1asqrainfix +c0c1Aainfix >=V0asqrc0Aainfix >=c0c0Iainfix >=V0c0F">
     <proof prover="cvc3" timelimit="2" edited="" obsolete="false">
      <result status="valid" time="0.01"/>
     </proof>
@@ -11,65 +20,155 @@
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
-   <goal name="WP_parameter main" expl="correctness of parameter main" sum="1c68d9c3079316cc99cf2e1bf49cbce6" proved="true" expanded="true">
+   <goal name="WP_parameter main" expl="correctness of parameter main" sum="1c68d9c3079316cc99cf2e1bf49cbce6" proved="true" expanded="false" shape="ainfix =V0c4Iainfix <c17asqrainfix +V0c1Aainfix <=asqrV0c17Aainfix >=V0c0FAainfix >=c17c0">
     <proof prover="z3" timelimit="2" edited="" obsolete="false">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
   </theory>
   <theory name="WP NewtonMethod" verified="true" expanded="true">
-   <goal name="WP_parameter sqrt" expl="correctness of parameter sqrt" sum="60eaaec813247c8c0f5a815d8255a1ad" proved="true" expanded="true">
-    <transf name="split_goal" proved="true" expanded="true">
-     <goal name="WP_parameter sqrt.1" expl="normal postcondition" sum="bb87fe0b8434e8d093943f1210b71ec5" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
+   <goal name="WP_parameter sqrt" expl="correctness of parameter sqrt" sum="e4337b042ceaf0bc1e59f1413875d24d" proved="true" expanded="false" shape="iainfix =V0c0ainfix <V0ainfix *ainfix +c0c1ainfix +c0c1Aainfix <=ainfix *c0c0V0iainfix <=V0c3ainfix <V0ainfix *ainfix +c1c1ainfix +c1c1Aainfix <=ainfix *c1c1V0iainfix <V1V2ainfix <V3V2Aainfix <=c0V2Aainfix <V0ainfix *ainfix +V4c1ainfix +V4c1Aainfix <V0ainfix *ainfix +V3c1ainfix +V3c1Aainfix =V4adivainfix +adivV0V3V3c2Aainfix >V3c0Aainfix >V4c0Iainfix =V4adivainfix +adivV0V1V1c2FIainfix =V3V1Fainfix <V0ainfix *ainfix +V2c1ainfix +V2c1Aainfix <=ainfix *V2V2V0Iainfix <V0ainfix *ainfix +V1c1ainfix +V1c1Aainfix <V0ainfix *ainfix +V2c1ainfix +V2c1Aainfix =V1adivainfix +adivV0V2V2c2Aainfix >V2c0Aainfix >V1c0FFAainfix <V0ainfix *ainfix +adivainfix +V0c1c2c1ainfix +adivainfix +V0c1c2c1Aainfix <V0ainfix *ainfix +V0c1ainfix +V0c1Aainfix =adivainfix +V0c1c2adivainfix +adivV0V0V0c2Aainfix >V0c0Aainfix >adivainfix +V0c1c2c0Iainfix >=V0c0F">
+    <transf name="split_goal" proved="true" expanded="false">
+     <goal name="WP_parameter sqrt.1" expl="normal postcondition" sum="70dbb7b3b334de43dee419a62bb173e6" proved="true" expanded="false" shape="ainfix <V0ainfix *ainfix +c0c1ainfix +c0c1Aainfix <=ainfix *c0c0V0Iainfix =V0c0Iainfix >=V0c0F">
+      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.00"/>
       </proof>
-     </goal>
-     <goal name="WP_parameter sqrt.2" expl="normal postcondition" sum="84710358cd8ada1454c80929dd0b421a" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
        <result status="valid" time="0.01"/>
       </proof>
+      <proof prover="z3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
      </goal>
-     <goal name="WP_parameter sqrt.3" expl="loop invariant init" sum="c11b288394dbf06ca63d6f183eed8902" proved="true" expanded="true">
-      <transf name="split_goal" proved="true" expanded="true">
-       <goal name="WP_parameter sqrt.3.1" expl="correctness of parameter sqrt" sum="e2c9e9d55c1fb96ff6927b0bf7ea08c3" proved="true" expanded="true">
+     <goal name="WP_parameter sqrt.2" expl="normal postcondition" sum="d9b3abfe5e2bb93ecc780e0aba0b37e3" proved="true" expanded="false" shape="ainfix <V0ainfix *ainfix +c1c1ainfix +c1c1Aainfix <=ainfix *c1c1V0Iainfix <=V0c3Iainfix =V0c0NIainfix >=V0c0F">
+      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof prover="z3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter sqrt.3" expl="loop invariant init" sum="5c88829f3f9df68225c2aff6f9084aa0" proved="true" expanded="false" shape="ainfix <V0ainfix *ainfix +adivainfix +V0c1c2c1ainfix +adivainfix +V0c1c2c1Aainfix <V0ainfix *ainfix +V0c1ainfix +V0c1Aainfix =adivainfix +V0c1c2adivainfix +adivV0V0V0c2Aainfix >V0c0Aainfix >adivainfix +V0c1c2c0Iainfix <=V0c3NIainfix =V0c0NIainfix >=V0c0F">
+      <transf name="split_goal" proved="true" expanded="false">
+       <goal name="WP_parameter sqrt.3.1" expl="correctness of parameter sqrt" sum="7be6c881690801aea0c8a90f85e30983" proved="true" expanded="false" shape="ainfix >adivainfix +V0c1c2c0Iainfix <=V0c3NIainfix =V0c0NIainfix >=V0c0F">
+        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.00"/>
+        </proof>
         <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
          <result status="valid" time="0.02"/>
         </proof>
-       </goal>
-       <goal name="WP_parameter sqrt.3.2" expl="correctness of parameter sqrt" sum="89a7b5a1daf6b4e2519b771a686341ed" proved="true" expanded="true">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+        <proof prover="z3" timelimit="10" edited="" obsolete="false">
          <result status="valid" time="0.01"/>
         </proof>
        </goal>
-       <goal name="WP_parameter sqrt.3.3" expl="correctness of parameter sqrt" sum="1e7292150fa5b3ff64df1f967aa339dd" proved="true" expanded="true">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.34"/>
+       <goal name="WP_parameter sqrt.3.2" expl="correctness of parameter sqrt" sum="d6c33551a632859686af3254b27ed285" proved="true" expanded="false" shape="ainfix >V0c0Iainfix <=V0c3NIainfix =V0c0NIainfix >=V0c0F">
+        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.00"/>
         </proof>
-       </goal>
-       <goal name="WP_parameter sqrt.3.4" expl="correctness of parameter sqrt" sum="7c4b5c925e20094d1a40d385f8888899" proved="true" expanded="true">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.01"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter sqrt.3.5" expl="correctness of parameter sqrt" sum="6ecbaf6ffa704b33dd36c7a1db072d41" proved="true" expanded="true">
         <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
          <result status="valid" time="0.02"/>
+        </proof>
+        <proof prover="z3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter sqrt.3.3" expl="correctness of parameter sqrt" sum="7d21ad8d99510a2fcc20f12a93e29fda" proved="true" expanded="false" shape="ainfix =adivainfix +V0c1c2adivainfix +adivV0V0V0c2Iainfix <=V0c3NIainfix =V0c0NIainfix >=V0c0F">
+        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.03"/>
+        </proof>
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.36"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter sqrt.3.4" expl="correctness of parameter sqrt" sum="8b4b2a8ae34c2810e71cdf563c51e310" proved="true" expanded="false" shape="ainfix <V0ainfix *ainfix +V0c1ainfix +V0c1Iainfix <=V0c3NIainfix =V0c0NIainfix >=V0c0F">
+        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.00"/>
+        </proof>
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof prover="z3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter sqrt.3.5" expl="correctness of parameter sqrt" sum="a252fd5201309879eddd94a6734ab199" proved="true" expanded="false" shape="ainfix <V0ainfix *ainfix +adivainfix +V0c1c2c1ainfix +adivainfix +V0c1c2c1Iainfix <=V0c3NIainfix =V0c0NIainfix >=V0c0F">
+        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.03"/>
+        </proof>
+        <proof prover="z3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
       </transf>
      </goal>
-     <goal name="WP_parameter sqrt.4" expl="loop invariant preservation" sum="635d4755b940a642f5f361e72d63b2ad" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-       <result status="valid" time="9.22"/>
-      </proof>
+     <goal name="WP_parameter sqrt.4" expl="loop invariant preservation" sum="0eea8d02017090f9f5ffcb5b933c5c05" proved="true" expanded="false" shape="ainfix <V0ainfix *ainfix +V4c1ainfix +V4c1Aainfix <V0ainfix *ainfix +V3c1ainfix +V3c1Aainfix =V4adivainfix +adivV0V3V3c2Aainfix >V3c0Aainfix >V4c0Iainfix =V4adivainfix +adivV0V1V1c2FIainfix =V3V1FIainfix <V1V2Iainfix <V0ainfix *ainfix +V1c1ainfix +V1c1Aainfix <V0ainfix *ainfix +V2c1ainfix +V2c1Aainfix =V1adivainfix +adivV0V2V2c2Aainfix >V2c0Aainfix >V1c0FFIainfix <=V0c3NIainfix =V0c0NIainfix >=V0c0F">
+      <transf name="split_goal" proved="true" expanded="false">
+       <goal name="WP_parameter sqrt.4.1" expl="correctness of parameter sqrt" sum="3846fb7d32e335936ddcce01a4a8d8d1" proved="true" expanded="false" shape="ainfix >V4c0Iainfix =V4adivainfix +adivV0V1V1c2FIainfix =V3V1FIainfix <V1V2Iainfix <V0ainfix *ainfix +V1c1ainfix +V1c1Aainfix <V0ainfix *ainfix +V2c1ainfix +V2c1Aainfix =V1adivainfix +adivV0V2V2c2Aainfix >V2c0Aainfix >V1c0FFIainfix <=V0c3NIainfix =V0c0NIainfix >=V0c0F">
+        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.06"/>
+        </proof>
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="1.65"/>
+        </proof>
+        <proof prover="z3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter sqrt.4.2" expl="correctness of parameter sqrt" sum="43b2de60e3bc0718779234af61188289" proved="true" expanded="false" shape="ainfix >V3c0Iainfix =V4adivainfix +adivV0V1V1c2FIainfix =V3V1FIainfix <V1V2Iainfix <V0ainfix *ainfix +V1c1ainfix +V1c1Aainfix <V0ainfix *ainfix +V2c1ainfix +V2c1Aainfix =V1adivainfix +adivV0V2V2c2Aainfix >V2c0Aainfix >V1c0FFIainfix <=V0c3NIainfix =V0c0NIainfix >=V0c0F">
+        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof prover="z3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter sqrt.4.3" expl="correctness of parameter sqrt" sum="3cca372df69b81be089cb0c501eda5fd" proved="true" expanded="false" shape="ainfix =V4adivainfix +adivV0V3V3c2Iainfix =V4adivainfix +adivV0V1V1c2FIainfix =V3V1FIainfix <V1V2Iainfix <V0ainfix *ainfix +V1c1ainfix +V1c1Aainfix <V0ainfix *ainfix +V2c1ainfix +V2c1Aainfix =V1adivainfix +adivV0V2V2c2Aainfix >V2c0Aainfix >V1c0FFIainfix <=V0c3NIainfix =V0c0NIainfix >=V0c0F">
+        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof prover="z3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter sqrt.4.4" expl="correctness of parameter sqrt" sum="98feb6dcff36c91c157f650f202a8fc0" proved="true" expanded="false" shape="ainfix <V0ainfix *ainfix +V3c1ainfix +V3c1Iainfix =V4adivainfix +adivV0V1V1c2FIainfix =V3V1FIainfix <V1V2Iainfix <V0ainfix *ainfix +V1c1ainfix +V1c1Aainfix <V0ainfix *ainfix +V2c1ainfix +V2c1Aainfix =V1adivainfix +adivV0V2V2c2Aainfix >V2c0Aainfix >V1c0FFIainfix <=V0c3NIainfix =V0c0NIainfix >=V0c0F">
+        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter sqrt.4.5" expl="correctness of parameter sqrt" sum="250a938d7ab7e781f7b8a0db605c5175" proved="true" expanded="false" shape="ainfix <V0ainfix *ainfix +V4c1ainfix +V4c1Iainfix =V4adivainfix +adivV0V1V1c2FIainfix =V3V1FIainfix <V1V2Iainfix <V0ainfix *ainfix +V1c1ainfix +V1c1Aainfix <V0ainfix *ainfix +V2c1ainfix +V2c1Aainfix =V1adivainfix +adivV0V2V2c2Aainfix >V2c0Aainfix >V1c0FFIainfix <=V0c3NIainfix =V0c0NIainfix >=V0c0F">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="2.23"/>
+        </proof>
+       </goal>
+      </transf>
      </goal>
-     <goal name="WP_parameter sqrt.5" expl="loop variant decreases" sum="0e4fa9a7a38870c021afae8a4e42ba92" proved="true" expanded="true">
+     <goal name="WP_parameter sqrt.5" expl="loop variant decreases" sum="7c3f10e9b4a4be20d6a2dbb810ddfd31" proved="true" expanded="false" shape="ainfix <V3V2Aainfix <=c0V2Iainfix <V0ainfix *ainfix +V4c1ainfix +V4c1Aainfix <V0ainfix *ainfix +V3c1ainfix +V3c1Aainfix =V4adivainfix +adivV0V3V3c2Aainfix >V3c0Aainfix >V4c0Iainfix =V4adivainfix +adivV0V1V1c2FIainfix =V3V1FIainfix <V1V2Iainfix <V0ainfix *ainfix +V1c1ainfix +V1c1Aainfix <V0ainfix *ainfix +V2c1ainfix +V2c1Aainfix =V1adivainfix +adivV0V2V2c2Aainfix >V2c0Aainfix >V1c0FFIainfix <=V0c3NIainfix =V0c0NIainfix >=V0c0F">
+      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
       <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
        <result status="valid" time="0.02"/>
       </proof>
+      <proof prover="z3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
      </goal>
-     <goal name="WP_parameter sqrt.6" expl="normal postcondition" sum="ee09cf3d584c24c45c524135e3d35bf3" proved="true" expanded="true">
+     <goal name="WP_parameter sqrt.6" expl="normal postcondition" sum="4f8c8a727070a34f014d169e61807c6d" proved="true" expanded="false" shape="ainfix <V0ainfix *ainfix +V2c1ainfix +V2c1Aainfix <=ainfix *V2V2V0Iainfix <V1V2NIainfix <V0ainfix *ainfix +V1c1ainfix +V1c1Aainfix <V0ainfix *ainfix +V2c1ainfix +V2c1Aainfix =V1adivainfix +adivV0V2V2c2Aainfix >V2c0Aainfix >V1c0FFIainfix <=V0c3NIainfix =V0c0NIainfix >=V0c0F">
       <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
        <result status="valid" time="0.18"/>
       </proof>
