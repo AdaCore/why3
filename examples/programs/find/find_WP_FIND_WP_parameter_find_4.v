@@ -6,11 +6,11 @@ Definition unit  := unit.
 
 Parameter mark : Type.
 
-Parameter at1: forall (a:Type), a -> mark  -> a.
+Parameter at1: forall (a:Type), a -> mark -> a.
 
 Implicit Arguments at1.
 
-Parameter old: forall (a:Type), a  -> a.
+Parameter old: forall (a:Type), a -> a.
 
 Implicit Arguments old.
 
@@ -26,11 +26,11 @@ Implicit Arguments contents.
 
 Parameter map : forall (a:Type) (b:Type), Type.
 
-Parameter get: forall (a:Type) (b:Type), (map a b) -> a  -> b.
+Parameter get: forall (a:Type) (b:Type), (map a b) -> a -> b.
 
 Implicit Arguments get.
 
-Parameter set: forall (a:Type) (b:Type), (map a b) -> a -> b  -> (map a b).
+Parameter set: forall (a:Type) (b:Type), (map a b) -> a -> b -> (map a b).
 
 Implicit Arguments set.
 
@@ -42,7 +42,7 @@ Axiom Select_neq : forall (a:Type) (b:Type), forall (m:(map a b)),
   forall (a1:a) (a2:a), forall (b1:b), (~ (a1 = a2)) -> ((get (set m a1 b1)
   a2) = (get m a2)).
 
-Parameter const: forall (b:Type) (a:Type), b  -> (map a b).
+Parameter const: forall (b:Type) (a:Type), b -> (map a b).
 
 Set Contextual Implicit.
 Implicit Arguments const.
@@ -107,8 +107,8 @@ Axiom permut_weakening : forall (a:Type), forall (a1:(map Z a)) (a2:(map Z
   (r2 <= r1)%Z) -> ((permut_sub a1 a2 l2 r2) -> (permut_sub a1 a2 l1 r1)).
 
 Axiom permut_eq : forall (a:Type), forall (a1:(map Z a)) (a2:(map Z a)),
-  forall (l:Z) (u:Z), (l <= u)%Z -> ((permut_sub a1 a2 l u) -> forall (i:Z),
-  ((i <  l)%Z \/ (u <= i)%Z) -> ((get a2 i) = (get a1 i))).
+  forall (l:Z) (u:Z), (permut_sub a1 a2 l u) -> forall (i:Z), ((i <  l)%Z \/
+  (u <= i)%Z) -> ((get a2 i) = (get a1 i)).
 
 Axiom permut_exists : forall (a:Type), forall (a1:(map Z a)) (a2:(map Z a)),
   forall (l:Z) (u:Z), (permut_sub a1 a2 l u) -> forall (i:Z), ((l <= i)%Z /\
@@ -133,6 +133,12 @@ Axiom exchange_permut : forall (a:Type), forall (a1:(array a)) (a2:(array a))
   (((0%Z <= i)%Z /\ (i <  (length a1))%Z) -> (((0%Z <= j)%Z /\
   (j <  (length a1))%Z) -> (permut a1 a2)))).
 
+Axiom permut_sym1 : forall (a:Type), forall (a1:(array a)) (a2:(array a)),
+  (permut a1 a2) -> (permut a2 a1).
+
+Axiom permut_trans1 : forall (a:Type), forall (a1:(array a)) (a2:(array a))
+  (a3:(array a)), (permut a1 a2) -> ((permut a2 a3) -> (permut a1 a3)).
+
 Definition array_eq_sub (a:Type)(a1:(array a)) (a2:(array a)) (l:Z)
   (u:Z): Prop := (map_eq_sub (elts a1) (elts a2) l u).
 Implicit Arguments array_eq_sub.
@@ -147,25 +153,25 @@ Axiom array_eq_sub_permut : forall (a:Type), forall (a1:(array a)) (a2:(array
 Axiom array_eq_permut : forall (a:Type), forall (a1:(array a)) (a2:(array
   a)), (array_eq a1 a2) -> (permut a1 a2).
 
-Parameter usN:  Z.
+Parameter usN: Z.
 
 
-Parameter f:  Z.
+Parameter f: Z.
 
 
-Axiom f_N_range : (1%Z <= (f ))%Z /\ ((f ) <= (usN ))%Z.
+Axiom f_N_range : (1%Z <= f)%Z /\ (f <= usN)%Z.
 
 Definition found(a:(array Z)): Prop := forall (p:Z) (q:Z), ((((1%Z <= p)%Z /\
-  (p <= (f ))%Z) /\ ((f ) <= q)%Z) /\ (q <= (usN ))%Z) -> (((get1 a
-  p) <= (get1 a (f )))%Z /\ ((get1 a (f )) <= (get1 a q))%Z).
+  (p <= f)%Z) /\ (f <= q)%Z) /\ (q <= usN)%Z) -> (((get1 a p) <= (get1 a
+  f))%Z /\ ((get1 a f) <= (get1 a q))%Z).
 
-Definition m_invariant(m:Z) (a:(array Z)): Prop := (m <= (f ))%Z /\
-  forall (p:Z) (q:Z), ((((1%Z <= p)%Z /\ (p <  m)%Z) /\ (m <= q)%Z) /\
-  (q <= (usN ))%Z) -> ((get1 a p) <= (get1 a q))%Z.
+Definition m_invariant(m:Z) (a:(array Z)): Prop := (m <= f)%Z /\ forall (p:Z)
+  (q:Z), ((((1%Z <= p)%Z /\ (p <  m)%Z) /\ (m <= q)%Z) /\ (q <= usN)%Z) ->
+  ((get1 a p) <= (get1 a q))%Z.
 
-Definition n_invariant(n:Z) (a:(array Z)): Prop := ((f ) <= n)%Z /\
-  forall (p:Z) (q:Z), ((((1%Z <= p)%Z /\ (p <= n)%Z) /\ (n <  q)%Z) /\
-  (q <= (usN ))%Z) -> ((get1 a p) <= (get1 a q))%Z.
+Definition n_invariant(n:Z) (a:(array Z)): Prop := (f <= n)%Z /\ forall (p:Z)
+  (q:Z), ((((1%Z <= p)%Z /\ (p <= n)%Z) /\ (n <  q)%Z) /\ (q <= usN)%Z) ->
+  ((get1 a p) <= (get1 a q))%Z.
 
 Definition i_invariant(m:Z) (n:Z) (i:Z) (r:Z) (a:(array Z)): Prop :=
   (m <= i)%Z /\ ((forall (p:Z), ((1%Z <= p)%Z /\ (p <  i)%Z) -> ((get1 a
@@ -173,31 +179,34 @@ Definition i_invariant(m:Z) (n:Z) (i:Z) (r:Z) (a:(array Z)): Prop :=
   (r <= (get1 a p))%Z)).
 
 Definition j_invariant(m:Z) (n:Z) (j:Z) (r:Z) (a:(array Z)): Prop :=
-  (j <= n)%Z /\ ((forall (q:Z), ((j <  q)%Z /\ (q <= (usN ))%Z) ->
-  (r <= (get1 a q))%Z) /\ ((m <= j)%Z -> exists q:Z, ((m <= q)%Z /\
-  (q <= j)%Z) /\ ((get1 a q) <= r)%Z)).
+  (j <= n)%Z /\ ((forall (q:Z), ((j <  q)%Z /\ (q <= usN)%Z) -> (r <= (get1 a
+  q))%Z) /\ ((m <= j)%Z -> exists q:Z, ((m <= q)%Z /\ (q <= j)%Z) /\ ((get1 a
+  q) <= r)%Z)).
 
 Definition termination(i:Z) (j:Z) (i0:Z) (j0:Z) (r:Z) (a:(array Z)): Prop :=
-  ((i0 <  i)%Z /\ (j <  j0)%Z) \/ (((i <= (f ))%Z /\ ((f ) <= j)%Z) /\
-  ((get1 a (f )) = r)).
+  ((i0 <  i)%Z /\ (j <  j0)%Z) \/ (((i <= f)%Z /\ (f <= j)%Z) /\ ((get1 a
+  f) = r)).
+
+(* YOU MAY EDIT THE CONTEXT BELOW *)
+
+(* DO NOT EDIT BELOW *)
 
 Theorem WP_parameter_find : forall (a:Z), forall (a1:(map Z Z)), let a2 :=
-  (mk_array a a1) in ((a = ((usN ) + 1%Z)%Z) -> forall (n:Z), forall (m:Z),
+  (mk_array a a1) in ((a = (usN + 1%Z)%Z) -> forall (n:Z), forall (m:Z),
   forall (a3:(map Z Z)), let a4 := (mk_array a a3) in (((m_invariant m a4) /\
   ((n_invariant n a4) /\ ((permut a4 a2) /\ ((1%Z <= m)%Z /\
-  (n <= (usN ))%Z)))) -> ((m <  n)%Z -> (((0%Z <= (f ))%Z /\
-  ((f ) <  a)%Z) -> let result := (get a3 (f )) in forall (j:Z),
-  forall (i:Z), forall (a5:(map Z Z)), let a6 := (mk_array a a5) in
-  (((i_invariant m n i result a6) /\ ((j_invariant m n j result a6) /\
-  ((m_invariant m a6) /\ ((n_invariant n a6) /\ ((0%Z <= j)%Z /\
-  ((i <= ((usN ) + 1%Z)%Z)%Z /\ ((termination i j m n result a6) /\
-  (permut a6 a2)))))))) -> ((i <= j)%Z -> forall (i1:Z), ((i_invariant m n i1
-  result a6) /\ (((i <= i1)%Z /\ (i1 <= n)%Z) /\ (termination i1 j m n result
-  a6))) -> (((0%Z <= i1)%Z /\ (i1 <  a)%Z) -> ((~ ((get a5
-  i1) <  result)%Z) -> forall (j1:Z), ((j_invariant m n j1 result a6) /\
-  ((j1 <= j)%Z /\ ((m <= j1)%Z /\ (termination i1 j1 m n result a6)))) ->
-  (((0%Z <= j1)%Z /\ (j1 <  a)%Z) -> ((~ (result <  (get a5 j1))%Z) ->
-  ((((get a5 j1) <= result)%Z /\ (result <= (get a5 i1))%Z) ->
+  (n <= usN)%Z)))) -> ((m <  n)%Z -> (((0%Z <= f)%Z /\ (f <  a)%Z) ->
+  let result := (get a3 f) in forall (j:Z), forall (i:Z), forall (a5:(map Z
+  Z)), let a6 := (mk_array a a5) in (((i_invariant m n i result a6) /\
+  ((j_invariant m n j result a6) /\ ((m_invariant m a6) /\ ((n_invariant n
+  a6) /\ ((0%Z <= j)%Z /\ ((i <= (usN + 1%Z)%Z)%Z /\ ((termination i j m n
+  result a6) /\ (permut a6 a2)))))))) -> ((i <= j)%Z -> forall (i1:Z),
+  ((i_invariant m n i1 result a6) /\ (((i <= i1)%Z /\ (i1 <= n)%Z) /\
+  (termination i1 j m n result a6))) -> (((0%Z <= i1)%Z /\ (i1 <  a)%Z) ->
+  ((~ ((get a5 i1) <  result)%Z) -> forall (j1:Z), ((j_invariant m n j1
+  result a6) /\ ((j1 <= j)%Z /\ ((m <= j1)%Z /\ (termination i1 j1 m n result
+  a6)))) -> (((0%Z <= j1)%Z /\ (j1 <  a)%Z) -> ((~ (result <  (get a5
+  j1))%Z) -> ((((get a5 j1) <= result)%Z /\ (result <= (get a5 i1))%Z) ->
   ((i1 <= j1)%Z -> (((0%Z <= i1)%Z /\ (i1 <  a)%Z) -> (((0%Z <= j1)%Z /\
   (j1 <  a)%Z) -> (((0%Z <= i1)%Z /\ (i1 <  a)%Z) -> forall (a7:(map Z Z)),
   (a7 = (set a5 i1 (get a5 j1))) -> (((0%Z <= j1)%Z /\ (j1 <  a)%Z) ->
@@ -206,8 +215,8 @@ Theorem WP_parameter_find : forall (a:Z), forall (a1:(map Z Z)), let a2 :=
   ((result <= (get a8 j1))%Z -> forall (i2:Z), (i2 = (i1 + 1%Z)%Z) ->
   forall (j2:Z), (j2 = (j1 - 1%Z)%Z) -> ((i_invariant m n i2 result a9) /\
   ((j_invariant m n j2 result a9) /\ ((m_invariant m a9) /\ ((n_invariant n
-  a9) /\ ((0%Z <= j2)%Z /\ ((i2 <= ((usN ) + 1%Z)%Z)%Z /\ ((termination i2 j2
-  m n result a9) /\ (permut a9 a2)))))))))))))))))))))))))))).
+  a9) /\ ((0%Z <= j2)%Z /\ ((i2 <= (usN + 1%Z)%Z)%Z /\ ((termination i2 j2 m
+  n result a9) /\ (permut a9 a2)))))))))))))))))))))))))))).
 (* YOU MAY EDIT THE PROOF BELOW *)
 intuition.
 intuition.

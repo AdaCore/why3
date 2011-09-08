@@ -1,256 +1,252 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
 <why3session name="examples/programs/find/why3session.xml">
+ <prover id="alt-ergo" name="Alt-Ergo" version="0.93"/>
+ <prover id="coq" name="Coq" version="8.3pl2"/>
+ <prover id="cvc3" name="CVC3" version="2.2"/>
+ <prover id="simplify" name="Simplify" version="1.5.4"/>
+ <prover id="yices" name="Yices" version="1.0.27"/>
+ <prover id="z3" name="Z3" version="2.19"/>
  <file name="../find.mlw" verified="true" expanded="true">
   <theory name="WP FIND" verified="true" expanded="true">
-   <goal name="WP_parameter find" expl="correctness of parameter find" sum="376262bd2ce0fe37a1d2c4dc727804fa" proved="true" expanded="true">
+   <goal name="WP_parameter find" expl="correctness of parameter find" sum="44b60a4322d459e4a5818ca4376c295a" proved="true" expanded="true" shape="Lamk arrayV0V1Lamk arrayV0V5iainfix <V4V3LagetV5afLamk arrayV0V10iainfix <=V9V8iainfix <agetV10V12V7ainfix <ainfix -ainfix +a_Nc1V13ainfix -ainfix +a_Nc1V12Aainfix <=c0ainfix -ainfix +a_Nc1V12AaterminationV13V8V4V3V7V11Aainfix <=V13V3Aainfix <=V9V13Aai_invariantV4V3V13V7V11Iainfix =V13ainfix +V12c1Fiainfix <V7agetV10V14ainfix <V15V14Aainfix <=c0V14AaterminationV12V15V4V3V7V11Aainfix <=V4V15Aainfix <=V15V8Aaj_invariantV4V3V15V7V11Iainfix =V15ainfix -V14c1Fiainfix <=V12V14Lamk arrayV0V17ainfix <ainfix -ainfix +ainfix +a_Nc2V20V19ainfix -ainfix +ainfix +a_Nc2V8V9Aainfix <=c0ainfix -ainfix +ainfix +a_Nc2V8V9AapermutV18V2AaterminationV19V20V4V3V7V18Aainfix <=V19ainfix +a_Nc1Aainfix <=c0V20Aan_invariantV3V18Aam_invariantV4V18Aaj_invariantV4V3V20V7V18Aai_invariantV4V3V19V7V18Iainfix =V20ainfix -V14c1FIainfix =V19ainfix +V12c1FAainfix <=V7agetV17V14Aainfix <=agetV17V12V7AaexchangeV17V10V12V14Iainfix =V17asetV16V14agetV10V12FAainfix <V14V0Aainfix <=c0V14Iainfix =V16asetV10V12agetV10V14FAainfix <V12V0Aainfix <=c0V12Aainfix <V14V0Aainfix <=c0V14Aainfix <V12V0Aainfix <=c0V12ainfix <ainfix -ainfix +ainfix +a_Nc2V14V12ainfix -ainfix +ainfix +a_Nc2V8V9Aainfix <=c0ainfix -ainfix +ainfix +a_Nc2V8V9AapermutV11V2AaterminationV12V14V4V3V7V11Aainfix <=V12ainfix +a_Nc1Aainfix <=c0V14Aan_invariantV3V11Aam_invariantV4V11Aaj_invariantV4V3V14V7V11Aai_invariantV4V3V12V7V11Aainfix <=V7agetV10V12Aainfix <=agetV10V14V7Aainfix <V14V0Aainfix <=c0V14IaterminationV12V14V4V3V7V11Aainfix <=V4V14Aainfix <=V14V8Aaj_invariantV4V3V14V7V11FAaterminationV12V8V4V3V7V11Aainfix <=V4V8Aainfix <=V8V8Aaj_invariantV4V3V8V7V11Aainfix <V12V0Aainfix <=c0V12IaterminationV12V8V4V3V7V11Aainfix <=V12V3Aainfix <=V9V12Aai_invariantV4V3V12V7V11FAaterminationV9V8V4V3V7V11Aainfix <=V9V3Aainfix <=V9V9Aai_invariantV4V3V9V7V11iainfix <=afV8ainfix <ainfix -V21V4ainfix -V3V4Aainfix <=c0ainfix -V3V4Aainfix <=V21a_NAainfix <=c1V4AapermutV11V2Aan_invariantV21V11Aam_invariantV4V11Iainfix =V21V8Fiainfix <=V9afainfix <ainfix -V3V22ainfix -V3V4Aainfix <=c0ainfix -V3V4Aainfix <=V3a_NAainfix <=c1V22AapermutV11V2Aan_invariantV3V11Aam_invariantV22V11Iainfix =V22V9Fainfix <ainfix -V23V24ainfix -V3V4Aainfix <=c0ainfix -V3V4Aainfix <=V23a_NAainfix <=c1V24AapermutV11V2Aan_invariantV23V11Aam_invariantV24V11Iainfix =V24afFIainfix =V23afFAainfix <V8V3Aainfix <V4V9IapermutV11V2AaterminationV9V8V4V3V7V11Aainfix <=V9ainfix +a_Nc1Aainfix <=c0V8Aan_invariantV3V11Aam_invariantV4V11Aaj_invariantV4V3V8V7V11Aai_invariantV4V3V9V7V11FFFAapermutV6V2AaterminationV4V3V4V3V7V6Aainfix <=V4ainfix +a_Nc1Aainfix <=c0V3Aan_invariantV3V6Aam_invariantV4V6Aaj_invariantV4V3V3V7V6Aai_invariantV4V3V4V7V6Aainfix <afV0Aainfix <=c0afapermutV6V2AafoundV6Iainfix <=V3a_NAainfix <=c1V4AapermutV6V2Aan_invariantV3V6Aam_invariantV4V6FFFAainfix <=a_Na_NAainfix <=c1c1AapermutV2V2Aan_invarianta_NV2Aam_invariantc1V2Iainfix =V0ainfix +a_Nc1FF">
     <transf name="split_goal" proved="true" expanded="true">
-     <goal name="WP_parameter find.1" expl="loop invariant init" sum="454b3bf075354fe09bedf8ad1165d164" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.2" expl="precondition" sum="5bfe0a7a0aa2471bf2dbb4937aa29551" proved="true" expanded="true">
-      <transf name="split_goal" proved="true" expanded="true">
-       <goal name="WP_parameter find.2.1" expl="correctness of parameter find" sum="0e89c10bd8c66e80757d5e2a7b0b100e" proved="true" expanded="true">
-        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.01"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter find.2.2" expl="correctness of parameter find" sum="23dd8f6c9c6368d436e9bfbbf7076737" proved="true" expanded="true">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.01"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter find.3" expl="loop invariant init" sum="0e24f3f824f9a736257b81d9d07640d3" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.18"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.4" expl="loop invariant init" sum="d999ea5bbf3a7dfa4539cbb2cce2bf67" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.5" expl="precondition" sum="f2d128cafe69733a0ad36c7293a28829" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.6" expl="loop invariant preservation" sum="7c97fda071078ae384d60eab00bdc410" proved="true" expanded="true">
-      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.06"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.7" expl="loop variant decreases" sum="b403c4965a0be748027458b1d20e930f" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.8" expl="loop invariant init" sum="59ca7e1df28b64169ee27afe193b29dc" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.9" expl="precondition" sum="880357adf680762f9bd342e68b42194e" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.10" expl="loop invariant preservation" sum="8973b302c2a28680a8428a805d3d96cb" proved="true" expanded="true">
-      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.07"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.11" expl="loop variant decreases" sum="2b1ae54582fbf7a46a8a3e870a96f9cd" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.12" expl="assertion" sum="774e1d890193acd9fe7d1a27eed25363" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.13" expl="precondition" sum="1ac1e3242120ba63306d4e0d56d8bf87" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.14" expl="precondition" sum="e2eb3f5e94bdce3c8af80895634f0200" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.15" expl="precondition" sum="948acc914a933e72fa729d7e15936836" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.16" expl="precondition" sum="7c82855ea72879a1504befb67aafbb58" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <transf name="split_goal" proved="true" expanded="true">
-       <goal name="WP_parameter find.16.1" expl="correctness of parameter find" sum="dde4697b5a4f94ed40dbe85e8605e6bb" proved="true" expanded="true">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter find.16.2" expl="correctness of parameter find" sum="fb6bcb78bb64f24071e14f1665d87212" proved="true" expanded="true">
-        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.03"/>
-        </proof>
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-        <proof prover="z3" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.03"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter find.17" expl="assertion" sum="0ffe8d071d9226c1f09584c5e28d325e" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.08"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.18" expl="assertion" sum="9d6400d2baa6b739b3fc005b84100669" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.19" expl="assertion" sum="de79c8b97cf3312d463bb177a54ece58" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.20" expl="loop invariant preservation" sum="f384bd98da18df5456f37eb9717b2393" proved="true" expanded="true">
-      <proof prover="coq" timelimit="10" edited="find_WP_FIND_WP_parameter_find_3.v" obsolete="false">
-       <result status="valid" time="7.08"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.21" expl="loop variant decreases" sum="ff6952e67790c8229f2f759710b8c4b4" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.03"/>
-      </proof>
-      <transf name="split_goal" proved="true" expanded="true">
-       <goal name="WP_parameter find.21.1" expl="correctness of parameter find" sum="34bc1d588e2b012dc14c7f5a30d6c92e" proved="true" expanded="true">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.03"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter find.21.2" expl="correctness of parameter find" sum="500812ba6d36c4746022a493d76f949d" proved="true" expanded="true">
-        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.04"/>
-        </proof>
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.03"/>
-        </proof>
-        <proof prover="z3" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.03"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter find.22" expl="loop invariant preservation" sum="2d5ca6fd10edc2c3044dcd949bf4449b" proved="true" expanded="true">
-      <transf name="split_goal" proved="true" expanded="true">
-       <goal name="WP_parameter find.22.1" expl="correctness of parameter find" sum="e936b101a2d07b80cda3b9f819e10698" proved="true" expanded="true">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter find.22.2" expl="correctness of parameter find" sum="9b65cfce52992be21ff51f2cc1d6d40b" proved="true" expanded="true">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter find.22.3" expl="correctness of parameter find" sum="4e0afab51a5c2bbd33e2d760dd96da54" proved="true" expanded="true">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.01"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter find.22.4" expl="correctness of parameter find" sum="2cfb0b2282a9cee9a69a77a50fee768d" proved="true" expanded="true">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter find.22.5" expl="correctness of parameter find" sum="e934da17684109d74b4fd38c138d150a" proved="true" expanded="true">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter find.22.6" expl="correctness of parameter find" sum="95c5e5d8dbdc452c3703e3580a1233f4" proved="true" expanded="true">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter find.22.7" expl="correctness of parameter find" sum="7a70d82852eef1db07ad0253bf23e5b0" proved="true" expanded="true">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.01"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter find.22.8" expl="correctness of parameter find" sum="57ec91ee3907a6e8edca53bf49bdf8e5" proved="true" expanded="true">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter find.23" expl="loop variant decreases" sum="6880f80eba44f87f8b5eeb8482e66cb4" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.24" expl="assertion" sum="78f03bf2e0f9d5618e810dde55efeabd" proved="true" expanded="true">
+     <goal name="WP_parameter find.1" expl="loop invariant init" sum="053c29d25704850bd87299d6e3425c5d" proved="true" expanded="false" shape="Lamk arrayV0V1ainfix <=a_Na_NAainfix <=c1c1AapermutV2V2Aan_invarianta_NV2Aam_invariantc1V2Iainfix =V0ainfix +a_Nc1FF">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.04"/>
       </proof>
      </goal>
-     <goal name="WP_parameter find.25" expl="loop invariant preservation" sum="850788d6d90ca3e4c719ea2e362e2bc7" proved="true" expanded="true">
+     <goal name="WP_parameter find.2" expl="precondition" sum="27650d219b464f1fbe96bea099a881a7" proved="true" expanded="false" shape="Lamk arrayV0V1Lamk arrayV0V5ainfix <afV0Aainfix <=c0afIainfix <V4V3Iainfix <=V3a_NAainfix <=c1V4AapermutV6V2Aan_invariantV3V6Aam_invariantV4V6FFFIainfix =V0ainfix +a_Nc1FF">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="2.24"/>
+       <result status="valid" time="0.04"/>
       </proof>
      </goal>
-     <goal name="WP_parameter find.26" expl="loop variant decreases" sum="af0ff0777031544c7734621a6d68e51f" proved="true" expanded="true">
+     <goal name="WP_parameter find.3" expl="loop invariant init" sum="005b73b27beb69ccef873e45f7e80066" proved="true" expanded="false" shape="Lamk arrayV0V1Lamk arrayV0V5LagetV5afapermutV6V2AaterminationV4V3V4V3V7V6Aainfix <=V4ainfix +a_Nc1Aainfix <=c0V3Aan_invariantV3V6Aam_invariantV4V6Aaj_invariantV4V3V3V7V6Aai_invariantV4V3V4V7V6Iainfix <afV0Aainfix <=c0afIainfix <V4V3Iainfix <=V3a_NAainfix <=c1V4AapermutV6V2Aan_invariantV3V6Aam_invariantV4V6FFFIainfix =V0ainfix +a_Nc1FF">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.28"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter find.4" expl="loop invariant init" sum="5507ffbedc034a8293bf1aaaf60776b1" proved="true" expanded="false" shape="Lamk arrayV0V1Lamk arrayV0V5LagetV5afLamk arrayV0V10aterminationV9V8V4V3V7V11Aainfix <=V9V3Aainfix <=V9V9Aai_invariantV4V3V9V7V11Iainfix <=V9V8IapermutV11V2AaterminationV9V8V4V3V7V11Aainfix <=V9ainfix +a_Nc1Aainfix <=c0V8Aan_invariantV3V11Aam_invariantV4V11Aaj_invariantV4V3V8V7V11Aai_invariantV4V3V9V7V11FFFIainfix <afV0Aainfix <=c0afIainfix <V4V3Iainfix <=V3a_NAainfix <=c1V4AapermutV6V2Aan_invariantV3V6Aam_invariantV4V6FFFIainfix =V0ainfix +a_Nc1FF">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter find.5" expl="precondition" sum="bc13f1bea7cc7c2fa084d32bc7903ced" proved="true" expanded="false" shape="Lamk arrayV0V1Lamk arrayV0V5LagetV5afLamk arrayV0V10ainfix <V12V0Aainfix <=c0V12IaterminationV12V8V4V3V7V11Aainfix <=V12V3Aainfix <=V9V12Aai_invariantV4V3V12V7V11FIainfix <=V9V8IapermutV11V2AaterminationV9V8V4V3V7V11Aainfix <=V9ainfix +a_Nc1Aainfix <=c0V8Aan_invariantV3V11Aam_invariantV4V11Aaj_invariantV4V3V8V7V11Aai_invariantV4V3V9V7V11FFFIainfix <afV0Aainfix <=c0afIainfix <V4V3Iainfix <=V3a_NAainfix <=c1V4AapermutV6V2Aan_invariantV3V6Aam_invariantV4V6FFFIainfix =V0ainfix +a_Nc1FF">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.02"/>
       </proof>
-     </goal>
-     <goal name="WP_parameter find.27" expl="loop invariant preservation" sum="dd2ece47c835d3d10f260a87ce3e4a30" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.80"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.28" expl="loop variant decreases" sum="dda501adbf00183b5f6cdd8adce7c76e" proved="true" expanded="true">
-      <transf name="split_goal" proved="true" expanded="true">
-       <goal name="WP_parameter find.28.1" expl="correctness of parameter find" sum="dd3b5f04854f8368b7971fa8c8d24335" proved="true" expanded="true">
+      <transf name="split_goal" proved="true" expanded="false">
+       <goal name="WP_parameter find.5.1" expl="correctness of parameter find" sum="06153f7b792c3525f1f93a44b14c39b4" proved="true" expanded="false" shape="Lamk arrayV0V1Lamk arrayV0V5LagetV5afLamk arrayV0V10ainfix <=c0V12IaterminationV12V8V4V3V7V11Aainfix <=V12V3Aainfix <=V9V12Aai_invariantV4V3V12V7V11FIainfix <=V9V8IapermutV11V2AaterminationV9V8V4V3V7V11Aainfix <=V9ainfix +a_Nc1Aainfix <=c0V8Aan_invariantV3V11Aam_invariantV4V11Aaj_invariantV4V3V8V7V11Aai_invariantV4V3V9V7V11FFFIainfix <afV0Aainfix <=c0afIainfix <V4V3Iainfix <=V3a_NAainfix <=c1V4AapermutV6V2Aan_invariantV3V6Aam_invariantV4V6FFFIainfix =V0ainfix +a_Nc1FF">
         <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.02"/>
+         <result status="valid" time="0.03"/>
         </proof>
        </goal>
-       <goal name="WP_parameter find.28.2" expl="correctness of parameter find" sum="b0399c366aa0cc38bd8f0f0bb8ff206f" proved="true" expanded="true">
+       <goal name="WP_parameter find.5.2" expl="correctness of parameter find" sum="59f3b4517b7847a8359ccc5d81d880e2" proved="true" expanded="false" shape="Lamk arrayV0V1Lamk arrayV0V5LagetV5afLamk arrayV0V10ainfix <V12V0IaterminationV12V8V4V3V7V11Aainfix <=V12V3Aainfix <=V9V12Aai_invariantV4V3V12V7V11FIainfix <=V9V8IapermutV11V2AaterminationV9V8V4V3V7V11Aainfix <=V9ainfix +a_Nc1Aainfix <=c0V8Aan_invariantV3V11Aam_invariantV4V11Aaj_invariantV4V3V8V7V11Aai_invariantV4V3V9V7V11FFFIainfix <afV0Aainfix <=c0afIainfix <V4V3Iainfix <=V3a_NAainfix <=c1V4AapermutV6V2Aan_invariantV3V6Aam_invariantV4V6FFFIainfix =V0ainfix +a_Nc1FF">
+        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.03"/>
+        </proof>
         <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.01"/>
+         <result status="valid" time="0.03"/>
+        </proof>
+        <proof prover="z3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.03"/>
         </proof>
        </goal>
       </transf>
      </goal>
-     <goal name="WP_parameter find.29" expl="loop invariant preservation" sum="ad3b0cf872fecac8f084ba28f81c07ad" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="6.97"/>
-      </proof>
+     <goal name="WP_parameter find.6" expl="loop invariant preservation" sum="1f1b96b85b6f6eef6246d5585604342a" proved="true" expanded="false" shape="Lamk arrayV0V1Lamk arrayV0V5LagetV5afLamk arrayV0V10aterminationV13V8V4V3V7V11Aainfix <=V13V3Aainfix <=V9V13Aai_invariantV4V3V13V7V11Iainfix =V13ainfix +V12c1FIainfix <agetV10V12V7Iainfix <V12V0Aainfix <=c0V12IaterminationV12V8V4V3V7V11Aainfix <=V12V3Aainfix <=V9V12Aai_invariantV4V3V12V7V11FIainfix <=V9V8IapermutV11V2AaterminationV9V8V4V3V7V11Aainfix <=V9ainfix +a_Nc1Aainfix <=c0V8Aan_invariantV3V11Aam_invariantV4V11Aaj_invariantV4V3V8V7V11Aai_invariantV4V3V9V7V11FFFIainfix <afV0Aainfix <=c0afIainfix <V4V3Iainfix <=V3a_NAainfix <=c1V4AapermutV6V2Aan_invariantV3V6Aam_invariantV4V6FFFIainfix =V0ainfix +a_Nc1FF">
+      <transf name="split_goal" proved="true" expanded="false">
+       <goal name="WP_parameter find.6.1" expl="correctness of parameter find" sum="e4dcb66938b1d6d6eefa6110bdd02778" proved="true" expanded="false" shape="Lamk arrayV0V1Lamk arrayV0V5LagetV5afLamk arrayV0V10ai_invariantV4V3V13V7V11Iainfix =V13ainfix +V12c1FIainfix <agetV10V12V7Iainfix <V12V0Aainfix <=c0V12IaterminationV12V8V4V3V7V11Aainfix <=V12V3Aainfix <=V9V12Aai_invariantV4V3V12V7V11FIainfix <=V9V8IapermutV11V2AaterminationV9V8V4V3V7V11Aainfix <=V9ainfix +a_Nc1Aainfix <=c0V8Aan_invariantV3V11Aam_invariantV4V11Aaj_invariantV4V3V8V7V11Aai_invariantV4V3V9V7V11FFFIainfix <afV0Aainfix <=c0afIainfix <V4V3Iainfix <=V3a_NAainfix <=c1V4AapermutV6V2Aan_invariantV3V6Aam_invariantV4V6FFFIainfix =V0ainfix +a_Nc1FF">
+        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.06"/>
+        </proof>
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="3.06"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter find.6.2" expl="correctness of parameter find" sum="dd57f5fc02b82c16ca5c0b1efc116fb9" proved="true" expanded="false" shape="Lamk arrayV0V1Lamk arrayV0V5LagetV5afLamk arrayV0V10ainfix <=V9V13Iainfix =V13ainfix +V12c1FIainfix <agetV10V12V7Iainfix <V12V0Aainfix <=c0V12IaterminationV12V8V4V3V7V11Aainfix <=V12V3Aainfix <=V9V12Aai_invariantV4V3V12V7V11FIainfix <=V9V8IapermutV11V2AaterminationV9V8V4V3V7V11Aainfix <=V9ainfix +a_Nc1Aainfix <=c0V8Aan_invariantV3V11Aam_invariantV4V11Aaj_invariantV4V3V8V7V11Aai_invariantV4V3V9V7V11FFFIainfix <afV0Aainfix <=c0afIainfix <V4V3Iainfix <=V3a_NAainfix <=c1V4AapermutV6V2Aan_invariantV3V6Aam_invariantV4V6FFFIainfix =V0ainfix +a_Nc1FF">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter find.6.3" expl="correctness of parameter find" sum="b4f2e1b0f73097a174a67273694ba5f0" proved="true" expanded="false" shape="Lamk arrayV0V1Lamk arrayV0V5LagetV5afLamk arrayV0V10ainfix <=V13V3Iainfix =V13ainfix +V12c1FIainfix <agetV10V12V7Iainfix <V12V0Aainfix <=c0V12IaterminationV12V8V4V3V7V11Aainfix <=V12V3Aainfix <=V9V12Aai_invariantV4V3V12V7V11FIainfix <=V9V8IapermutV11V2AaterminationV9V8V4V3V7V11Aainfix <=V9ainfix +a_Nc1Aainfix <=c0V8Aan_invariantV3V11Aam_invariantV4V11Aaj_invariantV4V3V8V7V11Aai_invariantV4V3V9V7V11FFFIainfix <afV0Aainfix <=c0afIainfix <V4V3Iainfix <=V3a_NAainfix <=c1V4AapermutV6V2Aan_invariantV3V6Aam_invariantV4V6FFFIainfix =V0ainfix +a_Nc1FF">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.78"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter find.6.4" expl="correctness of parameter find" sum="d93b5ff21a54637ff688ad765d3c1fdd" proved="true" expanded="false" shape="Lamk arrayV0V1Lamk arrayV0V5LagetV5afLamk arrayV0V10aterminationV13V8V4V3V7V11Iainfix =V13ainfix +V12c1FIainfix <agetV10V12V7Iainfix <V12V0Aainfix <=c0V12IaterminationV12V8V4V3V7V11Aainfix <=V12V3Aainfix <=V9V12Aai_invariantV4V3V12V7V11FIainfix <=V9V8IapermutV11V2AaterminationV9V8V4V3V7V11Aainfix <=V9ainfix +a_Nc1Aainfix <=c0V8Aan_invariantV3V11Aam_invariantV4V11Aaj_invariantV4V3V8V7V11Aai_invariantV4V3V9V7V11FFFIainfix <afV0Aainfix <=c0afIainfix <V4V3Iainfix <=V3a_NAainfix <=c1V4AapermutV6V2Aan_invariantV3V6Aam_invariantV4V6FFFIainfix =V0ainfix +a_Nc1FF">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="1.44"/>
+        </proof>
+       </goal>
+      </transf>
      </goal>
-     <goal name="WP_parameter find.30" expl="loop variant decreases" sum="f8fff79ae11296c59ce4cf65f9143158" proved="true" expanded="true">
+     <goal name="WP_parameter find.7" expl="loop variant decreases" sum="4fd81a79d3c6cffb4be0c6e5b55a1494" proved="true" expanded="false" shape="Lamk arrayV0V1Lamk arrayV0V5LagetV5afLamk arrayV0V10ainfix <ainfix -ainfix +a_Nc1V13ainfix -ainfix +a_Nc1V12Aainfix <=c0ainfix -ainfix +a_Nc1V12IaterminationV13V8V4V3V7V11Aainfix <=V13V3Aainfix <=V9V13Aai_invariantV4V3V13V7V11Iainfix =V13ainfix +V12c1FIainfix <agetV10V12V7Iainfix <V12V0Aainfix <=c0V12IaterminationV12V8V4V3V7V11Aainfix <=V12V3Aainfix <=V9V12Aai_invariantV4V3V12V7V11FIainfix <=V9V8IapermutV11V2AaterminationV9V8V4V3V7V11Aainfix <=V9ainfix +a_Nc1Aainfix <=c0V8Aan_invariantV3V11Aam_invariantV4V11Aaj_invariantV4V3V8V7V11Aai_invariantV4V3V9V7V11FFFIainfix <afV0Aainfix <=c0afIainfix <V4V3Iainfix <=V3a_NAainfix <=c1V4AapermutV6V2Aan_invariantV3V6Aam_invariantV4V6FFFIainfix =V0ainfix +a_Nc1FF">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter find.31" expl="normal postcondition" sum="fa3df7fbc5a7e715512d1633198a8aa7" proved="true" expanded="true">
+     <goal name="WP_parameter find.8" expl="loop invariant init" sum="4040ad7b1e2d49b565d8a54ac42dbbb7" proved="true" expanded="false" shape="Lamk arrayV0V1Lamk arrayV0V5LagetV5afLamk arrayV0V10aterminationV12V8V4V3V7V11Aainfix <=V4V8Aainfix <=V8V8Aaj_invariantV4V3V8V7V11Iainfix <agetV10V12V7NIainfix <V12V0Aainfix <=c0V12IaterminationV12V8V4V3V7V11Aainfix <=V12V3Aainfix <=V9V12Aai_invariantV4V3V12V7V11FIainfix <=V9V8IapermutV11V2AaterminationV9V8V4V3V7V11Aainfix <=V9ainfix +a_Nc1Aainfix <=c0V8Aan_invariantV3V11Aam_invariantV4V11Aaj_invariantV4V3V8V7V11Aai_invariantV4V3V9V7V11FFFIainfix <afV0Aainfix <=c0afIainfix <V4V3Iainfix <=V3a_NAainfix <=c1V4AapermutV6V2Aan_invariantV3V6Aam_invariantV4V6FFFIainfix =V0ainfix +a_Nc1FF">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter find.9" expl="precondition" sum="3afe0cb2c72d76d8c4bfe43d3644b16b" proved="true" expanded="false" shape="Lamk arrayV0V1Lamk arrayV0V5LagetV5afLamk arrayV0V10ainfix <V13V0Aainfix <=c0V13IaterminationV12V13V4V3V7V11Aainfix <=V4V13Aainfix <=V13V8Aaj_invariantV4V3V13V7V11FIainfix <agetV10V12V7NIainfix <V12V0Aainfix <=c0V12IaterminationV12V8V4V3V7V11Aainfix <=V12V3Aainfix <=V9V12Aai_invariantV4V3V12V7V11FIainfix <=V9V8IapermutV11V2AaterminationV9V8V4V3V7V11Aainfix <=V9ainfix +a_Nc1Aainfix <=c0V8Aan_invariantV3V11Aam_invariantV4V11Aaj_invariantV4V3V8V7V11Aai_invariantV4V3V9V7V11FFFIainfix <afV0Aainfix <=c0afIainfix <V4V3Iainfix <=V3a_NAainfix <=c1V4AapermutV6V2Aan_invariantV3V6Aam_invariantV4V6FFFIainfix =V0ainfix +a_Nc1FF">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter find.10" expl="loop invariant preservation" sum="cda1583c27926f396830461f75338adf" proved="true" expanded="false" shape="Lamk arrayV0V1Lamk arrayV0V5LagetV5afLamk arrayV0V10aterminationV12V14V4V3V7V11Aainfix <=V4V14Aainfix <=V14V8Aaj_invariantV4V3V14V7V11Iainfix =V14ainfix -V13c1FIainfix <V7agetV10V13Iainfix <V13V0Aainfix <=c0V13IaterminationV12V13V4V3V7V11Aainfix <=V4V13Aainfix <=V13V8Aaj_invariantV4V3V13V7V11FIainfix <agetV10V12V7NIainfix <V12V0Aainfix <=c0V12IaterminationV12V8V4V3V7V11Aainfix <=V12V3Aainfix <=V9V12Aai_invariantV4V3V12V7V11FIainfix <=V9V8IapermutV11V2AaterminationV9V8V4V3V7V11Aainfix <=V9ainfix +a_Nc1Aainfix <=c0V8Aan_invariantV3V11Aam_invariantV4V11Aaj_invariantV4V3V8V7V11Aai_invariantV4V3V9V7V11FFFIainfix <afV0Aainfix <=c0afIainfix <V4V3Iainfix <=V3a_NAainfix <=c1V4AapermutV6V2Aan_invariantV3V6Aam_invariantV4V6FFFIainfix =V0ainfix +a_Nc1FF">
+      <transf name="split_goal" proved="true" expanded="false">
+       <goal name="WP_parameter find.10.1" expl="correctness of parameter find" sum="c9be0e56d57ec11ac27b0e96e7f6370e" proved="true" expanded="false" shape="Lamk arrayV0V1Lamk arrayV0V5LagetV5afLamk arrayV0V10aj_invariantV4V3V14V7V11Iainfix =V14ainfix -V13c1FIainfix <V7agetV10V13Iainfix <V13V0Aainfix <=c0V13IaterminationV12V13V4V3V7V11Aainfix <=V4V13Aainfix <=V13V8Aaj_invariantV4V3V13V7V11FIainfix <agetV10V12V7NIainfix <V12V0Aainfix <=c0V12IaterminationV12V8V4V3V7V11Aainfix <=V12V3Aainfix <=V9V12Aai_invariantV4V3V12V7V11FIainfix <=V9V8IapermutV11V2AaterminationV9V8V4V3V7V11Aainfix <=V9ainfix +a_Nc1Aainfix <=c0V8Aan_invariantV3V11Aam_invariantV4V11Aaj_invariantV4V3V8V7V11Aai_invariantV4V3V9V7V11FFFIainfix <afV0Aainfix <=c0afIainfix <V4V3Iainfix <=V3a_NAainfix <=c1V4AapermutV6V2Aan_invariantV3V6Aam_invariantV4V6FFFIainfix =V0ainfix +a_Nc1FF">
+        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.09"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter find.10.2" expl="correctness of parameter find" sum="51f8ad930226cb2f012116c523002af6" proved="true" expanded="false" shape="Lamk arrayV0V1Lamk arrayV0V5LagetV5afLamk arrayV0V10ainfix <=V14V8Iainfix =V14ainfix -V13c1FIainfix <V7agetV10V13Iainfix <V13V0Aainfix <=c0V13IaterminationV12V13V4V3V7V11Aainfix <=V4V13Aainfix <=V13V8Aaj_invariantV4V3V13V7V11FIainfix <agetV10V12V7NIainfix <V12V0Aainfix <=c0V12IaterminationV12V8V4V3V7V11Aainfix <=V12V3Aainfix <=V9V12Aai_invariantV4V3V12V7V11FIainfix <=V9V8IapermutV11V2AaterminationV9V8V4V3V7V11Aainfix <=V9ainfix +a_Nc1Aainfix <=c0V8Aan_invariantV3V11Aam_invariantV4V11Aaj_invariantV4V3V8V7V11Aai_invariantV4V3V9V7V11FFFIainfix <afV0Aainfix <=c0afIainfix <V4V3Iainfix <=V3a_NAainfix <=c1V4AapermutV6V2Aan_invariantV3V6Aam_invariantV4V6FFFIainfix =V0ainfix +a_Nc1FF">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.04"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter find.10.3" expl="correctness of parameter find" sum="bcd8e45f322a0c104aa8b1c38bcc7d3c" proved="true" expanded="false" shape="Lamk arrayV0V1Lamk arrayV0V5LagetV5afLamk arrayV0V10ainfix <=V4V14Iainfix =V14ainfix -V13c1FIainfix <V7agetV10V13Iainfix <V13V0Aainfix <=c0V13IaterminationV12V13V4V3V7V11Aainfix <=V4V13Aainfix <=V13V8Aaj_invariantV4V3V13V7V11FIainfix <agetV10V12V7NIainfix <V12V0Aainfix <=c0V12IaterminationV12V8V4V3V7V11Aainfix <=V12V3Aainfix <=V9V12Aai_invariantV4V3V12V7V11FIainfix <=V9V8IapermutV11V2AaterminationV9V8V4V3V7V11Aainfix <=V9ainfix +a_Nc1Aainfix <=c0V8Aan_invariantV3V11Aam_invariantV4V11Aaj_invariantV4V3V8V7V11Aai_invariantV4V3V9V7V11FFFIainfix <afV0Aainfix <=c0afIainfix <V4V3Iainfix <=V3a_NAainfix <=c1V4AapermutV6V2Aan_invariantV3V6Aam_invariantV4V6FFFIainfix =V0ainfix +a_Nc1FF">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="3.66"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter find.10.4" expl="correctness of parameter find" sum="1be798a32f0cb079622b5116c55b2af3" proved="true" expanded="false" shape="Lamk arrayV0V1Lamk arrayV0V5LagetV5afLamk arrayV0V10aterminationV12V14V4V3V7V11Iainfix =V14ainfix -V13c1FIainfix <V7agetV10V13Iainfix <V13V0Aainfix <=c0V13IaterminationV12V13V4V3V7V11Aainfix <=V4V13Aainfix <=V13V8Aaj_invariantV4V3V13V7V11FIainfix <agetV10V12V7NIainfix <V12V0Aainfix <=c0V12IaterminationV12V8V4V3V7V11Aainfix <=V12V3Aainfix <=V9V12Aai_invariantV4V3V12V7V11FIainfix <=V9V8IapermutV11V2AaterminationV9V8V4V3V7V11Aainfix <=V9ainfix +a_Nc1Aainfix <=c0V8Aan_invariantV3V11Aam_invariantV4V11Aaj_invariantV4V3V8V7V11Aai_invariantV4V3V9V7V11FFFIainfix <afV0Aainfix <=c0afIainfix <V4V3Iainfix <=V3a_NAainfix <=c1V4AapermutV6V2Aan_invariantV3V6Aam_invariantV4V6FFFIainfix =V0ainfix +a_Nc1FF">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="3.86"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal name="WP_parameter find.11" expl="loop variant decreases" sum="8d9f9b223776744eaffa7df49dca8fca" proved="true" expanded="false" shape="Lamk arrayV0V1Lamk arrayV0V5LagetV5afLamk arrayV0V10ainfix <V14V13Aainfix <=c0V13IaterminationV12V14V4V3V7V11Aainfix <=V4V14Aainfix <=V14V8Aaj_invariantV4V3V14V7V11Iainfix =V14ainfix -V13c1FIainfix <V7agetV10V13Iainfix <V13V0Aainfix <=c0V13IaterminationV12V13V4V3V7V11Aainfix <=V4V13Aainfix <=V13V8Aaj_invariantV4V3V13V7V11FIainfix <agetV10V12V7NIainfix <V12V0Aainfix <=c0V12IaterminationV12V8V4V3V7V11Aainfix <=V12V3Aainfix <=V9V12Aai_invariantV4V3V12V7V11FIainfix <=V9V8IapermutV11V2AaterminationV9V8V4V3V7V11Aainfix <=V9ainfix +a_Nc1Aainfix <=c0V8Aan_invariantV3V11Aam_invariantV4V11Aaj_invariantV4V3V8V7V11Aai_invariantV4V3V9V7V11FFFIainfix <afV0Aainfix <=c0afIainfix <V4V3Iainfix <=V3a_NAainfix <=c1V4AapermutV6V2Aan_invariantV3V6Aam_invariantV4V6FFFIainfix =V0ainfix +a_Nc1FF">
+      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter find.12" expl="assertion" sum="3f3851916858bf5cc9625bfa913f1b22" proved="true" expanded="false" shape="Lamk arrayV0V1Lamk arrayV0V5LagetV5afLamk arrayV0V10ainfix <=V7agetV10V12Aainfix <=agetV10V13V7Iainfix <V7agetV10V13NIainfix <V13V0Aainfix <=c0V13IaterminationV12V13V4V3V7V11Aainfix <=V4V13Aainfix <=V13V8Aaj_invariantV4V3V13V7V11FIainfix <agetV10V12V7NIainfix <V12V0Aainfix <=c0V12IaterminationV12V8V4V3V7V11Aainfix <=V12V3Aainfix <=V9V12Aai_invariantV4V3V12V7V11FIainfix <=V9V8IapermutV11V2AaterminationV9V8V4V3V7V11Aainfix <=V9ainfix +a_Nc1Aainfix <=c0V8Aan_invariantV3V11Aam_invariantV4V11Aaj_invariantV4V3V8V7V11Aai_invariantV4V3V9V7V11FFFIainfix <afV0Aainfix <=c0afIainfix <V4V3Iainfix <=V3a_NAainfix <=c1V4AapermutV6V2Aan_invariantV3V6Aam_invariantV4V6FFFIainfix =V0ainfix +a_Nc1FF">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter find.13" expl="precondition" sum="b82792ea6aadb450eea87b8f12b6c342" proved="true" expanded="false" shape="Lamk arrayV0V1Lamk arrayV0V5LagetV5afLamk arrayV0V10ainfix <V12V0Aainfix <=c0V12Iainfix <=V12V13Iainfix <=V7agetV10V12Aainfix <=agetV10V13V7Iainfix <V7agetV10V13NIainfix <V13V0Aainfix <=c0V13IaterminationV12V13V4V3V7V11Aainfix <=V4V13Aainfix <=V13V8Aaj_invariantV4V3V13V7V11FIainfix <agetV10V12V7NIainfix <V12V0Aainfix <=c0V12IaterminationV12V8V4V3V7V11Aainfix <=V12V3Aainfix <=V9V12Aai_invariantV4V3V12V7V11FIainfix <=V9V8IapermutV11V2AaterminationV9V8V4V3V7V11Aainfix <=V9ainfix +a_Nc1Aainfix <=c0V8Aan_invariantV3V11Aam_invariantV4V11Aaj_invariantV4V3V8V7V11Aai_invariantV4V3V9V7V11FFFIainfix <afV0Aainfix <=c0afIainfix <V4V3Iainfix <=V3a_NAainfix <=c1V4AapermutV6V2Aan_invariantV3V6Aam_invariantV4V6FFFIainfix =V0ainfix +a_Nc1FF">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter find.14" expl="precondition" sum="e948eb77fa494709a35e9b537ab67f50" proved="true" expanded="false" shape="Lamk arrayV0V1Lamk arrayV0V5LagetV5afLamk arrayV0V10ainfix <V13V0Aainfix <=c0V13Iainfix <V12V0Aainfix <=c0V12Iainfix <=V12V13Iainfix <=V7agetV10V12Aainfix <=agetV10V13V7Iainfix <V7agetV10V13NIainfix <V13V0Aainfix <=c0V13IaterminationV12V13V4V3V7V11Aainfix <=V4V13Aainfix <=V13V8Aaj_invariantV4V3V13V7V11FIainfix <agetV10V12V7NIainfix <V12V0Aainfix <=c0V12IaterminationV12V8V4V3V7V11Aainfix <=V12V3Aainfix <=V9V12Aai_invariantV4V3V12V7V11FIainfix <=V9V8IapermutV11V2AaterminationV9V8V4V3V7V11Aainfix <=V9ainfix +a_Nc1Aainfix <=c0V8Aan_invariantV3V11Aam_invariantV4V11Aaj_invariantV4V3V8V7V11Aai_invariantV4V3V9V7V11FFFIainfix <afV0Aainfix <=c0afIainfix <V4V3Iainfix <=V3a_NAainfix <=c1V4AapermutV6V2Aan_invariantV3V6Aam_invariantV4V6FFFIainfix =V0ainfix +a_Nc1FF">
+      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter find.15" expl="precondition" sum="b81da66391b97b4b76dcd0c365303366" proved="true" expanded="false" shape="Lamk arrayV0V1Lamk arrayV0V5LagetV5afLamk arrayV0V10ainfix <V12V0Aainfix <=c0V12Iainfix <V13V0Aainfix <=c0V13Iainfix <V12V0Aainfix <=c0V12Iainfix <=V12V13Iainfix <=V7agetV10V12Aainfix <=agetV10V13V7Iainfix <V7agetV10V13NIainfix <V13V0Aainfix <=c0V13IaterminationV12V13V4V3V7V11Aainfix <=V4V13Aainfix <=V13V8Aaj_invariantV4V3V13V7V11FIainfix <agetV10V12V7NIainfix <V12V0Aainfix <=c0V12IaterminationV12V8V4V3V7V11Aainfix <=V12V3Aainfix <=V9V12Aai_invariantV4V3V12V7V11FIainfix <=V9V8IapermutV11V2AaterminationV9V8V4V3V7V11Aainfix <=V9ainfix +a_Nc1Aainfix <=c0V8Aan_invariantV3V11Aam_invariantV4V11Aaj_invariantV4V3V8V7V11Aai_invariantV4V3V9V7V11FFFIainfix <afV0Aainfix <=c0afIainfix <V4V3Iainfix <=V3a_NAainfix <=c1V4AapermutV6V2Aan_invariantV3V6Aam_invariantV4V6FFFIainfix =V0ainfix +a_Nc1FF">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter find.16" expl="precondition" sum="daa7bcf7ab19abe4c588eae361a15703" proved="true" expanded="false" shape="Lamk arrayV0V1Lamk arrayV0V5LagetV5afLamk arrayV0V10ainfix <V13V0Aainfix <=c0V13Iainfix =V14asetV10V12agetV10V13FIainfix <V12V0Aainfix <=c0V12Iainfix <V13V0Aainfix <=c0V13Iainfix <V12V0Aainfix <=c0V12Iainfix <=V12V13Iainfix <=V7agetV10V12Aainfix <=agetV10V13V7Iainfix <V7agetV10V13NIainfix <V13V0Aainfix <=c0V13IaterminationV12V13V4V3V7V11Aainfix <=V4V13Aainfix <=V13V8Aaj_invariantV4V3V13V7V11FIainfix <agetV10V12V7NIainfix <V12V0Aainfix <=c0V12IaterminationV12V8V4V3V7V11Aainfix <=V12V3Aainfix <=V9V12Aai_invariantV4V3V12V7V11FIainfix <=V9V8IapermutV11V2AaterminationV9V8V4V3V7V11Aainfix <=V9ainfix +a_Nc1Aainfix <=c0V8Aan_invariantV3V11Aam_invariantV4V11Aaj_invariantV4V3V8V7V11Aai_invariantV4V3V9V7V11FFFIainfix <afV0Aainfix <=c0afIainfix <V4V3Iainfix <=V3a_NAainfix <=c1V4AapermutV6V2Aan_invariantV3V6Aam_invariantV4V6FFFIainfix =V0ainfix +a_Nc1FF">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter find.17" expl="assertion" sum="d03183216d3e7cd09209edde13a65818" proved="true" expanded="false" shape="Lamk arrayV0V1Lamk arrayV0V5LagetV5afLamk arrayV0V10Lamk arrayV0V15aexchangeV15V10V12V13Iainfix =V15asetV14V13agetV10V12FIainfix <V13V0Aainfix <=c0V13Iainfix =V14asetV10V12agetV10V13FIainfix <V12V0Aainfix <=c0V12Iainfix <V13V0Aainfix <=c0V13Iainfix <V12V0Aainfix <=c0V12Iainfix <=V12V13Iainfix <=V7agetV10V12Aainfix <=agetV10V13V7Iainfix <V7agetV10V13NIainfix <V13V0Aainfix <=c0V13IaterminationV12V13V4V3V7V11Aainfix <=V4V13Aainfix <=V13V8Aaj_invariantV4V3V13V7V11FIainfix <agetV10V12V7NIainfix <V12V0Aainfix <=c0V12IaterminationV12V8V4V3V7V11Aainfix <=V12V3Aainfix <=V9V12Aai_invariantV4V3V12V7V11FIainfix <=V9V8IapermutV11V2AaterminationV9V8V4V3V7V11Aainfix <=V9ainfix +a_Nc1Aainfix <=c0V8Aan_invariantV3V11Aam_invariantV4V11Aaj_invariantV4V3V8V7V11Aai_invariantV4V3V9V7V11FFFIainfix <afV0Aainfix <=c0afIainfix <V4V3Iainfix <=V3a_NAainfix <=c1V4AapermutV6V2Aan_invariantV3V6Aam_invariantV4V6FFFIainfix =V0ainfix +a_Nc1FF">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.12"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter find.18" expl="assertion" sum="387951c53516d5ededf4d1076d302dcd" proved="true" expanded="false" shape="Lamk arrayV0V1Lamk arrayV0V5LagetV5afLamk arrayV0V10Lamk arrayV0V15ainfix <=agetV15V12V7IaexchangeV15V10V12V13Iainfix =V15asetV14V13agetV10V12FIainfix <V13V0Aainfix <=c0V13Iainfix =V14asetV10V12agetV10V13FIainfix <V12V0Aainfix <=c0V12Iainfix <V13V0Aainfix <=c0V13Iainfix <V12V0Aainfix <=c0V12Iainfix <=V12V13Iainfix <=V7agetV10V12Aainfix <=agetV10V13V7Iainfix <V7agetV10V13NIainfix <V13V0Aainfix <=c0V13IaterminationV12V13V4V3V7V11Aainfix <=V4V13Aainfix <=V13V8Aaj_invariantV4V3V13V7V11FIainfix <agetV10V12V7NIainfix <V12V0Aainfix <=c0V12IaterminationV12V8V4V3V7V11Aainfix <=V12V3Aainfix <=V9V12Aai_invariantV4V3V12V7V11FIainfix <=V9V8IapermutV11V2AaterminationV9V8V4V3V7V11Aainfix <=V9ainfix +a_Nc1Aainfix <=c0V8Aan_invariantV3V11Aam_invariantV4V11Aaj_invariantV4V3V8V7V11Aai_invariantV4V3V9V7V11FFFIainfix <afV0Aainfix <=c0afIainfix <V4V3Iainfix <=V3a_NAainfix <=c1V4AapermutV6V2Aan_invariantV3V6Aam_invariantV4V6FFFIainfix =V0ainfix +a_Nc1FF">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter find.19" expl="assertion" sum="f2ad31a358cf0aee6f7789c9584063d4" proved="true" expanded="false" shape="Lamk arrayV0V1Lamk arrayV0V5LagetV5afLamk arrayV0V10Lamk arrayV0V15ainfix <=V7agetV15V13Iainfix <=agetV15V12V7IaexchangeV15V10V12V13Iainfix =V15asetV14V13agetV10V12FIainfix <V13V0Aainfix <=c0V13Iainfix =V14asetV10V12agetV10V13FIainfix <V12V0Aainfix <=c0V12Iainfix <V13V0Aainfix <=c0V13Iainfix <V12V0Aainfix <=c0V12Iainfix <=V12V13Iainfix <=V7agetV10V12Aainfix <=agetV10V13V7Iainfix <V7agetV10V13NIainfix <V13V0Aainfix <=c0V13IaterminationV12V13V4V3V7V11Aainfix <=V4V13Aainfix <=V13V8Aaj_invariantV4V3V13V7V11FIainfix <agetV10V12V7NIainfix <V12V0Aainfix <=c0V12IaterminationV12V8V4V3V7V11Aainfix <=V12V3Aainfix <=V9V12Aai_invariantV4V3V12V7V11FIainfix <=V9V8IapermutV11V2AaterminationV9V8V4V3V7V11Aainfix <=V9ainfix +a_Nc1Aainfix <=c0V8Aan_invariantV3V11Aam_invariantV4V11Aaj_invariantV4V3V8V7V11Aai_invariantV4V3V9V7V11FFFIainfix <afV0Aainfix <=c0afIainfix <V4V3Iainfix <=V3a_NAainfix <=c1V4AapermutV6V2Aan_invariantV3V6Aam_invariantV4V6FFFIainfix =V0ainfix +a_Nc1FF">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter find.20" expl="loop invariant preservation" sum="122a90033617e0fbd2aa2552104d9cc7" proved="true" expanded="true" shape="Lamk arrayV0V1Lamk arrayV0V5LagetV5afLamk arrayV0V10Lamk arrayV0V15apermutV16V2AaterminationV17V18V4V3V7V16Aainfix <=V17ainfix +a_Nc1Aainfix <=c0V18Aan_invariantV3V16Aam_invariantV4V16Aaj_invariantV4V3V18V7V16Aai_invariantV4V3V17V7V16Iainfix =V18ainfix -V13c1FIainfix =V17ainfix +V12c1FIainfix <=V7agetV15V13Iainfix <=agetV15V12V7IaexchangeV15V10V12V13Iainfix =V15asetV14V13agetV10V12FIainfix <V13V0Aainfix <=c0V13Iainfix =V14asetV10V12agetV10V13FIainfix <V12V0Aainfix <=c0V12Iainfix <V13V0Aainfix <=c0V13Iainfix <V12V0Aainfix <=c0V12Iainfix <=V12V13Iainfix <=V7agetV10V12Aainfix <=agetV10V13V7Iainfix <V7agetV10V13NIainfix <V13V0Aainfix <=c0V13IaterminationV12V13V4V3V7V11Aainfix <=V4V13Aainfix <=V13V8Aaj_invariantV4V3V13V7V11FIainfix <agetV10V12V7NIainfix <V12V0Aainfix <=c0V12IaterminationV12V8V4V3V7V11Aainfix <=V12V3Aainfix <=V9V12Aai_invariantV4V3V12V7V11FIainfix <=V9V8IapermutV11V2AaterminationV9V8V4V3V7V11Aainfix <=V9ainfix +a_Nc1Aainfix <=c0V8Aan_invariantV3V11Aam_invariantV4V11Aaj_invariantV4V3V8V7V11Aai_invariantV4V3V9V7V11FFFIainfix <afV0Aainfix <=c0afIainfix <V4V3Iainfix <=V3a_NAainfix <=c1V4AapermutV6V2Aan_invariantV3V6Aam_invariantV4V6FFFIainfix =V0ainfix +a_Nc1FF">
+      <proof prover="coq" timelimit="10" edited="find_WP_FIND_WP_parameter_find_4.v" obsolete="false">
+       <result status="valid" time="9.31"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter find.21" expl="loop variant decreases" sum="1f0a63a405eadb8b61ed6952e1709545" proved="true" expanded="false" shape="Lamk arrayV0V1Lamk arrayV0V5LagetV5afLamk arrayV0V10Lamk arrayV0V15ainfix <ainfix -ainfix +ainfix +a_Nc2V18V17ainfix -ainfix +ainfix +a_Nc2V8V9Aainfix <=c0ainfix -ainfix +ainfix +a_Nc2V8V9IapermutV16V2AaterminationV17V18V4V3V7V16Aainfix <=V17ainfix +a_Nc1Aainfix <=c0V18Aan_invariantV3V16Aam_invariantV4V16Aaj_invariantV4V3V18V7V16Aai_invariantV4V3V17V7V16Iainfix =V18ainfix -V13c1FIainfix =V17ainfix +V12c1FIainfix <=V7agetV15V13Iainfix <=agetV15V12V7IaexchangeV15V10V12V13Iainfix =V15asetV14V13agetV10V12FIainfix <V13V0Aainfix <=c0V13Iainfix =V14asetV10V12agetV10V13FIainfix <V12V0Aainfix <=c0V12Iainfix <V13V0Aainfix <=c0V13Iainfix <V12V0Aainfix <=c0V12Iainfix <=V12V13Iainfix <=V7agetV10V12Aainfix <=agetV10V13V7Iainfix <V7agetV10V13NIainfix <V13V0Aainfix <=c0V13IaterminationV12V13V4V3V7V11Aainfix <=V4V13Aainfix <=V13V8Aaj_invariantV4V3V13V7V11FIainfix <agetV10V12V7NIainfix <V12V0Aainfix <=c0V12IaterminationV12V8V4V3V7V11Aainfix <=V12V3Aainfix <=V9V12Aai_invariantV4V3V12V7V11FIainfix <=V9V8IapermutV11V2AaterminationV9V8V4V3V7V11Aainfix <=V9ainfix +a_Nc1Aainfix <=c0V8Aan_invariantV3V11Aam_invariantV4V11Aaj_invariantV4V3V8V7V11Aai_invariantV4V3V9V7V11FFFIainfix <afV0Aainfix <=c0afIainfix <V4V3Iainfix <=V3a_NAainfix <=c1V4AapermutV6V2Aan_invariantV3V6Aam_invariantV4V6FFFIainfix =V0ainfix +a_Nc1FF">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter find.22" expl="loop invariant preservation" sum="29adab423d1255322ade6dc702a9deb5" proved="true" expanded="false" shape="Lamk arrayV0V1Lamk arrayV0V5LagetV5afLamk arrayV0V10apermutV11V2AaterminationV12V13V4V3V7V11Aainfix <=V12ainfix +a_Nc1Aainfix <=c0V13Aan_invariantV3V11Aam_invariantV4V11Aaj_invariantV4V3V13V7V11Aai_invariantV4V3V12V7V11Iainfix <=V12V13NIainfix <=V7agetV10V12Aainfix <=agetV10V13V7Iainfix <V7agetV10V13NIainfix <V13V0Aainfix <=c0V13IaterminationV12V13V4V3V7V11Aainfix <=V4V13Aainfix <=V13V8Aaj_invariantV4V3V13V7V11FIainfix <agetV10V12V7NIainfix <V12V0Aainfix <=c0V12IaterminationV12V8V4V3V7V11Aainfix <=V12V3Aainfix <=V9V12Aai_invariantV4V3V12V7V11FIainfix <=V9V8IapermutV11V2AaterminationV9V8V4V3V7V11Aainfix <=V9ainfix +a_Nc1Aainfix <=c0V8Aan_invariantV3V11Aam_invariantV4V11Aaj_invariantV4V3V8V7V11Aai_invariantV4V3V9V7V11FFFIainfix <afV0Aainfix <=c0afIainfix <V4V3Iainfix <=V3a_NAainfix <=c1V4AapermutV6V2Aan_invariantV3V6Aam_invariantV4V6FFFIainfix =V0ainfix +a_Nc1FF">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter find.23" expl="loop variant decreases" sum="8eecc6dea149905938353185e3b5cd81" proved="true" expanded="false" shape="Lamk arrayV0V1Lamk arrayV0V5LagetV5afLamk arrayV0V10ainfix <ainfix -ainfix +ainfix +a_Nc2V13V12ainfix -ainfix +ainfix +a_Nc2V8V9Aainfix <=c0ainfix -ainfix +ainfix +a_Nc2V8V9IapermutV11V2AaterminationV12V13V4V3V7V11Aainfix <=V12ainfix +a_Nc1Aainfix <=c0V13Aan_invariantV3V11Aam_invariantV4V11Aaj_invariantV4V3V13V7V11Aai_invariantV4V3V12V7V11Iainfix <=V12V13NIainfix <=V7agetV10V12Aainfix <=agetV10V13V7Iainfix <V7agetV10V13NIainfix <V13V0Aainfix <=c0V13IaterminationV12V13V4V3V7V11Aainfix <=V4V13Aainfix <=V13V8Aaj_invariantV4V3V13V7V11FIainfix <agetV10V12V7NIainfix <V12V0Aainfix <=c0V12IaterminationV12V8V4V3V7V11Aainfix <=V12V3Aainfix <=V9V12Aai_invariantV4V3V12V7V11FIainfix <=V9V8IapermutV11V2AaterminationV9V8V4V3V7V11Aainfix <=V9ainfix +a_Nc1Aainfix <=c0V8Aan_invariantV3V11Aam_invariantV4V11Aaj_invariantV4V3V8V7V11Aai_invariantV4V3V9V7V11FFFIainfix <afV0Aainfix <=c0afIainfix <V4V3Iainfix <=V3a_NAainfix <=c1V4AapermutV6V2Aan_invariantV3V6Aam_invariantV4V6FFFIainfix =V0ainfix +a_Nc1FF">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter find.24" expl="assertion" sum="7f3e37e52d50046451fe308f58a8cd09" proved="true" expanded="false" shape="Lamk arrayV0V1Lamk arrayV0V5LagetV5afLamk arrayV0V10ainfix <V8V3Aainfix <V4V9Iainfix <=V9V8NIapermutV11V2AaterminationV9V8V4V3V7V11Aainfix <=V9ainfix +a_Nc1Aainfix <=c0V8Aan_invariantV3V11Aam_invariantV4V11Aaj_invariantV4V3V8V7V11Aai_invariantV4V3V9V7V11FFFIainfix <afV0Aainfix <=c0afIainfix <V4V3Iainfix <=V3a_NAainfix <=c1V4AapermutV6V2Aan_invariantV3V6Aam_invariantV4V6FFFIainfix =V0ainfix +a_Nc1FF">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter find.25" expl="loop invariant preservation" sum="69b3b3d6d310ac9bddee42b6102edc7e" proved="true" expanded="false" shape="Lamk arrayV0V1Lamk arrayV0V5LagetV5afLamk arrayV0V10ainfix <=V12a_NAainfix <=c1V4AapermutV11V2Aan_invariantV12V11Aam_invariantV4V11Iainfix =V12V8FIainfix <=afV8Iainfix <V8V3Aainfix <V4V9Iainfix <=V9V8NIapermutV11V2AaterminationV9V8V4V3V7V11Aainfix <=V9ainfix +a_Nc1Aainfix <=c0V8Aan_invariantV3V11Aam_invariantV4V11Aaj_invariantV4V3V8V7V11Aai_invariantV4V3V9V7V11FFFIainfix <afV0Aainfix <=c0afIainfix <V4V3Iainfix <=V3a_NAainfix <=c1V4AapermutV6V2Aan_invariantV3V6Aam_invariantV4V6FFFIainfix =V0ainfix +a_Nc1FF">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="3.42"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter find.26" expl="loop variant decreases" sum="87d97badf74077da46ec4672a98c784a" proved="true" expanded="false" shape="Lamk arrayV0V1Lamk arrayV0V5LagetV5afLamk arrayV0V10ainfix <ainfix -V12V4ainfix -V3V4Aainfix <=c0ainfix -V3V4Iainfix <=V12a_NAainfix <=c1V4AapermutV11V2Aan_invariantV12V11Aam_invariantV4V11Iainfix =V12V8FIainfix <=afV8Iainfix <V8V3Aainfix <V4V9Iainfix <=V9V8NIapermutV11V2AaterminationV9V8V4V3V7V11Aainfix <=V9ainfix +a_Nc1Aainfix <=c0V8Aan_invariantV3V11Aam_invariantV4V11Aaj_invariantV4V3V8V7V11Aai_invariantV4V3V9V7V11FFFIainfix <afV0Aainfix <=c0afIainfix <V4V3Iainfix <=V3a_NAainfix <=c1V4AapermutV6V2Aan_invariantV3V6Aam_invariantV4V6FFFIainfix =V0ainfix +a_Nc1FF">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter find.27" expl="loop invariant preservation" sum="099f7c8d1bde3f4ba4fd06c08ed7155d" proved="true" expanded="false" shape="Lamk arrayV0V1Lamk arrayV0V5LagetV5afLamk arrayV0V10ainfix <=V3a_NAainfix <=c1V12AapermutV11V2Aan_invariantV3V11Aam_invariantV12V11Iainfix =V12V9FIainfix <=V9afIainfix <=afV8NIainfix <V8V3Aainfix <V4V9Iainfix <=V9V8NIapermutV11V2AaterminationV9V8V4V3V7V11Aainfix <=V9ainfix +a_Nc1Aainfix <=c0V8Aan_invariantV3V11Aam_invariantV4V11Aaj_invariantV4V3V8V7V11Aai_invariantV4V3V9V7V11FFFIainfix <afV0Aainfix <=c0afIainfix <V4V3Iainfix <=V3a_NAainfix <=c1V4AapermutV6V2Aan_invariantV3V6Aam_invariantV4V6FFFIainfix =V0ainfix +a_Nc1FF">
+      <transf name="split_goal" proved="true" expanded="false">
+       <goal name="WP_parameter find.27.1" expl="correctness of parameter find" sum="63b64926e2f10fb65dcde0bd67523bad" proved="true" expanded="false" shape="Lamk arrayV0V1Lamk arrayV0V5LagetV5afLamk arrayV0V10am_invariantV12V11Iainfix =V12V9FIainfix <=V9afIainfix <=afV8NIainfix <V8V3Aainfix <V4V9Iainfix <=V9V8NIapermutV11V2AaterminationV9V8V4V3V7V11Aainfix <=V9ainfix +a_Nc1Aainfix <=c0V8Aan_invariantV3V11Aam_invariantV4V11Aaj_invariantV4V3V8V7V11Aai_invariantV4V3V9V7V11FFFIainfix <afV0Aainfix <=c0afIainfix <V4V3Iainfix <=V3a_NAainfix <=c1V4AapermutV6V2Aan_invariantV3V6Aam_invariantV4V6FFFIainfix =V0ainfix +a_Nc1FF">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.24"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter find.27.2" expl="correctness of parameter find" sum="622822efb72121f93df9068d35dca6b7" proved="true" expanded="false" shape="Lamk arrayV0V1Lamk arrayV0V5LagetV5afLamk arrayV0V10an_invariantV3V11Iainfix =V12V9FIainfix <=V9afIainfix <=afV8NIainfix <V8V3Aainfix <V4V9Iainfix <=V9V8NIapermutV11V2AaterminationV9V8V4V3V7V11Aainfix <=V9ainfix +a_Nc1Aainfix <=c0V8Aan_invariantV3V11Aam_invariantV4V11Aaj_invariantV4V3V8V7V11Aai_invariantV4V3V9V7V11FFFIainfix <afV0Aainfix <=c0afIainfix <V4V3Iainfix <=V3a_NAainfix <=c1V4AapermutV6V2Aan_invariantV3V6Aam_invariantV4V6FFFIainfix =V0ainfix +a_Nc1FF">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter find.27.3" expl="correctness of parameter find" sum="4371a99c0ba873702406978af3578738" proved="true" expanded="false" shape="Lamk arrayV0V1Lamk arrayV0V5LagetV5afLamk arrayV0V10apermutV11V2Iainfix =V12V9FIainfix <=V9afIainfix <=afV8NIainfix <V8V3Aainfix <V4V9Iainfix <=V9V8NIapermutV11V2AaterminationV9V8V4V3V7V11Aainfix <=V9ainfix +a_Nc1Aainfix <=c0V8Aan_invariantV3V11Aam_invariantV4V11Aaj_invariantV4V3V8V7V11Aai_invariantV4V3V9V7V11FFFIainfix <afV0Aainfix <=c0afIainfix <V4V3Iainfix <=V3a_NAainfix <=c1V4AapermutV6V2Aan_invariantV3V6Aam_invariantV4V6FFFIainfix =V0ainfix +a_Nc1FF">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter find.27.4" expl="correctness of parameter find" sum="cf40f6b1998bf55f8cb38bde0dd4e8fe" proved="true" expanded="false" shape="Lamk arrayV0V1Lamk arrayV0V5LagetV5afLamk arrayV0V10ainfix <=c1V12Iainfix =V12V9FIainfix <=V9afIainfix <=afV8NIainfix <V8V3Aainfix <V4V9Iainfix <=V9V8NIapermutV11V2AaterminationV9V8V4V3V7V11Aainfix <=V9ainfix +a_Nc1Aainfix <=c0V8Aan_invariantV3V11Aam_invariantV4V11Aaj_invariantV4V3V8V7V11Aai_invariantV4V3V9V7V11FFFIainfix <afV0Aainfix <=c0afIainfix <V4V3Iainfix <=V3a_NAainfix <=c1V4AapermutV6V2Aan_invariantV3V6Aam_invariantV4V6FFFIainfix =V0ainfix +a_Nc1FF">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter find.27.5" expl="correctness of parameter find" sum="b4fe5e47878fac8635dc9bb0f04f99ec" proved="true" expanded="false" shape="Lamk arrayV0V1Lamk arrayV0V5LagetV5afLamk arrayV0V10ainfix <=V3a_NIainfix =V12V9FIainfix <=V9afIainfix <=afV8NIainfix <V8V3Aainfix <V4V9Iainfix <=V9V8NIapermutV11V2AaterminationV9V8V4V3V7V11Aainfix <=V9ainfix +a_Nc1Aainfix <=c0V8Aan_invariantV3V11Aam_invariantV4V11Aaj_invariantV4V3V8V7V11Aai_invariantV4V3V9V7V11FFFIainfix <afV0Aainfix <=c0afIainfix <V4V3Iainfix <=V3a_NAainfix <=c1V4AapermutV6V2Aan_invariantV3V6Aam_invariantV4V6FFFIainfix =V0ainfix +a_Nc1FF">
+        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.03"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal name="WP_parameter find.28" expl="loop variant decreases" sum="36bb54515d592efa742301edab56f6e0" proved="true" expanded="false" shape="Lamk arrayV0V1Lamk arrayV0V5LagetV5afLamk arrayV0V10ainfix <ainfix -V3V12ainfix -V3V4Aainfix <=c0ainfix -V3V4Iainfix <=V3a_NAainfix <=c1V12AapermutV11V2Aan_invariantV3V11Aam_invariantV12V11Iainfix =V12V9FIainfix <=V9afIainfix <=afV8NIainfix <V8V3Aainfix <V4V9Iainfix <=V9V8NIapermutV11V2AaterminationV9V8V4V3V7V11Aainfix <=V9ainfix +a_Nc1Aainfix <=c0V8Aan_invariantV3V11Aam_invariantV4V11Aaj_invariantV4V3V8V7V11Aai_invariantV4V3V9V7V11FFFIainfix <afV0Aainfix <=c0afIainfix <V4V3Iainfix <=V3a_NAainfix <=c1V4AapermutV6V2Aan_invariantV3V6Aam_invariantV4V6FFFIainfix =V0ainfix +a_Nc1FF">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter find.29" expl="loop invariant preservation" sum="80acbc636434954042499f673de1eea8" proved="true" expanded="false" shape="Lamk arrayV0V1Lamk arrayV0V5LagetV5afLamk arrayV0V10ainfix <=V12a_NAainfix <=c1V13AapermutV11V2Aan_invariantV12V11Aam_invariantV13V11Iainfix =V13afFIainfix =V12afFIainfix <=V9afNIainfix <=afV8NIainfix <V8V3Aainfix <V4V9Iainfix <=V9V8NIapermutV11V2AaterminationV9V8V4V3V7V11Aainfix <=V9ainfix +a_Nc1Aainfix <=c0V8Aan_invariantV3V11Aam_invariantV4V11Aaj_invariantV4V3V8V7V11Aai_invariantV4V3V9V7V11FFFIainfix <afV0Aainfix <=c0afIainfix <V4V3Iainfix <=V3a_NAainfix <=c1V4AapermutV6V2Aan_invariantV3V6Aam_invariantV4V6FFFIainfix =V0ainfix +a_Nc1FF">
+      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.08"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter find.30" expl="loop variant decreases" sum="a593e5dffd144771ed388a93a9411eef" proved="true" expanded="false" shape="Lamk arrayV0V1Lamk arrayV0V5LagetV5afLamk arrayV0V10ainfix <ainfix -V12V13ainfix -V3V4Aainfix <=c0ainfix -V3V4Iainfix <=V12a_NAainfix <=c1V13AapermutV11V2Aan_invariantV12V11Aam_invariantV13V11Iainfix =V13afFIainfix =V12afFIainfix <=V9afNIainfix <=afV8NIainfix <V8V3Aainfix <V4V9Iainfix <=V9V8NIapermutV11V2AaterminationV9V8V4V3V7V11Aainfix <=V9ainfix +a_Nc1Aainfix <=c0V8Aan_invariantV3V11Aam_invariantV4V11Aaj_invariantV4V3V8V7V11Aai_invariantV4V3V9V7V11FFFIainfix <afV0Aainfix <=c0afIainfix <V4V3Iainfix <=V3a_NAainfix <=c1V4AapermutV6V2Aan_invariantV3V6Aam_invariantV4V6FFFIainfix =V0ainfix +a_Nc1FF">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter find.31" expl="normal postcondition" sum="3b77d6bb925a84ad396e3572a3199a1b" proved="true" expanded="false" shape="Lamk arrayV0V1Lamk arrayV0V5apermutV6V2AafoundV6Iainfix <V4V3NIainfix <=V3a_NAainfix <=c1V4AapermutV6V2Aan_invariantV3V6Aam_invariantV4V6FFFIainfix =V0ainfix +a_Nc1FF">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.17"/>
       </proof>
      </goal>
     </transf>
