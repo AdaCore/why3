@@ -1,5 +1,16 @@
 #!/bin/bash
 
+
+case "$1" in
+  "-mail")
+        REPORTBYMAIL=yes;;
+  "")
+        REPORTBYMAIL=no;;
+  *)
+        echo "$0: Unknown option '$1'"
+        exit 2
+esac
+
 REPORTDIR=$PWD/..
 OUT=$REPORTDIR/nightly-bench.out
 PREVIOUS=$REPORTDIR/nightly-bench.previous
@@ -10,9 +21,12 @@ DATE=`date --utc +%Y-%m-%d`
 SUBJECT="Why3 nightly bench:"
 
 notify() {
-    mail -s "$SUBJECT" why3-commits@lists.gforge.inria.fr < $REPORT
-    # mail -s "$SUBJECT" Claude.Marche@inria.fr < $REPORT
-    # cat $REPORT
+    if test "$REPORTBYMAIL" == "yes"; then
+        mail -s "$SUBJECT" why3-commits@lists.gforge.inria.fr < $REPORT
+        # mail -s "$SUBJECT" Claude.Marche@inria.fr < $REPORT
+    else
+        cat $REPORT
+    fi
     exit 0
 }
 
@@ -56,7 +70,17 @@ fi
 # increase number of cores used
 perl -pi -e 's/running_provers_max = 2/running_provers_max = 4/' why3.conf
 
-# do we want to do "make bench" ?
+# run the bench
+make bench &> $OUT
+if test "$?" != "0" ; then
+    echo "Make bench FAILED" >> $REPORT
+    cat $OUT >> $REPORT
+    SUBJECT="$SUBJECT make bench failed"
+    notify
+else
+    echo "Make bench succeeded. " >> $REPORT
+fi
+
 
 # replay proofs
 examples/regtests.sh &> $OUT
