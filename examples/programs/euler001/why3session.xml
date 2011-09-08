@@ -2,16 +2,19 @@
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
 <why3session name="examples/programs/euler001/why3session.xml">
  <prover id="alt-ergo" name="Alt-Ergo" version="0.93"/>
- <prover id="coq" name="Coq" version="8.2pl1"/>
+ <prover id="coq" name="Coq" version="8.3pl2"/>
  <prover id="cvc3" name="CVC3" version="2.2"/>
- <prover id="gappa" name="Gappa" version="0.13.0"/>
+ <prover id="gappa" name="Gappa" version="0.15.0"/>
  <prover id="simplify" name="Simplify" version="1.5.4"/>
+ <prover id="spass" name="Spass" version="3.7"/>
+ <prover id="vampire" name="Vampire" version="0.6"/>
+ <prover id="yices" name="Yices" version="1.0.25"/>
  <prover id="z3" name="Z3" version="2.19"/>
  <file name="../euler001.mlw" verified="false" expanded="true">
   <theory name="SumMultiple" verified="false" expanded="true">
    <goal name="div_minus1_1" sum="5266791566cb9e131f79837e51b72de8" proved="true" expanded="true" shape="ainfix =adivainfix +V0c1V1ainfix +adivV0V1c1Iainfix =amodainfix +V0c1V1c0Iainfix >V1c0Aainfix >=V0c0F">
     <proof prover="coq" timelimit="5" edited="euler001_SumMultiple_div_minus1_1_1.v" obsolete="false">
-     <result status="valid" time="0.48"/>
+     <result status="valid" time="0.52"/>
     </proof>
    </goal>
    <goal name="div_minus1_2" sum="b75e15f7119a97ac29920a7a789b8e15" proved="false" expanded="true" shape="ainfix =adivainfix +V0c1V1adivV0V1Iainfix =amodainfix +V0c1V1c0NIainfix >V1c0Aainfix >=V0c0F">
@@ -23,9 +26,6 @@
     </proof>
     <proof prover="alt-ergo" timelimit="5" edited="" obsolete="false">
      <result status="unknown" time="0.23"/>
-    </proof>
-    <proof prover="z3" timelimit="5" edited="" obsolete="false">
-     <result status="timeout" time="5.06"/>
     </proof>
    </goal>
    <goal name="Closed_formula_0" sum="9d635abb360eeba223e62aea7d54449e" proved="true" expanded="true" shape="apc0">
