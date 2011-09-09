@@ -6,11 +6,11 @@ Definition unit  := unit.
 
 Parameter mark : Type.
 
-Parameter at1: forall (a:Type), a -> mark  -> a.
+Parameter at1: forall (a:Type), a -> mark -> a.
 
 Implicit Arguments at1.
 
-Parameter old: forall (a:Type), a  -> a.
+Parameter old: forall (a:Type), a -> a.
 
 Implicit Arguments old.
 
@@ -26,11 +26,11 @@ Implicit Arguments contents.
 
 Parameter map : forall (a:Type) (b:Type), Type.
 
-Parameter get: forall (a:Type) (b:Type), (map a b) -> a  -> b.
+Parameter get: forall (a:Type) (b:Type), (map a b) -> a -> b.
 
 Implicit Arguments get.
 
-Parameter set: forall (a:Type) (b:Type), (map a b) -> a -> b  -> (map a b).
+Parameter set: forall (a:Type) (b:Type), (map a b) -> a -> b -> (map a b).
 
 Implicit Arguments set.
 
@@ -42,7 +42,7 @@ Axiom Select_neq : forall (a:Type) (b:Type), forall (m:(map a b)),
   forall (a1:a) (a2:a), forall (b1:b), (~ (a1 = a2)) -> ((get (set m a1 b1)
   a2) = (get m a2)).
 
-Parameter const: forall (b:Type) (a:Type), b  -> (map a b).
+Parameter const: forall (b:Type) (a:Type), b -> (map a b).
 
 Set Contextual Implicit.
 Implicit Arguments const.
@@ -116,8 +116,8 @@ Axiom permut_weakening : forall (a:Type), forall (a1:(map Z a)) (a2:(map Z
   (r2 <= r1)%Z) -> ((permut_sub a1 a2 l2 r2) -> (permut_sub a1 a2 l1 r1)).
 
 Axiom permut_eq : forall (a:Type), forall (a1:(map Z a)) (a2:(map Z a)),
-  forall (l:Z) (u:Z), (l <= u)%Z -> ((permut_sub a1 a2 l u) -> forall (i:Z),
-  ((i <  l)%Z \/ (u <= i)%Z) -> ((get a2 i) = (get a1 i))).
+  forall (l:Z) (u:Z), (permut_sub a1 a2 l u) -> forall (i:Z), ((i <  l)%Z \/
+  (u <= i)%Z) -> ((get a2 i) = (get a1 i)).
 
 Axiom permut_exists : forall (a:Type), forall (a1:(map Z a)) (a2:(map Z a)),
   forall (l:Z) (u:Z), (permut_sub a1 a2 l u) -> forall (i:Z), ((l <= i)%Z /\
@@ -142,6 +142,12 @@ Axiom exchange_permut : forall (a:Type), forall (a1:(array a)) (a2:(array a))
   (((0%Z <= i)%Z /\ (i <  (length a1))%Z) -> (((0%Z <= j)%Z /\
   (j <  (length a1))%Z) -> (permut a1 a2)))).
 
+Axiom permut_sym1 : forall (a:Type), forall (a1:(array a)) (a2:(array a)),
+  (permut a1 a2) -> (permut a2 a1).
+
+Axiom permut_trans1 : forall (a:Type), forall (a1:(array a)) (a2:(array a))
+  (a3:(array a)), (permut a1 a2) -> ((permut a2 a3) -> (permut a1 a3)).
+
 Definition array_eq_sub (a:Type)(a1:(array a)) (a2:(array a)) (l:Z)
   (u:Z): Prop := (map_eq_sub (elts a1) (elts a2) l u).
 Implicit Arguments array_eq_sub.
@@ -156,13 +162,17 @@ Axiom array_eq_sub_permut : forall (a:Type), forall (a1:(array a)) (a2:(array
 Axiom array_eq_permut : forall (a:Type), forall (a1:(array a)) (a2:(array
   a)), (array_eq a1 a2) -> (permut a1 a2).
 
+(* YOU MAY EDIT THE CONTEXT BELOW *)
+
+(* DO NOT EDIT BELOW *)
+
 Theorem WP_parameter_insertion_sort : forall (a:Z), forall (a1:(map Z Z)),
   let a2 := (mk_array a a1) in ((1%Z <= (a - 1%Z)%Z)%Z -> forall (a3:(map Z
   Z)), forall (i:Z), ((1%Z <= i)%Z /\ (i <= (a - 1%Z)%Z)%Z) ->
-  (((sorted_sub a3 0%Z i) /\ (permut (mk_array a a3) a2)) ->
+  (((sorted_sub a3 0%Z i) /\ (permut a2 (mk_array a a3))) ->
   (((0%Z <= i)%Z /\ (i <  a)%Z) -> let result := (get a3 i) in forall (j:Z),
   forall (a4:(map Z Z)), let a5 := (mk_array a a4) in ((((0%Z <= j)%Z /\
-  (j <= i)%Z) /\ ((permut (set1 a5 j result) a2) /\ ((forall (k1:Z) (k2:Z),
+  (j <= i)%Z) /\ ((permut a2 (set1 a5 j result)) /\ ((forall (k1:Z) (k2:Z),
   (((0%Z <= k1)%Z /\ (k1 <= k2)%Z) /\ (k2 <= i)%Z) -> ((~ (k1 = j)) ->
   ((~ (k2 = j)) -> ((get a4 k1) <= (get a4 k2))%Z))) /\ forall (k:Z),
   (((j + 1%Z)%Z <= k)%Z /\ (k <= i)%Z) -> (result <  (get a4 k))%Z))) ->
@@ -170,13 +180,13 @@ Theorem WP_parameter_insertion_sort : forall (a:Z), forall (a1:(map Z Z)),
   ((result <  (get a4 (j - 1%Z)%Z))%Z -> (((0%Z <= (j - 1%Z)%Z)%Z /\
   ((j - 1%Z)%Z <  a)%Z) -> (((0%Z <= j)%Z /\ (j <  a)%Z) -> forall (a6:(map Z
   Z)), let a7 := (mk_array a a6) in ((a6 = (set a4 j (get a4
-  (j - 1%Z)%Z))) -> ((exchange match (set1 a7 (j - 1%Z)%Z
+  (j - 1%Z)%Z))) -> ((exchange match (set1 a5 j
   result) with
   | mk_array _ elts1 => elts1
-  end match (set1 a5 j result) with
+  end match (set1 a7 (j - 1%Z)%Z result) with
   | mk_array _ elts1 => elts1
-  end (j - 1%Z)%Z j) -> forall (j1:Z), (j1 = (j - 1%Z)%Z) -> (permut (set1 a7
-  j1 result) a2)))))))))))).
+  end (j - 1%Z)%Z j) -> forall (j1:Z), (j1 = (j - 1%Z)%Z) -> (permut a2
+  (set1 a7 j1 result))))))))))))).
 (* YOU MAY EDIT THE PROOF BELOW *)
 intuition.
 intuition.
@@ -190,12 +200,12 @@ subst a6.
 simpl.
 apply permut_trans with (elts (set1 (mk_array a a4) j (get a3 i))); auto.
 subst j1.
+unfold permut in H12.
+intuition.
 apply permut_exchange with (j-1)%Z j.
 simpl; omega.
 simpl; omega.
-assumption.
-unfold permut in H12.
-intuition.
+subst j1; assumption.
 Qed.
 (* DO NOT EDIT BELOW *)
 
