@@ -1,14 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
-<why3session name="examples/programs/vacid_0_binary_heaps/proofs/why3session.xml">
+<why3session name="proofs/why3session.xml">
  <prover id="alt-ergo" name="Alt-Ergo" version="0.93"/>
- <prover id="coq" name="Coq" version="8.3pl2"/>
+ <prover id="coq" name="Coq" version="8.2pl1"/>
  <prover id="cvc3" name="CVC3" version="2.2"/>
- <prover id="gappa" name="Gappa" version="0.15.0"/>
- <prover id="simplify" name="Simplify" version="1.5.4"/>
- <prover id="spass" name="Spass" version="3.7"/>
- <prover id="vampire" name="Vampire" version="0.6"/>
- <prover id="yices" name="Yices" version="1.0.25"/>
  <prover id="z3" name="Z3" version="2.19"/>
  <file name="../bag.why" verified="true" expanded="false">
   <theory name="Bag" verified="true" expanded="false">
@@ -44,27 +39,27 @@
    </goal>
    <goal name="Union_comm" sum="6709b268e77aaea1534be2e7e426d38d" proved="true" expanded="false" shape="ainfix =aunionV0V1aunionV1V0F">
     <proof prover="coq" timelimit="3" edited="bag_Bag_Union_comm_1.v" obsolete="false">
-     <result status="valid" time="0.47"/>
+     <result status="valid" time="0.65"/>
     </proof>
    </goal>
    <goal name="Union_identity" sum="70c58c49e6a2d1c6aa2561a76a79e8ac" proved="true" expanded="false" shape="ainfix =aunionV0aempty_bagV0F">
     <proof prover="coq" timelimit="3" edited="bag_Bag_Union_identity_1.v" obsolete="false">
-     <result status="valid" time="0.49"/>
+     <result status="valid" time="0.65"/>
     </proof>
    </goal>
    <goal name="Union_assoc" sum="bda12a858590db08f1f9063bdeb50bdf" proved="true" expanded="false" shape="ainfix =aunionV0aunionV1V2aunionaunionV0V1V2F">
     <proof prover="coq" timelimit="3" edited="bag_Bag_Union_assoc_1.v" obsolete="false">
-     <result status="valid" time="0.50"/>
+     <result status="valid" time="0.53"/>
     </proof>
    </goal>
    <goal name="bag_simpl" sum="f71b8a564336f987278fc7cfa390ce41" proved="true" expanded="false" shape="ainfix =V0V2Iainfix =aunionV0V1aunionV2V1F">
     <proof prover="coq" timelimit="3" edited="bag_Bag_bag_simpl_1.v" obsolete="false">
-     <result status="valid" time="0.51"/>
+     <result status="valid" time="0.54"/>
     </proof>
    </goal>
    <goal name="bag_simpl_left" sum="497d32698c95da8314a5200a2dea5782" proved="true" expanded="false" shape="ainfix =V1V2Iainfix =aunionV0V1aunionV0V2F">
     <proof prover="coq" timelimit="30" edited="bag_Bag_bag_simpl_left_1.v" obsolete="false">
-     <result status="valid" time="0.53"/>
+     <result status="valid" time="0.55"/>
     </proof>
     <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
      <result status="valid" time="0.01"/>
@@ -94,27 +89,27 @@
    </goal>
    <goal name="Diff_empty_right" sum="f856071c47b43018ae0c4fb367acd781" proved="true" expanded="false" shape="ainfix =adiffV0aempty_bagV0F">
     <proof prover="coq" timelimit="5" edited="bag_Bag_Diff_empty_right_1.v" obsolete="false">
-     <result status="valid" time="0.54"/>
+     <result status="valid" time="0.57"/>
     </proof>
    </goal>
    <goal name="Diff_empty_left" sum="9ad852741b22d70ea56522a6e1210a27" proved="true" expanded="false" shape="ainfix =adiffaempty_bagV0aempty_bagF">
     <proof prover="coq" timelimit="5" edited="bag_Bag_Diff_empty_left_1.v" obsolete="false">
-     <result status="valid" time="0.56"/>
+     <result status="valid" time="0.57"/>
     </proof>
    </goal>
    <goal name="Diff_add" sum="163aaca003e60192312e261fdfcdae29" proved="true" expanded="false" shape="ainfix =adiffaaddV1V0asingletonV1V0F">
     <proof prover="coq" timelimit="3" edited="bag_Bag_Diff_add_1.v" obsolete="false">
-     <result status="valid" time="0.54"/>
+     <result status="valid" time="0.57"/>
     </proof>
    </goal>
    <goal name="Diff_comm" sum="c79b27369e2d4e9c49b5328446fe7d71" proved="true" expanded="false" shape="ainfix =adiffadiffV0V1V2adiffadiffV0V2V1F">
     <proof prover="coq" timelimit="20" edited="bag_Bag_Diff_comm_1.v" obsolete="false">
-     <result status="valid" time="1.00"/>
+     <result status="valid" time="1.13"/>
     </proof>
    </goal>
    <goal name="Add_diff" sum="5500b0e01b8beb33cf932be19b2a80f8" proved="true" expanded="false" shape="ainfix =aaddV1adiffV0asingletonV1V0Iainfix >anb_occV1V0c0F">
     <proof prover="coq" timelimit="3" edited="bag_Bag_Add_diff_1.v" obsolete="false">
-     <result status="valid" time="0.58"/>
+     <result status="valid" time="0.63"/>
     </proof>
    </goal>
   </theory>
@@ -142,16 +137,16 @@
    </goal>
   </theory>
  </file>
- <file name="../elements.why" verified="true" expanded="false">
-  <theory name="Elements" verified="true" expanded="false">
+ <file name="../elements.why" verified="true" expanded="true">
+  <theory name="Elements" verified="true" expanded="true">
    <goal name="Elements_union1" sum="ca3677476d6a4abd5a8ca1c329dded56" proved="true" expanded="false" shape="ainfix =aelementsV0V1V2aaddagetV0V1aelementsV0ainfix +V1c1V2Iainfix <V1V2F">
     <proof prover="coq" timelimit="3" edited="elements_Elements_Elements_union1_1.v" obsolete="false">
-     <result status="valid" time="0.52"/>
+     <result status="valid" time="0.56"/>
     </proof>
    </goal>
    <goal name="Elements_union2" sum="9bf6f13db48b732fe946fef5fbd5375f" proved="true" expanded="false" shape="ainfix =aelementsV0V1V2aaddagetV0ainfix -V2c1aelementsV0V1ainfix -V2c1Iainfix <V1V2F">
     <proof prover="coq" timelimit="3" edited="elements_Elements_Elements_union2_1.v" obsolete="false">
-     <result status="valid" time="0.52"/>
+     <result status="valid" time="0.57"/>
     </proof>
    </goal>
    <goal name="Elements_remove_last" sum="75345482bbec94c8d9ead1e53ede4204" proved="true" expanded="false" shape="ainfix =aelementsV0V1ainfix -V2c1adiffaelementsV0V1V2asingletonagetV0ainfix -V2c1Iainfix <V1ainfix -V2c1F">
@@ -167,20 +162,20 @@
    </goal>
    <goal name="Occ_elements" sum="fdce72a7999dbe1ecd1f3ef6be256f11" proved="true" expanded="false" shape="ainfix >anb_occamixfix []V0V2aelementsV0V1V3c0Iainfix <V2V3Aainfix <=V1V2F">
     <proof prover="coq" timelimit="3" edited="elements_Elements_Occ_elements_1.v" obsolete="false">
-     <result status="valid" time="0.54"/>
+     <result status="valid" time="0.60"/>
     </proof>
    </goal>
    <goal name="Elements_set_outside" sum="16e39b5728f83139bed49eaa5c1f47bd" proved="true" expanded="false" shape="ainfix =aelementsasetV0V3V4V1V2aelementsV0V1V2FIainfix >=V3V2Oainfix <V3V1FIainfix <=V1V2F">
     <proof prover="coq" timelimit="30" edited="elements_Elements_Elements_set_outside_1.v" obsolete="false">
-     <result status="valid" time="0.66"/>
+     <result status="valid" time="0.77"/>
     </proof>
    </goal>
    <goal name="Elements_set_inside" sum="80d4c35a8f5ea7598c95803a30e7db76" proved="true" expanded="false" shape="ainfix =aelementsasetV0V2V4V1V3aaddV4V5Iainfix =aelementsV0V1V3aaddagetV0V2V5Iainfix <V2V3Aainfix <=V1V2F">
     <proof prover="coq" timelimit="30" edited="elements_Elements_Elements_set_inside_1.v" obsolete="false">
-     <result status="valid" time="0.58"/>
+     <result status="valid" time="0.62"/>
     </proof>
    </goal>
-   <goal name="Elements_set_inside2" sum="8cb993ec053c9ab95baba603e13406ad" proved="true" expanded="false" shape="ainfix =aelementsasetV0V2V4V1V3aaddV4adiffaelementsV0V1V3asingletonamixfix []V0V2Iainfix <V2V3Aainfix <=V1V2F">
+   <goal name="Elements_set_inside2" sum="8cb993ec053c9ab95baba603e13406ad" proved="true" expanded="true" shape="ainfix =aelementsasetV0V2V4V1V3aaddV4adiffaelementsV0V1V3asingletonamixfix []V0V2Iainfix <V2V3Aainfix <=V1V2F">
     <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
      <result status="valid" time="0.04"/>
     </proof>
@@ -198,7 +193,7 @@
   <theory name="WP HeapSort" verified="true" expanded="false">
    <goal name="Min_of_sorted" sum="e837f883a72f5b6c646b4ad307651d78" proved="true" expanded="false" shape="ainfix =amin_bagaelementsV0V1V2agetV0V1Iasorted_subV0c0V2Iainfix <V1V2Aainfix <=c0V1F">
     <proof prover="coq" timelimit="3" edited="heapsort_WP_HeapSort_Min_of_sorted_1.v" obsolete="false">
-     <result status="valid" time="0.72"/>
+     <result status="valid" time="0.78"/>
     </proof>
    </goal>
    <goal name="WP_parameter heapSort" expl="correctness of parameter heapSort" sum="109c5d20e6f06f5ea97fcd30d858bbed" proved="true" expanded="false" shape="Lamk arrayV0V1ainfix =aelementsV6c0V0aelementsV1c0V0Aasortedamk arrayV0V6Iainfix <=agetV6V7amin_bagamodelV5Iainfix <V7ainfix +ainfix -V0c1c1Aainfix <=c0V7FAasorted_subV6c0ainfix +ainfix -V0c1c1Aainfix =aelementsV1c0V0aunionamodelV5aelementsV6c0ainfix +ainfix -V0c1c1Aainfix =acardamodelV5ainfix -V0ainfix +ainfix -V0c1c1Aainfix <=ainfix +ainfix -V0c1c1V0Aainfix <=c0ainfix +ainfix -V0c1c1Aainfix <=agetV11V12amin_bagamodelV9Iainfix <V12ainfix +V8c1Aainfix <=c0V12FAasorted_subV11c0ainfix +V8c1Aainfix =aelementsV1c0V0aunionamodelV9aelementsV11c0ainfix +V8c1Aainfix =acardamodelV9ainfix -V0ainfix +V8c1Aainfix <=ainfix +V8c1V0Aainfix <=c0ainfix +V8c1Aainfix <=agetV11V8amin_bagamodelV9Iainfix =V11asetV6V8V10FAainfix <V8V0Aainfix <=c0V8Iainfix =acardamodelV5ainfix +acardamodelV9c1Aainfix =amodelV5aaddV10amodelV9Aainfix =V10amin_bagamodelV5FFAainfix =amodelV5aempty_bagNIainfix <=agetV6V13amin_bagamodelV5Iainfix <V13V8Aainfix <=c0V13FAasorted_subV6c0V8Aainfix =aelementsV1c0V0aunionamodelV5aelementsV6c0V8Aainfix =acardamodelV5ainfix -V0V8Aainfix <=V8V0Aainfix <=c0V8Iainfix <=V8ainfix -V0c1Aainfix <=c0V8FFFAainfix <=agetV1V14amin_bagamodelV4Iainfix <V14c0Aainfix <=c0V14FAasorted_subV1c0c0Aainfix =aelementsV1c0V0aunionamodelV4aelementsV1c0c0Aainfix =acardamodelV4ainfix -V0c0Aainfix <=c0V0Aainfix <=c0c0Iainfix <=c0ainfix -V0c1Aainfix =aelementsV1c0V0aelementsV1c0V0AasortedV2Iainfix >c0ainfix -V0c1Iainfix =amodelV4aelementsV1c0ainfix +ainfix -V0c1c1Aainfix =acardamodelV4ainfix +ainfix -V0c1c1Aainfix <=ainfix +ainfix -V0c1c1V0Aainfix <=c0ainfix +ainfix -V0c1c1Aainfix =amodelV16aelementsV1c0ainfix +V15c1Aainfix =acardamodelV16ainfix +V15c1Aainfix <=ainfix +V15c1V0Aainfix <=c0ainfix +V15c1Iainfix =amodelV16aaddagetV1V15amodelV4FAainfix <V15V0Aainfix <=c0V15Iainfix =amodelV4aelementsV1c0V15Aainfix =acardamodelV4V15Aainfix <=V15V0Aainfix <=c0V15Iainfix <=V15ainfix -V0c1Aainfix <=c0V15FFAainfix =amodelV3aelementsV1c0c0Aainfix =acardamodelV3c0Aainfix <=c0V0Aainfix <=c0c0Iainfix <=c0ainfix -V0c1Aainfix =aelementsV18c0V0aelementsV1c0V0Aasortedamk arrayV0V18Iainfix <=agetV18V19amin_bagamodelV17Iainfix <V19ainfix +ainfix -V0c1c1Aainfix <=c0V19FAasorted_subV18c0ainfix +ainfix -V0c1c1Aainfix =aelementsV1c0V0aunionamodelV17aelementsV18c0ainfix +ainfix -V0c1c1Aainfix =acardamodelV17ainfix -V0ainfix +ainfix -V0c1c1Aainfix <=ainfix +ainfix -V0c1c1V0Aainfix <=c0ainfix +ainfix -V0c1c1Aainfix <=agetV23V24amin_bagamodelV21Iainfix <V24ainfix +V20c1Aainfix <=c0V24FAasorted_subV23c0ainfix +V20c1Aainfix =aelementsV1c0V0aunionamodelV21aelementsV23c0ainfix +V20c1Aainfix =acardamodelV21ainfix -V0ainfix +V20c1Aainfix <=ainfix +V20c1V0Aainfix <=c0ainfix +V20c1Aainfix <=agetV23V20amin_bagamodelV21Iainfix =V23asetV18V20V22FAainfix <V20V0Aainfix <=c0V20Iainfix =acardamodelV17ainfix +acardamodelV21c1Aainfix =amodelV17aaddV22amodelV21Aainfix =V22amin_bagamodelV17FFAainfix =amodelV17aempty_bagNIainfix <=agetV18V25amin_bagamodelV17Iainfix <V25V20Aainfix <=c0V25FAasorted_subV18c0V20Aainfix =aelementsV1c0V0aunionamodelV17aelementsV18c0V20Aainfix =acardamodelV17ainfix -V0V20Aainfix <=V20V0Aainfix <=c0V20Iainfix <=V20ainfix -V0c1Aainfix <=c0V20FFFAainfix <=agetV1V26amin_bagamodelV3Iainfix <V26c0Aainfix <=c0V26FAasorted_subV1c0c0Aainfix =aelementsV1c0V0aunionamodelV3aelementsV1c0c0Aainfix =acardamodelV3ainfix -V0c0Aainfix <=c0V0Aainfix <=c0c0Iainfix <=c0ainfix -V0c1Aainfix =aelementsV1c0V0aelementsV1c0V0AasortedV2Iainfix >c0ainfix -V0c1Iainfix >c0ainfix -V0c1Iainfix =amodelV3aempty_bagFAainfix <=c0V0Iainfix >=V0c0FF">
@@ -564,7 +559,7 @@
   <theory name="WP Implementation" verified="true" expanded="false">
    <goal name="Is_heap_min" sum="b18a4c8abe4c65af8bbc66daa762e211" proved="true" expanded="false" shape="ainfix =amixfix []V0c0amin_bagamodelaTuple2V0V1Iais_heap_arrayV0c0V1Iainfix >V1c0F">
     <proof prover="coq" timelimit="5" edited="heap_implem_WP_Implementation_Is_heap_min_1.v" obsolete="false">
-     <result status="valid" time="0.69"/>
+     <result status="valid" time="0.73"/>
     </proof>
    </goal>
    <goal name="WP_parameter create" expl="normal postcondition" sum="1f47c413c2aeafb39e51ee57ae9339ac" proved="true" expanded="false" shape="ainfix =aelementsaconstc0c0c0aempty_bagAais_heapaTuple2aconstc0c0">
@@ -593,7 +588,7 @@
      </goal>
      <goal name="WP_parameter insert.2" expl="assertion" sum="99b3a044b668baeeb570e9443f8a4f06" proved="true" expanded="false" shape="ais_heapaTuple2V6V7Iainfix <V3V2Aainfix <c0V3Iainfix =aTuple2V6V7aTuple2V5ainfix +V2c1FIainfix =V5asetV4V3V0FIainfix >=V0agetV4adivainfix -V3c1c2Iainfix >V3c0Iainfix =aelementsV4c0ainfix +V2c1aaddagetV4V3aelementsV1c0V2Aainfix >amixfix []V4V3V0Aais_heap_arrayV4c0ainfix +V2c1Iainfix <V3V2Aainfix =aelementsV4c0V2aelementsV1c0V2Aais_heap_arrayV4c0V2Iainfix =V3V2Aainfix <=V3V2Aainfix <=c0V3FFIais_heapaTuple2V1V2FF">
       <proof prover="coq" timelimit="30" edited="heap_implem_WP_Implementation_WP_parameter_insert_1.v" obsolete="false">
-       <result status="valid" time="0.90"/>
+       <result status="valid" time="1.03"/>
       </proof>
      </goal>
      <goal name="WP_parameter insert.3" expl="assertion" sum="030e7e184f8d22b5c8e320bf4c2eb845" proved="true" expanded="false" shape="ainfix =aelementsV6c0V7aaddV0aelementsV1c0V2Iainfix <V3V2Iais_heapaTuple2V6V7Iainfix <V3V2Aainfix <c0V3Iainfix =aTuple2V6V7aTuple2V5ainfix +V2c1FIainfix =V5asetV4V3V0FIainfix >=V0agetV4adivainfix -V3c1c2Iainfix >V3c0Iainfix =aelementsV4c0ainfix +V2c1aaddagetV4V3aelementsV1c0V2Aainfix >amixfix []V4V3V0Aais_heap_arrayV4c0ainfix +V2c1Iainfix <V3V2Aainfix =aelementsV4c0V2aelementsV1c0V2Aais_heap_arrayV4c0V2Iainfix =V3V2Aainfix <=V3V2Aainfix <=c0V3FFIais_heapaTuple2V1V2FF">
@@ -766,7 +761,7 @@
      </goal>
      <goal name="WP_parameter extractMin.2" expl="assertion" sum="14c6412c54f565a531d3be18949e88df" proved="true" expanded="false" shape="ainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
       <proof prover="coq" timelimit="3" edited="heap_implem_WP_Implementation_WP_parameter_extractMin_3.v" obsolete="false">
-       <result status="valid" time="0.61"/>
+       <result status="valid" time="0.65"/>
       </proof>
      </goal>
      <goal name="WP_parameter extractMin.3" expl="loop invariant init" sum="9bc060c4bd77db6d58c0506f1963a132" proved="true" expanded="false" shape="ainfix <amixfix []V0aparentc0amixfix []V0ainfix -V1c1Iainfix >c0c0Aainfix =aelementsV0c0ainfix -V1c1aaddamixfix []V0c0adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V0V0Iainfix =c0c0Aais_heap_arrayV0c0ainfix -V1c1Aainfix <c0ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0c0Iainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
