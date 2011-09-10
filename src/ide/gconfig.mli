@@ -30,6 +30,7 @@ type t =
       mutable max_running_processes : int;
       mutable default_editor : string;
       mutable show_labels : bool;
+      mutable show_locs : bool;
       mutable saving_policy : int;
       mutable env : Why3.Env.env;
       mutable config : Whyconf.config;

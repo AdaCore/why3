@@ -28,6 +28,7 @@ open Theory
 open Task
 
 let debug_print_labels = Debug.register_flag "print_labels"
+let debug_print_locs = Debug.register_flag "print_locs"
 
 let iprinter,tprinter,pprinter =
   let bl = ["theory"; "type"; "function"; "predicate"; "inductive";
@@ -190,10 +191,18 @@ let prio_binop = function
 let print_label fmt l =
   if l = "" then () else fprintf fmt "\"%s\"" l
 
+let print_loc fmt l =
+  let (f,l,b,e) = Loc.get l in
+  fprintf fmt "#\"%s\" %d %d %d#" f l b e
+
 let print_ident_labels fmt id =
   if Debug.test_flag debug_print_labels && id.id_label <> []
   then fprintf fmt " %a" (print_list space print_label) id.id_label
+  else ();
+  if Debug.test_flag debug_print_locs then
+    Util.option_iter (fun l -> fprintf fmt " %a" print_loc l) id.id_loc
   else ()
+
 
 let rec print_term fmt t = print_lterm 0 fmt t
 

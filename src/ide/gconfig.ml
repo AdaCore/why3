@@ -35,6 +35,7 @@ type t =
       mutable max_running_processes : int;
       mutable default_editor : string;
       mutable show_labels : bool;
+      mutable show_locs : bool;
       mutable saving_policy : int;
         (** 0 = always, 1 = never, 2 = ask *)
       mutable env : Env.env;
@@ -97,7 +98,8 @@ let load_config config =
     saving_policy = ide.ide_saving_policy ;
     max_running_processes = Whyconf.running_provers_max main;
     default_editor = ide.ide_default_editor;
-    show_labels = false;
+    show_labels    = false;
+    show_locs      = false;
     config         = config;
     env            = env
   }
@@ -326,6 +328,11 @@ let set_labels_flag =
   fun b ->
     (if b then Debug.set_flag else Debug.unset_flag) fl
 
+let set_locs_flag =
+  let fl = Debug.lookup_flag "print_locs" in
+  fun b ->
+    (if b then Debug.set_flag else Debug.unset_flag) fl
+
 let preferences c =
   let dialog = GWindow.dialog ~title:"Why3: preferences" () in
   let vbox = dialog#vbox in
@@ -414,6 +421,16 @@ let preferences c =
     showlabels#connect#toggled ~callback:
       (fun () -> c.show_labels <- not c.show_labels;
          set_labels_flag c.show_labels)
+  in
+  let showlocs =
+    GButton.check_button ~label:"show source locations in formulas"
+      ~packing:display_options_box#add ()
+      ~active:(set_locs_flag c.show_locs;c.show_locs)
+  in
+  let (_ : GtkSignal.id) =
+    showlocs#connect#toggled ~callback:
+      (fun () -> c.show_locs <- not c.show_locs;
+         set_locs_flag c.show_locs)
   in
   let set_saving_policy n () = c.saving_policy <- n in
 (*
