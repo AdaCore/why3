@@ -601,7 +601,11 @@ and wp_desc env rm e q = match e.expr_desc with
 
   | Eassert (Ptree.Aassert, f) ->
       let (_, q), _ = q in
-      wp_and (wp_expl "assertion" f) q
+      let f = wp_expl "assertion" f in
+      (* eprintf "assert: AVANT f = %a@." print_term f; *)
+      let f = wp_and f q in
+      (* eprintf "assert: APRES f = %a@." print_term f; *)
+      f
   | Eassert (Ptree.Acheck, f) ->
       let (_, q), _ = q in
       wp_and ~sym:true (wp_expl "check" f) q
