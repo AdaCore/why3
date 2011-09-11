@@ -177,7 +177,7 @@ module Make(O: OBSERVER) : sig
     config:Whyconf.config ->
     init:(O.key -> any -> unit) ->
     notify:(any -> unit) ->
-    string -> unit
+    string -> bool
     (** starts a new proof session, using directory given as argument
         this reloads the previous session database if any.
 
@@ -192,6 +192,12 @@ module Make(O: OBSERVER) : sig
 
         raises [OutdatedSession] if [allow_obsolete] is false and any obsolete
         data for a goal is found in the session database
+
+        raises [Failure msg] if the database file cannot be read correctly
+
+        returns true if some obsolete goal was found (and
+        [allow_obsolete] is true), false otherwise
+
     *)
 
   val get_provers : unit -> prover_data Util.Mstr.t
@@ -259,7 +265,7 @@ module Make(O: OBSERVER) : sig
         which are triples (goal name, prover, report)
     *)
 
-  val reload_all: bool -> unit
+  val reload_all: bool -> bool
     (** reloads all the files
         If for one of the file, the parsing or typing fails, then
         the complete old session state is kept, and an exception
@@ -267,7 +273,10 @@ module Make(O: OBSERVER) : sig
 
         raises [OutdatedSession] if [allow_obsolete] is false and any obsolete
         data for a goal is found in the session database
-        
+
+        returns true if some obsolete goal was found (and
+        [allow_obsolete] is true), false otherwise
+
     *)
 
   val remove_proof_attempt : proof_attempt -> unit

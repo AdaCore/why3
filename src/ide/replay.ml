@@ -313,8 +313,12 @@ let print_report (g,p,r) =
 let () =
   try
     eprintf "Opening session...@?";
-    M.open_session ~allow_obsolete:false
-      ~env ~config ~init ~notify project_dir;
+    let found_obs =
+      M.open_session ~allow_obsolete:true
+        ~env ~config ~init ~notify project_dir
+    in
+    if found_obs then
+      eprintf "[Warning] session is obsolete@.";
     M.maximum_running_proofs :=
       Whyconf.running_provers_max (Whyconf.get_main config);
     eprintf " done@.";
@@ -322,15 +326,28 @@ let () =
       let files,n,m =
         List.fold_left file_statistics ([],0,0) (M.get_all_files ())
       in
-      printf " %d/%d@." n m ;
       match report with
         | [] ->
+            if found_obs then
+              if n=m then
+                printf " %d/%d (replay OK, all proved: obsolete session updated)@." n m
+              else
+                printf " %d/%d (replay OK, but not all proved: obsolete session NOT updated)@." n m
+            else
+              printf " %d/%d@." n m ;
             if !opt_stats && n<m then print_statistics files;
-            eprintf "Everything OK.@.";
+            eprintf "Everything replayed OK.@.";
+            if found_obs && n=m then
+              begin
+                eprintf "Updating obsolete session...@?";
+                M.save_session ();
+                eprintf " done@."
+              end;
             exit 0
         | _ ->
+            printf " %d/%d (replay failed)@." n m ;
             List.iter print_report report;
-            eprintf "Check failed.@.";
+            eprintf "Replay failed.@.";
             exit 1
     in
     M.check_all ~callback;

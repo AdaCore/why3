@@ -1138,6 +1138,7 @@ and reload_trans _goal_obsolete goal _ tr =
   apply_transformation ~callback tr.transf (get_task goal)
 
 exception OutdatedSession
+let found_obsolete = ref false
 
 (* reloads the task [t] in theory mth (named tname) *)
 let reload_root_goal ~allow_obsolete mth tname old_goals t : goal =
@@ -1154,7 +1155,10 @@ let reload_root_goal ~allow_obsolete mth tname old_goals t : goal =
   if goal_obsolete then
     begin
       eprintf "[Reload] Goal %s.%s has changed@." tname gname;
-      if not allow_obsolete then raise OutdatedSession
+      if allow_obsolete then
+        found_obsolete := true
+      else
+        raise OutdatedSession
     end;
   reload_any_goal (Parent_theory mth) id gname sum "" t old_goal goal_obsolete
 
@@ -1213,7 +1217,9 @@ let reload_all allow_obsolete =
   in
   all_files := [];
   O.reset ();
-  List.iter (fun (mf,ths) -> reload_file ~allow_obsolete mf ths) all_theories
+  found_obsolete := false;
+  List.iter (fun (mf,ths) -> reload_file ~allow_obsolete mf ths) all_theories;
+  !found_obsolete
 
 (****************************)
 (*     session opening      *)
@@ -1418,12 +1424,11 @@ let open_session ~allow_obsolete ~env ~config ~init ~notify dir =
           load_session ~env xml;
           reload_all allow_obsolete
         with
-          | Sys_error _ ->
+          | Sys_error msg ->
               (* xml does not exist yet *)
-              ()
+              failwith ("Open session: sys error " ^ msg)
           | Xml.Parse_error s ->
-              Format.eprintf "XML database corrupted, ignored (%s)@." s;
-              ()
+              failwith ("Open session: XML database corrupted (%s)@." ^ s)
         end
     | _ ->
         eprintf "Session.open_session: session already opened@.";
