@@ -196,25 +196,25 @@ let print_loc fmt l =
   fprintf fmt "#\"%s\" %d %d %d#" f l b e
 
 let print_ident_labels fmt id =
-  if Debug.test_flag debug_print_labels && id.id_label <> []
-  then fprintf fmt " %a" (print_list space print_label) id.id_label
-  else ();
+  if Debug.test_flag debug_print_labels && id.id_label <> [] then
+    fprintf fmt " %a" (print_list space print_label) id.id_label;
   if Debug.test_flag debug_print_locs then
-    Util.option_iter (fun l -> fprintf fmt " %a" print_loc l) id.id_loc
-  else ()
-
+    Util.option_iter (fprintf fmt " %a" print_loc) id.id_loc
 
 let rec print_term fmt t = print_lterm 0 fmt t
 
 and print_lterm pri fmt t =
-  if Debug.test_flag debug_print_locs then
-    Util.option_iter (fun l -> fprintf fmt "%a " print_loc l) t.t_loc;
-  match t.t_label with
-  | _ when Debug.nottest_flag debug_print_labels
-       -> print_tnode pri fmt t
-  | [] -> print_tnode pri fmt t
-  | ll -> fprintf fmt (protect_on (pri > 0) "%a %a")
-      (print_list space print_label) ll (print_tnode 0) t
+  let print_tlab pri fmt t =
+    if Debug.test_flag debug_print_labels || t.t_label <> []
+    then fprintf fmt (protect_on (pri > 0) "%a %a")
+      (print_list space print_label) t.t_label (print_tnode 0) t
+    else print_tnode pri fmt t in
+  let print_tloc pri fmt t =
+    if Debug.test_flag debug_print_locs || t.t_loc <> None
+    then fprintf fmt (protect_on (pri > 0) "%a %a")
+      (print_option print_loc) t.t_loc (print_tlab 0) t
+    else print_tlab pri fmt t in
+  print_tloc pri fmt t
 
 and print_app pri ls fmt tl = match extract_op ls, tl with
   | _, [] ->

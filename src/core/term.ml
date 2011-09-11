@@ -483,10 +483,7 @@ let t_not f         = mk_term (Tnot f) None
 let t_true          = mk_term (Ttrue) None
 let t_false         = mk_term (Tfalse) None
 
-let t_label ?loc l t =
-  Hsterm.hashcons
-    { t with t_label = l;
-        t_loc = match loc with None -> t.t_loc | Some _ -> loc }
+let t_label ?loc l t = Hsterm.hashcons { t with t_label = l; t_loc = loc }
 let t_label_add  l t = Hsterm.hashcons { t with t_label = l :: t.t_label }
 
 let t_label_copy { t_label = l; t_loc = p } t =
