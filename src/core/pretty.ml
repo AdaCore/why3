@@ -204,12 +204,12 @@ let print_ident_labels fmt id =
   else ()
 
 
-let rec print_term fmt t =
+let rec print_term fmt t = print_lterm 0 fmt t
+
+and print_lterm pri fmt t =
   if Debug.test_flag debug_print_locs then
     Util.option_iter (fun l -> fprintf fmt "%a " print_loc l) t.t_loc;
-  print_lterm 0 fmt t
-
-and print_lterm pri fmt t = match t.t_label with
+  match t.t_label with
   | _ when Debug.nottest_flag debug_print_labels
        -> print_tnode pri fmt t
   | [] -> print_tnode pri fmt t
