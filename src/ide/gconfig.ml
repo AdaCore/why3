@@ -94,6 +94,17 @@ let load_ide section =
         "default_editor";
   }
 
+
+let set_labels_flag =
+  let fl = Debug.lookup_flag "print_labels" in
+  fun b ->
+    (if b then Debug.set_flag else Debug.unset_flag) fl
+
+let set_locs_flag =
+  let fl = Debug.lookup_flag "print_locs" in
+  fun b ->
+    (if b then Debug.set_flag else Debug.unset_flag) fl
+
 let load_config config =
   let main = get_main config in
   let ide  = match get_section config "ide" with
@@ -101,6 +112,8 @@ let load_config config =
     | Some s -> load_ide s in
   (* temporary sets env to empty *)
   let env = Env.create_env_of_loadpath [] in
+  set_labels_flag ide.ide_show_labels;
+  set_locs_flag ide.ide_show_locs;
   { window_height = ide.ide_window_height;
     window_width  = ide.ide_window_width;
     tree_width    = ide.ide_tree_width;
@@ -340,16 +353,6 @@ let show_about_window () =
   let ( _ : GWindow.Buttons.about) = about_dialog#run () in
   about_dialog#destroy ()
 
-let set_labels_flag =
-  let fl = Debug.lookup_flag "print_labels" in
-  fun b ->
-    (if b then Debug.set_flag else Debug.unset_flag) fl
-
-let set_locs_flag =
-  let fl = Debug.lookup_flag "print_locs" in
-  fun b ->
-    (if b then Debug.set_flag else Debug.unset_flag) fl
-
 let preferences c =
   let dialog = GWindow.dialog ~title:"Why3: preferences" () in
   let vbox = dialog#vbox in
@@ -441,7 +444,7 @@ let preferences c =
     GButton.check_button
       ~label:"show labels in formulas"
       ~packing:display_options_box#add ()
-      ~active:(set_labels_flag c.show_labels;c.show_labels)
+      ~active:c.show_labels
   in
   let (_ : GtkSignal.id) =
     showlabels#connect#toggled ~callback:
@@ -453,7 +456,7 @@ let preferences c =
     GButton.check_button
       ~label:"show source locations in formulas"
       ~packing:display_options_box#add ()
-      ~active:(set_locs_flag c.show_locs;c.show_locs)
+      ~active:c.show_locs
   in
   let (_ : GtkSignal.id) =
     showlocs#connect#toggled ~callback:
