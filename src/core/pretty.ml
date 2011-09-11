@@ -205,12 +205,12 @@ let rec print_term fmt t = print_lterm 0 fmt t
 
 and print_lterm pri fmt t =
   let print_tlab pri fmt t =
-    if Debug.test_flag debug_print_labels || t.t_label <> []
+    if Debug.test_flag debug_print_labels && t.t_label <> []
     then fprintf fmt (protect_on (pri > 0) "%a %a")
       (print_list space print_label) t.t_label (print_tnode 0) t
     else print_tnode pri fmt t in
   let print_tloc pri fmt t =
-    if Debug.test_flag debug_print_locs || t.t_loc <> None
+    if Debug.test_flag debug_print_locs && t.t_loc <> None
     then fprintf fmt (protect_on (pri > 0) "%a %a")
       (print_option print_loc) t.t_loc (print_tlab 0) t
     else print_tlab pri fmt t in
