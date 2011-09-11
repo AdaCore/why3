@@ -34,6 +34,7 @@ type t =
       mutable verbose : int;
       mutable max_running_processes : int;
       mutable default_editor : string;
+      mutable intro_premises : bool;
       mutable show_labels : bool;
       mutable show_locs : bool;
       mutable saving_policy : int;
@@ -49,6 +50,9 @@ type ide = {
   ide_tree_width : int;
   ide_task_height : int;
   ide_verbose : int;
+  ide_intro_premises : bool;
+  ide_show_labels : bool;
+  ide_show_locs : bool;
   ide_saving_policy : int;
   ide_default_editor : string;
 }
@@ -59,6 +63,9 @@ let default_ide =
     ide_tree_width = 512;
     ide_task_height = 384;
     ide_verbose = 0;
+    ide_intro_premises = true;
+    ide_show_labels = false;
+    ide_show_locs = false;
     ide_saving_policy = 0;
     ide_default_editor = try Sys.getenv "EDITOR" with Not_found -> "editor";
   }
@@ -74,6 +81,12 @@ let load_ide section =
       get_int section ~default:default_ide.ide_task_height "task_height";
     ide_verbose =
       get_int section ~default:default_ide.ide_verbose "verbose";
+    ide_intro_premises =
+      get_bool section ~default:default_ide.ide_intro_premises "intro_premises";
+    ide_show_labels =
+      get_bool section ~default:default_ide.ide_show_labels "print_labels";
+    ide_show_locs =
+      get_bool section ~default:default_ide.ide_show_locs "print_locs";
     ide_saving_policy =
       get_int section ~default:default_ide.ide_saving_policy "saving_policy";
     ide_default_editor =
@@ -95,11 +108,12 @@ let load_config config =
     time_limit    = Whyconf.timelimit main;
     mem_limit     = Whyconf.memlimit main;
     verbose       = ide.ide_verbose;
+    intro_premises= ide.ide_intro_premises ;
+    show_labels   = ide.ide_show_labels ;
+    show_locs     = ide.ide_show_locs ;
     saving_policy = ide.ide_saving_policy ;
     max_running_processes = Whyconf.running_provers_max main;
     default_editor = ide.ide_default_editor;
-    show_labels    = false;
-    show_locs      = false;
     config         = config;
     env            = env
   }
@@ -133,6 +147,9 @@ let save_config t =
   let ide = set_int ide "tree_width" t.tree_width in
   let ide = set_int ide "task_height" t.task_height in
   let ide = set_int ide "verbose" t.verbose in
+  let ide = set_bool ide "intro_premises" t.intro_premises in
+  let ide = set_bool ide "print_labels" t.show_labels in
+  let ide = set_bool ide "print_locs" t.show_locs in
   let ide = set_int ide "saving_policy" t.saving_policy in
   let ide = set_string ide "default_editor" t.default_editor in
   let config = set_section config "ide" ide in
@@ -406,30 +423,42 @@ let preferences c =
     GBin.frame ~label:"Display options"
       ~packing:page1#add ()
   in
+  (* options for task display *)
   let display_options_box =
     GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
       ~packing:display_options_frame#add ()
   in
-  (* toggle show labels in formulas *)
-
+  let intropremises =
+    GButton.check_button ~label:"introduce premises"
+      ~packing:display_options_box#add ()
+      ~active:c.intro_premises
+  in
+  let (_ : GtkSignal.id) =
+    intropremises#connect#toggled ~callback:
+      (fun () -> c.intro_premises <- not c.intro_premises)
+  in
   let showlabels =
-    GButton.check_button ~label:"show labels in formulas"
+    GButton.check_button
+      ~label:"show labels in formulas"
       ~packing:display_options_box#add ()
       ~active:(set_labels_flag c.show_labels;c.show_labels)
   in
   let (_ : GtkSignal.id) =
     showlabels#connect#toggled ~callback:
-      (fun () -> c.show_labels <- not c.show_labels;
+      (fun () ->
+         c.show_labels <- not c.show_labels;
          set_labels_flag c.show_labels)
   in
   let showlocs =
-    GButton.check_button ~label:"show source locations in formulas"
+    GButton.check_button
+      ~label:"show source locations in formulas"
       ~packing:display_options_box#add ()
       ~active:(set_locs_flag c.show_locs;c.show_locs)
   in
   let (_ : GtkSignal.id) =
     showlocs#connect#toggled ~callback:
-      (fun () -> c.show_locs <- not c.show_locs;
+      (fun () ->
+         c.show_locs <- not c.show_locs;
          set_locs_flag c.show_locs)
   in
   let set_saving_policy n () = c.saving_policy <- n in

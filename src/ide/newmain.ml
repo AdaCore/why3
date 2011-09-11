@@ -1447,21 +1447,25 @@ let () =
 (* Bind events *)
 (***************)
 
+let display_task g t =
+  let task_text = Pp.string_of Pretty.print_task t in
+  task_view#source_buffer#set_text task_text;
+  task_view#scroll_to_mark `INSERT;
+  scroll_to_source_goal g
+
 (* to be run when a row in the tree view is selected *)
 let select_row r =
   let a = get_any_from_row_reference r in
   match a with
     | M.Goal g ->
-        let callback = function
-          | [t] ->
-              let task_text = Pp.string_of Pretty.print_task t in
-              task_view#source_buffer#set_text task_text;
-              task_view#scroll_to_mark `INSERT;
-              scroll_to_source_goal g
-          | _ -> assert false
-        in
-        M.apply_transformation ~callback intro_transformation (M.get_task g)
-
+        if config.intro_premises then
+          let callback = function
+            | [t] -> display_task g t
+            | _ -> assert false
+          in
+          M.apply_transformation ~callback intro_transformation (M.get_task g)
+        else
+          display_task g (M.get_task g)
     | M.Theory th ->
         task_view#source_buffer#set_text "";
         scroll_to_theory th

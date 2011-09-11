@@ -29,6 +29,7 @@ type t =
       mutable verbose : int;
       mutable max_running_processes : int;
       mutable default_editor : string;
+      mutable intro_premises : bool;
       mutable show_labels : bool;
       mutable show_locs : bool;
       mutable saving_policy : int;
