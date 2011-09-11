@@ -564,37 +564,30 @@ let schedule_edit_proof ~debug:_ ~editor ~file ~driver ~callback goal =
 
   let expl_regexp = Str.regexp "expl:\\(.*\\)"
 
-  let rec get_labels f =
+  exception Found of string
+
+  let check_expl lab =
+    if Str.string_match expl_regexp lab 0 then
+      raise (Found (Str.matched_group 1 lab))
+
+  let rec get_expl_fmla f =
+    List.iter check_expl f.Term.t_label;
     (match f.Term.t_node with
-      | Term.Tbinop(Term.Timplies,_,f) -> get_labels f
+      | Term.Tbinop(Term.Timplies,_,f) -> get_expl_fmla f
       | Term.Tquant(Term.Tforall,fq) ->
-          let (_,_,f) = Term.t_open_quant fq in get_labels f
+          let (_,_,f) = Term.t_open_quant fq in get_expl_fmla f
       | Term.Tlet(_,fb) ->
-          let (_,f) = Term.t_open_bound fb in get_labels f
+          let (_,f) = Term.t_open_bound fb in get_expl_fmla f
       | Term.Tcase(_,[fb]) ->
-          let (_,f) = Term.t_open_branch fb in get_labels f
-      | _ -> [])
-    @ f.Term.t_label
+          let (_,f) = Term.t_open_branch fb in get_expl_fmla f
+      | _ -> ())
 
   let get_explanation id fmla =
-    let r = ref None in
-(*
-    let fl = Debug.lookup_flag "print_labels" in
-    Debug.set_flag fl;
-    Format.eprintf "searching expl in formula '%a'@." Pretty.print_fmla fmla;
-*)
-    List.iter
-      (fun s ->
-         if Str.string_match expl_regexp s 0 then
-           begin
-             let e = Str.matched_group 1 s in
-(*
-             Format.eprintf "found explanation: '%s'" e;
-*)
-             r := Some e
-           end)
-      (id.Ident.id_label @ get_labels fmla);
-    !r
+    try
+      get_expl_fmla fmla;
+      List.iter check_expl id.Ident.id_label;
+      None
+    with Found e -> Some e
 
 
 (**********************)
