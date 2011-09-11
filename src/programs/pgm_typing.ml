@@ -1878,10 +1878,19 @@ let add_effect_decl uc ls =
 let add_impure_decl uc ls =
   Pgm_module.add_impure_decl (Decl.create_logic_decl [ls, None]) uc
 
-let add_global_fun loc x tyv uc =
+let add_global_fun loc ~labels x tyv uc =
   let x = parameter x in
   try
-    let ls, ps = create_psymbol_fun (id_user x loc) tyv in
+    let label,loc =
+      List.fold_left
+        (fun (labels,loc) lab ->
+           match lab with
+             | Lstr s -> (s::labels,loc)
+             | Lpos l -> (labels,l))
+        ([],loc)
+        labels
+    in
+    let ls, ps = create_psymbol_fun (id_user ~label x loc) tyv in
     let d = Decl.create_logic_decl [ls, None] in
     ps, Pgm_module.add_impure_decl d uc
   with Pgm_module.ClashSymbol _ ->
@@ -2216,7 +2225,9 @@ let rec decl ~wp env penv ltm lmod uc = function
       if Debug.test_flag debug then
         eprintf "@[--typing %s-----@\n  @[<hov 2>%a@]@\n@[<hov 2>: %a@]@]@."
           id.id Pgm_pretty.print_expr e print_type_v e.expr_type_v;
-      let ls, uc = add_global_fun id.id_loc id.id e.expr_type_v uc in
+      let ls, uc =
+        add_global_fun id.id_loc ~labels:id.id_lab id.id e.expr_type_v uc
+      in
       let d = Dlet (ls, e) in
       let uc = add_decl d uc in
       if wp then Pgm_wp.decl uc d else uc
@@ -2233,7 +2244,9 @@ let rec decl ~wp env penv ltm lmod uc = function
         if Debug.test_flag debug then
           eprintf "@[--typing %s-----@\n  %a@.%a@]@."
             id Pgm_pretty.print_recfun d print_type_v tyv;
-        let ps, uc = add_global_fun loc id tyv uc in
+        let ps, uc =
+          add_global_fun loc ~labels:[] (* FIXME *) id tyv uc
+        in
         uc, (ps, d)
       in
       let uc, dl = map_fold_left one uc dl in
@@ -2252,7 +2265,9 @@ let rec decl ~wp env penv ltm lmod uc = function
           id.id print_type_v tyv;
       let ps, uc = match tyv with
         | Tarrow _ ->
-            let ps, uc = add_global_fun loc id.id tyv uc in
+            let ps, uc =
+              add_global_fun loc ~labels:[] (* FIXME *) id.id tyv uc
+            in
             ps, uc
         | Tpure _ ->
             let id = id_user id.id loc in
