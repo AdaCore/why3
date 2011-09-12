@@ -455,7 +455,7 @@ and wp_desc env rm e q = match e.expr_desc with
   | Efun (bl, t) ->
       let (_, q), _ = q in
       let f = wp_triple env rm bl t in
-      wp_and q f
+      wp_and ~sym:true f q
   | Elet (x, e1, e2) ->
       let w2 =
         let rm = add_binder x rm in
@@ -511,8 +511,8 @@ and wp_desc env rm e q = match e.expr_desc with
               (wp_and ~sym:true
                  (wp_expl "loop invariant init" i)
                  (quantify env rm sreg (wp_implies i we)))
-        in
-        w
+      in
+      w
   (* optimization for the particular case let _ = y in e *)
   | Ematch (_, [{ppat_pat = {pat_node = Term.Pwild}}, e]) ->
       wp_expr env rm e (filter_post e.expr_effect q)
@@ -602,9 +602,7 @@ and wp_desc env rm e q = match e.expr_desc with
   | Eassert (Ptree.Aassert, f) ->
       let (_, q), _ = q in
       let f = wp_expl "assertion" f in
-      (* eprintf "assert: AVANT f = %a@." print_term f; *)
       let f = wp_and f q in
-      (* eprintf "assert: APRES f = %a@." print_term f; *)
       f
   | Eassert (Ptree.Acheck, f) ->
       let (_, q), _ = q in

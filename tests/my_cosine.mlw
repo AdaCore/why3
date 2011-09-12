@@ -49,7 +49,7 @@ let my_cosine "Safety of function my_cosine" #"my_cosine.c" 8 0 153#
   sub (single_of_real_exact 1.0)
       ("expl:check FP overflow for *"
        #"my_cosine.c" 10 16 28#
-       mul("expl:check FP overflow for *"
+       mul("expl:check FP overflow for second *"
            #"my_cosine.c" 10 16 21#
            mul x x) (single_of_real_exact 0.5)))
 { "expl:post-condition"
