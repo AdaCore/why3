@@ -473,7 +473,7 @@ and wp_desc env rm e q = match e.expr_desc with
   | Eif (e1, e2, e3) ->
       let res = v_result e1.expr_type in
       let test = t_equ (t_var res) (t_True env) in
-      (* if the both branches are pure, do not split *)
+      (* if both branches are pure, do not split *)
       let q1 =
         try
           let r2 = match e2.expr_desc with
@@ -487,7 +487,7 @@ and wp_desc env rm e q = match e.expr_desc with
             | Eglobal { ps_kind = PSvar pv } -> t_var pv.pv_pure
             | _ -> raise Exit in
           let (v, q), _ = q in
-          t_subst_single v (t_if test r2 r3) q
+          t_subst_single v (t_if_simp test r2 r3) q
         with Exit ->
           let w2 = wp_expr env rm e2 (filter_post e2.expr_effect q) in
           let w3 = wp_expr env rm e3 (filter_post e3.expr_effect q) in
