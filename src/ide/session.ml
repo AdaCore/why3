@@ -822,11 +822,10 @@ let associate_subgoals gname old_goals new_goals =
   (*
      we make a map of old goals indexed by their checksums
   *)
-  let old_goals_map = ref
-    (List.fold_left
-       (fun acc g -> Util.Mstr.add g.checksum g acc)
-       Util.Mstr.empty old_goals)
-  in
+  let old_goals_map = Hashtbl.create 7 in
+  List.iter
+    (fun g -> Hashtbl.add old_goals_map g.checksum g)
+    old_goals;
   (*
      we make an array of new goals with their numbers and checksums 
   *)
@@ -855,12 +854,12 @@ let associate_subgoals gname old_goals new_goals =
   let associate_goals ~obsolete i g =
     pairing_array.(i) <- Some g;
     obsolete_array.(i) <- obsolete;
-    old_goals_map := Util.Mstr.remove g.checksum !old_goals_map
+    Hashtbl.remove old_goals_map g.checksum
   in
   Array.iter
     (fun (i,_,_goal_name,_,sum) ->
        try
-         let h = Util.Mstr.find sum !old_goals_map in
+         let h = Hashtbl.find old_goals_map sum in
          (* an old goal has the same checksum *)
          (*
            eprintf "Merge phase 1: old goal '%s' -> new goal '%s'@."
@@ -878,9 +877,9 @@ let associate_subgoals gname old_goals new_goals =
   (* Phase 2: we now build a list of all remaining new and old goals,
      ordered by shapes, then by name *)
   let old_goals_without_pairing =
-    Util.Mstr.fold
+    Hashtbl.fold
       (fun _ g acc -> (g.goal_shape,Old_goal g)::acc)
-      !old_goals_map
+      old_goals_map
       []
   in
   let all_goals_without_pairing =
@@ -1048,9 +1047,9 @@ let associate_subgoals gname old_goals new_goals =
   eprintf "[Merge] phase 3: associate remaining goals@.";
 *)
   let remaining_old_goals =
-    Util.Mstr.fold
+    Hashtbl.fold
       (fun _ g acc -> (g.goal_name,g)::acc)
-      !old_goals_map
+      old_goals_map
       []
   in
   let remaining_old_goals =
