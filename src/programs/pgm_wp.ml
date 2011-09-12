@@ -491,7 +491,7 @@ and wp_desc env rm e q = match e.expr_desc with
         with Exit ->
           let w2 = wp_expr env rm e2 (filter_post e2.expr_effect q) in
           let w3 = wp_expr env rm e3 (filter_post e3.expr_effect q) in
-          t_if test w2 w3
+          t_if_simp test w2 w3
       in
       let q1 = saturate_post e1.expr_effect (res, q1) q in
       wp_expr env rm e1 q1
