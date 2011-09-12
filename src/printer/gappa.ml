@@ -50,9 +50,38 @@ let () =
           | _ -> true) f)
       ])))
 
+(* patterns (TODO: add a parser and generalize it out of Gappa) *)
+
+type pattern =
+  | PatHole of int
+  | PatApp of Env.pathname * string * string list * pattern list
+
+let incremental_pat_match env holes =
+  let rec aux p t =
+    match p, t.t_node with
+    | PatHole i, _ ->
+        begin match holes.(i) with
+        | None -> holes.(i) <- Some t
+        | Some t' -> if not (t_equal t t') then raise Not_found
+        end
+    | PatApp (sp,ss,sl,pl), Tapp (ls,tl) ->
+        if List.length pl <> List.length tl then raise Not_found;
+        let th = try Env.find_theory env sp ss with Env.TheoryNotFound _ -> raise Not_found in
+        let s = ns_find_ls th.th_export sl in
+        if not (ls_equal s ls) then raise Not_found;
+        List.iter2 aux pl tl
+    | _, _ -> raise Not_found in
+  aux
+
+let pat_match env nb_holes p t =
+  let holes = Array.make nb_holes None in
+  incremental_pat_match env holes p t;
+  Array.map (function None -> raise Not_found | Some t -> t) holes
+
 (* Gappa pre-compilation *)
 
 type info = {
+  info_env : Env.env;
   info_symbols : Sid.t;
   info_ops_of_rel : (string * string * string) Mls.t;
   info_syn : string Mid.t;
@@ -87,6 +116,7 @@ let get_info env task =
   let symb = Mls.fold (fun ls _ acc -> Sid.add ls.ls_name acc) ops symb in
   let symb = Sid.add ps_equ.ls_name symb in
   {
+    info_env = env;
     info_symbols = symb;
     info_ops_of_rel = ops;
     info_syn = syn;
@@ -165,6 +195,17 @@ let rec print_term info fmt t =
 
 (* predicates *)
 
+let rel_error_pat =
+  PatApp (["real"], "Real", ["infix <="], [
+    PatApp (["real"], "Abs", ["abs"], [
+      PatApp (["real"], "Real", ["infix -"], [
+        PatHole 0;
+        PatHole 1])]);
+    PatApp (["real"], "Real", ["infix *"], [
+      PatHole 2;
+        PatApp (["real"], "Abs", ["abs"], [
+          PatHole 1])])])
+
 let rec print_fmla info fmt f =
   let term = print_term info in
   let fmla = print_fmla info in
@@ -193,6 +234,10 @@ let rec print_fmla info fmt f =
         with Not_found -> assert false
       in
       begin try
+        let t = pat_match info.info_env 3 rel_error_pat f in
+        let c = constant_value t.(2) in
+        fprintf fmt "|%a -/ %a| <= %s" term t.(0) term t.(1) c
+      with Not_found -> try
         let c1 = constant_value t1 in
         fprintf fmt "%s%a %s %s" s term t2 rev_op c1
       with Not_found ->
