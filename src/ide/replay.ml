@@ -372,7 +372,7 @@ let () =
             if !opt_stats && n<m then print_statistics files;
 	    if !opt_latex then print_latex_statistics ();
             eprintf "Everything replayed OK.@.";
-            if found_obs && n=m then
+            if found_obs && (n=m || !opt_force) then
               begin
                 eprintf "Updating obsolete session...@?";
                 M.save_session ();
