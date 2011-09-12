@@ -1424,12 +1424,14 @@ let open_session ~allow_obsolete ~env ~config ~init ~notify dir =
           load_session ~env xml;
           reload_all allow_obsolete
         with
-          | Sys_error msg ->
+          | Sys_error _msg ->
               (* xml does not exist yet *)
               (*failwith ("Open session: sys error " ^ msg)*)
-	    false
+	      false
           | Xml.Parse_error s ->
-              failwith ("Open session: XML database corrupted (%s)@." ^ s)
+              Format.eprintf "XML database corrupted, ignored (%s)@." s;
+              (* failwith ("Open session: XML database corrupted (%s)@." ^ s) *)
+              false
         end
     | _ ->
         eprintf "Session.open_session: session already opened@.";
