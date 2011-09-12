@@ -26,16 +26,15 @@ let file = ref None
 let opt_version = ref false
 let opt_stats = ref true
 let opt_latex = ref false
+let opt_force = ref false
 
 let spec = Arg.align [
   ("-I",
    Arg.String (fun s -> includes := s :: !includes),
    "<s> add s to loadpath") ;
-(*
-  ("-f",
-   Arg.String (fun s -> input_files := s :: !input_files),
-   "<f> add file f to the project (ignored if it is already there)") ;
-*)
+  ("-force",
+   Arg.Set opt_force,
+   "enforce saving of session even if replay failed") ;
   ("-s",
    Arg.Clear opt_stats,
    " do not print statistics") ;
@@ -302,31 +301,31 @@ let print_statistics files =
     (List.rev files)
 
 (* Statistics in LaTeX*)
-let rec goal_latex_stat g = 
+let rec goal_latex_stat g =
   printf "%s & %b" (M.goal_name g) (M.goal_proved g);
-  let proofs = M.external_proofs g in 
-  Hashtbl.iter (fun p pr -> let s = pr.M.proof_state in 
-			    match s with 
-				Session.Done res -> 
-				  if res.Call_provers.pr_answer = Call_provers.Valid 
+  let proofs = M.external_proofs g in
+  Hashtbl.iter (fun p pr -> let s = pr.M.proof_state in
+			    match s with
+				Session.Done res ->
+				  if res.Call_provers.pr_answer = Call_provers.Valid
 				  then  printf " %s : %.2f" p res.Call_provers.pr_time
 				  else printf " %s : -" p
 			       | _ -> printf " %s: *" p) proofs;
   printf "\\\\@.";
-  let tr = M.transformations g in 
-  Hashtbl.iter (fun st tr -> let goals = tr.M.subgoals in 
+  let tr = M.transformations g in
+  Hashtbl.iter (fun _st tr -> let goals = tr.M.subgoals in
   List.iter goal_latex_stat goals) tr
-  
-let theory_latex_stat t = 
+
+let theory_latex_stat t =
   printf "\\begin{tabular}@.";
   List.iter goal_latex_stat (M.goals t);
   printf "\\end{tabular}@."
 
-let file_latex_stat f = 
+let file_latex_stat f =
    List.iter theory_latex_stat f.M.theories
 
-let print_latex_statistics () = 
-  let files = M.get_all_files () in 
+let print_latex_statistics () =
+  let files = M.get_all_files () in
   List.iter file_latex_stat files
 
 let print_report (g,p,r) =
@@ -364,7 +363,10 @@ let () =
               if n=m then
                 printf " %d/%d (replay OK, all proved: obsolete session updated)@." n m
               else
-                printf " %d/%d (replay OK, but not all proved: obsolete session NOT updated)@." n m
+                if !opt_force then
+                  printf " %d/%d (replay OK, but not all proved: obsolete session updated since -force was given)@." n m
+                else
+                  printf " %d/%d (replay OK, but not all proved: obsolete session NOT updated)@." n m
             else
               printf " %d/%d@." n m ;
             if !opt_stats && n<m then print_statistics files;
@@ -388,12 +390,12 @@ let () =
     with Exit -> eprintf "main replayer exited unexpectedly@."
   with
     | M.OutdatedSession ->
-        eprintf "The session database '%s' is outdated, cannot replay@." 
+        eprintf "The session database '%s' is outdated, cannot replay@."
           project_dir;
         eprintf "Aborting...@.";
         exit 1
     | e when not (Debug.test_flag Debug.stack_trace) ->
-        eprintf "Error while opening session with database '%s' : %a@." 
+        eprintf "Error while opening session with database '%s' : %a@."
           project_dir
           Exn_printer.exn_printer e;
         eprintf "Aborting...@.";
