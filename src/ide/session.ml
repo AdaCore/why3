@@ -1426,7 +1426,8 @@ let open_session ~allow_obsolete ~env ~config ~init ~notify dir =
         with
           | Sys_error msg ->
               (* xml does not exist yet *)
-              failwith ("Open session: sys error " ^ msg)
+              (*failwith ("Open session: sys error " ^ msg)*)
+	    false
           | Xml.Parse_error s ->
               failwith ("Open session: XML database corrupted (%s)@." ^ s)
         end

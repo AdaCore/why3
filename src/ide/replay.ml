@@ -25,6 +25,7 @@ let includes = ref []
 let file = ref None
 let opt_version = ref false
 let opt_stats = ref true
+let opt_latex = ref false
 
 let spec = Arg.align [
   ("-I",
@@ -41,6 +42,9 @@ let spec = Arg.align [
   ("-v",
    Arg.Set opt_version,
    " print version information") ;
+  ("-latex",
+   Arg.Set opt_latex,
+   " produce latex statistics") ;
 ]
 
 let version_msg = Format.sprintf "Why3 replayer, version %s (build date: %s)"
@@ -297,6 +301,34 @@ let print_statistics files =
          end)
     (List.rev files)
 
+(* Statistics in LaTeX*)
+let rec goal_latex_stat g = 
+  printf "%s & %b" (M.goal_name g) (M.goal_proved g);
+  let proofs = M.external_proofs g in 
+  Hashtbl.iter (fun p pr -> let s = pr.M.proof_state in 
+			    match s with 
+				Session.Done res -> 
+				  if res.Call_provers.pr_answer = Call_provers.Valid 
+				  then  printf " %s : %.2f" p res.Call_provers.pr_time
+				  else printf " %s : -" p
+			       | _ -> printf " %s: *" p) proofs;
+  printf "\\\\@.";
+  let tr = M.transformations g in 
+  Hashtbl.iter (fun st tr -> let goals = tr.M.subgoals in 
+  List.iter goal_latex_stat goals) tr
+  
+let theory_latex_stat t = 
+  printf "\\begin{tabular}@.";
+  List.iter goal_latex_stat (M.goals t);
+  printf "\\end{tabular}@."
+
+let file_latex_stat f = 
+   List.iter theory_latex_stat f.M.theories
+
+let print_latex_statistics () = 
+  let files = M.get_all_files () in 
+  List.iter file_latex_stat files
+
 let print_report (g,p,r) =
   printf "   goal '%s', prover '%s': " g p;
   match r with
@@ -336,6 +368,7 @@ let () =
             else
               printf " %d/%d@." n m ;
             if !opt_stats && n<m then print_statistics files;
+	    if !opt_latex then print_latex_statistics ();
             eprintf "Everything replayed OK.@.";
             if found_obs && n=m then
               begin
