@@ -176,26 +176,27 @@ Theorem WP_parameter_dutch_flag : forall (a:Z), forall (n:Z), forall (a1:(map
   | Blue  => (((0%Z <= b)%Z /\ (b <  a)%Z) /\ ((0%Z <= i)%Z /\
       (i <  a)%Z)) -> forall (a4:(map Z color)), (exchange a2 a4 b i) ->
       forall (b1:Z), (b1 = (b + 1%Z)%Z) -> forall (i1:Z),
-      (i1 = (i + 1%Z)%Z) -> (monochrome (mk_array a a4) b1 i1 White)
+      (i1 = (i + 1%Z)%Z) -> (monochrome (mk_array a a4) 0%Z b1 Blue)
   | White  => True
   | Red  => True
   end))).
 (* YOU MAY EDIT THE PROOF BELOW *)
 intuition.
 intuition.
-destruct (get a2 i); intuition.
+generalize (refl_equal (get a2 i)).
+pattern (get a2 i) at 1.
+destruct (get a2 i); intro hc; rewrite <- hc; simpl; intuition.
 red; intros.
 subst b1 i1.
 unfold get1; simpl.
-assert (case: (k < i \/ k = i)%Z) by omega. destruct case.
+assert (case: (k < b \/ k = b)%Z) by omega. destruct case.
 replace (get a4 k) with (get a2 k).
-apply H3; omega.
+apply H4; omega.
 destruct H15 as (_,h). destruct h as (_,h).
 apply h; omega.
 subst k.
-destruct H15 as (h,_). rewrite <- h.
-apply H3.
-omega.
+destruct H15 as (_,(h,_)). rewrite h.
+auto.
 Qed.
 (* DO NOT EDIT BELOW *)
 
