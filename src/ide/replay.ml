@@ -301,8 +301,19 @@ let print_statistics files =
     (List.rev files)
 
 (* Statistics in LaTeX*)
-let rec goal_latex_stat g =
-  printf "%s & %b" (M.goal_name g) (M.goal_proved g);
+
+let rec provers_latex_stats provers g = 
+  let proofs = M.external_proofs g in
+  Hashtbl.iter (fun p _-> Hashtbl.replace provers p ()) proofs;
+  let tr = M.transformations g in
+  Hashtbl.iter (fun _st tr -> let goals = tr.M.subgoals in
+  List.iter (provers_latex_stats provers) goals) tr
+
+
+(*let rec goal_latex_stat prov g =*)
+let rec goal_latex_stat g =     
+(*  printf "%s & %b" (M.goal_name g) (M.goal_proved g);*)
+  printf "%s " (M.goal_name g);
   let proofs = M.external_proofs g in
   Hashtbl.iter (fun p pr -> let s = pr.M.proof_state in
 			    match s with
@@ -317,7 +328,11 @@ let rec goal_latex_stat g =
   List.iter goal_latex_stat goals) tr
 
 let theory_latex_stat t =
-  printf "\\begin{tabular}@.";
+  printf " Collect provers used to proof this theory \n";
+  let provers = Hashtbl.create 9 in 
+  List.iter (provers_latex_stats provers) (M.goals t);
+  Hashtbl.iter (fun p _-> printf " %s :" p) provers;
+  printf "\\begin{tabular}{l|c|r}@.";
   List.iter goal_latex_stat (M.goals t);
   printf "\\end{tabular}@."
 
