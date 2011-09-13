@@ -330,7 +330,7 @@ let print_decls ?old info fmt dl =
 
 exception AlreadyDefined
 
-let filter_hyp info defs eqs hyps pr f =
+let rec filter_hyp info defs eqs hyps pr f =
   match f.t_node with
   | Tapp(ls,[t1;t2]) when ls == ps_equ ->
       let try_equality t1 t2 =
@@ -348,10 +348,16 @@ let filter_hyp info defs eqs hyps pr f =
       with AlreadyDefined ->
         (eqs, (pr,f)::hyps)
       end
-  (* todo: support more kinds of hypotheses *)
-  | Tapp(ls,_) when Sid.mem ls.ls_name info.info_symbols ->
-      (eqs, (pr,f)::hyps)
-  | _ -> (eqs,hyps)
+  | Tbinop (Tand, f1, f2) ->
+      let (eqs,hyps) = filter_hyp info defs eqs hyps pr f2 in
+      filter_hyp info defs eqs hyps pr f1
+  | Tapp(_,[]) ->
+      (* Discard (abstracted) predicate variables.
+         While Gappa would handle them, it is usually just noise from
+         Gappa's point of view and better delegated to a SAT solver. *)
+      (eqs,hyps)
+  | Ttrue -> (eqs,hyps)
+  | _ -> (eqs, (pr,f)::hyps)
 
 type filter_goal =
   | Goal_good of Decl.prsymbol * term
@@ -412,7 +418,7 @@ let print_task env pr thpr ?old:_ fmt task =
     List.fold_left (prepare info (Hid.create 17)) ([],[],Goal_none) (Task.task_decls task)
   in
   List.iter (print_equation info fmt) (List.rev equations);
-  fprintf fmt "@[<v 2>{ %a%a}@\n@]" (print_list nothing (print_hyp info)) hyps
+  fprintf fmt "@[<v 2>{ %a%a}@\n@]" (print_list nothing (print_hyp info)) (List.rev hyps)
     (print_goal info) goal
 (*
   print_decls ?old info fmt (Task.task_decls task)
