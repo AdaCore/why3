@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
-<why3session name="examples/programs/gcd/why3session.xml">
+<why3session name="programs/gcd/why3session.xml">
  <prover id="alt-ergo" name="Alt-Ergo" version="0.93"/>
  <prover id="coq" name="Coq" version="8.3pl2"/>
  <prover id="cvc3" name="CVC3" version="2.2"/>
@@ -12,33 +12,33 @@
  <prover id="z3" name="Z3" version="2.19"/>
  <file name="../gcd.mlw" verified="true" expanded="true">
   <theory name="WP EuclideanAlgorithm" verified="true" expanded="true">
-   <goal name="WP_parameter gcd" expl="correctness of parameter gcd" sum="ba296793e7239ef781b642b563445c45" proved="true" expanded="true" shape="iainfix =V1c0ainfix =V0agcdV0V1ainfix =agcdV1amodV0V1agcdV0V1Aainfix >=amodV0V1c0Aainfix >=V1c0Aainfix <amodV0V1V1Aainfix <=c0V1Iainfix >=V1c0Aainfix >=V0c0FF">
+   <goal name="WP_parameter gcd" expl=" parameter gcd" sum="b5983b506f968c1879fb457d42cd087a" proved="true" expanded="true" shape="iainfix =V1c0ainfix =V0agcdV0V1ainfix =agcdV1amodV0V1agcdV0V1Aainfix >=amodV0V1c0Aainfix >=V1c0Aainfix <amodV0V1V1Aainfix <=c0V1Iainfix >=V1c0Aainfix >=V0c0FF">
     <transf name="split_goal" proved="true" expanded="true">
-     <goal name="WP_parameter gcd.1" expl="normal postcondition" sum="07b96502c0442e98d6725484d197cc81" proved="true" expanded="true" shape="ainfix =V0agcdV0V1Iainfix =V1c0Iainfix >=V1c0Aainfix >=V0c0FF">
+     <goal name="WP_parameter gcd.1" expl="normal postcondition" sum="8cb84be3ffaec6a6cec99f83edd42e4d" proved="true" expanded="true" shape="ainfix =V0agcdV0V1Iainfix =V1c0Iainfix >=V1c0Aainfix >=V0c0FF">
       <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.00"/>
       </proof>
       <proof prover="alt-ergo" timelimit="2" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.01"/>
       </proof>
       <proof prover="z3" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter gcd.2" expl="precondition" sum="d2608cdc751cdec6209317d7b3be10f2" proved="true" expanded="true" shape="ainfix >=amodV0V1c0Aainfix >=V1c0Aainfix <amodV0V1V1Aainfix <=c0V1Iainfix =V1c0NIainfix >=V1c0Aainfix >=V0c0FF">
+     <goal name="WP_parameter gcd.2" expl="precondition" sum="938438738618f75890999bed3bb73c50" proved="true" expanded="true" shape="ainfix >=amodV0V1c0Aainfix >=V1c0Aainfix <amodV0V1V1Aainfix <=c0V1Iainfix =V1c0NIainfix >=V1c0Aainfix >=V0c0FF">
       <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.01"/>
       </proof>
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.06"/>
+       <result status="valid" time="0.05"/>
       </proof>
       <proof prover="z3" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter gcd.3" expl="normal postcondition" sum="d131035980e772756a02410f899d17cf" proved="true" expanded="true" shape="ainfix =agcdV1amodV0V1agcdV0V1Iainfix >=amodV0V1c0Aainfix >=V1c0Aainfix <amodV0V1V1Aainfix <=c0V1Iainfix =V1c0NIainfix >=V1c0Aainfix >=V0c0FF">
+     <goal name="WP_parameter gcd.3" expl="normal postcondition" sum="e576f9d4a9c7613d70ada85f63f9bc39" proved="true" expanded="true" shape="ainfix =agcdV1amodV0V1agcdV0V1Iainfix >=amodV0V1c0Aainfix >=V1c0Aainfix <amodV0V1V1Aainfix <=c0V1Iainfix =V1c0NIainfix >=V1c0Aainfix >=V0c0FF">
       <proof prover="coq" timelimit="10" edited="gcd_WP_EuclideanAlgorithm_WP_parameter_gcd_1.v" obsolete="false">
-       <result status="valid" time="0.55"/>
+       <result status="valid" time="0.56"/>
       </proof>
      </goal>
     </transf>

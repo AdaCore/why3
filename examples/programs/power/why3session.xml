@@ -1,115 +1,118 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
-<why3session name="examples/programs/power/why3session.xml">
+<why3session name="programs/power/why3session.xml">
  <prover id="alt-ergo" name="Alt-Ergo" version="0.93"/>
- <prover id="coq" name="Coq" version="8.2pl1"/>
+ <prover id="coq" name="Coq" version="8.3pl2"/>
  <prover id="cvc3" name="CVC3" version="2.2"/>
- <prover id="gappa" name="Gappa" version="0.13.0"/>
+ <prover id="gappa" name="Gappa" version="0.15.0"/>
  <prover id="simplify" name="Simplify" version="1.5.4"/>
+ <prover id="spass" name="Spass" version="3.7"/>
+ <prover id="vampire" name="Vampire" version="0.6"/>
+ <prover id="yices" name="Yices" version="1.0.25"/>
  <prover id="z3" name="Z3" version="2.19"/>
  <file name="../power.mlw" verified="true" expanded="true">
   <theory name="Power" verified="true" expanded="true">
-   <goal name="Power_1" sum="d547c92414b879742b9484a819fbeff6" proved="true" expanded="true" shape="ainfix =apowerV0c1V0F">
+   <goal name="Power_1" sum="e8d8bad3b400e0eb911e4ed70a60ca3b" proved="true" expanded="true" shape="ainfix =apowerV0c1V0F">
     <proof prover="cvc3" timelimit="2" edited="" obsolete="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.00"/>
     </proof>
     <proof prover="z3" timelimit="2" edited="" obsolete="false">
-     <result status="valid" time="0.03"/>
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
-   <goal name="Power_sum" sum="f0983c67127067fa8df1b687debc98b6" proved="true" expanded="true" shape="ainfix =apowerV0ainfix +V1V2ainfix *apowerV0V1apowerV0V2Iainfix <=c0V2Iainfix <=c0V1F">
+   <goal name="Power_sum" sum="e871704e13ce4bc80e421511cc29ca1a" proved="true" expanded="true" shape="ainfix =apowerV0ainfix +V1V2ainfix *apowerV0V1apowerV0V2Iainfix <=c0V2Iainfix <=c0V1F">
     <proof prover="coq" timelimit="2" edited="power_Power_Power_sum_1.v" obsolete="false">
-     <result status="valid" time="0.82"/>
+     <result status="valid" time="0.52"/>
     </proof>
    </goal>
-   <goal name="Power_mult" sum="9320f119ea919aa0a9259fbc3a3bba3a" proved="true" expanded="true" shape="ainfix =apowerV0ainfix *V1V2apowerapowerV0V1V2Iainfix <=c0V2Iainfix <=c0V1F">
+   <goal name="Power_mult" sum="a2d49e22e560c3e7a80f4d847489ac2a" proved="true" expanded="true" shape="ainfix =apowerV0ainfix *V1V2apowerapowerV0V1V2Iainfix <=c0V2Iainfix <=c0V1F">
     <proof prover="coq" timelimit="2" edited="power_Power_Power_mult_1.v" obsolete="false">
-     <result status="valid" time="0.74"/>
+     <result status="valid" time="0.56"/>
     </proof>
    </goal>
-   <goal name="Power_mult2" sum="72fb36e109a46553e5b8a74b99a8f4aa" proved="true" expanded="true" shape="ainfix =apowerainfix *V0V1V2ainfix *apowerV0V2apowerV1V2Iainfix <=c0V2F">
+   <goal name="Power_mult2" sum="fd2027e9f13d53b77a555240998edcea" proved="true" expanded="true" shape="ainfix =apowerainfix *V0V1V2ainfix *apowerV0V2apowerV1V2Iainfix <=c0V2F">
     <proof prover="coq" timelimit="5" edited="power_Power_Power_mult2_1.v" obsolete="false">
-     <result status="valid" time="0.77"/>
+     <result status="valid" time="0.50"/>
     </proof>
    </goal>
   </theory>
   <theory name="WP M" verified="true" expanded="true">
-   <goal name="WP_parameter fast_exp" expl="correctness of parameter fast_exp" sum="15f03c4679ea4a202e987eca32011a27" proved="true" expanded="true" shape="iainfix =V1c0ainfix =c1apowerV0V1LapowerV0adivV1c2ainfix =iainfix =iainfix =amodV1c2c0aTrueaFalseaTrueainfix *V2V2ainfix *ainfix *V2V2V0apowerV0V1Aainfix <=c0adivV1c2Aainfix <adivV1c2V1Aainfix <=c0V1Iainfix <=c0V1FF">
+   <goal name="WP_parameter fast_exp" expl=" parameter fast_exp" sum="c74dc51faaf95de5ccc3671cf8d79d71" proved="true" expanded="true" shape="iainfix =V1c0ainfix =c1apowerV0V1LapowerV0adivV1c2ainfix =iainfix =iainfix =amodV1c2c0aTrueaFalseaTrueainfix *V2V2ainfix *ainfix *V2V2V0apowerV0V1Aainfix <=c0adivV1c2Aainfix <adivV1c2V1Aainfix <=c0V1Iainfix <=c0V1FF">
     <proof prover="alt-ergo" timelimit="2" edited="" obsolete="false">
-     <result status="valid" time="2.11"/>
+     <result status="valid" time="1.00"/>
     </proof>
    </goal>
-   <goal name="WP_parameter fast_exp_imperative" expl="correctness of parameter fast_exp_imperative" sum="b2c30a8759469c93d9715a7d52ddb55e" proved="true" expanded="true" shape="iainfix >V2c0iainfix =amodV2c2c1ainfix <V7V2Aainfix <=c0V2Aainfix =ainfix *V5apowerV6V7apowerV0V1Aainfix <=c0V7Iainfix =V7adivV2c2FIainfix =V6ainfix *V3V3FIainfix =V5ainfix *V4V3Fainfix <V9V2Aainfix <=c0V2Aainfix =ainfix *V4apowerV8V9apowerV0V1Aainfix <=c0V9Iainfix =V9adivV2c2FIainfix =V8ainfix *V3V3Fainfix =V4apowerV0V1Iainfix =ainfix *V4apowerV3V2apowerV0V1Aainfix <=c0V2FFFAainfix =ainfix *c1apowerV0V1apowerV0V1Aainfix <=c0V1Iainfix <=c0V1FF">
+   <goal name="WP_parameter fast_exp_imperative" expl=" parameter fast_exp_imperative" sum="bb0d61b36fd96c3b34c6c4e51d7467ab" proved="true" expanded="true" shape="iainfix >V2c0iainfix =amodV2c2c1ainfix <V7V2Aainfix <=c0V2Aainfix =ainfix *V5apowerV6V7apowerV0V1Aainfix <=c0V7Iainfix =V7adivV2c2FIainfix =V6ainfix *V3V3FIainfix =V5ainfix *V4V3Fainfix <V9V2Aainfix <=c0V2Aainfix =ainfix *V4apowerV8V9apowerV0V1Aainfix <=c0V9Iainfix =V9adivV2c2FIainfix =V8ainfix *V3V3Fainfix =V4apowerV0V1Iainfix =ainfix *V4apowerV3V2apowerV0V1Aainfix <=c0V2FFFAainfix =ainfix *c1apowerV0V1apowerV0V1Aainfix <=c0V1Iainfix <=c0V1FF">
     <transf name="split_goal" proved="true" expanded="true">
-     <goal name="WP_parameter fast_exp_imperative.1" expl="loop invariant init" sum="c698e03dfd3a2950bc250a052d7047ce" proved="true" expanded="true" shape="ainfix =ainfix *c1apowerV0V1apowerV0V1Aainfix <=c0V1Iainfix <=c0V1FF">
+     <goal name="WP_parameter fast_exp_imperative.1" expl="loop invariant init" sum="518cce0279a65e1537e0a46098238986" proved="true" expanded="true" shape="ainfix =ainfix *c1apowerV0V1apowerV0V1Aainfix <=c0V1Iainfix <=c0V1FF">
       <proof prover="alt-ergo" timelimit="5" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.01"/>
       </proof>
       <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof prover="z3" timelimit="5" edited="" obsolete="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter fast_exp_imperative.2" expl="loop invariant preservation" sum="113ab2148e20a17e90500def7e08331b" proved="true" expanded="true" shape="ainfix =ainfix *V5apowerV6V7apowerV0V1Aainfix <=c0V7Iainfix =V7adivV2c2FIainfix =V6ainfix *V3V3FIainfix =V5ainfix *V4V3FIainfix =amodV2c2c1Iainfix >V2c0Iainfix =ainfix *V4apowerV3V2apowerV0V1Aainfix <=c0V2FFFIainfix <=c0V1FF">
+      <proof prover="cvc3" timelimit="5" edited="" obsolete="false">
+       <result status="valid" time="0.06"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.41"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter fast_exp_imperative.3" expl="loop variant decreases" sum="1ae141e607c9324eacd6a886764440af" proved="true" expanded="true" shape="ainfix <V7V2Aainfix <=c0V2Iainfix =ainfix *V5apowerV6V7apowerV0V1Aainfix <=c0V7Iainfix =V7adivV2c2FIainfix =V6ainfix *V3V3FIainfix =V5ainfix *V4V3FIainfix =amodV2c2c1Iainfix >V2c0Iainfix =ainfix *V4apowerV3V2apowerV0V1Aainfix <=c0V2FFFIainfix <=c0V1FF">
+      <proof prover="cvc3" timelimit="5" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.10"/>
       </proof>
       <proof prover="z3" timelimit="5" edited="" obsolete="false">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal name="WP_parameter fast_exp_imperative.2" expl="loop invariant preservation" sum="b3d1468402e5c8a7f9fd59267fe5782d" proved="true" expanded="true" shape="ainfix =ainfix *V5apowerV6V7apowerV0V1Aainfix <=c0V7Iainfix =V7adivV2c2FIainfix =V6ainfix *V3V3FIainfix =V5ainfix *V4V3FIainfix =amodV2c2c1Iainfix >V2c0Iainfix =ainfix *V4apowerV3V2apowerV0V1Aainfix <=c0V2FFFIainfix <=c0V1FF">
-      <proof prover="cvc3" timelimit="5" edited="" obsolete="false">
-       <result status="valid" time="0.11"/>
-      </proof>
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.87"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter fast_exp_imperative.3" expl="loop variant decreases" sum="5746e2c830f47c1ecca1e1698ed9e5c1" proved="true" expanded="true" shape="ainfix <V7V2Aainfix <=c0V2Iainfix =ainfix *V5apowerV6V7apowerV0V1Aainfix <=c0V7Iainfix =V7adivV2c2FIainfix =V6ainfix *V3V3FIainfix =V5ainfix *V4V3FIainfix =amodV2c2c1Iainfix >V2c0Iainfix =ainfix *V4apowerV3V2apowerV0V1Aainfix <=c0V2FFFIainfix <=c0V1FF">
-      <proof prover="cvc3" timelimit="5" edited="" obsolete="false">
-       <result status="valid" time="0.03"/>
-      </proof>
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.21"/>
-      </proof>
-      <proof prover="z3" timelimit="5" edited="" obsolete="false">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter fast_exp_imperative.4" expl="loop invariant preservation" sum="ed19f567fc265986d0532710ebe44b1d" proved="true" expanded="true" shape="ainfix =ainfix *V4apowerV5V6apowerV0V1Aainfix <=c0V6Iainfix =V6adivV2c2FIainfix =V5ainfix *V3V3FIainfix =amodV2c2c1NIainfix >V2c0Iainfix =ainfix *V4apowerV3V2apowerV0V1Aainfix <=c0V2FFFIainfix <=c0V1FF">
+     <goal name="WP_parameter fast_exp_imperative.4" expl="loop invariant preservation" sum="81aa4ce9ef337d8ce03dc5c831ce11b9" proved="true" expanded="true" shape="ainfix =ainfix *V4apowerV5V6apowerV0V1Aainfix <=c0V6Iainfix =V6adivV2c2FIainfix =V5ainfix *V3V3FIainfix =amodV2c2c1NIainfix >V2c0Iainfix =ainfix *V4apowerV3V2apowerV0V1Aainfix <=c0V2FFFIainfix <=c0V1FF">
       <transf name="split_goal" proved="true" expanded="true">
-       <goal name="WP_parameter fast_exp_imperative.4.1" expl="correctness of parameter fast_exp_imperative" sum="fd8b86fc49f323ddb1153d5582385fe9" proved="true" expanded="true" shape="ainfix <=c0V6Iainfix =V6adivV2c2FIainfix =V5ainfix *V3V3FIainfix =amodV2c2c1NIainfix >V2c0Iainfix =ainfix *V4apowerV3V2apowerV0V1Aainfix <=c0V2FFFIainfix <=c0V1FF">
+       <goal name="WP_parameter fast_exp_imperative.4.1" expl=" parameter fast_exp_imperative" sum="74ea8b7e25f6109b60f115ef5ec4627f" proved="true" expanded="true" shape="ainfix <=c0V6Iainfix =V6adivV2c2FIainfix =V5ainfix *V3V3FIainfix =amodV2c2c1NIainfix >V2c0Iainfix =ainfix *V4apowerV3V2apowerV0V1Aainfix <=c0V2FFFIainfix <=c0V1FF">
         <proof prover="cvc3" timelimit="5" edited="" obsolete="false">
-         <result status="valid" time="0.03"/>
+         <result status="valid" time="0.01"/>
         </proof>
         <proof prover="alt-ergo" timelimit="5" edited="" obsolete="false">
-         <result status="valid" time="0.03"/>
+         <result status="valid" time="0.02"/>
         </proof>
         <proof prover="z3" timelimit="5" edited="" obsolete="false">
-         <result status="valid" time="0.04"/>
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
-       <goal name="WP_parameter fast_exp_imperative.4.2" expl="correctness of parameter fast_exp_imperative" sum="045ec6966ace0261ceae0e660477a515" proved="true" expanded="true" shape="ainfix =ainfix *V4apowerV5V6apowerV0V1Iainfix =V6adivV2c2FIainfix =V5ainfix *V3V3FIainfix =amodV2c2c1NIainfix >V2c0Iainfix =ainfix *V4apowerV3V2apowerV0V1Aainfix <=c0V2FFFIainfix <=c0V1FF">
+       <goal name="WP_parameter fast_exp_imperative.4.2" expl=" parameter fast_exp_imperative" sum="6439226bf05e6205af6efe6cb3c548c5" proved="true" expanded="true" shape="ainfix =ainfix *V4apowerV5V6apowerV0V1Iainfix =V6adivV2c2FIainfix =V5ainfix *V3V3FIainfix =amodV2c2c1NIainfix >V2c0Iainfix =ainfix *V4apowerV3V2apowerV0V1Aainfix <=c0V2FFFIainfix <=c0V1FF">
         <proof prover="coq" timelimit="5" edited="power_WP_M_WP_parameter_fast_exp_imperative_3.v" obsolete="false">
          <result status="valid" time="0.61"/>
         </proof>
        </goal>
       </transf>
      </goal>
-     <goal name="WP_parameter fast_exp_imperative.5" expl="loop variant decreases" sum="dd5f28d0d56d521fdbdd2cfba67a5442" proved="true" expanded="true" shape="ainfix <V6V2Aainfix <=c0V2Iainfix =ainfix *V4apowerV5V6apowerV0V1Aainfix <=c0V6Iainfix =V6adivV2c2FIainfix =V5ainfix *V3V3FIainfix =amodV2c2c1NIainfix >V2c0Iainfix =ainfix *V4apowerV3V2apowerV0V1Aainfix <=c0V2FFFIainfix <=c0V1FF">
+     <goal name="WP_parameter fast_exp_imperative.5" expl="loop variant decreases" sum="eccfebfe44d8e0ac32342da71b6a3131" proved="true" expanded="true" shape="ainfix <V6V2Aainfix <=c0V2Iainfix =ainfix *V4apowerV5V6apowerV0V1Aainfix <=c0V6Iainfix =V6adivV2c2FIainfix =V5ainfix *V3V3FIainfix =amodV2c2c1NIainfix >V2c0Iainfix =ainfix *V4apowerV3V2apowerV0V1Aainfix <=c0V2FFFIainfix <=c0V1FF">
       <proof prover="cvc3" timelimit="5" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.01"/>
       </proof>
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.11"/>
-      </proof>
-      <proof prover="z3" timelimit="5" edited="" obsolete="false">
        <result status="valid" time="0.05"/>
       </proof>
+      <proof prover="z3" timelimit="5" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
      </goal>
-     <goal name="WP_parameter fast_exp_imperative.6" expl="normal postcondition" sum="1188bf6aeb0550bd28c229056071e3dc" proved="true" expanded="true" shape="ainfix =V4apowerV0V1Iainfix >V2c0NIainfix =ainfix *V4apowerV3V2apowerV0V1Aainfix <=c0V2FFFIainfix <=c0V1FF">
+     <goal name="WP_parameter fast_exp_imperative.6" expl="normal postcondition" sum="cd7bfa281c4733a7b5e11a734f699eeb" proved="true" expanded="true" shape="ainfix =V4apowerV0V1Iainfix >V2c0NIainfix =ainfix *V4apowerV3V2apowerV0V1Aainfix <=c0V2FFFIainfix <=c0V1FF">
       <transf name="split_goal" proved="true" expanded="true">
-       <goal name="WP_parameter fast_exp_imperative.6.1" expl="normal postcondition" sum="1188bf6aeb0550bd28c229056071e3dc" proved="true" expanded="true" shape="ainfix =V4apowerV0V1Iainfix >V2c0NIainfix =ainfix *V4apowerV3V2apowerV0V1Aainfix <=c0V2FFFIainfix <=c0V1FF">
+       <goal name="WP_parameter fast_exp_imperative.6.1" expl="normal postcondition" sum="cd7bfa281c4733a7b5e11a734f699eeb" proved="true" expanded="true" shape="ainfix =V4apowerV0V1Iainfix >V2c0NIainfix =ainfix *V4apowerV3V2apowerV0V1Aainfix <=c0V2FFFIainfix <=c0V1FF">
         <proof prover="cvc3" timelimit="5" edited="" obsolete="false">
-         <result status="valid" time="0.02"/>
+         <result status="valid" time="0.00"/>
         </proof>
         <proof prover="alt-ergo" timelimit="5" edited="" obsolete="false">
-         <result status="valid" time="0.03"/>
+         <result status="valid" time="0.02"/>
         </proof>
        </goal>
       </transf>

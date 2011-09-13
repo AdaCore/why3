@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
-<why3session name="examples/check-builtin/int/why3session.xml">
+<why3session name="check-builtin/int/why3session.xml">
  <prover id="alt-ergo" name="Alt-Ergo" version="0.93"/>
  <prover id="coq" name="Coq" version="8.3pl2"/>
  <prover id="cvc3" name="CVC3" version="2.2"/>
@@ -12,7 +12,63 @@
  <prover id="z3" name="Z3" version="2.19"/>
  <file name="../int.why" verified="true" expanded="true">
   <theory name="Test" verified="true" expanded="true">
-   <goal name="G1" sum="d5111159f39ad797db77ad7e2d80a226" proved="true" expanded="true" shape="ainfix =ainfix *c5c10c50">
+   <goal name="G1" sum="f3b088189b6d1cad40811addc4d6803a" proved="true" expanded="true" shape="ainfix =ainfix *c5c10c50">
+    <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof prover="z3" timelimit="10" edited="" obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof prover="spass" timelimit="10" edited="" obsolete="false">
+     <result status="timeout" time="10.13"/>
+    </proof>
+   </goal>
+   <goal name="G2" sum="dc89477693660d3b4d1752799ab3ad92" proved="true" expanded="true" shape="ainfix =ainfix +ainfix -ainfix +V0V0V0V0ainfix *c2V0F">
+    <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof prover="z3" timelimit="10" edited="" obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof prover="spass" timelimit="10" edited="" obsolete="false">
+     <result status="timeout" time="10.05"/>
+    </proof>
+   </goal>
+   <goal name="CompatOrderAdd" sum="995e98cb6b1a9efa72903110d4a87568" proved="true" expanded="true" shape="ainfix <=ainfix +V0V2ainfix +V1V2Iainfix <=V0V1F">
+    <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof prover="z3" timelimit="10" edited="" obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof prover="spass" timelimit="10" edited="" obsolete="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+   <goal name="CompatOrderMult" sum="bf32d6e38f083eb3b1b4122103d07ed0" proved="true" expanded="true" shape="ainfix <=ainfix *V0V2ainfix *V1V2Iainfix <=c0V2Iainfix <=V0V1F">
+    <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof prover="z3" timelimit="10" edited="" obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof prover="spass" timelimit="10" edited="" obsolete="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+   <goal name="InvMult" sum="0b46a39680d5f67d5f93c4c8f5b9804f" proved="true" expanded="true" shape="ainfix =aprefix -ainfix *V0V1ainfix *V0aprefix -V1Aainfix =ainfix *aprefix -V0V1aprefix -ainfix *V0V1F">
     <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
      <result status="valid" time="0.00"/>
     </proof>
@@ -26,7 +82,21 @@
      <result status="timeout" time="10.03"/>
     </proof>
    </goal>
-   <goal name="G2" sum="8dc6e7f38fd1fb7946a1212c89ba402d" proved="true" expanded="true" shape="ainfix =ainfix +ainfix -ainfix +V0V0V0V0ainfix *c2V0F">
+   <goal name="InvSquare" sum="691e3b9ce7e619beb48133aec4131a7f" proved="true" expanded="true" shape="ainfix =ainfix *V0V0ainfix *aprefix -V0aprefix -V0F">
+    <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof prover="z3" timelimit="10" edited="" obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof prover="spass" timelimit="10" edited="" obsolete="false">
+     <result status="timeout" time="10.18"/>
+    </proof>
+   </goal>
+   <goal name="ZeroMult" sum="160be6da3ce1512d4399229ce0fce605" proved="true" expanded="true" shape="ainfix =c0ainfix *c0V0Aainfix =ainfix *V0c0c0F">
     <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
      <result status="valid" time="0.00"/>
     </proof>
@@ -37,24 +107,10 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof prover="spass" timelimit="10" edited="" obsolete="false">
-     <result status="timeout" time="10.08"/>
+     <result status="timeout" time="10.06"/>
     </proof>
    </goal>
-   <goal name="CompatOrderAdd" sum="9385e56939c8dc201584ea4f3d9bc4af" proved="true" expanded="true" shape="ainfix <=ainfix +V0V2ainfix +V1V2Iainfix <=V0V1F">
-    <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof prover="z3" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof prover="spass" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-   </goal>
-   <goal name="CompatOrderMult" sum="b98fa9a55f2216428fda1a415944f990" proved="true" expanded="true" shape="ainfix <=ainfix *V0V2ainfix *V1V2Iainfix <=c0V2Iainfix <=V0V1F">
+   <goal name="SquareNonNeg1" sum="eeb4337e8e41c2167d24509f78284afb" proved="true" expanded="true" shape="ainfix <=c0ainfix *V0V0Iainfix <=V0c0F">
     <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
      <result status="valid" time="0.00"/>
     </proof>
@@ -65,10 +121,10 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof prover="spass" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.01"/>
+     <result status="timeout" time="10.26"/>
     </proof>
    </goal>
-   <goal name="InvMult" sum="1bfe3b11addac18ebecd101596d63095" proved="true" expanded="true" shape="ainfix =aprefix -ainfix *V0V1ainfix *V0aprefix -V1Aainfix =ainfix *aprefix -V0V1aprefix -ainfix *V0V1F">
+   <goal name="SquareNonNeg" sum="2979802203c80db522016836bcf336a5" proved="true" expanded="true" shape="ainfix <=c0ainfix *V0V0F">
     <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
      <result status="valid" time="0.00"/>
     </proof>
@@ -79,10 +135,10 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof prover="spass" timelimit="10" edited="" obsolete="false">
-     <result status="timeout" time="9.99"/>
+     <result status="timeout" time="10.00"/>
     </proof>
    </goal>
-   <goal name="InvSquare" sum="1b594a6b60e183e594b00faf939fcc3f" proved="true" expanded="true" shape="ainfix =ainfix *V0V0ainfix *aprefix -V0aprefix -V0F">
+   <goal name="ZeroLessOne" sum="07a7198a41094f338830d92f862e0e1a" proved="true" expanded="true" shape="ainfix <=c0c1">
     <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
      <result status="valid" time="0.00"/>
     </proof>
@@ -93,68 +149,12 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof prover="spass" timelimit="10" edited="" obsolete="false">
-     <result status="timeout" time="10.03"/>
-    </proof>
-   </goal>
-   <goal name="ZeroMult" sum="27316fd57c9735adb22695569bcb11a0" proved="true" expanded="true" shape="ainfix =c0ainfix *c0V0Aainfix =ainfix *V0c0c0F">
-    <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof prover="z3" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof prover="spass" timelimit="10" edited="" obsolete="false">
-     <result status="timeout" time="10.04"/>
-    </proof>
-   </goal>
-   <goal name="SquareNonNeg1" sum="70ded199aa475245ae7cdcf94f7d1da3" proved="true" expanded="true" shape="ainfix <=c0ainfix *V0V0Iainfix <=V0c0F">
-    <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof prover="z3" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof prover="spass" timelimit="10" edited="" obsolete="false">
-     <result status="timeout" time="9.98"/>
-    </proof>
-   </goal>
-   <goal name="SquareNonNeg" sum="12fd5ee57cbbcb48649ccac8dfc81690" proved="true" expanded="true" shape="ainfix <=c0ainfix *V0V0F">
-    <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof prover="z3" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof prover="spass" timelimit="10" edited="" obsolete="false">
-     <result status="timeout" time="10.03"/>
-    </proof>
-   </goal>
-   <goal name="ZeroLessOne" sum="bdbf802a95888bb77a6252cc1cb557f7" proved="true" expanded="true" shape="ainfix <=c0c1">
-    <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof prover="z3" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof prover="spass" timelimit="10" edited="" obsolete="false">
-     <result status="timeout" time="9.98"/>
+     <result status="timeout" time="10.01"/>
     </proof>
    </goal>
   </theory>
   <theory name="MinMax" verified="true" expanded="true">
-   <goal name="G" sum="5ae270cf2070b36d0278c96a283e2a4d" proved="true" expanded="true" shape="ainfix =aminc1aminc3c2c1">
+   <goal name="G" sum="977fcbebad29e171c02a891ed8dac707" proved="true" expanded="true" shape="ainfix =aminc1aminc3c2c1">
     <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
      <result status="valid" time="0.00"/>
     </proof>
@@ -162,10 +162,10 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof prover="z3" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.00"/>
     </proof>
     <proof prover="spass" timelimit="10" edited="" obsolete="false">
-     <result status="timeout" time="10.21"/>
+     <result status="timeout" time="10.22"/>
     </proof>
    </goal>
   </theory>
