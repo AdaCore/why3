@@ -28,11 +28,11 @@ val mul : x:single -> y:single ->
 
 
 lemma method_error
-    "expl:user lemma"
-    #"my_cosine.c" 1 1 100#
+    "expl:Lemma method_error"
+    #"my_cosine.c" 1 4 111#
     :
-    "expl:user lemma, the formula"
-    #"my_cosine.c" 1 24 80#
+    "expl:the formula"
+    #"my_cosine.c" 1 24 110#
     forall x:real.
     abs x  <=. 0x1p-5 -> abs (1.0 -. x*.x*.0.5 -. cos x) <=. 0x1p-24
 
@@ -60,6 +60,6 @@ end
 
 (*
 Local Variables:
-compile-command: "../../bin/why3ide.byte my_cosine.mlw"
+compile-command: "../bin/why3ide.byte my_cosine.mlw"
 End:
 *)

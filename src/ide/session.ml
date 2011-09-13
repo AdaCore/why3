@@ -595,6 +595,8 @@ let schedule_edit_proof ~debug:_ ~editor ~file ~driver ~callback goal =
 (**********************)
 
 let task_checksum t =
+  (* TODO: ignore print_locs and print_labels flag *)
+  (* even better: compute check_sum directly, similar to the shape *)
   fprintf str_formatter "%a@." Pretty.print_task t;
   let s = flush_str_formatter () in
 (*

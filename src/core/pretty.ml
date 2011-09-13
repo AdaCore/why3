@@ -197,21 +197,21 @@ let print_loc fmt l =
 
 let print_ident_labels fmt id =
   if Debug.test_flag debug_print_labels && id.id_label <> [] then
-    fprintf fmt " %a" (print_list space print_label) id.id_label;
+    fprintf fmt "@ %a" (print_list space print_label) id.id_label;
   if Debug.test_flag debug_print_locs then
-    Util.option_iter (fprintf fmt " %a" print_loc) id.id_loc
+    Util.option_iter (fprintf fmt "@ %a" print_loc) id.id_loc
 
 let rec print_term fmt t = print_lterm 0 fmt t
 
 and print_lterm pri fmt t =
   let print_tlab pri fmt t =
     if Debug.test_flag debug_print_labels && t.t_label <> []
-    then fprintf fmt (protect_on (pri > 0) "%a %a")
+    then fprintf fmt (protect_on (pri > 0) "@[<hov 0>%a@ %a@]")
       (print_list space print_label) t.t_label (print_tnode 0) t
     else print_tnode pri fmt t in
   let print_tloc pri fmt t =
     if Debug.test_flag debug_print_locs && t.t_loc <> None
-    then fprintf fmt (protect_on (pri > 0) "%a %a")
+    then fprintf fmt (protect_on (pri > 0) "@[<hov 0>%a@ %a@]")
       (print_option print_loc) t.t_loc (print_tlab 0) t
     else print_tlab pri fmt t in
   print_tloc pri fmt t
@@ -226,7 +226,7 @@ and print_app pri ls fmt tl = match extract_op ls, tl with
       fprintf fmt (protect_on (pri > 4) "%s %a")
         s (print_lterm 5) t1
   | Some s, [t1;t2] ->
-      fprintf fmt (protect_on (pri > 4) "%a %s@ %a")
+      fprintf fmt (protect_on (pri > 4) "@[<hov 1>%a %s@ %a@]")
         (print_lterm 5) t1 s (print_lterm 5) t2
   | _, [t1;t2] when ls.ls_name.id_string = "mixfix []" ->
       fprintf fmt (protect_on (pri > 6) "%a[%a]")
@@ -235,7 +235,7 @@ and print_app pri ls fmt tl = match extract_op ls, tl with
       fprintf fmt (protect_on (pri > 6) "%a[%a <- %a]")
         (print_lterm 6) t1 (print_lterm 5) t2 (print_lterm 5) t3
   | _, tl ->
-      fprintf fmt (protect_on (pri > 5) "%a@ %a")
+      fprintf fmt (protect_on (pri > 5) "@[<hov 1>%a@ %a@]")
         print_ls ls (print_list space (print_lterm 6)) tl
 
 and print_tnode pri fmt t = match t.t_node with
@@ -268,7 +268,7 @@ and print_tnode pri fmt t = match t.t_node with
       forget_var v
   | Tquant (q,fq) ->
       let vl,tl,f = t_open_quant fq in
-      fprintf fmt (protect_on (pri > 0) "%a %a%a.@ %a") print_quant q
+      fprintf fmt (protect_on (pri > 0) "@[<hov 1>%a %a%a.@ %a@]") print_quant q
         (print_list comma print_vsty) vl print_tl tl print_term f;
       List.iter forget_var vl
   | Ttrue ->
@@ -278,7 +278,7 @@ and print_tnode pri fmt t = match t.t_node with
   | Tbinop (b,f1,f2) ->
       let asym = List.mem Term.asym_label t.t_label in
       let p = prio_binop b in
-      fprintf fmt (protect_on (pri > p) "%a %a@ %a")
+      fprintf fmt (protect_on (pri > p) "@[<hov 1>%a %a@ %a@]")
         (print_lterm (p + 1)) f1 (print_binop ~asym) b (print_lterm p) f2
   | Tnot f ->
       fprintf fmt (protect_on (pri > 4) "not %a") (print_lterm 4) f
@@ -348,7 +348,7 @@ let print_logic_decl fst fmt (ls,ld) = match ld with
 let print_logic_decl fst fmt d = print_logic_decl fst fmt d; forget_tvs ()
 
 let print_ind fmt (pr,f) =
-  fprintf fmt "@[<hov 4>| %a%a : %a@]"
+  fprintf fmt "@[<hov 4>| %a%a :@ %a@]"
     print_pr pr print_ident_labels pr.pr_name print_term f
 
 let print_ind_decl fst fmt (ps,bl) =
@@ -367,7 +367,7 @@ let sprint_pkind = function
 let print_pkind fmt k = pp_print_string fmt (sprint_pkind k)
 
 let print_prop_decl fmt (k,pr,f) =
-  fprintf fmt "@[<hov 2>%a %a%a : %a@]" print_pkind k
+  fprintf fmt "@[<hov 2>%a %a%a :@ %a@]" print_pkind k
     print_pr pr print_ident_labels pr.pr_name print_term f;
   forget_tvs ()
 
