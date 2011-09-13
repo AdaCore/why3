@@ -26,6 +26,9 @@ open Pretty
 open Pgm_types.T
 open Pgm_ttree
 
+let debug_print_labels = Debug.register_flag "print_labels"
+let debug_print_locs = Debug.register_flag "print_locs"
+
 (* pretty-printing (for debugging) *)
 
 let rec print_expr fmt e = match e.expr_desc with
@@ -46,11 +49,11 @@ let rec print_expr fmt e = match e.expr_desc with
   | Elet (v, e1, e2) ->
       fprintf fmt "@[<hv 0>@[<hov 2>let %a/%a =@ %a in@]@ %a@]"
         print_vs v.pv_effect print_vs v.pv_pure
-        print_expr e1 print_expr e2
+        print_lexpr e1 print_lexpr e2
 
   | Eif (e1, e2, e3) ->
       fprintf fmt "@[if %a@ then@ %a else@ %a@]"
-        print_expr e1 print_expr e2 print_expr e3
+        print_lexpr e1 print_lexpr e2 print_lexpr e3
 
   | Eany c ->
       fprintf fmt "@[[any %a]@]" print_type_c c
@@ -60,7 +63,7 @@ let rec print_expr fmt e = match e.expr_desc with
   | Eassert (_, f) ->
       fprintf fmt "@[assert {%a}@]" print_term f
   | Efor (_, _, _, _, _, e) ->
-      fprintf fmt "@[<hov 2>for ... do@ %a@ done@]" print_expr e
+      fprintf fmt "@[<hov 2>for ... do@ %a@ done@]" print_lexpr e
   | Etry (_, _) ->
       fprintf fmt "<todo: Etry>"
   | Eraise (_, _)  ->
@@ -74,6 +77,19 @@ let rec print_expr fmt e = match e.expr_desc with
       fprintf fmt "<todo: Eletrec>"
   | Eabsurd ->
       fprintf fmt "absurd"
+
+and print_lexpr fmt e =
+  let print_elab fmt e =
+    if Debug.test_flag debug_print_labels && e.expr_lab <> []
+    then fprintf fmt "@[<hov 0>%a@ %a@]"
+      (print_list space print_label) e.expr_lab print_expr e
+    else print_expr fmt e in
+  let print_eloc fmt e =
+    if Debug.test_flag debug_print_locs
+    then fprintf fmt "@[<hov 0>%a@ %a@]"
+      print_loc e.expr_loc print_elab e
+    else print_elab fmt e in
+  print_eloc fmt e
 
 and print_pv fmt v =
   fprintf fmt "<@[%a@]>" print_vsty v.pv_effect
