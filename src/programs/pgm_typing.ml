@@ -410,6 +410,7 @@ and dexpr_desc ~ghost env loc = function
         with Not_found ->
           errorm ~loc "unbound symbol %a" print_qualid p
       in
+      if ls_equal ls fs_old then errorm ~loc "old not allowed in programs";
       let ps = get_psymbol ls in
       begin match ps.ps_kind with
         | PSvar v ->
