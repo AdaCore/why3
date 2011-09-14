@@ -1,83 +1,89 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
-<why3session name="examples/programs/vstte10_inverting/why3session.xml">
+<why3session name="programs/vstte10_inverting/why3session.xml">
+ <prover id="alt-ergo" name="Alt-Ergo" version="0.93"/>
+ <prover id="coq" name="Coq" version="8.2pl1"/>
+ <prover id="cvc3" name="CVC3" version="2.2"/>
+ <prover id="gappa" name="Gappa" version="0.13.0"/>
+ <prover id="simplify" name="Simplify" version="1.5.4"/>
+ <prover id="z3" name="Z3" version="2.19"/>
  <file name="../vstte10_inverting.mlw" verified="true" expanded="false">
   <theory name="WP InvertingAnInjection" verified="true" expanded="false">
-   <goal name="WP_parameter inverting" expl="correctness of parameter inverting" sum="980fccd748af7718224314003d53e55d" proved="true" expanded="false">
+   <goal name="WP_parameter inverting" expl="parameter inverting" sum="0b65fa707a4de77d5e5392c95e70f874" proved="true" expanded="false" shape="ainjectiveV5V2Iainfix =agetV5agetV4V6V6Iainfix <V6ainfix +ainfix -V2c1c1Aainfix <=c0V6FALagetV4V7ainfix =agetV9agetV4V10V10Iainfix <V10ainfix +V7c1Aainfix <=c0V10FIainfix =V9asetV5V8V7FAainfix <V8V1Aainfix <=c0V8Aainfix <V7V0Aainfix <=c0V7Iainfix =agetV5agetV4V11V11Iainfix <V11V7Aainfix <=c0V11FIainfix <=V7ainfix -V2c1Aainfix <=c0V7FFAainfix =agetV3agetV4V12V12Iainfix <V12c0Aainfix <=c0V12FIainfix <=c0ainfix -V2c1AainjectiveV3V2Iainfix >c0ainfix -V2c1IarangeV4V2AainjectiveV4V2Aainfix =V0V1Aainfix =V2V0Aainfix <=c0V2FFFFF">
     <transf name="split_goal" proved="true" expanded="false">
-     <goal name="WP_parameter inverting.1" expl="normal postcondition" sum="af95175c907eda27c8bed22d133417fa" proved="true" expanded="false">
+     <goal name="WP_parameter inverting.1" expl="normal postcondition" sum="50d4a0a10b51cc7fa3c38b659e6a32b6" proved="true" expanded="false" shape="ainjectiveV3V2Iainfix >c0ainfix -V2c1IarangeV4V2AainjectiveV4V2Aainfix =V0V1Aainfix =V2V0Aainfix <=c0V2FFFFF">
       <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter inverting.2" expl="for loop initialization" sum="812ed07d552bd033ba666c96021220b5" proved="true" expanded="false">
+     <goal name="WP_parameter inverting.2" expl="for loop initialization" sum="1be6e47beca57ed0c14b988de1da4a57" proved="true" expanded="false" shape="ainfix =agetV3agetV4V5V5Iainfix <V5c0Aainfix <=c0V5FIainfix <=c0ainfix -V2c1IarangeV4V2AainjectiveV4V2Aainfix =V0V1Aainfix =V2V0Aainfix <=c0V2FFFFF">
       <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter inverting.3" expl="for loop preservation" sum="fde94357bf0f4e4a1191f99b37d8a064" proved="true" expanded="false">
+     <goal name="WP_parameter inverting.3" expl="for loop preservation" sum="c79e172d72eff345b6d913ba9d407c1d" proved="true" expanded="false" shape="LagetV4V6ainfix =agetV8agetV4V9V9Iainfix <V9ainfix +V6c1Aainfix <=c0V9FIainfix =V8asetV5V7V6FAainfix <V7V1Aainfix <=c0V7Aainfix <V6V0Aainfix <=c0V6Iainfix =agetV5agetV4V10V10Iainfix <V10V6Aainfix <=c0V10FIainfix <=V6ainfix -V2c1Aainfix <=c0V6FFIainfix <=c0ainfix -V2c1IarangeV4V2AainjectiveV4V2Aainfix =V0V1Aainfix =V2V0Aainfix <=c0V2FFFFF">
       <proof prover="cvc3" timelimit="20" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.03"/>
       </proof>
      </goal>
-     <goal name="WP_parameter inverting.4" expl="normal postcondition" sum="2d9f7006e44a95b4e9b51046b6c3d712" proved="true" expanded="false">
+     <goal name="WP_parameter inverting.4" expl="normal postcondition" sum="435338e7b8fd56112a0a1bbc58cc19ca" proved="true" expanded="false" shape="ainjectiveV5V2Iainfix =agetV5agetV4V6V6Iainfix <V6ainfix +ainfix -V2c1c1Aainfix <=c0V6FFIainfix <=c0ainfix -V2c1IarangeV4V2AainjectiveV4V2Aainfix =V0V1Aainfix =V2V0Aainfix <=c0V2FFFFF">
       <proof prover="coq" timelimit="10" edited="vstte10_inverting_WP_InvertingAnInjection_WP_parameter_inverting_1.v" obsolete="false">
-       <result status="valid" time="0.53"/>
+       <result status="valid" time="0.48"/>
       </proof>
      </goal>
     </transf>
    </goal>
-   <goal name="WP_parameter inverting2" expl="correctness of parameter inverting2" sum="ae3f251d70978877f246c5b725980ee8" proved="true" expanded="false">
+   <goal name="WP_parameter inverting2" expl="parameter inverting2" sum="fac2a933b9538e399e964fc7a1831f76" proved="true" expanded="false" shape="ainfix =agetV3agetV2V4V4Iainfix <V4V1Aainfix <=c0V4FAainjectiveV3V1Aainfix =V1V1Iainfix =agetV3agetV2V5V5Iainfix <V5ainfix +ainfix -V1c1c1Aainfix <=c0V5FALagetV2V6ainfix =agetV8agetV2V9V9Iainfix <V9ainfix +V6c1Aainfix <=c0V9FIainfix =V8asetV3V7V6FAainfix <V7V1Aainfix <=c0V7Aainfix <V6V0Aainfix <=c0V6Iainfix =agetV3agetV2V10V10Iainfix <V10V6Aainfix <=c0V10FIainfix <=V6ainfix -V1c1Aainfix <=c0V6FFAainfix =agetaconstc0agetV2V11V11Iainfix <V11c0Aainfix <=c0V11FIainfix <=c0ainfix -V1c1Aainfix =agetaconstc0agetV2V12V12Iainfix <V12V1Aainfix <=c0V12FAainjectiveaconstc0V1Aainfix =V1V1Iainfix >c0ainfix -V1c1Aainfix >=V1c0IarangeV2V1AainjectiveV2V1Aainfix =V1V0Aainfix <=c0V1FFF">
     <transf name="split_goal" proved="true" expanded="false">
-     <goal name="WP_parameter inverting2.1" expl="precondition" sum="1a632e8017b09a42fbebd7cc4d0fbedb" proved="true" expanded="false">
+     <goal name="WP_parameter inverting2.1" expl="precondition" sum="b34a478953e23fcb5c29e6ca2087de22" proved="true" expanded="false" shape="ainfix >=V1c0IarangeV2V1AainjectiveV2V1Aainfix =V1V0Aainfix <=c0V1FFF">
+      <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter inverting2.2" expl="normal postcondition" sum="02e793ba0366b1d2184b81efe9a735ca" proved="true" expanded="false" shape="ainfix =agetaconstc0agetV2V3V3Iainfix <V3V1Aainfix <=c0V3FAainjectiveaconstc0V1Aainfix =V1V1Iainfix >c0ainfix -V1c1Iainfix >=V1c0IarangeV2V1AainjectiveV2V1Aainfix =V1V0Aainfix <=c0V1FFF">
       <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter inverting2.2" expl="normal postcondition" sum="734b05a52041792bcb83d88958e89133" proved="true" expanded="false">
+     <goal name="WP_parameter inverting2.3" expl="for loop initialization" sum="48eb51572a71cf19b41118e700df0a9b" proved="true" expanded="false" shape="ainfix =agetaconstc0agetV2V3V3Iainfix <V3c0Aainfix <=c0V3FIainfix <=c0ainfix -V1c1Iainfix >=V1c0IarangeV2V1AainjectiveV2V1Aainfix =V1V0Aainfix <=c0V1FFF">
       <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal name="WP_parameter inverting2.3" expl="for loop initialization" sum="0517baa9d199f42b4e89f8657497ef0f" proved="true" expanded="false">
-      <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter inverting2.4" expl="for loop preservation" sum="dbc8bddb3879ab120d1225e5a7e67978" proved="true" expanded="false">
+     <goal name="WP_parameter inverting2.4" expl="for loop preservation" sum="44c258cb0a9558599efd737fdea055d7" proved="true" expanded="false" shape="LagetV2V4ainfix =agetV6agetV2V7V7Iainfix <V7ainfix +V4c1Aainfix <=c0V7FIainfix =V6asetV3V5V4FAainfix <V5V1Aainfix <=c0V5Aainfix <V4V0Aainfix <=c0V4Iainfix =agetV3agetV2V8V8Iainfix <V8V4Aainfix <=c0V8FIainfix <=V4ainfix -V1c1Aainfix <=c0V4FFIainfix <=c0ainfix -V1c1Iainfix >=V1c0IarangeV2V1AainjectiveV2V1Aainfix =V1V0Aainfix <=c0V1FFF">
       <transf name="split_goal" proved="true" expanded="false">
-       <goal name="WP_parameter inverting2.4.1" expl="for loop preservation" sum="88bfba5fb8186f9ac401e78900bb2ca7" proved="true" expanded="false">
+       <goal name="WP_parameter inverting2.4.1" expl="for loop preservation" sum="658a530e59a2f42bad98fda8173a1977" proved="true" expanded="false" shape="ainfix <V4V0Aainfix <=c0V4Iainfix =agetV3agetV2V5V5Iainfix <V5V4Aainfix <=c0V5FIainfix <=V4ainfix -V1c1Aainfix <=c0V4FFIainfix <=c0ainfix -V1c1Iainfix >=V1c0IarangeV2V1AainjectiveV2V1Aainfix =V1V0Aainfix <=c0V1FFF">
         <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.03"/>
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
-       <goal name="WP_parameter inverting2.4.2" expl="for loop preservation" sum="536c3a75e6ccba2cc9b24631c11dd7cb" proved="true" expanded="false">
+       <goal name="WP_parameter inverting2.4.2" expl="for loop preservation" sum="69c29754f143cb0879e49d21dd72a639" proved="true" expanded="false" shape="LagetV2V4ainfix <V5V1Aainfix <=c0V5Iainfix <V4V0Aainfix <=c0V4Iainfix =agetV3agetV2V6V6Iainfix <V6V4Aainfix <=c0V6FIainfix <=V4ainfix -V1c1Aainfix <=c0V4FFIainfix <=c0ainfix -V1c1Iainfix >=V1c0IarangeV2V1AainjectiveV2V1Aainfix =V1V0Aainfix <=c0V1FFF">
         <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
          <result status="valid" time="0.02"/>
         </proof>
        </goal>
-       <goal name="WP_parameter inverting2.4.3" expl="for loop preservation" sum="5839f26b7df342f5108b764daff30cf6" proved="true" expanded="false">
+       <goal name="WP_parameter inverting2.4.3" expl="for loop preservation" sum="65e2545702748c085eb7dc74c7c69d0b" proved="true" expanded="false" shape="LagetV2V4ainfix =agetV6agetV2V7V7Iainfix <V7ainfix +V4c1Aainfix <=c0V7FIainfix =V6asetV3V5V4FIainfix <V5V1Aainfix <=c0V5Iainfix <V4V0Aainfix <=c0V4Iainfix =agetV3agetV2V8V8Iainfix <V8V4Aainfix <=c0V8FIainfix <=V4ainfix -V1c1Aainfix <=c0V4FFIainfix <=c0ainfix -V1c1Iainfix >=V1c0IarangeV2V1AainjectiveV2V1Aainfix =V1V0Aainfix <=c0V1FFF">
         <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
          <result status="valid" time="0.02"/>
         </proof>
        </goal>
       </transf>
      </goal>
-     <goal name="WP_parameter inverting2.5" expl="normal postcondition" sum="0bd93b96392bed2fbe5c4fa716f7911f" proved="true" expanded="false">
+     <goal name="WP_parameter inverting2.5" expl="normal postcondition" sum="2053209963edc888e548d0f99676de4d" proved="true" expanded="false" shape="ainfix =agetV3agetV2V4V4Iainfix <V4V1Aainfix <=c0V4FAainjectiveV3V1Aainfix =V1V1Iainfix =agetV3agetV2V5V5Iainfix <V5ainfix +ainfix -V1c1c1Aainfix <=c0V5FFIainfix <=c0ainfix -V1c1Iainfix >=V1c0IarangeV2V1AainjectiveV2V1Aainfix =V1V0Aainfix <=c0V1FFF">
       <transf name="split_goal" proved="true" expanded="false">
-       <goal name="WP_parameter inverting2.5.1" expl="correctness of parameter inverting2" sum="a1f5aba129bf8b1dfd73299f09ce20a2" proved="true" expanded="false">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter inverting2.5.2" expl="correctness of parameter inverting2" sum="8a6e0e742d146873c09d0753088c3fef" proved="true" expanded="false">
-        <proof prover="coq" timelimit="10" edited="vstte10_inverting_WP_InvertingAnInjection_WP_parameter_inverting2_2.v" obsolete="false">
-         <result status="valid" time="0.52"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter inverting2.5.3" expl="correctness of parameter inverting2" sum="f0064026f5a092d054cb1b89980f4ec6" proved="true" expanded="false">
+       <goal name="WP_parameter inverting2.5.1" expl="parameter inverting2" sum="860e2f29e39a71e6e5b3cda16e644a34" proved="true" expanded="false" shape="ainfix =V1V1Iainfix =agetV3agetV2V4V4Iainfix <V4ainfix +ainfix -V1c1c1Aainfix <=c0V4FFIainfix <=c0ainfix -V1c1Iainfix >=V1c0IarangeV2V1AainjectiveV2V1Aainfix =V1V0Aainfix <=c0V1FFF">
         <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
          <result status="valid" time="0.03"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter inverting2.5.2" expl="parameter inverting2" sum="3c6b9fa87db0ff6fffa5bb89b7fe9fe4" proved="true" expanded="false" shape="ainjectiveV3V1Iainfix =agetV3agetV2V4V4Iainfix <V4ainfix +ainfix -V1c1c1Aainfix <=c0V4FFIainfix <=c0ainfix -V1c1Iainfix >=V1c0IarangeV2V1AainjectiveV2V1Aainfix =V1V0Aainfix <=c0V1FFF">
+        <proof prover="coq" timelimit="10" edited="vstte10_inverting_WP_InvertingAnInjection_WP_parameter_inverting2_2.v" obsolete="false">
+         <result status="valid" time="0.48"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter inverting2.5.3" expl="parameter inverting2" sum="e33dbbcbec5cc7b6119370a67057a969" proved="true" expanded="false" shape="ainfix =agetV3agetV2V4V4Iainfix <V4V1Aainfix <=c0V4FIainfix =agetV3agetV2V5V5Iainfix <V5ainfix +ainfix -V1c1c1Aainfix <=c0V5FFIainfix <=c0ainfix -V1c1Iainfix >=V1c0IarangeV2V1AainjectiveV2V1Aainfix =V1V0Aainfix <=c0V1FFF">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.00"/>
         </proof>
        </goal>
       </transf>
@@ -86,76 +92,76 @@
    </goal>
   </theory>
   <theory name="WP Test" verified="true" expanded="false">
-   <goal name="WP_parameter test" expl="correctness of parameter test" sum="b865713450434275733efb362364ab97" proved="true" expanded="false">
+   <goal name="WP_parameter test" expl="parameter test" sum="92fe7f6cf2206406d65c3cb4d61ff186" proved="true" expanded="false" shape="ainfix =agetV11c9c0Aainfix =agetV11c8c2Aainfix =agetV11c7c4Aainfix =agetV11c6c9Aainfix =agetV11c5c8Aainfix =agetV11c4c5Aainfix =agetV11c3c1Aainfix =agetV11c2c3Aainfix =agetV11c1c7Aainfix =agetV11c0c6Iainfix =agetV11agetV9V12V12Iainfix <V12c10Aainfix <=c0V12FAainjectiveV11c10Aainfix =V10c10FAarangeV9c10AainjectiveV9c10Aainfix =c10c10Aainfix <=c0c10Aainfix =agetV9c9c6Aainfix =agetV9c8c5Aainfix =agetV9c7c1Aainfix =agetV9c6c0Aainfix =agetV9c5c4Aainfix =agetV9c4c7Aainfix =agetV9c3c2Aainfix =agetV9c2c8Aainfix =agetV9c1c3Aainfix =agetV9c0c9Iainfix =V9asetV8c9c6FAainfix <c9c10Aainfix <=c0c9Iainfix =V8asetV7c8c5FAainfix <c8c10Aainfix <=c0c8Iainfix =V7asetV6c7c1FAainfix <c7c10Aainfix <=c0c7Iainfix =V6asetV5c6c0FAainfix <c6c10Aainfix <=c0c6Iainfix =V5asetV4c5c4FAainfix <c5c10Aainfix <=c0c5Iainfix =V4asetV3c4c7FAainfix <c4c10Aainfix <=c0c4Iainfix =V3asetV2c3c2FAainfix <c3c10Aainfix <=c0c3Iainfix =V2asetV1c2c8FAainfix <c2c10Aainfix <=c0c2Iainfix =V1asetV0c1c3FAainfix <c1c10Aainfix <=c0c1Iainfix =V0asetaconstc0c0c9FAainfix <c0c10Aainfix <=c0c0Aainfix >=c10c0">
     <transf name="split_goal" proved="true" expanded="false">
-     <goal name="WP_parameter test.1" expl="precondition" sum="9fb1af9e0deff91788d9930ce123ff6c" proved="true" expanded="false">
+     <goal name="WP_parameter test.1" expl="precondition" sum="f8339ab5ca32e63290ab437fb6ca941f" proved="true" expanded="false" shape="ainfix >=c10c0">
+      <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter test.2" expl="precondition" sum="9b55d1c63c4650311ba205c57cc49483" proved="true" expanded="false" shape="ainfix <c0c10Aainfix <=c0c0Iainfix >=c10c0">
       <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal name="WP_parameter test.2" expl="precondition" sum="951cadb015ae7348cb9838b03309f125" proved="true" expanded="false">
-      <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter test.3" expl="precondition" sum="e6ebb8dd62b34b9e94404f7510828b2f" proved="true" expanded="false">
-      <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter test.4" expl="precondition" sum="babec0e876fed28020ba36197c7468f1" proved="true" expanded="false">
-      <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter test.5" expl="precondition" sum="680a7ac857d8349e13e2ee77385dfd69" proved="true" expanded="false">
-      <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter test.6" expl="precondition" sum="5dfb8bd098d9910b93dd8733103baf86" proved="true" expanded="false">
-      <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter test.7" expl="precondition" sum="3b73d53004ae23496ec818e13897368d" proved="true" expanded="false">
-      <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter test.8" expl="precondition" sum="5be0aba369d072034724f66620aebd5a" proved="true" expanded="false">
-      <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter test.9" expl="precondition" sum="fe0b3bb31a15ac8e54a653b5d93d6d82" proved="true" expanded="false">
-      <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter test.10" expl="precondition" sum="c30cf0833d4442835292a34a9e525f75" proved="true" expanded="false">
-      <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter test.11" expl="precondition" sum="9cb999b94a4c2105b424d3d9dad949fd" proved="true" expanded="false">
+     <goal name="WP_parameter test.3" expl="precondition" sum="74ed4178abf9689f2697003c24ea23a6" proved="true" expanded="false" shape="ainfix <c1c10Aainfix <=c0c1Iainfix =V0asetaconstc0c0c9FIainfix <c0c10Aainfix <=c0c0Iainfix >=c10c0">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter test.12" expl="assertion" sum="bfcf703ccb3a4c174df31a633bf62dc8" proved="true" expanded="false">
+     <goal name="WP_parameter test.4" expl="precondition" sum="aede0688c88f6fc2e0f1880222e382b1" proved="true" expanded="false" shape="ainfix <c2c10Aainfix <=c0c2Iainfix =V1asetV0c1c3FIainfix <c1c10Aainfix <=c0c1Iainfix =V0asetaconstc0c0c9FIainfix <c0c10Aainfix <=c0c0Iainfix >=c10c0">
       <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-       <result status="valid" time="0.17"/>
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter test.13" expl="precondition" sum="b727beb95336ead2791535429dc041cb" proved="true" expanded="false">
+     <goal name="WP_parameter test.5" expl="precondition" sum="d7eceb5b51e23c7e7c00e0ebee0424d3" proved="true" expanded="false" shape="ainfix <c3c10Aainfix <=c0c3Iainfix =V2asetV1c2c8FIainfix <c2c10Aainfix <=c0c2Iainfix =V1asetV0c1c3FIainfix <c1c10Aainfix <=c0c1Iainfix =V0asetaconstc0c0c9FIainfix <c0c10Aainfix <=c0c0Iainfix >=c10c0">
       <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-       <result status="valid" time="0.58"/>
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter test.14" expl="assertion" sum="8053641cf122aa3b40ad1bc41794a04b" proved="true" expanded="false">
+     <goal name="WP_parameter test.6" expl="precondition" sum="5a4b0dee55116efde5283d7c83d674d0" proved="true" expanded="false" shape="ainfix <c4c10Aainfix <=c0c4Iainfix =V3asetV2c3c2FIainfix <c3c10Aainfix <=c0c3Iainfix =V2asetV1c2c8FIainfix <c2c10Aainfix <=c0c2Iainfix =V1asetV0c1c3FIainfix <c1c10Aainfix <=c0c1Iainfix =V0asetaconstc0c0c9FIainfix <c0c10Aainfix <=c0c0Iainfix >=c10c0">
       <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-       <result status="valid" time="0.20"/>
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter test.7" expl="precondition" sum="78c8673e1519f33e673a270a6cca3dac" proved="true" expanded="false" shape="ainfix <c5c10Aainfix <=c0c5Iainfix =V4asetV3c4c7FIainfix <c4c10Aainfix <=c0c4Iainfix =V3asetV2c3c2FIainfix <c3c10Aainfix <=c0c3Iainfix =V2asetV1c2c8FIainfix <c2c10Aainfix <=c0c2Iainfix =V1asetV0c1c3FIainfix <c1c10Aainfix <=c0c1Iainfix =V0asetaconstc0c0c9FIainfix <c0c10Aainfix <=c0c0Iainfix >=c10c0">
+      <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter test.8" expl="precondition" sum="f8bef57e824c602bb9252a620713dbd9" proved="true" expanded="false" shape="ainfix <c6c10Aainfix <=c0c6Iainfix =V5asetV4c5c4FIainfix <c5c10Aainfix <=c0c5Iainfix =V4asetV3c4c7FIainfix <c4c10Aainfix <=c0c4Iainfix =V3asetV2c3c2FIainfix <c3c10Aainfix <=c0c3Iainfix =V2asetV1c2c8FIainfix <c2c10Aainfix <=c0c2Iainfix =V1asetV0c1c3FIainfix <c1c10Aainfix <=c0c1Iainfix =V0asetaconstc0c0c9FIainfix <c0c10Aainfix <=c0c0Iainfix >=c10c0">
+      <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter test.9" expl="precondition" sum="d878aad7e43c2cdec386219499f9e893" proved="true" expanded="false" shape="ainfix <c7c10Aainfix <=c0c7Iainfix =V6asetV5c6c0FIainfix <c6c10Aainfix <=c0c6Iainfix =V5asetV4c5c4FIainfix <c5c10Aainfix <=c0c5Iainfix =V4asetV3c4c7FIainfix <c4c10Aainfix <=c0c4Iainfix =V3asetV2c3c2FIainfix <c3c10Aainfix <=c0c3Iainfix =V2asetV1c2c8FIainfix <c2c10Aainfix <=c0c2Iainfix =V1asetV0c1c3FIainfix <c1c10Aainfix <=c0c1Iainfix =V0asetaconstc0c0c9FIainfix <c0c10Aainfix <=c0c0Iainfix >=c10c0">
+      <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter test.10" expl="precondition" sum="36246e67a7ace680183479960c429bad" proved="true" expanded="false" shape="ainfix <c8c10Aainfix <=c0c8Iainfix =V7asetV6c7c1FIainfix <c7c10Aainfix <=c0c7Iainfix =V6asetV5c6c0FIainfix <c6c10Aainfix <=c0c6Iainfix =V5asetV4c5c4FIainfix <c5c10Aainfix <=c0c5Iainfix =V4asetV3c4c7FIainfix <c4c10Aainfix <=c0c4Iainfix =V3asetV2c3c2FIainfix <c3c10Aainfix <=c0c3Iainfix =V2asetV1c2c8FIainfix <c2c10Aainfix <=c0c2Iainfix =V1asetV0c1c3FIainfix <c1c10Aainfix <=c0c1Iainfix =V0asetaconstc0c0c9FIainfix <c0c10Aainfix <=c0c0Iainfix >=c10c0">
+      <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter test.11" expl="precondition" sum="7ae78585593c48f196457334c60c0c57" proved="true" expanded="false" shape="ainfix <c9c10Aainfix <=c0c9Iainfix =V8asetV7c8c5FIainfix <c8c10Aainfix <=c0c8Iainfix =V7asetV6c7c1FIainfix <c7c10Aainfix <=c0c7Iainfix =V6asetV5c6c0FIainfix <c6c10Aainfix <=c0c6Iainfix =V5asetV4c5c4FIainfix <c5c10Aainfix <=c0c5Iainfix =V4asetV3c4c7FIainfix <c4c10Aainfix <=c0c4Iainfix =V3asetV2c3c2FIainfix <c3c10Aainfix <=c0c3Iainfix =V2asetV1c2c8FIainfix <c2c10Aainfix <=c0c2Iainfix =V1asetV0c1c3FIainfix <c1c10Aainfix <=c0c1Iainfix =V0asetaconstc0c0c9FIainfix <c0c10Aainfix <=c0c0Iainfix >=c10c0">
+      <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter test.12" expl="assertion" sum="a15c867af713cfcfd570798454289728" proved="true" expanded="false" shape="ainfix =agetV9c9c6Aainfix =agetV9c8c5Aainfix =agetV9c7c1Aainfix =agetV9c6c0Aainfix =agetV9c5c4Aainfix =agetV9c4c7Aainfix =agetV9c3c2Aainfix =agetV9c2c8Aainfix =agetV9c1c3Aainfix =agetV9c0c9Iainfix =V9asetV8c9c6FIainfix <c9c10Aainfix <=c0c9Iainfix =V8asetV7c8c5FIainfix <c8c10Aainfix <=c0c8Iainfix =V7asetV6c7c1FIainfix <c7c10Aainfix <=c0c7Iainfix =V6asetV5c6c0FIainfix <c6c10Aainfix <=c0c6Iainfix =V5asetV4c5c4FIainfix <c5c10Aainfix <=c0c5Iainfix =V4asetV3c4c7FIainfix <c4c10Aainfix <=c0c4Iainfix =V3asetV2c3c2FIainfix <c3c10Aainfix <=c0c3Iainfix =V2asetV1c2c8FIainfix <c2c10Aainfix <=c0c2Iainfix =V1asetV0c1c3FIainfix <c1c10Aainfix <=c0c1Iainfix =V0asetaconstc0c0c9FIainfix <c0c10Aainfix <=c0c0Iainfix >=c10c0">
+      <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
+       <result status="valid" time="0.15"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter test.13" expl="precondition" sum="58737b5eb8201312f80f30bee8d469bf" proved="true" expanded="false" shape="arangeV9c10AainjectiveV9c10Aainfix =c10c10Aainfix <=c0c10Iainfix =agetV9c9c6Aainfix =agetV9c8c5Aainfix =agetV9c7c1Aainfix =agetV9c6c0Aainfix =agetV9c5c4Aainfix =agetV9c4c7Aainfix =agetV9c3c2Aainfix =agetV9c2c8Aainfix =agetV9c1c3Aainfix =agetV9c0c9Iainfix =V9asetV8c9c6FIainfix <c9c10Aainfix <=c0c9Iainfix =V8asetV7c8c5FIainfix <c8c10Aainfix <=c0c8Iainfix =V7asetV6c7c1FIainfix <c7c10Aainfix <=c0c7Iainfix =V6asetV5c6c0FIainfix <c6c10Aainfix <=c0c6Iainfix =V5asetV4c5c4FIainfix <c5c10Aainfix <=c0c5Iainfix =V4asetV3c4c7FIainfix <c4c10Aainfix <=c0c4Iainfix =V3asetV2c3c2FIainfix <c3c10Aainfix <=c0c3Iainfix =V2asetV1c2c8FIainfix <c2c10Aainfix <=c0c2Iainfix =V1asetV0c1c3FIainfix <c1c10Aainfix <=c0c1Iainfix =V0asetaconstc0c0c9FIainfix <c0c10Aainfix <=c0c0Iainfix >=c10c0">
+      <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
+       <result status="valid" time="0.48"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter test.14" expl="assertion" sum="dd42ba1a4464fda0f1d5b63d0ded3ae9" proved="true" expanded="false" shape="ainfix =agetV11c9c0Aainfix =agetV11c8c2Aainfix =agetV11c7c4Aainfix =agetV11c6c9Aainfix =agetV11c5c8Aainfix =agetV11c4c5Aainfix =agetV11c3c1Aainfix =agetV11c2c3Aainfix =agetV11c1c7Aainfix =agetV11c0c6Iainfix =agetV11agetV9V12V12Iainfix <V12c10Aainfix <=c0V12FAainjectiveV11c10Aainfix =V10c10FIarangeV9c10AainjectiveV9c10Aainfix =c10c10Aainfix <=c0c10Iainfix =agetV9c9c6Aainfix =agetV9c8c5Aainfix =agetV9c7c1Aainfix =agetV9c6c0Aainfix =agetV9c5c4Aainfix =agetV9c4c7Aainfix =agetV9c3c2Aainfix =agetV9c2c8Aainfix =agetV9c1c3Aainfix =agetV9c0c9Iainfix =V9asetV8c9c6FIainfix <c9c10Aainfix <=c0c9Iainfix =V8asetV7c8c5FIainfix <c8c10Aainfix <=c0c8Iainfix =V7asetV6c7c1FIainfix <c7c10Aainfix <=c0c7Iainfix =V6asetV5c6c0FIainfix <c6c10Aainfix <=c0c6Iainfix =V5asetV4c5c4FIainfix <c5c10Aainfix <=c0c5Iainfix =V4asetV3c4c7FIainfix <c4c10Aainfix <=c0c4Iainfix =V3asetV2c3c2FIainfix <c3c10Aainfix <=c0c3Iainfix =V2asetV1c2c8FIainfix <c2c10Aainfix <=c0c2Iainfix =V1asetV0c1c3FIainfix <c1c10Aainfix <=c0c1Iainfix =V0asetaconstc0c0c9FIainfix <c0c10Aainfix <=c0c0Iainfix >=c10c0">
+      <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
+       <result status="valid" time="0.16"/>
       </proof>
      </goal>
     </transf>

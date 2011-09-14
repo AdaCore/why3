@@ -880,7 +880,14 @@ let associate_subgoals gname old_goals new_goals =
      ordered by shapes, then by name *)
   let old_goals_without_pairing =
     Hashtbl.fold
-      (fun _ g acc -> (g.goal_shape,Old_goal g)::acc)
+      (fun _ g acc ->
+         let s = g.goal_shape in
+         if s = "" then
+           (* We don't try to associate old goals without shapes:
+              they will be paired in order in next phase *)
+           acc
+         else
+           (s,Old_goal g)::acc)
       old_goals_map
       []
   in

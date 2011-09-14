@@ -1,50 +1,56 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
-<why3session name="examples/programs/zeros/why3session.xml">
+<why3session name="programs/zeros/why3session.xml">
+ <prover id="alt-ergo" name="Alt-Ergo" version="0.93"/>
+ <prover id="coq" name="Coq" version="8.2pl1"/>
+ <prover id="cvc3" name="CVC3" version="2.2"/>
+ <prover id="gappa" name="Gappa" version="0.13.0"/>
+ <prover id="simplify" name="Simplify" version="1.5.4"/>
+ <prover id="z3" name="Z3" version="2.19"/>
  <file name="../zeros.mlw" verified="true" expanded="true">
   <theory name="WP SetZeros" verified="true" expanded="true">
-   <goal name="WP_parameter set_zeros" expl="correctness of parameter set_zeros" sum="608a2ce58877f53e9321cbda96aef314" proved="true" expanded="true">
+   <goal name="WP_parameter set_zeros" expl="parameter set_zeros" sum="f6e18a017be683ab3093cfd0d89c2089" proved="true" expanded="true" shape="ainfix =agetV2V3c0Iainfix <V3V0Aainfix <=c0V3FIainfix =agetV2V4c0Iainfix <V4ainfix +ainfix -V0c1c1Aainfix <=c0V4FAainfix =agetV6V7c0Iainfix <V7ainfix +V5c1Aainfix <=c0V7FIainfix =V6asetV2V5c0FAainfix <V5V0Aainfix <=c0V5Iainfix =agetV2V8c0Iainfix <V8V5Aainfix <=c0V8FIainfix <=V5ainfix -V0c1Aainfix <=c0V5FFAainfix =agetV1V9c0Iainfix <V9c0Aainfix <=c0V9FIainfix <=c0ainfix -V0c1Aainfix =agetV1V10c0Iainfix <V10V0Aainfix <=c0V10FIainfix >c0ainfix -V0c1FF">
     <transf name="split_goal" proved="true" expanded="true">
-     <goal name="WP_parameter set_zeros.1" expl="normal postcondition" sum="a431d4701cdb317ba9ec6e8ce36fd903" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter set_zeros.2" expl="for loop initialization" sum="4fdcef61de7fd0dbce171e29c6a6c2c2" proved="true" expanded="true">
+     <goal name="WP_parameter set_zeros.1" expl="normal postcondition" sum="f58245d4b3f2788b8faec89e71a4593d" proved="true" expanded="true" shape="ainfix =agetV1V2c0Iainfix <V2V0Aainfix <=c0V2FIainfix >c0ainfix -V0c1FF">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter set_zeros.3" expl="for loop preservation" sum="c3bc7e2f309687b6496a3c2155d9f105" proved="true" expanded="true">
-      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-      <proof prover="z3" timelimit="10" edited="" obsolete="false">
+     <goal name="WP_parameter set_zeros.2" expl="for loop initialization" sum="f48c054282a92445bcc73fe91552336b" proved="true" expanded="true" shape="ainfix =agetV1V2c0Iainfix <V2c0Aainfix <=c0V2FIainfix <=c0ainfix -V0c1FF">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal name="WP_parameter set_zeros.4" expl="normal postcondition" sum="09ba19838fab192b5d1170a3f4919eb9" proved="true" expanded="true">
+     <goal name="WP_parameter set_zeros.3" expl="for loop preservation" sum="1c42dec1a25f08c3595dee18bd3abcef" proved="true" expanded="true" shape="ainfix =agetV4V5c0Iainfix <V5ainfix +V3c1Aainfix <=c0V5FIainfix =V4asetV2V3c0FAainfix <V3V0Aainfix <=c0V3Iainfix =agetV2V6c0Iainfix <V6V3Aainfix <=c0V6FIainfix <=V3ainfix -V0c1Aainfix <=c0V3FFIainfix <=c0ainfix -V0c1FF">
+      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof prover="z3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter set_zeros.4" expl="normal postcondition" sum="afbeb8d431c04bf7131f317e6f9036df" proved="true" expanded="true" shape="ainfix =agetV2V3c0Iainfix <V3V0Aainfix <=c0V3FIainfix =agetV2V4c0Iainfix <V4ainfix +ainfix -V0c1c1Aainfix <=c0V4FFIainfix <=c0ainfix -V0c1FF">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
     </transf>
    </goal>
-   <goal name="WP_parameter harness" expl="correctness of parameter harness" sum="65df51e3d0d0d1ffbbacf1a0e8b9ab4d" proved="true" expanded="true">
+   <goal name="WP_parameter harness" expl="parameter harness" sum="3bbc0bd5226781b088ca904ff4fcbfe8" proved="true" expanded="true" shape="ainfix =agetV0c12c0Aainfix =c42c42Iainfix =agetV0V1c0Iainfix <V1c42Aainfix <=c0V1FFAainfix >=c42c0">
     <transf name="split_goal" proved="true" expanded="true">
-     <goal name="WP_parameter harness.1" expl="precondition" sum="284da52c8b6d467e508ce632f80c060f" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter harness.2" expl="assertion" sum="6401951319f58db7beb77a4ecffcafdb" proved="true" expanded="true">
+     <goal name="WP_parameter harness.1" expl="precondition" sum="bc9d5154bb22af5e7d53d24481e085a3" proved="true" expanded="true" shape="ainfix >=c42c0">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter harness.3" expl="assertion" sum="b720467ebdc03ae1045b93f08b0ca3b8" proved="true" expanded="true">
+     <goal name="WP_parameter harness.2" expl="assertion" sum="b8e5898048ee9697e7392cdd5b7693ec" proved="true" expanded="true" shape="ainfix =c42c42Iainfix =agetV0V1c0Iainfix <V1c42Aainfix <=c0V1FFIainfix >=c42c0">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter harness.3" expl="assertion" sum="4549ac88635e016fd559fc0a901e31a4" proved="true" expanded="true" shape="ainfix =agetV0c12c0Iainfix =c42c42Iainfix =agetV0V1c0Iainfix <V1c42Aainfix <=c0V1FFIainfix >=c42c0">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
       </proof>
      </goal>
     </transf>

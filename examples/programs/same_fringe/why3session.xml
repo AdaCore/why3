@@ -1,67 +1,73 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
-<why3session name="examples/programs/same_fringe/why3session.xml">
+<why3session name="programs/same_fringe/why3session.xml">
+ <prover id="alt-ergo" name="Alt-Ergo" version="0.93"/>
+ <prover id="coq" name="Coq" version="8.2pl1"/>
+ <prover id="cvc3" name="CVC3" version="2.2"/>
+ <prover id="gappa" name="Gappa" version="0.13.0"/>
+ <prover id="simplify" name="Simplify" version="1.5.4"/>
+ <prover id="z3" name="Z3" version="2.19"/>
  <file name="../same_fringe.mlw" verified="true" expanded="true">
   <theory name="WP SameFringe" verified="true" expanded="true">
-   <goal name="WP_parameter enum" expl="correctness of parameter enum" sum="bdf86692af3d9108fb10b1c5ad0566cb" proved="true" expanded="true">
+   <goal name="WP_parameter enum" expl="parameter enum" sum="81ad6789c82a5da87d82ed79c481b2d8" proved="true" expanded="true" shape="CV0aEmptyainfix =aenum_elementsV1ainfix ++aelementsV0aenum_elementsV1aNodeVVVainfix =aenum_elementsV5ainfix ++aelementsV0aenum_elementsV1Iainfix =aenum_elementsV5ainfix ++aelementsV2aenum_elementsaNextV3V4V1FAtAainfix <alengthaelementsV2alengthaelementsV0Aainfix <=c0alengthaelementsV0FF">
     <transf name="split_goal" proved="true" expanded="true">
-     <goal name="WP_parameter enum.1" expl="correctness of parameter enum" sum="a6693a559bfaec7856fabbbd720cd46d" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter enum.2" expl="correctness of parameter enum" sum="1738f0e9c67bc5354834008977e07775" proved="true" expanded="true">
+     <goal name="WP_parameter enum.1" expl="parameter enum" sum="b4034ddbcbdc1870740ae9d636804019" proved="true" expanded="true" shape="CV0aEmptyainfix =aenum_elementsV1ainfix ++aelementsV0aenum_elementsV1aNodeVVVtFF">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter enum.3" expl="correctness of parameter enum" sum="ad0c532ed8c898123ca6cc75e6c44cb5" proved="true" expanded="true">
+     <goal name="WP_parameter enum.2" expl="parameter enum" sum="b21b169de882b1e10c977d31940d96cb" proved="true" expanded="true" shape="CV0aEmptytaNodeVVVtAainfix <alengthaelementsV2alengthaelementsV0Aainfix <=c0alengthaelementsV0FF">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter enum.3" expl="parameter enum" sum="e5340919f1183dcd6ac96cd13e3a7645" proved="true" expanded="true" shape="CV0aEmptytaNodeVVVainfix =aenum_elementsV5ainfix ++aelementsV0aenum_elementsV1Iainfix =aenum_elementsV5ainfix ++aelementsV2aenum_elementsaNextV3V4V1FItAainfix <alengthaelementsV2alengthaelementsV0Aainfix <=c0alengthaelementsV0FF">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.05"/>
       </proof>
      </goal>
     </transf>
    </goal>
-   <goal name="WP_parameter eq_enum" expl="correctness of parameter eq_enum" sum="d3dfe508d88185c560d08001b044edcb" proved="true" expanded="true">
+   <goal name="WP_parameter eq_enum" expl="parameter eq_enum" sum="3c50db5bd3ec55393c2ddd90f9945fd4" proved="true" expanded="true" shape="CV1aNextVVVCV0aNextVVViainfix =V5V2ainfix =aenum_elementsV0aenum_elementsV1qainfix =V10aTrueIainfix =aenum_elementsV8aenum_elementsV9qainfix =V10aTrueFAtAainfix <alengthaenum_elementsV8alengthaenum_elementsV0Aainfix <=c0alengthaenum_elementsV0Iainfix =aenum_elementsV9ainfix ++aelementsV3aenum_elementsV4FIainfix =aenum_elementsV8ainfix ++aelementsV6aenum_elementsV7Fainfix =aenum_elementsV0aenum_elementsV1qfwainfix =aenum_elementsV0aenum_elementsV1qfaDoneCV0aDoneainfix =aenum_elementsV0aenum_elementsV1qtwainfix =aenum_elementsV0aenum_elementsV1qfFF">
     <transf name="split_goal" proved="true" expanded="true">
-     <goal name="WP_parameter eq_enum.1" expl="correctness of parameter eq_enum" sum="541824b988f4678bfb4e4b13dab9ba9b" proved="true" expanded="true">
+     <goal name="WP_parameter eq_enum.1" expl="parameter eq_enum" sum="a51108cd4c449d92c487a33109b079ab" proved="true" expanded="true" shape="CV1aNextVVVCV0aNextVVVtAainfix <alengthaenum_elementsV8alengthaenum_elementsV0Aainfix <=c0alengthaenum_elementsV0Iainfix =aenum_elementsV9ainfix ++aelementsV3aenum_elementsV4FIainfix =aenum_elementsV8ainfix ++aelementsV6aenum_elementsV7FIainfix =V5V2wtaDonetFF">
       <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.05"/>
+       <result status="valid" time="0.06"/>
       </proof>
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter eq_enum.2" expl="correctness of parameter eq_enum" sum="6af4cbaa87aae0d4f4abb13e1285a5e1" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.03"/>
       </proof>
      </goal>
-     <goal name="WP_parameter eq_enum.3" expl="correctness of parameter eq_enum" sum="57cd5beee94ebf4da014c8011ed7ec67" proved="true" expanded="true">
+     <goal name="WP_parameter eq_enum.2" expl="parameter eq_enum" sum="c8bc4bb5bb758e3f084765762b126c9e" proved="true" expanded="true" shape="CV1aNextVVVCV0aNextVVVainfix =aenum_elementsV0aenum_elementsV1qainfix =V10aTrueIainfix =aenum_elementsV8aenum_elementsV9qainfix =V10aTrueFItAainfix <alengthaenum_elementsV8alengthaenum_elementsV0Aainfix <=c0alengthaenum_elementsV0Iainfix =aenum_elementsV9ainfix ++aelementsV3aenum_elementsV4FIainfix =aenum_elementsV8ainfix ++aelementsV6aenum_elementsV7FIainfix =V5V2wtaDonetFF">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.05"/>
       </proof>
      </goal>
-     <goal name="WP_parameter eq_enum.4" expl="correctness of parameter eq_enum" sum="25a36c430de0ebe984ce2e0f408f1a07" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter eq_enum.5" expl="correctness of parameter eq_enum" sum="97b8f446464842dc4d839da5b5961fdb" proved="true" expanded="true">
+     <goal name="WP_parameter eq_enum.3" expl="parameter eq_enum" sum="2baa166ded999d479c6c60aea2d17ab7" proved="true" expanded="true" shape="CV1aNextVVVCV0aNextVVVainfix =aenum_elementsV0aenum_elementsV1qfIainfix =V5V2NwtaDonetFF">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal name="WP_parameter eq_enum.6" expl="correctness of parameter eq_enum" sum="32374fa5283ef3c4909474d899dcacdf" proved="true" expanded="true">
+     <goal name="WP_parameter eq_enum.4" expl="parameter eq_enum" sum="30d09d4dcd66e07e2f747776c8fc5634" proved="true" expanded="true" shape="CV1aNextVVVCV0aNextVVVtwainfix =aenum_elementsV0aenum_elementsV1qfaDonetFF">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter eq_enum.5" expl="parameter eq_enum" sum="edf75c415095e661d5c2f42c41e868f0" proved="true" expanded="true" shape="CV1aNextVVVtaDoneCV0aDoneainfix =aenum_elementsV0aenum_elementsV1qtwtFF">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter eq_enum.6" expl="parameter eq_enum" sum="5391a12c5cf5917c768f8405db0df747" proved="true" expanded="true" shape="CV1aNextVVVtaDoneCV0aDonetwainfix =aenum_elementsV0aenum_elementsV1qfFF">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.03"/>
       </proof>
      </goal>
     </transf>
    </goal>
-   <goal name="WP_parameter same_fringe" expl="normal postcondition" sum="735f92bd11fb50afcf213c093d95fac9" proved="true" expanded="true">
+   <goal name="WP_parameter same_fringe" expl="normal postcondition" sum="9562e52813643d97602e52910d53384d" proved="true" expanded="true" shape="ainfix =aelementsV0aelementsV1qainfix =V4aTrueIainfix =aenum_elementsV2aenum_elementsV3qainfix =V4aTrueFIainfix =aenum_elementsV3ainfix ++aelementsV1aenum_elementsaDoneFIainfix =aenum_elementsV2ainfix ++aelementsV0aenum_elementsaDoneFFF">
     <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.03"/>
     </proof>
    </goal>
   </theory>

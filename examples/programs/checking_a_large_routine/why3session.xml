@@ -1,139 +1,73 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
-<why3session name="examples/programs/checking_a_large_routine/why3session.xml">
+<why3session name="checking_a_large_routine/why3session.xml">
  <prover id="alt-ergo" name="Alt-Ergo" version="0.93"/>
- <prover id="coq" name="Coq" version="8.3pl2"/>
+ <prover id="coq" name="Coq" version="8.2pl1"/>
  <prover id="cvc3" name="CVC3" version="2.2"/>
- <prover id="gappa" name="Gappa" version="0.15.0"/>
+ <prover id="gappa" name="Gappa" version="0.13.0"/>
  <prover id="simplify" name="Simplify" version="1.5.4"/>
- <prover id="spass" name="Spass" version="3.7"/>
- <prover id="vampire" name="Vampire" version="0.6"/>
- <prover id="yices" name="Yices" version="1.0.25"/>
  <prover id="z3" name="Z3" version="2.19"/>
  <file name="../checking_a_large_routine.mlw" verified="true" expanded="true">
   <theory name="WP CheckingALargeRoutine" verified="true" expanded="true">
-   <goal name="WP_parameter routine" expl=" parameter routine" sum="5b264b1ffef9b0cf942d6a26937d1e6c" proved="true" expanded="true" shape="iainfix <V2V0iainfix <=V3V2ainfix <ainfix -V2V6ainfix -V2V3Aainfix <=c0ainfix -V2V3Aainfix =V5ainfix *V6afactV2Aainfix <=V6ainfix +V2c1Aainfix <=c1V6Iainfix =V6ainfix +V3c1FIainfix =V5ainfix +V4V1Fainfix <ainfix -V0V7ainfix -V0V2Aainfix <=c0ainfix -V0V2Aainfix =V4afactV7Aainfix <=V7V0Aainfix <=c0V7Iainfix =V7ainfix +V2c1FIainfix =V4ainfix *V3afactV2Aainfix <=V3ainfix +V2c1Aainfix <=c1V3FFAainfix =V1ainfix *c1afactV2Aainfix <=c1ainfix +V2c1Aainfix <=c1c1ainfix =V1afactV0Iainfix =V1afactV2Aainfix <=V2V0Aainfix <=c0V2FFAainfix =c1afactc0Aainfix <=c0V0Aainfix <=c0c0Iainfix >=V0c0F">
+   <goal name="WP_parameter routine" expl="parameter routine" sum="5b264b1ffef9b0cf942d6a26937d1e6c" proved="true" expanded="true" shape="iainfix <V2V0iainfix <=V3V2ainfix <ainfix -V2V6ainfix -V2V3Aainfix <=c0ainfix -V2V3Aainfix =V5ainfix *V6afactV2Aainfix <=V6ainfix +V2c1Aainfix <=c1V6Iainfix =V6ainfix +V3c1FIainfix =V5ainfix +V4V1Fainfix <ainfix -V0V7ainfix -V0V2Aainfix <=c0ainfix -V0V2Aainfix =V4afactV7Aainfix <=V7V0Aainfix <=c0V7Iainfix =V7ainfix +V2c1FIainfix =V4ainfix *V3afactV2Aainfix <=V3ainfix +V2c1Aainfix <=c1V3FFAainfix =V1ainfix *c1afactV2Aainfix <=c1ainfix +V2c1Aainfix <=c1c1ainfix =V1afactV0Iainfix =V1afactV2Aainfix <=V2V0Aainfix <=c0V2FFAainfix =c1afactc0Aainfix <=c0V0Aainfix <=c0c0Iainfix >=V0c0F">
     <transf name="split_goal" proved="true" expanded="true">
      <goal name="WP_parameter routine.1" expl="loop invariant init" sum="698d7153b292aa8e6d44bc62e6288882" proved="true" expanded="true" shape="ainfix =c1afactc0Aainfix <=c0V0Aainfix <=c0c0Iainfix >=V0c0F">
-      <proof prover="cvc3" timelimit="5" edited="" obsolete="false">
-       <result status="valid" time="0.00"/>
-      </proof>
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof prover="z3" timelimit="5" edited="" obsolete="false">
-       <result status="valid" time="0.00"/>
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter routine.2" expl="loop invariant init" sum="2c1435fb10b7e50dbaa36b1d275d4ca7" proved="true" expanded="true" shape="ainfix =V1ainfix *c1afactV2Aainfix <=c1ainfix +V2c1Aainfix <=c1c1Iainfix <V2V0Iainfix =V1afactV2Aainfix <=V2V0Aainfix <=c0V2FFIainfix >=V0c0F">
-      <proof prover="alt-ergo" timelimit="5" edited="" obsolete="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-      <proof prover="z3" timelimit="5" edited="" obsolete="false">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal name="WP_parameter routine.3" expl="loop invariant preservation" sum="5f308a9408cb2e091e140542fbf7b738" proved="true" expanded="true" shape="ainfix =V5ainfix *V6afactV2Aainfix <=V6ainfix +V2c1Aainfix <=c1V6Iainfix =V6ainfix +V3c1FIainfix =V5ainfix +V4V1FIainfix <=V3V2Iainfix =V4ainfix *V3afactV2Aainfix <=V3ainfix +V2c1Aainfix <=c1V3FFIainfix <V2V0Iainfix =V1afactV2Aainfix <=V2V0Aainfix <=c0V2FFIainfix >=V0c0F">
-      <proof prover="cvc3" timelimit="5" edited="" obsolete="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-      <proof prover="z3" timelimit="5" edited="" obsolete="false">
+      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.03"/>
       </proof>
      </goal>
      <goal name="WP_parameter routine.4" expl="loop variant decreases" sum="1dd48d2368d5d8c64e6807b76ba466e7" proved="true" expanded="true" shape="ainfix <ainfix -V2V6ainfix -V2V3Aainfix <=c0ainfix -V2V3Iainfix =V5ainfix *V6afactV2Aainfix <=V6ainfix +V2c1Aainfix <=c1V6Iainfix =V6ainfix +V3c1FIainfix =V5ainfix +V4V1FIainfix <=V3V2Iainfix =V4ainfix *V3afactV2Aainfix <=V3ainfix +V2c1Aainfix <=c1V3FFIainfix <V2V0Iainfix =V1afactV2Aainfix <=V2V0Aainfix <=c0V2FFIainfix >=V0c0F">
-      <proof prover="cvc3" timelimit="5" edited="" obsolete="false">
-       <result status="valid" time="0.00"/>
-      </proof>
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof prover="z3" timelimit="5" edited="" obsolete="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter routine.5" expl="loop invariant preservation" sum="be92a4d050ec0edd72b34c9e4e18a3ed" proved="true" expanded="true" shape="ainfix =V4afactV5Aainfix <=V5V0Aainfix <=c0V5Iainfix =V5ainfix +V2c1FIainfix <=V3V2NIainfix =V4ainfix *V3afactV2Aainfix <=V3ainfix +V2c1Aainfix <=c1V3FFIainfix <V2V0Iainfix =V1afactV2Aainfix <=V2V0Aainfix <=c0V2FFIainfix >=V0c0F">
-      <proof prover="cvc3" timelimit="5" edited="" obsolete="false">
-       <result status="valid" time="0.00"/>
-      </proof>
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof prover="z3" timelimit="5" edited="" obsolete="false">
-       <result status="valid" time="0.04"/>
+       <result status="valid" time="0.03"/>
       </proof>
      </goal>
      <goal name="WP_parameter routine.6" expl="loop variant decreases" sum="c3a241c53ef9ce60948ed2333f33bf1c" proved="true" expanded="true" shape="ainfix <ainfix -V0V5ainfix -V0V2Aainfix <=c0ainfix -V0V2Iainfix =V4afactV5Aainfix <=V5V0Aainfix <=c0V5Iainfix =V5ainfix +V2c1FIainfix <=V3V2NIainfix =V4ainfix *V3afactV2Aainfix <=V3ainfix +V2c1Aainfix <=c1V3FFIainfix <V2V0Iainfix =V1afactV2Aainfix <=V2V0Aainfix <=c0V2FFIainfix >=V0c0F">
-      <proof prover="cvc3" timelimit="5" edited="" obsolete="false">
-       <result status="valid" time="0.00"/>
-      </proof>
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof prover="z3" timelimit="5" edited="" obsolete="false">
-       <result status="valid" time="0.00"/>
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter routine.7" expl="normal postcondition" sum="0c9c877516ed94fa9e9a4bbf23ab2133" proved="true" expanded="true" shape="ainfix =V1afactV0Iainfix <V2V0NIainfix =V1afactV2Aainfix <=V2V0Aainfix <=c0V2FFIainfix >=V0c0F">
-      <proof prover="cvc3" timelimit="5" edited="" obsolete="false">
-       <result status="valid" time="0.00"/>
-      </proof>
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-      <proof prover="z3" timelimit="5" edited="" obsolete="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
     </transf>
    </goal>
-   <goal name="WP_parameter routine2" expl=" parameter routine2" sum="eee978067219a2a7176850cb4a8d5f91" proved="true" expanded="true" shape="ainfix =V1afactV0Iainfix =V1afactainfix +ainfix -V0c1c1Aainfix =V3afactainfix +V2c1Iainfix =V3ainfix *ainfix +V2c1afactV2Aainfix =V5ainfix *ainfix +V4c1afactV2Iainfix =V5ainfix +V3V1FIainfix =V3ainfix *V4afactV2Iainfix <=V4V2Aainfix <=c1V4FFAainfix =V1ainfix *c1afactV2Iainfix <=c1V2Aainfix =V1afactainfix +V2c1Iainfix >c1V2Iainfix =V1afactV2Iainfix <=V2ainfix -V0c1Aainfix <=c0V2FFAainfix =c1afactc0Iainfix <=c0ainfix -V0c1Aainfix =c1afactV0Iainfix >c0ainfix -V0c1Iainfix >=V0c0F">
+   <goal name="WP_parameter routine2" expl="parameter routine2" sum="eee978067219a2a7176850cb4a8d5f91" proved="true" expanded="true" shape="ainfix =V1afactV0Iainfix =V1afactainfix +ainfix -V0c1c1Aainfix =V3afactainfix +V2c1Iainfix =V3ainfix *ainfix +V2c1afactV2Aainfix =V5ainfix *ainfix +V4c1afactV2Iainfix =V5ainfix +V3V1FIainfix =V3ainfix *V4afactV2Iainfix <=V4V2Aainfix <=c1V4FFAainfix =V1ainfix *c1afactV2Iainfix <=c1V2Aainfix =V1afactainfix +V2c1Iainfix >c1V2Iainfix =V1afactV2Iainfix <=V2ainfix -V0c1Aainfix <=c0V2FFAainfix =c1afactc0Iainfix <=c0ainfix -V0c1Aainfix =c1afactV0Iainfix >c0ainfix -V0c1Iainfix >=V0c0F">
     <transf name="split_goal" proved="true" expanded="true">
      <goal name="WP_parameter routine2.1" expl="normal postcondition" sum="438b099822fcddbd06e418a6302af2b1" proved="true" expanded="true" shape="ainfix =c1afactV0Iainfix >c0ainfix -V0c1Iainfix >=V0c0F">
-      <proof prover="cvc3" timelimit="5" edited="" obsolete="false">
-       <result status="valid" time="0.00"/>
-      </proof>
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof prover="z3" timelimit="5" edited="" obsolete="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter routine2.2" expl="for loop initialization" sum="dde2dd81eef80b4e2df04cfe2aaa6565" proved="true" expanded="true" shape="ainfix =c1afactc0Iainfix <=c0ainfix -V0c1Iainfix >=V0c0F">
-      <proof prover="cvc3" timelimit="5" edited="" obsolete="false">
-       <result status="valid" time="0.00"/>
-      </proof>
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.02"/>
-      </proof>
-      <proof prover="z3" timelimit="5" edited="" obsolete="false">
-       <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal name="WP_parameter routine2.3" expl="for loop preservation" sum="c6d48580e9f8dd881f5d59d1fa001157" proved="true" expanded="true" shape="ainfix =V3afactainfix +V2c1Iainfix =V3ainfix *ainfix +V2c1afactV2Aainfix =V5ainfix *ainfix +V4c1afactV2Iainfix =V5ainfix +V3V1FIainfix =V3ainfix *V4afactV2Iainfix <=V4V2Aainfix <=c1V4FFAainfix =V1ainfix *c1afactV2Iainfix <=c1V2Aainfix =V1afactainfix +V2c1Iainfix >c1V2Iainfix =V1afactV2Iainfix <=V2ainfix -V0c1Aainfix <=c0V2FFIainfix <=c0ainfix -V0c1Iainfix >=V0c0F">
-      <proof prover="cvc3" timelimit="5" edited="" obsolete="false">
-       <result status="valid" time="0.00"/>
-      </proof>
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof prover="z3" timelimit="5" edited="" obsolete="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.03"/>
       </proof>
      </goal>
      <goal name="WP_parameter routine2.4" expl="normal postcondition" sum="609eb9f3cf703de6155a3a9fb3b8719d" proved="true" expanded="true" shape="ainfix =V1afactV0Iainfix =V1afactainfix +ainfix -V0c1c1FIainfix <=c0ainfix -V0c1Iainfix >=V0c0F">
-      <proof prover="cvc3" timelimit="5" edited="" obsolete="false">
-       <result status="valid" time="0.00"/>
-      </proof>
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.02"/>
-      </proof>
-      <proof prover="z3" timelimit="5" edited="" obsolete="false">
-       <result status="valid" time="0.00"/>
       </proof>
      </goal>
     </transf>
