@@ -1169,7 +1169,9 @@ let scroll_to_loc ?(yalign=0.0) ~color loc =
     end;
   move_to_line ~yalign source_view (l-1);
   erase_color_loc source_view;
-  color_loc source_view ~color l b e
+  (* FIXME: use another color or none at all *)
+  (* color_loc source_view ~color l b e *)
+  ignore (color,l,b,e)
 
 let scroll_to_id ~color id =
   match id.Ident.id_loc with
@@ -1183,9 +1185,21 @@ let color_loc ~color loc =
   let f, l, b, e = Loc.get loc in
   if f = !current_file then color_loc ~color source_view l b e
 
-let rec color_t_locs () f =
-  Util.option_iter (color_loc ~color:location_tag) f.Term.t_loc;
-  Term.t_fold color_t_locs () f
+(* FIXME: we shouldn't open binders _every_time_ we redraw screen!!!
+   No t_fold, no t_open_quant! *)
+let rec color_t_locs f =
+  let color_locs f = 
+    Util.option_iter (color_loc ~color:location_tag) f.Term.t_loc in
+  let rec color_t () f =
+    color_locs f ; Term.t_fold color_t () f in
+  match f.Term.t_node with
+    | Term.Tbinop (Term.Timplies,f1,f2) ->
+        color_locs f1; color_t_locs f2
+    | Term.Tquant (Term.Tforall,fq) ->
+        let _,_,f2 = Term.t_open_quant fq in
+        color_t_locs f2
+    | _ ->
+        color_locs f
 
 let scroll_to_source_goal g =
   let t = M.get_task g in
@@ -1196,7 +1210,7 @@ let scroll_to_source_goal g =
         { Task.task_decl =
             { Theory.td_node =
                 Theory.Decl { Decl.d_node = Decl.Dprop (Decl.Pgoal, _, f)}}} ->
-        color_t_locs () f
+        color_t_locs f
     | _ ->
         assert false
 
