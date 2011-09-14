@@ -1,123 +1,338 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
-<why3session name="examples/programs/list_rev/why3session.xml">
- <prover id="alt-ergo" name="Alt-Ergo" version="0.93"/>
- <prover id="coq" name="Coq" version="8.3pl2"/>
- <prover id="cvc3" name="CVC3" version="2.2"/>
- <prover id="gappa" name="Gappa" version="0.15.0"/>
- <prover id="simplify" name="Simplify" version="1.5.4"/>
- <prover id="spass" name="Spass" version="3.7"/>
- <prover id="vampire" name="Vampire" version="0.6"/>
- <prover id="yices" name="Yices" version="1.0.25"/>
- <prover id="z3" name="Z3" version="2.19"/>
- <file name="../list_rev.mlw" verified="false" expanded="true">
-  <theory name="WP M" verified="false" expanded="true">
-   <goal name="acyclic_list" sum="38d7f032f9ed3c76f4f8cb366dcd021a" proved="false" expanded="true" shape="asep_node_listV0V1amixfix []V0V1Iais_listV0V1Iainfix =V1anullNF">
-    <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-     <result status="unknown" time="3.50"/>
+<why3session
+ name="examples/programs/list_rev/why3session.xml">
+ <prover
+  id="alt-ergo"
+  name="Alt-Ergo"
+  version="0.93"/>
+ <prover
+  id="coq"
+  name="Coq"
+  version="8.3pl2"/>
+ <prover
+  id="cvc3"
+  name="CVC3"
+  version="2.2"/>
+ <prover
+  id="gappa"
+  name="Gappa"
+  version="0.15.0"/>
+ <prover
+  id="simplify"
+  name="Simplify"
+  version="1.5.4"/>
+ <prover
+  id="spass"
+  name="Spass"
+  version="3.7"/>
+ <prover
+  id="vampire"
+  name="Vampire"
+  version="0.6"/>
+ <prover
+  id="yices"
+  name="Yices"
+  version="1.0.25"/>
+ <prover
+  id="z3"
+  name="Z3"
+  version="2.19"/>
+ <file
+  name="../list_rev.mlw"
+  verified="false"
+  expanded="true">
+  <theory
+   name="WP M"
+   verified="false"
+   expanded="true">
+   <goal
+    name="acyclic_list"
+    sum="3a73d7b8ddfc051d740c5820453b02bb"
+    proved="false"
+    expanded="true"
+    shape="asep_node_listV0V1amixfix []V0V1Iais_listV0V1Iainfix =V1anullNF">
+    <proof
+     prover="cvc3"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="unknown" time="3.06"/>
     </proof>
-    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
      <result status="unknown" time="0.02"/>
     </proof>
-    <proof prover="z3" timelimit="10" edited="" obsolete="false">
+    <proof
+     prover="z3"
+     timelimit="10"
+     edited=""
+     obsolete="false">
      <result status="timeout" time="10.03"/>
     </proof>
    </goal>
-   <goal name="consistent" sum="41a9d13fc846ec04f0ee5469f7a26899" proved="false" expanded="true" shape="fIais_listV0V2Iais_listV0V1F">
-    <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-     <result status="unknown" time="0.17"/>
+   <goal
+    name="consistent"
+    sum="757c8f85f5eb23b1d3e247c432c35cef"
+    proved="false"
+    expanded="true"
+    shape="fIais_listV0V2Iais_listV0V1F">
+    <proof
+     prover="cvc3"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="unknown" time="0.18"/>
     </proof>
-    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
      <result status="timeout" time="10.03"/>
     </proof>
-    <proof prover="z3" timelimit="10" edited="" obsolete="false">
+    <proof
+     prover="z3"
+     timelimit="10"
+     edited=""
+     obsolete="false">
      <result status="unknown" time="0.02"/>
     </proof>
    </goal>
-   <goal name="WP_parameter list_rev" expl="parameter list_rev" sum="5774fb668ef1953546dc9d2f1146a849" proved="true" expanded="false" shape="iainfix =V3anullNasep_list_listV5V7V6Aais_listV5V6Aais_listV5V7Iainfix =V7amixfix []V4V3FIainfix =V6V3FIainfix =V5amixfix [<-]V4V3V2Fais_listV4V2Iasep_list_listV4V3V2Aais_listV4V2Aais_listV4V3FFFAasep_list_listV1V0anullAais_listV1anullAais_listV1V0Iais_listV1V0FF">
-    <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.10"/>
+   <goal
+    name="WP_parameter list_rev"
+    expl="parameter list_rev"
+    sum="99a9aca72893111a97736dae8ab10987"
+    proved="true"
+    expanded="false"
+    shape="iainfix =V3anullNasep_list_listV5V7V6Aais_listV5V6Aais_listV5V7Iainfix =V7amixfix []V4V3FIainfix =V6V3FIainfix =V5amixfix [<-]V4V3V2Fais_listV4V2Iasep_list_listV4V3V2Aais_listV4V2Aais_listV4V3FFFAasep_list_listV1V0anullAais_listV1anullAais_listV1V0Iais_listV1V0FF">
+    <proof
+     prover="cvc3"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.09"/>
     </proof>
    </goal>
-   <goal name="reverse_append" sum="ba3b671b9efc71be840b8c3c667b714f" proved="true" expanded="false" shape="ainfix =ainfix ++areverseaConsV2V0V1ainfix ++areverseV0aConsV2V1F">
-    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+   <goal
+    name="reverse_append"
+    sum="3ad72abac8994e6e0195f0744155b4c4"
+    proved="true"
+    expanded="false"
+    shape="ainfix =ainfix ++areverseaConsV2V0V1ainfix ++areverseV0aConsV2V1F">
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
-   <goal name="WP_parameter list_rev_behv" expl="parameter list_rev_behv" sum="91dac7628fd72991234862205361e493" proved="false" expanded="true" shape="iainfix =V3anullNainfix =areverseamodelV1V0ainfix ++areverseamodelV5V7amodelV5V6Aasep_list_listV5V7V6Aais_listV5V6Aais_listV5V7Iainfix =V7amixfix []V4V3FIainfix =V6V3FAainfix =ainfix ++areverseaConsV3amodelV5amixfix []V4V3amodelV5V2ainfix ++areverseamodelV5amixfix []V4V3aConsV3amodelV5V2Iainfix =V5amixfix [<-]V4V3V2Fainfix =areverseamodelV1V0amodelV4V2Aais_listV4V2Iainfix =areverseamodelV1V0ainfix ++areverseamodelV4V3amodelV4V2Aasep_list_listV4V3V2Aais_listV4V2Aais_listV4V3FFFAainfix =areverseamodelV1V0ainfix ++areverseamodelV1V0amodelV1anullAasep_list_listV1V0anullAais_listV1anullAais_listV1V0Iais_listV1V0FF">
-    <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+   <goal
+    name="WP_parameter list_rev_behv"
+    expl="parameter list_rev_behv"
+    sum="e98010de3ab4e2b7db72b8915f09a865"
+    proved="false"
+    expanded="true"
+    shape="iainfix =V3anullNainfix =areverseamodelV1V0ainfix ++areverseamodelV5V7amodelV5V6Aasep_list_listV5V7V6Aais_listV5V6Aais_listV5V7Iainfix =V7amixfix []V4V3FIainfix =V6V3FAainfix =ainfix ++areverseaConsV3amodelV5amixfix []V4V3amodelV5V2ainfix ++areverseamodelV5amixfix []V4V3aConsV3amodelV5V2Iainfix =V5amixfix [<-]V4V3V2Fainfix =areverseamodelV1V0amodelV4V2Aais_listV4V2Iainfix =areverseamodelV1V0ainfix ++areverseamodelV4V3amodelV4V2Aasep_list_listV4V3V2Aais_listV4V2Aais_listV4V3FFFAainfix =areverseamodelV1V0ainfix ++areverseamodelV1V0amodelV1anullAasep_list_listV1V0anullAais_listV1anullAais_listV1V0Iais_listV1V0FF">
+    <proof
+     prover="cvc3"
+     timelimit="10"
+     edited=""
+     obsolete="false">
      <result status="timeout" time="10.03"/>
     </proof>
-    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
      <result status="timeout" time="10.03"/>
     </proof>
-    <proof prover="z3" timelimit="10" edited="" obsolete="false">
-     <result status="timeout" time="10.03"/>
+    <proof
+     prover="z3"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="timeout" time="10.04"/>
     </proof>
    </goal>
   </theory>
-  <theory name="WP M2" verified="false" expanded="true">
-   <goal name="is_list_disjoint_case" sum="976e1de4d1060edfab76b4cc47c14a12" proved="true" expanded="false" shape="fIais_listV0amixfix []V0V1Aainfix =V1anullNAainfix =V1anullF">
-    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+  <theory
+   name="WP M2"
+   verified="false"
+   expanded="true">
+   <goal
+    name="is_list_disjoint_case"
+    sum="b548ec2defc977be3126b422c4b3ee7b"
+    proved="true"
+    expanded="false"
+    shape="fIais_listV0amixfix []V0V1Aainfix =V1anullNAainfix =V1anullF">
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
-   <goal name="frame_list" sum="d71b12ab63827a97d738f2c9d66ddeb6" proved="true" expanded="false" shape="ais_listamixfix [<-]V0V2V3V1Iais_listV0V1Iain_ftV2alist_ftV0V1NF">
-    <proof prover="coq" timelimit="10" edited="list_rev_M2_frame_list_1.v" obsolete="false">
+   <goal
+    name="frame_list"
+    sum="e6d050162315e6f617930ccd700c1e32"
+    proved="true"
+    expanded="false"
+    shape="ais_listamixfix [<-]V0V2V3V1Iais_listV0V1Iain_ftV2alist_ftV0V1NF">
+    <proof
+     prover="coq"
+     timelimit="10"
+     edited="list_rev_M2_frame_list_1.v"
+     obsolete="false">
+     <result status="valid" time="0.50"/>
+    </proof>
+   </goal>
+   <goal
+    name="frame_list_ft"
+    sum="af72317e98e40f076ac8c12ea575d3b4"
+    proved="true"
+    expanded="false"
+    shape="ainfix =alist_ftV0V1alist_ftamixfix [<-]V0V2V3V1Iais_listV0V1Iain_ftV2alist_ftV0V1NF">
+    <proof
+     prover="coq"
+     timelimit="10"
+     edited="list_rev_M2_frame_list_ft_1.v"
+     obsolete="false">
      <result status="valid" time="0.51"/>
     </proof>
    </goal>
-   <goal name="frame_list_ft" sum="168945f4f61b296595e243f527867a1b" proved="true" expanded="false" shape="ainfix =alist_ftV0V1alist_ftamixfix [<-]V0V2V3V1Iais_listV0V1Iain_ftV2alist_ftV0V1NF">
-    <proof prover="coq" timelimit="10" edited="list_rev_M2_frame_list_ft_1.v" obsolete="false">
-     <result status="valid" time="0.51"/>
+   <goal
+    name="acyclic_list"
+    sum="2f482417755f4ddb6839cf1a68181202"
+    proved="false"
+    expanded="true"
+    shape="asep_node_listV0V1amixfix []V0V1Iais_listV0V1Iainfix =V1anullNF">
+    <proof
+     prover="cvc3"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="unknown" time="3.16"/>
     </proof>
-   </goal>
-   <goal name="acyclic_list" sum="2b9e2198256b469eaf16630e9bc3fd44" proved="false" expanded="true" shape="asep_node_listV0V1amixfix []V0V1Iais_listV0V1Iainfix =V1anullNF">
-    <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-     <result status="unknown" time="2.96"/>
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="unknown" time="0.02"/>
     </proof>
-    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-     <result status="unknown" time="0.03"/>
-    </proof>
-    <proof prover="z3" timelimit="10" edited="" obsolete="false">
+    <proof
+     prover="z3"
+     timelimit="10"
+     edited=""
+     obsolete="false">
      <result status="unknown" time="0.02"/>
     </proof>
    </goal>
-   <goal name="consistent" sum="3b8641e625117bc6d95f0f76964671da" proved="false" expanded="true" shape="fIais_listV0V2Iais_listV0V1F">
-    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+   <goal
+    name="consistent"
+    sum="c024db2dbe33d0ac46c5352833f6af62"
+    proved="false"
+    expanded="true"
+    shape="fIais_listV0V2Iais_listV0V1F">
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
      <result status="unknown" time="0.10"/>
     </proof>
-    <proof prover="z3" timelimit="10" edited="" obsolete="false">
+    <proof
+     prover="z3"
+     timelimit="10"
+     edited=""
+     obsolete="false">
      <result status="unknown" time="0.01"/>
     </proof>
-    <proof prover="spass" timelimit="10" edited="" obsolete="false">
-     <result status="timeout" time="10.03"/>
+    <proof
+     prover="spass"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="timeout" time="10.05"/>
     </proof>
    </goal>
-   <goal name="WP_parameter list_rev" expl="parameter list_rev" sum="f6291b88b391a8b623fef594da290f36" proved="true" expanded="false" shape="iainfix =V3anullNasep_list_listV5V7V6Aais_listV5V6Aais_listV5V7Iainfix =V7amixfix []V4V3FIainfix =V6V3FIainfix =V5amixfix [<-]V4V3V2Fais_listV4V2Iasep_list_listV4V3V2Aais_listV4V2Aais_listV4V3FFFAasep_list_listV1V0anullAais_listV1anullAais_listV1V0Iais_listV1V0FF">
-    <proof prover="z3" timelimit="10" edited="" obsolete="false">
+   <goal
+    name="WP_parameter list_rev"
+    expl="parameter list_rev"
+    sum="7011e970c4c4994edcdf5fa98021f476"
+    proved="true"
+    expanded="false"
+    shape="iainfix =V3anullNasep_list_listV5V7V6Aais_listV5V6Aais_listV5V7Iainfix =V7amixfix []V4V3FIainfix =V6V3FIainfix =V5amixfix [<-]V4V3V2Fais_listV4V2Iasep_list_listV4V3V2Aais_listV4V2Aais_listV4V3FFFAasep_list_listV1V0anullAais_listV1anullAais_listV1V0Iais_listV1V0FF">
+    <proof
+     prover="z3"
+     timelimit="10"
+     edited=""
+     obsolete="false">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
-   <goal name="frame_model" sum="5afc6843f7c06eda999f17d6843a24b5" proved="true" expanded="false" shape="ainfix =amodelV1V2amodelamixfix [<-]V1V3V4V2Iain_ftV3alist_ftV1V2NIais_listV1V2F">
-    <proof prover="coq" timelimit="10" edited="list_rev_M2_frame_model_1.v" obsolete="false">
+   <goal
+    name="frame_model"
+    sum="4525501fcc3b9b723890e81d2f31a1fe"
+    proved="true"
+    expanded="false"
+    shape="ainfix =amodelV1V2amodelamixfix [<-]V1V3V4V2Iain_ftV3alist_ftV1V2NIais_listV1V2F">
+    <proof
+     prover="coq"
+     timelimit="10"
+     edited="list_rev_M2_frame_model_1.v"
+     obsolete="false">
      <result status="valid" time="0.55"/>
     </proof>
    </goal>
-   <goal name="consistent_behv" sum="9e5956a142a08b2f07f4fe520fbe560d" proved="false" expanded="true" shape="fIais_listV0V2Iais_listV0V1F">
-    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-     <result status="unknown" time="0.11"/>
+   <goal
+    name="consistent_behv"
+    sum="36dd5122eb02e9c1004ba363477be23e"
+    proved="false"
+    expanded="true"
+    shape="fIais_listV0V2Iais_listV0V1F">
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="unknown" time="0.10"/>
     </proof>
-    <proof prover="z3" timelimit="10" edited="" obsolete="false">
-     <result status="timeout" time="10.12"/>
+    <proof
+     prover="z3"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="timeout" time="10.03"/>
     </proof>
-    <proof prover="spass" timelimit="10" edited="" obsolete="false">
-     <result status="timeout" time="10.14"/>
+    <proof
+     prover="spass"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="timeout" time="10.70"/>
     </proof>
    </goal>
-   <goal name="WP_parameter list_rev_behv" expl="parameter list_rev_behv" sum="ec863f3def5cc2b057922c38df84c19c" proved="true" expanded="false" shape="iainfix =V3anullNainfix =areverseamodelV1V0ainfix ++areverseamodelV5V7amodelV5V6Aasep_list_listV5V7V6Aais_listV5V6Aais_listV5V7Iainfix =V7amixfix []V4V3FIainfix =V6V3FIainfix =V5amixfix [<-]V4V3V2Fainfix =areverseamodelV1V0amodelV4V2Aais_listV4V2Iainfix =areverseamodelV1V0ainfix ++areverseamodelV4V3amodelV4V2Aasep_list_listV4V3V2Aais_listV4V2Aais_listV4V3FFFAainfix =areverseamodelV1V0ainfix ++areverseamodelV1V0amodelV1anullAasep_list_listV1V0anullAais_listV1anullAais_listV1V0Iais_listV1V0FF">
-    <proof prover="z3" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="2.18"/>
+   <goal
+    name="WP_parameter list_rev_behv"
+    expl="parameter list_rev_behv"
+    sum="bd53d83ae53880d79247b4e2652a3f3a"
+    proved="true"
+    expanded="false"
+    shape="iainfix =V3anullNainfix =areverseamodelV1V0ainfix ++areverseamodelV5V7amodelV5V6Aasep_list_listV5V7V6Aais_listV5V6Aais_listV5V7Iainfix =V7amixfix []V4V3FIainfix =V6V3FIainfix =V5amixfix [<-]V4V3V2Fainfix =areverseamodelV1V0amodelV4V2Aais_listV4V2Iainfix =areverseamodelV1V0ainfix ++areverseamodelV4V3amodelV4V2Aasep_list_listV4V3V2Aais_listV4V2Aais_listV4V3FFFAainfix =areverseamodelV1V0ainfix ++areverseamodelV1V0amodelV1anullAasep_list_listV1V0anullAais_listV1anullAais_listV1V0Iais_listV1V0FF">
+    <proof
+     prover="z3"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="2.13"/>
     </proof>
    </goal>
   </theory>

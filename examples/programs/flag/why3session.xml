@@ -1,339 +1,1001 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
-<why3session name="examples/programs/flag/why3session.xml">
- <prover id="alt-ergo" name="Alt-Ergo" version="0.93.1"/>
- <prover id="coq" name="Coq" version="8.3pl2"/>
- <prover id="cvc3" name="CVC3" version="2.2"/>
- <prover id="eprover" name="Eprover" version="0.8 Steinthal"/>
- <prover id="gappa" name="Gappa" version="0.15.0"/>
- <prover id="simplify" name="Simplify" version="1.5.4"/>
- <prover id="spass" name="Spass" version="3.7"/>
- <prover id="vampire" name="Vampire" version="0.6"/>
- <prover id="yices" name="Yices" version="1.0.27"/>
- <prover id="z3" name="Z3" version="2.19"/>
- <file name="../flag.mlw" verified="true" expanded="true">
-  <theory name="WP Flag" verified="true" expanded="true">
-   <goal name="WP_parameter swap" expl=" parameter swap" sum="db05fe10d4a59fdb411e58dd1e470828" proved="true" expanded="true" shape="aexchangeV3V5V1V2Iainfix =V5asetV4V2agetV3V1FAainfix <V2V0Aainfix <=c0V2Iainfix =V4asetV3V1agetV3V2FAainfix <V1V0Aainfix <=c0V1Aainfix <V2V0Aainfix <=c0V2Aainfix <V1V0Aainfix <=c0V1Iainfix <V2V0Aainfix <=c0V2Aainfix <V1V0Aainfix <=c0V1FFFF">
-    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.01"/>
+<why3session
+ name="programs/flag/why3session.xml">
+ <prover
+  id="alt-ergo"
+  name="Alt-Ergo"
+  version="0.93"/>
+ <prover
+  id="coq"
+  name="Coq"
+  version="8.3pl2"/>
+ <prover
+  id="cvc3"
+  name="CVC3"
+  version="2.2"/>
+ <prover
+  id="gappa"
+  name="Gappa"
+  version="0.15.0"/>
+ <prover
+  id="simplify"
+  name="Simplify"
+  version="1.5.4"/>
+ <prover
+  id="spass"
+  name="Spass"
+  version="3.7"/>
+ <prover
+  id="vampire"
+  name="Vampire"
+  version="0.6"/>
+ <prover
+  id="yices"
+  name="Yices"
+  version="1.0.25"/>
+ <prover
+  id="z3"
+  name="Z3"
+  version="2.19"/>
+ <file
+  name="../flag.mlw"
+  verified="true"
+  expanded="true">
+  <theory
+   name="WP Flag"
+   verified="true"
+   expanded="true">
+   <goal
+    name="WP_parameter swap"
+    expl="parameter swap"
+    sum="6e865b235bd2160cfc912722479e3df1"
+    proved="true"
+    expanded="true"
+    shape="aexchangeV3V5V1V2Iainfix =V5asetV4V2agetV3V1FAainfix <V2V0Aainfix <=c0V2Iainfix =V4asetV3V1agetV3V2FAainfix <V1V0Aainfix <=c0V1Aainfix <V2V0Aainfix <=c0V2Aainfix <V1V0Aainfix <=c0V1Iainfix <V2V0Aainfix <=c0V2Aainfix <V1V0Aainfix <=c0V1FFFF">
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.02"/>
     </proof>
-    <proof prover="z3" timelimit="10" edited="" obsolete="false">
+    <proof
+     prover="z3"
+     timelimit="10"
+     edited=""
+     obsolete="false">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
-   <goal name="WP_parameter dutch_flag" expl=" parameter dutch_flag" sum="42b745023e9b10627090aebb3ee16b6f" proved="true" expanded="true" shape="Lamk arrayV0V2Lamk arrayV0V7iainfix <V5V4CagetV7V5aBlueLamk arrayV0V9ainfix <ainfix -V4V12ainfix -V4V5Aainfix <=c0ainfix -V4V5Aapermut_subV2V9c0V1Aainfix =V0V1AamonochromeV10V4V1aRedAamonochromeV10V11V12aWhiteAamonochromeV10c0V11aBlueAainfix <=V4V1Aainfix <=V12V4Aainfix <=V11V12Aainfix <=c0V11Iainfix =V12ainfix +V5c1FIainfix =V11ainfix +V6c1FIaexchangeV7V9V6V5FAainfix <V5V0Aainfix <=c0V5Aainfix <V6V0Aainfix <=c0V6aWhiteainfix <ainfix -V4V13ainfix -V4V5Aainfix <=c0ainfix -V4V5Aapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V13aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V13V4Aainfix <=V6V13Aainfix <=c0V6Iainfix =V13ainfix +V5c1FaRedLamk arrayV0V15ainfix <ainfix -V14V5ainfix -V4V5Aainfix <=c0ainfix -V4V5Aapermut_subV2V15c0V1Aainfix =V0V1AamonochromeV16V14V1aRedAamonochromeV16V6V5aWhiteAamonochromeV16c0V6aBlueAainfix <=V14V1Aainfix <=V5V14Aainfix <=V6V5Aainfix <=c0V6IaexchangeV7V15V14V5FAainfix <V5V0Aainfix <=c0V5Aainfix <V14V0Aainfix <=c0V14Iainfix =V14ainfix -V4c1FAainfix <V5V0Aainfix <=c0V5apermutV3V8AamonochromeV8V18V1aRedAamonochromeV8V17V18aWhiteAamonochromeV8c0V17aBlueEEIapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFAapermut_subV2V2c0V1Aainfix =V0V1AamonochromeV3V1V1aRedAamonochromeV3c0c0aWhiteAamonochromeV3c0c0aBlueAainfix <=V1V1Aainfix <=c0V1Aainfix <=c0c0Aainfix <=c0c0Iainfix =V0V1Aainfix <=c0V1FFF">
-    <transf name="split_goal" proved="true" expanded="true">
-     <goal name="WP_parameter dutch_flag.1" expl="loop invariant init" sum="da5578541a915aee2d19f3eae60187cb" proved="true" expanded="true" shape="Lamk arrayV0V2apermut_subV2V2c0V1Aainfix =V0V1AamonochromeV3V1V1aRedAamonochromeV3c0c0aWhiteAamonochromeV3c0c0aBlueAainfix <=V1V1Aainfix <=c0V1Aainfix <=c0c0Aainfix <=c0c0Iainfix =V0V1Aainfix <=c0V1FFF">
-      <transf name="split_goal" proved="true" expanded="true">
-       <goal name="WP_parameter dutch_flag.1.1" expl=" parameter dutch_flag" sum="9ab6fa26802925196678403ba2eaa9a3" proved="true" expanded="true" shape="Lamk arrayV0V2ainfix <=c0c0Iainfix =V0V1Aainfix <=c0V1FFF">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.01"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter dutch_flag.1.2" expl=" parameter dutch_flag" sum="9ab6fa26802925196678403ba2eaa9a3" proved="true" expanded="true" shape="Lamk arrayV0V2ainfix <=c0c0Iainfix =V0V1Aainfix <=c0V1FFF">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.01"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter dutch_flag.1.3" expl=" parameter dutch_flag" sum="f5c9145ad7359b43c580ab7bdf96d72e" proved="true" expanded="true" shape="Lamk arrayV0V2ainfix <=c0V1Iainfix =V0V1Aainfix <=c0V1FFF">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.01"/>
-        </proof>
-        <proof prover="z3" timelimit="10" edited="" obsolete="false">
+   <goal
+    name="WP_parameter dutch_flag"
+    expl="parameter dutch_flag"
+    sum="ddc9f98d976eead62f2d93e4e606caaa"
+    proved="true"
+    expanded="true"
+    shape="Lamk arrayV0V2Lamk arrayV0V7iainfix <V5V4CagetV7V5aBlueLamk arrayV0V9ainfix <ainfix -V4V12ainfix -V4V5Aainfix <=c0ainfix -V4V5Aapermut_subV2V9c0V1Aainfix =V0V1AamonochromeV10V4V1aRedAamonochromeV10V11V12aWhiteAamonochromeV10c0V11aBlueAainfix <=V4V1Aainfix <=V12V4Aainfix <=V11V12Aainfix <=c0V11Iainfix =V12ainfix +V5c1FIainfix =V11ainfix +V6c1FIaexchangeV7V9V6V5FAainfix <V5V0Aainfix <=c0V5Aainfix <V6V0Aainfix <=c0V6aWhiteainfix <ainfix -V4V13ainfix -V4V5Aainfix <=c0ainfix -V4V5Aapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V13aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V13V4Aainfix <=V6V13Aainfix <=c0V6Iainfix =V13ainfix +V5c1FaRedLamk arrayV0V15ainfix <ainfix -V14V5ainfix -V4V5Aainfix <=c0ainfix -V4V5Aapermut_subV2V15c0V1Aainfix =V0V1AamonochromeV16V14V1aRedAamonochromeV16V6V5aWhiteAamonochromeV16c0V6aBlueAainfix <=V14V1Aainfix <=V5V14Aainfix <=V6V5Aainfix <=c0V6IaexchangeV7V15V14V5FAainfix <V5V0Aainfix <=c0V5Aainfix <V14V0Aainfix <=c0V14Iainfix =V14ainfix -V4c1FAainfix <V5V0Aainfix <=c0V5apermutV3V8AamonochromeV8V18V1aRedAamonochromeV8V17V18aWhiteAamonochromeV8c0V17aBlueEEIapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFAapermut_subV2V2c0V1Aainfix =V0V1AamonochromeV3V1V1aRedAamonochromeV3c0c0aWhiteAamonochromeV3c0c0aBlueAainfix <=V1V1Aainfix <=c0V1Aainfix <=c0c0Aainfix <=c0c0Iainfix =V0V1Aainfix <=c0V1FFF">
+    <transf
+     name="split_goal"
+     proved="true"
+     expanded="true">
+     <goal
+      name="WP_parameter dutch_flag.1"
+      expl="loop invariant init"
+      sum="830fb67786a5e48cfeec09e1789f800e"
+      proved="true"
+      expanded="true"
+      shape="Lamk arrayV0V2apermut_subV2V2c0V1Aainfix =V0V1AamonochromeV3V1V1aRedAamonochromeV3c0c0aWhiteAamonochromeV3c0c0aBlueAainfix <=V1V1Aainfix <=c0V1Aainfix <=c0c0Aainfix <=c0c0Iainfix =V0V1Aainfix <=c0V1FFF">
+      <transf
+       name="split_goal"
+       proved="true"
+       expanded="true">
+       <goal
+        name="WP_parameter dutch_flag.1.1"
+        expl="parameter dutch_flag"
+        sum="92e83915c1b958f0952830962097fa3e"
+        proved="true"
+        expanded="true"
+        shape="Lamk arrayV0V2ainfix <=c0c0Iainfix =V0V1Aainfix <=c0V1FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
          <result status="valid" time="0.02"/>
         </proof>
        </goal>
-       <goal name="WP_parameter dutch_flag.1.4" expl=" parameter dutch_flag" sum="5301ff3d905b2319b3e2881b013ec6d5" proved="true" expanded="true" shape="Lamk arrayV0V2ainfix <=V1V1Iainfix =V0V1Aainfix <=c0V1FFF">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <goal
+        name="WP_parameter dutch_flag.1.2"
+        expl="parameter dutch_flag"
+        sum="92e83915c1b958f0952830962097fa3e"
+        proved="true"
+        expanded="true"
+        shape="Lamk arrayV0V2ainfix <=c0c0Iainfix =V0V1Aainfix <=c0V1FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter dutch_flag.1.3"
+        expl="parameter dutch_flag"
+        sum="280ffd6d9bb62c89d09899e01aa6c684"
+        proved="true"
+        expanded="true"
+        shape="Lamk arrayV0V2ainfix <=c0V1Iainfix =V0V1Aainfix <=c0V1FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof
+         prover="z3"
+         timelimit="10"
+         edited=""
+         obsolete="false">
          <result status="valid" time="0.01"/>
         </proof>
-        <proof prover="z3" timelimit="10" edited="" obsolete="false">
+       </goal>
+       <goal
+        name="WP_parameter dutch_flag.1.4"
+        expl="parameter dutch_flag"
+        sum="dc2eff88d4a094fd363c8e692dfb161d"
+        proved="true"
+        expanded="true"
+        shape="Lamk arrayV0V2ainfix <=V1V1Iainfix =V0V1Aainfix <=c0V1FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof
+         prover="z3"
+         timelimit="10"
+         edited=""
+         obsolete="false">
          <result status="valid" time="0.00"/>
         </proof>
        </goal>
-       <goal name="WP_parameter dutch_flag.1.5" expl=" parameter dutch_flag" sum="ee489609cc1eafb535cb8d99cbad5ed6" proved="true" expanded="true" shape="Lamk arrayV0V2amonochromeV3c0c0aBlueIainfix =V0V1Aainfix <=c0V1FFF">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <goal
+        name="WP_parameter dutch_flag.1.5"
+        expl="parameter dutch_flag"
+        sum="39b073ddd08c0de838e940ba3268b3ce"
+        proved="true"
+        expanded="true"
+        shape="Lamk arrayV0V2amonochromeV3c0c0aBlueIainfix =V0V1Aainfix <=c0V1FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
          <result status="valid" time="0.01"/>
         </proof>
-        <proof prover="z3" timelimit="10" edited="" obsolete="false">
+        <proof
+         prover="z3"
+         timelimit="10"
+         edited=""
+         obsolete="false">
          <result status="valid" time="0.01"/>
         </proof>
        </goal>
-       <goal name="WP_parameter dutch_flag.1.6" expl=" parameter dutch_flag" sum="bfff78f3fffc0de0d41cd5dc73c26f67" proved="true" expanded="true" shape="Lamk arrayV0V2amonochromeV3c0c0aWhiteIainfix =V0V1Aainfix <=c0V1FFF">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.01"/>
+       <goal
+        name="WP_parameter dutch_flag.1.6"
+        expl="parameter dutch_flag"
+        sum="7c7f9b6cf665d83f7bdb5db60056cc95"
+        proved="true"
+        expanded="true"
+        shape="Lamk arrayV0V2amonochromeV3c0c0aWhiteIainfix =V0V1Aainfix <=c0V1FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.02"/>
         </proof>
-        <proof prover="z3" timelimit="10" edited="" obsolete="false">
+        <proof
+         prover="z3"
+         timelimit="10"
+         edited=""
+         obsolete="false">
          <result status="valid" time="0.01"/>
         </proof>
        </goal>
-       <goal name="WP_parameter dutch_flag.1.7" expl=" parameter dutch_flag" sum="add0a5a4e1188353576b7b10d873fcf3" proved="true" expanded="true" shape="Lamk arrayV0V2amonochromeV3V1V1aRedIainfix =V0V1Aainfix <=c0V1FFF">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.01"/>
+       <goal
+        name="WP_parameter dutch_flag.1.7"
+        expl="parameter dutch_flag"
+        sum="85991a2d1eba66f4276a9fac7d3f8f90"
+        proved="true"
+        expanded="true"
+        shape="Lamk arrayV0V2amonochromeV3V1V1aRedIainfix =V0V1Aainfix <=c0V1FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.02"/>
         </proof>
-        <proof prover="z3" timelimit="10" edited="" obsolete="false">
+        <proof
+         prover="z3"
+         timelimit="10"
+         edited=""
+         obsolete="false">
          <result status="valid" time="0.01"/>
         </proof>
        </goal>
-       <goal name="WP_parameter dutch_flag.1.8" expl=" parameter dutch_flag" sum="50d4e508d581a9a3c246948b29dee11b" proved="true" expanded="true" shape="Lamk arrayV0V2ainfix =V0V1Iainfix =V0V1Aainfix <=c0V1FFF">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <goal
+        name="WP_parameter dutch_flag.1.8"
+        expl="parameter dutch_flag"
+        sum="ffe644bd77af7558fbb48dd89382b5b6"
+        proved="true"
+        expanded="true"
+        shape="Lamk arrayV0V2ainfix =V0V1Iainfix =V0V1Aainfix <=c0V1FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
          <result status="valid" time="0.01"/>
         </proof>
-        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+        <proof
+         prover="cvc3"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.00"/>
+        </proof>
+        <proof
+         prover="z3"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter dutch_flag.1.9"
+        expl="parameter dutch_flag"
+        sum="065829f5645f9e7b20a3f3ae57f9eb03"
+        proved="true"
+        expanded="true"
+        shape="Lamk arrayV0V2apermut_subV2V2c0V1Iainfix =V0V1Aainfix <=c0V1FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof
+         prover="z3"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter dutch_flag.2"
+      expl="precondition"
+      sum="81cb42082a2833bef664ab5bce3c1067"
+      proved="true"
+      expanded="true"
+      shape="Lamk arrayV0V2Lamk arrayV0V7ainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+      <transf
+       name="split_goal"
+       proved="true"
+       expanded="true">
+       <goal
+        name="WP_parameter dutch_flag.2.1"
+        expl="parameter dutch_flag"
+        sum="2d828cc4127da260afdb74720a44c22c"
+        proved="true"
+        expanded="true"
+        shape="Lamk arrayV0V2Lamk arrayV0V7ainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof
+         prover="z3"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter dutch_flag.2.2"
+        expl="parameter dutch_flag"
+        sum="0f88fe9d978fd0e55015140c5782d697"
+        proved="true"
+        expanded="true"
+        shape="Lamk arrayV0V2Lamk arrayV0V7ainfix <V5V0Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof
+         prover="z3"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter dutch_flag.3"
+      expl="parameter dutch_flag"
+      sum="d9282856d3bdb55cfc66de076b8a4414"
+      proved="true"
+      expanded="true"
+      shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBlueainfix <V5V0Aainfix <=c0V5Aainfix <V6V0Aainfix <=c0V6aWhitetaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+      <proof
+       prover="cvc3"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="alt-ergo"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="z3"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter dutch_flag.4"
+      expl="parameter dutch_flag"
+      sum="e82f01e27ff46f9587a4c56e88b4a4fb"
+      proved="true"
+      expanded="true"
+      shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBlueLamk arrayV0V9apermut_subV2V9c0V1Aainfix =V0V1AamonochromeV10V4V1aRedAamonochromeV10V11V12aWhiteAamonochromeV10c0V11aBlueAainfix <=V4V1Aainfix <=V12V4Aainfix <=V11V12Aainfix <=c0V11Iainfix =V12ainfix +V5c1FIainfix =V11ainfix +V6c1FIaexchangeV7V9V6V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V6V0Aainfix <=c0V6aWhitetaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+      <transf
+       name="split_goal"
+       proved="true"
+       expanded="true">
+       <goal
+        name="WP_parameter dutch_flag.4.1"
+        expl="parameter dutch_flag"
+        sum="0e10355451956a2419594414d3f799a3"
+        proved="true"
+        expanded="true"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBlueLamk arrayV0V9ainfix <=c0V11Iainfix =V12ainfix +V5c1FIainfix =V11ainfix +V6c1FIaexchangeV7V9V6V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V6V0Aainfix <=c0V6aWhitetaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+        <proof
+         prover="z3"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter dutch_flag.4.2"
+        expl="parameter dutch_flag"
+        sum="59d3d24c36630400bb4e053bf69aa423"
+        proved="true"
+        expanded="true"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBlueLamk arrayV0V9ainfix <=V11V12Iainfix =V12ainfix +V5c1FIainfix =V11ainfix +V6c1FIaexchangeV7V9V6V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V6V0Aainfix <=c0V6aWhitetaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+        <proof
+         prover="z3"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter dutch_flag.4.3"
+        expl="parameter dutch_flag"
+        sum="9aadefa965c107abbbb3e9c8d435fcd9"
+        proved="true"
+        expanded="true"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBlueLamk arrayV0V9ainfix <=V12V4Iainfix =V12ainfix +V5c1FIainfix =V11ainfix +V6c1FIaexchangeV7V9V6V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V6V0Aainfix <=c0V6aWhitetaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof
+         prover="z3"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter dutch_flag.4.4"
+        expl="parameter dutch_flag"
+        sum="d5d43ca33e75eea193bfa4b3f3467c87"
+        proved="true"
+        expanded="true"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBlueLamk arrayV0V9ainfix <=V4V1Iainfix =V12ainfix +V5c1FIainfix =V11ainfix +V6c1FIaexchangeV7V9V6V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V6V0Aainfix <=c0V6aWhitetaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof
+         prover="z3"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter dutch_flag.4.5"
+        expl="parameter dutch_flag"
+        sum="8d5f236ce064fdcef27f18501fac6c5b"
+        proved="true"
+        expanded="true"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBlueLamk arrayV0V9amonochromeV10c0V11aBlueIainfix =V12ainfix +V5c1FIainfix =V11ainfix +V6c1FIaexchangeV7V9V6V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V6V0Aainfix <=c0V6aWhitetaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        <proof
+         prover="coq"
+         timelimit="10"
+         edited="flag_WP_Flag_WP_parameter_dutch_flag_1.v"
+         obsolete="false">
+         <result status="valid" time="0.57"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter dutch_flag.4.6"
+        expl="parameter dutch_flag"
+        sum="0165c27c3778c74dcebef52cb855c094"
+        proved="true"
+        expanded="true"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBlueLamk arrayV0V9amonochromeV10V11V12aWhiteIainfix =V12ainfix +V5c1FIainfix =V11ainfix +V6c1FIaexchangeV7V9V6V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V6V0Aainfix <=c0V6aWhitetaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        <proof
+         prover="coq"
+         timelimit="10"
+         edited="flag_WP_Flag_WP_parameter_dutch_flag_4.v"
+         obsolete="false">
+         <result status="valid" time="0.60"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter dutch_flag.4.7"
+        expl="parameter dutch_flag"
+        sum="75ac3676d1fd767b34b3e95b0a9bc1ef"
+        proved="true"
+        expanded="true"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBlueLamk arrayV0V9amonochromeV10V4V1aRedIainfix =V12ainfix +V5c1FIainfix =V11ainfix +V6c1FIaexchangeV7V9V6V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V6V0Aainfix <=c0V6aWhitetaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        <proof
+         prover="cvc3"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.48"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter dutch_flag.4.8"
+        expl="parameter dutch_flag"
+        sum="a6feecff281ec7f17944e65a57160583"
+        proved="true"
+        expanded="true"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBlueLamk arrayV0V9ainfix =V0V1Iainfix =V12ainfix +V5c1FIainfix =V11ainfix +V6c1FIaexchangeV7V9V6V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V6V0Aainfix <=c0V6aWhitetaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter dutch_flag.4.9"
+        expl="parameter dutch_flag"
+        sum="7859799aa7e3c42666e76a7bde482c3d"
+        proved="true"
+        expanded="true"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBlueLamk arrayV0V9apermut_subV2V9c0V1Iainfix =V12ainfix +V5c1FIainfix =V11ainfix +V6c1FIaexchangeV7V9V6V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V6V0Aainfix <=c0V6aWhitetaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="2.51"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter dutch_flag.5"
+      expl="parameter dutch_flag"
+      sum="5eb4c4951fd756aaaaa0215159599393"
+      proved="true"
+      expanded="true"
+      shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBlueLamk arrayV0V9ainfix <ainfix -V4V12ainfix -V4V5Aainfix <=c0ainfix -V4V5Iapermut_subV2V9c0V1Aainfix =V0V1AamonochromeV10V4V1aRedAamonochromeV10V11V12aWhiteAamonochromeV10c0V11aBlueAainfix <=V4V1Aainfix <=V12V4Aainfix <=V11V12Aainfix <=c0V11Iainfix =V12ainfix +V5c1FIainfix =V11ainfix +V6c1FIaexchangeV7V9V6V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V6V0Aainfix <=c0V6aWhitetaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+      <proof
+       prover="alt-ergo"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter dutch_flag.6"
+      expl="parameter dutch_flag"
+      sum="f6c53ebd76da8f969e593315d01fe049"
+      proved="true"
+      expanded="true"
+      shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhiteapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V9aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V9V4Aainfix <=V6V9Aainfix <=c0V6Iainfix =V9ainfix +V5c1FaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+      <transf
+       name="split_goal"
+       proved="true"
+       expanded="true">
+       <goal
+        name="WP_parameter dutch_flag.6.1"
+        expl="parameter dutch_flag"
+        sum="c5592d59d1d6b079d837c050ebb38d70"
+        proved="true"
+        expanded="true"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhiteainfix <=c0V6Iainfix =V9ainfix +V5c1FaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter dutch_flag.6.2"
+        expl="parameter dutch_flag"
+        sum="66037c71762ed1be0b45eb0a91c056dc"
+        proved="true"
+        expanded="true"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhiteainfix <=V6V9Iainfix =V9ainfix +V5c1FaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter dutch_flag.6.3"
+        expl="parameter dutch_flag"
+        sum="d61841957163ac2c3220050765374acd"
+        proved="true"
+        expanded="true"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhiteainfix <=V9V4Iainfix =V9ainfix +V5c1FaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter dutch_flag.6.4"
+        expl="parameter dutch_flag"
+        sum="352bbcc03eabb12bcf32c04440b51864"
+        proved="true"
+        expanded="true"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhiteainfix <=V4V1Iainfix =V9ainfix +V5c1FaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter dutch_flag.6.5"
+        expl="parameter dutch_flag"
+        sum="07013c5d75ad98bc31cafe40ccf33b3a"
+        proved="true"
+        expanded="true"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhiteamonochromeV8c0V6aBlueIainfix =V9ainfix +V5c1FaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter dutch_flag.6.6"
+        expl="parameter dutch_flag"
+        sum="3e20f0afc1d20c27a0f0d6c7ef4ccb9c"
+        proved="true"
+        expanded="true"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhiteamonochromeV8V6V9aWhiteIainfix =V9ainfix +V5c1FaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
          <result status="valid" time="0.03"/>
         </proof>
-        <proof prover="z3" timelimit="10" edited="" obsolete="false">
+       </goal>
+       <goal
+        name="WP_parameter dutch_flag.6.7"
+        expl="parameter dutch_flag"
+        sum="d8f283eaa5f8ebda7b16b76e981c9180"
+        proved="true"
+        expanded="true"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhiteamonochromeV8V4V1aRedIainfix =V9ainfix +V5c1FaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
          <result status="valid" time="0.02"/>
         </proof>
        </goal>
-       <goal name="WP_parameter dutch_flag.1.9" expl=" parameter dutch_flag" sum="01e43c076aa748608e9df36ebc4c9d20" proved="true" expanded="true" shape="Lamk arrayV0V2apermut_subV2V2c0V1Iainfix =V0V1Aainfix <=c0V1FFF">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <goal
+        name="WP_parameter dutch_flag.6.8"
+        expl="parameter dutch_flag"
+        sum="f45b6f4a48c66b447f4fae21460e3c51"
+        proved="true"
+        expanded="true"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhiteainfix =V0V1Iainfix =V9ainfix +V5c1FaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
          <result status="valid" time="0.02"/>
         </proof>
-        <proof prover="z3" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.01"/>
+       </goal>
+       <goal
+        name="WP_parameter dutch_flag.6.9"
+        expl="parameter dutch_flag"
+        sum="1e017b0788804e6e0e5f5584332911f9"
+        proved="true"
+        expanded="true"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhiteapermut_subV2V7c0V1Iainfix =V9ainfix +V5c1FaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.02"/>
         </proof>
        </goal>
       </transf>
      </goal>
-     <goal name="WP_parameter dutch_flag.2" expl="precondition" sum="42ef54e4fdb129174dae4c1cef9defd8" proved="true" expanded="true" shape="Lamk arrayV0V2Lamk arrayV0V7ainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
-      <transf name="split_goal" proved="true" expanded="true">
-       <goal name="WP_parameter dutch_flag.2.1" expl=" parameter dutch_flag" sum="897df9c093866a0fb96647d080cb50c9" proved="true" expanded="true" shape="Lamk arrayV0V2Lamk arrayV0V7ainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.01"/>
-        </proof>
-        <proof prover="z3" timelimit="10" edited="" obsolete="false">
+     <goal
+      name="WP_parameter dutch_flag.7"
+      expl="parameter dutch_flag"
+      sum="83237d74fe661fefc113fc9b58fdc736"
+      proved="true"
+      expanded="true"
+      shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhiteainfix <ainfix -V4V9ainfix -V4V5Aainfix <=c0ainfix -V4V5Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V9aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V9V4Aainfix <=V6V9Aainfix <=c0V6Iainfix =V9ainfix +V5c1FaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+      <transf
+       name="split_goal"
+       proved="true"
+       expanded="true">
+       <goal
+        name="WP_parameter dutch_flag.7.1"
+        expl="parameter dutch_flag"
+        sum="74bd750c7b97eeb3cd927c6490d2c667"
+        proved="true"
+        expanded="true"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhiteainfix <=c0ainfix -V4V5Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V9aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V9V4Aainfix <=V6V9Aainfix <=c0V6Iainfix =V9ainfix +V5c1FaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
          <result status="valid" time="0.02"/>
         </proof>
        </goal>
-       <goal name="WP_parameter dutch_flag.2.2" expl=" parameter dutch_flag" sum="31bc1dc50bf26ffe25b54240c0bd6916" proved="true" expanded="true" shape="Lamk arrayV0V2Lamk arrayV0V7ainfix <V5V0Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-        <proof prover="z3" timelimit="10" edited="" obsolete="false">
+       <goal
+        name="WP_parameter dutch_flag.7.2"
+        expl="parameter dutch_flag"
+        sum="012e7e7936498afda1293fd41a7749fa"
+        proved="true"
+        expanded="true"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhiteainfix <ainfix -V4V9ainfix -V4V5Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V9aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V9V4Aainfix <=V6V9Aainfix <=c0V6Iainfix =V9ainfix +V5c1FaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
          <result status="valid" time="0.02"/>
         </proof>
        </goal>
       </transf>
      </goal>
-     <goal name="WP_parameter dutch_flag.3" expl=" parameter dutch_flag" sum="eacb005d92d71e660473d3079f96b4f0" proved="true" expanded="true" shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBlueainfix <V5V0Aainfix <=c0V5Aainfix <V6V0Aainfix <=c0V6aWhitetaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
-      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.03"/>
-      </proof>
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof prover="z3" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter dutch_flag.4" expl=" parameter dutch_flag" sum="532bd5af01b3f8f77e6ff06902d35d0b" proved="true" expanded="true" shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBlueLamk arrayV0V9apermut_subV2V9c0V1Aainfix =V0V1AamonochromeV10V4V1aRedAamonochromeV10V11V12aWhiteAamonochromeV10c0V11aBlueAainfix <=V4V1Aainfix <=V12V4Aainfix <=V11V12Aainfix <=c0V11Iainfix =V12ainfix +V5c1FIainfix =V11ainfix +V6c1FIaexchangeV7V9V6V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V6V0Aainfix <=c0V6aWhitetaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
-      <transf name="split_goal" proved="true" expanded="true">
-       <goal name="WP_parameter dutch_flag.4.1" expl=" parameter dutch_flag" sum="6f3c093667f5f445b2ce73e4a5e24913" proved="true" expanded="true" shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBlueLamk arrayV0V9ainfix <=c0V11Iainfix =V12ainfix +V5c1FIainfix =V11ainfix +V6c1FIaexchangeV7V9V6V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V6V0Aainfix <=c0V6aWhitetaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-        <proof prover="z3" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter dutch_flag.4.2" expl=" parameter dutch_flag" sum="425d432e9859479580a84e4b7c38f1ca" proved="true" expanded="true" shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBlueLamk arrayV0V9ainfix <=V11V12Iainfix =V12ainfix +V5c1FIainfix =V11ainfix +V6c1FIaexchangeV7V9V6V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V6V0Aainfix <=c0V6aWhitetaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.01"/>
-        </proof>
-        <proof prover="z3" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter dutch_flag.4.3" expl=" parameter dutch_flag" sum="c187741e3c5b98b4cfb6ef019aa2aa47" proved="true" expanded="true" shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBlueLamk arrayV0V9ainfix <=V12V4Iainfix =V12ainfix +V5c1FIainfix =V11ainfix +V6c1FIaexchangeV7V9V6V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V6V0Aainfix <=c0V6aWhitetaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.01"/>
-        </proof>
-        <proof prover="z3" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter dutch_flag.4.4" expl=" parameter dutch_flag" sum="26fea5e851a80e4079e829bb130c15d5" proved="true" expanded="true" shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBlueLamk arrayV0V9ainfix <=V4V1Iainfix =V12ainfix +V5c1FIainfix =V11ainfix +V6c1FIaexchangeV7V9V6V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V6V0Aainfix <=c0V6aWhitetaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.01"/>
-        </proof>
-        <proof prover="z3" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter dutch_flag.4.5" expl=" parameter dutch_flag" sum="384a2cc3a658ce2077a463aa21216cc2" proved="true" expanded="true" shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBlueLamk arrayV0V9amonochromeV10c0V11aBlueIainfix =V12ainfix +V5c1FIainfix =V11ainfix +V6c1FIaexchangeV7V9V6V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V6V0Aainfix <=c0V6aWhitetaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
-        <proof prover="coq" timelimit="10" edited="flag_WP_Flag_WP_parameter_dutch_flag_1.v" obsolete="false">
-         <result status="valid" time="0.59"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter dutch_flag.4.6" expl=" parameter dutch_flag" sum="41a72395ad0572060a488549a374bdff" proved="true" expanded="true" shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBlueLamk arrayV0V9amonochromeV10V11V12aWhiteIainfix =V12ainfix +V5c1FIainfix =V11ainfix +V6c1FIaexchangeV7V9V6V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V6V0Aainfix <=c0V6aWhitetaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
-        <proof prover="coq" timelimit="10" edited="flag_WP_Flag_WP_parameter_dutch_flag_4.v" obsolete="false">
-         <result status="valid" time="0.58"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter dutch_flag.4.7" expl=" parameter dutch_flag" sum="2ef143bdff06ff828e45133eb436b462" proved="true" expanded="true" shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBlueLamk arrayV0V9amonochromeV10V4V1aRedIainfix =V12ainfix +V5c1FIainfix =V11ainfix +V6c1FIaexchangeV7V9V6V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V6V0Aainfix <=c0V6aWhitetaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
-        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.97"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter dutch_flag.4.8" expl=" parameter dutch_flag" sum="83e0036b716faff573084f487276ddf8" proved="true" expanded="true" shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBlueLamk arrayV0V9ainfix =V0V1Iainfix =V12ainfix +V5c1FIainfix =V11ainfix +V6c1FIaexchangeV7V9V6V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V6V0Aainfix <=c0V6aWhitetaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter dutch_flag.4.9" expl=" parameter dutch_flag" sum="2dd1f34cb410af9f1640d8a302247184" proved="true" expanded="true" shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBlueLamk arrayV0V9apermut_subV2V9c0V1Iainfix =V12ainfix +V5c1FIainfix =V11ainfix +V6c1FIaexchangeV7V9V6V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V6V0Aainfix <=c0V6aWhitetaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="2.52"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter dutch_flag.5" expl=" parameter dutch_flag" sum="d605049f2cf4001b48e316946c4e570d" proved="true" expanded="true" shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBlueLamk arrayV0V9ainfix <ainfix -V4V12ainfix -V4V5Aainfix <=c0ainfix -V4V5Iapermut_subV2V9c0V1Aainfix =V0V1AamonochromeV10V4V1aRedAamonochromeV10V11V12aWhiteAamonochromeV10c0V11aBlueAainfix <=V4V1Aainfix <=V12V4Aainfix <=V11V12Aainfix <=c0V11Iainfix =V12ainfix +V5c1FIainfix =V11ainfix +V6c1FIaexchangeV7V9V6V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V6V0Aainfix <=c0V6aWhitetaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+     <goal
+      name="WP_parameter dutch_flag.8"
+      expl="parameter dutch_flag"
+      sum="6927c5e4262f6de171038f2262d69f5b"
+      proved="true"
+      expanded="true"
+      shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedainfix <V5V0Aainfix <=c0V5Aainfix <V9V0Aainfix <=c0V9Iainfix =V9ainfix -V4c1FIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+      <proof
+       prover="alt-ergo"
+       timelimit="10"
+       edited=""
+       obsolete="false">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter dutch_flag.6" expl=" parameter dutch_flag" sum="c428c9ed825466a7cb84785fdae392a0" proved="true" expanded="true" shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhiteapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V9aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V9V4Aainfix <=V6V9Aainfix <=c0V6Iainfix =V9ainfix +V5c1FaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
-      <transf name="split_goal" proved="true" expanded="true">
-       <goal name="WP_parameter dutch_flag.6.1" expl=" parameter dutch_flag" sum="cde4677f2f3f4a82221b3e0857684135" proved="true" expanded="true" shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhiteainfix <=c0V6Iainfix =V9ainfix +V5c1FaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+     <goal
+      name="WP_parameter dutch_flag.9"
+      expl="parameter dutch_flag"
+      sum="b212930852e0155fb648820fe67c6197"
+      proved="true"
+      expanded="true"
+      shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedLamk arrayV0V10apermut_subV2V10c0V1Aainfix =V0V1AamonochromeV11V9V1aRedAamonochromeV11V6V5aWhiteAamonochromeV11c0V6aBlueAainfix <=V9V1Aainfix <=V5V9Aainfix <=V6V5Aainfix <=c0V6IaexchangeV7V10V9V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V9V0Aainfix <=c0V9Iainfix =V9ainfix -V4c1FIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+      <transf
+       name="split_goal"
+       proved="true"
+       expanded="true">
+       <goal
+        name="WP_parameter dutch_flag.9.1"
+        expl="parameter dutch_flag"
+        sum="97679596ce0ad1ff3d66ff61bed4f46c"
+        proved="true"
+        expanded="true"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedLamk arrayV0V10ainfix <=c0V6IaexchangeV7V10V9V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V9V0Aainfix <=c0V9Iainfix =V9ainfix -V4c1FIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
          <result status="valid" time="0.02"/>
         </proof>
        </goal>
-       <goal name="WP_parameter dutch_flag.6.2" expl=" parameter dutch_flag" sum="ed41c554b8f6a116041093e73dc924e4" proved="true" expanded="true" shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhiteainfix <=V6V9Iainfix =V9ainfix +V5c1FaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <goal
+        name="WP_parameter dutch_flag.9.2"
+        expl="parameter dutch_flag"
+        sum="1c4e5a4f8cd0cf0cd186c4aee39af63a"
+        proved="true"
+        expanded="true"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedLamk arrayV0V10ainfix <=V6V5IaexchangeV7V10V9V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V9V0Aainfix <=c0V9Iainfix =V9ainfix -V4c1FIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
          <result status="valid" time="0.02"/>
         </proof>
        </goal>
-       <goal name="WP_parameter dutch_flag.6.3" expl=" parameter dutch_flag" sum="0ff1bc3003b6702a69913a722fbcb670" proved="true" expanded="true" shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhiteainfix <=V9V4Iainfix =V9ainfix +V5c1FaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <goal
+        name="WP_parameter dutch_flag.9.3"
+        expl="parameter dutch_flag"
+        sum="aed7bdd787106e5506ea5249335cda06"
+        proved="true"
+        expanded="true"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedLamk arrayV0V10ainfix <=V5V9IaexchangeV7V10V9V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V9V0Aainfix <=c0V9Iainfix =V9ainfix -V4c1FIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
          <result status="valid" time="0.02"/>
         </proof>
        </goal>
-       <goal name="WP_parameter dutch_flag.6.4" expl=" parameter dutch_flag" sum="b662ddcc917682f3e8c309369dc8ede8" proved="true" expanded="true" shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhiteainfix <=V4V1Iainfix =V9ainfix +V5c1FaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <goal
+        name="WP_parameter dutch_flag.9.4"
+        expl="parameter dutch_flag"
+        sum="c3cf6160c8878e745c542f103163ebae"
+        proved="true"
+        expanded="true"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedLamk arrayV0V10ainfix <=V9V1IaexchangeV7V10V9V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V9V0Aainfix <=c0V9Iainfix =V9ainfix -V4c1FIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
          <result status="valid" time="0.01"/>
         </proof>
        </goal>
-       <goal name="WP_parameter dutch_flag.6.5" expl=" parameter dutch_flag" sum="576931aee12597389e83a0454950f4ae" proved="true" expanded="true" shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhiteamonochromeV8c0V6aBlueIainfix =V9ainfix +V5c1FaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <goal
+        name="WP_parameter dutch_flag.9.5"
+        expl="parameter dutch_flag"
+        sum="b3b94c1fdbf4a7d463071c3237844a3b"
+        proved="true"
+        expanded="true"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedLamk arrayV0V10amonochromeV11c0V6aBlueIaexchangeV7V10V9V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V9V0Aainfix <=c0V9Iainfix =V9ainfix -V4c1FIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        <proof
+         prover="cvc3"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.52"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter dutch_flag.9.6"
+        expl="parameter dutch_flag"
+        sum="d70bcc7b6e91866806598d601430de3b"
+        proved="true"
+        expanded="true"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedLamk arrayV0V10amonochromeV11V6V5aWhiteIaexchangeV7V10V9V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V9V0Aainfix <=c0V9Iainfix =V9ainfix -V4c1FIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        <proof
+         prover="cvc3"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="3.32"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter dutch_flag.9.7"
+        expl="parameter dutch_flag"
+        sum="46879490e115cd772c31aeda4b2d73d5"
+        proved="true"
+        expanded="true"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedLamk arrayV0V10amonochromeV11V9V1aRedIaexchangeV7V10V9V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V9V0Aainfix <=c0V9Iainfix =V9ainfix -V4c1FIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        <proof
+         prover="cvc3"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="6.94"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter dutch_flag.9.8"
+        expl="parameter dutch_flag"
+        sum="60685ced8184733a7fafd43205fd7eb4"
+        proved="true"
+        expanded="true"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedLamk arrayV0V10ainfix =V0V1IaexchangeV7V10V9V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V9V0Aainfix <=c0V9Iainfix =V9ainfix -V4c1FIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
          <result status="valid" time="0.02"/>
         </proof>
        </goal>
-       <goal name="WP_parameter dutch_flag.6.6" expl=" parameter dutch_flag" sum="04eb5763eb8dd640ca60c8ecf81c1abc" proved="true" expanded="true" shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhiteamonochromeV8V6V9aWhiteIainfix =V9ainfix +V5c1FaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <goal
+        name="WP_parameter dutch_flag.9.9"
+        expl="parameter dutch_flag"
+        sum="d17e2c51cacc132be7c8965fb911184a"
+        proved="true"
+        expanded="true"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedLamk arrayV0V10apermut_subV2V10c0V1IaexchangeV7V10V9V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V9V0Aainfix <=c0V9Iainfix =V9ainfix -V4c1FIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="2.56"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter dutch_flag.10"
+      expl="parameter dutch_flag"
+      sum="a4f7a544d42b8ef092f17a2d7ebfde47"
+      proved="true"
+      expanded="true"
+      shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedLamk arrayV0V10ainfix <ainfix -V9V5ainfix -V4V5Aainfix <=c0ainfix -V4V5Iapermut_subV2V10c0V1Aainfix =V0V1AamonochromeV11V9V1aRedAamonochromeV11V6V5aWhiteAamonochromeV11c0V6aBlueAainfix <=V9V1Aainfix <=V5V9Aainfix <=V6V5Aainfix <=c0V6IaexchangeV7V10V9V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V9V0Aainfix <=c0V9Iainfix =V9ainfix -V4c1FIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+      <transf
+       name="split_goal"
+       proved="true"
+       expanded="true">
+       <goal
+        name="WP_parameter dutch_flag.10.1"
+        expl="parameter dutch_flag"
+        sum="3459b736ca92fb88977b00bf85aaa206"
+        proved="true"
+        expanded="true"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedLamk arrayV0V10ainfix <=c0ainfix -V4V5Iapermut_subV2V10c0V1Aainfix =V0V1AamonochromeV11V9V1aRedAamonochromeV11V6V5aWhiteAamonochromeV11c0V6aBlueAainfix <=V9V1Aainfix <=V5V9Aainfix <=V6V5Aainfix <=c0V6IaexchangeV7V10V9V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V9V0Aainfix <=c0V9Iainfix =V9ainfix -V4c1FIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
          <result status="valid" time="0.02"/>
         </proof>
        </goal>
-       <goal name="WP_parameter dutch_flag.6.7" expl=" parameter dutch_flag" sum="b92d36a73187353fce89a00078155e6c" proved="true" expanded="true" shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhiteamonochromeV8V4V1aRedIainfix =V9ainfix +V5c1FaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter dutch_flag.6.8" expl=" parameter dutch_flag" sum="6a38226bcefcccd33c9acdfb03d132d7" proved="true" expanded="true" shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhiteainfix =V0V1Iainfix =V9ainfix +V5c1FaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter dutch_flag.6.9" expl=" parameter dutch_flag" sum="7119590359d40def4643d5895f4dcb28" proved="true" expanded="true" shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhiteapermut_subV2V7c0V1Iainfix =V9ainfix +V5c1FaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <goal
+        name="WP_parameter dutch_flag.10.2"
+        expl="parameter dutch_flag"
+        sum="cdf033587ab26bc04edbc9a3f69a0eb2"
+        proved="true"
+        expanded="true"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedLamk arrayV0V10ainfix <ainfix -V9V5ainfix -V4V5Iapermut_subV2V10c0V1Aainfix =V0V1AamonochromeV11V9V1aRedAamonochromeV11V6V5aWhiteAamonochromeV11c0V6aBlueAainfix <=V9V1Aainfix <=V5V9Aainfix <=V6V5Aainfix <=c0V6IaexchangeV7V10V9V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V9V0Aainfix <=c0V9Iainfix =V9ainfix -V4c1FIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
          <result status="valid" time="0.02"/>
         </proof>
        </goal>
       </transf>
      </goal>
-     <goal name="WP_parameter dutch_flag.7" expl=" parameter dutch_flag" sum="148c27639e62855a74ddf60f9ab59d56" proved="true" expanded="true" shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhiteainfix <ainfix -V4V9ainfix -V4V5Aainfix <=c0ainfix -V4V5Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V9aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V9V4Aainfix <=V6V9Aainfix <=c0V6Iainfix =V9ainfix +V5c1FaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
-      <transf name="split_goal" proved="true" expanded="true">
-       <goal name="WP_parameter dutch_flag.7.1" expl=" parameter dutch_flag" sum="615a6e93840309787b504ad4fc8282b2" proved="true" expanded="true" shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhiteainfix <=c0ainfix -V4V5Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V9aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V9V4Aainfix <=V6V9Aainfix <=c0V6Iainfix =V9ainfix +V5c1FaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+     <goal
+      name="WP_parameter dutch_flag.11"
+      expl="normal postcondition"
+      sum="a7a2e2482a6511ccfedf6605ba51f38e"
+      proved="true"
+      expanded="true"
+      shape="Lamk arrayV0V2Lamk arrayV0V7apermutV3V8AamonochromeV8V10V1aRedAamonochromeV8V9V10aWhiteAamonochromeV8c0V9aBlueEEIainfix <V5V4NIapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+      <transf
+       name="split_goal"
+       proved="true"
+       expanded="true">
+       <goal
+        name="WP_parameter dutch_flag.11.1"
+        expl="parameter dutch_flag"
+        sum="918866efde933cd5edc434ee052167dd"
+        proved="true"
+        expanded="true"
+        shape="Lamk arrayV0V2Lamk arrayV0V7amonochromeV8V10V1aRedAamonochromeV8V9V10aWhiteAamonochromeV8c0V9aBlueEEIainfix <V5V4NIapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
          <result status="valid" time="0.02"/>
         </proof>
        </goal>
-       <goal name="WP_parameter dutch_flag.7.2" expl=" parameter dutch_flag" sum="d1ddf4e9f4461b486078601e39b3a79f" proved="true" expanded="true" shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhiteainfix <ainfix -V4V9ainfix -V4V5Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V9aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V9V4Aainfix <=V6V9Aainfix <=c0V6Iainfix =V9ainfix +V5c1FaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.01"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter dutch_flag.8" expl=" parameter dutch_flag" sum="f263559bf5c4e8a45ba62feade13077d" proved="true" expanded="true" shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedainfix <V5V0Aainfix <=c0V5Aainfix <V9V0Aainfix <=c0V9Iainfix =V9ainfix -V4c1FIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter dutch_flag.9" expl=" parameter dutch_flag" sum="22d67339d96aa8f6a88e3fcc901e7cb9" proved="true" expanded="true" shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedLamk arrayV0V10apermut_subV2V10c0V1Aainfix =V0V1AamonochromeV11V9V1aRedAamonochromeV11V6V5aWhiteAamonochromeV11c0V6aBlueAainfix <=V9V1Aainfix <=V5V9Aainfix <=V6V5Aainfix <=c0V6IaexchangeV7V10V9V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V9V0Aainfix <=c0V9Iainfix =V9ainfix -V4c1FIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
-      <transf name="split_goal" proved="true" expanded="true">
-       <goal name="WP_parameter dutch_flag.9.1" expl=" parameter dutch_flag" sum="d23005d47e4f0192a2c45fe2cba99086" proved="true" expanded="true" shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedLamk arrayV0V10ainfix <=c0V6IaexchangeV7V10V9V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V9V0Aainfix <=c0V9Iainfix =V9ainfix -V4c1FIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <goal
+        name="WP_parameter dutch_flag.11.2"
+        expl="parameter dutch_flag"
+        sum="a1e51f6c56751861f70d44b6bfc2425c"
+        proved="true"
+        expanded="true"
+        shape="Lamk arrayV0V2Lamk arrayV0V7apermutV3V8Iainfix <V5V4NIapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        <proof
+         prover="cvc3"
+         timelimit="10"
+         edited=""
+         obsolete="false">
          <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter dutch_flag.9.2" expl=" parameter dutch_flag" sum="1b27de7822288915823f296fb7ff6cdc" proved="true" expanded="true" shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedLamk arrayV0V10ainfix <=V6V5IaexchangeV7V10V9V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V9V0Aainfix <=c0V9Iainfix =V9ainfix -V4c1FIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter dutch_flag.9.3" expl=" parameter dutch_flag" sum="3ddcf907770c9e7a39dba57e16f488f4" proved="true" expanded="true" shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedLamk arrayV0V10ainfix <=V5V9IaexchangeV7V10V9V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V9V0Aainfix <=c0V9Iainfix =V9ainfix -V4c1FIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter dutch_flag.9.4" expl=" parameter dutch_flag" sum="068d11e41684dc7abb00d1334ffc3dd0" proved="true" expanded="true" shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedLamk arrayV0V10ainfix <=V9V1IaexchangeV7V10V9V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V9V0Aainfix <=c0V9Iainfix =V9ainfix -V4c1FIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter dutch_flag.9.5" expl=" parameter dutch_flag" sum="f60f6f8066a7e510e52980cc92ac5cbe" proved="true" expanded="true" shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedLamk arrayV0V10amonochromeV11c0V6aBlueIaexchangeV7V10V9V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V9V0Aainfix <=c0V9Iainfix =V9ainfix -V4c1FIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
-        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="1.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter dutch_flag.9.6" expl=" parameter dutch_flag" sum="0cccea124d212a90db06c1e72b1a859c" proved="true" expanded="true" shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedLamk arrayV0V10amonochromeV11V6V5aWhiteIaexchangeV7V10V9V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V9V0Aainfix <=c0V9Iainfix =V9ainfix -V4c1FIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
-        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="6.31"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter dutch_flag.9.7" expl=" parameter dutch_flag" sum="5e66fa606bc4587dff553c77c94d4647" proved="true" expanded="true" shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedLamk arrayV0V10amonochromeV11V9V1aRedIaexchangeV7V10V9V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V9V0Aainfix <=c0V9Iainfix =V9ainfix -V4c1FIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
-        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="8.09"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter dutch_flag.9.8" expl=" parameter dutch_flag" sum="2085f24b1ed23cbea4695e4e3858fb5b" proved="true" expanded="true" shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedLamk arrayV0V10ainfix =V0V1IaexchangeV7V10V9V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V9V0Aainfix <=c0V9Iainfix =V9ainfix -V4c1FIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.01"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter dutch_flag.9.9" expl=" parameter dutch_flag" sum="d6d7f9696e85e9c7dab51b06f58ee3a7" proved="true" expanded="true" shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedLamk arrayV0V10apermut_subV2V10c0V1IaexchangeV7V10V9V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V9V0Aainfix <=c0V9Iainfix =V9ainfix -V4c1FIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="2.36"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter dutch_flag.10" expl=" parameter dutch_flag" sum="9ab9d6bbbfb8720d5ba6b1b71a2ab97d" proved="true" expanded="true" shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedLamk arrayV0V10ainfix <ainfix -V9V5ainfix -V4V5Aainfix <=c0ainfix -V4V5Iapermut_subV2V10c0V1Aainfix =V0V1AamonochromeV11V9V1aRedAamonochromeV11V6V5aWhiteAamonochromeV11c0V6aBlueAainfix <=V9V1Aainfix <=V5V9Aainfix <=V6V5Aainfix <=c0V6IaexchangeV7V10V9V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V9V0Aainfix <=c0V9Iainfix =V9ainfix -V4c1FIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
-      <transf name="split_goal" proved="true" expanded="true">
-       <goal name="WP_parameter dutch_flag.10.1" expl=" parameter dutch_flag" sum="6daded9f08aff97ebfe9d997d3cf4001" proved="true" expanded="true" shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedLamk arrayV0V10ainfix <=c0ainfix -V4V5Iapermut_subV2V10c0V1Aainfix =V0V1AamonochromeV11V9V1aRedAamonochromeV11V6V5aWhiteAamonochromeV11c0V6aBlueAainfix <=V9V1Aainfix <=V5V9Aainfix <=V6V5Aainfix <=c0V6IaexchangeV7V10V9V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V9V0Aainfix <=c0V9Iainfix =V9ainfix -V4c1FIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter dutch_flag.10.2" expl=" parameter dutch_flag" sum="7198dd13fac0d9f86d92c6c49822b777" proved="true" expanded="true" shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedLamk arrayV0V10ainfix <ainfix -V9V5ainfix -V4V5Iapermut_subV2V10c0V1Aainfix =V0V1AamonochromeV11V9V1aRedAamonochromeV11V6V5aWhiteAamonochromeV11c0V6aBlueAainfix <=V9V1Aainfix <=V5V9Aainfix <=V6V5Aainfix <=c0V6IaexchangeV7V10V9V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V9V0Aainfix <=c0V9Iainfix =V9ainfix -V4c1FIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter dutch_flag.11" expl="normal postcondition" sum="0f4ded929cfec0932f353045dcaf534b" proved="true" expanded="true" shape="Lamk arrayV0V2Lamk arrayV0V7apermutV3V8AamonochromeV8V10V1aRedAamonochromeV8V9V10aWhiteAamonochromeV8c0V9aBlueEEIainfix <V5V4NIapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
-      <transf name="split_goal" proved="true" expanded="true">
-       <goal name="WP_parameter dutch_flag.11.1" expl=" parameter dutch_flag" sum="ac36d71a5f9b4b66568614dff5cdafe0" proved="true" expanded="true" shape="Lamk arrayV0V2Lamk arrayV0V7amonochromeV8V10V1aRedAamonochromeV8V9V10aWhiteAamonochromeV8c0V9aBlueEEIainfix <V5V4NIapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter dutch_flag.11.2" expl=" parameter dutch_flag" sum="607c9c17a9efb1bcb978cdae9fb90336" proved="true" expanded="true" shape="Lamk arrayV0V2Lamk arrayV0V7apermutV3V8Iainfix <V5V4NIapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
-        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.04"/>
         </proof>
        </goal>
       </transf>

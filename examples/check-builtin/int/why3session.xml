@@ -1,171 +1,439 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
-<why3session name="check-builtin/int/why3session.xml">
- <prover id="alt-ergo" name="Alt-Ergo" version="0.93"/>
- <prover id="coq" name="Coq" version="8.3pl2"/>
- <prover id="cvc3" name="CVC3" version="2.2"/>
- <prover id="gappa" name="Gappa" version="0.15.0"/>
- <prover id="simplify" name="Simplify" version="1.5.4"/>
- <prover id="spass" name="Spass" version="3.7"/>
- <prover id="vampire" name="Vampire" version="0.6"/>
- <prover id="yices" name="Yices" version="1.0.25"/>
- <prover id="z3" name="Z3" version="2.19"/>
- <file name="../int.why" verified="true" expanded="true">
-  <theory name="Test" verified="true" expanded="true">
-   <goal name="G1" sum="f3b088189b6d1cad40811addc4d6803a" proved="true" expanded="true" shape="ainfix =ainfix *c5c10c50">
-    <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+<why3session
+ name="check-builtin/int/why3session.xml">
+ <prover
+  id="alt-ergo"
+  name="Alt-Ergo"
+  version="0.93"/>
+ <prover
+  id="coq"
+  name="Coq"
+  version="8.3pl2"/>
+ <prover
+  id="cvc3"
+  name="CVC3"
+  version="2.2"/>
+ <prover
+  id="gappa"
+  name="Gappa"
+  version="0.15.0"/>
+ <prover
+  id="simplify"
+  name="Simplify"
+  version="1.5.4"/>
+ <prover
+  id="spass"
+  name="Spass"
+  version="3.7"/>
+ <prover
+  id="vampire"
+  name="Vampire"
+  version="0.6"/>
+ <prover
+  id="yices"
+  name="Yices"
+  version="1.0.25"/>
+ <prover
+  id="z3"
+  name="Z3"
+  version="2.19"/>
+ <file
+  name="../int.why"
+  verified="true"
+  expanded="true">
+  <theory
+   name="Test"
+   verified="true"
+   expanded="true">
+   <goal
+    name="G1"
+    sum="817aa9c8a19bbdeedec4b6968ca5521d"
+    proved="true"
+    expanded="true"
+    shape="ainfix =ainfix *c5c10c50">
+    <proof
+     prover="cvc3"
+     timelimit="10"
+     edited=""
+     obsolete="false">
      <result status="valid" time="0.00"/>
     </proof>
-    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
      <result status="valid" time="0.01"/>
     </proof>
-    <proof prover="z3" timelimit="10" edited="" obsolete="false">
+    <proof
+     prover="z3"
+     timelimit="10"
+     edited=""
+     obsolete="false">
      <result status="valid" time="0.00"/>
     </proof>
-    <proof prover="spass" timelimit="10" edited="" obsolete="false">
-     <result status="timeout" time="10.13"/>
+    <proof
+     prover="spass"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="timeout" time="10.23"/>
     </proof>
    </goal>
-   <goal name="G2" sum="dc89477693660d3b4d1752799ab3ad92" proved="true" expanded="true" shape="ainfix =ainfix +ainfix -ainfix +V0V0V0V0ainfix *c2V0F">
-    <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+   <goal
+    name="G2"
+    sum="960e8799c65046f1894d55c7ab4b27be"
+    proved="true"
+    expanded="true"
+    shape="ainfix =ainfix +ainfix -ainfix +V0V0V0V0ainfix *c2V0F">
+    <proof
+     prover="cvc3"
+     timelimit="10"
+     edited=""
+     obsolete="false">
      <result status="valid" time="0.00"/>
     </proof>
-    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof prover="z3" timelimit="10" edited="" obsolete="false">
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
      <result status="valid" time="0.00"/>
     </proof>
-    <proof prover="spass" timelimit="10" edited="" obsolete="false">
-     <result status="timeout" time="10.05"/>
+    <proof
+     prover="z3"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="spass"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="timeout" time="9.99"/>
     </proof>
    </goal>
-   <goal name="CompatOrderAdd" sum="995e98cb6b1a9efa72903110d4a87568" proved="true" expanded="true" shape="ainfix <=ainfix +V0V2ainfix +V1V2Iainfix <=V0V1F">
-    <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+   <goal
+    name="CompatOrderAdd"
+    sum="cf6f2b32b88ffa7175e561f76c5640f3"
+    proved="true"
+    expanded="true"
+    shape="ainfix <=ainfix +V0V2ainfix +V1V2Iainfix <=V0V1F">
+    <proof
+     prover="cvc3"
+     timelimit="10"
+     edited=""
+     obsolete="false">
      <result status="valid" time="0.00"/>
     </proof>
-    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
      <result status="valid" time="0.01"/>
     </proof>
-    <proof prover="z3" timelimit="10" edited="" obsolete="false">
+    <proof
+     prover="z3"
+     timelimit="10"
+     edited=""
+     obsolete="false">
      <result status="valid" time="0.00"/>
     </proof>
-    <proof prover="spass" timelimit="10" edited="" obsolete="false">
+    <proof
+     prover="spass"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
+    name="CompatOrderMult"
+    sum="8cbd796abd4090b30c9ba18380fc030c"
+    proved="true"
+    expanded="true"
+    shape="ainfix <=ainfix *V0V2ainfix *V1V2Iainfix <=c0V2Iainfix <=V0V1F">
+    <proof
+     prover="cvc3"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="z3"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="spass"
+     timelimit="10"
+     edited=""
+     obsolete="false">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
-   <goal name="CompatOrderMult" sum="bf32d6e38f083eb3b1b4122103d07ed0" proved="true" expanded="true" shape="ainfix <=ainfix *V0V2ainfix *V1V2Iainfix <=c0V2Iainfix <=V0V1F">
-    <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+   <goal
+    name="InvMult"
+    sum="b458227da018681b8c69ca9d5c025bfb"
+    proved="true"
+    expanded="true"
+    shape="ainfix =aprefix -ainfix *V0V1ainfix *V0aprefix -V1Aainfix =ainfix *aprefix -V0V1aprefix -ainfix *V0V1F">
+    <proof
+     prover="cvc3"
+     timelimit="10"
+     edited=""
+     obsolete="false">
      <result status="valid" time="0.00"/>
     </proof>
-    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
      <result status="valid" time="0.01"/>
     </proof>
-    <proof prover="z3" timelimit="10" edited="" obsolete="false">
+    <proof
+     prover="z3"
+     timelimit="10"
+     edited=""
+     obsolete="false">
      <result status="valid" time="0.00"/>
     </proof>
-    <proof prover="spass" timelimit="10" edited="" obsolete="false">
+    <proof
+     prover="spass"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="timeout" time="10.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="InvSquare"
+    sum="a5225fb28c69161e25db06b06945917f"
+    proved="true"
+    expanded="true"
+    shape="ainfix =ainfix *V0V0ainfix *aprefix -V0aprefix -V0F">
+    <proof
+     prover="cvc3"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="z3"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="spass"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="timeout" time="10.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="ZeroMult"
+    sum="8b4195ab7c7068ae6e68b2d75f3be49e"
+    proved="true"
+    expanded="true"
+    shape="ainfix =c0ainfix *c0V0Aainfix =ainfix *V0c0c0F">
+    <proof
+     prover="cvc3"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
      <result status="valid" time="0.01"/>
     </proof>
-   </goal>
-   <goal name="InvMult" sum="0b46a39680d5f67d5f93c4c8f5b9804f" proved="true" expanded="true" shape="ainfix =aprefix -ainfix *V0V1ainfix *V0aprefix -V1Aainfix =ainfix *aprefix -V0V1aprefix -ainfix *V0V1F">
-    <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+    <proof
+     prover="z3"
+     timelimit="10"
+     edited=""
+     obsolete="false">
      <result status="valid" time="0.00"/>
     </proof>
-    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+    <proof
+     prover="spass"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="timeout" time="10.15"/>
+    </proof>
+   </goal>
+   <goal
+    name="SquareNonNeg1"
+    sum="7ad785cb7d5ff36a3debe75879fb2465"
+    proved="true"
+    expanded="true"
+    shape="ainfix <=c0ainfix *V0V0Iainfix <=V0c0F">
+    <proof
+     prover="cvc3"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
      <result status="valid" time="0.01"/>
     </proof>
-    <proof prover="z3" timelimit="10" edited="" obsolete="false">
+    <proof
+     prover="z3"
+     timelimit="10"
+     edited=""
+     obsolete="false">
      <result status="valid" time="0.00"/>
     </proof>
-    <proof prover="spass" timelimit="10" edited="" obsolete="false">
-     <result status="timeout" time="10.03"/>
-    </proof>
-   </goal>
-   <goal name="InvSquare" sum="691e3b9ce7e619beb48133aec4131a7f" proved="true" expanded="true" shape="ainfix =ainfix *V0V0ainfix *aprefix -V0aprefix -V0F">
-    <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof prover="z3" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof prover="spass" timelimit="10" edited="" obsolete="false">
-     <result status="timeout" time="10.18"/>
-    </proof>
-   </goal>
-   <goal name="ZeroMult" sum="160be6da3ce1512d4399229ce0fce605" proved="true" expanded="true" shape="ainfix =c0ainfix *c0V0Aainfix =ainfix *V0c0c0F">
-    <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof prover="z3" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof prover="spass" timelimit="10" edited="" obsolete="false">
-     <result status="timeout" time="10.06"/>
-    </proof>
-   </goal>
-   <goal name="SquareNonNeg1" sum="eeb4337e8e41c2167d24509f78284afb" proved="true" expanded="true" shape="ainfix <=c0ainfix *V0V0Iainfix <=V0c0F">
-    <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof prover="z3" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof prover="spass" timelimit="10" edited="" obsolete="false">
+    <proof
+     prover="spass"
+     timelimit="10"
+     edited=""
+     obsolete="false">
      <result status="timeout" time="10.26"/>
     </proof>
    </goal>
-   <goal name="SquareNonNeg" sum="2979802203c80db522016836bcf336a5" proved="true" expanded="true" shape="ainfix <=c0ainfix *V0V0F">
-    <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+   <goal
+    name="SquareNonNeg"
+    sum="6ab2a74a3978bc8842a46669770d134b"
+    proved="true"
+    expanded="true"
+    shape="ainfix <=c0ainfix *V0V0F">
+    <proof
+     prover="cvc3"
+     timelimit="10"
+     edited=""
+     obsolete="false">
      <result status="valid" time="0.00"/>
     </proof>
-    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.01"/>
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.02"/>
     </proof>
-    <proof prover="z3" timelimit="10" edited="" obsolete="false">
+    <proof
+     prover="z3"
+     timelimit="10"
+     edited=""
+     obsolete="false">
      <result status="valid" time="0.00"/>
     </proof>
-    <proof prover="spass" timelimit="10" edited="" obsolete="false">
-     <result status="timeout" time="10.00"/>
+    <proof
+     prover="spass"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="timeout" time="9.99"/>
     </proof>
    </goal>
-   <goal name="ZeroLessOne" sum="07a7198a41094f338830d92f862e0e1a" proved="true" expanded="true" shape="ainfix <=c0c1">
-    <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+   <goal
+    name="ZeroLessOne"
+    sum="0fa00ccbcd26f341f4cb33b466ce8b19"
+    proved="true"
+    expanded="true"
+    shape="ainfix <=c0c1">
+    <proof
+     prover="cvc3"
+     timelimit="10"
+     edited=""
+     obsolete="false">
      <result status="valid" time="0.00"/>
     </proof>
-    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.01"/>
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.02"/>
     </proof>
-    <proof prover="z3" timelimit="10" edited="" obsolete="false">
+    <proof
+     prover="z3"
+     timelimit="10"
+     edited=""
+     obsolete="false">
      <result status="valid" time="0.00"/>
     </proof>
-    <proof prover="spass" timelimit="10" edited="" obsolete="false">
-     <result status="timeout" time="10.01"/>
+    <proof
+     prover="spass"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="timeout" time="10.02"/>
     </proof>
    </goal>
   </theory>
-  <theory name="MinMax" verified="true" expanded="true">
-   <goal name="G" sum="977fcbebad29e171c02a891ed8dac707" proved="true" expanded="true" shape="ainfix =aminc1aminc3c2c1">
-    <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+  <theory
+   name="MinMax"
+   verified="true"
+   expanded="true">
+   <goal
+    name="G"
+    sum="9d623c864c557e7d79c483af177ca051"
+    proved="true"
+    expanded="true"
+    shape="ainfix =aminc1aminc3c2c1">
+    <proof
+     prover="cvc3"
+     timelimit="10"
+     edited=""
+     obsolete="false">
      <result status="valid" time="0.00"/>
     </proof>
-    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="z3"
+     timelimit="10"
+     edited=""
+     obsolete="false">
      <result status="valid" time="0.01"/>
     </proof>
-    <proof prover="z3" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof prover="spass" timelimit="10" edited="" obsolete="false">
-     <result status="timeout" time="10.22"/>
+    <proof
+     prover="spass"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="timeout" time="10.19"/>
     </proof>
    </goal>
   </theory>
