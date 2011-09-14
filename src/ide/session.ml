@@ -571,7 +571,7 @@ let schedule_edit_proof ~debug:_ ~editor ~file ~driver ~callback goal =
       raise (Found (Str.matched_group 1 lab))
 
   let rec get_expl_fmla f =
-    List.iter check_expl f.Term.t_label;
+    List.iter check_expl (List.rev f.Term.t_label);
     (match f.Term.t_node with
       | Term.Tbinop(Term.Timplies,_,f) -> get_expl_fmla f
       | Term.Tquant(Term.Tforall,fq) ->
@@ -585,7 +585,7 @@ let schedule_edit_proof ~debug:_ ~editor ~file ~driver ~callback goal =
   let get_explanation id fmla =
     try
       get_expl_fmla fmla;
-      List.iter check_expl id.Ident.id_label;
+      List.iter check_expl (List.rev id.Ident.id_label);
       None
     with Found e -> Some e
 
