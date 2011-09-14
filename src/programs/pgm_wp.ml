@@ -430,7 +430,7 @@ let rec wp_expr env rm e q =
   let q = post_map (old_mark lab) q in
   let f = wp_desc env rm e q in
   let f = erase_mark lab f in
-  let f = wp_label e f in
+(*  let f = wp_label e f in *)
   if Debug.test_flag debug then begin
     eprintf "@[--------@\n@[<hov 2>e = %a@]@\n" Pgm_pretty.print_expr e;
     eprintf "@[<hov 2>q = %a@]@\n" Pretty.print_term (snd (fst q));
@@ -441,21 +441,21 @@ let rec wp_expr env rm e q =
 and wp_desc env rm e q = match e.expr_desc with
   | Elogic t ->
       let (v, q), _ = q in
-      t_subst_single v t q
+      t_subst_single v (wp_label e t) q
   | Elocal pv ->
       let (v, q), _ = q in
-      t_subst_single v (t_var pv.pv_pure) q
+      t_subst_single v (wp_label e (t_var pv.pv_pure)) q
   | Eglobal { ps_kind = PSvar pv } ->
       let (v, q), _ = q in
-      t_subst_single v (t_var pv.pv_pure) q
+      t_subst_single v (wp_label e (t_var pv.pv_pure)) q
   | Eglobal { ps_kind = PSfun _ } ->
-      let (_, q), _ = q in q
+      let (_, q), _ = q in wp_label e q
   | Eglobal { ps_kind = PSlogic } ->
       assert false
   | Efun (bl, t) ->
       let (_, q), _ = q in
       let f = wp_triple env rm bl t in
-      wp_and ~sym:true f q
+      wp_and ~sym:true (wp_label e f) q
   | Elet (x, e1, e2) ->
       let w2 =
         let rm = add_binder x rm in
@@ -465,11 +465,11 @@ and wp_desc env rm e q = match e.expr_desc with
       let t1 = t_label ~loc:e1.expr_loc ["let"] (t_var v1) in
       let q1 = v1, t_subst (subst1 x.pv_pure t1) w2 in
       let q1 = saturate_post e1.expr_effect q1 q in
-      wp_expr env rm e1 q1
+      wp_label e (wp_expr env rm e1 q1)
   | Eletrec (dl, e1) ->
       let w1 = wp_expr env rm e1 q in
       let wl = List.map (wp_recfun env rm) dl in
-      wp_ands ~sym:true (w1 :: wl)
+      wp_label e (wp_ands ~sym:true (w1 :: wl)) (* FIXME? *)
   | Eif (e1, e2, e3) ->
       let res = v_result e1.expr_type in
       let test = t_equ (t_var res) (t_True env) in
@@ -494,7 +494,7 @@ and wp_desc env rm e q = match e.expr_desc with
           t_if_simp test w2 w3
       in
       let q1 = saturate_post e1.expr_effect (res, q1) q in
-      wp_expr env rm e1 q1
+      wp_label e (wp_expr env rm e1 q1) (* FIXME? *)
   | Eloop ({ loop_invariant = inv; loop_variant = var }, e1) ->
       let wfr = well_founded_rel var in
       let lab = fresh_mark () in
@@ -512,23 +512,24 @@ and wp_desc env rm e q = match e.expr_desc with
                  (wp_expl "loop invariant init" i)
                  (quantify env rm sreg (wp_implies i we)))
       in
-      w
+      wp_label e w (* FIXME? *)
   (* optimization for the particular case let _ = y in e *)
   | Ematch (_, [{ppat_pat = {pat_node = Term.Pwild}}, e]) ->
-      wp_expr env rm e (filter_post e.expr_effect q)
+      wp_label e (wp_expr env rm e (filter_post e.expr_effect q))
   | Ematch (x, bl) ->
       let branch (p, e) =
         t_close_branch p.ppat_pat
           (wp_expr env rm e (filter_post e.expr_effect q))
       in
       let t = t_var x.pv_pure in
-      t_case t (List.map branch bl)
+      wp_label e (t_case t (List.map branch bl))
   | Eabsurd ->
-      t_false
+      wp_label e t_false
   | Eraise (x, None) ->
       (* $wp(raise E, _, R) = R$ *)
       let _, ql = q in
-      let _, f = assoc_handler x ql in f
+      let _, f = assoc_handler x ql in
+      wp_label e f
   | Eraise (x, Some e1) ->
       (* $wp(raise (E e1), _, R) = wp(e1, R, R)$ *)
       let _, ql = q in
@@ -537,7 +538,7 @@ and wp_desc env rm e q = match e.expr_desc with
         | None, _ -> assert false
       in
       let q1 = filter_post e1.expr_effect q1 in
-      wp_expr env rm e1 q1
+      wp_label e (wp_expr env rm e1 q1)
   | Etry (e1, hl) ->
       (* $wp(try e1 with E -> e2, Q, R) = wp(e1, Q, wp(e2, Q, R))$ *)
       let hwl =
@@ -556,7 +557,7 @@ and wp_desc env rm e q = match e.expr_desc with
       in
       let q1 = saturate_post e1.expr_effect (fst q) q in
       let q1 = filter_post e1.expr_effect (make_post q1) in
-      wp_expr env rm e1 q1
+      wp_label e (wp_expr env rm e1 q1)
   | Efor (x, v1, d, v2, inv, e1) ->
       (* wp(for x = v1 to v2 do inv { I(x) } e1, Q, R) =
              v1 > v2  -> Q
@@ -597,22 +598,23 @@ and wp_desc env rm e q = match e.expr_desc with
               (let sv2 = fs_app add [t_var v2.pv_pure; incr] ty_int in
                wp_implies (t_subst (subst1 x.pv_pure sv2) inv) q1)))
       in
-      wp_and ~sym:true (wp_implies v1_gt_v2 q1) (wp_implies v1_le_v2 f)
-
+      let f =
+        wp_and ~sym:true (wp_implies v1_gt_v2 q1) (wp_implies v1_le_v2 f) in
+      wp_label e f (* FIXME? *)
   | Eassert (Ptree.Aassert, f) ->
       let (_, q), _ = q in
       let f = wp_expl "assertion" f in
-      let f = wp_and f q in
-      f
+      wp_and (wp_label e f) q   (* FIXME? *)
   | Eassert (Ptree.Acheck, f) ->
       let (_, q), _ = q in
-      wp_and ~sym:true (wp_expl "check" f) q
+      let f = wp_expl "check" f in
+      wp_and ~sym:true (wp_label e f) q  (* FIXME? *)
   | Eassert (Ptree.Aassume, f) ->
       let (_, q), _ = q in
-      wp_implies f q
+      wp_implies (wp_label e f) q  (* FIXME? *)
   | Emark (lab, e1) ->
       let w1 = wp_expr env rm e1 q in
-      erase_mark lab w1
+      wp_label e (erase_mark lab w1) (* FIXME? *)
   | Eany c ->
       (* TODO: propagate call labels into c.c_post *)
       let w = opaque_wp env rm c.c_effect.E.writes c.c_post q in
