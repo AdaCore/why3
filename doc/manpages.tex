@@ -456,7 +456,7 @@ main goal is to play non-regression tests, \eg you can find in
 \texttt{examples/regtests.sh} a script that runs regression tests on
 all the examples.
 
-The tool is inkoved in a terminal or a script using
+The tool is invoked in a terminal or a script using
 \begin{flushleft}\ttfamily
   why3replayer \textsl{[options] <project directory>}
 \end{flushleft}
@@ -472,13 +472,25 @@ tree-shape pretty print, similar to the IDE tree view after doing
 ``Collapse proved goals'', that is when a goal, a theory or a file is
 fully proved the subtree is not shown.
 
+\paragraph{Obsolete proofs}
+
+When some proofs store in the session file are obsolete, the replay is
+attempt anyway, as for the replay button in the IDE. Then, if all the
+replayed proofs went OK, the session file is updated, otherwise it is
+not and you have to use the IDE to update it.
 
 \paragraph{Exit code and options}
+
 \begin{itemize}
 \item The exit code is 0 if no difference was detected, 1 if there
   was. Other exit codes mean some failure in running the replay.
 \item option \texttt{-s}: suppresses the output of the final tree view
-\item option \texttt{-I \textsl{<path>}}: suppresses the output of the final tree view
+\item option \texttt{-I \textsl{<path>}}: add \textsl{<path>} to the loadpath
+\item option \texttt{-force}: force writing a new session file even if some proofs did not replay correctly.
+\item option \texttt{-latex  \textsl{<file.tex>}}: produce a summary of the replay
+  under the form of a tabular environment in LaTeX, one tabular for each theory, in the file  \texttt{\textsl{<file.tex>}}.
+\item option \texttt{-html \textsl{<file.html>}}: produce a summary of the replay in
+  HTML syntax.
 \end{itemize}
 
 \section{The \texttt{why3.conf} configuration file}
