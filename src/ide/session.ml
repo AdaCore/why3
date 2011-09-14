@@ -285,18 +285,18 @@ let save_status fmt s =
     | Done r -> save_result fmt r
 
 let save_proof_attempt fmt _key a =
-  fprintf fmt "@\n@[<v 1><proof prover=\"%s\" timelimit=\"%d\" edited=\"%s\" obsolete=\"%b\">"
+  fprintf fmt "@\n@[<v 1><proof@ prover=\"%s\"@ timelimit=\"%d\"@ edited=\"%s\"@ obsolete=\"%b\">"
     (prover_id a.prover) a.timelimit a.edited_as a.proof_obsolete;
   save_status fmt a.proof_state;
   fprintf fmt "@]@\n</proof>"
 
 let opt lab fmt = function
   | None -> ()
-  | Some s -> fprintf fmt "%s=\"%s\" " lab s
+  | Some s -> fprintf fmt "%s=\"%s\"@ " lab s
 
 let rec save_goal fmt g =
   assert (g.goal_shape <> "");
-  fprintf fmt "@\n@[<v 1><goal name=\"%s\" %asum=\"%s\" proved=\"%b\" expanded=\"%b\" shape=\"%s\">"
+  fprintf fmt "@\n@[<v 1><goal@ name=\"%s\"@ %asum=\"%s\"@ proved=\"%b\"@ expanded=\"%b\"@ shape=\"%s\">"
     g.goal_name (opt "expl") g.goal_expl g.checksum g.proved  g.goal_expanded
     g.goal_shape;
   Hashtbl.iter (save_proof_attempt fmt) g.external_proofs;
@@ -304,25 +304,25 @@ let rec save_goal fmt g =
   fprintf fmt "@]@\n</goal>"
 
 and save_trans fmt _ t =
-  fprintf fmt "@\n@[<v 1><transf name=\"%s\" proved=\"%b\" expanded=\"%b\">"
+  fprintf fmt "@\n@[<v 1><transf@ name=\"%s\"@ proved=\"%b\"@ expanded=\"%b\">"
     t.transf.transformation_name t.transf_proved t.transf_expanded;
   List.iter (save_goal fmt) t.subgoals;
   fprintf fmt "@]@\n</transf>"
 
 let save_theory fmt t =
-  fprintf fmt "@\n@[<v 1><theory name=\"%s\" verified=\"%b\" expanded=\"%b\">"
+  fprintf fmt "@\n@[<v 1><theory@ name=\"%s\"@ verified=\"%b\"@ expanded=\"%b\">"
     t.theory_name t.verified t.theory_expanded;
   List.iter (save_goal fmt) t.goals;
   fprintf fmt "@]@\n</theory>"
 
 let save_file fmt f =
-  fprintf fmt "@\n@[<v 1><file name=\"%s\" verified=\"%b\" expanded=\"%b\">"
+  fprintf fmt "@\n@[<v 1><file@ name=\"%s\"@ verified=\"%b\"@ expanded=\"%b\">"
     f.file_name f.file_verified f.file_expanded;
   List.iter (save_theory fmt) f.theories;
   fprintf fmt "@]@\n</file>"
 
 let save_prover fmt p =
-  fprintf fmt "@\n@[<v 1><prover id=\"%s\" name=\"%s\" version=\"%s\"/>@]"
+  fprintf fmt "@\n@[<v 1><prover@ id=\"%s\"@ name=\"%s\"@ version=\"%s\"/>@]"
     p.prover_id p.prover_name p.prover_version
 
 let save fname =
@@ -330,7 +330,7 @@ let save fname =
   let fmt = formatter_of_out_channel ch in
   fprintf fmt "<?xml version=\"1.0\" encoding=\"UTF-8\"?>@\n";
   fprintf fmt "<!DOCTYPE why3session SYSTEM \"why3session.dtd\">@\n";
-  fprintf fmt "@[<v 1><why3session name=\"%s\">" fname;
+  fprintf fmt "@[<v 1><why3session@ name=\"%s\">" fname;
   Util.Mstr.iter (fun _ d -> save_prover fmt d) (get_provers ());
   List.iter (save_file fmt) (get_all_files());
   fprintf fmt "@]@\n</why3session>";
@@ -594,6 +594,7 @@ let schedule_edit_proof ~debug:_ ~editor ~file ~driver ~callback goal =
 (*     check sum      *)
 (**********************)
 
+(*
 let task_checksum t =
   (* TODO: ignore print_locs and print_labels flag *)
   (* even better: compute check_sum directly, similar to the shape *)
@@ -610,6 +611,7 @@ let task_checksum t =
   eprintf "task %s, sum = %s@." tmp sum;
 *)
   sum
+*)
 
 
 
@@ -646,7 +648,7 @@ let raw_add_goal parent name expl sum shape topt exp =
   let key = O.create ~parent:parent_key () in
   let sum,shape = match topt with
     | None -> sum,shape
-    | Some t -> (task_checksum t,
+    | Some t -> (Termcode.task_checksum t,
                  Termcode.t_shape_buf (Task.task_goal_fmla t))
   in
   let goal = { goal_name = name;
@@ -836,7 +838,7 @@ let associate_subgoals gname old_goals new_goals =
       (fun i g ->
          let id = (Task.task_goal g).Decl.pr_name in
          let goal_name = gname ^ "." ^ (string_of_int (i+1)) in
-         let sum = task_checksum g in
+         let sum = Termcode.task_checksum g in
          (i,id,goal_name,g,sum))
       new_goals
   in
@@ -1152,7 +1154,7 @@ let found_obsolete = ref false
 let reload_root_goal ~allow_obsolete mth tname old_goals t : goal =
   let id = (Task.task_goal t).Decl.pr_name in
   let gname = id.Ident.id_string in
-  let sum = task_checksum t in
+  let sum = Termcode.task_checksum t in
   let old_goal, goal_obsolete =
     try
       let old_goal = Util.Mstr.find gname old_goals in

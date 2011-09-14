@@ -9,26 +9,26 @@
  <prover id="z3" name="Z3" version="2.19"/>
  <file name="../fib_memo.mlw" verified="true" expanded="true">
   <theory name="WP M" verified="true" expanded="true">
-   <goal name="WP_parameter fibo" expl="parameter fibo" sum="b2f9c59516b56e8121a870326cd6372f" proved="true" expanded="true" shape="iainfix <=V0c1ainvV1Aainfix =c1afibV0ainvV4Aainfix =ainfix +V3V5afibV0IainvV4Aainfix =V5afibainfix -V0c2FFAainvV2Aainfix <=c0ainfix -V0c2IainvV2Aainfix =V3afibainfix -V0c1FFAainvV1Aainfix <=c0ainfix -V0c1IainvV1Aainfix <=c0V0FF">
+   <goal name="WP_parameter fibo" expl="parameter fibo" sum="71696758d0d251707ad52253a2baddb7" proved="true" expanded="true" shape="iainfix <=V0c1ainvV1Aainfix =c1afibV0ainvV4Aainfix =ainfix +V3V5afibV0IainvV4Aainfix =V5afibainfix -V0c2FFAainvV2Aainfix <=c0ainfix -V0c2IainvV2Aainfix =V3afibainfix -V0c1FFAainvV1Aainfix <=c0ainfix -V0c1IainvV1Aainfix <=c0V0FF">
     <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.02"/>
+     <result status="valid" time="0.03"/>
     </proof>
    </goal>
-   <goal name="WP_parameter memo_fibo" expl="parameter memo_fibo" sum="bf0eac17c1109b6bf5a06bc4de105cb4" proved="true" expanded="true" shape="ainvV4Aainfix =V3afibV0Iainfix =V4asetV2V0aSomeV3FIainvV2Aainfix =V3afibV0FFAainvV1Aainfix <=c0V0Iainfix =agetV1V0aNoneAainvV1Aainfix =V5afibV0Iainfix =agetV1V0aSomeV5FIainvV1Aainfix <=c0V0FF">
+   <goal name="WP_parameter memo_fibo" expl="parameter memo_fibo" sum="1a5a8b59b73e473316227d458973d7b8" proved="true" expanded="true" shape="ainvV4Aainfix =V3afibV0Iainfix =V4asetV2V0aSomeV3FIainvV2Aainfix =V3afibV0FFAainvV1Aainfix <=c0V0Iainfix =agetV1V0aNoneAainvV1Aainfix =V5afibV0Iainfix =agetV1V0aSomeV5FIainvV1Aainfix <=c0V0FF">
     <transf name="split_goal" proved="true" expanded="true">
-     <goal name="WP_parameter memo_fibo.1" expl="normal postcondition" sum="191aa05a82087b2fe04b6ec1f56aea5c" proved="true" expanded="true" shape="ainvV1Aainfix =V2afibV0Iainfix =agetV1V0aSomeV2FIainvV1Aainfix <=c0V0FF">
+     <goal name="WP_parameter memo_fibo.1" expl="normal postcondition" sum="a90141f0f9f0d6412bf88e0be0a783da" proved="true" expanded="true" shape="ainvV1Aainfix =V2afibV0Iainfix =agetV1V0aSomeV2FIainvV1Aainfix <=c0V0FF">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal name="WP_parameter memo_fibo.2" expl="precondition" sum="8913ff358744193d16e3e8c0e70410cb" proved="true" expanded="true" shape="ainvV1Aainfix <=c0V0Iainfix =agetV1V0aNoneIainvV1Aainfix =V2afibV0Iainfix =agetV1V0aSomeV2FIainvV1Aainfix <=c0V0FF">
+     <goal name="WP_parameter memo_fibo.2" expl="precondition" sum="5591525660b508b53b9c5b82c1ae28af" proved="true" expanded="true" shape="ainvV1Aainfix <=c0V0Iainfix =agetV1V0aNoneIainvV1Aainfix =V2afibV0Iainfix =agetV1V0aSomeV2FIainvV1Aainfix <=c0V0FF">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.03"/>
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter memo_fibo.3" expl="normal postcondition" sum="a07d81d85f066a7daf5413f54edf2ea7" proved="true" expanded="true" shape="ainvV4Aainfix =V3afibV0Iainfix =V4asetV2V0aSomeV3FIainvV2Aainfix =V3afibV0FFIainvV1Aainfix <=c0V0Iainfix =agetV1V0aNoneIainvV1Aainfix =V5afibV0Iainfix =agetV1V0aSomeV5FIainvV1Aainfix <=c0V0FF">
+     <goal name="WP_parameter memo_fibo.3" expl="normal postcondition" sum="af2c7a6a629f2bdcc2cb6044ff61b527" proved="true" expanded="true" shape="ainvV4Aainfix =V3afibV0Iainfix =V4asetV2V0aSomeV3FIainvV2Aainfix =V3afibV0FFIainvV1Aainfix <=c0V0Iainfix =agetV1V0aNoneIainvV1Aainfix =V5afibV0Iainfix =agetV1V0aSomeV5FIainvV1Aainfix <=c0V0FF">
       <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.03"/>
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
     </transf>

@@ -1,20 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
-<why3session name="examples/scottish-private-club/why3session.xml">
+<why3session name="./scottish-private-club/why3session.xml">
+ <prover id="alt-ergo" name="Alt-Ergo" version="0.93"/>
+ <prover id="coq" name="Coq" version="8.2pl1"/>
+ <prover id="cvc3" name="CVC3" version="2.2"/>
+ <prover id="gappa" name="Gappa" version="0.13.0"/>
+ <prover id="simplify" name="Simplify" version="1.5.4"/>
+ <prover id="z3" name="Z3" version="2.19"/>
  <file name="../scottish-private-club.why" verified="true" expanded="true">
   <theory name="ScottishClubProblem" verified="true" expanded="true">
-   <goal name="ThereIsNobodyInTheClub" sum="c3a407614cecf50c38f66fddd8e677f5" proved="true" expanded="true">
+   <goal name="ThereIsNobodyInTheClub" sum="53a955f94f7b8de4969fa31f569b5f0a" proved="true" expanded="true" shape="f">
     <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.00"/>
+     <result status="valid" time="0.01"/>
     </proof>
     <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.00"/>
+     <result status="valid" time="0.02"/>
     </proof>
     <proof prover="simplify" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.00"/>
+     <result status="valid" time="0.01"/>
     </proof>
     <proof prover="z3" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.00"/>
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
   </theory>

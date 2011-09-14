@@ -47,6 +47,10 @@ let tag_and = "A"
 let tag_app = "a"
 let tag_case = "C"
 let tag_const = "c"
+let tag_Dtype = "Dt"
+let tag_Dlogic = "Dl"
+let tag_Dind = "Di"
+let tag_Dprop = "Dp"
 let tag_exists = "E"
 let tag_eps = "e"
 let tag_forall = "F"
@@ -56,8 +60,16 @@ let tag_if = "i"
 let tag_let = "L"
 let tag_not = "N"
 let tag_or = "O"
+let tag_Plemma = "Pl"
+let tag_Paxiom = "Pa"
+let tag_Pgoal = "Pg"
+let tag_Pskip = "Ps"
 let tag_iff = "q"
 let tag_true = "t"
+let tag_tDecl = "TD"
+let tag_tClone = "TC"
+let tag_tUse = "TU"
+let tag_tMeta = "TM"
 let tag_var = "V"
 let tag_wild = "w"
 let tag_as = "z"
@@ -142,6 +154,56 @@ let t_shape_list t =
 
 let pr_shape_list fmt t =
   List.iter (fun s -> Format.fprintf fmt "%s" s) (t_shape_list t)
+
+
+(* shape of a task *)
+
+let propdecl_shape ~(push:string->'a->'a) (acc:'a) (k,n,t) : 'a =
+  let tag = match k with
+    | Decl.Plemma -> tag_Plemma
+    | Decl.Paxiom -> tag_Paxiom
+    | Decl.Pgoal -> tag_Pgoal
+    | Decl.Pskip -> tag_Pskip
+  in
+  let acc = push tag acc in
+  let acc = push n.Decl.pr_name.Ident.id_string acc in
+  t_shape ~push (ref(-1)) Mvs.empty acc t
+
+let decl_shape ~(push:string->'a->'a) (acc:'a) d : 'a =
+  match d.Decl.d_node with
+    | Decl.Dtype _tyl -> push tag_Dtype acc
+    | Decl.Dlogic _ldl -> push tag_Dlogic acc
+    | Decl.Dind _idl -> push tag_Dind acc
+    | Decl.Dprop pdecl ->
+        propdecl_shape ~push (push tag_Dprop acc) pdecl
+
+
+let tdecl_shape ~(push:string->'a->'a) (acc:'a) t : 'a =
+  match t.Theory.td_node with
+    | Theory.Decl d -> decl_shape ~push (push tag_tDecl acc) d
+    | Theory.Meta _ -> push tag_tMeta acc
+    | Theory.Clone _ -> push tag_tClone acc
+    | Theory.Use _ -> push tag_tUse acc
+
+let rec task_shape ~(push:string->'a->'a) (acc:'a) t : 'a =
+  match t with
+    | None -> acc
+    | Some t ->
+        task_shape ~push (tdecl_shape ~push acc t.Task.task_decl)
+          t.Task.task_prev
+
+
+
+(* checksum of a task
+   it is the MD5 digest of the shape
+*)
+
+let task_checksum t =
+  let b = Buffer.create 257 in
+  let push t () = Buffer.add_string b t in
+  let () = task_shape ~push () t in
+  let shape = Buffer.contents b in
+  Digest.to_hex (Digest.string shape)
 
 
 

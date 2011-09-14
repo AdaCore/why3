@@ -40,7 +40,11 @@ val t_dist : term -> term -> float
 val t_shape_buf : Term.term -> string
   (** returns a shape of the given term *)
 
+(*
 val t_shape_list : Term.term -> string list
   (** returns a shape of the given term *)
 
 val pr_shape_list : Format.formatter -> Term.term -> unit
+*)
+
+val task_checksum : Task.task -> string

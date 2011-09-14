@@ -1,45 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
-<why3session name="examples/hello_proof/why3session.xml">
+<why3session name="./hello_proof/why3session.xml">
  <prover id="alt-ergo" name="Alt-Ergo" version="0.93"/>
- <prover id="coq" name="Coq" version="8.3pl2"/>
+ <prover id="coq" name="Coq" version="8.2pl1"/>
  <prover id="cvc3" name="CVC3" version="2.2"/>
- <prover id="gappa" name="Gappa" version="0.15.0"/>
+ <prover id="gappa" name="Gappa" version="0.13.0"/>
  <prover id="simplify" name="Simplify" version="1.5.4"/>
- <prover id="spass" name="Spass" version="3.7"/>
- <prover id="vampire" name="Vampire" version="0.6"/>
- <prover id="yices" name="Yices" version="1.0.25"/>
  <prover id="z3" name="Z3" version="2.19"/>
  <file name="../hello_proof.why" verified="false" expanded="true">
   <theory name="HelloProof" verified="false" expanded="true">
-   <goal name="G1" sum="da0794d2f4de035d230d26e93d3e1afe" proved="true" expanded="true" shape="t">
+   <goal name="G1" sum="b060ede45247709977a2817a7ac6b4bd" proved="true" expanded="true" shape="t">
     <proof prover="simplify" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.00"/>
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
-   <goal name="G2" sum="07e54d9a25fa3174d5d5bf7ce71a13dc" proved="false" expanded="true" shape="fOtAfIt">
+   <goal name="G2" sum="29d2b92fcf63e1df963c30f4822b9801" proved="false" expanded="true" shape="fOtAfIt">
     <proof prover="simplify" timelimit="10" edited="" obsolete="false">
-     <result status="unknown" time="0.00"/>
+     <result status="unknown" time="0.01"/>
     </proof>
     <transf name="split_goal" proved="false" expanded="true">
-     <goal name="G2.1" sum="f7915ef009bdd949e4af326643583051" proved="false" expanded="true" shape="fIt">
+     <goal name="G2.1" sum="12fa33a25c8f3a0a042196b8d8c3a85b" proved="false" expanded="true" shape="fIt">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="unknown" time="0.02"/>
+      </proof>
+      <proof prover="simplify" timelimit="10" edited="" obsolete="false">
        <result status="unknown" time="0.01"/>
       </proof>
-      <proof prover="simplify" timelimit="10" edited="" obsolete="false">
-       <result status="unknown" time="0.00"/>
-      </proof>
      </goal>
-     <goal name="G2.2" sum="c53f58872dc3cb71805234ace78f1c2d" proved="true" expanded="true" shape="fOt">
+     <goal name="G2.2" sum="0a8787ba8a8ae75c6e58904fa2a5ece0" proved="true" expanded="true" shape="fOt">
       <proof prover="simplify" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.00"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
     </transf>
    </goal>
-   <goal name="G3" sum="3c319e2d361d8bdd1e51c24c087a2981" proved="true" expanded="true" shape="ainfix >=ainfix *V0V0c0F">
+   <goal name="G3" sum="957de34bf31dbdb537afc46f3eaaa47b" proved="true" expanded="true" shape="ainfix >=ainfix *V0V0c0F">
     <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-     <result status="valid" time="0.00"/>
+     <result status="valid" time="0.02"/>
     </proof>
    </goal>
   </theory>
