@@ -1,56 +1,116 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
 <why3session name="examples/programs/vstte10_max_sum/why3session.xml">
+ <prover id="alt-ergo" name="Alt-Ergo" version="0.93"/>
+ <prover id="coq" name="Coq" version="8.3pl2"/>
+ <prover id="cvc3" name="CVC3" version="2.2"/>
+ <prover id="gappa" name="Gappa" version="0.15.0"/>
+ <prover id="simplify" name="Simplify" version="1.5.4"/>
+ <prover id="spass" name="Spass" version="3.7"/>
+ <prover id="vampire" name="Vampire" version="0.6"/>
+ <prover id="yices" name="Yices" version="1.0.25"/>
+ <prover id="z3" name="Z3" version="2.19"/>
  <file name="../vstte10_max_sum.mlw" verified="true" expanded="true">
   <theory name="WP MaxAndSum" verified="true" expanded="true">
-   <goal name="WP_parameter max_sum" expl="correctness of parameter max_sum" sum="4385c731695d5dfaf677a2e64e525aa3" proved="true" expanded="true">
+   <goal name="WP_parameter max_sum" expl="parameter max_sum" sum="6634c4fb2dd7a2c499498d8a6fc3db59" proved="true" expanded="true" shape="ainfix <=V4ainfix *V1V3Iainfix <=V4ainfix *ainfix +ainfix -V1c1c1V3Aiainfix <V3agetV2V5ainfix <=V7ainfix *ainfix +V5c1V6Iainfix =V7ainfix +V4agetV2V5FAainfix <V5V0Aainfix <=c0V5Iainfix =V6agetV2V5FAainfix <V5V0Aainfix <=c0V5ainfix <=V8ainfix *ainfix +V5c1V3Iainfix =V8ainfix +V4agetV2V5FAainfix <V5V0Aainfix <=c0V5Aainfix <V5V0Aainfix <=c0V5Iainfix <=V4ainfix *V5V3Iainfix <=V5ainfix -V1c1Aainfix <=c0V5FFFAainfix <=c0ainfix *c0c0Iainfix <=c0ainfix -V1c1Aainfix <=c0ainfix *V1c0Iainfix >c0ainfix -V1c1Iainfix >=agetV2V9c0Iainfix <V9V1Aainfix <=c0V9FAainfix =V1V0Aainfix <=c0V1FFF">
     <transf name="split_goal" proved="true" expanded="true">
-     <goal name="WP_parameter max_sum.1" expl="correctness of parameter max_sum" sum="50bff07f8e225489792e93970faf39bd" proved="true" expanded="true">
+     <goal name="WP_parameter max_sum.1" expl="normal postcondition" sum="66ed16c7ed5d535179dadd64fd9d3bf4" proved="true" expanded="true" shape="ainfix <=c0ainfix *V1c0Iainfix >c0ainfix -V1c1Iainfix >=agetV2V3c0Iainfix <V3V1Aainfix <=c0V3FAainfix =V1V0Aainfix <=c0V1FFF">
+      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.00"/>
+      </proof>
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.01"/>
       </proof>
+      <proof prover="z3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.00"/>
+      </proof>
      </goal>
-     <goal name="WP_parameter max_sum.2" expl="for loop initialization" sum="a74bcc609828a76cecf305ea20a855bd" proved="true" expanded="true">
+     <goal name="WP_parameter max_sum.2" expl="for loop initialization" sum="a647782537d5c7247ea973cff226c8d2" proved="true" expanded="true" shape="ainfix <=c0ainfix *c0c0Iainfix <=c0ainfix -V1c1Iainfix >=agetV2V3c0Iainfix <V3V1Aainfix <=c0V3FAainfix =V1V0Aainfix <=c0V1FFF">
+      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.00"/>
+      </proof>
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.01"/>
       </proof>
+      <proof prover="z3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.00"/>
+      </proof>
      </goal>
-     <goal name="WP_parameter max_sum.3" expl="for loop preservation" sum="03139bbf95227dc693291223a8adca7b" proved="true" expanded="true">
+     <goal name="WP_parameter max_sum.3" expl="for loop preservation" sum="de42d7483fd0c7358ef460e3c9a4842a" proved="true" expanded="true" shape="iainfix <V3agetV2V5ainfix <=V7ainfix *ainfix +V5c1V6Iainfix =V7ainfix +V4agetV2V5FAainfix <V5V0Aainfix <=c0V5Iainfix =V6agetV2V5FAainfix <V5V0Aainfix <=c0V5ainfix <=V8ainfix *ainfix +V5c1V3Iainfix =V8ainfix +V4agetV2V5FAainfix <V5V0Aainfix <=c0V5Aainfix <V5V0Aainfix <=c0V5Iainfix <=V4ainfix *V5V3Iainfix <=V5ainfix -V1c1Aainfix <=c0V5FFFIainfix <=c0ainfix -V1c1Iainfix >=agetV2V9c0Iainfix <V9V1Aainfix <=c0V9FAainfix =V1V0Aainfix <=c0V1FFF">
       <transf name="split_goal" proved="true" expanded="true">
-       <goal name="WP_parameter max_sum.3.1" expl="for loop preservation" sum="c5e1359bf0d3e5c965d176b41e4efaa0" proved="true" expanded="true">
+       <goal name="WP_parameter max_sum.3.1" expl="for loop preservation" sum="4f0d15ddfcbcbaa46bba67afc135b0c5" proved="true" expanded="true" shape="ainfix <V5V0Aainfix <=c0V5Iainfix <=V4ainfix *V5V3Iainfix <=V5ainfix -V1c1Aainfix <=c0V5FFFIainfix <=c0ainfix -V1c1Iainfix >=agetV2V6c0Iainfix <V6V1Aainfix <=c0V6FAainfix =V1V0Aainfix <=c0V1FFF">
+        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.00"/>
+        </proof>
         <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
          <result status="valid" time="0.01"/>
         </proof>
-       </goal>
-       <goal name="WP_parameter max_sum.3.2" expl="for loop preservation" sum="e0909f9fcddff65cc9df9ab17ae2c51e" proved="true" expanded="true">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+        <proof prover="z3" timelimit="10" edited="" obsolete="false">
          <result status="valid" time="0.01"/>
         </proof>
        </goal>
-       <goal name="WP_parameter max_sum.3.3" expl="for loop preservation" sum="95ab81f2ba7b8ea0e0ba5eab29e258d9" proved="true" expanded="true">
+       <goal name="WP_parameter max_sum.3.2" expl="for loop preservation" sum="262cabf02abe6124ed277664b6f399c6" proved="true" expanded="true" shape="ainfix <V5V0Aainfix <=c0V5Iainfix <V3agetV2V5Iainfix <V5V0Aainfix <=c0V5Iainfix <=V4ainfix *V5V3Iainfix <=V5ainfix -V1c1Aainfix <=c0V5FFFIainfix <=c0ainfix -V1c1Iainfix >=agetV2V6c0Iainfix <V6V1Aainfix <=c0V6FAainfix =V1V0Aainfix <=c0V1FFF">
+        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.00"/>
+        </proof>
         <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
          <result status="valid" time="0.01"/>
         </proof>
+        <proof prover="z3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.00"/>
+        </proof>
        </goal>
-       <goal name="WP_parameter max_sum.3.4" expl="for loop preservation" sum="1bd7da57e167967191f8870ca3284f8c" proved="true" expanded="true">
+       <goal name="WP_parameter max_sum.3.3" expl="for loop preservation" sum="c54f6ed83508c2b03699303725d04142" proved="true" expanded="true" shape="ainfix <V5V0Aainfix <=c0V5Iainfix =V6agetV2V5FIainfix <V5V0Aainfix <=c0V5Iainfix <V3agetV2V5Iainfix <V5V0Aainfix <=c0V5Iainfix <=V4ainfix *V5V3Iainfix <=V5ainfix -V1c1Aainfix <=c0V5FFFIainfix <=c0ainfix -V1c1Iainfix >=agetV2V7c0Iainfix <V7V1Aainfix <=c0V7FAainfix =V1V0Aainfix <=c0V1FFF">
+        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.00"/>
+        </proof>
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+        <proof prover="z3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.00"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter max_sum.3.4" expl="for loop preservation" sum="30a055dd152c30ef367bf6a3f4919831" proved="true" expanded="true" shape="ainfix <=V7ainfix *ainfix +V5c1V6Iainfix =V7ainfix +V4agetV2V5FIainfix <V5V0Aainfix <=c0V5Iainfix =V6agetV2V5FIainfix <V5V0Aainfix <=c0V5Iainfix <V3agetV2V5Iainfix <V5V0Aainfix <=c0V5Iainfix <=V4ainfix *V5V3Iainfix <=V5ainfix -V1c1Aainfix <=c0V5FFFIainfix <=c0ainfix -V1c1Iainfix >=agetV2V8c0Iainfix <V8V1Aainfix <=c0V8FAainfix =V1V0Aainfix <=c0V1FFF">
         <proof prover="coq" timelimit="10" edited="vstte10_max_sum_MaxAndSum_WP_parameter_max_sum_1.v" obsolete="false">
-         <result status="valid" time="0.54"/>
+         <result status="valid" time="0.53"/>
+        </proof>
+        <proof prover="z3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
         </proof>
        </goal>
-       <goal name="WP_parameter max_sum.3.5" expl="for loop preservation" sum="b5a79878ef17b26b0541a4fde7b532e6" proved="true" expanded="true">
+       <goal name="WP_parameter max_sum.3.5" expl="for loop preservation" sum="7036e32cb3b8b7a339e9201195e821bb" proved="true" expanded="true" shape="ainfix <V5V0Aainfix <=c0V5Iainfix <V3agetV2V5NIainfix <V5V0Aainfix <=c0V5Iainfix <=V4ainfix *V5V3Iainfix <=V5ainfix -V1c1Aainfix <=c0V5FFFIainfix <=c0ainfix -V1c1Iainfix >=agetV2V6c0Iainfix <V6V1Aainfix <=c0V6FAainfix =V1V0Aainfix <=c0V1FFF">
+        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.00"/>
+        </proof>
         <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
          <result status="valid" time="0.01"/>
         </proof>
+        <proof prover="z3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.00"/>
+        </proof>
        </goal>
-       <goal name="WP_parameter max_sum.3.6" expl="for loop preservation" sum="48c44cbaf0169308da2516b2963bafe2" proved="true" expanded="true">
+       <goal name="WP_parameter max_sum.3.6" expl="for loop preservation" sum="22a53f1ce9b097196e8c37ba19583c05" proved="true" expanded="true" shape="ainfix <=V6ainfix *ainfix +V5c1V3Iainfix =V6ainfix +V4agetV2V5FIainfix <V5V0Aainfix <=c0V5Iainfix <V3agetV2V5NIainfix <V5V0Aainfix <=c0V5Iainfix <=V4ainfix *V5V3Iainfix <=V5ainfix -V1c1Aainfix <=c0V5FFFIainfix <=c0ainfix -V1c1Iainfix >=agetV2V7c0Iainfix <V7V1Aainfix <=c0V7FAainfix =V1V0Aainfix <=c0V1FFF">
+        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.01"/>
+        </proof>
         <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+        <proof prover="z3" timelimit="10" edited="" obsolete="false">
          <result status="valid" time="0.01"/>
         </proof>
        </goal>
       </transf>
      </goal>
-     <goal name="WP_parameter max_sum.4" expl="correctness of parameter max_sum" sum="24085f97178d85b4b3755974f802c949" proved="true" expanded="true">
+     <goal name="WP_parameter max_sum.4" expl="normal postcondition" sum="b4701107f701835dfcdeb6207713de2c" proved="true" expanded="true" shape="ainfix <=V4ainfix *V1V3Iainfix <=V4ainfix *ainfix +ainfix -V1c1c1V3FFIainfix <=c0ainfix -V1c1Iainfix >=agetV2V5c0Iainfix <V5V1Aainfix <=c0V5FAainfix =V1V0Aainfix <=c0V1FFF">
+      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.00"/>
+      </proof>
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof prover="z3" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.00"/>
       </proof>
      </goal>
@@ -58,174 +118,295 @@
    </goal>
   </theory>
   <theory name="WP MaxAndSum2" verified="true" expanded="true">
-   <goal name="WP_parameter max_sum" expl="correctness of parameter max_sum" sum="511e229ad52d526ab7b61ac3af286c3c" proved="true" expanded="true">
+   <goal name="WP_parameter max_sum" expl="parameter max_sum" sum="ca993aa06cf26d5f8dd50685c100ef04" proved="true" expanded="true" shape="Lamk arrayV0V2ainfix <=V5ainfix *V1V4Aais_maxV3c0V1V4Aainfix =V5asumV2c0V1Iainfix <=V5ainfix *ainfix +ainfix -V1c1c1V4Aais_maxV3c0ainfix +ainfix -V1c1c1V4Aainfix =V5asumV2c0ainfix +ainfix -V1c1c1Aiainfix <V4agetV2V6ainfix <=V8ainfix *ainfix +V6c1V7Aais_maxV3c0ainfix +V6c1V7Aainfix =V8asumV2c0ainfix +V6c1Iainfix =V8ainfix +V5agetV2V6FAainfix <V6V0Aainfix <=c0V6Iainfix =V7agetV2V6FAainfix <V6V0Aainfix <=c0V6ainfix <=V9ainfix *ainfix +V6c1V4Aais_maxV3c0ainfix +V6c1V4Aainfix =V9asumV2c0ainfix +V6c1Iainfix =V9ainfix +V5agetV2V6FAainfix <V6V0Aainfix <=c0V6Aainfix <V6V0Aainfix <=c0V6Iainfix <=V5ainfix *V6V4Aais_maxV3c0V6V4Aainfix =V5asumV2c0V6Iainfix <=V6ainfix -V1c1Aainfix <=c0V6FFFAainfix <=c0ainfix *c0c0Aais_maxV3c0c0c0Aainfix =c0asumV2c0c0Iainfix <=c0ainfix -V1c1Aainfix <=c0ainfix *V1c0Aais_maxV3c0V1c0Aainfix =c0asumV2c0V1Iainfix >c0ainfix -V1c1Iainfix >=agetV2V10c0Iainfix <V10V1Aainfix <=c0V10FAainfix =V1V0Aainfix <=c0V1FFF">
     <transf name="split_goal" proved="true" expanded="true">
-     <goal name="WP_parameter max_sum.1" expl="correctness of parameter max_sum" sum="1527d45f4103d912473c45e5e2b3f0e0" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.01"/>
+     <goal name="WP_parameter max_sum.1" expl="normal postcondition" sum="824989189d32832ec370b6abc5bd8a1d" proved="true" expanded="true" shape="Lamk arrayV0V2ainfix <=c0ainfix *V1c0Aais_maxV3c0V1c0Aainfix =c0asumV2c0V1Iainfix >c0ainfix -V1c1Iainfix >=agetV2V4c0Iainfix <V4V1Aainfix <=c0V4FAainfix =V1V0Aainfix <=c0V1FFF">
+      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.00"/>
       </proof>
-     </goal>
-     <goal name="WP_parameter max_sum.2" expl="correctness of parameter max_sum" sum="143fefd325b72380610c6bfbffc4ccb0" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter max_sum.3" expl="correctness of parameter max_sum" sum="5495206725253d17db0a9c6da1b6cb38" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter max_sum.4" expl="for loop initialization" sum="8caeb1a833d416f694a005a932abe777" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.02"/>
       </proof>
+      <proof prover="z3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
      </goal>
-     <goal name="WP_parameter max_sum.5" expl="for loop preservation" sum="e45a4c12cbe159c4cca2b20fd6080eb4" proved="true" expanded="true">
+     <goal name="WP_parameter max_sum.2" expl="for loop initialization" sum="515c8665cea8d4f9c74fa3ee9e6af202" proved="true" expanded="true" shape="Lamk arrayV0V2ainfix <=c0ainfix *c0c0Aais_maxV3c0c0c0Aainfix =c0asumV2c0c0Iainfix <=c0ainfix -V1c1Iainfix >=agetV2V4c0Iainfix <V4V1Aainfix <=c0V4FAainfix =V1V0Aainfix <=c0V1FFF">
+      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof prover="z3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter max_sum.3" expl="for loop preservation" sum="8f2006ef27627f61f8651a02b1c5f573" proved="true" expanded="true" shape="Lamk arrayV0V2iainfix <V4agetV2V6ainfix <=V8ainfix *ainfix +V6c1V7Aais_maxV3c0ainfix +V6c1V7Aainfix =V8asumV2c0ainfix +V6c1Iainfix =V8ainfix +V5agetV2V6FAainfix <V6V0Aainfix <=c0V6Iainfix =V7agetV2V6FAainfix <V6V0Aainfix <=c0V6ainfix <=V9ainfix *ainfix +V6c1V4Aais_maxV3c0ainfix +V6c1V4Aainfix =V9asumV2c0ainfix +V6c1Iainfix =V9ainfix +V5agetV2V6FAainfix <V6V0Aainfix <=c0V6Aainfix <V6V0Aainfix <=c0V6Iainfix <=V5ainfix *V6V4Aais_maxV3c0V6V4Aainfix =V5asumV2c0V6Iainfix <=V6ainfix -V1c1Aainfix <=c0V6FFFIainfix <=c0ainfix -V1c1Iainfix >=agetV2V10c0Iainfix <V10V1Aainfix <=c0V10FAainfix =V1V0Aainfix <=c0V1FFF">
       <transf name="split_goal" proved="true" expanded="true">
-       <goal name="WP_parameter max_sum.5.1" expl="for loop preservation" sum="5566197fe481ee398c1e0ef64bb27d3a" proved="true" expanded="true">
+       <goal name="WP_parameter max_sum.3.1" expl="for loop preservation" sum="f2a4c7b06ebae568cf094e957e2b1e1e" proved="true" expanded="true" shape="Lamk arrayV0V2ainfix <V6V0Aainfix <=c0V6Iainfix <=V5ainfix *V6V4Aais_maxV3c0V6V4Aainfix =V5asumV2c0V6Iainfix <=V6ainfix -V1c1Aainfix <=c0V6FFFIainfix <=c0ainfix -V1c1Iainfix >=agetV2V7c0Iainfix <V7V1Aainfix <=c0V7FAainfix =V1V0Aainfix <=c0V1FFF">
+        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.00"/>
+        </proof>
         <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
          <result status="valid" time="0.01"/>
         </proof>
-       </goal>
-       <goal name="WP_parameter max_sum.5.2" expl="for loop preservation" sum="0c2c8880ec9b27febd20b2ecd3a3da72" proved="true" expanded="true">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.01"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter max_sum.5.3" expl="for loop preservation" sum="b15a83238f0ea600621af5d1a44afb8a" proved="true" expanded="true">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="0.01"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter max_sum.5.4" expl="for loop preservation" sum="09ca5a9d1398021c4ba6f825df439fe3" proved="true" expanded="true">
-        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+        <proof prover="z3" timelimit="10" edited="" obsolete="false">
          <result status="valid" time="0.02"/>
         </proof>
        </goal>
-       <goal name="WP_parameter max_sum.5.5" expl="for loop preservation" sum="7335e42f5decf90d49f1442b357f406c" proved="true" expanded="true">
+       <goal name="WP_parameter max_sum.3.2" expl="for loop preservation" sum="abead32612bc96a32b89344f6db7e05d" proved="true" expanded="true" shape="Lamk arrayV0V2ainfix <V6V0Aainfix <=c0V6Iainfix <V4agetV2V6Iainfix <V6V0Aainfix <=c0V6Iainfix <=V5ainfix *V6V4Aais_maxV3c0V6V4Aainfix =V5asumV2c0V6Iainfix <=V6ainfix -V1c1Aainfix <=c0V6FFFIainfix <=c0ainfix -V1c1Iainfix >=agetV2V7c0Iainfix <V7V1Aainfix <=c0V7FAainfix =V1V0Aainfix <=c0V1FFF">
+        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.00"/>
+        </proof>
         <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-         <result status="valid" time="2.64"/>
+         <result status="valid" time="0.01"/>
+        </proof>
+        <proof prover="z3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.00"/>
         </proof>
        </goal>
-       <goal name="WP_parameter max_sum.5.6" expl="for loop preservation" sum="adf41663cf84c9358f711e3637519b08" proved="true" expanded="true">
-        <proof prover="coq" timelimit="10" edited="vstte10_max_sum_WP_MaxAndSum2_WP_parameter_max_sum_1.v" obsolete="false">
-         <result status="valid" time="0.53"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter max_sum.5.7" expl="for loop preservation" sum="c30585e9b2d7dc9a6d0d8dde76234da8" proved="true" expanded="true">
+       <goal name="WP_parameter max_sum.3.3" expl="for loop preservation" sum="f1b0d114c384892a18b3207e54cd125b" proved="true" expanded="true" shape="Lamk arrayV0V2ainfix <V6V0Aainfix <=c0V6Iainfix =V7agetV2V6FIainfix <V6V0Aainfix <=c0V6Iainfix <V4agetV2V6Iainfix <V6V0Aainfix <=c0V6Iainfix <=V5ainfix *V6V4Aais_maxV3c0V6V4Aainfix =V5asumV2c0V6Iainfix <=V6ainfix -V1c1Aainfix <=c0V6FFFIainfix <=c0ainfix -V1c1Iainfix >=agetV2V8c0Iainfix <V8V1Aainfix <=c0V8FAainfix =V1V0Aainfix <=c0V1FFF">
         <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
          <result status="valid" time="0.01"/>
         </proof>
-       </goal>
-       <goal name="WP_parameter max_sum.5.8" expl="for loop preservation" sum="e4b7609936b9cd892823a97620480b7c" proved="true" expanded="true">
-        <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-         <result status="valid" time="0.01"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter max_sum.5.9" expl="for loop preservation" sum="c4505d8f6cb52b4b905329203cf5649a" proved="true" expanded="true">
-        <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-         <result status="valid" time="0.19"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter max_sum.5.10" expl="for loop preservation" sum="17c5a5d1b87d361eed5e30bc1a36b5db" proved="true" expanded="true">
         <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
          <result status="valid" time="0.01"/>
+        </proof>
+        <proof prover="z3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter max_sum.3.4" expl="for loop preservation" sum="4e34c21332bd5e38f885bddcd72914dc" proved="true" expanded="true" shape="Lamk arrayV0V2ainfix =V8asumV2c0ainfix +V6c1Iainfix =V8ainfix +V5agetV2V6FIainfix <V6V0Aainfix <=c0V6Iainfix =V7agetV2V6FIainfix <V6V0Aainfix <=c0V6Iainfix <V4agetV2V6Iainfix <V6V0Aainfix <=c0V6Iainfix <=V5ainfix *V6V4Aais_maxV3c0V6V4Aainfix =V5asumV2c0V6Iainfix <=V6ainfix -V1c1Aainfix <=c0V6FFFIainfix <=c0ainfix -V1c1Iainfix >=agetV2V9c0Iainfix <V9V1Aainfix <=c0V9FAainfix =V1V0Aainfix <=c0V1FFF">
+        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof prover="z3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter max_sum.3.5" expl="for loop preservation" sum="cdd4859b7f70d27897c3ae28660b7511" proved="true" expanded="true" shape="Lamk arrayV0V2ais_maxV3c0ainfix +V6c1V7Iainfix =V8ainfix +V5agetV2V6FIainfix <V6V0Aainfix <=c0V6Iainfix =V7agetV2V6FIainfix <V6V0Aainfix <=c0V6Iainfix <V4agetV2V6Iainfix <V6V0Aainfix <=c0V6Iainfix <=V5ainfix *V6V4Aais_maxV3c0V6V4Aainfix =V5asumV2c0V6Iainfix <=V6ainfix -V1c1Aainfix <=c0V6FFFIainfix <=c0ainfix -V1c1Iainfix >=agetV2V9c0Iainfix <V9V1Aainfix <=c0V9FAainfix =V1V0Aainfix <=c0V1FFF">
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="2.95"/>
+        </proof>
+        <proof prover="z3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter max_sum.3.6" expl="for loop preservation" sum="eb4124bc59a447f72a4be78dda35a707" proved="true" expanded="true" shape="Lamk arrayV0V2ainfix <=V8ainfix *ainfix +V6c1V7Iainfix =V8ainfix +V5agetV2V6FIainfix <V6V0Aainfix <=c0V6Iainfix =V7agetV2V6FIainfix <V6V0Aainfix <=c0V6Iainfix <V4agetV2V6Iainfix <V6V0Aainfix <=c0V6Iainfix <=V5ainfix *V6V4Aais_maxV3c0V6V4Aainfix =V5asumV2c0V6Iainfix <=V6ainfix -V1c1Aainfix <=c0V6FFFIainfix <=c0ainfix -V1c1Iainfix >=agetV2V9c0Iainfix <V9V1Aainfix <=c0V9FAainfix =V1V0Aainfix <=c0V1FFF">
+        <proof prover="coq" timelimit="10" edited="vstte10_max_sum_WP_MaxAndSum2_WP_parameter_max_sum_1.v" obsolete="false">
+         <result status="valid" time="0.51"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter max_sum.3.7" expl="for loop preservation" sum="3623b4807d8335848299b65e7356a9d2" proved="true" expanded="true" shape="Lamk arrayV0V2ainfix <V6V0Aainfix <=c0V6Iainfix <V4agetV2V6NIainfix <V6V0Aainfix <=c0V6Iainfix <=V5ainfix *V6V4Aais_maxV3c0V6V4Aainfix =V5asumV2c0V6Iainfix <=V6ainfix -V1c1Aainfix <=c0V6FFFIainfix <=c0ainfix -V1c1Iainfix >=agetV2V7c0Iainfix <V7V1Aainfix <=c0V7FAainfix =V1V0Aainfix <=c0V1FFF">
+        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.00"/>
+        </proof>
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+        <proof prover="z3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.00"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter max_sum.3.8" expl="for loop preservation" sum="626502741542df72b1cb644f37be7676" proved="true" expanded="true" shape="Lamk arrayV0V2ainfix =V7asumV2c0ainfix +V6c1Iainfix =V7ainfix +V5agetV2V6FIainfix <V6V0Aainfix <=c0V6Iainfix <V4agetV2V6NIainfix <V6V0Aainfix <=c0V6Iainfix <=V5ainfix *V6V4Aais_maxV3c0V6V4Aainfix =V5asumV2c0V6Iainfix <=V6ainfix -V1c1Aainfix <=c0V6FFFIainfix <=c0ainfix -V1c1Iainfix >=agetV2V8c0Iainfix <V8V1Aainfix <=c0V8FAainfix =V1V0Aainfix <=c0V1FFF">
+        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof prover="z3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter max_sum.3.9" expl="for loop preservation" sum="a93807c268041cdf7970248f9221f19e" proved="true" expanded="true" shape="Lamk arrayV0V2ais_maxV3c0ainfix +V6c1V4Iainfix =V7ainfix +V5agetV2V6FIainfix <V6V0Aainfix <=c0V6Iainfix <V4agetV2V6NIainfix <V6V0Aainfix <=c0V6Iainfix <=V5ainfix *V6V4Aais_maxV3c0V6V4Aainfix =V5asumV2c0V6Iainfix <=V6ainfix -V1c1Aainfix <=c0V6FFFIainfix <=c0ainfix -V1c1Iainfix >=agetV2V8c0Iainfix <V8V1Aainfix <=c0V8FAainfix =V1V0Aainfix <=c0V1FFF">
+        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.04"/>
+        </proof>
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.21"/>
+        </proof>
+       </goal>
+       <goal name="WP_parameter max_sum.3.10" expl="for loop preservation" sum="29966d8dd10a563f8fc56fea239bc05c" proved="true" expanded="true" shape="Lamk arrayV0V2ainfix <=V7ainfix *ainfix +V6c1V4Iainfix =V7ainfix +V5agetV2V6FIainfix <V6V0Aainfix <=c0V6Iainfix <V4agetV2V6NIainfix <V6V0Aainfix <=c0V6Iainfix <=V5ainfix *V6V4Aais_maxV3c0V6V4Aainfix =V5asumV2c0V6Iainfix <=V6ainfix -V1c1Aainfix <=c0V6FFFIainfix <=c0ainfix -V1c1Iainfix >=agetV2V8c0Iainfix <V8V1Aainfix <=c0V8FAainfix =V1V0Aainfix <=c0V1FFF">
+        <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+        <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+        <proof prover="z3" timelimit="10" edited="" obsolete="false">
+         <result status="valid" time="0.02"/>
         </proof>
        </goal>
       </transf>
      </goal>
-     <goal name="WP_parameter max_sum.6" expl="correctness of parameter max_sum" sum="b99a381d2b187c2ba33e05bc8d402b64" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.01"/>
+     <goal name="WP_parameter max_sum.4" expl="normal postcondition" sum="ddfef9f21a28d874548c2e22493c381f" proved="true" expanded="true" shape="Lamk arrayV0V2ainfix <=V5ainfix *V1V4Aais_maxV3c0V1V4Aainfix =V5asumV2c0V1Iainfix <=V5ainfix *ainfix +ainfix -V1c1c1V4Aais_maxV3c0ainfix +ainfix -V1c1c1V4Aainfix =V5asumV2c0ainfix +ainfix -V1c1c1FFIainfix <=c0ainfix -V1c1Iainfix >=agetV2V6c0Iainfix <V6V1Aainfix <=c0V6FAainfix =V1V0Aainfix <=c0V1FFF">
+      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.00"/>
       </proof>
-     </goal>
-     <goal name="WP_parameter max_sum.7" expl="correctness of parameter max_sum" sum="60fa78928763c03210ea758c19d964e6" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.02"/>
       </proof>
-     </goal>
-     <goal name="WP_parameter max_sum.8" expl="correctness of parameter max_sum" sum="2fceeac4cee78cabd72a4dc083d2883e" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.01"/>
+      <proof prover="z3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
     </transf>
    </goal>
   </theory>
   <theory name="WP TestCase" verified="true" expanded="true">
-   <goal name="WP_parameter test_case" expl="correctness of parameter test_case" sum="137c1f7a6676a39e94a3efa190022da4" proved="true" expanded="true">
+   <goal name="WP_parameter test_case" expl="parameter test_case" sum="bb2b52900300ec2b7984d6b798ef449f" proved="true" expanded="true" shape="ainfix =V11c10Aainfix =V10c45Iainfix <=V10ainfix *c10V11Aais_maxamk arrayc10V9c0c10V11Aainfix =V10asumV9c0c10FAainfix >=agetV9V12c0Iainfix <V12c10Aainfix <=c0V12FAainfix =c10c10Aainfix <=c0c10Iainfix =V9asetV8c9c6FAainfix <c9c10Aainfix <=c0c9Iainfix =V8asetV7c8c10FAainfix <c8c10Aainfix <=c0c8Iainfix =V7asetV6c7c1FAainfix <c7c10Aainfix <=c0c7Iainfix =V6asetV5c6c2FAainfix <c6c10Aainfix <=c0c6Iainfix =V5asetV4c5c3FAainfix <c5c10Aainfix <=c0c5Iainfix =V4asetV3c4c7FAainfix <c4c10Aainfix <=c0c4Iainfix =V3asetV2c3c2FAainfix <c3c10Aainfix <=c0c3Iainfix =V2asetV1c2c0FAainfix <c2c10Aainfix <=c0c2Iainfix =V1asetV0c1c5FAainfix <c1c10Aainfix <=c0c1Iainfix =V0asetaconstc0c0c9FAainfix <c0c10Aainfix <=c0c0Aainfix >=c10c0">
     <transf name="split_goal" proved="true" expanded="true">
-     <goal name="WP_parameter test_case.1" expl="precondition" sum="f316cb64e14c63f2b981efde6be1f43e" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter test_case.2" expl="precondition" sum="129ae2c2ec585e083f304c75e02d7059" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter test_case.3" expl="precondition" sum="cb53b856c9c68d5041e5e9e2d1472425" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter test_case.4" expl="precondition" sum="87b8e4c0e5f7e396117b49b288dbb29c" proved="true" expanded="true">
+     <goal name="WP_parameter test_case.1" expl="precondition" sum="c90c0c1cda39842d7381bfa04495a0ba" proved="true" expanded="true" shape="ainfix >=c10c0">
       <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter test_case.5" expl="precondition" sum="480ce07436e3c4f3f9004102858a5a5e" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.00"/>
       </proof>
-     </goal>
-     <goal name="WP_parameter test_case.6" expl="precondition" sum="26fe47d86bdf55d43ebaa76e717dcfbc" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter test_case.7" expl="precondition" sum="dedec8b54b8eefeb72c3101e0126e3f8" proved="true" expanded="true">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.01"/>
       </proof>
+      <proof prover="z3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.00"/>
+      </proof>
      </goal>
-     <goal name="WP_parameter test_case.8" expl="precondition" sum="a1cfbe04c461ccf5f752259330b23e2a" proved="true" expanded="true">
+     <goal name="WP_parameter test_case.2" expl="precondition" sum="a92c486771b3ba4cfee2e518ba174a8f" proved="true" expanded="true" shape="ainfix <c0c10Aainfix <=c0c0Iainfix >=c10c0">
       <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof prover="z3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter test_case.3" expl="precondition" sum="3080bc4f105766a9da5795bd0d5d158f" proved="true" expanded="true" shape="ainfix <c1c10Aainfix <=c0c1Iainfix =V0asetaconstc0c0c9FIainfix <c0c10Aainfix <=c0c0Iainfix >=c10c0">
+      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof prover="z3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter test_case.4" expl="precondition" sum="b9001125048f58030637ad6b5a4dd8f2" proved="true" expanded="true" shape="ainfix <c2c10Aainfix <=c0c2Iainfix =V1asetV0c1c5FIainfix <c1c10Aainfix <=c0c1Iainfix =V0asetaconstc0c0c9FIainfix <c0c10Aainfix <=c0c0Iainfix >=c10c0">
+      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof prover="z3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter test_case.5" expl="precondition" sum="66a23e96cfe361e87960cb0cbf854df5" proved="true" expanded="true" shape="ainfix <c3c10Aainfix <=c0c3Iainfix =V2asetV1c2c0FIainfix <c2c10Aainfix <=c0c2Iainfix =V1asetV0c1c5FIainfix <c1c10Aainfix <=c0c1Iainfix =V0asetaconstc0c0c9FIainfix <c0c10Aainfix <=c0c0Iainfix >=c10c0">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof prover="z3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter test_case.6" expl="precondition" sum="23d511c1c8074e893c343fab5979bef0" proved="true" expanded="true" shape="ainfix <c4c10Aainfix <=c0c4Iainfix =V3asetV2c3c2FIainfix <c3c10Aainfix <=c0c3Iainfix =V2asetV1c2c0FIainfix <c2c10Aainfix <=c0c2Iainfix =V1asetV0c1c5FIainfix <c1c10Aainfix <=c0c1Iainfix =V0asetaconstc0c0c9FIainfix <c0c10Aainfix <=c0c0Iainfix >=c10c0">
+      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof prover="z3" timelimit="3" edited="" obsolete="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter test_case.7" expl="precondition" sum="a92cc3e86a84f4b71187fcf9b3c11f04" proved="true" expanded="true" shape="ainfix <c5c10Aainfix <=c0c5Iainfix =V4asetV3c4c7FIainfix <c4c10Aainfix <=c0c4Iainfix =V3asetV2c3c2FIainfix <c3c10Aainfix <=c0c3Iainfix =V2asetV1c2c0FIainfix <c2c10Aainfix <=c0c2Iainfix =V1asetV0c1c5FIainfix <c1c10Aainfix <=c0c1Iainfix =V0asetaconstc0c0c9FIainfix <c0c10Aainfix <=c0c0Iainfix >=c10c0">
+      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof prover="z3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter test_case.8" expl="precondition" sum="d55909ee4cc8f8167aef2b82d7053827" proved="true" expanded="true" shape="ainfix <c6c10Aainfix <=c0c6Iainfix =V5asetV4c5c3FIainfix <c5c10Aainfix <=c0c5Iainfix =V4asetV3c4c7FIainfix <c4c10Aainfix <=c0c4Iainfix =V3asetV2c3c2FIainfix <c3c10Aainfix <=c0c3Iainfix =V2asetV1c2c0FIainfix <c2c10Aainfix <=c0c2Iainfix =V1asetV0c1c5FIainfix <c1c10Aainfix <=c0c1Iainfix =V0asetaconstc0c0c9FIainfix <c0c10Aainfix <=c0c0Iainfix >=c10c0">
+      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof prover="z3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter test_case.9" expl="precondition" sum="de80143dbd092c7e57f5427ea6b5a67d" proved="true" expanded="true" shape="ainfix <c7c10Aainfix <=c0c7Iainfix =V6asetV5c6c2FIainfix <c6c10Aainfix <=c0c6Iainfix =V5asetV4c5c3FIainfix <c5c10Aainfix <=c0c5Iainfix =V4asetV3c4c7FIainfix <c4c10Aainfix <=c0c4Iainfix =V3asetV2c3c2FIainfix <c3c10Aainfix <=c0c3Iainfix =V2asetV1c2c0FIainfix <c2c10Aainfix <=c0c2Iainfix =V1asetV0c1c5FIainfix <c1c10Aainfix <=c0c1Iainfix =V0asetaconstc0c0c9FIainfix <c0c10Aainfix <=c0c0Iainfix >=c10c0">
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof prover="z3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter test_case.10" expl="precondition" sum="9cef5a9e818e8175a84c7677cdfd2091" proved="true" expanded="true" shape="ainfix <c8c10Aainfix <=c0c8Iainfix =V7asetV6c7c1FIainfix <c7c10Aainfix <=c0c7Iainfix =V6asetV5c6c2FIainfix <c6c10Aainfix <=c0c6Iainfix =V5asetV4c5c3FIainfix <c5c10Aainfix <=c0c5Iainfix =V4asetV3c4c7FIainfix <c4c10Aainfix <=c0c4Iainfix =V3asetV2c3c2FIainfix <c3c10Aainfix <=c0c3Iainfix =V2asetV1c2c0FIainfix <c2c10Aainfix <=c0c2Iainfix =V1asetV0c1c5FIainfix <c1c10Aainfix <=c0c1Iainfix =V0asetaconstc0c0c9FIainfix <c0c10Aainfix <=c0c0Iainfix >=c10c0">
+      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof prover="z3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter test_case.11" expl="precondition" sum="2cc742be794c1460310e789e6768f18a" proved="true" expanded="true" shape="ainfix <c9c10Aainfix <=c0c9Iainfix =V8asetV7c8c10FIainfix <c8c10Aainfix <=c0c8Iainfix =V7asetV6c7c1FIainfix <c7c10Aainfix <=c0c7Iainfix =V6asetV5c6c2FIainfix <c6c10Aainfix <=c0c6Iainfix =V5asetV4c5c3FIainfix <c5c10Aainfix <=c0c5Iainfix =V4asetV3c4c7FIainfix <c4c10Aainfix <=c0c4Iainfix =V3asetV2c3c2FIainfix <c3c10Aainfix <=c0c3Iainfix =V2asetV1c2c0FIainfix <c2c10Aainfix <=c0c2Iainfix =V1asetV0c1c5FIainfix <c1c10Aainfix <=c0c1Iainfix =V0asetaconstc0c0c9FIainfix <c0c10Aainfix <=c0c0Iainfix >=c10c0">
+      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof prover="z3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter test_case.12" expl="precondition" sum="684d2ede439e794addf18d0459f6d820" proved="true" expanded="true" shape="ainfix >=agetV9V10c0Iainfix <V10c10Aainfix <=c0V10FAainfix =c10c10Aainfix <=c0c10Iainfix =V9asetV8c9c6FIainfix <c9c10Aainfix <=c0c9Iainfix =V8asetV7c8c10FIainfix <c8c10Aainfix <=c0c8Iainfix =V7asetV6c7c1FIainfix <c7c10Aainfix <=c0c7Iainfix =V6asetV5c6c2FIainfix <c6c10Aainfix <=c0c6Iainfix =V5asetV4c5c3FIainfix <c5c10Aainfix <=c0c5Iainfix =V4asetV3c4c7FIainfix <c4c10Aainfix <=c0c4Iainfix =V3asetV2c3c2FIainfix <c3c10Aainfix <=c0c3Iainfix =V2asetV1c2c0FIainfix <c2c10Aainfix <=c0c2Iainfix =V1asetV0c1c5FIainfix <c1c10Aainfix <=c0c1Iainfix =V0asetaconstc0c0c9FIainfix <c0c10Aainfix <=c0c0Iainfix >=c10c0">
+      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+      <proof prover="z3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal name="WP_parameter test_case.13" expl="assertion" sum="ed9cd7c5ffce7a0f9517b78812baf178" proved="true" expanded="true" shape="ainfix =V10c45Iainfix <=V10ainfix *c10V11Aais_maxamk arrayc10V9c0c10V11Aainfix =V10asumV9c0c10FIainfix >=agetV9V12c0Iainfix <V12c10Aainfix <=c0V12FAainfix =c10c10Aainfix <=c0c10Iainfix =V9asetV8c9c6FIainfix <c9c10Aainfix <=c0c9Iainfix =V8asetV7c8c10FIainfix <c8c10Aainfix <=c0c8Iainfix =V7asetV6c7c1FIainfix <c7c10Aainfix <=c0c7Iainfix =V6asetV5c6c2FIainfix <c6c10Aainfix <=c0c6Iainfix =V5asetV4c5c3FIainfix <c5c10Aainfix <=c0c5Iainfix =V4asetV3c4c7FIainfix <c4c10Aainfix <=c0c4Iainfix =V3asetV2c3c2FIainfix <c3c10Aainfix <=c0c3Iainfix =V2asetV1c2c0FIainfix <c2c10Aainfix <=c0c2Iainfix =V1asetV0c1c5FIainfix <c1c10Aainfix <=c0c1Iainfix =V0asetaconstc0c0c9FIainfix <c0c10Aainfix <=c0c0Iainfix >=c10c0">
+      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="0.09"/>
+      </proof>
+      <proof prover="z3" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.03"/>
       </proof>
      </goal>
-     <goal name="WP_parameter test_case.9" expl="precondition" sum="7adcbaff11921c0911eb026afbc40290" proved="true" expanded="true">
+     <goal name="WP_parameter test_case.14" expl="assertion" sum="3b8b323e9280e46efeaa8974f21eb3a4" proved="true" expanded="true" shape="ainfix =V11c10Iainfix =V10c45Iainfix <=V10ainfix *c10V11Aais_maxamk arrayc10V9c0c10V11Aainfix =V10asumV9c0c10FIainfix >=agetV9V12c0Iainfix <V12c10Aainfix <=c0V12FAainfix =c10c10Aainfix <=c0c10Iainfix =V9asetV8c9c6FIainfix <c9c10Aainfix <=c0c9Iainfix =V8asetV7c8c10FIainfix <c8c10Aainfix <=c0c8Iainfix =V7asetV6c7c1FIainfix <c7c10Aainfix <=c0c7Iainfix =V6asetV5c6c2FIainfix <c6c10Aainfix <=c0c6Iainfix =V5asetV4c5c3FIainfix <c5c10Aainfix <=c0c5Iainfix =V4asetV3c4c7FIainfix <c4c10Aainfix <=c0c4Iainfix =V3asetV2c3c2FIainfix <c3c10Aainfix <=c0c3Iainfix =V2asetV1c2c0FIainfix <c2c10Aainfix <=c0c2Iainfix =V1asetV0c1c5FIainfix <c1c10Aainfix <=c0c1Iainfix =V0asetaconstc0c0c9FIainfix <c0c10Aainfix <=c0c0Iainfix >=c10c0">
       <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+       <result status="valid" time="1.44"/>
+      </proof>
+      <proof prover="z3" timelimit="10" edited="" obsolete="false">
        <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter test_case.10" expl="precondition" sum="afc510eb1a97bc3905c2751d0bc0a1c7" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter test_case.11" expl="precondition" sum="37e2143fb5c2f86b94b0cd005774e7c8" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter test_case.12" expl="precondition" sum="49eda2eaaedccb3481367929a48f5f66" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.08"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter test_case.13" expl="assertion" sum="9b57dd07077d6706a8d09a50cf6c0ef4" proved="true" expanded="true">
-      <proof prover="cvc3" timelimit="3" edited="" obsolete="false">
-       <result status="valid" time="0.24"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter test_case.14" expl="assertion" sum="aed016b10f13b1997416ecb34a90b656" proved="true" expanded="true">
-      <proof prover="alt-ergo" timelimit="3" edited="" obsolete="false">
-       <result status="valid" time="2.71"/>
-      </proof>
-      <proof prover="z3" timelimit="3" edited="" obsolete="false">
-       <result status="valid" time="0.04"/>
       </proof>
      </goal>
     </transf>
