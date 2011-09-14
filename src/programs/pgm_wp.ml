@@ -619,7 +619,7 @@ and wp_desc env rm e q = match e.expr_desc with
       (* TODO: propagate call labels into c.c_post *)
       let w = opaque_wp env rm c.c_effect.E.writes c.c_post q in
       let p = wp_expl "precondition" c.c_pre in
-      let p = t_label ~loc:e.expr_loc p.t_label p in
+      let p = t_label ~loc:e.expr_loc (p.t_label @ e.expr_lab) p in
       wp_and p w
 
 and wp_triple env rm bl (p, e, q) =

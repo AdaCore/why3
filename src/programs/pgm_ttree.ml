@@ -74,6 +74,7 @@ type dloop_annotation = {
 type dexpr = {
   dexpr_desc : dexpr_desc;
   dexpr_type : Denv.dty;
+  dexpr_lab  : Ident.label list;
   dexpr_loc  : loc;
 }
 
@@ -101,7 +102,6 @@ and dexpr_desc =
   | DEassert of assertion_kind * Ptree.lexpr
   | DEmark of string * dexpr
   | DEany of dutype_c
-  | DEnamed of Ptree.label * dexpr
 
 and drecfun = (ident * Denv.dty) * dubinder list * dvariant option * dtriple
 
@@ -173,6 +173,7 @@ and ipat_node =
 type iexpr = {
   iexpr_desc : iexpr_desc;
   iexpr_type : ty;
+  iexpr_lab  : Ident.label list;
   iexpr_loc  : loc;
 }
 
@@ -201,7 +202,6 @@ and iexpr_desc =
   | IEassert of assertion_kind * Term.term
   | IEmark of mark * iexpr
   | IEany of itype_c
-  | IEnamed of Ptree.label * iexpr
 
 and irecfun = ivsymbol * ibinder list * irec_variant option * itriple
 
