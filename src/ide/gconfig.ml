@@ -41,8 +41,8 @@ type t =
       mutable show_locs : bool;
       mutable saving_policy : int;
       (** 0 = always, 1 = never, 2 = ask *)
-      mutable lighter_location_color : string;
-      mutable location_color : string;
+      mutable premise_color : string;
+      mutable goal_color : string;
       mutable error_color : string;
       (** colors *)
       mutable env : Env.env;
@@ -60,8 +60,8 @@ type ide = {
   ide_show_labels : bool;
   ide_show_locs : bool;
   ide_saving_policy : int;
-  ide_lighter_location_color : string;
-  ide_location_color : string;
+  ide_premise_color : string;
+  ide_goal_color : string;
   ide_error_color : string;
   ide_default_editor : string;
 }
@@ -76,8 +76,8 @@ let default_ide =
     ide_show_labels = false;
     ide_show_locs = false;
     ide_saving_policy = 0;
-    ide_lighter_location_color = "chartreuse";
-    ide_location_color = "gold";
+    ide_premise_color = "chartreuse";
+    ide_goal_color = "gold";
     ide_error_color = "orange";
     ide_default_editor = try Sys.getenv "EDITOR" with Not_found -> "editor";
   }
@@ -101,12 +101,12 @@ let load_ide section =
       get_bool section ~default:default_ide.ide_show_locs "print_locs";
     ide_saving_policy =
       get_int section ~default:default_ide.ide_saving_policy "saving_policy";
-    ide_lighter_location_color =
-      get_string section ~default:default_ide.ide_lighter_location_color
-        "lighter_location_color";
-    ide_location_color =
-      get_string section ~default:default_ide.ide_location_color
-        "location_color";
+    ide_premise_color =
+      get_string section ~default:default_ide.ide_premise_color
+        "premise_color";
+    ide_goal_color =
+      get_string section ~default:default_ide.ide_goal_color
+        "goal_color";
     ide_error_color =
       get_string section ~default:default_ide.ide_error_color
         "error_color";
@@ -146,8 +146,8 @@ let load_config config =
     show_labels   = ide.ide_show_labels ;
     show_locs     = ide.ide_show_locs ;
     saving_policy = ide.ide_saving_policy ;
-    lighter_location_color = ide.ide_lighter_location_color;
-    location_color = ide.ide_location_color;
+    premise_color = ide.ide_premise_color;
+    goal_color = ide.ide_goal_color;
     error_color = ide.ide_error_color;
     max_running_processes = Whyconf.running_provers_max main;
     default_editor = ide.ide_default_editor;
@@ -188,8 +188,8 @@ let save_config t =
   let ide = set_bool ide "print_labels" t.show_labels in
   let ide = set_bool ide "print_locs" t.show_locs in
   let ide = set_int ide "saving_policy" t.saving_policy in
-  let ide = set_string ide "lighter_location_color" t.lighter_location_color in
-  let ide = set_string ide "location_color" t.location_color in
+  let ide = set_string ide "premise_color" t.premise_color in
+  let ide = set_string ide "goal_color" t.goal_color in
   let ide = set_string ide "error_color" t.error_color in
   let ide = set_string ide "default_editor" t.default_editor in
   let config = set_section config "ide" ide in

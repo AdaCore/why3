@@ -1140,19 +1140,19 @@ let move_to_line ~yalign (v : GSourceView2.source_view) line =
   v#scroll_to_mark ~use_align:true ~yalign mark
 
 
-let lighter_location_tag = source_view#buffer#create_tag
-  ~name:"lighter_location_tag" [`BACKGROUND gconfig.lighter_location_color]
+let premise_tag = source_view#buffer#create_tag
+  ~name:"premise_tag" [`BACKGROUND gconfig.premise_color]
 
-let location_tag = source_view#buffer#create_tag
-  ~name:"location_tag" [`BACKGROUND gconfig.location_color]
+let goal_tag = source_view#buffer#create_tag
+  ~name:"goal_tag" [`BACKGROUND gconfig.goal_color]
 
 let error_tag = source_view#buffer#create_tag
   ~name:"error_tag" [`BACKGROUND gconfig.error_color]
 
 let erase_color_loc (v:GSourceView2.source_view) =
   let buf = v#buffer in
-  buf#remove_tag lighter_location_tag ~start:buf#start_iter ~stop:buf#end_iter;
-  buf#remove_tag location_tag ~start:buf#start_iter ~stop:buf#end_iter;
+  buf#remove_tag premise_tag ~start:buf#start_iter ~stop:buf#end_iter;
+  buf#remove_tag goal_tag ~start:buf#start_iter ~stop:buf#end_iter;
   buf#remove_tag error_tag ~start:buf#start_iter ~stop:buf#end_iter
 
 let color_loc (v:GSourceView2.source_view) ~color l b e =
@@ -1198,22 +1198,22 @@ let rec color_locs ~color f =
 let rec color_t_locs f =
   match f.Term.t_node with
     | Term.Tbinop (Term.Timplies,f1,f2) ->
-        color_locs ~color:lighter_location_tag f1;
+        color_locs ~color:premise_tag f1;
         color_t_locs f2
     | Term.Tlet (t,fb) ->
         let _,f1 = Term.t_open_bound fb in
-        color_locs ~color:lighter_location_tag t;
+        color_locs ~color:premise_tag t;
         color_t_locs f1
     | Term.Tquant (Term.Tforall,fq) ->
         let _,_,f1 = Term.t_open_quant fq in
         color_t_locs f1
     | _ ->
-        color_locs ~color:location_tag f
+        color_locs ~color:goal_tag f
 
 let scroll_to_source_goal g =
   let t = M.get_task g in
   let id = (Task.task_goal t).Decl.pr_name in
-  scroll_to_id ~color:location_tag id;
+  scroll_to_id ~color:goal_tag id;
   match t with
     | Some
         { Task.task_decl =
@@ -1226,7 +1226,7 @@ let scroll_to_source_goal g =
 let scroll_to_theory th =
   let t = M.get_theory th in
   let id = t.Theory.th_name in
-  scroll_to_id ~color:location_tag id
+  scroll_to_id ~color:goal_tag id
 
 
 let reload () =
