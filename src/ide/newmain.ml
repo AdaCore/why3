@@ -1141,13 +1141,13 @@ let move_to_line ~yalign (v : GSourceView2.source_view) line =
 
 
 let lighter_location_tag = source_view#buffer#create_tag
-  ~name:"lighter_location_tag" [`BACKGROUND "lightgreen"]
+  ~name:"lighter_location_tag" [`BACKGROUND gconfig.lighter_location_color]
 
 let location_tag = source_view#buffer#create_tag
-  ~name:"location_tag" [`BACKGROUND "green"]
+  ~name:"location_tag" [`BACKGROUND gconfig.location_color]
 
 let error_tag = source_view#buffer#create_tag
-  ~name:"error_tag" [`BACKGROUND "orange"]
+  ~name:"error_tag" [`BACKGROUND gconfig.error_color]
 
 let erase_color_loc (v:GSourceView2.source_view) =
   let buf = v#buffer in

@@ -33,6 +33,9 @@ type t =
       mutable show_labels : bool;
       mutable show_locs : bool;
       mutable saving_policy : int;
+      mutable lighter_location_color : string;
+      mutable location_color : string;
+      mutable error_color : string;
       mutable env : Why3.Env.env;
       mutable config : Whyconf.config;
     }

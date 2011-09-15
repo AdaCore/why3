@@ -24,6 +24,8 @@ open Rc
 open Whyconf
 
 
+(* config file *)
+
 type t =
     { mutable window_width : int;
       mutable window_height : int;
@@ -38,7 +40,11 @@ type t =
       mutable show_labels : bool;
       mutable show_locs : bool;
       mutable saving_policy : int;
-        (** 0 = always, 1 = never, 2 = ask *)
+      (** 0 = always, 1 = never, 2 = ask *)
+      mutable lighter_location_color : string;
+      mutable location_color : string;
+      mutable error_color : string;
+      (** colors *)
       mutable env : Env.env;
       mutable config : Whyconf.config;
     }
@@ -54,6 +60,9 @@ type ide = {
   ide_show_labels : bool;
   ide_show_locs : bool;
   ide_saving_policy : int;
+  ide_lighter_location_color : string;
+  ide_location_color : string;
+  ide_error_color : string;
   ide_default_editor : string;
 }
 
@@ -67,6 +76,9 @@ let default_ide =
     ide_show_labels = false;
     ide_show_locs = false;
     ide_saving_policy = 0;
+    ide_lighter_location_color = "chartreuse";
+    ide_location_color = "gold";
+    ide_error_color = "orange";
     ide_default_editor = try Sys.getenv "EDITOR" with Not_found -> "editor";
   }
 
@@ -89,6 +101,15 @@ let load_ide section =
       get_bool section ~default:default_ide.ide_show_locs "print_locs";
     ide_saving_policy =
       get_int section ~default:default_ide.ide_saving_policy "saving_policy";
+    ide_lighter_location_color =
+      get_string section ~default:default_ide.ide_lighter_location_color
+        "lighter_location_color";
+    ide_location_color =
+      get_string section ~default:default_ide.ide_location_color
+        "location_color";
+    ide_error_color =
+      get_string section ~default:default_ide.ide_error_color
+        "error_color";
     ide_default_editor =
       get_string section ~default:default_ide.ide_default_editor
         "default_editor";
@@ -125,6 +146,9 @@ let load_config config =
     show_labels   = ide.ide_show_labels ;
     show_locs     = ide.ide_show_locs ;
     saving_policy = ide.ide_saving_policy ;
+    lighter_location_color = ide.ide_lighter_location_color;
+    location_color = ide.ide_location_color;
+    error_color = ide.ide_error_color;
     max_running_processes = Whyconf.running_provers_max main;
     default_editor = ide.ide_default_editor;
     config         = config;
@@ -164,6 +188,9 @@ let save_config t =
   let ide = set_bool ide "print_labels" t.show_labels in
   let ide = set_bool ide "print_locs" t.show_locs in
   let ide = set_int ide "saving_policy" t.saving_policy in
+  let ide = set_string ide "lighter_location_color" t.lighter_location_color in
+  let ide = set_string ide "location_color" t.location_color in
+  let ide = set_string ide "error_color" t.error_color in
   let ide = set_string ide "default_editor" t.default_editor in
   let config = set_section config "ide" ide in
 (* TODO: store newly detected provers !
