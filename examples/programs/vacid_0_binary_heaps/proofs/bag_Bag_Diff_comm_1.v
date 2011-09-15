@@ -162,5 +162,3 @@ generalize (Zmax_spec 0 (nb_occ x b - nb_occ x b1 - nb_occ x b2));
   intuition.
 Qed.
 (* DO NOT EDIT BELOW *)
-
-

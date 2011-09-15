@@ -302,38 +302,50 @@ let print_statistics files =
 
 (* Statistics in LaTeX*)
 
-let rec provers_latex_stats provers g = 
+let rec provers_latex_stats provers depth g = 
   let proofs = M.external_proofs g in
   Hashtbl.iter (fun p _-> Hashtbl.replace provers p ()) proofs;
   let tr = M.transformations g in
-  Hashtbl.iter (fun _st tr -> let goals = tr.M.subgoals in
-  List.iter (provers_latex_stats provers) goals) tr
+  Hashtbl.iter (fun _st tr -> 
+    depth := !depth + 1; 
+    let goals = tr.M.subgoals in
+    List.iter (provers_latex_stats provers depth) goals) tr
 
-
-(*let rec goal_latex_stat prov g =*)
-let rec goal_latex_stat g =     
-(*  printf "%s & %b" (M.goal_name g) (M.goal_proved g);*)
-  printf "%s " (M.goal_name g);
+let rec goal_latex_stat prov depth g =
+ for i = 1 to depth do printf "\\quad" done;
+ printf "\\verb|%s| " (M.goal_name g);
   let proofs = M.external_proofs g in
-  Hashtbl.iter (fun p pr -> let s = pr.M.proof_state in
-			    match s with
-				Session.Done res ->
-				  if res.Call_provers.pr_answer = Call_provers.Valid
-				  then  printf " %s : %.2f" p res.Call_provers.pr_time
-				  else printf " %s : -" p
-			       | _ -> printf " %s: *" p) proofs;
-  printf "\\\\@.";
+  Hashtbl.iter (fun p _pr -> 
+    try 
+      let pr = Hashtbl.find proofs p in
+      let s = pr.M.proof_state in
+      match s with
+	  Session.Done res ->
+	    if res.Call_provers.pr_answer = Call_provers.Valid
+	    then  printf "& %.2f " res.Call_provers.pr_time
+	    else printf "& - "
+	| _ -> printf "& " 
+    with Not_found -> printf "&") prov;
+  printf "\\\\ \\hline @.";
   let tr = M.transformations g in
   Hashtbl.iter (fun _st tr -> let goals = tr.M.subgoals in
-  List.iter goal_latex_stat goals) tr
+  List.iter (goal_latex_stat prov (depth + 1)) goals) tr
 
 let theory_latex_stat t =
-  printf " Collect provers used to proof this theory \n";
-  let provers = Hashtbl.create 9 in 
-  List.iter (provers_latex_stats provers) (M.goals t);
-  Hashtbl.iter (fun p _-> printf " %s :" p) provers;
-  printf "\\begin{tabular}{l|c|r}@.";
-  List.iter goal_latex_stat (M.goals t);
+  let provers = Hashtbl.create 9 in
+  let depth = ref 0 in 
+  List.iter (provers_latex_stats provers depth) (M.goals t);
+  printf "\n@.";
+  printf "\\begin{tabular}";
+  printf "{| l |";
+  if (!depth = 0) then for i = 0 to (Hashtbl.length provers) -1 do printf "c |" done
+  else for i = 0 to (Hashtbl.length provers) + !depth - 2 do printf "c |" done;
+
+  printf "} \n \\hline@.";
+  for i = 0 to !depth - 2 do printf " & " done;
+  Hashtbl.iter (fun p _-> printf "& %s " p) provers;
+  printf "\\\\\\hline@.";
+  List.iter (goal_latex_stat provers 0) (M.goals t);
   printf "\\end{tabular}@."
 
 let file_latex_stat f =

@@ -151,5 +151,3 @@ generalize (occ_non_negative X b y).
 omega.
 Qed.
 (* DO NOT EDIT BELOW *)
-
-
