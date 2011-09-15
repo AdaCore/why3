@@ -1140,6 +1140,9 @@ let move_to_line ~yalign (v : GSourceView2.source_view) line =
   v#scroll_to_mark ~use_align:true ~yalign mark
 
 
+let lighter_location_tag = source_view#buffer#create_tag
+  ~name:"lighter_location_tag" [`BACKGROUND "lightgreen"]
+
 let location_tag = source_view#buffer#create_tag
   ~name:"location_tag" [`BACKGROUND "green"]
 
@@ -1148,6 +1151,7 @@ let error_tag = source_view#buffer#create_tag
 
 let erase_color_loc (v:GSourceView2.source_view) =
   let buf = v#buffer in
+  buf#remove_tag lighter_location_tag ~start:buf#start_iter ~stop:buf#end_iter;
   buf#remove_tag location_tag ~start:buf#start_iter ~stop:buf#end_iter;
   buf#remove_tag error_tag ~start:buf#start_iter ~stop:buf#end_iter
 
@@ -1185,21 +1189,20 @@ let color_loc ~color loc =
   let f, l, b, e = Loc.get loc in
   if f = !current_file then color_loc ~color source_view l b e
 
+let color_locs ~color f = 
+  Util.option_iter (color_loc ~color) f.Term.t_loc
+
 (* FIXME: we shouldn't open binders _every_time_ we redraw screen!!!
    No t_fold, no t_open_quant! *)
 let rec color_t_locs f =
-  let color_locs f = 
-    Util.option_iter (color_loc ~color:location_tag) f.Term.t_loc in
-  let rec color_t () f =
-    color_locs f ; Term.t_fold color_t () f in
   match f.Term.t_node with
     | Term.Tbinop (Term.Timplies,f1,f2) ->
-        color_locs f1; color_t_locs f2
+        color_locs ~color:lighter_location_tag f1; color_t_locs f2
     | Term.Tquant (Term.Tforall,fq) ->
         let _,_,f2 = Term.t_open_quant fq in
         color_t_locs f2
     | _ ->
-        color_locs f
+        color_locs ~color:location_tag f
 
 let scroll_to_source_goal g =
   let t = M.get_task g in
