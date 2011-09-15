@@ -1189,8 +1189,9 @@ let color_loc ~color loc =
   let f, l, b, e = Loc.get loc in
   if f = !current_file then color_loc ~color source_view l b e
 
-let color_locs ~color f = 
-  Util.option_iter (color_loc ~color) f.Term.t_loc
+let rec color_locs ~color f = 
+  Util.option_iter (color_loc ~color) f.Term.t_loc;
+  Term.t_fold (fun () -> color_locs ~color) () f
 
 (* FIXME: we shouldn't open binders _every_time_ we redraw screen!!!
    No t_fold, no t_open_quant! *)
