@@ -1,7 +1,8 @@
 open Why3
 open Term
 
-let config_main = Whyconf.get_main (Whyconf.read_config None)
+let config = Whyconf.read_config None
+let config_main = Whyconf.get_main (config)
 let loadpath =
    "/home/kanig/HiLite/hi-lite/stdlib_tmp" ::
    "." ::
@@ -38,10 +39,24 @@ let split_list l =
    List.fold_left (fun acc t ->
       List.rev_append (Trans.apply split_trans t) acc) [] l
 
-let why3_driver =
-   Driver.load_driver env "/usr/local/share/why3/drivers/why3.drv"
-let altergo_driver =
-   Driver.load_driver env "/usr/local/share/why3/drivers/alt_ergo.drv"
+let provers : Whyconf.config_prover Util.Mstr.t =
+   Whyconf.get_provers config
+
+let alt_ergo : Whyconf.config_prover =
+  try
+    Util.Mstr.find "alt-ergo" provers
+  with Not_found ->
+    Format.eprintf "Prover alt-ergo not installed or not configured@.";
+    exit 0
+
+(* loading the Alt-Ergo driver *)
+let altergo_driver : Driver.driver =
+  try
+    Driver.load_driver env alt_ergo.Whyconf.driver
+  with e ->
+    Format.eprintf "Failed to load driver for alt-ergo: %a@."
+      Exn_printer.exn_printer e;
+    exit 1
 
 (*
    let _ = Debug.set_flag (Debug.lookup_flag "print_labels")
@@ -129,6 +144,16 @@ let do_theory _ th =
    let tasks = Task.split_theory th None None in
    List.iter do_unsplitted_task tasks
 
+let prove_task t =
+   let pr_call =
+      Driver.prove_task ~command:alt_ergo.Whyconf.command
+                        ~timelimit:10 altergo_driver t () in
+   let res = Call_provers.wait_on_call pr_call () in
+   if res.Call_provers.pr_answer = Call_provers.Valid then true
+   else false
+
+exception Not_Proven
+
 let _ =
    if Array.length (Sys.argv) < 2 then begin
       prerr_endline "No file given. Aborting";
@@ -140,10 +165,14 @@ let _ =
       (* fill map of explanations *)
       Util.Mstr.iter do_theory m;
       Gnat_expl.MExpl.iter
-         (fun expl _ ->
-            Format.printf "%a@." (Gnat_expl.print_expl true) expl)
+         (fun expl tl ->
+            try
+               List.iter (fun t -> if not (prove_task t) then raise Not_Proven)
+               tl;
+               Format.printf "%a@." (Gnat_expl.print_expl true) expl
+            with Not_Proven ->
+               Format.printf "%a@." (Gnat_expl.print_expl false) expl)
          !expl_map
-
    with
       Loc.Located (p,_) ->
          Format.printf "%a: an error occurred@." Loc.gen_report_position p
