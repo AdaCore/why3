@@ -443,10 +443,17 @@ let preferences c =
       (fun () -> c.max_running_processes <- nb_processes_spin#value_as_int)
   in
   (** page 2 **)
-  let label2 = GMisc.label ~text:"Provers" () in
-  let _page2 = GMisc.label ~text:"This page should display detected provers"
+  let label2 = GMisc.label ~text:"Colors" () in
+  let _page2 = GMisc.color_selection (* ~title:"Goal color" *)
+    ~show:true
     ~packing:(fun w -> ignore(notebook#append_page
                                 ~tab_label:label2#coerce w)) ()
+  in
+  (** page 3 **)
+  let label3 = GMisc.label ~text:"Provers" () in
+  let _page3 = GMisc.label ~text:"This page should display detected provers"
+    ~packing:(fun w -> ignore(notebook#append_page
+                                ~tab_label:label3#coerce w)) ()
   in
   (** page 1 **)
   let display_options_frame =
