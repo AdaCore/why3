@@ -1,0 +1,85 @@
+
+(* Polymorphic mutable priority queues *)
+
+module Pqueue
+
+  use import set.Fset
+
+  type elt
+
+  predicate le elt elt
+  clone import relations.TotalOrder with type t = elt, predicate rel = le
+
+  type t model {| mutable elts: set elt |}
+
+  val create: unit -> {} t { result.elts = empty }
+
+  val push:
+    x: elt -> q: t ->
+    { }
+    unit writes q
+    { q.elts = add x (old q.elts) }
+
+  exception Empty
+
+  val pop:
+    q: t ->
+    {}
+    elt
+    writes q raises Empty
+    { q.elts = remove result (old q.elts) /\ mem result (old q.elts) /\
+      forall e: elt. mem e (old q.elts) -> le result e }
+    | Empty -> { q.elts = (old q.elts) = empty }
+
+  val peek:
+    q: t ->
+    {}
+    elt
+    reads q raises Empty
+    { mem result q.elts /\
+      forall e: elt. mem e q.elts -> le result e }
+    | Empty -> { q.elts = empty }
+
+  val clear: q: t -> {} unit writes q {q.elts = empty }
+
+  val copy: q: t -> {} t reads q { result = q }
+
+  val is_empty:
+    q: t -> {} bool reads q { result=True <-> q.elts = empty }
+
+  val length: q: t -> {} int reads q { result = cardinal q.elts }
+
+end
+
+module Test
+
+  use import set.Fset
+  use import module Pqueue
+
+  function v1 : elt
+  function v2 : elt
+  axiom values: le v2 v1 /\ v1 <> v2
+
+  let test0 () =
+    let s = Pqueue.create () : Pqueue.t in
+    assert { s.elts = empty };
+    let b = Pqueue.is_empty s in
+    assert { b = True };
+    let n = Pqueue.length s in
+    assert { n = 0 }
+
+  let test1 () =
+    let s = Pqueue.create () in
+    Pqueue.push v1 s;
+    let x = Pqueue.peek s in assert { x = v1 };
+    Pqueue.push v2 s;
+    let x = Pqueue.peek s in assert { x = v2 };
+    ()
+
+end
+
+(*
+Local Variables:
+compile-command: "unset LANG; make -C .. modules/pqueue"
+End:
+*)
