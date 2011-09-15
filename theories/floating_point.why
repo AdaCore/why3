@@ -85,12 +85,18 @@ theory GenFloat
 
   (* special values *)
   function class t : class
-  function sign t  : sign
 
   predicate is_finite (x:t) = class x = Finite
   predicate is_infinite (x:t) = class x = Infinite
   predicate is_NaN (x:t) = class x = NaN
   predicate is_not_NaN (x:t) = is_finite x \/ is_infinite x
+
+  lemma is_not_NaN: forall x:t. is_not_NaN x <-> not (is_NaN x)
+
+  function sign t  : sign
+
+  predicate same_sign (x:t) (y:t)  = sign x = sign y
+
   predicate is_minus_infinity (x:t) = is_infinite x /\ sign x = Neg
   predicate is_plus_infinity (x:t) = is_infinite x /\ sign x = Pos
   predicate is_gen_zero (x:t) = is_finite x /\ value x = 0.0
@@ -98,9 +104,37 @@ theory GenFloat
   predicate is_gen_zero_minus (x:t) = is_gen_zero x /\ sign x = Neg
 
   predicate le (x:t) (y:t) =
-     (is_finite x /\ is_finite y /\ value x <= value y)
-     \/ (is_minus_infinity x /\ is_not_NaN y)
-     \/ (is_not_NaN x /\ is_plus_infinity y)
+    (is_finite x /\ is_finite y /\ value x <= value y)
+    \/ (is_minus_infinity x /\ is_not_NaN y)
+    \/ (is_not_NaN x /\ is_plus_infinity y)
+
+  predicate lt (x:t) (y:t) =
+    (is_finite x /\ is_finite y /\ value x < value y)
+    \/ (is_minus_infinity x /\ is_not_NaN y /\ not (is_minus_infinity y))
+    \/ (is_not_NaN x /\ not (is_plus_infinity x) /\ is_plus_infinity y)
+
+  predicate ge (x:t) (y:t) = le y x
+
+  predicate gt (x:t) (y:t) = lt y x
+
+  predicate eq (x:t) (y:t) =
+    is_not_NaN x /\ is_not_NaN y /\
+      ((is_finite x /\ is_finite y /\ value x = value y) \/
+       (is_infinite x /\ is_infinite y /\ same_sign x y))
+
+  predicate ne (x:t) (y:t) = not (eq x y)
+
+  lemma le_lt_trans: forall x y z:t. le x y /\ lt y z -> lt x z
+
+  lemma lt_le_trans: forall x y z:t. lt x y /\ le y z -> lt x z
+
+  lemma le_ge_asym: forall x y:t. le x y /\ ge x y -> eq x y
+
+  lemma not_lt_ge: forall x y:t.
+    not (lt x y) /\ is_not_NaN x /\ is_not_NaN y -> ge x y
+
+  lemma not_gt_le: forall x y:t.
+    not (gt x y) /\ is_not_NaN x /\ is_not_NaN y -> le x y
 
 end
 
