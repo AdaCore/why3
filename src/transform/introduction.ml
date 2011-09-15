@@ -18,19 +18,15 @@
 (**************************************************************************)
 
 (*
-
   This module was poorly designed by Claude Marché, with the
   enormous help of Jean-Christophe Filliâtre and Andrei Paskevich
   for finding the right function in the Why3 API
-
 *)
-
 
 open Ident
 open Term
 open Decl
 open Task
-
 
 let rec intros pr f = match f.t_node with
   | Tbinop (Timplies,f1,f2) ->
@@ -43,12 +39,6 @@ let rec intros pr f = match f.t_node with
            d :: acc)
         l
         (intros pr f2)
-      (* old version, f1 not splitted *)
-      (*
-        let id = create_prsymbol (id_fresh "H") in
-        let d = create_prop_decl Paxiom id f1 in
-        d :: intros pr f2
-      *)
   | Tquant (Tforall,fq) ->
       let vsl,_trl,f = t_open_quant fq in
       let intro_var subst vs =
@@ -59,12 +49,15 @@ let rec intros pr f = match f.t_node with
       let subst, dl = Util.map_fold_left intro_var Mvs.empty vsl in
       let f = t_subst subst f in
       dl @ intros pr f
-
+  | Tlet (t,fb) ->
+      let vs,f = t_open_bound fb in
+      let ls = create_lsymbol (id_clone vs.vs_name) [] (Some vs.vs_ty) in
+      let f = t_subst_single vs (fs_app ls [] vs.vs_ty) f in
+      let d = create_logic_decl [make_ls_defn ls [] t] in
+      d :: intros pr f
   | _ -> [create_prop_decl Pgoal pr f]
 
 let () = Trans.register_transform "introduce_premises" (Trans.goal intros)
-
-
 
 (*
 Local Variables:
