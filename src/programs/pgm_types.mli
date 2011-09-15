@@ -165,8 +165,6 @@ module rec T : sig
 
   val post_map : (term -> term) -> post -> post
 
-  val subst1 : vsymbol -> term -> term Mvs.t
-
   val eq_type_v : type_v -> type_v -> bool
 
   (* pretty-printers *)

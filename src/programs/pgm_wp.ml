@@ -303,7 +303,7 @@ let abstract_wp env rm ef (q',ql') (q,ql) =
   let quantify_h (e',(x',f')) (e,(x,f)) =
     assert (ls_equal e' e);
     let res, f' = match x', x with
-      | Some v', Some v -> Some v, t_subst (subst1 v' (t_var v)) f'
+      | Some v', Some v -> Some v, t_subst_single v' (t_var v) f'
       | None, None -> None, f'
       | _ -> assert false
     in
@@ -313,7 +313,7 @@ let abstract_wp env rm ef (q',ql') (q,ql) =
     let res, f = q and res', f' = q' in
     let f' =
       if is_arrow_ty res'.vs_ty then f'
-      else t_subst (subst1 res' (t_var res)) f'
+      else t_subst_single res' (t_var res) f'
     in
     quantify_res f' f (Some res)
   in
@@ -463,7 +463,7 @@ and wp_desc env rm e q = match e.expr_desc with
       in
       let v1 = v_result x.pv_pure.vs_ty in
       let t1 = t_label ~loc:e1.expr_loc ["let"] (t_var v1) in
-      let q1 = v1, t_subst (subst1 x.pv_pure t1) w2 in
+      let q1 = v1, t_subst_single x.pv_pure t1 w2 in
       let q1 = saturate_post e1.expr_effect q1 q in
       wp_label e (wp_expr env rm e1 q1)
   | Eletrec (dl, e1) ->
@@ -580,13 +580,13 @@ and wp_desc env rm e q = match e.expr_desc with
       let add = find_ls~pure:true env "infix +" in
       let wp1 =
         let xp1 = fs_app add [t_var x.pv_pure; incr] ty_int in
-        let post = t_subst (subst1 x.pv_pure xp1) inv in
+        let post = t_subst_single x.pv_pure xp1 inv in
         let q1 = saturate_post e1.expr_effect (res, post) q in
         wp_expr env rm e1 q1
       in
       let f = wp_and ~sym:true
         (wp_expl "for loop initialization"
-           (t_subst (subst1 x.pv_pure (t_var v1.pv_pure)) inv))
+           (t_subst_single x.pv_pure (t_var v1.pv_pure) inv))
         (quantify env rm e.expr_effect.E.writes
            (wp_and ~sym:true
               (wp_expl "for loop preservation"
@@ -596,7 +596,7 @@ and wp_desc env rm e q = match e.expr_desc with
                             (ps_app le [t_var x.pv_pure;  t_var v2.pv_pure]))
                  (wp_implies inv wp1))))
               (let sv2 = fs_app add [t_var v2.pv_pure; incr] ty_int in
-               wp_implies (t_subst (subst1 x.pv_pure sv2) inv) q1)))
+               wp_implies (t_subst_single x.pv_pure sv2 inv) q1)))
       in
       let f =
         wp_and ~sym:true (wp_implies v1_gt_v2 q1) (wp_implies v1_le_v2 f) in

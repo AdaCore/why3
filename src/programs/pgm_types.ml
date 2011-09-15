@@ -264,8 +264,6 @@ module rec T : sig
 
   val post_map : (term -> term) -> post -> post
 
-  val subst1 : vsymbol -> term -> term Mvs.t
-
   val eq_type_v : type_v -> type_v -> bool
 
   (* pretty-printers *)
@@ -492,13 +490,11 @@ end = struct
           c_pre         = t_true;
           c_post        = (v_result ty, t_true), []; }
 
-  let subst1 vs1 t2 = Mvs.add vs1 t2 Mvs.empty
-
   let apply_type_v_var v pv = match v with
     | Tarrow (x :: bl, c) ->
         let ts = ty_match Mtv.empty x.pv_effect.vs_ty pv.pv_effect.vs_ty in
         let c = type_c_of_type_v (Tarrow (bl, c)) in
-        subst_type_c ts (subst1 x.pv_pure (t_var pv.pv_pure)) c
+        subst_type_c ts (Mvs.singleton x.pv_pure (t_var pv.pv_pure)) c
     | Tarrow ([], _) | Tpure _ ->
         assert false
 
@@ -507,7 +503,7 @@ end = struct
 (*         let ts = ty_match Mtv.empty x.pv_effect.vs_ty s.p_ty in *)
 (*         let c = type_c_of_type_v (Tarrow (bl, c)) in *)
 (*         let t = t_app s.p_ls [] (ty_inst ts x.pv_effect.vs_ty) in *)
-(*         subst_type_c ts (subst1 x.pv_pure t) c *)
+(*         subst_type_c ts (Mvs.singleton x.pv_pure t) c *)
 (*     | _ -> *)
 (*         assert false *)
 
