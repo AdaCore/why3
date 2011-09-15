@@ -1,21 +1,65 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
-<why3session name="programs/sorted_list/why3session.xml">
- <prover id="alt-ergo" name="Alt-Ergo" version="0.93"/>
- <prover id="coq" name="Coq" version="8.2pl1"/>
- <prover id="cvc3" name="CVC3" version="2.2"/>
- <prover id="gappa" name="Gappa" version="0.13.0"/>
- <prover id="simplify" name="Simplify" version="1.5.4"/>
- <prover id="z3" name="Z3" version="2.19"/>
- <file name="../sorted_list.mlw" verified="true" expanded="true">
-  <theory name="WP FindInSortedList" verified="true" expanded="true">
-   <goal name="Sorted_not_mem" sum="065ba337071029143930bed502bf4f54" proved="true" expanded="true" shape="amemV0aConsV1V2NIasortedaConsV1V2Iainfix <V0V1F">
-    <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
-     <result status="valid" time="0.02"/>
+<why3session
+ name="examples/programs/sorted_list/why3session.xml">
+ <prover
+  id="alt-ergo"
+  name="Alt-Ergo"
+  version="0.93"/>
+ <prover
+  id="coq"
+  name="Coq"
+  version="8.3pl2"/>
+ <prover
+  id="cvc3"
+  name="CVC3"
+  version="2.2"/>
+ <prover
+  id="simplify"
+  name="Simplify"
+  version="1.5.4"/>
+ <prover
+  id="yices"
+  name="Yices"
+  version="1.0.27"/>
+ <prover
+  id="z3"
+  name="Z3"
+  version="2.19"/>
+ <file
+  name="../sorted_list.mlw"
+  verified="true"
+  expanded="true">
+  <theory
+   name="WP FindInSortedList"
+   verified="true"
+   expanded="true">
+   <goal
+    name="Sorted_not_mem"
+    sum="0e5b025f01157d802e4968ce08ccd4c4"
+    proved="true"
+    expanded="true"
+    shape="amemV0aConsV1V2NIasortedaConsV1V2Iainfix <V0V1F">
+    <proof
+     prover="alt-ergo"
+     timelimit="20"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
-   <goal name="WP_parameter find" expl="parameter find" sum="3088f11d3e64fa3492117d9f16ba16b0" proved="true" expanded="true" shape="CV1aNilamemV0V1qfaConsVVamemV0V1qainfix =V4aTrueAainfix >V0V2Oainfix =V0V2IamemV0V3qainfix =V4aTrueFAasortedV3IasortedV1FF">
-    <proof prover="alt-ergo" timelimit="20" edited="" obsolete="false">
+   <goal
+    name="WP_parameter find"
+    expl="parameter find"
+    sum="d06791b94cf6be238e76a7a9c8c63a80"
+    proved="true"
+    expanded="true"
+    shape="CV1aNilamemV0V1qfaConsVVamemV0V1qainfix =V4aTrueAainfix >V0V2Oainfix =V0V2IamemV0V3qainfix =V4aTrueFAasortedV3IasortedV1FF">
+    <proof
+     prover="alt-ergo"
+     timelimit="20"
+     edited=""
+     obsolete="false">
      <result status="valid" time="0.03"/>
     </proof>
    </goal>

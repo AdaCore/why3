@@ -132,22 +132,31 @@ end
 theory Sorted
 
   use export List
-  use import int.Int
 
-  inductive sorted (l: list int) =
+  type t
+  predicate le t t
+
+  inductive sorted (l: list t) =
     | Sorted_Nil:
         sorted Nil
     | Sorted_One:
-        forall x: int. sorted (Cons x Nil)
+        forall x: t. sorted (Cons x Nil)
     | Sorted_Two:
-        forall x y: int, l: list int.
-        x <= y -> sorted (Cons y l) -> sorted (Cons x (Cons y l))
+        forall x y: t, l: list t.
+        le x y -> sorted (Cons y l) -> sorted (Cons x (Cons y l))
 
   use import Mem
 
-  lemma Sorted_mem:
-    forall x: int, l: list int.
-    (forall y: int. mem y l -> x <= y) /\ sorted l <-> sorted (Cons x l)
+  lemma sorted_mem:
+    forall x: t, l: list t.
+    (forall y: t. mem y l -> le x y) /\ sorted l <-> sorted (Cons x l)
+
+end
+
+theory SortedInt
+
+  use import int.Int
+  clone export Sorted with type t = int, predicate le = (<=)
 
 end
 

@@ -25,7 +25,7 @@ module Queue
                           | Cons x t -> result = x /\ q.elts = t end }
     | Empty -> { q.elts = old q.elts = Nil }
 
-  val top:
+  val peek:
     q: t 'a ->
     {}
     'a
@@ -35,7 +35,7 @@ module Queue
 
   val clear: q: t 'a -> {} unit writes q {q.elts = Nil }
 
-  val copy: q: t 'a -> {} t 'a { result = q }
+  val copy: q: t 'a -> {} t 'a reads q { result = q }
 
   val is_empty:
     q: t 'a -> {} bool reads q { result=True <-> q.elts = Nil }
@@ -61,9 +61,9 @@ module Test
   let test1 () =
     let s = Queue.create () in
     Queue.push 1 s;
-    let x = Queue.top s in assert { x = 1 };
+    let x = Queue.peek s in assert { x = 1 };
     Queue.push 2 s;
-    let x = Queue.top s in assert { x = 1 };
+    let x = Queue.peek s in assert { x = 1 };
     ()
 
 end
