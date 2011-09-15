@@ -668,13 +668,13 @@ let rec t_btop env t = match t.t_node with
   | Tapp (ls, []) when ls_equal ls (find_ls ~pure:true env "False") ->
       t_label t.t_label t_false
   | _ ->
-      t_equ t (t_True env)
+      t_equ (f_btop env t) (t_True env)
 
 and f_btop env f = match f.t_node with
   | Tapp (ls, [{t_ty = Some {ty_node = Tyapp (ts, [])}} as l; r])
   when ls_equal ls ps_equ && ts_equal ts (find_ts ~pure:true env "bool") ->
       t_label_copy f (t_iff_simp (t_btop env l) (t_btop env r))
-  | _ -> TermTF.t_map (fun t -> t) (f_btop env) f
+  | _ -> t_map (f_btop env) f
 
 let add_wp_decl ps f uc =
   let name = ps.ps_pure.ls_name in
