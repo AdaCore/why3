@@ -8,28 +8,28 @@ theory TestGappa
    use floating_point.Single
    use import floating_point.Double
 
-  lemma Round_single_01:
+  goal Round_single_01:
     Single.round NearestTiesToEven 0.1 = 0x1.99999ap-4
 
-  lemma Round_double_01:
+  goal Round_double_01:
     Double.round NearestTiesToEven 0.1 = 0x1.999999999999ap-4
 
-   lemma Test00: forall x:real.  abs x <= 2.0 -> -3.0 <= x
+   goal Test00: forall x:real.  abs x <= 2.0 -> -3.0 <= x
 
-   lemma Test01:
+   goal Test01:
        forall x:double.
           -2.0 <= value x <= 2.0 ->
              abs((value x) * (value x) -
                  round NearestTiesToEven ((value x) * (value x))) <= 0x1p-52
 
-   lemma Test02:
+   goal Test02:
        forall x y:double.
           abs (value x) <= 2.0 ->
             y = x ->
              abs((value y) * (value y) -
                  round NearestTiesToEven ((value x) * (value x))) <= 0x1p-52
 
-   lemma Test03:
+   goal Test03:
        forall x y z:double.
           abs (value x) <= 2.0 ->
           value y = round NearestTiesToEven ((value x) * (value x)) ->
