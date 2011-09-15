@@ -557,7 +557,7 @@ let info_window ?(callback=(fun () -> ())) mt s =
   in
   let (_ : GtkSignal.id) =
     d#connect#response
-      ~callback:(function x -> 
+      ~callback:(function x ->
                    d#destroy ();
                    if mt <> `QUESTION || x = `OK then callback ())
   in ()
@@ -566,7 +566,7 @@ let info_window ?(callback=(fun () -> ())) mt s =
 let () =
   if Util.Mstr.is_empty (Whyconf.get_provers gconfig.Gconfig.config) then
     begin
-      info_window `ERROR "No prover configured.\nPlease run 'why3config --detect-provers' first" 
+      info_window `ERROR "No prover configured.\nPlease run 'why3config --detect-provers' first"
         ~callback:GMain.quit;
       GMain.main ();
       exit 2;
@@ -1189,7 +1189,7 @@ let color_loc ~color loc =
   let f, l, b, e = Loc.get loc in
   if f = !current_file then color_loc ~color source_view l b e
 
-let rec color_locs ~color f = 
+let rec color_locs ~color f =
   Util.option_iter (color_loc ~color) f.Term.t_loc;
   Term.t_fold (fun () -> color_locs ~color) () f
 
@@ -1198,10 +1198,15 @@ let rec color_locs ~color f =
 let rec color_t_locs f =
   match f.Term.t_node with
     | Term.Tbinop (Term.Timplies,f1,f2) ->
-        color_locs ~color:lighter_location_tag f1; color_t_locs f2
-    | Term.Tquant (Term.Tforall,fq) ->
-        let _,_,f2 = Term.t_open_quant fq in
+        color_locs ~color:lighter_location_tag f1;
         color_t_locs f2
+    | Term.Tlet (t,fb) ->
+        let _,f1 = Term.t_open_bound fb in
+        color_locs ~color:lighter_location_tag t;
+        color_t_locs f1
+    | Term.Tquant (Term.Tforall,fq) ->
+        let _,_,f1 = Term.t_open_quant fq in
+        color_t_locs f1
     | _ ->
         color_locs ~color:location_tag f
 
@@ -1283,7 +1288,7 @@ let (_ : GMenu.image_menu_item) =
     ()
 *)
 
-let (_ : GtkSignal.id) = w#connect#destroy 
+let (_ : GtkSignal.id) = w#connect#destroy
   ~callback:(exit_function ~destroy:true)
 
 let (_ : GMenu.image_menu_item) =
