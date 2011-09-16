@@ -93,6 +93,7 @@ and dexpr_desc =
   | DEif of dexpr * dexpr * dexpr
   | DEloop of dloop_annotation * dexpr
   | DElazy of lazy_op * dexpr * dexpr
+  | DEnot of dexpr
   | DEmatch of dexpr * (Denv.dpattern * dexpr) list
   | DEabsurd
   | DEraise of esymbol * dexpr option
@@ -192,6 +193,7 @@ and iexpr_desc =
   | IEif of iexpr * iexpr * iexpr
   | IEloop of loop_annotation * iexpr
   | IElazy of lazy_op * iexpr * iexpr
+  | IEnot of iexpr
   | IEmatch of ivsymbol * (ipattern * iexpr) list
   | IEabsurd
   | IEraise of esymbol * iexpr option

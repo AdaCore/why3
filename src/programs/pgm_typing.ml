@@ -87,9 +87,10 @@ let find_ls ~pure uc s =
 
 (* TODO: improve efficiency *)
 let dty_bool uc = tyapp (find_ts ~pure:true uc "bool") []
-let dty_int _uc = tyapp Ty.ts_int []
-let dty_unit _uc = tyapp (ts_tuple 0) []
-let dty_mark _uc = tyapp ts_mark []
+
+let dty_int   = tyapp Ty.ts_int []
+let dty_unit  = tyapp (Ty.ts_tuple 0) []
+let dty_mark  = tyapp ts_mark []
 
 (* note: local variables are simultaneously in locals (to type programs)
    and in denv (to type logic elements) *)
@@ -444,6 +445,10 @@ and dexpr_desc ~ghost ~userloc env loc = function
       let e2 = dexpr ~ghost ~userloc env e2 in
       expected_type e2 (dty_bool env.uc);
       DElazy (op, e1, e2), dty_bool env.uc
+  | Ptree.Enot e1 ->
+      let e1 = dexpr ~ghost ~userloc env e1 in
+      expected_type e1 (dty_bool env.uc);
+      DEnot e1, dty_bool env.uc
   | Ptree.Eapply (e1, e2) ->
       let e1 = dexpr ~ghost ~userloc env e1 in
       (* let ghost = ghost || is_ps_ghost e1 in *)
@@ -590,13 +595,13 @@ and dexpr_desc ~ghost ~userloc env loc = function
               try mutable_field mt.mt_effect i
               with Not_found -> errorm ~loc "not a mutable field"
             in
-            DEassign (e1, ls, j, e2), dty_unit env.uc
+            DEassign (e1, ls, j, e2), dty_unit
         | None ->
             errorm ~loc "unbound record field %a" print_qualid q
       end
   | Ptree.Esequence (e1, e2) ->
       let e1 = dexpr ~ghost ~userloc env e1 in
-      expected_type e1 (dty_unit env.uc);
+      expected_type e1 dty_unit;
       let e2 = dexpr ~ghost ~userloc env e2 in
       DEsequence (e1, e2), e2.dexpr_type
   | Ptree.Eif (e1, e2, e3) ->
@@ -608,8 +613,8 @@ and dexpr_desc ~ghost ~userloc env loc = function
       DEif (e1, e2, e3), e2.dexpr_type
   | Ptree.Eloop (a, e1) ->
       let e1 = dexpr ~ghost ~userloc env e1 in
-      expected_type e1 (dty_unit env.uc);
-      DEloop (dloop_annotation env a, e1), dty_unit env.uc
+      expected_type e1 dty_unit;
+      DEloop (dloop_annotation env a, e1), dty_unit
   | Ptree.Ematch (e1, bl) ->
       let e1 = dexpr ~ghost ~userloc env e1 in
       let ty1 = e1.dexpr_type in
@@ -668,20 +673,19 @@ and dexpr_desc ~ghost ~userloc env loc = function
       DEtry (e1, List.map handler hl), e1.dexpr_type
   | Ptree.Efor (x, e1, d, e2, inv, e3) ->
       let e1 = dexpr ~ghost ~userloc env e1 in
-      expected_type e1 (dty_int env.uc);
+      expected_type e1 dty_int;
       let e2 = dexpr ~ghost ~userloc env e2 in
-      expected_type e2 (dty_int env.uc);
-      let env = add_local env x.id (dty_int env.uc) in
+      expected_type e2 dty_int;
+      let env = add_local env x.id dty_int in
       let e3 = dexpr ~ghost ~userloc env e3 in
-      expected_type e3 (dty_unit env.uc);
-      DEfor (x, e1, d, e2, inv, e3), dty_unit env.uc
+      expected_type e3 dty_unit;
+      DEfor (x, e1, d, e2, inv, e3), dty_unit
   | Ptree.Eassert (k, le) ->
-      DEassert (k, le), dty_unit env.uc
+      DEassert (k, le), dty_unit
   | Ptree.Emark ({id=s}, e1) ->
       if Typing.mem_var s env.denv then
         errorm ~loc "clash with previous mark %s" s;
-      let ty = dty_mark env.uc in
-      let env = { env with denv = add_pure_var s ty env.denv } in
+      let env = { env with denv = add_pure_var s dty_mark env.denv } in
       let e1 = dexpr ~ghost ~userloc env e1 in
       DEmark (s, e1), e1.dexpr_type
   | Ptree.Ecast (e1, ty) ->
@@ -972,34 +976,29 @@ let rec purify_itype_v  = function
         (List.map (fun (v,_) -> v.i_impure.vs_ty) bl)
         (purify_itype_v c.ic_result_type)
 
-let rec iutype_v gl env = function
+let rec iutype_v env = function
   | DUTpure ty ->
       ITpure (Denv.ty_of_dty ty)
   | DUTarrow (bl, c) ->
-      let env, bl = map_fold_left (iubinder gl) env bl in
-      ITarrow (bl, iutype_c gl env c)
+      let env, bl = map_fold_left iubinder env bl in
+      ITarrow (bl, iutype_c env c)
 
-and iutype_c gl env c =
-  let tyv = iutype_v gl env c.duc_result_type in
+and iutype_c env c =
+  let tyv = iutype_v env c.duc_result_type in
   let ty = purify_itype_v tyv in
   { ic_result_type = tyv;
     ic_effect      = iueffect env c.duc_effect;
     ic_pre         = ifmla env c.duc_pre;
     ic_post        = iupost env ty c.duc_post; }
 
-and iubinder gl env (x, ty, tyv) =
-  let tyv = iutype_v gl env tyv in
+and iubinder env (x, ty, tyv) =
+  let tyv = iutype_v env tyv in
   let ty = Denv.ty_of_dty ty in
   let env, v = iadd_local env (id_user x.id x.id_loc) ty in
   env, (v, tyv)
 
 let mk_iexpr loc ty d =
   { iexpr_desc = d; iexpr_loc = loc; iexpr_lab = []; iexpr_type = ty }
-
-let mk_t_if gl f =
-  let ty = ty_app (find_ts ~pure:true gl "bool") [] in
-  t_if f (fs_app (find_ls ~pure:true gl "True")  [] ty)
-         (fs_app (find_ls ~pure:true gl "False") [] ty)
 
 (* apply ls to a list of expressions, introducing let's if necessary
 
@@ -1011,15 +1010,14 @@ let mk_t_if gl f =
   let xn = en in
   ls(x1,x2,...,xn)
 *)
-let make_logic_app gl loc ty ls el =
+let make_logic_app loc ty ls el =
   let rec make lvars gvars args = function
     | [] ->
         begin match ls.ls_value with
           | Some _ ->
-              let t = fs_app ls (List.rev args) (purify ty) in
-              IElogic (t, lvars, gvars)
+              IElogic (fs_app ls (List.rev args) (purify ty), lvars, gvars)
           | None ->
-              IElogic (mk_t_if gl (ps_app ls (List.rev args)), lvars, gvars)
+              IElogic (ps_app ls (List.rev args), lvars, gvars)
         end
     | ({ iexpr_desc = IElogic (t, lvt, gvt) }, _, _) :: r ->
         make (Svs.union lvars lvt) (Spv.union gvars gvt) (t :: args) r
@@ -1039,7 +1037,7 @@ let make_logic_app gl loc ty ls el =
    f [e1; e2; ...; en]
 -> let x1 = e1 in ... let xn = en in (...((f x1) x2)... xn)
 *)
-let make_app _gl loc ty f el =
+let make_app loc ty f el =
   let mk_iexpr loc lab ty d =
     let ie = mk_iexpr loc ty d in
     { ie with iexpr_lab = lab }
@@ -1164,13 +1162,13 @@ let drown_lab d e =
 (* [iexpr] translates dexpr into iexpr
    [env : vsymbol Mstr.t] maps strings to vsymbols for local variables *)
 
-let rec iexpr gl env e =
+let rec iexpr env e =
   let ty = Denv.ty_of_dty e.dexpr_type in
-  let d = iexpr_desc gl env e.dexpr_loc ty e.dexpr_desc in
+  let d = iexpr_desc env e.dexpr_loc ty e.dexpr_desc in
   drown_lab e { iexpr_desc = d; iexpr_type = ty;
                 iexpr_loc = e.dexpr_loc; iexpr_lab = [] }
 
-and iexpr_desc gl env loc ty = function
+and iexpr_desc env loc ty = function
   | DEconstant c ->
       IElogic (t_const c, Svs.empty, Spv.empty)
   | DElocal (x, _) ->
@@ -1184,41 +1182,41 @@ and iexpr_desc gl env loc ty = function
         | [], Some _ ->
             IElogic (fs_app ls [] (purify ty), Svs.empty, Spv.empty)
         | [], None ->
-            IElogic (mk_t_if gl (ps_app ls []), Svs.empty, Spv.empty)
+            IElogic (ps_app ls [], Svs.empty, Spv.empty)
         | al, _ ->
             errorm ~loc "function symbol %s is expecting %d arguments"
               ls.ls_name.id_string (List.length al)
       end
   | DEapply (e1, e2) ->
-      let f, args = decompose_app gl env e1 [iexpr gl env e2, ty, []] in
+      let f, args = decompose_app env e1 [iexpr env e2, ty, []] in
       begin match f.dexpr_desc with
         | DElogic ls ->
             let n = List.length ls.ls_args in
             if List.length args <> n then
               errorm ~loc "function symbol %s is expecting %d arguments"
                 ls.ls_name.id_string n;
-            make_logic_app gl loc ty ls args
+            make_logic_app loc ty ls args
         | _ ->
-            let f = iexpr gl env f in
-            let e = make_app gl loc ty f args in
+            let f = iexpr env f in
+            let e = make_app loc ty f args in
             e.iexpr_desc
       end
   | DEfun (bl, e1) ->
-      let env, bl = map_fold_left (iubinder gl) env bl in
-      IEfun (bl, itriple gl env e1)
+      let env, bl = map_fold_left iubinder env bl in
+      IEfun (bl, itriple env e1)
   | DElet (x, e1, e2) ->
-      let e1 = iexpr gl env e1 in
+      let e1 = iexpr env e1 in
       let env, v = iadd_local env (id_user x.id x.id_loc) e1.iexpr_type in
-      IElet (v, e1, iexpr gl env e2)
+      IElet (v, e1, iexpr env e2)
   | DEletrec (dl, e1) ->
-      let env, dl = iletrec gl env dl in
-      let e1 = iexpr gl env e1 in
+      let env, dl = iletrec env dl in
+      let e1 = iexpr env e1 in
       IEletrec (dl, e1)
   | DEassign (e1, ls, j, e2) ->
       (* e1.f <- e2 is syntactic sugar for
          let x1 = e1 in let x2 = e2 in any {} writes f { x1.f = x2 } *)
-      let e1 = iexpr gl env e1 in
-      let e2 = iexpr gl env e2 in
+      let e1 = iexpr env e1 in
+      let e2 = iexpr env e2 in
       let x1 = create_ivsymbol (id_fresh "x") e1.iexpr_type in
       let x2 = create_ivsymbol (id_fresh "x") e2.iexpr_type in
       let r = match e1.iexpr_type.ty_node with
@@ -1244,9 +1242,9 @@ and iexpr_desc gl env loc ty = function
       IEany c))))
   | DEsequence (e1, e2) ->
       let vs = create_ivsymbol (id_fresh "_") (ty_app (ts_tuple 0) []) in
-      IElet (vs, iexpr gl env e1, iexpr gl env e2)
+      IElet (vs, iexpr env e1, iexpr env e2)
   | DEif (e1, e2, e3) ->
-      IEif (iexpr gl env e1, iexpr gl env e2, iexpr gl env e3)
+      IEif (iexpr env e1, iexpr env e2, iexpr env e3)
   | DEloop (la, e1) ->
       let la =
         { loop_invariant =
@@ -1254,16 +1252,18 @@ and iexpr_desc gl env loc ty = function
           loop_variant   =
             option_map (ivariant env) la.dloop_variant; }
       in
-      IEloop (la, iexpr gl env e1)
+      IEloop (la, iexpr env e1)
   | DElazy (op, e1, e2) ->
-      IElazy (op, iexpr gl env e1, iexpr gl env e2)
+      IElazy (op, iexpr env e1, iexpr env e2)
+  | DEnot e1 ->
+      IEnot (iexpr env e1)
   | DEmatch (e1, bl) ->
-      let e1 = iexpr gl env e1 in
+      let e1 = iexpr env e1 in
       let branch (p, e) =
         let envi = Mstr.map (fun v -> v.i_impure) env.i_impures in
         let _, p = Denv.pattern envi p in
         let env, p = ipattern env p in
-        (p, iexpr gl env e)
+        (p, iexpr env e)
       in
       let bl = List.map branch bl in
       let v = create_ivsymbol (id_user "x" loc) e1.iexpr_type in
@@ -1271,7 +1271,7 @@ and iexpr_desc gl env loc ty = function
   | DEabsurd ->
       IEabsurd
   | DEraise (ls, e) ->
-      IEraise (ls, option_map (iexpr gl env) e)
+      IEraise (ls, option_map (iexpr env) e)
   | DEtry (e, hl) ->
       let handler (ls, x, h) =
         let x, env = match x with
@@ -1282,17 +1282,17 @@ and iexpr_desc gl env loc ty = function
           | None ->
               None, env
         in
-        (ls, x, iexpr gl env h)
+        (ls, x, iexpr env h)
       in
-      IEtry (iexpr gl env e, List.map handler hl)
+      IEtry (iexpr env e, List.map handler hl)
   | DEfor (x, e1, d, e2, inv, e3) ->
       List.iter
         (fun s -> ignore (find_int_ls ~loc env.i_uc s)) ["infix <"; "infix +"];
-      let e1 = iexpr gl env e1 in
-      let e2 = iexpr gl env e2 in
+      let e1 = iexpr env e1 in
+      let e2 = iexpr env e2 in
       let env, vx = iadd_local env (id_user x.id x.id_loc) e1.iexpr_type in
       let inv = option_map (ifmla env) inv in
-      let e3 = iexpr gl env e3 in
+      let e3 = iexpr env e3 in
       let v1 = create_ivsymbol (id_user "for_start" loc) e1.iexpr_type in
       let v2 = create_ivsymbol (id_user "for_end" loc)   e2.iexpr_type in
       IElet (v1, e1, mk_iexpr loc ty (
@@ -1303,20 +1303,20 @@ and iexpr_desc gl env loc ty = function
       IEassert (k, f)
   | DEmark (s, e1) ->
       let env, v = iadd_local env (id_fresh s) ty_mark in
-      IEmark (v.i_impure, iexpr gl env e1)
+      IEmark (v.i_impure, iexpr env e1)
   | DEany c ->
-      let c = iutype_c gl env c in
+      let c = iutype_c env c in
       IEany c
 
-and decompose_app gl env e args = match e.dexpr_desc with
+and decompose_app env e args = match e.dexpr_desc with
   | DEapply (e1, e2) ->
       let lab = e.dexpr_lab in
       let ty = Denv.ty_of_dty e.dexpr_type in
-      decompose_app gl env e1 ((iexpr gl env e2, ty, lab) :: args)
+      decompose_app env e1 ((iexpr env e2, ty, lab) :: args)
   | _ ->
       e, args
 
-and iletrec gl env dl =
+and iletrec env dl =
   (* add all functions into env, and compute local env *)
   let step1 env ((x, dty), bl, var, t) =
     let ty = Denv.ty_of_dty dty in
@@ -1326,9 +1326,9 @@ and iletrec gl env dl =
   let env, dl = map_fold_left step1 env dl in
   (* then translate variants and bodies *)
   let step2 (v, bl, var, (_,_,_ as t)) =
-    let env, bl = map_fold_left (iubinder gl) env bl in
+    let env, bl = map_fold_left iubinder env bl in
     let var = option_map (ivariant env) var in
-    let t = itriple gl env t in
+    let t = itriple env t in
     let var, t = match var with
       | None ->
           None, t
@@ -1374,9 +1374,9 @@ and iletrec gl env dl =
   end;
   env, dl
 
-and itriple gl env (p, e, q) =
+and itriple env (p, e, q) =
   let p = ifmla env p in
-  let e = iexpr gl env e in
+  let e = iexpr env e in
   let ty = e.iexpr_type in
   let q = iupost env ty q in
   (p, e, q)
@@ -1691,6 +1691,13 @@ and expr_desc gl env loc ty = function
               Eif (e1, mk_true loc gl, e2)
       in
       d, tpure ty, ef
+  | IEnot e1 ->
+      let e1 = expr gl env e1 in
+      let ls = find_ls ~pure:true gl "notb" in
+      let v1 = create_pvsymbol_v (id_fresh "lazy") (tpure ty) in
+      let t = fs_app ls [t_var v1.pv_pure] ty in
+      let d = Elet (v1, e1, mk_simple_expr loc ty (Elogic t)) in
+      d, tpure ty, e1.expr_effect
   | IEmatch (i, bl) ->
       let v = Mvs.find i.i_impure env in
       let branch ef (p, e) =
@@ -2252,7 +2259,7 @@ let rec decl ~wp env penv ltm lmod uc = function
   | Ptree.Dlet (id, e) ->
       let denv = create_denv uc in
       let e = dexpr ~ghost:false ~userloc:None denv e in
-      let e = iexpr uc (create_ienv denv) e in
+      let e = iexpr (create_ienv denv) e in
       let e = expr uc Mvs.empty e in
       check_region_vars ();
       if Debug.test_flag debug then
@@ -2267,7 +2274,7 @@ let rec decl ~wp env penv ltm lmod uc = function
   | Ptree.Dletrec dl ->
       let denv = create_denv uc in
       let _, dl = dletrec ~ghost:false ~userloc:None denv dl in
-      let _, dl = iletrec uc (create_ienv denv) dl in
+      let _, dl = iletrec (create_ienv denv) dl in
       let _, dl = letrec uc Mvs.empty dl in
       check_region_vars ();
       let one uc (v, _, _, _ as d) =
@@ -2290,7 +2297,7 @@ let rec decl ~wp env penv ltm lmod uc = function
       let loc = id.id_loc in
       let denv = create_denv uc in
       let tyv = dutype_v denv tyv in
-      let tyv = iutype_v uc (create_ienv denv) tyv in
+      let tyv = iutype_v (create_ienv denv) tyv in
       let tyv = type_v Mvs.empty tyv in
       if cannot_be_generalized tyv then errorm ~loc "cannot be generalized";
       if Debug.test_flag debug then

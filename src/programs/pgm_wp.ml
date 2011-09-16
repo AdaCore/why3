@@ -411,14 +411,10 @@ let well_founded_rel = function
 
 (* Recursive computation of the weakest precondition *)
 
-let t_True env =
-  fs_app (find_ls ~pure:true env "True") []
-    (ty_app (find_ts ~pure:true env "bool") [])
-
-(*
-let add_expl msg f =
-  t_label_add Split_goal.stop_split (t_label_add ("expl:"^msg) f)
-*)
+let ty_bool env = ty_app (find_ts ~pure:true env "bool")  []
+let t_True  env = fs_app (find_ls ~pure:true env "True")  [] (ty_bool env)
+let t_False env = fs_app (find_ls ~pure:true env "False") [] (ty_bool env)
+let mk_t_if env f = t_if f (t_True env) (t_False env)
 
 (*
   env : module_uc
@@ -430,7 +426,6 @@ let rec wp_expr env rm e q =
   let q = post_map (old_mark lab) q in
   let f = wp_desc env rm e q in
   let f = erase_mark lab f in
-(*  let f = wp_label e f in *)
   if Debug.test_flag debug then begin
     eprintf "@[--------@\n@[<hov 2>e = %a@]@\n" Pgm_pretty.print_expr e;
     eprintf "@[<hov 2>q = %a@]@\n" Pretty.print_term (snd (fst q));
@@ -441,7 +436,9 @@ let rec wp_expr env rm e q =
 and wp_desc env rm e q = match e.expr_desc with
   | Elogic t ->
       let (v, q), _ = q in
-      t_subst_single v (wp_label e t) q
+      let t = wp_label e t in
+      let t = if t.t_ty = None then mk_t_if env t else t in
+      t_subst_single v t q
   | Elocal pv ->
       let (v, q), _ = q in
       t_subst_single v (wp_label e (t_var pv.pv_pure)) q
@@ -654,34 +651,44 @@ let wp_rec env (_,_,_,ef as def) =
   let f = wp_recfun env rm def in
   wp_close rm ef f
 
-let rec t_btop env t = match t.t_node with
-  | Tif (f,t1,t2) -> let f = f_btop env f in
-      t_label t.t_label (t_if_simp f (t_btop env t1) (t_btop env t2))
-  | Tapp (ls, [t1;t2]) when ls_equal ls (find_ls ~pure:true env "andb") ->
-      t_label t.t_label (t_and_simp (t_btop env t1) (t_btop env t2))
-  | Tapp (ls, [t1;t2]) when ls_equal ls (find_ls ~pure:true env "orb") ->
-      t_label t.t_label (t_or_simp (t_btop env t1) (t_btop env t2))
-  | Tapp (ls, [t1]) when ls_equal ls (find_ls ~pure:true env "notb") ->
-      t_label t.t_label (t_not_simp (t_btop env t1))
-  | Tapp (ls, []) when ls_equal ls (find_ls ~pure:true env "True") ->
-      t_label t.t_label t_true
-  | Tapp (ls, []) when ls_equal ls (find_ls ~pure:true env "False") ->
-      t_label t.t_label t_false
-  | _ ->
-      t_equ (f_btop env t) (t_True env)
-
-and f_btop env f = match f.t_node with
-  | Tapp (ls, [{t_ty = Some {ty_node = Tyapp (ts, [])}} as l; r])
-  when ls_equal ls ps_equ && ts_equal ts (find_ts ~pure:true env "bool") ->
-      t_label_copy f (t_iff_simp (t_btop env l) (t_btop env r))
-  | _ -> t_map (f_btop env) f
+let bool_to_prop env f =
+  let ts_bool  = find_ts ~pure:true env "bool" in
+  let ls_andb  = find_ls ~pure:true env "andb" in
+  let ls_orb   = find_ls ~pure:true env "orb" in
+  let ls_notb  = find_ls ~pure:true env "notb" in
+  let ls_True  = find_ls ~pure:true env "True" in
+  let ls_False = find_ls ~pure:true env "False" in
+  let t_True   = fs_app ls_True [] (ty_app ts_bool []) in
+  let rec t_btop t = t_label ?loc:t.t_loc t.t_label (* t_label_copy? *)
+    (match t.t_node with
+    | Tif (f,t1,t2) ->
+        t_if_simp (f_btop f) (t_btop t1) (t_btop t2)
+    | Tapp (ls, [t1;t2]) when ls_equal ls ls_andb ->
+        t_and_simp (t_btop t1) (t_btop t2)
+    | Tapp (ls, [t1;t2]) when ls_equal ls ls_orb ->
+        t_or_simp (t_btop t1) (t_btop t2)
+    | Tapp (ls, [t1]) when ls_equal ls ls_notb ->
+        t_not_simp (t_btop t1)
+    | Tapp (ls, []) when ls_equal ls ls_True ->
+        t_true
+    | Tapp (ls, []) when ls_equal ls ls_False ->
+        t_false
+    | _ ->
+        t_equ (f_btop t) t_True)
+  and f_btop f = match f.t_node with
+    | Tapp (ls, [{t_ty = Some {ty_node = Tyapp (ts, [])}} as l; r])
+    when ls_equal ls ps_equ && ts_equal ts ts_bool ->
+        t_label_copy f (t_iff_simp (t_btop l) (t_btop r))
+    | _ -> t_map f_btop f
+  in
+  f_btop f
 
 let add_wp_decl ps f uc =
   let name = ps.ps_pure.ls_name in
   let s = "WP_" ^ name.id_string in
   let label = ["expl:" ^ name.id_string] in
   let id = id_fresh ~label ?loc:name.id_loc s in
-  let f = f_btop uc f in
+  let f = bool_to_prop uc f in
   let km = get_known (pure_uc uc) in
   let f = eval_match ~inline:inline_nonrec_linear km f in
   (* printf "wp: f=%a@." print_term f; *)

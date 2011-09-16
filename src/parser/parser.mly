@@ -1056,8 +1056,7 @@ expr:
 | expr EQUAL expr
    { mk_infix $1 "=" $3 }
 | expr LTGT expr
-   { let t = mk_infix $1 "=" $3 in
-     mk_expr (mk_apply_id { id = "notb"; id_lab = []; id_loc = floc () } [t]) }
+   { mk_expr (Enot (mk_infix $1 "=" $3)) }
 | expr LARROW expr
     { match $1.expr_desc with
         | Eapply (e11, e12) -> begin match e11.expr_desc with
@@ -1081,7 +1080,7 @@ expr:
 | expr OP4 expr
    { mk_infix $1 $2 $3 }
 | NOT expr %prec prec_prefix_op
-   { mk_expr (mk_apply_id { id = "notb"; id_lab = []; id_loc = floc () } [$2]) }
+   { mk_expr (Enot $2) }
 | prefix_op expr %prec prec_prefix_op
    { mk_prefix $1 $2 }
 | expr_arg list1_expr_arg %prec prec_app
