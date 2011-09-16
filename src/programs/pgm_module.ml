@@ -170,7 +170,7 @@ let ts_unit = create_tysymbol (id_fresh "unit") [] (Some ty_unit)
 
 (* logic ignore 'a : () *)
 
-let ts_mark = create_tysymbol (id_fresh "mark") [] None
+let ts_mark = create_tysymbol (id_fresh "'mark") [] None
 let ty_mark = ty_app ts_mark []
 
 let fs_at =
@@ -180,6 +180,9 @@ let fs_at =
 let fs_old =
   let ty = ty_var (create_tvsymbol (id_fresh "a")) in
   create_lsymbol (id_fresh "old") [ty] (Some ty)
+
+let vs_old = create_vsymbol (id_fresh "'old") ty_mark
+let vs_now = create_vsymbol (id_fresh "'now") ty_mark
 
 let th_prelude =
   let uc = create_theory (id_fresh "Prelude") in

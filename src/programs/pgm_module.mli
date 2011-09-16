@@ -95,6 +95,9 @@ val ty_unit : ty
 val fs_old : lsymbol
 val fs_at  : lsymbol
 
+val vs_old : vsymbol
+val vs_now : vsymbol
+
 val th_prelude : theory
 
 (** exceptions *)

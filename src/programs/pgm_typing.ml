@@ -420,6 +420,7 @@ and dexpr_desc ~ghost ~userloc env loc = function
         with Not_found ->
           errorm ~loc "unbound symbol %a" print_qualid p
       in
+      (*if ls_equal ls fs_at then errorm ~loc "at not allowed in programs";*)
       if ls_equal ls fs_old then errorm ~loc "old not allowed in programs";
       let ps = get_psymbol ls in
       begin match ps.ps_kind with
@@ -913,7 +914,9 @@ let post env ((ty, f), ql) =
 
 let iterm env l =
   let t = dterm (pure_uc env.i_uc) env.i_denv l in
-  Denv.term env.i_pures t
+  let t = Denv.term env.i_pures t in
+  check_at_fmla l.pp_loc t;
+  t
 
 (* FIXME: ensure that symbol comes from theory int.Int *)
 let find_int_ls ~loc env s =
@@ -940,12 +943,18 @@ let ivariant env (t, ps) =
     | _ ->
         assert false
 
-let ifmla ?old env l =
-  let loc = l.pp_loc in
+(* replace every occurrence of [old(t)] with [at(t,'old)] *)
+let rec remove_old f = match f.t_node with
+  | Term.Tapp (ls, [t]) when ls_equal ls fs_old ->
+      t_app fs_at [remove_old t; t_var vs_old] f.t_ty
+  | _ ->
+      t_map remove_old f
+
+let ifmla ?(old=false) env l =
   let f = dfmla (pure_uc env.i_uc) env.i_denv l in
   let f = Denv.fmla env.i_pures f in
-  check_at_fmla ?old loc f;
-  f
+  check_at_fmla ~old l.pp_loc f;
+  if (old = true) then remove_old f else f
 
 let id_result loc = id_user id_result loc
 

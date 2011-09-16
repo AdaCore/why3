@@ -117,30 +117,27 @@ let add_binder x rm =
 
 let add_binders = List.fold_right add_binder
 
-(* replace old(t) with at(t,lab) everywhere in formula f *)
-let rec old_mark lab t = match t.t_node with
-  | Tapp (ls, [t]) when ls_equal ls fs_old ->
-      let t = old_mark lab t in (* NECESSARY? *)
-      t_app fs_at [t; t_var lab] t.t_ty
-  | _ ->
-      t_map (old_mark lab) t
+(* replace [at(t,'old)] with [at(t,lab)] everywhere in formula [f] *)
+let old_mark lab t = t_subst_single vs_old (t_var lab) t
 
-(* replace at(t,lab) with t everywhere in formula f *)
-let rec erase_mark lab t = match t.t_node with
-  | Tapp (ls, [t; {t_node = Tvar l}])
-    when ls_equal ls fs_at && vs_equal l lab ->
-      erase_mark lab t
-  | _ ->
-      t_map (erase_mark lab) t
+(* replace [at(t,lab)] with [at(t,'now)] everywhere in formula [f] *)
+let erase_mark lab t = t_subst_single lab (t_var vs_now) t
 
 let rec unref s t = match t.t_node with
   | Tvar vs ->
       begin try t_var (Mvs.find vs s) with Not_found -> t end
   | Tapp (ls, _) when ls_equal ls fs_old ->
       assert false
-  | Tapp (ls, _) when ls_equal ls fs_at ->
+  | Tapp (ls, [e;{t_node = Tvar lab}]) when ls_equal ls fs_at ->
+      if vs_equal lab vs_old then assert false else
+      if vs_equal lab vs_now then unref s e else
       (* do not recurse in at(...) *)
       t
+  | Tlet _ | Tcase _ | Teps _ | Tquant _ ->
+      (* do not open unless necessary *)
+      let s = Mvs.set_inter s t.t_vars in
+      if Mvs.is_empty s then t else
+      t_map (unref s) t
   | _ ->
       t_map (unref s) t
 
@@ -683,12 +680,20 @@ let bool_to_prop env f =
   in
   f_btop f
 
+(* replace every occurrence of [at(t,'now)] with [t] *)
+let rec remove_at f = match f.t_node with
+  | Tapp (ls, [t;{t_node = Tvar lab}])
+    when ls_equal ls fs_at && vs_equal lab vs_now ->
+      remove_at t
+  | _ ->
+      t_map remove_at f
+
 let add_wp_decl ps f uc =
   let name = ps.ps_pure.ls_name in
   let s = "WP_" ^ name.id_string in
   let label = ["expl:" ^ name.id_string] in
   let id = id_fresh ~label ?loc:name.id_loc s in
-  let f = bool_to_prop uc f in
+  let f = bool_to_prop uc (remove_at f) in
   let km = get_known (pure_uc uc) in
   let f = eval_match ~inline:inline_nonrec_linear km f in
   (* printf "wp: f=%a@." print_term f; *)
