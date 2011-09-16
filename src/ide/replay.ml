@@ -307,7 +307,6 @@ let rec provers_latex_stats provers depth g =
   Hashtbl.iter (fun p a-> Hashtbl.replace provers p a.M.prover) proofs;
   let tr = M.transformations g in
   Hashtbl.iter (fun _st tr -> 
-    depth := !depth + 1; 
     let goals = tr.M.subgoals in
     List.iter (provers_latex_stats provers depth) goals) tr
 
