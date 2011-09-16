@@ -311,9 +311,13 @@ let rec provers_latex_stats provers depth g =
     let goals = tr.M.subgoals in
     List.iter (provers_latex_stats provers depth) goals) tr
 
-let rec goal_latex_stat prov depth g =
- for i = 1 to depth do printf "\\quad" done;
- printf "\\verb|%s| " (M.goal_name g);
+let rec goal_latex_stat prov depth depth_max g =
+  for i = 1 to depth do printf "&" done;
+  printf "\\verb|%s| " (M.goal_name g);
+  if depth > 0 then 
+    for i = depth to (depth_max - depth - 1) do printf "&" done
+  else 
+    for i = depth to (depth_max - depth - 2) do printf "&" done;
   let proofs = M.external_proofs g in
   Hashtbl.iter (fun p _pr -> 
     try 
@@ -323,13 +327,13 @@ let rec goal_latex_stat prov depth g =
 	  Session.Done res ->
 	    if res.Call_provers.pr_answer = Call_provers.Valid
 	    then  printf "& %.2f " res.Call_provers.pr_time
-	    else printf "& - "
+	    else printf "& --- "
 	| _ -> printf "& " 
     with Not_found -> printf "&") prov;
   printf "\\\\ \\hline @.";
   let tr = M.transformations g in
   Hashtbl.iter (fun _st tr -> let goals = tr.M.subgoals in
-  List.iter (goal_latex_stat prov (depth + 1)) goals) tr
+  List.iter (goal_latex_stat prov (depth + 1) depth_max) goals) tr
 
 let theory_latex_stat t =
   let provers = Hashtbl.create 9 in
@@ -338,14 +342,15 @@ let theory_latex_stat t =
   printf "\n@.";
   printf "\\begin{tabular}";
   printf "{| l |";
-  if (!depth = 0) then for i = 0 to (Hashtbl.length provers) -1 do printf "c |" done
-  else for i = 0 to (Hashtbl.length provers) + !depth - 2 do printf "c |" done;
-
+  if (!depth = 0) then 
+    for i = 0 to (Hashtbl.length provers) -1 do printf "c |" done
+  else 
+    for i = 0 to (Hashtbl.length provers) + !depth - 2 do printf "c |" done;
   printf "} \n \\hline@.";
-  for i = 0 to !depth - 2 do printf " & " done;
+  printf " \\multicolumn{%d}{|c|}{ WPs } " (!depth );
   Hashtbl.iter (fun p _-> printf "& %s " p) provers;
   printf "\\\\\\hline@.";
-  List.iter (goal_latex_stat provers 0) (M.goals t);
+  List.iter (goal_latex_stat provers 0 !depth) (M.goals t);
   printf "\\end{tabular}@."
 
 let file_latex_stat f =
