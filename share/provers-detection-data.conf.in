@@ -107,8 +107,9 @@ name = "Vampire"
 exec = "vampire"
 version_switch = "--version"
 version_regexp = "Vampire \\([0-9.]+\\)"
-command = "@LOCALBIN@why3-cpulimit %t %m -s %e"
+command = "@LOCALBIN@why3-cpulimit %t %m -s %e -t %t"
 driver = "drivers/vampire.drv"
+version_ok = "0.6"
 
 [ATP verit]
 name = "veriT"
