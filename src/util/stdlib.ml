@@ -57,9 +57,11 @@ module type S =
     val inter : (key -> 'a -> 'b -> 'c option) -> 'a t -> 'b t -> 'c t
     val diff : (key -> 'a -> 'b -> 'a option) -> 'a t -> 'b t -> 'a t
     val submap : (key -> 'a -> 'b -> bool) -> 'a t -> 'b t -> bool
+    val disjoint : (key -> 'a -> 'b -> bool) -> 'a t -> 'b t -> bool
     val set_inter : 'a t -> 'b t -> 'a t
     val set_diff : 'a t -> 'b t -> 'a t
     val set_submap : 'a t -> 'b t -> bool
+    val set_disjoint : 'a t -> 'b t -> bool
     val find_default : key -> 'a -> 'a t -> 'a
     val find_option : key -> 'a t -> 'a option
     val map_filter: ('a -> 'b option) -> 'a t -> 'b t
@@ -91,6 +93,7 @@ module type S =
       val compare: t -> t -> int
       val equal: t -> t -> bool
       val subset: t -> t -> bool
+      val disjoint: t -> t -> bool
       val iter: (elt -> unit) -> t -> unit
       val fold: (elt -> 'a -> 'a) -> t -> 'a -> 'a
       val for_all: (elt -> bool) -> t -> bool
@@ -468,7 +471,7 @@ module Make(Ord: OrderedType) = struct
 
     let rec submap pr s1 s2 =
       match (s1, s2) with
-      |  Empty, _ -> true
+      | Empty, _ -> true
       | _, Empty -> false
       | Node (l1, v1, d1, r1, _), (Node (l2, v2, d2, r2, _) as t2) ->
           let c = Ord.compare v1 v2 in
@@ -480,9 +483,24 @@ module Make(Ord: OrderedType) = struct
             submap pr (Node (Empty, v1, d1, r1, 0)) r2 && submap pr l1 t2
 
 
+    let rec disjoint pr s1 s2 =
+      match (s1, s2) with
+      | Empty, _ -> true
+      | _, Empty -> true
+      | Node (l1, v1, d1, r1, _), (Node (l2, v2, d2, r2, _) as t2) ->
+          let c = Ord.compare v1 v2 in
+          if c = 0 then
+            pr v1 d1 d2 && disjoint pr l1 l2 && disjoint pr r1 r2
+          else if c < 0 then
+            disjoint pr (Node (l1, v1, d1, Empty, 0)) l2 && disjoint pr r1 t2
+          else
+            disjoint pr (Node (Empty, v1, d1, r1, 0)) r2 && disjoint pr l1 t2
+
+
     let set_inter m1 m2 = inter (fun _ x _ -> Some x) m1 m2
     let set_diff m1 m2 = diff (fun _ _ _ -> None) m1 m2
     let set_submap m1 m2 = submap (fun _ _ _ -> true) m1 m2
+    let set_disjoint m1 m2 = disjoint (fun _ _ _ -> false) m1 m2
 
 
     let rec find_default x def = function
@@ -597,6 +615,7 @@ module Make(Ord: OrderedType) = struct
       val compare: t -> t -> int
       val equal: t -> t -> bool
       val subset: t -> t -> bool
+      val disjoint: t -> t -> bool
       val iter: (elt -> unit) -> t -> unit
       val fold: (elt -> 'a -> 'a) -> t -> 'a -> 'a
       val for_all: (elt -> bool) -> t -> bool
@@ -639,6 +658,7 @@ module Make(Ord: OrderedType) = struct
         let compare = compare (fun _ _ -> 0)
         let equal = equal (fun _ _ -> true)
         let subset = submap (fun _ _ _ -> true)
+        let disjoint = disjoint (fun _ _ _ -> false)
         let iter f = iter (const f)
         let fold f = fold (const f)
         let for_all f = for_all (const f)

@@ -496,15 +496,30 @@ let bound_map fn (u,b,e) = (u, bnd_map fn b, fn e)
 
 let t_map_unsafe fn t = t_label_copy t (match t.t_node with
   | Tvar _ | Tconst _ -> t
-  | Tapp (f,tl) -> t_app f (List.map fn tl) t.t_ty
-  | Tif (f,t1,t2) -> t_if (fn f) (fn t1) (fn t2)
-  | Tlet (e,b) -> t_let (fn e) (bound_map fn b) t.t_ty
-  | Tcase (e,bl) -> t_case (fn e) (List.map (bound_map fn) bl) t.t_ty
-  | Teps b -> t_eps (bound_map fn b) t.t_ty
+  | Tapp (f,tl) ->
+      let sl = List.map fn tl in
+      if List.for_all2 t_equal sl tl then t else
+      t_app f sl t.t_ty
+  | Tif (f,t1,t2) ->
+      let g = fn f and s1 = fn t1 and s2 = fn t2 in
+      if t_equal g f && t_equal s1 t1 && t_equal s2 t2 then t else
+      t_if g s1 s2
+  | Tlet (e,b) ->
+      t_let (fn e) (bound_map fn b) t.t_ty
+  | Tcase (e,bl) ->
+      t_case (fn e) (List.map (bound_map fn) bl) t.t_ty
+  | Teps b ->
+      t_eps (bound_map fn b) t.t_ty
   | Tquant (q,(vl,b,tl,f1)) ->
       t_quant q (vl, bnd_map fn b, tr_map fn tl, fn f1)
-  | Tbinop (op,f1,f2) -> t_binary op (fn f1) (fn f2)
-  | Tnot f1 -> t_not (fn f1)
+  | Tbinop (op,f1,f2) ->
+      let g1 = fn f1 and g2 = fn f2 in
+      if t_equal g1 f1 && t_equal g2 f2 then t else
+      t_binary op g1 g2
+  | Tnot f1 ->
+      let g1 = fn f1 in
+      if t_equal g1 f1 then t else
+      t_not g1
   | Ttrue | Tfalse -> t)
 
 (* unsafe fold *)
@@ -534,13 +549,15 @@ let t_map_fold_unsafe fn acc t = match t.t_node with
   | Tvar _ | Tconst _ ->
       acc, t
   | Tapp (f,tl) ->
-      let acc,tl = map_fold_left fn acc tl in
-      acc, t_label_copy t (t_app f tl t.t_ty)
+      let acc,sl = map_fold_left fn acc tl in
+      if List.for_all2 t_equal sl tl then acc,t else
+      acc, t_label_copy t (t_app f sl t.t_ty)
   | Tif (f,t1,t2) ->
-      let acc, f  = fn acc f in
-      let acc, t1 = fn acc t1 in
-      let acc, t2 = fn acc t2 in
-      acc, t_label_copy t (t_if f t1 t2)
+      let acc, g  = fn acc f in
+      let acc, s1 = fn acc t1 in
+      let acc, s2 = fn acc t2 in
+      if t_equal g f && t_equal s1 t1 && t_equal s2 t2 then acc,t else
+      acc, t_label_copy t (t_if g s1 s2)
   | Tlet (e,b) ->
       let acc, e = fn acc e in
       let acc, b = bound_map_fold fn acc b in
@@ -558,12 +575,14 @@ let t_map_fold_unsafe fn acc t = match t.t_node with
       let acc, f1 = fn acc f1 in
       acc, t_label_copy t (t_quant q (vl,b,tl,f1))
   | Tbinop (op,f1,f2) ->
-      let acc, f1 = fn acc f1 in
-      let acc, f2 = fn acc f2 in
-      acc, t_label_copy t (t_binary op f1 f2)
+      let acc, g1 = fn acc f1 in
+      let acc, g2 = fn acc f2 in
+      if t_equal g1 f1 && t_equal g2 f2 then acc,t else
+      acc, t_label_copy t (t_binary op g1 g2)
   | Tnot f1 ->
-      let acc, f1 = fn acc f1 in
-      acc, t_label_copy t (t_not f1)
+      let acc, g1 = fn acc f1 in
+      if t_equal g1 f1 then acc,t else
+      acc, t_label_copy t (t_not g1)
   | Ttrue | Tfalse ->
       acc, t
 
@@ -572,17 +591,24 @@ let t_map_fold_unsafe fn acc t = match t.t_node with
 let rec t_subst_unsafe m t =
   let t_subst t = t_subst_unsafe m t in
   let b_subst (u,b,e) = (u, bv_subst_unsafe m b, e) in
+  let nosubst (_,b,_) = Mvs.set_disjoint m b.bv_vars in
   match t.t_node with
   | Tvar u ->
       Mvs.find_default u t m
   | Tlet (e, bt) ->
-      t_label_copy t (t_let (t_subst e) (b_subst bt) t.t_ty)
+      let d = t_subst e in
+      if t_equal d e && nosubst bt then t else
+      t_label_copy t (t_let d (b_subst bt) t.t_ty)
   | Tcase (e, bl) ->
+      let d = t_subst e in
+      if t_equal d e && List.for_all nosubst bl then t else
       let bl = List.map b_subst bl in
-      t_label_copy t (t_case (t_subst e) bl t.t_ty)
+      t_label_copy t (t_case d bl t.t_ty)
   | Teps bf ->
+      if nosubst bf then t else
       t_label_copy t (t_eps (b_subst bf) t.t_ty)
   | Tquant (q, (vl,b,tl,f1)) ->
+      if Mvs.set_disjoint m b.bv_vars then t else
       let b = bv_subst_unsafe m b in
       t_label_copy t (t_quant q (vl,b,tl,f1))
   | _ ->

@@ -208,6 +208,10 @@ module type S =
     (** [submap pr m1 m2] verifies that all the keys in m1 are in m2
         and that for each such binding pr is verified. *)
 
+    val disjoint : (key -> 'a -> 'b -> bool) -> 'a t -> 'b t -> bool
+    (** [disjoint pr m1 m2] verifies that for every common key in m1
+        and m2, pr is verified. *)
+
     val set_inter : 'a t -> 'b t -> 'a t
     (** [set_inter = inter (fun _ x _ -> Some x)] *)
 
@@ -216,6 +220,9 @@ module type S =
 
     val set_submap : 'a t -> 'b t -> bool
     (** [set_submap = submap (fun _ _ _ -> true)] *)
+
+    val set_disjoint : 'a t -> 'b t -> bool
+    (** [set_disjoint = disjoint (fun _ _ _ -> false)] *)
 
     val find_default : key -> 'a -> 'a t -> 'a
     (** [find_default x d m] returns the current binding of [x] in [m],
@@ -309,6 +316,10 @@ module type S =
 
       val subset: t -> t -> bool
       (** [subset s1 s2] tests whether the set [s1] is a subset of [s2]. *)
+
+      val disjoint: t -> t -> bool
+      (** [disjoint s1 s2] tests whether the sets [s1] and [s2]
+          are disjoint. *)
 
       val iter: (elt -> unit) -> t -> unit
       (** [iter f s] applies [f] to all elements of [s].
