@@ -267,7 +267,6 @@ let prepare_task drv task =
   let task = update_task drv task in
   List.fold_left apply task transl
 
-
 let print_task_prepared ?old drv fmt task =
   let p = match drv.drv_printer with
     | None -> raise NoPrinter
@@ -277,7 +276,6 @@ let print_task_prepared ?old drv fmt task =
     lookup_printer p drv.drv_env drv.drv_prelude drv.drv_thprelude
   in
   fprintf fmt "@[%a@]@?" (printer ?old) task
-
 
 let print_task ?old drv fmt task =
   let task = prepare_task drv task in
@@ -290,7 +288,6 @@ let prove_task_prepared ~command ?timelimit ?memlimit ?old drv task =
   let res = call_on_buffer ~command ?timelimit ?memlimit drv buf in
   Buffer.reset buf;
   res
-
 
 let prove_task ~command ?timelimit ?memlimit ?old drv task =
   let task = prepare_task drv task in

@@ -342,7 +342,8 @@ let () = try
   begin match !opt_prover with
   | Some s ->
       let prover = try Mstr.find s (get_provers config) with
-        | Not_found -> eprintf "Driver %s not found.@." s; exit 1
+        | Not_found -> eprintf "Prover '%s' not found in %s@."
+            s (Whyconf.get_conf_file config); exit 1
       in
       opt_command := Some prover.command;
       opt_driver := Some prover.driver
