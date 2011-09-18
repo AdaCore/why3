@@ -53,7 +53,10 @@ let ident_printer =
       "get-option"; "get-proof"; "get-unsat-core"; "get-value"; "pop"; "push";
       "set-logic"; "set-info"; "set-option";
        (** for security *)
-      "Bool";"unsat";"sat";"true";"false";"select";"store"]
+      "Bool";"unsat";"sat";"true";"false";"select";"store";
+       (** arrays -- this really belongs to the driver! (esp. const) *)
+      "Array";"select";"store";"const";
+      ]
   in
   let san = sanitizer char_to_alpha char_to_alnumus in
   create_ident_printer bls ~sanitizer:san
@@ -87,7 +90,7 @@ let iter_complex_type info fmt () ty =
         let id = id_fresh (Pp.string_of_wnl Pretty.print_ty ty) in
         let ts = create_tysymbol id [] None in
         let cty = ty_app ts [] in
-        fprintf fmt "(define-sorts ((%a %a)))@."
+        fprintf fmt "(define-sorts ((%a %a)))@\n"
           print_ident ts.ts_name
           (print_type info) ty;
         Hty.add info.complex_type ty cty
@@ -96,12 +99,6 @@ let iter_complex_type info fmt () ty =
 
 let find_complex_type info fmt f =
   t_ty_fold (iter_complex_type info fmt) () f
-
-let find_complex_type_expr info fmt f =
-  TermTF.t_selecti
-    (t_ty_fold (iter_complex_type info fmt))
-    (t_ty_fold (iter_complex_type info fmt))
-    () f
 
 let print_type info fmt ty =
   print_type info fmt
@@ -266,7 +263,7 @@ let print_logic_decl info fmt (ls,ld) =
       (print_type_value info) ls.ls_value
   | Some def ->
     let vsl,expr = Decl.open_ls_defn def  in
-    find_complex_type_expr info fmt expr;
+    find_complex_type info fmt expr;
     fprintf fmt "@[<hov 2>(declare-fun %a (%a) %a %a)@]@\n"
       print_ident ls.ls_name
       (print_var_list info) vsl
