@@ -174,8 +174,8 @@ theory NumOfParam
     forall p : param, a b : int.
     a < b -> pr p (b-1) -> num_of p a b = 1 + num_of p a (b-1)
 
-  lemma Num_of_non_negative :
-    forall p : param, a b : int. 0 <= num_of p a b
+  lemma Num_of_bounds :
+    forall p : param, a b : int. a < b -> 0 <= num_of p a b <= b - a
     (* direct when a>=b, by induction on b when a <= b *)
 
   lemma Num_of_append :
@@ -195,6 +195,11 @@ theory NumOfParam
   lemma Empty :
     forall p : param, a b : int.
     (forall n : int. a <= n < b -> not pr p n) -> num_of p a b = 0
+    (* by induction on b *)
+
+  lemma Full :
+    forall p : param, a b : int. a < b ->
+    (forall n : int. a <= n < b -> pr p n) -> num_of p a b = b - a
     (* by induction on b *)
 
   lemma num_of_increasing:
