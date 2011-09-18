@@ -161,6 +161,10 @@ let prio_binop = function
 
 let print_label = Pretty.print_label
 
+let print_ident_labels fmt id =
+  if id.id_label <> [] then
+    fprintf fmt "@ %a" (print_list space print_label) id.id_label
+
 let rec print_term fmt t = print_lterm 0 fmt t
 
 and print_lterm pri fmt t = match t.t_label with
@@ -168,13 +172,13 @@ and print_lterm pri fmt t = match t.t_label with
   | ll -> fprintf fmt (protect_on (pri > 0) "%a %a")
       (print_list space print_label) ll (print_tnode 0) t
 
-and print_tapp pri fs fmt tl =
+and print_app pri fs fmt tl =
   match query_syntax fs.ls_name with
     | Some s -> syntax_arguments s print_term fmt tl
     | None -> begin match tl with
         | [] -> print_ls fmt fs
-        | tl -> fprintf fmt (protect_on (pri > 4) "%a@ %a")
-            print_ls fs (print_list space (print_lterm 5)) tl
+        | tl -> fprintf fmt (protect_on (pri > 5) "%a@ %a")
+            print_ls fs (print_list space (print_lterm 6)) tl
         end
 
 and print_tnode pri fmt t = match t.t_node with
@@ -183,10 +187,10 @@ and print_tnode pri fmt t = match t.t_node with
   | Tconst c ->
       print_const fmt c
   | Tapp (fs, tl) when unambig_fs fs ->
-      print_tapp pri fs fmt tl
+      print_app pri fs fmt tl
   | Tapp (fs, tl) ->
       fprintf fmt (protect_on (pri > 0) "%a:%a")
-        (print_tapp 0 fs) tl print_ty (t_type t)
+        (print_app 5 fs) tl print_ty (t_type t)
   | Tif (f,t1,t2) ->
       fprintf fmt (protect_on (pri > 0) "if @[%a@] then %a@ else %a")
         print_term f print_term t1 print_term t2
@@ -208,6 +212,10 @@ and print_tnode pri fmt t = match t.t_node with
       fprintf fmt (protect_on (pri > 0) "%a %a%a.@ %a") print_quant q
         (print_list comma print_vsty) vl print_tl tl print_term f;
       List.iter forget_var vl
+  | Ttrue ->
+      fprintf fmt "true"
+  | Tfalse ->
+      fprintf fmt "false"
   | Tbinop (b,f1,f2) ->
       let asym = List.mem Term.asym_label t.t_label in
       let p = prio_binop b in
@@ -215,10 +223,6 @@ and print_tnode pri fmt t = match t.t_node with
         (print_lterm (p + 1)) f1 (print_binop ~asym) b (print_lterm p) f2
   | Tnot f ->
       fprintf fmt (protect_on (pri > 4) "not %a") (print_lterm 4) f
-  | Ttrue ->
-      fprintf fmt "true"
-  | Tfalse ->
-      fprintf fmt "false"
 
 and print_tbranch fmt br =
   let p,t = t_open_branch br in
@@ -235,32 +239,32 @@ let print_tv_arg fmt tv = fprintf fmt "@ %a" print_tv tv
 let print_ty_arg fmt ty = fprintf fmt "@ %a" (print_ty_node true) ty
 let print_vs_arg fmt vs = fprintf fmt "@ (%a)" print_vsty vs
 
-let print_constr fmt cs =
-  fprintf fmt "@[<hov 4>| %a%a@]" print_cs cs
-    (print_list nothing print_ty_arg) cs.ls_args
-
 let print_constr ty fmt cs =
   let ty_val = of_option cs.ls_value in
   let m = ty_match Mtv.empty ty_val ty in
   let tl = List.map (ty_inst m) cs.ls_args in
-  fprintf fmt "@[<hov 4>| %a%a@]" print_cs cs
+  fprintf fmt "@[<hov 4>| %a%a%a@]" print_cs cs
+    print_ident_labels cs.ls_name
     (print_list nothing print_ty_arg) tl
 
 let print_type_decl fst fmt (ts,def) = match def with
   | Tabstract -> begin match ts.ts_def with
       | None ->
-          fprintf fmt "@[<hov 2>%s %a%a@]@\n@\n"
+          fprintf fmt "@[<hov 2>%s %a%a%a@]@\n@\n"
             (if fst then "type" else "with") print_ts ts
+            print_ident_labels ts.ts_name
             (print_list nothing print_tv_arg) ts.ts_args
       | Some ty ->
-          fprintf fmt "@[<hov 2>%s %a%a =@ %a@]@\n@\n"
+          fprintf fmt "@[<hov 2>%s %a%a%a =@ %a@]@\n@\n"
             (if fst then "type" else "with") print_ts ts
+            print_ident_labels ts.ts_name
             (print_list nothing print_tv_arg) ts.ts_args print_ty ty
       end
   | Talgebraic csl ->
       let ty = ty_app ts (List.map ty_var ts.ts_args) in
-      fprintf fmt "@[<hov 2>%s %a%a =@\n@[<hov>%a@]@]@\n@\n"
+      fprintf fmt "@[<hov 2>%s %a%a%a =@\n@[<hov>%a@]@]@\n@\n"
         (if fst then "type" else "with") print_ts ts
+        print_ident_labels ts.ts_name
         (print_list nothing print_tv_arg) ts.ts_args
         (print_list newline (print_constr ty)) csl
 
@@ -275,14 +279,16 @@ let ls_kind ls = if ls.ls_value = None then "predicate" else "function"
 let print_logic_decl fst fmt (ls,ld) = match ld with
   | Some ld ->
       let vl,e = open_ls_defn ld in
-      fprintf fmt "@[<hov 2>%s %a%a%a =@ %a@]@\n@\n"
+      fprintf fmt "@[<hov 2>%s %a%a%a%a =@ %a@]@\n@\n"
         (if fst then ls_kind ls else "with") print_ls ls
+        print_ident_labels ls.ls_name
         (print_list nothing print_vs_arg) vl
         (print_option print_ls_type) ls.ls_value print_term e;
       List.iter forget_var vl
   | None ->
-      fprintf fmt "@[<hov 2>%s %a%a%a@]@\n@\n"
+      fprintf fmt "@[<hov 2>%s %a%a%a%a@]@\n@\n"
         (if fst then ls_kind ls else "with") print_ls ls
+        print_ident_labels ls.ls_name
         (print_list nothing print_ty_arg) ls.ls_args
         (print_option print_ls_type) ls.ls_value
 
@@ -291,11 +297,13 @@ let print_logic_decl first fmt d =
     (print_logic_decl first fmt d; forget_tvs ())
 
 let print_ind fmt (pr,f) =
-  fprintf fmt "@[<hov 4>| %a : %a@]" print_pr pr print_term f
+  fprintf fmt "@[<hov 4>| %a%a :@ %a@]"
+    print_pr pr print_ident_labels pr.pr_name print_term f
 
 let print_ind_decl fst fmt (ps,bl) =
-  fprintf fmt "@[<hov 2>%s %a%a =@ @[<hov>%a@]@]@\n@\n"
+  fprintf fmt "@[<hov 2>%s %a%a%a =@ @[<hov>%a@]@]@\n@\n"
     (if fst then "inductive" else "with") print_ls ps
+    print_ident_labels ps.ls_name
     (print_list nothing print_ty_arg) ps.ls_args
     (print_list newline print_ind) bl
 
@@ -306,8 +314,8 @@ let print_ind_decl first fmt d =
 let print_pkind = Pretty.print_pkind
 
 let print_prop_decl fmt (k,pr,f) =
-  fprintf fmt "@[<hov 2>%a %a : %a@]@\n@\n" print_pkind k
-    print_pr pr print_term f
+  fprintf fmt "@[<hov 2>%a %a%a : %a@]@\n@\n" print_pkind k
+    print_pr pr print_ident_labels pr.pr_name print_term f
 
 let print_prop_decl fmt (k,pr,f) = match k with
   | Paxiom when query_remove pr.pr_name -> ()
@@ -361,13 +369,29 @@ let print_tdecl fmt td = match td.td_node with
       fprintf fmt "@[<hov 2>(* meta %s %a *)@]@\n@\n"
         m.meta_name (print_list comma print_meta_arg) al
 
-let print_task _env pr thpr ?old:_ fmt task =
+let print_task_old _env pr thpr ?old:_ fmt task =
   forget_all ();
   print_prelude fmt pr;
   print_th_prelude task fmt thpr;
   info := { info_syn = get_syntax_map task };
-  fprintf fmt "@[<hov 2>theory Task@\n%a@]@\nend@."
+  fprintf fmt "theory Task@\n%a@\nend@."
     (print_list nothing print_tdecl) (Task.task_tdecls task)
 
+let print_tdecls =
+  let print sm fmt td =
+    info := { info_syn = sm };
+    print_tdecl fmt td in
+  Printer.sprint_tdecls print
+
+let print_task _env pr thpr ?old:_ fmt task =
+  (* In trans-based p-printing [forget_all] IST STRENG VERBOTEN *)
+  (* forget_all (); *)
+  print_prelude fmt pr;
+  print_th_prelude task fmt thpr;
+  fprintf fmt "theory Task@\n%a@\nend@."
+    (print_list nothing string)
+      (List.rev (Trans.apply print_tdecls task))
+
+let () = register_printer "why3old" print_task_old
 let () = register_printer "why3" print_task
 

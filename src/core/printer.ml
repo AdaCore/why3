@@ -50,7 +50,7 @@ let lookup_printer s =
 
 let list_printers ()  = Hashtbl.fold (fun k _ acc -> k::acc) printers []
 
-let () = register_printer "(null)" (fun _ _ _ ?old _ _ -> ignore old)
+let () = register_printer "(null)" (fun _ _ _ ?old:_ _ _ -> ())
 
 (** Syntax substitutions *)
 

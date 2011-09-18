@@ -302,28 +302,33 @@ let print_constr ty fmt cs =
   let ty_val = of_option cs.ls_value in
   let m = ty_match Mtv.empty ty_val ty in
   let tl = List.map (ty_inst m) cs.ls_args in
-  fprintf fmt "@[<hov 4>| %a%a@]" print_cs cs
+  fprintf fmt "@[<hov 4>| %a%a%a@]" print_cs cs
+    print_ident_labels cs.ls_name
     (print_list nothing print_ty_arg) tl
 
 let print_type_decl fst fmt (ts,def) = match def with
   | Tabstract -> begin match ts.ts_def with
       | None ->
-          fprintf fmt "@[<hov 2>%s %a%a@]"
+          fprintf fmt "@[<hov 2>%s %a%a%a@]"
             (if fst then "type" else "with") print_ts ts
+            print_ident_labels ts.ts_name
             (print_list nothing print_tv_arg) ts.ts_args
       | Some ty ->
-          fprintf fmt "@[<hov 2>%s %a%a =@ %a@]"
+          fprintf fmt "@[<hov 2>%s %a%a%a =@ %a@]"
             (if fst then "type" else "with") print_ts ts
+            print_ident_labels ts.ts_name
             (print_list nothing print_tv_arg) ts.ts_args print_ty ty
       end
   | Talgebraic csl ->
       let ty = ty_app ts (List.map ty_var ts.ts_args) in
-      fprintf fmt "@[<hov 2>%s %a%a =@\n@[<hov>%a@]@]"
+      fprintf fmt "@[<hov 2>%s %a%a%a =@\n@[<hov>%a@]@]"
         (if fst then "type" else "with") print_ts ts
+        print_ident_labels ts.ts_name
         (print_list nothing print_tv_arg) ts.ts_args
         (print_list newline (print_constr ty)) csl
 
-let print_type_decl fst fmt d = print_type_decl fst fmt d; forget_tvs ()
+let print_type_decl first fmt d =
+  print_type_decl first fmt d; forget_tvs ()
 
 let print_ls_type fmt = fprintf fmt " :@ %a" print_ty
 
@@ -345,18 +350,22 @@ let print_logic_decl fst fmt (ls,ld) = match ld with
         (print_list nothing print_ty_arg) ls.ls_args
         (print_option print_ls_type) ls.ls_value
 
-let print_logic_decl fst fmt d = print_logic_decl fst fmt d; forget_tvs ()
+let print_logic_decl first fmt d =
+  print_logic_decl first fmt d; forget_tvs ()
 
 let print_ind fmt (pr,f) =
   fprintf fmt "@[<hov 4>| %a%a :@ %a@]"
     print_pr pr print_ident_labels pr.pr_name print_term f
 
 let print_ind_decl fst fmt (ps,bl) =
-  fprintf fmt "@[<hov 2>%s %a%a =@ @[<hov>%a@]@]"
+  fprintf fmt "@[<hov 2>%s %a%a%a =@ @[<hov>%a@]@]"
     (if fst then "inductive" else "with") print_ls ps
+    print_ident_labels ps.ls_name
     (print_list nothing print_ty_arg) ps.ls_args
-    (print_list newline print_ind) bl;
-  forget_tvs ()
+    (print_list newline print_ind) bl
+
+let print_ind_decl first fmt d =
+  print_ind_decl first fmt d; forget_tvs ()
 
 let sprint_pkind = function
   | Paxiom -> "axiom"
