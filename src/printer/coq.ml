@@ -100,8 +100,7 @@ let print_pr fmt pr =
 (* info *)
 
 type info = {
-  info_syn : string Mid.t;
-  info_rem : Sid.t;
+  info_syn : syntax_map;
   realization : bool;
 }
 
@@ -525,7 +524,7 @@ let print_type_decl ~old info fmt (ts,def) =
         fprintf fmt "@\n"
 
 let print_type_decl ~old info fmt d =
-  if not (Sid.mem (fst d).ts_name info.info_rem) then
+  if not (Mid.mem (fst d).ts_name info.info_syn) then
     (print_type_decl ~old info fmt d; forget_tvs ())
 
 let print_ls_type ?(arrow=false) info fmt ls =
@@ -560,7 +559,7 @@ let print_logic_decl ~old info fmt (ls,ld) =
   fprintf fmt "@\n"
 
 let print_logic_decl ~old info fmt d =
-  if not (Sid.mem (fst d).ls_name info.info_rem) then
+  if not (Mid.mem (fst d).ls_name info.info_syn) then
     (print_logic_decl ~old info fmt d; forget_tvs ())
 
 let print_recursive_decl info tm fmt (ls,ld) =
@@ -608,7 +607,7 @@ let print_ind_decl info fmt (ps,bl) =
   fprintf fmt "@\n"
 
 let print_ind_decl info fmt d =
-  if not (Sid.mem (fst d).ls_name info.info_rem) then
+  if not (Mid.mem (fst d).ls_name info.info_syn) then
     (print_ind_decl info fmt d; forget_tvs ())
 
 let print_pkind info fmt = function
@@ -644,7 +643,7 @@ let print_decl ~old info fmt d = match d.d_node with
       print_recursive_decl info fmt ll
   | Dind il   ->
       print_list nothing (print_ind_decl info) fmt il
-  | Dprop (_,pr,_) when Sid.mem pr.pr_name info.info_rem ->
+  | Dprop (_,pr,_) when Mid.mem pr.pr_name info.info_syn ->
       ()
   | Dprop (k,pr,f) ->
       print_proof_context ~old info fmt k;
@@ -665,7 +664,6 @@ let print_task _env pr thpr ?old fmt task =
   print_th_prelude task fmt thpr;
   let info = {
     info_syn = get_syntax_map task;
-    info_rem = get_remove_set task;
     realization = false;
   } in
   let old = match old with
@@ -702,11 +700,10 @@ let print_theory _env pr thpr ?old fmt th =
 (* TODO
   let info = {
     info_syn = get_syntax_map th;
-    info_rem = get_remove_set th} in
+    info_syn = get_remove_set th} in
 *)
   let info = {
     info_syn = Mid.empty (* get_syntax_map_of_theory th *);
-    info_rem = Mid.empty;
     realization = true;
   }
   in

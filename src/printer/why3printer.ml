@@ -85,18 +85,12 @@ let print_pr fmt pr =
 
 (* info *)
 
-type info = {
-  info_syn : string Mid.t;
-  info_rem : Sid.t;
-}
+type info = { info_syn : syntax_map }
 
-let info = ref {
-  info_syn = Mid.empty;
-  info_rem = Sid.empty
-}
+let info = ref { info_syn = Mid.empty }
 
 let query_syntax id = query_syntax !info.info_syn id
-let query_remove id = Sid.mem id !info.info_rem
+let query_remove id = Mid.mem id !info.info_syn
 
 (** Types *)
 
@@ -371,9 +365,7 @@ let print_task _env pr thpr ?old:_ fmt task =
   forget_all ();
   print_prelude fmt pr;
   print_th_prelude task fmt thpr;
-  info := {
-    info_syn = get_syntax_map task;
-    info_rem = get_remove_set task };
+  info := { info_syn = get_syntax_map task };
   fprintf fmt "@[<hov 2>theory Task@\n%a@]@\nend@."
     (print_list nothing print_tdecl) (Task.task_tdecls task)
 

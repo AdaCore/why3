@@ -41,8 +41,7 @@ let forget_var v = forget_id ident_printer v.vs_name
 let print_var fmt {vs_name = id} = print_ident fmt id
 
 type info = {
-  info_syn : string Mid.t;
-  info_rem : Sid.t;
+  info_syn : syntax_map;
 }
 
 let rec print_term info fmt t = match t.t_node with
@@ -140,7 +139,7 @@ let print_logic_decl _drv _fmt (_ls,ld) = match ld with
       unsupported "Predicate and function definition aren't supported"
 
 let print_logic_decl info fmt d =
-  if Sid.mem (fst d).ls_name info.info_rem then false
+  if Mid.mem (fst d).ls_name info.info_syn then false
   else begin print_logic_decl info fmt d; true end
 
 let print_decl info fmt d = match d.d_node with
@@ -150,7 +149,7 @@ let print_decl info fmt d = match d.d_node with
       print_list_opt newline (print_logic_decl info) fmt dl
   | Dind _ ->
       unsupportedDecl d "simplify : inductive definition are not supported"
-  | Dprop (Paxiom, pr, _) when Sid.mem pr.pr_name info.info_rem ->
+  | Dprop (Paxiom, pr, _) when Mid.mem pr.pr_name info.info_syn ->
       false
   | Dprop (Paxiom, pr, f) ->
       fprintf fmt "@[(BG_PUSH@\n ;; axiom %s@\n @[<hov 2>%a@])@]@\n"
@@ -174,8 +173,7 @@ let print_task pr thpr fmt task =
   print_prelude fmt pr;
   print_th_prelude task fmt thpr;
   let info = {
-    info_syn = get_syntax_map task;
-    info_rem = get_remove_set task }
+    info_syn = get_syntax_map task }
   in
   let decls = Task.task_decls task in
   ignore (print_list_opt (add_flush newline2) (print_decl info) fmt decls)

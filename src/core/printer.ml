@@ -50,6 +50,8 @@ let lookup_printer s =
 
 let list_printers ()  = Hashtbl.fold (fun k _ acc -> k::acc) printers []
 
+let () = register_printer "(null)" (fun _ _ _ ?old _ _ -> ignore old)
+
 (** Syntax substitutions *)
 
 let opt_search_forward re s pos =
@@ -98,7 +100,6 @@ let check_syntax s len =
     if i > len then raise (BadSyntaxArity (len,i));
   in
   iter_group regexp_arg_pos arg s
-
 
 let check_syntax_typed s len ret =
   let arg s =
@@ -182,49 +183,65 @@ let syntax_logic ls s =
 let remove_prop pr =
   create_meta meta_remove_prop [MApr pr]
 
-let get_syntax_map, get_syntax_map_of_theory =
-  let add_ts m = function
-    | [MAts ts; MAstr s] ->
-        Mid.add_new ts.ts_name s (KnownTypeSyntax ts) m
-    | _ -> assert false
-  in
-  let add_ls m = function
-    | [MAls ls; MAstr s] ->
-        Mid.add_new ls.ls_name s (KnownLogicSyntax ls) m
-    | _ -> assert false
-  in
-  (fun task ->
-    let m = Mid.empty in
-    let m = Task.on_meta meta_syntax_logic add_ls m task in
-    let m = Task.on_meta meta_syntax_type add_ts m task in
-    m),
-  (fun theory ->
-    let m = Mid.empty in
-    let m = Theory.on_meta meta_syntax_logic add_ls m theory in
-    let m = Theory.on_meta meta_syntax_type add_ts m theory in
-    m)
+type syntax_map = string Mid.t
 
+let sm_add_ts sm = function
+  | [MAts ts; MAstr rs] -> Mid.add_new ts.ts_name rs (KnownTypeSyntax ts) sm
+  | _ -> assert false
 
-let get_remove_set task =
-  let add_ts s = function
-    | [MAts ts; _] -> Sid.add ts.ts_name s
-    | _ -> assert false
-  in
-  let add_ls s = function
-    | [MAls ls; _] -> Sid.add ls.ls_name s
-    | _ -> assert false
-  in
-  let add_pr s = function
-    | [MApr pr] -> Sid.add pr.pr_name s
-    | _ -> assert false
-  in
-  let s = Sid.empty in
-  let s = Task.on_meta meta_syntax_type add_ts s task in
-  let s = Task.on_meta meta_syntax_logic add_ls s task in
-  let s = Task.on_meta meta_remove_prop add_pr s task in
-  s
+let sm_add_ls sm = function
+  | [MAls ls; MAstr rs] -> Mid.add_new ls.ls_name rs (KnownLogicSyntax ls) sm
+  | _ -> assert false
+
+let sm_add_pr sm = function
+  | [MApr pr] -> Mid.add pr.pr_name "" sm
+  | _ -> assert false
+
+let get_syntax_map task =
+  let sm = Mid.empty in
+  let sm = Task.on_meta meta_syntax_type sm_add_ts sm task in
+  let sm = Task.on_meta meta_syntax_logic sm_add_ls sm task in
+  let sm = Task.on_meta meta_remove_prop sm_add_pr sm task in
+  sm
+
+let get_syntax_map_of_theory theory =
+  let sm = Mid.empty in
+  let sm = Theory.on_meta meta_syntax_type sm_add_ts sm theory in
+  let sm = Theory.on_meta meta_syntax_logic sm_add_ls sm theory in
+  let sm = Theory.on_meta meta_remove_prop sm_add_pr sm theory in
+  sm
 
 let query_syntax sm id = Mid.find_option id sm
+
+let fold_tdecls fn acc =
+  Trans.on_meta meta_syntax_type (fun sts ->
+  Trans.on_meta meta_syntax_logic (fun sls ->
+  Trans.on_meta meta_remove_prop (fun spr ->
+    let sm = Mid.empty in
+    let sm = List.fold_left sm_add_ts sm sts in
+    let sm = List.fold_left sm_add_ls sm sls in
+    let sm = List.fold_left sm_add_pr sm spr in
+    Trans.fold (fun t -> fn sm t.task_decl) acc)))
+
+let sprint_tdecls (fn : syntax_map -> tdecl pp) =
+  let buf = Buffer.create 512 in
+  let fmt = Format.formatter_of_buffer buf in
+  let print sm td acc =
+    Buffer.reset buf;
+    Format.fprintf fmt "%a@?" (fn sm) td;
+    Buffer.contents buf :: acc in
+  fold_tdecls print []
+
+let sprint_decls (fn : syntax_map -> decl pp) =
+  let buf = Buffer.create 512 in
+  let fmt = Format.formatter_of_buffer buf in
+  let print sm td acc = match td.td_node with
+    | Decl d ->
+        Buffer.reset buf;
+        Format.fprintf fmt "%a@?" (fn sm) d;
+        Buffer.contents buf :: acc
+    | _ -> acc in
+  fold_tdecls print []
 
 (** {2 exceptions to use in transformations and printers} *)
 

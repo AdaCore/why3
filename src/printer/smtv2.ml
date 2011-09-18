@@ -63,8 +63,7 @@ let print_ident fmt id =
 
 (** type *)
 type info = {
-  info_syn : string Mid.t;
-  info_rem : Sid.t;
+  info_syn : syntax_map;
   use_trigger : bool;
   complex_type : ty Hty.t;
 }
@@ -247,7 +246,7 @@ let print_logic_binder info fmt v =
     (print_type info) v.vs_ty
 
 let print_type_decl info fmt = function
-  | ts, Tabstract when Sid.mem ts.ts_name info.info_rem -> false
+  | ts, Tabstract when Mid.mem ts.ts_name info.info_syn -> false
   | ts, Tabstract when ts.ts_args = [] ->
       fprintf fmt "(declare-sort %a 0)" print_ident ts.ts_name; true
   | ts, Tabstract when ts.ts_def = None ->
@@ -276,7 +275,7 @@ let print_logic_decl info fmt (ls,ld) =
     List.iter forget_var vsl
 
 let print_logic_decl info fmt d =
-  if Sid.mem (fst d).ls_name info.info_rem then
+  if Mid.mem (fst d).ls_name info.info_syn then
     false else (print_logic_decl info fmt d; true)
 
 let print_decl info fmt d = match d.d_node with
@@ -286,7 +285,7 @@ let print_decl info fmt d = match d.d_node with
       print_list_opt newline (print_logic_decl info) fmt dl
   | Dind _ -> unsupportedDecl d
       "smt : inductive definition are not supported"
-  | Dprop (Paxiom, pr, _) when Sid.mem pr.pr_name info.info_rem -> false
+  | Dprop (Paxiom, pr, _) when Mid.mem pr.pr_name info.info_syn -> false
   | Dprop (Paxiom, pr, f) ->
     find_complex_type info fmt f;
       fprintf fmt "@[<hov 2>;; %s@\n(assert@ %a)@]@\n"
@@ -329,7 +328,6 @@ let print_task pr thpr fmt task =
   let info = {
     info_syn = Mid.union (fun _ _ s -> Some s)
       (get_syntax_map task) (Trans.apply distingued task);
-    info_rem = get_remove_set task;
     use_trigger = false;
     complex_type = Hty.create 5;
   }

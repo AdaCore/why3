@@ -57,8 +57,7 @@ let print_var fmt {vs_name = id} =
   fprintf fmt "%s" n
 
 type info = {
-  info_syn : string Mid.t;
-  info_rem : Sid.t;
+  info_syn : syntax_map;
   use_trigger : bool;
 }
 
@@ -175,7 +174,7 @@ let print_logic_binder info fmt v =
   fprintf fmt "%a: %a" print_ident v.vs_name (print_type info) v.vs_ty
 
 let print_type_decl info fmt = function
-  | ts, Tabstract when Sid.mem ts.ts_name info.info_rem -> false
+  | ts, Tabstract when Mid.mem ts.ts_name info.info_syn -> false
   | ts, Tabstract when ts.ts_args = [] ->
       fprintf fmt ":extrasorts (%a)" print_ident ts.ts_name; true
   | _, Tabstract -> unsupported
@@ -200,7 +199,7 @@ let print_logic_decl info fmt (ls,ld) = match ld with
       "Predicate and function definition aren't supported"
 
 let print_logic_decl info fmt d =
-  if Sid.mem (fst d).ls_name info.info_rem then
+  if Mid.mem (fst d).ls_name info.info_syn then
     false else (print_logic_decl info fmt d; true)
 
 let print_decl info fmt d = match d.d_node with
@@ -210,7 +209,7 @@ let print_decl info fmt d = match d.d_node with
       print_list_opt newline (print_logic_decl info) fmt dl
   | Dind _ -> unsupportedDecl d
       "smt : inductive definition are not supported"
-  | Dprop (Paxiom, pr, _) when Sid.mem pr.pr_name info.info_rem -> false
+  | Dprop (Paxiom, pr, _) when Mid.mem pr.pr_name info.info_syn -> false
   | Dprop (Paxiom, pr, f) ->
       fprintf fmt "@[<hov 2>;; %s@\n:assumption@ %a@]@\n"
         pr.pr_name.id_string
@@ -235,7 +234,6 @@ let print_task pr thpr fmt task =
   print_th_prelude task fmt thpr;
   let info = {
     info_syn = get_syntax_map task;
-    info_rem = get_remove_set task;
     use_trigger = false;
   }
   in

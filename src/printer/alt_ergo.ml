@@ -53,8 +53,7 @@ let print_tvsymbols fmt tv =
 let forget_var v = forget_id ident_printer v.vs_name
 
 type info = {
-  info_syn : string Mid.t;
-  info_rem : Sid.t;
+  info_syn : syntax_map;
   info_ac  : Sls.t;
 }
 
@@ -173,7 +172,7 @@ let print_type_decl fmt ts = match ts.ts_args with
       (print_list comma print_tvsymbols) tl print_ident ts.ts_name
 
 let print_type_decl info fmt = function
-  | ts, Tabstract when Sid.mem ts.ts_name info.info_rem -> false
+  | ts, Tabstract when Mid.mem ts.ts_name info.info_syn -> false
   | ts, Tabstract -> print_type_decl fmt ts; true
   | _, Talgebraic _ -> unsupported
       "alt-ergo : algebraic datatype are not supported"
@@ -208,7 +207,7 @@ let print_logic_decl info fmt (ls,ld) =
         List.iter forget_var vl
 
 let print_logic_decl info fmt d =
-  if Sid.mem (fst d).ls_name info.info_rem then
+  if Mid.mem (fst d).ls_name info.info_syn then
     false else (print_logic_decl info fmt d; true)
 
 let print_decl info fmt d = match d.d_node with
@@ -218,7 +217,7 @@ let print_decl info fmt d = match d.d_node with
       print_list_opt newline (print_logic_decl info) fmt dl
   | Dind _ -> unsupportedDecl d
       "alt-ergo : inductive definition are not supported"
-  | Dprop (Paxiom, pr, _) when Sid.mem pr.pr_name info.info_rem -> false
+  | Dprop (Paxiom, pr, _) when Mid.mem pr.pr_name info.info_syn -> false
   | Dprop (Paxiom, pr, f) ->
       fprintf fmt "@[<hov 2>axiom %a :@ %a@]@\n"
         print_ident pr.pr_name (print_fmla info) f; true
@@ -235,7 +234,6 @@ let print_task pr thpr fmt task =
   print_th_prelude task fmt thpr;
   let info = {
     info_syn = get_syntax_map task;
-    info_rem = get_remove_set task;
     info_ac  = Task.on_tagged_ls meta_ac task }
   in
   let decls = Task.task_decls task in

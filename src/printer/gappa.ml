@@ -84,8 +84,7 @@ type info = {
   info_env : Env.env;
   info_symbols : Sid.t;
   info_ops_of_rel : (string * string * string) Mls.t;
-  info_syn : string Mid.t;
-  info_rem : Sid.t;
+  info_syn : syntax_map;
 }
 
 let int_minus = ref ps_equ
@@ -120,7 +119,6 @@ let get_info env task =
     info_symbols = symb;
     info_ops_of_rel = ops;
     info_syn = syn;
-    info_rem = get_remove_set task;
   }
 
 (* Gappa printing *)
