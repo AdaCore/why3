@@ -29,7 +29,7 @@ open Decl
 open Printer
 open Theory
 
-let iprinter,tprinter,pprinter =
+let iprinter,aprinter,tprinter,pprinter =
   let bl = ["theory"; "type"; "function"; "predicate"; "inductive";
             "axiom"; "lemma"; "goal"; "use"; "clone"; "prop"; "meta";
             "namespace"; "import"; "export"; "end";
@@ -39,24 +39,21 @@ let iprinter,tprinter,pprinter =
   let lsanitize = sanitizer char_to_lalpha char_to_alnumus in
   create_ident_printer bl ~sanitizer:isanitize,
   create_ident_printer bl ~sanitizer:lsanitize,
+  create_ident_printer bl ~sanitizer:lsanitize,
   create_ident_printer bl ~sanitizer:isanitize
+
+let forget_tvs () =
+  forget_all aprinter
 
 let forget_all () =
   forget_all iprinter;
+  forget_all aprinter;
   forget_all tprinter;
   forget_all pprinter
 
-let tv_set = ref Sid.empty
-
 (* type variables always start with a quote *)
 let print_tv fmt tv =
-  tv_set := Sid.add tv.tv_name !tv_set;
-  let sanitizer n = "'" ^ n in
-  fprintf fmt "%s" (id_unique iprinter ~sanitizer tv.tv_name)
-
-let forget_tvs () =
-  Sid.iter (forget_id iprinter) !tv_set;
-  tv_set := Sid.empty
+  fprintf fmt "'%s" (id_unique aprinter tv.tv_name)
 
 (* logic variables always start with a lower case letter *)
 let print_vs fmt vs =
@@ -343,7 +340,7 @@ let print_inst_pr fmt (pr1,pr2) =
   fprintf fmt "prop %a = %a" print_pr pr1 print_pr pr2
 
 let print_meta_arg fmt = function
-  | MAty ty -> fprintf fmt "type %a" print_ty ty
+  | MAty ty -> fprintf fmt "type %a" print_ty ty; forget_tvs ()
   | MAts ts -> fprintf fmt "type %a" print_ts ts
   | MAls ls -> fprintf fmt "%s %a" (ls_kind ls) print_ls ls
   | MApr pr -> fprintf fmt "prop %a" print_pr pr
