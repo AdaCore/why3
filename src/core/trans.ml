@@ -62,9 +62,9 @@ let fold fn v =
   let h = Wtask.create 63 in
   let rewind acc task =
 (*
-    Format.printf "%c%d." (match task.task_decl.td_node with
+    Format.eprintf "%c%d." (match task.task_decl.td_node with
     | Decl _ -> 'D' | Clone _ -> 'C'
-    | Use _  -> 'U' | Meta _  -> 'M') task.task_tag;
+    | Use _  -> 'U' | Meta _  -> 'M') (task.task_decl.td_tag);
 *)
     let acc = fn task acc in
     Wtask.set h task acc;

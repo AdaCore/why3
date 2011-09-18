@@ -1520,6 +1520,10 @@ let (_ : GtkSignal.id) =
         | _ -> ()
     end
 
+(*
+let () = Debug.set_flag (Debug.lookup_flag "transform")
+*)
+
 let () = w#add_accel_group accel_group
 let () = w#show ()
 let () = GMain.main ()
