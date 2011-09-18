@@ -115,16 +115,16 @@ let apply_to_goal fn d = match d.d_node with
   | _ -> assert false
 
 let gen_goal add fn =
-  let fn = Wdecl.memoize 5 (apply_to_goal fn) in function
+  let fn = Wdecl.memoize 5 (apply_to_goal fn) in store (function
     | Some { task_decl = { td_node = Decl d }; task_prev = prev } ->
         List.fold_left add prev (fn d)
-    | _ -> assert false
+    | _ -> assert false)
 
 let gen_goal_l add fn =
-  let fn = Wdecl.memoize 5 (apply_to_goal fn) in function
+  let fn = Wdecl.memoize 5 (apply_to_goal fn) in store (function
     | Some { task_decl = { td_node = Decl d }; task_prev = prev } ->
         List.map (List.fold_left add prev) (fn d)
-    | _ -> assert false
+    | _ -> assert false)
 
 let goal    = gen_goal   add_decl
 let goal_l  = gen_goal_l add_decl
@@ -134,10 +134,10 @@ let tgoal_l = gen_goal_l add_tdecl
 let rewrite fn = decl (fun d -> [decl_map fn d])
 let rewriteTF fnT fnF = rewrite (TermTF.t_select fnT fnF)
 
-let gen_add_decl add decls = function
+let gen_add_decl add decls = store (function
   | Some { task_decl = { td_node = Decl d }; task_prev = prev } ->
       add_decl (List.fold_left add prev decls) d
-  | _ -> assert false
+  | _ -> assert false)
 
 let add_decls  = gen_add_decl add_decl
 let add_tdecls = gen_add_decl add_tdecl
