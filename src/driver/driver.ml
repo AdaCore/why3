@@ -44,6 +44,7 @@ type driver = {
   drv_regexps     : (Str.regexp * prover_answer) list;
   drv_timeregexps : Call_provers.timeregexp list;
   drv_exitcodes   : (int * prover_answer) list;
+  drv_tag         : int
 }
 
 (** parse a driver file *)
@@ -195,6 +196,7 @@ let load_driver = let driver_tag = ref (-1) in fun env file ->
     drv_regexps     = List.rev !regexps;
     drv_timeregexps = List.rev !timeregexps;
     drv_exitcodes   = List.rev !exitcodes;
+    drv_tag         = !driver_tag
   }
 
 (** apply drivers *)
@@ -259,6 +261,17 @@ let update_task drv task =
     ) drv.drv_meta_cl task
   in
   add_tdecl task goal
+
+let update_task =
+  let h = Hashtbl.create 5 in
+  fun drv ->
+    let update = try Hashtbl.find h drv.drv_tag with
+      | Not_found ->
+          let upd = Trans.store (update_task drv) in
+          Hashtbl.add h drv.drv_tag upd;
+          upd
+    in
+    Trans.apply update
 
 let prepare_task drv task =
   let lookup_transform t = lookup_transform t drv.drv_env in

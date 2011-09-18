@@ -55,9 +55,9 @@ val prove_task :
   ?old       : in_channel ->
   driver -> Task.task -> Call_provers.pre_prover_call
 
-
-(** Split the previous function in two simpler function *)
+(** Split the previous function in two simpler functions *)
 val prepare_task : driver -> Task.task -> Task.task
+
 val print_task_prepared :
   ?old       : in_channel ->
   driver -> Format.formatter -> Task.task -> unit
