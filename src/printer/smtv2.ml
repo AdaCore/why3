@@ -68,7 +68,7 @@ let print_ident fmt id =
 type info = {
   info_syn : syntax_map;
   use_trigger : bool;
-  complex_type : ty Hty.t;
+(*  complex_type : ty Hty.t; *)
 }
 
 let rec print_type info fmt ty = match ty.ty_node with
@@ -84,6 +84,7 @@ let rec print_type info fmt ty = match ty.ty_node with
         (print_list space (print_type info)) l
      end
 
+(*
 let iter_complex_type info fmt () ty =
     match ty.ty_node with
       | Tyapp (_,_::_) when not (Hty.mem info.complex_type ty) ->
@@ -96,7 +97,6 @@ let iter_complex_type info fmt () ty =
         Hty.add info.complex_type ty cty
       | _ -> ()
 
-
 let find_complex_type info fmt f =
   t_ty_fold (iter_complex_type info fmt) () f
 
@@ -105,6 +105,7 @@ let print_type info fmt ty =
     (try
        Hty.find info.complex_type ty
      with Not_found -> ty)
+*)
 
 (* and print_tyapp info fmt = function *)
 (*   | [] -> () *)
@@ -242,64 +243,68 @@ let print_logic_binder info fmt v =
   fprintf fmt "%a: %a" print_ident v.vs_name
     (print_type info) v.vs_ty
 
-let print_type_decl info fmt = function
-  | ts, Tabstract when Mid.mem ts.ts_name info.info_syn -> false
-  | ts, Tabstract when ts.ts_args = [] ->
-      fprintf fmt "(declare-sort %a 0)" print_ident ts.ts_name; true
-  | ts, Tabstract when ts.ts_def = None ->
-    let len = List.length ts.ts_args in
-    fprintf fmt "(declare-sort %a %i)" print_ident ts.ts_name len; true
-  | _, Tabstract -> false
-  | _, Talgebraic _ -> unsupported
+let print_type_decl _info fmt ts = function
+(*
+  | Tabstract when ts.ts_args = [] ->
+      fprintf fmt "(declare-sort %a 0)@\n@\n"
+        print_ident ts.ts_name
+*)
+  | Tabstract when ts.ts_def = None ->
+      fprintf fmt "(declare-sort %a %i)@\n@\n"
+        print_ident ts.ts_name (List.length ts.ts_args)
+  | Tabstract -> ()
+  | Talgebraic _ -> unsupported
           "smtv2 : algebraic type are not supported"
 
-let print_logic_decl info fmt (ls,ld) =
-  if not (Mid.mem ls.ls_name info.info_syn) then
-  match ld with
+let print_type_decl info fmt (ts,td) =
+  if Mid.mem ts.ts_name info.info_syn then () else
+  print_type_decl info fmt ts td
+
+let print_logic_decl info fmt ls = function
   | None ->
-    fprintf fmt "@[<hov 2>(declare-fun %a (%a) %a)@]@\n"
-      print_ident ls.ls_name
-      (print_list space (print_type info)) ls.ls_args
-      (print_type_value info) ls.ls_value
+      fprintf fmt "@[<hov 2>(declare-fun %a (%a) %a)@]@\n@\n"
+        print_ident ls.ls_name
+        (print_list space (print_type info)) ls.ls_args
+        (print_type_value info) ls.ls_value
   | Some def ->
-    let vsl,expr = Decl.open_ls_defn def  in
-    find_complex_type info fmt expr;
-    fprintf fmt "@[<hov 2>(declare-fun %a (%a) %a %a)@]@\n"
-      print_ident ls.ls_name
-      (print_var_list info) vsl
-      (print_type_value info) ls.ls_value
-      (print_expr info) expr;
-    List.iter forget_var vsl
+      let vsl,expr = Decl.open_ls_defn def in
+      fprintf fmt "@[<hov 2>(declare-fun %a (%a) %a %a)@]@\n@\n"
+        print_ident ls.ls_name
+        (print_var_list info) vsl
+        (print_type_value info) ls.ls_value
+        (print_expr info) expr;
+      List.iter forget_var vsl
 
-let print_logic_decl info fmt d =
-  if Mid.mem (fst d).ls_name info.info_syn then
-    false else (print_logic_decl info fmt d; true)
+let print_logic_decl info fmt (ls,ld) =
+  if Mid.mem ls.ls_name info.info_syn then () else
+  print_logic_decl info fmt ls ld
 
-let print_decl info fmt d = match d.d_node with
-  | Dtype dl ->
-      print_list_opt newline (print_type_decl info) fmt dl
-  | Dlogic dl ->
-      print_list_opt newline (print_logic_decl info) fmt dl
-  | Dind _ -> unsupportedDecl d
-      "smt : inductive definition are not supported"
-  | Dprop (Paxiom, pr, _) when Mid.mem pr.pr_name info.info_syn -> false
-  | Dprop (Paxiom, pr, f) ->
-    find_complex_type info fmt f;
-      fprintf fmt "@[<hov 2>;; %s@\n(assert@ %a)@]@\n"
-        pr.pr_name.id_string
-        (print_fmla info) f; true
-  | Dprop (Pgoal, pr, f) ->
-    find_complex_type info fmt f;
+let print_prop_decl info fmt k pr f = match k with
+  | Paxiom ->
+      fprintf fmt "@[<hov 2>;; %s@\n(assert@ %a)@]@\n@\n"
+        pr.pr_name.id_string (* FIXME? collisions *)
+        (print_fmla info) f
+  | Pgoal ->
       fprintf fmt "@[(assert@\n";
       fprintf fmt "@[;; %a@]@\n" print_ident pr.pr_name;
       (match pr.pr_name.id_loc with
         | None -> ()
         | Some loc -> fprintf fmt " @[;; %a@]@\n"
             Loc.gen_report_position loc);
-      fprintf fmt "  @[(not@ %a))@]" (print_fmla info) f;
-      fprintf fmt "@[(check-sat)@]@\n";
-      true
-  | Dprop ((Plemma|Pskip), _, _) -> assert false
+      fprintf fmt "  @[(not@ %a))@]@\n" (print_fmla info) f;
+      fprintf fmt "@[(check-sat)@]@\n"
+  | Plemma| Pskip -> assert false
+
+let print_decl info fmt d = match d.d_node with
+  | Dtype dl ->
+      print_list nothing (print_type_decl info) fmt dl
+  | Dlogic dl ->
+      print_list nothing (print_logic_decl info) fmt dl
+  | Dind _ -> unsupportedDecl d
+      "smt : inductive definition are not supported"
+  | Dprop (k,pr,f) ->
+      if Mid.mem pr.pr_name info.info_syn then () else
+      print_prop_decl info fmt k pr f
 
 let print_decl info fmt = catch_unsupportedDecl (print_decl info fmt)
 
@@ -319,20 +324,45 @@ let distingued =
       let dis2 = List.fold_left (dist_dist syntax) Mid.empty dis in
       Trans.return dis2))
 
-let print_task pr thpr fmt task =
+let print_task_old pr thpr fmt task =
   print_prelude fmt pr;
   print_th_prelude task fmt thpr;
   let info = {
     info_syn = Mid.union (fun _ _ s -> Some s)
       (get_syntax_map task) (Trans.apply distingued task);
     use_trigger = false;
-    complex_type = Hty.create 5;
+    (* complex_type = Hty.create 5; *)
   }
   in
   let decls = Task.task_decls task in
-  ignore (print_list_opt (add_flush newline2) (print_decl info) fmt decls)
+  fprintf fmt "%a@." (print_list nothing (print_decl info)) decls
 
 let () = register_printer "smtv2"
   (fun _env pr thpr ?old:_ fmt task ->
      forget_all ident_printer;
-     print_task pr thpr fmt task)
+     print_task_old pr thpr fmt task)
+
+let print_decls =
+  let add_ls sm acc = function
+    | [MAls ls; MAls lsdis] ->
+        begin try
+          Mid.add lsdis.ls_name (Mid.find ls.ls_name sm) acc
+        with Not_found -> acc end
+    | _ -> assert false in
+  let print dls sm fmt d =
+    let info = {
+      info_syn = List.fold_left (add_ls sm) sm dls;
+      use_trigger = false } in
+    print_decl info fmt d in
+  Trans.on_meta Discriminate.meta_lsinst (fun dls ->
+    Printer.sprint_decls (print dls))
+
+let print_task _env pr thpr ?old:_ fmt task =
+  (* In trans-based p-printing [forget_all] is taboo *)
+  (* forget_all ident_printer; *)
+  print_prelude fmt pr;
+  print_th_prelude task fmt thpr;
+  fprintf fmt "%a@." (print_list nothing string)
+    (List.rev (Trans.apply print_decls task))
+
+let () = register_printer "smtv2new" print_task

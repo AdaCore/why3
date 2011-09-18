@@ -150,11 +150,11 @@ theory map.Map
   syntax type map "(Array %1 %2)"
   meta "encoding : lskept" function get
   meta "encoding : lskept" function set
-  meta "encoding : lskept" function const
+(*  meta "encoding : lskept" function const *)
 
   syntax function get   "(select %1 %2)"
   syntax function set   "(store %1 %2 %3)"
-  syntax function const "(const[%t0] %1)"
+(*  syntax function const "(const[%t0] %1)" *)
 end
 
 
