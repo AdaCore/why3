@@ -26,6 +26,7 @@ let file = ref None
 let opt_version = ref false
 let opt_stats = ref true
 let opt_latex = ref false
+let opt_latex2 = ref false
 let opt_force = ref false
 
 let spec = Arg.align [
@@ -43,6 +44,9 @@ let spec = Arg.align [
    " print version information") ;
   ("-latex",
    Arg.Set opt_latex,
+   " produce latex statistics") ;
+  ("-latex2",
+   Arg.Set opt_latex2,
    " produce latex statistics") ;
 ]
 
@@ -307,6 +311,7 @@ let rec provers_latex_stats provers depth g =
   Hashtbl.iter (fun p a-> Hashtbl.replace provers p a.M.prover) proofs;
   let tr = M.transformations g in
   Hashtbl.iter (fun _st tr -> 
+    depth := !depth + 1;
     let goals = tr.M.subgoals in
     List.iter (provers_latex_stats provers depth) goals) tr
 
@@ -316,12 +321,16 @@ let rec goal_trans_stat rows g  =
 			      rows := !rows + (List.length goals);
 			      List.iter (goal_trans_stat rows) goals) tr
  
-let rec goal_latex_stat prov depth depth_max first g =
-  if not first then
-    for i = 1 to depth do printf "&" done
-  else
-    if depth > 0 then printf "&";
-
+let rec goal_latex_stat n prov depth depth_max first g =
+  if(n ==1) then begin
+    if not first then
+      for i = 1 to depth do printf "&" done
+    else
+      if depth > 0 then printf "&"
+	end
+  else begin
+    for i = 1 to depth do printf "\\quad" done
+  end;
   printf "\\verb|%s| " (M.goal_expl g);
   let proofs = M.external_proofs g in
   if (Hashtbl.length proofs) > 0 then 
@@ -348,7 +357,7 @@ let rec goal_latex_stat prov depth depth_max first g =
     Hashtbl.iter (fun _st tr -> 
       let goals = tr.M.subgoals in
       let _ = List.fold_left (fun first g -> 
-	goal_latex_stat prov (depth + 1) depth_max first g; false) true  goals in 
+	goal_latex_stat n prov (depth + 1) depth_max first g; false) true  goals in 
     () ) tr
   end
 
@@ -357,11 +366,10 @@ let prover_name a =
       M.Detected_prover d -> d.Session.prover_name ^ " " ^ d.Session.prover_version
     | M.Undetected_prover s -> s
 
-let theory_latex_stat t =
+let theory_latex_stat n t =
   let provers = Hashtbl.create 9 in
   let depth = ref 0 in 
   List.iter (provers_latex_stats provers depth) (M.goals t);
-  printf "profondeur %d \n " !depth;
 
   printf "\n@.";
   printf "\\begin{tabular}";
@@ -374,15 +382,15 @@ let theory_latex_stat t =
   printf " \\multicolumn{%d}{|c|}{ } " (!depth );
   Hashtbl.iter (fun _ a-> printf "& %s " (prover_name a)) provers;
   printf "\\\\\\hline@.";
-  List.iter (goal_latex_stat provers 0 !depth true) (M.goals t);
-  printf "\\end{tabular}@."
+  List.iter (goal_latex_stat n provers 0 !depth true) (M.goals t);
+  printf "\\end{tabular}@." 
 
-let file_latex_stat f =
-   List.iter theory_latex_stat f.M.theories
+let file_latex_stat n f =
+   List.iter (theory_latex_stat n) f.M.theories
 
-let print_latex_statistics () =
+let print_latex_statistics n =
   let files = M.get_all_files () in
-  List.iter file_latex_stat files
+  List.iter (file_latex_stat n) files
 
 let print_report (g,p,r) =
   printf "   goal '%s', prover '%s': " g p;
@@ -426,7 +434,8 @@ let () =
             else
               printf " %d/%d@." n m ;
             if !opt_stats && n<m then print_statistics files;
-	    if !opt_latex then print_latex_statistics ();
+	    if !opt_latex then print_latex_statistics (1);
+	    if !opt_latex2 then print_latex_statistics (2);
             eprintf "Everything replayed OK.@.";
             if found_obs && (n=m || !opt_force) then
               begin
