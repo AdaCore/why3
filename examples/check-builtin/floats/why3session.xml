@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
 <why3session
- name="examples/check-builtin/floats/why3session.xml">
+ name="check-builtin/floats/why3session.xml">
  <prover
   id="alt-ergo"
   name="Alt-Ergo"
@@ -9,7 +9,7 @@
  <prover
   id="coq"
   name="Coq"
-  version="8.2pl1"/>
+  version="8.3pl2"/>
  <prover
   id="cvc3"
   name="CVC3"
@@ -17,11 +17,23 @@
  <prover
   id="gappa"
   name="Gappa"
-  version="0.13.0"/>
+  version="0.15.0"/>
  <prover
   id="simplify"
   name="Simplify"
   version="1.5.4"/>
+ <prover
+  id="spass"
+  name="Spass"
+  version="3.7"/>
+ <prover
+  id="vampire"
+  name="Vampire"
+  version="0.6"/>
+ <prover
+  id="yices"
+  name="Yices"
+  version="1.0.25"/>
  <prover
   id="z3"
   name="Z3"
@@ -36,7 +48,7 @@
    expanded="true">
    <goal
     name="Round_single_01"
-    sum="b356284ef3c67cc31bb22f6c7deae9f0"
+    sum="4350d059bf72b21b36729eaccc394959"
     proved="true"
     expanded="true"
     shape="ainfix =aroundaNearestTiesToEvenc0.1c0x1.99999ap-4">
@@ -45,12 +57,12 @@
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
     name="Round_double_01"
-    sum="a981e04c08472362dcca34e0f3487b74"
+    sum="fc4b69caf28748e651e23f375e300b70"
     proved="true"
     expanded="true"
     shape="ainfix =aroundaNearestTiesToEvenc0.1c0x1.999999999999ap-4">
@@ -59,12 +71,12 @@
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
     name="Test00"
-    sum="532babe00b8785ec6f7286621c12a512"
+    sum="d126875bf4fc484b4b44c2b52b9da437"
     proved="true"
     expanded="true"
     shape="ainfix <=aprefix -c3.0V0Iainfix <=aabsV0c2.0F">
@@ -73,33 +85,33 @@
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.03"/>
+     <result status="valid" time="0.00"/>
     </proof>
     <proof
      prover="alt-ergo"
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.04"/>
+     <result status="valid" time="0.01"/>
     </proof>
     <proof
      prover="z3"
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.04"/>
+     <result status="valid" time="0.02"/>
     </proof>
     <proof
      prover="gappa"
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
     name="Test01"
-    sum="a2dc5970c8ef3c553ea90e0fc634da83"
+    sum="bcbfbae3da81b362e99b319253ef2a20"
     proved="true"
     expanded="true"
     shape="ainfix <=aabsainfix -ainfix *avalueV0avalueV0aroundaNearestTiesToEvenainfix *avalueV0avalueV0c0x1.p-52Iainfix <=avalueV0c2.0Aainfix <=aprefix -c2.0avalueV0F">
@@ -108,12 +120,12 @@
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
     name="Test02"
-    sum="eb102544c66926067fe7350ea3f1ba87"
+    sum="1d3e20e12a14b6bd91a25d057da3b098"
     proved="true"
     expanded="true"
     shape="ainfix <=aabsainfix -ainfix *avalueV1avalueV1aroundaNearestTiesToEvenainfix *avalueV0avalueV0c0x1.p-52Iainfix =V1V0Iainfix <=aabsavalueV0c2.0F">
@@ -122,12 +134,12 @@
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
     name="Test03"
-    sum="3d36d4470fa7e12c3ba550960abf7a6c"
+    sum="42c26c3443d67722883a37dfe8f9253c"
     proved="true"
     expanded="true"
     shape="ainfix <=asqrtainfix *ainfix -avalueV2ainfix *avalueV0avalueV0ainfix -avalueV1ainfix *avalueV0avalueV0c0x1.p-52Iainfix =V2V1Iainfix =avalueV1aroundaNearestTiesToEvenainfix *avalueV0avalueV0Iainfix <=aabsavalueV0c2.0F">
@@ -136,7 +148,7 @@
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.00"/>
     </proof>
    </goal>
   </theory>
