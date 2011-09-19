@@ -3,12 +3,14 @@ open Term
 
 let config = Whyconf.read_config None
 let config_main = Whyconf.get_main (config)
-let loadpath =
-   "/home/kanig/HiLite/hi-lite/stdlib_tmp" ::
-   "." ::
-   Whyconf.loadpath config_main
 
-let env = Env.create_env_of_loadpath loadpath
+let env =
+   let loadpath = "." :: Whyconf.loadpath config_main in
+   let loadpath =
+      try Sys.getenv "WHYLIB" :: loadpath
+      with Not_found -> loadpath
+   in
+   Env.create_env_of_loadpath loadpath
 
 let is_not_why_loc s =
    not (Filename.check_suffix s "why" ||
@@ -164,6 +166,7 @@ let _ =
       let m = Env.read_file env fn in
       (* fill map of explanations *)
       Util.Mstr.iter do_theory m;
+      Format.printf "built map of explanations@.";
       Gnat_expl.MExpl.iter
          (fun expl tl ->
             try
