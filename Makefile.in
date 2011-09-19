@@ -305,6 +305,16 @@ bin/why3ml.byte: src/why3.cma $(PGMCMO) src/main.cmo
 bin/why3ml: bin/why3ml.@OCAMLBEST@
 	ln -sf why3ml.@OCAMLBEST@ $@
 
+.PHONY: adacore-patch
+
+BASETAG=0.70
+PATCHRELEVANT= bin doc configure.in drivers examples INSTALL LICENSE \
+	       Makefile.in META.in modules OCAML-LICENSE plugins README \
+	       share src theories Version
+adacore-patch:
+	git diff --no-prefix $(BASETAG) $(PATCHRELEVANT) > why3-$(BASETAG).patch
+
+
 # depend and clean targets
 
 include .depend.programs
