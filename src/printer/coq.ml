@@ -163,8 +163,9 @@ let rec print_pat info fmt p = match p.pat_node with
   | Papp (cs,pl) ->
       begin match query_syntax info.info_syn cs.ls_name with
         | Some s -> syntax_arguments s (print_pat info) fmt pl
-        | _ -> fprintf fmt "%a %a"
-            print_ls cs (print_list space (print_pat info)) pl
+        | _ when pl = [] -> print_ls fmt cs
+        | _ -> fprintf fmt "(%a %a)"
+          print_ls cs (print_list space (print_pat info)) pl
       end
 
 let print_vsty_nopar info fmt v =
