@@ -29,9 +29,16 @@ theory SortedList
         forall x y : t, l : list t.
         x <= y -> sorted (Cons y l) -> sorted (Cons x (Cons y l))
 
+  lemma sorted_inf: 
+    forall x y: t, l: list t. x <= y -> sorted (Cons y l) -> 
+      sorted (Cons x l)  
+    
+
   lemma sorted_mem: 
     forall x: t, l: list t. sorted (Cons x l) -> 
     forall y: t. mem y l -> x <= y
+    (* by induction on l *)
+
 end
 
 theory SortedIntList
