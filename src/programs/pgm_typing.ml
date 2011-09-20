@@ -1859,8 +1859,8 @@ and letrec gl env dl = (* : env * recfun list *)
 
 let rec fresh_expr gl ~term locals e = match e.expr_desc with
   | Elocal vs when is_mutable_ty vs.pv_effect.vs_ty
-    && (not term || not (Spv.mem vs locals)) ->
-      errorm ~loc:e.expr_loc "not a fresh reference (could create an alias)"
+    && term && not (Spv.mem vs locals) ->
+      errorm ~loc:e.expr_loc "not a fresh value (could create an alias)"
   | Elogic _ | Elocal _ | Eglobal _ ->
       ()
   | Efun (_, t) ->
@@ -2271,6 +2271,7 @@ let rec decl ~wp env penv ltm lmod uc = function
       let e = iexpr (create_ienv denv) e in
       let e = expr uc Mvs.empty e in
       check_region_vars ();
+      ignore (fresh_expr uc ~term:false Spv.empty e);
       if Debug.test_flag debug then
         eprintf "@[--typing %s-----@\n  @[<hov 2>%a@]@\n@[<hov 2>: %a@]@]@."
           id.id Pgm_pretty.print_expr e print_type_v e.expr_type_v;
@@ -2285,6 +2286,7 @@ let rec decl ~wp env penv ltm lmod uc = function
       let _, dl = dletrec ~ghost:false ~userloc:None denv dl in
       let _, dl = iletrec (create_ienv denv) dl in
       let _, dl = letrec uc Mvs.empty dl in
+      List.iter (fun (_, _, t, _) -> fresh_triple uc t) dl;
       check_region_vars ();
       let one uc (v, _, _, _ as d) =
         let tyv = v.pv_tv in
