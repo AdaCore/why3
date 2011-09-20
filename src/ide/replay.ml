@@ -328,13 +328,14 @@ let prover_name a =
   match a with
       M.Detected_prover d -> d.Session.prover_name ^ " " ^ d.Session.prover_version
     | M.Undetected_prover s -> s
+
 let rec goal_latex_stat n fmt prov depth depth_max first g =
   if(n ==1) then begin
     if not first then
       for i = 1 to depth do fprintf fmt "&" done
     else
       if depth > 0 then fprintf fmt "&"
-	end
+  end
   else begin
     for i = 1 to depth do fprintf fmt "\\quad" done
   end;
@@ -345,10 +346,10 @@ let rec goal_latex_stat n fmt prov depth depth_max first g =
     begin
       if (n == 1) then 
 	begin 
-      if depth > 0 then 
-	for i = depth to (depth_max - depth) do fprintf fmt "&" done
-      else 
-	for i = depth to (depth_max - depth - 1) do fprintf fmt "&" done;
+	  if depth > 0 then 
+	    for i = depth to (depth_max - depth) do fprintf fmt "&" done
+	  else 
+	    for i = depth to (depth_max - depth - 1) do fprintf fmt "&" done;
 	end;
       List.iter (fun (p, _pr) -> 
 	try 
@@ -392,7 +393,10 @@ let theory_latex_stat n dir t =
   for i = 0 to (List.length provers) + depth do fprintf fmt "c |" done;
   fprintf fmt "} \n \\hline@.";
   if (n == 1) then 
-    fprintf fmt " \\multicolumn{%d}{|c|}{Proof obligations } " (depth + 1)
+    if (depth > 1) then 
+      fprintf fmt " \\multicolumn{%d}{|c|}{Proof obligations } "  depth
+      else
+      fprintf fmt " \\multicolumn{%d}{|c|}{Proof obligations } " (depth + 1)
   else 
     fprintf fmt " Proof obligations ";
   List.iter (fun (_, a) -> fprintf fmt "& %s " a) provers;
