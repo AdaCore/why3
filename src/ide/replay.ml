@@ -323,6 +323,11 @@ let rec provers_latex_stats provers g =
     let goals = tr.M.subgoals in
     List.iter (provers_latex_stats provers) goals) tr
 
+
+let prover_name a = 
+  match a with
+      M.Detected_prover d -> d.Session.prover_name ^ " " ^ d.Session.prover_version
+    | M.Undetected_prover s -> s
 let rec goal_latex_stat n fmt prov depth depth_max first g =
   if(n ==1) then begin
     if not first then
@@ -372,11 +377,6 @@ let rec goal_latex_stat n fmt prov depth depth_max first g =
     () ) tr
   end
 
-let prover_name a = 
-  match a with
-      M.Detected_prover d -> d.Session.prover_name ^ " " ^ d.Session.prover_version
-    | M.Undetected_prover s -> s
-
 let theory_latex_stat n dir t =
   let provers = Hashtbl.create 9 in
   List.iter (provers_latex_stats provers) (M.goals t);
@@ -391,7 +391,7 @@ let theory_latex_stat n dir t =
   fprintf fmt "{| l |";
   for i = 0 to (List.length provers) + depth do fprintf fmt "c |" done;
   fprintf fmt "} \n \\hline@.";
-  if (n == 1) then
+  if (n == 1) then 
     fprintf fmt " \\multicolumn{%d}{|c|}{Proof obligations } " (depth + 1)
   else 
     fprintf fmt " Proof obligations ";
