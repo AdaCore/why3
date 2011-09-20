@@ -4,7 +4,7 @@ open Term
 let config =
    try Whyconf.read_config (Some "why3.conf")
    with Rc.CannotOpen _ ->
-      prerr_endline "Cannot file why3.conf. Aborting.";
+      Format.eprintf "Cannot file why3.conf. Aborting.@.";
       exit 1
 
 let config_main = Whyconf.get_main (config)
@@ -17,24 +17,7 @@ let is_not_why_loc s =
    not (Filename.check_suffix s "why" ||
         Filename.check_suffix s "mlw")
 
-let filename =
-   if Array.length (Sys.argv) < 2 then begin
-      prerr_endline "No file given. Aborting";
-      exit 1
-   end;
-   Sys.argv.(1)
-
 let suffix = ".mlw"
-
-let basename =
-   if Filename.check_suffix filename suffix then
-      Filename.chop_suffix filename suffix
-   else begin
-      Format.eprintf
-        "File should have suffix .mlw, but the file is %s. Aborting."
-        filename;
-      exit 1
-   end
 
 let split_trans = Trans.lookup_transform_l "split_goal" env
 
@@ -135,7 +118,10 @@ let do_task t =
    | _ ->
          let expl = search_labels None fml in
          match expl with
-         | None -> assert false
+         | None ->
+               Format.eprintf "Task has no tracability label. Aborting.@.";
+               exit 1
+
          | Some e ->
                add_task e t
 
@@ -159,7 +145,7 @@ exception Not_Proven
 
 let _ =
    if Array.length (Sys.argv) < 2 then begin
-      prerr_endline "No file given. Aborting";
+      Format.eprintf "No file given. Aborting.@.";
       exit 1
    end;
    let fn = Sys.argv.(1) in
