@@ -306,21 +306,24 @@ let print_statistics files =
 
 (* Statistics in LaTeX*)
 
-let rec provers_latex_stats provers depth g = 
+let rec transf_depth tr = 
+  List.fold_left (fun depth g -> max depth (goal_depth g)) 0 (tr.M.subgoals)
+and goal_depth g =
+  Hashtbl.fold 
+    (fun _st tr depth -> max depth (1 + transf_depth tr)) (M.transformations g) 0
+ 
+let theory_depth t = 
+  List.fold_left (fun depth g -> max depth (goal_depth g)) 0 (M.goals t)
+(*  List.iter (max depth (goal_depth 0)) (M.goals t)*)
+ 
+let rec provers_latex_stats provers g = 
   let proofs = M.external_proofs g in
   Hashtbl.iter (fun p a-> Hashtbl.replace provers p a.M.prover) proofs;
   let tr = M.transformations g in
   Hashtbl.iter (fun _st tr -> 
-    depth := !depth + 1;
     let goals = tr.M.subgoals in
-    List.iter (provers_latex_stats provers depth) goals) tr
+    List.iter (provers_latex_stats provers) goals) tr
 
-let rec goal_trans_stat rows g  = 
- let tr = M.transformations g in
-  Hashtbl.iter (fun _st tr -> let goals = tr.M.subgoals in
-			      rows := !rows + (List.length goals);
-			      List.iter (goal_trans_stat rows) goals) tr
- 
 let rec goal_latex_stat n prov depth depth_max first g =
   if(n ==1) then begin
     if not first then
@@ -336,9 +339,9 @@ let rec goal_latex_stat n prov depth depth_max first g =
   if (Hashtbl.length proofs) > 0 then 
     begin
       if depth > 0 then 
-	for i = depth to (depth_max - depth - 1) do printf "&" done
+	for i = depth to (depth_max - depth) do printf "&" done
       else 
-	for i = depth to (depth_max - depth - 2) do printf "&" done;
+	for i = depth to (depth_max - depth - 1) do printf "&" done;
       Hashtbl.iter (fun p _pr -> 
 	try 
 	  let pr = Hashtbl.find proofs p in
@@ -368,21 +371,17 @@ let prover_name a =
 
 let theory_latex_stat n t =
   let provers = Hashtbl.create 9 in
-  let depth = ref 0 in 
-  List.iter (provers_latex_stats provers depth) (M.goals t);
-
+  let depth = theory_depth  t in
+  List.iter (provers_latex_stats provers) (M.goals t);
   printf "\n@.";
   printf "\\begin{tabular}";
   printf "{| l |";
-  if (!depth = 0) then 
-    for i = 0 to (Hashtbl.length provers) -1 do printf "c |" done
-  else 
-    for i = 0 to (Hashtbl.length provers) + !depth - 2 do printf "c |" done;
+  for i = 0 to (Hashtbl.length provers) + depth do printf "c |" done;
   printf "} \n \\hline@.";
-  printf " \\multicolumn{%d}{|c|}{ } " (!depth );
+  printf " \\multicolumn{%d}{|c|}{Proof obligations } " (depth + 1);
   Hashtbl.iter (fun _ a-> printf "& %s " (prover_name a)) provers;
   printf "\\\\\\hline@.";
-  List.iter (goal_latex_stat n provers 0 !depth true) (M.goals t);
+  List.iter (goal_latex_stat n provers 0 depth true) (M.goals t);
   printf "\\end{tabular}@." 
 
 let file_latex_stat n f =
