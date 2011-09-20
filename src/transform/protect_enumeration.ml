@@ -66,26 +66,7 @@ let protect_enumeration =
   Trans.on_tagged_ty Libencoding.meta_kept (fun kept ->
   Trans.on_tagged_ts Eliminate_algebraic.meta_enum (fun enum ->
   Trans.on_meta Eliminate_algebraic.meta_phantom (fun phlist ->
-    let add_ph phmap = function
-      | [MAts ts; MAint i] ->
-          let phmap, pha = try phmap, Mts.find ts phmap with
-            | Not_found ->
-                let pha = Array.make (List.length ts.ts_args) false in
-                Mts.add ts pha phmap, pha
-          in
-          Array.set pha i true;
-          phmap
-      | _ -> assert false
-    in
-    let phmap = List.fold_left add_ph Mts.empty phlist in
-    let phmap = Mts.map Array.to_list phmap in
-    let rec finite_ty ty = match ty.ty_node with
-      | Tyapp (ts,tl) when Mts.mem ts enum ->
-          let phl = try Mts.find ts phmap with Not_found ->
-            List.map Util.ffalse ts.ts_args in
-          List.for_all2 (fun ph ty -> ph || finite_ty ty) phl tl
-      | _ -> false
-    in
+    let finite_ty = Eliminate_algebraic.is_finite_ty enum phlist in
     let add_protect ty tenv =
       if not (finite_ty ty) then tenv else
       let ts = match ty.ty_node with Tyapp (s,_) -> s | _ -> assert false in

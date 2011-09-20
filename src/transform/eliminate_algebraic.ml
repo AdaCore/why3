@@ -52,6 +52,29 @@ let rec enum_ts kn sts ts =
 
 let enum_ts kn ts = try Some (enum_ts kn Sts.empty ts) with Exit -> None
 
+let is_finite_ty enum phlist =
+  let add_ph phmap = function
+    | [MAts ts; MAint i] ->
+        let phmap, pha = try phmap, Mts.find ts phmap with
+          | Not_found ->
+              let pha = Array.make (List.length ts.ts_args) false in
+              Mts.add ts pha phmap, pha
+        in
+        Array.set pha i true;
+        phmap
+    | _ -> assert false
+  in
+  let phmap = List.fold_left add_ph Mts.empty phlist in
+  let phmap = Mts.map Array.to_list phmap in
+  let rec finite_ty ty = match ty.ty_node with
+    | Tyapp (ts,tl) when Mts.mem ts enum ->
+        let phl = try Mts.find ts phmap with Not_found ->
+          List.map Util.ffalse ts.ts_args in
+        List.for_all2 (fun ph ty -> ph || finite_ty ty) phl tl
+    | _ -> false
+  in
+  finite_ty
+
 (** Compile match patterns *)
 
 let rec rewriteT kn t = match t.t_node with
