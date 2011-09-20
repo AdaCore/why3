@@ -9,7 +9,7 @@
  <prover
   id="coq"
   name="Coq"
-  version="8.3pl2"/>
+  version="8.2pl1"/>
  <prover
   id="cvc3"
   name="CVC3"
@@ -17,23 +17,11 @@
  <prover
   id="gappa"
   name="Gappa"
-  version="0.15.0"/>
+  version="0.13.0"/>
  <prover
   id="simplify"
   name="Simplify"
   version="1.5.4"/>
- <prover
-  id="spass"
-  name="Spass"
-  version="3.7"/>
- <prover
-  id="vampire"
-  name="Vampire"
-  version="0.6"/>
- <prover
-  id="yices"
-  name="Yices"
-  version="1.0.25"/>
  <prover
   id="z3"
   name="Z3"
@@ -41,16 +29,16 @@
  <file
   name="../bag.why"
   verified="true"
-  expanded="false">
+  expanded="true">
   <theory
    name="Bag"
    verified="true"
-   expanded="false">
+   expanded="true">
    <goal
     name="is_empty"
     sum="3b93ad71baf9990bea396bbb4b478927"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =V0aempty_bagIainfix =anb_occV1V0c0FF">
     <proof
      prover="cvc3"
@@ -70,7 +58,7 @@
      prover="vampire"
      timelimit="10"
      edited=""
-     obsolete="false">
+     obsolete="true">
      <result status="valid" time="0.04"/>
     </proof>
    </goal>
@@ -105,7 +93,7 @@
      prover="vampire"
      timelimit="10"
      edited=""
-     obsolete="false">
+     obsolete="true">
      <result status="valid" time="0.00"/>
     </proof>
    </goal>
@@ -140,7 +128,7 @@
      prover="vampire"
      timelimit="10"
      edited=""
-     obsolete="false">
+     obsolete="true">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
@@ -155,7 +143,7 @@
      timelimit="3"
      edited="bag_Bag_Union_comm_1.v"
      obsolete="false">
-     <result status="valid" time="0.48"/>
+     <result status="valid" time="0.47"/>
     </proof>
    </goal>
    <goal
@@ -169,13 +157,13 @@
      timelimit="3"
      edited="bag_Bag_Union_identity_1.v"
      obsolete="false">
-     <result status="valid" time="0.50"/>
+     <result status="valid" time="0.60"/>
     </proof>
     <proof
      prover="vampire"
      timelimit="10"
      edited=""
-     obsolete="false">
+     obsolete="true">
      <result status="valid" time="0.18"/>
     </proof>
    </goal>
@@ -190,7 +178,7 @@
      timelimit="3"
      edited="bag_Bag_Union_assoc_1.v"
      obsolete="false">
-     <result status="valid" time="0.49"/>
+     <result status="valid" time="0.59"/>
     </proof>
    </goal>
    <goal
@@ -218,7 +206,7 @@
      timelimit="30"
      edited="bag_Bag_bag_simpl_left_1.v"
      obsolete="false">
-     <result status="valid" time="0.50"/>
+     <result status="valid" time="0.52"/>
     </proof>
     <proof
      prover="cvc3"
@@ -266,7 +254,7 @@
      prover="vampire"
      timelimit="10"
      edited=""
-     obsolete="false">
+     obsolete="true">
      <result status="valid" time="0.05"/>
     </proof>
    </goal>
@@ -294,7 +282,7 @@
      prover="vampire"
      timelimit="10"
      edited=""
-     obsolete="false">
+     obsolete="true">
      <result status="valid" time="0.89"/>
     </proof>
    </goal>
@@ -309,13 +297,13 @@
      timelimit="5"
      edited="bag_Bag_Diff_empty_right_1.v"
      obsolete="false">
-     <result status="valid" time="0.54"/>
+     <result status="valid" time="0.66"/>
     </proof>
     <proof
      prover="vampire"
      timelimit="10"
      edited=""
-     obsolete="false">
+     obsolete="true">
      <result status="valid" time="1.08"/>
     </proof>
    </goal>
@@ -330,13 +318,13 @@
      timelimit="5"
      edited="bag_Bag_Diff_empty_left_1.v"
      obsolete="false">
-     <result status="valid" time="0.52"/>
+     <result status="valid" time="0.64"/>
     </proof>
     <proof
      prover="vampire"
      timelimit="10"
      edited=""
-     obsolete="false">
+     obsolete="true">
      <result status="valid" time="0.84"/>
     </proof>
    </goal>
@@ -351,7 +339,7 @@
      timelimit="3"
      edited="bag_Bag_Diff_add_1.v"
      obsolete="false">
-     <result status="valid" time="0.54"/>
+     <result status="valid" time="0.53"/>
     </proof>
    </goal>
    <goal
@@ -365,7 +353,7 @@
      timelimit="20"
      edited="bag_Bag_Diff_comm_1.v"
      obsolete="false">
-     <result status="valid" time="0.97"/>
+     <result status="valid" time="1.04"/>
     </proof>
    </goal>
    <goal
@@ -379,7 +367,7 @@
      timelimit="3"
      edited="bag_Bag_Add_diff_1.v"
      obsolete="false">
-     <result status="valid" time="0.58"/>
+     <result status="valid" time="0.57"/>
     </proof>
    </goal>
   </theory>
@@ -416,7 +404,7 @@
      prover="vampire"
      timelimit="10"
      edited=""
-     obsolete="false">
+     obsolete="true">
      <result status="valid" time="1.07"/>
     </proof>
    </goal>
@@ -451,7 +439,7 @@
      prover="vampire"
      timelimit="10"
      edited=""
-     obsolete="false">
+     obsolete="true">
      <result status="valid" time="0.08"/>
     </proof>
    </goal>
@@ -460,7 +448,7 @@
  <file
   name="../elements.why"
   verified="true"
-  expanded="false">
+  expanded="true">
   <theory
    name="Elements"
    verified="true"
@@ -490,7 +478,7 @@
      timelimit="5"
      edited="elements_Elements_Elements_union_1.v"
      obsolete="false">
-     <result status="valid" time="0.57"/>
+     <result status="valid" time="0.56"/>
     </proof>
    </goal>
    <goal
@@ -504,7 +492,7 @@
      timelimit="5"
      edited="elements_Elements_Elements_add1_1.v"
      obsolete="false">
-     <result status="valid" time="0.51"/>
+     <result status="valid" time="0.68"/>
     </proof>
    </goal>
    <goal
@@ -546,7 +534,7 @@
      timelimit="3"
      edited="elements_Elements_Occ_elements_1.v"
      obsolete="false">
-     <result status="valid" time="0.54"/>
+     <result status="valid" time="0.68"/>
     </proof>
    </goal>
    <goal
@@ -560,7 +548,7 @@
      timelimit="30"
      edited="elements_Elements_Elements_set_outside_1.v"
      obsolete="false">
-     <result status="valid" time="0.69"/>
+     <result status="valid" time="0.67"/>
     </proof>
    </goal>
    <goal
@@ -574,7 +562,7 @@
      timelimit="30"
      edited="elements_Elements_Elements_set_inside_1.v"
      obsolete="false">
-     <result status="valid" time="0.59"/>
+     <result status="valid" time="0.55"/>
     </proof>
    </goal>
    <goal
@@ -613,11 +601,11 @@
  <file
   name="../heapsort.mlw"
   verified="true"
-  expanded="false">
+  expanded="true">
   <theory
    name="WP HeapSort"
    verified="true"
-   expanded="false">
+   expanded="true">
    <goal
     name="Min_of_sorted"
     sum="f0e2ad1ff77cb4c0d59f057e5dc5428d"
@@ -629,7 +617,7 @@
      timelimit="3"
      edited="heapsort_WP_HeapSort_Min_of_sorted_1.v"
      obsolete="false">
-     <result status="valid" time="0.75"/>
+     <result status="valid" time="0.70"/>
     </proof>
    </goal>
    <goal
@@ -889,7 +877,7 @@
          prover="vampire"
          timelimit="5"
          edited=""
-         obsolete="false">
+         obsolete="true">
          <result status="valid" time="0.96"/>
         </proof>
        </goal>
@@ -947,7 +935,7 @@
          prover="vampire"
          timelimit="5"
          edited=""
-         obsolete="false">
+         obsolete="true">
          <result status="valid" time="3.37"/>
         </proof>
        </goal>
@@ -1083,7 +1071,7 @@
          prover="vampire"
          timelimit="5"
          edited=""
-         obsolete="false">
+         obsolete="true">
          <result status="valid" time="1.29"/>
         </proof>
        </goal>
@@ -1134,7 +1122,7 @@
          prover="vampire"
          timelimit="5"
          edited=""
-         obsolete="false">
+         obsolete="true">
          <result status="valid" time="3.05"/>
         </proof>
        </goal>
@@ -1170,7 +1158,7 @@
          prover="vampire"
          timelimit="5"
          edited=""
-         obsolete="false">
+         obsolete="true">
          <result status="valid" time="1.10"/>
         </proof>
        </goal>
@@ -1206,7 +1194,7 @@
          prover="vampire"
          timelimit="5"
          edited=""
-         obsolete="false">
+         obsolete="true">
          <result status="valid" time="1.68"/>
         </proof>
        </goal>
@@ -1660,7 +1648,7 @@
      timelimit="5"
      edited="heap_implem_WP_Implementation_Is_heap_min_1.v"
      obsolete="false">
-     <result status="valid" time="0.66"/>
+     <result status="valid" time="0.84"/>
     </proof>
    </goal>
    <goal
@@ -1695,7 +1683,7 @@
      prover="vampire"
      timelimit="5"
      edited=""
-     obsolete="false">
+     obsolete="true">
      <result status="valid" time="0.38"/>
     </proof>
    </goal>
@@ -1751,7 +1739,7 @@
        timelimit="30"
        edited="heap_implem_WP_Implementation_WP_parameter_insert_1.v"
        obsolete="false">
-       <result status="valid" time="0.97"/>
+       <result status="valid" time="1.06"/>
       </proof>
      </goal>
      <goal
@@ -1905,7 +1893,7 @@
          prover="vampire"
          timelimit="5"
          edited=""
-         obsolete="false">
+         obsolete="true">
          <result status="valid" time="0.94"/>
         </proof>
        </goal>
@@ -2060,7 +2048,7 @@
        prover="vampire"
        timelimit="5"
        edited=""
-       obsolete="false">
+       obsolete="true">
        <result status="valid" time="0.05"/>
       </proof>
      </goal>
@@ -2240,7 +2228,7 @@
        timelimit="3"
        edited="heap_implem_WP_Implementation_WP_parameter_extractMin_3.v"
        obsolete="false">
-       <result status="valid" time="0.64"/>
+       <result status="valid" time="0.60"/>
       </proof>
      </goal>
      <goal
@@ -2373,7 +2361,7 @@
          prover="vampire"
          timelimit="5"
          edited=""
-         obsolete="false">
+         obsolete="true">
          <result status="valid" time="0.01"/>
         </proof>
        </goal>
@@ -2604,7 +2592,7 @@
          prover="vampire"
          timelimit="5"
          edited=""
-         obsolete="false">
+         obsolete="true">
          <result status="valid" time="0.01"/>
         </proof>
        </goal>
@@ -2640,7 +2628,7 @@
          prover="vampire"
          timelimit="5"
          edited=""
-         obsolete="false">
+         obsolete="true">
          <result status="valid" time="0.00"/>
         </proof>
        </goal>
@@ -2676,7 +2664,7 @@
          prover="vampire"
          timelimit="5"
          edited=""
-         obsolete="false">
+         obsolete="true">
          <result status="valid" time="0.01"/>
         </proof>
        </goal>
@@ -2838,7 +2826,7 @@
        prover="vampire"
        timelimit="5"
        edited=""
-       obsolete="false">
+       obsolete="true">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
@@ -2914,7 +2902,7 @@
          prover="vampire"
          timelimit="5"
          edited=""
-         obsolete="false">
+         obsolete="true">
          <result status="valid" time="0.04"/>
         </proof>
        </goal>
@@ -3218,7 +3206,7 @@
          prover="vampire"
          timelimit="5"
          edited=""
-         obsolete="false">
+         obsolete="true">
          <result status="valid" time="0.01"/>
         </proof>
        </goal>
@@ -3254,7 +3242,7 @@
          prover="vampire"
          timelimit="5"
          edited=""
-         obsolete="false">
+         obsolete="true">
          <result status="valid" time="0.01"/>
         </proof>
        </goal>
@@ -3290,7 +3278,7 @@
          prover="vampire"
          timelimit="5"
          edited=""
-         obsolete="false">
+         obsolete="true">
          <result status="valid" time="0.00"/>
         </proof>
        </goal>
@@ -3368,7 +3356,7 @@
          prover="vampire"
          timelimit="5"
          edited=""
-         obsolete="false">
+         obsolete="true">
          <result status="valid" time="0.06"/>
         </proof>
        </goal>
@@ -3597,7 +3585,7 @@
        prover="vampire"
        timelimit="5"
        edited=""
-       obsolete="false">
+       obsolete="true">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
@@ -3673,7 +3661,7 @@
          prover="vampire"
          timelimit="5"
          edited=""
-         obsolete="false">
+         obsolete="true">
          <result status="valid" time="0.06"/>
         </proof>
        </goal>
@@ -3857,7 +3845,7 @@
        prover="vampire"
        timelimit="5"
        edited=""
-       obsolete="false">
+       obsolete="true">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
@@ -3893,7 +3881,7 @@
        prover="vampire"
        timelimit="5"
        edited=""
-       obsolete="false">
+       obsolete="true">
        <result status="valid" time="0.00"/>
       </proof>
      </goal>
@@ -3929,7 +3917,7 @@
        prover="vampire"
        timelimit="5"
        edited=""
-       obsolete="false">
+       obsolete="true">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
@@ -3965,7 +3953,7 @@
        prover="vampire"
        timelimit="5"
        edited=""
-       obsolete="false">
+       obsolete="true">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
@@ -3999,6 +3987,565 @@
       </proof>
      </goal>
     </transf>
+   </goal>
+  </theory>
+ </file>
+ <file
+  name="../heap_model.why"
+  verified="true"
+  expanded="true">
+  <theory
+   name="Model"
+   verified="true"
+   expanded="true">
+   <goal
+    name="Model_empty"
+    sum="b12eef594a663bc5b31b3a9533698e31"
+    proved="true"
+    expanded="true"
+    shape="ainfix =amodelaTuple2V0c0aempty_bagF">
+    <proof
+     prover="cvc3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.06"/>
+    </proof>
+    <proof
+     prover="alt-ergo"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.04"/>
+    </proof>
+    <proof
+     prover="z3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.08"/>
+    </proof>
+   </goal>
+   <goal
+    name="Model_singleton"
+    sum="dc08c13209aa5b2550d8a11074616a4a"
+    proved="true"
+    expanded="true"
+    shape="ainfix =amodelaTuple2V0c1asingletonagetV0c0F">
+    <proof
+     prover="cvc3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.04"/>
+    </proof>
+    <proof
+     prover="alt-ergo"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="z3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.09"/>
+    </proof>
+   </goal>
+   <goal
+    name="Model_set"
+    sum="ef1dc6af4dc8eab66cb900b866b70333"
+    proved="true"
+    expanded="true"
+    shape="ainfix =aaddagetV0V3amodelaTuple2V1V4aaddV2amodelaTuple2V0V4Iainfix =V1asetV0V3V2Iainfix <V3V4Aainfix <=c0V3F">
+    <proof
+     prover="coq"
+     timelimit="5"
+     edited="heap_model_Model_Model_set_1.v"
+     obsolete="false">
+     <result status="valid" time="0.59"/>
+    </proof>
+   </goal>
+   <goal
+    name="Model_add_last"
+    sum="89a15a0c9278e62f88487a33a56d8f92"
+    proved="true"
+    expanded="true"
+    shape="ainfix =amodelaTuple2V0ainfix +V1c1aaddagetV0V1amodelaTuple2V0V1Iainfix >=V1c0F">
+    <proof
+     prover="cvc3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.04"/>
+    </proof>
+    <proof
+     prover="z3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.06"/>
+    </proof>
+   </goal>
+  </theory>
+ </file>
+ <file
+  name="../heap.why"
+  verified="true"
+  expanded="false">
+  <theory
+   name="Heap"
+   verified="true"
+   expanded="false">
+   <goal
+    name="Parent_inf"
+    sum="2f02f8911f85ab4824eecd8b6b24e05a"
+    proved="true"
+    expanded="false"
+    shape="ainfix <aparentV0V0Iainfix <c0V0F">
+    <proof
+     prover="cvc3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="alt-ergo"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="z3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+   </goal>
+   <goal
+    name="Left_sup"
+    sum="d9f9545205639e26459fdc472539de81"
+    proved="true"
+    expanded="false"
+    shape="ainfix <V0aleftV0Iainfix <=c0V0F">
+    <proof
+     prover="cvc3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="alt-ergo"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="z3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+   </goal>
+   <goal
+    name="Right_sup"
+    sum="3918dc47591e9c5dc9d2085bb5bb0b5d"
+    proved="true"
+    expanded="false"
+    shape="ainfix <V0arightV0Iainfix <=c0V0F">
+    <proof
+     prover="cvc3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="alt-ergo"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+    <proof
+     prover="z3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+   </goal>
+   <goal
+    name="Parent_right"
+    sum="a65be0562846b0e05c0afc27c046b01b"
+    proved="true"
+    expanded="false"
+    shape="ainfix =aparentarightV0V0Iainfix <=c0V0F">
+    <proof
+     prover="cvc3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="alt-ergo"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+    <proof
+     prover="z3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.04"/>
+    </proof>
+   </goal>
+   <goal
+    name="Parent_left"
+    sum="691b4e3fe49ed385ea38d9600cbeb1b2"
+    proved="true"
+    expanded="false"
+    shape="ainfix =aparentaleftV0V0Iainfix <=c0V0F">
+    <proof
+     prover="cvc3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+    <proof
+     prover="alt-ergo"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="z3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.04"/>
+    </proof>
+   </goal>
+   <goal
+    name="Inf_parent"
+    sum="268d11d03d11ba72c347be89cc15e170"
+    proved="true"
+    expanded="false"
+    shape="ainfix <=aparentV1V0Iainfix <=V1arightV0Aainfix <c0V1F">
+    <proof
+     prover="cvc3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+    <proof
+     prover="alt-ergo"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="z3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+   </goal>
+   <goal
+    name="Child_parent"
+    sum="b3b1b97f647b8e187b1d2edaf5dd4469"
+    proved="true"
+    expanded="false"
+    shape="ainfix =V0arightaparentV0Oainfix =V0aleftaparentV0Iainfix <c0V0F">
+    <proof
+     prover="cvc3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="2.78"/>
+    </proof>
+    <proof
+     prover="alt-ergo"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.15"/>
+    </proof>
+    <proof
+     prover="z3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+   </goal>
+   <goal
+    name="Parent_pos"
+    sum="f6ba943ccc844c74db35836f78be26c7"
+    proved="true"
+    expanded="false"
+    shape="ainfix <=c0aparentV0Iainfix <c0V0F">
+    <proof
+     prover="cvc3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="alt-ergo"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="z3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="Is_heap_when_no_element"
+    sum="06c2dce1a38439abbd02370ff22d15fb"
+    proved="true"
+    expanded="false"
+    shape="ais_heap_arrayV0V1V2Iainfix <=V2V1Aainfix <=c0V2F">
+    <proof
+     prover="cvc3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="alt-ergo"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="z3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.04"/>
+    </proof>
+   </goal>
+   <goal
+    name="Is_heap_sub"
+    sum="9854ea974f1b8af2b60f3c1908aa18b8"
+    proved="true"
+    expanded="false"
+    shape="ais_heap_arrayV0V1V3Iainfix <=V3V2Aainfix <=V1V3FIais_heap_arrayV0V1V2F">
+    <proof
+     prover="cvc3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="alt-ergo"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+    <proof
+     prover="z3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.04"/>
+    </proof>
+   </goal>
+   <goal
+    name="Is_heap_sub2"
+    sum="9166a9733b88425fda50655236570ce1"
+    proved="true"
+    expanded="false"
+    shape="ais_heap_arrayV0V2V1Iainfix <=V2V1Aainfix <=c0V2FIais_heap_arrayV0c0V1F">
+    <proof
+     prover="cvc3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="alt-ergo"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="z3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.04"/>
+    </proof>
+   </goal>
+   <goal
+    name="Is_heap_when_node_modified"
+    sum="0c9dc882311894972d54b01c940eb98c"
+    proved="true"
+    expanded="false"
+    shape="ais_heap_arrayasetV0V4V2V3V1Iainfix <=V2agetV0arightV4Iainfix <arightV4V1Iainfix <=V2agetV0aleftV4Iainfix <aleftV4V1Iainfix <=agetV0aparentV4V2Iainfix >V4c0Iais_heap_arrayV0V3V1Iainfix <V4V1Aainfix <=c0V4F">
+    <proof
+     prover="cvc3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.39"/>
+    </proof>
+    <proof
+     prover="alt-ergo"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.79"/>
+    </proof>
+    <proof
+     prover="z3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.12"/>
+    </proof>
+   </goal>
+   <goal
+    name="Is_heap_add_last"
+    sum="6c82bcaf37481ac71c595fdc8504a81e"
+    proved="true"
+    expanded="false"
+    shape="ais_heap_arrayasetV0V1V2c0ainfix +V1c1Iainfix >=V2agetV0aparentV1Aais_heap_arrayV0c0V1Iainfix >V1c0F">
+    <proof
+     prover="cvc3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.11"/>
+    </proof>
+    <proof
+     prover="z3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.05"/>
+    </proof>
+   </goal>
+   <goal
+    name="Parent_inf_el"
+    sum="0e0de3357bc3781992d2307cd14851df"
+    proved="true"
+    expanded="false"
+    shape="ainfix <=agetV0aparentV2agetV0V2Iainfix <V2V1Aainfix <c0V2FIais_heap_arrayV0c0V1F">
+    <proof
+     prover="cvc3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.04"/>
+    </proof>
+    <proof
+     prover="z3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.06"/>
+    </proof>
+   </goal>
+   <goal
+    name="Left_sup_el"
+    sum="248b4bc3e541cfa3191462e422d6b9fe"
+    proved="true"
+    expanded="false"
+    shape="ainfix <=agetV0V2agetV0aleftV2Iainfix <aleftV2V1Iainfix <V2V1Aainfix <=c0V2FIais_heap_arrayV0c0V1F">
+    <proof
+     prover="cvc3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="alt-ergo"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.04"/>
+    </proof>
+    <proof
+     prover="z3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.05"/>
+    </proof>
+   </goal>
+   <goal
+    name="Right_sup_el"
+    sum="5d23eae08e6625fdd82ff810ce730ee1"
+    proved="true"
+    expanded="false"
+    shape="ainfix <=agetV0V2agetV0arightV2Iainfix <arightV2V1Iainfix <V2V1Aainfix <=c0V2FIais_heap_arrayV0c0V1F">
+    <proof
+     prover="cvc3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+    <proof
+     prover="alt-ergo"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.04"/>
+    </proof>
+    <proof
+     prover="z3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.04"/>
+    </proof>
+   </goal>
+   <goal
+    name="Is_heap_relation"
+    sum="b035b0972e0310127c7535db47f4fd8e"
+    proved="true"
+    expanded="false"
+    shape="ainfix <=agetV0c0agetV0V2Iainfix <V2V1Iainfix <=c0V2FIais_heap_arrayV0c0V1Iainfix >V1c0F">
+    <proof
+     prover="coq"
+     timelimit="5"
+     edited="heap_Heap_Is_heap_relation_1.v"
+     obsolete="false">
+     <result status="valid" time="0.50"/>
+    </proof>
    </goal>
   </theory>
  </file>

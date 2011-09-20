@@ -1430,13 +1430,17 @@ let open_session ~allow_obsolete ~env ~config ~init ~notify dir =
         current_provers :=
           Util.Mstr.fold (get_prover_data env) provers Util.Mstr.empty;
         begin try
-          let xml = Xml.from_file (Filename.concat dir db_filename) in
-          load_session ~env xml;
-          reload_all allow_obsolete
+          let xml =
+            Xml.from_file (Filename.concat dir db_filename)
+          in
+          try
+            load_session ~env xml;
+            reload_all allow_obsolete
+          with Sys_error msg ->
+            failwith ("Open session: sys error " ^ msg)
         with
           | Sys_error _msg ->
               (* xml does not exist yet *)
-              (*failwith ("Open session: sys error " ^ msg)*)
 	      false
           | Xml.Parse_error s ->
               Format.eprintf "XML database corrupted, ignored (%s)@." s;
