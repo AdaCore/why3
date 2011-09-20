@@ -278,7 +278,10 @@ let () =
   view_name_column#pack name_renderer;
   view_name_column#add_attribute name_renderer "text" name_column;
   view_name_column#set_resizable true;
-  view_name_column#set_max_width 400;
+  view_name_column#set_max_width 800;
+(*
+  view_name_column#set_alignment 1.0;
+*)
   ()
 
 let view_status_column =
