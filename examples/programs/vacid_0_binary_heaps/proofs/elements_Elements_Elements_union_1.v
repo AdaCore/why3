@@ -2,18 +2,6 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import ZArith.
 Require Import Rbase.
-Definition unit  := unit.
-
-Parameter qtmark : Type.
-
-Parameter at1: forall (a:Type), a -> qtmark -> a.
-
-Implicit Arguments at1.
-
-Parameter old: forall (a:Type), a -> a.
-
-Implicit Arguments old.
-
 Parameter bag : forall (a:Type), Type.
 
 Parameter nb_occ: forall (a:Type), a -> (bag a) -> Z.
@@ -189,133 +177,32 @@ Axiom Elements_add : forall (a:Type), forall (a1:(map Z a)) (i:Z) (j:Z),
 Axiom Elements_singleton : forall (a:Type), forall (a1:(map Z a)) (i:Z)
   (j:Z), (j = (i + 1%Z)%Z) -> ((elements a1 i j) = (singleton (get a1 i))).
 
-Axiom Elements_union : forall (a:Type), forall (a1:(map Z a)) (i:Z) (j:Z)
-  (k:Z), ((i <= j)%Z /\ (j <= k)%Z) -> ((elements a1 i
-  k) = (union (elements a1 i j) (elements a1 j k))).
-
-Axiom Elements_add1 : forall (a:Type), forall (a1:(map Z a)) (i:Z) (j:Z),
-  (i <  j)%Z -> ((elements a1 i j) = (add (get a1 i) (elements a1 (i + 1%Z)%Z
-  j))).
-
-Axiom Elements_remove_last : forall (a:Type), forall (a1:(map Z a)) (i:Z)
-  (j:Z), (i <  (j - 1%Z)%Z)%Z -> ((elements a1 i
-  (j - 1%Z)%Z) = (diff (elements a1 i j) (singleton (get a1 (j - 1%Z)%Z)))).
-
-Axiom Occ_elements : forall (a:Type), forall (a1:(map Z a)) (i:Z) (j:Z)
-  (n:Z), ((i <= j)%Z /\ (j <  n)%Z) -> (0%Z <  (nb_occ (get a1 j)
-  (elements a1 i n)))%Z.
-
-Axiom Elements_set_outside : forall (a:Type), forall (a1:(map Z a)) (i:Z)
-  (j:Z), (i <= j)%Z -> forall (k:Z), ((k <  i)%Z \/ (j <= k)%Z) ->
-  forall (e:a), ((elements (set a1 k e) i j) = (elements a1 i j)).
-
-Axiom Elements_set_inside : forall (a:Type), forall (a1:(map Z a)) (i:Z)
-  (j:Z) (n:Z) (e:a) (b:(bag a)), ((i <= j)%Z /\ (j <  n)%Z) -> (((elements a1
-  i n) = (add (get a1 j) b)) -> ((elements (set a1 j e) i n) = (add e b))).
-
-Axiom Elements_set_inside2 : forall (a:Type), forall (a1:(map Z a)) (i:Z)
-  (j:Z) (n:Z) (e:a), ((i <= j)%Z /\ (j <  n)%Z) -> ((elements (set a1 j e) i
-  n) = (add e (diff (elements a1 i n) (singleton (get a1 j))))).
-
-Parameter min_bag: (bag Z) -> Z.
-
-
-Axiom Min_bag_singleton : forall (x:Z), ((min_bag (singleton x)) = x).
-
-Axiom Min_bag_union : forall (x:(bag Z)) (y:(bag Z)), ((min_bag (union x
-  y)) = (Zmin (min_bag x) (min_bag y))).
-
-Axiom Min_bag_union1 : forall (x:(bag Z)) (y:(bag Z)) (a:Z), (x = (add a
-  y)) -> ((min_bag x) = (Zmin a (min_bag y))).
-
-Axiom Min_bag_union2 : forall (x:(bag Z)) (a:Z), (a <= (min_bag x))%Z ->
-  (a <= (min_bag (add a x)))%Z.
-
-Inductive ref (a:Type) :=
-  | mk_ref : a -> ref a.
-Implicit Arguments mk_ref.
-
-Definition contents (a:Type)(u:(ref a)): a :=
-  match u with
-  | (mk_ref contents1) => contents1
-  end.
-Implicit Arguments contents.
-
-Inductive array1 (a:Type) :=
-  | mk_array : Z -> (map Z a) -> array1 a.
-Implicit Arguments mk_array.
-
-Definition elts (a:Type)(u:(array1 a)): (map Z a) :=
-  match u with
-  | (mk_array _ elts1) => elts1
-  end.
-Implicit Arguments elts.
-
-Definition length (a:Type)(u:(array1 a)): Z :=
-  match u with
-  | (mk_array length1 _) => length1
-  end.
-Implicit Arguments length.
-
-Definition get1 (a:Type)(a1:(array1 a)) (i:Z): a := (get (elts a1) i).
-Implicit Arguments get1.
-
-Definition set1 (a:Type)(a1:(array1 a)) (i:Z) (v:a): (array1 a) :=
-  match a1 with
-  | (mk_array xcl0 _) => (mk_array xcl0 (set (elts a1) i v))
-  end.
-Implicit Arguments set1.
-
-Definition sorted_sub(a:(map Z Z)) (l:Z) (u:Z): Prop := forall (i1:Z) (i2:Z),
-  (((l <= i1)%Z /\ (i1 <= i2)%Z) /\ (i2 <  u)%Z) -> ((get a i1) <= (get a
-  i2))%Z.
-
-Definition sorted_sub1(a:(array1 Z)) (l:Z) (u:Z): Prop :=
-  (sorted_sub (elts a) l u).
-
-Definition sorted(a:(array1 Z)): Prop := (sorted_sub (elts a) 0%Z
-  (length a)).
-
-Parameter logic_heap : Type.
-
-Parameter model: logic_heap -> (bag Z).
-
-
 (* YOU MAY EDIT THE CONTEXT BELOW *)
 
 (* DO NOT EDIT BELOW *)
 
-Theorem Min_of_sorted : forall (a:(map Z Z)) (i:Z) (n:Z), ((0%Z <= i)%Z /\
-  (i <  n)%Z) -> ((sorted_sub a 0%Z n) -> ((min_bag (elements a i
-  n)) = (get a i))).
+Theorem Elements_union : forall (a:Type), forall (a1:(map Z a)) (i:Z) (j:Z)
+  (k:Z), ((i <= j)%Z /\ (j <= k)%Z) -> ((elements a1 i
+  k) = (union (elements a1 i j) (elements a1 j k))).
 (* YOU MAY EDIT THE PROOF BELOW *)
-intros a i n H_i_n H_sorted.
-generalize (H_sorted) (H_i_n).
-apply (Z_lt_induction 
-  (fun n => sorted_sub a 0 n -> 0 <= i < n -> 
-    min_bag (elements a i n) = get a i)%Z); 
-  auto with zarith.
-intros j H_induc H_sorted_j H_i_j.
-assert (h: (i = j-1 \/ i < j-1)%Z) by omega.
-   destruct h.
-   (* case i = j-1 *)
-   subst.
-   rewrite Elements_singleton; auto with zarith.
-   rewrite Min_bag_singleton; auto.
-   (* case i < j-1 *)
-   rewrite Elements_add; auto with zarith.
-   rewrite Min_bag_union1 with 
-      (a:= (get a (j-1))%Z) 
-      (y:= (elements a i (j-1)));
-     auto.
-   assert (h: (get a i <= get a (n-1))%Z).
-      apply H_sorted; intuition.
-   rewrite Min_y; auto.
-   rewrite <- (H_induc (j-1)%Z); auto with zarith.
-   unfold sorted_sub; auto with zarith.
-   pattern (min_bag (elements a i (j-1))); 
-     rewrite H_induc; auto with zarith.
-   unfold sorted_sub; auto with zarith.
+intros X a i j k (H0, H1).
+apply Zlt_lower_bound_ind with (z := j)
+     (P := fun k => elements a i k = union (elements a i j) (elements a j k)); auto.
+intros x H_ind H.
+assert (h: (j = x \/ j < x)%Z) by omega.
+  destruct h.
+  (*  j = x *)
+  subst x.
+   rewrite Elements_empty with (i := j); auto.
+   rewrite Union_identity; auto.
+   (* j < x *)
+   rewrite Elements_add with (i := j); auto.
+   rewrite Elements_add with (i := i); auto with zarith.
+   unfold add.
+   rewrite H_ind with (y := (x - 1)%Z); auto with zarith.
+   apply bag_extensionality.
+   intro z.
+   repeat rewrite occ_union; auto with zarith.
 Qed.
 (* DO NOT EDIT BELOW *)
 

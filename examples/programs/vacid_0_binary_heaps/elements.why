@@ -12,7 +12,7 @@ function elements (a:array 'a) (i j:int) : bag 'a
 axiom Elements_empty : forall a:array 'a, i j:int.
      i >= j -> (elements a i j) = empty_bag
 
-axiom Elements_union2 : forall a:array 'a, i j :int.
+axiom Elements_add : forall a:array 'a, i j :int.
        i < j ->
        (elements a i j) = (add (A.get a (j-1)) (elements a i (j-1)))
 
@@ -24,7 +24,7 @@ lemma Elements_union : forall a:array 'a, i j k:int.
      i <= j <= k  ->
       (elements a i k) = (union (elements a i j) (elements a j k))
 
-lemma Elements_union1 : forall a:array 'a, i j :int.
+lemma Elements_add1 : forall a:array 'a, i j :int.
       i < j ->
       (elements a i j) = (add (A.get a i) (elements a (i+1) j))
 
