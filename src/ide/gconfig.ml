@@ -444,11 +444,18 @@ let preferences c =
   in
   (** page 2 **)
   let label2 = GMisc.label ~text:"Colors" () in
-  let _page2 = GMisc.color_selection (* ~title:"Goal color" *)
+  let _color_sel = GMisc.color_selection (* ~title:"Goal color" *)
     ~show:true
     ~packing:(fun w -> ignore(notebook#append_page
                                 ~tab_label:label2#coerce w)) ()
   in
+(*
+  let (_ : GtkSignal.id) =
+    color_sel#connect ColorSelection.S.color_changed ~callback:
+      (fun _ -> Format.eprintf "Gconfig.color_sel : %s@."
+         c)
+  in
+*)
   (** page 3 **)
   let label3 = GMisc.label ~text:"Provers" () in
   let _page3 = GMisc.label ~text:"This page should display detected provers"

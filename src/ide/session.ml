@@ -1164,7 +1164,7 @@ let reload_root_goal ~allow_obsolete mth tname old_goals t : goal =
   in
   if goal_obsolete then
     begin
-      eprintf "[Reload] Goal %s.%s has changed@." tname gname;
+      eprintf "[Reload] Goal %s.%s has changed@\n" tname gname;
       if allow_obsolete then
         found_obsolete := true
       else
