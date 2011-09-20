@@ -25,8 +25,8 @@ let includes = ref []
 let file = ref None
 let opt_version = ref false
 let opt_stats = ref true
-let opt_latex = ref false
-let opt_latex2 = ref false
+let opt_latex = ref ""
+let opt_latex2 = ref ""
 let opt_force = ref false
 
 let spec = Arg.align [
@@ -43,10 +43,10 @@ let spec = Arg.align [
    Arg.Set opt_version,
    " print version information") ;
   ("-latex",
-   Arg.Set opt_latex,
+   Arg.Set_string opt_latex,
    " produce latex statistics") ;
   ("-latex2",
-   Arg.Set opt_latex2,
+   Arg.Set_string opt_latex2,
    " produce latex statistics") ;
 ]
 
@@ -314,7 +314,6 @@ and goal_depth g =
  
 let theory_depth t = 
   List.fold_left (fun depth g -> max depth (goal_depth g)) 0 (M.goals t)
-(*  List.iter (max depth (goal_depth 0)) (M.goals t)*)
  
 let rec provers_latex_stats provers g = 
   let proofs = M.external_proofs g in
@@ -324,43 +323,52 @@ let rec provers_latex_stats provers g =
     let goals = tr.M.subgoals in
     List.iter (provers_latex_stats provers) goals) tr
 
-let rec goal_latex_stat n prov depth depth_max first g =
+let rec goal_latex_stat n fmt prov depth depth_max first g =
   if(n ==1) then begin
     if not first then
-      for i = 1 to depth do printf "&" done
+      for i = 1 to depth do fprintf fmt "&" done
     else
-      if depth > 0 then printf "&"
+      if depth > 0 then fprintf fmt "&"
 	end
   else begin
-    for i = 1 to depth do printf "\\quad" done
+    for i = 1 to depth do fprintf fmt "\\quad" done
   end;
-  printf "\\verb|%s| " (M.goal_expl g);
+  if (depth <= 1) then 
+    fprintf fmt "\\verb|%s| " (M.goal_expl g);
   let proofs = M.external_proofs g in
   if (Hashtbl.length proofs) > 0 then 
     begin
+      if (n == 1) then 
+	begin 
       if depth > 0 then 
-	for i = depth to (depth_max - depth) do printf "&" done
+	for i = depth to (depth_max - depth) do fprintf fmt "&" done
       else 
-	for i = depth to (depth_max - depth - 1) do printf "&" done;
-      Hashtbl.iter (fun p _pr -> 
+	for i = depth to (depth_max - depth - 1) do fprintf fmt "&" done;
+	end;
+      List.iter (fun (p, _pr) -> 
 	try 
 	  let pr = Hashtbl.find proofs p in
 	  let s = pr.M.proof_state in
 	  match s with
 	      Session.Done res ->
 		if res.Call_provers.pr_answer = Call_provers.Valid
-		then  printf "& %.2f " res.Call_provers.pr_time
-		else printf "& - "
-	    | _ -> printf "& " 
-	with Not_found -> printf "&") prov;
-      printf "\\\\ \\hline @.";
+		then  fprintf fmt "& %.2f " res.Call_provers.pr_time
+		else fprintf fmt "& - "
+	    | _ -> fprintf fmt "& " 
+	with Not_found -> fprintf fmt "&") prov;
+      fprintf fmt "\\\\ \\hline @.";
     end
   else begin
     let tr = M.transformations g in
+    if (n == 2) then 
+      begin 
+	for i = 1 to (List.length prov) do fprintf fmt "&" done;
+      fprintf fmt "\\\\ \\hline @."
+      end;
     Hashtbl.iter (fun _st tr -> 
       let goals = tr.M.subgoals in
       let _ = List.fold_left (fun first g -> 
-	goal_latex_stat n prov (depth + 1) depth_max first g; false) true  goals in 
+	goal_latex_stat n fmt prov (depth + 1) depth_max first g; false) true  goals in 
     () ) tr
   end
 
@@ -369,27 +377,36 @@ let prover_name a =
       M.Detected_prover d -> d.Session.prover_name ^ " " ^ d.Session.prover_version
     | M.Undetected_prover s -> s
 
-let theory_latex_stat n t =
+let theory_latex_stat n dir t =
   let provers = Hashtbl.create 9 in
-  let depth = theory_depth  t in
   List.iter (provers_latex_stats provers) (M.goals t);
-  printf "\n@.";
-  printf "\\begin{tabular}";
-  printf "{| l |";
-  for i = 0 to (Hashtbl.length provers) + depth do printf "c |" done;
-  printf "} \n \\hline@.";
-  printf " \\multicolumn{%d}{|c|}{Proof obligations } " (depth + 1);
-  Hashtbl.iter (fun _ a-> printf "& %s " (prover_name a)) provers;
-  printf "\\\\\\hline@.";
-  List.iter (goal_latex_stat n provers 0 depth true) (M.goals t);
-  printf "\\end{tabular}@." 
+  let provers = Hashtbl.fold (fun p pr acc -> (p, prover_name pr) :: acc) provers [] in 
+  let provers = 
+    List.sort (fun (_p1, n1) (_p2, n2) -> String.compare n1 n2) provers in 
+  let depth = theory_depth  t in
+  let name = M.theory_name t in 
+  let ch = open_out (Filename.concat dir(name^".tex")) in 
+  let fmt = formatter_of_out_channel ch in 
+      fprintf fmt "\\begin{tabular}";
+  fprintf fmt "{| l |";
+  for i = 0 to (List.length provers) + depth do fprintf fmt "c |" done;
+  fprintf fmt "} \n \\hline@.";
+  if (n == 1) then
+    fprintf fmt " \\multicolumn{%d}{|c|}{Proof obligations } " (depth + 1)
+  else 
+    fprintf fmt " Proof obligations ";
+  List.iter (fun (_, a) -> fprintf fmt "& %s " a) provers;
+  fprintf fmt "\\\\\\hline@.";
+  List.iter (goal_latex_stat n fmt provers 0 depth true) (M.goals t);
+  fprintf fmt "\\end{tabular}@.";
+  close_out ch
 
-let file_latex_stat n f =
-   List.iter (theory_latex_stat n) f.M.theories
+let file_latex_stat n dir f =
+   List.iter (theory_latex_stat n dir) f.M.theories
 
-let print_latex_statistics n =
+let print_latex_statistics n dir =
   let files = M.get_all_files () in
-  List.iter (file_latex_stat n) files
+  List.iter (file_latex_stat n dir) files
 
 let print_report (g,p,r) =
   printf "   goal '%s', prover '%s': " g p;
@@ -416,10 +433,14 @@ let () =
     M.maximum_running_proofs :=
       Whyconf.running_provers_max (Whyconf.get_main config);
     eprintf " done@.";
-    let callback report =
-      let files,n,m =
-        List.fold_left file_statistics ([],0,0) (M.get_all_files ())
-      in
+    if !opt_latex <> "" then print_latex_statistics 1 !opt_latex
+    else 
+    if !opt_latex2 <> "" then print_latex_statistics 2 !opt_latex2
+    else 
+      let callback report =
+	let files,n,m =
+          List.fold_left file_statistics ([],0,0) (M.get_all_files ())
+	in
       match report with
         | [] ->
             if found_obs then
@@ -433,8 +454,6 @@ let () =
             else
               printf " %d/%d@." n m ;
             if !opt_stats && n<m then print_statistics files;
-	    if !opt_latex then print_latex_statistics (1);
-	    if !opt_latex2 then print_latex_statistics (2);
             eprintf "Everything replayed OK.@.";
             if found_obs && (n=m || !opt_force) then
               begin
