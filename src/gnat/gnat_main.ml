@@ -176,9 +176,9 @@ let _ =
             with Not_Proven ->
                Format.printf "%a@." (Gnat_expl.print_expl false) expl)
          !expl_map
-   with
-      Loc.Located (p,_) ->
-         Format.printf "%a: an error occurred@." Loc.gen_report_position p
+    with e when not (Debug.test_flag Debug.stack_trace) ->
+      Format.eprintf "%a@." Exn_printer.exn_printer e;
+      exit 1
 
 
 
