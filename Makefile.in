@@ -368,23 +368,23 @@ $(GNATCMO) $(GNATCMX): INCLUDES += -I src/programs -I src/gnat -I src/util
 
 # build targets
 
-byte: bin/gnat3why.byte
-opt:  bin/gnat3why.opt
+byte: bin/gnatwhy3.byte
+opt:  bin/gnatwhy3.opt
 
-bin/gnat3why.opt: src/why3.cmxa $(PGMCMX) $(GNATCMX)
+bin/gnatwhy3.opt: src/why3.cmxa $(PGMCMX) $(GNATCMX)
 	$(if $(QUIET), @echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
 	$(STRIP) $@
 
-bin/gnat3why.byte: src/why3.cma $(PGMCMO) $(GNATCMO)
+bin/gnatwhy3.byte: src/why3.cma $(PGMCMO) $(GNATCMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
 
-bin/gnat3why: bin/gnat3why.@OCAMLBEST@
-	ln -sf gnat3why.@OCAMLBEST@ $@
+bin/gnatwhy3: bin/gnatwhy3.@OCAMLBEST@
+	ln -sf gnatwhy3.@OCAMLBEST@ $@
 
 install_no_local::
-	cp -f bin/gnat3why.@OCAMLBEST@ $(BINDIR)/gnat3why
+	cp -f bin/gnatwhy3.@OCAMLBEST@ $(BINDIR)/gnatwhy3
 
 include .depend.gnat
 
@@ -396,7 +396,7 @@ depend: .depend.gnat
 clean::
 	rm -f src/gnat/*.cm[iox] src/gnat/*.o
 	rm -f src/gnat/*.annot src/gnat/*~
-	rm -f bin/gnat3why.byte bin/gnat3why.opt bin/gnat3why
+	rm -f bin/gnatwhy3.byte bin/gnatwhy3.opt bin/gnatwhy3
 	rm -f .depend.gnat
 
 ##########
