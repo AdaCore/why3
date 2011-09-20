@@ -675,7 +675,8 @@ let bool_to_prop env f =
   and f_btop f = match f.t_node with
     | Tapp (ls, [{t_ty = Some {ty_node = Tyapp (ts, [])}} as l; r])
     when ls_equal ls ps_equ && ts_equal ts ts_bool ->
-        t_label_copy f (t_iff_simp (t_btop l) (t_btop r))
+        t_label ?loc:f.t_loc f.t_label
+          (t_iff_simp (t_btop l) (t_btop r))
     | _ -> t_map f_btop f
   in
   f_btop f
@@ -691,7 +692,7 @@ let rec remove_at f = match f.t_node with
 let add_wp_decl ps f uc =
   let name = ps.ps_pure.ls_name in
   let s = "WP_" ^ name.id_string in
-  let label = 
+  let label =
     ("expl:" ^ name.id_string) :: ps.ps_pure.ls_name.id_label
   in
   let id = id_fresh ~label ?loc:name.id_loc s in
