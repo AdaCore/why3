@@ -1,19 +1,25 @@
 
-(*
-module MutualRec
+module Test
 
-  use import int.Int
+  use import module ref.Ref
 
-  let rec f (x1 x2: int) : int variant { x1+x2 } =
-    { x1 >= 0 && x2 >= 0 } if x1 <= 1 then 0 else g (x1-1) x2 { result = 0 }
+  type foo = (ref int, ref int)
 
-  with g (y1: int) variant { y1 } =
-    { y1 >= 0  }
-    f (y1-1)
-    { 0 = 0 }
+  let test_foo (f: foo) =
+    let r = ref 0 in
+    let y = (r, r) in
+    let (x,_) = y in (* local reference would escape its scope *)
+    r
+
+  let test () =
+    let f = ref in
+    let x = f 0 in
+    let y = f 1 in
+    assert { !x = 0 /\ !y = 1 };
+    x := 2;
+    assert { !x = 2 /\ !y = 1 } (* BUG: alias should be detected *)
 
 end
-*)
 
 module M
 
@@ -24,18 +30,20 @@ module M
     let x = ref 0 in
     while !x = 0 do variant { !x } () done
 
-(***
+(*
   use import option.Option
 
   val clear (o : option (ref int)) :
-    {} unit writes (match o with Some r -> r end).contents { !r = 0 }
-***)
+    {}
+    unit writes (match o with Some r -> r end).contents
+    { match o with None -> true | Some r -> !r = 0 end }
+*)
 
   (* BUG: x escapes its scope (in the postcondition) => should be an error *)
   (* let scope (a: ref int) = let x = a in fun () -> {} x := 0 { !x = 0 } *)
 
-(*   let foo (a: ref int) = let x = a in fun () -> {} x := 0 { !a = 0 } *)
-(*   let test3 () = let x = ref 0 in begin foo x (); assert { !x = 0 } end *)
+  (* let foo (a: ref int) = let x = a in fun () -> {} x := 0 { !a = 0 } *)
+  (* let test3 () = let x = ref 0 in begin foo x (); assert { !x = 0 } end *)
 
 end
 
