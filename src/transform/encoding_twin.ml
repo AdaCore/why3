@@ -124,5 +124,22 @@ let decl tenv d =
 let t = Trans.on_tagged_ty Libencoding.meta_kept (fun s ->
   Trans.decl (decl (Mty.mapi make_pont s)) None)
 
-let () = Hashtbl.replace Encoding.ft_enco_kept "twin" (const t)
+(* Every finite protected type has a finite twin type. But
+   as we do not introduce twin types explicitly, we declare
+   a dummy type constant finite. This is enough to trigger
+   the safety in Encoding_explicit. *)
 
+let ts_dummy = Ty.create_tysymbol (id_fresh "finite_twin_type") [] None
+
+let enum =
+  Trans.on_tagged_ty Libencoding.meta_kept (fun kept ->
+  Trans.on_tagged_ts Eliminate_algebraic.meta_enum (fun enum ->
+  Trans.on_meta Eliminate_algebraic.meta_phantom (fun phlist ->
+    let finite_ty = Eliminate_algebraic.is_finite_ty enum phlist in
+    if not (Sty.exists finite_ty kept) then Trans.identity else
+      Trans.add_tdecls [create_meta Eliminate_algebraic.meta_enum
+        [MAts ts_dummy]])))
+
+let twin = const (Trans.compose t enum)
+
+let () = Hashtbl.replace Encoding.ft_enco_kept "twin" twin

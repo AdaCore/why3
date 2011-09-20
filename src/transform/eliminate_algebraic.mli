@@ -24,3 +24,6 @@ val compile_match : Task.task Trans.trans
 
 val meta_enum : Theory.meta (* [MTtysymbol] *)
 val meta_phantom : Theory.meta (* [MTtysymbol; MTint] *)
+
+(* tests whether a type is finite given [meta_enum] and [meta_phantom] *)
+val is_finite_ty : Ty.Sts.t -> Theory.meta_arg list list -> (Ty.ty -> bool)
