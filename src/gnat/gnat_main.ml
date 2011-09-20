@@ -166,7 +166,6 @@ let _ =
       let m = Env.read_file env fn in
       (* fill map of explanations *)
       Util.Mstr.iter do_theory m;
-      Format.printf "built map of explanations@.";
       Gnat_expl.MExpl.iter
          (fun expl tl ->
             try
