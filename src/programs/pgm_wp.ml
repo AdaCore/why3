@@ -691,7 +691,9 @@ let rec remove_at f = match f.t_node with
 let add_wp_decl ps f uc =
   let name = ps.ps_pure.ls_name in
   let s = "WP_" ^ name.id_string in
-  let label = ["expl:" ^ name.id_string] in
+  let label = 
+    ("expl:" ^ name.id_string) :: ps.ps_pure.ls_name.id_label
+  in
   let id = id_fresh ~label ?loc:name.id_loc s in
   let f = bool_to_prop uc (remove_at f) in
   let km = get_known (pure_uc uc) in

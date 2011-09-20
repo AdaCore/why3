@@ -36,7 +36,7 @@ lemma method_error
     forall x:real.
     abs x  <=. 0x1p-5 -> abs (1.0 -. x*.x*.0.5 -. cos x) <=. 0x1p-24
 
-let my_cosine "Safety of function my_cosine" #"my_cosine.c" 8 0 153#
+let my_cosine "expl:Safety of function my_cosine" #"my_cosine.c" 8 0 153#
     (x:single) : single =
 { abs (value x) <=. 0x1p-5 }
   assert {
