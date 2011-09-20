@@ -1,15 +1,16 @@
 open Why3
 open Term
 
-let config = Whyconf.read_config None
+let config =
+   try Whyconf.read_config (Some "why3.conf")
+   with Rc.CannotOpen _ ->
+      prerr_endline "Cannot file why3.conf. Aborting.";
+      exit 1
+
 let config_main = Whyconf.get_main (config)
 
 let env =
    let loadpath = "." :: Whyconf.loadpath config_main in
-   let loadpath =
-      try Sys.getenv "WHYLIB" :: loadpath
-      with Not_found -> loadpath
-   in
    Env.create_env_of_loadpath loadpath
 
 let is_not_why_loc s =
