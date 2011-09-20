@@ -350,7 +350,7 @@ let rec goal_latex_stat n prov depth depth_max first g =
 	      Session.Done res ->
 		if res.Call_provers.pr_answer = Call_provers.Valid
 		then  printf "& %.2f " res.Call_provers.pr_time
-		else printf "& --- "
+		else printf "& - "
 	    | _ -> printf "& " 
 	with Not_found -> printf "&") prov;
       printf "\\\\ \\hline @.";
