@@ -1190,20 +1190,21 @@ let color_loc ~color loc =
   if f = !current_file then color_loc ~color source_view l b e
 
 let rec color_locs ~color f =
-  Util.option_iter (color_loc ~color) f.Term.t_loc;
-  Term.t_fold (fun () -> color_locs ~color) () f
+  let b = ref false in
+  Util.option_iter (fun loc -> color_loc ~color loc; b := true) f.Term.t_loc;
+  Term.t_fold (fun b loc -> color_locs ~color loc || b) !b f
 
 (* FIXME: we shouldn't open binders _every_time_ we redraw screen!!!
    No t_fold, no t_open_quant! *)
 let rec color_t_locs f =
   match f.Term.t_node with
     | Term.Tbinop (Term.Timplies,f1,f2) ->
-        color_locs ~color:premise_tag f1;
-        color_t_locs f2
+        let b = color_locs ~color:premise_tag f1 in
+        color_t_locs f2 || b
     | Term.Tlet (t,fb) ->
         let _,f1 = Term.t_open_bound fb in
-        color_locs ~color:premise_tag t;
-        color_t_locs f1
+        let b = color_locs ~color:premise_tag t in
+        color_t_locs f1 || b
     | Term.Tquant (Term.Tforall,fq) ->
         let _,_,f1 = Term.t_open_quant fq in
         color_t_locs f1
@@ -1219,7 +1220,8 @@ let scroll_to_source_goal g =
         { Task.task_decl =
             { Theory.td_node =
                 Theory.Decl { Decl.d_node = Decl.Dprop (Decl.Pgoal, _, f)}}} ->
-        color_t_locs f
+        if not (color_t_locs f) then
+          Util.option_iter (color_loc ~color:goal_tag) id.Ident.id_loc
     | _ ->
         assert false
 
