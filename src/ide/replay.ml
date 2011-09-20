@@ -332,12 +332,12 @@ let prover_name a =
 let rec goal_latex_stat n fmt prov depth depth_max first g =
   if(n ==1) then begin
     if not first then
-      for i = 1 to depth do fprintf fmt "&" done
+      if(depth < depth_max) then
+	for i = 1 to depth do fprintf fmt "&" done
+      else
+	for i = 1 to depth - 1 do fprintf fmt "&" done
     else
-      if depth > 0 then fprintf fmt "&"
-  end
-  else begin
-    for i = 1 to depth do fprintf fmt "\\quad" done
+     if depth > 0 then fprintf fmt "&"
   end;
   if (depth <= 1) then 
     fprintf fmt "\\verb|%s| " (M.goal_expl g);
@@ -346,21 +346,31 @@ let rec goal_latex_stat n fmt prov depth depth_max first g =
     begin
       if (n == 1) then 
 	begin 
-	  if depth > 0 then 
-	    for i = depth to (depth_max - depth) do fprintf fmt "&" done
+	  if (depth_max <= 1) then 
+	    begin
+	      if depth > 0 then	
+		for i = depth to (depth_max - depth) do fprintf fmt "&" done
+	      else 
+		for i = depth to (depth_max - depth - 1) do fprintf fmt "&" done
+	    end
 	  else 
-	    for i = depth to (depth_max - depth - 1) do fprintf fmt "&" done;
+		for i = depth to (depth_max - depth - 1) do fprintf fmt "&" done
 	end;
       List.iter (fun (p, _pr) -> 
 	try 
 	  let pr = Hashtbl.find proofs p in
 	  let s = pr.M.proof_state in
 	  match s with
-	      Session.Done res ->
-		if res.Call_provers.pr_answer = Call_provers.Valid
-		then  fprintf fmt "& %.2f " res.Call_provers.pr_time
-		else fprintf fmt "& - "
-	    | _ -> fprintf fmt "& " 
+	      Session.Done res -> 
+		begin
+		  match res.Call_provers.pr_answer with
+		      Call_provers.Valid -> fprintf fmt "& %.2f " res.Call_provers.pr_time
+		    | Call_provers.Invalid -> fprintf fmt "& _ "
+		    | Call_provers.Timeout -> fprintf fmt "& timeout "
+		    | Call_provers.Unknown _s -> fprintf fmt "& ? "
+		    | _ -> fprintf fmt "& "
+		end
+	    | _ -> fprintf fmt "& "
 	with Not_found -> fprintf fmt "&") prov;
       fprintf fmt "\\\\ \\hline @.";
     end
