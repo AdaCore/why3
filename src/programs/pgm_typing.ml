@@ -1028,7 +1028,7 @@ let make_logic_app loc ty ls el =
           | None ->
               IElogic (ps_app ls (List.rev args), lvars, gvars)
         end
-    | ({ iexpr_desc = IElogic (t, lvt, gvt) }, _, _) :: r ->
+    | ({ iexpr_desc = IElogic (t,lvt,gvt) }, _, _) :: r when t.t_ty <> None ->
         make (Svs.union lvars lvt) (Spv.union gvars gvt) (t :: args) r
     | ({ iexpr_desc = IElocal v }, _, _) :: r ->
         make (Svs.add v.i_impure lvars) gvars (t_var v.i_pure :: args) r
