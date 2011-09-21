@@ -330,14 +330,18 @@ let prover_name a =
     | M.Undetected_prover s -> s
 
 let rec goal_latex_stat n fmt prov depth depth_max first g =
-  if(n ==1) then begin
+  if(n ==1) then 
+    begin
     if not first then
-      if(depth < depth_max) then
-	for i = 1 to depth do fprintf fmt "&" done
-      else
-	for i = 1 to depth - 1 do fprintf fmt "&" done
+      begin
+	  if(depth < depth_max) then
+	    for i = 1 to depth do fprintf fmt "&" done
+	  else
+	    for i = 1 to depth - 1 do fprintf fmt "&" done
+      end
     else
-     if depth > 0 then fprintf fmt "&"
+       if(depth < depth_max) then
+	if depth > 0 then fprintf fmt "&"
   end;
   if (depth <= 1) then 
     fprintf fmt "\\verb|%s| " (M.goal_expl g);
