@@ -671,13 +671,13 @@ let bool_to_prop env f =
     | Tapp (ls, []) when ls_equal ls ls_False ->
         t_false
     | _ ->
-        t_equ (f_btop t) t_True)
+        t_equ_simp (f_btop t) t_True)
   and f_btop f = match f.t_node with
     | Tapp (ls, [{t_ty = Some {ty_node = Tyapp (ts, [])}} as l; r])
     when ls_equal ls ps_equ && ts_equal ts ts_bool ->
         t_label ?loc:f.t_loc f.t_label
           (t_iff_simp (t_btop l) (t_btop r))
-    | _ -> t_map f_btop f
+    | _ -> t_map_simp f_btop f
   in
   f_btop f
 
