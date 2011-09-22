@@ -1,11 +1,50 @@
 open Why3
 open Term
 
+let opt_verbose = ref false
+let opt_timeout = ref 10
+let opt_steps = ref 0
+let opt_filename : string option ref = ref None
+
+let abort_with_message s =
+   Format.eprintf s;
+   Format.eprintf " Aborting.@.";
+   exit 1
+
+let set_filename s =
+   if !opt_filename = None then
+      opt_filename := Some s
+   else
+      abort_with_message "Only one file name should be given."
+
+let usage_msg =
+  "Usage: gnatwhy3 [options] file"
+
+let options = Arg.align [
+   "-v", Arg.Set opt_verbose, "Output extra verbose information";
+   "-t", Arg.Set opt_verbose, "Output extra verbose information";
+
+   "-t", Arg.Set_int opt_timeout,
+          "Set the timeout in seconds (default is 10 seconds)";
+   "--timeout", Arg.Set_int opt_timeout,
+          "Set the timeout in seconds (default is 10 seconds)";
+
+   "-s", Arg.Set_int opt_steps,
+          "Set the maximal number of proof steps";
+   "--steps", Arg.Set_int opt_steps,
+          "Set the maximal number of proof steps";
+]
+
+let filename =
+   Arg.parse options set_filename usage_msg;
+   match !opt_filename with
+   | None -> abort_with_message "No file given."
+   | Some s -> s
+
 let config =
    try Whyconf.read_config (Some "why3.conf")
    with Rc.CannotOpen _ ->
-      Format.eprintf "Cannot file why3.conf. Aborting.@.";
-      exit 1
+      abort_with_message "Cannot read file why3.conf."
 
 let config_main = Whyconf.get_main (config)
 
@@ -32,17 +71,17 @@ let alt_ergo : Whyconf.config_prover =
   try
     Util.Mstr.find "alt-ergo" provers
   with Not_found ->
-    Format.eprintf "Prover alt-ergo not installed or not configured@.";
-    exit 0
+    abort_with_message "Prover alt-ergo not installed or not configured.@."
 
 (* loading the Alt-Ergo driver *)
 let altergo_driver : Driver.driver =
   try
     Driver.load_driver env alt_ergo.Whyconf.driver
   with e ->
-    Format.eprintf "Failed to load driver for alt-ergo: %a@."
-      Exn_printer.exn_printer e;
-    exit 1
+    Format.eprintf "Failed to load driver for alt-ergo: %a"
+       Exn_printer.exn_printer e;
+    abort_with_message ""
+
 
 let starts_with s start =
    if String.length start > String.length s then false
@@ -107,8 +146,7 @@ let do_task t =
          let expl = search_labels None fml in
          match expl with
          | None ->
-               Format.eprintf "Task has no tracability label. Aborting.@.";
-               exit 1
+               abort_with_message "Task has no tracability label."
 
          | Some e ->
                add_task e t
@@ -121,10 +159,11 @@ let do_theory _ th =
    let tasks = Task.split_theory th None None in
    List.iter do_unsplitted_task tasks
 
+(* ??? Does not use option for steps yet *)
 let prove_task t =
    let pr_call =
       Driver.prove_task ~command:alt_ergo.Whyconf.command
-                        ~timelimit:10 altergo_driver t () in
+                        ~timelimit:!opt_timeout altergo_driver t () in
    let res = Call_provers.wait_on_call pr_call () in
    if res.Call_provers.pr_answer = Call_provers.Valid then true
    else false
@@ -132,13 +171,8 @@ let prove_task t =
 exception Not_Proven
 
 let _ =
-   if Array.length (Sys.argv) < 2 then begin
-      Format.eprintf "No file given. Aborting.@.";
-      exit 1
-   end;
-   let fn = Sys.argv.(1) in
    try
-      let m = Env.read_file env fn in
+      let m = Env.read_file env filename in
       (* fill map of explanations *)
       Util.Mstr.iter do_theory m;
       Gnat_expl.MExpl.iter
@@ -151,6 +185,5 @@ let _ =
                Format.printf "%a@." (Gnat_expl.print_expl false) expl)
          !expl_map
     with e when not (Debug.test_flag Debug.stack_trace) ->
-      Format.eprintf "%a@." Exn_printer.exn_printer e;
-      exit 1
-
+       Format.printf "%a" Exn_printer.exn_printer e;
+       abort_with_message ""
