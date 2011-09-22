@@ -22,7 +22,7 @@ let usage_msg =
 
 let options = Arg.align [
    "-v", Arg.Set opt_verbose, "Output extra verbose information";
-   "-t", Arg.Set opt_verbose, "Output extra verbose information";
+   "--verbose", Arg.Set opt_verbose, "Output extra verbose information";
 
    "-t", Arg.Set_int opt_timeout,
           "Set the timeout in seconds (default is 10 seconds)";
@@ -82,6 +82,10 @@ let altergo_driver : Driver.driver =
        Exn_printer.exn_printer e;
     abort_with_message ""
 
+let alt_ergo_command =
+   let command = alt_ergo.Whyconf.command in
+   if !opt_steps = 0 then command
+   else command ^ Printf.sprintf " -steps %d" !opt_steps
 
 let starts_with s start =
    if String.length start > String.length s then false
@@ -159,14 +163,27 @@ let do_theory _ th =
    let tasks = Task.split_theory th None None in
    List.iter do_unsplitted_task tasks
 
-(* ??? Does not use option for steps yet *)
 let prove_task t =
    let pr_call =
-      Driver.prove_task ~command:alt_ergo.Whyconf.command
+      Driver.prove_task ~command:alt_ergo_command
                         ~timelimit:!opt_timeout altergo_driver t () in
    let res = Call_provers.wait_on_call pr_call () in
-   if res.Call_provers.pr_answer = Call_provers.Valid then true
-   else false
+   match res.Call_provers.pr_answer with
+   | Call_provers.Valid -> true
+   | Call_provers.Failure s ->
+         if !opt_verbose then begin
+            Format.eprintf "An error occured when calling alt-ergo: ";
+            Format.eprintf "%s" s;
+            Format.eprintf "@.";
+         end;
+         false
+   | Call_provers.HighFailure ->
+         if !opt_verbose then begin
+            Format.eprintf "An error occured when calling alt-ergo@."
+         end;
+         false
+   | _ ->
+         false
 
 exception Not_Proven
 
