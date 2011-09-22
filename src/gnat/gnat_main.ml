@@ -44,10 +44,6 @@ let altergo_driver : Driver.driver =
       Exn_printer.exn_printer e;
     exit 1
 
-(*
-   let _ = Debug.set_flag (Debug.lookup_flag "print_labels")
-let _ = Debug.set_flag (Debug.lookup_flag "print_locs") *)
-
 let starts_with s start =
    if String.length start > String.length s then false
    else
@@ -57,12 +53,6 @@ let starts_with s start =
          done;
          true
       with Exit -> false
-
-let asym_split = Term.asym_label
-let stop_split = "stop_split"
-
-let asym f = List.mem asym_split f.t_label
-let stop f = List.mem stop_split f.t_label
 
 let rec extract_explanation expl gnat l =
     match l with
@@ -81,8 +71,6 @@ let rec search_labels acc f =
       let expl, gnat = extract_explanation "" "" f.t_label in
       if gnat <> "" then begin
          let pos = Util.of_option f.t_loc in
-         (* VC_INVARIANT is the only one where we actually need a Why
-            explanation *)
          Some (Gnat_expl.expl_from_label_info pos gnat  expl)
       end else
          match f.t_node with
@@ -165,6 +153,4 @@ let _ =
     with e when not (Debug.test_flag Debug.stack_trace) ->
       Format.eprintf "%a@." Exn_printer.exn_printer e;
       exit 1
-
-
 
