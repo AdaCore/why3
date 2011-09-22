@@ -115,7 +115,7 @@ let eval_match ~inline kn t =
         let vl,tl,f = List.fold_left (add_quant kn) ([],tl,f) vl in
         t_label_merge t (t_quant_simp q (close (List.rev vl) tl (eval env f)))
     | _ ->
-        t_map (eval env) t
+        t_map_simp (eval env) t
   in
   eval Mvs.empty t
 
