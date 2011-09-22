@@ -483,11 +483,18 @@ let idle_handler () =
             if debug then
               Format.eprintf "Task for prover: %a@."
                 (Driver.print_task driver) goal;
-            let pre_call =
-              Driver.prove_task ?old ~command ~timelimit ~memlimit driver goal
-            in
-            Queue.push (callback,pre_call) proof_attempts_queue;
-            run_timeout_handler ()
+            begin
+              try
+                let pre_call =
+                  Driver.prove_task ?old ~command ~timelimit ~memlimit driver goal
+                in
+                Queue.push (callback,pre_call) proof_attempts_queue;
+                run_timeout_handler ()
+              with e ->
+                Format.eprintf "@[Exception raise in Session.idle_handler:@ %a@.@]"
+                  Exn_printer.exn_printer e;
+                callback (InternalFailure e)
+            end
         | Action_delayed callback -> callback ()
     end;
     true
@@ -497,6 +504,12 @@ let idle_handler () =
     eprintf "Info: idle_handler stopped@.";
 *)
     false
+    | e ->
+      Format.eprintf "@[Exception raise in Session.idle_handler:@ %a@.@]"
+        Exn_printer.exn_printer e;
+      eprintf "Session.idle_handler stopped@.";
+      false
+    
 
 let run_idle_handler () =
   if !idle_handler_activated then () else

@@ -621,11 +621,15 @@ let () =
 let prover_on_selected_goals pr =
   List.iter
     (fun row ->
+      try
        let a = get_any_from_row_reference row in
-        M.run_prover
-          ~context_unproved_goals_only:!context_unproved_goals_only
-          ~timelimit:gconfig.time_limit
-          pr a)
+       M.run_prover
+         ~context_unproved_goals_only:!context_unproved_goals_only
+         ~timelimit:gconfig.time_limit
+         pr a
+      with e ->
+        eprintf "@[Exception raised while running a prover:@ %a@.@]"
+          Exn_printer.exn_printer e)
     (get_selected_row_references ())
 
 (**********************************)
@@ -1506,8 +1510,14 @@ let select_row r =
     | M.Proof_attempt a ->
         let o =
           match a.M.proof_state with
-            | Session.Done r -> r.Call_provers.pr_output;
-            | _ -> "No information available"
+            | Session.Undone -> "proof not yet scheduled for running"
+            | Session.Done r -> r.Call_provers.pr_output
+            | Session.Scheduled-> "proof scheduled by not running yet"
+            | Session.Running -> "prover currently running"
+            | Session.InternalFailure e -> 
+              let b = Buffer.create 37 in
+              bprintf b "%a" Exn_printer.exn_printer e;
+              Buffer.contents b
         in
         task_view#source_buffer#set_text o;
         scroll_to_source_goal a.M.proof_goal
