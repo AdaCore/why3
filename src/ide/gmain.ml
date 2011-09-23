@@ -229,6 +229,23 @@ let cleaning_box =
   GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
   ~packing:cleaning_frame#add ()
 
+let monitor_frame =
+  GBin.frame ~label:"Monitor"
+    ~packing:(tools_window_vbox#pack ~expand:false) ()
+
+let monitor_box =
+  GPack.vbox ~homogeneous:false ~packing:monitor_frame#add ()
+
+let monitor_waiting =
+  GMisc.label ~text:"  Waiting: 0" ~packing:monitor_box#add ()
+
+let monitor_scheduled =
+  GMisc.label ~text:"Scheduled: 0" ~packing:monitor_box#add ()
+
+let monitor_running =
+  GMisc.label ~text:"  Running: 0" ~packing:monitor_box#add ()
+
+
 
 (* horizontal paned *)
 
@@ -318,6 +335,7 @@ let image_of_result ~obsolete result =
     | Session.Undone -> !image_undone
     | Session.Scheduled -> !image_scheduled
     | Session.Running -> !image_running
+    | Session.Interrupted -> assert false
     | Session.InternalFailure _ -> !image_failure
     | Session.Done r -> match r.Call_provers.pr_answer with
         | Call_provers.Valid ->
@@ -360,6 +378,11 @@ module M = Session.Make
      let timeout ~ms f =
        let (_ : GMain.Timeout.id) = GMain.Timeout.add ~ms ~callback:f in
        ()
+
+     let notify_timer_state t s r =
+       monitor_waiting#set_text ("Waiting: " ^ (string_of_int t));
+       monitor_scheduled#set_text ("Scheduled: " ^ (string_of_int s));
+       monitor_running#set_text ("Running: " ^ (string_of_int r));
 
    end)
 
@@ -1377,16 +1400,6 @@ let () =
     b#connect#pressed ~callback:replay_obsolete_proofs
   in ()
 
-(*
-let () =
-  let b = GButton.button ~packing:tools_box#add ~label:"Cancel" () in
-  b#misc#set_tooltip_markup "Mark all proofs below the current selection as <b>obsolete</b>";
-  let i = GMisc.image ~pixbuf:(!image_cancel) () in
-  let () = b#set_image i#coerce in
-  let (_ : GtkSignal.id) =
-    b#connect#pressed ~callback:cancel_proofs
-  in ()
-*)
 
 (*************)
 (* removing  *)
@@ -1477,6 +1490,15 @@ let () =
     b#connect#pressed ~callback:clean_selection
   in ()
 
+let () =
+  let b = GButton.button ~packing:monitor_box#add ~label:"Interrupt" () in
+  b#misc#set_tooltip_markup "Cancels all scheduled proof attempts";
+  let i = GMisc.image ~pixbuf:(!image_cancel) () in
+  let () = b#set_image i#coerce in
+  let (_ : GtkSignal.id) =
+    b#connect#pressed ~callback:M.cancel_scheduled_proofs 
+  in ()
+
 
 (***************)
 (* Bind events *)
@@ -1514,7 +1536,8 @@ let select_row r =
             | Session.Done r -> r.Call_provers.pr_output
             | Session.Scheduled-> "proof scheduled by not running yet"
             | Session.Running -> "prover currently running"
-            | Session.InternalFailure e -> 
+            | Session.Interrupted -> assert false
+            | Session.InternalFailure e ->
               let b = Buffer.create 37 in
               bprintf b "%a" Exn_printer.exn_printer e;
               Buffer.contents b

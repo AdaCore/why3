@@ -119,6 +119,8 @@ module M = Session.Make
          | None -> timeout_handler := Some(float ms /. 1000.0 ,f);
          | Some _ -> failwith "Replay.timeout: already one handler installed"
 
+     let notify_timer_state _ _ _ = ()
+
    end)
 
 

@@ -96,6 +96,7 @@ let lookup_transformation env =
 type proof_attempt_status =
   | Undone
   | Scheduled (** external proof attempt is scheduled *)
+  | Interrupted
   | Running (** external proof attempt is in progress *)
   | Done of Call_provers.prover_result (** external proof done *)
   | InternalFailure of exn (** external proof aborted by internal error *)
@@ -113,6 +114,9 @@ module type OBSERVER = sig
 
   val timeout: ms:int -> (unit -> bool) -> unit
   val idle: (unit -> bool) -> unit
+
+  val notify_timer_state : int -> int -> int -> unit
+
 end
 
 module Make(O : OBSERVER) = struct
@@ -277,7 +281,7 @@ let save_result fmt r =
 
 let save_status fmt s =
   match s with
-    | Undone | Scheduled | Running ->
+    | Undone | Scheduled | Running | Interrupted ->
         fprintf fmt "<undone/>@\n"
     | InternalFailure msg ->
         fprintf fmt "<internalfailure reason=\"%s\"/>@\n"
@@ -390,6 +394,13 @@ let set_proof_state ~obsolete a res =
 (*************************)
 
 
+type action =
+  | Action_proof_attempt of bool * int * int * in_channel option * string * Driver.driver *
+    (proof_attempt_status -> unit) * Task.task
+  | Action_delayed of (unit -> unit)
+
+let actions_queue = Queue.create ()
+
 (* timeout handler *)
 
 type timeout_action =
@@ -436,24 +447,26 @@ let timeout_handler () =
   let continue =
     match l with
       | [] ->
-(*
+(**)
           eprintf "Info: timeout_handler stopped@.";
-*)
+(**)
           false
       | _ -> true
   in
+  O.notify_timer_state
+    (Queue.length actions_queue)
+    (Queue.length proof_attempts_queue) (List.length l);
   timeout_handler_activated := continue;
   timeout_handler_running := false;
   continue
-
 
 let run_timeout_handler () =
   if !timeout_handler_activated then () else
     begin
       timeout_handler_activated := true;
-(*
+(**)
       eprintf "Info: timeout_handler started@.";
-*)
+(**)
       O.timeout ~ms:100 timeout_handler
     end
 
@@ -463,13 +476,6 @@ let schedule_any_timeout callback =
 
 (* idle handler *)
 
-
-type action =
-  | Action_proof_attempt of bool * int * int * in_channel option * string * Driver.driver *
-    (proof_attempt_status -> unit) * Task.task
-  | Action_delayed of (unit -> unit)
-
-let actions_queue = Queue.create ()
 
 let idle_handler_activated = ref false
 
@@ -500,31 +506,56 @@ let idle_handler () =
     true
   with Queue.Empty ->
     idle_handler_activated := false;
-(*
+(**)
     eprintf "Info: idle_handler stopped@.";
-*)
+(**)
     false
     | e ->
       Format.eprintf "@[Exception raise in Session.idle_handler:@ %a@.@]"
         Exn_printer.exn_printer e;
       eprintf "Session.idle_handler stopped@.";
       false
-    
+
 
 let run_idle_handler () =
   if !idle_handler_activated then () else
     begin
       idle_handler_activated := true;
-(*
+(**)
       eprintf "Info: idle_handler started@.";
-*)
+(**)
       O.idle idle_handler
     end
 
 (* main scheduling functions *)
 
+let cancel_scheduled_proofs () =
+  let new_queue = Queue.create () in
+  try
+    while true do
+      match Queue.pop actions_queue with
+        | Action_proof_attempt(_debug,_timelimit,_memlimit,_old,_command,
+                               _driver,callback,_goal) ->
+            callback Interrupted
+        | Action_delayed _ as a->
+            Queue.push a new_queue
+    done
+  with Queue.Empty ->
+    Queue.transfer new_queue actions_queue;
+    try
+      while true do
+        let (callback,_) = Queue.pop proof_attempts_queue in
+        callback Interrupted
+      done
+    with
+      | Queue.Empty -> ()
+
+
 let schedule_proof_attempt ~debug ~timelimit ~memlimit ?old
     ~command ~driver ~callback goal =
+(**)
+  eprintf "Scheduling a new proof attempt@.";
+(**)
   Queue.push
     (Action_proof_attempt(debug,timelimit,memlimit,old,command,driver,
                         callback,goal))
@@ -1484,8 +1515,9 @@ let save_session () =
 
 let redo_external_proof ~timelimit g a =
   (* check that the state is not Scheduled or Running *)
-  let running = match a.proof_state with
-    | Scheduled | Running -> true
+  let previous_result,previous_obs = a.proof_state,a.proof_obsolete in
+  let running = match previous_result with
+    | Scheduled | Running | Interrupted -> true
     | Done _ | Undone | InternalFailure _ -> false
   in
   if running then ()
@@ -1495,7 +1527,11 @@ let redo_external_proof ~timelimit g a =
       | Undetected_prover _ -> ()
       | Detected_prover p ->
           let callback result =
-            set_proof_state ~obsolete:false a result;
+            match result with
+              | Interrupted ->
+                  set_proof_state ~obsolete:previous_obs a previous_result
+              | _ ->
+                  set_proof_state ~obsolete:false a result;
           in
           let old = if a.edited_as = "" then None else
             begin
@@ -1660,7 +1696,7 @@ let same_result r1 r2 =
 let check_external_proof g a =
   (* check that the state is not Scheduled or Running *)
   let running = match a.proof_state with
-    | Scheduled | Running -> true
+    | Scheduled | Running | Interrupted -> true
     | Done _ | Undone | InternalFailure _ -> false
   in
   if running then ()
@@ -1676,7 +1712,7 @@ let check_external_proof g a =
             let p_name = p.prover_name ^ " " ^ p.prover_version in
             let callback result =
               match result with
-                | Scheduled | Running -> ()
+                | Scheduled | Running | Interrupted -> ()
                 | Undone -> assert false
                 | InternalFailure msg ->
                     push_report g p_name (CallFailed msg);
@@ -1849,7 +1885,7 @@ let ft_of_pa a =
 let edit_proof ~default_editor ~project_dir a =
   (* check that the state is not Scheduled or Running *)
   let running = match a.proof_state with
-    | Scheduled | Running -> true
+    | Scheduled | Running | Interrupted -> true
     | Undone | Done _ | InternalFailure _ -> false
   in
   if running then ()
