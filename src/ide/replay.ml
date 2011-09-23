@@ -357,7 +357,6 @@ let rec goal_latex_stat n fmt prov depth depth_max column subgoal subgoals_max f
     for i = 1 to depth do fprintf fmt "\\quad" done;
   if (depth <= 1) then 
     fprintf fmt "\\verb|%s| " (M.goal_expl g);
-  printf "%s \n" (M.goal_expl g);
  
   let proofs = M.external_proofs g in
   if (Hashtbl.length proofs) > 0 then 
