@@ -329,7 +329,7 @@ let prover_name a =
       M.Detected_prover d -> d.Session.prover_name ^ " " ^ d.Session.prover_version
     | M.Undetected_prover s -> s
 
-let rec goal_latex_stat n fmt prov depth depth_max first g =
+let rec goal_latex_stat n fmt prov depth depth_max column subgoal subgoals_max first g =
   if(n ==1) then 
     begin
       if depth_max > 1 then 
@@ -357,6 +357,8 @@ let rec goal_latex_stat n fmt prov depth depth_max first g =
     for i = 1 to depth do fprintf fmt "\\quad" done;
   if (depth <= 1) then 
     fprintf fmt "\\verb|%s| " (M.goal_expl g);
+  printf "%s \n" (M.goal_expl g);
+ 
   let proofs = M.external_proofs g in
   if (Hashtbl.length proofs) > 0 then 
     begin
@@ -381,14 +383,22 @@ let rec goal_latex_stat n fmt prov depth depth_max first g =
 		begin
 		  match res.Call_provers.pr_answer with
 		      Call_provers.Valid -> fprintf fmt "& %.2f " res.Call_provers.pr_time
-		    | Call_provers.Invalid -> fprintf fmt "& _ "
+		    | Call_provers.Invalid -> fprintf fmt "& - "
 		    | Call_provers.Timeout -> fprintf fmt "& timeout "
 		    | Call_provers.Unknown _s -> fprintf fmt "& ? "
 		    | _ -> fprintf fmt "& "
 		end
 	    | _ -> fprintf fmt "& "
 	with Not_found -> fprintf fmt "&") prov;
-      fprintf fmt "\\\\ \\hline @.";
+      if depth > 0 then
+	begin
+	  if (!subgoal < subgoals_max) then
+	    fprintf fmt "\\\\ \\cline{%d-%d} @." (depth+1) column
+	  else 
+	    fprintf fmt "\\\\ \\cline{%d-%d} @." depth column
+	end
+      else 
+	fprintf fmt "\\\\ \\hline @."
     end
   else begin
     let tr = M.transformations g in
@@ -397,10 +407,12 @@ let rec goal_latex_stat n fmt prov depth depth_max first g =
 	for i = 1 to (List.length prov) do fprintf fmt "&" done;
       fprintf fmt "\\\\ \\hline @."
       end;
-    Hashtbl.iter (fun _st tr -> 
+    Hashtbl.iter (fun _st tr ->
       let goals = tr.M.subgoals in
+      let subgoal = ref 0 in
       let _ = List.fold_left (fun first g -> 
-	goal_latex_stat n fmt prov (depth + 1) depth_max first g; false) true  goals in 
+	subgoal := !subgoal + 1;
+	goal_latex_stat n fmt prov (depth + 1) depth_max column (subgoal) (List.length goals) first g; false) true goals in 
     () ) tr
   end
 
@@ -427,7 +439,10 @@ let theory_latex_stat n dir t =
     fprintf fmt " Proof obligations ";
   List.iter (fun (_, a) -> fprintf fmt "& %s " a) provers;
   fprintf fmt "\\\\\\hline@.";
-  List.iter (goal_latex_stat n fmt provers 0 depth true) (M.goals t);
+  if (depth > 1) then
+    List.iter (goal_latex_stat n fmt provers 0 depth ((List.length provers) + depth) (ref 0) 0 true) (M.goals t)
+  else
+    List.iter (goal_latex_stat n fmt provers 0 depth ((List.length provers) + depth + 1) (ref 0) 0 true) (M.goals t);
   fprintf fmt "\\end{tabular}@.";
   close_out ch
 
