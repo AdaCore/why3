@@ -49,8 +49,7 @@ let config =
 let config_main = Whyconf.get_main (config)
 
 let env =
-   let loadpath = "." :: Whyconf.loadpath config_main in
-   Env.create_env_of_loadpath loadpath
+   Env.create_env_of_loadpath (Whyconf.loadpath config_main)
 
 let is_not_why_loc s =
    not (Filename.check_suffix s "why" ||
