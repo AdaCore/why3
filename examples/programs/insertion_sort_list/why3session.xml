@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
 <why3session
- name="examples/programs/insertion_sort_list/why3session.xml">
+ name="programs/insertion_sort_list/why3session.xml">
  <prover
   id="alt-ergo"
   name="Alt-Ergo"
@@ -15,13 +15,33 @@
   name="CVC3"
   version="2.2"/>
  <prover
+  id="eprover"
+  name="Eprover"
+  version="1.4 Namring"/>
+ <prover
+  id="gappa"
+  name="Gappa"
+  version="0.15.1"/>
+ <prover
   id="simplify"
   name="Simplify"
   version="1.5.4"/>
  <prover
+  id="spass"
+  name="Spass"
+  version="3.7"/>
+ <prover
+  id="vampire"
+  name="Vampire"
+  version="0.6"/>
+ <prover
+  id="verit"
+  name="veriT"
+  version="dev"/>
+ <prover
   id="yices"
   name="Yices"
-  version="1.0.27"/>
+  version="1.0.25"/>
  <prover
   id="z3"
   name="Z3"
@@ -57,7 +77,7 @@
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.04"/>
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal
@@ -72,7 +92,7 @@
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
@@ -87,7 +107,7 @@
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
@@ -102,7 +122,7 @@
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.16"/>
+       <result status="valid" time="0.11"/>
       </proof>
      </goal>
     </transf>
@@ -110,10 +130,10 @@
    <goal
     name="WP_parameter insertion_sort"
     expl="parameter insertion_sort"
-    sum="46635995e70dafba62918db97266e98f"
+    sum="f6422819904cf0810dab92302203a3da"
     proved="true"
     expanded="true"
-    shape="CV0aNilapermutV0aNilAasortedaNilaConsVVapermutV0V4AasortedV4IapermutaConsV1V3V4AasortedV4FAasortedV3IapermutV2V3AasortedV3FAtAainfix <alengthV2alengthV0Aainfix <=c0alengthV0F">
+    shape="CV0aNilapermutV0aNilAasortedaNilaConsVVapermutV0V4AasortedV4IapermutaConsV1V3V4AasortedV4FAasortedV3IapermutV2V3AasortedV3FAainfix <alengthV2alengthV0Aainfix <=c0alengthV0F">
     <transf
      name="split_goal"
      proved="true"
@@ -136,32 +156,10 @@
      <goal
       name="WP_parameter insertion_sort.2"
       expl="parameter insertion_sort"
-      sum="27a3062937b8ed1da51c09ec52470022"
+      sum="b1263506941c3e9cdecf1420d57bcdaa"
       proved="true"
       expanded="true"
-      shape="CV0aNiltaConsVVtAainfix <alengthV2alengthV0Aainfix <=c0alengthV0F">
-      <proof
-       prover="cvc3"
-       timelimit="10"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof
-       prover="alt-ergo"
-       timelimit="10"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter insertion_sort.3"
-      expl="parameter insertion_sort"
-      sum="6ef15f5b330e8edef7df11c869826969"
-      proved="true"
-      expanded="true"
-      shape="CV0aNiltaConsVVasortedV3IapermutV2V3AasortedV3FItAainfix <alengthV2alengthV0Aainfix <=c0alengthV0F">
+      shape="CV0aNiltaConsVVainfix <alengthV2alengthV0Aainfix <=c0alengthV0F">
       <proof
        prover="cvc3"
        timelimit="10"
@@ -178,25 +176,47 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter insertion_sort.4"
+      name="WP_parameter insertion_sort.3"
       expl="parameter insertion_sort"
-      sum="502c37d439bb83979123f028666cb157"
+      sum="51c0f419f2cf0990b63e1b0f96aab82b"
       proved="true"
       expanded="true"
-      shape="CV0aNiltaConsVVapermutV0V4AasortedV4IapermutaConsV1V3V4AasortedV4FIasortedV3IapermutV2V3AasortedV3FItAainfix <alengthV2alengthV0Aainfix <=c0alengthV0F">
+      shape="CV0aNiltaConsVVasortedV3IapermutV2V3AasortedV3FIainfix <alengthV2alengthV0Aainfix <=c0alengthV0F">
       <proof
        prover="cvc3"
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.05"/>
+       <result status="valid" time="0.00"/>
       </proof>
       <proof
        prover="alt-ergo"
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.06"/>
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.4"
+      expl="parameter insertion_sort"
+      sum="b1309c3f075dd3f76317adad063fbaf0"
+      proved="true"
+      expanded="true"
+      shape="CV0aNiltaConsVVapermutV0V4AasortedV4IapermutaConsV1V3V4AasortedV4FIasortedV3IapermutV2V3AasortedV3FIainfix <alengthV2alengthV0Aainfix <=c0alengthV0F">
+      <proof
+       prover="cvc3"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof
+       prover="alt-ergo"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.03"/>
       </proof>
      </goal>
     </transf>

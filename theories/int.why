@@ -133,6 +133,14 @@ theory Exponentiation
 
   axiom Power_s : forall x: t, n: int. n >= 0 -> power x (n+1) = x * power x n
 
+  lemma Power_1 : forall x : t. power x 1 = x
+
+  lemma Power_sum : forall x: t, n m: int. n >= 0 /\ m >= 0 -> 
+    power x (n+m) = power x n * power x m
+
+  lemma Power_mult : forall x:t, n m : int. 0 <= n -> 0 <= m ->
+    power x (Int.(*) n m) = power (power x n) m
+
 end
 
 theory Power
@@ -141,14 +149,6 @@ theory Power
 
   clone export
     Exponentiation with type t = int, function one = one, function (*) = (*)
-
-  lemma Power_1 : forall x : int. power x 1 = x
-
-  lemma Power_sum : forall x n m : int. 0 <= n -> 0 <= m ->
-    power x (n + m) = power x n * power x m
-
-  lemma Power_mult : forall x n m : int. 0 <= n -> 0 <= m ->
-    power x (n * m) = power (power x n) m
 
 end
 

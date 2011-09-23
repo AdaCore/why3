@@ -15,9 +15,13 @@
   name="CVC3"
   version="2.2"/>
  <prover
+  id="eprover"
+  name="Eprover"
+  version="1.4 Namring"/>
+ <prover
   id="gappa"
   name="Gappa"
-  version="0.15.0"/>
+  version="0.15.1"/>
  <prover
   id="simplify"
   name="Simplify"
@@ -30,6 +34,10 @@
   id="vampire"
   name="Vampire"
   version="0.6"/>
+ <prover
+  id="verit"
+  name="veriT"
+  version="dev"/>
  <prover
   id="yices"
   name="Yices"
@@ -65,7 +73,7 @@
      timelimit="10"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.05"/>
+     <result status="valid" time="0.06"/>
     </proof>
     <proof
      prover="z3"
@@ -78,23 +86,23 @@
    <goal
     name="WP_parameter test"
     expl="parameter test"
-    sum="abe812ee5ede1ba0e6e65edda1c593ae"
+    sum="9dccb19e251bd6ef9bf42171f8b807e4"
     proved="true"
     expanded="true"
-    shape="Lamk sparse_arrayamk arrayV0V8amk arrayV1V7amk arrayV2V6V5V3iainfix <=c0agetV7V4iainfix <agetV7V4V5LagetV7V4ais_eltV9V4qainfix =agetV6V10V4Aainfix <V10V2Aainfix <=c0V10Aainfix <V4V1Aainfix <=c0V4ais_eltV9V4qfAainfix <V4V1Aainfix <=c0V4ais_eltV9V4qfAainfix <V4V1Aainfix <=c0V4Iasa_invV9Aainfix <V4V0Aainfix <=c0V4FFFFFF">
+    shape="Lamk sparse_arrayamk arrayV0V8amk arrayV1V7amk arrayV2V6V5V3iainfix <=c0agetV7V4iainfix <agetV7V4V5LagetV7V4ais_eltV9V4qainfix =agetV6V10V4Aainfix <V10V2Aainfix <=c0V10Aainfix <V4V1Aainfix <=c0V4ais_eltV9V4NAainfix <V4V1Aainfix <=c0V4ais_eltV9V4NAainfix <V4V1Aainfix <=c0V4Iasa_invV9Aainfix <V4V0Aainfix <=c0V4FFFFFF">
     <proof
      prover="cvc3"
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.04"/>
+     <result status="valid" time="0.03"/>
     </proof>
     <proof
      prover="alt-ergo"
      timelimit="10"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.28"/>
+     <result status="valid" time="0.23"/>
     </proof>
     <proof
      prover="z3"
@@ -116,14 +124,14 @@
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.02"/>
+     <result status="valid" time="0.01"/>
     </proof>
     <proof
      prover="alt-ergo"
      timelimit="10"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.04"/>
+     <result status="valid" time="0.05"/>
     </proof>
     <proof
      prover="z3"
@@ -144,7 +152,7 @@
      timelimit="10"
      edited="vacid_0_sparse_array_WP_SparseArray_permutation_1.v"
      obsolete="false">
-     <result status="valid" time="0.67"/>
+     <result status="valid" time="0.65"/>
     </proof>
    </goal>
    <goal
@@ -184,7 +192,7 @@
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
@@ -199,21 +207,21 @@
        timelimit="5"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.04"/>
+       <result status="valid" time="0.03"/>
       </proof>
       <proof
        prover="alt-ergo"
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.38"/>
+       <result status="valid" time="0.28"/>
       </proof>
       <proof
        prover="z3"
        timelimit="5"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.03"/>
       </proof>
      </goal>
      <goal
@@ -228,7 +236,7 @@
        timelimit="5"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.03"/>
+       <result status="valid" time="0.02"/>
       </proof>
       <proof
        prover="alt-ergo"
@@ -264,7 +272,7 @@
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.06"/>
+       <result status="valid" time="0.05"/>
       </proof>
       <proof
        prover="z3"
@@ -286,7 +294,7 @@
        timelimit="5"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.03"/>
       </proof>
       <proof
        prover="alt-ergo"
@@ -326,7 +334,7 @@
          timelimit="5"
          edited=""
          obsolete="false">
-         <result status="valid" time="2.14"/>
+         <result status="valid" time="2.07"/>
         </proof>
         <proof
          prover="z3"
@@ -348,7 +356,7 @@
          timelimit="5"
          edited=""
          obsolete="false">
-         <result status="valid" time="0.71"/>
+         <result status="valid" time="0.70"/>
         </proof>
         <proof
          prover="z3"
@@ -370,14 +378,14 @@
          timelimit="5"
          edited=""
          obsolete="false">
-         <result status="valid" time="3.23"/>
+         <result status="valid" time="2.44"/>
         </proof>
         <proof
          prover="alt-ergo"
          timelimit="10"
          edited=""
          obsolete="false">
-         <result status="valid" time="2.56"/>
+         <result status="valid" time="1.61"/>
         </proof>
         <proof
          prover="z3"
@@ -401,21 +409,21 @@
        timelimit="5"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.11"/>
+       <result status="valid" time="0.10"/>
       </proof>
       <proof
        prover="alt-ergo"
        timelimit="5"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.34"/>
+       <result status="valid" time="0.26"/>
       </proof>
       <proof
        prover="z3"
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.04"/>
+       <result status="valid" time="0.03"/>
       </proof>
      </goal>
     </transf>
@@ -455,7 +463,7 @@
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.02"/>
       </proof>
       <proof
        prover="z3"
@@ -484,7 +492,7 @@
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.01"/>
       </proof>
       <proof
        prover="z3"
@@ -513,7 +521,7 @@
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.02"/>
       </proof>
       <proof
        prover="z3"
@@ -564,7 +572,7 @@
        timelimit="5"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.02"/>
       </proof>
       <proof
        prover="alt-ergo"
@@ -629,7 +637,7 @@
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.00"/>
       </proof>
       <proof
        prover="z3"
@@ -680,7 +688,7 @@
        timelimit="5"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.01"/>
       </proof>
       <proof
        prover="alt-ergo"
@@ -745,7 +753,7 @@
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.01"/>
       </proof>
       <proof
        prover="z3"
@@ -825,14 +833,14 @@
        timelimit="5"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.12"/>
+       <result status="valid" time="0.13"/>
       </proof>
       <proof
        prover="alt-ergo"
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.46"/>
+       <result status="valid" time="0.37"/>
       </proof>
       <proof
        prover="z3"
@@ -861,14 +869,14 @@
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.01"/>
       </proof>
       <proof
        prover="z3"
        timelimit="5"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.03"/>
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal
@@ -883,21 +891,21 @@
        timelimit="5"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.22"/>
+       <result status="valid" time="0.23"/>
       </proof>
       <proof
        prover="alt-ergo"
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.42"/>
+       <result status="valid" time="0.36"/>
       </proof>
       <proof
        prover="z3"
        timelimit="5"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.04"/>
+       <result status="valid" time="0.03"/>
       </proof>
      </goal>
      <goal
@@ -948,14 +956,14 @@
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.60"/>
+       <result status="valid" time="0.47"/>
       </proof>
       <proof
        prover="z3"
        timelimit="5"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.04"/>
+       <result status="valid" time="0.03"/>
       </proof>
      </goal>
      <goal
@@ -999,14 +1007,14 @@
        timelimit="5"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.31"/>
+       <result status="valid" time="0.30"/>
       </proof>
       <proof
        prover="alt-ergo"
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.52"/>
+       <result status="valid" time="0.45"/>
       </proof>
       <proof
        prover="z3"

@@ -1,72 +1,239 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
-<why3session name="programs/same_fringe/why3session.xml">
- <prover id="alt-ergo" name="Alt-Ergo" version="0.93"/>
- <prover id="coq" name="Coq" version="8.2pl1"/>
- <prover id="cvc3" name="CVC3" version="2.2"/>
- <prover id="gappa" name="Gappa" version="0.13.0"/>
- <prover id="simplify" name="Simplify" version="1.5.4"/>
- <prover id="z3" name="Z3" version="2.19"/>
- <file name="../same_fringe.mlw" verified="true" expanded="true">
-  <theory name="WP SameFringe" verified="true" expanded="true">
-   <goal name="WP_parameter enum" expl="parameter enum" sum="7515115e30bfb2e02e374b29eca6314b" proved="true" expanded="true" shape="CV0aEmptyainfix =aenum_elementsV1ainfix ++aelementsV0aenum_elementsV1aNodeVVVainfix =aenum_elementsV5ainfix ++aelementsV0aenum_elementsV1Iainfix =aenum_elementsV5ainfix ++aelementsV2aenum_elementsaNextV3V4V1FAtAainfix <alengthaelementsV2alengthaelementsV0Aainfix <=c0alengthaelementsV0FF">
-    <transf name="split_goal" proved="true" expanded="true">
-     <goal name="WP_parameter enum.1" expl="parameter enum" sum="2420f91c1ffde9b7a37e19ebb0c88555" proved="true" expanded="true" shape="CV0aEmptyainfix =aenum_elementsV1ainfix ++aelementsV0aenum_elementsV1aNodeVVVtFF">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.04"/>
+<why3session
+ name="programs/same_fringe/why3session.xml">
+ <prover
+  id="alt-ergo"
+  name="Alt-Ergo"
+  version="0.93"/>
+ <prover
+  id="coq"
+  name="Coq"
+  version="8.3pl2"/>
+ <prover
+  id="cvc3"
+  name="CVC3"
+  version="2.2"/>
+ <prover
+  id="eprover"
+  name="Eprover"
+  version="1.4 Namring"/>
+ <prover
+  id="gappa"
+  name="Gappa"
+  version="0.15.1"/>
+ <prover
+  id="simplify"
+  name="Simplify"
+  version="1.5.4"/>
+ <prover
+  id="spass"
+  name="Spass"
+  version="3.7"/>
+ <prover
+  id="vampire"
+  name="Vampire"
+  version="0.6"/>
+ <prover
+  id="verit"
+  name="veriT"
+  version="dev"/>
+ <prover
+  id="yices"
+  name="Yices"
+  version="1.0.25"/>
+ <prover
+  id="z3"
+  name="Z3"
+  version="2.19"/>
+ <file
+  name="../same_fringe.mlw"
+  verified="true"
+  expanded="true">
+  <theory
+   name="WP SameFringe"
+   verified="true"
+   expanded="true">
+   <goal
+    name="WP_parameter enum"
+    expl="parameter enum"
+    sum="422dd6c062eb415d99ea6ec236afc646"
+    proved="true"
+    expanded="true"
+    shape="CV0aEmptyainfix =aenum_elementsV1ainfix ++aelementsV0aenum_elementsV1aNodeVVVainfix =aenum_elementsV5ainfix ++aelementsV0aenum_elementsV1Iainfix =aenum_elementsV5ainfix ++aelementsV2aenum_elementsaNextV3V4V1FAainfix <alengthaelementsV2alengthaelementsV0Aainfix <=c0alengthaelementsV0FF">
+    <transf
+     name="split_goal"
+     proved="true"
+     expanded="true">
+     <goal
+      name="WP_parameter enum.1"
+      expl="parameter enum"
+      sum="2420f91c1ffde9b7a37e19ebb0c88555"
+      proved="true"
+      expanded="true"
+      shape="CV0aEmptyainfix =aenum_elementsV1ainfix ++aelementsV0aenum_elementsV1aNodeVVVtFF">
+      <proof
+       prover="alt-ergo"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter enum.2" expl="parameter enum" sum="759f6cdb2b67733a18170d333302c9b7" proved="true" expanded="true" shape="CV0aEmptytaNodeVVVtAainfix <alengthaelementsV2alengthaelementsV0Aainfix <=c0alengthaelementsV0FF">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.03"/>
+     <goal
+      name="WP_parameter enum.2"
+      expl="parameter enum"
+      sum="263920765cfe9db8e2f81b8c569a78fc"
+      proved="true"
+      expanded="true"
+      shape="CV0aEmptytaNodeVVVainfix <alengthaelementsV2alengthaelementsV0Aainfix <=c0alengthaelementsV0FF">
+      <proof
+       prover="alt-ergo"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter enum.3" expl="parameter enum" sum="9b1577756e0c0fca303765fedf321930" proved="true" expanded="true" shape="CV0aEmptytaNodeVVVainfix =aenum_elementsV5ainfix ++aelementsV0aenum_elementsV1Iainfix =aenum_elementsV5ainfix ++aelementsV2aenum_elementsaNextV3V4V1FItAainfix <alengthaelementsV2alengthaelementsV0Aainfix <=c0alengthaelementsV0FF">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+     <goal
+      name="WP_parameter enum.3"
+      expl="parameter enum"
+      sum="90cd3ac393a1110b9fb057efeb6ac01a"
+      proved="true"
+      expanded="true"
+      shape="CV0aEmptytaNodeVVVainfix =aenum_elementsV5ainfix ++aelementsV0aenum_elementsV1Iainfix =aenum_elementsV5ainfix ++aelementsV2aenum_elementsaNextV3V4V1FIainfix <alengthaelementsV2alengthaelementsV0Aainfix <=c0alengthaelementsV0FF">
+      <proof
+       prover="alt-ergo"
+       timelimit="10"
+       edited=""
+       obsolete="false">
        <result status="valid" time="0.03"/>
       </proof>
      </goal>
     </transf>
    </goal>
-   <goal name="WP_parameter eq_enum" expl="parameter eq_enum" sum="8c5eec35681fed688e1363529999f08c" proved="true" expanded="true" shape="CV1aNextVVVCV0aNextVVViainfix =V5V2ainfix =aenum_elementsV0aenum_elementsV1qainfix =V10aTrueIainfix =aenum_elementsV8aenum_elementsV9qainfix =V10aTrueFAtAainfix <alengthaenum_elementsV8alengthaenum_elementsV0Aainfix <=c0alengthaenum_elementsV0Iainfix =aenum_elementsV9ainfix ++aelementsV3aenum_elementsV4FIainfix =aenum_elementsV8ainfix ++aelementsV6aenum_elementsV7Fainfix =aenum_elementsV0aenum_elementsV1qfwainfix =aenum_elementsV0aenum_elementsV1qfaDoneCV0aDoneainfix =aenum_elementsV0aenum_elementsV1qtwainfix =aenum_elementsV0aenum_elementsV1qfFF">
-    <transf name="split_goal" proved="true" expanded="true">
-     <goal name="WP_parameter eq_enum.1" expl="parameter eq_enum" sum="66975feabbec50588e702b42070550af" proved="true" expanded="true" shape="CV1aNextVVVCV0aNextVVVtAainfix <alengthaenum_elementsV8alengthaenum_elementsV0Aainfix <=c0alengthaenum_elementsV0Iainfix =aenum_elementsV9ainfix ++aelementsV3aenum_elementsV4FIainfix =aenum_elementsV8ainfix ++aelementsV6aenum_elementsV7FIainfix =V5V2wtaDonetFF">
-      <proof prover="cvc3" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.06"/>
+   <goal
+    name="WP_parameter eq_enum"
+    expl="parameter eq_enum"
+    sum="a2f2d303c43bb73418cd9da6aac49a8a"
+    proved="true"
+    expanded="true"
+    shape="CV1aNextVVVCV0aNextVVViainfix =V5V2ainfix =aenum_elementsV0aenum_elementsV1qainfix =V10aTrueIainfix =aenum_elementsV8aenum_elementsV9qainfix =V10aTrueFAainfix <alengthaenum_elementsV8alengthaenum_elementsV0Aainfix <=c0alengthaenum_elementsV0Iainfix =aenum_elementsV9ainfix ++aelementsV3aenum_elementsV4FIainfix =aenum_elementsV8ainfix ++aelementsV6aenum_elementsV7Fainfix =aenum_elementsV0aenum_elementsV1Nwainfix =aenum_elementsV0aenum_elementsV1NaDoneCV0aDoneainfix =aenum_elementsV0aenum_elementsV1wainfix =aenum_elementsV0aenum_elementsV1NFF">
+    <transf
+     name="split_goal"
+     proved="true"
+     expanded="true">
+     <goal
+      name="WP_parameter eq_enum.1"
+      expl="parameter eq_enum"
+      sum="c4fb7dc80f90377f45ce2682e5b14376"
+      proved="true"
+      expanded="true"
+      shape="CV1aNextVVVCV0aNextVVVainfix <alengthaenum_elementsV8alengthaenum_elementsV0Aainfix <=c0alengthaenum_elementsV0Iainfix =aenum_elementsV9ainfix ++aelementsV3aenum_elementsV4FIainfix =aenum_elementsV8ainfix ++aelementsV6aenum_elementsV7FIainfix =V5V2wtaDonetFF">
+      <proof
+       prover="cvc3"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.04"/>
       </proof>
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+      <proof
+       prover="alt-ergo"
+       timelimit="10"
+       edited=""
+       obsolete="false">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter eq_enum.2" expl="parameter eq_enum" sum="184140413687712534b15bac748ca0ae" proved="true" expanded="true" shape="CV1aNextVVVCV0aNextVVVainfix =aenum_elementsV0aenum_elementsV1qainfix =V10aTrueIainfix =aenum_elementsV8aenum_elementsV9qainfix =V10aTrueFItAainfix <alengthaenum_elementsV8alengthaenum_elementsV0Aainfix <=c0alengthaenum_elementsV0Iainfix =aenum_elementsV9ainfix ++aelementsV3aenum_elementsV4FIainfix =aenum_elementsV8ainfix ++aelementsV6aenum_elementsV7FIainfix =V5V2wtaDonetFF">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+     <goal
+      name="WP_parameter eq_enum.2"
+      expl="parameter eq_enum"
+      sum="01cb0751c5b5ff4dc55ccc9e26ecb713"
+      proved="true"
+      expanded="true"
+      shape="CV1aNextVVVCV0aNextVVVainfix =aenum_elementsV0aenum_elementsV1qainfix =V10aTrueIainfix =aenum_elementsV8aenum_elementsV9qainfix =V10aTrueFIainfix <alengthaenum_elementsV8alengthaenum_elementsV0Aainfix <=c0alengthaenum_elementsV0Iainfix =aenum_elementsV9ainfix ++aelementsV3aenum_elementsV4FIainfix =aenum_elementsV8ainfix ++aelementsV6aenum_elementsV7FIainfix =V5V2wtaDonetFF">
+      <proof
+       prover="alt-ergo"
+       timelimit="10"
+       edited=""
+       obsolete="false">
        <result status="valid" time="0.05"/>
       </proof>
      </goal>
-     <goal name="WP_parameter eq_enum.3" expl="parameter eq_enum" sum="46f3c606cbdc685f3eacfe4660969ac6" proved="true" expanded="true" shape="CV1aNextVVVCV0aNextVVVainfix =aenum_elementsV0aenum_elementsV1qfIainfix =V5V2NwtaDonetFF">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter eq_enum.4" expl="parameter eq_enum" sum="4fdb96af857c54a3ac77021b90ca0ece" proved="true" expanded="true" shape="CV1aNextVVVCV0aNextVVVtwainfix =aenum_elementsV0aenum_elementsV1qfaDonetFF">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter eq_enum.5" expl="parameter eq_enum" sum="12ed4a4ed9ef446e5f6fbe216fbd5fc2" proved="true" expanded="true" shape="CV1aNextVVVtaDoneCV0aDoneainfix =aenum_elementsV0aenum_elementsV1qtwtFF">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+     <goal
+      name="WP_parameter eq_enum.3"
+      expl="parameter eq_enum"
+      sum="287cfd7ef39a7a1bbad6e26746ee9fe8"
+      proved="true"
+      expanded="true"
+      shape="CV1aNextVVVCV0aNextVVVainfix =aenum_elementsV0aenum_elementsV1NIainfix =V5V2NwtaDonetFF">
+      <proof
+       prover="alt-ergo"
+       timelimit="10"
+       edited=""
+       obsolete="false">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter eq_enum.6" expl="parameter eq_enum" sum="4bfb33a674ac9486123074825ddcbe55" proved="true" expanded="true" shape="CV1aNextVVVtaDoneCV0aDonetwainfix =aenum_elementsV0aenum_elementsV1qfFF">
-      <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
-       <result status="valid" time="0.03"/>
+     <goal
+      name="WP_parameter eq_enum.4"
+      expl="parameter eq_enum"
+      sum="14dd61c5e2495c85b28ad33b9c1003a8"
+      proved="true"
+      expanded="true"
+      shape="CV1aNextVVVCV0aNextVVVtwainfix =aenum_elementsV0aenum_elementsV1NaDonetFF">
+      <proof
+       prover="alt-ergo"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter eq_enum.5"
+      expl="parameter eq_enum"
+      sum="fa624b2c238a6afd3fc3be5adce0071f"
+      proved="true"
+      expanded="true"
+      shape="CV1aNextVVVtaDoneCV0aDoneainfix =aenum_elementsV0aenum_elementsV1wtFF">
+      <proof
+       prover="alt-ergo"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter eq_enum.6"
+      expl="parameter eq_enum"
+      sum="4722b35538d20012e28cbad90027aab7"
+      proved="true"
+      expanded="true"
+      shape="CV1aNextVVVtaDoneCV0aDonetwainfix =aenum_elementsV0aenum_elementsV1NFF">
+      <proof
+       prover="alt-ergo"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
     </transf>
    </goal>
-   <goal name="WP_parameter same_fringe" expl="normal postcondition" sum="c9f882a43781c23b177a53b6d195040a" proved="true" expanded="true" shape="ainfix =aelementsV0aelementsV1qainfix =V4aTrueIainfix =aenum_elementsV2aenum_elementsV3qainfix =V4aTrueFIainfix =aenum_elementsV3ainfix ++aelementsV1aenum_elementsaDoneFIainfix =aenum_elementsV2ainfix ++aelementsV0aenum_elementsaDoneFFF">
-    <proof prover="alt-ergo" timelimit="10" edited="" obsolete="false">
+   <goal
+    name="WP_parameter same_fringe"
+    expl="normal postcondition"
+    sum="c9f882a43781c23b177a53b6d195040a"
+    proved="true"
+    expanded="true"
+    shape="ainfix =aelementsV0aelementsV1qainfix =V4aTrueIainfix =aenum_elementsV2aenum_elementsV3qainfix =V4aTrueFIainfix =aenum_elementsV3ainfix ++aelementsV1aenum_elementsaDoneFIainfix =aenum_elementsV2ainfix ++aelementsV0aenum_elementsaDoneFFF">
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
