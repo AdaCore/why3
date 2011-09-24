@@ -333,6 +333,7 @@ let clear model = model#clear ()
 let image_of_result ~obsolete result =
   match result with
     | Session.Undone -> !image_undone
+    | Session.Unedited -> !image_unknown
     | Session.Scheduled -> !image_scheduled
     | Session.Running -> !image_running
     | Session.Interrupted -> assert false
@@ -400,6 +401,7 @@ let set_proof_state ~obsolete a =
   let t = match res with
     | Session.Done { Call_provers.pr_time = time } ->
         Format.sprintf "%.2f" time
+    | Session.Unedited -> "not yet edited"
     | _ -> ""
   in
   let t = if obsolete then t ^ " (obsolete)" else t in
@@ -1533,8 +1535,9 @@ let select_row r =
         let o =
           match a.M.proof_state with
             | Session.Undone -> "proof not yet scheduled for running"
+            | Session.Unedited -> "proof not yet edited"
             | Session.Done r -> r.Call_provers.pr_output
-            | Session.Scheduled-> "proof scheduled by not running yet"
+            | Session.Scheduled-> "proof scheduled but not running yet"
             | Session.Running -> "prover currently running"
             | Session.Interrupted -> assert false
             | Session.InternalFailure e ->

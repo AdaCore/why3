@@ -33,6 +33,7 @@ type prover_data =
       driver_name : string;
       driver : Driver.driver;
       mutable editor : string;
+      interactive : bool;
     }
 
 let get_prover_data env id pr acc =
@@ -46,6 +47,7 @@ let get_prover_data env id pr acc =
         driver_name = pr.Whyconf.driver;
         driver = dr;
         editor = pr.Whyconf.editor;
+        interactive = pr.Whyconf.interactive;
       }
       acc
   with e ->
@@ -100,7 +102,7 @@ type proof_attempt_status =
   | Running (** external proof attempt is in progress *)
   | Done of Call_provers.prover_result (** external proof done *)
   | InternalFailure of exn (** external proof aborted by internal error *)
-
+  | Unedited (** interactive prover yet no proof script *)
 
 (***************************)
 (*     main functor        *)
@@ -201,6 +203,9 @@ let verified t = t.verified
 let goals t = t.goals
 let theory_expanded t = t.theory_expanded
 
+let running a = match a.proof_state with
+  | Scheduled | Running | Interrupted -> true
+  | Undone | Done _ | InternalFailure _ | Unedited -> false
 
 let get_theory t =
   match t.theory with
@@ -283,6 +288,8 @@ let save_status fmt s =
   match s with
     | Undone | Scheduled | Running | Interrupted ->
         fprintf fmt "<undone/>@\n"
+    | Unedited ->
+        fprintf fmt "<unedited/>@\n"
     | InternalFailure msg ->
         fprintf fmt "<internalfailure reason=\"%s\"/>@\n"
           (Printexc.to_string msg)
@@ -1333,6 +1340,7 @@ let load_result r =
           Call_provers.pr_output = "";
         }
     | "undone" -> Undone
+    | "unedited" -> Unedited
     | s ->
         eprintf "[Warning] Session.load_result: unexpected element '%s'@." s;
         Undone
@@ -1517,16 +1525,15 @@ let save_session () =
 let redo_external_proof ~timelimit g a =
   (* check that the state is not Scheduled or Running *)
   let previous_result,previous_obs = a.proof_state,a.proof_obsolete in
-  let running = match previous_result with
-    | Scheduled | Running | Interrupted -> true
-    | Done _ | Undone | InternalFailure _ -> false
-  in
-  if running then ()
+  if running a then ()
     (* info_window `ERROR "Proof already in progress" *)
   else
     match a.prover with
       | Undetected_prover _ -> ()
       | Detected_prover p ->
+        if a.edited_as = "" && p.interactive then
+          set_proof_state ~obsolete:false a Unedited
+        else begin
           let callback result =
             match result with
               | Interrupted ->
@@ -1546,6 +1553,7 @@ let redo_external_proof ~timelimit g a =
             ?old ~command:p.command ~driver:p.driver
             ~callback
             (get_task g)
+        end
 
 let rec prover_on_goal ~timelimit p g =
   let id = p.prover_id in
@@ -1696,11 +1704,7 @@ let same_result r1 r2 =
 
 let check_external_proof g a =
   (* check that the state is not Scheduled or Running *)
-  let running = match a.proof_state with
-    | Scheduled | Running | Interrupted -> true
-    | Done _ | Undone | InternalFailure _ -> false
-  in
-  if running then ()
+  if running a then ()
   else
     begin
       incr proofs_to_do;
@@ -1714,7 +1718,7 @@ let check_external_proof g a =
             let callback result =
               match result with
                 | Scheduled | Running | Interrupted -> ()
-                | Undone -> assert false
+                | Undone | Unedited -> assert false
                 | InternalFailure msg ->
                     push_report g p_name (CallFailed msg);
                     incr proofs_done;
@@ -1889,11 +1893,7 @@ let ft_of_pa a =
 
 let edit_proof ~default_editor ~project_dir a =
   (* check that the state is not Scheduled or Running *)
-  let running = match a.proof_state with
-    | Scheduled | Running | Interrupted -> true
-    | Undone | Done _ | InternalFailure _ -> false
-  in
-  if running then ()
+  if running a then ()
 (*
     info_window `ERROR "Edition already in progress"
 *)
@@ -1925,6 +1925,7 @@ let edit_proof ~default_editor ~project_dir a =
                   let file = name ^ "_" ^ (string_of_int !i) ^ ext in
                   let file = Sysutil.relativize_filename project_dir file in
                   a.edited_as <- file;
+                  if a.proof_state = Unedited then a.proof_state <- Undone;
                   file
               | f -> f
           in

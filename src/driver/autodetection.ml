@@ -159,7 +159,8 @@ let detect_exec main data com =
               version = ver;
               command = c;
               driver  = Filename.concat (datadir main) data.prover_driver;
-              editor = data.prover_editor}
+              editor = data.prover_editor;
+              interactive = match data.kind with ITP -> true | ATP -> false; }
       end
     with Not_found ->
       begin

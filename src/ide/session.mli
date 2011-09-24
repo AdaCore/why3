@@ -31,6 +31,7 @@ type prover_data = private
       driver_name : string;
       driver : Driver.driver;
       mutable editor : string;
+      interactive : bool;
     }
     (** record of necessary data for a given external prover *)
 
@@ -61,6 +62,7 @@ type proof_attempt_status = private
     | Running (** external proof attempt is in progress *)
     | Done of Call_provers.prover_result (** external proof done *)
     | InternalFailure of exn (** external proof aborted by internal error *)
+    | Unedited (** interactive prover yet no proof script *)
 
 (** {2 Observers signature} *)
 

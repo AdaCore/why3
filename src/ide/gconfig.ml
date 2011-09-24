@@ -172,6 +172,7 @@ let save_config t =
         driver  = pr.Session.driver_name;
         version = pr.Session.prover_version;
         editor  = pr.Session.editor;
+        interactive = pr.Session.interactive;
       } acc in
   let config = t.config in
   let config = set_main config
