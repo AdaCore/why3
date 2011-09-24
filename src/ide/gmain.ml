@@ -230,7 +230,7 @@ let cleaning_box =
   ~packing:cleaning_frame#add ()
 
 let monitor_frame =
-  GBin.frame ~label:"Monitor"
+  GBin.frame ~label:"Proof monitoring"
     ~packing:(tools_window_vbox#pack ~expand:false) ()
 
 let monitor_box =

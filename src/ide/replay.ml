@@ -119,7 +119,8 @@ module M = Session.Make
          | None -> timeout_handler := Some(float ms /. 1000.0 ,f);
          | Some _ -> failwith "Replay.timeout: already one handler installed"
 
-     let notify_timer_state _ _ _ = ()
+     let notify_timer_state w s r =
+       Printf.eprintf "Progress: %d/%d/%d   \r%!" w s r 
 
    end)
 
@@ -484,6 +485,7 @@ let () =
     if !opt_latex2 <> "" then print_latex_statistics 2 !opt_latex2
     else 
       let callback report =
+        eprintf "@.";
 	let files,n,m =
           List.fold_left file_statistics ([],0,0) (M.get_all_files ())
 	in

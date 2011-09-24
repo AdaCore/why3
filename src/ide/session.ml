@@ -447,9 +447,9 @@ let timeout_handler () =
   let continue =
     match l with
       | [] ->
-(**)
+(*
           eprintf "Info: timeout_handler stopped@.";
-(**)
+*)
           false
       | _ -> true
   in
@@ -464,9 +464,9 @@ let run_timeout_handler () =
   if !timeout_handler_activated then () else
     begin
       timeout_handler_activated := true;
-(**)
+(*
       eprintf "Info: timeout_handler started@.";
-(**)
+*)
       O.timeout ~ms:100 timeout_handler
     end
 
@@ -506,9 +506,9 @@ let idle_handler () =
     true
   with Queue.Empty ->
     idle_handler_activated := false;
-(**)
+(*
     eprintf "Info: idle_handler stopped@.";
-(**)
+*)
     false
     | e ->
       Format.eprintf "@[Exception raise in Session.idle_handler:@ %a@.@]"
@@ -521,9 +521,9 @@ let run_idle_handler () =
   if !idle_handler_activated then () else
     begin
       idle_handler_activated := true;
-(**)
+(*
       eprintf "Info: idle_handler started@.";
-(**)
+*)
       O.idle idle_handler
     end
 
@@ -548,14 +548,15 @@ let cancel_scheduled_proofs () =
         callback Interrupted
       done
     with
-      | Queue.Empty -> ()
+      | Queue.Empty -> 
+          O.notify_timer_state 0 0 (List.length !running_proofs)
 
 
 let schedule_proof_attempt ~debug ~timelimit ~memlimit ?old
     ~command ~driver ~callback goal =
-(**)
-  eprintf "Scheduling a new proof attempt@.";
-(**)
+  (*
+    eprintf "Scheduling a new proof attempt@.";
+  *)
   Queue.push
     (Action_proof_attempt(debug,timelimit,memlimit,old,command,driver,
                         callback,goal))
@@ -1762,10 +1763,14 @@ let check_all ~callback =
          file.theories)
     !all_files;
   let timeout () =
+(*
     Printf.eprintf "Progress: %d/%d\r%!" !proofs_done !proofs_to_do;
+*)
     if !proofs_done = !proofs_to_do then
       begin
+(*
         Printf.eprintf "\n%!";
+*)
         decr maximum_running_proofs;
         callback !reports;
         false
