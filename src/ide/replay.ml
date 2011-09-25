@@ -27,6 +27,7 @@ let opt_version = ref false
 let opt_stats = ref true
 let opt_latex = ref ""
 let opt_latex2 = ref ""
+let opt_html = ref ""
 let opt_force = ref false
 
 let spec = Arg.align [
@@ -48,6 +49,9 @@ let spec = Arg.align [
   ("-latex2",
    Arg.Set_string opt_latex2,
    " produce latex statistics") ;
+  ("-html",
+   Arg.Set_string opt_html,
+   " produce html statistics") ;
 ]
 
 let version_msg = Format.sprintf "Why3 replayer, version %s (build date: %s)"
@@ -123,7 +127,6 @@ module M = Session.Make
        Printf.eprintf "Progress: %d/%d/%d   \r%!" w s r 
 
    end)
-
 
 
 let main_loop () =
@@ -309,33 +312,32 @@ let print_statistics files =
 
 (* Statistics in LaTeX*)
 
-let rec transf_depth tr = 
+let rec transf_depth tr =
   List.fold_left (fun depth g -> max depth (goal_depth g)) 0 (tr.M.subgoals)
 and goal_depth g =
-  Hashtbl.fold 
+  Hashtbl.fold
     (fun _st tr depth -> max depth (1 + transf_depth tr)) (M.transformations g) 0
- 
-let theory_depth t = 
+
+let theory_depth t =
   List.fold_left (fun depth g -> max depth (goal_depth g)) 0 (M.goals t)
- 
-let rec provers_latex_stats provers g = 
+
+let rec provers_latex_stats provers g =
   let proofs = M.external_proofs g in
   Hashtbl.iter (fun p a-> Hashtbl.replace provers p a.M.prover) proofs;
   let tr = M.transformations g in
-  Hashtbl.iter (fun _st tr -> 
+  Hashtbl.iter (fun _st tr ->
     let goals = tr.M.subgoals in
     List.iter (provers_latex_stats provers) goals) tr
 
-
-let prover_name a = 
+let prover_name a =
   match a with
       M.Detected_prover d -> d.Session.prover_name ^ " " ^ d.Session.prover_version
     | M.Undetected_prover s -> s
 
 let rec goal_latex_stat n fmt prov depth depth_max column subgoal subgoals_max first g =
-  if(n ==1) then 
+  if(n ==1) then
     begin
-      if depth_max > 1 then 
+      if depth_max > 1 then
 	begin
 	  if not first then
 	    begin
@@ -356,32 +358,31 @@ let rec goal_latex_stat n fmt prov depth depth_max column subgoal subgoals_max f
 	    if depth > 0 then fprintf fmt "&"
 	end
     end
-  else 
+  else
     for i = 1 to depth do fprintf fmt "\\quad" done;
-  if (depth <= 1) then 
+  if (depth <= 1) then
     fprintf fmt "\\verb|%s| " (M.goal_expl g);
- 
   let proofs = M.external_proofs g in
-  if (Hashtbl.length proofs) > 0 then 
+  if (Hashtbl.length proofs) > 0 then
     begin
-      if (n == 1) then 
-	begin 
-	  if (depth_max <= 1) then 
+      if (n == 1) then
+	begin
+	  if (depth_max <= 1) then
 	    begin
-	      if depth > 0 then	
+	      if depth > 0 then
 		for i = depth to (depth_max - depth) do fprintf fmt "&" done
-	      else 
+	      else
 		for i = depth to (depth_max - depth - 1) do fprintf fmt "&" done
 	    end
-	  else 
+	  else
 		for i = depth to (depth_max - depth - 1) do fprintf fmt "&" done
 	end;
-      List.iter (fun (p, _pr) -> 
-	try 
+      List.iter (fun (p, _pr) ->
+	try
 	  let pr = Hashtbl.find proofs p in
 	  let s = pr.M.proof_state in
 	  match s with
-	      Session.Done res -> 
+	      Session.Done res ->
 		begin
 		  match res.Call_provers.pr_answer with
 		      Call_provers.Valid -> fprintf fmt "& %.2f " res.Call_provers.pr_time
@@ -393,51 +394,49 @@ let rec goal_latex_stat n fmt prov depth depth_max column subgoal subgoals_max f
 	    | _ -> fprintf fmt "& "
 	with Not_found -> fprintf fmt "&") prov;
       if depth > 0 then
-	begin
 	  if (!subgoal < subgoals_max) then
-	    fprintf fmt "\\\\ \\cline{%d-%d} @." (depth+1) column
-	  else 
+	    fprintf fmt "\\\\ \\cline{%d-%d} @." (depth + 1) column
+	  else
 	    fprintf fmt "\\\\ \\cline{%d-%d} @." depth column
-	end
-      else 
+      else
 	fprintf fmt "\\\\ \\hline @."
     end
   else begin
     let tr = M.transformations g in
-    if (n == 2) then 
-      begin 
+    if (n == 2) then
+      begin
 	for i = 1 to (List.length prov) do fprintf fmt "&" done;
       fprintf fmt "\\\\ \\hline @."
       end;
     Hashtbl.iter (fun _st tr ->
       let goals = tr.M.subgoals in
       let subgoal = ref 0 in
-      let _ = List.fold_left (fun first g -> 
+      let _ = List.fold_left (fun first g ->
 	subgoal := !subgoal + 1;
-	goal_latex_stat n fmt prov (depth + 1) depth_max column (subgoal) (List.length goals) first g; false) true goals in 
+	goal_latex_stat n fmt prov (depth + 1) depth_max column (subgoal) (List.length goals) first g; false) true goals in
     () ) tr
   end
 
 let theory_latex_stat n dir t =
   let provers = Hashtbl.create 9 in
   List.iter (provers_latex_stats provers) (M.goals t);
-  let provers = Hashtbl.fold (fun p pr acc -> (p, prover_name pr) :: acc) provers [] in 
-  let provers = 
-    List.sort (fun (_p1, n1) (_p2, n2) -> String.compare n1 n2) provers in 
+  let provers = Hashtbl.fold (fun p pr acc -> (p, prover_name pr) :: acc) provers [] in
+  let provers =
+    List.sort (fun (_p1, n1) (_p2, n2) -> String.compare n1 n2) provers in
   let depth = theory_depth  t in
-  let name = M.theory_name t in 
-  let ch = open_out (Filename.concat dir(name^".tex")) in 
-  let fmt = formatter_of_out_channel ch in 
+  let name = M.theory_name t in
+  let ch = open_out (Filename.concat dir(name^".tex")) in
+  let fmt = formatter_of_out_channel ch in
       fprintf fmt "\\begin{tabular}";
   fprintf fmt "{| l |";
   for i = 0 to (List.length provers) + depth do fprintf fmt "c |" done;
   fprintf fmt "} \n \\hline@.";
-  if (n == 1) then 
-    if (depth > 1) then 
+  if (n == 1) then
+    if (depth > 1) then
       fprintf fmt " \\multicolumn{%d}{|c|}{Proof obligations } "  depth
       else
       fprintf fmt " \\multicolumn{%d}{|c|}{Proof obligations } " (depth + 1)
-  else 
+  else
     fprintf fmt " Proof obligations ";
   List.iter (fun (_, a) -> fprintf fmt "& %s " a) provers;
   fprintf fmt "\\\\\\hline@.";
@@ -481,9 +480,9 @@ let () =
       Whyconf.running_provers_max (Whyconf.get_main config);
     eprintf " done@.";
     if !opt_latex <> "" then print_latex_statistics 1 !opt_latex
-    else 
+    else
     if !opt_latex2 <> "" then print_latex_statistics 2 !opt_latex2
-    else 
+    else
       let callback report =
         eprintf "@.";
 	let files,n,m =
