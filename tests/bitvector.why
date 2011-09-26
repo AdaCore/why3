@@ -1,0 +1,263 @@
+
+theory BitVector
+
+  use export bool.Bool
+  use import int.Int
+
+  function size : int
+
+  type bv
+
+  function nth bv int: bool
+
+  function bvzero : bv
+  axiom Nth_zero:
+    forall n:int. 0 <= n < size -> nth bvzero n = False
+
+  function bvone : bv
+  axiom Nth_one:
+    forall n:int. 0 <= n < size -> nth bvone n = True
+
+  predicate eq (v1 v2 : bv) =
+    forall n:int. 0 <= n < size -> nth v1 n = nth v2 n
+
+  axiom extensionality:
+    forall v1 v2 : bv. eq v1 v2 -> v1 = v2
+
+  function bw_and (v1 v2 : bv) : bv
+  axiom Nth_bw_and:
+    forall v1 v2:bv, n:int. 0 <= n < size ->
+      nth (bw_and v1 v2) n = andb (nth v1 n) (nth v2 n)
+
+  function bw_or (v1 v2 : bv) : bv
+  axiom Nth_bw_or:
+    forall v1 v2:bv, n:int. 0 <= n < size ->
+      nth (bw_or v1 v2) n = orb (nth v1 n) (nth v2 n)
+
+  function bw_xor (v1 v2 : bv) : bv
+  axiom Nth_bw_xor:
+    forall v1 v2:bv, n:int. 0 <= n < size ->
+      nth (bw_xor v1 v2) n = xorb (nth v1 n) (nth v2 n)
+
+  function bw_not (v : bv) : bv
+  axiom Nth_bw_not:
+    forall v:bv, n:int. 0 <= n < size ->
+      nth (bw_not v) n = notb (nth v n)
+
+  (* logical shift right *)
+  function lsr bv int : bv
+
+  axiom lsr_nth_low:
+    forall b:bv, n s:int.
+      0 <= n < size -> 0 <= s ->
+        n+s < size -> nth (lsr b s) n = nth b (n+s)
+
+  axiom lsr_nth_high:
+    forall b:bv, n s:int.
+      0 <= n < size -> 0 <= s ->
+        n+s >= size -> nth (lsr b s) n = False
+
+  (* arithmetic shift right *)
+  function asr bv int : bv
+
+  axiom asr_nth_low:
+    forall b:bv, n s:int.
+      0 <= n < size -> 0 <= s ->
+        n+s < size -> nth (asr b s) n = nth b (n+s)
+
+  axiom asr_nth_high:
+    forall b:bv, n s:int.
+      0 <= n < size -> 0 <= s ->
+        n+s >= size -> nth (asr b s) n = nth b (size-1)
+
+  (* logical shift left *)
+  function lsl bv int : bv
+
+  axiom lsl_nth_high:
+    forall b:bv, n s:int.
+      0 <= n < size -> 0 <= s ->
+        0 <= n-s -> nth (lsl b s) n = nth b (n-s)
+
+  axiom lsl_nth_low:
+    forall b:bv, n s:int.
+      0 <= n < size -> 0 <= s ->
+        0 > n-s -> nth (lsl b s) n = False
+
+  (* conversion to/from integers *)
+
+  function to_nat_aux bv int : int
+    (* (to_nat_aux b i) returns the non-negative integer whose
+       binary repr is b[size-1..i] *)
+
+  axiom to_nat_aux_zero :
+    forall b:bv, i:int.
+      0 <= i < size ->
+        nth b i = False ->
+          to_nat_aux b i = 2 * to_nat_aux b (i+1)
+
+  axiom to_nat_aux_one :
+    forall b:bv, i:int.
+      0 <= i < size ->
+        nth b i = True ->
+          to_nat_aux b i = 1 + 2 * to_nat_aux b (i+1)
+
+  axiom to_nat_aux_high :
+    forall b:bv, i:int.
+      i >= size ->
+        to_nat_aux b i = 0
+
+  function to_nat (b:bv) : int = to_nat_aux b 0
+
+
+  function to_int_aux bv int : int
+    (* (to_int_aux b i) returns the integer whose
+       2-complement binary repr is b[size-1..i] *)
+
+  axiom to_int_aux_zero :
+    forall b:bv, i:int.
+      0 <= i < size-1 ->
+        nth b i = False ->
+          to_int_aux b i = 2 * to_int_aux b (i+1)
+
+  axiom to_int_aux_one :
+    forall b:bv, i:int.
+      0 <= i < size-1 ->
+        nth b i = True ->
+          to_int_aux b i = 1 + 2 * to_int_aux b (i+1)
+
+  axiom to_int_aux_pos :
+    forall b:bv. nth b (size-1) = False ->
+         to_int_aux b (size-1) = 0
+
+  axiom to_int_aux_neg :
+    forall b:bv. nth b (size-1) = True ->
+         to_int_aux b (size-1) = -1
+
+  function to_int (b:bv) : int = to_int_aux b 0
+
+end
+
+
+theory BV32
+
+  function size : int = 32
+
+  clone export BitVector with function size = size
+
+end
+
+
+theory TestBv32
+
+  use import BV32
+  use import int.Int
+
+  goal Test1:
+    let b = bw_and bvzero bvone in nth b 1 = False
+
+  goal Test2:
+    let b = lsr bvone 16 in nth b 15 = True
+
+  goal Test3:
+    let b = lsr bvone 16 in nth b 16 = False
+
+  goal Test4:
+    let b = asr bvone 16 in nth b 15 = True
+
+  goal Test5:
+    let b = asr bvone 16 in nth b 16 = True
+
+  goal Test6:
+    let b = asr (lsr bvone 1) 16 in nth b 16 = False
+
+  goal to_nat_0x00000000:
+    to_nat bvzero = 0
+
+  goal to_nat_0x0000000F:
+    to_nat (lsr bvone 28) = 15
+
+  goal to_nat_0x0000001F:
+    to_nat (lsr bvone 27) = 31
+
+  goal to_nat_0x0000003F:
+    to_nat (lsr bvone 26) = 63
+
+  goal to_nat_0x0000007F:
+    to_nat (lsr bvone 25) = 127
+
+  goal to_nat_0x000000FF:
+    to_nat (lsr bvone 24) = 255
+
+  goal to_nat_0x000001FF:
+    to_nat (lsr bvone 23) = 511
+
+  goal to_nat_0x000003FF:
+    to_nat (lsr bvone 22) = 1023
+
+  goal to_nat_0x000007FF:
+    to_nat (lsr bvone 21) = 2047
+
+  goal to_nat_0x00000FFF:
+    to_nat (lsr bvone 20) = 4095
+
+  goal to_nat_0x00001FFF:
+    to_nat (lsr bvone 19) = 8191
+
+  goal to_nat_0x00003FFF:
+    to_nat (lsr bvone 18) = 16383
+
+  goal to_nat_0x00007FFF:
+    to_nat (lsr bvone 17) = 32767
+
+  goal to_nat_0x0000FFFF:
+    to_nat (lsr bvone 16) = 65535
+
+(*
+  goal to_nat_smoke:
+    to_nat (lsr bvone 16) = 65536
+*)
+
+  goal to_nat_0x0001FFFF:
+    to_nat (lsr bvone 15) = 131071
+
+  goal to_nat_0x0003FFFF:
+    to_nat (lsr bvone 14) = 262143
+
+  goal to_nat_0x0007FFFF:
+    to_nat (lsr bvone 13) = 524287
+
+  goal to_nat_0x000FFFFF:
+    to_nat (lsr bvone 12) = 1048575
+
+  goal to_nat_0x00FFFFFF:
+    to_nat (lsr bvone 8) = 16777215
+
+  goal to_nat_0xFFFFFFFF:
+    to_nat bvone = 4294967295
+
+  goal to_int_0x00000000:
+    to_int bvzero = 0
+
+  goal to_int_0xFFFFFFFF:
+    to_int bvone = -1
+
+  goal to_int_0x7FFFFFFF:
+    to_int (lsr bvone 1) = 2147483647
+
+  goal to_int_0x80000000:
+    to_int (lsl bvone 31) = -2147483648
+
+  goal to_int_0x0000FFFF:
+    to_int (lsr bvone 16) = 65535
+
+  goal to_int_smoke:
+    to_int (lsr bvone 16) = 65536
+
+end
+
+
+(*
+Local Variables:
+compile-command: "why3ide bitvector.why"
+End:
+*)
