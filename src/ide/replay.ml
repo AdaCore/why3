@@ -335,13 +335,23 @@ let prover_name a =
     | M.Undetected_prover s -> s
 
 let rec goal_latex_stat n fmt prov depth depth_max column subgoal _subgoals_max g =
-  if n == 1 && depth > 0 then
-    if subgoal > 0 then
+  if n == 1 then
+    begin
+    if depth > 0 then
+      if subgoal > 0 then
       fprintf fmt "\\cline{%d-%d} @." (depth + 1) column
     else ()
       (*fprintf fmt "\\cline{%d-%d} @." depth column*)
   else
     fprintf fmt "\\hline @.";
+    end
+  else
+    begin
+    if depth > 0 then
+      fprintf fmt "\\cline{%d-%d} @." 2 column
+    else
+      fprintf fmt "\\hline @."
+    end;
   if(n ==1) then
     begin
       if depth_max > 1 then
@@ -442,10 +452,17 @@ let theory_latex_stat n dir t =
     fprintf fmt "\\hline Proof obligations ";
   List.iter (fun (_, a) -> fprintf fmt "& %s " a) provers;
   fprintf fmt "\\\\ @.";
-  if (depth > 1) then
-    List.iter (goal_latex_stat n fmt provers 0 depth ((List.length provers) + depth) 0 0) (M.goals t)
-  else
-    List.iter (goal_latex_stat n fmt provers 0 depth ((List.length provers) + depth + 1) 0 0) (M.goals t);
+  let column = 
+    if n == 1 then 
+    if depth > 1
+    then 
+      (List.length provers) + depth
+    else 
+      (List.length provers) + depth + 1
+    else 
+      (List.length provers) +  1
+  in 
+  List.iter (goal_latex_stat n fmt provers 0 depth column 0 0) (M.goals t);
   fprintf fmt "\\hline \\end{tabular}@.";
   close_out ch
 
