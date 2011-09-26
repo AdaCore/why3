@@ -334,12 +334,19 @@ let prover_name a =
       M.Detected_prover d -> d.Session.prover_name ^ " " ^ d.Session.prover_version
     | M.Undetected_prover s -> s
 
-let rec goal_latex_stat n fmt prov depth depth_max column subgoal subgoals_max first g =
+let rec goal_latex_stat n fmt prov depth depth_max column subgoal _subgoals_max g =
+  if n == 1 && depth > 0 then
+    if subgoal > 0 then
+      fprintf fmt "\\cline{%d-%d} @." (depth + 1) column
+    else ()
+      (*fprintf fmt "\\cline{%d-%d} @." depth column*)
+  else
+    fprintf fmt "\\hline @.";
   if(n ==1) then
     begin
       if depth_max > 1 then
 	begin
-	  if not first then
+	  if subgoal > 0 then
 	    begin
 	      if(depth < depth_max)  then
 		for i = 1 to depth do fprintf fmt "&" done
@@ -352,7 +359,7 @@ let rec goal_latex_stat n fmt prov depth depth_max column subgoal subgoals_max f
 	end
       else
 	begin
-	  if not first then
+	  if subgoal > 0  then
 	    for i = 1 to depth  do fprintf fmt "&" done
 	  else
 	    if depth > 0 then fprintf fmt "&"
@@ -361,7 +368,10 @@ let rec goal_latex_stat n fmt prov depth depth_max column subgoal subgoals_max f
   else
     for i = 1 to depth do fprintf fmt "\\quad" done;
   if (depth <= 1) then
-    fprintf fmt "\\verb|%s| " (M.goal_expl g);
+    fprintf fmt "\\verb|%s| " (M.goal_expl g)
+  else
+    if n == 2 then
+      fprintf fmt "%d " (subgoal + 1);
   let proofs = M.external_proofs g in
   if (Hashtbl.length proofs) > 0 then
     begin
@@ -393,27 +403,19 @@ let rec goal_latex_stat n fmt prov depth depth_max column subgoal subgoals_max f
 		end
 	    | _ -> fprintf fmt "& "
 	with Not_found -> fprintf fmt "&") prov;
-      if depth > 0 then
-	  if (!subgoal < subgoals_max) then
-	    fprintf fmt "\\\\ \\cline{%d-%d} @." (depth + 1) column
-	  else
-	    fprintf fmt "\\\\ \\cline{%d-%d} @." depth column
-      else
-	fprintf fmt "\\\\ \\hline @."
+    fprintf fmt "\\\\ @."
     end
   else begin
     let tr = M.transformations g in
     if (n == 2) then
       begin
-	for i = 1 to (List.length prov) do fprintf fmt "&" done;
-      fprintf fmt "\\\\ \\hline @."
+	(*for i = 1 to (List.length prov) do fprintf fmt "&" done;*)
+	fprintf fmt "& \\multicolumn{%d}{|c|}{}\\\\ @." (List.length prov);
       end;
     Hashtbl.iter (fun _st tr ->
       let goals = tr.M.subgoals in
-      let subgoal = ref 0 in
-      let _ = List.fold_left (fun first g ->
-	subgoal := !subgoal + 1;
-	goal_latex_stat n fmt prov (depth + 1) depth_max column (subgoal) (List.length goals) first g; false) true goals in
+      let _ = List.fold_left (fun subgoal g ->
+	goal_latex_stat n fmt prov (depth + 1) depth_max column (subgoal) (List.length goals) g; subgoal + 1) 0 goals in
     () ) tr
   end
 
@@ -430,21 +432,21 @@ let theory_latex_stat n dir t =
       fprintf fmt "\\begin{tabular}";
   fprintf fmt "{| l |";
   for i = 0 to (List.length provers) + depth do fprintf fmt "c |" done;
-  fprintf fmt "} \n \\hline@.";
+  fprintf fmt "}@.";
   if (n == 1) then
     if (depth > 1) then
-      fprintf fmt " \\multicolumn{%d}{|c|}{Proof obligations } "  depth
+      fprintf fmt "\\hline \\multicolumn{%d}{|c|}{Proof obligations } "  depth
       else
-      fprintf fmt " \\multicolumn{%d}{|c|}{Proof obligations } " (depth + 1)
+      fprintf fmt "\\hline \\multicolumn{%d}{|c|}{Proof obligations } " (depth + 1)
   else
-    fprintf fmt " Proof obligations ";
+    fprintf fmt "\\hline Proof obligations ";
   List.iter (fun (_, a) -> fprintf fmt "& %s " a) provers;
-  fprintf fmt "\\\\\\hline@.";
+  fprintf fmt "\\\\ @.";
   if (depth > 1) then
-    List.iter (goal_latex_stat n fmt provers 0 depth ((List.length provers) + depth) (ref 0) 0 true) (M.goals t)
+    List.iter (goal_latex_stat n fmt provers 0 depth ((List.length provers) + depth) 0 0) (M.goals t)
   else
-    List.iter (goal_latex_stat n fmt provers 0 depth ((List.length provers) + depth + 1) (ref 0) 0 true) (M.goals t);
-  fprintf fmt "\\end{tabular}@.";
+    List.iter (goal_latex_stat n fmt provers 0 depth ((List.length provers) + depth + 1) 0 0) (M.goals t);
+  fprintf fmt "\\hline \\end{tabular}@.";
   close_out ch
 
 let file_latex_stat n dir f =
