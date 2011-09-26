@@ -387,9 +387,9 @@ let rec goal_latex_stat n fmt prov depth depth_max column subgoal subgoals_max f
 		  match res.Call_provers.pr_answer with
 		      Call_provers.Valid -> fprintf fmt "& %.2f " res.Call_provers.pr_time
 		    | Call_provers.Invalid -> fprintf fmt "& - "
-		    | Call_provers.Timeout -> fprintf fmt "& timeout "
+		    | Call_provers.Timeout -> fprintf fmt "& Timeout "
 		    | Call_provers.Unknown _s -> fprintf fmt "& ? "
-		    | _ -> fprintf fmt "& "
+		    | _ -> fprintf fmt "& Fail "
 		end
 	    | _ -> fprintf fmt "& "
 	with Not_found -> fprintf fmt "&") prov;
