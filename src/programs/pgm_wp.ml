@@ -413,6 +413,9 @@ let t_True  env = fs_app (find_ls ~pure:true env "True")  [] (ty_bool env)
 let t_False env = fs_app (find_ls ~pure:true env "False") [] (ty_bool env)
 let mk_t_if env f = t_if f (t_True env) (t_False env)
 
+let ls_absurd = create_lsymbol (id_fresh "absurd") [] None
+let t_absurd  = ps_app ls_absurd []
+
 (*
   env : module_uc
   rm  : Spv.t Mreg.t (maps regions to pvsymbol sets)
@@ -518,7 +521,7 @@ and wp_desc env rm e q = match e.expr_desc with
       let t = t_var x.pv_pure in
       wp_label e (t_case t (List.map branch bl))
   | Eabsurd ->
-      wp_label e t_false
+      wp_label e t_absurd
   | Eraise (x, None) ->
       (* $wp(raise E, _, R) = R$ *)
       let _, ql = q in
@@ -689,18 +692,27 @@ let rec remove_at f = match f.t_node with
   | _ ->
       t_map remove_at f
 
+(* replace t_absurd with t_false *)
+let rec unabsurd f = match f.t_node with
+  | Tapp (ls, []) when ls_equal ls ls_absurd ->
+      t_label_copy f t_false
+  | _ ->
+      t_map unabsurd f
+
 let add_wp_decl ps f uc =
+  (* prepare a proposition symbol *)
   let name = ps.ps_pure.ls_name in
   let s = "WP_" ^ name.id_string in
-  let label =
-    ("expl:" ^ name.id_string) :: ps.ps_pure.ls_name.id_label
-  in
+  let label = ("expl:" ^ name.id_string) :: name.id_label in
   let id = id_fresh ~label ?loc:name.id_loc s in
-  let f = bool_to_prop uc (remove_at f) in
-  let km = get_known (pure_uc uc) in
-  let f = eval_match ~inline:inline_nonrec_linear km f in
-  (* printf "wp: f=%a@." print_term f; *)
   let pr = create_prsymbol id in
+  (* prepare the VC formula *)
+  let km = get_known (pure_uc uc) in
+  let f = remove_at f in
+  let f = bool_to_prop uc f in
+  let f = eval_match ~inline:inline_nonrec_linear km f in
+  let f = unabsurd f in
+  (* printf "wp: f=%a@." print_term f; *)
   let d = create_prop_decl Pgoal pr f in
   add_pure_decl d uc
 
