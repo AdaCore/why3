@@ -70,7 +70,7 @@ let alt_ergo : Whyconf.config_prover =
   try
     Util.Mstr.find "alt-ergo" provers
   with Not_found ->
-    abort_with_message "Prover alt-ergo not installed or not configured.@."
+    abort_with_message "Prover alt-ergo not installed or not configured."
 
 (* loading the Alt-Ergo driver *)
 let altergo_driver : Driver.driver =
@@ -201,5 +201,5 @@ let _ =
                Format.printf "%a@." (Gnat_expl.print_expl false) expl)
          !expl_map
     with e when not (Debug.test_flag Debug.stack_trace) ->
-       Format.printf "%a" Exn_printer.exn_printer e;
+       Format.eprintf "%a.@." Exn_printer.exn_printer e;
        abort_with_message ""
