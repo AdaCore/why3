@@ -113,18 +113,21 @@ let rec search_labels acc f =
       let expl, gnat = extract_explanation "" "" f.t_label in
       if gnat <> "" then begin
          let pos = Util.of_option f.t_loc in
-         Some (Gnat_expl.expl_from_label_info pos gnat  expl)
+         Some (Gnat_expl.expl_from_label_info pos gnat expl)
       end else
          match f.t_node with
          | Ttrue | Tfalse | Tconst _ | Tvar _ | Tapp _  -> None
          | Tif (_,t1,t2) ->
                search_labels (search_labels acc t1) t2
-         | Teps _ | Tcase _ -> assert false
+         | Tcase (_, tbl) ->
+               List.fold_left (fun acc b ->
+                  let _, t = t_open_branch b in
+                  search_labels acc t) acc tbl
          | Tnot t -> search_labels acc t
          | Tbinop (Timplies,_,t2) ->
                search_labels acc t2
          | Tbinop (_,t1,t2) -> search_labels (search_labels acc t1) t2
-         | Tlet (_,tb) ->
+         | Tlet (_,tb) | Teps tb ->
                let _, t = t_open_bound tb in
                search_labels acc t
          | Tquant (_,tq) ->
