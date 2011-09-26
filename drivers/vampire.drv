@@ -4,12 +4,12 @@ printer "tptp"
 filename "%f-%t-%g.p"
 
 valid   "Refutation found"
+timeout "Aborted by signal SIGXCPU on"
 unknown   "Refutation not found" "Unknown"
 (* invalid "Completion found" *)
 (* invalid "SZS status CounterSatisfiable" *)
 (* timeout "Ran out of time" *)
 (* timeout "Resource limit exceeded" *)
-timeout "Time limit reached!"
 (* unknown "No Proof Found"            "Unknown" *)
 (* fail    "Failure.*"                   "\"\\0\"" *)
 time "why3cpulimit time : %s s"
