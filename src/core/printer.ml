@@ -204,12 +204,14 @@ let get_syntax_map task =
   let sm = Task.on_meta meta_remove_prop sm_add_pr sm task in
   sm
 
+(*
 let get_syntax_map_of_theory theory =
   let sm = Mid.empty in
   let sm = Theory.on_meta meta_syntax_type sm_add_ts sm theory in
   let sm = Theory.on_meta meta_syntax_logic sm_add_ls sm theory in
   let sm = Theory.on_meta meta_remove_prop sm_add_pr sm theory in
   sm
+*)
 
 let query_syntax sm id = Mid.find_option id sm
 

@@ -720,6 +720,7 @@ let on_meta meta fn acc theory =
   Stdecl.fold add tds.tds_set acc
 *)
 
+(*
 let on_meta _meta fn acc theory =
   let tdecls = theory.th_decls in
   List.fold_left
@@ -728,6 +729,7 @@ let on_meta _meta fn acc theory =
          | Meta (_,ma) -> fn acc ma
          | _ -> acc)
     acc tdecls
+*)
 
 
 (** Base theories *)

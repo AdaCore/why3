@@ -145,7 +145,7 @@ let option_list = Arg.align [
   "--prover", Arg.String (fun s -> opt_prover := Some s),
       " same as -P";
   "--coq-realize", Arg.String (fun s -> opt_coq_realization := Some s),
-      " produce, in given file, a Coq realization of the theory given \
+      " <file> produce, in given file, a Coq realization of the theory given \
         using -T";
   "-F", Arg.String (fun s -> opt_parser := Some s),
       "<format> Select input format (default: \"why\")";
@@ -482,7 +482,24 @@ let do_local_theory env drv fname m (tname,_,t,glist) =
   in
   do_theory env drv fname tname th glist
 
-let do_coq_realize_theory env _drv oldf fname m (tname,_,t,_glist) =
+let do_coq_realize_theory_raw env _drv oldf th =
+  let old =
+    if Sys.file_exists oldf
+    then
+      begin
+        let backup = oldf ^ ".bak" in
+        Sys.rename oldf backup;
+        Some(open_in backup)
+      end
+    else None
+  in
+  let ch = open_out oldf in
+  let fmt = formatter_of_out_channel ch in
+  Queue.iter
+    (Coq.print_theory ?old env [] Ident.Mid.empty fmt) th
+
+let do_coq_realize_theory env _drv oldf fname m (tname,_,t,_ths) =
+  eprintf "[Coq realization] theory '%s' of file '%s'.@." tname fname;
   let th = try Mstr.find t m with Not_found ->
     eprintf "Theory '%s' not found in file '%s'.@." tname fname;
     exit 1
@@ -505,7 +522,15 @@ let do_input env drv = function
   | None, _ when !opt_parse_only || !opt_type_only ->
       ()
   | None, tlist ->
-      Queue.iter (do_global_theory env drv) tlist
+      begin
+        match !opt_coq_realization with
+          | Some f ->
+              eprintf "[Coq realization] output file: %s@." f;
+(*
+              Queue.iter (do_coq_realize_theory_raw env drv f) tlist
+*)
+          | None -> Queue.iter (do_global_theory env drv) tlist
+      end
   | Some f, tlist ->
       let fname, cin = match f with
         | "-" -> "stdin", stdin
@@ -518,6 +543,7 @@ let do_input env drv = function
       else
         match !opt_coq_realization with
           | Some f ->
+              eprintf "[Coq realization] output file: %s@." f;
               Queue.iter (do_coq_realize_theory env drv f fname m) tlist
           | None ->
               if Queue.is_empty tlist then

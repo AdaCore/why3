@@ -683,28 +683,25 @@ let () = register_printer "coq" print_task
 open Theory
 
 let print_tdecl ~old info fmt d = match d.td_node with
-  | Decl d -> print_decl ~old info fmt d
-  | Use _t -> ()
-(*
-      fprintf fmt "Require Import %s.@\n@\n" (id_unique iprinter t.th_name)
-*)
+  | Decl d ->
+      print_decl ~old info fmt d
+  | Use t ->
+      fprintf fmt "Require %s.@\n@\n"
+        (id_unique iprinter t.th_name)
   | Meta _ -> assert false (* TODO ? *)
   | Clone _ -> assert false (* TODO *)
 
 let print_tdecls ~old info fmt dl =
-  fprintf fmt "@[<hov>%a@\n@]" (print_list nothing (print_tdecl ~old info)) dl
+  fprintf fmt "@[<hov>%a@\n@]"
+    (print_list nothing (print_tdecl ~old info)) dl
 
 let print_theory _env pr thpr ?old fmt th =
   forget_all ();
   print_prelude fmt pr;
   print_prelude_for_theory th fmt thpr;
-(* TODO
   let info = {
-    info_syn = get_syntax_map th;
-    info_syn = get_remove_set th} in
-*)
-  let info = {
-    info_syn = Mid.empty (* get_syntax_map_of_theory th *);
+    info_syn = (Mid.empty : string Ident.Mid.t)
+      (* get_syntax_map_of_theory th*);
     realization = true;
   }
   in

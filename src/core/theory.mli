@@ -180,7 +180,9 @@ val clone_meta : tdecl -> symbol_map -> tdecl
 (* [clone_meta td_meta sm] produces from [td_meta]
  * a new Meta tdecl instantiated with respect to [sm]]. *)
 
+(*
 val on_meta: meta-> ('a -> meta_arg list -> 'a) -> 'a -> theory -> 'a
+*)
 
 (** Base theories *)
 
