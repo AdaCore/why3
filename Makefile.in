@@ -308,9 +308,9 @@ bin/why3ml: bin/why3ml.@OCAMLBEST@
 .PHONY: adacore-patch
 
 BASETAG=0.70
-PATCHRELEVANT= bin doc configure.in drivers examples INSTALL LICENSE \
+PATCHRELEVANT= configure.in drivers INSTALL LICENSE \
 	       Makefile.in META.in modules OCAML-LICENSE plugins README \
-	       share src theories Version
+	       src theories Version
 adacore-patch:
 	git diff --no-prefix $(BASETAG) $(PATCHRELEVANT) > why3-$(BASETAG).patch
 
