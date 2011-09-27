@@ -334,6 +334,15 @@ let prover_name a =
       M.Detected_prover d -> d.Session.prover_name ^ " " ^ d.Session.prover_version
     | M.Undetected_prover s -> s
 
+let protect s = 
+  let b = Buffer.create 7 in 
+  for i = 0 to String.length s - 1 do 
+    match s.[i] with 
+	'_' -> Buffer.add_string b "\\_"
+      | c -> Buffer.add_char b c
+  done;
+  Buffer.contents b
+
 let rec goal_latex_stat n fmt prov depth depth_max column subgoal _subgoals_max g =
   if n == 1 then
     begin
@@ -378,7 +387,7 @@ let rec goal_latex_stat n fmt prov depth depth_max column subgoal _subgoals_max 
   else
     for i = 1 to depth do fprintf fmt "\\quad" done;
   if (depth <= 1) then
-    fprintf fmt "\\verb|%s| " (M.goal_expl g)
+    fprintf fmt "\\explanation{%s} " (protect (M.goal_expl g))
   else
     if n == 2 then
       fprintf fmt "%d " (subgoal + 1);
@@ -387,7 +396,7 @@ let rec goal_latex_stat n fmt prov depth depth_max column subgoal _subgoals_max 
     begin
       if (n == 1) then
 	begin
-	  if (depth_max <= 1) then
+	  if depth_max <= 1 then
 	    begin
 	      if depth > 0 then
 		for i = depth to (depth_max - depth) do fprintf fmt "&" done
@@ -395,7 +404,10 @@ let rec goal_latex_stat n fmt prov depth depth_max column subgoal _subgoals_max 
 		for i = depth to (depth_max - depth - 1) do fprintf fmt "&" done
 	    end
 	  else
+	      if depth > 0 then
 		for i = depth to (depth_max - depth - 1) do fprintf fmt "&" done
+	      else
+		for i = depth to (depth_max - depth - 2) do fprintf fmt "&" done
 	end;
       List.iter (fun (p, _pr) ->
 	try
@@ -405,14 +417,14 @@ let rec goal_latex_stat n fmt prov depth depth_max column subgoal _subgoals_max 
 	      Session.Done res ->
 		begin
 		  match res.Call_provers.pr_answer with
-		      Call_provers.Valid -> fprintf fmt "& %.2f " res.Call_provers.pr_time
-		    | Call_provers.Invalid -> fprintf fmt "& - "
-		    | Call_provers.Timeout -> fprintf fmt "& Timeout "
-		    | Call_provers.Unknown _s -> fprintf fmt "& ? "
-		    | _ -> fprintf fmt "& Fail "
+		      Call_provers.Valid -> fprintf fmt "& \\valid{%.2f} " res.Call_provers.pr_time
+		    | Call_provers.Invalid -> fprintf fmt "& \\invalid "
+		    | Call_provers.Timeout -> fprintf fmt "& \\timeout "
+		    | Call_provers.Unknown _s -> fprintf fmt "& \\unknown "
+		    | _ -> fprintf fmt "& \\failure "
 		end
-	    | _ -> fprintf fmt "& "
-	with Not_found -> fprintf fmt "&") prov;
+	    | _ -> fprintf fmt "& Undone"
+	with Not_found -> fprintf fmt "& \\noresult") prov;
     fprintf fmt "\\\\ @."
     end
   else begin
@@ -450,7 +462,7 @@ let theory_latex_stat n dir t =
       fprintf fmt "\\hline \\multicolumn{%d}{|c|}{Proof obligations } " (depth + 1)
   else
     fprintf fmt "\\hline Proof obligations ";
-  List.iter (fun (_, a) -> fprintf fmt "& %s " a) provers;
+  List.iter (fun (_, a) -> fprintf fmt "& \\provername{%s} " a) provers;
   fprintf fmt "\\\\ @.";
   let column = 
     if n == 1 then 
