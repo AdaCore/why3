@@ -135,27 +135,35 @@ let rec search_labels acc f =
                search_labels acc t
 
 let expl_map = ref Gnat_expl.MExpl.empty
+let nb_vcs   = ref 0
+let nb_po    = ref 0
 
 let find_expl e =
    try Gnat_expl.MExpl.find e !expl_map
-   with Not_found -> []
+   with Not_found ->
+      incr nb_po;
+      []
+
+let add_entry e t =
+   expl_map := Gnat_expl.MExpl.add e t !expl_map
 
 let add_task e t =
    let l = find_expl e in
-   expl_map := Gnat_expl.MExpl.add e (t::l) !expl_map
+   incr nb_vcs;
+   add_entry e (t::l)
+
+let add_empty_task e =
+   let l = find_expl e in
+   add_entry e l
 
 let do_task t =
    let fml = Task.task_goal_fmla t in
-   match fml.t_node with
-   | Ttrue -> ()
-   | _ ->
-         let expl = search_labels None fml in
-         match expl with
-         | None ->
-               abort_with_message "Task has no tracability label."
-
-         | Some e ->
-               add_task e t
+   match fml.t_node , search_labels None fml with
+   | Ttrue, None -> ()
+   | Ttrue, Some e -> add_empty_task e
+   | _, None ->
+         abort_with_message "Task has no tracability label."
+   | _, Some e -> add_task e t
 
 let do_unsplitted_task t =
    let tasks = Trans.apply split_trans t in
@@ -194,6 +202,9 @@ let _ =
       let m = Env.read_file env filename in
       (* fill map of explanations *)
       Util.Mstr.iter do_theory m;
+      if !opt_verbose then
+         Format.printf "Obtained %d proof objectives and %d VCs@."
+            !nb_po !nb_vcs;
       Gnat_expl.MExpl.iter
          (fun expl tl ->
             try
