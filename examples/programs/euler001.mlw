@@ -7,6 +7,29 @@ Find the sum of all the multiples of 3 or 5 below 1000.
 
 *)
 
+theory DivModHints
+
+  use import int.Int
+  use import int.EuclideanDivision
+
+  lemma mod_succ_1 :
+    forall x y:int. x >= 0 /\ y > 0 ->
+      mod (x+1) y <> 0 -> mod (x+1) y = (mod x y) + 1
+
+  lemma mod_succ_2 :
+    forall x y:int. x >= 0 /\ y > 0 ->
+      mod (x+1) y = 0 -> mod x y = y-1
+
+  lemma div_succ_1 :
+    forall x y:int. x >= 0 /\ y > 0 ->
+      mod (x+1) y = 0 -> div (x+1) y = (div x y) + 1
+
+  lemma div_succ_2 :
+    forall x y:int. x >= 0 /\ y > 0 ->
+      mod (x+1) y <> 0 -> div (x+1) y = (div x y)
+
+end
+
 
 theory SumMultiple
 
@@ -27,14 +50,6 @@ theory SumMultiple
     mod n 3 = 0 \/ mod n 5 = 0 ->
     sum_multiple_3_5_lt (n+1) = sum_multiple_3_5_lt n + n
 
-  lemma div_minus1_1 :
-    forall x y:int. x >= 0 /\ y > 0 ->
-      mod (x+1) y = 0 -> div (x+1) y = (div x y) + 1
-
-  lemma div_minus1_2 :
-    forall x y:int. x >= 0 /\ y > 0 ->
-      mod (x+1) y <> 0 -> div (x+1) y = (div x y)
-
   function closed_formula (n:int) : int =
     let n3 = div n 3 in
     let n5 = div n 5 in
@@ -43,15 +58,11 @@ theory SumMultiple
          5 * n5 * (n5+1) -
          15 * n15 * (n15+1)) 2
 
-(*
-  lemma mod_15 :
-    forall n:int. n >= 0 ->
-      mod n 15 = 0 <-> (mod n 3 = 0 /\ mod n 5 = 0)
-*)
-
   predicate p (n:int) = sum_multiple_3_5_lt (n+1) = closed_formula n
 
   lemma Closed_formula_0: p 0
+
+  use DivModHints
 
   lemma Closed_formula_n:
     forall n:int. n > 0 -> p (n-1) ->
