@@ -96,6 +96,10 @@ theory int.MinMax
 
 end
 
+(* removed: Coq Zdiv is NOT true Euclidean division:
+   Zmod can be negative, in fact (Zmod x y) has the same sign as y,
+   which is not the usual convention of programming language either. 
+
 theory int.EuclideanDivision
 
   prelude "Require Import Zdiv."
@@ -110,8 +114,13 @@ theory int.EuclideanDivision
   remove prop Div_1
 
 end
+*)
 
 theory int.ComputerDivision
+
+  (* Coq Z0div provides the division and modulo operators
+     with the same convention as mainstream programming language
+     such C, Java, OCaml *)
 
   prelude "Require Import ZOdiv."
 

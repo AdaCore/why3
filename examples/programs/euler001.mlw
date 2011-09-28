@@ -10,7 +10,11 @@ Find the sum of all the multiples of 3 or 5 below 1000.
 theory DivModHints
 
   use import int.Int
-  use import int.EuclideanDivision
+  use import int.ComputerDivision
+
+  lemma mod_div_unique :
+    forall x y q r:int. y > 0 /\ x = q*y + r /\ 0 <= r < y ->
+      r = mod x y /\ q = div x y
 
   lemma mod_succ_1 :
     forall x y:int. x >= 0 /\ y > 0 ->
@@ -34,7 +38,7 @@ end
 theory SumMultiple
 
   use import int.Int
-  use import int.EuclideanDivision
+  use import int.ComputerDivision
 
   (* [sum_multiple_3_5_lt n] is the sum of all the multiples
      of 3 or 5 below n] *)
@@ -64,6 +68,10 @@ theory SumMultiple
 
   use DivModHints
 
+  lemma mod_15:
+    forall n:int.
+      mod n 15 = 0 <-> mod n 3 = 0 /\ mod n 5 = 0
+
   lemma Closed_formula_n:
     forall n:int. n > 0 -> p (n-1) ->
       mod n 3 <> 0 /\ mod n 5 <> 0 -> p n
@@ -91,7 +99,7 @@ module Euler001
 
   use import SumMultiple
   use import int.Int
-  use import int.EuclideanDivision
+  use import int.ComputerDivision
 
   let solve n =
     { n >= 1 }

@@ -49,6 +49,9 @@ end
 
 theory EuclideanDivision
 
+  (* division and modulo operators with the convention that division
+     rounds down, and thus modulo is always non-negative *)
+
   use import Int
   use import Abs
 
@@ -71,6 +74,11 @@ theory EuclideanDivision
 end
 
 theory ComputerDivision
+
+  (* division and modulo operators with the same conventions as
+     mainstream programming language such C, Java, OCaml, that is
+     division rounds towards zero, and thus (x mod y) as the same sign
+     as x *)
 
   use import Int
   use import Abs
