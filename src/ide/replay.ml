@@ -36,7 +36,7 @@ let spec = Arg.align [
    "<s> add s to loadpath") ;
   ("-force",
    Arg.Set opt_force,
-   "enforce saving of session even if replay failed") ;
+   " enforce saving of session even if replay failed") ;
   ("-s",
    Arg.Clear opt_stats,
    " do not print statistics") ;
@@ -45,13 +45,13 @@ let spec = Arg.align [
    " print version information") ;
   ("-latex",
    Arg.Set_string opt_latex,
-   " produce latex statistics") ;
+   " [Dir_output] produce latex statistics") ;
   ("-latex2",
    Arg.Set_string opt_latex2,
-   " produce latex statistics") ;
+   " [Dir_output] produce latex statistics") ;
   ("-html",
    Arg.Set_string opt_html,
-   " produce html statistics") ;
+   " [Dir_output] produce html statistics") ;
 ]
 
 let version_msg = Format.sprintf "Why3 replayer, version %s (build date: %s)"
@@ -390,7 +390,9 @@ let rec goal_latex_stat n fmt prov depth depth_max column subgoal _subgoals_max 
     fprintf fmt "\\explanation{%s} " (protect (M.goal_expl g))
   else
     if n == 2 then
-      fprintf fmt "%d " (subgoal + 1);
+      fprintf fmt "%d " (subgoal + 1)
+    else
+      fprintf fmt "\\explanation{%s}"  " ";
   let proofs = M.external_proofs g in
   if (Hashtbl.length proofs) > 0 then
     begin
