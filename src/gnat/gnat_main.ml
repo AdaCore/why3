@@ -4,6 +4,7 @@ open Term
 let opt_verbose = ref false
 let opt_timeout = ref 10
 let opt_steps = ref 0
+let opt_report = ref false
 let opt_filename : string option ref = ref None
 
 let abort_with_message s =
@@ -33,6 +34,8 @@ let options = Arg.align [
           "Set the maximal number of proof steps";
    "--steps", Arg.Set_int opt_steps,
           "Set the maximal number of proof steps";
+   "--report", Arg.Set opt_report,
+          "Enable report mode, report on all VCs, even proven ones";
 ]
 
 let filename =
@@ -210,7 +213,8 @@ let _ =
             try
                List.iter (fun t -> if not (prove_task t) then raise Not_Proven)
                tl;
-               Format.printf "%a@." (Gnat_expl.print_expl true) expl
+               if !opt_report then
+                  Format.printf "%a@." (Gnat_expl.print_expl true) expl
             with Not_Proven ->
                Format.printf "%a@." (Gnat_expl.print_expl false) expl)
          !expl_map
