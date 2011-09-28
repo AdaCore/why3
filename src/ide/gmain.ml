@@ -354,6 +354,14 @@ let image_of_result ~obsolete result =
 
 (* connecting to the Session model *)
 
+let fan n =
+  match n mod 4 with
+    | 0 -> "|"
+    | 1 | -3 -> "\\"
+    | 2 | -2 -> "-"
+    | 3 | -1 -> "/"
+    | _ -> assert false
+
 module M = Session.Make
   (struct
      type key = GTree.row_reference
@@ -380,10 +388,15 @@ module M = Session.Make
        let (_ : GMain.Timeout.id) = GMain.Timeout.add ~ms ~callback:f in
        ()
 
-     let notify_timer_state t s r =
-       monitor_waiting#set_text ("Waiting: " ^ (string_of_int t));
-       monitor_scheduled#set_text ("Scheduled: " ^ (string_of_int s));
-       monitor_running#set_text ("Running: " ^ (string_of_int r));
+     let notify_timer_state =
+       let c = ref 0 in
+       fun t s r ->
+         incr c;
+         monitor_waiting#set_text ("Waiting: " ^ (string_of_int t));
+         monitor_scheduled#set_text ("Scheduled: " ^ (string_of_int s));
+         monitor_running#set_text
+           (if r=0 then "Running: 0" else
+              "Running: " ^ (string_of_int r)^ " " ^ (fan (!c / 10)))
 
    end)
 
