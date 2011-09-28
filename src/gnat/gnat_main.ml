@@ -8,7 +8,7 @@ let opt_report = ref false
 let opt_filename : string option ref = ref None
 
 let abort_with_message s =
-   Format.eprintf s;
+   Format.eprintf "%s" s;
    Format.eprintf " Aborting.@.";
    exit 1
 
@@ -39,10 +39,21 @@ let options = Arg.align [
 ]
 
 let filename =
+   let is_not_why_loc s =
+      not (Filename.check_suffix s "why" ||
+           Filename.check_suffix s "mlw") in
    Arg.parse options set_filename usage_msg;
    match !opt_filename with
    | None -> abort_with_message "No file given."
-   | Some s -> s
+   | Some s ->
+         if is_not_why_loc s then
+            abort_with_message (Printf.sprintf "Not a Why input file: %s." s);
+         s
+
+let result_file =
+   let base = Filename.chop_extension filename in
+   base ^ ".proof"
+
 
 let config =
    try Whyconf.read_config (Some "why3.conf")
@@ -53,12 +64,6 @@ let config_main = Whyconf.get_main (config)
 
 let env =
    Env.create_env_of_loadpath (Whyconf.loadpath config_main)
-
-let is_not_why_loc s =
-   not (Filename.check_suffix s "why" ||
-        Filename.check_suffix s "mlw")
-
-let suffix = ".mlw"
 
 let split_trans = Trans.lookup_transform_l "split_goal" env
 
@@ -200,6 +205,13 @@ let prove_task t =
 
 exception Not_Proven
 
+let report =
+   let print fmt b expl =
+      Format.fprintf fmt "%a@." (Gnat_expl.print_expl b) expl in
+   fun fmt b expl ->
+      if not b || !opt_report then print Format.std_formatter b expl;
+      print fmt b expl
+
 let _ =
    try
       let m = Env.read_file env filename in
@@ -208,16 +220,18 @@ let _ =
       if !opt_verbose then
          Format.printf "Obtained %d proof objectives and %d VCs@."
             !nb_po !nb_vcs;
+      let cout = open_out result_file in
+      let fmt = Format.formatter_of_out_channel cout in
       Gnat_expl.MExpl.iter
          (fun expl tl ->
             try
                List.iter (fun t -> if not (prove_task t) then raise Not_Proven)
                tl;
-               if !opt_report then
-                  Format.printf "%a@." (Gnat_expl.print_expl true) expl
+               report fmt true expl
             with Not_Proven ->
-               Format.printf "%a@." (Gnat_expl.print_expl false) expl)
-         !expl_map
+               report fmt false expl)
+         !expl_map;
+      close_out cout
     with e when not (Debug.test_flag Debug.stack_trace) ->
        Format.eprintf "%a.@." Exn_printer.exn_printer e;
        abort_with_message ""
