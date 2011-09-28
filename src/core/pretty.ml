@@ -421,19 +421,25 @@ let print_meta_arg fmt = function
   | MAstr s -> fprintf fmt "\"%s\"" s
   | MAint i -> fprintf fmt "%d" i
 
+let print_qt fmt th =
+  if th.th_path = [] then print_th fmt th else
+  fprintf fmt "%a.%a"
+    (print_list (constant_string ".") string) th.th_path
+    print_th th
+
 let print_tdecl fmt td = match td.td_node with
   | Decl d ->
       print_decl fmt d
   | Use th ->
-      fprintf fmt "@[<hov 2>(* use %a *)@]" print_th th
+      fprintf fmt "@[<hov 2>(* use %a *)@]" print_qt th
   | Clone (th,sm) when is_empty_sm sm ->
-      fprintf fmt "@[<hov 2>(* use %a *)@]" print_th th
+      fprintf fmt "@[<hov 2>(* use %a *)@]" print_qt th
   | Clone (th,sm) ->
       let tm = Mts.fold (fun x y a -> (x,y)::a) sm.sm_ts [] in
       let lm = Mls.fold (fun x y a -> (x,y)::a) sm.sm_ls [] in
       let pm = Mpr.fold (fun x y a -> (x,y)::a) sm.sm_pr [] in
       fprintf fmt "@[<hov 2>(* clone %a with %a,@ %a,@ %a *)@]"
-        print_th th (print_list comma print_inst_ts) tm
+        print_qt th (print_list comma print_inst_ts) tm
                     (print_list comma print_inst_ls) lm
                     (print_list comma print_inst_pr) pm
   | Meta (m,al) ->
