@@ -83,6 +83,7 @@ val list_metas  : unit -> meta list
 
 type theory = private {
   th_name   : ident;      (* theory name *)
+  th_path   : string list;(* environment qualifiers *)
   th_decls  : tdecl list; (* theory declarations *)
   th_export : namespace;  (* exported namespace *)
   th_known  : known_map;  (* known identifiers *)
@@ -118,7 +119,7 @@ val td_hash : tdecl -> int
 
 type theory_uc  (* a theory under construction *)
 
-val create_theory : preid -> theory_uc
+val create_theory : ?path:string list -> preid -> theory_uc
 val close_theory  : theory_uc -> theory
 
 val open_namespace  : theory_uc -> theory_uc

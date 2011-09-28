@@ -314,16 +314,16 @@ and string = parse
       | Loc.Located _ as e -> raise e
       | e -> raise (Loc.Located (loc lb, e))
 
-  let parse_logic_file env lb =
-    pre_logic_file token (Lexing.from_string "") env;
+  let parse_logic_file env path lb =
+    pre_logic_file token (Lexing.from_string "") env path;
     with_location (logic_file token) lb
 
   let parse_program_file = with_location (program_file token)
 
-  let read_channel env file c =
+  let read_channel env path file c =
     let lb = Lexing.from_channel c in
     Loc.set_file file lb;
-    parse_logic_file env lb
+    parse_logic_file env path lb
 
   let () = Env.register_format "why" ["why"] read_channel
 }

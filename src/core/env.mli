@@ -44,7 +44,8 @@ exception TheoryNotFound of pathname * string
 
 open Theory
 
-type read_channel = env -> filename -> in_channel -> theory Util.Mstr.t
+type read_channel =
+  env -> pathname -> filename -> in_channel -> theory Util.Mstr.t
 (** a function of type [read_channel] parses a channel using
     its own syntax. The string argument indicates the origin of
     the stream (e.g. file name) to be used in error messages. *)
@@ -57,8 +58,9 @@ val register_format : fformat -> extension list -> read_channel -> unit
 
     @raise KnownFormat [name] if the format is already registered *)
 
-val read_channel : ?format:fformat -> read_channel
-(** [read_channel ?format env file ch] returns the theories in [ch].
+val read_channel :
+  ?format:fformat -> env -> filename -> in_channel -> theory Util.Mstr.t
+(** [read_channel ?format env path file ch] returns the theories in [ch].
     When given, [format] enforces the format, otherwise we choose
     the format according to [file]'s extension. Nothing ensures
     that [ch] corresponds to the contents of [f].

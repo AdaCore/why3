@@ -30,7 +30,7 @@ type t = {
   memo     : (string list, module_file) Hashtbl.t;
 }
 
-and retrieve_module = t -> string -> in_channel -> module_file
+and retrieve_module = t -> string list -> string -> in_channel -> module_file
 
 let get_env penv = penv.env
 
@@ -48,7 +48,7 @@ let find_library penv sl =
   with Not_found ->
     Hashtbl.add penv.memo sl (Mstr.empty, Mstr.empty);
     let file, c = Env.find_channel penv.env "whyml" sl in
-    let r = penv.retrieve penv file c in
+    let r = penv.retrieve penv sl file c in
     close_in c;
     Hashtbl.replace penv.memo sl r;
     r

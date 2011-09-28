@@ -41,7 +41,7 @@ type find_channel = fformat -> pathname -> filename * in_channel
 
 type env = {
   env_find : find_channel;
-  env_memo : (string list, theory Mstr.t) Hashtbl.t;
+  env_memo : (pathname, theory Mstr.t) Hashtbl.t;
   env_tag  : Hashweak.tag;
 }
 
@@ -51,7 +51,8 @@ module Wenv = Hashweak.Make(struct type t = env let tag = env_tag end)
 
 (** Input formats *)
 
-type read_channel = env -> filename -> in_channel -> theory Mstr.t
+type read_channel =
+  env -> pathname -> filename -> in_channel -> theory Mstr.t
 
 let read_channel_table = Hashtbl.create 17 (* format name -> read_channel *)
 let extensions_table   = Hashtbl.create 17 (* suffix -> format name *)
@@ -76,12 +77,15 @@ let get_format file =
   try Hashtbl.find extensions_table ext
   with Not_found -> raise (UnknownExtension ext)
 
-let read_channel ?format env file ic =
+let real_read_channel ?format env path file ic =
   let name = match format with
     | Some name -> name
     | None -> get_format file in
   let rc,_ = lookup_format name in
-  rc env file ic
+  rc env path file ic
+
+let read_channel ?format env file ic =
+  real_read_channel ?format env [] file ic
 
 let read_file ?format env file =
   let ic = open_in file in
@@ -143,7 +147,7 @@ let find_library env sl =
   let file, ic = env.env_find "why" sl in
   try
     Hashtbl.replace env.env_memo sl Mstr.empty;
-    let mth = read_channel ~format:"why" env file ic in
+    let mth = real_read_channel ~format:"why" env sl file ic in
     Hashtbl.replace env.env_memo sl mth;
     close_in ic;
     mth

@@ -27,7 +27,7 @@ val get_env : t -> Env.env
 
 type module_file = Theory.theory Util.Mstr.t * Pgm_module.t Util.Mstr.t
 
-type retrieve_module = t -> string -> in_channel -> module_file
+type retrieve_module = t -> string list -> string -> in_channel -> module_file
 
 val create : Env.env -> retrieve_module -> t
 

@@ -193,13 +193,13 @@ let th_prelude =
   let uc = add_logic_decl uc [fs_old, None] in
   close_theory uc
 
-let empty_module n =
+let empty_module path n =
   let m = {
-    uc_name = id_register n;
-    uc_impure = Theory.create_theory n;
-    uc_effect = Theory.create_theory n;
-    uc_pure = Theory.create_theory n;
-    uc_decls = [];
+    uc_name   = id_register n;
+    uc_impure = Theory.create_theory ~path n;
+    uc_effect = Theory.create_theory ~path n;
+    uc_pure   = Theory.create_theory ~path n;
+    uc_decls  = [];
     uc_import = [empty_ns];
     uc_export = [empty_ns]; }
   in
@@ -267,8 +267,8 @@ let use_export_theory uc th =
   in
   add_ns th.th_export uc
 
-let create_module id =
-  let uc = empty_module id in
+let create_module ?(path=[]) id =
+  let uc = empty_module path id in
   use_export_theory uc th_prelude
 
 let add_impure_pdecl env ltm d uc =
