@@ -294,6 +294,10 @@ let print_task ?old drv fmt task =
   let task = prepare_task drv task in
   print_task_prepared ?old drv fmt task
 
+let print_theory ?old drv fmt th =
+  let task = Task.use_export None th in
+  print_task ?old drv fmt task
+
 let prove_task_prepared ~command ?timelimit ?memlimit ?old drv task =
   let buf = Buffer.create 1024 in
   let fmt = formatter_of_buffer buf in
@@ -331,14 +335,4 @@ let () = Exn_printer.register (fun fmt exn -> match exn with
   | PSymExpected ls -> Format.fprintf fmt
       "%a is not a predicate symbol" Pretty.print_ls ls
   | e -> raise e)
-
-
-
-
-
-
-
-let print_theory ?old drv fmt th =
-  let task = Task.use_export None th in
-  print_task ?old drv fmt task
 

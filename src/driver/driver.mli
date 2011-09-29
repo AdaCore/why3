@@ -48,6 +48,11 @@ val print_task :
   ?old       : in_channel ->
   driver -> Format.formatter -> Task.task -> unit
 
+val print_theory :
+  ?old       : in_channel ->
+  driver -> Format.formatter -> Theory.theory -> unit
+  (** produce a realization of the given theory using the given driver *)
+
 val prove_task :
   command    : string ->
   ?timelimit : int ->
@@ -68,11 +73,4 @@ val prove_task_prepared :
   ?memlimit  : int ->
   ?old       : in_channel ->
   driver -> Task.task -> Call_provers.pre_prover_call
-(***)
-
-
-val print_theory :
-  ?old       : in_channel ->
-  driver -> Format.formatter -> Theory.theory -> unit
-  (** produce a realization of the given theory using the given driver *)
 

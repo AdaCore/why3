@@ -83,8 +83,29 @@ val add_prop_decl : task -> prop_kind -> prsymbol -> term -> task
 (** {2 utilities} *)
 
 val split_theory : theory -> Spr.t option -> task -> task list
-  (** [split_theory th s] returns the tasks of [th] which end by one
-      of [s]. They are in the opposite order than in the theory *)
+  (** [split_theory th s t] returns the tasks of [th] added to [t]
+      that end by one of [s]. They are in the opposite order than
+      in the theory *)
+
+val bisect : (task -> bool) -> task -> task
+   (** [bisect test task] return a task included in [task] which is at
+       the limit of truthness of the function test. The returned task is
+       included in [task] and if any declarations are removed from it the
+       task doesn't verify test anymore *)
+
+(** {2 realization utilities} *)
+
+val used_theories : task -> theory Mid.t
+  (** returns a map from theory names to theories themselves *)
+
+val used_symbols : theory Mid.t -> theory Mid.t
+  (** takes the result of [used_theories] and returns
+      a map from symbol names to their theories of origin *)
+
+val local_decls : task -> theory Mid.t -> decl list
+  (** takes the result of [used_symbols] adn returns
+      the list of declarations that are not imported
+      with those theories or derived thereof *)
 
 (** {2 bottom-up, tail-recursive traversal functions} *)
 
@@ -120,8 +141,3 @@ exception GoalFound
 exception SkipFound
 exception LemmaFound
 
-val bisect : (task -> bool) -> task -> task
-   (** [bisect test task] return a task included in [task] which is at
-       the limit of truthness of the function test. The returned task is
-       included in [task] and if any declarations are removed from it the
-       task doesn't verify test anymore *)
