@@ -179,7 +179,7 @@ let print_task pr thpr fmt task =
   ignore (print_list_opt (add_flush newline2) (print_decl info) fmt decls)
 
 let () = register_printer "simplify"
-  (fun _env pr thpr ?old:_ fmt task ->
+  (fun _env pr thpr ?realize:_ ?old:_ fmt task ->
      forget_all ident_printer;
      print_task pr thpr fmt task)
 

@@ -103,7 +103,7 @@ val used_symbols : theory Mid.t -> theory Mid.t
       a map from symbol names to their theories of origin *)
 
 val local_decls : task -> theory Mid.t -> decl list
-  (** takes the result of [used_symbols] adn returns
+  (** takes the result of [used_symbols] and returns
       the list of declarations that are not imported
       with those theories or derived thereof *)
 

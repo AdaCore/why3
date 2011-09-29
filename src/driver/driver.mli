@@ -45,6 +45,7 @@ val call_on_buffer :
 
 
 val print_task :
+  ?realize   : bool ->
   ?old       : in_channel ->
   driver -> Format.formatter -> Task.task -> unit
 
@@ -64,6 +65,7 @@ val prove_task :
 val prepare_task : driver -> Task.task -> Task.task
 
 val print_task_prepared :
+  ?realize   : bool ->
   ?old       : in_channel ->
   driver -> Format.formatter -> Task.task -> unit
 

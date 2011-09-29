@@ -33,7 +33,7 @@ type prelude_map = prelude Mid.t
 
 type 'a pp = formatter -> 'a -> unit
 
-type printer = Env.env -> prelude -> prelude_map -> ?old:in_channel -> task pp
+type printer = Env.env -> prelude -> prelude_map -> ?realize:bool -> ?old:in_channel -> task pp
 
 let printers : (string, printer) Hashtbl.t = Hashtbl.create 17
 
@@ -50,7 +50,7 @@ let lookup_printer s =
 
 let list_printers ()  = Hashtbl.fold (fun k _ acc -> k::acc) printers []
 
-let () = register_printer "(null)" (fun _ _ _ ?old:_ _ _ -> ())
+let () = register_printer "(null)" (fun _ _ _ ?realize:_ ?old:_ _ _ -> ())
 
 (** Syntax substitutions *)
 

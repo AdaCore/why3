@@ -407,7 +407,7 @@ let print_goal info fmt g =
         fprintf fmt "# (no goal at all ??)@\n";
         fprintf fmt "1 in [0,0]@\n"
 
-let print_task env pr thpr ?old:_ fmt task =
+let print_task env pr thpr ?realize:_ ?old:_ fmt task =
   forget_all ident_printer;
   let info = get_info env task in
   print_prelude fmt pr;

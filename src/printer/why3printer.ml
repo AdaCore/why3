@@ -372,7 +372,7 @@ let print_tdecl fmt td = match td.td_node with
       fprintf fmt "@[<hov 2>(* meta %s %a *)@]@\n@\n"
         m.meta_name (print_list comma print_meta_arg) al
 
-let print_task_old _env pr thpr ?old:_ fmt task =
+let print_task_old _env pr thpr ?realize:_ ?old:_ fmt task =
   forget_all ();
   print_prelude fmt pr;
   print_th_prelude task fmt thpr;
@@ -386,7 +386,7 @@ let print_tdecls =
     print_tdecl fmt td in
   Printer.sprint_tdecls print
 
-let print_task _env pr thpr ?old:_ fmt task =
+let print_task _env pr thpr ?realize:_ ?old:_ fmt task =
   (* In trans-based p-printing [forget_all] IST STRENG VERBOTEN *)
   (* forget_all (); *)
   print_prelude fmt pr;

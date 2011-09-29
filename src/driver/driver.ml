@@ -280,7 +280,7 @@ let prepare_task drv task =
   let task = update_task drv task in
   List.fold_left apply task transl
 
-let print_task_prepared ?old drv fmt task =
+let print_task_prepared ?realize ?old drv fmt task =
   let p = match drv.drv_printer with
     | None -> raise NoPrinter
     | Some p -> p
@@ -288,15 +288,15 @@ let print_task_prepared ?old drv fmt task =
   let printer =
     lookup_printer p drv.drv_env drv.drv_prelude drv.drv_thprelude
   in
-  fprintf fmt "@[%a@]@?" (printer ?old) task
+  fprintf fmt "@[%a@]@?" (printer ?realize ?old) task
 
-let print_task ?old drv fmt task =
+let print_task ?realize ?old drv fmt task =
   let task = prepare_task drv task in
-  print_task_prepared ?old drv fmt task
+  print_task_prepared ?realize ?old drv fmt task
 
 let print_theory ?old drv fmt th =
   let task = Task.use_export None th in
-  print_task ?old drv fmt task
+  print_task ~realize:true ?old drv fmt task
 
 let prove_task_prepared ~command ?timelimit ?memlimit ?old drv task =
   let buf = Buffer.create 1024 in

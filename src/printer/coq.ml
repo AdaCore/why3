@@ -28,12 +28,12 @@ open Term
 open Decl
 open Printer
 
+let black_list = [ "at"; "cofix"; "exists2"; "fix"; "IF"; "mod"; "Prop";
+                   "return"; "Set"; "Type"; "using"; "where"]
+
 let iprinter =
-  let bl = [ "at"; "cofix"; "exists2"; "fix"; "IF"; "mod"; "Prop";
-             "return"; "Set"; "Type"; "using"; "where"]
-  in
   let isanitize = sanitizer char_to_alpha char_to_alnumus in
-  create_ident_printer bl ~sanitizer:isanitize
+  create_ident_printer black_list ~sanitizer:isanitize
 
 let forget_all () = forget_all iprinter
 
@@ -101,7 +101,7 @@ let print_pr fmt pr =
 
 type info = {
   info_syn : syntax_map;
-  realization : bool;
+  realization : (Theory.theory * ident_printer) Mid.t option;
 }
 
 (** Types *)
@@ -348,7 +348,7 @@ let print_implicits fmt ls ty_vars_args ty_vars_value all_ty_params =
     end
 
 let definition fmt info =
-  fprintf fmt "%s" (if info.realization then "Definition" else "Parameter")
+  fprintf fmt "%s" (if info.realization <> None then "Definition" else "Parameter")
 
 (*
 
@@ -507,7 +507,7 @@ let print_type_decl ~old info fmt (ts,def) =
             fprintf fmt "@[<hov 2>%a %a : %aType.@]@\n%a"
               definition info
               print_ts ts print_params_list ts.ts_args
-              (realization ~old ~def:true) info.realization
+              (realization ~old ~def:true) (info.realization <> None)
         | Some ty ->
             fprintf fmt "@[<hov 2>Definition %a %a :=@ %a.@]@\n@\n"
               print_ts ts (print_list space print_tv_binder) ts.ts_args
@@ -554,7 +554,7 @@ let print_logic_decl ~old info fmt (ls,ld) =
             print_params all_ty_params
             (print_arrow_list (print_ty info)) ls.ls_args
             (print_ls_type ~arrow:(ls.ls_args <> []) info) ls.ls_value
-            (realization ~old ~def:true) info.realization
+            (realization ~old ~def:true) (info.realization <> None)
   end;
   print_implicits fmt ls ty_vars_args ty_vars_value all_ty_params;
   fprintf fmt "@\n"
@@ -613,7 +613,7 @@ let print_ind_decl info fmt d =
 
 let print_pkind info fmt = function
   | Paxiom ->
-      if info.realization then
+      if info.realization <> None then
         fprintf fmt "Lemma"
       else
         fprintf fmt "Axiom"
@@ -625,14 +625,14 @@ let print_proof ~old info fmt = function
   | Plemma | Pgoal ->
       realization ~old fmt true
   | Paxiom ->
-      realization ~old fmt info.realization
+      realization ~old fmt (info.realization <> None)
   | Pskip -> ()
 
 let print_proof_context ~old info fmt = function
   | Plemma | Pgoal ->
       print_context ~old fmt
   | Paxiom ->
-      if info.realization then print_context ~old fmt
+      if info.realization <> None then print_context ~old fmt
   | Pskip -> ()
 
 let print_decl ~old info fmt d = match d.d_node with
@@ -659,22 +659,51 @@ let print_decl ~old info fmt d = match d.d_node with
 let print_decls ~old info fmt dl =
   fprintf fmt "@[<hov>%a@\n@]" (print_list nothing (print_decl ~old info)) dl
 
-let print_task _env pr thpr ?old fmt task =
+let init_printer th =
+  let isanitize = sanitizer char_to_alpha char_to_alnumus in
+  let pr = create_ident_printer black_list ~sanitizer:isanitize in
+  Sid.iter (fun id -> ignore (id_unique pr id)) th.Theory.th_local;
+  pr
+
+let print_task _env pr thpr ?realize ?old fmt task =
   forget_all ();
   print_prelude fmt pr;
   print_th_prelude task fmt thpr;
+  let realization,decls = 
+    if realize = Some true then
+      let used = Task.used_theories task in
+      (* 2 cases: goal is clone T with [] or goal is a real goal *)
+      let used = match task with
+        | None -> assert false
+        | Some { Task.task_decl = { Theory.td_node = Theory.Clone (th,_) }} ->
+            Sid.iter (fun id -> ignore (id_unique iprinter id)) th.Theory.th_local;
+            Mid.remove th.Theory.th_name used 
+        | _ -> used
+      in
+      let symbols = Task.used_symbols used in
+      (* build the printers for each theories *)
+      let printers = Mid.map init_printer used in
+      let decls = Task.local_decls task symbols in
+      let symbols =
+        Mid.map (fun th -> (th,Mid.find th.Theory.th_name printers))
+          symbols
+      in
+      Some symbols, decls
+    else
+      None, Task.task_decls task
+  in
   let info = {
     info_syn = get_syntax_map task;
-    realization = false;
-  } in
+    realization = realization;
+  }
+  in
   let old = match old with
     | None -> None
     | Some ch -> Some(ref NoWhere,ch)
   in
-  print_decls ~old info fmt (Task.task_decls task)
+  print_decls ~old info fmt decls
 
 let () = register_printer "coq" print_task
-
 
 
 
