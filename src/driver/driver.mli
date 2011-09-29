@@ -70,3 +70,9 @@ val prove_task_prepared :
   driver -> Task.task -> Call_provers.pre_prover_call
 (***)
 
+
+val print_theory :
+  ?old       : in_channel ->
+  driver -> Format.formatter -> Theory.theory -> unit
+  (** produce a realization of the given theory using the given driver *)
+

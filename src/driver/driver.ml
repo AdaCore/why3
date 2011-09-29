@@ -332,3 +332,13 @@ let () = Exn_printer.register (fun fmt exn -> match exn with
       "%a is not a predicate symbol" Pretty.print_ls ls
   | e -> raise e)
 
+
+
+
+
+
+
+let print_theory ?old drv fmt th =
+  let task = Task.use_export None th in
+  print_task ?old drv fmt task
+

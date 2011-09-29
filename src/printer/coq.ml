@@ -679,6 +679,7 @@ let () = register_printer "coq" print_task
 
 
 (* specific printer for realization of theories *)
+(* OBSOLETE
 
 open Theory
 
@@ -712,6 +713,7 @@ let print_theory _env pr thpr ?old fmt th =
   print_tdecls ~old info fmt th.th_decls;
   produce_remaining_contexts_and_proofs ~old fmt
 
+*)
 
 (*
 Local Variables:
