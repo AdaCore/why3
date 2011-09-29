@@ -1,0 +1,54 @@
+theory Formula
+
+type ident
+
+function mk_ident int : ident
+
+type fmla 'a =
+  | Ffalse
+  | Ftrue
+  | Fatom 'a
+  | Fnot (fmla 'a)
+  | Fand (fmla 'a) (fmla 'a)
+  | For (fmla 'a) (fmla 'a)
+  | Fimp (fmla 'a) (fmla 'a)
+  | Fiff (fmla 'a) (fmla 'a)
+  | Fforall ident (fmla 'a)
+  | Fexists ident (fmla 'a)
+
+end
+
+theory PropositionalCalculus
+
+use import bool.Bool
+use import Formula
+
+type prop_fmla = fmla ident
+
+use map.Map as IdMap
+
+type idmap 'a = IdMap.map ident 'a
+
+function eval (f:prop_fmla) (v:idmap bool) : bool =
+  match f with
+    | Ffalse -> False
+    | Ftrue -> True
+    | Fatom x -> IdMap.get v x
+    | Fnot p -> notb (eval p v)
+    | Fand p q -> andb (eval p v) (eval q v)
+    | For p q -> orb (eval p v) (eval q v)
+    | Fimp p q -> orb (notb (eval p v)) (eval q v)
+    | Fiff p q -> notb (xorb (eval p v) (eval q v))
+    | Fforall _ _ -> False
+    | Fexists _ _ -> False
+  end
+
+
+  goal Test1 :
+    let x = mk_ident 0 in
+    let v = IdMap.set (IdMap.const False) x True in
+    eval (For (Fnot (Fatom x)) (Ffalse)) v = False
+
+end
+
+
