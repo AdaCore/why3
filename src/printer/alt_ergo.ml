@@ -248,7 +248,7 @@ let print_task_old pr thpr fmt task =
   fprintf fmt "%a@." (print_list nothing (print_decl info)) decls
 
 let () = register_printer "alt-ergo-old"
-  (fun _env pr thpr ?realize:_ ?old:_ fmt task ->
+  (fun _env pr thpr ?old:_ fmt task ->
      forget_all ident_printer;
      print_task_old pr thpr fmt task)
 
@@ -261,7 +261,7 @@ let print_decls =
   Trans.on_tagged_ls meta_ac (fun ac ->
     Printer.sprint_decls (print ac))
 
-let print_task _env pr thpr ?realize:_ ?old:_ fmt task =
+let print_task _env pr thpr ?old:_ fmt task =
   (* In trans-based p-printing [forget_all] is a no-no *)
   (* forget_all ident_printer; *)
   print_prelude fmt pr;

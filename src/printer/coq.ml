@@ -376,11 +376,11 @@ let context_end = "(* DO NOT EDIT BELOW *)"
 (* current kind of script in an old file *)
 type old_file_state = InContext | InProof | NoWhere
 
-let copy_proof s ch fmt = 
+let copy_proof s ch fmt =
   copy_user_script proof_begin proof_end ch fmt;
   s := NoWhere
 
-let copy_context s ch fmt = 
+let copy_context s ch fmt =
   copy_user_script context_begin context_end ch fmt;
   s := NoWhere
 
@@ -665,19 +665,19 @@ let init_printer th =
   Sid.iter (fun id -> ignore (id_unique pr id)) th.Theory.th_local;
   pr
 
-let print_task _env pr thpr ?realize ?old fmt task =
+let print_task _env pr thpr realize ?old fmt task =
   forget_all ();
   print_prelude fmt pr;
   print_th_prelude task fmt thpr;
-  let realization,decls = 
-    if realize = Some true then
+  let realization,decls =
+    if realize then
       let used = Task.used_theories task in
       (* 2 cases: goal is clone T with [] or goal is a real goal *)
       let used = match task with
         | None -> assert false
         | Some { Task.task_decl = { Theory.td_node = Theory.Clone (th,_) }} ->
             Sid.iter (fun id -> ignore (id_unique iprinter id)) th.Theory.th_local;
-            Mid.remove th.Theory.th_name used 
+            Mid.remove th.Theory.th_name used
         | _ -> used
       in
       let symbols = Task.used_symbols used in
@@ -703,9 +703,14 @@ let print_task _env pr thpr ?realize ?old fmt task =
   in
   print_decls ~old info fmt decls
 
-let () = register_printer "coq" print_task
+let print_task_full env pr thpr ?old fmt task =
+  print_task env pr thpr false ?old fmt task
 
+let print_task_real env pr thpr ?old fmt task =
+  print_task env pr thpr true  ?old fmt task
 
+let () = register_printer "coq" print_task_full
+let () = register_printer "coq-realize" print_task_real
 
 (* specific printer for realization of theories *)
 (* OBSOLETE

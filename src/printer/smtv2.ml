@@ -338,7 +338,7 @@ let print_task_old pr thpr fmt task =
   fprintf fmt "%a@." (print_list nothing (print_decl info)) decls
 
 let () = register_printer "smtv2"
-  (fun _env pr thpr ?realize:_ ?old:_ fmt task ->
+  (fun _env pr thpr ?old:_ fmt task ->
      forget_all ident_printer;
      print_task_old pr thpr fmt task)
 
@@ -357,7 +357,7 @@ let print_decls =
   Trans.on_meta Discriminate.meta_lsinst (fun dls ->
     Printer.sprint_decls (print dls))
 
-let print_task _env pr thpr ?realize:_ ?old:_ fmt task =
+let print_task _env pr thpr ?old:_ fmt task =
   (* In trans-based p-printing [forget_all] is taboo *)
   (* forget_all ident_printer; *)
   print_prelude fmt pr;

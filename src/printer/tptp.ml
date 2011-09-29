@@ -147,7 +147,7 @@ let print_task pr thpr fmt task =
     (print_decl info) fmt (Task.task_decls task))
 
 let () = register_printer "tptp"
-  (fun _env pr thpr ?realize:_ ?old:_ fmt task ->
+  (fun _env pr thpr ?old:_ fmt task ->
      forget_all ident_printer;
      print_task pr thpr fmt task)
 
