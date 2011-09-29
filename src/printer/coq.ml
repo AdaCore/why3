@@ -680,6 +680,10 @@ let print_task _env pr thpr realize ?old fmt task =
             Mid.remove th.Theory.th_name used
         | _ -> used
       in
+      (* output the Require commands *)
+      Mid.iter
+        (fun id _th -> fprintf fmt "Require %s.@." id.id_string)
+        used;
       let symbols = Task.used_symbols used in
       (* build the printers for each theories *)
       let printers = Mid.map init_printer used in

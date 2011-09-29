@@ -18,10 +18,9 @@ let do_theory _env drv _path thname th =
       end
     else None
   in
-  eprintf "[Coq realization] realizing theory '%s' in file '%s'.@." thname oldf;
+  eprintf "Realizing theory '%s' in file '%s'.@." thname oldf;
   let ch = open_out oldf in
   let fmt = formatter_of_out_channel ch in
-  fprintf fmt "(* Coq file produced by why3realize *)@\n@\n";
   Driver.print_theory ?old drv fmt th;
   fprintf fmt "@.";
   close_out ch
@@ -89,9 +88,9 @@ let () =
             Env.create_env_of_loadpath (!opt_loadpath @ Whyconf.loadpath main)
           in
           let coq =
-            try Util.Mstr.find "coq" (Whyconf.get_provers config)
+            try Util.Mstr.find "coq-realize" (Whyconf.get_provers config)
             with Not_found ->
-              eprintf "Driver for Coq not found@.";
+              eprintf "Driver for coq-realize prover not found@.";
               exit 2
           in
           let drv = Driver.load_driver env coq.Whyconf.driver in
