@@ -124,7 +124,7 @@ module M = Session.Make
          | Some _ -> failwith "Replay.timeout: already one handler installed"
 
      let notify_timer_state w s r =
-       Printf.eprintf "Progress: %d/%d/%d   \r%!" w s r 
+       Printf.eprintf "Progress: %d/%d/%d   \r%!" w s r
 
    end)
 
@@ -334,10 +334,10 @@ let prover_name a =
       M.Detected_prover d -> d.Session.prover_name ^ " " ^ d.Session.prover_version
     | M.Undetected_prover s -> s
 
-let protect s = 
-  let b = Buffer.create 7 in 
-  for i = 0 to String.length s - 1 do 
-    match s.[i] with 
+let protect s =
+  let b = Buffer.create 7 in
+  for i = 0 to String.length s - 1 do
+    match s.[i] with
 	'_' -> Buffer.add_string b "\\_"
       | c -> Buffer.add_char b c
   done;
@@ -368,20 +368,20 @@ let rec goal_latex_stat n fmt prov depth depth_max column subgoal _subgoals_max 
 	  if subgoal > 0 then
 	    begin
 	      if(depth < depth_max)  then
-		for i = 1 to depth do fprintf fmt "&" done
+		for i = 1 to depth do fprintf fmt "& \\explanation{%s}" " " done
 	      else
-		for i = 1 to depth - 1 do fprintf fmt "&" done
+		for i = 1 to depth - 1 do fprintf fmt "& \\explanation{%s}" " " done
 	    end
 	  else
 	    if(depth < depth_max) then
-	      if depth > 0 then fprintf fmt "&"
+	      if depth > 0 then fprintf fmt "& \\explanation{%s}" " "
 	end
       else
 	begin
 	  if subgoal > 0  then
-	    for i = 1 to depth  do fprintf fmt "&" done
+	    for i = 1 to depth  do fprintf fmt "& \\explanation{%s}" " " done
 	  else
-	    if depth > 0 then fprintf fmt "&"
+	    if depth > 0 then fprintf fmt "& \\explanation{%s}" " "
 	end
     end
   else
@@ -401,15 +401,15 @@ let rec goal_latex_stat n fmt prov depth depth_max column subgoal _subgoals_max 
 	  if depth_max <= 1 then
 	    begin
 	      if depth > 0 then
-		for i = depth to (depth_max - depth) do fprintf fmt "&" done
+		for i = depth to (depth_max - depth) do fprintf fmt "& \\explanation{%s}" " " done
 	      else
-		for i = depth to (depth_max - depth - 1) do fprintf fmt "&" done
+		for i = depth to (depth_max - depth - 1) do fprintf fmt "& \\explanation{%s}" " " done
 	    end
 	  else
 	      if depth > 0 then
-		for i = depth to (depth_max - depth - 1) do fprintf fmt "&" done
+		for i = depth to (depth_max - depth - 1) do fprintf fmt "& \\explanation{%s}" " " done
 	      else
-		for i = depth to (depth_max - depth - 2) do fprintf fmt "&" done
+		for i = depth to (depth_max - depth - 2) do fprintf fmt "& \\explanation{%s}" " " done
 	end;
       List.iter (fun (p, _pr) ->
 	try
@@ -433,7 +433,6 @@ let rec goal_latex_stat n fmt prov depth depth_max column subgoal _subgoals_max 
     let tr = M.transformations g in
     if (n == 2) then
       begin
-	(*for i = 1 to (List.length prov) do fprintf fmt "&" done;*)
 	fprintf fmt "& \\multicolumn{%d}{|c|}{}\\\\ @." (List.length prov);
       end;
     Hashtbl.iter (fun _st tr ->
@@ -466,16 +465,16 @@ let theory_latex_stat n dir t =
     fprintf fmt "\\hline Proof obligations ";
   List.iter (fun (_, a) -> fprintf fmt "& \\provername{%s} " a) provers;
   fprintf fmt "\\\\ @.";
-  let column = 
-    if n == 1 then 
+  let column =
+    if n == 1 then
     if depth > 1
-    then 
+    then
       (List.length provers) + depth
-    else 
+    else
       (List.length provers) + depth + 1
-    else 
+    else
       (List.length provers) +  1
-  in 
+  in
   List.iter (goal_latex_stat n fmt provers 0 depth column 0 0) (M.goals t);
   fprintf fmt "\\hline \\end{tabular}@.";
   close_out ch
