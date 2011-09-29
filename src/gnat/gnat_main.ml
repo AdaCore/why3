@@ -54,6 +54,21 @@ let result_file =
    let base = Filename.chop_extension filename in
    base ^ ".proof"
 
+let report_mode =
+   if Sys.file_exists result_file then begin
+      if Gnat_util.cmp_timestamps filename result_file < 0 then begin
+         if !opt_verbose then Format.printf "gnatwhy3: entering report mode@.";
+         true
+      end else begin
+         if !opt_verbose then
+            Format.printf "gnatwhy3: result file older than input file@.";
+         false
+      end
+   end else begin
+      if !opt_verbose then
+         Format.printf "gnatwhy3: result file does not exist@.";
+      false
+   end
 
 let config =
    try Whyconf.read_config (Some "why3.conf")
@@ -212,7 +227,20 @@ let report =
       if not b || !opt_report then print Format.std_formatter b expl;
       print fmt b expl
 
+let output_buffer buf =
+   let cout = open_out result_file in
+   Buffer.output_buffer cout buf;
+   close_out cout
+
 let _ =
+   if report_mode then begin
+      let filter =
+         if !opt_report then (fun _ -> true)
+         else (fun s -> Gnat_util.ends_with s "not proved")
+      in
+      Gnat_util.cat filter result_file;
+      exit 0
+   end;
    try
       let m = Env.read_file env filename in
       (* fill map of explanations *)
@@ -220,8 +248,8 @@ let _ =
       if !opt_verbose then
          Format.printf "Obtained %d proof objectives and %d VCs@."
             !nb_po !nb_vcs;
-      let cout = open_out result_file in
-      let fmt = Format.formatter_of_out_channel cout in
+      let outbuf = Buffer.create 1024 in
+      let fmt = Format.formatter_of_buffer outbuf in
       Gnat_expl.MExpl.iter
          (fun expl tl ->
             try
@@ -231,7 +259,7 @@ let _ =
             with Not_Proven ->
                report fmt false expl)
          !expl_map;
-      close_out cout
+      output_buffer outbuf
     with e when not (Debug.test_flag Debug.stack_trace) ->
        Format.eprintf "%a.@." Exn_printer.exn_printer e;
        abort_with_message ""
