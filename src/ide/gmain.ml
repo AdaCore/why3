@@ -116,7 +116,7 @@ let source_text fname =
 let gconfig =
   let c = Gconfig.config in
   let loadpath = (Whyconf.loadpath (get_main ())) @ List.rev !includes in
-  c.env <- Env.create_env_of_loadpath loadpath;
+  c.env <- Env.create_env loadpath;
 (*
   let provers = Whyconf.get_provers c.Gconfig.config in
   c.provers <-

@@ -37,10 +37,8 @@ exception ChannelNotFound of pathname
 exception TheoryNotFound of pathname * string
 exception AmbiguousPath of filename * filename
 
-type find_channel = fformat -> pathname -> filename * in_channel
-
 type env = {
-  env_find : find_channel;
+  env_path : filename list;
   env_memo : (pathname, theory Mstr.t) Hashtbl.t;
   env_tag  : Hashweak.tag;
 }
@@ -102,11 +100,19 @@ let list_formats () =
 
 (** Environment construction and utilisation *)
 
-let create_env = let c = ref (-1) in fun fc -> {
-  env_find = fc;
+let create_env = let c = ref (-1) in fun lp -> {
+  env_path = lp;
   env_memo = Hashtbl.create 17;
   env_tag  = (incr c; Hashweak.create_tag !c)
 }
+
+let create_env_of_loadpath lp =
+  Format.eprintf "WARNING: Env.create_env_of_loadpath is deprecated
+    and will be removed in future versions of Why3.
+    Replace it with Env.create_env.@.";
+  create_env lp
+
+let get_loadpath env = env.env_path
 
 (* looks for file [file] of format [name] in loadpath [lp] *)
 let locate_file name lp path =
@@ -133,18 +139,13 @@ let check_qualifier s =
       find_dir_sep s)
   then raise (InvalidQualifier s)
 
-let create_env_of_loadpath lp =
-  let fc f sl =
-    List.iter check_qualifier sl;
-    let file = locate_file f lp sl in
-    file, open_in file
-  in
-  create_env fc
-
-let find_channel env = env.env_find
+let find_channel env f sl =
+  List.iter check_qualifier sl;
+  let file = locate_file f env.env_path sl in
+  file, open_in file
 
 let find_library env sl =
-  let file, ic = env.env_find "why" sl in
+  let file, ic = find_channel env "why" sl in
   try
     Hashtbl.replace env.env_memo sl Mstr.empty;
     let mth = real_read_channel ~format:"why" env sl file ic in

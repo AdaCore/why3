@@ -87,7 +87,7 @@ let config = Whyconf.read_config None
 let loadpath = (Whyconf.loadpath (Whyconf.get_main config))
   @ List.rev !includes
 
-let env = Env.create_env_of_loadpath loadpath
+let env = Env.create_env loadpath
 
 let provers = Whyconf.get_provers config
 

@@ -132,7 +132,7 @@ let load_config config =
     | None -> default_ide
     | Some s -> load_ide s in
   (* temporary sets env to empty *)
-  let env = Env.create_env_of_loadpath [] in
+  let env = Env.create_env [] in
   set_labels_flag ide.ide_show_labels;
   set_locs_flag ide.ide_show_locs;
   { window_height = ide.ide_window_height;

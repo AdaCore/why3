@@ -184,7 +184,7 @@ loaded first.
 \begin{verbatim}
 (* builds the environment from the [loadpath] *)
 let env : Env.env =
-  Env.create_env_of_loadpath (Whyconf.loadpath main)
+  Env.create_env (Whyconf.loadpath main)
 (* loading the Alt-Ergo driver *)
 let alt_ergo_driver : Driver.driver =
   try

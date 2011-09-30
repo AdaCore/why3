@@ -80,20 +80,20 @@ val list_formats : unit -> (fformat * extension list) list
 
 (** Environment construction and utilisation *)
 
-type find_channel = fformat -> pathname -> filename * in_channel
-(** a function of type [find_channel] retrieves an input channel,
-    knowing its format and its name (presented as a list of strings);
-    a filename is also returned, to be used in logs or error messages. *)
-
-val create_env : find_channel -> env
-(** creates an environment of input library channels *)
+val create_env : filename list -> env
+(** creates an environment from a "loadpath", a list of directories
+    containing loadable Why3/WhyML/etc files *)
 
 val create_env_of_loadpath : filename list -> env
-(** a special case of [init_environment] that looks for files in
-    the given list of directories *)
+(** the same as [create_env], will be removed in some future version *)
 
-val find_channel : env -> find_channel
-(** finds an input channel in a given environment
+val get_loadpath : env -> filename list
+(** returns the loadpath of a given environment *)
+
+val find_channel : env -> fformat -> pathname -> filename * in_channel
+(** finds an input channel in a given environment, knowing its format
+    and its name (presented as a list of strings); a filename is also
+    returned, to be used in logs or error messages.
 
     @raise ChannelNotFound [sl] if the channel [sl] was not found
     @raise UnknownFormat [f] if the format is not registered *)

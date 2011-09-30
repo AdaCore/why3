@@ -85,7 +85,7 @@ let () =
           let config = Whyconf.read_config None in
           let main = Whyconf.get_main config in
           let env =
-            Env.create_env_of_loadpath (!opt_loadpath @ Whyconf.loadpath main)
+            Env.create_env (!opt_loadpath @ Whyconf.loadpath main)
           in
           let coq =
             try Util.Mstr.find "coq-realize" (Whyconf.get_provers config)

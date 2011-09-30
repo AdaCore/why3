@@ -84,8 +84,7 @@ let alt_ergo : Whyconf.config_prover =
     exit 0
 
 (* builds the environment from the [loadpath] *)
-let env : Env.env =
-  Env.create_env_of_loadpath (Whyconf.loadpath main)
+let env : Env.env = Env.create_env (Whyconf.loadpath main)
 
 (* loading the Alt-Ergo driver *)
 let alt_ergo_driver : Driver.driver =
