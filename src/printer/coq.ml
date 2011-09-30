@@ -104,6 +104,26 @@ type info = {
   realization : (Theory.theory * ident_printer) Mid.t option;
 }
 
+let print_path = print_list (constant_string ".") string
+
+let print_id fmt id = string fmt (id_unique iprinter id)
+
+let print_id_real info fmt id = match info.realization with
+  | Some m ->
+      begin
+        try let th,ipr = Mid.find id m in
+        fprintf fmt "%a.%s.%s"
+          print_path th.Theory.th_path
+          th.Theory.th_name.id_string
+          (id_unique ipr id)
+        with Not_found -> print_id fmt id
+      end
+  | None -> print_id fmt id
+
+let print_ls_real info fmt ls = print_id_real info fmt ls.ls_name
+let print_ts_real info fmt ts = print_id_real info fmt ts.ts_name
+let print_pr_real info fmt pr = print_id_real info fmt pr.pr_name
+
 (** Types *)
 
 let rec print_ty info fmt ty = match ty.ty_node with
@@ -121,8 +141,8 @@ let rec print_ty info fmt ty = match ty.ty_node with
         | None ->
             begin
               match tl with
-                | []  -> print_ts fmt ts
-                | l   -> fprintf fmt "(%a@ %a)" print_ts ts
+                | []  -> (print_ts_real info) fmt ts
+                | l   -> fprintf fmt "(%a@ %a)" (print_ts_real info) ts
                     (print_list space (print_ty info)) l
             end
       end
@@ -163,9 +183,9 @@ let rec print_pat info fmt p = match p.pat_node with
   | Papp (cs,pl) ->
       begin match query_syntax info.info_syn cs.ls_name with
         | Some s -> syntax_arguments s (print_pat info) fmt pl
-        | _ when pl = [] -> print_ls fmt cs
+        | _ when pl = [] -> (print_ls_real info) fmt cs
         | _ -> fprintf fmt "(%a %a)"
-          print_ls cs (print_list space (print_pat info)) pl
+          (print_ls_real info) cs (print_list space (print_pat info)) pl
       end
 
 let print_vsty_nopar info fmt v =
@@ -250,10 +270,10 @@ and print_tnode opl opr info fmt t = match t.t_node with
           syntax_arguments s (print_term info) fmt tl
       | _ -> if unambig_fs fs
           then
-            if tl = [] then fprintf fmt "%a" print_ls fs
-            else fprintf fmt "(%a %a)" print_ls fs
+            if tl = [] then fprintf fmt "%a" (print_ls_real info) fs
+            else fprintf fmt "(%a %a)" (print_ls_real info) fs
               (print_space_list (print_term info)) tl
-          else fprintf fmt (protect_on opl "(%a%a:%a)") print_ls fs
+          else fprintf fmt (protect_on opl "(%a%a:%a)") (print_ls_real info) fs
             (print_paren_r (print_term info)) tl (print_ty info) (t_type t)
     end
   | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> raise (TermExpected t)
@@ -301,7 +321,7 @@ and print_fnode opl opr info fmt f = match f.t_node with
   | Tapp (ps, tl) ->
     begin match query_syntax info.info_syn ps.ls_name with
       | Some s -> syntax_arguments s (print_term info) fmt tl
-      | _ -> fprintf fmt "(%a %a)" print_ls ps
+      | _ -> fprintf fmt "(%a %a)" (print_ls_real info) ps
           (print_space_list (print_term info)) tl
     end
   | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
@@ -665,24 +685,31 @@ let init_printer th =
   Sid.iter (fun id -> ignore (id_unique pr id)) th.Theory.th_local;
   pr
 
-let print_task _env pr thpr realize ?old fmt task =
+let print_task env pr thpr realize ?old fmt task =
   forget_all ();
   print_prelude fmt pr;
   print_th_prelude task fmt thpr;
   let realization,decls =
     if realize then
       let used = Task.used_theories task in
+      let used = Mid.filter (fun _ th -> th.Theory.th_path <> []) used in
       (* 2 cases: goal is clone T with [] or goal is a real goal *)
       let used = match task with
         | None -> assert false
         | Some { Task.task_decl = { Theory.td_node = Theory.Clone (th,_) }} ->
-            Sid.iter (fun id -> ignore (id_unique iprinter id)) th.Theory.th_local;
+            Sid.iter
+              (fun id -> ignore (id_unique iprinter id))
+              th.Theory.th_local;
             Mid.remove th.Theory.th_name used
         | _ -> used
       in
       (* output the Require commands *)
+      List.iter
+        (fprintf fmt "Add Rec LoadPath \"%s\".@\n")
+        (Env.get_loadpath env);
       Mid.iter
-        (fun id _th -> fprintf fmt "Require %s.@." id.id_string)
+        (fun id th -> fprintf fmt "Require %a.%s.@\n"
+          print_path th.Theory.th_path id.id_string)
         used;
       let symbols = Task.used_symbols used in
       (* build the printers for each theories *)
