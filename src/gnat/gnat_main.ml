@@ -78,7 +78,23 @@ let do_theory _ th =
    let tasks = Task.split_theory th None None in
    List.iter do_unsplitted_task tasks
 
-let prove_task t =
+let vc_name expl n =
+   let base = Gnat_expl.to_filename expl in
+   let suffix = ".why" in
+   if n = 1 then base ^ suffix
+   else base ^ "_" ^ string_of_int n ^ suffix
+
+let save_vc t expl n =
+   let dr = Gnat_config.altergo_driver in
+   let vc_fn = vc_name expl n in
+   let cout = open_out vc_fn in
+   let fmt  = Format.formatter_of_out_channel cout in
+   Driver.print_task dr fmt t;
+   Format.printf "saved VC to %s@." vc_fn
+
+
+let prove_task t expl n =
+   if Gnat_config.debug then save_vc t expl n;
    let pr_call =
       Driver.prove_task ~command:Gnat_config.alt_ergo_command
                         ~timelimit:Gnat_config.timeout
@@ -131,8 +147,10 @@ let _ =
       Gnat_expl.MExpl.iter
          (fun expl tl ->
             try
-               List.iter (fun t -> if not (prove_task t) then raise Not_Proven)
-               tl;
+               let cnt = ref 0 in
+               List.iter (fun t ->
+                  incr cnt;
+                  if not (prove_task t expl !cnt) then raise Not_Proven) tl;
                report fmt true expl
             with Not_Proven ->
                report fmt false expl)

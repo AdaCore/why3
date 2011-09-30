@@ -15,7 +15,6 @@ type reason =
 type loc  = { file : string; line : int ; col : int }
 type expl = { loc : loc ; reason : reason }
 
-
 let reason_from_string s =
    match s with
    | "VC_OVERFLOW_CHECK"          -> VC_Overflow_Check
@@ -42,6 +41,14 @@ let string_of_reason s =
    | VC_Loop_Invariant_Init       -> "loop invariant initialization"
    | VC_Loop_Invariant_Preserv    -> "loop invariant preservation"
    | VC_Assert                    -> "assertion"
+
+let to_filename expl =
+   let s = string_of_reason expl.reason in
+   for i = 0 to String.length s - 1 do
+      if s.[i] = ' ' then s.[i] <- '_'
+   done;
+   let l = expl.loc in
+   Format.sprintf "%s_%d_%d_%s" l.file l.line l.col s
 
 let loc_of_pos l =
    let f,l,c,_ = Loc.get l in
