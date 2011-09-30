@@ -99,6 +99,7 @@ let opt_timelimit = ref None
 let opt_memlimit = ref None
 let opt_command = ref None
 let opt_task = ref None
+let opt_realize = ref false
 let opt_bisect = ref false
 
 let opt_print_libdir = ref false
@@ -171,9 +172,11 @@ let option_list = Arg.align [
       "<dir> Print the selected goals to separate files in <dir>";
   "--output", Arg.String (fun s -> opt_output := Some s),
       " same as -o";
+  "--realize", Arg.Set opt_realize,
+      " Realize selected theories from the library";
   "--bisect", Arg.Set opt_bisect,
-  " Reduce the set of needed axioms which prove a goal, \
-    and output the resulting task";
+      " Reduce the set of needed axioms which prove a goal, \
+        and output the resulting task";
   "--print-theory", Arg.Set opt_print_theory,
       " Print selected theories";
   "--print-namespace", Arg.Set opt_print_namespace,
@@ -374,8 +377,7 @@ let fname_printer = ref (Ident.create_ident_printer [])
 let output_task drv fname _tname th task dir =
   let fname = Filename.basename fname in
   let fname =
-    try Filename.chop_extension fname with _ -> fname
-  in
+    try Filename.chop_extension fname with _ -> fname in
   let tname = th.th_name.Ident.id_string in
   let dest = Driver.file_of_task drv fname tname task in
   (* Uniquify the filename before the extension if it exists*)
@@ -386,12 +388,10 @@ let output_task drv fname _tname th task dir =
   Driver.print_task drv (formatter_of_out_channel cout) task;
   close_out cout
 
-
 let output_task_prepared drv fname _tname th task dir =
   let fname = Filename.basename fname in
   let fname =
-    try Filename.chop_extension fname with _ -> fname
-  in
+    try Filename.chop_extension fname with _ -> fname in
   let tname = th.th_name.Ident.id_string in
   let dest = Driver.file_of_task drv fname tname task in
   (* Uniquify the filename before the extension if it exists*)
@@ -402,25 +402,50 @@ let output_task_prepared drv fname _tname th task dir =
   Driver.print_task_prepared drv (formatter_of_out_channel cout) task;
   close_out cout
 
+let output_theory drv fname _tname th task dir =
+  let fname = Filename.basename fname in
+  let fname =
+    try Filename.chop_extension fname with _ -> fname in
+  let dest = Driver.file_of_theory drv fname th in
+  let file = Filename.concat dir dest in
+  let old =
+    if Sys.file_exists file then begin
+      let backup = file ^ ".bak" in
+      Sys.rename file backup;
+      Some (open_in backup)
+    end else None in
+  let cout = open_out file in
+  Driver.print_task ?old drv (formatter_of_out_channel cout) task;
+  close_out cout
 
-let do_task drv fname tname (th : Theory.theory) (task : Task.task) =
+let do_task env drv fname tname (th : Theory.theory) (task : Task.task) =
   match !opt_output, !opt_command with
+    | Some dir, _ when !opt_realize ->
+        output_theory drv fname tname th task dir
+    | None, _ when !opt_realize ->
+        (* FIXME: we should be able to realize other formats *)
+        let file,ich = Env.find_channel env "why" th.th_path in
+        let dir = try Filename.chop_extension file with _ ->
+          eprintf "File %s does not have an extension.@." file;
+          exit 1 in
+        close_in ich;
+        output_theory drv fname tname th task dir
     | Some dir, Some command when !opt_bisect ->
-      let test task =
-        let call = Driver.prove_task_prepared
-          ~command ~timelimit ~memlimit drv task in
-        let res = Call_provers.wait_on_call (call ()) () in
-        printf "%s %s %s : %a@." fname tname
+        let test task =
+          let call = Driver.prove_task_prepared
+            ~command ~timelimit ~memlimit drv task in
+          let res = Call_provers.wait_on_call (call ()) () in
+          printf "%s %s %s : %a@." fname tname
+            (task_goal task).Decl.pr_name.Ident.id_string
+            Call_provers.print_prover_result res;
+          res.Call_provers.pr_answer = Call_provers.Valid in
+        let prepared_task = Driver.prepare_task drv task in
+        if not (test prepared_task)
+        then printf "I can't bisect %s %s %s which is not valid@." fname tname
           (task_goal task).Decl.pr_name.Ident.id_string
-          Call_provers.print_prover_result res;
-        res.Call_provers.pr_answer = Call_provers.Valid in
-      let prepared_task = Driver.prepare_task drv task in
-      if not (test prepared_task)
-      then printf "I can't bisect %s %s %s which is not valid@." fname tname
-        (task_goal task).Decl.pr_name.Ident.id_string
-      else
-        let prepared_task = Task.bisect test prepared_task in
-        output_task_prepared drv fname tname th prepared_task dir
+        else
+          let prepared_task = Task.bisect test prepared_task in
+          output_task_prepared drv fname tname th prepared_task dir
     | None, Some command ->
         let call = Driver.prove_task ~command ~timelimit ~memlimit drv task in
         let res = Call_provers.wait_on_call (call ()) () in
@@ -442,13 +467,25 @@ let do_tasks env drv fname tname th task =
       List.rev_append (Trans.apply tr task) acc) [] tasks)
   in
   let tasks = List.fold_left apply [task] trans in
-  List.iter (do_task drv fname tname th) tasks
+  List.iter (do_task env drv fname tname th) tasks
 
 let do_theory env drv fname tname th glist =
   if !opt_print_theory then
     printf "%a@." Pretty.print_theory th
   else if !opt_print_namespace then
     printf "%a@." print_th_namespace th
+  else if !opt_realize then
+    if th.th_path = [] then begin
+      eprintf "Theory %s is not from the library.@." tname;
+      exit 1
+    end else if not (Queue.is_empty glist) then begin
+      eprintf "Cannot realize individual goals.@.";
+      exit 1
+    end else begin
+      let drv = Util.of_option drv in
+      let task = Task.use_export None th in
+      do_tasks env drv fname tname th task
+    end
   else begin
     let add acc (x,l) =
       let pr = try ns_find_pr th.th_export l with Not_found ->
@@ -477,7 +514,6 @@ let do_local_theory env drv fname m (tname,_,t,glist) =
     exit 1
   in
   do_theory env drv fname tname th glist
-
 
 let do_input env drv = function
   | None, _ when !opt_parse_only || !opt_type_only ->

@@ -224,6 +224,9 @@ let get_filename drv input_file theory_name goal_name =
 let file_of_task drv input_file theory_name task =
   get_filename drv input_file theory_name (task_goal task).pr_name.id_string
 
+let file_of_theory drv input_file th =
+  get_filename drv input_file th.th_name.Ident.id_string "null"
+
 let call_on_buffer ~command ?timelimit ?memlimit drv buffer =
   let regexps = drv.drv_regexps in
   let timeregexps = drv.drv_timeregexps in
