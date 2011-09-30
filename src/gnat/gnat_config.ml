@@ -4,6 +4,7 @@ let opt_verbose = ref false
 let opt_timeout = ref 10
 let opt_steps = ref 0
 let opt_report = ref false
+let opt_debug = ref false
 let opt_filename : string option ref = ref None
 
 let set_filename s =
@@ -30,6 +31,8 @@ let options = Arg.align [
           "Set the maximal number of proof steps";
    "--report", Arg.Set opt_report,
           "Enable report mode, report on all VCs, even proven ones";
+   "--debug", Arg.Set opt_debug,
+          "Enable debug mode";
 ]
 
 let filename =
@@ -106,3 +109,4 @@ let split_trans = Trans.lookup_transform_l "split_goal" env
 let timeout = !opt_timeout
 let verbose = !opt_verbose
 let report  = !opt_report
+let debug = !opt_debug

@@ -18,6 +18,8 @@ val verbose : bool
 val report : bool
 (* true if option --report was present *)
 
+val debug : bool
+(* true if option --debug was present *)
 
 (* Configuration settings related to input and output *)
 
