@@ -19,7 +19,29 @@ let ends_with s suffix =
          true
       with Exit -> false
 
+let starts_with s start =
+   if String.length start > String.length s then false
+   else
+      try
+         for i = 0 to String.length start - 1 do
+            if s.[i] <> start.[i] then raise Exit
+         done;
+         true
+      with Exit -> false
+
+
 let cmp_timestamps f1 f2 =
    let s1 = Unix.stat f1 in
    let s2 = Unix.stat f2 in
    Pervasives.compare s1.Unix.st_mtime s2.Unix.st_mtime
+
+let abort_with_message s =
+   Format.eprintf "%s" s;
+   Format.eprintf " Aborting.@.";
+   exit 1
+
+let output_buffer buf file =
+   let cout = open_out file in
+   Buffer.output_buffer cout buf;
+   close_out cout
+
