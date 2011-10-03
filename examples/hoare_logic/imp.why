@@ -130,6 +130,15 @@ inductive one_step state stmt state stmt =
        many_steps s2 i2 s3 i3 ->
        many_steps s1 i1 s3 i3
 
+lemma many_steps_seq:
+  forall s1 s3:state, i1 i2:stmt.
+    many_steps s1 (Sseq i1 i2) s3 Sskip ->
+    exists s2:state.
+      many_steps s1 i1 s2 Sskip /\ many_steps s2 i2 s3 Sskip
+
+
+(* formulas *)
+
 type fmla =
   | Fterm expr
 
@@ -137,6 +146,31 @@ predicate eval_fmla (s:state) (f:fmla) =
   match f with
   | Fterm e -> eval_expr s e <> 0
   end
+
+(* substitution *) 
+
+function subst_expr (e:expr) (x:ident) (t:expr) : expr =
+  match e with
+  | Econst _ -> e
+  | Evar y -> if x=y then t else e
+  | Ebin e1 op e2 -> Ebin (subst_expr e1 x t) op (subst_expr e2 x t)
+  end
+
+lemma eval_subst_expr:
+  forall s:state, e:expr, x:ident, t:expr.
+    eval_expr s (subst_expr e x t) =
+      eval_expr (IdMap.set s x (eval_expr s t)) e
+
+function subst (f:fmla) (x:ident) (t:expr) : fmla =
+  match f with
+  | Fterm e -> Fterm (subst_expr e x t)
+  end
+
+lemma eval_subst:
+  forall s:state, f:fmla, x:ident, t:expr.
+    eval_fmla s (subst f x t) -> eval_fmla (IdMap.set s x (eval_expr s t)) f
+
+(* Hoare triples *)
 
 type triple = T fmla stmt fmla
 
@@ -148,27 +182,17 @@ predicate valid_triple (t:triple) =
         eval_fmla s' q
   end
 
-function subst_expr (e:expr) (x:ident) (t:expr) : expr =
-  match e with
-  | Econst _ -> e
-  | Evar y -> if x=y then t else e
-  | Ebin e1 op e2 -> Ebin (subst_expr e1 x t) op (subst_expr e2 x t)
-  end
-
-function subst (f:fmla) (x:ident) (t:expr) : fmla =
-  match f with
-  | Fterm e -> Fterm (subst_expr e x t)
-  end
-
-lemma eval_subst:
-  forall s:state, f:fmla, x:ident, t:expr.
-    eval_fmla s (subst f x t) -> eval_fmla (IdMap.set s x (eval_expr s t)) f
 
 (* Hoare logic rules *)
 
 lemma assign_rule:
   forall q:fmla, x:ident, e:expr.
   valid_triple (T (subst q x e) (Sassign x e) q)
+
+lemma seq_rule:
+  forall p q r:fmla, i1 i2:stmt.
+  valid_triple (T p i1 r) /\ valid_triple (T r i2 q) ->
+  valid_triple (T p (Sseq i1 i2) q)
 
 end
 

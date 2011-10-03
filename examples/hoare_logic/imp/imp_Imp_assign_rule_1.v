@@ -135,6 +135,9 @@ Definition subst(f:fmla) (x:ident) (t:expr): fmla :=
   | (Fterm e) => (Fterm (subst_expr e x t))
   end.
 
+Axiom eval_subst : forall (s:(map ident Z)) (f:fmla) (x:ident) (t:expr),
+  (eval_fmla s (subst f x t)) -> (eval_fmla (set s x (eval_expr s t)) f).
+
 (* YOU MAY EDIT THE CONTEXT BELOW *)
 
 (* DO NOT EDIT BELOW *)
@@ -150,7 +153,7 @@ inversion H; subst.
 inversion H0; subst.
 (* normal case *)
 clear H Hred H0.
-apply subst_lemma.
+apply eval_subst; auto.
 
 (* absurd case *)
 inversion H1.
