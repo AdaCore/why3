@@ -350,7 +350,6 @@ let rec goal_latex_stat n fmt prov depth depth_max column subgoal _subgoals_max 
       if subgoal > 0 then
       fprintf fmt "\\cline{%d-%d} @." (depth + 1) column
     else ()
-      (*fprintf fmt "\\cline{%d-%d} @." depth column*)
   else
     fprintf fmt "\\hline @.";
     end
@@ -368,20 +367,20 @@ let rec goal_latex_stat n fmt prov depth depth_max column subgoal _subgoals_max 
 	  if subgoal > 0 then
 	    begin
 	      if(depth < depth_max)  then
-		for i = 1 to depth do fprintf fmt "& \\explanation{%s}" " " done
+		for i = 1 to depth do fprintf fmt "\\explanation{%s}& \\explanation{%s}" " " " "done
 	      else
-		for i = 1 to depth - 1 do fprintf fmt "& \\explanation{%s}" " " done
+		for i = 1 to depth - 1 do fprintf fmt "\\explanation{%s}& \\explanation{%s}" " " " " done
 	    end
 	  else
 	    if(depth < depth_max) then
-	      if depth > 0 then fprintf fmt "& \\explanation{%s}" " "
+	      if depth > 0 then fprintf fmt "\\explanation{%s}& \\explanation{%s}" " " " "
 	end
       else
 	begin
 	  if subgoal > 0  then
-	    for i = 1 to depth  do fprintf fmt "& \\explanation{%s}" " " done
+	    for i = 1 to depth  do fprintf fmt "\\explanation{%s}& \\explanation{%s}" " " " " done
 	  else
-	    if depth > 0 then fprintf fmt "& \\explanation{%s}" " "
+	    if depth > 0 then fprintf fmt "\\explanation{%s}& \\explanation{%s}" " " " "
 	end
     end
   else
