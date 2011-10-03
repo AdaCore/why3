@@ -157,7 +157,7 @@ Definition infix_sl(x:R) (y:R): R := (infix_as x (inv y)).
 Lemma assoc_mul_div : forall (x:R) (y:R) (z:R), (~ (z = 0%R)) ->
   ((infix_sl (infix_as x y) z) = (infix_as x (infix_sl y z))).
 (* YOU MAY EDIT THE PROOF BELOW *)
-intros x y z Zz.
+intros x y z _.
 apply Rmult_assoc.
 Qed.
 (* DO NOT EDIT BELOW *)
@@ -170,8 +170,10 @@ Lemma assoc_div_mul : forall (x:R) (y:R) (z:R), ((~ (y = 0%R)) /\
   ~ (z = 0%R)) -> ((infix_sl (infix_sl x y) z) = (infix_sl x (infix_as y
   z))).
 (* YOU MAY EDIT THE PROOF BELOW *)
-intuition.
-
+intros x y z (Zy, Zz).
+unfold infix_sl, infix_as, inv.
+rewrite Rmult_assoc.
+now rewrite Rinv_mult_distr.
 Qed.
 (* DO NOT EDIT BELOW *)
 
@@ -183,8 +185,10 @@ Lemma assoc_div_div : forall (x:R) (y:R) (z:R), ((~ (y = 0%R)) /\
   ~ (z = 0%R)) -> ((infix_sl x (infix_sl y z)) = (infix_sl (infix_as x z)
   y)).
 (* YOU MAY EDIT THE PROOF BELOW *)
-intuition.
-
+intros x y z (Zy, Zz).
+unfold infix_sl, infix_as, inv.
+field.
+now split.
 Qed.
 (* DO NOT EDIT BELOW *)
 
@@ -194,8 +198,7 @@ Qed.
 
 Lemma Refl : forall (x:R), (infix_lseq x x).
 (* YOU MAY EDIT THE PROOF BELOW *)
-intuition.
-
+exact Rle_refl.
 Qed.
 (* DO NOT EDIT BELOW *)
 
@@ -206,8 +209,7 @@ Qed.
 Lemma Trans : forall (x:R) (y:R) (z:R), (infix_lseq x y) -> ((infix_lseq y
   z) -> (infix_lseq x z)).
 (* YOU MAY EDIT THE PROOF BELOW *)
-intuition.
-
+exact Rle_trans.
 Qed.
 (* DO NOT EDIT BELOW *)
 
@@ -218,8 +220,7 @@ Qed.
 Lemma Antisymm : forall (x:R) (y:R), (infix_lseq x y) -> ((infix_lseq y x) ->
   (x = y)).
 (* YOU MAY EDIT THE PROOF BELOW *)
-intuition.
-
+exact Rle_antisym.
 Qed.
 (* DO NOT EDIT BELOW *)
 
@@ -229,8 +230,11 @@ Qed.
 
 Lemma Total : forall (x:R) (y:R), (infix_lseq x y) \/ (infix_lseq y x).
 (* YOU MAY EDIT THE PROOF BELOW *)
-intuition.
-
+intros x y.
+destruct (Rle_or_lt x y) as [H|H].
+now left.
+right.
+now apply Rlt_le.
 Qed.
 (* DO NOT EDIT BELOW *)
 
@@ -241,8 +245,8 @@ Qed.
 Lemma CompatOrderAdd : forall (x:R) (y:R) (z:R), (infix_lseq x y) ->
   (infix_lseq (infix_pl x z) (infix_pl y z)).
 (* YOU MAY EDIT THE PROOF BELOW *)
-intuition.
-
+intros x y z.
+exact (Rplus_le_compat_r z x y).
 Qed.
 (* DO NOT EDIT BELOW *)
 
@@ -253,8 +257,8 @@ Qed.
 Lemma CompatOrderMult : forall (x:R) (y:R) (z:R), (infix_lseq x y) ->
   ((infix_lseq 0%R z) -> (infix_lseq (infix_as x z) (infix_as y z))).
 (* YOU MAY EDIT THE PROOF BELOW *)
-intuition.
-
+intros x y z H Zz.
+now apply Rmult_le_compat_r.
 Qed.
 (* DO NOT EDIT BELOW *)
 
