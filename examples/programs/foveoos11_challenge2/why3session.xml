@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session SYSTEM "why3session.dtd">
+<why3session
+ name="examples/programs/foveoos11_challenge2/why3session.xml">
+ <prover
+  id="alt-ergo"
+  name="Alt-Ergo"
+  version="0.93"/>
+ <prover
+  id="coq"
+  name="Coq"
+  version="8.2pl1"/>
+ <prover
+  id="cvc3"
+  name="CVC3"
+  version="2.2"/>
+ <prover
+  id="eprover"
+  name="Eprover"
+  version="0.7 Dhajea"/>
+ <prover
+  id="gappa"
+  name="Gappa"
+  version="0.14.0"/>
+ <prover
+  id="simplify"
+  name="Simplify"
+  version="1.5.4"/>
+ <prover
+  id="yices"
+  name="Yices"
+  version="1.0.13"/>
+ <prover
+  id="z3"
+  name="Z3"
+  version="2.13"/>
+ <file
+  name="../foveoos11_challenge2.mlw"
+  verified="true"
+  expanded="true">
+  <theory
+   name="WP MaximumTree"
+   verified="true"
+   expanded="true">
+   <goal
+    name="WP_parameter maximum"
+    expl="parameter maximum"
+    sum="be2c72561ff37f3f52d7a3123788f957"
+    proved="true"
+    expanded="true"
+    shape="CV0aEmptyfaNodeaEmptyVaEmptyainfix <=V2V1IamemV2V0FAamemV1V0aNodeaEmptyVVainfix <=V6amaxV3V5IamemV6V0FAamemamaxV3V5V0Iainfix <=V7V5IamemV7V4FAamemV5V4FAainfix =V4aEmptyNaNodeVVaEmptyainfix <=V11amaxV10V9IamemV11V0FAamemamaxV10V9V0Iainfix <=V12V10IamemV12V8FAamemV10V8FAainfix =V8aEmptyNaNodeVVVainfix <=V18amaxV16amaxV14V17IamemV18V0FAamemamaxV16amaxV14V17V0Iainfix <=V19V17IamemV19V15FAamemV17V15FAainfix =V15aEmptyNIainfix <=V20V16IamemV20V13FAamemV16V13FAainfix =V13aEmptyNIainfix =V0aEmptyNF">
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.36"/>
+    </proof>
+   </goal>
+  </theory>
+ </file>
+</why3session>
