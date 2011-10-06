@@ -123,7 +123,7 @@ inductive one_step state stmt state stmt =
  (* many steps of execution *)
  inductive many_steps state stmt state stmt =
    | many_steps_refl:
-     forall s:state, i:stmt. many_steps s i s i
+     forall s1 s2:state, i1 i2:stmt. s1=s2 /\ i1=i2 -> many_steps s1 i1 s2 i2
    | many_steps_trans:
      forall s1 s2 s3:state, i1 i2 i3:stmt.
        one_step s1 i1 s2 i2 ->
@@ -131,8 +131,8 @@ inductive one_step state stmt state stmt =
        many_steps s1 i1 s3 i3
 
 lemma many_steps_seq:
-  forall s1 s3:state, i1 i2:stmt.
-    many_steps s1 (Sseq i1 i2) s3 Sskip ->
+  forall s1 s3:state, i i1 i2 i3:stmt.
+    many_steps s1 i s3 i3 -> i = Sseq i1 i2 -> i3 = Sskip ->
     exists s2:state.
       many_steps s1 i1 s2 Sskip /\ many_steps s2 i2 s3 Sskip
 
@@ -195,5 +195,13 @@ lemma seq_rule:
   valid_triple (T p (Sseq i1 i2) q)
 
 end
+
+
+
+(*
+Local Variables:
+compile-command: "why3ide imp.why"
+End:
+*)
 
 
