@@ -1,0 +1,92 @@
+(*
+COST Verification Competition. vladimir@cost-ic0701.org
+
+Challenge 3: Two equal elements
+
+Given: An integer array a of length n+2 with n>=2. It is known that at
+least two values stored in the array appear twice (i.e., there are at
+least two duplets).
+
+Implement and verify a program finding such two values.
+
+You may assume that the array contains values between 0 and n-1.
+*)
+
+theory Option
+
+  type option 'a = None | Some 'a
+
+  predicate eq_opt (x:'a) (o:option 'a) =
+    match o with
+    | None -> false
+    | Some v -> v=x
+    end
+
+end
+
+module Duplets
+
+  use import int.Int
+  use import Option
+  use import module ref.Ref
+  use import module array.Array
+
+  (* duplet in array a is a pair of indexes (i,j) in the bounds of array
+     a such that a[i] = a[j] *)
+  predicate is_duplet (a:array int) (i:int) (j:int) =
+     0 <= i < j < length a /\ a[i] = a[j]
+
+  exception Break
+
+  (* (duplet a) returns the indexes (i,j) of a
+     duplet in a. *)
+  let duplet (a:array int) (except:option int) =
+     { 2 <= length a /\
+       exists i j:int. is_duplet a i j /\
+                       not (eq_opt a[i] except) }
+     let res = ref (0,0) in
+     try
+      for i=0 to length a - 2 do
+        invariant {
+          forall k l:int. 0 <= k < i /\ k < l < length a ->
+            not (eq_opt a[k] except) -> not (is_duplet a k l)
+        }
+         let v = a[i] in
+         if eq_opt v except then () else
+         for j=i+1 to length a - 1 do
+           invariant {
+             forall l:int. i < l < j -> not (is_duplet a i l)
+           }
+             if a[j] = v then
+               begin
+                res := (i,j);
+                raise Break
+               end
+         done
+      done;
+      assert { forall i j:int. not (is_duplet a i j) };
+      absurd
+     with Break -> !res
+     end
+  { let (i,j) = result in
+    is_duplet a i j /\ not (eq_opt a[i] except) }
+
+
+  let duplets (a: array int) =
+    { 4 <= length a /\ exists i j k l:int.
+      is_duplet a i j /\ is_duplet a k l /\ a[i] <> a[k] 
+    }
+    let (i,j) = duplet a None in
+    let (k,l) = duplet a (Some a[j]) in
+    ((i,j),(k,l))
+    { let ((i,j),(k,l)) = result in
+      is_duplet a i j /\ is_duplet a k l /\ a[i] <> a[k] }
+
+end
+
+(*
+Local Variables:
+compile-command: "why3ide duplets.mlw"
+End:
+*)
+
