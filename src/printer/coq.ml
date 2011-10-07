@@ -28,8 +28,9 @@ open Term
 open Decl
 open Printer
 
-let black_list = [ "at"; "cofix"; "exists2"; "fix"; "IF"; "mod"; "Prop";
-                   "return"; "Set"; "Type"; "using"; "where"]
+let black_list =
+  [ "at"; "cofix"; "exists2"; "fix"; "IF"; "left"; "mod"; "Prop";
+    "return"; "right"; "Set"; "Type"; "using"; "where"; ]
 
 let iprinter =
   let isanitize = sanitizer char_to_alpha char_to_alnumus in
