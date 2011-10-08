@@ -9,6 +9,7 @@ type reason =
    | VC_Loop_Invariant_Init
    | VC_Loop_Invariant_Preserv
    | VC_Assert
+   | VC_Subtype_Decl
 
 type expl
 

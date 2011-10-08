@@ -11,6 +11,7 @@ type reason =
    | VC_Loop_Invariant_Init
    | VC_Loop_Invariant_Preserv
    | VC_Assert
+   | VC_Subtype_Decl
 
 type loc  = { file : string; line : int ; col : int }
 type expl = { loc : loc ; reason : reason }
@@ -27,6 +28,7 @@ let reason_from_string s =
    | "VC_LOOP_INVARIANT_INIT"     -> VC_Loop_Invariant_Init
    | "VC_LOOP_INVARIANT_PRESERV"  -> VC_Loop_Invariant_Preserv
    | "VC_ASSERT"                  -> VC_Assert
+   | "VC_SUBTYPE_DECL"            -> VC_Subtype_Decl
    | _                            -> assert false
 
 let string_of_reason s =
@@ -41,6 +43,7 @@ let string_of_reason s =
    | VC_Loop_Invariant_Init       -> "loop invariant initialization"
    | VC_Loop_Invariant_Preserv    -> "loop invariant preservation"
    | VC_Assert                    -> "assertion"
+   | VC_Subtype_Decl              -> "validity of subtype declaration"
 
 let to_filename expl =
    let s = string_of_reason expl.reason in
