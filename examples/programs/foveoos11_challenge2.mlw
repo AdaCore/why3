@@ -20,10 +20,10 @@ module MaximumTree
   let rec maximum (t: tree) : int =
     { t <> Empty }
     match t with
-      | Empty -> absurd
+      | Empty              -> absurd
       | Node Empty v Empty -> v
-      | Node Empty v r     -> max v (maximum r)
-      | Node l     v Empty -> max (maximum l) v
+      | Node Empty v s
+      | Node s     v Empty -> max (maximum s) v
       | Node l     v r     -> max (maximum l) (max v (maximum r))
     end
     { mem result t /\ forall x: int. mem x t -> x <= result }
