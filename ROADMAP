@@ -19,7 +19,7 @@
 
 * traceability: Partially done
   (Claude)
-  TODO: traceability des hyp comme path dans le prog (depuis
+  DONE: traceability des hyp comme path dans le prog (depuis
   Frama-C en particulier)
   afficher les explications dans les outils en ligne de
   commande why3 et why3bench + le path
@@ -41,32 +41,12 @@
 
 * choose a logo -> done ?
 
-=== Roadmap for fourth release ========================
-
-* Final preparation:
-** put on the web page
-*** why3-0.71.tar.gz
-*** manual in PDF: check that macro \todo can be commented out
-    from ./macros.tex
-*** API doc in HTML (suggestion: http://why3.lri.fr/api/)
-    Note: check that URL of API doc is correct in doc/api.tex line 9.
-** What to put in the announcement ?
-   - why3replayer improved ?
-   - other ?
-** The last commit:
-*** increment the magic number in config
-*** add a tag to the git repository
-*** The next commit : increment de why3 version
-
-
 * Coq plugin
 
 * Coq realization of theories
-  (Andrei)
 
 * prover support
 ** avoid bug of CVC3, e.g in examples/my_cosine.why
-** test/debug TPTP output, make Vampire work
 ** understand bug reports 12792-12794 and 12907
 
 * IDE:
@@ -82,14 +62,44 @@
    * add "ctrl-S" to save the session explicitly
      (partially done, but no shortcut)
 
-* DONE replayer: don't replay a goal that has changed, just display as an
-  unsuccessful replay
-
 * DOC:
 ** complete api.tex: explain how to build theories, apply
    transformations, write new functions on terms (A)
 ** complete manpages.tex: section "Drivers of external provers" (A+F)
 ** make the glossary available
+
+
+=== Roadmap for fourth release ========================
+
+* Final preparation:
+** put on the web page
+*** why3-0.71.tar.gz
+*** manual in PDF: check that macro \todo is commented out
+    in ./macros.tex
+*** API doc in HTML (suggestion: http://why3.lri.fr/api/)
+    Note: check that URL of API doc is correct in doc/api.tex line 9.
+** What to put in the announcement:
+*** traceability from front-ends work
+    (see Krakatoa and Jessie of the next release 2.30 of Why2)
+*** many new examples in examples/ and examples/programs
+*** significantly improved efficiency of WP calculus
+*** improved method for matching old and new goals in proof sessions
+*** several bug fixes
+*** see also the file CHANGES
+** The last commit:
+*** increment the magic number in config
+*** add a tag to the git repository
+*** The next commit : increment de why3 version
+
+* prover support
+** DONE test/debug TPTP output, make Vampire work
+
+* IDE:
+** saving session
+   * DONE add a "cancel" choice in the "ask" window
+
+* DONE replayer: don't replay a goal that has changed, just display as an
+  unsuccessful replay
 
 * DONE reload: improve matching of new and old goals by use a kind a distance
   between some notion of shape of a goal
