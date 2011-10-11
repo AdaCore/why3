@@ -4,8 +4,13 @@ Require Import ZArith.
 Require Import Rbase.
 Parameter ident : Type.
 
+Axiom ident_eq_dec : forall (i1:ident) (i2:ident), (i1 = i2) \/ ~ (i1 = i2).
+
 Parameter mk_ident: Z -> ident.
 
+
+Axiom mk_ident_inj : forall (i:Z) (j:Z), ((mk_ident i) = (mk_ident j)) ->
+  (i = j).
 
 Inductive operator  :=
   | Oplus : operator 
@@ -129,41 +134,36 @@ Axiom subst_expr_def : forall (e:expr) (x:ident) (t:expr),
       (subst_expr e2 x t)))
   end.
 
-Axiom eval_subst_expr : forall (s:(map ident Z)) (e:expr) (x:ident) (t:expr),
-  ((eval_expr s (subst_expr e x t)) = (eval_expr (set s x (eval_expr s t))
-  e)).
-
-Definition subst(f:fmla) (x:ident) (t:expr): fmla :=
-  match f with
-  | (Fterm e) => (Fterm (subst_expr e x t))
-  end.
-
-Axiom eval_subst : forall (s:(map ident Z)) (f:fmla) (x:ident) (t:expr),
-  (eval_fmla s (subst f x t)) -> (eval_fmla (set s x (eval_expr s t)) f).
-
-Definition valid_triple(p:fmla) (i:stmt) (q:fmla): Prop := forall (s:(map
-  ident Z)), (eval_fmla s p) -> forall (sqt:(map ident Z)), (many_steps s i
-  sqt Sskip) -> (eval_fmla sqt q).
-
 (* YOU MAY EDIT THE CONTEXT BELOW *)
 
 (* DO NOT EDIT BELOW *)
 
-Theorem assign_rule : forall (q:fmla) (x:ident) (e:expr),
-  (valid_triple (subst q x e) (Sassign x e) q).
+Theorem eval_subst_expr : forall (s:(map ident Z)) (e:expr) (x:ident)
+  (t:expr), ((eval_expr s (subst_expr e x t)) = (eval_expr (set s x
+  (eval_expr s t)) e)).
 (* YOU MAY EDIT THE PROOF BELOW *)
-intros q x e.
-unfold valid_triple.
-intros s Pre s' Hred.
-inversion Hred; subst.
-inversion H; subst.
-inversion H0; subst.
-(* normal case *)
-clear H Hred H0.
-apply eval_subst; auto.
-
-(* absurd case *)
-inversion H1.
+intros s e x t.
+induction e.
+(* case Econst *)
+rewrite (subst_expr_def (Econst z) x t).
+now simpl.
+(* case Evar *)
+generalize (subst_expr_def (Evar i) x t).
+intros (H1,H2).
+case (ident_eq_dec x i).
+(* subcase x=i *)
+simpl; intro; subst x.
+rewrite Select_eq; auto.
+now rewrite H1.
+(* subcase x<>i *)
+simpl; intro.
+rewrite Select_neq; auto.
+now rewrite H2.
+(* case Ebin *)
+rewrite (subst_expr_def (Ebin e1 o e2) x t).
+simpl.
+rewrite IHe2.
+now rewrite IHe1.
 Qed.
 (* DO NOT EDIT BELOW *)
 

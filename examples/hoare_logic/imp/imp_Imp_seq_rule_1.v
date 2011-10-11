@@ -100,21 +100,22 @@ Inductive many_steps : (map ident Z) -> stmt -> (map ident Z)
       ident Z)) (i1:stmt) (i2:stmt) (i3:stmt), (one_step s1 i1 s2 i2) ->
       ((many_steps s2 i2 s3 i3) -> (many_steps s1 i1 s3 i3)).
 
-Axiom many_steps_seq_rec : forall (s1:(map ident Z)) (s3:(map ident Z))
-  (i:stmt) (i3:stmt), (many_steps s1 i s3 i3) -> ((i3 = Sskip) ->
-  forall (i1:stmt) (i2:stmt), (i = (Sseq i1 i2)) -> exists s2:(map ident Z),
-  (many_steps s1 i1 s2 Sskip) /\ (many_steps s2 i2 s3 Sskip)).
-
-Axiom many_steps_seq : forall (s1:(map ident Z)) (s3:(map ident Z)) (i1:stmt)
-  (i2:stmt), (many_steps s1 (Sseq i1 i2) s3 Sskip) -> exists s2:(map ident
-  Z), (many_steps s1 i1 s2 Sskip) /\ (many_steps s2 i2 s3 Sskip).
-
 Inductive fmla  :=
   | Fterm : expr -> fmla .
 
 Definition eval_fmla(s:(map ident Z)) (f:fmla): Prop :=
   match f with
   | (Fterm e) => ~ ((eval_expr s e) = 0%Z)
+  end.
+
+Inductive triple  :=
+  | T : fmla -> stmt -> fmla -> triple .
+
+Definition valid_triple(t:triple): Prop :=
+  match t with
+  | (T p i q) => forall (s:(map ident Z)), (eval_fmla s p) ->
+      forall (sqt:(map ident Z)), (many_steps s i sqt Sskip) ->
+      (eval_fmla sqt q)
   end.
 
 Parameter subst_expr: expr -> ident -> expr -> expr.
@@ -129,10 +130,6 @@ Axiom subst_expr_def : forall (e:expr) (x:ident) (t:expr),
       (subst_expr e2 x t)))
   end.
 
-Axiom eval_subst_expr : forall (s:(map ident Z)) (e:expr) (x:ident) (t:expr),
-  ((eval_expr s (subst_expr e x t)) = (eval_expr (set s x (eval_expr s t))
-  e)).
-
 Definition subst(f:fmla) (x:ident) (t:expr): fmla :=
   match f with
   | (Fterm e) => (Fterm (subst_expr e x t))
@@ -141,29 +138,21 @@ Definition subst(f:fmla) (x:ident) (t:expr): fmla :=
 Axiom eval_subst : forall (s:(map ident Z)) (f:fmla) (x:ident) (t:expr),
   (eval_fmla s (subst f x t)) -> (eval_fmla (set s x (eval_expr s t)) f).
 
-Definition valid_triple(p:fmla) (i:stmt) (q:fmla): Prop := forall (s:(map
-  ident Z)), (eval_fmla s p) -> forall (sqt:(map ident Z)), (many_steps s i
-  sqt Sskip) -> (eval_fmla sqt q).
+Axiom assign_rule : forall (q:fmla) (x:ident) (e:expr),
+  (valid_triple (T (subst q x e) (Sassign x e) q)).
 
 (* YOU MAY EDIT THE CONTEXT BELOW *)
 
 (* DO NOT EDIT BELOW *)
 
-Theorem assign_rule : forall (q:fmla) (x:ident) (e:expr),
-  (valid_triple (subst q x e) (Sassign x e) q).
+Theorem seq_rule : forall (p:fmla) (q:fmla) (r:fmla) (i1:stmt) (i2:stmt),
+  ((valid_triple (T p i1 r)) /\ (valid_triple (T r i2 q))) ->
+  (valid_triple (T p (Sseq i1 i2) q)).
 (* YOU MAY EDIT THE PROOF BELOW *)
-intros q x e.
-unfold valid_triple.
-intros s Pre s' Hred.
-inversion Hred; subst.
-inversion H; subst.
-inversion H0; subst.
-(* normal case *)
-clear H Hred H0.
-apply eval_subst; auto.
+intros p q r i1 i2 (H1,H2).
+unfold valid_triple in *.
+intros s H s' Hred.
 
-(* absurd case *)
-inversion H1.
 Qed.
 (* DO NOT EDIT BELOW *)
 

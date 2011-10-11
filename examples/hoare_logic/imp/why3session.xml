@@ -52,15 +52,43 @@
   version="2.19"/>
  <file
   name="../imp.why"
-  verified="false"
+  verified="true"
   expanded="true">
   <theory
    name="Imp"
-   verified="false"
+   verified="true"
    expanded="true">
    <goal
+    name="ident_eq_dec"
+    sum="657a0cf836398f0e71a03149e8d3f752"
+    proved="true"
+    expanded="false"
+    shape="ainfix =V0V1NOainfix =V0V1F">
+    <proof
+     prover="cvc3"
+     timelimit="3"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="alt-ergo"
+     timelimit="3"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+    <proof
+     prover="z3"
+     timelimit="3"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+   <goal
     name="check_skip"
-    sum="6e45bbe5f29a8cfd919ae1f08a1020e2"
+    sum="7a80eb56e935bc1dae5a16b66655b71a"
     proved="true"
     expanded="false"
     shape="ainfix =V0aSskipNOainfix =V0aSskipF">
@@ -69,19 +97,19 @@
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.02"/>
+     <result status="valid" time="0.01"/>
     </proof>
     <proof
      prover="alt-ergo"
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.02"/>
+     <result status="valid" time="0.03"/>
     </proof>
    </goal>
    <goal
     name="Test13"
-    sum="e12eecbdd96b2281610235f2fcc63751"
+    sum="752a2c5d7bd2066e4a0ea6f8202ff247"
     proved="true"
     expanded="false"
     shape="Laconstc0ainfix =aeval_exprV0aEconstc13c13">
@@ -111,19 +139,19 @@
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.02"/>
     </proof>
     <proof
      prover="spass"
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.03"/>
+     <result status="valid" time="0.04"/>
     </proof>
    </goal>
    <goal
     name="Test42"
-    sum="f8558a13a875934483ed332056b4cbbe"
+    sum="3c9c1d72a759712365d998f7a29886de"
     proved="true"
     expanded="false"
     shape="Lamk_identc0Lasetaconstc0V0c42ainfix =aeval_exprV1aEvarV0c42">
@@ -139,7 +167,7 @@
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.03"/>
     </proof>
     <proof
      prover="eprover"
@@ -153,19 +181,19 @@
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.12"/>
+     <result status="valid" time="0.14"/>
     </proof>
     <proof
      prover="spass"
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.04"/>
+     <result status="valid" time="0.05"/>
     </proof>
    </goal>
    <goal
     name="Test55"
-    sum="dd37008f932e3fc376d52c430886f5b5"
+    sum="ff32d38bb9935b5125f45e8793463171"
     proved="true"
     expanded="false"
     shape="Lamk_identc0Lasetaconstc0V0c42ainfix =aeval_exprV1aEbinaEvarV0aOplusaEconstc13c55">
@@ -186,7 +214,7 @@
    </goal>
    <goal
     name="Ass42"
-    sum="8042f4b04d21f83c438b7f3fa5ffefc2"
+    sum="dcf28f4f2eb16812656ba92851bc662a"
     proved="true"
     expanded="false"
     shape="Lamk_identc0Laconstc0ainfix =agetV2V0c42Iaone_stepV1aSassignV0aEconstc42V2aSskipF">
@@ -207,7 +235,7 @@
    </goal>
    <goal
     name="If42"
-    sum="5d1dcda6f7eb3a2c6571b851ec21e278"
+    sum="c31c3a15e03ada451dfc85fff902ad2b"
     proved="true"
     expanded="false"
     shape="Lamk_identc0Laconstc0ainfix =agetV3V0c42Iaone_stepV2V4V3aSskipIaone_stepV1aSifaEvarV0aSassignV0aEconstc13aSassignV0aEconstc42V2V4F">
@@ -216,19 +244,19 @@
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.57"/>
+     <result status="valid" time="0.63"/>
     </proof>
     <proof
      prover="alt-ergo"
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.66"/>
+     <result status="valid" time="0.86"/>
     </proof>
    </goal>
    <goal
     name="progress"
-    sum="edc177614e801c2dfa962191c2a4e85b"
+    sum="de162538bff3e343afe673c48cceac7c"
     proved="true"
     expanded="false"
     shape="aone_stepV0V1V2V3EIainfix =V1aSskipNF">
@@ -237,77 +265,112 @@
      timelimit="5"
      edited="imp_Imp_progress_1.v"
      obsolete="false">
-     <result status="valid" time="0.45"/>
+     <result status="valid" time="0.51"/>
+    </proof>
+   </goal>
+   <goal
+    name="many_steps_seq_rec"
+    sum="d65712d0e695898d17b619c58dfaddc5"
+    proved="true"
+    expanded="false"
+    shape="amany_stepsV6V5V1aSskipAamany_stepsV0V4V6aSskipEIainfix =V2aSseqV4V5FIainfix =V3aSskipIamany_stepsV0V2V1V3F">
+    <proof
+     prover="coq"
+     timelimit="3"
+     edited="imp_Imp_many_steps_seq_rec_1.v"
+     obsolete="false">
+     <result status="valid" time="0.65"/>
     </proof>
    </goal>
    <goal
     name="many_steps_seq"
-    sum="771cc1d253a080268858269035654fe7"
-    proved="false"
-    expanded="true"
-    shape="amany_stepsV6V4V1aSskipAamany_stepsV0V3V6aSskipEIainfix =V5aSskipIainfix =V2aSseqV3V4Iamany_stepsV0V2V1V5F">
+    sum="98667096725002aa995a17db1a8945b8"
+    proved="true"
+    expanded="false"
+    shape="amany_stepsV4V3V1aSskipAamany_stepsV0V2V4aSskipEIamany_stepsV0aSseqV2V3V1aSskipF">
     <proof
-     prover="coq"
-     timelimit="5"
-     edited="imp_Imp_many_steps_seq_1.v"
-     obsolete="true">
-     <result status="failure" time="0.45"/>
+     prover="cvc3"
+     timelimit="3"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+    <proof
+     prover="alt-ergo"
+     timelimit="3"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.04"/>
+    </proof>
+    <proof
+     prover="z3"
+     timelimit="3"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.04"/>
     </proof>
    </goal>
    <goal
     name="eval_subst_expr"
-    sum="dc8b48dfb119a06daa12809a1bc8a37d"
-    proved="false"
-    expanded="true"
+    sum="43a7f007490895fc85d1a5055de98919"
+    proved="true"
+    expanded="false"
     shape="ainfix =aeval_exprV0asubst_exprV1V2V3aeval_exprasetV0V2aeval_exprV0V3V1F">
     <proof
      prover="coq"
      timelimit="5"
      edited="imp_Imp_eval_subst_expr_1.v"
-     obsolete="true">
-     <result status="unknown" time="0.43"/>
+     obsolete="false">
+     <result status="valid" time="0.45"/>
     </proof>
    </goal>
    <goal
     name="eval_subst"
-    sum="db6e0424463873d4f3f5d039496a3510"
-    proved="false"
+    sum="75fe9028dd520dcb211e6cde21feb1a6"
+    proved="true"
     expanded="false"
     shape="aeval_fmlaasetV0V2aeval_exprV0V3V1Iaeval_fmlaV0asubstV1V2V3F">
     <proof
      prover="coq"
      timelimit="5"
      edited="imp_Imp_eval_subst_2.v"
-     obsolete="true">
-     <result status="valid" time="0.43"/>
+     obsolete="false">
+     <result status="valid" time="0.66"/>
     </proof>
    </goal>
    <goal
     name="assign_rule"
-    sum="b128e9cf9280645c89fbe34176dc53b8"
-    proved="false"
+    sum="12f9657b1c525075d56bcf69c77110b1"
+    proved="true"
     expanded="false"
-    shape="avalid_tripleaTasubstV0V1V2aSassignV1V2V0F">
+    shape="avalid_tripleasubstV0V1V2aSassignV1V2V0F">
     <proof
      prover="coq"
      timelimit="5"
      edited="imp_Imp_assign_rule_1.v"
-     obsolete="true">
-     <result status="valid" time="0.55"/>
+     obsolete="false">
+     <result status="valid" time="0.74"/>
     </proof>
    </goal>
    <goal
     name="seq_rule"
-    sum="11646ebb9e6da0d832f0bf1eb67a1b76"
-    proved="false"
+    sum="298c63994d40d9ae8da8b97a6309eed1"
+    proved="true"
     expanded="false"
-    shape="avalid_tripleaTV0aSseqV3V4V1Iavalid_tripleaTV2V4V1Aavalid_tripleaTV0V3V2F">
+    shape="avalid_tripleV0aSseqV3V4V1Iavalid_tripleV2V4V1Aavalid_tripleV0V3V2F">
+    <proof
+     prover="coq"
+     timelimit="3"
+     edited="imp_Imp_seq_rule_2.v"
+     obsolete="false">
+     <result status="valid" time="0.54"/>
+    </proof>
     <proof
      prover="z3"
      timelimit="5"
      edited=""
-     obsolete="true">
-     <result status="valid" time="0.17"/>
+     obsolete="false">
+     <result status="valid" time="0.07"/>
     </proof>
    </goal>
   </theory>

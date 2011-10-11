@@ -100,70 +100,35 @@ Inductive many_steps : (map ident Z) -> stmt -> (map ident Z)
       ident Z)) (i1:stmt) (i2:stmt) (i3:stmt), (one_step s1 i1 s2 i2) ->
       ((many_steps s2 i2 s3 i3) -> (many_steps s1 i1 s3 i3)).
 
-Axiom many_steps_seq_rec : forall (s1:(map ident Z)) (s3:(map ident Z))
-  (i:stmt) (i3:stmt), (many_steps s1 i s3 i3) -> ((i3 = Sskip) ->
-  forall (i1:stmt) (i2:stmt), (i = (Sseq i1 i2)) -> exists s2:(map ident Z),
-  (many_steps s1 i1 s2 Sskip) /\ (many_steps s2 i2 s3 Sskip)).
-
-Axiom many_steps_seq : forall (s1:(map ident Z)) (s3:(map ident Z)) (i1:stmt)
-  (i2:stmt), (many_steps s1 (Sseq i1 i2) s3 Sskip) -> exists s2:(map ident
-  Z), (many_steps s1 i1 s2 Sskip) /\ (many_steps s2 i2 s3 Sskip).
-
-Inductive fmla  :=
-  | Fterm : expr -> fmla .
-
-Definition eval_fmla(s:(map ident Z)) (f:fmla): Prop :=
-  match f with
-  | (Fterm e) => ~ ((eval_expr s e) = 0%Z)
-  end.
-
-Parameter subst_expr: expr -> ident -> expr -> expr.
-
-
-Axiom subst_expr_def : forall (e:expr) (x:ident) (t:expr),
-  match e with
-  | (Econst _) => ((subst_expr e x t) = e)
-  | (Evar y) => ((x = y) -> ((subst_expr e x t) = t)) /\ ((~ (x = y)) ->
-      ((subst_expr e x t) = e))
-  | (Ebin e1 op e2) => ((subst_expr e x t) = (Ebin (subst_expr e1 x t) op
-      (subst_expr e2 x t)))
-  end.
-
-Axiom eval_subst_expr : forall (s:(map ident Z)) (e:expr) (x:ident) (t:expr),
-  ((eval_expr s (subst_expr e x t)) = (eval_expr (set s x (eval_expr s t))
-  e)).
-
-Definition subst(f:fmla) (x:ident) (t:expr): fmla :=
-  match f with
-  | (Fterm e) => (Fterm (subst_expr e x t))
-  end.
-
-Axiom eval_subst : forall (s:(map ident Z)) (f:fmla) (x:ident) (t:expr),
-  (eval_fmla s (subst f x t)) -> (eval_fmla (set s x (eval_expr s t)) f).
-
-Definition valid_triple(p:fmla) (i:stmt) (q:fmla): Prop := forall (s:(map
-  ident Z)), (eval_fmla s p) -> forall (sqt:(map ident Z)), (many_steps s i
-  sqt Sskip) -> (eval_fmla sqt q).
-
 (* YOU MAY EDIT THE CONTEXT BELOW *)
 
 (* DO NOT EDIT BELOW *)
 
-Theorem assign_rule : forall (q:fmla) (x:ident) (e:expr),
-  (valid_triple (subst q x e) (Sassign x e) q).
+Theorem many_steps_seq_rec : forall (s1:(map ident Z)) (s3:(map ident Z))
+  (i:stmt) (i3:stmt), (many_steps s1 i s3 i3) -> ((i3 = Sskip) ->
+  forall (i1:stmt) (i2:stmt), (i = (Sseq i1 i2)) -> exists s2:(map ident Z),
+  (many_steps s1 i1 s2 Sskip) /\ (many_steps s2 i2 s3 Sskip)).
 (* YOU MAY EDIT THE PROOF BELOW *)
-intros q x e.
-unfold valid_triple.
-intros s Pre s' Hred.
-inversion Hred; subst.
-inversion H; subst.
-inversion H0; subst.
-(* normal case *)
-clear H Hred H0.
-apply eval_subst; auto.
-
-(* absurd case *)
-inversion H1.
+intros s1 s3 i i3 H.
+elim H.
+(* case 1/2 : 0 steps *)
+intros s i0 H0 i1 i2 H12.
+subst; discriminate.
+(* case 2/2 : at least one step *)
+intros s2 s4 s5 i1 i2 i4.
+intros Hstep Hmany Hind.
+intros H4 i5 i6 H56.
+subst.
+inversion Hstep; subst.
+(* case 1: one_step_seq (no skip) *)
+elim Hind with (i1:=i1qt) (i2:=i6); auto; clear Hind.
+intros s6 (H1,H2).
+exists s6.
+split; auto.
+eapply many_steps_trans; eauto.
+(* case 2: one_step_seq_skip *)
+exists s4.
+split; [constructor | auto].
 Qed.
 (* DO NOT EDIT BELOW *)
 

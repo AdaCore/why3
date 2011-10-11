@@ -141,29 +141,35 @@ Definition subst(f:fmla) (x:ident) (t:expr): fmla :=
 Axiom eval_subst : forall (s:(map ident Z)) (f:fmla) (x:ident) (t:expr),
   (eval_fmla s (subst f x t)) -> (eval_fmla (set s x (eval_expr s t)) f).
 
-Definition valid_triple(p:fmla) (i:stmt) (q:fmla): Prop := forall (s:(map
-  ident Z)), (eval_fmla s p) -> forall (sqt:(map ident Z)), (many_steps s i
-  sqt Sskip) -> (eval_fmla sqt q).
+Inductive triple  :=
+  | T : fmla -> stmt -> fmla -> triple .
+
+Definition valid_triple(t:triple): Prop :=
+  match t with
+  | (T p i q) => forall (s:(map ident Z)), (eval_fmla s p) ->
+      forall (sqt:(map ident Z)), (many_steps s i sqt Sskip) ->
+      (eval_fmla sqt q)
+  end.
+
+Axiom assign_rule : forall (q:fmla) (x:ident) (e:expr),
+  (valid_triple (T (subst q x e) (Sassign x e) q)).
 
 (* YOU MAY EDIT THE CONTEXT BELOW *)
 
 (* DO NOT EDIT BELOW *)
 
-Theorem assign_rule : forall (q:fmla) (x:ident) (e:expr),
-  (valid_triple (subst q x e) (Sassign x e) q).
+Theorem seq_rule : forall (p:fmla) (q:fmla) (r:fmla) (i1:stmt) (i2:stmt),
+  ((valid_triple (T p i1 r)) /\ (valid_triple (T r i2 q))) ->
+  (valid_triple (T p (Sseq i1 i2) q)).
 (* YOU MAY EDIT THE PROOF BELOW *)
-intros q x e.
-unfold valid_triple.
-intros s Pre s' Hred.
-inversion Hred; subst.
-inversion H; subst.
-inversion H0; subst.
-(* normal case *)
-clear H Hred H0.
-apply eval_subst; auto.
-
-(* absurd case *)
-inversion H1.
+intros p q r i1 i2 (H1,H2).
+unfold valid_triple in *.
+intros s Hp s' Hsteps.
+generalize (many_steps_seq _ _ _ _ Hsteps).
+intro H; elim H;clear H.
+intros s0 (H3,H4).
+apply H2 with (s:=s0); auto.
+apply H1 with (s:=s); auto.
 Qed.
 (* DO NOT EDIT BELOW *)
 

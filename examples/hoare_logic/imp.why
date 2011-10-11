@@ -1,9 +1,17 @@
 
 theory Imp
 
+(* identifiers *)
+
 type ident
 
+lemma ident_eq_dec : forall i1 i2:ident. i1=i2 \/ i1 <> i2
+
 function mk_ident int : ident
+
+axiom mk_ident_inj: forall i j:int. mk_ident i = mk_ident j -> i=j
+
+(* expressions *)
 
 type operator = Oplus | Ominus | Omult
 
@@ -11,6 +19,8 @@ type expr =
   | Econst int
   | Evar ident
   | Ebin expr operator expr
+
+(* statements *)
 
 type stmt =
   | Sskip
@@ -22,10 +32,14 @@ type stmt =
 lemma check_skip:
   forall s:stmt. s=Sskip \/s<>Sskip
 
+(* program states *)
+
 use map.Map as IdMap
 use import int.Int
 
 type state = IdMap.map ident int
+
+(* semantics of expressions *)
 
 function eval_bin (x:int) (op:operator) (y:int) : int =
   match op with
@@ -57,7 +71,7 @@ function eval_expr (s:state) (e:expr) : int =
     eval_expr s (Ebin (Evar x) Oplus (Econst 13)) = 55
 
 
-(* small-steps semantics *)
+(* small-steps semantics for statements *)
 
 inductive one_step state stmt state stmt =
 
@@ -121,18 +135,26 @@ inductive one_step state stmt state stmt =
 
 
  (* many steps of execution *)
+
  inductive many_steps state stmt state stmt =
    | many_steps_refl:
-     forall s1 s2:state, i1 i2:stmt. s1=s2 /\ i1=i2 -> many_steps s1 i1 s2 i2
+     forall s:state, i:stmt. many_steps s i s i
    | many_steps_trans:
      forall s1 s2 s3:state, i1 i2 i3:stmt.
        one_step s1 i1 s2 i2 ->
        many_steps s2 i2 s3 i3 ->
        many_steps s1 i1 s3 i3
 
+lemma many_steps_seq_rec:
+  forall s1 s3:state, i i3:stmt.
+    many_steps s1 i s3 i3 -> i3 = Sskip ->
+    forall i1 i2:stmt. i = Sseq i1 i2 ->
+    exists s2:state.
+      many_steps s1 i1 s2 Sskip /\ many_steps s2 i2 s3 Sskip
+
 lemma many_steps_seq:
-  forall s1 s3:state, i i1 i2 i3:stmt.
-    many_steps s1 i s3 i3 -> i = Sseq i1 i2 -> i3 = Sskip ->
+  forall s1 s3:state, i1 i2:stmt [many_steps s1 (Sseq i1 i2) s3 Sskip].
+    many_steps s1 (Sseq i1 i2) s3 Sskip ->
     exists s2:state.
       many_steps s1 i1 s2 Sskip /\ many_steps s2 i2 s3 Sskip
 
@@ -172,27 +194,21 @@ lemma eval_subst:
 
 (* Hoare triples *)
 
-type triple = T fmla stmt fmla
-
-predicate valid_triple (t:triple) =
-  match t with
-  | T p i q ->
+predicate valid_triple (p:fmla) (i:stmt) (q:fmla) =
     forall s:state. eval_fmla s p ->
       forall s':state. many_steps s i s' Sskip ->
         eval_fmla s' q
-  end
-
 
 (* Hoare logic rules *)
 
 lemma assign_rule:
   forall q:fmla, x:ident, e:expr.
-  valid_triple (T (subst q x e) (Sassign x e) q)
+  valid_triple (subst q x e) (Sassign x e) q
 
 lemma seq_rule:
   forall p q r:fmla, i1 i2:stmt.
-  valid_triple (T p i1 r) /\ valid_triple (T r i2 q) ->
-  valid_triple (T p (Sseq i1 i2) q)
+  valid_triple p i1 r /\ valid_triple r i2 q ->
+  valid_triple p (Sseq i1 i2) q
 
 end
 
