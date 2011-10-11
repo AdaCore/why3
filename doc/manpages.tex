@@ -490,62 +490,49 @@ not and you have to use the IDE to update it.
 \item option \texttt{-s}: suppresses the output of the final tree view
 \item option \texttt{-I \textsl{<path>}}: add \textsl{<path>} to the loadpath
 \item option \texttt{-force}: force writing a new session file even if some proofs did not replay correctly.
-\item option \texttt{-latex  \textsl{<file.tex>}}: produce a summary of the replay
-  under the form of a tabular environment in LaTeX, one tabular for each theory, in the file  \texttt{\textsl{<file.tex>}}.
-\item option \texttt{-html \textsl{<file.html>}}: produce a summary of the replay in
-  HTML syntax.
+\item option \texttt{-latex \textsl{<dir>}}: produce a summary of
+  the replay under the form of a tabular environment in LaTeX, one
+  tabular for each theory, one per file, in directory \texttt{\textsl{<dir>}}.
+\item option \texttt{-latex2 \textsl{<dir>}}: alternate version of
+  LaTeX output, with a different layout of the tables.
+% \item option \texttt{-html \textsl{<file.html>}}: produce a summary of
+%   the replay in HTML syntax.
 \end{itemize}
 
-About \texttt{latex} output, we propose another option
-\texttt{-latex2} with the same parameters. The difference between
-these two options is the layout of the tabular.
+\paragraph{Customizing LaTeX output}
 
-Generated \latex files contain a set of macros. Definitions of these macros is left to the care of user depending on what he wants, or not, highlight.
-In the following, we will give some suggestions for these macros:
-
+The generated LaTeX files contain some macros that must be defined
+externally.  Various definitions can be given to them to customize the
+output. 
 \begin{itemize}
-\item For columns names which correspond to the prover names:
-\begin{verbatim}
-\usepackage{rotating}
-\newcommand{\provername}[1]{\cellcolor{yellow!25}\begin{sideways}\textbf{#1}~~\end{sideways}}|
-\end{verbatim}
+\item \verb|\provername|: macro with one parameter, a prover name
+\item \verb|\valid|: macro with one parameter, used where the corresponding prover answers that the goal is valid. The parameter is the time in seconds.
+\item \verb|\noresult|: macro without parameter, used where no result
+  exists for the corresponding prover
+\item \verb|\timeout|: macro without parameter, used where the corresponding prover reached the time limit
+\item \verb|\explanation|: macro with one parameter, the goal name or its explnation
+\end{itemize}
 
-\item For regrouping the empty cells. That is where no result is informed for the corresponding prover:
-\begin{verbatim}
-\usepackage{colortbl}
-\newcommand{\noresult}{\multicolumn{1}{>{\columncolor[gray]{0.8}}c|}{~}}
-\end{verbatim}
+\begin{figure}[t]
+  \begin{center}
+    \input{HelloProof.tex}
+  \end{center}
+  \verbatiminput{./replayer_macros.tex}
+  \caption{Sample macros for the LaTeX option of why3replayer}
+\label{fig:replayer}
+\end{figure}
 
-\item When the prover reachs the timeout:
-\begin{verbatim}
-\usepackage{wasysym}
-\newcommand{\timeout}{\cellcolor{red!20}\clock}
-\end{verbatim}
+Figure~\ref{fig:replayer} proposes some suggestions for these macros, together
+with the table obtained from the hello proof example of Section~\ref{chap:starting}.
 
-\item For explanations associating to the proof obligations:
-\begin{verbatim}
-\newcommand{\explanation}[1]{\cellcolor{yellow!13}\textsl{#1}}
-\end{verbatim}
+
+
 
 \section{The \texttt{why3.conf} configuration file}
 \label{sec:whyconffile}
-One can use a custom configuration file. \texttt{why3config}
-and other \texttt{why3} tools use priorities for which
-user's configuration file to consider:
-\begin{itemize}
-\item the file specified by the \texttt{-C} or \texttt{-{}-config} options,
-\item the file specified by the environment variable
-  \texttt{WHY3CONFIG} if set.
-\item the file \texttt{\$HOME/.why3.conf}
-  (\texttt{\$USERPROFILE/.why3.conf} under Windows) or, in the case of
-  local installation, \texttt{why3.conf} in Why3 sources top directory.
-\end{itemize}
-If none of these files exists, a built-in default configuration is used.
 
-The configuration file is a human-readable text file, which consists
-of association pairs arranged in sections. Here follows an example of
-configuration file.
 
+\begin{figure}[t]
 \begin{verbatim}
 [main ]
 loadpath = "/usr/local/share/why3/theories"
@@ -576,6 +563,28 @@ editor = ""
 name = "Alt-Ergo"
 version = "0.91"
 \end{verbatim}
+  \caption{Sample why3.conf file}
+\label{fig:why3conf}
+\end{figure}
+
+
+
+One can use a custom configuration file. \texttt{why3config}
+and other \texttt{why3} tools use priorities for which
+user's configuration file to consider:
+\begin{itemize}
+\item the file specified by the \texttt{-C} or \texttt{-{}-config} options,
+\item the file specified by the environment variable
+  \texttt{WHY3CONFIG} if set.
+\item the file \texttt{\$HOME/.why3.conf}
+  (\texttt{\$USERPROFILE/.why3.conf} under Windows) or, in the case of
+  local installation, \texttt{why3.conf} in Why3 sources top directory.
+\end{itemize}
+If none of these files exists, a built-in default configuration is used.
+
+The configuration file is a human-readable text file, which consists
+of association pairs arranged in sections. Figure~\ref{fig:why3conf}
+shows an example of configuration file.
 
 A section begins with a header inside square brackets and ends at the
 beginning of the next section. The header of a
