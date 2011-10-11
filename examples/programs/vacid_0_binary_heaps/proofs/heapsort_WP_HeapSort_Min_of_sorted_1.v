@@ -318,5 +318,3 @@ assert (h: (i = j-1 \/ i < j-1)%Z) by omega.
    unfold sorted_sub; auto with zarith.
 Qed.
 (* DO NOT EDIT BELOW *)
-
-

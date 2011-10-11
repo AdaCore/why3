@@ -134,5 +134,3 @@ assert (h: x=0 \/ 0 < x) by omega.
     auto with zarith.
 Qed.
 (* DO NOT EDIT BELOW *)
-
-
