@@ -326,21 +326,35 @@
    </goal>
    <goal
     name="eval_subst"
-    sum="75fe9028dd520dcb211e6cde21feb1a6"
+    sum="41c9426526820307330065d8ac78c17c"
     proved="true"
     expanded="false"
-    shape="aeval_fmlaasetV0V2aeval_exprV0V3V1Iaeval_fmlaV0asubstV1V2V3F">
+    shape="aeval_fmlaasetV0V2aeval_exprV0V3V1qaeval_fmlaV0asubstV1V2V3F">
     <proof
      prover="coq"
      timelimit="5"
      edited="imp_Imp_eval_subst_2.v"
      obsolete="false">
-     <result status="valid" time="0.66"/>
+     <result status="valid" time="0.53"/>
+    </proof>
+   </goal>
+   <goal
+    name="skip_rule"
+    sum="dfcd50b4105bd2ae7cd329453fdbc909"
+    proved="true"
+    expanded="false"
+    shape="avalid_tripleV0aSskipV0F">
+    <proof
+     prover="coq"
+     timelimit="3"
+     edited="imp_Imp_skip_rule_1.v"
+     obsolete="false">
+     <result status="valid" time="0.67"/>
     </proof>
    </goal>
    <goal
     name="assign_rule"
-    sum="12f9657b1c525075d56bcf69c77110b1"
+    sum="d492b0a1117c6083520f1a99f602c05b"
     proved="true"
     expanded="false"
     shape="avalid_tripleasubstV0V1V2aSassignV1V2V0F">
@@ -349,12 +363,12 @@
      timelimit="5"
      edited="imp_Imp_assign_rule_1.v"
      obsolete="false">
-     <result status="valid" time="0.74"/>
+     <result status="valid" time="0.55"/>
     </proof>
    </goal>
    <goal
     name="seq_rule"
-    sum="298c63994d40d9ae8da8b97a6309eed1"
+    sum="a5e519277ce236964d153818a92437e6"
     proved="true"
     expanded="false"
     shape="avalid_tripleV0aSseqV3V4V1Iavalid_tripleV2V4V1Aavalid_tripleV0V3V2F">
@@ -363,7 +377,7 @@
      timelimit="3"
      edited="imp_Imp_seq_rule_2.v"
      obsolete="false">
-     <result status="valid" time="0.54"/>
+     <result status="valid" time="0.51"/>
     </proof>
     <proof
      prover="z3"
@@ -371,6 +385,20 @@
      edited=""
      obsolete="false">
      <result status="valid" time="0.07"/>
+    </proof>
+   </goal>
+   <goal
+    name="if_rule"
+    sum="72ad5869a02dbc44921cf038f2f2959e"
+    proved="true"
+    expanded="false"
+    shape="avalid_tripleV1aSifV0V3V4V2Iavalid_tripleaFandV1aFnotaFtermV0V4V2Aavalid_tripleaFandV1aFtermV0V3V2F">
+    <proof
+     prover="coq"
+     timelimit="3"
+     edited="imp_Imp_if_rule_1.v"
+     obsolete="false">
+     <result status="valid" time="0.51"/>
     </proof>
    </goal>
   </theory>

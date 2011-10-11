@@ -4,8 +4,13 @@ Require Import ZArith.
 Require Import Rbase.
 Parameter ident : Type.
 
+Axiom ident_eq_dec : forall (i1:ident) (i2:ident), (i1 = i2) \/ ~ (i1 = i2).
+
 Parameter mk_ident: Z -> ident.
 
+
+Axiom mk_ident_inj : forall (i:Z) (j:Z), ((mk_ident i) = (mk_ident j)) ->
+  (i = j).
 
 Inductive operator  :=
   | Oplus : operator 
@@ -100,17 +105,28 @@ Inductive many_steps : (map ident Z) -> stmt -> (map ident Z)
       ident Z)) (i1:stmt) (i2:stmt) (i3:stmt), (one_step s1 i1 s2 i2) ->
       ((many_steps s2 i2 s3 i3) -> (many_steps s1 i1 s3 i3)).
 
+Axiom many_steps_seq_rec : forall (s1:(map ident Z)) (s3:(map ident Z))
+  (i:stmt) (i3:stmt), (many_steps s1 i s3 i3) -> ((i3 = Sskip) ->
+  forall (i1:stmt) (i2:stmt), (i = (Sseq i1 i2)) -> exists s2:(map ident Z),
+  (many_steps s1 i1 s2 Sskip) /\ (many_steps s2 i2 s3 Sskip)).
+
 Axiom many_steps_seq : forall (s1:(map ident Z)) (s3:(map ident Z)) (i1:stmt)
   (i2:stmt), (many_steps s1 (Sseq i1 i2) s3 Sskip) -> exists s2:(map ident
   Z), (many_steps s1 i1 s2 Sskip) /\ (many_steps s2 i2 s3 Sskip).
 
 Inductive fmla  :=
-  | Fterm : expr -> fmla .
+  | Fterm : expr -> fmla 
+  | Fand : fmla -> fmla -> fmla 
+  | Fnot : fmla -> fmla .
 
-Definition eval_fmla(s:(map ident Z)) (f:fmla): Prop :=
+Set Implicit Arguments.
+Fixpoint eval_fmla(s:(map ident Z)) (f:fmla) {struct f}: Prop :=
   match f with
   | (Fterm e) => ~ ((eval_expr s e) = 0%Z)
+  | (Fand f1 f2) => (eval_fmla s f1) /\ (eval_fmla s f2)
+  | (Fnot f1) => ~ (eval_fmla s f1)
   end.
+Unset Implicit Arguments.
 
 Parameter subst_expr: expr -> ident -> expr -> expr.
 
@@ -128,21 +144,37 @@ Axiom eval_subst_expr : forall (s:(map ident Z)) (e:expr) (x:ident) (t:expr),
   ((eval_expr s (subst_expr e x t)) = (eval_expr (set s x (eval_expr s t))
   e)).
 
-Definition subst(f:fmla) (x:ident) (t:expr): fmla :=
+Set Implicit Arguments.
+Fixpoint subst(f:fmla) (x:ident) (t:expr) {struct f}: fmla :=
   match f with
   | (Fterm e) => (Fterm (subst_expr e x t))
+  | (Fand f1 f2) => (Fand (subst f1 x t) (subst f2 x t))
+  | (Fnot f1) => (Fnot (subst f1 x t))
   end.
+Unset Implicit Arguments.
 
 (* YOU MAY EDIT THE CONTEXT BELOW *)
 
 (* DO NOT EDIT BELOW *)
 
 Theorem eval_subst : forall (s:(map ident Z)) (f:fmla) (x:ident) (t:expr),
-  (eval_fmla s (subst f x t)) -> (eval_fmla (set s x (eval_expr s t)) f).
+  (eval_fmla s (subst f x t)) <-> (eval_fmla (set s x (eval_expr s t)) f).
 (* YOU MAY EDIT THE PROOF BELOW *)
-induction f; unfold eval_fmla, subst in *.
-intros x t H.
-rewrite <- eval_subst_expr; auto.
+induction f.
+unfold eval_fmla, subst in *.
+intros x t.
+rewrite <- eval_subst_expr; tauto.
+
+simpl.
+intros x t.
+rewrite IHf1.
+rewrite IHf2.
+tauto.
+
+simpl.
+intros x t.
+rewrite IHf.
+tauto.
 Qed.
 (* DO NOT EDIT BELOW *)
 

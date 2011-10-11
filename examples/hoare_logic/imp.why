@@ -163,10 +163,14 @@ lemma many_steps_seq:
 
 type fmla =
   | Fterm expr
+  | Fand fmla fmla
+  | Fnot fmla
 
 predicate eval_fmla (s:state) (f:fmla) =
   match f with
   | Fterm e -> eval_expr s e <> 0
+  | Fand f1 f2 ->  eval_fmla s f1 /\ eval_fmla s f2
+  | Fnot f ->  not (eval_fmla s f)
   end
 
 (* substitution *) 
@@ -186,11 +190,13 @@ lemma eval_subst_expr:
 function subst (f:fmla) (x:ident) (t:expr) : fmla =
   match f with
   | Fterm e -> Fterm (subst_expr e x t)
+  | Fand f1 f2 -> Fand (subst f1 x t) (subst f2 x t)
+  | Fnot f -> Fnot (subst f x t)
   end
 
 lemma eval_subst:
   forall s:state, f:fmla, x:ident, t:expr.
-    eval_fmla s (subst f x t) -> eval_fmla (IdMap.set s x (eval_expr s t)) f
+    eval_fmla s (subst f x t) <-> eval_fmla (IdMap.set s x (eval_expr s t)) f
 
 (* Hoare triples *)
 
@@ -201,6 +207,9 @@ predicate valid_triple (p:fmla) (i:stmt) (q:fmla) =
 
 (* Hoare logic rules *)
 
+lemma skip_rule:
+  forall q:fmla. valid_triple q Sskip q
+
 lemma assign_rule:
   forall q:fmla, x:ident, e:expr.
   valid_triple (subst q x e) (Sassign x e) q
@@ -209,6 +218,12 @@ lemma seq_rule:
   forall p q r:fmla, i1 i2:stmt.
   valid_triple p i1 r /\ valid_triple r i2 q ->
   valid_triple p (Sseq i1 i2) q
+
+lemma if_rule:
+  forall e:expr, p q:fmla, i1 i2:stmt.
+  valid_triple (Fand p (Fterm e)) i1 q /\
+  valid_triple (Fand p (Fnot (Fterm e))) i2 q ->
+  valid_triple p (Sif e i1 i2) q
 
 end
 
