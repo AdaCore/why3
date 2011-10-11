@@ -501,6 +501,31 @@ About \texttt{latex} output, we propose another option
 these two options is the layout of the tabular.
 
 Generated \latex files contain a set of macros. Definitions of these macros is left to the care of user depending on what he wants, or not, highlight.
+In the following, we will give some suggestions for these macros:
+
+\begin{itemize}
+\item For columns names which correspond to the prover names:
+\begin{verbatim}
+\usepackage{rotating}
+\newcommand{\provername}[1]{\cellcolor{yellow!25}\begin{sideways}\textbf{#1}~~\end{sideways}}|
+\end{verbatim}
+
+\item For regrouping the empty cells. That is where no result is informed for the corresponding prover:
+\begin{verbatim}
+\usepackage{colortbl}
+\newcommand{\noresult}{\multicolumn{1}{>{\columncolor[gray]{0.8}}c|}{~}}
+\end{verbatim}
+
+\item When the prover reachs the timeout:
+\begin{verbatim}
+\usepackage{wasysym}
+\newcommand{\timeout}{\cellcolor{red!20}\clock}
+\end{verbatim}
+
+\item For explanations associating to the proof obligations:
+\begin{verbatim}
+\newcommand{\explanation}[1]{\cellcolor{yellow!13}\textsl{#1}}
+\end{verbatim}
 
 \section{The \texttt{why3.conf} configuration file}
 \label{sec:whyconffile}
