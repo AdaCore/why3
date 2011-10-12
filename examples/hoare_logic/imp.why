@@ -153,7 +153,7 @@ lemma many_steps_seq_rec:
       many_steps s1 i1 s2 Sskip /\ many_steps s2 i2 s3 Sskip
 
 lemma many_steps_seq:
-  forall s1 s3:state, i1 i2:stmt [many_steps s1 (Sseq i1 i2) s3 Sskip].
+  forall s1 s3:state, i1 i2:stmt.
     many_steps s1 (Sseq i1 i2) s3 Sskip ->
     exists s2:state.
       many_steps s1 i1 s2 Sskip /\ many_steps s2 i2 s3 Sskip
