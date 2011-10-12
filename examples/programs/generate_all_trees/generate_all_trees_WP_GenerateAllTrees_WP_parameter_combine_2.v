@@ -152,19 +152,42 @@ Axiom size_left : forall (t:tree), (0%Z <  (size t))%Z -> exists l:tree,
 Definition all_trees(n:Z) (l:(list tree)): Prop := (distinct l) /\
   forall (t:tree), ((size t) = n) <-> (mem t l).
 
+Axiom all_trees_0 : (all_trees 0%Z (Cons Empty (Nil:(list tree)))).
+
+Axiom tree_diff : forall (l1:tree) (l2:tree), (~ ((size l1) = (size l2))) ->
+  forall (r1:tree) (r2:tree), ~ ((Node l1 r1) = (Node l2 r2)).
+
 (* YOU MAY EDIT THE CONTEXT BELOW *)
 
 (* DO NOT EDIT BELOW *)
 
-Theorem all_trees_0 : (all_trees 0%Z (Cons Empty (Nil:(list tree)))).
+Theorem WP_parameter_combine : forall (i1:Z), forall (l1:(list tree)),
+  forall (i2:Z), forall (l2:(list tree)), ((0%Z <= i1)%Z /\ ((all_trees i1
+  l1) /\ ((0%Z <= i2)%Z /\ (all_trees i2 l2)))) -> forall (l11:(list tree)),
+  (distinct l11) ->
+  match l11 with
+  | Nil => True
+  | (Cons t1 l12) => forall (l21:(list tree)), (distinct l21) ->
+      match l21 with
+      | Nil => True
+      | (Cons t2 l22) => (distinct l22) -> forall (result:(list tree)),
+          ((distinct result) /\ forall (t:tree), (mem t result) <->
+          exists r:tree, (t = (Node t1 r)) /\ (mem r l22)) ->
+          forall (t:tree), (mem t (Cons (Node t1 t2) result)) ->
+          exists r:tree, (t = (Node t1 r)) /\ (mem r l21)
+      end
+  end.
 (* YOU MAY EDIT THE PROOF BELOW *)
+intuition.
+destruct l11; intuition.
+destruct l21; intuition.
+unfold mem in H6; fold mem in H6.
+destruct H6.
+exists t0; intuition.
 red; intuition.
-apply distinct_one.
-destruct t; simpl; auto.
-unfold size in H; fold size in H.
-right; generalize (size_nonneg t1); generalize (size_nonneg t2); omega.
-simpl in H; destruct H; intuition.
-subst; simpl; auto.
+generalize (H8 t1); clear H8. intuition.
+destruct H8 as (r,h); exists r; intuition.
+red; intuition.
 Qed.
 (* DO NOT EDIT BELOW *)
 
