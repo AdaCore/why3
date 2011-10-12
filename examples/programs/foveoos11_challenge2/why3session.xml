@@ -9,19 +9,11 @@
  <prover
   id="coq"
   name="Coq"
-  version="8.2pl1"/>
+  version="8.3pl2"/>
  <prover
   id="cvc3"
   name="CVC3"
   version="2.2"/>
- <prover
-  id="eprover"
-  name="Eprover"
-  version="0.7 Dhajea"/>
- <prover
-  id="gappa"
-  name="Gappa"
-  version="0.14.0"/>
  <prover
   id="simplify"
   name="Simplify"
@@ -29,11 +21,11 @@
  <prover
   id="yices"
   name="Yices"
-  version="1.0.13"/>
+  version="1.0.27"/>
  <prover
   id="z3"
   name="Z3"
-  version="2.13"/>
+  version="2.19"/>
  <file
   name="../foveoos11_challenge2.mlw"
   verified="true"
@@ -43,18 +35,32 @@
    verified="true"
    expanded="true">
    <goal
-    name="WP_parameter maximum"
-    expl="parameter maximum"
-    sum="f40fb156943f0b6bc126f4aa41b513f4"
+    name="size_nonneg"
+    sum="d9dbfdf8e431c42e593667388fe56267"
     proved="true"
     expanded="true"
-    shape="CV0aEmptyfaNodeaEmptyVaEmptyainfix <=V2V1IamemV2V0FAamemV1V0aNodeVVaEmptyOaNodeaEmptyVVainfix <=V6amaxV5V3IamemV6V0FAamemamaxV5V3V0Iainfix <=V7V5IamemV7V4FAamemV5V4FAainfix =V4aEmptyNaNodeVVVainfix <=V13amaxV11amaxV9V12IamemV13V0FAamemamaxV11amaxV9V12V0Iainfix <=V14V12IamemV14V10FAamemV12V10FAainfix =V10aEmptyNIainfix <=V15V11IamemV15V8FAamemV11V8FAainfix =V8aEmptyNIainfix =V0aEmptyNF">
+    shape="ainfix >=asizeV0c0F">
+    <proof
+     prover="coq"
+     timelimit="10"
+     edited="foveoos11_challenge2_WP_MaximumTree_size_nonneg_1.v"
+     obsolete="false">
+     <result status="valid" time="0.46"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter maximum"
+    expl="parameter maximum"
+    sum="633cd631bb850639d4b5effe2b5fcdf2"
+    proved="true"
+    expanded="true"
+    shape="CV0aEmptyfaNodeaEmptyVaEmptyainfix <=V2V1IamemV2V0FAamemV1V0aNodeVVaEmptyOaNodeaEmptyVVainfix <=V6amaxV5V3IamemV6V0FAamemamaxV5V3V0Iainfix <=V7V5IamemV7V4FAamemV5V4FAainfix =V4aEmptyNAainfix <asizeV4asizeV0Aainfix <=c0asizeV0aNodeVVVainfix <=V13amaxV11amaxV9V12IamemV13V0FAamemamaxV11amaxV9V12V0Iainfix <=V14V12IamemV14V10FAamemV12V10FAainfix =V10aEmptyNAainfix <asizeV10asizeV0Aainfix <=c0asizeV0Iainfix <=V15V11IamemV15V8FAamemV11V8FAainfix =V8aEmptyNAainfix <asizeV8asizeV0Aainfix <=c0asizeV0Iainfix =V0aEmptyNF">
     <proof
      prover="alt-ergo"
      timelimit="10"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.40"/>
+     <result status="valid" time="0.62"/>
     </proof>
    </goal>
   </theory>

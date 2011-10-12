@@ -12,12 +12,19 @@ module MaximumTree
 
   type tree = Empty | Node tree int tree
 
+  function size (t: tree) : int = match t with
+    | Empty      -> 0
+    | Node l _ r -> 1 + size l + size r
+  end
+
+  lemma size_nonneg: forall t: tree. size t >= 0
+
   predicate mem (x: int) (t: tree) = match t with
     | Empty      -> false
     | Node l v r -> mem x l \/ x = v \/ mem x r
   end
 
-  let rec maximum (t: tree) : int =
+  let rec maximum (t: tree) : int variant { size t } =
     { t <> Empty }
     match t with
       | Empty              -> absurd
