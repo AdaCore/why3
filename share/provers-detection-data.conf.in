@@ -169,23 +169,6 @@ version_old = "1.3"
 command = "@LOCALBIN@why3-cpulimit %t %m -s %e -smt %f"
 driver = "drivers/z3_smtv1.drv"
 
-[ITP coq-realize]
-name = "Coq Realize"
-exec = "coqc"
-version_switch = "-v"
-version_regexp = "The Coq Proof Assistant, version \\([^ \n]+\\)"
-version_ok = "8.3pl2"
-version_ok = "8.3pl1"
-version_ok = "8.3"
-version_ok = "8.2pl2"
-version_ok = "8.2pl1"
-version_ok = "8.2"
-version_old = "8.1"
-version_old = "8.0"
-command = "@LOCALBIN@why3-cpulimit 0 %m -s %e %f"
-driver = "drivers/coq-realize.drv"
-editor = "coqide"
-
 [ITP coq]
 name = "Coq"
 exec = "coqc"
