@@ -16,6 +16,7 @@ module GenerateAllTrees
   use import list.Append
   use import list.Distinct
   use import module array.Array
+  use import list.Length
 
   type tree = Empty | Node tree tree
 
@@ -44,12 +45,12 @@ module GenerateAllTrees
      with a left sub-tree from l1 and a right sub-tree from l2 *)
   let combine (i1: int) (l1: list tree) (i2: int) (l2: list tree) =
     { 0 <= i1 /\ all_trees i1 l1 /\ 0 <= i2 /\ all_trees i2 l2 }
-    let rec loop1 (l1: list tree) : list tree =
+    let rec loop1 (l1: list tree) : list tree variant { length l1 } =
       { distinct l1 }
       match l1 with
       | Nil -> Nil
       | Cons t1 l1 ->
-          let rec loop2 (l2: list tree) : list tree =
+          let rec loop2 (l2: list tree) : list tree  variant { length l2 } =
             { distinct l2 }
             match l2 with
             | Nil -> Nil

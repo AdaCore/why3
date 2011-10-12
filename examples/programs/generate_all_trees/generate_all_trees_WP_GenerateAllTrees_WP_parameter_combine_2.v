@@ -170,10 +170,11 @@ Theorem WP_parameter_combine : forall (i1:Z), forall (l1:(list tree)),
   | (Cons t1 l12) => forall (l21:(list tree)), (distinct l21) ->
       match l21 with
       | Nil => True
-      | (Cons t2 l22) => (distinct l22) -> forall (result:(list tree)),
-          ((distinct result) /\ forall (t:tree), (mem t result) <->
-          exists r:tree, (t = (Node t1 r)) /\ (mem r l22)) ->
-          forall (t:tree), (mem t (Cons (Node t1 t2) result)) ->
+      | (Cons t2 l22) => (((0%Z <= (length l21))%Z /\
+          ((length l22) <  (length l21))%Z) /\ (distinct l22)) ->
+          forall (result:(list tree)), ((distinct result) /\ forall (t:tree),
+          (mem t result) <-> exists r:tree, (t = (Node t1 r)) /\ (mem r
+          l22)) -> forall (t:tree), (mem t (Cons (Node t1 t2) result)) ->
           exists r:tree, (t = (Node t1 r)) /\ (mem r l21)
       end
   end.
@@ -185,7 +186,7 @@ unfold mem in H6; fold mem in H6.
 destruct H6.
 exists t0; intuition.
 red; intuition.
-generalize (H8 t1); clear H8. intuition.
+generalize (H10 t1); clear H8. intuition.
 destruct H8 as (r,h); exists r; intuition.
 red; intuition.
 Qed.
