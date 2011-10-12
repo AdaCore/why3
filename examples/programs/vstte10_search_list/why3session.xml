@@ -57,7 +57,7 @@
    <goal
     name="WP_parameter search"
     expl="parameter search"
-    sum="a842aa54c0e81e9bb60f3e7c557cc468"
+    sum="84b6841b327ba2de148110d79bd0d203"
     proved="true"
     expanded="false"
     shape="CV1aNilano_zeroV1Aainfix =V0ainfix +V0alengthV1Oazero_atV1ainfix -V0V0Aainfix <V0ainfix +V0alengthV1Aainfix <=V0V0aConsVViainfix =V2c0ano_zeroV1Aainfix =V0ainfix +V0alengthV1Oazero_atV1ainfix -V0V0Aainfix <V0ainfix +V0alengthV1Aainfix <=V0V0ano_zeroV1Aainfix =V4ainfix +V0alengthV1Oazero_atV1ainfix -V4V0Aainfix <V4ainfix +V0alengthV1Aainfix <=V0V4Iano_zeroV3Aainfix =V4ainfix +ainfix +V0c1alengthV3Oazero_atV3ainfix -V4ainfix +V0c1Aainfix <V4ainfix +ainfix +V0c1alengthV3Aainfix <=ainfix +V0c1V4FAainfix <alengthV3alengthV1Aainfix <=c0alengthV1FF">
@@ -66,7 +66,7 @@
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.37"/>
+     <result status="valid" time="0.36"/>
     </proof>
     <proof
      prover="alt-ergo"
@@ -79,7 +79,7 @@
    <goal
     name="WP_parameter search_list"
     expl="normal postcondition"
-    sum="6d470a7964b8bdd3926c179d451c44a7"
+    sum="d5506a1563519ab49b9503cdfebe7ef0"
     proved="true"
     expanded="false"
     shape="ano_zeroV0Aainfix =V1alengthV0Oazero_atV0V1Aainfix <V1alengthV0Aainfix <=c0V1Iano_zeroV0Aainfix =V1ainfix +c0alengthV0Oazero_atV0ainfix -V1c0Aainfix <V1ainfix +c0alengthV0Aainfix <=c0V1FF">
@@ -108,10 +108,39 @@
    <goal
     name="WP_parameter head"
     expl="parameter head"
-    sum="ddd986b5c9b2f96cb26607ebf5ae0454"
+    sum="cf3d916196bfd5fff268fd7595f5e71c"
     proved="true"
     expanded="false"
     shape="CV0aNilfaConsVwainfix =CV0aNilaNoneaConsVwaSomeV2aSomeV1Iainfix =V0aNilNF">
+    <proof
+     prover="cvc3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="alt-ergo"
+     timelimit="20"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="z3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter tail"
+    expl="parameter tail"
+    sum="eda6aa8c7acf0aae0cede5170638826d"
+    proved="true"
+    expanded="false"
+    shape="CV0aNilfaConswVainfix =CV0aNilaNoneaConswVaSomeV2aSomeV1Iainfix =V0aNilNF">
     <proof
      prover="cvc3"
      timelimit="5"
@@ -135,38 +164,9 @@
     </proof>
    </goal>
    <goal
-    name="WP_parameter tail"
-    expl="parameter tail"
-    sum="034b032350a7bf968f2596bebbc473a0"
-    proved="true"
-    expanded="false"
-    shape="CV0aNilfaConswVainfix =CV0aNilaNoneaConswVaSomeV2aSomeV1Iainfix =V0aNilNF">
-    <proof
-     prover="cvc3"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="alt-ergo"
-     timelimit="20"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="z3"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-   </goal>
-   <goal
     name="WP_parameter search_loop"
     expl="parameter search_loop"
-    sum="8e84facf99b76c8718c974e6c502020f"
+    sum="2f81ff326114437a1285e2c2a1eb5931"
     proved="true"
     expanded="true"
     shape="iainfix =V1aNilNiainfix =V3c0Nainfix <alengthV6alengthV1Aainfix <=c0alengthV1Aainfix =anthV7V0aSomec0NIainfix <V7V4Aainfix <=c0V7FAainfix =anthV8V6anthainfix +V4V8V0Iainfix <=c0V8FAainfix =ainfix +V4alengthV6alengthV0Aainfix <=c0V4Iainfix =V6V5FIainfix =CV1aNilaNoneaConswVaSomeV9aSomeV5FAainfix =V1aNilNIainfix =V4ainfix +V2c1Fano_zeroV0Aainfix =V2alengthV0Oazero_atV0V2Aainfix <V2alengthV0Aainfix <=c0V2Iainfix =CV1aNilaNoneaConsVwaSomeV10aSomeV3FAainfix =V1aNilNano_zeroV0Aainfix =V2alengthV0Oazero_atV0V2Aainfix <V2alengthV0Aainfix <=c0V2Iainfix =anthV11V0aSomec0NIainfix <V11V2Aainfix <=c0V11FAainfix =anthV12V1anthainfix +V2V12V0Iainfix <=c0V12FAainfix =ainfix +V2alengthV1alengthV0Aainfix <=c0V2FFAainfix =anthV13V0aSomec0NIainfix <V13c0Aainfix <=c0V13FAainfix =anthV14V0anthainfix +c0V14V0Iainfix <=c0V14FAainfix =ainfix +c0alengthV0alengthV0Aainfix <=c0c0F">
@@ -177,7 +177,7 @@
      <goal
       name="WP_parameter search_loop.1"
       expl="loop invariant init"
-      sum="8af32ddf5a40204923553335f34d7a9a"
+      sum="8843d5052e7541f46a02707a69d81290"
       proved="true"
       expanded="true"
       shape="ainfix =anthV1V0aSomec0NIainfix <V1c0Aainfix <=c0V1FAainfix =anthV2V0anthainfix +c0V2V0Iainfix <=c0V2FAainfix =ainfix +c0alengthV0alengthV0Aainfix <=c0c0F">
@@ -186,14 +186,14 @@
        timelimit="5"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.00"/>
       </proof>
       <proof
        prover="alt-ergo"
        timelimit="20"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.00"/>
+       <result status="valid" time="0.02"/>
       </proof>
       <proof
        prover="z3"
@@ -206,7 +206,7 @@
      <goal
       name="WP_parameter search_loop.2"
       expl="precondition"
-      sum="226b96ce9aa36d861168b3449caa3b64"
+      sum="cc2df0bccda9033d80d6d33b1c1158f6"
       proved="true"
       expanded="true"
       shape="ainfix =V1aNilNIainfix =V1aNilNIainfix =anthV3V0aSomec0NIainfix <V3V2Aainfix <=c0V3FAainfix =anthV4V1anthainfix +V2V4V0Iainfix <=c0V4FAainfix =ainfix +V2alengthV1alengthV0Aainfix <=c0V2FFF">
@@ -215,7 +215,7 @@
        timelimit="5"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.00"/>
       </proof>
       <proof
        prover="cvc3"
@@ -235,7 +235,7 @@
      <goal
       name="WP_parameter search_loop.3"
       expl="precondition"
-      sum="b2b3df1d94f8c825a9bb38b3ab2e2d23"
+      sum="69be14f540d1bcb8512b6d9b56361c65"
       proved="true"
       expanded="true"
       shape="ainfix =V1aNilNIainfix =V4ainfix +V2c1FIainfix =V3c0NIainfix =CV1aNilaNoneaConsVwaSomeV5aSomeV3FIainfix =V1aNilNIainfix =V1aNilNIainfix =anthV6V0aSomec0NIainfix <V6V2Aainfix <=c0V6FAainfix =anthV7V1anthainfix +V2V7V0Iainfix <=c0V7FAainfix =ainfix +V2alengthV1alengthV0Aainfix <=c0V2FFF">
@@ -264,7 +264,7 @@
      <goal
       name="WP_parameter search_loop.4"
       expl="loop invariant preservation"
-      sum="dbac4e2ad0d495b02134215883b2e1e7"
+      sum="f71cfd427be934e45f578cb8e3e45aa8"
       proved="true"
       expanded="true"
       shape="ainfix =anthV7V0aSomec0NIainfix <V7V4Aainfix <=c0V7FAainfix =anthV8V6anthainfix +V4V8V0Iainfix <=c0V8FAainfix =ainfix +V4alengthV6alengthV0Aainfix <=c0V4Iainfix =V6V5FIainfix =CV1aNilaNoneaConswVaSomeV9aSomeV5FIainfix =V1aNilNIainfix =V4ainfix +V2c1FIainfix =V3c0NIainfix =CV1aNilaNoneaConsVwaSomeV10aSomeV3FIainfix =V1aNilNIainfix =V1aNilNIainfix =anthV11V0aSomec0NIainfix <V11V2Aainfix <=c0V11FAainfix =anthV12V1anthainfix +V2V12V0Iainfix <=c0V12FAainfix =ainfix +V2alengthV1alengthV0Aainfix <=c0V2FFF">
@@ -275,7 +275,7 @@
        <goal
         name="WP_parameter search_loop.4.1"
         expl="parameter search_loop"
-        sum="78a2637e99dba7d19308f98498822ab6"
+        sum="015bf096bcd0e0befd01096faca46731"
         proved="true"
         expanded="true"
         shape="ainfix <=c0V4Iainfix =V6V5FIainfix =CV1aNilaNoneaConswVaSomeV7aSomeV5FIainfix =V1aNilNIainfix =V4ainfix +V2c1FIainfix =V3c0NIainfix =CV1aNilaNoneaConsVwaSomeV8aSomeV3FIainfix =V1aNilNIainfix =V1aNilNIainfix =anthV9V0aSomec0NIainfix <V9V2Aainfix <=c0V9FAainfix =anthV10V1anthainfix +V2V10V0Iainfix <=c0V10FAainfix =ainfix +V2alengthV1alengthV0Aainfix <=c0V2FFF">
@@ -284,14 +284,14 @@
          timelimit="5"
          edited=""
          obsolete="false">
-         <result status="valid" time="0.01"/>
+         <result status="valid" time="0.00"/>
         </proof>
         <proof
          prover="alt-ergo"
          timelimit="20"
          edited=""
          obsolete="false">
-         <result status="valid" time="0.00"/>
+         <result status="valid" time="0.02"/>
         </proof>
         <proof
          prover="z3"
@@ -304,7 +304,7 @@
        <goal
         name="WP_parameter search_loop.4.2"
         expl="parameter search_loop"
-        sum="430fa4f3516f59e7df75f50a0df5d86b"
+        sum="1f5a66c75367589bc13a1471880a4989"
         proved="true"
         expanded="true"
         shape="ainfix =ainfix +V4alengthV6alengthV0Iainfix =V6V5FIainfix =CV1aNilaNoneaConswVaSomeV7aSomeV5FIainfix =V1aNilNIainfix =V4ainfix +V2c1FIainfix =V3c0NIainfix =CV1aNilaNoneaConsVwaSomeV8aSomeV3FIainfix =V1aNilNIainfix =V1aNilNIainfix =anthV9V0aSomec0NIainfix <V9V2Aainfix <=c0V9FAainfix =anthV10V1anthainfix +V2V10V0Iainfix <=c0V10FAainfix =ainfix +V2alengthV1alengthV0Aainfix <=c0V2FFF">
@@ -320,7 +320,7 @@
          timelimit="20"
          edited=""
          obsolete="false">
-         <result status="valid" time="0.01"/>
+         <result status="valid" time="0.02"/>
         </proof>
         <proof
          prover="z3"
@@ -333,7 +333,7 @@
        <goal
         name="WP_parameter search_loop.4.3"
         expl="parameter search_loop"
-        sum="8c9e1fcb85501e95637b95510006bc46"
+        sum="d1c4403f27bca41feddf28b4a34241f1"
         proved="true"
         expanded="true"
         shape="ainfix =anthV7V6anthainfix +V4V7V0Iainfix <=c0V7FIainfix =V6V5FIainfix =CV1aNilaNoneaConswVaSomeV8aSomeV5FIainfix =V1aNilNIainfix =V4ainfix +V2c1FIainfix =V3c0NIainfix =CV1aNilaNoneaConsVwaSomeV9aSomeV3FIainfix =V1aNilNIainfix =V1aNilNIainfix =anthV10V0aSomec0NIainfix <V10V2Aainfix <=c0V10FAainfix =anthV11V1anthainfix +V2V11V0Iainfix <=c0V11FAainfix =ainfix +V2alengthV1alengthV0Aainfix <=c0V2FFF">
@@ -348,7 +348,7 @@
        <goal
         name="WP_parameter search_loop.4.4"
         expl="parameter search_loop"
-        sum="dbbb2e45c2df5ea1ab8eecec5b3b04b7"
+        sum="efe45b91aaa899eeb1ae39ccbe4173a0"
         proved="true"
         expanded="true"
         shape="ainfix =anthV7V0aSomec0NIainfix <V7V4Aainfix <=c0V7FIainfix =V6V5FIainfix =CV1aNilaNoneaConswVaSomeV8aSomeV5FIainfix =V1aNilNIainfix =V4ainfix +V2c1FIainfix =V3c0NIainfix =CV1aNilaNoneaConsVwaSomeV9aSomeV3FIainfix =V1aNilNIainfix =V1aNilNIainfix =anthV10V0aSomec0NIainfix <V10V2Aainfix <=c0V10FAainfix =anthV11V1anthainfix +V2V11V0Iainfix <=c0V11FAainfix =ainfix +V2alengthV1alengthV0Aainfix <=c0V2FFF">
@@ -357,7 +357,7 @@
          timelimit="5"
          edited="vstte10_search_list_WP_SearchingALinkedList_WP_parameter_search_loop_4.v"
          obsolete="false">
-         <result status="valid" time="0.78"/>
+         <result status="valid" time="0.73"/>
         </proof>
        </goal>
       </transf>
@@ -365,54 +365,10 @@
      <goal
       name="WP_parameter search_loop.5"
       expl="loop variant decreases"
-      sum="c0d95f98f870cf55d62786e6abc2a9e2"
+      sum="3f9c3afa0fc6e60230774f17ea30b9d3"
       proved="true"
       expanded="true"
       shape="ainfix <alengthV6alengthV1Aainfix <=c0alengthV1Iainfix =anthV7V0aSomec0NIainfix <V7V4Aainfix <=c0V7FAainfix =anthV8V6anthainfix +V4V8V0Iainfix <=c0V8FAainfix =ainfix +V4alengthV6alengthV0Aainfix <=c0V4Iainfix =V6V5FIainfix =CV1aNilaNoneaConswVaSomeV9aSomeV5FIainfix =V1aNilNIainfix =V4ainfix +V2c1FIainfix =V3c0NIainfix =CV1aNilaNoneaConsVwaSomeV10aSomeV3FIainfix =V1aNilNIainfix =V1aNilNIainfix =anthV11V0aSomec0NIainfix <V11V2Aainfix <=c0V11FAainfix =anthV12V1anthainfix +V2V12V0Iainfix <=c0V12FAainfix =ainfix +V2alengthV1alengthV0Aainfix <=c0V2FFF">
-      <proof
-       prover="cvc3"
-       timelimit="5"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof
-       prover="alt-ergo"
-       timelimit="20"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof
-       prover="z3"
-       timelimit="5"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.54"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter search_loop.6"
-      expl="normal postcondition"
-      sum="19f286e4d7e9c42ba31d6b8fdcded268"
-      proved="true"
-      expanded="true"
-      shape="ano_zeroV0Aainfix =V2alengthV0Oazero_atV0V2Aainfix <V2alengthV0Aainfix <=c0V2Iainfix =V3c0NNIainfix =CV1aNilaNoneaConsVwaSomeV4aSomeV3FIainfix =V1aNilNIainfix =V1aNilNIainfix =anthV5V0aSomec0NIainfix <V5V2Aainfix <=c0V5FAainfix =anthV6V1anthainfix +V2V6V0Iainfix <=c0V6FAainfix =ainfix +V2alengthV1alengthV0Aainfix <=c0V2FFF">
-      <proof
-       prover="coq"
-       timelimit="5"
-       edited="vstte10_search_list_WP_SearchingALinkedList_WP_parameter_search_loop_1.v"
-       obsolete="false">
-       <result status="valid" time="0.67"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter search_loop.7"
-      expl="normal postcondition"
-      sum="56378da834ecb03373dd2651c9dc7d54"
-      proved="true"
-      expanded="true"
-      shape="ano_zeroV0Aainfix =V2alengthV0Oazero_atV0V2Aainfix <V2alengthV0Aainfix <=c0V2Iainfix =V1aNilNNIainfix =anthV3V0aSomec0NIainfix <V3V2Aainfix <=c0V3FAainfix =anthV4V1anthainfix +V2V4V0Iainfix <=c0V4FAainfix =ainfix +V2alengthV1alengthV0Aainfix <=c0V2FFF">
       <proof
        prover="cvc3"
        timelimit="5"
@@ -432,7 +388,51 @@
        timelimit="5"
        edited=""
        obsolete="false">
+       <result status="valid" time="0.56"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter search_loop.6"
+      expl="normal postcondition"
+      sum="5c24a8c72932be592bde0f9b168a9c93"
+      proved="true"
+      expanded="true"
+      shape="ano_zeroV0Aainfix =V2alengthV0Oazero_atV0V2Aainfix <V2alengthV0Aainfix <=c0V2Iainfix =V3c0NNIainfix =CV1aNilaNoneaConsVwaSomeV4aSomeV3FIainfix =V1aNilNIainfix =V1aNilNIainfix =anthV5V0aSomec0NIainfix <V5V2Aainfix <=c0V5FAainfix =anthV6V1anthainfix +V2V6V0Iainfix <=c0V6FAainfix =ainfix +V2alengthV1alengthV0Aainfix <=c0V2FFF">
+      <proof
+       prover="coq"
+       timelimit="5"
+       edited="vstte10_search_list_WP_SearchingALinkedList_WP_parameter_search_loop_1.v"
+       obsolete="false">
+       <result status="valid" time="0.62"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter search_loop.7"
+      expl="normal postcondition"
+      sum="8660bec638a3fec3224eb7118ff42edd"
+      proved="true"
+      expanded="true"
+      shape="ano_zeroV0Aainfix =V2alengthV0Oazero_atV0V2Aainfix <V2alengthV0Aainfix <=c0V2Iainfix =V1aNilNNIainfix =anthV3V0aSomec0NIainfix <V3V2Aainfix <=c0V3FAainfix =anthV4V1anthainfix +V2V4V0Iainfix <=c0V4FAainfix =ainfix +V2alengthV1alengthV0Aainfix <=c0V2FFF">
+      <proof
+       prover="cvc3"
+       timelimit="5"
+       edited=""
+       obsolete="false">
        <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="alt-ergo"
+       timelimit="20"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="z3"
+       timelimit="5"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
     </transf>
