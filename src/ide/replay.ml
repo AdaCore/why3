@@ -343,22 +343,22 @@ let protect s =
   done;
   Buffer.contents b
 
-let rec goal_latex_stat n fmt prov depth depth_max column subgoal _subgoals_max g =
+let rec goal_latex_stat n fmt prov depth depth_max column subgoal g =
   if n == 1 then
     begin
-    if depth > 0 then
-      if subgoal > 0 then
-      fprintf fmt "\\cline{%d-%d} @." (depth + 1) column
-    else ()
-  else
-    fprintf fmt "\\hline @.";
+      if depth > 0 then
+	if subgoal > 0 then
+	  fprintf fmt "\\cline{%d-%d} @." (depth + 1) column
+	else ()
+      else
+	fprintf fmt "\\hline @.";
     end
   else
     begin
-    if depth > 0 then
-      fprintf fmt "\\cline{%d-%d} @." 2 column
-    else
-      fprintf fmt "\\hline @."
+      if depth > 0 then
+	fprintf fmt "\\cline{%d-%d} @." 2 column
+      else
+	fprintf fmt "\\hline @."
     end;
   if(n ==1) then
     begin
@@ -389,7 +389,7 @@ let rec goal_latex_stat n fmt prov depth depth_max column subgoal _subgoals_max 
     fprintf fmt "\\explanation{%s} " (protect (M.goal_expl g))
   else
     if n == 2 then
-      fprintf fmt "%d " (subgoal + 1)
+      fprintf fmt "\\explanation{%d} " (subgoal + 1)
     else
       fprintf fmt "\\explanation{%s}"  " ";
   let proofs = M.external_proofs g in
@@ -427,19 +427,23 @@ let rec goal_latex_stat n fmt prov depth depth_max column subgoal _subgoals_max 
 	    | _ -> fprintf fmt "& Undone"
 	with Not_found -> fprintf fmt "& \\noresult") prov;
     fprintf fmt "\\\\ @."
+    end;
+  let tr = M.transformations g in
+  if Hashtbl.length tr > 0 then
+  if n == 2 then 
+    begin
+      if (Hashtbl.length proofs == 0) then 
+	fprintf fmt "& \\multicolumn{%d}{|c|}{}\\\\ @." (List.length prov)
     end
-  else begin
-    let tr = M.transformations g in
-    if (n == 2) then
-      begin
-	fprintf fmt "& \\multicolumn{%d}{|c|}{}\\\\ @." (List.length prov);
-      end;
-    Hashtbl.iter (fun _st tr ->
-      let goals = tr.M.subgoals in
-      let _ = List.fold_left (fun subgoal g ->
-	goal_latex_stat n fmt prov (depth + 1) depth_max column (subgoal) (List.length goals) g; subgoal + 1) 0 goals in
+  else
+      if Hashtbl.length proofs > 0 then 
+	  fprintf fmt "\\cline{%d-%d} @." (depth + 2) column;
+  Hashtbl.iter (fun _st tr ->
+    let goals = tr.M.subgoals in
+    let _ = List.fold_left (fun subgoal g ->
+      goal_latex_stat n fmt prov (depth + 1) depth_max column (subgoal) g; subgoal + 1) 0 goals in
     () ) tr
-  end
+
 
 let theory_latex_stat n dir t =
   let provers = Hashtbl.create 9 in
@@ -474,7 +478,7 @@ let theory_latex_stat n dir t =
     else
       (List.length provers) +  1
   in
-  List.iter (goal_latex_stat n fmt provers 0 depth column 0 0) (M.goals t);
+  List.iter (goal_latex_stat n fmt provers 0 depth column 0) (M.goals t);
   fprintf fmt "\\hline \\end{tabular}@.";
   close_out ch
 
