@@ -1,0 +1,545 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session SYSTEM "why3session.dtd">
+<why3session
+ name="examples/programs/generate_all_trees/why3session.xml">
+ <prover
+  id="alt-ergo"
+  name="Alt-Ergo"
+  version="0.93"/>
+ <prover
+  id="coq"
+  name="Coq"
+  version="8.3pl2"/>
+ <prover
+  id="cvc3"
+  name="CVC3"
+  version="2.2"/>
+ <prover
+  id="simplify"
+  name="Simplify"
+  version="1.5.4"/>
+ <prover
+  id="yices"
+  name="Yices"
+  version="1.0.27"/>
+ <prover
+  id="z3"
+  name="Z3"
+  version="2.19"/>
+ <file
+  name="../generate_all_trees.mlw"
+  verified="true"
+  expanded="true">
+  <theory
+   name="WP GenerateAllTrees"
+   verified="true"
+   expanded="true">
+   <goal
+    name="size_nonneg"
+    sum="156445ef5ef8c4b3be9028fb0a504302"
+    proved="true"
+    expanded="true"
+    shape="ainfix >=asizeV0c0F">
+    <proof
+     prover="coq"
+     timelimit="10"
+     edited="generate_all_trees_WP_GenerateAllTrees_size_nonneg_1.v"
+     obsolete="false">
+     <result status="valid" time="0.47"/>
+    </proof>
+   </goal>
+   <goal
+    name="size_left"
+    sum="391c3e8fcb36f33bfc7f2cafbad2ff8e"
+    proved="true"
+    expanded="true"
+    shape="ainfix <asizeV1asizeV0Aainfix =V0aNodeV1V2EIainfix >asizeV0c0F">
+    <proof
+     prover="cvc3"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="all_trees_0"
+    sum="163ba1acf3e63b8095ef53144b7c3b3e"
+    proved="true"
+    expanded="true"
+    shape="aall_treesc0aConsaEmptyaNil">
+    <proof
+     prover="coq"
+     timelimit="10"
+     edited="generate_all_trees_WP_GenerateAllTrees_all_trees_0_1.v"
+     obsolete="false">
+     <result status="valid" time="0.48"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter combine"
+    expl="parameter combine"
+    sum="d406394db26b8e2560a451321b056992"
+    proved="true"
+    expanded="true"
+    shape="CV4aNilamemV7V3AamemV6V4Aainfix =V5aNodeV6V7EqamemV5aNilFaConsVVCV10aNilamemV12V10Aainfix =V11aNodeV8V12EqamemV11aNilFaConsVVamemV17V10Aainfix =V16aNodeV8V17EqamemV16aConsaNodeV8V13V15FIamemV19V14Aainfix =V18aNodeV8V19EqamemV18V15FFFAamemV24V3AamemV23V4Aainfix =V22aNodeV23V24EqamemV22ainfix ++V20V21FIamemV27V3AamemV26V9Aainfix =V25aNodeV26V27EqamemV25V21FFIamemV29V3Aainfix =V28aNodeV8V29EqamemV28V20FFFAainfix =asizeV33V2Aainfix =asizeV32V0Aainfix =V31aNodeV32V33EqamemV31V30FIamemV36V3AamemV35V1Aainfix =V34aNodeV35V36EqamemV34V30FFIaall_treesV2V3Aainfix <=c0V2Aaall_treesV0V1Aainfix <=c0V0FFFF">
+    <transf
+     name="split_goal"
+     proved="true"
+     expanded="true">
+     <goal
+      name="WP_parameter combine.1"
+      expl="normal postcondition"
+      sum="affcd1a759f2503ee334d059ebc1eb75"
+      proved="true"
+      expanded="true"
+      shape="ainfix =asizeV7V2Aainfix =asizeV6V0Aainfix =V5aNodeV6V7EqamemV5V4FIamemV10V3AamemV9V1Aainfix =V8aNodeV9V10EqamemV8V4FFIaall_treesV2V3Aainfix <=c0V2Aaall_treesV0V1Aainfix <=c0V0FFFF">
+      <proof
+       prover="alt-ergo"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter combine.2"
+      expl="parameter combine"
+      sum="d6be72ec59c784189250c702db80561b"
+      proved="true"
+      expanded="true"
+      shape="CV4aNilamemV7V3AamemV6V4Aainfix =V5aNodeV6V7EqamemV5aNilFaConsVVtFIaall_treesV2V3Aainfix <=c0V2Aaall_treesV0V1Aainfix <=c0V0FFFF">
+      <proof
+       prover="alt-ergo"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter combine.3"
+      expl="parameter combine"
+      sum="57848e3c5a069d2e362706c1f4b9b0a3"
+      proved="true"
+      expanded="true"
+      shape="CV4aNiltaConsVVamemV11V3AamemV10V4Aainfix =V9aNodeV10V11EqamemV9ainfix ++V7V8FIamemV14V3AamemV13V6Aainfix =V12aNodeV13V14EqamemV12V8FFIamemV16V3Aainfix =V15aNodeV5V16EqamemV15V7FFFIaall_treesV2V3Aainfix <=c0V2Aaall_treesV0V1Aainfix <=c0V0FFFF">
+      <transf
+       name="split_goal"
+       proved="true"
+       expanded="true">
+       <goal
+        name="WP_parameter combine.3.1"
+        expl="parameter combine"
+        sum="bb429c722ed4a2354f2f11d1a4f43f4c"
+        proved="true"
+        expanded="true"
+        shape="CV4aNiltaConsVVamemV11V3AamemV10V4Aainfix =V9aNodeV10V11EIamemV9ainfix ++V7V8FIamemV14V3AamemV13V6Aainfix =V12aNodeV13V14EqamemV12V8FFIamemV16V3Aainfix =V15aNodeV5V16EqamemV15V7FFFIaall_treesV2V3Aainfix <=c0V2Aaall_treesV0V1Aainfix <=c0V0FFFF">
+        <proof
+         prover="cvc3"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.38"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter combine.3.2"
+        expl="parameter combine"
+        sum="64d22eed0b3456d8b81661a943cce110"
+        proved="true"
+        expanded="true"
+        shape="CV4aNiltaConsVVamemV9ainfix ++V7V8IamemV11V3AamemV10V4Aainfix =V9aNodeV10V11EFIamemV14V3AamemV13V6Aainfix =V12aNodeV13V14EqamemV12V8FFIamemV16V3Aainfix =V15aNodeV5V16EqamemV15V7FFFIaall_treesV2V3Aainfix <=c0V2Aaall_treesV0V1Aainfix <=c0V0FFFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.10"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter combine.4"
+      expl="parameter combine"
+      sum="ad04c73961725f5865b00b397164991f"
+      proved="true"
+      expanded="true"
+      shape="CV4aNiltaConsVVCV7aNilamemV9V7Aainfix =V8aNodeV5V9EqamemV8aNilFaConsVVtFFIaall_treesV2V3Aainfix <=c0V2Aaall_treesV0V1Aainfix <=c0V0FFFF">
+      <proof
+       prover="alt-ergo"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter combine.5"
+      expl="parameter combine"
+      sum="f24a85046e19e3820a3d69ffae3ee960"
+      proved="true"
+      expanded="true"
+      shape="CV4aNiltaConsVVCV7aNiltaConsVVamemV12V7Aainfix =V11aNodeV5V12EqamemV11aConsaNodeV5V8V10FIamemV14V9Aainfix =V13aNodeV5V14EqamemV13V10FFFFIaall_treesV2V3Aainfix <=c0V2Aaall_treesV0V1Aainfix <=c0V0FFFF">
+      <proof
+       prover="alt-ergo"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="2.80"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+   <goal
+    name="WP_parameter all_trees"
+    expl="parameter all_trees"
+    sum="dfe06fca72b52a7052a6848a5de4bbd0"
+    proved="true"
+    expanded="true"
+    shape="aall_treesV3agetV2V3Iainfix <=V3V0Aainfix <=c0V3FIaall_treesV4agetV2V4Iainfix <V4ainfix +V0c1Aainfix <=c0V4FAaall_treesV8agetV7V8Iainfix <V8ainfix +V5c1Aainfix <=c0V8FIainfix <asizeV10ainfix +ainfix -V5c1c1Aainfix =asizeV9V5Aainfix =V9aNodeV10V11EqamemV9agetV7V5FAaall_treesV12agetV7V12Iainfix <V12V5Aainfix <=c0V12FAainfix <asizeV17ainfix +V13c1Aainfix =asizeV16V5Aainfix =V16aNodeV17V18EqamemV16agetV15V5FAaall_treesV19agetV15V19Iainfix <V19V5Aainfix <=c0V19FIainfix =V15asetV7V5ainfix ++V14agetV7V5FAainfix <V5ainfix +V0c1Aainfix <=c0V5Aainfix <V5ainfix +V0c1Aainfix <=c0V5Iainfix =asizeV22ainfix -ainfix -V5c1V13Aainfix =asizeV21V13Aainfix =V20aNodeV21V22EqamemV20V14FFAaall_treesainfix -ainfix -V5c1V13agetV7ainfix -ainfix -V5c1V13Aainfix <=c0ainfix -ainfix -V5c1V13Aaall_treesV13agetV7V13Aainfix <=c0V13Aainfix <ainfix -ainfix -V5c1V13ainfix +V0c1Aainfix <=c0ainfix -ainfix -V5c1V13Aainfix <V13ainfix +V0c1Aainfix <=c0V13Iainfix <asizeV24V13Aainfix =asizeV23V5Aainfix =V23aNodeV24V25EqamemV23agetV7V5FAaall_treesV26agetV7V26Iainfix <V26V5Aainfix <=c0V26FIainfix <=V13ainfix -V5c1Aainfix <=c0V13FFAainfix <asizeV28c0Aainfix =asizeV27V5Aainfix =V27aNodeV28V29EqamemV27agetV6V5FAaall_treesV30agetV6V30Iainfix <V30V5Aainfix <=c0V30FIainfix <=c0ainfix -V5c1Aaall_treesV31agetV6V31Iainfix <V31ainfix +V5c1Aainfix <=c0V31FIainfix >c0ainfix -V5c1Iainfix =V6asetV2V5aNilFAainfix <V5ainfix +V0c1Aainfix <=c0V5Iaall_treesV32agetV2V32Iainfix <V32V5Aainfix <=c0V32FIainfix <=V5V0Aainfix <=c1V5FFAaall_treesV33agetV1V33Iainfix <V33c1Aainfix <=c0V33FIainfix <=c1V0Aaall_treesV34agetV1V34Iainfix <=V34V0Aainfix <=c0V34FIainfix >c1V0Iainfix =V1asetaconstaNilc0aConsaEmptyaNilFAainfix <c0ainfix +V0c1Aainfix <=c0c0Aainfix >=ainfix +V0c1c0Iainfix >=V0c0F">
+    <transf
+     name="split_goal"
+     proved="true"
+     expanded="true">
+     <goal
+      name="WP_parameter all_trees.1"
+      expl="precondition"
+      sum="261c17a3be210b33387cef4e0d569ef9"
+      proved="true"
+      expanded="true"
+      shape="ainfix >=ainfix +V0c1c0Iainfix >=V0c0F">
+      <proof
+       prover="alt-ergo"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter all_trees.2"
+      expl="precondition"
+      sum="8bcccd583cd98d9d75561ac24fe5f798"
+      proved="true"
+      expanded="true"
+      shape="ainfix <c0ainfix +V0c1Aainfix <=c0c0Iainfix >=ainfix +V0c1c0Iainfix >=V0c0F">
+      <proof
+       prover="alt-ergo"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter all_trees.3"
+      expl="normal postcondition"
+      sum="ecef785e4268c5cd2b35ca3ed1e46a3c"
+      proved="true"
+      expanded="true"
+      shape="aall_treesV2agetV1V2Iainfix <=V2V0Aainfix <=c0V2FIainfix >c1V0Iainfix =V1asetaconstaNilc0aConsaEmptyaNilFIainfix <c0ainfix +V0c1Aainfix <=c0c0Iainfix >=ainfix +V0c1c0Iainfix >=V0c0F">
+      <proof
+       prover="alt-ergo"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter all_trees.4"
+      expl="for loop initialization"
+      sum="acbf4ab5105bcd9a1e679105e3ba530d"
+      proved="true"
+      expanded="true"
+      shape="aall_treesV2agetV1V2Iainfix <V2c1Aainfix <=c0V2FIainfix <=c1V0Iainfix =V1asetaconstaNilc0aConsaEmptyaNilFIainfix <c0ainfix +V0c1Aainfix <=c0c0Iainfix >=ainfix +V0c1c0Iainfix >=V0c0F">
+      <transf
+       name="split_goal"
+       proved="true"
+       expanded="true">
+       <goal
+        name="WP_parameter all_trees.4.1"
+        expl="for loop initialization"
+        sum="acbf4ab5105bcd9a1e679105e3ba530d"
+        proved="true"
+        expanded="true"
+        shape="aall_treesV2agetV1V2Iainfix <V2c1Aainfix <=c0V2FIainfix <=c1V0Iainfix =V1asetaconstaNilc0aConsaEmptyaNilFIainfix <c0ainfix +V0c1Aainfix <=c0c0Iainfix >=ainfix +V0c1c0Iainfix >=V0c0F">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.03"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter all_trees.5"
+      expl="for loop preservation"
+      sum="e730432ba8b9b0a74dd9ed72d0b4de66"
+      proved="true"
+      expanded="true"
+      shape="aall_treesV6agetV5V6Iainfix <V6ainfix +V3c1Aainfix <=c0V6FIainfix <asizeV8ainfix +ainfix -V3c1c1Aainfix =asizeV7V3Aainfix =V7aNodeV8V9EqamemV7agetV5V3FAaall_treesV10agetV5V10Iainfix <V10V3Aainfix <=c0V10FAainfix <asizeV15ainfix +V11c1Aainfix =asizeV14V3Aainfix =V14aNodeV15V16EqamemV14agetV13V3FAaall_treesV17agetV13V17Iainfix <V17V3Aainfix <=c0V17FIainfix =V13asetV5V3ainfix ++V12agetV5V3FAainfix <V3ainfix +V0c1Aainfix <=c0V3Aainfix <V3ainfix +V0c1Aainfix <=c0V3Iainfix =asizeV20ainfix -ainfix -V3c1V11Aainfix =asizeV19V11Aainfix =V18aNodeV19V20EqamemV18V12FFAaall_treesainfix -ainfix -V3c1V11agetV5ainfix -ainfix -V3c1V11Aainfix <=c0ainfix -ainfix -V3c1V11Aaall_treesV11agetV5V11Aainfix <=c0V11Aainfix <ainfix -ainfix -V3c1V11ainfix +V0c1Aainfix <=c0ainfix -ainfix -V3c1V11Aainfix <V11ainfix +V0c1Aainfix <=c0V11Iainfix <asizeV22V11Aainfix =asizeV21V3Aainfix =V21aNodeV22V23EqamemV21agetV5V3FAaall_treesV24agetV5V24Iainfix <V24V3Aainfix <=c0V24FIainfix <=V11ainfix -V3c1Aainfix <=c0V11FFAainfix <asizeV26c0Aainfix =asizeV25V3Aainfix =V25aNodeV26V27EqamemV25agetV4V3FAaall_treesV28agetV4V28Iainfix <V28V3Aainfix <=c0V28FIainfix <=c0ainfix -V3c1Aaall_treesV29agetV4V29Iainfix <V29ainfix +V3c1Aainfix <=c0V29FIainfix >c0ainfix -V3c1Iainfix =V4asetV2V3aNilFAainfix <V3ainfix +V0c1Aainfix <=c0V3Iaall_treesV30agetV2V30Iainfix <V30V3Aainfix <=c0V30FIainfix <=V3V0Aainfix <=c1V3FFIainfix <=c1V0Iainfix =V1asetaconstaNilc0aConsaEmptyaNilFIainfix <c0ainfix +V0c1Aainfix <=c0c0Iainfix >=ainfix +V0c1c0Iainfix >=V0c0F">
+      <transf
+       name="split_goal"
+       proved="true"
+       expanded="true">
+       <goal
+        name="WP_parameter all_trees.5.1"
+        expl="for loop preservation"
+        sum="5de38c3a5b4782ba42257cd89dbc5a75"
+        proved="true"
+        expanded="true"
+        shape="ainfix <V3ainfix +V0c1Aainfix <=c0V3Iaall_treesV4agetV2V4Iainfix <V4V3Aainfix <=c0V4FIainfix <=V3V0Aainfix <=c1V3FFIainfix <=c1V0Iainfix =V1asetaconstaNilc0aConsaEmptyaNilFIainfix <c0ainfix +V0c1Aainfix <=c0c0Iainfix >=ainfix +V0c1c0Iainfix >=V0c0F">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter all_trees.5.2"
+        expl="for loop preservation"
+        sum="987ce4578e2107026e6c49f6060465c2"
+        proved="true"
+        expanded="true"
+        shape="aall_treesV5agetV4V5Iainfix <V5ainfix +V3c1Aainfix <=c0V5FIainfix >c0ainfix -V3c1Iainfix =V4asetV2V3aNilFIainfix <V3ainfix +V0c1Aainfix <=c0V3Iaall_treesV6agetV2V6Iainfix <V6V3Aainfix <=c0V6FIainfix <=V3V0Aainfix <=c1V3FFIainfix <=c1V0Iainfix =V1asetaconstaNilc0aConsaEmptyaNilFIainfix <c0ainfix +V0c1Aainfix <=c0c0Iainfix >=ainfix +V0c1c0Iainfix >=V0c0F">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter all_trees.5.3"
+        expl="for loop preservation"
+        sum="7a6ad17e60a79b330cf3501964bb14d1"
+        proved="true"
+        expanded="true"
+        shape="ainfix <asizeV6c0Aainfix =asizeV5V3Aainfix =V5aNodeV6V7EqamemV5agetV4V3FAaall_treesV8agetV4V8Iainfix <V8V3Aainfix <=c0V8FIainfix <=c0ainfix -V3c1Iainfix =V4asetV2V3aNilFIainfix <V3ainfix +V0c1Aainfix <=c0V3Iaall_treesV9agetV2V9Iainfix <V9V3Aainfix <=c0V9FIainfix <=V3V0Aainfix <=c1V3FFIainfix <=c1V0Iainfix =V1asetaconstaNilc0aConsaEmptyaNilFIainfix <c0ainfix +V0c1Aainfix <=c0c0Iainfix >=ainfix +V0c1c0Iainfix >=V0c0F">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.04"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter all_trees.5.4"
+        expl="for loop preservation"
+        sum="25f866ace24daea6a781fd8f7953f2e7"
+        proved="true"
+        expanded="true"
+        shape="ainfix <asizeV10ainfix +V6c1Aainfix =asizeV9V3Aainfix =V9aNodeV10V11EqamemV9agetV8V3FAaall_treesV12agetV8V12Iainfix <V12V3Aainfix <=c0V12FIainfix =V8asetV5V3ainfix ++V7agetV5V3FAainfix <V3ainfix +V0c1Aainfix <=c0V3Aainfix <V3ainfix +V0c1Aainfix <=c0V3Iainfix =asizeV15ainfix -ainfix -V3c1V6Aainfix =asizeV14V6Aainfix =V13aNodeV14V15EqamemV13V7FFAaall_treesainfix -ainfix -V3c1V6agetV5ainfix -ainfix -V3c1V6Aainfix <=c0ainfix -ainfix -V3c1V6Aaall_treesV6agetV5V6Aainfix <=c0V6Aainfix <ainfix -ainfix -V3c1V6ainfix +V0c1Aainfix <=c0ainfix -ainfix -V3c1V6Aainfix <V6ainfix +V0c1Aainfix <=c0V6Iainfix <asizeV17V6Aainfix =asizeV16V3Aainfix =V16aNodeV17V18EqamemV16agetV5V3FAaall_treesV19agetV5V19Iainfix <V19V3Aainfix <=c0V19FIainfix <=V6ainfix -V3c1Aainfix <=c0V6FFIainfix <=c0ainfix -V3c1Iainfix =V4asetV2V3aNilFIainfix <V3ainfix +V0c1Aainfix <=c0V3Iaall_treesV20agetV2V20Iainfix <V20V3Aainfix <=c0V20FIainfix <=V3V0Aainfix <=c1V3FFIainfix <=c1V0Iainfix =V1asetaconstaNilc0aConsaEmptyaNilFIainfix <c0ainfix +V0c1Aainfix <=c0c0Iainfix >=ainfix +V0c1c0Iainfix >=V0c0F">
+        <transf
+         name="split_goal"
+         proved="true"
+         expanded="true">
+         <goal
+          name="WP_parameter all_trees.5.4.1"
+          expl="for loop preservation"
+          sum="2e7f986966f9fef1aa63db54fd10133a"
+          proved="true"
+          expanded="true"
+          shape="ainfix <V6ainfix +V0c1Aainfix <=c0V6Iainfix <asizeV8V6Aainfix =asizeV7V3Aainfix =V7aNodeV8V9EqamemV7agetV5V3FAaall_treesV10agetV5V10Iainfix <V10V3Aainfix <=c0V10FIainfix <=V6ainfix -V3c1Aainfix <=c0V6FFIainfix <=c0ainfix -V3c1Iainfix =V4asetV2V3aNilFIainfix <V3ainfix +V0c1Aainfix <=c0V3Iaall_treesV11agetV2V11Iainfix <V11V3Aainfix <=c0V11FIainfix <=V3V0Aainfix <=c1V3FFIainfix <=c1V0Iainfix =V1asetaconstaNilc0aConsaEmptyaNilFIainfix <c0ainfix +V0c1Aainfix <=c0c0Iainfix >=ainfix +V0c1c0Iainfix >=V0c0F">
+          <proof
+           prover="alt-ergo"
+           timelimit="10"
+           edited=""
+           obsolete="false">
+           <result status="valid" time="0.03"/>
+          </proof>
+         </goal>
+         <goal
+          name="WP_parameter all_trees.5.4.2"
+          expl="for loop preservation"
+          sum="cbf5b2f4c709af666b6eea9e00969823"
+          proved="true"
+          expanded="true"
+          shape="ainfix <ainfix -ainfix -V3c1V6ainfix +V0c1Aainfix <=c0ainfix -ainfix -V3c1V6Iainfix <V6ainfix +V0c1Aainfix <=c0V6Iainfix <asizeV8V6Aainfix =asizeV7V3Aainfix =V7aNodeV8V9EqamemV7agetV5V3FAaall_treesV10agetV5V10Iainfix <V10V3Aainfix <=c0V10FIainfix <=V6ainfix -V3c1Aainfix <=c0V6FFIainfix <=c0ainfix -V3c1Iainfix =V4asetV2V3aNilFIainfix <V3ainfix +V0c1Aainfix <=c0V3Iaall_treesV11agetV2V11Iainfix <V11V3Aainfix <=c0V11FIainfix <=V3V0Aainfix <=c1V3FFIainfix <=c1V0Iainfix =V1asetaconstaNilc0aConsaEmptyaNilFIainfix <c0ainfix +V0c1Aainfix <=c0c0Iainfix >=ainfix +V0c1c0Iainfix >=V0c0F">
+          <proof
+           prover="alt-ergo"
+           timelimit="10"
+           edited=""
+           obsolete="false">
+           <result status="valid" time="0.01"/>
+          </proof>
+         </goal>
+         <goal
+          name="WP_parameter all_trees.5.4.3"
+          expl="for loop preservation"
+          sum="317e8a177847381c23eaa2db9ba5aac6"
+          proved="true"
+          expanded="true"
+          shape="aall_treesainfix -ainfix -V3c1V6agetV5ainfix -ainfix -V3c1V6Aainfix <=c0ainfix -ainfix -V3c1V6Aaall_treesV6agetV5V6Aainfix <=c0V6Iainfix <ainfix -ainfix -V3c1V6ainfix +V0c1Aainfix <=c0ainfix -ainfix -V3c1V6Iainfix <V6ainfix +V0c1Aainfix <=c0V6Iainfix <asizeV8V6Aainfix =asizeV7V3Aainfix =V7aNodeV8V9EqamemV7agetV5V3FAaall_treesV10agetV5V10Iainfix <V10V3Aainfix <=c0V10FIainfix <=V6ainfix -V3c1Aainfix <=c0V6FFIainfix <=c0ainfix -V3c1Iainfix =V4asetV2V3aNilFIainfix <V3ainfix +V0c1Aainfix <=c0V3Iaall_treesV11agetV2V11Iainfix <V11V3Aainfix <=c0V11FIainfix <=V3V0Aainfix <=c1V3FFIainfix <=c1V0Iainfix =V1asetaconstaNilc0aConsaEmptyaNilFIainfix <c0ainfix +V0c1Aainfix <=c0c0Iainfix >=ainfix +V0c1c0Iainfix >=V0c0F">
+          <proof
+           prover="alt-ergo"
+           timelimit="10"
+           edited=""
+           obsolete="false">
+           <result status="valid" time="0.04"/>
+          </proof>
+         </goal>
+         <goal
+          name="WP_parameter all_trees.5.4.4"
+          expl="for loop preservation"
+          sum="f703fc63f619690aa34ea03b9f1db5f6"
+          proved="true"
+          expanded="true"
+          shape="ainfix <V3ainfix +V0c1Aainfix <=c0V3Iainfix =asizeV10ainfix -ainfix -V3c1V6Aainfix =asizeV9V6Aainfix =V8aNodeV9V10EqamemV8V7FFIaall_treesainfix -ainfix -V3c1V6agetV5ainfix -ainfix -V3c1V6Aainfix <=c0ainfix -ainfix -V3c1V6Aaall_treesV6agetV5V6Aainfix <=c0V6Iainfix <ainfix -ainfix -V3c1V6ainfix +V0c1Aainfix <=c0ainfix -ainfix -V3c1V6Iainfix <V6ainfix +V0c1Aainfix <=c0V6Iainfix <asizeV12V6Aainfix =asizeV11V3Aainfix =V11aNodeV12V13EqamemV11agetV5V3FAaall_treesV14agetV5V14Iainfix <V14V3Aainfix <=c0V14FIainfix <=V6ainfix -V3c1Aainfix <=c0V6FFIainfix <=c0ainfix -V3c1Iainfix =V4asetV2V3aNilFIainfix <V3ainfix +V0c1Aainfix <=c0V3Iaall_treesV15agetV2V15Iainfix <V15V3Aainfix <=c0V15FIainfix <=V3V0Aainfix <=c1V3FFIainfix <=c1V0Iainfix =V1asetaconstaNilc0aConsaEmptyaNilFIainfix <c0ainfix +V0c1Aainfix <=c0c0Iainfix >=ainfix +V0c1c0Iainfix >=V0c0F">
+          <proof
+           prover="alt-ergo"
+           timelimit="10"
+           edited=""
+           obsolete="false">
+           <result status="valid" time="0.03"/>
+          </proof>
+         </goal>
+         <goal
+          name="WP_parameter all_trees.5.4.5"
+          expl="for loop preservation"
+          sum="242f2d548655fbf812b7bfe9bde3bda0"
+          proved="true"
+          expanded="true"
+          shape="ainfix <V3ainfix +V0c1Aainfix <=c0V3Iainfix <V3ainfix +V0c1Aainfix <=c0V3Iainfix =asizeV10ainfix -ainfix -V3c1V6Aainfix =asizeV9V6Aainfix =V8aNodeV9V10EqamemV8V7FFIaall_treesainfix -ainfix -V3c1V6agetV5ainfix -ainfix -V3c1V6Aainfix <=c0ainfix -ainfix -V3c1V6Aaall_treesV6agetV5V6Aainfix <=c0V6Iainfix <ainfix -ainfix -V3c1V6ainfix +V0c1Aainfix <=c0ainfix -ainfix -V3c1V6Iainfix <V6ainfix +V0c1Aainfix <=c0V6Iainfix <asizeV12V6Aainfix =asizeV11V3Aainfix =V11aNodeV12V13EqamemV11agetV5V3FAaall_treesV14agetV5V14Iainfix <V14V3Aainfix <=c0V14FIainfix <=V6ainfix -V3c1Aainfix <=c0V6FFIainfix <=c0ainfix -V3c1Iainfix =V4asetV2V3aNilFIainfix <V3ainfix +V0c1Aainfix <=c0V3Iaall_treesV15agetV2V15Iainfix <V15V3Aainfix <=c0V15FIainfix <=V3V0Aainfix <=c1V3FFIainfix <=c1V0Iainfix =V1asetaconstaNilc0aConsaEmptyaNilFIainfix <c0ainfix +V0c1Aainfix <=c0c0Iainfix >=ainfix +V0c1c0Iainfix >=V0c0F">
+          <proof
+           prover="alt-ergo"
+           timelimit="10"
+           edited=""
+           obsolete="false">
+           <result status="valid" time="0.04"/>
+          </proof>
+         </goal>
+         <goal
+          name="WP_parameter all_trees.5.4.6"
+          expl="for loop preservation"
+          sum="42cdb70f0b2b02a3093c8cdb9c3004e1"
+          proved="true"
+          expanded="true"
+          shape="aall_treesV9agetV8V9Iainfix <V9V3Aainfix <=c0V9FIainfix =V8asetV5V3ainfix ++V7agetV5V3FIainfix <V3ainfix +V0c1Aainfix <=c0V3Iainfix <V3ainfix +V0c1Aainfix <=c0V3Iainfix =asizeV12ainfix -ainfix -V3c1V6Aainfix =asizeV11V6Aainfix =V10aNodeV11V12EqamemV10V7FFIaall_treesainfix -ainfix -V3c1V6agetV5ainfix -ainfix -V3c1V6Aainfix <=c0ainfix -ainfix -V3c1V6Aaall_treesV6agetV5V6Aainfix <=c0V6Iainfix <ainfix -ainfix -V3c1V6ainfix +V0c1Aainfix <=c0ainfix -ainfix -V3c1V6Iainfix <V6ainfix +V0c1Aainfix <=c0V6Iainfix <asizeV14V6Aainfix =asizeV13V3Aainfix =V13aNodeV14V15EqamemV13agetV5V3FAaall_treesV16agetV5V16Iainfix <V16V3Aainfix <=c0V16FIainfix <=V6ainfix -V3c1Aainfix <=c0V6FFIainfix <=c0ainfix -V3c1Iainfix =V4asetV2V3aNilFIainfix <V3ainfix +V0c1Aainfix <=c0V3Iaall_treesV17agetV2V17Iainfix <V17V3Aainfix <=c0V17FIainfix <=V3V0Aainfix <=c1V3FFIainfix <=c1V0Iainfix =V1asetaconstaNilc0aConsaEmptyaNilFIainfix <c0ainfix +V0c1Aainfix <=c0c0Iainfix >=ainfix +V0c1c0Iainfix >=V0c0F">
+          <proof
+           prover="alt-ergo"
+           timelimit="10"
+           edited=""
+           obsolete="false">
+           <result status="valid" time="0.04"/>
+          </proof>
+         </goal>
+         <goal
+          name="WP_parameter all_trees.5.4.7"
+          expl="for loop preservation"
+          sum="5dee8bf6ca5eea991ab5ea83c687b885"
+          proved="true"
+          expanded="true"
+          shape="ainfix <asizeV10ainfix +V6c1Aainfix =asizeV9V3Aainfix =V9aNodeV10V11EIamemV9agetV8V3FIainfix =V8asetV5V3ainfix ++V7agetV5V3FIainfix <V3ainfix +V0c1Aainfix <=c0V3Iainfix <V3ainfix +V0c1Aainfix <=c0V3Iainfix =asizeV14ainfix -ainfix -V3c1V6Aainfix =asizeV13V6Aainfix =V12aNodeV13V14EqamemV12V7FFIaall_treesainfix -ainfix -V3c1V6agetV5ainfix -ainfix -V3c1V6Aainfix <=c0ainfix -ainfix -V3c1V6Aaall_treesV6agetV5V6Aainfix <=c0V6Iainfix <ainfix -ainfix -V3c1V6ainfix +V0c1Aainfix <=c0ainfix -ainfix -V3c1V6Iainfix <V6ainfix +V0c1Aainfix <=c0V6Iainfix <asizeV16V6Aainfix =asizeV15V3Aainfix =V15aNodeV16V17EqamemV15agetV5V3FAaall_treesV18agetV5V18Iainfix <V18V3Aainfix <=c0V18FIainfix <=V6ainfix -V3c1Aainfix <=c0V6FFIainfix <=c0ainfix -V3c1Iainfix =V4asetV2V3aNilFIainfix <V3ainfix +V0c1Aainfix <=c0V3Iaall_treesV19agetV2V19Iainfix <V19V3Aainfix <=c0V19FIainfix <=V3V0Aainfix <=c1V3FFIainfix <=c1V0Iainfix =V1asetaconstaNilc0aConsaEmptyaNilFIainfix <c0ainfix +V0c1Aainfix <=c0c0Iainfix >=ainfix +V0c1c0Iainfix >=V0c0F">
+          <proof
+           prover="cvc3"
+           timelimit="10"
+           edited=""
+           obsolete="false">
+           <result status="valid" time="0.34"/>
+          </proof>
+         </goal>
+         <goal
+          name="WP_parameter all_trees.5.4.8"
+          expl="for loop preservation"
+          sum="1560e2e78fd1fbb495d64b4ef9785cb3"
+          proved="true"
+          expanded="true"
+          shape="amemV9agetV8V3Iainfix <asizeV10ainfix +V6c1Aainfix =asizeV9V3Aainfix =V9aNodeV10V11EFIainfix =V8asetV5V3ainfix ++V7agetV5V3FIainfix <V3ainfix +V0c1Aainfix <=c0V3Iainfix <V3ainfix +V0c1Aainfix <=c0V3Iainfix =asizeV14ainfix -ainfix -V3c1V6Aainfix =asizeV13V6Aainfix =V12aNodeV13V14EqamemV12V7FFIaall_treesainfix -ainfix -V3c1V6agetV5ainfix -ainfix -V3c1V6Aainfix <=c0ainfix -ainfix -V3c1V6Aaall_treesV6agetV5V6Aainfix <=c0V6Iainfix <ainfix -ainfix -V3c1V6ainfix +V0c1Aainfix <=c0ainfix -ainfix -V3c1V6Iainfix <V6ainfix +V0c1Aainfix <=c0V6Iainfix <asizeV16V6Aainfix =asizeV15V3Aainfix =V15aNodeV16V17EqamemV15agetV5V3FAaall_treesV18agetV5V18Iainfix <V18V3Aainfix <=c0V18FIainfix <=V6ainfix -V3c1Aainfix <=c0V6FFIainfix <=c0ainfix -V3c1Iainfix =V4asetV2V3aNilFIainfix <V3ainfix +V0c1Aainfix <=c0V3Iaall_treesV19agetV2V19Iainfix <V19V3Aainfix <=c0V19FIainfix <=V3V0Aainfix <=c1V3FFIainfix <=c1V0Iainfix =V1asetaconstaNilc0aConsaEmptyaNilFIainfix <c0ainfix +V0c1Aainfix <=c0c0Iainfix >=ainfix +V0c1c0Iainfix >=V0c0F">
+          <proof
+           prover="alt-ergo"
+           timelimit="10"
+           edited=""
+           obsolete="false">
+           <result status="valid" time="0.63"/>
+          </proof>
+         </goal>
+        </transf>
+       </goal>
+       <goal
+        name="WP_parameter all_trees.5.5"
+        expl="for loop preservation"
+        sum="29bd050a93bd98d7844e51a30b5b4e29"
+        proved="true"
+        expanded="true"
+        shape="aall_treesV6agetV5V6Iainfix <V6ainfix +V3c1Aainfix <=c0V6FIainfix <asizeV8ainfix +ainfix -V3c1c1Aainfix =asizeV7V3Aainfix =V7aNodeV8V9EqamemV7agetV5V3FAaall_treesV10agetV5V10Iainfix <V10V3Aainfix <=c0V10FFIainfix <=c0ainfix -V3c1Iainfix =V4asetV2V3aNilFIainfix <V3ainfix +V0c1Aainfix <=c0V3Iaall_treesV11agetV2V11Iainfix <V11V3Aainfix <=c0V11FIainfix <=V3V0Aainfix <=c1V3FFIainfix <=c1V0Iainfix =V1asetaconstaNilc0aConsaEmptyaNilFIainfix <c0ainfix +V0c1Aainfix <=c0c0Iainfix >=ainfix +V0c1c0Iainfix >=V0c0F">
+        <transf
+         name="inline_goal"
+         proved="true"
+         expanded="true">
+         <goal
+          name="WP_parameter all_trees.5.5.1"
+          expl="for loop preservation"
+          sum="f3dbc405c6622e2cf894c5063338901d"
+          proved="true"
+          expanded="true"
+          shape="amemV7agetV5V6qainfix =asizeV7V6FIainfix <V6ainfix +V3c1Aainfix =c0V6Oainfix <c0V6FIainfix <asizeV9ainfix +ainfix -V3c1c1Aainfix =asizeV8V3Aainfix =V8aNodeV9V10EqamemV8agetV5V3FAamemV12agetV5V11qainfix =asizeV12V11FIainfix <V11V3Aainfix =c0V11Oainfix <c0V11FFIainfix =c0ainfix -V3c1Oainfix <c0ainfix -V3c1Iainfix =V4asetV2V3aNilFIainfix <V3ainfix +V0c1Aainfix =c0V3Oainfix <c0V3IamemV14agetV2V13qainfix =asizeV14V13FIainfix <V13V3Aainfix =c0V13Oainfix <c0V13FIainfix =V3V0Oainfix <V3V0Aainfix =c1V3Oainfix <c1V3FFIainfix =c1V0Oainfix <c1V0Iainfix =V1asetaconstaNilc0aConsaEmptyaNilFIainfix <c0ainfix +V0c1Aainfix =c0c0Oainfix <c0c0Iainfix <=c0ainfix +V0c1Iainfix <=c0V0F">
+          <transf
+           name="split_goal"
+           proved="true"
+           expanded="true">
+           <goal
+            name="WP_parameter all_trees.5.5.1.1"
+            expl="for loop preservation"
+            sum="090c5b2866056a70c45edbf4b40caf42"
+            proved="true"
+            expanded="true"
+            shape="amemV7agetV5V6Iainfix =asizeV7V6FIainfix <V6ainfix +V3c1Aainfix =c0V6Oainfix <c0V6FIainfix <asizeV9ainfix +ainfix -V3c1c1Aainfix =asizeV8V3Aainfix =V8aNodeV9V10EqamemV8agetV5V3FAamemV12agetV5V11qainfix =asizeV12V11FIainfix <V11V3Aainfix =c0V11Oainfix <c0V11FFIainfix =c0ainfix -V3c1Oainfix <c0ainfix -V3c1Iainfix =V4asetV2V3aNilFIainfix <V3ainfix +V0c1Aainfix =c0V3Oainfix <c0V3IamemV14agetV2V13qainfix =asizeV14V13FIainfix <V13V3Aainfix =c0V13Oainfix <c0V13FIainfix =V3V0Oainfix <V3V0Aainfix =c1V3Oainfix <c1V3FFIainfix =c1V0Oainfix <c1V0Iainfix =V1asetaconstaNilc0aConsaEmptyaNilFIainfix <c0ainfix +V0c1Aainfix =c0c0Oainfix <c0c0Iainfix <=c0ainfix +V0c1Iainfix <=c0V0F">
+            <proof
+             prover="alt-ergo"
+             timelimit="10"
+             edited=""
+             obsolete="false">
+             <result status="valid" time="0.10"/>
+            </proof>
+           </goal>
+           <goal
+            name="WP_parameter all_trees.5.5.1.2"
+            expl="for loop preservation"
+            sum="73e58cc7820a18c65629719cc22e74ed"
+            proved="true"
+            expanded="true"
+            shape="ainfix =asizeV7V6IamemV7agetV5V6FIainfix <V6ainfix +V3c1Aainfix =c0V6Oainfix <c0V6FIainfix <asizeV9ainfix +ainfix -V3c1c1Aainfix =asizeV8V3Aainfix =V8aNodeV9V10EqamemV8agetV5V3FAamemV12agetV5V11qainfix =asizeV12V11FIainfix <V11V3Aainfix =c0V11Oainfix <c0V11FFIainfix =c0ainfix -V3c1Oainfix <c0ainfix -V3c1Iainfix =V4asetV2V3aNilFIainfix <V3ainfix +V0c1Aainfix =c0V3Oainfix <c0V3IamemV14agetV2V13qainfix =asizeV14V13FIainfix <V13V3Aainfix =c0V13Oainfix <c0V13FIainfix =V3V0Oainfix <V3V0Aainfix =c1V3Oainfix <c1V3FFIainfix =c1V0Oainfix <c1V0Iainfix =V1asetaconstaNilc0aConsaEmptyaNilFIainfix <c0ainfix +V0c1Aainfix =c0c0Oainfix <c0c0Iainfix <=c0ainfix +V0c1Iainfix <=c0V0F">
+            <proof
+             prover="alt-ergo"
+             timelimit="10"
+             edited=""
+             obsolete="false">
+             <result status="valid" time="0.72"/>
+            </proof>
+           </goal>
+          </transf>
+         </goal>
+        </transf>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter all_trees.6"
+      expl="normal postcondition"
+      sum="36486cd8ada89c3937c7c6586e4ab698"
+      proved="true"
+      expanded="true"
+      shape="aall_treesV3agetV2V3Iainfix <=V3V0Aainfix <=c0V3FIaall_treesV4agetV2V4Iainfix <V4ainfix +V0c1Aainfix <=c0V4FFIainfix <=c1V0Iainfix =V1asetaconstaNilc0aConsaEmptyaNilFIainfix <c0ainfix +V0c1Aainfix <=c0c0Iainfix >=ainfix +V0c1c0Iainfix >=V0c0F">
+      <proof
+       prover="alt-ergo"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+  </theory>
+ </file>
+</why3session>
