@@ -11,10 +11,6 @@
   name="Coq"
   version="8.2pl1"/>
  <prover
-  id="coq-realize"
-  name="Coq Realize"
-  version="8.2pl1"/>
- <prover
   id="cvc3"
   name="CVC3"
   version="2.2"/>
@@ -402,38 +398,45 @@
     </proof>
    </goal>
    <goal
+    name="while_rule_rec"
+    sum="a984a32a61ac3a2a4f6bd3514298ecfe"
+    proved="false"
+    expanded="true"
+    shape="aeval_fmlaV4aFandaFnotaFtermV0V1Iaeval_fmlaV3V1Iainfix =V6aSskipIainfix =V5aSwhileV0V2Iamany_stepsV3V5V4V6FIavalid_tripleaFandaFtermV0V1V2V1F">
+    <proof
+     prover="coq"
+     timelimit="5"
+     edited="imp_Imp_while_rule_rec_1.v"
+     obsolete="true"><undone/>
+     
+    </proof>
+   </goal>
+   <goal
     name="while_rule"
-    sum="94fbdb08982a09191521520728619166"
+    sum="681ef1ff491ebf2565e3659f675db3fa"
     proved="false"
     expanded="true"
     shape="avalid_tripleV1aSwhileV0V2aFandaFnotaFtermV0V1Iavalid_tripleaFandaFtermV0V1V2V1F">
     <proof
-     prover="coq"
-     timelimit="3"
-     edited="imp_Imp_while_rule_1.v"
-     obsolete="true"><undone/>
-     
-    </proof>
-    <proof
      prover="cvc3"
      timelimit="3"
      edited=""
-     obsolete="false">
-     <result status="timeout" time="3.09"/>
+     obsolete="true">
+     <result status="valid" time="0.16"/>
     </proof>
     <proof
      prover="alt-ergo"
      timelimit="3"
      edited=""
-     obsolete="false">
-     <result status="timeout" time="3.09"/>
+     obsolete="true">
+     <result status="valid" time="0.41"/>
     </proof>
     <proof
      prover="z3"
      timelimit="3"
      edited=""
-     obsolete="false">
-     <result status="timeout" time="3.09"/>
+     obsolete="true">
+     <result status="valid" time="0.05"/>
     </proof>
    </goal>
   </theory>

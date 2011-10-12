@@ -225,6 +225,24 @@ lemma if_rule:
   valid_triple (Fand p (Fnot (Fterm e))) i2 q ->
   valid_triple p (Sif e i1 i2) q
 
+(*
+lemma while_induction:
+  forall e:expr, inv:fmla, i:stmt.
+  valid_triple (Fand (Fterm e) inv) i inv ->
+  forall s1 s2:state, loo:stmt, skip:stmt. skip = Sskip ->
+    loo = Swhile e i ->
+    many_steps s1 loo s2 skip ->
+    eval_fmla s1 inv -> eval_fmla s2 inv
+*)
+
+lemma while_rule_rec:
+  forall e:expr, inv:fmla, i:stmt.
+  valid_triple (Fand (Fterm e) inv) i inv ->
+  forall s s':state, l skip:stmt.
+    many_steps s l s' skip ->
+    l = (Swhile e i) -> skip = Sskip ->
+    eval_fmla s inv -> eval_fmla s' (Fand (Fnot (Fterm e)) inv)
+
 lemma while_rule:
   forall e:expr, inv:fmla, i:stmt.
   valid_triple (Fand (Fterm e) inv) i inv ->
