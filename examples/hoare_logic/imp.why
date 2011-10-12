@@ -225,6 +225,11 @@ lemma if_rule:
   valid_triple (Fand p (Fnot (Fterm e))) i2 q ->
   valid_triple p (Sif e i1 i2) q
 
+lemma while_rule:
+  forall e:expr, inv:fmla, i:stmt.
+  valid_triple (Fand (Fterm e) inv) i inv ->
+  valid_triple inv (Swhile e i) (Fand (Fnot (Fterm e)) inv)
+
 end
 
 

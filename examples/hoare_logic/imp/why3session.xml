@@ -52,11 +52,11 @@
   version="2.19"/>
  <file
   name="../imp.why"
-  verified="true"
+  verified="false"
   expanded="true">
   <theory
    name="Imp"
-   verified="true"
+   verified="false"
    expanded="true">
    <goal
     name="ident_eq_dec"
@@ -399,6 +399,41 @@
      edited="imp_Imp_if_rule_1.v"
      obsolete="false">
      <result status="valid" time="0.51"/>
+    </proof>
+   </goal>
+   <goal
+    name="while_rule"
+    sum="94fbdb08982a09191521520728619166"
+    proved="false"
+    expanded="true"
+    shape="avalid_tripleV1aSwhileV0V2aFandaFnotaFtermV0V1Iavalid_tripleaFandaFtermV0V1V2V1F">
+    <proof
+     prover="coq"
+     timelimit="3"
+     edited="imp_Imp_while_rule_1.v"
+     obsolete="true"><undone/>
+     
+    </proof>
+    <proof
+     prover="cvc3"
+     timelimit="3"
+     edited=""
+     obsolete="false">
+     <result status="timeout" time="3.09"/>
+    </proof>
+    <proof
+     prover="alt-ergo"
+     timelimit="3"
+     edited=""
+     obsolete="false">
+     <result status="timeout" time="3.09"/>
+    </proof>
+    <proof
+     prover="z3"
+     timelimit="3"
+     edited=""
+     obsolete="false">
+     <result status="timeout" time="3.09"/>
     </proof>
    </goal>
   </theory>
