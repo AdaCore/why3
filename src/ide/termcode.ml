@@ -124,6 +124,7 @@ let rec t_shape ~(push:string->'a->'a) c m (acc:'a) t : 'a =
         t_shape ~push c m (push tag_eps acc) f
     | Tquant (q,b) ->
         let vl,_,f1 = t_open_quant b in
+        (* TODO: take triggers into account !! *)
         let m = vl_rename_alpha c m vl in
         let hq = match q with Tforall -> tag_forall | Texists -> tag_exists in
         push hq (t_shape ~push c m acc f1)
