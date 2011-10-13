@@ -111,7 +111,7 @@ LIBGENERATED = src/util/rc.ml src/parser/lexer.ml \
 	       src/driver/driver_parser.mli src/driver/driver_parser.ml \
 	       src/driver/driver_lexer.ml
 
-LIB_UTIL = stdlib exn_printer debug pp loc print_tree \
+LIB_UTIL = stdlib exn_printer debug pp loc print_tree print_number \
 	   cmdline hashweak hashcons util sysutil rc plugin
 
 LIB_CORE = ident ty term pattern decl theory task pretty env trans printer
@@ -133,8 +133,8 @@ LIB_TRANSFORM = simplify_recursive_definition simplify_formula \
 		introduction abstraction close_epsilon lift_epsilon \
 		eval_match instantiate_predicate
 
-LIB_PRINTER = print_number alt_ergo why3printer smtv1 smtv2 \
-		coq tptp simplify gappa cvc3 yices
+LIB_PRINTER = alt_ergo why3printer smtv1 smtv2 coq tptp simplify gappa \
+	      cvc3 yices
 
 LIBMODULES = src/config \
 	      $(addprefix src/util/, $(LIB_UTIL)) \
