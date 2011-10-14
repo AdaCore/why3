@@ -27,16 +27,22 @@ int main(int argc, char *argv[]) {
   int i;
   unsigned ex;
   unsigned long s = 0; // length of args after concat
+  int showtime, hidetime;
   char * p; // command line parameter
   ZeroMemory(&si, sizeof(si));
   si.cb = sizeof(si);
   ZeroMemory(&pi, sizeof(pi));
-  if (argc < 3) {
-    printf("Usage: %s <time limit in seconds> <command>\n", argv[0]);
-    return -1;
+  showtime = argc >= 4 && !strncmp("-s",argv[3],3);
+  hidetime = argc >= 4 && !strncmp("-h",argv[3],3);
+
+  if (argc < 5 || !(showtime || hidetime)) {
+    fprintf(stderr, "usage: %s <time limit in seconds> <virtual memory limit in MiB>\n"
+                    "          <show/hide cpu time: -s|-h> <command> <args>...\n\n"
+                    "Zero sets no limit (keeps the actual limit)\n", argv[0]);
+    return EXIT_FAILURE;
   }
   // concats argv[2..] into a single command line parameter
-  for (i = 2; i < argc; i++)
+  for (i = 4; i < argc; i++)
     s += strlen(argv[i]) + 1;
   // CreateProcess does not allow more than 32767 bytes for command line parameter
   if (s > 32767) {
@@ -49,7 +55,7 @@ int main(int argc, char *argv[]) {
     return -1;
   }
   *p = '\0';
-  for (i = 2; i < argc; i++) {
+  for (i = 4; i < argc; i++) {
     strncat(p, argv[i], strlen(argv[i]));
     if (i < argc - 1) strcat(p, " ");
   }
