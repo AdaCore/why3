@@ -118,7 +118,8 @@ Axiom many_steps_seq : forall (s1:(map ident Z)) (s3:(map ident Z)) (i1:stmt)
 Inductive fmla  :=
   | Fterm : expr -> fmla 
   | Fand : fmla -> fmla -> fmla 
-  | Fnot : fmla -> fmla .
+  | Fnot : fmla -> fmla 
+  | Fimplies : fmla -> fmla -> fmla .
 
 Set Implicit Arguments.
 Fixpoint eval_fmla(s:(map ident Z)) (f:fmla) {struct f}: Prop :=
@@ -126,6 +127,7 @@ Fixpoint eval_fmla(s:(map ident Z)) (f:fmla) {struct f}: Prop :=
   | (Fterm e) => ~ ((eval_expr s e) = 0%Z)
   | (Fand f1 f2) => (eval_fmla s f1) /\ (eval_fmla s f2)
   | (Fnot f1) => ~ (eval_fmla s f1)
+  | (Fimplies f1 f2) => (eval_fmla s f1) -> (eval_fmla s f2)
   end.
 Unset Implicit Arguments.
 
@@ -151,6 +153,7 @@ Fixpoint subst(f:fmla) (x:ident) (t:expr) {struct f}: fmla :=
   | (Fterm e) => (Fterm (subst_expr e x t))
   | (Fand f1 f2) => (Fand (subst f1 x t) (subst f2 x t))
   | (Fnot f1) => (Fnot (subst f1 x t))
+  | (Fimplies f1 f2) => (Fimplies (subst f1 x t) (subst f2 x t))
   end.
 Unset Implicit Arguments.
 
@@ -175,6 +178,12 @@ tauto.
 simpl.
 intros x t.
 rewrite IHf.
+tauto.
+
+simpl.
+intros x t.
+rewrite IHf1.
+rewrite IHf2.
 tauto.
 Qed.
 (* DO NOT EDIT BELOW *)

@@ -49,11 +49,11 @@
  <file
   name="../imp_n.why"
   verified="true"
-  expanded="false">
+  expanded="true">
   <theory
    name="Imp"
    verified="true"
-   expanded="false">
+   expanded="true">
    <goal
     name="ident_eq_dec"
     sum="ca7c4648761db026ea93d61666f0b79a"
@@ -196,7 +196,7 @@
    </goal>
    <goal
     name="eval_subst_expr"
-    sum="432527140383d9ed905a4ef8dab99ce9"
+    sum="9528a4415f2f99046bde6107851e9279"
     proved="true"
     expanded="false"
     shape="ainfix =aeval_exprV0asubst_exprV1V2V3aeval_exprasetV0V2aeval_exprV0V3V1F">
@@ -205,12 +205,12 @@
      timelimit="3"
      edited="imp_n_Imp_eval_subst_expr_1.v"
      obsolete="false">
-     <result status="valid" time="0.46"/>
+     <result status="valid" time="0.59"/>
     </proof>
    </goal>
    <goal
     name="eval_subst"
-    sum="42e8807c0e7de719407e18d985ea40bd"
+    sum="f9958c4b6b55b1609f43dd2ad3432473"
     proved="true"
     expanded="false"
     shape="aeval_fmlaasetV0V2aeval_exprV0V3V1qaeval_fmlaV0asubstV1V2V3F">
@@ -219,12 +219,12 @@
      timelimit="3"
      edited="imp_n_Imp_eval_subst_1.v"
      obsolete="false">
-     <result status="valid" time="0.47"/>
+     <result status="valid" time="0.48"/>
     </proof>
    </goal>
    <goal
     name="skip_rule"
-    sum="7a20cd733f1db8f5c0e57078c7bc6c41"
+    sum="dfc9be1a6c7c1951f0739b5eb00818fa"
     proved="true"
     expanded="false"
     shape="avalid_tripleV0aSskipV0F">
@@ -233,12 +233,12 @@
      timelimit="3"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.24"/>
+     <result status="valid" time="0.36"/>
     </proof>
    </goal>
    <goal
     name="assign_rule"
-    sum="6eb5f67e952a87c570fa064514b7dc4d"
+    sum="2ce35dd2e431c206c4ef4d4353dd9c47"
     proved="true"
     expanded="false"
     shape="avalid_tripleasubstV0V1V2aSassignV1V2V0F">
@@ -247,12 +247,12 @@
      timelimit="3"
      edited="imp_n_Imp_assign_rule_1.v"
      obsolete="false">
-     <result status="valid" time="0.52"/>
+     <result status="valid" time="0.72"/>
     </proof>
    </goal>
    <goal
     name="seq_rule"
-    sum="3a30604cea3dd530ecfdac102f24dbc9"
+    sum="3da8614c2f6127af09be97a426dc327e"
     proved="true"
     expanded="false"
     shape="avalid_tripleV0aSseqV3V4V1Iavalid_tripleV2V4V1Aavalid_tripleV0V3V2F">
@@ -261,12 +261,12 @@
      timelimit="3"
      edited="imp_n_Imp_seq_rule_1.v"
      obsolete="false">
-     <result status="valid" time="0.45"/>
+     <result status="valid" time="0.52"/>
     </proof>
    </goal>
    <goal
     name="if_rule"
-    sum="94f90ecc202136d911b225f3fc4e9971"
+    sum="5e738541b92efb7be1706db09a761442"
     proved="true"
     expanded="false"
     shape="avalid_tripleV1aSifV0V3V4V2Iavalid_tripleaFandV1aFnotaFtermV0V4V2Aavalid_tripleaFandV1aFtermV0V3V2F">
@@ -275,12 +275,12 @@
      timelimit="3"
      edited="imp_n_Imp_if_rule_1.v"
      obsolete="false">
-     <result status="valid" time="0.50"/>
+     <result status="valid" time="0.68"/>
     </proof>
    </goal>
    <goal
     name="while_rule"
-    sum="e06704f2ee07c0300cd55e907e612733"
+    sum="17f0b6240f5cfd179c6cea9bfc294a9d"
     proved="true"
     expanded="false"
     shape="avalid_tripleV1aSwhileV0V2aFandaFnotaFtermV0V1Iavalid_tripleaFandaFtermV0V1V2V1F">
@@ -289,7 +289,28 @@
      timelimit="3"
      edited="imp_n_Imp_while_rule_1.v"
      obsolete="false">
-     <result status="valid" time="0.56"/>
+     <result status="valid" time="0.57"/>
+    </proof>
+   </goal>
+   <goal
+    name="consequence_rule"
+    sum="c6ee564de35ed1dc6ad77dbe593817ba"
+    proved="true"
+    expanded="false"
+    shape="avalid_tripleV1V4V3Iavalid_fmlaaFimpliesV2V3Iavalid_tripleV0V4V2Iavalid_fmlaaFimpliesV1V0F">
+    <proof
+     prover="cvc3"
+     timelimit="3"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.55"/>
+    </proof>
+    <proof
+     prover="z3"
+     timelimit="3"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.05"/>
     </proof>
    </goal>
   </theory>

@@ -149,15 +149,6 @@ lemma steps_non_neg:
   forall s1 s2:state, i1 i2:stmt, n:int.
     many_steps s1 i1 s2 i2 n -> n >= 0
 
-(*
-lemma many_steps_seq_rec:
-  forall s1 s3:state, i i3:stmt.
-    many_steps s1 i s3 i3 -> i3 = Sskip ->
-    forall i1 i2:stmt. i = Sseq i1 i2 ->
-    exists s2:state.
-      many_steps s1 i1 s2 Sskip /\ many_steps s2 i2 s3 Sskip
-*)
-
 lemma many_steps_seq:
   forall s1 s3:state, i1 i2:stmt, n:int.
     many_steps s1 (Sseq i1 i2) s3 Sskip n ->
@@ -173,12 +164,14 @@ type fmla =
   | Fterm expr
   | Fand fmla fmla
   | Fnot fmla
+  | Fimplies fmla fmla
 
 predicate eval_fmla (s:state) (f:fmla) =
   match f with
   | Fterm e -> eval_expr s e <> 0
   | Fand f1 f2 ->  eval_fmla s f1 /\ eval_fmla s f2
   | Fnot f ->  not (eval_fmla s f)
+  | Fimplies f1 f2 ->  eval_fmla s f1 -> eval_fmla s f2
   end
 
 (* substitution *) 
@@ -200,11 +193,14 @@ function subst (f:fmla) (x:ident) (t:expr) : fmla =
   | Fterm e -> Fterm (subst_expr e x t)
   | Fand f1 f2 -> Fand (subst f1 x t) (subst f2 x t)
   | Fnot f -> Fnot (subst f x t)
+  | Fimplies f1 f2 -> Fimplies (subst f1 x t) (subst f2 x t)
   end
 
 lemma eval_subst:
   forall s:state, f:fmla, x:ident, t:expr.
     eval_fmla s (subst f x t) <-> eval_fmla (IdMap.set s x (eval_expr s t)) f
+
+predicate valid_fmla (p:fmla) = forall s:state. eval_fmla s p
 
 (* Hoare triples *)
 
@@ -233,20 +229,17 @@ lemma if_rule:
   valid_triple (Fand p (Fnot (Fterm e))) i2 q ->
   valid_triple p (Sif e i1 i2) q
 
-(*
-lemma while_rule_rec:
-  forall e:expr, inv:fmla, i:stmt.
-  valid_triple (Fand (Fterm e) inv) i inv ->
-  forall s s':state, l skip:stmt.
-    many_steps s l s' skip ->
-    l = (Swhile e i) -> skip = Sskip ->
-    eval_fmla s inv -> eval_fmla s' (Fand (Fnot (Fterm e)) inv)
-*)
-
 lemma while_rule:
   forall e:expr, inv:fmla, i:stmt.
   valid_triple (Fand (Fterm e) inv) i inv ->
   valid_triple inv (Swhile e i) (Fand (Fnot (Fterm e)) inv)
+
+lemma consequence_rule:
+  forall p p' q q':fmla, i:stmt.
+  valid_fmla (Fimplies p' p) ->
+  valid_triple p i q ->
+  valid_fmla (Fimplies q q') ->
+  valid_triple p' i q'
 
 end
 
