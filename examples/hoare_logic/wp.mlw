@@ -1,0 +1,28 @@
+
+module WP
+
+  use import imp_n.Imp
+
+  let rec wp (i:stmt) (q:fmla) =
+    { true }
+    match i with
+    | Sskip -> q
+    | Sseq i1 i2 -> wp i1 (wp i2 q)
+    | Sassign x e -> subst q x e
+    | Sif e i1 i2 ->
+        Fand (Fimplies (Fterm e) (wp i1 q))
+             (Fimplies (Fnot (Fterm e)) (wp i2 q))
+    | Swhile _ _ -> Fterm (Econst 0)
+    end
+    { valid_triple result i q }
+
+end
+
+
+
+(*
+Local Variables:
+compile-command: "why3ide -I . wp.mlw"
+End:
+*)
+

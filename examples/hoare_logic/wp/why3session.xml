@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session SYSTEM "why3session.dtd">
+<why3session
+ name="wp/why3session.xml">
+ <prover
+  id="alt-ergo"
+  name="Alt-Ergo"
+  version="0.93"/>
+ <prover
+  id="coq"
+  name="Coq"
+  version="8.2pl1"/>
+ <prover
+  id="cvc3"
+  name="CVC3"
+  version="2.2"/>
+ <prover
+  id="eprover"
+  name="Eprover"
+  version="1.4 Namring"/>
+ <prover
+  id="gappa"
+  name="Gappa"
+  version="0.15.1"/>
+ <prover
+  id="simplify"
+  name="Simplify"
+  version="1.5.4"/>
+ <prover
+  id="spass"
+  name="Spass"
+  version="3.7"/>
+ <prover
+  id="vampire"
+  name="Vampire"
+  version="0.6"/>
+ <prover
+  id="verit"
+  name="veriT"
+  version="dev"/>
+ <prover
+  id="yices"
+  name="Yices"
+  version="1.0.25"/>
+ <prover
+  id="z3"
+  name="Z3"
+  version="2.19"/>
+ <file
+  name="../wp.mlw"
+  verified="true"
+  expanded="true">
+  <theory
+   name="WP WP"
+   verified="true"
+   expanded="true">
+   <goal
+    name="WP_parameter wp"
+    expl="parameter wp"
+    sum="5bd057f848f72a63b4c3917e9392e870"
+    proved="true"
+    expanded="true"
+    shape="CV0aSskipavalid_tripleV1V0V1aSseqVVavalid_tripleV5V0V1Iavalid_tripleV5V2V4FIavalid_tripleV4V3V1FaSassignVVavalid_tripleasubstV1V6V7V0V1aSifVVVavalid_tripleaFandaFimpliesaFtermV8V11aFimpliesaFnotaFtermV8V12V0V1Iavalid_tripleV12V10V1FIavalid_tripleV11V9V1FaSwhilewwavalid_tripleaFtermaEconstc0V0V1FF">
+    <proof
+     prover="z3"
+     timelimit="3"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.13"/>
+    </proof>
+    <transf
+     name="split_goal"
+     proved="true"
+     expanded="true">
+     <goal
+      name="WP_parameter wp.1"
+      expl="parameter wp"
+      sum="bb82b4da28a75725ff508bb872eb9300"
+      proved="true"
+      expanded="true"
+      shape="CV0aSskipavalid_tripleV1V0V1aSseqVVtaSassignVVtaSifVVVtaSwhilewwtFF">
+      <proof
+       prover="cvc3"
+       timelimit="3"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof
+       prover="alt-ergo"
+       timelimit="3"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof
+       prover="z3"
+       timelimit="3"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter wp.2"
+      expl="parameter wp"
+      sum="9617ec74c86f83cccb6ec913990f6686"
+      proved="true"
+      expanded="true"
+      shape="CV0aSskiptaSseqVVavalid_tripleV5V0V1Iavalid_tripleV5V2V4FIavalid_tripleV4V3V1FaSassignVVtaSifVVVtaSwhilewwtFF">
+      <proof
+       prover="cvc3"
+       timelimit="3"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof
+       prover="alt-ergo"
+       timelimit="3"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="z3"
+       timelimit="3"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.06"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter wp.3"
+      expl="parameter wp"
+      sum="f8a917b7a30a9efc9190b33726d130f7"
+      proved="true"
+      expanded="true"
+      shape="CV0aSskiptaSseqVVtaSassignVVavalid_tripleasubstV1V4V5V0V1aSifVVVtaSwhilewwtFF">
+      <proof
+       prover="cvc3"
+       timelimit="3"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof
+       prover="alt-ergo"
+       timelimit="3"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="z3"
+       timelimit="3"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter wp.4"
+      expl="parameter wp"
+      sum="fb617d6a26606c752274200a34871307"
+      proved="true"
+      expanded="true"
+      shape="CV0aSskiptaSseqVVtaSassignVVtaSifVVVavalid_tripleaFandaFimpliesaFtermV6V9aFimpliesaFnotaFtermV6V10V0V1Iavalid_tripleV10V8V1FIavalid_tripleV9V7V1FaSwhilewwtFF">
+      <proof
+       prover="z3"
+       timelimit="3"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.17"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter wp.5"
+      expl="parameter wp"
+      sum="47f03e3a1f44c5b72c589d56d1baa1b2"
+      proved="true"
+      expanded="true"
+      shape="CV0aSskiptaSseqVVtaSassignVVtaSifVVVtaSwhilewwavalid_tripleaFtermaEconstc0V0V1FF">
+      <proof
+       prover="cvc3"
+       timelimit="3"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.18"/>
+      </proof>
+      <proof
+       prover="alt-ergo"
+       timelimit="3"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+      <proof
+       prover="z3"
+       timelimit="3"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+  </theory>
+ </file>
+</why3session>
