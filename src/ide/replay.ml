@@ -455,7 +455,7 @@ let theory_latex_stat n dir t =
   let name = M.theory_name t in
   let ch = open_out (Filename.concat dir(name^".tex")) in
   let fmt = formatter_of_out_channel ch in
-      fprintf fmt "\\begin{tabular}";
+      fprintf fmt "\\begin{longtable}";
   fprintf fmt "{| l |";
   for i = 0 to (List.length provers) + depth do fprintf fmt "c |" done;
   fprintf fmt "}@.";
@@ -468,6 +468,19 @@ let theory_latex_stat n dir t =
     fprintf fmt "\\hline Proof obligations ";
   List.iter (fun (_, a) -> fprintf fmt "& \\provername{%s} " a) provers;
   fprintf fmt "\\\\ @.";
+  fprintf fmt "\\hline \\endfirsthead @.";
+  fprintf fmt "\\multicolumn{%d}{r}{\\textit{Continued from previous page}} \\\\ @." (List.length provers + 1) ;
+  fprintf fmt "\\hline @.";
+  if (depth > 1) then
+    fprintf fmt "\\hline \\multicolumn{%d}{|c|}{Proof obligations } "  depth
+  else
+    fprintf fmt "\\hline \\multicolumn{%d}{|c|}{Proof obligations } " (depth + 1);
+  List.iter (fun (_, a) -> fprintf fmt "& \\provername{%s} " a) provers;
+  fprintf fmt "\\\\ @.";
+  fprintf fmt "\\hline \\endhead @.";
+  fprintf fmt "\\hline \\multicolumn{%d}{r}{\\textit{Continued on next page}} \\\\ @." (List.length provers);
+  fprintf fmt "\\endfoot \\endlastfoot @.";
+
   let column =
     if n == 1 then
     if depth > 1
@@ -479,7 +492,8 @@ let theory_latex_stat n dir t =
       (List.length provers) +  1
   in
   List.iter (goal_latex_stat n fmt provers 0 depth column 0) (M.goals t);
-  fprintf fmt "\\hline \\end{tabular}@.";
+  fprintf fmt "\\hline \\caption{%s statistics} @." (protect name);
+  fprintf fmt "\\label{%s} \\end{longtable}@." (protect name);
   close_out ch
 
 let file_latex_stat n dir f =
