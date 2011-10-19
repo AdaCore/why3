@@ -296,7 +296,9 @@ let save_status fmt s =
     | Done r -> save_result fmt r
 
 let save_proof_attempt fmt _key a =
-  fprintf fmt "@\n@[<v 1><proof@ prover=\"%s\"@ timelimit=\"%d\"@ edited=\"%s\"@ obsolete=\"%b\">"
+  fprintf fmt
+    "@\n@[<v 1><proof@ prover=\"%s\"@ timelimit=\"%d\"@ edited=\"%s\"@ \
+obsolete=\"%b\">"
     (prover_id a.prover) a.timelimit a.edited_as a.proof_obsolete;
   save_status fmt a.proof_state;
   fprintf fmt "@]@\n</proof>"
@@ -307,7 +309,9 @@ let opt lab fmt = function
 
 let rec save_goal fmt g =
   assert (g.goal_shape <> "");
-  fprintf fmt "@\n@[<v 1><goal@ name=\"%s\"@ %asum=\"%s\"@ proved=\"%b\"@ expanded=\"%b\"@ shape=\"%s\">"
+  fprintf fmt
+    "@\n@[<v 1><goal@ name=\"%s\"@ %asum=\"%s\"@ proved=\"%b\"@ \
+expanded=\"%b\"@ shape=\"%s\">"
     g.goal_name (opt "expl") g.goal_expl g.checksum g.proved  g.goal_expanded
     g.goal_shape;
   Hashtbl.iter (save_proof_attempt fmt) g.external_proofs;
@@ -321,7 +325,8 @@ and save_trans fmt _ t =
   fprintf fmt "@]@\n</transf>"
 
 let save_theory fmt t =
-  fprintf fmt "@\n@[<v 1><theory@ name=\"%s\"@ verified=\"%b\"@ expanded=\"%b\">"
+  fprintf fmt
+    "@\n@[<v 1><theory@ name=\"%s\"@ verified=\"%b\"@ expanded=\"%b\">"
     t.theory_name t.verified t.theory_expanded;
   List.iter (save_goal fmt) t.goals;
   fprintf fmt "@]@\n</theory>"
@@ -402,8 +407,8 @@ let set_proof_state ~obsolete a res =
 
 
 type action =
-  | Action_proof_attempt of bool * int * int * in_channel option * string * Driver.driver *
-    (proof_attempt_status -> unit) * Task.task
+  | Action_proof_attempt of bool * int * int * in_channel option * string *
+      Driver.driver * (proof_attempt_status -> unit) * Task.task
   | Action_delayed of (unit -> unit)
 
 let actions_queue = Queue.create ()
@@ -499,12 +504,14 @@ let idle_handler () =
             begin
               try
                 let pre_call =
-                  Driver.prove_task ?old ~command ~timelimit ~memlimit driver goal
+                  Driver.prove_task
+                    ?old ~command ~timelimit ~memlimit driver goal
                 in
                 Queue.push (callback,pre_call) proof_attempts_queue;
                 run_timeout_handler ()
               with e ->
-                Format.eprintf "@[Exception raise in Session.idle_handler:@ %a@.@]"
+                Format.eprintf "@[Exception raise in Session.idle_handler:@ \
+%a@.@]"
                   Exn_printer.exn_printer e;
                 callback (InternalFailure e)
             end
@@ -770,7 +777,9 @@ let add_theory mfile name th =
          let id = (Task.task_goal t).Decl.pr_name in
          let name = id.Ident.id_string in
          let expl = get_explanation id (Task.task_goal_fmla t) in
-         let goal = raw_add_goal (Parent_theory mth) name expl "" "" (Some t) true in
+         let goal = raw_add_goal
+           (Parent_theory mth) name expl "" "" (Some t)
+true in
          goal :: acc)
       []
       tasks
@@ -1006,7 +1015,8 @@ let associate_subgoals gname old_goals new_goals =
           end
   and try_associate si i sh h opt rem =
     let n = similarity_shape 0 si sh in
-    eprintf "[Merge] try_associate: claiming similarity %d for new shape@\n%s@\nand old shape@\n%s@." n si sh;
+    eprintf "[Merge] try_associate: claiming similarity %d for new \
+shape@\n%s@\nand old shape@\n%s@." n si sh;
     if (match opt with
       | None ->
           eprintf "[Merge] try_associate: no previous claim@.";
@@ -1025,7 +1035,8 @@ let associate_subgoals gname old_goals new_goals =
         end
       else
         begin
-          eprintf "[Merge] try_associate: succeeded to associate new goal@\n%s@\nwith old goal@\n%s@." si sh;
+          eprintf "[Merge] try_associate: succeeded to associate new \
+goal@\n%s@\nwith old goal@\n%s@." si sh;
           associate_goals ~obsolete:true i h;
           true
         end
@@ -1074,12 +1085,14 @@ let associate_subgoals gname old_goals new_goals =
   and try_associate min si i sh h hd rem =
     let n = similarity_shape 0 si sh in
 (*
-    eprintf "[Merge] try_associate: claiming similarity %d for new shape@\n%s@\nand old shape@\n%s@." n si sh;
+    eprintf "[Merge] try_associate: claiming similarity %d for new \
+shape@\n%s@\nand old shape@\n%s@." n si sh;
 *)
     if n < min then
       begin
 (*
-        eprintf "[Merge] try_associate: claiming dropped because similarity lower than min = %d@." min;
+        eprintf "[Merge] try_associate: claiming dropped because similarity \
+lower than min = %d@." min;
 *)
         let (b,rem2) = match_shape min rem in
         if b then
@@ -1090,12 +1103,14 @@ let associate_subgoals gname old_goals new_goals =
     else
       match match_shape n rem with
         | false, rem2 ->
-            eprintf "[Merge] try_associate: claiming dropped because head was consumed by larger similarity@.";
+            eprintf "[Merge] try_associate: claiming dropped because head was \
+consumed by larger similarity@.";
             match_shape min (hd::rem2)
         | true, [] -> assert false
         | true, _::rem2 ->
 (*
-            eprintf "[Merge] try_associate: claiming succeeded (similarity %d) for new shape@\n%s@\nand old shape@\n%s@." n si sh;
+            eprintf "[Merge] try_associate: claiming succeeded \
+(similarity %d) for new shape@\n%s@\nand old shape@\n%s@." n si sh;
 *)
             associate_goals ~obsolete:true i h;
             let (_,rem3) = match_shape min rem2 in
@@ -1439,7 +1454,8 @@ let load_file ~env old_provers f =
         let mf = raw_add_file fn exp in
         mf.theories <-
           List.rev
-          (List.fold_left (load_theory ~env ~old_provers mf) [] f.Xml.elements);
+          (List.fold_left
+             (load_theory ~env ~old_provers mf) [] f.Xml.elements);
         old_provers
     | "prover" ->
         let id = string_attribute "id" f in
@@ -1450,11 +1466,13 @@ let load_file ~env old_provers f =
             let p = Util.Mstr.find id !current_provers in
             if p.prover_name <> name || p.prover_version <> version then
               eprintf
-                "[Warning] Database prover id '%s' = '%s %s' but on this computer '%s' = '%s %s'@."
+                "[Warning] Database prover id '%s' = '%s %s' but on this \
+computer '%s' = '%s %s'@."
                 id name version id p.prover_name p.prover_version
           with Not_found ->
             eprintf
-              "[Warning] Database has prover %s (%s %s) which is not available on this computer@."
+              "[Warning] Database has prover %s (%s %s) which is not \
+available on this computer@."
               id name version;
         end;
         Util.Mstr.add id (name,version) old_provers
@@ -1497,7 +1515,8 @@ let open_session ~allow_obsolete ~env ~config ~init ~notify dir =
 	      false
           | Xml.Parse_error s ->
               Format.eprintf "XML database corrupted, ignored (%s)@." s;
-              (* failwith ("Open session: XML database corrupted (%s)@." ^ s) *)
+              (* failwith
+                 ("Open session: XML database corrupted (%s)@." ^ s) *)
               false
         end
     | _ ->
@@ -1568,7 +1587,8 @@ let rec prover_on_goal ~timelimit p g =
     (fun _ t -> List.iter (prover_on_goal ~timelimit p) t.subgoals)
     g.transformations
 
-let rec prover_on_goal_or_children ~context_unproved_goals_only ~timelimit p g =
+let rec prover_on_goal_or_children
+    ~context_unproved_goals_only ~timelimit p g =
   if not (g.proved && context_unproved_goals_only) then
     begin
       let r = ref true in
@@ -1587,20 +1607,24 @@ let run_prover ~context_unproved_goals_only ~timelimit pr a =
         prover_on_goal_or_children ~context_unproved_goals_only ~timelimit pr g
     | Theory th ->
         List.iter
-          (prover_on_goal_or_children ~context_unproved_goals_only ~timelimit pr)
+          (prover_on_goal_or_children
+             ~context_unproved_goals_only ~timelimit pr)
           th.goals
     | File file ->
         List.iter
           (fun th ->
              List.iter
-               (prover_on_goal_or_children ~context_unproved_goals_only ~timelimit pr)
+               (prover_on_goal_or_children
+                  ~context_unproved_goals_only ~timelimit pr)
                th.goals)
           file.theories
     | Proof_attempt a ->
-        prover_on_goal_or_children ~context_unproved_goals_only ~timelimit pr a.proof_goal
+        prover_on_goal_or_children
+          ~context_unproved_goals_only ~timelimit pr a.proof_goal
     | Transformation tr ->
         List.iter
-          (prover_on_goal_or_children ~context_unproved_goals_only ~timelimit pr)
+          (prover_on_goal_or_children
+             ~context_unproved_goals_only ~timelimit pr)
           tr.subgoals
 
 (**********************************)
@@ -1612,7 +1636,8 @@ let proof_successful a =
     | Done { Call_provers.pr_answer = Call_provers.Valid } -> true
     | _ -> false
 
-let rec replay_on_goal_or_children ~obsolete_only ~context_unproved_goals_only g =
+let rec replay_on_goal_or_children
+    ~obsolete_only ~context_unproved_goals_only g =
   Hashtbl.iter
     (fun _ a ->
        if not obsolete_only || a.proof_obsolete then
@@ -1622,30 +1647,36 @@ let rec replay_on_goal_or_children ~obsolete_only ~context_unproved_goals_only g
   Hashtbl.iter
     (fun _ t ->
        List.iter
-         (replay_on_goal_or_children ~obsolete_only ~context_unproved_goals_only)
+         (replay_on_goal_or_children
+            ~obsolete_only ~context_unproved_goals_only)
          t.subgoals)
     g.transformations
 
 let replay ~obsolete_only ~context_unproved_goals_only a =
   match a with
     | Goal g ->
-        replay_on_goal_or_children ~obsolete_only ~context_unproved_goals_only g
+        replay_on_goal_or_children
+          ~obsolete_only ~context_unproved_goals_only g
     | Theory th ->
         List.iter
-          (replay_on_goal_or_children ~obsolete_only ~context_unproved_goals_only)
+          (replay_on_goal_or_children
+             ~obsolete_only ~context_unproved_goals_only)
           th.goals
     | File file ->
         List.iter
           (fun th ->
              List.iter
-               (replay_on_goal_or_children ~obsolete_only ~context_unproved_goals_only)
+               (replay_on_goal_or_children
+                  ~obsolete_only ~context_unproved_goals_only)
                th.goals)
           file.theories
     | Proof_attempt a ->
-        replay_on_goal_or_children ~obsolete_only ~context_unproved_goals_only a.proof_goal
+        replay_on_goal_or_children
+          ~obsolete_only ~context_unproved_goals_only a.proof_goal
     | Transformation tr ->
         List.iter
-          (replay_on_goal_or_children ~obsolete_only ~context_unproved_goals_only)
+          (replay_on_goal_or_children
+             ~obsolete_only ~context_unproved_goals_only)
           tr.subgoals
 
 (***********************************)
@@ -1728,7 +1759,8 @@ let check_external_proof g a =
                       match a.proof_state with
                         | Done old_res ->
                             if same_result old_res new_res then () else
-                              push_report g p_name (Wrong_result(new_res,old_res))
+                              push_report
+                                g p_name (Wrong_result(new_res,old_res))
                         | _ ->
                             push_report g p_name No_former_result
                     end;
@@ -1811,8 +1843,11 @@ let transformation_on_goal g tr =
               (* let s1 = task_checksum (get_task g) in *)
               (* let s2 = task_checksum task in *)
               (* (\* *)
-              (*   eprintf "Transformation returned only one task. sum before = %s, sum after = %s@." (task_checksum g.task) (task_checksum task); *)
-              (*   eprintf "addresses: %x %x@." (Obj.magic g.task) (Obj.magic task); *)
+              (*   eprintf "Transformation returned only one task.
+                   sum before = %s, sum after = %s@." (task_checksum g.task)
+                   (task_checksum task); *)
+              (*   eprintf "addresses: %x %x@." (Obj.magic g.task)
+                   (Obj.magic task); *)
               (* *\) *)
               (* s1 <> s2 *)
               not (Task.task_equal task (get_task g))
@@ -1944,9 +1979,11 @@ let edit_proof ~default_editor ~project_dir a =
               | s -> s
           in
           (*
-            eprintf "[Editing] goal %s with command %s %s@." g.Decl.pr_name.id_string editor file;
+            eprintf "[Editing] goal %s with command %s %s@."
+            g.Decl.pr_name.id_string editor file;
           *)
-          eprintf "[Editing] goal %s with command %s %s@." (Task.task_goal t).Decl.pr_name.Ident.id_string editor file;
+          eprintf "[Editing] goal %s with command %s %s@."
+            (Task.task_goal t).Decl.pr_name.Ident.id_string editor file;
           schedule_edit_proof ~debug:false ~editor
             ~file
             ~driver
