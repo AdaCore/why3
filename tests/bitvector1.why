@@ -1,9 +1,80 @@
+theory PowerValue
+
+   function pow_of2 (i:int) : int 
+
+   axiom pow_of2_value:   	 
+	pow_of2 0  =   		        1 /\
+	pow_of2 1  =                    2 /\
+	pow_of2 2  =                    4 /\
+	pow_of2 3  =                    8 /\
+	pow_of2 4  =                   16 /\
+	pow_of2 5  =                   32 /\
+	pow_of2 6  =                   64 /\
+	pow_of2 7  =                  128 /\
+	pow_of2 8  =                  256 /\
+	pow_of2 9  =                  512 /\
+	pow_of2 10 =                 1024 /\
+	pow_of2 11 =                 2048 /\
+	pow_of2 12 =                 4096 /\
+	pow_of2 13 =                 8192 /\
+	pow_of2 14 =                16384 /\
+	pow_of2 15 =                32768 /\
+	pow_of2 16 =                65536 /\
+	pow_of2 17 =               131072 /\
+	pow_of2 18 =               262144 /\
+	pow_of2 19 =               524288 /\
+	pow_of2 20 =              1048576 /\
+	pow_of2 21 =              2097152 /\
+	pow_of2 22 =              4194304 /\
+	pow_of2 23 =              8388608 /\
+	pow_of2 24 =             16777216 /\
+	pow_of2 25 =             33554432 /\
+	pow_of2 26 =             67108864 /\
+	pow_of2 27 =            134217728 /\
+	pow_of2 28 =            268435456 /\
+	pow_of2 29 =            536870912 /\
+	pow_of2 30 =           1073741824 /\
+	pow_of2 31 =           2147483648 /\
+	pow_of2 32 =           4294967296 /\
+	pow_of2 33 =           8589934592 /\
+	pow_of2 34 =          17179869184 /\
+	pow_of2 35 =          34359738368 /\
+	pow_of2 36 =          68719476736 /\
+	pow_of2 37 =         137438953472 /\
+	pow_of2 38 =         274877906944 /\
+	pow_of2 39 =         549755813888 /\
+	pow_of2 40 =        1099511627776 /\
+	pow_of2 41 =        2199023255552 /\
+	pow_of2 42 =        4398046511104 /\
+	pow_of2 43 =        8796093022208 /\
+	pow_of2 44 =       17592186044416 /\
+	pow_of2 45 =       35184372088832 /\
+	pow_of2 46 =       70368744177664 /\
+	pow_of2 47 =      140737488355328 /\
+	pow_of2 48 =      281474976710656 /\
+	pow_of2 49 =      562949953421312 /\
+	pow_of2 50 =     1125899906842624 /\
+	pow_of2 51 =     2251799813685248 /\
+	pow_of2 52 =     4503599627370496 /\
+	pow_of2 53 =     9007199254740992 /\
+	pow_of2 54 =    18014398509481984 /\
+	pow_of2 55 =    36028797018963968 /\
+	pow_of2 56 =    72057594037927936 /\
+	pow_of2 57 =   144115188075855872 /\
+	pow_of2 58 =   288230376151711744 /\
+	pow_of2 59 =   576460752303423488 /\
+	pow_of2 60 =  1152921504606846976 /\
+	pow_of2 61 =  2305843009213693952 /\
+	pow_of2 62 =  4611686018427387904 /\
+	pow_of2 63 =  9223372036854775808 
+
+end
 
 theory BitVector
 
   use export bool.Bool
   use import int.Int
-
+  use import PowerValue
   function size : int
 
   type bv
@@ -38,6 +109,21 @@ theory BitVector
   axiom Nth_bw_xor:
     forall v1 v2:bv, n:int. 0 <= n < size ->
       nth (bw_xor v1 v2) n = xorb (nth v1 n) (nth v2 n)
+
+  axiom Nth_bw_xor_v1true:
+    forall v1 v2:bv, n:int. 0 <= n < size /\ nth v1 n = True->
+      nth (bw_xor v1 v2) n = notb (nth v2 n)
+  axiom Nth_bw_xor_v1false:
+    forall v1 v2:bv, n:int. 0 <= n < size /\ nth v1 n = False->
+      nth (bw_xor v1 v2) n = nth v2 n
+
+  axiom Nth_bw_xor_v2true:
+    forall v1 v2:bv, n:int. 0 <= n < size /\ nth v2 n = True->
+      nth (bw_xor v1 v2) n = notb (nth v1 n)
+  axiom Nth_bw_xor_v2false:
+    forall v1 v2:bv, n:int. 0 <= n < size /\ nth v2 n = False->
+      nth (bw_xor v1 v2) n = nth v1 n
+
 
   function bw_not (v : bv) : bv
   axiom Nth_bw_not:
@@ -115,7 +201,7 @@ theory BitVector
     (* (to_nat_sub b j i) returns the non-negative integer whose
        binary repr is b[j..i] *)
 
-  axiom to_nat_sub_zero :
+(*  axiom to_nat_sub_zero :
     forall b:bv, j i:int.
       0 <= i <= j ->
         nth b i = False ->
@@ -131,6 +217,26 @@ theory BitVector
     forall b:bv, j i:int.
       i > j ->
         to_nat_sub b j i = 0
+*)
+  axiom to_nat_sub_zero :
+    forall b:bv, j i:int.
+      0 <= i <= j ->
+        nth b j = False ->
+          to_nat_sub b j i = to_nat_sub b (j-1) i
+
+  axiom to_nat_sub_one :
+    forall b:bv, j i:int.
+      0 <= i <= j ->
+        nth b j = True ->
+          to_nat_sub b j i = (pow_of2 (j-i)) + to_nat_sub b (j-1) i
+  axiom to_nat_sub_high :
+    forall b:bv, j i:int.
+      i > j ->
+        to_nat_sub b j i = 0
+  axiom to_nat_sub_low_true :
+    forall b:bv, j:int.nth b  j= True -> to_nat_sub b j j = 1
+  axiom to_nat_sub_low_false :
+    forall b:bv, j:int.nth b j = False -> to_nat_sub b j j = 0
 
 
   lemma to_nat_sub_footprint: forall b1 b2:bv, j i:int.
@@ -179,10 +285,19 @@ theory BitVector
   axiom nth_from_int_low_odd:
     forall n:int. mod n 2 <> 0 -> nth (from_int n) 0 = True
 
-  axiom nth_from_int_high:
+(*  axiom nth_from_int_high:
      forall n i:int. size>i > 0 -> nth (from_int n) i = nth (from_int (div n 2)) (i-1)
+*)
 
+  axiom nth_from_int_0:	
+     forall i:int. size>i > 0 -> nth (from_int 0) i = False
 
+ 
+  axiom nth_from_int_high_even:	
+     forall n i:int. size>i > 0 /\ mod (div n (pow_of2 i)) 2 = 0-> nth (from_int n) i = False
+
+  axiom nth_from_int_high_odd:
+     forall n i:int. size>i > 0 /\ mod (div n (pow_of2 i)) 2 = 1-> nth (from_int n) i = True
 end
 
 
@@ -223,8 +338,11 @@ end
 theory BV_double
 
   use import BV64
-  use import real.Real
-
+  use import real.RealInfix
+  use import int.Int
+  use import real.Power
+  use import real.FromInt	
+  use import int.Power
   function double_of_bv64 (b:bv) : real
 
   (* TODO: axioms 
@@ -255,9 +373,26 @@ theory BV_double
   function exp (b:bv) : int = BV64.to_nat_sub b 62 52
   function mantissa (b:bv) : int= BV64.to_nat_sub b 51 0
   function sign (b:bv) : bool = BV64.nth b 63
+  
+  function sign_value(s:bool):real
+
+  axiom sign_value_true:
+  	sign_value(True) = 1.0
+
+  axiom sign_value_false:
+  	sign_value(False) = -.1.0
+
 
   axiom zero : forall b:bv.
      exp(b) = 0 /\ mantissa(b) = 0 -> double_of_bv64(b) = 0.0
+
+  axiom sign_of_double_positive:
+     forall b:bv. sign b = True -> double_of_bv64(b) >=. 0.0
+  axiom sign_of_double_negative:
+     forall b:bv. sign b = False -> double_of_bv64(b) <. 0.0
+
+  axiom double_of_bv64_value:
+     forall b:bv. 0 < exp(b) < 2047 -> double_of_bv64(b) =  sign_value(sign(b)) *. (from_int (power 2 ((exp b) - 1023))) *. (from_int (1 + (mantissa b)* (power 2 (1 - size))))
 
   (* TODO *)
 
@@ -272,7 +407,20 @@ theory TestNegAsXOR
   use import int.Int
   use import real.RealInfix
 
+
   function j : bv = from_int 0x8000000000000000
+
+ (* function j':bv = from_int 4607182418800017408*)
+  function j':bv = from_int 7     
+
+  lemma to_nat_sub_j': (to_nat_sub j' 4 0) = 7
+
+
+(*  lemma double_value_of_1: double_of_bv64(j') = 1.0
+*)
+  lemma mantissa_of_j: mantissa(j) = 0
+  lemma exp_of_j: exp(j) = 0
+  lemma int_of_bv: double_of_bv64(j) = 0.0
 
   lemma Nth_j: forall i:int. 0 <= i <= 62 -> nth j i = False
 
@@ -283,8 +431,12 @@ theory TestNegAsXOR
   lemma MainResultZero : forall x:bv. 0 = exp(x) /\ mantissa(x) = 0 ->
      double_of_bv64 (bw_xor x j) = -. double_of_bv64 x
 
+  lemma MainResultxor : forall x:bv. forall i:int. 0 <exp(x) < 2047 /\ 0<=i<size-1->
+     nth (bw_xor x j) i = nth x i
+
   lemma MainResult : forall x:bv. 0 < exp(x) < 2047 ->
      double_of_bv64 (bw_xor x j) = -. double_of_bv64 x
+
 
 end
 
@@ -429,6 +581,6 @@ end
 
 (*
 Local Variables:
-compile-command: "why3ide bitvector.why"
+compile-command: "why3ide bitvector1.why"
 End:
 *)
