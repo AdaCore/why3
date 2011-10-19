@@ -218,6 +218,7 @@ theory BitVector
       i > j ->
         to_nat_sub b j i = 0
 *)
+
   axiom to_nat_sub_zero :
     forall b:bv, j i:int.
       0 <= i <= j ->
@@ -229,15 +230,27 @@ theory BitVector
       0 <= i <= j ->
         nth b j = True ->
           to_nat_sub b j i = (pow_of2 (j-i)) + to_nat_sub b (j-1) i
+
   axiom to_nat_sub_high :
     forall b:bv, j i:int.
       i > j ->
         to_nat_sub b j i = 0
-  axiom to_nat_sub_low_true :
-    forall b:bv, j:int.nth b  j= True -> to_nat_sub b j j = 1
-  axiom to_nat_sub_low_false :
+
+  lemma to_nat_sub_low_true :
+    forall b:bv, j:int.nth b j = True -> to_nat_sub b j j = 1
+
+  lemma to_nat_sub_low_false :
     forall b:bv, j:int.nth b j = False -> to_nat_sub b j j = 0
 
+  lemma to_nat_of_zero:
+    forall b:bv, i j:int.
+      (forall k:int. j >= k >= i -> nth b k = False) ->
+      to_nat_sub b j i = 0
+
+  lemma to_nat_of_one:
+    forall b:bv, i j:int.
+      (forall k:int. j >= k >= i -> nth b k = True) ->
+      to_nat_sub b j i = pow_of2 (j-i+1) - 1
 
   lemma to_nat_sub_footprint: forall b1 b2:bv, j i:int.
     (forall k:int. i <= k <= j -> nth b1 k = nth b2 k) ->
@@ -271,33 +284,31 @@ theory BitVector
 
   function to_int (b:bv) : int = to_int_aux b 0
 
-
-
   (* (from_uint n) returns the bitvector representing the non-negative
      integer n on size bits. *)
   function from_int (n:int) : bv
 
   use import int.EuclideanDivision
 
-  axiom nth_from_int_low_even:
-    forall n:int. mod n 2 = 0 -> nth (from_int n) 0 = False
-
-  axiom nth_from_int_low_odd:
-    forall n:int. mod n 2 <> 0 -> nth (from_int n) 0 = True
-
 (*  axiom nth_from_int_high:
      forall n i:int. size>i > 0 -> nth (from_int n) i = nth (from_int (div n 2)) (i-1)
 *)
 
-  axiom nth_from_int_0:	
-     forall i:int. size>i > 0 -> nth (from_int 0) i = False
-
- 
-  axiom nth_from_int_high_even:	
-     forall n i:int. size>i > 0 /\ mod (div n (pow_of2 i)) 2 = 0-> nth (from_int n) i = False
+  axiom nth_from_int_high_even:
+     forall n i:int. size > i >= 0 /\ mod (div n (pow_of2 i)) 2 = 0 -> nth (from_int n) i = False
 
   axiom nth_from_int_high_odd:
-     forall n i:int. size>i > 0 /\ mod (div n (pow_of2 i)) 2 = 1-> nth (from_int n) i = True
+     forall n i:int. size > i >= 0 /\ mod (div n (pow_of2 i)) 2 <> 0 -> nth (from_int n) i = True
+
+  lemma nth_from_int_low_even:
+    forall n:int. mod n 2 = 0 -> nth (from_int n) 0 = False
+
+  lemma nth_from_int_low_odd:
+    forall n:int. mod n 2 <> 0 -> nth (from_int n) 0 = True
+
+  lemma nth_from_int_0:
+     forall i:int. size > i >= 0 -> nth (from_int 0) i = False
+
 end
 
 
@@ -315,6 +326,16 @@ theory BV64
   function size : int = 64
 
   clone export BitVector with function size = size
+
+end
+
+theory TestNatSub
+
+  use import BV64
+
+  function b:bv = from_int 7
+
+  lemma to_nat_sub_b: (to_nat_sub b 4 0) = 7
 
 end
 
@@ -341,8 +362,7 @@ theory BV_double
   use import real.RealInfix
   use import int.Int
   use import real.Power
-  use import real.FromInt	
-  use import int.Power
+  use import real.FromInt
   function double_of_bv64 (b:bv) : real
 
   (* TODO: axioms 
@@ -373,56 +393,77 @@ theory BV_double
   function exp (b:bv) : int = BV64.to_nat_sub b 62 52
   function mantissa (b:bv) : int= BV64.to_nat_sub b 51 0
   function sign (b:bv) : bool = BV64.nth b 63
-  
+
   function sign_value(s:bool):real
 
   axiom sign_value_true:
-  	sign_value(True) = 1.0
+  	sign_value(False) = 1.0
 
   axiom sign_value_false:
-  	sign_value(False) = -.1.0
-
+  	sign_value(True) = -.1.0
 
   axiom zero : forall b:bv.
      exp(b) = 0 /\ mantissa(b) = 0 -> double_of_bv64(b) = 0.0
 
   axiom sign_of_double_positive:
-     forall b:bv. sign b = True -> double_of_bv64(b) >=. 0.0
+     forall b:bv. sign b = False -> double_of_bv64(b) >=. 0.0
   axiom sign_of_double_negative:
-     forall b:bv. sign b = False -> double_of_bv64(b) <. 0.0
+     forall b:bv. sign b = True -> double_of_bv64(b) <=. 0.0
 
   axiom double_of_bv64_value:
-     forall b:bv. 0 < exp(b) < 2047 -> double_of_bv64(b) =  sign_value(sign(b)) *. (from_int (power 2 ((exp b) - 1023))) *. (from_int (1 + (mantissa b)* (power 2 (1 - size))))
+     forall b:bv. 0 < exp(b) < 2047 ->
+       double_of_bv64(b) =  sign_value(sign(b)) *.
+                            (pow 2.0 (from_int ((exp b) - 1023))) *.
+                            (1.0 +. (from_int (mantissa b)) *. (pow 2.0 (-.52.0)))
 
   (* TODO *)
+
+end
+
+theory TestDouble
+
+  use import BV64
+  use import BV_double
+  use import int.Int
+
+  function one:bv = from_int 4607182418800017408 (* 1.0 *)
+
+  lemma nth_one1: forall i:int. 0 <= i <= 51 -> nth one i = False
+  lemma nth_one2: forall i:int. 52 <= i <= 61 -> nth one i = True
+  lemma nth_one3: forall i:int. 62 <= i <= 63 -> nth one i = False
+
+  lemma sign_one: sign(one) = False
+  lemma exp_one: exp(one) = 1023
+  lemma mantissa_one: mantissa(one) = 0
+
+  lemma double_value_of_1: double_of_bv64(one) = 1.0
 
 end
 
 
 theory TestNegAsXOR
 
-
   use import BV64
   use import BV_double
   use import int.Int
+  use import bool.Bool
   use import real.RealInfix
-
 
   function j : bv = from_int 0x8000000000000000
 
- (* function j':bv = from_int 4607182418800017408*)
-  function j':bv = from_int 7     
+  lemma Nth_j: forall i:int. 0 <= i <= 62 -> nth j i = False
 
-  lemma to_nat_sub_j': (to_nat_sub j' 4 0) = 7
-
-
-(*  lemma double_value_of_1: double_of_bv64(j') = 1.0
-*)
+  lemma sign_of_j: sign(j) = True
   lemma mantissa_of_j: mantissa(j) = 0
   lemma exp_of_j: exp(j) = 0
   lemma int_of_bv: double_of_bv64(j) = 0.0
 
-  lemma Nth_j: forall i:int. 0 <= i <= 62 -> nth j i = False
+  lemma MainResultBits : forall x:bv. forall i:int. 0 <= i < 63 ->
+     nth (bw_xor x j) i = nth x i
+
+  lemma MainResultSign : forall x:bv. nth (bw_xor x j) 63 = notb (nth x 63)
+
+  lemma Sign_of_xor_j : forall x:bv. sign(bw_xor x j) = notb (sign x)
 
   lemma Exp_of_xor_j : forall x:bv. exp(bw_xor x j) = exp(x)
 
@@ -430,9 +471,6 @@ theory TestNegAsXOR
 
   lemma MainResultZero : forall x:bv. 0 = exp(x) /\ mantissa(x) = 0 ->
      double_of_bv64 (bw_xor x j) = -. double_of_bv64 x
-
-  lemma MainResultxor : forall x:bv. forall i:int. 0 <exp(x) < 2047 /\ 0<=i<size-1->
-     nth (bw_xor x j) i = nth x i
 
   lemma MainResult : forall x:bv. 0 < exp(x) < 2047 ->
      double_of_bv64 (bw_xor x j) = -. double_of_bv64 x
@@ -445,9 +483,12 @@ theory TestDoubleOfInt
   use BV32
   use BV64
   use BV32_64
+  use import bool.Bool
+  use import PowerValue
   use import BV_double
-  use import real.Real
+  use import real.RealInfix
   use import real.FromInt
+  use import real.Power
 
   function j : BV32.bv = BV32.from_int 0x43300000
 
@@ -455,16 +496,23 @@ theory TestDoubleOfInt
 
   function const : BV64.bv = BV32_64.concat j j'
 
+  lemma sign_const: sign(const) = False
+  lemma exp_const: exp(const) = 1075
+  lemma mantissa_const: mantissa(const) = pow_of2 31
+
   function const_as_double : real = double_of_bv64 const
 
   clone import int.Exponentiation with type t = real
 
-  lemma L: const_as_double = power 2.0 52 + power 2.0 31
+  lemma const_value0: const_as_double = 
+    pow 2.0 (1075.0 -. 1023.0) *. (1.0 +. 2147483648.0 *. pow 2.0 (-.52.0))
+
+  lemma const_value: const_as_double = pow 2.0 52.0 +. pow 2.0 31.0
 
   function double_of_int32 (i:int) : real =
      let var = BV32_64.concat j (BV32.bw_xor j' (BV32.from_int i)) in
      let v = double_of_bv64 var in
-     v - const_as_double
+     v -. const_as_double
 
   lemma MainResult: forall i:int. double_of_int32 i = from_int i
 
