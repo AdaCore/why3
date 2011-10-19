@@ -290,25 +290,22 @@ let file_statistics (files,n,m) f =
   ((f,ths,n1,m1)::files,n+n1,m+m1)
 
 let print_statistics files =
-  List.iter
-    (fun (f,ths,n,m) ->
-       if n<m then
-         begin
-           printf "   +--file %s: %d/%d@." f.M.file_name n m;
-           List.iter
-             (fun (th,goals,n,m) ->
-                if n<m then
-                  begin
-                    printf "      +--theory %s: %d/%d@."
-                      (M.theory_name th) n m;
-                    List.iter
-                      (fun g ->
-                         printf "         +--goal %s not proved@." (M.goal_name g))
-                      (List.rev goals)
-                  end)
-             (List.rev ths)
-         end)
-    (List.rev files)
+  let print_goal g =
+      printf "         +--goal %s not proved@." (M.goal_name g)
+  in
+  let print_theory (th,goals,n,m) =
+    if n<m then begin
+      printf "      +--theory %s: %d/%d@." (M.theory_name th) n m;
+      List.iter print_goal (List.rev goals)
+    end
+  in
+  let print_file (f,ths,n,m) =
+    if n<m then begin
+      printf "   +--file %s: %d/%d@." f.M.file_name n m;
+      List.iter print_theory (List.rev ths)
+    end
+  in
+  List.iter print_file (List.rev files)
 
 (* Statistics in LaTeX*)
 
@@ -316,7 +313,8 @@ let rec transf_depth tr =
   List.fold_left (fun depth g -> max depth (goal_depth g)) 0 (tr.M.subgoals)
 and goal_depth g =
   Hashtbl.fold
-    (fun _st tr depth -> max depth (1 + transf_depth tr)) (M.transformations g) 0
+    (fun _st tr depth -> max depth (1 + transf_depth tr))
+    (M.transformations g) 0
 
 let theory_depth t =
   List.fold_left (fun depth g -> max depth (goal_depth g)) 0 (M.goals t)
@@ -331,7 +329,8 @@ let rec provers_latex_stats provers g =
 
 let prover_name a =
   match a with
-      M.Detected_prover d -> d.Session.prover_name ^ " " ^ d.Session.prover_version
+      M.Detected_prover d ->
+        d.Session.prover_name ^ " " ^ d.Session.prover_version
     | M.Undetected_prover s -> s
 
 let protect s =
@@ -367,20 +366,27 @@ let rec goal_latex_stat n fmt prov depth depth_max column subgoal g =
 	  if subgoal > 0 then
 	    begin
 	      if(depth < depth_max)  then
-		for i = 1 to depth do fprintf fmt "\\explanation{%s}& \\explanation{%s}" " " " "done
+		for i = 1 to depth do
+                  fprintf fmt "\\explanation{%s}& \\explanation{%s}" " " " "
+                done
 	      else
-		for i = 1 to depth - 1 do fprintf fmt "\\explanation{%s}& \\explanation{%s}" " " " " done
+		for i = 1 to depth - 1 do
+                  fprintf fmt "\\explanation{%s}& \\explanation{%s}" " " " "
+                done
 	    end
 	  else
 	    if(depth < depth_max) then
-	      if depth > 0 then fprintf fmt "\\explanation{%s}& \\explanation{%s}" " " " "
+	      if depth > 0 then
+                fprintf fmt "\\explanation{%s}& \\explanation{%s}" " " " "
 	end
       else
 	begin
 	  if subgoal > 0  then
-	    for i = 1 to depth  do fprintf fmt "\\explanation{%s}& \\explanation{%s}" " " " " done
+	    for i = 1 to depth  do
+              fprintf fmt "\\explanation{%s}& \\explanation{%s}" " " " " done
 	  else
-	    if depth > 0 then fprintf fmt "\\explanation{%s}& \\explanation{%s}" " " " "
+	    if depth > 0 then
+              fprintf fmt "\\explanation{%s}& \\explanation{%s}" " " " "
 	end
     end
   else
@@ -400,15 +406,19 @@ let rec goal_latex_stat n fmt prov depth depth_max column subgoal g =
 	  if depth_max <= 1 then
 	    begin
 	      if depth > 0 then
-		for i = depth to (depth_max - depth) do fprintf fmt "& \\explanation{%s}" " " done
+		for i = depth to (depth_max - depth) do
+                  fprintf fmt "& \\explanation{%s}" " " done
 	      else
-		for i = depth to (depth_max - depth - 1) do fprintf fmt "& \\explanation{%s}" " " done
+		for i = depth to (depth_max - depth - 1) do
+                  fprintf fmt "& \\explanation{%s}" " " done
 	    end
 	  else
 	      if depth > 0 then
-		for i = depth to (depth_max - depth - 1) do fprintf fmt "& \\explanation{%s}" " " done
+		for i = depth to (depth_max - depth - 1) do
+                  fprintf fmt "& \\explanation{%s}" " " done
 	      else
-		for i = depth to (depth_max - depth - 2) do fprintf fmt "& \\explanation{%s}" " " done
+		for i = depth to (depth_max - depth - 2) do
+                  fprintf fmt "& \\explanation{%s}" " " done
 	end;
       List.iter (fun (p, _pr) ->
 	try
@@ -418,7 +428,8 @@ let rec goal_latex_stat n fmt prov depth depth_max column subgoal g =
 	      Session.Done res ->
 		begin
 		  match res.Call_provers.pr_answer with
-		      Call_provers.Valid -> fprintf fmt "& \\valid{%.2f} " res.Call_provers.pr_time
+		      Call_provers.Valid ->
+                        fprintf fmt "& \\valid{%.2f} " res.Call_provers.pr_time
 		    | Call_provers.Invalid -> fprintf fmt "& \\invalid "
 		    | Call_provers.Timeout -> fprintf fmt "& \\timeout "
 		    | Call_provers.Unknown _s -> fprintf fmt "& \\unknown "
@@ -430,25 +441,27 @@ let rec goal_latex_stat n fmt prov depth depth_max column subgoal g =
     end;
   let tr = M.transformations g in
   if Hashtbl.length tr > 0 then
-  if n == 2 then 
+  if n == 2 then
     begin
-      if (Hashtbl.length proofs == 0) then 
+      if (Hashtbl.length proofs == 0) then
 	fprintf fmt "& \\multicolumn{%d}{|c|}{}\\\\ @." (List.length prov)
     end
   else
-      if Hashtbl.length proofs > 0 then 
+      if Hashtbl.length proofs > 0 then
 	  fprintf fmt "\\cline{%d-%d} @." (depth + 2) column;
   Hashtbl.iter (fun _st tr ->
     let goals = tr.M.subgoals in
     let _ = List.fold_left (fun subgoal g ->
-      goal_latex_stat n fmt prov (depth + 1) depth_max column (subgoal) g; subgoal + 1) 0 goals in
+      goal_latex_stat n fmt prov (depth + 1) depth_max column (subgoal) g;
+      subgoal + 1) 0 goals in
     () ) tr
 
 
 let theory_latex_stat n dir t =
   let provers = Hashtbl.create 9 in
   List.iter (provers_latex_stats provers) (M.goals t);
-  let provers = Hashtbl.fold (fun p pr acc -> (p, prover_name pr) :: acc) provers [] in
+  let provers = Hashtbl.fold (fun p pr acc -> (p, prover_name pr) :: acc)
+    provers [] in
   let provers =
     List.sort (fun (_p1, n1) (_p2, n2) -> String.compare n1 n2) provers in
   let depth = theory_depth  t in
@@ -463,22 +476,26 @@ let theory_latex_stat n dir t =
     if (depth > 1) then
       fprintf fmt "\\hline \\multicolumn{%d}{|c|}{Proof obligations } "  depth
       else
-      fprintf fmt "\\hline \\multicolumn{%d}{|c|}{Proof obligations } " (depth + 1)
+      fprintf fmt "\\hline \\multicolumn{%d}{|c|}{Proof obligations } "
+        (depth + 1)
   else
     fprintf fmt "\\hline Proof obligations ";
   List.iter (fun (_, a) -> fprintf fmt "& \\provername{%s} " a) provers;
   fprintf fmt "\\\\ @.";
   fprintf fmt "\\hline \\endfirsthead @.";
-  fprintf fmt "\\multicolumn{%d}{r}{\\textit{Continued from previous page}} \\\\ @." (List.length provers + 1) ;
+  fprintf fmt "\\multicolumn{%d}{r}{\\textit{Continued from previous page}} \
+\\\\ @." (List.length provers + 1) ;
   fprintf fmt "\\hline @.";
   if (depth > 1) then
     fprintf fmt "\\hline \\multicolumn{%d}{|c|}{Proof obligations } "  depth
   else
-    fprintf fmt "\\hline \\multicolumn{%d}{|c|}{Proof obligations } " (depth + 1);
+    fprintf fmt "\\hline \\multicolumn{%d}{|c|}{Proof obligations } "
+      (depth + 1);
   List.iter (fun (_, a) -> fprintf fmt "& \\provername{%s} " a) provers;
   fprintf fmt "\\\\ @.";
   fprintf fmt "\\hline \\endhead @.";
-  fprintf fmt "\\hline \\multicolumn{%d}{r}{\\textit{Continued on next page}} \\\\ @." (List.length provers);
+  fprintf fmt "\\hline \\multicolumn{%d}{r}{\\textit{Continued on next page}} \
+\\\\ @." (List.length provers);
   fprintf fmt "\\endfoot \\endlastfoot @.";
 
   let column =
@@ -541,12 +558,15 @@ let () =
         | [] ->
             if found_obs then
               if n=m then
-                printf " %d/%d (replay OK, all proved: obsolete session updated)@." n m
+                printf " %d/%d (replay OK, all proved: obsolete session \
+updated)@." n m
               else
                 if !opt_force then
-                  printf " %d/%d (replay OK, but not all proved: obsolete session updated since -force was given)@." n m
+                  printf " %d/%d (replay OK, but not all proved: obsolete \
+session updated since -force was given)@." n m
                 else
-                  printf " %d/%d (replay OK, but not all proved: obsolete session NOT updated)@." n m
+                  printf " %d/%d (replay OK, but not all proved: obsolete \
+session NOT updated)@." n m
             else
               printf " %d/%d@." n m ;
             if !opt_stats && n<m then print_statistics files;
