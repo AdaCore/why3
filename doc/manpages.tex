@@ -487,9 +487,12 @@ not and you have to use the IDE to update it.
 \begin{itemize}
 \item The exit code is 0 if no difference was detected, 1 if there
   was. Other exit codes mean some failure in running the replay.
-\item option \texttt{-s}: suppresses the output of the final tree view
-\item option \texttt{-I \textsl{<path>}}: add \textsl{<path>} to the loadpath
-\item option \texttt{-force}: force writing a new session file even if some proofs did not replay correctly.
+\item option \texttt{-s}: suppresses the output of the final tree view.
+\item option \texttt{-I \textsl{<path>}}: add \textsl{<path>} to the loadpath.
+\item option \texttt{-force}: force writing a new session file even if
+  some proofs did not replay correctly.
+\item option \texttt{-smoke-detector \{none|top|deep\}} try to detect
+  if the context is self-contradicting.
 \item option \texttt{-latex \textsl{<dir>}}: produce a summary of
   the replay under the form of a tabular environment in LaTeX, one
   tabular for each theory, one per file, in directory \texttt{\textsl{<dir>}}.
@@ -498,6 +501,46 @@ not and you have to use the IDE to update it.
 % \item option \texttt{-html \textsl{<file.html>}}: produce a summary of
 %   the replay in HTML syntax.
 \end{itemize}
+
+\paragraph{Smoke Detector}
+ The smoke detector try to detect if the context is self-contradicting
+ and, thus, that anything can be proved in this context. The smoke
+ detector can't be run on outdated session and doesn't modify the session.
+ It has three possible configurations :
+ \begin{itemize}
+ \item \texttt{none} : don't run the smoke detector
+ \item \texttt{top} : The negation of each proved goals
+   tries to be proved with the same timeout and the same prover which
+   prove the goal.
+\begin{verbatim}
+[ ... ]
+
+Goal G : forall x:int. q x -> (p1 x \/ p2 x)
+\end{verbatim}
+becomes
+\begin{verbatim}
+[ ... ]
+
+Goal G : ~ (forall x:int. q x -> (p1 x \/ p2 x))
+\end{verbatim}
+ \item \texttt{deep} : The same technique as \texttt{top} but the
+   negation is pushed under the universal quantification (without
+   changing them) and under the implication. The previous example becomes
+\begin{verbatim}
+[ ... ]
+
+Goal G : forall x:int. q x /\ ~ (p1 x \/ p2 x)
+\end{verbatim}
+ \end{itemize}
+
+The name of the goals which triggered the smoke detector are printed :
+\begin{verbatim}
+   goal 'G', prover 'Alt-Ergo 0.93.1': Smoke detected!!!
+\end{verbatim}
+Moreover \texttt{Smoke detected} (exit code 1) is printed at the end if the smoke
+detector has been trigged, or \texttt{No smoke detected} (exit code 0)
+otherwise.
+
 
 \paragraph{Customizing LaTeX output}
 

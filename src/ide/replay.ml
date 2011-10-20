@@ -29,6 +29,13 @@ let opt_latex = ref ""
 let opt_latex2 = ref ""
 let opt_html = ref ""
 let opt_force = ref false
+let opt_smoke = ref Session.SD_None
+
+let set_opt_smoke = function
+  | "none" -> opt_smoke := Session.SD_None
+  | "top" ->  opt_smoke := Session.SD_Top
+  | "deep" ->  opt_smoke := Session.SD_Deep
+  | _ -> assert false
 
 let spec = Arg.align [
   ("-I",
@@ -37,6 +44,9 @@ let spec = Arg.align [
   ("-force",
    Arg.Set opt_force,
    " enforce saving of session even if replay failed") ;
+  ("-smoke-detector",
+   Arg.Symbol (["none";"top";"deep"],set_opt_smoke),
+   " try to detect if the context is self-contradicting") ;
   ("-s",
    Arg.Clear opt_stats,
    " do not print statistics") ;
@@ -73,6 +83,12 @@ let () =
   if !opt_version then begin
     Format.printf "%s@." version_msg;
     exit 0
+  end
+
+let () =
+  if !opt_smoke <> Session.SD_None && !opt_force then begin
+    Format.printf "You can't force when detecting smoke@.";
+    exit 1
   end
 
 let fname = match !file with
@@ -524,8 +540,13 @@ let print_report (g,p,r) =
   printf "   goal '%s', prover '%s': " g p;
   match r with
   | M.Wrong_result(new_res,old_res) ->
-      printf "%a instead of %a@."
-        print_result new_res print_result old_res
+    begin match !opt_smoke with
+      | Session.SD_None ->
+        printf "%a instead of %a@."
+          print_result new_res print_result old_res
+      | _ ->
+        printf "Smoke detected!!!@."
+    end
   | M.No_former_result ->
       printf "no former result available@."
   | M.CallFailed msg ->
@@ -533,22 +554,7 @@ let print_report (g,p,r) =
   | M.Prover_not_installed ->
       printf "not installed@."
 
-let () =
-  try
-    eprintf "Opening session...@?";
-    let found_obs =
-      M.open_session ~allow_obsolete:true
-        ~env ~config ~init ~notify project_dir
-    in
-    if found_obs then
-      eprintf "[Warning] session is obsolete@.";
-    M.maximum_running_proofs :=
-      Whyconf.running_provers_max (Whyconf.get_main config);
-    eprintf " done@.";
-    if !opt_latex <> "" then print_latex_statistics 1 !opt_latex
-    else
-    if !opt_latex2 <> "" then print_latex_statistics 2 !opt_latex2
-    else
+let add_to_check_no_smoke found_obs =
       let callback report =
         eprintf "@.";
 	let files,n,m =
@@ -584,9 +590,56 @@ session NOT updated)@." n m
             eprintf "Replay failed.@.";
             exit 1
     in
-    M.check_all ~callback;
-    try main_loop ()
-    with Exit -> eprintf "main replayer exited unexpectedly@."
+    M.check_all ~callback
+
+let add_to_check_smoke () =
+  let callback report =
+    eprintf "@.";
+    match report with
+      | [] ->
+        eprintf "No smoke detected.@.";
+        exit 0
+      | _ ->
+        List.iter print_report report;
+        eprintf "Smoke detected.@.";
+        exit 1
+  in
+  M.check_all ~callback
+
+let add_to_check found_obs =
+  match !opt_smoke with
+    | Session.SD_None -> add_to_check_no_smoke found_obs;
+    | _ -> assert (not found_obs); add_to_check_smoke ()
+
+
+let () =
+  try
+    eprintf "Opening session...@?";
+    let found_obs =
+      M.open_session ~allow_obsolete:true
+        ~env ~config ~init ~notify project_dir
+    in
+    if found_obs then begin
+      if !opt_smoke <> Session.SD_None then begin
+        eprintf
+          "[Error] I can't run the smoke detector if the session is obsolete";
+        exit 1
+      end;
+      eprintf "[Warning] session is obsolete@.";
+    end;
+    M.maximum_running_proofs :=
+      Whyconf.running_provers_max (Whyconf.get_main config);
+    M.smoke_detector := !opt_smoke;
+    eprintf " done@.";
+    if !opt_latex <> "" then print_latex_statistics 1 !opt_latex
+    else
+    if !opt_latex2 <> "" then print_latex_statistics 2 !opt_latex2
+    else
+      begin
+        add_to_check found_obs;
+        try main_loop ()
+        with Exit -> eprintf "main replayer exited unexpectedly@."
+      end
   with
     | M.OutdatedSession ->
         eprintf "The session database '%s' is outdated, cannot replay@."

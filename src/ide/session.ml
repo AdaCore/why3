@@ -104,6 +104,11 @@ type proof_attempt_status =
   | InternalFailure of exn (** external proof aborted by internal error *)
   | Unedited (** interactive prover yet no proof script *)
 
+type smoke_detector =
+  | SD_None (** no smoke detector *)
+  | SD_Top  (** smoke_detector *)
+  | SD_Deep (** smoke_detector_deep *)
+
 (***************************)
 (*     main functor        *)
 (***************************)
@@ -224,6 +229,8 @@ let goal_proved g = g.proved
 let transformations g = g.transformations
 let external_proofs g = g.external_proofs
 let goal_expanded g = g.goal_expanded
+
+let smoke_detector = ref SD_None
 
 let get_task g =
   match g.task with
@@ -1733,7 +1740,8 @@ let same_result r1 r2 =
     | Call_provers.Failure _, Call_provers.Failure _-> true
     | _ -> false
 
-let check_external_proof g a =
+(** When no smoke *)
+let check_external_proof_not_smoked g a =
   (* check that the state is not Scheduled or Running *)
   if running a then ()
   else
@@ -1780,6 +1788,62 @@ let check_external_proof g a =
             ~callback
             (get_task g)
     end
+
+(** When some smoke method is used *)
+let check_external_proof_smoked g a =
+  (* check that the state is not Scheduled or Running *)
+  match a.proof_state with
+    | Done ({Call_provers.pr_answer = Call_provers.Valid } as old_res)
+        when not (running a)->
+      begin
+        incr proofs_to_do;
+        match a.prover with
+          | Undetected_prover s ->
+            push_report g s Prover_not_installed;
+            incr proofs_done;
+            set_proof_state ~obsolete:false a Undone
+          | Detected_prover p ->
+            let p_name = p.prover_name ^ " " ^ p.prover_version in
+            let callback result =
+              match result with
+                | Scheduled | Running | Interrupted -> ()
+                | Undone | Unedited -> assert false
+                | InternalFailure msg ->
+                  push_report g p_name (CallFailed msg);
+                  incr proofs_done;
+                  set_proof_state ~obsolete:false a result
+                | Done new_res ->
+                  begin
+                    match new_res.Call_provers.pr_answer with
+                      | Call_provers.Valid ->
+                        push_report g p_name (Wrong_result(new_res,old_res))
+                      | _ -> ()
+                  end;
+                  incr proofs_done;
+                  set_proof_state ~obsolete:false a result
+            in
+            let old = if a.edited_as = "" then None else
+                begin
+                  let f = Filename.concat !project_dir a.edited_as in
+                  (Some (open_in f))
+                end
+            in
+            let task =  match !smoke_detector with
+              | SD_None -> assert false
+              | SD_Top -> Trans.apply Smoke_detector.top (get_task g)
+              | SD_Deep -> Trans.apply Smoke_detector.deep (get_task g) in
+            schedule_proof_attempt
+              ~debug:false ~timelimit:a.timelimit ~memlimit:0
+              ?old ~command:p.command ~driver:p.driver
+              ~callback
+              task
+      end
+    | _ -> ()
+
+let check_external_proof g a =
+  match !smoke_detector with
+    | SD_None -> check_external_proof_not_smoked g a
+    | _ -> check_external_proof_smoked g a
 
 let rec check_goal_and_children g =
   Hashtbl.iter (fun _ a -> check_external_proof g a) g.external_proofs;
