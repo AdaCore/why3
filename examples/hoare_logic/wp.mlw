@@ -38,7 +38,7 @@ type state = {| var_env : list value; ref_env: list value |}
 
 function eval_bin (x:value) (op:operator) (y:value) : value =
   match x,y with
-  | Vint x,Vint y -> 
+  | Vint x,Vint y ->
      match op with
      | Oplus -> Vint (x+y)
      | Ominus -> Vint (x-y)
@@ -76,8 +76,57 @@ function eval_term (s:state) (t:term) : value =
   goal Test55 :
     eval_term my_state (Tbin (Tvar 0) Oplus (Tconst 13)) = Vint 55
 
+(*
+
+predicate eval_fmla (s:state) (f:fmla) =
+  match f with
+  | Fterm t ->
+     match eval_term s t with
+     | Verror -> false
+     | Vint n -> n <> 0
+     | Vbool b -> b = True
+     end
+  | Fand f1 f2 ->  eval_fmla s f1 /\ eval_fmla s f2
+  | Fnot f ->  not (eval_fmla s f)
+  | Fimplies f1 f2 ->  eval_fmla s f1 -> eval_fmla s f2
+  | Fforall f ->
+      forall n:int. eval_fmla (Cons (Vint n) s) f
+  end
+*)
+
+(* substitution *) 
+
+(*
+
+function subst_expr (e:expr) (x:ident) (t:expr) : expr =
+  match e with
+  | Econst _ -> e
+  | Evar y -> if x=y then t else e
+  | Ebin e1 op e2 -> Ebin (subst_expr e1 x t) op (subst_expr e2 x t)
+  end
+
+lemma eval_subst_expr:
+  forall s:state, e:expr, x:ident, t:expr.
+    eval_expr s (subst_expr e x t) =
+      eval_expr (IdMap.set s x (eval_expr s t)) e
+
+function subst (f:fmla) (x:ident) (t:expr) : fmla =
+  match f with
+  | Fterm e -> Fterm (subst_expr e x t)
+  | Fand f1 f2 -> Fand (subst f1 x t) (subst f2 x t)
+  | Fnot f -> Fnot (subst f x t)
+  | Fimplies f1 f2 -> Fimplies (subst f1 x t) (subst f2 x t)
+  end
+
+lemma eval_subst:
+  forall s:state, f:fmla, x:ident, t:expr.
+    eval_fmla s (subst f x t) <-> eval_fmla (IdMap.set s x (eval_expr s t)) f
+
+*)
 
 (* statements *)
+
+(*
 
 type stmt =
   | Sskip
@@ -89,6 +138,7 @@ type stmt =
 lemma check_skip:
   forall s:stmt. s=Sskip \/s<>Sskip
 
+*)
 
 (* small-steps semantics for statements *)
 
@@ -178,42 +228,6 @@ lemma many_steps_seq:
       many_steps s2 i2 s3 Sskip n2 /\
       n = 1 + n1 + n2
 
-
-(* formulas *)
-
-predicate eval_fmla (s:state) (f:fmla) =
-  match f with
-  | Fterm e -> eval_expr s e <> 0
-  | Fand f1 f2 ->  eval_fmla s f1 /\ eval_fmla s f2
-  | Fnot f ->  not (eval_fmla s f)
-  | Fimplies f1 f2 ->  eval_fmla s f1 -> eval_fmla s f2
-  end
-
-(* substitution *) 
-
-function subst_expr (e:expr) (x:ident) (t:expr) : expr =
-  match e with
-  | Econst _ -> e
-  | Evar y -> if x=y then t else e
-  | Ebin e1 op e2 -> Ebin (subst_expr e1 x t) op (subst_expr e2 x t)
-  end
-
-lemma eval_subst_expr:
-  forall s:state, e:expr, x:ident, t:expr.
-    eval_expr s (subst_expr e x t) =
-      eval_expr (IdMap.set s x (eval_expr s t)) e
-
-function subst (f:fmla) (x:ident) (t:expr) : fmla =
-  match f with
-  | Fterm e -> Fterm (subst_expr e x t)
-  | Fand f1 f2 -> Fand (subst f1 x t) (subst f2 x t)
-  | Fnot f -> Fnot (subst f x t)
-  | Fimplies f1 f2 -> Fimplies (subst f1 x t) (subst f2 x t)
-  end
-
-lemma eval_subst:
-  forall s:state, f:fmla, x:ident, t:expr.
-    eval_fmla s (subst f x t) <-> eval_fmla (IdMap.set s x (eval_expr s t)) f
 
 predicate valid_fmla (p:fmla) = forall s:state. eval_fmla s p
 
