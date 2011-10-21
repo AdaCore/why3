@@ -488,30 +488,32 @@ let theory_latex_stat n dir t =
   fprintf fmt "{| l |";
   for i = 0 to (List.length provers) + depth do fprintf fmt "c |" done;
   fprintf fmt "}@.";
-  if (n == 1) then
-    if (depth > 1) then
-      fprintf fmt "\\hline \\multicolumn{%d}{|c|}{Proof obligations } "  depth
+  let print_head fmt =
+    if (n == 1) then
+      if (depth > 1) then
+        fprintf fmt "\\hline \\multicolumn{%d}{|c|}{Proof obligations } "
+          depth
       else
-      fprintf fmt "\\hline \\multicolumn{%d}{|c|}{Proof obligations } "
-        (depth + 1)
-  else
-    fprintf fmt "\\hline Proof obligations ";
-  List.iter (fun (_, a) -> fprintf fmt "& \\provername{%s} " a) provers;
-  fprintf fmt "\\\\ @.";
+        fprintf fmt "\\hline \\multicolumn{%d}{|c|}{Proof obligations } "
+          (depth + 1)
+    else
+      fprintf fmt "\\hline Proof obligations ";
+    List.iter (fun (_, a) -> fprintf fmt "& \\provername{%s} " a) provers;
+    fprintf fmt "\\\\ @.";
+  in
+  (** First head *)
+  print_head fmt;
   fprintf fmt "\\hline \\endfirsthead @.";
+  (** Other heads : "Continued... " added *)
   fprintf fmt "\\multicolumn{%d}{r}{\\textit{Continued from previous page}} \
 \\\\ @." (List.length provers + 1) ;
   fprintf fmt "\\hline @.";
-  if (depth > 1) then
-    fprintf fmt "\\hline \\multicolumn{%d}{|c|}{Proof obligations } "  depth
-  else
-    fprintf fmt "\\hline \\multicolumn{%d}{|c|}{Proof obligations } "
-      (depth + 1);
-  List.iter (fun (_, a) -> fprintf fmt "& \\provername{%s} " a) provers;
-  fprintf fmt "\\\\ @.";
+  print_head fmt;
   fprintf fmt "\\hline \\endhead @.";
+  (** Other foots : "Continued..." added *)
   fprintf fmt "\\hline \\multicolumn{%d}{r}{\\textit{Continued on next page}} \
 \\\\ @." (List.length provers);
+  (** Last foot : nothing *)
   fprintf fmt "\\endfoot \\endlastfoot @.";
 
   let column =
