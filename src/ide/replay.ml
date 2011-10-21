@@ -27,6 +27,7 @@ let opt_version = ref false
 let opt_stats = ref true
 let opt_latex = ref ""
 let opt_latex2 = ref ""
+let opt_longtable = ref false
 let opt_html = ref ""
 let opt_force = ref false
 let opt_smoke = ref Session.SD_None
@@ -59,6 +60,9 @@ let spec = Arg.align [
   ("-latex2",
    Arg.Set_string opt_latex2,
    " [Dir_output] produce latex statistics") ;
+  ("-longtable",
+   Arg.Set opt_longtable,
+   " produce latex statistics using longtable package") ;
   ("-html",
    Arg.Set_string opt_html,
    " [Dir_output] produce html statistics") ;
@@ -633,15 +637,29 @@ let () =
       Whyconf.running_provers_max (Whyconf.get_main config);
     M.smoke_detector := !opt_smoke;
     eprintf " done@.";
-    if !opt_latex <> "" then print_latex_statistics 1 !opt_latex
-    else
-    if !opt_latex2 <> "" then print_latex_statistics 2 !opt_latex2
-    else
+    if !opt_longtable && !opt_latex = " " && !opt_latex2 = " " then 
       begin
-        add_to_check found_obs;
-        try main_loop ()
-        with Exit -> eprintf "main replayer exited unexpectedly@."
-      end
+        eprintf
+          "[Error] I can't use option longtable without latex ou latex2";
+        exit 1
+      end;
+    if !opt_latex <> "" then 
+      if !opt_longtable then 
+	print_latex_statistics 1 !opt_latex
+      else 
+	print_latex_statistics 1 !opt_latex
+    else
+      if !opt_latex2 <> "" then 
+	if !opt_longtable then 
+	  print_latex_statistics 2 !opt_latex2
+	else 
+	  print_latex_statistics 2 !opt_latex2
+      else
+	begin
+          add_to_check found_obs;
+          try main_loop ()
+          with Exit -> eprintf "main replayer exited unexpectedly@."
+	end
   with
     | M.OutdatedSession ->
         eprintf "The session database '%s' is outdated, cannot replay@."
