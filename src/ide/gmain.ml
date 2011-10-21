@@ -37,11 +37,22 @@ open Gconfig
 let includes = ref []
 let file = ref None
 let opt_version = ref false
+let opt_config = ref None
 
 let spec = Arg.align [
-  ("-I",
+  ("-L",
    Arg.String (fun s -> includes := s :: !includes),
    "<s> add s to loadpath") ;
+  ("--library",
+   Arg.String (fun s -> includes := s :: !includes),
+   " same as -L") ;
+  ("-I",
+   Arg.String (fun s -> includes := s :: !includes),
+   " same as -L (obsolete)") ;
+  "-C", Arg.String (fun s -> opt_config := Some s),
+      "<file> Read configuration from <file>";
+  "--config", Arg.String (fun s -> opt_config := Some s),
+      " same as -C";
 (*
   ("-f",
    Arg.String (fun s -> input_files := s :: !input_files),
@@ -72,6 +83,8 @@ let () =
     printf "%s@." version_msg;
     exit 0
   end
+
+let () = Gconfig.read_config !opt_config
 
 let fname = match !file with
   | None ->
@@ -114,7 +127,7 @@ let source_text fname =
 (********************************)
 
 let gconfig =
-  let c = Gconfig.config in
+  let c = Gconfig.config () in
   let loadpath = (Whyconf.loadpath (get_main ())) @ List.rev !includes in
   c.env <- Env.create_env loadpath;
 (*
@@ -825,7 +838,7 @@ let exit_function ?(destroy=false) () =
   let ret = Sys.command "xmllint --noout --dtdvalid share/why3session.dtd essai.xml" in
   if ret = 0 then eprintf "DTD validation succeeded, good!@.";
   *)
-  match config.saving_policy with
+  match (Gconfig.config ()).saving_policy with
     | 0 -> save_session (); GMain.quit ()
     | 1 -> GMain.quit ()
     | 2 ->
@@ -1530,7 +1543,7 @@ let select_row r =
   let a = get_any_from_row_reference r in
   match a with
     | M.Goal g ->
-        if config.intro_premises then
+        if (Gconfig.config ()).intro_premises then
           let callback = function
             | [t] -> display_task g t
             | _ -> assert false
