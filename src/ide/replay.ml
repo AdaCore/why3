@@ -373,6 +373,27 @@ let column n depth provers =
     (List.length provers) +  1
 
 
+let print_result_prov proofs prov fmt=
+  List.iter (fun (p, _pr) ->
+  try
+    let pr = Hashtbl.find proofs p in
+    let s = pr.M.proof_state in
+      match s with
+	  Session.Done res ->
+	    begin
+	      match res.Call_provers.pr_answer with
+		  Call_provers.Valid ->
+                    fprintf fmt "& \\valid{%.2f} " res.Call_provers.pr_time
+		| Call_provers.Invalid -> fprintf fmt "& \\invalid "
+		| Call_provers.Timeout -> fprintf fmt "& \\timeout "
+		| Call_provers.Unknown _s -> fprintf fmt "& \\unknown "
+		| _ -> fprintf fmt "& \\failure "
+	    end
+	| _ -> fprintf fmt "& Undone"
+  with Not_found -> fprintf fmt "& \\noresult") prov;
+  fprintf fmt "\\\\ @."
+
+
 let rec goal_latex_stat fmt prov depth depth_max subgoal g =
   let column = column 1 depth prov
   in
@@ -415,57 +436,35 @@ let rec goal_latex_stat fmt prov depth depth_max subgoal g =
       fprintf fmt "\\explanation{%s}"  " ";
     let proofs = M.external_proofs g in
       if (Hashtbl.length proofs) > 0 then
-      begin
-	if depth_max <= 1 then
-	  begin
-	    if depth > 0 then
-	      for i = depth to (depth_max - depth) do
-                fprintf fmt "& \\explanation{%s}" " " done
-	    else
-	      for i = depth to (depth_max - depth - 1) do
-                fprintf fmt "& \\explanation{%s}" " " done
-	  end
-	else
-	  if depth > 0 then
-	    for i = depth to (depth_max - depth - 1) do
-              fprintf fmt "& \\explanation{%s}" " " done
+	begin
+	  if depth_max <= 1 then
+	    begin
+	      if depth > 0 then
+		for i = depth to (depth_max - depth) do
+                  fprintf fmt "& \\explanation{%s}" " " done
+	      else
+		for i = depth to (depth_max - depth - 1) do
+                  fprintf fmt "& \\explanation{%s}" " " done
+	    end
 	  else
-	    for i = depth to (depth_max - depth - 2) do
-              fprintf fmt "& \\explanation{%s}" " " done;
-	List.iter (fun (p, _pr) ->
-	  try
-	    let pr = Hashtbl.find proofs p in
-	    let s = pr.M.proof_state in
-	      match s with
-		  Session.Done res ->
-		    begin
-		      match res.Call_provers.pr_answer with
-			  Call_provers.Valid ->
-                            fprintf fmt "& \\valid{%.2f} " res.Call_provers.pr_time
-			| Call_provers.Invalid -> fprintf fmt "& \\invalid "
-			| Call_provers.Timeout -> fprintf fmt "& \\timeout "
-			| Call_provers.Unknown _s -> fprintf fmt "& \\unknown "
-			| _ -> fprintf fmt "& \\failure "
-		    end
-		| _ -> fprintf fmt "& Undone"
-	  with Not_found -> fprintf fmt "& \\noresult") prov;
-	  fprintf fmt "\\\\ @."
+	    if depth > 0 then
+	      for i = depth to (depth_max - depth - 1) do
+		fprintf fmt "& \\explanation{%s}" " " done
+	    else
+	      for i = depth to (depth_max - depth - 2) do
+		fprintf fmt "& \\explanation{%s}" " " done;
+	  print_result_prov proofs prov fmt;
 	end;
       let tr = M.transformations g in
 	if Hashtbl.length tr > 0 then
-	  begin
-	    if Hashtbl.length proofs > 0 then
-	      fprintf fmt "\\cline{%d-%d} @." (depth + 2) column;
-	    Hashtbl.iter (fun _st tr ->
-		let goals = tr.M.subgoals in
-		let _ = List.fold_left (fun subgoal g ->
-			goal_latex_stat fmt prov (depth + 1) depth_max (subgoal) g;
-			subgoal + 1) 0 goals in
-		  () ) tr
-	  end
-	else
-	  if (Hashtbl.length proofs) = 0 then
-	    fprintf fmt "\\\\ @."
+	  if Hashtbl.length proofs > 0 then
+	    fprintf fmt "\\cline{%d-%d} @." (depth + 2) column;
+	Hashtbl.iter (fun _st tr ->
+          let goals = tr.M.subgoals in
+	  let _ = List.fold_left (fun subgoal g ->
+              goal_latex_stat fmt prov (depth + 1) depth_max (subgoal) g;
+               subgoal + 1) 0 goals in
+	    () ) tr
 
 
 let rec goal_latex2_stat fmt prov depth depth_max subgoal g =
@@ -482,26 +481,7 @@ let rec goal_latex2_stat fmt prov depth depth_max subgoal g =
       fprintf fmt "\\explanation{%d} " (subgoal + 1);
     let proofs = M.external_proofs g in
       if (Hashtbl.length proofs) > 0 then
-	begin
-	  List.iter (fun (p, _pr) ->
-	  try
-	    let pr = Hashtbl.find proofs p in
-	    let s = pr.M.proof_state in
-	      match s with
-		  Session.Done res ->
-		    begin
-		      match res.Call_provers.pr_answer with
-			  Call_provers.Valid ->
-                            fprintf fmt "& \\valid{%.2f} " res.Call_provers.pr_time
-			| Call_provers.Invalid -> fprintf fmt "& \\invalid "
-			| Call_provers.Timeout -> fprintf fmt "& \\timeout "
-			| Call_provers.Unknown _s -> fprintf fmt "& \\unknown "
-			| _ -> fprintf fmt "& \\failure "
-		    end
-		| _ -> fprintf fmt "& Undone"
-	  with Not_found -> fprintf fmt "& \\noresult") prov;
-	  fprintf fmt "\\\\ @."
-	end;
+	print_result_prov proofs prov fmt;
       let tr = M.transformations g in
 	if Hashtbl.length tr > 0 then
 	  begin
@@ -585,7 +565,9 @@ let theory_latex_stat n table dir t =
   let ch = open_out (Filename.concat dir(name^".tex")) in
   let fmt = formatter_of_out_channel ch in
     if table = "tabular" then
+      begin
       latex_tabular n fmt depth provers t
+      end
     else
       latex_longtable n fmt depth name provers t;
     close_out ch
@@ -708,7 +690,7 @@ let () =
 	if !opt_longtable then
 	  print_latex_statistics 2 "longtable" !opt_latex2
 	else
-	  print_latex_statistics 2 "tabular "!opt_latex2
+	  print_latex_statistics 2 "tabular" !opt_latex2
       else
 	begin
           add_to_check found_obs;
