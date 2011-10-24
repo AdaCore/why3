@@ -659,6 +659,18 @@ let bool_to_prop env f =
   let ls_True  = find_ls ~pure:true env "True" in
   let ls_False = find_ls ~pure:true env "False" in
   let t_True   = fs_app ls_True [] (ty_app ts_bool []) in
+  let is_bool ls = ls_equal ls ls_True || ls_equal ls ls_False in
+  let rec t_iff_bool f1 f2 = match f1.t_node, f2.t_node with
+    | Tnot f1, _ -> t_not_simp (t_iff_bool f1 f2)
+    | _, Tnot f2 -> t_not_simp (t_iff_bool f1 f2)
+    | Tapp (ps1, [t1; { t_node = Tapp (ls1, []) }]),
+      Tapp (ps2, [t2; { t_node = Tapp (ls2, []) }])
+      when ls_equal ps1 ps_equ && ls_equal ps2 ps_equ &&
+           is_bool ls1 && is_bool ls2 ->
+        if ls_equal ls1 ls2 then t_equ t1 t2 else t_neq t1 t2
+    | _ ->
+        t_iff_simp f1 f2
+  in
   let rec t_btop t = t_label ?loc:t.t_loc t.t_label (* t_label_copy? *)
     (match t.t_node with
     | Tif (f,t1,t2) ->
@@ -677,10 +689,10 @@ let bool_to_prop env f =
         t_equ_simp (f_btop t) t_True)
   and f_btop f = match f.t_node with
     | Tapp (ls, [{t_ty = Some {ty_node = Tyapp (ts, [])}} as l; r])
-    when ls_equal ls ps_equ && ts_equal ts ts_bool ->
-        t_label ?loc:f.t_loc f.t_label
-          (t_iff_simp (t_btop l) (t_btop r))
-    | _ -> t_map_simp f_btop f
+      when ls_equal ls ps_equ && ts_equal ts ts_bool ->
+        t_label ?loc:f.t_loc f.t_label (t_iff_bool (t_btop l) (t_btop r))
+    | _ ->
+        t_map_simp f_btop f
   in
   f_btop f
 
