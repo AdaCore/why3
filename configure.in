@@ -148,10 +148,8 @@ OCAMLVERSION=`$OCAMLC -v | sed -n -e 's|.*version* *\(.*\)$|\1|p' `
 echo "ocaml version is $OCAMLVERSION"
 
 case "$OCAMLVERSION" in
-  0.*|1.*|2.*|3.0*)
-        AC_MSG_ERROR(You need Objective Caml 3.10 or higher);;
-  3.10*)
-        enable_plugins=no;;
+  0.*|1.*|2.*|3.0*|3.10*|3.11|3.11.0*|3.11.1*)
+        AC_MSG_ERROR(You need Objective Caml 3.11.2 or higher);;
 esac
 
 if test "$enable_plugins" = "yes" ; then
