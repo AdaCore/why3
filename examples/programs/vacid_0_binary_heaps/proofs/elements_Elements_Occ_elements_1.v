@@ -207,5 +207,3 @@ generalize (occ_non_negative X (elements a (j+1)n) (get a j)).
 omega.
 Qed.
 (* DO NOT EDIT BELOW *)
-
-

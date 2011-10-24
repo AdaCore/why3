@@ -1,7 +1,7 @@
-
 theory Model
 
 use import int.Int
+(*use import map.Map*)
 
 use import bag.Bag
 use import elements.Elements
@@ -13,23 +13,22 @@ function model (h:logic_heap): (bag int) =
 lemma Model_empty :
    forall a: array int. model (a,0) = empty_bag
 
-lemma Model_singleton : forall a: array int. model (a,1) = singleton(A.get a 0)
+lemma Model_singleton : forall a: array int. model (a,1) = singleton(a[0])
 
 lemma Model_set :
   forall a a': array int,v: int, i n : int.
     0 <= i < n ->
-    a' = A.set a i v ->
-        add (A.get a i) (model (a',n)) =
+        add (a[i]) (model (a[i <- v],n)) =
         add v (model (a, n))
 
 lemma Model_add_last:
  forall a: array int, n : int. n >= 0 ->
-   model (a, n+1) = add (A.get a n) (model (a, n))
+   model (a, n+1) = add (a[n]) (model (a, n))
 
 end
 
 (*
 Local Variables:
-compile-command: "why3ide -I . proofs"
+compile-command: "why3ide -I . heap_model.why"
 End:
 *)

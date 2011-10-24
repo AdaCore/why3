@@ -3,12 +3,12 @@ module Implementation
 
 use import int.Int
 use import int.ComputerDivision
-use import map.Map
+(*use import map.Map*)
 
-use import heap.Heap
 use import heap_model.Model
 use import bag_of_integers.Bag_integers
 use import elements.Elements
+use import heap.Heap
 
 lemma Is_heap_min:
   forall a:map, n :int. n > 0 ->
@@ -40,18 +40,18 @@ let insert (this : ref logic_heap) (e : int) : unit  =
       (!i < n ->
          is_heap_array !arr 0 (n + 1) /\
          !arr[!i] > e /\
-         model (!arr, n+1) = add (A.get !arr !i) (model (a, n)))
+         model (!arr, n+1) = add !arr[!i] (model (a, n)))
     }
     variant { !i }
     let parent = div (!i - 1) 2 in
     let p = A.get !arr parent in
     if (e >= p) then raise Break;
-    arr := A.set !arr !i p;
+    arr := !arr[!i<-p];
     i := parent
   done
   with Break -> ()
   end;
-  arr := A.set !arr !i e;
+  arr := !arr[!i<-e];
   this := (!arr, n + 1);
   assert { 0 < !i < n -> is_heap !this };
   assert { !i < n -> model !this = add e (model (a,n)) } 
