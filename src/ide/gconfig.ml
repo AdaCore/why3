@@ -155,14 +155,6 @@ let load_config config =
     env            = env
   }
 
-let read_config () =
-  try
-    let config = Whyconf.read_config None in
-    load_config config
-  with e when not (Debug.test_flag Debug.stack_trace) ->
-    eprintf "@.%a@." Exn_printer.exn_printer e;
-    exit 1
-
 let save_config t =
   let _save_prover _ pr acc =
     Mstr.add pr.Session.prover_id
@@ -200,15 +192,29 @@ let save_config t =
 *)
   save_config config
 
-let config =
-  eprintf "[Info] reading IDE config file...@?";
-  let c = read_config () in
-  eprintf " done.@.";
-  c
+let read_config conf_file =
+  try
+    let config = Whyconf.read_config conf_file in
+    load_config config
+  with e when not (Debug.test_flag Debug.stack_trace) ->
+    eprintf "@.%a@." Exn_printer.exn_printer e;
+    exit 1
 
-let save_config () = save_config config
+let config,read_config =
+  let config = ref None in
+  (fun () ->
+    match !config with
+      | None -> invalid_arg "configuration not yet loaded"
+      | Some conf -> conf),
+  (fun conf_file ->
+    eprintf "[Info] reading IDE config file...@?";
+    let c = read_config conf_file in
+    eprintf " done.@.";
+    config := Some c)
 
-let get_main () = (get_main config.config)
+let save_config () = save_config (config ())
+
+let get_main () = (get_main (config ()).config)
 
 
 (*
@@ -254,7 +260,7 @@ let iconname_reload = "movefile32"
 let iconname_remove = "deletefile32"
 let iconname_cleaning = "trashb32"
 
-let image_default = ref (image ~size:20 iconname_default)
+let image_default = ref (GdkPixbuf.create ~width:1 ~height:1 ()) (** dumb pixbuf *)
 let image_undone = ref !image_default
 let image_scheduled = ref !image_default
 let image_running = ref !image_default
@@ -312,7 +318,7 @@ let resize_images size =
   image_cleaning := image ~size iconname_cleaning;
   ()
 
-let () =
+let init () =
   eprintf "[Info] reading icons...@?";
   why_icon := image "logo-why";
   resize_images 20;
@@ -563,12 +569,15 @@ let run_auto_detection gconfig =
   gconfig.config <- config;
   let _provers = get_provers config in
 (* TODO: store the result differently
-  gconfig.provers <- Mstr.fold (Session.get_prover_data gconfig.env) provers Mstr.empty
+  gconfig.provers <- Mstr.fold (Session.get_prover_data gconfig.env) provers
+  Mstr.empty
 *)
   ()
 *)
 
-let () = eprintf "[Info] end of configuration initialization@."
+(* let () = eprintf "[Info] end of configuration initialization@." *)
+
+let read_config conf_file = read_config conf_file; init ()
 
 (*
 Local Variables:

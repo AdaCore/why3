@@ -40,9 +40,14 @@ type t =
       mutable config : Whyconf.config;
     }
 
+val read_config : string option -> unit
+(** None use the default config *)
+
 val save_config : unit -> unit
 
-val config : t
+val config : unit -> t
+(** [config ()] raise [invalid_arg "configuration not yet loaded"]
+    if load_config is not called *)
 
 val get_main : unit -> Whyconf.main
 

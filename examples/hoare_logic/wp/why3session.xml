@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
 <why3session
- name="hoare_logic/formula/why3session.xml">
+ name="wp/why3session.xml">
  <prover
   id="alt-ergo"
   name="Alt-Ergo"
@@ -47,44 +47,67 @@
   name="Z3"
   version="2.19"/>
  <file
-  name="../formula.why"
+  name="../wp.mlw"
   verified="true"
   expanded="true">
   <theory
-   name="Formula"
-   verified="true"
-   expanded="true">
-  </theory>
-  <theory
-   name="PropositionalCalculus"
+   name="Imp"
    verified="true"
    expanded="true">
    <goal
-    name="Test1"
-    sum="ad0268b5331a68e8313850369f12a695"
+    name="Test13"
+    sum="10a7fb7a54721cc5d2e8fe0ccc0a06dd"
     proved="true"
     expanded="true"
-    shape="Lamk_identc0LasetaconstaFalseV0aTrueainfix =aevalaForaFnotaFatomV0aFfalseV1aFalse">
-    <proof
-     prover="cvc3"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.03"/>
-    </proof>
+    shape="ainfix =aeval_termamy_stateaTconstc13aVintc13">
     <proof
      prover="alt-ergo"
-     timelimit="5"
+     timelimit="3"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.05"/>
+    </proof>
+   </goal>
+   <goal
+    name="Test42"
+    sum="8062e7b817a81543a8e958c35e86e92f"
+    proved="true"
+    expanded="true"
+    shape="ainfix =aeval_termamy_stateaTvarc0aVintc42">
+    <proof
+     prover="alt-ergo"
+     timelimit="3"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.07"/>
+    </proof>
+   </goal>
+   <goal
+    name="Test55"
+    sum="2890146a1089020f995c0962244237b7"
+    proved="true"
+    expanded="true"
+    shape="ainfix =aeval_termamy_stateaTbinaTvarc0aOplusaTconstc13aVintc55">
+    <proof
+     prover="coq"
+     timelimit="3"
+     edited="wp_Imp_Test55_1.v"
+     obsolete="false">
+     <result status="valid" time="0.47"/>
+    </proof>
+   </goal>
+   <goal
+    name="check_skip"
+    sum="7df7f8c1ae36c58d46923adb24d820f3"
+    proved="true"
+    expanded="true"
+    shape="ainfix =V0aSskipNOainfix =V0aSskipF">
+    <proof
+     prover="alt-ergo"
+     timelimit="3"
      edited=""
      obsolete="false">
      <result status="valid" time="0.04"/>
-    </proof>
-    <proof
-     prover="vampire"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.24"/>
     </proof>
    </goal>
   </theory>

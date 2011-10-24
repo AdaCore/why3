@@ -64,6 +64,14 @@ type proof_attempt_status = private
     | InternalFailure of exn (** external proof aborted by internal error *)
     | Unedited (** interactive prover yet no proof script *)
 
+(** {2 Smoke detector} *)
+
+type smoke_detector =
+  | SD_None (** No smoke detector *)
+  | SD_Top  (** Negation added at the top of the goals *)
+  | SD_Deep
+(** Negation added under implication and universal quantification *)
+
 (** {2 Observers signature} *)
 
 module type OBSERVER = sig
@@ -303,6 +311,9 @@ module Make(O: OBSERVER) : sig
   val clean : any -> unit
     (** [clean a] removes failed attempts below [a] where
         there at least one successful attempt or transformation *)
+
+  val smoke_detector : smoke_detector ref
+    (** Define if the smoke detector is used *)
 
 end
 
