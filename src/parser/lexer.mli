@@ -24,6 +24,8 @@ val parse_logic_file :
 
 val parse_program_file : Lexing.lexbuf -> Ptree.program_file
 
+val token_counter : Lexing.lexbuf -> int * int 
+
 (** other functions to be re-used in other lexers/parsers *)
 
 val newline : Lexing.lexbuf -> unit

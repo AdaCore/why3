@@ -114,6 +114,7 @@ let opt_list_formats = ref false
 let opt_list_metas = ref false
 let opt_list_flags = ref false
 
+let opt_token_count = ref false
 let opt_parse_only = ref false
 let opt_type_only = ref false
 let opt_debug_all = ref false
@@ -193,6 +194,8 @@ let option_list = Arg.align [
       " List known metas";
   "--list-debug-flags", Arg.Set opt_list_flags,
       " List known debug flags";
+  "--token-count", Arg.Set opt_token_count,
+      " Only lexing, and give numbers of tokens in spec vs in program";
   "--parse-only", Arg.Set opt_parse_only,
       " Stop after parsing (same as --debug parse_only)";
   "--type-only", Arg.Set opt_type_only,
@@ -515,6 +518,9 @@ let do_local_theory env drv fname m (tname,_,t,glist) =
   in
   do_theory env drv fname tname th glist
 
+let total_annot_tokens = ref 0
+let total_program_tokens = ref 0
+
 let do_input env drv = function
   | None, _ when !opt_parse_only || !opt_type_only ->
       ()
@@ -525,24 +531,46 @@ let do_input env drv = function
         | "-" -> "stdin", stdin
         | f   -> f, open_in f
       in
-      let m = Env.read_channel ?format:!opt_parser env fname cin in
-      close_in cin;
-      if !opt_type_only then
-        ()
-      else
-        if Queue.is_empty tlist then
-          let glist = Queue.create () in
-          let add_th t th mi = Ident.Mid.add th.th_name (t,th) mi in
-          let do_th _ (t,th) = do_theory env drv fname t th glist in
-          Ident.Mid.iter do_th (Mstr.fold add_th m Ident.Mid.empty)
+      if !opt_token_count then
+        let lb = Lexing.from_channel cin in
+        let a,p = Lexer.token_counter lb in
+        close_in cin;
+        if a = 0 then
+          begin
+            (* hack: we assume it is a why file and not a mlw *)
+            total_annot_tokens := !total_annot_tokens + p;
+            Format.printf "File %s: %d tokens@." f p;
+          end
         else
-          Queue.iter (do_local_theory env drv fname m) tlist
+          begin
+            total_program_tokens := !total_program_tokens + p;
+            total_annot_tokens := !total_annot_tokens + a;
+            Format.printf "File %s: %d tokens in annotations@." f a;
+            Format.printf "File %s: %d tokens in programs@." f p
+          end
+      else
+        let m = Env.read_channel ?format:!opt_parser env fname cin in
+        close_in cin;
+        if !opt_type_only then
+          ()
+        else
+          if Queue.is_empty tlist then
+            let glist = Queue.create () in
+            let add_th t th mi = Ident.Mid.add th.th_name (t,th) mi in
+            let do_th _ (t,th) = do_theory env drv fname t th glist in
+            Ident.Mid.iter do_th (Mstr.fold add_th m Ident.Mid.empty)
+          else
+            Queue.iter (do_local_theory env drv fname m) tlist
 
 let () =
   try
     let env = Env.create_env !opt_loadpath in
     let drv = Util.option_map (load_driver env) !opt_driver in
-    Queue.iter (do_input env drv) opt_queue
+    Queue.iter (do_input env drv) opt_queue;
+    if !opt_token_count then
+      Format.printf "Total: %d annot/%d programs, ratio = %.3f@." 
+        !total_annot_tokens !total_program_tokens
+        ((float !total_annot_tokens) /. (float !total_program_tokens))
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1
