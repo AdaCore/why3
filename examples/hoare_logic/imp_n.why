@@ -30,7 +30,7 @@ type stmt =
   | Swhile expr stmt
 
 lemma check_skip:
-  forall s:stmt. s=Sskip \/s<>Sskip
+  forall s:stmt. s=Sskip \/ s<>Sskip
 
 (* program states *)
 

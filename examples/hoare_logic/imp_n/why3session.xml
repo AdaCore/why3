@@ -48,17 +48,17 @@
   version="2.19"/>
  <file
   name="../imp_n.why"
-  verified="true"
+  verified="false"
   expanded="true">
   <theory
    name="Imp"
-   verified="true"
+   verified="false"
    expanded="true">
    <goal
     name="ident_eq_dec"
     sum="ca7c4648761db026ea93d61666f0b79a"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =V0V1NOainfix =V0V1F">
     <proof
      prover="alt-ergo"
@@ -72,7 +72,7 @@
     name="check_skip"
     sum="a28ed21b2b531fe3e8a3933e02f27497"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =V0aSskipNOainfix =V0aSskipF">
     <proof
      prover="alt-ergo"
@@ -86,7 +86,7 @@
     name="Test13"
     sum="bc53c41524b84304eb79b4e36fef8af8"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="Laconstc0ainfix =aeval_exprV0aEconstc13c13">
     <proof
      prover="alt-ergo"
@@ -100,7 +100,7 @@
     name="Test42"
     sum="78671d09729d8ffd84136c2dcf7eb74b"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="Lamk_identc0Lasetaconstc0V0c42ainfix =aeval_exprV1aEvarV0c42">
     <proof
      prover="alt-ergo"
@@ -114,7 +114,7 @@
     name="Test55"
     sum="9f1ffc89f69ccb03e44edbf6adfebb8d"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="Lamk_identc0Lasetaconstc0V0c42ainfix =aeval_exprV1aEbinaEvarV0aOplusaEconstc13c55">
     <proof
      prover="alt-ergo"
@@ -128,7 +128,7 @@
     name="Ass42"
     sum="456c846b124e10fccdeb72291a3819b0"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="Lamk_identc0Laconstc0ainfix =agetV2V0c42Iaone_stepV1aSassignV0aEconstc42V2aSskipF">
     <proof
      prover="alt-ergo"
@@ -142,7 +142,7 @@
     name="If42"
     sum="9c97951c8cf8d86219396907bf0260eb"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="Lamk_identc0Laconstc0ainfix =agetV3V0c42Iaone_stepV2V4V3aSskipIaone_stepV1aSifaEvarV0aSassignV0aEconstc13aSassignV0aEconstc42V2V4F">
     <proof
      prover="alt-ergo"
@@ -156,41 +156,62 @@
     name="progress"
     sum="3e029691d2ae6f6e5afe69a1860de120"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="aone_stepV0V1V2V3EIainfix =V1aSskipNF">
     <proof
      prover="coq"
      timelimit="3"
      edited="imp_n_Imp_progress_1.v"
      obsolete="false">
-     <result status="valid" time="0.45"/>
+     <result status="valid" time="0.54"/>
+    </proof>
+    <proof
+     prover="eprover"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="timeout" time="10.01"/>
+    </proof>
+    <proof
+     prover="vampire"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="timeout" time="6.55"/>
+    </proof>
+    <proof
+     prover="spass"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="timeout" time="9.51"/>
     </proof>
    </goal>
    <goal
     name="steps_non_neg"
     sum="7fe79f6298fbe9fbaa31741ffa430e03"
-    proved="true"
-    expanded="false"
+    proved="false"
+    expanded="true"
     shape="ainfix >=V4c0Iamany_stepsV0V2V1V3V4F">
     <proof
      prover="coq"
      timelimit="3"
      edited="imp_n_Imp_steps_non_neg_1.v"
-     obsolete="false">
+     obsolete="true">
      <result status="valid" time="0.46"/>
     </proof>
    </goal>
    <goal
     name="many_steps_seq"
     sum="c4867410343f6c684f9ca00c1536720a"
-    proved="true"
-    expanded="false"
+    proved="false"
+    expanded="true"
     shape="ainfix =V4ainfix +ainfix +c1V6V7Aamany_stepsV5V3V1aSskipV7Aamany_stepsV0V2V5aSskipV6EIamany_stepsV0aSseqV2V3V1aSskipV4F">
     <proof
      prover="coq"
      timelimit="3"
      edited="imp_n_Imp_many_steps_seq_1.v"
-     obsolete="false">
+     obsolete="true">
      <result status="valid" time="0.54"/>
     </proof>
    </goal>
@@ -198,7 +219,7 @@
     name="eval_subst_expr"
     sum="9528a4415f2f99046bde6107851e9279"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =aeval_exprV0asubst_exprV1V2V3aeval_exprasetV0V2aeval_exprV0V3V1F">
     <proof
      prover="coq"
@@ -212,7 +233,7 @@
     name="eval_subst"
     sum="f9958c4b6b55b1609f43dd2ad3432473"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="aeval_fmlaasetV0V2aeval_exprV0V3V1qaeval_fmlaV0asubstV1V2V3F">
     <proof
      prover="coq"
@@ -226,7 +247,7 @@
     name="skip_rule"
     sum="dfc9be1a6c7c1951f0739b5eb00818fa"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="avalid_tripleV0aSskipV0F">
     <proof
      prover="alt-ergo"
@@ -239,56 +260,56 @@
    <goal
     name="assign_rule"
     sum="2ce35dd2e431c206c4ef4d4353dd9c47"
-    proved="true"
-    expanded="false"
+    proved="false"
+    expanded="true"
     shape="avalid_tripleasubstV0V1V2aSassignV1V2V0F">
     <proof
      prover="coq"
      timelimit="3"
      edited="imp_n_Imp_assign_rule_1.v"
-     obsolete="false">
+     obsolete="true">
      <result status="valid" time="0.72"/>
     </proof>
    </goal>
    <goal
     name="seq_rule"
     sum="3da8614c2f6127af09be97a426dc327e"
-    proved="true"
-    expanded="false"
+    proved="false"
+    expanded="true"
     shape="avalid_tripleV0aSseqV3V4V1Iavalid_tripleV2V4V1Aavalid_tripleV0V3V2F">
     <proof
      prover="coq"
      timelimit="3"
      edited="imp_n_Imp_seq_rule_1.v"
-     obsolete="false">
+     obsolete="true">
      <result status="valid" time="0.52"/>
     </proof>
    </goal>
    <goal
     name="if_rule"
     sum="5e738541b92efb7be1706db09a761442"
-    proved="true"
-    expanded="false"
+    proved="false"
+    expanded="true"
     shape="avalid_tripleV1aSifV0V3V4V2Iavalid_tripleaFandV1aFnotaFtermV0V4V2Aavalid_tripleaFandV1aFtermV0V3V2F">
     <proof
      prover="coq"
      timelimit="3"
      edited="imp_n_Imp_if_rule_1.v"
-     obsolete="false">
+     obsolete="true">
      <result status="valid" time="0.68"/>
     </proof>
    </goal>
    <goal
     name="while_rule"
     sum="17f0b6240f5cfd179c6cea9bfc294a9d"
-    proved="true"
-    expanded="false"
+    proved="false"
+    expanded="true"
     shape="avalid_tripleV1aSwhileV0V2aFandaFnotaFtermV0V1Iavalid_tripleaFandaFtermV0V1V2V1F">
     <proof
      prover="coq"
      timelimit="3"
      edited="imp_n_Imp_while_rule_1.v"
-     obsolete="false">
+     obsolete="true">
      <result status="valid" time="0.57"/>
     </proof>
    </goal>
@@ -296,7 +317,7 @@
     name="consequence_rule"
     sum="c6ee564de35ed1dc6ad77dbe593817ba"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="avalid_tripleV1V4V3Iavalid_fmlaaFimpliesV2V3Iavalid_tripleV0V4V2Iavalid_fmlaaFimpliesV1V0F">
     <proof
      prover="cvc3"

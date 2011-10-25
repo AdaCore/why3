@@ -118,7 +118,8 @@ Axiom many_steps_seq : forall (s1:(map ident Z)) (s3:(map ident Z)) (i1:stmt)
 Inductive fmla  :=
   | Fterm : expr -> fmla 
   | Fand : fmla -> fmla -> fmla 
-  | Fnot : fmla -> fmla .
+  | Fnot : fmla -> fmla 
+  | Fimplies : fmla -> fmla -> fmla .
 
 Set Implicit Arguments.
 Fixpoint eval_fmla(s:(map ident Z)) (f:fmla) {struct f}: Prop :=
@@ -126,6 +127,7 @@ Fixpoint eval_fmla(s:(map ident Z)) (f:fmla) {struct f}: Prop :=
   | (Fterm e) => ~ ((eval_expr s e) = 0%Z)
   | (Fand f1 f2) => (eval_fmla s f1) /\ (eval_fmla s f2)
   | (Fnot f1) => ~ (eval_fmla s f1)
+  | (Fimplies f1 f2) => (eval_fmla s f1) -> (eval_fmla s f2)
   end.
 Unset Implicit Arguments.
 
@@ -151,11 +153,15 @@ Fixpoint subst(f:fmla) (x:ident) (t:expr) {struct f}: fmla :=
   | (Fterm e) => (Fterm (subst_expr e x t))
   | (Fand f1 f2) => (Fand (subst f1 x t) (subst f2 x t))
   | (Fnot f1) => (Fnot (subst f1 x t))
+  | (Fimplies f1 f2) => (Fimplies (subst f1 x t) (subst f2 x t))
   end.
 Unset Implicit Arguments.
 
 Axiom eval_subst : forall (s:(map ident Z)) (f:fmla) (x:ident) (t:expr),
   (eval_fmla s (subst f x t)) <-> (eval_fmla (set s x (eval_expr s t)) f).
+
+Definition valid_fmla(p:fmla): Prop := forall (s:(map ident Z)), (eval_fmla s
+  p).
 
 Definition valid_triple(p:fmla) (i:stmt) (q:fmla): Prop := forall (s:(map
   ident Z)), (eval_fmla s p) -> forall (sqt:(map ident Z)) (n:Z),
@@ -200,7 +206,7 @@ inversion H1; subst; clear H1.
 inversion H2; subst; clear H2.
 (* case cond true *)
 generalize (many_steps_seq _ _ _ _ _ H3).
-intros (s3,(n1,(n2,(h1,(h2,h3))))).
+intros (s3&n1&n2&h1&h2&h3).
 apply H with (y:=n2) (s:=s3); auto.
 generalize (steps_non_neg _ _ _ _ _ h1).
 generalize (steps_non_neg _ _ _ _ _ h2).
