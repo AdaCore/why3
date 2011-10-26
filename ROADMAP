@@ -39,28 +39,25 @@
   * system description (e.g. at CAD, TACAS)
   * rapports recherche ?
 
-* choose a logo -> done ?
+* IDE:
+** edition, navigation (partially done)
+** reimplement "hide proved goals" feature
+  + suggested solution: replace model + filter_model by a custom model
+  (JC + ?)
+
+=== Roadmap for next release ========================
+
+* update the BTS
+
+* API for programs
+
+* reject global "val"s in typing environment for logic decls.
+
+* move session.ml and its dependencies into the Why3 lib
 
 * Coq plugin
 
 * Coq realization of theories
-
-* prover support
-** avoid bug of CVC3, e.g in examples/my_cosine.why
-** understand bug reports 12792-12794 and 12907
-
-* IDE:
-** edition, navigation (partially done)
-** restore provers detection in the middle of a session.
-  + todo: run detection immediately at start up if conf file absent or
-    outdated
-** reimplement "hide proved goals" feature
-  + suggested solution: replace model + filter_model by a custom model
-  (JC + ?)
-** saving session
-   * DONE add a "cancel" choice in the "ask" window
-   * add "ctrl-S" to save the session explicitly
-     (partially done, but no shortcut)
 
 * DOC:
 ** complete api.tex: explain how to build theories, apply
@@ -68,10 +65,18 @@
 ** complete manpages.tex: section "Drivers of external provers" (A+F)
 ** make the glossary available
 
+* IDE:
+** saving session
+   * add "ctrl-S" to save the session explicitly
+     (partially done, but no shortcut)
+** restore provers detection in the middle of a session.
+  + todo: run detection immediately at start up if conf file absent or
+    outdated
+
 
 === Roadmap for release 0.71 ========================
 
-* Final preparation:
+* DONE Final preparation:
 ** put on the web page
 *** why3-0.71.tar.gz
 *** manual in PDF: check that macro \todo is commented out
