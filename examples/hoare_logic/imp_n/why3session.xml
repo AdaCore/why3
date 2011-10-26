@@ -9,7 +9,7 @@
  <prover
   id="coq"
   name="Coq"
-  version="8.2pl1"/>
+  version="8.3pl2"/>
  <prover
   id="cvc3"
   name="CVC3"
@@ -48,11 +48,11 @@
   version="2.19"/>
  <file
   name="../imp_n.why"
-  verified="false"
+  verified="true"
   expanded="true">
   <theory
    name="Imp"
-   verified="false"
+   verified="true"
    expanded="true">
    <goal
     name="ident_eq_dec"
@@ -163,56 +163,35 @@
      timelimit="3"
      edited="imp_n_Imp_progress_1.v"
      obsolete="false">
-     <result status="valid" time="0.54"/>
-    </proof>
-    <proof
-     prover="eprover"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="10.01"/>
-    </proof>
-    <proof
-     prover="vampire"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="6.55"/>
-    </proof>
-    <proof
-     prover="spass"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="9.51"/>
+     <result status="valid" time="0.63"/>
     </proof>
    </goal>
    <goal
     name="steps_non_neg"
     sum="7fe79f6298fbe9fbaa31741ffa430e03"
-    proved="false"
+    proved="true"
     expanded="true"
     shape="ainfix >=V4c0Iamany_stepsV0V2V1V3V4F">
     <proof
      prover="coq"
      timelimit="3"
      edited="imp_n_Imp_steps_non_neg_1.v"
-     obsolete="true">
-     <result status="valid" time="0.46"/>
+     obsolete="false">
+     <result status="valid" time="0.60"/>
     </proof>
    </goal>
    <goal
     name="many_steps_seq"
     sum="c4867410343f6c684f9ca00c1536720a"
-    proved="false"
+    proved="true"
     expanded="true"
     shape="ainfix =V4ainfix +ainfix +c1V6V7Aamany_stepsV5V3V1aSskipV7Aamany_stepsV0V2V5aSskipV6EIamany_stepsV0aSseqV2V3V1aSskipV4F">
     <proof
      prover="coq"
      timelimit="3"
      edited="imp_n_Imp_many_steps_seq_1.v"
-     obsolete="true">
-     <result status="valid" time="0.54"/>
+     obsolete="false">
+     <result status="valid" time="0.72"/>
     </proof>
    </goal>
    <goal
@@ -226,7 +205,7 @@
      timelimit="3"
      edited="imp_n_Imp_eval_subst_expr_1.v"
      obsolete="false">
-     <result status="valid" time="0.59"/>
+     <result status="valid" time="0.63"/>
     </proof>
    </goal>
    <goal
@@ -240,7 +219,7 @@
      timelimit="3"
      edited="imp_n_Imp_eval_subst_1.v"
      obsolete="false">
-     <result status="valid" time="0.48"/>
+     <result status="valid" time="0.56"/>
     </proof>
    </goal>
    <goal
@@ -260,57 +239,57 @@
    <goal
     name="assign_rule"
     sum="2ce35dd2e431c206c4ef4d4353dd9c47"
-    proved="false"
+    proved="true"
     expanded="true"
     shape="avalid_tripleasubstV0V1V2aSassignV1V2V0F">
     <proof
      prover="coq"
      timelimit="3"
      edited="imp_n_Imp_assign_rule_1.v"
-     obsolete="true">
-     <result status="valid" time="0.72"/>
+     obsolete="false">
+     <result status="valid" time="0.58"/>
     </proof>
    </goal>
    <goal
     name="seq_rule"
     sum="3da8614c2f6127af09be97a426dc327e"
-    proved="false"
+    proved="true"
     expanded="true"
     shape="avalid_tripleV0aSseqV3V4V1Iavalid_tripleV2V4V1Aavalid_tripleV0V3V2F">
     <proof
      prover="coq"
      timelimit="3"
      edited="imp_n_Imp_seq_rule_1.v"
-     obsolete="true">
-     <result status="valid" time="0.52"/>
+     obsolete="false">
+     <result status="valid" time="0.53"/>
     </proof>
    </goal>
    <goal
     name="if_rule"
     sum="5e738541b92efb7be1706db09a761442"
-    proved="false"
+    proved="true"
     expanded="true"
     shape="avalid_tripleV1aSifV0V3V4V2Iavalid_tripleaFandV1aFnotaFtermV0V4V2Aavalid_tripleaFandV1aFtermV0V3V2F">
     <proof
      prover="coq"
      timelimit="3"
      edited="imp_n_Imp_if_rule_1.v"
-     obsolete="true">
-     <result status="valid" time="0.68"/>
+     obsolete="false">
+     <result status="valid" time="0.58"/>
     </proof>
    </goal>
    <goal
     name="while_rule"
     sum="17f0b6240f5cfd179c6cea9bfc294a9d"
-    proved="false"
+    proved="true"
     expanded="true"
     shape="avalid_tripleV1aSwhileV0V2aFandaFnotaFtermV0V1Iavalid_tripleaFandaFtermV0V1V2V1F">
     <proof
      prover="coq"
      timelimit="3"
      edited="imp_n_Imp_while_rule_1.v"
-     obsolete="true">
-     <result status="valid" time="0.57"/>
+     obsolete="false">
+     <result status="valid" time="0.60"/>
     </proof>
    </goal>
    <goal

@@ -49,16 +49,16 @@
  <file
   name="../bag.why"
   verified="true"
-  expanded="false">
+  expanded="true">
   <theory
    name="Bag"
    verified="true"
-   expanded="false">
+   expanded="true">
    <goal
     name="is_empty"
     sum="0e96d6770c43d5f19440bf1a4fc5b354"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =V0aempty_bagIainfix =anb_occV1V0c0FF">
     <proof
      prover="cvc3"
@@ -100,7 +100,7 @@
     name="occ_singleton_eq"
     sum="882406e2c56d276713b87ff9f0c02db4"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =anb_occV1asingletonV0c1Iainfix =V0V1F">
     <proof
      prover="simplify"
@@ -163,7 +163,7 @@
     name="occ_singleton_neq"
     sum="d5ce40b31cf1932f206eeefcf7ddf731"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =anb_occV1asingletonV0c0Iainfix =V0V1NF">
     <proof
      prover="simplify"
@@ -226,7 +226,7 @@
     name="Union_comm"
     sum="e3502c2df9aaa3531050ec659ee8d91a"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =aunionV0V1aunionV1V0F">
     <proof
      prover="coq"
@@ -240,7 +240,7 @@
     name="Union_identity"
     sum="9ac253cef1cbc65a19b0b5649bea049b"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =aunionV0aempty_bagV0F">
     <proof
      prover="coq"
@@ -261,7 +261,7 @@
     name="Union_assoc"
     sum="e99d9b9734bc8fe4121f7b399ff7e2d5"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =aunionV0aunionV1V2aunionaunionV0V1V2F">
     <proof
      prover="coq"
@@ -275,7 +275,7 @@
     name="bag_simpl"
     sum="11d473dc1cbe56aa3fdf7223519876d1"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =V0V2Iainfix =aunionV0V1aunionV2V1F">
     <proof
      prover="coq"
@@ -289,7 +289,7 @@
     name="bag_simpl_left"
     sum="459560673977622b96cb2cf3c9f23925"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =V1V2Iainfix =aunionV0V1aunionV0V2F">
     <proof
      prover="coq"
@@ -352,7 +352,7 @@
     name="occ_add_eq"
     sum="7eaa3b0eccefeab4d37d652933189d87"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =anb_occV1aaddV1V0ainfix +anb_occV1V0c1Iainfix =V1V2F">
     <proof
      prover="simplify"
@@ -401,7 +401,7 @@
     name="occ_add_neq"
     sum="4a8ed20231fbe9987756f9e3e7bbfa89"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =anb_occV2aaddV1V0anb_occV2V0Iainfix =V1V2NF">
     <proof
      prover="simplify"
@@ -450,7 +450,7 @@
     name="Diff_empty_right"
     sum="d5d83dd2eb2dd556c91325ed6510d84b"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =adiffV0aempty_bagV0F">
     <proof
      prover="coq"
@@ -471,7 +471,7 @@
     name="Diff_empty_left"
     sum="e5ea8e9ba9a20cbc398402d5026fb9f1"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =adiffaempty_bagV0aempty_bagF">
     <proof
      prover="coq"
@@ -492,7 +492,7 @@
     name="Diff_add"
     sum="0b5f561e70010d74e1bbd2fdb51b7b7f"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =adiffaaddV1V0asingletonV1V0F">
     <proof
      prover="coq"
@@ -506,7 +506,7 @@
     name="Diff_comm"
     sum="f57ee4d940ab32bcda049a1153a3eb3c"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =adiffadiffV0V1V2adiffadiffV0V2V1F">
     <proof
      prover="coq"
@@ -520,7 +520,7 @@
     name="Add_diff"
     sum="6fdf93610eefc6ada240830b040b2d53"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =aaddV1adiffV0asingletonV1V0Iainfix >anb_occV1V0c0F">
     <proof
      prover="coq"
@@ -535,16 +535,16 @@
  <file
   name="../bag_of_integers.why"
   verified="true"
-  expanded="false">
+  expanded="true">
   <theory
    name="Bag_integers"
    verified="true"
-   expanded="false">
+   expanded="true">
    <goal
     name="Min_bag_union1"
     sum="04c0b6bedee5a10eed6790270e760042"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =amin_bagV0aminV2amin_bagV1Iainfix =V0aaddV2V1F">
     <proof
      prover="simplify"
@@ -593,7 +593,7 @@
     name="Min_bag_union2"
     sum="78722813303502e1b6296e48fd903459"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix <=V1amin_bagaaddV1V0Iainfix <=V1amin_bagV0F">
     <proof
      prover="cvc3"
@@ -654,13 +654,6 @@
     proved="true"
     expanded="false"
     shape="ainfix =aelementsV0V1V2asingletonamixfix []V0V1Iainfix =V2ainfix +V1c1F">
-    <proof
-     prover="verit"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="highfailure" time="0.00"/>
-    </proof>
     <proof
      prover="simplify"
      timelimit="10"
@@ -731,13 +724,6 @@
     proved="true"
     expanded="false"
     shape="ainfix =aelementsV0V1V3aunionaelementsV0V1V2aelementsV0V2V3Iainfix <=V2V3Aainfix <=V1V2F">
-    <proof
-     prover="verit"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="highfailure" time="0.00"/>
-    </proof>
     <proof
      prover="coq"
      timelimit="5"
@@ -816,13 +802,6 @@
     expanded="false"
     shape="ainfix =aelementsV0V1V2aaddamixfix []V0V1aelementsV0ainfix +V1c1V2Iainfix <V1V2F">
     <proof
-     prover="verit"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="highfailure" time="0.00"/>
-    </proof>
-    <proof
      prover="coq"
      timelimit="5"
      edited="elements_Elements_Elements_add1_1.v"
@@ -900,13 +879,6 @@
     expanded="false"
     shape="ainfix =aelementsV0V1ainfix -V2c1adiffaelementsV0V1V2asingletonamixfix []V0ainfix -V2c1Iainfix <V1ainfix -V2c1F">
     <proof
-     prover="verit"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="highfailure" time="0.00"/>
-    </proof>
-    <proof
      prover="simplify"
      timelimit="10"
      edited=""
@@ -976,13 +948,6 @@
     proved="true"
     expanded="false"
     shape="ainfix >anb_occamixfix []V0V2aelementsV0V1V3c0Iainfix <V2V3Aainfix <=V1V2F">
-    <proof
-     prover="verit"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="highfailure" time="0.00"/>
-    </proof>
     <proof
      prover="coq"
      timelimit="3"
@@ -1061,13 +1026,6 @@
     expanded="false"
     shape="ainfix =aelementsamixfix [<-]V0V3V4V1V2aelementsV0V1V2FIainfix >=V3V2Oainfix <V3V1FIainfix <=V1V2F">
     <proof
-     prover="verit"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="highfailure" time="0.00"/>
-    </proof>
-    <proof
      prover="coq"
      timelimit="30"
      edited="elements_Elements_Elements_set_outside_1.v"
@@ -1144,13 +1102,6 @@
     proved="true"
     expanded="false"
     shape="ainfix =aelementsamixfix [<-]V0V2V4V1V3aaddV4V5Iainfix =aelementsV0V1V3aaddamixfix []V0V2V5Iainfix <V2V3Aainfix <=V1V2F">
-    <proof
-     prover="verit"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="highfailure" time="0.00"/>
-    </proof>
     <proof
      prover="coq"
      timelimit="30"
@@ -1229,13 +1180,6 @@
     expanded="false"
     shape="ainfix =aelementsamixfix [<-]V0V2V4V1V3aaddV4adiffaelementsV0V1V3asingletonamixfix []V0V2Iainfix <V2V3Aainfix <=V1V2F">
     <proof
-     prover="verit"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="highfailure" time="0.00"/>
-    </proof>
-    <proof
      prover="simplify"
      timelimit="10"
      edited=""
@@ -1304,7 +1248,7 @@
  <file
   name="../abstract_heap.mlw"
   verified="true"
-  expanded="false">
+  expanded="true">
   <theory
    name="WP AbstractHeap"
    verified="true"
@@ -1314,16 +1258,16 @@
  <file
   name="../heapsort.mlw"
   verified="true"
-  expanded="false">
+  expanded="true">
   <theory
    name="WP HeapSort"
    verified="true"
-   expanded="false">
+   expanded="true">
    <goal
     name="Min_of_sorted"
     sum="23d3e0c92705d38d79765901e1c641eb"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =amin_bagaelementsV0V1V2agetV0V1Iasorted_subV0c0V2Iainfix <V1V2Aainfix <=c0V1F">
     <proof
      prover="coq"
@@ -1338,18 +1282,18 @@
     expl="parameter heapSort"
     sum="121842bbbd90cab41b5e0514b816dbe1"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="Lamk arrayV0V1ainfix =aelementsV6c0V0aelementsV1c0V0Aasortedamk arrayV0V6Iainfix <=agetV6V7amin_bagamodelV5Iainfix <V7ainfix +ainfix -V0c1c1Aainfix <=c0V7FAasorted_subV6c0ainfix +ainfix -V0c1c1Aainfix =aelementsV1c0V0aunionamodelV5aelementsV6c0ainfix +ainfix -V0c1c1Aainfix =acardamodelV5ainfix -V0ainfix +ainfix -V0c1c1Aainfix <=ainfix +ainfix -V0c1c1V0Aainfix <=c0ainfix +ainfix -V0c1c1Aainfix <=agetV11V12amin_bagamodelV9Iainfix <V12ainfix +V8c1Aainfix <=c0V12FAasorted_subV11c0ainfix +V8c1Aainfix =aelementsV1c0V0aunionamodelV9aelementsV11c0ainfix +V8c1Aainfix =acardamodelV9ainfix -V0ainfix +V8c1Aainfix <=ainfix +V8c1V0Aainfix <=c0ainfix +V8c1Aainfix <=agetV11V8amin_bagamodelV9Iainfix =V11asetV6V8V10FAainfix <V8V0Aainfix <=c0V8Iainfix =acardamodelV5ainfix +acardamodelV9c1Aainfix =amodelV5aaddV10amodelV9Aainfix =V10amin_bagamodelV5FFAainfix =amodelV5aempty_bagNIainfix <=agetV6V13amin_bagamodelV5Iainfix <V13V8Aainfix <=c0V13FAasorted_subV6c0V8Aainfix =aelementsV1c0V0aunionamodelV5aelementsV6c0V8Aainfix =acardamodelV5ainfix -V0V8Aainfix <=V8V0Aainfix <=c0V8Iainfix <=V8ainfix -V0c1Aainfix <=c0V8FFFAainfix <=agetV1V14amin_bagamodelV4Iainfix <V14c0Aainfix <=c0V14FAasorted_subV1c0c0Aainfix =aelementsV1c0V0aunionamodelV4aelementsV1c0c0Aainfix =acardamodelV4ainfix -V0c0Aainfix <=c0V0Aainfix <=c0c0Iainfix <=c0ainfix -V0c1Aainfix =aelementsV1c0V0aelementsV1c0V0AasortedV2Iainfix >c0ainfix -V0c1Iainfix =amodelV4aelementsV1c0ainfix +ainfix -V0c1c1Aainfix =acardamodelV4ainfix +ainfix -V0c1c1Aainfix <=ainfix +ainfix -V0c1c1V0Aainfix <=c0ainfix +ainfix -V0c1c1Aainfix =amodelV16aelementsV1c0ainfix +V15c1Aainfix =acardamodelV16ainfix +V15c1Aainfix <=ainfix +V15c1V0Aainfix <=c0ainfix +V15c1Iainfix =amodelV16aaddagetV1V15amodelV4FAainfix <V15V0Aainfix <=c0V15Iainfix =amodelV4aelementsV1c0V15Aainfix =acardamodelV4V15Aainfix <=V15V0Aainfix <=c0V15Iainfix <=V15ainfix -V0c1Aainfix <=c0V15FFAainfix =amodelV3aelementsV1c0c0Aainfix =acardamodelV3c0Aainfix <=c0V0Aainfix <=c0c0Iainfix <=c0ainfix -V0c1Aainfix =aelementsV18c0V0aelementsV1c0V0Aasortedamk arrayV0V18Iainfix <=agetV18V19amin_bagamodelV17Iainfix <V19ainfix +ainfix -V0c1c1Aainfix <=c0V19FAasorted_subV18c0ainfix +ainfix -V0c1c1Aainfix =aelementsV1c0V0aunionamodelV17aelementsV18c0ainfix +ainfix -V0c1c1Aainfix =acardamodelV17ainfix -V0ainfix +ainfix -V0c1c1Aainfix <=ainfix +ainfix -V0c1c1V0Aainfix <=c0ainfix +ainfix -V0c1c1Aainfix <=agetV23V24amin_bagamodelV21Iainfix <V24ainfix +V20c1Aainfix <=c0V24FAasorted_subV23c0ainfix +V20c1Aainfix =aelementsV1c0V0aunionamodelV21aelementsV23c0ainfix +V20c1Aainfix =acardamodelV21ainfix -V0ainfix +V20c1Aainfix <=ainfix +V20c1V0Aainfix <=c0ainfix +V20c1Aainfix <=agetV23V20amin_bagamodelV21Iainfix =V23asetV18V20V22FAainfix <V20V0Aainfix <=c0V20Iainfix =acardamodelV17ainfix +acardamodelV21c1Aainfix =amodelV17aaddV22amodelV21Aainfix =V22amin_bagamodelV17FFAainfix =amodelV17aempty_bagNIainfix <=agetV18V25amin_bagamodelV17Iainfix <V25V20Aainfix <=c0V25FAasorted_subV18c0V20Aainfix =aelementsV1c0V0aunionamodelV17aelementsV18c0V20Aainfix =acardamodelV17ainfix -V0V20Aainfix <=V20V0Aainfix <=c0V20Iainfix <=V20ainfix -V0c1Aainfix <=c0V20FFFAainfix <=agetV1V26amin_bagamodelV3Iainfix <V26c0Aainfix <=c0V26FAasorted_subV1c0c0Aainfix =aelementsV1c0V0aunionamodelV3aelementsV1c0c0Aainfix =acardamodelV3ainfix -V0c0Aainfix <=c0V0Aainfix <=c0c0Iainfix <=c0ainfix -V0c1Aainfix =aelementsV1c0V0aelementsV1c0V0AasortedV2Iainfix >c0ainfix -V0c1Iainfix >c0ainfix -V0c1Iainfix =amodelV3aempty_bagFAainfix <=c0V0Iainfix >=V0c0FF">
     <transf
      name="split_goal"
      proved="true"
-     expanded="false">
+     expanded="true">
      <goal
       name="WP_parameter heapSort.1"
       expl="precondition"
       sum="8f961b322f6119c3dbfc2fe3715a6b3f"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="Lamk arrayV0V1ainfix <=c0V0Iainfix >=V0c0FF">
       <proof
        prover="cvc3"
@@ -1399,7 +1343,7 @@
       expl="normal postcondition"
       sum="4fe569a69942376ef8d5786176cacb74"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="Lamk arrayV0V1ainfix =aelementsV1c0V0aelementsV1c0V0AasortedV2Iainfix >c0ainfix -V0c1Iainfix >c0ainfix -V0c1Iainfix =amodelV3aempty_bagFIainfix <=c0V0Iainfix >=V0c0FF">
       <proof
        prover="cvc3"
@@ -1435,7 +1379,7 @@
       expl="for loop initialization"
       sum="a02d6c9bfd44d4388a9d3de482dddca8"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="Lamk arrayV0V1ainfix <=agetV1V4amin_bagamodelV3Iainfix <V4c0Aainfix <=c0V4FAasorted_subV1c0c0Aainfix =aelementsV1c0V0aunionamodelV3aelementsV1c0c0Aainfix =acardamodelV3ainfix -V0c0Aainfix <=c0V0Aainfix <=c0c0Iainfix <=c0ainfix -V0c1Iainfix >c0ainfix -V0c1Iainfix =amodelV3aempty_bagFIainfix <=c0V0Iainfix >=V0c0FF">
       <proof
        prover="cvc3"
@@ -1485,7 +1429,7 @@
       expl="for loop preservation"
       sum="47959e7c4dfe2eb15bffffcc776f88a8"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="Lamk arrayV0V1ainfix <=agetV9V10amin_bagamodelV7Iainfix <V10ainfix +V6c1Aainfix <=c0V10FAasorted_subV9c0ainfix +V6c1Aainfix =aelementsV1c0V0aunionamodelV7aelementsV9c0ainfix +V6c1Aainfix =acardamodelV7ainfix -V0ainfix +V6c1Aainfix <=ainfix +V6c1V0Aainfix <=c0ainfix +V6c1Aainfix <=agetV9V6amin_bagamodelV7Iainfix =V9asetV5V6V8FAainfix <V6V0Aainfix <=c0V6Iainfix =acardamodelV4ainfix +acardamodelV7c1Aainfix =amodelV4aaddV8amodelV7Aainfix =V8amin_bagamodelV4FFAainfix =amodelV4aempty_bagNIainfix <=agetV5V11amin_bagamodelV4Iainfix <V11V6Aainfix <=c0V11FAasorted_subV5c0V6Aainfix =aelementsV1c0V0aunionamodelV4aelementsV5c0V6Aainfix =acardamodelV4ainfix -V0V6Aainfix <=V6V0Aainfix <=c0V6Iainfix <=V6ainfix -V0c1Aainfix <=c0V6FFFIainfix <=c0ainfix -V0c1Iainfix >c0ainfix -V0c1Iainfix =amodelV3aempty_bagFIainfix <=c0V0Iainfix >=V0c0FF">
       <proof
        prover="cvc3"
@@ -1528,7 +1472,7 @@
       expl="normal postcondition"
       sum="9febe6976855a8682b242b39a2728fef"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="Lamk arrayV0V1ainfix =aelementsV5c0V0aelementsV1c0V0Aasortedamk arrayV0V5Iainfix <=agetV5V6amin_bagamodelV4Iainfix <V6ainfix +ainfix -V0c1c1Aainfix <=c0V6FAasorted_subV5c0ainfix +ainfix -V0c1c1Aainfix =aelementsV1c0V0aunionamodelV4aelementsV5c0ainfix +ainfix -V0c1c1Aainfix =acardamodelV4ainfix -V0ainfix +ainfix -V0c1c1Aainfix <=ainfix +ainfix -V0c1c1V0Aainfix <=c0ainfix +ainfix -V0c1c1FFIainfix <=c0ainfix -V0c1Iainfix >c0ainfix -V0c1Iainfix =amodelV3aempty_bagFIainfix <=c0V0Iainfix >=V0c0FF">
       <proof
        prover="cvc3"
@@ -1578,7 +1522,7 @@
       expl="for loop initialization"
       sum="7a45141b229f58dc90da5c67119f2705"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="Lamk arrayV0V1ainfix =amodelV3aelementsV1c0c0Aainfix =acardamodelV3c0Aainfix <=c0V0Aainfix <=c0c0Iainfix <=c0ainfix -V0c1Iainfix =amodelV3aempty_bagFIainfix <=c0V0Iainfix >=V0c0FF">
       <proof
        prover="cvc3"
@@ -1621,18 +1565,18 @@
       expl="for loop preservation"
       sum="cb782d4873a6e89ad5039b55614f818f"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="Lamk arrayV0V1ainfix =amodelV6aelementsV1c0ainfix +V5c1Aainfix =acardamodelV6ainfix +V5c1Aainfix <=ainfix +V5c1V0Aainfix <=c0ainfix +V5c1Iainfix =amodelV6aaddagetV1V5amodelV4FAainfix <V5V0Aainfix <=c0V5Iainfix =amodelV4aelementsV1c0V5Aainfix =acardamodelV4V5Aainfix <=V5V0Aainfix <=c0V5Iainfix <=V5ainfix -V0c1Aainfix <=c0V5FFIainfix <=c0ainfix -V0c1Iainfix =amodelV3aempty_bagFIainfix <=c0V0Iainfix >=V0c0FF">
       <transf
        name="split_goal"
        proved="true"
-       expanded="false">
+       expanded="true">
        <goal
         name="WP_parameter heapSort.7.1"
         expl="for loop preservation"
         sum="58e118676c7a105d52b827a6a0023ae5"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="Lamk arrayV0V1ainfix <V5V0Aainfix <=c0V5Iainfix =amodelV4aelementsV1c0V5Aainfix =acardamodelV4V5Aainfix <=V5V0Aainfix <=c0V5Iainfix <=V5ainfix -V0c1Aainfix <=c0V5FFIainfix <=c0ainfix -V0c1Iainfix =amodelV3aempty_bagFIainfix <=c0V0Iainfix >=V0c0FF">
         <proof
          prover="cvc3"
@@ -1668,7 +1612,7 @@
         expl="for loop preservation"
         sum="be1c534530b44a7a425e7c827698ae10"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="Lamk arrayV0V1ainfix <=c0ainfix +V5c1Iainfix =amodelV6aaddagetV1V5amodelV4FIainfix <V5V0Aainfix <=c0V5Iainfix =amodelV4aelementsV1c0V5Aainfix =acardamodelV4V5Aainfix <=V5V0Aainfix <=c0V5Iainfix <=V5ainfix -V0c1Aainfix <=c0V5FFIainfix <=c0ainfix -V0c1Iainfix =amodelV3aempty_bagFIainfix <=c0V0Iainfix >=V0c0FF">
         <proof
          prover="cvc3"
@@ -1718,7 +1662,7 @@
         expl="for loop preservation"
         sum="cea7afa83de3145589d2b6041d76e591"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="Lamk arrayV0V1ainfix <=ainfix +V5c1V0Iainfix =amodelV6aaddagetV1V5amodelV4FIainfix <V5V0Aainfix <=c0V5Iainfix =amodelV4aelementsV1c0V5Aainfix =acardamodelV4V5Aainfix <=V5V0Aainfix <=c0V5Iainfix <=V5ainfix -V0c1Aainfix <=c0V5FFIainfix <=c0ainfix -V0c1Iainfix =amodelV3aempty_bagFIainfix <=c0V0Iainfix >=V0c0FF">
         <proof
          prover="cvc3"
@@ -1754,7 +1698,7 @@
         expl="for loop preservation"
         sum="a0d274c2003a434dc6d231763ffe3dc4"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="Lamk arrayV0V1ainfix =acardamodelV6ainfix +V5c1Iainfix =amodelV6aaddagetV1V5amodelV4FIainfix <V5V0Aainfix <=c0V5Iainfix =amodelV4aelementsV1c0V5Aainfix =acardamodelV4V5Aainfix <=V5V0Aainfix <=c0V5Iainfix <=V5ainfix -V0c1Aainfix <=c0V5FFIainfix <=c0ainfix -V0c1Iainfix =amodelV3aempty_bagFIainfix <=c0V0Iainfix >=V0c0FF">
         <proof
          prover="alt-ergo"
@@ -1783,7 +1727,7 @@
         expl="for loop preservation"
         sum="54368d55f4eb77f712d8d526c3edfc44"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="Lamk arrayV0V1ainfix =amodelV6aelementsV1c0ainfix +V5c1Iainfix =amodelV6aaddagetV1V5amodelV4FIainfix <V5V0Aainfix <=c0V5Iainfix =amodelV4aelementsV1c0V5Aainfix =acardamodelV4V5Aainfix <=V5V0Aainfix <=c0V5Iainfix <=V5ainfix -V0c1Aainfix <=c0V5FFIainfix <=c0ainfix -V0c1Iainfix =amodelV3aempty_bagFIainfix <=c0V0Iainfix >=V0c0FF">
         <proof
          prover="cvc3"
@@ -1821,7 +1765,7 @@
       expl="normal postcondition"
       sum="6e868ff28b16297e662f9127d41de1ee"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="Lamk arrayV0V1ainfix =aelementsV1c0V0aelementsV1c0V0AasortedV2Iainfix >c0ainfix -V0c1Iainfix =amodelV4aelementsV1c0ainfix +ainfix -V0c1c1Aainfix =acardamodelV4ainfix +ainfix -V0c1c1Aainfix <=ainfix +ainfix -V0c1c1V0Aainfix <=c0ainfix +ainfix -V0c1c1FIainfix <=c0ainfix -V0c1Iainfix =amodelV3aempty_bagFIainfix <=c0V0Iainfix >=V0c0FF">
       <proof
        prover="cvc3"
@@ -1864,7 +1808,7 @@
       expl="for loop initialization"
       sum="a752d72311ccb861e03a9a91510b38b8"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="Lamk arrayV0V1ainfix <=agetV1V5amin_bagamodelV4Iainfix <V5c0Aainfix <=c0V5FAasorted_subV1c0c0Aainfix =aelementsV1c0V0aunionamodelV4aelementsV1c0c0Aainfix =acardamodelV4ainfix -V0c0Aainfix <=c0V0Aainfix <=c0c0Iainfix <=c0ainfix -V0c1Iainfix =amodelV4aelementsV1c0ainfix +ainfix -V0c1c1Aainfix =acardamodelV4ainfix +ainfix -V0c1c1Aainfix <=ainfix +ainfix -V0c1c1V0Aainfix <=c0ainfix +ainfix -V0c1c1FIainfix <=c0ainfix -V0c1Iainfix =amodelV3aempty_bagFIainfix <=c0V0Iainfix >=V0c0FF">
       <proof
        prover="cvc3"
@@ -1907,18 +1851,18 @@
       expl="for loop preservation"
       sum="85bd1ca4230c7f160fc5f1d88da9468f"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="Lamk arrayV0V1ainfix <=agetV10V11amin_bagamodelV8Iainfix <V11ainfix +V7c1Aainfix <=c0V11FAasorted_subV10c0ainfix +V7c1Aainfix =aelementsV1c0V0aunionamodelV8aelementsV10c0ainfix +V7c1Aainfix =acardamodelV8ainfix -V0ainfix +V7c1Aainfix <=ainfix +V7c1V0Aainfix <=c0ainfix +V7c1Aainfix <=agetV10V7amin_bagamodelV8Iainfix =V10asetV6V7V9FAainfix <V7V0Aainfix <=c0V7Iainfix =acardamodelV5ainfix +acardamodelV8c1Aainfix =amodelV5aaddV9amodelV8Aainfix =V9amin_bagamodelV5FFAainfix =amodelV5aempty_bagNIainfix <=agetV6V12amin_bagamodelV5Iainfix <V12V7Aainfix <=c0V12FAasorted_subV6c0V7Aainfix =aelementsV1c0V0aunionamodelV5aelementsV6c0V7Aainfix =acardamodelV5ainfix -V0V7Aainfix <=V7V0Aainfix <=c0V7Iainfix <=V7ainfix -V0c1Aainfix <=c0V7FFFIainfix <=c0ainfix -V0c1Iainfix =amodelV4aelementsV1c0ainfix +ainfix -V0c1c1Aainfix =acardamodelV4ainfix +ainfix -V0c1c1Aainfix <=ainfix +ainfix -V0c1c1V0Aainfix <=c0ainfix +ainfix -V0c1c1FIainfix <=c0ainfix -V0c1Iainfix =amodelV3aempty_bagFIainfix <=c0V0Iainfix >=V0c0FF">
       <transf
        name="split_goal"
        proved="true"
-       expanded="false">
+       expanded="true">
        <goal
         name="WP_parameter heapSort.10.1"
         expl="for loop preservation"
         sum="f40e368cf1ee6dc066d459216f1378d1"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="Lamk arrayV0V1ainfix =amodelV5aempty_bagNIainfix <=agetV6V8amin_bagamodelV5Iainfix <V8V7Aainfix <=c0V8FAasorted_subV6c0V7Aainfix =aelementsV1c0V0aunionamodelV5aelementsV6c0V7Aainfix =acardamodelV5ainfix -V0V7Aainfix <=V7V0Aainfix <=c0V7Iainfix <=V7ainfix -V0c1Aainfix <=c0V7FFFIainfix <=c0ainfix -V0c1Iainfix =amodelV4aelementsV1c0ainfix +ainfix -V0c1c1Aainfix =acardamodelV4ainfix +ainfix -V0c1c1Aainfix <=ainfix +ainfix -V0c1c1V0Aainfix <=c0ainfix +ainfix -V0c1c1FIainfix <=c0ainfix -V0c1Iainfix =amodelV3aempty_bagFIainfix <=c0V0Iainfix >=V0c0FF">
         <proof
          prover="cvc3"
@@ -1968,7 +1912,7 @@
         expl="for loop preservation"
         sum="8d238da7458117bf318273f65ffb1a13"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="Lamk arrayV0V1ainfix <V7V0Aainfix <=c0V7Iainfix =acardamodelV5ainfix +acardamodelV8c1Aainfix =amodelV5aaddV9amodelV8Aainfix =V9amin_bagamodelV5FFIainfix =amodelV5aempty_bagNIainfix <=agetV6V10amin_bagamodelV5Iainfix <V10V7Aainfix <=c0V10FAasorted_subV6c0V7Aainfix =aelementsV1c0V0aunionamodelV5aelementsV6c0V7Aainfix =acardamodelV5ainfix -V0V7Aainfix <=V7V0Aainfix <=c0V7Iainfix <=V7ainfix -V0c1Aainfix <=c0V7FFFIainfix <=c0ainfix -V0c1Iainfix =amodelV4aelementsV1c0ainfix +ainfix -V0c1c1Aainfix =acardamodelV4ainfix +ainfix -V0c1c1Aainfix <=ainfix +ainfix -V0c1c1V0Aainfix <=c0ainfix +ainfix -V0c1c1FIainfix <=c0ainfix -V0c1Iainfix =amodelV3aempty_bagFIainfix <=c0V0Iainfix >=V0c0FF">
         <proof
          prover="cvc3"
@@ -2011,7 +1955,7 @@
         expl="for loop preservation"
         sum="53ce710f1587beab0bc5192b62b47198"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="Lamk arrayV0V1ainfix <=agetV10V7amin_bagamodelV8Iainfix =V10asetV6V7V9FIainfix <V7V0Aainfix <=c0V7Iainfix =acardamodelV5ainfix +acardamodelV8c1Aainfix =amodelV5aaddV9amodelV8Aainfix =V9amin_bagamodelV5FFIainfix =amodelV5aempty_bagNIainfix <=agetV6V11amin_bagamodelV5Iainfix <V11V7Aainfix <=c0V11FAasorted_subV6c0V7Aainfix =aelementsV1c0V0aunionamodelV5aelementsV6c0V7Aainfix =acardamodelV5ainfix -V0V7Aainfix <=V7V0Aainfix <=c0V7Iainfix <=V7ainfix -V0c1Aainfix <=c0V7FFFIainfix <=c0ainfix -V0c1Iainfix =amodelV4aelementsV1c0ainfix +ainfix -V0c1c1Aainfix =acardamodelV4ainfix +ainfix -V0c1c1Aainfix <=ainfix +ainfix -V0c1c1V0Aainfix <=c0ainfix +ainfix -V0c1c1FIainfix <=c0ainfix -V0c1Iainfix =amodelV3aempty_bagFIainfix <=c0V0Iainfix >=V0c0FF">
         <proof
          prover="alt-ergo"
@@ -2040,7 +1984,7 @@
         expl="for loop preservation"
         sum="2539b9f20955421550ba98d81a2c897b"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="Lamk arrayV0V1ainfix <=c0ainfix +V7c1Iainfix <=agetV10V7amin_bagamodelV8Iainfix =V10asetV6V7V9FIainfix <V7V0Aainfix <=c0V7Iainfix =acardamodelV5ainfix +acardamodelV8c1Aainfix =amodelV5aaddV9amodelV8Aainfix =V9amin_bagamodelV5FFIainfix =amodelV5aempty_bagNIainfix <=agetV6V11amin_bagamodelV5Iainfix <V11V7Aainfix <=c0V11FAasorted_subV6c0V7Aainfix =aelementsV1c0V0aunionamodelV5aelementsV6c0V7Aainfix =acardamodelV5ainfix -V0V7Aainfix <=V7V0Aainfix <=c0V7Iainfix <=V7ainfix -V0c1Aainfix <=c0V7FFFIainfix <=c0ainfix -V0c1Iainfix =amodelV4aelementsV1c0ainfix +ainfix -V0c1c1Aainfix =acardamodelV4ainfix +ainfix -V0c1c1Aainfix <=ainfix +ainfix -V0c1c1V0Aainfix <=c0ainfix +ainfix -V0c1c1FIainfix <=c0ainfix -V0c1Iainfix =amodelV3aempty_bagFIainfix <=c0V0Iainfix >=V0c0FF">
         <proof
          prover="cvc3"
@@ -2090,7 +2034,7 @@
         expl="for loop preservation"
         sum="803172e118c92cc02e193f455fcbf964"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="Lamk arrayV0V1ainfix <=ainfix +V7c1V0Iainfix <=agetV10V7amin_bagamodelV8Iainfix =V10asetV6V7V9FIainfix <V7V0Aainfix <=c0V7Iainfix =acardamodelV5ainfix +acardamodelV8c1Aainfix =amodelV5aaddV9amodelV8Aainfix =V9amin_bagamodelV5FFIainfix =amodelV5aempty_bagNIainfix <=agetV6V11amin_bagamodelV5Iainfix <V11V7Aainfix <=c0V11FAasorted_subV6c0V7Aainfix =aelementsV1c0V0aunionamodelV5aelementsV6c0V7Aainfix =acardamodelV5ainfix -V0V7Aainfix <=V7V0Aainfix <=c0V7Iainfix <=V7ainfix -V0c1Aainfix <=c0V7FFFIainfix <=c0ainfix -V0c1Iainfix =amodelV4aelementsV1c0ainfix +ainfix -V0c1c1Aainfix =acardamodelV4ainfix +ainfix -V0c1c1Aainfix <=ainfix +ainfix -V0c1c1V0Aainfix <=c0ainfix +ainfix -V0c1c1FIainfix <=c0ainfix -V0c1Iainfix =amodelV3aempty_bagFIainfix <=c0V0Iainfix >=V0c0FF">
         <proof
          prover="cvc3"
@@ -2133,7 +2077,7 @@
         expl="for loop preservation"
         sum="1d4ad8fa2e078eb71ec7da8d23d414b5"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="Lamk arrayV0V1ainfix =acardamodelV8ainfix -V0ainfix +V7c1Iainfix <=agetV10V7amin_bagamodelV8Iainfix =V10asetV6V7V9FIainfix <V7V0Aainfix <=c0V7Iainfix =acardamodelV5ainfix +acardamodelV8c1Aainfix =amodelV5aaddV9amodelV8Aainfix =V9amin_bagamodelV5FFIainfix =amodelV5aempty_bagNIainfix <=agetV6V11amin_bagamodelV5Iainfix <V11V7Aainfix <=c0V11FAasorted_subV6c0V7Aainfix =aelementsV1c0V0aunionamodelV5aelementsV6c0V7Aainfix =acardamodelV5ainfix -V0V7Aainfix <=V7V0Aainfix <=c0V7Iainfix <=V7ainfix -V0c1Aainfix <=c0V7FFFIainfix <=c0ainfix -V0c1Iainfix =amodelV4aelementsV1c0ainfix +ainfix -V0c1c1Aainfix =acardamodelV4ainfix +ainfix -V0c1c1Aainfix <=ainfix +ainfix -V0c1c1V0Aainfix <=c0ainfix +ainfix -V0c1c1FIainfix <=c0ainfix -V0c1Iainfix =amodelV3aempty_bagFIainfix <=c0V0Iainfix >=V0c0FF">
         <proof
          prover="cvc3"
@@ -2169,7 +2113,7 @@
         expl="for loop preservation"
         sum="f5ad276bd10886a6634d8d561faad0b8"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="Lamk arrayV0V1ainfix =aelementsV1c0V0aunionamodelV8aelementsV10c0ainfix +V7c1Iainfix <=agetV10V7amin_bagamodelV8Iainfix =V10asetV6V7V9FIainfix <V7V0Aainfix <=c0V7Iainfix =acardamodelV5ainfix +acardamodelV8c1Aainfix =amodelV5aaddV9amodelV8Aainfix =V9amin_bagamodelV5FFIainfix =amodelV5aempty_bagNIainfix <=agetV6V11amin_bagamodelV5Iainfix <V11V7Aainfix <=c0V11FAasorted_subV6c0V7Aainfix =aelementsV1c0V0aunionamodelV5aelementsV6c0V7Aainfix =acardamodelV5ainfix -V0V7Aainfix <=V7V0Aainfix <=c0V7Iainfix <=V7ainfix -V0c1Aainfix <=c0V7FFFIainfix <=c0ainfix -V0c1Iainfix =amodelV4aelementsV1c0ainfix +ainfix -V0c1c1Aainfix =acardamodelV4ainfix +ainfix -V0c1c1Aainfix <=ainfix +ainfix -V0c1c1V0Aainfix <=c0ainfix +ainfix -V0c1c1FIainfix <=c0ainfix -V0c1Iainfix =amodelV3aempty_bagFIainfix <=c0V0Iainfix >=V0c0FF">
         <proof
          prover="z3"
@@ -2184,7 +2128,7 @@
         expl="for loop preservation"
         sum="860d629f6d2e2621dbdadbe0f1bf9757"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="Lamk arrayV0V1asorted_subV10c0ainfix +V7c1Iainfix <=agetV10V7amin_bagamodelV8Iainfix =V10asetV6V7V9FIainfix <V7V0Aainfix <=c0V7Iainfix =acardamodelV5ainfix +acardamodelV8c1Aainfix =amodelV5aaddV9amodelV8Aainfix =V9amin_bagamodelV5FFIainfix =amodelV5aempty_bagNIainfix <=agetV6V11amin_bagamodelV5Iainfix <V11V7Aainfix <=c0V11FAasorted_subV6c0V7Aainfix =aelementsV1c0V0aunionamodelV5aelementsV6c0V7Aainfix =acardamodelV5ainfix -V0V7Aainfix <=V7V0Aainfix <=c0V7Iainfix <=V7ainfix -V0c1Aainfix <=c0V7FFFIainfix <=c0ainfix -V0c1Iainfix =amodelV4aelementsV1c0ainfix +ainfix -V0c1c1Aainfix =acardamodelV4ainfix +ainfix -V0c1c1Aainfix <=ainfix +ainfix -V0c1c1V0Aainfix <=c0ainfix +ainfix -V0c1c1FIainfix <=c0ainfix -V0c1Iainfix =amodelV3aempty_bagFIainfix <=c0V0Iainfix >=V0c0FF">
         <proof
          prover="cvc3"
@@ -2199,7 +2143,7 @@
         expl="for loop preservation"
         sum="abb9be139877df4559872d9d1acc9010"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="Lamk arrayV0V1ainfix <=agetV10V11amin_bagamodelV8Iainfix <V11ainfix +V7c1Aainfix <=c0V11FIainfix <=agetV10V7amin_bagamodelV8Iainfix =V10asetV6V7V9FIainfix <V7V0Aainfix <=c0V7Iainfix =acardamodelV5ainfix +acardamodelV8c1Aainfix =amodelV5aaddV9amodelV8Aainfix =V9amin_bagamodelV5FFIainfix =amodelV5aempty_bagNIainfix <=agetV6V12amin_bagamodelV5Iainfix <V12V7Aainfix <=c0V12FAasorted_subV6c0V7Aainfix =aelementsV1c0V0aunionamodelV5aelementsV6c0V7Aainfix =acardamodelV5ainfix -V0V7Aainfix <=V7V0Aainfix <=c0V7Iainfix <=V7ainfix -V0c1Aainfix <=c0V7FFFIainfix <=c0ainfix -V0c1Iainfix =amodelV4aelementsV1c0ainfix +ainfix -V0c1c1Aainfix =acardamodelV4ainfix +ainfix -V0c1c1Aainfix <=ainfix +ainfix -V0c1c1V0Aainfix <=c0ainfix +ainfix -V0c1c1FIainfix <=c0ainfix -V0c1Iainfix =amodelV3aempty_bagFIainfix <=c0V0Iainfix >=V0c0FF">
         <proof
          prover="alt-ergo"
@@ -2230,7 +2174,7 @@
       expl="normal postcondition"
       sum="580ee0a3ee7d2067fba21030a874c7f2"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="Lamk arrayV0V1ainfix =aelementsV6c0V0aelementsV1c0V0Aasortedamk arrayV0V6Iainfix <=agetV6V7amin_bagamodelV5Iainfix <V7ainfix +ainfix -V0c1c1Aainfix <=c0V7FAasorted_subV6c0ainfix +ainfix -V0c1c1Aainfix =aelementsV1c0V0aunionamodelV5aelementsV6c0ainfix +ainfix -V0c1c1Aainfix =acardamodelV5ainfix -V0ainfix +ainfix -V0c1c1Aainfix <=ainfix +ainfix -V0c1c1V0Aainfix <=c0ainfix +ainfix -V0c1c1FFIainfix <=c0ainfix -V0c1Iainfix =amodelV4aelementsV1c0ainfix +ainfix -V0c1c1Aainfix =acardamodelV4ainfix +ainfix -V0c1c1Aainfix <=ainfix +ainfix -V0c1c1V0Aainfix <=c0ainfix +ainfix -V0c1c1FIainfix <=c0ainfix -V0c1Iainfix =amodelV3aempty_bagFIainfix <=c0V0Iainfix >=V0c0FF">
       <proof
        prover="cvc3"
@@ -2268,28 +2212,28 @@
  <file
   name="../test_harness.mlw"
   verified="true"
-  expanded="false">
+  expanded="true">
   <theory
    name="WP TestHarness"
    verified="true"
-   expanded="false">
+   expanded="true">
    <goal
     name="WP_parameter testHarness"
     expl="parameter testHarness"
     sum="8ecafb89fac8c5e095ae4c48193aa476"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =agetV3c2c42Aainfix =agetV3c1c42Aainfix =agetV3c1amin_bagaelementsV3c1c3Aainfix =agetV3c0c13Aainfix =agetV3c0amin_bagaelementsV3c0c3Aainfix =aelementsV3c0c3aunionasingletonc13aunionasingletonc42asingletonc42Aainfix <=agetV3c1agetV3c2Aainfix <=agetV3c0agetV3c1Iainfix =aelementsV3c0c3aelementsV2c0c3Aasortedamk arrayc3V3FAainfix >=c3c0Iainfix =V2asetV1c2c42FAainfix <c2c3Aainfix <=c0c2Iainfix =V1asetV0c1c13FAainfix <c1c3Aainfix <=c0c1Iainfix =V0asetaconstc0c0c42FAainfix <c0c3Aainfix <=c0c0Aainfix >=c3c0">
     <transf
      name="split_goal"
      proved="true"
-     expanded="false">
+     expanded="true">
      <goal
       name="WP_parameter testHarness.1"
       expl="precondition"
       sum="ae85a52260209cc08fdd7e45f78df521"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix >=c3c0">
       <proof
        prover="cvc3"
@@ -2339,7 +2283,7 @@
       expl="precondition"
       sum="5bb42a8a8098866c0bd3374b4c40cd04"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix <c0c3Aainfix <=c0c0Iainfix >=c3c0">
       <proof
        prover="cvc3"
@@ -2389,7 +2333,7 @@
       expl="precondition"
       sum="5deb901edea0347adee72f2adc6009db"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix <c1c3Aainfix <=c0c1Iainfix =V0asetaconstc0c0c42FIainfix <c0c3Aainfix <=c0c0Iainfix >=c3c0">
       <proof
        prover="cvc3"
@@ -2432,7 +2376,7 @@
       expl="precondition"
       sum="133aa33dc4162501b6d79f739a21b15d"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix <c2c3Aainfix <=c0c2Iainfix =V1asetV0c1c13FIainfix <c1c3Aainfix <=c0c1Iainfix =V0asetaconstc0c0c42FIainfix <c0c3Aainfix <=c0c0Iainfix >=c3c0">
       <proof
        prover="cvc3"
@@ -2475,7 +2419,7 @@
       expl="precondition"
       sum="8bc5899273c3e9a1b5420ef0455b6014"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix >=c3c0Iainfix =V2asetV1c2c42FIainfix <c2c3Aainfix <=c0c2Iainfix =V1asetV0c1c13FIainfix <c1c3Aainfix <=c0c1Iainfix =V0asetaconstc0c0c42FIainfix <c0c3Aainfix <=c0c0Iainfix >=c3c0">
       <proof
        prover="cvc3"
@@ -2518,7 +2462,7 @@
       expl="assertion"
       sum="a3def0ce5a27e994d41e489170e2adf1"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix <=agetV3c1agetV3c2Aainfix <=agetV3c0agetV3c1Iainfix =aelementsV3c0c3aelementsV2c0c3Aasortedamk arrayc3V3FIainfix >=c3c0Iainfix =V2asetV1c2c42FIainfix <c2c3Aainfix <=c0c2Iainfix =V1asetV0c1c13FIainfix <c1c3Aainfix <=c0c1Iainfix =V0asetaconstc0c0c42FIainfix <c0c3Aainfix <=c0c0Iainfix >=c3c0">
       <proof
        prover="cvc3"
@@ -2540,7 +2484,7 @@
       expl="assertion"
       sum="45a0da89f7f5acfdd6109e9f84e8c67e"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix =aelementsV3c0c3aunionasingletonc13aunionasingletonc42asingletonc42Iainfix <=agetV3c1agetV3c2Aainfix <=agetV3c0agetV3c1Iainfix =aelementsV3c0c3aelementsV2c0c3Aasortedamk arrayc3V3FIainfix >=c3c0Iainfix =V2asetV1c2c42FIainfix <c2c3Aainfix <=c0c2Iainfix =V1asetV0c1c13FIainfix <c1c3Aainfix <=c0c1Iainfix =V0asetaconstc0c0c42FIainfix <c0c3Aainfix <=c0c0Iainfix >=c3c0">
       <proof
        prover="z3"
@@ -2555,7 +2499,7 @@
       expl="assertion"
       sum="fdbe9b6df06ac4802dac7558f8e54c90"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix =agetV3c0amin_bagaelementsV3c0c3Iainfix =aelementsV3c0c3aunionasingletonc13aunionasingletonc42asingletonc42Iainfix <=agetV3c1agetV3c2Aainfix <=agetV3c0agetV3c1Iainfix =aelementsV3c0c3aelementsV2c0c3Aasortedamk arrayc3V3FIainfix >=c3c0Iainfix =V2asetV1c2c42FIainfix <c2c3Aainfix <=c0c2Iainfix =V1asetV0c1c13FIainfix <c1c3Aainfix <=c0c1Iainfix =V0asetaconstc0c0c42FIainfix <c0c3Aainfix <=c0c0Iainfix >=c3c0">
       <proof
        prover="cvc3"
@@ -2591,7 +2535,7 @@
       expl="assertion"
       sum="a7699f05b2e34177991551ffd425a244"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix =agetV3c0c13Iainfix =agetV3c0amin_bagaelementsV3c0c3Iainfix =aelementsV3c0c3aunionasingletonc13aunionasingletonc42asingletonc42Iainfix <=agetV3c1agetV3c2Aainfix <=agetV3c0agetV3c1Iainfix =aelementsV3c0c3aelementsV2c0c3Aasortedamk arrayc3V3FIainfix >=c3c0Iainfix =V2asetV1c2c42FIainfix <c2c3Aainfix <=c0c2Iainfix =V1asetV0c1c13FIainfix <c1c3Aainfix <=c0c1Iainfix =V0asetaconstc0c0c42FIainfix <c0c3Aainfix <=c0c0Iainfix >=c3c0">
       <proof
        prover="cvc3"
@@ -2620,7 +2564,7 @@
       expl="assertion"
       sum="01269cebcf7eeae4170e25bad6fae08d"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix =agetV3c1amin_bagaelementsV3c1c3Iainfix =agetV3c0c13Iainfix =agetV3c0amin_bagaelementsV3c0c3Iainfix =aelementsV3c0c3aunionasingletonc13aunionasingletonc42asingletonc42Iainfix <=agetV3c1agetV3c2Aainfix <=agetV3c0agetV3c1Iainfix =aelementsV3c0c3aelementsV2c0c3Aasortedamk arrayc3V3FIainfix >=c3c0Iainfix =V2asetV1c2c42FIainfix <c2c3Aainfix <=c0c2Iainfix =V1asetV0c1c13FIainfix <c1c3Aainfix <=c0c1Iainfix =V0asetaconstc0c0c42FIainfix <c0c3Aainfix <=c0c0Iainfix >=c3c0">
       <proof
        prover="cvc3"
@@ -2649,7 +2593,7 @@
       expl="assertion"
       sum="7ce8567594c1f1fa33601d0739bdcd90"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix =agetV3c1c42Iainfix =agetV3c1amin_bagaelementsV3c1c3Iainfix =agetV3c0c13Iainfix =agetV3c0amin_bagaelementsV3c0c3Iainfix =aelementsV3c0c3aunionasingletonc13aunionasingletonc42asingletonc42Iainfix <=agetV3c1agetV3c2Aainfix <=agetV3c0agetV3c1Iainfix =aelementsV3c0c3aelementsV2c0c3Aasortedamk arrayc3V3FIainfix >=c3c0Iainfix =V2asetV1c2c42FIainfix <c2c3Aainfix <=c0c2Iainfix =V1asetV0c1c13FIainfix <c1c3Aainfix <=c0c1Iainfix =V0asetaconstc0c0c42FIainfix <c0c3Aainfix <=c0c0Iainfix >=c3c0">
       <proof
        prover="cvc3"
@@ -2671,7 +2615,7 @@
       expl="assertion"
       sum="a5d5ccd8c3eba76f46eeca41fe7072e9"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix =agetV3c2c42Iainfix =agetV3c1c42Iainfix =agetV3c1amin_bagaelementsV3c1c3Iainfix =agetV3c0c13Iainfix =agetV3c0amin_bagaelementsV3c0c3Iainfix =aelementsV3c0c3aunionasingletonc13aunionasingletonc42asingletonc42Iainfix <=agetV3c1agetV3c2Aainfix <=agetV3c0agetV3c1Iainfix =aelementsV3c0c3aelementsV2c0c3Aasortedamk arrayc3V3FIainfix >=c3c0Iainfix =V2asetV1c2c42FIainfix <c2c3Aainfix <=c0c2Iainfix =V1asetV0c1c13FIainfix <c1c3Aainfix <=c0c1Iainfix =V0asetaconstc0c0c42FIainfix <c0c3Aainfix <=c0c0Iainfix >=c3c0">
       <proof
        prover="cvc3"
@@ -2695,16 +2639,16 @@
  <file
   name="../heap_implem.mlw"
   verified="true"
-  expanded="false">
+  expanded="true">
   <theory
    name="WP Implementation"
    verified="true"
-   expanded="false">
+   expanded="true">
    <goal
     name="Is_heap_min"
     sum="c706eca5d2345d4d33eb014c7c2b1e58"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =amixfix []V0c0amin_bagamodelaTuple2V0V1Iais_heap_arrayV0c0V1Iainfix >V1c0F">
     <proof
      prover="coq"
@@ -2719,7 +2663,7 @@
     expl="normal postcondition"
     sum="8c1ad1b8ac4f9320ea221830ef017007"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =aelementsaconstc0c0c0aempty_bagAais_heapaTuple2aconstc0c0">
     <proof
      prover="cvc3"
@@ -2769,18 +2713,18 @@
     expl="parameter insert"
     sum="571a9d6e72ebda85b9970042d8811fb5"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="iainfix >V3c0iainfix >=V0agetV4adivainfix -V3c1c2ainfix =aelementsV6c0V7aaddV0aelementsV1c0V2Aais_heapaTuple2V6V7Aainfix =aelementsV6c0V7aaddV0aelementsV1c0V2Iainfix <V3V2Aais_heapaTuple2V6V7Iainfix <V3V2Aainfix <c0V3Iainfix =aTuple2V6V7aTuple2V5ainfix +V2c1FIainfix =V5amixfix [<-]V4V3V0Fainfix <V9V3Aainfix <=c0V3Aainfix =aelementsV8c0ainfix +V2c1aaddamixfix []V8V9aelementsV1c0V2Aainfix >amixfix []V8V9V0Aais_heap_arrayV8c0ainfix +V2c1Iainfix <V9V2Aainfix =aelementsV8c0V2aelementsV1c0V2Aais_heap_arrayV8c0V2Iainfix =V9V2Aainfix <=V9V2Aainfix <=c0V9Iainfix =V9adivainfix -V3c1c2FIainfix =V8amixfix [<-]V4V3agetV4adivainfix -V3c1c2Fainfix =aelementsV11c0V12aaddV0aelementsV1c0V2Aais_heapaTuple2V11V12Aainfix =aelementsV11c0V12aaddV0aelementsV1c0V2Iainfix <V3V2Aais_heapaTuple2V11V12Iainfix <V3V2Aainfix <c0V3Iainfix =aTuple2V11V12aTuple2V10ainfix +V2c1FIainfix =V10amixfix [<-]V4V3V0FIainfix =aelementsV4c0ainfix +V2c1aaddamixfix []V4V3aelementsV1c0V2Aainfix >amixfix []V4V3V0Aais_heap_arrayV4c0ainfix +V2c1Iainfix <V3V2Aainfix =aelementsV4c0V2aelementsV1c0V2Aais_heap_arrayV4c0V2Iainfix =V3V2Aainfix <=V3V2Aainfix <=c0V3FFAainfix =aelementsV1c0ainfix +V2c1aaddamixfix []V1V2aelementsV1c0V2Aainfix >amixfix []V1V2V0Aais_heap_arrayV1c0ainfix +V2c1Iainfix <V2V2Aainfix =aelementsV1c0V2aelementsV1c0V2Aais_heap_arrayV1c0V2Iainfix =V2V2Aainfix <=V2V2Aainfix <=c0V2Iais_heapaTuple2V1V2FF">
     <transf
      name="split_goal"
      proved="true"
-     expanded="false">
+     expanded="true">
      <goal
       name="WP_parameter insert.1"
       expl="loop invariant init"
       sum="b3b28814e05fceaa103014b3c2457084"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix =aelementsV1c0ainfix +V2c1aaddamixfix []V1V2aelementsV1c0V2Aainfix >amixfix []V1V2V0Aais_heap_arrayV1c0ainfix +V2c1Iainfix <V2V2Aainfix =aelementsV1c0V2aelementsV1c0V2Aais_heap_arrayV1c0V2Iainfix =V2V2Aainfix <=V2V2Aainfix <=c0V2Iais_heapaTuple2V1V2FF">
       <proof
        prover="cvc3"
@@ -2816,7 +2760,7 @@
       expl="assertion"
       sum="e2392d15bc8bc9865b625ca90dcf223d"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ais_heapaTuple2V6V7Iainfix <V3V2Aainfix <c0V3Iainfix =aTuple2V6V7aTuple2V5ainfix +V2c1FIainfix =V5amixfix [<-]V4V3V0FIainfix >=V0agetV4adivainfix -V3c1c2Iainfix >V3c0Iainfix =aelementsV4c0ainfix +V2c1aaddamixfix []V4V3aelementsV1c0V2Aainfix >amixfix []V4V3V0Aais_heap_arrayV4c0ainfix +V2c1Iainfix <V3V2Aainfix =aelementsV4c0V2aelementsV1c0V2Aais_heap_arrayV4c0V2Iainfix =V3V2Aainfix <=V3V2Aainfix <=c0V3FFIais_heapaTuple2V1V2FF">
       <proof
        prover="yices"
@@ -2831,7 +2775,7 @@
       expl="assertion"
       sum="bc4e3bb5322126092157d00da903c0f2"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix =aelementsV6c0V7aaddV0aelementsV1c0V2Iainfix <V3V2Iais_heapaTuple2V6V7Iainfix <V3V2Aainfix <c0V3Iainfix =aTuple2V6V7aTuple2V5ainfix +V2c1FIainfix =V5amixfix [<-]V4V3V0FIainfix >=V0agetV4adivainfix -V3c1c2Iainfix >V3c0Iainfix =aelementsV4c0ainfix +V2c1aaddamixfix []V4V3aelementsV1c0V2Aainfix >amixfix []V4V3V0Aais_heap_arrayV4c0ainfix +V2c1Iainfix <V3V2Aainfix =aelementsV4c0V2aelementsV1c0V2Aais_heap_arrayV4c0V2Iainfix =V3V2Aainfix <=V3V2Aainfix <=c0V3FFIais_heapaTuple2V1V2FF">
       <proof
        prover="cvc3"
@@ -2867,18 +2811,18 @@
       expl="normal postcondition"
       sum="f4003ec1f17320980275b042e90ac575"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix =aelementsV6c0V7aaddV0aelementsV1c0V2Aais_heapaTuple2V6V7Iainfix =aelementsV6c0V7aaddV0aelementsV1c0V2Iainfix <V3V2Iais_heapaTuple2V6V7Iainfix <V3V2Aainfix <c0V3Iainfix =aTuple2V6V7aTuple2V5ainfix +V2c1FIainfix =V5amixfix [<-]V4V3V0FIainfix >=V0agetV4adivainfix -V3c1c2Iainfix >V3c0Iainfix =aelementsV4c0ainfix +V2c1aaddamixfix []V4V3aelementsV1c0V2Aainfix >amixfix []V4V3V0Aais_heap_arrayV4c0ainfix +V2c1Iainfix <V3V2Aainfix =aelementsV4c0V2aelementsV1c0V2Aais_heap_arrayV4c0V2Iainfix =V3V2Aainfix <=V3V2Aainfix <=c0V3FFIais_heapaTuple2V1V2FF">
       <transf
        name="split_goal"
        proved="true"
-       expanded="false">
+       expanded="true">
        <goal
         name="WP_parameter insert.4.1"
         expl="parameter insert"
         sum="5655a2ec43704572aa239aac6537f113"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ais_heapaTuple2V6V7Iainfix =aelementsV6c0V7aaddV0aelementsV1c0V2Iainfix <V3V2Iais_heapaTuple2V6V7Iainfix <V3V2Aainfix <c0V3Iainfix =aTuple2V6V7aTuple2V5ainfix +V2c1FIainfix =V5amixfix [<-]V4V3V0FIainfix >=V0agetV4adivainfix -V3c1c2Iainfix >V3c0Iainfix =aelementsV4c0ainfix +V2c1aaddamixfix []V4V3aelementsV1c0V2Aainfix >amixfix []V4V3V0Aais_heap_arrayV4c0ainfix +V2c1Iainfix <V3V2Aainfix =aelementsV4c0V2aelementsV1c0V2Aais_heap_arrayV4c0V2Iainfix =V3V2Aainfix <=V3V2Aainfix <=c0V3FFIais_heapaTuple2V1V2FF">
         <proof
          prover="alt-ergo"
@@ -2900,7 +2844,7 @@
         expl="parameter insert"
         sum="0731a56bf23df4fabfcef967e4a2ae1c"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix =aelementsV6c0V7aaddV0aelementsV1c0V2Iainfix =aelementsV6c0V7aaddV0aelementsV1c0V2Iainfix <V3V2Iais_heapaTuple2V6V7Iainfix <V3V2Aainfix <c0V3Iainfix =aTuple2V6V7aTuple2V5ainfix +V2c1FIainfix =V5amixfix [<-]V4V3V0FIainfix >=V0agetV4adivainfix -V3c1c2Iainfix >V3c0Iainfix =aelementsV4c0ainfix +V2c1aaddamixfix []V4V3aelementsV1c0V2Aainfix >amixfix []V4V3V0Aais_heap_arrayV4c0ainfix +V2c1Iainfix <V3V2Aainfix =aelementsV4c0V2aelementsV1c0V2Aais_heap_arrayV4c0V2Iainfix =V3V2Aainfix <=V3V2Aainfix <=c0V3FFIais_heapaTuple2V1V2FF">
         <proof
          prover="cvc3"
@@ -2931,18 +2875,18 @@
       expl="loop invariant preservation"
       sum="79d6dda2556938b5592499244bb1782c"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix =aelementsV5c0ainfix +V2c1aaddamixfix []V5V6aelementsV1c0V2Aainfix >amixfix []V5V6V0Aais_heap_arrayV5c0ainfix +V2c1Iainfix <V6V2Aainfix =aelementsV5c0V2aelementsV1c0V2Aais_heap_arrayV5c0V2Iainfix =V6V2Aainfix <=V6V2Aainfix <=c0V6Iainfix =V6adivainfix -V3c1c2FIainfix =V5amixfix [<-]V4V3agetV4adivainfix -V3c1c2FIainfix >=V0agetV4adivainfix -V3c1c2NIainfix >V3c0Iainfix =aelementsV4c0ainfix +V2c1aaddamixfix []V4V3aelementsV1c0V2Aainfix >amixfix []V4V3V0Aais_heap_arrayV4c0ainfix +V2c1Iainfix <V3V2Aainfix =aelementsV4c0V2aelementsV1c0V2Aais_heap_arrayV4c0V2Iainfix =V3V2Aainfix <=V3V2Aainfix <=c0V3FFIais_heapaTuple2V1V2FF">
       <transf
        name="split_goal"
        proved="true"
-       expanded="false">
+       expanded="true">
        <goal
         name="WP_parameter insert.5.1"
         expl="parameter insert"
         sum="0e3a209fbb3da46561e4855a5d936f32"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix <=c0V6Iainfix =V6adivainfix -V3c1c2FIainfix =V5amixfix [<-]V4V3agetV4adivainfix -V3c1c2FIainfix >=V0agetV4adivainfix -V3c1c2NIainfix >V3c0Iainfix =aelementsV4c0ainfix +V2c1aaddamixfix []V4V3aelementsV1c0V2Aainfix >amixfix []V4V3V0Aais_heap_arrayV4c0ainfix +V2c1Iainfix <V3V2Aainfix =aelementsV4c0V2aelementsV1c0V2Aais_heap_arrayV4c0V2Iainfix =V3V2Aainfix <=V3V2Aainfix <=c0V3FFIais_heapaTuple2V1V2FF">
         <proof
          prover="cvc3"
@@ -2978,7 +2922,7 @@
         expl="parameter insert"
         sum="cbc677b07967059ffeb3b9865e07d30a"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix <=V6V2Iainfix =V6adivainfix -V3c1c2FIainfix =V5amixfix [<-]V4V3agetV4adivainfix -V3c1c2FIainfix >=V0agetV4adivainfix -V3c1c2NIainfix >V3c0Iainfix =aelementsV4c0ainfix +V2c1aaddamixfix []V4V3aelementsV1c0V2Aainfix >amixfix []V4V3V0Aais_heap_arrayV4c0ainfix +V2c1Iainfix <V3V2Aainfix =aelementsV4c0V2aelementsV1c0V2Aais_heap_arrayV4c0V2Iainfix =V3V2Aainfix <=V3V2Aainfix <=c0V3FFIais_heapaTuple2V1V2FF">
         <proof
          prover="cvc3"
@@ -3035,7 +2979,7 @@
         expl="parameter insert"
         sum="14338e5905d7eae898f51107ca550ceb"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ais_heap_arrayV5c0V2Iainfix =V6V2Iainfix =V6adivainfix -V3c1c2FIainfix =V5amixfix [<-]V4V3agetV4adivainfix -V3c1c2FIainfix >=V0agetV4adivainfix -V3c1c2NIainfix >V3c0Iainfix =aelementsV4c0ainfix +V2c1aaddamixfix []V4V3aelementsV1c0V2Aainfix >amixfix []V4V3V0Aais_heap_arrayV4c0ainfix +V2c1Iainfix <V3V2Aainfix =aelementsV4c0V2aelementsV1c0V2Aais_heap_arrayV4c0V2Iainfix =V3V2Aainfix <=V3V2Aainfix <=c0V3FFIais_heapaTuple2V1V2FF">
         <proof
          prover="cvc3"
@@ -3078,7 +3022,7 @@
         expl="parameter insert"
         sum="79da42e0cbc2efb0c50968954f2f550d"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix =aelementsV5c0V2aelementsV1c0V2Iainfix =V6V2Iainfix =V6adivainfix -V3c1c2FIainfix =V5amixfix [<-]V4V3agetV4adivainfix -V3c1c2FIainfix >=V0agetV4adivainfix -V3c1c2NIainfix >V3c0Iainfix =aelementsV4c0ainfix +V2c1aaddamixfix []V4V3aelementsV1c0V2Aainfix >amixfix []V4V3V0Aais_heap_arrayV4c0ainfix +V2c1Iainfix <V3V2Aainfix =aelementsV4c0V2aelementsV1c0V2Aais_heap_arrayV4c0V2Iainfix =V3V2Aainfix <=V3V2Aainfix <=c0V3FFIais_heapaTuple2V1V2FF">
         <proof
          prover="cvc3"
@@ -3121,7 +3065,7 @@
         expl="parameter insert"
         sum="e464790c8e3ee00897cf37f729de0fa3"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ais_heap_arrayV5c0ainfix +V2c1Iainfix <V6V2Iainfix =V6adivainfix -V3c1c2FIainfix =V5amixfix [<-]V4V3agetV4adivainfix -V3c1c2FIainfix >=V0agetV4adivainfix -V3c1c2NIainfix >V3c0Iainfix =aelementsV4c0ainfix +V2c1aaddamixfix []V4V3aelementsV1c0V2Aainfix >amixfix []V4V3V0Aais_heap_arrayV4c0ainfix +V2c1Iainfix <V3V2Aainfix =aelementsV4c0V2aelementsV1c0V2Aais_heap_arrayV4c0V2Iainfix =V3V2Aainfix <=V3V2Aainfix <=c0V3FFIais_heapaTuple2V1V2FF">
         <proof
          prover="alt-ergo"
@@ -3150,7 +3094,7 @@
         expl="parameter insert"
         sum="d9abe259660e1e11db470ec645ef0db2"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix >amixfix []V5V6V0Iainfix <V6V2Iainfix =V6adivainfix -V3c1c2FIainfix =V5amixfix [<-]V4V3agetV4adivainfix -V3c1c2FIainfix >=V0agetV4adivainfix -V3c1c2NIainfix >V3c0Iainfix =aelementsV4c0ainfix +V2c1aaddamixfix []V4V3aelementsV1c0V2Aainfix >amixfix []V4V3V0Aais_heap_arrayV4c0ainfix +V2c1Iainfix <V3V2Aainfix =aelementsV4c0V2aelementsV1c0V2Aais_heap_arrayV4c0V2Iainfix =V3V2Aainfix <=V3V2Aainfix <=c0V3FFIais_heapaTuple2V1V2FF">
         <proof
          prover="cvc3"
@@ -3186,7 +3130,7 @@
         expl="parameter insert"
         sum="3cab0af2298faa94b17fcf2f2c4ac79c"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix =aelementsV5c0ainfix +V2c1aaddamixfix []V5V6aelementsV1c0V2Iainfix <V6V2Iainfix =V6adivainfix -V3c1c2FIainfix =V5amixfix [<-]V4V3agetV4adivainfix -V3c1c2FIainfix >=V0agetV4adivainfix -V3c1c2NIainfix >V3c0Iainfix =aelementsV4c0ainfix +V2c1aaddamixfix []V4V3aelementsV1c0V2Aainfix >amixfix []V4V3V0Aais_heap_arrayV4c0ainfix +V2c1Iainfix <V3V2Aainfix =aelementsV4c0V2aelementsV1c0V2Aais_heap_arrayV4c0V2Iainfix =V3V2Aainfix <=V3V2Aainfix <=c0V3FFIais_heapaTuple2V1V2FF">
         <proof
          prover="cvc3"
@@ -3217,7 +3161,7 @@
       expl="loop variant decreases"
       sum="fb04c1cf8400406548806e87628b1a8c"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix <V6V3Aainfix <=c0V3Iainfix =aelementsV5c0ainfix +V2c1aaddamixfix []V5V6aelementsV1c0V2Aainfix >amixfix []V5V6V0Aais_heap_arrayV5c0ainfix +V2c1Iainfix <V6V2Aainfix =aelementsV5c0V2aelementsV1c0V2Aais_heap_arrayV5c0V2Iainfix =V6V2Aainfix <=V6V2Aainfix <=c0V6Iainfix =V6adivainfix -V3c1c2FIainfix =V5amixfix [<-]V4V3agetV4adivainfix -V3c1c2FIainfix >=V0agetV4adivainfix -V3c1c2NIainfix >V3c0Iainfix =aelementsV4c0ainfix +V2c1aaddamixfix []V4V3aelementsV1c0V2Aainfix >amixfix []V4V3V0Aais_heap_arrayV4c0ainfix +V2c1Iainfix <V3V2Aainfix =aelementsV4c0V2aelementsV1c0V2Aais_heap_arrayV4c0V2Iainfix =V3V2Aainfix <=V3V2Aainfix <=c0V3FFIais_heapaTuple2V1V2FF">
       <proof
        prover="cvc3"
@@ -3274,7 +3218,7 @@
       expl="assertion"
       sum="c238a00219c7b22df00073b7031da44d"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ais_heapaTuple2V6V7Iainfix <V3V2Aainfix <c0V3Iainfix =aTuple2V6V7aTuple2V5ainfix +V2c1FIainfix =V5amixfix [<-]V4V3V0FIainfix >V3c0NIainfix =aelementsV4c0ainfix +V2c1aaddamixfix []V4V3aelementsV1c0V2Aainfix >amixfix []V4V3V0Aais_heap_arrayV4c0ainfix +V2c1Iainfix <V3V2Aainfix =aelementsV4c0V2aelementsV1c0V2Aais_heap_arrayV4c0V2Iainfix =V3V2Aainfix <=V3V2Aainfix <=c0V3FFIais_heapaTuple2V1V2FF">
       <proof
        prover="cvc3"
@@ -3317,7 +3261,7 @@
       expl="assertion"
       sum="f0c511039b3fa7ef77e2626c6aa9e379"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix =aelementsV6c0V7aaddV0aelementsV1c0V2Iainfix <V3V2Iais_heapaTuple2V6V7Iainfix <V3V2Aainfix <c0V3Iainfix =aTuple2V6V7aTuple2V5ainfix +V2c1FIainfix =V5amixfix [<-]V4V3V0FIainfix >V3c0NIainfix =aelementsV4c0ainfix +V2c1aaddamixfix []V4V3aelementsV1c0V2Aainfix >amixfix []V4V3V0Aais_heap_arrayV4c0ainfix +V2c1Iainfix <V3V2Aainfix =aelementsV4c0V2aelementsV1c0V2Aais_heap_arrayV4c0V2Iainfix =V3V2Aainfix <=V3V2Aainfix <=c0V3FFIais_heapaTuple2V1V2FF">
       <proof
        prover="cvc3"
@@ -3353,18 +3297,18 @@
       expl="normal postcondition"
       sum="ee71f83ace72a29a8940314290d0d502"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix =aelementsV6c0V7aaddV0aelementsV1c0V2Aais_heapaTuple2V6V7Iainfix =aelementsV6c0V7aaddV0aelementsV1c0V2Iainfix <V3V2Iais_heapaTuple2V6V7Iainfix <V3V2Aainfix <c0V3Iainfix =aTuple2V6V7aTuple2V5ainfix +V2c1FIainfix =V5amixfix [<-]V4V3V0FIainfix >V3c0NIainfix =aelementsV4c0ainfix +V2c1aaddamixfix []V4V3aelementsV1c0V2Aainfix >amixfix []V4V3V0Aais_heap_arrayV4c0ainfix +V2c1Iainfix <V3V2Aainfix =aelementsV4c0V2aelementsV1c0V2Aais_heap_arrayV4c0V2Iainfix =V3V2Aainfix <=V3V2Aainfix <=c0V3FFIais_heapaTuple2V1V2FF">
       <transf
        name="split_goal"
        proved="true"
-       expanded="false">
+       expanded="true">
        <goal
         name="WP_parameter insert.9.1"
         expl="parameter insert"
         sum="4885ffd2df7d604788a4349d39609b91"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ais_heapaTuple2V6V7Iainfix =aelementsV6c0V7aaddV0aelementsV1c0V2Iainfix <V3V2Iais_heapaTuple2V6V7Iainfix <V3V2Aainfix <c0V3Iainfix =aTuple2V6V7aTuple2V5ainfix +V2c1FIainfix =V5amixfix [<-]V4V3V0FIainfix >V3c0NIainfix =aelementsV4c0ainfix +V2c1aaddamixfix []V4V3aelementsV1c0V2Aainfix >amixfix []V4V3V0Aais_heap_arrayV4c0ainfix +V2c1Iainfix <V3V2Aainfix =aelementsV4c0V2aelementsV1c0V2Aais_heap_arrayV4c0V2Iainfix =V3V2Aainfix <=V3V2Aainfix <=c0V3FFIais_heapaTuple2V1V2FF">
         <proof
          prover="cvc3"
@@ -3386,7 +3330,7 @@
         expl="parameter insert"
         sum="c31a3225374ca902ac18be3acb69ec70"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix =aelementsV6c0V7aaddV0aelementsV1c0V2Iainfix =aelementsV6c0V7aaddV0aelementsV1c0V2Iainfix <V3V2Iais_heapaTuple2V6V7Iainfix <V3V2Aainfix <c0V3Iainfix =aTuple2V6V7aTuple2V5ainfix +V2c1FIainfix =V5amixfix [<-]V4V3V0FIainfix >V3c0NIainfix =aelementsV4c0ainfix +V2c1aaddamixfix []V4V3aelementsV1c0V2Aainfix >amixfix []V4V3V0Aais_heap_arrayV4c0ainfix +V2c1Iainfix <V3V2Aainfix =aelementsV4c0V2aelementsV1c0V2Aais_heap_arrayV4c0V2Iainfix =V3V2Aainfix <=V3V2Aainfix <=c0V3FFIais_heapaTuple2V1V2FF">
         <proof
          prover="alt-ergo"
@@ -3440,18 +3384,18 @@
     expl="parameter extractMin"
     sum="bcc1828b3364d16a6d0dddaaf30b0171"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="iainfix <V2ainfix -V1c1iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1iainfix <V2ainfix -V1c1ainfix =aelementsV0c0V1aaddamixfix []V0c0aelementsV5c0V6Aainfix =amixfix []V0c0amin_bagaelementsV0c0V1Aais_heapaTuple2V5V6Iainfix =aTuple2V5V6aTuple2V4ainfix -V1c1FAainfix =aelementsV4c0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aais_heap_arrayV4c0ainfix -V1c1Aais_heap_arrayV4c0ainfix -V1c1Iainfix >V2c0Iainfix =V4amixfix [<-]V3V2amixfix []V0ainfix -V1c1Fainfix =aelementsV0c0V1aaddamixfix []V0c0aelementsV7c0V8Aainfix =amixfix []V0c0amin_bagaelementsV0c0V1Aais_heapaTuple2V7V8Iainfix =aTuple2V7V8aTuple2V3ainfix -V1c1Fiainfix <ainfix +ainfix *c2V2c2ainfix -V1c1iainfix >amixfix []V3ainfix +ainfix *c2V2c1amixfix []V3ainfix +ainfix *c2V2c2iainfix <=amixfix []V0ainfix -V1c1amixfix []V3V9iainfix <V2ainfix -V1c1ainfix =aelementsV0c0V1aaddamixfix []V0c0aelementsV11c0V12Aainfix =amixfix []V0c0amin_bagaelementsV0c0V1Aais_heapaTuple2V11V12Iainfix =aTuple2V11V12aTuple2V10ainfix -V1c1FAainfix =aelementsV10c0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aais_heap_arrayV10c0ainfix -V1c1Aais_heap_arrayV10c0ainfix -V1c1Iainfix >V2c0Iainfix =V10amixfix [<-]V3V2amixfix []V0ainfix -V1c1Fainfix =aelementsV0c0V1aaddamixfix []V0c0aelementsV13c0V14Aainfix =amixfix []V0c0amin_bagaelementsV0c0V1Aais_heapaTuple2V13V14Iainfix =aTuple2V13V14aTuple2V3ainfix -V1c1Fainfix <ainfix -ainfix -V1c1V16ainfix -ainfix -V1c1V2Aainfix <=c0ainfix -ainfix -V1c1V2Aainfix <amixfix []V15aparentV16amixfix []V0ainfix -V1c1Iainfix >V16c0Aainfix =aelementsV15c0ainfix -V1c1aaddamixfix []V15V16adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V15V0Iainfix =V16c0Aais_heap_arrayV15c0ainfix -V1c1Aainfix <V16ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V16Iainfix =V16V9FIainfix =V15amixfix [<-]V3V2amixfix []V3V9FIainfix =V9ainfix +ainfix *c2V2c2Fiainfix <=amixfix []V0ainfix -V1c1amixfix []V3ainfix +ainfix *c2V2c1iainfix <V2ainfix -V1c1ainfix =aelementsV0c0V1aaddamixfix []V0c0aelementsV18c0V19Aainfix =amixfix []V0c0amin_bagaelementsV0c0V1Aais_heapaTuple2V18V19Iainfix =aTuple2V18V19aTuple2V17ainfix -V1c1FAainfix =aelementsV17c0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aais_heap_arrayV17c0ainfix -V1c1Aais_heap_arrayV17c0ainfix -V1c1Iainfix >V2c0Iainfix =V17amixfix [<-]V3V2amixfix []V0ainfix -V1c1Fainfix =aelementsV0c0V1aaddamixfix []V0c0aelementsV20c0V21Aainfix =amixfix []V0c0amin_bagaelementsV0c0V1Aais_heapaTuple2V20V21Iainfix =aTuple2V20V21aTuple2V3ainfix -V1c1Fainfix <ainfix -ainfix -V1c1V23ainfix -ainfix -V1c1V2Aainfix <=c0ainfix -ainfix -V1c1V2Aainfix <amixfix []V22aparentV23amixfix []V0ainfix -V1c1Iainfix >V23c0Aainfix =aelementsV22c0ainfix -V1c1aaddamixfix []V22V23adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V22V0Iainfix =V23c0Aais_heap_arrayV22c0ainfix -V1c1Aainfix <V23ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V23Iainfix =V23ainfix +ainfix *c2V2c1FIainfix =V22amixfix [<-]V3V2amixfix []V3ainfix +ainfix *c2V2c1Fiainfix <=amixfix []V0ainfix -V1c1amixfix []V3ainfix +ainfix *c2V2c1iainfix <V2ainfix -V1c1ainfix =aelementsV0c0V1aaddamixfix []V0c0aelementsV25c0V26Aainfix =amixfix []V0c0amin_bagaelementsV0c0V1Aais_heapaTuple2V25V26Iainfix =aTuple2V25V26aTuple2V24ainfix -V1c1FAainfix =aelementsV24c0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aais_heap_arrayV24c0ainfix -V1c1Aais_heap_arrayV24c0ainfix -V1c1Iainfix >V2c0Iainfix =V24amixfix [<-]V3V2amixfix []V0ainfix -V1c1Fainfix =aelementsV0c0V1aaddamixfix []V0c0aelementsV27c0V28Aainfix =amixfix []V0c0amin_bagaelementsV0c0V1Aais_heapaTuple2V27V28Iainfix =aTuple2V27V28aTuple2V3ainfix -V1c1Fainfix <ainfix -ainfix -V1c1V30ainfix -ainfix -V1c1V2Aainfix <=c0ainfix -ainfix -V1c1V2Aainfix <amixfix []V29aparentV30amixfix []V0ainfix -V1c1Iainfix >V30c0Aainfix =aelementsV29c0ainfix -V1c1aaddamixfix []V29V30adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V29V0Iainfix =V30c0Aais_heap_arrayV29c0ainfix -V1c1Aainfix <V30ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V30Iainfix =V30ainfix +ainfix *c2V2c1FIainfix =V29amixfix [<-]V3V2amixfix []V3ainfix +ainfix *c2V2c1Fiainfix <V2ainfix -V1c1ainfix =aelementsV0c0V1aaddamixfix []V0c0aelementsV32c0V33Aainfix =amixfix []V0c0amin_bagaelementsV0c0V1Aais_heapaTuple2V32V33Iainfix =aTuple2V32V33aTuple2V31ainfix -V1c1FAainfix =aelementsV31c0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aais_heap_arrayV31c0ainfix -V1c1Aais_heap_arrayV31c0ainfix -V1c1Iainfix >V2c0Iainfix =V31amixfix [<-]V3V2amixfix []V0ainfix -V1c1Fainfix =aelementsV0c0V1aaddamixfix []V0c0aelementsV34c0V35Aainfix =amixfix []V0c0amin_bagaelementsV0c0V1Aais_heapaTuple2V34V35Iainfix =aTuple2V34V35aTuple2V3ainfix -V1c1FAainfix =ainfix -V1c1c0Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFAainfix <amixfix []V0aparentc0amixfix []V0ainfix -V1c1Iainfix >c0c0Aainfix =aelementsV0c0ainfix -V1c1aaddamixfix []V0c0adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V0V0Iainfix =c0c0Aais_heap_arrayV0c0ainfix -V1c1Aainfix <c0ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0c0Aainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Aainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
     <transf
      name="split_goal"
      proved="true"
-     expanded="false">
+     expanded="true">
      <goal
       name="WP_parameter extractMin.1"
       expl="assertion"
       sum="066d934b042167c66a7edbfcc4e20b79"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
       <proof
        prover="cvc3"
@@ -3487,7 +3431,7 @@
       expl="assertion"
       sum="aed2117223d35aba397fbca5da15cab8"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
       <proof
        prover="coq"
@@ -3502,18 +3446,18 @@
       expl="loop invariant init"
       sum="84bd964399794995309f1a997cdbc865"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix <amixfix []V0aparentc0amixfix []V0ainfix -V1c1Iainfix >c0c0Aainfix =aelementsV0c0ainfix -V1c1aaddamixfix []V0c0adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V0V0Iainfix =c0c0Aais_heap_arrayV0c0ainfix -V1c1Aainfix <c0ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0c0Iainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
       <transf
        name="split_goal"
        proved="true"
-       expanded="false">
+       expanded="true">
        <goal
         name="WP_parameter extractMin.3.1"
         expl="parameter extractMin"
         sum="b96d3103eb4c509415bcd598c48fd922"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix <=c0c0Iainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
         <proof
          prover="cvc3"
@@ -3556,7 +3500,7 @@
         expl="parameter extractMin"
         sum="c97c16e0276c28d05ebbd7278d3cfb2d"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix <c0ainfix -V1c1Iainfix >ainfix -V1c1c0Iainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
         <proof
          prover="cvc3"
@@ -3599,7 +3543,7 @@
         expl="parameter extractMin"
         sum="2fef1f61c25a1ae53168eeef82ed16ed"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ais_heap_arrayV0c0ainfix -V1c1Iainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
         <proof
          prover="cvc3"
@@ -3628,7 +3572,7 @@
         expl="parameter extractMin"
         sum="dfd848817a260ab084c59eb0424780bf"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix =V0V0Iainfix =c0c0Iainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
         <proof
          prover="cvc3"
@@ -3692,7 +3636,7 @@
         expl="parameter extractMin"
         sum="9864c0a7789524edf191a69d3a70b538"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix =aelementsV0c0ainfix -V1c1aaddamixfix []V0c0adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Iainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
         <proof
          prover="cvc3"
@@ -3728,7 +3672,7 @@
         expl="parameter extractMin"
         sum="d67309e2eaa6b1266ab97ddfe7c7c80c"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix <amixfix []V0aparentc0amixfix []V0ainfix -V1c1Iainfix >c0c0Iainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
         <proof
          prover="cvc3"
@@ -3773,7 +3717,7 @@
       expl="assertion"
       sum="1b8cac6ec58ccb5a41ede84aea2dfa67"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ais_heap_arrayV4c0ainfix -V1c1Iainfix >V2c0Iainfix =V4amixfix [<-]V3V2amixfix []V0ainfix -V1c1FIainfix <V2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1Iainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
       <proof
        prover="alt-ergo"
@@ -3788,7 +3732,7 @@
       expl="assertion"
       sum="b9f9489d5fd08c762ce23c1c3599975f"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ais_heap_arrayV4c0ainfix -V1c1Iais_heap_arrayV4c0ainfix -V1c1Iainfix >V2c0Iainfix =V4amixfix [<-]V3V2amixfix []V0ainfix -V1c1FIainfix <V2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1Iainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
       <proof
        prover="cvc3"
@@ -3817,7 +3761,7 @@
       expl="assertion"
       sum="966828df56ba6f908cd8a6c4729cc375"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix =aelementsV4c0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Iais_heap_arrayV4c0ainfix -V1c1Iais_heap_arrayV4c0ainfix -V1c1Iainfix >V2c0Iainfix =V4amixfix [<-]V3V2amixfix []V0ainfix -V1c1FIainfix <V2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1Iainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
       <proof
        prover="cvc3"
@@ -3839,18 +3783,18 @@
       expl="normal postcondition"
       sum="21b990f88e681b1f21b0af9d5b1c46fa"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix =aelementsV0c0V1aaddamixfix []V0c0aelementsV5c0V6Aainfix =amixfix []V0c0amin_bagaelementsV0c0V1Aais_heapaTuple2V5V6Iainfix =aTuple2V5V6aTuple2V4ainfix -V1c1FIainfix =aelementsV4c0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Iais_heap_arrayV4c0ainfix -V1c1Iais_heap_arrayV4c0ainfix -V1c1Iainfix >V2c0Iainfix =V4amixfix [<-]V3V2amixfix []V0ainfix -V1c1FIainfix <V2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1Iainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
       <transf
        name="split_goal"
        proved="true"
-       expanded="false">
+       expanded="true">
        <goal
         name="WP_parameter extractMin.7.1"
         expl="parameter extractMin"
         sum="f0221603c876880f52bf0faa0144ddcb"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ais_heapaTuple2V5V6Iainfix =aTuple2V5V6aTuple2V4ainfix -V1c1FIainfix =aelementsV4c0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Iais_heap_arrayV4c0ainfix -V1c1Iais_heap_arrayV4c0ainfix -V1c1Iainfix >V2c0Iainfix =V4amixfix [<-]V3V2amixfix []V0ainfix -V1c1FIainfix <V2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1Iainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
         <proof
          prover="cvc3"
@@ -3872,7 +3816,7 @@
         expl="parameter extractMin"
         sum="3841a1a890a3243ed4f97aef6e457a63"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix =amixfix []V0c0amin_bagaelementsV0c0V1Iainfix =aTuple2V5V6aTuple2V4ainfix -V1c1FIainfix =aelementsV4c0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Iais_heap_arrayV4c0ainfix -V1c1Iais_heap_arrayV4c0ainfix -V1c1Iainfix >V2c0Iainfix =V4amixfix [<-]V3V2amixfix []V0ainfix -V1c1FIainfix <V2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1Iainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
         <proof
          prover="cvc3"
@@ -3915,7 +3859,7 @@
         expl="parameter extractMin"
         sum="ae689208fa4c416a19ad42ae99e033cd"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix =aelementsV0c0V1aaddamixfix []V0c0aelementsV5c0V6Iainfix =aTuple2V5V6aTuple2V4ainfix -V1c1FIainfix =aelementsV4c0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Iais_heap_arrayV4c0ainfix -V1c1Iais_heap_arrayV4c0ainfix -V1c1Iainfix >V2c0Iainfix =V4amixfix [<-]V3V2amixfix []V0ainfix -V1c1FIainfix <V2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1Iainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
         <proof
          prover="cvc3"
@@ -3939,18 +3883,18 @@
       expl="normal postcondition"
       sum="7e0f9753ad06bd53cbaffe8ab8adc2ed"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix =aelementsV0c0V1aaddamixfix []V0c0aelementsV4c0V5Aainfix =amixfix []V0c0amin_bagaelementsV0c0V1Aais_heapaTuple2V4V5Iainfix =aTuple2V4V5aTuple2V3ainfix -V1c1FIainfix <V2ainfix -V1c1NIainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1Iainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
       <transf
        name="split_goal"
        proved="true"
-       expanded="false">
+       expanded="true">
        <goal
         name="WP_parameter extractMin.8.1"
         expl="parameter extractMin"
         sum="735b75eb4c2098f1fdd7077d1efa6779"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ais_heapaTuple2V4V5Iainfix =aTuple2V4V5aTuple2V3ainfix -V1c1FIainfix <V2ainfix -V1c1NIainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1Iainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
         <proof
          prover="cvc3"
@@ -4014,7 +3958,7 @@
         expl="parameter extractMin"
         sum="b5f91ededcbe41a0340581b3d6f42b61"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix =amixfix []V0c0amin_bagaelementsV0c0V1Iainfix =aTuple2V4V5aTuple2V3ainfix -V1c1FIainfix <V2ainfix -V1c1NIainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1Iainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
         <proof
          prover="cvc3"
@@ -4078,7 +4022,7 @@
         expl="parameter extractMin"
         sum="1db7b9f1c731d49809dbcc9a64dd79db"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix =aelementsV0c0V1aaddamixfix []V0c0aelementsV4c0V5Iainfix =aTuple2V4V5aTuple2V3ainfix -V1c1FIainfix <V2ainfix -V1c1NIainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1Iainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
         <proof
          prover="cvc3"
@@ -4144,7 +4088,7 @@
       expl="assertion"
       sum="77c1d4bbc1fd5eb0f940ce93a5d83ed7"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ais_heap_arrayV5c0ainfix -V1c1Iainfix >V2c0Iainfix =V5amixfix [<-]V3V2amixfix []V0ainfix -V1c1FIainfix <V2ainfix -V1c1Iainfix <=amixfix []V0ainfix -V1c1amixfix []V3V4Iainfix =V4ainfix +ainfix *c2V2c2FIainfix >amixfix []V3ainfix +ainfix *c2V2c1amixfix []V3ainfix +ainfix *c2V2c2Iainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
       <proof
        prover="alt-ergo"
@@ -4159,7 +4103,7 @@
       expl="assertion"
       sum="0cf3096e714e2b000e561e0cd275b339"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ais_heap_arrayV5c0ainfix -V1c1Iais_heap_arrayV5c0ainfix -V1c1Iainfix >V2c0Iainfix =V5amixfix [<-]V3V2amixfix []V0ainfix -V1c1FIainfix <V2ainfix -V1c1Iainfix <=amixfix []V0ainfix -V1c1amixfix []V3V4Iainfix =V4ainfix +ainfix *c2V2c2FIainfix >amixfix []V3ainfix +ainfix *c2V2c1amixfix []V3ainfix +ainfix *c2V2c2Iainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
       <proof
        prover="alt-ergo"
@@ -4174,7 +4118,7 @@
       expl="assertion"
       sum="91d81aa4391b8b12f21967e9ba62fed7"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix =aelementsV5c0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Iais_heap_arrayV5c0ainfix -V1c1Iais_heap_arrayV5c0ainfix -V1c1Iainfix >V2c0Iainfix =V5amixfix [<-]V3V2amixfix []V0ainfix -V1c1FIainfix <V2ainfix -V1c1Iainfix <=amixfix []V0ainfix -V1c1amixfix []V3V4Iainfix =V4ainfix +ainfix *c2V2c2FIainfix >amixfix []V3ainfix +ainfix *c2V2c1amixfix []V3ainfix +ainfix *c2V2c2Iainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
       <proof
        prover="cvc3"
@@ -4196,18 +4140,18 @@
       expl="normal postcondition"
       sum="172d893204aa3d621237bd7c24a1cd23"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix =aelementsV0c0V1aaddamixfix []V0c0aelementsV6c0V7Aainfix =amixfix []V0c0amin_bagaelementsV0c0V1Aais_heapaTuple2V6V7Iainfix =aTuple2V6V7aTuple2V5ainfix -V1c1FIainfix =aelementsV5c0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Iais_heap_arrayV5c0ainfix -V1c1Iais_heap_arrayV5c0ainfix -V1c1Iainfix >V2c0Iainfix =V5amixfix [<-]V3V2amixfix []V0ainfix -V1c1FIainfix <V2ainfix -V1c1Iainfix <=amixfix []V0ainfix -V1c1amixfix []V3V4Iainfix =V4ainfix +ainfix *c2V2c2FIainfix >amixfix []V3ainfix +ainfix *c2V2c1amixfix []V3ainfix +ainfix *c2V2c2Iainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
       <transf
        name="split_goal"
        proved="true"
-       expanded="false">
+       expanded="true">
        <goal
         name="WP_parameter extractMin.12.1"
         expl="parameter extractMin"
         sum="5a1c4ed381efac3d70fb30aa1612d965"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ais_heapaTuple2V6V7Iainfix =aTuple2V6V7aTuple2V5ainfix -V1c1FIainfix =aelementsV5c0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Iais_heap_arrayV5c0ainfix -V1c1Iais_heap_arrayV5c0ainfix -V1c1Iainfix >V2c0Iainfix =V5amixfix [<-]V3V2amixfix []V0ainfix -V1c1FIainfix <V2ainfix -V1c1Iainfix <=amixfix []V0ainfix -V1c1amixfix []V3V4Iainfix =V4ainfix +ainfix *c2V2c2FIainfix >amixfix []V3ainfix +ainfix *c2V2c1amixfix []V3ainfix +ainfix *c2V2c2Iainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
         <proof
          prover="alt-ergo"
@@ -4236,7 +4180,7 @@
         expl="parameter extractMin"
         sum="40349cb2a9bfed8c90d3292ba54896f1"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix =amixfix []V0c0amin_bagaelementsV0c0V1Iainfix =aTuple2V6V7aTuple2V5ainfix -V1c1FIainfix =aelementsV5c0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Iais_heap_arrayV5c0ainfix -V1c1Iais_heap_arrayV5c0ainfix -V1c1Iainfix >V2c0Iainfix =V5amixfix [<-]V3V2amixfix []V0ainfix -V1c1FIainfix <V2ainfix -V1c1Iainfix <=amixfix []V0ainfix -V1c1amixfix []V3V4Iainfix =V4ainfix +ainfix *c2V2c2FIainfix >amixfix []V3ainfix +ainfix *c2V2c1amixfix []V3ainfix +ainfix *c2V2c2Iainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
         <proof
          prover="cvc3"
@@ -4279,7 +4223,7 @@
         expl="parameter extractMin"
         sum="8cd7da78e20c9b054fdb551db13a40ca"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix =aelementsV0c0V1aaddamixfix []V0c0aelementsV6c0V7Iainfix =aTuple2V6V7aTuple2V5ainfix -V1c1FIainfix =aelementsV5c0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Iais_heap_arrayV5c0ainfix -V1c1Iais_heap_arrayV5c0ainfix -V1c1Iainfix >V2c0Iainfix =V5amixfix [<-]V3V2amixfix []V0ainfix -V1c1FIainfix <V2ainfix -V1c1Iainfix <=amixfix []V0ainfix -V1c1amixfix []V3V4Iainfix =V4ainfix +ainfix *c2V2c2FIainfix >amixfix []V3ainfix +ainfix *c2V2c1amixfix []V3ainfix +ainfix *c2V2c2Iainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
         <proof
          prover="alt-ergo"
@@ -4317,7 +4261,7 @@
       expl="normal postcondition"
       sum="7ecefeca918ec1f6a017024239c49cce"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix =aelementsV0c0V1aaddamixfix []V0c0aelementsV5c0V6Aainfix =amixfix []V0c0amin_bagaelementsV0c0V1Aais_heapaTuple2V5V6Iainfix =aTuple2V5V6aTuple2V3ainfix -V1c1FIainfix <V2ainfix -V1c1NIainfix <=amixfix []V0ainfix -V1c1amixfix []V3V4Iainfix =V4ainfix +ainfix *c2V2c2FIainfix >amixfix []V3ainfix +ainfix *c2V2c1amixfix []V3ainfix +ainfix *c2V2c2Iainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
       <proof
        prover="alt-ergo"
@@ -4381,18 +4325,18 @@
       expl="loop invariant preservation"
       sum="515851fc20583327a9e604a0b56112d8"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix <amixfix []V5aparentV6amixfix []V0ainfix -V1c1Iainfix >V6c0Aainfix =aelementsV5c0ainfix -V1c1aaddamixfix []V5V6adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V5V0Iainfix =V6c0Aais_heap_arrayV5c0ainfix -V1c1Aainfix <V6ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V6Iainfix =V6V4FIainfix =V5amixfix [<-]V3V2amixfix []V3V4FIainfix <=amixfix []V0ainfix -V1c1amixfix []V3V4NIainfix =V4ainfix +ainfix *c2V2c2FIainfix >amixfix []V3ainfix +ainfix *c2V2c1amixfix []V3ainfix +ainfix *c2V2c2Iainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
       <transf
        name="split_goal"
        proved="true"
-       expanded="false">
+       expanded="true">
        <goal
         name="WP_parameter extractMin.14.1"
         expl="parameter extractMin"
         sum="323c4226f486adf5383190583937578f"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix <=c0V6Iainfix =V6V4FIainfix =V5amixfix [<-]V3V2amixfix []V3V4FIainfix <=amixfix []V0ainfix -V1c1amixfix []V3V4NIainfix =V4ainfix +ainfix *c2V2c2FIainfix >amixfix []V3ainfix +ainfix *c2V2c1amixfix []V3ainfix +ainfix *c2V2c2Iainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
         <proof
          prover="cvc3"
@@ -4428,7 +4372,7 @@
         expl="parameter extractMin"
         sum="ff1f59635c16d6120966e63ba43879f5"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix <V6ainfix -V1c1Iainfix >ainfix -V1c1c0Iainfix =V6V4FIainfix =V5amixfix [<-]V3V2amixfix []V3V4FIainfix <=amixfix []V0ainfix -V1c1amixfix []V3V4NIainfix =V4ainfix +ainfix *c2V2c2FIainfix >amixfix []V3ainfix +ainfix *c2V2c1amixfix []V3ainfix +ainfix *c2V2c2Iainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
         <proof
          prover="cvc3"
@@ -4492,7 +4436,7 @@
         expl="parameter extractMin"
         sum="a6136ca59ca7f2da11f836b1188fda87"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ais_heap_arrayV5c0ainfix -V1c1Iainfix =V6V4FIainfix =V5amixfix [<-]V3V2amixfix []V3V4FIainfix <=amixfix []V0ainfix -V1c1amixfix []V3V4NIainfix =V4ainfix +ainfix *c2V2c2FIainfix >amixfix []V3ainfix +ainfix *c2V2c1amixfix []V3ainfix +ainfix *c2V2c2Iainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
         <proof
          prover="alt-ergo"
@@ -4507,7 +4451,7 @@
         expl="parameter extractMin"
         sum="20eaaacc9b664bcb2e3a4c8d2adcd536"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix =V5V0Iainfix =V6c0Iainfix =V6V4FIainfix =V5amixfix [<-]V3V2amixfix []V3V4FIainfix <=amixfix []V0ainfix -V1c1amixfix []V3V4NIainfix =V4ainfix +ainfix *c2V2c2FIainfix >amixfix []V3ainfix +ainfix *c2V2c1amixfix []V3ainfix +ainfix *c2V2c2Iainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
         <proof
          prover="cvc3"
@@ -4543,7 +4487,7 @@
         expl="parameter extractMin"
         sum="f404d1521ea5e2b7455383eb0c405c2d"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix =aelementsV5c0ainfix -V1c1aaddamixfix []V5V6adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Iainfix =V6V4FIainfix =V5amixfix [<-]V3V2amixfix []V3V4FIainfix <=amixfix []V0ainfix -V1c1amixfix []V3V4NIainfix =V4ainfix +ainfix *c2V2c2FIainfix >amixfix []V3ainfix +ainfix *c2V2c1amixfix []V3ainfix +ainfix *c2V2c2Iainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
         <proof
          prover="cvc3"
@@ -4579,7 +4523,7 @@
         expl="parameter extractMin"
         sum="2e69243e3e5cf594678fef4e540d0692"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix <amixfix []V5aparentV6amixfix []V0ainfix -V1c1Iainfix >V6c0Iainfix =V6V4FIainfix =V5amixfix [<-]V3V2amixfix []V3V4FIainfix <=amixfix []V0ainfix -V1c1amixfix []V3V4NIainfix =V4ainfix +ainfix *c2V2c2FIainfix >amixfix []V3ainfix +ainfix *c2V2c1amixfix []V3ainfix +ainfix *c2V2c2Iainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
         <proof
          prover="cvc3"
@@ -4610,7 +4554,7 @@
       expl="loop variant decreases"
       sum="5a79a99c9ef8c0980b1ace6360d4653e"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix <ainfix -ainfix -V1c1V6ainfix -ainfix -V1c1V2Aainfix <=c0ainfix -ainfix -V1c1V2Iainfix <amixfix []V5aparentV6amixfix []V0ainfix -V1c1Iainfix >V6c0Aainfix =aelementsV5c0ainfix -V1c1aaddamixfix []V5V6adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V5V0Iainfix =V6c0Aais_heap_arrayV5c0ainfix -V1c1Aainfix <V6ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V6Iainfix =V6V4FIainfix =V5amixfix [<-]V3V2amixfix []V3V4FIainfix <=amixfix []V0ainfix -V1c1amixfix []V3V4NIainfix =V4ainfix +ainfix *c2V2c2FIainfix >amixfix []V3ainfix +ainfix *c2V2c1amixfix []V3ainfix +ainfix *c2V2c2Iainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
       <proof
        prover="cvc3"
@@ -4646,7 +4590,7 @@
       expl="assertion"
       sum="d67ea627e2a46d500bd0b04955b8d83a"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ais_heap_arrayV4c0ainfix -V1c1Iainfix >V2c0Iainfix =V4amixfix [<-]V3V2amixfix []V0ainfix -V1c1FIainfix <V2ainfix -V1c1Iainfix <=amixfix []V0ainfix -V1c1amixfix []V3ainfix +ainfix *c2V2c1Iainfix >amixfix []V3ainfix +ainfix *c2V2c1amixfix []V3ainfix +ainfix *c2V2c2NIainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
       <proof
        prover="alt-ergo"
@@ -4661,7 +4605,7 @@
       expl="assertion"
       sum="ab13b72368aaac022ef43749571b5c34"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ais_heap_arrayV4c0ainfix -V1c1Iais_heap_arrayV4c0ainfix -V1c1Iainfix >V2c0Iainfix =V4amixfix [<-]V3V2amixfix []V0ainfix -V1c1FIainfix <V2ainfix -V1c1Iainfix <=amixfix []V0ainfix -V1c1amixfix []V3ainfix +ainfix *c2V2c1Iainfix >amixfix []V3ainfix +ainfix *c2V2c1amixfix []V3ainfix +ainfix *c2V2c2NIainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
       <proof
        prover="alt-ergo"
@@ -4676,7 +4620,7 @@
       expl="assertion"
       sum="40858ae3d96eb05ea154d01fa7edda63"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix =aelementsV4c0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Iais_heap_arrayV4c0ainfix -V1c1Iais_heap_arrayV4c0ainfix -V1c1Iainfix >V2c0Iainfix =V4amixfix [<-]V3V2amixfix []V0ainfix -V1c1FIainfix <V2ainfix -V1c1Iainfix <=amixfix []V0ainfix -V1c1amixfix []V3ainfix +ainfix *c2V2c1Iainfix >amixfix []V3ainfix +ainfix *c2V2c1amixfix []V3ainfix +ainfix *c2V2c2NIainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
       <proof
        prover="cvc3"
@@ -4698,18 +4642,18 @@
       expl="normal postcondition"
       sum="a1de06e32d6150c7ed72b3985ad634a1"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix =aelementsV0c0V1aaddamixfix []V0c0aelementsV5c0V6Aainfix =amixfix []V0c0amin_bagaelementsV0c0V1Aais_heapaTuple2V5V6Iainfix =aTuple2V5V6aTuple2V4ainfix -V1c1FIainfix =aelementsV4c0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Iais_heap_arrayV4c0ainfix -V1c1Iais_heap_arrayV4c0ainfix -V1c1Iainfix >V2c0Iainfix =V4amixfix [<-]V3V2amixfix []V0ainfix -V1c1FIainfix <V2ainfix -V1c1Iainfix <=amixfix []V0ainfix -V1c1amixfix []V3ainfix +ainfix *c2V2c1Iainfix >amixfix []V3ainfix +ainfix *c2V2c1amixfix []V3ainfix +ainfix *c2V2c2NIainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
       <transf
        name="split_goal"
        proved="true"
-       expanded="false">
+       expanded="true">
        <goal
         name="WP_parameter extractMin.19.1"
         expl="parameter extractMin"
         sum="5311d18f444b23b281230fef767f92de"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ais_heapaTuple2V5V6Iainfix =aTuple2V5V6aTuple2V4ainfix -V1c1FIainfix =aelementsV4c0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Iais_heap_arrayV4c0ainfix -V1c1Iais_heap_arrayV4c0ainfix -V1c1Iainfix >V2c0Iainfix =V4amixfix [<-]V3V2amixfix []V0ainfix -V1c1FIainfix <V2ainfix -V1c1Iainfix <=amixfix []V0ainfix -V1c1amixfix []V3ainfix +ainfix *c2V2c1Iainfix >amixfix []V3ainfix +ainfix *c2V2c1amixfix []V3ainfix +ainfix *c2V2c2NIainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
         <proof
          prover="alt-ergo"
@@ -4738,7 +4682,7 @@
         expl="parameter extractMin"
         sum="70be8f34ea19ac0cc7d2c4704039ad3b"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix =amixfix []V0c0amin_bagaelementsV0c0V1Iainfix =aTuple2V5V6aTuple2V4ainfix -V1c1FIainfix =aelementsV4c0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Iais_heap_arrayV4c0ainfix -V1c1Iais_heap_arrayV4c0ainfix -V1c1Iainfix >V2c0Iainfix =V4amixfix [<-]V3V2amixfix []V0ainfix -V1c1FIainfix <V2ainfix -V1c1Iainfix <=amixfix []V0ainfix -V1c1amixfix []V3ainfix +ainfix *c2V2c1Iainfix >amixfix []V3ainfix +ainfix *c2V2c1amixfix []V3ainfix +ainfix *c2V2c2NIainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
         <proof
          prover="cvc3"
@@ -4781,7 +4725,7 @@
         expl="parameter extractMin"
         sum="2929b806beec0da58259a422c8e724dc"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix =aelementsV0c0V1aaddamixfix []V0c0aelementsV5c0V6Iainfix =aTuple2V5V6aTuple2V4ainfix -V1c1FIainfix =aelementsV4c0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Iais_heap_arrayV4c0ainfix -V1c1Iais_heap_arrayV4c0ainfix -V1c1Iainfix >V2c0Iainfix =V4amixfix [<-]V3V2amixfix []V0ainfix -V1c1FIainfix <V2ainfix -V1c1Iainfix <=amixfix []V0ainfix -V1c1amixfix []V3ainfix +ainfix *c2V2c1Iainfix >amixfix []V3ainfix +ainfix *c2V2c1amixfix []V3ainfix +ainfix *c2V2c2NIainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
         <proof
          prover="cvc3"
@@ -4812,18 +4756,18 @@
       expl="normal postcondition"
       sum="3c7eb23d74d84656bf2e5e83469f1b7d"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix =aelementsV0c0V1aaddamixfix []V0c0aelementsV4c0V5Aainfix =amixfix []V0c0amin_bagaelementsV0c0V1Aais_heapaTuple2V4V5Iainfix =aTuple2V4V5aTuple2V3ainfix -V1c1FIainfix <V2ainfix -V1c1NIainfix <=amixfix []V0ainfix -V1c1amixfix []V3ainfix +ainfix *c2V2c1Iainfix >amixfix []V3ainfix +ainfix *c2V2c1amixfix []V3ainfix +ainfix *c2V2c2NIainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
       <transf
        name="split_goal"
        proved="true"
-       expanded="false">
+       expanded="true">
        <goal
         name="WP_parameter extractMin.20.1"
         expl="parameter extractMin"
         sum="2d4c3a38d04cb2181fcf5c770161c6cd"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ais_heapaTuple2V4V5Iainfix =aTuple2V4V5aTuple2V3ainfix -V1c1FIainfix <V2ainfix -V1c1NIainfix <=amixfix []V0ainfix -V1c1amixfix []V3ainfix +ainfix *c2V2c1Iainfix >amixfix []V3ainfix +ainfix *c2V2c1amixfix []V3ainfix +ainfix *c2V2c2NIainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
         <proof
          prover="cvc3"
@@ -4887,7 +4831,7 @@
         expl="parameter extractMin"
         sum="90642d68914a1aa82eae94eae10858fc"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix =amixfix []V0c0amin_bagaelementsV0c0V1Iainfix =aTuple2V4V5aTuple2V3ainfix -V1c1FIainfix <V2ainfix -V1c1NIainfix <=amixfix []V0ainfix -V1c1amixfix []V3ainfix +ainfix *c2V2c1Iainfix >amixfix []V3ainfix +ainfix *c2V2c1amixfix []V3ainfix +ainfix *c2V2c2NIainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
         <proof
          prover="cvc3"
@@ -4951,7 +4895,7 @@
         expl="parameter extractMin"
         sum="9cfc2878dcca518a45526c0d41cafc6e"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix =aelementsV0c0V1aaddamixfix []V0c0aelementsV4c0V5Iainfix =aTuple2V4V5aTuple2V3ainfix -V1c1FIainfix <V2ainfix -V1c1NIainfix <=amixfix []V0ainfix -V1c1amixfix []V3ainfix +ainfix *c2V2c1Iainfix >amixfix []V3ainfix +ainfix *c2V2c1amixfix []V3ainfix +ainfix *c2V2c2NIainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
         <proof
          prover="cvc3"
@@ -5017,18 +4961,18 @@
       expl="loop invariant preservation"
       sum="af38886b3d04c6ee5198ee92d6512bb8"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix <amixfix []V4aparentV5amixfix []V0ainfix -V1c1Iainfix >V5c0Aainfix =aelementsV4c0ainfix -V1c1aaddamixfix []V4V5adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V4V0Iainfix =V5c0Aais_heap_arrayV4c0ainfix -V1c1Aainfix <V5ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V5Iainfix =V5ainfix +ainfix *c2V2c1FIainfix =V4amixfix [<-]V3V2amixfix []V3ainfix +ainfix *c2V2c1FIainfix <=amixfix []V0ainfix -V1c1amixfix []V3ainfix +ainfix *c2V2c1NIainfix >amixfix []V3ainfix +ainfix *c2V2c1amixfix []V3ainfix +ainfix *c2V2c2NIainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
       <transf
        name="split_goal"
        proved="true"
-       expanded="false">
+       expanded="true">
        <goal
         name="WP_parameter extractMin.21.1"
         expl="parameter extractMin"
         sum="26688e917f18bbc464283d0f3500f168"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix <=c0V5Iainfix =V5ainfix +ainfix *c2V2c1FIainfix =V4amixfix [<-]V3V2amixfix []V3ainfix +ainfix *c2V2c1FIainfix <=amixfix []V0ainfix -V1c1amixfix []V3ainfix +ainfix *c2V2c1NIainfix >amixfix []V3ainfix +ainfix *c2V2c1amixfix []V3ainfix +ainfix *c2V2c2NIainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
         <proof
          prover="cvc3"
@@ -5064,7 +5008,7 @@
         expl="parameter extractMin"
         sum="2670cd5617819199384570d89debf053"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix <V5ainfix -V1c1Iainfix >ainfix -V1c1c0Iainfix =V5ainfix +ainfix *c2V2c1FIainfix =V4amixfix [<-]V3V2amixfix []V3ainfix +ainfix *c2V2c1FIainfix <=amixfix []V0ainfix -V1c1amixfix []V3ainfix +ainfix *c2V2c1NIainfix >amixfix []V3ainfix +ainfix *c2V2c1amixfix []V3ainfix +ainfix *c2V2c2NIainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
         <proof
          prover="cvc3"
@@ -5128,7 +5072,7 @@
         expl="parameter extractMin"
         sum="265c8f5a8b30327b98efdb583a52140d"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ais_heap_arrayV4c0ainfix -V1c1Iainfix =V5ainfix +ainfix *c2V2c1FIainfix =V4amixfix [<-]V3V2amixfix []V3ainfix +ainfix *c2V2c1FIainfix <=amixfix []V0ainfix -V1c1amixfix []V3ainfix +ainfix *c2V2c1NIainfix >amixfix []V3ainfix +ainfix *c2V2c1amixfix []V3ainfix +ainfix *c2V2c2NIainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
         <proof
          prover="alt-ergo"
@@ -5143,7 +5087,7 @@
         expl="parameter extractMin"
         sum="5fb4ccfc4e75da954d1cc4cc2063efc7"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix =V4V0Iainfix =V5c0Iainfix =V5ainfix +ainfix *c2V2c1FIainfix =V4amixfix [<-]V3V2amixfix []V3ainfix +ainfix *c2V2c1FIainfix <=amixfix []V0ainfix -V1c1amixfix []V3ainfix +ainfix *c2V2c1NIainfix >amixfix []V3ainfix +ainfix *c2V2c1amixfix []V3ainfix +ainfix *c2V2c2NIainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
         <proof
          prover="cvc3"
@@ -5179,7 +5123,7 @@
         expl="parameter extractMin"
         sum="caabbff99f4b5f96f7e3f33114056926"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix =aelementsV4c0ainfix -V1c1aaddamixfix []V4V5adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Iainfix =V5ainfix +ainfix *c2V2c1FIainfix =V4amixfix [<-]V3V2amixfix []V3ainfix +ainfix *c2V2c1FIainfix <=amixfix []V0ainfix -V1c1amixfix []V3ainfix +ainfix *c2V2c1NIainfix >amixfix []V3ainfix +ainfix *c2V2c1amixfix []V3ainfix +ainfix *c2V2c2NIainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
         <proof
          prover="alt-ergo"
@@ -5208,7 +5152,7 @@
         expl="parameter extractMin"
         sum="ae8fb492e8b146331176d95e48934827"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix <amixfix []V4aparentV5amixfix []V0ainfix -V1c1Iainfix >V5c0Iainfix =V5ainfix +ainfix *c2V2c1FIainfix =V4amixfix [<-]V3V2amixfix []V3ainfix +ainfix *c2V2c1FIainfix <=amixfix []V0ainfix -V1c1amixfix []V3ainfix +ainfix *c2V2c1NIainfix >amixfix []V3ainfix +ainfix *c2V2c1amixfix []V3ainfix +ainfix *c2V2c2NIainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
         <proof
          prover="alt-ergo"
@@ -5239,7 +5183,7 @@
       expl="loop variant decreases"
       sum="2d9901ec601a64b2eeb32c3c405e77d1"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix <ainfix -ainfix -V1c1V5ainfix -ainfix -V1c1V2Aainfix <=c0ainfix -ainfix -V1c1V2Iainfix <amixfix []V4aparentV5amixfix []V0ainfix -V1c1Iainfix >V5c0Aainfix =aelementsV4c0ainfix -V1c1aaddamixfix []V4V5adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V4V0Iainfix =V5c0Aais_heap_arrayV4c0ainfix -V1c1Aainfix <V5ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V5Iainfix =V5ainfix +ainfix *c2V2c1FIainfix =V4amixfix [<-]V3V2amixfix []V3ainfix +ainfix *c2V2c1FIainfix <=amixfix []V0ainfix -V1c1amixfix []V3ainfix +ainfix *c2V2c1NIainfix >amixfix []V3ainfix +ainfix *c2V2c1amixfix []V3ainfix +ainfix *c2V2c2NIainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
       <proof
        prover="cvc3"
@@ -5275,7 +5219,7 @@
       expl="assertion"
       sum="d3a7e504094dfa08199fb6eb74d31444"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ais_heap_arrayV4c0ainfix -V1c1Iainfix >V2c0Iainfix =V4amixfix [<-]V3V2amixfix []V0ainfix -V1c1FIainfix <V2ainfix -V1c1Iainfix <=amixfix []V0ainfix -V1c1amixfix []V3ainfix +ainfix *c2V2c1Iainfix <ainfix +ainfix *c2V2c2ainfix -V1c1NIainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
       <proof
        prover="alt-ergo"
@@ -5290,7 +5234,7 @@
       expl="assertion"
       sum="c2cc11cff0925d4789f037ac338dd8f3"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ais_heap_arrayV4c0ainfix -V1c1Iais_heap_arrayV4c0ainfix -V1c1Iainfix >V2c0Iainfix =V4amixfix [<-]V3V2amixfix []V0ainfix -V1c1FIainfix <V2ainfix -V1c1Iainfix <=amixfix []V0ainfix -V1c1amixfix []V3ainfix +ainfix *c2V2c1Iainfix <ainfix +ainfix *c2V2c2ainfix -V1c1NIainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
       <proof
        prover="cvc3"
@@ -5319,7 +5263,7 @@
       expl="assertion"
       sum="8e26b4f63df058db263ac6c00c6f370f"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix =aelementsV4c0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Iais_heap_arrayV4c0ainfix -V1c1Iais_heap_arrayV4c0ainfix -V1c1Iainfix >V2c0Iainfix =V4amixfix [<-]V3V2amixfix []V0ainfix -V1c1FIainfix <V2ainfix -V1c1Iainfix <=amixfix []V0ainfix -V1c1amixfix []V3ainfix +ainfix *c2V2c1Iainfix <ainfix +ainfix *c2V2c2ainfix -V1c1NIainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
       <proof
        prover="cvc3"
@@ -5341,7 +5285,7 @@
       expl="normal postcondition"
       sum="e3a2786dc33e6c2d6e061452888c4eca"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix =aelementsV0c0V1aaddamixfix []V0c0aelementsV5c0V6Aainfix =amixfix []V0c0amin_bagaelementsV0c0V1Aais_heapaTuple2V5V6Iainfix =aTuple2V5V6aTuple2V4ainfix -V1c1FIainfix =aelementsV4c0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Iais_heap_arrayV4c0ainfix -V1c1Iais_heap_arrayV4c0ainfix -V1c1Iainfix >V2c0Iainfix =V4amixfix [<-]V3V2amixfix []V0ainfix -V1c1FIainfix <V2ainfix -V1c1Iainfix <=amixfix []V0ainfix -V1c1amixfix []V3ainfix +ainfix *c2V2c1Iainfix <ainfix +ainfix *c2V2c2ainfix -V1c1NIainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
       <proof
        prover="cvc3"
@@ -5363,7 +5307,7 @@
       expl="normal postcondition"
       sum="97c051c7d061d9103d3cc7ebbe7d6049"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix =aelementsV0c0V1aaddamixfix []V0c0aelementsV4c0V5Aainfix =amixfix []V0c0amin_bagaelementsV0c0V1Aais_heapaTuple2V4V5Iainfix =aTuple2V4V5aTuple2V3ainfix -V1c1FIainfix <V2ainfix -V1c1NIainfix <=amixfix []V0ainfix -V1c1amixfix []V3ainfix +ainfix *c2V2c1Iainfix <ainfix +ainfix *c2V2c2ainfix -V1c1NIainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
       <proof
        prover="alt-ergo"
@@ -5427,18 +5371,18 @@
       expl="loop invariant preservation"
       sum="97a92f87f776762fe33ea23cd4043b49"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix <amixfix []V4aparentV5amixfix []V0ainfix -V1c1Iainfix >V5c0Aainfix =aelementsV4c0ainfix -V1c1aaddamixfix []V4V5adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V4V0Iainfix =V5c0Aais_heap_arrayV4c0ainfix -V1c1Aainfix <V5ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V5Iainfix =V5ainfix +ainfix *c2V2c1FIainfix =V4amixfix [<-]V3V2amixfix []V3ainfix +ainfix *c2V2c1FIainfix <=amixfix []V0ainfix -V1c1amixfix []V3ainfix +ainfix *c2V2c1NIainfix <ainfix +ainfix *c2V2c2ainfix -V1c1NIainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
       <transf
        name="split_goal"
        proved="true"
-       expanded="false">
+       expanded="true">
        <goal
         name="WP_parameter extractMin.28.1"
         expl="parameter extractMin"
         sum="cf1ab2a4013dacb87cda1a5fd671f97d"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix <=c0V5Iainfix =V5ainfix +ainfix *c2V2c1FIainfix =V4amixfix [<-]V3V2amixfix []V3ainfix +ainfix *c2V2c1FIainfix <=amixfix []V0ainfix -V1c1amixfix []V3ainfix +ainfix *c2V2c1NIainfix <ainfix +ainfix *c2V2c2ainfix -V1c1NIainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
         <proof
          prover="cvc3"
@@ -5474,7 +5418,7 @@
         expl="parameter extractMin"
         sum="168cbdfa194b7c1c7f3f9e18ccd34126"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix <V5ainfix -V1c1Iainfix >ainfix -V1c1c0Iainfix =V5ainfix +ainfix *c2V2c1FIainfix =V4amixfix [<-]V3V2amixfix []V3ainfix +ainfix *c2V2c1FIainfix <=amixfix []V0ainfix -V1c1amixfix []V3ainfix +ainfix *c2V2c1NIainfix <ainfix +ainfix *c2V2c2ainfix -V1c1NIainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
         <proof
          prover="cvc3"
@@ -5538,7 +5482,7 @@
         expl="parameter extractMin"
         sum="6afd23ade1c7290697123d2277589222"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ais_heap_arrayV4c0ainfix -V1c1Iainfix =V5ainfix +ainfix *c2V2c1FIainfix =V4amixfix [<-]V3V2amixfix []V3ainfix +ainfix *c2V2c1FIainfix <=amixfix []V0ainfix -V1c1amixfix []V3ainfix +ainfix *c2V2c1NIainfix <ainfix +ainfix *c2V2c2ainfix -V1c1NIainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
         <proof
          prover="alt-ergo"
@@ -5553,7 +5497,7 @@
         expl="parameter extractMin"
         sum="69054e7afb966c15fa3cf550ba04d9ba"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix =V4V0Iainfix =V5c0Iainfix =V5ainfix +ainfix *c2V2c1FIainfix =V4amixfix [<-]V3V2amixfix []V3ainfix +ainfix *c2V2c1FIainfix <=amixfix []V0ainfix -V1c1amixfix []V3ainfix +ainfix *c2V2c1NIainfix <ainfix +ainfix *c2V2c2ainfix -V1c1NIainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
         <proof
          prover="cvc3"
@@ -5589,7 +5533,7 @@
         expl="parameter extractMin"
         sum="2dc82247d2f87e12700e856a8b1b8711"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix =aelementsV4c0ainfix -V1c1aaddamixfix []V4V5adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Iainfix =V5ainfix +ainfix *c2V2c1FIainfix =V4amixfix [<-]V3V2amixfix []V3ainfix +ainfix *c2V2c1FIainfix <=amixfix []V0ainfix -V1c1amixfix []V3ainfix +ainfix *c2V2c1NIainfix <ainfix +ainfix *c2V2c2ainfix -V1c1NIainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
         <proof
          prover="cvc3"
@@ -5611,7 +5555,7 @@
         expl="parameter extractMin"
         sum="d1b37aa795540d65180b2f4754dd3e9a"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix <amixfix []V4aparentV5amixfix []V0ainfix -V1c1Iainfix >V5c0Iainfix =V5ainfix +ainfix *c2V2c1FIainfix =V4amixfix [<-]V3V2amixfix []V3ainfix +ainfix *c2V2c1FIainfix <=amixfix []V0ainfix -V1c1amixfix []V3ainfix +ainfix *c2V2c1NIainfix <ainfix +ainfix *c2V2c2ainfix -V1c1NIainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
         <proof
          prover="cvc3"
@@ -5642,7 +5586,7 @@
       expl="loop variant decreases"
       sum="4f1b3dce8190680a16c8eaff5d52d29b"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix <ainfix -ainfix -V1c1V5ainfix -ainfix -V1c1V2Aainfix <=c0ainfix -ainfix -V1c1V2Iainfix <amixfix []V4aparentV5amixfix []V0ainfix -V1c1Iainfix >V5c0Aainfix =aelementsV4c0ainfix -V1c1aaddamixfix []V4V5adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V4V0Iainfix =V5c0Aais_heap_arrayV4c0ainfix -V1c1Aainfix <V5ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V5Iainfix =V5ainfix +ainfix *c2V2c1FIainfix =V4amixfix [<-]V3V2amixfix []V3ainfix +ainfix *c2V2c1FIainfix <=amixfix []V0ainfix -V1c1amixfix []V3ainfix +ainfix *c2V2c1NIainfix <ainfix +ainfix *c2V2c2ainfix -V1c1NIainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
       <proof
        prover="cvc3"
@@ -5678,7 +5622,7 @@
       expl="assertion"
       sum="5ef0576999821df95a41138146ca8ed8"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix =ainfix -V1c1c0Iainfix <V2ainfix -V1c1NIainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
       <proof
        prover="cvc3"
@@ -5714,7 +5658,7 @@
       expl="assertion"
       sum="534e4c96c5e750325dd31829a8ecd811"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ais_heap_arrayV4c0ainfix -V1c1Iainfix >V2c0Iainfix =V4amixfix [<-]V3V2amixfix []V0ainfix -V1c1FIainfix <V2ainfix -V1c1Iainfix =ainfix -V1c1c0Iainfix <V2ainfix -V1c1NIainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
       <proof
        prover="cvc3"
@@ -5778,7 +5722,7 @@
       expl="assertion"
       sum="6e9de91461b96e06912994bfb86cadd5"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ais_heap_arrayV4c0ainfix -V1c1Iais_heap_arrayV4c0ainfix -V1c1Iainfix >V2c0Iainfix =V4amixfix [<-]V3V2amixfix []V0ainfix -V1c1FIainfix <V2ainfix -V1c1Iainfix =ainfix -V1c1c0Iainfix <V2ainfix -V1c1NIainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
       <proof
        prover="alt-ergo"
@@ -5842,7 +5786,7 @@
       expl="assertion"
       sum="0434214d0734cd8bb70e87d87105a841"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix =aelementsV4c0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Iais_heap_arrayV4c0ainfix -V1c1Iais_heap_arrayV4c0ainfix -V1c1Iainfix >V2c0Iainfix =V4amixfix [<-]V3V2amixfix []V0ainfix -V1c1FIainfix <V2ainfix -V1c1Iainfix =ainfix -V1c1c0Iainfix <V2ainfix -V1c1NIainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
       <proof
        prover="cvc3"
@@ -5906,7 +5850,7 @@
       expl="normal postcondition"
       sum="1770aab4825c3fb8e0152f9cbb629152"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix =aelementsV0c0V1aaddamixfix []V0c0aelementsV5c0V6Aainfix =amixfix []V0c0amin_bagaelementsV0c0V1Aais_heapaTuple2V5V6Iainfix =aTuple2V5V6aTuple2V4ainfix -V1c1FIainfix =aelementsV4c0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Iais_heap_arrayV4c0ainfix -V1c1Iais_heap_arrayV4c0ainfix -V1c1Iainfix >V2c0Iainfix =V4amixfix [<-]V3V2amixfix []V0ainfix -V1c1FIainfix <V2ainfix -V1c1Iainfix =ainfix -V1c1c0Iainfix <V2ainfix -V1c1NIainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
       <proof
        prover="cvc3"
@@ -5970,7 +5914,7 @@
       expl="normal postcondition"
       sum="3b9d46ca5e28c2ed8cdbf63af8b5e934"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix =aelementsV0c0V1aaddamixfix []V0c0aelementsV4c0V5Aainfix =amixfix []V0c0amin_bagaelementsV0c0V1Aais_heapaTuple2V4V5Iainfix =aTuple2V4V5aTuple2V3ainfix -V1c1FIainfix <V2ainfix -V1c1NIainfix =ainfix -V1c1c0Iainfix <V2ainfix -V1c1NIainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
       <proof
        prover="cvc3"
@@ -6008,16 +5952,16 @@
  <file
   name="../heap_model.why"
   verified="true"
-  expanded="false">
+  expanded="true">
   <theory
    name="Model"
    verified="true"
-   expanded="false">
+   expanded="true">
    <goal
     name="Model_empty"
     sum="1e9254e4d4731f82aa9ca01fdb3b367d"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =amodelaTuple2V0c0aempty_bagF">
     <proof
      prover="cvc3"
@@ -6073,7 +6017,7 @@
     name="Model_singleton"
     sum="9c1b0821eb60708117ef3de787e3d0bd"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =amodelaTuple2V0c1asingletonamixfix []V0c0F">
     <proof
      prover="cvc3"
@@ -6129,7 +6073,7 @@
     name="Model_set"
     sum="b0eeaad211a4f5d48bf68989fbeb4cff"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =aaddamixfix []V0V3amodelaTuple2amixfix [<-]V0V3V2V4aaddV2amodelaTuple2V0V4Iainfix <V3V4Aainfix <=c0V3F">
     <proof
      prover="coq"
@@ -6143,7 +6087,7 @@
     name="Model_add_last"
     sum="d6297f6e7b40e9c0de1674e59f223ad1"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =amodelaTuple2V0ainfix +V1c1aaddamixfix []V0V1amodelaTuple2V0V1Iainfix >=V1c0F">
     <proof
      prover="cvc3"
@@ -6181,7 +6125,7 @@
     name="Parent_inf"
     sum="a7cdb7bd0fc39a2665689dfdda2a10cd"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix <aparentV0V0Iainfix <c0V0F">
     <proof
      prover="simplify"
@@ -6223,7 +6167,7 @@
     name="Left_sup"
     sum="e0aa5898609ce1e637f929163f14b8b8"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix <V0aleftV0Iainfix <=c0V0F">
     <proof
      prover="simplify"
@@ -6265,7 +6209,7 @@
     name="Right_sup"
     sum="9d827bec0292e24ce097853e089ca79a"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix <V0arightV0Iainfix <=c0V0F">
     <proof
      prover="simplify"
@@ -6307,7 +6251,7 @@
     name="Parent_right"
     sum="a523c36182d8e449729fa220d66bb1b6"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =aparentarightV0V0Iainfix <=c0V0F">
     <proof
      prover="simplify"
@@ -6349,7 +6293,7 @@
     name="Parent_left"
     sum="ca949b2386e625b6df751171aaaf3cad"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =aparentaleftV0V0Iainfix <=c0V0F">
     <proof
      prover="simplify"
@@ -6391,7 +6335,7 @@
     name="Inf_parent"
     sum="b2b195ad120614cd76e70bf81b37bbf9"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix <=aparentV1V0Iainfix <=V1arightV0Aainfix <c0V1F">
     <proof
      prover="simplify"
@@ -6433,7 +6377,7 @@
     name="Child_parent"
     sum="7eea02a87c8284056f73ee4d11752f2f"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =V0arightaparentV0Oainfix =V0aleftaparentV0Iainfix <c0V0F">
     <proof
      prover="simplify"
@@ -6475,7 +6419,7 @@
     name="Parent_pos"
     sum="01a9858bd072f441d90435a50c193f94"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix <=c0aparentV0Iainfix <c0V0F">
     <proof
      prover="simplify"
@@ -6524,7 +6468,7 @@
     name="Is_heap_when_no_element"
     sum="d222eeb36014bdbdce57cdf3d064d7f6"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ais_heap_arrayV0V1V2Iainfix <=V2V1Aainfix <=c0V2F">
     <proof
      prover="simplify"
@@ -6580,7 +6524,7 @@
     name="Is_heap_sub"
     sum="f5861b699db662a4399a470ce47074ab"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ais_heap_arrayV0V1V3Iainfix <=V3V2Aainfix <=V1V3FIais_heap_arrayV0V1V2F">
     <proof
      prover="simplify"
@@ -6622,7 +6566,7 @@
     name="Is_heap_sub2"
     sum="321cc056df34388eca2000d59d1d7dfb"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ais_heap_arrayV0V2V1Iainfix <=V2V1Aainfix <=c0V2FIais_heap_arrayV0c0V1F">
     <proof
      prover="simplify"
@@ -6657,7 +6601,7 @@
     name="Is_heap_when_node_modified"
     sum="57a108dd313cb4ace742337028048457"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ais_heap_arrayamixfix [<-]V0V4V2V3V1Iainfix <=V2amixfix []V0arightV4Iainfix <arightV4V1Iainfix <=V2amixfix []V0aleftV4Iainfix <aleftV4V1Iainfix <=amixfix []V0aparentV4V2Iainfix >V4c0Iais_heap_arrayV0V3V1Iainfix <V4V1Aainfix <=c0V4F">
     <proof
      prover="cvc3"
@@ -6692,7 +6636,7 @@
     name="Is_heap_add_last"
     sum="95c52398c821a79e2408048717da285f"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ais_heap_arrayamixfix [<-]V0V1V2c0ainfix +V1c1Iainfix >=V2amixfix []V0aparentV1Aais_heap_arrayV0c0V1Iainfix >V1c0F">
     <proof
      prover="cvc3"
@@ -6720,7 +6664,7 @@
     name="Parent_inf_el"
     sum="7b629c67bb3cb6a6d14794d776fd400f"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix <=amixfix []V0aparentV2amixfix []V0V2Iainfix <V2V1Aainfix <c0V2FIais_heap_arrayV0c0V1F">
     <proof
      prover="cvc3"
@@ -6762,7 +6706,7 @@
     name="Left_sup_el"
     sum="a3e53e214abf8bf93bf90111b6fa2b54"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix <=amixfix []V0V2amixfix []V0aleftV2Iainfix <aleftV2V1Iainfix <V2V1Aainfix <=c0V2FIais_heap_arrayV0c0V1F">
     <proof
      prover="simplify"
@@ -6818,7 +6762,7 @@
     name="Right_sup_el"
     sum="09b8c10eb823f4bec60032d88e121c6d"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix <=amixfix []V0V2amixfix []V0arightV2Iainfix <arightV2V1Iainfix <V2V1Aainfix <=c0V2FIais_heap_arrayV0c0V1F">
     <proof
      prover="simplify"
@@ -6874,7 +6818,7 @@
     name="Is_heap_relation"
     sum="b6e142a5cdd67f9aa5baddfed1ba7d9a"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix <=amixfix []V0c0amixfix []V0V2Iainfix <V2V1Iainfix <=c0V2FIais_heap_arrayV0c0V1Iainfix >V1c0F">
     <proof
      prover="coq"

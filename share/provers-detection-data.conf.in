@@ -38,7 +38,7 @@ version_switch = "-version"
 version_regexp = "This is CVC3 version \\([^ \n]+\\)"
 version_ok = "2.2"
 version_old = "2.1"
-command = "@LOCALBIN@why3-cpulimit 0 %m -s %e -timeout %t %f"
+command = "@LOCALBIN@why3-cpulimit %t %m -s %e -timeout %T %f"
 driver = "drivers/cvc3.drv"
 
 [ATP yices]
@@ -62,7 +62,9 @@ exec = "eprover"
 version_switch = "--version"
 version_regexp = "E \\([^\n]+\\)"
 version_ok = "1.4 Namring"
-command = "@LOCALBIN@why3-cpulimit 0 %m -s %e -s -R -xAuto -tAuto --cpu-limit=%t --tstp-in %f"
+# we pass %T ie time+1 to e-prover, 
+# to avoid replacing answer "timeout" by "unknown"
+command = "@LOCALBIN@why3-cpulimit %t %m -s %e -s -R -xAuto -tAuto --cpu-limit=%T --tstp-in %f"
 driver = "drivers/tptp.drv"
 
 [ATP gappa]
@@ -102,7 +104,9 @@ exec = "SPASS"
 version_switch = "-TPTP || true"
 version_regexp = "SPASS V \\([^ \n\t]+\\)"
 version_ok = "3.7"
-command = "@LOCALBIN@why3-cpulimit 0 %m -s %e -TPTP -PGiven=0 -PProblem=0 -TimeLimit=%t %f"
+# we pass %T ie time+1 to spass, 
+# to avoid replacing answer "timeout" by "unknown"
+command = "@LOCALBIN@why3-cpulimit %t %m -s %e -TPTP -PGiven=0 -PProblem=0 -TimeLimit=%T %f"
 driver = "drivers/tptp.drv"
 
 [ATP vampire]
@@ -110,7 +114,9 @@ name = "Vampire"
 exec = "vampire"
 version_switch = "--version"
 version_regexp = "Vampire \\([0-9.]+\\)"
-command = "@LOCALBIN@why3-cpulimit %t %m -s %e -t %t"
+# we pass %T ie time+1 to vampire, 
+# to avoid replacing answer "timeout" by "unknown"
+command = "@LOCALBIN@why3-cpulimit %t %m -s %e -t %T"
 driver = "drivers/vampire.drv"
 version_ok = "0.6"
 
