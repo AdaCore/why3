@@ -48,18 +48,32 @@
   version="2.19"/>
  <file
   name="../wp.mlw"
-  verified="true"
+  verified="false"
   expanded="true">
   <theory
    name="Imp"
-   verified="true"
+   verified="false"
    expanded="true">
    <goal
     name="Test13"
-    sum="10a7fb7a54721cc5d2e8fe0ccc0a06dd"
+    sum="79f3fb3351626d34bfb37da12b0bd140"
     proved="true"
     expanded="true"
-    shape="ainfix =aeval_termamy_stateaTconstc13aVintc13">
+    shape="aeval_termamy_stateaTconstc13aVintc13">
+    <proof
+     prover="alt-ergo"
+     timelimit="3"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.06"/>
+    </proof>
+   </goal>
+   <goal
+    name="Test42"
+    sum="1f19dab18a6999ab7e11f82d7e74d850"
+    proved="true"
+    expanded="true"
+    shape="aeval_termamy_stateaTvarc0aVintc42">
     <proof
      prover="alt-ergo"
      timelimit="3"
@@ -69,31 +83,38 @@
     </proof>
    </goal>
    <goal
-    name="Test42"
-    sum="8062e7b817a81543a8e958c35e86e92f"
-    proved="true"
-    expanded="true"
-    shape="ainfix =aeval_termamy_stateaTvarc0aVintc42">
-    <proof
-     prover="alt-ergo"
-     timelimit="3"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.07"/>
-    </proof>
-   </goal>
-   <goal
     name="Test55"
-    sum="2890146a1089020f995c0962244237b7"
-    proved="true"
+    sum="0bf8af91734c8766090834ab82722ed2"
+    proved="false"
     expanded="true"
-    shape="ainfix =aeval_termamy_stateaTbinaTvarc0aOplusaTconstc13aVintc55">
+    shape="aeval_termamy_stateaTbinaTvarc0aOplusaTconstc13aVintc55">
     <proof
      prover="coq"
      timelimit="3"
      edited="wp_Imp_Test55_1.v"
+     obsolete="true">
+     <result status="highfailure" time="0.63"/>
+    </proof>
+    <proof
+     prover="alt-ergo"
+     timelimit="5"
+     edited=""
      obsolete="false">
-     <result status="valid" time="0.47"/>
+     <result status="timeout" time="5.08"/>
+    </proof>
+    <proof
+     prover="cvc3"
+     timelimit="5"
+     edited="wp-Imp-Test55_1.cvc"
+     obsolete="true">
+     <result status="timeout" time="5.29"/>
+    </proof>
+    <proof
+     prover="z3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="timeout" time="5.48"/>
     </proof>
    </goal>
   </theory>

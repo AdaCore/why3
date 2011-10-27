@@ -26,7 +26,6 @@ use import int.Int
 use import bool.Bool
 
 type value =
-  | Verror
   | Vint int
   | Vbool bool
 
@@ -36,55 +35,58 @@ type state = {| var_env : list value; ref_env: list value |}
 
 (* semantics of formulas *)
 
-function eval_bin (x:value) (op:operator) (y:value) : value =
+predicate eval_bin (x:value) (op:operator) (y:value) (res:value) =
   match x,y with
   | Vint x,Vint y ->
      match op with
-     | Oplus -> Vint (x+y)
-     | Ominus -> Vint (x-y)
-     | Omult -> Vint (x*y)
+     | Oplus -> res = Vint (x+y)
+     | Ominus -> res = Vint (x-y)
+     | Omult -> res = Vint (x*y)
      end
-  | _,_ -> Verror
+  | _,_ -> false
   end
 
 use import list.Nth
 
-function get_env (i:int) (env:list value) : value =
+predicate get_env (i:int) (env:list value) (res:value) =
   match nth i env with
-  | None -> Verror
-  | Some v -> v
+  | None -> false
+  | Some v -> v = res
   end
-
-function eval_term (s:state) (t:term) : value =
-  match t with
-    | Tconst n -> Vint n
-    | Tvar i -> get_env i (var_env s)
-    | Tderef i -> get_env i (ref_env s)
-    | Tbin t1 op t2 ->
-       eval_bin (eval_term s t1) op (eval_term s t2)
-  end
+ 
+  inductive eval_term state term value =
+  | eval_const :
+      forall s:state, n:int. eval_term s (Tconst n) (Vint n)
+  | eval_var :
+      forall s:state, i:int, res:value.
+        get_env i (var_env s) res -> eval_term s (Tvar i) res
+  | eval_deref :
+      forall s:state, i:int, res:value.
+        get_env i (ref_env s) res -> eval_term s (Tderef i) res
+  | eval_bin :
+      forall s:state, op:operator, t1 t2:term, r1 r2 r:value.
+        eval_term s t1 r1 -> eval_term s t2 r2 ->
+        eval_bin r1 op r2 r -> eval_term s (Tbin t1 op t2) r
 
   function my_state :state = 
     {| var_env = Cons (Vint 42) Nil; ref_env = Nil |}
 
   goal Test13 :
-    eval_term my_state (Tconst 13) = Vint 13
+    eval_term my_state (Tconst 13) (Vint 13)
 
   goal Test42 :
-    eval_term my_state (Tvar 0) = Vint 42
+    eval_term my_state (Tvar 0) (Vint 42)
 
   goal Test55 :
-    eval_term my_state (Tbin (Tvar 0) Oplus (Tconst 13)) = Vint 55
+    eval_term my_state (Tbin (Tvar 0) Oplus (Tconst 13)) (Vint 55)
 
 (*
-
-predicate eval_fmla (s:state) (f:fmla) =
-  match f with
-  | Fterm t ->
-     match eval_term s t with
-     | Verror -> false
-     | Vint n -> n <> 0
-     | Vbool b -> b = True
+  predicate eval_fmla (s:state) (f:fmla) (b:bool) =
+    match f with
+      | Fterm t -> eval_term s t with
+            | Verror -> false
+            | Vint n -> n <> 0
+            | Vbool b -> b = True
      end
   | Fand f1 f2 ->  eval_fmla s f1 /\ eval_fmla s f2
   | Fnot f ->  not (eval_fmla s f)

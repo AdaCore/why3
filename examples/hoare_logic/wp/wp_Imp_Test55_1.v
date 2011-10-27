@@ -22,7 +22,6 @@ Inductive fmla  :=
   | Fforall : fmla -> fmla .
 
 Inductive value  :=
-  | Verror : value 
   | Vint : Z -> value 
   | Vbool : bool -> value .
 
@@ -47,15 +46,16 @@ Definition var_env(u:state): (list value) :=
   | (mk_state var_env1 _) => var_env1
   end.
 
-Definition eval_bin(x:value) (op:operator) (y:value): value := match (x,
+Definition eval_bin(x:value) (op:operator) (y:value) (res:value): Prop :=
+  match (x,
   y) with
   | ((Vint x1), (Vint y1)) =>
       match op with
-      | Oplus => (Vint (x1 + y1)%Z)
-      | Ominus => (Vint (x1 - y1)%Z)
-      | Omult => (Vint (x1 * y1)%Z)
+      | Oplus => (res = (Vint (x1 + y1)%Z))
+      | Ominus => (res = (Vint (x1 - y1)%Z))
+      | Omult => (res = (Vint (x1 * y1)%Z))
       end
-  | (_, _) => Verror
+  | (_, _) => False
   end.
 
 Inductive option (a:Type) :=
@@ -77,30 +77,34 @@ Axiom nth_def : forall (a:Type), forall (n:Z) (l:(list a)),
       ((nth n l) = (nth (n - 1%Z)%Z r)))
   end.
 
-Definition get_env(i:Z) (env:(list value)): value := match (nth i
+Definition get_env(i:Z) (env:(list value)) (res:value): Prop := match (nth i
   env) with
-  | None => Verror
-  | (Some v) => v
+  | None => False
+  | (Some v) => (v = res)
   end.
 
-Set Implicit Arguments.
-Fixpoint eval_term(s:state) (t:term) {struct t}: value :=
-  match t with
-  | (Tconst n) => (Vint n)
-  | (Tvar i) => (get_env i (var_env s))
-  | (Tderef i) => (get_env i (ref_env s))
-  | (Tbin t1 op t2) => (eval_bin (eval_term s t1) op (eval_term s t2))
-  end.
-Unset Implicit Arguments.
+Inductive eval_term : state -> term -> value -> Prop :=
+  | eval_const : forall (s:state) (n:Z), (eval_term s (Tconst n) (Vint n))
+  | eval_var : forall (s:state) (i:Z) (res:value), (get_env i (var_env s)
+      res) -> (eval_term s (Tvar i) res)
+  | eval_deref : forall (s:state) (i:Z) (res:value), (get_env i (ref_env s)
+      res) -> (eval_term s (Tderef i) res)
+  | eval_bin1 : forall (s:state) (op:operator) (t1:term) (t2:term) (r1:value)
+      (r2:value) (r:value), (eval_term s t1 r1) -> ((eval_term s t2 r2) ->
+      ((eval_bin r1 op r2 r) -> (eval_term s (Tbin t1 op t2) r))).
 
 (* YOU MAY EDIT THE CONTEXT BELOW *)
 
 (* DO NOT EDIT BELOW *)
 
-Theorem Test55 : ((eval_term (mk_state (Cons (Vint 42%Z) (Nil:(list value)))
-  (Nil:(list value))) (Tbin (Tvar 0%Z) Oplus (Tconst 13%Z))) = (Vint 55%Z)).
+Theorem Test55 : (eval_term (mk_state (Cons (Vint 42%Z) (Nil:(list value)))
+  (Nil:(list value))) (Tbin (Tvar 0%Z) Oplus (Tconst 13%Z)) (Vint 55%Z)).
 (* YOU MAY EDIT THE PROOF BELOW *)
-simpl.
+apply eval_bin1 with (r1:=Vint 42) (r2:=Vint 13).
+constructor.
+red; simpl.
+generalize (nth_def _ 0 (Cons (Vint 42) Nil)).
+SearchAbout nth.
 unfold eval_bin; simpl.
 unfold get_env; simpl.
 generalize (nth_def _ 0 (Cons (Vint 42) Nil)).
