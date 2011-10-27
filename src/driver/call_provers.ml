@@ -128,7 +128,6 @@ let call_on_buffer ~command ?(timelimit=0) ?(memlimit=0)
     | "%" -> "%"
     | "f" -> file
     | "t" -> on_timelimit := true; string_of_int timelimit
-    | "T" -> on_timelimit := true; string_of_int (timelimit+1)
     | "m" -> string_of_int memlimit
     | "b" -> string_of_int (memlimit * 1024)
     | _ -> failwith "unknown format specifier, use %%f, %%t, %%m or %%b"
