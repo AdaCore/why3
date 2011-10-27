@@ -56,7 +56,7 @@
    expanded="true">
    <goal
     name="Test13"
-    sum="79f3fb3351626d34bfb37da12b0bd140"
+    sum="588a68a35eb40a90e89f2604e6fd3683"
     proved="true"
     expanded="true"
     shape="aeval_termamy_stateaTconstc13aVintc13">
@@ -65,12 +65,12 @@
      timelimit="3"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.06"/>
+     <result status="valid" time="0.03"/>
     </proof>
    </goal>
    <goal
     name="Test42"
-    sum="1f19dab18a6999ab7e11f82d7e74d850"
+    sum="ad60784608efee681d7bfb6d4657ce64"
     proved="true"
     expanded="true"
     shape="aeval_termamy_stateaTvarc0aVintc42">
@@ -79,42 +79,119 @@
      timelimit="3"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.05"/>
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="Test55"
-    sum="0bf8af91734c8766090834ab82722ed2"
-    proved="false"
+    sum="a416d24c7e960e30780c57a6ed5795aa"
+    proved="true"
     expanded="true"
     shape="aeval_termamy_stateaTbinaTvarc0aOplusaTconstc13aVintc55">
     <proof
      prover="coq"
-     timelimit="3"
-     edited="wp_Imp_Test55_1.v"
-     obsolete="true">
-     <result status="highfailure" time="0.63"/>
+     timelimit="5"
+     edited="wp_Imp_Test55_2.v"
+     obsolete="false">
+     <result status="valid" time="0.52"/>
+    </proof>
+   </goal>
+   <goal
+    name="check_skip"
+    sum="2dfd7981c1282e38fe4d32469fa442c3"
+    proved="true"
+    expanded="true"
+    shape="ainfix =V0aSskipNOainfix =V0aSskipF">
+    <proof
+     prover="alt-ergo"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.04"/>
+    </proof>
+   </goal>
+   <goal
+    name="Ass42"
+    sum="8329fde7dbe71ed5445e3fe0fbff0f00"
+    proved="true"
+    expanded="true"
+    shape="Lc0ainfix =agetaref_envV1V0aVintc42Iaone_stepamy_stateaSassignV0aTconstc42V1aSskipF">
+    <proof
+     prover="cvc3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.16"/>
+    </proof>
+   </goal>
+   <goal
+    name="If42"
+    sum="aff6d2fdcb44ce731b6d88a5e11d731e"
+    proved="true"
+    expanded="true"
+    shape="Lc0ainfix =agetaref_envV2V0aVintc42Iaone_stepV1V3V2aSskipIaone_stepamy_stateaSifaTbinaTvarV0aOleaTconstc10aSassignV0aTconstc13aSassignV0aTconstc42V1V3F">
+    <proof
+     prover="coq"
+     timelimit="5"
+     edited="wp_Imp_If42_1.v"
+     obsolete="false">
+     <result status="valid" time="0.82"/>
+    </proof>
+   </goal>
+   <goal
+    name="steps_non_neg"
+    sum="eadba762cc1a40c7895345dfdf01917a"
+    proved="false"
+    expanded="true"
+    shape="ainfix >=V4c0Iamany_stepsV0V2V1V3V4F">
+    <proof
+     prover="cvc3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="timeout" time="6.06"/>
     </proof>
     <proof
      prover="alt-ergo"
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="timeout" time="5.08"/>
-    </proof>
-    <proof
-     prover="cvc3"
-     timelimit="5"
-     edited="wp-Imp-Test55_1.cvc"
-     obsolete="true">
-     <result status="timeout" time="5.29"/>
+     <result status="timeout" time="8.57"/>
     </proof>
     <proof
      prover="z3"
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="timeout" time="5.48"/>
+     <result status="timeout" time="9.84"/>
+    </proof>
+   </goal>
+   <goal
+    name="many_steps_seq"
+    sum="1c58617d16ff2ed20d6a49c7ff3990ad"
+    proved="false"
+    expanded="true"
+    shape="ainfix =V4ainfix +ainfix +c1V6V7Aamany_stepsV5V3V1aSskipV7Aamany_stepsV0V2V5aSskipV6EIamany_stepsV0aSseqV2V3V1aSskipV4F">
+    <proof
+     prover="cvc3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="timeout" time="6.07"/>
+    </proof>
+    <proof
+     prover="alt-ergo"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="timeout" time="8.57"/>
+    </proof>
+    <proof
+     prover="z3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="timeout" time="10.24"/>
     </proof>
    </goal>
   </theory>

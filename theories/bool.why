@@ -28,6 +28,12 @@ theory Bool
     | True  -> False
     end
 
+  function implb (x y : bool) : bool =
+    match x,y with
+    | True, False -> False
+    | _,_  -> True
+    end
+
 end
 
 theory Ite
