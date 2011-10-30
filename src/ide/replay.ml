@@ -109,11 +109,6 @@ let loadpath = (Whyconf.loadpath (Whyconf.get_main config))
 
 let env = Env.create_env loadpath
 
-let provers = Whyconf.get_provers config
-
-let provers =
-  Util.Mstr.fold (Session.get_prover_data env) provers Util.Mstr.empty
-
 let usleep t = ignore (Unix.select [] [] [] t)
 
 

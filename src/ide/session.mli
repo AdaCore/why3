@@ -35,13 +35,6 @@ type prover_data = private
     }
     (** record of necessary data for a given external prover *)
 
-(* stays here until old IDE is deleted *)
-val get_prover_data :
-  Env.env -> Util.Mstr.key -> Whyconf.config_prover ->
-  prover_data Util.Mstr.t -> prover_data Util.Mstr.t
-  (** loads all provers from the current configuration *)
-
-
 (** {2 Transformation's data} *)
 
 type transformation_data
