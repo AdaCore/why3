@@ -193,15 +193,22 @@ end
 module Jstree =
 struct
 
+  let print_verified fmt b =
+    if b
+    then fprintf fmt "class='verified'"
+    else fprintf fmt "class='notverified'"
+
   let print_prover fmt = function
     | Detected_prover pd -> fprintf fmt "%s" pd.prover_name
     | Undetected_prover s -> fprintf fmt "%s" s
 
   let print_proof_status fmt = function
-    | Undone -> fprintf fmt "Undone"
-    | Done pr -> fprintf fmt "Done : %a" Call_provers.print_prover_result pr
+    | Undone -> fprintf fmt "<span class='notverified'>Undone</span>"
+    | Done pr -> fprintf fmt "<span class='verified'>Done : %a</span>"
+      Call_provers.print_prover_result pr
     | InternalFailure exn ->
-      fprintf fmt "Failure : %a"Exn_printer.exn_printer exn
+      fprintf fmt "<span class='notverified'>Failure : %a</span>"
+        Exn_printer.exn_printer exn
 
   let print_proof_attempt fmt pa =
     fprintf fmt "@[<hov><li rel='prover' ><a href='#'>%a : %a</a></li>@]"
@@ -210,13 +217,17 @@ struct
 
   let rec print_transf fmt tr =
     fprintf fmt
-      "@[<hov><li rel='transf'><a href='#'>%s</a>@,<ul>%a</ul></li>@]"
+      "@[<hov><li rel='transf'><a href='#'>\
+<span %a>%s</span></a>@,<ul>%a</ul></li>@]"
+      print_verified tr.transf_verified
       tr.transf_name
       (Pp.print_list Pp.newline print_goal) tr.subgoals
 
   and print_goal fmt g =
     fprintf fmt
-      "@[<hov><li rel='goal'><a href='#'>%s</a>@,<ul>%a%a</ul></li>@]"
+      "@[<hov><li rel='goal'><a href='#'>\
+<span %a>%s</a></a>@,<ul>%a%a</ul></li>@]"
+      print_verified g.goal_verified
       g.goal_name
       (Pp.print_iter2 Mstr.iter Pp.newline Pp.nothing
          Pp.nothing print_proof_attempt)
@@ -227,12 +238,17 @@ struct
 
   let print_theory fmt th =
     fprintf fmt
-      "@[<hov><li rel='theory'><a href='#'>%s</a>@,<ul>%a</ul></li>@]"
+      "@[<hov><li rel='theory'><a href='#'>\
+<span %a>%s</span></a>@,<ul>%a</ul></li>@]"
+      print_verified th.theory_verified
       th.theory_name
       (Pp.print_list Pp.newline print_goal) th.goals
 
   let print_file fmt f =
-    fprintf fmt "@[<hov><li rel='file'><a href='#'>%s</a>@,<ul>%a</ul></li>@]"
+    fprintf fmt
+      "@[<hov><li rel='file'><a href='#'>\
+<span %a>%s</span></a>@,<ul>%a</ul></li>@]"
+      print_verified f.file_verified
       f.file_name
       (Pp.print_list Pp.newline print_theory) f.theories
 
@@ -289,6 +305,8 @@ PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"
 <head>
     <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />
     <title>Why3 session of %s</title>
+    <link rel=\"stylesheet\" type=\"text/css\"
+     href=\"javascript/session.css\" />
     <script type=\"text/javascript\" src=\"javascript/jquery.js\"></script>
     <script type=\"text/javascript\" src=\"javascript/jquery.jstree.js\">
     </script>
