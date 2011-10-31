@@ -191,6 +191,14 @@ let split_string_rev s c =
       | Invalid_argument _ -> ""::acc in
   aux [] 0
 
+let ends_with s suf =
+  let rec aux s suf suflen offset i =
+    i >= suflen || (s.[i + offset] = suf.[i]
+                   && aux s suf suflen offset (i+1)) in
+  let slen = String.length s in
+  let suflen = String.length suf in
+  slen >= suflen && aux s suf suflen (slen - suflen) 0
+
 (** usefule function on char *)
 let is_uppercase c = 'A' <= c && c <= 'Z'
 

@@ -98,10 +98,10 @@ struct
 end
 
 
-module Read_project (O : Session.OBSERVER) =
+module Read_project (O : Session.OBSERVER)
+  (P : sig val project_dir : string end) =
 struct
   module M = Session.Make(Observer_dumb)
-
 
   let read_prover_option = function
     | M.Detected_prover pd -> Detected_prover
@@ -120,7 +120,7 @@ struct
   let read_edited_as prover ea =
     match prover, ea with
       | (_, "") | (M.Detected_prover {Session.interactive = false},_) -> None
-      | _ -> Some ea
+      | _ -> Some (Filename.concat P.project_dir ea)
 
   let rec read_trans key transf acc =
     Mstr.add key
@@ -161,19 +161,20 @@ struct
       theories = List.map read_theory file.M.theories;
       file_verified = file.M.file_verified}
 
-  let read_project_dir ~allow_obsolete ~env project_dir =
+  let read_project_dir ~allow_obsolete ~env =
     let init _ _ = () in
     let notify _ = () in
     let _found_obs = M.open_session ~allow_obsolete
-        ~env:env.env ~config:env.config ~init ~notify project_dir
+        ~env:env.env ~config:env.config ~init ~notify P.project_dir
     in
     List.map read_file (M.get_all_files ())
 
 end
 
 let read_project_dir ~allow_obsolete ~env project_dir =
-  let module Rp = Read_project(Observer_dumb) in
-  Rp.read_project_dir ~allow_obsolete ~env project_dir
+  let module Rp = Read_project(Observer_dumb)
+        (struct let project_dir = project_dir end)in
+  Rp.read_project_dir ~allow_obsolete ~env
 
 
 open Format

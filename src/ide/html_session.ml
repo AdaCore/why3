@@ -39,6 +39,15 @@ let set_opt_style = function
   | "jstree" -> opt_style := Jstree
   | _ -> assert false
 
+let opt_pp = ref []
+
+let set_opt_pp_in,set_opt_pp_cmd,set_opt_pp_out =
+  let suf = ref "" in
+  let cmd = ref "" in
+  (fun s -> suf := s),
+  (fun s -> cmd := s),
+  (fun s -> opt_pp := (!suf,(!cmd,s))::!opt_pp)
+
 let spec = Arg.align [
   ("-I",
    Arg.String (fun s -> includes := s :: !includes),
@@ -62,7 +71,19 @@ let spec = Arg.align [
     all the needed external file. It can't be set with stdout output";
   "--style", Arg.Symbol (["simple";"jstree"], set_opt_style),
   " Set the style to use. 'simple' use only 'ul' and 'il' tag. 'jstree' use \
-    the 'jstree' plugin of the javascript library 'jquery'."
+    the 'jstree' plugin of the javascript library 'jquery'.";
+  "--add_pp", Arg.Tuple
+    [Arg.String set_opt_pp_in;
+     Arg.String set_opt_pp_cmd;
+     Arg.String set_opt_pp_out],
+  "<suffix> <cmd> <out_suffix> \
+Add for the given prefix the given pretty-printer, \
+the new file as the given out_suffix. cmd must contain '%i' which will be \
+replace by the input file and '%o' which will be replaced by the output file.";
+    "--coqdoc",
+  Arg.Unit (fun ()->
+    opt_pp := (".v",("coqdoc --no-index --html -o %o %i",".html"))::!opt_pp),
+  " same as '--add_pp .v \"coqdoc --no-index --html -o %o %i\" .html'"
 ]
 
 
@@ -84,6 +105,10 @@ let () =
     exit 0
   end
 
+(* let () = *)
+(*   List.iter (fun (in_,(cmd,out)) -> *)
+(*     printf "in : %s, cmd : %s, out : %s@." in_ cmd out) !opt_pp *)
+
 let output_dir =
   match !output_dir with
     | "" -> printf
@@ -94,6 +119,8 @@ let output_dir =
         "Error: context and stdout output can't be set at the same time@.";
       exit 1
     | _ -> !output_dir
+
+let edited_dst = Filename.concat output_dir "edited"
 
 let allow_obsolete = !allow_obsolete
 let includes = List.rev !includes
@@ -210,10 +237,53 @@ struct
       fprintf fmt "<span class='notverified'>Failure : %a</span>"
         Exn_printer.exn_printer exn
 
+  let cmd_regexp = Str.regexp "%\\(.\\)"
+
+  let pp_run input cmd output =
+    let replace s = match Str.matched_group 1 s with
+      | "%" -> "%"
+      | "i" -> input
+      | "o" -> output
+      | _ -> failwith "unknown format specifier, use %%i, %%o"
+    in
+    let cmd = Str.global_substitute cmd_regexp replace cmd in
+    let c = Sys.command cmd in
+    if c <> 0 then
+      eprintf "[Error] '%s' stopped abnormaly : code %i" cmd c
+
+  let find_pp edited =
+    let basename = Filename.basename edited in
+    try
+      let suff,(cmd,suff_out) =
+        List.find (fun (s,_) -> ends_with basename s) !opt_pp in
+      let base =
+        String.sub basename 0 (String.length basename - String.length suff) in
+      let base_dst = (base^suff_out) in
+      if !opt_context then
+        pp_run edited cmd (Filename.concat edited_dst base_dst);
+      base_dst
+    with Not_found ->
+      eprintf "Default %s@." basename;
+      (** default printer *)
+      let base = try Filename.chop_extension basename with _ -> basename in
+      let base_dst = base^".txt" in
+      if !opt_context then
+        Sysutil.copy_file edited (Filename.concat edited_dst base_dst);
+      base_dst
+
   let print_proof_attempt fmt pa =
-    fprintf fmt "@[<hov><li rel='prover' ><a href='#'>%a : %a</a></li>@]"
-      print_prover pa.prover
-      print_proof_status pa.proof_state
+    match pa.edited_as with
+      | None ->
+        fprintf fmt "@[<hov><li rel='prover' ><a href='#'>%a : %a</a></li>@]"
+          print_prover pa.prover
+          print_proof_status pa.proof_state
+      | Some f ->
+        let output = find_pp f in
+        fprintf fmt "@[<hov><li rel='prover' ><a href='#' \
+onclick=\"showedited('%s'); return false;\">%a : %a</a></li>@]"
+          output
+          print_prover pa.prover
+          print_proof_status pa.proof_state
 
   let rec print_transf fmt tr =
     fprintf fmt
@@ -308,16 +378,28 @@ PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"
     <link rel=\"stylesheet\" type=\"text/css\"
      href=\"javascript/session.css\" />
     <script type=\"text/javascript\" src=\"javascript/jquery.js\"></script>
-    <script type=\"text/javascript\" src=\"javascript/jquery.jstree.js\">
-    </script>
+    <script type=\"text/javascript\" src=\"javascript/jquery.jstree.js\">\
+</script>
+    <script type=\"text/javascript\" src=\"javascript/session.js\">\
+</script>
 </head>
 <body>
 %a
+<iframe src=\"\"  id='edited'>
+<p>Your browser does not support iframes.</p>
+</iframe>
+<script type=\"text/javascript\" class=\"source\">
+$(function () {
+  $('#edited').hide()
+})
+</script>
 </body>
 </html>
 "
 
   let run_files () =
+    if !opt_context then
+      if not (Sys.file_exists edited_dst) then Unix.mkdir edited_dst 0o755;
     Queue.iter (run_file context print_session) files;
     if !opt_context then
       let data_dir = Whyconf.datadir (Whyconf.get_main env.config) in

@@ -135,6 +135,9 @@ val ttrue : 'a -> bool
 (* useful function on string *)
 val split_string_rev : string -> char -> string list
 
+val ends_with : string -> string -> bool
+(** test if a string ends with another *)
+
 (* useful function on char *)
 val is_uppercase : char -> bool
 
