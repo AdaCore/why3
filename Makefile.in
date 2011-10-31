@@ -568,6 +568,56 @@ install_no_local::
 
 install_local: bin/why3replayer
 
+###############
+# Html
+###############
+
+HTML_FILES = xml termcode session session_ro html_session
+
+HTMLMODULES = $(addprefix src/ide/, $(HTML_FILES))
+
+HTMLML  = $(addsuffix .ml,  $(HTMLMODULES))
+HTMLMLI = $(addsuffix .mli, $(HTMLMODULES))
+HTMLCMO = $(addsuffix .cmo, $(HTMLMODULES))
+HTMLCMX = $(addsuffix .cmx, $(HTMLMODULES))
+
+$(HTMLCMO) $(HTMLCMX): INCLUDES += -I src/ide
+
+# build targets
+
+byte: bin/why3html.byte
+opt:  bin/why3html.opt
+
+bin/why3html.opt: src/why3.cmxa $(PGMCMX) $(HTMLCMX)
+	$(if $(QUIET), @echo 'Linking  $@' &&) \
+	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
+	$(STRIP) $@
+
+bin/why3html.byte: src/why3.cma $(PGMCMO) $(HTMLCMO)
+	$(if $(QUIET),@echo 'Linking  $@' &&) \
+	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
+
+bin/why3html: bin/why3html.@OCAMLBEST@
+	ln -sf why3html.@OCAMLBEST@ $@
+
+# depend and clean targets
+
+include .depend.html
+
+.depend.html: src/ide/xml.ml
+	$(OCAMLDEP) -slash -I src -I src/ide $(HTMLML) $(HTMLMLI) > $@
+
+depend: .depend.html
+
+clean::
+	rm -f bin/why3html.byte bin/why3html.opt bin/why3html
+	rm -f .depend.html
+
+install_no_local::
+	cp -f bin/why3html.@OCAMLBEST@ $(BINDIR)/why3html
+
+install_local: bin/why3html
+
 
 ###############
 # Bench
