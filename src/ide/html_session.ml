@@ -17,6 +17,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Format
 open Why3
 
 let includes = ref []
@@ -25,33 +26,38 @@ let opt_version = ref false
 let output_dir = ref ""
 let allow_obsolete = ref true
 let opt_config = ref None
+let opt_context = ref false
 
 
 let spec = Arg.align [
   ("-I",
    Arg.String (fun s -> includes := s :: !includes),
-   "<s> add s to loadpath") ;
+   "<s> Add s to loadpath") ;
   ("-v",
    Arg.Set opt_version,
-   " print version information") ;
+   " Print version information") ;
   ("-o",
    Arg.Set_string output_dir,
-   " the directory to output the files");
+   " The directory to output the files ('-' for stdout)");
   ("--strict",
    Arg.Clear allow_obsolete,
-   " forbid obsolete session");
+   " Forbid obsolete session");
   "-C", Arg.String (fun s -> opt_config := Some s),
       "<file> Read configuration from <file>";
   "--config", Arg.String (fun s -> opt_config := Some s),
-      " same as -C";
+      " Same as -C";
+  "--context", Arg.Set opt_context,
+  " Add context around the generated code in order to allow direct \
+    visualisation (header, css, ...). It also add in the directory \
+    all the needed external file. It can't be set with stdout output";
 ]
 
 
-let version_msg = Format.sprintf
+let version_msg = sprintf
   "Why3 html session output, version %s (build date: %s)"
   Config.version Config.builddate
 
-let usage_str = Format.sprintf
+let usage_str = sprintf
   "Usage: %s [options] [<file.why>|<project directory>] ... "
   (Filename.basename Sys.argv.(0))
 
@@ -61,17 +67,20 @@ let () = Arg.parse spec set_file usage_str
 
 let () =
   if !opt_version then begin
-    Format.printf "%s@." version_msg;
+    printf "%s@." version_msg;
     exit 0
   end
 
 let output_dir =
-  if !output_dir = "" then begin
-    Format.printf "output_dir must be set@.";
-    exit 0
-  end
-  else !output_dir
-
+  match !output_dir with
+    | "" -> printf
+      "Error: output_dir must be set@.";
+      exit 1
+    | "-" when !opt_context ->
+      printf
+        "Error: context and stdout output can't be set at the same time@.";
+      exit 1
+    | _ -> !output_dir
 
 let allow_obsolete = !allow_obsolete
 let includes = List.rev !includes
@@ -80,7 +89,6 @@ open Session_ro
 
 let env = read_config ~includes !opt_config
 
-open Format
 open Util
 
 let print_prover fmt = function
@@ -127,14 +135,11 @@ let print_session fmt s =
   fprintf fmt "<p><ul>%a</ul></p>"
     (Pp.print_list Pp.newline print_file) s
 
-let run_file f =
-  let session_path = get_project_dir f in
-  let session = read_project_dir ~allow_obsolete ~env session_path in
-  let basename = Filename.basename session_path in
-  let cout = open_out (Filename.concat output_dir (basename^".html")) in
-  let fmt = formatter_of_out_channel cout in
-  fprintf fmt
-    "<!DOCTYPE html
+type context =
+    ((formatter -> Session_ro.session -> unit)
+     -> Session_ro.session -> unit, formatter, unit) format
+
+let simple_context : context = "<!DOCTYPE html
 PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"
 \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">
 <html xmlns=\"http://www.w3.org/1999/xhtml\">
@@ -146,7 +151,19 @@ PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"
 </body>
 </html>
 "
-print_session session
+
+let run_file f =
+  let session_path = get_project_dir f in
+  let session = read_project_dir ~allow_obsolete ~env session_path in
+  let cout = if output_dir = "-" then stdout else
+      let basename = Filename.basename session_path in
+      open_out (Filename.concat output_dir (basename^".html")) in
+  let fmt = formatter_of_out_channel cout in
+  if !opt_context
+  then fprintf fmt simple_context print_session session
+  else print_session fmt session;
+  pp_print_flush fmt ();
+  if output_dir <> "-" then close_out cout
 
 
 let () = Queue.iter run_file files
