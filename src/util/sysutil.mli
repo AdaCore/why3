@@ -62,6 +62,12 @@ val call_asynchronous : (unit -> 'a) -> (unit -> 'a)
 val copy_file : string -> string -> unit
 (** [copy_file from to] copy the file from [from] to [to] *)
 
+val copy_dir : string -> string -> unit
+(** [copy_dir from to] copy the directory recursively from [from] to [to],
+    currently the directory must contains only directories and common files
+*)
+
+
 val path_of_file : string -> string list
 (** [path_of_file filename] return the absolute path of [filename] *)
 

@@ -120,6 +120,18 @@ let copy_file from to_ =
     output cout buff 0 !n
   done
 
+let rec copy_dir from to_ =
+  if not (Sys.file_exists to_) then Unix.mkdir to_ 0o755;
+  let files = Sys.readdir from in
+  let copy fname =
+    let src = Filename.concat from fname in
+    let dst = Filename.concat to_ fname in
+    if Sys.is_directory src
+    then copy_dir src dst
+    else copy_file src dst in
+  Array.iter copy files
+
+
 (* return the absolute path of a given file name.
    this code has been designed to be architecture-independant so
    be very careful if you modify this *)
@@ -183,5 +195,6 @@ let absolutize_filename dirname f =
 (*
 let p1 = relativize_filename "/bin/bash" "src/f.why"
 
-let p1 = relativize_filename "test" "/home/cmarche/recherche/why3/src/ide/f.why"
+let p1 = relativize_filename "test"
+  "/home/cmarche/recherche/why3/src/ide/f.why"
 *)

@@ -73,7 +73,9 @@ and proof_attempt = private
   }
     (** a proof attempt for a given goal *)
 
-type env
+type env =
+  { env : Env.env;
+    config : Whyconf.config}
 
 val read_config : ?includes:string list -> string option -> env
 (** [read_config ~includes conf_path] read the configuration located in

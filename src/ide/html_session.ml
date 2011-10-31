@@ -28,6 +28,16 @@ let allow_obsolete = ref true
 let opt_config = ref None
 let opt_context = ref false
 
+type style =
+  | Simple
+  | Jstree
+
+let opt_style = ref Jstree
+
+let set_opt_style = function
+  | "simple" -> opt_style := Simple
+  | "jstree" -> opt_style := Jstree
+  | _ -> assert false
 
 let spec = Arg.align [
   ("-I",
@@ -50,6 +60,9 @@ let spec = Arg.align [
   " Add context around the generated code in order to allow direct \
     visualisation (header, css, ...). It also add in the directory \
     all the needed external file. It can't be set with stdout output";
+  "--style", Arg.Symbol (["simple";"jstree"], set_opt_style),
+  " Set the style to use. 'simple' use only 'ul' and 'il' tag. 'jstree' use \
+    the 'jstree' plugin of the javascript library 'jquery'."
 ]
 
 
@@ -91,60 +104,80 @@ let env = read_config ~includes !opt_config
 
 open Util
 
-let print_prover fmt = function
-  | Detected_prover pd -> fprintf fmt "%s" pd.prover_name
-  | Undetected_prover s -> fprintf fmt "%s" s
-
-let print_proof_status fmt = function
-  | Undone -> fprintf fmt "Undone"
-  | Done pr -> fprintf fmt "Done : %a" Call_provers.print_prover_result pr
-  | InternalFailure exn ->
-    fprintf fmt "Failure : %a"Exn_printer.exn_printer exn
-
-let print_proof_attempt fmt pa =
-  fprintf fmt "<il>%a : %a</il>"
-    print_prover pa.prover
-    print_proof_status pa.proof_state
-
-let rec print_transf fmt tr =
-  fprintf fmt "<il>%s : <ul>%a</ul></il>"
-    tr.transf_name
-    (Pp.print_list Pp.newline print_goal) tr.subgoals
-
-and print_goal fmt g =
-  fprintf fmt "<il>%s : <ul>%a%a</ul></il>"
-    g.goal_name
-    (Pp.print_iter2 Mstr.iter Pp.newline Pp.nothing
-       Pp.nothing print_proof_attempt)
-    g.external_proofs
-    (Pp.print_iter2 Mstr.iter Pp.newline Pp.nothing
-       Pp.nothing print_transf)
-    g.transformations
-
-let print_theory fmt th =
-  fprintf fmt "<il>%s : <ul>%a</ul></il>"
-    th.theory_name
-    (Pp.print_list Pp.newline print_goal) th.goals
-
-let print_file fmt f =
-  fprintf fmt "<il>%s : <ul>%a</ul></il>"
-    f.file_name
-    (Pp.print_list Pp.newline print_theory) f.theories
-
-let print_session fmt s =
-  fprintf fmt "<p><ul>%a</ul></p>"
-    (Pp.print_list Pp.newline print_file) s
 
 type context =
-    ((formatter -> Session_ro.session -> unit)
-     -> Session_ro.session -> unit, formatter, unit) format
+    (string ->
+     (formatter -> Session_ro.session -> unit) -> Session_ro.session
+     -> unit, formatter, unit) format
 
-let simple_context : context = "<!DOCTYPE html
+let run_file (context : context) print_session f =
+  let session_path = get_project_dir f in
+  let basename = Filename.basename session_path in
+  let session = read_project_dir ~allow_obsolete ~env session_path in
+  let cout = if output_dir = "-" then stdout else
+      open_out (Filename.concat output_dir (basename^".html")) in
+  let fmt = formatter_of_out_channel cout in
+  if !opt_context
+  then fprintf fmt context basename (print_session basename) session
+  else print_session basename fmt session;
+  pp_print_flush fmt ();
+  if output_dir <> "-" then close_out cout
+
+
+module Simple =
+struct
+
+  let print_prover fmt = function
+    | Detected_prover pd -> fprintf fmt "%s" pd.prover_name
+    | Undetected_prover s -> fprintf fmt "%s" s
+
+  let print_proof_status fmt = function
+    | Undone -> fprintf fmt "Undone"
+    | Done pr -> fprintf fmt "Done : %a" Call_provers.print_prover_result pr
+    | InternalFailure exn ->
+      fprintf fmt "Failure : %a"Exn_printer.exn_printer exn
+
+  let print_proof_attempt fmt pa =
+    fprintf fmt "<li>%a : %a</li>"
+      print_prover pa.prover
+      print_proof_status pa.proof_state
+
+  let rec print_transf fmt tr =
+    fprintf fmt "<li>%s : <ul>%a</ul></li>"
+      tr.transf_name
+      (Pp.print_list Pp.newline print_goal) tr.subgoals
+
+  and print_goal fmt g =
+    fprintf fmt "<li>%s : <ul>%a%a</ul></li>"
+      g.goal_name
+      (Pp.print_iter2 Mstr.iter Pp.newline Pp.nothing
+         Pp.nothing print_proof_attempt)
+      g.external_proofs
+      (Pp.print_iter2 Mstr.iter Pp.newline Pp.nothing
+         Pp.nothing print_transf)
+      g.transformations
+
+  let print_theory fmt th =
+    fprintf fmt "<li>%s : <ul>%a</ul></li>"
+      th.theory_name
+      (Pp.print_list Pp.newline print_goal) th.goals
+
+  let print_file fmt f =
+    fprintf fmt "<li>%s : <ul>%a</ul></li>"
+      f.file_name
+      (Pp.print_list Pp.newline print_theory) f.theories
+
+  let print_session _name fmt s =
+    fprintf fmt "<ul>%a</ul>"
+      (Pp.print_list Pp.newline print_file) s
+
+
+  let context : context = "<!DOCTYPE html
 PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"
 \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">
 <html xmlns=\"http://www.w3.org/1999/xhtml\">
 <head>
-<title>A template for why3html</title>
+<title>Why3 session of %s</title>
 </head>
 <body>
 %a
@@ -152,18 +185,142 @@ PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"
 </html>
 "
 
-let run_file f =
-  let session_path = get_project_dir f in
-  let session = read_project_dir ~allow_obsolete ~env session_path in
-  let cout = if output_dir = "-" then stdout else
-      let basename = Filename.basename session_path in
-      open_out (Filename.concat output_dir (basename^".html")) in
-  let fmt = formatter_of_out_channel cout in
-  if !opt_context
-  then fprintf fmt simple_context print_session session
-  else print_session fmt session;
-  pp_print_flush fmt ();
-  if output_dir <> "-" then close_out cout
+  let run_files () =
+  Queue.iter (run_file context print_session) files
+
+end
+
+module Jstree =
+struct
+
+  let print_prover fmt = function
+    | Detected_prover pd -> fprintf fmt "%s" pd.prover_name
+    | Undetected_prover s -> fprintf fmt "%s" s
+
+  let print_proof_status fmt = function
+    | Undone -> fprintf fmt "Undone"
+    | Done pr -> fprintf fmt "Done : %a" Call_provers.print_prover_result pr
+    | InternalFailure exn ->
+      fprintf fmt "Failure : %a"Exn_printer.exn_printer exn
+
+  let print_proof_attempt fmt pa =
+    fprintf fmt "@[<hov><li rel='prover' ><a href='#'>%a : %a</a></li>@]"
+      print_prover pa.prover
+      print_proof_status pa.proof_state
+
+  let rec print_transf fmt tr =
+    fprintf fmt
+      "@[<hov><li rel='transf'><a href='#'>%s</a>@,<ul>%a</ul></li>@]"
+      tr.transf_name
+      (Pp.print_list Pp.newline print_goal) tr.subgoals
+
+  and print_goal fmt g =
+    fprintf fmt
+      "@[<hov><li rel='goal'><a href='#'>%s</a>@,<ul>%a%a</ul></li>@]"
+      g.goal_name
+      (Pp.print_iter2 Mstr.iter Pp.newline Pp.nothing
+         Pp.nothing print_proof_attempt)
+      g.external_proofs
+      (Pp.print_iter2 Mstr.iter Pp.newline Pp.nothing
+         Pp.nothing print_transf)
+      g.transformations
+
+  let print_theory fmt th =
+    fprintf fmt
+      "@[<hov><li rel='theory'><a href='#'>%s</a>@,<ul>%a</ul></li>@]"
+      th.theory_name
+      (Pp.print_list Pp.newline print_goal) th.goals
+
+  let print_file fmt f =
+    fprintf fmt "@[<hov><li rel='file'><a href='#'>%s</a>@,<ul>%a</ul></li>@]"
+      f.file_name
+      (Pp.print_list Pp.newline print_theory) f.theories
+
+  let print_session_aux name fmt s =
+    fprintf fmt "@[<hov><ul><a href='#'>%s</a>@,%a</ul>@]"
+      name
+      (Pp.print_list Pp.newline print_file) s
 
 
-let () = Queue.iter run_file files
+  let print_session name fmt s =
+    fprintf fmt
+      "<a href='#' onclick=\"$('#%s_session').jstree('open_all');\">
+expand all
+</a> <a href='#' onclick=\"$('#%s_session').jstree('close_all');\">
+close all
+</a>
+<div id=\"%s_session\" class=\"session\">
+%a
+</div>
+<script type=\"text/javascript\" class=\"source\">
+$(function () {
+  $(\"#%s_session\").jstree({ 
+      \"types\" : {
+	   \"types\" : {
+	   \"file\" : {
+		\"icon\" : { \"image\" : \"images/folder16.png\"},
+		      },
+	   \"theory\" : {
+		\"icon\" : { \"image\" : \"images/folder16.png\"},
+		      },
+	   \"goal\" : {
+		\"icon\" : { \"image\" : \"images/file16.png\"},
+		      },
+	   \"prover\" : {
+		\"icon\" : { \"image\" : \"images/wizard16.png\"},
+		      },
+	   \"transf\" : {
+		\"icon\" : { \"image\" : \"images/configure16.png\"},
+		      },
+                        }
+                },
+      \"plugins\" : [\"themes\",\"html_data\",\"types\"]
+        });
+});
+</script>
+"
+  name name name (print_session_aux name) s name
+
+
+  let context : context = "<!DOCTYPE html
+PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"
+\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">
+<html xmlns=\"http://www.w3.org/1999/xhtml\">
+<head>
+    <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />
+    <title>Why3 session of %s</title>
+    <script type=\"text/javascript\" src=\"javascript/jquery.js\"></script>
+    <script type=\"text/javascript\" src=\"javascript/jquery.jstree.js\">
+    </script>
+</head>
+<body>
+%a
+</body>
+</html>
+"
+
+  let run_files () =
+    Queue.iter (run_file context print_session) files;
+    if !opt_context then
+      let data_dir = Whyconf.datadir (Whyconf.get_main env.config) in
+      (** copy images *)
+      let img_dir_src = Filename.concat data_dir "images" in
+      let img_dir_dst = Filename.concat output_dir "images" in
+      if not (Sys.file_exists img_dir_dst) then Unix.mkdir img_dir_dst 0o755;
+      List.iter (fun img_name ->
+        let from = Filename.concat img_dir_src img_name in
+        let to_  = Filename.concat img_dir_dst img_name in
+        Sysutil.copy_file from to_)
+        ["folder16.png";"file16.png";"wizard16.png";"configure16.png"];
+      (** copy javascript *)
+      let js_dir_src = Filename.concat data_dir "javascript" in
+      let js_dir_dst = Filename.concat output_dir "javascript" in
+      Sysutil.copy_dir js_dir_src js_dir_dst
+
+end
+
+
+let () =
+  match !opt_style with
+    | Simple -> Simple.run_files ()
+    | Jstree -> Jstree.run_files ()
