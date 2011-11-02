@@ -570,6 +570,56 @@ install_no_local::
 install_local: bin/why3replayer
 
 ###############
+# Stats
+###############
+
+STATS_FILES = xml termcode session session_ro stats
+
+STATSMODULES = $(addprefix src/ide/, $(STATS_FILES))
+
+STATSML  = $(addsuffix .ml,  $(STATSMODULES))
+STATSMLI = $(addsuffix .mli, $(STATSMODULES))
+STATSCMO = $(addsuffix .cmo, $(STATSMODULES))
+STATSCMX = $(addsuffix .cmx, $(STATSMODULES))
+
+$(STATSCMO) $(STATSCMX): INCLUDES += -I src/ide
+
+# build targets
+
+byte: bin/why3stats.byte
+opt:  bin/why3stats.opt
+
+bin/why3stats.opt: src/why3.cmxa $(PGMCMX) $(STATSCMX)
+	$(if $(QUIET), @echo 'Linking  $@' &&) \
+	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
+	$(STRIP) $@
+
+bin/why3stats.byte: src/why3.cma $(PGMCMO) $(STATSCMO)
+	$(if $(QUIET),@echo 'Linking  $@' &&) \
+	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
+
+bin/why3stats: bin/why3stats.@OCAMLBEST@
+	ln -sf why3stats.@OCAMLBEST@ $@
+
+# depend and clean targets
+
+include .depend.stats
+
+.depend.stats: src/ide/xml.ml
+	$(OCAMLDEP) -slash -I src -I src/ide $(STATSML) $(STATSMLI) > $@
+
+depend: .depend.stats
+
+clean::
+	rm -f bin/why3stats.byte bin/why3stats.opt bin/why3stats
+	rm -f .depend.stats
+
+install_no_local::
+	cp -f bin/why3stats.@OCAMLBEST@ $(BINDIR)/why3stats
+
+install_local: bin/why3stats
+
+###############
 # Html
 ###############
 
