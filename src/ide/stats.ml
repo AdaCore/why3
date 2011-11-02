@@ -126,10 +126,9 @@ let update_perf_stats stats prover_and_time =
   update_avg_time stats.prover_avg_time prover_and_time;
   update_count stats.prover_num_proofs prover_and_time
 
-let stats_of_goal file theory stats goal =
+let rec stats_of_goal prefix_name stats goal =
   let ext_proofs = goal.external_proofs in
-  let proof_id = file.file_name ^ " / " ^ theory.theory_name
-    ^  " / " ^ goal.goal_name in
+  let proof_id = prefix_name ^ goal.goal_name in
   let proof_list =
     Mstr.fold
       (fun prover proof_attempt acc ->
@@ -145,19 +144,27 @@ let stats_of_goal file theory stats goal =
           | _ -> acc)
       ext_proofs
       [] in
-  match proof_list with
-    | [] ->
+  let no_transf = Mstr.is_empty goal.transformations in
+  begin match proof_list with
+    | [] when no_transf ->
       stats.no_proof <- Sstr.add proof_id stats.no_proof
-    | [ (prover, time) ] ->
+    | [ (prover, time) ] when no_transf ->
       stats.only_one_proof <-
         Sstr.add (proof_id ^ " : " ^ prover) stats.only_one_proof;
       update_perf_stats stats (prover, time)
-    | _ :: _ ->
-      List.iter (update_perf_stats stats) proof_list
+    | _ ->
+      List.iter (update_perf_stats stats) proof_list end;
+  Mstr.iter (stats_of_transf prefix_name stats) goal.transformations
+
+and stats_of_transf prefix_name stats _ transf =
+  let prefix_name = prefix_name ^ transf.transf_name  ^ " / " in
+  List.iter (stats_of_goal prefix_name stats) transf.subgoals
 
 let stats_of_theory file stats theory =
   let goals = theory.goals in
-  List.iter (stats_of_goal file theory stats) goals
+  let prefix_name = file.file_name ^ " / " ^ theory.theory_name
+    ^  " / " in
+  List.iter (stats_of_goal prefix_name stats) goals
 
 let stats_of_file stats file =
   let theories = file.theories in
@@ -172,10 +179,9 @@ let fill_prover_data stats =
     provers
 
 let extract_stats_from_file stats fname =
-  let env = read_config ~includes:!includes None in
   let project_dir = get_project_dir fname in
   try
-    let file_list = read_project_dir ~allow_obsolete:true ~env project_dir in
+    let file_list = read_project_dir ~allow_obsolete ~env project_dir in
     fill_prover_data stats;
     List.iter (stats_of_file stats) file_list
   with e when not (Debug.test_flag Debug.stack_trace) ->
