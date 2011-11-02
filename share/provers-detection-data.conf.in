@@ -36,6 +36,19 @@ name = "CVC3"
 exec = "cvc3"
 version_switch = "-version"
 version_regexp = "This is CVC3 version \\([^ \n]+\\)"
+version_ok = "2.4.1"
+version_ok = "2.4"
+version_bad = "2.2"
+version_bad = "2.1"
+# the -timeout option is unreliable in CVC3 2.4.1
+command = "@LOCALBIN@why3-cpulimit %t %m -s %e %f"
+driver = "drivers/cvc3.drv"
+
+[ATP cvc3]
+name = "CVC3"
+exec = "cvc3"
+version_switch = "-version"
+version_regexp = "This is CVC3 version \\([^ \n]+\\)"
 version_ok = "2.2"
 version_old = "2.1"
 # we pass time 0 to why3-cpulimit to avoid race
@@ -62,7 +75,7 @@ name = "Eprover"
 exec = "eprover"
 version_switch = "--version"
 version_regexp = "E \\([^\n]+\\)"
-version_ok = "1.4 Namring"   
+version_ok = "1.4 Namring"
 # we pass time 0 to why3-cpulimit to avoid race
 command = "@LOCALBIN@why3-cpulimit 0 %m -s %e -s -R -xAuto -tAuto --cpu-limit=%t --tstp-in %f"
 driver = "drivers/tptp.drv"
@@ -144,17 +157,8 @@ version_bad = "2.2"
 version_bad = "2.1"
 version_bad = "1.3"
 driver = "drivers/z3.drv"
-command = "@LOCALBIN@why3-cpulimit %t %m -s %e -smtc \
--rs:42 \
-PHASE_SELECTION=0 \
-RESTART_STRATEGY=0 \
-RESTART_FACTOR=1.5 \
-QI_EAGER_THRESHOLD=100 \
-ARITH_RANDOM_INITIAL_VALUE=true \
-CASE_SPLIT=3 \
-DELAY_UNITS=true \
-DELAY_UNITS_THRESHOLD=16 \
-%f"
+# the -T is unreliable in Z3 3.2
+command = "@LOCALBIN@why3-cpulimit %t %m -s %e -smt2 -rs:42 %f"
 
 [ATP z3]
 name = "Z3"
