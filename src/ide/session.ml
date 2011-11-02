@@ -1487,13 +1487,16 @@ available on this computer@."
         eprintf "[Warning] Session.load_file: unexpected element '%s'@." s;
         old_provers
 
+let old_provers = ref Util.Mstr.empty
+let get_old_provers () = !old_provers
+
 let load_session ~env xml =
   let cont = xml.Xml.content in
   match cont.Xml.name with
     | "why3session" ->
-        let _old_provers =
+      (** just to keep the old_provers somewhere *)
+        old_provers :=
           List.fold_left (load_file ~env) Util.Mstr.empty cont.Xml.elements
-        in ()
     | s ->
         eprintf "[Warning] Session.load_session: unexpected element '%s'@." s
 

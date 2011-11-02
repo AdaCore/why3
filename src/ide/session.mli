@@ -210,6 +210,10 @@ module Make(O: OBSERVER) : sig
     *)
 
   val get_provers : unit -> prover_data Util.Mstr.t
+  (** The provers on this computer *)
+
+  val get_old_provers : unit -> (string * string) Util.Mstr.t
+  (** The provers in this session (name * version ) *)
 
   val maximum_running_proofs : int ref
 

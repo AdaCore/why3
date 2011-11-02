@@ -25,7 +25,9 @@ open Util
 
 
 
-type session = file list
+type session =
+    { files : file list;
+      provers : prover_data Mstr.t}
 
 and file =
     { file_name : string;
@@ -53,13 +55,9 @@ and transf =
 and prover_data =
     { prover_name : string;
       prover_version : string;
-      prover_interactive : bool;
+      (** will be added again when session records it *)
+      (* prover_interactive : bool; *)
     }
-
-and prover_option =
-  | Detected_prover of prover_data
-  | Undetected_prover of string
-
 
 and proof_attempt_status =
   | Undone
@@ -67,7 +65,7 @@ and proof_attempt_status =
   | InternalFailure of exn (** external proof aborted by internal error *)
 
 and proof_attempt =
-  { prover : prover_option;
+  { prover : prover_data;
     proof_state : proof_attempt_status;
     timelimit : int;
     proof_obsolete : bool;
@@ -86,6 +84,16 @@ let read_config ?(includes=[]) conf_path_opt =
   {env = env; config = config}
 
 
+let get_provers env =
+  let provers = Whyconf.get_provers env.config in
+  let get_prover_data pr =
+      { prover_name = pr.Whyconf.name;
+        prover_version = pr.Whyconf.version;
+        (* prover_interactive = pr.Whyconf.interactive; *)
+      }
+  in
+  Mstr.map get_prover_data provers
+
 module Observer_dumb : Session.OBSERVER =
 struct
   type key = unit
@@ -103,13 +111,16 @@ module Read_project (O : Session.OBSERVER)
 struct
   module M = Session.Make(Observer_dumb)
 
-  let read_prover_option = function
-    | M.Detected_prover pd -> Detected_prover
-      { prover_name = pd.Session.prover_name;
-        prover_version = pd.Session.prover_version;
-        prover_interactive = pd.Session.interactive;
-      }
-    | M.Undetected_prover s -> Undetected_prover s
+  let old_provers = ref Mstr.empty
+
+  let get_prover_by_id pid =
+    try Mstr.find pid !old_provers
+    with Not_found -> assert false (** the provers must be an old_provers *)
+
+  let read_prover_option po =
+    get_prover_by_id (match po with
+      | M.Detected_prover pd -> pd.Session.prover_id
+      | M.Undetected_prover s -> s)
 
   let read_attempt_status = function
     | Session.Undone | Session.Scheduled | Session.Interrupted
@@ -167,7 +178,12 @@ struct
     let _found_obs = M.open_session ~allow_obsolete
         ~env:env.env ~config:env.config ~init ~notify P.project_dir
     in
-    List.map read_file (M.get_all_files ())
+    let prover_data (name,version) =
+      { prover_name = name; prover_version = version} in
+    let op = Mstr.map prover_data (M.get_old_provers ()) in
+    old_provers := op;
+    {files = List.map read_file (M.get_all_files ());
+     provers = op}
 
 end
 

@@ -154,9 +154,7 @@ let run_file (context : context) print_session f =
 module Simple =
 struct
 
-  let print_prover fmt = function
-    | Detected_prover pd -> fprintf fmt "%s" pd.prover_name
-    | Undetected_prover s -> fprintf fmt "%s" s
+  let print_prover fmt pd = fprintf fmt "%s" pd.prover_name
 
   let print_proof_status fmt = function
     | Undone -> fprintf fmt "Undone"
@@ -196,7 +194,7 @@ struct
 
   let print_session _name fmt s =
     fprintf fmt "<ul>%a</ul>"
-      (Pp.print_list Pp.newline print_file) s
+      (Pp.print_list Pp.newline print_file) s.files
 
 
   let context : context = "<!DOCTYPE html
@@ -225,9 +223,7 @@ struct
     then fprintf fmt "class='verified'"
     else fprintf fmt "class='notverified'"
 
-  let print_prover fmt = function
-    | Detected_prover pd -> fprintf fmt "%s" pd.prover_name
-    | Undetected_prover s -> fprintf fmt "%s" s
+  let print_prover fmt pd = fprintf fmt "%s" pd.prover_name
 
   let print_proof_status fmt = function
     | Undone -> fprintf fmt "<span class='notverified'>Undone</span>"
@@ -325,7 +321,7 @@ onclick=\"showedited('%s'); return false;\">%a : %a</a></li>@]"
   let print_session_aux name fmt s =
     fprintf fmt "@[<hov><ul><a href='#'>%s</a>@,%a</ul>@]"
       name
-      (Pp.print_list Pp.newline print_file) s
+      (Pp.print_list Pp.newline print_file) s.files
 
 
   let print_session name fmt s =

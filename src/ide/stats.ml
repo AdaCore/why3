@@ -170,20 +170,19 @@ let stats_of_file stats file =
   let theories = file.theories in
   List.iter (stats_of_theory file stats) theories
 
-let fill_prover_data stats =
-  let provers = Mstr.empty (* FIXME get_provers ()*) in
+let fill_prover_data stats session =
   Mstr.iter
     (fun prover data ->
       Hashtbl.add stats.prover_data prover
-        (data.Session.prover_name ^ " " ^ data.Session.prover_version))
-    provers
+        (data.prover_name ^ " " ^ data.prover_version))
+    session.provers
 
 let extract_stats_from_file stats fname =
   let project_dir = get_project_dir fname in
   try
-    let file_list = read_project_dir ~allow_obsolete ~env project_dir in
-    fill_prover_data stats;
-    List.iter (stats_of_file stats) file_list
+    let session = read_project_dir ~allow_obsolete ~env project_dir in
+    fill_prover_data stats session;
+    List.iter (stats_of_file stats) session.files
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "Error while opening session with database '%s' : %a@." project_dir
       Exn_printer.exn_printer e;
@@ -198,7 +197,7 @@ let finalize_stats stats =
     stats.prover_avg_time
 
 let print_stats stats =
-  printf "== Provers used ==@\n  @[";
+  printf "== Provers available ==@\n  @[";
   Hashtbl.iter (fun prover data -> printf "%-10s: %s@\n" prover data)
     stats.prover_data;
   printf "@]@\n";

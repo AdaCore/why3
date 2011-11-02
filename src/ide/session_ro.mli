@@ -23,7 +23,9 @@
 open Why3
 open Util
 
-type session = file list
+type session =
+    { files : file list;
+      provers : prover_data Mstr.t}
 
 and file = private
     { file_name : string;
@@ -51,13 +53,9 @@ and transf = private
 and prover_data = private
     { prover_name : string;
       prover_version : string;
-      prover_interactive : bool;
+      (** will be added again when session records it *)
+      (* prover_interactive : bool; *)
     }
-
-and prover_option = private
-  | Detected_prover of prover_data
-  | Undetected_prover of string
-
 
 and proof_attempt_status = private
   | Undone
@@ -65,7 +63,7 @@ and proof_attempt_status = private
   | InternalFailure of exn (** external proof aborted by internal error *)
 
 and proof_attempt = private
-  { prover : prover_option;
+  { prover : prover_data;
     proof_state : proof_attempt_status;
     timelimit : int;
     proof_obsolete : bool;
@@ -81,6 +79,9 @@ val read_config : ?includes:string list -> string option -> env
 (** [read_config ~includes conf_path] read the configuration located in
     [conf_path] or use the default location if [conf_path] is [None].
     Add the directory in [includes] in the loadpath  *)
+
+val get_provers : env -> prover_data Util.Mstr.t
+(** Get the provers on this computer *)
 
 val read_project_dir :
   allow_obsolete:bool ->
