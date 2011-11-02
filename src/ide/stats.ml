@@ -19,9 +19,48 @@ open Util
 open Session_ro
 
 let includes = ref []
-let file = ref None
+let files = Queue.create ()
 let opt_version = ref false
 let opt_stats = ref true
+let opt_config = ref None
+let allow_obsolete = ref true
+
+let spec = Arg.align [
+  ("-I",
+   Arg.String (fun s -> includes := s :: !includes),
+   "<s> add s to loadpath") ;
+  "-C", Arg.String (fun s -> opt_config := Some s),
+      "<file> Read configuration from <file>";
+  "--config", Arg.String (fun s -> opt_config := Some s),
+      " Same as -C";
+  ("--strict",
+   Arg.Clear allow_obsolete,
+   " Forbid obsolete session");
+  ("-v",
+   Arg.Set opt_version,
+   " print version information") ;
+]
+
+let version_msg = Format.sprintf "Why3 statistics, version 0.1"
+
+let usage_str = Format.sprintf
+  "Usage: %s [options] [<file.why>|<project directory>]"
+  (Filename.basename Sys.argv.(0))
+
+let set_file f = Queue.add f files
+
+let () = Arg.parse spec set_file usage_str
+
+let () =
+  if !opt_version then begin
+    Format.printf "%s@." version_msg;
+    exit 0
+  end
+
+let allow_obsolete = !allow_obsolete
+
+let env = read_config ~includes:!includes !opt_config
+
 
 type proof_stats =
     { mutable no_proof : Sstr.t;
@@ -186,43 +225,9 @@ let print_stats stats =
     stats.prover_avg_time;
   printf "@]@\n"
 
-let spec = Arg.align [
-  ("-I",
-   Arg.String (fun s -> includes := s :: !includes),
-   "<s> add s to loadpath") ;
-  ("-v",
-   Arg.Set opt_version,
-   " print version information") ;
-]
-
-let version_msg = Format.sprintf "Why3 statistics, version 0.1"
-
-let usage_str = Format.sprintf
-  "Usage: %s [options] [<file.why>|<project directory>]"
-  (Filename.basename Sys.argv.(0))
-
-let set_file f = match !file with
-  | Some _ ->
-      raise (Arg.Bad "only one parameter")
-  | None ->
-      file := Some f
-
-let _ =
-  Arg.parse spec set_file usage_str;
-
-  if !opt_version then begin
-    Format.printf "%s@." version_msg;
-    exit 0
-  end;
-
-  let fname = match !file with
-    | None ->
-      Arg.usage spec usage_str;
-      exit 1
-    | Some f ->
-      f in
-
-  let stats = new_proof_stats () in
-  let _ = extract_stats_from_file stats fname in
-  finalize_stats stats;
-  print_stats stats
+let () =
+  Queue.iter (fun fname ->
+    let stats = new_proof_stats () in
+    let _ = extract_stats_from_file stats fname in
+    finalize_stats stats;
+    print_stats stats) files
