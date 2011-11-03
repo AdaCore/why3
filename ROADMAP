@@ -15,7 +15,7 @@
   ** extraction of Ocaml code
   ** logic symbols used in programs
 
-* Jessie3
+* A true Jessie3 front-end ?
 
 * traceability: Partially done
   (Claude)
@@ -47,13 +47,23 @@
 
 === Roadmap for next release ========================
 
+* fix support for newer Z3, CVC3 and Alt-Ergo, allow several version
+  of them at the same time. Allow why3config --detect to find e.g z3
+  under names like z3-3.2 (how ? command-line option ? e.g. -p z3 /usr/local/bin/z3-3.2)
+
+* move Session module and its dependencies into the Why3 library
+
+* document new tools why3stats or others
+
+* Ensure that we kill a prover after some time (ressurect %T ? with a
+  meaning like twice the value of %t ?), because we cannot be sure they always
+  honor their own -timeout option.
+
 * update the BTS
 
 * API for programs
 
 * reject global "val"s in typing environment for logic decls.
-
-* move session.ml and its dependencies into the Why3 lib
 
 * Coq plugin
 
