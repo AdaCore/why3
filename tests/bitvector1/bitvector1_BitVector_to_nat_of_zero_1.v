@@ -255,34 +255,33 @@ Axiom to_nat_sub_one : forall (b:bv) (j:Z) (i:Z), ((0%Z <= i)%Z /\
 Axiom to_nat_sub_high : forall (b:bv) (j:Z) (i:Z), (j <  i)%Z ->
   ((to_nat_sub b j i) = 0%Z).
 
-(* YOU MAY EDIT THE CONTEXT BELOW *)
-Open Scope Z_scope.
-(* DO NOT EDIT BELOW *)
-
-Theorem to_nat_of_zero2 : forall (b:bv) (i:Z) (j:Z), ((i <= j)%Z /\
+Axiom to_nat_of_zero2 : forall (b:bv) (i:Z) (j:Z), ((i <= j)%Z /\
   (0%Z <= i)%Z) -> ((forall (k:Z), ((k <= j)%Z /\ (i <  k)%Z) -> ((nth b
   k) = false)) -> ((to_nat_sub b j 0%Z) = (to_nat_sub b i 0%Z))).
+
+(* YOU MAY EDIT THE CONTEXT BELOW *)
+
+(* DO NOT EDIT BELOW *)
+
+Theorem to_nat_of_zero : forall (b:bv) (i:Z) (j:Z), ((i <= j)%Z /\
+  (0%Z <= i)%Z) -> ((forall (k:Z), ((k <= j)%Z /\ (i <= k)%Z) -> ((nth b
+  k) = false)) -> ((to_nat_sub b j i) = 0%Z)).
 (* YOU MAY EDIT THE PROOF BELOW *)
-intros b i j (Hij,Hipos).
+Open Scope Z_scope.
+intros b i j Hij.
 apply Zlt_lower_bound_ind with (z:=i)
- (P:=fun j => 
-   (forall k : Z, (k <= j) /\ (i < k) -> nth b k = false) ->
-   to_nat_sub b j 0 = to_nat_sub b i 0); auto.
+                    (P:= fun j=> (forall k : Z, (k <= j)%Z /\ (i <= k)%Z -> nth b k = false) ->
+to_nat_sub b j i = 0%Z).
 intros x Hind Hxi.
-assert (h:(i=x\/i < x)) by omega.
+assert (h: (i=x \/ i<x)) by omega.
 destruct h.
-subst x; auto.
-intros Hbits.
-rewrite to_nat_sub_zero; auto with zarith.
-(*
-apply Hind.
-omega.
-intros; apply Hbits.
-omega.
-omega.
-apply Hbits.
-omega.
-*)
+subst x;auto.
+intro Hbits.
+rewrite to_nat_sub_zero;auto with zarith.
+rewrite to_nat_sub_high;auto with zarith.
+intro.
+rewrite to_nat_sub_zero;auto with zarith.
+apply Hij.
 Qed.
 (* DO NOT EDIT BELOW *)
 

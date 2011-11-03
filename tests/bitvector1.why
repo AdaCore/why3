@@ -294,7 +294,7 @@ theory BitVector
 
 
   lemma to_nat_of_zero:
-    forall b:bv, i j:int. j >=i ->
+    forall b:bv, i j:int. j >=i>=0 ->
       (forall k:int. j >= k >= i -> nth b k = False) ->
       to_nat_sub b j i = 0
 
