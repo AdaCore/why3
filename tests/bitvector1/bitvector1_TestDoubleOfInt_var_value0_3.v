@@ -2,6 +2,12 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import ZArith.
 Require Import Rbase.
+Definition implb(x:bool) (y:bool): bool := match (x,
+  y) with
+  | (true, false) => false
+  | (_, _) => true
+  end.
+
 Parameter pow2: Z -> Z.
 
 
@@ -565,11 +571,7 @@ Axiom const_value0 : ((double_of_bv64 (concat (from_int 1127219200%Z)
 Axiom const_value : ((double_of_bv64 (concat (from_int 1127219200%Z)
   (from_int 2147483648%Z))) = ((pow21 52%Z) + (pow21 31%Z))%R).
 
-Parameter jpxor: Z -> bv.
-
-
-Axiom jxori_axiom : forall (i:Z),
-  ((jpxor i) = (bw_xor (from_int 2147483648%Z) (from_int i))).
+Definition jpxor(i:Z): bv := (bw_xor (from_int 2147483648%Z) (from_int i)).
 
 Definition var(i:Z): bv1 := (concat (from_int 1127219200%Z) (jpxor i)).
 
