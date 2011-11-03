@@ -294,7 +294,7 @@ theory BitVector
 
 
   lemma to_nat_of_zero:
-    forall b:bv, i j:int.
+    forall b:bv, i j:int. j >=i -> 
       (forall k:int. j >= k >= i -> nth b k = False) ->
       to_nat_sub b j i = 0
 
@@ -382,6 +382,9 @@ theory BitVector
 
   lemma nth_from_int_low_odd:
     forall n:int. mod n 2 <> 0 -> nth (from_int n) 0 = True
+
+  lemma pow2i:
+    forall i:int. i>=0 -> (pow2 i) <>0
 
   lemma nth_from_int_0:
      forall i:int. size > i >= 0 -> nth (from_int 0) i = False
@@ -599,18 +602,71 @@ theory TestDoubleOfInt
 
   lemma real1075m1023_2: 1075.0 -. 1023.0 = 52.0
 
+  lemma real52_a_m52:  Pow2real.pow2 (1075 - 1023) *. Pow2real.pow2 31 *. Pow2real.pow2 (-52) = Pow2real.pow2 31
+
   function const_as_double : real = double_of_bv64 const
 
   lemma const_value0: const_as_double = 
-    Pow2real.pow2 (1075 - 1023) *. (1.0 +. 2147483648.0 *. Pow2real.pow2 (-52))
+    1.0*.Pow2real.pow2 (1075 - 1023) *. (1.0 +. Pow2real.pow2 31 *. Pow2real.pow2 (-52))
+
 
   lemma const_value: const_as_double = Pow2real.pow2 52 +. Pow2real.pow2 31
 
+  function jpxor(i:int): BV32.bv
+
+  axiom jxori_axiom: forall i:int. jpxor(i) = (BV32.bw_xor j' (BV32.from_int i))     
+
+  function var(i:int): BV64.bv = (BV32_64.concat j (jpxor i))
+  
+  lemma nth30_0:
+     forall x:BV32.bv, j:int. 0 <= j <31 -> 
+       (BV32.nth (BV32.bw_xor j' x) j) = (BV32.nth x j)
+
+  lemma nth30_0_var:
+     forall x:int, j:int. 0 <= j <31 -> 
+       (BV64.nth (var x) j) = (BV32.nth (BV32.from_int x) j)
+
+  lemma nth31_var:	 
+     forall x:int. (BV64.nth (var x) 31) = notb (BV32.nth (BV32.from_int x) 31)
+
+  lemma nth63_32_var:
+     forall x k:int. 32 <= k <= 63 -> BV64.nth (var x) k = BV32.nth j (k - 32)
+
+  lemma sign_var: forall x:int. sign(var(x)) = False
+
+  lemma exp_var: forall x:int. exp(var(x)) = 1075
+
+  lemma mantissa_var_0_30:
+    forall x:int. (BV32.nth (BV32.from_int x) 31) = False -> BV64.to_nat_sub (var x) 30 0 = x
+  lemma mantissa_var_0_30_1:
+    forall x:int. (BV32.nth (BV32.from_int x) 31) = True -> BV64.to_nat_sub (var x) 30 0 = -x
+
+
+  lemma mantissa_var: forall x:int. mantissa(var(x)) = Pow2int.pow2 31 + x
+
+  lemma realx_a_mx:  forall x:int. Pow2real.pow2 (1075 - 1023) *. ((Pow2real.pow2 31 +. (from_int x)) *. Pow2real.pow2 (-52)) = Pow2real.pow2 31 +. (from_int x)
+
+  function var_as_double(x:int) : real = double_of_bv64 (var x)
+
+  lemma one_mult:
+    forall x:real. 1.0*.x = x
+
+  lemma int_real_from_int:
+    forall x:int. from_int (Pow2int.pow2 31 + x) = Pow2real.pow2 31 +. (from_int x)
+
+   (*proved by Coq*) 
+  lemma var_value0: forall x:int. var_as_double(x) = 
+    Pow2real.pow2 (1075 - 1023) *. (1.0 +. (from_int (Pow2int.pow2 31 + x)) *. Pow2real.pow2 (-52))
+
+  lemma var_value: forall x:int. var_as_double(x) = Pow2real.pow2 52 +. Pow2real.pow2 31 +. (from_int x)
+
+  function double_of_int32 (i:int) : real = var_as_double(i) -. const_as_double
+(*
   function double_of_int32 (i:int) : real =
      let var = BV32_64.concat j (BV32.bw_xor j' (BV32.from_int i)) in
      let v = double_of_bv64 var in
      v -. const_as_double
-
+*)
   lemma MainResult: forall i:int. double_of_int32 i = from_int i
 
 end
