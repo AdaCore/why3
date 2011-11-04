@@ -47,27 +47,58 @@
 
 === Roadmap for next release ========================
 
-* fix support for newer Z3, CVC3 and Alt-Ergo, allow several version
+
+
+* stages
+** M1. preuve d'un petit compilateur, pas de pb de lieur,
+   eventuellement outils pour les preuves par recurrence
+   a la Leino, + fct size automatique
+** M2. Lieur en Why3, POPLmark challenge. vers
+   un theorie et/ou un module réutilisable de lieurs
+** (M2?) Stage Airbus, "TIP" avec Frama-C/Jessie ou WP/Why/Coq
+   besoin du plugin Coq? 
+
+* PRIORITAIRE, JCF et ANDREI, clone de module
+** demarche: ecrire une API avec smart constructors garantissant
+   le bon typage, et clone sera en premier lieu un de ces constructors
+** cas d'utilisation: range d'entiers de Jessie, Flottants -> double ou single
+   containeurs pour Adacore et Claire
+
+* extraction vers Caml
+** PRIORITAIRE, JCF, ANDREI, besoin pour cours aux JFLA en janvier 2012
+
+* FRANCOIS new tools
+** merge why3html and why3stats into a new executable why3report
+** move -latex from why3replayer to why3report
+** document why3report
+
+
+* CLAUDE provers
+** fix support for newer Z3, CVC3 and Alt-Ergo, allow several version
   of them at the same time. Allow why3config --detect to find e.g z3
   under names like z3-3.2 (how ? command-line option ? e.g. -p z3 /usr/local/bin/z3-3.2)
+** Ensure that we kill a prover after some time (ressurect %T ? with a
+   meaning like twice the value of %t ?), because we cannot be sure they always
+   honor their own -timeout option.
 
-* move Session module and its dependencies into the Why3 library
+* FRANCOIS CLAUDE, move Session module and its dependencies into the Why3 library
+** but avoid duplication with session_ro
+** avoid also duplication of type like prover_data record
+** do not include task and transf in the data type, so that
+   one can reload, and redetect provers
+** session + session_ro -> session_data + session_dynamic
 
-* document new tools why3stats or others
 
-* Ensure that we kill a prover after some time (ressurect %T ? with a
-  meaning like twice the value of %t ?), because we cannot be sure they always
-  honor their own -timeout option.
+* efficiency issues
+** understand problems when large number of goals (cf D Mentré examples)
 
-* update the BTS
+* ALL fix bug and update the BTS
+** reject global "val"s in typing environment for logic decls.
 
-* API for programs
-
-* reject global "val"s in typing environment for logic decls.
-
-* Coq plugin
+* DELAYED Coq plugin
 
 * Coq realization of theories
+** corriger l'incoherence
 
 * DOC:
 ** complete api.tex: explain how to build theories, apply
@@ -81,7 +112,7 @@
      (partially done, but no shortcut)
 ** restore provers detection in the middle of a session.
   + todo: run detection immediately at start up if conf file absent or
-    outdated
+    outdated. should become doable with the new Session module
 
 
 === Roadmap for release 0.71 ========================
