@@ -177,12 +177,25 @@ let detect_prover main acc l =
   try
     let detect_execs data =
       try Some (Util.list_first (detect_exec main data) data.execs)
-      with Not_found -> None in
+      with Not_found -> None
+    in
     let prover = Util.list_first detect_execs l in
     Mstr.add prover_id prover acc
   with Not_found ->
     eprintf "Prover %s not found.@." prover_id;
     acc
+(* does not work
+  List.fold_left
+    (fun acc data ->
+      List.fold_left
+        (fun acc e ->
+          eprintf "Trying executable %s@." e;
+          match detect_exec main data e with
+            | None -> acc
+            | Some prover -> Mstr.add prover_id prover acc)
+        acc data.execs)
+    acc l
+*)
 
 let run_auto_detection config =
   let main = get_main config in
