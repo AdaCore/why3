@@ -1,0 +1,34 @@
+
+(* EWD 650: A Theorem About Odd Powers of Odd Integers *)
+
+module EWD673
+
+  use import int.Int
+  use import int.Power
+  use import number.Parity
+  use import number.Divisibility
+  use import module ref.Refint
+
+  let theorem (p: int) (k: int) (r: int) =
+    { p >= 1 /\ odd p /\ k >= 1 /\ 1 <= r < power 2 k /\ odd r }
+    let x = ref 1 in
+    let d = ref 2 in
+    for i = 1 to k do
+      invariant
+        { !d = power 2 i /\ 1 <= !x < !d /\
+          divides !d (power !x p - r) /\ odd !x }
+      if not (divides (2 * !d) (power !x p - r)) then x := !x + !d;
+      d := 2 * !d
+    done;
+    !x
+    { 1 <= result < power 2 k /\
+      divides (power 2 k) (power result p - r) /\
+      odd result }
+
+end
+
+(*
+Local Variables:
+compile-command: "unset LANG; make -C ../.. examples/programs/ewd650.gui"
+End:
+*)
