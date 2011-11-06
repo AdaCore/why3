@@ -2,6 +2,24 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import ZArith.
 Require Import Rbase.
+Definition unit  := unit.
+
+Parameter qtmark : Type.
+
+Parameter at1: forall (a:Type), a -> qtmark -> a.
+
+Implicit Arguments at1.
+
+Parameter old: forall (a:Type), a -> a.
+
+Implicit Arguments old.
+
+Definition implb(x:bool) (y:bool): bool := match (x,
+  y) with
+  | (true, false) => false
+  | (_, _) => true
+  end.
+
 Inductive datatype  :=
   | Tint : datatype 
   | Tbool : datatype .
@@ -25,12 +43,6 @@ Inductive fmla  :=
   | Fand : fmla -> fmla -> fmla 
   | Fnot : fmla -> fmla 
   | Fimplies : fmla -> fmla -> fmla .
-
-Definition implb(x:bool) (y:bool): bool := match (x,
-  y) with
-  | (true, false) => false
-  | (_, _) => true
-  end.
 
 Inductive value  :=
   | Vint : Z -> value 
@@ -145,6 +157,10 @@ Fixpoint subst(f:fmla) (x:Z) (t:term) {struct f}: fmla :=
   end.
 Unset Implicit Arguments.
 
+Axiom eval_subst : forall (f:fmla) (s:state) (x:Z) (t:term), (eval_fmla s
+  (subst f x t)) <-> (eval_fmla (mk_state (var_env1 s) (set (ref_env1 s) x
+  (eval_term s t))) f).
+
 Inductive stmt  :=
   | Sskip : stmt 
   | Sassign : Z -> term -> stmt 
@@ -195,25 +211,55 @@ Definition valid_triple(p:fmla) (i:stmt) (q:fmla): Prop := forall (s:state),
 
 Axiom skip_rule : forall (q:fmla), (valid_triple q Sskip q).
 
+Axiom assign_rule : forall (q:fmla) (x:Z) (e:term), (valid_triple (subst q x
+  e) (Sassign x e) q).
+
+Axiom seq_rule : forall (p:fmla) (q:fmla) (r:fmla) (i1:stmt) (i2:stmt),
+  ((valid_triple p i1 r) /\ (valid_triple r i2 q)) -> (valid_triple p
+  (Sseq i1 i2) q).
+
+Axiom if_rule : forall (e:term) (p:fmla) (q:fmla) (i1:stmt) (i2:stmt),
+  ((valid_triple (Fand p (Fterm e)) i1 q) /\ (valid_triple (Fand p
+  (Fnot (Fterm e))) i2 q)) -> (valid_triple p (Sif e i1 i2) q).
+
+Axiom while_rule : forall (e:term) (inv:fmla) (i:stmt),
+  (valid_triple (Fand (Fterm e) inv) i inv) -> (valid_triple inv (Swhile e
+  inv i) (Fand (Fnot (Fterm e)) inv)).
+
+Axiom consequence_rule : forall (p:fmla) (pqt:fmla) (q:fmla) (qqt:fmla)
+  (i:stmt), (valid_fmla (Fimplies pqt p)) -> ((valid_triple p i q) ->
+  ((valid_fmla (Fimplies q qqt)) -> (valid_triple pqt i qqt))).
+
 (* YOU MAY EDIT THE CONTEXT BELOW *)
 
 (* DO NOT EDIT BELOW *)
 
-Theorem assign_rule : forall (q:fmla) (x:Z) (e:term), (valid_triple (subst q
-  x e) (Sassign x e) q).
+Theorem WP_parameter_wp : forall (i:stmt), forall (q:fmla),
+  match i with
+  | Sskip => True
+  | (Sseq i1 i2) => True
+  | (Sassign x e) => True
+  | (Sif e i1 i2) => True
+  | (Swhile e inv i1) => forall (result:fmla), (valid_triple result i1
+      inv) -> (valid_triple (Fand inv (Fand (Fimplies (Fand (Fterm e) inv)
+      result) (Fimplies (Fand (Fnot (Fterm e)) inv) q))) i q)
+  end.
 (* YOU MAY EDIT THE PROOF BELOW *)
-intros q x e.
-unfold valid_triple.
-intros s Pre s' n Hred.
-inversion Hred; subst.
-inversion H; subst.
-inversion H0; subst.
-(* normal case *)
-clear H Hred H0.
-rewrite <- eval_subst; auto.
+intros i q.
+destruct i; auto.
+rename f into inv.
+intros wp_i_inv H.
+(* goal: 
+   { inv /\ (t /\ inv -> wp_i_inv) /\ (~t /\ inv -> q) } 
+   while t inv i 
+   { q }
+*)
+apply consequence_rule with 
+  (p := inv)
+  (q := Fand (Fnot (Fterm t)) inv).
+2: apply while_rule.
 
-(* absurd case *)
-inversion H1.
+
 Qed.
 (* DO NOT EDIT BELOW *)
 

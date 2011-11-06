@@ -145,75 +145,37 @@ Fixpoint subst(f:fmla) (x:Z) (t:term) {struct f}: fmla :=
   end.
 Unset Implicit Arguments.
 
-Inductive stmt  :=
-  | Sskip : stmt 
-  | Sassign : Z -> term -> stmt 
-  | Sseq : stmt -> stmt -> stmt 
-  | Sif : term -> stmt -> stmt -> stmt 
-  | Swhile : term -> fmla -> stmt -> stmt .
-
-Axiom check_skip : forall (s:stmt), (s = Sskip) \/ ~ (s = Sskip).
-
-Inductive one_step : state -> stmt -> state -> stmt -> Prop :=
-  | one_step_assign : forall (s:state) (x:Z) (e:term), (one_step s (Sassign x
-      e) (mk_state (var_env1 s) (set (ref_env1 s) x (eval_term s e))) Sskip)
-  | one_step_seq : forall (s:state) (sqt:state) (i1:stmt) (i1qt:stmt)
-      (i2:stmt), (one_step s i1 sqt i1qt) -> (one_step s (Sseq i1 i2) sqt
-      (Sseq i1qt i2))
-  | one_step_seq_skip : forall (s:state) (i:stmt), (one_step s (Sseq Sskip i)
-      s i)
-  | one_step_if_true : forall (s:state) (e:term) (i1:stmt) (i2:stmt),
-      ((eval_term s e) = (Vbool true)) -> (one_step s (Sif e i1 i2) s i1)
-  | one_step_if_false : forall (s:state) (e:term) (i1:stmt) (i2:stmt),
-      ((eval_term s e) = (Vbool false)) -> (one_step s (Sif e i1 i2) s i2)
-  | one_step_while_true : forall (s:state) (e:term) (inv:fmla) (i:stmt),
-      (eval_fmla s inv) -> (((eval_term s e) = (Vbool true)) -> (one_step s
-      (Swhile e inv i) s (Sseq i (Swhile e inv i))))
-  | one_step_while_false : forall (s:state) (e:term) (inv:fmla) (i:stmt),
-      (eval_fmla s inv) -> (((eval_term s e) = (Vbool false)) -> (one_step s
-      (Swhile e inv i) s Sskip)).
-
-Inductive many_steps : state -> stmt -> state -> stmt -> Z -> Prop :=
-  | many_steps_refl : forall (s:state) (i:stmt), (many_steps s i s i 0%Z)
-  | many_steps_trans : forall (s1:state) (s2:state) (s3:state) (i1:stmt)
-      (i2:stmt) (i3:stmt) (n:Z), (one_step s1 i1 s2 i2) -> ((many_steps s2 i2
-      s3 i3 n) -> (many_steps s1 i1 s3 i3 (n + 1%Z)%Z)).
-
-Axiom steps_non_neg : forall (s1:state) (s2:state) (i1:stmt) (i2:stmt) (n:Z),
-  (many_steps s1 i1 s2 i2 n) -> (0%Z <= n)%Z.
-
-Axiom many_steps_seq : forall (s1:state) (s3:state) (i1:stmt) (i2:stmt)
-  (n:Z), (many_steps s1 (Sseq i1 i2) s3 Sskip n) -> exists s2:state,
-  exists n1:Z, exists n2:Z, (many_steps s1 i1 s2 Sskip n1) /\ ((many_steps s2
-  i2 s3 Sskip n2) /\ (n = ((1%Z + n1)%Z + n2)%Z)).
-
-Definition valid_fmla(p:fmla): Prop := forall (s:state), (eval_fmla s p).
-
-Definition valid_triple(p:fmla) (i:stmt) (q:fmla): Prop := forall (s:state),
-  (eval_fmla s p) -> forall (sqt:state) (n:Z), (many_steps s i sqt Sskip
-  n) -> (eval_fmla sqt q).
-
-Axiom skip_rule : forall (q:fmla), (valid_triple q Sskip q).
-
 (* YOU MAY EDIT THE CONTEXT BELOW *)
 
 (* DO NOT EDIT BELOW *)
 
-Theorem assign_rule : forall (q:fmla) (x:Z) (e:term), (valid_triple (subst q
-  x e) (Sassign x e) q).
+Theorem eval_subst : forall (f:fmla) (s:state) (x:Z) (t:term), (eval_fmla s
+  (subst f x t)) <-> (eval_fmla (mk_state (var_env1 s) (set (ref_env1 s) x
+  (eval_term s t))) f).
 (* YOU MAY EDIT THE PROOF BELOW *)
-intros q x e.
-unfold valid_triple.
-intros s Pre s' n Hred.
-inversion Hred; subst.
-inversion H; subst.
-inversion H0; subst.
-(* normal case *)
-clear H Hred H0.
-rewrite <- eval_subst; auto.
+induction f.
+unfold eval_fmla, subst in *.
+intros s x t0.
+rewrite eval_subst_term; tauto.
 
-(* absurd case *)
-inversion H1.
+simpl.
+intros s x t.
+rewrite IHf1.
+rewrite IHf2.
+tauto.
+
+simpl.
+intros s x t.
+rewrite IHf.
+tauto.
+
+simpl.
+intros s x t.
+rewrite IHf1.
+rewrite IHf2.
+tauto.
+
+
 Qed.
 (* DO NOT EDIT BELOW *)
 

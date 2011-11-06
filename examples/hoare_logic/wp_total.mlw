@@ -21,8 +21,10 @@ type fmla =
   | Fand fmla fmla
   | Fnot fmla
   | Fimplies fmla fmla
+(*
   | Flet ident term fmla
   | Fforall ident datatype fmla
+*)
 
 (* program states: 2 stack env for refs and local vars  *)
 
@@ -95,7 +97,8 @@ predicate eval_fmla (s:state) (f:fmla) =
   | Fterm t -> eval_term s t = Vbool True
   | Fand f1 f2 -> eval_fmla s f1 /\ eval_fmla s f2
   | Fnot f -> not (eval_fmla s f)
-  | Fimplies f1 f2 -> not (eval_fmla s f1) \/ eval_fmla s f2
+  | Fimplies f1 f2 -> eval_fmla s f1 -> eval_fmla s f2
+(*
   | Flet x t f ->
       eval_fmla
         {| var_env = IdMap.set s.var_env x (eval_term s t) ;
@@ -113,6 +116,7 @@ predicate eval_fmla (s:state) (f:fmla) =
           {| var_env = IdMap.set s.var_env x (Vbool b);
              ref_env = s.ref_env |}
           f
+*)
   end
 
 (* substitution of a *reference* by a term *)
@@ -138,18 +142,19 @@ function subst (f:fmla) (x:ident) (t:term) : fmla =
   | Fand f1 f2 -> Fand (subst f1 x t) (subst f2 x t)
   | Fnot f -> Fnot (subst f x t)
   | Fimplies f1 f2 -> Fimplies (subst f1 x t) (subst f2 x t)
+(*
   | Flet y t' f -> Flet y t' (subst f x t)
   | Fforall y ty f -> Fforall y ty (subst f x t)
+*)
   end
 
-(* faux pour let ?
+(* faux pour let *)
 lemma eval_subst:
   forall f:fmla, s:state, x:ident, t:term.
     eval_fmla s (subst f x t) <->
     eval_fmla {| var_env = s.var_env;
                  ref_env = (IdMap.set s.ref_env x (eval_term s t)) |}
               f
-*)
 
 (* statements *)
 
@@ -158,6 +163,7 @@ type stmt =
   | Sassign ident term
   | Sseq stmt stmt
   | Sif term stmt stmt
+  | Sassert fmla
   | Swhile term fmla stmt
 
 lemma check_skip:
@@ -192,6 +198,11 @@ inductive one_step state stmt state stmt =
       forall s:state, e:term, i1 i2:stmt.
         eval_term s e = (Vbool False) ->
           one_step s (Sif e i1 i2) s i2
+
+  | one_step_assert:
+      forall s:state, f:fmla.
+        eval_fmla s f ->
+          one_step s (Sassert f) s Sskip
 
   | one_step_while_true:
       forall s:state, e:term, inv:fmla, i:stmt.
@@ -284,10 +295,20 @@ lemma if_rule:
   valid_triple (Fand p (Fnot (Fterm e))) i2 q ->
   valid_triple p (Sif e i1 i2) q
 
+lemma assert_rule:
+  forall f p:fmla. valid_fmla (Fimplies p f) ->
+  valid_triple p (Sassert f) p
+
 lemma while_rule:
   forall e:term, inv:fmla, i:stmt.
   valid_triple (Fand (Fterm e) inv) i inv ->
   valid_triple inv (Swhile e inv i) (Fand (Fnot (Fterm e)) inv)
+
+lemma while_rule_ext:
+  forall e:term, inv inv':fmla, i:stmt.
+  valid_fmla (Fimplies inv' inv) ->
+  valid_triple (Fand (Fterm e) inv') i inv' ->
+  valid_triple inv' (Swhile e inv i) (Fand (Fnot (Fterm e)) inv')
 
 lemma consequence_rule:
   forall p p' q q':fmla, i:stmt.
@@ -320,6 +341,9 @@ module WP
     | Sif e i1 i2 ->
         Fand (Fimplies (Fterm e) (wp i1 q))
              (Fimplies (Fnot (Fterm e)) (wp i2 q))
+    | Sassert f ->
+       (* Fimplies f q (* liberal wp, no termination requires *)*)
+       Fand f q
     | Swhile e inv i ->
         Fand inv
           ((*Fforall*) (Fand

@@ -114,7 +114,7 @@ Fixpoint eval_fmla(s:state) (f:fmla) {struct f}: Prop :=
   | (Fterm t) => ((eval_term s t) = (Vbool true))
   | (Fand f1 f2) => (eval_fmla s f1) /\ (eval_fmla s f2)
   | (Fnot f1) => ~ (eval_fmla s f1)
-  | (Fimplies f1 f2) => (~ (eval_fmla s f1)) \/ (eval_fmla s f2)
+  | (Fimplies f1 f2) => (eval_fmla s f1) -> (eval_fmla s f2)
   end.
 Unset Implicit Arguments.
 
@@ -145,11 +145,16 @@ Fixpoint subst(f:fmla) (x:Z) (t:term) {struct f}: fmla :=
   end.
 Unset Implicit Arguments.
 
+Axiom eval_subst : forall (f:fmla) (s:state) (x:Z) (t:term), (eval_fmla s
+  (subst f x t)) <-> (eval_fmla (mk_state (var_env1 s) (set (ref_env1 s) x
+  (eval_term s t))) f).
+
 Inductive stmt  :=
   | Sskip : stmt 
   | Sassign : Z -> term -> stmt 
   | Sseq : stmt -> stmt -> stmt 
   | Sif : term -> stmt -> stmt -> stmt 
+  | Sassert : fmla -> stmt 
   | Swhile : term -> fmla -> stmt -> stmt .
 
 Axiom check_skip : forall (s:stmt), (s = Sskip) \/ ~ (s = Sskip).
@@ -166,6 +171,8 @@ Inductive one_step : state -> stmt -> state -> stmt -> Prop :=
       ((eval_term s e) = (Vbool true)) -> (one_step s (Sif e i1 i2) s i1)
   | one_step_if_false : forall (s:state) (e:term) (i1:stmt) (i2:stmt),
       ((eval_term s e) = (Vbool false)) -> (one_step s (Sif e i1 i2) s i2)
+  | one_step_assert : forall (s:state) (f:fmla), (eval_fmla s f) ->
+      (one_step s (Sassert f) s Sskip)
   | one_step_while_true : forall (s:state) (e:term) (inv:fmla) (i:stmt),
       (eval_fmla s inv) -> (((eval_term s e) = (Vbool true)) -> (one_step s
       (Swhile e inv i) s (Sseq i (Swhile e inv i))))
@@ -195,25 +202,31 @@ Definition valid_triple(p:fmla) (i:stmt) (q:fmla): Prop := forall (s:state),
 
 Axiom skip_rule : forall (q:fmla), (valid_triple q Sskip q).
 
+Axiom assign_rule : forall (q:fmla) (x:Z) (e:term), (valid_triple (subst q x
+  e) (Sassign x e) q).
+
+Axiom seq_rule : forall (p:fmla) (q:fmla) (r:fmla) (i1:stmt) (i2:stmt),
+  ((valid_triple p i1 r) /\ (valid_triple r i2 q)) -> (valid_triple p
+  (Sseq i1 i2) q).
+
+Axiom if_rule : forall (e:term) (p:fmla) (q:fmla) (i1:stmt) (i2:stmt),
+  ((valid_triple (Fand p (Fterm e)) i1 q) /\ (valid_triple (Fand p
+  (Fnot (Fterm e))) i2 q)) -> (valid_triple p (Sif e i1 i2) q).
+
 (* YOU MAY EDIT THE CONTEXT BELOW *)
 
 (* DO NOT EDIT BELOW *)
 
-Theorem assign_rule : forall (q:fmla) (x:Z) (e:term), (valid_triple (subst q
-  x e) (Sassign x e) q).
+Theorem assert_rule : forall (f:fmla) (p:fmla), (valid_fmla (Fimplies p
+  f)) -> (valid_triple p (Sassert f) p).
 (* YOU MAY EDIT THE PROOF BELOW *)
-intros q x e.
-unfold valid_triple.
-intros s Pre s' n Hred.
-inversion Hred; subst.
-inversion H; subst.
-inversion H0; subst.
-(* normal case *)
-clear H Hred H0.
-rewrite <- eval_subst; auto.
-
-(* absurd case *)
-inversion H1.
+intros f p H.
+red.
+intros s Hp s' n Hred.
+inversion Hred; subst; clear Hred.
+inversion H0; subst; clear H0.
+inversion H1; subst; clear H1; auto.
+inversion H0; subst; clear H0.
 Qed.
 (* DO NOT EDIT BELOW *)
 

@@ -114,7 +114,7 @@ Fixpoint eval_fmla(s:state) (f:fmla) {struct f}: Prop :=
   | (Fterm t) => ((eval_term s t) = (Vbool true))
   | (Fand f1 f2) => (eval_fmla s f1) /\ (eval_fmla s f2)
   | (Fnot f1) => ~ (eval_fmla s f1)
-  | (Fimplies f1 f2) => (~ (eval_fmla s f1)) \/ (eval_fmla s f2)
+  | (Fimplies f1 f2) => (eval_fmla s f1) -> (eval_fmla s f2)
   end.
 Unset Implicit Arguments.
 
@@ -144,6 +144,10 @@ Fixpoint subst(f:fmla) (x:Z) (t:term) {struct f}: fmla :=
   | (Fimplies f1 f2) => (Fimplies (subst f1 x t) (subst f2 x t))
   end.
 Unset Implicit Arguments.
+
+Axiom eval_subst : forall (f:fmla) (s:state) (x:Z) (t:term), (eval_fmla s
+  (subst f x t)) <-> (eval_fmla (mk_state (var_env1 s) (set (ref_env1 s) x
+  (eval_term s t))) f).
 
 Inductive stmt  :=
   | Sskip : stmt 
@@ -195,25 +199,59 @@ Definition valid_triple(p:fmla) (i:stmt) (q:fmla): Prop := forall (s:state),
 
 Axiom skip_rule : forall (q:fmla), (valid_triple q Sskip q).
 
+Axiom assign_rule : forall (q:fmla) (x:Z) (e:term), (valid_triple (subst q x
+  e) (Sassign x e) q).
+
+Axiom seq_rule : forall (p:fmla) (q:fmla) (r:fmla) (i1:stmt) (i2:stmt),
+  ((valid_triple p i1 r) /\ (valid_triple r i2 q)) -> (valid_triple p
+  (Sseq i1 i2) q).
+
+Axiom if_rule : forall (e:term) (p:fmla) (q:fmla) (i1:stmt) (i2:stmt),
+  ((valid_triple (Fand p (Fterm e)) i1 q) /\ (valid_triple (Fand p
+  (Fnot (Fterm e))) i2 q)) -> (valid_triple p (Sif e i1 i2) q).
+
+Axiom while_rule : forall (e:term) (inv:fmla) (i:stmt),
+  (valid_triple (Fand (Fterm e) inv) i inv) -> (valid_triple inv (Swhile e
+  inv i) (Fand (Fnot (Fterm e)) inv)).
+
 (* YOU MAY EDIT THE CONTEXT BELOW *)
 
 (* DO NOT EDIT BELOW *)
 
-Theorem assign_rule : forall (q:fmla) (x:Z) (e:term), (valid_triple (subst q
-  x e) (Sassign x e) q).
+Theorem while_rule_ext : forall (e:term) (inv:fmla) (invqt:fmla) (i:stmt),
+  (valid_fmla (Fimplies invqt inv)) -> ((valid_triple (Fand (Fterm e) invqt)
+  i invqt) -> (valid_triple invqt (Swhile e inv i) (Fand (Fnot (Fterm e))
+  invqt))).
 (* YOU MAY EDIT THE PROOF BELOW *)
-intros q x e.
 unfold valid_triple.
-intros s Pre s' n Hred.
-inversion Hred; subst.
-inversion H; subst.
-inversion H0; subst.
-(* normal case *)
-clear H Hred H0.
-rewrite <- eval_subst; auto.
-
-(* absurd case *)
-inversion H1.
+intros e inv inv' i Himpl Hinv'_preserved.
+intros s Hinv'_init s' n Hred.
+generalize (steps_non_neg _ _ _ _ _ Hred); intro Hn_pos.
+generalize Hred; clear Hred.
+generalize s Hinv'_init; clear s Hinv'_init.
+apply Z_lt_induction
+ with (P := fun n =>
+  forall s : state,
+  eval_fmla s inv' ->
+  many_steps s (Swhile e inv i) s' Sskip n ->
+  eval_fmla s' (Fand (Fnot (Fterm e)) inv')
+); auto.
+intros.
+inversion H1; subst; clear H1.
+inversion H2; subst; clear H2.
+(* case cond true *)
+generalize (many_steps_seq _ _ _ _ _ H3).
+intros (s3&n1&n2&h1&h2&h3).
+apply H with (y:=n2) (s:=s3); auto.
+generalize (steps_non_neg _ _ _ _ _ h1).
+generalize (steps_non_neg _ _ _ _ _ h2).
+now (auto with zarith).
+apply Hinv'_preserved with (s:=s2) (n:=n1); simpl; auto.
+(* case cond false *)
+inversion H3; subst.
+simpl; rewrite H10; intuition.
+discriminate.
+now inversion H1.
 Qed.
 (* DO NOT EDIT BELOW *)
 
