@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
 <why3session
- name="wp/why3session.xml">
+ name="wp_total/why3session.xml">
  <prover
   id="alt-ergo"
   name="Alt-Ergo"
@@ -47,7 +47,7 @@
   name="Z3"
   version="2.19"/>
  <file
-  name="../wp.mlw"
+  name="../wp_total.mlw"
   verified="false"
   expanded="true">
   <theory
@@ -56,65 +56,93 @@
    expanded="true">
    <goal
     name="Test13"
-    sum="c9030241e89dc006dab8cc9ae47a7718"
+    sum="9b0660d5d185851f0e35579e58bae743"
     proved="true"
-    expanded="true"
-    shape="aeval_termamy_stateaTconstc13aVintc13">
+    expanded="false"
+    shape="ainfix =aeval_termamy_stateaTconstc13aVintc13">
     <proof
      prover="alt-ergo"
-     timelimit="3"
+     timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.04"/>
+     <result status="valid" time="0.02"/>
     </proof>
    </goal>
    <goal
     name="Test42"
-    sum="1a9081f642f945dbe5d29567cdab6c3b"
+    sum="934097032de361d9d75442d5486a8aaa"
     proved="true"
-    expanded="true"
-    shape="aeval_termamy_stateaTvarc0aVintc42">
+    expanded="false"
+    shape="ainfix =aeval_termamy_stateaTvarc0aVintc42">
     <proof
      prover="alt-ergo"
-     timelimit="3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+   </goal>
+   <goal
+    name="Test0"
+    sum="804f5888bd7cad34e88d7361df8669da"
+    proved="true"
+    expanded="false"
+    shape="ainfix =aeval_termamy_stateaTderefc0aVintc0">
+    <proof
+     prover="cvc3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.05"/>
+    </proof>
+    <proof
+     prover="alt-ergo"
+     timelimit="5"
      edited=""
      obsolete="false">
      <result status="valid" time="0.04"/>
     </proof>
+    <proof
+     prover="z3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.05"/>
+    </proof>
    </goal>
    <goal
     name="Test55"
-    sum="c836a48e248b70c8e1b24d72622c0c12"
-    proved="false"
-    expanded="true"
-    shape="aeval_termamy_stateaTbinaTvarc0aOplusaTconstc13aVintc55">
+    sum="619f5098cb14fb9bf2edbc6c18adfbc8"
+    proved="true"
+    expanded="false"
+    shape="ainfix =aeval_termamy_stateaTbinaTvarc0aOplusaTconstc13aVintc55">
     <proof
      prover="coq"
      timelimit="5"
-     edited="wp_Imp_Test55_2.v"
+     edited="wp_total_Imp_Test55_1.v"
      obsolete="false">
-     <result status="unknown" time="0.68"/>
+     <result status="valid" time="0.43"/>
     </proof>
    </goal>
    <goal
     name="eval_subst_term"
-    sum="60bd6222851e94fd66727d7e9a0b1017"
-    proved="false"
-    expanded="true"
-    shape="aeval_termamk stateavar_envV0asetaref_envV0V2V4V1V5qaeval_termV0asubst_termV1V2V3V5Iaeval_termV0V3V4F">
-   </goal>
-   <goal
-    name="eval_subst"
-    sum="ec744e293a652182334adca9e988063f"
-    proved="false"
-    expanded="true"
-    shape="aeval_fmlaamk stateavar_envV0asetaref_envV0V2V4V1V5qaeval_fmlaV0asubstV1V2V3V5F">
+    sum="8cfbbda225fdff7af27a667f09e6dd0f"
+    proved="true"
+    expanded="false"
+    shape="ainfix =aeval_termV0asubst_termV1V2V3aeval_termamk stateavar_envV0asetaref_envV0V2aeval_termV0V3V1F">
+    <proof
+     prover="coq"
+     timelimit="5"
+     edited="wp_total_Imp_eval_subst_term_1.v"
+     obsolete="false">
+     <result status="valid" time="0.45"/>
+    </proof>
    </goal>
    <goal
     name="check_skip"
-    sum="4639337ccc2425b532d7ff9875c9c4eb"
+    sum="767d446be1d9e794108c31b474c10b0b"
     proved="true"
-    expanded="true"
+    expanded="false"
     shape="ainfix =V0aSskipNOainfix =V0aSskipF">
     <proof
      prover="alt-ergo"
@@ -126,129 +154,150 @@
    </goal>
    <goal
     name="Ass42"
-    sum="44dd3d1e51c27ee5e8c2c4314633dbd8"
+    sum="b110f870196aa5910dd9cc2d5a63ff64"
     proved="true"
-    expanded="true"
+    expanded="false"
     shape="Lc0ainfix =agetaref_envV1V0aVintc42Iaone_stepamy_stateaSassignV0aTconstc42V1aSskipF">
+    <proof
+     prover="alt-ergo"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.09"/>
+    </proof>
+   </goal>
+   <goal
+    name="If42"
+    sum="337fcba5f957c18c73da829ac346c544"
+    proved="true"
+    expanded="false"
+    shape="Lc0ainfix =agetaref_envV2V0aVintc13Iaone_stepV1V3V2aSskipIaone_stepamy_stateaSifaTbinaTderefV0aOleaTconstc10aSassignV0aTconstc13aSassignV0aTconstc42V1V3F">
+    <proof
+     prover="coq"
+     timelimit="5"
+     edited="wp_total_Imp_If42_1.v"
+     obsolete="false">
+     <result status="valid" time="0.78"/>
+    </proof>
+   </goal>
+   <goal
+    name="steps_non_neg"
+    sum="acfd5fdd8fee6166f41a329d75e9beac"
+    proved="true"
+    expanded="false"
+    shape="ainfix >=V4c0Iamany_stepsV0V2V1V3V4F">
+    <proof
+     prover="coq"
+     timelimit="5"
+     edited="wp_total_Imp_steps_non_neg_1.v"
+     obsolete="false">
+     <result status="valid" time="0.61"/>
+    </proof>
+   </goal>
+   <goal
+    name="many_steps_seq"
+    sum="45f4c41144135177cf227158673eadd9"
+    proved="true"
+    expanded="false"
+    shape="ainfix =V4ainfix +ainfix +c1V6V7Aamany_stepsV5V3V1aSskipV7Aamany_stepsV0V2V5aSskipV6EIamany_stepsV0aSseqV2V3V1aSskipV4F">
+    <proof
+     prover="coq"
+     timelimit="5"
+     edited="wp_total_Imp_many_steps_seq_1.v"
+     obsolete="false">
+     <result status="valid" time="0.82"/>
+    </proof>
+   </goal>
+   <goal
+    name="skip_rule"
+    sum="c16ea8a8c9aef7573da9e41064159591"
+    proved="true"
+    expanded="false"
+    shape="avalid_tripleV0aSskipV0F">
+    <proof
+     prover="alt-ergo"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.32"/>
+    </proof>
+   </goal>
+   <goal
+    name="assign_rule"
+    sum="f3e113eb10d03aa293cc6a1b4f27d411"
+    proved="false"
+    expanded="true"
+    shape="avalid_tripleasubstV0V1V2aSassignV1V2V0F">
+    <proof
+     prover="coq"
+     timelimit="5"
+     edited="wp_total_Imp_assign_rule_1.v"
+     obsolete="false">
+     <result status="unknown" time="0.52"/>
+    </proof>
+   </goal>
+   <goal
+    name="seq_rule"
+    sum="7ec60f182a0f4db8bdb3a4827e22e3f3"
+    proved="true"
+    expanded="false"
+    shape="avalid_tripleV0aSseqV3V4V1Iavalid_tripleV2V4V1Aavalid_tripleV0V3V2F">
+    <proof
+     prover="z3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.08"/>
+    </proof>
+   </goal>
+   <goal
+    name="if_rule"
+    sum="2e144c96a46fd8a1b76c049e1e1e438f"
+    proved="true"
+    expanded="false"
+    shape="avalid_tripleV1aSifV0V3V4V2Iavalid_tripleaFandV1aFnotaFtermV0V4V2Aavalid_tripleaFandV1aFtermV0V3V2F">
+    <proof
+     prover="coq"
+     timelimit="5"
+     edited="wp_total_Imp_if_rule_1.v"
+     obsolete="false">
+     <result status="valid" time="0.79"/>
+    </proof>
+   </goal>
+   <goal
+    name="while_rule"
+    sum="c51fcac43a71708b0c07f14f1b4660a7"
+    proved="true"
+    expanded="false"
+    shape="avalid_tripleV1aSwhileV0V1V2aFandaFnotaFtermV0V1Iavalid_tripleaFandaFtermV0V1V2V1F">
+    <proof
+     prover="coq"
+     timelimit="5"
+     edited="wp_total_Imp_while_rule_1.v"
+     obsolete="false">
+     <result status="valid" time="0.88"/>
+    </proof>
+   </goal>
+   <goal
+    name="consequence_rule"
+    sum="eb069a8bc2aee13167e0de4f771a5383"
+    proved="true"
+    expanded="false"
+    shape="avalid_tripleV1V4V3Iavalid_fmlaaFimpliesV2V3Iavalid_tripleV0V4V2Iavalid_fmlaaFimpliesV1V0F">
     <proof
      prover="cvc3"
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.15"/>
-    </proof>
-   </goal>
-   <goal
-    name="If42"
-    sum="8f67af21dfd6689f3ffe63de07f6800a"
-    proved="false"
-    expanded="true"
-    shape="Lc0ainfix =agetaref_envV2V0aVintc42Iaone_stepV1V3V2aSskipIaone_stepamy_stateaSifaTbinaTvarV0aOleaTconstc10aSassignV0aTconstc13aSassignV0aTconstc42V1V3F">
-    <proof
-     prover="coq"
-     timelimit="5"
-     edited="wp_Imp_If42_1.v"
-     obsolete="true">
-     <result status="unknown" time="0.71"/>
-    </proof>
-   </goal>
-   <goal
-    name="steps_non_neg"
-    sum="0196a8f3e7819c74e6ad8d12303bf434"
-    proved="false"
-    expanded="true"
-    shape="ainfix >=V4c0Iamany_stepsV0V2V1V3V4F">
-    <proof
-     prover="cvc3"
-     timelimit="5"
-     edited=""
-     obsolete="true">
-     <result status="timeout" time="5.10"/>
-    </proof>
-    <proof
-     prover="alt-ergo"
-     timelimit="5"
-     edited=""
-     obsolete="true">
-     <result status="timeout" time="5.11"/>
+     <result status="valid" time="0.52"/>
     </proof>
     <proof
      prover="z3"
      timelimit="5"
      edited=""
-     obsolete="true">
-     <result status="timeout" time="5.10"/>
+     obsolete="false">
+     <result status="valid" time="0.08"/>
     </proof>
-   </goal>
-   <goal
-    name="many_steps_seq"
-    sum="194261c30065d2a593dacbf80e32ffd6"
-    proved="false"
-    expanded="true"
-    shape="ainfix =V4ainfix +ainfix +c1V6V7Aamany_stepsV5V3V1aSskipV7Aamany_stepsV0V2V5aSskipV6EIamany_stepsV0aSseqV2V3V1aSskipV4F">
-    <proof
-     prover="cvc3"
-     timelimit="5"
-     edited=""
-     obsolete="true">
-     <result status="timeout" time="5.09"/>
-    </proof>
-    <proof
-     prover="alt-ergo"
-     timelimit="5"
-     edited=""
-     obsolete="true">
-     <result status="timeout" time="5.09"/>
-    </proof>
-    <proof
-     prover="z3"
-     timelimit="5"
-     edited=""
-     obsolete="true">
-     <result status="timeout" time="5.09"/>
-    </proof>
-   </goal>
-   <goal
-    name="skip_rule"
-    sum="7740840676004f8e873efdfa5a3802c8"
-    proved="false"
-    expanded="true"
-    shape="avalid_tripleV0aSskipV0F">
-   </goal>
-   <goal
-    name="assign_rule"
-    sum="b7535c22fb43d376a2f1bbe6cdeee60b"
-    proved="false"
-    expanded="true"
-    shape="avalid_tripleasubstV0V1V2aSassignV1V2V0F">
-   </goal>
-   <goal
-    name="seq_rule"
-    sum="0e850f17ee8c9e7af2b1d580037cbf18"
-    proved="false"
-    expanded="true"
-    shape="avalid_tripleV0aSseqV3V4V1Iavalid_tripleV2V4V1Aavalid_tripleV0V3V2F">
-   </goal>
-   <goal
-    name="if_rule"
-    sum="f032bc501506be99c87020b3ccad50e9"
-    proved="false"
-    expanded="true"
-    shape="avalid_tripleV1aSifV0V3V4V2Iavalid_tripleaFandV1aFnotaFtermV0V4V2Aavalid_tripleaFandV1aFtermV0V3V2F">
-   </goal>
-   <goal
-    name="while_rule"
-    sum="bbf0273d3c9eb6358de92fba9dc26818"
-    proved="false"
-    expanded="true"
-    shape="avalid_tripleV1aSwhileV0V1V2aFandaFnotaFtermV0V1Iavalid_tripleaFandaFtermV0V1V2V1F">
-   </goal>
-   <goal
-    name="consequence_rule"
-    sum="7cf47ddd7f0eb2126b8db970048698d4"
-    proved="false"
-    expanded="true"
-    shape="avalid_tripleV1V4V3Iavalid_fmlaaFimpliesV2V3Iavalid_tripleV0V4V2Iavalid_fmlaaFimpliesV1V0F">
    </goal>
   </theory>
   <theory
@@ -258,7 +307,7 @@
    <goal
     name="WP_parameter wp"
     expl="parameter wp"
-    sum="3b09ac100940bc751d849850bdb49841"
+    sum="69731f3352fe78899f62411f37a30141"
     proved="false"
     expanded="true"
     shape="CV0aSskipavalid_tripleV1V0V1aSseqVVavalid_tripleV5V0V1Iavalid_tripleV5V2V4FIavalid_tripleV4V3V1FaSassignVVavalid_tripleasubstV1V6V7V0V1aSifVVVavalid_tripleaFandaFimpliesaFtermV8V11aFimpliesaFnotaFtermV8V12V0V1Iavalid_tripleV12V10V1FIavalid_tripleV11V9V1FaSwhileVVVavalid_tripleaFandV14aFandaFimpliesaFandaFtermV13V14V16aFimpliesaFandaFnotaFtermV13V14V1V0V1Iavalid_tripleV16V15V14FFF">
@@ -269,20 +318,20 @@
      <goal
       name="WP_parameter wp.1"
       expl="parameter wp"
-      sum="7fcedec64e203b088ab3c5b0c7f9416c"
+      sum="bfd043c91e88ee7a3b08eddb8c0db15b"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="CV0aSskipavalid_tripleV1V0V1aSseqVVtaSassignVVtaSifVVVtaSwhileVVVtFF">
       <proof
        prover="cvc3"
        timelimit="5"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.06"/>
+       <result status="valid" time="0.03"/>
       </proof>
       <proof
        prover="alt-ergo"
-       timelimit="10"
+       timelimit="5"
        edited=""
        obsolete="false">
        <result status="valid" time="0.03"/>
@@ -298,9 +347,9 @@
      <goal
       name="WP_parameter wp.2"
       expl="parameter wp"
-      sum="22b57229e9953f06aa01bfe3a19052d3"
+      sum="ff49930528b0f50149c85a6e656da27a"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="CV0aSskiptaSseqVVavalid_tripleV5V0V1Iavalid_tripleV5V2V4FIavalid_tripleV4V3V1FaSassignVVtaSifVVVtaSwhileVVVtFF">
       <proof
        prover="cvc3"
@@ -311,7 +360,7 @@
       </proof>
       <proof
        prover="alt-ergo"
-       timelimit="10"
+       timelimit="5"
        edited=""
        obsolete="false">
        <result status="valid" time="0.04"/>
@@ -321,15 +370,15 @@
        timelimit="5"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.06"/>
+       <result status="valid" time="0.05"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter wp.3"
       expl="parameter wp"
-      sum="dd7de88316d322a997443611ce5db05c"
+      sum="9cd2ae347463c71f7aee247a64810c43"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="CV0aSskiptaSseqVVtaSassignVVavalid_tripleasubstV1V4V5V0V1aSifVVVtaSwhileVVVtFF">
       <proof
        prover="cvc3"
@@ -340,59 +389,38 @@
       </proof>
       <proof
        prover="alt-ergo"
-       timelimit="10"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.04"/>
-      </proof>
-      <proof
-       prover="z3"
        timelimit="5"
        edited=""
        obsolete="false">
        <result status="valid" time="0.03"/>
       </proof>
-     </goal>
-     <goal
-      name="WP_parameter wp.4"
-      expl="parameter wp"
-      sum="97ea50b51d77991e8716cbc010e7e1fd"
-      proved="false"
-      expanded="true"
-      shape="CV0aSskiptaSseqVVtaSassignVVtaSifVVVavalid_tripleaFandaFimpliesaFtermV6V9aFimpliesaFnotaFtermV6V10V0V1Iavalid_tripleV10V8V1FIavalid_tripleV9V7V1FaSwhileVVVtFF">
-      <proof
-       prover="coq"
-       timelimit="5"
-       edited="wp_WP_WP_WP_parameter_wp_1.v"
-       obsolete="true">
-       <result status="unknown" time="0.63"/>
-      </proof>
-      <proof
-       prover="cvc3"
-       timelimit="5"
-       edited=""
-       obsolete="true">
-       <result status="timeout" time="5.07"/>
-      </proof>
-      <proof
-       prover="alt-ergo"
-       timelimit="10"
-       edited=""
-       obsolete="true">
-       <result status="timeout" time="10.11"/>
-      </proof>
       <proof
        prover="z3"
        timelimit="5"
        edited=""
-       obsolete="true">
-       <result status="timeout" time="5.08"/>
+       obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter wp.4"
+      expl="parameter wp"
+      sum="fb0ffbb95452c9afffe19437236cb035"
+      proved="true"
+      expanded="false"
+      shape="CV0aSskiptaSseqVVtaSassignVVtaSifVVVavalid_tripleaFandaFimpliesaFtermV6V9aFimpliesaFnotaFtermV6V10V0V1Iavalid_tripleV10V8V1FIavalid_tripleV9V7V1FaSwhileVVVtFF">
+      <proof
+       prover="z3"
+       timelimit="5"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.16"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter wp.5"
       expl="parameter wp"
-      sum="e0b034c5f72361415ea9e9bdc7a9074c"
+      sum="9ad4f2e9b31c086669b7920a2597b640"
       proved="false"
       expanded="true"
       shape="CV0aSskiptaSseqVVtaSassignVVtaSifVVVtaSwhileVVVavalid_tripleaFandV10aFandaFimpliesaFandaFtermV9V10V12aFimpliesaFandaFnotaFtermV9V10V1V0V1Iavalid_tripleV12V11V10FFF">
@@ -401,21 +429,21 @@
        timelimit="5"
        edited=""
        obsolete="true">
-       <result status="timeout" time="5.12"/>
+       <result status="timeout" time="5.09"/>
       </proof>
       <proof
        prover="alt-ergo"
-       timelimit="10"
+       timelimit="5"
        edited=""
        obsolete="true">
-       <result status="timeout" time="10.08"/>
+       <result status="timeout" time="5.01"/>
       </proof>
       <proof
        prover="z3"
        timelimit="5"
        edited=""
        obsolete="true">
-       <result status="timeout" time="5.08"/>
+       <result status="timeout" time="5.07"/>
       </proof>
      </goal>
     </transf>

@@ -34,23 +34,24 @@ type value =
   | Vbool bool
 
 use map.Map as IdMap
-type var_env = IdMap.map ident value
-type ref_env = IdMap.map ident value
+type env = IdMap.map ident value
+type var_env = env
+type ref_env = env
 
 type state = {| var_env : var_env; ref_env: ref_env |}
 
 (* semantics of formulas *)
 
-predicate eval_bin (x:value) (op:operator) (y:value) (res:value) =
+function eval_bin (x:value) (op:operator) (y:value) : value =
   match x,y with
   | Vint x,Vint y ->
      match op with
-     | Oplus -> res = Vint (x+y)
-     | Ominus -> res = Vint (x-y)
-     | Omult -> res = Vint (x*y)
-     | Ole -> res = Vbool (if x <= y then True else False)
+     | Oplus -> Vint (x+y)
+     | Ominus -> Vint (x-y)
+     | Omult -> Vint (x*y)
+     | Ole -> Vbool (if x <= y then True else False)
      end
-  | _,_ -> false
+  | _,_ -> Vbool False
   end
 
 (*
@@ -62,62 +63,59 @@ inductive get_env (i:int) (env:list value) (res:value) =
       get_env (i-1) l r -> get_env i (Cons x l) x
 *)
 
-predicate get_refenv (i:ident) (e:ref_env) (r:value) =
-    IdMap.get e i = r
+function get_env (i:ident) (e:env) : value = IdMap.get e i
 
-inductive eval_term state term value =
-  | eval_const :
-      forall s:state, n:int. eval_term s (Tconst n) (Vint n)
-  | eval_var :
-      forall s:state, i:int, res:value.
-        get_refenv i (var_env s) res -> eval_term s (Tvar i) res
-  | eval_deref :
-      forall s:state, i:ident, res:value.
-        get_refenv i (ref_env s) res -> eval_term s (Tderef i) res
-  | eval_bin :
-      forall s:state, op:operator, t1 t2:term, r1 r2 r:value.
-        eval_term s t1 r1 -> eval_term s t2 r2 ->
-        eval_bin r1 op r2 r -> eval_term s (Tbin t1 op t2) r
+function eval_term (s:state) (t:term) : value =
+  match t with
+  | Tconst n -> Vint n
+  | Tvar id -> get_env id (var_env s)
+  | Tderef id -> get_env id (ref_env s)
+  | Tbin t1 op t2 ->
+     eval_bin (eval_term s t1) op (eval_term s t2)
+  end
 
-  function my_state :state =
+function my_state :state =
     {| var_env = IdMap.const (Vint 42);
        ref_env = IdMap.const (Vint 0) |}
 
-  goal Test13 :
-    eval_term my_state (Tconst 13) (Vint 13)
+goal Test13 :
+  eval_term my_state (Tconst 13) = Vint 13
 
-  goal Test42 :
-    eval_term my_state (Tvar 0) (Vint 42)
+goal Test42 :
+  eval_term my_state (Tvar 0) = Vint 42
 
-  goal Test55 :
-    eval_term my_state (Tbin (Tvar 0) Oplus (Tconst 13)) (Vint 55)
+goal Test0 :
+  eval_term my_state (Tderef 0) = Vint 0
 
-inductive eval_fmla state fmla bool =
-  | eval_term:
-    forall s:state, t:term, b:bool.
-      eval_term s t (Vbool b) -> eval_fmla s (Fterm t) b
-  | eval_and:
-    forall s:state, f1 f2:fmla, b1 b2:bool.
-      eval_fmla s f1 b1 -> eval_fmla s f2 b2 ->
-      eval_fmla s (Fand f1 f2) (andb b1 b2)
-  | eval_not:
-    forall s:state, f:fmla, b:bool.
-      eval_fmla s f b -> eval_fmla s (Fnot f) (notb b)
-  | eval_impl:
-    forall s:state, f1 f2:fmla, b1 b2:bool.
-      eval_fmla s f1 b1 -> eval_fmla s f2 b2 ->
-      eval_fmla s (Fimplies f1 f2) (implb b1 b2)
-  | eval_forall_int_true:
-      forall s:state, x:ident, f:fmla.
-        (* problem: qu'est-ce qui garanti que s.var_env a exactement
-           autant de debruijn que f ? *)
-        (forall n:int. eval_fmla
+goal Test55 :
+  eval_term my_state (Tbin (Tvar 0) Oplus (Tconst 13)) = Vint 55
+
+predicate eval_fmla (s:state) (f:fmla) =
+  match f with
+  | Fterm t -> eval_term s t = Vbool True
+  | Fand f1 f2 -> eval_fmla s f1 /\ eval_fmla s f2
+  | Fnot f -> not (eval_fmla s f)
+  | Fimplies f1 f2 -> not (eval_fmla s f1) \/ eval_fmla s f2
+  | Flet x t f ->
+      eval_fmla
+        {| var_env = IdMap.set s.var_env x (eval_term s t) ;
+           ref_env = s.ref_env |}
+        f
+  | Fforall x Tint f ->
+     forall n:int.
+        eval_fmla
           {| var_env = IdMap.set s.var_env x (Vint n);
              ref_env = s.ref_env |}
-          f True) ->
-        eval_fmla s (Fforall x Tint f) True
+          f
+  | Fforall x Tbool f ->
+     forall b:bool.
+        eval_fmla
+          {| var_env = IdMap.set s.var_env x (Vbool b);
+             ref_env = s.ref_env |}
+          f
+  end
 
-(* substitution *) 
+(* substitution of a *reference* by a term *)
 
 function subst_term (e:term) (x:ident) (t:term) : term =
   match e with
@@ -128,12 +126,11 @@ function subst_term (e:term) (x:ident) (t:term) : term =
   end
 
 lemma eval_subst_term:
-  forall s:state, e:term, x:ident, t:term, r v:value.
-    eval_term s t r ->
-    eval_term s (subst_term e x t) v <->
-      eval_term {| var_env = s.var_env;
-                   ref_env = (IdMap.set s.ref_env x r) |}
-                 e v
+  forall s:state, e:term, x:ident, t:term.
+    eval_term s (subst_term e x t) =
+    eval_term {| var_env = s.var_env;
+                 ref_env = (IdMap.set s.ref_env x (eval_term s t)) |}
+              e
 
 function subst (f:fmla) (x:ident) (t:term) : fmla =
   match f with
@@ -145,13 +142,14 @@ function subst (f:fmla) (x:ident) (t:term) : fmla =
   | Fforall y ty f -> Fforall y ty (subst f x t)
   end
 
+(* faux pour let ?
 lemma eval_subst:
-  forall s:state, f:fmla, x:ident, t:term, r:value, b:bool.
-    eval_fmla s (subst f x t) b <->
+  forall f:fmla, s:state, x:ident, t:term.
+    eval_fmla s (subst f x t) <->
     eval_fmla {| var_env = s.var_env;
-                 ref_env = (IdMap.set s.ref_env x r) |}
-              f b
-
+                 ref_env = (IdMap.set s.ref_env x (eval_term s t)) |}
+              f
+*)
 
 (* statements *)
 
@@ -170,11 +168,10 @@ lemma check_skip:
 inductive one_step state stmt state stmt =
 
   | one_step_assign:
-      forall s:state, x:ident, e:term, r:value.
-        eval_term s e r ->
+      forall s:state, x:ident, e:term.
         one_step s (Sassign x e)
                  {| var_env = s.var_env;
-                    ref_env = (IdMap.set s.ref_env x r) |}
+                    ref_env = (IdMap.set s.ref_env x (eval_term s e)) |}
                  Sskip
 
   | one_step_seq:
@@ -188,24 +185,24 @@ inductive one_step state stmt state stmt =
 
   | one_step_if_true:
       forall s:state, e:term, i1 i2:stmt.
-        eval_term s e (Vbool True) ->
+        eval_term s e = (Vbool True) ->
           one_step s (Sif e i1 i2) s i1
 
   | one_step_if_false:
       forall s:state, e:term, i1 i2:stmt.
-        eval_term s e (Vbool False) ->
+        eval_term s e = (Vbool False) ->
           one_step s (Sif e i1 i2) s i2
 
   | one_step_while_true:
       forall s:state, e:term, inv:fmla, i:stmt.
-        eval_fmla s inv True ->
-        eval_term s e (Vbool True) ->
+        eval_fmla s inv ->
+        eval_term s e = (Vbool True) ->
           one_step s (Swhile e inv i) s (Sseq i (Swhile e inv i))
 
   | one_step_while_false:
       forall s:state, e:term, inv:fmla, i:stmt.
-        eval_fmla s inv True ->
-        eval_term s e (Vbool False) ->
+        eval_fmla s inv ->
+        eval_term s e = (Vbool False) ->
           one_step s (Swhile e inv i) s Sskip
 
   goal Ass42 :
@@ -218,12 +215,12 @@ inductive one_step state stmt state stmt =
     let x = 0 in
     forall s1 s2:state, i:stmt.
       one_step my_state
-        (Sif (Tbin (Tvar x) Ole (Tconst 10))
+        (Sif (Tbin (Tderef x) Ole (Tconst 10))
              (Sassign x (Tconst 13))
              (Sassign x (Tconst 42)))
         s1 i ->
       one_step s1 i s2 Sskip ->
-        IdMap.get s2.ref_env x = Vint 42
+        IdMap.get s2.ref_env x = Vint 13
 
 (*
 
@@ -258,14 +255,14 @@ lemma many_steps_seq:
       n = 1 + n1 + n2
 
 
-predicate valid_fmla (p:fmla) = forall s:state. eval_fmla s p True
+predicate valid_fmla (p:fmla) = forall s:state. eval_fmla s p
 
 (* Hoare triples *)
 
 predicate valid_triple (p:fmla) (i:stmt) (q:fmla) =
-    forall s:state. eval_fmla s p True ->
+    forall s:state. eval_fmla s p ->
       forall s':state, n:int. many_steps s i s' Sskip n ->
-        eval_fmla s' q True
+        eval_fmla s' q
 
 (* Hoare logic rules *)
 
@@ -315,7 +312,11 @@ module WP
     match i with
     | Sskip -> q
     | Sseq i1 i2 -> wp i1 (wp i2 q)
-    | Sassign x e -> subst q x e
+    | Sassign x e ->
+       (*
+         let id = fresh ? in Flet id e (subst q x (Tvar id))
+       *)
+       subst q x e
     | Sif e i1 i2 ->
         Fand (Fimplies (Fterm e) (wp i1 q))
              (Fimplies (Fnot (Fterm e)) (wp i2 q))
@@ -334,7 +335,7 @@ end
 
 (*
 Local Variables:
-compile-command: "why3ide -I . wp.mlw"
+compile-command: "why3ide -I . wp_total.mlw"
 End:
 *)
 
