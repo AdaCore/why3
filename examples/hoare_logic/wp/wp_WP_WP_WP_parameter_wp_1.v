@@ -42,7 +42,8 @@ Inductive fmla  :=
   | Fterm : term -> fmla 
   | Fand : fmla -> fmla -> fmla 
   | Fnot : fmla -> fmla 
-  | Fimplies : fmla -> fmla -> fmla .
+  | Fimplies : fmla -> fmla -> fmla 
+  | Fforall : Z -> datatype -> fmla -> fmla .
 
 Inductive value  :=
   | Vint : Z -> value 
@@ -75,8 +76,6 @@ Unset Contextual Implicit.
 Axiom Const : forall (b:Type) (a:Type), forall (b1:b) (a1:a), ((get (const(
   b1):(map a b)) a1) = b1).
 
-Definition env  := (map Z value).
-
 Definition var_env  := (map Z value).
 
 Definition ref_env  := (map Z value).
@@ -94,41 +93,47 @@ Definition var_env1(u:state): (map Z value) :=
   | (mk_state var_env2 _) => var_env2
   end.
 
-Parameter eval_bin: value -> operator -> value -> value.
-
-
-Axiom eval_bin_def : forall (x:value) (op:operator) (y:value), match (x,
+Definition eval_bin(x:value) (op:operator) (y:value) (res:value): Prop :=
+  match (x,
   y) with
   | ((Vint x1), (Vint y1)) =>
       match op with
-      | Oplus => ((eval_bin x op y) = (Vint (x1 + y1)%Z))
-      | Ominus => ((eval_bin x op y) = (Vint (x1 - y1)%Z))
-      | Omult => ((eval_bin x op y) = (Vint (x1 * y1)%Z))
-      | Ole => ((x1 <= y1)%Z -> ((eval_bin x op y) = (Vbool true))) /\
-          ((~ (x1 <= y1)%Z) -> ((eval_bin x op y) = (Vbool false)))
+      | Oplus => (res = (Vint (x1 + y1)%Z))
+      | Ominus => (res = (Vint (x1 - y1)%Z))
+      | Omult => (res = (Vint (x1 * y1)%Z))
+      | Ole => ((x1 <= y1)%Z -> (res = (Vbool true))) /\ ((~ (x1 <= y1)%Z) ->
+          (res = (Vbool false)))
       end
-  | (_, _) => ((eval_bin x op y) = (Vbool false))
+  | (_, _) => False
   end.
 
-Set Implicit Arguments.
-Fixpoint eval_term(s:state) (t:term) {struct t}: value :=
-  match t with
-  | (Tconst n) => (Vint n)
-  | (Tvar id) => (get (var_env1 s) id)
-  | (Tderef id) => (get (ref_env1 s) id)
-  | (Tbin t1 op t2) => (eval_bin (eval_term s t1) op (eval_term s t2))
-  end.
-Unset Implicit Arguments.
+Definition get_refenv(i:Z) (e:(map Z value)) (r:value): Prop := ((get e
+  i) = r).
 
-Set Implicit Arguments.
-Fixpoint eval_fmla(s:state) (f:fmla) {struct f}: Prop :=
-  match f with
-  | (Fterm t) => ((eval_term s t) = (Vbool true))
-  | (Fand f1 f2) => (eval_fmla s f1) /\ (eval_fmla s f2)
-  | (Fnot f1) => ~ (eval_fmla s f1)
-  | (Fimplies f1 f2) => (eval_fmla s f1) -> (eval_fmla s f2)
-  end.
-Unset Implicit Arguments.
+Inductive eval_term : state -> term -> value -> Prop :=
+  | eval_const : forall (s:state) (n:Z), (eval_term s (Tconst n) (Vint n))
+  | eval_var : forall (s:state) (i:Z) (res:value), (get_refenv i (var_env1 s)
+      res) -> (eval_term s (Tvar i) res)
+  | eval_deref : forall (s:state) (i:Z) (res:value), (get_refenv i
+      (ref_env1 s) res) -> (eval_term s (Tderef i) res)
+  | eval_bin1 : forall (s:state) (op:operator) (t1:term) (t2:term) (r1:value)
+      (r2:value) (r:value), (eval_term s t1 r1) -> ((eval_term s t2 r2) ->
+      ((eval_bin r1 op r2 r) -> (eval_term s (Tbin t1 op t2) r))).
+
+Inductive eval_fmla : state -> fmla -> bool -> Prop :=
+  | eval_term1 : forall (s:state) (t:term) (b:bool), (eval_term s t
+      (Vbool b)) -> (eval_fmla s (Fterm t) b)
+  | eval_and : forall (s:state) (f1:fmla) (f2:fmla) (b1:bool) (b2:bool),
+      (eval_fmla s f1 b1) -> ((eval_fmla s f2 b2) -> (eval_fmla s (Fand f1
+      f2) (andb b1 b2)))
+  | eval_not : forall (s:state) (f:fmla) (b:bool), (eval_fmla s f b) ->
+      (eval_fmla s (Fnot f) (negb b))
+  | eval_impl : forall (s:state) (f1:fmla) (f2:fmla) (b1:bool) (b2:bool),
+      (eval_fmla s f1 b1) -> ((eval_fmla s f2 b2) -> (eval_fmla s
+      (Fimplies f1 f2) (implb b1 b2)))
+  | eval_forall_int_true : forall (s:state) (x:Z) (f:fmla), (forall (n:Z),
+      (eval_fmla (mk_state (set (var_env1 s) x (Vint n)) (ref_env1 s)) f
+      true)) -> (eval_fmla s (Fforall x Tint f) true).
 
 Parameter subst_term: term -> Z -> term -> term.
 
@@ -143,9 +148,9 @@ Axiom subst_term_def : forall (e:term) (x:Z) (t:term),
       (subst_term e2 x t)))
   end.
 
-Axiom eval_subst_term : forall (s:state) (e:term) (x:Z) (t:term),
-  ((eval_term s (subst_term e x t)) = (eval_term (mk_state (var_env1 s)
-  (set (ref_env1 s) x (eval_term s t))) e)).
+Axiom eval_subst_term : forall (s:state) (e:term) (x:Z) (t:term) (r:value)
+  (v:value), (eval_term s t r) -> ((eval_term s (subst_term e x t) v) <->
+  (eval_term (mk_state (var_env1 s) (set (ref_env1 s) x r)) e v)).
 
 Set Implicit Arguments.
 Fixpoint subst(f:fmla) (x:Z) (t:term) {struct f}: fmla :=
@@ -154,42 +159,41 @@ Fixpoint subst(f:fmla) (x:Z) (t:term) {struct f}: fmla :=
   | (Fand f1 f2) => (Fand (subst f1 x t) (subst f2 x t))
   | (Fnot f1) => (Fnot (subst f1 x t))
   | (Fimplies f1 f2) => (Fimplies (subst f1 x t) (subst f2 x t))
+  | (Fforall y ty f1) => (Fforall y ty (subst f1 x t))
   end.
 Unset Implicit Arguments.
 
-Axiom eval_subst : forall (f:fmla) (s:state) (x:Z) (t:term), (eval_fmla s
-  (subst f x t)) <-> (eval_fmla (mk_state (var_env1 s) (set (ref_env1 s) x
-  (eval_term s t))) f).
+Axiom eval_subst : forall (s:state) (f:fmla) (x:Z) (t:term) (r:value)
+  (b:bool), (eval_fmla s (subst f x t) b) <->
+  (eval_fmla (mk_state (var_env1 s) (set (ref_env1 s) x r)) f b).
 
 Inductive stmt  :=
   | Sskip : stmt 
   | Sassign : Z -> term -> stmt 
   | Sseq : stmt -> stmt -> stmt 
   | Sif : term -> stmt -> stmt -> stmt 
-  | Sassert : fmla -> stmt 
   | Swhile : term -> fmla -> stmt -> stmt .
 
 Axiom check_skip : forall (s:stmt), (s = Sskip) \/ ~ (s = Sskip).
 
 Inductive one_step : state -> stmt -> state -> stmt -> Prop :=
-  | one_step_assign : forall (s:state) (x:Z) (e:term), (one_step s (Sassign x
-      e) (mk_state (var_env1 s) (set (ref_env1 s) x (eval_term s e))) Sskip)
+  | one_step_assign : forall (s:state) (x:Z) (e:term) (r:value), (eval_term s
+      e r) -> (one_step s (Sassign x e) (mk_state (var_env1 s)
+      (set (ref_env1 s) x r)) Sskip)
   | one_step_seq : forall (s:state) (sqt:state) (i1:stmt) (i1qt:stmt)
       (i2:stmt), (one_step s i1 sqt i1qt) -> (one_step s (Sseq i1 i2) sqt
       (Sseq i1qt i2))
   | one_step_seq_skip : forall (s:state) (i:stmt), (one_step s (Sseq Sskip i)
       s i)
   | one_step_if_true : forall (s:state) (e:term) (i1:stmt) (i2:stmt),
-      ((eval_term s e) = (Vbool true)) -> (one_step s (Sif e i1 i2) s i1)
+      (eval_term s e (Vbool true)) -> (one_step s (Sif e i1 i2) s i1)
   | one_step_if_false : forall (s:state) (e:term) (i1:stmt) (i2:stmt),
-      ((eval_term s e) = (Vbool false)) -> (one_step s (Sif e i1 i2) s i2)
-  | one_step_assert : forall (s:state) (f:fmla), (eval_fmla s f) ->
-      (one_step s (Sassert f) s Sskip)
+      (eval_term s e (Vbool false)) -> (one_step s (Sif e i1 i2) s i2)
   | one_step_while_true : forall (s:state) (e:term) (inv:fmla) (i:stmt),
-      (eval_fmla s inv) -> (((eval_term s e) = (Vbool true)) -> (one_step s
+      (eval_fmla s inv true) -> ((eval_term s e (Vbool true)) -> (one_step s
       (Swhile e inv i) s (Sseq i (Swhile e inv i))))
   | one_step_while_false : forall (s:state) (e:term) (inv:fmla) (i:stmt),
-      (eval_fmla s inv) -> (((eval_term s e) = (Vbool false)) -> (one_step s
+      (eval_fmla s inv true) -> ((eval_term s e (Vbool false)) -> (one_step s
       (Swhile e inv i) s Sskip)).
 
 Inductive many_steps : state -> stmt -> state -> stmt -> Z -> Prop :=
@@ -206,11 +210,12 @@ Axiom many_steps_seq : forall (s1:state) (s3:state) (i1:stmt) (i2:stmt)
   exists n1:Z, exists n2:Z, (many_steps s1 i1 s2 Sskip n1) /\ ((many_steps s2
   i2 s3 Sskip n2) /\ (n = ((1%Z + n1)%Z + n2)%Z)).
 
-Definition valid_fmla(p:fmla): Prop := forall (s:state), (eval_fmla s p).
+Definition valid_fmla(p:fmla): Prop := forall (s:state), (eval_fmla s p
+  true).
 
 Definition valid_triple(p:fmla) (i:stmt) (q:fmla): Prop := forall (s:state),
-  (eval_fmla s p) -> forall (sqt:state) (n:Z), (many_steps s i sqt Sskip
-  n) -> (eval_fmla sqt q).
+  (eval_fmla s p true) -> forall (sqt:state) (n:Z), (many_steps s i sqt Sskip
+  n) -> (eval_fmla sqt q true).
 
 Axiom skip_rule : forall (q:fmla), (valid_triple q Sskip q).
 
@@ -225,20 +230,9 @@ Axiom if_rule : forall (e:term) (p:fmla) (q:fmla) (i1:stmt) (i2:stmt),
   ((valid_triple (Fand p (Fterm e)) i1 q) /\ (valid_triple (Fand p
   (Fnot (Fterm e))) i2 q)) -> (valid_triple p (Sif e i1 i2) q).
 
-Axiom assert_rule : forall (f:fmla) (p:fmla), (valid_fmla (Fimplies p f)) ->
-  (valid_triple p (Sassert f) p).
-
-Axiom assert_rule_ext : forall (f:fmla) (p:fmla), (valid_triple p (Sassert f)
-  p).
-
 Axiom while_rule : forall (e:term) (inv:fmla) (i:stmt),
   (valid_triple (Fand (Fterm e) inv) i inv) -> (valid_triple inv (Swhile e
   inv i) (Fand (Fnot (Fterm e)) inv)).
-
-Axiom while_rule_ext : forall (e:term) (inv:fmla) (invqt:fmla) (i:stmt),
-  (valid_fmla (Fimplies invqt inv)) -> ((valid_triple (Fand (Fterm e) invqt)
-  i invqt) -> (valid_triple invqt (Swhile e inv i) (Fand (Fnot (Fterm e))
-  invqt))).
 
 Axiom consequence_rule : forall (p:fmla) (pqt:fmla) (q:fmla) (qqt:fmla)
   (i:stmt), (valid_fmla (Fimplies pqt p)) -> ((valid_triple p i q) ->
@@ -253,20 +247,24 @@ Theorem WP_parameter_wp : forall (i:stmt), forall (q:fmla),
   | Sskip => True
   | (Sseq i1 i2) => True
   | (Sassign x e) => True
-  | (Sif e i1 i2) => True
-  | (Sassert f) => (valid_triple (Fimplies f q) i q)
+  | (Sif e i1 i2) => forall (result:fmla), (valid_triple result i1 q) ->
+      forall (result1:fmla), (valid_triple result1 i2 q) ->
+      (valid_triple (Fand (Fimplies (Fterm e) result)
+      (Fimplies (Fnot (Fterm e)) result1)) i q)
   | (Swhile e inv i1) => True
   end.
 (* YOU MAY EDIT THE PROOF BELOW *)
-intros i q.
 destruct i; auto.
-eapply consequence_rule.
-2: apply assert_rule_ext.
-apply consequence_rule with (p:=Fand f q) (q:=Fand f q).
-red; simpl; tauto.
-apply assert_rule.
-red; simpl; tauto.
-red; simpl; tauto.
+intros q r1 H1 r2 H2. 
+apply if_rule.
+split.
+apply consequence_rule with (2:= H1).
+Focus 2.
+red.
+intro.
+
+apply eval_impl.
+simpl.
 Qed.
 (* DO NOT EDIT BELOW *)
 

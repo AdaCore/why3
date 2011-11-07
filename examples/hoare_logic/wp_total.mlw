@@ -299,6 +299,10 @@ lemma assert_rule:
   forall f p:fmla. valid_fmla (Fimplies p f) ->
   valid_triple p (Sassert f) p
 
+lemma assert_rule_ext:
+  forall f p:fmla.
+  valid_triple (Fimplies f p) (Sassert f) p
+
 lemma while_rule:
   forall e:term, inv:fmla, i:stmt.
   valid_triple (Fand (Fterm e) inv) i inv ->
@@ -335,15 +339,15 @@ module WP
     | Sseq i1 i2 -> wp i1 (wp i2 q)
     | Sassign x e ->
        (*
-         let id = fresh ? in Flet id e (subst q x (Tvar id))
+         let id = fresh (vars q) in Flet id e (subst q x (Tvar id))
        *)
        subst q x e
     | Sif e i1 i2 ->
         Fand (Fimplies (Fterm e) (wp i1 q))
              (Fimplies (Fnot (Fterm e)) (wp i2 q))
     | Sassert f ->
-       (* Fimplies f q (* liberal wp, no termination requires *)*)
-       Fand f q
+       Fimplies f q (* liberal wp, no termination requires *)
+       (* Fand f q *) (* strict wp, termination required *)
     | Swhile e inv i ->
         Fand inv
           ((*Fforall*) (Fand

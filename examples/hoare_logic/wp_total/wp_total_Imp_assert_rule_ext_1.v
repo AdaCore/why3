@@ -2,24 +2,6 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import ZArith.
 Require Import Rbase.
-Definition unit  := unit.
-
-Parameter qtmark : Type.
-
-Parameter at1: forall (a:Type), a -> qtmark -> a.
-
-Implicit Arguments at1.
-
-Parameter old: forall (a:Type), a -> a.
-
-Implicit Arguments old.
-
-Definition implb(x:bool) (y:bool): bool := match (x,
-  y) with
-  | (true, false) => false
-  | (_, _) => true
-  end.
-
 Inductive datatype  :=
   | Tint : datatype 
   | Tbool : datatype .
@@ -43,6 +25,12 @@ Inductive fmla  :=
   | Fand : fmla -> fmla -> fmla 
   | Fnot : fmla -> fmla 
   | Fimplies : fmla -> fmla -> fmla .
+
+Definition implb(x:bool) (y:bool): bool := match (x,
+  y) with
+  | (true, false) => false
+  | (_, _) => true
+  end.
 
 Inductive value  :=
   | Vint : Z -> value 
@@ -228,45 +216,20 @@ Axiom if_rule : forall (e:term) (p:fmla) (q:fmla) (i1:stmt) (i2:stmt),
 Axiom assert_rule : forall (f:fmla) (p:fmla), (valid_fmla (Fimplies p f)) ->
   (valid_triple p (Sassert f) p).
 
-Axiom assert_rule_ext : forall (f:fmla) (p:fmla), (valid_triple p (Sassert f)
-  p).
-
-Axiom while_rule : forall (e:term) (inv:fmla) (i:stmt),
-  (valid_triple (Fand (Fterm e) inv) i inv) -> (valid_triple inv (Swhile e
-  inv i) (Fand (Fnot (Fterm e)) inv)).
-
-Axiom while_rule_ext : forall (e:term) (inv:fmla) (invqt:fmla) (i:stmt),
-  (valid_fmla (Fimplies invqt inv)) -> ((valid_triple (Fand (Fterm e) invqt)
-  i invqt) -> (valid_triple invqt (Swhile e inv i) (Fand (Fnot (Fterm e))
-  invqt))).
-
-Axiom consequence_rule : forall (p:fmla) (pqt:fmla) (q:fmla) (qqt:fmla)
-  (i:stmt), (valid_fmla (Fimplies pqt p)) -> ((valid_triple p i q) ->
-  ((valid_fmla (Fimplies q qqt)) -> (valid_triple pqt i qqt))).
-
 (* YOU MAY EDIT THE CONTEXT BELOW *)
 
 (* DO NOT EDIT BELOW *)
 
-Theorem WP_parameter_wp : forall (i:stmt), forall (q:fmla),
-  match i with
-  | Sskip => True
-  | (Sseq i1 i2) => True
-  | (Sassign x e) => True
-  | (Sif e i1 i2) => True
-  | (Sassert f) => (valid_triple (Fimplies f q) i q)
-  | (Swhile e inv i1) => True
-  end.
+Theorem assert_rule_ext : forall (f:fmla) (p:fmla), (valid_triple p
+  (Sassert f) p).
 (* YOU MAY EDIT THE PROOF BELOW *)
-intros i q.
-destruct i; auto.
-eapply consequence_rule.
-2: apply assert_rule_ext.
-apply consequence_rule with (p:=Fand f q) (q:=Fand f q).
-red; simpl; tauto.
-apply assert_rule.
-red; simpl; tauto.
-red; simpl; tauto.
+intros f p.
+red.
+intros s Hp s' n Hred.
+inversion Hred; subst; clear Hred.
+inversion H; subst; clear H.
+inversion H0; subst; clear H0; auto.
+inversion H; subst; clear H.
 Qed.
 (* DO NOT EDIT BELOW *)
 
