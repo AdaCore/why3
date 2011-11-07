@@ -8,13 +8,6 @@
 
 * more libraries (theories and modules)
 
-* WhyML
-  ** regions : strong update
-  ** clone module
-  ** ghost code
-  ** extraction of Ocaml code
-  ** logic symbols used in programs
-
 * A true Jessie3 front-end ?
 
 * traceability: Partially done
@@ -61,6 +54,10 @@
    le bon typage, et clone sera en premier lieu un de ces constructors
 ** cas d'utilisation: range d'entiers de Jessie, Flottants -> double ou single
    containeurs pour Adacore et Claire
+NON PRIORITAIRE ?
+** regions : strong update
+** ghost code
+** logic symbols used in programs
 
 * extraction vers Caml
 ** PRIORITAIRE, JCF, ANDREI, besoin pour cours aux JFLA en janvier 2012
@@ -98,9 +95,18 @@
 * DELAYED Coq plugin
 
 * Coq realization of theories
-** corriger l'incoherence
+** corriger l'incoherence, comprendre si on veut vraiment accepter
+
+  function x : 'a
+  (cf: en caml cela ne marche pas)
+
+** make it really usable
+** understand problems when trying to realize set.why.
+   Status of equality, relation with clone module feature
+
 
 * DOC:
+** document new tools why3stats and others if any
 ** complete api.tex: explain how to build theories, apply
    transformations, write new functions on terms (A)
 ** complete manpages.tex: section "Drivers of external provers" (A+F)
@@ -110,6 +116,7 @@
 ** saving session
    * add "ctrl-S" to save the session explicitly
      (partially done, but no shortcut)
+   * do not save if no change was made
 ** restore provers detection in the middle of a session.
   + todo: run detection immediately at start up if conf file absent or
     outdated. should become doable with the new Session module
