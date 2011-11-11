@@ -43,11 +43,3 @@ let exn_printer fmt exn =
   try Stack.iter test exn_printers
   with Exit_loop -> ()
 
-(** For Config *)
-
-let () = register
-  (fun fmt exn -> match exn with
-    | Config.Dynlink.Error error ->
-        Format.fprintf fmt "Dynlink: %s" (Config.Dynlink.error_message error)
-    | _ -> raise exn)
-

@@ -49,13 +49,10 @@ type driver = {
 
 (** parse a driver file *)
 
-exception NoPlugins
-
 let load_plugin dir (byte,nat) =
-  if not Config.plugins then raise NoPlugins;
-  let file = if Config.Dynlink.is_native then nat else byte in
+  let file = if Dynlink.is_native then nat else byte in
   let file = Filename.concat dir file in
-  Config.Dynlink.loadfile_private file
+  Dynlink.loadfile_private file
 
 let load_file file =
   let basename = Filename.dirname file in
@@ -321,8 +318,6 @@ let string_of_qualid thl idl =
 let () = Exn_printer.register (fun fmt exn -> match exn with
   | NoPrinter -> Format.fprintf fmt
       "No printer specified in the driver file"
-  | NoPlugins -> Format.fprintf fmt
-      "Plugins are not supported, recomplie Why3"
   | Duplicate s -> Format.fprintf fmt
       "Duplicate %s specification" s
   | UnknownType (thl,idl) -> Format.fprintf fmt

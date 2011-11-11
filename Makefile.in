@@ -82,7 +82,7 @@ endif
 # external libraries common to all binaries
 
 EXTOBJS =
-EXTLIBS = str unix nums @META_DYNLINK@
+EXTLIBS = str unix nums dynlink
 
 EXTCMA	= $(addsuffix .cma,$(EXTLIBS)) $(addsuffix .cmo,$(EXTOBJS))
 EXTCMXA = $(addsuffix .cmxa,$(EXTLIBS)) $(addsuffix .cmx,$(EXTOBJS))
@@ -994,8 +994,6 @@ bts12244: src/why3.cma
 
 ## Examples : Plugins ##
 
-ifeq (@enable_plugins@,yes)
-
 PLUGDIR = examples/plugins/
 PLUG_FILES = genequlin
 
@@ -1034,8 +1032,6 @@ clean::
 	rm -f $(PLUGDIR)/*.annot $(PLUGDIR)/*~
 	rm -f $(PLUGGENERATED)
 	rm -f .depend.plug
-
-endif
 
 ################
 # documentation

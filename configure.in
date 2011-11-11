@@ -17,10 +17,9 @@
 #                                                                        #
 ##########################################################################
 
-
 #
 # autoconf input for Objective Caml programs
-# Copyright (C) 2001 Jean-Christophe Filli‚tre
+# Copyright (C) 2001 Jean-Christophe Filli√¢tre
 #   from a first script by Georges Mariano
 #
 # This library is free software; you can redistribute it and/or
@@ -77,12 +76,6 @@ AC_ARG_ENABLE(ide,
 AC_ARG_ENABLE(bench,
     [  --enable-bench          enable Why3 benchmarking tool],,
     enable_bench=yes)
-
-# dynlink
-
-AC_ARG_ENABLE(plugins,
-    [  --enable-plugins        enable Why3 plugins],,
-    enable_plugins=yes)
 
 # Coq plugin
 
@@ -151,12 +144,6 @@ case "$OCAMLVERSION" in
   0.*|1.*|2.*|3.0*|3.10*|3.11|3.11.0*|3.11.1*)
         AC_MSG_ERROR(You need Objective Caml 3.11.2 or higher);;
 esac
-
-if test "$enable_plugins" = "yes" ; then
-    DYNLINK="Dynlink"
-else
-    DYNLINK="Dynlink_"
-fi
 
 # Ocaml library path
 # old way: OCAMLLIB=`$OCAMLC -v | tail -1 | cut -f 4 -d ' ' | tr -d '\\r'`
@@ -433,13 +420,6 @@ else
    META_OCAMLGRAPH=""
 fi
 
-if test "$enable_plugins" = yes; then
-  META_DYNLINK="dynlink"
-else
-  META_DYNLINK=""
-fi
-
-
 #Viewer for ps and pdf
 dnl AC_CHECK_PROGS(PSVIEWER,gv evince)
 dnl AC_CHECK_PROGS(PDFVIEWER,xpdf acroread evince)
@@ -482,9 +462,6 @@ AC_SUBST(MENHIRLIB)
 AC_SUBST(LABLGTK2LIB)
 AC_SUBST(SQLITE3LIB)
 AC_SUBST(enable_bench)
-AC_SUBST(enable_plugins)
-AC_SUBST(DYNLINK)
-AC_SUBST(META_DYNLINK)
 AC_SUBST(META_OCAMLGRAPH)
 
 AC_SUBST(enable_coq_support)
@@ -532,7 +509,6 @@ echo "Verbose make            : $enable_verbose_make"
 echo "Why IDE                 : $enable_ide $reason_ide"
 echo "Why bench tool          : $enable_bench"
 echo "Why documentation       : $enable_doc"
-echo "Why plugins             : $enable_plugins"
 echo "Coq plugin support      : $enable_coq_support $reason_coq_support"
 if test "$enable_coq_support" = "yes" ; then
    echo "    Version             : $COQVERSION"
