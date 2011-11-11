@@ -68,7 +68,7 @@ let scanf s =
 
 
 (** the main function *)
-let read_channel env filename cin =
+let read_channel env path filename cin =
   (** Find the int theory and the needed operation *)
   let th_int = Env.find_theory env ["int"] "Int" in
   let leq = ns_find_ls th_int.th_export ["infix <"] in
@@ -76,17 +76,17 @@ let read_channel env filename cin =
   let mult_symbol = Theory.ns_find_ls th_int.Theory.th_export ["infix *"] in
 
 
-  let zero = t_const (ConstInt "0") in
+  let zero = t_int_const "0" in
 
   (** create a contraint : polynome <= constant *)
   let create_lit lvar k lits _ =
     let left = List.fold_left (fun acc e ->
       let const = string_of_int ((Random.int k) - (k/2)) in
-      let monome = t_app mult_symbol [e;t_const(ConstInt const)]
+      let monome = t_app mult_symbol [e;t_int_const const]
         (Some Ty.ty_int) in
       t_app plus_symbol [acc;monome] (Some Ty.ty_int)) zero lvar in
     let rconst = string_of_int ((Random.int k) - (k/2)) in
-    t_and_simp lits (t_app leq [left;t_const(ConstInt rconst)] None) in
+    t_and_simp lits (t_app leq [left;t_int_const rconst] None) in
 
   (** create a set of constraints *)
   let create_fmla nvar m k =
@@ -107,7 +107,7 @@ let read_channel env filename cin =
   end;
   (** Create the theory *)
   let th_uc_loc = Loc.user_position filename 1 0 0 in
-  let th_uc = create_theory (id_user "EqLin" th_uc_loc) in
+  let th_uc = create_theory ~path (id_user "EqLin" th_uc_loc) in
   let th_uc = Theory.use_export th_uc th_int in
   (** Read one line and add it to the theory *)
   let fold th_uc s =
@@ -129,7 +129,5 @@ let read_channel env filename cin =
   let th_uc = Sysutil.fold_channel fold th_uc cin in
   (** Return the map with the theory *)
   Mstr.singleton "EqLin" (close_theory th_uc)
-
-
 
 let () = Env.register_format "EquLin" ["equlin"] read_channel
