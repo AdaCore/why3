@@ -109,6 +109,8 @@ let loadpath = (Whyconf.loadpath (Whyconf.get_main config))
 
 let env = Env.create_env loadpath
 
+let () = Whyconf.load_plugins (Whyconf.get_main config)
+
 let usleep t = ignore (Unix.select [] [] [] t)
 
 
