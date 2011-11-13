@@ -29,14 +29,11 @@
   exception IllegalCharacter of char
   exception UnterminatedComment
   exception UnterminatedString
-  exception AmbiguousPath of string * string
 
   let () = Exn_printer.register (fun fmt e -> match e with
     | IllegalCharacter c -> fprintf fmt "illegal character %c" c
     | UnterminatedComment -> fprintf fmt "unterminated comment"
     | UnterminatedString -> fprintf fmt "unterminated string"
-    | AmbiguousPath (f1, f2) ->
-        fprintf fmt "ambiguous path:@ both `%s'@ and `%s'@ match" f1 f2
     | _ -> raise e)
 
   let keywords = Hashtbl.create 97
