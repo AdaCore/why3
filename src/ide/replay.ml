@@ -141,7 +141,7 @@ module M = Session.Make
          | Some _ -> failwith "Replay.timeout: already one handler installed"
 
      let notify_timer_state w s r =
-       Printf.eprintf "Progress: %d/%d/%d   \r%!" w s r
+       Printf.eprintf "Progress: %d/%d/%d                       \r%!" w s r
 
    end)
 

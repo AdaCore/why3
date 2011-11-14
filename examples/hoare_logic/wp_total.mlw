@@ -268,14 +268,23 @@ lemma many_steps_seq:
 
 predicate valid_fmla (p:fmla) = forall s:state. eval_fmla s p
 
-(* Hoare triples *)
+(*** Hoare triples ***)
 
+(* partial correctness *)
 predicate valid_triple (p:fmla) (i:stmt) (q:fmla) =
     forall s:state. eval_fmla s p ->
       forall s':state, n:int. many_steps s i s' Sskip n ->
         eval_fmla s' q
 
-(* Hoare logic rules *)
+(* total correctness *)
+(*
+predicate total_valid_triple (p:fmla) (i:stmt) (q:fmla) =
+    forall s:state. eval_fmla s p ->
+      exists s':state, n:int. many_steps s i s' Sskip n /\
+        eval_fmla s' q
+*)
+
+(* Hoare logic rules (partial correctness) *)
 
 lemma skip_rule:
   forall q:fmla. valid_triple q Sskip q
@@ -321,11 +330,25 @@ lemma consequence_rule:
   valid_fmla (Fimplies q q') ->
   valid_triple p' i q'
 
+(* frame rule *)
 
+use set.Set
+
+predicate assigns (s:state) (a:Set.set ident) (s':state) =
+  forall i:ident. not (Set.mem i a) ->
+    eval_term s (Tderef i) = eval_term s' (Tderef i)
+
+function stmt_writes (s:stmt) : Set.set ident =
+  match s with
+  | Sskip -> Set.empty
+  | Sassign i _ -> Set.singleton i
+  | Sseq s1 s2 -> Set.union (stmt_writes s1) (stmt_writes s2)
+  | Sif _ s1 s2 -> Set.union (stmt_writes s1) (stmt_writes s2)
+  | Swhile _ _ s -> stmt_writes s
+  | Sassert _ -> Set.empty
+  end
 
 end
-
-
 
 
 module WP
@@ -346,7 +369,7 @@ module WP
         Fand (Fimplies (Fterm e) (wp i1 q))
              (Fimplies (Fnot (Fterm e)) (wp i2 q))
     | Sassert f ->
-       Fimplies f q (* liberal wp, no termination requires *)
+       Fimplies f q (* liberal wp, no termination required *)
        (* Fand f q *) (* strict wp, termination required *)
     | Swhile e inv i ->
         Fand inv
