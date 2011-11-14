@@ -218,31 +218,6 @@ let init =
     (* eprintf "Item '%s' loaded@." name *)
     ()
 
-(*
-let string_of_result result =
-  match result with
-    | Session.Undone -> "undone"
-    | Session.Scheduled -> "scheduled"
-    | Session.Running -> "running"
-    | Session.InternalFailure _ -> "internal failure"
-    | Session.Done r -> match r.Call_provers.pr_answer with
-        | Call_provers.Valid -> "valid"
-        | Call_provers.Invalid -> "invalid"
-        | Call_provers.Timeout -> "timeout"
-        | Call_provers.Unknown _ -> "unknown"
-        | Call_provers.Failure _ -> "failure"
-        | Call_provers.HighFailure -> "high failure"
-
-let print_result fmt res =
-  let t = match res with
-    | Session.Done { Call_provers.pr_time = time } ->
-        Format.sprintf "(%.1f)" time
-    | _ -> ""
-  in
-  fprintf fmt "%s%s" (string_of_result res) t
-*)
-
-
 let print_result fmt
     {Call_provers.pr_answer=ans; Call_provers.pr_output=out;
      Call_provers.pr_time=t} =

@@ -1652,7 +1652,15 @@ let rec replay_on_goal_or_children
     (fun _ a ->
        if not obsolete_only || a.proof_obsolete then
          if not context_unproved_goals_only || proof_successful a
-         then redo_external_proof ~timelimit:a.timelimit g a)
+         then
+           let timelimit =
+             match a.proof_state with
+               | Done { Call_provers.pr_answer = Call_provers.Valid;
+                        Call_provers.pr_time = t }
+                 -> max a.timelimit (truncate (ceil (t *. 2.0)))
+               | _ -> a.timelimit
+           in
+           redo_external_proof ~timelimit g a)
     g.external_proofs;
   Hashtbl.iter
     (fun _ t ->
