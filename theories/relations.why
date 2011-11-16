@@ -93,6 +93,9 @@ theory TransClosure
   inductive relT t t =
   | BaseTrans : forall x y:t. rel x y -> relT x y
   | StepTrans : forall x y z:t. relT x y -> rel y z -> relT x z
+
+  lemma relT_transitive:
+    forall x y z: t. relT x y -> relT y z -> relT x z
 end
 
 theory ReflTransClosure
@@ -101,6 +104,9 @@ theory ReflTransClosure
   inductive relTR t t =
   | BaseTransRefl : forall x:t. relTR x x
   | StepTransRefl : forall x y z:t. relTR x y -> rel y z -> relTR x z
+
+  lemma relTR_transitive:
+    forall x y z: t. relTR x y -> relTR y z -> relTR x z
 end
 
 (*

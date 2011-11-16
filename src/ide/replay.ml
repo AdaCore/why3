@@ -25,8 +25,9 @@ let includes = ref []
 let file = ref None
 let opt_version = ref false
 let opt_stats = ref true
-let opt_latex = ref false
-let opt_latex2 = ref false
+let opt_latex = ref ""
+let opt_latex2 = ref ""
+let opt_html = ref ""
 let opt_force = ref false
 
 let spec = Arg.align [
@@ -35,7 +36,7 @@ let spec = Arg.align [
    "<s> add s to loadpath") ;
   ("-force",
    Arg.Set opt_force,
-   "enforce saving of session even if replay failed") ;
+   " enforce saving of session even if replay failed") ;
   ("-s",
    Arg.Clear opt_stats,
    " do not print statistics") ;
@@ -43,11 +44,14 @@ let spec = Arg.align [
    Arg.Set opt_version,
    " print version information") ;
   ("-latex",
-   Arg.Set opt_latex,
-   " produce latex statistics") ;
+   Arg.Set_string opt_latex,
+   " [Dir_output] produce latex statistics") ;
   ("-latex2",
-   Arg.Set opt_latex2,
-   " produce latex statistics") ;
+   Arg.Set_string opt_latex2,
+   " [Dir_output] produce latex statistics") ;
+  ("-html",
+   Arg.Set_string opt_html,
+   " [Dir_output] produce html statistics") ;
 ]
 
 let version_msg = Format.sprintf "Why3 replayer, version %s (build date: %s)"
@@ -83,7 +87,7 @@ let config = Whyconf.read_config None
 let loadpath = (Whyconf.loadpath (Whyconf.get_main config))
   @ List.rev !includes
 
-let env = Env.create_env_of_loadpath loadpath
+let env = Env.create_env loadpath
 
 let provers = Whyconf.get_provers config
 
@@ -119,8 +123,10 @@ module M = Session.Make
          | None -> timeout_handler := Some(float ms /. 1000.0 ,f);
          | Some _ -> failwith "Replay.timeout: already one handler installed"
 
-   end)
+     let notify_timer_state w s r =
+       Printf.eprintf "Progress: %d/%d/%d   \r%!" w s r
 
+   end)
 
 
 let main_loop () =
@@ -306,91 +312,182 @@ let print_statistics files =
 
 (* Statistics in LaTeX*)
 
-let rec provers_latex_stats provers depth g = 
+let rec transf_depth tr =
+  List.fold_left (fun depth g -> max depth (goal_depth g)) 0 (tr.M.subgoals)
+and goal_depth g =
+  Hashtbl.fold
+    (fun _st tr depth -> max depth (1 + transf_depth tr)) (M.transformations g) 0
+
+let theory_depth t =
+  List.fold_left (fun depth g -> max depth (goal_depth g)) 0 (M.goals t)
+
+let rec provers_latex_stats provers g =
   let proofs = M.external_proofs g in
   Hashtbl.iter (fun p a-> Hashtbl.replace provers p a.M.prover) proofs;
   let tr = M.transformations g in
-  Hashtbl.iter (fun _st tr -> 
-    depth := !depth + 1;
+  Hashtbl.iter (fun _st tr ->
     let goals = tr.M.subgoals in
-    List.iter (provers_latex_stats provers depth) goals) tr
+    List.iter (provers_latex_stats provers) goals) tr
 
-let rec goal_trans_stat rows g  = 
- let tr = M.transformations g in
-  Hashtbl.iter (fun _st tr -> let goals = tr.M.subgoals in
-			      rows := !rows + (List.length goals);
-			      List.iter (goal_trans_stat rows) goals) tr
- 
-let rec goal_latex_stat n prov depth depth_max first g =
-  if(n ==1) then begin
-    if not first then
-      for i = 1 to depth do printf "&" done
-    else
-      if depth > 0 then printf "&"
-	end
-  else begin
-    for i = 1 to depth do printf "\\quad" done
-  end;
-  printf "\\verb|%s| " (M.goal_expl g);
-  let proofs = M.external_proofs g in
-  if (Hashtbl.length proofs) > 0 then 
-    begin
-      if depth > 0 then 
-	for i = depth to (depth_max - depth - 1) do printf "&" done
-      else 
-	for i = depth to (depth_max - depth - 2) do printf "&" done;
-      Hashtbl.iter (fun p _pr -> 
-	try 
-	  let pr = Hashtbl.find proofs p in
-	  let s = pr.M.proof_state in
-	  match s with
-	      Session.Done res ->
-		if res.Call_provers.pr_answer = Call_provers.Valid
-		then  printf "& %.2f " res.Call_provers.pr_time
-		else printf "& --- "
-	    | _ -> printf "& " 
-	with Not_found -> printf "&") prov;
-      printf "\\\\ \\hline @.";
-    end
-  else begin
-    let tr = M.transformations g in
-    Hashtbl.iter (fun _st tr -> 
-      let goals = tr.M.subgoals in
-      let _ = List.fold_left (fun first g -> 
-	goal_latex_stat n prov (depth + 1) depth_max first g; false) true  goals in 
-    () ) tr
-  end
-
-let prover_name a = 
+let prover_name a =
   match a with
       M.Detected_prover d -> d.Session.prover_name ^ " " ^ d.Session.prover_version
     | M.Undetected_prover s -> s
 
-let theory_latex_stat n t =
+let protect s =
+  let b = Buffer.create 7 in
+  for i = 0 to String.length s - 1 do
+    match s.[i] with
+	'_' -> Buffer.add_string b "\\_"
+      | c -> Buffer.add_char b c
+  done;
+  Buffer.contents b
+
+let rec goal_latex_stat n fmt prov depth depth_max column subgoal g =
+  if n == 1 then
+    begin
+      if depth > 0 then
+	if subgoal > 0 then
+	  fprintf fmt "\\cline{%d-%d} @." (depth + 1) column
+	else ()
+      else
+	fprintf fmt "\\hline @.";
+    end
+  else
+    begin
+      if depth > 0 then
+	fprintf fmt "\\cline{%d-%d} @." 2 column
+      else
+	fprintf fmt "\\hline @."
+    end;
+  if(n ==1) then
+    begin
+      if depth_max > 1 then
+	begin
+	  if subgoal > 0 then
+	    begin
+	      if(depth < depth_max)  then
+		for i = 1 to depth do fprintf fmt "\\explanation{%s}& \\explanation{%s}" " " " "done
+	      else
+		for i = 1 to depth - 1 do fprintf fmt "\\explanation{%s}& \\explanation{%s}" " " " " done
+	    end
+	  else
+	    if(depth < depth_max) then
+	      if depth > 0 then fprintf fmt "\\explanation{%s}& \\explanation{%s}" " " " "
+	end
+      else
+	begin
+	  if subgoal > 0  then
+	    for i = 1 to depth  do fprintf fmt "\\explanation{%s}& \\explanation{%s}" " " " " done
+	  else
+	    if depth > 0 then fprintf fmt "\\explanation{%s}& \\explanation{%s}" " " " "
+	end
+    end
+  else
+    for i = 1 to depth do fprintf fmt "\\quad" done;
+  if (depth <= 1) then
+    fprintf fmt "\\explanation{%s} " (protect (M.goal_expl g))
+  else
+    if n == 2 then
+      fprintf fmt "\\explanation{%d} " (subgoal + 1)
+    else
+      fprintf fmt "\\explanation{%s}"  " ";
+  let proofs = M.external_proofs g in
+  if (Hashtbl.length proofs) > 0 then
+    begin
+      if (n == 1) then
+	begin
+	  if depth_max <= 1 then
+	    begin
+	      if depth > 0 then
+		for i = depth to (depth_max - depth) do fprintf fmt "& \\explanation{%s}" " " done
+	      else
+		for i = depth to (depth_max - depth - 1) do fprintf fmt "& \\explanation{%s}" " " done
+	    end
+	  else
+	      if depth > 0 then
+		for i = depth to (depth_max - depth - 1) do fprintf fmt "& \\explanation{%s}" " " done
+	      else
+		for i = depth to (depth_max - depth - 2) do fprintf fmt "& \\explanation{%s}" " " done
+	end;
+      List.iter (fun (p, _pr) ->
+	try
+	  let pr = Hashtbl.find proofs p in
+	  let s = pr.M.proof_state in
+	  match s with
+	      Session.Done res ->
+		begin
+		  match res.Call_provers.pr_answer with
+		      Call_provers.Valid -> fprintf fmt "& \\valid{%.2f} " res.Call_provers.pr_time
+		    | Call_provers.Invalid -> fprintf fmt "& \\invalid "
+		    | Call_provers.Timeout -> fprintf fmt "& \\timeout "
+		    | Call_provers.Unknown _s -> fprintf fmt "& \\unknown "
+		    | _ -> fprintf fmt "& \\failure "
+		end
+	    | _ -> fprintf fmt "& Undone"
+	with Not_found -> fprintf fmt "& \\noresult") prov;
+    fprintf fmt "\\\\ @."
+    end;
+  let tr = M.transformations g in
+  if Hashtbl.length tr > 0 then
+  if n == 2 then 
+    begin
+      if (Hashtbl.length proofs == 0) then 
+	fprintf fmt "& \\multicolumn{%d}{|c|}{}\\\\ @." (List.length prov)
+    end
+  else
+      if Hashtbl.length proofs > 0 then 
+	  fprintf fmt "\\cline{%d-%d} @." (depth + 2) column;
+  Hashtbl.iter (fun _st tr ->
+    let goals = tr.M.subgoals in
+    let _ = List.fold_left (fun subgoal g ->
+      goal_latex_stat n fmt prov (depth + 1) depth_max column (subgoal) g; subgoal + 1) 0 goals in
+    () ) tr
+
+
+let theory_latex_stat n dir t =
   let provers = Hashtbl.create 9 in
-  let depth = ref 0 in 
-  List.iter (provers_latex_stats provers depth) (M.goals t);
+  List.iter (provers_latex_stats provers) (M.goals t);
+  let provers = Hashtbl.fold (fun p pr acc -> (p, prover_name pr) :: acc) provers [] in
+  let provers =
+    List.sort (fun (_p1, n1) (_p2, n2) -> String.compare n1 n2) provers in
+  let depth = theory_depth  t in
+  let name = M.theory_name t in
+  let ch = open_out (Filename.concat dir(name^".tex")) in
+  let fmt = formatter_of_out_channel ch in
+      fprintf fmt "\\begin{tabular}";
+  fprintf fmt "{| l |";
+  for i = 0 to (List.length provers) + depth do fprintf fmt "c |" done;
+  fprintf fmt "}@.";
+  if (n == 1) then
+    if (depth > 1) then
+      fprintf fmt "\\hline \\multicolumn{%d}{|c|}{Proof obligations } "  depth
+      else
+      fprintf fmt "\\hline \\multicolumn{%d}{|c|}{Proof obligations } " (depth + 1)
+  else
+    fprintf fmt "\\hline Proof obligations ";
+  List.iter (fun (_, a) -> fprintf fmt "& \\provername{%s} " a) provers;
+  fprintf fmt "\\\\ @.";
+  let column =
+    if n == 1 then
+    if depth > 1
+    then
+      (List.length provers) + depth
+    else
+      (List.length provers) + depth + 1
+    else
+      (List.length provers) +  1
+  in
+  List.iter (goal_latex_stat n fmt provers 0 depth column 0) (M.goals t);
+  fprintf fmt "\\hline \\end{tabular}@.";
+  close_out ch
 
-  printf "\n@.";
-  printf "\\begin{tabular}";
-  printf "{| l |";
-  if (!depth = 0) then 
-    for i = 0 to (Hashtbl.length provers) -1 do printf "c |" done
-  else 
-    for i = 0 to (Hashtbl.length provers) + !depth - 2 do printf "c |" done;
-  printf "} \n \\hline@.";
-  printf " \\multicolumn{%d}{|c|}{ } " (!depth );
-  Hashtbl.iter (fun _ a-> printf "& %s " (prover_name a)) provers;
-  printf "\\\\\\hline@.";
-  List.iter (goal_latex_stat n provers 0 !depth true) (M.goals t);
-  printf "\\end{tabular}@." 
+let file_latex_stat n dir f =
+   List.iter (theory_latex_stat n dir) f.M.theories
 
-let file_latex_stat n f =
-   List.iter (theory_latex_stat n) f.M.theories
-
-let print_latex_statistics n =
+let print_latex_statistics n dir =
   let files = M.get_all_files () in
-  List.iter (file_latex_stat n) files
+  List.iter (file_latex_stat n dir) files
 
 let print_report (g,p,r) =
   printf "   goal '%s', prover '%s': " g p;
@@ -417,10 +514,15 @@ let () =
     M.maximum_running_proofs :=
       Whyconf.running_provers_max (Whyconf.get_main config);
     eprintf " done@.";
-    let callback report =
-      let files,n,m =
-        List.fold_left file_statistics ([],0,0) (M.get_all_files ())
-      in
+    if !opt_latex <> "" then print_latex_statistics 1 !opt_latex
+    else
+    if !opt_latex2 <> "" then print_latex_statistics 2 !opt_latex2
+    else
+      let callback report =
+        eprintf "@.";
+	let files,n,m =
+          List.fold_left file_statistics ([],0,0) (M.get_all_files ())
+	in
       match report with
         | [] ->
             if found_obs then
@@ -434,8 +536,6 @@ let () =
             else
               printf " %d/%d@." n m ;
             if !opt_stats && n<m then print_statistics files;
-	    if !opt_latex then print_latex_statistics (1);
-	    if !opt_latex2 then print_latex_statistics (2);
             eprintf "Everything replayed OK.@.";
             if found_obs && (n=m || !opt_force) then
               begin

@@ -33,9 +33,13 @@ val load_driver : Env.env -> string -> driver
 
 val file_of_task : driver -> string -> string -> Task.task -> string
 (** [file_of_task d f th t] produces a filename
-    for the prover of driver [d], for a task [t] generated from
-    a goal in theory [th] of filename [f]
+    for the prover of driver [d], for a task [t] generated
+    from  a goal in theory named [th] of filename [f]
 *)
+
+val file_of_theory : driver -> string -> Theory.theory -> string
+(** [file_of_theory d f th] produces a filename
+    for the prover of driver [d], for a theory [th] from filename [f] *)
 
 val call_on_buffer :
   command    : string ->
@@ -47,6 +51,11 @@ val call_on_buffer :
 val print_task :
   ?old       : in_channel ->
   driver -> Format.formatter -> Task.task -> unit
+
+val print_theory :
+  ?old       : in_channel ->
+  driver -> Format.formatter -> Theory.theory -> unit
+  (** produce a realization of the given theory using the given driver *)
 
 val prove_task :
   command    : string ->
@@ -68,5 +77,4 @@ val prove_task_prepared :
   ?memlimit  : int ->
   ?old       : in_channel ->
   driver -> Task.task -> Call_provers.pre_prover_call
-(***)
 

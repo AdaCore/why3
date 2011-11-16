@@ -19,5 +19,6 @@
 (**************************************************************************)
 
 
-val theory_of_decls : string -> TptpTree.decl list -> Why3.Theory.theory
+val theory_of_decls :
+  string list -> string -> TptpTree.decl list -> Why3.Theory.theory
 

@@ -157,6 +157,7 @@ let list_metas () = Hashtbl.fold (fun _ v acc -> v::acc) meta_table []
 
 type theory = {
   th_name   : ident;      (* theory name *)
+  th_path   : string list;(* environment qualifiers *)
   th_decls  : tdecl list; (* theory declarations *)
   th_export : namespace;  (* exported namespace *)
   th_known  : known_map;  (* known identifiers *)
@@ -255,6 +256,7 @@ let td_hash td = td.td_tag
 
 type theory_uc = {
   uc_name   : ident;
+  uc_path   : string list;
   uc_decls  : tdecl list;
   uc_import : namespace list;
   uc_export : namespace list;
@@ -266,8 +268,9 @@ type theory_uc = {
 exception CloseTheory
 exception NoOpenedNamespace
 
-let empty_theory n = {
+let empty_theory n p = {
   uc_name   = id_register n;
+  uc_path   = p;
   uc_decls  = [];
   uc_import = [empty_ns];
   uc_export = [empty_ns];
@@ -279,6 +282,7 @@ let empty_theory n = {
 let close_theory uc = match uc.uc_export with
   | [e] -> {
       th_name   = uc.uc_name;
+      th_path   = uc.uc_path;
       th_decls  = List.rev uc.uc_decls;
       th_export = e;
       th_known  = uc.uc_known;
@@ -720,6 +724,7 @@ let on_meta meta fn acc theory =
   Stdecl.fold add tds.tds_set acc
 *)
 
+(*
 let on_meta _meta fn acc theory =
   let tdecls = theory.th_decls in
   List.fold_left
@@ -728,29 +733,31 @@ let on_meta _meta fn acc theory =
          | Meta (_,ma) -> fn acc ma
          | _ -> acc)
     acc tdecls
+*)
 
 
 (** Base theories *)
 
 let builtin_theory =
-  let uc = empty_theory (id_fresh "BuiltIn") in
+  let uc = empty_theory (id_fresh "BuiltIn") [] in
   let uc = add_ty_decl uc [ts_int, Tabstract] in
   let uc = add_ty_decl uc [ts_real, Tabstract] in
   let uc = add_logic_decl uc [ps_equ, None] in
   close_theory uc
 
 let highord_theory =
-  let uc = empty_theory (id_fresh "HighOrd") in
+  let uc = empty_theory (id_fresh "HighOrd") [] in
   let uc = add_ty_decl uc [ts_func, Tabstract] in
   let uc = add_ty_decl uc [ts_pred, Tabstract] in
   let uc = add_logic_decl uc [fs_func_app, None] in
   let uc = add_logic_decl uc [ps_pred_app, None] in
   close_theory uc
 
-let create_theory n = use_export (empty_theory n) builtin_theory
+let create_theory ?(path=[]) n =
+  use_export (empty_theory n path) builtin_theory
 
 let tuple_theory = Util.memo_int 17 (fun n ->
-  let uc = empty_theory (id_fresh ("Tuple" ^ string_of_int n)) in
+  let uc = empty_theory (id_fresh ("Tuple" ^ string_of_int n)) [] in
   let uc = add_ty_decl uc [ts_tuple n, Talgebraic [fs_tuple n]] in
   close_theory uc)
 

@@ -33,6 +33,7 @@ type prover_data =
       driver_name : string;
       driver : Driver.driver;
       mutable editor : string;
+      interactive : bool;
     }
 
 let get_prover_data env id pr acc =
@@ -46,6 +47,7 @@ let get_prover_data env id pr acc =
         driver_name = pr.Whyconf.driver;
         driver = dr;
         editor = pr.Whyconf.editor;
+        interactive = pr.Whyconf.interactive;
       }
       acc
   with e ->
@@ -96,10 +98,11 @@ let lookup_transformation env =
 type proof_attempt_status =
   | Undone
   | Scheduled (** external proof attempt is scheduled *)
+  | Interrupted
   | Running (** external proof attempt is in progress *)
   | Done of Call_provers.prover_result (** external proof done *)
   | InternalFailure of exn (** external proof aborted by internal error *)
-
+  | Unedited (** interactive prover yet no proof script *)
 
 (***************************)
 (*     main functor        *)
@@ -113,6 +116,9 @@ module type OBSERVER = sig
 
   val timeout: ms:int -> (unit -> bool) -> unit
   val idle: (unit -> bool) -> unit
+
+  val notify_timer_state : int -> int -> int -> unit
+
 end
 
 module Make(O : OBSERVER) = struct
@@ -197,6 +203,9 @@ let verified t = t.verified
 let goals t = t.goals
 let theory_expanded t = t.theory_expanded
 
+let running a = match a.proof_state with
+  | Scheduled | Running | Interrupted -> true
+  | Undone | Done _ | InternalFailure _ | Unedited -> false
 
 let get_theory t =
   match t.theory with
@@ -277,8 +286,10 @@ let save_result fmt r =
 
 let save_status fmt s =
   match s with
-    | Undone | Scheduled | Running ->
+    | Undone | Scheduled | Running | Interrupted ->
         fprintf fmt "<undone/>@\n"
+    | Unedited ->
+        fprintf fmt "<unedited/>@\n"
     | InternalFailure msg ->
         fprintf fmt "<internalfailure reason=\"%s\"/>@\n"
           (Printexc.to_string msg)
@@ -390,6 +401,13 @@ let set_proof_state ~obsolete a res =
 (*************************)
 
 
+type action =
+  | Action_proof_attempt of bool * int * int * in_channel option * string * Driver.driver *
+    (proof_attempt_status -> unit) * Task.task
+  | Action_delayed of (unit -> unit)
+
+let actions_queue = Queue.create ()
+
 (* timeout handler *)
 
 type timeout_action =
@@ -442,10 +460,12 @@ let timeout_handler () =
           false
       | _ -> true
   in
+  O.notify_timer_state
+    (Queue.length actions_queue)
+    (Queue.length proof_attempts_queue) (List.length l);
   timeout_handler_activated := continue;
   timeout_handler_running := false;
   continue
-
 
 let run_timeout_handler () =
   if !timeout_handler_activated then () else
@@ -464,13 +484,6 @@ let schedule_any_timeout callback =
 (* idle handler *)
 
 
-type action =
-  | Action_proof_attempt of bool * int * int * in_channel option * string * Driver.driver *
-    (proof_attempt_status -> unit) * Task.task
-  | Action_delayed of (unit -> unit)
-
-let actions_queue = Queue.create ()
-
 let idle_handler_activated = ref false
 
 let idle_handler () =
@@ -483,11 +496,18 @@ let idle_handler () =
             if debug then
               Format.eprintf "Task for prover: %a@."
                 (Driver.print_task driver) goal;
-            let pre_call =
-              Driver.prove_task ?old ~command ~timelimit ~memlimit driver goal
-            in
-            Queue.push (callback,pre_call) proof_attempts_queue;
-            run_timeout_handler ()
+            begin
+              try
+                let pre_call =
+                  Driver.prove_task ?old ~command ~timelimit ~memlimit driver goal
+                in
+                Queue.push (callback,pre_call) proof_attempts_queue;
+                run_timeout_handler ()
+              with e ->
+                Format.eprintf "@[Exception raise in Session.idle_handler:@ %a@.@]"
+                  Exn_printer.exn_printer e;
+                callback (InternalFailure e)
+            end
         | Action_delayed callback -> callback ()
     end;
     true
@@ -497,6 +517,12 @@ let idle_handler () =
     eprintf "Info: idle_handler stopped@.";
 *)
     false
+    | e ->
+      Format.eprintf "@[Exception raise in Session.idle_handler:@ %a@.@]"
+        Exn_printer.exn_printer e;
+      eprintf "Session.idle_handler stopped@.";
+      false
+
 
 let run_idle_handler () =
   if !idle_handler_activated then () else
@@ -510,8 +536,34 @@ let run_idle_handler () =
 
 (* main scheduling functions *)
 
+let cancel_scheduled_proofs () =
+  let new_queue = Queue.create () in
+  try
+    while true do
+      match Queue.pop actions_queue with
+        | Action_proof_attempt(_debug,_timelimit,_memlimit,_old,_command,
+                               _driver,callback,_goal) ->
+            callback Interrupted
+        | Action_delayed _ as a->
+            Queue.push a new_queue
+    done
+  with Queue.Empty ->
+    Queue.transfer new_queue actions_queue;
+    try
+      while true do
+        let (callback,_) = Queue.pop proof_attempts_queue in
+        callback Interrupted
+      done
+    with
+      | Queue.Empty -> 
+          O.notify_timer_state 0 0 (List.length !running_proofs)
+
+
 let schedule_proof_attempt ~debug ~timelimit ~memlimit ?old
     ~command ~driver ~callback goal =
+  (*
+    eprintf "Scheduling a new proof attempt@.";
+  *)
   Queue.push
     (Action_proof_attempt(debug,timelimit,memlimit,old,command,driver,
                         callback,goal))
@@ -1164,7 +1216,7 @@ let reload_root_goal ~allow_obsolete mth tname old_goals t : goal =
   in
   if goal_obsolete then
     begin
-      eprintf "[Reload] Goal %s.%s has changed@." tname gname;
+      eprintf "[Reload] Goal %s.%s has changed@\n" tname gname;
       if allow_obsolete then
         found_obsolete := true
       else
@@ -1288,6 +1340,7 @@ let load_result r =
           Call_provers.pr_output = "";
         }
     | "undone" -> Undone
+    | "unedited" -> Unedited
     | s ->
         eprintf "[Warning] Session.load_result: unexpected element '%s'@." s;
         Undone
@@ -1430,13 +1483,17 @@ let open_session ~allow_obsolete ~env ~config ~init ~notify dir =
         current_provers :=
           Util.Mstr.fold (get_prover_data env) provers Util.Mstr.empty;
         begin try
-          let xml = Xml.from_file (Filename.concat dir db_filename) in
-          load_session ~env xml;
-          reload_all allow_obsolete
+          let xml =
+            Xml.from_file (Filename.concat dir db_filename)
+          in
+          try
+            load_session ~env xml;
+            reload_all allow_obsolete
+          with Sys_error msg ->
+            failwith ("Open session: sys error " ^ msg)
         with
           | Sys_error _msg ->
               (* xml does not exist yet *)
-              (*failwith ("Open session: sys error " ^ msg)*)
 	      false
           | Xml.Parse_error s ->
               Format.eprintf "XML database corrupted, ignored (%s)@." s;
@@ -1467,18 +1524,22 @@ let save_session () =
 
 let redo_external_proof ~timelimit g a =
   (* check that the state is not Scheduled or Running *)
-  let running = match a.proof_state with
-    | Scheduled | Running -> true
-    | Done _ | Undone | InternalFailure _ -> false
-  in
-  if running then ()
+  let previous_result,previous_obs = a.proof_state,a.proof_obsolete in
+  if running a then ()
     (* info_window `ERROR "Proof already in progress" *)
   else
     match a.prover with
       | Undetected_prover _ -> ()
       | Detected_prover p ->
+        if a.edited_as = "" && p.interactive then
+          set_proof_state ~obsolete:false a Unedited
+        else begin
           let callback result =
-            set_proof_state ~obsolete:false a result;
+            match result with
+              | Interrupted ->
+                  set_proof_state ~obsolete:previous_obs a previous_result
+              | _ ->
+                  set_proof_state ~obsolete:false a result;
           in
           let old = if a.edited_as = "" then None else
             begin
@@ -1492,6 +1553,7 @@ let redo_external_proof ~timelimit g a =
             ?old ~command:p.command ~driver:p.driver
             ~callback
             (get_task g)
+        end
 
 let rec prover_on_goal ~timelimit p g =
   let id = p.prover_id in
@@ -1642,11 +1704,7 @@ let same_result r1 r2 =
 
 let check_external_proof g a =
   (* check that the state is not Scheduled or Running *)
-  let running = match a.proof_state with
-    | Scheduled | Running -> true
-    | Done _ | Undone | InternalFailure _ -> false
-  in
-  if running then ()
+  if running a then ()
   else
     begin
       incr proofs_to_do;
@@ -1659,8 +1717,8 @@ let check_external_proof g a =
             let p_name = p.prover_name ^ " " ^ p.prover_version in
             let callback result =
               match result with
-                | Scheduled | Running -> ()
-                | Undone -> assert false
+                | Scheduled | Running | Interrupted -> ()
+                | Undone | Unedited -> assert false
                 | InternalFailure msg ->
                     push_report g p_name (CallFailed msg);
                     incr proofs_done;
@@ -1709,10 +1767,14 @@ let check_all ~callback =
          file.theories)
     !all_files;
   let timeout () =
+(*
     Printf.eprintf "Progress: %d/%d\r%!" !proofs_done !proofs_to_do;
+*)
     if !proofs_done = !proofs_to_do then
       begin
+(*
         Printf.eprintf "\n%!";
+*)
         decr maximum_running_proofs;
         callback !reports;
         false
@@ -1831,11 +1893,7 @@ let ft_of_pa a =
 
 let edit_proof ~default_editor ~project_dir a =
   (* check that the state is not Scheduled or Running *)
-  let running = match a.proof_state with
-    | Scheduled | Running -> true
-    | Undone | Done _ | InternalFailure _ -> false
-  in
-  if running then ()
+  if running a then ()
 (*
     info_window `ERROR "Edition already in progress"
 *)
@@ -1867,6 +1925,7 @@ let edit_proof ~default_editor ~project_dir a =
                   let file = name ^ "_" ^ (string_of_int !i) ^ ext in
                   let file = Sysutil.relativize_filename project_dir file in
                   a.edited_as <- file;
+                  if a.proof_state = Unedited then a.proof_state <- Undone;
                   file
               | f -> f
           in

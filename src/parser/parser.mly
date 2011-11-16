@@ -22,6 +22,7 @@ module Incremental = struct
   let env_ref  = ref []
   let lenv_ref = ref []
   let uc_ref   = ref []
+  let path_ref = ref []
 
   let ref_get  ref = List.hd !ref
   let ref_tail ref = List.tl !ref
@@ -31,14 +32,19 @@ module Incremental = struct
   let ref_push ref v = ref := v :: !ref
   let ref_set  ref v = ref := v :: ref_tail ref
 
-  let open_logic_file env =
-    ref_push env_ref env; ref_push lenv_ref Util.Mstr.empty
+  let open_logic_file env path =
+    ref_push env_ref env;
+    ref_push path_ref path;
+    ref_push lenv_ref Util.Mstr.empty
 
   let close_logic_file () =
-    ref_drop env_ref; ref_pop lenv_ref
+    ref_drop path_ref;
+    ref_drop env_ref;
+    ref_pop lenv_ref
 
   let open_theory id =
-    ref_push uc_ref (Theory.create_theory (Denv.create_user_id id))
+    let path = ref_get path_ref in
+    ref_push uc_ref (Theory.create_theory ~path (Denv.create_user_id id))
 
   let close_theory loc =
     let uc = ref_pop uc_ref in
@@ -252,7 +258,7 @@ end
 
 /* Entry points */
 
-%type <Env.env -> unit> pre_logic_file
+%type <Env.env -> string list -> unit> pre_logic_file
 %start pre_logic_file
 %type <Theory.theory Util.Mstr.t> logic_file
 %start logic_file

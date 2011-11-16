@@ -7,27 +7,26 @@ use import map.Map as A
 type array 'a = A.map int 'a
 
 (* [elements a i j] is the bag of elements in a[i..j[ *)
-
 function elements (a:array 'a) (i j:int) : bag 'a
 
 axiom Elements_empty : forall a:array 'a, i j:int.
      i >= j -> (elements a i j) = empty_bag
 
-axiom Elements_singleton : forall a:array 'a, i j:int.
+axiom Elements_add : forall a:array 'a, i j :int.
+       i < j ->
+       (elements a i j) = (add (A.get a (j-1)) (elements a i (j-1)))
+
+lemma Elements_singleton : forall a:array 'a, i j:int.
      j = i + 1 ->
        (elements a i j) = (singleton (A.get a i))
 
-axiom Elements_union : forall a:array 'a, i j k:int.
+lemma Elements_union : forall a:array 'a, i j k:int.
      i <= j <= k  ->
       (elements a i k) = (union (elements a i j) (elements a j k))
 
-lemma Elements_union1 : forall a:array 'a, i j :int.
+lemma Elements_add1 : forall a:array 'a, i j :int.
       i < j ->
       (elements a i j) = (add (A.get a i) (elements a (i+1) j))
-
-lemma Elements_union2 : forall a:array 'a, i j :int.
-       i < j ->
-       (elements a i j) = (add (A.get a (j-1)) (elements a i (j-1)))
 
 lemma Elements_remove_last: forall a:array 'a, i j :int.
       i < j-1 ->

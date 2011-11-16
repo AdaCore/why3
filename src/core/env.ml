@@ -37,11 +37,9 @@ exception ChannelNotFound of pathname
 exception TheoryNotFound of pathname * string
 exception AmbiguousPath of filename * filename
 
-type find_channel = fformat -> pathname -> filename * in_channel
-
 type env = {
-  env_find : find_channel;
-  env_memo : (string list, theory Mstr.t) Hashtbl.t;
+  env_path : filename list;
+  env_memo : (pathname, theory Mstr.t) Hashtbl.t;
   env_tag  : Hashweak.tag;
 }
 
@@ -51,7 +49,8 @@ module Wenv = Hashweak.Make(struct type t = env let tag = env_tag end)
 
 (** Input formats *)
 
-type read_channel = env -> filename -> in_channel -> theory Mstr.t
+type read_channel =
+  env -> pathname -> filename -> in_channel -> theory Mstr.t
 
 let read_channel_table = Hashtbl.create 17 (* format name -> read_channel *)
 let extensions_table   = Hashtbl.create 17 (* suffix -> format name *)
@@ -76,12 +75,15 @@ let get_format file =
   try Hashtbl.find extensions_table ext
   with Not_found -> raise (UnknownExtension ext)
 
-let read_channel ?format env file ic =
+let real_read_channel ?format env path file ic =
   let name = match format with
     | Some name -> name
     | None -> get_format file in
   let rc,_ = lookup_format name in
-  rc env file ic
+  rc env path file ic
+
+let read_channel ?format env file ic =
+  real_read_channel ?format env [] file ic
 
 let read_file ?format env file =
   let ic = open_in file in
@@ -98,11 +100,19 @@ let list_formats () =
 
 (** Environment construction and utilisation *)
 
-let create_env = let c = ref (-1) in fun fc -> {
-  env_find = fc;
+let create_env = let c = ref (-1) in fun lp -> {
+  env_path = lp;
   env_memo = Hashtbl.create 17;
   env_tag  = (incr c; Hashweak.create_tag !c)
 }
+
+let create_env_of_loadpath lp =
+  Format.eprintf "WARNING: Env.create_env_of_loadpath is deprecated
+    and will be removed in future versions of Why3.
+    Replace it with Env.create_env.@.";
+  create_env lp
+
+let get_loadpath env = env.env_path
 
 (* looks for file [file] of format [name] in loadpath [lp] *)
 let locate_file name lp path =
@@ -129,21 +139,16 @@ let check_qualifier s =
       find_dir_sep s)
   then raise (InvalidQualifier s)
 
-let create_env_of_loadpath lp =
-  let fc f sl =
-    List.iter check_qualifier sl;
-    let file = locate_file f lp sl in
-    file, open_in file
-  in
-  create_env fc
-
-let find_channel env = env.env_find
+let find_channel env f sl =
+  List.iter check_qualifier sl;
+  let file = locate_file f env.env_path sl in
+  file, open_in file
 
 let find_library env sl =
-  let file, ic = env.env_find "why" sl in
+  let file, ic = find_channel env "why" sl in
   try
     Hashtbl.replace env.env_memo sl Mstr.empty;
-    let mth = read_channel ~format:"why" env file ic in
+    let mth = real_read_channel ~format:"why" env sl file ic in
     Hashtbl.replace env.env_memo sl mth;
     close_in ic;
     mth

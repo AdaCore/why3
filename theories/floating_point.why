@@ -104,7 +104,7 @@ theory Double
   type double
 
   function max_double : real = 0x1.FFFFFFFFFFFFFp1023
-  function max_int : int = 9007199254740992 (* 2^23 *)
+  function max_int : int = 9007199254740992 (* 2^53 *)
 
   clone export GenFloat with
     type t = double,

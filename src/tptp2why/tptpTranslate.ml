@@ -298,8 +298,8 @@ module Translate = struct
 
 
   (** from a list of untyped declarations, translates them into a why theory *)
-  let theory_of_decls theoryName decls =
-    let theory = Theory.create_theory (Ident.id_fresh theoryName) in
+  let theory_of_decls path theoryName decls =
+    let theory = Theory.create_theory ~path (Ident.id_fresh theoryName) in
     let theory = Theory.add_ty_decl theory [ts, Decl.Tabstract] in
     let theory = S.fold addAtomForwardDecl (Summary.findAllAtoms decls) theory in
     (* Format.eprintf "atoms forward decls finished.@."; *)

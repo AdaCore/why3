@@ -15,9 +15,13 @@
   name="CVC3"
   version="2.2"/>
  <prover
+  id="eprover"
+  name="Eprover"
+  version="1.4 Namring"/>
+ <prover
   id="gappa"
   name="Gappa"
-  version="0.15.0"/>
+  version="0.15.1"/>
  <prover
   id="simplify"
   name="Simplify"
@@ -30,6 +34,10 @@
   id="vampire"
   name="Vampire"
   version="0.6"/>
+ <prover
+  id="verit"
+  name="veriT"
+  version="dev"/>
  <prover
   id="yices"
   name="Yices"
@@ -48,7 +56,7 @@
    expanded="true">
    <goal
     name="G1"
-    sum="923f9516714dc02ef445cf8649d70e59"
+    sum="96c87b82c5c292811bebf4514d489284"
     proved="true"
     expanded="true"
     shape="ainfix =ainfix *c5.5c10.c55.">
@@ -64,7 +72,7 @@
      timelimit="10"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.00"/>
+     <result status="valid" time="0.01"/>
     </proof>
     <proof
      prover="z3"
@@ -85,12 +93,12 @@
      timelimit="10"
      edited=""
      obsolete="false">
-     <result status="timeout" time="10.22"/>
+     <result status="timeout" time="10.15"/>
     </proof>
    </goal>
    <goal
     name="G2"
-    sum="3714f15433c7dbf5b09d20e0f689f3d5"
+    sum="487f0a7ef488eb9fe4c27873b1b31d8c"
     proved="true"
     expanded="true"
     shape="ainfix =ainfix /c9.c3.c3.">
@@ -120,12 +128,12 @@
      timelimit="10"
      edited=""
      obsolete="false">
-     <result status="timeout" time="10.33"/>
+     <result status="timeout" time="10.31"/>
     </proof>
    </goal>
    <goal
     name="G3"
-    sum="57488ed736f28a7b7d3c016aa506dbdb"
+    sum="d9194cffeaa312cfb5a18bf029d31b2e"
     proved="true"
     expanded="true"
     shape="ainfix =ainvc5.c0.2">
@@ -155,7 +163,7 @@
      timelimit="10"
      edited=""
      obsolete="false">
-     <result status="timeout" time="10.18"/>
+     <result status="timeout" time="10.00"/>
     </proof>
    </goal>
   </theory>

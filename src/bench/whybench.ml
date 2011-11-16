@@ -342,7 +342,7 @@ let () =
     (Theory.create_theory (Ident.id_fresh "cmdline"))
     !opt_metas) in
 
-  let env = Env.create_env_of_loadpath !opt_loadpath in
+  let env = Env.create_env !opt_loadpath in
 
   if !opt_redo then
     begin if not (Db.is_initialized ()) then

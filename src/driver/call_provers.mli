@@ -17,7 +17,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Call provers and parse there outputs *)
+(** Call provers and parse their outputs *)
 
 type prover_answer =
   | Valid

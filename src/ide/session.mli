@@ -31,6 +31,7 @@ type prover_data = private
       driver_name : string;
       driver : Driver.driver;
       mutable editor : string;
+      interactive : bool;
     }
     (** record of necessary data for a given external prover *)
 
@@ -57,9 +58,11 @@ val lookup_transformation : Env.env -> string -> transformation_data
 type proof_attempt_status = private
     | Undone
     | Scheduled (** external proof attempt is scheduled *)
+    | Interrupted
     | Running (** external proof attempt is in progress *)
     | Done of Call_provers.prover_result (** external proof done *)
     | InternalFailure of exn (** external proof aborted by internal error *)
+    | Unedited (** interactive prover yet no proof script *)
 
 (** {2 Observers signature} *)
 
@@ -89,6 +92,11 @@ module type OBSERVER = sig
         there is nothing else to do. When the given function returns
         true, it must be rescheduled *)
 
+  val notify_timer_state : int -> int -> int -> unit
+    (** this function is called when timer state changes.
+        The first arg is the number of tasks waiting.
+        The second arg is the number of scheduled proof tasks.
+        The third arg is the number of running proof tasks *)
 end
 
 (** {2 Main functor} *)
@@ -228,7 +236,16 @@ module Make(O: OBSERVER) : sig
 
   val run_prover : context_unproved_goals_only:bool ->
     timelimit:int -> prover_data -> any -> unit
-    (** [run_prover p a] runs prover [p] on all goals under [a] *)
+    (** [run_prover p a] runs prover [p] on all goals under [a]
+        the proof attempts are only scheduled for running, and they
+        will be started asynchronously when processors are available
+    *)
+
+  val cancel_scheduled_proofs : unit -> unit
+    (** cancels all currently scheduled proof attempts.
+        note that the already running proof attempts are not
+        stopped, the corresponding processes must terminate
+        by their own. *)
 
   val transform : context_unproved_goals_only:bool ->
     transformation_data -> any -> unit

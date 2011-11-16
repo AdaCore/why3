@@ -44,12 +44,10 @@ let trans spr task_hd (((lpr, past), task) as current) =
         ) lpr task
       ) in
     match t.t_node with
-    | Tapp _ ->
+    | Tapp _
+    | Tbinop _
+    | Tnot _ ->
         t_fold scan_term current t
-    | Tbinop (_,f1,f2) ->
-        t_fold scan_term (t_fold scan_term current f1) f2
-    | Tnot f ->
-        t_fold scan_term current f
     | _ -> current in
 
   let (current, task) =

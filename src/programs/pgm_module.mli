@@ -51,7 +51,7 @@ type t = private {
   m_export : namespace;
 }
 
-val create_module : preid -> uc
+val create_module : ?path:string list -> preid -> uc
 val close_module : uc -> t
 
 val open_namespace  : uc -> uc

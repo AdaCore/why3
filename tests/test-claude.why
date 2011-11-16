@@ -130,7 +130,6 @@ theory TestRealize
 
   axiom P_arefl: forall x:t. not (p x x)
 
-(*
   axiom P_total: forall x y:t. p x y \/ p y x \/ x=y
 
   function f t : t
@@ -139,19 +138,25 @@ theory TestRealize
 
   lemma B : forall x:t. not (p x (f x))
 
-*)
-
 end
 
 theory TestRealizeUse
-
-(*  use import int.Int *)
 
   use import TestRealize
 
   function q t : t
 
   axiom C : forall x:t. p (q x) x
+
+end
+
+theory TestRealizeUseInt
+
+  use import int.Int
+
+  function q int : int
+
+  axiom C : forall x:int. q x + x >= 0
 
 end
 

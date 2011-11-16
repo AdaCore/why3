@@ -69,13 +69,13 @@ end = struct
     TptpParser.tptp TptpLexer.token lb
 
 
-  let read_channel _env file c =
+  let read_channel _env path file c =
     let decls = getDeclsFromChan c in
     if Debug.test_flag Typing.debug_parse_only ||
        Debug.test_flag Typing.debug_type_only
     then Util.Mstr.empty
     else
-      let my_theory = theory_of_decls file decls in
+      let my_theory = theory_of_decls path file decls in
       Util.Mstr.add "Tptp" my_theory Util.Mstr.empty
 
 end

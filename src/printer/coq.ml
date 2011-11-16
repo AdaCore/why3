@@ -28,12 +28,13 @@ open Term
 open Decl
 open Printer
 
+let black_list =
+  [ "at"; "cofix"; "exists2"; "fix"; "IF"; "left"; "mod"; "Prop";
+    "return"; "right"; "Set"; "Type"; "using"; "where"; ]
+
 let iprinter =
-  let bl = [ "at"; "cofix"; "exists2"; "fix"; "IF"; "mod"; "Prop";
-             "return"; "Set"; "Type"; "using"; "where"]
-  in
   let isanitize = sanitizer char_to_alpha char_to_alnumus in
-  create_ident_printer bl ~sanitizer:isanitize
+  create_ident_printer black_list ~sanitizer:isanitize
 
 let forget_all () = forget_all iprinter
 
@@ -101,8 +102,28 @@ let print_pr fmt pr =
 
 type info = {
   info_syn : syntax_map;
-  realization : bool;
+  realization : (Theory.theory * ident_printer) Mid.t option;
 }
+
+let print_path = print_list (constant_string ".") string
+
+let print_id fmt id = string fmt (id_unique iprinter id)
+
+let print_id_real info fmt id = match info.realization with
+  | Some m ->
+      begin
+        try let th,ipr = Mid.find id m in
+        fprintf fmt "%a.%s.%s"
+          print_path th.Theory.th_path
+          th.Theory.th_name.id_string
+          (id_unique ipr id)
+        with Not_found -> print_id fmt id
+      end
+  | None -> print_id fmt id
+
+let print_ls_real info fmt ls = print_id_real info fmt ls.ls_name
+let print_ts_real info fmt ts = print_id_real info fmt ts.ts_name
+let print_pr_real info fmt pr = print_id_real info fmt pr.pr_name
 
 (** Types *)
 
@@ -121,8 +142,8 @@ let rec print_ty info fmt ty = match ty.ty_node with
         | None ->
             begin
               match tl with
-                | []  -> print_ts fmt ts
-                | l   -> fprintf fmt "(%a@ %a)" print_ts ts
+                | []  -> (print_ts_real info) fmt ts
+                | l   -> fprintf fmt "(%a@ %a)" (print_ts_real info) ts
                     (print_list space (print_ty info)) l
             end
       end
@@ -163,8 +184,9 @@ let rec print_pat info fmt p = match p.pat_node with
   | Papp (cs,pl) ->
       begin match query_syntax info.info_syn cs.ls_name with
         | Some s -> syntax_arguments s (print_pat info) fmt pl
-        | _ -> fprintf fmt "%a %a"
-            print_ls cs (print_list space (print_pat info)) pl
+        | _ when pl = [] -> (print_ls_real info) fmt cs
+        | _ -> fprintf fmt "(%a %a)"
+          (print_ls_real info) cs (print_list space (print_pat info)) pl
       end
 
 let print_vsty_nopar info fmt v =
@@ -249,10 +271,10 @@ and print_tnode opl opr info fmt t = match t.t_node with
           syntax_arguments s (print_term info) fmt tl
       | _ -> if unambig_fs fs
           then
-            if tl = [] then fprintf fmt "%a" print_ls fs
-            else fprintf fmt "(%a %a)" print_ls fs
+            if tl = [] then fprintf fmt "%a" (print_ls_real info) fs
+            else fprintf fmt "(%a %a)" (print_ls_real info) fs
               (print_space_list (print_term info)) tl
-          else fprintf fmt (protect_on opl "(%a%a:%a)") print_ls fs
+          else fprintf fmt (protect_on opl "(%a%a:%a)") (print_ls_real info) fs
             (print_paren_r (print_term info)) tl (print_ty info) (t_type t)
     end
   | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> raise (TermExpected t)
@@ -300,7 +322,7 @@ and print_fnode opl opr info fmt f = match f.t_node with
   | Tapp (ps, tl) ->
     begin match query_syntax info.info_syn ps.ls_name with
       | Some s -> syntax_arguments s (print_term info) fmt tl
-      | _ -> fprintf fmt "(%a %a)" print_ls ps
+      | _ -> fprintf fmt "(%a %a)" (print_ls_real info) ps
           (print_space_list (print_term info)) tl
     end
   | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
@@ -347,7 +369,7 @@ let print_implicits fmt ls ty_vars_args ty_vars_value all_ty_params =
     end
 
 let definition fmt info =
-  fprintf fmt "%s" (if info.realization then "Definition" else "Parameter")
+  fprintf fmt "%s" (if info.realization <> None then "Definition" else "Parameter")
 
 (*
 
@@ -375,11 +397,11 @@ let context_end = "(* DO NOT EDIT BELOW *)"
 (* current kind of script in an old file *)
 type old_file_state = InContext | InProof | NoWhere
 
-let copy_proof s ch fmt = 
+let copy_proof s ch fmt =
   copy_user_script proof_begin proof_end ch fmt;
   s := NoWhere
 
-let copy_context s ch fmt = 
+let copy_context s ch fmt =
   copy_user_script context_begin context_end ch fmt;
   s := NoWhere
 
@@ -506,7 +528,7 @@ let print_type_decl ~old info fmt (ts,def) =
             fprintf fmt "@[<hov 2>%a %a : %aType.@]@\n%a"
               definition info
               print_ts ts print_params_list ts.ts_args
-              (realization ~old ~def:true) info.realization
+              (realization ~old ~def:true) (info.realization <> None)
         | Some ty ->
             fprintf fmt "@[<hov 2>Definition %a %a :=@ %a.@]@\n@\n"
               print_ts ts (print_list space print_tv_binder) ts.ts_args
@@ -553,7 +575,7 @@ let print_logic_decl ~old info fmt (ls,ld) =
             print_params all_ty_params
             (print_arrow_list (print_ty info)) ls.ls_args
             (print_ls_type ~arrow:(ls.ls_args <> []) info) ls.ls_value
-            (realization ~old ~def:true) info.realization
+            (realization ~old ~def:true) (info.realization <> None)
   end;
   print_implicits fmt ls ty_vars_args ty_vars_value all_ty_params;
   fprintf fmt "@\n"
@@ -612,7 +634,7 @@ let print_ind_decl info fmt d =
 
 let print_pkind info fmt = function
   | Paxiom ->
-      if info.realization then
+      if info.realization <> None then
         fprintf fmt "Lemma"
       else
         fprintf fmt "Axiom"
@@ -624,14 +646,14 @@ let print_proof ~old info fmt = function
   | Plemma | Pgoal ->
       realization ~old fmt true
   | Paxiom ->
-      realization ~old fmt info.realization
+      realization ~old fmt (info.realization <> None)
   | Pskip -> ()
 
 let print_proof_context ~old info fmt = function
   | Plemma | Pgoal ->
       print_context ~old fmt
   | Paxiom ->
-      if info.realization then print_context ~old fmt
+      if info.realization <> None then print_context ~old fmt
   | Pskip -> ()
 
 let print_decl ~old info fmt d = match d.d_node with
@@ -658,52 +680,95 @@ let print_decl ~old info fmt d = match d.d_node with
 let print_decls ~old info fmt dl =
   fprintf fmt "@[<hov>%a@\n@]" (print_list nothing (print_decl ~old info)) dl
 
-let print_task _env pr thpr ?old fmt task =
+let init_printer th =
+  let isanitize = sanitizer char_to_alpha char_to_alnumus in
+  let pr = create_ident_printer black_list ~sanitizer:isanitize in
+  Sid.iter (fun id -> ignore (id_unique pr id)) th.Theory.th_local;
+  pr
+
+let print_task env pr thpr realize ?old fmt task =
   forget_all ();
   print_prelude fmt pr;
   print_th_prelude task fmt thpr;
+  let realization,decls =
+    if realize then
+      let used = Task.used_theories task in
+      let used = Mid.filter (fun _ th -> th.Theory.th_path <> []) used in
+      (* 2 cases: goal is clone T with [] or goal is a real goal *)
+      let used = match task with
+        | None -> assert false
+        | Some { Task.task_decl = { Theory.td_node = Theory.Clone (th,_) }} ->
+            Sid.iter
+              (fun id -> ignore (id_unique iprinter id))
+              th.Theory.th_local;
+            Mid.remove th.Theory.th_name used
+        | _ -> used
+      in
+      (* output the Require commands *)
+      List.iter
+        (fprintf fmt "Add Rec LoadPath \"%s\".@\n")
+        (Env.get_loadpath env);
+      Mid.iter
+        (fun id th -> fprintf fmt "Require %a.%s.@\n"
+          print_path th.Theory.th_path id.id_string)
+        used;
+      let symbols = Task.used_symbols used in
+      (* build the printers for each theories *)
+      let printers = Mid.map init_printer used in
+      let decls = Task.local_decls task symbols in
+      let symbols =
+        Mid.map (fun th -> (th,Mid.find th.Theory.th_name printers))
+          symbols
+      in
+      Some symbols, decls
+    else
+      None, Task.task_decls task
+  in
   let info = {
     info_syn = get_syntax_map task;
-    realization = false;
-  } in
+    realization = realization;
+  }
+  in
   let old = match old with
     | None -> None
     | Some ch -> Some(ref NoWhere,ch)
   in
-  print_decls ~old info fmt (Task.task_decls task)
+  print_decls ~old info fmt decls
 
-let () = register_printer "coq" print_task
+let print_task_full env pr thpr ?old fmt task =
+  print_task env pr thpr false ?old fmt task
 
+let print_task_real env pr thpr ?old fmt task =
+  print_task env pr thpr true  ?old fmt task
 
-
+let () = register_printer "coq" print_task_full
+let () = register_printer "coq-realize" print_task_real
 
 (* specific printer for realization of theories *)
+(* OBSOLETE
 
 open Theory
 
 let print_tdecl ~old info fmt d = match d.td_node with
-  | Decl d -> print_decl ~old info fmt d
-  | Use _t -> ()
-(*
-      fprintf fmt "Require Import %s.@\n@\n" (id_unique iprinter t.th_name)
-*)
+  | Decl d ->
+      print_decl ~old info fmt d
+  | Use t ->
+      fprintf fmt "Require %s.@\n@\n"
+        (id_unique iprinter t.th_name)
   | Meta _ -> assert false (* TODO ? *)
   | Clone _ -> assert false (* TODO *)
 
 let print_tdecls ~old info fmt dl =
-  fprintf fmt "@[<hov>%a@\n@]" (print_list nothing (print_tdecl ~old info)) dl
+  fprintf fmt "@[<hov>%a@\n@]"
+    (print_list nothing (print_tdecl ~old info)) dl
 
 let print_theory _env pr thpr ?old fmt th =
   forget_all ();
   print_prelude fmt pr;
   print_prelude_for_theory th fmt thpr;
-(* TODO
   let info = {
-    info_syn = get_syntax_map th;
-    info_syn = get_remove_set th} in
-*)
-  let info = {
-    info_syn = Mid.empty (* get_syntax_map_of_theory th *);
+    info_syn = (Mid.empty : string Ident.Mid.t)
+      (* get_syntax_map_of_theory th*);
     realization = true;
   }
   in
@@ -714,6 +779,7 @@ let print_theory _env pr thpr ?old fmt th =
   print_tdecls ~old info fmt th.th_decls;
   produce_remaining_contexts_and_proofs ~old fmt
 
+*)
 
 (*
 Local Variables:

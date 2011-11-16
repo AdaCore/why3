@@ -116,7 +116,7 @@ let source_text fname =
 let gconfig =
   let c = Gconfig.config in
   let loadpath = (Whyconf.loadpath (get_main ())) @ List.rev !includes in
-  c.env <- Env.create_env_of_loadpath loadpath;
+  c.env <- Env.create_env loadpath;
 (*
   let provers = Whyconf.get_provers c.Gconfig.config in
   c.provers <-
@@ -229,6 +229,23 @@ let cleaning_box =
   GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
   ~packing:cleaning_frame#add ()
 
+let monitor_frame =
+  GBin.frame ~label:"Proof monitoring"
+    ~packing:(tools_window_vbox#pack ~expand:false) ()
+
+let monitor_box =
+  GPack.vbox ~homogeneous:false ~packing:monitor_frame#add ()
+
+let monitor_waiting =
+  GMisc.label ~text:"  Waiting: 0" ~packing:monitor_box#add ()
+
+let monitor_scheduled =
+  GMisc.label ~text:"Scheduled: 0" ~packing:monitor_box#add ()
+
+let monitor_running =
+  GMisc.label ~text:"  Running: 0" ~packing:monitor_box#add ()
+
+
 
 (* horizontal paned *)
 
@@ -278,7 +295,10 @@ let () =
   view_name_column#pack name_renderer;
   view_name_column#add_attribute name_renderer "text" name_column;
   view_name_column#set_resizable true;
-  view_name_column#set_max_width 400;
+  view_name_column#set_max_width 800;
+(*
+  view_name_column#set_alignment 1.0;
+*)
   ()
 
 let view_status_column =
@@ -313,8 +333,10 @@ let clear model = model#clear ()
 let image_of_result ~obsolete result =
   match result with
     | Session.Undone -> !image_undone
+    | Session.Unedited -> !image_unknown
     | Session.Scheduled -> !image_scheduled
     | Session.Running -> !image_running
+    | Session.Interrupted -> assert false
     | Session.InternalFailure _ -> !image_failure
     | Session.Done r -> match r.Call_provers.pr_answer with
         | Call_provers.Valid ->
@@ -331,6 +353,14 @@ let image_of_result ~obsolete result =
             if obsolete then !image_failure_obs else !image_failure
 
 (* connecting to the Session model *)
+
+let fan n =
+  match n mod 4 with
+    | 0 -> "|"
+    | 1 | -3 -> "\\"
+    | 2 | -2 -> "-"
+    | 3 | -1 -> "/"
+    | _ -> assert false
 
 module M = Session.Make
   (struct
@@ -358,6 +388,16 @@ module M = Session.Make
        let (_ : GMain.Timeout.id) = GMain.Timeout.add ~ms ~callback:f in
        ()
 
+     let notify_timer_state =
+       let c = ref 0 in
+       fun t s r ->
+         incr c;
+         monitor_waiting#set_text ("Waiting: " ^ (string_of_int t));
+         monitor_scheduled#set_text ("Scheduled: " ^ (string_of_int s));
+         monitor_running#set_text
+           (if r=0 then "Running: 0" else
+              "Running: " ^ (string_of_int r)^ " " ^ (fan (!c / 10)))
+
    end)
 
 let set_row_status row b =
@@ -374,6 +414,7 @@ let set_proof_state ~obsolete a =
   let t = match res with
     | Session.Done { Call_provers.pr_time = time } ->
         Format.sprintf "%.2f" time
+    | Session.Unedited -> "not yet edited"
     | _ -> ""
   in
   let t = if obsolete then t ^ " (obsolete)" else t in
@@ -618,11 +659,15 @@ let () =
 let prover_on_selected_goals pr =
   List.iter
     (fun row ->
+      try
        let a = get_any_from_row_reference row in
-        M.run_prover
-          ~context_unproved_goals_only:!context_unproved_goals_only
-          ~timelimit:gconfig.time_limit
-          pr a)
+       M.run_prover
+         ~context_unproved_goals_only:!context_unproved_goals_only
+         ~timelimit:gconfig.time_limit
+         pr a
+      with e ->
+        eprintf "@[Exception raised while running a prover:@ %a@.@]"
+          Exn_printer.exn_printer e)
     (get_selected_row_references ())
 
 (**********************************)
@@ -1190,20 +1235,21 @@ let color_loc ~color loc =
   if f = !current_file then color_loc ~color source_view l b e
 
 let rec color_locs ~color f =
-  Util.option_iter (color_loc ~color) f.Term.t_loc;
-  Term.t_fold (fun () -> color_locs ~color) () f
+  let b = ref false in
+  Util.option_iter (fun loc -> color_loc ~color loc; b := true) f.Term.t_loc;
+  Term.t_fold (fun b loc -> color_locs ~color loc || b) !b f
 
 (* FIXME: we shouldn't open binders _every_time_ we redraw screen!!!
    No t_fold, no t_open_quant! *)
 let rec color_t_locs f =
   match f.Term.t_node with
     | Term.Tbinop (Term.Timplies,f1,f2) ->
-        color_locs ~color:premise_tag f1;
-        color_t_locs f2
+        let b = color_locs ~color:premise_tag f1 in
+        color_t_locs f2 || b
     | Term.Tlet (t,fb) ->
         let _,f1 = Term.t_open_bound fb in
-        color_locs ~color:premise_tag t;
-        color_t_locs f1
+        let b = color_locs ~color:premise_tag t in
+        color_t_locs f1 || b
     | Term.Tquant (Term.Tforall,fq) ->
         let _,_,f1 = Term.t_open_quant fq in
         color_t_locs f1
@@ -1219,7 +1265,8 @@ let scroll_to_source_goal g =
         { Task.task_decl =
             { Theory.td_node =
                 Theory.Decl { Decl.d_node = Decl.Dprop (Decl.Pgoal, _, f)}}} ->
-        color_t_locs f
+        if not (color_t_locs f) then
+          Util.option_iter (color_loc ~color:goal_tag) id.Ident.id_loc
     | _ ->
         assert false
 
@@ -1368,16 +1415,6 @@ let () =
     b#connect#pressed ~callback:replay_obsolete_proofs
   in ()
 
-(*
-let () =
-  let b = GButton.button ~packing:tools_box#add ~label:"Cancel" () in
-  b#misc#set_tooltip_markup "Mark all proofs below the current selection as <b>obsolete</b>";
-  let i = GMisc.image ~pixbuf:(!image_cancel) () in
-  let () = b#set_image i#coerce in
-  let (_ : GtkSignal.id) =
-    b#connect#pressed ~callback:cancel_proofs
-  in ()
-*)
 
 (*************)
 (* removing  *)
@@ -1468,6 +1505,15 @@ let () =
     b#connect#pressed ~callback:clean_selection
   in ()
 
+let () =
+  let b = GButton.button ~packing:monitor_box#add ~label:"Interrupt" () in
+  b#misc#set_tooltip_markup "Cancels all scheduled proof attempts";
+  let i = GMisc.image ~pixbuf:(!image_cancel) () in
+  let () = b#set_image i#coerce in
+  let (_ : GtkSignal.id) =
+    b#connect#pressed ~callback:M.cancel_scheduled_proofs 
+  in ()
+
 
 (***************)
 (* Bind events *)
@@ -1501,8 +1547,16 @@ let select_row r =
     | M.Proof_attempt a ->
         let o =
           match a.M.proof_state with
-            | Session.Done r -> r.Call_provers.pr_output;
-            | _ -> "No information available"
+            | Session.Undone -> "proof not yet scheduled for running"
+            | Session.Unedited -> "proof not yet edited"
+            | Session.Done r -> r.Call_provers.pr_output
+            | Session.Scheduled-> "proof scheduled but not running yet"
+            | Session.Running -> "prover currently running"
+            | Session.Interrupted -> assert false
+            | Session.InternalFailure e ->
+              let b = Buffer.create 37 in
+              bprintf b "%a" Exn_printer.exn_printer e;
+              Buffer.contents b
         in
         task_view#source_buffer#set_text o;
         scroll_to_source_goal a.M.proof_goal

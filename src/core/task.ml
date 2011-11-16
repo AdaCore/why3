@@ -55,16 +55,19 @@ type clone_map = tdecl_set Mid.t
 type meta_map = tdecl_set Mmeta.t
 
 let cm_find cm th = Mid.find_default th.th_name tds_empty cm
-
 let mm_find mm t = Mmeta.find_default t tds_empty mm
 
 let cm_add cm th td = Mid.change th.th_name (function
   | None -> Some (tds_singleton td)
   | Some tds -> Some (tds_add td tds)) cm
 
+let mm_add mm t td = Mmeta.change t (function
+  | None -> Some (tds_singleton td)
+  | Some tds -> Some (tds_add td tds)) mm
+
 let mm_add mm t td = if t.meta_excl
   then Mmeta.add t (tds_singleton td) mm
-  else Mmeta.add t (tds_add td (mm_find mm t)) mm
+  else mm_add mm t td
 
 (** Task *)
 
@@ -219,6 +222,40 @@ let task_tdecls = task_fold (fun acc td -> td::acc) []
 
 let task_decls  = task_fold (fun acc td ->
   match td.td_node with Decl d -> d::acc | _ -> acc) []
+
+(* Realization utilities *)
+
+let used_theories task =
+  let used { tds_set = s } =
+    let th = match Mtdecl.choose s with
+      | { td_node = Clone (th,_) }, _ -> th
+      | _ -> assert false in
+    let td = create_null_clone th in
+    if Stdecl.mem td s then Some th else None
+  in
+  Mid.map_filter used (task_clone task)
+
+let used_symbols thmap =
+  let dict th = Mid.map (fun () -> th) th.th_local in
+  let join _ = Mid.union (fun _ -> assert false) in
+  Mid.fold join (Mid.map dict thmap) Mid.empty
+
+let local_decls task symbmap =
+  let rec skip t = function
+    | { td_node = Clone (th,_) } :: rest
+      when id_equal t.th_name th.th_name -> rest
+    | _ :: rest -> skip t rest
+    | [] -> []
+  in
+  let rec filter acc = function
+    | { td_node = Decl d } :: rest ->
+        let id = Sid.choose d.d_news in
+        (try filter acc (skip (Mid.find id symbmap) rest)
+        with Not_found -> filter (d::acc) rest)
+    | _ :: rest -> filter acc rest
+    | [] -> List.rev acc
+  in
+  filter [] (task_tdecls task)
 
 (* Selectors *)
 

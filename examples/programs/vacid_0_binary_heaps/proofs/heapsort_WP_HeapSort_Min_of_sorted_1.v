@@ -4,23 +4,155 @@ Require Import ZArith.
 Require Import Rbase.
 Definition unit  := unit.
 
-Parameter mark : Type.
+Parameter qtmark : Type.
 
-Parameter at1: forall (a:Type), a -> mark  -> a.
+Parameter at1: forall (a:Type), a -> qtmark -> a.
 
 Implicit Arguments at1.
 
-Parameter old: forall (a:Type), a  -> a.
+Parameter old: forall (a:Type), a -> a.
 
 Implicit Arguments old.
 
+Parameter bag : forall (a:Type), Type.
+
+Parameter nb_occ: forall (a:Type), a -> (bag a) -> Z.
+
+Implicit Arguments nb_occ.
+
+Axiom occ_non_negative : forall (a:Type), forall (b:(bag a)) (x:a),
+  (0%Z <= (nb_occ x b))%Z.
+
+Definition eq_bag (a:Type)(a1:(bag a)) (b:(bag a)): Prop := forall (x:a),
+  ((nb_occ x a1) = (nb_occ x b)).
+Implicit Arguments eq_bag.
+
+Axiom bag_extensionality : forall (a:Type), forall (a1:(bag a)) (b:(bag a)),
+  (eq_bag a1 b) -> (a1 = b).
+
+Parameter empty_bag: forall (a:Type), (bag a).
+
+Set Contextual Implicit.
+Implicit Arguments empty_bag.
+Unset Contextual Implicit.
+
+Axiom occ_empty : forall (a:Type), forall (x:a), ((nb_occ x (empty_bag:(bag
+  a))) = 0%Z).
+
+Axiom is_empty : forall (a:Type), forall (b:(bag a)), (forall (x:a),
+  ((nb_occ x b) = 0%Z)) -> (b = (empty_bag:(bag a))).
+
+Parameter singleton: forall (a:Type), a -> (bag a).
+
+Implicit Arguments singleton.
+
+Axiom occ_singleton : forall (a:Type), forall (x:a) (y:a), ((x = y) /\
+  ((nb_occ y (singleton x)) = 1%Z)) \/ ((~ (x = y)) /\ ((nb_occ y
+  (singleton x)) = 0%Z)).
+
+Axiom occ_singleton_eq : forall (a:Type), forall (x:a) (y:a), (x = y) ->
+  ((nb_occ y (singleton x)) = 1%Z).
+
+Axiom occ_singleton_neq : forall (a:Type), forall (x:a) (y:a), (~ (x = y)) ->
+  ((nb_occ y (singleton x)) = 0%Z).
+
+Parameter union: forall (a:Type), (bag a) -> (bag a) -> (bag a).
+
+Implicit Arguments union.
+
+Axiom occ_union : forall (a:Type), forall (x:a) (a1:(bag a)) (b:(bag a)),
+  ((nb_occ x (union a1 b)) = ((nb_occ x a1) + (nb_occ x b))%Z).
+
+Axiom Union_comm : forall (a:Type), forall (a1:(bag a)) (b:(bag a)),
+  ((union a1 b) = (union b a1)).
+
+Axiom Union_identity : forall (a:Type), forall (a1:(bag a)), ((union a1
+  (empty_bag:(bag a))) = a1).
+
+Axiom Union_assoc : forall (a:Type), forall (a1:(bag a)) (b:(bag a)) (c:(bag
+  a)), ((union a1 (union b c)) = (union (union a1 b) c)).
+
+Axiom bag_simpl : forall (a:Type), forall (a1:(bag a)) (b:(bag a)) (c:(bag
+  a)), ((union a1 b) = (union c b)) -> (a1 = c).
+
+Axiom bag_simpl_left : forall (a:Type), forall (a1:(bag a)) (b:(bag a))
+  (c:(bag a)), ((union a1 b) = (union a1 c)) -> (b = c).
+
+Definition add (a:Type)(x:a) (b:(bag a)): (bag a) := (union (singleton x) b).
+Implicit Arguments add.
+
+Axiom occ_add_eq : forall (a:Type), forall (b:(bag a)) (x:a) (y:a),
+  (x = y) -> ((nb_occ x (add x b)) = ((nb_occ x b) + 1%Z)%Z).
+
+Axiom occ_add_neq : forall (a:Type), forall (b:(bag a)) (x:a) (y:a),
+  (~ (x = y)) -> ((nb_occ y (add x b)) = (nb_occ y b)).
+
+Parameter card: forall (a:Type), (bag a) -> Z.
+
+Implicit Arguments card.
+
+Axiom Card_empty : forall (a:Type), ((card (empty_bag:(bag a))) = 0%Z).
+
+Axiom Card_singleton : forall (a:Type), forall (x:a),
+  ((card (singleton x)) = 1%Z).
+
+Axiom Card_union : forall (a:Type), forall (x:(bag a)) (y:(bag a)),
+  ((card (union x y)) = ((card x) + (card y))%Z).
+
+Axiom Card_zero_empty : forall (a:Type), forall (x:(bag a)),
+  ((card x) = 0%Z) -> (x = (empty_bag:(bag a))).
+
+Axiom Max_is_ge : forall (x:Z) (y:Z), (x <= (Zmax x y))%Z /\
+  (y <= (Zmax x y))%Z.
+
+Axiom Max_is_some : forall (x:Z) (y:Z), ((Zmax x y) = x) \/ ((Zmax x y) = y).
+
+Axiom Min_is_le : forall (x:Z) (y:Z), ((Zmin x y) <= x)%Z /\
+  ((Zmin x y) <= y)%Z.
+
+Axiom Min_is_some : forall (x:Z) (y:Z), ((Zmin x y) = x) \/ ((Zmin x y) = y).
+
+Axiom Max_x : forall (x:Z) (y:Z), (y <= x)%Z -> ((Zmax x y) = x).
+
+Axiom Max_y : forall (x:Z) (y:Z), (x <= y)%Z -> ((Zmax x y) = y).
+
+Axiom Min_x : forall (x:Z) (y:Z), (x <= y)%Z -> ((Zmin x y) = x).
+
+Axiom Min_y : forall (x:Z) (y:Z), (y <= x)%Z -> ((Zmin x y) = y).
+
+Axiom Max_sym : forall (x:Z) (y:Z), (y <= x)%Z -> ((Zmax x y) = (Zmax y x)).
+
+Axiom Min_sym : forall (x:Z) (y:Z), (y <= x)%Z -> ((Zmin x y) = (Zmin y x)).
+
+Parameter diff: forall (a:Type), (bag a) -> (bag a) -> (bag a).
+
+Implicit Arguments diff.
+
+Axiom Diff_occ : forall (a:Type), forall (b1:(bag a)) (b2:(bag a)) (x:a),
+  ((nb_occ x (diff b1 b2)) = (Zmax 0%Z ((nb_occ x b1) - (nb_occ x b2))%Z)).
+
+Axiom Diff_empty_right : forall (a:Type), forall (b:(bag a)), ((diff b
+  (empty_bag:(bag a))) = b).
+
+Axiom Diff_empty_left : forall (a:Type), forall (b:(bag a)),
+  ((diff (empty_bag:(bag a)) b) = (empty_bag:(bag a))).
+
+Axiom Diff_add : forall (a:Type), forall (b:(bag a)) (x:a), ((diff (add x b)
+  (singleton x)) = b).
+
+Axiom Diff_comm : forall (a:Type), forall (b:(bag a)) (b1:(bag a)) (b2:(bag
+  a)), ((diff (diff b b1) b2) = (diff (diff b b2) b1)).
+
+Axiom Add_diff : forall (a:Type), forall (b:(bag a)) (x:a), (0%Z <  (nb_occ x
+  b))%Z -> ((add x (diff b (singleton x))) = b).
+
 Parameter map : forall (a:Type) (b:Type), Type.
 
-Parameter get: forall (a:Type) (b:Type), (map a b) -> a  -> b.
+Parameter get: forall (a:Type) (b:Type), (map a b) -> a -> b.
 
 Implicit Arguments get.
 
-Parameter set: forall (a:Type) (b:Type), (map a b) -> a -> b  -> (map a b).
+Parameter set: forall (a:Type) (b:Type), (map a b) -> a -> b -> (map a b).
 
 Implicit Arguments set.
 
@@ -32,7 +164,7 @@ Axiom Select_neq : forall (a:Type) (b:Type), forall (m:(map a b)),
   forall (a1:a) (a2:a), forall (b1:b), (~ (a1 = a2)) -> ((get (set m a1 b1)
   a2) = (get m a2)).
 
-Parameter const: forall (b:Type) (a:Type), b  -> (map a b).
+Parameter const: forall (b:Type) (a:Type), b -> (map a b).
 
 Set Contextual Implicit.
 Implicit Arguments const.
@@ -41,155 +173,62 @@ Unset Contextual Implicit.
 Axiom Const : forall (b:Type) (a:Type), forall (b1:b) (a1:a), ((get (const(
   b1):(map a b)) a1) = b1).
 
-Definition bag (a:Type) := (map a Z).
-
-Axiom occ_non_negative : forall (a:Type), forall (b:(map a Z)) (x:a),
-  (0%Z <= (get b x))%Z.
-
-Definition eq_bag (a:Type)(a1:(map a Z)) (b:(map a Z)): Prop := forall (x:a),
-  ((get a1 x) = (get b x)).
-Implicit Arguments eq_bag.
-
-Axiom bag_extensionality : forall (a:Type), forall (a1:(map a Z)) (b:(map a
-  Z)), (eq_bag a1 b) -> (a1 = b).
-
-Parameter empty_bag: forall (a:Type),  (map a Z).
-
-Set Contextual Implicit.
-Implicit Arguments empty_bag.
-Unset Contextual Implicit.
-
-Axiom occ_empty : forall (a:Type), forall (x:a), ((get (empty_bag:(map a Z))
-  x) = 0%Z).
-
-Axiom is_empty : forall (a:Type), forall (b:(map a Z)), (forall (x:a),
-  ((get b x) = 0%Z)) -> (b = (empty_bag:(map a Z))).
-
-Axiom occ_singleton_eq : forall (a:Type), forall (x:a) (y:a), (x = y) ->
-  ((get (set (empty_bag:(map a Z)) x 1%Z) y) = 1%Z).
-
-Axiom occ_singleton_neq : forall (a:Type), forall (x:a) (y:a), (~ (x = y)) ->
-  ((get (set (empty_bag:(map a Z)) x 1%Z) y) = 0%Z).
-
-Parameter union: forall (a:Type), (map a Z) -> (map a Z)  -> (map a Z).
-
-Implicit Arguments union.
-
-Axiom occ_union : forall (a:Type), forall (x:a) (a1:(map a Z)) (b:(map a Z)),
-  ((get (union a1 b) x) = ((get a1 x) + (get b x))%Z).
-
-Axiom Union_comm : forall (a:Type), forall (a1:(map a Z)) (b:(map a Z)),
-  ((union a1 b) = (union b a1)).
-
-Axiom Union_identity : forall (a:Type), forall (a1:(map a Z)), ((union a1
-  (empty_bag:(map a Z))) = a1).
-
-Axiom Union_assoc : forall (a:Type), forall (a1:(map a Z)) (b:(map a Z))
-  (c:(map a Z)), ((union a1 (union b c)) = (union (union a1 b) c)).
-
-Axiom bag_simpl : forall (a:Type), forall (a1:(map a Z)) (b:(map a Z))
-  (c:(map a Z)), ((union a1 b) = (union c b)) -> (a1 = c).
-
-Definition add (a:Type)(x:a) (b:(map a Z)): (map a Z) :=
-  (union (set (empty_bag:(map a Z)) x 1%Z) b).
-Implicit Arguments add.
-
-Axiom occ_add_eq : forall (a:Type), forall (b:(map a Z)) (x:a) (y:a),
-  (x = y) -> ((get (add x b) x) = ((get b x) + 1%Z)%Z).
-
-Axiom occ_add_neq : forall (a:Type), forall (b:(map a Z)) (x:a) (y:a),
-  (~ (x = y)) -> ((get (add x b) y) = (get b y)).
-
-Parameter card: forall (a:Type), (map a Z)  -> Z.
-
-Implicit Arguments card.
-
-Axiom Card_empty : forall (a:Type), ((card (empty_bag:(map a Z))) = 0%Z).
-
-Axiom Card_singleton : forall (a:Type), forall (x:a),
-  ((card (set (empty_bag:(map a Z)) x 1%Z)) = 1%Z).
-
-Axiom Card_union : forall (a:Type), forall (x:(map a Z)) (y:(map a Z)),
-  ((card (union x y)) = ((card x) + (card y))%Z).
-
-Axiom Card_zero_empty : forall (a:Type), forall (x:(map a Z)),
-  ((card x) = 0%Z) -> (x = (empty_bag:(map a Z))).
-
 Definition array (a:Type) := (map Z a).
 
-Parameter elements: forall (a:Type), (map Z a) -> Z -> Z  -> (map a Z).
+Parameter elements: forall (a:Type), (map Z a) -> Z -> Z -> (bag a).
 
 Implicit Arguments elements.
 
-Axiom Elements_empty : forall (a:(map Z Z)) (i:Z) (j:Z), (j <= i)%Z ->
-  ((elements a i j) = (empty_bag:(map Z Z))).
+Axiom Elements_empty : forall (a:Type), forall (a1:(map Z a)) (i:Z) (j:Z),
+  (j <= i)%Z -> ((elements a1 i j) = (empty_bag:(bag a))).
 
-Axiom Elements_singleton : forall (a:(map Z Z)) (i:Z) (j:Z),
-  (j = (i + 1%Z)%Z) -> ((elements a i j) = (set (empty_bag:(map Z Z)) (get a
-  i) 1%Z)).
+Axiom Elements_add : forall (a:Type), forall (a1:(map Z a)) (i:Z) (j:Z),
+  (i <  j)%Z -> ((elements a1 i j) = (add (get a1 (j - 1%Z)%Z) (elements a1 i
+  (j - 1%Z)%Z))).
 
-Axiom Elements_union : forall (a:(map Z Z)) (i:Z) (j:Z) (k:Z), ((i <= j)%Z /\
-  (j <= k)%Z) -> ((elements a i k) = (union (elements a i j) (elements a j
-  k))).
+Axiom Elements_singleton : forall (a:Type), forall (a1:(map Z a)) (i:Z)
+  (j:Z), (j = (i + 1%Z)%Z) -> ((elements a1 i j) = (singleton (get a1 i))).
 
-Axiom Elements_union1 : forall (a:(map Z Z)) (i:Z) (j:Z), (i <  j)%Z ->
-  ((elements a i j) = (add (get a i) (elements a (i + 1%Z)%Z j))).
+Axiom Elements_union : forall (a:Type), forall (a1:(map Z a)) (i:Z) (j:Z)
+  (k:Z), ((i <= j)%Z /\ (j <= k)%Z) -> ((elements a1 i
+  k) = (union (elements a1 i j) (elements a1 j k))).
 
-Axiom Elements_union2 : forall (a:(map Z Z)) (i:Z) (j:Z), (i <  j)%Z ->
-  ((elements a i j) = (add (get a (j - 1%Z)%Z) (elements a i (j - 1%Z)%Z))).
+Axiom Elements_add1 : forall (a:Type), forall (a1:(map Z a)) (i:Z) (j:Z),
+  (i <  j)%Z -> ((elements a1 i j) = (add (get a1 i) (elements a1 (i + 1%Z)%Z
+  j))).
 
-Axiom Elements_set : forall (a:(map Z Z)) (i:Z) (j:Z), (i <= j)%Z ->
-  forall (k:Z), ((k <  i)%Z \/ (j <= k)%Z) -> forall (e:Z), ((elements (set a
-  k e) i j) = (elements a i j)).
+Axiom Elements_remove_last : forall (a:Type), forall (a1:(map Z a)) (i:Z)
+  (j:Z), (i <  (j - 1%Z)%Z)%Z -> ((elements a1 i
+  (j - 1%Z)%Z) = (diff (elements a1 i j) (singleton (get a1 (j - 1%Z)%Z)))).
 
-Axiom Elements_union3 : forall (a:(map Z Z)) (i:Z) (j:Z) (k:Z), (i <= j)%Z ->
-  ((add k (elements a i j)) = (elements (set a j k) i (j + 1%Z)%Z)).
+Axiom Occ_elements : forall (a:Type), forall (a1:(map Z a)) (i:Z) (j:Z)
+  (n:Z), ((i <= j)%Z /\ (j <  n)%Z) -> (0%Z <  (nb_occ (get a1 j)
+  (elements a1 i n)))%Z.
 
-Axiom Elements_set2 : forall (a:(map Z Z)) (i:Z) (j:Z) (k:Z), ((i <= k)%Z /\
-  (k <  j)%Z) -> forall (e:Z), ((add (get a k) (elements (set a k e) i
-  j)) = (add e (elements a i j))).
+Axiom Elements_set_outside : forall (a:Type), forall (a1:(map Z a)) (i:Z)
+  (j:Z), (i <= j)%Z -> forall (k:Z), ((k <  i)%Z \/ (j <= k)%Z) ->
+  forall (e:a), ((elements (set a1 k e) i j) = (elements a1 i j)).
 
-Parameter min: Z -> Z  -> Z.
+Axiom Elements_set_inside : forall (a:Type), forall (a1:(map Z a)) (i:Z)
+  (j:Z) (n:Z) (e:a) (b:(bag a)), ((i <= j)%Z /\ (j <  n)%Z) -> (((elements a1
+  i n) = (add (get a1 j) b)) -> ((elements (set a1 j e) i n) = (add e b))).
 
+Axiom Elements_set_inside2 : forall (a:Type), forall (a1:(map Z a)) (i:Z)
+  (j:Z) (n:Z) (e:a), ((i <= j)%Z /\ (j <  n)%Z) -> ((elements (set a1 j e) i
+  n) = (add e (diff (elements a1 i n) (singleton (get a1 j))))).
 
-Parameter max: Z -> Z  -> Z.
-
-
-Axiom Max_is_ge : forall (x:Z) (y:Z), (x <= (max x y))%Z /\ (y <= (max x
-  y))%Z.
-
-Axiom Max_is_some : forall (x:Z) (y:Z), ((max x y) = x) \/ ((max x y) = y).
-
-Axiom Min_is_le : forall (x:Z) (y:Z), ((min x y) <= x)%Z /\ ((min x
-  y) <= y)%Z.
-
-Axiom Min_is_some : forall (x:Z) (y:Z), ((min x y) = x) \/ ((min x y) = y).
-
-Axiom Max_x : forall (x:Z) (y:Z), (y <= x)%Z -> ((max x y) = x).
-
-Axiom Max_y : forall (x:Z) (y:Z), (x <= y)%Z -> ((max x y) = y).
-
-Axiom Min_x : forall (x:Z) (y:Z), (x <= y)%Z -> ((min x y) = x).
-
-Axiom Min_y : forall (x:Z) (y:Z), (y <= x)%Z -> ((min x y) = y).
-
-Axiom Max_sym : forall (x:Z) (y:Z), (y <= x)%Z -> ((max x y) = (max y x)).
-
-Axiom Min_sym : forall (x:Z) (y:Z), (y <= x)%Z -> ((min x y) = (min y x)).
-
-Parameter min_bag: (map Z Z)  -> Z.
+Parameter min_bag: (bag Z) -> Z.
 
 
-Axiom Min_bag_singleton : forall (x:Z), ((min_bag (set (empty_bag:(map Z Z))
-  x 1%Z)) = x).
+Axiom Min_bag_singleton : forall (x:Z), ((min_bag (singleton x)) = x).
 
-Axiom Min_bag_union : forall (x:(map Z Z)) (y:(map Z Z)), ((min_bag (union x
-  y)) = (min (min_bag x) (min_bag y))).
+Axiom Min_bag_union : forall (x:(bag Z)) (y:(bag Z)), ((min_bag (union x
+  y)) = (Zmin (min_bag x) (min_bag y))).
 
-Axiom Min_bag_union1 : forall (x:(map Z Z)) (y:(map Z Z)) (a:Z), (x = (add a
-  y)) -> ((min_bag x) = (min a (min_bag y))).
+Axiom Min_bag_union1 : forall (x:(bag Z)) (y:(bag Z)) (a:Z), (x = (add a
+  y)) -> ((min_bag x) = (Zmin a (min_bag y))).
 
-Axiom Min_bag_union2 : forall (x:(map Z Z)) (a:Z), (a <= (min_bag x))%Z ->
+Axiom Min_bag_union2 : forall (x:(bag Z)) (a:Z), (a <= (min_bag x))%Z ->
   (a <= (min_bag (add a x)))%Z.
 
 Inductive ref (a:Type) :=
@@ -198,7 +237,7 @@ Implicit Arguments mk_ref.
 
 Definition contents (a:Type)(u:(ref a)): a :=
   match u with
-  | mk_ref contents1 => contents1
+  | (mk_ref contents1) => contents1
   end.
 Implicit Arguments contents.
 
@@ -208,13 +247,13 @@ Implicit Arguments mk_array.
 
 Definition elts (a:Type)(u:(array1 a)): (map Z a) :=
   match u with
-  | mk_array _ elts1 => elts1
+  | (mk_array _ elts1) => elts1
   end.
 Implicit Arguments elts.
 
 Definition length (a:Type)(u:(array1 a)): Z :=
   match u with
-  | mk_array length1 _ => length1
+  | (mk_array length1 _) => length1
   end.
 Implicit Arguments length.
 
@@ -223,7 +262,7 @@ Implicit Arguments get1.
 
 Definition set1 (a:Type)(a1:(array1 a)) (i:Z) (v:a): (array1 a) :=
   match a1 with
-  | mk_array xcl0 _ => (mk_array xcl0 (set (elts a1) i v))
+  | (mk_array xcl0 _) => (mk_array xcl0 (set (elts a1) i v))
   end.
 Implicit Arguments set1.
 
@@ -239,8 +278,12 @@ Definition sorted(a:(array1 Z)): Prop := (sorted_sub (elts a) 0%Z
 
 Parameter logic_heap : Type.
 
-Parameter model: logic_heap  -> (map Z Z).
+Parameter model: logic_heap -> (bag Z).
 
+
+(* YOU MAY EDIT THE CONTEXT BELOW *)
+
+(* DO NOT EDIT BELOW *)
 
 Theorem Min_of_sorted : forall (a:(map Z Z)) (i:Z) (n:Z), ((0%Z <= i)%Z /\
   (i <  n)%Z) -> ((sorted_sub a 0%Z n) -> ((min_bag (elements a i
@@ -260,7 +303,7 @@ assert (h: (i = j-1 \/ i < j-1)%Z) by omega.
    rewrite Elements_singleton; auto with zarith.
    rewrite Min_bag_singleton; auto.
    (* case i < j-1 *)
-   rewrite Elements_union2; auto with zarith.
+   rewrite Elements_add; auto with zarith.
    rewrite Min_bag_union1 with 
       (a:= (get a (j-1))%Z) 
       (y:= (elements a i (j-1)));
@@ -275,5 +318,3 @@ assert (h: (i = j-1 \/ i < j-1)%Z) by omega.
    unfold sorted_sub; auto with zarith.
 Qed.
 (* DO NOT EDIT BELOW *)
-
-

@@ -34,10 +34,10 @@ let () = Exn_printer.register (fun fmt e -> match e with
   | ClashModule m -> fprintf fmt "clash with previous module %s" m
   | _ -> raise e)
 
-let add_theory env lenv m =
+let add_theory env path lenv m =
   let id = m.pth_name in
   let loc = id.id_loc in
-  let th = Theory.create_theory (Denv.create_user_id id) in
+  let th = Theory.create_theory ~path (Denv.create_user_id id) in
   let rec add_decl th = function
     | Dlogic d ->
         Typing.add_decl env lenv th d
@@ -50,12 +50,12 @@ let add_theory env lenv m =
   let th = List.fold_left add_decl th m.pth_decl in
   close_theory loc lenv th
 
-let add_module ?(type_only=false) env penv (ltm, lmod) m =
+let add_module ?(type_only=false) env penv path (ltm, lmod) m =
   let id = m.mod_name in
   let loc = id.id_loc in
   if Mstr.mem id.id lmod then raise (Loc.Located (loc, ClashModule id.id));
   let wp = not type_only in
-  let uc = create_module (Ident.id_user id.id loc) in
+  let uc = create_module ~path (Ident.id_user id.id loc) in
   let prelude = Env.find_theory env ["bool"] "Bool" in
   let uc = use_export_theory uc prelude in
   let uc =
@@ -65,11 +65,11 @@ let add_module ?(type_only=false) env penv (ltm, lmod) m =
   Mstr.add ("WP " ^ id.id) md.m_pure ltm, (* avoids a theory/module clash *)
   Mstr.add id.id md lmod
 
-let add_theory_module ?(type_only=false) env penv (ltm, lmod) = function
-  | Ptheory t -> add_theory env ltm t, lmod
-  | Pmodule m -> add_module ~type_only env penv (ltm, lmod) m
+let add_theory_module ?(type_only=false) env penv path (ltm, lmod) = function
+  | Ptheory t -> add_theory env path ltm t, lmod
+  | Pmodule m -> add_module ~type_only env penv path (ltm, lmod) m
 
-let retrieve penv file c =
+let retrieve penv path file c =
   let lb = Lexing.from_channel c in
   Loc.set_file file lb;
   let ml = Lexer.parse_program_file lb in
@@ -78,7 +78,7 @@ let retrieve penv file c =
   else
     let type_only = Debug.test_flag Typing.debug_type_only in
     let env = Pgm_env.get_env penv in
-    List.fold_left (add_theory_module ~type_only env penv)
+    List.fold_left (add_theory_module ~type_only env penv path)
       (Mstr.empty, Mstr.empty) ml
 
 let pgm_env_of_env =
@@ -91,9 +91,9 @@ let pgm_env_of_env =
       Env.Wenv.set h env penv;
       penv
 
-let read_channel env file c =
+let read_channel env path file c =
   let penv = pgm_env_of_env env in
-  let tm, _ = retrieve penv file c in
+  let tm, _ = retrieve penv path file c in
   tm
 
 let () = Env.register_format "whyml" ["mlw"] read_channel

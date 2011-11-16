@@ -17,5 +17,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(* OBSOLETE
 val print_theory : Env.env -> Printer.prelude -> Printer.prelude_map ->
   ?old:Pervasives.in_channel -> Format.formatter -> Theory.theory -> unit
+*)

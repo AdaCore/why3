@@ -132,7 +132,7 @@ let load_config config =
     | None -> default_ide
     | Some s -> load_ide s in
   (* temporary sets env to empty *)
-  let env = Env.create_env_of_loadpath [] in
+  let env = Env.create_env [] in
   set_labels_flag ide.ide_show_labels;
   set_locs_flag ide.ide_show_locs;
   { window_height = ide.ide_window_height;
@@ -172,6 +172,7 @@ let save_config t =
         driver  = pr.Session.driver_name;
         version = pr.Session.prover_version;
         editor  = pr.Session.editor;
+        interactive = pr.Session.interactive;
       } acc in
   let config = t.config in
   let config = set_main config
@@ -444,11 +445,18 @@ let preferences c =
   in
   (** page 2 **)
   let label2 = GMisc.label ~text:"Colors" () in
-  let _page2 = GMisc.color_selection (* ~title:"Goal color" *)
+  let _color_sel = GMisc.color_selection (* ~title:"Goal color" *)
     ~show:true
     ~packing:(fun w -> ignore(notebook#append_page
                                 ~tab_label:label2#coerce w)) ()
   in
+(*
+  let (_ : GtkSignal.id) =
+    color_sel#connect ColorSelection.S.color_changed ~callback:
+      (fun _ -> Format.eprintf "Gconfig.color_sel : %s@."
+         c)
+  in
+*)
   (** page 3 **)
   let label3 = GMisc.label ~text:"Provers" () in
   let _page3 = GMisc.label ~text:"This page should display detected provers"

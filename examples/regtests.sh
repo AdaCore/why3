@@ -18,7 +18,10 @@ TMPERR=$PWD/why3regtests.err
 
 cd `dirname $0`
 
+
 res=0
+export success=0
+export total=0
 
 run_dir () {
     for f in `ls $1/*/why3session.xml`; do
@@ -39,7 +42,9 @@ run_dir () {
 	else
 	    echo -n "OK"
 	    cat $TMP
+            success=`expr $success + 1`
 	fi
+        total=`expr $total + 1`
     done
 }
 
@@ -63,6 +68,8 @@ echo "=== Check Builtin translation ==="
 run_dir check-builtin
 echo ""
 
+echo "Summary: $success/$total"
 exit $res
+
 
 
