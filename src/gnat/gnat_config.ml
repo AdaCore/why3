@@ -76,7 +76,7 @@ let config =
 let config_main = Whyconf.get_main (config)
 
 let env =
-   Env.create_env_of_loadpath (Whyconf.loadpath config_main)
+   Env.create_env (Whyconf.loadpath config_main)
 
 let provers : Whyconf.config_prover Util.Mstr.t =
    Whyconf.get_provers config
