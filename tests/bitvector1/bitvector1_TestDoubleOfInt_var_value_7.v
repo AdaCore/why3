@@ -604,24 +604,23 @@ Axiom mantissa_var : forall (x:Z), ((to_nat_sub1 (var x) 51%Z
 
 Definition var_as_double(x:Z): R := (double_of_bv64 (var x)).
 
-(* YOU MAY EDIT THE CONTEXT BELOW *)
+Axiom var_value0 : forall (x:Z),
+  ((var_as_double x) = ((pow21 (1075%Z - 1023%Z)%Z) * (1%R + ((IZR ((pow2 31%Z) + x)%Z) * (pow21 (-52%Z)%Z))%R)%R)%R).
 
+(* YOU MAY EDIT THE CONTEXT BELOW *)
+Open Scope Z_scope.
 (* DO NOT EDIT BELOW *)
 
-Theorem var_value0 : forall (x:Z),
-  ((var_as_double x) = ((pow21 (1075%Z - 1023%Z)%Z) * (1%R + ((IZR ((pow2 31%Z) + x)%Z) * (pow21 (-52%Z)%Z))%R)%R)%R).
+Theorem var_value : forall (x:Z),
+  ((var_as_double x) = (((pow21 52%Z) + (pow21 31%Z))%R + (IZR x))%R).
 (* YOU MAY EDIT THE PROOF BELOW *)
 intro.
-unfold var_as_double.
-rewrite double_of_bv64_value.
-rewrite sign_var.
-rewrite sign_value_false.
-rewrite exp_var.
-rewrite mantissa_var.
-rewrite Rmult_1_l.
-auto with *.
-rewrite exp_var.
-auto with *.
+rewrite var_value0.
+rewrite plus_IZR.
+replace (1075 - 1023) with 52 by omega.
+rewrite Rmult_plus_distr_l.
+SearchAbout Rmult.
+rewrite Rmult_1_r.
 Qed.
 (* DO NOT EDIT BELOW *)
 

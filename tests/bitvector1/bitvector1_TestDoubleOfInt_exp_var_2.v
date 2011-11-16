@@ -266,8 +266,8 @@ Axiom to_nat_of_zero : forall (b:bv) (i:Z) (j:Z), ((i <= j)%Z /\
   (0%Z <= i)%Z) -> ((forall (k:Z), ((k <= j)%Z /\ (i <= k)%Z) -> ((nth b
   k) = false)) -> ((to_nat_sub b j i) = 0%Z)).
 
-Axiom to_nat_of_one : forall (b:bv) (i:Z) (j:Z), ((j <= i)%Z /\
-  (0%Z <= j)%Z) -> ((forall (k:Z), ((k <= j)%Z /\ (i <= k)%Z) -> ((nth b
+Axiom to_nat_of_one : forall (b:bv) (i:Z) (j:Z), ((i <= j)%Z /\
+  (0%Z <= i)%Z) -> ((forall (k:Z), ((k <= j)%Z /\ (i <= k)%Z) -> ((nth b
   k) = true)) -> ((to_nat_sub b j
   i) = ((pow2 ((j - i)%Z + 1%Z)%Z) - 1%Z)%Z)).
 
@@ -443,8 +443,8 @@ Axiom to_nat_of_zero1 : forall (b:bv1) (i:Z) (j:Z), ((i <= j)%Z /\
   (0%Z <= i)%Z) -> ((forall (k:Z), ((k <= j)%Z /\ (i <= k)%Z) -> ((nth1 b
   k) = false)) -> ((to_nat_sub1 b j i) = 0%Z)).
 
-Axiom to_nat_of_one1 : forall (b:bv1) (i:Z) (j:Z), ((j <= i)%Z /\
-  (0%Z <= j)%Z) -> ((forall (k:Z), ((k <= j)%Z /\ (i <= k)%Z) -> ((nth1 b
+Axiom to_nat_of_one1 : forall (b:bv1) (i:Z) (j:Z), ((i <= j)%Z /\
+  (0%Z <= i)%Z) -> ((forall (k:Z), ((k <= j)%Z /\ (i <= k)%Z) -> ((nth1 b
   k) = true)) -> ((to_nat_sub1 b j
   i) = ((pow2 ((j - i)%Z + 1%Z)%Z) - 1%Z)%Z)).
 
@@ -533,18 +533,42 @@ Axiom double_of_bv64_value : forall (b:bv1), ((0%Z <  (to_nat_sub1 b 62%Z
   62%Z 52%Z) - 1023%Z)%Z))%R * (1%R + ((IZR (to_nat_sub1 b 51%Z
   0%Z)) * (pow21 (-52%Z)%Z))%R)%R)%R).
 
+Axiom nth_const1 : forall (i:Z), ((0%Z <= i)%Z /\ (i <= 30%Z)%Z) ->
+  ((nth1 (concat (from_int 1127219200%Z) (from_int 2147483648%Z))
+  i) = false).
+
+Axiom nth_const2 : ((nth1 (concat (from_int 1127219200%Z)
+  (from_int 2147483648%Z)) 31%Z) = true).
+
+Axiom nth_const3 : forall (i:Z), ((32%Z <= i)%Z /\ (i <= 51%Z)%Z) ->
+  ((nth1 (concat (from_int 1127219200%Z) (from_int 2147483648%Z))
+  i) = false).
+
+Axiom nth_const4 : forall (i:Z), ((52%Z <= i)%Z /\ (i <= 53%Z)%Z) ->
+  ((nth1 (concat (from_int 1127219200%Z) (from_int 2147483648%Z)) i) = true).
+
+Axiom nth_const5 : forall (i:Z), ((54%Z <= i)%Z /\ (i <= 55%Z)%Z) ->
+  ((nth1 (concat (from_int 1127219200%Z) (from_int 2147483648%Z))
+  i) = false).
+
+Axiom nth_const6 : forall (i:Z), ((56%Z <= i)%Z /\ (i <= 57%Z)%Z) ->
+  ((nth1 (concat (from_int 1127219200%Z) (from_int 2147483648%Z)) i) = true).
+
+Axiom nth_const7 : forall (i:Z), ((58%Z <= i)%Z /\ (i <= 61%Z)%Z) ->
+  ((nth1 (concat (from_int 1127219200%Z) (from_int 2147483648%Z))
+  i) = false).
+
+Axiom nth_const8 : ((nth1 (concat (from_int 1127219200%Z)
+  (from_int 2147483648%Z)) 62%Z) = true).
+
+Axiom nth_const9 : ((nth1 (concat (from_int 1127219200%Z)
+  (from_int 2147483648%Z)) 63%Z) = false).
+
 Axiom sign_const : ((nth1 (concat (from_int 1127219200%Z)
   (from_int 2147483648%Z)) 63%Z) = false).
 
 Axiom exp_const : ((to_nat_sub1 (concat (from_int 1127219200%Z)
   (from_int 2147483648%Z)) 62%Z 52%Z) = 1075%Z).
-
-Axiom mantissa_const_nth : forall (i:Z), ((0%Z <= i)%Z /\ (i <= 30%Z)%Z) ->
-  ((nth1 (concat (from_int 1127219200%Z) (from_int 2147483648%Z))
-  i) = false).
-
-Axiom mantissa_const_31th : ((nth1 (concat (from_int 1127219200%Z)
-  (from_int 2147483648%Z)) 31%Z) = true).
 
 Axiom to_nat_mantissa_1 : ((to_nat_sub1 (concat (from_int 1127219200%Z)
   (from_int 2147483648%Z)) 30%Z 0%Z) = 0%Z).
@@ -591,37 +615,14 @@ Axiom nth63_32_var : forall (x:Z) (k:Z), ((32%Z <= k)%Z /\ (k <= 63%Z)%Z) ->
 
 Axiom sign_var : forall (x:Z), ((nth1 (var x) 63%Z) = false).
 
-Axiom exp_var : forall (x:Z), ((to_nat_sub1 (var x) 62%Z 52%Z) = 1075%Z).
-
-Axiom mantissa_var_0_30 : forall (x:Z), ((nth (from_int x) 31%Z) = false) ->
-  ((to_nat_sub1 (var x) 30%Z 0%Z) = x).
-
-Axiom mantissa_var_0_30_1 : forall (x:Z), ((nth (from_int x) 31%Z) = true) ->
-  ((to_nat_sub1 (var x) 30%Z 0%Z) = (-x)%Z).
-
-Axiom mantissa_var : forall (x:Z), ((to_nat_sub1 (var x) 51%Z
-  0%Z) = ((pow2 31%Z) + x)%Z).
-
-Definition var_as_double(x:Z): R := (double_of_bv64 (var x)).
-
 (* YOU MAY EDIT THE CONTEXT BELOW *)
 
 (* DO NOT EDIT BELOW *)
 
-Theorem var_value0 : forall (x:Z),
-  ((var_as_double x) = ((pow21 (1075%Z - 1023%Z)%Z) * (1%R + ((IZR ((pow2 31%Z) + x)%Z) * (pow21 (-52%Z)%Z))%R)%R)%R).
+Theorem exp_var : forall (x:Z), ((to_nat_sub1 (var x) 62%Z 52%Z) = 1075%Z).
 (* YOU MAY EDIT THE PROOF BELOW *)
-intro.
-unfold var_as_double.
-rewrite double_of_bv64_value.
-rewrite sign_var.
-rewrite sign_value_false.
-rewrite exp_var.
-rewrite mantissa_var.
-rewrite Rmult_1_l.
-auto with *.
-rewrite exp_var.
-auto with *.
+intuition.
+
 Qed.
 (* DO NOT EDIT BELOW *)
 
