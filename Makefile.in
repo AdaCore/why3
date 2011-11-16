@@ -351,37 +351,6 @@ install_no_local::
 
 install_local: bin/why3
 
-##################
-# Why realize binary
-##################
-
-byte: bin/why3realize.byte
-opt:  bin/why3realize.opt
-
-bin/why3realize.opt: src/why3.cmxa src/realize.cmx
-	$(if $(QUIET),@echo 'Linking  $@' &&) \
-	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
-	$(STRIP) $@
-
-bin/why3realize.byte: src/why3.cma src/realize.cmo
-	$(if $(QUIET),@echo 'Linking  $@' &&) \
-	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
-
-bin/why3realize: bin/why3realize.@OCAMLBEST@
-	ln -sf why3realize.@OCAMLBEST@ $@
-
-src/realize.cmo: src/why3.cma
-src/realize.cmx: src/why3.cmxa
-
-clean::
-	rm -f src/realize.cm[iox] src/realize.annot src/realize.o
-	rm -f bin/why3realize.byte bin/why3realize.opt bin/why3realize
-
-install_no_local::
-	cp -f bin/why3realize.@OCAMLBEST@ $(BINDIR)/why3realize
-
-install_local: bin/why3realize
-
 ########
 # Whyml
 ########
