@@ -299,7 +299,7 @@ theory BitVector
       to_nat_sub b j i = 0
 
   lemma to_nat_of_one:
-    forall b:bv, i j:int.
+    forall b:bv, i j:int. i >= j >=0 ->
       (forall k:int. j >= k >= i -> nth b k = True) ->
       to_nat_sub b j i = pow2 (j-i+1) - 1
 
