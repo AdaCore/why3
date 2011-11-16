@@ -130,13 +130,9 @@ let locate_file name lp path =
 exception InvalidQualifier of string
 
 let check_qualifier s =
-  let find_dir_sep s =
-    let re = Str.regexp_string Filename.dir_sep in
-    try ignore (Str.search_forward re s 0); true
-    with Not_found -> false in
   if (s = Filename.parent_dir_name ||
       s = Filename.current_dir_name ||
-      find_dir_sep s)
+      Filename.basename s <> s)
   then raise (InvalidQualifier s)
 
 let find_channel env f sl =
