@@ -82,7 +82,7 @@ endif
 # external libraries common to all binaries
 
 EXTOBJS =
-EXTLIBS = str unix nums @META_DYNLINK@
+EXTLIBS = str unix nums dynlink
 
 EXTCMA	= $(addsuffix .cma,$(EXTLIBS)) $(addsuffix .cmo,$(EXTOBJS))
 EXTCMXA = $(addsuffix .cmxa,$(EXTLIBS)) $(addsuffix .cmx,$(EXTOBJS))
@@ -91,7 +91,7 @@ EXTCMXA = $(addsuffix .cmxa,$(EXTLIBS)) $(addsuffix .cmx,$(EXTOBJS))
 # main target
 ###############
 
-all: @OCAMLBEST@
+all: @OCAMLBEST@ plugins
 
 ifeq (@enable_local@,yes)
 all: install_local
@@ -133,7 +133,7 @@ LIB_TRANSFORM = simplify_recursive_definition simplify_formula \
 		introduction abstraction close_epsilon lift_epsilon \
 		eval_match instantiate_predicate smoke_detector
 
-LIB_PRINTER = alt_ergo why3printer smtv1 smtv2 coq tptp simplify gappa \
+LIB_PRINTER = alt_ergo why3printer smtv1 smtv2 coq simplify gappa \
 	      cvc3 yices
 
 LIBMODULES = src/config \
@@ -208,7 +208,7 @@ clean::
 
 install_no_local::
 	mkdir -p $(BINDIR)
-	mkdir -p $(LIBDIR)/why3
+	mkdir -p $(LIBDIR)/why3/coq
 	mkdir -p $(DATADIR)/why3/images
 	mkdir -p $(DATADIR)/why3/emacs
 	mkdir -p $(DATADIR)/why3/lang
@@ -240,6 +240,84 @@ install-lib: install_no_local_lib
 endif
 
 install-all: install install-lib
+
+##################
+# Why plugins
+##################
+
+PLUGGENERATED =
+
+PLUG_PARSER = genequlin
+PLUG_PRINTER = tptpfof
+PLUG_TRANSFORM =
+
+PLUGINS = genequlin tptpfof
+
+PLUGMODULES = $(addprefix plugins/parser/, $(PLUG_PARSER)) \
+	      $(addprefix plugins/printer/, $(PLUG_PRINTER)) \
+	      $(addprefix plugins/transform/, $(PLUG_TRANSFORM))
+
+PLUGML  = $(addsuffix .ml,  $(PLUGMODULES))
+PLUGMLI = $(addsuffix .mli, $(PLUGMODULES))
+PLUGCMO = $(addsuffix .cmo, $(PLUGMODULES))
+PLUGCMX = $(addsuffix .cmx, $(PLUGMODULES))
+
+PLUGDIRS = parser printer transform
+PLUGINCLUDES = $(addprefix -I plugins/, $(PLUGDIRS))
+
+$(PLUGCMO) $(PLUGCMX): INCLUDES += $(PLUGINCLUDES)
+
+plugins.byte: $(addsuffix .cmo, $(addprefix lib/plugins/, $(PLUGINS)))
+plugins.opt : $(addsuffix .cmxs, $(addprefix lib/plugins/, $(PLUGINS)))
+
+lib/plugins/%.cmxs: plugins/parser/%.cmx
+	$(if $(QUIET), @echo 'Linking  $@' &&) \
+	    $(OCAMLOPT) $(OFLAGS) -shared -o $@ $<
+
+lib/plugins/%.cmo: plugins/parser/%.cmo
+	$(if $(QUIET),@echo 'Linking  $@' &&) \
+	    $(OCAMLC) $(BFLAGS) -pack -o $@ $<
+
+lib/plugins/%.cmxs: plugins/printer/%.cmx
+	$(if $(QUIET), @echo 'Linking  $@' &&) \
+	    $(OCAMLOPT) $(OFLAGS) -shared -o $@ $<
+
+lib/plugins/%.cmo: plugins/printer/%.cmo
+	$(if $(QUIET),@echo 'Linking  $@' &&) \
+	    $(OCAMLC) $(BFLAGS) -pack -o $@ $<
+
+lib/plugins/%.cmxs: plugins/transform/%.cmx
+	$(if $(QUIET), @echo 'Linking  $@' &&) \
+	    $(OCAMLOPT) $(OFLAGS) -shared -o $@ $<
+
+lib/plugins/%.cmo: plugins/transform/%.cmo
+	$(if $(QUIET),@echo 'Linking  $@' &&) \
+	    $(OCAMLC) $(BFLAGS) -pack -o $@ $<
+
+include .depend.plugins
+
+.depend.plugins: $(PLUGGENERATED)
+	$(OCAMLDEP) -slash -I src -I plugins $(PLUGINCLUDES) \
+		$(PLUGML) $(PLUGMLI) > $@
+
+depend: .depend.plugins
+
+PLUGSDIRS = plugins $(addprefix plugins/, $(PLUGDIRS))
+PLUGCLEAN = $(addsuffix /*.cm[iox], $(PLUGSDIRS)) \
+	    $(addsuffix /*.annot, $(PLUGSDIRS)) \
+	    $(addsuffix /*.output, $(PLUGSDIRS)) \
+	    $(addsuffix /*.automaton, $(PLUGSDIRS)) \
+	    $(addsuffix /*.o, $(PLUGSDIRS)) \
+	    $(addsuffix /*~, $(PLUGSDIRS))
+
+clean::
+	rm -f $(PLUGCLEAN) $(PLUGGENERATED)
+	rm -f lib/plugins/*
+	rm -f .depend.plugins
+
+install_no_local::
+	mkdir -p $(LIBDIR)/why3/plugins
+	cp -f lib/plugins/* $(LIBDIR)/why3/plugins
 
 
 ##################
@@ -297,7 +375,7 @@ src/realize.cmx: src/why3.cmxa
 
 clean::
 	rm -f src/realize.cm[iox] src/realize.annot src/realize.o
-	rm -f bin/realize.byte bin/realize.opt bin/realize
+	rm -f bin/why3realize.byte bin/why3realize.opt bin/why3realize
 
 install_no_local::
 	cp -f bin/why3realize.@OCAMLBEST@ $(BINDIR)/why3realize
@@ -442,7 +520,6 @@ clean::
 	rm -f src/config/*.annot src/config/*~
 	rm -f src/config/*.output src/config/*.automaton
 	rm -f bin/why3config.byte bin/why3config.opt bin/why3config
-	rm -f .why.conf
 	rm -f .depend.config
 
 local_config: bin/why3config.@OCAMLBEST@
@@ -808,22 +885,22 @@ $(TPTPCMO) $(TPTPCMX): INCLUDES += -I src/tptp2why
 
 # build targets
 
-plugins.byte byte: plugins/whytptp.cmo
-plugins.opt  opt : plugins/whytptp.cmxs
+plugins.byte byte: lib/plugins/whytptp.cmo
+plugins.opt  opt : lib/plugins/whytptp.cmxs
 
-plugins/whytptp.cmxs plugins/whytptp.cmo: EXTOBJS += $(MENHIRLIB)
-plugins/whytptp.cmxs plugins/whytptp.cmo: INCLUDES += $(MENHIRINC)
+lib/plugins/whytptp.cmxs lib/plugins/whytptp.cmo: EXTOBJS += $(MENHIRLIB)
+lib/plugins/whytptp.cmxs lib/plugins/whytptp.cmo: INCLUDES += $(MENHIRINC)
 
-plugins/whytptp.cmxs: $(TPTPCMX)
+lib/plugins/whytptp.cmxs: $(TPTPCMX)
 	$(if $(QUIET), @echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -shared -o $@ $^
 
-plugins/whytptp.cmo: $(TPTPCMO)
+lib/plugins/whytptp.cmo: $(TPTPCMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -pack -o $@ $^
 
 install_no_local::
-	cp -f plugins/whytptp.cm* $(LIBDIR)/why3/
+	cp -f lib/plugins/whytptp.cm* $(LIBDIR)/why3/plugins/
 
 # depend and clean targets
 
@@ -839,7 +916,7 @@ clean::
 	rm -f src/tptp2why/*.cm* src/tptp2why/*.o
 	rm -f src/tptp2why/*.annot src/tptp2why/*.conflicts
 	rm -f src/tptp2why/*.output src/tptp2why/*.automaton
-	rm -f plugins/whytptp.cm* plugins/whytptp.o
+	rm -f lib/plugins/whytptp.cm* lib/plugins/whytptp.o
 	rm -f .depend.tptp2why
 
 endif
@@ -921,25 +998,13 @@ install_local: bin/why3doc
 # bench
 ########
 
-.PHONY: bench test comp_bench_plugins
+.PHONY: bench test
 
 bench:: bin/why3.@OCAMLBEST@ bin/why3ml.@OCAMLBEST@ bin/why3config.@OCAMLBEST@ plugins $(TOOLS)
 	$(MAKE) test-api
 	sh bench/bench \
 	    "bin/why3.@OCAMLBEST@" \
 	    "bin/why3ml.@OCAMLBEST@"
-
-BENCH_PLUGINS_CMO := helloworld.cmo
-BENCH_PLUGINS_CMO := $(addprefix bench/plugins/,$(BENCH_PLUGINS_CMO))
-BENCH_PLUGINS_CMXS := $(BENCH_PLUGINS_CMO:.cmo=.cmxs)
-
-comp_bench_plugins:: $(BENCH_PLUGINS_CMO) $(BENCH_PLUGINS_CMXS)
-
-# bench_plugins:: $(BENCH_PLUGINS_CMO) $(BENCH_PLUGINS_CMXS) byte $(TOOLS)
-# 	bin/why3.byte -D bench/plugins/helloworld.drv \
-# 	tests/test-jcf.why -T Test -G G
-# 	bin/why3.$(OCAMLBEST) -D bench/plugins/helloworld.drv  \
-# 	tests/test-jcf.why -T Test -G G
 
 ###############
 # test targets
@@ -990,51 +1055,6 @@ test-shape: src/why3.cma src/ide/termcode.cmo
 bts12244: src/why3.cma
 	ocaml -I src/ $(INCLUDES) $(EXTCMA) src/why3.cma examples/bts12244.ml
 
-
-## Examples : Plugins ##
-
-ifeq (@enable_plugins@,yes)
-
-PLUGDIR = examples/plugins/
-PLUG_FILES = genequlin
-
-PLUGMODULES = $(addprefix $(PLUGDIR), $(PLUG_FILES))
-
-PLUGML  = $(addsuffix .ml,  $(PLUGMODULES))
-PLUGCMO = $(addsuffix .cmo, $(PLUGMODULES))
-PLUGCMX = $(addsuffix .cmx, $(PLUGMODULES))
-PLUGCMXS = $(addsuffix .cmxs, $(PLUGMODULES))
-
-# ifeq (@enable_plug_support@,yes)
-# byte: src/plug-plugin/whytac.cma
-# opt:  src/plug-plugin/whytac.cmxs
-# endif
-
-# $(PLUGCMO):  src/why3.cma
-# $(PLUGCMXS): src/why3.cmxa
-
-.PHONY: examples_plugins.byte examples_plugins.opt
-
-examples_plugins.byte : $(PLUGCMO)
-examples_plugins.opt : $(PLUGCMXS)
-
-# depend and clean targets
-
-include .depend.plug
-
-.depend.plug: $(PLUGGENERATED)
-	$(OCAMLDEP) -slash -I src -I $(PLUGDIR) $(PLUGML) | sed "s/cmx/cmxs/" > $@
-
-depend: .depend.plug
-
-clean::
-	rm -f $(PLUGDIR)/*.cm[iox] $(PLUGDIR)/*.o
-	rm -f $(PLUGDIR)/*.cma $(PLUGDIR)/*.cmxs
-	rm -f $(PLUGDIR)/*.annot $(PLUGDIR)/*~
-	rm -f $(PLUGGENERATED)
-	rm -f .depend.plug
-
-endif
 
 ################
 # documentation
@@ -1198,6 +1218,7 @@ DISTRIB_FILES = Version Makefile.in configure.in META.in configure .depend.* \
       README INSTALL OCAML-LICENSE LICENSE \
       src/*.ml* src/*/*.ml* src/*/*.c \
       src/config.sh.in \
+      plugins/*.ml* plugins/*/*.ml* \
       doc/version.tex.in doc/manual.pdf \
       drivers/*.drv drivers/*.gen \
       examples/*.why examples/programs/*.mlw examples/tptp/*.why \
@@ -1206,6 +1227,7 @@ DISTRIB_FILES = Version Makefile.in configure.in META.in configure .depend.* \
       examples/use_api.ml \
       theories/*.why \
       modules/*.mlw \
+      lib/coq/*/*.v \
       share/provers-detection-data.conf.in \
       share/emacs/why.el share/images/*.png share/lang/*.lang
 
@@ -1228,14 +1250,16 @@ $(DISTRIB_TAR): doc/manual.pdf
 	mkdir -p $(DISTRIB_DIR)
 	mkdir -p $(DISTRIB_DIR)/bin
 	mkdir -p $(DISTRIB_DIR)/share
-	mkdir -p $(DISTRIB_DIR)/plugins
+	mkdir -p $(DISTRIB_DIR)/lib
+	mkdir -p $(DISTRIB_DIR)/lib/plugins
+	mkdir -p $(DISTRIB_DIR)/lib/coq
 	ln -s ../drivers $(DISTRIB_DIR)/share/drivers
 	ln -s ../modules $(DISTRIB_DIR)/share/modules
 	ln -s ../theories $(DISTRIB_DIR)/share/theories
 	cp --parents $(DISTRIB_FILES) $(DISTRIB_DIR)
 	rm -f $(DISTRIB_DIR)/src/config.ml
 	cd $(DISTRIB_DIR); rm -f $(LIBGENERATED) $(TPTPGENERATED) \
-          $(COQGENERATED) $(WHY3DOCGENERATED)
+          $(COQGENERATED) $(WHY3DOCGENERATED) $(PLUGGENERATED)
 	cd distrib; tar cf $(NAME).tar $(NAME); gzip -f --best $(NAME).tar
 
 # distrib export: source export-doc export-www export-examples export-examples-c linux

@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
 <why3session
- name="examples/einstein/why3session.xml">
+ name="einstein/why3session.xml">
  <prover
   id="alt-ergo"
   name="Alt-Ergo"
   version="0.93"/>
+ <prover
+  id="alt-ergo-0.93.1"
+  name="Alt-Ergo"
+  version="0.93.1"/>
  <prover
   id="coq"
   name="Coq"
@@ -14,6 +18,10 @@
   id="cvc3"
   name="CVC3"
   version="2.2"/>
+ <prover
+  id="cvc3-2.4"
+  name="CVC3"
+  version="2.4.1"/>
  <prover
   id="eprover"
   name="Eprover"
@@ -46,6 +54,10 @@
   id="z3"
   name="Z3"
   version="2.19"/>
+ <prover
+  id="z3-3"
+  name="Z3"
+  version="3.2"/>
  <file
   name="../einstein.why"
   verified="false"
@@ -76,15 +88,29 @@
     expanded="true"
     shape="ainfix =ato_aFishaGerman">
     <proof
-     prover="cvc3"
-     timelimit="3"
+     prover="alt-ergo-0.93.1"
+     timelimit="10"
      edited=""
      obsolete="false">
-     <result status="valid" time="2.53"/>
+     <result status="unknown" time="0.45"/>
+    </proof>
+    <proof
+     prover="z3-3"
+     timelimit="2"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.05"/>
+    </proof>
+    <proof
+     prover="cvc3"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="2.42"/>
     </proof>
     <proof
      prover="z3"
-     timelimit="3"
+     timelimit="10"
      edited=""
      obsolete="false">
      <result status="valid" time="0.03"/>
@@ -95,6 +121,13 @@
      edited=""
      obsolete="false">
      <result status="timeout" time="4.96"/>
+    </proof>
+    <proof
+     prover="cvc3-2.4"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="1.92"/>
     </proof>
     <proof
      prover="yices"
@@ -125,18 +158,32 @@
     expanded="true"
     shape="ainfix =ato_aCatsaSwede">
     <proof
-     prover="cvc3"
-     timelimit="3"
+     prover="alt-ergo-0.93.1"
+     timelimit="10"
      edited=""
      obsolete="false">
-     <result status="timeout" time="5.04"/>
+     <result status="unknown" time="0.43"/>
+    </proof>
+    <proof
+     prover="z3-3"
+     timelimit="2"
+     edited=""
+     obsolete="false">
+     <result status="timeout" time="10.09"/>
+    </proof>
+    <proof
+     prover="cvc3"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="timeout" time="10.06"/>
     </proof>
     <proof
      prover="z3"
-     timelimit="3"
+     timelimit="10"
      edited=""
      obsolete="false">
-     <result status="timeout" time="3.02"/>
+     <result status="timeout" time="10.09"/>
     </proof>
     <proof
      prover="eprover"
@@ -144,6 +191,13 @@
      edited=""
      obsolete="false">
      <result status="timeout" time="4.97"/>
+    </proof>
+    <proof
+     prover="cvc3-2.4"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="timeout" time="10.10"/>
     </proof>
     <proof
      prover="yices"
@@ -174,18 +228,32 @@
     expanded="true"
     shape="ainfix =ato_aCatsaNorwegian">
     <proof
-     prover="cvc3"
-     timelimit="3"
+     prover="alt-ergo-0.93.1"
+     timelimit="10"
      edited=""
      obsolete="false">
-     <result status="valid" time="1.94"/>
+     <result status="unknown" time="0.43"/>
+    </proof>
+    <proof
+     prover="z3-3"
+     timelimit="2"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.05"/>
+    </proof>
+    <proof
+     prover="cvc3"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="1.87"/>
     </proof>
     <proof
      prover="z3"
-     timelimit="3"
+     timelimit="10"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.02"/>
+     <result status="valid" time="0.03"/>
     </proof>
     <proof
      prover="eprover"
@@ -193,6 +261,13 @@
      edited=""
      obsolete="false">
      <result status="timeout" time="4.98"/>
+    </proof>
+    <proof
+     prover="cvc3-2.4"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="2.02"/>
     </proof>
     <proof
      prover="yices"

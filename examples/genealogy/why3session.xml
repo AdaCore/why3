@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
 <why3session
- name="examples/genealogy/why3session.xml">
+ name="genealogy/why3session.xml">
  <prover
   id="alt-ergo"
   name="Alt-Ergo"
   version="0.93"/>
+ <prover
+  id="alt-ergo-0.93.1"
+  name="Alt-Ergo"
+  version="0.93.1"/>
  <prover
   id="coq"
   name="Coq"
@@ -14,6 +18,10 @@
   id="cvc3"
   name="CVC3"
   version="2.2"/>
+ <prover
+  id="cvc3-2.4"
+  name="CVC3"
+  version="2.4.1"/>
  <prover
   id="eprover"
   name="Eprover"
@@ -46,6 +54,10 @@
   id="z3"
   name="Z3"
   version="2.19"/>
+ <prover
+  id="z3-3"
+  name="Z3"
+  version="3.2"/>
  <file
   name="../genealogy.why"
   verified="true"
@@ -61,11 +73,18 @@
     expanded="true"
     shape="adaughterV0V1OasonV0V1qachildV0V1F">
     <proof
-     prover="alt-ergo"
-     timelimit="3"
+     prover="alt-ergo-0.93.1"
+     timelimit="5"
      edited=""
      obsolete="false">
-     <result status="unknown" time="0.02"/>
+     <result status="unknown" time="0.01"/>
+    </proof>
+    <proof
+     prover="z3-3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.00"/>
     </proof>
     <proof
      prover="cvc3"
@@ -75,11 +94,11 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="eprover"
+     prover="alt-ergo"
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.00"/>
+     <result status="unknown" time="0.01"/>
     </proof>
     <proof
      prover="z3"
@@ -87,6 +106,20 @@
      edited=""
      obsolete="false">
      <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="eprover"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="cvc3-2.4"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.00"/>
     </proof>
     <proof
      prover="yices"
@@ -117,6 +150,20 @@
     expanded="true"
     shape="asiblingV1V0IasiblingV0V1F">
     <proof
+     prover="alt-ergo-0.93.1"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="z3-3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
      prover="cvc3"
      timelimit="5"
      edited=""
@@ -128,7 +175,14 @@
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.00"/>
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="z3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.01"/>
     </proof>
     <proof
      prover="eprover"
@@ -138,11 +192,11 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="z3"
+     prover="cvc3-2.4"
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.00"/>
     </proof>
     <proof
      prover="yices"
@@ -173,11 +227,18 @@
     expanded="true"
     shape="asisterV0V1OabrotherV0V1qasiblingV0V1F">
     <proof
-     prover="alt-ergo"
-     timelimit="3"
+     prover="alt-ergo-0.93.1"
+     timelimit="5"
      edited=""
      obsolete="false">
      <result status="unknown" time="0.01"/>
+    </proof>
+    <proof
+     prover="z3-3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.00"/>
     </proof>
     <proof
      prover="cvc3"
@@ -187,11 +248,11 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="eprover"
+     prover="alt-ergo"
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.00"/>
+     <result status="unknown" time="0.01"/>
     </proof>
     <proof
      prover="z3"
@@ -199,6 +260,20 @@
      edited=""
      obsolete="false">
      <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="eprover"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="cvc3-2.4"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.00"/>
     </proof>
     <proof
      prover="yices"
@@ -229,6 +304,20 @@
     expanded="true"
     shape="agrandmotherV0V1OagrandfatherV0V1qagrandparentV0V1F">
     <proof
+     prover="alt-ergo-0.93.1"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="z3-3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
      prover="cvc3"
      timelimit="5"
      edited=""
@@ -243,6 +332,13 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
+     prover="z3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
      prover="eprover"
      timelimit="5"
      edited=""
@@ -250,18 +346,11 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="z3"
+     prover="cvc3-2.4"
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="vampire"
-     timelimit="3"
-     edited=""
-     obsolete="false">
-     <result status="unknown" time="3.08"/>
+     <result status="valid" time="0.00"/>
     </proof>
     <proof
      prover="yices"
@@ -269,13 +358,6 @@
      edited=""
      obsolete="false">
      <result status="valid" time="0.04"/>
-    </proof>
-    <proof
-     prover="spass"
-     timelimit="3"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="3.55"/>
     </proof>
    </goal>
    <goal
@@ -285,6 +367,20 @@
     expanded="true"
     shape="ainfix =agenderV0aMaleIagrandfatherV0V1F">
     <proof
+     prover="alt-ergo-0.93.1"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="z3-3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
      prover="cvc3"
      timelimit="5"
      edited=""
@@ -299,6 +395,13 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
+     prover="z3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
      prover="eprover"
      timelimit="5"
      edited=""
@@ -306,11 +409,11 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="z3"
+     prover="cvc3-2.4"
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.00"/>
     </proof>
     <proof
      prover="yices"
@@ -341,6 +444,20 @@
     expanded="true"
     shape="ainfix =agenderV0aFemaleIagrandmotherV0V1F">
     <proof
+     prover="alt-ergo-0.93.1"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="z3-3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
      prover="cvc3"
      timelimit="5"
      edited=""
@@ -355,6 +472,13 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
+     prover="z3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
      prover="eprover"
      timelimit="5"
      edited=""
@@ -362,11 +486,11 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="z3"
+     prover="cvc3-2.4"
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.00"/>
     </proof>
     <proof
      prover="yices"
@@ -397,6 +521,20 @@
     expanded="true"
     shape="ainfix =V0V2Oainfix =V1V2Oainfix =V0V1IagrandfatherV2V3IagrandfatherV1V3IagrandfatherV0V3F">
     <proof
+     prover="alt-ergo-0.93.1"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="z3-3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
      prover="cvc3"
      timelimit="5"
      edited=""
@@ -411,6 +549,13 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
+     prover="z3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
      prover="eprover"
      timelimit="5"
      edited=""
@@ -418,18 +563,11 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="z3"
+     prover="cvc3-2.4"
      timelimit="5"
      edited=""
      obsolete="false">
      <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="vampire"
-     timelimit="3"
-     edited=""
-     obsolete="false">
-     <result status="unknown" time="2.97"/>
     </proof>
     <proof
      prover="yices"

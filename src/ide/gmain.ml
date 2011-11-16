@@ -388,7 +388,6 @@ module M = Session.Make
        goals_model#set ~row:iter ~column:index_column (-1);
        goals_model#get_row_reference (goals_model#get_path iter)
 
-
      let remove row =
        let (_:bool) = goals_model#remove row#iter in ()
 
@@ -426,7 +425,7 @@ let set_proof_state ~obsolete a =
     (image_of_result ~obsolete res);
   let t = match res with
     | Session.Done { Call_provers.pr_time = time } ->
-        Format.sprintf "%.2f" time
+        Format.sprintf "%.2f [%d.0]" time a.M.timelimit
     | Session.Unedited -> "not yet edited"
     | _ -> ""
   in

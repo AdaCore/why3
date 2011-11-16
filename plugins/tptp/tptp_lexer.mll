@@ -20,9 +20,8 @@
 {
   open Format
   open Lexing
-  open Term
-  open Ptree
-  open Parser
+  open Tptp_ast
+  open Tptp_parser
 
   (* lexical errors *)
 
@@ -36,72 +35,63 @@
     | UnterminatedString -> fprintf fmt "unterminated string"
     | _ -> raise e)
 
+  let defwords = Hashtbl.create 97
+  let () = List.iter (fun (x,y) -> Hashtbl.add defwords x y) [
+    "ceiling", CEILING;
+    "difference", DIFFERENCE;
+    "distinct", DISTINCT;
+    "false", FALSE;
+    "floor", FLOOR;
+    "greater", GREATER;
+    "greatereq", GREATEREQ;
+    "i", ITYPE;
+    "int", INT;
+    "is_int", IS_INT;
+    "is_rat", IS_RAT;
+    "ite_f", ITEF;
+    "ite_t", ITET;
+    "iType", ITYPE;
+    "less", LESS;
+    "lesseq", LESSEQ;
+    "o", OTYPE;
+    "oType", OTYPE;
+    "product", PRODUCT;
+    "quotient", QUOTIENT;
+    "quotient_e", QUOTIENT_E;
+    "quotient_t", QUOTIENT_T;
+    "quotient_f", QUOTIENT_F;
+    "rat", RAT;
+    "real", REAL;
+    "remainder_e", REMAINDER_E;
+    "remainder_t", REMAINDER_T;
+    "remainder_f", REMAINDER_F;
+    "round", ROUND;
+    "sum", SUM;
+    "to_int", TO_INT;
+    "to_rat", TO_RAT;
+    "to_real", TO_REAL;
+    "true", TRUE;
+    "truncate", TRUNCATE;
+    "tType", TTYPE;
+    "uminus", UMINUS;
+  ]
+
   let keywords = Hashtbl.create 97
-  let () =
-    List.iter
-      (fun (x,y) -> Hashtbl.add keywords x y)
-      [
-        "as", AS;
-        "axiom", AXIOM;
-        "clone", CLONE;
-        "else", ELSE;
-        "end", END;
-        "epsilon", EPSILON;
-        "exists", EXISTS;
-        "export", EXPORT;
-        "false", FALSE;
-        "forall", FORALL;
-        "function", FUNCTION;
-        "goal", GOAL;
-        "if", IF;
-        "import", IMPORT;
-        "in", IN;
-        "inductive", INDUCTIVE;
-        "lemma", LEMMA;
-        "let", LET;
-        "match", MATCH;
-        "meta", META;
-        "namespace", NAMESPACE;
-        "not", NOT;
-        "predicate", PREDICATE;
-        "prop", PROP;
-        "then", THEN;
-        "theory", THEORY;
-        "true", TRUE;
-        "type", TYPE;
-        "use", USE;
-        "with", WITH;
-        (* programs *)
-        "abstract", ABSTRACT;
-        "absurd", ABSURD;
-        "any", ANY;
-        "assert", ASSERT;
-        "assume", ASSUME;
-        "begin", BEGIN;
-        "check", CHECK;
-        "do", DO;
-        "done", DONE;
-        "downto", DOWNTO;
-        "exception", EXCEPTION;
-        "for", FOR;
-        "fun", FUN;
-        (* "ghost", GHOST; *)
-        "invariant", INVARIANT;
-        "loop", LOOP;
-        "model", MODEL;
-        "module", MODULE;
-        "mutable", MUTABLE;
-        "raise", RAISE;
-        "raises", RAISES;
-        "reads", READS;
-        "rec", REC;
-        "to", TO;
-        "try", TRY;
-        "val", VAL;
-        "variant", VARIANT;
-        "while", WHILE;
-        "writes", WRITES;
-      ]
+  let () = List.iter (fun (x,y) -> Hashtbl.add keywords x y) [
+    "assumption", ASSUMPTION;
+    "axiom", AXIOM;
+    "cnf", CNF;
+    "conjecture", CONJECTURE;
+    "definition", DEFINITION;
+    "fof", FOF;
+    "hypothesis", HYPOTHESIS;
+    "include", INCLUDE;
+    "lemma", LEMMA;
+    "negated_conjecture", NEGATED_CONJECTURE;
+    "tff", TFF;
+    "theorem", THEOREM;
+    "type", TYPE;
+  ]
 
   let newline lexbuf =
     let pos = lexbuf.lex_curr_p in
@@ -121,71 +111,52 @@
   let update_loc lexbuf file line chars =
     let pos = lexbuf.lex_curr_p in
     let new_file = match file with None -> pos.pos_fname | Some s -> s in
-    lexbuf.lex_curr_p <-
-      { pos with
-          pos_fname = new_file;
-          pos_lnum = int_of_string line;
-          pos_bol = pos.pos_cnum - int_of_string chars;
-      }
-
-  let remove_leading_plus s =
-    let n = String.length s in
-    if n > 0 && s.[0] = '+' then String.sub s 1 (n-1) else s
+    lexbuf.lex_curr_p <- { pos with
+      pos_fname = new_file;
+      pos_lnum = int_of_string line;
+      pos_bol = pos.pos_cnum - int_of_string chars;
+    }
 
   let loc lb = Loc.extract (lexeme_start_p lb, lexeme_end_p lb)
-
-  let remove_underscores s =
-    if String.contains s '_' then begin
-      let count =
-        let nb = ref 0 in
-        String.iter (fun c -> if c = '_' then incr nb) s;
-        !nb in
-      let t = String.create (String.length s - count) in
-      let i = ref 0 in
-      String.iter (fun c -> if c <> '_' then (t.[!i] <-c; incr i)) s;
-      t
-    end else s
 }
 
 let newline = '\n'
 let space = [' ' '\t' '\r']
-let lalpha = ['a'-'z' '_']
+
+let lalpha = ['a'-'z']
 let ualpha = ['A'-'Z']
-let alpha = lalpha | ualpha
-let digit = ['0'-'9']
-let lident = lalpha (alpha | digit | '\'')*
-let uident = ualpha (alpha | digit | '\'')*
-let hexadigit = ['0'-'9' 'a'-'f' 'A'-'F']
+let digit  = ['0'-'9']
+let nzero  = ['1'-'9']
 
-let op_char_1 = ['=' '<' '>' '~']
-let op_char_2 = ['+' '-']
-let op_char_3 = ['*' '/' '%']
-let op_char_4 = ['!' '$' '&' '?' '@' '^' '.' ':' '|' '#']
-let op_char_34 = op_char_3 | op_char_4
-let op_char_234 = op_char_2 | op_char_34
-let op_char_1234 = op_char_1 | op_char_234
+let alnum = lalpha | ualpha | digit | '_'
+let lword = lalpha alnum* 
+let uword = ualpha alnum* 
 
-let op_char_pref = ['!' '?']
+let positive = nzero digit*
+let natural  = '0' | positive
+let negative = '-' natural
 
 rule token = parse
-  | "##" space* ("\"" ([^ '\010' '\013' '"' ]* as file) "\"")?
-    space* (digit+ as line) space* (digit+ as char) space* "##"
-      { update_loc lexbuf file line char; token lexbuf }
-  | "#" space* "\"" ([^ '\010' '\013' '"' ]* as file) "\""
-    space* (digit+ as line) space* (digit+ as bchar) space*
-    (digit+ as echar) space* "#"
-      { POSITION (Loc.user_position file (int_of_string line)
-                 (int_of_string bchar) (int_of_string echar)) }
   | newline
       { newline lexbuf; token lexbuf }
   | space+
       { token lexbuf }
-  | '_'
-      { UNDERSCORE }
-  | lident as id
-      { try Hashtbl.find keywords id with Not_found -> LIDENT id }
-  | uident as id
-      { UIDENT id }
+  | lword as id
+      { try Hashtbl.find keywords id with Not_found -> LWORD id }
+  | uword as id
+      { UWORD id }
+  | '+'? (natural as s)
+      { INTEGER s }
+  | negative as s
+      { INTEGER s }
+  | '+'? (natural as n) '/' (natural as d)
+      { RATIONAL (n,d) }
+  | (negative as n) '/' (natural as d)
+      { RATIONAL (n,d) }
+
+
+  |  
+  | nzero 
   | ['0'-'9'] ['0'-'9' '_']* as s
       { INTEGER (IConstDecimal (remove_underscores s)) }
   | '0' ['x' 'X'] (['0'-'9' 'A'-'F' 'a'-'f']['0'-'9' 'A'-'F' 'a'-'f' '_']* as s)

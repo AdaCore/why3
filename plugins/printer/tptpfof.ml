@@ -18,6 +18,8 @@
 (**************************************************************************)
 
 open Format
+
+open Why3
 open Pp
 open Ident
 open Ty
@@ -146,7 +148,7 @@ let print_task pr thpr fmt task =
   ignore (print_list_opt (add_flush newline2)
     (print_decl info) fmt (Task.task_decls task))
 
-let () = register_printer "tptp"
+let () = register_printer "tptp-fof"
   (fun _env pr thpr ?old:_ fmt task ->
      forget_all ident_printer;
      print_task pr thpr fmt task)

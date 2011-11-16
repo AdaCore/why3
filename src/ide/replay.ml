@@ -109,6 +109,8 @@ let loadpath = (Whyconf.loadpath (Whyconf.get_main config))
 
 let env = Env.create_env loadpath
 
+let () = Whyconf.load_plugins (Whyconf.get_main config)
+
 let usleep t = ignore (Unix.select [] [] [] t)
 
 
@@ -139,7 +141,7 @@ module M = Session.Make
          | Some _ -> failwith "Replay.timeout: already one handler installed"
 
      let notify_timer_state w s r =
-       Printf.eprintf "Progress: %d/%d/%d   \r%!" w s r
+       Printf.eprintf "Progress: %d/%d/%d                       \r%!" w s r
 
    end)
 
@@ -216,38 +218,15 @@ let init =
     (* eprintf "Item '%s' loaded@." name *)
     ()
 
-(*
-let string_of_result result =
-  match result with
-    | Session.Undone -> "undone"
-    | Session.Scheduled -> "scheduled"
-    | Session.Running -> "running"
-    | Session.InternalFailure _ -> "internal failure"
-    | Session.Done r -> match r.Call_provers.pr_answer with
-        | Call_provers.Valid -> "valid"
-        | Call_provers.Invalid -> "invalid"
-        | Call_provers.Timeout -> "timeout"
-        | Call_provers.Unknown _ -> "unknown"
-        | Call_provers.Failure _ -> "failure"
-        | Call_provers.HighFailure -> "high failure"
-
-let print_result fmt res =
-  let t = match res with
-    | Session.Done { Call_provers.pr_time = time } ->
-        Format.sprintf "(%.1f)" time
-    | _ -> ""
-  in
-  fprintf fmt "%s%s" (string_of_result res) t
-*)
-
-
 let print_result fmt
     {Call_provers.pr_answer=ans; Call_provers.pr_output=out;
-     Call_provers.pr_time=_t} =
-(*
+     Call_provers.pr_time=t} =
+(**)
   fprintf fmt "%a (%.1fs)" Call_provers.print_prover_answer ans t;
-*)
+(**)
+(*
   fprintf fmt "%a" Call_provers.print_prover_answer ans;
+*)
   if ans == Call_provers.HighFailure then
     fprintf fmt "@\nProver output:@\n%s@." out
 
