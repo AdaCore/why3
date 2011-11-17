@@ -28,7 +28,7 @@ open Rc
   - 5 cvc3 native
   - 6 driver renaming
   - 7 yices native (used for release 0.70)
-  - 8 for release 0.71 
+  - 8 for release 0.71
 
 If a configuration doesn't contain the actual magic number we don't use it.*)
 
@@ -247,7 +247,7 @@ let read_config conf_file =
 
 let save_config config =
   let filename = config.conf_file in
-  if Sys.file_exists filename then Sys.rename filename (filename ^ ".bak");
+  Sysutil.backup_file filename;
   to_file filename config.config
 
 let get_main config = config.main

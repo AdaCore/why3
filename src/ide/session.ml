@@ -610,6 +610,8 @@ let schedule_edit_proof ~debug:_ ~editor ~file ~driver ~callback goal =
     then
       begin
         let backup = file ^ ".bak" in
+        if Sys.file_exists backup
+          then Sys.remove backup;
         Sys.rename file backup;
         Some(open_in backup)
       end
@@ -1537,11 +1539,7 @@ let save_session () =
   match !current_env with
     | Some _ ->
         let f = Filename.concat !project_dir db_filename in
-        begin if Sys.file_exists f then
-          let b = f ^ ".bak" in
-          if Sys.file_exists b then Sys.remove b ;
-          Sys.rename f b
-        end;
+        Sysutil.backup_file f;
         save f
     | None ->
         eprintf "Session.save_session: no session opened@.";

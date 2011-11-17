@@ -17,6 +17,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(* create a backup copy of a file if it exists *)
+val backup_file : string -> unit
+
 (* return the content of an in-channel *)
 val channel_contents : in_channel -> string
 

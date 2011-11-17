@@ -17,6 +17,13 @@
 (*                                                                        *)
 (**************************************************************************)
 
+let backup_file f =
+  if Sys.file_exists f then begin
+    let fb = f ^ ".bak" in
+    if Sys.file_exists fb then Sys.remove fb;
+    Sys.rename f fb
+  end
+
 let channel_contents_fmt cin fmt =
   let buff = String.make 1024 ' ' in
   let n = ref 0 in
