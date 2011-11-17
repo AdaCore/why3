@@ -569,7 +569,7 @@ let cancel_scheduled_proofs () =
         callback Interrupted
       done
     with
-      | Queue.Empty -> 
+      | Queue.Empty ->
           O.notify_timer_state 0 0 (List.length !running_proofs)
 
 
@@ -899,7 +899,7 @@ let associate_subgoals gname old_goals new_goals =
     (fun g -> Hashtbl.add old_goals_map g.checksum g)
     old_goals;
   (*
-     we make an array of new goals with their numbers and checksums 
+     we make an array of new goals with their numbers and checksums
   *)
   let new_goals_array =
     array_map_list
@@ -967,7 +967,7 @@ let associate_subgoals gname old_goals new_goals =
          match pairing_array.(i) with
            | Some _ -> acc
            | None ->
-               let shape = 
+               let shape =
                  Termcode.t_shape_buf (Task.task_goal_fmla g)
                in
                shape_array.(i) <- shape;
@@ -976,7 +976,7 @@ let associate_subgoals gname old_goals new_goals =
       new_goals_array
   in
   let sort_by_shape =
-    List.sort (fun (s1,_) (s2,_) -> String.compare s1 s2) 
+    List.sort (fun (s1,_) (s2,_) -> String.compare s1 s2)
       all_goals_without_pairing
   in
 (*
@@ -1184,7 +1184,7 @@ let reload_proof obsolete goal pid old_a =
   in
   !notify_fun (Goal a.proof_goal)
 
-let rec reload_any_goal parent gid gname sum shape t 
+let rec reload_any_goal parent gid gname sum shape t
     old_goal goal_obsolete =
   let info = get_explanation gid (Task.task_goal_fmla t) in
   let exp = match old_goal with None -> true | Some g -> g.goal_expanded in
@@ -1641,6 +1641,13 @@ let run_prover ~context_unproved_goals_only ~timelimit pr a =
 (* method: replay obsolete proofs *)
 (**********************************)
 
+let replay_timelimit a =
+  match a.proof_state with
+    | Done { Call_provers.pr_answer = Call_provers.Valid;
+             Call_provers.pr_time = t } ->
+        max a.timelimit (truncate (ceil (t *. 2.0)))
+    | _ -> a.timelimit
+
 let proof_successful a =
   match a.proof_state with
     | Done { Call_provers.pr_answer = Call_provers.Valid } -> true
@@ -1653,13 +1660,7 @@ let rec replay_on_goal_or_children
        if not obsolete_only || a.proof_obsolete then
          if not context_unproved_goals_only || proof_successful a
          then
-           let timelimit =
-             match a.proof_state with
-               | Done { Call_provers.pr_answer = Call_provers.Valid;
-                        Call_provers.pr_time = t }
-                 -> max a.timelimit (truncate (ceil (t *. 2.0)))
-               | _ -> a.timelimit
-           in
+           let timelimit = replay_timelimit a in
            redo_external_proof ~timelimit g a)
     g.external_proofs;
   Hashtbl.iter
@@ -1793,8 +1794,9 @@ let check_external_proof_not_smoked g a =
               (Some (open_in f))
             end
           in
+          let timelimit = replay_timelimit a in
           schedule_proof_attempt
-            ~debug:false ~timelimit:a.timelimit ~memlimit:0
+            ~debug:false ~timelimit ~memlimit:0
             ?old ~command:p.command ~driver:p.driver
             ~callback
             (get_task g)
@@ -1843,8 +1845,9 @@ let check_external_proof_smoked g a =
               | SD_None -> assert false
               | SD_Top -> Trans.apply Smoke_detector.top (get_task g)
               | SD_Deep -> Trans.apply Smoke_detector.deep (get_task g) in
+            let timelimit = replay_timelimit a in
             schedule_proof_attempt
-              ~debug:false ~timelimit:a.timelimit ~memlimit:0
+              ~debug:false ~timelimit ~memlimit:0
               ?old ~command:p.command ~driver:p.driver
               ~callback
               task
