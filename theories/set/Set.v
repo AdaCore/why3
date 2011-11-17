@@ -11,7 +11,7 @@ Definition set : forall (a:Type), Type.
 (* YOU MAY EDIT THE PROOF BELOW *)
 exact set_.
 (*
-(fun (X: Type) => X -> Prop).
+exact (fun (X: Type) => X -> Prop).
 *)
 Defined.
 (* DO NOT EDIT BELOW *)
