@@ -120,13 +120,22 @@ if uname -s | grep -q CYGWIN ; then
   EXE=.exe
   STRIP='echo "no strip "'
   CPULIMIT=cpulimit-win
-  AC_MSG_RESULT(.exe)
+  AC_MSG_RESULT(.exe <Cygwin>)
+else
+if uname -s | grep -q MINGW ; then
+  EXE=.exe
+  STRIP=strip
+  CPULIMIT=cpulimit-win
+  AC_MSG_RESULT(.exe <MinGW>)
 else
   EXE=
   STRIP=strip
   CPULIMIT=cpulimit
   AC_MSG_RESULT(<none>)
 fi
+fi
+
+AC_PROG_CC()
 
 # Check for Ocaml compilers
 
