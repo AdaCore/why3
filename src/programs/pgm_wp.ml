@@ -123,23 +123,23 @@ let old_mark lab t = t_subst_single vs_old (t_var lab) t
 (* replace [at(t,lab)] with [at(t,'now)] everywhere in formula [f] *)
 let erase_mark lab t = t_subst_single lab (t_var vs_now) t
 
-let rec unref s t = match t.t_node with
-  | Tvar vs ->
+let rec unref ~now s t = match t.t_node with
+  | Tvar vs when now ->
       begin try t_var (Mvs.find vs s) with Not_found -> t end
   | Tapp (ls, _) when ls_equal ls fs_old ->
       assert false
   | Tapp (ls, [e;{t_node = Tvar lab}]) when ls_equal ls fs_at ->
       if vs_equal lab vs_old then assert false else
-      if vs_equal lab vs_now then unref s e else
-      (* do not recurse in at(...) *)
-      t
+      if vs_equal lab vs_now then unref ~now:true s e else
+      (* no longer assume that unmarked variables are at mark 'now *)
+      t_map (unref ~now:false s) t
   | Tlet _ | Tcase _ | Teps _ | Tquant _ ->
       (* do not open unless necessary *)
       let s = Mvs.set_inter s t.t_vars in
       if Mvs.is_empty s then t else
-      t_map (unref s) t
+      t_map (unref ~now s) t
   | _ ->
-      t_map (unref s) t
+      t_map (unref ~now s) t
 
 let find_constructor env ts =
   let km = get_known (pure_uc env) in
@@ -247,7 +247,7 @@ let quantify env rm sreg f =
     in
     Spv.fold add vars Mvs.empty
   in
-  let f = unref vv' f in
+  let f = unref ~now:true vv' f in
   let f =
     let add_update x f =
       let v' = Mvs.find x.pv_pure vv' in
