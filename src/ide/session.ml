@@ -584,10 +584,10 @@ let schedule_proof_attempt ~debug ~timelimit ~memlimit ?old
     actions_queue;
   run_idle_handler ()
 
-let schedule_edition command callback =
+let schedule_edition command filename callback =
   let precall =
-    Call_provers.call_on_buffer ~command ~regexps:[] ~timeregexps:[]
-      ~exitcodes:[(0,Call_provers.Unknown "")] ~filename:"" (Buffer.create 1)
+    Call_provers.call_on_file ~command ~regexps:[] ~timeregexps:[]
+      ~exitcodes:[(0,Call_provers.Unknown "")] filename
   in
   callback Running;
   running_proofs := (Check_prover(callback, precall ())) :: !running_proofs;
@@ -622,8 +622,7 @@ let schedule_edit_proof ~debug:_ ~editor ~file ~driver ~callback goal =
   Driver.print_task ?old driver fmt goal;
   Util.option_iter close_in old;
   close_out ch;
-  let command = editor ^ " \"" ^ file ^ "\"" in
-  schedule_edition command callback
+  schedule_edition editor file callback
 
 
 (*******************************)

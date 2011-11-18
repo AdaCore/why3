@@ -114,29 +114,30 @@ type post_prover_call = unit -> prover_result
 type prover_call = Unix.wait_flag list -> post_prover_call
 type pre_prover_call = unit -> prover_call
 
-let call_on_buffer ~command ?(timelimit=0) ?(memlimit=0)
-                   ~regexps ~timeregexps ~exitcodes ~filename buffer =
+let call_on_file ~command ?(timelimit=0) ?(memlimit=0)
+                 ~regexps ~timeregexps ~exitcodes
+                 ?(cleanup=false) fin =
 
   let arglist = Cmdline.cmdline_split command in
   let command = List.hd arglist in
-  let fin,cin = Filename.open_temp_file "why_" ("_" ^ filename) in
-  Buffer.output_buffer cin buffer; close_out cin;
-
   let on_timelimit = ref false in
+  let on_filename = ref false in
   let cmd_regexp = Str.regexp "%\\(.\\)" in
-  let replace file s = match Str.matched_group 1 s with
+  let replace s = match Str.matched_group 1 s with
     | "%" -> "%"
-    | "f" -> file
+    | "f" -> on_filename := true; fin
     | "t" -> on_timelimit := true; string_of_int timelimit
     | "m" -> string_of_int memlimit
     | "b" -> string_of_int (memlimit * 1024)
     | _ -> failwith "unknown format specifier, use %%f, %%t, %%m or %%b"
   in
   let subst s =
-    try Str.global_substitute cmd_regexp (replace fin) s
-    with e -> Sys.remove fin; raise e
+    try Str.global_substitute cmd_regexp replace s
+    with e -> if cleanup then Sys.remove fin; raise e
   in
-  let argarray = Array.of_list (List.map subst arglist) in
+  let arglist = List.map subst arglist in
+  let argarray = Array.of_list
+    (if !on_filename then arglist else arglist @ [fin]) in
 
   fun () ->
     let fd_in = Unix.openfile fin [Unix.O_RDONLY] 0 in
@@ -158,8 +159,8 @@ let call_on_buffer ~command ?(timelimit=0) ?(memlimit=0)
 
       fun () ->
         if Debug.nottest_flag debug then begin
-          Sys.remove fin;
-          Sys.remove fout;
+          if cleanup then Sys.remove fin;
+          Sys.remove fout
         end;
         let ans = match ret with
           | Unix.WSTOPPED n ->
@@ -182,6 +183,14 @@ let call_on_buffer ~command ?(timelimit=0) ?(memlimit=0)
         { pr_answer = ans;
           pr_output = out;
           pr_time   = time }
+
+let call_on_buffer ~command ?(timelimit=0) ?(memlimit=0)
+                   ~regexps ~timeregexps ~exitcodes ~filename buffer =
+
+  let fin,cin = Filename.open_temp_file "why_" ("_" ^ filename) in
+  Buffer.output_buffer cin buffer; close_out cin;
+  call_on_file ~command ~timelimit ~memlimit
+               ~regexps ~timeregexps ~exitcodes ~cleanup:true fin
 
 let query_call call = try Some (call [Unix.WNOHANG]) with Exit -> None
 

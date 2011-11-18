@@ -72,6 +72,16 @@ type pre_prover_call = unit -> prover_call
 type post_prover_call = unit -> prover_result
 (** Thread-unsafe closure that interprets the prover's results *)
 
+val call_on_file :
+  command     : string ->
+  ?timelimit  : int ->
+  ?memlimit   : int ->
+  regexps     : (Str.regexp * prover_answer) list ->
+  timeregexps : timeregexp list ->
+  exitcodes   : (int * prover_answer) list ->
+  ?cleanup    : bool ->
+  string -> pre_prover_call
+
 val call_on_buffer :
   command     : string ->
   ?timelimit  : int ->
