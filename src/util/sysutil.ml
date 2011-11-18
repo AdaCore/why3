@@ -185,3 +185,14 @@ let p1 = relativize_filename "/bin/bash" "src/f.why"
 
 let p1 = relativize_filename "test" "/home/cmarche/recherche/why3/src/ide/f.why"
 *)
+
+let delete_later : string list ref = ref []
+
+let try_remove s =
+   try
+      Sys.remove s
+   with _ ->
+      delete_later := s :: !delete_later
+
+let remove_clean_up () =
+   List.iter (fun s -> try Sys.remove s with _ -> ()) !delete_later

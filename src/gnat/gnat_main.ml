@@ -155,7 +155,9 @@ let _ =
             with Not_Proven ->
                report fmt false expl)
          !expl_map;
-      Gnat_util.output_buffer outbuf Gnat_config.result_file
+      Gnat_util.output_buffer outbuf Gnat_config.result_file;
+      Sysutil.remove_clean_up ()
     with e when not (Debug.test_flag Debug.stack_trace) ->
+       Sysutil.remove_clean_up ();
        Format.eprintf "%a.@." Exn_printer.exn_printer e;
        Gnat_util.abort_with_message ""
