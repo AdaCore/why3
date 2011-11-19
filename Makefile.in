@@ -54,6 +54,8 @@ OCAMLDOC  = @OCAMLDOC@
 OCAMLLIB  = @OCAMLLIB@
 OCAMLBEST = @OCAMLBEST@
 OCAMLVERSION = @OCAMLVERSION@
+COQC      = @COQC@
+COQDEP    = @COQDEP@
 
 CAMLP5O   = @CAMLP5O@
 
@@ -209,7 +211,6 @@ clean::
 
 install_no_local::
 	mkdir -p $(BINDIR)
-	mkdir -p $(LIBDIR)/why3/coq
 	mkdir -p $(DATADIR)/why3/images
 	mkdir -p $(DATADIR)/why3/emacs
 	mkdir -p $(DATADIR)/why3/lang
@@ -782,7 +783,7 @@ endif
 # Coq plugin
 ##############
 
-ifeq (@enable_coq_support@,yes)
+ifeq (@enable_coq_plugin@,yes)
 
 COQGENERATED = src/coq-plugin/g_whytac.ml
 
@@ -816,19 +817,58 @@ src/coq-plugin/g_whytac.ml: src/coq-plugin/g_whytac.ml4
 
 # depend and clean targets
 
-include .depend.coq
+include .depend.coq-plugin
 
-.depend.coq: $(COQGENERATED)
+.depend.coq-plugin: $(COQGENERATED)
 	$(OCAMLDEP) -slash -I src -I src/coq-plugin $(COQML) > $@
 
-depend: .depend.coq
+depend: .depend.coq-plugin
 
 clean::
 	rm -f src/coq-plugin/*.cm[iox] src/coq-plugin/*.o
 	rm -f src/coq-plugin/*.cma src/coq-plugin/*.cmxs
 	rm -f src/coq-plugin/*.annot src/coq-plugin/*~
 	rm -f $(COQGENERATED)
-	rm -f .depend.coq
+	rm -f .depend.coq-plugin
+
+endif
+
+####################
+# Coq realizations
+####################
+
+ifeq (@enable_coq_libs@,yes)
+
+COQLIBS_REAL_FILES = Abs MinMax Real Square
+COQLIBS_REAL = $(addprefix lib/coq/real/, $(COQLIBS_REAL_FILES))
+
+COQLIBS_FILES = $(COQLIBS_REAL)
+
+COQV  = $(addsuffix .v,  $(COQLIBS_FILES))
+COQVO = $(addsuffix .vo, $(COQLIBS_FILES))
+
+%.vo: %.v
+	$(COQC) -R lib/coq Why3 $<
+
+all: $(COQVO)
+
+install_no_local::
+	mkdir -p $(LIBDIR)/why3/coq
+	mkdir -p $(LIBDIR)/why3/coq/real
+	cp $(addsuffix .vo, $(COQLIBS_REAL)) $(LIBDIR)/why3/coq/real/
+
+install_local: $(COQVO)
+
+include .depend.coq-libs
+
+.depend.coq-libs:
+	$(COQDEP) -slash -R lib/coq Why3 $(COQV) > $@
+
+depend: .depend.coq-libs
+
+clean::
+	rm -f $COQVO $(addsuffix .glob, $(COQLIBS_FILES))
+	rm -f .depend.coq-libs
 
 endif
 
@@ -1125,12 +1165,6 @@ clean::
 
 # .ml4.ml:
 # 	$(CAMLP4) pr_o.cmo -impl $< > $@
-
-# lib/coq/%.vo: lib/coq/%.v
-# 	$(COQC8) -I lib/coq $<
-
-# lib/coq-v7/%.vo: lib/coq-v7/%.v
-# 	$(COQC7) -I lib/coq-v7 $<
 
 # jc/jc_ai.ml: jc/jc_annot_inference.ml jc/jc_annot_fail.ml Makefile
 # 	if test "@enable_apron@" = "yes" ; then \
