@@ -839,10 +839,13 @@ endif
 
 ifeq (@enable_coq_libs@,yes)
 
+COQLIBS_INT_FILES = Int
+COQLIBS_INT = $(addprefix lib/coq/int/, $(COQLIBS_INT_FILES))
+
 COQLIBS_REAL_FILES = Abs MinMax Real Square
 COQLIBS_REAL = $(addprefix lib/coq/real/, $(COQLIBS_REAL_FILES))
 
-COQLIBS_FILES = $(COQLIBS_REAL)
+COQLIBS_FILES = $(COQLIBS_INT) $(COQLIBS_REAL)
 
 COQV  = $(addsuffix .v,  $(COQLIBS_FILES))
 COQVO = $(addsuffix .vo, $(COQLIBS_FILES))
@@ -854,7 +857,9 @@ all: $(COQVO)
 
 install_no_local::
 	mkdir -p $(LIBDIR)/why3/coq
+	mkdir -p $(LIBDIR)/why3/coq/int
 	mkdir -p $(LIBDIR)/why3/coq/real
+	cp $(addsuffix .vo, $(COQLIBS_INT)) $(LIBDIR)/why3/coq/int/
 	cp $(addsuffix .vo, $(COQLIBS_REAL)) $(LIBDIR)/why3/coq/real/
 
 install_local: $(COQVO)
