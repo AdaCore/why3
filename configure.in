@@ -302,14 +302,24 @@ if test "$enable_ide" = yes ; then
       LABLGTK2LIB="+lablgtk2"
       AC_CHECK_FILE($OCAMLLIB/lablgtk2/lablgtk.cma,,enable_ide=no)
       if test "$enable_ide" = no; then
-      	 AC_MSG_WARN(Lib lablgtk2 not found, IDE disabled.)
-   	 reason_ide=" (lablgtk2 not found)"
-      else
-	 AC_CHECK_FILE($OCAMLLIB/lablgtk2/lablgtksourceview2.cma,,enable_ide=no)
-      	 if test "$enable_ide" = no; then
-      	    AC_MSG_WARN(Lib lablgtksourceview2 not found, IDE disabled.)
-            reason_ide=" (lablgtksourceview2 not found)"
-         fi
+         AC_MSG_WARN(Lib lablgtk2 not found, IDE disabled.)
+         reason_ide=" (lablgtk2 not found)"
+      fi
+   fi
+fi
+
+# checking for lablgtksourceview2
+if test "$enable_ide" = yes ; then
+   if test "$USEOCAMLFIND" = yes; then
+      LABLGTKSV2LIB=$(ocamlfind query lablgtksourceview2)
+   fi
+   if test -n "$LABLGTKSV2LIB";then
+      echo "ocamlfind found lablgtksourceview2 in $LABLGTKSV2LIB"
+   else
+      AC_CHECK_FILE($OCAMLLIB/lablgtk2/lablgtksourceview2.cma,,enable_ide=no)
+      if test "$enable_ide" = no; then
+         AC_MSG_WARN(Lib lablgtksourceview2 not found, IDE disabled.)
+         reason_ide=" (lablgtksourceview2 not found)"
       fi
    fi
 fi
