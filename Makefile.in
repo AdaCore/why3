@@ -839,10 +839,10 @@ endif
 
 ifeq (@enable_coq_libs@,yes)
 
-COQLIBS_INT_FILES = Int
+COQLIBS_INT_FILES = Abs EuclideanDivision Int MinMax
 COQLIBS_INT = $(addprefix lib/coq/int/, $(COQLIBS_INT_FILES))
 
-COQLIBS_REAL_FILES = Abs MinMax Real Square
+COQLIBS_REAL_FILES = Abs FromInt MinMax Real Square
 COQLIBS_REAL = $(addprefix lib/coq/real/, $(COQLIBS_REAL_FILES))
 
 COQLIBS_FILES = $(COQLIBS_INT) $(COQLIBS_REAL)
