@@ -102,24 +102,21 @@ let print_pr fmt pr =
 
 type info = {
   info_syn : syntax_map;
-  realization : (Theory.theory * ident_printer) Mid.t option;
+  symbol_printers : (Theory.theory * ident_printer) Mid.t;
+  realization : bool;
 }
 
 let print_path = print_list (constant_string ".") string
 
 let print_id fmt id = string fmt (id_unique iprinter id)
 
-let print_id_real info fmt id = match info.realization with
-  | Some m ->
-      begin
-        try let th,ipr = Mid.find id m in
+let print_id_real info fmt id =
+        try let th,ipr = Mid.find id info.symbol_printers in
         fprintf fmt "%a.%s.%s"
           print_path th.Theory.th_path
           th.Theory.th_name.id_string
           (id_unique ipr id)
         with Not_found -> print_id fmt id
-      end
-  | None -> print_id fmt id
 
 let print_ls_real info fmt ls = print_id_real info fmt ls.ls_name
 let print_ts_real info fmt ts = print_id_real info fmt ts.ts_name
@@ -369,7 +366,7 @@ let print_implicits fmt ls ty_vars_args ty_vars_value all_ty_params =
     end
 
 let definition fmt info =
-  fprintf fmt "%s" (if info.realization <> None then "Definition" else "Parameter")
+  fprintf fmt "%s" (if info.realization then "Definition" else "Parameter")
 
 (*
 
@@ -528,7 +525,7 @@ let print_type_decl ~old info fmt (ts,def) =
             fprintf fmt "@[<hov 2>%a %a : %aType.@]@\n%a"
               definition info
               print_ts ts print_params_list ts.ts_args
-              (realization ~old ~def:true) (info.realization <> None)
+              (realization ~old ~def:true) info.realization
         | Some ty ->
             fprintf fmt "@[<hov 2>Definition %a %a :=@ %a.@]@\n@\n"
               print_ts ts (print_list space print_tv_binder) ts.ts_args
@@ -575,7 +572,7 @@ let print_logic_decl ~old info fmt (ls,ld) =
             print_params all_ty_params
             (print_arrow_list (print_ty info)) ls.ls_args
             (print_ls_type ~arrow:(ls.ls_args <> []) info) ls.ls_value
-            (realization ~old ~def:true) (info.realization <> None)
+            (realization ~old ~def:true) info.realization
   end;
   print_implicits fmt ls ty_vars_args ty_vars_value all_ty_params;
   fprintf fmt "@\n"
@@ -634,7 +631,7 @@ let print_ind_decl info fmt d =
 
 let print_pkind info fmt = function
   | Paxiom ->
-      if info.realization <> None then
+      if info.realization then
         fprintf fmt "Lemma"
       else
         fprintf fmt "Axiom"
@@ -646,14 +643,14 @@ let print_proof ~old info fmt = function
   | Plemma | Pgoal ->
       realization ~old fmt true
   | Paxiom ->
-      realization ~old fmt (info.realization <> None)
+      realization ~old fmt info.realization
   | Pskip -> ()
 
 let print_proof_context ~old info fmt = function
   | Plemma | Pgoal ->
       print_context ~old fmt
   | Paxiom ->
-      if info.realization <> None then print_context ~old fmt
+      if info.realization then print_context ~old fmt
   | Pskip -> ()
 
 let print_decl ~old info fmt d = match d.d_node with
@@ -686,14 +683,28 @@ let init_printer th =
   Sid.iter (fun id -> ignore (id_unique pr id)) th.Theory.th_local;
   pr
 
-let print_task env pr thpr realize ?old fmt task =
+(* TODO: change into a less intrusive coding, e.g. a driver meta, and
+   make the lookup a bit more efficient along the way *)
+let realized_theories = [
+  ["int"; "Abs"];
+  ["int"; "ComputerDivision"];
+  ["int"; "EuclideanDivision"];
+  ["int"; "Int"];
+  ["int"; "MinMax"];
+  ["real"; "Abs"];
+  ["real"; "FromInt"];
+  ["real"; "MinMax"];
+  ["real"; "Real"];
+  ["real"; "Square"];
+]
+
+let print_task _env pr thpr realize ?old fmt task =
   forget_all ();
   print_prelude fmt pr;
   print_th_prelude task fmt thpr;
-  let realization,decls =
-    if realize then
+  let symbol_printers,decls =
       let used = Task.used_theories task in
-      let used = Mid.filter (fun _ th -> th.Theory.th_path <> []) used in
+      let used = Mid.filter (fun _ th -> List.mem (th.Theory.th_path@[th.Theory.th_name.id_string]) realized_theories) used in
       (* 2 cases: goal is clone T with [] or goal is a real goal *)
       let used = match task with
         | None -> assert false
@@ -704,10 +715,12 @@ let print_task env pr thpr realize ?old fmt task =
             Mid.remove th.Theory.th_name used
         | _ -> used
       in
+      (*
       (* output the Require commands *)
       List.iter
         (fprintf fmt "Add Rec LoadPath \"%s\".@\n")
         (Env.get_loadpath env);
+      *)
       Mid.iter
         (fun id th -> fprintf fmt "Require %a.%s.@\n"
           print_path th.Theory.th_path id.id_string)
@@ -720,13 +733,12 @@ let print_task env pr thpr realize ?old fmt task =
         Mid.map (fun th -> (th,Mid.find th.Theory.th_name printers))
           symbols
       in
-      Some symbols, decls
-    else
-      None, Task.task_decls task
+      symbols, decls
   in
   let info = {
     info_syn = get_syntax_map task;
-    realization = realization;
+    symbol_printers = symbol_printers;
+    realization = realize;
   }
   in
   let old = match old with
