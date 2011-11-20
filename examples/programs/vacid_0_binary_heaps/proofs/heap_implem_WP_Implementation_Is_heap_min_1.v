@@ -3,6 +3,10 @@
 Require Import ZArith.
 Require Import Rbase.
 Require Import ZOdiv.
+Require int.Int.
+Require int.Abs.
+Require int.MinMax.
+Require int.ComputerDivision.
 Definition unit  := unit.
 
 Parameter qtmark : Type.
@@ -15,110 +19,11 @@ Parameter old: forall (a:Type), a -> a.
 
 Implicit Arguments old.
 
-Axiom Abs_le : forall (x:Z) (y:Z), ((Zabs x) <= y)%Z <-> (((-y)%Z <= x)%Z /\
-  (x <= y)%Z).
-
-Parameter map : forall (a:Type) (b:Type), Type.
-
-Parameter get: forall (a:Type) (b:Type), (map a b) -> a -> b.
-
-Implicit Arguments get.
-
-Parameter set: forall (a:Type) (b:Type), (map a b) -> a -> b -> (map a b).
-
-Implicit Arguments set.
-
-Axiom Select_eq : forall (a:Type) (b:Type), forall (m:(map a b)),
-  forall (a1:a) (a2:a), forall (b1:b), (a1 = a2) -> ((get (set m a1 b1)
-  a2) = b1).
-
-Axiom Select_neq : forall (a:Type) (b:Type), forall (m:(map a b)),
-  forall (a1:a) (a2:a), forall (b1:b), (~ (a1 = a2)) -> ((get (set m a1 b1)
-  a2) = (get m a2)).
-
-Parameter const: forall (b:Type) (a:Type), b -> (map a b).
-
-Set Contextual Implicit.
-Implicit Arguments const.
-Unset Contextual Implicit.
-
-Axiom Const : forall (b:Type) (a:Type), forall (b1:b) (a1:a), ((get (const(
-  b1):(map a b)) a1) = b1).
-
-Definition left(i:Z): Z := ((2%Z * i)%Z + 1%Z)%Z.
-
-Definition right(i:Z): Z := ((2%Z * i)%Z + 2%Z)%Z.
-
-Definition parent(i:Z): Z := (ZOdiv (i - 1%Z)%Z 2%Z).
-
-Axiom Parent_inf : forall (i:Z), (0%Z <  i)%Z -> ((parent i) <  i)%Z.
-
-Axiom Left_sup : forall (i:Z), (0%Z <= i)%Z -> (i <  (left i))%Z.
-
-Axiom Right_sup : forall (i:Z), (0%Z <= i)%Z -> (i <  (right i))%Z.
-
-Axiom Parent_right : forall (i:Z), (0%Z <= i)%Z -> ((parent (right i)) = i).
-
-Axiom Parent_left : forall (i:Z), (0%Z <= i)%Z -> ((parent (left i)) = i).
-
-Axiom Inf_parent : forall (i:Z) (j:Z), ((0%Z <  j)%Z /\
-  (j <= (right i))%Z) -> ((parent j) <= i)%Z.
-
-Axiom Child_parent : forall (i:Z), (0%Z <  i)%Z ->
-  ((i = (left (parent i))) \/ (i = (right (parent i)))).
-
-Axiom Parent_pos : forall (j:Z), (0%Z <  j)%Z -> (0%Z <= (parent j))%Z.
-
-Definition parentChild(i:Z) (j:Z): Prop := ((0%Z <= i)%Z /\ (i <  j)%Z) ->
-  ((j = (left i)) \/ (j = (right i))).
-
-Definition map1  := (map Z Z).
-
-Definition logic_heap  := ((map Z Z)* Z)%type.
-
-Definition is_heap_array(a:(map Z Z)) (idx:Z) (sz:Z): Prop :=
-  (0%Z <= idx)%Z -> forall (i:Z) (j:Z), (((idx <= i)%Z /\ (i <  j)%Z) /\
-  (j <  sz)%Z) -> ((parentChild i j) -> ((get a i) <= (get a j))%Z).
-
-Definition is_heap(h:((map Z Z)* Z)%type): Prop :=
-  match h with
-  | (a, sz) => (0%Z <= sz)%Z /\ (is_heap_array a 0%Z sz)
+Definition implb(x:bool) (y:bool): bool := match (x,
+  y) with
+  | (true, false) => false
+  | (_, _) => true
   end.
-
-Axiom Is_heap_when_no_element : forall (a:(map Z Z)) (idx:Z) (n:Z),
-  ((0%Z <= n)%Z /\ (n <= idx)%Z) -> (is_heap_array a idx n).
-
-Axiom Is_heap_sub : forall (a:(map Z Z)) (i:Z) (n:Z), (is_heap_array a i
-  n) -> forall (j:Z), ((i <= j)%Z /\ (j <= n)%Z) -> (is_heap_array a i j).
-
-Axiom Is_heap_sub2 : forall (a:(map Z Z)) (n:Z), (is_heap_array a 0%Z n) ->
-  forall (j:Z), ((0%Z <= j)%Z /\ (j <= n)%Z) -> (is_heap_array a j n).
-
-Axiom Is_heap_when_node_modified : forall (a:(map Z Z)) (n:Z) (e:Z) (idx:Z)
-  (i:Z), ((0%Z <= i)%Z /\ (i <  n)%Z) -> ((is_heap_array a idx n) ->
-  (((0%Z <  i)%Z -> ((get a (parent i)) <= e)%Z) -> ((((left i) <  n)%Z ->
-  (e <= (get a (left i)))%Z) -> ((((right i) <  n)%Z -> (e <= (get a
-  (right i)))%Z) -> (is_heap_array (set a i e) idx n))))).
-
-Axiom Is_heap_add_last : forall (a:(map Z Z)) (n:Z) (e:Z), (0%Z <  n)%Z ->
-  (((is_heap_array a 0%Z n) /\ ((get a (parent n)) <= e)%Z) ->
-  (is_heap_array (set a n e) 0%Z (n + 1%Z)%Z)).
-
-Axiom Parent_inf_el : forall (a:(map Z Z)) (n:Z), (is_heap_array a 0%Z n) ->
-  forall (j:Z), ((0%Z <  j)%Z /\ (j <  n)%Z) -> ((get a (parent j)) <= (get a
-  j))%Z.
-
-Axiom Left_sup_el : forall (a:(map Z Z)) (n:Z), (is_heap_array a 0%Z n) ->
-  forall (j:Z), ((0%Z <= j)%Z /\ (j <  n)%Z) -> (((left j) <  n)%Z -> ((get a
-  j) <= (get a (left j)))%Z).
-
-Axiom Right_sup_el : forall (a:(map Z Z)) (n:Z), (is_heap_array a 0%Z n) ->
-  forall (j:Z), ((0%Z <= j)%Z /\ (j <  n)%Z) -> (((right j) <  n)%Z ->
-  ((get a j) <= (get a (right j)))%Z).
-
-Axiom Is_heap_relation : forall (a:(map Z Z)) (n:Z), (0%Z <  n)%Z ->
-  ((is_heap_array a 0%Z n) -> forall (j:Z), (0%Z <= j)%Z -> ((j <  n)%Z ->
-  ((get a 0%Z) <= (get a j))%Z)).
 
 Parameter bag : forall (a:Type), Type.
 
@@ -208,28 +113,6 @@ Axiom Card_union : forall (a:Type), forall (x:(bag a)) (y:(bag a)),
 Axiom Card_zero_empty : forall (a:Type), forall (x:(bag a)),
   ((card x) = 0%Z) -> (x = (empty_bag:(bag a))).
 
-Axiom Max_is_ge : forall (x:Z) (y:Z), (x <= (Zmax x y))%Z /\
-  (y <= (Zmax x y))%Z.
-
-Axiom Max_is_some : forall (x:Z) (y:Z), ((Zmax x y) = x) \/ ((Zmax x y) = y).
-
-Axiom Min_is_le : forall (x:Z) (y:Z), ((Zmin x y) <= x)%Z /\
-  ((Zmin x y) <= y)%Z.
-
-Axiom Min_is_some : forall (x:Z) (y:Z), ((Zmin x y) = x) \/ ((Zmin x y) = y).
-
-Axiom Max_x : forall (x:Z) (y:Z), (y <= x)%Z -> ((Zmax x y) = x).
-
-Axiom Max_y : forall (x:Z) (y:Z), (x <= y)%Z -> ((Zmax x y) = y).
-
-Axiom Min_x : forall (x:Z) (y:Z), (x <= y)%Z -> ((Zmin x y) = x).
-
-Axiom Min_y : forall (x:Z) (y:Z), (y <= x)%Z -> ((Zmin x y) = y).
-
-Axiom Max_sym : forall (x:Z) (y:Z), (y <= x)%Z -> ((Zmax x y) = (Zmax y x)).
-
-Axiom Min_sym : forall (x:Z) (y:Z), (y <= x)%Z -> ((Zmin x y) = (Zmin y x)).
-
 Parameter diff: forall (a:Type), (bag a) -> (bag a) -> (bag a).
 
 Implicit Arguments diff.
@@ -251,6 +134,33 @@ Axiom Diff_comm : forall (a:Type), forall (b:(bag a)) (b1:(bag a)) (b2:(bag
 
 Axiom Add_diff : forall (a:Type), forall (b:(bag a)) (x:a), (0%Z <  (nb_occ x
   b))%Z -> ((add x (diff b (singleton x))) = b).
+
+Parameter map : forall (a:Type) (b:Type), Type.
+
+Parameter get: forall (a:Type) (b:Type), (map a b) -> a -> b.
+
+Implicit Arguments get.
+
+Parameter set: forall (a:Type) (b:Type), (map a b) -> a -> b -> (map a b).
+
+Implicit Arguments set.
+
+Axiom Select_eq : forall (a:Type) (b:Type), forall (m:(map a b)),
+  forall (a1:a) (a2:a), forall (b1:b), (a1 = a2) -> ((get (set m a1 b1)
+  a2) = b1).
+
+Axiom Select_neq : forall (a:Type) (b:Type), forall (m:(map a b)),
+  forall (a1:a) (a2:a), forall (b1:b), (~ (a1 = a2)) -> ((get (set m a1 b1)
+  a2) = (get m a2)).
+
+Parameter const: forall (b:Type) (a:Type), b -> (map a b).
+
+Set Contextual Implicit.
+Implicit Arguments const.
+Unset Contextual Implicit.
+
+Axiom Const : forall (b:Type) (a:Type), forall (b1:b) (a1:a), ((get (const(
+  b1):(map a b)) a1) = b1).
 
 Definition array (a:Type) := (map Z a).
 
@@ -296,6 +206,81 @@ Axiom Elements_set_inside2 : forall (a:Type), forall (a1:(map Z a)) (i:Z)
   (j:Z) (n:Z) (e:a), ((i <= j)%Z /\ (j <  n)%Z) -> ((elements (set a1 j e) i
   n) = (add e (diff (elements a1 i n) (singleton (get a1 j))))).
 
+Definition left1(i:Z): Z := ((2%Z * i)%Z + 1%Z)%Z.
+
+Definition right1(i:Z): Z := ((2%Z * i)%Z + 2%Z)%Z.
+
+Definition parent(i:Z): Z := (ZOdiv (i - 1%Z)%Z 2%Z).
+
+Axiom Parent_inf : forall (i:Z), (0%Z <  i)%Z -> ((parent i) <  i)%Z.
+
+Axiom Left_sup : forall (i:Z), (0%Z <= i)%Z -> (i <  (left1 i))%Z.
+
+Axiom Right_sup : forall (i:Z), (0%Z <= i)%Z -> (i <  (right1 i))%Z.
+
+Axiom Parent_right : forall (i:Z), (0%Z <= i)%Z -> ((parent (right1 i)) = i).
+
+Axiom Parent_left : forall (i:Z), (0%Z <= i)%Z -> ((parent (left1 i)) = i).
+
+Axiom Inf_parent : forall (i:Z) (j:Z), ((0%Z <  j)%Z /\
+  (j <= (right1 i))%Z) -> ((parent j) <= i)%Z.
+
+Axiom Child_parent : forall (i:Z), (0%Z <  i)%Z ->
+  ((i = (left1 (parent i))) \/ (i = (right1 (parent i)))).
+
+Axiom Parent_pos : forall (j:Z), (0%Z <  j)%Z -> (0%Z <= (parent j))%Z.
+
+Definition parentChild(i:Z) (j:Z): Prop := ((0%Z <= i)%Z /\ (i <  j)%Z) ->
+  ((j = (left1 i)) \/ (j = (right1 i))).
+
+Definition map1  := (map Z Z).
+
+Definition logic_heap  := ((map Z Z)* Z)%type.
+
+Definition is_heap_array(a:(map Z Z)) (idx:Z) (sz:Z): Prop :=
+  (0%Z <= idx)%Z -> forall (i:Z) (j:Z), (((idx <= i)%Z /\ (i <  j)%Z) /\
+  (j <  sz)%Z) -> ((parentChild i j) -> ((get a i) <= (get a j))%Z).
+
+Definition is_heap(h:((map Z Z)* Z)%type): Prop :=
+  match h with
+  | (a, sz) => (0%Z <= sz)%Z /\ (is_heap_array a 0%Z sz)
+  end.
+
+Axiom Is_heap_when_no_element : forall (a:(map Z Z)) (idx:Z) (n:Z),
+  ((0%Z <= n)%Z /\ (n <= idx)%Z) -> (is_heap_array a idx n).
+
+Axiom Is_heap_sub : forall (a:(map Z Z)) (i:Z) (n:Z), (is_heap_array a i
+  n) -> forall (j:Z), ((i <= j)%Z /\ (j <= n)%Z) -> (is_heap_array a i j).
+
+Axiom Is_heap_sub2 : forall (a:(map Z Z)) (n:Z), (is_heap_array a 0%Z n) ->
+  forall (j:Z), ((0%Z <= j)%Z /\ (j <= n)%Z) -> (is_heap_array a j n).
+
+Axiom Is_heap_when_node_modified : forall (a:(map Z Z)) (n:Z) (e:Z) (idx:Z)
+  (i:Z), ((0%Z <= i)%Z /\ (i <  n)%Z) -> ((is_heap_array a idx n) ->
+  (((0%Z <  i)%Z -> ((get a (parent i)) <= e)%Z) -> ((((left1 i) <  n)%Z ->
+  (e <= (get a (left1 i)))%Z) -> ((((right1 i) <  n)%Z -> (e <= (get a
+  (right1 i)))%Z) -> (is_heap_array (set a i e) idx n))))).
+
+Axiom Is_heap_add_last : forall (a:(map Z Z)) (n:Z) (e:Z), (0%Z <  n)%Z ->
+  (((is_heap_array a 0%Z n) /\ ((get a (parent n)) <= e)%Z) ->
+  (is_heap_array (set a n e) 0%Z (n + 1%Z)%Z)).
+
+Axiom Parent_inf_el : forall (a:(map Z Z)) (n:Z), (is_heap_array a 0%Z n) ->
+  forall (j:Z), ((0%Z <  j)%Z /\ (j <  n)%Z) -> ((get a (parent j)) <= (get a
+  j))%Z.
+
+Axiom Left_sup_el : forall (a:(map Z Z)) (n:Z), (is_heap_array a 0%Z n) ->
+  forall (j:Z), ((0%Z <= j)%Z /\ (j <  n)%Z) -> (((left1 j) <  n)%Z ->
+  ((get a j) <= (get a (left1 j)))%Z).
+
+Axiom Right_sup_el : forall (a:(map Z Z)) (n:Z), (is_heap_array a 0%Z n) ->
+  forall (j:Z), ((0%Z <= j)%Z /\ (j <  n)%Z) -> (((right1 j) <  n)%Z ->
+  ((get a j) <= (get a (right1 j)))%Z).
+
+Axiom Is_heap_relation : forall (a:(map Z Z)) (n:Z), (0%Z <  n)%Z ->
+  ((is_heap_array a 0%Z n) -> forall (j:Z), (0%Z <= j)%Z -> ((j <  n)%Z ->
+  ((get a 0%Z) <= (get a j))%Z)).
+
 Definition model(h:((map Z Z)* Z)%type): (bag Z) :=
   match h with
   | (a, n) => (elements a 0%Z n)
@@ -307,9 +292,9 @@ Axiom Model_empty : forall (a:(map Z Z)), ((model (a, 0%Z)) = (empty_bag:(bag
 Axiom Model_singleton : forall (a:(map Z Z)), ((model (a,
   1%Z)) = (singleton (get a 0%Z))).
 
-Axiom Model_set : forall (a:(map Z Z)) (aqt:(map Z Z)) (v:Z) (i:Z) (n:Z),
-  ((0%Z <= i)%Z /\ (i <  n)%Z) -> ((aqt = (set a i v)) -> ((add (get a i)
-  (model (aqt, n))) = (add v (model (a, n))))).
+Axiom Model_set : forall (a:(map Z Z)) (v:Z) (i:Z) (n:Z), ((0%Z <= i)%Z /\
+  (i <  n)%Z) -> ((add (get a i) (model ((set a i v), n))) = (add v (model (
+  a, n)))).
 
 Axiom Model_add_last : forall (a:(map Z Z)) (n:Z), (0%Z <= n)%Z -> ((model (
   a, (n + 1%Z)%Z)) = (add (get a n) (model (a, n)))).
@@ -354,7 +339,7 @@ assert (h:i=1 \/ i> 1) by omega.
   rewrite Elements_add; [idtac | omega].
   rewrite Min_bag_union1 with (a:= (get a (i - 1))) (y:= (elements a 0 (i - 1))); auto.
   rewrite <- (H_induc (i-1)).
-  rewrite Min_y; auto.
+  rewrite Zmin_r; auto.
   apply Is_heap_relation with (n:=i); auto with *.
   split.
   omega.

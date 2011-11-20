@@ -2,6 +2,9 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import ZArith.
 Require Import Rbase.
+Require int.Int.
+Require int.Abs.
+Require int.EuclideanDivision.
 Definition unit  := unit.
 
 Parameter qtmark : Type.
@@ -14,6 +17,12 @@ Parameter old: forall (a:Type), a -> a.
 
 Implicit Arguments old.
 
+Definition implb(x:bool) (y:bool): bool := match (x,
+  y) with
+  | (true, false) => false
+  | (_, _) => true
+  end.
+
 Parameter fib: Z -> Z.
 
 
@@ -23,28 +32,6 @@ Axiom fib1 : ((fib 1%Z) = 1%Z).
 
 Axiom fibn : forall (n:Z), (2%Z <= n)%Z ->
   ((fib n) = ((fib (n - 1%Z)%Z) + (fib (n - 2%Z)%Z))%Z).
-
-Axiom Abs_le : forall (x:Z) (y:Z), ((Zabs x) <= y)%Z <-> (((-y)%Z <= x)%Z /\
-  (x <= y)%Z).
-
-Parameter div: Z -> Z -> Z.
-
-
-Parameter mod1: Z -> Z -> Z.
-
-
-Axiom Div_mod : forall (x:Z) (y:Z), (~ (y = 0%Z)) -> (x = ((y * (div x
-  y))%Z + (mod1 x y))%Z).
-
-Axiom Div_bound : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (0%Z <  y)%Z) ->
-  ((0%Z <= (div x y))%Z /\ ((div x y) <= x)%Z).
-
-Axiom Mod_bound : forall (x:Z) (y:Z), (~ (y = 0%Z)) -> ((0%Z <= (mod1 x
-  y))%Z /\ ((mod1 x y) <  (Zabs y))%Z).
-
-Axiom Mod_1 : forall (x:Z), ((mod1 x 1%Z) = 0%Z).
-
-Axiom Div_1 : forall (x:Z), ((div x 1%Z) = x).
 
 Inductive t  :=
   | mk_t : Z -> Z -> Z -> Z -> t .
@@ -88,22 +75,24 @@ Axiom Power_mult : forall (x:t) (n:Z) (m:Z), (0%Z <= n)%Z -> ((0%Z <= m)%Z ->
   ((power x (n * m)%Z) = (power (power x n) m))).
 
 (* YOU MAY EDIT THE CONTEXT BELOW *)
-
 (* DO NOT EDIT BELOW *)
 
 Theorem WP_parameter_logfib : forall (n:Z), (0%Z <= n)%Z -> ((~ (n = 0%Z)) ->
-  ((((0%Z <= n)%Z /\ ((div n 2%Z) <  n)%Z) /\ (0%Z <= (div n 2%Z))%Z) ->
-  forall (result:Z) (result1:Z), ((power (mk_t 1%Z 1%Z 1%Z 0%Z) (div n
-  2%Z)) = (mk_t (result + result1)%Z result1 result1 result)) -> ((((mod1 n
-  2%Z) = 0%Z) -> match (((result * result)%Z + (result1 * result1)%Z)%Z,
+  ((((0%Z <= n)%Z /\ ((int.EuclideanDivision.div n 2%Z) <  n)%Z) /\
+  (0%Z <= (int.EuclideanDivision.div n 2%Z))%Z) -> forall (result:Z)
+  (result1:Z), ((power (mk_t 1%Z 1%Z 1%Z 0%Z) (int.EuclideanDivision.div n
+  2%Z)) = (mk_t (result + result1)%Z result1 result1 result)) ->
+  ((((int.EuclideanDivision.mod1 n 2%Z) = 0%Z) -> match (
+  ((result * result)%Z + (result1 * result1)%Z)%Z,
   (result1 * (result + (result + result1)%Z)%Z)%Z) with
   | (a, b) => ((power (mk_t 1%Z 1%Z 1%Z 0%Z) n) = (mk_t (a + b)%Z b b a))
-  end) /\ ((~ ((mod1 n 2%Z) = 0%Z)) -> match (
+  end) /\ ((~ ((int.EuclideanDivision.mod1 n 2%Z) = 0%Z)) -> match (
   (result1 * (result + (result + result1)%Z)%Z)%Z,
   (((result + result1)%Z * (result + result1)%Z)%Z + (result1 * result1)%Z)%Z) with
   | (a, b) => ((power (mk_t 1%Z 1%Z 1%Z 0%Z) n) = (mk_t (a + b)%Z b b a))
   end)))).
 (* YOU MAY EDIT THE PROOF BELOW *)
+Import EuclideanDivision.
 intros.
 assert (h: (2 <> 0)%Z) by omega.
 generalize (Div_mod n 2 h)%Z.
