@@ -129,6 +129,7 @@ let call_on_file ~command ?(timelimit=0) ?(memlimit=0)
     | "t" -> on_timelimit := true; string_of_int timelimit
     | "m" -> string_of_int memlimit
     | "b" -> string_of_int (memlimit * 1024)
+    | "l" -> Config.libdir
     | _ -> failwith "unknown format specifier, use %%f, %%t, %%m or %%b"
   in
   let subst s =
