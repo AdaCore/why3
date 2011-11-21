@@ -39,6 +39,7 @@ type t =
       mutable intro_premises : bool;
       mutable show_labels : bool;
       mutable show_locs : bool;
+      mutable show_time_limit : bool;
       mutable saving_policy : int;
       (** 0 = always, 1 = never, 2 = ask *)
       mutable premise_color : string;
@@ -59,6 +60,7 @@ type ide = {
   ide_intro_premises : bool;
   ide_show_labels : bool;
   ide_show_locs : bool;
+  ide_show_time_limit : bool;
   ide_saving_policy : int;
   ide_premise_color : string;
   ide_goal_color : string;
@@ -75,6 +77,7 @@ let default_ide =
     ide_intro_premises = true;
     ide_show_labels = false;
     ide_show_locs = false;
+    ide_show_time_limit = false;
     ide_saving_policy = 0;
     ide_premise_color = "chartreuse";
     ide_goal_color = "gold";
@@ -99,6 +102,8 @@ let load_ide section =
       get_bool section ~default:default_ide.ide_show_labels "print_labels";
     ide_show_locs =
       get_bool section ~default:default_ide.ide_show_locs "print_locs";
+    ide_show_time_limit =
+      get_bool section ~default:default_ide.ide_show_time_limit "print_time_limit";
     ide_saving_policy =
       get_int section ~default:default_ide.ide_saving_policy "saving_policy";
     ide_premise_color =
@@ -145,6 +150,7 @@ let load_config config =
     intro_premises= ide.ide_intro_premises ;
     show_labels   = ide.ide_show_labels ;
     show_locs     = ide.ide_show_locs ;
+    show_time_limit = ide.ide_show_time_limit;
     saving_policy = ide.ide_saving_policy ;
     premise_color = ide.ide_premise_color;
     goal_color = ide.ide_goal_color;
@@ -180,6 +186,7 @@ let save_config t =
   let ide = set_bool ide "intro_premises" t.intro_premises in
   let ide = set_bool ide "print_labels" t.show_labels in
   let ide = set_bool ide "print_locs" t.show_locs in
+  let ide = set_bool ide "print_time_limit" t.show_time_limit in
   let ide = set_int ide "saving_policy" t.saving_policy in
   let ide = set_string ide "premise_color" t.premise_color in
   let ide = set_string ide "goal_color" t.goal_color in
@@ -511,6 +518,17 @@ let preferences c =
       (fun () ->
          c.show_locs <- not c.show_locs;
          set_locs_flag c.show_locs)
+  in
+  let showtimelimit =
+    GButton.check_button
+      ~label:"show time limit for each proof"
+      ~packing:display_options_box#add ()
+      ~active:c.show_time_limit
+  in
+  let (_ : GtkSignal.id) =
+    showtimelimit#connect#toggled ~callback:
+      (fun () ->
+         c.show_time_limit <- not c.show_time_limit)
   in
   let set_saving_policy n () = c.saving_policy <- n in
 (*
