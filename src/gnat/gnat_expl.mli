@@ -1,15 +1,14 @@
 type reason =
+   | VC_Division_Check
+   | VC_Index_Check
    | VC_Overflow_Check
    | VC_Range_Check
-   | VC_Array_Bounds_Check
-   | VC_Division_By_Zero
    | VC_Precondition
    | VC_Postcondition
    | VC_Loop_Invariant
    | VC_Loop_Invariant_Init
    | VC_Loop_Invariant_Preserv
    | VC_Assert
-   | VC_Subtype_Decl
 
 type expl
 
