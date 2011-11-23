@@ -2,6 +2,12 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import ZArith.
 Require Import Rbase.
+Definition implb(x:bool) (y:bool): bool := match (x,
+  y) with
+  | (true, false) => false
+  | (_, _) => true
+  end.
+
 Parameter pow2: Z -> Z.
 
 
@@ -211,13 +217,13 @@ Axiom Nth_bw_not : forall (v:bv) (n:Z), ((0%Z <= n)%Z /\ (n <  size)%Z) ->
 Parameter lsr: bv -> Z -> bv.
 
 
-Axiom lsr_nth_low : forall (b:bv) (n:Z) (s:Z), ((0%Z <= n)%Z /\
-  (n <  size)%Z) -> ((0%Z <= s)%Z -> (((n + s)%Z <  size)%Z -> ((nth (lsr b
-  s) n) = (nth b (n + s)%Z)))).
+Axiom lsr_nth_low : forall (b:bv) (n:Z) (s:Z), (((0%Z <= n)%Z /\
+  (n <  size)%Z) /\ (((0%Z <= s)%Z /\ (s <  size)%Z) /\
+  ((n + s)%Z <  size)%Z)) -> ((nth (lsr b s) n) = (nth b (n + s)%Z)).
 
-Axiom lsr_nth_high : forall (b:bv) (n:Z) (s:Z), ((0%Z <= n)%Z /\
-  (n <  size)%Z) -> ((0%Z <= s)%Z -> ((size <= (n + s)%Z)%Z -> ((nth (lsr b
-  s) n) = false))).
+Axiom lsr_nth_high : forall (b:bv) (n:Z) (s:Z), (((0%Z <= n)%Z /\
+  (n <  size)%Z) /\ (((0%Z <= s)%Z /\ (s <  size)%Z) /\
+  (size <= (n + s)%Z)%Z)) -> ((nth (lsr b s) n) = false).
 
 Parameter asr: bv -> Z -> bv.
 

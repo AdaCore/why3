@@ -222,8 +222,8 @@ Axiom lsr_nth_low : forall (b:bv) (n:Z) (s:Z), (((0%Z <= n)%Z /\
   ((n + s)%Z <  size)%Z)) -> ((nth (lsr b s) n) = (nth b (n + s)%Z)).
 
 Axiom lsr_nth_high : forall (b:bv) (n:Z) (s:Z), (((0%Z <= n)%Z /\
-  (n <  size)%Z) /\ ((0%Z <= s)%Z /\ (size <= (n + s)%Z)%Z)) -> ((nth (lsr b
-  s) n) = false).
+  (n <  size)%Z) /\ (((0%Z <= s)%Z /\ (s <  size)%Z) /\
+  (size <= (n + s)%Z)%Z)) -> ((nth (lsr b s) n) = false).
 
 Parameter asr: bv -> Z -> bv.
 
@@ -274,22 +274,23 @@ Axiom to_nat_of_one : forall (b:bv) (i:Z) (j:Z), ((i <= j)%Z /\
   k) = true)) -> ((to_nat_sub b j
   i) = ((pow2 ((j - i)%Z + 1%Z)%Z) - 1%Z)%Z)).
 
-Axiom to_nat_sub_footprint : forall (b1:bv) (b2:bv) (j:Z) (i:Z),
-  (forall (k:Z), ((i <= k)%Z /\ (k <= j)%Z) -> ((nth b1 k) = (nth b2 k))) ->
-  ((to_nat_sub b1 j i) = (to_nat_sub b2 j i)).
-
 (* YOU MAY EDIT THE CONTEXT BELOW *)
 Open Scope Z_scope.
 (* DO NOT EDIT BELOW *)
 
-Theorem lsr_to_nat_sub : forall (b:bv) (s:Z), ((0%Z <= s)%Z /\
-  (s <  size)%Z) -> ((to_nat_sub (lsr b s) (size - 1%Z)%Z
-  0%Z) = (to_nat_sub b ((size - 1%Z)%Z - s)%Z 0%Z)).
+Theorem to_nat_sub_footprint : forall (b1:bv) (b2:bv) (j:Z) (i:Z),
+  ((i <= j)%Z /\ (0%Z <= i)%Z) -> ((forall (k:Z), ((i <= k)%Z /\
+  (k <= j)%Z) -> ((nth b1 k) = (nth b2 k))) -> ((to_nat_sub b1 j
+  i) = (to_nat_sub b2 j i))).
 (* YOU MAY EDIT THE PROOF BELOW *)
-intros.
-rewrite to_nat_of_zero2 with (i:=s).
-2: auto with *.
-
+intros b1 b2 j i H.
+apply Zlt_lower_bound_ind with (z:=i) (P:= fun j => (forall k : Z, i <= k <= j -> nth b1 k = nth b2 k) ->
+to_nat_sub b1 j i = to_nat_sub b2 j i);auto with *.
+intros x Hind Hxi.
+assert (h:(i = x)\/ (i<x)) by omega.
+destruct h.
+subst x;auto.
+intro.
 
 
 

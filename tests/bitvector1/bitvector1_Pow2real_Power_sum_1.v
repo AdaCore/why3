@@ -18,12 +18,24 @@ Axiom Power_1 : ((pow2 1%Z) = 2%R).
 Axiom Power_neg1 : ((pow2 (-1%Z)%Z) = (05 / 10)%R).
 
 (* YOU MAY EDIT THE CONTEXT BELOW *)
-
+Open Scope Z_scope.
 (* DO NOT EDIT BELOW *)
 
 Theorem Power_sum : forall (n:Z) (m:Z),
   ((pow2 (n + m)%Z) = ((pow2 n) * (pow2 m))%R).
 (* YOU MAY EDIT THE PROOF BELOW *)
+intros n m.
+elim n.
+replace (0 + m) with m by omega.
+rewrite Power_0.
+rewrite Rmult_1_l. 
+auto.
+intro.
+elim p.
+intros p0 Hp0.
+3: replace (1+m) with (m+1) by omega.
+3:rewrite Power_1.
+3:apply Power_s.
 
 
 Qed.
