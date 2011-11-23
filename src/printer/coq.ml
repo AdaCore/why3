@@ -696,6 +696,9 @@ let realized_theories = [
   ["real"; "MinMax"];
   ["real"; "Real"];
   ["real"; "Square"];
+  ["floating_point"; "Rounding"];
+  ["floating_point"; "Single"];
+  ["floating_point"; "Double"];
 ]
 
 let print_task _env pr thpr realize ?old fmt task =
