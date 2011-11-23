@@ -20,9 +20,22 @@ Theorem Power_sum : forall (n:Z) (m:Z), ((0%Z <= n)%Z /\ (0%Z <= m)%Z) ->
   ((pow2 (n + m)%Z) = ((pow2 n) * (pow2 m))%Z).
 (* YOU MAY EDIT THE PROOF BELOW *)
 intros n m Hmn.
+cut (0 <= m); auto with zarith.
+apply Z_lt_induction with
+  (P:= fun m => 
+      0 <= m -> pow2 (n + m) = pow2 n * pow2 m);
+  auto with zarith.
+intros x Hind Hxpos.
+assert (h:(x = 0 \/ x > 0)) by omega.
+destruct h.
+subst x.
+rewrite Power_0.
+
+
+(*
+auto with zarith.
 elim n.
 replace (0+m) with m by omega.
-rewrite Power_0.
 replace (1* pow2 m) with (pow2 m) by omega.
 auto.
 intro.
@@ -37,7 +50,7 @@ replace (2 * Zpos p0) with (Zpos p0 * 2) by omega.
 rewrite<-Zplus_diag_eq_mult_2.
 rewrite Power_s.
 
-
+*)
 
 
 Qed.
