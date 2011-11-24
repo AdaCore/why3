@@ -100,36 +100,60 @@ let prove_task t expl n =
                         ~timelimit:Gnat_config.timeout
                         Gnat_config.altergo_driver t () in
    let res = Call_provers.wait_on_call pr_call () in
-   match res.Call_provers.pr_answer with
-   | Call_provers.Valid -> true
-   | Call_provers.Failure s ->
-         if Gnat_config.verbose then begin
-            Format.eprintf "An error occured when calling alt-ergo: ";
-            Format.eprintf "%s" s;
-            Format.eprintf "@.";
-         end;
-         false
-   | Call_provers.HighFailure ->
-         if Gnat_config.verbose then begin
-            Format.eprintf "An error occured when calling alt-ergo@."
-         end;
-         false
-   | _ ->
-         false
-
-exception Not_Proven
+   res.Call_provers.pr_answer
 
 let report =
-   let print fmt b expl =
-      Format.fprintf fmt "%a@." (Gnat_expl.print_expl b) expl in
-   fun fmt b expl ->
-      if not b || Gnat_config.report then print Format.std_formatter b expl;
-      print fmt b expl
+   let print fmt ?(endline=true) b expl =
+      if endline then
+         Format.fprintf fmt "%a@." (Gnat_expl.print_expl b) expl
+      else
+         Format.fprintf fmt "%a" (Gnat_expl.print_expl b) expl
+   in
+   let report_failure result =
+      match result with
+      | Call_provers.Failure s ->
+            if Gnat_config.verbose then begin
+               Format.eprintf "An error occured when calling alt-ergo: ";
+               Format.eprintf "%s" s;
+               Format.eprintf "@.";
+            end
+      | Call_provers.HighFailure ->
+            Format.eprintf "An error occured when calling alt-ergo@."
+      | _ -> ()
+   in
+   fun fmt result expl ->
+      (* always print to output file *)
+      print fmt (result = Call_provers.Valid) expl;
+      (* if there is a problem, always report something to stderr *)
+      report_failure result;
+      (* now print (possibly detailed) messages to stdout *)
+      let print = print Format.std_formatter in
+      if result = Call_provers.Valid then begin
+         match Gnat_config.report with
+         | (Gnat_config.Verbose | Gnat_config.Detailed) -> print true expl
+         | _ -> ()
+      end else
+         if Gnat_config.report = Gnat_config.Detailed then begin
+            print ~endline:false false expl;
+            Format.printf " (%a)@." Call_provers.print_prover_answer result
+         end else print false expl
+
+exception Not_Proven of Call_provers.prover_answer
+
+let prove_objective fmt expl tl =
+   try
+      let cnt = ref 0 in
+      List.iter (fun t ->
+         incr cnt;
+         let result = prove_task t expl !cnt in
+         if result <> Call_provers.Valid then raise (Not_Proven result)) tl;
+      report fmt Call_provers.Valid expl
+   with Not_Proven result -> report fmt result expl
 
 let _ =
    if Gnat_config.report_mode then begin
       let filter =
-         if Gnat_config.report then (fun _ -> true)
+         if not (Gnat_config.report = Gnat_config.Fail) then (fun _ -> true)
          else (fun s -> Gnat_util.ends_with s "not proved")
       in
       Gnat_util.cat filter Gnat_config.result_file;
@@ -144,17 +168,7 @@ let _ =
             !nb_po !nb_vcs;
       let outbuf = Buffer.create 1024 in
       let fmt = Format.formatter_of_buffer outbuf in
-      Gnat_expl.MExpl.iter
-         (fun expl tl ->
-            try
-               let cnt = ref 0 in
-               List.iter (fun t ->
-                  incr cnt;
-                  if not (prove_task t expl !cnt) then raise Not_Proven) tl;
-               report fmt true expl
-            with Not_Proven ->
-               report fmt false expl)
-         !expl_map;
+      Gnat_expl.MExpl.iter (prove_objective fmt) !expl_map;
       Gnat_util.output_buffer outbuf Gnat_config.result_file;
       Sysutil.remove_clean_up ()
     with e when not (Debug.test_flag Debug.stack_trace) ->

@@ -15,7 +15,13 @@ val timeout : int
 val verbose : bool
 (* true if option -v/--verbose was present *)
 
-val report : bool
+type report_mode = Fail | Verbose | Detailed
+(* In mode fail, only print failed proof objectives.
+   In mode verbose, print all proof objectives.
+   In mode detailed, additionally print if VC was timeout or if prover stopped.
+   *)
+
+val report : report_mode
 (* true if option --report was present *)
 
 val debug : bool

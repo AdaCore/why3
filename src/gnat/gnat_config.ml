@@ -1,9 +1,11 @@
 open Why3
 
+type report_mode = Fail | Verbose | Detailed
+
 let opt_verbose = ref false
 let opt_timeout = ref 10
 let opt_steps = ref 0
-let opt_report = ref false
+let opt_report = ref Fail
 let opt_debug = ref false
 let opt_filename : string option ref = ref None
 
@@ -12,6 +14,16 @@ let set_filename s =
       opt_filename := Some s
    else
       Gnat_util.abort_with_message "Only one file name should be given."
+
+let set_report s =
+   if s = "detailed" then
+      opt_report := Detailed
+   else if s = "all" then
+      opt_report := Verbose
+   else if s <> "fail" then
+      Gnat_util.abort_with_message
+        "argument for option --report should be one of (fail|all|detailed)."
+
 
 let usage_msg =
   "Usage: gnatwhy3 [options] file"
@@ -29,8 +41,8 @@ let options = Arg.align [
           "Set the maximal number of proof steps";
    "--steps", Arg.Set_int opt_steps,
           "Set the maximal number of proof steps";
-   "--report", Arg.Set opt_report,
-          "Enable report mode, report on all VCs, even proven ones";
+   "--report", Arg.String set_report,
+          "set report mode, one of (fail | all | detailed), default is fail";
    "--debug", Arg.Set opt_debug,
           "Enable debug mode";
 ]
