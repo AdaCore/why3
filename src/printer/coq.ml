@@ -683,23 +683,9 @@ let init_printer th =
   Sid.iter (fun id -> ignore (id_unique pr id)) th.Theory.th_local;
   pr
 
-(* TODO: change into a less intrusive coding, e.g. a driver meta, and
-   make the lookup a bit more efficient along the way *)
-let realized_theories = [
-  ["int"; "Abs"];
-  ["int"; "ComputerDivision"];
-  ["int"; "EuclideanDivision"];
-  ["int"; "Int"];
-  ["int"; "MinMax"];
-  ["real"; "Abs"];
-  ["real"; "FromInt"];
-  ["real"; "MinMax"];
-  ["real"; "Real"];
-  ["real"; "Square"];
-  ["floating_point"; "Rounding"];
-  ["floating_point"; "Single"];
-  ["floating_point"; "Double"];
-]
+(* TODO: add a driver meta and make lookup for realized theories a bit
+   more efficient *)
+let realized_theories = Coq_config.realized_theories
 
 let print_task _env pr thpr realize ?old fmt task =
   forget_all ();

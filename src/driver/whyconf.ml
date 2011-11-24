@@ -29,10 +29,11 @@ open Rc
   - 6 driver renaming
   - 7 yices native (used for release 0.70)
   - 8 for release 0.71
+  - 9 coq realizations
 
 If a configuration doesn't contain the actual magic number we don't use it.*)
 
-let magicnumber = 8
+let magicnumber = 9
 
 exception WrongMagicNumber
 

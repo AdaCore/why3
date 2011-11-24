@@ -112,7 +112,7 @@ plugins: plugins.@OCAMLBEST@
 LIBGENERATED = src/util/rc.ml src/parser/lexer.ml \
 	       src/parser/parser.mli src/parser/parser.ml \
 	       src/driver/driver_parser.mli src/driver/driver_parser.ml \
-	       src/driver/driver_lexer.ml
+	       src/driver/driver_lexer.ml src/coq_config.ml
 
 LIB_UTIL = stdlib exn_printer debug pp loc print_tree print_number \
 	   cmdline hashweak hashcons util sysutil rc plugin
@@ -139,7 +139,7 @@ LIB_TRANSFORM = simplify_recursive_definition simplify_formula \
 LIB_PRINTER = alt_ergo why3printer smtv1 smtv2 coq simplify gappa \
 	      cvc3 yices
 
-LIBMODULES = src/config \
+LIBMODULES = src/config src/coq_config \
 	      $(addprefix src/util/, $(LIB_UTIL)) \
 	      $(addprefix src/core/, $(LIB_CORE)) \
 	      $(addprefix src/parser/, $(LIB_PARSER)) \
@@ -845,8 +845,11 @@ COQLIBS_INT = $(addprefix lib/coq/int/, $(COQLIBS_INT_FILES))
 COQLIBS_REAL_FILES = Abs FromInt MinMax Real Square
 COQLIBS_REAL = $(addprefix lib/coq/real/, $(COQLIBS_REAL_FILES))
 
-COQLIBS_FP_FILES = Rounding GenFloat Single Double
-COQLIBS_FP = $(addprefix lib/coq/floating_point/, $(COQLIBS_FP_FILES))
+ifeq (@enable_coq_fp_libs@,yes)
+COQLIBS_FP_FILES = Rounding Single Double
+COQLIBS_FP_ALL_FILES = GenFloat $(COQLIBS_FP_FILES)
+COQLIBS_FP = $(addprefix lib/coq/floating_point/, $(COQLIBS_FP_ALL_FILES))
+endif
 
 COQLIBS_FILES = $(COQLIBS_INT) $(COQLIBS_REAL) $(COQLIBS_FP)
 
@@ -856,16 +859,27 @@ COQVO = $(addsuffix .vo, $(COQLIBS_FILES))
 %.vo: %.v
 	$(COQC) -R lib/coq Why3 $<
 
+src/coq_config.ml:
+	echo "let realized_theories = [" > $@
+	for f in $(COQLIBS_INT_FILES); do echo '  ["int"; "'"$$f"'"];'; done >> $@
+	for f in $(COQLIBS_REAL_FILES); do echo '  ["real"; "'"$$f"'"];'; done >> $@
+ifeq (@enable_coq_fp_libs@,yes)
+	for f in $(COQLIBS_FP_FILES); do echo '  ["floating_point"; "'"$$f"'"];'; done >> $@
+endif
+	echo "]" >> $@
+
 all: $(COQVO)
 
 install_no_local::
 	mkdir -p $(LIBDIR)/why3/coq
 	mkdir -p $(LIBDIR)/why3/coq/int
-	mkdir -p $(LIBDIR)/why3/coq/real
-	mkdir -p $(LIBDIR)/why3/coq/floating_point
 	cp $(addsuffix .vo, $(COQLIBS_INT)) $(LIBDIR)/why3/coq/int/
+	mkdir -p $(LIBDIR)/why3/coq/real
 	cp $(addsuffix .vo, $(COQLIBS_REAL)) $(LIBDIR)/why3/coq/real/
+ifeq (@enable_coq_fp_libs@,yes)
+	mkdir -p $(LIBDIR)/why3/coq/floating_point
 	cp $(addsuffix .vo, $(COQLIBS_FP)) $(LIBDIR)/why3/coq/floating_point/
+endif
 
 install_local: $(COQVO)
 
@@ -879,6 +893,11 @@ depend: .depend.coq-libs
 clean::
 	rm -f $COQVO $(addsuffix .glob, $(COQLIBS_FILES))
 	rm -f .depend.coq-libs
+
+else
+
+src/coq_config.ml:
+	echo "let realized_theories = []" > $@
 
 endif
 

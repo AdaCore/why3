@@ -367,6 +367,8 @@ dnl AC_CHECK_PROG(OCAMLWEB,ocamlweb,ocamlweb,true)
 
 # Coq
 
+enable_coq_fp_libs=yes
+
 if test "$enable_coq_plugins" = no -a "$enable_coq_libs" = no; then
     enable_coq_support=no
     AC_MSG_WARN(coq support disabled)
@@ -383,14 +385,19 @@ else
         COQVERSION=`$COQC -v | sed -n -e 's|.*version* *\([[^ ]]*\) .*$|\1|p' `
 
         case $COQVERSION in
+          8.0*|8.1*|8.2*)
+                enable_coq_support=no
+                AC_MSG_WARN(You need Coq 8.3 or later; Coq discarded)
+                reason_coq_support=" (need version 8.3 or later)"
+                ;;
           8.*|trunk)
 	        enable_coq_support=yes
                 AC_MSG_RESULT($COQVERSION)
                 ;;
           *)
                 enable_coq_support=no
-	        AC_MSG_WARN(You need Coq 8.x or later; Coq discarded)
-                reason_coq_support=" (need version 8.x or later)"
+	        AC_MSG_WARN(You need Coq 8.3 or later; Coq discarded)
+                reason_coq_support=" (need version 8.3 or later)"
                 ;;
         esac
     fi
@@ -424,6 +431,19 @@ if test "$enable_coq_libs" = yes; then
       AC_MSG_WARN(Cannot find coqc.)
       reason_coq_libs=" (coqdep not found)"
    fi
+fi
+
+if test "$enable_coq_libs" = yes; then
+   AC_MSG_CHECKING([for Flocq])
+   AS_IF(
+     [ echo "Require Fcore Fcalc_digits." > conftest.v
+       "$COQC" conftest.v > conftest.err ],
+     [ AC_MSG_RESULT(yes) ],
+     [ AC_MSG_RESULT(no)
+       enable_coq_fp_libs=no
+       AC_MSG_WARN(Cannot find Flocq.)
+       reason_coq_fp_libs=" (Flocq >= 1.4 not found)" ])
+   rm -f conftest.v conftest.vo conftest.err
 fi
 
 # hypothesis_selection
@@ -504,6 +524,7 @@ AC_SUBST(META_OCAMLGRAPH)
 
 AC_SUBST(enable_coq_plugin)
 AC_SUBST(enable_coq_libs)
+AC_SUBST(enable_coq_fp_libs)
 
 AC_SUBST(COQC)
 AC_SUBST(COQDEP)
@@ -554,6 +575,9 @@ if test "$enable_coq_support" = "yes" ; then
    echo "    Lib                 : $COQLIB"
    echo "    Plugin support      : $enable_coq_plugin $reason_coq_plugin"
    echo "    Realization support : $enable_coq_libs $reason_coq_libs"
+   if test "$enable_coq_libs" = "yes" ; then
+      echo "        FP arithmetic   : $enable_coq_fp_libs $reason_coq_fp_libs"
+   fi
 fi
 echo "TPTP parser             : $enable_whytptp"
 echo "Menhir library          : $enable_menhirlib"
