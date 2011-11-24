@@ -109,23 +109,12 @@ let report =
       else
          Format.fprintf fmt "%a" (Gnat_expl.print_expl b) expl
    in
-   let report_failure result =
-      match result with
-      | Call_provers.Failure s ->
-            if Gnat_config.verbose then begin
-               Format.eprintf "An error occured when calling alt-ergo: ";
-               Format.eprintf "%s" s;
-               Format.eprintf "@.";
-            end
-      | Call_provers.HighFailure ->
-            Format.eprintf "An error occured when calling alt-ergo@."
-      | _ -> ()
-   in
    fun fmt result expl ->
       (* always print to output file *)
       print fmt (result = Call_provers.Valid) expl;
-      (* if there is a problem, always report something to stderr *)
-      report_failure result;
+      (* if there was a problem, always report something to stderr *)
+      if result = Call_provers.HighFailure then
+         Format.eprintf "An error occured when calling alt-ergo@.";
       (* now print (possibly detailed) messages to stdout *)
       let print = print Format.std_formatter in
       if result = Call_provers.Valid then begin
