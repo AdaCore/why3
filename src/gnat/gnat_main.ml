@@ -100,7 +100,13 @@ let prove_task t expl n =
                         ~timelimit:Gnat_config.timeout
                         Gnat_config.altergo_driver t () in
    let res = Call_provers.wait_on_call pr_call () in
-   res.Call_provers.pr_answer
+   (* if there was a problem, always report something to stderr *)
+   let answer = res.Call_provers.pr_answer in
+   if answer = Call_provers.HighFailure then begin
+      Format.eprintf "An error occured when calling alt-ergo:@.";
+      Format.eprintf "%s@." res.Call_provers.pr_output;
+   end;
+   answer
 
 let report =
    let print fmt ?(endline=true) b expl =
@@ -112,9 +118,6 @@ let report =
    fun fmt result expl ->
       (* always print to output file *)
       print fmt (result = Call_provers.Valid) expl;
-      (* if there was a problem, always report something to stderr *)
-      if result = Call_provers.HighFailure then
-         Format.eprintf "An error occured when calling alt-ergo@.";
       (* now print (possibly detailed) messages to stdout *)
       let print = print Format.std_formatter in
       if result = Call_provers.Valid then begin
