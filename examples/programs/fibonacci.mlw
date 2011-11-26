@@ -63,12 +63,6 @@ theory Mat22 "2x2 integer matrices"
   clone export
     int.Exponentiation with type t = t, function one = id, function (*) = mult
 
-  (* already in int.Exponentiation 
-  lemma power_sum :
-    forall x: t, n m: int.
-    n >= 0 -> m >= 0 -> power x (n + m) = mult (power x n) (power x m)
-  *)
-  
 end
 
 module FibonacciLogarithmic
@@ -78,7 +72,7 @@ module FibonacciLogarithmic
   use import Mat22
 
   function m1110 : t = {| a11 = 1; a12 = 1;
-                       a21 = 1; a22 = 0 |}
+                          a21 = 1; a22 = 0 |}
 
   (* computes ((1 1) (1 0))^n in O(log(n)) time
 
