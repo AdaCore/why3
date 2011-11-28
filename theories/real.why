@@ -48,6 +48,13 @@ theory Abs
   lemma Abs_zero: forall x:real. abs x = 0.0 -> x = 0.0
 *)
 
+  lemma Abs_sum: forall x y:real. abs(x+y) <= abs x + abs y
+
+  lemma Abs_prod: forall x y:real. abs(x*y) = abs x * abs y
+
+  lemma triangular_inequality:
+    forall x y z:real. abs(x-z) <= abs(x-y) + abs(y-z)
+
 end
 
 theory MinMax
