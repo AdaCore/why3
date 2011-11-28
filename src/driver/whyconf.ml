@@ -30,10 +30,11 @@ open Rc
   - 7 yices native (used for release 0.70)
   - 8 for release 0.71
   - 9 coq realizations
+  - 10 require %f in editor lines
 
 If a configuration doesn't contain the actual magic number we don't use it.*)
 
-let magicnumber = 9
+let magicnumber = 10
 
 exception WrongMagicNumber
 

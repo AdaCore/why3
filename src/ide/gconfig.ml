@@ -82,7 +82,9 @@ let default_ide =
     ide_premise_color = "chartreuse";
     ide_goal_color = "gold";
     ide_error_color = "orange";
-    ide_default_editor = try Sys.getenv "EDITOR" with Not_found -> "editor";
+    ide_default_editor =
+      try Sys.getenv "EDITOR" ^ " %f"
+      with Not_found -> "editor %f";
   }
 
 let load_ide section =

@@ -121,24 +121,24 @@ let call_on_file ~command ?(timelimit=0) ?(memlimit=0)
   let arglist = Cmdline.cmdline_split command in
   let command = List.hd arglist in
   let on_timelimit = ref false in
-  let on_filename = ref false in
   let cmd_regexp = Str.regexp "%\\(.\\)" in
   let replace s = match Str.matched_group 1 s with
     | "%" -> "%"
-    | "f" -> on_filename := true; fin
+    | "f" -> fin
     | "t" -> on_timelimit := true; string_of_int timelimit
     | "m" -> string_of_int memlimit
-    | "b" -> string_of_int (memlimit * 1024)
+    (* FIXME: libdir and datadir can be changed in the configuration file
+       Should we pass them as additional arguments? Or would it be better
+       to prepare the command line in a separate function? *)
     | "l" -> Config.libdir
-    | _ -> failwith "unknown format specifier, use %%f, %%t, %%m or %%b"
+    | "d" -> Config.datadir
+    | _ -> failwith "unknown specifier, use %%f, %%t, %%m, %%l, or %%d"
   in
   let subst s =
     try Str.global_substitute cmd_regexp replace s
     with e -> if cleanup then Sys.remove fin; raise e
   in
-  let arglist = List.map subst arglist in
-  let argarray = Array.of_list
-    (if !on_filename then arglist else arglist @ [fin]) in
+  let argarray = Array.of_list (List.map subst arglist) in
 
   fun () ->
     let fd_in = Unix.openfile fin [Unix.O_RDONLY] 0 in
