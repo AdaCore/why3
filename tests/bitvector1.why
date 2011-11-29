@@ -94,6 +94,10 @@ theory Pow2real
 
   axiom Power_p : forall n: int. n <= 0 -> pow2 (n-1) = 0.5 *. pow2 n
 
+(*  axiom Power_s : forall n:int. pow2 (n+1) = 2.0 *. pow2 n
+
+  axiom Power_p : forall n:int. pow2 (n-1) = 0.5 *. pow2 n
+*)
   lemma Power_1 : pow2 1 = 2.0
 
   lemma Power_neg1 : pow2 (-1) = 0.5
@@ -742,6 +746,12 @@ theory TestDoubleOfInt
   lemma x_positive:forall x:int. (BV32.nth (BV32.from_int2c x) 31) = False ->   
   	BV32.to_nat_sub (BV32.from_int2c x) 31 0 = BV32.to_nat_sub (BV32.from_int2c x) 30 0
 
+  lemma sign_of_x:
+  	forall x:int. (BV32.nth (BV32.from_int2c x) 31) = False->x>0
+
+  lemma from_int2c_to_nat_sub: 
+  	forall x:int.x>0 -> BV32.to_nat_sub (BV32.from_int2c x) 31 0 = x	       
+
   lemma x_positive1: forall x:int. (BV32.nth (BV32.from_int2c x) 31) = False ->   
   	BV32.to_nat_sub (BV32.from_int2c x) 30 0 = x
   lemma x_positive2: forall x:int. (BV64.nth (var x) 31) = True ->   
@@ -750,12 +760,13 @@ theory TestDoubleOfInt
   lemma mantissa_var_x_positive: 
   	forall x:int. (BV64.nth (var x) 31) = True ->
 	       mantissa(var(x)) = Pow2int.pow2 31 + x
-
+  (*a verifier*)
   lemma x_negative: forall x:int. (BV64.nth (var x) 31) = False ->   
   	BV64.to_nat_sub (var x) 30 0 = -x
+  (*a verifier*)
   lemma mantissa_var_x_negative: 
   	forall x:int. (BV64.nth (var x) 31) = False ->
-	       mantissa(var(x)) = Pow2int.pow2 31 - x
+	       mantissa(var(x)) = Pow2int.pow2 31 + x
 
   lemma mantissa_var: forall x:int. mantissa(var(x)) = Pow2int.pow2 31 + x
 

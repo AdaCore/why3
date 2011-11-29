@@ -30,29 +30,16 @@ assert (h:(x = 0 \/ x > 0)) by omega.
 destruct h.
 subst x.
 rewrite Power_0.
-
-
-(*
-auto with zarith.
-elim n.
-replace (0+m) with m by omega.
-replace (1* pow2 m) with (pow2 m) by omega.
+replace (n+0) with n by omega.
+replace (pow2 n * 1) with (pow2 n)  by omega.
 auto.
-intro.
-elim p.
-3:rewrite Power_1.
-3:replace (1+m) with (m+1) by omega.
-3:apply Power_s.
-3:apply Hmn.
-intros p0 Hp0.
-rewrite Zpos_xI.
-replace (2 * Zpos p0) with (Zpos p0 * 2) by omega.
-rewrite<-Zplus_diag_eq_mult_2.
-rewrite Power_s.
-
-*)
-
-
+replace (x) with ((x-1)+1) by omega.
+rewrite Power_s;auto with zarith.
+replace (n + (x-1+1)) with (n+(x-1)+1) by omega.
+rewrite Power_s;auto with zarith.
+rewrite Hind;auto with zarith.
+rewrite Zmult_permute.
+auto with zarith.
 Qed.
 (* DO NOT EDIT BELOW *)
 

@@ -7,10 +7,9 @@ Parameter pow2: Z -> R.
 
 Axiom Power_0 : ((pow2 0%Z) = 1%R).
 
-Axiom Power_s : forall (n:Z), (0%Z <= n)%Z ->
-  ((pow2 (n + 1%Z)%Z) = (2%R * (pow2 n))%R).
+Axiom Power_s : forall (n:Z), ((pow2 (n + 1%Z)%Z) = (2%R * (pow2 n))%R).
 
-Axiom Power_p : forall (n:Z), (n <= 0%Z)%Z ->
+Axiom Power_p : forall (n:Z),
   ((pow2 (n - 1%Z)%Z) = ((05 / 10)%R * (pow2 n))%R).
 
 Axiom Power_1 : ((pow2 1%Z) = 2%R).
@@ -25,17 +24,31 @@ Theorem Power_sum : forall (n:Z) (m:Z),
   ((pow2 (n + m)%Z) = ((pow2 n) * (pow2 m))%R).
 (* YOU MAY EDIT THE PROOF BELOW *)
 intros n m.
-elim n.
-replace (0 + m) with m by omega.
+
+assert (hm:m>=0 \/ m <=0) by omega.
+destruct hm.
+cut (0 <= m); auto with zarith.
+apply Z_lt_induction with
+  (P:= fun m => 
+      0 <= m ->pow2 (n + m) = (pow2 n * pow2 m)%R);
+  auto with zarith.
+intros x Hind Hxpos.
+assert (h:(x = 0 \/ x > 0)) by omega.
+destruct h.
+subst x.
 rewrite Power_0.
-rewrite Rmult_1_l. 
+replace (n+0) with n by omega.
+rewrite Rmult_1_r.
 auto.
-intro.
-elim p.
-intros p0 Hp0.
-3: replace (1+m) with (m+1) by omega.
-3:rewrite Power_1.
-3:apply Power_s.
+replace (x) with ((x-1)+1) by omega.
+rewrite Power_s;auto with zarith.
+replace (n + (x-1+1)) with (n+(x-1)+1) by omega.
+rewrite Power_s;auto with zarith.
+rewrite Hind;auto with zarith.
+rewrite <-Rmult_assoc.
+rewrite <-Rmult_assoc.
+rewrite Rmult_comm with (r1:=pow2 n)(r2:=2%R).
+auto with zarith.
 
 
 Qed.

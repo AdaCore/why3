@@ -654,43 +654,68 @@ Axiom nth_const9 : ((nth1 (concat (from_int 1127219200%Z)
 Axiom sign_const : ((nth1 (concat (from_int 1127219200%Z)
   (from_int 2147483648%Z)) 63%Z) = false).
 
+Axiom exp_const : ((to_nat_sub1 (concat (from_int 1127219200%Z)
+  (from_int 2147483648%Z)) 62%Z 52%Z) = 1075%Z).
+
+Axiom to_nat_mantissa_1 : ((to_nat_sub1 (concat (from_int 1127219200%Z)
+  (from_int 2147483648%Z)) 30%Z 0%Z) = 0%Z).
+
+Axiom mantissa_const_nth2 : forall (i:Z), ((32%Z <= i)%Z /\ (i <= 51%Z)%Z) ->
+  ((nth1 (concat (from_int 1127219200%Z) (from_int 2147483648%Z))
+  i) = false).
+
+Axiom mantissa_const_to_nat51 : ((to_nat_sub1 (concat (from_int 1127219200%Z)
+  (from_int 2147483648%Z)) 51%Z
+  0%Z) = (to_nat_sub1 (concat (from_int 1127219200%Z)
+  (from_int 2147483648%Z)) 31%Z 0%Z)).
+
+Axiom mantissa_const : ((to_nat_sub1 (concat (from_int 1127219200%Z)
+  (from_int 2147483648%Z)) 51%Z 0%Z) = (pow2 31%Z)).
+
+Axiom real1075m1023 : ((IZR (1075%Z - 1023%Z)%Z) = 52%R).
+
+Axiom real1075m1023_2 : ((1075%R - 1023%R)%R = 52%R).
+
+Axiom real52_a_m52 : ((((pow21 (1075%Z - 1023%Z)%Z) * (pow21 31%Z))%R * (pow21 (-52%Z)%Z))%R = (pow21 31%Z)).
+
+Axiom const_value0 : ((double_of_bv64 (concat (from_int 1127219200%Z)
+  (from_int 2147483648%Z))) = ((1%R * (pow21 (1075%Z - 1023%Z)%Z))%R * (1%R + ((pow21 31%Z) * (pow21 (-52%Z)%Z))%R)%R)%R).
+
+Axiom const_value : ((double_of_bv64 (concat (from_int 1127219200%Z)
+  (from_int 2147483648%Z))) = ((pow21 52%Z) + (pow21 31%Z))%R).
+
+Definition jpxor(i:Z): bv := (bw_xor (from_int 2147483648%Z) (from_int2c i)).
+
+Definition var(i:Z): bv1 := (concat (from_int 1127219200%Z) (jpxor i)).
+
+Definition var_as_double(x:Z): R := (double_of_bv64 (var x)).
+
+Axiom nth_var1 : forall (x:bv) (j:Z), ((0%Z <= j)%Z /\ (j <  31%Z)%Z) ->
+  ((nth (bw_xor (from_int 2147483648%Z) x) j) = (nth x j)).
+
+Axiom nth_var11 : forall (x:Z) (j:Z), ((0%Z <= j)%Z /\ (j <  31%Z)%Z) ->
+  ((nth1 (var x) j) = (nth (from_int2c x) j)).
+
 (* YOU MAY EDIT THE CONTEXT BELOW *)
 Open Scope Z_scope.
 (* DO NOT EDIT BELOW *)
 
-Theorem exp_const : ((to_nat_sub1 (concat (from_int 1127219200%Z)
-  (from_int 2147483648%Z)) 62%Z 52%Z) = 1075%Z).
+Theorem nth_var2 : forall (x:Z), ((nth1 (var x)
+  31%Z) = (negb (nth (from_int2c x) 31%Z))).
 (* YOU MAY EDIT THE PROOF BELOW *)
-rewrite to_nat_sub_one1; auto with zarith.
-  2: apply nth_const8.
-replace (62 - 52) with 10 by omega.
- rewrite pow2_10.
-rewrite to_nat_sub_zero1; auto with zarith.
-  2: apply nth_const7; auto with zarith.
-rewrite to_nat_sub_zero1; auto with zarith.
-  2: apply nth_const7; auto with zarith.
-rewrite to_nat_sub_zero1; auto with zarith.
-  2: apply nth_const7; auto with zarith.
-rewrite to_nat_sub_zero1; auto with zarith.
-  2: apply nth_const7; auto with zarith.
-rewrite to_nat_sub_one1; auto with zarith.
-  2: apply nth_const6; auto with zarith.
-replace (62 - 1 - 1 - 1 - 1 - 1 - 52) with 5 by omega.
- rewrite pow2_5.
-rewrite to_nat_sub_one1; auto with zarith.
-  2: apply nth_const6; auto with zarith.
-replace (62 - 1 - 1 - 1 - 1 - 1 - 1 -  52) with 4 by omega.
- rewrite pow2_4.
-rewrite to_nat_sub_zero1; auto with zarith.
-  2: apply nth_const5; auto with zarith.
-rewrite to_nat_sub_zero1; auto with zarith.
-  2: apply nth_const5; auto with zarith.
-rewrite to_nat_of_one1; auto with zarith.
-replace (62 - 1 - 1 - 1 - 1 - 1 - 1 - 1 - 1 - 1 - 52) with 1 by omega.
-replace (1+1) with 2 by omega.
- rewrite pow2_2; auto.
-intros.
-apply nth_const4; auto with zarith.
+intro x.
+unfold var.
+rewrite concat_low;auto with zarith.
+unfold jpxor.
+rewrite Nth_bw_xor_v1true.
+auto.
+split;auto with zarith.
+rewrite nth_from_int_high_odd;auto with *.
+split.
+split;auto with zarith.
+rewrite pow2_31.
+
+
 Qed.
 (* DO NOT EDIT BELOW *)
 

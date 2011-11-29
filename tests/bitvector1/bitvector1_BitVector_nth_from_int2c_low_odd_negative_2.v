@@ -324,26 +324,67 @@ Axiom nth_from_int_low_even : forall (n:Z), ((mod1 n 2%Z) = 0%Z) ->
 Axiom nth_from_int_low_odd : forall (n:Z), (~ ((mod1 n 2%Z) = 0%Z)) ->
   ((nth (from_int n) 0%Z) = true).
 
+Axiom pow2i : forall (i:Z), (0%Z <= i)%Z -> ~ ((pow2 i) = 0%Z).
+
+Axiom nth_from_int_0 : forall (i:Z), ((i <  size)%Z /\ (0%Z <= i)%Z) ->
+  ((nth (from_int 0%Z) i) = false).
+
+Parameter from_int2c: Z -> bv.
+
+
+Axiom size_from_int2c : (0%Z <  (size - 1%Z)%Z)%Z.
+
+Axiom nth_sign_positive : forall (n:Z), (0%Z <= n)%Z -> ((nth (from_int2c n)
+  (size - 1%Z)%Z) = false).
+
+Axiom nth_from_int2c_high_even_positive : forall (n:Z) (i:Z),
+  ((0%Z <= n)%Z /\ (((i <  (size - 1%Z)%Z)%Z /\ (0%Z <= i)%Z) /\
+  ((mod1 (div n (pow2 i)) 2%Z) = 0%Z))) -> ((nth (from_int2c n) i) = false).
+
+Axiom nth_from_int2c_high_odd_positive : forall (n:Z) (i:Z), ((0%Z <= n)%Z /\
+  (((i <  (size - 1%Z)%Z)%Z /\ (0%Z <= i)%Z) /\ ~ ((mod1 (div n (pow2 i))
+  2%Z) = 0%Z))) -> ((nth (from_int2c n) i) = true).
+
+Axiom nth_from_int2c_low_even_positive : forall (n:Z), ((0%Z <= n)%Z /\
+  ((mod1 n 2%Z) = 0%Z)) -> ((nth (from_int2c n) 0%Z) = false).
+
+Axiom nth_from_int2c_low_odd_positive : forall (n:Z), ((0%Z <= n)%Z /\
+  ~ ((mod1 n 2%Z) = 0%Z)) -> ((nth (from_int2c n) 0%Z) = true).
+
+Axiom nth_sign_negative : forall (n:Z), (0%Z <= n)%Z -> ((nth (from_int2c n)
+  (size - 1%Z)%Z) = true).
+
+Axiom nth_from_int2c_high_even_negative : forall (n:Z) (i:Z),
+  ((n <  0%Z)%Z /\ (((i <  (size - 1%Z)%Z)%Z /\ (0%Z <= i)%Z) /\
+  ((mod1 (div n (pow2 i)) 2%Z) = 0%Z))) -> ((nth (from_int2c n) i) = true).
+
+Axiom nth_from_int2c_high_odd_negative : forall (n:Z) (i:Z), ((n <  0%Z)%Z /\
+  (((i <  (size - 1%Z)%Z)%Z /\ (0%Z <= i)%Z) /\ ~ ((mod1 (div n (pow2 i))
+  2%Z) = 0%Z))) -> ((nth (from_int2c n) i) = false).
+
+Axiom nth_from_int2c_low_even_negative : forall (n:Z), ((n <  0%Z)%Z /\
+  ((mod1 n 2%Z) = 0%Z)) -> ((nth (from_int2c n) 0%Z) = true).
+
 (* YOU MAY EDIT THE CONTEXT BELOW *)
 Open Scope Z_scope.
 (* DO NOT EDIT BELOW *)
 
-Theorem pow2i : forall (i:Z), (0%Z <= i)%Z -> ~ ((pow2 i) = 0%Z).
+Theorem nth_from_int2c_low_odd_negative : forall (n:Z), ((n <  0%Z)%Z /\
+  ~ ((mod1 n 2%Z) = 0%Z)) -> ((nth (from_int2c n) 0%Z) = false).
 (* YOU MAY EDIT THE PROOF BELOW *)
-intros i Hi.
-cut (0 <= i); auto with zarith.
-apply Z_lt_induction with
-  (P:= fun i => 
-       0 <= i -> pow2 i <> 0);auto with zarith.
-intros x Hind Hxpos.
-assert (hx:x = 0 \/ x >0) by omega.
-destruct hx.
-subst x.
-rewrite Power_0;auto with zarith.
 
-replace (x) with (x-1+1) by omega.
-rewrite Power_s;auto with *.
-
+intros.
+rewrite nth_from_int2c_high_odd_negative.
+auto.
+split.
+apply H.
+split.
+split.
+apply size_from_int2c.
+auto with *.
+rewrite pow2_0.
+rewrite Div_1.
+apply H.
 Qed.
 (* DO NOT EDIT BELOW *)
 

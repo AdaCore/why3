@@ -154,6 +154,8 @@ Parameter size: Z.
 
 Parameter bv : Type.
 
+Axiom size_positive : (0%Z <  size)%Z.
+
 Parameter nth: bv -> Z -> bool.
 
 
