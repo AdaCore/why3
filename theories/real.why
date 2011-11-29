@@ -134,7 +134,7 @@ theory Truncate
     forall i:int. floor (from_int i) = i
 
   axiom Ceil_int :
-    forall i:int. floor (from_int i) = i
+    forall i:int. ceil (from_int i) = i
 
   axiom Floor_down:
     forall x:real. from_int (floor x) <= x < from_int (Int.(+) (floor x) 1)
