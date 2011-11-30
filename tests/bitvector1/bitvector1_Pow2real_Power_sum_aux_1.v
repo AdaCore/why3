@@ -24,27 +24,36 @@ Axiom Power_neg1 : ((pow2 (-1%Z)%Z) = (05 / 10)%R).
 
 Axiom Power_neg : forall (n:Z), ((pow2 (-n)%Z) = (Rdiv 1%R (pow2 n))%R).
 
-Axiom Power_sum_aux : forall (n:Z) (m:Z), (0%Z <= m)%Z ->
-  ((pow2 (n + m)%Z) = ((pow2 n) * (pow2 m))%R).
-
 (* YOU MAY EDIT THE CONTEXT BELOW *)
 Open Scope Z_scope.
 (* DO NOT EDIT BELOW *)
 
-Theorem Power_sum : forall (n:Z) (m:Z),
+Theorem Power_sum_aux : forall (n:Z) (m:Z), (0%Z <= m)%Z ->
   ((pow2 (n + m)%Z) = ((pow2 n) * (pow2 m))%R).
 (* YOU MAY EDIT THE PROOF BELOW *)
-intros n m.
-assert (hm:m>=0 \/ m <=0) by omega.
-destruct hm.
-apply Power_sum_aux; auto with zarith.
-pose (m' := -m).
-replace m with (-m') by (subst m'; omega).
-replace (n+ - m') with (- ((-n) + m')) by omega.
-repeat rewrite Power_neg.
-rewrite Power_sum_aux.
-rewrite Power_neg.
-field.
+intros n m Hmpos.
+cut (0 <= m); auto with zarith.
+apply Z_lt_induction with
+  (P:= fun m => 
+      0 <= m ->pow2 (n + m) = (pow2 n * pow2 m)%R);
+  auto with zarith.
+intros x Hind Hxpos.
+assert (h:(x = 0 \/ x > 0)) by omega.
+destruct h.
+subst x.
+rewrite Power_0.
+replace (n+0) with n by omega.
+rewrite Rmult_1_r.
+auto.
+replace (x) with ((x-1)+1) by omega.
+rewrite Power_s_all;auto with zarith.
+replace (n + (x-1+1)) with (n+(x-1)+1) by omega.
+rewrite Power_s_all;auto with zarith.
+rewrite Hind;auto with zarith.
+rewrite <-Rmult_assoc.
+rewrite <-Rmult_assoc.
+rewrite Rmult_comm with (r1:=pow2 n)(r2:=2%R).
+auto with zarith.
 
 Qed.
 (* DO NOT EDIT BELOW *)
