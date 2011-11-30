@@ -759,15 +759,23 @@ Axiom x_positive : forall (x:Z), ((nth (from_int2c x) 31%Z) = false) ->
   ((to_nat_sub (from_int2c x) 31%Z 0%Z) = (to_nat_sub (from_int2c x) 30%Z
   0%Z)).
 
+Axiom sign_of_x : forall (x:Z), ((nth (from_int2c x) 31%Z) = false) ->
+  (0%Z <  x)%Z.
+
+Axiom from_int2c_to_nat_sub : forall (x:Z), (0%Z <  x)%Z ->
+  ((to_nat_sub (from_int2c x) 31%Z 0%Z) = x).
+
 (* YOU MAY EDIT THE CONTEXT BELOW *)
 Open Scope Z_scope.
 (* DO NOT EDIT BELOW *)
 
-Theorem sign_of_x : forall (x:Z), ((nth (from_int2c x) 31%Z) = false) ->
-  (0%Z <  x)%Z.
+Theorem x_positive1 : forall (x:Z), ((nth (from_int2c x) 31%Z) = false) ->
+  ((to_nat_sub (from_int2c x) 30%Z 0%Z) = x).
 (* YOU MAY EDIT THE PROOF BELOW *)
 intros x H.
-
+rewrite<-x_positive;auto.
+rewrite from_int2c_to_nat_sub;auto.
+apply sign_of_x;exact H.
 
 
 Qed.

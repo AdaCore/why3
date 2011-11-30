@@ -18,40 +18,49 @@ Axiom Power_s_all : forall (n:Z), ((pow2 (n + 1%Z)%Z) = (2%R * (pow2 n))%R).
 Axiom Power_p_all : forall (n:Z),
   ((pow2 (n - 1%Z)%Z) = ((05 / 10)%R * (pow2 n))%R).
 
+Axiom Power_1_2 : ((05 / 10)%R = (Rdiv 1%R 2%R)%R).
+
 Axiom Power_1 : ((pow2 1%Z) = 2%R).
 
 Axiom Power_neg1 : ((pow2 (-1%Z)%Z) = (05 / 10)%R).
 
 Axiom Power_non_null : forall (n:Z), ~ ((pow2 n) = 0%R).
 
-Axiom Power_neg : forall (n:Z), ((pow2 (-n)%Z) = (Rdiv 1%R (pow2 n))%R).
-
-Axiom Power_sum_aux : forall (n:Z) (m:Z), (0%Z <= m)%Z ->
-  ((pow2 (n + m)%Z) = ((pow2 n) * (pow2 m))%R).
-
 (* YOU MAY EDIT THE CONTEXT BELOW *)
+Open Scope R_scope.
 Open Scope Z_scope.
 (* DO NOT EDIT BELOW *)
 
-Theorem Power_sum : forall (n:Z) (m:Z),
-  ((pow2 (n + m)%Z) = ((pow2 n) * (pow2 m))%R).
+Theorem Power_neg_aux : forall (n:Z), (0%Z <= n)%Z ->
+  ((pow2 (-n)%Z) = (Rdiv 1%R (pow2 n))%R).
 (* YOU MAY EDIT THE PROOF BELOW *)
-intros n m.
-assert (hm:m>=0 \/ m <=0) by omega.
-destruct hm.
-apply Power_sum_aux; auto with zarith.
-pose (m' := -m).
-replace m with (-m') by (subst m'; omega).
-replace (n+ - m') with (- ((-n) + m')) by omega.
-repeat rewrite Power_neg.
-rewrite Power_sum_aux.
-rewrite Power_neg.
-field.
-split.
+intros n H.
+cut (0 <=n);auto.
+apply Z_lt_induction with
+  (P:= fun n => 
+      0 <= n -> pow2 (- n) = (1 / pow2 n)%R);
+  auto with zarith.
+intros x Hind Hxpos.
+assert (hx:x>0\/x=0) by omega.
+destruct hx.
+replace (x) with (x-1+1) by omega.
+replace (- (x - 1 + 1)) with (-(x-1) -1)  by omega.
+rewrite Power_p;auto with zarith.
+rewrite Power_s;auto with zarith.
+rewrite Hind;auto with *.
+rewrite Power_1_2.
+unfold Rdiv in |-*.
+repeat rewrite Rmult_1_l.
+rewrite<-Rinv_mult_distr;auto.
+apply Rgt_not_eq;auto with *.
 apply Power_non_null.
-apply Power_non_null.
-subst m'.
-auto with zarith.
+(*x = 0*)
+subst x.
+replace (-0) with 0 by omega.
+rewrite Power_0.
+unfold Rdiv in |-*.
+rewrite Rinv_r;auto with *.
+
 Qed.
 (* DO NOT EDIT BELOW *)
 

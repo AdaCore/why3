@@ -95,12 +95,16 @@ theory Pow2real
 
   lemma Power_p_all : forall n:int. pow2 (n-1) = 0.5 *. pow2 n
 
+  lemma Power_1_2: 0.5 = 1.0 /. 2.0
+
   lemma Power_1 : pow2 1 = 2.0
 
   lemma Power_neg1 : pow2 (-1) = 0.5
 
+  lemma Power_non_null_aux: forall n:int.n>=0 -> pow2 n <> 0.0
   lemma Power_non_null: forall n:int. pow2 n <> 0.0
 
+  lemma Power_neg_aux : forall n:int. n>=0 ->pow2 (-n) = 1.0 /. pow2 n
   lemma Power_neg : forall n:int. pow2 (-n) = 1.0 /. pow2 n
 
   lemma Power_sum_aux : forall n m: int. m >= 0 -> pow2 (n+m) = pow2 n *. pow2 m

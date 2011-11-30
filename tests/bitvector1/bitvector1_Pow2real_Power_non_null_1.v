@@ -22,36 +22,32 @@ Axiom Power_1 : ((pow2 1%Z) = 2%R).
 
 Axiom Power_neg1 : ((pow2 (-1%Z)%Z) = (05 / 10)%R).
 
-Axiom Power_non_null : forall (n:Z), ~ ((pow2 n) = 0%R).
-
-Axiom Power_neg : forall (n:Z), ((pow2 (-n)%Z) = (Rdiv 1%R (pow2 n))%R).
-
-Axiom Power_sum_aux : forall (n:Z) (m:Z), (0%Z <= m)%Z ->
-  ((pow2 (n + m)%Z) = ((pow2 n) * (pow2 m))%R).
-
 (* YOU MAY EDIT THE CONTEXT BELOW *)
 Open Scope Z_scope.
 (* DO NOT EDIT BELOW *)
 
-Theorem Power_sum : forall (n:Z) (m:Z),
-  ((pow2 (n + m)%Z) = ((pow2 n) * (pow2 m))%R).
+Theorem Power_non_null : forall (n:Z), ~ ((pow2 n) = 0%R).
 (* YOU MAY EDIT THE PROOF BELOW *)
-intros n m.
-assert (hm:m>=0 \/ m <=0) by omega.
-destruct hm.
-apply Power_sum_aux; auto with zarith.
-pose (m' := -m).
-replace m with (-m') by (subst m'; omega).
-replace (n+ - m') with (- ((-n) + m')) by omega.
-repeat rewrite Power_neg.
-rewrite Power_sum_aux.
-rewrite Power_neg.
-field.
-split.
-apply Power_non_null.
-apply Power_non_null.
-subst m'.
-auto with zarith.
+
+
+intro n.
+assert (h:n>=0 \/ n<=0) by omega.
+destruct h.
+cut (0 <= n); auto with zarith.
+apply Z_lt_induction with
+  (P:= fun n => 
+       0 <= n -> pow2 n <> 0%R);auto with zarith.
+intros x Hind Hxpos.
+assert (hx:x = 0 \/ x >0) by omega.
+destruct hx.
+subst x.
+rewrite Power_0;auto with *.
+replace (x) with (x-1+1) by omega.
+rewrite Power_s;auto with *.
+
+rewrite Rmult_neq_0_reg with (r1:=2%R) (r2:=pow2 (x - 1)).
+apply Hind.
+
 Qed.
 (* DO NOT EDIT BELOW *)
 
