@@ -464,6 +464,9 @@ Axiom MainResultZero : forall (x:bv), ((0%Z = (to_nat_sub x 62%Z 52%Z)) /\
   ((to_nat_sub x 51%Z 0%Z) = 0%Z)) -> ((double_of_bv64 (bw_xor x
   (from_int 9223372036854775808%Z))) = (-(double_of_bv64 x))%R).
 
+Axiom sign_neg : forall (x:bv), ((sign_value (negb (nth x
+  63%Z))) = (-(sign_value (nth x 63%Z)))%R).
+
 (* YOU MAY EDIT THE CONTEXT BELOW *)
 Open Scope Z_scope.
 (* DO NOT EDIT BELOW *)
@@ -474,10 +477,15 @@ Theorem MainResult : forall (x:bv), ((0%Z <  (to_nat_sub x 62%Z 52%Z))%Z /\
 (* YOU MAY EDIT THE PROOF BELOW *)
 intros x H.
 rewrite double_of_bv64_value.
-rewrite 
 rewrite MainResultSign.
-rewrite Sign_of_xor_j.
-
+rewrite Exp_of_xor_j.
+rewrite Mantissa_of_xor_j.
+rewrite sign_neg.
+rewrite double_of_bv64_value.
+repeat rewrite Rmult_assoc.
+auto with *.
+exact H.
+rewrite Exp_of_xor_j;exact H.
 
 Qed.
 (* DO NOT EDIT BELOW *)

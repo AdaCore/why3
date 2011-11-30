@@ -624,6 +624,8 @@ theory TestNegAsXOR
   lemma MainResultZero : forall x:bv. 0 = exp(x) /\ mantissa(x) = 0 ->
      double_of_bv64 (bw_xor x j) = -. double_of_bv64 x
 
+  lemma sign_neg:
+     forall x:bv. sign_value(notb(sign(x))) = -.sign_value(sign(x))	
   lemma MainResult : forall x:bv. 0 < exp(x) < 2047 ->
      double_of_bv64 (bw_xor x j) = -. double_of_bv64 x
 
