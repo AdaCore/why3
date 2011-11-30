@@ -289,13 +289,13 @@ theory BitVector
 
   axiom to_nat_sub_zero :
     forall b:bv, j i:int.
-      0 <= i <= j ->
+      0 <= i <= j < size ->
         nth b j = False ->
           to_nat_sub b j i = to_nat_sub b (j-1) i
 
   axiom to_nat_sub_one :
     forall b:bv, j i:int.
-      0 <= i <= j ->
+      0 <= i <= j < size ->
         nth b j = True ->
           to_nat_sub b j i = (pow2 (j-i)) + to_nat_sub b (j-1) i
 
@@ -312,22 +312,22 @@ theory BitVector
 *)
 
   lemma to_nat_of_zero2:
-    forall b:bv, i j:int. j >= i >= 0 ->
+    forall b:bv, i j:int. size > j >= i >= 0 ->
       (forall k:int. j >= k > i -> nth b k = False) ->
       to_nat_sub b j 0 = to_nat_sub b i 0
 
 
   lemma to_nat_of_zero:
-    forall b:bv, i j:int. j >= i >=0 ->
+    forall b:bv, i j:int. size > j >= i >= 0 ->
       (forall k:int. j >= k >= i -> nth b k = False) ->
       to_nat_sub b j i = 0
 
   lemma to_nat_of_one:
-    forall b:bv, i j:int. j >= i >=0 ->
+    forall b:bv, i j:int. size > j >= i >= 0 ->
       (forall k:int. j >= k >= i -> nth b k = True) ->
       to_nat_sub b j i = pow2 (j-i+1) - 1
 
-  lemma to_nat_sub_footprint: forall b1 b2:bv, j i:int. j >=i>=0 ->
+  lemma to_nat_sub_footprint: forall b1 b2:bv, j i:int. size > j /\ i >=0 ->
     (forall k:int. i <= k <= j -> nth b1 k = nth b2 k) ->
     to_nat_sub b1 j i = to_nat_sub b2 j i
 (*
@@ -434,7 +434,7 @@ theory BitVector
   axiom size_from_int2c: size - 1 >0
 
   axiom nth_sign_positive:
-     forall n :int. n>=0 -> nth (from_int2c n) (size-1) = False	
+     forall n :int. n>=0 -> nth (from_int2c n) (size-1) = False
   axiom nth_from_int2c_high_even_positive:
      forall n i:int. n>=0 /\ size-1 > i >= 0 /\ mod (div n (pow2 i)) 2 = 0 -> nth (from_int2c n) i = False
 
@@ -452,7 +452,7 @@ theory BitVector
 (*********************************************************************)
 
   axiom nth_sign_negative:
-     forall n:int. n>=0 -> nth (from_int2c n) (size-1) = True	
+     forall n:int. n<0 -> nth (from_int2c n) (size-1) = True
   axiom nth_from_int2c_high_even_negative:
      forall n i:int. n<0 /\ size-1 > i >= 0 /\ mod (div n (pow2 i)) 2 = 0 -> nth (from_int2c n) i = True
 
@@ -627,7 +627,7 @@ theory TestNegAsXOR
      double_of_bv64 (bw_xor x j) = -. double_of_bv64 x
 
   lemma sign_neg:
-     forall x:bv. sign_value(notb(sign(x))) = -.sign_value(sign(x))	
+     forall x:bv. sign_value(notb(sign(x))) = -.sign_value(sign(x))
   lemma MainResult : forall x:bv. 0 < exp(x) < 2047 ->
      double_of_bv64 (bw_xor x j) = -. double_of_bv64 x
 
@@ -746,36 +746,36 @@ theory TestDoubleOfInt
   lemma exp_var: forall x:int. exp(var(x)) = 1075
 
   lemma to_nat_sub_same: forall i:BV64.bv. forall j:BV32.bv. forall m:int.
-  (forall k:int. 0<=k<=m -> BV64.nth i k = BV32.nth j k) -> 
-  	  BV64.to_nat_sub i m 0 = BV32.to_nat_sub j m 0 
+  (forall k:int. 0<=k<=m -> BV64.nth i k = BV32.nth j k) ->
+  	  BV64.to_nat_sub i m 0 = BV32.to_nat_sub j m 0
 
   lemma nat_to_sub_x: forall x:int.
        BV64.to_nat_sub (var x) 30 0  = BV32.to_nat_sub (BV32.from_int2c x) 30 0
   lemma to_nat_sub_var:
   	forall x:int. BV64.to_nat_sub (var x) 30 0 = BV32.to_nat_sub (BV32.from_int2c x) 30 0
 
-  lemma x_positive:forall x:int. (BV32.nth (BV32.from_int2c x) 31) = False ->   
+  lemma x_positive:forall x:int. (BV32.nth (BV32.from_int2c x) 31) = False ->
   	BV32.to_nat_sub (BV32.from_int2c x) 31 0 = BV32.to_nat_sub (BV32.from_int2c x) 30 0
 
   lemma sign_of_x:
   	forall x:int. (BV32.nth (BV32.from_int2c x) 31) = False->x>0
 
-  lemma from_int2c_to_nat_sub: 
-  	forall x:int.x>0 -> BV32.to_nat_sub (BV32.from_int2c x) 31 0 = x	       
+  lemma from_int2c_to_nat_sub:
+  	forall x:int.x>0 -> BV32.to_nat_sub (BV32.from_int2c x) 31 0 = x
 
-  lemma x_positive1: forall x:int. (BV32.nth (BV32.from_int2c x) 31) = False ->   
+  lemma x_positive1: forall x:int. (BV32.nth (BV32.from_int2c x) 31) = False ->
   	BV32.to_nat_sub (BV32.from_int2c x) 30 0 = x
-  lemma x_positive2: forall x:int. (BV64.nth (var x) 31) = True ->   
+  lemma x_positive2: forall x:int. (BV64.nth (var x) 31) = True ->
   	BV64.to_nat_sub (var x) 30 0 = x
 
-  lemma mantissa_var_x_positive: 
+  lemma mantissa_var_x_positive:
   	forall x:int. (BV64.nth (var x) 31) = True ->
 	       mantissa(var(x)) = Pow2int.pow2 31 + x
   (*a verifier*)
-  lemma x_negative: forall x:int. (BV64.nth (var x) 31) = False ->   
+  lemma x_negative: forall x:int. (BV64.nth (var x) 31) = False ->
   	BV64.to_nat_sub (var x) 30 0 = -x
   (*a verifier*)
-  lemma mantissa_var_x_negative: 
+  lemma mantissa_var_x_negative:
   	forall x:int. (BV64.nth (var x) 31) = False ->
 	       mantissa(var(x)) = Pow2int.pow2 31 + x
 
