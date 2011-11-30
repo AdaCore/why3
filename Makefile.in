@@ -723,18 +723,16 @@ install_local: bin/why3html
 
 ifeq (@enable_bench@,yes)
 
-BENCH_FILES = bench benchrc benchdb whybench
+BENCH_FILES = worker db bench benchrc benchdb whybench
 
 BENCHMODULES := $(addprefix src/bench/, $(BENCH_FILES))
-
-BENCHMODULES := src/ide/worker src/ide/db $(BENCHMODULES)
 
 BENCHML  = $(addsuffix .ml,  $(BENCHMODULES))
 BENCHMLI = $(addsuffix .mli, $(BENCHMODULES))
 BENCHCMO = $(addsuffix .cmo, $(BENCHMODULES))
 BENCHCMX = $(addsuffix .cmx, $(BENCHMODULES))
 
-$(BENCHCMO) $(BENCHCMX): INCLUDES += -I src/ide -I src/bench -I @SQLITE3LIB@
+$(BENCHCMO) $(BENCHCMX): INCLUDES += -I src/bench -I @SQLITE3LIB@
 
 # build targets
 
