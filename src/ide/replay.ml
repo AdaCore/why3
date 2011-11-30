@@ -28,7 +28,6 @@ let opt_stats = ref true
 let opt_latex = ref ""
 let opt_latex2 = ref ""
 let opt_longtable = ref false
-let opt_html = ref ""
 let opt_force = ref false
 let opt_smoke = ref Session.SD_None
 
@@ -63,9 +62,6 @@ let spec = Arg.align [
   ("-longtable",
    Arg.Set opt_longtable,
    " produce latex statistics using longtable package") ;
-  ("-html",
-   Arg.Set_string opt_html,
-   " [Dir_output] produce html statistics") ;
 ]
 
 let version_msg = Format.sprintf "Why3 replayer, version %s (build date: %s)"
@@ -460,7 +456,7 @@ let rec goal_latex2_stat fmt prov depth depth_max subgoal g =
 	if Hashtbl.length tr > 0 then
 	  begin
 	    if (Hashtbl.length proofs == 0) then
-	      fprintf fmt "& \\multicolumn{%d}{|c|}{}\\\\ @." (List.length prov);
+	      fprintf fmt "& \\multicolumn{%d}{c|}{}\\\\ @." (List.length prov);
 	    Hashtbl.iter (fun _st tr ->
 		let goals = tr.M.subgoals in
 		let _ = List.fold_left (fun subgoal g ->

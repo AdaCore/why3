@@ -35,6 +35,9 @@ let top = create t_not
 
 let rec neg f = match f.t_node with
   | Tbinop (Timplies,f1,f2) -> t_and f1 (neg f2)
+(* Would show too much smoke ? 
+  | Tbinop (Timplies,f1,f2) -> t_implies f1 (neg f2)
+*)
   | Tquant (Tforall,fq) ->
       let vsl,_trl,f = t_open_quant fq in
       t_forall_close vsl _trl (neg f)
