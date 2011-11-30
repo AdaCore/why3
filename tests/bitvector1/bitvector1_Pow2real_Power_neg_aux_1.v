@@ -24,6 +24,8 @@ Axiom Power_1 : ((pow2 1%Z) = 2%R).
 
 Axiom Power_neg1 : ((pow2 (-1%Z)%Z) = (05 / 10)%R).
 
+Axiom Power_non_null_aux : forall (n:Z), (0%Z <= n)%Z -> ~ ((pow2 n) = 0%R).
+
 Axiom Power_non_null : forall (n:Z), ~ ((pow2 n) = 0%R).
 
 (* YOU MAY EDIT THE CONTEXT BELOW *)
@@ -53,7 +55,7 @@ unfold Rdiv in |-*.
 repeat rewrite Rmult_1_l.
 rewrite<-Rinv_mult_distr;auto.
 apply Rgt_not_eq;auto with *.
-apply Power_non_null.
+apply Power_non_null_aux; omega.
 (*x = 0*)
 subst x.
 replace (-0) with 0 by omega.

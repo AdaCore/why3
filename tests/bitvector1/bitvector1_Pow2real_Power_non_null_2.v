@@ -26,6 +26,9 @@ Axiom Power_neg1 : ((pow2 (-1%Z)%Z) = (05 / 10)%R).
 
 Axiom Power_non_null_aux : forall (n:Z), (0%Z <= n)%Z -> ~ ((pow2 n) = 0%R).
 
+Axiom Power_neg_aux : forall (n:Z), (0%Z <= n)%Z ->
+  ((pow2 (-n)%Z) = (Rdiv 1%R (pow2 n))%R).
+
 (* YOU MAY EDIT THE CONTEXT BELOW *)
 Open Scope Z_scope.
 (* DO NOT EDIT BELOW *)
@@ -39,43 +42,13 @@ apply Power_non_null_aux;auto with zarith.
 
 pose (n':=-n).
 replace n with (-n') by (subst n';omega).
-replace (n') with (n'-1+1) by omega.
-replace (- (n' - 1 + 1)) with (-(n'-1)-1) by omega.
-rewrite Power_p.
-apply Rmult_integral_contrapositive.
-split.
-rewrite Power_1_2.
-unfold Rdiv in |-*.
+rewrite Power_neg_aux.
+unfold Rdiv.
 rewrite Rmult_1_l.
 apply Rinv_neq_0_compat.
-apply Rgt_not_eq;auto with *.
-
-
-
-
-
-cut(n'>0);auto with zarith.
-
-
-
-apply Z_lt_induction with
-  (P:= fun n' => 
-       n' > 0 -> pow2 (- n') <> 0%R);auto with zarith.
-intros x Hind Hnxpos.
-
-replace (x) with (x-1+1) by omega.
-replace (- (x - 1 + 1)) with (-(x-1)-1) by omega.
-rewrite Power_p_all;auto with zarith.
-apply Rmult_integral_contrapositive.
-split.
-rewrite Power_1_2.
-unfold Rdiv in |-*.
-rewrite Rmult_1_l.
-apply Rinv_neq_0_compat.
-apply Rgt_not_eq;auto with *.
-apply Hind;auto with zarith.
-
-
+apply Power_non_null_aux.
+subst n'; auto with zarith.
+subst n'; auto with zarith.
 Qed.
 (* DO NOT EDIT BELOW *)
 
