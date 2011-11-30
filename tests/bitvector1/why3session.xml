@@ -1817,8 +1817,8 @@
   </theory>
   <theory
    name="TestNegAsXOR"
-   verified="false"
-   expanded="true">
+   verified="true"
+   expanded="false">
    <goal
     name="Nth_j"
     sum="15895ef405c3203aef5bb762f966e432"
@@ -2086,59 +2086,31 @@
     </proof>
    </goal>
    <goal
+    name="sign_neg"
+    sum="212999f617692a60408b72954e66eac6"
+    proved="true"
+    expanded="false"
+    shape="ainfix =asign_valueanotbasignV0aprefix -.asign_valueasignV0F">
+    <proof
+     prover="alt-ergo"
+     timelimit="15"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="1.66"/>
+    </proof>
+   </goal>
+   <goal
     name="MainResult"
-    sum="47a7fcf8aa00014c3901dbff32d093ce"
-    proved="false"
+    sum="63015f466468bc52e0c36799b4b245ff"
+    proved="true"
     expanded="false"
     shape="ainfix =adouble_of_bv64abw_xorV0ajaprefix -.adouble_of_bv64V0Iainfix <aexpV0c2047Aainfix <c0aexpV0F">
     <proof
      prover="coq"
      timelimit="15"
-     edited=""
-     obsolete="false"><unedited/>
-     
-    </proof>
-    <proof
-     prover="z3-3"
-     timelimit="5"
-     edited=""
+     edited="bitvector1_TestNegAsXOR_MainResult_2.v"
      obsolete="false">
-     <result status="timeout" time="15.06"/>
-    </proof>
-    <proof
-     prover="alt-ergo-0.93.1"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="15.06"/>
-    </proof>
-    <proof
-     prover="alt-ergo"
-     timelimit="20"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="15.07"/>
-    </proof>
-    <proof
-     prover="cvc3"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="failure" time="0.03"/>
-    </proof>
-    <proof
-     prover="z3"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="15.07"/>
-    </proof>
-    <proof
-     prover="cvc3-2.4"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="failure" time="0.04"/>
+     <result status="valid" time="0.78"/>
     </proof>
    </goal>
   </theory>
@@ -2843,8 +2815,15 @@
     name="to_nat_sub_same"
     sum="3b811e9180d25f2817da17eb652f7e39"
     proved="false"
-    expanded="false"
+    expanded="true"
     shape="ainfix =ato_nat_subV0V2c0ato_nat_subV1V2c0Iainfix =anthV0V3anthV1V3Iainfix <=V3V2Aainfix <=c0V3FFFF">
+    <proof
+     prover="coq"
+     timelimit="15"
+     edited="bitvector1_TestDoubleOfInt_to_nat_sub_same_1.v"
+     obsolete="false"><undone/>
+     
+    </proof>
     <proof
      prover="z3-3"
      timelimit="20"
@@ -3101,29 +3080,15 @@
    <goal
     name="x_positive1"
     sum="2b6197f5af02d4b27f2641b23b38ad95"
-    proved="false"
-    expanded="true"
+    proved="true"
+    expanded="false"
     shape="ainfix =ato_nat_subafrom_int2cV0c30c0V0Iainfix =anthafrom_int2cV0c31aFalseF">
     <proof
      prover="coq"
      timelimit="15"
      edited="bitvector1_TestDoubleOfInt_x_positive1_5.v"
-     obsolete="false"><undone/>
-     
-    </proof>
-    <proof
-     prover="cvc3"
-     timelimit="5"
-     edited=""
      obsolete="false">
-     <result status="failure" time="0.04"/>
-    </proof>
-    <proof
-     prover="cvc3-2.4"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="failure" time="0.05"/>
+     <result status="valid" time="0.91"/>
     </proof>
    </goal>
    <goal
