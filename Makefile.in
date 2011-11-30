@@ -56,7 +56,6 @@ OCAMLBEST = @OCAMLBEST@
 OCAMLVERSION = @OCAMLVERSION@
 COQC      = @COQC@
 COQDEP    = @COQDEP@
-
 CAMLP5O   = @CAMLP5O@
 
 ifeq (@enable_menhirlib@,yes)
@@ -349,7 +348,7 @@ clean::
 	rm -f bin/why3.byte bin/why3.opt bin/why3
 
 install_no_local::
-	cp -f bin/why3.@OCAMLBEST@ $(BINDIR)/why3
+	cp -f bin/why3.@OCAMLBEST@ $(BINDIR)/why3$(EXE)
 
 install_local: bin/why3
 
@@ -419,7 +418,7 @@ clean::
 	bin/why3ml.opt --type-only $*.mlw
 
 install_no_local::
-	cp -f bin/why3ml.@OCAMLBEST@ $(BINDIR)/why3ml
+	cp -f bin/why3ml.@OCAMLBEST@ $(BINDIR)/why3ml$(EXE)
 
 install_local: bin/why3ml
 
@@ -498,7 +497,7 @@ local_config: bin/why3config.@OCAMLBEST@
 		--detect --conf_file why.conf
 
 install_no_local::
-	cp -f bin/why3config.@OCAMLBEST@ $(BINDIR)/why3config
+	cp -f bin/why3config.@OCAMLBEST@ $(BINDIR)/why3config$(EXE)
 
 install_local: bin/why3config
 
@@ -557,7 +556,7 @@ clean::
 	rm -f .depend.ide
 
 install_no_local::
-	cp -f bin/why3ide.@OCAMLBEST@ $(BINDIR)/why3ide
+	cp -f bin/why3ide.@OCAMLBEST@ $(BINDIR)/why3ide$(EXE)
 
 install_local: bin/why3ide
 
@@ -613,7 +612,7 @@ clean::
 	rm -f .depend.replayer
 
 install_no_local::
-	cp -f bin/why3replayer.@OCAMLBEST@ $(BINDIR)/why3replayer
+	cp -f bin/why3replayer.@OCAMLBEST@ $(BINDIR)/why3replayer$(EXE)
 
 install_local: bin/why3replayer
 
@@ -773,7 +772,7 @@ clean::
 	rm -f .depend.bench
 
 install_no_local::
-	cp -f bin/why3bench.@OCAMLBEST@ $(BINDIR)/why3bench
+	cp -f bin/why3bench.@OCAMLBEST@ $(BINDIR)/why3bench$(EXE)
 
 install_local: bin/why3bench
 
@@ -964,18 +963,18 @@ endif
 # tools
 #######
 
-TOOLS = bin/why3-cpulimit
+TOOLS = bin/why3-cpulimit$(EXE)
 
 byte opt: $(TOOLS)
 
-bin/why3-cpulimit: src/tools/@CPULIMIT@.c
+bin/why3-cpulimit$(EXE): src/tools/@CPULIMIT@.c
 	$(CC) -Wall -o $@ $^
 
 clean::
-	rm -f bin/why3-cpulimit src/tools/*~
+	rm -f bin/why3-cpulimit$(EXE) src/tools/*~
 
 install_no_local::
-	cp -f bin/why3-cpulimit $(BINDIR)/why3-cpulimit
+	cp -f bin/why3-cpulimit$(EXE) $(BINDIR)/why3-cpulimit$(EXE)
 
 #########
 # why3doc
@@ -1011,7 +1010,7 @@ bin/why3doc: bin/why3doc.@OCAMLBEST@
 	ln -sf why3doc.@OCAMLBEST@ $@
 
 install_no_local::
-	cp -f bin/why3doc.@OCAMLBEST@ $(BINDIR)/why3doc
+	cp -f bin/why3doc.@OCAMLBEST@ $(BINDIR)/why3doc$(EXE)
 
 # depend and clean targets
 
