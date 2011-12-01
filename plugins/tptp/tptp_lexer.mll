@@ -37,6 +37,7 @@
     | DoubleDollarWord -> fprintf fmt "system-specifics are not supported"
     | _ -> raise e)
 
+(*
   let defwords = Hashtbl.create 97
   let () = List.iter (fun (x,y) -> Hashtbl.add defwords x y) [
     "ceiling", CEILING;
@@ -77,6 +78,7 @@
     "tType", TTYPE;
     "uminus", UMINUS;
   ]
+*)
 
   let keywords = Hashtbl.create 97
   let () = List.iter (fun (x,y) -> Hashtbl.add keywords x y) [
@@ -142,23 +144,27 @@ rule token = parse
       { raise DoubleDollarWord }
   | '+'? (natural as s)
   | '-'   natural as s
-      { INTEGER s }
+      { INTNUM s }
   | '+'? (natural as n) '/' (positive as d)
   | ('-'  natural as n) '/' (positive as d)
-      { RATIONAL (n,d) }
+      { RATNUM (n,d) }
   | '+'? (natural as i) ('.' (digit+ as f))? (['e' 'E'] ('+'? (natural as e)))?
   | ('-'  natural as i) ('.' (digit+ as f))? (['e' 'E'] ('+'? (natural as e)))?
   | '+'? (natural as i) ('.' (digit+ as f))? (['e' 'E'] ('-'   natural as e))?
   | ('-'  natural as i) ('.' (digit+ as f))? (['e' 'E'] ('-'   natural as e))?
-      { REAL (i,f,e) }
+      { REALNUM (i,f,e) }
   | "/*/"
       { SLASH_STAR_SLASH }
   | "/*"
       { comment_start_loc := loc lexbuf; comment_block lexbuf; token lexbuf }
   | "%"
       { comment_start_loc := loc lexbuf; comment_line  lexbuf; token lexbuf }
+  | "."
+      { DOT }
   | ","
       { COMMA }
+  | ":"
+      { COLON }
   | "("
       { LEFTPAR }
   | ")"
@@ -167,8 +173,6 @@ rule token = parse
       { LEFTSQ }
   | "]"
       { RIGHTSQ }
-  | ":"
-      { COLON }
   | "-->"
       { LONGARROW }
   | "<="
@@ -185,8 +189,6 @@ rule token = parse
       { NBAR }
   | "~"
       { TILDE }
-  | "."
-      { DOT }
   | "="
       { EQUAL }
   | "!="

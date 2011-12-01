@@ -21,6 +21,7 @@ type loc = Loc.position
 
 type atomic_word = string
 type variable = string
+type distinct = string
 
 (** TFF type *)
 
@@ -60,13 +61,16 @@ type defined_func =
   | DFfloor  | DFceil
   | DFtrunc  | DFround
   | DFtoint  | DFtorat  | DFtoreal
+  | DFunknown of string
 
-type distinct = string
+type num_integer = string
+type num_rational = string * string
+type num_real = string * string option * string option
 
 type number =
-  | Nint of string
-  | Nrat of string
-  | Nreal of string
+  | Nint of num_integer
+  | Nrat of num_rational
+  | Nreal of num_real
 
 type formula_node =
   | LFqnt of quant * tyvar list * formula
@@ -113,7 +117,7 @@ type role =
 
 type input =
   | Formula of kind * name * role * top_formula * loc
-  | Include of file * name list option * loc
+  | Include of file * name list * loc
 
 type tptp_file = tptp_input list
 
