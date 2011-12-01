@@ -49,17 +49,28 @@ Definition rnd_of_mode (m:mode) :=
   |  NearestTiesToAway => mode_NA
   end.
 
+(* from Flocq 2.0 *)
+Definition binary_normalize mode m e szero :=
+  match m with
+  | Z0 => B754_zero _ _ szero
+  | Zpos m => FF2B _ _ _ (proj1 (binary_round_correct mode false m e))
+  | Zneg m => FF2B _ _ _ (proj1 (binary_round_correct mode true m e))
+  end.
 
+(* from Flocq 2.0 *)
+Axiom binary_normalize_correct :
+  forall m mx ex szero,
+  if Rlt_bool (Rabs (round radix2 fexp (round_mode m) (F2R (Float radix2 mx ex)))) (bpow radix2 emax) then
+    B2R _ _ (binary_normalize m mx ex szero) = round radix2 fexp (round_mode m) (F2R (Float radix2 mx ex)) /\
+    is_finite _ _ (binary_normalize m mx ex szero) = true
+  else
+    B2FF _ _ (binary_normalize m mx ex szero) = binary_overflow prec emax m (Rlt_bool (F2R (Float radix2 mx ex)) 0).
 
 Definition r_to_fp rnd x : binary_float prec emax :=
   let r := round radix2 fexp (round_mode rnd) x in
   let m := Ztrunc (scaled_mantissa radix2 fexp r) in
   let e := canonic_exponent radix2 fexp r in
-  match m with
-  | Z0 => B754_zero prec emax false
-  | Zpos m => FF2B _ _ _ (proj1 (binary_round_correct rnd false m e))
-  | Zneg m => FF2B _ _ _ (proj1 (binary_round_correct rnd true m e))
-  end.
+  binary_normalize rnd m e false.
 
 Lemma is_finite_FF2B :
   forall f H,
@@ -82,56 +93,17 @@ Theorem r_to_fp_correct :
 Proof.
 intros rnd x r Bx.
 unfold r_to_fp. fold r.
+generalize (binary_normalize_correct rnd (Ztrunc (scaled_mantissa radix2 fexp r)) (canonic_exponent radix2 fexp r) false).
 assert (Gx: generic_format radix2 fexp r).
 apply generic_format_round.
 apply FLT_exp_correct.
 exact Hprec'.
-assert (Hr: Z2R (Ztrunc (scaled_mantissa radix2 fexp r)) = scaled_mantissa radix2 fexp r).
-apply sym_eq.
-now apply scaled_mantissa_generic.
-revert Hr.
-case_eq (Ztrunc (scaled_mantissa radix2 fexp r)).
-(* *)
-intros _ Hx.
-repeat split.
-apply Rmult_eq_reg_r with (bpow radix2 (- canonic_exponent radix2 fexp r)).
-now rewrite Rmult_0_l.
-apply Rgt_not_eq.
-apply bpow_gt_0.
-(* *)
-intros p Hp Hx.
-case binary_round_correct ; intros Hv.
-unfold F2R, Fnum, Fexp, cond_Zopp.
-rewrite Hx, scaled_mantissa_bpow.
+unfold F2R ; simpl.
+rewrite <- scaled_mantissa_generic with (1 := Gx).
+rewrite scaled_mantissa_bpow.
 rewrite round_generic with (1 := Gx).
 rewrite Rlt_bool_true with (1 := Bx).
-intros H.
-split.
-rewrite is_finite_FF2B.
-revert H.
-assert (0 <> r)%R.
-intros H.
-rewrite <- H, scaled_mantissa_0 in Hx.
-now apply (Z2R_neq 0 (Zpos p)).
-now case binary_round_sign_shl.
-now rewrite B2R_FF2B.
-(* *)
-intros p Hp Hx.
-case binary_round_correct ; intros Hv.
-unfold F2R, Fnum, Fexp, cond_Zopp, Zopp.
-rewrite Hx, scaled_mantissa_bpow.
-rewrite round_generic with (1 := Gx).
-rewrite Rlt_bool_true with (1 := Bx).
-intros H.
-split.
-rewrite is_finite_FF2B.
-revert H.
-assert (0 <> r)%R.
-intros H.
-rewrite <- H, scaled_mantissa_0 in Hx.
-now apply (Z2R_neq 0 (Zneg p)).
-now case binary_round_sign_shl.
-now rewrite B2R_FF2B.
+now split.
 Qed.
 
 Theorem r_to_fp_format :
