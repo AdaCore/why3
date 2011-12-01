@@ -72,14 +72,12 @@ type formula_node =
   | LFqnt of quant * tyvar list * formula
   | LFbin of binop * formula * formula
   | LFnot of formula
-  | LFlet of binding list * formula
   | LFite of formula * formula * formula
   | LFapp of atomic_word * term list
   | LFdef of defined_pred * term list
   | LFvar of variable
 
 and term_node =
-  | LTlet of binding list * term
   | LTite of formula * term * term
   | LTapp of atomic_word * term list
   | LTdef of defined_func * term list
