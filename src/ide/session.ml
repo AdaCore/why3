@@ -1574,6 +1574,7 @@ let redo_external_proof ~timelimit g a =
               (Some (open_in f))
             end
           in
+          a.timelimit <- timelimit;
           schedule_proof_attempt
             ~debug:false ~timelimit ~memlimit:0
             ?old ~command:p.command ~driver:p.driver

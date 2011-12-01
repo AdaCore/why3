@@ -429,8 +429,12 @@ let set_proof_state ~obsolete a =
           Format.sprintf "%.2f [%d.0]" time a.M.timelimit
         else
           Format.sprintf "%.2f" time
-    | Session.Unedited -> "not yet edited"
-    | _ -> ""
+    | Session.Unedited -> "(not yet edited, edit with \"Edit\" button)"
+    | Session.InternalFailure _ -> "(internal failure)"
+    | Session.Interrupted -> "(interrupted)"
+    | Session.Scheduled | Session.Running ->
+        Format.sprintf "[limit=%d.0]" a.M.timelimit
+    | Session.Undone -> "(undone)"
   in
   let t = if obsolete then t ^ " (obsolete)" else t in
   goals_model#set ~row:row#iter ~column:time_column t
