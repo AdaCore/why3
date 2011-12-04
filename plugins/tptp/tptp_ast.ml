@@ -17,91 +17,73 @@
 (*                                                                        *)
 (**************************************************************************)
 
-type loc = Loc.position
+type loc = Why3.Loc.position
 
 type atomic_word = string
 type variable = string
 type distinct = string
 
-(** TFF type *)
-
 type defined_type =
-  | DTtype | DTprop | DTuniv
-  | DTint  | DTrat  | DTreal
-  | DTunknown of string
+  | DTtype   | DTprop   | DTuniv   | DTint
+  | DTrat    | DTreal   | DTdummy (* placeholder *)
 
-type tff_type_node =
-  | TVar of variable
-  | TConstr of atomic_word * tff_type list
-  | TDef of defined_type
+type defined_func =
+  | DFumin   | DFsum    | DFdiff   | DFprod
+  | DFquot   | DFquot_e | DFquot_t | DFquot_f
+  | DFrem_e  | DFrem_t  | DFrem_f
+  | DFfloor  | DFceil   | DFtrunc  | DFround
+  | DFtoint  | DFtorat  | DFtoreal
 
-and tff_type = { ty_node : tff_type_node ; ty_loc : loc }
+type defined_pred =
+  | DPtrue   | DPfalse  | DPdistinct
+  | DPless   | DPlesseq | DPgreater | DPgreatereq
+  | DPisint  | DPisrat  | DPequal   | DPnoneq
 
-type top_type = variable list * tff_type list * tff_type
+type defined_word =
+  | DT of defined_type
+  | DF of defined_func
+  | DP of defined_pred
 
 (** Formula *)
 
-type binop = BOequ | BOimp | BOpmi | BOand | BOor | BOnand | BOnor
+type binop =
+  | BOequ | BOnequ | BOimp  | BOpmi
+  | BOand | BOor   | BOnand | BOnor
 
 type quant = Qforall | Qexists
-
-type tyvar = variable * tff_type
-
-type defined_pred =
-  | DPtrue  | DPfalse  | DPdistinct
-  | DPless  | DPlesseq | DPgreater | DPgreatereq
-  | DPisint | DPisrat  | DPequal   | DPnoneq
-  | DPunknown of string
-
-type defined_func =
-  | DFumin   | DFsum    | DFdiff
-  | DFprod   | DFquot
-  | DFquot_e | DFquot_t | DFquot_f
-  | DFrem_e  | DFrem_t  | DFrem_f
-  | DFfloor  | DFceil
-  | DFtrunc  | DFround
-  | DFtoint  | DFtorat  | DFtoreal
-  | DFunknown of string
 
 type num_integer = string
 type num_rational = string * string
 type num_real = string * string option * string option
 
 type number =
-  | Nint of num_integer
-  | Nrat of num_rational
+  | Nint  of num_integer
+  | Nrat  of num_rational
   | Nreal of num_real
 
-type formula_node =
-  | LFqnt of quant * tyvar list * formula
-  | LFbin of binop * formula * formula
-  | LFnot of formula
-  | LFite of formula * formula * formula
-  | LFapp of atomic_word * term list
-  | LFdef of defined_pred * term list
-  | LFvar of variable
+type expr = { e_node : expr_node ; e_loc : loc }
 
-and term_node =
-  | LTite of formula * term * term
-  | LTapp of atomic_word * term list
-  | LTdef of defined_func * term list
-  | LTvar of variable
-  | LTdob of distinct
-  | LTnum of number
+and expr_node =
+  | Elet of expr * expr
+  | Eite of expr * expr * expr
+  | Eqnt of quant * tyvar list * expr
+  | Ebin of binop * expr * expr
+  | Enot of expr
+  | Eequ of expr * expr
+  | Eapp of atomic_word * expr list
+  | Edef of defined_word * expr list
+  | Evar of variable
+  | Edob of distinct
+  | Enum of number
 
-and binding_node =
-  | LBform of variable * formula
-  | LBterm of variable * term
-  | LBtype of variable * tff_type
+and tyvar = variable * expr
 
-and formula = { f_node : formula_node ; f_loc : loc }
-and term    = { t_node : term_node    ; t_loc : loc }
-and binding = { b_node : binding_node ; b_loc : loc }
+type top_type = tyvar list * (expr list * expr)
 
 type top_formula =
-  | LogicFormula of formula
+  | LogicFormula of expr
   | TypedAtom of atomic_word * top_type
-  | Sequent of formula list * formula list
+  | Sequent of expr list * expr list
 
 (** Top level *)
 
@@ -119,5 +101,5 @@ type input =
   | Formula of kind * name * role * top_formula * loc
   | Include of file * name list * loc
 
-type tptp_file = tptp_input list
+type tptp_file = input list
 

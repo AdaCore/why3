@@ -251,24 +251,32 @@ install-all: install install-lib
 # Why plugins
 ##################
 
-PLUGGENERATED =
+PLUGGENERATED = plugins/tptp/tptp_lexer.ml \
+		plugins/tptp/tptp_parser.ml plugins/tptp/tptp_parser.mli
 
 PLUG_PARSER = genequlin
 PLUG_PRINTER = tptpfof
 PLUG_TRANSFORM =
+PLUG_TPTP = tptp_ast tptp_parser tptp_lexer
 
-PLUGINS = genequlin tptpfof
+PLUGINS = genequlin tptpfof tptp
+
+TFF1MODULES = $(addprefix plugins/tptp/, $(PLUG_TPTP))
+
+TFF1CMO = $(addsuffix .cmo, $(TFF1MODULES))
+TFF1CMX = $(addsuffix .cmx, $(TFF1MODULES))
 
 PLUGMODULES = $(addprefix plugins/parser/, $(PLUG_PARSER)) \
 	      $(addprefix plugins/printer/, $(PLUG_PRINTER)) \
-	      $(addprefix plugins/transform/, $(PLUG_TRANSFORM))
+	      $(addprefix plugins/transform/, $(PLUG_TRANSFORM)) \
+	      $(TFF1MODULES)
 
 PLUGML  = $(addsuffix .ml,  $(PLUGMODULES))
 PLUGMLI = $(addsuffix .mli, $(PLUGMODULES))
 PLUGCMO = $(addsuffix .cmo, $(PLUGMODULES))
 PLUGCMX = $(addsuffix .cmx, $(PLUGMODULES))
 
-PLUGDIRS = parser printer transform
+PLUGDIRS = parser printer transform tptp
 PLUGINCLUDES = $(addprefix -I plugins/, $(PLUGDIRS))
 
 $(PLUGCMO) $(PLUGCMX): INCLUDES += $(PLUGINCLUDES)
@@ -297,6 +305,14 @@ lib/plugins/%.cmxs: plugins/transform/%.cmx
 	    $(OCAMLOPT) $(OFLAGS) -shared -o $@ $<
 
 lib/plugins/%.cmo: plugins/transform/%.cmo
+	$(if $(QUIET),@echo 'Linking  $@' &&) \
+	    $(OCAMLC) $(BFLAGS) -pack -o $@ $<
+
+lib/plugins/tptp.cmxs: $(TFF1CMX)
+	$(if $(QUIET), @echo 'Linking  $@' &&) \
+	    $(OCAMLOPT) $(OFLAGS) -shared -o $@ $<
+
+lib/plugins/tptp.cmo: $(TFF1CMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -pack -o $@ $<
 

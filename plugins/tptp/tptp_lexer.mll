@@ -22,63 +22,70 @@
   open Lexing
   open Tptp_ast
   open Tptp_parser
-  open Tptp_typing
+  (* open Tptp_typing *)
+
+  open Why3
 
   (* lexical errors *)
 
   exception IllegalCharacter of char
   exception UnterminatedComment
   exception UnterminatedString
+  exception UnknownDDW of string
+  exception UnknownDW of string
 
   let () = Exn_printer.register (fun fmt e -> match e with
     | IllegalCharacter c -> fprintf fmt "illegal character %c" c
     | UnterminatedComment -> fprintf fmt "unterminated comment"
     | UnterminatedString -> fprintf fmt "unterminated string"
-    | DoubleDollarWord -> fprintf fmt "system-specifics are not supported"
+    | UnknownDDW s -> fprintf fmt "unknown system_word %s" s
+    | UnknownDW s -> fprintf fmt "unknown defined_word %s" s
     | _ -> raise e)
 
-(*
   let defwords = Hashtbl.create 97
   let () = List.iter (fun (x,y) -> Hashtbl.add defwords x y) [
-    "ceiling", CEILING;
-    "difference", DIFFERENCE;
-    "distinct", DISTINCT;
-    "false", FALSE;
-    "floor", FLOOR;
-    "greater", GREATER;
-    "greatereq", GREATEREQ;
-    "i", ITYPE;
-    "int", INT;
-    "is_int", IS_INT;
-    "is_rat", IS_RAT;
-    "ite_f", ITEF;
-    "ite_t", ITET;
-    "iType", ITYPE;
-    "less", LESS;
-    "lesseq", LESSEQ;
-    "o", OTYPE;
-    "oType", OTYPE;
-    "product", PRODUCT;
-    "quotient", QUOTIENT;
-    "quotient_e", QUOTIENT_E;
-    "quotient_t", QUOTIENT_T;
-    "quotient_f", QUOTIENT_F;
-    "rat", RAT;
-    "real", REAL;
-    "remainder_e", REMAINDER_E;
-    "remainder_t", REMAINDER_T;
-    "remainder_f", REMAINDER_F;
-    "round", ROUND;
-    "sum", SUM;
-    "to_int", TO_INT;
-    "to_rat", TO_RAT;
-    "to_real", TO_REAL;
-    "true", TRUE;
-    "truncate", TRUNCATE;
-    "tType", TTYPE;
-    "uminus", UMINUS;
+    "ceiling", DWORD (DF DFceil);
+    "difference", DWORD (DF DFdiff);
+    "distinct", DWORD (DP DPdistinct);
+    "false", DWORD (DP DPfalse);
+    "floor", DWORD (DF DFfloor);
+    "greater", DWORD (DP DPgreater);
+    "greatereq", DWORD (DP DPgreatereq);
+    "i", DWORD (DT DTuniv);
+    "int", DWORD (DT DTint);
+    "is_int", DWORD (DP DPisint);
+    "is_rat", DWORD (DP DPisrat);
+    "ite_f", ITE_F;
+    "ite_t", ITE_T;
+    "iType", DWORD (DT DTuniv);
+    "let_tt", LET_TT;
+    "let_ft", LET_FT;
+    "let_tf", LET_TF;
+    "let_ff", LET_FF;
+    "less", DWORD (DP DPless);
+    "lesseq", DWORD (DP DPlesseq);
+    "o", DWORD (DT DTprop);
+    "oType", DWORD (DT DTprop);
+    "product", DWORD (DF DFprod);
+    "quotient", DWORD (DF DFquot);
+    "quotient_e", DWORD (DF DFquot_e);
+    "quotient_t", DWORD (DF DFquot_t);
+    "quotient_f", DWORD (DF DFquot_f);
+    "rat", DWORD (DT DTrat);
+    "real", DWORD (DT DTreal);
+    "remainder_e", DWORD (DF DFrem_e);
+    "remainder_t", DWORD (DF DFrem_t);
+    "remainder_f", DWORD (DF DFrem_f);
+    "round", DWORD (DF DFround);
+    "sum", DWORD (DF DFsum);
+    "to_int", DWORD (DF DFtoint);
+    "to_rat", DWORD (DF DFtorat);
+    "to_real", DWORD (DF DFtoreal);
+    "true", DWORD (DP DPtrue);
+    "truncate", DWORD (DF DFtrunc);
+    "tType", DWORD (DT DTtype);
+    "uminus", DWORD (DF DFumin);
   ]
-*)
 
   let keywords = Hashtbl.create 97
   let () = List.iter (fun (x,y) -> Hashtbl.add keywords x y) [
@@ -138,10 +145,12 @@ rule token = parse
       { SINGLE_QUOTED sq }
   | '"' (do_char* as dob) '"'
       { DISTINCT_OBJECT dob }
+  | "$_"
+      { DWORD (DT DTdummy) }
   | '$' (lword as id)
-      { DWORD id }
-  | "$$" lword
-      { raise DoubleDollarWord }
+      { try Hashtbl.find defwords id with Not_found -> raise (UnknownDW id) }
+  | "$$" (lword as id)
+      { raise (UnknownDDW id) }
   | '+'? (natural as s)
   | '-'   natural as s
       { INTNUM s }
@@ -189,6 +198,10 @@ rule token = parse
       { NBAR }
   | "~"
       { TILDE }
+  | "&"
+      { AMP }
+  | "|"
+      { BAR }
   | "="
       { EQUAL }
   | "!="
@@ -212,11 +225,11 @@ and comment_block = parse
   | "*/"
       { () }
   | newline
-      { newline lexbuf; comment lexbuf }
+      { newline lexbuf; comment_block lexbuf }
   | eof
       { raise (Loc.Located (!comment_start_loc, UnterminatedComment)) }
   | _
-      { comment lexbuf }
+      { comment_block lexbuf }
 
 and comment_line = parse
   | newline
@@ -224,7 +237,7 @@ and comment_line = parse
   | eof
       { () }
   | _
-      { comment lexbuf }
+      { comment_line lexbuf }
 
 {
   let with_location f lb =
@@ -237,9 +250,10 @@ and comment_line = parse
     let lb = Lexing.from_channel c in
     Loc.set_file file lb;
     let ast = with_location (tptp_file token) lb in
-    tptp_typing env path ast
+(*    tptp_typing env path ast *)
+    Util.Mstr.empty
 
-  let () = Env.register_format "why" ["why"] read_channel
+  let () = Env.register_format "tptp" ["p";"ax"] read_channel
 }
 
 (*
