@@ -94,8 +94,7 @@ type file = string
 
 type role =
   | Axiom | Hypothesis | Definition  | Assumption
-  | Lemma | Theorem    | Conjecture  | Negated_conjecture
-  | Type  | Unknown of string
+  | Lemma | Theorem    | Conjecture  | Negated_conjecture | Type
 
 type input =
   | Formula of kind * name * role * top_formula * loc

@@ -325,8 +325,25 @@ number:
 ;
 
 atomic_word:
-| LWORD         { $1 }
-| SINGLE_QUOTED { $1 }
+| LWORD          { $1 }
+| SINGLE_QUOTED  { $1 }
+| reserved_word  { $1 }
+;
+
+reserved_word:
+| ASSUMPTION          { "assumption" }
+| AXIOM               { "axiom" }
+| CNF                 { "cnf" }
+| CONJECTURE          { "conjecture" }
+| DEFINITION          { "definition" }
+| FOF                 { "fof" }
+| HYPOTHESIS          { "hypothesis" }
+| INCLUDE             { "include" }
+| LEMMA               { "lemma" }
+| NEGATED_CONJECTURE  { "negated_conjecture" }
+| TFF                 { "tff" }
+| THEOREM             { "theorem" }
+| TYPE                { "type" }
 ;
 
 /* TODO: add support for annotations */

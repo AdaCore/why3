@@ -22,7 +22,7 @@
   open Lexing
   open Tptp_ast
   open Tptp_parser
-  (* open Tptp_typing *)
+  open Tptp_typing
 
   open Why3
 
@@ -250,8 +250,7 @@ and comment_line = parse
     let lb = Lexing.from_channel c in
     Loc.set_file file lb;
     let ast = with_location (tptp_file token) lb in
-(*    tptp_typing env path ast *)
-    Util.Mstr.empty
+    Tptp_typing.typecheck env path ast
 
   let () = Env.register_format "tptp" ["p";"ax"] read_channel
 }
