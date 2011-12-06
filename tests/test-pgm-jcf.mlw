@@ -50,6 +50,8 @@ module M
 
   predicate is_zero (a:int) = a=0
 
+  val foo: x:ref int -> unit
+
   let test1 () =
     let x = ref 0 in
     while is_zero !x do variant { !x } () done

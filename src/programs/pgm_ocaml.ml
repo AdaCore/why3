@@ -8,6 +8,7 @@ open Ty
 open Term
 open Decl
 open Theory
+open Pgm_types.T
 open Pgm_ttree
 open Pgm_module
 
@@ -118,6 +119,8 @@ let star fmt () = fprintf fmt " *@ "
 let rec print_ty_node inn fmt ty = match ty.ty_node with
   | Tyvar v ->
       print_tv fmt v
+  | Tyapp (ts, []) when is_ts_tuple ts ->
+      fprintf fmt "unit"
   | Tyapp (ts, tl) when is_ts_tuple ts ->
       fprintf fmt "(%a)" (print_list star (print_ty_node false)) tl
   | Tyapp (ts, []) ->
@@ -408,10 +411,88 @@ let logic_tdecl fmt td = match td.td_node with
 let extract_theory _path _th =
   assert false (*TODO*)
 
+(** Program Expression *)
+
+let rec print_expr fmt e = match e.expr_desc with
+  | Elogic t ->
+      print_term fmt t
+  | Elocal v ->
+      print_pv fmt v
+  | Eglobal ps ->
+      print_ls fmt ps.ps_pure
+  | Efun (bl, t) ->
+      fprintf fmt "@[<hov 2>fun %a ->@ %a@]"
+        (print_list space print_pv_arg) bl print_triple t
+  | Elet (v, e1, e2) ->
+      fprintf fmt "@[<hv 0>@[<hov 2>let %a =@ %a in@]@ %a@]"
+        print_vs v.pv_pure
+        print_lexpr e1 print_lexpr e2;
+    forget_var v.pv_pure
+
+  | Eif (e1, e2, e3) ->
+      fprintf fmt "@[if %a@ then@ %a else@ %a@]"
+        print_lexpr e1 print_lexpr e2 print_lexpr e3
+
+  | Eany _c ->
+      fprintf fmt "assert false (* TODO: call *)"
+
+  | Emark (_, _)  ->
+      fprintf fmt "<todo: Emark>"
+  | Eassert (_, f) ->
+      fprintf fmt "@[assert {%a}@]" print_term f
+  | Efor (_, _, _, _, _, e) ->
+      fprintf fmt "@[<hov 2>for ... do@ %a@ done@]" print_lexpr e
+  | Etry (e1, bl) ->
+      let print_handler fmt (es, vs, e) =
+        fprintf fmt "| %a %a -> %a" print_cs es (print_option print_pv) vs
+          print_expr e
+      in
+      fprintf fmt "@[<hov 2>begin try@ %a@\nwith@\n%a end@]"
+        print_expr e1 (print_list newline print_handler) bl
+  | Eraise (es, e)  ->
+      fprintf fmt "(raise (%a %a))" print_cs es (print_option print_expr) e
+  | Ematch (v, cl) ->
+      fprintf fmt "@[<hov 2>match %a with@ %a@]" print_pv v
+        (print_list newline print_branch) cl
+  | Eloop (_, e1) ->
+      fprintf fmt "@[<hov 2>while true do@ %a done@]" print_expr e1
+  | Eletrec (_, _)  ->
+      fprintf fmt "<todo: Eletrec>"
+  | Eabsurd ->
+      fprintf fmt "assert false (* absurd *)"
+
+and print_lexpr fmt e =
+  print_expr fmt e
+
+and print_pv fmt v =
+  fprintf fmt "%a" print_vs v.pv_pure
+
+and print_pv_arg fmt v =
+  fprintf fmt "(%a)" print_vsty v.pv_pure
+
+and print_triple fmt (_, e, _) =
+  print_expr fmt e
+
+and print_recfun fmt (v, bl, t, _) =
+  fprintf fmt "@[<hov 2>rec %a@ %a =@ %a@]"
+    print_pv v (print_list space print_pv_arg) bl print_triple t
+
+and print_branch fmt (p, e) =
+  fprintf fmt "@[<hov 4>| %a ->@ %a@]" print_pattern p print_expr e
+
+and print_pattern fmt p =
+  print_pat fmt p.ppat_pat
+
 (** Program Declarations *)
 
-let decl fmt _d =
-  fprintf fmt "(* pgm decl *)" (* TODO *)
+let decl fmt = function
+  | Dlet (ps, e) ->
+      fprintf fmt "@[<hov 2>let %a =@ %a@]"
+        print_ls ps.ps_pure print_expr e
+  | Dletrec _dl ->
+      fprintf fmt "(* pgm let rec *)" (* TODO *)
+  | Dparam ps ->
+      print_logic_decl true fmt (ps.ps_pure, None)
 
 (** Modules *)
 
