@@ -161,9 +161,7 @@ let _ =
       let outbuf = Buffer.create 1024 in
       let fmt = Format.formatter_of_buffer outbuf in
       Gnat_expl.MExpl.iter (prove_objective fmt) !expl_map;
-      Gnat_util.output_buffer outbuf Gnat_config.result_file;
-      Sysutil.remove_clean_up ()
+      Gnat_util.output_buffer outbuf Gnat_config.result_file
     with e when not (Debug.test_flag Debug.stack_trace) ->
-       Sysutil.remove_clean_up ();
        Format.eprintf "%a.@." Exn_printer.exn_printer e;
        Gnat_util.abort_with_message ""

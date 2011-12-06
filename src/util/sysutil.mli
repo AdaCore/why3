@@ -72,11 +72,3 @@ val relativize_filename : string -> string -> string
 val absolutize_filename : string -> string -> string
 (** [absolutize_filename base filename] absolutize the filename
     [filename] according to [base] *)
-
-val try_remove : string -> unit
-(** try to remove the file; if there is a problem, put the file in a list to be
-    cleaned by calling [remove_clean_up]. Do not raise an error in any case. *)
-
-val remove_clean_up : unit -> unit
-(** remove all the files that have not been removed immediately when calling
-    [try_remove]. *)

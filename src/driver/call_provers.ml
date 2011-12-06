@@ -158,8 +158,8 @@ let call_on_buffer ~command ?(timelimit=0) ?(memlimit=0)
 
       fun () ->
         if Debug.nottest_flag debug then begin
-          Sysutil.try_remove fin;
-          Sysutil.try_remove fout;
+          Sys.remove fin;
+          Sys.remove fout;
         end;
         let ans = match ret with
           | Unix.WSTOPPED n ->
