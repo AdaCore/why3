@@ -28,6 +28,8 @@ open Typing
 open Ptree
 open Pgm_module
 
+let debug_extraction = Debug.register_flag "extraction"
+
 exception ClashModule of string
 
 let () = Exn_printer.register (fun fmt e -> match e with
@@ -62,6 +64,7 @@ let add_module ?(type_only=false) env penv path (ltm, lmod) m =
     List.fold_left (Pgm_typing.decl ~wp env penv ltm lmod) uc m.mod_decl
   in
   let md = close_module uc in
+  if Debug.test_flag debug_extraction then Pgm_ocaml.extract_module path md;
   Mstr.add ("WP " ^ id.id) md.m_pure ltm, (* avoids a theory/module clash *)
   Mstr.add id.id md lmod
 
