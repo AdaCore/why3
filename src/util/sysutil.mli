@@ -72,3 +72,9 @@ val relativize_filename : string -> string -> string
 val absolutize_filename : string -> string -> string
 (** [absolutize_filename base filename] absolutize the filename
     [filename] according to [base] *)
+
+val safe_remove : string -> unit
+(** a version of Sys.remove that insists to delete the file as long as the
+    simple Sys.remove fails. This allows to delete files unter windows, where
+    it may take a few milliseconds to liberate a handle. The function stops
+    trying when we have waited for too long. *)

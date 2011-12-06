@@ -180,6 +180,17 @@ let absolutize_filename dirname f =
   else
     f
 
+let safe_remove =
+   let rec rec_saferemove f time =
+      try Sys.remove f
+      with e ->
+         if time > 1. then raise e
+         else
+            ignore (Unix.select [] [] [] time);
+            rec_saferemove f (time *. 2.)
+   in
+   (fun s -> rec_saferemove s 0.01)
+
 (*
 let p1 = relativize_filename "/bin/bash" "src/f.why"
 
