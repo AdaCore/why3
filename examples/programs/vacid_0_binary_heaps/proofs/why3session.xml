@@ -5,7 +5,7 @@
  <prover
   id="alt-ergo"
   name="Alt-Ergo"
-  version="0.93"/>
+  version="0.94"/>
  <prover
   id="alt-ergo-0.93.1"
   name="Alt-Ergo"
@@ -2664,11 +2664,11 @@
  </file>
  <file
   name="../heap_implem.mlw"
-  verified="true"
+  verified="false"
   expanded="false">
   <theory
    name="WP Implementation"
-   verified="true"
+   verified="false"
    expanded="false">
    <goal
     name="Is_heap_min"
@@ -4350,12 +4350,12 @@
       name="WP_parameter extractMin.14"
       expl="loop invariant preservation"
       sum="96dceb3a4a93d025b1dce841e592844a"
-      proved="true"
+      proved="false"
       expanded="false"
       shape="ainfix <amixfix []V5aparentV6amixfix []V0ainfix -V1c1Iainfix >V6c0Aainfix =aelementsV5c0ainfix -V1c1aaddamixfix []V5V6adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V5V0Iainfix =V6c0Aais_heap_arrayV5c0ainfix -V1c1Aainfix <V6ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V6Iainfix =V6V4FIainfix =V5amixfix [<-]V3V2amixfix []V3V4FIainfix <=amixfix []V0ainfix -V1c1amixfix []V3V4NIainfix =V4ainfix +ainfix *c2V2c2FIainfix >amixfix []V3ainfix +ainfix *c2V2c1amixfix []V3ainfix +ainfix *c2V2c2Iainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
       <transf
        name="split_goal"
-       proved="true"
+       proved="false"
        expanded="false">
        <goal
         name="WP_parameter extractMin.14.1"
@@ -4461,15 +4461,15 @@
         name="WP_parameter extractMin.14.3"
         expl="parameter extractMin"
         sum="66746da7f042240e777d67d7b23b224b"
-        proved="true"
+        proved="false"
         expanded="false"
         shape="ais_heap_arrayV5c0ainfix -V1c1Iainfix =V6V4FIainfix =V5amixfix [<-]V3V2amixfix []V3V4FIainfix <=amixfix []V0ainfix -V1c1amixfix []V3V4NIainfix =V4ainfix +ainfix *c2V2c2FIainfix >amixfix []V3ainfix +ainfix *c2V2c1amixfix []V3ainfix +ainfix *c2V2c2Iainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
         <proof
          prover="alt-ergo"
-         timelimit="3"
+         timelimit="10"
          edited=""
          obsolete="false">
-         <result status="valid" time="0.05"/>
+         <result status="timeout" time="10.03"/>
         </proof>
        </goal>
        <goal
@@ -4979,12 +4979,12 @@
       name="WP_parameter extractMin.21"
       expl="loop invariant preservation"
       sum="f95c2451d33fd5382ee4cdda82a250bc"
-      proved="true"
+      proved="false"
       expanded="false"
       shape="ainfix <amixfix []V4aparentV5amixfix []V0ainfix -V1c1Iainfix >V5c0Aainfix =aelementsV4c0ainfix -V1c1aaddamixfix []V4V5adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V4V0Iainfix =V5c0Aais_heap_arrayV4c0ainfix -V1c1Aainfix <V5ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V5Iainfix =V5ainfix +ainfix *c2V2c1FIainfix =V4amixfix [<-]V3V2amixfix []V3ainfix +ainfix *c2V2c1FIainfix <=amixfix []V0ainfix -V1c1amixfix []V3ainfix +ainfix *c2V2c1NIainfix >amixfix []V3ainfix +ainfix *c2V2c1amixfix []V3ainfix +ainfix *c2V2c2NIainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
       <transf
        name="split_goal"
-       proved="true"
+       proved="false"
        expanded="false">
        <goal
         name="WP_parameter extractMin.21.1"
@@ -5090,15 +5090,15 @@
         name="WP_parameter extractMin.21.3"
         expl="parameter extractMin"
         sum="2d0484d5a5eb0ba98bf82c4aef036342"
-        proved="true"
+        proved="false"
         expanded="false"
         shape="ais_heap_arrayV4c0ainfix -V1c1Iainfix =V5ainfix +ainfix *c2V2c1FIainfix =V4amixfix [<-]V3V2amixfix []V3ainfix +ainfix *c2V2c1FIainfix <=amixfix []V0ainfix -V1c1amixfix []V3ainfix +ainfix *c2V2c1NIainfix >amixfix []V3ainfix +ainfix *c2V2c1amixfix []V3ainfix +ainfix *c2V2c2NIainfix <ainfix +ainfix *c2V2c2ainfix -V1c1Iainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
         <proof
          prover="alt-ergo"
-         timelimit="3"
+         timelimit="10"
          edited=""
          obsolete="false">
-         <result status="valid" time="0.04"/>
+         <result status="timeout" time="10.03"/>
         </proof>
        </goal>
        <goal
@@ -5389,12 +5389,12 @@
       name="WP_parameter extractMin.28"
       expl="loop invariant preservation"
       sum="3ac0e5e32d0658c93dc03e6ad58f9e84"
-      proved="true"
+      proved="false"
       expanded="false"
       shape="ainfix <amixfix []V4aparentV5amixfix []V0ainfix -V1c1Iainfix >V5c0Aainfix =aelementsV4c0ainfix -V1c1aaddamixfix []V4V5adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V4V0Iainfix =V5c0Aais_heap_arrayV4c0ainfix -V1c1Aainfix <V5ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V5Iainfix =V5ainfix +ainfix *c2V2c1FIainfix =V4amixfix [<-]V3V2amixfix []V3ainfix +ainfix *c2V2c1FIainfix <=amixfix []V0ainfix -V1c1amixfix []V3ainfix +ainfix *c2V2c1NIainfix <ainfix +ainfix *c2V2c2ainfix -V1c1NIainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
       <transf
        name="split_goal"
-       proved="true"
+       proved="false"
        expanded="false">
        <goal
         name="WP_parameter extractMin.28.1"
@@ -5500,15 +5500,15 @@
         name="WP_parameter extractMin.28.3"
         expl="parameter extractMin"
         sum="c74ee239121c81d8866aea126946c2db"
-        proved="true"
+        proved="false"
         expanded="false"
         shape="ais_heap_arrayV4c0ainfix -V1c1Iainfix =V5ainfix +ainfix *c2V2c1FIainfix =V4amixfix [<-]V3V2amixfix []V3ainfix +ainfix *c2V2c1FIainfix <=amixfix []V0ainfix -V1c1amixfix []V3ainfix +ainfix *c2V2c1NIainfix <ainfix +ainfix *c2V2c2ainfix -V1c1NIainfix >=ainfix +ainfix *c2V2c1ainfix -V1c1NIainfix <V2ainfix -V1c1Iainfix <amixfix []V3aparentV2amixfix []V0ainfix -V1c1Iainfix >V2c0Aainfix =aelementsV3c0ainfix -V1c1aaddamixfix []V3V2adiffadiffaelementsV0c0V1asingletonamixfix []V0ainfix -V1c1asingletonamixfix []V0c0Iainfix >ainfix -V1c1c0Aainfix =V3V0Iainfix =V2c0Aais_heap_arrayV3c0ainfix -V1c1Aainfix <V2ainfix -V1c1Iainfix >ainfix -V1c1c0Aainfix <=c0V2FFIainfix >anb_occamixfix []V0ainfix -V1c1adiffaelementsV0c0V1asingletonamixfix []V0c0c0Iainfix >ainfix -V1c1c0Iainfix >V1c0Iais_heapaTuple2V0V1Aainfix =aelementsV0c0V1aempty_bagNF">
         <proof
          prover="alt-ergo"
-         timelimit="3"
+         timelimit="10"
          edited=""
          obsolete="false">
-         <result status="valid" time="0.05"/>
+         <result status="timeout" time="10.09"/>
         </proof>
        </goal>
        <goal
