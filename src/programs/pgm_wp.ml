@@ -623,6 +623,11 @@ and wp_desc env rm e q = match e.expr_desc with
       let p = wp_label e (wp_expl "precondition" c.c_pre) in
       let p = t_label ~loc:e.expr_loc p.t_label p in
       wp_and p w
+  | ESandbox e ->
+        (* a sandbox never raises exceptions and has a unit result *)
+        let (_, q), _ = q in
+        let wpe = wp_expr env rm e (default_post e.expr_type e.expr_effect) in
+        wp_and ~sym:true wpe q
 
 and wp_triple env rm bl (p, e, q) =
   let rm = add_binders bl rm in

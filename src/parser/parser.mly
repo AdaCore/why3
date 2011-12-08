@@ -213,6 +213,7 @@ end
 %token EXCEPTION FOR
 %token FUN GHOST INVARIANT LOOP MODEL MODULE MUTABLE PRIVATE RAISE
 %token RAISES READS REC TO TRY VAL VARIANT WHILE WRITES
+%token SANDBOX
 
 /* symbols */
 
@@ -1188,6 +1189,8 @@ expr:
    { mk_expr (Eany $2) }
 | label expr %prec prec_named
    { mk_expr (Enamed ($1, $2)) }
+| SANDBOX LEFTPAR expr RIGHTPAR
+   { mk_expr (ESandbox $3) }
 ;
 
 triple:

@@ -241,6 +241,7 @@ and expr_desc =
   | Ecast of expr * pty
   | Eany of type_c
   | Enamed of label * expr
+  | ESandbox of expr
 
   (* TODO: ghost *)
 

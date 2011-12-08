@@ -77,6 +77,8 @@ let rec print_expr fmt e = match e.expr_desc with
       fprintf fmt "<todo: Eletrec>"
   | Eabsurd ->
       fprintf fmt "absurd"
+  | ESandbox _ ->
+      fprintf fmt "<todo: sandbox>"
 
 and print_lexpr fmt e =
   let print_elab fmt e =
