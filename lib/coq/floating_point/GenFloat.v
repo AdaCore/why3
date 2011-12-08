@@ -20,11 +20,12 @@ Variable prec emax : Z.
 Hypothesis Hprec : Zlt_bool 0 prec = true.
 Hypothesis Hemax : Zlt_bool prec emax = true.
 Let emin := (3 - emax - prec)%Z.
-Let fexp := FLT_exp emin prec.
+Notation fexp := (FLT_exp emin prec).
+
 Lemma Hprec': (0 < prec)%Z. revert Hprec. now case Zlt_bool_spec. Qed.
 Lemma Hemax': (prec < emax)%Z. revert Hemax. now case Zlt_bool_spec. Qed.
-Let binary_round_correct := binary_round_sign_shl_correct prec emax Hprec' Hemax'.
 
+Instance Hprec'' : Prec_gt_0 prec := Hprec'.
 
 Record t : Set := mk_fp {
   binary : binary_float prec emax;
@@ -49,28 +50,11 @@ Definition rnd_of_mode (m:mode) :=
   |  NearestTiesToAway => mode_NA
   end.
 
-(* from Flocq 2.0 *)
-Definition binary_normalize mode m e szero :=
-  match m with
-  | Z0 => B754_zero _ _ szero
-  | Zpos m => FF2B _ _ _ (proj1 (binary_round_correct mode false m e))
-  | Zneg m => FF2B _ _ _ (proj1 (binary_round_correct mode true m e))
-  end.
-
-(* from Flocq 2.0 *)
-Axiom binary_normalize_correct :
-  forall m mx ex szero,
-  if Rlt_bool (Rabs (round radix2 fexp (round_mode m) (F2R (Float radix2 mx ex)))) (bpow radix2 emax) then
-    B2R _ _ (binary_normalize m mx ex szero) = round radix2 fexp (round_mode m) (F2R (Float radix2 mx ex)) /\
-    is_finite _ _ (binary_normalize m mx ex szero) = true
-  else
-    B2FF _ _ (binary_normalize m mx ex szero) = binary_overflow prec emax m (Rlt_bool (F2R (Float radix2 mx ex)) 0).
-
 Definition r_to_fp rnd x : binary_float prec emax :=
   let r := round radix2 fexp (round_mode rnd) x in
   let m := Ztrunc (scaled_mantissa radix2 fexp r) in
-  let e := canonic_exponent radix2 fexp r in
-  binary_normalize rnd m e false.
+  let e := canonic_exp radix2 fexp r in
+  binary_normalize prec emax Hprec' Hemax' rnd m e false.
 
 Lemma is_finite_FF2B :
   forall f H,
@@ -90,20 +74,17 @@ Theorem r_to_fp_correct :
   (Rabs r < bpow radix2 emax)%R ->
   is_finite prec emax (r_to_fp rnd x) = true /\
   r_to_fp rnd x = r :>R.
-Proof.
+Proof with auto with typeclass_instances.
 intros rnd x r Bx.
 unfold r_to_fp. fold r.
-generalize (binary_normalize_correct rnd (Ztrunc (scaled_mantissa radix2 fexp r)) (canonic_exponent radix2 fexp r) false).
-assert (Gx: generic_format radix2 fexp r).
-apply generic_format_round.
-apply FLT_exp_correct.
-exact Hprec'.
-unfold F2R ; simpl.
-rewrite <- scaled_mantissa_generic with (1 := Gx).
-rewrite scaled_mantissa_bpow.
-rewrite round_generic with (1 := Gx).
+generalize (binary_normalize_correct prec emax Hprec' Hemax' rnd (Ztrunc (scaled_mantissa radix2 fexp r)) (canonic_exp radix2 fexp r) false).
+unfold r.
+elim generic_format_round...
+fold emin r.
+rewrite round_generic...
 rewrite Rlt_bool_true with (1 := Bx).
 now split.
+apply generic_format_round...
 Qed.
 
 Theorem r_to_fp_format :
@@ -111,18 +92,15 @@ Theorem r_to_fp_format :
   FLT_format radix2 emin prec x ->
   (Rabs x < bpow radix2 emax)%R ->
   r_to_fp rnd x = x :>R.
-Proof.
+Proof with auto with typeclass_instances.
 intros rnd x Fx Bx.
 assert (Gx: generic_format radix2 fexp x).
-apply -> FLT_format_generic.
+apply generic_format_FLT.
 apply Fx.
-exact Hprec'.
-pattern x at 2 ; rewrite <- round_generic with (rnd := round_mode rnd) (1 := Gx).
+pattern x at 2 ; rewrite <- round_generic with (rnd := round_mode rnd) (2 := Gx)...
 refine (proj2 (r_to_fp_correct _ _ _)).
-now rewrite round_generic with (1 := Gx).
+rewrite round_generic...
 Qed.
-
-
 
 Definition r_to_fp_aux (m:mode) (r r1 r2:R) :=
   mk_fp (r_to_fp (rnd_of_mode m) r) r1 r2.
@@ -152,20 +130,21 @@ Definition no_overflow(m:floating_point.Rounding.mode) (x:R): Prop :=
 Lemma Bounded_real_no_overflow : forall (m:floating_point.Rounding.mode)
   (x:R), ((Rabs x) <= max)%R -> (no_overflow m x).
 (* YOU MAY EDIT THE PROOF BELOW *)
-Proof.
+Proof with auto with typeclass_instances.
 intros m x Hx.
 apply Rabs_le.
 assert (generic_format radix2 fexp max).
-apply generic_format_canonic_exponent.
-unfold canonic_exponent.
-rewrite ln_beta_F2R.
+apply generic_format_F2R.
+intros H.
+unfold canonic_exp.
+rewrite ln_beta_F2R with (1 := H).
 rewrite (ln_beta_unique _ _ prec).
 ring_simplify (prec + (emax - prec))%Z.
-unfold fexp, FLT_exp.
+unfold FLT_exp.
 rewrite Zmax_l.
 apply Zle_refl.
 unfold emin.
-generalize Hprec' Hemax' ; clear; omega.
+generalize Hprec' Hemax' ; clear ; omega.
 rewrite <- Z2R_abs, Zabs_eq, <- 2!Z2R_Zpower.
 split.
 apply Z2R_le.
@@ -192,26 +171,13 @@ change 2%Z with (radix_val radix2).
 apply Zpower_gt_0.
 apply Zlt_le_weak.
 exact Hprec'.
-apply Zgt_not_eq.
-cut (2 <= 2^prec)%Z.
-clear ; omega.
-change (radix2 ^ 1 <= radix2 ^ prec)%Z.
-apply le_Z2R.
-rewrite 2!Z2R_Zpower.
-apply bpow_le.
-generalize Hprec' ; clear ; omega.
-apply Zlt_le_weak.
-exact Hprec'.
-easy.
 generalize (Rabs_le_inv _ _ Hx).
 split.
-erewrite <- round_generic with (x := Ropp max).
-apply round_monotone with (2 := proj1 H0).
-apply FLT_exp_correct; exact Hprec'.
+apply round_ge_generic...
 now apply generic_format_opp.
-rewrite <- round_generic with (rnd := round_mode (rnd_of_mode m)) (1 := H).
-apply round_monotone with (2 := proj2 H0).
-apply FLT_exp_correct; exact Hprec'.
+apply H0.
+apply round_le_generic...
+apply H0.
 Qed.
 
 (* DO NOT EDIT BELOW *)
@@ -223,9 +189,9 @@ Qed.
 Lemma Round_monotonic : forall (m:floating_point.Rounding.mode) (x:R) (y:R),
   (x <= y)%R -> ((round m x) <= (round m y))%R.
 (* YOU MAY EDIT THE PROOF BELOW *)
+Proof with auto with typeclass_instances.
 intros m x y Hxy.
-apply round_monotone with (2 := Hxy).
-apply FLT_exp_correct; exact Hprec'.
+apply round_le with (3 := Hxy)...
 Qed.
 (* DO NOT EDIT BELOW *)
 
@@ -237,10 +203,10 @@ Lemma Round_idempotent : forall (m1:floating_point.Rounding.mode)
   (m2:floating_point.Rounding.mode) (x:R), ((round m1 (round m2
   x)) = (round m2 x)).
 (* YOU MAY EDIT THE PROOF BELOW *)
+Proof with auto with typeclass_instances.
 intros m1 m2 x.
-apply round_generic.
-apply generic_format_round.
-apply FLT_exp_correct; exact Hprec'.
+apply round_generic...
+apply generic_format_round...
 Qed.
 
 (* DO NOT EDIT BELOW *)
@@ -252,9 +218,9 @@ Qed.
 Lemma Round_value : forall (m:floating_point.Rounding.mode) (x:t), ((round m
   (value x)) = (value x)).
 (* YOU MAY EDIT THE PROOF BELOW *)
-Proof.
+Proof with auto with typeclass_instances.
 intros m x.
-apply round_generic.
+apply round_generic...
 apply generic_format_B2R.
 Qed.
 (* DO NOT EDIT BELOW *)
@@ -263,33 +229,24 @@ Qed.
 
 (* DO NOT EDIT BELOW *)
 
-(* This is not an axiom: this is proved in flocq 2.0 *)
-Axiom le_pred_lt_bis: forall (beta : radix) (fexp : Z -> Z),
-       valid_exp fexp ->
-       forall x y : R,
-       F beta fexp x ->
-       F beta fexp y -> (0 < y)%R -> (x < y)%R -> (x <= pred beta fexp y)%R.
-
-
 Lemma Bounded_value : forall (x:t), ((Rabs (value x)) <= max)%R.
 (* YOU MAY EDIT THE PROOF BELOW *)
+Proof with auto with typeclass_instances.
 intros x.
 replace max with (pred radix2 fexp (bpow radix2 emax)).
-apply le_pred_lt_bis.
-apply FLT_exp_correct; exact Hprec'.
+apply le_pred_lt...
 apply generic_format_abs.
 apply generic_format_B2R.
 apply generic_format_bpow.
-unfold fexp, FLT_exp, emin.
+unfold FLT_exp, emin.
 clear ; zify ; generalize Hprec' Hemax' ; omega.
 apply bpow_gt_0.
-apply B2R_lt_emax.
+apply abs_B2R_lt_emax.
 unfold pred.
 rewrite ln_beta_bpow.
 ring_simplify (emax+1-1)%Z.
-rewrite Req_bool_true.
-2: easy.
-unfold fexp, FLT_exp, emin.
+rewrite Req_bool_true by easy.
+unfold FLT_exp, emin.
 rewrite Zmax_l.
 unfold max, F2R; simpl.
 pattern emax at 1; replace emax with (prec+(emax-prec))%Z by ring.
@@ -314,16 +271,15 @@ Lemma Exact_rounding_for_integers : forall (m:floating_point.Rounding.mode)
   (i:Z), (((-max_representable_integer)%Z <= i)%Z /\
   (i <= max_representable_integer)%Z) -> ((round m (IZR i)) = (IZR i)).
 (* YOU MAY EDIT THE PROOF BELOW *)
-Proof.
+Proof with auto with typeclass_instances.
 intros m z Hz.
-apply round_generic.
+apply round_generic...
 assert (Zabs z <= max_representable_integer)%Z.
 apply Abs_le with (1:=Hz).
 destruct (Zle_lt_or_eq _ _ H) as [Bz|Bz] ; clear H Hz.
-apply FLT_format_generic.
-exact Hprec'.
+apply generic_format_FLT.
 exists (Float radix2 z 0).
-unfold F2R. simpl.
+unfold F2R ; simpl.
 split.
 rewrite Z2R_IZR.
 now rewrite Rmult_1_r.
@@ -331,22 +287,10 @@ split. easy.
 clear;unfold emin; generalize Hprec' Hemax'; omega.
 unfold max_representable_integer in Bz.
 change 2%Z with (radix_val radix2) in Bz.
-destruct z as [|z|z] ; unfold Zabs in Bz.
-apply generic_format_0.
-rewrite Bz.
-rewrite <- Z2R_IZR, Z2R_Zpower.
+apply generic_format_abs_inv.
+rewrite  <- Z2R_IZR, <- Z2R_abs, Bz, Z2R_Zpower.
 apply generic_format_bpow.
-unfold fexp, FLT_exp, emin.
-clear; generalize Hprec' Hemax'; zify.
-omega.
-apply Zlt_le_weak.
-apply Hprec'.
-change (Zneg z) with (Zopp (Zpos z)).
-rewrite Bz, <- Z2R_IZR, Z2R_opp.
-rewrite Z2R_Zpower.
-apply generic_format_opp.
-apply generic_format_bpow.
-unfold fexp, FLT_exp, emin.
+unfold FLT_exp, emin.
 clear; generalize Hprec' Hemax'; zify.
 omega.
 apply Zlt_le_weak.
@@ -361,9 +305,9 @@ Qed.
 Lemma Round_down_le : forall (x:R), ((round floating_point.Rounding.Down
   x) <= x)%R.
 (* YOU MAY EDIT THE PROOF BELOW *)
+Proof with auto with typeclass_instances.
 intros x.
-eapply round_DN_pt.
-apply FLT_exp_correct; exact Hprec'.
+apply round_DN_pt...
 Qed.
 (* DO NOT EDIT BELOW *)
 
@@ -374,9 +318,9 @@ Qed.
 Lemma Round_up_ge : forall (x:R), (x <= (round floating_point.Rounding.Up
   x))%R.
 (* YOU MAY EDIT THE PROOF BELOW *)
+Proof with auto with typeclass_instances.
 intros x.
-eapply round_UP_pt.
-apply FLT_exp_correct; exact Hprec'.
+apply round_UP_pt...
 Qed.
 (* DO NOT EDIT BELOW *)
 
