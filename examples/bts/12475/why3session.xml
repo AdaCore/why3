@@ -5,7 +5,7 @@
  <prover
   id="alt-ergo"
   name="Alt-Ergo"
-  version="0.93"/>
+  version="0.94"/>
  <prover
   id="alt-ergo-0.93.1"
   name="Alt-Ergo"
@@ -15,7 +15,7 @@
   name="Coq"
   version="8.3pl2"/>
  <prover
-  id="cvc3"
+  id="cvc3-2.2"
   name="CVC3"
   version="2.2"/>
  <prover
@@ -51,7 +51,7 @@
   name="Yices"
   version="1.0.25"/>
  <prover
-  id="z3"
+  id="z3-2"
   name="Z3"
   version="2.19"/>
  <prover
@@ -68,12 +68,19 @@
    expanded="true">
    <goal
     name="toto"
-    sum="59cafced2f6bc3b8459444b6a68d53c8"
+    sum="165013fe8031c756d7de7572f7f8946f"
     proved="true"
     expanded="true"
     shape="ainfix <V0ainfix +aroundaUpV0c1.F">
     <proof
-     prover="cvc3"
+     prover="z3-2"
+     timelimit="2"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="cvc3-2.2"
      timelimit="2"
      edited=""
      obsolete="false">
@@ -84,14 +91,7 @@
      timelimit="2"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="z3"
-     timelimit="2"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.00"/>
     </proof>
     <proof
      prover="gappa"

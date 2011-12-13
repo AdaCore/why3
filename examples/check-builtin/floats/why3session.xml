@@ -5,7 +5,7 @@
  <prover
   id="alt-ergo"
   name="Alt-Ergo"
-  version="0.93"/>
+  version="0.94"/>
  <prover
   id="alt-ergo-0.93.1"
   name="Alt-Ergo"
@@ -15,7 +15,7 @@
   name="Coq"
   version="8.3pl2"/>
  <prover
-  id="cvc3"
+  id="cvc3-2.2"
   name="CVC3"
   version="2.2"/>
  <prover
@@ -51,7 +51,7 @@
   name="Yices"
   version="1.0.25"/>
  <prover
-  id="z3"
+  id="z3-2"
   name="Z3"
   version="2.19"/>
  <prover
@@ -68,7 +68,7 @@
    expanded="true">
    <goal
     name="Round_single_01"
-    sum="08e575aa0e76fc87133a6c5c469e35c7"
+    sum="c695abe3717fc90b1a9aa1ad52d05e5d"
     proved="true"
     expanded="true"
     shape="ainfix =aroundaNearestTiesToEvenc0.1c0x1.99999ap-4">
@@ -82,7 +82,7 @@
    </goal>
    <goal
     name="Round_double_01"
-    sum="670055059267b4361b761fe1388692d1"
+    sum="c6b65e4e688a7485b4711bc158f03af8"
     proved="true"
     expanded="true"
     shape="ainfix =aroundaNearestTiesToEvenc0.1c0x1.999999999999ap-4">
@@ -96,12 +96,19 @@
    </goal>
    <goal
     name="Test00"
-    sum="e3955674c25843b943eb3cb509d1211d"
+    sum="576b9f28ab661cfd3686561630fcb1dd"
     proved="true"
     expanded="true"
     shape="ainfix <=aprefix -c3.0V0Iainfix <=aabsV0c2.0F">
     <proof
-     prover="cvc3"
+     prover="z3-2"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="cvc3-2.2"
      timelimit="5"
      edited=""
      obsolete="false">
@@ -115,13 +122,6 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="z3"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
      prover="gappa"
      timelimit="5"
      edited=""
@@ -131,7 +131,7 @@
    </goal>
    <goal
     name="Test01"
-    sum="36a3ee4f3505945e50abd89d988f45c3"
+    sum="fa5ec51fb09f6dfde05247edd282aba0"
     proved="true"
     expanded="true"
     shape="ainfix <=aabsainfix -ainfix *avalueV0avalueV0aroundaNearestTiesToEvenainfix *avalueV0avalueV0c0x1.p-52Iainfix <=avalueV0c2.0Aainfix <=aprefix -c2.0avalueV0F">
@@ -145,7 +145,7 @@
    </goal>
    <goal
     name="Test02"
-    sum="fda6f380d63383695418d32003c3a025"
+    sum="32bd537f8808bd87168e834eefeade4e"
     proved="true"
     expanded="true"
     shape="ainfix <=aabsainfix -ainfix *avalueV1avalueV1aroundaNearestTiesToEvenainfix *avalueV0avalueV0c0x1.p-52Iainfix =V1V0Iainfix <=aabsavalueV0c2.0F">
@@ -159,7 +159,7 @@
    </goal>
    <goal
     name="Test03"
-    sum="8a89e5eb9ccfd12bb0241ad10f84b005"
+    sum="b149b1539e57a5b0c0de9f77ca45f88a"
     proved="true"
     expanded="true"
     shape="ainfix <=asqrtainfix *ainfix -avalueV2ainfix *avalueV0avalueV0ainfix -avalueV1ainfix *avalueV0avalueV0c0x1.p-52Iainfix =V2V1Iainfix =avalueV1aroundaNearestTiesToEvenainfix *avalueV0avalueV0Iainfix <=aabsavalueV0c2.0F">

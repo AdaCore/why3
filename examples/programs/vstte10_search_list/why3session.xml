@@ -5,15 +5,23 @@
  <prover
   id="alt-ergo"
   name="Alt-Ergo"
-  version="0.93"/>
+  version="0.94"/>
+ <prover
+  id="alt-ergo-0.93.1"
+  name="Alt-Ergo"
+  version="0.93.1"/>
  <prover
   id="coq"
   name="Coq"
   version="8.3pl2"/>
  <prover
-  id="cvc3"
+  id="cvc3-2.2"
   name="CVC3"
   version="2.2"/>
+ <prover
+  id="cvc3-2.4"
+  name="CVC3"
+  version="2.4.1"/>
  <prover
   id="eprover"
   name="Eprover"
@@ -43,9 +51,13 @@
   name="Yices"
   version="1.0.25"/>
  <prover
-  id="z3"
+  id="z3-2"
   name="Z3"
   version="2.19"/>
+ <prover
+  id="z3-3"
+  name="Z3"
+  version="3.2"/>
  <file
   name="../vstte10_search_list.mlw"
   verified="true"
@@ -57,34 +69,41 @@
    <goal
     name="WP_parameter search"
     expl="parameter search"
-    sum="a98ffbd56879bd530a9b54f3c148acdf"
+    sum="d8863fd9ee2f0dae803e01883f4bb14f"
     proved="true"
     expanded="false"
     shape="CV1aNilano_zeroV1Aainfix =V0ainfix +V0alengthV1Oazero_atV1ainfix -V0V0Aainfix <V0ainfix +V0alengthV1Aainfix <=V0V0aConsVViainfix =V2c0ano_zeroV1Aainfix =V0ainfix +V0alengthV1Oazero_atV1ainfix -V0V0Aainfix <V0ainfix +V0alengthV1Aainfix <=V0V0ano_zeroV1Aainfix =V4ainfix +V0alengthV1Oazero_atV1ainfix -V4V0Aainfix <V4ainfix +V0alengthV1Aainfix <=V0V4Iano_zeroV3Aainfix =V4ainfix +ainfix +V0c1alengthV3Oazero_atV3ainfix -V4ainfix +V0c1Aainfix <V4ainfix +ainfix +V0c1alengthV3Aainfix <=ainfix +V0c1V4FAainfix <alengthV3alengthV1Aainfix <=c0alengthV1FF">
     <proof
-     prover="cvc3"
+     prover="cvc3-2.2"
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.36"/>
+     <result status="valid" time="0.40"/>
     </proof>
     <proof
      prover="alt-ergo"
      timelimit="20"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.06"/>
+     <result status="valid" time="0.07"/>
     </proof>
    </goal>
    <goal
     name="WP_parameter search_list"
     expl="normal postcondition"
-    sum="17f84c4c153b1b38eb716385fd79e72b"
+    sum="e61d890708b401f731920d95f7c3a309"
     proved="true"
     expanded="false"
     shape="ano_zeroV0Aainfix =V1alengthV0Oazero_atV0V1Aainfix <V1alengthV0Aainfix <=c0V1Iano_zeroV0Aainfix =V1ainfix +c0alengthV0Oazero_atV0ainfix -V1c0Aainfix <V1ainfix +c0alengthV0Aainfix <=c0V1FF">
     <proof
-     prover="cvc3"
+     prover="z3-2"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="cvc3-2.2"
      timelimit="5"
      edited=""
      obsolete="false">
@@ -95,25 +114,25 @@
      timelimit="20"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="z3"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.00"/>
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="WP_parameter head"
     expl="parameter head"
-    sum="6b260de1d56824f24d6b7ce9948a97bc"
+    sum="54307c694a1ff19627e361f749cb6e7f"
     proved="true"
     expanded="false"
     shape="CV0aNilfaConsVwainfix =CV0aNilaNoneaConsVwaSomeV2aSomeV1Iainfix =V0aNilNF">
     <proof
-     prover="cvc3"
+     prover="z3-2"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="cvc3-2.2"
      timelimit="5"
      edited=""
      obsolete="false">
@@ -124,25 +143,25 @@
      timelimit="20"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="z3"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.02"/>
+     <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
     name="WP_parameter tail"
     expl="parameter tail"
-    sum="11d428092658f38c4b1b001849fff1de"
+    sum="a49b1f23ead1c5e5ccbcc72b5f4f3408"
     proved="true"
     expanded="false"
     shape="CV0aNilfaConswVainfix =CV0aNilaNoneaConswVaSomeV2aSomeV1Iainfix =V0aNilNF">
     <proof
-     prover="cvc3"
+     prover="z3-2"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="cvc3-2.2"
      timelimit="5"
      edited=""
      obsolete="false">
@@ -153,20 +172,13 @@
      timelimit="20"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="z3"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
     name="WP_parameter search_loop"
     expl="parameter search_loop"
-    sum="80a26df46f9acccd121445c80af20cbe"
+    sum="ddc48fa75fc2894b35bbabc10878c659"
     proved="true"
     expanded="true"
     shape="iainfix =V1aNilNiainfix =V3c0Nainfix <alengthV6alengthV1Aainfix <=c0alengthV1Aainfix =anthV7V0aSomec0NIainfix <V7V4Aainfix <=c0V7FAainfix =anthV8V6anthainfix +V4V8V0Iainfix <=c0V8FAainfix =ainfix +V4alengthV6alengthV0Aainfix <=c0V4Iainfix =V6V5FIainfix =CV1aNilaNoneaConswVaSomeV9aSomeV5FAainfix =V1aNilNIainfix =V4ainfix +V2c1Fano_zeroV0Aainfix =V2alengthV0Oazero_atV0V2Aainfix <V2alengthV0Aainfix <=c0V2Iainfix =CV1aNilaNoneaConsVwaSomeV10aSomeV3FAainfix =V1aNilNano_zeroV0Aainfix =V2alengthV0Oazero_atV0V2Aainfix <V2alengthV0Aainfix <=c0V2Iainfix =anthV11V0aSomec0NIainfix <V11V2Aainfix <=c0V11FAainfix =anthV12V1anthainfix +V2V12V0Iainfix <=c0V12FAainfix =ainfix +V2alengthV1alengthV0Aainfix <=c0V2FFAainfix =anthV13V0aSomec0NIainfix <V13c0Aainfix <=c0V13FAainfix =anthV14V0anthainfix +c0V14V0Iainfix <=c0V14FAainfix =ainfix +c0alengthV0alengthV0Aainfix <=c0c0F">
@@ -177,12 +189,19 @@
      <goal
       name="WP_parameter search_loop.1"
       expl="loop invariant init"
-      sum="156862d7cb05fe428326b878e45787b5"
+      sum="084df90e464829a6ad87a36a91c58a6c"
       proved="true"
       expanded="true"
       shape="ainfix =anthV1V0aSomec0NIainfix <V1c0Aainfix <=c0V1FAainfix =anthV2V0anthainfix +c0V2V0Iainfix <=c0V2FAainfix =ainfix +c0alengthV0alengthV0Aainfix <=c0c0F">
       <proof
-       prover="cvc3"
+       prover="z3-2"
+       timelimit="5"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="cvc3-2.2"
        timelimit="5"
        edited=""
        obsolete="false">
@@ -191,13 +210,6 @@
       <proof
        prover="alt-ergo"
        timelimit="20"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof
-       prover="z3"
-       timelimit="5"
        edited=""
        obsolete="false">
        <result status="valid" time="0.00"/>
@@ -206,65 +218,65 @@
      <goal
       name="WP_parameter search_loop.2"
       expl="precondition"
-      sum="e4b4b6e65b7e8050c32ecdad75005faf"
+      sum="8c4d5e8736a12b02ffd43e327cf51039"
       proved="true"
       expanded="true"
       shape="ainfix =V1aNilNIainfix =V1aNilNIainfix =anthV3V0aSomec0NIainfix <V3V2Aainfix <=c0V3FAainfix =anthV4V1anthainfix +V2V4V0Iainfix <=c0V4FAainfix =ainfix +V2alengthV1alengthV0Aainfix <=c0V2FFF">
+      <proof
+       prover="z3-2"
+       timelimit="5"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.00"/>
+      </proof>
       <proof
        prover="alt-ergo"
        timelimit="5"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.00"/>
       </proof>
       <proof
-       prover="cvc3"
+       prover="cvc3-2.2"
        timelimit="20"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-      <proof
-       prover="z3"
-       timelimit="5"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.00"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter search_loop.3"
       expl="precondition"
-      sum="a02e4069946271a24784de943d26586a"
+      sum="6084285f0f5e69a7aa16b194d77c4040"
       proved="true"
       expanded="true"
       shape="ainfix =V1aNilNIainfix =V4ainfix +V2c1FIainfix =V3c0NIainfix =CV1aNilaNoneaConsVwaSomeV5aSomeV3FIainfix =V1aNilNIainfix =V1aNilNIainfix =anthV6V0aSomec0NIainfix <V6V2Aainfix <=c0V6FAainfix =anthV7V1anthainfix +V2V7V0Iainfix <=c0V7FAainfix =ainfix +V2alengthV1alengthV0Aainfix <=c0V2FFF">
       <proof
-       prover="cvc3"
+       prover="z3-2"
        timelimit="5"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="cvc3-2.2"
+       timelimit="5"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.00"/>
       </proof>
       <proof
        prover="alt-ergo"
        timelimit="20"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof
-       prover="z3"
-       timelimit="5"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter search_loop.4"
       expl="loop invariant preservation"
-      sum="3dc839979a5ab424d9b4163efe0b635d"
+      sum="3089662adb652804e935a35e71546bcd"
       proved="true"
       expanded="true"
       shape="ainfix =anthV7V0aSomec0NIainfix <V7V4Aainfix <=c0V7FAainfix =anthV8V6anthainfix +V4V8V0Iainfix <=c0V8FAainfix =ainfix +V4alengthV6alengthV0Aainfix <=c0V4Iainfix =V6V5FIainfix =CV1aNilaNoneaConswVaSomeV9aSomeV5FIainfix =V1aNilNIainfix =V4ainfix +V2c1FIainfix =V3c0NIainfix =CV1aNilaNoneaConsVwaSomeV10aSomeV3FIainfix =V1aNilNIainfix =V1aNilNIainfix =anthV11V0aSomec0NIainfix <V11V2Aainfix <=c0V11FAainfix =anthV12V1anthainfix +V2V12V0Iainfix <=c0V12FAainfix =ainfix +V2alengthV1alengthV0Aainfix <=c0V2FFF">
@@ -275,12 +287,19 @@
        <goal
         name="WP_parameter search_loop.4.1"
         expl="parameter search_loop"
-        sum="4194bfc7509d719732c89060ebc37867"
+        sum="7337adf87b35e1e3ec7b7202055ef9b3"
         proved="true"
         expanded="true"
         shape="ainfix <=c0V4Iainfix =V6V5FIainfix =CV1aNilaNoneaConswVaSomeV7aSomeV5FIainfix =V1aNilNIainfix =V4ainfix +V2c1FIainfix =V3c0NIainfix =CV1aNilaNoneaConsVwaSomeV8aSomeV3FIainfix =V1aNilNIainfix =V1aNilNIainfix =anthV9V0aSomec0NIainfix <V9V2Aainfix <=c0V9FAainfix =anthV10V1anthainfix +V2V10V0Iainfix <=c0V10FAainfix =ainfix +V2alengthV1alengthV0Aainfix <=c0V2FFF">
         <proof
-         prover="cvc3"
+         prover="z3-2"
+         timelimit="5"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof
+         prover="cvc3-2.2"
          timelimit="5"
          edited=""
          obsolete="false">
@@ -291,25 +310,25 @@
          timelimit="20"
          edited=""
          obsolete="false">
-         <result status="valid" time="0.01"/>
-        </proof>
-        <proof
-         prover="z3"
-         timelimit="5"
-         edited=""
-         obsolete="false">
-         <result status="valid" time="0.02"/>
+         <result status="valid" time="0.00"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter search_loop.4.2"
         expl="parameter search_loop"
-        sum="0c11b39b86fe166139673688fac456aa"
+        sum="efaa6d8579e77fff08b67e411815f842"
         proved="true"
         expanded="true"
         shape="ainfix =ainfix +V4alengthV6alengthV0Iainfix =V6V5FIainfix =CV1aNilaNoneaConswVaSomeV7aSomeV5FIainfix =V1aNilNIainfix =V4ainfix +V2c1FIainfix =V3c0NIainfix =CV1aNilaNoneaConsVwaSomeV8aSomeV3FIainfix =V1aNilNIainfix =V1aNilNIainfix =anthV9V0aSomec0NIainfix <V9V2Aainfix <=c0V9FAainfix =anthV10V1anthainfix +V2V10V0Iainfix <=c0V10FAainfix =ainfix +V2alengthV1alengthV0Aainfix <=c0V2FFF">
         <proof
-         prover="cvc3"
+         prover="z3-2"
+         timelimit="5"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof
+         prover="cvc3-2.2"
          timelimit="5"
          edited=""
          obsolete="false">
@@ -322,18 +341,11 @@
          obsolete="false">
          <result status="valid" time="0.02"/>
         </proof>
-        <proof
-         prover="z3"
-         timelimit="5"
-         edited=""
-         obsolete="false">
-         <result status="valid" time="0.01"/>
-        </proof>
        </goal>
        <goal
         name="WP_parameter search_loop.4.3"
         expl="parameter search_loop"
-        sum="aad55cf145e293d293a81b23e0c60293"
+        sum="be9381695d6351e635111fbca528621d"
         proved="true"
         expanded="true"
         shape="ainfix =anthV7V6anthainfix +V4V7V0Iainfix <=c0V7FIainfix =V6V5FIainfix =CV1aNilaNoneaConswVaSomeV8aSomeV5FIainfix =V1aNilNIainfix =V4ainfix +V2c1FIainfix =V3c0NIainfix =CV1aNilaNoneaConsVwaSomeV9aSomeV3FIainfix =V1aNilNIainfix =V1aNilNIainfix =anthV10V0aSomec0NIainfix <V10V2Aainfix <=c0V10FAainfix =anthV11V1anthainfix +V2V11V0Iainfix <=c0V11FAainfix =ainfix +V2alengthV1alengthV0Aainfix <=c0V2FFF">
@@ -342,13 +354,13 @@
          timelimit="5"
          edited="vstte10_search_list_WP_SearchingALinkedList_WP_parameter_search_loop_3.v"
          obsolete="false">
-         <result status="valid" time="0.59"/>
+         <result status="valid" time="0.62"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter search_loop.4.4"
         expl="parameter search_loop"
-        sum="9b60055521d53210a7128453c6737ea4"
+        sum="45a9261149eae20717a0631348664039"
         proved="true"
         expanded="true"
         shape="ainfix =anthV7V0aSomec0NIainfix <V7V4Aainfix <=c0V7FIainfix =V6V5FIainfix =CV1aNilaNoneaConswVaSomeV8aSomeV5FIainfix =V1aNilNIainfix =V4ainfix +V2c1FIainfix =V3c0NIainfix =CV1aNilaNoneaConsVwaSomeV9aSomeV3FIainfix =V1aNilNIainfix =V1aNilNIainfix =anthV10V0aSomec0NIainfix <V10V2Aainfix <=c0V10FAainfix =anthV11V1anthainfix +V2V11V0Iainfix <=c0V11FAainfix =ainfix +V2alengthV1alengthV0Aainfix <=c0V2FFF">
@@ -357,7 +369,7 @@
          timelimit="5"
          edited="vstte10_search_list_WP_SearchingALinkedList_WP_parameter_search_loop_4.v"
          obsolete="false">
-         <result status="valid" time="0.73"/>
+         <result status="valid" time="0.76"/>
         </proof>
        </goal>
       </transf>
@@ -365,16 +377,23 @@
      <goal
       name="WP_parameter search_loop.5"
       expl="loop variant decreases"
-      sum="46d0a4a55a2ef5927901efe8514cde15"
+      sum="ef7a29f5a913d4e9ec4b4626d3b4268e"
       proved="true"
       expanded="true"
       shape="ainfix <alengthV6alengthV1Aainfix <=c0alengthV1Iainfix =anthV7V0aSomec0NIainfix <V7V4Aainfix <=c0V7FAainfix =anthV8V6anthainfix +V4V8V0Iainfix <=c0V8FAainfix =ainfix +V4alengthV6alengthV0Aainfix <=c0V4Iainfix =V6V5FIainfix =CV1aNilaNoneaConswVaSomeV9aSomeV5FIainfix =V1aNilNIainfix =V4ainfix +V2c1FIainfix =V3c0NIainfix =CV1aNilaNoneaConsVwaSomeV10aSomeV3FIainfix =V1aNilNIainfix =V1aNilNIainfix =anthV11V0aSomec0NIainfix <V11V2Aainfix <=c0V11FAainfix =anthV12V1anthainfix +V2V12V0Iainfix <=c0V12FAainfix =ainfix +V2alengthV1alengthV0Aainfix <=c0V2FFF">
       <proof
-       prover="cvc3"
+       prover="z3-2"
        timelimit="5"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.56"/>
+      </proof>
+      <proof
+       prover="cvc3-2.2"
+       timelimit="5"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.02"/>
       </proof>
       <proof
        prover="alt-ergo"
@@ -383,18 +402,11 @@
        obsolete="false">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof
-       prover="z3"
-       timelimit="5"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.52"/>
-      </proof>
      </goal>
      <goal
       name="WP_parameter search_loop.6"
       expl="normal postcondition"
-      sum="1849027f516227df6bb37201c65b3e8b"
+      sum="df4a4cd7576888b6357ae5bf094023f7"
       proved="true"
       expanded="true"
       shape="ano_zeroV0Aainfix =V2alengthV0Oazero_atV0V2Aainfix <V2alengthV0Aainfix <=c0V2Iainfix =V3c0NNIainfix =CV1aNilaNoneaConsVwaSomeV4aSomeV3FIainfix =V1aNilNIainfix =V1aNilNIainfix =anthV5V0aSomec0NIainfix <V5V2Aainfix <=c0V5FAainfix =anthV6V1anthainfix +V2V6V0Iainfix <=c0V6FAainfix =ainfix +V2alengthV1alengthV0Aainfix <=c0V2FFF">
@@ -403,36 +415,36 @@
        timelimit="5"
        edited="vstte10_search_list_WP_SearchingALinkedList_WP_parameter_search_loop_1.v"
        obsolete="false">
-       <result status="valid" time="0.64"/>
+       <result status="valid" time="0.63"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter search_loop.7"
       expl="normal postcondition"
-      sum="9894ff14900e156b61c88cdf8d3da565"
+      sum="7062ef791a6fa2ad57389a5125412dde"
       proved="true"
       expanded="true"
       shape="ano_zeroV0Aainfix =V2alengthV0Oazero_atV0V2Aainfix <V2alengthV0Aainfix <=c0V2Iainfix =V1aNilNNIainfix =anthV3V0aSomec0NIainfix <V3V2Aainfix <=c0V3FAainfix =anthV4V1anthainfix +V2V4V0Iainfix <=c0V4FAainfix =ainfix +V2alengthV1alengthV0Aainfix <=c0V2FFF">
       <proof
-       prover="cvc3"
+       prover="z3-2"
        timelimit="5"
        edited=""
        obsolete="false">
        <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="cvc3-2.2"
+       timelimit="5"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.01"/>
       </proof>
       <proof
        prover="alt-ergo"
        timelimit="20"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof
-       prover="z3"
-       timelimit="5"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
     </transf>

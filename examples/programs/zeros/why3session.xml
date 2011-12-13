@@ -5,15 +5,23 @@
  <prover
   id="alt-ergo"
   name="Alt-Ergo"
-  version="0.93"/>
+  version="0.94"/>
+ <prover
+  id="alt-ergo-0.93.1"
+  name="Alt-Ergo"
+  version="0.93.1"/>
  <prover
   id="coq"
   name="Coq"
   version="8.3pl2"/>
  <prover
-  id="cvc3"
+  id="cvc3-2.2"
   name="CVC3"
   version="2.2"/>
+ <prover
+  id="cvc3-2.4"
+  name="CVC3"
+  version="2.4.1"/>
  <prover
   id="eprover"
   name="Eprover"
@@ -43,9 +51,13 @@
   name="Yices"
   version="1.0.25"/>
  <prover
-  id="z3"
+  id="z3-2"
   name="Z3"
   version="2.19"/>
+ <prover
+  id="z3-3"
+  name="Z3"
+  version="3.2"/>
  <file
   name="../zeros.mlw"
   verified="true"
@@ -57,7 +69,7 @@
    <goal
     name="WP_parameter set_zeros"
     expl="parameter set_zeros"
-    sum="5f0f55d85d9a6c3c497a3da7bc25a4c2"
+    sum="95571f9a1e402ab05fdb5fc9c2956a3e"
     proved="true"
     expanded="true"
     shape="ainfix =agetV2V3c0Iainfix <V3V0Aainfix <=c0V3FIainfix =agetV2V4c0Iainfix <V4ainfix +ainfix -V0c1c1Aainfix <=c0V4FAainfix =agetV6V7c0Iainfix <V7ainfix +V5c1Aainfix <=c0V7FIainfix =V6asetV2V5c0FAainfix <V5V0Aainfix <=c0V5Iainfix =agetV2V8c0Iainfix <V8V5Aainfix <=c0V8FIainfix <=V5ainfix -V0c1Aainfix <=c0V5FFAainfix =agetV1V9c0Iainfix <V9c0Aainfix <=c0V9FIainfix <=c0ainfix -V0c1Aainfix =agetV1V10c0Iainfix <V10V0Aainfix <=c0V10FIainfix >c0ainfix -V0c1FF">
@@ -68,7 +80,7 @@
      <goal
       name="WP_parameter set_zeros.1"
       expl="normal postcondition"
-      sum="38c61242bf5c61f08722a9429c1cd9ff"
+      sum="61c57a4c0f43d49727c84269dfb719b3"
       proved="true"
       expanded="true"
       shape="ainfix =agetV1V2c0Iainfix <V2V0Aainfix <=c0V2FIainfix >c0ainfix -V0c1FF">
@@ -77,13 +89,13 @@
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter set_zeros.2"
       expl="for loop initialization"
-      sum="359496ead4e59168656f051791ffef85"
+      sum="ea6b033d10f1c5b3dadb4729caadb4f5"
       proved="true"
       expanded="true"
       shape="ainfix =agetV1V2c0Iainfix <V2c0Aainfix <=c0V2FIainfix <=c0ainfix -V0c1FF">
@@ -92,35 +104,35 @@
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter set_zeros.3"
       expl="for loop preservation"
-      sum="ef3b7f32410a3c4ee9048ec86e0db84b"
+      sum="63360c201dfec714c365139597f5cd81"
       proved="true"
       expanded="true"
       shape="ainfix =agetV4V5c0Iainfix <V5ainfix +V3c1Aainfix <=c0V5FIainfix =V4asetV2V3c0FAainfix <V3V0Aainfix <=c0V3Iainfix =agetV2V6c0Iainfix <V6V3Aainfix <=c0V6FIainfix <=V3ainfix -V0c1Aainfix <=c0V3FFIainfix <=c0ainfix -V0c1FF">
       <proof
-       prover="cvc3"
-       timelimit="10"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-      <proof
-       prover="z3"
+       prover="z3-2"
        timelimit="10"
        edited=""
        obsolete="false">
        <result status="valid" time="0.01"/>
       </proof>
+      <proof
+       prover="cvc3-2.2"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.00"/>
+      </proof>
      </goal>
      <goal
       name="WP_parameter set_zeros.4"
       expl="normal postcondition"
-      sum="c8f5a1e4014026a6c08dead1f4abb03d"
+      sum="f6c8d4df781a2cd65ec9a6b93375a45f"
       proved="true"
       expanded="true"
       shape="ainfix =agetV2V3c0Iainfix <V3V0Aainfix <=c0V3FIainfix =agetV2V4c0Iainfix <V4ainfix +ainfix -V0c1c1Aainfix <=c0V4FFIainfix <=c0ainfix -V0c1FF">
@@ -129,7 +141,7 @@
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
     </transf>
@@ -137,7 +149,7 @@
    <goal
     name="WP_parameter harness"
     expl="parameter harness"
-    sum="6bfc1d0a5bd71fcf37036a8a2e2ff7e5"
+    sum="c8bd958ac4e2b8020c683ad21ef3e970"
     proved="true"
     expanded="true"
     shape="ainfix =agetV0c12c0Aainfix =c42c42Iainfix =agetV0V1c0Iainfix <V1c42Aainfix <=c0V1FFAainfix >=c42c0">
@@ -148,7 +160,7 @@
      <goal
       name="WP_parameter harness.1"
       expl="precondition"
-      sum="0186685b01688a9d64196fb62c2f77df"
+      sum="35f4757c0d4cdea303ce5e88ffee6c63"
       proved="true"
       expanded="true"
       shape="ainfix >=c42c0">
@@ -157,13 +169,13 @@
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter harness.2"
       expl="assertion"
-      sum="e7637fab83c43dd7b7359be697736aac"
+      sum="266725ca98933326a40ebaa83fcd8b3d"
       proved="true"
       expanded="true"
       shape="ainfix =c42c42Iainfix =agetV0V1c0Iainfix <V1c42Aainfix <=c0V1FFIainfix >=c42c0">
@@ -172,13 +184,13 @@
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter harness.3"
       expl="assertion"
-      sum="66b0364d9dc4a3042cb555ab67805faa"
+      sum="089d63706e75e3729e3e0644468c1d14"
       proved="true"
       expanded="true"
       shape="ainfix =agetV0c12c0Iainfix =c42c42Iainfix =agetV0V1c0Iainfix <V1c42Aainfix <=c0V1FFIainfix >=c42c0">
@@ -187,7 +199,7 @@
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
     </transf>

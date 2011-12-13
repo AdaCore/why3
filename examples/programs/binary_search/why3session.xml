@@ -5,15 +5,23 @@
  <prover
   id="alt-ergo"
   name="Alt-Ergo"
-  version="0.93"/>
+  version="0.94"/>
+ <prover
+  id="alt-ergo-0.93.1"
+  name="Alt-Ergo"
+  version="0.93.1"/>
  <prover
   id="coq"
   name="Coq"
   version="8.3pl2"/>
  <prover
-  id="cvc3"
+  id="cvc3-2.2"
   name="CVC3"
   version="2.2"/>
+ <prover
+  id="cvc3-2.4"
+  name="CVC3"
+  version="2.4.1"/>
  <prover
   id="eprover"
   name="Eprover"
@@ -43,9 +51,13 @@
   name="Yices"
   version="1.0.25"/>
  <prover
-  id="z3"
+  id="z3-2"
   name="Z3"
   version="2.19"/>
+ <prover
+  id="z3-3"
+  name="Z3"
+  version="3.2"/>
  <file
   name="../binary_search.mlw"
   verified="true"
@@ -57,19 +69,19 @@
    <goal
     name="WP_parameter binary_search"
     expl="parameter binary_search"
-    sum="2d4368f5fd910b1ceb69adef571ead55"
+    sum="05b308271de57dac7bc9311c80a79391"
     proved="true"
     expanded="true"
     shape="iainfix <=V4V3iainfix <agetV2ainfix +V4adivainfix -V3V4c2V1ainfix <ainfix -V3V5ainfix -V3V4Aainfix <=c0ainfix -V3V4Aainfix <=V6V3Aainfix <=V5V6Iainfix =agetV2V6V1Iainfix <V6V0Aainfix <=c0V6FAainfix <V3V0Aainfix <=c0V5Iainfix =V5ainfix +ainfix +V4adivainfix -V3V4c2c1Fiainfix >agetV2ainfix +V4adivainfix -V3V4c2V1ainfix <ainfix -V7V4ainfix -V3V4Aainfix <=c0ainfix -V3V4Aainfix <=V8V7Aainfix <=V4V8Iainfix =agetV2V8V1Iainfix <V8V0Aainfix <=c0V8FAainfix <V7V0Aainfix <=c0V4Iainfix =V7ainfix -ainfix +V4adivainfix -V3V4c2c1Fainfix =agetV2ainfix +V4adivainfix -V3V4c2V1Aainfix <ainfix +V4adivainfix -V3V4c2V0Aainfix <=c0ainfix +V4adivainfix -V3V4c2Aainfix <ainfix +V4adivainfix -V3V4c2V0Aainfix <=c0ainfix +V4adivainfix -V3V4c2Aainfix <ainfix +V4adivainfix -V3V4c2V0Aainfix <=c0ainfix +V4adivainfix -V3V4c2Aainfix <=ainfix +V4adivainfix -V3V4c2V3Aainfix <=V4ainfix +V4adivainfix -V3V4c2ainfix =agetV2V9V1NIainfix <V9V0Aainfix <=c0V9FIainfix <=V10V3Aainfix <=V4V10Iainfix =agetV2V10V1Iainfix <V10V0Aainfix <=c0V10FAainfix <V3V0Aainfix <=c0V4FFAainfix <=V11ainfix -V0c1Aainfix <=c0V11Iainfix =agetV2V11V1Iainfix <V11V0Aainfix <=c0V11FAainfix <ainfix -V0c1V0Aainfix <=c0c0Iainfix <=agetV2V12agetV2V13Iainfix <V13V0Aainfix <=V12V13Aainfix <=c0V12FFFF">
     <proof
-     prover="alt-ergo"
+     prover="z3-2"
      timelimit="10"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.03"/>
+     <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="z3"
+     prover="alt-ergo"
      timelimit="10"
      edited=""
      obsolete="false">
@@ -84,7 +96,7 @@
    <goal
     name="WP_parameter binary_search"
     expl="parameter binary_search"
-    sum="d5cd94966f7526a19692c7d56b842e9f"
+    sum="332e80ad2cab058df73928f0e1009412"
     proved="true"
     expanded="true"
     shape="iainfix <=V4V3iainfix <agetV2V5V1ainfix <ainfix -V3V6ainfix -V3V4Aainfix <=c0ainfix -V3V4Aainfix <=V7V3Aainfix <=V6V7Iainfix =agetV2V7V1Iainfix <V7V0Aainfix <=c0V7FAainfix <V3V0Aainfix <=c0V6Iainfix =V6ainfix +V5c1Fiainfix >agetV2V5V1ainfix <ainfix -V8V4ainfix -V3V4Aainfix <=c0ainfix -V3V4Aainfix <=V9V8Aainfix <=V4V9Iainfix =agetV2V9V1Iainfix <V9V0Aainfix <=c0V9FAainfix <V8V0Aainfix <=c0V4Iainfix =V8ainfix -V5c1Fainfix =agetV2V5V1Aainfix <V5V0Aainfix <=c0V5Aainfix <V5V0Aainfix <=c0V5Aainfix <V5V0Aainfix <=c0V5Iainfix <=V5V3Aainfix <=V4V5FAainfix <=V4V3ainfix =agetV2V10V1NIainfix <V10V0Aainfix <=c0V10FIainfix <=V11V3Aainfix <=V4V11Iainfix =agetV2V11V1Iainfix <V11V0Aainfix <=c0V11FAainfix <V3V0Aainfix <=c0V4FFAainfix <=V12ainfix -V0c1Aainfix <=c0V12Iainfix =agetV2V12V1Iainfix <V12V0Aainfix <=c0V12FAainfix <ainfix -V0c1V0Aainfix <=c0c0Iainfix <=agetV2V13agetV2V14Iainfix <V14V0Aainfix <=V13V14Aainfix <=c0V13FFFF">
@@ -93,7 +105,7 @@
      timelimit="10"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.02"/>
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
   </theory>

@@ -5,15 +5,23 @@
  <prover
   id="alt-ergo"
   name="Alt-Ergo"
-  version="0.93"/>
+  version="0.94"/>
+ <prover
+  id="alt-ergo-0.93.1"
+  name="Alt-Ergo"
+  version="0.93.1"/>
  <prover
   id="coq"
   name="Coq"
   version="8.3pl2"/>
  <prover
-  id="cvc3"
+  id="cvc3-2.2"
   name="CVC3"
   version="2.2"/>
+ <prover
+  id="cvc3-2.4"
+  name="CVC3"
+  version="2.4.1"/>
  <prover
   id="eprover"
   name="Eprover"
@@ -43,9 +51,13 @@
   name="Yices"
   version="1.0.25"/>
  <prover
-  id="z3"
+  id="z3-2"
   name="Z3"
   version="2.19"/>
+ <prover
+  id="z3-3"
+  name="Z3"
+  version="3.2"/>
  <file
   name="../foveoos11_challenge1.mlw"
   verified="true"
@@ -57,7 +69,7 @@
    <goal
     name="WP_parameter max"
     expl="parameter max"
-    sum="ab67d6e8633a69cceb76dac4edbc2079"
+    sum="d4cb9ba94f41f7e87aedf331ae89effa"
     proved="true"
     expanded="true"
     shape="iainfix =V3V2Niainfix <=agetV1V3agetV1V2ainfix <ainfix -V2V4ainfix -V2V3Aainfix <=c0ainfix -V2V3Aainfix <=agetV1V5agetV1V4Oainfix <=agetV1V5agetV1V2Iainfix <V5V0Aainfix <V2V5Oainfix <V5V4Aainfix <=c0V5FAainfix <V2V0Aainfix <=V4V2Aainfix <=c0V4Iainfix =V4ainfix +V3c1Fainfix <ainfix -V6V3ainfix -V2V3Aainfix <=c0ainfix -V2V3Aainfix <=agetV1V7agetV1V3Oainfix <=agetV1V7agetV1V6Iainfix <V7V0Aainfix <V6V7Oainfix <V7V3Aainfix <=c0V7FAainfix <V6V0Aainfix <=V3V6Aainfix <=c0V3Iainfix =V6ainfix -V2c1FAainfix <V2V0Aainfix <=c0V2Aainfix <V3V0Aainfix <=c0V3ainfix <=agetV1V8agetV1V3Iainfix <V8V0Aainfix <=c0V8FAainfix <V3V0Aainfix <=c0V3Iainfix <=agetV1V9agetV1V3Oainfix <=agetV1V9agetV1V2Iainfix <V9V0Aainfix <V2V9Oainfix <V9V3Aainfix <=c0V9FAainfix <V2V0Aainfix <=V3V2Aainfix <=c0V3FFAainfix <=agetV1V10agetV1c0Oainfix <=agetV1V10agetV1ainfix -V0c1Iainfix <V10V0Aainfix <ainfix -V0c1V10Oainfix <V10c0Aainfix <=c0V10FAainfix <ainfix -V0c1V0Aainfix <=c0ainfix -V0c1Aainfix <=c0c0Iainfix >V0c0FF">
@@ -68,7 +80,7 @@
      <goal
       name="WP_parameter max.1"
       expl="loop invariant init"
-      sum="d75271e4e4d3f839f8988f447d57432b"
+      sum="6d5e307a5823e7a0c7dd7eedde0e6ef2"
       proved="true"
       expanded="false"
       shape="ainfix <=agetV1V2agetV1c0Oainfix <=agetV1V2agetV1ainfix -V0c1Iainfix <V2V0Aainfix <ainfix -V0c1V2Oainfix <V2c0Aainfix <=c0V2FAainfix <ainfix -V0c1V0Aainfix <=c0ainfix -V0c1Aainfix <=c0c0Iainfix >V0c0FF">
@@ -77,13 +89,13 @@
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter max.2"
       expl="precondition"
-      sum="26bba7c5dd6060be3a9f504adc5ac345"
+      sum="4599064aa9a3564220fd58f948e4a028"
       proved="true"
       expanded="false"
       shape="ainfix <V3V0Aainfix <=c0V3Iainfix =V3V2NIainfix <=agetV1V4agetV1V3Oainfix <=agetV1V4agetV1V2Iainfix <V4V0Aainfix <V2V4Oainfix <V4V3Aainfix <=c0V4FAainfix <V2V0Aainfix <=V3V2Aainfix <=c0V3FFIainfix >V0c0FF">
@@ -98,7 +110,7 @@
      <goal
       name="WP_parameter max.3"
       expl="precondition"
-      sum="6b0f8a419b74beaa96024b42613c5c2b"
+      sum="8def637aa3548b79e119e2aa51aaee86"
       proved="true"
       expanded="false"
       shape="ainfix <V2V0Aainfix <=c0V2Iainfix <V3V0Aainfix <=c0V3Iainfix =V3V2NIainfix <=agetV1V4agetV1V3Oainfix <=agetV1V4agetV1V2Iainfix <V4V0Aainfix <V2V4Oainfix <V4V3Aainfix <=c0V4FAainfix <V2V0Aainfix <=V3V2Aainfix <=c0V3FFIainfix >V0c0FF">
@@ -107,13 +119,13 @@
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter max.4"
       expl="loop invariant preservation"
-      sum="c9d1c10cd60e214a7df1508aa2c5bc94"
+      sum="99c4a43a9608b3bb3fadc7d8360f25d6"
       proved="true"
       expanded="false"
       shape="ainfix <=agetV1V5agetV1V4Oainfix <=agetV1V5agetV1V2Iainfix <V5V0Aainfix <V2V5Oainfix <V5V4Aainfix <=c0V5FAainfix <V2V0Aainfix <=V4V2Aainfix <=c0V4Iainfix =V4ainfix +V3c1FIainfix <=agetV1V3agetV1V2Iainfix <V2V0Aainfix <=c0V2Iainfix <V3V0Aainfix <=c0V3Iainfix =V3V2NIainfix <=agetV1V6agetV1V3Oainfix <=agetV1V6agetV1V2Iainfix <V6V0Aainfix <V2V6Oainfix <V6V3Aainfix <=c0V6FAainfix <V2V0Aainfix <=V3V2Aainfix <=c0V3FFIainfix >V0c0FF">
@@ -124,7 +136,7 @@
        <goal
         name="WP_parameter max.4.1"
         expl="parameter max"
-        sum="0459053527ea0d12e9bf3f3e6440b5ec"
+        sum="262192c8c20bde029ad5424bc1379041"
         proved="true"
         expanded="false"
         shape="ainfix <=c0V4Iainfix =V4ainfix +V3c1FIainfix <=agetV1V3agetV1V2Iainfix <V2V0Aainfix <=c0V2Iainfix <V3V0Aainfix <=c0V3Iainfix =V3V2NIainfix <=agetV1V5agetV1V3Oainfix <=agetV1V5agetV1V2Iainfix <V5V0Aainfix <V2V5Oainfix <V5V3Aainfix <=c0V5FAainfix <V2V0Aainfix <=V3V2Aainfix <=c0V3FFIainfix >V0c0FF">
@@ -133,13 +145,13 @@
          timelimit="10"
          edited=""
          obsolete="false">
-         <result status="valid" time="0.02"/>
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter max.4.2"
         expl="parameter max"
-        sum="a182f62117607d5b454d7568dee91010"
+        sum="0cdd149da8ab016206fdf68025090ec9"
         proved="true"
         expanded="false"
         shape="ainfix <=V4V2Iainfix =V4ainfix +V3c1FIainfix <=agetV1V3agetV1V2Iainfix <V2V0Aainfix <=c0V2Iainfix <V3V0Aainfix <=c0V3Iainfix =V3V2NIainfix <=agetV1V5agetV1V3Oainfix <=agetV1V5agetV1V2Iainfix <V5V0Aainfix <V2V5Oainfix <V5V3Aainfix <=c0V5FAainfix <V2V0Aainfix <=V3V2Aainfix <=c0V3FFIainfix >V0c0FF">
@@ -148,13 +160,13 @@
          timelimit="10"
          edited=""
          obsolete="false">
-         <result status="valid" time="0.01"/>
+         <result status="valid" time="0.00"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter max.4.3"
         expl="parameter max"
-        sum="59bbf6054fb2b0917fa50fb2d5d09b37"
+        sum="14a3e7402290851238fcce87a1842a9b"
         proved="true"
         expanded="false"
         shape="ainfix <V2V0Iainfix =V4ainfix +V3c1FIainfix <=agetV1V3agetV1V2Iainfix <V2V0Aainfix <=c0V2Iainfix <V3V0Aainfix <=c0V3Iainfix =V3V2NIainfix <=agetV1V5agetV1V3Oainfix <=agetV1V5agetV1V2Iainfix <V5V0Aainfix <V2V5Oainfix <V5V3Aainfix <=c0V5FAainfix <V2V0Aainfix <=V3V2Aainfix <=c0V3FFIainfix >V0c0FF">
@@ -163,13 +175,13 @@
          timelimit="10"
          edited=""
          obsolete="false">
-         <result status="valid" time="0.01"/>
+         <result status="valid" time="0.00"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter max.4.4"
         expl="parameter max"
-        sum="1d6c35decea2a2e4abb565931e64a787"
+        sum="e054be25edb9902d68e796995b01b157"
         proved="true"
         expanded="false"
         shape="ainfix <=agetV1V5agetV1V4Oainfix <=agetV1V5agetV1V2Iainfix <V5V0Aainfix <V2V5Oainfix <V5V4Aainfix <=c0V5FIainfix =V4ainfix +V3c1FIainfix <=agetV1V3agetV1V2Iainfix <V2V0Aainfix <=c0V2Iainfix <V3V0Aainfix <=c0V3Iainfix =V3V2NIainfix <=agetV1V6agetV1V3Oainfix <=agetV1V6agetV1V2Iainfix <V6V0Aainfix <V2V6Oainfix <V6V3Aainfix <=c0V6FAainfix <V2V0Aainfix <=V3V2Aainfix <=c0V3FFIainfix >V0c0FF">
@@ -178,7 +190,7 @@
          timelimit="10"
          edited=""
          obsolete="false">
-         <result status="valid" time="0.02"/>
+         <result status="valid" time="0.00"/>
         </proof>
        </goal>
       </transf>
@@ -186,7 +198,7 @@
      <goal
       name="WP_parameter max.5"
       expl="loop variant decreases"
-      sum="0f30fc05d6508f2714c8eb9ee265d197"
+      sum="506c05a9432ff09d0651d416e66d74e1"
       proved="true"
       expanded="false"
       shape="ainfix <ainfix -V2V4ainfix -V2V3Aainfix <=c0ainfix -V2V3Iainfix <=agetV1V5agetV1V4Oainfix <=agetV1V5agetV1V2Iainfix <V5V0Aainfix <V2V5Oainfix <V5V4Aainfix <=c0V5FAainfix <V2V0Aainfix <=V4V2Aainfix <=c0V4Iainfix =V4ainfix +V3c1FIainfix <=agetV1V3agetV1V2Iainfix <V2V0Aainfix <=c0V2Iainfix <V3V0Aainfix <=c0V3Iainfix =V3V2NIainfix <=agetV1V6agetV1V3Oainfix <=agetV1V6agetV1V2Iainfix <V6V0Aainfix <V2V6Oainfix <V6V3Aainfix <=c0V6FAainfix <V2V0Aainfix <=V3V2Aainfix <=c0V3FFIainfix >V0c0FF">
@@ -201,7 +213,7 @@
      <goal
       name="WP_parameter max.6"
       expl="loop invariant preservation"
-      sum="076fdda426d4ab6b9e16ca861992e2c4"
+      sum="6cc1b08e912dc586bc77a0deec763585"
       proved="true"
       expanded="false"
       shape="ainfix <=agetV1V5agetV1V3Oainfix <=agetV1V5agetV1V4Iainfix <V5V0Aainfix <V4V5Oainfix <V5V3Aainfix <=c0V5FAainfix <V4V0Aainfix <=V3V4Aainfix <=c0V3Iainfix =V4ainfix -V2c1FIainfix <=agetV1V3agetV1V2NIainfix <V2V0Aainfix <=c0V2Iainfix <V3V0Aainfix <=c0V3Iainfix =V3V2NIainfix <=agetV1V6agetV1V3Oainfix <=agetV1V6agetV1V2Iainfix <V6V0Aainfix <V2V6Oainfix <V6V3Aainfix <=c0V6FAainfix <V2V0Aainfix <=V3V2Aainfix <=c0V3FFIainfix >V0c0FF">
@@ -212,7 +224,7 @@
        <goal
         name="WP_parameter max.6.1"
         expl="parameter max"
-        sum="de9c099a6dff57043c03484ce9efc8ee"
+        sum="d45248241b9ed12c97e3181e94006abe"
         proved="true"
         expanded="false"
         shape="ainfix <=c0V3Iainfix =V4ainfix -V2c1FIainfix <=agetV1V3agetV1V2NIainfix <V2V0Aainfix <=c0V2Iainfix <V3V0Aainfix <=c0V3Iainfix =V3V2NIainfix <=agetV1V5agetV1V3Oainfix <=agetV1V5agetV1V2Iainfix <V5V0Aainfix <V2V5Oainfix <V5V3Aainfix <=c0V5FAainfix <V2V0Aainfix <=V3V2Aainfix <=c0V3FFIainfix >V0c0FF">
@@ -227,7 +239,7 @@
        <goal
         name="WP_parameter max.6.2"
         expl="parameter max"
-        sum="6bd67d4d4b7ca74ddb2eff201e2255c6"
+        sum="029cef7712e071e4895a6130b6fb2a49"
         proved="true"
         expanded="false"
         shape="ainfix <=V3V4Iainfix =V4ainfix -V2c1FIainfix <=agetV1V3agetV1V2NIainfix <V2V0Aainfix <=c0V2Iainfix <V3V0Aainfix <=c0V3Iainfix =V3V2NIainfix <=agetV1V5agetV1V3Oainfix <=agetV1V5agetV1V2Iainfix <V5V0Aainfix <V2V5Oainfix <V5V3Aainfix <=c0V5FAainfix <V2V0Aainfix <=V3V2Aainfix <=c0V3FFIainfix >V0c0FF">
@@ -236,13 +248,13 @@
          timelimit="10"
          edited=""
          obsolete="false">
-         <result status="valid" time="0.01"/>
+         <result status="valid" time="0.00"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter max.6.3"
         expl="parameter max"
-        sum="fed3e406abde60b92faccfd752fd0ad5"
+        sum="9bd7549a42b5b62bd036d6ab4f7aab82"
         proved="true"
         expanded="false"
         shape="ainfix <V4V0Iainfix =V4ainfix -V2c1FIainfix <=agetV1V3agetV1V2NIainfix <V2V0Aainfix <=c0V2Iainfix <V3V0Aainfix <=c0V3Iainfix =V3V2NIainfix <=agetV1V5agetV1V3Oainfix <=agetV1V5agetV1V2Iainfix <V5V0Aainfix <V2V5Oainfix <V5V3Aainfix <=c0V5FAainfix <V2V0Aainfix <=V3V2Aainfix <=c0V3FFIainfix >V0c0FF">
@@ -251,13 +263,13 @@
          timelimit="10"
          edited=""
          obsolete="false">
-         <result status="valid" time="0.01"/>
+         <result status="valid" time="0.00"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter max.6.4"
         expl="parameter max"
-        sum="569d67333fd3948ebfa4e00a2466383e"
+        sum="6d5bea45486f227fc1924366a6f3cca5"
         proved="true"
         expanded="false"
         shape="ainfix <=agetV1V5agetV1V3Oainfix <=agetV1V5agetV1V4Iainfix <V5V0Aainfix <V4V5Oainfix <V5V3Aainfix <=c0V5FIainfix =V4ainfix -V2c1FIainfix <=agetV1V3agetV1V2NIainfix <V2V0Aainfix <=c0V2Iainfix <V3V0Aainfix <=c0V3Iainfix =V3V2NIainfix <=agetV1V6agetV1V3Oainfix <=agetV1V6agetV1V2Iainfix <V6V0Aainfix <V2V6Oainfix <V6V3Aainfix <=c0V6FAainfix <V2V0Aainfix <=V3V2Aainfix <=c0V3FFIainfix >V0c0FF">
@@ -266,7 +278,7 @@
          timelimit="10"
          edited=""
          obsolete="false">
-         <result status="valid" time="0.02"/>
+         <result status="valid" time="0.00"/>
         </proof>
        </goal>
       </transf>
@@ -274,7 +286,7 @@
      <goal
       name="WP_parameter max.7"
       expl="loop variant decreases"
-      sum="24d62ad8fa095cb6cd5cef815be59206"
+      sum="dca8a968c38714918d2617a298952f49"
       proved="true"
       expanded="false"
       shape="ainfix <ainfix -V4V3ainfix -V2V3Aainfix <=c0ainfix -V2V3Iainfix <=agetV1V5agetV1V3Oainfix <=agetV1V5agetV1V4Iainfix <V5V0Aainfix <V4V5Oainfix <V5V3Aainfix <=c0V5FAainfix <V4V0Aainfix <=V3V4Aainfix <=c0V3Iainfix =V4ainfix -V2c1FIainfix <=agetV1V3agetV1V2NIainfix <V2V0Aainfix <=c0V2Iainfix <V3V0Aainfix <=c0V3Iainfix =V3V2NIainfix <=agetV1V6agetV1V3Oainfix <=agetV1V6agetV1V2Iainfix <V6V0Aainfix <V2V6Oainfix <V6V3Aainfix <=c0V6FAainfix <V2V0Aainfix <=V3V2Aainfix <=c0V3FFIainfix >V0c0FF">
@@ -283,13 +295,13 @@
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter max.8"
       expl="normal postcondition"
-      sum="2708d6c8418e4f31f0d9960c6c1c29ef"
+      sum="b0faa4155aae411758fa6f9a2e53ec52"
       proved="true"
       expanded="true"
       shape="ainfix <=agetV1V4agetV1V3Iainfix <V4V0Aainfix <=c0V4FAainfix <V3V0Aainfix <=c0V3Iainfix =V3V2NNIainfix <=agetV1V5agetV1V3Oainfix <=agetV1V5agetV1V2Iainfix <V5V0Aainfix <V2V5Oainfix <V5V3Aainfix <=c0V5FAainfix <V2V0Aainfix <=V3V2Aainfix <=c0V3FFIainfix >V0c0FF">
@@ -300,7 +312,7 @@
        <goal
         name="WP_parameter max.8.1"
         expl="parameter max"
-        sum="4f811568f36d283a6e52d3a3c7ddf744"
+        sum="a7dbc4e2f647afd9fe376180aba23fe5"
         proved="true"
         expanded="false"
         shape="ainfix <=c0V3Iainfix =V3V2NNIainfix <=agetV1V4agetV1V3Oainfix <=agetV1V4agetV1V2Iainfix <V4V0Aainfix <V2V4Oainfix <V4V3Aainfix <=c0V4FAainfix <V2V0Aainfix <=V3V2Aainfix <=c0V3FFIainfix >V0c0FF">
@@ -309,13 +321,13 @@
          timelimit="10"
          edited=""
          obsolete="false">
-         <result status="valid" time="0.01"/>
+         <result status="valid" time="0.00"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter max.8.2"
         expl="parameter max"
-        sum="02683c40b8f7cbeb1ebe6ea9ae2213ff"
+        sum="14311715a2ad39484a54c2f6447f124a"
         proved="true"
         expanded="false"
         shape="ainfix <V3V0Iainfix =V3V2NNIainfix <=agetV1V4agetV1V3Oainfix <=agetV1V4agetV1V2Iainfix <V4V0Aainfix <V2V4Oainfix <V4V3Aainfix <=c0V4FAainfix <V2V0Aainfix <=V3V2Aainfix <=c0V3FFIainfix >V0c0FF">
@@ -324,13 +336,13 @@
          timelimit="10"
          edited=""
          obsolete="false">
-         <result status="valid" time="0.01"/>
+         <result status="valid" time="0.00"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter max.8.3"
         expl="parameter max"
-        sum="a773f6dd3f16ed83d1dd649b3076c6c7"
+        sum="3ce2b1611c335a29b842140b299e6129"
         proved="true"
         expanded="true"
         shape="ainfix <=agetV1V4agetV1V3Iainfix <V4V0Aainfix <=c0V4FIainfix =V3V2NNIainfix <=agetV1V5agetV1V3Oainfix <=agetV1V5agetV1V2Iainfix <V5V0Aainfix <V2V5Oainfix <V5V3Aainfix <=c0V5FAainfix <V2V0Aainfix <=V3V2Aainfix <=c0V3FFIainfix >V0c0FF">
@@ -339,7 +351,7 @@
          timelimit="10"
          edited=""
          obsolete="false">
-         <result status="valid" time="0.02"/>
+         <result status="valid" time="0.00"/>
         </proof>
        </goal>
       </transf>

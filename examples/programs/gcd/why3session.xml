@@ -5,15 +5,23 @@
  <prover
   id="alt-ergo"
   name="Alt-Ergo"
-  version="0.93"/>
+  version="0.94"/>
+ <prover
+  id="alt-ergo-0.93.1"
+  name="Alt-Ergo"
+  version="0.93.1"/>
  <prover
   id="coq"
   name="Coq"
   version="8.3pl2"/>
  <prover
-  id="cvc3"
+  id="cvc3-2.2"
   name="CVC3"
   version="2.2"/>
+ <prover
+  id="cvc3-2.4"
+  name="CVC3"
+  version="2.4.1"/>
  <prover
   id="eprover"
   name="Eprover"
@@ -43,9 +51,13 @@
   name="Yices"
   version="1.0.25"/>
  <prover
-  id="z3"
+  id="z3-2"
   name="Z3"
   version="2.19"/>
+ <prover
+  id="z3-3"
+  name="Z3"
+  version="3.2"/>
  <file
   name="../gcd.mlw"
   verified="true"
@@ -57,7 +69,7 @@
    <goal
     name="WP_parameter gcd"
     expl="parameter gcd"
-    sum="5f469fc093cbb640f29b08472da5d5ae"
+    sum="0705a08301522a8bc6a65ac7318e16df"
     proved="true"
     expanded="true"
     shape="iainfix =V1c0ainfix =V0agcdV0V1ainfix =agcdV1amodV0V1agcdV0V1Aainfix >=amodV0V1c0Aainfix >=V1c0Aainfix <amodV0V1V1Aainfix <=c0V1Iainfix >=V1c0Aainfix >=V0c0FF">
@@ -68,12 +80,19 @@
      <goal
       name="WP_parameter gcd.1"
       expl="normal postcondition"
-      sum="8a9285b11e84c7c53cf9a5c94b4eb5e1"
+      sum="ed1d0962186b663d871c4b3c371f0e5c"
       proved="true"
       expanded="true"
       shape="ainfix =V0agcdV0V1Iainfix =V1c0Iainfix >=V1c0Aainfix >=V0c0FF">
       <proof
-       prover="cvc3"
+       prover="z3-2"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="cvc3-2.2"
        timelimit="10"
        edited=""
        obsolete="false">
@@ -84,25 +103,25 @@
        timelimit="2"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof
-       prover="z3"
-       timelimit="10"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter gcd.2"
       expl="precondition"
-      sum="70f561be461e15e97fcccbe19f12dd14"
+      sum="2e71ed4c0e24510fa1ac06aa7eb9f667"
       proved="true"
       expanded="true"
       shape="ainfix >=amodV0V1c0Aainfix >=V1c0Aainfix <amodV0V1V1Aainfix <=c0V1Iainfix =V1c0NIainfix >=V1c0Aainfix >=V0c0FF">
       <proof
-       prover="cvc3"
+       prover="z3-2"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="cvc3-2.2"
        timelimit="10"
        edited=""
        obsolete="false">
@@ -115,18 +134,11 @@
        obsolete="false">
        <result status="valid" time="0.06"/>
       </proof>
-      <proof
-       prover="z3"
-       timelimit="10"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
      </goal>
      <goal
       name="WP_parameter gcd.3"
       expl="normal postcondition"
-      sum="36142a54426b32466a940e453a923485"
+      sum="ee54e5bc45f97fa2cde12d2a15eb8865"
       proved="true"
       expanded="true"
       shape="ainfix =agcdV1amodV0V1agcdV0V1Iainfix >=amodV0V1c0Aainfix >=V1c0Aainfix <amodV0V1V1Aainfix <=c0V1Iainfix =V1c0NIainfix >=V1c0Aainfix >=V0c0FF">

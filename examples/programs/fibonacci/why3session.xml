@@ -5,15 +5,23 @@
  <prover
   id="alt-ergo"
   name="Alt-Ergo"
-  version="0.93"/>
+  version="0.94"/>
+ <prover
+  id="alt-ergo-0.93.1"
+  name="Alt-Ergo"
+  version="0.93.1"/>
  <prover
   id="coq"
   name="Coq"
   version="8.3pl2"/>
  <prover
-  id="cvc3"
+  id="cvc3-2.2"
   name="CVC3"
   version="2.2"/>
+ <prover
+  id="cvc3-2.4"
+  name="CVC3"
+  version="2.4.1"/>
  <prover
   id="eprover"
   name="Eprover"
@@ -43,9 +51,13 @@
   name="Yices"
   version="1.0.25"/>
  <prover
-  id="z3"
+  id="z3-2"
   name="Z3"
   version="2.19"/>
+ <prover
+  id="z3-3"
+  name="Z3"
+  version="3.2"/>
  <file
   name="../fibonacci.mlw"
   verified="true"
@@ -61,12 +73,12 @@
    expanded="false">
    <goal
     name="isfib_2_1"
-    sum="a573dce971d7a98b8090c2b65b0e19ce"
+    sum="6a6de2a49bf0306363ac7e4c9960b38e"
     proved="true"
     expanded="false"
     shape="ainfix =afibc2c1">
     <proof
-     prover="cvc3"
+     prover="cvc3-2.2"
      timelimit="5"
      edited=""
      obsolete="false">
@@ -75,12 +87,12 @@
    </goal>
    <goal
     name="isfib_6_8"
-    sum="bb3c7e05359e5ef78c8924483a1a4e2d"
+    sum="beb170b155842a01445a3eff991ada77"
     proved="true"
     expanded="false"
     shape="ainfix =afibc6c8">
     <proof
-     prover="cvc3"
+     prover="cvc3-2.2"
      timelimit="5"
      edited=""
      obsolete="false">
@@ -89,12 +101,12 @@
    </goal>
    <goal
     name="not_isfib_2_2"
-    sum="9b2329d29c7e6c143b2093332f7b4e30"
+    sum="45bb2d286e731b0dbb8229b29994f595"
     proved="true"
     expanded="false"
     shape="ainfix =afibc2c2N">
     <proof
-     prover="cvc3"
+     prover="cvc3-2.2"
      timelimit="5"
      edited=""
      obsolete="false">
@@ -105,7 +117,7 @@
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.00"/>
     </proof>
     <proof
      prover="eprover"
@@ -126,7 +138,7 @@
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.00"/>
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
   </theory>
@@ -137,12 +149,12 @@
    <goal
     name="WP_parameter fib"
     expl="parameter fib"
-    sum="12e9d270d7926a589766ab383d72ad19"
+    sum="0ccc78a145ed53738a4b37f049c70127"
     proved="true"
     expanded="false"
     shape="ainfix =afibV0V2Iainfix =afibainfix +ainfix -V0c1c1V2Aainfix =afibainfix +ainfix +ainfix -V0c1c1c1V1Aainfix <=ainfix +ainfix -V0c1c1V0Aainfix <=c0ainfix +ainfix -V0c1c1Aainfix =afibainfix +V3c1V4Aainfix =afibainfix +ainfix +V3c1c1V5Aainfix <=ainfix +V3c1V0Aainfix <=c0ainfix +V3c1Iainfix =V5ainfix +V1V2FIainfix =V4V1FIainfix =afibV3V2Aainfix =afibainfix +V3c1V1Aainfix <=V3V0Aainfix <=c0V3Iainfix <=V3ainfix -V0c1Aainfix <=c0V3FFFAainfix =afibc0c0Aainfix =afibainfix +c0c1c1Aainfix <=c0V0Aainfix <=c0c0Iainfix <=c0ainfix -V0c1Aainfix =afibV0c0Iainfix >c0ainfix -V0c1Iainfix >=V0c0F">
     <proof
-     prover="cvc3"
+     prover="cvc3-2.2"
      timelimit="5"
      edited=""
      obsolete="false">
@@ -162,7 +174,7 @@
    <goal
     name="WP_parameter logfib"
     expl="parameter logfib"
-    sum="890a6957a8dd9eabe63bc08489ce3469"
+    sum="1e0ee05a86a9105998e9115b57c79df9"
     proved="true"
     expanded="false"
     shape="iainfix =V0c0ainfix =apoweramk tc1c1c1c0V0amk tainfix +c1c0c0c0c1Ciainfix =amodV0c2c0aTuple2ainfix +ainfix *V1V1ainfix *V2V2ainfix *V2ainfix +V1ainfix +V1V2aTuple2ainfix *V2ainfix +V1ainfix +V1V2ainfix +ainfix *ainfix +V1V2ainfix +V1V2ainfix *V2V2aTuple2VVainfix =apoweramk tc1c1c1c0V0amk tainfix +V3V4V4V4V3Iainfix =apoweramk tc1c1c1c0adivV0c2amk tainfix +V1V2V2V2V1FAainfix >=adivV0c2c0Aainfix <adivV0c2V0Aainfix <=c0V0Iainfix >=V0c0F">
@@ -173,12 +185,19 @@
      <goal
       name="WP_parameter logfib.1"
       expl="normal postcondition"
-      sum="5b6a3fc307c16f5f49607a0ff7e674c2"
+      sum="f4aec057cdbf9d8cfe8823e8e0aff935"
       proved="true"
       expanded="false"
       shape="ainfix =apoweramk tc1c1c1c0V0amk tainfix +c1c0c0c0c1Iainfix =V0c0Iainfix >=V0c0F">
       <proof
-       prover="cvc3"
+       prover="z3-2"
+       timelimit="5"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="cvc3-2.2"
        timelimit="5"
        edited=""
        obsolete="false">
@@ -186,13 +205,6 @@
       </proof>
       <proof
        prover="alt-ergo"
-       timelimit="5"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof
-       prover="z3"
        timelimit="5"
        edited=""
        obsolete="false">
@@ -209,29 +221,29 @@
      <goal
       name="WP_parameter logfib.2"
       expl="precondition"
-      sum="ccb751a2548cd006b6d1231f6536f6d4"
+      sum="8835f89d38796072dd216b690e89b845"
       proved="true"
       expanded="false"
       shape="ainfix >=adivV0c2c0Aainfix <adivV0c2V0Aainfix <=c0V0Iainfix =V0c0NIainfix >=V0c0F">
       <proof
-       prover="cvc3"
-       timelimit="5"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-      <proof
-       prover="z3"
+       prover="z3-2"
        timelimit="5"
        edited=""
        obsolete="false">
        <result status="valid" time="0.01"/>
       </proof>
+      <proof
+       prover="cvc3-2.2"
+       timelimit="5"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.00"/>
+      </proof>
      </goal>
      <goal
       name="WP_parameter logfib.3"
       expl="normal postcondition"
-      sum="f3375d97605e811de102a16b234bba77"
+      sum="113b4909f80f58b34505489bedb6a9ba"
       proved="true"
       expanded="false"
       shape="Ciainfix =amodV0c2c0aTuple2ainfix +ainfix *V1V1ainfix *V2V2ainfix *V2ainfix +V1ainfix +V1V2aTuple2ainfix *V2ainfix +V1ainfix +V1V2ainfix +ainfix *ainfix +V1V2ainfix +V1V2ainfix *V2V2aTuple2VVainfix =apoweramk tc1c1c1c0V0amk tainfix +V3V4V4V4V3Iainfix =apoweramk tc1c1c1c0adivV0c2amk tainfix +V1V2V2V2V1FIainfix >=adivV0c2c0Aainfix <adivV0c2V0Aainfix <=c0V0Iainfix =V0c0NIainfix >=V0c0F">
@@ -240,14 +252,14 @@
        timelimit="10"
        edited="fibonacci_WP_FibonacciLogarithmic_WP_parameter_logfib_1.v"
        obsolete="false">
-       <result status="valid" time="0.68"/>
+       <result status="valid" time="0.73"/>
       </proof>
      </goal>
     </transf>
    </goal>
    <goal
     name="fib_m"
-    sum="9362f2ebbeeb0e107380bb923d9ceef8"
+    sum="9e71565d0b6b4a7cc165e57eded22692"
     proved="true"
     expanded="true"
     shape="Lapoweram1110V0ainfix =afibV0aa21V1Aainfix =afibainfix +V0c1aa11V1Iainfix >=V0c0F">
@@ -262,12 +274,12 @@
    <goal
     name="WP_parameter fibo"
     expl="parameter fibo"
-    sum="dba445c42574ab6df74a30491182b2c8"
+    sum="d8823f7600bed7722cdca15c65b6d74e"
     proved="true"
     expanded="false"
     shape="ainfix =V2afibV0Iainfix =apoweramk tc1c1c1c0V0amk tainfix +V1V2V2V2V1FAainfix >=V0c0Iainfix >=V0c0F">
     <proof
-     prover="cvc3"
+     prover="cvc3-2.2"
      timelimit="5"
      edited=""
      obsolete="false">
@@ -278,7 +290,7 @@
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.02"/>
+     <result status="valid" time="0.00"/>
     </proof>
    </goal>
   </theory>

@@ -5,15 +5,23 @@
  <prover
   id="alt-ergo"
   name="Alt-Ergo"
-  version="0.93"/>
+  version="0.94"/>
+ <prover
+  id="alt-ergo-0.93.1"
+  name="Alt-Ergo"
+  version="0.93.1"/>
  <prover
   id="coq"
   name="Coq"
   version="8.3pl2"/>
  <prover
-  id="cvc3"
+  id="cvc3-2.2"
   name="CVC3"
   version="2.2"/>
+ <prover
+  id="cvc3-2.4"
+  name="CVC3"
+  version="2.4.1"/>
  <prover
   id="eprover"
   name="Eprover"
@@ -43,9 +51,13 @@
   name="Yices"
   version="1.0.25"/>
  <prover
-  id="z3"
+  id="z3-2"
   name="Z3"
   version="2.19"/>
+ <prover
+  id="z3-3"
+  name="Z3"
+  version="3.2"/>
  <file
   name="../vstte10_aqueue.mlw"
   verified="true"
@@ -57,10 +69,25 @@
    <goal
     name="WP_parameter empty"
     expl="normal postcondition"
-    sum="8f9efe6fccafb635003d0a404d5d6cac"
+    sum="5ebc0507964a2e77ae29b348d1a76acb"
     proved="true"
     expanded="false"
     shape="ainfix =asequenceamk queueaNilc0aNilc0aNilAainvamk queueaNilc0aNilc0">
+    <proof
+     prover="alt-ergo"
+     timelimit="20"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter head"
+    expl="parameter head"
+    sum="fbd3a0a47813802710de690957bf4170"
+    proved="true"
+    expanded="false"
+    shape="Lamk queueV0V1V2V3CV0aNilfaConsVwainfix =CasequenceV4aNilaNoneaConsVwaSomeV6aSomeV5Iainfix =asequenceV4aNilNAainvV4F">
     <proof
      prover="alt-ergo"
      timelimit="20"
@@ -70,24 +97,9 @@
     </proof>
    </goal>
    <goal
-    name="WP_parameter head"
-    expl="parameter head"
-    sum="3ec2541f90af48fcab6422be32cbeb7b"
-    proved="true"
-    expanded="false"
-    shape="Lamk queueV0V1V2V3CV0aNilfaConsVwainfix =CasequenceV4aNilaNoneaConsVwaSomeV6aSomeV5Iainfix =asequenceV4aNilNAainvV4F">
-    <proof
-     prover="alt-ergo"
-     timelimit="20"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.04"/>
-    </proof>
-   </goal>
-   <goal
     name="WP_parameter create"
     expl="parameter create"
-    sum="9151aec3de1f3cd23076cdd8a792c3e6"
+    sum="037dec6214294b61f503e444ecf87a89"
     proved="true"
     expanded="false"
     shape="LalengthV2iainfix >=V1V3ainfix =asequenceamk queueV0V1V2V3ainfix ++V0areverseV2Aainvamk queueV0V1V2V3ainfix =asequenceamk queueainfix ++V0areverseV2ainfix +V1V3aNilc0ainfix ++V0areverseV2Aainvamk queueainfix ++V0areverseV2ainfix +V1V3aNilc0Iainfix =V1alengthV0FFF">
@@ -96,13 +108,13 @@
      timelimit="20"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.34"/>
+     <result status="valid" time="0.43"/>
     </proof>
    </goal>
    <goal
     name="WP_parameter tail"
     expl="parameter tail"
-    sum="bbf4fa5dc2ef88c2d13f927cbcc76688"
+    sum="7ddb8e7feef1b679851cc322daddc596"
     proved="true"
     expanded="false"
     shape="Lamk queueV0V1V2V3CV0aNilfaConswVLamk queueV6V7V8V9ainfix =CasequenceV4aNilaNoneaConswVaSomeV11aSomeasequenceV10AainvV10Iainfix =asequenceV10ainfix ++V5areverseV2AainvV10FAainfix =V3alengthV2Aainfix =ainfix -V1c1alengthV5Iainfix =asequenceV4aNilNAainvV4F">
@@ -113,7 +125,7 @@
      <goal
       name="WP_parameter tail.1"
       expl="parameter tail"
-      sum="74f309e0db7936dce1cdaf84e3420347"
+      sum="19fd73af0d3c4008ffc2238bd1a28bb1"
       proved="true"
       expanded="false"
       shape="Lamk queueV0V1V2V3CV0aNilfaConswVtIainfix =asequenceV4aNilNAainvV4F">
@@ -122,13 +134,13 @@
        timelimit="20"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter tail.2"
       expl="parameter tail"
-      sum="63d7c503cb690717833b416f68ec982d"
+      sum="4cfaf5aca91c0c211d7ef3efb0444bb5"
       proved="true"
       expanded="false"
       shape="Lamk queueV0V1V2V3CV0aNiltaConswVainfix =V3alengthV2Aainfix =ainfix -V1c1alengthV5Iainfix =asequenceV4aNilNAainvV4F">
@@ -143,7 +155,7 @@
      <goal
       name="WP_parameter tail.3"
       expl="parameter tail"
-      sum="8c66512b9bd836432d2c2acdafc4c706"
+      sum="c9f26deb901b45072775215a3175aa48"
       proved="true"
       expanded="false"
       shape="Lamk queueV0V1V2V3CV0aNiltaConswVLamk queueV6V7V8V9ainfix =CasequenceV4aNilaNoneaConswVaSomeV11aSomeasequenceV10AainvV10Iainfix =asequenceV10ainfix ++V5areverseV2AainvV10FIainfix =V3alengthV2Aainfix =ainfix -V1c1alengthV5Iainfix =asequenceV4aNilNAainvV4F">
@@ -152,7 +164,7 @@
        timelimit="20"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.12"/>
+       <result status="valid" time="0.16"/>
       </proof>
      </goal>
     </transf>
@@ -160,7 +172,7 @@
    <goal
     name="WP_parameter enqueue"
     expl="parameter enqueue"
-    sum="557f67f61d3f601539940880d8cca7e7"
+    sum="e3b95cd07546e68134fba8c254ee6a01"
     proved="true"
     expanded="false"
     shape="Lamk queueV1V2V3V4Lamk queueV6V7V8V9ainfix =asequenceV10ainfix ++asequenceV5aConsV0aNilAainvV10Iainfix =asequenceV10ainfix ++V1areverseaConsV0V3AainvV10FAainfix =ainfix +V4c1alengthaConsV0V3Aainfix =V2alengthV1IainvV5FF">
@@ -169,7 +181,7 @@
      timelimit="20"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.10"/>
+     <result status="valid" time="0.12"/>
     </proof>
    </goal>
   </theory>

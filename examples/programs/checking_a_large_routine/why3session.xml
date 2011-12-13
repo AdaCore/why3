@@ -5,15 +5,23 @@
  <prover
   id="alt-ergo"
   name="Alt-Ergo"
-  version="0.93"/>
+  version="0.94"/>
+ <prover
+  id="alt-ergo-0.93.1"
+  name="Alt-Ergo"
+  version="0.93.1"/>
  <prover
   id="coq"
   name="Coq"
   version="8.3pl2"/>
  <prover
-  id="cvc3"
+  id="cvc3-2.2"
   name="CVC3"
   version="2.2"/>
+ <prover
+  id="cvc3-2.4"
+  name="CVC3"
+  version="2.4.1"/>
  <prover
   id="eprover"
   name="Eprover"
@@ -43,9 +51,13 @@
   name="Yices"
   version="1.0.25"/>
  <prover
-  id="z3"
+  id="z3-2"
   name="Z3"
   version="2.19"/>
+ <prover
+  id="z3-3"
+  name="Z3"
+  version="3.2"/>
  <file
   name="../checking_a_large_routine.mlw"
   verified="true"
@@ -57,7 +69,7 @@
    <goal
     name="WP_parameter routine"
     expl="parameter routine"
-    sum="e9943b170f7bb3699ce2bcd677d1c8df"
+    sum="ffe1787c3d31b7076e05acb592dd53d9"
     proved="true"
     expanded="true"
     shape="iainfix <V2V0iainfix <=V3V2ainfix <ainfix -V2V6ainfix -V2V3Aainfix <=c0ainfix -V2V3Aainfix =V5ainfix *V6afactV2Aainfix <=V6ainfix +V2c1Aainfix <=c1V6Iainfix =V6ainfix +V3c1FIainfix =V5ainfix +V4V1Fainfix <ainfix -V0V7ainfix -V0V2Aainfix <=c0ainfix -V0V2Aainfix =V4afactV7Aainfix <=V7V0Aainfix <=c0V7Iainfix =V7ainfix +V2c1FIainfix =V4ainfix *V3afactV2Aainfix <=V3ainfix +V2c1Aainfix <=c1V3FFAainfix =V1ainfix *c1afactV2Aainfix <=c1ainfix +V2c1Aainfix <=c1c1ainfix =V1afactV0Iainfix =V1afactV2Aainfix <=V2V0Aainfix <=c0V2FFAainfix =c1afactc0Aainfix <=c0V0Aainfix <=c0c0Iainfix >=V0c0F">
@@ -68,7 +80,7 @@
      <goal
       name="WP_parameter routine.1"
       expl="loop invariant init"
-      sum="cf4d4ec6d860d93ad83a718703abfdf6"
+      sum="1f5a6e6bd55116929e4d297f296390a1"
       proved="true"
       expanded="true"
       shape="ainfix =c1afactc0Aainfix <=c0V0Aainfix <=c0c0Iainfix >=V0c0F">
@@ -77,13 +89,13 @@
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter routine.2"
       expl="loop invariant init"
-      sum="c8674b048553d8e22c93a2121e9547ee"
+      sum="6c5e303f4362d7c04f11f524115619f4"
       proved="true"
       expanded="true"
       shape="ainfix =V1ainfix *c1afactV2Aainfix <=c1ainfix +V2c1Aainfix <=c1c1Iainfix <V2V0Iainfix =V1afactV2Aainfix <=V2V0Aainfix <=c0V2FFIainfix >=V0c0F">
@@ -92,18 +104,18 @@
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter routine.3"
       expl="loop invariant preservation"
-      sum="bd00fd1d7ba80e558d08e48ba1f00300"
+      sum="be6c2facde1553ed4a15de2f75750a6d"
       proved="true"
       expanded="true"
       shape="ainfix =V5ainfix *V6afactV2Aainfix <=V6ainfix +V2c1Aainfix <=c1V6Iainfix =V6ainfix +V3c1FIainfix =V5ainfix +V4V1FIainfix <=V3V2Iainfix =V4ainfix *V3afactV2Aainfix <=V3ainfix +V2c1Aainfix <=c1V3FFIainfix <V2V0Iainfix =V1afactV2Aainfix <=V2V0Aainfix <=c0V2FFIainfix >=V0c0F">
       <proof
-       prover="cvc3"
+       prover="cvc3-2.2"
        timelimit="10"
        edited=""
        obsolete="false">
@@ -113,7 +125,7 @@
      <goal
       name="WP_parameter routine.4"
       expl="loop variant decreases"
-      sum="51d4291be664900c9cbd81c003133093"
+      sum="27df4fc251de6ce631861f0746c7b90e"
       proved="true"
       expanded="true"
       shape="ainfix <ainfix -V2V6ainfix -V2V3Aainfix <=c0ainfix -V2V3Iainfix =V5ainfix *V6afactV2Aainfix <=V6ainfix +V2c1Aainfix <=c1V6Iainfix =V6ainfix +V3c1FIainfix =V5ainfix +V4V1FIainfix <=V3V2Iainfix =V4ainfix *V3afactV2Aainfix <=V3ainfix +V2c1Aainfix <=c1V3FFIainfix <V2V0Iainfix =V1afactV2Aainfix <=V2V0Aainfix <=c0V2FFIainfix >=V0c0F">
@@ -122,31 +134,16 @@
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter routine.5"
       expl="loop invariant preservation"
-      sum="913719957de4bd9785c5691c0e30d026"
+      sum="5d56ff80d60289d49318061907d4b21f"
       proved="true"
       expanded="true"
       shape="ainfix =V4afactV5Aainfix <=V5V0Aainfix <=c0V5Iainfix =V5ainfix +V2c1FIainfix <=V3V2NIainfix =V4ainfix *V3afactV2Aainfix <=V3ainfix +V2c1Aainfix <=c1V3FFIainfix <V2V0Iainfix =V1afactV2Aainfix <=V2V0Aainfix <=c0V2FFIainfix >=V0c0F">
-      <proof
-       prover="alt-ergo"
-       timelimit="10"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter routine.6"
-      expl="loop variant decreases"
-      sum="c6d17a46365b163d54d0b27a82a0bf93"
-      proved="true"
-      expanded="true"
-      shape="ainfix <ainfix -V0V5ainfix -V0V2Aainfix <=c0ainfix -V0V2Iainfix =V4afactV5Aainfix <=V5V0Aainfix <=c0V5Iainfix =V5ainfix +V2c1FIainfix <=V3V2NIainfix =V4ainfix *V3afactV2Aainfix <=V3ainfix +V2c1Aainfix <=c1V3FFIainfix <V2V0Iainfix =V1afactV2Aainfix <=V2V0Aainfix <=c0V2FFIainfix >=V0c0F">
       <proof
        prover="alt-ergo"
        timelimit="10"
@@ -156,9 +153,24 @@
       </proof>
      </goal>
      <goal
+      name="WP_parameter routine.6"
+      expl="loop variant decreases"
+      sum="e7af70e5247763f995c5ebfae0f58b73"
+      proved="true"
+      expanded="true"
+      shape="ainfix <ainfix -V0V5ainfix -V0V2Aainfix <=c0ainfix -V0V2Iainfix =V4afactV5Aainfix <=V5V0Aainfix <=c0V5Iainfix =V5ainfix +V2c1FIainfix <=V3V2NIainfix =V4ainfix *V3afactV2Aainfix <=V3ainfix +V2c1Aainfix <=c1V3FFIainfix <V2V0Iainfix =V1afactV2Aainfix <=V2V0Aainfix <=c0V2FFIainfix >=V0c0F">
+      <proof
+       prover="alt-ergo"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
       name="WP_parameter routine.7"
       expl="normal postcondition"
-      sum="f6f36c963637e7834456ced524a93c7c"
+      sum="f8078c491360b1080f6377e8b0adfaba"
       proved="true"
       expanded="true"
       shape="ainfix =V1afactV0Iainfix <V2V0NIainfix =V1afactV2Aainfix <=V2V0Aainfix <=c0V2FFIainfix >=V0c0F">
@@ -175,7 +187,7 @@
    <goal
     name="WP_parameter routine2"
     expl="parameter routine2"
-    sum="23a788ebffdb3b8b2ffa0b34431e1c13"
+    sum="b3ec9b7ab8163a944bc896743e2b306e"
     proved="true"
     expanded="true"
     shape="ainfix =V1afactV0Iainfix =V1afactainfix +ainfix -V0c1c1Aainfix =V3afactainfix +V2c1Iainfix =V3ainfix *ainfix +V2c1afactV2Aainfix =V5ainfix *ainfix +V4c1afactV2Iainfix =V5ainfix +V3V1FIainfix =V3ainfix *V4afactV2Iainfix <=V4V2Aainfix <=c1V4FFAainfix =V1ainfix *c1afactV2Iainfix <=c1V2Aainfix =V1afactainfix +V2c1Iainfix >c1V2Iainfix =V1afactV2Iainfix <=V2ainfix -V0c1Aainfix <=c0V2FFAainfix =c1afactc0Iainfix <=c0ainfix -V0c1Aainfix =c1afactV0Iainfix >c0ainfix -V0c1Iainfix >=V0c0F">
@@ -186,7 +198,7 @@
      <goal
       name="WP_parameter routine2.1"
       expl="normal postcondition"
-      sum="05b73de596d62510f46cb9c8fa84d31e"
+      sum="82da043adf8641a2a03f8f0718c9b1c2"
       proved="true"
       expanded="true"
       shape="ainfix =c1afactV0Iainfix >c0ainfix -V0c1Iainfix >=V0c0F">
@@ -195,13 +207,13 @@
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter routine2.2"
       expl="for loop initialization"
-      sum="45ce46675e3ae2bd664fb071fb218ec3"
+      sum="98cfd0b6633d0e31b90d91d6009c5a90"
       proved="true"
       expanded="true"
       shape="ainfix =c1afactc0Iainfix <=c0ainfix -V0c1Iainfix >=V0c0F">
@@ -210,13 +222,13 @@
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter routine2.3"
       expl="for loop preservation"
-      sum="d40b8c6ef80176abf3f3eba6a6f85c76"
+      sum="d44aa02a4bb39c77c69e513a69c4d882"
       proved="true"
       expanded="true"
       shape="ainfix =V3afactainfix +V2c1Iainfix =V3ainfix *ainfix +V2c1afactV2Aainfix =V5ainfix *ainfix +V4c1afactV2Iainfix =V5ainfix +V3V1FIainfix =V3ainfix *V4afactV2Iainfix <=V4V2Aainfix <=c1V4FFAainfix =V1ainfix *c1afactV2Iainfix <=c1V2Aainfix =V1afactainfix +V2c1Iainfix >c1V2Iainfix =V1afactV2Iainfix <=V2ainfix -V0c1Aainfix <=c0V2FFIainfix <=c0ainfix -V0c1Iainfix >=V0c0F">
@@ -225,13 +237,13 @@
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.03"/>
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter routine2.4"
       expl="normal postcondition"
-      sum="5f544f2aeadc86cd3c1aeea6d40bdbe3"
+      sum="a09748c54237746899ef02ee43ccc2bb"
       proved="true"
       expanded="true"
       shape="ainfix =V1afactV0Iainfix =V1afactainfix +ainfix -V0c1c1FIainfix <=c0ainfix -V0c1Iainfix >=V0c0F">
@@ -240,7 +252,7 @@
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
     </transf>

@@ -1,19 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
 <why3session
- name="imp_n/why3session.xml">
+ name="hoare_logic/imp_n/why3session.xml">
  <prover
   id="alt-ergo"
   name="Alt-Ergo"
-  version="0.93"/>
+  version="0.94"/>
+ <prover
+  id="alt-ergo-0.93.1"
+  name="Alt-Ergo"
+  version="0.93.1"/>
  <prover
   id="coq"
   name="Coq"
   version="8.3pl2"/>
  <prover
-  id="cvc3"
+  id="cvc3-2.2"
   name="CVC3"
   version="2.2"/>
+ <prover
+  id="cvc3-2.4"
+  name="CVC3"
+  version="2.4.1"/>
  <prover
   id="eprover"
   name="Eprover"
@@ -43,9 +51,13 @@
   name="Yices"
   version="1.0.25"/>
  <prover
-  id="z3"
+  id="z3-2"
   name="Z3"
   version="2.19"/>
+ <prover
+  id="z3-3"
+  name="Z3"
+  version="3.2"/>
  <file
   name="../imp_n.why"
   verified="true"
@@ -65,7 +77,7 @@
      timelimit="3"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.02"/>
+     <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
@@ -79,12 +91,12 @@
      timelimit="3"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.02"/>
+     <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
     name="Test13"
-    sum="bc53c41524b84304eb79b4e36fef8af8"
+    sum="47771fdd8f10cd404a1be72c05b89b62"
     proved="true"
     expanded="true"
     shape="Laconstc0ainfix =aeval_exprV0aEconstc13c13">
@@ -93,12 +105,12 @@
      timelimit="3"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
     name="Test42"
-    sum="78671d09729d8ffd84136c2dcf7eb74b"
+    sum="66f51de67bbcc45681c18bbb133c7efc"
     proved="true"
     expanded="true"
     shape="Lamk_identc0Lasetaconstc0V0c42ainfix =aeval_exprV1aEvarV0c42">
@@ -112,7 +124,7 @@
    </goal>
    <goal
     name="Test55"
-    sum="9f1ffc89f69ccb03e44edbf6adfebb8d"
+    sum="e0e274e128214fd47bb140fa5447fdbf"
     proved="true"
     expanded="true"
     shape="Lamk_identc0Lasetaconstc0V0c42ainfix =aeval_exprV1aEbinaEvarV0aOplusaEconstc13c55">
@@ -121,12 +133,12 @@
      timelimit="3"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.02"/>
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="Ass42"
-    sum="456c846b124e10fccdeb72291a3819b0"
+    sum="ad91c5edb6a7c61af63e3734fa2df58c"
     proved="true"
     expanded="true"
     shape="Lamk_identc0Laconstc0ainfix =agetV2V0c42Iaone_stepV1aSassignV0aEconstc42V2aSskipF">
@@ -140,7 +152,7 @@
    </goal>
    <goal
     name="If42"
-    sum="9c97951c8cf8d86219396907bf0260eb"
+    sum="547bdfd4fb6e6492671e8e56dc457328"
     proved="true"
     expanded="true"
     shape="Lamk_identc0Laconstc0ainfix =agetV3V0c42Iaone_stepV2V4V3aSskipIaone_stepV1aSifaEvarV0aSassignV0aEconstc13aSassignV0aEconstc42V2V4F">
@@ -149,12 +161,12 @@
      timelimit="3"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.83"/>
+     <result status="valid" time="1.10"/>
     </proof>
    </goal>
    <goal
     name="progress"
-    sum="3e029691d2ae6f6e5afe69a1860de120"
+    sum="ab71e4a735926e8487483992d359be90"
     proved="true"
     expanded="true"
     shape="aone_stepV0V1V2V3EIainfix =V1aSskipNF">
@@ -163,12 +175,12 @@
      timelimit="3"
      edited="imp_n_Imp_progress_1.v"
      obsolete="false">
-     <result status="valid" time="0.63"/>
+     <result status="valid" time="0.52"/>
     </proof>
    </goal>
    <goal
     name="steps_non_neg"
-    sum="7fe79f6298fbe9fbaa31741ffa430e03"
+    sum="5ae0d230196a55f4099bbbabf2e35ce9"
     proved="true"
     expanded="true"
     shape="ainfix >=V4c0Iamany_stepsV0V2V1V3V4F">
@@ -177,12 +189,12 @@
      timelimit="3"
      edited="imp_n_Imp_steps_non_neg_1.v"
      obsolete="false">
-     <result status="valid" time="0.60"/>
+     <result status="valid" time="0.54"/>
     </proof>
    </goal>
    <goal
     name="many_steps_seq"
-    sum="c4867410343f6c684f9ca00c1536720a"
+    sum="3304e9f77bcbabd88c3500a321baa76b"
     proved="true"
     expanded="true"
     shape="ainfix =V4ainfix +ainfix +c1V6V7Aamany_stepsV5V3V1aSskipV7Aamany_stepsV0V2V5aSskipV6EIamany_stepsV0aSseqV2V3V1aSskipV4F">
@@ -191,12 +203,12 @@
      timelimit="3"
      edited="imp_n_Imp_many_steps_seq_1.v"
      obsolete="false">
-     <result status="valid" time="0.72"/>
+     <result status="valid" time="0.64"/>
     </proof>
    </goal>
    <goal
     name="eval_subst_expr"
-    sum="9528a4415f2f99046bde6107851e9279"
+    sum="73fb4b0e67cf194aaae253a7398a5658"
     proved="true"
     expanded="true"
     shape="ainfix =aeval_exprV0asubst_exprV1V2V3aeval_exprasetV0V2aeval_exprV0V3V1F">
@@ -205,12 +217,12 @@
      timelimit="3"
      edited="imp_n_Imp_eval_subst_expr_1.v"
      obsolete="false">
-     <result status="valid" time="0.63"/>
+     <result status="valid" time="0.59"/>
     </proof>
    </goal>
    <goal
     name="eval_subst"
-    sum="f9958c4b6b55b1609f43dd2ad3432473"
+    sum="f2b1ed8a979f94bf5659ffbd9b05bb26"
     proved="true"
     expanded="true"
     shape="aeval_fmlaasetV0V2aeval_exprV0V3V1qaeval_fmlaV0asubstV1V2V3F">
@@ -219,12 +231,12 @@
      timelimit="3"
      edited="imp_n_Imp_eval_subst_1.v"
      obsolete="false">
-     <result status="valid" time="0.56"/>
+     <result status="valid" time="0.58"/>
     </proof>
    </goal>
    <goal
     name="skip_rule"
-    sum="dfc9be1a6c7c1951f0739b5eb00818fa"
+    sum="abde2bfff6aab8b1162384f7c3829604"
     proved="true"
     expanded="true"
     shape="avalid_tripleV0aSskipV0F">
@@ -233,12 +245,12 @@
      timelimit="3"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.36"/>
+     <result status="valid" time="2.46"/>
     </proof>
    </goal>
    <goal
     name="assign_rule"
-    sum="2ce35dd2e431c206c4ef4d4353dd9c47"
+    sum="4d58e4100376cfccf9162d4e49060dff"
     proved="true"
     expanded="true"
     shape="avalid_tripleasubstV0V1V2aSassignV1V2V0F">
@@ -247,12 +259,12 @@
      timelimit="3"
      edited="imp_n_Imp_assign_rule_1.v"
      obsolete="false">
-     <result status="valid" time="0.58"/>
+     <result status="valid" time="0.60"/>
     </proof>
    </goal>
    <goal
     name="seq_rule"
-    sum="3da8614c2f6127af09be97a426dc327e"
+    sum="f304e22ba8dc86c43efe9ad436300360"
     proved="true"
     expanded="true"
     shape="avalid_tripleV0aSseqV3V4V1Iavalid_tripleV2V4V1Aavalid_tripleV0V3V2F">
@@ -261,12 +273,12 @@
      timelimit="3"
      edited="imp_n_Imp_seq_rule_1.v"
      obsolete="false">
-     <result status="valid" time="0.53"/>
+     <result status="valid" time="0.54"/>
     </proof>
    </goal>
    <goal
     name="if_rule"
-    sum="5e738541b92efb7be1706db09a761442"
+    sum="a4cb3a17be885e24f6541f5daf7b9a23"
     proved="true"
     expanded="true"
     shape="avalid_tripleV1aSifV0V3V4V2Iavalid_tripleaFandV1aFnotaFtermV0V4V2Aavalid_tripleaFandV1aFtermV0V3V2F">
@@ -280,7 +292,7 @@
    </goal>
    <goal
     name="while_rule"
-    sum="17f0b6240f5cfd179c6cea9bfc294a9d"
+    sum="f5c9c86820aae5ece8eea79bcc72a3f7"
     proved="true"
     expanded="true"
     shape="avalid_tripleV1aSwhileV0V2aFandaFnotaFtermV0V1Iavalid_tripleaFandaFtermV0V1V2V1F">
@@ -289,28 +301,28 @@
      timelimit="3"
      edited="imp_n_Imp_while_rule_1.v"
      obsolete="false">
-     <result status="valid" time="0.60"/>
+     <result status="valid" time="0.63"/>
     </proof>
    </goal>
    <goal
     name="consequence_rule"
-    sum="c6ee564de35ed1dc6ad77dbe593817ba"
+    sum="f4918b1986352c264348f4975ef2d3ea"
     proved="true"
     expanded="true"
     shape="avalid_tripleV1V4V3Iavalid_fmlaaFimpliesV2V3Iavalid_tripleV0V4V2Iavalid_fmlaaFimpliesV1V0F">
     <proof
-     prover="cvc3"
+     prover="z3-2"
      timelimit="3"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.55"/>
+     <result status="valid" time="0.03"/>
     </proof>
     <proof
-     prover="z3"
+     prover="cvc3-2.2"
      timelimit="3"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.05"/>
+     <result status="valid" time="0.30"/>
     </proof>
    </goal>
   </theory>

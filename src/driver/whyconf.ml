@@ -31,10 +31,11 @@ open Rc
   - 8 for release 0.71
   - 9 coq realizations
   - 10 require %f in editor lines
+  - 11 change prover identifiers in provers-detection-data.conf
 
 If a configuration doesn't contain the actual magic number we don't use it.*)
 
-let magicnumber = 10
+let magicnumber = 11
 
 exception WrongMagicNumber
 

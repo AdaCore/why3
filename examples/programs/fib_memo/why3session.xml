@@ -5,15 +5,23 @@
  <prover
   id="alt-ergo"
   name="Alt-Ergo"
-  version="0.93"/>
+  version="0.94"/>
+ <prover
+  id="alt-ergo-0.93.1"
+  name="Alt-Ergo"
+  version="0.93.1"/>
  <prover
   id="coq"
   name="Coq"
   version="8.3pl2"/>
  <prover
-  id="cvc3"
+  id="cvc3-2.2"
   name="CVC3"
   version="2.2"/>
+ <prover
+  id="cvc3-2.4"
+  name="CVC3"
+  version="2.4.1"/>
  <prover
   id="eprover"
   name="Eprover"
@@ -43,9 +51,13 @@
   name="Yices"
   version="1.0.25"/>
  <prover
-  id="z3"
+  id="z3-2"
   name="Z3"
   version="2.19"/>
+ <prover
+  id="z3-3"
+  name="Z3"
+  version="3.2"/>
  <file
   name="../fib_memo.mlw"
   verified="true"
@@ -57,7 +69,7 @@
    <goal
     name="WP_parameter fibo"
     expl="parameter fibo"
-    sum="624557db4ecad108a36feee7ed4e4274"
+    sum="24945dd1f2ab25890cb744d50c993de9"
     proved="true"
     expanded="true"
     shape="iainfix <=V0c1ainvV1Aainfix =c1afibV0ainvV4Aainfix =ainfix +V3V5afibV0IainvV4Aainfix =V5afibainfix -V0c2FFAainvV2Aainfix <=c0ainfix -V0c2IainvV2Aainfix =V3afibainfix -V0c1FFAainvV1Aainfix <=c0ainfix -V0c1IainvV1Aainfix <=c0V0FF">
@@ -72,7 +84,7 @@
    <goal
     name="WP_parameter memo_fibo"
     expl="parameter memo_fibo"
-    sum="04808f378e0cfb09a96394dd57cc3c26"
+    sum="2742915ad3259ca50237d00872ec96ef"
     proved="true"
     expanded="true"
     shape="ainvV4Aainfix =V3afibV0Iainfix =V4asetV2V0aSomeV3FIainvV2Aainfix =V3afibV0FFAainvV1Aainfix <=c0V0Iainfix =agetV1V0aNoneAainvV1Aainfix =V5afibV0Iainfix =agetV1V0aSomeV5FIainvV1Aainfix <=c0V0FF">
@@ -83,7 +95,7 @@
      <goal
       name="WP_parameter memo_fibo.1"
       expl="normal postcondition"
-      sum="6b529c9757fbdf6def1970ee84b9e012"
+      sum="f2739f99a551b412a50fcc68ebc185d8"
       proved="true"
       expanded="true"
       shape="ainvV1Aainfix =V2afibV0Iainfix =agetV1V0aSomeV2FIainvV1Aainfix <=c0V0FF">
@@ -92,13 +104,13 @@
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter memo_fibo.2"
       expl="precondition"
-      sum="f2e8625484bb0613fa4e5257791ed8be"
+      sum="dc0a55ab88a2a6d6be3bf294f0f95576"
       proved="true"
       expanded="true"
       shape="ainvV1Aainfix <=c0V0Iainfix =agetV1V0aNoneIainvV1Aainfix =V2afibV0Iainfix =agetV1V0aSomeV2FIainvV1Aainfix <=c0V0FF">
@@ -107,18 +119,18 @@
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter memo_fibo.3"
       expl="normal postcondition"
-      sum="283ecc0710282820b384d15676c19192"
+      sum="b1fcf12fd19406872ef063bd5b86b4e1"
       proved="true"
       expanded="true"
       shape="ainvV4Aainfix =V3afibV0Iainfix =V4asetV2V0aSomeV3FIainvV2Aainfix =V3afibV0FFIainvV1Aainfix <=c0V0Iainfix =agetV1V0aNoneIainvV1Aainfix =V5afibV0Iainfix =agetV1V0aSomeV5FIainvV1Aainfix <=c0V0FF">
       <proof
-       prover="cvc3"
+       prover="cvc3-2.2"
        timelimit="10"
        edited=""
        obsolete="false">

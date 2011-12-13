@@ -5,15 +5,23 @@
  <prover
   id="alt-ergo"
   name="Alt-Ergo"
-  version="0.93"/>
+  version="0.94"/>
+ <prover
+  id="alt-ergo-0.93.1"
+  name="Alt-Ergo"
+  version="0.93.1"/>
  <prover
   id="coq"
   name="Coq"
   version="8.3pl2"/>
  <prover
-  id="cvc3"
+  id="cvc3-2.2"
   name="CVC3"
   version="2.2"/>
+ <prover
+  id="cvc3-2.4"
+  name="CVC3"
+  version="2.4.1"/>
  <prover
   id="eprover"
   name="Eprover"
@@ -43,9 +51,13 @@
   name="Yices"
   version="1.0.25"/>
  <prover
-  id="z3"
+  id="z3-2"
   name="Z3"
   version="2.19"/>
+ <prover
+  id="z3-3"
+  name="Z3"
+  version="3.2"/>
  <file
   name="../assigning_meanings_to_programs.mlw"
   verified="true"
@@ -57,7 +69,7 @@
    <goal
     name="WP_parameter sum"
     expl="parameter sum"
-    sum="623e0f9ea6fbf22e855f3e4465a61e44"
+    sum="bb8ea1e6201294d18299b4a1cb3b23b8"
     proved="true"
     expanded="true"
     shape="iainfix <=V4V1ainfix <ainfix -V1V6ainfix -V1V4Aainfix <=c0ainfix -V1V4Aainfix =V5asumV2c1V6Aainfix <=V6ainfix +V1c1Aainfix <=c1V6Iainfix =V6ainfix +V4c1FIainfix =V5ainfix +V3agetV2V4FAainfix <V4V0Aainfix <=c0V4ainfix =V3asumV2c1ainfix +V1c1Iainfix =V3asumV2c1V4Aainfix <=V4ainfix +V1c1Aainfix <=c1V4FFAainfix =c0asumV2c1c1Aainfix <=c1ainfix +V1c1Aainfix <=c1c1Iainfix <V1V0Aainfix <=c0V1FFF">
@@ -77,12 +89,12 @@
    <goal
     name="WP_parameter division"
     expl="parameter division"
-    sum="1fd6f117a9ecb1227e7acde6a58e5f39"
+    sum="64e03deb0869292d6c1c46d1fa2b3d07"
     proved="true"
     expanded="true"
     shape="iainfix >=V2V1ainfix <V4V2Aainfix <=c0V2Aainfix =V0ainfix +ainfix *V5V1V4Aainfix <=c0V4Iainfix =V5ainfix +V3c1FIainfix =V4ainfix -V2V1Fainfix =V0ainfix +ainfix *V3V1V2Aainfix <V2V1Aainfix <=c0V2Iainfix =V0ainfix +ainfix *V3V1V2Aainfix <=c0V2FFAainfix =V0ainfix +ainfix *c0V1V0Aainfix <=c0V0Iainfix <c0V1Aainfix <=c0V0FF">
     <proof
-     prover="cvc3"
+     prover="cvc3-2.2"
      timelimit="10"
      edited=""
      obsolete="false">

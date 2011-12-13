@@ -5,17 +5,13 @@
  <prover
   id="alt-ergo"
   name="Alt-Ergo"
-  version="0.93"/>
- <prover
-  id="alt-ergo-0.93.1"
-  name="Alt-Ergo"
-  version="0.93.1"/>
+  version="0.94"/>
  <prover
   id="coq"
   name="Coq"
   version="8.3pl2"/>
  <prover
-  id="cvc3"
+  id="cvc3-2.2"
   name="CVC3"
   version="2.2"/>
  <prover
@@ -51,7 +47,7 @@
   name="Yices"
   version="1.0.25"/>
  <prover
-  id="z3"
+  id="z3-2"
   name="Z3"
   version="2.19"/>
  <prover
@@ -78,6 +74,13 @@
     expanded="true"
     shape="ainfix =aappaLambdaaVaraZeroaaaa">
     <proof
+     prover="z3-2"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
      prover="z3-3"
      timelimit="5"
      edited=""
@@ -85,18 +88,18 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="alt-ergo-0.93.1"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="cvc3"
+     prover="alt-ergo"
      timelimit="5"
      edited=""
      obsolete="false">
      <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="cvc3-2.2"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.01"/>
     </proof>
     <proof
      prover="eprover"
@@ -104,13 +107,6 @@
      edited=""
      obsolete="false">
      <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="z3"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.01"/>
     </proof>
     <proof
      prover="cvc3-2.4"
@@ -141,60 +137,60 @@
     expanded="true"
     shape="ainfix =aappaLambdaaVaraZeroaaab">
     <proof
-     prover="z3-3"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="alt-ergo-0.93.1"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="4.90"/>
-    </proof>
-    <proof
-     prover="cvc3"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.09"/>
-    </proof>
-    <proof
-     prover="eprover"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="1.12"/>
-    </proof>
-    <proof
-     prover="z3"
+     prover="z3-2"
      timelimit="5"
      edited=""
      obsolete="false">
      <result status="valid" time="0.02"/>
     </proof>
     <proof
+     prover="z3-3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="timeout" time="13.37"/>
+    </proof>
+    <proof
+     prover="cvc3-2.2"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.13"/>
+    </proof>
+    <proof
+     prover="eprover"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="1.40"/>
+    </proof>
+    <proof
      prover="cvc3-2.4"
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.11"/>
+     <result status="valid" time="0.16"/>
     </proof>
     <proof
      prover="vampire"
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="2.11"/>
+     <result status="valid" time="2.23"/>
     </proof>
     <proof
      prover="spass"
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="2.11"/>
+     <result status="valid" time="2.53"/>
     </proof>
    </goal>
    <goal
@@ -204,6 +200,13 @@
     expanded="true"
     shape="LaLambdaasubstaVaraSaZeroaSaZeroaaLaLambdaaaainfix =V0V1">
     <proof
+     prover="z3-2"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
      prover="z3-3"
      timelimit="5"
      edited=""
@@ -211,14 +214,14 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="alt-ergo-0.93.1"
+     prover="alt-ergo"
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="cvc3"
+     prover="cvc3-2.2"
      timelimit="5"
      edited=""
      obsolete="false">
@@ -232,18 +235,11 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="z3"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
      prover="cvc3-2.4"
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.00"/>
+     <result status="valid" time="0.01"/>
     </proof>
     <proof
      prover="vampire"
@@ -267,6 +263,13 @@
     expanded="true"
     shape="LasubstaLambdaaVaraSaZeroaZeroaaLaLambdaaaainfix =V0V1">
     <proof
+     prover="z3-2"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
      prover="z3-3"
      timelimit="5"
      edited=""
@@ -274,14 +277,14 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="alt-ergo-0.93.1"
+     prover="alt-ergo"
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.01"/>
+     <result status="timeout" time="6.86"/>
     </proof>
     <proof
-     prover="cvc3"
+     prover="cvc3-2.2"
      timelimit="5"
      edited=""
      obsolete="false">
@@ -293,13 +296,6 @@
      edited=""
      obsolete="false">
      <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="z3"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.01"/>
     </proof>
     <proof
      prover="cvc3-2.4"
@@ -330,6 +326,13 @@
     expanded="true"
     shape="LaLambdaaLambdaaVaraSaZeroLaLambdaaaainfix =aappV0aaV1">
     <proof
+     prover="z3-2"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
      prover="z3-3"
      timelimit="5"
      edited=""
@@ -337,39 +340,32 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="alt-ergo-0.93.1"
+     prover="alt-ergo"
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.03"/>
+     <result status="timeout" time="5.75"/>
     </proof>
     <proof
-     prover="cvc3"
+     prover="cvc3-2.2"
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.19"/>
+     <result status="valid" time="0.22"/>
     </proof>
     <proof
      prover="eprover"
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.05"/>
-    </proof>
-    <proof
-     prover="z3"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.06"/>
     </proof>
     <proof
      prover="cvc3-2.4"
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.23"/>
+     <result status="valid" time="0.34"/>
     </proof>
     <proof
      prover="vampire"
@@ -393,53 +389,53 @@
     expanded="true"
     shape="LaLambdaaLambdaaappaVaraZeroaVaraSaZeroainfix =aappaappV0aaaidaa">
     <proof
+     prover="z3-2"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.05"/>
+    </proof>
+    <proof
      prover="z3-3"
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.02"/>
+     <result status="valid" time="0.03"/>
     </proof>
     <proof
-     prover="alt-ergo-0.93.1"
+     prover="alt-ergo"
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="timeout" time="5.06"/>
+     <result status="unknown" time="1.24"/>
     </proof>
     <proof
      prover="eprover"
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.21"/>
-    </proof>
-    <proof
-     prover="z3"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.04"/>
+     <result status="valid" time="0.24"/>
     </proof>
     <proof
      prover="cvc3-2.4"
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="timeout" time="5.04"/>
+     <result status="timeout" time="5.95"/>
     </proof>
     <proof
      prover="vampire"
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="2.35"/>
+     <result status="valid" time="2.56"/>
     </proof>
     <proof
      prover="spass"
-     timelimit="5"
+     timelimit="8"
      edited=""
      obsolete="false">
-     <result status="valid" time="3.54"/>
+     <result status="valid" time="4.19"/>
     </proof>
    </goal>
    <goal
@@ -449,67 +445,60 @@
     expanded="true"
     shape="LaLambdaaLambdaaappaVaraZeroaVaraSaZeroLaLambdaaappaVaraZeroaaainfix =aappV0aaV1">
     <proof
-     prover="z3-3"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="alt-ergo-0.93.1"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="5.06"/>
-    </proof>
-    <proof
-     prover="alt-ergo"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="unknown" time="0.08"/>
-    </proof>
-    <proof
-     prover="cvc3"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="4.61"/>
-    </proof>
-    <proof
-     prover="eprover"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.21"/>
-    </proof>
-    <proof
-     prover="z3"
+     prover="z3-2"
      timelimit="5"
      edited=""
      obsolete="false">
      <result status="valid" time="0.02"/>
     </proof>
     <proof
+     prover="z3-3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="alt-ergo"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="unknown" time="1.03"/>
+    </proof>
+    <proof
+     prover="cvc3-2.2"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="5.02"/>
+    </proof>
+    <proof
+     prover="eprover"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.25"/>
+    </proof>
+    <proof
      prover="cvc3-2.4"
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="timeout" time="5.04"/>
+     <result status="timeout" time="6.55"/>
     </proof>
     <proof
      prover="vampire"
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="2.35"/>
+     <result status="valid" time="2.54"/>
     </proof>
     <proof
      prover="spass"
-     timelimit="5"
+     timelimit="7"
      edited=""
      obsolete="false">
-     <result status="valid" time="3.11"/>
+     <result status="valid" time="3.69"/>
     </proof>
    </goal>
   </theory>
@@ -529,6 +518,13 @@
     expanded="true"
     shape="ainfix =aappalambdaavaraZeroaaaa">
     <proof
+     prover="z3-2"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
      prover="z3-3"
      timelimit="5"
      edited=""
@@ -536,11 +532,11 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="alt-ergo-0.93.1"
+     prover="alt-ergo"
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="timeout" time="5.06"/>
+     <result status="unknown" time="0.00"/>
     </proof>
     <proof
      prover="eprover"
@@ -550,18 +546,11 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="z3"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
      prover="cvc3-2.4"
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="timeout" time="5.04"/>
+     <result status="timeout" time="5.33"/>
     </proof>
     <proof
      prover="vampire"
@@ -575,7 +564,7 @@
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.00"/>
+     <result status="valid" time="0.02"/>
     </proof>
    </goal>
    <goal
@@ -585,18 +574,25 @@
     expanded="true"
     shape="ainfix =aappalambdaavaraZeroaaab">
     <proof
+     prover="z3-2"
+     timelimit="6"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="3.02"/>
+    </proof>
+    <proof
      prover="z3-3"
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="2.12"/>
+     <result status="valid" time="2.08"/>
     </proof>
     <proof
-     prover="alt-ergo-0.93.1"
+     prover="alt-ergo"
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="timeout" time="5.10"/>
+     <result status="unknown" time="0.00"/>
     </proof>
     <proof
      prover="eprover"
@@ -606,32 +602,25 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="z3"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="2.82"/>
-    </proof>
-    <proof
      prover="cvc3-2.4"
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="timeout" time="5.04"/>
+     <result status="timeout" time="5.94"/>
     </proof>
     <proof
      prover="vampire"
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.00"/>
+     <result status="valid" time="0.01"/>
     </proof>
     <proof
      prover="spass"
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.02"/>
     </proof>
    </goal>
    <goal
@@ -641,18 +630,25 @@
     expanded="true"
     shape="LalambdaasubstavaraSaZeroaSaZeroaaLalambdaaaainfix =V0V1">
     <proof
+     prover="z3-2"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
      prover="z3-3"
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.00"/>
+     <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="alt-ergo-0.93.1"
+     prover="alt-ergo"
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="timeout" time="5.08"/>
+     <result status="timeout" time="5.74"/>
     </proof>
     <proof
      prover="eprover"
@@ -662,18 +658,11 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="z3"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
      prover="cvc3-2.4"
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="timeout" time="5.03"/>
+     <result status="timeout" time="6.25"/>
     </proof>
     <proof
      prover="vampire"
@@ -697,6 +686,13 @@
     expanded="true"
     shape="LasubstalambdaavaraSaZeroaZeroaaLalambdaaaainfix =V0V1">
     <proof
+     prover="z3-2"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
      prover="z3-3"
      timelimit="5"
      edited=""
@@ -704,11 +700,11 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="alt-ergo-0.93.1"
+     prover="alt-ergo"
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="timeout" time="5.08"/>
+     <result status="timeout" time="6.67"/>
     </proof>
     <proof
      prover="eprover"
@@ -718,18 +714,11 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="z3"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
      prover="cvc3-2.4"
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="timeout" time="5.04"/>
+     <result status="timeout" time="6.14"/>
     </proof>
     <proof
      prover="vampire"
@@ -743,7 +732,7 @@
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.02"/>
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
@@ -753,6 +742,13 @@
     expanded="true"
     shape="LalambdaalambdaavaraSaZeroLalambdaaaainfix =aappV0aaV1">
     <proof
+     prover="z3-2"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
      prover="z3-3"
      timelimit="5"
      edited=""
@@ -760,11 +756,11 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="alt-ergo-0.93.1"
+     prover="alt-ergo"
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="timeout" time="5.08"/>
+     <result status="timeout" time="6.35"/>
     </proof>
     <proof
      prover="eprover"
@@ -774,18 +770,11 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="z3"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
      prover="cvc3-2.4"
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="timeout" time="5.04"/>
+     <result status="timeout" time="6.04"/>
     </proof>
     <proof
      prover="vampire"
@@ -813,63 +802,7 @@
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="timeout" time="5.03"/>
-    </proof>
-    <proof
-     prover="alt-ergo-0.93.1"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="5.04"/>
-    </proof>
-    <proof
-     prover="eprover"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="cvc3-2.4"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="5.05"/>
-    </proof>
-    <proof
-     prover="vampire"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="spass"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-   </goal>
-   <goal
-    name="G4"
-    sum="4f2913cc344a2c93df948e83ed396194"
-    proved="true"
-    expanded="true"
-    shape="LalambdaalambdaaappavaraZeroavaraSaZeroLalambdaaappavaraZeroaaainfix =aappV0aaV1">
-    <proof
-     prover="z3-3"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="5.14"/>
-    </proof>
-    <proof
-     prover="alt-ergo-0.93.1"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="5.04"/>
+     <result status="timeout" time="5.65"/>
     </proof>
     <proof
      prover="alt-ergo"
@@ -890,7 +823,7 @@
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="timeout" time="5.05"/>
+     <result status="timeout" time="6.55"/>
     </proof>
     <proof
      prover="vampire"
@@ -905,6 +838,55 @@
      edited=""
      obsolete="false">
      <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+   <goal
+    name="G4"
+    sum="4f2913cc344a2c93df948e83ed396194"
+    proved="true"
+    expanded="true"
+    shape="LalambdaalambdaaappavaraZeroavaraSaZeroLalambdaaappavaraZeroaaainfix =aappV0aaV1">
+    <proof
+     prover="z3-3"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="timeout" time="5.14"/>
+    </proof>
+    <proof
+     prover="alt-ergo"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="unknown" time="0.02"/>
+    </proof>
+    <proof
+     prover="eprover"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="cvc3-2.4"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="timeout" time="5.34"/>
+    </proof>
+    <proof
+     prover="vampire"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="spass"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.02"/>
     </proof>
    </goal>
   </theory>
