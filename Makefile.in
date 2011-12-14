@@ -888,7 +888,7 @@ include .depend.coq-libs
 depend: .depend.coq-libs
 
 clean::
-	rm -f $COQVO $(addsuffix .glob, $(COQLIBS_FILES))
+	rm -f $(COQVO) $(addsuffix .glob, $(COQLIBS_FILES))
 	rm -f .depend.coq-libs
 
 else
