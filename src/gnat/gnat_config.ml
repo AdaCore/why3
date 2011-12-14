@@ -7,6 +7,7 @@ let opt_timeout = ref 10
 let opt_steps = ref 0
 let opt_report = ref Fail
 let opt_debug = ref false
+let opt_force = ref false
 let opt_filename : string option ref = ref None
 
 let set_filename s =
@@ -41,6 +42,10 @@ let options = Arg.align [
           "Set the maximal number of proof steps";
    "--steps", Arg.Set_int opt_steps,
           "Set the maximal number of proof steps";
+   "-f", Arg.Set opt_force,
+          "Rerun VC generation and proofs, even when the result is up to date";
+   "--force", Arg.Set opt_force,
+          "Rerun VC generation and proofs, even when the result is up to date";
    "--report", Arg.String set_report,
           "set report mode, one of (fail | all | detailed), default is fail";
    "--debug", Arg.Set opt_debug,
@@ -65,20 +70,23 @@ let result_file =
    base ^ ".proof"
 
 let report_mode =
-   if Sys.file_exists result_file then begin
-      if Gnat_util.cmp_timestamps filename result_file < 0 then begin
-         if !opt_verbose then Format.printf "gnatwhy3: entering report mode@.";
-         true
+   if !opt_force then false
+   else
+      if Sys.file_exists result_file then begin
+         if Gnat_util.cmp_timestamps filename result_file < 0 then begin
+            if !opt_verbose then
+               Format.printf "gnatwhy3: entering report mode@.";
+            true
+         end else begin
+            if !opt_verbose then
+               Format.printf "gnatwhy3: result file older than input file@.";
+            false
+         end
       end else begin
          if !opt_verbose then
-            Format.printf "gnatwhy3: result file older than input file@.";
+            Format.printf "gnatwhy3: result file does not exist@.";
          false
       end
-   end else begin
-      if !opt_verbose then
-         Format.printf "gnatwhy3: result file does not exist@.";
-      false
-   end
 
 let config =
    try Whyconf.read_config (Some "why3.conf")
@@ -122,3 +130,4 @@ let timeout = !opt_timeout
 let verbose = !opt_verbose
 let report  = !opt_report
 let debug = !opt_debug
+let force = !opt_force

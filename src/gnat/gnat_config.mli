@@ -36,4 +36,5 @@ val filename : string
 (* the name of the input file *)
 
 val report_mode : bool
-(* true if the output file exists and is newer than the input file *)
+(* true if the output file exists and is newer than the input file, and we are
+ * not in force mode (--force or -f) *)
