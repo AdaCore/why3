@@ -123,8 +123,21 @@ val create_vtysymbol :
 
 val vty_var : tvsymbol -> vty
 val vty_pur : tysymbol -> vty list -> vty
+
+(* this constructor expands type aliases only in non-model types *)
 val vty_app : vtysymbol -> vty list -> region list -> vty
+
+(* this constructor expands type aliases even in model types *)
 val vty_app_model : vtysymbol -> vty list -> region list -> vty
+
+(* expands all type aliases *)
+val vty_model : vty -> vty
+
+(* all aliases expanded, all regions removed *)
+val ty_of_vty : vty -> ty
+
+(* replaces every [Tyapp] with [Vtypur] *)
+val vty_of_ty : ty -> vty
 
 (* generic traversal functions *)
 

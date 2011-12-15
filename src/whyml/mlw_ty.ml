@@ -260,20 +260,36 @@ let rec vty_of_ty ty = match ty.ty_node with
   | Tyvar v -> vty_var v
   | Tyapp (s,tl) -> vty_pur s (List.map vty_of_ty tl)
 
-let create_vtysymbol name args regs def model =
-  let puredef = option_map ty_of_vty def in
-  let purets = create_tysymbol name args puredef in
-  let add s v = Srv.add_new v (DuplicateRegVar v) s in
-  let s = List.fold_left add Srv.empty regs in
-  let check r = match r.reg_node with
-    | Rvar v -> Srv.mem v s || raise (UnboundRegVar v)
-    | _ -> raise (InvalidRegion r) in
-  ignore (option_map (vty_v_all Util.ttrue check) def);
-  { vts_pure  = purets;
-    vts_args  = args;
-    vts_regs  = regs;
-    vts_def   = def;
-    vts_model = model; }
+let rec vty_app_real s tl rl model =
+  let tll = List.length tl in
+  let rll = List.length rl in
+  let stl = List.length s.vts_args in
+  let srl = List.length s.vts_regs in
+  if tll <> stl then raise (BadVtyArity (s,stl,tll));
+  if rll <> srl then raise (BadRegArity (s,srl,rll));
+  let expand = not s.vts_model || model in
+  let subexp = not s.vts_model && model in
+  match s.vts_def with
+  | Some vty when expand ->
+      let add m v t = Mtv.add v t m in
+      let mv = List.fold_left2 add Mtv.empty s.vts_args tl in
+      let add m v r = Mrv.add v r m in
+      let mr = List.fold_left2 add Mrv.empty s.vts_regs rl in
+      (* if s is a model alias, vty is already expanded *)
+      let vty = if subexp then vty_model vty else vty in
+      vty_full_inst mv mr vty
+  | None when expand && rll = 0 ->
+      (* if a pure non-model vts is an alias, the RHS can contain
+         pure model alias types, so we cannot replace vts with ts *)
+      (* also, model types should never be replaced with pure types *)
+      vty_pur s.vts_pure tl
+  | _ ->
+      vty_app s tl rl
+
+and vty_model vty = match vty.vty_node with
+  | Vtyvar _ -> vty
+  | Vtypur (s,tl) -> vty_pur s (List.map vty_model tl)
+  | Vtyapp (s,tl,rl) -> vty_app_real s (List.map vty_model tl) rl true
 
 let vty_pur s tl = match s.ts_def with
   | Some ty ->
@@ -283,25 +299,25 @@ let vty_pur s tl = match s.ts_def with
   | None ->
       vty_pur s tl
 
-let vty_app s tl rl model =
-  let tll = List.length tl in
-  let rll = List.length rl in
-  let stl = List.length s.vts_args in
-  let srl = List.length s.vts_regs in
-  if tll <> stl then raise (BadVtyArity (s,stl,tll));
-  if rll <> srl then raise (BadRegArity (s,srl,rll));
-  match s.vts_def with
-  | Some vty when (not s.vts_model || model) ->
-      let add m v t = Mtv.add v t m in
-      let mv = List.fold_left2 add Mtv.empty s.vts_args tl in
-      let add m v r = Mrv.add v r m in
-      let mr = List.fold_left2 add Mrv.empty s.vts_regs rl in
-      vty_full_inst mv mr vty
-  | _ ->
-      vty_app s tl rl
+let vty_app s tl rl = vty_app_real s tl rl false
+let vty_app_model s tl rl = vty_app_real s tl rl true
 
-let vty_app_model s tl rl = vty_app s tl rl true
-let vty_app s tl rl = vty_app s tl rl false
+let create_vtysymbol name args regs def model =
+  let puredef = option_map ty_of_vty def in
+  let purets = create_tysymbol name args puredef in
+  let add s v = Srv.add_new v (DuplicateRegVar v) s in
+  let s = List.fold_left add Srv.empty regs in
+  let check r = match r.reg_node with
+    | Rvar v -> Srv.mem v s || raise (UnboundRegVar v)
+    | _ -> raise (InvalidRegion r) in
+  ignore (option_map (vty_v_all Util.ttrue check) def);
+  (* if a type is a model alias, expand everything on the RHS *)
+  let def = if model then option_map vty_model def else def in
+  { vts_pure  = purets;
+    vts_args  = args;
+    vts_regs  = regs;
+    vts_def   = def;
+    vts_model = model; }
 
 (*
 (* symbol-wise map/fold *)
