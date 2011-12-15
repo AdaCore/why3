@@ -422,6 +422,41 @@ install_no_local::
 
 install_local: bin/why3ml
 
+########
+# Whyml (new API)
+########
+
+MLW_FILES = mlw_ty
+
+MLWMODULES = $(addprefix src/whyml/, $(MLW_FILES))
+
+MLWML  = $(addsuffix .ml,  $(MLWMODULES))
+MLWMLI = $(addsuffix .mli, $(MLWMODULES))
+MLWCMO = $(addsuffix .cmo, $(MLWMODULES))
+MLWCMX = $(addsuffix .cmx, $(MLWMODULES))
+
+$(MLWCMO) $(MLWCMX): INCLUDES += -I src/whyml
+
+# build targets
+
+byte: $(MLWCMX)
+opt:  $(MLWCMO)
+
+# depend and clean targets
+
+include .depend.whyml
+
+.depend.whyml:
+	$(OCAMLDEP) -slash -I src -I src/whyml $(MLWML) $(MLWMLI) > $@
+
+depend: .depend.whyml
+
+clean::
+	rm -f src/whyml/*.cm[iox] src/whyml/*.o
+	rm -f src/whyml/*.annot src/whyml/*~
+#	rm -f bin/why3ml.byte bin/why3ml.opt bin/why3ml
+	rm -f .depend.whyml
+
 ##########
 # gallery
 ##########
