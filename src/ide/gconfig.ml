@@ -164,6 +164,7 @@ let load_config config =
   }
 
 let save_config t =
+  (*
   let _save_prover _ pr acc =
     Mstr.add pr.Session.prover_id
       {
@@ -174,6 +175,7 @@ let save_config t =
         editor  = pr.Session.editor;
         interactive = pr.Session.interactive;
       } acc in
+  *)
   let config = t.config in
   let config = set_main config
     (set_limits (get_main config)
@@ -201,9 +203,10 @@ let save_config t =
 *)
   save_config config
 
-let read_config conf_file =
+let read_config conf_file extra_files =
   try
     let config = Whyconf.read_config conf_file in
+    let config = List.fold_left Whyconf.merge_config config extra_files in
     load_config config
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "@.%a@." Exn_printer.exn_printer e;
@@ -215,9 +218,9 @@ let config,read_config =
     match !config with
       | None -> invalid_arg "configuration not yet loaded"
       | Some conf -> conf),
-  (fun conf_file ->
+  (fun conf_file extra_files ->
     eprintf "[Info] reading IDE config file...@?";
-    let c = read_config conf_file in
+    let c = read_config conf_file extra_files in
     eprintf " done.@.";
     config := Some c)
 
@@ -597,7 +600,7 @@ let run_auto_detection gconfig =
 
 (* let () = eprintf "[Info] end of configuration initialization@." *)
 
-let read_config conf_file = read_config conf_file; init ()
+let read_config conf_file extra_files = read_config conf_file extra_files; init ()
 
 (*
 Local Variables:

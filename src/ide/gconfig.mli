@@ -41,7 +41,7 @@ type t =
       mutable config : Whyconf.config;
     }
 
-val read_config : string option -> unit
+val read_config : string option -> string list -> unit
 (** None use the default config *)
 
 val save_config : unit -> unit
