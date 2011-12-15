@@ -23,10 +23,11 @@
 
 type driver
 
-val load_driver : Env.env -> string -> driver
+val load_driver : Env.env -> string -> string list -> driver
 (** loads a driver from a file
     @param env TODO
     @param string driver file name
+    @param string list additional driver files containing only theories
 *)
 
 (** {2 use a driver} *)

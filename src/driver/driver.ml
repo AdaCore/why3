@@ -80,7 +80,7 @@ exception UnknownProp  of (string list * string list)
 exception FSymExpected of lsymbol
 exception PSymExpected of lsymbol
 
-let load_driver = let driver_tag = ref (-1) in fun env file ->
+let load_driver = let driver_tag = ref (-1) in fun env file extra_files ->
   let prelude   = ref [] in
   let regexps   = ref [] in
   let exitcodes = ref [] in
@@ -180,6 +180,7 @@ let load_driver = let driver_tag = ref (-1) in fun env file ->
     List.iter (add_local th) trl
   in
   List.iter add_theory f.f_rules;
+  List.iter (fun f -> List.iter add_theory (load_file f).f_rules) extra_files;
   incr driver_tag;
   {
     drv_env         = env;

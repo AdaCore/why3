@@ -38,7 +38,7 @@ type prover_data =
 
 let get_prover_data env id pr acc =
   try
-    let dr = Driver.load_driver env pr.Whyconf.driver in
+    let dr = Driver.load_driver env pr.Whyconf.driver pr.Whyconf.extra_drivers in
     Util.Mstr.add id
       { prover_id = id ;
         prover_name = pr.Whyconf.name;

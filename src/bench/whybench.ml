@@ -358,7 +358,7 @@ let () =
     in
     { B.tval   = {B.tool_name = "cmdline"; prover_name = s; tool_db = None};
       ttrans   = [Trans.identity,None];
-      tdriver  = load_driver env prover.driver;
+      tdriver  = load_driver env prover.driver prover.extra_drivers;
       tcommand = prover.command;
       tenv     = env;
       tuse     = [opt_theo,None];
