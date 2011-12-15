@@ -56,7 +56,8 @@ let rec goal whyconf env path dbgoal wgoal =
       let driver, extra, command =
         try
           let p = Mstr.find prover_name (Whyconf.get_provers whyconf) in
-          p.Whyconf.driver, p.Whyconf.extra_drivers, p.Whyconf.command
+          p.Whyconf.driver, p.Whyconf.extra_drivers,
+          String.concat " " (p.Whyconf.command :: p.Whyconf.extra_options)
         with
       (* TODO add exceptions pehaps inside rc.ml in fact*)
           | Not_found ->

@@ -76,7 +76,8 @@ let read_tools absf wc map (name,section) =
   let provers = get_stringl ~default:[] section "prover" in
   let find_provers s =
     try let p = Mstr.find s (get_provers wc) in
-        s, p.driver, p.extra_drivers, p.command
+        s, p.driver, p.extra_drivers,
+        String.concat " " (p.command :: p.extra_options)
     with
       (* TODO add exceptions pehaps inside rc.ml in fact*)
       | Not_found -> eprintf "Prover %s not found.@." s; exit 1 in

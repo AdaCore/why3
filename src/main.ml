@@ -351,7 +351,7 @@ let () = try
         | Not_found -> eprintf "Prover '%s' not found in %s@."
             s (Whyconf.get_conf_file config); exit 1
       in
-      opt_command := Some prover.command;
+      opt_command := Some (String.concat " " (prover.command :: prover.extra_options));
       opt_driver := Some (prover.driver, prover.extra_drivers)
   | None ->
       ()
