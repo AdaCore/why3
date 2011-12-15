@@ -710,20 +710,26 @@ Definition var(i:Z): bv1 := (concat (from_int 1127219200%Z) (jpxor i)).
 
 Definition var_as_double(x:Z): R := (double_of_bv64 (var x)).
 
-Axiom nth_var1 : forall (x:bv) (j:Z), ((0%Z <= j)%Z /\ (j <  31%Z)%Z) ->
-  ((nth (bw_xor (from_int 2147483648%Z) x) j) = (nth x j)).
+Definition is_int32(x:Z): Prop := ((-(pow2 31%Z))%Z <= x)%Z /\
+  (x <  (pow2 31%Z))%Z.
 
-Axiom nth_var11 : forall (x:Z) (j:Z), ((0%Z <= j)%Z /\ (j <  31%Z)%Z) ->
-  ((nth1 (var x) j) = (nth (from_int2c x) j)).
+Axiom two_compl_pos : forall (x:Z), ((is_int32 x) /\ (0%Z <= x)%Z) ->
+  ((to_nat_sub (from_int2c x) 31%Z 0%Z) = x).
 
-Axiom nth_var2 : forall (x:Z), ((nth1 (var x)
-  31%Z) = (negb (nth (from_int2c x) 31%Z))).
+Axiom two_compl_neg : forall (x:Z), ((is_int32 x) /\ (x <  0%Z)%Z) ->
+  ((to_nat_sub (from_int2c x) 31%Z 0%Z) = ((pow2 32%Z) + x)%Z).
 
-Axiom nth_var30 : forall (x:Z) (k:Z), ((32%Z <= k)%Z /\ (k <= 63%Z)%Z) ->
-  ((nth1 (var x) k) = (nth (from_int 1127219200%Z) (k - 32%Z)%Z)).
+Axiom lemma1_pos : forall (x:Z), ((is_int32 x) /\ (0%Z <= x)%Z) ->
+  ((to_nat_sub (jpxor x) 31%Z 0%Z) = ((pow2 31%Z) + x)%Z).
 
-Axiom nth_var3 : forall (x:Z), forall (i:Z), ((32%Z <= i)%Z /\
-  (i <= 51%Z)%Z) -> ((nth1 (var x) i) = false).
+Axiom lemma1_neg : forall (x:Z), ((is_int32 x) /\ (x <  0%Z)%Z) ->
+  ((to_nat_sub (jpxor x) 31%Z 0%Z) = ((pow2 31%Z) + x)%Z).
+
+Axiom lemma1 : forall (x:Z), (is_int32 x) -> ((to_nat_sub (jpxor x) 31%Z
+  0%Z) = ((pow2 31%Z) + x)%Z).
+
+Axiom lemma2 : forall (x:Z), (is_int32 x) -> ((to_nat_sub1 (var x) 51%Z
+  0%Z) = ((pow2 31%Z) + x)%Z).
 
 Axiom nth_var4 : forall (x:Z), forall (i:Z), ((52%Z <= i)%Z /\
   (i <= 53%Z)%Z) -> ((nth1 (var x) i) = true).
@@ -739,44 +745,43 @@ Axiom nth_var7 : forall (x:Z), forall (i:Z), ((58%Z <= i)%Z /\
 
 Axiom nth_var8 : forall (x:Z), ((nth1 (var x) 62%Z) = true).
 
-Axiom nth_var9 : forall (x:Z), ((nth1 (var x) 63%Z) = false).
-
-Axiom sign_var : forall (x:Z), ((nth1 (var x) 63%Z) = false).
-
-Axiom exp_var : forall (x:Z), ((to_nat_sub1 (var x) 62%Z 52%Z) = 1075%Z).
-
-Axiom to_nat_sub_same : forall (i:bv1), forall (j:bv), forall (m:Z),
-  (forall (k:Z), ((0%Z <= k)%Z /\ (k <= m)%Z) -> ((nth1 i k) = (nth j k))) ->
-  ((to_nat_sub1 i m 0%Z) = (to_nat_sub j m 0%Z)).
-
-Axiom nat_to_sub_x : forall (x:Z), ((to_nat_sub1 (var x) 30%Z
-  0%Z) = (to_nat_sub (from_int2c x) 30%Z 0%Z)).
-
-Axiom to_nat_sub_var : forall (x:Z), ((to_nat_sub1 (var x) 30%Z
-  0%Z) = (to_nat_sub (from_int2c x) 30%Z 0%Z)).
-
-Axiom x_positive : forall (x:Z), ((nth (from_int2c x) 31%Z) = false) ->
-  ((to_nat_sub (from_int2c x) 31%Z 0%Z) = (to_nat_sub (from_int2c x) 30%Z
-  0%Z)).
-
-Axiom sign_of_x : forall (x:Z), ((nth (from_int2c x) 31%Z) = false) ->
-  (0%Z <  x)%Z.
-
-Axiom from_int2c_to_nat_sub : forall (x:Z), (0%Z <  x)%Z ->
-  ((to_nat_sub (from_int2c x) 31%Z 0%Z) = x).
-
 (* YOU MAY EDIT THE CONTEXT BELOW *)
 Open Scope Z_scope.
 (* DO NOT EDIT BELOW *)
 
-Theorem x_positive1 : forall (x:Z), ((nth (from_int2c x) 31%Z) = false) ->
-  ((to_nat_sub (from_int2c x) 30%Z 0%Z) = x).
+Theorem lemma3 : forall (x:Z), ((to_nat_sub1 (var x) 62%Z 52%Z) = 1075%Z).
 (* YOU MAY EDIT THE PROOF BELOW *)
-intros x H.
-rewrite<-x_positive;auto.
-rewrite from_int2c_to_nat_sub;auto.
-apply sign_of_x;exact H.
-
+intro.
+rewrite to_nat_sub_one1; auto with zarith.
+  2: apply nth_var8.
+replace (62 - 52) with 10 by omega.
+ rewrite pow2_10.
+rewrite to_nat_sub_zero1; auto with zarith.
+  2: apply nth_var7; auto with zarith.
+rewrite to_nat_sub_zero1; auto with zarith.
+  2: apply nth_var7; auto with zarith.
+rewrite to_nat_sub_zero1; auto with zarith.
+  2: apply nth_var7; auto with zarith.
+rewrite to_nat_sub_zero1; auto with zarith.
+  2: apply nth_var7; auto with zarith.
+rewrite to_nat_sub_one1; auto with zarith.
+  2: apply nth_var6; auto with zarith.
+replace (62 - 1 - 1 - 1 - 1 - 1 - 52) with 5 by omega.
+ rewrite pow2_5.
+rewrite to_nat_sub_one1; auto with zarith.
+  2: apply nth_var6; auto with zarith.
+replace (62 - 1 - 1 - 1 - 1 - 1 - 1 -  52) with 4 by omega.
+ rewrite pow2_4.
+rewrite to_nat_sub_zero1; auto with zarith.
+  2: apply nth_var5; auto with zarith.
+rewrite to_nat_sub_zero1; auto with zarith.
+  2: apply nth_var5; auto with zarith.
+rewrite to_nat_of_one1; auto with zarith.
+replace (62 - 1 - 1 - 1 - 1 - 1 - 1 - 1 - 1 - 1 - 52) with 1 by omega.
+replace (1+1) with 2 by omega.
+ rewrite pow2_2; auto.
+intros.
+apply nth_var4; auto with zarith.
 
 Qed.
 (* DO NOT EDIT BELOW *)

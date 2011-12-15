@@ -759,24 +759,38 @@ Axiom x_positive : forall (x:Z), ((nth (from_int2c x) 31%Z) = false) ->
   ((to_nat_sub (from_int2c x) 31%Z 0%Z) = (to_nat_sub (from_int2c x) 30%Z
   0%Z)).
 
+Axiom x_negative : forall (x:Z), ((nth (from_int2c x) 31%Z) = true) ->
+  ((to_nat_sub (from_int2c x) 31%Z
+  0%Z) = ((pow2 31%Z) + (to_nat_sub (from_int2c x) 30%Z 0%Z))%Z).
+
 Axiom sign_of_x : forall (x:Z), ((nth (from_int2c x) 31%Z) = false) ->
   (0%Z <  x)%Z.
 
 Axiom from_int2c_to_nat_sub : forall (x:Z), (0%Z <  x)%Z ->
   ((to_nat_sub (from_int2c x) 31%Z 0%Z) = x).
 
+Axiom x_positive1 : forall (x:Z), ((nth (from_int2c x) 31%Z) = false) ->
+  ((to_nat_sub (from_int2c x) 30%Z 0%Z) = x).
+
+Axiom x_positive2 : forall (x:Z), ((nth1 (var x) 31%Z) = true) ->
+  ((to_nat_sub1 (var x) 30%Z 0%Z) = x).
+
+Axiom mantissa_var_x_positive : forall (x:Z), ((nth1 (var x) 31%Z) = true) ->
+  ((to_nat_sub1 (var x) 51%Z 0%Z) = ((pow2 31%Z) + x)%Z).
+
 (* YOU MAY EDIT THE CONTEXT BELOW *)
 Open Scope Z_scope.
 (* DO NOT EDIT BELOW *)
 
-Theorem x_positive1 : forall (x:Z), ((nth (from_int2c x) 31%Z) = false) ->
-  ((to_nat_sub (from_int2c x) 30%Z 0%Z) = x).
+Theorem x_negative1 : forall (x:Z), ((nth (from_int2c x) 31%Z) = true) ->
+  ((to_nat_sub (from_int2c x) 30%Z 0%Z) = ((pow2 31%Z) + x)%Z).
 (* YOU MAY EDIT THE PROOF BELOW *)
 intros x H.
-rewrite<-x_positive;auto.
+SearchAbout Zplus.
+apply Zplus_reg_l with (n:=pow2 31).
+rewrite <- x_negative; auto.
 rewrite from_int2c_to_nat_sub;auto.
 apply sign_of_x;exact H.
-
 
 Qed.
 (* DO NOT EDIT BELOW *)

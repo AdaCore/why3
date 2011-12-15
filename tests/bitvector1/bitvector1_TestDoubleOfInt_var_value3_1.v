@@ -765,19 +765,42 @@ Axiom sign_of_x : forall (x:Z), ((nth (from_int2c x) 31%Z) = false) ->
 Axiom from_int2c_to_nat_sub : forall (x:Z), (0%Z <  x)%Z ->
   ((to_nat_sub (from_int2c x) 31%Z 0%Z) = x).
 
+Axiom x_positive1 : forall (x:Z), ((nth (from_int2c x) 31%Z) = false) ->
+  ((to_nat_sub (from_int2c x) 30%Z 0%Z) = x).
+
+Axiom x_positive2 : forall (x:Z), ((nth1 (var x) 31%Z) = true) ->
+  ((to_nat_sub1 (var x) 30%Z 0%Z) = x).
+
+Axiom mantissa_var_x_positive : forall (x:Z), ((nth1 (var x) 31%Z) = true) ->
+  ((to_nat_sub1 (var x) 51%Z 0%Z) = ((pow2 31%Z) + x)%Z).
+
+Axiom x_negative : forall (x:Z), ((nth1 (var x) 31%Z) = false) ->
+  ((to_nat_sub1 (var x) 30%Z 0%Z) = (-x)%Z).
+
+Axiom mantissa_var_x_negative : forall (x:Z), ((nth1 (var x)
+  31%Z) = false) -> ((to_nat_sub1 (var x) 51%Z 0%Z) = ((pow2 31%Z) + x)%Z).
+
+Axiom mantissa_var : forall (x:Z), ((to_nat_sub1 (var x) 51%Z
+  0%Z) = ((pow2 31%Z) + x)%Z).
+
+Axiom var_value0 : forall (x:Z),
+  ((var_as_double x) = ((pow21 (1075%Z - 1023%Z)%Z) * (1%R + ((IZR ((pow2 31%Z) + x)%Z) * (pow21 (-52%Z)%Z))%R)%R)%R).
+
+Axiom from_int_sum : forall (x:Z),
+  ((IZR ((pow2 31%Z) + x)%Z) = ((IZR (pow2 31%Z)) + (IZR x))%R).
+
 (* YOU MAY EDIT THE CONTEXT BELOW *)
 Open Scope Z_scope.
 (* DO NOT EDIT BELOW *)
 
-Theorem x_positive1 : forall (x:Z), ((nth (from_int2c x) 31%Z) = false) ->
-  ((to_nat_sub (from_int2c x) 30%Z 0%Z) = x).
+Theorem var_value3 : forall (x:Z),
+  ((var_as_double x) = ((pow21 52%Z) + (((pow21 52%Z) * ((IZR (pow2 31%Z)) + (IZR x))%R)%R * (pow21 (-52%Z)%Z))%R)%R).
 (* YOU MAY EDIT THE PROOF BELOW *)
-intros x H.
-rewrite<-x_positive;auto.
-rewrite from_int2c_to_nat_sub;auto.
-apply sign_of_x;exact H.
-
-
+intro.
+rewrite var_value0.
+replace (1075 - 1023) with 52 by omega.
+rewrite plus_IZR.
+ring.
 Qed.
 (* DO NOT EDIT BELOW *)
 

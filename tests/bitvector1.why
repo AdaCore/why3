@@ -718,7 +718,24 @@ theory TestDoubleOfInt
   function var_as_double(x:int) : real = double_of_bv64 (var x)
 
   (*********************************************************************)
-  (* next lemma: for all integer x, var_as_double(x) = 2^52 + 2^31 + x *)
+  (*  lemma 1: for all integer x, to_nat(jpxor(x)) = 2^31 + x          *)
+  (*********************************************************************)
+
+  predicate is_int32(x:int) = - Pow2int.pow2 31 <= x < Pow2int.pow2 31
+
+  lemma two_compl_pos: forall x:int. is_int32 x /\ x >= 0 -> BV32.to_nat_sub (BV32.from_int2c x) 31 0 = x
+
+  lemma two_compl_neg: forall x:int. is_int32 x /\ x < 0 -> BV32.to_nat_sub (BV32.from_int2c x) 31 0 = Pow2int.pow2 32 + x
+
+  lemma lemma1_pos : forall x:int. is_int32 x /\ x >= 0 -> BV32.to_nat_sub (jpxor x) 31 0 = Pow2int.pow2 31 + x
+
+  lemma lemma1_neg : forall x:int. is_int32 x /\ x < 0 -> BV32.to_nat_sub (jpxor x) 31 0 = Pow2int.pow2 31 + x
+
+  lemma lemma1 : forall x:int. is_int32 x -> BV32.to_nat_sub (jpxor x) 31 0 = Pow2int.pow2 31 + x
+
+
+  (*********************************************************************)
+  (*  lemma 2: for all integer x, mantissa(var(x)) = 2^31 + x          *)
   (*********************************************************************)
 
   lemma nth_var1: forall x:BV32.bv, j:int. 0 <= j <31 ->
@@ -730,16 +747,60 @@ theory TestDoubleOfInt
   lemma nth_var2:
      forall x:int. (BV64.nth (var x) 31) = notb (BV32.nth (BV32.from_int2c x) 31)
 
-  lemma nth_var30:
+  lemma nth_var32to63:
      forall x k:int. 32 <= k <= 63 -> BV64.nth (var x) k = BV32.nth j (k - 32)
 
   lemma nth_var3: forall x:int. forall i:int. 32 <= i <= 51 -> BV64.nth (var x) i = False
+ 
+  lemma lemma2 : forall x:int. is_int32 x -> mantissa(var(x)) = Pow2int.pow2 31 + x
+
+  (*********************************************************************)
+  (*  lemma 3: for all integer x, exp(var(x)) = 1075                   *)
+  (*********************************************************************)
+
   lemma nth_var4: forall x:int. forall i:int. 52 <= i <= 53 -> BV64.nth (var x) i = True
   lemma nth_var5: forall x:int. forall i:int. 54 <= i <= 55 -> BV64.nth (var x) i = False
   lemma nth_var6: forall x:int. forall i:int. 56 <= i <= 57 -> BV64.nth (var x) i = True
   lemma nth_var7: forall x:int. forall i:int. 58 <= i <= 61 -> BV64.nth (var x) i = False
   lemma nth_var8: forall x:int. BV64.nth (var x) 62 = True
+
+  lemma lemma3 : forall x:int. exp(var(x)) = 1075
+
+  (*********************************************************************)
+  (*  lemma 4: for all integer x, sign(var(x)) = false                 *)
+  (*********************************************************************)
+
   lemma nth_var9: forall x:int. BV64.nth (var x) 63 = False
+
+ lemma lemma4 : forall x:int. sign(var(x)) = False
+
+  (*********************************************************************)
+  (*  lemma 5: for all integer x, var_as_double(x) = 2^52 + 2^31 + x   *)
+  (*********************************************************************)
+
+  lemma lemma5: forall x:int. is_int32 x -> var_as_double(x) = Pow2real.pow2 52 +. Pow2real.pow2 31 +. (from_int x)
+
+
+
+  (*********************************************************************)
+  (* main result                                                       *)
+  (*********************************************************************)
+
+  function double_of_int32 (x:int) : real = var_as_double(x) -. const_as_double
+
+  lemma MainResult: forall x:int. is_int32 x -> double_of_int32 x = from_int x
+
+
+
+
+  (****************************************************)
+
+
+
+
+  (* dans ce qui suit, reprendre les bouts necessaires et les mettre au-dessus *)
+
+
 
   lemma sign_var: forall x:int. sign(var(x)) = False
 
@@ -751,30 +812,40 @@ theory TestDoubleOfInt
 
   lemma nat_to_sub_x: forall x:int.
        BV64.to_nat_sub (var x) 30 0  = BV32.to_nat_sub (BV32.from_int2c x) 30 0
+
   lemma to_nat_sub_var:
   	forall x:int. BV64.to_nat_sub (var x) 30 0 = BV32.to_nat_sub (BV32.from_int2c x) 30 0
 
   lemma x_positive:forall x:int. (BV32.nth (BV32.from_int2c x) 31) = False ->
   	BV32.to_nat_sub (BV32.from_int2c x) 31 0 = BV32.to_nat_sub (BV32.from_int2c x) 30 0
 
+  lemma x_negative:forall x:int. (BV32.nth (BV32.from_int2c x) 31) = True ->
+  	BV32.to_nat_sub (BV32.from_int2c x) 31 0 = Pow2int.pow2 31 + BV32.to_nat_sub (BV32.from_int2c x) 30 0
+
   lemma sign_of_x:
   	forall x:int. (BV32.nth (BV32.from_int2c x) 31) = False->x>0
 
   lemma from_int2c_to_nat_sub:
-  	forall x:int.x>0 -> BV32.to_nat_sub (BV32.from_int2c x) 31 0 = x
+  	forall x:int. x >= 0 -> BV32.to_nat_sub (BV32.from_int2c x) 31 0 = x
+
+  lemma from_int2c_to_nat_sub_neg:
+  	forall x:int. x < 0 -> BV32.to_nat_sub (BV32.from_int2c x) 31 0 = Pow2int.pow2 31 + x
 
   lemma x_positive1: forall x:int. (BV32.nth (BV32.from_int2c x) 31) = False ->
   	BV32.to_nat_sub (BV32.from_int2c x) 30 0 = x
+
   lemma x_positive2: forall x:int. (BV64.nth (var x) 31) = True ->
   	BV64.to_nat_sub (var x) 30 0 = x
 
   lemma mantissa_var_x_positive:
   	forall x:int. (BV64.nth (var x) 31) = True ->
 	       mantissa(var(x)) = Pow2int.pow2 31 + x
-  (*a verifier*)
-  lemma x_negative: forall x:int. (BV64.nth (var x) 31) = False ->
-  	BV64.to_nat_sub (var x) 30 0 = -x
-  (*a verifier*)
+
+  lemma x_negative1: forall x:int. (BV32.nth (BV32.from_int2c x) 31) = True ->
+  	BV32.to_nat_sub (BV32.from_int2c x) 30 0 = Pow2int.pow2 31 + x
+  lemma x_negative2: forall x:int. (BV64.nth (var x) 31) = False ->
+  	BV64.to_nat_sub (var x) 30 0 =  Pow2int.pow2 31 + x
+
   lemma mantissa_var_x_negative:
   	forall x:int. (BV64.nth (var x) 31) = False ->
 	       mantissa(var(x)) = Pow2int.pow2 31 + x
@@ -802,14 +873,6 @@ theory TestDoubleOfInt
   lemma pow31 : from_int (Pow2int.pow2 31) = Pow2real.pow2 31
 
   lemma var_value: forall x:int. var_as_double(x) = Pow2real.pow2 52 +. Pow2real.pow2 31 +. (from_int x)
-
-  (*********************************************************************)
-  (* main result                                                       *)
-  (*********************************************************************)
-
-  function double_of_int32 (i:int) : real = var_as_double(i) -. const_as_double
-
-  lemma MainResult: forall i:int. double_of_int32 i = from_int i
 
 end
 
