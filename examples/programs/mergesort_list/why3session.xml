@@ -7,10 +7,6 @@
   name="Alt-Ergo"
   version="0.94"/>
  <prover
-  id="alt-ergo-0.93.1"
-  name="Alt-Ergo"
-  version="0.93.1"/>
- <prover
   id="coq"
   name="Coq"
   version="8.3pl2"/>
@@ -18,6 +14,10 @@
   id="cvc3-2.2"
   name="CVC3"
   version="2.2"/>
+ <prover
+  id="cvc3-2.4"
+  name="CVC3"
+  version="2.4.1"/>
  <prover
   id="eprover"
   name="Eprover"
@@ -50,104 +50,244 @@
   id="z3-2"
   name="Z3"
   version="2.19"/>
+ <prover
+  id="z3-3"
+  name="Z3"
+  version="3.2"/>
  <file
   name="../mergesort_list.mlw"
-  verified="true"
+  verified="false"
   expanded="true">
   <theory
    name="WP M"
-   verified="true"
+   verified="false"
    expanded="true">
    <goal
     name="Permut_cons_append"
-    sum="a999e4d9f5eeadb94546038c9a94e370"
+    sum="f3741e03bfb2c80e96797b76e73eb2f7"
     proved="true"
-    expanded="true"
+    expanded="false"
     shape="apermutainfix ++aConsV0V1V2ainfix ++V1aConsV0V2F">
     <proof
      prover="coq"
      timelimit="10"
      edited="mergesort_list_WP_M_Permut_cons_append_1.v"
      obsolete="false">
-     <result status="valid" time="0.50"/>
+     <result status="valid" time="0.51"/>
     </proof>
    </goal>
    <goal
     name="Permut_append"
-    sum="31dab1bbed55f2d556634bbfa1a2d743"
+    sum="739152915900b491892f91685e096a55"
     proved="true"
-    expanded="true"
+    expanded="false"
     shape="apermutainfix ++V0V1ainfix ++V2V3IapermutV1V3IapermutV0V2F">
     <proof
      prover="coq"
      timelimit="10"
      edited="mergesort_list_WP_M_Permut_append_1.v"
      obsolete="false">
-     <result status="valid" time="0.93"/>
+     <result status="valid" time="0.91"/>
     </proof>
    </goal>
    <goal
     name="WP_parameter split"
     expl="parameter split"
-    sum="23d543578112a107fb4f2cea2da7efe2"
+    sum="ee9ad2fff7382db9becd62a1d27be9d0"
     proved="false"
     expanded="true"
     shape="CV3aNilapermutainfix ++V1V2ainfix ++V1ainfix ++V2V3Aainfix =alengthV2ainfix +alengthV1c1Oainfix =alengthV2alengthV1aConsVVapermutainfix ++V6V7ainfix ++V1ainfix ++V2V3Aainfix =alengthV7ainfix +alengthV6c1Oainfix =alengthV7alengthV6Iapermutainfix ++V6V7ainfix ++V2ainfix ++aConsV4V1V5Aainfix =alengthV7ainfix +alengthV6c1Oainfix =alengthV7alengthV6FAainfix =alengthaConsV4V1ainfix +alengthV2c1Oainfix =alengthaConsV4V1alengthV2Aainfix <alengthV5alengthV3Aainfix <=c0alengthV3Iainfix =alengthV2ainfix +alengthV1c1Oainfix =alengthV2alengthV1FFFAapermutV0ainfix ++V8V9Aainfix <=c1alengthV9Aainfix <=c1alengthV8Iapermutainfix ++V8V9ainfix ++aNilainfix ++aNilV0Aainfix =alengthV9ainfix +alengthV8c1Oainfix =alengthV9alengthV8FAainfix =alengthaNilainfix +alengthaNilc1Oainfix =alengthaNilalengthaNilIainfix >=alengthV0c2F">
-    <proof
-     prover="alt-ergo"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="10.03"/>
-    </proof>
+    <transf
+     name="split_goal"
+     proved="false"
+     expanded="true">
+     <goal
+      name="WP_parameter split.1"
+      expl="precondition"
+      sum="6e6dae2701cc62614612fd7de89bf034"
+      proved="true"
+      expanded="false"
+      shape="ainfix =alengthaNilainfix +alengthaNilc1Oainfix =alengthaNilalengthaNilIainfix >=alengthV0c2F">
+      <proof
+       prover="z3-3"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="alt-ergo"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="cvc3-2.4"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter split.2"
+      expl="normal postcondition"
+      sum="bdfdc3e131d531cc572c8e3727b1ee90"
+      proved="true"
+      expanded="false"
+      shape="apermutV0ainfix ++V1V2Aainfix <=c1alengthV2Aainfix <=c1alengthV1Iapermutainfix ++V1V2ainfix ++aNilainfix ++aNilV0Aainfix =alengthV2ainfix +alengthV1c1Oainfix =alengthV2alengthV1FIainfix =alengthaNilainfix +alengthaNilc1Oainfix =alengthaNilalengthaNilIainfix >=alengthV0c2F">
+      <proof
+       prover="z3-3"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="1.75"/>
+      </proof>
+      <proof
+       prover="alt-ergo"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.09"/>
+      </proof>
+      <proof
+       prover="cvc3-2.4"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter split.3"
+      expl="parameter split"
+      sum="29861374d9c071174bee23c003f1d752"
+      proved="true"
+      expanded="false"
+      shape="CV3aNilapermutainfix ++V1V2ainfix ++V1ainfix ++V2V3Aainfix =alengthV2ainfix +alengthV1c1Oainfix =alengthV2alengthV1aConsVVtIainfix =alengthV2ainfix +alengthV1c1Oainfix =alengthV2alengthV1FFFIainfix >=alengthV0c2F">
+      <proof
+       prover="z3-3"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="alt-ergo"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="cvc3-2.4"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter split.4"
+      expl="parameter split"
+      sum="ff8db86778c8bbf0aa75e3016b6c1262"
+      proved="true"
+      expanded="false"
+      shape="CV3aNiltaConsVVainfix =alengthaConsV4V1ainfix +alengthV2c1Oainfix =alengthaConsV4V1alengthV2Aainfix <alengthV5alengthV3Aainfix <=c0alengthV3Iainfix =alengthV2ainfix +alengthV1c1Oainfix =alengthV2alengthV1FFFIainfix >=alengthV0c2F">
+      <proof
+       prover="alt-ergo"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="cvc3-2.4"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter split.5"
+      expl="parameter split"
+      sum="16ce0b228e7c0a85ac87a923a0df6dd1"
+      proved="false"
+      expanded="true"
+      shape="CV3aNiltaConsVVapermutainfix ++V6V7ainfix ++V1ainfix ++V2V3Aainfix =alengthV7ainfix +alengthV6c1Oainfix =alengthV7alengthV6Iapermutainfix ++V6V7ainfix ++V2ainfix ++aConsV4V1V5Aainfix =alengthV7ainfix +alengthV6c1Oainfix =alengthV7alengthV6FIainfix =alengthaConsV4V1ainfix +alengthV2c1Oainfix =alengthaConsV4V1alengthV2Aainfix <alengthV5alengthV3Aainfix <=c0alengthV3Iainfix =alengthV2ainfix +alengthV1c1Oainfix =alengthV2alengthV1FFFIainfix >=alengthV0c2F">
+      <proof
+       prover="z3-3"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="timeout" time="10.08"/>
+      </proof>
+      <proof
+       prover="alt-ergo"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="timeout" time="10.09"/>
+      </proof>
+      <proof
+       prover="cvc3-2.4"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="timeout" time="10.08"/>
+      </proof>
+     </goal>
+    </transf>
    </goal>
    <goal
     name="WP_parameter merge"
     expl="parameter merge"
-    sum="f05155700c82e3cad1ea317bd746433b"
+    sum="868b17b9076c2783afe37d36ca44c963"
     proved="true"
-    expanded="true"
+    expanded="false"
     shape="CV1aConsVVCV0aConsVViainfix <=V4V2apermutaConsV4V6ainfix ++V0V1AasortedaConsV4V6IapermutV6ainfix ++V5V1AasortedV6FAasortedV1AasortedV5Aainfix <ainfix +alengthV5alengthV1ainfix +alengthV0alengthV1Aainfix <=c0ainfix +alengthV0alengthV1apermutaConsV2V7ainfix ++V0V1AasortedaConsV2V7IapermutV7ainfix ++V0V3AasortedV7FAasortedV3AasortedV0Aainfix <ainfix +alengthV0alengthV3ainfix +alengthV0alengthV1Aainfix <=c0ainfix +alengthV0alengthV1aNilapermutV1ainfix ++V0V1AasortedV1aNilCV0aNilapermutV1ainfix ++V0V1AasortedV1wapermutV0ainfix ++V0V1AasortedV0IasortedV1AasortedV0FF">
     <transf
      name="split_goal"
      proved="true"
-     expanded="true">
+     expanded="false">
      <goal
       name="WP_parameter merge.1"
       expl="parameter merge"
-      sum="34aff60824e3588bf4089484530e615e"
+      sum="17e01d294259fd571ad16df1f2f56c29"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="CV1aConsVVCV0aConsVVasortedV1AasortedV5Aainfix <ainfix +alengthV5alengthV1ainfix +alengthV0alengthV1Aainfix <=c0ainfix +alengthV0alengthV1Iainfix <=V4V2aNiltaNiltIasortedV1AasortedV0FF">
       <proof
        prover="alt-ergo"
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.03"/>
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter merge.2"
       expl="parameter merge"
-      sum="f7b486cb929ce2086bc3383b7ee71fb1"
+      sum="96cfb68c283f3c125ea78ad198c3bd59"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="CV1aConsVVCV0aConsVVapermutaConsV4V6ainfix ++V0V1AasortedaConsV4V6IapermutV6ainfix ++V5V1AasortedV6FIasortedV1AasortedV5Aainfix <ainfix +alengthV5alengthV1ainfix +alengthV0alengthV1Aainfix <=c0ainfix +alengthV0alengthV1Iainfix <=V4V2aNiltaNiltIasortedV1AasortedV0FF">
       <proof
        prover="cvc3-2.2"
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.67"/>
+       <result status="valid" time="0.68"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter merge.3"
       expl="parameter merge"
-      sum="a86173f0abb7b2ec4bc6133aa5604279"
+      sum="122c08537c65574121087560ceb01734"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="CV1aConsVVCV0aConsVVasortedV3AasortedV0Aainfix <ainfix +alengthV0alengthV3ainfix +alengthV0alengthV1Aainfix <=c0ainfix +alengthV0alengthV1Iainfix <=V4V2NaNiltaNiltIasortedV1AasortedV0FF">
       <proof
        prover="cvc3-2.2"
@@ -167,24 +307,24 @@
      <goal
       name="WP_parameter merge.4"
       expl="parameter merge"
-      sum="7f60f24345cd0d23c37d981de91a71d5"
+      sum="a48ef996f7e65ba895f92782d0492399"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="CV1aConsVVCV0aConsVVapermutaConsV2V6ainfix ++V0V1AasortedaConsV2V6IapermutV6ainfix ++V0V3AasortedV6FIasortedV3AasortedV0Aainfix <ainfix +alengthV0alengthV3ainfix +alengthV0alengthV1Aainfix <=c0ainfix +alengthV0alengthV1Iainfix <=V4V2NaNiltaNiltIasortedV1AasortedV0FF">
       <proof
        prover="cvc3-2.2"
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="3.61"/>
+       <result status="valid" time="4.23"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter merge.5"
       expl="parameter merge"
-      sum="d1e143da8e02cc44145b8bb56726e309"
+      sum="3489a9c6a36ce17496a13fa28e4fcf2b"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="CV1aConsVVCV0aConsVVtaNilapermutV1ainfix ++V0V1AasortedV1aNiltIasortedV1AasortedV0FF">
       <proof
        prover="cvc3-2.2"
@@ -198,37 +338,37 @@
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter merge.6"
       expl="parameter merge"
-      sum="b904db73ab5829ebdd639df1b6e12bbb"
+      sum="f4b420f7c1d9a57f78652843134c5490"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="CV1aConsVVtaNilCV0aNilapermutV1ainfix ++V0V1AasortedV1wtIasortedV1AasortedV0FF">
       <proof
        prover="cvc3-2.2"
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.00"/>
       </proof>
       <proof
        prover="alt-ergo"
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter merge.7"
       expl="parameter merge"
-      sum="6a145fea8d77f1865992c114fc5e94c8"
+      sum="bdfc83574124f592dfa6e93ce6e97ee6"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="CV1aConsVVtaNilCV0aNiltwapermutV0ainfix ++V0V1AasortedV0IasortedV1AasortedV0FF">
       <proof
        prover="cvc3-2.2"
@@ -242,7 +382,7 @@
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
     </transf>
@@ -250,81 +390,21 @@
    <goal
     name="WP_parameter mergesort"
     expl="parameter mergesort"
-    sum="7e85a2ea7d8d6c6c3ff34879adcee73c"
+    sum="7a50fee679046d260e180503d74cd119"
     proved="true"
-    expanded="true"
+    expanded="false"
     shape="CV0aConswaNilOaNilapermutV0V0AasortedV0wapermutV0V5AasortedV5IapermutV5ainfix ++V3V4AasortedV5FAasortedV4AasortedV3IapermutV2V4AasortedV4FAainfix <alengthV2alengthV0Aainfix <=c0alengthV0IapermutV1V3AasortedV3FAainfix <alengthV1alengthV0Aainfix <=c0alengthV0IapermutV0ainfix ++V1V2Aainfix <=c1alengthV2Aainfix <=c1alengthV1FAainfix >=alengthV0c2F">
     <transf
      name="split_goal"
      proved="true"
-     expanded="true">
+     expanded="false">
      <goal
       name="WP_parameter mergesort.1"
       expl="parameter mergesort"
-      sum="7674d06fa690f366be5d8e32c16f363d"
+      sum="7d43476139b74f459aa1821c197c9d03"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="CV0aConswaNilOaNilapermutV0V0AasortedV0wtF">
-      <proof
-       prover="alt-ergo"
-       timelimit="10"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter mergesort.2"
-      expl="parameter mergesort"
-      sum="d7dad034a82fa61d28b923b8aaf329a1"
-      proved="true"
-      expanded="true"
-      shape="CV0aConswaNilOaNiltwainfix >=alengthV0c2F">
-      <proof
-       prover="alt-ergo"
-       timelimit="10"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.34"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter mergesort.3"
-      expl="parameter mergesort"
-      sum="8db87179a0f2c48aaabf3ee47938dece"
-      proved="true"
-      expanded="true"
-      shape="CV0aConswaNilOaNiltwainfix <alengthV1alengthV0Aainfix <=c0alengthV0IapermutV0ainfix ++V1V2Aainfix <=c1alengthV2Aainfix <=c1alengthV1FIainfix >=alengthV0c2F">
-      <proof
-       prover="alt-ergo"
-       timelimit="10"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter mergesort.4"
-      expl="parameter mergesort"
-      sum="e5817532772df5be5cfc15b81254e352"
-      proved="true"
-      expanded="true"
-      shape="CV0aConswaNilOaNiltwainfix <alengthV2alengthV0Aainfix <=c0alengthV0IapermutV1V3AasortedV3FIainfix <alengthV1alengthV0Aainfix <=c0alengthV0IapermutV0ainfix ++V1V2Aainfix <=c1alengthV2Aainfix <=c1alengthV1FIainfix >=alengthV0c2F">
-      <proof
-       prover="alt-ergo"
-       timelimit="10"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter mergesort.5"
-      expl="parameter mergesort"
-      sum="d11586476b6a835bdcc81287a0e34771"
-      proved="true"
-      expanded="true"
-      shape="CV0aConswaNilOaNiltwasortedV4AasortedV3IapermutV2V4AasortedV4FIainfix <alengthV2alengthV0Aainfix <=c0alengthV0IapermutV1V3AasortedV3FIainfix <alengthV1alengthV0Aainfix <=c0alengthV0IapermutV0ainfix ++V1V2Aainfix <=c1alengthV2Aainfix <=c1alengthV1FIainfix >=alengthV0c2F">
       <proof
        prover="alt-ergo"
        timelimit="10"
@@ -334,37 +414,97 @@
       </proof>
      </goal>
      <goal
+      name="WP_parameter mergesort.2"
+      expl="parameter mergesort"
+      sum="7762e2e9152af29391f5fd134e9c1b3c"
+      proved="true"
+      expanded="false"
+      shape="CV0aConswaNilOaNiltwainfix >=alengthV0c2F">
+      <proof
+       prover="alt-ergo"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.47"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter mergesort.3"
+      expl="parameter mergesort"
+      sum="59ccc8f610f3d3719f338ca4c49dc491"
+      proved="true"
+      expanded="false"
+      shape="CV0aConswaNilOaNiltwainfix <alengthV1alengthV0Aainfix <=c0alengthV0IapermutV0ainfix ++V1V2Aainfix <=c1alengthV2Aainfix <=c1alengthV1FIainfix >=alengthV0c2F">
+      <proof
+       prover="alt-ergo"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter mergesort.4"
+      expl="parameter mergesort"
+      sum="e3d3149dda05cfbda8c0e3b2bb780601"
+      proved="true"
+      expanded="false"
+      shape="CV0aConswaNilOaNiltwainfix <alengthV2alengthV0Aainfix <=c0alengthV0IapermutV1V3AasortedV3FIainfix <alengthV1alengthV0Aainfix <=c0alengthV0IapermutV0ainfix ++V1V2Aainfix <=c1alengthV2Aainfix <=c1alengthV1FIainfix >=alengthV0c2F">
+      <proof
+       prover="alt-ergo"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter mergesort.5"
+      expl="parameter mergesort"
+      sum="044415219d4fec3627064f776c6b7f50"
+      proved="true"
+      expanded="false"
+      shape="CV0aConswaNilOaNiltwasortedV4AasortedV3IapermutV2V4AasortedV4FIainfix <alengthV2alengthV0Aainfix <=c0alengthV0IapermutV1V3AasortedV3FIainfix <alengthV1alengthV0Aainfix <=c0alengthV0IapermutV0ainfix ++V1V2Aainfix <=c1alengthV2Aainfix <=c1alengthV1FIainfix >=alengthV0c2F">
+      <proof
+       prover="alt-ergo"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
       name="WP_parameter mergesort.6"
       expl="parameter mergesort"
-      sum="d35218a76bdc8d9f831b78cf7db62d21"
+      sum="090b8d33fc96c590ca46406d0d1dbd46"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="CV0aConswaNilOaNiltwapermutV0V5AasortedV5IapermutV5ainfix ++V3V4AasortedV5FIasortedV4AasortedV3IapermutV2V4AasortedV4FIainfix <alengthV2alengthV0Aainfix <=c0alengthV0IapermutV1V3AasortedV3FIainfix <alengthV1alengthV0Aainfix <=c0alengthV0IapermutV0ainfix ++V1V2Aainfix <=c1alengthV2Aainfix <=c1alengthV1FIainfix >=alengthV0c2F">
       <transf
        name="split_goal"
        proved="true"
-       expanded="true">
+       expanded="false">
        <goal
         name="WP_parameter mergesort.6.1"
         expl="parameter mergesort"
-        sum="7ac11c3ca7f5454e1207f52066ced2c6"
+        sum="2081f632b8d7d0658a5165c2f9a22742"
         proved="true"
-        expanded="true"
+        expanded="false"
         shape="CV0aConswaNilOaNiltwasortedV5IapermutV5ainfix ++V3V4AasortedV5FIasortedV4AasortedV3IapermutV2V4AasortedV4FIainfix <alengthV2alengthV0Aainfix <=c0alengthV0IapermutV1V3AasortedV3FIainfix <alengthV1alengthV0Aainfix <=c0alengthV0IapermutV0ainfix ++V1V2Aainfix <=c1alengthV2Aainfix <=c1alengthV1FIainfix >=alengthV0c2F">
         <proof
          prover="alt-ergo"
          timelimit="10"
          edited=""
          obsolete="false">
-         <result status="valid" time="0.01"/>
+         <result status="valid" time="0.00"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter mergesort.6.2"
         expl="parameter mergesort"
-        sum="72682d30bfd2166971a342aa83e1c0dd"
+        sum="5d56170f4acbf2588fe05628e189ca9a"
         proved="true"
-        expanded="true"
+        expanded="false"
         shape="CV0aConswaNilOaNiltwapermutV0V5IapermutV5ainfix ++V3V4AasortedV5FIasortedV4AasortedV3IapermutV2V4AasortedV4FIainfix <alengthV2alengthV0Aainfix <=c0alengthV0IapermutV1V3AasortedV3FIainfix <alengthV1alengthV0Aainfix <=c0alengthV0IapermutV0ainfix ++V1V2Aainfix <=c1alengthV2Aainfix <=c1alengthV1FIainfix >=alengthV0c2F">
         <proof
          prover="coq"
