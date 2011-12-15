@@ -7,10 +7,6 @@
   name="Alt-Ergo"
   version="0.94"/>
  <prover
-  id="alt-ergo-0.93.1"
-  name="Alt-Ergo"
-  version="0.93.1"/>
- <prover
   id="coq"
   name="Coq"
   version="8.3pl2"/>
@@ -25,7 +21,7 @@
  <prover
   id="eprover"
   name="Eprover"
-  version="1.4 Namring"/>
+  version="1.4"/>
  <prover
   id="gappa"
   name="Gappa"
@@ -69,7 +65,7 @@
    <goal
     name="WP_parameter f91"
     expl="parameter f91"
-    sum="24e50a800c338b3a8b0dc293fa75dc5a"
+    sum="d2083d77525b9bb6f170c0e56335aada"
     proved="true"
     expanded="false"
     shape="iainfix <=V0c100ainfix =V2ainfix -V0c10Aainfix >=V0c101Oainfix =V2c91Aainfix <=V0c100Iainfix =V2ainfix -V1c10Aainfix >=V1c101Oainfix =V2c91Aainfix <=V1c100FAainfix <ainfix -c101V1ainfix -c101V0Aainfix <=c0ainfix -c101V0Iainfix =V1ainfix -ainfix +V0c11c10Aainfix >=ainfix +V0c11c101Oainfix =V1c91Aainfix <=ainfix +V0c11c100FAainfix <ainfix -c101ainfix +V0c11ainfix -c101V0Aainfix <=c0ainfix -c101V0ainfix =ainfix -V0c10ainfix -V0c10Aainfix >=V0c101Oainfix =ainfix -V0c10c91Aainfix <=V0c100F">
@@ -78,7 +74,7 @@
      timelimit="2"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.00"/>
+     <result status="valid" time="0.01"/>
     </proof>
     <proof
      prover="cvc3-2.2"
@@ -105,7 +101,7 @@
    <goal
     name="WP_parameter f91_nonrec"
     expl="parameter f91_nonrec"
-    sum="eee892dd94622d0bb58fbd37f2862400"
+    sum="d63ac79f229fb22fb16fecce5521625d"
     proved="true"
     expanded="true"
     shape="iainfix >V2c0iainfix >V1c100alexaTuple2ainfix +ainfix -c101V3ainfix *c10V4V4aTuple2ainfix +ainfix -c101V1ainfix *c10V2V2Aainfix =aiterV4V3afV0Aainfix >=V4c0Iainfix =V4ainfix -V2c1FIainfix =V3ainfix -V1c10FalexaTuple2ainfix +ainfix -c101V5ainfix *c10V6V6aTuple2ainfix +ainfix -c101V1ainfix *c10V2V2Aainfix =aiterV6V5afV0Aainfix >=V6c0Iainfix =V6ainfix +V2c1FIainfix =V5ainfix +V1c11Fainfix =V1afV0Iainfix =aiterV2V1afV0Aainfix >=V2c0FFAainfix =aiterc1V0afV0Aainfix >=c1c0F">
@@ -116,7 +112,7 @@
      <goal
       name="WP_parameter f91_nonrec.1"
       expl="loop invariant init"
-      sum="248f1a172cf956ddae37eb0d8182300c"
+      sum="7549d891ce7fe68249aee62ff1435b62"
       proved="true"
       expanded="false"
       shape="ainfix =aiterc1V0afV0Aainfix >=c1c0F">
@@ -145,7 +141,7 @@
      <goal
       name="WP_parameter f91_nonrec.2"
       expl="loop invariant preservation"
-      sum="112e636c766970971ca9aaa38e51b085"
+      sum="a6926811f3cc84c7480b6b5c2320e35b"
       proved="true"
       expanded="false"
       shape="ainfix =aiterV4V3afV0Aainfix >=V4c0Iainfix =V4ainfix -V2c1FIainfix =V3ainfix -V1c10FIainfix >V1c100Iainfix >V2c0Iainfix =aiterV2V1afV0Aainfix >=V2c0FFF">
@@ -168,16 +164,74 @@
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter f91_nonrec.3"
       expl="loop variant decreases"
-      sum="74e4f406f71cb3748dc95a3e8b3cfc2e"
+      sum="2377b96b87b151bf0ff08639de66f9df"
       proved="true"
       expanded="false"
       shape="alexaTuple2ainfix +ainfix -c101V3ainfix *c10V4V4aTuple2ainfix +ainfix -c101V1ainfix *c10V2V2Iainfix =aiterV4V3afV0Aainfix >=V4c0Iainfix =V4ainfix -V2c1FIainfix =V3ainfix -V1c10FIainfix >V1c100Iainfix >V2c0Iainfix =aiterV2V1afV0Aainfix >=V2c0FFF">
+      <proof
+       prover="z3-2"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="cvc3-2.2"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="alt-ergo"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter f91_nonrec.4"
+      expl="loop invariant preservation"
+      sum="d16fd1bab97cb9d606198ac6d49db33b"
+      proved="true"
+      expanded="false"
+      shape="ainfix =aiterV4V3afV0Aainfix >=V4c0Iainfix =V4ainfix +V2c1FIainfix =V3ainfix +V1c11FIainfix >V1c100NIainfix >V2c0Iainfix =aiterV2V1afV0Aainfix >=V2c0FFF">
+      <proof
+       prover="z3-2"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="cvc3-2.2"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="alt-ergo"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.16"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter f91_nonrec.5"
+      expl="loop variant decreases"
+      sum="359940f497a48984e01e1cae18b88dc0"
+      proved="true"
+      expanded="false"
+      shape="alexaTuple2ainfix +ainfix -c101V3ainfix *c10V4V4aTuple2ainfix +ainfix -c101V1ainfix *c10V2V2Iainfix =aiterV4V3afV0Aainfix >=V4c0Iainfix =V4ainfix +V2c1FIainfix =V3ainfix +V1c11FIainfix >V1c100NIainfix >V2c0Iainfix =aiterV2V1afV0Aainfix >=V2c0FFF">
       <proof
        prover="z3-2"
        timelimit="10"
@@ -201,67 +255,9 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter f91_nonrec.4"
-      expl="loop invariant preservation"
-      sum="0436f7cf886eb867db53eaa9e749b97b"
-      proved="true"
-      expanded="false"
-      shape="ainfix =aiterV4V3afV0Aainfix >=V4c0Iainfix =V4ainfix +V2c1FIainfix =V3ainfix +V1c11FIainfix >V1c100NIainfix >V2c0Iainfix =aiterV2V1afV0Aainfix >=V2c0FFF">
-      <proof
-       prover="z3-2"
-       timelimit="10"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof
-       prover="cvc3-2.2"
-       timelimit="10"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.03"/>
-      </proof>
-      <proof
-       prover="alt-ergo"
-       timelimit="10"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.16"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter f91_nonrec.5"
-      expl="loop variant decreases"
-      sum="2a516039dea540094ef8951b1640f8c0"
-      proved="true"
-      expanded="false"
-      shape="alexaTuple2ainfix +ainfix -c101V3ainfix *c10V4V4aTuple2ainfix +ainfix -c101V1ainfix *c10V2V2Iainfix =aiterV4V3afV0Aainfix >=V4c0Iainfix =V4ainfix +V2c1FIainfix =V3ainfix +V1c11FIainfix >V1c100NIainfix >V2c0Iainfix =aiterV2V1afV0Aainfix >=V2c0FFF">
-      <proof
-       prover="z3-2"
-       timelimit="10"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof
-       prover="cvc3-2.2"
-       timelimit="10"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof
-       prover="alt-ergo"
-       timelimit="10"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal
       name="WP_parameter f91_nonrec.6"
       expl="normal postcondition"
-      sum="03f1dc5b37b3e78f1b4e1c126a0608c0"
+      sum="dfbecf43c71054001704a6a83199312b"
       proved="true"
       expanded="false"
       shape="ainfix =V1afV0Iainfix >V2c0NIainfix =aiterV2V1afV0Aainfix >=V2c0FFF">
