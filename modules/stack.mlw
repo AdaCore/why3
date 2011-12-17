@@ -4,7 +4,7 @@
 module Stack
 
   use import list.List
-  use import list.Length
+  use import list.Length as L
 
   type t 'a model {| mutable elts: list 'a |}
 
@@ -39,7 +39,10 @@ module Stack
   val is_empty:
     s: t 'a -> {} bool reads s { result=True <-> s.elts = Nil }
 
+  (*
   val length: s: t 'a -> {} int reads s { result = length s.elts }
+  *)
+  function length (s: t 'a) : int = L.length s.elts
 
 end
 

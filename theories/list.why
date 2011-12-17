@@ -119,8 +119,12 @@ theory Reverse
     | Cons x r -> reverse r ++ Cons x Nil
   end
 
-  lemma reverse_append: forall l1 l2: list 'a, x: 'a.
-  (reverse (Cons x l1)) ++ l2 = (reverse l1) ++ (Cons x l2)
+  lemma reverse_append:
+    forall l1 l2: list 'a, x: 'a.
+    (reverse (Cons x l1)) ++ l2 = (reverse l1) ++ (Cons x l2)
+
+  lemma reverse_reverse:
+    forall l: list 'a. reverse (reverse l) = l
 
   use import Length
 

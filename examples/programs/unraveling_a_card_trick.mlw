@@ -1,0 +1,87 @@
+
+(*
+  Unraveling a Card Trick
+  Tony Hoare and Natarajan Shankar
+  Time for Verification
+  Lecture Notes in Computer Science, 2010, Volume 6200/2010, 195-201,
+  DOI: 10.1007/978-3-642-13754-9_10
+  http://www.springerlink.com/content/gn18673357154448/
+*)
+
+module GilbreathCardTrick
+
+  use import int.Int
+  use import list.List
+  use import list.Append
+  use import list.Reverse
+  use import module stack.Stack
+
+  function m: int
+  axiom m_positive: 0 < m
+
+  function n: int
+  axiom n_nonnegative: 0 <= n
+
+  (* c is a riffle shuffle of a and b *)
+  inductive shuffle (a b c: list 'a) =
+  | Shuffle_nil_left:
+      forall l: list 'a. shuffle l Nil l
+  | Shuffle_nil_right:
+      forall l: list 'a. shuffle Nil l l
+  | Shuffle_cons_left:
+      forall x: 'a, a b c: list 'a.
+      shuffle a b c -> shuffle (Cons x a) b (Cons x c)
+  | Shuffle_cons_right:
+      forall x: 'a, a b c: list 'a.
+      shuffle a b c -> shuffle a (Cons x b) (Cons x c)
+
+  lemma shuffle_nil_nil_nil: shuffle Nil Nil (Nil: list 'a)
+
+  lemma shuffle_length:
+    forall a b c: list 'a. shuffle a b c -> L.length a + L.length b = L.length c
+
+  let shuffle (a b: t int) =
+    {}
+    'Init:
+    let c = create () in
+    while not (is_empty a && is_empty b) do
+      invariant {
+        exists a' b': list int.
+          reverse (at a.elts 'Init) = reverse a.elts ++ a' /\
+          reverse (at b.elts 'Init) = reverse b.elts ++ b' /\
+          shuffle a' b' c.elts
+      }
+      variant { length a + length b }
+      if not (is_empty a) && (is_empty b || any bool) then
+        push (pop a) c
+      else
+        push (pop b) c
+    done;
+    c
+    { a.elts = Nil /\ b.elts = Nil /\
+      shuffle (reverse (old a.elts)) (reverse (old b.elts)) result.elts }
+
+  let card_trick (a: t int) =
+    { length a = n*m }
+    'Init:
+    (* cut a into c;d and reverse d in d_ *)
+    let d_ = create () in
+    let cut = any {} int { 0 <= result <= n*m } in
+    for i = 1 to cut do
+      invariant { length a = n*m-i+1 /\ length d_ = i-1 /\
+                  at a.elts 'Init = reverse d_.elts ++ a.elts }
+      push (pop a) d_
+    done;
+    assert { at a.elts 'Init = reverse d_.elts ++ a.elts };
+    (* then suffle c (that is a) and d_ to get b *)
+    'Inter:
+    shuffle a d_
+    { length result = n*m }
+
+end
+
+(*
+Local Variables:
+compile-command: "unset LANG; make -C ../.. examples/programs/unraveling_a_card_trick.gui"
+End:
+*)
