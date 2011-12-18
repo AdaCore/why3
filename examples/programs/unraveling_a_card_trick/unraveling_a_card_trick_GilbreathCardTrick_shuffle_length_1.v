@@ -2,24 +2,6 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import ZArith.
 Require Import Rbase.
-Definition unit  := unit.
-
-Parameter qtmark : Type.
-
-Parameter at1: forall (a:Type), a -> qtmark -> a.
-
-Implicit Arguments at1.
-
-Parameter old: forall (a:Type), a -> a.
-
-Implicit Arguments old.
-
-Definition implb(x:bool) (y:bool): bool := match (x,
-  y) with
-  | (true, false) => false
-  | (_, _) => true
-  end.
-
 Inductive list (a:Type) :=
   | Nil : list a
   | Cons : a -> (list a) -> list a.
@@ -27,6 +9,20 @@ Set Contextual Implicit.
 Implicit Arguments Nil.
 Unset Contextual Implicit.
 Implicit Arguments Cons.
+
+Set Implicit Arguments.
+Fixpoint length (a:Type)(l:(list a)) {struct l}: Z :=
+  match l with
+  | Nil => 0%Z
+  | (Cons _ r) => (1%Z + (length r))%Z
+  end.
+Unset Implicit Arguments.
+
+Axiom Length_nonnegative : forall (a:Type), forall (l:(list a)),
+  (0%Z <= (length l))%Z.
+
+Axiom Length_nil : forall (a:Type), forall (l:(list a)),
+  ((length l) = 0%Z) <-> (l = (Nil:(list a))).
 
 Set Implicit Arguments.
 Fixpoint infix_plpl (a:Type)(l1:(list a)) (l2:(list a)) {struct l1}: (list
@@ -43,20 +39,6 @@ Axiom Append_assoc : forall (a:Type), forall (l1:(list a)) (l2:(list a))
 
 Axiom Append_l_nil : forall (a:Type), forall (l:(list a)), ((infix_plpl l
   (Nil:(list a))) = l).
-
-Set Implicit Arguments.
-Fixpoint length (a:Type)(l:(list a)) {struct l}: Z :=
-  match l with
-  | Nil => 0%Z
-  | (Cons _ r) => (1%Z + (length r))%Z
-  end.
-Unset Implicit Arguments.
-
-Axiom Length_nonnegative : forall (a:Type), forall (l:(list a)),
-  (0%Z <= (length l))%Z.
-
-Axiom Length_nil : forall (a:Type), forall (l:(list a)),
-  ((length l) = 0%Z) <-> (l = (Nil:(list a))).
 
 Axiom Append_length : forall (a:Type), forall (l1:(list a)) (l2:(list a)),
   ((length (infix_plpl l1 l2)) = ((length l1) + (length l2))%Z).
@@ -92,19 +74,6 @@ Axiom reverse_reverse : forall (a:Type), forall (l:(list a)),
 
 Axiom Reverse_length : forall (a:Type), forall (l:(list a)),
   ((length (reverse l)) = (length l)).
-
-Inductive t (a:Type) :=
-  | mk_t : (list a) -> t a.
-Implicit Arguments mk_t.
-
-Definition elts (a:Type)(u:(t a)): (list a) :=
-  match u with
-  | (mk_t elts1) => elts1
-  end.
-Implicit Arguments elts.
-
-Definition length1 (a:Type)(s:(t a)): Z := (length (elts s)).
-Implicit Arguments length1.
 
 Parameter m: Z.
 

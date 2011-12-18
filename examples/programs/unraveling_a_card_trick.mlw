@@ -8,13 +8,13 @@
   http://www.springerlink.com/content/gn18673357154448/
 *)
 
-module GilbreathCardTrick
+theory GilbreathCardTrick
 
-  use import int.Int
-  use import list.List
-  use import list.Append
-  use import list.Reverse
-  use import module stack.Stack
+  use export int.Int
+  use export list.List
+  use export list.Length
+  use export list.Append
+  use export list.Reverse
 
   function m: int
   axiom m_positive: 0 < m
@@ -38,7 +38,15 @@ module GilbreathCardTrick
   lemma shuffle_nil_nil_nil: shuffle Nil Nil (Nil: list 'a)
 
   lemma shuffle_length:
-    forall a b c: list 'a. shuffle a b c -> L.length a + L.length b = L.length c
+    forall a b c: list 'a. shuffle a b c -> length a + length b = length c
+
+end
+
+(* a program implementing the card trick using stacks *)
+module GilbreathCardTrick
+
+  use import GilbreathCardTrick
+  use import module stack.Stack
 
   let shuffle (a b: t int) =
     {}
