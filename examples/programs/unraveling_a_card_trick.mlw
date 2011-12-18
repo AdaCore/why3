@@ -15,6 +15,7 @@ theory GilbreathCardTrick
   use export list.Length
   use export list.Append
   use export list.Reverse
+  use import list.Nth
 
   function m: int
   axiom m_positive: 0 < m
@@ -37,8 +38,28 @@ theory GilbreathCardTrick
 
   lemma shuffle_nil_nil_nil: shuffle Nil Nil (Nil: list 'a)
 
+  lemma shuffle_sym:
+     forall a b c: list 'a. shuffle a b c -> shuffle b a c
+
   lemma shuffle_length:
     forall a b c: list 'a. shuffle a b c -> length a + length b = length c
+
+  (* the list l is composed of n blocks, each being 0,1,...,m-1 *)
+  predicate suit_ordered (l: list int) =
+    forall i j: int. 0 <= i < n -> 0 <= j < m -> nth (i * m + j) l = Some j
+
+  (* the list l is a sequence of n blocks,
+     each being a permutation of 0,1,...,m-1 *)
+  predicate suit_sorted (l: list int) =
+    (forall i v: int. nth i l = Some v -> 0 <= v < m) /\
+    (forall i j1 j2: int. 0 <= i < n -> 0 <= j1 < m -> 0 <= j2 < m ->
+     nth (i * m + j1) l <> nth (i * m + j2) l)
+
+  (* TODO: prove it! *)
+  axiom gilbreath_card_trick:
+    forall a: list int. length a = n * m -> suit_ordered a ->
+    forall c d: list int. a = c ++ d ->
+    forall b: list int. shuffle c (reverse d) b -> suit_sorted b
 
 end
 
@@ -70,7 +91,7 @@ module GilbreathCardTrick
       shuffle (reverse (old a.elts)) (reverse (old b.elts)) result.elts }
 
   let card_trick (a: t int) =
-    { length a = n*m }
+    { length a = n*m /\ suit_ordered a.elts }
     'Init:
     (* cut a into c;d and reverse d in d_ *)
     let d_ = create () in
@@ -82,9 +103,8 @@ module GilbreathCardTrick
     done;
     assert { at a.elts 'Init = reverse d_.elts ++ a.elts };
     (* then suffle c (that is a) and d_ to get b *)
-    'Inter:
     shuffle a d_
-    { length result = n*m }
+    { length result = n*m && suit_sorted result.elts }
 
 end
 

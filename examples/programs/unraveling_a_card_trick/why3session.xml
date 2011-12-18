@@ -48,9 +48,9 @@
    expanded="true">
    <goal
     name="shuffle_nil_nil_nil"
-    sum="0f3a893bbb6db91b9e8425a35a14fe9c"
+    sum="e24f40db314c81b568d6c3f57b411293"
     proved="true"
-    expanded="true"
+    expanded="false"
     shape="ashuffleaNilaNilaNil">
     <proof
      prover="alt-ergo"
@@ -61,17 +61,31 @@
     </proof>
    </goal>
    <goal
-    name="shuffle_length"
-    sum="7e83b1555e35fcabcfa4fdf44e648d95"
+    name="shuffle_sym"
+    sum="4d4874b04d6f53a21c9377ca9b657479"
     proved="true"
     expanded="true"
+    shape="ashuffleV1V0V2IashuffleV0V1V2F">
+    <proof
+     prover="coq"
+     timelimit="10"
+     edited="unraveling_a_card_trick_GilbreathCardTrick_shuffle_sym_1.v"
+     obsolete="false">
+     <result status="valid" time="0.55"/>
+    </proof>
+   </goal>
+   <goal
+    name="shuffle_length"
+    sum="5c2026b7b89d5f40b1c284e4ff391a93"
+    proved="true"
+    expanded="false"
     shape="ainfix =ainfix +alengthV0alengthV1alengthV2IashuffleV0V1V2F">
     <proof
      prover="coq"
      timelimit="10"
      edited="unraveling_a_card_trick_GilbreathCardTrick_shuffle_length_1.v"
      obsolete="false">
-     <result status="valid" time="0.48"/>
+     <result status="valid" time="0.64"/>
     </proof>
    </goal>
   </theory>
@@ -82,7 +96,7 @@
    <goal
     name="WP_parameter shuffle"
     expl="parameter shuffle"
-    sum="86b037d0168c22bdd01d4bb26fb6086b"
+    sum="cf4bf96570af9d9a42d8ecb37b6f1275"
     proved="true"
     expanded="false"
     shape="iainfix =V6aTrueiainfix =V7aTrueNiainfix =V8aTrueNiainfix =V10aTrueOainfix =V9aTrueainfix =V5aNilAainfix =V11V5NFAainfix <ainfix +alengthV12alengthV4ainfix +alengthV5alengthV4Aainfix <=c0ainfix +alengthV5alengthV4AashuffleV15V16V14Aainfix =areverseV0ainfix ++areverseV4V16Aainfix =areverseV1ainfix ++areverseV12V15EIainfix =V14aConsV13V3FICV5aNilfaConsVVainfix =V12V18Aainfix =V13V17FFainfix =V4aNilAainfix =V19V4NFAainfix <ainfix +alengthV5alengthV20ainfix +alengthV5alengthV4Aainfix <=c0ainfix +alengthV5alengthV4AashuffleV23V24V22Aainfix =areverseV0ainfix ++areverseV20V24Aainfix =areverseV1ainfix ++areverseV5V23EIainfix =V22aConsV21V3FICV4aNilfaConsVVainfix =V20V26Aainfix =V21V25FFFIainfix =V4aNilqainfix =V9aTrueFainfix =V4aNilAainfix =V27V4NFAainfix <ainfix +alengthV5alengthV28ainfix +alengthV5alengthV4Aainfix <=c0ainfix +alengthV5alengthV4AashuffleV31V32V30Aainfix =areverseV0ainfix ++areverseV28V32Aainfix =areverseV1ainfix ++areverseV5V31EIainfix =V30aConsV29V3FICV4aNilfaConsVVainfix =V28V34Aainfix =V29V33FFIainfix =V5aNilqainfix =V8aTrueFashuffleareverseV1areverseV0V3Aainfix =V4aNilAainfix =V5aNilIainfix =V4aNilqainfix =V7aTrueFiainfix =V35aTrueNiainfix =V37aTrueOainfix =V36aTrueainfix =V5aNilAainfix =V38V5NFAainfix <ainfix +alengthV39alengthV4ainfix +alengthV5alengthV4Aainfix <=c0ainfix +alengthV5alengthV4AashuffleV42V43V41Aainfix =areverseV0ainfix ++areverseV4V43Aainfix =areverseV1ainfix ++areverseV39V42EIainfix =V41aConsV40V3FICV5aNilfaConsVVainfix =V39V45Aainfix =V40V44FFainfix =V4aNilAainfix =V46V4NFAainfix <ainfix +alengthV5alengthV47ainfix +alengthV5alengthV4Aainfix <=c0ainfix +alengthV5alengthV4AashuffleV50V51V49Aainfix =areverseV0ainfix ++areverseV47V51Aainfix =areverseV1ainfix ++areverseV5V50EIainfix =V49aConsV48V3FICV4aNilfaConsVVainfix =V47V53Aainfix =V48V52FFFIainfix =V4aNilqainfix =V36aTrueFainfix =V4aNilAainfix =V54V4NFAainfix <ainfix +alengthV5alengthV55ainfix +alengthV5alengthV4Aainfix <=c0ainfix +alengthV5alengthV4AashuffleV58V59V57Aainfix =areverseV0ainfix ++areverseV55V59Aainfix =areverseV1ainfix ++areverseV5V58EIainfix =V57aConsV56V3FICV4aNilfaConsVVainfix =V55V61Aainfix =V56V60FFIainfix =V5aNilqainfix =V35aTrueFIainfix =V5aNilqainfix =V6aTrueFIashuffleV62V63V3Aainfix =areverseV0ainfix ++areverseV4V63Aainfix =areverseV1ainfix ++areverseV5V62EFFFAashuffleV64V65V2Aainfix =areverseV0ainfix ++areverseV0V65Aainfix =areverseV1ainfix ++areverseV1V64EIainfix =V2aNilFFF">
@@ -93,7 +107,7 @@
      <goal
       name="WP_parameter shuffle.1"
       expl="loop invariant init"
-      sum="c5d77e573a0388684ab31669f6f16a6b"
+      sum="18bd3a560e10f0e11fd8b92722b56857"
       proved="true"
       expanded="false"
       shape="ashuffleV3V4V2Aainfix =areverseV0ainfix ++areverseV0V4Aainfix =areverseV1ainfix ++areverseV1V3EIainfix =V2aNilFFF">
@@ -102,13 +116,13 @@
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.07"/>
+       <result status="valid" time="0.12"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter shuffle.2"
       expl="loop invariant preservation"
-      sum="4b0c3215cd73778d65f66afb75c0a5b8"
+      sum="aacaaf6d7b81046d99c6850438ff876b"
       proved="true"
       expanded="false"
       shape="ashuffleV14V15V13Aainfix =areverseV0ainfix ++areverseV4V15Aainfix =areverseV1ainfix ++areverseV11V14EIainfix =V13aConsV12V3FICV5aNilfaConsVVainfix =V11V17Aainfix =V12V16FFIainfix =V10aTrueOainfix =V9aTrueFIainfix =V4aNilqainfix =V9aTrueFIainfix =V8aTrueNIainfix =V5aNilqainfix =V8aTrueFIainfix =V7aTrueNIainfix =V4aNilqainfix =V7aTrueFIainfix =V6aTrueIainfix =V5aNilqainfix =V6aTrueFIashuffleV18V19V3Aainfix =areverseV0ainfix ++areverseV4V19Aainfix =areverseV1ainfix ++areverseV5V18EFFFIainfix =V2aNilFFF">
@@ -117,16 +131,31 @@
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.03"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter shuffle.3"
       expl="loop variant decreases"
-      sum="977ab7ffb22752e37e68a3756cc1c70e"
+      sum="0049657d176fce7482b3e26d750193b7"
       proved="true"
       expanded="false"
       shape="ainfix <ainfix +alengthV11alengthV4ainfix +alengthV5alengthV4Aainfix <=c0ainfix +alengthV5alengthV4IashuffleV14V15V13Aainfix =areverseV0ainfix ++areverseV4V15Aainfix =areverseV1ainfix ++areverseV11V14EIainfix =V13aConsV12V3FICV5aNilfaConsVVainfix =V11V17Aainfix =V12V16FFIainfix =V10aTrueOainfix =V9aTrueFIainfix =V4aNilqainfix =V9aTrueFIainfix =V8aTrueNIainfix =V5aNilqainfix =V8aTrueFIainfix =V7aTrueNIainfix =V4aNilqainfix =V7aTrueFIainfix =V6aTrueIainfix =V5aNilqainfix =V6aTrueFIashuffleV18V19V3Aainfix =areverseV0ainfix ++areverseV4V19Aainfix =areverseV1ainfix ++areverseV5V18EFFFIainfix =V2aNilFFF">
+      <proof
+       prover="alt-ergo"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter shuffle.4"
+      expl="parameter shuffle"
+      sum="da92cc8f6dd38176f9f2a39e9ba132d3"
+      proved="true"
+      expanded="false"
+      shape="ainfix =V5aNilAainfix =V11V5NFIainfix <ainfix +alengthV12alengthV4ainfix +alengthV5alengthV4Aainfix <=c0ainfix +alengthV5alengthV4AashuffleV15V16V14Aainfix =areverseV0ainfix ++areverseV4V16Aainfix =areverseV1ainfix ++areverseV12V15EIainfix =V14aConsV13V3FICV5aNilfaConsVVainfix =V12V18Aainfix =V13V17FFIainfix =V10aTrueOainfix =V9aTrueFIainfix =V4aNilqainfix =V9aTrueFIainfix =V8aTrueNIainfix =V5aNilqainfix =V8aTrueFIainfix =V7aTrueNIainfix =V4aNilqainfix =V7aTrueFIainfix =V6aTrueIainfix =V5aNilqainfix =V6aTrueFIashuffleV19V20V3Aainfix =areverseV0ainfix ++areverseV4V20Aainfix =areverseV1ainfix ++areverseV5V19EFFFIainfix =V2aNilFFF">
       <proof
        prover="alt-ergo"
        timelimit="10"
@@ -136,24 +165,9 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter shuffle.4"
-      expl="parameter shuffle"
-      sum="3bcae620f6db6e1873fc5e48869867bd"
-      proved="true"
-      expanded="false"
-      shape="ainfix =V5aNilAainfix =V11V5NFIainfix <ainfix +alengthV12alengthV4ainfix +alengthV5alengthV4Aainfix <=c0ainfix +alengthV5alengthV4AashuffleV15V16V14Aainfix =areverseV0ainfix ++areverseV4V16Aainfix =areverseV1ainfix ++areverseV12V15EIainfix =V14aConsV13V3FICV5aNilfaConsVVainfix =V12V18Aainfix =V13V17FFIainfix =V10aTrueOainfix =V9aTrueFIainfix =V4aNilqainfix =V9aTrueFIainfix =V8aTrueNIainfix =V5aNilqainfix =V8aTrueFIainfix =V7aTrueNIainfix =V4aNilqainfix =V7aTrueFIainfix =V6aTrueIainfix =V5aNilqainfix =V6aTrueFIashuffleV19V20V3Aainfix =areverseV0ainfix ++areverseV4V20Aainfix =areverseV1ainfix ++areverseV5V19EFFFIainfix =V2aNilFFF">
-      <proof
-       prover="alt-ergo"
-       timelimit="10"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal
       name="WP_parameter shuffle.5"
       expl="loop invariant preservation"
-      sum="a81599c4f1d77f66570c1db15ce28190"
+      sum="920dbfdc7bb489917ba977d1df12da46"
       proved="true"
       expanded="false"
       shape="ashuffleV14V15V13Aainfix =areverseV0ainfix ++areverseV11V15Aainfix =areverseV1ainfix ++areverseV5V14EIainfix =V13aConsV12V3FICV4aNilfaConsVVainfix =V11V17Aainfix =V12V16FFIainfix =V10aTrueOainfix =V9aTrueNFIainfix =V4aNilqainfix =V9aTrueFIainfix =V8aTrueNIainfix =V5aNilqainfix =V8aTrueFIainfix =V7aTrueNIainfix =V4aNilqainfix =V7aTrueFIainfix =V6aTrueIainfix =V5aNilqainfix =V6aTrueFIashuffleV18V19V3Aainfix =areverseV0ainfix ++areverseV4V19Aainfix =areverseV1ainfix ++areverseV5V18EFFFIainfix =V2aNilFFF">
@@ -168,7 +182,7 @@
      <goal
       name="WP_parameter shuffle.6"
       expl="loop variant decreases"
-      sum="e532bbfcc0f8ecf2890345c3bb97e0b0"
+      sum="c692888cdd56f0aa0d8eb62e491c91ce"
       proved="true"
       expanded="false"
       shape="ainfix <ainfix +alengthV5alengthV11ainfix +alengthV5alengthV4Aainfix <=c0ainfix +alengthV5alengthV4IashuffleV14V15V13Aainfix =areverseV0ainfix ++areverseV11V15Aainfix =areverseV1ainfix ++areverseV5V14EIainfix =V13aConsV12V3FICV4aNilfaConsVVainfix =V11V17Aainfix =V12V16FFIainfix =V10aTrueOainfix =V9aTrueNFIainfix =V4aNilqainfix =V9aTrueFIainfix =V8aTrueNIainfix =V5aNilqainfix =V8aTrueFIainfix =V7aTrueNIainfix =V4aNilqainfix =V7aTrueFIainfix =V6aTrueIainfix =V5aNilqainfix =V6aTrueFIashuffleV18V19V3Aainfix =areverseV0ainfix ++areverseV4V19Aainfix =areverseV1ainfix ++areverseV5V18EFFFIainfix =V2aNilFFF">
@@ -183,7 +197,7 @@
      <goal
       name="WP_parameter shuffle.7"
       expl="parameter shuffle"
-      sum="261c3d10a4878b7b52868a316e8dc6e0"
+      sum="22e7606742859912858e5eb95d3c5f9c"
       proved="true"
       expanded="false"
       shape="ainfix =V4aNilAainfix =V11V4NFIainfix <ainfix +alengthV5alengthV12ainfix +alengthV5alengthV4Aainfix <=c0ainfix +alengthV5alengthV4AashuffleV15V16V14Aainfix =areverseV0ainfix ++areverseV12V16Aainfix =areverseV1ainfix ++areverseV5V15EIainfix =V14aConsV13V3FICV4aNilfaConsVVainfix =V12V18Aainfix =V13V17FFIainfix =V10aTrueOainfix =V9aTrueNFIainfix =V4aNilqainfix =V9aTrueFIainfix =V8aTrueNIainfix =V5aNilqainfix =V8aTrueFIainfix =V7aTrueNIainfix =V4aNilqainfix =V7aTrueFIainfix =V6aTrueIainfix =V5aNilqainfix =V6aTrueFIashuffleV19V20V3Aainfix =areverseV0ainfix ++areverseV4V20Aainfix =areverseV1ainfix ++areverseV5V19EFFFIainfix =V2aNilFFF">
@@ -192,13 +206,13 @@
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.03"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter shuffle.8"
       expl="loop invariant preservation"
-      sum="d57eeb534ecbcaee69957e4b98283424"
+      sum="44a1b98b6004303017791f1e56bdfc97"
       proved="true"
       expanded="false"
       shape="ashuffleV12V13V11Aainfix =areverseV0ainfix ++areverseV9V13Aainfix =areverseV1ainfix ++areverseV5V12EIainfix =V11aConsV10V3FICV4aNilfaConsVVainfix =V9V15Aainfix =V10V14FFIainfix =V8aTrueNNIainfix =V5aNilqainfix =V8aTrueFIainfix =V7aTrueNIainfix =V4aNilqainfix =V7aTrueFIainfix =V6aTrueIainfix =V5aNilqainfix =V6aTrueFIashuffleV16V17V3Aainfix =areverseV0ainfix ++areverseV4V17Aainfix =areverseV1ainfix ++areverseV5V16EFFFIainfix =V2aNilFFF">
@@ -207,13 +221,13 @@
        timelimit="10"
        edited="unraveling_a_card_trick_WP_GilbreathCardTrick_WP_parameter_shuffle_1.v"
        obsolete="false">
-       <result status="valid" time="0.62"/>
+       <result status="valid" time="0.66"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter shuffle.9"
       expl="loop variant decreases"
-      sum="ecee8cf9187417a0bd484f4226d76d6a"
+      sum="1f400aa5c6f7ccddf75c4b65b7024ebd"
       proved="true"
       expanded="false"
       shape="ainfix <ainfix +alengthV5alengthV9ainfix +alengthV5alengthV4Aainfix <=c0ainfix +alengthV5alengthV4IashuffleV12V13V11Aainfix =areverseV0ainfix ++areverseV9V13Aainfix =areverseV1ainfix ++areverseV5V12EIainfix =V11aConsV10V3FICV4aNilfaConsVVainfix =V9V15Aainfix =V10V14FFIainfix =V8aTrueNNIainfix =V5aNilqainfix =V8aTrueFIainfix =V7aTrueNIainfix =V4aNilqainfix =V7aTrueFIainfix =V6aTrueIainfix =V5aNilqainfix =V6aTrueFIashuffleV16V17V3Aainfix =areverseV0ainfix ++areverseV4V17Aainfix =areverseV1ainfix ++areverseV5V16EFFFIainfix =V2aNilFFF">
@@ -222,13 +236,13 @@
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.06"/>
+       <result status="valid" time="0.13"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter shuffle.10"
       expl="parameter shuffle"
-      sum="5991313b6d33fbcea1f9d166001b58c8"
+      sum="cb66099e0b08fb6ce8dc0ca9faa13ae4"
       proved="true"
       expanded="false"
       shape="ainfix =V4aNilAainfix =V9V4NFIainfix <ainfix +alengthV5alengthV10ainfix +alengthV5alengthV4Aainfix <=c0ainfix +alengthV5alengthV4AashuffleV13V14V12Aainfix =areverseV0ainfix ++areverseV10V14Aainfix =areverseV1ainfix ++areverseV5V13EIainfix =V12aConsV11V3FICV4aNilfaConsVVainfix =V10V16Aainfix =V11V15FFIainfix =V8aTrueNNIainfix =V5aNilqainfix =V8aTrueFIainfix =V7aTrueNIainfix =V4aNilqainfix =V7aTrueFIainfix =V6aTrueIainfix =V5aNilqainfix =V6aTrueFIashuffleV17V18V3Aainfix =areverseV0ainfix ++areverseV4V18Aainfix =areverseV1ainfix ++areverseV5V17EFFFIainfix =V2aNilFFF">
@@ -237,13 +251,13 @@
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.03"/>
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter shuffle.11"
       expl="normal postcondition"
-      sum="8be8ec7920c1d67eca318dae07cd2dfd"
+      sum="a3612cde7b38c6cfc347cf536dde1362"
       proved="true"
       expanded="false"
       shape="ashuffleareverseV1areverseV0V3Aainfix =V4aNilAainfix =V5aNilIainfix =V7aTrueNNIainfix =V4aNilqainfix =V7aTrueFIainfix =V6aTrueIainfix =V5aNilqainfix =V6aTrueFIashuffleV8V9V3Aainfix =areverseV0ainfix ++areverseV4V9Aainfix =areverseV1ainfix ++areverseV5V8EFFFIainfix =V2aNilFFF">
@@ -252,20 +266,13 @@
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.03"/>
-      </proof>
-      <proof
-       prover="alt-ergo"
-       timelimit="16"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="7.89"/>
+       <result status="valid" time="0.05"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter shuffle.12"
       expl="loop invariant preservation"
-      sum="5a94b5cf16194069e43e33792feb7dd7"
+      sum="f54199733349cd2552093bd86e2a11ec"
       proved="true"
       expanded="false"
       shape="ashuffleV13V14V12Aainfix =areverseV0ainfix ++areverseV4V14Aainfix =areverseV1ainfix ++areverseV10V13EIainfix =V12aConsV11V3FICV5aNilfaConsVVainfix =V10V16Aainfix =V11V15FFIainfix =V9aTrueOainfix =V8aTrueFIainfix =V4aNilqainfix =V8aTrueFIainfix =V7aTrueNIainfix =V5aNilqainfix =V7aTrueFIainfix =V6aTrueNIainfix =V5aNilqainfix =V6aTrueFIashuffleV17V18V3Aainfix =areverseV0ainfix ++areverseV4V18Aainfix =areverseV1ainfix ++areverseV5V17EFFFIainfix =V2aNilFFF">
@@ -274,13 +281,13 @@
        timelimit="10"
        edited="unraveling_a_card_trick_WP_GilbreathCardTrick_WP_parameter_shuffle_2.v"
        obsolete="false">
-       <result status="valid" time="0.78"/>
+       <result status="valid" time="0.74"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter shuffle.13"
       expl="loop variant decreases"
-      sum="cb1323f88f48a24418e497577ff22696"
+      sum="08c0b20c7f8aa692cafee77c84ceab5d"
       proved="true"
       expanded="false"
       shape="ainfix <ainfix +alengthV10alengthV4ainfix +alengthV5alengthV4Aainfix <=c0ainfix +alengthV5alengthV4IashuffleV13V14V12Aainfix =areverseV0ainfix ++areverseV4V14Aainfix =areverseV1ainfix ++areverseV10V13EIainfix =V12aConsV11V3FICV5aNilfaConsVVainfix =V10V16Aainfix =V11V15FFIainfix =V9aTrueOainfix =V8aTrueFIainfix =V4aNilqainfix =V8aTrueFIainfix =V7aTrueNIainfix =V5aNilqainfix =V7aTrueFIainfix =V6aTrueNIainfix =V5aNilqainfix =V6aTrueFIashuffleV17V18V3Aainfix =areverseV0ainfix ++areverseV4V18Aainfix =areverseV1ainfix ++areverseV5V17EFFFIainfix =V2aNilFFF">
@@ -289,13 +296,13 @@
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.12"/>
+       <result status="valid" time="0.15"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter shuffle.14"
       expl="parameter shuffle"
-      sum="17f89da0711a04018df95c5f0eff68bc"
+      sum="3bf55998d775d2a090f75a1129631f51"
       proved="true"
       expanded="false"
       shape="ainfix =V5aNilAainfix =V10V5NFIainfix <ainfix +alengthV11alengthV4ainfix +alengthV5alengthV4Aainfix <=c0ainfix +alengthV5alengthV4AashuffleV14V15V13Aainfix =areverseV0ainfix ++areverseV4V15Aainfix =areverseV1ainfix ++areverseV11V14EIainfix =V13aConsV12V3FICV5aNilfaConsVVainfix =V11V17Aainfix =V12V16FFIainfix =V9aTrueOainfix =V8aTrueFIainfix =V4aNilqainfix =V8aTrueFIainfix =V7aTrueNIainfix =V5aNilqainfix =V7aTrueFIainfix =V6aTrueNIainfix =V5aNilqainfix =V6aTrueFIashuffleV18V19V3Aainfix =areverseV0ainfix ++areverseV4V19Aainfix =areverseV1ainfix ++areverseV5V18EFFFIainfix =V2aNilFFF">
@@ -310,7 +317,7 @@
      <goal
       name="WP_parameter shuffle.15"
       expl="loop invariant preservation"
-      sum="a49f7e46d4ef165c074a5379f32ad77e"
+      sum="bc0585674cf31bd2fcdae5673ff47d6f"
       proved="true"
       expanded="false"
       shape="ashuffleV13V14V12Aainfix =areverseV0ainfix ++areverseV10V14Aainfix =areverseV1ainfix ++areverseV5V13EIainfix =V12aConsV11V3FICV4aNilfaConsVVainfix =V10V16Aainfix =V11V15FFIainfix =V9aTrueOainfix =V8aTrueNFIainfix =V4aNilqainfix =V8aTrueFIainfix =V7aTrueNIainfix =V5aNilqainfix =V7aTrueFIainfix =V6aTrueNIainfix =V5aNilqainfix =V6aTrueFIashuffleV17V18V3Aainfix =areverseV0ainfix ++areverseV4V18Aainfix =areverseV1ainfix ++areverseV5V17EFFFIainfix =V2aNilFFF">
@@ -319,13 +326,13 @@
        timelimit="10"
        edited="unraveling_a_card_trick_WP_GilbreathCardTrick_WP_parameter_shuffle_3.v"
        obsolete="false">
-       <result status="valid" time="0.78"/>
+       <result status="valid" time="0.69"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter shuffle.16"
       expl="loop variant decreases"
-      sum="3fd5185cedf81217ff2d6d5bd07d8dab"
+      sum="36289cfe651d9de583c79a76870c9888"
       proved="true"
       expanded="false"
       shape="ainfix <ainfix +alengthV5alengthV10ainfix +alengthV5alengthV4Aainfix <=c0ainfix +alengthV5alengthV4IashuffleV13V14V12Aainfix =areverseV0ainfix ++areverseV10V14Aainfix =areverseV1ainfix ++areverseV5V13EIainfix =V12aConsV11V3FICV4aNilfaConsVVainfix =V10V16Aainfix =V11V15FFIainfix =V9aTrueOainfix =V8aTrueNFIainfix =V4aNilqainfix =V8aTrueFIainfix =V7aTrueNIainfix =V5aNilqainfix =V7aTrueFIainfix =V6aTrueNIainfix =V5aNilqainfix =V6aTrueFIashuffleV17V18V3Aainfix =areverseV0ainfix ++areverseV4V18Aainfix =areverseV1ainfix ++areverseV5V17EFFFIainfix =V2aNilFFF">
@@ -334,31 +341,16 @@
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.10"/>
+       <result status="valid" time="0.14"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter shuffle.17"
       expl="parameter shuffle"
-      sum="3f9f0878e737235cff34275f5acb874d"
+      sum="8e770d2edb8517ccc24b60f4ff1143ba"
       proved="true"
       expanded="false"
       shape="ainfix =V4aNilAainfix =V10V4NFIainfix <ainfix +alengthV5alengthV11ainfix +alengthV5alengthV4Aainfix <=c0ainfix +alengthV5alengthV4AashuffleV14V15V13Aainfix =areverseV0ainfix ++areverseV11V15Aainfix =areverseV1ainfix ++areverseV5V14EIainfix =V13aConsV12V3FICV4aNilfaConsVVainfix =V11V17Aainfix =V12V16FFIainfix =V9aTrueOainfix =V8aTrueNFIainfix =V4aNilqainfix =V8aTrueFIainfix =V7aTrueNIainfix =V5aNilqainfix =V7aTrueFIainfix =V6aTrueNIainfix =V5aNilqainfix =V6aTrueFIashuffleV18V19V3Aainfix =areverseV0ainfix ++areverseV4V19Aainfix =areverseV1ainfix ++areverseV5V18EFFFIainfix =V2aNilFFF">
-      <proof
-       prover="alt-ergo"
-       timelimit="10"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter shuffle.18"
-      expl="loop invariant preservation"
-      sum="e68828822e93b2ffc7ec3c769d0f50b2"
-      proved="true"
-      expanded="false"
-      shape="ashuffleV11V12V10Aainfix =areverseV0ainfix ++areverseV8V12Aainfix =areverseV1ainfix ++areverseV5V11EIainfix =V10aConsV9V3FICV4aNilfaConsVVainfix =V8V14Aainfix =V9V13FFIainfix =V7aTrueNNIainfix =V5aNilqainfix =V7aTrueFIainfix =V6aTrueNIainfix =V5aNilqainfix =V6aTrueFIashuffleV15V16V3Aainfix =areverseV0ainfix ++areverseV4V16Aainfix =areverseV1ainfix ++areverseV5V15EFFFIainfix =V2aNilFFF">
       <proof
        prover="alt-ergo"
        timelimit="10"
@@ -368,9 +360,24 @@
       </proof>
      </goal>
      <goal
+      name="WP_parameter shuffle.18"
+      expl="loop invariant preservation"
+      sum="5016aa461408f539aa9f4d0a94434ac2"
+      proved="true"
+      expanded="false"
+      shape="ashuffleV11V12V10Aainfix =areverseV0ainfix ++areverseV8V12Aainfix =areverseV1ainfix ++areverseV5V11EIainfix =V10aConsV9V3FICV4aNilfaConsVVainfix =V8V14Aainfix =V9V13FFIainfix =V7aTrueNNIainfix =V5aNilqainfix =V7aTrueFIainfix =V6aTrueNIainfix =V5aNilqainfix =V6aTrueFIashuffleV15V16V3Aainfix =areverseV0ainfix ++areverseV4V16Aainfix =areverseV1ainfix ++areverseV5V15EFFFIainfix =V2aNilFFF">
+      <proof
+       prover="alt-ergo"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
       name="WP_parameter shuffle.19"
       expl="loop variant decreases"
-      sum="53b32ba35887c41be2aec8116da3bee7"
+      sum="b111b42d92f8aa06808fb3994c047e32"
       proved="true"
       expanded="false"
       shape="ainfix <ainfix +alengthV5alengthV8ainfix +alengthV5alengthV4Aainfix <=c0ainfix +alengthV5alengthV4IashuffleV11V12V10Aainfix =areverseV0ainfix ++areverseV8V12Aainfix =areverseV1ainfix ++areverseV5V11EIainfix =V10aConsV9V3FICV4aNilfaConsVVainfix =V8V14Aainfix =V9V13FFIainfix =V7aTrueNNIainfix =V5aNilqainfix =V7aTrueFIainfix =V6aTrueNIainfix =V5aNilqainfix =V6aTrueFIashuffleV15V16V3Aainfix =areverseV0ainfix ++areverseV4V16Aainfix =areverseV1ainfix ++areverseV5V15EFFFIainfix =V2aNilFFF">
@@ -385,7 +392,7 @@
      <goal
       name="WP_parameter shuffle.20"
       expl="parameter shuffle"
-      sum="7b3d907173a105d49d54d7c60e717c24"
+      sum="d881baa5ca8fcb59ff28cfac639947e1"
       proved="true"
       expanded="false"
       shape="ainfix =V4aNilAainfix =V8V4NFIainfix <ainfix +alengthV5alengthV9ainfix +alengthV5alengthV4Aainfix <=c0ainfix +alengthV5alengthV4AashuffleV12V13V11Aainfix =areverseV0ainfix ++areverseV9V13Aainfix =areverseV1ainfix ++areverseV5V12EIainfix =V11aConsV10V3FICV4aNilfaConsVVainfix =V9V15Aainfix =V10V14FFIainfix =V7aTrueNNIainfix =V5aNilqainfix =V7aTrueFIainfix =V6aTrueNIainfix =V5aNilqainfix =V6aTrueFIashuffleV16V17V3Aainfix =areverseV0ainfix ++areverseV4V17Aainfix =areverseV1ainfix ++areverseV5V16EFFFIainfix =V2aNilFFF">
@@ -402,21 +409,79 @@
    <goal
     name="WP_parameter card_trick"
     expl="parameter card_trick"
-    sum="ee7a5543bb0b7337823279753668c90c"
+    sum="ae04569bf2715b8b0f323e54601990bc"
     proved="true"
-    expanded="false"
-    shape="ainfix =alengthV7ainfix *anamIashuffleareverseV4areverseV3V7Aainfix =V5aNilAainfix =V6aNilFFFAainfix =V0ainfix ++areverseV3V4Iainfix =V0ainfix ++areverseV3V4Aainfix =alengthV3ainfix -ainfix +V2c1c1Aainfix =alengthV4ainfix +ainfix -ainfix *anamainfix +V2c1c1Aainfix =V4aNilAainfix =V9V4NFAainfix =V0ainfix ++areverseV12V10Aainfix =alengthV12ainfix -ainfix +V8c1c1Aainfix =alengthV10ainfix +ainfix -ainfix *anamainfix +V8c1c1Iainfix =V12aConsV11V3FICV4aNilfaConsVVainfix =V10V14Aainfix =V11V13FFIainfix =V0ainfix ++areverseV3V4Aainfix =alengthV3ainfix -V8c1Aainfix =alengthV4ainfix +ainfix -ainfix *anamV8c1Iainfix <=V8V2Aainfix <=c1V8FFFAainfix =V0ainfix ++areverseV1V0Aainfix =alengthV1ainfix -c1c1Aainfix =alengthV0ainfix +ainfix -ainfix *anamc1c1Iainfix <=c1V2Aainfix =alengthV17ainfix *anamIashuffleareverseV0areverseV1V17Aainfix =V15aNilAainfix =V16aNilFFFAainfix =V0ainfix ++areverseV1V0Iainfix >c1V2Iainfix <=V2ainfix *anamAainfix <=c0V2FIainfix =V1aNilFIainfix =alengthV0ainfix *anamF">
+    expanded="true"
+    shape="asuit_sortedV7Aainfix =alengthV7ainfix *anamIashuffleareverseV4areverseV3V7Aainfix =V5aNilAainfix =V6aNilFFFAainfix =V0ainfix ++areverseV3V4Iainfix =V0ainfix ++areverseV3V4Aainfix =alengthV3ainfix -ainfix +V2c1c1Aainfix =alengthV4ainfix +ainfix -ainfix *anamainfix +V2c1c1Aainfix =V4aNilAainfix =V9V4NFAainfix =V0ainfix ++areverseV12V10Aainfix =alengthV12ainfix -ainfix +V8c1c1Aainfix =alengthV10ainfix +ainfix -ainfix *anamainfix +V8c1c1Iainfix =V12aConsV11V3FICV4aNilfaConsVVainfix =V10V14Aainfix =V11V13FFIainfix =V0ainfix ++areverseV3V4Aainfix =alengthV3ainfix -V8c1Aainfix =alengthV4ainfix +ainfix -ainfix *anamV8c1Iainfix <=V8V2Aainfix <=c1V8FFFAainfix =V0ainfix ++areverseV1V0Aainfix =alengthV1ainfix -c1c1Aainfix =alengthV0ainfix +ainfix -ainfix *anamc1c1Iainfix <=c1V2Aasuit_sortedV17Aainfix =alengthV17ainfix *anamIashuffleareverseV0areverseV1V17Aainfix =V15aNilAainfix =V16aNilFFFAainfix =V0ainfix ++areverseV1V0Iainfix >c1V2Iainfix <=V2ainfix *anamAainfix <=c0V2FIainfix =V1aNilFIasuit_orderedV0Aainfix =alengthV0ainfix *anamF">
     <transf
      name="split_goal"
      proved="true"
-     expanded="false">
+     expanded="true">
      <goal
       name="WP_parameter card_trick.1"
       expl="assertion"
-      sum="79142a2ccaea7f6a5f8480407b1c9fc1"
+      sum="4bcda1da58c48c1cadc01eb845808ddc"
       proved="true"
       expanded="false"
-      shape="ainfix =V0ainfix ++areverseV1V0Iainfix >c1V2Iainfix <=V2ainfix *anamAainfix <=c0V2FIainfix =V1aNilFIainfix =alengthV0ainfix *anamF">
+      shape="ainfix =V0ainfix ++areverseV1V0Iainfix >c1V2Iainfix <=V2ainfix *anamAainfix <=c0V2FIainfix =V1aNilFIasuit_orderedV0Aainfix =alengthV0ainfix *anamF">
+      <proof
+       prover="alt-ergo"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.10"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter card_trick.2"
+      expl="normal postcondition"
+      sum="f1fc760093e6284395847236ad413332"
+      proved="true"
+      expanded="true"
+      shape="asuit_sortedV5Aainfix =alengthV5ainfix *anamIashuffleareverseV0areverseV1V5Aainfix =V3aNilAainfix =V4aNilFFFIainfix =V0ainfix ++areverseV1V0Iainfix >c1V2Iainfix <=V2ainfix *anamAainfix <=c0V2FIainfix =V1aNilFIasuit_orderedV0Aainfix =alengthV0ainfix *anamF">
+      <transf
+       name="split_goal"
+       proved="true"
+       expanded="true">
+       <goal
+        name="WP_parameter card_trick.2.1"
+        expl="parameter card_trick"
+        sum="a4e2a8d273cc3241a4752ba374d63d5f"
+        proved="true"
+        expanded="false"
+        shape="ainfix =alengthV5ainfix *anamIashuffleareverseV0areverseV1V5Aainfix =V3aNilAainfix =V4aNilFFFIainfix =V0ainfix ++areverseV1V0Iainfix >c1V2Iainfix <=V2ainfix *anamAainfix <=c0V2FIainfix =V1aNilFIasuit_orderedV0Aainfix =alengthV0ainfix *anamF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.08"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter card_trick.2.2"
+        expl="parameter card_trick"
+        sum="a17ee3b3d93813b564510734b438c7a5"
+        proved="true"
+        expanded="true"
+        shape="asuit_sortedV5Iainfix =alengthV5ainfix *anamIashuffleareverseV0areverseV1V5Aainfix =V3aNilAainfix =V4aNilFFFIainfix =V0ainfix ++areverseV1V0Iainfix >c1V2Iainfix <=V2ainfix *anamAainfix <=c0V2FIainfix =V1aNilFIasuit_orderedV0Aainfix =alengthV0ainfix *anamF">
+        <proof
+         prover="cvc3-2.2"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.03"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter card_trick.3"
+      expl="for loop initialization"
+      sum="41fa37cde1932c6d389e55c2f17ed508"
+      proved="true"
+      expanded="false"
+      shape="ainfix =V0ainfix ++areverseV1V0Aainfix =alengthV1ainfix -c1c1Aainfix =alengthV0ainfix +ainfix -ainfix *anamc1c1Iainfix <=c1V2Iainfix <=V2ainfix *anamAainfix <=c0V2FIainfix =V1aNilFIasuit_orderedV0Aainfix =alengthV0ainfix *anamF">
       <proof
        prover="alt-ergo"
        timelimit="10"
@@ -426,42 +491,12 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter card_trick.2"
-      expl="normal postcondition"
-      sum="b77b6b0be2fd415cf366d679820d46e8"
-      proved="true"
-      expanded="false"
-      shape="ainfix =alengthV5ainfix *anamIashuffleareverseV0areverseV1V5Aainfix =V3aNilAainfix =V4aNilFFFIainfix =V0ainfix ++areverseV1V0Iainfix >c1V2Iainfix <=V2ainfix *anamAainfix <=c0V2FIainfix =V1aNilFIainfix =alengthV0ainfix *anamF">
-      <proof
-       prover="alt-ergo"
-       timelimit="10"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.08"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter card_trick.3"
-      expl="for loop initialization"
-      sum="0968f46cb1a681830ef0de0a78ff658b"
-      proved="true"
-      expanded="false"
-      shape="ainfix =V0ainfix ++areverseV1V0Aainfix =alengthV1ainfix -c1c1Aainfix =alengthV0ainfix +ainfix -ainfix *anamc1c1Iainfix <=c1V2Iainfix <=V2ainfix *anamAainfix <=c0V2FIainfix =V1aNilFIainfix =alengthV0ainfix *anamF">
-      <proof
-       prover="alt-ergo"
-       timelimit="10"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.13"/>
-      </proof>
-     </goal>
-     <goal
       name="WP_parameter card_trick.4"
       expl="for loop preservation"
-      sum="62cb2b36b3f21cb0cffb9849585c9463"
+      sum="c16e1f3b5eaaeef1db50af43b6e3decb"
       proved="true"
       expanded="false"
-      shape="ainfix =V4aNilAainfix =V6V4NFAainfix =V0ainfix ++areverseV9V7Aainfix =alengthV9ainfix -ainfix +V5c1c1Aainfix =alengthV7ainfix +ainfix -ainfix *anamainfix +V5c1c1Iainfix =V9aConsV8V3FICV4aNilfaConsVVainfix =V7V11Aainfix =V8V10FFIainfix =V0ainfix ++areverseV3V4Aainfix =alengthV3ainfix -V5c1Aainfix =alengthV4ainfix +ainfix -ainfix *anamV5c1Iainfix <=V5V2Aainfix <=c1V5FFFIainfix <=c1V2Iainfix <=V2ainfix *anamAainfix <=c0V2FIainfix =V1aNilFIainfix =alengthV0ainfix *anamF">
+      shape="ainfix =V4aNilAainfix =V6V4NFAainfix =V0ainfix ++areverseV9V7Aainfix =alengthV9ainfix -ainfix +V5c1c1Aainfix =alengthV7ainfix +ainfix -ainfix *anamainfix +V5c1c1Iainfix =V9aConsV8V3FICV4aNilfaConsVVainfix =V7V11Aainfix =V8V10FFIainfix =V0ainfix ++areverseV3V4Aainfix =alengthV3ainfix -V5c1Aainfix =alengthV4ainfix +ainfix -ainfix *anamV5c1Iainfix <=V5V2Aainfix <=c1V5FFFIainfix <=c1V2Iainfix <=V2ainfix *anamAainfix <=c0V2FIainfix =V1aNilFIasuit_orderedV0Aainfix =alengthV0ainfix *anamF">
       <transf
        name="split_goal"
        proved="true"
@@ -469,55 +504,40 @@
        <goal
         name="WP_parameter card_trick.4.1"
         expl="for loop preservation"
-        sum="75076e3e18b4f6ed5c7e7fb24dae249f"
+        sum="c3a5e7e999c12d6d76e2dd0993f3e511"
         proved="true"
         expanded="false"
-        shape="ainfix =alengthV6ainfix +ainfix -ainfix *anamainfix +V5c1c1Iainfix =V8aConsV7V3FICV4aNilfaConsVVainfix =V6V10Aainfix =V7V9FFIainfix =V0ainfix ++areverseV3V4Aainfix =alengthV3ainfix -V5c1Aainfix =alengthV4ainfix +ainfix -ainfix *anamV5c1Iainfix <=V5V2Aainfix <=c1V5FFFIainfix <=c1V2Iainfix <=V2ainfix *anamAainfix <=c0V2FIainfix =V1aNilFIainfix =alengthV0ainfix *anamF">
+        shape="ainfix =alengthV6ainfix +ainfix -ainfix *anamainfix +V5c1c1Iainfix =V8aConsV7V3FICV4aNilfaConsVVainfix =V6V10Aainfix =V7V9FFIainfix =V0ainfix ++areverseV3V4Aainfix =alengthV3ainfix -V5c1Aainfix =alengthV4ainfix +ainfix -ainfix *anamV5c1Iainfix <=V5V2Aainfix <=c1V5FFFIainfix <=c1V2Iainfix <=V2ainfix *anamAainfix <=c0V2FIainfix =V1aNilFIasuit_orderedV0Aainfix =alengthV0ainfix *anamF">
         <proof
          prover="alt-ergo"
          timelimit="10"
          edited=""
          obsolete="false">
-         <result status="valid" time="0.28"/>
+         <result status="valid" time="0.43"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter card_trick.4.2"
         expl="for loop preservation"
-        sum="38dd27ca873350305abf33119981cc26"
+        sum="7d8bc42a204e48d3e36e04ac04d599a6"
         proved="true"
         expanded="false"
-        shape="ainfix =alengthV8ainfix -ainfix +V5c1c1Iainfix =V8aConsV7V3FICV4aNilfaConsVVainfix =V6V10Aainfix =V7V9FFIainfix =V0ainfix ++areverseV3V4Aainfix =alengthV3ainfix -V5c1Aainfix =alengthV4ainfix +ainfix -ainfix *anamV5c1Iainfix <=V5V2Aainfix <=c1V5FFFIainfix <=c1V2Iainfix <=V2ainfix *anamAainfix <=c0V2FIainfix =V1aNilFIainfix =alengthV0ainfix *anamF">
+        shape="ainfix =alengthV8ainfix -ainfix +V5c1c1Iainfix =V8aConsV7V3FICV4aNilfaConsVVainfix =V6V10Aainfix =V7V9FFIainfix =V0ainfix ++areverseV3V4Aainfix =alengthV3ainfix -V5c1Aainfix =alengthV4ainfix +ainfix -ainfix *anamV5c1Iainfix <=V5V2Aainfix <=c1V5FFFIainfix <=c1V2Iainfix <=V2ainfix *anamAainfix <=c0V2FIainfix =V1aNilFIasuit_orderedV0Aainfix =alengthV0ainfix *anamF">
         <proof
          prover="alt-ergo"
          timelimit="10"
          edited=""
          obsolete="false">
-         <result status="valid" time="0.05"/>
+         <result status="valid" time="0.06"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter card_trick.4.3"
         expl="for loop preservation"
-        sum="11be80c78bcbb53943ebc51a5ac36577"
+        sum="7707013aa7b661e104d217450a10fdea"
         proved="true"
         expanded="false"
-        shape="ainfix =V0ainfix ++areverseV8V6Iainfix =V8aConsV7V3FICV4aNilfaConsVVainfix =V6V10Aainfix =V7V9FFIainfix =V0ainfix ++areverseV3V4Aainfix =alengthV3ainfix -V5c1Aainfix =alengthV4ainfix +ainfix -ainfix *anamV5c1Iainfix <=V5V2Aainfix <=c1V5FFFIainfix <=c1V2Iainfix <=V2ainfix *anamAainfix <=c0V2FIainfix =V1aNilFIainfix =alengthV0ainfix *anamF">
-        <proof
-         prover="alt-ergo"
-         timelimit="10"
-         edited=""
-         obsolete="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal
-        name="WP_parameter card_trick.4.4"
-        expl="for loop preservation"
-        sum="4f54ca47f3d2e3244a24e97cd1f3233a"
-        proved="true"
-        expanded="false"
-        shape="ainfix =V4aNilAainfix =V6V4NFIainfix =V0ainfix ++areverseV9V7Aainfix =alengthV9ainfix -ainfix +V5c1c1Aainfix =alengthV7ainfix +ainfix -ainfix *anamainfix +V5c1c1Iainfix =V9aConsV8V3FICV4aNilfaConsVVainfix =V7V11Aainfix =V8V10FFIainfix =V0ainfix ++areverseV3V4Aainfix =alengthV3ainfix -V5c1Aainfix =alengthV4ainfix +ainfix -ainfix *anamV5c1Iainfix <=V5V2Aainfix <=c1V5FFFIainfix <=c1V2Iainfix <=V2ainfix *anamAainfix <=c0V2FIainfix =V1aNilFIainfix =alengthV0ainfix *anamF">
+        shape="ainfix =V0ainfix ++areverseV8V6Iainfix =V8aConsV7V3FICV4aNilfaConsVVainfix =V6V10Aainfix =V7V9FFIainfix =V0ainfix ++areverseV3V4Aainfix =alengthV3ainfix -V5c1Aainfix =alengthV4ainfix +ainfix -ainfix *anamV5c1Iainfix <=V5V2Aainfix <=c1V5FFFIainfix <=c1V2Iainfix <=V2ainfix *anamAainfix <=c0V2FIainfix =V1aNilFIasuit_orderedV0Aainfix =alengthV0ainfix *anamF">
         <proof
          prover="alt-ergo"
          timelimit="10"
@@ -526,37 +546,80 @@
          <result status="valid" time="0.04"/>
         </proof>
        </goal>
+       <goal
+        name="WP_parameter card_trick.4.4"
+        expl="for loop preservation"
+        sum="a52974ac0fd0e509eaf99ff47a4edca8"
+        proved="true"
+        expanded="false"
+        shape="ainfix =V4aNilAainfix =V6V4NFIainfix =V0ainfix ++areverseV9V7Aainfix =alengthV9ainfix -ainfix +V5c1c1Aainfix =alengthV7ainfix +ainfix -ainfix *anamainfix +V5c1c1Iainfix =V9aConsV8V3FICV4aNilfaConsVVainfix =V7V11Aainfix =V8V10FFIainfix =V0ainfix ++areverseV3V4Aainfix =alengthV3ainfix -V5c1Aainfix =alengthV4ainfix +ainfix -ainfix *anamV5c1Iainfix <=V5V2Aainfix <=c1V5FFFIainfix <=c1V2Iainfix <=V2ainfix *anamAainfix <=c0V2FIainfix =V1aNilFIasuit_orderedV0Aainfix =alengthV0ainfix *anamF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.05"/>
+        </proof>
+       </goal>
       </transf>
      </goal>
      <goal
       name="WP_parameter card_trick.5"
       expl="assertion"
-      sum="d8d62cc0e78805f84e99ad75f2a8f3fa"
+      sum="aba501b7ff89bf33bcfa70a472e3e98a"
       proved="true"
       expanded="false"
-      shape="ainfix =V0ainfix ++areverseV3V4Iainfix =V0ainfix ++areverseV3V4Aainfix =alengthV3ainfix -ainfix +V2c1c1Aainfix =alengthV4ainfix +ainfix -ainfix *anamainfix +V2c1c1FFIainfix <=c1V2Iainfix <=V2ainfix *anamAainfix <=c0V2FIainfix =V1aNilFIainfix =alengthV0ainfix *anamF">
+      shape="ainfix =V0ainfix ++areverseV3V4Iainfix =V0ainfix ++areverseV3V4Aainfix =alengthV3ainfix -ainfix +V2c1c1Aainfix =alengthV4ainfix +ainfix -ainfix *anamainfix +V2c1c1FFIainfix <=c1V2Iainfix <=V2ainfix *anamAainfix <=c0V2FIainfix =V1aNilFIasuit_orderedV0Aainfix =alengthV0ainfix *anamF">
       <proof
        prover="alt-ergo"
        timelimit="10"
        edited=""
        obsolete="false">
-       <result status="valid" time="0.03"/>
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter card_trick.6"
       expl="normal postcondition"
-      sum="33ec713f663e288b51c40b571e78ad6f"
+      sum="3a71b07245476ed33a23622bfc902192"
       proved="true"
       expanded="false"
-      shape="ainfix =alengthV7ainfix *anamIashuffleareverseV4areverseV3V7Aainfix =V5aNilAainfix =V6aNilFFFIainfix =V0ainfix ++areverseV3V4Iainfix =V0ainfix ++areverseV3V4Aainfix =alengthV3ainfix -ainfix +V2c1c1Aainfix =alengthV4ainfix +ainfix -ainfix *anamainfix +V2c1c1FFIainfix <=c1V2Iainfix <=V2ainfix *anamAainfix <=c0V2FIainfix =V1aNilFIainfix =alengthV0ainfix *anamF">
-      <proof
-       prover="alt-ergo"
-       timelimit="10"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.12"/>
-      </proof>
+      shape="asuit_sortedV7Aainfix =alengthV7ainfix *anamIashuffleareverseV4areverseV3V7Aainfix =V5aNilAainfix =V6aNilFFFIainfix =V0ainfix ++areverseV3V4Iainfix =V0ainfix ++areverseV3V4Aainfix =alengthV3ainfix -ainfix +V2c1c1Aainfix =alengthV4ainfix +ainfix -ainfix *anamainfix +V2c1c1FFIainfix <=c1V2Iainfix <=V2ainfix *anamAainfix <=c0V2FIainfix =V1aNilFIasuit_orderedV0Aainfix =alengthV0ainfix *anamF">
+      <transf
+       name="split_goal"
+       proved="true"
+       expanded="false">
+       <goal
+        name="WP_parameter card_trick.6.1"
+        expl="parameter card_trick"
+        sum="aee791fc1aeddf0bcf3b0141c42ebce1"
+        proved="true"
+        expanded="false"
+        shape="ainfix =alengthV7ainfix *anamIashuffleareverseV4areverseV3V7Aainfix =V5aNilAainfix =V6aNilFFFIainfix =V0ainfix ++areverseV3V4Iainfix =V0ainfix ++areverseV3V4Aainfix =alengthV3ainfix -ainfix +V2c1c1Aainfix =alengthV4ainfix +ainfix -ainfix *anamainfix +V2c1c1FFIainfix <=c1V2Iainfix <=V2ainfix *anamAainfix <=c0V2FIainfix =V1aNilFIasuit_orderedV0Aainfix =alengthV0ainfix *anamF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.15"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter card_trick.6.2"
+        expl="parameter card_trick"
+        sum="3308589a00d116ddc1e2db0354babc39"
+        proved="true"
+        expanded="false"
+        shape="asuit_sortedV7Iainfix =alengthV7ainfix *anamIashuffleareverseV4areverseV3V7Aainfix =V5aNilAainfix =V6aNilFFFIainfix =V0ainfix ++areverseV3V4Iainfix =V0ainfix ++areverseV3V4Aainfix =alengthV3ainfix -ainfix +V2c1c1Aainfix =alengthV4ainfix +ainfix -ainfix *anamainfix +V2c1c1FFIainfix <=c1V2Iainfix <=V2ainfix *anamAainfix <=c0V2FIainfix =V1aNilFIasuit_orderedV0Aainfix =alengthV0ainfix *anamF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="8.65"/>
+        </proof>
+       </goal>
+      </transf>
      </goal>
     </transf>
    </goal>
