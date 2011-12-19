@@ -83,6 +83,10 @@ let print_expl proven fmt p =
       Format.fprintf fmt "%a: %a not proved"
         print_loc p.loc print_reason p.reason
 
+let print_skipped fmt p =
+   Format.fprintf fmt "%a: %a skipped"
+     print_loc p.loc print_reason p.reason
+
 module ExplCmp = struct
    type t = expl
    let compare = Pervasives.compare

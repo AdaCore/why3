@@ -38,3 +38,6 @@ val filename : string
 val report_mode : bool
 (* true if the output file exists and is newer than the input file, and we are
  * not in force mode (--force or -f) *)
+
+val noproof : bool
+(* true if option --no-proof was present *)

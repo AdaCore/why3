@@ -8,6 +8,7 @@ let opt_steps = ref 0
 let opt_report = ref Fail
 let opt_debug = ref false
 let opt_force = ref false
+let opt_noproof = ref false
 let opt_filename : string option ref = ref None
 
 let set_filename s =
@@ -46,6 +47,8 @@ let options = Arg.align [
           "Rerun VC generation and proofs, even when the result is up to date";
    "--force", Arg.Set opt_force,
           "Rerun VC generation and proofs, even when the result is up to date";
+   "--no-proof", Arg.Set opt_noproof,
+          "Do not call the prover";
    "--report", Arg.String set_report,
           "set report mode, one of (fail | all | detailed), default is fail";
    "--debug", Arg.Set opt_debug,
@@ -131,3 +134,4 @@ let verbose = !opt_verbose
 let report  = !opt_report
 let debug = !opt_debug
 let force = !opt_force
+let noproof = !opt_noproof

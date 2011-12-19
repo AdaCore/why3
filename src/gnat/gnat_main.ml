@@ -133,14 +133,17 @@ let report =
 exception Not_Proven of Call_provers.prover_answer
 
 let prove_objective fmt expl tl =
-   try
-      let cnt = ref 0 in
-      List.iter (fun t ->
-         incr cnt;
-         let result = prove_task t expl !cnt in
-         if result <> Call_provers.Valid then raise (Not_Proven result)) tl;
-      report fmt Call_provers.Valid expl
-   with Not_Proven result -> report fmt result expl
+   if Gnat_config.noproof then
+      Format.printf "%a@." Gnat_expl.print_skipped expl
+   else
+      try
+         let cnt = ref 0 in
+         List.iter (fun t ->
+            incr cnt;
+            let result = prove_task t expl !cnt in
+            if result <> Call_provers.Valid then raise (Not_Proven result)) tl;
+         report fmt Call_provers.Valid expl
+      with Not_Proven result -> report fmt result expl
 
 let _ =
    if Gnat_config.report_mode then begin

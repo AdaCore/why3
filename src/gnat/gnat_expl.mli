@@ -17,6 +17,8 @@ val expl_from_label_info :
 
 val print_expl : bool -> Format.formatter -> expl -> unit
 
+val print_skipped : Format.formatter -> expl -> unit
+
 val to_filename : expl -> string
 (* print a representation of an explanation that could serve as a filename *)
 
