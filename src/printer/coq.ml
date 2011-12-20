@@ -32,9 +32,11 @@ let black_list =
   [ "at"; "cofix"; "exists2"; "fix"; "IF"; "left"; "mod"; "Prop";
     "return"; "right"; "Set"; "Type"; "using"; "where"; ]
 
-let iprinter =
+let fresh_printer () =
   let isanitize = sanitizer char_to_alpha char_to_alnumus in
   create_ident_printer black_list ~sanitizer:isanitize
+
+let iprinter = fresh_printer ()
 
 let forget_all () = forget_all iprinter
 
@@ -102,7 +104,7 @@ let print_pr fmt pr =
 
 type info = {
   info_syn : syntax_map;
-  symbol_printers : (Theory.theory * ident_printer) Mid.t;
+  symbol_printers : (string * ident_printer) Mid.t;
   realization : bool;
 }
 
@@ -111,12 +113,10 @@ let print_path = print_list (constant_string ".") string
 let print_id fmt id = string fmt (id_unique iprinter id)
 
 let print_id_real info fmt id =
-        try let th,ipr = Mid.find id info.symbol_printers in
-        fprintf fmt "%a.%s.%s"
-          print_path th.Theory.th_path
-          th.Theory.th_name.id_string
-          (id_unique ipr id)
-        with Not_found -> print_id fmt id
+  try
+    let path,ipr = Mid.find id info.symbol_printers in
+    fprintf fmt "%s.%s" path (id_unique ipr id)
+  with Not_found -> print_id fmt id
 
 let print_ls_real info fmt ls = print_id_real info fmt ls.ls_name
 let print_ts_real info fmt ts = print_id_real info fmt ts.ts_name
@@ -677,53 +677,45 @@ let print_decl ~old info fmt d = match d.d_node with
 let print_decls ~old info fmt dl =
   fprintf fmt "@[<hov>%a@\n@]" (print_list nothing (print_decl ~old info)) dl
 
-let init_printer th =
-  let isanitize = sanitizer char_to_alpha char_to_alnumus in
-  let pr = create_ident_printer black_list ~sanitizer:isanitize in
-  Sid.iter (fun id -> ignore (id_unique pr id)) th.Theory.th_local;
-  pr
-
-(* TODO: add a driver meta and make lookup for realized theories a bit
-   more efficient *)
-let realized_theories = Coq_config.realized_theories
-
-let print_task _env pr thpr realize ?old fmt task =
+let print_task env pr thpr realize ?old fmt task =
   forget_all ();
   print_prelude fmt pr;
   print_th_prelude task fmt thpr;
-  let symbol_printers,decls =
-      let used = Task.used_theories task in
-      let used = Mid.filter (fun _ th -> List.mem (th.Theory.th_path@[th.Theory.th_name.id_string]) realized_theories) used in
-      (* 2 cases: goal is clone T with [] or goal is a real goal *)
-      let used = match task with
-        | None -> assert false
-        | Some { Task.task_decl = { Theory.td_node = Theory.Clone (th,_) }} ->
-            Sid.iter
-              (fun id -> ignore (id_unique iprinter id))
-              th.Theory.th_local;
-            Mid.remove th.Theory.th_name used
-        | _ -> used
-      in
-      (*
-      (* output the Require commands *)
-      List.iter
-        (fprintf fmt "Add Rec LoadPath \"%s\".@\n")
-        (Env.get_loadpath env);
-      *)
-      Mid.iter
-        (fun id th -> fprintf fmt "Require %a.%s.@\n"
-          print_path th.Theory.th_path id.id_string)
-        used;
-      let symbols = Task.used_symbols used in
-      (* build the printers for each theories *)
-      let printers = Mid.map init_printer used in
-      let decls = Task.local_decls task symbols in
-      let symbols =
-        Mid.map (fun th -> (th,Mid.find th.Theory.th_name printers))
-          symbols
-      in
-      symbols, decls
-  in
+  (* find theories that are both used and realized from metas *)
+  let realized_theories =
+    Task.on_meta meta_realized (fun mid args ->
+      match args with
+      | [Theory.MAstr s1; Theory.MAstr s2] ->
+        (* TODO: do not split string; in fact, do not even use a string argument *)
+        let f,id = let l = split_string_rev s1 '.' in List.rev (List.tl l),List.hd l in
+        let th = Env.find_theory env f id in
+        Mid.add th.Theory.th_name (th, if s2 = "" then s1 else s2) mid
+      | _ -> assert false
+    ) Mid.empty task in
+  (* 2 cases: goal is clone T with [] or goal is a real goal *)
+  let realized_theories =
+    match task with
+    | None -> assert false
+    | Some { Task.task_decl = { Theory.td_node = Theory.Clone (th,_) }} ->
+      Sid.iter (fun id -> ignore (id_unique iprinter id)) th.Theory.th_local;
+      Mid.remove th.Theory.th_name realized_theories
+    | _ -> realized_theories in
+  let realized_theories' =
+    Mid.map (fun (th,s) -> fprintf fmt "Require %s.@\n" s; th) realized_theories in
+  let realized_symbols = Task.used_symbols realized_theories' in
+  let local_decls = Task.local_decls task realized_symbols in
+  (* associate a special printer to each symbol in a realized theory *)
+  let symbol_printers =
+    let printers =
+      Mid.map (fun th ->
+        let pr = fresh_printer () in
+        Sid.iter (fun id -> ignore (id_unique pr id)) th.Theory.th_local;
+        pr
+      ) realized_theories' in
+    Mid.map (fun th ->
+      (snd (Mid.find th.Theory.th_name realized_theories),
+       Mid.find th.Theory.th_name printers)
+    ) realized_symbols in
   let info = {
     info_syn = get_syntax_map task;
     symbol_printers = symbol_printers;
@@ -734,7 +726,7 @@ let print_task _env pr thpr realize ?old fmt task =
     | None -> None
     | Some ch -> Some(ref NoWhere,ch)
   in
-  print_decls ~old info fmt decls
+  print_decls ~old info fmt local_decls
 
 let print_task_full env pr thpr ?old fmt task =
   print_task env pr thpr false ?old fmt task
