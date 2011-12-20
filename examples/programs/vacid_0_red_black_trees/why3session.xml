@@ -1,0 +1,1752 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session SYSTEM "why3session.dtd">
+<why3session
+ name="examples/programs/vacid_0_red_black_trees/why3session.xml">
+ <prover
+  id="alt-ergo"
+  name="Alt-Ergo"
+  version="0.93.1"/>
+ <prover
+  id="coq"
+  name="Coq"
+  version="8.3pl2"/>
+ <prover
+  id="cvc3-2.2"
+  name="CVC3"
+  version="2.2"/>
+ <prover
+  id="eprover"
+  name="Eprover"
+  version="0.7"/>
+ <prover
+  id="gappa"
+  name="Gappa"
+  version="0.14.0"/>
+ <prover
+  id="simplify"
+  name="Simplify"
+  version="1.5.4"/>
+ <prover
+  id="yices"
+  name="Yices"
+  version="1.0.13"/>
+ <prover
+  id="z3-2"
+  name="Z3"
+  version="2.13"/>
+ <prover
+  id="z3-3"
+  name="Z3"
+  version="2.13"/>
+ <file
+  name="../vacid_0_red_black_trees.mlw"
+  verified="false"
+  expanded="true">
+  <theory
+   name="WP RedBlackTree"
+   verified="false"
+   expanded="true">
+   <goal
+    name="memt_color"
+    sum="2d4cd49968ed7b06819eedc8226bd6df"
+    proved="true"
+    expanded="false"
+    shape="amemtaNodeV7V0V2V4V1V3V5IamemtaNodeV6V0V2V4V1V3V5F">
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="lt_leaf"
+    sum="cecb418bcdcada12cbf8512e7922a706"
+    proved="true"
+    expanded="false"
+    shape="alt_treeV0aLeafF">
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+   <goal
+    name="gt_leaf"
+    sum="925aab62b6792bd10edc7abad8210618"
+    proved="true"
+    expanded="false"
+    shape="agt_treeV0aLeafF">
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="lt_tree_node"
+    sum="2e86ea6be0a0ba6934625297514fc29f"
+    proved="true"
+    expanded="false"
+    shape="alt_treeV0aNodeV5V3V1V2V4Iainfix <V1V0Ialt_treeV0V4Ialt_treeV0V3F">
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="gt_tree_node"
+    sum="ce462dc0158c3f410823000946f011af"
+    proved="true"
+    expanded="false"
+    shape="agt_treeV0aNodeV5V3V1V2V4Iainfix <V0V1Iagt_treeV0V4Iagt_treeV0V3F">
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="lt_node_lt"
+    sum="fe8d56153eb5e457be7e95fe7e2d3016"
+    proved="true"
+    expanded="false"
+    shape="ainfix <V1V0Ialt_treeV0aNodeV5V3V1V2V4F">
+    <proof
+     prover="coq"
+     timelimit="10"
+     edited="vacid_0_red_black_trees_WP_RedBlackTree_lt_node_lt_1.v"
+     obsolete="false">
+     <result status="valid" time="0.66"/>
+    </proof>
+   </goal>
+   <goal
+    name="gt_node_gt"
+    sum="215a2e62024cc49cc671e0668e85ff08"
+    proved="true"
+    expanded="false"
+    shape="ainfix <V0V1Iagt_treeV0aNodeV5V3V1V2V4F">
+    <proof
+     prover="coq"
+     timelimit="10"
+     edited="vacid_0_red_black_trees_WP_RedBlackTree_gt_node_gt_1.v"
+     obsolete="false">
+     <result status="valid" time="0.66"/>
+    </proof>
+   </goal>
+   <goal
+    name="lt_left"
+    sum="22f0f7df07e06a2e8b463d4dfcaff1ed"
+    proved="true"
+    expanded="false"
+    shape="alt_treeV0V3Ialt_treeV0aNodeV5V3V1V2V4F">
+    <proof
+     prover="cvc3-2.2"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.19"/>
+    </proof>
+   </goal>
+   <goal
+    name="lt_right"
+    sum="da1f5e36eaebaa5fc902562c325bfed9"
+    proved="true"
+    expanded="false"
+    shape="alt_treeV0V4Ialt_treeV0aNodeV5V3V1V2V4F">
+    <proof
+     prover="cvc3-2.2"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.08"/>
+    </proof>
+   </goal>
+   <goal
+    name="gt_left"
+    sum="616b7d4a296257a5ff41bb8b46e051e9"
+    proved="true"
+    expanded="false"
+    shape="agt_treeV0V3Iagt_treeV0aNodeV5V3V1V2V4F">
+    <proof
+     prover="cvc3-2.2"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.20"/>
+    </proof>
+   </goal>
+   <goal
+    name="gt_right"
+    sum="a05de662061c0f0d6ca00d187a0236e3"
+    proved="true"
+    expanded="false"
+    shape="agt_treeV0V4Iagt_treeV0aNodeV5V3V1V2V4F">
+    <proof
+     prover="cvc3-2.2"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.09"/>
+    </proof>
+   </goal>
+   <goal
+    name="lt_tree_not_in"
+    sum="f9fd0e3ace68045ff6bba1a583af1df7"
+    proved="true"
+    expanded="false"
+    shape="amemtV1V0V2NFIalt_treeV0V1F">
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
+    name="lt_tree_trans"
+    sum="000036c5cb5756f30ce0fe5908a055c2"
+    proved="true"
+    expanded="false"
+    shape="alt_treeV1V2Ialt_treeV0V2FIainfix <V0V1F">
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+   <goal
+    name="gt_tree_not_in"
+    sum="53e7007619bb5da37c5d238e4812cd21"
+    proved="true"
+    expanded="false"
+    shape="amemtV1V0V2NFIagt_treeV0V1F">
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+   <goal
+    name="gt_tree_trans"
+    sum="fe3bb7423538133c45ae791354168cb4"
+    proved="true"
+    expanded="false"
+    shape="agt_treeV1V2Iagt_treeV0V2FIainfix <V1V0F">
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="bst_Leaf"
+    sum="10a12b83e21cdc20e1105c013a79378e"
+    proved="true"
+    expanded="false"
+    shape="abstaLeaf">
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+   <goal
+    name="bst_left"
+    sum="90f462a387f51d4df370cff18762b537"
+    proved="true"
+    expanded="false"
+    shape="abstV2IabstaNodeV4V2V0V1V3F">
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="bst_right"
+    sum="9960ecc0e8aab3861477d85f5a8b8f29"
+    proved="true"
+    expanded="false"
+    shape="abstV3IabstaNodeV4V2V0V1V3F">
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="bst_color"
+    sum="5fb8033b565e20d0b0d54f768df11669"
+    proved="true"
+    expanded="false"
+    shape="abstaNodeV1V4V2V3V5IabstaNodeV0V4V2V3V5F">
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+   </goal>
+   <goal
+    name="rotate_left"
+    sum="2d552bfad8798d56c693b9362c13ab05"
+    proved="true"
+    expanded="false"
+    shape="abstaNodeV9aNodeV10V4V0V2V5V1V3V6IabstaNodeV7V4V0V2aNodeV8V5V1V3V6F">
+    <proof
+     prover="cvc3-2.2"
+     timelimit="10"
+     edited=""
+     obsolete="true">
+     <result status="timeout" time="10.04"/>
+    </proof>
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.39"/>
+    </proof>
+    <proof
+     prover="gappa"
+     timelimit="10"
+     edited=""
+     obsolete="true">
+     <result status="unknown" time="0.01"/>
+    </proof>
+   </goal>
+   <goal
+    name="rotate_right"
+    sum="7ab4fcdf237734b418bdc274840097f6"
+    proved="true"
+    expanded="false"
+    shape="abstaNodeV7V4V0V2aNodeV8V5V1V3V6IabstaNodeV9aNodeV10V4V0V2V5V1V3V6F">
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.39"/>
+    </proof>
+   </goal>
+   <goal
+    name="rbtree_Leaf"
+    sum="63652cb4fbcb2c00bcebcb99f1325d66"
+    proved="true"
+    expanded="false"
+    shape="arbtreec0aLeaf">
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="rbtree_Node1"
+    sum="dc50a762562f38d759ee285832534cf0"
+    proved="true"
+    expanded="false"
+    shape="arbtreec0aNodeaRedaLeafV0V1aLeafF">
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.11"/>
+    </proof>
+   </goal>
+   <goal
+    name="rbtree_left"
+    sum="bd5292c3d768c13baf062a84babcbd66"
+    proved="true"
+    expanded="false"
+    shape="arbtreeV5V2EIarbtreeV6aNodeV4V2V0V1V3EF">
+    <proof
+     prover="cvc3-2.2"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.09"/>
+    </proof>
+   </goal>
+   <goal
+    name="rbtree_right"
+    sum="d14c72ec6453eef35cf503404237f004"
+    proved="true"
+    expanded="false"
+    shape="arbtreeV5V3EIarbtreeV6aNodeV4V2V0V1V3EF">
+    <proof
+     prover="cvc3-2.2"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.20"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter find"
+    expl="parameter find"
+    sum="73a381f74a0bf99856331c1b4b1ab623"
+    proved="true"
+    expanded="false"
+    shape="CV0aLeafamemtV0V1V2NFaNodewVVVViainfix =V1V4amemtV0V1V5iainfix <V1V4amemtV0V1V7NFIamemtV3V1V8NFAamemtV0V1V9IamemtV3V1V9FAabstV3amemtV0V1V10NFIamemtV6V1V11NFAamemtV0V1V12IamemtV6V1V12FAabstV6IabstV0FF">
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.07"/>
+    </proof>
+   </goal>
+   <goal
+    name="rbtree_almost_rbtree"
+    sum="08d7961b9f0b5cc31f8985e2b848f6c7"
+    proved="true"
+    expanded="false"
+    shape="aalmost_rbtreeV0V1IarbtreeV0V1F">
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.04"/>
+    </proof>
+   </goal>
+   <goal
+    name="rbtree_almost_rbtree_ex"
+    sum="3b72d5a660607c9dbc7098e1379010fe"
+    proved="true"
+    expanded="false"
+    shape="aalmost_rbtreeV1V0EIarbtreeV2V0EF">
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="almost_rbtree_rbtree_black"
+    sum="8b71df1d8d7331e93dd23b6ee3305a90"
+    proved="true"
+    expanded="false"
+    shape="arbtreeV4aNodeaBlackV2V0V1V3Iaalmost_rbtreeV4aNodeaBlackV2V0V1V3F">
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter lbalance"
+    expl="parameter lbalance"
+    sum="84aa8058a719b84415961eea571f57a4"
+    proved="false"
+    expanded="true"
+    shape="CV0aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVViainfix =V11V1ainfix =V12V2amemtV3V11V12OamemtV0V11V12qamemtaNodeaRedaNodeaBlackV4V5V6V7V8V9aNodeaBlackV10V1V2V3V11V12FAarbtreeainfix +V13c1aNodeaRedaNodeaBlackV4V5V6V7V8V9aNodeaBlackV10V1V2V3IarbtreeV13V3Iaalmost_rbtreeV13V0FAabstaNodeaRedaNodeaBlackV4V5V6V7V8V9aNodeaBlackV10V1V2V3wiainfix =V14V1ainfix =V15V2amemtV3V14V15OamemtV0V14V15qamemtaNodeaBlackV0V1V2V3V14V15FAarbtreeainfix +V16c1aNodeaBlackV0V1V2V3IarbtreeV16V3Iaalmost_rbtreeV16V0FAabstaNodeaBlackV0V1V2V3IabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
+    <transf
+     name="split_goal"
+     proved="false"
+     expanded="true">
+     <goal
+      name="WP_parameter lbalance.1"
+      expl="parameter lbalance"
+      sum="d398e854c9851945d617f7ab22339efc"
+      proved="false"
+      expanded="true"
+      shape="CV0aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVViainfix =V11V1ainfix =V12V2amemtV3V11V12OamemtV0V11V12qamemtaNodeaRedaNodeaBlackV4V5V6V7V8V9aNodeaBlackV10V1V2V3V11V12FAarbtreeainfix +V13c1aNodeaRedaNodeaBlackV4V5V6V7V8V9aNodeaBlackV10V1V2V3IarbtreeV13V3Iaalmost_rbtreeV13V0FAabstaNodeaRedaNodeaBlackV4V5V6V7V8V9aNodeaBlackV10V1V2V3wtIabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
+      <transf
+       name="split_goal"
+       proved="false"
+       expanded="true">
+       <goal
+        name="WP_parameter lbalance.1.1"
+        expl="parameter lbalance"
+        sum="9b8c9b82f789a649cf67d9314997b1d9"
+        proved="true"
+        expanded="false"
+        shape="CV0aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVabstaNodeaRedaNodeaBlackV4V5V6V7V8V9aNodeaBlackV10V1V2V3wtIabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
+        <proof
+         prover="z3-3"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="2.05"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter lbalance.1.2"
+        expl="parameter lbalance"
+        sum="bc24a4cc96de25047ad073ae9625a0dc"
+        proved="false"
+        expanded="true"
+        shape="CV0aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVarbtreeainfix +V11c1aNodeaRedaNodeaBlackV4V5V6V7V8V9aNodeaBlackV10V1V2V3IarbtreeV11V3Iaalmost_rbtreeV11V0FwtIabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
+        <proof
+         prover="z3-3"
+         timelimit="30"
+         edited=""
+         obsolete="false">
+         <result status="unknown" time="0.74"/>
+        </proof>
+        <proof
+         prover="cvc3-2.2"
+         timelimit="30"
+         edited=""
+         obsolete="false">
+         <result status="timeout" time="30.07"/>
+        </proof>
+        <proof
+         prover="alt-ergo"
+         timelimit="30"
+         edited=""
+         obsolete="false">
+         <result status="timeout" time="30.05"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter lbalance.1.3"
+        expl="parameter lbalance"
+        sum="67639debbccff868a745a8c4f71399e7"
+        proved="false"
+        expanded="true"
+        shape="CV0aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVainfix =V12V2Iainfix =V11V1IamemtaNodeaRedaNodeaBlackV4V5V6V7V8V9aNodeaBlackV10V1V2V3V11V12FwtIabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
+        <proof
+         prover="z3-3"
+         timelimit="30"
+         edited=""
+         obsolete="false">
+         <result status="unknown" time="0.73"/>
+        </proof>
+        <proof
+         prover="cvc3-2.2"
+         timelimit="30"
+         edited=""
+         obsolete="false">
+         <result status="timeout" time="30.08"/>
+        </proof>
+        <proof
+         prover="alt-ergo"
+         timelimit="30"
+         edited=""
+         obsolete="false">
+         <result status="timeout" time="30.04"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter lbalance.1.4"
+        expl="parameter lbalance"
+        sum="2b996e21b1fb7af21fc80d951abf5942"
+        proved="true"
+        expanded="false"
+        shape="CV0aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVamemtV3V11V12OamemtV0V11V12Iainfix =V11V1NIamemtaNodeaRedaNodeaBlackV4V5V6V7V8V9aNodeaBlackV10V1V2V3V11V12FwtIabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="13"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="8.16"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter lbalance.1.5"
+        expl="parameter lbalance"
+        sum="d48f78a19073e0281badd68249093f8d"
+        proved="true"
+        expanded="false"
+        shape="CV0aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVamemtaNodeaRedaNodeaBlackV4V5V6V7V8V9aNodeaBlackV10V1V2V3V11V12Iiainfix =V11V1ainfix =V12V2amemtV3V11V12OamemtV0V11V12FwtIabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="14"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="7.75"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter lbalance.2"
+      expl="parameter lbalance"
+      sum="469db8687389ab50d285ba43e74117e5"
+      proved="true"
+      expanded="false"
+      shape="CV0aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVtwiainfix =V11V1ainfix =V12V2amemtV3V11V12OamemtV0V11V12qamemtaNodeaBlackV0V1V2V3V11V12FAarbtreeainfix +V13c1aNodeaBlackV0V1V2V3IarbtreeV13V3Iaalmost_rbtreeV13V0FAabstaNodeaBlackV0V1V2V3IabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
+      <transf
+       name="split_goal"
+       proved="true"
+       expanded="false">
+       <goal
+        name="WP_parameter lbalance.2.1"
+        expl="parameter lbalance"
+        sum="07179ebafc48dfe8265f57f624b37b62"
+        proved="true"
+        expanded="false"
+        shape="CV0aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVtwabstaNodeaBlackV0V1V2V3IabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.06"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter lbalance.2.2"
+        expl="parameter lbalance"
+        sum="e7df7407ce2ad764608ed230aac9438c"
+        proved="true"
+        expanded="false"
+        shape="CV0aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVtwarbtreeainfix +V11c1aNodeaBlackV0V1V2V3IarbtreeV11V3Iaalmost_rbtreeV11V0FIabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
+        <proof
+         prover="cvc3-2.2"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="1.31"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter lbalance.2.3"
+        expl="parameter lbalance"
+        sum="a65d353332e53a4c703c136b8b71d490"
+        proved="true"
+        expanded="false"
+        shape="CV0aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVtwainfix =V12V2Iainfix =V11V1IamemtaNodeaBlackV0V1V2V3V11V12FIabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="2.48"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter lbalance.2.4"
+        expl="parameter lbalance"
+        sum="2f7ada71178c7b2f213ebcc379139dcd"
+        proved="true"
+        expanded="false"
+        shape="CV0aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVtwamemtV3V11V12OamemtV0V11V12Iainfix =V11V1NIamemtaNodeaBlackV0V1V2V3V11V12FIabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.39"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter lbalance.2.5"
+        expl="parameter lbalance"
+        sum="623be14d373dd7dec770a95bf3d6c18b"
+        proved="true"
+        expanded="false"
+        shape="CV0aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVtwamemtaNodeaBlackV0V1V2V3V11V12Iiainfix =V11V1ainfix =V12V2amemtV3V11V12OamemtV0V11V12FIabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.46"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+    </transf>
+   </goal>
+   <goal
+    name="WP_parameter rbalance"
+    expl="parameter rbalance"
+    sum="16ab66f0e4f58cf2ef0187cb4a3fe1f2"
+    proved="false"
+    expanded="true"
+    shape="CV3aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVViainfix =V11V1ainfix =V12V2amemtV3V11V12OamemtV0V11V12qamemtaNodeaRedaNodeaBlackV0V1V2V4V5V6aNodeaBlackV7V8V9V10V11V12FAarbtreeainfix +V13c1aNodeaRedaNodeaBlackV0V1V2V4V5V6aNodeaBlackV7V8V9V10IarbtreeV13V0Iaalmost_rbtreeV13V3FAabstaNodeaRedaNodeaBlackV0V1V2V4V5V6aNodeaBlackV7V8V9V10wiainfix =V14V1ainfix =V15V2amemtV3V14V15OamemtV0V14V15qamemtaNodeaBlackV0V1V2V3V14V15FAarbtreeainfix +V16c1aNodeaBlackV0V1V2V3IarbtreeV16V0Iaalmost_rbtreeV16V3FAabstaNodeaBlackV0V1V2V3IabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
+    <transf
+     name="split_goal"
+     proved="false"
+     expanded="true">
+     <goal
+      name="WP_parameter rbalance.1"
+      expl="parameter rbalance"
+      sum="807fad2df096b8855f00457712b0fad1"
+      proved="false"
+      expanded="true"
+      shape="CV3aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVViainfix =V11V1ainfix =V12V2amemtV3V11V12OamemtV0V11V12qamemtaNodeaRedaNodeaBlackV0V1V2V4V5V6aNodeaBlackV7V8V9V10V11V12FAarbtreeainfix +V13c1aNodeaRedaNodeaBlackV0V1V2V4V5V6aNodeaBlackV7V8V9V10IarbtreeV13V0Iaalmost_rbtreeV13V3FAabstaNodeaRedaNodeaBlackV0V1V2V4V5V6aNodeaBlackV7V8V9V10wtIabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
+      <transf
+       name="split_goal"
+       proved="false"
+       expanded="true">
+       <goal
+        name="WP_parameter rbalance.1.1"
+        expl="parameter rbalance"
+        sum="5f2aba11ccb5e2a49c21790f40cf984a"
+        proved="true"
+        expanded="false"
+        shape="CV3aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVabstaNodeaRedaNodeaBlackV0V1V2V4V5V6aNodeaBlackV7V8V9V10wtIabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
+        <proof
+         prover="z3-3"
+         timelimit="30"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="1.84"/>
+        </proof>
+        <proof
+         prover="alt-ergo"
+         timelimit="30"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="18.73"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter rbalance.1.2"
+        expl="parameter rbalance"
+        sum="12824fba5c7a9ce0d613969ac51503a6"
+        proved="false"
+        expanded="true"
+        shape="CV3aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVarbtreeainfix +V11c1aNodeaRedaNodeaBlackV0V1V2V4V5V6aNodeaBlackV7V8V9V10IarbtreeV11V0Iaalmost_rbtreeV11V3FwtIabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
+        <proof
+         prover="z3-3"
+         timelimit="30"
+         edited=""
+         obsolete="false">
+         <result status="unknown" time="0.46"/>
+        </proof>
+        <proof
+         prover="cvc3-2.2"
+         timelimit="30"
+         edited=""
+         obsolete="false">
+         <result status="timeout" time="30.06"/>
+        </proof>
+        <proof
+         prover="alt-ergo"
+         timelimit="30"
+         edited=""
+         obsolete="false">
+         <result status="timeout" time="30.05"/>
+        </proof>
+        <transf
+         name="inline_goal"
+         proved="false"
+         expanded="true">
+         <goal
+          name="WP_parameter rbalance.1.2.1"
+          expl="parameter rbalance"
+          sum="2952b780cff7b1d09a3482b80c4a1161"
+          proved="false"
+          expanded="true"
+          shape="CV3aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVarbtreeainfix +V11c1aNodeaRedaNodeaBlackV0V1V2V4V5V6aNodeaBlackV7V8V9V10IarbtreeV11V0ICV3aLeafainfix =V11c0aNodeaRedVwwVarbtreeV11V13AarbtreeV11V12aNodeaBlackVwwVarbtreeainfix -V11c1V15Aarbtreeainfix -V11c1V14FwtIabstV3AabstV0Aainfix <V1V16IamemtV3V16V17FFAainfix <V18V1IamemtV0V18V19FFFFFF">
+          <proof
+           prover="z3-2"
+           timelimit="30"
+           edited=""
+           obsolete="false">
+           <result status="unknown" time="0.49"/>
+          </proof>
+          <proof
+           prover="cvc3-2.2"
+           timelimit="30"
+           edited=""
+           obsolete="false">
+           <result status="timeout" time="30.08"/>
+          </proof>
+          <proof
+           prover="alt-ergo"
+           timelimit="30"
+           edited=""
+           obsolete="false">
+           <result status="timeout" time="30.10"/>
+          </proof>
+         </goal>
+        </transf>
+       </goal>
+       <goal
+        name="WP_parameter rbalance.1.3"
+        expl="parameter rbalance"
+        sum="6fd435c406d28e0ccd0b9b04627ab662"
+        proved="false"
+        expanded="true"
+        shape="CV3aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVainfix =V12V2Iainfix =V11V1IamemtaNodeaRedaNodeaBlackV0V1V2V4V5V6aNodeaBlackV7V8V9V10V11V12FwtIabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
+        <proof
+         prover="z3-3"
+         timelimit="30"
+         edited=""
+         obsolete="false">
+         <result status="unknown" time="0.30"/>
+        </proof>
+        <proof
+         prover="cvc3-2.2"
+         timelimit="30"
+         edited=""
+         obsolete="false">
+         <result status="timeout" time="30.03"/>
+        </proof>
+        <proof
+         prover="alt-ergo"
+         timelimit="30"
+         edited=""
+         obsolete="false">
+         <result status="timeout" time="30.09"/>
+        </proof>
+        <transf
+         name="inline_goal"
+         proved="false"
+         expanded="true">
+         <goal
+          name="WP_parameter rbalance.1.3.1"
+          expl="parameter rbalance"
+          sum="7cab314c97bdf6a5841e32be5b6c3a5c"
+          proved="false"
+          expanded="true"
+          shape="CV3aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVainfix =V12V2Iainfix =V11V1IamemtaNodeaRedaNodeaBlackV0V1V2V4V5V6aNodeaBlackV7V8V9V10V11V12FwtIabstV3AabstV0Aainfix <V1V13IamemtV3V13V14FFAainfix <V15V1IamemtV0V15V16FFFFFF">
+          <proof
+           prover="z3-2"
+           timelimit="30"
+           edited=""
+           obsolete="false">
+           <result status="unknown" time="0.20"/>
+          </proof>
+          <proof
+           prover="cvc3-2.2"
+           timelimit="30"
+           edited=""
+           obsolete="false">
+           <result status="timeout" time="30.06"/>
+          </proof>
+          <proof
+           prover="alt-ergo"
+           timelimit="30"
+           edited=""
+           obsolete="false">
+           <result status="timeout" time="30.10"/>
+          </proof>
+         </goal>
+        </transf>
+       </goal>
+       <goal
+        name="WP_parameter rbalance.1.4"
+        expl="parameter rbalance"
+        sum="656fa281ead0a3b0523ab5a9f58817e3"
+        proved="true"
+        expanded="false"
+        shape="CV3aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVamemtV3V11V12OamemtV0V11V12Iainfix =V11V1NIamemtaNodeaRedaNodeaBlackV0V1V2V4V5V6aNodeaBlackV7V8V9V10V11V12FwtIabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="7.53"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter rbalance.1.5"
+        expl="parameter rbalance"
+        sum="e97391975c2bed4de908c5f5707c75c8"
+        proved="true"
+        expanded="false"
+        shape="CV3aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVamemtaNodeaRedaNodeaBlackV0V1V2V4V5V6aNodeaBlackV7V8V9V10V11V12Iiainfix =V11V1ainfix =V12V2amemtV3V11V12OamemtV0V11V12FwtIabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="12"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="6.11"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter rbalance.2"
+      expl="parameter rbalance"
+      sum="71780cd70918a6700cd6ac9c79a7ea4c"
+      proved="true"
+      expanded="false"
+      shape="CV3aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVtwiainfix =V11V1ainfix =V12V2amemtV3V11V12OamemtV0V11V12qamemtaNodeaBlackV0V1V2V3V11V12FAarbtreeainfix +V13c1aNodeaBlackV0V1V2V3IarbtreeV13V0Iaalmost_rbtreeV13V3FAabstaNodeaBlackV0V1V2V3IabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
+      <proof
+       prover="cvc3-2.2"
+       timelimit="16"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="14.07"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+   <goal
+    name="WP_parameter insert"
+    expl="parameter insert"
+    sum="e2b7da1f9004135f294ed193660c4a96"
+    proved="true"
+    expanded="false"
+    shape="CV0aLeafiainfix =V3V1ainfix =V4V2amemtV0V3V4qamemtaNodeaRedaLeafV1V2aLeafV3V4FAamemtaNodeaRedaLeafV1V2aLeafV1V2AarbtreeV5aNodeaRedaLeafV1V2aLeafICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV5aNodeaRedaLeafV1V2aLeafIarbtreeV5V0FAabstaNodeaRedaLeafV1V2aLeafaNodeaRedVVVViainfix <V1V7iainfix =V11V1ainfix =V12V2amemtV0V11V12qamemtaNodeaRedV10V7V8V9V11V12FAamemtaNodeaRedV10V7V8V9V1V2AarbtreeV13aNodeaRedV10V7V8V9ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV13aNodeaRedV10V7V8V9IarbtreeV13V0FAabstaNodeaRedV10V7V8V9Iiainfix =V14V1ainfix =V15V2amemtV6V14V15qamemtV10V14V15FAamemtV10V1V2AarbtreeV16V10ICV6aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV16V10IarbtreeV16V6FAabstV10FAarbtreeV17V6EAabstV6iainfix <V7V1iainfix =V19V1ainfix =V20V2amemtV0V19V20qamemtaNodeaRedV6V7V8V18V19V20FAamemtaNodeaRedV6V7V8V18V1V2AarbtreeV21aNodeaRedV6V7V8V18ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV21aNodeaRedV6V7V8V18IarbtreeV21V0FAabstaNodeaRedV6V7V8V18Iiainfix =V22V1ainfix =V23V2amemtV9V22V23qamemtV18V22V23FAamemtV18V1V2AarbtreeV24V18ICV9aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV24V18IarbtreeV24V9FAabstV18FAarbtreeV25V9EAabstV9iainfix =V26V1ainfix =V27V2amemtV0V26V27qamemtaNodeaRedV6V7V2V9V26V27FAamemtaNodeaRedV6V7V2V9V1V2AarbtreeV28aNodeaRedV6V7V2V9ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV28aNodeaRedV6V7V2V9IarbtreeV28V0FAabstaNodeaRedV6V7V2V9aNodeaBlackVVVViainfix <V1V30iainfix =V35V1ainfix =V36V2amemtV0V35V36qamemtV34V35V36FAamemtV34V1V2AarbtreeV37V34ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV37V34IarbtreeV37V0FAabstV34Iiainfix =V38V30ainfix =V39V31amemtV32V38V39OamemtV33V38V39qamemtV34V38V39FAarbtreeainfix +V40c1V34IarbtreeV40V32Iaalmost_rbtreeV40V33FAabstV34FAabstV32AabstV33Aagt_treeV30V32Aalt_treeV30V33Iiainfix =V41V1ainfix =V42V2amemtV29V41V42qamemtV33V41V42FAamemtV33V1V2AarbtreeV43V33ICV29aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV43V33IarbtreeV43V29FAabstV33FAarbtreeV44V29EAabstV29iainfix <V30V1iainfix =V47V1ainfix =V48V2amemtV0V47V48qamemtV46V47V48FAamemtV46V1V2AarbtreeV49V46ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV49V46IarbtreeV49V0FAabstV46Iiainfix =V50V30ainfix =V51V31amemtV45V50V51OamemtV29V50V51qamemtV46V50V51FAarbtreeainfix +V52c1V46IarbtreeV52V29Iaalmost_rbtreeV52V45FAabstV46FAabstV45AabstV29Aagt_treeV30V45Aalt_treeV30V29Iiainfix =V53V1ainfix =V54V2amemtV32V53V54qamemtV45V53V54FAamemtV45V1V2AarbtreeV55V45ICV32aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV55V45IarbtreeV55V32FAabstV45FAarbtreeV56V32EAabstV32iainfix =V57V1ainfix =V58V2amemtV0V57V58qamemtaNodeaBlackV29V30V2V32V57V58FAamemtaNodeaBlackV29V30V2V32V1V2AarbtreeV59aNodeaBlackV29V30V2V32ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV59aNodeaBlackV29V30V2V32IarbtreeV59V0FAabstaNodeaBlackV29V30V2V32IarbtreeV60V0EAabstV0FFF">
+    <transf
+     name="split_goal"
+     proved="true"
+     expanded="false">
+     <goal
+      name="WP_parameter insert.1"
+      expl="parameter insert"
+      sum="c31b12c709040863d6f49b55e272f18d"
+      proved="true"
+      expanded="false"
+      shape="CV0aLeafiainfix =V3V1ainfix =V4V2amemtV0V3V4qamemtaNodeaRedaLeafV1V2aLeafV3V4FAamemtaNodeaRedaLeafV1V2aLeafV1V2AarbtreeV5aNodeaRedaLeafV1V2aLeafICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV5aNodeaRedaLeafV1V2aLeafIarbtreeV5V0FAabstaNodeaRedaLeafV1V2aLeafaNodeaRedVVVVtaNodeaBlackVVVVtIarbtreeV14V0EAabstV0FFF">
+      <proof
+       prover="alt-ergo"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.62"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insert.2"
+      expl="parameter insert"
+      sum="c864e931a410858a66caef45b0452c38"
+      proved="true"
+      expanded="false"
+      shape="CV0aLeaftaNodeaRedVVVVarbtreeV7V3EAabstV3Iainfix <V1V4aNodeaBlackVVVVtIarbtreeV12V0EAabstV0FFF">
+      <proof
+       prover="alt-ergo"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.13"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insert.3"
+      expl="parameter insert"
+      sum="ae424572f47d27d3a78151f09c9bed4d"
+      proved="true"
+      expanded="false"
+      shape="CV0aLeaftaNodeaRedVVVViainfix =V8V1ainfix =V9V2amemtV0V8V9qamemtaNodeaRedV7V4V5V6V8V9FAamemtaNodeaRedV7V4V5V6V1V2AarbtreeV10aNodeaRedV7V4V5V6ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV10aNodeaRedV7V4V5V6IarbtreeV10V0FAabstaNodeaRedV7V4V5V6Iiainfix =V11V1ainfix =V12V2amemtV3V11V12qamemtV7V11V12FAamemtV7V1V2AarbtreeV13V7ICV3aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV13V7IarbtreeV13V3FAabstV7FIarbtreeV14V3EAabstV3Iainfix <V1V4aNodeaBlackVVVVtIarbtreeV19V0EAabstV0FFF">
+      <transf
+       name="split_goal"
+       proved="true"
+       expanded="false">
+       <goal
+        name="WP_parameter insert.3.1"
+        expl="parameter insert"
+        sum="4a4e276c9e6f03ef2ec1e0a5fd353234"
+        proved="true"
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVabstaNodeaRedV7V4V5V6Iiainfix =V8V1ainfix =V9V2amemtV3V8V9qamemtV7V8V9FAamemtV7V1V2AarbtreeV10V7ICV3aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV10V7IarbtreeV10V3FAabstV7FIarbtreeV11V3EAabstV3Iainfix <V1V4aNodeaBlackVVVVtIarbtreeV16V0EAabstV0FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.36"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter insert.3.2"
+        expl="parameter insert"
+        sum="1eae0b2bb8040a24a42d90e471f79b42"
+        proved="true"
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVaalmost_rbtreeV8aNodeaRedV7V4V5V6IarbtreeV8V0FIiainfix =V9V1ainfix =V10V2amemtV3V9V10qamemtV7V9V10FAamemtV7V1V2AarbtreeV11V7ICV3aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV11V7IarbtreeV11V3FAabstV7FIarbtreeV12V3EAabstV3Iainfix <V1V4aNodeaBlackVVVVtIarbtreeV17V0EAabstV0FFF">
+        <proof
+         prover="cvc3-2.2"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="2.98"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter insert.3.3"
+        expl="parameter insert"
+        sum="39292848e40587d60651f9834c4a8560"
+        proved="true"
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVarbtreeV8aNodeaRedV7V4V5V6ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftIarbtreeV8V0FIiainfix =V9V1ainfix =V10V2amemtV3V9V10qamemtV7V9V10FAamemtV7V1V2AarbtreeV11V7ICV3aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV11V7IarbtreeV11V3FAabstV7FIarbtreeV12V3EAabstV3Iainfix <V1V4aNodeaBlackVVVVtIarbtreeV17V0EAabstV0FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.36"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter insert.3.4"
+        expl="parameter insert"
+        sum="3a08961538198ee6a6a461f64f710ba1"
+        proved="true"
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVamemtaNodeaRedV7V4V5V6V1V2Iiainfix =V8V1ainfix =V9V2amemtV3V8V9qamemtV7V8V9FAamemtV7V1V2AarbtreeV10V7ICV3aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV10V7IarbtreeV10V3FAabstV7FIarbtreeV11V3EAabstV3Iainfix <V1V4aNodeaBlackVVVVtIarbtreeV16V0EAabstV0FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter insert.3.5"
+        expl="parameter insert"
+        sum="45906b89c8454cef53c0642ee0a52dd4"
+        proved="true"
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVainfix =V9V2Iainfix =V8V1IamemtaNodeaRedV7V4V5V6V8V9FIiainfix =V10V1ainfix =V11V2amemtV3V10V11qamemtV7V10V11FAamemtV7V1V2AarbtreeV12V7ICV3aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV12V7IarbtreeV12V3FAabstV7FIarbtreeV13V3EAabstV3Iainfix <V1V4aNodeaBlackVVVVtIarbtreeV18V0EAabstV0FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="1.47"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter insert.3.6"
+        expl="parameter insert"
+        sum="f63d2f324e31ad70020e1d2d11216840"
+        proved="true"
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVamemtV0V8V9Iainfix =V8V1NIamemtaNodeaRedV7V4V5V6V8V9FIiainfix =V10V1ainfix =V11V2amemtV3V10V11qamemtV7V10V11FAamemtV7V1V2AarbtreeV12V7ICV3aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV12V7IarbtreeV12V3FAabstV7FIarbtreeV13V3EAabstV3Iainfix <V1V4aNodeaBlackVVVVtIarbtreeV18V0EAabstV0FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.06"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter insert.3.7"
+        expl="parameter insert"
+        sum="cc7b5725f49d199e6e1d2bbd3df16b86"
+        proved="true"
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVamemtaNodeaRedV7V4V5V6V8V9Iiainfix =V8V1ainfix =V9V2amemtV0V8V9FIiainfix =V10V1ainfix =V11V2amemtV3V10V11qamemtV7V10V11FAamemtV7V1V2AarbtreeV12V7ICV3aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV12V7IarbtreeV12V3FAabstV7FIarbtreeV13V3EAabstV3Iainfix <V1V4aNodeaBlackVVVVtIarbtreeV18V0EAabstV0FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.12"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter insert.4"
+      expl="parameter insert"
+      sum="0356840a3a41ab5a2eb9300278e89444"
+      proved="true"
+      expanded="false"
+      shape="CV0aLeaftaNodeaRedVVVVarbtreeV7V6EAabstV6Iainfix <V4V1Iainfix <V1V4NaNodeaBlackVVVVtIarbtreeV12V0EAabstV0FFF">
+      <proof
+       prover="alt-ergo"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.18"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insert.5"
+      expl="parameter insert"
+      sum="e1fcfce16aa8d7b958ae833586f157e4"
+      proved="true"
+      expanded="false"
+      shape="CV0aLeaftaNodeaRedVVVViainfix =V8V1ainfix =V9V2amemtV0V8V9qamemtaNodeaRedV3V4V5V7V8V9FAamemtaNodeaRedV3V4V5V7V1V2AarbtreeV10aNodeaRedV3V4V5V7ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV10aNodeaRedV3V4V5V7IarbtreeV10V0FAabstaNodeaRedV3V4V5V7Iiainfix =V11V1ainfix =V12V2amemtV6V11V12qamemtV7V11V12FAamemtV7V1V2AarbtreeV13V7ICV6aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV13V7IarbtreeV13V6FAabstV7FIarbtreeV14V6EAabstV6Iainfix <V4V1Iainfix <V1V4NaNodeaBlackVVVVtIarbtreeV19V0EAabstV0FFF">
+      <transf
+       name="split_goal"
+       proved="true"
+       expanded="false">
+       <goal
+        name="WP_parameter insert.5.1"
+        expl="parameter insert"
+        sum="e38e079d065dd2be532955a28142a1b2"
+        proved="true"
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVabstaNodeaRedV3V4V5V7Iiainfix =V8V1ainfix =V9V2amemtV6V8V9qamemtV7V8V9FAamemtV7V1V2AarbtreeV10V7ICV6aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV10V7IarbtreeV10V6FAabstV7FIarbtreeV11V6EAabstV6Iainfix <V4V1Iainfix <V1V4NaNodeaBlackVVVVtIarbtreeV16V0EAabstV0FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.31"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter insert.5.2"
+        expl="parameter insert"
+        sum="c93f07aeed83c4e9399a171c281227e5"
+        proved="true"
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVaalmost_rbtreeV8aNodeaRedV3V4V5V7IarbtreeV8V0FIiainfix =V9V1ainfix =V10V2amemtV6V9V10qamemtV7V9V10FAamemtV7V1V2AarbtreeV11V7ICV6aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV11V7IarbtreeV11V6FAabstV7FIarbtreeV12V6EAabstV6Iainfix <V4V1Iainfix <V1V4NaNodeaBlackVVVVtIarbtreeV17V0EAabstV0FFF">
+        <proof
+         prover="cvc3-2.2"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="3.04"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter insert.5.3"
+        expl="parameter insert"
+        sum="5235d8e4ea345deca8a3f51ba2362845"
+        proved="true"
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVarbtreeV8aNodeaRedV3V4V5V7ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftIarbtreeV8V0FIiainfix =V9V1ainfix =V10V2amemtV6V9V10qamemtV7V9V10FAamemtV7V1V2AarbtreeV11V7ICV6aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV11V7IarbtreeV11V6FAabstV7FIarbtreeV12V6EAabstV6Iainfix <V4V1Iainfix <V1V4NaNodeaBlackVVVVtIarbtreeV17V0EAabstV0FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.51"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter insert.5.4"
+        expl="parameter insert"
+        sum="e47c496a18f06cffb0340eb5022d3f99"
+        proved="true"
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVamemtaNodeaRedV3V4V5V7V1V2Iiainfix =V8V1ainfix =V9V2amemtV6V8V9qamemtV7V8V9FAamemtV7V1V2AarbtreeV10V7ICV6aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV10V7IarbtreeV10V6FAabstV7FIarbtreeV11V6EAabstV6Iainfix <V4V1Iainfix <V1V4NaNodeaBlackVVVVtIarbtreeV16V0EAabstV0FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.03"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter insert.5.5"
+        expl="parameter insert"
+        sum="26fea8aea267caef4e576c7108df80d6"
+        proved="true"
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVainfix =V9V2Iainfix =V8V1IamemtaNodeaRedV3V4V5V7V8V9FIiainfix =V10V1ainfix =V11V2amemtV6V10V11qamemtV7V10V11FAamemtV7V1V2AarbtreeV12V7ICV6aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV12V7IarbtreeV12V6FAabstV7FIarbtreeV13V6EAabstV6Iainfix <V4V1Iainfix <V1V4NaNodeaBlackVVVVtIarbtreeV18V0EAabstV0FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="1.54"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter insert.5.6"
+        expl="parameter insert"
+        sum="e28f7cd5b0d72435d9c24f18a673cfe7"
+        proved="true"
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVamemtV0V8V9Iainfix =V8V1NIamemtaNodeaRedV3V4V5V7V8V9FIiainfix =V10V1ainfix =V11V2amemtV6V10V11qamemtV7V10V11FAamemtV7V1V2AarbtreeV12V7ICV6aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV12V7IarbtreeV12V6FAabstV7FIarbtreeV13V6EAabstV6Iainfix <V4V1Iainfix <V1V4NaNodeaBlackVVVVtIarbtreeV18V0EAabstV0FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.08"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter insert.5.7"
+        expl="parameter insert"
+        sum="e869c9c38a6c276045cc37b88e9fcb90"
+        proved="true"
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVamemtaNodeaRedV3V4V5V7V8V9Iiainfix =V8V1ainfix =V9V2amemtV0V8V9FIiainfix =V10V1ainfix =V11V2amemtV6V10V11qamemtV7V10V11FAamemtV7V1V2AarbtreeV12V7ICV6aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV12V7IarbtreeV12V6FAabstV7FIarbtreeV13V6EAabstV6Iainfix <V4V1Iainfix <V1V4NaNodeaBlackVVVVtIarbtreeV18V0EAabstV0FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.18"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter insert.6"
+      expl="parameter insert"
+      sum="c1afca24e173d50f01db39b339817ecf"
+      proved="true"
+      expanded="false"
+      shape="CV0aLeaftaNodeaRedVVVViainfix =V7V1ainfix =V8V2amemtV0V7V8qamemtaNodeaRedV3V4V2V6V7V8FAamemtaNodeaRedV3V4V2V6V1V2AarbtreeV9aNodeaRedV3V4V2V6ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV9aNodeaRedV3V4V2V6IarbtreeV9V0FAabstaNodeaRedV3V4V2V6Iainfix <V4V1NIainfix <V1V4NaNodeaBlackVVVVtIarbtreeV14V0EAabstV0FFF">
+      <proof
+       prover="alt-ergo"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.52"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insert.7"
+      expl="parameter insert"
+      sum="7d10b66a819aefff82cd5110d528117a"
+      proved="true"
+      expanded="false"
+      shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVarbtreeV11V7EAabstV7Iainfix <V1V8IarbtreeV12V0EAabstV0FFF">
+      <proof
+       prover="alt-ergo"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.80"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insert.8"
+      expl="parameter insert"
+      sum="e4d80d2a3ed78395cb3e0e3b3f11e693"
+      proved="true"
+      expanded="false"
+      shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVabstV10AabstV11Aagt_treeV8V10Aalt_treeV8V11Iiainfix =V12V1ainfix =V13V2amemtV7V12V13qamemtV11V12V13FAamemtV11V1V2AarbtreeV14V11ICV7aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV14V11IarbtreeV14V7FAabstV11FIarbtreeV15V7EAabstV7Iainfix <V1V8IarbtreeV16V0EAabstV0FFF">
+      <proof
+       prover="alt-ergo"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.90"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insert.9"
+      expl="parameter insert"
+      sum="affa33a573bcf9758aa79787a9072ddb"
+      proved="true"
+      expanded="false"
+      shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVViainfix =V13V1ainfix =V14V2amemtV0V13V14qamemtV12V13V14FAamemtV12V1V2AarbtreeV15V12ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV15V12IarbtreeV15V0FAabstV12Iiainfix =V16V8ainfix =V17V9amemtV10V16V17OamemtV11V16V17qamemtV12V16V17FAarbtreeainfix +V18c1V12IarbtreeV18V10Iaalmost_rbtreeV18V11FAabstV12FIabstV10AabstV11Aagt_treeV8V10Aalt_treeV8V11Iiainfix =V19V1ainfix =V20V2amemtV7V19V20qamemtV11V19V20FAamemtV11V1V2AarbtreeV21V11ICV7aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV21V11IarbtreeV21V7FAabstV11FIarbtreeV22V7EAabstV7Iainfix <V1V8IarbtreeV23V0EAabstV0FFF">
+      <transf
+       name="split_goal"
+       proved="true"
+       expanded="false">
+       <goal
+        name="WP_parameter insert.9.1"
+        expl="parameter insert"
+        sum="03073055de5e8d3ceec799357e16fcf0"
+        proved="true"
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVabstV12Iiainfix =V13V8ainfix =V14V9amemtV10V13V14OamemtV11V13V14qamemtV12V13V14FAarbtreeainfix +V15c1V12IarbtreeV15V10Iaalmost_rbtreeV15V11FAabstV12FIabstV10AabstV11Aagt_treeV8V10Aalt_treeV8V11Iiainfix =V16V1ainfix =V17V2amemtV7V16V17qamemtV11V16V17FAamemtV11V1V2AarbtreeV18V11ICV7aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV18V11IarbtreeV18V7FAabstV11FIarbtreeV19V7EAabstV7Iainfix <V1V8IarbtreeV20V0EAabstV0FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.03"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter insert.9.2"
+        expl="parameter insert"
+        sum="33a64cbbcb193a1ad801c0ba3af2bd8b"
+        proved="true"
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVaalmost_rbtreeV13V12IarbtreeV13V0FIiainfix =V14V8ainfix =V15V9amemtV10V14V15OamemtV11V14V15qamemtV12V14V15FAarbtreeainfix +V16c1V12IarbtreeV16V10Iaalmost_rbtreeV16V11FAabstV12FIabstV10AabstV11Aagt_treeV8V10Aalt_treeV8V11Iiainfix =V17V1ainfix =V18V2amemtV7V17V18qamemtV11V17V18FAamemtV11V1V2AarbtreeV19V11ICV7aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV19V11IarbtreeV19V7FAabstV11FIarbtreeV20V7EAabstV7Iainfix <V1V8IarbtreeV21V0EAabstV0FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="50"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.26"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter insert.9.3"
+        expl="parameter insert"
+        sum="893f092afad20ec1643a98244a880fc9"
+        proved="true"
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVarbtreeV13V12ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftIarbtreeV13V0FIiainfix =V14V8ainfix =V15V9amemtV10V14V15OamemtV11V14V15qamemtV12V14V15FAarbtreeainfix +V16c1V12IarbtreeV16V10Iaalmost_rbtreeV16V11FAabstV12FIabstV10AabstV11Aagt_treeV8V10Aalt_treeV8V11Iiainfix =V17V1ainfix =V18V2amemtV7V17V18qamemtV11V17V18FAamemtV11V1V2AarbtreeV19V11ICV7aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV19V11IarbtreeV19V7FAabstV11FIarbtreeV20V7EAabstV7Iainfix <V1V8IarbtreeV21V0EAabstV0FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="2.54"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter insert.9.4"
+        expl="parameter insert"
+        sum="8f3475743755230a466b8e092770210e"
+        proved="true"
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVamemtV12V1V2Iiainfix =V13V8ainfix =V14V9amemtV10V13V14OamemtV11V13V14qamemtV12V13V14FAarbtreeainfix +V15c1V12IarbtreeV15V10Iaalmost_rbtreeV15V11FAabstV12FIabstV10AabstV11Aagt_treeV8V10Aalt_treeV8V11Iiainfix =V16V1ainfix =V17V2amemtV7V16V17qamemtV11V16V17FAamemtV11V1V2AarbtreeV18V11ICV7aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV18V11IarbtreeV18V7FAabstV11FIarbtreeV19V7EAabstV7Iainfix <V1V8IarbtreeV20V0EAabstV0FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.03"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter insert.9.5"
+        expl="parameter insert"
+        sum="fe87db6580e58dc9f763e85700e4fa07"
+        proved="true"
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVainfix =V14V2Iainfix =V13V1IamemtV12V13V14FIiainfix =V15V8ainfix =V16V9amemtV10V15V16OamemtV11V15V16qamemtV12V15V16FAarbtreeainfix +V17c1V12IarbtreeV17V10Iaalmost_rbtreeV17V11FAabstV12FIabstV10AabstV11Aagt_treeV8V10Aalt_treeV8V11Iiainfix =V18V1ainfix =V19V2amemtV7V18V19qamemtV11V18V19FAamemtV11V1V2AarbtreeV20V11ICV7aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV20V11IarbtreeV20V7FAabstV11FIarbtreeV21V7EAabstV7Iainfix <V1V8IarbtreeV22V0EAabstV0FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="7.16"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter insert.9.6"
+        expl="parameter insert"
+        sum="2fc688678f16bc674ddd8cd9627b135b"
+        proved="true"
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVamemtV0V13V14Iainfix =V13V1NIamemtV12V13V14FIiainfix =V15V8ainfix =V16V9amemtV10V15V16OamemtV11V15V16qamemtV12V15V16FAarbtreeainfix +V17c1V12IarbtreeV17V10Iaalmost_rbtreeV17V11FAabstV12FIabstV10AabstV11Aagt_treeV8V10Aalt_treeV8V11Iiainfix =V18V1ainfix =V19V2amemtV7V18V19qamemtV11V18V19FAamemtV11V1V2AarbtreeV20V11ICV7aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV20V11IarbtreeV20V7FAabstV11FIarbtreeV21V7EAabstV7Iainfix <V1V8IarbtreeV22V0EAabstV0FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.07"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter insert.9.7"
+        expl="parameter insert"
+        sum="60ac96fd6501be7b51bf52930a27fd4c"
+        proved="true"
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVamemtV12V13V14Iiainfix =V13V1ainfix =V14V2amemtV0V13V14FIiainfix =V15V8ainfix =V16V9amemtV10V15V16OamemtV11V15V16qamemtV12V15V16FAarbtreeainfix +V17c1V12IarbtreeV17V10Iaalmost_rbtreeV17V11FAabstV12FIabstV10AabstV11Aagt_treeV8V10Aalt_treeV8V11Iiainfix =V18V1ainfix =V19V2amemtV7V18V19qamemtV11V18V19FAamemtV11V1V2AarbtreeV20V11ICV7aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV20V11IarbtreeV20V7FAabstV11FIarbtreeV21V7EAabstV7Iainfix <V1V8IarbtreeV22V0EAabstV0FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="2.22"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter insert.10"
+      expl="parameter insert"
+      sum="eef19a491c74399eb8d4d2ba627f7c9b"
+      proved="true"
+      expanded="false"
+      shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVarbtreeV11V10EAabstV10Iainfix <V8V1Iainfix <V1V8NIarbtreeV12V0EAabstV0FFF">
+      <proof
+       prover="alt-ergo"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.80"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insert.11"
+      expl="parameter insert"
+      sum="8bdef66f45b39f5bab57bb0388fa69cc"
+      proved="true"
+      expanded="false"
+      shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVabstV11AabstV7Aagt_treeV8V11Aalt_treeV8V7Iiainfix =V12V1ainfix =V13V2amemtV10V12V13qamemtV11V12V13FAamemtV11V1V2AarbtreeV14V11ICV10aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV14V11IarbtreeV14V10FAabstV11FIarbtreeV15V10EAabstV10Iainfix <V8V1Iainfix <V1V8NIarbtreeV16V0EAabstV0FFF">
+      <proof
+       prover="alt-ergo"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.98"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insert.12"
+      expl="parameter insert"
+      sum="a395d55f496ea15888f2ee8274ed1cc7"
+      proved="true"
+      expanded="false"
+      shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVViainfix =V13V1ainfix =V14V2amemtV0V13V14qamemtV12V13V14FAamemtV12V1V2AarbtreeV15V12ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV15V12IarbtreeV15V0FAabstV12Iiainfix =V16V8ainfix =V17V9amemtV11V16V17OamemtV7V16V17qamemtV12V16V17FAarbtreeainfix +V18c1V12IarbtreeV18V7Iaalmost_rbtreeV18V11FAabstV12FIabstV11AabstV7Aagt_treeV8V11Aalt_treeV8V7Iiainfix =V19V1ainfix =V20V2amemtV10V19V20qamemtV11V19V20FAamemtV11V1V2AarbtreeV21V11ICV10aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV21V11IarbtreeV21V10FAabstV11FIarbtreeV22V10EAabstV10Iainfix <V8V1Iainfix <V1V8NIarbtreeV23V0EAabstV0FFF">
+      <transf
+       name="split_goal"
+       proved="true"
+       expanded="false">
+       <goal
+        name="WP_parameter insert.12.1"
+        expl="parameter insert"
+        sum="da04378c7fa7b6b979c508ccc51c1a8b"
+        proved="true"
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVabstV12Iiainfix =V13V8ainfix =V14V9amemtV11V13V14OamemtV7V13V14qamemtV12V13V14FAarbtreeainfix +V15c1V12IarbtreeV15V7Iaalmost_rbtreeV15V11FAabstV12FIabstV11AabstV7Aagt_treeV8V11Aalt_treeV8V7Iiainfix =V16V1ainfix =V17V2amemtV10V16V17qamemtV11V16V17FAamemtV11V1V2AarbtreeV18V11ICV10aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV18V11IarbtreeV18V10FAabstV11FIarbtreeV19V10EAabstV10Iainfix <V8V1Iainfix <V1V8NIarbtreeV20V0EAabstV0FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.03"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter insert.12.2"
+        expl="parameter insert"
+        sum="99c1e46003acc96a369093fe2d7532ac"
+        proved="true"
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVaalmost_rbtreeV13V12IarbtreeV13V0FIiainfix =V14V8ainfix =V15V9amemtV11V14V15OamemtV7V14V15qamemtV12V14V15FAarbtreeainfix +V16c1V12IarbtreeV16V7Iaalmost_rbtreeV16V11FAabstV12FIabstV11AabstV7Aagt_treeV8V11Aalt_treeV8V7Iiainfix =V17V1ainfix =V18V2amemtV10V17V18qamemtV11V17V18FAamemtV11V1V2AarbtreeV19V11ICV10aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV19V11IarbtreeV19V10FAabstV11FIarbtreeV20V10EAabstV10Iainfix <V8V1Iainfix <V1V8NIarbtreeV21V0EAabstV0FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="48"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.31"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter insert.12.3"
+        expl="parameter insert"
+        sum="b3255299cca9ae03dd999286c94aa83c"
+        proved="true"
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVarbtreeV13V12ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftIarbtreeV13V0FIiainfix =V14V8ainfix =V15V9amemtV11V14V15OamemtV7V14V15qamemtV12V14V15FAarbtreeainfix +V16c1V12IarbtreeV16V7Iaalmost_rbtreeV16V11FAabstV12FIabstV11AabstV7Aagt_treeV8V11Aalt_treeV8V7Iiainfix =V17V1ainfix =V18V2amemtV10V17V18qamemtV11V17V18FAamemtV11V1V2AarbtreeV19V11ICV10aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV19V11IarbtreeV19V10FAabstV11FIarbtreeV20V10EAabstV10Iainfix <V8V1Iainfix <V1V8NIarbtreeV21V0EAabstV0FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="2.51"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter insert.12.4"
+        expl="parameter insert"
+        sum="b42a9c92b49df9f223279197e3d7711f"
+        proved="true"
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVamemtV12V1V2Iiainfix =V13V8ainfix =V14V9amemtV11V13V14OamemtV7V13V14qamemtV12V13V14FAarbtreeainfix +V15c1V12IarbtreeV15V7Iaalmost_rbtreeV15V11FAabstV12FIabstV11AabstV7Aagt_treeV8V11Aalt_treeV8V7Iiainfix =V16V1ainfix =V17V2amemtV10V16V17qamemtV11V16V17FAamemtV11V1V2AarbtreeV18V11ICV10aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV18V11IarbtreeV18V10FAabstV11FIarbtreeV19V10EAabstV10Iainfix <V8V1Iainfix <V1V8NIarbtreeV20V0EAabstV0FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.03"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter insert.12.5"
+        expl="parameter insert"
+        sum="02d15d0b7567e29275a2f16e692e75cc"
+        proved="true"
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVainfix =V14V2Iainfix =V13V1IamemtV12V13V14FIiainfix =V15V8ainfix =V16V9amemtV11V15V16OamemtV7V15V16qamemtV12V15V16FAarbtreeainfix +V17c1V12IarbtreeV17V7Iaalmost_rbtreeV17V11FAabstV12FIabstV11AabstV7Aagt_treeV8V11Aalt_treeV8V7Iiainfix =V18V1ainfix =V19V2amemtV10V18V19qamemtV11V18V19FAamemtV11V1V2AarbtreeV20V11ICV10aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV20V11IarbtreeV20V10FAabstV11FIarbtreeV21V10EAabstV10Iainfix <V8V1Iainfix <V1V8NIarbtreeV22V0EAabstV0FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="9.21"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter insert.12.6"
+        expl="parameter insert"
+        sum="929e053b010309536c18bd64794fa338"
+        proved="true"
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVamemtV0V13V14Iainfix =V13V1NIamemtV12V13V14FIiainfix =V15V8ainfix =V16V9amemtV11V15V16OamemtV7V15V16qamemtV12V15V16FAarbtreeainfix +V17c1V12IarbtreeV17V7Iaalmost_rbtreeV17V11FAabstV12FIabstV11AabstV7Aagt_treeV8V11Aalt_treeV8V7Iiainfix =V18V1ainfix =V19V2amemtV10V18V19qamemtV11V18V19FAamemtV11V1V2AarbtreeV20V11ICV10aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV20V11IarbtreeV20V10FAabstV11FIarbtreeV21V10EAabstV10Iainfix <V8V1Iainfix <V1V8NIarbtreeV22V0EAabstV0FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.07"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter insert.12.7"
+        expl="parameter insert"
+        sum="925852f1c1286186e71e959141087ce4"
+        proved="true"
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVamemtV12V13V14Iiainfix =V13V1ainfix =V14V2amemtV0V13V14FIiainfix =V15V8ainfix =V16V9amemtV11V15V16OamemtV7V15V16qamemtV12V15V16FAarbtreeainfix +V17c1V12IarbtreeV17V7Iaalmost_rbtreeV17V11FAabstV12FIabstV11AabstV7Aagt_treeV8V11Aalt_treeV8V7Iiainfix =V18V1ainfix =V19V2amemtV10V18V19qamemtV11V18V19FAamemtV11V1V2AarbtreeV20V11ICV10aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV20V11IarbtreeV20V10FAabstV11FIarbtreeV21V10EAabstV10Iainfix <V8V1Iainfix <V1V8NIarbtreeV22V0EAabstV0FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="2.27"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter insert.13"
+      expl="parameter insert"
+      sum="c8b34396938b23c5e35c220d5008cfc0"
+      proved="true"
+      expanded="false"
+      shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVViainfix =V11V1ainfix =V12V2amemtV0V11V12qamemtaNodeaBlackV7V8V2V10V11V12FAamemtaNodeaBlackV7V8V2V10V1V2AarbtreeV13aNodeaBlackV7V8V2V10ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV13aNodeaBlackV7V8V2V10IarbtreeV13V0FAabstaNodeaBlackV7V8V2V10Iainfix <V8V1NIainfix <V1V8NIarbtreeV14V0EAabstV0FFF">
+      <proof
+       prover="alt-ergo"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="1.21"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+   <goal
+    name="WP_parameter add"
+    expl="parameter add"
+    sum="3b9b8a2f24ccd6d0e314cd6d4ccc30c8"
+    proved="true"
+    expanded="false"
+    shape="CV3aNodewVVVViainfix =V8V1ainfix =V9V2amemtV0V8V9qamemtaNodeaBlackV4V5V6V7V8V9FAamemtaNodeaBlackV4V5V6V7V1V2AarbtreeV10aNodeaBlackV4V5V6V7EAabstaNodeaBlackV4V5V6V7aLeaffIiainfix =V11V1ainfix =V12V2amemtV0V11V12qamemtV3V11V12FAamemtV3V1V2AarbtreeV13V3ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV13V3IarbtreeV13V0FAabstV3FAarbtreeV14V0EAabstV0IarbtreeV15V0EAabstV0FFF">
+    <transf
+     name="split_goal"
+     proved="true"
+     expanded="false">
+     <goal
+      name="WP_parameter add.1"
+      expl="precondition"
+      sum="5cf9b0670637b831799ed9ed67ad78b1"
+      proved="true"
+      expanded="false"
+      shape="arbtreeV3V0EAabstV0IarbtreeV4V0EAabstV0FFF">
+      <proof
+       prover="alt-ergo"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter add.2"
+      expl="parameter add"
+      sum="e666dc2aaa83fa2a6f8235f4a7b4a5ae"
+      proved="true"
+      expanded="false"
+      shape="CV3aNodewVVVViainfix =V8V1ainfix =V9V2amemtV0V8V9qamemtaNodeaBlackV4V5V6V7V8V9FAamemtaNodeaBlackV4V5V6V7V1V2AarbtreeV10aNodeaBlackV4V5V6V7EAabstaNodeaBlackV4V5V6V7aLeaftIiainfix =V11V1ainfix =V12V2amemtV0V11V12qamemtV3V11V12FAamemtV3V1V2AarbtreeV13V3ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV13V3IarbtreeV13V0FAabstV3FIarbtreeV14V0EAabstV0IarbtreeV15V0EAabstV0FFF">
+      <transf
+       name="split_goal"
+       proved="true"
+       expanded="false">
+       <goal
+        name="WP_parameter add.2.1"
+        expl="parameter add"
+        sum="3281f6b0a89268748237c54922cc9b95"
+        proved="true"
+        expanded="false"
+        shape="CV3aNodewVVVVabstaNodeaBlackV4V5V6V7aLeaftIiainfix =V8V1ainfix =V9V2amemtV0V8V9qamemtV3V8V9FAamemtV3V1V2AarbtreeV10V3ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV10V3IarbtreeV10V0FAabstV3FIarbtreeV11V0EAabstV0IarbtreeV12V0EAabstV0FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.03"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter add.2.2"
+        expl="parameter add"
+        sum="b7247ff24a2cdf313b07dcbffa51672b"
+        proved="true"
+        expanded="false"
+        shape="CV3aNodewVVVVarbtreeV8aNodeaBlackV4V5V6V7EaLeaftIiainfix =V9V1ainfix =V10V2amemtV0V9V10qamemtV3V9V10FAamemtV3V1V2AarbtreeV11V3ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV11V3IarbtreeV11V0FAabstV3FIarbtreeV12V0EAabstV0IarbtreeV13V0EAabstV0FFF">
+        <transf
+         name="inline_goal"
+         proved="true"
+         expanded="false">
+         <goal
+          name="WP_parameter add.2.2.1"
+          expl="parameter add"
+          sum="20926efaa624ba508460f2f25fb8ce8e"
+          proved="true"
+          expanded="false"
+          shape="CV3aNodewVVVVarbtreeV8aNodeaBlackV4V5V6V7EaLeaftIiainfix =V9V1ainfix =V10V2amemtV0V9V10qamemtV3V9V10FAamemtV3V1V2AarbtreeV11V3ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftACV3aLeafainfix =V11c0aNodeaRedVwwVarbtreeV11V13AarbtreeV11V12aNodeaBlackVwwVarbtreeainfix -V11c1V15Aarbtreeainfix -V11c1V14IarbtreeV11V0FAabstV3FIarbtreeV16V0EAabstV0IarbtreeV17V0EAabstV0FFF">
+          <proof
+           prover="coq"
+           timelimit="10"
+           edited="vacid_0_red_black_trees_WP_RedBlackTree_WP_parameter_add_1.v"
+           obsolete="false">
+           <result status="valid" time="0.89"/>
+          </proof>
+         </goal>
+        </transf>
+       </goal>
+       <goal
+        name="WP_parameter add.2.3"
+        expl="parameter add"
+        sum="43594be9173185f94d19cc4c2cbe2074"
+        proved="true"
+        expanded="false"
+        shape="CV3aNodewVVVVamemtaNodeaBlackV4V5V6V7V1V2aLeaftIiainfix =V8V1ainfix =V9V2amemtV0V8V9qamemtV3V8V9FAamemtV3V1V2AarbtreeV10V3ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV10V3IarbtreeV10V0FAabstV3FIarbtreeV11V0EAabstV0IarbtreeV12V0EAabstV0FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.03"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter add.2.4"
+        expl="parameter add"
+        sum="3e0a828be159babbc6f6604f68078f81"
+        proved="true"
+        expanded="false"
+        shape="CV3aNodewVVVVainfix =V9V2Iainfix =V8V1IamemtaNodeaBlackV4V5V6V7V8V9FaLeaftIiainfix =V10V1ainfix =V11V2amemtV0V10V11qamemtV3V10V11FAamemtV3V1V2AarbtreeV12V3ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV12V3IarbtreeV12V0FAabstV3FIarbtreeV13V0EAabstV0IarbtreeV14V0EAabstV0FFF">
+        <proof
+         prover="cvc3-2.2"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.26"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter add.2.5"
+        expl="parameter add"
+        sum="0020b9ff97766621bcf8dbe852d22ecb"
+        proved="true"
+        expanded="false"
+        shape="CV3aNodewVVVVamemtV0V8V9Iainfix =V8V1NIamemtaNodeaBlackV4V5V6V7V8V9FaLeaftIiainfix =V10V1ainfix =V11V2amemtV0V10V11qamemtV3V10V11FAamemtV3V1V2AarbtreeV12V3ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV12V3IarbtreeV12V0FAabstV3FIarbtreeV13V0EAabstV0IarbtreeV14V0EAabstV0FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.05"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter add.2.6"
+        expl="parameter add"
+        sum="ab42549c894134b23c9dc41de5c96c34"
+        proved="true"
+        expanded="false"
+        shape="CV3aNodewVVVVamemtaNodeaBlackV4V5V6V7V8V9Iiainfix =V8V1ainfix =V9V2amemtV0V8V9FaLeaftIiainfix =V10V1ainfix =V11V2amemtV0V10V11qamemtV3V10V11FAamemtV3V1V2AarbtreeV12V3ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV12V3IarbtreeV12V0FAabstV3FIarbtreeV13V0EAabstV0IarbtreeV14V0EAabstV0FFF">
+        <proof
+         prover="alt-ergo"
+         timelimit="10"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.63"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter add.3"
+      expl="parameter add"
+      sum="5b9ff41e7c67fdcf0dd68b985a99b8d6"
+      proved="true"
+      expanded="false"
+      shape="CV3aNodewVVVVtaLeaffIiainfix =V8V1ainfix =V9V2amemtV0V8V9qamemtV3V8V9FAamemtV3V1V2AarbtreeV10V3ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV10V3IarbtreeV10V0FAabstV3FIarbtreeV11V0EAabstV0IarbtreeV12V0EAabstV0FFF">
+      <proof
+       prover="alt-ergo"
+       timelimit="10"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+  </theory>
+  <theory
+   name="WP Vacid0"
+   verified="true"
+   expanded="false">
+   <goal
+    name="WP_parameter create"
+    expl="normal postcondition"
+    sum="7ad83d9bac17d1444c7337f3dfe2809e"
+    proved="true"
+    expanded="false"
+    shape="ainfix =V2V0qamemaTuple2V0aLeafV1V2FAainfix =V0V0AainvaTuple2V0aLeafF">
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.09"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter replace"
+    expl="parameter replace"
+    sum="04cdec3d56e636c8376379aadc2075f7"
+    proved="true"
+    expanded="false"
+    shape="iainfix =V7V0ainfix =V8V1amemaTuple2V2V3V7V8qamemaTuple2V5V6V7V8FAainfix =V5V2AainvaTuple2V5V6Iainfix =aTuple2V5V6aTuple2V2V4FIiainfix =V9V0ainfix =V10V1amemtV3V9V10qamemtV4V9V10FAamemtV4V0V1AarbtreeV11V4EAabstV4FAarbtreeV12V3EAabstV3IainvaTuple2V2V3FFF">
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.68"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter lookup"
+    expl="parameter lookup"
+    sum="7bf894980f8223167bdf3215cbf93b1b"
+    proved="true"
+    expanded="false"
+    shape="amemaTuple2V1V2V0V1IamemtV2V0V3NFAamemaTuple2V1V2V0V4IamemtV2V0V4FAabstV2IainvaTuple2V1V2FF">
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.09"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter remove"
+    expl="parameter remove"
+    sum="6fe1d0419477261e4df16b51253332e7"
+    proved="true"
+    expanded="false"
+    shape="iainfix =V5V0ainfix =V6V3amemaTuple2V1V2V5V6qamemaTuple2V3V4V5V6FAainfix =V3V1AainvaTuple2V3V4Iiainfix =V7V0ainfix =V8V1amemaTuple2V1V2V7V8qamemaTuple2V3V4V7V8FAainfix =V3V1AainvaTuple2V3V4FAainvaTuple2V1V2IainvaTuple2V1V2FF">
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.11"/>
+    </proof>
+   </goal>
+  </theory>
+ </file>
+</why3session>
