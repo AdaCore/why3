@@ -39,7 +39,6 @@ let opt_input = ref None
 let opt_theory = ref None
 let opt_trans = ref []
 let opt_metas = ref []
-let opt_debug = ref []
 
 let add_opt_file x =
   let tlist = Queue.create () in
@@ -80,8 +79,6 @@ let add_opt_goal x = match !opt_theory with
 
 let add_opt_trans x = opt_trans := x::!opt_trans
 
-let add_opt_debug x = opt_debug := x::!opt_debug
-
 let add_opt_meta meta =
   let meta_name, meta_arg =
     let index = String.index meta '=' in
@@ -112,7 +109,6 @@ let opt_list_printers = ref false
 let opt_list_provers = ref false
 let opt_list_formats = ref false
 let opt_list_metas = ref false
-let opt_list_flags = ref false
 
 let opt_token_count = ref false
 let opt_parse_only = ref false
@@ -192,18 +188,14 @@ let option_list = Arg.align [
       " List known input formats";
   "--list-metas", Arg.Set opt_list_metas,
       " List known metas";
-  "--list-debug-flags", Arg.Set opt_list_flags,
-      " List known debug flags";
+  Debug.Opt.desc_debug_list;
   "--token-count", Arg.Set opt_token_count,
       " Only lexing, and give numbers of tokens in spec vs in program";
-  "--parse-only", Arg.Set opt_parse_only,
-      " Stop after parsing (same as --debug parse_only)";
-  "--type-only", Arg.Set opt_type_only,
-      " Stop after type checking (same as --debug type_only)";
-  "--debug-all", Arg.Set opt_debug_all,
-      " Set all debug flags (except parse_only and type_only)";
-  "--debug", Arg.String add_opt_debug,
-      "<flag> Set a debug flag";
+  Debug.Opt.desc_shortcut "parse_only" "--parse-only" " Stop after parsing";
+  Debug.Opt.desc_shortcut
+    "type_only" "--type-only" " Stop after type checking";
+  Debug.Opt.desc_debug_all;
+  Debug.Opt.desc_debug;
   "--print-libdir", Arg.Set opt_print_libdir,
       " Print location of binary components (plugins, etc)";
   "--print-datadir", Arg.Set opt_print_datadir,
@@ -227,22 +219,12 @@ let () = try
     exit 0
   end;
 
-  (** Debug flag *)
-  if !opt_debug_all then begin
-    List.iter (fun (_,f,_) -> Debug.set_flag f) (Debug.list_flags ());
-    Debug.unset_flag Typing.debug_parse_only;
-    Debug.unset_flag Typing.debug_type_only
-  end;
-
-  List.iter (fun s -> Debug.set_flag (Debug.lookup_flag s)) !opt_debug;
-
-  if !opt_parse_only then Debug.set_flag Typing.debug_parse_only;
-  if !opt_type_only then Debug.set_flag Typing.debug_type_only;
-
   (** Configuration *)
   let config = read_config !opt_config in
   let main = get_main config in
   Whyconf.load_plugins main;
+
+  Debug.Opt.set_flags_selected ();
 
   (** listings*)
 
@@ -292,13 +274,7 @@ let () = try
     printf "@[<hov 2>Known metas:@\n%a@]@\n@."
       (Pp.print_list Pp.newline print) (List.sort cmp (Theory.list_metas ()))
   end;
-  if !opt_list_flags then begin
-    opt_list := true;
-    let print fmt (p,_,_) = fprintf fmt "%s" p in
-    printf "@[<hov 2>Known debug flags:@\n%a@]@."
-      (Pp.print_list Pp.newline print)
-      (List.sort Pervasives.compare (Debug.list_flags ()))
-  end;
+  opt_list :=  Debug.Opt.option_list () || !opt_list;
   if !opt_list then exit 0;
 
   if Queue.is_empty opt_queue then begin

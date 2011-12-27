@@ -101,8 +101,8 @@ let () = Exn_printer.register (fun fmt e -> match e with
        fprintf fmt "Unbound symbol '%a'" (print_list dot pp_print_string) sl
   | _ -> raise e)
 
-let debug_parse_only = Debug.register_flag "parse_only"
-let debug_type_only  = Debug.register_flag "type_only"
+let debug_parse_only = Debug.register_stop_flag "parse_only"
+let debug_type_only  = Debug.register_stop_flag "type_only"
 
 (** Environments *)
 

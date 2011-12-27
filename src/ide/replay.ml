@@ -62,6 +62,13 @@ let spec = Arg.align [
   ("-longtable",
    Arg.Set opt_longtable,
    " produce latex statistics using longtable package") ;
+  Debug.Opt.desc_debug_list;
+  Debug.Opt.desc_shortcut "parse_only" "--parse-only" " Stop after parsing";
+  Debug.Opt.desc_shortcut
+    "type_only" "--type-only" " Stop after type checking";
+  Debug.Opt.desc_debug_all;
+  Debug.Opt.desc_debug;
+
 ]
 
 let version_msg = Format.sprintf "Why3 replayer, version %s (build date: %s)"
@@ -91,6 +98,7 @@ let () =
     exit 1
   end
 
+
 let fname = match !file with
   | None ->
       Arg.usage spec usage_str;
@@ -106,6 +114,10 @@ let loadpath = (Whyconf.loadpath (Whyconf.get_main config))
 let env = Env.create_env loadpath
 
 let () = Whyconf.load_plugins (Whyconf.get_main config)
+
+let () =
+  Debug.Opt.set_flags_selected ();
+  if Debug.Opt.option_list () then exit 0
 
 let usleep t = ignore (Unix.select [] [] [] t)
 

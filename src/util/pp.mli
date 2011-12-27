@@ -125,6 +125,9 @@ val string_of_wnl : (Format.formatter -> 'a -> unit) -> 'a -> string
 
 val wnl : Format.formatter -> unit
 
+val sprintf :
+  ('b,  formatter, unit, string) Pervasives.format4 -> 'b
+
 module Ansi :
 sig
   val set_column : Format.formatter -> int -> unit

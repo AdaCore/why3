@@ -83,7 +83,10 @@ replace by the input file and '%o' which will be replaced by the output file.";
     "--coqdoc",
   Arg.Unit (fun ()->
     opt_pp := (".v",("coqdoc --no-index --html -o %o %i",".html"))::!opt_pp),
-  " same as '--add_pp .v \"coqdoc --no-index --html -o %o %i\" .html'"
+  " same as '--add_pp .v \"coqdoc --no-index --html -o %o %i\" .html'";
+    Debug.Opt.desc_debug_list;
+    Debug.Opt.desc_debug_all;
+    Debug.Opt.desc_debug;
 ]
 
 
@@ -109,6 +112,17 @@ let () =
 (*   List.iter (fun (in_,(cmd,out)) -> *)
 (*     printf "in : %s, cmd : %s, out : %s@." in_ cmd out) !opt_pp *)
 
+let allow_obsolete = !allow_obsolete
+let includes = List.rev !includes
+
+open Session_ro
+
+let env = read_config ~includes !opt_config
+
+let () =
+  Debug.Opt.set_flags_selected ();
+  if  Debug.Opt.option_list () then exit 0
+
 let output_dir =
   match !output_dir with
     | "" -> printf
@@ -122,15 +136,7 @@ let output_dir =
 
 let edited_dst = Filename.concat output_dir "edited"
 
-let allow_obsolete = !allow_obsolete
-let includes = List.rev !includes
-
-open Session_ro
-
-let env = read_config ~includes !opt_config
-
 open Util
-
 
 type context =
     (string ->

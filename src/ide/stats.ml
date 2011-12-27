@@ -39,6 +39,9 @@ let spec = Arg.align [
   ("-v",
    Arg.Set opt_version,
    " print version information") ;
+    Debug.Opt.desc_debug_list;
+    Debug.Opt.desc_debug_all;
+    Debug.Opt.desc_debug;
 ]
 
 let version_msg = Format.sprintf "Why3 statistics, version 0.1"
@@ -61,6 +64,9 @@ let allow_obsolete = !allow_obsolete
 
 let env = read_config ~includes:!includes !opt_config
 
+let () =
+  Debug.Opt.set_flags_selected ();
+  if  Debug.Opt.option_list () then exit 0
 
 type proof_stats =
     { mutable no_proof : Sstr.t;
