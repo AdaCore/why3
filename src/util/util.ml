@@ -38,6 +38,8 @@ let cons f acc x = (f x)::acc
 
 let of_option = function None -> assert false | Some x -> x
 
+let exn_option exn = function None -> raise exn | Some x -> x
+
 let default_option d = function None -> d | Some x -> x
 
 let option_map f = function None -> None | Some x -> Some (f x)
@@ -160,6 +162,12 @@ let list_fold_lefti f acc l =
   in
   fold_left acc 0 l
 
+let list_or f l =
+  List.fold_left (fun acc e -> f e || acc) false l
+
+let list_and f l =
+  List.fold_left (fun acc e -> f e && acc) true l
+
 let rec prefix n l =
   if n = 0 then []
   else if n < 0 || l = [] then invalid_arg "Util.chop"
@@ -211,6 +219,13 @@ module Sint = Mint.Set
 
 module Mstr = Map.Make(String)
 module Sstr = Mstr.Set
+module Hstr = Hashtbl.Make
+  (struct
+    type t = String.t
+    let compare = String.compare
+    let hash    = (Hashtbl.hash : string -> int)
+    let equal   = ((=) : string -> string -> bool)
+  end)
 
 (* Set, Map, Hashtbl on structures with a unique tag *)
 
@@ -278,3 +293,20 @@ let memo_int size f =
 
 let memo_string = memo_int
 
+module type PrivateHashtbl = sig
+  (** Private Hashtbl *)
+  type 'a t
+  type key
+
+  val find : 'a t -> key -> 'a
+    (** Same as {Hashtbl.find} *)
+  val iter : (key -> 'a -> unit) -> 'a t -> unit
+    (** Same as {Hashtbl.iter} *)
+  val fold : (key -> 'a -> 'acc -> 'acc) -> 'a t -> 'acc -> 'acc
+    (** Same as {Hashtbl.fold} *)
+  val mem : 'a t -> key -> bool
+    (** Same as {Hashtbl.mem} *)
+  val length : 'a t -> int
+    (** Same as {Hashtbl.length} *)
+
+end

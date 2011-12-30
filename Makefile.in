@@ -111,7 +111,8 @@ plugins: plugins.@OCAMLBEST@
 LIBGENERATED = src/util/rc.ml src/parser/lexer.ml \
 	       src/parser/parser.mli src/parser/parser.ml \
 	       src/driver/driver_parser.mli src/driver/driver_parser.ml \
-	       src/driver/driver_lexer.ml src/coq_config.ml
+	       src/driver/driver_lexer.ml src/coq_config.ml \
+               src/session/xml.ml
 
 LIB_UTIL = stdlib exn_printer pp debug loc print_tree print_number \
 	   cmdline hashweak hashcons util sysutil rc plugin
@@ -138,15 +139,18 @@ LIB_TRANSFORM = simplify_recursive_definition simplify_formula \
 LIB_PRINTER = alt_ergo why3printer smtv1 smtv2 coq simplify gappa \
 	      cvc3 yices
 
+LIB_SESSION = xml termcode session session_tools session_scheduler
+
 LIBMODULES = src/config src/coq_config \
 	      $(addprefix src/util/, $(LIB_UTIL)) \
 	      $(addprefix src/core/, $(LIB_CORE)) \
 	      $(addprefix src/parser/, $(LIB_PARSER)) \
 	      $(addprefix src/driver/, $(LIB_DRIVER)) \
 	      $(addprefix src/transform/, $(LIB_TRANSFORM)) \
-	      $(addprefix src/printer/, $(LIB_PRINTER))
+	      $(addprefix src/printer/, $(LIB_PRINTER)) \
+	      $(addprefix src/session/, $(LIB_SESSION))
 
-LIBDIRS = util core parser driver transform printer
+LIBDIRS = util core parser driver transform printer session
 LIBINCLUDES = $(addprefix -I src/, $(LIBDIRS))
 
 ifeq (@enable_hypothesis_selection@,yes)
@@ -542,7 +546,7 @@ install_local: bin/why3config
 
 ifeq (@enable_ide@,yes)
 
-IDE_FILES = xml termcode session gconfig gmain
+IDE_FILES = gconfig gmain
 
 IDEMODULES = $(addprefix src/ide/, $(IDE_FILES))
 
@@ -578,7 +582,7 @@ bin/why3ide: bin/why3ide.@OCAMLBEST@
 
 include .depend.ide
 
-.depend.ide: src/ide/xml.ml
+.depend.ide:
 	$(OCAMLDEP) -slash -I src -I src/ide $(IDEML) $(IDEMLI) > $@
 
 depend: .depend.ide
@@ -602,7 +606,7 @@ endif
 # Replayer
 ###############
 
-REPLAYER_FILES = xml termcode session replay
+REPLAYER_FILES = replay
 
 REPLAYERMODULES = $(addprefix src/ide/, $(REPLAYER_FILES))
 
@@ -634,13 +638,12 @@ bin/why3replayer: bin/why3replayer.@OCAMLBEST@
 
 include .depend.replayer
 
-.depend.replayer: src/ide/xml.ml
+.depend.replayer:
 	$(OCAMLDEP) -slash -I src -I src/ide $(REPLAYERML) $(REPLAYERMLI) > $@
 
 depend: .depend.replayer
 
 clean::
-	rm -f src/ide/xml.ml
 	rm -f src/ide/*.cm[iox] src/ide/*.o
 	rm -f src/ide/*.annot src/ide/*~
 	rm -f bin/why3replayer.byte bin/why3replayer.opt bin/why3replayer
@@ -655,7 +658,7 @@ install_local: bin/why3replayer
 # Stats
 ###############
 
-STATS_FILES = xml termcode session session_ro stats
+STATS_FILES = stats
 
 STATSMODULES = $(addprefix src/ide/, $(STATS_FILES))
 
@@ -687,7 +690,7 @@ bin/why3stats: bin/why3stats.@OCAMLBEST@
 
 include .depend.stats
 
-.depend.stats: src/ide/xml.ml
+.depend.stats:
 	$(OCAMLDEP) -slash -I src -I src/ide $(STATSML) $(STATSMLI) > $@
 
 depend: .depend.stats
@@ -705,7 +708,7 @@ install_local: bin/why3stats
 # Html
 ###############
 
-HTML_FILES = xml termcode session session_ro html_session
+HTML_FILES = html_session
 
 HTMLMODULES = $(addprefix src/ide/, $(HTML_FILES))
 
@@ -737,7 +740,7 @@ bin/why3html: bin/why3html.@OCAMLBEST@
 
 include .depend.html
 
-.depend.html: src/ide/xml.ml
+.depend.html:
 	$(OCAMLDEP) -slash -I src -I src/ide $(HTMLML) $(HTMLMLI) > $@
 
 depend: .depend.html
@@ -1120,8 +1123,8 @@ test-api: src/why3.cma
 	ocaml -I src/ $(INCLUDES) $(EXTCMA) src/why3.cma examples/use_api.ml \
 	|| (printf "Test of Why API calls failed. Please fix it"; exit 2)
 
-test-shape: src/why3.cma src/ide/termcode.cmo
-	ocaml -I src/ -I src/ide/ $(INCLUDES) $(EXTCMA) $? examples/test_shape.ml
+test-shape: src/why3.cma
+	ocaml -I src/ $(INCLUDES) $(EXTCMA) $? examples/test_shape.ml
 
 bts12244: src/why3.cma
 	ocaml -I src/ $(INCLUDES) $(EXTCMA) src/why3.cma examples/bts12244.ml
@@ -1179,7 +1182,7 @@ MODULESTODOC = util/util util/hashweak \
 	core/ident core/ty core/term core/decl core/theory \
 	core/env core/task \
 	driver/whyconf driver/driver \
-	ide/session
+	session/session session/session_tools session/session_scheduler
 #	transform/introduction \
 #	ide/db
 

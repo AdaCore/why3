@@ -29,6 +29,10 @@ let () =
 open Why3
 open Whyconf
 open Gconfig
+open Util
+open Debug
+
+let debug = register_flag "gui"
 
 (************************)
 (* parsing command line *)
@@ -126,9 +130,10 @@ let source_text fname =
 (* loading WhyIDE configuration *)
 (********************************)
 
+let loadpath = (Whyconf.loadpath (get_main ())) @ List.rev !includes
+
 let gconfig =
   let c = Gconfig.config () in
-  let loadpath = (Whyconf.loadpath (get_main ())) @ List.rev !includes in
   c.env <- Env.create_env loadpath;
 (*
   let provers = Whyconf.get_provers c.Gconfig.config in
@@ -193,7 +198,8 @@ let () =
   let b1 = GButton.radio_button
     ~packing:context_box#add ~label:"Unproved goals" ()
   in
-  b1#misc#set_tooltip_markup "When selected, tools below are applied only to <b>unproved</b> goals";
+  b1#misc#set_tooltip_markup
+    "When selected, tools below are applied only to <b>unproved</b> goals";
   let (_ : GtkSignal.id) =
     b1#connect#clicked
       ~callback:(fun () -> context_unproved_goals_only := true)
@@ -201,7 +207,8 @@ let () =
   let b2 = GButton.radio_button
     ~group:b1#group ~packing:context_box#add ~label:"All goals" ()
   in
-  b2#misc#set_tooltip_markup "When selected, tools below are applied to all goals";
+  b2#misc#set_tooltip_markup
+    "When selected, tools below are applied to all goals";
   let (_ : GtkSignal.id) =
     b2#connect#clicked
       ~callback:(fun () -> context_unproved_goals_only := false)
@@ -345,11 +352,10 @@ let clear model = model#clear ()
 
 let image_of_result ~obsolete result =
   match result with
-    | Session.Undone -> !image_undone
-    | Session.Unedited -> !image_unknown
-    | Session.Scheduled -> !image_scheduled
-    | Session.Running -> !image_running
-    | Session.Interrupted -> assert false
+    | Session.Undone Session.Interrupted -> !image_undone
+    | Session.Undone Session.Unedited -> !image_unknown
+    | Session.Undone Session.Scheduled -> !image_scheduled
+    | Session.Undone Session.Running -> !image_running
     | Session.InternalFailure _ -> !image_failure
     | Session.Done r -> match r.Call_provers.pr_answer with
         | Call_provers.Valid ->
@@ -375,42 +381,7 @@ let fan n =
     | 3 | -1 -> "/"
     | _ -> assert false
 
-module M = Session.Make
-  (struct
-     type key = GTree.row_reference
-
-     let create ?parent () =
-       let parent = match parent with
-         | None -> None
-         | Some r -> Some r#iter
-       in
-       let iter = goals_model#append ?parent () in
-       goals_model#set ~row:iter ~column:index_column (-1);
-       goals_model#get_row_reference (goals_model#get_path iter)
-
-     let remove row =
-       let (_:bool) = goals_model#remove row#iter in ()
-
-     let reset () = goals_model#clear ()
-
-     let idle f =
-       let (_ : GMain.Idle.id) = GMain.Idle.add f in ()
-
-     let timeout ~ms f =
-       let (_ : GMain.Timeout.id) = GMain.Timeout.add ~ms ~callback:f in
-       ()
-
-     let notify_timer_state =
-       let c = ref 0 in
-       fun t s r ->
-         incr c;
-         monitor_waiting#set_text ("Waiting: " ^ (string_of_int t));
-         monitor_scheduled#set_text ("Scheduled: " ^ (string_of_int s));
-         monitor_running#set_text
-           (if r=0 then "Running: 0" else
-              "Running: " ^ (string_of_int r)^ " " ^ (fan (!c / 10)))
-
-   end)
+module S = Session
 
 let set_row_status row b =
   if b then
@@ -419,22 +390,21 @@ let set_row_status row b =
     goals_model#set ~row:row#iter ~column:status_column !image_unknown
 
 let set_proof_state ~obsolete a =
-  let row = a.M.proof_key in
-  let res = a.M.proof_state in
+  let row = a.S.proof_key in
+  let res = a.S.proof_state in
   goals_model#set ~row:row#iter ~column:status_column
     (image_of_result ~obsolete res);
   let t = match res with
-    | Session.Done { Call_provers.pr_time = time } ->
-        if gconfig.show_time_limit then 
-          Format.sprintf "%.2f [%d.0]" time a.M.timelimit
+    | S.Done { Call_provers.pr_time = time } ->
+        if gconfig.show_time_limit then
+          Format.sprintf "%.2f [%d.0]" time a.S.proof_timelimit
         else
           Format.sprintf "%.2f" time
-    | Session.Unedited -> "(not yet edited, edit with \"Edit\" button)"
-    | Session.InternalFailure _ -> "(internal failure)"
-    | Session.Interrupted -> "(interrupted)"
-    | Session.Scheduled | Session.Running ->
-        Format.sprintf "[limit=%d.0]" a.M.timelimit
-    | Session.Undone -> "(undone)"
+    | S.Undone S.Unedited -> "(not yet edited, edit with \"Edit\" button)"
+    | S.InternalFailure _ -> "(internal failure)"
+    | S.Undone S.Interrupted -> "(interrupted)"
+    | S.Undone (S.Scheduled | S.Running) ->
+        Format.sprintf "[limit=%d.0]" a.S.proof_timelimit
   in
   let t = if obsolete then t ^ " (obsolete)" else t in
   goals_model#set ~row:row#iter ~column:time_column t
@@ -462,15 +432,15 @@ let get_selected_row_references () =
 
 let row_expanded b iter _path =
   match get_any_from_iter iter with
-    | M.File f ->
-        M.set_file_expanded f b
-    | M.Theory t ->
-        M.set_theory_expanded t b
-    | M.Goal g ->
-        M.set_goal_expanded g b
-    | M.Transformation tr ->
-        M.set_transf_expanded tr b
-    | M.Proof_attempt _ -> ()
+    | S.File f ->
+        S.set_file_expanded f b
+    | S.Theory t ->
+        S.set_theory_expanded t b
+    | S.Goal g ->
+        S.set_goal_expanded g b
+    | S.Transf tr ->
+        S.set_transf_expanded tr b
+    | S.Proof_attempt _ -> ()
 
 
 let (_:GtkSignal.id) =
@@ -479,28 +449,65 @@ let (_:GtkSignal.id) =
 let (_:GtkSignal.id) =
   goals_view#connect#row_expanded ~callback:(row_expanded true)
 
+module M = Session_scheduler.Make
+  (struct
+     type key = GTree.row_reference
+
+     let create ?parent () =
+       let parent = match parent with
+         | None -> None
+         | Some r -> Some r#iter
+       in
+       let iter = goals_model#append ?parent () in
+       goals_model#set ~row:iter ~column:index_column (-1);
+       goals_model#get_row_reference (goals_model#get_path iter)
+
+
+     let remove row =
+       let (_:bool) = goals_model#remove row#iter in ()
+
+     let reset () = goals_model#clear ()
+
+     let idle f =
+       let (_ : GMain.Idle.id) = GMain.Idle.add f in ()
+
+     let timeout ~ms f =
+       let (_ : GMain.Timeout.id) = GMain.Timeout.add ~ms ~callback:f in
+       ()
+
+     let notify_timer_state =
+       let c = ref 0 in
+       fun t s r ->
+         incr c;
+         monitor_waiting#set_text ("Waiting: " ^ (string_of_int t));
+         monitor_scheduled#set_text ("Scheduled: " ^ (string_of_int s));
+         monitor_running#set_text
+           (if r=0 then "Running: 0" else
+              "Running: " ^ (string_of_int r)^ " " ^ (fan (!c / 10)))
+
 let notify any =
   let row,exp =
     match any with
-      | M.Goal g -> (M.goal_key g),(M.goal_expanded g)
-      | M.Theory t -> (M.theory_key t),(M.theory_expanded t)
-      | M.File f -> f.M.file_key,f.M.file_expanded
-      | M.Proof_attempt a -> a.M.proof_key,false
-      | M.Transformation tr -> tr.M.transf_key,tr.M.transf_expanded
+      | S.Goal g ->
+          g.S.goal_key, g.S.goal_expanded
+      | S.Theory t -> t.S.theory_key, t.S.theory_expanded
+      | S.File f -> f.S.file_key, f.S.file_expanded
+      | S.Proof_attempt a -> a.S.proof_key,false
+      | S.Transf tr -> tr.S.transf_key,tr.S.transf_expanded
   in
   if exp then goals_view#expand_to_path row#path else
     goals_view#collapse_row row#path;
   match any with
-    | M.Goal g ->
-        set_row_status row (M.goal_proved g)
-    | M.Theory th ->
-        set_row_status row (M.verified th)
-    | M.File file ->
-        set_row_status row file.M.file_verified
-    | M.Proof_attempt a ->
-        set_proof_state ~obsolete:a.M.proof_obsolete a
-    | M.Transformation tr ->
-        set_row_status row tr.M.transf_proved
+    | S.Goal g ->
+        set_row_status row g.S.goal_verified
+    | S.Theory th ->
+        set_row_status row th.S.theory_verified
+    | S.File file ->
+        set_row_status row file.S.file_verified
+    | S.Proof_attempt a ->
+        set_proof_state ~obsolete:a.S.proof_obsolete a
+    | S.Transf tr ->
+        set_row_status row tr.S.transf_verified
 
 let init =
   let cpt = ref (-1) in
@@ -519,26 +526,23 @@ let init =
     (* useless since it has no child: goals_view#expand_row row#path; *)
     goals_model#set ~row:row#iter ~column:icon_column
       (match any with
-         | M.Goal _ -> !image_file
-         | M.Theory _
-         | M.File _ -> !image_directory
-         | M.Proof_attempt _ -> !image_prover
-         | M.Transformation _ -> !image_transf);
+         | S.Goal _ -> !image_file
+         | S.Theory _
+         | S.File _ -> !image_directory
+         | S.Proof_attempt _ -> !image_prover
+         | S.Transf _ -> !image_transf);
     goals_model#set ~row:row#iter ~column:name_column
       (match any with
-         | M.Goal g -> M.goal_expl g
-         | M.Theory th -> M.theory_name th
-         | M.File f -> Filename.basename f.M.file_name
-         | M.Proof_attempt a ->
-             begin
-               match a.M.prover with
-                 | M.Detected_prover p ->
-                     p.Session.prover_name ^ " " ^ p.Session.prover_version
-                 | M.Undetected_prover s -> s
-             end
-         | M.Transformation tr -> Session.transformation_id tr.M.transf);
+         | S.Goal g -> default_option "" g.S.goal_expl
+         | S.Theory th -> th.S.theory_name.Ident.id_string
+         | S.File f -> Filename.basename f.S.file_name
+         | S.Proof_attempt a ->
+           let p = a.S.proof_prover in
+           p.Session.prover_name ^ " " ^ p.Session.prover_version
+         | S.Transf tr -> tr.S.transf_name);
     notify any
 
+   end)
 
 
 (********************)
@@ -604,23 +608,24 @@ let info_window ?(callback=(fun () -> ())) mt s =
 let () =
   if Util.Mstr.is_empty (Whyconf.get_provers gconfig.Gconfig.config) then
     begin
-      info_window `ERROR "No prover configured.\nPlease run 'why3config --detect-provers' first"
+      info_window `ERROR
+        "No prover configured.\nPlease run 'why3config --detect-provers' first"
         ~callback:GMain.quit;
       GMain.main ();
       exit 2;
     end
 
-let () =
+let env_session,sched =
   try
     eprintf "[Info] Opening session...@\n@[<v 2>  ";
-    let (_:bool) =
-      M.open_session ~allow_obsolete:true
-        ~env:gconfig.env
-        ~config:gconfig.Gconfig.config
-        ~init ~notify project_dir
+    let session = S.read_session project_dir in
+    let env_session,(_:bool) =
+      M.update_session ~allow_obsolete:true session gconfig.env
+        gconfig.Gconfig.config
     in
-    M.maximum_running_proofs := gconfig.max_running_processes;
-    eprintf "@]@\n[Info] Opening session: done@."
+    let sched = M.init gconfig.max_running_processes in
+    dprintf debug "@]@\n[Info] Opening session: done@.";
+    ref env_session, sched
   with e ->
     eprintf "@[Error while opening session:@ %a@.@]"
       Exn_printer.exn_printer e;
@@ -636,11 +641,11 @@ let () =
   match file_to_read with
     | None -> ()
     | Some fn ->
-        if M.file_exists fn then
-          eprintf "[Info] file %s already in database@." fn
+        if S.PHstr.mem !env_session.S.session.S.session_files fn then
+          dprintf debug "[Info] file %s already in database@." fn
         else
           try
-            M.add_file fn
+            ignore (M.add_file !env_session fn)
           with e ->
             eprintf "@[Error while reading file@ '%s':@ %a@.@]" fn
               Exn_printer.exn_printer e;
@@ -659,6 +664,7 @@ let prover_on_selected_goals pr =
       try
        let a = get_any_from_row_reference row in
        M.run_prover
+         !env_session sched
          ~context_unproved_goals_only:!context_unproved_goals_only
          ~timelimit:gconfig.time_limit
          pr a
@@ -675,7 +681,7 @@ let replay_obsolete_proofs () =
   List.iter
     (fun r ->
        let a = get_any_from_row_reference r in
-       M.replay ~obsolete_only:true
+       M.replay !env_session sched ~obsolete_only:true
          ~context_unproved_goals_only:!context_unproved_goals_only a)
     (get_selected_row_references ())
 
@@ -695,17 +701,16 @@ let cancel_proofs () =
 (* method: split selected goals *)
 (*****************************************************)
 
-let lookup_trans = Session.lookup_transformation gconfig.env
-let split_transformation = lookup_trans "split_goal"
-let inline_transformation = lookup_trans "inline_goal"
-let intro_transformation = lookup_trans "introduce_premises"
+let split_transformation = "split_goal"
+let inline_transformation = "inline_goal"
+let intro_transformation = "introduce_premises"
 
 
 let apply_trans_on_selection tr =
   List.iter
     (fun r ->
        let a = get_any_from_row_reference r in
-        M.transform
+        M.transform !env_session sched
           ~context_unproved_goals_only:!context_unproved_goals_only
           tr
           a)
@@ -744,7 +749,7 @@ let select_file () =
               let f = Sysutil.relativize_filename project_dir f in
               eprintf "Adding file '%s'@." f;
               try
-                M.add_file f
+                ignore (M.add_file !env_session f)
               with e ->
                 fprintf str_formatter
                   "@[Error while reading file@ '%s':@ %a@]" f
@@ -777,7 +782,7 @@ let (_ : GMenu.image_menu_item) =
   file_factory#add_image_item ~label:"_Preferences" ~callback:
     (fun () ->
        Gconfig.preferences gconfig;
-       M.maximum_running_proofs := gconfig.max_running_processes)
+       M.set_maximum_running_proofs gconfig.max_running_processes sched)
     ()
 
 let refresh_provers = ref (fun () -> ())
@@ -798,7 +803,7 @@ let (_ : GMenu.image_menu_item) =
 
 let save_session () =
   eprintf "[Info] saving session@.";
-  M.save_session ()
+  S.save_session !env_session.S.session
 
 let exit_function ?(destroy=false) () =
   eprintf "[Info] saving IDE config file@.";
@@ -819,7 +824,8 @@ let exit_function ?(destroy=false) () =
     with e -> eprintf "test reloading failed with exception %s@."
       (Printexc.to_string e)
   end;
-  let ret = Sys.command "xmllint --noout --dtdvalid share/why3session.dtd essai.xml" in
+  let ret = Sys.command
+    "xmllint --noout --dtdvalid share/why3session.dtd essai.xml" in
   if ret = 0 then eprintf "DTD validation succeeded, good!@.";
   *)
   match (Gconfig.config ()).saving_policy with
@@ -852,39 +858,20 @@ let (_ : GMenu.image_menu_item) =
   view_factory#add_image_item ~key:GdkKeysyms._E
     ~label:"Expand all" ~callback:(fun () -> goals_view#expand_all ()) ()
 
-
-
-let rec collapse_proved_goal g =
-  if M.goal_proved g then
-    begin
-      let row = M.goal_key g in
-      goals_view#collapse_row row#path;
-    end
-  else
-    Hashtbl.iter
-      (fun _ t -> List.iter collapse_proved_goal t.M.subgoals)
-      (M.transformations g)
-
-let collapse_verified_theory th =
-  if M.verified th then
-    begin
-      let row = M.theory_key th in
-      goals_view#collapse_row row#path;
-    end
-  else
-    List.iter collapse_proved_goal (M.goals th)
-
-let collapse_verified_file f =
-  if f.M.file_verified then
-    begin
-      let row = f.M.file_key in
-      goals_view#collapse_row row#path;
-    end
-  else
-    List.iter collapse_verified_theory f.M.theories
+let rec collapse_verified = function
+  | S.Goal g when g.S.goal_verified ->
+    let row = g.S.goal_key in
+    goals_view#collapse_row row#path
+  | S.Theory th when th.S.theory_verified ->
+    let row = th.S.theory_key in
+    goals_view#collapse_row row#path
+  | S.File f when f.S.file_verified ->
+    let row = f.S.file_key in
+    goals_view#collapse_row row#path
+  | any -> S.iter collapse_verified any
 
 let collapse_all_verified_things () =
-  List.iter collapse_verified_file (M.get_all_files ())
+  S.session_iter collapse_verified !env_session.S.session
 
 let (_ : GMenu.image_menu_item) =
   view_factory#add_image_item ~key:GdkKeysyms._C
@@ -994,16 +981,16 @@ let () = add_refresh_provers (fun () ->
 
 let () =
   let add_item_provers () =
-    Util.Mstr.iter
-      (fun _ p ->
-         let n = p.Session.prover_name ^ " " ^ p.Session.prover_version in
+    S.Sprover.iter
+      (fun p ->
+         let n = p.S.prover_name ^ " " ^ p.S.prover_version in
          let (_ : GMenu.image_menu_item) =
            tools_factory#add_image_item ~label:n
              ~callback:(fun () -> prover_on_selected_goals p)
              ()
          in
          let b = GButton.button ~packing:provers_box#add ~label:n () in
-         b#misc#set_tooltip_markup ("Start <tt>" ^ p.Session.prover_name ^
+         b#misc#set_tooltip_markup ("Start <tt>" ^ p.S.prover_name ^
            "</tt> on the <b>selected goals</b>");
 
 (* prend de la place pour rien
@@ -1014,7 +1001,7 @@ let () =
            b#connect#pressed
              ~callback:(fun () -> prover_on_selected_goals p)
          in ())
-      (M.get_provers ())
+      (S.get_known_provers !env_session)
   in
   add_refresh_provers add_item_provers "Add in tools menu and provers box";
   add_item_provers ()
@@ -1049,7 +1036,8 @@ let () =
 
 let () =
   let b = GButton.button ~packing:transf_box#add ~label:"Split" () in
-  b#misc#set_tooltip_markup "Apply the transformation <tt>split_goal</tt> to the <b>selected goals</b>";
+  b#misc#set_tooltip_markup "Apply the transformation <tt>split_goal</tt> \
+to the <b>selected goals</b>";
 
   let i = GMisc.image ~pixbuf:(!image_transf) () in
   let () = b#set_image i#coerce in
@@ -1060,7 +1048,8 @@ let () =
 
 let () =
   let b = GButton.button ~packing:transf_box#add ~label:"Inline" () in
-  b#misc#set_tooltip_markup "Apply the transformation <tt>inline_goal</tt> to the <b>selected goals</b>";
+  b#misc#set_tooltip_markup "Apply the transformation <tt>inline_goal</tt> \
+to the <b>selected goals</b>";
   let i = GMisc.image ~pixbuf:(!image_transf) () in
   let () = b#set_image i#coerce in
   let (_ : GtkSignal.id) =
@@ -1254,7 +1243,7 @@ let rec color_t_locs f =
         color_locs ~color:goal_tag f
 
 let scroll_to_source_goal g =
-  let t = M.get_task g in
+  let t = S.goal_task g in
   let id = (Task.task_goal t).Decl.pr_name in
   scroll_to_id ~color:goal_tag id;
   match t with
@@ -1268,8 +1257,7 @@ let scroll_to_source_goal g =
         assert false
 
 let scroll_to_theory th =
-  let t = M.get_theory th in
-  let id = t.Theory.th_name in
+  let id = th.S.theory_name in
   scroll_to_id ~color:goal_tag id
 
 
@@ -1277,8 +1265,16 @@ let reload () =
   try
     erase_color_loc source_view;
     current_file := "";
-    let (_:bool) = M.reload_all true in
-    ()
+    (** create a new environnement
+        (in order to reload the files which are "use") *)
+    gconfig.env <- Env.create_env loadpath;
+    (** reload the session *)
+    let old_session = (!env_session).S.session in
+    let new_env_session,(_:bool) =
+      M.update_session ~allow_obsolete:true old_session gconfig.env
+        gconfig.Gconfig.config
+    in
+    env_session := new_env_session
   with
     | e ->
         let e = match e with
@@ -1346,16 +1342,16 @@ let (_ : GMenu.image_menu_item) =
 
 let edit_selected_row r =
   match get_any_from_row_reference r with
-    | M.Goal _g ->
+    | S.Goal _g ->
         ()
-    | M.Theory _th ->
+    | S.Theory _th ->
         ()
-    | M.File _file ->
+    | S.File _file ->
         ()
-    | M.Proof_attempt a ->
-        M.edit_proof ~default_editor:gconfig.default_editor
+    | S.Proof_attempt a ->
+        M.edit_proof !env_session sched ~default_editor:gconfig.default_editor
           ~project_dir a
-    | M.Transformation _ -> ()
+    | S.Transf _ -> ()
 
 let edit_current_proof () =
   match get_selected_row_references () with
@@ -1394,7 +1390,8 @@ let () =
 
 let () =
   let b = GButton.button ~packing:tools_box#add ~label:"Edit" () in
-  b#misc#set_tooltip_markup "Edit the <b>selected proof</b> with the appropriate editor";
+  b#misc#set_tooltip_markup
+    "Edit the <b>selected proof</b> with the appropriate editor";
 
   let i = GMisc.image ~pixbuf:(!image_editor) () in
   let () = b#set_image i#coerce in
@@ -1404,7 +1401,8 @@ let () =
 
 let () =
   let b = GButton.button ~packing:tools_box#add ~label:"Replay" () in
-  b#misc#set_tooltip_markup "Replay <b>obsolete</b> proofs below the current selection";
+  b#misc#set_tooltip_markup
+    "Replay <b>obsolete</b> proofs below the current selection";
 
   let i = GMisc.image ~pixbuf:(!image_replay) () in
   let () = b#set_image i#coerce in
@@ -1419,18 +1417,18 @@ let () =
 
 let confirm_remove_row r =
   match get_any_from_row_reference r with
-    | M.Goal _g ->
+    | S.Goal _g ->
         info_window `ERROR "Cannot remove a goal"
-    | M.Theory _th ->
+    | S.Theory _th ->
         info_window `ERROR "Cannot remove a theory"
-    | M.File _file ->
+    | S.File _file ->
         info_window `ERROR "Cannot remove a file"
-    | M.Proof_attempt a ->
+    | S.Proof_attempt a ->
         info_window
           ~callback:(fun () -> M.remove_proof_attempt a)
           `QUESTION
           "Do you really want to remove the selected proof attempt?"
-    | M.Transformation tr ->
+    | S.Transf tr ->
         info_window
           ~callback:(fun () -> M.remove_transformation tr)
           `QUESTION
@@ -1439,11 +1437,11 @@ and all its subgoals?"
 
 let remove_proof r =
   match get_any_from_row_reference r with
-    | M.Goal _g -> ()
-    | M.Theory _th -> ()
-    | M.File _file -> ()
-    | M.Proof_attempt a -> M.remove_proof_attempt a
-    | M.Transformation _tr -> ()
+    | S.Goal _g -> ()
+    | S.Theory _th -> ()
+    | S.File _file -> ()
+    | S.Proof_attempt a -> M.remove_proof_attempt a
+    | S.Transf _tr -> ()
 
 let confirm_remove_selection () =
   match get_selected_row_references () with
@@ -1486,7 +1484,8 @@ let () =
 
 let () =
   let b = GButton.button ~packing:cleaning_box#add ~label:"Remove" () in
-  b#misc#set_tooltip_markup "Remove selected <b>proof attempts</b> and <b>transformations</b>";
+  b#misc#set_tooltip_markup "Remove selected <b>proof attempts</b> and \
+<b>transformations</b>";
   let i = GMisc.image ~pixbuf:(!image_remove) () in
   let () = b#set_image i#coerce in
   let (_ : GtkSignal.id) =
@@ -1495,7 +1494,8 @@ let () =
 
 let () =
   let b = GButton.button ~packing:cleaning_box#add ~label:"Clean" () in
-  b#misc#set_tooltip_markup "Remove unsuccessful <b>proof attempts</b> associated to proved goals";
+  b#misc#set_tooltip_markup "Remove unsuccessful <b>proof attempts</b> \
+associated to proved goals";
   let i = GMisc.image ~pixbuf:(!image_cleaning) () in
   let () = b#set_image i#coerce in
   let (_ : GtkSignal.id) =
@@ -1508,7 +1508,7 @@ let () =
   let i = GMisc.image ~pixbuf:(!image_cancel) () in
   let () = b#set_image i#coerce in
   let (_ : GtkSignal.id) =
-    b#connect#pressed ~callback:M.cancel_scheduled_proofs 
+    b#connect#pressed ~callback:(fun () -> M.cancel_scheduled_proofs sched)
   in ()
 
 
@@ -1526,40 +1526,38 @@ let display_task g t =
 let select_row r =
   let a = get_any_from_row_reference r in
   match a with
-    | M.Goal g ->
+    | S.Goal g ->
         if (Gconfig.config ()).intro_premises then
-          let callback = function
-            | [t] -> display_task g t
-            | _ -> assert false
-          in
-          M.apply_transformation ~callback intro_transformation (M.get_task g)
+          let trans =
+            Trans.lookup_transform intro_transformation !env_session.S.env in
+          display_task g (Trans.apply trans (S.goal_task g))
         else
-          display_task g (M.get_task g)
-    | M.Theory th ->
+          display_task g (S.goal_task g)
+    | S.Theory th ->
         task_view#source_buffer#set_text "";
         scroll_to_theory th
-    | M.File _file ->
+    | S.File _file ->
         task_view#source_buffer#set_text "";
         (* scroll_to_file file *)
-    | M.Proof_attempt a ->
+    | S.Proof_attempt a ->
         let o =
-          match a.M.proof_state with
-            | Session.Undone -> "proof not yet scheduled for running"
-            | Session.Unedited -> "proof not yet edited"
-            | Session.Done r -> r.Call_provers.pr_output
-            | Session.Scheduled-> "proof scheduled but not running yet"
-            | Session.Running -> "prover currently running"
-            | Session.Interrupted -> assert false
-            | Session.InternalFailure e ->
+          match a.S.proof_state with
+            | S.Undone S.Interrupted ->
+              "proof not yet scheduled for running"
+            | S.Undone S.Unedited -> "proof not yet edited"
+            | S.Done r -> r.Call_provers.pr_output
+            | S.Undone S.Scheduled-> "proof scheduled but not running yet"
+            | S.Undone S.Running -> "prover currently running"
+            | S.InternalFailure e ->
               let b = Buffer.create 37 in
               bprintf b "%a" Exn_printer.exn_printer e;
               Buffer.contents b
         in
         task_view#source_buffer#set_text o;
-        scroll_to_source_goal a.M.proof_goal
-    | M.Transformation tr ->
+        scroll_to_source_goal a.S.proof_parent
+    | S.Transf tr ->
         task_view#source_buffer#set_text "";
-        scroll_to_source_goal tr.M.parent_goal
+        scroll_to_source_goal tr.S.transf_parent
 
 (* row selection on tree view on the left *)
 let (_ : GtkSignal.id) =

@@ -17,8 +17,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Why3
-
 (*
 val t_dist : term -> term -> float
   (** returns an heuristic distance between the two given terms. The

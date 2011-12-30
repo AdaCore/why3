@@ -18,8 +18,9 @@
 (**************************************************************************)
 
 
+open Format
 open Why3
-
+module S = Session
 
 let includes = ref []
 let file = ref None
@@ -29,12 +30,24 @@ let opt_latex = ref ""
 let opt_latex2 = ref ""
 let opt_longtable = ref false
 let opt_force = ref false
-let opt_smoke = ref Session.SD_None
+let opt_convert_unknown_provers = ref false
+
+
+(** {2 Smoke detector} *)
+
+type smoke_detector =
+  | SD_None (** No smoke detector *)
+  | SD_Top  (** Negation added at the top of the goals *)
+  | SD_Deep
+(** Negation added under implication and universal quantification *)
+
+
+let opt_smoke = ref SD_None
 
 let set_opt_smoke = function
-  | "none" -> opt_smoke := Session.SD_None
-  | "top" ->  opt_smoke := Session.SD_Top
-  | "deep" ->  opt_smoke := Session.SD_Deep
+  | "none" -> opt_smoke := SD_None
+  | "top" ->  opt_smoke := SD_Top
+  | "deep" ->  opt_smoke := SD_Deep
   | _ -> assert false
 
 let spec = Arg.align [
@@ -62,6 +75,8 @@ let spec = Arg.align [
   ("-longtable",
    Arg.Set opt_longtable,
    " produce latex statistics using longtable package") ;
+  "--convert-unknown-provers", Arg.Set opt_convert_unknown_provers,
+  " try to find compatible provers for all unknown provers";
   Debug.Opt.desc_debug_list;
   Debug.Opt.desc_shortcut "parse_only" "--parse-only" " Stop after parsing";
   Debug.Opt.desc_shortcut
@@ -92,11 +107,11 @@ let () =
     exit 0
   end
 
-let () =
-  if !opt_smoke <> Session.SD_None && !opt_force then begin
-    Format.printf "You can't force when detecting smoke@.";
-    exit 1
-  end
+(* let () = *)
+(*   if !opt_smoke <> Session.SD_None && !opt_force then begin *)
+(*     Format.printf "You can't force when detecting smoke@."; *)
+(*     exit 1 *)
+(*   end *)
 
 
 let fname = match !file with
@@ -125,7 +140,7 @@ let usleep t = ignore (Unix.select [] [] [] t)
 let idle_handler = ref None
 let timeout_handler = ref None
 
-module M = Session.Make
+module O =
   (struct
      type key = int
 
@@ -151,8 +166,64 @@ module M = Session.Make
      let notify_timer_state w s r =
        Printf.eprintf "Progress: %d/%d/%d                       \r%!" w s r
 
+
+let init =
+(*
+  let cpt = ref 0 in
+*)
+  fun _row any ->
+(*
+    incr cpt;
+    Hashtbl.add model_index !cpt any;
+*)
+    let _name =
+      match any with
+        | S.Goal g -> S.goal_expl g
+        | S.Theory th -> th.S.theory_name.Ident.id_string
+        | S.File f -> Filename.basename f.S.file_name
+        | S.Proof_attempt a ->
+          let p = a.S.proof_prover in
+          p.S.prover_name ^ " " ^ p.S.prover_version
+        | S.Transf tr -> tr.S.transf_name
+    in
+    (* eprintf "Item '%s' loaded@." name *)
+    ()
+
+
+let notify _any = ()
+(*
+  match any with
+    | M.Goal g ->
+        printf "Goal '%s' proved: %b@." (M.goal_expl g) (M.goal_proved g)
+    | M.Theory th ->
+        printf "Theory '%s' verified: %b@." (M.theory_name th) (M.verified th)
+    | M.File file ->
+        printf "File '%s' verified: %b@." (Filename.basename file.M.file_name)
+          file.M.file_verified
+    | M.Proof_attempt a ->
+        let p = a.M.prover in
+        printf "Proof with '%s %s' gives %a@."
+          p.Session.prover_name p.Session.prover_version
+          print_result a.M.proof_state
+    | M.Transformation tr ->
+        printf "Transformation '%s' proved: %b@."
+          (Session.transformation_id tr.M.transf) tr.M.transf_proved
+*)
+
+
    end)
 
+module M = Session_scheduler.Make(O)
+
+let print_result fmt
+    {Call_provers.pr_answer=ans; Call_provers.pr_output=out;
+     Call_provers.pr_time=_t} =
+(*
+  fprintf fmt "%a (%.1fs)" Call_provers.print_prover_answer ans t;
+*)
+  fprintf fmt "%a" Call_provers.print_prover_answer ans;
+  if ans == Call_provers.HighFailure then
+    fprintf fmt "@\nProver output:@\n%s@." out
 
 let main_loop () =
   let last = ref (Unix.gettimeofday ()) in
@@ -194,68 +265,8 @@ let main_loop () =
               end
   done
 
-open Format
-
 (*
 let model_index = Hashtbl.create 257
-*)
-
-let init =
-(*
-  let cpt = ref 0 in
-*)
-  fun _row any ->
-(*
-    incr cpt;
-    Hashtbl.add model_index !cpt any;
-*)
-    let _name =
-      match any with
-        | M.Goal g -> M.goal_expl g
-        | M.Theory th -> M.theory_name th
-        | M.File f -> Filename.basename f.M.file_name
-        | M.Proof_attempt a ->
-            begin
-              match a.M.prover with
-                | M.Detected_prover p ->
-                    p.Session.prover_name ^ " " ^ p.Session.prover_version
-                | M.Undetected_prover s -> s
-            end
-        | M.Transformation tr -> Session.transformation_id tr.M.transf
-    in
-    (* eprintf "Item '%s' loaded@." name *)
-    ()
-
-let print_result fmt
-    {Call_provers.pr_answer=ans; Call_provers.pr_output=out;
-     Call_provers.pr_time=t} =
-(**)
-  fprintf fmt "%a (%.1fs)" Call_provers.print_prover_answer ans t;
-(**)
-(*
-  fprintf fmt "%a" Call_provers.print_prover_answer ans;
-*)
-  if ans == Call_provers.HighFailure then
-    fprintf fmt "@\nProver output:@\n%s@." out
-
-let notify _any = ()
-(*
-  match any with
-    | M.Goal g ->
-        printf "Goal '%s' proved: %b@." (M.goal_expl g) (M.goal_proved g)
-    | M.Theory th ->
-        printf "Theory '%s' verified: %b@." (M.theory_name th) (M.verified th)
-    | M.File file ->
-        printf "File '%s' verified: %b@." (Filename.basename file.M.file_name)
-          file.M.file_verified
-    | M.Proof_attempt a ->
-        let p = a.M.prover in
-        printf "Proof with '%s %s' gives %a@."
-          p.Session.prover_name p.Session.prover_version
-          print_result a.M.proof_state
-    | M.Transformation tr ->
-        printf "Transformation '%s' proved: %b@."
-          (Session.transformation_id tr.M.transf) tr.M.transf_proved
 *)
 
 let project_dir =
@@ -281,29 +292,32 @@ let project_dir =
     failwith "file does not exist"
 
 let goal_statistics (goals,n,m) g =
-  if M.goal_proved g then (goals,n+1,m+1) else (g::goals,n,m+1)
+  if g.S.goal_verified then (goals,n+1,m+1) else (g::goals,n,m+1)
 
 let theory_statistics (ths,n,m) th =
-  let goals,n1,m1 = List.fold_left goal_statistics ([],0,0) (M.goals th) in
+  let goals,n1,m1 =
+    List.fold_left goal_statistics ([],0,0) th.S.theory_goals in
   ((th,goals,n1,m1)::ths,n+n1,m+m1)
 
-let file_statistics (files,n,m) f =
-  let ths,n1,m1 = List.fold_left theory_statistics ([],0,0) f.M.theories in
+let file_statistics _ f (files,n,m) =
+  let ths,n1,m1 =
+    List.fold_left theory_statistics ([],0,0) f.S.file_theories in
   ((f,ths,n1,m1)::files,n+n1,m+m1)
 
 let print_statistics files =
   let print_goal g =
-      printf "         +--goal %s not proved@." (M.goal_name g)
+      printf "         +--goal %s not proved@." g.S.goal_name.Ident.id_string
   in
   let print_theory (th,goals,n,m) =
     if n<m then begin
-      printf "      +--theory %s: %d/%d@." (M.theory_name th) n m;
+      printf "      +--theory %s: %d/%d@."
+        th.S.theory_name.Ident.id_string n m;
       List.iter print_goal (List.rev goals)
     end
   in
   let print_file (f,ths,n,m) =
     if n<m then begin
-      printf "   +--file %s: %d/%d@." f.M.file_name n m;
+      printf "   +--file %s: %d/%d@." f.S.file_name n m;
       List.iter print_theory (List.rev ths)
     end
   in
@@ -312,28 +326,20 @@ let print_statistics files =
 (* Statistics in LaTeX*)
 
 let rec transf_depth tr =
-  List.fold_left (fun depth g -> max depth (goal_depth g)) 0 (tr.M.subgoals)
+  List.fold_left (fun depth g -> max depth (goal_depth g)) 0 tr.S.transf_goals
 and goal_depth g =
-  Hashtbl.fold
+  S.PHstr.fold
     (fun _st tr depth -> max depth (1 + transf_depth tr))
-    (M.transformations g) 0
+    g.S.goal_transformations 0
 
 let theory_depth t =
-  List.fold_left (fun depth g -> max depth (goal_depth g)) 0 (M.goals t)
+  List.fold_left (fun depth g -> max depth (goal_depth g)) 0 t.S.theory_goals
 
-let rec provers_latex_stats provers g =
-  let proofs = M.external_proofs g in
-  Hashtbl.iter (fun p a-> Hashtbl.replace provers p a.M.prover) proofs;
-  let tr = M.transformations g in
-  Hashtbl.iter (fun _st tr ->
-    let goals = tr.M.subgoals in
-    List.iter (provers_latex_stats provers) goals) tr
+let rec provers_latex_stats provers theory =
+  S.theory_iter_proof_attempt (fun a ->
+    Hashtbl.replace provers a.S.proof_prover a.S.proof_prover) theory
 
-let prover_name a =
-  match a with
-      M.Detected_prover d ->
-        d.Session.prover_name ^ " " ^ d.Session.prover_version
-    | M.Undetected_prover s -> s
+let prover_name a = a.S.prover_name ^ " " ^ a.S.prover_version
 
 let protect s =
   let b = Buffer.create 7 in
@@ -356,10 +362,10 @@ let column n depth provers =
 
 
 let print_result_prov proofs prov fmt=
-  List.iter (fun (p, _pr) ->
+  List.iter (fun p ->
   try
-    let pr = Hashtbl.find proofs p in
-    let s = pr.M.proof_state in
+    let pr = S.PHprover.find proofs p in
+    let s = pr.S.proof_state in
       match s with
 	  Session.Done res ->
 	    begin
@@ -413,11 +419,11 @@ let rec goal_latex_stat fmt prov depth depth_max subgoal g =
 	    fprintf fmt "\\explanation{%s}& \\explanation{%s}" " " " "
       end;
     if (depth <= 1) then
-      fprintf fmt "\\explanation{%s} " (protect (M.goal_expl g))
+      fprintf fmt "\\explanation{%s} " (protect (S.goal_expl g))
     else
       fprintf fmt "\\explanation{%s}"  " ";
-    let proofs = M.external_proofs g in
-      if (Hashtbl.length proofs) > 0 then
+    let proofs = g.S.goal_external_proofs in
+      if (S.PHprover.length proofs) > 0 then
 	begin
 	  if depth_max <= 1 then
 	    begin
@@ -437,12 +443,12 @@ let rec goal_latex_stat fmt prov depth depth_max subgoal g =
 		fprintf fmt "& \\explanation{%s}" " " done;
 	  print_result_prov proofs prov fmt;
 	end;
-      let tr = M.transformations g in
-	if Hashtbl.length tr > 0 then
-	  if Hashtbl.length proofs > 0 then
+      let tr = g.S.goal_transformations in
+	if S.PHstr.length tr > 0 then
+	  if S.PHprover.length proofs > 0 then
 	    fprintf fmt "\\cline{%d-%d} @." (depth + 2) column;
-	Hashtbl.iter (fun _st tr ->
-          let goals = tr.M.subgoals in
+	S.PHstr.iter (fun _st tr ->
+          let goals = tr.S.transf_goals in
 	  let _ = List.fold_left (fun subgoal g ->
               goal_latex_stat fmt prov (depth + 1) depth_max (subgoal) g;
                subgoal + 1) 0 goals in
@@ -458,26 +464,27 @@ let rec goal_latex2_stat fmt prov depth depth_max subgoal g =
       fprintf fmt "\\hline @.";
     for i = 1 to depth do fprintf fmt "\\quad" done;
     if (depth <= 1) then
-      fprintf fmt "\\explanation{%s} " (protect (M.goal_expl g))
+      fprintf fmt "\\explanation{%s} " (protect (S.goal_expl g))
     else
       fprintf fmt "\\explanation{%d} " (subgoal + 1);
-    let proofs = M.external_proofs g in
-      if (Hashtbl.length proofs) > 0 then
+    let proofs = g.S.goal_external_proofs in
+      if (S.PHprover.length proofs) > 0 then
 	print_result_prov proofs prov fmt;
-      let tr = M.transformations g in
-	if Hashtbl.length tr > 0 then
+      let tr = g.S.goal_transformations in
+	if S.PHstr.length tr > 0 then
 	  begin
-	    if (Hashtbl.length proofs == 0) then
-	      fprintf fmt "& \\multicolumn{%d}{c|}{}\\\\ @." (List.length prov);
-	    Hashtbl.iter (fun _st tr ->
-		let goals = tr.M.subgoals in
+	    if (S.PHprover.length proofs == 0) then
+	      fprintf fmt "& \\multicolumn{%d}{|c|}{}\\\\ @."
+                (List.length prov);
+	    S.PHstr.iter (fun _st tr ->
+		let goals = tr.S.transf_goals in
 		let _ = List.fold_left (fun subgoal g ->
-				goal_latex2_stat fmt prov (depth + 1) depth_max (subgoal) g;
+		  goal_latex2_stat fmt prov (depth + 1) depth_max (subgoal) g;
 				subgoal + 1) 0 goals in
 		  () ) tr
 	  end
 	else
-	  if (Hashtbl.length proofs) == 0 then
+	  if (S.PHprover.length proofs) == 0 then
 	    fprintf fmt "\\\\ @."
 
 
@@ -491,7 +498,8 @@ let print_head n depth provers fmt =
         (depth + 1)
   else
     fprintf fmt "\\hline Proof obligations ";
-  List.iter (fun (_, a) -> fprintf fmt "& \\provername{%s} " a) provers;
+  List.iter (fun a -> fprintf fmt "& \\provername{%s} " a.S.prover_name)
+    provers;
   fprintf fmt "\\\\ @."
 
 
@@ -502,9 +510,9 @@ fprintf fmt "{| l |";
   fprintf fmt "}@.";
   print_head n depth provers fmt;
   if n == 1 then
-    List.iter (goal_latex_stat fmt provers 0 depth 0) (M.goals t)
+    List.iter (goal_latex_stat fmt provers 0 depth 0) t.S.theory_goals
   else
-    List.iter (goal_latex2_stat fmt provers 0 depth  0) (M.goals t);
+    List.iter (goal_latex2_stat fmt provers 0 depth  0) t.S.theory_goals;
   fprintf fmt "\\hline \\end{tabular}@."
 
 
@@ -528,22 +536,23 @@ let latex_longtable n fmt depth name provers t=
   (** Last foot : nothing *)
   fprintf fmt "\\endfoot \\endlastfoot @.";
   if n == 1 then
-    List.iter (goal_latex_stat fmt provers 0 depth 0) (M.goals t)
+    List.iter (goal_latex_stat fmt provers 0 depth 0) t.S.theory_goals
   else
-    List.iter (goal_latex2_stat fmt provers 0 depth  0) (M.goals t);
+    List.iter (goal_latex2_stat fmt provers 0 depth  0) t.S.theory_goals;
   fprintf fmt "\\hline \\caption{%s statistics} @." (protect name);
   fprintf fmt "\\label{%s} \\end{longtable}@." (protect name)
 
 
 let theory_latex_stat n table dir t =
   let provers = Hashtbl.create 9 in
-  List.iter (provers_latex_stats provers) (M.goals t);
-  let provers = Hashtbl.fold (fun p pr acc -> (p, prover_name pr) :: acc)
+  provers_latex_stats provers t;
+  let provers = Hashtbl.fold (fun _ pr acc -> pr :: acc)
     provers [] in
   let provers =
-    List.sort (fun (_p1, n1) (_p2, n2) -> String.compare n1 n2) provers in
+    List.sort (fun p1 p2 -> String.compare p1.S.prover_name p2.S.prover_name)
+      provers in
   let depth = theory_depth  t in
-  let name = M.theory_name t in
+  let name = t.S.theory_name.Ident.id_string in
   let ch = open_out (Filename.concat dir(name^".tex")) in
   let fmt = formatter_of_out_channel ch in
     if table = "tabular" then
@@ -555,38 +564,52 @@ let theory_latex_stat n table dir t =
     close_out ch
 
 let file_latex_stat n table  dir f =
-   List.iter (theory_latex_stat n table dir) f.M.theories
+   List.iter (theory_latex_stat n table dir) f.S.file_theories
 
-let print_latex_statistics n table dir =
-  let files = M.get_all_files () in
-  List.iter (file_latex_stat n table dir) files
+let print_latex_statistics n table dir session =
+  let files = session.S.session_files in
+  S.PHstr.iter (fun _ f -> file_latex_stat n table dir f) files
 
 let print_report (g,p,r) =
-  printf "   goal '%s', prover '%s': " g p;
+  printf "   goal '%s', prover '%a': " g.Ident.id_string S.print_prover p;
   match r with
-  | M.Wrong_result(new_res,old_res) ->
-    begin match !opt_smoke with
-      | Session.SD_None ->
+  | M.Result(new_res,old_res) ->
+    (* begin match !opt_smoke with *)
+    (*   | Session.SD_None -> *)
         printf "%a instead of %a@."
           print_result new_res print_result old_res
-      | _ ->
-        printf "Smoke detected!!!@."
-    end
-  | M.No_former_result ->
-      printf "no former result available@."
+    (*   | _ -> *)
+    (*     printf "Smoke detected!!!@." *)
+    (* end *)
+  | M.No_former_result new_res ->
+      printf "no former result available : %a@." print_result new_res
   | M.CallFailed msg ->
       printf "internal failure '%a'@." Exn_printer.exn_printer msg;
   | M.Prover_not_installed ->
       printf "not installed@."
 
-let add_to_check_no_smoke found_obs =
+
+let same_result r1 r2 =
+  match r1.Call_provers.pr_answer, r2.Call_provers.pr_answer with
+    | Call_provers.Valid, Call_provers.Valid -> true
+    | Call_provers.Invalid, Call_provers.Invalid -> true
+    | Call_provers.Timeout, Call_provers.Timeout -> true
+    | Call_provers.Unknown _, Call_provers.Unknown _-> true
+    | Call_provers.Failure _, Call_provers.Failure _-> true
+    | _ -> false
+
+let add_to_check_no_smoke found_obs env_session sched =
+      let session = env_session.S.session in
       let callback report =
         eprintf "@.";
 	let files,n,m =
-          List.fold_left file_statistics ([],0,0) (M.get_all_files ())
+          S.PHstr.fold file_statistics
+            session.S.session_files ([],0,0)
 	in
-      match report with
-        | [] ->
+        let report = List.filter (function
+          | (_,_,M.Result(new_res,old_res)) ->not (same_result new_res old_res)
+          | _ -> true) report in
+        if report = [] then begin
             if found_obs then
               if n=m then
                 printf " %d/%d (replay OK, all proved: obsolete session \
@@ -605,56 +628,76 @@ session NOT updated)@." n m
             if found_obs && (n=m || !opt_force) then
               begin
                 eprintf "Updating obsolete session...@?";
-                M.save_session ();
+                S.save_session session;
                 eprintf " done@."
               end;
             exit 0
-        | _ ->
+        end
+        else
+          begin
             printf " %d/%d (replay failed)@." n m ;
             List.iter print_report report;
             eprintf "Replay failed.@.";
             exit 1
+          end
     in
-    M.check_all ~callback
+    M.check_all ~callback env_session sched
 
-let add_to_check_smoke () =
+let add_to_check_smoke env_session sched =
   let callback report =
     eprintf "@.";
-    match report with
-      | [] ->
+    let report = List.filter (function
+      | (_,_,M.Result({Call_provers.pr_answer = Call_provers.Valid} ,_))
+        -> true
+      | (_,_,M.No_former_result({Call_provers.pr_answer = Call_provers.Valid}))
+        -> true
+      | _ -> false) report in
+    if report = [] then begin
         eprintf "No smoke detected.@.";
         exit 0
-      | _ ->
+    end
+    else begin
         List.iter print_report report;
         eprintf "Smoke detected.@.";
         exit 1
+    end
   in
-  M.check_all ~callback
+  M.check_all ~callback env_session sched
 
 let add_to_check found_obs =
   match !opt_smoke with
-    | Session.SD_None -> add_to_check_no_smoke found_obs;
-    | _ -> assert (not found_obs); add_to_check_smoke ()
+    | SD_None -> add_to_check_no_smoke found_obs;
+    | _ -> assert (not found_obs); add_to_check_smoke
+
+let transform_smoke env_session =
+  let trans tr_name s =
+    Session_tools.filter_proof_attempt S.proof_verified s.S.session;
+    Session_tools.transform_proof_attempt ~keygen:O.create s tr_name in
+  match !opt_smoke with
+    | SD_None -> ()
+    | SD_Top -> trans "smoke_detector_top" env_session
+    | SD_Deep -> trans "smoke_detector_deep" env_session
 
 
 let () =
   try
     eprintf "Opening session...@?";
-    let found_obs =
-      M.open_session ~allow_obsolete:true
-        ~env ~config ~init ~notify project_dir
-    in
+    let session = S.read_session project_dir in
+    let env_session,found_obs =
+      M.update_session ~allow_obsolete:true session env config in
+    transform_smoke env_session;
+    if !opt_convert_unknown_provers then M.convert_unknown_prover env_session;
+    let sched =
+      M.init (Whyconf.running_provers_max (Whyconf.get_main config)) in
     if found_obs then begin
-      if !opt_smoke <> Session.SD_None then begin
+      if (* !opt_smoke <> Session.SD_None *) false then begin
         eprintf
           "[Error] I can't run the smoke detector if the session is obsolete";
         exit 1
       end;
       eprintf "[Warning] session is obsolete@.";
     end;
-    M.maximum_running_proofs :=
-      Whyconf.running_provers_max (Whyconf.get_main config);
-    M.smoke_detector := !opt_smoke;
+    (* M.smoke_detector := !opt_smoke; *)
     eprintf " done.";
     if !opt_longtable && !opt_latex == "" && !opt_latex2 == "" then
       begin
@@ -665,22 +708,26 @@ let () =
     if !opt_latex <> "" then
       if !opt_longtable then
 	print_latex_statistics 1 "longtable" !opt_latex
+            env_session.S.session
       else
 	print_latex_statistics 1 "tabular" !opt_latex
+            env_session.S.session
     else
       if !opt_latex2 <> "" then
 	if !opt_longtable then
 	  print_latex_statistics 2 "longtable" !opt_latex2
+            env_session.S.session
 	else
 	  print_latex_statistics 2 "tabular" !opt_latex2
+            env_session.S.session
       else
 	begin
-          add_to_check found_obs;
+          add_to_check found_obs env_session sched;
           try main_loop ()
           with Exit -> eprintf "main replayer exited unexpectedly@."
 	end
   with
-    | M.OutdatedSession ->
+    | S.OutdatedSession ->
         eprintf "The session database '%s' is outdated, cannot replay@."
           project_dir;
         eprintf "Aborting...@.";

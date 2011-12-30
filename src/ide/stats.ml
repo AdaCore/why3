@@ -16,7 +16,8 @@
 open Format
 open Why3
 open Util
-open Session_ro
+
+open Session
 
 let includes = ref []
 let files = Queue.create ()
@@ -61,8 +62,6 @@ let () =
   end
 
 let allow_obsolete = !allow_obsolete
-
-let env = read_config ~includes:!includes !opt_config
 
 let () =
   Debug.Opt.set_flags_selected ();
@@ -133,24 +132,24 @@ let update_perf_stats stats prover_and_time =
   update_count stats.prover_num_proofs prover_and_time
 
 let rec stats_of_goal prefix_name stats goal =
-  let ext_proofs = goal.external_proofs in
-  let proof_id = prefix_name ^ goal.goal_name in
+  let ext_proofs = goal.goal_external_proofs in
+  let proof_id = prefix_name ^ goal.goal_name.Ident.id_string in
   let proof_list =
-    Mstr.fold
+    PHprover.fold
       (fun prover proof_attempt acc ->
         match proof_attempt.proof_state with
           | Done result ->
             begin
               match result.Call_provers.pr_answer with
                 | Call_provers.Valid ->
-                    (prover, result.Call_provers.pr_time) :: acc
+                    (prover.prover_name, result.Call_provers.pr_time) :: acc
                 | _ ->
                   acc
             end
           | _ -> acc)
       ext_proofs
       [] in
-  let no_transf = Mstr.is_empty goal.transformations in
+  let no_transf = PHstr.length goal.goal_transformations = 0 in
   begin match proof_list with
     | [] when no_transf ->
       stats.no_proof <- Sstr.add proof_id stats.no_proof
@@ -160,35 +159,35 @@ let rec stats_of_goal prefix_name stats goal =
       update_perf_stats stats (prover, time)
     | _ ->
       List.iter (update_perf_stats stats) proof_list end;
-  Mstr.iter (stats_of_transf prefix_name stats) goal.transformations
+  PHstr.iter (stats_of_transf prefix_name stats) goal.goal_transformations
 
 and stats_of_transf prefix_name stats _ transf =
   let prefix_name = prefix_name ^ transf.transf_name  ^ " / " in
-  List.iter (stats_of_goal prefix_name stats) transf.subgoals
+  List.iter (stats_of_goal prefix_name stats) transf.transf_goals
 
 let stats_of_theory file stats theory =
-  let goals = theory.goals in
-  let prefix_name = file.file_name ^ " / " ^ theory.theory_name
+  let goals = theory.theory_goals in
+  let prefix_name = file.file_name ^ " / " ^ theory.theory_name.Ident.id_string
     ^  " / " in
   List.iter (stats_of_goal prefix_name stats) goals
 
-let stats_of_file stats file =
-  let theories = file.theories in
+let stats_of_file stats _ file =
+  let theories = file.file_theories in
   List.iter (stats_of_theory file stats) theories
 
 let fill_prover_data stats session =
-  Mstr.iter
-    (fun prover data ->
-      Hashtbl.add stats.prover_data prover
-        (data.prover_name ^ " " ^ data.prover_version))
-    session.provers
+  Sprover.iter
+    (fun prover ->
+      Hashtbl.add stats.prover_data prover.prover_id
+        (prover.prover_name ^ " " ^ prover.prover_version))
+    (get_provers session)
 
 let extract_stats_from_file stats fname =
   let project_dir = get_project_dir fname in
   try
-    let session = read_project_dir ~allow_obsolete ~env project_dir in
+    let session = read_session project_dir in
     fill_prover_data stats session;
-    List.iter (stats_of_file stats) session.files
+    PHstr.iter (stats_of_file stats) session.session_files
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "Error while opening session with database '%s' : %a@." project_dir
       Exn_printer.exn_printer e;

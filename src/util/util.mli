@@ -38,6 +38,8 @@ val cons : ('a -> 'b) -> 'b list -> 'a -> 'b list
 
 val of_option : 'a option -> 'a
 
+val exn_option : exn -> 'a option -> 'a
+
 val default_option : 'a -> 'a option -> 'a
 
 val option_map : ('a -> 'b) -> 'a option -> 'b option
@@ -110,8 +112,13 @@ val list_fold_lefti : ('a -> int -> 'b -> 'a) -> 'a -> 'b list -> 'a
   (** similar to List.map, List.iter and List.fold_left,
       but with element index passed as extra argument (in 0..len-1) *)
 
+val list_or : ('a -> bool) -> 'a list -> bool
+val list_and : ('a -> bool) -> 'a list -> bool
+(** make the or or the and of the results of the function on all the
+    element of the list *)
+
 val prefix : int -> 'a list -> 'a list
-  (** the first n elements of a list *)
+(** the first n elements of a list *)
 val chop : int -> 'a list -> 'a list
   (** removes the first n elements of a list;
       raises Invalid_argument if the list is not long enough *)
@@ -148,6 +155,7 @@ module Sint : Mint.Set
 
 module Mstr : Map.S with type key = string
 module Sstr : Mstr.Set
+module Hstr : Hashtbl.S with type key = string
 
 val memo_int : int -> (int -> 'a) -> int -> 'a
 val memo_string : int -> (string -> 'a) -> string -> 'a
@@ -186,3 +194,20 @@ sig
   module W : Hashweak.S with type key = X.t
 end
 
+module type PrivateHashtbl = sig
+  (** Private Hashtbl *)
+  type 'a t
+  type key
+
+  val find : 'a t -> key -> 'a
+    (** Same as {Hashtbl.find} *)
+  val iter : (key -> 'a -> unit) -> 'a t -> unit
+    (** Same as {Hashtbl.iter} *)
+  val fold : (key -> 'a -> 'acc -> 'acc) -> 'a t -> 'acc -> 'acc
+    (** Same as {Hashtbl.fold} *)
+  val mem : 'a t -> key -> bool
+    (** Same as {Hashtbl.mem} *)
+  val length : 'a t -> int
+    (** Same as {Hashtbl.length} *)
+
+end

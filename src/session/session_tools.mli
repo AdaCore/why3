@@ -17,44 +17,24 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(*s This module provides a generic ASCII pretty-printing function for trees,
-    in a way similar to what the Unix command pstree does:
+(** This module contains generic tools which can be applied on sessions *)
 
-bash-+-emacs-+-emacsserver
-     |       `-ispell
-     |-pstree
-     `-xdvi.bin
-*)
+open Session
 
-(*s A tree structure is given as an abstract type [t] together with a
-    decomposition function [decomp] returning the label of the node and
-    the list of the children trees. Leaves are nodes with no child (i.e.
-    an empty list). *)
+val convert_unknown_prover : keygen:'a keygen -> 'a env_session -> unit
+(** try to add new proof_attempt with known provers for all proof
+    attempt with unknwon provers *)
 
-module type Tree = sig
-  type t
-  val decomp : t -> string * t list
-end
+val filter_proof_attempt :
+  ?notify:'key notify ->
+  ('key proof_attempt -> bool) -> 'key session -> unit
+(** remove all the proof attempts which doesn't satisfy the given predicate *)
 
-(*s The functor [Make] takes a tree structure [T] as argument and provides a
-    single function [print: formatter -> T.t -> unit] to print a tree on a
-    given formatter. *)
-
-module Make (T : Tree) : sig
-  val print : Format.formatter -> T.t -> unit
-end
-
-
-(** With type variable *)
-module type PTree = sig
-  type 'a t
-  val decomp : 'a t -> string * 'a t list
-end
-
-(*s The functor [Make] takes a tree structure [T] as argument and provides a
-    single function [print: formatter -> T.t -> unit] to print a tree on a
-    given formatter. *)
-
-module PMake (T : PTree) : sig
-  val print : Format.formatter -> 'a T.t -> unit
-end
+val transform_proof_attempt :
+  ?notify:'key notify ->
+  keygen:'key keygen ->
+  'key env_session -> string -> unit
+(** replace all the proof attempts of the given session
+    by the application of the given
+    registered transformation followed by a proof_attempt with the same prover
+    and time limit (but undone) *)

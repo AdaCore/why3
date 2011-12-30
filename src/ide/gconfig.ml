@@ -99,7 +99,8 @@ let load_ide section =
     ide_verbose =
       get_int section ~default:default_ide.ide_verbose "verbose";
     ide_intro_premises =
-      get_bool section ~default:default_ide.ide_intro_premises "intro_premises";
+      get_bool section ~default:default_ide.ide_intro_premises
+        "intro_premises";
     ide_show_labels =
       get_bool section ~default:default_ide.ide_show_labels "print_labels";
     ide_show_locs =
@@ -164,16 +165,6 @@ let load_config config =
   }
 
 let save_config t =
-  let _save_prover _ pr acc =
-    Mstr.add pr.Session.prover_id
-      {
-        Whyconf.name    = pr.Session.prover_name;
-        command = pr.Session.command;
-        driver  = pr.Session.driver_name;
-        version = pr.Session.prover_version;
-        editor  = pr.Session.editor;
-        interactive = pr.Session.interactive;
-      } acc in
   let config = t.config in
   let config = set_main config
     (set_limits (get_main config)
@@ -269,7 +260,8 @@ let iconname_reload = "movefile32"
 let iconname_remove = "deletefile32"
 let iconname_cleaning = "trashb32"
 
-let image_default = ref (GdkPixbuf.create ~width:1 ~height:1 ()) (** dumb pixbuf *)
+let image_default = ref (GdkPixbuf.create ~width:1 ~height:1 ())
+(** dumb pixbuf *)
 let image_undone = ref !image_default
 let image_scheduled = ref !image_default
 let image_running = ref !image_default
@@ -438,7 +430,8 @@ let preferences c =
 *)
   (* timelimit ? *)
   let hb = GPack.hbox ~homogeneous:false ~packing:page1#add () in
-  let _ = GMisc.label ~text:"Time limit: " ~packing:(hb#pack ~expand:false) () in
+  let _ = GMisc.label ~text:"Time limit: "
+    ~packing:(hb#pack ~expand:false) () in
   let timelimit_spin = GEdit.spin_button ~digits:0 ~packing:hb#add () in
   timelimit_spin#adjustment#set_bounds ~lower:2. ~upper:300. ~step_incr:1. ();
   timelimit_spin#adjustment#set_value (float_of_int c.time_limit);
@@ -448,7 +441,8 @@ let preferences c =
   in
   (* nb of processes ? *)
   let hb = GPack.hbox ~homogeneous:false ~packing:page1#add () in
-  let _ = GMisc.label ~text:"Nb of processes: " ~packing:(hb#pack ~expand:false) () in
+  let _ = GMisc.label ~text:"Nb of processes: "
+    ~packing:(hb#pack ~expand:false) () in
   let nb_processes_spin = GEdit.spin_button ~digits:0 ~packing:hb#add () in
   nb_processes_spin#adjustment#set_bounds
     ~lower:1. ~upper:16. ~step_incr:1. ();
