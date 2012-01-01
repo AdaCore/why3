@@ -192,111 +192,21 @@ Axiom Nth_bw_xor_v1true : forall (v1:bv) (v2:bv) (n:Z), (((0%Z <= n)%Z /\
   (n <  size)%Z) /\ ((nth v1 n) = true)) -> ((nth (bw_xor v1 v2)
   n) = (negb (nth v2 n))).
 
-Axiom Nth_bw_xor_v1false : forall (v1:bv) (v2:bv) (n:Z), (((0%Z <= n)%Z /\
-  (n <  size)%Z) /\ ((nth v1 n) = false)) -> ((nth (bw_xor v1 v2)
-  n) = (nth v2 n)).
-
-Axiom Nth_bw_xor_v2true : forall (v1:bv) (v2:bv) (n:Z), (((0%Z <= n)%Z /\
-  (n <  size)%Z) /\ ((nth v2 n) = true)) -> ((nth (bw_xor v1 v2)
-  n) = (negb (nth v1 n))).
-
-Axiom Nth_bw_xor_v2false : forall (v1:bv) (v2:bv) (n:Z), (((0%Z <= n)%Z /\
-  (n <  size)%Z) /\ ((nth v2 n) = false)) -> ((nth (bw_xor v1 v2)
-  n) = (nth v1 n)).
-
-Parameter bw_not: bv -> bv.
-
-
-Axiom Nth_bw_not : forall (v:bv) (n:Z), ((0%Z <= n)%Z /\ (n <  size)%Z) ->
-  ((nth (bw_not v) n) = (negb (nth v n))).
-
-Parameter lsr: bv -> Z -> bv.
-
-
-Axiom lsr_nth_low : forall (b:bv) (n:Z) (s:Z), (((0%Z <= n)%Z /\
-  (n <  size)%Z) /\ (((0%Z <= s)%Z /\ (s <  size)%Z) /\
-  ((n + s)%Z <  size)%Z)) -> ((nth (lsr b s) n) = (nth b (n + s)%Z)).
-
-Axiom lsr_nth_high : forall (b:bv) (n:Z) (s:Z), (((0%Z <= n)%Z /\
-  (n <  size)%Z) /\ (((0%Z <= s)%Z /\ (s <  size)%Z) /\
-  (size <= (n + s)%Z)%Z)) -> ((nth (lsr b s) n) = false).
-
-Parameter asr: bv -> Z -> bv.
-
-
-Axiom asr_nth_low : forall (b:bv) (n:Z) (s:Z), ((0%Z <= n)%Z /\
-  (n <  size)%Z) -> ((0%Z <= s)%Z -> (((n + s)%Z <  size)%Z -> ((nth (asr b
-  s) n) = (nth b (n + s)%Z)))).
-
-Axiom asr_nth_high : forall (b:bv) (n:Z) (s:Z), ((0%Z <= n)%Z /\
-  (n <  size)%Z) -> ((0%Z <= s)%Z -> ((size <= (n + s)%Z)%Z -> ((nth (asr b
-  s) n) = (nth b (size - 1%Z)%Z)))).
-
-Parameter lsl: bv -> Z -> bv.
-
-
-Axiom lsl_nth_high : forall (b:bv) (n:Z) (s:Z), ((0%Z <= n)%Z /\
-  (n <  size)%Z) -> ((0%Z <= s)%Z -> ((0%Z <= (n - s)%Z)%Z -> ((nth (lsl b s)
-  n) = (nth b (n - s)%Z)))).
-
-Axiom lsl_nth_low : forall (b:bv) (n:Z) (s:Z), ((0%Z <= n)%Z /\
-  (n <  size)%Z) -> ((0%Z <= s)%Z -> (((n - s)%Z <  0%Z)%Z -> ((nth (lsl b s)
-  n) = false))).
-
-Parameter to_nat_sub: bv -> Z -> Z -> Z.
-
-
-Axiom to_nat_sub_zero : forall (b:bv) (j:Z) (i:Z), (((0%Z <= i)%Z /\
-  (i <= j)%Z) /\ (j <  size)%Z) -> (((nth b j) = false) -> ((to_nat_sub b j
-  i) = (to_nat_sub b (j - 1%Z)%Z i))).
-
-Axiom to_nat_sub_one : forall (b:bv) (j:Z) (i:Z), (((0%Z <= i)%Z /\
-  (i <= j)%Z) /\ (j <  size)%Z) -> (((nth b j) = true) -> ((to_nat_sub b j
-  i) = ((pow2 (j - i)%Z) + (to_nat_sub b (j - 1%Z)%Z i))%Z)).
-
-Axiom to_nat_sub_high : forall (b:bv) (j:Z) (i:Z), (j <  i)%Z ->
-  ((to_nat_sub b j i) = 0%Z).
-
-Axiom to_nat_of_zero2 : forall (b:bv) (i:Z) (j:Z), (((j <  size)%Z /\
-  (i <= j)%Z) /\ (0%Z <= i)%Z) -> ((forall (k:Z), ((k <= j)%Z /\
-  (i <  k)%Z) -> ((nth b k) = false)) -> ((to_nat_sub b j
-  0%Z) = (to_nat_sub b i 0%Z))).
-
 (* YOU MAY EDIT THE CONTEXT BELOW *)
-
+Open Scope Z_scope.
 (* DO NOT EDIT BELOW *)
 
-Theorem to_nat_of_zero : forall (b:bv) (i:Z) (j:Z), (((j <  size)%Z /\
-  (i <= j)%Z) /\ (0%Z <= i)%Z) -> ((forall (k:Z), ((k <= j)%Z /\
-  (i <= k)%Z) -> ((nth b k) = false)) -> ((to_nat_sub b j i) = 0%Z)).
+Theorem Nth_bw_xor_v1false : forall (v1:bv) (v2:bv) (n:Z), (((0%Z <= n)%Z /\
+  (n <  size)%Z) /\ ((nth v1 n) = false)) -> ((nth (bw_xor v1 v2)
+  n) = (nth v2 n)).
 (* YOU MAY EDIT THE PROOF BELOW *)
-Open Scope Z_scope.
-intros b i j Hij.
-cut(j<size).
-apply Zlt_lower_bound_ind with (z:=i)
-                    (P:= fun j=>  j < size ->
-(forall k : Z, k <= j /\ i <= k -> nth b k = false) -> to_nat_sub b j i = 0).
-
-(*apply Zlt_lower_bound_ind with (z:=i)
-                    (P:= fun j=> (forall k : Z, (k <= j)%Z /\ (i <= k)%Z -> nth b k = false) ->
-to_nat_sub b j i = 0%Z).
-*)
-
-intros x Hind Hxi Hxsize.
-assert (h: (i=x \/ i<x)) by omega.
-destruct h.
-subst x;auto.
-intro Hbits.
-rewrite to_nat_sub_zero;auto with zarith.
-rewrite to_nat_sub_high;auto with zarith.
-intro.
-rewrite to_nat_sub_zero;auto with zarith.
-destruct Hij.
+intros.
+rewrite Nth_bw_xor.
 destruct H.
-exact H1.
-destruct Hij.
+replace (nth v1 n) with false.
+destruct (nth v2 n);auto.
 destruct H.
-exact H.
+auto.
 Qed.
 (* DO NOT EDIT BELOW *)
 

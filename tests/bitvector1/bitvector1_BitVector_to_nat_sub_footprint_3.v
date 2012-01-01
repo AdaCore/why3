@@ -2,12 +2,6 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import ZArith.
 Require Import Rbase.
-Definition implb(x:bool) (y:bool): bool := match (x,
-  y) with
-  | (true, false) => false
-  | (_, _) => true
-  end.
-
 Parameter pow2: Z -> Z.
 
 
@@ -286,22 +280,67 @@ Theorem to_nat_sub_footprint : forall (b1:bv) (b2:bv) (j:Z) (i:Z),
   (k <= j)%Z) -> ((nth b1 k) = (nth b2 k))) -> ((to_nat_sub b1 j
   i) = (to_nat_sub b2 j i))).
 (* YOU MAY EDIT THE PROOF BELOW *)
-intros b1 b2 j i (Hij,Hipos) Hfootprint.
+intros b1 b2 j i (Hij,Hipos).
 assert (h:(j < i \/ i <= j)) by omega.
 destruct h.
 do 2 (rewrite to_nat_sub_high; auto).
-cut (i-1 <= j).
-apply Zlt_lower_bound_ind with
- (P:= fun j => to_nat_sub b1 j i = to_nat_sub b2 j i).
-intros x Hind Hxi.
-assert (h: x=i-1 \/ i <= x) by omega.
+(*cut(i-1 <= j<size).
+apply Zlt_lower_bound_ind with (z:=i)
+ (P:= fun j =>i - 1 <= j < size -> to_nat_sub b1 j i = to_nat_sub b2 j i).
+*)
+cut (j<size).
+apply Zlt_lower_bound_ind with (z:=i)
+ (P:= fun j =>j < size ->
+(forall k : Z, i <= k <= j -> nth b1 k = nth b2 k) ->
+to_nat_sub b1 j i = to_nat_sub b2 j i).
+intros x Hind Hxi Hs Hfootprint.
+(*assert (h: x=i-1 \/ i <= x) by omega.*)
+assert (h:i=x \/ i<x) by omega.
 destruct h.
 subst x.
-rewrite to_nat_sub_high; auto with zarith.
-rewrite to_nat_sub_high; auto with zarith.
+
+
+assert (h:(nth b1 i) = true \/ (nth b1 i) = false).
+destruct (nth b1 i);auto.
+destruct h.
+
+rewrite to_nat_sub_one;auto with zarith.
+rewrite to_nat_sub_one with (b:=b2);auto with zarith.
+apply Zplus_eq_compat;auto.
+
+do 2(rewrite to_nat_sub_high; auto with zarith).
+cut (nth b1 i = nth b2 i).
+rewrite H0;auto.
+auto.
+
+rewrite to_nat_sub_zero;auto with zarith.
+rewrite to_nat_sub_zero with (b:=b2);auto with zarith.
+
+do 2(rewrite to_nat_sub_high; auto with zarith).
+cut (nth b1 i = nth b2 i).
+rewrite H0;auto.
+auto.
+
+
+(*do 2(rewrite to_nat_sub_high; auto with zarith).*)
+(*rewrite to_nat_sub_high; auto with zarith.*)
 assert (h:(nth b1 x) = true \/ (nth b1 x) = false).
 destruct (nth b1 x); auto.
 destruct h.
+rewrite to_nat_sub_one;auto with zarith.
+rewrite to_nat_sub_one with (b:=b2);auto with zarith.
+cut (nth b1 x = nth b2 x).
+rewrite H1;auto.
+apply Hfootprint;auto with zarith.
+
+
+rewrite to_nat_sub_zero;auto with zarith.
+rewrite to_nat_sub_zero with (b:=b2);auto with zarith.
+cut (nth b1 x = nth b2 x).
+rewrite H1;auto.
+apply Hfootprint;auto with zarith.
+exact H.
+exact Hij.
 
 Qed.
 (* DO NOT EDIT BELOW *)

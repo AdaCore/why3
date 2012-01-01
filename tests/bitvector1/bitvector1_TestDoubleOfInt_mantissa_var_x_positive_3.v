@@ -2,17 +2,6 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import ZArith.
 Require Import Rbase.
-Require int.Int.
-Require int.Abs.
-Require int.EuclideanDivision.
-Require real.Real.
-Require real.FromInt.
-Definition implb(x:bool) (y:bool): bool := match (x,
-  y) with
-  | (true, false) => false
-  | (_, _) => true
-  end.
-
 Parameter pow2: Z -> Z.
 
 
@@ -291,20 +280,41 @@ Axiom lsr_to_nat_sub : forall (b:bv) (s:Z), ((0%Z <= s)%Z /\
 Parameter from_int: Z -> bv.
 
 
+Axiom Abs_le : forall (x:Z) (y:Z), ((Zabs x) <= y)%Z <-> (((-y)%Z <= x)%Z /\
+  (x <= y)%Z).
+
+Parameter div: Z -> Z -> Z.
+
+
+Parameter mod1: Z -> Z -> Z.
+
+
+Axiom Div_mod : forall (x:Z) (y:Z), (~ (y = 0%Z)) -> (x = ((y * (div x
+  y))%Z + (mod1 x y))%Z).
+
+Axiom Div_bound : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (0%Z <  y)%Z) ->
+  ((0%Z <= (div x y))%Z /\ ((div x y) <= x)%Z).
+
+Axiom Mod_bound : forall (x:Z) (y:Z), (~ (y = 0%Z)) -> ((0%Z <= (mod1 x
+  y))%Z /\ ((mod1 x y) <  (Zabs y))%Z).
+
+Axiom Mod_1 : forall (x:Z), ((mod1 x 1%Z) = 0%Z).
+
+Axiom Div_1 : forall (x:Z), ((div x 1%Z) = x).
+
 Axiom nth_from_int_high_even : forall (n:Z) (i:Z), (((i <  32%Z)%Z /\
-  (0%Z <= i)%Z) /\ ((int.EuclideanDivision.mod1 (int.EuclideanDivision.div n
-  (pow2 i)) 2%Z) = 0%Z)) -> ((nth (from_int n) i) = false).
+  (0%Z <= i)%Z) /\ ((mod1 (div n (pow2 i)) 2%Z) = 0%Z)) -> ((nth (from_int n)
+  i) = false).
 
 Axiom nth_from_int_high_odd : forall (n:Z) (i:Z), (((i <  32%Z)%Z /\
-  (0%Z <= i)%Z) /\
-  ~ ((int.EuclideanDivision.mod1 (int.EuclideanDivision.div n (pow2 i))
-  2%Z) = 0%Z)) -> ((nth (from_int n) i) = true).
+  (0%Z <= i)%Z) /\ ~ ((mod1 (div n (pow2 i)) 2%Z) = 0%Z)) ->
+  ((nth (from_int n) i) = true).
 
-Axiom nth_from_int_low_even : forall (n:Z), ((int.EuclideanDivision.mod1 n
-  2%Z) = 0%Z) -> ((nth (from_int n) 0%Z) = false).
+Axiom nth_from_int_low_even : forall (n:Z), ((mod1 n 2%Z) = 0%Z) ->
+  ((nth (from_int n) 0%Z) = false).
 
-Axiom nth_from_int_low_odd : forall (n:Z), (~ ((int.EuclideanDivision.mod1 n
-  2%Z) = 0%Z)) -> ((nth (from_int n) 0%Z) = true).
+Axiom nth_from_int_low_odd : forall (n:Z), (~ ((mod1 n 2%Z) = 0%Z)) ->
+  ((nth (from_int n) 0%Z) = true).
 
 Axiom pow2i : forall (i:Z), (0%Z <= i)%Z -> ~ ((pow2 i) = 0%Z).
 
@@ -321,42 +331,34 @@ Axiom nth_sign_positive : forall (n:Z), (0%Z <= n)%Z -> ((nth (from_int2c n)
 
 Axiom nth_from_int2c_high_even_positive : forall (n:Z) (i:Z),
   ((0%Z <= n)%Z /\ (((i <  (32%Z - 1%Z)%Z)%Z /\ (0%Z <= i)%Z) /\
-  ((int.EuclideanDivision.mod1 (int.EuclideanDivision.div n (pow2 i))
-  2%Z) = 0%Z))) -> ((nth (from_int2c n) i) = false).
+  ((mod1 (div n (pow2 i)) 2%Z) = 0%Z))) -> ((nth (from_int2c n) i) = false).
 
 Axiom nth_from_int2c_high_odd_positive : forall (n:Z) (i:Z), ((0%Z <= n)%Z /\
-  (((i <  (32%Z - 1%Z)%Z)%Z /\ (0%Z <= i)%Z) /\
-  ~ ((int.EuclideanDivision.mod1 (int.EuclideanDivision.div n (pow2 i))
+  (((i <  (32%Z - 1%Z)%Z)%Z /\ (0%Z <= i)%Z) /\ ~ ((mod1 (div n (pow2 i))
   2%Z) = 0%Z))) -> ((nth (from_int2c n) i) = true).
 
 Axiom nth_from_int2c_low_even_positive : forall (n:Z), ((0%Z <= n)%Z /\
-  ((int.EuclideanDivision.mod1 n 2%Z) = 0%Z)) -> ((nth (from_int2c n)
-  0%Z) = false).
+  ((mod1 n 2%Z) = 0%Z)) -> ((nth (from_int2c n) 0%Z) = false).
 
 Axiom nth_from_int2c_low_odd_positive : forall (n:Z), ((0%Z <= n)%Z /\
-  ~ ((int.EuclideanDivision.mod1 n 2%Z) = 0%Z)) -> ((nth (from_int2c n)
-  0%Z) = true).
+  ~ ((mod1 n 2%Z) = 0%Z)) -> ((nth (from_int2c n) 0%Z) = true).
 
 Axiom nth_sign_negative : forall (n:Z), (n <  0%Z)%Z -> ((nth (from_int2c n)
   (32%Z - 1%Z)%Z) = true).
 
 Axiom nth_from_int2c_high_even_negative : forall (n:Z) (i:Z),
   ((n <  0%Z)%Z /\ (((i <  (32%Z - 1%Z)%Z)%Z /\ (0%Z <= i)%Z) /\
-  ((int.EuclideanDivision.mod1 (int.EuclideanDivision.div n (pow2 i))
-  2%Z) = 0%Z))) -> ((nth (from_int2c n) i) = true).
+  ((mod1 (div n (pow2 i)) 2%Z) = 0%Z))) -> ((nth (from_int2c n) i) = true).
 
 Axiom nth_from_int2c_high_odd_negative : forall (n:Z) (i:Z), ((n <  0%Z)%Z /\
-  (((i <  (32%Z - 1%Z)%Z)%Z /\ (0%Z <= i)%Z) /\
-  ~ ((int.EuclideanDivision.mod1 (int.EuclideanDivision.div n (pow2 i))
+  (((i <  (32%Z - 1%Z)%Z)%Z /\ (0%Z <= i)%Z) /\ ~ ((mod1 (div n (pow2 i))
   2%Z) = 0%Z))) -> ((nth (from_int2c n) i) = false).
 
 Axiom nth_from_int2c_low_even_negative : forall (n:Z), ((n <  0%Z)%Z /\
-  ((int.EuclideanDivision.mod1 n 2%Z) = 0%Z)) -> ((nth (from_int2c n)
-  0%Z) = true).
+  ((mod1 n 2%Z) = 0%Z)) -> ((nth (from_int2c n) 0%Z) = true).
 
 Axiom nth_from_int2c_low_odd_negative : forall (n:Z), ((n <  0%Z)%Z /\
-  ~ ((int.EuclideanDivision.mod1 n 2%Z) = 0%Z)) -> ((nth (from_int2c n)
-  0%Z) = false).
+  ~ ((mod1 n 2%Z) = 0%Z)) -> ((nth (from_int2c n) 0%Z) = false).
 
 Parameter bv1 : Type.
 
@@ -499,19 +501,18 @@ Parameter from_int1: Z -> bv1.
 
 
 Axiom nth_from_int_high_even1 : forall (n:Z) (i:Z), (((i <  64%Z)%Z /\
-  (0%Z <= i)%Z) /\ ((int.EuclideanDivision.mod1 (int.EuclideanDivision.div n
-  (pow2 i)) 2%Z) = 0%Z)) -> ((nth1 (from_int1 n) i) = false).
+  (0%Z <= i)%Z) /\ ((mod1 (div n (pow2 i)) 2%Z) = 0%Z)) ->
+  ((nth1 (from_int1 n) i) = false).
 
 Axiom nth_from_int_high_odd1 : forall (n:Z) (i:Z), (((i <  64%Z)%Z /\
-  (0%Z <= i)%Z) /\
-  ~ ((int.EuclideanDivision.mod1 (int.EuclideanDivision.div n (pow2 i))
-  2%Z) = 0%Z)) -> ((nth1 (from_int1 n) i) = true).
+  (0%Z <= i)%Z) /\ ~ ((mod1 (div n (pow2 i)) 2%Z) = 0%Z)) ->
+  ((nth1 (from_int1 n) i) = true).
 
-Axiom nth_from_int_low_even1 : forall (n:Z), ((int.EuclideanDivision.mod1 n
-  2%Z) = 0%Z) -> ((nth1 (from_int1 n) 0%Z) = false).
+Axiom nth_from_int_low_even1 : forall (n:Z), ((mod1 n 2%Z) = 0%Z) ->
+  ((nth1 (from_int1 n) 0%Z) = false).
 
-Axiom nth_from_int_low_odd1 : forall (n:Z), (~ ((int.EuclideanDivision.mod1 n
-  2%Z) = 0%Z)) -> ((nth1 (from_int1 n) 0%Z) = true).
+Axiom nth_from_int_low_odd1 : forall (n:Z), (~ ((mod1 n 2%Z) = 0%Z)) ->
+  ((nth1 (from_int1 n) 0%Z) = true).
 
 Axiom pow2i1 : forall (i:Z), (0%Z <= i)%Z -> ~ ((pow2 i) = 0%Z).
 
@@ -528,42 +529,37 @@ Axiom nth_sign_positive1 : forall (n:Z), (0%Z <= n)%Z ->
 
 Axiom nth_from_int2c_high_even_positive1 : forall (n:Z) (i:Z),
   ((0%Z <= n)%Z /\ (((i <  (64%Z - 1%Z)%Z)%Z /\ (0%Z <= i)%Z) /\
-  ((int.EuclideanDivision.mod1 (int.EuclideanDivision.div n (pow2 i))
-  2%Z) = 0%Z))) -> ((nth1 (from_int2c1 n) i) = false).
+  ((mod1 (div n (pow2 i)) 2%Z) = 0%Z))) -> ((nth1 (from_int2c1 n)
+  i) = false).
 
 Axiom nth_from_int2c_high_odd_positive1 : forall (n:Z) (i:Z),
   ((0%Z <= n)%Z /\ (((i <  (64%Z - 1%Z)%Z)%Z /\ (0%Z <= i)%Z) /\
-  ~ ((int.EuclideanDivision.mod1 (int.EuclideanDivision.div n (pow2 i))
-  2%Z) = 0%Z))) -> ((nth1 (from_int2c1 n) i) = true).
+  ~ ((mod1 (div n (pow2 i)) 2%Z) = 0%Z))) -> ((nth1 (from_int2c1 n)
+  i) = true).
 
 Axiom nth_from_int2c_low_even_positive1 : forall (n:Z), ((0%Z <= n)%Z /\
-  ((int.EuclideanDivision.mod1 n 2%Z) = 0%Z)) -> ((nth1 (from_int2c1 n)
-  0%Z) = false).
+  ((mod1 n 2%Z) = 0%Z)) -> ((nth1 (from_int2c1 n) 0%Z) = false).
 
 Axiom nth_from_int2c_low_odd_positive1 : forall (n:Z), ((0%Z <= n)%Z /\
-  ~ ((int.EuclideanDivision.mod1 n 2%Z) = 0%Z)) -> ((nth1 (from_int2c1 n)
-  0%Z) = true).
+  ~ ((mod1 n 2%Z) = 0%Z)) -> ((nth1 (from_int2c1 n) 0%Z) = true).
 
 Axiom nth_sign_negative1 : forall (n:Z), (n <  0%Z)%Z ->
   ((nth1 (from_int2c1 n) (64%Z - 1%Z)%Z) = true).
 
 Axiom nth_from_int2c_high_even_negative1 : forall (n:Z) (i:Z),
   ((n <  0%Z)%Z /\ (((i <  (64%Z - 1%Z)%Z)%Z /\ (0%Z <= i)%Z) /\
-  ((int.EuclideanDivision.mod1 (int.EuclideanDivision.div n (pow2 i))
-  2%Z) = 0%Z))) -> ((nth1 (from_int2c1 n) i) = true).
+  ((mod1 (div n (pow2 i)) 2%Z) = 0%Z))) -> ((nth1 (from_int2c1 n) i) = true).
 
 Axiom nth_from_int2c_high_odd_negative1 : forall (n:Z) (i:Z),
   ((n <  0%Z)%Z /\ (((i <  (64%Z - 1%Z)%Z)%Z /\ (0%Z <= i)%Z) /\
-  ~ ((int.EuclideanDivision.mod1 (int.EuclideanDivision.div n (pow2 i))
-  2%Z) = 0%Z))) -> ((nth1 (from_int2c1 n) i) = false).
+  ~ ((mod1 (div n (pow2 i)) 2%Z) = 0%Z))) -> ((nth1 (from_int2c1 n)
+  i) = false).
 
 Axiom nth_from_int2c_low_even_negative1 : forall (n:Z), ((n <  0%Z)%Z /\
-  ((int.EuclideanDivision.mod1 n 2%Z) = 0%Z)) -> ((nth1 (from_int2c1 n)
-  0%Z) = true).
+  ((mod1 n 2%Z) = 0%Z)) -> ((nth1 (from_int2c1 n) 0%Z) = true).
 
 Axiom nth_from_int2c_low_odd_negative1 : forall (n:Z), ((n <  0%Z)%Z /\
-  ~ ((int.EuclideanDivision.mod1 n 2%Z) = 0%Z)) -> ((nth1 (from_int2c1 n)
-  0%Z) = false).
+  ~ ((mod1 n 2%Z) = 0%Z)) -> ((nth1 (from_int2c1 n) 0%Z) = false).
 
 Parameter concat: bv -> bv -> bv1.
 
@@ -710,6 +706,24 @@ Definition var(i:Z): bv1 := (concat (from_int 1127219200%Z) (jpxor i)).
 
 Definition var_as_double(x:Z): R := (double_of_bv64 (var x)).
 
+Definition is_int32(x:Z): Prop := ((-(pow2 31%Z))%Z <= x)%Z /\
+  (x <  (pow2 31%Z))%Z.
+
+Axiom two_compl_pos : forall (x:Z), ((is_int32 x) /\ (0%Z <= x)%Z) ->
+  ((to_nat_sub (from_int2c x) 31%Z 0%Z) = x).
+
+Axiom two_compl_neg : forall (x:Z), ((is_int32 x) /\ (x <  0%Z)%Z) ->
+  ((to_nat_sub (from_int2c x) 31%Z 0%Z) = ((pow2 32%Z) + x)%Z).
+
+Axiom lemma1_pos : forall (x:Z), ((is_int32 x) /\ (0%Z <= x)%Z) ->
+  ((to_nat_sub (jpxor x) 31%Z 0%Z) = ((pow2 31%Z) + x)%Z).
+
+Axiom lemma1_neg : forall (x:Z), ((is_int32 x) /\ (x <  0%Z)%Z) ->
+  ((to_nat_sub (jpxor x) 31%Z 0%Z) = ((pow2 31%Z) + x)%Z).
+
+Axiom lemma1 : forall (x:Z), (is_int32 x) -> ((to_nat_sub (jpxor x) 31%Z
+  0%Z) = ((pow2 31%Z) + x)%Z).
+
 Axiom nth_var1 : forall (x:bv) (j:Z), ((0%Z <= j)%Z /\ (j <  31%Z)%Z) ->
   ((nth (bw_xor (from_int 2147483648%Z) x) j) = (nth x j)).
 
@@ -719,11 +733,14 @@ Axiom nth_var11 : forall (x:Z) (j:Z), ((0%Z <= j)%Z /\ (j <  31%Z)%Z) ->
 Axiom nth_var2 : forall (x:Z), ((nth1 (var x)
   31%Z) = (negb (nth (from_int2c x) 31%Z))).
 
-Axiom nth_var30 : forall (x:Z) (k:Z), ((32%Z <= k)%Z /\ (k <= 63%Z)%Z) ->
+Axiom nth_var32to63 : forall (x:Z) (k:Z), ((32%Z <= k)%Z /\ (k <= 63%Z)%Z) ->
   ((nth1 (var x) k) = (nth (from_int 1127219200%Z) (k - 32%Z)%Z)).
 
 Axiom nth_var3 : forall (x:Z), forall (i:Z), ((32%Z <= i)%Z /\
   (i <= 51%Z)%Z) -> ((nth1 (var x) i) = false).
+
+Axiom lemma2 : forall (x:Z), (is_int32 x) -> ((to_nat_sub1 (var x) 51%Z
+  0%Z) = ((pow2 31%Z) + x)%Z).
 
 Axiom nth_var4 : forall (x:Z), forall (i:Z), ((52%Z <= i)%Z /\
   (i <= 53%Z)%Z) -> ((nth1 (var x) i) = true).
@@ -739,7 +756,21 @@ Axiom nth_var7 : forall (x:Z), forall (i:Z), ((58%Z <= i)%Z /\
 
 Axiom nth_var8 : forall (x:Z), ((nth1 (var x) 62%Z) = true).
 
+Axiom lemma3 : forall (x:Z), ((to_nat_sub1 (var x) 62%Z 52%Z) = 1075%Z).
+
 Axiom nth_var9 : forall (x:Z), ((nth1 (var x) 63%Z) = false).
+
+Axiom lemma4 : forall (x:Z), ((nth1 (var x) 63%Z) = false).
+
+Axiom lemma5 : forall (x:Z), (is_int32 x) ->
+  ((var_as_double x) = (((pow21 52%Z) + (pow21 31%Z))%R + (IZR x))%R).
+
+Definition double_of_int32(x:Z): R :=
+  ((var_as_double x) - (double_of_bv64 (concat (from_int 1127219200%Z)
+  (from_int 2147483648%Z))))%R.
+
+Axiom MainResult : forall (x:Z), (is_int32 x) ->
+  ((double_of_int32 x) = (IZR x)).
 
 Axiom sign_var : forall (x:Z), ((nth1 (var x) 63%Z) = false).
 
@@ -759,11 +790,18 @@ Axiom x_positive : forall (x:Z), ((nth (from_int2c x) 31%Z) = false) ->
   ((to_nat_sub (from_int2c x) 31%Z 0%Z) = (to_nat_sub (from_int2c x) 30%Z
   0%Z)).
 
+Axiom x_negative : forall (x:Z), ((nth (from_int2c x) 31%Z) = true) ->
+  ((to_nat_sub (from_int2c x) 31%Z
+  0%Z) = ((pow2 31%Z) + (to_nat_sub (from_int2c x) 30%Z 0%Z))%Z).
+
 Axiom sign_of_x : forall (x:Z), ((nth (from_int2c x) 31%Z) = false) ->
   (0%Z <  x)%Z.
 
-Axiom from_int2c_to_nat_sub : forall (x:Z), (0%Z <  x)%Z ->
+Axiom from_int2c_to_nat_sub : forall (x:Z), (0%Z <= x)%Z ->
   ((to_nat_sub (from_int2c x) 31%Z 0%Z) = x).
+
+Axiom from_int2c_to_nat_sub_neg : forall (x:Z), (x <  0%Z)%Z ->
+  ((to_nat_sub (from_int2c x) 31%Z 0%Z) = ((pow2 31%Z) + x)%Z).
 
 Axiom x_positive1 : forall (x:Z), ((nth (from_int2c x) 31%Z) = false) ->
   ((to_nat_sub (from_int2c x) 30%Z 0%Z) = x).

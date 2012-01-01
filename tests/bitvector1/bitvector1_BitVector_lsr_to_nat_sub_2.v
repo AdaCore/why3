@@ -2,12 +2,6 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import ZArith.
 Require Import Rbase.
-Definition implb(x:bool) (y:bool): bool := match (x,
-  y) with
-  | (true, false) => false
-  | (_, _) => true
-  end.
-
 Parameter pow2: Z -> Z.
 
 
@@ -154,6 +148,8 @@ Parameter size: Z.
 
 Parameter bv : Type.
 
+Axiom size_positive : (0%Z <  size)%Z.
+
 Parameter nth: bv -> Z -> bool.
 
 
@@ -222,8 +218,8 @@ Axiom lsr_nth_low : forall (b:bv) (n:Z) (s:Z), (((0%Z <= n)%Z /\
   ((n + s)%Z <  size)%Z)) -> ((nth (lsr b s) n) = (nth b (n + s)%Z)).
 
 Axiom lsr_nth_high : forall (b:bv) (n:Z) (s:Z), (((0%Z <= n)%Z /\
-  (n <  size)%Z) /\ ((0%Z <= s)%Z /\ (size <= (n + s)%Z)%Z)) -> ((nth (lsr b
-  s) n) = false).
+  (n <  size)%Z) /\ (((0%Z <= s)%Z /\ (s <  size)%Z) /\
+  (size <= (n + s)%Z)%Z)) -> ((nth (lsr b s) n) = false).
 
 Parameter asr: bv -> Z -> bv.
 
@@ -250,33 +246,35 @@ Axiom lsl_nth_low : forall (b:bv) (n:Z) (s:Z), ((0%Z <= n)%Z /\
 Parameter to_nat_sub: bv -> Z -> Z -> Z.
 
 
-Axiom to_nat_sub_zero : forall (b:bv) (j:Z) (i:Z), ((0%Z <= i)%Z /\
-  (i <= j)%Z) -> (((nth b j) = false) -> ((to_nat_sub b j i) = (to_nat_sub b
-  (j - 1%Z)%Z i))).
+Axiom to_nat_sub_zero : forall (b:bv) (j:Z) (i:Z), (((0%Z <= i)%Z /\
+  (i <= j)%Z) /\ (j <  size)%Z) -> (((nth b j) = false) -> ((to_nat_sub b j
+  i) = (to_nat_sub b (j - 1%Z)%Z i))).
 
-Axiom to_nat_sub_one : forall (b:bv) (j:Z) (i:Z), ((0%Z <= i)%Z /\
-  (i <= j)%Z) -> (((nth b j) = true) -> ((to_nat_sub b j
+Axiom to_nat_sub_one : forall (b:bv) (j:Z) (i:Z), (((0%Z <= i)%Z /\
+  (i <= j)%Z) /\ (j <  size)%Z) -> (((nth b j) = true) -> ((to_nat_sub b j
   i) = ((pow2 (j - i)%Z) + (to_nat_sub b (j - 1%Z)%Z i))%Z)).
 
 Axiom to_nat_sub_high : forall (b:bv) (j:Z) (i:Z), (j <  i)%Z ->
   ((to_nat_sub b j i) = 0%Z).
 
-Axiom to_nat_of_zero2 : forall (b:bv) (i:Z) (j:Z), ((i <= j)%Z /\
-  (0%Z <= i)%Z) -> ((forall (k:Z), ((k <= j)%Z /\ (i <  k)%Z) -> ((nth b
-  k) = false)) -> ((to_nat_sub b j 0%Z) = (to_nat_sub b i 0%Z))).
+Axiom to_nat_of_zero2 : forall (b:bv) (i:Z) (j:Z), (((j <  size)%Z /\
+  (i <= j)%Z) /\ (0%Z <= i)%Z) -> ((forall (k:Z), ((k <= j)%Z /\
+  (i <  k)%Z) -> ((nth b k) = false)) -> ((to_nat_sub b j
+  0%Z) = (to_nat_sub b i 0%Z))).
 
-Axiom to_nat_of_zero : forall (b:bv) (i:Z) (j:Z), ((i <= j)%Z /\
-  (0%Z <= i)%Z) -> ((forall (k:Z), ((k <= j)%Z /\ (i <= k)%Z) -> ((nth b
-  k) = false)) -> ((to_nat_sub b j i) = 0%Z)).
+Axiom to_nat_of_zero : forall (b:bv) (i:Z) (j:Z), (((j <  size)%Z /\
+  (i <= j)%Z) /\ (0%Z <= i)%Z) -> ((forall (k:Z), ((k <= j)%Z /\
+  (i <= k)%Z) -> ((nth b k) = false)) -> ((to_nat_sub b j i) = 0%Z)).
 
-Axiom to_nat_of_one : forall (b:bv) (i:Z) (j:Z), ((i <= j)%Z /\
-  (0%Z <= i)%Z) -> ((forall (k:Z), ((k <= j)%Z /\ (i <= k)%Z) -> ((nth b
-  k) = true)) -> ((to_nat_sub b j
+Axiom to_nat_of_one : forall (b:bv) (i:Z) (j:Z), (((j <  size)%Z /\
+  (i <= j)%Z) /\ (0%Z <= i)%Z) -> ((forall (k:Z), ((k <= j)%Z /\
+  (i <= k)%Z) -> ((nth b k) = true)) -> ((to_nat_sub b j
   i) = ((pow2 ((j - i)%Z + 1%Z)%Z) - 1%Z)%Z)).
 
 Axiom to_nat_sub_footprint : forall (b1:bv) (b2:bv) (j:Z) (i:Z),
-  (forall (k:Z), ((i <= k)%Z /\ (k <= j)%Z) -> ((nth b1 k) = (nth b2 k))) ->
-  ((to_nat_sub b1 j i) = (to_nat_sub b2 j i)).
+  ((j <  size)%Z /\ (0%Z <= i)%Z) -> ((forall (k:Z), ((i <= k)%Z /\
+  (k <= j)%Z) -> ((nth b1 k) = (nth b2 k))) -> ((to_nat_sub b1 j
+  i) = (to_nat_sub b2 j i))).
 
 (* YOU MAY EDIT THE CONTEXT BELOW *)
 Open Scope Z_scope.
@@ -284,15 +282,24 @@ Open Scope Z_scope.
 
 Theorem lsr_to_nat_sub : forall (b:bv) (s:Z), ((0%Z <= s)%Z /\
   (s <  size)%Z) -> ((to_nat_sub (lsr b s) (size - 1%Z)%Z
-  0%Z) = (to_nat_sub b ((size - 1%Z)%Z - s)%Z 0%Z)).
+  0%Z) = (to_nat_sub b (size - 1%Z)%Z s)).
 (* YOU MAY EDIT THE PROOF BELOW *)
 intros.
-rewrite to_nat_of_zero2 with (i:=s).
-2: auto with *.
+cut (0<=s<size);auto.
+apply Z_lt_induction with
+    (P:= fun s=>0 <= s < size ->
+to_nat_sub (lsr b s) (size - 1) 0 = to_nat_sub b (size - 1) s);auto with zarith.
+intros x Hind Hx.
+assert (h:x = 0 \/ x>0) by omega.
+destruct h.
+subst x.
+apply to_nat_sub_footprint;auto with zarith.
+intros.
+rewrite lsr_nth_low;auto with zarith.
+replace (k+0) with k by omega;auto.
 
-
-
-
+(* x > 0 *)
+replace x with (x-1+1) by omega.
 
 Qed.
 (* DO NOT EDIT BELOW *)
