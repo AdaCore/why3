@@ -162,13 +162,13 @@ type notask
     following function *)
 
 val read_session : string -> notask session
-(** read a session stored on the disk. It returns a session without any
+(** Read a session stored on the disk. It returns a session without any
     task attached to goals *)
 
 val save_session : 'key session -> unit
-(** save a session on disk *)
+(** Save a session on disk *)
 
-(** Context of a session *)
+(** {2 Context of a session} *)
 
 (** A session which contains task and proof_attempt depends on an
     environnement and a prover configuration.
@@ -186,9 +186,6 @@ type 'a env_session = private
       loaded_provers : loaded_provers;
       session : 'a session}
 
-val get_provers : 'a session -> Sprover.t
-(** Get the set of provers which appear in the session *)
-
 val load_prover : 'a env_session -> prover -> loaded_prover option
 (** load a prover *)
 
@@ -198,22 +195,53 @@ val is_prover_known : 'a env_session -> prover -> bool
 val get_known_provers : 'a env_session -> Sprover.t
 (** get the set of known provers *)
 
-(** Accessor *)
+(** {2 Update session} *)
+
+type 'key keygen = ?parent:'key -> unit -> 'key
+(** type of functions which can generate keys *)
+
+exception OutdatedSession
+
+val update_session : keygen:'a keygen ->
+  allow_obsolete:bool -> 'b session ->
+  Env.env -> Whyconf.config -> 'a env_session * bool
+(** reload the given session with the given environnement :
+    - the file are reloaded
+    - apply again the transformation
+    - if some goals appears try to find to which goal
+    in the given session it corresponds.
+
+    The last case meant that the session was obsolete.
+    It is autorized if [allow_obsolete] is [true],
+    otherwise the exception [OutdatedSession] is raised.
+    If the session was obsolete is indicated by
+    the second result.
+
+    raises [Failure msg] if the database file cannot be read correctly
+
+*)
+
+(** {2 Accessor} *)
+
 exception NoTask
 val goal_task : 'key goal -> Task.task
-(** return the task of a goal. Raise NoTask if the goal doesn't contain a task
+(** Return the task of a goal. Raise NoTask if the goal doesn't contain a task
     (equivalent to 'key = notask) *)
 
 val goal_task_option : 'key goal -> Task.task option
-(** return the task of a goal. *)
+(** Return the task of a goal. *)
 
 val goal_expl : 'key goal -> string
-(** return the explication of a goal *)
+(** Return the explication of a goal *)
 
 val proof_verified : 'key proof_attempt -> bool
-(** return true if the proof is not obsolete and the result is valid *)
+(** Return true if the proof is not obsolete and the result is valid *)
 
-(** Modificator *)
+
+val get_provers : 'a session -> Sprover.t
+(** Get the set of provers which appear in the session *)
+
+(** {2 Modificator} *)
 
 val set_transf_expanded : 'key transf -> bool -> unit
 val set_goal_expanded : 'key goal -> bool -> unit
@@ -221,7 +249,7 @@ val set_theory_expanded : 'key theory -> bool -> unit
 val set_file_expanded : 'key file -> bool -> unit
 (** open one level or close all the sub-level *)
 
-(** General type *)
+(** {2 General type} *)
 
 type 'a any =
   | File of 'a file
@@ -237,9 +265,6 @@ val key_any : 'a any -> 'a
 (** return the key of an element of the tree *)
 
 (** {2 External proof} *)
-
-type 'key keygen = ?parent:'key -> unit -> 'key
-(** type of functions which can generate keys *)
 
 type 'key notify = 'key any -> unit
 (** type of functions which notify modification of the verified field *)
@@ -288,6 +313,7 @@ val add_registered_transformation :
     raise NoTask if the goal doesn't contain a task *)
 
 val remove_transformation : ?notify:'key notify -> 'key transf -> unit
+  (** Remove a transformation *)
 
 (** {2 File} *)
 
@@ -296,11 +322,13 @@ val add_file :
   'key env_session ->
   string ->
   'key file
-(** add a real file by its filename *)
+(** Add a real file by its filename *)
 
 val remove_file : 'key file -> unit
+(** Remove a file *)
 
-(** Explanation *)
+(** {2 Explanation} *)
+
 val get_explanation : Ident.ident -> Task.task -> expl
 val goal_expl_task : Task.task -> Ident.ident * expl * Task.task
 
@@ -327,6 +355,7 @@ val goal_iter_leaf_goal :
     (no transformations are applied on it) *)
 
 (** {3 not reccursive} *)
+
 val iter_goal :
   ('key proof_attempt -> unit) -> ('key transf -> unit) -> 'key goal -> unit
 val iter_transf :
@@ -341,19 +370,7 @@ val file_iter : ('key any -> unit) -> 'key file -> unit
 val session_iter : ('key any -> unit) -> 'key session -> unit
 val iter : ('key any -> unit) -> 'key any -> unit
 
-
-(***********************)
-(*                     *)
-(***********************)
-exception OutdatedSession
-
-val update_session : keygen:'a keygen ->
-  allow_obsolete:bool -> 'b session ->
-  Env.env -> Whyconf.config -> 'a env_session * bool
-
-(***************************************************)
-(* Some functorized interface (not very useful...) *)
-(***************************************************)
+(** {2 Some functorized interface (not very useful...)}*)
 
 
 module AddTransf (X : sig

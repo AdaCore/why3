@@ -86,29 +86,8 @@ module Make(O: OBSERVER) : sig
     'key session ->
     Env.env -> Whyconf.config ->
     O.key env_session * bool
-
-
-
-    (** starts a new proof session, using directory given as argument
-        this reloads the previous session database if any.
-
-        Opening a session must be done prior to any other actions.
-        And it cannot be done twice.
-
-        the [notify] function is a function that will be called at each
-        update of element of the state
-
-        the [init] function is a function that will be called at each
-        creation of element of the state
-
-        raises [OutdatedSession] if [allow_obsolete] is false and any obsolete
-        data for a goal is found in the session database
-
-        raises [Failure msg] if the database file cannot be read correctly
-
-        returns true if some obsolete goal was found (and
-        [allow_obsolete] is true), false otherwise
-
+  (**
+     Same as {!Session.update_session} except initialisation is done.
     *)
 
   val add_file : O.key env_session -> string -> O.key Session.file
@@ -179,14 +158,14 @@ module Make(O: OBSERVER) : sig
     O.key env_session -> t ->
     callback:((Ident.ident * prover * report) list -> unit) -> unit
     (** [check_all ()] reruns all the proofs of the session, and reports
-        all difference with the current state
+        for all proofs the current result and the new one
         (does not change the session state)
-        When finished, calls the callback with the list of failed comparisons,
+        When finished, calls the callback with the reports
         which are triples (goal name, prover, report)
     *)
 
   val convert_unknown_prover : O.key env_session -> unit
-
+    (** Same as {!Session_tools.convert_unknown_prover} *)
 (*
   val reload_all: bool -> bool
     (** reloads all the files
