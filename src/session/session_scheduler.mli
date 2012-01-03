@@ -68,7 +68,7 @@ end
 
 module Make(O: OBSERVER) : sig
 
-  (** A session, with the environnement, and the configuration *)
+  (** A session, with the environment, and the configuration *)
   type t (** the scheduler environment *)
 
   val set_maximum_running_proofs : int -> t -> unit
@@ -87,7 +87,7 @@ module Make(O: OBSERVER) : sig
     Env.env -> Whyconf.config ->
     O.key env_session * bool
   (**
-     Same as {!Session.update_session} except initialisation is done.
+     Same as {!Session.update_session} except initialization is done.
     *)
 
   val add_file : O.key env_session -> string -> O.key Session.file
@@ -166,24 +166,7 @@ module Make(O: OBSERVER) : sig
 
   val convert_unknown_prover : O.key env_session -> unit
     (** Same as {!Session_tools.convert_unknown_prover} *)
-(*
-  val reload_all: bool -> bool
-    (** reloads all the files
-        If for one of the file, the parsing or typing fails, then
-        the complete old session state is kept, and an exception
-        is raised
 
-        raises [OutdatedSession] if [allow_obsolete] is false and any obsolete
-        data for a goal is found in the session database
-
-        returns true if some obsolete goal was found (and
-        [allow_obsolete] is true), false otherwise
-
-    *)
-
-  val smoke_detector : smoke_detector ref
-    (** Define if the smoke detector is used *)
-*)
 end
 
 

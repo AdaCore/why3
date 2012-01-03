@@ -23,7 +23,7 @@ open Session
 
 val convert_unknown_prover : keygen:'a keygen -> 'a env_session -> unit
 (** try to add new proof_attempt with known provers for all proof
-    attempt with unknwon provers *)
+    attempt with unknown provers *)
 
 val filter_proof_attempt :
   ?notify:'key notify ->

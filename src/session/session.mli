@@ -18,7 +18,7 @@
 (**************************************************************************)
 
 (** Proof sessions *)
-(** Define all the fonction needed for managing a session :
+(** Define all the function needed for managing a session :
     Creation, saving, loading, modification, ...
     All the operation are immediately done.
     Use session_scheduler if you want to queue the operations
@@ -171,7 +171,7 @@ val save_session : 'key session -> unit
 (** {2 Context of a session} *)
 
 (** A session which contains task and proof_attempt depends on an
-    environnement and a prover configuration.
+    environment and a prover configuration.
     Loaded provers are cached in order to load drivers once *)
 
 type loaded_prover =
@@ -206,13 +206,13 @@ val update_session : keygen:'a keygen ->
   allow_obsolete:bool -> 'b session ->
   Env.env -> Whyconf.config -> 'a env_session * bool
 (** reload the given session with the given environnement :
-    - the file are reloaded
+    - the files are reloaded
     - apply again the transformation
-    - if some goals appears try to find to which goal
+    - if some goals appear try to find to which goal
     in the given session it corresponds.
 
     The last case meant that the session was obsolete.
-    It is autorized if [allow_obsolete] is [true],
+    It is authorized if [allow_obsolete] is [true],
     otherwise the exception [OutdatedSession] is raised.
     If the session was obsolete is indicated by
     the second result.
@@ -354,7 +354,7 @@ val goal_iter_leaf_goal :
 (** iter all the goals which are a leaf
     (no transformations are applied on it) *)
 
-(** {3 not reccursive} *)
+(** {3 not recursive} *)
 
 val iter_goal :
   ('key proof_attempt -> unit) -> ('key transf -> unit) -> 'key goal -> unit
