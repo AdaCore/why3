@@ -130,7 +130,8 @@ theory BitVector
 
   type bv
 
-  axiom size_positive: size >0
+  (* size at least 2 since we need 2-complement representation *)
+  axiom size_positive: size > 1
 
   function nth bv int: bool
 
@@ -344,9 +345,11 @@ theory BitVector
 (*false:::  lemma lsr_to_nat_sub:
     forall b:bv, n s:int.
       0 <= s <size -> to_nat_sub (lsr b s) (size -1) 0 = to_nat_sub b (size-1-s) 0*)
+(*
   lemma lsr_to_nat_sub:
     forall b:bv, n s:int.
       0 <= s <size -> to_nat_sub (lsr b s) (size -1) 0 = to_nat_sub b (size-1) s
+*)
 
   (* 2-complement version *)
 
@@ -430,29 +433,13 @@ theory BitVector
 (*        bit size-1:sign, false if n is non-negative, true otherwise*)
 (*********************************************************************)
   function from_int2c (n:int) : bv
+
 (*********************************************************************)
 (* axiom for n is non-negative                                       *)
 (*********************************************************************)
-  axiom size_from_int2c: size - 1 >0
 
   axiom nth_sign_positive:
      forall n :int. n>=0 -> nth (from_int2c n) (size-1) = False
-  axiom nth_from_int2c_high_even_positive:
-     forall n i:int. n>=0 /\ size-1 > i >= 0 /\ mod (div n (pow2 i)) 2 = 0 
-                             -> nth (from_int2c n) i = False
-
-  axiom nth_from_int2c_high_odd_positive:
-     forall n i:int. n>=0 /\size-1 > i >= 0 /\ mod (div n (pow2 i)) 2 <> 0 
-                             -> nth (from_int2c n) i = True
-
-  lemma nth_from_int2c_low_even_positive:
-    forall n:int. n>=0 /\ mod n 2 = 0 -> nth (from_int2c n) 0 = False
-
-  lemma nth_from_int2c_low_odd_positive:
-    forall n:int. n>=0 /\ mod n 2 <> 0 -> nth (from_int2c n) 0 = True
-
-  lemma nth_from_int2c_0:
-     forall i:int. size > i >= 0 -> nth (from_int2c 0) i = False
 
 (*********************************************************************)
 (* axiom for n is negative                                           *)
@@ -460,17 +447,29 @@ theory BitVector
 
   axiom nth_sign_negative:
      forall n:int. n<0 -> nth (from_int2c n) (size-1) = True
-  axiom nth_from_int2c_high_even_negative:
-     forall n i:int. n<0 /\ size-1 > i >= 0 /\ mod (div n (pow2 i)) 2 = 0 -> nth (from_int2c n) i = True
 
-  axiom nth_from_int2c_high_odd_negative:
-     forall n i:int. n<0 /\size-1 > i >= 0 /\ mod (div n (pow2 i)) 2 <> 0 -> nth (from_int2c n) i = False
+(*********************************************************************)
+(* axioms for any n                                          *)
+(*********************************************************************)
 
-  lemma nth_from_int2c_low_even_negative:
-    forall n:int. n<0 /\ mod n 2 = 0 -> nth (from_int2c n) 0 = True
+  axiom nth_from_int2c_high_even:
+     forall n i:int. size-1 > i >= 0 /\ mod (div n (pow2 i)) 2 = 0
+                             -> nth (from_int2c n) i = False
 
-  lemma nth_from_int2c_low_odd_negative:
-    forall n:int. n<0 /\ mod n 2 <> 0 -> nth (from_int2c n) 0 = False
+  axiom nth_from_int2c_high_odd:
+     forall n i:int. size-1 > i >= 0 /\ mod (div n (pow2 i)) 2 <> 0
+                             -> nth (from_int2c n) i = True
+
+  lemma nth_from_int2c_low_even:
+    forall n:int. mod n 2 = 0 -> nth (from_int2c n) 0 = False
+
+  lemma nth_from_int2c_low_odd:
+    forall n:int. mod n 2 <> 0 -> nth (from_int2c n) 0 = True
+
+  lemma nth_from_int2c_0:
+     forall i:int. size > i >= 0 -> nth (from_int2c 0) i = False
+
+
 end
 
 
@@ -491,6 +490,7 @@ theory BV64
 
 end
 
+(*
 theory TestNatSub
 
   use import BV64
@@ -501,6 +501,7 @@ theory TestNatSub
   lemma to_nat_sub_b: (to_nat_sub b 4 0) = 7
 
 end
+*)
 
 theory BV32_64
 
@@ -730,25 +731,44 @@ theory TestDoubleOfInt
   (*********************************************************************)
 
   predicate is_int32(x:int) = - Pow2int.pow2 31 <= x < Pow2int.pow2 31
+
+(*
   lemma two_compl_pos: forall x:int. is_int32 x /\ x >= 0 -> BV32.to_nat_sub (BV32.from_int2c x) 31 0 = x
   lemma two_compl_neg: forall x:int. is_int32 x /\ x < 0 -> BV32.to_nat_sub (BV32.from_int2c x) 31 0 = Pow2int.pow2 32 + x
+*)
 
+  (* bits of jpxor x *)
   lemma nth_0_30: forall x:int. forall i:int. is_int32(x) /\  0<=i<=30 ->
-  BV32.nth (BV32.bw_xor j' (BV32.from_int2c x)) i = BV32.nth (BV32.from_int2c x) i	
+  BV32.nth (BV32.bw_xor j' (BV32.from_int2c x)) i = BV32.nth (BV32.from_int2c x) i
+  lemma nth_jpxor_0_30: forall x:int. forall i:int. is_int32(x) /\  0<=i<=30 ->
+  BV32.nth (jpxor x) i = BV32.nth (BV32.from_int2c x) i
+  lemma nth_var31:
+     forall x:int. (BV32.nth (jpxor x) 31) = notb (BV32.nth (BV32.from_int2c x) 31)
 
   lemma to_nat_sub_0_30: forall x:int. is_int32(x)   ->
        (BV32.to_nat_sub (BV32.bw_xor j' (BV32.from_int2c x)) 30 0) = (BV32.to_nat_sub (BV32.from_int2c x) 30 0)
+
+
+
+  (* case x >= 0 *)
+
   lemma jpxorx_pos: forall x:int. x>=0 -> BV32.nth (BV32.bw_xor j' (BV32.from_int2c x)) 31 = True
+
 (*
   lemma from_int2c_to_nat_sub31:
   	forall x:int. x >= 0 -> BV32.to_nat_sub (BV32.from_int2c x) 31 0 = x
 *)
+
+  lemma from_int2c_to_nat_sub_gen:
+  	forall x i:int. 0 <= i <= 30 /\ 0 <= x <  Pow2int.pow2 i -> 
+           BV32.to_nat_sub (BV32.from_int2c x) i 0 = x
+
   lemma from_int2c_to_nat_sub:
   	forall x:int. is_int32(x) /\ x >= 0 -> BV32.to_nat_sub (BV32.from_int2c x) 30 0 = x
-  lemma nth_var31:
-     forall x:int. (BV32.nth (jpxor x) 31) = notb (BV32.nth (BV32.from_int2c x) 31)
 
   lemma lemma1_pos : forall x:int. is_int32 x /\ x >= 0 -> BV32.to_nat_sub (jpxor x) 31 0 = Pow2int.pow2 31 + x
+
+  (* case x < 0 *)
 
   lemma to_nat_sub_0_30_neg: forall x:int. is_int32(x) /\ x<0  ->
        (BV32.to_nat_sub (BV32.bw_xor j' (BV32.from_int2c x)) 30 0) = (BV32.to_nat_sub (BV32.from_int2c x) 30 0)
@@ -757,6 +777,8 @@ theory TestDoubleOfInt
        (BV32.to_nat_sub  (BV32.from_int2c x) 30 0) = Pow2int.pow2 31 + x
 
   lemma lemma1_neg : forall x:int. is_int32 x /\ x < 0 -> BV32.to_nat_sub (jpxor x) 31 0 = Pow2int.pow2 31 + x
+
+  (* final lemma *)
 
   lemma lemma1 : forall x:int. is_int32 x -> BV32.to_nat_sub (jpxor x) 31 0 = Pow2int.pow2 31 + x
 
@@ -838,6 +860,7 @@ theory TestDoubleOfInt
 
 end
 
+(*
 theory TestBv32
 
   use import BV32
@@ -949,6 +972,7 @@ theory TestBv32
 
 end
 
+*)
 
 (*
 Local Variables:

@@ -7,11 +7,15 @@
   name="Alt-Ergo"
   version="0.94"/>
  <prover
+  id="alt-ergo-0.93.1"
+  name="Alt-Ergo"
+  version="0.93.1"/>
+ <prover
   id="coq"
   name="Coq"
   version="8.3pl2"/>
  <prover
-  id="cvc3-2.2"
+  id="cvc3"
   name="CVC3"
   version="2.2"/>
  <prover
@@ -21,7 +25,7 @@
  <prover
   id="eprover"
   name="Eprover"
-  version="1.4"/>
+  version="1.4 Namring"/>
  <prover
   id="gappa"
   name="Gappa"
@@ -47,7 +51,7 @@
   name="Yices"
   version="1.0.25"/>
  <prover
-  id="z3-2"
+  id="z3"
   name="Z3"
   version="2.19"/>
  <prover
@@ -1015,14 +1019,14 @@
      prover="alt-ergo-0.93.1"
      timelimit="5"
      edited=""
-     obsolete="true">
-     <result status="valid" time="0.00"/>
+     obsolete="false">
+     <result status="valid" time="0.01"/>
     </proof>
     <proof
      prover="cvc3"
      timelimit="5"
      edited=""
-     obsolete="true">
+     obsolete="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
@@ -1036,7 +1040,7 @@
      prover="z3"
      timelimit="5"
      edited=""
-     obsolete="true">
+     obsolete="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
@@ -1064,14 +1068,14 @@
      prover="alt-ergo-0.93.1"
      timelimit="5"
      edited=""
-     obsolete="true">
+     obsolete="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
      prover="cvc3"
      timelimit="5"
      edited=""
-     obsolete="true">
+     obsolete="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
@@ -1085,7 +1089,7 @@
      prover="z3"
      timelimit="5"
      edited=""
-     obsolete="true">
+     obsolete="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
@@ -1274,11 +1278,11 @@
   </theory>
   <theory
    name="BitVector"
-   verified="false"
+   verified="true"
    expanded="false">
    <goal
     name="Nth_bw_xor_v1true"
-    sum="94f132e45ee9935cf1d04670e32f5891"
+    sum="88f8bb92324def1e6b262849f963837e"
     proved="true"
     expanded="false"
     shape="ainfix =anthabw_xorV0V1V2anotbanthV1V2Iainfix =anthV0V2aTrueAainfix <V2asizeAainfix <=c0V2F">
@@ -1287,12 +1291,12 @@
      timelimit="20"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.16"/>
+     <result status="valid" time="0.17"/>
     </proof>
    </goal>
    <goal
     name="Nth_bw_xor_v1false"
-    sum="2df4e618249e8623ac35899af15fa094"
+    sum="0110ba3203806a3a1919caca71b42d49"
     proved="true"
     expanded="false"
     shape="ainfix =anthabw_xorV0V1V2anthV1V2Iainfix =anthV0V2aFalseAainfix <V2asizeAainfix <=c0V2F">
@@ -1301,13 +1305,13 @@
      timelimit="10"
      edited="bitvector1_BitVector_Nth_bw_xor_v1false_1.v"
      obsolete="false">
-     <result status="valid" time="0.55"/>
+     <result status="valid" time="0.54"/>
     </proof>
     <proof
      prover="alt-ergo"
      timelimit="10"
      edited=""
-     obsolete="false">
+     obsolete="true">
      <result status="timeout" time="10.07"/>
     </proof>
     <proof
@@ -1320,7 +1324,7 @@
    </goal>
    <goal
     name="Nth_bw_xor_v2true"
-    sum="8b248333b2b795de2a8759aea6b192d9"
+    sum="06bcfbebf47d0003b996a4e180ee2f4b"
     proved="true"
     expanded="false"
     shape="ainfix =anthabw_xorV0V1V2anotbanthV0V2Iainfix =anthV1V2aTrueAainfix <V2asizeAainfix <=c0V2F">
@@ -1329,12 +1333,12 @@
      timelimit="20"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.05"/>
+     <result status="valid" time="0.04"/>
     </proof>
    </goal>
    <goal
     name="Nth_bw_xor_v2false"
-    sum="838187b06691aa9691c6ac9fa1b47ab0"
+    sum="3dfc647500db0ad759fb5bf86d173039"
     proved="true"
     expanded="false"
     shape="ainfix =anthabw_xorV0V1V2anthV0V2Iainfix =anthV1V2aFalseAainfix <V2asizeAainfix <=c0V2F">
@@ -1343,12 +1347,12 @@
      timelimit="20"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.16"/>
+     <result status="valid" time="0.18"/>
     </proof>
    </goal>
    <goal
     name="to_nat_of_zero2"
-    sum="2bee3bf3dab70099c8a165318c5cf53c"
+    sum="9d07afef6b4a3e44e817b617006feb18"
     proved="true"
     expanded="false"
     shape="ainfix =ato_nat_subV0V2c0ato_nat_subV0V1c0Iainfix =anthV0V3aFalseIainfix >V3V1Aainfix >=V2V3FIainfix >=V1c0Aainfix >=V2V1Aainfix >asizeV2F">
@@ -1357,12 +1361,12 @@
      timelimit="10"
      edited="bitvector1_BitVector_to_nat_of_zero2_2.v"
      obsolete="false">
-     <result status="valid" time="0.62"/>
+     <result status="valid" time="0.65"/>
     </proof>
    </goal>
    <goal
     name="to_nat_of_zero"
-    sum="5aa393d62977ddeb948b001547dfaf96"
+    sum="141d7d3d954977d7c4eb380a99bc7f67"
     proved="true"
     expanded="false"
     shape="ainfix =ato_nat_subV0V2V1c0Iainfix =anthV0V3aFalseIainfix >=V3V1Aainfix >=V2V3FIainfix >=V1c0Aainfix >=V2V1Aainfix >asizeV2F">
@@ -1371,12 +1375,12 @@
      timelimit="10"
      edited="bitvector1_BitVector_to_nat_of_zero_1.v"
      obsolete="false">
-     <result status="valid" time="0.62"/>
+     <result status="valid" time="0.61"/>
     </proof>
    </goal>
    <goal
     name="to_nat_of_one"
-    sum="63971a2279e541bcb93df398b28d93d8"
+    sum="643f8f25c51219b9c13ae98ebf47af4d"
     proved="true"
     expanded="false"
     shape="ainfix =ato_nat_subV0V2V1ainfix -apow2ainfix +ainfix -V2V1c1c1Iainfix =anthV0V3aTrueIainfix >=V3V1Aainfix >=V2V3FIainfix >=V1c0Aainfix >=V2V1Aainfix >asizeV2F">
@@ -1385,12 +1389,12 @@
      timelimit="10"
      edited="bitvector1_BitVector_to_nat_of_one_2.v"
      obsolete="false">
-     <result status="valid" time="0.70"/>
+     <result status="valid" time="0.71"/>
     </proof>
    </goal>
    <goal
     name="to_nat_sub_footprint"
-    sum="65bf7dae72db3f537e41b4d4c06c2f2a"
+    sum="b220c3f75951e2c5284cd7065eb523df"
     proved="true"
     expanded="false"
     shape="ainfix =ato_nat_subV0V2V3ato_nat_subV1V2V3Iainfix =anthV0V4anthV1V4Iainfix <=V4V2Aainfix <=V3V4FIainfix >=V3c0Aainfix >asizeV2F">
@@ -1403,43 +1407,8 @@
     </proof>
    </goal>
    <goal
-    name="lsr_to_nat_sub"
-    sum="8d3a88f289700bd60239d92074712d75"
-    proved="false"
-    expanded="false"
-    shape="ainfix =ato_nat_subalsrV0V2ainfix -asizec1c0ato_nat_subV0ainfix -asizec1V2Iainfix <V2asizeAainfix <=c0V2F">
-    <proof
-     prover="coq"
-     timelimit="10"
-     edited="bitvector1_BitVector_lsr_to_nat_sub_2.v"
-     obsolete="false">
-     <result status="unknown" time="0.61"/>
-    </proof>
-    <proof
-     prover="cvc3"
-     timelimit="2"
-     edited=""
-     obsolete="true">
-     <result status="failure" time="0.00"/>
-    </proof>
-    <proof
-     prover="alt-ergo"
-     timelimit="20"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="20.09"/>
-    </proof>
-    <proof
-     prover="z3"
-     timelimit="2"
-     edited=""
-     obsolete="true">
-     <result status="failure" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
     name="nth_from_int_low_even"
-    sum="0fc53bcd9c98af6e9de93cef263fa36f"
+    sum="766084f0c3e821b8aa209f7abfaadae1"
     proved="true"
     expanded="false"
     shape="ainfix =anthafrom_intV0c0aFalseIainfix =amodV0c2c0F">
@@ -1447,7 +1416,7 @@
      prover="coq"
      timelimit="5"
      edited="bitvector1_BitVector_nth_from_int_low_even_2.v"
-     obsolete="false">
+     obsolete="true">
      <result status="unknown" time="0.57"/>
     </proof>
     <proof
@@ -1474,7 +1443,7 @@
    </goal>
    <goal
     name="nth_from_int_low_odd"
-    sum="31e34f0570607e5c0da9049e406f8cf3"
+    sum="c47004d382f79e0874b7c7221f9da0a7"
     proved="true"
     expanded="false"
     shape="ainfix =anthafrom_intV0c0aTrueIainfix =amodV0c2c0NF">
@@ -1502,7 +1471,7 @@
    </goal>
    <goal
     name="pow2i"
-    sum="1fb092b90fa3823c0aa94f7e4e99afa3"
+    sum="3417be1f2bd88758d6b25cfe78938194"
     proved="true"
     expanded="false"
     shape="ainfix =apow2V0c0NIainfix >=V0c0F">
@@ -1511,19 +1480,19 @@
      timelimit="10"
      edited="bitvector1_BitVector_pow2i_1.v"
      obsolete="false">
-     <result status="valid" time="0.65"/>
+     <result status="valid" time="0.70"/>
     </proof>
     <proof
      prover="alt-ergo"
      timelimit="10"
      edited=""
-     obsolete="false">
+     obsolete="true">
      <result status="timeout" time="10.11"/>
     </proof>
    </goal>
    <goal
     name="nth_from_int_0"
-    sum="28c1fff692f32e70ec9e464beddf3219"
+    sum="6e6b155800805da5cda396c6f7767b7b"
     proved="true"
     expanded="false"
     shape="ainfix =anthafrom_intc0V0aFalseIainfix >=V0c0Aainfix >asizeV0F">
@@ -1532,54 +1501,40 @@
      timelimit="10"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.02"/>
+     <result status="valid" time="0.03"/>
     </proof>
    </goal>
    <goal
-    name="nth_from_int2c_low_even_positive"
-    sum="f7c1447d36beed21dffc3d7d5824653f"
+    name="nth_from_int2c_low_even"
+    sum="6911d61810c57fabe8470bd31bd0c470"
     proved="true"
     expanded="false"
-    shape="ainfix =anthafrom_int2cV0c0aFalseIainfix =amodV0c2c0Aainfix >=V0c0F">
+    shape="ainfix =anthafrom_int2cV0c0aFalseIainfix =amodV0c2c0F">
     <proof
-     prover="alt-ergo-0.93.1"
-     timelimit="5"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.75"/>
-    </proof>
-    <proof
-     prover="alt-ergo"
-     timelimit="5"
-     edited=""
+     prover="coq"
+     timelimit="10"
+     edited="bitvector1_BitVector_nth_from_int2c_low_even_1.v"
      obsolete="false">
-     <result status="valid" time="0.47"/>
+     <result status="valid" time="0.58"/>
     </proof>
    </goal>
    <goal
-    name="nth_from_int2c_low_odd_positive"
-    sum="25f906c293268b063ceb454e71a2489e"
+    name="nth_from_int2c_low_odd"
+    sum="1e73139275aff2b907f26b20e35299df"
     proved="true"
     expanded="false"
-    shape="ainfix =anthafrom_int2cV0c0aTrueIainfix =amodV0c2c0NAainfix >=V0c0F">
+    shape="ainfix =anthafrom_int2cV0c0aTrueIainfix =amodV0c2c0NF">
     <proof
-     prover="alt-ergo-0.93.1"
-     timelimit="5"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.83"/>
-    </proof>
-    <proof
-     prover="alt-ergo"
-     timelimit="5"
-     edited=""
+     prover="coq"
+     timelimit="10"
+     edited="bitvector1_BitVector_nth_from_int2c_low_odd_1.v"
      obsolete="false">
-     <result status="valid" time="0.50"/>
+     <result status="valid" time="0.56"/>
     </proof>
    </goal>
    <goal
     name="nth_from_int2c_0"
-    sum="2b2eeb57645f627dfcecb46fb09fbbd7"
+    sum="4357a2cf0ca74310de6eabff058ba8ed"
     proved="true"
     expanded="false"
     shape="ainfix =anthafrom_int2cc0V0aFalseIainfix >=V0c0Aainfix >asizeV0F">
@@ -1588,49 +1543,7 @@
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.06"/>
-    </proof>
-   </goal>
-   <goal
-    name="nth_from_int2c_low_even_negative"
-    sum="4a0681bede0724b1b1fa93d4d381387f"
-    proved="true"
-    expanded="false"
-    shape="ainfix =anthafrom_int2cV0c0aTrueIainfix =amodV0c2c0Aainfix <V0c0F">
-    <proof
-     prover="alt-ergo-0.93.1"
-     timelimit="5"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.82"/>
-    </proof>
-    <proof
-     prover="alt-ergo"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.47"/>
-    </proof>
-   </goal>
-   <goal
-    name="nth_from_int2c_low_odd_negative"
-    sum="605a28c8b882e8fa409e04ed4901f546"
-    proved="true"
-    expanded="false"
-    shape="ainfix =anthafrom_int2cV0c0aFalseIainfix =amodV0c2c0NAainfix <V0c0F">
-    <proof
-     prover="alt-ergo-0.93.1"
-     timelimit="5"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.93"/>
-    </proof>
-    <proof
-     prover="alt-ergo"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.49"/>
+     <result status="valid" time="0.05"/>
     </proof>
    </goal>
   </theory>
@@ -1643,60 +1556,6 @@
    name="BV64"
    verified="true"
    expanded="false">
-  </theory>
-  <theory
-   name="TestNatSub"
-   verified="false"
-   expanded="false">
-   <goal
-    name="to_nat_sub_b"
-    sum="91faa0679e5e5df4a3ad394be8540320"
-    proved="false"
-    expanded="false"
-    shape="ainfix =ato_nat_subabc4c0c7">
-    <proof
-     prover="z3-3"
-     timelimit="20"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="20.07"/>
-    </proof>
-    <proof
-     prover="alt-ergo-0.93.1"
-     timelimit="20"
-     edited=""
-     obsolete="true">
-     <result status="timeout" time="20.04"/>
-    </proof>
-    <proof
-     prover="cvc3"
-     timelimit="20"
-     edited=""
-     obsolete="true">
-     <result status="failure" time="0.00"/>
-    </proof>
-    <proof
-     prover="alt-ergo"
-     timelimit="20"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="20.06"/>
-    </proof>
-    <proof
-     prover="z3"
-     timelimit="20"
-     edited=""
-     obsolete="true">
-     <result status="failure" time="0.00"/>
-    </proof>
-    <proof
-     prover="cvc3-2.4"
-     timelimit="20"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="20.05"/>
-    </proof>
-   </goal>
   </theory>
   <theory
    name="BV32_64"
@@ -1714,7 +1573,7 @@
    expanded="false">
    <goal
     name="nth_one1"
-    sum="08717a5d49cd5f6f02263d7398ad9b86"
+    sum="37be26e7b6c480a31ed3b82db078a848"
     proved="true"
     expanded="false"
     shape="ainfix =anthaoneV0aFalseIainfix <=V0c51Aainfix <=c0V0F">
@@ -1728,7 +1587,7 @@
    </goal>
    <goal
     name="nth_one2"
-    sum="884f778c7200cdac1d003d8f48a1c4cd"
+    sum="2656bedc11d6f177c939f65bf5365037"
     proved="true"
     expanded="false"
     shape="ainfix =anthaoneV0aTrueIainfix <=V0c61Aainfix <=c52V0F">
@@ -1737,12 +1596,12 @@
      timelimit="10"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.06"/>
+     <result status="valid" time="0.05"/>
     </proof>
    </goal>
    <goal
     name="nth_one3"
-    sum="adc3c1424874eb4bc3c03824fbd115f4"
+    sum="fc5ba72c30a9614f2196d736abe73cfc"
     proved="true"
     expanded="false"
     shape="ainfix =anthaoneV0aFalseIainfix <=V0c63Aainfix <=c62V0F">
@@ -1756,7 +1615,7 @@
    </goal>
    <goal
     name="sign_one"
-    sum="8236b73e5f775644f48982a2126fde65"
+    sum="90220b4ca884394c39e35f382e5a14d6"
     proved="true"
     expanded="false"
     shape="ainfix =asignaoneaFalse">
@@ -1777,7 +1636,7 @@
    </goal>
    <goal
     name="exp_one"
-    sum="359f1a3e1ccb43aa4921d2d5232d7251"
+    sum="553f4ca2aec6cb43afcaf0dc08b43f0e"
     proved="true"
     expanded="false"
     shape="ainfix =aexpaonec1023">
@@ -1800,12 +1659,12 @@
      timelimit="21"
      edited=""
      obsolete="false">
-     <result status="valid" time="9.54"/>
+     <result status="valid" time="4.77"/>
     </proof>
    </goal>
    <goal
     name="mantissa_one"
-    sum="90c5f97d9c2f97e85b319aa602a63ecf"
+    sum="eb50a8964da4ebb8abae539cda05d6c8"
     proved="true"
     expanded="false"
     shape="ainfix =amantissaaonec0">
@@ -1814,12 +1673,12 @@
      timelimit="10"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.26"/>
+     <result status="valid" time="0.28"/>
     </proof>
    </goal>
    <goal
     name="double_value_of_1"
-    sum="23471662f67b91b4ea7be4195576d174"
+    sum="c326238b1886e32bb58d5c45e1947350"
     proved="true"
     expanded="false"
     shape="ainfix =adouble_of_bv64aonec1.0">
@@ -1845,7 +1704,7 @@
    expanded="false">
    <goal
     name="Nth_j"
-    sum="7818dd8788c64c2d2427d8fcaf9bd269"
+    sum="bc6b33cf7105c443bcfd9cc45eafb8ef"
     proved="true"
     expanded="false"
     shape="ainfix =anthajV0aFalseIainfix <=V0c62Aainfix <=c0V0F">
@@ -1853,8 +1712,113 @@
      prover="alt-ergo-0.93.1"
      timelimit="5"
      edited=""
-     obsolete="true">
-     <result status="valid" time="0.29"/>
+     obsolete="false">
+     <result status="valid" time="0.28"/>
+    </proof>
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.07"/>
+    </proof>
+   </goal>
+   <goal
+    name="sign_of_j"
+    sum="4744023d6fa92f3b4aa0582428ee4973"
+    proved="true"
+    expanded="false"
+    shape="ainfix =asignajaTrue">
+    <proof
+     prover="alt-ergo-0.93.1"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.07"/>
+    </proof>
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="mantissa_of_j"
+    sum="4fe01508e95e4b3f6f33783fcf7f9229"
+    proved="true"
+    expanded="false"
+    shape="ainfix =amantissaajc0">
+    <proof
+     prover="alt-ergo-0.93.1"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.48"/>
+    </proof>
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.15"/>
+    </proof>
+   </goal>
+   <goal
+    name="exp_of_j"
+    sum="bfbafe4c0df650853163e41f59715f5e"
+    proved="true"
+    expanded="false"
+    shape="ainfix =aexpajc0">
+    <proof
+     prover="alt-ergo-0.93.1"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.48"/>
+    </proof>
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.15"/>
+    </proof>
+   </goal>
+   <goal
+    name="int_of_bv"
+    sum="14e00104e44da4296832fe7e17da2574"
+    proved="true"
+    expanded="false"
+    shape="ainfix =adouble_of_bv64ajc0.0">
+    <proof
+     prover="alt-ergo-0.93.1"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.07"/>
+    </proof>
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.04"/>
+    </proof>
+   </goal>
+   <goal
+    name="MainResultBits"
+    sum="b3f78d9caf615986dd196c0d66b8bf3e"
+    proved="true"
+    expanded="false"
+    shape="ainfix =anthabw_xorV0ajV1anthV0V1Iainfix <V1c63Aainfix <=c0V1FF">
+    <proof
+     prover="alt-ergo-0.93.1"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.24"/>
     </proof>
     <proof
      prover="alt-ergo"
@@ -1865,113 +1829,8 @@
     </proof>
    </goal>
    <goal
-    name="sign_of_j"
-    sum="7deeb198b1b6bab780e0fc0a6697948c"
-    proved="true"
-    expanded="false"
-    shape="ainfix =asignajaTrue">
-    <proof
-     prover="alt-ergo-0.93.1"
-     timelimit="5"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.07"/>
-    </proof>
-    <proof
-     prover="alt-ergo"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.03"/>
-    </proof>
-   </goal>
-   <goal
-    name="mantissa_of_j"
-    sum="21e8e3afc3e2b770b92cf180e40bcd83"
-    proved="true"
-    expanded="false"
-    shape="ainfix =amantissaajc0">
-    <proof
-     prover="alt-ergo-0.93.1"
-     timelimit="5"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.48"/>
-    </proof>
-    <proof
-     prover="alt-ergo"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.16"/>
-    </proof>
-   </goal>
-   <goal
-    name="exp_of_j"
-    sum="d52fd53d14042068150506a48ca0dc0c"
-    proved="true"
-    expanded="false"
-    shape="ainfix =aexpajc0">
-    <proof
-     prover="alt-ergo-0.93.1"
-     timelimit="5"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.60"/>
-    </proof>
-    <proof
-     prover="alt-ergo"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.27"/>
-    </proof>
-   </goal>
-   <goal
-    name="int_of_bv"
-    sum="acdf80d60091aa773c54f131806338c1"
-    proved="true"
-    expanded="false"
-    shape="ainfix =adouble_of_bv64ajc0.0">
-    <proof
-     prover="alt-ergo-0.93.1"
-     timelimit="5"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.06"/>
-    </proof>
-    <proof
-     prover="alt-ergo"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.03"/>
-    </proof>
-   </goal>
-   <goal
-    name="MainResultBits"
-    sum="0251235030bc656b2cd472fc4a8919e8"
-    proved="true"
-    expanded="false"
-    shape="ainfix =anthabw_xorV0ajV1anthV0V1Iainfix <V1c63Aainfix <=c0V1FF">
-    <proof
-     prover="alt-ergo-0.93.1"
-     timelimit="5"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.24"/>
-    </proof>
-    <proof
-     prover="alt-ergo"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.07"/>
-    </proof>
-   </goal>
-   <goal
     name="MainResultSign"
-    sum="863870ba21b14852a23bc425b0d8e6da"
+    sum="e9d18c37ac77ead1b577e6277ca0a85e"
     proved="true"
     expanded="false"
     shape="ainfix =anthabw_xorV0ajc63anotbanthV0c63F">
@@ -1980,12 +1839,12 @@
      timelimit="10"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.02"/>
+     <result status="valid" time="0.03"/>
     </proof>
    </goal>
    <goal
     name="Sign_of_xor_j"
-    sum="74d9d01520dfb3e5493bd027bd0f323c"
+    sum="e70f8d6d25693543c35e6091b9b93e68"
     proved="true"
     expanded="false"
     shape="ainfix =asignabw_xorV0ajanotbasignV0F">
@@ -1999,7 +1858,7 @@
    </goal>
    <goal
     name="Exp_of_xor_j"
-    sum="552e7c3bf2aed548a24d6f25e16c16a4"
+    sum="a97f46336dd30f3d21b141c82242b302"
     proved="true"
     expanded="false"
     shape="ainfix =aexpabw_xorV0ajaexpV0F">
@@ -2008,33 +1867,33 @@
      timelimit="18"
      edited=""
      obsolete="false">
-     <result status="valid" time="7.91"/>
+     <result status="valid" time="1.05"/>
     </proof>
    </goal>
    <goal
     name="Mantissa_of_xor_j"
-    sum="1c8674bcff24d492a7c68a0f04fb115e"
+    sum="a6e4072df83cc697f770ff5610272c40"
     proved="true"
     expanded="false"
     shape="ainfix =amantissaabw_xorV0ajamantissaV0F">
     <proof
      prover="alt-ergo-0.93.1"
-     timelimit="5"
+     timelimit="8"
      edited=""
-     obsolete="true">
-     <result status="valid" time="3.66"/>
+     obsolete="false">
+     <result status="valid" time="3.41"/>
     </proof>
     <proof
      prover="alt-ergo"
      timelimit="10"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.59"/>
+     <result status="valid" time="0.56"/>
     </proof>
    </goal>
    <goal
     name="MainResultZero"
-    sum="9380eb26c2f9a5d5a0d3323842103e69"
+    sum="88cbddaf2965f3f9a4ce8987bdae04c0"
     proved="true"
     expanded="false"
     shape="ainfix =adouble_of_bv64abw_xorV0ajaprefix -.adouble_of_bv64V0Iainfix =amantissaV0c0Aainfix =c0aexpV0F">
@@ -2043,12 +1902,12 @@
      timelimit="10"
      edited=""
      obsolete="false">
-     <result status="valid" time="1.69"/>
+     <result status="valid" time="1.68"/>
     </proof>
    </goal>
    <goal
     name="sign_neg"
-    sum="5bcafe789c311825cf19ce2753273f5e"
+    sum="34aabdd1dfce3d2e53a5e19dbc3b49fc"
     proved="true"
     expanded="false"
     shape="ainfix =asign_valueanotbasignV0aprefix -.asign_valueasignV0F">
@@ -2057,12 +1916,12 @@
      timelimit="15"
      edited=""
      obsolete="false">
-     <result status="valid" time="2.70"/>
+     <result status="valid" time="2.80"/>
     </proof>
    </goal>
    <goal
     name="MainResult"
-    sum="b82d209795ffdd8b3f46563a6fb1e6f6"
+    sum="ef7aaa26de80f330be7535b9eba7c45e"
     proved="true"
     expanded="false"
     shape="ainfix =adouble_of_bv64abw_xorV0ajaprefix -.adouble_of_bv64V0Iainfix <aexpV0c2047Aainfix <c0aexpV0F">
@@ -2071,17 +1930,17 @@
      timelimit="15"
      edited="bitvector1_TestNegAsXOR_MainResult_2.v"
      obsolete="false">
-     <result status="valid" time="0.71"/>
+     <result status="valid" time="0.65"/>
     </proof>
    </goal>
   </theory>
   <theory
    name="TestDoubleOfInt"
    verified="false"
-   expanded="false">
+   expanded="true">
    <goal
     name="jp0_30"
-    sum="a0de27fd1619567f37e9ea96fb9f52d8"
+    sum="a0109dda67bf0f44b4037e5e9b473f47"
     proved="true"
     expanded="false"
     shape="ainfix =anthaj'V0aFalseIainfix <V0c30Aainfix <=c0V0F">
@@ -2095,7 +1954,7 @@
    </goal>
    <goal
     name="nth_const1"
-    sum="6d7525f3558e32ae842b49bf54764540"
+    sum="9568e538f4e9250ac38f134f67d524b4"
     proved="true"
     expanded="false"
     shape="ainfix =anthaconstV0aFalseIainfix <=V0c30Aainfix <=c0V0F">
@@ -2104,12 +1963,12 @@
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.07"/>
+     <result status="valid" time="0.06"/>
     </proof>
    </goal>
    <goal
     name="nth_const2"
-    sum="b4d73b29bcba227d311d0eed86e9bd34"
+    sum="9dc05843fcecf7962f3ada83bfcfe66d"
     proved="true"
     expanded="false"
     shape="ainfix =anthaconstc31aTrue">
@@ -2123,7 +1982,7 @@
    </goal>
    <goal
     name="nth_const3"
-    sum="b2d3942331b6064aff45f0dc4a53e718"
+    sum="1c1c0a38e803a80acb61e689ee08cc67"
     proved="true"
     expanded="false"
     shape="ainfix =anthaconstV0aFalseIainfix <=V0c51Aainfix <=c32V0F">
@@ -2132,12 +1991,12 @@
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="1.06"/>
+     <result status="valid" time="0.99"/>
     </proof>
    </goal>
    <goal
     name="nth_const4"
-    sum="25a6459d436a704b54d6029df70c6c11"
+    sum="645c3b53679693d8844de547c76c6c56"
     proved="true"
     expanded="false"
     shape="ainfix =anthaconstV0aTrueIainfix <=V0c53Aainfix <=c52V0F">
@@ -2146,29 +2005,15 @@
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="1.05"/>
+     <result status="valid" time="1.07"/>
     </proof>
    </goal>
    <goal
     name="nth_const5"
-    sum="607a700163eae3c163ddb56dcc7cceeb"
+    sum="219c9640c10e686fa4c25e6d777c5645"
     proved="true"
     expanded="false"
     shape="ainfix =anthaconstV0aFalseIainfix <=V0c55Aainfix <=c54V0F">
-    <proof
-     prover="alt-ergo"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="1.06"/>
-    </proof>
-   </goal>
-   <goal
-    name="nth_const6"
-    sum="e34ae35648490289faef71370329fd8b"
-    proved="true"
-    expanded="false"
-    shape="ainfix =anthaconstV0aTrueIainfix <=V0c57Aainfix <=c56V0F">
     <proof
      prover="alt-ergo"
      timelimit="5"
@@ -2178,8 +2023,22 @@
     </proof>
    </goal>
    <goal
+    name="nth_const6"
+    sum="7ce0a3dbfa37396d28eaa1e36615e904"
+    proved="true"
+    expanded="false"
+    shape="ainfix =anthaconstV0aTrueIainfix <=V0c57Aainfix <=c56V0F">
+    <proof
+     prover="alt-ergo"
+     timelimit="5"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="1.07"/>
+    </proof>
+   </goal>
+   <goal
     name="nth_const7"
-    sum="f030b7dca62738ec63b4a69b9de305b6"
+    sum="f151e7acce453bbec1a7c7c5ad4092be"
     proved="true"
     expanded="false"
     shape="ainfix =anthaconstV0aFalseIainfix <=V0c61Aainfix <=c58V0F">
@@ -2188,12 +2047,12 @@
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="1.05"/>
+     <result status="valid" time="1.00"/>
     </proof>
    </goal>
    <goal
     name="nth_const8"
-    sum="96e44609a3840e9a5969bbd3fe2f7c96"
+    sum="f1869efc4e8408240be46dffa9b41743"
     proved="true"
     expanded="false"
     shape="ainfix =anthaconstc62aTrue">
@@ -2202,12 +2061,12 @@
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.04"/>
+     <result status="valid" time="0.03"/>
     </proof>
    </goal>
    <goal
     name="nth_const9"
-    sum="9491830319c7aa72eddb1eb9c731b1af"
+    sum="47a86ca5034e826fbef09bc189195f5a"
     proved="true"
     expanded="false"
     shape="ainfix =anthaconstc63aFalse">
@@ -2221,7 +2080,7 @@
    </goal>
    <goal
     name="sign_const"
-    sum="633d06beabb0c83ef909e3d37970d7b3"
+    sum="50795b93235cfde3e2ea85941e714a9a"
     proved="true"
     expanded="false"
     shape="ainfix =asignaconstaFalse">
@@ -2235,7 +2094,7 @@
    </goal>
    <goal
     name="exp_const"
-    sum="10300772ed1bf0f8ec7fdff11a9137b5"
+    sum="b464ef32b2ce5f254241f006f6bdcaa4"
     proved="true"
     expanded="false"
     shape="ainfix =aexpaconstc1075">
@@ -2244,19 +2103,19 @@
      timelimit="5"
      edited="bitvector1_TestDoubleOfInt_exp_const_1.v"
      obsolete="false">
-     <result status="valid" time="1.10"/>
+     <result status="valid" time="1.08"/>
     </proof>
     <proof
      prover="alt-ergo"
      timelimit="10"
      edited=""
      obsolete="false">
-     <result status="timeout" time="10.07"/>
+     <result status="timeout" time="10.02"/>
     </proof>
    </goal>
    <goal
     name="to_nat_mantissa_1"
-    sum="e580e4890de355a9a05cea6fb236f244"
+    sum="c262fe172be0731ad4f326f8d7c0775a"
     proved="true"
     expanded="false"
     shape="ainfix =ato_nat_subaconstc30c0c0">
@@ -2270,7 +2129,7 @@
    </goal>
    <goal
     name="mantissa_const_nth2"
-    sum="cd4bfc946e47069f7c7a2eed571f6c74"
+    sum="d2625f105aa6f3f2af99a77e2a1ea5cb"
     proved="true"
     expanded="false"
     shape="ainfix =anthaconstV0aFalseIainfix <=V0c51Aainfix <=c32V0F">
@@ -2284,7 +2143,7 @@
    </goal>
    <goal
     name="mantissa_const_to_nat51"
-    sum="2895add58de9c5648d7071d6325b4b93"
+    sum="cbaa29980ea4253e9e450030d730ef11"
     proved="true"
     expanded="false"
     shape="ainfix =ato_nat_subaconstc51c0ato_nat_subaconstc31c0">
@@ -2293,12 +2152,12 @@
      timelimit="20"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.12"/>
+     <result status="valid" time="0.11"/>
     </proof>
    </goal>
    <goal
     name="mantissa_const"
-    sum="16aa930f050480aa4492913b129c1868"
+    sum="c5dfe79ae7033d1be13d240b5d8306c2"
     proved="true"
     expanded="false"
     shape="ainfix =amantissaaconstapow2c31">
@@ -2306,20 +2165,20 @@
      prover="cvc3"
      timelimit="10"
      edited=""
-     obsolete="true">
-     <result status="failure" time="0.00"/>
+     obsolete="false">
+     <result status="valid" time="0.05"/>
     </proof>
     <proof
      prover="alt-ergo"
      timelimit="10"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.66"/>
+     <result status="valid" time="0.56"/>
     </proof>
    </goal>
    <goal
     name="real1075m1023"
-    sum="13bb00fc7c2424371ff230dd3b13ce0d"
+    sum="94f1658ef5bbdff05cd637c0d89c655a"
     proved="true"
     expanded="false"
     shape="ainfix =afrom_intainfix -c1075c1023c52.0">
@@ -2328,7 +2187,7 @@
      timelimit="10"
      edited=""
      obsolete="false">
-     <result status="timeout" time="10.08"/>
+     <result status="timeout" time="10.01"/>
     </proof>
     <proof
      prover="gappa"
@@ -2340,7 +2199,7 @@
    </goal>
    <goal
     name="real1075m1023_2"
-    sum="7576169cd3b77a20d9f6a3408384c0d4"
+    sum="8f40cfbef69d12365da82e89ec74e9aa"
     proved="true"
     expanded="false"
     shape="ainfix =ainfix -.c1075.0c1023.0c52.0">
@@ -2354,7 +2213,7 @@
    </goal>
    <goal
     name="real52_a_m52"
-    sum="32ea7682d1cf701e70d2bb356c2c1231"
+    sum="3cc1e05bd8f655d9f5f14d3750fce566"
     proved="true"
     expanded="false"
     shape="ainfix =ainfix *.ainfix *.apow2ainfix -c1075c1023apow2c31apow2aprefix -c52apow2c31">
@@ -2363,12 +2222,12 @@
      timelimit="30"
      edited=""
      obsolete="false">
-     <result status="valid" time="12.40"/>
+     <result status="valid" time="12.38"/>
     </proof>
    </goal>
    <goal
     name="const_value0"
-    sum="1943b5af0e3366c692e4123b56b74721"
+    sum="4a43691149ee5a1f1a51f3d0fb4193ba"
     proved="true"
     expanded="false"
     shape="ainfix =aconst_as_doubleainfix *.ainfix *.c1.0apow2ainfix -c1075c1023ainfix +.c1.0ainfix *.apow2c31apow2aprefix -c52">
@@ -2377,26 +2236,26 @@
      timelimit="20"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.23"/>
+     <result status="valid" time="0.24"/>
     </proof>
     <proof
      prover="cvc3"
      timelimit="10"
      edited=""
-     obsolete="true">
-     <result status="failure" time="0.00"/>
+     obsolete="false">
+     <result status="failure" time="0.04"/>
     </proof>
     <proof
      prover="z3"
      timelimit="20"
      edited=""
-     obsolete="true">
-     <result status="failure" time="0.00"/>
+     obsolete="false">
+     <result status="timeout" time="20.18"/>
     </proof>
    </goal>
    <goal
     name="const_value"
-    sum="bf499240db62ed228d10f2bedd8fcae2"
+    sum="0d7108173c108ab827d517f323166472"
     proved="true"
     expanded="false"
     shape="ainfix =aconst_as_doubleainfix +.apow2c52apow2c31">
@@ -2411,8 +2270,8 @@
      prover="cvc3"
      timelimit="10"
      edited=""
-     obsolete="true">
-     <result status="failure" time="0.00"/>
+     obsolete="false">
+     <result status="failure" time="0.04"/>
     </proof>
     <proof
      prover="alt-ergo"
@@ -2425,69 +2284,97 @@
      prover="z3"
      timelimit="10"
      edited=""
-     obsolete="true">
-     <result status="failure" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
-    name="two_compl_pos"
-    sum="35545c56b2217ed62111caf42374ba20"
-    proved="false"
-    expanded="false"
-    shape="ainfix =ato_nat_subafrom_int2cV0c31c0V0Iainfix >=V0c0Aais_int32V0F">
-    <proof
-     prover="coq"
-     timelimit="10"
-     edited="bitvector1_TestDoubleOfInt_two_compl_pos_3.v"
      obsolete="false">
-     <result status="highfailure" time="0.73"/>
-    </proof>
-   </goal>
-   <goal
-    name="two_compl_neg"
-    sum="6a0965e5b94ee1ff46f1b7da1eb5dd6d"
-    proved="false"
-    expanded="false"
-    shape="ainfix =ato_nat_subafrom_int2cV0c31c0ainfix +apow2c32V0Iainfix <V0c0Aais_int32V0F">
-    <proof
-     prover="coq"
-     timelimit="10"
-     edited="bitvector1_TestDoubleOfInt_two_compl_neg_1.v"
-     obsolete="false">
-     <result status="unknown" time="0.69"/>
+     <result status="valid" time="0.12"/>
     </proof>
    </goal>
    <goal
     name="nth_0_30"
-    sum="3894bd17842690d10bdf8d3a3c2f4527"
+    sum="2f11b080534e4ab5412104a704b6998a"
     proved="true"
     expanded="false"
     shape="ainfix =anthabw_xoraj'afrom_int2cV0V1anthafrom_int2cV0V1Iainfix <=V1c30Aainfix <=c0V1Aais_int32V0FF">
     <proof
-     prover="alt-ergo"
-     timelimit="5"
+     prover="alt-ergo-0.93.1"
+     timelimit="10"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.38"/>
+     <result status="valid" time="1.42"/>
+    </proof>
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.44"/>
+    </proof>
+   </goal>
+   <goal
+    name="nth_jpxor_0_30"
+    sum="63fabb860dc33065d310fdf437e5993d"
+    proved="true"
+    expanded="false"
+    shape="ainfix =anthajpxorV0V1anthafrom_int2cV0V1Iainfix <=V1c30Aainfix <=c0V1Aais_int32V0FF">
+    <proof
+     prover="alt-ergo-0.93.1"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.25"/>
+    </proof>
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.09"/>
+    </proof>
+   </goal>
+   <goal
+    name="nth_var31"
+    sum="041e6c84adcf68c582c49f1c641c72e1"
+    proved="true"
+    expanded="false"
+    shape="ainfix =anthajpxorV0c31anotbanthafrom_int2cV0c31F">
+    <proof
+     prover="alt-ergo-0.93.1"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="3.43"/>
+    </proof>
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="1.04"/>
     </proof>
    </goal>
    <goal
     name="to_nat_sub_0_30"
-    sum="a80d1ff95664c36d159891af1674568c"
+    sum="1fc6968606340cdbc83ce3ecd9922261"
     proved="true"
     expanded="false"
     shape="ainfix =ato_nat_subabw_xoraj'afrom_int2cV0c30c0ato_nat_subafrom_int2cV0c30c0Iais_int32V0F">
     <proof
-     prover="alt-ergo"
-     timelimit="5"
+     prover="alt-ergo-0.93.1"
+     timelimit="10"
      edited=""
      obsolete="false">
-     <result status="valid" time="1.61"/>
+     <result status="valid" time="0.61"/>
+    </proof>
+    <proof
+     prover="alt-ergo"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.21"/>
     </proof>
    </goal>
    <goal
     name="jpxorx_pos"
-    sum="345e3e371ae991274671f2cf96bf1ca6"
+    sum="1895dbcba4dcc35573f336761450ce1e"
     proved="true"
     expanded="false"
     shape="ainfix =anthabw_xoraj'afrom_int2cV0c31aTrueIainfix >=V0c0F">
@@ -2496,42 +2383,70 @@
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.22"/>
+     <result status="valid" time="0.20"/>
     </proof>
    </goal>
    <goal
+    name="from_int2c_to_nat_sub_gen"
+    sum="d146bec702eb69651ff7316def593d42"
+    proved="false"
+    expanded="true"
+    shape="ainfix =ato_nat_subafrom_int2cV0V1c0V0Iainfix <V0apow2V1Aainfix <=c0V0Aainfix <=V1c30Aainfix <=c0V1F">
+   </goal>
+   <goal
     name="from_int2c_to_nat_sub"
-    sum="2df9fc7466f55f12485a72eafe1c57c8"
-    proved="true"
-    expanded="false"
+    sum="070fcf54c21b940202199d4db081e855"
+    proved="false"
+    expanded="true"
     shape="ainfix =ato_nat_subafrom_int2cV0c30c0V0Iainfix >=V0c0Aais_int32V0F">
+    <proof
+     prover="z3-3"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="timeout" time="10.08"/>
+    </proof>
+    <proof
+     prover="alt-ergo-0.93.1"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="timeout" time="10.00"/>
+    </proof>
+    <proof
+     prover="cvc3"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="highfailure" time="0.04"/>
+    </proof>
     <proof
      prover="alt-ergo"
      timelimit="10"
      edited=""
      obsolete="false">
-     <result status="valid" time="3.38"/>
+     <result status="timeout" time="10.04"/>
     </proof>
-   </goal>
-   <goal
-    name="nth_var31"
-    sum="269c2e71d5c5df2bf00c051175b49365"
-    proved="true"
-    expanded="false"
-    shape="ainfix =anthajpxorV0c31anotbanthafrom_int2cV0c31F">
     <proof
-     prover="alt-ergo"
-     timelimit="5"
+     prover="z3"
+     timelimit="10"
      edited=""
      obsolete="false">
-     <result status="valid" time="1.07"/>
+     <result status="timeout" time="10.08"/>
+    </proof>
+    <proof
+     prover="cvc3-2.4"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="highfailure" time="0.04"/>
     </proof>
    </goal>
    <goal
     name="lemma1_pos"
-    sum="f8a2ca3ec5296a80bb790d3f981836b3"
+    sum="de2c0799c61e8050f1c1b718cda08f62"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =ato_nat_subajpxorV0c31c0ainfix +apow2c31V0Iainfix >=V0c0Aais_int32V0F">
     <proof
      prover="coq"
@@ -2545,12 +2460,12 @@
      timelimit="16"
      edited=""
      obsolete="false">
-     <result status="valid" time="6.68"/>
+     <result status="valid" time="5.16"/>
     </proof>
    </goal>
    <goal
     name="to_nat_sub_0_30_neg"
-    sum="2ade0fb71b5ff90d7b83de7bea8c3ad4"
+    sum="03c1e5590d268fef48b01426c849b42b"
     proved="true"
     expanded="false"
     shape="ainfix =ato_nat_subabw_xoraj'afrom_int2cV0c30c0ato_nat_subafrom_int2cV0c30c0Iainfix <V0c0Aais_int32V0F">
@@ -2559,26 +2474,26 @@
      timelimit="5"
      edited="bitvector1_TestDoubleOfInt_to_nat_sub_0_30_neg_1.v"
      obsolete="false">
-     <result status="valid" time="0.72"/>
+     <result status="valid" time="0.70"/>
     </proof>
    </goal>
    <goal
     name="to_nat_sub_0_30_neg1"
-    sum="0cd8eca0937c0b90f6e4cd1e06c8908b"
-    proved="true"
-    expanded="false"
+    sum="68c140b7de62a9a3063ccb4834149cff"
+    proved="false"
+    expanded="true"
     shape="ainfix =ato_nat_subafrom_int2cV0c30c0ainfix +apow2c31V0Iainfix <V0c0Aais_int32V0F">
     <proof
      prover="alt-ergo"
      timelimit="14"
      edited=""
      obsolete="false">
-     <result status="valid" time="5.97"/>
+     <result status="timeout" time="14.02"/>
     </proof>
    </goal>
    <goal
     name="lemma1_neg"
-    sum="b80dec08a558ca54c6650b8b98b45059"
+    sum="3885d184f3e266ccdf5bdb82668cd060"
     proved="true"
     expanded="false"
     shape="ainfix =ato_nat_subajpxorV0c31c0ainfix +apow2c31V0Iainfix <V0c0Aais_int32V0F">
@@ -2587,12 +2502,12 @@
      timelimit="5"
      edited="bitvector1_TestDoubleOfInt_lemma1_neg_1.v"
      obsolete="false">
-     <result status="valid" time="0.72"/>
+     <result status="valid" time="0.70"/>
     </proof>
    </goal>
    <goal
     name="lemma1"
-    sum="64525e622928edee05e49aacd39bdcfe"
+    sum="81ab06d95d6009d17e9168b71eefcb17"
     proved="true"
     expanded="false"
     shape="ainfix =ato_nat_subajpxorV0c31c0ainfix +apow2c31V0Iais_int32V0F">
@@ -2606,7 +2521,7 @@
    </goal>
    <goal
     name="nth_var_0_31"
-    sum="6b8510fe8aa909fcba18887dc4b9013b"
+    sum="5afc7191f8c8b71b14df185b343d2a92"
     proved="true"
     expanded="false"
     shape="ainfix =anthavarV0V1anthajpxorV0V1Iainfix <=V1c31Aainfix <=c0V1Aais_int32V0FF">
@@ -2615,12 +2530,12 @@
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.97"/>
+     <result status="valid" time="1.46"/>
     </proof>
    </goal>
    <goal
     name="to_nat_bv32_bv64_aux"
-    sum="d474cd78b40861d7b5cded038c52308a"
+    sum="72bb157fb03b13c50c985210cc23549e"
     proved="true"
     expanded="false"
     shape="ainfix =ato_nat_subaconcatV0V1V2c0ato_nat_subV1V2c0Iainfix <V2c32Aainfix <=c0V2FFF">
@@ -2629,12 +2544,12 @@
      timelimit="10"
      edited="bitvector1_TestDoubleOfInt_to_nat_bv32_bv64_aux_2.v"
      obsolete="false">
-     <result status="valid" time="0.93"/>
+     <result status="valid" time="0.91"/>
     </proof>
    </goal>
    <goal
     name="to_nat_bv32_bv64"
-    sum="a57091b287c0824f8b510d26f1eff1af"
+    sum="d5bbb333a8094c85207b6c76591bc354"
     proved="true"
     expanded="false"
     shape="ainfix =ato_nat_subaconcatV0V1c31c0ato_nat_subV1c31c0FF">
@@ -2643,12 +2558,12 @@
      timelimit="10"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.03"/>
+     <result status="valid" time="0.04"/>
     </proof>
    </goal>
    <goal
     name="to_nat_var_0_31"
-    sum="fb982ae91f6a8b568d316b13393d12a0"
+    sum="b6e84ada649431328d4c7911f3a6f9c3"
     proved="true"
     expanded="false"
     shape="ainfix =ato_nat_subavarV0c31c0ato_nat_subajpxorV0c31c0Iais_int32V0F">
@@ -2657,12 +2572,12 @@
      timelimit="5"
      edited="bitvector1_TestDoubleOfInt_to_nat_var_0_31_1.v"
      obsolete="false">
-     <result status="valid" time="0.74"/>
+     <result status="valid" time="0.69"/>
     </proof>
    </goal>
    <goal
     name="nth_var32to63"
-    sum="e2920a282081df0cc30fd4d0f183452f"
+    sum="282d3614800d62784a07ea86aaec4d45"
     proved="true"
     expanded="false"
     shape="ainfix =anthavarV0V1anthajainfix -V1c32Iainfix <=V1c63Aainfix <=c32V1F">
@@ -2670,20 +2585,20 @@
      prover="alt-ergo-0.93.1"
      timelimit="30"
      edited=""
-     obsolete="true">
-     <result status="valid" time="5.59"/>
+     obsolete="false">
+     <result status="valid" time="3.75"/>
     </proof>
     <proof
      prover="alt-ergo"
      timelimit="30"
      edited=""
      obsolete="false">
-     <result status="valid" time="1.41"/>
+     <result status="valid" time="1.13"/>
     </proof>
    </goal>
    <goal
     name="nth_var3"
-    sum="54e204ce61298d62d92cc0a9b16ab8bd"
+    sum="eae2e626aada15ba3a8aebef1d0adc27"
     proved="true"
     expanded="false"
     shape="ainfix =anthavarV0V1aFalseIainfix <=V1c51Aainfix <=c32V1FF">
@@ -2691,20 +2606,20 @@
      prover="alt-ergo-0.93.1"
      timelimit="15"
      edited=""
-     obsolete="true">
-     <result status="timeout" time="19.01"/>
+     obsolete="false">
+     <result status="timeout" time="15.08"/>
     </proof>
     <proof
      prover="alt-ergo"
      timelimit="20"
      edited=""
      obsolete="false">
-     <result status="valid" time="9.26"/>
+     <result status="valid" time="8.33"/>
     </proof>
    </goal>
    <goal
     name="lemma2"
-    sum="2107071bb917e368326f7bb7de17a0ea"
+    sum="88844af8079f950e61215ed3210db262"
     proved="true"
     expanded="false"
     shape="ainfix =amantissaavarV0ainfix +apow2c31V0Iais_int32V0F">
@@ -2713,12 +2628,12 @@
      timelimit="30"
      edited="bitvector1_TestDoubleOfInt_lemma2_2.v"
      obsolete="false">
-     <result status="valid" time="0.73"/>
+     <result status="valid" time="0.70"/>
     </proof>
    </goal>
    <goal
     name="nth_var4"
-    sum="501384c1838d05a83e1d258cf52d74bb"
+    sum="aa10d1375ac96222d6259cbf6bd9c3fa"
     proved="true"
     expanded="false"
     shape="ainfix =anthavarV0V1aTrueIainfix <=V1c53Aainfix <=c52V1FF">
@@ -2727,12 +2642,12 @@
      timelimit="23"
      edited=""
      obsolete="false">
-     <result status="valid" time="9.93"/>
+     <result status="valid" time="9.85"/>
     </proof>
    </goal>
    <goal
     name="nth_var5"
-    sum="83a8b4ef8f9ba5f52a6323e15bd1307f"
+    sum="3d2bfa461e55e00e68204e5a6e513531"
     proved="true"
     expanded="false"
     shape="ainfix =anthavarV0V1aFalseIainfix <=V1c55Aainfix <=c54V1FF">
@@ -2741,12 +2656,12 @@
      timelimit="30"
      edited=""
      obsolete="false">
-     <result status="valid" time="9.08"/>
+     <result status="valid" time="8.40"/>
     </proof>
    </goal>
    <goal
     name="nth_var6"
-    sum="5a3a27b9ace7251579ec8c4dd613465b"
+    sum="52cee5a6ccbc55263bcbb9c032f90d0f"
     proved="true"
     expanded="false"
     shape="ainfix =anthavarV0V1aTrueIainfix <=V1c57Aainfix <=c56V1FF">
@@ -2755,12 +2670,12 @@
      timelimit="30"
      edited=""
      obsolete="false">
-     <result status="valid" time="9.94"/>
+     <result status="valid" time="9.91"/>
     </proof>
    </goal>
    <goal
     name="nth_var7"
-    sum="fe5249cee548f2bbf95157f4b05983ae"
+    sum="ec601730b59350c1139e636e7e95a233"
     proved="true"
     expanded="false"
     shape="ainfix =anthavarV0V1aFalseIainfix <=V1c61Aainfix <=c58V1FF">
@@ -2769,12 +2684,12 @@
      timelimit="30"
      edited=""
      obsolete="false">
-     <result status="valid" time="9.07"/>
+     <result status="valid" time="8.40"/>
     </proof>
    </goal>
    <goal
     name="nth_var8"
-    sum="fa00c365789dae724df5cbcbc36cf8a0"
+    sum="1715e7e7467f75897ab03e148dfa786c"
     proved="true"
     expanded="false"
     shape="ainfix =anthavarV0c62aTrueF">
@@ -2783,19 +2698,19 @@
      timelimit="10"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.10"/>
+     <result status="valid" time="0.08"/>
     </proof>
     <proof
      prover="z3"
      timelimit="5"
      edited=""
-     obsolete="true">
-     <result status="failure" time="0.00"/>
+     obsolete="false">
+     <result status="valid" time="0.12"/>
     </proof>
    </goal>
    <goal
     name="lemma3"
-    sum="9254dd772f799fe748bf18930e88242e"
+    sum="d77a69824138fa784db2a14b231f80a6"
     proved="true"
     expanded="false"
     shape="ainfix =aexpavarV0c1075F">
@@ -2804,12 +2719,12 @@
      timelimit="5"
      edited="bitvector1_TestDoubleOfInt_lemma3_1.v"
      obsolete="false">
-     <result status="valid" time="1.13"/>
+     <result status="valid" time="1.01"/>
     </proof>
    </goal>
    <goal
     name="nth_var9"
-    sum="d3505f727bbbad743f6b76ff236376c2"
+    sum="485a0f505471b9b445b521aad451730f"
     proved="true"
     expanded="false"
     shape="ainfix =anthavarV0c63aFalseF">
@@ -2818,12 +2733,12 @@
      timelimit="10"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.23"/>
+     <result status="valid" time="0.21"/>
     </proof>
    </goal>
    <goal
     name="lemma4"
-    sum="598a73b99c7ac2fd52bef62fd6ba008a"
+    sum="bf1b9685c0c753a928d8b391f115b6d9"
     proved="true"
     expanded="false"
     shape="ainfix =asignavarV0aFalseF">
@@ -2838,8 +2753,8 @@
      prover="alt-ergo-0.93.1"
      timelimit="5"
      edited=""
-     obsolete="true">
-     <result status="valid" time="0.17"/>
+     obsolete="false">
+     <result status="valid" time="0.19"/>
     </proof>
     <proof
      prover="alt-ergo"
@@ -2851,7 +2766,7 @@
    </goal>
    <goal
     name="sign_var"
-    sum="a90cdbf487dcef993f31a9ea82706f24"
+    sum="f1adc00f4ba6f593896ad6db3dcc0f57"
     proved="true"
     expanded="false"
     shape="ainfix =asignavarV0aFalseF">
@@ -2860,12 +2775,12 @@
      timelimit="10"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.06"/>
+     <result status="valid" time="0.05"/>
     </proof>
    </goal>
    <goal
     name="var_value0"
-    sum="a9e94cf0b9617ba451eb34d89b923c1d"
+    sum="7a7590af604e88f176f1f692341152dc"
     proved="true"
     expanded="false"
     shape="ainfix =avar_as_doubleV0ainfix *.apow2ainfix -c1075c1023ainfix +.c1.0ainfix *.afrom_intainfix +apow2c31V0apow2aprefix -c52Iais_int32V0F">
@@ -2874,12 +2789,12 @@
      timelimit="20"
      edited="bitvector1_TestDoubleOfInt_var_value0_3.v"
      obsolete="false">
-     <result status="valid" time="0.77"/>
+     <result status="valid" time="0.73"/>
     </proof>
    </goal>
    <goal
     name="from_int_sum"
-    sum="bf9608be3e99050c7c9cb76722123756"
+    sum="63989775221a27ecb3b2c8258b13454a"
     proved="true"
     expanded="false"
     shape="ainfix =afrom_intainfix +apow2c31V0ainfix +.afrom_intapow2c31afrom_intV0Iais_int32V0F">
@@ -2893,7 +2808,7 @@
    </goal>
    <goal
     name="var_value3"
-    sum="00099e89070bbe009e1d3df22e04308b"
+    sum="d678357275a8fc6757d8f80a951924c4"
     proved="true"
     expanded="false"
     shape="ainfix =avar_as_doubleV0ainfix +.apow2c52ainfix *.ainfix *.apow2c52ainfix +.afrom_intapow2c31afrom_intV0apow2aprefix -c52Iais_int32V0F">
@@ -2902,7 +2817,7 @@
      timelimit="20"
      edited="bitvector1_TestDoubleOfInt_var_value3_1.v"
      obsolete="false">
-     <result status="valid" time="0.80"/>
+     <result status="valid" time="0.72"/>
     </proof>
     <proof
      prover="alt-ergo"
@@ -2914,7 +2829,7 @@
    </goal>
    <goal
     name="distr_pow52"
-    sum="1b7fd2bbb447fded9f101e711bf3da05"
+    sum="011e7133427e24a9dcd102e939d7f289"
     proved="true"
     expanded="false"
     shape="ainfix =ainfix *.ainfix *.apow2c52V0apow2aprefix -c52V0F">
@@ -2923,7 +2838,7 @@
      timelimit="15"
      edited="bitvector1_TestDoubleOfInt_distr_pow52_1.v"
      obsolete="false">
-     <result status="valid" time="0.76"/>
+     <result status="valid" time="0.69"/>
     </proof>
     <proof
      prover="alt-ergo"
@@ -2935,7 +2850,7 @@
    </goal>
    <goal
     name="var_value4"
-    sum="0e22bc98b091fa9e797d992cdaca36e7"
+    sum="850a83d1392c76f949159f91bbc2e260"
     proved="true"
     expanded="false"
     shape="ainfix =avar_as_doubleV0ainfix +.ainfix +.apow2c52afrom_intapow2c31afrom_intV0Iais_int32V0F">
@@ -2944,19 +2859,19 @@
      timelimit="5"
      edited="bitvector1_TestDoubleOfInt_var_value4_2.v"
      obsolete="false">
-     <result status="valid" time="0.74"/>
+     <result status="valid" time="0.70"/>
     </proof>
     <proof
      prover="alt-ergo"
      timelimit="33"
      edited=""
      obsolete="false">
-     <result status="valid" time="13.89"/>
+     <result status="valid" time="12.87"/>
     </proof>
    </goal>
    <goal
     name="pow31"
-    sum="0f3c3a31f8a1521af89e59f5ceee319b"
+    sum="afbab501cb3e3a722c31d795cdbbb553"
     proved="true"
     expanded="false"
     shape="ainfix =afrom_intapow2c31apow2c31">
@@ -2965,14 +2880,14 @@
      timelimit="5"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.12"/>
+     <result status="valid" time="0.13"/>
     </proof>
     <proof
      prover="alt-ergo-0.93.1"
      timelimit="5"
      edited=""
-     obsolete="true">
-     <result status="valid" time="0.12"/>
+     obsolete="false">
+     <result status="valid" time="0.20"/>
     </proof>
     <proof
      prover="alt-ergo"
@@ -2984,7 +2899,7 @@
    </goal>
    <goal
     name="lemma5"
-    sum="bf6d78cff90a16a894a9f25476d429f6"
+    sum="69b7be7553291fbab51aac22c4cf7ed3"
     proved="true"
     expanded="false"
     shape="ainfix =avar_as_doubleV0ainfix +.ainfix +.apow2c52apow2c31afrom_intV0Iais_int32V0F">
@@ -2998,7 +2913,7 @@
    </goal>
    <goal
     name="MainResult"
-    sum="84340ef078441bbe60b6e41c0f3b1303"
+    sum="d421bf22ffbee94a7ed79ebdf284538e"
     proved="true"
     expanded="false"
     shape="ainfix =adouble_of_int32V0afrom_intV0Iais_int32V0F">
@@ -3006,531 +2921,22 @@
      prover="alt-ergo-0.93.1"
      timelimit="5"
      edited=""
-     obsolete="true">
-     <result status="valid" time="0.10"/>
+     obsolete="false">
+     <result status="valid" time="0.12"/>
     </proof>
     <proof
      prover="alt-ergo"
      timelimit="10"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.24"/>
+     <result status="valid" time="0.20"/>
     </proof>
     <proof
      prover="z3"
      timelimit="10"
      edited=""
-     obsolete="true">
-     <result status="failure" time="0.00"/>
-    </proof>
-   </goal>
-  </theory>
-  <theory
-   name="TestBv32"
-   verified="true"
-   expanded="false">
-   <goal
-    name="Test1"
-    sum="c62fbc8ab677c0420de8869614af455b"
-    proved="true"
-    expanded="false"
-    shape="Labw_andabvzeroabvoneainfix =anthV0c1aFalse">
-    <proof
-     prover="alt-ergo"
-     timelimit="10"
-     edited=""
      obsolete="false">
-     <result status="valid" time="0.19"/>
-    </proof>
-   </goal>
-   <goal
-    name="Test2"
-    sum="aea236c5d31595a37ecd7f91fbd575bf"
-    proved="true"
-    expanded="false"
-    shape="Lalsrabvonec16ainfix =anthV0c15aTrue">
-    <proof
-     prover="alt-ergo"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-   </goal>
-   <goal
-    name="Test3"
-    sum="dfdd7c4577bb5c317b623ae2ecac50f9"
-    proved="true"
-    expanded="false"
-    shape="Lalsrabvonec16ainfix =anthV0c16aFalse">
-    <proof
-     prover="alt-ergo"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-   </goal>
-   <goal
-    name="Test4"
-    sum="5a254377320381a5385e8387cff4294f"
-    proved="true"
-    expanded="false"
-    shape="Laasrabvonec16ainfix =anthV0c15aTrue">
-    <proof
-     prover="alt-ergo"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-   </goal>
-   <goal
-    name="Test5"
-    sum="7ff5ebd1872f615c73db19ceef69c60b"
-    proved="true"
-    expanded="false"
-    shape="Laasrabvonec16ainfix =anthV0c16aTrue">
-    <proof
-     prover="alt-ergo"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-   </goal>
-   <goal
-    name="Test6"
-    sum="9fac4a5cb65b21220d102e4be61a17ca"
-    proved="true"
-    expanded="false"
-    shape="Laasralsrabvonec1c16ainfix =anthV0c16aFalse">
-    <proof
-     prover="alt-ergo"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.07"/>
-    </proof>
-   </goal>
-   <goal
-    name="to_nat_0x00000000"
-    sum="a6d84b157de581a271f7adf21fd3d983"
-    proved="true"
-    expanded="false"
-    shape="ainfix =ato_natabvzeroc0">
-    <proof
-     prover="cvc3"
-     timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="failure" time="0.00"/>
-    </proof>
-    <proof
-     prover="alt-ergo"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.14"/>
-    </proof>
-   </goal>
-   <goal
-    name="to_nat_0x0000000F"
-    sum="398dd9a56ad6058f80e927052afc1681"
-    proved="true"
-    expanded="false"
-    shape="ainfix =ato_natalsrabvonec28c15">
-    <proof
-     prover="cvc3"
-     timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="failure" time="0.00"/>
-    </proof>
-    <proof
-     prover="alt-ergo"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="4.03"/>
-    </proof>
-   </goal>
-   <goal
-    name="to_nat_0x0000001F"
-    sum="63fc49c954a802556da73d32939a021f"
-    proved="true"
-    expanded="false"
-    shape="ainfix =ato_natalsrabvonec27c31">
-    <proof
-     prover="cvc3"
-     timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="failure" time="0.00"/>
-    </proof>
-    <proof
-     prover="alt-ergo"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="4.05"/>
-    </proof>
-   </goal>
-   <goal
-    name="to_nat_0x0000003F"
-    sum="c1f773333a0dc3e63ca2043acd3c87da"
-    proved="true"
-    expanded="false"
-    shape="ainfix =ato_natalsrabvonec26c63">
-    <proof
-     prover="cvc3"
-     timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="failure" time="0.00"/>
-    </proof>
-    <proof
-     prover="alt-ergo"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="4.07"/>
-    </proof>
-   </goal>
-   <goal
-    name="to_nat_0x0000007F"
-    sum="9ac5f19ddb7aa5fe71a44f57f73af413"
-    proved="true"
-    expanded="false"
-    shape="ainfix =ato_natalsrabvonec25c127">
-    <proof
-     prover="cvc3"
-     timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="failure" time="0.00"/>
-    </proof>
-    <proof
-     prover="alt-ergo"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="4.07"/>
-    </proof>
-   </goal>
-   <goal
-    name="to_nat_0x000000FF"
-    sum="56bc19a0b62b0477b736ea259b69be67"
-    proved="true"
-    expanded="false"
-    shape="ainfix =ato_natalsrabvonec24c255">
-    <proof
-     prover="cvc3"
-     timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="failure" time="0.00"/>
-    </proof>
-    <proof
-     prover="alt-ergo"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="4.05"/>
-    </proof>
-   </goal>
-   <goal
-    name="to_nat_0x000001FF"
-    sum="a9a2c6fa76bc3ec0dace79a6e40ea364"
-    proved="true"
-    expanded="false"
-    shape="ainfix =ato_natalsrabvonec23c511">
-    <proof
-     prover="cvc3"
-     timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="failure" time="0.00"/>
-    </proof>
-    <proof
-     prover="alt-ergo"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="4.07"/>
-    </proof>
-   </goal>
-   <goal
-    name="to_nat_0x000003FF"
-    sum="1f40763c006d0f3175d12fff9694f4c9"
-    proved="true"
-    expanded="false"
-    shape="ainfix =ato_natalsrabvonec22c1023">
-    <proof
-     prover="cvc3"
-     timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="failure" time="0.00"/>
-    </proof>
-    <proof
-     prover="alt-ergo"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="4.20"/>
-    </proof>
-   </goal>
-   <goal
-    name="to_nat_0x000007FF"
-    sum="02dab016c64c1440ae2f3c9f902eb976"
-    proved="true"
-    expanded="false"
-    shape="ainfix =ato_natalsrabvonec21c2047">
-    <proof
-     prover="cvc3"
-     timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="failure" time="0.00"/>
-    </proof>
-    <proof
-     prover="alt-ergo"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="4.09"/>
-    </proof>
-   </goal>
-   <goal
-    name="to_nat_0x00000FFF"
-    sum="5fba54f0989afedd894ae914d5abd4a9"
-    proved="true"
-    expanded="false"
-    shape="ainfix =ato_natalsrabvonec20c4095">
-    <proof
-     prover="cvc3"
-     timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="failure" time="0.00"/>
-    </proof>
-    <proof
-     prover="alt-ergo"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="4.06"/>
-    </proof>
-   </goal>
-   <goal
-    name="to_nat_0x00001FFF"
-    sum="cecc458fde19f9b9cb5097b68f97694a"
-    proved="true"
-    expanded="false"
-    shape="ainfix =ato_natalsrabvonec19c8191">
-    <proof
-     prover="cvc3"
-     timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="failure" time="0.00"/>
-    </proof>
-    <proof
-     prover="alt-ergo"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="4.26"/>
-    </proof>
-   </goal>
-   <goal
-    name="to_nat_0x00003FFF"
-    sum="0d89ae01b6a7060eb56deffe97ffbf42"
-    proved="true"
-    expanded="false"
-    shape="ainfix =ato_natalsrabvonec18c16383">
-    <proof
-     prover="cvc3"
-     timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="failure" time="0.00"/>
-    </proof>
-    <proof
-     prover="alt-ergo"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="4.13"/>
-    </proof>
-   </goal>
-   <goal
-    name="to_nat_0x00007FFF"
-    sum="95f42926823ad72174de11a2b963be34"
-    proved="true"
-    expanded="false"
-    shape="ainfix =ato_natalsrabvonec17c32767">
-    <proof
-     prover="cvc3"
-     timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="failure" time="0.00"/>
-    </proof>
-    <proof
-     prover="alt-ergo"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="4.12"/>
-    </proof>
-   </goal>
-   <goal
-    name="to_nat_0x0000FFFF"
-    sum="0489cc490f49b85b55d1030cbda9660a"
-    proved="true"
-    expanded="false"
-    shape="ainfix =ato_natalsrabvonec16c65535">
-    <proof
-     prover="cvc3"
-     timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="failure" time="0.00"/>
-    </proof>
-    <proof
-     prover="alt-ergo"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="4.10"/>
-    </proof>
-   </goal>
-   <goal
-    name="to_nat_0x0001FFFF"
-    sum="49c921fbe2d075c50980666a75c082b2"
-    proved="true"
-    expanded="false"
-    shape="ainfix =ato_natalsrabvonec15c131071">
-    <proof
-     prover="cvc3"
-     timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="failure" time="0.00"/>
-    </proof>
-    <proof
-     prover="alt-ergo"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="4.12"/>
-    </proof>
-   </goal>
-   <goal
-    name="to_nat_0x0003FFFF"
-    sum="7c5005e447035e307287422e910d59f0"
-    proved="true"
-    expanded="false"
-    shape="ainfix =ato_natalsrabvonec14c262143">
-    <proof
-     prover="cvc3"
-     timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="failure" time="0.00"/>
-    </proof>
-    <proof
-     prover="alt-ergo"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="4.14"/>
-    </proof>
-   </goal>
-   <goal
-    name="to_nat_0x0007FFFF"
-    sum="4cfe4d541c9674b2e8a6442e01a2ad7f"
-    proved="true"
-    expanded="false"
-    shape="ainfix =ato_natalsrabvonec13c524287">
-    <proof
-     prover="cvc3"
-     timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="failure" time="0.00"/>
-    </proof>
-    <proof
-     prover="alt-ergo"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="4.09"/>
-    </proof>
-   </goal>
-   <goal
-    name="to_nat_0x000FFFFF"
-    sum="a2d4346571ec5782d2fea24f98b471ee"
-    proved="true"
-    expanded="false"
-    shape="ainfix =ato_natalsrabvonec12c1048575">
-    <proof
-     prover="cvc3"
-     timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="failure" time="0.00"/>
-    </proof>
-    <proof
-     prover="alt-ergo"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="4.02"/>
-    </proof>
-   </goal>
-   <goal
-    name="to_nat_0x00FFFFFF"
-    sum="aa8cb56d93d488afc05af0b8fb97a8b1"
-    proved="true"
-    expanded="false"
-    shape="ainfix =ato_natalsrabvonec8c16777215">
-    <proof
-     prover="cvc3"
-     timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="failure" time="0.00"/>
-    </proof>
-    <proof
-     prover="alt-ergo"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="4.02"/>
-    </proof>
-   </goal>
-   <goal
-    name="to_nat_0xFFFFFFFF"
-    sum="7a6406a7357371ff8920e4eb1db103a7"
-    proved="true"
-    expanded="false"
-    shape="ainfix =ato_natabvonec4294967295">
-    <proof
-     prover="cvc3"
-     timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="failure" time="0.00"/>
-    </proof>
-    <proof
-     prover="alt-ergo"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.10"/>
+     <result status="valid" time="2.02"/>
     </proof>
    </goal>
   </theory>
