@@ -234,6 +234,7 @@ install_no_local_lib::
 	cp -f src/why3.cm* $(OCAMLLIB)/why3
 	cp -f META $(OCAMLLIB)/why3
 	if test -f src/why3.a; then cp -f src/why3.a $(OCAMLLIB)/why3; fi
+	if test -f src/why3.o; then cp -f src/why3.o $(OCAMLLIB)/why3; fi
 
 ifeq (@enable_local@,yes)
 install install-lib:
