@@ -77,7 +77,7 @@ let print_reason fmt r =
 
 let print_expl proven fmt p =
    if proven then
-      Format.fprintf fmt "%a: (info) %a proved"
+      Format.fprintf fmt "%a: info: %a proved"
         print_loc p.loc print_reason p.reason
    else
       Format.fprintf fmt "%a: %a not proved"
