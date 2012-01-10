@@ -20,15 +20,15 @@
 open Stdlib
 open Util
 
-type label =
-   { label_id : int ;
-     label_string : string }
+type label = int
 
-let label_hash (x : label) = Hashtbl.hash x.label_id
+let label_hash (x : label) = x
 
-let label_equal (a : label) (b : label) = a.label_id = b.label_id
+let label_equal (a : label) (b : label) = a = b
 
 let ht : (string, label) Hashtbl.t = Hashtbl.create 17
+
+let inverse : (label, string) Hashtbl.t = Hashtbl.create 17
 
 let cnt = ref 0
 
@@ -37,15 +37,16 @@ let from_string s =
       Hashtbl.find ht s
    with Not_found ->
       incr cnt;
-      let r = { label_id = !cnt ; label_string = s } in
+      let r = !cnt in
       Hashtbl.add ht s r;
+      Hashtbl.add inverse r s;
       r
 
-let to_string x = x.label_string
+let to_string x = Hashtbl.find inverse x
 
 module Lab = StructMake (struct
   type t = label
-  let tag id = id.label_id
+  let tag id = id
 end)
 
 module Slab = Lab.S
