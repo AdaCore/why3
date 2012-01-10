@@ -164,10 +164,12 @@ let print_ident_labels fmt id =
 
 let rec print_term fmt t = print_lterm 0 fmt t
 
-and print_lterm pri fmt t = match t.t_label with
-  | [] -> print_tnode pri fmt t
-  | ll -> fprintf fmt (protect_on (pri > 0) "%a %a")
-      (print_list space print_label) ll (print_tnode 0) t
+and print_lterm pri fmt t =
+  if Labels.Slab.is_empty t.t_label then
+     print_tnode pri fmt t
+  else
+     fprintf fmt (protect_on (pri > 0) "%a %a")
+       Pretty.print_labels t.t_label (print_tnode 0) t
 
 and print_app pri fs fmt tl =
   match query_syntax fs.ls_name with
@@ -214,7 +216,7 @@ and print_tnode pri fmt t = match t.t_node with
   | Tfalse ->
       fprintf fmt "false"
   | Tbinop (b,f1,f2) ->
-      let asym = List.mem Term.asym_label t.t_label in
+      let asym = Labels.Slab.mem Term.asym_label t.t_label in
       let p = prio_binop b in
       fprintf fmt (protect_on (pri > p) "%a %a@ %a")
         (print_lterm (p + 1)) f1 (print_binop ~asym) b (print_lterm p) f2

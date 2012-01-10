@@ -226,11 +226,11 @@ let rec term env t = match t.dt_node with
       t_case (term env t1) (List.map branch bl)
   | Tnamed _ ->
       let rec collect p ll e = match e.dt_node with
-        | Tnamed (Lstr l, e) -> collect p (l::ll) e
+        | Tnamed (Lstr l, e) -> collect p (Labels.Slab.add l ll) e
         | Tnamed (Lpos p, e) -> collect (Some p) ll e
-        | _ -> t_label ?loc:p (List.rev ll) (term env e)
+        | _ -> t_label ?loc:p ll (term env e)
       in
-      collect None [] t
+      collect None Labels.Slab.empty t
   | Teps (id, ty, e1) ->
       let v = create_user_vs id (ty_of_dty ty) in
       let env = Mstr.add id.id v env in
@@ -275,11 +275,11 @@ and fmla env = function
       t_case (term env t) (List.map branch bl)
   | (Fnamed _) as f ->
       let rec collect p ll = function
-        | Fnamed (Lstr l, e) -> collect p (l::ll) e
+        | Fnamed (Lstr l, e) -> collect p (Labels.Slab.add l ll) e
         | Fnamed (Lpos p, e) -> collect (Some p) ll e
-        | e -> t_label ?loc:p (List.rev ll) (fmla env e)
+        | e -> t_label ?loc:p ll (fmla env e)
       in
-      collect None [] f
+      collect None Labels.Slab.empty f
   | Fvar f ->
       f
 

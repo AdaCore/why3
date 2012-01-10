@@ -52,3 +52,9 @@ end)
 module Slab = Lab.S
 module Mlab = Lab.M
 
+
+let hash_set s =
+   Slab.fold (fun acc x -> Hashcons.combine acc x) s 17
+
+let singleton s =
+   Slab.singleton (from_string s)

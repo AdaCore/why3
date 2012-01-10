@@ -29,3 +29,8 @@ val to_string : label -> string
 
 module Mlab : Map.S with type key = label
 module Slab : Mlab.Set
+
+val hash_set : Slab.t -> int
+(* a hash that only depends on the elements of the list *)
+
+val singleton : string -> Slab.t

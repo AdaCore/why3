@@ -69,7 +69,7 @@ let rec add_quant kn (vl,tl,f) v =
 
 let t_label_merge { t_label = l; t_loc = p } t =
   let p = if t.t_loc = None then p else t.t_loc in
-  t_label ?loc:p (l @ t.t_label) t
+  t_label ?loc:p (Labels.Slab.union l t.t_label) t
 
 let eval_match ~inline kn t =
   let rec eval env t = match t.t_node with

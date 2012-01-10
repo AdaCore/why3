@@ -1,19 +1,20 @@
 open Why3
 open Term
 
-let rec extract_explanation expl gnat l =
-    match l with
-   | [] -> expl, gnat
-   | x::rest ->
-         let x = Labels.to_string x in
-         if Gnat_util.starts_with x "expl:" then
-            let s = String.sub x 5 (String.length x - 5) in
-            extract_explanation s gnat rest
-         else if Gnat_util.starts_with x "gnatprove:" then
-            let s = String.sub x 10 (String.length x - 10) in
-            extract_explanation expl s rest
-         else
-            extract_explanation expl gnat rest
+let rec extract_explanation expl gnat s =
+   if Labels.Slab.is_empty s then expl, gnat
+   else
+      let x = Labels.Slab.choose s in
+      let rest = Labels.Slab.remove x s in
+      let x = Labels.to_string x in
+      if Gnat_util.starts_with x "expl:" then
+         let s = String.sub x 5 (String.length x - 5) in
+         extract_explanation s gnat rest
+      else if Gnat_util.starts_with x "gnatprove:" then
+         let s = String.sub x 10 (String.length x - 10) in
+         extract_explanation expl s rest
+      else
+         extract_explanation expl gnat rest
 
 let rec search_labels acc f =
    if acc <> None then acc

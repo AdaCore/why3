@@ -57,7 +57,8 @@ let get_mutable_field ts i =
 
 let wp_label e f =
   let loc = if f.t_loc = None then Some e.expr_loc else f.t_loc in
-  let lab = e.expr_lab @ f.t_label in
+  let lab =
+     List.fold_left (fun acc x -> Labels.Slab.add x acc) f.t_label e.expr_lab in
   t_label ?loc lab f
 
 let wp_and ?(sym=false) f1 f2 =
@@ -376,7 +377,9 @@ let term_at lab t =
 
 let wp_expl l f =
   let l = Labels.from_string ("expl:"^l) in
-  t_label ?loc:f.t_loc (l::Split_goal.stop_split::f.t_label) f
+  let lab =
+     Labels.Slab.add l (Labels.Slab.add Split_goal.stop_split f.t_label) in
+  t_label ?loc:f.t_loc lab f
 
 (* 0 <= phi0 and phi < phi0 *)
 let default_variant le lt phi phi0 =
@@ -460,7 +463,7 @@ and wp_desc env rm e q = match e.expr_desc with
         wp_expr env rm e2 (filter_post e2.expr_effect q)
       in
       let v1 = v_result x.pv_pure.vs_ty in
-      let t1 = t_label ~loc:e1.expr_loc [Labels.from_string "let"] (t_var v1) in
+      let t1 = t_label ~loc:e1.expr_loc (Labels.singleton "let") (t_var v1) in
       let q1 = v1, t_subst_single x.pv_pure t1 w2 in
       let q1 = saturate_post e1.expr_effect q1 q in
       wp_label e (wp_expr env rm e1 q1)
@@ -617,7 +620,10 @@ and wp_desc env rm e q = match e.expr_desc with
       (* TODO: propagate call labels into c.c_post *)
       let w = opaque_wp env rm c.c_effect.E.writes c.c_post q in
       let p = wp_expl "precondition" c.c_pre in
-      let p = t_label ~loc:e.expr_loc (p.t_label @ e.expr_lab) p in
+      let lab =
+         List.fold_left
+           (fun acc x -> Labels.Slab.add x acc) p.t_label e.expr_lab in
+      let p = t_label ~loc:e.expr_loc lab p in
       wp_and p w
 
 and wp_triple env rm bl (p, e, q) =
