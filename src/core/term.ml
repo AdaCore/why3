@@ -272,7 +272,7 @@ type constant =
 type term = {
   t_node  : term_node;
   t_ty    : ty option;
-  t_label : label list;
+  t_label : Labels.label list;
   t_loc   : Loc.position option;
   t_vars  : int Mvs.t;
   t_tag   : int;
@@ -771,7 +771,7 @@ let t_or      = t_binary Tor
 let t_implies = t_binary Timplies
 let t_iff     = t_binary Tiff
 
-let asym_label = "asym_split"
+let asym_label = Labels.from_string "asym_split"
 let t_and_asym t1 t2 = t_label [asym_label] (t_and t1 t2)
 let t_or_asym  t1 t2 = t_label [asym_label] (t_or  t1 t2)
 

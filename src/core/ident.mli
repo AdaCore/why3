@@ -21,15 +21,11 @@ open Stdlib
 
 (** Identifiers *)
 
-(** {2 Labels} *)
-
-type label = string
-
 (** {2 Identifiers} *)
 
 type ident = private {
   id_string : string;               (* non-unique name *)
-  id_label  : label list;           (* identifier labels *)
+  id_label  : Labels.label list;           (* identifier labels *)
   id_loc    : Loc.position option;  (* optional location *)
   id_tag    : Hashweak.tag;         (* unique magical tag *)
 }
@@ -49,16 +45,17 @@ type preid
 val id_register : preid -> ident
 
 (* create a fresh pre-ident *)
-val id_fresh : ?label:(label list) -> ?loc:Loc.position -> string -> preid
+val id_fresh :
+   ?label:(Labels.label list) -> ?loc:Loc.position -> string -> preid
 
 (* create a localized pre-ident *)
-val id_user : ?label:(label list) -> string -> Loc.position -> preid
+val id_user : ?label:(Labels.label list) -> string -> Loc.position -> preid
 
 (* create a duplicate pre-ident *)
-val id_clone : ?label:(label list) -> ident -> preid
+val id_clone : ?label:(Labels.label list) -> ident -> preid
 
 (* create a derived pre-ident (inherit labels and location) *)
-val id_derive : ?label:(label list) -> string -> ident -> preid
+val id_derive : ?label:(Labels.label list) -> string -> ident -> preid
 
 
 (** Unique persistent names for pretty printing *)

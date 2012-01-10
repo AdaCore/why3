@@ -133,7 +133,7 @@ type constant =
 type term = private {
   t_node  : term_node;
   t_ty    : ty option;
-  t_label : label list;
+  t_label : Labels.label list;
   t_loc   : Loc.position option;
   t_vars  : int Mvs.t;
   t_tag   : int;
@@ -236,7 +236,7 @@ val t_not : term -> term
 val t_true : term
 val t_false : term
 
-val asym_label : label
+val asym_label : Labels.label
 val t_and_asym : term -> term -> term
 val t_or_asym : term -> term -> term
 
@@ -246,8 +246,8 @@ val t_quant_close : quant -> vsymbol list -> trigger -> term -> term
 val t_forall_close : vsymbol list -> trigger -> term -> term
 val t_exists_close : vsymbol list -> trigger -> term -> term
 
-val t_label : ?loc:Loc.position -> label list -> term -> term
-val t_label_add : label -> term -> term
+val t_label : ?loc:Loc.position -> Labels.label list -> term -> term
+val t_label_add : Labels.label -> term -> term
 val t_label_copy : term -> term -> term
 
 (** Constructors with propositional simplification *)

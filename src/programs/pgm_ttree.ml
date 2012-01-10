@@ -74,7 +74,7 @@ type dloop_annotation = {
 type dexpr = {
   dexpr_desc : dexpr_desc;
   dexpr_type : Denv.dty;
-  dexpr_lab  : Ident.label list;
+  dexpr_lab  : Labels.label list;
   dexpr_loc  : loc;
 }
 
@@ -174,7 +174,7 @@ and ipat_node =
 type iexpr = {
   iexpr_desc : iexpr_desc;
   iexpr_type : ty;
-  iexpr_lab  : Ident.label list;
+  iexpr_lab  : Labels.label list;
   iexpr_loc  : loc;
 }
 
@@ -236,7 +236,7 @@ type expr = {
   expr_type  : ty;
   expr_type_v: type_v;
   expr_effect: E.t;
-  expr_lab   : Ident.label list;
+  expr_lab   : Labels.label list;
   expr_loc   : loc;
 }
 

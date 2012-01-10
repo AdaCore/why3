@@ -186,6 +186,7 @@ let prio_binop = function
   | Tiff -> 1
 
 let print_label fmt l =
+  let l = Labels.to_string l in
   if l = "" then () else fprintf fmt "\"%s\"" l
 
 let print_loc fmt l =

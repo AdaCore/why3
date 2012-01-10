@@ -17,31 +17,37 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val stop_split : Labels.label
+open Stdlib
+open Util
 
-val split_pos : Term.term -> Term.term list
-(** [split_pos f] returns a list [[g1;..;gk]] such that
- [f] is logically equivalent to [g1 /\ .. /\ gk] *)
+type label =
+   { label_id : int ;
+     label_string : string }
 
-val split_neg : Term.term -> Term.term list
-(** [split_neg f] returns a list [[g1;..;gk]] such that
- [f] is logically equivalent to [g1 \/ .. \/ gk] *)
+let label_hash (x : label) = Hashtbl.hash x.label_id
 
-val full_split_pos : Term.term -> Term.term list
-(** [full_split_pos f] returns a list [[g1;..;gk]] such that
- [f] is logically equivalent to [g1 /\ .. /\ gk] and the length
- of the resulting list can be exponential wrt the size of [f] *)
+let label_equal (a : label) (b : label) = a.label_id = b.label_id
 
-val full_split_neg : Term.term -> Term.term list
-(** [full_split_neg f] returns a list [[g1;..;gk]] such that
- [f] is logically equivalent to [g1 \/ .. \/ gk] and the length
- of the resulting list can be exponential wrt the size of [f] *)
+let ht : (string, label) Hashtbl.t = Hashtbl.create 17
 
-val split_goal : Task.task Trans.tlist
-val split_all  : Task.task Trans.tlist
+let cnt = ref 0
 
-val full_split_goal : Task.task Trans.tlist
-val full_split_all  : Task.task Trans.tlist
+let from_string s =
+   try
+      Hashtbl.find ht s
+   with Not_found ->
+      incr cnt;
+      let r = { label_id = !cnt ; label_string = s } in
+      Hashtbl.add ht s r;
+      r
 
-val split_intro : Task.task Trans.tlist
-(** [split_intro] is [split_goal] with skolemization and formula separation *)
+let to_string x = x.label_string
+
+module Lab = StructMake (struct
+  type t = label
+  let tag id = id.label_id
+end)
+
+module Slab = Lab.S
+module Mlab = Lab.M
+

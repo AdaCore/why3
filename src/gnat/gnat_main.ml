@@ -4,13 +4,16 @@ open Term
 let rec extract_explanation expl gnat l =
     match l with
    | [] -> expl, gnat
-   | x::rest when Gnat_util.starts_with x "expl:" ->
-         let s = String.sub x 5 (String.length x - 5) in
-         extract_explanation s gnat rest
-   | x::rest when Gnat_util.starts_with x "gnatprove:" ->
-         let s = String.sub x 10 (String.length x - 10) in
-         extract_explanation expl s rest
-   | _::xs -> extract_explanation expl gnat xs
+   | x::rest ->
+         let x = Labels.to_string x in
+         if Gnat_util.starts_with x "expl:" then
+            let s = String.sub x 5 (String.length x - 5) in
+            extract_explanation s gnat rest
+         else if Gnat_util.starts_with x "gnatprove:" then
+            let s = String.sub x 10 (String.length x - 10) in
+            extract_explanation expl s rest
+         else
+            extract_explanation expl gnat rest
 
 let rec search_labels acc f =
    if acc <> None then acc

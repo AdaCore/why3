@@ -41,7 +41,7 @@ let split_case forig spl c acc tl bl =
   apply_append fn acc bll
 
 let asym_split = Term.asym_label
-let stop_split = "stop_split"
+let stop_split = Labels.from_string "stop_split"
 
 let asym f = List.mem asym_split f.t_label
 let stop f = List.mem stop_split f.t_label

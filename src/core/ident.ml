@@ -20,15 +20,11 @@
 open Stdlib
 open Util
 
-(** Labels *)
-
-type label = string
-
 (** Identifiers *)
 
 type ident = {
   id_string : string;               (* non-unique name *)
-  id_label  : label list;           (* identifier labels *)
+  id_label  : Labels.label list;           (* identifier labels *)
   id_loc    : Loc.position option;  (* optional location *)
   id_tag    : Hashweak.tag;         (* unique magical tag *)
 }

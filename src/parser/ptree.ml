@@ -28,7 +28,7 @@ type real_constant = Term.real_constant
 type constant = Term.constant
 
 type label =
-  | Lstr of Ident.label
+  | Lstr of Labels.label
   | Lpos of Loc.position
 
 type pp_quant =

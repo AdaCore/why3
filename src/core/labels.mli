@@ -17,31 +17,15 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val stop_split : Labels.label
+open Stdlib
 
-val split_pos : Term.term -> Term.term list
-(** [split_pos f] returns a list [[g1;..;gk]] such that
- [f] is logically equivalent to [g1 /\ .. /\ gk] *)
+type label
 
-val split_neg : Term.term -> Term.term list
-(** [split_neg f] returns a list [[g1;..;gk]] such that
- [f] is logically equivalent to [g1 \/ .. \/ gk] *)
+val label_hash : label -> int
+val label_equal : label -> label -> bool
 
-val full_split_pos : Term.term -> Term.term list
-(** [full_split_pos f] returns a list [[g1;..;gk]] such that
- [f] is logically equivalent to [g1 /\ .. /\ gk] and the length
- of the resulting list can be exponential wrt the size of [f] *)
+val from_string : string -> label
+val to_string : label -> string
 
-val full_split_neg : Term.term -> Term.term list
-(** [full_split_neg f] returns a list [[g1;..;gk]] such that
- [f] is logically equivalent to [g1 \/ .. \/ gk] and the length
- of the resulting list can be exponential wrt the size of [f] *)
-
-val split_goal : Task.task Trans.tlist
-val split_all  : Task.task Trans.tlist
-
-val full_split_goal : Task.task Trans.tlist
-val full_split_all  : Task.task Trans.tlist
-
-val split_intro : Task.task Trans.tlist
-(** [split_intro] is [split_goal] with skolemization and formula separation *)
+module Mlab : Map.S with type key = label
+module Slab : Mlab.Set
