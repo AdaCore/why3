@@ -488,9 +488,8 @@ let t_label_add  l t =
    Hsterm.hashcons { t with t_label = Labels.Slab.add l t.t_label }
 
 let t_label_copy { t_label = l; t_loc = p } t =
-  if Labels.Slab.is_empty t.t_label && t.t_loc = None &&
-  (not (Labels.Slab.is_empty l) || p <> None)
-  then t_label ?loc:p l t else t
+  let p = if t.t_loc <> None then t.t_loc else p in
+  t_label ?loc:p (Labels.Slab.union l t.t_label) t
 
 (* unsafe map *)
 
