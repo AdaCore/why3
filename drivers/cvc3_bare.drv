@@ -110,6 +110,19 @@ theory real.Real
 
 end
 
+theory real.FromInt
+
+  syntax function from_int "%1"
+
+  remove prop Zero
+  remove prop One
+  remove prop Add
+  remove prop Sub
+  remove prop Mul
+  remove prop Neg
+
+end
+
 theory bool.Bool
    syntax type     bool  "BITVECTOR(1)"
    syntax function True  "0bin1"
