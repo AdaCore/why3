@@ -20,11 +20,53 @@
 open Stdlib
 open Util
 
+(** Labels *)
+
+type label = {
+  lab_string : string;
+  lab_tag    : int;
+}
+
+module Lab = StructMake (struct
+   type t = label
+   let tag l = l.lab_tag
+end)
+
+module Slab = Lab.S
+module Mlab = Lab.M
+
+let label_hash (x : label) = x.lab_tag
+
+let label_equal (a : label) (b : label) = a == b
+
+module Hslab = Hashcons.Make (struct
+   type t = label
+
+   let equal l1 l2 = l1.lab_string = l2.lab_string
+
+   let hash l = Hashtbl.hash l.lab_string
+
+   let tag t l = {l with lab_tag = t}
+end)
+
+let to_string x = x.lab_string
+let from_string s = Hslab.hashcons { lab_string = s ; lab_tag = -1 }
+
+let hash_labelset s =
+   Slab.fold (fun x acc -> Hashcons.combine acc x.lab_tag) s 17
+
+let singleton s =
+   Slab.singleton (from_string s)
+
+let singl_pair s =
+   let x = from_string s in
+   x, Slab.singleton x
+
 (** Identifiers *)
 
 type ident = {
   id_string : string;               (* non-unique name *)
-  id_label  : Labels.label list;           (* identifier labels *)
+  id_label  : Slab.t;               (* identifier labels *)
   id_loc    : Loc.position option;  (* optional location *)
   id_tag    : Hashweak.tag;         (* unique magical tag *)
 }
@@ -56,17 +98,17 @@ let create_ident name labels loc = {
   id_tag    = Hashweak.dummy_tag;
 }
 
-let id_fresh ?(label = []) ?loc nm =
+let id_fresh ?(label = Slab.empty) ?loc nm =
   create_ident nm label loc
 
-let id_user ?(label = []) nm loc =
+let id_user ?(label = Slab.empty) nm loc =
   create_ident nm label (Some loc)
 
-let id_clone ?(label = []) id =
-  create_ident id.id_string (label @ id.id_label) id.id_loc
+let id_clone ?(label = Slab.empty) id =
+  create_ident id.id_string (Slab.union label id.id_label) id.id_loc
 
-let id_derive ?(label = []) nm id =
-  create_ident nm (label @ id.id_label) id.id_loc
+let id_derive ?(label = Slab.empty) nm id =
+  create_ident nm (Slab.union label id.id_label) id.id_loc
 
 (** Unique names for pretty printing *)
 

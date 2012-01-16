@@ -21,11 +21,34 @@ open Stdlib
 
 (** Identifiers *)
 
+(** {2 Labels} *)
+
+type label = private {
+  lab_string : string;
+  lab_tag    : int;
+}
+
+val from_string : string -> label
+val to_string : label -> string
+
+module Mlab : Map.S with type key = label
+module Slab : Mlab.Set
+
+val hash_labelset : Slab.t -> int
+(** a hash that only depends on the elements of the list *)
+
+val singleton : string -> Slab.t
+(** return the set of labels that only contains the given string *)
+
+val singl_pair : string -> label * Slab.t
+(** return the set of label corresponding to a given string, along with its
+   singleton set *)
+
 (** {2 Identifiers} *)
 
 type ident = private {
   id_string : string;               (* non-unique name *)
-  id_label  : Labels.label list;           (* identifier labels *)
+  id_label  : Slab.t;           (* identifier labels *)
   id_loc    : Loc.position option;  (* optional location *)
   id_tag    : Hashweak.tag;         (* unique magical tag *)
 }
@@ -46,17 +69,16 @@ val id_register : preid -> ident
 
 (* create a fresh pre-ident *)
 val id_fresh :
-   ?label:(Labels.label list) -> ?loc:Loc.position -> string -> preid
+   ?label:Slab.t -> ?loc:Loc.position -> string -> preid
 
 (* create a localized pre-ident *)
-val id_user : ?label:(Labels.label list) -> string -> Loc.position -> preid
+val id_user : ?label:Slab.t -> string -> Loc.position -> preid
 
 (* create a duplicate pre-ident *)
-val id_clone : ?label:(Labels.label list) -> ident -> preid
+val id_clone : ?label:Slab.t -> ident -> preid
 
 (* create a derived pre-ident (inherit labels and location) *)
-val id_derive : ?label:(Labels.label list) -> string -> ident -> preid
-
+val id_derive : ?label:Slab.t -> string -> ident -> preid
 
 (** Unique persistent names for pretty printing *)
 

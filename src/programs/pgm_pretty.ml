@@ -80,9 +80,9 @@ let rec print_expr fmt e = match e.expr_desc with
 
 and print_lexpr fmt e =
   let print_elab fmt e =
-    if Debug.test_flag debug_print_labels && e.expr_lab <> []
+    if Debug.test_flag debug_print_labels && not (Slab.is_empty e.expr_lab)
     then fprintf fmt "@[<hov 0>%a@ %a@]"
-      (print_list space print_label) e.expr_lab print_expr e
+      print_labels e.expr_lab print_expr e
     else print_expr fmt e in
   let print_eloc fmt e =
     if Debug.test_flag debug_print_locs

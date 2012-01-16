@@ -361,18 +361,18 @@ let is_ps_ghost e = match e.dexpr_desc with
 ***)
 
 let rec extract_labels labs loc e = match e.Ptree.expr_desc with
-  | Ptree.Enamed (Ptree.Lstr s, e) -> extract_labels (s :: labs) loc e
+  | Ptree.Enamed (Ptree.Lstr s, e) -> extract_labels (Slab.add s labs) loc e
   | Ptree.Enamed (Ptree.Lpos p, e) -> extract_labels labs (Some p) e
   | Ptree.Ecast  (e, ty) ->
       let labs, loc, d = extract_labels labs loc e in
       labs, loc, Ptree.Ecast ({ e with Ptree.expr_desc = d }, ty)
-  | e -> List.rev labs, loc, e
+  | e -> labs, loc, e
 
 (* [dexpr] translates ptree into dexpr *)
 
 let rec dexpr ~ghost ~userloc env e =
   let loc = e.Ptree.expr_loc in
-  let labs, userloc, d = extract_labels [] userloc e in
+  let labs, userloc, d = extract_labels Slab.empty userloc e in
   let d, ty = dexpr_desc ~ghost ~userloc env loc d in
   let loc = default_option loc userloc in
   let e = {
@@ -482,7 +482,7 @@ and dexpr_desc ~ghost ~userloc env loc = function
       let ty = tyapp (ts_tuple n) tyl in
       let uloc = default_option loc userloc in
       let create d ty = { dexpr_desc = d; dexpr_type = ty;
-                          dexpr_loc = uloc; dexpr_lab = [] } in
+                          dexpr_loc = uloc; dexpr_lab = Slab.empty } in
       let apply e1 e2 ty2 =
         let e2 = dexpr ~ghost ~userloc env e2 in
         assert (Denv.unify e2.dexpr_type ty2);
@@ -500,7 +500,7 @@ and dexpr_desc ~ghost ~userloc env loc = function
       let ty = of_option ty in
       let uloc = default_option loc userloc in
       let create d ty = { dexpr_desc = d; dexpr_type = ty;
-                          dexpr_loc = uloc; dexpr_lab = [] } in
+                          dexpr_loc = uloc; dexpr_lab = Slab.empty } in
       let constructor d f tyf = match f with
         | Some (_, f) ->
             let f = dexpr ~ghost ~userloc env f in
@@ -552,7 +552,7 @@ and dexpr_desc ~ghost ~userloc env loc = function
       List.iter2 set_pat_var_ty fl tyl;
       let uloc = default_option loc userloc in
       let create d ty = { dexpr_desc = d; dexpr_type = ty;
-                          dexpr_loc = uloc; dexpr_lab = [] } in
+                          dexpr_loc = uloc; dexpr_lab = Slab.empty } in
       let apply t f tyf = match f with
         | Some (_,e) ->
             let e = dexpr ~ghost ~userloc env e in
@@ -1007,7 +1007,7 @@ and iubinder env (x, ty, tyv) =
   env, (v, tyv)
 
 let mk_iexpr loc ty d =
-  { iexpr_desc = d; iexpr_loc = loc; iexpr_lab = []; iexpr_type = ty }
+  { iexpr_desc = d; iexpr_loc = loc; iexpr_lab = Slab.empty; iexpr_type = ty }
 
 (* apply ls to a list of expressions, introducing let's if necessary
 
@@ -1067,14 +1067,14 @@ let make_app loc ty f el =
               let d =
                 make (fun f -> mk_iexpr loc lab tye (IEapply_var (k f, v))) r
               in
-              mk_iexpr loc [] ty (IElet (v, e, d))
+              mk_iexpr loc Slab.empty ty (IElet (v, e, d))
         end
     | ({ iexpr_desc = IElocal v }, tye, lab) :: r ->
         make (fun f -> mk_iexpr loc lab tye (IEapply (k f, v))) r
     | (e, tye, lab) :: r ->
         let v = create_ivsymbol (id_user "x" loc) e.iexpr_type in
         let d = make (fun f -> mk_iexpr loc lab tye (IEapply (k f, v))) r in
-        mk_iexpr loc [] ty (IElet (v, e, d))
+        mk_iexpr loc Slab.empty ty (IElet (v, e, d))
   in
   make (fun f -> f) el
 
@@ -1175,7 +1175,7 @@ let rec iexpr env e =
   let ty = Denv.ty_of_dty e.dexpr_type in
   let d = iexpr_desc env e.dexpr_loc ty e.dexpr_desc in
   drown_lab e { iexpr_desc = d; iexpr_type = ty;
-                iexpr_loc = e.dexpr_loc; iexpr_lab = [] }
+                iexpr_loc = e.dexpr_loc; iexpr_lab = Slab.empty }
 
 and iexpr_desc env loc ty = function
   | DEconstant c ->
@@ -1197,7 +1197,7 @@ and iexpr_desc env loc ty = function
               ls.ls_name.id_string (List.length al)
       end
   | DEapply (e1, e2) ->
-      let f, args = decompose_app env e1 [iexpr env e2, ty, []] in
+      let f, args = decompose_app env e1 [iexpr env e2, ty, Slab.empty] in
       begin match f.dexpr_desc with
         | DElogic ls ->
             let n = List.length ls.ls_args in
@@ -1348,7 +1348,7 @@ and iletrec env dl =
             iexpr_desc = IElogic (phi, Svs.empty, Spv.empty);
                      (* FIXME: vars(phi) *)
             iexpr_type = t_type phi;
-            iexpr_lab = [];
+            iexpr_lab = Slab.empty;
             iexpr_loc = e.iexpr_loc }
           in
           let e = { e with iexpr_desc = IElet (phi0, e_phi, e) } in
@@ -1505,7 +1505,7 @@ and pattern_node env ty p =
 let make_apply loc e1 ty c =
   let x = create_pvsymbol_v (id_fresh "f") (tpure e1.expr_type) in
   let v = c.c_result_type and ef = c.c_effect in
-  let any_c = { expr_desc = Eany c; expr_type = ty; expr_lab = [];
+  let any_c = { expr_desc = Eany c; expr_type = ty; expr_lab = Slab.empty;
                 expr_type_v = v; expr_effect = ef; expr_loc = loc } in
   Elet (x, e1, any_c), v, ef
 
@@ -1533,7 +1533,7 @@ let rec is_pure_expr e =
   | Eloop _ | Eletrec _ | Efun _
   | Eglobal _ | Eabsurd -> false (* TODO: improve *)
 
-let mk_expr ?(lab=[]) loc ty ef d =
+let mk_expr ?(lab=Slab.empty) loc ty ef d =
   { expr_desc = d; expr_type = ty; expr_type_v = tpure ty;
     expr_effect = ef; expr_lab = lab; expr_loc = loc }
 
@@ -1543,7 +1543,7 @@ let mk_bool_constant loc gl ls =
   let ty = ty_app (find_ts ~pure:true gl "bool") [] in
   { expr_desc = Elogic (fs_app ls [] ty);
     expr_type = ty; expr_type_v = tpure ty;
-    expr_effect = E.empty; expr_lab = []; expr_loc = loc }
+    expr_effect = E.empty; expr_lab = Slab.empty; expr_loc = loc }
 
 let mk_false loc gl =
   mk_bool_constant loc gl (find_ls ~pure:true gl "False")
@@ -1601,7 +1601,7 @@ let rec expr gl env e =
   let ty = e.iexpr_type in
   let loc = e.iexpr_loc in
   let d, v, ef = expr_desc gl env loc ty e.iexpr_desc in
-  drown_lab e { expr_desc = d; expr_type = ty; expr_lab = [];
+  drown_lab e { expr_desc = d; expr_type = ty; expr_lab = Slab.empty;
                 expr_type_v = v; expr_effect = ef; expr_loc = loc }
 
 and expr_desc gl env loc ty = function
@@ -1934,9 +1934,9 @@ let add_global_fun loc ~labels x tyv uc =
       List.fold_left
         (fun (labels,loc) lab ->
            match lab with
-             | Lstr s -> (s::labels,loc)
+             | Lstr s -> (Slab.add s labels,loc)
              | Lpos l -> (labels,l))
-        ([],loc)
+        (Slab.empty,loc)
         labels
     in
     let ls, ps = create_psymbol_fun (id_user ~label x loc) tyv in

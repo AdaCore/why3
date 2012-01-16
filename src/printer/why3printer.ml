@@ -157,15 +157,16 @@ let prio_binop = function
   | Tiff -> 1
 
 let print_label = Pretty.print_label
+let print_labels = Pretty.print_labels
 
 let print_ident_labels fmt id =
-  if id.id_label <> [] then
-    fprintf fmt "@ %a" (print_list space print_label) id.id_label
+  if not (Slab.is_empty id.id_label) then
+    fprintf fmt "@ %a" print_labels id.id_label
 
 let rec print_term fmt t = print_lterm 0 fmt t
 
 and print_lterm pri fmt t =
-  if Labels.Slab.is_empty t.t_label then
+  if Slab.is_empty t.t_label then
      print_tnode pri fmt t
   else
      fprintf fmt (protect_on (pri > 0) "%a %a")
@@ -216,7 +217,7 @@ and print_tnode pri fmt t = match t.t_node with
   | Tfalse ->
       fprintf fmt "false"
   | Tbinop (b,f1,f2) ->
-      let asym = Labels.Slab.mem Term.asym_label t.t_label in
+      let asym = Slab.mem Term.asym_label t.t_label in
       let p = prio_binop b in
       fprintf fmt (protect_on (pri > p) "%a %a@ %a")
         (print_lterm (p + 1)) f1 (print_binop ~asym) b (print_lterm p) f2

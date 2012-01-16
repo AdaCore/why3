@@ -41,13 +41,13 @@ let split_case forig spl c acc tl bl =
   apply_append fn acc bll
 
 let asym_split = Term.asym_label
-let stop_split = Labels.from_string "stop_split"
+let stop_split = from_string "stop_split"
 
-let asym f = Labels.Slab.mem asym_split f.t_label
-let stop f = Labels.Slab.mem stop_split f.t_label
+let asym f = Slab.mem asym_split f.t_label
+let stop f = Slab.mem stop_split f.t_label
 
 let unstop f =
-  let ll = Labels.Slab.remove stop_split f.t_label in
+  let ll = Slab.remove stop_split f.t_label in
   t_label ?loc:f.t_loc ll f
 
 let rec split_pos ro acc f = match f.t_node with

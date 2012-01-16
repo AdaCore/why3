@@ -1,12 +1,13 @@
 open Why3
 open Term
+open Ident
 
 let rec extract_explanation expl gnat s =
-   if Labels.Slab.is_empty s then expl, gnat
+   if Slab.is_empty s then expl, gnat
    else
-      let x = Labels.Slab.choose s in
-      let rest = Labels.Slab.remove x s in
-      let x = Labels.to_string x in
+      let x = Slab.choose s in
+      let rest = Slab.remove x s in
+      let x = to_string x in
       if Gnat_util.starts_with x "expl:" then
          let s = String.sub x 5 (String.length x - 5) in
          extract_explanation s gnat rest

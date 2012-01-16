@@ -619,12 +619,12 @@ let schedule_edit_proof ~debug:_ ~editor ~file ~driver ~callback goal =
   exception Found of string
 
   let check_expl lab =
-    let lab = Labels.to_string lab in
+    let lab = Ident.to_string lab in
     if Str.string_match expl_regexp lab 0 then
       raise (Found (Str.matched_group 1 lab))
 
   let rec get_expl_fmla f =
-    Labels.Slab.iter check_expl f.Term.t_label;
+    Ident.Slab.iter check_expl f.Term.t_label;
     (match f.Term.t_node with
       | Term.Tbinop(Term.Timplies,_,f) -> get_expl_fmla f
       | Term.Tquant(Term.Tforall,fq) ->
@@ -638,7 +638,7 @@ let schedule_edit_proof ~debug:_ ~editor ~file ~driver ~callback goal =
   let get_explanation id fmla =
     try
       get_expl_fmla fmla;
-      List.iter check_expl (List.rev id.Ident.id_label);
+      Ident.Slab.iter check_expl id.Ident.id_label;
       None
     with Found e -> Some e
 

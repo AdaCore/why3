@@ -17,7 +17,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val stop_split : Labels.label
+val stop_split : Ident.label
 
 val split_pos : Term.term -> Term.term list
 (** [split_pos f] returns a list [[g1;..;gk]] such that
