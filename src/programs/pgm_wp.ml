@@ -375,7 +375,7 @@ let term_at lab t =
   t_app fs_at [t; t_var lab] t.t_ty
 
 let wp_expl l f =
-  let l = from_string ("expl:"^l) in
+  let l = mk_label ("expl:"^l) in
   let lab = Slab.add l (Slab.add Split_goal.stop_split f.t_label) in
   t_label ?loc:f.t_loc lab f
 
@@ -706,7 +706,7 @@ let add_wp_decl ps f uc =
   (* prepare a proposition symbol *)
   let name = ps.ps_pure.ls_name in
   let s = "WP_" ^ name.id_string in
-  let label = Slab.add (from_string ("expl:" ^ name.id_string)) name.id_label in
+  let label = Slab.add (mk_label ("expl:" ^ name.id_string)) name.id_label in
   let id = id_fresh ~label ?loc:name.id_loc s in
   let pr = create_prsymbol id in
   (* prepare the VC formula *)

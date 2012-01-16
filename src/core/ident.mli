@@ -28,8 +28,7 @@ type label = private {
   lab_tag    : int;
 }
 
-val from_string : string -> label
-val to_string : label -> string
+val mk_label : string -> label
 
 module Mlab : Map.S with type key = label
 module Slab : Mlab.Set

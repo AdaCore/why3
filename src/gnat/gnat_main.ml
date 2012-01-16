@@ -7,7 +7,7 @@ let rec extract_explanation expl gnat s =
    else
       let x = Slab.choose s in
       let rest = Slab.remove x s in
-      let x = to_string x in
+      let x = x.lab_string in
       if Gnat_util.starts_with x "expl:" then
          let s = String.sub x 5 (String.length x - 5) in
          extract_explanation s gnat rest

@@ -922,7 +922,7 @@ sident:
 /* Misc */
 
 label:
-| STRING    { Lstr (Ident.from_string $1) }
+| STRING    { Lstr (Ident.mk_label $1) }
 | POSITION  { Lpos $1 }
 ;
 

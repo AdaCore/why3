@@ -619,7 +619,7 @@ let schedule_edit_proof ~debug:_ ~editor ~file ~driver ~callback goal =
   exception Found of string
 
   let check_expl lab =
-    let lab = Ident.to_string lab in
+    let lab = lab.Ident.lab_string in
     if Str.string_match expl_regexp lab 0 then
       raise (Found (Str.matched_group 1 lab))
 

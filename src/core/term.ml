@@ -772,8 +772,7 @@ let t_or      = t_binary Tor
 let t_implies = t_binary Timplies
 let t_iff     = t_binary Tiff
 
-let asym_label = from_string "asym_split"
-let asym_label_s = singleton "asym_split"
+let asym_label, asym_label_s = singl_pair "asym_split"
 
 let t_and_asym t1 t2 = t_label asym_label_s (t_and t1 t2)
 let t_or_asym  t1 t2 = t_label asym_label_s (t_or  t1 t2)

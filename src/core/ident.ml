@@ -49,17 +49,16 @@ module Hslab = Hashcons.Make (struct
    let tag t l = {l with lab_tag = t}
 end)
 
-let to_string x = x.lab_string
-let from_string s = Hslab.hashcons { lab_string = s ; lab_tag = -1 }
+let mk_label s = Hslab.hashcons { lab_string = s ; lab_tag = -1 }
 
 let hash_labelset s =
    Slab.fold (fun x acc -> Hashcons.combine acc x.lab_tag) s 17
 
 let singleton s =
-   Slab.singleton (from_string s)
+   Slab.singleton (mk_label s)
 
 let singl_pair s =
-   let x = from_string s in
+   let x = mk_label s in
    x, Slab.singleton x
 
 (** Identifiers *)
