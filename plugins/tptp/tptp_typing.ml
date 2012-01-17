@@ -43,31 +43,26 @@ let errorm ?loc f =
     Buffer.clear buf;
     error ?loc (Message s)) fmt f
 
-exception TypeInference
 exception TypeExpected
 exception TermExpected
 exception FmlaExpected
-exception TVarExpected
-exception VarExpected
 exception InvalidDummy
-exception BadTyQuant
+exception DependentTy
 exception BadArity
 
 let () = Exn_printer.register (fun fmt e -> match e with
   | Message s -> fprintf fmt "%s" s
-  | TypeInference -> fprintf fmt "type inference is not supported"
   | TypeExpected -> fprintf fmt "type expression expected"
   | TermExpected -> fprintf fmt "term expression expected"
   | FmlaExpected -> fprintf fmt "formula expression expected"
-  | TVarExpected -> fprintf fmt "type variable expected"
-  | VarExpected  -> fprintf fmt "term variable expected"
   | InvalidDummy -> fprintf fmt "invalid type placeholder"
-  | BadTyQuant -> fprintf fmt "forbidden type quantifier"
-  | BadArity -> fprintf fmt "bad arity"
+  | DependentTy  -> fprintf fmt "dependent type"
+  | BadArity     -> fprintf fmt "bad arity"
   | _ -> raise e)
 
 type symbol =
-  | STVar of ty
+  | STSko of ty
+  | STVar of tvsymbol
   | SVar  of vsymbol
   | SType of tysymbol
   | SFunc of tvsymbol list * lsymbol
@@ -86,12 +81,13 @@ let d_univ  = create_ty_decl [ts_univ, Tabstract]
 let find_tv ~loc env impl s =
   let tv = try Mstr.find s env with Not_found ->
     try Hashtbl.find impl s with Not_found ->
-      let tv = STVar (ty_var (create_tvsymbol (id_user s loc))) in
+      let tv = STVar (create_tvsymbol (id_user s loc)) in
       Hashtbl.add impl s tv;
       tv in
   match tv with
-    | STVar tv -> tv
-    | _ -> error ~loc TVarExpected
+    | STVar tv -> ty_var tv
+    | STSko ty -> ty
+    | _ -> error ~loc TypeExpected
 
 let find_vs ~loc env impl s =
   let vs = try Mstr.find s env with Not_found ->
@@ -100,16 +96,19 @@ let find_vs ~loc env impl s =
       Hashtbl.add impl s vs;
       vs in
   match vs with
-    | SVar vs -> vs
-    | _ -> error ~loc VarExpected
+    | SVar vs -> t_var vs
+    | _ -> error ~loc TermExpected
 
 let find_ts ~loc env impl s args =
-  try Mstr.find s env with Not_found ->
+  let ts = try Mstr.find s env with Not_found ->
     try Hashtbl.find impl s with Not_found ->
       let args = List.map (fun _ -> create_tvsymbol (id_fresh "a")) args in
       let ts = SType (create_tysymbol (id_user s loc) args None) in
       Hashtbl.add impl s ts;
-      ts
+      ts in
+  match ts with
+    | SType ts -> ts
+    | _ -> error ~loc TypeExpected
 
 let find_fs ~loc env impl s args =
   try Mstr.find s env with Not_found ->
@@ -129,9 +128,7 @@ let find_ps ~loc env impl s args =
 
 let rec ty denv env impl { e_loc = loc; e_node = n } = match n with
   | Eapp (aw,al) ->
-      let ts = match find_ts ~loc env impl aw al with
-        | SType ts -> ts
-        | _ -> error ~loc TypeExpected in
+      let ts = find_ts ~loc env impl aw al in
       let tys = List.map (ty denv env impl) al in
       ty_app ts tys
   | Edef (dw,al) ->
@@ -165,7 +162,7 @@ let rec term denv env impl { e_loc = loc; e_node = n } = match n with
       let tl = List.map (term denv env impl) al in
       t_app_infer fs tl
   | Evar v ->
-      t_var (find_vs ~loc env impl v)
+      find_vs ~loc env impl v
   | Edob _ ->
       (* TODO: distinct objects *)
       assert false
@@ -177,7 +174,7 @@ let rec term denv env impl { e_loc = loc; e_node = n } = match n with
       assert false
   | Eite (e1,e2,e3) ->
       (* we can't fix the polarity of the condition here,
-         and so type quantifiers are forbidden in terms *)
+         hence type quantifiers are forbidden in terms *)
       let cn,_ = fmla denv env impl None [] e1 in
       let th = term denv env impl e2 in
       let el = term denv env impl e3 in
@@ -206,17 +203,18 @@ and fmla denv env impl pol tvl { e_loc = loc; e_node = n } = match n with
         let loc = e.e_loc in
         if e.e_node = Edef (DT DTtype, []) then
           match pol,quant with
-            | None, _ -> error ~loc BadTyQuant
+            | None, _ ->
+                errorm ~loc "Invalid type quantifier"
             | Some true, Qexists  (* goals *)
             | Some false, Qforall (* premises *) ->
                 let tv = create_tvsymbol (id_user s loc) in
-                Mstr.add s (STVar (ty_var tv)) env, pol, tv::tvl, vl, true
+                Mstr.add s (STVar tv) env, pol, tv::tvl, vl, true
             | Some true, Qforall  (* goals *)
             | Some false, Qexists (* premises *) ->
                 let ts = create_tysymbol (id_user s loc) tvl None in
                 let tv = ty_app ts (List.map ty_var tvl) in
                 Hashtbl.add impl ("_sk_" ^ s) (SType ts);
-                Mstr.add s (STVar tv) env, pol, tvl, vl, true
+                Mstr.add s (STSko tv) env, pol, tvl, vl, true
         else
           let ty = ty denv env impl e in
           let vs = create_vsymbol (id_user s loc) ty in
@@ -226,8 +224,7 @@ and fmla denv env impl pol tvl { e_loc = loc; e_node = n } = match n with
       let f1,b1 = fmla denv env impl pol tvl e1 in
       let quant = match quant with
         | Qforall -> Tforall
-        | Qexists -> Texists
-      in
+        | Qexists -> Texists in
       t_quant_close quant (List.rev vl) [] f1, b || b1
   | Eite (e1,e2,e3) ->
       (* here we can treat type quantifiers in 'if' conditions,
@@ -319,5 +316,109 @@ and let_args denv env impl loc e tvl vl al =
   in
   args Mtv.empty Mvs.empty tvl vl al
 
-let typecheck _env _path _ast = Mstr.empty
+let typedecl denv env impl loc s (tvl,(el,e)) =
+  if e.e_node = Edef (DT DTtype, []) then
+    (* type constructor *)
+    if tvl <> [] then error ~loc DependentTy else
+    let ntv { e_node = n ; e_loc = loc } = match n with
+      | Edef (DT DTtype, []) -> create_tvsymbol (id_fresh "a")
+      | _ -> error ~loc DependentTy
+    in
+    let ts = create_tysymbol (id_user s loc) (List.map ntv el) None in
+    Hashtbl.add impl s (SType ts)
+  else
+    (* function/predicate symbol *)
+    let ntv (s, { e_node = n ; e_loc = loc }) = match n with
+      | Edef (DT DTtype, []) -> create_tvsymbol (id_fresh s)
+      | _ -> error ~loc DependentTy
+    in
+    let tvl = List.map ntv tvl in
+    let add e v = Mstr.add v.tv_name.id_string (STVar v) e in
+    let env = List.fold_left add env tvl in
+    let tyl = List.map (ty denv env impl) el in
+    let tyv =
+      if e.e_node = Edef (DT DTprop, []) then None
+      else Some (ty denv env impl e) in
+    let ls = create_lsymbol (id_user s loc) tyl tyv in
+    Hashtbl.add impl s (SFunc (tvl,ls))
+
+let flush_impl ~strict env uc impl =
+  let update s e (env,uc) = match e with
+    | SType ts ->
+        Mstr.add s e env, add_ty_decl uc [ts,Tabstract]
+    | SFunc (_,ls) | SPred (_,ls) ->
+        Mstr.add s e env, add_logic_decl uc [ls,None]
+    | STVar tv when strict ->
+        errorm ?loc:tv.tv_name.id_loc "Unbound type variable %s" s
+    | SVar vs when strict ->
+        errorm ?loc:vs.vs_name.id_loc "Unbound variable %s" s
+    | STVar _ | SVar _ -> env,uc
+    (* none of these is possible in implicit *)
+    | SletF _ | SletP _ | STSko _ -> assert false
+  in
+  let res = Hashtbl.fold update impl (env,uc) in
+  Hashtbl.clear impl;
+  res
+
+let typecheck _genv path ast =
+  (* TODO: built-ins *)
+  let denv = () in
+  let impl = Hashtbl.create 17 in
+  let conj = ref false in
+  let negc = ref false in
+  let input (env,uc) = function
+    (* illegal stuff *)
+    | Formula (_,_,_,_,loc) when !conj ->
+        errorm ~loc "No formula can appear below a conjecture"
+    | Formula (_,_,r,_,loc) when !negc && r <> Negated_conjecture ->
+        errorm ~loc "This formula cannot appear below a negated_conjecture"
+    | Include (_,_,loc) when !conj || !negc ->
+        errorm ~loc "Includes cannot appear below conjectures"
+    (* type declarations *)
+    | Formula (_,_,Type,TypedAtom (s,e),loc) ->
+        typedecl denv env impl loc s e;
+        flush_impl ~strict:true env uc impl
+    | Formula (_,_,Type,_,loc)
+    | Formula (_,_,_,TypedAtom _,loc) ->
+        errorm ~loc "Invalid type declaration"
+    (* logical formulas *)
+    | Formula (_,_,_,Sequent _,loc) -> (* TODO *)
+        errorm ~loc "Sequents are not supported"
+    | Formula (k,s,r,LogicFormula e,loc) ->
+        if r = Conjecture then conj := true;
+        if r = Negated_conjecture then negc := true;
+
+        let strict = k <> CNF in
+        let pol = r = Conjecture in
+        let f,_ = fmla denv env impl (Some pol) [] e in
+        let f = if strict then f else
+          let q = if pol then Texists else Tforall in
+          let vl = Mvs.keys f.t_vars in
+          t_quant_close q vl [] f in
+        let env,uc = flush_impl ~strict env uc impl in
+
+        let pr = create_prsymbol (id_user s loc) in
+        if r <> Conjecture then
+          env, add_prop_decl uc Paxiom pr f
+        else if Stv.is_empty (t_ty_freevars Stv.empty f) then
+          env, add_prop_decl uc Pgoal pr f
+        else
+          (* Why3 does not support polymorphic goals *)
+          let uc = add_prop_decl uc Paxiom pr (t_not f) in
+          let pr = create_prsymbol (id_fresh "contradiction") in
+          env, add_prop_decl uc Pgoal pr t_false
+    (* includes *)
+    | Include (_f,[],_loc) ->
+        assert false (* TODO: include *)
+    | Include (_,_,loc) ->
+        errorm ~loc "Formula selection is not supported"
+  in
+  let env = Mstr.empty in
+  (* FIXME: localize the identifier *)
+  let uc = create_theory ~path (id_fresh "T") in
+  let _,uc = List.fold_left input (env,uc) ast in
+  let uc = if not !negc then uc else
+    let pr = create_prsymbol (id_fresh "contradiction") in
+    add_prop_decl uc Pgoal pr t_false in
+  Mstr.singleton "T" (close_theory uc)
 

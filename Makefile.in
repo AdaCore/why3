@@ -310,11 +310,11 @@ lib/plugins/%.cmo: plugins/transform/%.cmo
 
 lib/plugins/tptp.cmxs: $(TFF1CMX)
 	$(if $(QUIET), @echo 'Linking  $@' &&) \
-	    $(OCAMLOPT) $(OFLAGS) -shared -o $@ $<
+	    $(OCAMLOPT) $(OFLAGS) -shared -o $@ $^
 
 lib/plugins/tptp.cmo: $(TFF1CMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
-	    $(OCAMLC) $(BFLAGS) -pack -o $@ $<
+	    $(OCAMLC) $(BFLAGS) -pack -o $@ $^
 
 include .depend.plugins
 

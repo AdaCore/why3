@@ -148,7 +148,7 @@ unitary_formula:
   { mk_e (Enot (mk_e (Eequ ($1,$3)))) }
 | term EQUAL term
   { mk_e (Eequ ($1,$3)) }
-| LEFTPAR unitary_formula RIGHTPAR
+| LEFTPAR formula RIGHTPAR
   { $2 }
 | plain_term
   { $1 }
