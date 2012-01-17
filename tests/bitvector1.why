@@ -1,4 +1,15 @@
 
+theory Div
+
+  use import int.Int
+  use export int.EuclideanDivision
+  
+  lemma Div_inf: forall x y:int. 0 <= x < y -> div x y = 0
+
+  lemma Mod_0: forall y:int. y <> 0 -> mod 0 y = 0
+
+end
+
 theory Pow2int
 
   use import int.Int
@@ -319,7 +330,7 @@ theory BitVector
 
 
   lemma to_nat_of_zero:
-    forall b:bv, i j:int. size > j >= i >= 0 ->
+    forall b:bv, i j:int. size > j /\ i >= 0 ->
       (forall k:int. j >= k >= i -> nth b k = False) ->
       to_nat_sub b j i = 0
 
@@ -394,7 +405,7 @@ theory BitVector
      integer n on size bits. *)
   function from_int (n:int) : bv
 
-  use import int.EuclideanDivision
+  use import Div
 
 
 (*  axiom nth_from_int_high:
@@ -469,6 +480,10 @@ theory BitVector
   lemma nth_from_int2c_0:
      forall i:int. size > i >= 0 -> nth (from_int2c 0) i = False
 
+
+  lemma nth_from_int2c_plus_pow2:
+      forall x k i:int. 0 <= k < i ->
+        nth (from_int2c (x+pow2 i)) k = nth (from_int2c x) k
 
 end
 
@@ -760,8 +775,9 @@ theory TestDoubleOfInt
 *)
 
   lemma from_int2c_to_nat_sub_gen:
-  	forall x i:int. 0 <= i <= 30 /\ 0 <= x <  Pow2int.pow2 i -> 
-           BV32.to_nat_sub (BV32.from_int2c x) i 0 = x
+  	forall i:int. 0 <= i <= 30 -> 
+          forall x:int. 0 <= x <  Pow2int.pow2 i -> 
+           BV32.to_nat_sub (BV32.from_int2c x) (i-1) 0 = x
 
   lemma from_int2c_to_nat_sub:
   	forall x:int. is_int32(x) /\ x >= 0 -> BV32.to_nat_sub (BV32.from_int2c x) 30 0 = x

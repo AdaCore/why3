@@ -2,6 +2,7 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import ZArith.
 Require Import Rbase.
+Require int.Int.
 Parameter pow2: Z -> Z.
 
 
