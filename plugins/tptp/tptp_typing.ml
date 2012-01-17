@@ -336,11 +336,13 @@ let typedecl denv env impl loc s (tvl,(el,e)) =
     let add e v = Mstr.add v.tv_name.id_string (STVar v) e in
     let env = List.fold_left add env tvl in
     let tyl = List.map (ty denv env impl) el in
-    let tyv =
-      if e.e_node = Edef (DT DTprop, []) then None
-      else Some (ty denv env impl e) in
-    let ls = create_lsymbol (id_user s loc) tyl tyv in
-    Hashtbl.add impl s (SFunc (tvl,ls))
+    if e.e_node = Edef (DT DTprop, []) then
+      let ls = create_psymbol (id_user s loc) tyl in
+      Hashtbl.add impl s (SPred (tvl,ls))
+    else
+      let tyv = ty denv env impl e in
+      let ls = create_fsymbol (id_user s loc) tyl tyv in
+      Hashtbl.add impl s (SFunc (tvl,ls))
 
 let flush_impl ~strict env uc impl =
   let update s e (env,uc) = match e with
