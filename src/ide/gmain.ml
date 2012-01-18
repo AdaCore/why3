@@ -624,7 +624,9 @@ let () =
 let env_session,sched =
   try
     eprintf "[Info] Opening session...@\n@[<v 2>  ";
-    let session = S.read_session project_dir in
+    let session =
+      if Sys.file_exists project_dir then S.read_session project_dir
+      else S.create_session project_dir in
     let env_session,(_:bool) =
       M.update_session ~allow_obsolete:true session gconfig.env
         gconfig.Gconfig.config

@@ -865,23 +865,30 @@ let load_session session xml =
 exception OpenError of string
 type notask = unit
 let read_session dir =
+  if not (Sys.file_exists dir && Sys.is_directory dir) then
+    raise (OpenError (Pp.sprintf "%s is not an existing directory" dir));
+  let xml_filename = Filename.concat dir db_filename in
   let session = {session_files = PHstr.create 3; session_dir = dir} in
-  try
-    let xml = Xml.from_file (Filename.concat dir db_filename) in
+  (** If the xml is present we read it, otherwise we consider it empty *)
+  if Sys.file_exists xml_filename then begin
     try
-      load_session session xml;
-      session
-    with Sys_error msg ->
-      failwith ("Open session: sys error " ^ msg)
-  with
-    | Sys_error _msg ->
-              (* xml does not exist yet *)
-      raise (OpenError "Can't open")
-    | Xml.Parse_error s ->
-      Format.eprintf "XML database corrupted, ignored (%s)@." s;
+      let xml = Xml.from_file xml_filename in
+      try
+        load_session session xml;
+      with Sys_error msg ->
+        failwith ("Open session: sys error " ^ msg)
+    with
+      | Sys_error _msg ->
+      (* xml does not exist yet *)
+        raise (OpenError "Can't open")
+      | Xml.Parse_error s ->
+        Format.eprintf "XML database corrupted, ignored (%s)@." s;
       (* failwith
          ("Open session: XML database corrupted (%s)@." ^ s) *)
-      raise (OpenError "XML corrupted")
+        raise (OpenError "XML corrupted")
+  end;
+  session
+
 
 (*******************************)
 (* Session modification        *)

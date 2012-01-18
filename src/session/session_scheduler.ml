@@ -350,7 +350,8 @@ let redo_external_proof eS eT ?timelimit g a =
   else
     match load_prover eS a.proof_prover with
       | None -> Debug.dprintf debug
-        "[Info] Can't redo an external proof since the prover %a is not loaded"
+        "[Info] Can't redo an external proof since the prover %a is not \
+loaded@."
         print_prover a.proof_prover
       | Some p ->
         if a.proof_edited_as = None && p.prover_config.Whyconf.interactive then
