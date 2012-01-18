@@ -62,6 +62,9 @@ let spec = Arg.align [
    Arg.String (fun s -> input_files := s :: !input_files),
    "<f> add file f to the project (ignored if it is already there)") ;
 *)
+  Debug.Opt.desc_debug_list;
+  Debug.Opt.desc_debug_all;
+  Debug.Opt.desc_debug;
   ("-v",
    Arg.Set opt_version,
    " print version information") ;
@@ -145,6 +148,9 @@ let gconfig =
 let () =
   Whyconf.load_plugins (get_main ())
 
+let () =
+  Debug.Opt.set_flags_selected ();
+  if Debug.Opt.option_list () then exit 0
 
 
 (***************)
