@@ -2,6 +2,8 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import ZArith.
 Require Import Rbase.
+Require int.Int.
+Require real.Real.
 Parameter pow2: Z -> R.
 
 
@@ -25,8 +27,6 @@ Axiom Power_1 : ((pow2 1%Z) = 2%R).
 Axiom Power_neg1 : ((pow2 (-1%Z)%Z) = (05 / 10)%R).
 
 Axiom Power_non_null_aux : forall (n:Z), (0%Z <= n)%Z -> ~ ((pow2 n) = 0%R).
-
-Axiom Power_non_null : forall (n:Z), ~ ((pow2 n) = 0%R).
 
 (* YOU MAY EDIT THE CONTEXT BELOW *)
 Open Scope R_scope.

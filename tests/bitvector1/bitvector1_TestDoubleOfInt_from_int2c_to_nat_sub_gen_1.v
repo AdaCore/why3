@@ -270,9 +270,9 @@ Axiom to_nat_of_zero2 : forall (b:bv) (i:Z) (j:Z), (((j <  32%Z)%Z /\
   (i <  k)%Z) -> ((nth b k) = false)) -> ((to_nat_sub b j
   0%Z) = (to_nat_sub b i 0%Z))).
 
-Axiom to_nat_of_zero : forall (b:bv) (i:Z) (j:Z), ((j <  32%Z)%Z /\
-  (0%Z <= i)%Z) -> ((forall (k:Z), ((k <= j)%Z /\ (i <= k)%Z) -> ((nth b
-  k) = false)) -> ((to_nat_sub b j i) = 0%Z)).
+Axiom to_nat_of_zero : forall (b:bv) (i:Z) (j:Z), (((j <  32%Z)%Z /\
+  (i <= j)%Z) /\ (0%Z <= i)%Z) -> ((forall (k:Z), ((k <= j)%Z /\
+  (i <= k)%Z) -> ((nth b k) = false)) -> ((to_nat_sub b j i) = 0%Z)).
 
 Axiom to_nat_of_one : forall (b:bv) (i:Z) (j:Z), (((j <  32%Z)%Z /\
   (i <= j)%Z) /\ (0%Z <= i)%Z) -> ((forall (k:Z), ((k <= j)%Z /\
@@ -290,8 +290,25 @@ Parameter from_int: Z -> bv.
 Axiom Div_inf : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (x <  y)%Z) ->
   ((int.EuclideanDivision.div x y) = 0%Z).
 
+Axiom Div_inf_neg : forall (x:Z) (y:Z), ((0%Z <  x)%Z /\ (x <= y)%Z) ->
+  ((int.EuclideanDivision.div (-x)%Z y) = (-1%Z)%Z).
+
 Axiom Mod_0 : forall (y:Z), (~ (y = 0%Z)) -> ((int.EuclideanDivision.mod1 0%Z
   y) = 0%Z).
+
+Axiom Mod_1y : forall (y:Z), (1%Z <  y)%Z -> ((int.EuclideanDivision.mod1 1%Z
+  y) = 1%Z).
+
+Axiom Mod_neg1y : forall (y:Z), (1%Z <  y)%Z ->
+  ((int.EuclideanDivision.mod1 (-1%Z)%Z y) = 1%Z).
+
+Axiom Div_pow : forall (x:Z) (i:Z), ((0%Z <  i)%Z /\
+  (((pow2 (i - 1%Z)%Z) <= x)%Z /\ (x <  (pow2 i))%Z)) ->
+  ((int.EuclideanDivision.div x (pow2 (i - 1%Z)%Z)) = 1%Z).
+
+Axiom Div_pow2 : forall (x:Z) (i:Z), ((0%Z <  i)%Z /\
+  (((-(pow2 i))%Z <= x)%Z /\ (x <  (-(pow2 (i - 1%Z)%Z))%Z)%Z)) ->
+  ((int.EuclideanDivision.div x (pow2 (i - 1%Z)%Z)) = (-2%Z)%Z).
 
 Axiom nth_from_int_high_even : forall (n:Z) (i:Z), (((i <  32%Z)%Z /\
   (0%Z <= i)%Z) /\ ((int.EuclideanDivision.mod1 (int.EuclideanDivision.div n
@@ -465,9 +482,9 @@ Axiom to_nat_of_zero21 : forall (b:bv1) (i:Z) (j:Z), (((j <  64%Z)%Z /\
   (i <  k)%Z) -> ((nth1 b k) = false)) -> ((to_nat_sub1 b j
   0%Z) = (to_nat_sub1 b i 0%Z))).
 
-Axiom to_nat_of_zero1 : forall (b:bv1) (i:Z) (j:Z), ((j <  64%Z)%Z /\
-  (0%Z <= i)%Z) -> ((forall (k:Z), ((k <= j)%Z /\ (i <= k)%Z) -> ((nth1 b
-  k) = false)) -> ((to_nat_sub1 b j i) = 0%Z)).
+Axiom to_nat_of_zero1 : forall (b:bv1) (i:Z) (j:Z), (((j <  64%Z)%Z /\
+  (i <= j)%Z) /\ (0%Z <= i)%Z) -> ((forall (k:Z), ((k <= j)%Z /\
+  (i <= k)%Z) -> ((nth1 b k) = false)) -> ((to_nat_sub1 b j i) = 0%Z)).
 
 Axiom to_nat_of_one1 : forall (b:bv1) (i:Z) (j:Z), (((j <  64%Z)%Z /\
   (i <= j)%Z) /\ (0%Z <= i)%Z) -> ((forall (k:Z), ((k <= j)%Z /\
@@ -704,12 +721,15 @@ Axiom to_nat_sub_0_30 : forall (x:Z), (is_int32 x) ->
 Axiom jpxorx_pos : forall (x:Z), (0%Z <= x)%Z ->
   ((nth (bw_xor (from_int 2147483648%Z) (from_int2c x)) 31%Z) = true).
 
+Axiom jpxorx_neg : forall (x:Z), (x <  0%Z)%Z ->
+  ((nth (bw_xor (from_int 2147483648%Z) (from_int2c x)) 31%Z) = false).
+
 (* YOU MAY EDIT THE CONTEXT BELOW *)
 Open Scope Z_scope.
 (* DO NOT EDIT BELOW *)
 
 Theorem from_int2c_to_nat_sub_gen : forall (i:Z), ((0%Z <= i)%Z /\
-  (i <= 30%Z)%Z) -> forall (x:Z), ((0%Z <= x)%Z /\ (x <  (pow2 i))%Z) ->
+  (i <= 31%Z)%Z) -> forall (x:Z), ((0%Z <= x)%Z /\ (x <  (pow2 i))%Z) ->
   ((to_nat_sub (from_int2c x) (i - 1%Z)%Z 0%Z) = x).
 (* YOU MAY EDIT THE PROOF BELOW *)
 intros i H.
@@ -717,7 +737,7 @@ generalize H.
 cut (0 <= i); auto with zarith.
 apply Z_lt_induction with
   (P:= fun i => 0 <= i ->
-     0 <= i <= 30 -> 
+     0 <= i <= 31 -> 
      forall x:Z, 0 <= x < pow2 i -> 
      to_nat_sub (from_int2c x) (i-1) 0 = x);
   auto with zarith.
@@ -730,13 +750,14 @@ destruct h.
 subst i0.
 rewrite pow2_0 in Hx0.
 assert (x0=0) by omega.
-subst x0. 
-apply to_nat_of_zero; auto with zarith.
+subst x0.
+apply to_nat_sub_high;auto with zarith.
+(*apply to_nat_of_zero; auto with zarith.
 intros.
 assert (k=0) by omega.
 subst k.
 apply nth_from_int2c_0; omega.
-
+*)
 (* case i0 > 0 *)
 
 assert (h:(0 <= x0 < pow2 (i0-1) \/ 
@@ -758,10 +779,24 @@ rewrite to_nat_sub_footprint with
 rewrite Hind; auto with zarith.
 replace (i0 - 1 - 0) with (i0 -1) by omega; omega.
 split; auto with zarith.
-
-rewrite nth_from_int2c_high_odd.
-
-
+apply Zplus_lt_reg_r with (n:=x0- pow2 (i0 - 1))(m:=pow2 (i0 - 1)) (p:= pow2 (i0 - 1)).
+rewrite Zplus_diag_eq_mult_2.
+replace (x0 - pow2 (i0 - 1) + pow2 (i0 - 1)) with (x0) by omega.
+rewrite Zmult_comm.
+rewrite<-Power_s;auto with zarith.
+replace (i0 - 1 + 1) with i0 by omega.
+apply Hx0.
+replace (i0-1-1) with (i0-2) by omega.
+intros k Hk.
+replace x0 with (x0 - pow2 (i0 - 1) + pow2 (i0 - 1)) by omega.
+replace (x0 - pow2 (i0 - 1) + pow2 (i0 - 1) - pow2 (i0 - 1)) 
+            with (x0 - pow2 (i0 - 1)) by omega.
+apply nth_from_int2c_plus_pow2 with(x:= x0 - pow2 (i0 - 1));auto with zarith.
+rewrite nth_from_int2c_high_odd;auto.
+split.
+split;auto with zarith.
+rewrite Div_pow;auto with zarith.
+rewrite Mod_1y;omega.
 Qed.
 (* DO NOT EDIT BELOW *)
 

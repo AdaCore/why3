@@ -2,6 +2,8 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import ZArith.
 Require Import Rbase.
+Require int.Int.
+Require real.Real.
 Parameter pow2: Z -> R.
 
 
@@ -18,9 +20,18 @@ Axiom Power_s_all : forall (n:Z), ((pow2 (n + 1%Z)%Z) = (2%R * (pow2 n))%R).
 Axiom Power_p_all : forall (n:Z),
   ((pow2 (n - 1%Z)%Z) = ((05 / 10)%R * (pow2 n))%R).
 
+Axiom Power_1_2 : ((05 / 10)%R = (Rdiv 1%R 2%R)%R).
+
 Axiom Power_1 : ((pow2 1%Z) = 2%R).
 
 Axiom Power_neg1 : ((pow2 (-1%Z)%Z) = (05 / 10)%R).
+
+Axiom Power_non_null_aux : forall (n:Z), (0%Z <= n)%Z -> ~ ((pow2 n) = 0%R).
+
+Axiom Power_neg_aux : forall (n:Z), (0%Z <= n)%Z ->
+  ((pow2 (-n)%Z) = (Rdiv 1%R (pow2 n))%R).
+
+Axiom Power_non_null : forall (n:Z), ~ ((pow2 n) = 0%R).
 
 Axiom Power_neg : forall (n:Z), ((pow2 (-n)%Z) = (Rdiv 1%R (pow2 n))%R).
 
