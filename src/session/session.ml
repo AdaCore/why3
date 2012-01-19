@@ -538,7 +538,7 @@ let add_external_proof
             proof_edited_as = edit;
           }
   in
-  PHprover.add g.goal_external_proofs p a;
+  PHprover.replace g.goal_external_proofs p a;
   check_goal_proved notify g;
   a
 
@@ -620,7 +620,7 @@ let raw_add_transformation ~(keygen:'a keygen) g name exp =
              transf_expanded = exp;
            }
   in
-  PHstr.add g.goal_transformations name tr;
+  PHstr.replace g.goal_transformations name tr;
   tr
 
 let raw_add_theory ~(keygen:'a keygen) mfile thname exp =
