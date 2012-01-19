@@ -109,7 +109,8 @@ let find_ts ~loc env impl s args =
   let ts = try Mstr.find s env with Not_found ->
     try Hashtbl.find impl s with Not_found ->
       let args = List.map (fun _ -> create_tvsymbol (id_fresh "a")) args in
-      let ts = SType (create_tysymbol (id_user s loc) args None) in
+      let ss = if s = "int" || s = "real" then "_" ^ s else s in
+      let ts = SType (create_tysymbol (id_user ss loc) args None) in
       Hashtbl.add impl s ts;
       ts in
   match ts with
@@ -211,6 +212,16 @@ and fmla denv env impl pol tvl { e_loc = loc; e_node = n } = match n with
         | SletP (tvl,vl,e) -> let_args denv env impl loc e tvl vl al, false
         | _ -> error ~loc FmlaExpected
       end
+  | Edef (DP DPtrue,[]) -> t_true, false
+  | Edef (DP DPfalse,[]) -> t_false, false
+  | Edef (DP (DPtrue|DPfalse),_) -> error ~loc BadArity
+  | Edef (DP DPdistinct,al) ->
+      let rec dist acc = function
+        | t::tl ->
+            let add acc s = t_and_simp acc (t_neq t s) in
+            dist (List.fold_left add acc tl) tl
+        | _ -> acc in
+      dist t_true (List.map (term denv env impl) al), false
   | Edef (dw,al) ->
       let ps = match dw with
         | DP _ -> assert false (* TODO: arithmetic *)
@@ -406,7 +417,8 @@ let typedecl denv env impl loc s (tvl,(el,e)) =
       | Edef (DT DTtype, []) -> create_tvsymbol (id_fresh "a")
       | _ -> error ~loc DependentTy
     in
-    let ts = create_tysymbol (id_user s loc) (List.map ntv el) None in
+    let ss = if s = "int" || s = "real" then "_" ^ s else s in
+    let ts = create_tysymbol (id_user ss loc) (List.map ntv el) None in
     Hashtbl.add impl s (SType ts)
   else
     (* function/predicate symbol *)

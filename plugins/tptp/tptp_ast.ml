@@ -37,7 +37,7 @@ type defined_func =
 type defined_pred =
   | DPtrue   | DPfalse  | DPdistinct
   | DPless   | DPlesseq | DPgreater | DPgreatereq
-  | DPisint  | DPisrat  | DPequal   | DPnoneq
+  | DPisint  | DPisrat
 
 type defined_word =
   | DT of defined_type
