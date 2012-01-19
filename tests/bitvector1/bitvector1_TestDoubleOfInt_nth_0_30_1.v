@@ -287,13 +287,13 @@ Axiom to_nat_sub_footprint : forall (b1:bv) (b2:bv) (j:Z) (i:Z),
 Parameter from_int: Z -> bv.
 
 
-Axiom Div_inf1 : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (x <  y)%Z) ->
+Axiom Div_inf_1 : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (x <  y)%Z) ->
   ((int.EuclideanDivision.div x y) = 0%Z).
 
 Axiom Div_inf_neg : forall (x:Z) (y:Z), ((0%Z <  x)%Z /\ (x <= y)%Z) ->
   ((int.EuclideanDivision.div (-x)%Z y) = (-1%Z)%Z).
 
-Axiom Mod_01 : forall (y:Z), (~ (y = 0%Z)) ->
+Axiom Mod_0_1 : forall (y:Z), (~ (y = 0%Z)) ->
   ((int.EuclideanDivision.mod1 0%Z y) = 0%Z).
 
 Axiom Mod_1y : forall (y:Z), (1%Z <  y)%Z -> ((int.EuclideanDivision.mod1 1%Z
@@ -308,7 +308,7 @@ Axiom Div_pow : forall (x:Z) (i:Z), (((pow2 (i - 1%Z)%Z) <= x)%Z /\
 
 Axiom Div_pow2 : forall (x:Z) (i:Z), (((-(pow2 i))%Z <= x)%Z /\
   (x <  (-(pow2 (i - 1%Z)%Z))%Z)%Z) -> ((int.EuclideanDivision.div x
-  (pow2 (i - 1%Z)%Z)) = (-2%Z)%Z).
+  (pow2 (i - 1%Z)%Z)) = 1%Z).
 
 Axiom nth_from_int_high_even : forall (n:Z) (i:Z), (((i <  32%Z)%Z /\
   (0%Z <= i)%Z) /\ ((int.EuclideanDivision.mod1 (int.EuclideanDivision.div n
@@ -703,56 +703,16 @@ Definition var_as_double(x:Z): R := (double_of_bv64 (var x)).
 Definition is_int32(x:Z): Prop := ((-(pow2 31%Z))%Z <= x)%Z /\
   (x <  (pow2 31%Z))%Z.
 
-Axiom nth_0_30 : forall (x:Z), forall (i:Z), ((is_int32 x) /\
-  ((0%Z <= i)%Z /\ (i <= 30%Z)%Z)) -> ((nth (bw_xor (from_int 2147483648%Z)
-  (from_int2c x)) i) = (nth (from_int2c x) i)).
-
-Axiom nth_jpxor_0_30 : forall (x:Z), forall (i:Z), ((is_int32 x) /\
-  ((0%Z <= i)%Z /\ (i <= 30%Z)%Z)) -> ((nth (jpxor x)
-  i) = (nth (from_int2c x) i)).
-
-Axiom nth_var31 : forall (x:Z), ((nth (jpxor x)
-  31%Z) = (negb (nth (from_int2c x) 31%Z))).
-
-Axiom to_nat_sub_0_30 : forall (x:Z), (is_int32 x) ->
-  ((to_nat_sub (bw_xor (from_int 2147483648%Z) (from_int2c x)) 30%Z
-  0%Z) = (to_nat_sub (from_int2c x) 30%Z 0%Z)).
-
-Axiom jpxorx_pos : forall (x:Z), (0%Z <= x)%Z ->
-  ((nth (bw_xor (from_int 2147483648%Z) (from_int2c x)) 31%Z) = true).
-
-Axiom from_int2c_to_nat_sub_pos : forall (i:Z), ((0%Z <= i)%Z /\
-  (i <= 31%Z)%Z) -> forall (x:Z), ((0%Z <= x)%Z /\ (x <  (pow2 i))%Z) ->
-  ((to_nat_sub (from_int2c x) (i - 1%Z)%Z 0%Z) = x).
-
-Axiom from_int2c_to_nat_sub_neg : forall (i:Z), ((0%Z <= i)%Z /\
-  (i <= 31%Z)%Z) -> forall (x:Z), (((-(pow2 i))%Z <= x)%Z /\ (x <  0%Z)%Z) ->
-  ((to_nat_sub (from_int2c x) (i - 1%Z)%Z 0%Z) = ((pow2 i) + x)%Z).
-
-Axiom lemma1_pos : forall (x:Z), ((is_int32 x) /\ (0%Z <= x)%Z) ->
-  ((to_nat_sub (jpxor x) 31%Z 0%Z) = ((pow2 31%Z) + x)%Z).
-
 (* YOU MAY EDIT THE CONTEXT BELOW *)
-Open Scope Z_scope.
+
 (* DO NOT EDIT BELOW *)
 
-Theorem lemma1_neg : forall (x:Z), ((is_int32 x) /\ (x <  0%Z)%Z) ->
-  ((to_nat_sub (jpxor x) 31%Z 0%Z) = ((pow2 31%Z) + x)%Z).
+Theorem nth_0_30 : forall (x:Z), forall (i:Z), ((is_int32 x) /\
+  ((0%Z <= i)%Z /\ (i <= 30%Z)%Z)) -> ((nth (bw_xor (from_int 2147483648%Z)
+  (from_int2c x)) i) = (nth (from_int2c x) i)).
 (* YOU MAY EDIT THE PROOF BELOW *)
-intros.
-unfold jpxor.
-rewrite to_nat_sub_zero;auto with zarith.
-replace (31-1) with 30 by omega.
-rewrite to_nat_sub_0_30;auto with zarith.
-rewrite<-from_int2c_to_nat_sub_neg;auto with zarith.
-destruct H.
-split.
-generalize H.
-unfold is_int32.
-auto with zarith.
-exact H0.
-destruct H;exact H.
-rewrite jpxorx_neg;auto with zarith.
+intuition.
+
 Qed.
 (* DO NOT EDIT BELOW *)
 

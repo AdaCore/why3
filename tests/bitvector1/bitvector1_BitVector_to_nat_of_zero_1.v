@@ -273,9 +273,9 @@ Axiom to_nat_of_zero2 : forall (b:bv) (i:Z) (j:Z), (((j <  size)%Z /\
 
 (* DO NOT EDIT BELOW *)
 
-Theorem to_nat_of_zero : forall (b:bv) (i:Z) (j:Z), ((j <  size)%Z /\
-  (0%Z <= i)%Z) -> ((forall (k:Z), ((k <= j)%Z /\ (i <= k)%Z) -> ((nth b
-  k) = false)) -> ((to_nat_sub b j i) = 0%Z)).
+Theorem to_nat_of_zero : forall (b:bv) (i:Z) (j:Z), (((j <  size)%Z /\
+  (i <= j)%Z) /\ (0%Z <= i)%Z) -> ((forall (k:Z), ((k <= j)%Z /\
+  (i <= k)%Z) -> ((nth b k) = false)) -> ((to_nat_sub b j i) = 0%Z)).
 (* YOU MAY EDIT THE PROOF BELOW *)
 Open Scope Z_scope.
 intros b i j Hij.
