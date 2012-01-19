@@ -134,6 +134,12 @@ let find_ps ~loc env impl s args =
       Hashtbl.add impl s ps;
       ps
 
+let ty_check loc s ty1 t =
+  let ty1 = ty_inst s ty1 in
+  let ty2 = of_option t.t_ty in
+  if ty_equal ty1 ty2 then () else
+  error ~loc (Ty.TypeMismatch (ty1,ty2))
+
 let rec ty denv env impl { e_loc = loc; e_node = n } = match n with
   | Eapp (aw,al) ->
       let ts = find_ts ~loc env impl aw al in
@@ -360,11 +366,13 @@ and ls_args denv env impl loc fs tvl gl al =
         let tvm = Mtv.add tv ty tvm in
         args tvm tvl al
     | [],al ->
-        (* TODO: type checking + dummies *)
+        (* TODO: dummies *)
         let ghost v = fs_app fs_ghost [] (Mtv.find v tvm) in
         let ty = option_map (ty_inst tvm) fs.ls_value in
         let tl = List.map (term denv env impl) al in
-        t_app fs (List.map ghost gl @ tl) ty
+        let tl = List.map ghost gl @ tl in
+        List.iter2 (ty_check loc tvm) fs.ls_args tl;
+        t_app fs tl ty
     | _ -> error ~loc BadArity
   in
   if gl <> [] && not (Mstr.mem nm_ghost env) then begin
@@ -381,6 +389,7 @@ and let_args denv env impl loc e tvl vl al =
         args tvm vm tvl vl al
     | _,(v::vl),(a::al) ->
         let t = term denv env impl a in
+        ty_check loc tvm v.vs_ty t;
         let vm = Mvs.add v t vm in
         args tvm vm tvl vl al
     | [],[],[] ->
