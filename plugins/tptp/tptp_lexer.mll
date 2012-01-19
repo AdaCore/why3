@@ -141,7 +141,9 @@ rule token = parse
       { try Hashtbl.find keywords id with Not_found -> LWORD id }
   | uword as id
       { UWORD id }
-  | '\'' (sq_char+ as sq) '\''
+  | '\'' (lword as id) '\''
+      { LWORD id }
+  | '\'' sq_char+ '\'' as sq
       { SINGLE_QUOTED sq }
   | '"' (do_char* as dob) '"'
       { DISTINCT_OBJECT dob }

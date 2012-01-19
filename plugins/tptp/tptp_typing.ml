@@ -231,9 +231,11 @@ and fmla denv env impl pol tvl { e_loc = loc; e_node = n } = match n with
                 Mstr.add s (STVar tv) env, pol, tv::tvl, vl, true
             | Some true, Qforall  (* goals *)
             | Some false, Qexists (* premises *) ->
-                let ts = create_tysymbol (id_user s loc) tvl None in
+                let _,ln,cn,_ = Loc.get loc in
+                let sk = Format.sprintf "_%s_%d_%d" s ln cn in
+                let ts = create_tysymbol (id_user sk loc) tvl None in
                 let tv = ty_app ts (List.map ty_var tvl) in
-                Hashtbl.add impl ("_sk_" ^ s) (SType ts);
+                Hashtbl.add impl sk (SType ts);
                 Mstr.add s (STSko tv) env, pol, tvl, vl, true
         else
           let ty = ty denv env impl e in
@@ -478,6 +480,7 @@ let typecheck _genv path ast =
   let env = Mstr.empty in
   (* FIXME: localize the identifier *)
   let uc = create_theory ~path (id_fresh "T") in
+  let uc = add_decl uc d_univ in
   let _,uc = List.fold_left input (env,uc) ast in
   let uc = if not !negc then uc else
     let pr = create_prsymbol (id_fresh "contradiction") in
