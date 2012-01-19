@@ -47,6 +47,7 @@ exception TypeExpected
 exception TermExpected
 exception FmlaExpected
 exception InvalidDummy
+exception MalformedLet
 exception DependentTy
 exception BadArity
 
@@ -56,6 +57,7 @@ let () = Exn_printer.register (fun fmt e -> match e with
   | TermExpected -> fprintf fmt "term expression expected"
   | FmlaExpected -> fprintf fmt "formula expression expected"
   | InvalidDummy -> fprintf fmt "invalid type placeholder"
+  | MalformedLet -> fprintf fmt "malformed let-expression"
   | DependentTy  -> fprintf fmt "dependent type"
   | BadArity     -> fprintf fmt "bad arity"
   | _ -> raise e)
@@ -169,9 +171,18 @@ let rec term denv env impl { e_loc = loc; e_node = n } = match n with
   | Enum _ ->
       (* TODO: arithmetic *)
       assert false
-  | Elet (_def,_e) ->
-      (* TODO: let *)
-      assert false
+  | Elet (def,e) ->
+      let env,s = let_defn denv env impl def in
+      begin match Mstr.find s env with
+        | SletF ([],[],t) ->
+            let id = id_user s def.e_loc in
+            let vs = create_vsymbol id (of_option t.t_ty) in
+            let env = Mstr.add s (SVar vs) env in
+            let t1 = term denv env impl e in
+            t_let_close vs t t1
+        | _ ->
+            term denv env impl e
+      end
   | Eite (e1,e2,e3) ->
       (* we can't fix the polarity of the condition here,
          hence type quantifiers are forbidden in terms *)
@@ -195,9 +206,18 @@ and fmla denv env impl pol tvl { e_loc = loc; e_node = n } = match n with
         | DT _ | DF _ -> error ~loc FmlaExpected in
       let tl = List.map (term denv env impl) al in
       ps_app ps tl, false
-  | Elet (_def,_e) ->
-      (* TODO: let *)
-      assert false
+  | Elet (def,e) ->
+      let env,s = let_defn denv env impl def in
+      begin match Mstr.find s env with
+        | SletF ([],[],t) ->
+            let id = id_user s def.e_loc in
+            let vs = create_vsymbol id (of_option t.t_ty) in
+            let env = Mstr.add s (SVar vs) env in
+            let f,b = fmla denv env impl pol tvl e in
+            t_let_close vs t f, b
+        | _ ->
+            fmla denv env impl pol tvl e
+      end
   | Eqnt (quant,vl,e1) ->
       let vlist (env,pol,tvl,vl,b) (s,e) =
         let loc = e.e_loc in
@@ -284,6 +304,46 @@ and fmla denv env impl pol tvl { e_loc = loc; e_node = n } = match n with
       let t2 = term denv env impl e2 in
       t_equ t1 t2, false
   | Evar _ | Edob _ | Enum _ -> error ~loc FmlaExpected
+
+and let_defn denv env impl { e_node = n ; e_loc = loc } =
+  let rec newenv env tvl vl = function
+    | [] -> env, List.rev tvl, List.rev vl
+    | (s,{ e_node = Edef (DT DTtype, []); e_loc = loc })::al ->
+        if vl <> [] then errorm ~loc "Invalid type quantifier";
+        let tv = create_tvsymbol (id_user s loc) in
+        let env = Mstr.add s (STVar tv) env in
+        newenv env (tv::tvl) vl al
+    | (s,e)::al ->
+        let ty = ty denv env impl e in
+        let vs = create_vsymbol (id_user s e.e_loc) ty in
+        let env = Mstr.add s (SVar vs) env in
+        newenv env tvl (vs::vl) al
+  in
+  let rec check ss vl al = match vl,al with
+    | [],[] -> ()
+    | (v,_)::vl, { e_node = Evar u }::al when u = v ->
+        let ss = Sstr.change v (fun b ->
+          not (b && error ~loc MalformedLet)) ss in
+        check ss vl al
+    | _,_ -> error ~loc MalformedLet in
+  let dig vl d isf e = match d.e_node with
+    | Eapp (s,al) ->
+        check Sstr.empty vl al;
+        let enw,tvl,vl = newenv env [] [] vl in
+        if isf then
+          let f,_ = fmla denv enw impl None [] e in
+          Mstr.add s (SletP (tvl,vl,f)) env, s
+        else
+          let t = term denv enw impl e in
+          Mstr.add s (SletF (tvl,vl,t)) env, s
+    | _ -> assert false (* impossible *) in
+  let dig vl = function
+    | Ebin (BOequ,e1,e2) -> dig vl e1 true e2
+    | Eequ (e1,e2) -> dig vl e1 false e2
+    | _ -> assert false (* impossible *) in
+  match n with
+    | Eqnt (Qforall,vl,d) -> dig vl d.e_node
+    | d -> dig [] d
 
 and ls_args denv env impl loc fs tvl al =
   let rec args tvm tvl al = match tvl,al with
