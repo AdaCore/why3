@@ -539,7 +539,7 @@ let init =
          | S.Transf _ -> !image_transf);
     goals_model#set ~row:row#iter ~column:name_column
       (match any with
-         | S.Goal g -> default_option "" g.S.goal_expl
+         | S.Goal g -> S.goal_expl g
          | S.Theory th -> th.S.theory_name.Ident.id_string
          | S.File f -> Filename.basename f.S.file_name
          | S.Proof_attempt a ->

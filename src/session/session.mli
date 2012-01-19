@@ -62,7 +62,7 @@ type proof_attempt_status =
     | Done of Call_provers.prover_result (** external proof done *)
     | InternalFailure of exn (** external proof aborted by internal error *)
 
-type expl = string option
+type expl
 (** An explanation gives hint about how the goal has been produced.
     Allow to reattach proof_attempt to goal when the source file has been
     modified.
@@ -296,7 +296,7 @@ val set_timelimit : int -> 'key proof_attempt -> unit
 
 val add_transformation :
   keygen:'key keygen ->
-  goal:('goal -> Ident.ident * string option * Task.task) ->
+  goal:('goal -> Ident.ident * expl * Task.task) ->
   string ->
   'key goal ->
   'goal list ->
@@ -378,7 +378,7 @@ module AddTransf (X : sig
   val keygen : key keygen
 
   type goal
-  val goal : goal -> Ident.ident * string option * Task.task
+  val goal : goal -> Ident.ident * expl * Task.task
 
   type transf
   val fold_transf : ('a -> goal -> 'a) -> 'a -> Task.task -> transf -> 'a
@@ -391,7 +391,7 @@ module AddFile(X : sig
   val keygen : key keygen
 
   type goal
-  val goal : goal -> Ident.ident * string option * Task.task
+  val goal : goal -> Ident.ident * expl * Task.task
 
   type theory
   val fold_theory : ('a -> goal -> 'a) -> 'a -> theory -> 'a
