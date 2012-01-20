@@ -17,18 +17,6 @@ module MergesortQueue
 
   clone import list.Sorted with type t = elt, predicate le = le
 
-  lemma Permut_cons_append:
-    forall x : 'a, l1 l2 : list 'a.
-    permut (Cons x l1 ++ l2) (l1 ++ Cons x l2)
-
-  lemma Permut_append:
-    forall l1 l2 k1 k2 : list 'a.
-    permut l1 k1 -> permut l2 k2 -> permut (l1 ++ l2) (k1 ++ k2)
-
-  lemma Permut_append_swap:
-    forall l1 l2 : list 'a.
-    permut (l1 ++ l2) (l2 ++ l1)
-
   let merge (q1: t elt) (q2: t elt) (q: t elt) =
     { q.elts = Nil (* /\ sorted q1.elts /\ sorted q2.elts *) }
     'L:
