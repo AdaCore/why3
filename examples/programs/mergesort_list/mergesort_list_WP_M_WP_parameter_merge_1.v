@@ -146,28 +146,28 @@ Axiom Permut_append_swap : forall (a:Type), forall (l1:(list a)) (l2:(list
 
 (* DO NOT EDIT BELOW *)
 
-Theorem WP_parameter_mergesort : forall (l:(list Z)),
-  match l with
-  | (Nil|(Cons _ Nil)) => True
-  | _ => (2%Z <= (length l))%Z -> forall (result:(list Z)) (result1:(list
-      Z)), ((1%Z <= (length result))%Z /\ ((1%Z <= (length result1))%Z /\
-      (permut l (infix_plpl result result1)))) -> (((0%Z <= (length l))%Z /\
-      ((length result) <  (length l))%Z) -> forall (result2:(list Z)),
-      ((sorted result2) /\ (permut result2 result)) ->
-      (((0%Z <= (length l))%Z /\ ((length result1) <  (length l))%Z) ->
-      forall (result3:(list Z)), ((sorted result3) /\ (permut result3
-      result1)) -> (((sorted result2) /\ (sorted result3)) ->
-      forall (result4:(list Z)), ((sorted result4) /\ (permut result4
-      (infix_plpl result2 result3))) -> (permut result4 l))))
+Theorem WP_parameter_merge : forall (l1:(list Z)), forall (l2:(list Z)),
+  ((sorted l1) /\ (sorted l2)) ->
+  match l2 with
+  | (Cons x x1) =>
+      match l1 with
+      | (Cons x2 x3) => (~ (x2 <= x)%Z) ->
+          ((((0%Z <= ((length l1) + (length l2))%Z)%Z /\
+          (((length l1) + (length x1))%Z <  ((length l1) + (length l2))%Z)%Z) /\
+          ((sorted l1) /\ (sorted x1))) -> forall (result:(list Z)),
+          ((sorted result) /\ (permut result (infix_plpl l1 x1))) ->
+          (permut (Cons x result) (infix_plpl l1 l2)))
+      | Nil => True
+      end
+  | Nil => True
   end.
 (* YOU MAY EDIT THE PROOF BELOW *)
-destruct l; try trivial.
-destruct l; try trivial.
 intuition.
-apply Permut_trans with (infix_plpl result2 result3); auto.
-apply Permut_trans with (infix_plpl result result1); auto.
-apply Permut_append; auto.
-apply Permut_sym; auto.
+destruct l2; intuition.
+destruct l1; intuition.
+apply Permut_trans with (Cons z (infix_plpl (Cons z0 l1) l2)); auto.
+apply Permut_cons; auto.
+apply Permut_cons_append.
 Qed.
 (* DO NOT EDIT BELOW *)
 
