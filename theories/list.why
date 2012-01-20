@@ -211,6 +211,24 @@ theory Permut
   lemma Permut_swap:
     forall x y: 'a, l: list 'a. permut (Cons x (Cons y l)) (Cons y (Cons x l))
 
+  use import Append
+
+  lemma Permut_cons_append:
+    forall x : 'a, l1 l2 : list 'a.
+    permut (Cons x l1 ++ l2) (l1 ++ Cons x l2)
+
+  lemma Permut_assoc:
+    forall l1 l2 l3: list 'a.
+    permut ((l1 ++ l2) ++ l3) (l1 ++ (l2 ++ l3))
+
+  lemma Permut_append:
+    forall l1 l2 k1 k2 : list 'a.
+    permut l1 k1 -> permut l2 k2 -> permut (l1 ++ l2) (k1 ++ k2)
+
+  lemma Permut_append_swap:
+    forall l1 l2 : list 'a.
+    permut (l1 ++ l2) (l2 ++ l1)
+
   use import Mem
 
   lemma Permut_mem:
