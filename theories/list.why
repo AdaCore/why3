@@ -181,6 +181,12 @@ theory NumOcc
   lemma Mem_Num_Occ :
     forall x: 'a, l: list 'a. mem x l <-> num_occ x l > 0
 
+  use import Append
+
+  lemma Append_Num_Occ :
+    forall x: 'a, l1 l2: list 'a.
+    num_occ x (l1 ++ l2) = num_occ x l1 + num_occ x l2
+
 end
 
 theory Permut

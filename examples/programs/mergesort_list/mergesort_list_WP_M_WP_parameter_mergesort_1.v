@@ -4,15 +4,21 @@ Require Import ZArith.
 Require Import Rbase.
 Definition unit  := unit.
 
-Parameter mark : Type.
+Parameter qtmark : Type.
 
-Parameter at1: forall (a:Type), a -> mark  -> a.
+Parameter at1: forall (a:Type), a -> qtmark -> a.
 
 Implicit Arguments at1.
 
-Parameter old: forall (a:Type), a  -> a.
+Parameter old: forall (a:Type), a -> a.
 
 Implicit Arguments old.
+
+Definition implb(x:bool) (y:bool): bool := match (x,
+  y) with
+  | (true, false) => false
+  | (_, _) => true
+  end.
 
 Inductive list (a:Type) :=
   | Nil : list a
@@ -25,8 +31,8 @@ Implicit Arguments Cons.
 Set Implicit Arguments.
 Fixpoint length (a:Type)(l:(list a)) {struct l}: Z :=
   match l with
-  | Nil  => 0%Z
-  | Cons _ r => (1%Z + (length r))%Z
+  | Nil => 0%Z
+  | (Cons _ r) => (1%Z + (length r))%Z
   end.
 Unset Implicit Arguments.
 
@@ -45,20 +51,20 @@ Inductive sorted : (list Z) -> Prop :=
 Set Implicit Arguments.
 Fixpoint mem (a:Type)(x:a) (l:(list a)) {struct l}: Prop :=
   match l with
-  | Nil  => False
-  | Cons y r => (x = y) \/ (mem x r)
+  | Nil => False
+  | (Cons y r) => (x = y) \/ (mem x r)
   end.
 Unset Implicit Arguments.
 
-Axiom Sorted_mem : forall (x:Z) (l:(list Z)), ((forall (y:Z), (mem y l) ->
+Axiom sorted_mem : forall (x:Z) (l:(list Z)), ((forall (y:Z), (mem y l) ->
   (x <= y)%Z) /\ (sorted l)) <-> (sorted (Cons x l)).
 
 Set Implicit Arguments.
 Fixpoint infix_plpl (a:Type)(l1:(list a)) (l2:(list a)) {struct l1}: (list
   a) :=
   match l1 with
-  | Nil  => l2
-  | Cons x1 r1 => (Cons x1 (infix_plpl r1 l2))
+  | Nil => l2
+  | (Cons x1 r1) => (Cons x1 (infix_plpl r1 l2))
   end.
 Unset Implicit Arguments.
 
@@ -75,19 +81,26 @@ Axiom Append_length : forall (a:Type), forall (l1:(list a)) (l2:(list a)),
 Axiom mem_append : forall (a:Type), forall (x:a) (l1:(list a)) (l2:(list a)),
   (mem x (infix_plpl l1 l2)) <-> ((mem x l1) \/ (mem x l2)).
 
-Parameter num_occ: forall (a:Type), a -> (list a)  -> Z.
+Axiom mem_decomp : forall (a:Type), forall (x:a) (l:(list a)), (mem x l) ->
+  exists l1:(list a), exists l2:(list a), (l = (infix_plpl l1 (Cons x l2))).
+
+Parameter num_occ: forall (a:Type), a -> (list a) -> Z.
 
 Implicit Arguments num_occ.
 
 Axiom num_occ_def : forall (a:Type), forall (x:a) (l:(list a)),
   match l with
-  | Nil  => ((num_occ x l) = 0%Z)
-  | Cons y r => ((x = y) -> ((num_occ x l) = (1%Z + (num_occ x r))%Z)) /\
+  | Nil => ((num_occ x l) = 0%Z)
+  | (Cons y r) => ((x = y) -> ((num_occ x l) = (1%Z + (num_occ x r))%Z)) /\
       ((~ (x = y)) -> ((num_occ x l) = (0%Z + (num_occ x r))%Z))
   end.
 
 Axiom Mem_Num_Occ : forall (a:Type), forall (x:a) (l:(list a)), (mem x l) <->
   (0%Z <  (num_occ x l))%Z.
+
+Axiom Append_Num_Occ : forall (a:Type), forall (x:a) (l1:(list a)) (l2:(list
+  a)), ((num_occ x (infix_plpl l1 l2)) = ((num_occ x l1) + (num_occ x
+  l2))%Z).
 
 Definition permut (a:Type)(l1:(list a)) (l2:(list a)): Prop := forall (x:a),
   ((num_occ x l1) = (num_occ x l2)).
@@ -117,19 +130,30 @@ Axiom Permut_cons_append : forall (a:Type), forall (x:a) (l1:(list a))
   (l2:(list a)), (permut (infix_plpl (Cons x l1) l2) (infix_plpl l1 (Cons x
   l2))).
 
+Axiom Permut_append : forall (a:Type), forall (l1:(list a)) (l2:(list a))
+  (k1:(list a)) (k2:(list a)), (permut l1 k1) -> ((permut l2 k2) ->
+  (permut (infix_plpl l1 l2) (infix_plpl k1 k2))).
+
+Axiom Permut_append_swap : forall (a:Type), forall (l1:(list a)) (l2:(list
+  a)), (permut (infix_plpl l1 l2) (infix_plpl l2 l1)).
+
+(* YOU MAY EDIT THE CONTEXT BELOW *)
+
+(* DO NOT EDIT BELOW *)
+
 Theorem WP_parameter_mergesort : forall (l:(list Z)),
   match l with
-  | (Nil |Cons _ Nil ) => True
+  | (Nil|(Cons _ Nil)) => True
   | _ => (2%Z <= (length l))%Z -> forall (result:(list Z)) (result1:(list
       Z)), ((1%Z <= (length result))%Z /\ ((1%Z <= (length result1))%Z /\
       (permut l (infix_plpl result result1)))) -> (((0%Z <= (length l))%Z /\
       ((length result) <  (length l))%Z) -> forall (result2:(list Z)),
-      ((sorted result2) /\ (permut result result2)) ->
+      ((sorted result2) /\ (permut result2 result)) ->
       (((0%Z <= (length l))%Z /\ ((length result1) <  (length l))%Z) ->
-      forall (result3:(list Z)), ((sorted result3) /\ (permut result1
-      result3)) -> (((sorted result2) /\ (sorted result3)) ->
+      forall (result3:(list Z)), ((sorted result3) /\ (permut result3
+      result1)) -> (((sorted result2) /\ (sorted result3)) ->
       forall (result4:(list Z)), ((sorted result4) /\ (permut result4
-      (infix_plpl result2 result3))) -> (permut l result4))))
+      (infix_plpl result2 result3))) -> (permut result4 l))))
   end.
 (* YOU MAY EDIT THE PROOF BELOW *)
 destruct l; try trivial.
