@@ -75,7 +75,7 @@ let read_tools absf wc map (name,section) =
   (* provers *)
   let provers = get_stringl ~default:[] section "prover" in
   let find_provers s =
-    try let p = Mstr.find s (get_provers wc) in
+    try let p = prover_by_id wc s in
         s,p.driver ,p.command
     with
       (* TODO add exceptions pehaps inside rc.ml in fact*)
@@ -90,7 +90,7 @@ let read_tools absf wc map (name,section) =
   let load_driver (n,d,c) = n,Driver.load_driver env d,c in
   let provers = List.map load_driver provers in
   let create_tool (n,driver,command) =
-    { tval = {tool_name = name; prover_name = n; tool_db =
+    { tval = {Bench.tool_name = name; prover_name = n; tool_db =
         if Db.is_initialized () then Some (Db.prover_from_name n) else None};
       ttrans = transforms;
       tdriver = driver;

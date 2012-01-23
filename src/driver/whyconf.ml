@@ -20,6 +20,7 @@
 open Format
 open Util
 open Rc
+open Stdlib
 
 (* magicnumber for the configuration :
   - 0 before the magic number
@@ -49,6 +50,45 @@ let default_conf_file =
   match Config.localdir with
     | None -> Filename.concat (Rc.get_home_dir ()) ".why3.conf"
     | Some d -> Filename.concat d "why3.conf"
+
+(* Prover *)
+
+type prover =
+    { prover_id : string;
+      prover_name : string;
+      prover_version : string;
+    }
+
+let print_prover fmt p =
+  Format.fprintf fmt "%s(%s)" p.prover_name p.prover_version
+
+module Prover = struct
+  type t = prover
+  let compare s1 s2 =
+    if s1 == s2 then 0 else
+    let c = String.compare s1.prover_id s2.prover_id in
+    if c <> 0 then c else
+    let c = String.compare s1.prover_name s2.prover_name in
+    if c <> 0 then c else
+    let c = String.compare s1.prover_version s2.prover_version in
+    c
+
+  let equal s1 s2 =
+    s1.prover_id = s2.prover_id &&
+      s1.prover_name = s2.prover_name &&
+      s1.prover_version = s2.prover_version
+
+  let hash s1 =
+    2 * Hashtbl.hash s1.prover_id +
+      3 * Hashtbl.hash s1.prover_name +
+      5 * Hashtbl.hash s1.prover_version
+
+
+end
+
+module Mprover = Map.Make(Prover)
+module Sprover = Mprover.Set
+module Hprover = Hashtbl.Make(Prover)
 
 (* Configuration file *)
 
@@ -128,7 +168,7 @@ type config = {
   conf_file : string;       (* "/home/innocent_user/.why3.conf" *)
   config    : Rc.t;
   main      : main;
-  provers   : config_prover Mstr.t;
+  provers   : config_prover Mprover.t;
 }
 
 let default_main =
@@ -157,7 +197,7 @@ let set_main rc main =
   let section = set_stringl section "plugin" main.plugins in
   set_section rc "main" section
 
-let set_prover id prover family =
+let set_prover prover_id prover family =
   let section = empty_section in
   let section = set_string section "name" prover.name in
   let section = set_string section "command" prover.command in
@@ -165,20 +205,27 @@ let set_prover id prover family =
   let section = set_string section "version" prover.version in
   let section = set_string section "editor" prover.editor in
   let section = set_bool section "interactive" prover.interactive in
-  (id,section)::family
+  (prover_id.prover_id,section)::family
 
 let set_provers rc provers =
-  let family = Mstr.fold set_prover provers [] in
+  let family = Mprover.fold set_prover provers [] in
   set_family rc "prover" family
 
 let absolute_filename = Sysutil.absolutize_filename
 
 let load_prover dirname provers (id,section) =
-  Mstr.add id
-    { name    = get_string section "name";
+  let version = get_string ~default:"" section "version" in
+  let name = get_string section "name" in
+  let prover =
+    { prover_id = id;
+      prover_name = name;
+      prover_version = version }
+  in
+  Mprover.add prover
+    { name    = name;
       command = get_string section "command";
       driver  = absolute_filename dirname (get_string section "driver");
-      version = get_string ~default:"" section "version";
+      version = version;
       editor  = get_string ~default:"" section "editor";
       interactive = get_bool ~default:false section "interactive";
     } provers
@@ -224,7 +271,7 @@ let get_config (filename,rc) =
       | Some main -> rc, load_main dirname main
   in
   let provers = get_family rc "prover" in
-  let provers = List.fold_left (load_prover dirname) Mstr.empty provers in
+  let provers = List.fold_left (load_prover dirname) Mprover.empty provers in
   { conf_file = filename;
     config    = rc;
     main      = main;
@@ -268,8 +315,42 @@ let set_provers config provers =
     provers = provers;
   }
 
+(*******)
+
 let set_conf_file config conf_file = {config with conf_file = conf_file}
 let get_conf_file config           =  config.conf_file
+
+(*******)
+
+let is_prover_known whyconf prover =
+  Mprover.mem prover (get_provers whyconf)
+
+exception ProverNotFound of config * string
+exception ProverAmbiguity of config * string * prover list
+
+let prover_by_id whyconf id =
+  let potentials =
+    Mprover.filter (fun p _ -> p.prover_id = id) whyconf.provers in
+  match Mprover.keys potentials with
+    | [] -> raise (ProverNotFound(whyconf,id))
+    | [_] -> snd (Mprover.choose potentials)
+    |  l -> raise (ProverAmbiguity(whyconf,id,l))
+
+let () = Exn_printer.register
+  (fun fmt exn ->
+    match exn with
+      | ProverNotFound (config,s) ->
+        fprintf fmt "Prover '%s' not found in %s@."
+          s (get_conf_file config)
+      | ProverAmbiguity (config,s,l) ->
+        fprintf fmt "More than one provers corresponds to '%s' in %s:@.%a@."
+          s (get_conf_file config)
+          (Pp.print_list Pp.newline print_prover) l
+      | e -> raise e
+  )
+
+
+(******)
 
 let get_section config name = assert (name <> "main");
   get_section config.config name
@@ -283,3 +364,4 @@ let set_section config name section = assert (name <> "main");
 
 let set_family config name section = assert (name <> "prover");
   {config with config = set_family config.config name section}
+

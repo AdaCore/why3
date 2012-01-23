@@ -257,8 +257,9 @@ let () = try
   if !opt_list_provers then begin
     opt_list := true;
     let config = read_config !opt_config in
-    let print fmt s prover = fprintf fmt "%s (%s)@\n" s prover.name in
-    let print fmt m = Mstr.iter (print fmt) m in
+    let print fmt prover _ = fprintf fmt "%s (%s)@\n"
+      prover.prover_id prover.prover_name in
+    let print fmt m = Mprover.iter (print fmt) m in
     let provers = get_provers config in
     printf "@[<hov 2>Known provers:@\n%a@]@." print provers
   end;
@@ -319,12 +320,9 @@ let () = try
   if !opt_memlimit  = None then opt_memlimit  := Some (Whyconf.memlimit main);
   begin match !opt_prover with
   | Some s ->
-      let prover = try Mstr.find s (get_provers config) with
-        | Not_found -> eprintf "Prover '%s' not found in %s@."
-            s (Whyconf.get_conf_file config); exit 1
-      in
-      opt_command := Some prover.command;
-      opt_driver := Some prover.driver
+    let prover = Whyconf.prover_by_id config s in
+    opt_command := Some prover.command;
+    opt_driver := Some prover.driver
   | None ->
       ()
   end;

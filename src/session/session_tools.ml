@@ -17,13 +17,14 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Whyconf
 open Session
 
 (** convert unknown prover *)
 let unknown_to_known_provers provers pu () =
   let module M = struct exception Perfect_prover_found of prover end in
   try
-    Sprover.fold (fun pk acc ->
+    Mprover.fold (fun pk _ acc ->
       if pk.prover_name = pu.prover_name then begin
         if pk.prover_version = pu.prover_version
         then raise (M.Perfect_prover_found pk);
@@ -33,9 +34,9 @@ let unknown_to_known_provers provers pu () =
   with M.Perfect_prover_found pk -> [pk]
 
 let convert_unknown_prover ~keygen env_session =
-  let known_provers = get_known_provers env_session in
-  let provers = get_provers env_session.session in
-  let unknown_provers = Sprover.diff provers known_provers in
+  let known_provers = get_provers env_session.whyconf in
+  let provers = get_used_provers env_session.session in
+  let unknown_provers = Mprover.set_diff provers known_provers in
   if not (Sprover.is_empty unknown_provers) then begin
     (** construct the list of compatible provers for each unknown provers *)
     let unknown_provers =

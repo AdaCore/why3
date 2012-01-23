@@ -19,6 +19,7 @@
 
 open Format
 open Why3
+module C = Whyconf
 
 let files = Queue.create ()
 let opt_version = ref false
@@ -152,7 +153,7 @@ let run_file (context : context) print_session f =
 module Simple =
 struct
 
-  let print_prover fmt pd = fprintf fmt "%s" pd.prover_name
+  let print_prover fmt pd = fprintf fmt "%s" pd.C.prover_name
 
   let print_proof_status fmt = function
     | Undone _ -> fprintf fmt "Undone"
@@ -222,7 +223,7 @@ struct
     then fprintf fmt "class='verified'"
     else fprintf fmt "class='notverified'"
 
-  let print_prover fmt pd = fprintf fmt "%s" pd.prover_name
+  let print_prover fmt pd = fprintf fmt "%s" pd.C.prover_name
 
   let print_proof_status fmt = function
     | Undone _ -> fprintf fmt "<span class='notverified'>Undone</span>"

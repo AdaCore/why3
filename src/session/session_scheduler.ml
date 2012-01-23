@@ -352,7 +352,7 @@ let redo_external_proof eS eT ?timelimit g a =
       | None -> Debug.dprintf debug
         "[Info] Can't redo an external proof since the prover %a is not \
 loaded@."
-        print_prover a.proof_prover
+        Whyconf.print_prover a.proof_prover
       | Some p ->
         if a.proof_edited_as = None && p.prover_config.Whyconf.interactive then
           set_proof_state ~notify ~obsolete:false (Undone Unedited) a
@@ -551,7 +551,7 @@ let check_external_proof eS eT todo a =
       match load_prover eS ap with
         | None ->
           dprintf debug "[sched] prover not found : %a-%s@."
-            print_prover ap ap.prover_id;
+            Whyconf.print_prover ap ap.Whyconf.prover_id;
             Todo._done todo (g,ap,Prover_not_installed)
             (* set_proof_state ~notify ~obsolete:false a Undone *)
         | Some p ->

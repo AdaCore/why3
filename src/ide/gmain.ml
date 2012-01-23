@@ -31,6 +31,7 @@ open Whyconf
 open Gconfig
 open Util
 open Debug
+module C = Whyconf
 
 let debug = register_flag "gui"
 
@@ -133,20 +134,20 @@ let source_text fname =
 (* loading WhyIDE configuration *)
 (********************************)
 
-let loadpath = (Whyconf.loadpath (get_main ())) @ List.rev !includes
+let loadpath = (C.loadpath (get_main ())) @ List.rev !includes
 
 let gconfig =
   let c = Gconfig.config () in
   c.env <- Env.create_env loadpath;
 (*
-  let provers = Whyconf.get_provers c.Gconfig.config in
+  let provers = C.get_provers c.Gconfig.config in
   c.provers <-
     Util.Mstr.fold (Session.get_prover_data c.env) provers Util.Mstr.empty;
 *)
   c
 
 let () =
-  Whyconf.load_plugins (get_main ())
+  C.load_plugins (get_main ())
 
 let () =
   Debug.Opt.set_flags_selected ();
@@ -544,7 +545,7 @@ let init =
          | S.File f -> Filename.basename f.S.file_name
          | S.Proof_attempt a ->
            let p = a.S.proof_prover in
-           p.Session.prover_name ^ " " ^ p.Session.prover_version
+           p.C.prover_name ^ " " ^ p.C.prover_version
          | S.Transf tr -> tr.S.transf_name);
     notify any
 
@@ -612,7 +613,7 @@ let info_window ?(callback=(fun () -> ())) mt s =
 
 (* check if provers are present *)
 let () =
-  if Util.Mstr.is_empty (Whyconf.get_provers gconfig.Gconfig.config) then
+  if C.Mprover.is_empty (C.get_provers gconfig.Gconfig.config) then
     begin
       info_window `ERROR
         "No prover configured.\nPlease run 'why3config --detect-provers' first"
@@ -989,16 +990,16 @@ let () = add_refresh_provers (fun () ->
 
 let () =
   let add_item_provers () =
-    S.Sprover.iter
-      (fun p ->
-         let n = p.S.prover_name ^ " " ^ p.S.prover_version in
+    C.Mprover.iter
+      (fun p _ ->
+         let n = p.C.prover_name ^ " " ^ p.C.prover_version in
          let (_ : GMenu.image_menu_item) =
            tools_factory#add_image_item ~label:n
              ~callback:(fun () -> prover_on_selected_goals p)
              ()
          in
          let b = GButton.button ~packing:provers_box#add ~label:n () in
-         b#misc#set_tooltip_markup ("Start <tt>" ^ p.S.prover_name ^
+         b#misc#set_tooltip_markup ("Start <tt>" ^ p.C.prover_name ^
            "</tt> on the <b>selected goals</b>");
 
 (* prend de la place pour rien
@@ -1009,7 +1010,7 @@ let () =
            b#connect#pressed
              ~callback:(fun () -> prover_on_selected_goals p)
          in ())
-      (S.get_known_provers !env_session)
+      (C.get_provers gconfig.Gconfig.config)
   in
   add_refresh_provers add_item_provers "Add in tools menu and provers box";
   add_item_provers ()

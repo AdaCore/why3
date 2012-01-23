@@ -247,8 +247,9 @@ let () =
   if !opt_list_provers then begin
     opt_list := true;
     let config = read_config !opt_config in
-    let print fmt s prover = fprintf fmt "%s (%s)@\n" s prover.name in
-    let print fmt m = Mstr.iter (print fmt) m in
+    let print fmt prover _ = fprintf fmt "%s (%s)@\n"
+      prover.prover_id prover.prover_name in
+    let print fmt m = Mprover.iter (print fmt) m in
     let provers = get_provers config in
     printf "@[<hov 2>Known provers:@\n%a@]@." print provers
   end;
@@ -333,9 +334,7 @@ let () =
 
 
   let map_prover s =
-    let prover = try Mstr.find s (get_provers config) with
-      | Not_found -> eprintf "Prover %s not found.@." s; exit 1
-    in
+    let prover = prover_by_id config s in
     { B.tval   = {B.tool_name = "cmdline"; prover_name = s; tool_db = None};
       ttrans   = [Trans.identity,None];
       tdriver  = load_driver env prover.driver;

@@ -55,7 +55,7 @@ let rec goal whyconf env path dbgoal wgoal =
       let prover_name = Db.prover_name prover_id in
       let driver,command =
         try
-          let p = Mstr.find prover_name (Whyconf.get_provers whyconf) in
+          let p = Whyconf.prover_by_id whyconf prover_name in
           p.Whyconf.driver ,p.Whyconf.command
         with
       (* TODO add exceptions pehaps inside rc.ml in fact*)

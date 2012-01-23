@@ -20,48 +20,16 @@
 open Stdlib
 open Debug
 
+module Mprover = Whyconf.Mprover
+module Sprover = Whyconf.Sprover
+module PHprover = Whyconf.Hprover
+module C = Whyconf
+
 let debug = Debug.register_flag "session"
 
 (** {2 Type definitions} *)
 
 module PHstr = Util.Hstr
-
-type prover =
-    { prover_id : string;
-      prover_name : string;
-      prover_version : string;
-    }
-
-let print_prover fmt p =
-  Format.fprintf fmt "%s(%s)" p.prover_name p.prover_version
-
-module Prover = struct
-  type t = prover
-  let compare s1 s2 =
-    if s1 == s2 then 0 else
-    let c = String.compare s1.prover_id s2.prover_id in
-    if c <> 0 then c else
-    let c = String.compare s1.prover_name s2.prover_name in
-    if c <> 0 then c else
-    let c = String.compare s1.prover_version s2.prover_version in
-    c
-
-  let equal s1 s2 =
-    s1.prover_id = s2.prover_id &&
-      s1.prover_name = s2.prover_name &&
-      s1.prover_version = s2.prover_version
-
-  let hash s1 =
-    2 * Hashtbl.hash s1.prover_id +
-      3 * Hashtbl.hash s1.prover_name +
-      5 * Hashtbl.hash s1.prover_version
-
-
-end
-
-module Mprover = Map.Make(Prover)
-module Sprover = Mprover.Set
-module PHprover = Hashtbl.Make(Prover)
 
 type undone_proof =
     | Scheduled (** external proof attempt is scheduled *)
@@ -92,7 +60,7 @@ type 'a goal =
 
 and 'a proof_attempt =
     { proof_key : 'a;
-      proof_prover : prover;
+      proof_prover : Whyconf.prover;
       proof_parent : 'a goal;
       mutable proof_state : proof_attempt_status;
       mutable proof_timelimit : int;
@@ -143,7 +111,7 @@ type loaded_prover =
     { prover_config : Whyconf.config_prover;
       prover_driver : Driver.driver}
 
-type loaded_provers = loaded_prover option PHstr.t
+type loaded_provers = loaded_prover option PHprover.t
 
 type 'a env_session =
     { env : Env.env;
@@ -203,7 +171,8 @@ let iter_transf f t =
   List.iter (fun g -> f g) t.transf_goals
 
 let goal_iter f g =
-  PHprover.iter (fun _ a -> f (Proof_attempt a)) g.goal_external_proofs;
+  PHprover.iter
+    (fun _ a -> f (Proof_attempt a)) g.goal_external_proofs;
   PHstr.iter (fun _ t -> f (Transf t)) g.goal_transformations
 
 let transf_iter f t =
@@ -239,7 +208,8 @@ module PTreeT = struct
           if g.goal_task = None
           then g.goal_name.Ident.id_string^"*"
           else g.goal_name.Ident.id_string
-        | Proof_attempt pr -> Pp.string_of_wnl print_prover pr.proof_prover
+        | Proof_attempt pr ->
+          Pp.string_of_wnl Whyconf.print_prover pr.proof_prover
         | Transf tr -> tr.transf_name in
       let l = ref [] in
       iter (fun a -> l := (Any a)::!l) t;
@@ -279,7 +249,7 @@ let load_env_session ?(includes=[]) session conf_path_opt =
   { session = session;
     env = env;
     whyconf = config;
-    loaded_provers = PHstr.create 5;
+    loaded_provers = PHprover.create 5;
   }
 
 (************************)
@@ -299,7 +269,7 @@ and get_session_trans transf = get_session_goal transf.transf_parent
 
 let get_session_proof_attempt pa = get_session_goal pa.proof_parent
 
-let get_provers session =
+let get_used_provers session =
   let sprover = ref Sprover.empty in
   session_iter_proof_attempt
     (fun pa -> sprover := Sprover.add pa.proof_prover !sprover)
@@ -407,7 +377,7 @@ let save_file provers fmt _ f =
 let save_prover fmt p (provers,id) =
   fprintf fmt "@\n@[<v 1><prover@ id=\"%i\"@ prover_id=\"%s\" \
 name=\"%s\"@ version=\"%s\"/>@]"
-    id p.prover_id p.prover_name p.prover_version;
+    id p.C.prover_id p.C.prover_name p.C.prover_version;
   Mprover.add p id provers, id+1
 
 let save fname session =
@@ -416,7 +386,7 @@ let save fname session =
   fprintf fmt "<?xml version=\"1.0\" encoding=\"UTF-8\"?>@\n";
   fprintf fmt "<!DOCTYPE why3session SYSTEM \"why3session.dtd\">@\n";
   fprintf fmt "@[<v 1><why3session@ name=\"%s\">" fname;
-  let provers,_ = Sprover.fold (save_prover fmt) (get_provers session)
+  let provers,_ = Sprover.fold (save_prover fmt) (get_used_provers session)
     (Mprover.empty,0) in
   PHstr.iter (save_file provers fmt) session.session_files;
   fprintf fmt "@]@\n</why3session>";
@@ -841,7 +811,7 @@ let load_file session old_provers f =
         let prover_id = string_attribute_def "prover_id" f id in
         let name = string_attribute "name" f in
         let version = string_attribute "version" f in
-        let p = {prover_id = prover_id;
+        let p = {C.prover_id = prover_id;
                  prover_name = name;
                  prover_version = version} in
         Util.Mstr.add id p old_provers
@@ -1072,10 +1042,10 @@ let add_registered_transformation ~keygen env_session tr_name g =
 
 let load_prover eS prover =
   try
-    PHstr.find eS.loaded_provers prover.prover_id
+    PHprover.find eS.loaded_provers prover
   with Not_found ->
     let provers = Whyconf.get_provers eS.whyconf in
-    let r = Util.Mstr.find_option prover.prover_id provers in
+    let r = Mprover.find_option prover provers in
     let r = match r with
       | None -> None
       | Some pr ->
@@ -1083,20 +1053,8 @@ let load_prover eS prover =
         Some { prover_config = pr;
                prover_driver = dr}
     in
-    PHstr.add eS.loaded_provers prover.prover_id r;
+    PHprover.add eS.loaded_provers prover r;
     r
-
-let is_prover_known eS prover =
-  Util.Mstr.mem prover.prover_id (Whyconf.get_provers eS.whyconf)
-
-let get_known_provers eS =
-  Util.Mstr.fold (fun pid p acc ->
-    Sprover.add
-      {prover_id = pid;
-       prover_name = p.Whyconf.name;
-       prover_version = p.Whyconf.version}
-      acc)
-    (Whyconf.get_provers eS.whyconf) Sprover.empty
 
 let () = Exn_printer.register
   (fun fmt exn ->
@@ -1510,7 +1468,7 @@ let update_session ~keygen ~allow_obsolete old_session env whyconf =
   let new_env_session = { session = new_session;
                       env = env;
                       whyconf = whyconf;
-                      loaded_provers = PHstr.create 5;
+                      loaded_provers = PHprover.create 5;
                     } in
   let obsolete = PHstr.fold (fun _ old_file acc ->
     dprintf debug "[Load] file '%s'@\n" old_file.file_name;

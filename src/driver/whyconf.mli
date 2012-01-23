@@ -82,6 +82,26 @@ val load_plugins : main -> unit
 
 (** {2 Provers} *)
 
+(** {3 Prover's identifier} *)
+
+type prover =
+    { prover_id : string;
+      prover_name : string;
+      prover_version : string;
+    }
+    (** record of necessary data for a given external prover
+        In the future prover_id will disappear.
+    *)
+
+val print_prover : Format.formatter -> prover -> unit
+(** Printer for prover *)
+
+module Mprover  : Stdlib.Map.S with type key = prover
+module Sprover  : Mprover.Set
+module Hprover  : Hashtbl.S with type key = prover
+
+(** {3 Prover configuration} *)
+
 type config_prover = {
   name    : string;   (* "Alt-Ergo v2.95 (special)" *)
   command : string;   (* "exec why-limit %t %m alt-ergo %f" *)
@@ -91,13 +111,20 @@ type config_prover = {
   interactive : bool; (* Interative theorem prover *)
 }
 
-val get_provers : config  -> config_prover Mstr.t
+val get_provers : config  -> config_prover Mprover.t
 (** [get_main config] get the prover family stored in the Rc file. The
     keys are the unique ids of the prover (argument of the family) *)
 
-val set_provers : config -> config_prover Mstr.t -> config
+val set_provers : config -> config_prover Mprover.t -> config
 (** [set_provers config provers] replace all the family prover by the
     one given *)
+
+val is_prover_known : config -> prover -> bool
+(** test if a prover is detected *)
+
+val prover_by_id : config -> string -> config_prover
+
+(** {2 For accesing other parts of the configuration } *)
 
 (** Access to the Rc.t *)
 val get_section : config -> string -> Rc.section option

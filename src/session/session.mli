@@ -28,23 +28,7 @@ val debug : Debug.flag
 (** The debug flag "session" *)
 
 module PHstr : Util.PrivateHashtbl with type key = string
-(** {2 Prover's data} *)
-
-type prover = private
-    { prover_id : string;
-      prover_name : string;
-      prover_version : string;
-    }
-    (** record of necessary data for a given external prover
-        In the future prover_id will disappear.
-    *)
-
-val print_prover : Format.formatter -> prover -> unit
-(** Printer for prover *)
-
-module Mprover  : Stdlib.Map.S with type key = prover
-module Sprover  : Mprover.Set
-module PHprover : Util.PrivateHashtbl with type key = prover
+module PHprover : Util.PrivateHashtbl with type key = Whyconf.prover
 
 (** {2 Proof attempts} *)
 
@@ -94,7 +78,7 @@ type 'a goal = private
 
 and 'a proof_attempt = private
     { proof_key : 'a;
-      proof_prover : prover;
+      proof_prover : Whyconf.prover;
       proof_parent : 'a goal;
       mutable proof_state : proof_attempt_status;
       mutable proof_timelimit : int;
@@ -178,7 +162,7 @@ type loaded_prover =
     { prover_config : Whyconf.config_prover;
       prover_driver : Driver.driver}
 
-type loaded_provers = loaded_prover option PHstr.t
+type loaded_provers = loaded_prover option PHprover.t
 
 type 'a env_session = private
     { env : Env.env;
@@ -186,14 +170,8 @@ type 'a env_session = private
       loaded_provers : loaded_provers;
       session : 'a session}
 
-val load_prover : 'a env_session -> prover -> loaded_prover option
+val load_prover : 'a env_session -> Whyconf.prover -> loaded_prover option
 (** load a prover *)
-
-val is_prover_known : 'a env_session -> prover -> bool
-(** test if a prover is detected *)
-
-val get_known_provers : 'a env_session -> Sprover.t
-(** get the set of known provers *)
 
 (** {2 Update session} *)
 
@@ -238,7 +216,7 @@ val proof_verified : 'key proof_attempt -> bool
 (** Return true if the proof is not obsolete and the result is valid *)
 
 
-val get_provers : 'a session -> Sprover.t
+val get_used_provers : 'a session -> Whyconf.Sprover.t
 (** Get the set of provers which appear in the session *)
 
 (** {2 Modificator} *)
@@ -276,7 +254,7 @@ val add_external_proof :
   timelimit:int ->
   edit:string option ->
   'key goal ->
-  prover ->
+  Whyconf.prover ->
   proof_attempt_status ->
   'key proof_attempt
 

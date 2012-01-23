@@ -16,6 +16,7 @@
 open Format
 open Why3
 open Util
+module C = Whyconf
 
 open Session
 
@@ -142,7 +143,7 @@ let rec stats_of_goal prefix_name stats goal =
             begin
               match result.Call_provers.pr_answer with
                 | Call_provers.Valid ->
-                    (prover.prover_name, result.Call_provers.pr_time) :: acc
+                    (prover.C.prover_name, result.Call_provers.pr_time) :: acc
                 | _ ->
                   acc
             end
@@ -176,11 +177,11 @@ let stats_of_file stats _ file =
   List.iter (stats_of_theory file stats) theories
 
 let fill_prover_data stats session =
-  Sprover.iter
+  C.Sprover.iter
     (fun prover ->
-      Hashtbl.add stats.prover_data prover.prover_id
-        (prover.prover_name ^ " " ^ prover.prover_version))
-    (get_provers session)
+      Hashtbl.add stats.prover_data prover.C.prover_id
+        (prover.C.prover_name ^ " " ^ prover.C.prover_version))
+    (get_used_provers session)
 
 let extract_stats_from_file stats fname =
   let project_dir = get_project_dir fname in

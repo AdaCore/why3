@@ -100,7 +100,7 @@ module Make(O: OBSERVER) : sig
   val run_prover :
     O.key env_session -> t ->
     context_unproved_goals_only:bool ->
-    timelimit:int -> prover -> O.key any -> unit
+    timelimit:int -> Whyconf.prover -> O.key any -> unit
     (** [run_prover p a] runs prover [p] on all goals under [a]
         the proof attempts are only scheduled for running, and they
         will be started asynchronously when processors are available
@@ -156,7 +156,7 @@ module Make(O: OBSERVER) : sig
 
   val check_all:
     O.key env_session -> t ->
-    callback:((Ident.ident * prover * report) list -> unit) -> unit
+    callback:((Ident.ident * Whyconf.prover * report) list -> unit) -> unit
     (** [check_all ()] reruns all the proofs of the session, and reports
         for all proofs the current result and the new one
         (does not change the session state)

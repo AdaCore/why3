@@ -21,6 +21,7 @@
 open Format
 open Why3
 module S = Session
+module C = Whyconf
 
 let includes = ref []
 let file = ref None
@@ -183,7 +184,7 @@ let init =
         | S.File f -> Filename.basename f.S.file_name
         | S.Proof_attempt a ->
           let p = a.S.proof_prover in
-          p.S.prover_name ^ " " ^ p.S.prover_version
+          p.C.prover_name ^ " " ^ p.C.prover_version
         | S.Transf tr -> tr.S.transf_name
     in
     (* eprintf "Item '%s' loaded@." name *)
@@ -339,7 +340,7 @@ let rec provers_latex_stats provers theory =
   S.theory_iter_proof_attempt (fun a ->
     Hashtbl.replace provers a.S.proof_prover a.S.proof_prover) theory
 
-let prover_name a = a.S.prover_name ^ " " ^ a.S.prover_version
+let prover_name a = a.C.prover_name ^ " " ^ a.C.prover_version
 
 let protect s =
   let b = Buffer.create 7 in
@@ -498,7 +499,7 @@ let print_head n depth provers fmt =
         (depth + 1)
   else
     fprintf fmt "\\hline Proof obligations ";
-  List.iter (fun a -> fprintf fmt "& \\provername{%s} " a.S.prover_name)
+  List.iter (fun a -> fprintf fmt "& \\provername{%s} " a.C.prover_name)
     provers;
   fprintf fmt "\\\\ @."
 
@@ -549,7 +550,7 @@ let theory_latex_stat n table dir t =
   let provers = Hashtbl.fold (fun _ pr acc -> pr :: acc)
     provers [] in
   let provers =
-    List.sort (fun p1 p2 -> String.compare p1.S.prover_name p2.S.prover_name)
+    List.sort (fun p1 p2 -> String.compare p1.C.prover_name p2.C.prover_name)
       provers in
   let depth = theory_depth  t in
   let name = t.S.theory_name.Ident.id_string in
@@ -571,7 +572,7 @@ let print_latex_statistics n table dir session =
   S.PHstr.iter (fun _ f -> file_latex_stat n table dir f) files
 
 let print_report (g,p,r) =
-  printf "   goal '%s', prover '%a': " g.Ident.id_string S.print_prover p;
+  printf "   goal '%s', prover '%a': " g.Ident.id_string C.print_prover p;
   match r with
   | M.Result(new_res,old_res) ->
     (* begin match !opt_smoke with *)
