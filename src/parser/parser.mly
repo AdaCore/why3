@@ -1003,6 +1003,8 @@ program_decl:
     { Dlogic $1 }
 | LET lident_rich_pgm labels list1_type_v_binder opt_cast EQUAL triple
     { Dlet (add_lab $2 $3, mk_expr_i 7 (Efun ($4, cast_body $5 $7))) }
+| LET lident_rich_pgm labels EQUAL qualid
+    { Dlet (add_lab $2 $3, mk_expr_i 5 (Eident $5)) }
 | LET lident_rich_pgm labels EQUAL FUN list1_type_v_binder ARROW triple
     { Dlet (add_lab $2 $3, mk_expr_i 8 (Efun ($6, $8))) }
 | LET REC list1_recfun_sep_and
