@@ -36,7 +36,7 @@ let utkp provers pu () =
   let _,name,version = unknown_to_known_provers provers pu in
   version@name
 
-let convert_unknown_prover ~keygen env_session =
+let convert_unknown_prover ?(remove_converted=false) ~keygen env_session =
   let known_provers = get_provers env_session.whyconf in
   let provers = get_used_provers env_session.session in
   let unknown_provers = Mprover.set_diff provers known_provers in
@@ -46,9 +46,11 @@ let convert_unknown_prover ~keygen env_session =
       Mprover.mapi (utkp known_provers) unknown_provers in
     session_iter_proof_attempt (fun pr ->
       let pks = Mprover.find_default pr.proof_prover [] unknown_provers in
+      let converted = ref false in
       List.iter (fun pk ->
         (** If such a prover already exists we add nothing *)
         if not (PHprover.mem pr.proof_parent.goal_external_proofs pk) then
+          converted := true;
           ignore (add_external_proof
                     ~keygen
                     ~obsolete:pr.proof_obsolete
@@ -57,7 +59,10 @@ let convert_unknown_prover ~keygen env_session =
                     pr.proof_parent
                     pk
                     pr.proof_state)
-      ) pks) env_session.session
+      ) pks;
+      (** pks = [] (!converted = false) also for the one which are known *)
+      if remove_converted && !converted then Session.remove_external_proof pr
+    ) env_session.session
   end
 
 (** filter the proof attempt *)

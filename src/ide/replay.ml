@@ -33,7 +33,6 @@ let opt_longtable = ref false
 let opt_force = ref false
 let opt_convert_unknown_provers = ref false
 
-
 (** {2 Smoke detector} *)
 
 type smoke_detector =
@@ -77,7 +76,8 @@ let spec = Arg.align [
    Arg.Set opt_longtable,
    " produce latex statistics using longtable package") ;
   "--convert-unknown-provers", Arg.Set opt_convert_unknown_provers,
-  " try to find compatible provers for all unknown provers";
+  " try to find compatible provers for all unknown provers. The external \
+proof which have been converted are removed";
   Debug.Opt.desc_debug_list;
   Debug.Opt.desc_shortcut "parse_only" "--parse-only" " Stop after parsing";
   Debug.Opt.desc_shortcut
@@ -629,9 +629,12 @@ session NOT updated)@." n m
               printf " %d/%d@." n m ;
             if !opt_stats && n<m then print_statistics files;
             eprintf "Everything replayed OK.@.";
-            if found_obs && (n=m || !opt_force) then
+            if (!opt_convert_unknown_provers || found_obs)
+              && (n=m || !opt_force) then
               begin
-                eprintf "Updating obsolete session...@?";
+                eprintf "Updating %s%ssession...@?"
+                (if !opt_convert_unknown_provers then "converted " else "")
+                (if found_obs then "obsolete " else "");
                 S.save_session session;
                 eprintf " done@."
               end;
@@ -686,11 +689,12 @@ let transform_smoke env_session =
 let () =
   try
     eprintf "Opening session...@?";
-    let session = S.read_session project_dir in
     let env_session,found_obs =
+      let session = S.read_session project_dir in
       M.update_session ~allow_obsolete:true session env config in
     transform_smoke env_session;
-    if !opt_convert_unknown_provers then M.convert_unknown_prover env_session;
+    if !opt_convert_unknown_provers then
+        M.convert_unknown_prover ~remove_converted:true env_session;
     let sched =
       M.init (Whyconf.running_provers_max (Whyconf.get_main config)) in
     if found_obs then begin
