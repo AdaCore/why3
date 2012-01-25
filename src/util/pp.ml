@@ -173,6 +173,12 @@ let sprintf p =
   let fmt = formatter_of_buffer b in
   kfprintf (fun fmt -> Format.pp_print_flush fmt (); Buffer.contents b) fmt p
 
+let sprintf_wnl p =
+  let b = Buffer.create 100 in
+  let fmt = formatter_of_buffer b in
+  wnl fmt;
+  kfprintf (fun fmt -> Format.pp_print_flush fmt (); Buffer.contents b) fmt p
+
 
 module Ansi =
   struct

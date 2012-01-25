@@ -247,8 +247,8 @@ let () =
   if !opt_list_provers then begin
     opt_list := true;
     let config = read_config !opt_config in
-    let print fmt prover _ = fprintf fmt "%s (%s)@\n"
-      prover.prover_id prover.prover_name in
+    let print fmt prover pc = fprintf fmt "%s (%a)@\n"
+      pc.id print_prover prover in
     let print fmt m = Mprover.iter (print fmt) m in
     let provers = get_provers config in
     printf "@[<hov 2>Known provers:@\n%a@]@." print provers

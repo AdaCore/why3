@@ -155,8 +155,11 @@ let detect_exec main data com =
                      supported, use it at your own risk!@." nam ver
           end;
         let c = make_command com data.prover_command in
-        Some {name = data.prover_name;
-              version = ver;
+        let prover = {Whyconf.prover_name = data.prover_name;
+                      prover_version = ver;
+                      prover_altern = ""} in
+        Some {prover = prover;
+              id = data.prover_id;
               command = c;
               driver  = Filename.concat (datadir main) data.prover_driver;
               editor = data.prover_editor;
@@ -180,10 +183,7 @@ let detect_prover main acc l =
       with Not_found -> None
     in
     let prover = Util.list_first detect_execs l in
-    let prover_id = {Whyconf.prover_id = prover_id;
-                     prover_name = prover.name;
-                     prover_version = prover.version} in
-    Mprover.add prover_id prover acc
+    Mprover.add prover.prover prover acc
   with Not_found ->
     eprintf "Prover %s not found.@." prover_id;
     acc

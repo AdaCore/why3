@@ -21,17 +21,20 @@ open Whyconf
 open Session
 
 (** convert unknown prover *)
-let unknown_to_known_provers provers pu () =
-  let module M = struct exception Perfect_prover_found of prover end in
-  try
-    Mprover.fold (fun pk _ acc ->
-      if pk.prover_name = pu.prover_name then begin
-        if pk.prover_version = pu.prover_version
-        then raise (M.Perfect_prover_found pk);
-        pk::acc
-      end
-      else acc) provers []
-  with M.Perfect_prover_found pk -> [pk]
+let unknown_to_known_provers provers pu =
+  Mprover.fold (fun pk _ (others,name,version) ->
+    match
+      pk.prover_name = pu.prover_name,
+      pk.prover_version = pu.prover_version,
+      pk.prover_altern = pu.prover_altern with
+        | false, _, _ -> pk::others, name, version
+        | _, false, _ -> others, pk::name, version
+        | _           -> others, name, pk::version
+  ) provers ([],[],[])
+
+let utkp provers pu () =
+  let _,name,version = unknown_to_known_provers provers pu in
+  version@name
 
 let convert_unknown_prover ~keygen env_session =
   let known_provers = get_provers env_session.whyconf in
@@ -40,7 +43,7 @@ let convert_unknown_prover ~keygen env_session =
   if not (Sprover.is_empty unknown_provers) then begin
     (** construct the list of compatible provers for each unknown provers *)
     let unknown_provers =
-      Mprover.mapi (unknown_to_known_provers known_provers) unknown_provers in
+      Mprover.mapi (utkp known_provers) unknown_provers in
     session_iter_proof_attempt (fun pr ->
       let pks = Mprover.find_default pr.proof_prover [] unknown_provers in
       List.iter (fun pk ->

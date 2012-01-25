@@ -549,6 +549,10 @@ let init =
          | S.Transf tr -> tr.S.transf_name);
     notify any
 
+let unknown_prover = Gconfig.unknown_prover gconfig
+
+let replace_prover = Gconfig.replace_prover gconfig
+
    end)
 
 
@@ -556,6 +560,7 @@ let init =
 (* opening database *)
 (********************)
 
+(** TODO remove that should done only in session *)
 let project_dir, file_to_read =
   if Sys.file_exists fname then
     begin
@@ -1358,8 +1363,8 @@ let edit_selected_row r =
     | S.File _file ->
         ()
     | S.Proof_attempt a ->
-        M.edit_proof !env_session sched ~default_editor:gconfig.default_editor
-          ~project_dir a
+        M.edit_proof
+          !env_session sched ~default_editor:gconfig.default_editor a
     | S.Transf _ -> ()
 
 let edit_current_proof () =

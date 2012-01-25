@@ -129,6 +129,10 @@ and 'a session = private
 val print_session : Format.formatter -> 'a session -> unit
 (** Print a session with a pstree format (cf Tree module) *)
 
+val print_attempt_status : Format.formatter -> proof_attempt_status -> unit
+
+val print_external_proof : Format.formatter -> 'key proof_attempt -> unit
+
 val create_session : string -> 'key session
 (** create a new_session in the given directory. The directory is
     created if it doesn't exists yet. Don't change the current
@@ -268,7 +272,44 @@ val set_proof_state :
 
 val set_edited_as : string option -> 'key proof_attempt -> unit
 
+val update_edit_external_proof :
+  'key env_session -> 'key proof_attempt -> string
+(** return the absolute path of the edited file update with the
+    current goal *)
+
+
 val set_timelimit : int -> 'key proof_attempt -> unit
+
+val copy_external_proof :
+  ?notify:'key notify ->
+  keygen:'key keygen ->
+  ?obsolete:bool ->
+  ?timelimit:int ->
+  ?edit:string option ->
+  ?goal:'key goal ->
+  ?prover:Whyconf.prover ->
+  ?attempt_status:proof_attempt_status ->
+  ?env_session:'key env_session ->
+  ?session:'key session ->
+  'key proof_attempt -> 'key proof_attempt
+(** copy an external proof.
+    if env_session and session are given only env_session.session is
+    taken into account.
+    The edited file is copied and an env_session is not required if :
+    {ul
+    {- the goal is not modified}
+    {- the prover is not modified}
+    {- a session or env_session is given}
+    }
+    The edited file is regenerated if
+    {ul
+    {- the external proof contain an edited file}
+    {- an env_session is given}
+    {- the given goal (or the old one if not modified) contain a task}
+    }
+    In all the other case the resulting external proof is considered
+    not edited.
+*)
 
 (** {2 Transformation} *)
 

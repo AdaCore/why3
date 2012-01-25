@@ -81,3 +81,8 @@ val relativize_filename : string -> string -> string
 val absolutize_filename : string -> string -> string
 (** [absolutize_filename base filename] absolutize the filename
     [filename] according to [base] *)
+
+val uniquify : string -> string
+(** find filename that doesn't exists based on the given filename.
+    Be careful the file can be taken after the return of this function.
+*)

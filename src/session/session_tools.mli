@@ -21,6 +21,13 @@
 
 open Session
 
+val unknown_to_known_provers  :
+  Whyconf.config_prover Whyconf.Mprover.t ->
+  Whyconf.prover ->
+  Whyconf.Mprover.key list * Whyconf.Mprover.key list *
+    Whyconf.Mprover.key list
+(** return others, same name, same version *)
+
 val convert_unknown_prover : keygen:'a keygen -> 'a env_session -> unit
 (** try to add new proof_attempt with known provers for all proof
     attempt with unknown provers *)

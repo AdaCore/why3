@@ -85,9 +85,9 @@ val load_plugins : main -> unit
 (** {3 Prover's identifier} *)
 
 type prover =
-    { prover_id : string;
-      prover_name : string;
-      prover_version : string;
+    { prover_name : string; (* "Alt-Ergo" *)
+      prover_version : string; (* "2.95" *)
+      prover_altern : string; (* "special" *)
     }
     (** record of necessary data for a given external prover
         In the future prover_id will disappear.
@@ -103,10 +103,10 @@ module Hprover  : Hashtbl.S with type key = prover
 (** {3 Prover configuration} *)
 
 type config_prover = {
-  name    : string;   (* "Alt-Ergo v2.95 (special)" *)
+  prover : prover;  (* unique name for session *)
+  id      : string; (* unique name for command line *)
   command : string;   (* "exec why-limit %t %m alt-ergo %f" *)
   driver  : string;   (* "/usr/local/share/why/drivers/ergo-spec.drv" *)
-  version : string;   (* "v2.95" *)
   editor  : string;   (* Dedicated editor *)
   interactive : bool; (* Interative theorem prover *)
 }

@@ -62,6 +62,18 @@ module type OBSERVER = sig
   val notify : key any -> unit
     (** notify modification of node of the session *)
 
+  val unknown_prover : key env_session -> Whyconf.prover ->
+    Whyconf.prover option
+    (** When a prover must be called on a task but it is currently
+      unknown another prover can be used instead. (the proof_attempt
+      will have the new prover) *)
+
+  val replace_prover : key proof_attempt -> key proof_attempt -> bool
+  (** If the previous function give a prover which already have a
+      proof attempt attached to the goal, this function is fired. If
+      [replace_prover to_be_removed to_be_copied] return [true] the
+      proof_attempt is replaced *)
+
 end
 
 (** {2 Main functor} *)
@@ -121,7 +133,7 @@ module Make(O: OBSERVER) : sig
 
   val edit_proof :
     O.key env_session -> t ->
-    default_editor:string -> project_dir:string ->
+    default_editor:string ->
     O.key proof_attempt -> unit
     (** edit the given proof attempt using the appropriate editor *)
 

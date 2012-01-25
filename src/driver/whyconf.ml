@@ -54,34 +54,37 @@ let default_conf_file =
 (* Prover *)
 
 type prover =
-    { prover_id : string;
-      prover_name : string;
+    { prover_name : string;
       prover_version : string;
+      prover_altern : string;
     }
 
 let print_prover fmt p =
-  Format.fprintf fmt "%s(%s)" p.prover_name p.prover_version
+  Format.fprintf fmt "%s(%s%s%s)"
+    p.prover_name p.prover_version
+    (if p.prover_altern = "" then "" else " ") p.prover_altern
 
 module Prover = struct
   type t = prover
   let compare s1 s2 =
     if s1 == s2 then 0 else
-    let c = String.compare s1.prover_id s2.prover_id in
-    if c <> 0 then c else
     let c = String.compare s1.prover_name s2.prover_name in
     if c <> 0 then c else
     let c = String.compare s1.prover_version s2.prover_version in
+    if c <> 0 then c else
+    let c = String.compare s1.prover_altern s2.prover_altern in
     c
 
   let equal s1 s2 =
-    s1.prover_id = s2.prover_id &&
-      s1.prover_name = s2.prover_name &&
-      s1.prover_version = s2.prover_version
+    s1 == s2 ||
+      (s1.prover_name = s2.prover_name &&
+       s1.prover_version = s2.prover_version &&
+       s1.prover_altern = s2.prover_altern)
 
   let hash s1 =
-    2 * Hashtbl.hash s1.prover_id +
-      3 * Hashtbl.hash s1.prover_name +
-      5 * Hashtbl.hash s1.prover_version
+      2 * Hashtbl.hash s1.prover_name +
+      3 * Hashtbl.hash s1.prover_version +
+      5 * Hashtbl.hash s1.prover_altern
 
 
 end
@@ -93,10 +96,10 @@ module Hprover = Hashtbl.Make(Prover)
 (* Configuration file *)
 
 type config_prover = {
-  name    : string;   (* "Alt-Ergo v2.95 (special)" *)
-  command : string;   (* "exec why-limit %t %m alt-ergo %f" *)
-  driver  : string;   (* "/usr/local/share/why/drivers/ergo-spec.drv" *)
-  version : string;   (* "v2.95" *)
+  prover  : prover;
+  id      : string;
+  command : string;
+  driver  : string;
   editor  : string;
   interactive : bool;
 }
@@ -197,35 +200,41 @@ let set_main rc main =
   let section = set_stringl section "plugin" main.plugins in
   set_section rc "main" section
 
-let set_prover prover_id prover family =
+exception NonUniqueId
+
+let set_prover _ prover (ids,family) =
+  if Sstr.mem prover.id ids then raise NonUniqueId;
   let section = empty_section in
-  let section = set_string section "name" prover.name in
+  let section = set_string section "name" prover.prover.prover_name in
   let section = set_string section "command" prover.command in
   let section = set_string section "driver" prover.driver in
-  let section = set_string section "version" prover.version in
+  let section = set_string section "version" prover.prover.prover_version in
+  let section = set_string ~default:""
+    section "alternative" prover.prover.prover_altern in
   let section = set_string section "editor" prover.editor in
   let section = set_bool section "interactive" prover.interactive in
-  (prover_id.prover_id,section)::family
+  (Sstr.add prover.id ids,(prover.id,section)::family)
 
 let set_provers rc provers =
-  let family = Mprover.fold set_prover provers [] in
+  let _,family = Mprover.fold set_prover provers (Sstr.empty,[]) in
   set_family rc "prover" family
 
 let absolute_filename = Sysutil.absolutize_filename
 
 let load_prover dirname provers (id,section) =
   let version = get_string ~default:"" section "version" in
+  let altern = get_string ~default:"" section "alternative" in
   let name = get_string section "name" in
   let prover =
-    { prover_id = id;
-      prover_name = name;
-      prover_version = version }
+    { prover_name = name;
+      prover_version = version;
+      prover_altern = altern}
   in
   Mprover.add prover
-    { name    = name;
+    { id = id;
+      prover  = prover;
       command = get_string section "command";
       driver  = absolute_filename dirname (get_string section "driver");
-      version = version;
       editor  = get_string ~default:"" section "editor";
       interactive = get_bool ~default:false section "interactive";
     } provers
@@ -261,6 +270,8 @@ let () = Exn_printer.register (fun fmt e -> match e with
       Format.fprintf fmt "error in config file %s: %s" f s
   | WrongMagicNumber ->
       Format.fprintf fmt "outdated config file; rerun why3config"
+  | NonUniqueId ->
+    Format.fprintf fmt "InternalError : two provers share the same id"
   | _ -> raise e)
 
 let get_config (filename,rc) =
@@ -330,7 +341,7 @@ exception ProverAmbiguity of config * string * prover list
 
 let prover_by_id whyconf id =
   let potentials =
-    Mprover.filter (fun p _ -> p.prover_id = id) whyconf.provers in
+    Mprover.filter (fun _ p -> p.id = id) whyconf.provers in
   match Mprover.keys potentials with
     | [] -> raise (ProverNotFound(whyconf,id))
     | [_] -> snd (Mprover.choose potentials)

@@ -26,6 +26,13 @@ open Whyconf
 
 (* config file *)
 
+type altern_provers = prover option Mprover.t
+
+(** Todo do something generic perhaps*)
+type conf_replace_prover =
+  | CRP_Ask
+  | CRP_Not_Obsolete
+
 type t =
     { mutable window_width : int;
       mutable window_height : int;
@@ -48,6 +55,8 @@ type t =
       (** colors *)
       mutable env : Env.env;
       mutable config : Whyconf.config;
+      mutable altern_provers : altern_provers;
+      mutable replace_prover : conf_replace_prover;
     }
 
 
@@ -66,6 +75,7 @@ type ide = {
   ide_goal_color : string;
   ide_error_color : string;
   ide_default_editor : string;
+  ide_replace_prover : conf_replace_prover;
 }
 
 let default_ide =
@@ -82,9 +92,10 @@ let default_ide =
     ide_premise_color = "chartreuse";
     ide_goal_color = "gold";
     ide_error_color = "orange";
+    ide_replace_prover = CRP_Ask;
     ide_default_editor =
       try Sys.getenv "EDITOR" ^ " %f"
-      with Not_found -> "editor %f";
+      with Not_found -> "editor %f"
   }
 
 let load_ide section =
@@ -106,7 +117,8 @@ let load_ide section =
     ide_show_locs =
       get_bool section ~default:default_ide.ide_show_locs "print_locs";
     ide_show_time_limit =
-      get_bool section ~default:default_ide.ide_show_time_limit "print_time_limit";
+      get_bool section ~default:default_ide.ide_show_time_limit
+        "print_time_limit";
     ide_saving_policy =
       get_int section ~default:default_ide.ide_saving_policy "saving_policy";
     ide_premise_color =
@@ -121,6 +133,12 @@ let load_ide section =
     ide_default_editor =
       get_string section ~default:default_ide.ide_default_editor
         "default_editor";
+    ide_replace_prover =
+      match get_stringo section "replace_prover" with
+        | None -> default_ide.ide_replace_prover
+        | Some "never not obsolete" -> CRP_Not_Obsolete
+        | Some "ask" | Some _ -> CRP_Ask
+
   }
 
 
@@ -134,11 +152,31 @@ let set_locs_flag =
   fun b ->
     (if b then Debug.set_flag else Debug.unset_flag) fl
 
+let load_altern alterns (_,section) =
+  let unknown =
+    {prover_name = get_string section "unknown_name";
+     prover_version = get_string section "unknown_version";
+     prover_altern = get_string ~default:"" section "unknown_alternative"
+    } in
+  let name = get_stringo section "known_name" in
+  let known = match name with
+    | None -> None
+    | Some name ->
+      Some
+        {prover_name = name;
+         prover_version = get_string section "known_version";
+         prover_altern = get_string ~default:"" section "known_alternative";
+        } in
+  Mprover.add unknown known alterns
+
 let load_config config =
   let main = get_main config in
   let ide  = match get_section config "ide" with
     | None -> default_ide
     | Some s -> load_ide s in
+  let alterns =
+    List.fold_left load_altern
+      Mprover.empty (get_family config "alternative_prover") in
   (* temporary sets env to empty *)
   let env = Env.create_env [] in
   set_labels_flag ide.ide_show_labels;
@@ -161,8 +199,24 @@ let load_config config =
     max_running_processes = Whyconf.running_provers_max main;
     default_editor = ide.ide_default_editor;
     config         = config;
-    env            = env
+    env            = env;
+    altern_provers = alterns;
+    replace_prover = ide.ide_replace_prover;
   }
+
+let save_altern unknown known (id,family) =
+  let alt = empty_section in
+  let alt = set_string alt "unknown_name" unknown.prover_name in
+  let alt = set_string alt "unknown_version" unknown.prover_version in
+  let alt =
+    set_string ~default:"" alt "unknown_alternative" unknown.prover_altern in
+  let alt = match known with
+    | None -> alt
+    | Some known ->
+      let alt = set_string alt "known_name" known.prover_name in
+      let alt = set_string alt "known_version" known.prover_version in
+      set_string ~default:"" alt "known_alternative" known.prover_altern in
+  (id+1,(sprintf "alt%i" id,alt)::family)
 
 let save_config t =
   let config = t.config in
@@ -170,6 +224,8 @@ let save_config t =
     (set_limits (get_main config)
        t.time_limit t.mem_limit t.max_running_processes)
   in
+  let _,alterns = Mprover.fold save_altern t.altern_provers (0,[]) in
+  let config = set_family config "alternative_prover" alterns in
   let ide = empty_section in
   let ide = set_int ide "window_height" t.window_height in
   let ide = set_int ide "window_width" t.window_width in
@@ -185,6 +241,10 @@ let save_config t =
   let ide = set_string ide "goal_color" t.goal_color in
   let ide = set_string ide "error_color" t.error_color in
   let ide = set_string ide "default_editor" t.default_editor in
+  let ide = set_string ~default:"ask" ide "replace_prover"
+    (match t.replace_prover with
+      | CRP_Ask -> "ask"
+      | CRP_Not_Obsolete -> "never not obsolete")  in
   let config = set_section config "ide" ide in
 (* TODO: store newly detected provers !
   let config = set_provers config
@@ -388,6 +448,48 @@ let show_about_window () =
   let ( _ : GWindow.Buttons.about) = about_dialog#run () in
   about_dialog#destroy ()
 
+let alternatives_frame c (notebook:GPack.notebook) =
+  let label = GMisc.label ~text:"Alternative provers" () in
+  let page =
+    GPack.vbox ~homogeneous:false ~packing:
+      (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) ()
+  in
+  let replace_prover =
+    GButton.check_button ~label:"never replace not obsolete external proof"
+      ~packing:page#add ()
+      ~active:(c.replace_prover = CRP_Not_Obsolete)
+  in
+  let (_ : GtkSignal.id) =
+    replace_prover#connect#toggled ~callback:
+      (fun () ->
+        if replace_prover#active
+        then c.replace_prover <- CRP_Not_Obsolete
+        else c.replace_prover <- CRP_Ask
+      )
+  in
+  let frame =
+    GBin.frame ~label:"Click for removing an association"
+      ~packing:page#add ()
+  in
+  let box =
+    GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
+      ~packing:frame#add ()
+  in
+  let remove button unknown () =
+    button#destroy ();
+    c.altern_provers <- Mprover.remove unknown c.altern_provers in
+  let iter unknown known =
+    let label =
+      match known with
+        | None -> Pp.sprintf_wnl "%a ignored" print_prover unknown
+        | Some known ->
+          Pp.sprintf_wnl "%a -> %a" print_prover unknown print_prover known in
+    let button = GButton.button ~label ~packing:box#add () in
+    let (_ : GtkSignal.id) =
+      button#connect#released ~callback:(remove button unknown)
+    in () in
+  Mprover.iter iter c.altern_provers
+
 let preferences c =
   let dialog = GWindow.dialog ~title:"Why3: preferences" () in
   let vbox = dialog#vbox in
@@ -570,6 +672,8 @@ let preferences c =
   let (_ : GtkSignal.id) =
     choice2#connect#toggled ~callback:(set_saving_policy 2)
   in
+  (* page 4 *)
+  alternatives_frame c notebook;
   (* buttons *)
   dialog#add_button "Close" `CLOSE ;
   let ( _ : GWindow.Buttons.about) = dialog#run () in
@@ -591,7 +695,86 @@ let run_auto_detection gconfig =
 
 (* let () = eprintf "[Info] end of configuration initialization@." *)
 
-let read_config conf_file = read_config conf_file; init ()
+let unknown_prover c eS unknown =
+  try Mprover.find unknown c.altern_provers
+  with Not_found ->
+  let others,names,versions = Session_tools.unknown_to_known_provers
+  (Whyconf.get_provers eS.Session.whyconf) unknown in
+  let dialog = GWindow.dialog ~title:"Why3: Unknown prover" () in
+  let vbox = dialog#vbox in
+  let text = Pp.sprintf "The prover %a is unknown. Could you please choose \
+an alternative?" Whyconf.print_prover unknown in
+  let _label1 = GMisc.label ~text ~packing:vbox#add () in
+  let frame = vbox in
+  let prover_choosed = ref None in
+  let set_prover prover () = prover_choosed := Some prover in
+  let box =
+    GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
+      ~packing:frame#add ()
+  in
+  let choice0 = GButton.radio_button
+    ~label:"ignore this prover"
+    ~active:true
+    ~packing:box#add () in
+  ignore (choice0#connect#toggled
+            ~callback:(fun () -> prover_choosed := None));
+  let alternatives_section text alternatives =
+    if alternatives <> [] then
+    let _label1 = GMisc.label ~text ~packing:frame#add () in
+    let box =
+      GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
+        ~packing:frame#add ()
+    in
+    let iter_alter prover =
+      let choice = GButton.radio_button
+        ~label:(Pp.string_of_wnl print_prover prover)
+        ~group:choice0#group
+        ~active:false
+        ~packing:box#add () in
+      ignore (choice#connect#toggled ~callback:(set_prover prover))
+    in
+    List.iter iter_alter alternatives in
+  alternatives_section "Same name and same version:" versions;
+  alternatives_section "Same name and different version:" names;
+  alternatives_section "Different name and different version:" others;
+  let save =
+    GButton.check_button
+      ~label:"always use this association"
+      ~packing:frame#add ()
+      ~active:true
+  in
+  dialog#add_button "Ok" `CLOSE ;
+  ignore (dialog#run ());
+  dialog#destroy ();
+  if save#active then
+    c.altern_provers <- Mprover.add unknown !prover_choosed c.altern_provers;
+  !prover_choosed
+
+let replace_prover c to_be_removed to_be_copied =
+  if not to_be_removed.Session.proof_obsolete &&
+    c.replace_prover = CRP_Not_Obsolete
+  then false
+  else
+  let dialog = GWindow.dialog ~title:"Why3: replace proof" () in
+  let vbox = dialog#vbox in
+  let text = Pp.sprintf
+    "Do you want to replace the external proof %a by the external proof %a \
+     (with the prover of the first)"
+    Session.print_external_proof to_be_removed
+    Session.print_external_proof to_be_copied in
+  let _label1 = GMisc.label ~text ~line_wrap:true ~packing:vbox#add () in
+  dialog#add_button "Replace" `Replace;
+  dialog#add_button "Keep" `Keep;
+  dialog#add_button "Never replace an external proof valid and not obsolete"
+    `Never;
+  let res = match dialog#run () with
+    | `Replace -> true
+    | `Never   -> c.replace_prover <- CRP_Not_Obsolete; false
+    | `DELETE_EVENT | `Keep -> false in
+  dialog#destroy ();
+  res
+
+  let read_config conf_file = read_config conf_file; init ()
 
 (*
 Local Variables:

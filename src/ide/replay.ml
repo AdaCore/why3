@@ -211,6 +211,9 @@ let notify _any = ()
           (Session.transformation_id tr.M.transf) tr.M.transf_proved
 *)
 
+let unknown_prover _ _ = None
+
+let replace_prover _ _ = false
 
    end)
 

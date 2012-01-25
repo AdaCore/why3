@@ -19,6 +19,7 @@
 
 open Stdlib
 open Debug
+open Util
 
 module Mprover = Whyconf.Mprover
 module Sprover = Whyconf.Sprover
@@ -375,9 +376,11 @@ let save_file provers fmt _ f =
   fprintf fmt "@]@\n</file>"
 
 let save_prover fmt p (provers,id) =
-  fprintf fmt "@\n@[<v 1><prover@ id=\"%i\"@ prover_id=\"%s\" \
-name=\"%s\"@ version=\"%s\"/>@]"
-    id p.C.prover_id p.C.prover_name p.C.prover_version;
+  fprintf fmt "@\n@[<v 1><prover@ id=\"%i\"@ \
+name=\"%s\"@ version=\"%s\"%a/>@]"
+    id p.C.prover_name p.C.prover_version
+    (fun fmt s -> if s <> "" then fprintf fmt "@ alternative=\"%s\"" s)
+    p.C.prover_altern;
   Mprover.add p id provers, id+1
 
 let save fname session =
@@ -498,6 +501,7 @@ type 'a keygen = ?parent:'a -> unit -> 'a
 let add_external_proof
     ?(notify=notify)
     ~(keygen:'a keygen) ~obsolete ~timelimit ~edit (g:'a goal) p result =
+  assert (edit <> Some "");
   let key = keygen ~parent:g.goal_key () in
   let a = { proof_prover = p;
             proof_parent = g;
@@ -749,6 +753,7 @@ and load_proof_or_transf ~old_provers mg a =
 
         in
         let edit = load_option "edited" a in
+        let edit = match edit with None | Some "" -> None | _ -> edit in
         let obsolete = bool_attribute "obsolete" a true in
         let timelimit = int_attribute "timelimit" a (-1) in
         if timelimit < 0 then begin
@@ -807,13 +812,14 @@ let load_file session old_provers f =
              (load_theory ~old_provers mf) [] f.Xml.elements);
         old_provers
     | "prover" ->
+      (** The id is just for the session file *)
         let id = string_attribute "id" f in
-        let prover_id = string_attribute_def "prover_id" f id in
         let name = string_attribute "name" f in
         let version = string_attribute "version" f in
-        let p = {C.prover_id = prover_id;
-                 prover_name = name;
-                 prover_version = version} in
+        let altern = string_attribute_def "alternative" f "" in
+        let p = {C.prover_name = name;
+                   prover_version = version;
+                   prover_altern = altern} in
         Util.Mstr.add id p old_provers
     | s ->
         eprintf "[Warning] Session.load_file: unexpected element '%s'@." s;
@@ -1064,6 +1070,135 @@ let () = Exn_printer.register
           "A goal doesn't contain a task but here it needs one"
       | _ -> raise exn)
 
+
+let ft_of_th th =
+  let fn = Filename.basename th.theory_parent.file_name in
+  let fn = try Filename.chop_extension fn with Invalid_argument _ -> fn in
+  (fn, th.theory_name.Ident.id_string)
+
+let rec ft_of_goal g =
+  match g.goal_parent with
+    | Parent_transf tr -> ft_of_goal tr.transf_parent
+    | Parent_theory th -> ft_of_th th
+
+let ft_of_pa a =
+  ft_of_goal a.proof_parent
+
+(** TODO see with Undone Edited
+    But since it will be perhaps removed...
+ *)
+let copy_external_proof
+    ?notify ~keygen ?obsolete ?timelimit ?edit
+    ?goal ?prover ?attempt_status ?env_session ?session a =
+  let session = match env_session with
+    | Some eS -> Some eS.session
+    | _ -> session in
+  let obsolete = default_option a.proof_obsolete obsolete in
+  let timelimit = default_option a.proof_timelimit timelimit in
+  let pas = default_option a.proof_state attempt_status in
+  let ngoal = default_option a.proof_parent goal in
+  let nprover = match prover with
+    | None -> a.proof_prover
+    | Some prover -> prover in
+  (** copy or generate the edit file if needed *)
+  let edit =
+    match edit, a.proof_edited_as, session with
+      | Some edit, _, _ -> edit
+      | _, None, _ -> None
+      | _, _, None -> (** In the other case a session is needed *)
+        None
+      | _, Some file, Some session ->
+        assert (file != "");
+        (** Copy the edited file *)
+        let dir = session.session_dir in
+        let file = Filename.concat dir file in
+        if not (Sys.file_exists file) then None else
+        match prover,goal, ngoal.goal_task, env_session with
+          | None,None,_,_ ->
+            let dst_file = Sysutil.uniquify file in
+            Sysutil.copy_file file dst_file;
+            let dst_file = Sysutil.relativize_filename dir dst_file in
+            Some dst_file
+          | (_, _, None,_)| (_, _, _, None) ->
+            (** In the other cases an env_session and a task are needed *)
+            None
+          | _, _, Some task, Some env_session ->
+            match load_prover env_session nprover with
+              | None -> None
+              | Some prover_conf ->
+            let (fn,tn) = ft_of_goal ngoal in
+            let driver = prover_conf.prover_driver in
+            let dst_file = Driver.file_of_task driver fn tn task in
+            let dst_file = Filename.concat dir dst_file in
+            let dst_file = Sysutil.uniquify dst_file in
+            let old = open_in file in
+            let ch = open_out dst_file in
+            let fmt = formatter_of_out_channel ch in
+            Driver.print_task ~old driver fmt task;
+            close_in old;
+            close_out ch;
+            let dst_file = Sysutil.relativize_filename dir dst_file in
+            Some (dst_file)
+  in
+  add_external_proof ?notify ~keygen
+    ~obsolete ~timelimit ~edit ngoal nprover pas
+
+exception UnloadableProver of Whyconf.prover
+
+let update_edit_external_proof env_session a =
+  let prover_conf = match load_prover env_session a.proof_prover with
+    | Some prover_conf -> prover_conf
+    | None -> raise (UnloadableProver a.proof_prover) in
+  let driver = prover_conf.prover_driver in
+  let goal = goal_task a.proof_parent in
+  let session_dir = env_session.session.session_dir in
+  let file =
+    match a.proof_edited_as with
+      | None ->
+        let (fn,tn) = ft_of_pa a in
+        let file = Driver.file_of_task driver fn tn goal in
+        let file = Filename.concat session_dir file in
+        let file = Sysutil.uniquify file in
+        let file = Sysutil.relativize_filename session_dir file in
+        set_edited_as (Some file) a;
+        if a.proof_state = Undone Unedited
+        then set_proof_state ~notify ~obsolete:a.proof_obsolete
+          (Undone Interrupted) a;
+        file
+      | Some f -> f
+  in
+  let file = Filename.concat session_dir file in
+  let old =
+    if Sys.file_exists file
+    then
+      begin
+        let backup = file ^ ".bak" in
+        if Sys.file_exists backup
+        then Sys.remove backup;
+        Sys.rename file backup;
+        Some(open_in backup)
+      end
+    else None
+  in
+  let ch = open_out file in
+  let fmt = formatter_of_out_channel ch in
+  Driver.print_task ?old driver fmt goal;
+  Util.option_iter close_in old;
+  close_out ch;
+  file
+
+let print_attempt_status fmt = function
+  | Undone _ -> pp_print_string fmt "Undone"
+  | Done pr -> Call_provers.print_prover_result fmt pr
+  | InternalFailure _ -> pp_print_string fmt "Failure"
+
+let print_external_proof fmt p =
+  fprintf fmt "%a - %a (%i)%s%s"
+    Whyconf.print_prover p.proof_prover
+    print_attempt_status p.proof_state
+    p.proof_timelimit
+    (if p.proof_obsolete then " obsolete" else "")
+    (if p.proof_edited_as <> None then " edited" else "")
 
 (***********************************************************)
 (**    Reload a session with the current transformation    *)
