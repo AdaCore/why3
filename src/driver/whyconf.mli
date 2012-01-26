@@ -89,9 +89,7 @@ type prover =
       prover_version : string; (* "2.95" *)
       prover_altern : string; (* "special" *)
     }
-    (** record of necessary data for a given external prover
-        In the future prover_id will disappear.
-    *)
+    (** record of necessary data for a given external prover *)
 
 val print_prover : Format.formatter -> prover -> unit
 (** Printer for prover *)
@@ -121,6 +119,9 @@ val set_provers : config -> config_prover Mprover.t -> config
 
 val is_prover_known : config -> prover -> bool
 (** test if a prover is detected *)
+
+exception ProverNotFound of config * string
+exception ProverAmbiguity of config * string * prover list
 
 val prover_by_id : config -> string -> config_prover
 

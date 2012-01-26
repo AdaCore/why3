@@ -161,18 +161,42 @@ let config : Whyconf.config = Whyconf.read_config None
 (* the [main] section of the config file *)
 let main : Whyconf.main = Whyconf.get_main config
 (* all the provers detected, from the config file *)
-let provers : Whyconf.config_prover Util.Mstr.t =
+let provers : Whyconf.config_prover Whyconf.Mprover.t =
   Whyconf.get_provers config
 \end{verbatim}
-The type \texttt{'a Util.Mstr.t} is a map indexed by strings. This map
-can provide the set of existing provers. In the following, we directly
+The type \texttt{'a Whyconf.Mprover.t} is a map indexed by provers. A
+provers is a record with a name, a version and an alternative description
+(if someone want to compare different command line options of the same
+provers for example). It's definition is in the module
+\texttt{Whyconf} :
+\begin{verbatim}
+type prover =
+    { prover_name : string; (* "Alt-Ergo" *)
+      prover_version : string; (* "2.95" *)
+      prover_altern : string; (* "special" *)
+    }
+\end{verbatim}
+The map \texttt{provers} provides the set of existing provers.
+In the following, we directly
 attempt to access the prover Alt-Ergo, which is known to be identified
 with id \texttt{"alt-ergo"}.
 \begin{verbatim}
 (* the [prover alt-ergo] section of the config file *)
 let alt_ergo : Whyconf.config_prover =
   try
-    Util.Mstr.find "alt-ergo" provers
+    Whyconf.prover_by_id config "alt-ergo"
+  with Whyconf.ProverNotFound _ ->
+    eprintf "Prover alt-ergo not installed or not configured@.";
+    exit 0
+\end{verbatim}
+We could also get a specific version with :
+\begin{verbatim}
+let alt_ergo : Whyconf.config_prover =
+  try
+    let prover = {Whyconf.prover_name = "Alt-Ergo";
+                  prover_version = "0.92.3";
+                  prover_altern = ""} in
+    Whyconf.Mprover.find prover provers
   with Not_found ->
     eprintf "Prover alt-ergo not installed or not configured@.";
     exit 0
