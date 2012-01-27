@@ -7,14 +7,14 @@ Hannes Mehnert, Filip Sieczkowski, Lars Birkedal, and Peter Sestoft
 VSTTE 2012
 *)
 
+(* Purely applicative binary trees with elements at the nodes *)
+
 theory Tree
 
   use export int.Int
   use export list.List
   use export list.Length
   use export list.Append
-
-  (* binary trees with elements at the nodes *)
 
   type elt = int
 
@@ -34,11 +34,11 @@ theory Tree
 
 end
 
+(* Purely applicative iterators over binary trees *)
+
 module Enum
 
   use import Tree
-
-  (* the left spine of a tree, as a bottom-up list *)
 
   type enum =
     | Done
@@ -49,8 +49,6 @@ module Enum
     | Next x r e -> Cons x (tree_elements r ++ enum_elements e)
   end
 
-  (* the enum of a tree [t], prepended to a given enum [e] *)
-
   let rec enum t e variant { length (tree_elements t) } =
     { }
     match t with
@@ -60,6 +58,8 @@ module Enum
     { enum_elements result = tree_elements t ++ enum_elements e }
 
 end
+
+(* Mutable iterators with a Java-like API *)
 
 module Iterator
 
@@ -86,6 +86,8 @@ module Iterator
     { old (elements i) = Cons result (elements i) }
 
 end
+
+(* Binary search trees *)
 
 module BSTree
 
@@ -114,6 +116,7 @@ module BSTree
     { result=True <-> mem x t }
 
   exception Already
+    (* bst_add raises exception Already when the element is already present *)
 
   let rec bst_add (x: elt) (t: tree) =
     { bst t }
@@ -129,6 +132,8 @@ module BSTree
     | Already -> { mem x t }
 
 end
+
+(* Imperative trees with add/contains/snapshot/iterator API *)
 
 module ITree
 
@@ -188,7 +193,6 @@ module Harness
        let _ = add t (x * 3) in
        ()
      done
-
 
 end
 
