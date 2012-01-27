@@ -1,0 +1,199 @@
+
+(*
+Snapshotable Trees
+
+Formalized Verification of Snapshotable Trees: Separation and Sharing
+Hannes Mehnert, Filip Sieczkowski, Lars Birkedal, and Peter Sestoft
+VSTTE 2012
+*)
+
+theory Tree
+
+  use export int.Int
+  use export list.List
+  use export list.Length
+  use export list.Append
+
+  (* binary trees with elements at the nodes *)
+
+  type elt = int
+
+  type tree =
+    | Empty
+    | Node tree elt tree
+
+  function tree_elements (t: tree) : list elt = match t with
+    | Empty -> Nil
+    | Node l x r -> tree_elements l ++ Cons x (tree_elements r)
+  end
+
+  predicate mem (x: elt) (t: tree) = match t with
+    | Empty -> false
+    | Node l y r -> mem x l || x = y || mem x r
+  end
+
+end
+
+module Enum
+
+  use import Tree
+
+  (* the left spine of a tree, as a bottom-up list *)
+
+  type enum =
+    | Done
+    | Next elt tree enum
+
+  function enum_elements (e: enum) : list elt = match e with
+    | Done -> Nil
+    | Next x r e -> Cons x (tree_elements r ++ enum_elements e)
+  end
+
+  (* the enum of a tree [t], prepended to a given enum [e] *)
+
+  let rec enum t e variant { length (tree_elements t) } =
+    { }
+    match t with
+    | Empty -> e
+    | Node l x r -> enum l (Next x r e)
+    end
+    { enum_elements result = tree_elements t ++ enum_elements e }
+
+end
+
+module Iterator
+
+  use import Tree
+  use import module Enum
+
+  type iterator = {| mutable it: enum |}
+
+  function elements (i: iterator) : list elt = enum_elements i.it
+
+  let create_iterator (t: tree) =
+    {}
+    {| it = enum t Done |}
+    { elements result = tree_elements t }
+
+  predicate hasNext (i: iterator) = i.it <> Done
+
+  let next (i: iterator) =
+    { hasNext i }
+    match i.it with
+    | Done -> absurd
+    | Next x r e -> i.it <- enum r e; x
+    end
+    { old (elements i) = Cons result (elements i) }
+
+end
+
+module BSTree
+
+  use export Tree
+
+  predicate lt_tree (x: elt) (t: tree) =
+    forall y: elt. mem y t -> y < x
+
+  predicate gt_tree (x: elt) (t: tree) =
+    forall y: elt. mem y t -> x < y
+
+  predicate bst (t: tree) =
+    match t with
+    | Empty -> true
+    | Node l x r -> bst l /\ bst r /\ lt_tree x l /\ gt_tree x r
+    end
+
+  let rec bst_mem (x: elt) (t: tree) =
+    { bst t }
+    match t with
+    | Empty ->
+        False
+    | Node l y r ->
+        if x < y then bst_mem x l else x = y || bst_mem x r
+    end
+    { result=True <-> mem x t }
+
+  exception Already
+
+  let rec bst_add (x: elt) (t: tree) =
+    { bst t }
+    match t with
+    | Empty ->
+        Node Empty x Empty
+    | Node l y r ->
+        if x = y then raise Already;
+        if x < y then Node (bst_add x l) y r else Node l y (bst_add x r)
+    end
+    { bst result /\ not (mem x t) /\
+      forall y: elt. mem y result <-> y=x || mem y t }
+    | Already -> { mem x t }
+
+end
+
+module ITree
+
+  use export module BSTree
+  use export module Iterator
+
+  type itree = {| mutable tree: tree |}
+
+  predicate inv (t: itree) = bst t.tree
+
+  let create () =
+    {}
+    {| tree = Empty |}
+    { inv result }
+
+  let contains (t: itree) (x: elt) =
+    { inv t }
+    bst_mem x t.tree
+    { result=True <-> mem x t.tree }
+
+  let add (t: itree) (x: elt) = 
+    { inv t }
+    try t.tree <- bst_add x t.tree; True
+    with Already -> False
+    end
+    { inv t /\ (result=False <-> mem x (old t.tree)) /\
+      forall y: elt. mem y t.tree <-> y=x || mem y (old t.tree) }
+
+  let snapshot (t: itree) =
+    { inv t }
+    {| tree = t.tree |}
+    { inv result }
+
+  let iterator (t: itree) =
+    { inv t }
+    create_iterator t.tree
+    { elements result = tree_elements t.tree }
+
+end
+
+module Harness
+
+  use import module ITree
+
+  let test () =
+     let t = create () in
+     let _ = add t 1 in
+     let _ = add t 2 in
+     let _ = add t 3 in
+     assert { mem 2 t.tree };
+     let s = snapshot t in
+     let it = iterator s in
+     while hasNext it do
+       invariant { inv t }
+       variant { length (elements it) }
+       let x = next it in
+       let _ = add t (x * 3) in
+       ()
+     done
+
+
+end
+
+(*
+Local Variables:
+compile-command: "unset LANG; make -C ../.. examples/programs/snapshotable_trees.gui"
+End:
+*)
