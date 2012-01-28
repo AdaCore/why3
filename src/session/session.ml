@@ -442,20 +442,14 @@ let get_explanation id task =
 type 'a notify = 'a any -> unit
 let notify : 'a notify = fun _ -> ()
 
-let check_file_verified notify f =
-  let b = List.for_all (fun t -> t.theory_verified) f.file_theories in
-  if f.file_verified <> b then begin
-    f.file_verified <- b;
-    notify (File f)
-  end
+let file_verified f =
+  List.for_all (fun t -> t.theory_verified) f.file_theories
 
-let check_theory_proved notify t =
-  let b = List.for_all (fun g -> g.goal_verified) t.theory_goals in
-  if t.theory_verified <> b then begin
-    t.theory_verified <- b;
-    notify (Theory t);
-    check_file_verified notify t.theory_parent
-  end
+let theory_verified t =
+  List.for_all (fun g -> g.goal_verified) t.theory_goals
+
+let transf_verified t =
+  List.for_all (fun g -> g.goal_verified) t.transf_goals
 
 let proof_verified a =
   (not a.proof_obsolete) &&
@@ -463,8 +457,7 @@ let proof_verified a =
       | Done { Call_provers.pr_answer = Call_provers.Valid} -> true
       | _ -> false
 
-let rec check_goal_proved notify g =
-  let b =
+let goal_verified g =
     try
       PHprover.iter
         (fun _ a ->
@@ -476,7 +469,24 @@ let rec check_goal_proved notify g =
         g.goal_transformations;
       false
     with Exit -> true
-  in
+
+let check_file_verified notify f =
+  let b = file_verified f in
+  if f.file_verified <> b then begin
+    f.file_verified <- b;
+    notify (File f)
+  end
+
+let check_theory_proved notify t =
+  let b = theory_verified t in
+  if t.theory_verified <> b then begin
+    t.theory_verified <- b;
+    notify (Theory t);
+    check_file_verified notify t.theory_parent
+  end
+
+let rec check_goal_proved notify g =
+  let b = goal_verified g in
   if g.goal_verified <> b then begin
     g.goal_verified <- b;
     notify (Goal g);
@@ -486,7 +496,7 @@ let rec check_goal_proved notify g =
   end
 
 and check_transf_proved notify t =
-  let b = List.for_all (fun g -> g.goal_verified) t.transf_goals in
+  let b = transf_verified t in
   if t.transf_verified <> b then begin
     t.transf_verified <- b;
     notify (Transf t);
@@ -726,6 +736,7 @@ let rec load_goal ~old_provers parent acc g =
         let exp = bool_attribute "expanded" g true in
         let mg = raw_add_no_task ~keygen parent gname expl sum shape exp in
         List.iter (load_proof_or_transf ~old_provers mg) g.Xml.elements;
+        mg.goal_verified <- goal_verified mg;
         mg::acc
     | "label" -> acc
     | s ->
@@ -777,7 +788,7 @@ and load_proof_or_transf ~old_provers mg a =
              [] a.Xml.elements);
         (* already done by raw_add_transformation
            Hashtbl.add mg.transformations trname mtr *)
-        ()
+        mtr.transf_verified <- transf_verified mtr
     | "label" -> ()
     | s ->
         eprintf
@@ -795,6 +806,7 @@ let load_theory ~old_provers mf acc th =
           (List.fold_left
              (load_goal ~old_provers (Parent_theory mth))
              [] th.Xml.elements);
+        mth.theory_verified <- theory_verified mth;
         mth::acc
     | s ->
         eprintf "[Warning] Session.load_theory: unexpected element '%s'@." s;
@@ -810,6 +822,7 @@ let load_file session old_provers f =
           List.rev
           (List.fold_left
              (load_theory ~old_provers mf) [] f.Xml.elements);
+        mf.file_verified <- file_verified mf;
         old_provers
     | "prover" ->
       (** The id is just for the session file *)
@@ -906,6 +919,7 @@ let raw_add_file ~x_keygen ~x_goal ~x_fold_theory ~x_fold_file =
       let parent = Parent_theory rtheory in
       let goals = x_fold_theory (add_goal parent) [] theory in
       rtheory.theory_goals <- List.rev goals;
+      rtheory.theory_verified <- theory_verified rtheory;
       rtheory::acc
     in
     let theories = x_fold_file add_theory [] file in
@@ -1002,6 +1016,7 @@ end) = (struct
     let g =
       raw_add_task ~keygen:X.keygen parent
         name expl task false in
+    (** no verified since that can't be empty (no proof no transf) and true *)
     g::acc
 
   let add_transformation g name transf =
@@ -1010,6 +1025,7 @@ end) = (struct
     let parent = Parent_transf rtransf in
     let goals = X.fold_transf (add_goal parent) [] task transf in
     rtransf.transf_goals <- List.rev goals;
+    rtransf.transf_verified <- transf_verified rtransf;
     rtransf
 
 end : sig
@@ -1025,6 +1041,7 @@ let add_transformation ~keygen ~goal transfn g goals =
     g::acc in
   let goals = List.fold_left add_goal [] goals in
   rtransf.transf_goals <- List.rev goals;
+  rtransf.transf_verified <- transf_verified rtransf;
   rtransf
 
 
