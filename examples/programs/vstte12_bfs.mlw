@@ -1,0 +1,159 @@
+
+(* The 2nd Verified Software Competition (VSTTE 2012) 
+   https://sites.google.com/site/vstte2012/compet
+
+   Problem 5:
+   Shortest path in a graph using breadth-first search *)
+
+theory Graph
+
+  use import set.Fset
+
+  type vertex
+
+  function succ vertex : set vertex
+
+  use import int.Int
+
+  (* there is a path of length n from v1 to v2 *)
+  inductive path (v1 v2: vertex) (n: int) =
+    | path_empty:
+        forall v: vertex. path v v 0
+    | path_succ:
+        forall v1 v2 v3: vertex, n: int.
+        path v1 v2 n -> mem v3 (succ v2) -> path v1 v3 (n+1)
+
+  (* path length is non-negative *)
+  lemma path_nonneg:
+    forall v1 v2: vertex, n: int. path v1 v2 n -> n >= 0
+
+  (* a non-empty path has a last but one node *)
+  lemma path_inversion:
+    forall v1 v3: vertex, n: int. n >= 0 ->
+    path v1 v3 (n+1) ->
+    exists v2: vertex. path v1 v2 n /\ mem v3 (succ v2)
+
+  (* a path starting in a set S that is closed under succ ends up in S *)
+  lemma path_closure:
+    forall s: set vertex.
+    (forall x: vertex. mem x s ->
+       forall y: vertex. mem y (succ x) -> mem y s) ->
+    forall v1 v2: vertex, n: int. path v1 v2 n ->
+    mem v1 s -> mem v2 s
+
+  predicate shortest_path (v1 v2: vertex) (n: int) =
+    path v1 v2 n /\
+    forall m: int. m < n -> not (path v1 v2 m)
+
+end
+
+(* a bag is simply a reference containing a finite set *)
+module Bag
+
+  use export set.Fset
+  use export module ref.Ref
+
+  type bag 'a = ref (set 'a)
+
+  val is_empty (b: bag 'a) :
+    {} bool { result=True <-> is_empty !b }
+
+  val push (x: 'a) (b: bag 'a) :
+    {} unit writes b { !b = add x (old !b) }
+
+  val take (b: bag 'a) :
+    { not (is_empty !b) }
+    'a
+    writes b
+    { mem result (old !b) /\ !b = remove result (old !b) }
+
+end
+
+module BFS
+
+  use import int.Int
+  use import Graph
+  use import module Bag
+  use import module ref.Refint
+
+  exception Found int
+
+  (* global invariant *)
+  predicate inv (s t: vertex) (visited current next: set vertex) (d: int) =
+    (* current *)
+    subset current visited /\
+    (forall x: vertex. mem x current -> shortest_path s x d) /\
+    (* next *)
+    subset next visited /\
+    (forall x: vertex. mem x next -> shortest_path s x (d + 1)) /\
+    (* visited *)
+    (forall x: vertex, m: int. path s x m -> m <= d -> mem x visited) /\
+    (forall x: vertex. mem x visited ->
+       exists m: int. path s x m /\ m <= d+1) /\
+    (* nodes at distance d+1 are either in next or not yet visited *)
+    (forall x: vertex. shortest_path s x (d + 1) ->
+       mem x next \/ not (mem x visited)) /\
+    (* target t *)
+    (mem t visited -> mem t current \/ mem t next)
+
+  (* visited\current\next is closed under succ *)
+  predicate closure (visited current next: set vertex) (x: vertex) =
+    mem x visited -> not (mem x current) -> not (mem x next) ->
+    forall y: vertex. mem y (succ x) -> mem y visited
+
+  (* function fill_next fills set next with the unvisited successors of v *)
+  let fill_next (s t v: vertex) (visited current next: bag vertex) (d:ref int) =
+    { inv s t !visited !current !next !d /\
+      shortest_path s v !d /\
+      (forall x: vertex. x<> v -> closure !visited !current !next x) }
+    let acc = ref (succ v) in
+    while not (is_empty acc) do
+      invariant {
+        inv s t !visited !current !next !d /\
+        subset !acc (succ v) /\
+        subset (diff (succ v) !acc) !visited /\
+        (forall x: vertex. x<> v -> closure !visited !current !next x)
+      }
+      let w = take acc in
+      if not (mem w !visited) then begin
+        push w visited;
+        push w next
+      end
+    done
+    { inv s t !visited !current !next !d /\
+      subset (succ v) !visited  /\
+      (forall x: vertex. closure !visited !current !next x) }
+
+  let bfs (s: vertex) (t: vertex) =
+    {}
+    let visited = ref (singleton s) in
+    let current = ref (singleton s) in
+    let next    = ref empty in
+    let d = ref 0 in
+    while not (is_empty current) do
+      invariant {
+        inv s t !visited !current !next !d /\
+        (is_empty !current -> is_empty !next) /\
+        (forall x: vertex. closure !visited !current !next x) /\
+        0 <= !d
+      }
+      let v = take current in
+      if v = t then raise (Found !d);
+      fill_next s t v visited current next d;
+      if is_empty current then begin
+        current := !next;
+        next    := empty;
+        incr d
+      end
+    done;
+    assert { not (mem t !visited) }
+    { forall d: int. not (path s t d) }
+    | Found -> { shortest_path s t result }
+
+end
+
+(*
+Local Variables:
+compile-command: "why3ide vstte12_bfs.mlw"
+End:
+*)
