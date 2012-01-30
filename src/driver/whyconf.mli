@@ -93,7 +93,7 @@ type prover =
 
 val print_prover : Format.formatter -> prover -> unit
 (** Printer for prover *)
-
+module Prover   : Util.OrderedHash with type t = prover
 module Mprover  : Stdlib.Map.S with type key = prover
 module Sprover  : Mprover.Set
 module Hprover  : Hashtbl.S with type key = prover

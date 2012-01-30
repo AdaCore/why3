@@ -545,7 +545,7 @@ let init =
          | S.File f -> Filename.basename f.S.file_name
          | S.Proof_attempt a ->
            let p = a.S.proof_prover in
-           p.C.prover_name ^ " " ^ p.C.prover_version
+           Pp.string_of_wnl C.print_prover p
          | S.Transf tr -> tr.S.transf_name);
     notify any
 
@@ -997,15 +997,16 @@ let () =
   let add_item_provers () =
     C.Mprover.iter
       (fun p _ ->
-         let n = p.C.prover_name ^ " " ^ p.C.prover_version in
+         let n = Pp.string_of_wnl C.print_prover p in
          let (_ : GMenu.image_menu_item) =
            tools_factory#add_image_item ~label:n
              ~callback:(fun () -> prover_on_selected_goals p)
              ()
          in
          let b = GButton.button ~packing:provers_box#add ~label:n () in
-         b#misc#set_tooltip_markup ("Start <tt>" ^ p.C.prover_name ^
-           "</tt> on the <b>selected goals</b>");
+         b#misc#set_tooltip_markup
+           (Pp.sprintf_wnl "Start <tt>%a</tt> on the <b>selected goals</b>"
+              C.print_prover p);
 
 (* prend de la place pour rien
          let i = GMisc.image ~pixbuf:(!image_prover) () in

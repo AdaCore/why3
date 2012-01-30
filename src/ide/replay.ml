@@ -173,11 +173,11 @@ let init =
 (*
   let cpt = ref 0 in
 *)
-  fun _row any ->
+  fun _row _any ->
 (*
     incr cpt;
     Hashtbl.add model_index !cpt any;
-*)
+
     let _name =
       match any with
         | S.Goal g -> S.goal_expl g
@@ -188,6 +188,7 @@ let init =
           p.C.prover_name ^ " " ^ p.C.prover_version
         | S.Transf tr -> tr.S.transf_name
     in
+*)
     (* eprintf "Item '%s' loaded@." name *)
     ()
 
@@ -343,8 +344,6 @@ let theory_depth t =
 let rec provers_latex_stats provers theory =
   S.theory_iter_proof_attempt (fun a ->
     Hashtbl.replace provers a.S.proof_prover a.S.proof_prover) theory
-
-let prover_name a = a.C.prover_name ^ " " ^ a.C.prover_version
 
 let protect s =
   let b = Buffer.create 7 in
@@ -503,7 +502,7 @@ let print_head n depth provers fmt =
         (depth + 1)
   else
     fprintf fmt "\\hline Proof obligations ";
-  List.iter (fun a -> fprintf fmt "& \\provername{%s} " a.C.prover_name)
+  List.iter (fun a -> fprintf fmt "& \\provername{%a} " C.print_prover a)
     provers;
   fprintf fmt "\\\\ @."
 
@@ -553,9 +552,7 @@ let theory_latex_stat n table dir t =
   provers_latex_stats provers t;
   let provers = Hashtbl.fold (fun _ pr acc -> pr :: acc)
     provers [] in
-  let provers =
-    List.sort (fun p1 p2 -> String.compare p1.C.prover_name p2.C.prover_name)
-      provers in
+  let provers = List.sort C.Prover.compare provers in
   let depth = theory_depth  t in
   let name = t.S.theory_name.Ident.id_string in
   let ch = open_out (Filename.concat dir(name^".tex")) in
