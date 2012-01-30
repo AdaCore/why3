@@ -113,7 +113,6 @@ let opt_list_metas = ref false
 let opt_token_count = ref false
 let opt_parse_only = ref false
 let opt_type_only = ref false
-let opt_debug_all = ref false
 let opt_version = ref false
 
 let option_list = Arg.align [

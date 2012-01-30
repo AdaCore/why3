@@ -275,7 +275,7 @@ val set_proof_state :
 
 val set_obsolete : ?notify:'key notify -> 'key proof_attempt -> unit
 
-val set_archive : 'key proof_attempt -> bool -> unit
+val set_archived : 'key proof_attempt -> bool -> unit
 
 val set_edited_as : string option -> 'key proof_attempt -> unit
 

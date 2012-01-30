@@ -519,7 +519,7 @@ let cancel = iter_proof_attempt cancel_proof
 
 (** Set or unset archive *)
 
-let set_archive a b = set_archive a b; notify (Proof_attempt a)
+let set_archive a b = set_archived a b; notify (Proof_attempt a)
 
 (*********************************)
 (* method: check existing proofs *)

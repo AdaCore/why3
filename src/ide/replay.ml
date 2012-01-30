@@ -276,26 +276,9 @@ let model_index = Hashtbl.create 257
 *)
 
 let project_dir =
-  if Sys.file_exists fname then
-    begin
-      if Sys.is_directory fname then
-        begin
-          eprintf "Info: found directory '%s' for the project@." fname;
-          fname
-        end
-      else
-        begin
-          eprintf "Info: found regular file '%s'@." fname;
-          let d =
-            try Filename.chop_extension fname
-            with Invalid_argument _ -> fname
-          in
-          eprintf "Info: using '%s' as directory for the project@." d;
-          d
-        end
-    end
-  else
-    failwith "file does not exist"
+  try
+    Session.get_project_dir fname
+  with Not_found -> failwith "file does not exist"
 
 let goal_statistics (goals,n,m) g =
   if g.S.goal_verified then (goals,n+1,m+1) else (g::goals,n,m+1)

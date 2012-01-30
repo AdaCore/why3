@@ -121,9 +121,10 @@ val is_prover_known : config -> prover -> bool
 (** test if a prover is detected *)
 
 exception ProverNotFound of config * string
-exception ProverAmbiguity of config * string * prover list
 
 val prover_by_id : config -> string -> config_prover
+(** return the configuration of the prover if found, otherwise return
+    ProverNotFound *)
 
 (** {2 For accesing other parts of the configuration } *)
 

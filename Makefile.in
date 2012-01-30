@@ -671,6 +671,60 @@ install_no_local::
 
 install_local: bin/why3replayer
 
+
+###############
+# Session
+###############
+
+SESSION_FILES = why3session_lib why3session_mod why3session_copy \
+		why3session_info why3session
+
+SESSIONMODULES = $(addprefix src/why3session/, $(SESSION_FILES))
+
+SESSIONML  = $(addsuffix .ml,  $(SESSIONMODULES))
+SESSIONMLI = $(addsuffix .mli, $(SESSIONMODULES))
+SESSIONCMO = $(addsuffix .cmo, $(SESSIONMODULES))
+SESSIONCMX = $(addsuffix .cmx, $(SESSIONMODULES))
+
+$(SESSIONCMO) $(SESSIONCMX): INCLUDES += -I src/why3session
+
+# build targets
+
+byte: bin/why3session.byte
+opt:  bin/why3session.opt
+
+bin/why3session.opt: src/why3.cmxa $(PGMCMX) $(SESSIONCMX)
+	$(if $(QUIET), @echo 'Linking  $@' &&) \
+	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
+	$(STRIP) $@
+
+bin/why3session.byte: src/why3.cma $(PGMCMO) $(SESSIONCMO)
+	$(if $(QUIET),@echo 'Linking  $@' &&) \
+	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
+
+bin/why3session: bin/why3session.@OCAMLBEST@
+	ln -sf why3session.@OCAMLBEST@ $@
+
+# depend and clean targets
+
+include .depend.session
+
+.depend.session:
+	$(OCAMLDEP) -slash -I src -I src/why3session $(SESSIONML) $(SESSIONMLI) > $@
+
+depend: .depend.session
+
+clean::
+	rm -f src/ide/*.cm[iox] src/ide/*.o
+	rm -f src/ide/*.annot src/ide/*~
+	rm -f bin/why3session.byte bin/why3session.opt bin/why3session
+	rm -f .depend.session
+
+install_no_local::
+	cp -f bin/why3session.@OCAMLBEST@ $(BINDIR)/why3session$(EXE)
+
+install_local: bin/why3session
+
 ###############
 # Stats
 ###############

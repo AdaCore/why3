@@ -337,7 +337,6 @@ let is_prover_known whyconf prover =
   Mprover.mem prover (get_provers whyconf)
 
 exception ProverNotFound of config * string
-exception ProverAmbiguity of config * string * prover list
 
 let prover_by_id whyconf id =
   let potentials =
@@ -345,7 +344,7 @@ let prover_by_id whyconf id =
   match Mprover.keys potentials with
     | [] -> raise (ProverNotFound(whyconf,id))
     | [_] -> snd (Mprover.choose potentials)
-    |  l -> raise (ProverAmbiguity(whyconf,id,l))
+    |  _  -> assert false (** by the verification done by set_provers *)
 
 let () = Exn_printer.register
   (fun fmt exn ->
@@ -353,10 +352,6 @@ let () = Exn_printer.register
       | ProverNotFound (config,s) ->
         fprintf fmt "Prover '%s' not found in %s@."
           s (get_conf_file config)
-      | ProverAmbiguity (config,s,l) ->
-        fprintf fmt "More than one provers corresponds to '%s' in %s:@.%a@."
-          s (get_conf_file config)
-          (Pp.print_list Pp.newline print_prover) l
       | e -> raise e
   )
 

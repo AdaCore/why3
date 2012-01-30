@@ -211,7 +211,11 @@ module PTreeT = struct
           then g.goal_name.Ident.id_string^"*"
           else g.goal_name.Ident.id_string
         | Proof_attempt pr ->
-          Pp.string_of_wnl Whyconf.print_prover pr.proof_prover
+          Pp.sprintf_wnl "%a%s%s%s"
+            Whyconf.print_prover pr.proof_prover
+            (if pr.proof_obsolete || pr.proof_archived then " " else "")
+            (if pr.proof_obsolete then "O" else "")
+            (if pr.proof_archived then "A" else "")
         | Transf tr -> tr.transf_name in
       let l = ref [] in
       iter (fun a -> l := (Any a)::!l) t;
@@ -552,7 +556,7 @@ let set_obsolete ?(notify=notify) a =
   notify (Proof_attempt a);
   check_goal_proved notify a.proof_parent
 
-let set_archive a b = a.proof_archived <- b
+let set_archived a b = a.proof_archived <- b
 
 (* [raw_add_goal parent name expl sum t] adds a goal to the given parent
    DOES NOT record the new goal in its parent, thus this should not be exported
@@ -1650,23 +1654,22 @@ let update_session ~keygen ~allow_obsolete old_session env whyconf =
   new_env_session, obsolete
 
 let get_project_dir fname =
-  if Sys.file_exists fname then begin
-    if Sys.is_directory fname then begin
-      eprintf "Info: found directory '%s' for the project@." fname;
-      fname
+  if not (Sys.file_exists fname) then raise Not_found;
+  let d =
+    if Sys.is_directory fname then fname
+    else if Filename.basename fname = db_filename then begin
+      dprintf debug "Info: found db file '%s'@." fname;
+      Filename.dirname fname
     end
-    else begin
-      eprintf "Info: found regular file '%s'@." fname;
-      let d =
+    else
+      begin
+        dprintf debug "Info: found regular file '%s'@." fname;
         try Filename.chop_extension fname
-        with Invalid_argument _ -> fname
-      in
-      eprintf "Info: using '%s' as directory for the project@." d;
-      d
-    end
-  end
-  else
-    raise Not_found
+        with Invalid_argument _ -> fname^".w3s"
+      end
+  in
+  dprintf debug "Info: using '%s' as directory for the project@." d;
+  d
 
 let key_any = function
   | File p -> p.file_key
