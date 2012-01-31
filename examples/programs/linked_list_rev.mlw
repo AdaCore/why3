@@ -1,0 +1,97 @@
+
+(*
+
+In-place linked list reversal.
+
+Version designed for the MPRI lecture http://www.lri.fr/~marche/MPRI-2-36-1/
+
+*)
+
+theory ListReverse
+
+  use export int.Int
+  use export list.List
+
+  function head (l: list 'a) : 'a
+  axiom head_cons: forall x:'a, l:list 'a. head (Cons x l) = x
+  function tail (l: list 'a) : list 'a
+  axiom tail_cons: forall x:'a, l:list 'a. tail (Cons x l) = l
+
+  use export list.Mem
+
+  predicate disjoint (l1:list 'a) (l2:list 'a) =
+    forall x:'a. not (mem x l1 /\ mem x l2)
+
+  predicate no_repet (l:list 'a) =
+    match l with
+    | Nil -> true
+    | Cons x r -> not (mem x r) /\ no_repet r
+    end
+
+  use export list.Append
+  use export list.Reverse
+
+end
+
+module InPlaceRev
+
+  use import ListReverse
+  use import map.Map
+
+  type loc
+
+  function null:loc
+
+  inductive list_seg loc (map loc loc) (list loc) loc =
+  | list_seg_nil: forall p:loc, next:map loc loc. list_seg p next Nil p
+  | list_seg_cons: forall p q:loc, next:map loc loc, l:list loc.
+      p <> null /\ list_seg (get next p) next l q ->
+         list_seg p next (Cons p l) q
+
+
+  lemma list_seg_frame:
+    forall next1 next2:map loc loc, p q v: loc, pM:list loc.
+      list_seg p next1 pM null /\ next2 = set next1 q v /\
+      not (mem q pM) -> list_seg p next2 pM null
+
+  lemma list_seg_no_repet:
+    forall next:map loc loc, p: loc, pM:list loc.
+      list_seg p next pM null -> no_repet pM
+
+  use import module ref.Ref
+
+  val next : ref (map loc loc)
+
+  let in_place_reverse (l:loc) (lM:list loc) : loc =
+    { list_seg l !next lM null }
+    'Init:
+    let p = ref l in
+    let pM = ref lM in
+    let r = ref null in
+    let rM = ref (Nil : list loc) in
+    while !p <> null do
+      invariant {
+         list_seg !p !next !pM null /\
+         list_seg !r !next !rM null /\
+         disjoint !pM !rM /\
+         (reverse !pM) ++ !rM = reverse lM
+        }
+        let n = get !next !p in
+        next := set !next !p !r;
+        assert { list_seg !r !next !rM null };
+        r := !p;
+        p := n;
+        rM := Cons (head !pM) !rM;
+        pM := tail !pM
+    done;
+    !r
+    { list_seg result !next (reverse lM) null } 
+
+end
+
+
+(*
+Local Variables:
+compile-command: "why3ide linked_list_rev.mlw"
+End:
+*)
