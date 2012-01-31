@@ -3,228 +3,236 @@
 <why3session
  name="programs/insertion_sort_list/why3session.xml">
  <prover
-  id="alt-ergo"
+  id="0"
   name="Alt-Ergo"
   version="0.94"/>
  <prover
-  id="coq"
-  name="Coq"
-  version="8.3pl3"/>
- <prover
-  id="cvc3-2.2"
+  id="1"
   name="CVC3"
   version="2.2"/>
- <prover
-  id="cvc3-2.4"
-  name="CVC3"
-  version="2.4.1"/>
- <prover
-  id="eprover"
-  name="Eprover"
-  version="1.4"/>
- <prover
-  id="gappa"
-  name="Gappa"
-  version="0.15.1"/>
- <prover
-  id="simplify"
-  name="Simplify"
-  version="1.5.4"/>
- <prover
-  id="spass"
-  name="Spass"
-  version="3.7"/>
- <prover
-  id="vampire"
-  name="Vampire"
-  version="0.6"/>
- <prover
-  id="verit"
-  name="veriT"
-  version="dev"/>
- <prover
-  id="yices"
-  name="Yices"
-  version="1.0.25"/>
- <prover
-  id="z3-2"
-  name="Z3"
-  version="2.19"/>
- <prover
-  id="z3-3"
-  name="Z3"
-  version="3.2"/>
  <file
   name="../insertion_sort_list.mlw"
   verified="true"
-  expanded="true">
+  expanded="false">
   <theory
    name="WP M"
+   locfile="programs/insertion_sort_list/../insertion_sort_list.mlw"
+   loclnum="4" loccnumb="7" loccnume="8"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter insert"
+    locfile="programs/insertion_sort_list/../insertion_sort_list.mlw"
+    loclnum="11" loccnumb="10" loccnume="16"
     expl="parameter insert"
-    sum="8a1ed54c3f0c362fb144098bfd668b32"
+    sum="84e2aa9751598370fc4d9f6f9c5b4a40"
     proved="true"
     expanded="true"
     shape="CV1aNilapermutaConsV0V1aConsV0aNilAasortedaConsV0aNilaConsVViainfix <=V0V2apermutaConsV0V1aConsV0V1AasortedaConsV0V1apermutaConsV0V1aConsV2V4AasortedaConsV2V4IapermutaConsV0V3V4AasortedV4FAasortedV3Aainfix <alengthV3alengthV1Aainfix <=c0alengthV1IasortedV1FF">
+    <label
+     name="expl:parameter insert">
+     </label>
     <transf
      name="split_goal"
      proved="true"
      expanded="true">
      <goal
       name="WP_parameter insert.1"
+      locfile="programs/insertion_sort_list/../insertion_sort_list.mlw"
+      loclnum="11" loccnumb="10" loccnume="16"
       expl="parameter insert"
-      sum="221159a13d4206a4460d1723c7561f5b"
+      sum="4a69f68c5d460749f0ef438e15442acf"
       proved="true"
       expanded="true"
       shape="CV1aNilapermutaConsV0V1aConsV0aNilAasortedaConsV0aNilaConsVVtIasortedV1FF">
+      <label
+       name="expl:parameter insert">
+       </label>
       <proof
-       prover="alt-ergo"
+       prover="0"
        timelimit="10"
-       edited=""
-       obsolete="false">
+       obsolete="false"
+       archived="false">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter insert.2"
+      locfile="programs/insertion_sort_list/../insertion_sort_list.mlw"
+      loclnum="11" loccnumb="10" loccnume="16"
       expl="parameter insert"
-      sum="03780f98738f0a4d31b9f5cdafef018f"
+      sum="ca1192523c9f6846cbe0519ed7977850"
       proved="true"
       expanded="true"
       shape="CV1aNiltaConsVVapermutaConsV0V1aConsV0V1AasortedaConsV0V1Iainfix <=V0V2IasortedV1FF">
+      <label
+       name="expl:parameter insert">
+       </label>
       <proof
-       prover="cvc3-2.2"
+       prover="1"
        timelimit="10"
-       edited=""
-       obsolete="false">
+       obsolete="false"
+       archived="false">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter insert.3"
+      locfile="programs/insertion_sort_list/../insertion_sort_list.mlw"
+      loclnum="11" loccnumb="10" loccnume="16"
       expl="parameter insert"
-      sum="bd15c5616f0e48a457c665b7daeb5133"
+      sum="323ba14021e983aedaa70f389a6f9ca2"
       proved="true"
       expanded="true"
       shape="CV1aNiltaConsVVasortedV3Aainfix <alengthV3alengthV1Aainfix <=c0alengthV1Iainfix <=V0V2NIasortedV1FF">
+      <label
+       name="expl:parameter insert">
+       </label>
       <proof
-       prover="cvc3-2.2"
+       prover="1"
        timelimit="10"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.00"/>
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter insert.4"
+      locfile="programs/insertion_sort_list/../insertion_sort_list.mlw"
+      loclnum="11" loccnumb="10" loccnume="16"
       expl="parameter insert"
-      sum="17df99648aa521a75f2047df4cf0c6f0"
+      sum="3dd8034ce59793f25f60f2f400095552"
       proved="true"
       expanded="true"
       shape="CV1aNiltaConsVVapermutaConsV0V1aConsV2V4AasortedaConsV2V4IapermutaConsV0V3V4AasortedV4FIasortedV3Aainfix <alengthV3alengthV1Aainfix <=c0alengthV1Iainfix <=V0V2NIasortedV1FF">
+      <label
+       name="expl:parameter insert">
+       </label>
       <proof
-       prover="cvc3-2.2"
+       prover="1"
        timelimit="10"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.11"/>
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.18"/>
       </proof>
      </goal>
     </transf>
    </goal>
    <goal
     name="WP_parameter insertion_sort"
+    locfile="programs/insertion_sort_list/../insertion_sort_list.mlw"
+    loclnum="19" loccnumb="10" loccnume="24"
     expl="parameter insertion_sort"
-    sum="d28eefc56d379c5156175265bf010598"
+    sum="16d8a43872423232fe7bd6e35d3a5ba5"
     proved="true"
     expanded="true"
     shape="CV0aNilapermutV0aNilAasortedaNilaConsVVapermutV0V4AasortedV4IapermutaConsV1V3V4AasortedV4FAasortedV3IapermutV2V3AasortedV3FAainfix <alengthV2alengthV0Aainfix <=c0alengthV0F">
+    <label
+     name="expl:parameter insertion_sort">
+     </label>
     <transf
      name="split_goal"
      proved="true"
      expanded="true">
      <goal
       name="WP_parameter insertion_sort.1"
+      locfile="programs/insertion_sort_list/../insertion_sort_list.mlw"
+      loclnum="19" loccnumb="10" loccnume="24"
       expl="parameter insertion_sort"
-      sum="71173457dcb476b018a44d47d231ad49"
+      sum="94c7e6b8ec2a0a739033d3bd222c577f"
       proved="true"
       expanded="true"
       shape="CV0aNilapermutV0aNilAasortedaNilaConsVVtF">
+      <label
+       name="expl:parameter insertion_sort">
+       </label>
       <proof
-       prover="cvc3-2.2"
+       prover="1"
        timelimit="10"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.00"/>
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter insertion_sort.2"
+      locfile="programs/insertion_sort_list/../insertion_sort_list.mlw"
+      loclnum="19" loccnumb="10" loccnume="24"
       expl="parameter insertion_sort"
-      sum="17e9acde476c648319587d89cd36c1c8"
+      sum="59f3bde7dbb179dd4ba4e0943bb955c7"
       proved="true"
       expanded="true"
       shape="CV0aNiltaConsVVainfix <alengthV2alengthV0Aainfix <=c0alengthV0F">
+      <label
+       name="expl:parameter insertion_sort">
+       </label>
       <proof
-       prover="cvc3-2.2"
+       prover="1"
        timelimit="10"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.00"/>
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="alt-ergo"
+       prover="0"
        timelimit="10"
-       edited=""
-       obsolete="false">
+       obsolete="false"
+       archived="false">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter insertion_sort.3"
+      locfile="programs/insertion_sort_list/../insertion_sort_list.mlw"
+      loclnum="19" loccnumb="10" loccnume="24"
       expl="parameter insertion_sort"
-      sum="80b0842e233ef20ca04bf6ed7b47e326"
+      sum="01a3a1139967fc619194daefb574ad7e"
       proved="true"
       expanded="true"
       shape="CV0aNiltaConsVVasortedV3IapermutV2V3AasortedV3FIainfix <alengthV2alengthV0Aainfix <=c0alengthV0F">
+      <label
+       name="expl:parameter insertion_sort">
+       </label>
       <proof
-       prover="cvc3-2.2"
+       prover="1"
        timelimit="10"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.00"/>
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="alt-ergo"
+       prover="0"
        timelimit="10"
-       edited=""
-       obsolete="false">
+       obsolete="false"
+       archived="false">
        <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter insertion_sort.4"
+      locfile="programs/insertion_sort_list/../insertion_sort_list.mlw"
+      loclnum="19" loccnumb="10" loccnume="24"
       expl="parameter insertion_sort"
-      sum="70da74d76767b2269d36aef985b01798"
+      sum="0664d39ce85984eefbde659a0dd4e23a"
       proved="true"
       expanded="true"
       shape="CV0aNiltaConsVVapermutV0V4AasortedV4IapermutaConsV1V3V4AasortedV4FIasortedV3IapermutV2V3AasortedV3FIainfix <alengthV2alengthV0Aainfix <=c0alengthV0F">
+      <label
+       name="expl:parameter insertion_sort">
+       </label>
       <proof
-       prover="cvc3-2.2"
+       prover="1"
        timelimit="10"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.03"/>
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
       </proof>
       <proof
-       prover="alt-ergo"
+       prover="0"
        timelimit="10"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.03"/>
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.08"/>
       </proof>
      </goal>
     </transf>

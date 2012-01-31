@@ -54,8 +54,17 @@ module InPlaceRev
       list_seg p next1 pM null /\ next2 = set next1 q v /\
       not (mem q pM) -> list_seg p next2 pM null
 
+  lemma list_seg_functional:
+    forall next:map loc loc, l1 l2:list loc, p: loc.
+      list_seg p next l1 null /\ list_seg p next l2 null -> l1 = l2
+
+  lemma list_seg_sublistl:
+    forall next:map loc loc, l1 l2:list loc, p q: loc.
+      list_seg p next (l1++Cons q l2) null -> 
+        list_seg q next (Cons q l2) null
+
   lemma list_seg_no_repet:
-    forall next:map loc loc, p: loc, pM:list loc.
+    forall next:map loc loc, pM:list loc, p: loc.
       list_seg p next pM null -> no_repet pM
 
   use import module ref.Ref

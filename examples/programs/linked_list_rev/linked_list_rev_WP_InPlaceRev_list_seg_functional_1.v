@@ -163,46 +163,23 @@ Axiom list_seg_frame : forall (next1:(map loc loc)) (next2:(map loc loc))
   (p:loc) (q:loc) (v:loc) (pM:(list loc)), ((list_seg p next1 pM null) /\
   ((next2 = (set next1 q v)) /\ ~ (mem q pM))) -> (list_seg p next2 pM null).
 
-Axiom list_seg_functional : forall (next:(map loc loc)) (l1:(list loc))
-  (l2:(list loc)) (p:loc), ((list_seg p next l1 null) /\ (list_seg p next l2
-  null)) -> (l1 = l2).
-
-Axiom list_seg_sublistl : forall (next:(map loc loc)) (l1:(list loc))
-  (l2:(list loc)) (p:loc) (q:loc), (list_seg p next (infix_plpl l1 (Cons q
-  l2)) null) -> (list_seg q next (Cons q l2) null).
-
 (* YOU MAY EDIT THE CONTEXT BELOW *)
 
 (* DO NOT EDIT BELOW *)
 
-Theorem list_seg_no_repet : forall (next:(map loc loc)) (pM:(list loc))
-  (p:loc), (list_seg p next pM null) -> (no_repet pM).
+Theorem list_seg_functional : forall (next:(map loc loc)) (l1:(list loc))
+  (l2:(list loc)) (p:loc), ((list_seg p next l1 null) /\ (list_seg p next l2
+  null)) -> (l1 = l2).
 (* YOU MAY EDIT THE PROOF BELOW *)
-induction pM.
-now simpl.
-intros p h.
-assert (a=p) by (inversion h; auto).
-subst a.
-split.
-intro h1.
-generalize (mem_decomp _ p pM h1).
-intros (l1&l2&h2).
-subst pM.
-change (Cons p (infix_plpl l1 (Cons p l2))) with
-  (infix_plpl (Cons p l1) (Cons p l2)) in h.
-generalize (list_seg_sublistl _ _ _ _ _ h).
-intro h2.
-generalize (list_seg_functional _ _ _ _ (conj h h2)).
-intro h3.
-generalize (f_equal (@length _) h3).
-rewrite Append_length.
-intros h4.
-generalize (Length_nonnegative _ l1).
-change (length (Cons p l1)) with (1+length l1)%Z in h4.
-omega.
-inversion h; subst; clear h.
-apply IHpM with (p := get next p).
-tauto.
+induction l1.
+intros l2 p (h1,h2).
+inversion h1; subst; clear h1.
+inversion h2; subst; clear h2; intuition.
+intros l2 p (h1,h2).
+inversion h1; subst; clear h1.
+inversion h2; subst; clear h2; intuition.
+apply f_equal.
+apply IHl1 with (p:=get next a); auto.
 Qed.
 (* DO NOT EDIT BELOW *)
 
