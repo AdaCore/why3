@@ -178,8 +178,7 @@ module Make(O: OBSERVER) : sig
         which are triples (goal name, prover, report)
     *)
 
-  val convert_unknown_prover :
-    ?remove_converted:bool -> O.key env_session -> unit
+  val convert_unknown_prover : O.key env_session -> unit
     (** Same as {!Session_tools.convert_unknown_prover} *)
 
 end

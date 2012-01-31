@@ -28,11 +28,9 @@ val unknown_to_known_provers  :
     Whyconf.Mprover.key list
 (** return others, same name, same version *)
 
-val convert_unknown_prover :
-  ?remove_converted:bool -> keygen:'a keygen -> 'a env_session -> unit
+val convert_unknown_prover : keygen:'a keygen -> 'a env_session -> unit
 (** try to add new proof_attempt with known provers for all proof
-    attempt with unknown provers. If [remove_converted] is true the
-    proof_attempt which have been converted are removed *)
+    attempt with unknown provers *)
 
 val filter_proof_attempt :
   ?notify:'key notify ->
