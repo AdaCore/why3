@@ -1,25 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
 <why3session
- name="fill/why3session.xml">
+ name="examples/programs/fill/why3session.xml">
  <prover
   id="0"
   name="Alt-Ergo"
-  version="0.93.1"/>
+  version="0.94"/>
+ <prover
+  id="1"
+  name="CVC3"
+  version="2.2"/>
+ <prover
+  id="2"
+  name="CVC3"
+  version="2.4.1"/>
+ <prover
+  id="3"
+  name="Z3"
+  version="2.19"/>
+ <prover
+  id="4"
+  name="Z3"
+  version="3.2"/>
  <file
   name="../fill.mlw"
   verified="true"
   expanded="true">
   <theory
    name="WP Fill"
-   locfile="fill/../fill.mlw"
-   loclnum="2" loccnumb="7" loccnume="11"
+   locfile="examples/programs/fill/../fill.mlw"
+   loclnum="4" loccnumb="7" loccnume="11"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter fill"
-    locfile="fill/../fill.mlw"
-    loclnum="14" loccnumb="10" loccnume="14"
+    locfile="examples/programs/fill/../fill.mlw"
+    loclnum="16" loccnumb="10" loccnume="14"
     expl="parameter fill"
     sum="a7f6d0a4fd8b99196978e39ff255fcf5"
     proved="true"
@@ -29,10 +45,39 @@
      name="expl:parameter fill">
      </label>
     <proof
+     prover="3"
+     timelimit="10"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.18"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="10"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.05"/>
+    </proof>
+    <proof
      prover="0"
      timelimit="10"
-     obsolete="false">
-     <result status="valid" time="0.15"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.05"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="10"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.10"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="10"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="10.10"/>
     </proof>
    </goal>
   </theory>
