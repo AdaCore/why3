@@ -232,6 +232,10 @@ module type S =
     (** [find_default x d m] returns the [Some] of the current binding
         of [x] in [m], or return [None] if no such binding exists. *)
 
+    val find_exn : exn -> key -> 'a t -> 'a
+    (** [find_exn exn x d m] returns the current binding
+        of [x] in [m], or raise [exn] if no such binding exists. *)
+
     val map_filter: ('a -> 'b option) -> 'a t -> 'b t
     (** Same as {!Map.S.map}, but may remove bindings. *)
 
