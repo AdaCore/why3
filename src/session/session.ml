@@ -66,6 +66,7 @@ and 'a proof_attempt =
       mutable proof_state : proof_attempt_status;
       mutable proof_timelimit : int;
       mutable proof_obsolete : bool;
+      mutable proof_archived : bool;
       mutable proof_edited_as : string option;
     }
 
@@ -321,9 +322,10 @@ let opt lab fmt = function
 let save_proof_attempt provers fmt _key a =
   fprintf fmt
     "@\n@[<v 1><proof@ prover=\"%i\"@ timelimit=\"%d\"@ %a\
-obsolete=\"%b\">"
+obsolete=\"%b\"@ archived=\"%b\">"
     (Mprover.find a.proof_prover provers) a.proof_timelimit
-    (opt "edited") a.proof_edited_as a.proof_obsolete;
+    (opt "edited") a.proof_edited_as a.proof_obsolete
+    a.proof_archived;
   save_status fmt a.proof_state;
   fprintf fmt "@]@\n</proof>"
 
@@ -510,13 +512,15 @@ type 'a keygen = ?parent:'a -> unit -> 'a
 
 let add_external_proof
     ?(notify=notify)
-    ~(keygen:'a keygen) ~obsolete ~timelimit ~edit (g:'a goal) p result =
+    ~(keygen:'a keygen) ~obsolete
+    ~archived ~timelimit ~edit (g:'a goal) p result =
   assert (edit <> Some "");
   let key = keygen ~parent:g.goal_key () in
   let a = { proof_prover = p;
             proof_parent = g;
             proof_key = key;
             proof_obsolete = obsolete;
+            proof_archived = archived;
             proof_state = result;
             proof_timelimit = timelimit;
             proof_edited_as = edit;
@@ -532,15 +536,23 @@ let remove_external_proof ?(notify=notify) a =
   check_goal_proved notify g
 
 
-let set_proof_state ?(notify=notify) ~obsolete res a =
+let set_proof_state ?(notify=notify) ~obsolete ~archived res a =
   a.proof_state <- res;
   a.proof_obsolete <- obsolete;
+  a.proof_archived <- archived;
   notify (Proof_attempt a);
   check_goal_proved notify a.proof_parent
 
 let set_edited_as edited_as a = a.proof_edited_as <- edited_as
 
 let set_timelimit timelimit a = a.proof_timelimit <- timelimit
+
+let set_obsolete ?(notify=notify) a =
+  a.proof_obsolete <- true;
+  notify (Proof_attempt a);
+  check_goal_proved notify a.proof_parent
+
+let set_archive a b = a.proof_archived <- b
 
 (* [raw_add_goal parent name expl sum t] adds a goal to the given parent
    DOES NOT record the new goal in its parent, thus this should not be exported
@@ -766,6 +778,7 @@ and load_proof_or_transf ~old_provers mg a =
         let edit = load_option "edited" a in
         let edit = match edit with None | Some "" -> None | _ -> edit in
         let obsolete = bool_attribute "obsolete" a true in
+        let archived = bool_attribute "archived" a false in
         let timelimit = int_attribute "timelimit" a (-1) in
         if timelimit < 0 then begin
             eprintf "[Error] incorrector unspecified  timelimit '%i'@."
@@ -774,7 +787,8 @@ and load_proof_or_transf ~old_provers mg a =
               timelimit))
         end;
         let (_ : 'a proof_attempt) =
-          add_external_proof ~keygen ~obsolete ~timelimit ~edit mg p res
+          add_external_proof ~keygen ~archived ~obsolete
+            ~timelimit ~edit mg p res
         in
         ()
     | "transf" ->
@@ -1105,12 +1119,13 @@ let ft_of_pa a =
     But since it will be perhaps removed...
  *)
 let copy_external_proof
-    ?notify ~keygen ?obsolete ?timelimit ?edit
+    ?notify ~keygen ?obsolete ?archived ?timelimit ?edit
     ?goal ?prover ?attempt_status ?env_session ?session a =
   let session = match env_session with
     | Some eS -> Some eS.session
     | _ -> session in
   let obsolete = default_option a.proof_obsolete obsolete in
+  let archived = default_option a.proof_archived archived in
   let timelimit = default_option a.proof_timelimit timelimit in
   let pas = default_option a.proof_state attempt_status in
   let ngoal = default_option a.proof_parent goal in
@@ -1158,7 +1173,7 @@ let copy_external_proof
             Some (dst_file)
   in
   add_external_proof ?notify ~keygen
-    ~obsolete ~timelimit ~edit ngoal nprover pas
+    ~obsolete ~archived ~timelimit ~edit ngoal nprover pas
 
 exception UnloadableProver of Whyconf.prover
 
@@ -1180,6 +1195,7 @@ let update_edit_external_proof env_session a =
         set_edited_as (Some file) a;
         if a.proof_state = Undone Unedited
         then set_proof_state ~notify ~obsolete:a.proof_obsolete
+          ~archived:a.proof_archived
           (Undone Interrupted) a;
         file
       | Some f -> f
@@ -1210,11 +1226,12 @@ let print_attempt_status fmt = function
   | InternalFailure _ -> pp_print_string fmt "Failure"
 
 let print_external_proof fmt p =
-  fprintf fmt "%a - %a (%i)%s%s"
+  fprintf fmt "%a - %a (%i)%s%s%s"
     Whyconf.print_prover p.proof_prover
     print_attempt_status p.proof_state
     p.proof_timelimit
     (if p.proof_obsolete then " obsolete" else "")
+    (if p.proof_archived then " archived" else "")
     (if p.proof_edited_as <> None then " edited" else "")
 
 (***********************************************************)
@@ -1540,6 +1557,7 @@ let merge_proof ~keygen obsolete to_goal _ from_proof =
   ignore
     (add_external_proof ~keygen
        ~obsolete:(obsolete || from_proof.proof_obsolete)
+       ~archived:from_proof.proof_archived
        ~timelimit:from_proof.proof_timelimit
        ~edit:from_proof.proof_edited_as
        to_goal
@@ -1566,7 +1584,8 @@ and merge_trans ~keygen env to_goal _ from_transf =
     from_transf_name to_goal goals in
   List.iter2 (fun (_,_,_,_,_,from_goal,obsolete) to_goal ->
     match from_goal with
-      | Some from_goal -> merge_any_goal ~keygen env obsolete from_goal to_goal
+      | Some from_goal -> merge_any_goal ~keygen env obsolete
+        from_goal to_goal
       | None -> ()) goals transf.transf_goals
 
 exception OutdatedSession

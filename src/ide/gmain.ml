@@ -396,7 +396,8 @@ let set_row_status row b =
   else
     goals_model#set ~row:row#iter ~column:status_column !image_unknown
 
-let set_proof_state ~obsolete a =
+let set_proof_state a =
+  let obsolete = a.S.proof_obsolete in
   let row = a.S.proof_key in
   let res = a.S.proof_state in
   goals_model#set ~row:row#iter ~column:status_column
@@ -414,6 +415,8 @@ let set_proof_state ~obsolete a =
         Format.sprintf "[limit=%d.0]" a.S.proof_timelimit
   in
   let t = if obsolete then t ^ " (obsolete)" else t in
+  (* TODO find a better way to signal arhived row *)
+  let t = if a.S.proof_archived then t ^ " (archived)" else t in
   goals_model#set ~row:row#iter ~column:time_column t
 
 let model_index = Hashtbl.create 17
@@ -512,7 +515,7 @@ let notify any =
     | S.File file ->
         set_row_status row file.S.file_verified
     | S.Proof_attempt a ->
-        set_proof_state ~obsolete:a.S.proof_obsolete a
+        set_proof_state a
     | S.Transf tr ->
         set_row_status row tr.S.transf_verified
 
@@ -710,6 +713,16 @@ let cancel_proofs () =
        M.cancel a)
     (get_selected_row_references ())
 
+(*****************************************)
+(* method: Set or unset the archive flag *)
+(*****************************************)
+
+let set_archive_proofs b () =
+  List.iter
+    (fun r ->
+       let a = get_any_from_row_reference r in
+       S.iter_proof_attempt (fun a -> M.set_archive a b) a)
+    (get_selected_row_references ())
 
 (*****************************************************)
 (* method: split selected goals *)
@@ -1394,14 +1407,30 @@ let () =
               ~label:"Mark as obsolete"
               ~callback:cancel_proofs
               () : GMenu.image_menu_item) in
+  let add_item_archived () =
+    ignore (tools_factory#add_image_item
+              ~label:"Mark as archive"
+              ~callback:(set_archive_proofs true)
+              () : GMenu.image_menu_item) in
+  let add_item_unarchived () =
+    ignore (tools_factory#add_image_item
+              ~label:"Remove from archive"
+              ~callback:(set_archive_proofs false)
+              () : GMenu.image_menu_item) in
   add_refresh_provers add_separator "add sep in tools menu";
   add_refresh_provers add_item_edit "add edit in tools menu";
   add_refresh_provers add_item_replay "add replay in tools menu";
   add_refresh_provers add_item_cancel "add cancel in tools menu";
+  add_refresh_provers add_item_archived "add archive in tools menu";
+  add_refresh_provers add_item_unarchived "add unarchive in tools menu";
   add_separator ();
   add_item_edit ();
   add_item_replay ();
-  add_item_cancel ()
+  add_item_cancel ();
+  add_item_archived ();
+  add_item_unarchived ()
+
+
 
 let () =
   let b = GButton.button ~packing:tools_box#add ~label:"Edit" () in

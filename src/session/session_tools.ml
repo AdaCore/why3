@@ -51,14 +51,7 @@ let convert_unknown_prover ?(remove_converted=false) ~keygen env_session =
         (** If such a prover already exists we add nothing *)
         if not (PHprover.mem pr.proof_parent.goal_external_proofs pk) then
           converted := true;
-          ignore (add_external_proof
-                    ~keygen
-                    ~obsolete:pr.proof_obsolete
-                    ~timelimit:pr.proof_timelimit
-                    ~edit:pr.proof_edited_as
-                    pr.proof_parent
-                    pk
-                    pr.proof_state)
+          ignore (copy_external_proof ~keygen ~prover:pk pr)
       ) pks;
       (** pks = [] (!converted = false) also for the one which are known *)
       if remove_converted && !converted then Session.remove_external_proof pr
@@ -88,9 +81,8 @@ let transform_proof_attempt ?notify ~keygen env_session tr_name =
         add_registered_transformation ~keygen env_session tr_name g in
     let add_pa sg =
       if not (PHprover.mem sg.goal_external_proofs pr.proof_prover) then
-        ignore (add_external_proof ~keygen ~obsolete:pr.proof_obsolete
-                  ~timelimit:pr.proof_timelimit ~edit:pr.proof_edited_as
-                  sg pr.proof_prover (Undone Interrupted)) in
+        ignore (copy_external_proof ~keygen ~goal:sg
+                  ~attempt_status:(Undone Interrupted) pr) in
     List.iter add_pa tr.transf_goals in
   let proofs = all_proof_attempts env_session.session in
   List.iter replace proofs

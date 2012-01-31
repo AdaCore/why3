@@ -335,14 +335,14 @@ let rec find_loadable_prover eS prover =
 
 
 let redo_external_proof eS eT ?timelimit a =
-  let timelimit = match timelimit with
-    | None -> Whyconf.timelimit (Whyconf.get_main eS.whyconf)
-    | Some t -> t in
-  (* check that the state is not Scheduled or Running *)
-  let previous_result,previous_obs = a.proof_state,a.proof_obsolete in
-  if running a then ()
-    (* info_window `ERROR "Proof already in progress" *)
+  if a.proof_archived || running a then ()
   else
+    let timelimit = match timelimit with
+      | None -> Whyconf.timelimit (Whyconf.get_main eS.whyconf)
+      | Some t -> t in
+    (* check that the state is not Scheduled or Running *)
+    let previous_result,previous_obs = a.proof_state,a.proof_obsolete in
+    (* info_window `ERROR "Proof already in progress" *)
     let ap = a.proof_prover in
     match find_loadable_prover eS a.proof_prover with
       | None -> Debug.dprintf debug
@@ -369,15 +369,17 @@ loaded@."
             a in
         if a.proof_edited_as = None &&
           npc.prover_config.Whyconf.interactive then
-          set_proof_state ~notify ~obsolete:false (Undone Unedited) a
+          set_proof_state ~notify ~obsolete:false ~archived:false
+            (Undone Unedited) a
         else begin
           let callback result =
             match result with
               | Undone Interrupted ->
                   set_proof_state ~notify
-                    ~obsolete:previous_obs previous_result a
+                    ~obsolete:previous_obs ~archived:false previous_result a
               | _ ->
-                  set_proof_state ~notify ~obsolete:false result a;
+                  set_proof_state ~notify ~obsolete:false
+                    ~archived:false result a;
           in
           let old =
             match a.proof_edited_as with
@@ -401,7 +403,8 @@ let rec prover_on_goal eS eT ~timelimit p g =
   let a =
     try PHprover.find g.goal_external_proofs p
     with Not_found ->
-      let ep = add_external_proof ~keygen:O.create ~obsolete:false ~timelimit
+      let ep = add_external_proof ~keygen:O.create ~obsolete:false
+        ~archived:false ~timelimit
         ~edit:None g p (Undone Interrupted) in
       O.init ep.proof_key (Proof_attempt ep);
       ep
@@ -508,9 +511,15 @@ let replay eS eT ~obsolete_only ~context_unproved_goals_only a =
 (* method: mark proofs as obsolete *)
 (***********************************)
 
-let cancel_proof a = set_proof_state ~notify ~obsolete:true a.proof_state a
+let cancel_proof a =
+  if not a.proof_archived then
+    set_obsolete ~notify a
 
 let cancel = iter_proof_attempt cancel_proof
+
+(** Set or unset archive *)
+
+let set_archive a b = set_archive a b; notify (Proof_attempt a)
 
 (*********************************)
 (* method: check existing proofs *)
@@ -557,7 +566,7 @@ let check_external_proof eS eT todo a =
   dprintf debug "[Sched] Check external proof : %a@."
     (fun fmt g -> pp_print_string fmt g.goal_name.Ident.id_string) g;
   (* check that the state is not Scheduled or Running *)
-  if running a then ()
+  if a.proof_archived || running a then ()
   else
     begin
       Todo.todo todo;
@@ -592,7 +601,8 @@ let check_external_proof eS eT todo a =
                 | Undone Unedited -> assert false
                 | InternalFailure msg ->
                   Todo._done todo (g,ap,(CallFailed msg));
-                  set_proof_state ~notify ~obsolete:false result a
+                  set_proof_state ~notify ~obsolete:false ~archived:false
+                    result a
                 | Done new_res ->
                   begin
                     match a.proof_state with
@@ -601,7 +611,8 @@ let check_external_proof eS eT todo a =
                       | _ ->
                         Todo._done todo (g,ap,No_former_result new_res)
                   end;
-                  set_proof_state ~notify ~obsolete:false result a
+                  set_proof_state ~notify ~obsolete:false ~archived:false
+                    result a
           in
           let old =
             match a.proof_edited_as with
@@ -698,7 +709,7 @@ let rec transform eS sched ~context_unproved_goals_only tr a =
 
 let edit_proof eS sched ~default_editor a =
   (* check that the state is not Scheduled or Running *)
-  if running a then ()
+  if a.proof_archived || running a then ()
 (*
     info_window `ERROR "Edition already in progress"
 *)
@@ -730,9 +741,11 @@ let edit_proof eS sched ~default_editor a =
           let callback res =
             match res with
               | Done _ ->
-                  set_proof_state ~notify ~obsolete:true old_res a
+                  set_proof_state ~notify ~obsolete:true ~archived:false
+                    old_res a
               | _ ->
-                  set_proof_state ~notify ~obsolete:false res a
+                  set_proof_state ~notify ~obsolete:false ~archived:false
+                    res a
           in
           let editor =
             match npc.prover_config.Whyconf.editor with

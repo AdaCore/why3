@@ -154,6 +154,8 @@ module Make(O: OBSERVER) : sig
 
   val remove_transformation : O.key transf -> unit
 
+  val set_archive : O.key proof_attempt -> bool -> unit
+
   val clean : O.key any -> unit
     (** [clean a] removes failed attempts below [a] where
         there at least one successful attempt or transformation *)

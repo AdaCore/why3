@@ -83,6 +83,7 @@ and 'a proof_attempt = private
       mutable proof_state : proof_attempt_status;
       mutable proof_timelimit : int;
       mutable proof_obsolete : bool;
+      mutable proof_archived : bool;
       mutable proof_edited_as : string option;
     }
 
@@ -255,6 +256,7 @@ val add_external_proof :
   ?notify:'key notify ->
   keygen:'key keygen ->
   obsolete:bool ->
+  archived:bool ->
   timelimit:int ->
   edit:string option ->
   'key goal ->
@@ -267,8 +269,13 @@ val remove_external_proof : ?notify:'key notify -> 'key proof_attempt -> unit
 val set_proof_state :
   ?notify:'key notify ->
   obsolete:bool ->
+  archived:bool ->
   proof_attempt_status ->
   'key proof_attempt -> unit
+
+val set_obsolete : ?notify:'key notify -> 'key proof_attempt -> unit
+
+val set_archive : 'key proof_attempt -> bool -> unit
 
 val set_edited_as : string option -> 'key proof_attempt -> unit
 
@@ -284,6 +291,7 @@ val copy_external_proof :
   ?notify:'key notify ->
   keygen:'key keygen ->
   ?obsolete:bool ->
+  ?archived:bool ->
   ?timelimit:int ->
   ?edit:string option ->
   ?goal:'key goal ->
