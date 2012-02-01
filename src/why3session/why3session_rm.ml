@@ -20,40 +20,63 @@
 open Why3
 open Why3session_lib
 open Whyconf
-module S = Session
+open Session
+open Format
 
-(** TODO:
-    filter_state
-    filter_time
-    filter_?
-*)
+type filter_prover =
+  | Prover of Whyconf.prover
+  | ProverId of string
 
-let tobe_archived = ref None
-let set_archived () = tobe_archived := Some true
-let unset_archived () = tobe_archived := Some false
+(**
+   TODO remove_transformation,...
+**)
 
-let tobe_obsolete = ref false
+(** Currently doesn't share the configuration of ide *)
+type replace = Interactive | Always | Not_valid (*| Never*)
+let opt_remove = ref Always
+let set_remove s () = opt_remove := s
 
 let spec =
-  ("--set-obsolete", Arg.Set tobe_obsolete,
-   " the proof is set to obsolete" ) ::
-  ("--set-archive", Arg.Unit set_archived,
-   " the proof is set to archive" ) ::
-  ("--unset-archive", Arg.Unit unset_archived,
-   " the proof is set to replayable" ) ::
+  ("--clean",
+   Arg.Unit (fun () -> set_remove Not_valid ();
+     set_filter_verified_goal FT_Yes),
+   " Remove unsuccessful proof attempts \
+associated to proved goals (same as --filter-verified-goal --conservative)")::
+  ("--interactive",
+   Arg.Unit (set_remove Interactive), " ask before replacing proof_attempt")::
+  ("-i",
+   Arg.Unit (set_remove Interactive), " same as --interactive")::
+  ("--force", Arg.Unit (set_remove Always),
+   " remove all selected proof_attempt (default)")::
+  ("-f", Arg.Unit (set_remove Always), " same as --force")::
+  ("--conservative", Arg.Unit (set_remove Not_valid),
+   " don't remove proof_attempt which are not obsolete and valid")::
+  ("-c", Arg.Unit (set_remove Not_valid), " same as --conservative")::
+(*  ("--never", Arg.Unit (set_remove Never),
+   " never remove a proof")::
+  ("-n", Arg.Unit (set_remove Never), " same as --never")::*)
   (filter_spec @ env_spec)
+
+let rec interactive to_remove =
+  eprintf "Do you want to remove the external proof %a (y/n)@."
+    print_external_proof to_remove;
+  let answer = read_line () in
+  match answer with
+    | "y" -> true
+    | "n" -> false
+    | _ -> interactive to_remove
 
 let run_one env config filters fname =
   let env_session,_ =
     read_update_session ~allow_obsolete:false env config fname in
   session_iter_proof_attempt_by_filter filters
-    (fun a ->
-      if !tobe_obsolete then S.set_obsolete a;
-      begin match !tobe_archived with
-        | None -> ()
-        | Some b -> S.set_archived a b end;
-    ) env_session.S.session;
-  S.save_session env_session.S.session
+    (fun pr ->
+      let remove = match !opt_remove with
+        | Always -> true (*| Never -> false*)
+        | Interactive -> interactive pr
+        | Not_valid -> not (proof_verified pr) in
+      if remove then remove_external_proof pr) env_session.session;
+  save_session env_session.session
 
 
 let run () =
@@ -65,8 +88,8 @@ let run () =
 
 let cmd =
   { cmd_spec = spec;
-    cmd_desc     = "modify proof based on filter. \
+    cmd_desc     = "remove proof based on a filter. \
 No filter means all the possibilities (except for --filter-archived).";
-    cmd_name     = "mod";
+    cmd_name     = "rm";
     cmd_run      = run;
   }

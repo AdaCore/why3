@@ -66,8 +66,7 @@ type filter_prover =
 val read_opt_prover : string -> filter_prover
 val prover_of_filter_prover : config -> filter_prover -> prover
 
-type filters = Sprover.t (* if empty : every provers *)
-    (* * ... *)
+type filters
 
 val filter_spec : spec_list
 
@@ -76,3 +75,8 @@ val read_filter_spec : Whyconf.config -> filters * bool
 val session_iter_proof_attempt_by_filter :
   filters ->
   ('key Session.proof_attempt -> unit) -> 'key Session.session -> unit
+
+
+(* quite ad-hoc *)
+type filter_three = | FT_Yes | FT_No | FT_All
+val set_filter_verified_goal : filter_three -> unit

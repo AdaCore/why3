@@ -104,7 +104,6 @@ let run_one env config filters pk fname =
     (fun pr -> Stack.push pr s) env_session.session;
   Stack.iter (fun pr ->
     try
-      if pr.proof_archived then raise Exit;
       let prover = match to_prover with To_prover pk -> pk
         | Convert mprover -> Mprover.find_exn Exit pr.proof_prover mprover
       in
@@ -160,7 +159,7 @@ but@ one@ is@ needed.@.";
 let cmd =
   { cmd_spec = spec;
     cmd_desc     = "copy proof based on a filter. \
-No filter means all the possibilities.";
+No filter means all the possibilities (except for --filter-archived).";
     cmd_name     = "copy";
     cmd_run      = run;
   }

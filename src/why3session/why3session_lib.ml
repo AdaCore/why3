@@ -115,13 +115,42 @@ let read_opt_prover s =
 
 let add_filter_prover s = Stack.push (read_opt_prover s) filter_prover
 
+type filter_three = | FT_Yes | FT_No | FT_All
+
+let opt_filter_archived = ref FT_No
+let opt_filter_obsolete = ref FT_All
+let opt_filter_verified_goal = ref FT_All
+let opt_filter_verified = ref FT_All
+
+let add_filter_three r = function
+  | "no" -> r := FT_No
+  | "yes" -> r := FT_Yes
+  | "all" -> r := FT_All
+  | _ -> assert false
+
+let opt_three r = Arg.Symbol (["yes";"no";"all"], add_filter_three r)
+
 let filter_spec =
   ["--filter-prover", Arg.String add_filter_prover,
    " [name,version[,alternative]|id] \
-the proof containing this prover will be transformed"]
+the proof containing this prover are selected";
+   "--filter-archived", opt_three opt_filter_obsolete,
+   " no: only non-obsolete, yes: only obsolete (default all)";
+   "--filter-archived", opt_three opt_filter_archived,
+   " no: only unarchived, yes: only archived (default no)";
+   "--filter-verified-goal", opt_three opt_filter_verified_goal,
+   " no: only parent goal not verified, yes: only verified (default all)";
+   "--filter-verified", opt_three opt_filter_verified,
+   " no: only not verified, yes: only verified (default all)";
+]
 
-type filters = C.Sprover.t (* if empty : every provers *)
-    (* * ... *)
+type filters =
+    { provers : C.Sprover.t; (* if empty : every provers *)
+      obsolete : filter_three;
+      archived : filter_three;
+      verified : filter_three;
+      verified_goal : filter_three;
+    }
 
 let prover_of_filter_prover whyconf = function
   | Prover p -> p
@@ -139,11 +168,36 @@ let read_filter_spec whyconf : filters * bool =
         id (Whyconf.get_conf_file whyconf);
       should_exit := true in
   Stack.iter iter filter_prover;
-  !s,!should_exit
+  {provers = !s;
+   obsolete = !opt_filter_obsolete;
+   archived = !opt_filter_archived;
+   verified = !opt_filter_verified;
+   verified_goal = !opt_filter_verified_goal;
+  },!should_exit
 
-let session_iter_proof_attempt_by_filter provers f session =
-  let iter a = if C.Sprover.mem a.S.proof_prover provers then f a in
-  if C.Sprover.is_empty provers
-  (** if no prover is filtered then they are all taken *)
-  then S.session_iter_proof_attempt f session
-  else S.session_iter_proof_attempt iter session
+let session_iter_proof_attempt_by_filter filters f session =
+  (** provers *)
+  let iter_provers a =
+    if C.Sprover.mem a.S.proof_prover filters.provers then f a in
+  let f = if C.Sprover.is_empty filters.provers then f else iter_provers in
+  (** three value *)
+  let three_value f v p =
+    let iter_obsolete a =
+      match v with
+        | FT_No  when not (p a) -> f a
+        | FT_Yes when     (p a) -> f a
+        | _ -> () (** FT_All treated after *) in
+    if v = FT_All then f else iter_obsolete in
+  (** obsolete *)
+  let f = three_value f filters.obsolete (fun a -> a.S.proof_obsolete) in
+  (** archived *)
+  let f = three_value f filters.archived (fun a -> a.S.proof_archived) in
+  (** verified_goal *)
+  let f = three_value f filters.verified_goal
+    (fun a -> a.S.proof_parent.S.goal_verified) in
+  (** verified *)
+  let f = three_value f filters.verified S.proof_verified in
+  S.session_iter_proof_attempt f session
+
+
+let set_filter_verified_goal t = opt_filter_verified_goal := t
