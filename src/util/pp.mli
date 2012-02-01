@@ -101,6 +101,7 @@ val rchevron : formatter -> unit -> unit
 val nothing : formatter -> 'a -> unit
 val string : formatter -> string -> unit
 val constant_string : string -> formatter -> unit -> unit
+val print0 : formatter -> unit -> unit
 val hov : int -> formatter -> ('a -> unit) -> 'a -> unit
 val add_flush : (formatter -> 'a -> unit) -> formatter -> 'a -> unit
 

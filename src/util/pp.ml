@@ -100,6 +100,7 @@ let rchevron fmt () = fprintf fmt ">"
 let nothing _fmt _ = ()
 let string fmt s = fprintf fmt "%s" s
 let constant_string s fmt () = string fmt s
+let print0 fmt () = pp_print_string fmt "\000"
 let add_flush sep fmt x = sep fmt x; pp_print_flush fmt ()
 
 let print_pair pr1 = print_pair_delim lparen comma rparen pr1

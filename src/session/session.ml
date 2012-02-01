@@ -565,6 +565,9 @@ let set_obsolete ?(notify=notify) a =
 
 let set_archived a b = a.proof_archived <- b
 
+let get_edited_as_abs session pr =
+  option_map (Filename.concat session.session_dir) pr.proof_edited_as
+
 (* [raw_add_goal parent name expl sum t] adds a goal to the given parent
    DOES NOT record the new goal in its parent, thus this should not be exported
 *)
