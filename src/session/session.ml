@@ -207,16 +207,23 @@ module PTreeT = struct
         | File f -> f.file_name
         | Theory th -> th.theory_name.Ident.id_string
         | Goal g ->
-          if g.goal_task = None
-          then g.goal_name.Ident.id_string^"*"
-          else g.goal_name.Ident.id_string
+          if g.goal_verified
+          then g.goal_name.Ident.id_string
+          else g.goal_name.Ident.id_string^"?"
         | Proof_attempt pr ->
-          Pp.sprintf_wnl "%a%s%s%s"
+          Pp.sprintf_wnl "%a%s%s%s%s"
             Whyconf.print_prover pr.proof_prover
+            (match pr.proof_state with
+              | Done { Call_provers.pr_answer = Call_provers.Valid} -> ""
+              | InternalFailure _ -> "!"
+              | _ -> "?")
             (if pr.proof_obsolete || pr.proof_archived then " " else "")
             (if pr.proof_obsolete then "O" else "")
             (if pr.proof_archived then "A" else "")
-        | Transf tr -> tr.transf_name in
+        | Transf tr ->
+          if tr.transf_verified
+          then tr.transf_name
+          else tr.transf_name^"?" in
       let l = ref [] in
       iter (fun a -> l := (Any a)::!l) t;
       s,!l
