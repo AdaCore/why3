@@ -382,12 +382,17 @@ loaded@."
                     ~archived:false result a;
           in
           let old =
-            match a.proof_edited_as with
+            match get_edited_as_abs eS.session a with
               | None -> None
-              | Some edited_as ->
-                let f = Filename.concat eS.session.session_dir edited_as in
-                dprintf debug "Info: proving using edited file %s@." f;
-                (Some (open_in f))
+              | Some f ->
+                if Sys.file_exists f then begin
+                  dprintf debug "Info: proving using edited file %s@." f;
+                  (Some (open_in f))
+                end
+                else begin
+                  dprintf debug "Warning: the file %s is not found@." f;
+                  None
+                end
           in
           set_timelimit timelimit a;
           schedule_proof_attempt
