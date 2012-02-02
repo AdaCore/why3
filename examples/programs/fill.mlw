@@ -1,11 +1,13 @@
 
-(* From Rustan Leino's tutorial on Dafny at VSTTE 2012 *)
+(* From Rustan Leino's tutorial on Dafny at VSTTE 2012
+
+   TODO: prove termination *)
 
 module Fill
 
   use import int.Int
   use import module array.Array
- 
+
   type tree = Null | Node tree int tree
 
   predicate contains (t: tree) (x: int) = match t with
