@@ -8,14 +8,15 @@ module Fill
   use import int.Int
   use import module array.Array
 
-  type tree = Null | Node tree int tree
+  type elt
+  type tree = Null | Node tree elt tree
 
-  predicate contains (t: tree) (x: int) = match t with
-    | Null -> false
+  predicate contains (t: tree) (x: elt) = match t with
+    | Null       -> false
     | Node l y r -> contains l x || x = y || contains r x
   end
 
-  let rec fill (t: tree) (a: array int) (start: int) : int =
+  let rec fill (t: tree) (a: array elt) (start: int) : int =
     { 0 <= start <= length a }
     match t with
     | Null ->
