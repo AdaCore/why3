@@ -719,11 +719,17 @@ let add_wp_decl ps f uc =
   let id = id_fresh ~label ?loc:name.id_loc s in
   let pr = create_prsymbol id in
   (* prepare the VC formula *)
-  let km = get_known (pure_uc uc) in
   let f = remove_at f in
   let f = bool_to_prop uc f in
-  let f = eval_match ~inline:inline_nonrec_linear km f in
   let f = unabsurd f in
+  (* get a known map with tuples added *)
+  let km =
+    let d = create_prop_decl Pgoal pr f in
+    let uc = add_pure_decl d uc in
+    get_known (pure_uc uc)
+  in
+  (* simplify f *)
+  let f = eval_match ~inline:inline_nonrec_linear km f in
   (* printf "wp: f=%a@." print_term f; *)
   let d = create_prop_decl Pgoal pr f in
   add_pure_decl d uc
