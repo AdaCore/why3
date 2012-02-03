@@ -1,7 +1,5 @@
 
-(* From Rustan Leino's tutorial on Dafny at VSTTE 2012
-
-   TODO: prove termination *)
+(* From Rustan Leino's tutorial on Dafny at VSTTE 2012 *)
 
 module Fill
 
@@ -16,7 +14,17 @@ module Fill
     | Node l y r -> contains l x || x = y || contains r x
   end
 
-  let rec fill (t: tree) (a: array elt) (start: int) : int =
+  (* the size of a tree, to prove termination *)
+  function size (t: tree) : int = match t with
+    | Null       -> 0
+    | Node l _ r -> size l + size r + 1
+  end
+
+  lemma size_nonneg: forall t: tree. size t >= 0
+
+  let rec fill (t: tree) (a: array elt) (start: int) : int
+    variant { size t }
+  =
     { 0 <= start <= length a }
     match t with
     | Null ->
