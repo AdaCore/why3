@@ -1763,7 +1763,7 @@ and expr_desc gl env loc ty = function
       let c = type_c env c in
       Eany c, c.c_result_type, c.c_effect
 
-and triple ?(sat_exn=false) gl env (p, e, q) =
+and triple ?(sat_exn=true) gl env (p, e, q) =
   let e = expr gl env e in
   let q = if sat_exn then saturation e.expr_loc e.expr_effect q else q in
   let ef = e.expr_effect in
