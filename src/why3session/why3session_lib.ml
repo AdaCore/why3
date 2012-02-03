@@ -134,7 +134,7 @@ let filter_spec =
   ["--filter-prover", Arg.String add_filter_prover,
    " [name,version[,alternative]|id] \
 the proof containing this prover are selected";
-   "--filter-archived", opt_three opt_filter_obsolete,
+   "--filter-obsolete", opt_three opt_filter_obsolete,
    " no: only non-obsolete, yes: only obsolete (default all)";
    "--filter-archived", opt_three opt_filter_archived,
    " no: only unarchived, yes: only archived (default no)";
