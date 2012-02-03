@@ -204,8 +204,14 @@ module PTreeT = struct
   let decomp = function
     | Any t ->
       let s = match t with
-        | File f -> f.file_name
-        | Theory th -> th.theory_name.Ident.id_string
+        | File f ->
+          if f.file_verified
+          then f.file_name
+          else f.file_name^"?"
+        | Theory th ->
+          if th.theory_verified
+          then th.theory_name.Ident.id_string
+          else th.theory_name.Ident.id_string^"?"
         | Goal g ->
           if g.goal_verified
           then g.goal_name.Ident.id_string
