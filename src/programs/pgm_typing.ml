@@ -1763,9 +1763,9 @@ and expr_desc gl env loc ty = function
       let c = type_c env c in
       Eany c, c.c_result_type, c.c_effect
 
-and triple gl env (p, e, q) =
+and triple ?(sat_exn=false) gl env (p, e, q) =
   let e = expr gl env e in
-  let q = saturation e.expr_loc e.expr_effect q in
+  let q = if sat_exn then saturation e.expr_loc e.expr_effect q else q in
   let ef = e.expr_effect in
   let ef, p = term_effect ef p in
   let ef, q = post_effect ef q in
@@ -1811,11 +1811,11 @@ and letrec gl env dl = (* : env * recfun list *)
     in
     List.fold_left add1 env dl
   in
-  let one_step m0 =
+  let one_step ?(sat_exn=false) m0 =
     let type1 m (i, bl, env, var, t) =
       let decvar = option_map (fun (v,_,_) -> v.pv_pure) var in
       let env = make_env env ?decvar m0 in
-      let t, c = triple gl env t in
+      let t, c = triple ~sat_exn gl env t in
       let v = create_pvsymbol (id_clone i.i_impure.vs_name) (tarrow bl c)
         ~effect:i.i_effect ~pure:i.i_pure
       in
@@ -1825,7 +1825,7 @@ and letrec gl env dl = (* : env * recfun list *)
   in
   let rec fixpoint m =
     (* printf "fixpoint...@\n"; *)
-    let m', dl' = one_step m in
+    let m', _ = one_step m in
     let same_effect (i,bl,_,_,_) =
       let c = Mvs.find i.i_impure m and c' = Mvs.find i.i_impure m' in
       let v = tarrow bl c and v' = tarrow bl c' in
@@ -1834,7 +1834,10 @@ and letrec gl env dl = (* : env * recfun list *)
       eq_type_v v v'
       (* E.equal c.c_effect c'.c_effect *)
     in
-    if List.for_all same_effect dl then m, dl' else fixpoint m'
+    if List.for_all same_effect dl then
+      one_step ~sat_exn:true m
+    else
+      fixpoint m'
   in
   let add_empty_effect m (i, bl, _, _, (p, _, q)) =
     let tyl, ty = uncurrying i.i_impure.vs_ty in

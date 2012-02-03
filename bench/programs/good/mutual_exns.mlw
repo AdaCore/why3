@@ -1,0 +1,19 @@
+module T
+
+  use import int.Int
+
+  exception MyExc
+
+  (* g can raise MyExc *)
+
+  let rec f (x: int) : int  = {} raise MyExc {} | MyExc -> {}
+
+  with    g (x: int) : int = {} f x {} | MyExc -> {}
+
+end
+
+(*
+Local Variables:
+compile-command: "unset LANG; make -C ../../.. bench/programs/good/mutual_exns"
+End:
+*)
