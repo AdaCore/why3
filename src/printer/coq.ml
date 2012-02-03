@@ -271,8 +271,8 @@ and print_tnode opl opr info fmt t = match t.t_node with
             if tl = [] then fprintf fmt "%a" (print_ls_real info) fs
             else fprintf fmt "(%a %a)" (print_ls_real info) fs
               (print_space_list (print_term info)) tl
-          else fprintf fmt (protect_on opl "(%a%a:%a)") (print_ls_real info) fs
-            (print_paren_r (print_term info)) tl (print_ty info) (t_type t)
+          else fprintf fmt (protect_on opl "(%a %a:%a)") (print_ls_real info) fs
+            (print_space_list (print_term info)) tl (print_ty info) (t_type t)
     end
   | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> raise (TermExpected t)
 

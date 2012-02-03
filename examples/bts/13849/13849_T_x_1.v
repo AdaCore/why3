@@ -26,7 +26,7 @@ Inductive b  :=
 
 (* DO NOT EDIT BELOW *)
 
-Theorem x1 : ((X(T, A0):(x a b)) = (X(T, A1):(x a b))).
+Theorem x1 : ((X T A0:(x a b)) = (X T A1:(x a b))).
 (* YOU MAY EDIT THE PROOF BELOW *)
 intuition.
 
