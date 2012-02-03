@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
 <why3session
- name="fill/why3session.xml">
+ name="examples/programs/fill/why3session.xml">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -9,21 +9,21 @@
  <prover
   id="1"
   name="Coq"
-  version="8.2pl2"/>
+  version="8.3pl3"/>
  <file
   name="../fill.mlw"
   verified="true"
   expanded="true">
   <theory
    name="WP Fill"
-   locfile="fill/../fill.mlw"
-   loclnum="6" loccnumb="7" loccnume="11"
+   locfile="examples/programs/fill/../fill.mlw"
+   loclnum="4" loccnumb="7" loccnume="11"
    verified="true"
    expanded="true">
    <goal
     name="size_nonneg"
-    locfile="fill/../fill.mlw"
-    loclnum="24" loccnumb="8" loccnume="19"
+    locfile="examples/programs/fill/../fill.mlw"
+    loclnum="23" loccnumb="8" loccnume="19"
     sum="8382205e1f534dc681a160909cc41727"
     proved="true"
     expanded="true"
@@ -31,16 +31,16 @@
     <proof
      prover="1"
      timelimit="15"
-     edited="fill_WP_Fill_size_nonneg_1.v"
+     edited="fill_WP_Fill_size_nonneg_2.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.45"/>
+     <result status="valid" time="0.48"/>
     </proof>
    </goal>
    <goal
     name="WP_parameter fill"
-    locfile="fill/../fill.mlw"
-    loclnum="26" loccnumb="10" loccnume="14"
+    locfile="examples/programs/fill/../fill.mlw"
+    loclnum="25" loccnumb="10" loccnume="14"
     expl="parameter fill"
     sum="2382af3dce215ccfb7a37bfd9f852d4a"
     proved="true"
@@ -54,7 +54,7 @@
      timelimit="15"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.09"/>
+     <result status="valid" time="0.07"/>
     </proof>
    </goal>
   </theory>
