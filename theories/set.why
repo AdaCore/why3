@@ -19,7 +19,7 @@ theory Set
     forall s1 s2 s3: set 'a. subset s1 s2 -> subset s2 s3 -> subset s1 s3
 
   (* empty set *)
-  function empty : set 'a
+  constant empty : set 'a
 
   predicate is_empty (s: set 'a) = forall x: 'a. not (mem x s)
 
@@ -144,7 +144,7 @@ theory SetMap
 
   predicate mem (x:'a) (s:set 'a) = s[x] = True
 
-  function empty : set 'a = const False
+  constant empty : set 'a = const False
 
   predicate is_empty (s : set 'a) = forall x : 'a. not (mem x s)
 

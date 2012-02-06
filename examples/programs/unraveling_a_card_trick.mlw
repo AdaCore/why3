@@ -17,10 +17,10 @@ theory GilbreathCardTrick
   use export list.Reverse
   use import list.Nth
 
-  function m: int
+  constant m: int
   axiom m_positive: 0 < m
 
-  function n: int
+  constant n: int
   axiom n_nonnegative: 0 <= n
 
   (* c is a riffle shuffle of a and b *)

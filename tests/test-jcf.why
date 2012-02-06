@@ -1,4 +1,18 @@
 
+theory TestConstant
+
+  constant a : int
+  constant b : int
+  constant c : int
+
+  function f : int
+  function g : int
+
+  predicate p
+
+  goal G: a=0 && p
+end
+
 theory TestCoq
   use import list.List
   use import list.Append
@@ -31,8 +45,8 @@ theory Order
 end
 
 (*
-Local Variables: 
+Local Variables:
 compile-command: "make -C .. tests/test-jcf.gui"
-End: 
+End:
 *)
 

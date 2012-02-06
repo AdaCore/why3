@@ -11,7 +11,7 @@ module M
   use import module ref.Ref
   use import module array.Array
 
-  function n : int
+  constant n : int
   axiom N_non_negative : n >= 0
 
   let hull (a: array int) (b: array int) =

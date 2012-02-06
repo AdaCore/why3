@@ -31,7 +31,7 @@ let debug_print_labels = Debug.register_flag "print_labels"
 let debug_print_locs = Debug.register_flag "print_locs"
 
 let iprinter,aprinter,tprinter,pprinter =
-  let bl = ["theory"; "type"; "function"; "predicate"; "inductive";
+  let bl = ["theory"; "type"; "constant"; "function"; "predicate"; "inductive";
             "axiom"; "lemma"; "goal"; "use"; "clone"; "prop"; "meta";
             "namespace"; "import"; "export"; "end";
             "forall"; "exists"; "not"; "true"; "false"; "if"; "then"; "else";
@@ -329,7 +329,9 @@ let print_type_decl first fmt d =
 
 let print_ls_type fmt = fprintf fmt " :@ %a" print_ty
 
-let ls_kind ls = if ls.ls_value = None then "predicate" else "function"
+let ls_kind ls =
+  if ls.ls_value = None then "predicate"
+  else if ls.ls_args = [] then "constant" else "function"
 
 let print_logic_decl fst fmt (ls,ld) = match ld with
   | Some ld ->

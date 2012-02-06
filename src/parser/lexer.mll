@@ -44,6 +44,7 @@
         "as", AS;
         "axiom", AXIOM;
         "clone", CLONE;
+        "constant", CONSTANT;
         "else", ELSE;
         "end", END;
         "epsilon", EPSILON;

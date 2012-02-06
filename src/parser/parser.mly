@@ -194,7 +194,7 @@ end
 
 /* keywords */
 
-%token AS AXIOM CLONE
+%token AS AXIOM CLONE CONSTANT
 %token ELSE END EPSILON EXISTS EXPORT FALSE FORALL FUNCTION
 %token GOAL IF IMPORT IN INDUCTIVE LEMMA
 %token LET MATCH META NAMESPACE NOT PROP PREDICATE
@@ -320,6 +320,8 @@ namespace_name:
 decl:
 | TYPE list1_type_decl
     { TypeDecl $2 }
+| CONSTANT logic_decl_constant
+    { LogicDecl [$2] }
 | FUNCTION list1_logic_decl_function
     { LogicDecl $2 }
 | PREDICATE list1_logic_decl_predicate
@@ -370,6 +372,7 @@ list1_comma_subst:
 subst:
 | NAMESPACE ns     EQUAL ns     { CSns   ($2, $4) }
 | TYPE      qualid EQUAL qualid { CStsym ($2, $4) }
+| CONSTANT  qualid EQUAL qualid { CSfsym ($2, $4) }
 | FUNCTION  qualid EQUAL qualid { CSfsym ($2, $4) }
 | PREDICATE qualid EQUAL qualid { CSpsym ($2, $4) }
 | LEMMA     qualid              { CSlemma $2 }
@@ -467,6 +470,12 @@ list1_logic_decl_predicate:
 list1_logic_decl:
 | logic_decl                        { [$1] }
 | logic_decl WITH list1_logic_decl  { $1 :: $3 }
+;
+
+logic_decl_constant:
+| lident_rich labels COLON primitive_type logic_def_option
+  { { ld_loc = floc (); ld_ident = add_lab $1 $2;
+      ld_params = []; ld_type = Some $4; ld_def = $5 } }
 ;
 
 logic_decl_function:

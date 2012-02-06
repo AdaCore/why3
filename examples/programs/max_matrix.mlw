@@ -23,7 +23,7 @@ theory Bitset "sets of small integers"
 
   use import int.Int
 
-  function size : int (* elements belong to 0..size-1 *)
+  constant size : int (* elements belong to 0..size-1 *)
 
   type set
 
@@ -172,13 +172,13 @@ module MaxMatrixMemo
   use import map.Map
   use import module ref.Ref
 
-  function n : int
+  constant n : int
   axiom n_nonneg: 0 <= n
 
   use import Bitset
   axiom integer_size: n <= size
 
-  function m : map int (map int int)
+  constant m : map int (map int int)
   axiom m_pos: forall i j: int. 0 <= i < n -> 0 <= j < n -> 0 <= m[i][j]
 
   predicate solution (s: map int int) (i: int) =

@@ -12,7 +12,7 @@ module TortoiseAndHare
   function f t : t
 
   (* given some initial value x0 *)
-  function x0: t
+  constant x0: t
 
   (* we can build the infinite sequence defined by x{i+1} = f(xi) *)
   clone import int.Iter with type t = t, function f = f
@@ -27,8 +27,8 @@ module TortoiseAndHare
      (2) x{n+lambda} = x_n when n >= mu. *)
 
   (* lambda and mu are skomlemized *)
-  function mu     : int
-  function lambda : int
+  constant mu     : int
+  constant lambda : int
 
   (* they are axiomatized as follows *)
   axiom mu_range: 0 <= mu

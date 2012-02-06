@@ -22,7 +22,7 @@ end
 theory Group
   type t
 
-  function unit : t
+  constant unit : t
 
   function op t t : t
   function inv t : t
@@ -47,13 +47,13 @@ end
 
 theory Ring
   type t
-  function zero : t
+  constant zero : t
   function (+) t t : t
   function (-_) t : t
   function (*) t t : t
 
   clone CommutativeGroup with type t = t,
-                              function unit = zero,
+                              constant unit = zero,
                               function op = (+),
                               function inv = (-_)
 
@@ -72,7 +72,7 @@ end
 
 theory UnitaryCommutativeRing
   clone export CommutativeRing
-  function one : t
+  constant one : t
   axiom Unitary : forall x:t. one * x = x
   axiom NonTrivialRing : zero <> one
 end

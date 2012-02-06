@@ -1,15 +1,16 @@
 \begin{syntax}
-  theory ::= "theory" uident label* decl* "end" 
+  theory ::= "theory" uident label* decl* "end"
   \
   decl ::= "type" type-decl ("with" type-decl)* ;
+    | "constant" constant-decl ;
     | "function" function-decl ("with" logic-decl)* ;
     | "predicate" predicate-decl ("with" logic-decl)* ;
     | "inductive" inductive-decl ("with" inductive-decl)* ;
     | "axiom" ident ":" formula 	   ;
     | "lemma" ident ":" formula 	   ;
     | "goal"  ident ":" formula 	   ;
-    | "use" imp-exp tqualid ("as" uident-opt)?     ; 
-    | "clone" imp-exp tqualid ("as" uident-opt)? subst? ;	   
+    | "use" imp-exp tqualid ("as" uident-opt)?     ;
+    | "clone" imp-exp tqualid ("as" uident-opt)? subst? ;
     | "namespace" "import"? uident-opt decl* "end" ;
   \
   type-decl ::= lident label* ("'" lident label*)* type-defn;
@@ -25,6 +26,9 @@
   \
   logic-decl ::= function-decl ;
     | predicate-decl
+  \
+  constant-decl ::= lident label* ":" type ;
+    | lident label* ":" type "=" term
   \
   function-decl ::= lident label* type-param* ":" type ;
     | lident label* type-param* ":" type "=" term
