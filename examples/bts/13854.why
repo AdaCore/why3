@@ -1,0 +1,11 @@
+theory T
+ type t 'a = A 'a | B
+
+ function f () : () 
+
+  goal g : () = f ()
+
+  goal x : A () <> B
+(*Theorem x : ((A ) = (B :(t unit))). *)
+
+end

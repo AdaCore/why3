@@ -260,6 +260,8 @@ and print_tnode opl opr info fmt t = match t.t_node with
       fprintf fmt (protect_on opr "epsilon %a.@ %a")
         (print_vsty info) v (print_opl_fmla info) f;
       forget_var v
+  | Tapp (fs,[]) when is_fs_tuple fs ->
+      fprintf fmt "tt" 
   | Tapp (fs,pl) when is_fs_tuple fs ->
       fprintf fmt "%a" (print_paren_r (print_term info)) pl
   | Tapp (fs, tl) ->
