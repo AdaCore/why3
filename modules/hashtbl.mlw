@@ -1,4 +1,8 @@
 
+(* Hash tables à la OCaml: each key is mapped to a *stack* of values,
+   with [add h k v] pushing a new value [v] for key [k],
+   and [remove h k] popping a value for key [key]. *)
+
 module Hashtbl
 
   use import list.List
@@ -51,9 +55,9 @@ module Hashtbl
     { forall k: key. result[k] = h[k] }
 
   val remove (h: t 'a) (k: key) :
-    { h[k] <> Nil }
+    {}
     unit writes h
-    { (match (old h)[k] with Nil -> false | Cons _ l -> h[k] =l end) /\
+    { h[k] = match (old h)[k] with Nil -> Nil | Cons _ l -> l end /\
       forall k': key. k' <> k -> h[k'] = (old h)[k'] }
 
   val replace (h: t 'a) (k: key) (v: 'a) :

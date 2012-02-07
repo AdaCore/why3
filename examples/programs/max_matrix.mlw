@@ -14,7 +14,7 @@
 
    The following code implements such a solution. Sets of integers are
    provided in theory Bitset. Hash tables for memoization are provided
-   in module HashTable (signature) and HashTableImpl (implementation).
+   in module HashTable (see file hash_tables.mlw for an implementation).
    Code for f is in module MaxMatrixMemo (mutually recursive functions
    maximum and memo).
 *)
@@ -89,79 +89,6 @@ module HashTable
     {}
     'b reads h raises Not_found
     { h[k] = Some result } | Not_found -> { h[k] = None }
-
-end
-
-module HashTableImpl
-
-  use import option.Option
-  use import int.Int
-  use import int.Abs
-  use import int.ComputerDivision
-  use import map.Map
-  use import list.List
-  use import list.Mem
-  use import module array.Array
-
-  type t 'a 'b = array (list ('a, 'b))
-
-  function get (h: t 'a 'b) (k: 'a) : option 'b
-
-  axiom get_None:
-    forall h: t 'a 'b, k: 'a.
-    get h k = None <->
-    (forall i: int. 0 <= i < length h -> forall v: 'b. not (mem (k, v) h[i]))
-
-  axiom get_Some:
-    forall h: t 'a 'b, k: 'a, v: 'b.
-    get h k = Some v <->
-    exists i: int. 0 <= i < length h /\ mem (k,v) h[i]
-
-  function hash 'a : int
-
-  function idx (h: t 'a 'b) (k: 'a) : int =
-    mod (abs (hash k)) (length h)
-
-  predicate inv (h: t 'a 'b) =
-    length h > 0 /\
-    forall i: int. 0 <= i < length h ->
-    forall k: 'a, v: 'b. mem (k,v) h[i] -> idx h k = i
-
-  lemma idx_bounds:
-    forall h: t 'a 'b. inv h -> forall k: 'a. 0 <= idx h k < length h
-
-  let create (n:int) =
-    { 0 < n }
-    make n (Nil: list ('a, 'b))
-    { inv result /\ forall k: 'a. get result k = None }
-
-  let clear (h: t 'a 'b) =
-    { inv h }
-    fill h 0 (length h) Nil
-    { inv h /\ forall k: 'a. get h k = None }
-
-  let add (h: t 'a 'b) (k: 'a) (v: 'b) =
-    { inv h }
-    let i = idx h k in
-    h[i] <- Cons (k,v) h[i]
-    { inv h &&
-      get h k = Some v /\ forall k': 'a. k' <> k -> get h k' = get (old h) k' }
-
-  exception Not_found
-
-  let rec lookup (k: 'a) (l: list ('a, 'b)) : 'b =
-    {}
-    match l with
-    | Nil -> raise Not_found
-    | Cons (k', v) r -> if k = k' then v else lookup k r
-    end
-    { mem (k, result) l } | Not_found -> { forall v: 'b. not (mem (k, v) l) }
-
-  let find (h: t 'a 'b) (k: 'a) =
-    { inv h }
-    let i = idx h k in
-    lookup k h[i]
-    { get h k = Some result } | Not_found -> { get h k = None }
 
 end
 
