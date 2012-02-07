@@ -22,68 +22,13 @@ open Stdlib
 open Ident
 open Ty
 
-(** region variables *)
-
-type rvsymbol = private {
-  rv_name : ident;
-}
-
-module Mrv : Map.S with type key = rvsymbol
-module Srv : Mrv.Set
-module Hrv : Hashtbl.S with type key = rvsymbol
-module Wrv : Hashweak.S with type key = rvsymbol
-
-val rv_equal : rvsymbol -> rvsymbol -> bool
-
-val rv_hash : rvsymbol -> int
-
-val create_rvsymbol : preid -> rvsymbol
-
-(** subregion projections *)
-
-type srsymbol = private {
-  srs_name : ident;
-}
-
-val srs_equal : srsymbol -> srsymbol -> bool
-
-val srs_hash : srsymbol -> int
-
-val create_srsymbol : preid -> srsymbol
-
-(** regions *)
-
-type region = private {
-  reg_node : reg_node;
-  reg_tag  : Hashweak.tag;
-}
-
-and reg_node = private
-  | Rvar of rvsymbol
-  | Rsub of srsymbol * region
-
-val reg_equal : region -> region -> bool
-
-val reg_hash : region -> int
-
-module Mreg : Map.S with type key = region
-module Sreg : Mreg.Set
-module Hreg : Hashtbl.S with type key = region
-module Wreg : Hashweak.S with type key = region
-
-val reg_var : rvsymbol -> region
-val reg_sub : srsymbol -> region -> region
-
-val reg_getrv : region -> rvsymbol
-
 (** value types (w/o effects) *)
 
 type vtysymbol = private {
   vts_pure  : tysymbol;
   vts_args  : tvsymbol list;
-  vts_regs  : rvsymbol list;
+  vts_regs  : region   list;
   vts_def   : vty option;
-  vts_model : bool;
 }
 
 and vty = private {
@@ -95,6 +40,12 @@ and vty_node = private
   | Vtyvar of tvsymbol
   | Vtypur of tysymbol * vty list
   | Vtyapp of vtysymbol * vty list * region list
+  | Vtymod of tysymbol * vty
+
+and region = private {
+  reg_ty  : vty;
+  reg_tag : Hashweak.tag;
+}
 
 module Mvts : Map.S with type key = vtysymbol
 module Svts : Mvts.Set
@@ -106,32 +57,38 @@ module Svty : Mvty.Set
 module Hvty : Hashtbl.S with type key = vty
 module Wvty : Hashweak.S with type key = vty
 
+module Mreg : Map.S with type key = region
+module Sreg : Mreg.Set
+module Hreg : Hashtbl.S with type key = region
+module Wreg : Hashweak.S with type key = region
+
 val vts_equal : vtysymbol -> vtysymbol -> bool
 val vty_equal : vty -> vty -> bool
 
 val vts_hash : vtysymbol -> int
 val vty_hash : vty -> int
 
+val reg_equal : region -> region -> bool
+val reg_hash : region -> int
+
 exception BadVtyArity of vtysymbol * int * int
 exception BadRegArity of vtysymbol * int * int
-exception DuplicateRegVar of rvsymbol
-exception UnboundRegVar of rvsymbol
+exception DuplicateRegion of region
+exception UnboundRegion of region
 exception InvalidRegion of region
 
+val create_region : vty -> region
+
 val create_vtysymbol :
-  preid -> tvsymbol list -> rvsymbol list -> vty option -> bool -> vtysymbol
+  preid -> tvsymbol list -> region list -> vty option -> bool -> vtysymbol
 
 val vty_var : tvsymbol -> vty
 val vty_pur : tysymbol -> vty list -> vty
 
-(* this constructor expands type aliases only in non-model types *)
 val vty_app : vtysymbol -> vty list -> region list -> vty
 
-(* this constructor expands type aliases even in model types *)
-val vty_app_model : vtysymbol -> vty list -> region list -> vty
-
-(* expands all type aliases *)
-val vty_model : vty -> vty
+(* erases all [Vtymod] *)
+val vty_unmod : vty -> vty
 
 (* all aliases expanded, all regions removed *)
 val ty_of_vty : vty -> ty
@@ -157,22 +114,22 @@ val vty_v_fold :
 val vty_v_all : (tvsymbol -> bool) -> (region -> bool) -> vty -> bool
 val vty_v_any : (tvsymbol -> bool) -> (region -> bool) -> vty -> bool
 
-(*
 (** {3 symbol-wise map/fold} *)
 (** visits every symbol of the type *)
-val ty_s_map : (tysymbol -> tysymbol) -> ty -> ty
-val ty_s_fold : ('a -> tysymbol -> 'a) -> 'a -> ty -> 'a
-val ty_s_all : (tysymbol -> bool) -> ty -> bool
-val ty_s_any : (tysymbol -> bool) -> ty -> bool
+(*
+val vty_s_map : (vtysymbol -> vtysymbol) -> vty -> vty
+val vty_s_fold : ('a -> vtysymbol -> 'a) -> 'a -> vty -> 'a
+val vty_s_all : (vtysymbol -> bool) -> vty -> bool
+val vty_s_any : (vtysymbol -> bool) -> vty -> bool
 
-exception TypeMismatch of ty * ty
+exception TypeMismatch of vty * vty
 
-val ty_match : ty Mrv.t -> ty -> ty -> ty Mrv.t
-val ty_inst  : ty Mrv.t -> ty -> ty
-val ty_freevars : Srv.t -> ty -> Srv.t
-val ty_closed : ty -> bool
+val vty_match : vty Mreg.t -> vty -> vty -> vty Mreg.t
+val vty_inst  : vty Mreg.t -> vty -> vty
+val vty_freevars : Srv.t -> vty -> Srv.t
+val vty_closed : vty -> bool
 
-val ty_equal_check : ty -> ty -> unit
+val vty_equal_check : vty -> vty -> unit
 *)
 
 
