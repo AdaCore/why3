@@ -1,450 +1,466 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
 <why3session
- name="hoare_logic/imp/why3session.xml">
+ name="examples/hoare_logic/imp/why3session.xml">
  <prover
-  id="alt-ergo"
+  id="0"
   name="Alt-Ergo"
   version="0.94"/>
  <prover
-  id="coq"
-  name="Coq"
-  version="8.3pl3"/>
- <prover
-  id="cvc3-2.2"
+  id="1"
   name="CVC3"
   version="2.2"/>
  <prover
-  id="cvc3-2.4"
-  name="CVC3"
-  version="2.4.1"/>
+  id="2"
+  name="Coq"
+  version="8.3pl3"/>
  <prover
-  id="eprover"
+  id="3"
   name="Eprover"
   version="1.4"/>
  <prover
-  id="gappa"
-  name="Gappa"
-  version="0.15.1"/>
- <prover
-  id="simplify"
-  name="Simplify"
-  version="1.5.4"/>
- <prover
-  id="spass"
+  id="4"
   name="Spass"
   version="3.7"/>
  <prover
-  id="vampire"
+  id="5"
   name="Vampire"
   version="0.6"/>
  <prover
-  id="verit"
-  name="veriT"
-  version="dev"/>
- <prover
-  id="yices"
-  name="Yices"
-  version="1.0.25"/>
- <prover
-  id="z3-2"
+  id="6"
   name="Z3"
   version="2.19"/>
- <prover
-  id="z3-3"
-  name="Z3"
-  version="3.2"/>
  <file
   name="../imp.why"
   verified="false"
   expanded="true">
   <theory
    name="Imp"
+   locfile="examples/hoare_logic/imp/../imp.why"
+   loclnum="2" loccnumb="7" loccnume="10"
    verified="false"
    expanded="true">
    <goal
     name="ident_eq_dec"
+    locfile="examples/hoare_logic/imp/../imp.why"
+    loclnum="8" loccnumb="6" loccnume="18"
     sum="ca7c4648761db026ea93d61666f0b79a"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =V0V1NOainfix =V0V1F">
     <proof
-     prover="z3-2"
+     prover="6"
      timelimit="3"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.01"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="cvc3-2.2"
+     prover="1"
      timelimit="3"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.01"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="alt-ergo"
+     prover="0"
      timelimit="3"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
     name="check_skip"
+    locfile="examples/hoare_logic/imp/../imp.why"
+    loclnum="32" loccnumb="6" loccnume="16"
     sum="a28ed21b2b531fe3e8a3933e02f27497"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =V0aSskipNOainfix =V0aSskipF">
     <proof
-     prover="cvc3-2.2"
+     prover="1"
      timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.02"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="alt-ergo"
+     prover="0"
      timelimit="5"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
     name="Test13"
+    locfile="examples/hoare_logic/imp/../imp.why"
+    loclnum="59" loccnumb="7" loccnume="13"
     sum="89034cff3a243960c6fe7b2b2a91966f"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="Laconstc0ainfix =aeval_exprV0aEconstc13c13">
     <proof
-     prover="cvc3-2.2"
+     prover="4"
      timelimit="5"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="eprover"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="vampire"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="spass"
-     timelimit="5"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="0"
+     timelimit="5"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="5"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
     name="Test42"
+    locfile="examples/hoare_logic/imp/../imp.why"
+    loclnum="63" loccnumb="7" loccnume="13"
     sum="991bca434c242bd0fc4fcae7860bb583"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="Lamk_identc0Lasetaconstc0V0c42ainfix =aeval_exprV1aEvarV0c42">
     <proof
-     prover="cvc3-2.2"
+     prover="4"
      timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="alt-ergo"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="eprover"
-     timelimit="5"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="vampire"
+     prover="1"
      timelimit="5"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="0"
+     timelimit="5"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="5"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.08"/>
     </proof>
     <proof
-     prover="spass"
+     prover="3"
      timelimit="5"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
    <goal
     name="Test55"
+    locfile="examples/hoare_logic/imp/../imp.why"
+    loclnum="68" loccnumb="7" loccnume="13"
     sum="13ad67fe0a83a4e1ece624124c864703"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="Lamk_identc0Lasetaconstc0V0c42ainfix =aeval_exprV1aEbinaEvarV0aOplusaEconstc13c55">
     <proof
-     prover="cvc3-2.2"
+     prover="1"
      timelimit="5"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="alt-ergo"
+     prover="0"
      timelimit="5"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="Ass42"
+    locfile="examples/hoare_logic/imp/../imp.why"
+    loclnum="112" loccnumb="7" loccnume="12"
     sum="2eae993f753f8826c606f370e5382862"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="Lamk_identc0Laconstc0ainfix =agetV2V0c42Iaone_stepV1aSassignV0aEconstc42V2aSskipF">
     <proof
-     prover="cvc3-2.2"
+     prover="1"
      timelimit="5"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="alt-ergo"
+     prover="0"
      timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.05"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
     </proof>
    </goal>
    <goal
     name="If42"
+    locfile="examples/hoare_logic/imp/../imp.why"
+    loclnum="119" loccnumb="7" loccnume="11"
     sum="12b5437a3440e505c69b24e6e91a75b8"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="Lamk_identc0Laconstc0ainfix =agetV3V0c42Iaone_stepV2V4V3aSskipIaone_stepV1aSifaEvarV0aSassignV0aEconstc13aSassignV0aEconstc42V2V4F">
     <proof
-     prover="cvc3-2.2"
+     prover="1"
      timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.35"/>
-    </proof>
-    <proof
-     prover="alt-ergo"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="1.04"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.32"/>
     </proof>
    </goal>
    <goal
     name="progress"
+    locfile="examples/hoare_logic/imp/../imp.why"
+    loclnum="131" loccnumb="8" loccnume="16"
     sum="1de081684224e7f85881292371e2b0b0"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="aone_stepV0V1V2V3EIainfix =V1aSskipNF">
     <proof
-     prover="coq"
+     prover="2"
      timelimit="5"
      edited="imp_Imp_progress_1.v"
-     obsolete="false">
-     <result status="valid" time="0.52"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.50"/>
     </proof>
    </goal>
    <goal
     name="many_steps_seq_rec"
+    locfile="examples/hoare_logic/imp/../imp.why"
+    loclnum="148" loccnumb="6" loccnume="24"
     sum="1437eebbf80b92b8c7d930a8e1f09f1d"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="amany_stepsV6V5V1aSskipAamany_stepsV0V4V6aSskipEIainfix =V2aSseqV4V5FIainfix =V3aSskipIamany_stepsV0V2V1V3F">
     <proof
-     prover="coq"
+     prover="2"
      timelimit="3"
      edited="imp_Imp_many_steps_seq_rec_1.v"
-     obsolete="false">
-     <result status="valid" time="0.56"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.53"/>
     </proof>
    </goal>
    <goal
     name="many_steps_seq"
+    locfile="examples/hoare_logic/imp/../imp.why"
+    loclnum="155" loccnumb="6" loccnume="20"
     sum="c454267b2ebd89d6185e11ed0374c13c"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="amany_stepsV4V3V1aSskipAamany_stepsV0V2V4aSskipEIamany_stepsV0aSseqV2V3V1aSskipF">
     <proof
-     prover="z3-2"
+     prover="6"
      timelimit="3"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="cvc3-2.2"
+     prover="0"
      timelimit="3"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="alt-ergo"
-     timelimit="3"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.04"/>
     </proof>
    </goal>
    <goal
     name="eval_subst_expr"
+    locfile="examples/hoare_logic/imp/../imp.why"
+    loclnum="185" loccnumb="6" loccnume="21"
     sum="f5d51c7e4199b965800307ebb3d10140"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =aeval_exprV0asubst_exprV1V2V3aeval_exprasetV0V2aeval_exprV0V3V1F">
     <proof
-     prover="coq"
+     prover="2"
      timelimit="5"
      edited="imp_Imp_eval_subst_expr_1.v"
-     obsolete="false">
-     <result status="valid" time="0.53"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.52"/>
     </proof>
    </goal>
    <goal
     name="eval_subst"
+    locfile="examples/hoare_logic/imp/../imp.why"
+    loclnum="197" loccnumb="6" loccnume="16"
     sum="99eaa712e77012cdbc17731732304877"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="aeval_fmlaasetV0V2aeval_exprV0V3V1qaeval_fmlaV0asubstV1V2V3F">
     <proof
-     prover="coq"
+     prover="2"
      timelimit="5"
      edited="imp_Imp_eval_subst_2.v"
-     obsolete="false">
-     <result status="valid" time="0.55"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.52"/>
     </proof>
    </goal>
    <goal
     name="skip_rule"
+    locfile="examples/hoare_logic/imp/../imp.why"
+    loclnum="210" loccnumb="6" loccnume="15"
     sum="6f634e9ba9fef417c81e04f8c64a990a"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="avalid_tripleV0aSskipV0F">
     <proof
-     prover="coq"
+     prover="2"
      timelimit="3"
      edited="imp_Imp_skip_rule_1.v"
-     obsolete="false">
-     <result status="valid" time="0.58"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.51"/>
     </proof>
    </goal>
    <goal
     name="assign_rule"
+    locfile="examples/hoare_logic/imp/../imp.why"
+    loclnum="213" loccnumb="6" loccnume="17"
     sum="1c2200a7792284ba6d0a78d2f2a04be9"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="avalid_tripleasubstV0V1V2aSassignV1V2V0F">
     <proof
-     prover="coq"
+     prover="2"
      timelimit="5"
      edited="imp_Imp_assign_rule_1.v"
-     obsolete="false">
-     <result status="valid" time="0.59"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.56"/>
     </proof>
    </goal>
    <goal
     name="seq_rule"
+    locfile="examples/hoare_logic/imp/../imp.why"
+    loclnum="217" loccnumb="6" loccnume="14"
     sum="3430e48f60bc03df61fed9db4f65710b"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="avalid_tripleV0aSseqV3V4V1Iavalid_tripleV2V4V1Aavalid_tripleV0V3V2F">
     <proof
-     prover="coq"
-     timelimit="3"
-     edited="imp_Imp_seq_rule_2.v"
-     obsolete="false">
-     <result status="valid" time="0.54"/>
+     prover="6"
+     timelimit="5"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
     </proof>
     <proof
-     prover="z3-2"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.03"/>
+     prover="2"
+     timelimit="3"
+     edited="imp_Imp_seq_rule_2.v"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.50"/>
     </proof>
    </goal>
    <goal
     name="if_rule"
+    locfile="examples/hoare_logic/imp/../imp.why"
+    loclnum="222" loccnumb="6" loccnume="13"
     sum="17c3ab55261d3b73b0b5cd8d446dc3d4"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="avalid_tripleV1aSifV0V3V4V2Iavalid_tripleaFandV1aFnotaFtermV0V4V2Aavalid_tripleaFandV1aFtermV0V3V2F">
     <proof
-     prover="coq"
+     prover="2"
      timelimit="3"
      edited="imp_Imp_if_rule_1.v"
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.56"/>
     </proof>
    </goal>
    <goal
     name="while_rule_rec"
+    locfile="examples/hoare_logic/imp/../imp.why"
+    loclnum="238" loccnumb="6" loccnume="20"
     sum="e78d7b18fc6e38f4102faaf8fc7ac692"
     proved="false"
     expanded="true"
     shape="aeval_fmlaV4aFandaFnotaFtermV0V1Iaeval_fmlaV3V1Iainfix =V6aSskipIainfix =V5aSwhileV0V2Iamany_stepsV3V5V4V6FIavalid_tripleaFandaFtermV0V1V2V1F">
     <proof
-     prover="coq"
+     prover="2"
      timelimit="5"
      edited="imp_Imp_while_rule_rec_1.v"
-     obsolete="false">
+     obsolete="true"
+     archived="false">
      <result status="unknown" time="0.53"/>
     </proof>
    </goal>
    <goal
     name="while_rule"
+    locfile="examples/hoare_logic/imp/../imp.why"
+    loclnum="246" loccnumb="6" loccnume="16"
     sum="160833addfc656befefa1bbe6863cac0"
     proved="true"
     expanded="true"
     shape="avalid_tripleV1aSwhileV0V2aFandaFnotaFtermV0V1Iavalid_tripleaFandaFtermV0V1V2V1F">
     <proof
-     prover="z3-2"
+     prover="6"
      timelimit="3"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.02"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
     </proof>
     <proof
-     prover="cvc3-2.2"
+     prover="1"
      timelimit="3"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.10"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.09"/>
     </proof>
     <proof
-     prover="alt-ergo"
+     prover="0"
      timelimit="3"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.37"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.34"/>
     </proof>
    </goal>
   </theory>
