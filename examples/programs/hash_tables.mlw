@@ -69,10 +69,16 @@ module HashTableImpl
     forall k: 'a, v: 'b, l: list ('a, 'b).
     occurs_first k v l -> mem (k, v) l
 
+  lemma cons_occurs_first:
+    forall k1: 'a, v1: 'b, l: list ('a, 'b). occurs_first k1 v1 l ->
+    forall k: 'a, v: 'b. k <> k1 -> occurs_first k1 v1 (Cons (k,v) l)
+
   predicate valid (h: t 'a 'b) =
     length h.data > 0 /\
+    (* h[k]=v iff (k,v) is the first pair for k in the bucket for k *)
     (forall k: 'a, v: 'b.
        get h k = Some v <-> occurs_first k v h.data[idx h k]) /\
+    (* a pair (k,v) is always stored in the right bucket *)
     (forall k: 'a, v: 'b.
      forall i: int. 0 <= i < length h.data ->
        mem (k,v) h.data[i] -> i = idx h k)
