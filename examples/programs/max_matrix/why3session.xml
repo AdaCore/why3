@@ -4,33 +4,33 @@
  name="examples/programs/max_matrix/why3session.xml">
  <prover
   id="0"
-  prover_id="alt-ergo" name="Alt-Ergo"
+  name="Alt-Ergo"
   version="0.94"/>
  <prover
   id="1"
-  prover_id="cvc3-2.2" name="CVC3"
+  name="CVC3"
   version="2.2"/>
  <prover
   id="2"
-  prover_id="yices" name="Yices"
+  name="Yices"
   version="1.0.25"/>
  <prover
   id="3"
-  prover_id="z3-2" name="Z3"
-  version="2.19"/>
+  name="Yices"
+  version="1.0.27"/>
  <prover
   id="4"
-  prover_id="z3-3" name="Z3"
-  version="3.2"/>
+  name="Z3"
+  version="2.19"/>
  <file
   name="../max_matrix.mlw"
-  verified="false"
+  verified="true"
   expanded="true">
   <theory
    name="Bitset"
    locfile="examples/programs/max_matrix/../max_matrix.mlw"
-   loclnum="8" loccnumb="7" loccnume="13"
-   verified="false"
+   loclnum="22" loccnumb="7" loccnume="13"
+   verified="true"
    expanded="true">
    <label
     name="sets of small integers">
@@ -39,20 +39,20 @@
   <theory
    name="WP HashTable"
    locfile="examples/programs/max_matrix/../max_matrix.mlw"
-   loclnum="51" loccnumb="7" loccnume="16"
-   verified="false"
+   loclnum="65" loccnumb="7" loccnume="16"
+   verified="true"
    expanded="false">
   </theory>
   <theory
    name="WP HashTableImpl"
    locfile="examples/programs/max_matrix/../max_matrix.mlw"
-   loclnum="81" loccnumb="7" loccnume="20"
+   loclnum="95" loccnumb="7" loccnume="20"
    verified="true"
-   expanded="false">
+   expanded="true">
    <goal
     name="idx_bounds"
     locfile="examples/programs/max_matrix/../max_matrix.mlw"
-    loclnum="116" loccnumb="8" loccnume="18"
+    loclnum="130" loccnumb="8" loccnume="18"
     sum="e2d6f78c386a3a98aa5b311ba94c435e"
     proved="true"
     expanded="false"
@@ -60,15 +60,15 @@
     <proof
      prover="0"
      timelimit="30"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.05"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
     </proof>
    </goal>
    <goal
     name="WP_parameter create"
     locfile="examples/programs/max_matrix/../max_matrix.mlw"
-    loclnum="119" loccnumb="6" loccnume="12"
+    loclnum="133" loccnumb="6" loccnume="12"
     expl="parameter create"
     sum="bc0f54f1b551ebc79e0c14fc02e9349b"
     proved="true"
@@ -84,7 +84,7 @@
      <goal
       name="WP_parameter create.1"
       locfile="examples/programs/max_matrix/../max_matrix.mlw"
-      loclnum="119" loccnumb="6" loccnume="12"
+      loclnum="133" loccnumb="6" loccnume="12"
       expl="precondition"
       sum="e7d769a43ab9a925ae7e124cc52afc4e"
       proved="true"
@@ -96,15 +96,15 @@
       <proof
        prover="0"
        timelimit="30"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.02"/>
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter create.2"
       locfile="examples/programs/max_matrix/../max_matrix.mlw"
-      loclnum="119" loccnumb="6" loccnume="12"
+      loclnum="133" loccnumb="6" loccnume="12"
       expl="normal postcondition"
       sum="6686dd69ba41a4473113f21d4246ecb8"
       proved="true"
@@ -120,7 +120,7 @@
        <goal
         name="WP_parameter create.2.1"
         locfile="examples/programs/max_matrix/../max_matrix.mlw"
-        loclnum="119" loccnumb="6" loccnume="12"
+        loclnum="133" loccnumb="6" loccnume="12"
         expl="parameter create"
         sum="014b86a21b6be38a028d52d898160f52"
         proved="true"
@@ -132,15 +132,15 @@
         <proof
          prover="0"
          timelimit="30"
-         edited=""
-         obsolete="false">
-         <result status="valid" time="0.08"/>
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.05"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter create.2.2"
         locfile="examples/programs/max_matrix/../max_matrix.mlw"
-        loclnum="119" loccnumb="6" loccnume="12"
+        loclnum="133" loccnumb="6" loccnume="12"
         expl="parameter create"
         sum="8cd5e352bc17eb75e0b8f83cecbdbc3b"
         proved="true"
@@ -152,9 +152,9 @@
         <proof
          prover="0"
          timelimit="30"
-         edited=""
-         obsolete="false">
-         <result status="valid" time="0.07"/>
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.05"/>
         </proof>
        </goal>
       </transf>
@@ -164,7 +164,7 @@
    <goal
     name="WP_parameter clear"
     locfile="examples/programs/max_matrix/../max_matrix.mlw"
-    loclnum="124" loccnumb="6" loccnume="11"
+    loclnum="138" loccnumb="6" loccnume="11"
     expl="parameter clear"
     sum="5238400f9328073a9c9cb046601b7859"
     proved="true"
@@ -180,7 +180,7 @@
      <goal
       name="WP_parameter clear.1"
       locfile="examples/programs/max_matrix/../max_matrix.mlw"
-      loclnum="124" loccnumb="6" loccnume="11"
+      loclnum="138" loccnumb="6" loccnume="11"
       expl="precondition"
       sum="9b89dd49059bba7abb92581cb52476f3"
       proved="true"
@@ -192,15 +192,15 @@
       <proof
        prover="0"
        timelimit="30"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.00"/>
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter clear.2"
       locfile="examples/programs/max_matrix/../max_matrix.mlw"
-      loclnum="124" loccnumb="6" loccnume="11"
+      loclnum="138" loccnumb="6" loccnume="11"
       expl="normal postcondition"
       sum="21f961e8801dc1dd1f0bd53afbc42d33"
       proved="true"
@@ -212,9 +212,9 @@
       <proof
        prover="0"
        timelimit="30"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.28"/>
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.23"/>
       </proof>
      </goal>
     </transf>
@@ -222,11 +222,11 @@
    <goal
     name="WP_parameter add"
     locfile="examples/programs/max_matrix/../max_matrix.mlw"
-    loclnum="129" loccnumb="6" loccnume="9"
+    loclnum="143" loccnumb="6" loccnume="9"
     expl="parameter add"
     sum="ba337e98b9c09856eb4f5ddb56e22d38"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="Lamk arrayV0V3Lamk arrayV0V5ainfix =agetV6V7agetV4V7Iainfix =V7V1NFAainfix =agetV6V1aSomeV2AainvV6Iainfix =V5asetV3amodaabsahashV1V0aConsaTuple2V1V2agetV3amodaabsahashV1V0FAainfix <amodaabsahashV1V0V0Aainfix <=c0amodaabsahashV1V0Aainfix <amodaabsahashV1V0V0Aainfix <=c0amodaabsahashV1V0IainvV4FFFF">
     <label
      name="expl:parameter add">
@@ -234,11 +234,11 @@
     <transf
      name="split_goal"
      proved="true"
-     expanded="false">
+     expanded="true">
      <goal
       name="WP_parameter add.1"
       locfile="examples/programs/max_matrix/../max_matrix.mlw"
-      loclnum="129" loccnumb="6" loccnume="9"
+      loclnum="143" loccnumb="6" loccnume="9"
       expl="precondition"
       sum="688c9e55f539d990119ad3e63995be89"
       proved="true"
@@ -254,7 +254,7 @@
        <goal
         name="WP_parameter add.1.1"
         locfile="examples/programs/max_matrix/../max_matrix.mlw"
-        loclnum="129" loccnumb="6" loccnume="9"
+        loclnum="143" loccnumb="6" loccnume="9"
         expl="parameter add"
         sum="dd5a40267268d745b6626cb47b4763c8"
         proved="true"
@@ -266,15 +266,15 @@
         <proof
          prover="0"
          timelimit="30"
-         edited=""
-         obsolete="false">
-         <result status="valid" time="0.03"/>
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.00"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter add.1.2"
         locfile="examples/programs/max_matrix/../max_matrix.mlw"
-        loclnum="129" loccnumb="6" loccnume="9"
+        loclnum="143" loccnumb="6" loccnume="9"
         expl="parameter add"
         sum="d44fdbef4001002c65549b17c609321b"
         proved="true"
@@ -286,9 +286,9 @@
         <proof
          prover="0"
          timelimit="30"
-         edited=""
-         obsolete="false">
-         <result status="valid" time="0.09"/>
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.06"/>
         </proof>
        </goal>
       </transf>
@@ -296,7 +296,7 @@
      <goal
       name="WP_parameter add.2"
       locfile="examples/programs/max_matrix/../max_matrix.mlw"
-      loclnum="129" loccnumb="6" loccnume="9"
+      loclnum="143" loccnumb="6" loccnume="9"
       expl="precondition"
       sum="9b869b056b829b04bc3878a0bc39be33"
       proved="true"
@@ -308,19 +308,19 @@
       <proof
        prover="0"
        timelimit="30"
-       edited=""
-       obsolete="false">
+       obsolete="false"
+       archived="false">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter add.3"
       locfile="examples/programs/max_matrix/../max_matrix.mlw"
-      loclnum="129" loccnumb="6" loccnume="9"
+      loclnum="143" loccnumb="6" loccnume="9"
       expl="normal postcondition"
       sum="bbf2b4992db1a3e3de425ff80ce404cc"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="Lamk arrayV0V3Lamk arrayV0V5ainfix =agetV6V7agetV4V7Iainfix =V7V1NFAainfix =agetV6V1aSomeV2AainvV6Iainfix =V5asetV3amodaabsahashV1V0aConsaTuple2V1V2agetV3amodaabsahashV1V0FIainfix <amodaabsahashV1V0V0Aainfix <=c0amodaabsahashV1V0Iainfix <amodaabsahashV1V0V0Aainfix <=c0amodaabsahashV1V0IainvV4FFFF">
       <label
        name="expl:parameter add">
@@ -328,11 +328,11 @@
       <transf
        name="split_goal"
        proved="true"
-       expanded="false">
+       expanded="true">
        <goal
         name="WP_parameter add.3.1"
         locfile="examples/programs/max_matrix/../max_matrix.mlw"
-        loclnum="129" loccnumb="6" loccnume="9"
+        loclnum="143" loccnumb="6" loccnume="9"
         expl="parameter add"
         sum="6bd9d4204343bd5df19c11e48e406d65"
         proved="true"
@@ -342,17 +342,17 @@
          name="expl:parameter add">
          </label>
         <proof
-         prover="3"
+         prover="4"
          timelimit="10"
-         edited=""
-         obsolete="false">
-         <result status="valid" time="0.19"/>
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.06"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter add.3.2"
         locfile="examples/programs/max_matrix/../max_matrix.mlw"
-        loclnum="129" loccnumb="6" loccnume="9"
+        loclnum="143" loccnumb="6" loccnume="9"
         expl="parameter add"
         sum="dbdbcfd88b1aa3d804c0c0760634c094"
         proved="true"
@@ -362,21 +362,21 @@
          name="expl:parameter add">
          </label>
         <proof
-         prover="3"
+         prover="4"
          timelimit="10"
-         edited=""
-         obsolete="false">
-         <result status="valid" time="0.03"/>
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.04"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter add.3.3"
         locfile="examples/programs/max_matrix/../max_matrix.mlw"
-        loclnum="129" loccnumb="6" loccnume="9"
+        loclnum="143" loccnumb="6" loccnume="9"
         expl="parameter add"
         sum="a3cea909815ff15a6ccab170451c8039"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="Lamk arrayV0V3Lamk arrayV0V5ainfix =agetV6V7agetV4V7Iainfix =V7V1NFIainvV6Iainfix =V5asetV3amodaabsahashV1V0aConsaTuple2V1V2agetV3amodaabsahashV1V0FIainfix <amodaabsahashV1V0V0Aainfix <=c0amodaabsahashV1V0Iainfix <amodaabsahashV1V0V0Aainfix <=c0amodaabsahashV1V0IainvV4FFFF">
         <label
          name="expl:parameter add">
@@ -384,9 +384,9 @@
         <proof
          prover="4"
          timelimit="10"
-         edited=""
-         obsolete="false">
-         <result status="valid" time="5.11"/>
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.50"/>
         </proof>
        </goal>
       </transf>
@@ -396,7 +396,7 @@
    <goal
     name="WP_parameter lookup"
     locfile="examples/programs/max_matrix/../max_matrix.mlw"
-    loclnum="138" loccnumb="10" loccnume="16"
+    loclnum="152" loccnumb="10" loccnume="16"
     expl="parameter lookup"
     sum="ce86185e78bd73c51c750f3908959823"
     proved="true"
@@ -412,7 +412,7 @@
      <goal
       name="WP_parameter lookup.1"
       locfile="examples/programs/max_matrix/../max_matrix.mlw"
-      loclnum="138" loccnumb="10" loccnume="16"
+      loclnum="152" loccnumb="10" loccnume="16"
       expl="parameter lookup"
       sum="736fc1a5df0d8f0ab1a0d7d161fbad6d"
       proved="true"
@@ -424,15 +424,15 @@
       <proof
        prover="0"
        timelimit="10"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.01"/>
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter lookup.2"
       locfile="examples/programs/max_matrix/../max_matrix.mlw"
-      loclnum="138" loccnumb="10" loccnume="16"
+      loclnum="152" loccnumb="10" loccnume="16"
       expl="parameter lookup"
       sum="cb365e1c362800194cc90244e308f478"
       proved="true"
@@ -444,15 +444,15 @@
       <proof
        prover="0"
        timelimit="10"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.02"/>
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter lookup.3"
       locfile="examples/programs/max_matrix/../max_matrix.mlw"
-      loclnum="138" loccnumb="10" loccnume="16"
+      loclnum="152" loccnumb="10" loccnume="16"
       expl="parameter lookup"
       sum="edd1d708630a5f71fba44502aa918a01"
       proved="true"
@@ -464,15 +464,15 @@
       <proof
        prover="0"
        timelimit="10"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.01"/>
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter lookup.4"
       locfile="examples/programs/max_matrix/../max_matrix.mlw"
-      loclnum="138" loccnumb="10" loccnume="16"
+      loclnum="152" loccnumb="10" loccnume="16"
       expl="parameter lookup"
       sum="757f3184c1eb6fb8df1a9b0b22e0fe04"
       proved="true"
@@ -484,9 +484,9 @@
       <proof
        prover="0"
        timelimit="10"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.00"/>
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
     </transf>
@@ -494,7 +494,7 @@
    <goal
     name="WP_parameter find"
     locfile="examples/programs/max_matrix/../max_matrix.mlw"
-    loclnum="146" loccnumb="6" loccnume="10"
+    loclnum="160" loccnumb="6" loccnume="10"
     expl="parameter find"
     sum="f31ecc876fb4cb27cc479fa705ca89e1"
     proved="true"
@@ -506,22 +506,22 @@
     <proof
      prover="0"
      timelimit="18"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="2.75"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="1.93"/>
     </proof>
    </goal>
   </theory>
   <theory
    name="WP MaxMatrixMemo"
    locfile="examples/programs/max_matrix/../max_matrix.mlw"
-   loclnum="154" loccnumb="7" loccnume="20"
+   loclnum="168" loccnumb="7" loccnume="20"
    verified="true"
    expanded="false">
    <goal
     name="sum_ind"
     locfile="examples/programs/max_matrix/../max_matrix.mlw"
-    loclnum="180" loccnumb="8" loccnume="15"
+    loclnum="194" loccnumb="8" loccnume="15"
     sum="82c17a7da0e1b8a3aae23567c0b67b7d"
     proved="true"
     expanded="false"
@@ -529,15 +529,15 @@
     <proof
      prover="0"
      timelimit="47"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="7.47"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="5.07"/>
     </proof>
    </goal>
    <goal
     name="WP_parameter maximum"
     locfile="examples/programs/max_matrix/../max_matrix.mlw"
-    loclnum="211" loccnumb="10" loccnume="17"
+    loclnum="225" loccnumb="10" loccnume="17"
     expl="parameter maximum"
     sum="85d19f6875d30098f4ce5f9a09440533"
     proved="true"
@@ -553,7 +553,7 @@
      <goal
       name="WP_parameter maximum.1"
       locfile="examples/programs/max_matrix/../max_matrix.mlw"
-      loclnum="211" loccnumb="10" loccnume="17"
+      loclnum="225" loccnumb="10" loccnume="17"
       expl="normal postcondition"
       sum="1e2ce87dce38f0c4ee88fdfa12db4709"
       proved="true"
@@ -565,15 +565,15 @@
       <proof
        prover="0"
        timelimit="30"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.11"/>
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.06"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter maximum.2"
       locfile="examples/programs/max_matrix/../max_matrix.mlw"
-      loclnum="211" loccnumb="10" loccnume="17"
+      loclnum="225" loccnumb="10" loccnume="17"
       expl="assertion"
       sum="604974106ff1fe2dce7f6741e1c01da0"
       proved="true"
@@ -589,7 +589,7 @@
        <goal
         name="WP_parameter maximum.2.1"
         locfile="examples/programs/max_matrix/../max_matrix.mlw"
-        loclnum="211" loccnumb="10" loccnume="17"
+        loclnum="225" loccnumb="10" loccnume="17"
         expl="assertion"
         sum="1cf3e7c00647d0d782efb80e3fe401ad"
         proved="true"
@@ -601,9 +601,9 @@
         <proof
          prover="0"
          timelimit="30"
-         edited=""
-         obsolete="false">
-         <result status="valid" time="0.02"/>
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
       </transf>
@@ -611,7 +611,7 @@
      <goal
       name="WP_parameter maximum.3"
       locfile="examples/programs/max_matrix/../max_matrix.mlw"
-      loclnum="211" loccnumb="10" loccnume="17"
+      loclnum="225" loccnumb="10" loccnume="17"
       expl="normal postcondition"
       sum="2afe95fceda82737e5c0145369ee03f7"
       proved="true"
@@ -623,15 +623,15 @@
       <proof
        prover="0"
        timelimit="30"
-       edited=""
-       obsolete="false">
+       obsolete="false"
+       archived="false">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter maximum.4"
       locfile="examples/programs/max_matrix/../max_matrix.mlw"
-      loclnum="211" loccnumb="10" loccnume="17"
+      loclnum="225" loccnumb="10" loccnume="17"
       expl="for loop initialization"
       sum="d0d16c1bb1f4177e02f8b27f02eb60a0"
       proved="true"
@@ -643,15 +643,15 @@
       <proof
        prover="0"
        timelimit="30"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.01"/>
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter maximum.5"
       locfile="examples/programs/max_matrix/../max_matrix.mlw"
-      loclnum="211" loccnumb="10" loccnume="17"
+      loclnum="225" loccnumb="10" loccnume="17"
       expl="for loop preservation"
       sum="a57ce5321fda6ea3963b7356dadb6974"
       proved="true"
@@ -667,7 +667,7 @@
        <goal
         name="WP_parameter maximum.5.1"
         locfile="examples/programs/max_matrix/../max_matrix.mlw"
-        loclnum="211" loccnumb="10" loccnume="17"
+        loclnum="225" loccnumb="10" loccnume="17"
         expl="for loop preservation"
         sum="2c7eff006807e09c92b5a84971743561"
         proved="true"
@@ -683,7 +683,7 @@
          <goal
           name="WP_parameter maximum.5.1.1"
           locfile="examples/programs/max_matrix/../max_matrix.mlw"
-          loclnum="211" loccnumb="10" loccnume="17"
+          loclnum="225" loccnumb="10" loccnume="17"
           expl="for loop preservation"
           sum="861a8092b0ca3b6f0dfa225f88ae7007"
           proved="true"
@@ -695,15 +695,15 @@
           <proof
            prover="0"
            timelimit="10"
-           edited=""
-           obsolete="false">
-           <result status="valid" time="0.02"/>
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="0.01"/>
           </proof>
          </goal>
          <goal
           name="WP_parameter maximum.5.1.2"
           locfile="examples/programs/max_matrix/../max_matrix.mlw"
-          loclnum="211" loccnumb="10" loccnume="17"
+          loclnum="225" loccnumb="10" loccnume="17"
           expl="for loop preservation"
           sum="d72fd248727279e5500a4f045bc34f22"
           proved="true"
@@ -715,15 +715,15 @@
           <proof
            prover="0"
            timelimit="10"
-           edited=""
-           obsolete="false">
-           <result status="valid" time="0.02"/>
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="0.01"/>
           </proof>
          </goal>
          <goal
           name="WP_parameter maximum.5.1.3"
           locfile="examples/programs/max_matrix/../max_matrix.mlw"
-          loclnum="211" loccnumb="10" loccnume="17"
+          loclnum="225" loccnumb="10" loccnume="17"
           expl="for loop preservation"
           sum="06e19f96f682ceeb1d0523b0276184bf"
           proved="true"
@@ -735,15 +735,15 @@
           <proof
            prover="0"
            timelimit="30"
-           edited=""
-           obsolete="false">
-           <result status="valid" time="0.07"/>
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="0.04"/>
           </proof>
          </goal>
          <goal
           name="WP_parameter maximum.5.1.4"
           locfile="examples/programs/max_matrix/../max_matrix.mlw"
-          loclnum="211" loccnumb="10" loccnume="17"
+          loclnum="225" loccnumb="10" loccnume="17"
           expl="for loop preservation"
           sum="651481adf97d7dc94aeeee2c3943d6c9"
           proved="true"
@@ -755,9 +755,9 @@
           <proof
            prover="0"
            timelimit="30"
-           edited=""
-           obsolete="false">
-           <result status="valid" time="0.01"/>
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="0.00"/>
           </proof>
          </goal>
         </transf>
@@ -765,7 +765,7 @@
        <goal
         name="WP_parameter maximum.5.2"
         locfile="examples/programs/max_matrix/../max_matrix.mlw"
-        loclnum="211" loccnumb="10" loccnume="17"
+        loclnum="225" loccnumb="10" loccnume="17"
         expl="for loop preservation"
         sum="3cbb0781c6d4afea587cd0f6a5e8a36c"
         proved="true"
@@ -777,15 +777,15 @@
         <proof
          prover="0"
          timelimit="30"
-         edited=""
-         obsolete="false">
-         <result status="valid" time="0.02"/>
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter maximum.5.3"
         locfile="examples/programs/max_matrix/../max_matrix.mlw"
-        loclnum="211" loccnumb="10" loccnume="17"
+        loclnum="225" loccnumb="10" loccnume="17"
         expl="for loop preservation"
         sum="6ceb58f4fd3604500060d3331f563196"
         proved="true"
@@ -801,7 +801,7 @@
          <goal
           name="WP_parameter maximum.5.3.1"
           locfile="examples/programs/max_matrix/../max_matrix.mlw"
-          loclnum="211" loccnumb="10" loccnume="17"
+          loclnum="225" loccnumb="10" loccnume="17"
           expl="for loop preservation"
           sum="58ccc583b5fb2e36d4cb16b0d3e97e9e"
           proved="true"
@@ -817,7 +817,7 @@
            <goal
             name="WP_parameter maximum.5.3.1.1"
             locfile="examples/programs/max_matrix/../max_matrix.mlw"
-            loclnum="211" loccnumb="10" loccnume="17"
+            loclnum="225" loccnumb="10" loccnume="17"
             expl="for loop preservation"
             sum="c9e696037fd1ffa7c7ce9823d1fcef3f"
             proved="true"
@@ -827,10 +827,17 @@
              name="expl:parameter maximum">
              </label>
             <proof
+             prover="3"
+             timelimit="30"
+             obsolete="false"
+             archived="false">
+             <result status="valid" time="0.05"/>
+            </proof>
+            <proof
              prover="2"
              timelimit="30"
-             edited=""
-             obsolete="false">
+             obsolete="true"
+             archived="false">
              <result status="valid" time="0.07"/>
             </proof>
            </goal>
@@ -841,7 +848,7 @@
        <goal
         name="WP_parameter maximum.5.4"
         locfile="examples/programs/max_matrix/../max_matrix.mlw"
-        loclnum="211" loccnumb="10" loccnume="17"
+        loclnum="225" loccnumb="10" loccnume="17"
         expl="for loop preservation"
         sum="34e8091eb59fd908334c33a734a0a687"
         proved="true"
@@ -853,15 +860,15 @@
         <proof
          prover="0"
          timelimit="30"
-         edited=""
-         obsolete="false">
-         <result status="valid" time="0.02"/>
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.00"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter maximum.5.5"
         locfile="examples/programs/max_matrix/../max_matrix.mlw"
-        loclnum="211" loccnumb="10" loccnume="17"
+        loclnum="225" loccnumb="10" loccnume="17"
         expl="for loop preservation"
         sum="fa6639484140825694af1684a48199c3"
         proved="true"
@@ -877,7 +884,7 @@
          <goal
           name="WP_parameter maximum.5.5.1"
           locfile="examples/programs/max_matrix/../max_matrix.mlw"
-          loclnum="211" loccnumb="10" loccnume="17"
+          loclnum="225" loccnumb="10" loccnume="17"
           expl="for loop preservation"
           sum="228182814cbe59742e38c9866830c199"
           proved="true"
@@ -889,9 +896,9 @@
           <proof
            prover="1"
            timelimit="10"
-           edited=""
-           obsolete="false">
-           <result status="valid" time="0.80"/>
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="0.39"/>
           </proof>
          </goal>
         </transf>
@@ -899,7 +906,7 @@
        <goal
         name="WP_parameter maximum.5.6"
         locfile="examples/programs/max_matrix/../max_matrix.mlw"
-        loclnum="211" loccnumb="10" loccnume="17"
+        loclnum="225" loccnumb="10" loccnume="17"
         expl="for loop preservation"
         sum="d9c06e3e41f05b089bcb3f94ab33273f"
         proved="true"
@@ -911,15 +918,15 @@
         <proof
          prover="0"
          timelimit="30"
-         edited=""
-         obsolete="false">
-         <result status="valid" time="0.02"/>
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter maximum.5.7"
         locfile="examples/programs/max_matrix/../max_matrix.mlw"
-        loclnum="211" loccnumb="10" loccnume="17"
+        loclnum="225" loccnumb="10" loccnume="17"
         expl="for loop preservation"
         sum="cd3cb88f0e3ad82ed536c30341aa4bf5"
         proved="true"
@@ -931,9 +938,9 @@
         <proof
          prover="0"
          timelimit="30"
-         edited=""
-         obsolete="false">
-         <result status="valid" time="0.25"/>
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.15"/>
         </proof>
        </goal>
       </transf>
@@ -941,7 +948,7 @@
      <goal
       name="WP_parameter maximum.6"
       locfile="examples/programs/max_matrix/../max_matrix.mlw"
-      loclnum="211" loccnumb="10" loccnume="17"
+      loclnum="225" loccnumb="10" loccnume="17"
       expl="assertion"
       sum="202432429700fe5814bea65413e69fce"
       proved="true"
@@ -957,7 +964,7 @@
        <goal
         name="WP_parameter maximum.6.1"
         locfile="examples/programs/max_matrix/../max_matrix.mlw"
-        loclnum="211" loccnumb="10" loccnume="17"
+        loclnum="225" loccnumb="10" loccnume="17"
         expl="assertion"
         sum="202432429700fe5814bea65413e69fce"
         proved="true"
@@ -967,10 +974,17 @@
          name="expl:parameter maximum">
          </label>
         <proof
+         prover="3"
+         timelimit="30"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof
          prover="2"
          timelimit="30"
-         edited=""
-         obsolete="false">
+         obsolete="true"
+         archived="false">
          <result status="valid" time="0.05"/>
         </proof>
        </goal>
@@ -979,7 +993,7 @@
      <goal
       name="WP_parameter maximum.7"
       locfile="examples/programs/max_matrix/../max_matrix.mlw"
-      loclnum="211" loccnumb="10" loccnume="17"
+      loclnum="225" loccnumb="10" loccnume="17"
       expl="normal postcondition"
       sum="d1b887a878076811f5f659c323e8ed37"
       proved="true"
@@ -995,7 +1009,7 @@
        <goal
         name="WP_parameter maximum.7.1"
         locfile="examples/programs/max_matrix/../max_matrix.mlw"
-        loclnum="211" loccnumb="10" loccnume="17"
+        loclnum="225" loccnumb="10" loccnume="17"
         expl="parameter maximum"
         sum="4c6a4fb7f5c7dae203d0f87f4c130da6"
         proved="true"
@@ -1011,7 +1025,7 @@
          <goal
           name="WP_parameter maximum.7.1.1"
           locfile="examples/programs/max_matrix/../max_matrix.mlw"
-          loclnum="211" loccnumb="10" loccnume="17"
+          loclnum="225" loccnumb="10" loccnume="17"
           expl="parameter maximum"
           sum="4f8901f876b0c293a153840d256b22f7"
           proved="true"
@@ -1023,9 +1037,9 @@
           <proof
            prover="1"
            timelimit="10"
-           edited=""
-           obsolete="false">
-           <result status="valid" time="0.27"/>
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="0.12"/>
           </proof>
          </goal>
         </transf>
@@ -1033,7 +1047,7 @@
        <goal
         name="WP_parameter maximum.7.2"
         locfile="examples/programs/max_matrix/../max_matrix.mlw"
-        loclnum="211" loccnumb="10" loccnume="17"
+        loclnum="225" loccnumb="10" loccnume="17"
         expl="parameter maximum"
         sum="e684182a792d4153a467d908b935c7c2"
         proved="true"
@@ -1045,8 +1059,8 @@
         <proof
          prover="0"
          timelimit="30"
-         edited=""
-         obsolete="false">
+         obsolete="false"
+         archived="false">
          <result status="valid" time="0.00"/>
         </proof>
        </goal>
@@ -1057,7 +1071,7 @@
    <goal
     name="WP_parameter memo"
     locfile="examples/programs/max_matrix/../max_matrix.mlw"
-    loclnum="240" loccnumb="7" loccnume="11"
+    loclnum="254" loccnumb="7" loccnume="11"
     expl="parameter memo"
     sum="30dabefbf6eb53b70fe70d8703847b02"
     proved="true"
@@ -1073,7 +1087,7 @@
      <goal
       name="WP_parameter memo.1"
       locfile="examples/programs/max_matrix/../max_matrix.mlw"
-      loclnum="240" loccnumb="7" loccnume="11"
+      loclnum="254" loccnumb="7" loccnume="11"
       expl="normal postcondition"
       sum="22def48adf312189c0d8826bd779edcc"
       proved="true"
@@ -1089,7 +1103,7 @@
        <goal
         name="WP_parameter memo.1.1"
         locfile="examples/programs/max_matrix/../max_matrix.mlw"
-        loclnum="240" loccnumb="7" loccnume="11"
+        loclnum="254" loccnumb="7" loccnume="11"
         expl="parameter memo"
         sum="4e81a06d68911ffb61e23051bd5156ef"
         proved="true"
@@ -1101,15 +1115,15 @@
         <proof
          prover="0"
          timelimit="30"
-         edited=""
-         obsolete="false">
-         <result status="valid" time="0.06"/>
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter memo.1.2"
         locfile="examples/programs/max_matrix/../max_matrix.mlw"
-        loclnum="240" loccnumb="7" loccnume="11"
+        loclnum="254" loccnumb="7" loccnume="11"
         expl="parameter memo"
         sum="f11918fe38be288e977cb1cdc493f1e4"
         proved="true"
@@ -1121,9 +1135,9 @@
         <proof
          prover="0"
          timelimit="30"
-         edited=""
-         obsolete="false">
-         <result status="valid" time="0.02"/>
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.00"/>
         </proof>
        </goal>
       </transf>
@@ -1131,7 +1145,7 @@
      <goal
       name="WP_parameter memo.2"
       locfile="examples/programs/max_matrix/../max_matrix.mlw"
-      loclnum="240" loccnumb="7" loccnume="11"
+      loclnum="254" loccnumb="7" loccnume="11"
       expl="precondition"
       sum="adeccc6e84da3898c8c5697d99cd88cb"
       proved="true"
@@ -1143,15 +1157,15 @@
       <proof
        prover="0"
        timelimit="30"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.03"/>
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter memo.3"
       locfile="examples/programs/max_matrix/../max_matrix.mlw"
-      loclnum="240" loccnumb="7" loccnume="11"
+      loclnum="254" loccnumb="7" loccnume="11"
       expl="normal postcondition"
       sum="74bd98364dbfefe170b82a3335906977"
       proved="true"
@@ -1163,9 +1177,9 @@
       <proof
        prover="0"
        timelimit="30"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.18"/>
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.08"/>
       </proof>
      </goal>
     </transf>
@@ -1173,7 +1187,7 @@
    <goal
     name="WP_parameter maxmat"
     locfile="examples/programs/max_matrix/../max_matrix.mlw"
-    loclnum="246" loccnumb="6" loccnume="12"
+    loclnum="260" loccnumb="6" loccnume="12"
     expl="parameter maxmat"
     sum="7214d41ac15a98f7740677d46aec6d3e"
     proved="true"
@@ -1189,7 +1203,7 @@
      <goal
       name="WP_parameter maxmat.1"
       locfile="examples/programs/max_matrix/../max_matrix.mlw"
-      loclnum="246" loccnumb="6" loccnume="12"
+      loclnum="260" loccnumb="6" loccnume="12"
       expl="assertion"
       sum="300a957501c44722767367a4b9281df1"
       proved="true"
@@ -1205,7 +1219,7 @@
        <goal
         name="WP_parameter maxmat.1.1"
         locfile="examples/programs/max_matrix/../max_matrix.mlw"
-        loclnum="246" loccnumb="6" loccnume="12"
+        loclnum="260" loccnumb="6" loccnume="12"
         expl="assertion"
         sum="cdf9ffd353e98ca82ba6d9ecab013522"
         proved="true"
@@ -1217,9 +1231,9 @@
         <proof
          prover="0"
          timelimit="30"
-         edited=""
-         obsolete="false">
-         <result status="valid" time="0.03"/>
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
       </transf>
@@ -1227,7 +1241,7 @@
      <goal
       name="WP_parameter maxmat.2"
       locfile="examples/programs/max_matrix/../max_matrix.mlw"
-      loclnum="246" loccnumb="6" loccnume="12"
+      loclnum="260" loccnumb="6" loccnume="12"
       expl="precondition"
       sum="d580a5c4ef41cbec22677deb60af64b6"
       proved="true"
@@ -1243,7 +1257,7 @@
        <goal
         name="WP_parameter maxmat.2.1"
         locfile="examples/programs/max_matrix/../max_matrix.mlw"
-        loclnum="246" loccnumb="6" loccnume="12"
+        loclnum="260" loccnumb="6" loccnume="12"
         expl="precondition"
         sum="8e05f66eb6b668aa2a2cd271dc5d0d11"
         proved="true"
@@ -1259,7 +1273,7 @@
          <goal
           name="WP_parameter maxmat.2.1.1"
           locfile="examples/programs/max_matrix/../max_matrix.mlw"
-          loclnum="246" loccnumb="6" loccnume="12"
+          loclnum="260" loccnumb="6" loccnume="12"
           expl="parameter maxmat"
           sum="0f46c0ebc3eff7960851f9bcca6392a8"
           proved="true"
@@ -1271,15 +1285,15 @@
           <proof
            prover="0"
            timelimit="30"
-           edited=""
-           obsolete="false">
-           <result status="valid" time="0.02"/>
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="0.00"/>
           </proof>
          </goal>
          <goal
           name="WP_parameter maxmat.2.1.2"
           locfile="examples/programs/max_matrix/../max_matrix.mlw"
-          loclnum="246" loccnumb="6" loccnume="12"
+          loclnum="260" loccnumb="6" loccnume="12"
           expl="parameter maxmat"
           sum="79c27636d6dcff4ed8830944d1bd2098"
           proved="true"
@@ -1291,15 +1305,15 @@
           <proof
            prover="0"
            timelimit="30"
-           edited=""
-           obsolete="false">
-           <result status="valid" time="0.02"/>
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="0.01"/>
           </proof>
          </goal>
          <goal
           name="WP_parameter maxmat.2.1.3"
           locfile="examples/programs/max_matrix/../max_matrix.mlw"
-          loclnum="246" loccnumb="6" loccnume="12"
+          loclnum="260" loccnumb="6" loccnume="12"
           expl="parameter maxmat"
           sum="ed9dda22777992900b494a652931e37e"
           proved="true"
@@ -1311,15 +1325,15 @@
           <proof
            prover="0"
            timelimit="30"
-           edited=""
-           obsolete="false">
-           <result status="valid" time="0.02"/>
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="0.01"/>
           </proof>
          </goal>
          <goal
           name="WP_parameter maxmat.2.1.4"
           locfile="examples/programs/max_matrix/../max_matrix.mlw"
-          loclnum="246" loccnumb="6" loccnume="12"
+          loclnum="260" loccnumb="6" loccnume="12"
           expl="parameter maxmat"
           sum="42ec6bb8e1a7b0e3a51f93ba8736d0c5"
           proved="true"
@@ -1331,15 +1345,15 @@
           <proof
            prover="0"
            timelimit="30"
-           edited=""
-           obsolete="false">
-           <result status="valid" time="0.02"/>
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="0.00"/>
           </proof>
          </goal>
          <goal
           name="WP_parameter maxmat.2.1.5"
           locfile="examples/programs/max_matrix/../max_matrix.mlw"
-          loclnum="246" loccnumb="6" loccnume="12"
+          loclnum="260" loccnumb="6" loccnume="12"
           expl="parameter maxmat"
           sum="29fb5db22f36a44f903eab899426ac49"
           proved="true"
@@ -1351,15 +1365,15 @@
           <proof
            prover="0"
            timelimit="30"
-           edited=""
-           obsolete="false">
-           <result status="valid" time="0.02"/>
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="0.00"/>
           </proof>
          </goal>
          <goal
           name="WP_parameter maxmat.2.1.6"
           locfile="examples/programs/max_matrix/../max_matrix.mlw"
-          loclnum="246" loccnumb="6" loccnume="12"
+          loclnum="260" loccnumb="6" loccnume="12"
           expl="parameter maxmat"
           sum="046c1ef8cd618ecabdd8a689bee8904a"
           proved="true"
@@ -1371,9 +1385,9 @@
           <proof
            prover="0"
            timelimit="30"
-           edited=""
-           obsolete="false">
-           <result status="valid" time="0.02"/>
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="0.00"/>
           </proof>
          </goal>
         </transf>
@@ -1383,7 +1397,7 @@
      <goal
       name="WP_parameter maxmat.3"
       locfile="examples/programs/max_matrix/../max_matrix.mlw"
-      loclnum="246" loccnumb="6" loccnume="12"
+      loclnum="260" loccnumb="6" loccnume="12"
       expl="normal postcondition"
       sum="8496fcd249d940642f06358a718581f1"
       proved="true"
@@ -1399,7 +1413,7 @@
        <goal
         name="WP_parameter maxmat.3.1"
         locfile="examples/programs/max_matrix/../max_matrix.mlw"
-        loclnum="246" loccnumb="6" loccnume="12"
+        loclnum="260" loccnumb="6" loccnume="12"
         expl="parameter maxmat"
         sum="23bb7b7ee7844aa70a8f8f5e57fb2e94"
         proved="true"
@@ -1411,15 +1425,15 @@
         <proof
          prover="0"
          timelimit="30"
-         edited=""
-         obsolete="false">
-         <result status="valid" time="0.04"/>
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter maxmat.3.2"
         locfile="examples/programs/max_matrix/../max_matrix.mlw"
-        loclnum="246" loccnumb="6" loccnume="12"
+        loclnum="260" loccnumb="6" loccnume="12"
         expl="parameter maxmat"
         sum="62dfe964fb1fefbdc1153ccfe9d30871"
         proved="true"
@@ -1435,7 +1449,7 @@
          <goal
           name="WP_parameter maxmat.3.2.1"
           locfile="examples/programs/max_matrix/../max_matrix.mlw"
-          loclnum="246" loccnumb="6" loccnume="12"
+          loclnum="260" loccnumb="6" loccnume="12"
           expl="parameter maxmat"
           sum="f92e5c4693d60712147531faae7f3990"
           proved="true"
@@ -1447,9 +1461,9 @@
           <proof
            prover="0"
            timelimit="30"
-           edited=""
-           obsolete="false">
-           <result status="valid" time="0.17"/>
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="0.10"/>
           </proof>
          </goal>
         </transf>
