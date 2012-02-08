@@ -215,7 +215,7 @@ and print_tnode pri fmt t = match t.t_node with
   | Tfalse ->
       fprintf fmt "false"
   | Tbinop (b,f1,f2) ->
-      let asym = Slab.mem Term.asym_label t.t_label in
+      let asym = Slab.mem Term.asym_label f1.t_label in
       let p = prio_binop b in
       fprintf fmt (protect_on (pri > p) "%a %a@ %a")
         (print_lterm (p + 1)) f1 (print_binop ~asym) b (print_lterm p) f2

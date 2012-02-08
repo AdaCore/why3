@@ -777,10 +777,9 @@ let t_implies = t_binary Timplies
 let t_iff     = t_binary Tiff
 
 let asym_label = create_label "asym_split"
-let asym_labels = Slab.singleton asym_label
 
-let t_and_asym t1 t2 = t_label asym_labels (t_and t1 t2)
-let t_or_asym  t1 t2 = t_label asym_labels (t_or  t1 t2)
+let t_and_asym t1 t2 = t_and (t_label_add asym_label t1) t2
+let t_or_asym  t1 t2 = t_or  (t_label_add asym_label t1) t2
 
 (* closing constructors *)
 
