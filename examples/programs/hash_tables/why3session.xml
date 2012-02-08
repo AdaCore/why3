@@ -13,7 +13,7 @@
  <prover
   id="2"
   name="Coq"
-  version="8.2pl2"/>
+  version="8.3pl3"/>
  <prover
   id="3"
   name="Z3"
@@ -46,10 +46,10 @@
     <proof
      prover="2"
      timelimit="10"
-     edited="hash_tables_WP_HashTableImpl_mem_occurs_first_1.v"
+     edited="hash_tables_WP_HashTableImpl_mem_occurs_first_2.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.77"/>
+     <result status="valid" time="0.59"/>
     </proof>
    </goal>
    <goal
@@ -65,14 +65,14 @@
      timelimit="20"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.07"/>
+     <result status="valid" time="0.05"/>
     </proof>
     <proof
      prover="1"
      timelimit="20"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.00"/>
     </proof>
     <proof
      prover="0"
@@ -115,7 +115,7 @@
      timelimit="10"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.05"/>
+     <result status="valid" time="0.03"/>
     </proof>
    </goal>
    <goal
@@ -151,7 +151,7 @@
        timelimit="10"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
@@ -203,7 +203,7 @@
            timelimit="10"
            obsolete="false"
            archived="false">
-           <result status="valid" time="0.02"/>
+           <result status="valid" time="0.01"/>
           </proof>
          </goal>
          <goal
@@ -223,7 +223,7 @@
            timelimit="10"
            obsolete="false"
            archived="false">
-           <result status="valid" time="0.06"/>
+           <result status="valid" time="0.04"/>
           </proof>
          </goal>
          <goal
@@ -243,7 +243,7 @@
            timelimit="10"
            obsolete="false"
            archived="false">
-           <result status="valid" time="0.45"/>
+           <result status="valid" time="0.35"/>
           </proof>
          </goal>
          <goal
@@ -263,7 +263,7 @@
            timelimit="10"
            obsolete="false"
            archived="false">
-           <result status="valid" time="1.49"/>
+           <result status="valid" time="1.10"/>
           </proof>
          </goal>
          <goal
@@ -315,7 +315,7 @@
       expl="precondition"
       sum="0c15f39a237a1cee7d6de08d77579ce8"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix <amodaabsahashV1V0V0Aainfix <=c0amodaabsahashV1V0Iavalidamk tV4amk arrayV0V3FFFFF">
       <label
        name="expl:parameter add">
@@ -325,7 +325,7 @@
        timelimit="10"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.11"/>
+       <result status="valid" time="0.08"/>
       </proof>
      </goal>
      <goal
@@ -335,7 +335,7 @@
       expl="precondition"
       sum="edf3b4f24bb9eac9964f3252a59e4f1d"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix <amodaabsahashV1V0V0Aainfix <=c0amodaabsahashV1V0Iainfix <amodaabsahashV1V0V0Aainfix <=c0amodaabsahashV1V0Iavalidamk tV4amk arrayV0V3FFFFF">
       <label
        name="expl:parameter add">
@@ -345,7 +345,7 @@
        timelimit="10"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
@@ -381,7 +381,7 @@
          proved="true"
          expanded="true">
          <goal
-          name="WP_parameter add.3.1.0"
+          name="WP_parameter add.3.1.1"
           locfile="examples/programs/hash_tables/../hash_tables.mlw"
           loclnum="101" loccnumb="6" loccnume="9"
           expl="parameter add"
@@ -397,13 +397,13 @@
            proved="true"
            expanded="true">
            <goal
-            name="WP_parameter add.3.1.0.0"
+            name="WP_parameter add.3.1.1.1"
             locfile="examples/programs/hash_tables/../hash_tables.mlw"
             loclnum="101" loccnumb="6" loccnume="9"
             expl="parameter add"
             sum="93b6aa461479bf916ced6982d604ff56"
             proved="true"
-            expanded="false"
+            expanded="true"
             shape="ainfix >alengthadataamk tV6amk arrayV0V5c0Iainfix =V6asetV4V1aSomeV2FIainfix =V5asetV3amodaabsahashV1V0aConsaTuple2V1V2agetV3amodaabsahashV1V0FIainfix <amodaabsahashV1V0V0Aainfix =c0amodaabsahashV1V0Oainfix <c0amodaabsahashV1V0Iainfix <amodaabsahashV1V0V0Aainfix =c0amodaabsahashV1V0Oainfix <c0amodaabsahashV1V0Iainfix =V9aidxamk tV4amk arrayV0V3V7IamemaTuple2V7V8amixfix []adataamk tV4amk arrayV0V3V9Iainfix <V9alengthadataamk tV4amk arrayV0V3Aainfix <=c0V9FFAaoccurs_firstV10V11amixfix []adataamk tV4amk arrayV0V3aidxamk tV4amk arrayV0V3V10qainfix =agetamk tV4amk arrayV0V3V10aSomeV11FAainfix >alengthadataamk tV4amk arrayV0V3c0FFFFF">
             <label
              name="expl:parameter add">
@@ -417,7 +417,7 @@
             </proof>
            </goal>
            <goal
-            name="WP_parameter add.3.1.0.1"
+            name="WP_parameter add.3.1.1.2"
             locfile="examples/programs/hash_tables/../hash_tables.mlw"
             loclnum="101" loccnumb="6" loccnume="9"
             expl="parameter add"
@@ -431,14 +431,14 @@
             <proof
              prover="2"
              timelimit="20"
-             edited="hash_tables_WP_HashTableImpl_WP_parameter_add_1.v"
+             edited="hash_tables_WP_HashTableImpl_WP_parameter_add_3.v"
              obsolete="false"
              archived="false">
-             <result status="valid" time="0.73"/>
+             <result status="valid" time="0.74"/>
             </proof>
            </goal>
            <goal
-            name="WP_parameter add.3.1.0.2"
+            name="WP_parameter add.3.1.1.3"
             locfile="examples/programs/hash_tables/../hash_tables.mlw"
             loclnum="101" loccnumb="6" loccnume="9"
             expl="parameter add"
@@ -454,11 +454,11 @@
              timelimit="20"
              obsolete="false"
              archived="false">
-             <result status="valid" time="1.56"/>
+             <result status="valid" time="1.18"/>
             </proof>
            </goal>
            <goal
-            name="WP_parameter add.3.1.0.3"
+            name="WP_parameter add.3.1.1.4"
             locfile="examples/programs/hash_tables/../hash_tables.mlw"
             loclnum="101" loccnumb="6" loccnume="9"
             expl="parameter add"
@@ -472,10 +472,10 @@
             <proof
              prover="2"
              timelimit="20"
-             edited="hash_tables_WP_HashTableImpl_WP_parameter_add_2.v"
+             edited="hash_tables_WP_HashTableImpl_WP_parameter_add_4.v"
              obsolete="false"
              archived="false">
-             <result status="valid" time="0.74"/>
+             <result status="valid" time="0.72"/>
             </proof>
            </goal>
           </transf>
@@ -489,7 +489,7 @@
         expl="parameter add"
         sum="189ea93466913e0b9563df5ba4c4602b"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix =agetV6V1aSomeV2Iavalidamk tV6amk arrayV0V5Iainfix =V6asetV4V1aSomeV2FIainfix =V5asetV3amodaabsahashV1V0aConsaTuple2V1V2agetV3amodaabsahashV1V0FIainfix <amodaabsahashV1V0V0Aainfix <=c0amodaabsahashV1V0Iainfix <amodaabsahashV1V0V0Aainfix <=c0amodaabsahashV1V0Iavalidamk tV4amk arrayV0V3FFFFF">
         <label
          name="expl:parameter add">
@@ -499,7 +499,7 @@
          timelimit="30"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.02"/>
+         <result status="valid" time="0.00"/>
         </proof>
        </goal>
        <goal
@@ -509,7 +509,7 @@
         expl="parameter add"
         sum="36361ea7cddb5b7f2295c1198bb05d58"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix =agetV6V7agetV4V7Iainfix =V7V1NFIavalidamk tV6amk arrayV0V5Iainfix =V6asetV4V1aSomeV2FIainfix =V5asetV3amodaabsahashV1V0aConsaTuple2V1V2agetV3amodaabsahashV1V0FIainfix <amodaabsahashV1V0V0Aainfix <=c0amodaabsahashV1V0Iainfix <amodaabsahashV1V0V0Aainfix <=c0amodaabsahashV1V0Iavalidamk tV4amk arrayV0V3FFFFF">
         <label
          name="expl:parameter add">
@@ -519,7 +519,7 @@
          timelimit="30"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.00"/>
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
       </transf>
@@ -533,7 +533,7 @@
     expl="parameter lookup"
     sum="9e3702e537e0dedc39485f070b374dbd"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="CV1aNilamemaTuple2V0V2V1NFaConsaTuple2VVViainfix =V0V3aoccurs_firstV0V4V1amemaTuple2V0V6V1NFIamemaTuple2V0V7V5NFAaoccurs_firstV0V8V1Iaoccurs_firstV0V8V5FFF">
     <label
      name="expl:parameter lookup">
@@ -553,7 +553,7 @@
     expl="parameter find"
     sum="7df23c1341f47cacd2cc6990d3b1af50"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="LagetV2amodaabsahashV1V0ainfix =agetV3V1aNoneIamemaTuple2V1V5V4NFAainfix =agetV3V1aSomeV6Iaoccurs_firstV1V6V4FAainfix <amodaabsahashV1V0V0Aainfix <=c0amodaabsahashV1V0Iavalidamk tV3amk arrayV0V2FFFF">
     <label
      name="expl:parameter find">
@@ -561,7 +561,7 @@
     <transf
      name="split_goal"
      proved="true"
-     expanded="false">
+     expanded="true">
      <goal
       name="WP_parameter find.1"
       locfile="examples/programs/hash_tables/../hash_tables.mlw"
@@ -569,7 +569,7 @@
       expl="precondition"
       sum="f1dba4d2143790a152c3951d81c6390e"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix <amodaabsahashV1V0V0Aainfix <=c0amodaabsahashV1V0Iavalidamk tV3amk arrayV0V2FFFF">
       <label
        name="expl:parameter find">
@@ -579,7 +579,7 @@
        timelimit="10"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.11"/>
+       <result status="valid" time="0.09"/>
       </proof>
      </goal>
      <goal
@@ -589,7 +589,7 @@
       expl="normal postcondition"
       sum="39532d3e8787e4b70b51cd9125d2d841"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="LagetV2amodaabsahashV1V0ainfix =agetV3V1aSomeV5Iaoccurs_firstV1V5V4FIainfix <amodaabsahashV1V0V0Aainfix <=c0amodaabsahashV1V0Iavalidamk tV3amk arrayV0V2FFFF">
       <label
        name="expl:parameter find">
@@ -599,7 +599,7 @@
        timelimit="10"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.42"/>
+       <result status="valid" time="0.32"/>
       </proof>
      </goal>
      <goal
@@ -609,7 +609,7 @@
       expl="exceptional postcondition"
       sum="caf50d892506cd9c1de44fa17859a070"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="LagetV2amodaabsahashV1V0ainfix =agetV3V1aNoneIamemaTuple2V1V5V4NFIainfix =agetV3V1aSomeV6Iaoccurs_firstV1V6V4FIainfix <amodaabsahashV1V0V0Aainfix <=c0amodaabsahashV1V0Iavalidamk tV3amk arrayV0V2FFFF">
       <label
        name="expl:parameter find">
@@ -617,10 +617,10 @@
       <proof
        prover="2"
        timelimit="10"
-       edited="hash_tables_WP_HashTableImpl_WP_parameter_find_1.v"
+       edited="hash_tables_WP_HashTableImpl_WP_parameter_find_2.v"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.57"/>
+       <result status="valid" time="0.63"/>
       </proof>
      </goal>
     </transf>

@@ -2,6 +2,7 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import ZArith.
 Require Import Rbase.
+Require int.Int.
 Definition unit  := unit.
 
 Parameter qtmark : Type.
@@ -81,6 +82,14 @@ Definition sorted_sub1(a:(array Z)) (l:Z) (u:Z): Prop := (sorted_sub (elts a)
 
 Definition sorted(a:(array Z)): Prop := (sorted_sub (elts a) 0%Z (length a)).
 
+Parameter k: Z.
+
+
+Axiom k_positive : (0%Z <  k)%Z.
+
+Definition k_values(a:(array Z)): Prop := forall (i:Z), ((0%Z <= i)%Z /\
+  (i <  (length a))%Z) -> ((0%Z <= (get1 a i))%Z /\ ((get1 a i) <  k)%Z).
+
 Definition param  := ((map Z Z)* Z)%type.
 
 Definition eq(p:((map Z Z)* Z)%type) (i:Z): Prop :=
@@ -125,11 +134,11 @@ Axiom Full : forall (p:((map Z Z)* Z)%type) (a:Z) (b:Z), (a <  b)%Z ->
   ((forall (n:Z), ((a <= n)%Z /\ (n <  b)%Z) -> (eq p n)) -> ((num_of p a
   b) = (b - a)%Z)).
 
-Axiom num_of_increasing : forall (p:((map Z Z)* Z)%type) (i:Z) (j:Z) (k:Z),
-  ((i <= j)%Z /\ (j <= k)%Z) -> ((num_of p i j) <= (num_of p i k))%Z.
+Axiom num_of_increasing : forall (p:((map Z Z)* Z)%type) (i:Z) (j:Z) (k1:Z),
+  ((i <= j)%Z /\ (j <= k1)%Z) -> ((num_of p i j) <= (num_of p i k1))%Z.
 
 Axiom num_of_strictly_increasing : forall (p:((map Z Z)* Z)%type) (i:Z) (j:Z)
-  (k:Z) (l:Z), (((i <= j)%Z /\ (j <= k)%Z) /\ (k <  l)%Z) -> ((eq p k) ->
+  (k1:Z) (l:Z), (((i <= j)%Z /\ (j <= k1)%Z) /\ (k1 <  l)%Z) -> ((eq p k1) ->
   ((num_of p i j) <  (num_of p i l))%Z).
 
 Axiom num_of_change_any : forall (p1:((map Z Z)* Z)%type) (p2:((map Z Z)*
@@ -186,12 +195,12 @@ Axiom Full1 : forall (p:((map Z Z)* Z)%type) (a:Z) (b:Z), (a <  b)%Z ->
   ((forall (n:Z), ((a <= n)%Z /\ (n <  b)%Z) -> (lt p n)) -> ((num_of1 p a
   b) = (b - a)%Z)).
 
-Axiom num_of_increasing1 : forall (p:((map Z Z)* Z)%type) (i:Z) (j:Z) (k:Z),
-  ((i <= j)%Z /\ (j <= k)%Z) -> ((num_of1 p i j) <= (num_of1 p i k))%Z.
+Axiom num_of_increasing1 : forall (p:((map Z Z)* Z)%type) (i:Z) (j:Z) (k1:Z),
+  ((i <= j)%Z /\ (j <= k1)%Z) -> ((num_of1 p i j) <= (num_of1 p i k1))%Z.
 
 Axiom num_of_strictly_increasing1 : forall (p:((map Z Z)* Z)%type) (i:Z)
-  (j:Z) (k:Z) (l:Z), (((i <= j)%Z /\ (j <= k)%Z) /\ (k <  l)%Z) -> ((lt p
-  k) -> ((num_of1 p i j) <  (num_of1 p i l))%Z).
+  (j:Z) (k1:Z) (l:Z), (((i <= j)%Z /\ (j <= k1)%Z) /\ (k1 <  l)%Z) -> ((lt p
+  k1) -> ((num_of1 p i j) <  (num_of1 p i l))%Z).
 
 Axiom num_of_change_any1 : forall (p1:((map Z Z)* Z)%type) (p2:((map Z Z)*
   Z)%type) (a:Z) (b:Z), (forall (j:Z), ((a <= j)%Z /\ (j <  b)%Z) -> ((lt p1
@@ -204,14 +213,6 @@ Axiom num_of_change_some1 : forall (p1:((map Z Z)* Z)%type) (p2:((map Z Z)*
 
 Definition numlt(a:(array Z)) (v:Z) (i:Z) (j:Z): Z := (num_of1 ((elts a), v)
   i j).
-
-Parameter k: Z.
-
-
-Axiom k_positive : (0%Z <  k)%Z.
-
-Definition k_values(a:(array Z)): Prop := forall (i:Z), ((0%Z <= i)%Z /\
-  (i <  (length a))%Z) -> ((0%Z <= (get1 a i))%Z /\ ((get1 a i) <  k)%Z).
 
 (* YOU MAY EDIT THE CONTEXT BELOW *)
 

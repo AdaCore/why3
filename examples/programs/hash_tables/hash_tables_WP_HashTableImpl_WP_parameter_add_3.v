@@ -3,6 +3,9 @@
 Require Import ZArith.
 Require Import Rbase.
 Require Import ZOdiv.
+Require int.Int.
+Require int.Abs.
+Require int.ComputerDivision.
 Definition unit  := unit.
 
 Parameter qtmark : Type.
@@ -28,9 +31,6 @@ Set Contextual Implicit.
 Implicit Arguments None.
 Unset Contextual Implicit.
 Implicit Arguments Some.
-
-Axiom Abs_le : forall (x:Z) (y:Z), ((Zabs x) <= y)%Z <-> (((-y)%Z <= x)%Z /\
-  (x <= y)%Z).
 
 Parameter map : forall (a:Type) (b:Type), Type.
 
@@ -139,16 +139,95 @@ Fixpoint occurs_first (a:Type) (b:Type)(k:a) (v:b) (l:(list (a*
   end.
 Unset Implicit Arguments.
 
-(* YOU MAY EDIT THE CONTEXT BELOW *)
+Axiom mem_occurs_first : forall (a:Type) (b:Type), forall (k:a) (v:b)
+  (l:(list (a* b)%type)), (occurs_first k v l) -> (mem (k, v) l).
 
+Axiom cons_occurs_first : forall (a:Type) (b:Type), forall (k1:a) (v1:b)
+  (l:(list (a* b)%type)), (occurs_first k1 v1 l) -> forall (k:a) (v:b),
+  (~ (k = k1)) -> (occurs_first k1 v1 (Cons (k, v) l)).
+
+Definition valid (a:Type) (b:Type)(h:(t a b)): Prop :=
+  (0%Z <  (length (data h)))%Z /\ ((forall (k:a) (v:b), ((get2 h
+  k) = (Some v)) <-> (occurs_first k v (get1 (data h) (idx h k)))) /\
+  forall (k:a) (v:b), forall (i:Z), ((0%Z <= i)%Z /\
+  (i <  (length (data h)))%Z) -> ((mem (k, v) (get1 (data h) i)) ->
+  (i = (idx h k)))).
+Implicit Arguments valid.
+
+Axiom idx_bounds : forall (a:Type) (b:Type), forall (h:(t a b)), (valid h) ->
+  forall (k:a), (0%Z <= (idx h k))%Z /\ ((idx h k) <  (length (data h)))%Z.
+
+(* YOU MAY EDIT THE CONTEXT BELOW *)
+Require Import Classical.
 (* DO NOT EDIT BELOW *)
 
-Theorem mem_occurs_first : forall (a:Type) (b:Type), forall (k:a) (v:b)
-  (l:(list (a* b)%type)), (occurs_first k v l) -> (mem (k, v) l).
+Theorem WP_parameter_add : forall (a:Type) (b:Type), forall (h:Z),
+  forall (k:a), forall (v:b), forall (rho:(map Z (list (a* b)%type))),
+  forall (rho1:(map a (option b))), ((0%Z <  (length (data (mk_t rho1
+  (mk_array h rho)))))%Z /\ ((forall (k1:a) (v1:b), ((get2 (mk_t rho1
+  (mk_array h rho)) k1) = (Some v1)) <-> (occurs_first k1 v1
+  (get1 (data (mk_t rho1 (mk_array h rho))) (idx (mk_t rho1 (mk_array h rho))
+  k1)))) /\ forall (k1:a) (v1:b), forall (i:Z), ((0%Z <= i)%Z /\
+  (i <  (length (data (mk_t rho1 (mk_array h rho)))))%Z) -> ((mem (k1, v1)
+  (get1 (data (mk_t rho1 (mk_array h rho))) i)) -> (i = (idx (mk_t rho1
+  (mk_array h rho)) k1))))) -> ((((0%Z <  (ZOmod (Zabs (hash k)) h))%Z \/
+  (0%Z = (ZOmod (Zabs (hash k)) h))) /\
+  ((ZOmod (Zabs (hash k)) h) <  h)%Z) ->
+  ((((0%Z <  (ZOmod (Zabs (hash k)) h))%Z \/
+  (0%Z = (ZOmod (Zabs (hash k)) h))) /\
+  ((ZOmod (Zabs (hash k)) h) <  h)%Z) -> forall (x:(map Z (list (a*
+  b)%type))), (x = (set rho (ZOmod (Zabs (hash k)) h) (Cons (k, v) (get rho
+  (ZOmod (Zabs (hash k)) h))))) -> forall (rho2:(map a (option b))),
+  (rho2 = (set rho1 k (Some v))) -> forall (k1:a) (v1:b), ((get2 (mk_t rho2
+  (mk_array h x)) k1) = (Some v1)) -> (occurs_first k1 v1
+  (get1 (data (mk_t rho2 (mk_array h x))) (idx (mk_t rho2 (mk_array h x))
+  k1))))).
 (* YOU MAY EDIT THE PROOF BELOW *)
-induction l; simpl; intuition.
-destruct a0; intuition.
-subst; left; auto.
+unfold get1; simpl; intros.
+assert (case: (k1=k \/ k1<>k)) by apply classic; destruct case.
+(* k1 = k *)
+subst k1.
+subst rho2.
+unfold get2 in H4; simpl in H4.
+rewrite Select_eq in H4; auto.
+injection H4; intro; subst v1; clear H4.
+unfold idx; simpl.
+subst x; rewrite Select_eq.
+red; intuition.
+auto.
+(* k1 <> k *)
+subst rho2.
+unfold idx; simpl.
+unfold get2 in H4; simpl in H4.
+rewrite Select_neq in H4; auto.
+subst x.
+set (i := (Zabs (hash k) mod h)).
+set (i1 := (Zabs (hash k1) mod h)).
+assert (case: (i1=i \/ i1<>i)) by omega; destruct case.
+(* i1 = i *)
+subst i1.
+rewrite Select_eq; auto.
+simpl.
+right; split; auto.
+destruct H.
+destruct H3.
+rewrite <- H2.
+destruct (H3 k1 v1); clear H3.
+unfold idx in H7; simpl in H7.
+subst i.
+apply H7.
+unfold get2; simpl.
+auto.
+(* i1 <> i *)
+rewrite Select_neq; auto.
+destruct H.
+destruct H3.
+destruct (H3 k1 v1); clear H3.
+unfold idx in H7; simpl in H7.
+subst i1.
+apply H7.
+unfold get2; simpl.
+auto.
 Qed.
 (* DO NOT EDIT BELOW *)
 
