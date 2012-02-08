@@ -357,7 +357,7 @@ let save_ident fmt id =
         file lnum cnumb cnume
 
 let save_label fmt s =
-  fprintf fmt "@\n@[<v 1><label@ name=\"%s\">@,</label>@]" s
+  fprintf fmt "@\n@[<v 1><label@ name=\"%s\">@,</label>@]" s.Ident.lab_string
 
 let rec save_goal provers fmt g =
   assert (g.goal_shape <> "");
@@ -429,6 +429,7 @@ let expl_regexp = Str.regexp "expl:\\(.*\\)"
 exception Found of string
 
 let check_expl lab =
+  let lab = lab.Ident.lab_string in
   if Str.string_match expl_regexp lab 0 then
     raise (Found (Str.matched_group 1 lab))
 
@@ -742,7 +743,9 @@ let load_ident elt =
   let label = List.fold_left
     (fun acc label ->
       match label with
-        | {Xml.name = "label"} -> string_attribute "name" label::acc
+        | {Xml.name = "label"} ->
+            let lab = string_attribute "name" label in
+            Ident.create_label lab :: acc
         | _ -> acc
     ) [] elt.Xml.elements in
   let preid =

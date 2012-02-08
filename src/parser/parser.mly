@@ -931,7 +931,7 @@ sident:
 /* Misc */
 
 label:
-| STRING    { Lstr $1 }
+| STRING    { Lstr (Ident.create_label $1) }
 | POSITION  { Lpos $1 }
 ;
 

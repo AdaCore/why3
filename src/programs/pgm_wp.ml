@@ -375,7 +375,8 @@ let term_at lab t =
   t_app fs_at [t; t_var lab] t.t_ty
 
 let wp_expl l f =
-  t_label ?loc:f.t_loc (("expl:"^l)::Split_goal.stop_split::f.t_label) f
+  let lab = Ident.create_label ("expl:"^l) in
+  t_label ?loc:f.t_loc (lab::Split_goal.stop_split::f.t_label) f
 
 (* 0 <= phi0 and phi < phi0 *)
 let default_variant le lt phi phi0 =
@@ -459,7 +460,8 @@ and wp_desc env rm e q = match e.expr_desc with
         wp_expr env rm e2 (filter_post e2.expr_effect q)
       in
       let v1 = v_result x.pv_pure.vs_ty in
-      let t1 = t_label ~loc:e1.expr_loc ["let"] (t_var v1) in
+      let ll = [Ident.create_label "let"] in
+      let t1 = t_label ~loc:e1.expr_loc ll (t_var v1) in
       let q1 = v1, t_subst_single x.pv_pure t1 w2 in
       let q1 = saturate_post e1.expr_effect q1 q in
       wp_label e (wp_expr env rm e1 q1)
@@ -715,7 +717,8 @@ let add_wp_decl ps f uc =
   (* prepare a proposition symbol *)
   let name = ps.ps_pure.ls_name in
   let s = "WP_" ^ name.id_string in
-  let label = ("expl:" ^ name.id_string) :: name.id_label in
+  let lab = Ident.create_label ("expl:" ^ name.id_string) in
+  let label = lab :: name.id_label in
   let id = id_fresh ~label ?loc:name.id_loc s in
   let pr = create_prsymbol id in
   (* prepare the VC formula *)

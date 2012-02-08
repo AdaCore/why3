@@ -152,8 +152,8 @@ let ls_of_const =
 
 (* unprotected and unprotecting idents *)
 
-let unprotected_label = "encoding : unprotected"
-let unprotecting_label = "encoding : unprotecting"
+let unprotected_label = Ident.create_label "encoding : unprotected"
+let unprotecting_label = Ident.create_label "encoding : unprotecting"
 
 let id_unprotected n = id_fresh ~label:[unprotected_label] n
 let id_unprotecting n = id_fresh ~label:[unprotecting_label] n

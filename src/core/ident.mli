@@ -23,7 +23,15 @@ open Stdlib
 
 (** {2 Labels} *)
 
-type label = string
+type label = private {
+  lab_string : string;
+  lab_tag    : int;
+}
+
+val lab_equal : label -> label -> bool
+val lab_hash  : label -> int
+
+val create_label : string -> label
 
 (** {2 Identifiers} *)
 
