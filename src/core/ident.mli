@@ -28,6 +28,9 @@ type label = private {
   lab_tag    : int;
 }
 
+module Mlab : Map.S with type key = label
+module Slab : Mlab.Set
+
 val lab_equal : label -> label -> bool
 val lab_hash  : label -> int
 
@@ -37,7 +40,7 @@ val create_label : string -> label
 
 type ident = private {
   id_string : string;               (* non-unique name *)
-  id_label  : label list;           (* identifier labels *)
+  id_label  : Slab.t;               (* identifier labels *)
   id_loc    : Loc.position option;  (* optional location *)
   id_tag    : Hashweak.tag;         (* unique magical tag *)
 }
@@ -57,16 +60,16 @@ type preid
 val id_register : preid -> ident
 
 (* create a fresh pre-ident *)
-val id_fresh : ?label:(label list) -> ?loc:Loc.position -> string -> preid
+val id_fresh : ?label:Slab.t -> ?loc:Loc.position -> string -> preid
 
 (* create a localized pre-ident *)
-val id_user : ?label:(label list) -> string -> Loc.position -> preid
+val id_user : ?label:Slab.t -> string -> Loc.position -> preid
 
 (* create a duplicate pre-ident *)
-val id_clone : ?label:(label list) -> ident -> preid
+val id_clone : ?label:Slab.t -> ident -> preid
 
 (* create a derived pre-ident (inherit labels and location) *)
-val id_derive : ?label:(label list) -> string -> ident -> preid
+val id_derive : ?label:Slab.t -> string -> ident -> preid
 
 
 (** Unique persistent names for pretty printing *)

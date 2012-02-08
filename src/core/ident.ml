@@ -27,6 +27,14 @@ type label = {
   lab_tag    : int;
 }
 
+module Lab = StructMake (struct
+  type t = label
+  let tag lab = lab.lab_tag
+end)
+
+module Slab = Lab.S
+module Mlab = Lab.M
+
 module Hslab = Hashcons.Make (struct
   type t = label
   let equal lab1 lab2 = lab1.lab_string = lab2.lab_string
@@ -47,7 +55,7 @@ let lab_hash (lab : label) = lab.lab_tag
 
 type ident = {
   id_string : string;               (* non-unique name *)
-  id_label  : label list;           (* identifier labels *)
+  id_label  : Slab.t;               (* identifier labels *)
   id_loc    : Loc.position option;  (* optional location *)
   id_tag    : Hashweak.tag;         (* unique magical tag *)
 }
@@ -79,17 +87,19 @@ let create_ident name labels loc = {
   id_tag    = Hashweak.dummy_tag;
 }
 
-let id_fresh ?(label = []) ?loc nm =
+let id_fresh ?(label = Slab.empty) ?loc nm =
   create_ident nm label loc
 
-let id_user ?(label = []) nm loc =
+let id_user ?(label = Slab.empty) nm loc =
   create_ident nm label (Some loc)
 
-let id_clone ?(label = []) id =
-  create_ident id.id_string (label @ id.id_label) id.id_loc
+let id_clone ?(label = Slab.empty) id =
+  let ll = Slab.union label id.id_label in
+  create_ident id.id_string ll id.id_loc
 
-let id_derive ?(label = []) nm id =
-  create_ident nm (label @ id.id_label) id.id_loc
+let id_derive ?(label = Slab.empty) nm id =
+  let ll = Slab.union label id.id_label in
+  create_ident nm ll id.id_loc
 
 (** Unique names for pretty printing *)
 

@@ -272,7 +272,7 @@ type constant =
 type term = {
   t_node  : term_node;
   t_ty    : ty option;
-  t_label : label list;
+  t_label : Slab.t;
   t_loc   : Loc.position option;
   t_vars  : int Mvs.t;
   t_tag   : int;
@@ -397,7 +397,7 @@ module Hsterm = Hashcons.Make (struct
   let equal t1 t2 =
     oty_equal t1.t_ty t2.t_ty &&
     t_equal_node t1.t_node t2.t_node &&
-    list_all2 (=) t1.t_label t2.t_label &&
+    Slab.equal t1.t_label t2.t_label &&
     option_eq Loc.equal t1.t_loc t2.t_loc
 
   let t_hash_bound (v,b,t) =
@@ -427,9 +427,10 @@ module Hsterm = Hashcons.Make (struct
     | Tfalse -> 1
 
   let hash t =
+    let comb l = Hashcons.combine (lab_hash l) in
     Hashcons.combine2 (t_hash_node t.t_node)
       (Hashcons.combine_option Loc.hash t.t_loc)
-      (Hashcons.combine_list Hashtbl.hash (oty_hash t.t_ty) t.t_label)
+      (Slab.fold comb t.t_label (oty_hash t.t_ty))
 
   let t_vars_node = function
     | Tvar v -> Mvs.singleton v 1
@@ -461,7 +462,7 @@ module Hterm = Term.H
 
 let mk_term n ty = Hsterm.hashcons {
   t_node  = n;
-  t_label = [];
+  t_label = Slab.empty;
   t_loc   = None;
   t_vars  = Mvs.empty;
   t_ty    = ty;
@@ -483,12 +484,16 @@ let t_not f         = mk_term (Tnot f) None
 let t_true          = mk_term (Ttrue) None
 let t_false         = mk_term (Tfalse) None
 
-let t_label ?loc l t = Hsterm.hashcons { t with t_label = l; t_loc = loc }
-let t_label_add  l t = Hsterm.hashcons { t with t_label = l :: t.t_label }
+let t_label ?loc l t =
+  Hsterm.hashcons { t with t_label = l; t_loc = loc }
 
-let t_label_copy { t_label = l; t_loc = p } t =
-  if t.t_label = [] && t.t_loc = None && (l <> [] || p <> None)
-  then t_label ?loc:p l t else t
+let t_label_add l t =
+  Hsterm.hashcons { t with t_label = Slab.add l t.t_label }
+
+let t_label_copy { t_label = lab; t_loc = loc } t =
+  let lab = Slab.union lab t.t_label in
+  let loc = if t.t_loc = None then loc else t.t_loc in
+  Hsterm.hashcons { t with t_label = lab; t_loc = loc }
 
 (* unsafe map *)
 
@@ -772,8 +777,10 @@ let t_implies = t_binary Timplies
 let t_iff     = t_binary Tiff
 
 let asym_label = create_label "asym_split"
-let t_and_asym t1 t2 = t_label [asym_label] (t_and t1 t2)
-let t_or_asym  t1 t2 = t_label [asym_label] (t_or  t1 t2)
+let asym_labels = Slab.singleton asym_label
+
+let t_and_asym t1 t2 = t_label asym_labels (t_and t1 t2)
+let t_or_asym  t1 t2 = t_label asym_labels (t_or  t1 t2)
 
 (* closing constructors *)
 

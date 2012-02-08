@@ -188,13 +188,16 @@ let prio_binop = function
 let print_label fmt l =
   fprintf fmt "\"%s\"" l.lab_string
 
+let print_labels = print_iter1 Slab.iter space print_label
+
 let print_loc fmt l =
   let (f,l,b,e) = Loc.get l in
   fprintf fmt "#\"%s\" %d %d %d#" f l b e
 
 let print_ident_labels fmt id =
-  if Debug.test_flag debug_print_labels && id.id_label <> [] then
-    fprintf fmt "@ %a" (print_list space print_label) id.id_label;
+  if Debug.test_flag debug_print_labels &&
+      not (Slab.is_empty id.id_label) then
+    fprintf fmt "@ %a" print_labels id.id_label;
   if Debug.test_flag debug_print_locs then
     Util.option_iter (fprintf fmt "@ %a" print_loc) id.id_loc
 
@@ -202,9 +205,9 @@ let rec print_term fmt t = print_lterm 0 fmt t
 
 and print_lterm pri fmt t =
   let print_tlab pri fmt t =
-    if Debug.test_flag debug_print_labels && t.t_label <> []
+    if Debug.test_flag debug_print_labels && not (Slab.is_empty t.t_label)
     then fprintf fmt (protect_on (pri > 0) "@[<hov 0>%a@ %a@]")
-      (print_list space print_label) t.t_label (print_tnode 0) t
+      print_labels t.t_label (print_tnode 0) t
     else print_tnode pri fmt t in
   let print_tloc pri fmt t =
     if Debug.test_flag debug_print_locs && t.t_loc <> None
@@ -273,7 +276,7 @@ and print_tnode pri fmt t = match t.t_node with
   | Tfalse ->
       fprintf fmt "false"
   | Tbinop (b,f1,f2) ->
-      let asym = List.mem Term.asym_label t.t_label in
+      let asym = Slab.mem Term.asym_label t.t_label in
       let p = prio_binop b in
       fprintf fmt (protect_on (pri > p) "@[<hov 1>%a %a@ %a@]")
         (print_lterm (p + 1)) f1 (print_binop ~asym) b (print_lterm p) f2

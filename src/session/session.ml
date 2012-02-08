@@ -368,7 +368,7 @@ expanded=\"%b\"@ shape=\"%s\">"
     (opt "expl") g.goal_expl
     g.goal_checksum g.goal_verified  g.goal_expanded
     g.goal_shape;
-  List.iter (save_label fmt) g.goal_name.Ident.id_label;
+  Ident.Slab.iter (save_label fmt) g.goal_name.Ident.id_label;
   PHprover.iter (save_proof_attempt provers fmt) g.goal_external_proofs;
   PHstr.iter (save_trans provers fmt) g.goal_transformations;
   fprintf fmt "@]@\n</goal>"
@@ -384,7 +384,7 @@ let save_theory provers fmt t =
     "@\n@[<v 1><theory@ %a@ verified=\"%b\"@ expanded=\"%b\">"
     save_ident t.theory_name
     t.theory_verified t.theory_expanded;
-  List.iter (save_label fmt) t.theory_name.Ident.id_label;
+  Ident.Slab.iter (save_label fmt) t.theory_name.Ident.id_label;
   List.iter (save_goal provers fmt) t.theory_goals;
   fprintf fmt "@]@\n</theory>"
 
@@ -434,7 +434,7 @@ let check_expl lab =
     raise (Found (Str.matched_group 1 lab))
 
 let rec get_expl_fmla f =
-  List.iter check_expl (List.rev f.Term.t_label);
+  Ident.Slab.iter check_expl f.Term.t_label;
   (match f.Term.t_node with
     | Term.Tbinop(Term.Timplies,_,f) -> get_expl_fmla f
     | Term.Tquant(Term.Tforall,fq) ->
@@ -451,7 +451,7 @@ let get_explanation id task =
   let fmla = Task.task_goal_fmla task in
   try
     get_expl_fmla fmla;
-    List.iter check_expl (List.rev id.Ident.id_label);
+    Ident.Slab.iter check_expl id.Ident.id_label;
     None
   with Found e -> Some e
 
@@ -745,9 +745,9 @@ let load_ident elt =
       match label with
         | {Xml.name = "label"} ->
             let lab = string_attribute "name" label in
-            Ident.create_label lab :: acc
+            Ident.Slab.add (Ident.create_label lab) acc
         | _ -> acc
-    ) [] elt.Xml.elements in
+    ) Ident.Slab.empty elt.Xml.elements in
   let preid =
     try
       let load_exn attr g = List.assoc attr g.Xml.attributes in
@@ -1309,7 +1309,7 @@ let associate_subgoals gname (old_goals : 'a goal list) new_goals =
     (fun g -> Hashtbl.add old_goals_map g.goal_checksum g)
     old_goals;
   (*
-     we make an array of new goals with their numbers and checksums 
+     we make an array of new goals with their numbers and checksums
   *)
   let new_goals_array =
     array_map_list
@@ -1378,7 +1378,7 @@ let associate_subgoals gname (old_goals : 'a goal list) new_goals =
          match pairing_array.(i) with
            | Some _ -> acc
            | None ->
-               let shape = 
+               let shape =
                  Termcode.t_shape_buf (Task.task_goal_fmla g)
                in
                shape_array.(i) <- shape;
@@ -1387,7 +1387,7 @@ let associate_subgoals gname (old_goals : 'a goal list) new_goals =
       new_goals_array
   in
   let sort_by_shape =
-    List.sort (fun (s1,_) (s2,_) -> String.compare s1 s2) 
+    List.sort (fun (s1,_) (s2,_) -> String.compare s1 s2)
       all_goals_without_pairing
   in
 (*

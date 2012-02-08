@@ -43,12 +43,11 @@ let split_case forig spl c acc tl bl =
 let asym_split = Term.asym_label
 let stop_split = Ident.create_label "stop_split"
 
-let asym f = List.mem asym_split f.t_label
-let stop f = List.mem stop_split f.t_label
+let asym f = Slab.mem asym_split f.t_label
+let stop f = Slab.mem stop_split f.t_label
 
 let unstop f =
-  let ll = List.filter ((<>) stop_split) f.t_label in
-  t_label ?loc:f.t_loc ll f
+  t_label ?loc:f.t_loc (Slab.remove stop_split f.t_label) f
 
 let rec split_pos ro acc f = match f.t_node with
   | _ when ro && stop f -> unstop f :: acc

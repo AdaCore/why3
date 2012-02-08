@@ -1937,9 +1937,9 @@ let add_global_fun loc ~labels x tyv uc =
       List.fold_left
         (fun (labels,loc) lab ->
            match lab with
-             | Lstr s -> (s::labels,loc)
+             | Lstr s -> (Ident.Slab.add s labels,loc)
              | Lpos l -> (labels,l))
-        ([],loc)
+        (Slab.empty,loc)
         labels
     in
     let ls, ps = create_psymbol_fun (id_user ~label x loc) tyv in

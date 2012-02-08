@@ -133,7 +133,7 @@ type constant =
 type term = private {
   t_node  : term_node;
   t_ty    : ty option;
-  t_label : label list;
+  t_label : Slab.t;
   t_loc   : Loc.position option;
   t_vars  : int Mvs.t;
   t_tag   : int;
@@ -246,7 +246,7 @@ val t_quant_close : quant -> vsymbol list -> trigger -> term -> term
 val t_forall_close : vsymbol list -> trigger -> term -> term
 val t_exists_close : vsymbol list -> trigger -> term -> term
 
-val t_label : ?loc:Loc.position -> label list -> term -> term
+val t_label : ?loc:Loc.position -> Slab.t -> term -> term
 val t_label_add : label -> term -> term
 val t_label_copy : term -> term -> term
 
