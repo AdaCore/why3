@@ -184,15 +184,23 @@ let factory = new GMenu.factory menubar
 
 let accel_group = factory#accel_group
 
-let hb = GPack.hbox ~packing:vbox#add ~border_width:2 ()
+let hb = GPack.hbox ~packing:vbox#add ()
+
+let left_scrollview =
+  try
+    GBin.scrolled_window ~hpolicy:`NEVER ~vpolicy:`AUTOMATIC
+      ~packing:(hb#pack ~expand:false) ()
+  with Gtk.Error _ -> assert false
+
+let () = left_scrollview#set_shadow_type `OUT
 
 let tools_window_vbox =
   try
-    GPack.vbox ~packing:(hb#pack ~expand:false) ~border_width:2 ()
+    GPack.vbox ~packing:left_scrollview#add_with_viewport ()
   with Gtk.Error _ -> assert false
 
 let context_frame =
-  GBin.frame ~label:"Context"
+  GBin.frame ~label:"Context" ~shadow_type:`ETCHED_OUT
     ~packing:(tools_window_vbox#pack ~expand:false) ()
 
 let context_box =
@@ -223,8 +231,9 @@ let () =
 
 
 let provers_frame =
-  GBin.frame ~label:"Provers"
+  GBin.frame ~label:"Provers" ~shadow_type:`ETCHED_OUT
     ~packing:(tools_window_vbox#pack ~expand:false) ()
+
 
 let provers_box =
   GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
@@ -233,7 +242,7 @@ let provers_box =
 let () = provers_frame#set_resize_mode `PARENT
 
 let transf_frame =
-  GBin.frame ~label:"Transformations"
+  GBin.frame ~label:"Transformations" ~shadow_type:`ETCHED_OUT
     ~packing:(tools_window_vbox#pack ~expand:false) ()
 
 let transf_box =
@@ -241,7 +250,7 @@ let transf_box =
   ~packing:transf_frame#add ()
 
 let tools_frame =
-  GBin.frame ~label:"Tools"
+  GBin.frame ~label:"Tools" ~shadow_type:`ETCHED_OUT
     ~packing:(tools_window_vbox#pack ~expand:false) ()
 
 let tools_box =
@@ -249,7 +258,7 @@ let tools_box =
   ~packing:tools_frame#add ()
 
 let cleaning_frame =
-  GBin.frame ~label:"Cleaning"
+  GBin.frame ~label:"Cleaning" ~shadow_type:`ETCHED_OUT
     ~packing:(tools_window_vbox#pack ~expand:false) ()
 
 let cleaning_box =
@@ -257,7 +266,7 @@ let cleaning_box =
   ~packing:cleaning_frame#add ()
 
 let monitor_frame =
-  GBin.frame ~label:"Proof monitoring"
+  GBin.frame ~label:"Proof monitoring" ~shadow_type:`ETCHED_OUT
     ~packing:(tools_window_vbox#pack ~expand:false) ()
 
 let monitor_box =
@@ -283,11 +292,10 @@ let hp = GPack.paned `HORIZONTAL ~packing:hb#add ()
 let scrollview =
   try
     GBin.scrolled_window ~hpolicy:`AUTOMATIC ~vpolicy:`AUTOMATIC
-      ~width:gconfig.tree_width
+      ~width:gconfig.tree_width ~shadow_type:`ETCHED_OUT
       ~packing:hp#add ()
   with Gtk.Error _ -> assert false
 
-let () = scrollview#set_shadow_type `ETCHED_OUT
 let (_ : GtkSignal.id) =
   scrollview#misc#connect#size_allocate
     ~callback:
@@ -1125,11 +1133,10 @@ let right_hb = GPack.hbox ~packing:(right_vb#pack ~expand:false) ()
 (* goal text view *)
 (******************)
 
-let scrolled_task_view = GBin.scrolled_window
-  ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
-  ~packing:vp#add ()
-
-let () = scrolled_task_view#set_shadow_type `ETCHED_OUT
+let scrolled_task_view =
+  GBin.scrolled_window
+    ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
+    ~shadow_type:`ETCHED_OUT ~packing:vp#add ()
 
 let (_ : GtkSignal.id) =
   scrolled_task_view#misc#connect#size_allocate
@@ -1154,10 +1161,8 @@ let () = task_view#set_highlight_current_line true
 
 let scrolled_source_view = GBin.scrolled_window
   ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
-  ~packing:vp#add
+  ~packing:vp#add ~shadow_type:`ETCHED_OUT
   ()
-
-let () = scrolled_source_view#set_shadow_type `ETCHED_OUT
 
 let source_view =
   GSourceView2.source_view
