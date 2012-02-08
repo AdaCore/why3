@@ -68,7 +68,7 @@ let rec add_quant kn (vl,tl,f) v =
         (v::vl, tl, f)
 
 let eval_match ~inline kn t =
-  let rec eval env t = match t.t_node with
+  let rec eval env t = t_label_copy t (match t.t_node with
     | Tapp (ls, tl) when inline kn ls (List.map t_type tl) t.t_ty ->
         begin match find_logic_definition kn ls with
           | None ->
@@ -110,9 +110,9 @@ let eval_match ~inline kn t =
         let vl,tl,f = List.fold_left (add_quant kn) ([],tl,f) vl in
         t_quant_simp q (close (List.rev vl) tl (eval env f))
     | _ ->
-        t_map_simp (eval env) t
+        t_map_simp (eval env) t)
   in
-  t_label_copy t (eval Mvs.empty t)
+  eval Mvs.empty t
 
 let rec linear vars t = match t.t_node with
   | Tvar x when Svs.mem x vars -> raise Exit
