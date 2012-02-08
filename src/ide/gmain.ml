@@ -887,8 +887,47 @@ let exit_function ?(destroy=false) () =
 (* View menu *)
 (*************)
 
+let modifiable_font_views = ref [goals_view#misc]
+
+let font_family = "Monospace"
+let font_size = ref 10
+
+let change_font () =
+(*
+  Tools.resize_images (!Colors.font_size * 2 - 4);
+*)
+  let f =
+    Pango.Font.from_string (font_family ^ " " ^ string_of_int !font_size)
+  in
+  List.iter (fun v -> v#modify_font f) !modifiable_font_views
+
+let enlarge_font () =
+  incr font_size;
+  change_font ();
+(*
+  GConfig.save ()
+*)
+  ()
+
+let reduce_font () =
+  decr font_size; 
+  change_font ();
+(*
+  GConfig.save ()
+*)
+()
+
 let view_menu = factory#add_submenu "_View"
 let view_factory = new GMenu.factory view_menu ~accel_group
+
+let (_ : GMenu.menu_item) =
+  view_factory#add_item ~key:GdkKeysyms._plus
+    ~callback:enlarge_font "Enlarge font"
+
+let (_ : GMenu.menu_item) =
+    view_factory#add_item ~key:GdkKeysyms._minus
+      ~callback:reduce_font "Reduce font"
+
 let (_ : GMenu.image_menu_item) =
   view_factory#add_image_item ~key:GdkKeysyms._E
     ~label:"Expand all" ~callback:(fun () -> goals_view#expand_all ()) ()
@@ -1152,6 +1191,7 @@ let task_view =
     ~height:gconfig.task_height
     ()
 
+let () = modifiable_font_views := task_view#misc :: !modifiable_font_views
 let () = task_view#source_buffer#set_language why_lang
 let () = task_view#set_highlight_current_line true
 
@@ -1180,6 +1220,7 @@ let source_view =
 (*
   source_view#misc#modify_font_by_name font_name;
 *)
+let () = modifiable_font_views := source_view#misc :: !modifiable_font_views
 let () = source_view#source_buffer#set_language None
 let () = source_view#set_highlight_current_line true
 (*
