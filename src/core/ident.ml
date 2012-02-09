@@ -193,8 +193,14 @@ let char_to_ualpha c = String.capitalize (char_to_alpha c)
 let char_to_alnum c =
   match c with '0'..'9' -> String.make 1 c | _ -> char_to_alpha c
 
+let char_to_lalnum c =
+  match c with '0'..'9' -> String.make 1 c | _ -> char_to_lalpha c
+
 let char_to_alnumus c =
   match c with '_' | ' ' -> "_" | _ -> char_to_alnum c
+
+let char_to_lalnumus c =
+  match c with '_' | ' ' -> "_" | _ -> char_to_lalnum c
 
 let sanitizer head rest n =
   let lst = ref [] in

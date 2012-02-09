@@ -103,5 +103,7 @@ val char_to_alpha : char -> string
 val char_to_lalpha : char -> string
 val char_to_ualpha : char -> string
 val char_to_alnum : char -> string
+val char_to_lalnum : char -> string
 val char_to_alnumus : char -> string
+val char_to_lalnumus : char -> string
 
