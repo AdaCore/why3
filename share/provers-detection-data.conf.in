@@ -255,3 +255,12 @@ command = "@LOCALBIN@why3-cpulimit 0 %m -s %e -R %l/coq Why3 -l %f"
 driver = "drivers/coq.drv"
 editor = "coqide -R %l/coq Why3 %f"
 
+[ITP pvs]
+name = "PVS"
+exec = "pvs"
+version_switch = "-version"
+version_regexp = "PVS Version \\([^ \n]+\\)"
+version_ok = "5.0"
+command = "@LOCALBIN@why3-cpulimit 0 %m -s %e -l %f"
+driver = "drivers/pvs.drv"
+editor = "pvs %f"
