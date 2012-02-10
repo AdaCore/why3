@@ -42,7 +42,7 @@ theory int.Int
   syntax function (+)  "(+ %1 %2)"
   syntax function (-)  "(- %1 %2)"
   syntax function (*)  "(* %1 %2)"
-  syntax function (-_) "(- %1)"
+  syntax function (-_) "(- 0 %1)"
 
   syntax predicate (<=) "(<= %1 %2)"
   syntax predicate (<)  "(< %1 %2)"
@@ -81,7 +81,7 @@ theory real.Real
   (* Yices division doesn't accept anything else than constant on
   denominator so we don't use it (except for constant cf printer) *)
   (* syntax function (/)  "(/ %1 %2)" *)
-  syntax function (-_) "(- %1)"
+  syntax function (-_) "(- 0 %1)"
   (* syntax function inv  "(/ 1 %1)" *)
 
   syntax predicate (<=) "(<= %1 %2)"
