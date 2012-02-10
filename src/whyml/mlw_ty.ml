@@ -21,29 +21,30 @@ open Why3
 open Util
 open Ident
 open Ty
+open Term
 
 (** value types (w/o effects) *)
 
-type vtysymbol = {
-  vts_pure  : tysymbol;
-  vts_args  : tvsymbol list;
-  vts_regs  : region   list;
-  vts_def   : vty option;
+type itysymbol = {
+  its_pure  : tysymbol;
+  its_args  : tvsymbol list;
+  its_regs  : region   list;
+  its_def   : ity option;
 }
 
-and vty = {
-  vty_node : vty_node;
-  vty_tag  : Hashweak.tag;
+and ity = {
+  ity_node : ity_node;
+  ity_tag  : Hashweak.tag;
 }
 
-and vty_node =
-  | Vtyvar of tvsymbol
-  | Vtypur of tysymbol * vty list
-  | Vtyapp of vtysymbol * vty list * region list
-  (* | Vtymod of tysymbol * vty *)
+and ity_node =
+  | Ityvar of tvsymbol
+  | Itypur of tysymbol * ity list
+  | Ityapp of itysymbol * ity list * region list
+  (* | Itymod of tysymbol * ity *)
 
 and region = {
-  reg_ty  : vty;
+  reg_ity : ity;
   reg_tag : Hashweak.tag;
 }
 
@@ -66,177 +67,177 @@ let create_region =
   let r = ref 0 in
   fun ty ->
     incr r;
-    { reg_ty = ty; reg_tag = Hashweak.create_tag !r }
+    { reg_ity = ty; reg_tag = Hashweak.create_tag !r }
 
 (* value type symbols *)
 
-module VTsym = WeakStructMake (struct
-  type t = vtysymbol
-  let tag vts = vts.vts_pure.ts_name.id_tag
+module Itsym = WeakStructMake (struct
+  type t = itysymbol
+  let tag its = its.its_pure.ts_name.id_tag
 end)
 
-module Svts = VTsym.S
-module Mvts = VTsym.M
-module Hvts = VTsym.H
-module Wvts = VTsym.W
+module Sits = Itsym.S
+module Mits = Itsym.M
+module Hits = Itsym.H
+module Wits = Itsym.W
 
-let vts_equal : vtysymbol -> vtysymbol -> bool = (==)
-let vty_equal : vty       -> vty       -> bool = (==)
+let its_equal : itysymbol -> itysymbol -> bool = (==)
+let ity_equal : ity       -> ity       -> bool = (==)
 
-let vts_hash vts = id_hash vts.vts_pure.ts_name
-let vty_hash vty = Hashweak.tag_hash vty.vty_tag
+let its_hash its = id_hash its.its_pure.ts_name
+let ity_hash ity = Hashweak.tag_hash ity.ity_tag
 
-module Hsvty = Hashcons.Make (struct
-  type t = vty
+module Hsity = Hashcons.Make (struct
+  type t = ity
 
-  let equal vty1 vty2 = match vty1.vty_node, vty2.vty_node with
-    | Vtyvar n1, Vtyvar n2 ->
+  let equal ity1 ity2 = match ity1.ity_node, ity2.ity_node with
+    | Ityvar n1, Ityvar n2 ->
         tv_equal n1 n2
-    | Vtypur (s1,l1), Vtypur (s2,l2) ->
-        ts_equal s1 s2 && List.for_all2 vty_equal l1 l2
-    | Vtyapp (s1,l1,r1), Vtyapp (s2,l2,r2) ->
-        vts_equal s1 s2 && List.for_all2 vty_equal l1 l2
+    | Itypur (s1,l1), Itypur (s2,l2) ->
+        ts_equal s1 s2 && List.for_all2 ity_equal l1 l2
+    | Ityapp (s1,l1,r1), Ityapp (s2,l2,r2) ->
+        its_equal s1 s2 && List.for_all2 ity_equal l1 l2
           && List.for_all2 reg_equal r1 r2
-    (* | Vtymod (s1, vty1), Vtymod (s2, vty2) -> *)
-    (*     ts_equal s1 s2 && vty_equal vty1 vty2 *)
+    (* | Itymod (s1, ity1), Itymod (s2, ity2) -> *)
+    (*     ts_equal s1 s2 && ity_equal ity1 ity2 *)
     | _ ->
         false
 
-  let hash vty = match vty.vty_node with
-    | Vtyvar v -> tv_hash v
-    | Vtypur (s,tl) -> Hashcons.combine_list vty_hash (ts_hash s) tl
-    | Vtyapp (s,tl,rl) ->
+  let hash ity = match ity.ity_node with
+    | Ityvar v -> tv_hash v
+    | Itypur (s,tl) -> Hashcons.combine_list ity_hash (ts_hash s) tl
+    | Ityapp (s,tl,rl) ->
         Hashcons.combine_list reg_hash
-          (Hashcons.combine_list vty_hash (vts_hash s) tl) rl
-    (* | Vtymod (ts, vty) -> *)
-    (*     Hashcons.combine (ts_hash ts) (vty_hash vty) *)
+          (Hashcons.combine_list ity_hash (its_hash s) tl) rl
+    (* | Itymod (ts, ity) -> *)
+    (*     Hashcons.combine (ts_hash ts) (ity_hash ity) *)
 
-  let tag n vty = { vty with vty_tag = Hashweak.create_tag n }
+  let tag n ity = { ity with ity_tag = Hashweak.create_tag n }
 end)
 
-module Vty = WeakStructMake (struct
-  type t = vty
-  let tag vty = vty.vty_tag
+module Ity = WeakStructMake (struct
+  type t = ity
+  let tag ity = ity.ity_tag
 end)
 
-module Svty = Vty.S
-module Mvty = Vty.M
-module Hvty = Vty.H
-module Wvty = Vty.W
+module Sity = Ity.S
+module Mity = Ity.M
+module Hity = Ity.H
+module Wity = Ity.W
 
-let mk_vty n = {
-  vty_node = n;
-  vty_tag  = Hashweak.dummy_tag;
+let mk_ity n = {
+  ity_node = n;
+  ity_tag  = Hashweak.dummy_tag;
 }
 
-let vty_var n = Hsvty.hashcons (mk_vty (Vtyvar n))
-let vty_pur s tl = Hsvty.hashcons (mk_vty (Vtypur (s,tl)))
-let vty_app s tl rl = Hsvty.hashcons (mk_vty (Vtyapp (s,tl,rl)))
-(* let vty_mod ts vty = Hsvty.hashcons (mk_vty (Vtymod (ts,vty))) *)
+let ity_var n = Hsity.hashcons (mk_ity (Ityvar n))
+let ity_pur s tl = Hsity.hashcons (mk_ity (Itypur (s,tl)))
+let ity_app s tl rl = Hsity.hashcons (mk_ity (Ityapp (s,tl,rl)))
+(* let ity_mod ts ity = Hsity.hashcons (mk_ity (Itymod (ts,ity))) *)
 
 (* generic traversal functions *)
 
-let vty_map fn vty = match vty.vty_node with
-  | Vtyvar _ -> vty
-  | Vtypur (f,tl) -> vty_pur f (List.map fn tl)
-  | Vtyapp (f,tl,rl) -> vty_app f (List.map fn tl) rl
-  (* | Vtymod (ts, vty) -> vty_mod ts (fn vty) *)
+let ity_map fn ity = match ity.ity_node with
+  | Ityvar _ -> ity
+  | Itypur (f,tl) -> ity_pur f (List.map fn tl)
+  | Ityapp (f,tl,rl) -> ity_app f (List.map fn tl) rl
+  (* | Itymod (ts, ity) -> ity_mod ts (fn ity) *)
 
-let vty_fold fn acc vty = match vty.vty_node with
-  | Vtyvar _ -> acc
-  | Vtypur (_,tl)
-  | Vtyapp (_,tl,_) -> List.fold_left fn acc tl
-  (* | Vtymod (_,vty) -> fn acc vty *)
+let ity_fold fn acc ity = match ity.ity_node with
+  | Ityvar _ -> acc
+  | Itypur (_,tl)
+  | Ityapp (_,tl,_) -> List.fold_left fn acc tl
+  (* | Itymod (_,ity) -> fn acc ity *)
 
-let vty_all pr vty =
-  try vty_fold (all_fn pr) true vty with FoldSkip -> false
+let ity_all pr ity =
+  try ity_fold (all_fn pr) true ity with FoldSkip -> false
 
-let vty_any pr vty =
-  try vty_fold (any_fn pr) false vty with FoldSkip -> true
+let ity_any pr ity =
+  try ity_fold (any_fn pr) false ity with FoldSkip -> true
 
 (* traversal functions on type variables and regions *)
 
-let rec vty_v_map fnv fnr vty = match vty.vty_node with
-  | Vtyvar v ->
+let rec ity_v_map fnv fnr ity = match ity.ity_node with
+  | Ityvar v ->
       fnv v
-  | Vtypur (f,tl) ->
-      vty_pur f (List.map (vty_v_map fnv fnr) tl)
-  | Vtyapp (f,tl,rl) ->
-      vty_app f (List.map (vty_v_map fnv fnr) tl) (List.map fnr rl)
-  (* | Vtymod (ts, vty) -> *)
-  (*     vty_mod ts (vty_v_map fnv fnr vty) *)
+  | Itypur (f,tl) ->
+      ity_pur f (List.map (ity_v_map fnv fnr) tl)
+  | Ityapp (f,tl,rl) ->
+      ity_app f (List.map (ity_v_map fnv fnr) tl) (List.map fnr rl)
+  (* | Itymod (ts, ity) -> *)
+  (*     ity_mod ts (ity_v_map fnv fnr ity) *)
 
-let rec vty_v_fold fnv fnr acc vty = match vty.vty_node with
-  | Vtyvar v ->
+let rec ity_v_fold fnv fnr acc ity = match ity.ity_node with
+  | Ityvar v ->
       fnv acc v
-  | Vtypur (_,tl) ->
-      List.fold_left (vty_v_fold fnv fnr) acc tl
-  | Vtyapp (_,tl,rl) ->
-      List.fold_left (vty_v_fold fnv fnr) (List.fold_left fnr acc rl) tl
-  (* | Vtymod (_, vty) -> *)
-  (*     vty_v_fold fnv fnr acc vty *)
+  | Itypur (_,tl) ->
+      List.fold_left (ity_v_fold fnv fnr) acc tl
+  | Ityapp (_,tl,rl) ->
+      List.fold_left (ity_v_fold fnv fnr) (List.fold_left fnr acc rl) tl
+  (* | Itymod (_, ity) -> *)
+  (*     ity_v_fold fnv fnr acc ity *)
 
-let vty_v_all prv prr vty =
-  try vty_v_fold (all_fn prv) (all_fn prr) true vty with FoldSkip -> false
+let ity_v_all prv prr ity =
+  try ity_v_fold (all_fn prv) (all_fn prr) true ity with FoldSkip -> false
 
-let vty_v_any prv prr vty =
-  try vty_v_fold (any_fn prv) (any_fn prr) false vty with FoldSkip -> true
+let ity_v_any prv prr ity =
+  try ity_v_fold (any_fn prv) (any_fn prr) false ity with FoldSkip -> true
 
-let vty_full_inst mv mr vty =
-  vty_v_map (fun v -> Mtv.find v mv) (fun r -> Mreg.find r mr) vty
+let ity_full_inst mv mr ity =
+  ity_v_map (fun v -> Mtv.find v mv) (fun r -> Mreg.find r mr) ity
 
-let vty_freevars s vty = vty_v_fold (fun s v -> Stv.add v s) Util.const s vty
+let ity_freevars s ity = ity_v_fold (fun s v -> Stv.add v s) Util.const s ity
 
-let vty_closed vty = vty_v_all Util.ffalse Util.ttrue vty
-let vty_pure vty = vty_v_all Util.ttrue Util.ffalse vty
+let ity_closed ity = ity_v_all Util.ffalse Util.ttrue ity
+let ity_pure ity = ity_v_all Util.ttrue Util.ffalse ity
 
 (* smart constructors *)
 
-exception BadVtyArity of vtysymbol * int * int
-exception BadRegArity of vtysymbol * int * int
+exception BadItyArity of itysymbol * int * int
+exception BadRegArity of itysymbol * int * int
 
 exception DuplicateRegion of region
 exception UnboundRegion of region
 exception InvalidRegion of region
 
 exception RegionMismatch of region * region
-exception TypeMismatch of vty * vty
+exception TypeMismatch of ity * ity
 
-let vty_equal_check ty1 ty2 =
-  if not (vty_equal ty1 ty2) then raise (TypeMismatch (ty1, ty2))
+let ity_equal_check ty1 ty2 =
+  if not (ity_equal ty1 ty2) then raise (TypeMismatch (ty1, ty2))
 
-type vty_subst = {
-  vty_subst_tv:  vty Mtv.t;
-  vty_subst_reg: region Mreg.t;
+type ity_subst = {
+  ity_subst_tv:  ity Mtv.t;
+  ity_subst_reg: region Mreg.t;
 }
 
-let vty_subst_empty = {
-  vty_subst_tv = Mtv.empty;
-  vty_subst_reg = Mreg.empty;
+let ity_subst_empty = {
+  ity_subst_tv = Mtv.empty;
+  ity_subst_reg = Mreg.empty;
 }
 
-let vty_inst s vty =
-  vty_v_map
-    (fun v -> Mtv.find_default v (vty_var v) s.vty_subst_tv)
-    (fun r -> Mreg.find_default r r s.vty_subst_reg)
-    vty
+let ity_inst s ity =
+  ity_v_map
+    (fun v -> Mtv.find_default v (ity_var v) s.ity_subst_tv)
+    (fun r -> Mreg.find_default r r s.ity_subst_reg)
+    ity
 
-let rec vty_match s vty1 vty2 =
+let rec ity_match s ity1 ity2 =
   let set = function
-    | None -> Some vty2
-    | Some vty3 as r when vty_equal vty3 vty2 -> r
+    | None -> Some ity2
+    | Some ity3 as r when ity_equal ity3 ity2 -> r
     | _ -> raise Exit
   in
-  match vty1.vty_node, vty2.vty_node with
-  | Vtyapp (s1, l1, r1), Vtyapp (s2, l2, r2) when vts_equal s1 s2 ->
-      let s = List.fold_left2 vty_match s l1 l2 in
+  match ity1.ity_node, ity2.ity_node with
+  | Ityapp (s1, l1, r1), Ityapp (s2, l2, r2) when its_equal s1 s2 ->
+      let s = List.fold_left2 ity_match s l1 l2 in
       List.fold_left2 reg_match s r1 r2
-  | Vtypur (s1, l1), Vtypur (s2, l2) when ts_equal s1 s2 ->
-      List.fold_left2 vty_match s l1 l2
-  (* | Vtymod (s1, vty1), Vtymod (s2, vty2) when ts_equal s1 s2 -> *)
-  (*     vty_match s vty1 vty2 *)
-  | Vtyvar tv1, _ ->
-      { s with vty_subst_tv = Mtv.change tv1 set s.vty_subst_tv }
+  | Itypur (s1, l1), Itypur (s2, l2) when ts_equal s1 s2 ->
+      List.fold_left2 ity_match s l1 l2
+  (* | Itymod (s1, ity1), Itymod (s2, ity2) when ts_equal s1 s2 -> *)
+  (*     ity_match s ity1 ity2 *)
+  | Ityvar tv1, _ ->
+      { s with ity_subst_tv = Mtv.change tv1 set s.ity_subst_tv }
   | _ ->
       raise Exit
 
@@ -247,62 +248,62 @@ and reg_match s r1 r2 =
     | Some r3 as r when reg_equal r3 r2 -> r
     | _ -> raise Exit
   in
-  let reg_map = Mreg.change r1 set s.vty_subst_reg in
-  let s = { s with vty_subst_reg = reg_map } in
-  if !is_new then vty_match s r1.reg_ty r2.reg_ty else s
+  let reg_map = Mreg.change r1 set s.ity_subst_reg in
+  let s = { s with ity_subst_reg = reg_map } in
+  if !is_new then ity_match s r1.reg_ity r2.reg_ity else s
 
-let vty_match s vty1 vty2 =
-  try vty_match s vty1 vty2
-  with Exit -> raise (TypeMismatch (vty_inst s vty1, vty2))
+let ity_match s ity1 ity2 =
+  try ity_match s ity1 ity2
+  with Exit -> raise (TypeMismatch (ity_inst s ity1, ity2))
 
-let rec ty_of_vty vty = match vty.vty_node with
-  | Vtyvar v -> ty_var v
-  | Vtypur (s,tl) -> ty_app s (List.map ty_of_vty tl)
-  | Vtyapp (s,tl,_) -> ty_app s.vts_pure (List.map ty_of_vty tl)
-  (* | Vtymod (_,vty) -> ty_of_vty vty *)
+let rec ty_of_ity ity = match ity.ity_node with
+  | Ityvar v -> ty_var v
+  | Itypur (s,tl) -> ty_app s (List.map ty_of_ity tl)
+  | Ityapp (s,tl,_) -> ty_app s.its_pure (List.map ty_of_ity tl)
+  (* | Itymod (_,ity) -> ty_of_ity ity *)
 
-let rec vty_of_ty ty = match ty.ty_node with
-  | Tyvar v -> vty_var v
-  | Tyapp (s,tl) -> vty_pur s (List.map vty_of_ty tl)
+let rec ity_of_ty ty = match ty.ty_node with
+  | Tyvar v -> ity_var v
+  | Tyapp (s,tl) -> ity_pur s (List.map ity_of_ty tl)
 
-let vty_app s tl rl =
+let ity_app s tl rl =
   let tll = List.length tl in
   let rll = List.length rl in
-  let stl = List.length s.vts_args in
-  let srl = List.length s.vts_regs in
-  if tll <> stl then raise (BadVtyArity (s,stl,tll));
+  let stl = List.length s.its_args in
+  let srl = List.length s.its_regs in
+  if tll <> stl then raise (BadItyArity (s,stl,tll));
   if rll <> srl then raise (BadRegArity (s,srl,rll));
   let add m v t = Mtv.add v t m in
-  let mv = List.fold_left2 add Mtv.empty s.vts_args tl in
+  let mv = List.fold_left2 add Mtv.empty s.its_args tl in
   let add m v r = Mreg.add v r m in
-  let mr = List.fold_left2 add Mreg.empty s.vts_regs rl in
+  let mr = List.fold_left2 add Mreg.empty s.its_regs rl in
   (* check that region types do unify *)
-  let sub = { vty_subst_tv = mv; vty_subst_reg = mr } in
-  let rmatch sub r1 r2 = vty_match sub r1.reg_ty r2.reg_ty in
-  ignore (List.fold_left2 rmatch sub s.vts_regs rl);
+  let sub = { ity_subst_tv = mv; ity_subst_reg = mr } in
+  let rmatch sub r1 r2 = ity_match sub r1.reg_ity r2.reg_ity in
+  ignore (List.fold_left2 rmatch sub s.its_regs rl);
   (* to instantiate def, mv and mr are enough *)
-  match s.vts_def with
-  | Some vty ->
-      vty_full_inst mv mr vty
+  match s.its_def with
+  | Some ity ->
+      ity_full_inst mv mr ity
   | None ->
-      vty_app s tl rl
+      ity_app s tl rl
 
-(* let rec vty_unmod vty = match vty.vty_node with *)
-(*   | Vtyvar _ -> vty *)
-(*   | Vtypur (s,tl) -> vty_pur s (List.map vty_unmod tl) *)
-(*   | Vtyapp (s,tl,rl) -> vty_app s (List.map vty_unmod tl) rl *)
-(*   | Vtymod (_,vty) -> vty_unmod vty *)
+(* let rec ity_unmod ity = match ity.ity_node with *)
+(*   | Ityvar _ -> ity *)
+(*   | Itypur (s,tl) -> ity_pur s (List.map ity_unmod tl) *)
+(*   | Ityapp (s,tl,rl) -> ity_app s (List.map ity_unmod tl) rl *)
+(*   | Itymod (_,ity) -> ity_unmod ity *)
 
-let vty_pur s tl = match s.ts_def with
+let ity_pur s tl = match s.ts_def with
   | Some ty ->
       let add m v t = Mtv.add v t m in
       let m = List.fold_left2 add Mtv.empty s.ts_args tl in
-      vty_full_inst m Mreg.empty (vty_of_ty ty)
+      ity_full_inst m Mreg.empty (ity_of_ty ty)
   | None ->
-      vty_pur s tl
+      ity_pur s tl
 
-let create_vtysymbol name args regs def (* model *) =
-  let puredef = option_map ty_of_vty def in
+let create_itysymbol name args regs def (* model *) =
+  let puredef = option_map ty_of_ity def in
   let purets = create_tysymbol name args puredef in
   (* all regions *)
   let add s v = Sreg.add_new v (DuplicateRegion v) s in
@@ -311,112 +312,129 @@ let create_vtysymbol name args regs def (* model *) =
   let sargs = List.fold_right Stv.add args Stv.empty in
   (* all type variables in [regs] must be in [args] *)
   let check tv = Stv.mem tv sargs || raise (UnboundTypeVar tv) in
-  List.iter (fun r -> ignore (vty_v_all check Util.ttrue r.reg_ty)) regs;
+  List.iter (fun r -> ignore (ity_v_all check Util.ttrue r.reg_ity)) regs;
   (* all regions in [def] must be in [regs] *)
   let check r = Sreg.mem r sregs || raise (UnboundRegion r) in
-  ignore (option_map (vty_v_all Util.ttrue check) def);
+  ignore (option_map (ity_v_all Util.ttrue check) def);
   (* if a type is a model alias, expand everything on the RHS *)
-  (* let def = if model then option_map (vty_mod purets) def else def in *)
-  { vts_pure  = purets;
-    vts_args  = args;
-    vts_regs  = regs;
-    vts_def   = def; }
+  (* let def = if model then option_map (ity_mod purets) def else def in *)
+  { its_pure  = purets;
+    its_args  = args;
+    its_regs  = regs;
+    its_def   = def; }
 
-(* symbol-wise map/fold *)
+(** computation types (with effects) *)
 
-(*
-let rec vty_s_map fn vty = match vty.vty_node with
-  | Vtyvar _ -> ty
-  | Vtyapp (f, tl) -> vty_app (fn f) (List.map (vty_s_map fn) tl)
+(* exception symbols *)
+type xsymbol = {
+  xs_name : ident;
+  xs_ity:   ity; (* closed and pure *)
+}
 
-let rec ty_s_fold fn acc ty = match ty.ty_node with
-  | Tyvar _ -> acc
-  | Tyapp (f, tl) -> List.fold_left (ty_s_fold fn) (fn acc f) tl
+exception PolymorphicException of ident * ity
+exception MutableException of ident * ity
 
-let ty_s_all pr ty =
-  try ty_s_fold (all_fn pr) true ty with FoldSkip -> false
+let create_xsymbol id ity =
+  let id = id_register id in
+  if not (ity_closed ity) then raise (PolymorphicException (id, ity));
+  if not (ity_pure ity) then raise (MutableException (id, ity));
+  { xs_name = id; xs_ity = ity; }
 
-let ty_s_any pr ty =
-  try ty_s_fold (any_fn pr) false ty with FoldSkip -> true
+module Exn = StructMake (struct
+  type t = xsymbol
+  let tag xs = Hashweak.tag_hash xs.xs_name.id_tag
+end)
+module Sexn = Exn.S
+module Mexn = Exn.M
 
-(* type matching *)
+(* effects *)
+type effect = {
+  eff_reads:   Sreg.t;
+  eff_writes:  Sreg.t;
+  eff_erases:  Sreg.t;
+  eff_renames: region Mreg.t; (* if r1->r2 then r1 appears in ty(r2) *)
+  eff_raises:  Sexn.t;
+}
 
-let rec ty_inst s ty = match ty.ty_node with
-  | Tyvar n -> Mrv.find_default n ty s
-  | _ -> ty_map (ty_inst s) ty
+let eff_empty = {
+  eff_reads = Sreg.empty;
+  eff_writes = Sreg.empty;
+  eff_erases = Sreg.empty;
+  eff_renames = Mreg.empty;
+  eff_raises = Sexn.empty
+}
 
-let rec ty_match s ty1 ty2 =
-  let set = function
-    | None -> Some ty2
-    | Some ty1 as r when ty_equal ty1 ty2 -> r
-    | _ -> raise Exit
+let eff_union x y =
+  let e = Sreg.union x.eff_erases y.eff_erases in
+  let rx = Mreg.diff (fun _ _ _ -> None) x.eff_renames e in
+  let ry = Mreg.diff (fun _ _ _ -> None) y.eff_renames e in
+  let rn = Mreg.union
+      (fun _ r1 r2 -> if reg_equal r1 r2 then Some r1 else None) rx ry in
+  let re = Mreg.inter 
+      (fun _ r1 r2 -> if reg_equal r1 r2 then None else Some ()) rx ry in
+  { eff_reads = Sreg.union x.eff_reads y.eff_reads;
+    eff_writes = Sreg.union x.eff_writes y.eff_writes;
+    eff_erases = Sreg.union e re;
+    eff_renames = rn;
+    eff_raises = Sexn.union x.eff_raises y.eff_raises; }
+
+let eff_read r = { eff_empty with eff_reads = Sreg.singleton r }
+let eff_write r = { eff_empty with eff_writes = Sreg.singleton r }
+let eff_raise xs = { eff_empty with eff_raises = Sexn.singleton xs }
+let eff_remove_raise xs e = { e with eff_raises = Sexn.remove xs e.eff_raises }
+
+(* program variables *)
+type pvsymbol = {
+  pv_vs:      vsymbol;
+  pv_ity:     ity;
+  pv_ghost:   bool;
+  pv_mutable: region option;
+}
+
+exception InvalidPVsymbol of ident
+
+let create_pvsymbol id ?mut ?(ghost=false) ity =
+  let ty = ty_of_ity ity in
+  let vs = create_vsymbol id ty in
+  begin match mut with
+    | Some r when not (ity_equal r.reg_ity ity) ->
+        raise (InvalidPVsymbol vs.vs_name)
+    | _ -> ()
+  end;
+  { pv_vs = vs;
+    pv_ity = ity;
+    pv_ghost = ghost;
+    pv_mutable = mut; }
+
+(* value types *)
+type vty =
+  | VTvalue of pvsymbol
+  | VTarrow of pvsymbol * cty
+
+(* computation types *)
+and cty = {
+  c_pre: term;
+  c_vty: vty;
+  c_eff: effect;
+  c_post: term;
+  c_xpost: xpost;
+}
+
+and xpost = (pvsymbol * term) Mexn.t
+
+(* smart constructors *)
+let vty_value pvs = VTvalue pvs
+(* let vty_arrow pvs cty = VTarrow (pvs, cty) *)
+
+let vty_arrow x ?(pre=t_true) ?(post=t_true) ?(xpost=Mexn.empty) vty eff =
+  let cty = {
+    c_pre = pre;
+    c_vty = vty;
+    c_eff = eff;
+    c_post = post;
+    c_xpost = xpost;
+  }
   in
-  match ty1.ty_node, ty2.ty_node with
-    | Tyapp (f1,l1), Tyapp (f2,l2) when ts_equal f1 f2 ->
-        List.fold_left2 ty_match s l1 l2
-    | Tyvar n1, _ -> Mrv.change n1 set s
-    | _ -> raise Exit
+  VTarrow (x, cty)
 
-exception TypeMismatch of ty * ty
 
-let ty_match s ty1 ty2 =
-  try ty_match s ty1 ty2
-  with Exit -> raise (TypeMismatch (ty_inst s ty1, ty2))
-
-(* built-in symbols *)
-
-let ts_int  = create_tysymbol (id_fresh "int")  [] None
-let ts_real = create_tysymbol (id_fresh "real") [] None
-
-let ty_int  = ty_app ts_int  []
-let ty_real = ty_app ts_real []
-
-let ts_func =
-  let rv_a = create_rvsymbol (id_fresh "a") in
-  let rv_b = create_rvsymbol (id_fresh "b") in
-  create_tysymbol (id_fresh "func") [rv_a;rv_b] None
-
-let ts_pred =
-  let rv_a = create_rvsymbol (id_fresh "a") in
-  create_tysymbol (id_fresh "pred") [rv_a] None
-
-let ty_func ty_a ty_b = ty_app ts_func [ty_a;ty_b]
-let ty_pred ty_a = ty_app ts_pred [ty_a]
-
-let ts_tuple_ids = Hid.create 17
-
-let ts_tuple = Util.memo_int 17 (fun n ->
-  let vl = ref [] in
-  for i = 1 to n do vl := create_rvsymbol (id_fresh "a") :: !vl done;
-  let ts = create_tysymbol (id_fresh ("tuple" ^ string_of_int n)) !vl None in
-  Hid.add ts_tuple_ids ts.ts_name n;
-  ts)
-
-let ty_tuple tyl = ty_app (ts_tuple (List.length tyl)) tyl
-
-let is_ts_tuple ts = ts_equal ts (ts_tuple (List.length ts.ts_args))
-
-let is_ts_tuple_id id =
-  try Some (Hid.find ts_tuple_ids id) with Not_found -> None
-
-(** {2 Operations on [ty option]} *)
-
-exception UnexpectedProp
-
-let oty_type = function Some ty -> ty | None -> raise UnexpectedProp
-
-let oty_equal = Util.option_eq ty_equal
-let oty_hash = Util.option_apply 1 ty_hash
-
-let oty_match m o1 o2 = match o1,o2 with
-  | Some ty1, Some ty2 -> ty_match m ty1 ty2
-  | None, None -> m
-  | _ -> raise UnexpectedProp
-
-let oty_inst m = Util.option_map (ty_inst m)
-let oty_freevars = Util.option_fold ty_freevars
-let oty_cons = Util.option_fold (fun tl t -> t::tl)
-
-let ty_equal_check ty1 ty2 =
-  if not (ty_equal ty1 ty2) then raise (TypeMismatch (ty1, ty2))
-*)
