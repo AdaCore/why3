@@ -261,15 +261,15 @@ PLUG_TPTP = tptp_ast tptp_parser tptp_typing tptp_lexer
 
 PLUGINS = genequlin tptpfof tptp
 
-TFF1MODULES = $(addprefix plugins/tptp/, $(PLUG_TPTP))
+TPTPMODULES = $(addprefix plugins/tptp/, $(PLUG_TPTP))
 
-TFF1CMO = $(addsuffix .cmo, $(TFF1MODULES))
-TFF1CMX = $(addsuffix .cmx, $(TFF1MODULES))
+TPTPCMO = $(addsuffix .cmo, $(TPTPMODULES))
+TPTPCMX = $(addsuffix .cmx, $(TPTPMODULES))
 
 PLUGMODULES = $(addprefix plugins/parser/, $(PLUG_PARSER)) \
 	      $(addprefix plugins/printer/, $(PLUG_PRINTER)) \
 	      $(addprefix plugins/transform/, $(PLUG_TRANSFORM)) \
-	      $(TFF1MODULES)
+	      $(TPTPMODULES)
 
 PLUGML  = $(addsuffix .ml,  $(PLUGMODULES))
 PLUGMLI = $(addsuffix .mli, $(PLUGMODULES))
@@ -308,11 +308,11 @@ lib/plugins/%.cmo: plugins/transform/%.cmo
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -pack -o $@ $<
 
-lib/plugins/tptp.cmxs: $(TFF1CMX)
+lib/plugins/tptp.cmxs: $(TPTPCMX)
 	$(if $(QUIET), @echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -shared -o $@ $^
 
-lib/plugins/tptp.cmo: $(TFF1CMO)
+lib/plugins/tptp.cmo: $(TPTPCMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -pack -o $@ $^
 
@@ -1007,65 +1007,6 @@ src/coq_config.ml:
 
 endif
 
-########
-# Tptp2why
-########
-
-ifeq (@enable_whytptp@,yes)
-
-TPTPGENERATED = src/tptp2why/tptpLexer.ml \
-	src/tptp2why/tptpParser.ml src/tptp2why/tptpParser.mli
-
-TPTP_FILES = tptpTree tptpParser tptpLexer tptpTranslate tptp2whymain
-
-TPTPMODULES = $(addprefix src/tptp2why/, $(TPTP_FILES))
-
-TPTPML  = $(addsuffix .ml,  $(TPTPMODULES))
-TPTPMLI = $(addsuffix .mli, $(TPTPMODULES))
-TPTPCMO = $(addsuffix .cmo, $(TPTPMODULES))
-TPTPCMX = $(addsuffix .cmx, $(TPTPMODULES))
-
-$(TPTPML) $(TPTPMLI): OCAMLYACC = $(MENHIR)
-$(TPTPCMO) $(TPTPCMX): INCLUDES += -I src/tptp2why
-
-# build targets
-
-plugins.byte byte: lib/plugins/whytptp.cmo
-plugins.opt  opt : lib/plugins/whytptp.cmxs
-
-lib/plugins/whytptp.cmxs lib/plugins/whytptp.cmo: EXTOBJS += $(MENHIRLIB)
-lib/plugins/whytptp.cmxs lib/plugins/whytptp.cmo: INCLUDES += $(MENHIRINC)
-
-lib/plugins/whytptp.cmxs: $(TPTPCMX)
-	$(if $(QUIET), @echo 'Linking  $@' &&) \
-	    $(OCAMLOPT) $(OFLAGS) -shared -o $@ $^
-
-lib/plugins/whytptp.cmo: $(TPTPCMO)
-	$(if $(QUIET),@echo 'Linking  $@' &&) \
-	    $(OCAMLC) $(BFLAGS) -pack -o $@ $^
-
-install_no_local::
-	cp -f lib/plugins/whytptp.cm* $(LIBDIR)/why3/plugins/
-
-# depend and clean targets
-
-include .depend.tptp2why
-
-.depend.tptp2why: $(TPTPGENERATED)
-	$(OCAMLDEP) -slash -I src -I src/tptp2why $(TPTPML) $(TPTPMLI) > $@
-
-depend: .depend.tptp2why
-
-clean::
-	rm -f $(TPTPGENERATED)
-	rm -f src/tptp2why/*.cm* src/tptp2why/*.o
-	rm -f src/tptp2why/*.annot src/tptp2why/*.conflicts
-	rm -f src/tptp2why/*.output src/tptp2why/*.automaton
-	rm -f lib/plugins/whytptp.cm* lib/plugins/whytptp.o
-	rm -f .depend.tptp2why
-
-endif
-
 #######
 # tools
 #######
@@ -1397,7 +1338,7 @@ $(DISTRIB_TAR): doc/manual.pdf
 	ln -s ../theories $(DISTRIB_DIR)/share/theories
 	cp --parents $(DISTRIB_FILES) $(DISTRIB_DIR)
 	rm -f $(DISTRIB_DIR)/src/config.ml
-	cd $(DISTRIB_DIR); rm -f $(LIBGENERATED) $(TPTPGENERATED) \
+	cd $(DISTRIB_DIR); rm -f $(LIBGENERATED) \
           $(COQGENERATED) $(WHY3DOCGENERATED) $(PLUGGENERATED)
 	cd distrib; tar cf $(NAME).tar $(NAME); gzip -f --best $(NAME).tar
 
@@ -1469,8 +1410,7 @@ headers:
 	    src/transform/close_epsilon.ml* \
 	    src/transform/lift_epsilon.ml*
 	headache -c misc/headache_config.txt -h misc/header_sc.txt \
-	    src/transform/hypothesis_selection.ml* \
-	    src/tptp2why/*.ml*
+	    src/transform/hypothesis_selection.ml*
 	sed -i -f misc/fixnames.sed -- \
 	    Makefile.in configure.in src/*.ml* src/*/*.ml* \
 	    src/tools/cpulimit.c
