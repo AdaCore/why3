@@ -22,32 +22,6 @@ open Ident
 open Ty
 open Mlw_ty
 
-(* program symbols *)
-type psymbol = private {
-  p_ident: ident;
-  p_tvs:   Stv.t;
-  p_reg:   Sreg.t;
-  p_vty:   vty;
-  (* pv_ghost: bool; *)
-}
+type pdecl
 
-val create_psymbol: preid -> Stv.t -> Sreg.t -> vty -> psymbol
-
-val ps_equal: psymbol -> psymbol -> bool
-
-(* program expressions *)
-
-type expr = private {
-  e_node  : expr_node;
-  e_vty   : vty;
-  e_eff   : effect;
-  e_label : Slab.t;
-  e_loc   : Loc.position option;
-}
-
-and expr_node
-(*
-  | Letrec of (psymbol * lambda) list * expr
-  | Let of pvsymbol * expr * expr
-*)
-
+type known_map = pdecl Mid.t

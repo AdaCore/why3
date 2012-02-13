@@ -18,36 +18,49 @@
 (**************************************************************************)
 
 open Why3
+open Util
 open Ident
 open Ty
+open Theory
 open Mlw_ty
+open Mlw_expr
+open Mlw_decl
 
-(* program symbols *)
-type psymbol = private {
-  p_ident: ident;
-  p_tvs:   Stv.t;
-  p_reg:   Sreg.t;
-  p_vty:   vty;
-  (* pv_ghost: bool; *)
+type namespace = private {
+  ns_it : itysymbol Mstr.t;  (* type symbols *)
+  ns_ps : psymbol Mstr.t;    (* program symbols *)
+  ns_ns : namespace Mstr.t;  (* inner namespaces *)
 }
 
-val create_psymbol: preid -> Stv.t -> Sreg.t -> vty -> psymbol
+val ns_find_it : namespace -> string list -> itysymbol
+val ns_find_ps : namespace -> string list -> psymbol
+val ns_find_ns : namespace -> string list -> namespace
 
-val ps_equal: psymbol -> psymbol -> bool
+(** Module *)
 
-(* program expressions *)
-
-type expr = private {
-  e_node  : expr_node;
-  e_vty   : vty;
-  e_eff   : effect;
-  e_label : Slab.t;
-  e_loc   : Loc.position option;
+type modul = private {
+  mod_theory: theory;			(* pure theory *)
+  mod_decls : pdecl list;		(* module declarations *)
+  mod_export: namespace;		(* exported namespace *)
+  mod_known : known_map;		(* known identifiers *)
+  mod_local : Sid.t;			(* locally declared idents *)
 }
 
-and expr_node
-(*
-  | Letrec of (psymbol * lambda) list * expr
-  | Let of pvsymbol * expr * expr
-*)
+(** Module under construction *)
 
+type module_uc (* a module under construction *)
+
+val create_module : ?path:string list -> preid -> module_uc
+val close_module  : module_uc -> modul
+
+val open_namespace  : module_uc -> module_uc
+val close_namespace : module_uc -> bool -> string option -> module_uc
+
+val get_namespace : module_uc -> namespace
+val get_known : module_uc -> known_map
+
+(** Use *)
+
+(* val use_export : module_uc -> modul -> module_uc *)
+
+(** Clone: not yet implemented *)

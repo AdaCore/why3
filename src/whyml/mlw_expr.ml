@@ -38,3 +38,14 @@ let create_psymbol id tvars regs vty =
     p_reg   = regs;
     p_vty   = vty; }
 
+let ps_equal : psymbol -> psymbol -> bool = (==)
+
+type expr = private {
+  e_node  : expr_node;
+  e_vty   : vty;
+  e_eff   : effect;
+  e_label : Slab.t;
+  e_loc   : Loc.position option;
+}
+
+and expr_node

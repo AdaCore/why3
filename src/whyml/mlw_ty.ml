@@ -45,6 +45,7 @@ and ity_node =
 
 and region = {
   reg_ity : ity;
+  reg_ghost: bool;
   reg_tag : Hashweak.tag;
 }
 
@@ -65,9 +66,9 @@ let reg_hash r = Hashweak.tag_hash r.reg_tag
 
 let create_region =
   let r = ref 0 in
-  fun ty ->
+  fun ?(ghost=false) ty ->
     incr r;
-    { reg_ity = ty; reg_tag = Hashweak.create_tag !r }
+    { reg_ity = ty; reg_ghost = ghost; reg_tag = Hashweak.create_tag !r }
 
 (* value type symbols *)
 
@@ -397,9 +398,10 @@ let create_pvsymbol id ?mut ?(ghost=false) ity =
   let ty = ty_of_ity ity in
   let vs = create_vsymbol id ty in
   begin match mut with
-    | Some r when not (ity_equal r.reg_ity ity) ->
+    | Some r when not (ity_equal r.reg_ity ity) || ghost <> r.reg_ghost ->
         raise (InvalidPVsymbol vs.vs_name)
-    | _ -> ()
+    | _ ->
+        ()
   end;
   { pv_vs = vs;
     pv_ity = ity;

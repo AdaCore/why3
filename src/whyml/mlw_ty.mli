@@ -26,10 +26,10 @@ open Term
 (** individual types (first-order types w/o effects) *)
 
 type itysymbol = private {
-  its_pure  : tysymbol;
-  its_args  : tvsymbol list;
-  its_regs  : region   list;
-  its_def   : ity option;
+  its_pure : tysymbol;
+  its_args : tvsymbol list;
+  its_regs : region   list;
+  its_def  : ity option;
 }
 
 and ity = private {
@@ -44,8 +44,9 @@ and ity_node = private
   (* | Itymod of tysymbol * ity *)
 
 and region = private {
-  reg_ity : ity;
-  reg_tag : Hashweak.tag;
+  reg_ity   : ity;
+  reg_ghost : bool;
+  reg_tag   : Hashweak.tag;
 }
 
 module Mits : Map.S with type key = itysymbol
@@ -78,7 +79,7 @@ exception DuplicateRegion of region
 exception UnboundRegion of region
 exception InvalidRegion of region
 
-val create_region : ity -> region
+val create_region : ?ghost:bool -> ity -> region
 
 val create_itysymbol :
   preid -> tvsymbol list -> region list -> ity option -> itysymbol
