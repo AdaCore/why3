@@ -47,7 +47,6 @@ STRIP = @STRIP@
 CC        = @CC@
 OCAMLC    = @OCAMLC@
 OCAMLOPT  = @OCAMLOPT@
-OCAMLDEP  = @OCAMLDEP@
 OCAMLLEX  = @OCAMLLEX@
 OCAMLYACC = @OCAMLYACC@
 OCAMLDOC  = @OCAMLDOC@
@@ -58,14 +57,10 @@ COQC      = @COQC@
 COQDEP    = @COQDEP@
 CAMLP5O   = @CAMLP5O@
 
-ifeq (@enable_menhirlib@,yes)
-  MENHIR    = @MENHIR@ --table
-  MENHIRINC = -I @MENHIRLIB@
-  MENHIRLIB = menhirLib
+ifeq (@OCAMLBEST@,opt)
+OCAMLDEP  = @OCAMLDEP@ -native
 else
-  MENHIR    = @MENHIR@
-  MENHIRINC =
-  MENHIRLIB =
+OCAMLDEP  = @OCAMLDEP@
 endif
 
 RUBBER = @RUBBER@
@@ -1221,8 +1216,13 @@ clean::
 # generic rules
 ################
 
+ifeq (@OCAMLBEST@,opt)
+%.cmi: %.mli
+	$(if $(QUIET),@echo 'Ocamlopt $<' &&) $(OCAMLOPT) -c $(OFLAGS) $<
+else
 %.cmi: %.mli
 	$(if $(QUIET),@echo 'Ocamlc   $<' &&) $(OCAMLC) -c $(BFLAGS) $<
+endif
 
 %.cmo: %.ml
 	$(if $(QUIET),@echo 'Ocamlc   $<' &&) $(OCAMLC) -c $(BFLAGS) $<
