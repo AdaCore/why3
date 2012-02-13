@@ -34,9 +34,9 @@ val print_list_par :
   (Format.formatter -> unit -> 'a) ->
   (Format.formatter -> 'b -> unit) -> Format.formatter -> 'b list -> unit
 val print_list_delim :
-  (Format.formatter -> unit -> unit) ->
-  (Format.formatter -> unit -> unit) ->
-  (Format.formatter -> unit -> unit) ->
+  start:(Format.formatter -> unit -> unit) ->
+  stop:(Format.formatter -> unit -> unit) ->
+  sep:(Format.formatter -> unit -> unit) ->
   (Format.formatter -> 'b -> unit) -> Format.formatter -> 'b list -> unit
 
 val print_pair_delim :

@@ -162,8 +162,10 @@ let unambig_fs fs =
 
 let lparen_l fmt () = fprintf fmt "@ ("
 let lparen_r fmt () = fprintf fmt "(@,"
-let print_paren_l fmt x = print_list_delim lparen_l rparen comma fmt x
-let print_paren_r fmt x = print_list_delim lparen_r rparen comma fmt x
+let print_paren_l fmt x =
+  print_list_delim ~start:lparen_l ~stop:rparen ~sep:comma fmt x
+let print_paren_r fmt x =
+  print_list_delim ~start:lparen_r ~stop:rparen ~sep:comma fmt x
 
 let arrow fmt () = fprintf fmt "@ -> "
 let print_arrow_list fmt x = print_list arrow fmt x
@@ -590,7 +592,7 @@ let print_recursive_decl info tm fmt (ls,ld) =
   begin match ld with
     | Some ld ->
         let vl,e = open_ls_defn ld in
-        fprintf fmt "%a%a%a {struct %a}: %a :=@ %a.@]@\n"
+        fprintf fmt "%a%a%a {struct %a}: %a :=@ %a@]"
           print_ls ls
           print_ne_params all_ty_params
           (print_space_list (print_vsty info)) vl
@@ -604,15 +606,13 @@ let print_recursive_decl info tm fmt (ls,ld) =
 
 let print_recursive_decl info fmt dl =
   let tm = check_termination dl in
-  let d, dl = match dl with d :: dl -> d, dl | [] -> assert false in
   fprintf fmt "Set Implicit Arguments.@\n";
-  fprintf fmt "@[<hov 2>Fixpoint ";
-  print_recursive_decl info tm fmt d; forget_tvs ();
-  List.iter
-    (fun d ->
-       fprintf fmt "@[<hov 2>with ";
-       print_recursive_decl info tm fmt d; forget_tvs ())
-    dl;
+  print_list_delim
+    ~start:(fun fmt () -> fprintf fmt "@[<hov 2>Fixpoint ")
+    ~stop:(fun fmt () -> fprintf fmt ".@\n")
+    ~sep:(fun fmt () -> fprintf fmt "@\n@[<hov 2>with ")
+    (fun fmt d -> print_recursive_decl info tm fmt d; forget_tvs ())
+    fmt dl;
   fprintf fmt "Unset Implicit Arguments.@\n@\n"
 
 let print_ind info fmt (pr,f) =

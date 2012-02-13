@@ -7,6 +7,7 @@ time "why3cpulimit time : %s s"
 transformation "inline_trivial"
 
 transformation "eliminate_builtin"
+transformation "eliminate_mutual_recursion"
 transformation "eliminate_non_struct_recursion"
 
 transformation "compile_match"
@@ -14,10 +15,14 @@ transformation "compile_match"
 transformation "simplify_formula"
 
 theory BuiltIn
-
   syntax type   int   "int"
   syntax type   real  "real"
   syntax predicate  (=)   "(%1 = %2)"
+end
+
+theory Tuple0
+  syntax type     tuple0 "tuple0"
+  syntax function Tuple0 "Tuple0"
 end
 
 theory bool.Bool

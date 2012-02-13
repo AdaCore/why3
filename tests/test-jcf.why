@@ -1,47 +1,59 @@
 
-theory TestConstant
+theory TestPVS
 
-  constant a : int
-  constant b : int
-  constant c : int
+  use import int.Int
 
-  function f : int
-  function g : int
-
-  predicate p
-
-  goal G: a=0 && p
-end
-
-theory TestCoq
-  use import list.List
-  use import list.Append
-
-  lemma append_nil: forall l: list 'a. Nil ++ l = l
-end
-
-theory Bijection
-  use export int.Int
-  function n : int
+(***
   function f int : int
-  axiom dom_f : forall i: int. 0 <= i < n -> 0 <= f i < n
-  function g int : int
-  axiom gf : forall i: int. 0 <= i < n -> g (f i) = i
-end
 
-theory Test1
-  function id (i: int) : int = i
-  clone import Bijection with function f = id, lemma dom_f
-  goal G: n > 4 -> g (id 4) = 4
-end
+  axiom f_def: forall x: int. f(x) = x+1
 
-theory Order
-  type t
-  predicate (<=) t t
+  goal G: forall x: int. f(x) > x
 
-  axiom le_refl : forall x : t. x <= x
-  axiom le_asym : forall x y : t. x <= y -> y <= x -> x = y
-  axiom le_trans: forall x y z : t. x <= y -> y <= z -> x <= z
+  type t = A int (int, int) | B () | C
+
+  function g (x:int) : t = A x (x+1, x+2)
+
+  goal G1: match g 1 with
+             | A x ((y,z) as p) -> y=1+1 /\ p = (2,3)
+             | B (() as p) -> p=()
+             | C -> false end
+***)
+
+  type elt
+  type tree = Null | Node tree elt tree
+
+  predicate contains (t: tree) (x: elt) = match t with
+    | Null       -> false
+    | Node l y r -> contains l x || x = y || contains r x
+  end
+
+  (* the size of a tree, to prove termination *)
+  function size (t: tree) : int = match t with
+    | Null       -> 0
+    | Node l _ r -> size2 l + size2 r + 1
+  end
+  with size2 (t: tree) : int = match t with
+    | Null       -> 0
+    | Node l _ r -> size l + size r + 1
+  end
+
+  function size3 (t: tree) : int = match t with
+    | Null       -> 0
+    | Node l _ r -> size2 l + size2 r + 1
+  end
+
+  type u = t
+  with t = A | B u
+
+(*
+  inductive even int =
+    | even0: even 0
+    | evens: forall n: int. even n -> even (n+2)
+*)
+
+  lemma size_nonneg: forall t: tree. size t >= 0
+
 end
 
 (*

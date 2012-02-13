@@ -43,7 +43,7 @@ let print_list_or_default default sep print fmt = function
 let print_list_par sep pr fmt l =
   print_list sep (fun fmt x -> fprintf fmt "(%a)" pr x) fmt l
 
-let print_list_delim start stop sep pr fmt = function
+let print_list_delim ~start ~stop ~sep pr fmt = function
   | [] -> ()
   | l -> fprintf fmt "%a%a%a" start () (print_list sep pr) l stop ()
 
