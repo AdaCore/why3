@@ -47,6 +47,7 @@ STRIP = @STRIP@
 CC        = @CC@
 OCAMLC    = @OCAMLC@
 OCAMLOPT  = @OCAMLOPT@
+OCAMLDEP  = @OCAMLDEP@
 OCAMLLEX  = @OCAMLLEX@
 OCAMLYACC = @OCAMLYACC@
 OCAMLDOC  = @OCAMLDOC@
@@ -57,10 +58,9 @@ COQC      = @COQC@
 COQDEP    = @COQDEP@
 CAMLP5O   = @CAMLP5O@
 
+DEPFLAGS  = -slash -I src
 ifeq (@OCAMLBEST@,opt)
-OCAMLDEP  = @OCAMLDEP@ -native
-else
-OCAMLDEP  = @OCAMLDEP@
+DEPFLAGS += -native
 endif
 
 RUBBER = @RUBBER@
@@ -154,11 +154,11 @@ ifeq (@enable_hypothesis_selection@,yes)
   EXTLIBS += graph
 endif
 
-LIBML  = $(addsuffix .ml,  $(LIBMODULES))
-LIBMLI = $(addsuffix .mli, $(LIBMODULES))
+LIBDEP = $(addsuffix .dep, $(LIBMODULES))
 LIBCMO = $(addsuffix .cmo, $(LIBMODULES))
 LIBCMX = $(addsuffix .cmx, $(LIBMODULES))
 
+$(LIBDEP): DEPFLAGS += $(LIBINCLUDES)
 $(LIBCMO) $(LIBCMX): INCLUDES += $(LIBINCLUDES)
 $(LIBCMX): OFLAGS += -for-pack Why3
 
@@ -179,29 +179,26 @@ src/why3.cmo: $(LIBCMO)
 src/why3.cmx: $(LIBCMX)
 	$(OCAMLOPT) $(OFLAGS) -pack -o $@ $^
 
-# depend target
+# clean and depend
 
-include .depend.lib
+ifneq "$(MAKECMDGOALS)" "clean"
+include $(LIBDEP)
+endif
 
-.depend.lib: src/config.ml $(LIBGENERATED)
-	$(OCAMLDEP) -slash -I src $(LIBINCLUDES) $(LIBML) $(LIBMLI) > $@
-
-depend: .depend.lib
-
-# clean target
+depend: $(LIBGENERATED) $(LIBDEP)
 
 LIBSDIRS = src $(addprefix src/, $(LIBDIRS))
 LIBCLEAN = $(addsuffix /*.cm[iox], $(LIBSDIRS)) \
 	   $(addsuffix /*.annot, $(LIBSDIRS)) \
 	   $(addsuffix /*.output, $(LIBSDIRS)) \
 	   $(addsuffix /*.automaton, $(LIBSDIRS)) \
+	   $(addsuffix /*.dep, $(LIBSDIRS)) \
 	   $(addsuffix /*.o, $(LIBSDIRS)) \
 	   $(addsuffix /*~, $(LIBSDIRS))
 
 clean::
 	rm -f $(LIBCLEAN) $(LIBGENERATED)
 	rm -f src/why3.cm[aiox] src/why3.[ao] src/why3.cmxa
-	rm -f .depend.lib
 
 ###############
 # installation
@@ -266,14 +263,14 @@ PLUGMODULES = $(addprefix plugins/parser/, $(PLUG_PARSER)) \
 	      $(addprefix plugins/transform/, $(PLUG_TRANSFORM)) \
 	      $(TPTPMODULES)
 
-PLUGML  = $(addsuffix .ml,  $(PLUGMODULES))
-PLUGMLI = $(addsuffix .mli, $(PLUGMODULES))
+PLUGDEP = $(addsuffix .dep, $(PLUGMODULES))
 PLUGCMO = $(addsuffix .cmo, $(PLUGMODULES))
 PLUGCMX = $(addsuffix .cmx, $(PLUGMODULES))
 
 PLUGDIRS = parser printer transform tptp
 PLUGINCLUDES = $(addprefix -I plugins/, $(PLUGDIRS))
 
+$(PLUGDEP): DEPFLAGS += $(PLUGINCLUDES)
 $(PLUGCMO) $(PLUGCMX): INCLUDES += $(PLUGINCLUDES)
 
 plugins.byte: $(addsuffix .cmo, $(addprefix lib/plugins/, $(PLUGINS)))
@@ -311,26 +308,26 @@ lib/plugins/tptp.cmo: $(TPTPCMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -pack -o $@ $^
 
-include .depend.plugins
-
-.depend.plugins: $(PLUGGENERATED)
-	$(OCAMLDEP) -slash -I src -I plugins $(PLUGINCLUDES) \
-		$(PLUGML) $(PLUGMLI) > $@
-
-depend: .depend.plugins
-
 PLUGSDIRS = plugins $(addprefix plugins/, $(PLUGDIRS))
 PLUGCLEAN = $(addsuffix /*.cm[iox], $(PLUGSDIRS)) \
 	    $(addsuffix /*.annot, $(PLUGSDIRS)) \
 	    $(addsuffix /*.output, $(PLUGSDIRS)) \
 	    $(addsuffix /*.automaton, $(PLUGSDIRS)) \
+	    $(addsuffix /*.dep, $(PLUGSDIRS)) \
 	    $(addsuffix /*.o, $(PLUGSDIRS)) \
 	    $(addsuffix /*~, $(PLUGSDIRS))
+
+# depend and clean targets
+
+ifneq "$(MAKECMDGOALS)" "clean"
+include $(PLUGDEP)
+endif
+
+depend: $(PLUGGENERATED) $(PLUGDEP)
 
 clean::
 	rm -f $(PLUGCLEAN) $(PLUGGENERATED)
 	rm -f lib/plugins/*
-	rm -f .depend.plugins
 
 install_no_local::
 	mkdir -p $(LIBDIR)/why3/plugins
@@ -377,11 +374,11 @@ PGM_FILES = pgm_ttree pgm_types pgm_pretty \
 
 PGMMODULES = $(addprefix src/programs/, $(PGM_FILES))
 
-PGMML  = $(addsuffix .ml,  $(PGMMODULES))
-PGMMLI = $(addsuffix .mli, $(PGMMODULES))
+PGMDEP = $(addsuffix .dep, $(PGMMODULES))
 PGMCMO = $(addsuffix .cmo, $(PGMMODULES))
 PGMCMX = $(addsuffix .cmx, $(PGMMODULES))
 
+$(PGMDEP): DEPFLAGS += -I src/programs
 $(PGMCMO) $(PGMCMX): INCLUDES += -I src/programs
 
 # build targets
@@ -403,18 +400,16 @@ bin/why3ml: bin/why3ml.@OCAMLBEST@
 
 # depend and clean targets
 
-include .depend.programs
+ifneq "$(MAKECMDGOALS)" "clean"
+include $(PGMDEP)
+endif
 
-.depend.programs:
-	$(OCAMLDEP) -slash -I src -I src/programs $(PGMML) $(PGMMLI) > $@
-
-depend: .depend.programs
+depend: $(PGMDEP)
 
 clean::
 	rm -f src/programs/*.cm[iox] src/programs/*.o
-	rm -f src/programs/*.annot src/programs/*~
+	rm -f src/programs/*.annot src/programs/*.dep src/programs/*~
 	rm -f bin/why3ml.byte bin/why3ml.opt bin/why3ml
-	rm -f .depend.programs
 
 # test target
 
@@ -446,11 +441,11 @@ MLW_FILES = mlw_ty mlw_expr mlw_decl mlw_module
 
 MLWMODULES = $(addprefix src/whyml/, $(MLW_FILES))
 
-MLWML  = $(addsuffix .ml,  $(MLWMODULES))
-MLWMLI = $(addsuffix .mli, $(MLWMODULES))
+MLWDEP = $(addsuffix .dep, $(MLWMODULES))
 MLWCMO = $(addsuffix .cmo, $(MLWMODULES))
 MLWCMX = $(addsuffix .cmx, $(MLWMODULES))
 
+$(MLWDEP): DEPFLAGS += -I src/whyml
 $(MLWCMO) $(MLWCMX): INCLUDES += -I src/whyml
 
 # build targets
@@ -460,18 +455,16 @@ opt:  $(MLWCMX)
 
 # depend and clean targets
 
-include .depend.whyml
+ifneq "$(MAKECMDGOALS)" "clean"
+include $(MLWDEP)
+endif
 
-.depend.whyml:
-	$(OCAMLDEP) -slash -I src -I src/whyml $(MLWML) $(MLWMLI) > $@
-
-depend: .depend.whyml
+depend: $(MLWDEP)
 
 clean::
 	rm -f src/whyml/*.cm[iox] src/whyml/*.o
-	rm -f src/whyml/*.annot src/whyml/*~
+	rm -f src/whyml/*.annot src/whyml/*.dep src/whyml/*~
 #	rm -f bin/why3ml.byte bin/why3ml.opt bin/why3ml
-	rm -f .depend.whyml
 
 ##########
 # gallery
@@ -503,11 +496,11 @@ CONFIG_FILES = whyconfig
 
 CONFIGMODULES = $(addprefix src/config/, $(CONFIG_FILES))
 
-CONFIGML  = $(addsuffix .ml,  $(CONFIGMODULES))
-CONFIGMLI = $(addsuffix .mli, $(CONFIGMODULES))
+CONFIGDEP = $(addsuffix .dep, $(CONFIGMODULES))
 CONFIGCMO = $(addsuffix .cmo, $(CONFIGMODULES))
 CONFIGCMX = $(addsuffix .cmx, $(CONFIGMODULES))
 
+$(CONFIGDEP): DEPFLAGS += -I src/programs
 $(CONFIGCMO) $(CONFIGCMX): INCLUDES += -I src/programs
 
 # build targets
@@ -529,19 +522,17 @@ bin/why3config: bin/why3config.@OCAMLBEST@
 
 # depend and clean targets
 
-include .depend.config
+ifneq "$(MAKECMDGOALS)" "clean"
+include $(CONFIGDEP)
+endif
 
-.depend.config: $(CONFIGGENERATED)
-	$(OCAMLDEP) -slash -I src -I src/config $(CONFIGML) $(CONFIGMLI) > $@
-
-depend: .depend.config
+depend: $(CONFIGDEP)
 
 clean::
 	rm -f src/config/*.cm[iox] src/config/*.o
-	rm -f src/config/*.annot src/config/*~
+	rm -f src/config/*.annot src/config/*.dep src/config/*~
 	rm -f src/config/*.output src/config/*.automaton
 	rm -f bin/why3config.byte bin/why3config.opt bin/why3config
-	rm -f .depend.config
 
 local_config: bin/why3config.@OCAMLBEST@
 	WHY3LIB=$(PWD) WHY3DATA=$(PWD)/share bin/why3config.@OCAMLBEST@ \
@@ -562,11 +553,11 @@ IDE_FILES = gconfig gmain
 
 IDEMODULES = $(addprefix src/ide/, $(IDE_FILES))
 
-IDEML  = $(addsuffix .ml,  $(IDEMODULES))
-IDEMLI = $(addsuffix .mli, $(IDEMODULES))
+IDEDEP = $(addsuffix .dep, $(IDEMODULES))
 IDECMO = $(addsuffix .cmo, $(IDEMODULES))
 IDECMX = $(addsuffix .cmx, $(IDEMODULES))
 
+$(IDEDEP): DEPFLAGS += -I src/ide
 $(IDECMO) $(IDECMX): INCLUDES += -I src/ide
 
 # build targets
@@ -592,19 +583,17 @@ bin/why3ide: bin/why3ide.@OCAMLBEST@
 
 # depend and clean targets
 
-include .depend.ide
+ifneq "$(MAKECMDGOALS)" "clean"
+include $(IDEDEP)
+endif
 
-.depend.ide:
-	$(OCAMLDEP) -slash -I src -I src/ide $(IDEML) $(IDEMLI) > $@
-
-depend: .depend.ide
+depend: $(IDEDEP)
 
 clean::
 	rm -f src/ide/xml.ml
 	rm -f src/ide/*.cm[iox] src/ide/*.o
-	rm -f src/ide/*.annot src/ide/*~
+	rm -f src/ide/*.annot src/ide/*.dep src/ide/*~
 	rm -f bin/why3ide.byte bin/why3ide.opt bin/why3ide
-	rm -f .depend.ide
 
 install_no_local::
 	cp -f bin/why3ide.@OCAMLBEST@ $(BINDIR)/why3ide$(EXE)
@@ -622,11 +611,11 @@ REPLAYER_FILES = replay
 
 REPLAYERMODULES = $(addprefix src/ide/, $(REPLAYER_FILES))
 
-REPLAYERML  = $(addsuffix .ml,  $(REPLAYERMODULES))
-REPLAYERMLI = $(addsuffix .mli, $(REPLAYERMODULES))
+REPLAYERDEP = $(addsuffix .dep, $(REPLAYERMODULES))
 REPLAYERCMO = $(addsuffix .cmo, $(REPLAYERMODULES))
 REPLAYERCMX = $(addsuffix .cmx, $(REPLAYERMODULES))
 
+$(REPLAYERDEP): DEPFLAGS += -I src/ide
 $(REPLAYERCMO) $(REPLAYERCMX): INCLUDES += -I src/ide
 
 # build targets
@@ -648,18 +637,14 @@ bin/why3replayer: bin/why3replayer.@OCAMLBEST@
 
 # depend and clean targets
 
-include .depend.replayer
+ifneq "$(MAKECMDGOALS)" "clean"
+include $(REPLAYERDEP)
+endif
 
-.depend.replayer:
-	$(OCAMLDEP) -slash -I src -I src/ide $(REPLAYERML) $(REPLAYERMLI) > $@
-
-depend: .depend.replayer
+depend: $(REPLAYERDEP)
 
 clean::
-	rm -f src/ide/*.cm[iox] src/ide/*.o
-	rm -f src/ide/*.annot src/ide/*~
 	rm -f bin/why3replayer.byte bin/why3replayer.opt bin/why3replayer
-	rm -f .depend.replayer
 
 install_no_local::
 	cp -f bin/why3replayer.@OCAMLBEST@ $(BINDIR)/why3replayer$(EXE)
@@ -676,11 +661,11 @@ SESSION_FILES = why3session_lib why3session_mod why3session_copy \
 
 SESSIONMODULES = $(addprefix src/why3session/, $(SESSION_FILES))
 
-SESSIONML  = $(addsuffix .ml,  $(SESSIONMODULES))
-SESSIONMLI = $(addsuffix .mli, $(SESSIONMODULES))
+SESSIONDEP = $(addsuffix .dep, $(SESSIONMODULES))
 SESSIONCMO = $(addsuffix .cmo, $(SESSIONMODULES))
 SESSIONCMX = $(addsuffix .cmx, $(SESSIONMODULES))
 
+$(SESSIONDEP): DEPFLAGS += -I src/why3session
 $(SESSIONCMO) $(SESSIONCMX): INCLUDES += -I src/why3session
 
 # build targets
@@ -702,18 +687,16 @@ bin/why3session: bin/why3session.@OCAMLBEST@
 
 # depend and clean targets
 
-include .depend.session
+ifneq "$(MAKECMDGOALS)" "clean"
+include $(SESSIONDEP)
+endif
 
-.depend.session:
-	$(OCAMLDEP) -slash -I src -I src/why3session $(SESSIONML) $(SESSIONMLI) > $@
-
-depend: .depend.session
+depend: $(SESSIONDEP)
 
 clean::
-	rm -f src/ide/*.cm[iox] src/ide/*.o
-	rm -f src/ide/*.annot src/ide/*~
+	rm -f src/why3session/*.cm[iox] src/why3session/*.o
+	rm -f src/why3session/*.annot src/why3session/*.dep src/why3session/*~
 	rm -f bin/why3session.byte bin/why3session.opt bin/why3session
-	rm -f .depend.session
 
 install_no_local::
 	cp -f bin/why3session.@OCAMLBEST@ $(BINDIR)/why3session$(EXE)
@@ -728,11 +711,11 @@ STATS_FILES = stats
 
 STATSMODULES = $(addprefix src/ide/, $(STATS_FILES))
 
-STATSML  = $(addsuffix .ml,  $(STATSMODULES))
-STATSMLI = $(addsuffix .mli, $(STATSMODULES))
+STATSDEP = $(addsuffix .dep, $(STATSMODULES))
 STATSCMO = $(addsuffix .cmo, $(STATSMODULES))
 STATSCMX = $(addsuffix .cmx, $(STATSMODULES))
 
+$(STATSDEP): DEPFLAGS += -I src/ide
 $(STATSCMO) $(STATSCMX): INCLUDES += -I src/ide
 
 # build targets
@@ -754,16 +737,14 @@ bin/why3stats: bin/why3stats.@OCAMLBEST@
 
 # depend and clean targets
 
-include .depend.stats
+ifneq "$(MAKECMDGOALS)" "clean"
+include $(STATSDEP)
+endif
 
-.depend.stats:
-	$(OCAMLDEP) -slash -I src -I src/ide $(STATSML) $(STATSMLI) > $@
-
-depend: .depend.stats
+depend: $(STATSDEP)
 
 clean::
 	rm -f bin/why3stats.byte bin/why3stats.opt bin/why3stats
-	rm -f .depend.stats
 
 install_no_local::
 	cp -f bin/why3stats.@OCAMLBEST@ $(BINDIR)/why3stats
@@ -778,11 +759,11 @@ HTML_FILES = html_session
 
 HTMLMODULES = $(addprefix src/ide/, $(HTML_FILES))
 
-HTMLML  = $(addsuffix .ml,  $(HTMLMODULES))
-HTMLMLI = $(addsuffix .mli, $(HTMLMODULES))
+HTMLDEP = $(addsuffix .dep, $(HTMLMODULES))
 HTMLCMO = $(addsuffix .cmo, $(HTMLMODULES))
 HTMLCMX = $(addsuffix .cmx, $(HTMLMODULES))
 
+$(HTMLDEP): DEPFLAGS += -I src/ide
 $(HTMLCMO) $(HTMLCMX): INCLUDES += -I src/ide
 
 # build targets
@@ -804,16 +785,14 @@ bin/why3html: bin/why3html.@OCAMLBEST@
 
 # depend and clean targets
 
-include .depend.html
+ifneq "$(MAKECMDGOALS)" "clean"
+include $(HTMLDEP)
+endif
 
-.depend.html:
-	$(OCAMLDEP) -slash -I src -I src/ide $(HTMLML) $(HTMLMLI) > $@
-
-depend: .depend.html
+depend: $(HTMLDEP)
 
 clean::
 	rm -f bin/why3html.byte bin/why3html.opt bin/why3html
-	rm -f .depend.html
 
 install_no_local::
 	cp -f bin/why3html.@OCAMLBEST@ $(BINDIR)/why3html
@@ -831,11 +810,11 @@ BENCH_FILES = worker db bench benchrc benchdb whybench
 
 BENCHMODULES := $(addprefix src/bench/, $(BENCH_FILES))
 
-BENCHML  = $(addsuffix .ml,  $(BENCHMODULES))
-BENCHMLI = $(addsuffix .mli, $(BENCHMODULES))
+BENCHDEP = $(addsuffix .dep, $(BENCHMODULES))
 BENCHCMO = $(addsuffix .cmo, $(BENCHMODULES))
 BENCHCMX = $(addsuffix .cmx, $(BENCHMODULES))
 
+$(BENCHDEP): DEPFLAGS += -I src/bench
 $(BENCHCMO) $(BENCHCMX): INCLUDES += -I src/bench -I @SQLITE3LIB@
 
 # build targets
@@ -860,18 +839,16 @@ bin/why3bench: bin/why3bench.@OCAMLBEST@
 
 # depend and clean targets
 
-include .depend.bench
+ifneq "$(MAKECMDGOALS)" "clean"
+include $(BENCHDEP)
+endif
 
-.depend.bench:
-	$(OCAMLDEP) -slash -I src -I src/bench -I src/ide $(BENCHML) $(BENCHMLI) > $@
-
-depend: .depend.bench
+depend: $(BENCHDEP)
 
 clean::
 	rm -f src/bench/*.cm[iox] src/bench/*.o
-	rm -f src/bench/*.annot src/bench/*~
+	rm -f src/bench/*.annot src/bench/*.dep src/bench/*~
 	rm -f bin/why3bench.byte bin/why3bench.opt bin/why3bench
-	rm -f .depend.bench
 
 install_no_local::
 	cp -f bin/why3bench.@OCAMLBEST@ $(BINDIR)/why3bench$(EXE)
@@ -892,13 +869,14 @@ COQ_FILES = whytac g_whytac
 
 COQMODULES = $(addprefix src/coq-plugin/, $(COQ_FILES))
 
-COQML  = $(addsuffix .ml,  $(COQMODULES))
+COQDEP = $(addsuffix .dep, $(COQMODULES))
 COQCMO = $(addsuffix .cmo, $(COQMODULES))
 COQCMX = $(addsuffix .cmx, $(COQMODULES))
 
 COQTREES = kernel lib interp parsing proofs pretyping tactics library toplevel
 COQINCLUDES = -I src/coq-plugin $(addprefix -I @COQLIB@/, $(COQTREES))
 
+$(COQDEP): DEPFLAGS += -I src/coq-plugin
 $(COQCMO) $(COQCMX): INCLUDES += $(COQINCLUDES)
 
 byte: src/coq-plugin/whytac.cma
@@ -918,19 +896,17 @@ src/coq-plugin/g_whytac.ml: src/coq-plugin/g_whytac.ml4
 
 # depend and clean targets
 
-include .depend.coq-plugin
+ifneq "$(MAKECMDGOALS)" "clean"
+include $(COQDEP)
+endif
 
-.depend.coq-plugin: $(COQGENERATED)
-	$(OCAMLDEP) -slash -I src -I src/coq-plugin $(COQML) > $@
-
-depend: .depend.coq-plugin
+depend: $(COQGENERATED) $(COQDEP)
 
 clean::
 	rm -f src/coq-plugin/*.cm[iox] src/coq-plugin/*.o
 	rm -f src/coq-plugin/*.cma src/coq-plugin/*.cmxs
-	rm -f src/coq-plugin/*.annot src/coq-plugin/*~
+	rm -f src/coq-plugin/*.annot src/coq-plugin/*.dep src/coq-plugin/*~
 	rm -f $(COQGENERATED)
-	rm -f .depend.coq-plugin
 
 endif
 
@@ -984,7 +960,9 @@ endif
 
 install_local: $(COQVO)
 
+ifneq "$(MAKECMDGOALS)" "clean"
 include .depend.coq-libs
+endif
 
 .depend.coq-libs:
 	$(COQDEP) -slash -R lib/coq Why3 $(COQV) > $@
@@ -1023,16 +1001,18 @@ install_no_local::
 # why3doc
 #########
 
+WHY3DOCGENERATED = src/why3doc/to_html.ml
+
 # WHY3DOC_FILES = doc_html doc_main
 WHY3DOC_FILES = to_html
 
 WHY3DOCMODULES = $(addprefix src/why3doc/, $(WHY3DOC_FILES))
 
-WHY3DOCML  = $(addsuffix .ml,  $(WHY3DOCMODULES))
-WHY3DOCMLI = $(addsuffix .mli, $(WHY3DOCMODULES))
+WHY3DOCDEP = $(addsuffix .dep, $(WHY3DOCMODULES))
 WHY3DOCCMO = $(addsuffix .cmo, $(WHY3DOCMODULES))
 WHY3DOCCMX = $(addsuffix .cmx, $(WHY3DOCMODULES))
 
+$(WHY3DOCDEP): DEPFLAGS += -I src/why3doc
 $(WHY3DOCCMO) $(WHY3DOCCMX): INCLUDES += -I src/why3doc
 
 # build targets
@@ -1052,26 +1032,22 @@ bin/why3doc.byte: src/why3.cma $(WHY3DOCCMO)
 bin/why3doc: bin/why3doc.@OCAMLBEST@
 	ln -sf why3doc.@OCAMLBEST@ $@
 
-install_no_local::
-	cp -f bin/why3doc.@OCAMLBEST@ $(BINDIR)/why3doc$(EXE)
-
 # depend and clean targets
 
-WHY3DOCGENERATED=src/why3doc/to_html.ml
+ifneq "$(MAKECMDGOALS)" "clean"
+include $(WHY3DOCDEP)
+endif
 
-include .depend.why3doc
-
-.depend.why3doc: $(WHY3DOCGENERATED)
-	$(OCAMLDEP) -slash -I src -I src/why3doc $(WHY3DOCML) $(WHY3DOCMLI) > $@
-
-depend: .depend.why3doc
+depend: $(WHY3DOCGENERATED) $(WHY3DOCDEP)
 
 clean::
 	rm -f $(WHY3DOCGENERATED)
 	rm -f src/why3doc/*.cm[iox] src/why3doc/*.o
-	rm -f src/why3doc/*.annot src/why3doc/*~
+	rm -f src/why3doc/*.annot src/why3doc/*.dep src/why3doc/*~
 	rm -f bin/why3doc.byte bin/why3doc.opt bin/why3doc
-	rm -f .depend.why3doc
+
+install_no_local::
+	cp -f bin/why3doc.@OCAMLBEST@ $(BINDIR)/why3doc$(EXE)
 
 install_local: bin/why3doc
 
@@ -1199,7 +1175,6 @@ apidoc: $(FILESTODOC)
 	mkdir -p doc/apidoc
 	$(OCAMLDOC) -d doc/apidoc -html -keep-code $(INCLUDES) \
 		$(LIBINCLUDES) -I src $(FILESTODOC)
-# $(LIBML)
 
 install_apidoc: apidoc
 	rsync -av doc/apidoc/ marche@scm.gforge.inria.fr:/home/groups/why3/htdocs/apidoc/
@@ -1207,7 +1182,6 @@ install_apidoc: apidoc
 doc/apidoc.tex: $(FILESTODOC)
 	$(OCAMLDOC) -o doc/apidoc.tex -latex -noheader -notrailer $(INCLUDES) \
 		$(LIBINCLUDES) -I src $(FILESTODOC)
-# $(LIBML)
 
 clean::
 	rm -f doc/apidoc/*
@@ -1216,13 +1190,8 @@ clean::
 # generic rules
 ################
 
-ifeq (@OCAMLBEST@,opt)
-%.cmi: %.mli
-	$(if $(QUIET),@echo 'Ocamlopt $<' &&) $(OCAMLOPT) -c $(OFLAGS) $<
-else
 %.cmi: %.mli
 	$(if $(QUIET),@echo 'Ocamlc   $<' &&) $(OCAMLC) -c $(BFLAGS) $<
-endif
 
 %.cmo: %.ml
 	$(if $(QUIET),@echo 'Ocamlc   $<' &&) $(OCAMLC) -c $(BFLAGS) $<
@@ -1238,6 +1207,9 @@ endif
 
 %.ml %.mli: %.mly
 	$(OCAMLYACC) -v $<
+
+%.dep: %.ml
+	$(if $(QUIET),@echo 'Ocamldep $<' &&) $(OCAMLDEP) $(DEPFLAGS) $< $<i > $@
 
 # .ml4.ml:
 # 	$(CAMLP4) pr_o.cmo -impl $< > $@
@@ -1282,8 +1254,8 @@ otags-vi:
 wc:
 	ocamlwc -p src/*.ml* src/*/*.ml*
 
-dep: depend
-	cat .depend* | ocamldot | dot -Tpdf > dep.pdf
+#dep: depend
+#	cat .depend* | ocamldot | dot -Tpdf > dep.pdf
 #	$(PDFVIEWER) dep.pdf
 
 # distrib
@@ -1294,11 +1266,10 @@ DISTRIB_DIR = distrib/$(NAME)
 DISTRIB_TAR = $(DISTRIB_DIR).tar.gz
 
 # CHANGES (not up-to-date, moreover is in French)
-DISTRIB_FILES = Version Makefile.in configure.in META.in configure .depend.* \
-      README INSTALL OCAML-LICENSE LICENSE \
-      src/*.ml* src/*/*.ml* src/*/*.c \
-      src/config.sh.in \
-      plugins/*.ml* plugins/*/*.ml* \
+DISTRIB_FILES = Version Makefile.in configure.in META.in configure \
+      README INSTALL OCAML-LICENSE LICENSE src/config.sh.in \
+      src/*.ml* src/*.dep src/*/*.ml* src/*/*.dep src/*/*.c \
+      plugins/*.ml* plugins/*.dep plugins/*/*.ml* plugins/*/*.dep \
       doc/version.tex.in doc/manual.pdf \
       drivers/*.drv drivers/*.gen \
       examples/*.why examples/programs/*.mlw examples/tptp/*.why \
