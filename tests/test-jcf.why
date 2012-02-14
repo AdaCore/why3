@@ -2,21 +2,8 @@
 theory TestPVS
 
   use import int.Int
-
-  function f int : int
-
-  axiom f_def: forall x: int. f(x) = x+1
-
-  goal G: forall x: int. f(x) > x
-
-  type t = A int (int, int) | B () | C
-
-  function g (x:int) : t = A x (x+1, x+2)
-
-  goal G1: match g 1 with
-             | A x ((y,z) as p) -> y=1+1 /\ p = (2,3)
-             | _ -> false
-           end
+  use import list.List
+  use import list.Append
 
   type elt
   type tree = Null | Node tree elt tree
@@ -26,27 +13,12 @@ theory TestPVS
     | Node l y r -> contains l x || x = y || contains r x
   end
 
-  (* the size of a tree, to prove termination *)
-  function size (t: tree) : int = match t with
-    | Null       -> 0
-    | Node l _ r -> size2 l + size2 r + 1
-  end
-  with size2 (t: tree) : int = match t with
-    | Null       -> 0
-    | Node l _ r -> size l + size r + 1
+  function elements (t: tree): list elt = match t with
+    | Null       -> Nil
+    | Node l x r -> elements l ++ (Cons x (elements r))
   end
 
-  function size3 (t: tree) : int = match t with
-    | Null       -> 0
-    | Node l _ r -> size2 l + size2 r + 1
-  end
-
-  inductive even int =
-    | even0: even 0
-    | even2: forall n: int. even n -> even (n+2)
-    | even4: forall n: int. even n -> even (n+4)
-
-  lemma size_nonneg: forall t: tree. size t >= 0
+  goal G: forall t: tree. elements t = Nil <-> t = Null
 
 end
 

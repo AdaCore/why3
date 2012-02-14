@@ -53,7 +53,9 @@ QUESTIONS FOR THE PVS TEAM
 
 TODO
 ----
-  * use PVS maps
+  * drivers
+    - maps
+    - reals
 
 *)
 
@@ -106,34 +108,14 @@ let print_tv fmt tv =
 let print_tv_binder fmt tv =
   tv_set := Sid.add tv.tv_name !tv_set;
   let n = id_unique iprinter tv.tv_name in
-  fprintf fmt "(%s:Type)" n
+  fprintf fmt "%s:TYPE" n
 
-let print_implicit_tv_binder fmt tv =
-  tv_set := Sid.add tv.tv_name !tv_set;
-  let n = id_unique iprinter tv.tv_name in
-  fprintf fmt "{%s:Type}" n
-
-let print_ne_params fmt stv =
-  Stv.iter
-    (fun tv -> fprintf fmt "@ %a" print_tv_binder tv)
-    stv
-
-let print_ne_params_list fmt ltv =
-  List.iter
-    (fun tv -> fprintf fmt "@ %a" print_tv_binder tv)
-    ltv
+let print_params_list fmt = function
+  | [] -> ()
+  | tvl -> fprintf fmt "[%a]" (print_list comma print_tv_binder) tvl
 
 let print_params fmt stv =
-  if Stv.is_empty stv then () else
-    fprintf fmt "forall%a,@ " print_ne_params stv
-
-let print_implicit_params fmt stv =
-  Stv.iter (fun tv -> fprintf fmt "%a@ " print_implicit_tv_binder tv) stv
-
-let print_params_list fmt ltv =
-  match ltv with
-    | [] -> ()
-    | _ -> fprintf fmt "forall%a,@ " print_ne_params_list ltv
+  print_params_list fmt (Stv.elements stv)
 
 let forget_tvs () =
   Sid.iter (forget_id iprinter) !tv_set;
@@ -336,17 +318,27 @@ and print_tnode opl opr info fmt t = match t.t_node with
   | Tapp (fs, tl) ->
     begin match query_syntax info.info_syn fs.ls_name with
       | Some s ->
-        syntax_arguments s (print_term info) fmt tl
+          syntax_arguments s (print_term info) fmt tl
       | _ ->
-        if unambig_fs fs then
-          if tl = [] then fprintf fmt "%a" (print_ls_real info) fs
-          else fprintf fmt "%a(%a)" (print_ls_real info) fs
-            (print_comma_list (print_term info)) tl
-        else
-          fprintf fmt (protect_on opl "(%a(%a)::%a)") (print_ls_real info) fs
-            (print_comma_list (print_term info)) tl (print_ty info) (t_type t)
+          let no_cast = unambig_fs fs in
+          begin match tl with
+            | [] when no_cast ->
+              fprintf fmt "%a" (print_ls_real info) fs
+            | [] ->
+              fprintf fmt "(%a :: %a)"
+                (print_ls_real info) fs (print_ty info) (t_type t)
+            | _ when no_cast ->
+              fprintf fmt "%a(%a)" (print_ls_real info) fs
+                (print_comma_list (print_term info)) tl
+            |_ ->
+              fprintf fmt (protect_on opl "(%a(%a) :: %a)")
+                (print_ls_real info) fs
+                (print_comma_list (print_term info)) tl
+                (print_ty info) (t_type t)
+          end
     end
-  | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> raise (TermExpected t)
+  | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse ->
+      raise (TermExpected t)
 
 and print_fnode opl opr info fmt f = match f.t_node with
   | Tquant (Tforall, fq) ->
@@ -638,13 +630,13 @@ let print_type_decl ~old info fmt (ts,def) =
               (realization ~old ~def:true) info.realization
         | Some ty ->
             fprintf fmt "@[<hov 2>%a%a: TYPE =@ %a@]@\n@\n"
-              print_ts ts (print_list space print_tv_binder) ts.ts_args
+              print_ts ts print_params_list ts.ts_args
               (print_ty info) ty
         end
     | Talgebraic csl ->
         fprintf fmt
           "@[<hov 1>%a%a: DATATYPE@\n@[<hov 1>BEGIN@\n%a@]@\nEND %a@]@\n"
-          print_ts ts (print_list space print_tv_binder) ts.ts_args
+          print_ts ts print_params_list ts.ts_args
           (print_list newline (print_constr info ts)) csl
           print_ts ts;
         fprintf fmt "@\n"
@@ -666,8 +658,7 @@ let print_logic_decl ~old info fmt (ls,ld) =
     | Some ld ->
         let vl,e = open_ls_defn ld in
 	fprintf fmt "@[<hov 2>%a%a(%a): %a =@ %a@]@\n"
-          print_ls ls
-          print_ne_params all_ty_params
+          print_ls ls print_params all_ty_params
           (print_comma_list (print_vsty_nopar info)) vl
           (print_ls_type info) ls.ls_value
           (print_expr info) e;
@@ -679,8 +670,7 @@ let print_logic_decl ~old info fmt (ls,ld) =
           (print_ls_type info) ls.ls_value
     | None ->
         fprintf fmt "@[<hov 2>%a%a: [%a -> %a]@]@\n"
-          print_ls ls
-          print_params all_ty_params
+          print_ls ls print_params all_ty_params
           (print_comma_list (print_ty info)) ls.ls_args
           (print_ls_type info) ls.ls_value
           (* (realization ~old ~def:true) info.realization *)
@@ -699,7 +689,7 @@ let print_recursive_decl info tm fmt (ls,ld) =
     | Some ld ->
         let vl,e = open_ls_defn ld in
         fprintf fmt "@[<hov 2>%a%a(%a): RECURSIVE %a =@ %a@\n"
-          print_ls ls print_ne_params all_ty_params
+          print_ls ls print_params all_ty_params
           (print_comma_list (print_vsty_nopar info)) vl
           (print_ls_type info) ls.ls_value
           (print_expr info) e;
@@ -731,7 +721,7 @@ let print_ind_decl info fmt (ps,al) =
   let tl = List.map t_var vl in
   let dj = Util.map_join_left (Eliminate_inductive.exi tl) t_or al in
   fprintf fmt "@[<hov 2>%a%a(%a): INDUCTIVE bool =@ @[<hov>%a@]@]@\n"
-    print_ls ps print_implicit_params all_ty_params
+    print_ls ps print_params all_ty_params
     (print_comma_list (print_vsty_nopar info)) vl
     (print_fmla info) dj;
   fprintf fmt "@\n"
@@ -775,10 +765,9 @@ let print_decl ~old info fmt d = match d.d_node with
   | Dprop (k, pr, f) ->
       print_proof_context ~old info fmt k;
       let params = t_ty_freevars Stv.empty f in
-      fprintf fmt "@[<hov 2>%a: %a %a%a@]@\n@\n"
-        print_pr pr
+      fprintf fmt "@[<hov 2>%a%a: %a %a@]@\n@\n"
+        print_pr pr print_params params
         (print_pkind info) k
-        print_params params
         (print_fmla info) f (* (print_proof ~old info) k *);
       forget_tvs ()
 
