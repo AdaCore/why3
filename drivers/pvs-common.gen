@@ -38,8 +38,11 @@ theory map.Map
   remove prop Select_eq
   remove prop Select_neq
 
-  (*
-  syntax function const "(LAMBDA (x:%t0): %1)"
+  (* %t0 is "map a b"
+     %t1 is the type of const's argument, that is "b"
+     but we need type "a" instead, i.e. the first type argument
+
+  syntax function const "(LAMBDA (x:%t1): %1)"
   remove prop Const
   *)
 end
