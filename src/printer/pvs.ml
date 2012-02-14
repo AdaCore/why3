@@ -53,9 +53,8 @@ QUESTIONS FOR THE PVS TEAM
 
 TODO
 ----
-  * drivers
-    - maps
-    - reals
+  * driver
+    - maps: const
 
 *)
 
@@ -282,7 +281,7 @@ and print_tnode opl opr info fmt t = match t.t_node with
           Print_number.hex_real_support = Print_number.Number_unsupported;
           Print_number.frac_real_support = Print_number.Number_custom
             (Print_number.PrintFracReal
-               ("%s%%R", "(%s * %s)%%R", "(%s / %s)%%R"));
+               ("%s", "(%s * %s)", "(%s / %s)"));
           Print_number.def_real_support = Print_number.Number_unsupported;
         }
       in
@@ -808,7 +807,7 @@ let print_task _env pr thpr realize ?old fmt task =
         | _ -> used
       in
       Mid.iter
-        (fun id th -> fprintf fmt "Require %a.%s.@\n"
+        (fun id th -> fprintf fmt "IMPORTING %a.%s.@\n"
           print_path th.Theory.th_path id.id_string)
         used;
       let symbols = Task.used_symbols used in

@@ -1,24 +1,21 @@
 
 theory TestPVS
 
+  use import bool.Bool
   use import int.Int
-  use import list.List
-  use import list.Append
+  use import map.Map
 
-  type elt
-  type tree = Null | Node tree elt tree
+  function m: map int bool
 
-  predicate contains (t: tree) (x: elt) = match t with
-    | Null       -> false
-    | Node l y r -> contains l x || x = y || contains r x
-  end
+  axiom a: get m 0 = True
+  axiom b: get m 1 = False
 
-  function elements (t: tree): list elt = match t with
-    | Null       -> Nil
-    | Node l x r -> elements l ++ (Cons x (elements r))
-  end
+  goal G: get (const False) 42 = False
 
-  goal G: forall t: tree. elements t = Nil <-> t = Null
+  use import real.Real
+  use import real.Power
+
+  goal G1: pow 2. 4. = 16.
 
 end
 

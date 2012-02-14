@@ -29,6 +29,21 @@ theory Tuple0
   syntax function Tuple0 "Tuple0"
 end
 
+theory map.Map
+  syntax type  map "[%1 -> %2]"
+
+  syntax function get "%1(%2)"
+  syntax function set "(%1 WITH [(%2) |-> %3])"
+
+  remove prop Select_eq
+  remove prop Select_neq
+
+  (*
+  syntax function const "(LAMBDA (x:%t0): %1)"
+  remove prop Const
+  *)
+end
+
 theory bool.Bool
 
   syntax type bool   "bool"
@@ -40,7 +55,7 @@ theory bool.Bool
   syntax function orb   "(%1 OR %2)"
   syntax function xorb  "(%1 XOR %2)"
   syntax function notb  "(NOT %1)"
-  syntax function implb  "(%1 => %2)"
+  syntax function implb "(%1 => %2)"
 
 end
 
@@ -107,6 +122,7 @@ theory int.EuclideanDivision
 
 end
 
+(***
 theory int.ComputerDivision
 
   syntax function div "(ZOdiv %1 %2)"
@@ -128,23 +144,24 @@ theory int.ComputerDivision
   remove prop Mod_mult
 
 end
+***)
 
 theory real.Real
 
-  syntax function zero "0%R"
-  syntax function one  "1%R"
+  syntax function zero "0"
+  syntax function one  "1"
 
-  syntax function (+)  "(%1 + %2)%R"
-  syntax function (-)  "(%1 - %2)%R"
-  syntax function (-_) "(-%1)%R"
-  syntax function (*)  "(%1 * %2)%R"
-  syntax function (/)  "(Rdiv %1 %2)%R"
-  syntax function inv  "(Rinv %1)"
+  syntax function (+)  "(%1 + %2)"
+  syntax function (-)  "(%1 - %2)"
+  syntax function (-_) "(-%1)"
+  syntax function (*)  "(%1 * %2)"
+  syntax function (/)  "(%1 / %2)"
+  syntax function inv  "(1 / %1)"
 
-  syntax predicate (<=) "(%1 <= %2)%R"
-  syntax predicate (<)  "(%1 <  %2)%R"
-  syntax predicate (>=) "(%1 >= %2)%R"
-  syntax predicate (>)  "(%1 >  %2)%R"
+  syntax predicate (<=) "(%1 <= %2)"
+  syntax predicate (<)  "(%1 <  %2)"
+  syntax predicate (>=) "(%1 >= %2)"
+  syntax predicate (>)  "(%1 >  %2)"
 
   remove prop CommutativeGroup.Comm.Comm
   remove prop CommutativeGroup.Assoc.Assoc
@@ -171,22 +188,22 @@ end
 
 theory real.RealInfix
 
-  syntax function (+.)  "(%1 + %2)%R"
-  syntax function (-.)  "(%1 - %2)%R"
-  syntax function (-._) "(-%1)%R"
-  syntax function ( *.) "(%1 * %2)%R"
-  syntax function (/.)  "(%1 / %2)%R"
+  syntax function (+.)  "(%1 + %2)"
+  syntax function (-.)  "(%1 - %2)"
+  syntax function (-._) "(-%1)"
+  syntax function ( *.) "(%1 * %2)"
+  syntax function (/.)  "(%1 / %2)"
 
-  syntax predicate (<=.) "(%1 <= %2)%R"
-  syntax predicate (<.)  "(%1 <  %2)%R"
-  syntax predicate (>=.) "(%1 >= %2)%R"
-  syntax predicate (>.)  "(%1 >  %2)%R"
+  syntax predicate (<=.) "(%1 <= %2)"
+  syntax predicate (<.)  "(%1 <  %2)"
+  syntax predicate (>=.) "(%1 >= %2)"
+  syntax predicate (>.)  "(%1 >  %2)"
 
 end
 
 theory real.Abs
 
-  syntax function abs "(Rabs %1)"
+  syntax function abs "abs(%1)"
 
   remove prop Abs_le
   remove prop Abs_pos
@@ -195,7 +212,7 @@ end
 
 theory real.FromInt
 
-  syntax function from_int "(IZR %1)"
+  syntax function from_int "(%1 :: real)"
 
   remove prop Zero
   remove prop One
@@ -208,62 +225,34 @@ end
 
 theory real.Square
 
-  syntax function sqr  "(Rsqr %1)"
-  syntax function sqrt "(sqrt %1)"  (* and not Rsqrt *)
-
-  remove prop Sqrt_positive
-  remove prop Sqrt_square
-  remove prop Square_sqrt
+  syntax function sqrt "SQRT(%1)"
 
 end
-
 
 theory real.ExpLog
 
-  prelude "Require Import Rtrigo_def."
-  prelude "Require Import Rpower."
-
-  syntax function exp "(exp %1)"
-  syntax function log "(ln %1)"
-
-  remove prop Exp_zero
-  remove prop Exp_sum
-  remove prop Log_one
-  remove prop Log_mul
-  remove prop Log_exp
-  remove prop Exp_log
+  syntax function exp "EXP(%1)"
+  syntax function log "LOG(%1)"
 
 end
 
-
 theory real.Power
 
-  prelude "Require Import Rpower."
+  syntax function pow "(%1 ^ %2)"
 
-  (* no power: R -> R -> R in Coq ? (only powerRZ: R -> Z -> R) *)
+  remove prop Pow_x_zero
+  remove prop Pow_x_one
+  remove prop Pow_one_y
+
 end
 
 theory real.Trigonometry
 
-  prelude "Require Import Rtrigo."
-  prelude "Require Import AltSeries. (* for def of pi *)"
-
-  syntax function cos "(Rtrigo_def.cos %1)"
-  syntax function sin "(Rtrigo_def.sin %1)"
+  syntax function cos "COS(%1)"
+  syntax function sin "SIN(%1)"
 
   syntax function pi "PI"
 
-  syntax function tan "(Rtrigo.tan %1)"
-  (* syntax function atan "atan not defined in Coq ?" *)
-
-  remove prop Pythagorean_identity
-  remove prop Cos_le_one
-  remove prop Sin_le_one
-  remove prop Cos_0
-  remove prop Sin_0
-  remove prop Cos_pi
-  remove prop Sin_pi
-  remove prop Cos_pi2
-  remove prop Sin_pi2
+  syntax function tan "TAN(%1)"
 
 end
