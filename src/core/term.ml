@@ -802,6 +802,9 @@ let ps_equ =
 let t_equ t1 t2 = ps_app ps_equ [t1; t2]
 let t_neq t1 t2 = t_not (ps_app ps_equ [t1; t2])
 
+let fs_true  = create_fsymbol (id_fresh "True") [] ty_bool
+let fs_false = create_fsymbol (id_fresh "False") [] ty_bool
+
 let fs_tuple_ids = Hid.create 17
 
 let fs_tuple = Util.memo_int 17 (fun n ->

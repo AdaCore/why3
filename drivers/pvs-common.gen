@@ -47,12 +47,14 @@ theory map.Map
   *)
 end
 
-theory bool.Bool
-
+theory Bool
   syntax type bool   "bool"
 
   syntax function True  "TRUE"
   syntax function False "FALSE"
+end
+
+theory bool.Bool
 
   syntax function andb  "(%1 AND %2)"
   syntax function orb   "(%1 OR %2)"

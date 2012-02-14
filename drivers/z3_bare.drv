@@ -110,15 +110,17 @@ theory real.Real
 
 end
 
-theory bool.Bool
+theory Bool
    syntax type     bool  "Bool"
    syntax function True  "true"
    syntax function False "false"
+   meta "encoding : kept" type bool
+end
+theory bool.Bool
    syntax function andb  "(and %1 %2)"
    syntax function orb   "(or %1 %2)"
    syntax function xorb  "(xor %1 %2)"
    syntax function notb  "(not %1)"
-   meta "encoding : kept" type bool
 end
 
 theory int.EuclideanDivision

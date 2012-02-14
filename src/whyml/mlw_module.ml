@@ -123,9 +123,6 @@ let empty_module n p = {
   muc_used   = Sid.empty;
 }
 
-let create_module ?(path=[]) n =
-  empty_module n path
-
 let close_module uc =
   let th = close_theory uc.muc_theory in (* catches errors *)
   { mod_theory = th;
@@ -198,6 +195,9 @@ let clone_export_theory uc th i =
   { uc with muc_theory = Theory.clone_export uc.muc_theory th i }
 let add_meta uc m al =
   { uc with muc_theory = Theory.add_meta uc.muc_theory m al }
+
+let create_module ?(path=[]) n =
+  use_export_theory (empty_module n path) bool_theory
 
 (** Program decls *)
 

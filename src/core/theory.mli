@@ -189,6 +189,8 @@ val on_meta: meta-> ('a -> meta_arg list -> 'a) -> 'a -> theory -> 'a
 
 val builtin_theory : theory
 
+val bool_theory : theory
+
 val highord_theory : theory
 
 val tuple_theory : int -> theory

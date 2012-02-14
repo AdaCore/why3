@@ -123,15 +123,18 @@ theory real.FromInt
 
 end
 
-theory bool.Bool
+theory Bool
    syntax type     bool  "BITVECTOR(1)"
    syntax function True  "0bin1"
    syntax function False "0bin0"
+   meta "encoding : kept" type bool
+end
+
+theory bool.Bool
    syntax function andb  "(%1 & %2)"
    syntax function orb   "(%1 | %2)"
    syntax function xorb  "(BVXOR(%1,%2))"
    syntax function notb  "(~ %1)"
-   meta "encoding : kept" type bool
 end
 
 (*
