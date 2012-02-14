@@ -77,7 +77,7 @@ Axiom Append_assoc : forall (a:Type), forall (l1:(list a)) (l2:(list a))
   l3)) = (infix_plpl (infix_plpl l1 l2) l3)).
 
 Axiom Append_l_nil : forall (a:Type), forall (l:(list a)), ((infix_plpl l
-  (Nil:(list a))) = l).
+  (Nil :(list a))) = l).
 
 Set Implicit Arguments.
 Fixpoint length (a:Type)(l:(list a)) {struct l}: Z :=
@@ -91,7 +91,7 @@ Axiom Length_nonnegative : forall (a:Type), forall (l:(list a)),
   (0%Z <= (length l))%Z.
 
 Axiom Length_nil : forall (a:Type), forall (l:(list a)),
-  ((length l) = 0%Z) <-> (l = (Nil:(list a))).
+  ((length l) = 0%Z) <-> (l = (Nil :(list a))).
 
 Axiom Append_length : forall (a:Type), forall (l1:(list a)) (l2:(list a)),
   ((length (infix_plpl l1 l2)) = ((length l1) + (length l2))%Z).
@@ -105,8 +105,8 @@ Axiom mem_decomp : forall (a:Type), forall (x:a) (l:(list a)), (mem x l) ->
 Set Implicit Arguments.
 Fixpoint reverse (a:Type)(l:(list a)) {struct l}: (list a) :=
   match l with
-  | Nil => (Nil:(list a))
-  | (Cons x r) => (infix_plpl (reverse r) (Cons x (Nil:(list a))))
+  | Nil => (Nil :(list a))
+  | (Cons x r) => (infix_plpl (reverse r) (Cons x (Nil :(list a))))
   end.
 Unset Implicit Arguments.
 
@@ -144,8 +144,8 @@ Set Contextual Implicit.
 Implicit Arguments const.
 Unset Contextual Implicit.
 
-Axiom Const : forall (b:Type) (a:Type), forall (b1:b) (a1:a), ((get (const(
-  b1):(map a b)) a1) = b1).
+Axiom Const : forall (b:Type) (a:Type), forall (b1:b) (a1:a),
+  ((get (const b1:(map a b)) a1) = b1).
 
 Parameter loc : Type.
 
@@ -154,7 +154,7 @@ Parameter null: loc.
 
 Inductive list_seg : loc -> (map loc loc) -> (list loc) -> loc -> Prop :=
   | list_seg_nil : forall (p:loc) (next:(map loc loc)), (list_seg p next
-      (Nil:(list loc)) p)
+      (Nil :(list loc)) p)
   | list_seg_cons : forall (p:loc) (q:loc) (next:(map loc loc)) (l:(list
       loc)), ((~ (p = null)) /\ (list_seg (get next p) next l q)) ->
       (list_seg p next (Cons p l) q).
@@ -170,19 +170,18 @@ Theorem list_seg_frame : forall (next1:(map loc loc)) (next2:(map loc loc))
 intros until pM.
 generalize p; clear p.
 elim pM.
-intros p (h1,(h2,h3)).
+(* case pM = Nil *)
+intros p (h1&h2&h3).
 inversion h1; subst; clear h1.
 constructor.
-intros a l Hind p (h1,(h2,h3)).
+(* case pM = Cons a l *)
+intros a l Hind p (h1&h2&h3).
 inversion h1; subst; clear h1.
 destruct H4.
-constructor.
-split; auto.
+constructor; split; auto.
 simpl in h3.
-rewrite Select_neq.
-apply Hind.
-split; auto.
-intuition.
+rewrite Select_neq; auto.
+apply Hind; split; auto.
 Qed.
 (* DO NOT EDIT BELOW *)
 
