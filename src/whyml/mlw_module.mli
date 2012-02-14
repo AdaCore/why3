@@ -21,6 +21,8 @@ open Why3
 open Util
 open Ident
 open Ty
+open Term
+open Decl
 open Theory
 open Mlw_ty
 open Mlw_expr
@@ -44,6 +46,7 @@ type modul = private {
   mod_export: namespace;		(* exported namespace *)
   mod_known : known_map;		(* known identifiers *)
   mod_local : Sid.t;			(* locally declared idents *)
+  mod_used  : Sid.t;			(* used modules *)
 }
 
 (** Module under construction *)
@@ -61,6 +64,28 @@ val get_known : module_uc -> known_map
 
 (** Use *)
 
-(* val use_export : module_uc -> modul -> module_uc *)
+val use_export : module_uc -> modul -> module_uc
 
-(** Clone: not yet implemented *)
+(** Clone *)
+(* not yet implemented *)
+
+(** Logic decls *)
+
+val add_decl : module_uc -> decl -> module_uc
+val add_decl_with_tuples : module_uc -> decl -> module_uc
+
+val add_ty_decl : module_uc -> ty_decl list -> module_uc
+val add_logic_decl : module_uc -> logic_decl list -> module_uc
+val add_ind_decl : module_uc -> ind_decl list -> module_uc
+val add_prop_decl : module_uc -> prop_kind -> prsymbol -> term -> module_uc
+
+val use_export_theory: module_uc -> theory -> module_uc
+val clone_export_theory: module_uc -> theory -> th_inst -> module_uc
+val add_meta : module_uc -> meta -> meta_arg list -> module_uc
+
+(** Program decls *)
+
+(*
+val add_pdecl : module_uc -> pdecl -> module_uc
+val add_pdecl_with_tuples : module_uc -> pdecl -> module_uc
+*)

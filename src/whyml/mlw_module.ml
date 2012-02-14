@@ -27,7 +27,7 @@ open Mlw_expr
 open Mlw_decl
 
 (*
-  module = 
+  module =
     theory +
     namespace +
     program decls (no logic decl here)
@@ -98,6 +98,7 @@ type modul = {
   mod_export: namespace;		(* exported namespace *)
   mod_known : known_map;		(* known identifiers *)
   mod_local : Sid.t;			(* locally declared idents *)
+  mod_used  : Sid.t;			(* used modules *)
 }
 
 (** Module under construction *)
@@ -109,6 +110,7 @@ type module_uc = {
   muc_export : namespace list;
   muc_known  : known_map;
   muc_local  : Sid.t;
+  muc_used   : Sid.t;
 }
 
 let empty_module n p = {
@@ -118,6 +120,7 @@ let empty_module n p = {
   muc_export = [empty_ns];
   muc_known  = Mid.empty;
   muc_local  = Sid.empty;
+  muc_used   = Sid.empty;
 }
 
 let create_module ?(path=[]) n =
@@ -129,7 +132,8 @@ let close_module uc =
     mod_decls  = List.rev uc.muc_decls;
     mod_export = List.hd uc.muc_export;
     mod_known  = uc.muc_known;
-    mod_local  = uc.muc_local; }
+    mod_local  = uc.muc_local;
+    mod_used   = uc.muc_used; }
 
 let get_namespace uc = List.hd uc.muc_import
 let get_known uc = uc.muc_known
@@ -159,11 +163,45 @@ let close_namespace uc import s =
 
 (** Use *)
 
-(***
 let use_export uc m =
+  let mth = m.mod_theory in
+  let id = mth.th_name in
+  let uc =
+    if not (Sid.mem id uc.muc_used) then
+      { uc with
+          muc_known = merge_known uc.muc_known m.mod_known;
+          muc_used  = Sid.add id uc.muc_used; }
+    else
+      uc
+  in
   match uc.muc_import, uc.muc_export with
   | i0 :: sti, e0 :: ste -> { uc with
+      muc_theory = Theory.use_export uc.muc_theory mth;
       muc_import = merge_ns false m.mod_export i0 :: sti;
-      muc_export = merge_ns true  m.mod_export e0 :: ste }
+      muc_export = merge_ns true  m.mod_export e0 :: ste; }
   | _ -> assert false
-***)
+
+(** Logic decls *)
+
+let add_to_theory f uc x = { uc with muc_theory = f uc.muc_theory x }
+
+let add_decl = add_to_theory Theory.add_decl
+let add_decl_with_tuples = add_to_theory Theory.add_decl_with_tuples
+let add_ty_decl = add_to_theory Theory.add_ty_decl
+let add_logic_decl = add_to_theory Theory.add_logic_decl
+let add_ind_decl = add_to_theory Theory.add_ind_decl
+let add_prop_decl uc k pr f =
+  { uc with muc_theory = Theory.add_prop_decl uc.muc_theory k pr f }
+
+let use_export_theory = add_to_theory Theory.use_export
+let clone_export_theory uc th i =
+  { uc with muc_theory = Theory.clone_export uc.muc_theory th i }
+let add_meta uc m al =
+  { uc with muc_theory = Theory.add_meta uc.muc_theory m al }
+
+(** Program decls *)
+
+(*
+val add_pdecl : module_uc -> pdecl -> module_uc
+val add_pdecl_with_tuples : module_uc -> pdecl -> module_uc
+*)
