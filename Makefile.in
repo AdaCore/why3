@@ -162,6 +162,8 @@ $(LIBDEP): DEPFLAGS += $(LIBINCLUDES)
 $(LIBCMO) $(LIBCMX): INCLUDES += $(LIBINCLUDES)
 $(LIBCMX): OFLAGS += -for-pack Why3
 
+$(LIBDEP): $(LIBGENERATED)
+
 # build targets
 
 byte: src/why3.cma
@@ -185,7 +187,7 @@ ifneq "$(MAKECMDGOALS)" "clean"
 include $(LIBDEP)
 endif
 
-depend: $(LIBGENERATED) $(LIBDEP)
+depend: $(LIBDEP)
 
 LIBSDIRS = src $(addprefix src/, $(LIBDIRS))
 LIBCLEAN = $(addsuffix /*.cm[iox], $(LIBSDIRS)) \
@@ -273,6 +275,8 @@ PLUGINCLUDES = $(addprefix -I plugins/, $(PLUGDIRS))
 $(PLUGDEP): DEPFLAGS += $(PLUGINCLUDES)
 $(PLUGCMO) $(PLUGCMX): INCLUDES += $(PLUGINCLUDES)
 
+$(PLUGDEP): $(PLUGGENERATED)
+
 plugins.byte: $(addsuffix .cmo, $(addprefix lib/plugins/, $(PLUGINS)))
 plugins.opt : $(addsuffix .cmxs, $(addprefix lib/plugins/, $(PLUGINS)))
 
@@ -323,7 +327,7 @@ ifneq "$(MAKECMDGOALS)" "clean"
 include $(PLUGDEP)
 endif
 
-depend: $(PLUGGENERATED) $(PLUGDEP)
+depend: $(PLUGDEP)
 
 clean::
 	rm -f $(PLUGCLEAN) $(PLUGGENERATED)
@@ -879,6 +883,8 @@ COQINCLUDES = -I src/coq-plugin $(addprefix -I @COQLIB@/, $(COQTREES))
 $(COQDEP): DEPFLAGS += -I src/coq-plugin
 $(COQCMO) $(COQCMX): INCLUDES += $(COQINCLUDES)
 
+$(COQDEP): $(COQGENERATED)
+
 byte: src/coq-plugin/whytac.cma
 opt:  src/coq-plugin/whytac.cmxs
 
@@ -900,7 +906,7 @@ ifneq "$(MAKECMDGOALS)" "clean"
 include $(COQDEP)
 endif
 
-depend: $(COQGENERATED) $(COQDEP)
+depend: $(COQDEP)
 
 clean::
 	rm -f src/coq-plugin/*.cm[iox] src/coq-plugin/*.o
@@ -1015,6 +1021,8 @@ WHY3DOCCMX = $(addsuffix .cmx, $(WHY3DOCMODULES))
 $(WHY3DOCDEP): DEPFLAGS += -I src/why3doc
 $(WHY3DOCCMO) $(WHY3DOCCMX): INCLUDES += -I src/why3doc
 
+$(WHY3DOCDEP): $(WHY3DOCGENERATED)
+
 # build targets
 
 byte: bin/why3doc.byte
@@ -1038,7 +1046,7 @@ ifneq "$(MAKECMDGOALS)" "clean"
 include $(WHY3DOCDEP)
 endif
 
-depend: $(WHY3DOCGENERATED) $(WHY3DOCDEP)
+depend: $(WHY3DOCDEP)
 
 clean::
 	rm -f $(WHY3DOCGENERATED)
