@@ -394,18 +394,13 @@ let output_theory drv fname _tname th task dir =
   Driver.print_task ?old drv (formatter_of_out_channel cout) task;
   close_out cout
 
-let do_task env drv fname tname (th : Theory.theory) (task : Task.task) =
+let do_task drv fname tname (th : Theory.theory) (task : Task.task) =
   match !opt_output, !opt_command with
     | Some dir, _ when !opt_realize ->
         output_theory drv fname tname th task dir
     | None, _ when !opt_realize ->
-        (* FIXME: we should be able to realize other formats *)
-        let file,ich = Env.find_channel env "why" th.th_path in
-        let dir = try Filename.chop_extension file with _ ->
-          eprintf "File %s does not have an extension.@." file;
-          exit 1 in
-        close_in ich;
-        output_theory drv fname tname th task dir
+        eprintf "Output directory (-o) is required.@.";
+        exit 1
     | Some dir, Some command when !opt_bisect ->
         let test task =
           let call = Driver.prove_task_prepared
@@ -443,7 +438,7 @@ let do_tasks env drv fname tname th task =
       List.rev_append (Trans.apply tr task) acc) [] tasks)
   in
   let tasks = List.fold_left apply [task] trans in
-  List.iter (do_task env drv fname tname th) tasks
+  List.iter (do_task drv fname tname th) tasks
 
 let do_theory env drv fname tname th glist =
   if !opt_print_theory then
@@ -478,7 +473,8 @@ let do_theory env drv fname tname th glist =
   end
 
 let do_global_theory env drv (tname,p,t,glist) =
-  let th = try Env.find_theory env p t with Env.TheoryNotFound _ ->
+  let format = Util.default_option "why" !opt_parser in
+  let th = try Env.read_theory ~format env p t with Env.TheoryNotFound _ ->
     eprintf "Theory '%s' not found.@." tname;
     exit 1
   in
@@ -541,7 +537,7 @@ let () =
     let drv = Util.option_map (load_driver env) !opt_driver in
     Queue.iter (do_input env drv) opt_queue;
     if !opt_token_count then
-      Format.printf "Total: %d annot/%d programs, ratio = %.3f@." 
+      Format.printf "Total: %d annot/%d programs, ratio = %.3f@."
         !total_annot_tokens !total_program_tokens
         ((float !total_annot_tokens) /. (float !total_program_tokens))
   with e when not (Debug.test_flag Debug.stack_trace) ->

@@ -18,6 +18,7 @@
 (**************************************************************************)
 
 open Why3
+open Util
 open Ident
 open Ty
 open Term
@@ -26,8 +27,8 @@ open Pgm_types
 open Pgm_types.T
 
 type namespace = private {
-  ns_ex : esymbol   Util.Mstr.t;  (* exception symbols *)
-  ns_ns : namespace Util.Mstr.t;  (* inner namespaces *)
+  ns_ex : esymbol   Mstr.t;  (* exception symbols *)
+  ns_ns : namespace Mstr.t;  (* inner namespaces *)
 }
 
 val ns_find_ex : namespace -> string list -> esymbol
@@ -74,14 +75,14 @@ val add_effect_decl : Decl.decl -> uc -> uc
 val add_pure_decl : Decl.decl -> uc -> uc
 
 val add_impure_pdecl :
-  Env.env -> Theory.theory Util.Mstr.t -> Ptree.decl -> uc -> uc
+  t Mstr.t Env.library -> Theory.theory Mstr.t -> Ptree.decl -> uc -> uc
 val add_effect_pdecl :
-  Env.env -> Theory.theory Util.Mstr.t -> Ptree.decl -> uc -> uc
+  t Mstr.t Env.library -> Theory.theory Mstr.t -> Ptree.decl -> uc -> uc
 val add_pure_pdecl :
-  Env.env -> Theory.theory Util.Mstr.t -> Ptree.decl -> uc -> uc
+  t Mstr.t Env.library -> Theory.theory Mstr.t -> Ptree.decl -> uc -> uc
 
 val add_pdecl :
-  Env.env -> Theory.theory Util.Mstr.t -> Ptree.decl -> uc -> uc
+  t Mstr.t Env.library -> Theory.theory Mstr.t -> Ptree.decl -> uc -> uc
   (** add in impure, effect and pure *)
 
 (** builtins *)

@@ -258,7 +258,7 @@ end
 
 /* Entry points */
 
-%type <Env.env -> string list -> unit> pre_logic_file
+%type <unit Env.library -> string list -> unit> pre_logic_file
 %start pre_logic_file
 %type <Theory.theory Util.Mstr.t> logic_file
 %start logic_file

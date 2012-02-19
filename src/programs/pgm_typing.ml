@@ -2261,13 +2261,12 @@ let find_module penv lmod q id = match q with
       (* local module *)
       Mstr.find id lmod
   | _ :: _ ->
-      (* theory in file f *)
-      Pgm_env.find_module penv q id
+      (* module in file f *)
+      Mstr.find id (Env.read_lib_file penv q)
 
-(* env  = to retrieve theories from the loadpath
-   penv = to retrieve modules from the loadpath
+(* env  = to retrieve theories and modules from the loadpath
    lmod = local modules *)
-let rec decl ~wp env penv ltm lmod uc = function
+let rec decl ~wp env ltm lmod uc = function
   | Ptree.Dlet (id, e) ->
       let denv = create_denv uc in
       let e = dexpr ~ghost:false ~userloc:None denv e in
@@ -2343,8 +2342,8 @@ let rec decl ~wp env penv ltm lmod uc = function
       let q, id = Typing.split_qualid qid in
       let m =
         try
-          find_module penv lmod q id
-        with Not_found | Pgm_env.ModuleNotFound _ ->
+          find_module env lmod q id
+        with Not_found ->
           errorm ~loc "@[unbound module %a@]" print_qualid qid
       in
       let n = match use_as with
@@ -2369,7 +2368,7 @@ let rec decl ~wp env penv ltm lmod uc = function
       end
   | Ptree.Dnamespace (loc, id, import, dl) ->
       let uc = open_namespace uc in
-      let uc = List.fold_left (decl ~wp env penv ltm lmod) uc dl in
+      let uc = List.fold_left (decl ~wp env ltm lmod) uc dl in
       let id = option_map (fun id -> id.id) id in
       begin try close_namespace uc import id
       with ClashSymbol s -> errorm ~loc "clash with previous symbol %s" s end

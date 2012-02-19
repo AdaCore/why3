@@ -22,7 +22,7 @@ open Why3
 val debug : Debug.flag
 
 val decl :
-  wp:bool -> Env.env -> Pgm_env.t ->
+  wp:bool -> Pgm_module.t Util.Mstr.t Env.library ->
   Theory.theory Util.Mstr.t ->
   Pgm_module.t Util.Mstr.t ->
   Pgm_module.uc -> Ptree.program_decl -> Pgm_module.uc

@@ -1081,10 +1081,10 @@ let find_theory env lenv q id = match q with
   | [] ->
       (* local theory *)
       begin try Mstr.find id lenv
-      with Not_found -> find_theory env [] id end
+      with Not_found -> read_lib_theory env [] id end
   | _ :: _ ->
       (* theory in file f *)
-      find_theory env q id
+      read_lib_theory env q id
 
 let rec clone_ns loc sl ns2 ns1 s =
   let clash id = error ~loc (Clash id.id_string) in
