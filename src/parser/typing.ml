@@ -1109,7 +1109,7 @@ let rec clone_ns loc sl ns2 ns1 s =
   in
   { s with inst_ts = inst_ts; inst_ls = inst_ls }
 
-let add_decl env lenv th = function
+let add_decl th = function
   | TypeDecl dl ->
       add_types dl th
   | LogicDecl dl ->
@@ -1118,76 +1118,6 @@ let add_decl env lenv th = function
       add_inductives dl th
   | PropDecl (loc, k, s, f) ->
       add_prop (prop_kind k) loc s f th
-  | UseClone (loc, use, subst) ->
-      let q, id = split_qualid use.use_theory in
-      let t =
-        try
-          find_theory env lenv q id
-        with
-          | TheoryNotFound _ -> error ~loc (UnboundTheory use.use_theory)
-      in
-      let use_or_clone th = match subst with
-        | None ->
-            use_export th t
-        | Some s ->
-            let add_inst s = function
-              | CSns (p,q) ->
-                  let find ns x = find_namespace_ns x ns in
-                  let ns1 = option_fold find t.th_export p in
-                  let ns2 = option_fold find (get_namespace th) q in
-                  clone_ns loc t.th_local ns2 ns1 s
-              | CStsym (p,q) ->
-                  let ts1 = find_tysymbol_ns p t.th_export in
-                  let ts2 = find_tysymbol q th in
-                  if Mts.mem ts1 s.inst_ts
-                  then error ~loc (Clash ts1.ts_name.id_string);
-                  { s with inst_ts = Mts.add ts1 ts2 s.inst_ts }
-              | CSfsym (p,q) ->
-                  let ls1 = find_fsymbol_ns p t.th_export in
-                  let ls2 = find_fsymbol q th in
-                  if Mls.mem ls1 s.inst_ls
-                  then error ~loc (Clash ls1.ls_name.id_string);
-                  { s with inst_ls = Mls.add ls1 ls2 s.inst_ls }
-              | CSpsym (p,q) ->
-                  let ls1 = find_psymbol_ns p t.th_export in
-                  let ls2 = find_psymbol q th in
-                  if Mls.mem ls1 s.inst_ls
-                  then error ~loc (Clash ls1.ls_name.id_string);
-                  { s with inst_ls = Mls.add ls1 ls2 s.inst_ls }
-              | CSlemma p ->
-                  let pr = find_prop_ns p t.th_export in
-                  if Spr.mem pr s.inst_lemma || Spr.mem pr s.inst_goal
-                  then error ~loc (Clash pr.pr_name.id_string);
-                  { s with inst_lemma = Spr.add pr s.inst_lemma }
-              | CSgoal p ->
-                  let pr = find_prop_ns p t.th_export in
-                  if Spr.mem pr s.inst_lemma || Spr.mem pr s.inst_goal
-                  then error ~loc (Clash pr.pr_name.id_string);
-                  { s with inst_goal = Spr.add pr s.inst_goal }
-            in
-            let s = List.fold_left add_inst empty_inst s in
-            clone_export th t s
-      in
-      let n = match use.use_as with
-        | None -> Some t.th_name.id_string
-        | Some (Some x) -> Some x.id
-        | Some None -> None
-      in
-      begin try match use.use_imp_exp with
-        | Nothing ->
-            (* use T = namespace T use_export T end *)
-            let th = open_namespace th in
-            let th = use_or_clone th in
-            close_namespace th false n
-        | Import ->
-            (* use import T = namespace T use_export T end import T *)
-            let th = open_namespace th in
-            let th = use_or_clone th in
-            close_namespace th true n
-        | Export ->
-            use_or_clone th
-      with ClashSymbol s -> error ~loc (Clash s)
-      end
   | Meta (loc, id, al) ->
       let s = id.id in
       let convert = function
@@ -1202,9 +1132,80 @@ let add_decl env lenv th = function
       begin try add_meta th (lookup_meta s) al
       with e -> raise (Loc.Located (loc,e)) end
 
-let add_decl env lenv th d =
+let add_decl th d =
+  if Debug.test_flag debug_parse_only then th else add_decl th d
+
+let add_use_clone env lenv th (loc, use, subst) =
   if Debug.test_flag debug_parse_only then th else
-  add_decl env lenv th d
+  let q, id = split_qualid use.use_theory in
+  let t =
+    try
+      find_theory env lenv q id
+    with
+      | TheoryNotFound _ -> error ~loc (UnboundTheory use.use_theory)
+  in
+  let use_or_clone th = match subst with
+    | None ->
+      use_export th t
+    | Some s ->
+      let add_inst s = function
+        | CSns (p,q) ->
+          let find ns x = find_namespace_ns x ns in
+          let ns1 = option_fold find t.th_export p in
+          let ns2 = option_fold find (get_namespace th) q in
+          clone_ns loc t.th_local ns2 ns1 s
+        | CStsym (p,q) ->
+          let ts1 = find_tysymbol_ns p t.th_export in
+          let ts2 = find_tysymbol q th in
+          if Mts.mem ts1 s.inst_ts
+          then error ~loc (Clash ts1.ts_name.id_string);
+          { s with inst_ts = Mts.add ts1 ts2 s.inst_ts }
+        | CSfsym (p,q) ->
+          let ls1 = find_fsymbol_ns p t.th_export in
+          let ls2 = find_fsymbol q th in
+          if Mls.mem ls1 s.inst_ls
+          then error ~loc (Clash ls1.ls_name.id_string);
+          { s with inst_ls = Mls.add ls1 ls2 s.inst_ls }
+        | CSpsym (p,q) ->
+          let ls1 = find_psymbol_ns p t.th_export in
+          let ls2 = find_psymbol q th in
+          if Mls.mem ls1 s.inst_ls
+          then error ~loc (Clash ls1.ls_name.id_string);
+          { s with inst_ls = Mls.add ls1 ls2 s.inst_ls }
+        | CSlemma p ->
+          let pr = find_prop_ns p t.th_export in
+          if Spr.mem pr s.inst_lemma || Spr.mem pr s.inst_goal
+          then error ~loc (Clash pr.pr_name.id_string);
+          { s with inst_lemma = Spr.add pr s.inst_lemma }
+        | CSgoal p ->
+          let pr = find_prop_ns p t.th_export in
+          if Spr.mem pr s.inst_lemma || Spr.mem pr s.inst_goal
+          then error ~loc (Clash pr.pr_name.id_string);
+          { s with inst_goal = Spr.add pr s.inst_goal }
+      in
+      let s = List.fold_left add_inst empty_inst s in
+      clone_export th t s
+  in
+  let n = match use.use_as with
+    | None -> Some t.th_name.id_string
+    | Some (Some x) -> Some x.id
+    | Some None -> None
+  in
+  begin try match use.use_imp_exp with
+    | Nothing ->
+            (* use T = namespace T use_export T end *)
+      let th = open_namespace th in
+      let th = use_or_clone th in
+      close_namespace th false n
+    | Import ->
+            (* use import T = namespace T use_export T end import T *)
+      let th = open_namespace th in
+      let th = use_or_clone th in
+      close_namespace th true n
+    | Export ->
+      use_or_clone th
+    with ClashSymbol s -> error ~loc (Clash s)
+  end
 
 let close_theory loc lenv th =
   if Debug.test_flag debug_parse_only then lenv else

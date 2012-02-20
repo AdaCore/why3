@@ -74,15 +74,12 @@ val add_impure_decl : Decl.decl -> uc -> uc
 val add_effect_decl : Decl.decl -> uc -> uc
 val add_pure_decl : Decl.decl -> uc -> uc
 
-val add_impure_pdecl :
-  t Mstr.t Env.library -> Theory.theory Mstr.t -> Ptree.decl -> uc -> uc
-val add_effect_pdecl :
-  t Mstr.t Env.library -> Theory.theory Mstr.t -> Ptree.decl -> uc -> uc
-val add_pure_pdecl :
-  t Mstr.t Env.library -> Theory.theory Mstr.t -> Ptree.decl -> uc -> uc
+val add_impure_pdecl : Ptree.decl -> uc -> uc
+val add_effect_pdecl : Ptree.decl -> uc -> uc
+val add_pure_pdecl : Ptree.decl -> uc -> uc
 
-val add_pdecl :
-  t Mstr.t Env.library -> Theory.theory Mstr.t -> Ptree.decl -> uc -> uc
+val add_use_clone :
+  t Mstr.t Env.library -> Theory.theory Mstr.t -> Ptree.use_clone -> uc -> uc
   (** add in impure, effect and pure *)
 
 (** builtins *)

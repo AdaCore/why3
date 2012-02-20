@@ -57,8 +57,11 @@ module Incremental = struct
     ref_set uc_ref (Typing.close_namespace loc import name (ref_get uc_ref))
 
   let new_decl d =
+    ref_set uc_ref (Typing.add_decl (ref_get uc_ref) d)
+
+  let new_use_clone d =
     let env = ref_get env_ref in let lenv = ref_get lenv_ref in
-    ref_set uc_ref (Typing.add_decl env lenv (ref_get uc_ref) d)
+    ref_set uc_ref (Typing.add_use_clone env lenv (ref_get uc_ref) d)
 end
 
   open Ptree
@@ -297,6 +300,8 @@ list0_decl:
 new_decl:
 | decl
    { Incremental.new_decl $1 }
+| use_clone
+   { Incremental.new_use_clone $1 }
 | namespace_head namespace_import namespace_name list0_decl END
    { Incremental.close_namespace (floc_i 3) $2 $3 }
 ;
@@ -334,15 +339,18 @@ decl:
     { PropDecl (floc (), Klemma, add_lab $2 $3, $5) }
 | GOAL ident labels COLON lexpr
     { PropDecl (floc (), Kgoal, add_lab $2 $3, $5) }
-| USE use
-    { UseClone (floc (), $2, None) }
-| CLONE use clone_subst
-    { UseClone (floc (), $2, Some $3) }
 | META sident list1_meta_arg_sep_comma
     { Meta (floc (), $2, $3) }
 ;
 
 /* Use and clone */
+
+use_clone:
+| USE use
+    { (floc (), $2, None) }
+| CLONE use clone_subst
+    { (floc (), $2, Some $3) }
+;
 
 use:
 | imp_exp tqualid
@@ -987,10 +995,12 @@ list1_full_decl:
 ;
 
 full_decl:
-| NAMESPACE namespace_import namespace_name list0_full_decl END
-   { Dnamespace (floc_i 3, $3, $2, $4) }
 | decl
    { Dlogic $1 }
+| use_clone
+   { Duseclone $1 }
+| NAMESPACE namespace_import namespace_name list0_full_decl END
+   { Dnamespace (floc_i 3, $3, $2, $4) }
 ;
 
 list0_program_decl:
@@ -1010,6 +1020,8 @@ list1_program_decl:
 program_decl:
 | decl
     { Dlogic $1 }
+| use_clone
+    { Duseclone $1 }
 | LET lident_rich_pgm labels list1_type_v_binder opt_cast EQUAL triple
     { Dlet (add_lab $2 $3, mk_expr_i 7 (Efun ($4, cast_body $5 $7))) }
 | LET lident_rich_pgm labels EQUAL FUN list1_type_v_binder ARROW triple
