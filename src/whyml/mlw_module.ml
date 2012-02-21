@@ -132,6 +132,7 @@ let close_module uc =
     mod_local  = uc.muc_local;
     mod_used   = uc.muc_used; }
 
+let get_theory uc = uc.muc_theory
 let get_namespace uc = List.hd uc.muc_import
 let get_known uc = uc.muc_known
 
@@ -205,3 +206,8 @@ let create_module ?(path=[]) n =
 val add_pdecl : module_uc -> pdecl -> module_uc
 val add_pdecl_with_tuples : module_uc -> pdecl -> module_uc
 *)
+
+(** Clone *)
+
+let clone_export _uc _m _inst =
+  assert false (*TODO*)

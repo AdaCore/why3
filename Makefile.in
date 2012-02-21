@@ -370,6 +370,39 @@ install_no_local::
 install_local: bin/why3
 
 ########
+# Whyml (new API)
+########
+
+MLW_FILES = mlw_ty mlw_expr mlw_decl mlw_module mlw_typing mlw_main
+
+MLWMODULES = $(addprefix src/whyml/, $(MLW_FILES))
+
+MLWDEP = $(addsuffix .dep, $(MLWMODULES))
+MLWCMO = $(addsuffix .cmo, $(MLWMODULES))
+MLWCMX = $(addsuffix .cmx, $(MLWMODULES))
+
+$(MLWDEP): DEPFLAGS += -I src/whyml
+$(MLWCMO) $(MLWCMX): INCLUDES += -I src/whyml
+
+# build targets
+
+byte: $(MLWCMO)
+opt:  $(MLWCMX)
+
+# depend and clean targets
+
+ifneq "$(MAKECMDGOALS)" "clean"
+include $(MLWDEP)
+endif
+
+depend: $(MLWDEP)
+
+clean::
+	rm -f src/whyml/*.cm[iox] src/whyml/*.o
+	rm -f src/whyml/*.annot src/whyml/*.dep src/whyml/*~
+#	rm -f bin/why3ml.byte bin/why3ml.opt bin/why3ml
+
+########
 # Whyml
 ########
 
@@ -436,39 +469,6 @@ install_no_local::
 	cp -f bin/why3ml.@OCAMLBEST@ $(BINDIR)/why3ml$(EXE)
 
 install_local: bin/why3ml
-
-########
-# Whyml (new API)
-########
-
-MLW_FILES = mlw_ty mlw_expr mlw_decl mlw_module mlw_typing mlw_main
-
-MLWMODULES = $(addprefix src/whyml/, $(MLW_FILES))
-
-MLWDEP = $(addsuffix .dep, $(MLWMODULES))
-MLWCMO = $(addsuffix .cmo, $(MLWMODULES))
-MLWCMX = $(addsuffix .cmx, $(MLWMODULES))
-
-$(MLWDEP): DEPFLAGS += -I src/whyml
-$(MLWCMO) $(MLWCMX): INCLUDES += -I src/whyml
-
-# build targets
-
-byte: $(MLWCMO)
-opt:  $(MLWCMX)
-
-# depend and clean targets
-
-ifneq "$(MAKECMDGOALS)" "clean"
-include $(MLWDEP)
-endif
-
-depend: $(MLWDEP)
-
-clean::
-	rm -f src/whyml/*.cm[iox] src/whyml/*.o
-	rm -f src/whyml/*.annot src/whyml/*.dep src/whyml/*~
-#	rm -f bin/why3ml.byte bin/why3ml.opt bin/why3ml
 
 ##########
 # gallery

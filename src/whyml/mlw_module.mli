@@ -59,6 +59,7 @@ val close_module  : module_uc -> modul
 val open_namespace  : module_uc -> module_uc
 val close_namespace : module_uc -> bool -> string option -> module_uc
 
+val get_theory : module_uc -> theory_uc
 val get_namespace : module_uc -> namespace
 val get_known : module_uc -> known_map
 
@@ -67,9 +68,12 @@ val get_known : module_uc -> known_map
 val use_export : module_uc -> modul -> module_uc
 
 (** Clone *)
-(* not yet implemented *)
+val clone_export : module_uc -> modul -> th_inst -> module_uc
 
 (** Logic decls *)
+
+val add_to_theory :
+  (theory_uc -> 'a -> theory_uc) -> module_uc -> 'a -> module_uc
 
 val add_decl : module_uc -> decl -> module_uc
 val add_decl_with_tuples : module_uc -> decl -> module_uc

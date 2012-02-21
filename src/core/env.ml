@@ -204,7 +204,7 @@ let () = Exn_printer.register
   | LibFileNotFound sl ->
       Format.fprintf fmt "Library file not found: %a" print_path sl
   | TheoryNotFound (sl,s) ->
-      Format.fprintf fmt "Theory not found: %a.%s" print_path sl s
+      Format.fprintf fmt "Theory not found: %a" print_path (sl @ [s])
   | KnownFormat s ->
       Format.fprintf fmt "Format %s is already registered" s
   | UnknownFormat s ->

@@ -57,6 +57,9 @@ let find_theory loc lib mt path s = match path with
 
 type theory_or_module = Theory of Theory.theory | Module of modul
 
+let print_path fmt sl =
+  Pp.print_list (Pp.constant_string ".") Format.pp_print_string fmt sl
+
 let find_module loc lib path s =
   (* search first in .mlw files *)
   let m, thm =
@@ -76,11 +79,12 @@ let find_module loc lib path s =
     | _, Some _, Some _ ->
         Loc.errorm ~loc
           "a module/theory %s is defined both in Why and WhyML libraries" s
-    | None, None, None -> Loc.error ~loc (Env.TheoryNotFound (path, s))
+    | None, None, None ->
+        Loc.errorm ~loc "Theory/module not found: %a" print_path (path @ [s])
     | Some m, Some _, None -> Module m
     | None, Some t, None | None, None, Some t -> Theory t
 
-let find_module loc lib mt mm path s = match path with
+let find_module loc lib mm mt path s = match path with
   | [] -> (* local module/theory *)
       begin try Module (Mstr.find s mm)
         with Not_found -> begin try Theory (Mstr.find s mt)
@@ -89,9 +93,9 @@ let find_module loc lib mt mm path s = match path with
       find_module loc lib path s
 
 let add_theory lib path mt m =
-  let id = m.pth_name in
-  let loc = id.id_loc in
-  let uc = Theory.create_theory ~path (Denv.create_user_id id) in
+  let { id = id; id_loc = loc } = m.pth_name in
+  if Mstr.mem id mt then Loc.errorm ~loc "clash with previous theory %s" id;
+  let uc = Theory.create_theory ~path (Denv.create_user_id m.pth_name) in
   let rec add_decl uc = function
     | Duseclone (loc, use, inst) ->
         let path, s = Typing.split_qualid use.use_theory in
@@ -121,9 +125,51 @@ let add_theory lib path mt m =
         assert false
   in
   let uc = List.fold_left add_decl uc m.pth_decl in
-  Typing.close_theory loc mt uc
+  let th = Theory.close_theory uc in
+  Mstr.add id th mt
+
+let add_module lib path mm mt m =
+  let { id = id; id_loc = loc } = m.mod_name in
+  if Mstr.mem id mm then Loc.errorm ~loc "clash with previous module %s" id;
+  if Mstr.mem id mt then Loc.errorm ~loc "clash with previous theory %s" id;
+  let uc = create_module ~path (Denv.create_user_id m.mod_name) in
+  let rec add_decl uc = function
+    | Duseclone (loc, use, inst) ->
+        let path, s = Typing.split_qualid use.use_theory in
+        let mth = find_module loc lib mm mt path s in
+        (* open namespace, if any *)
+        let uc = if use.use_imp_exp <> None then open_namespace uc else uc in
+        (* use or clone *)
+        let uc = match mth, inst with
+          | Theory th, None -> use_export_theory uc th
+          | Theory th, Some inst ->
+              let inst = Typing.type_inst (get_theory uc) th inst in
+              clone_export_theory uc th inst
+          | Module m, None -> use_export uc m
+          | Module m, Some inst ->
+              let inst = Typing.type_inst (get_theory uc) m.mod_theory inst in
+              clone_export uc m inst
+        in
+        (* close namespace, if any *)
+        begin match use.use_imp_exp with
+          | None -> uc
+          | Some imp -> close_namespace uc imp use.use_as
+        end
+    (* TODO: handle types differently *)
+    | Dlogic d ->
+        add_to_theory Typing.add_decl uc d
+    | Dnamespace (loc, name, import, dl) ->
+        let uc = open_namespace uc in
+        let uc = List.fold_left add_decl uc dl in
+        Loc.try3 loc close_namespace uc import name
+    | Dlet _ | Dletrec _ | Dparam _ | Dexn _ | Duse _ ->
+        assert false
+  in
+  let uc = List.fold_left add_decl uc m.mod_decl in
+  let m = close_module uc in
+  Mstr.add id m mm, Mstr.add id m.mod_theory mt
 
 let add_theory_module lib path (mm, mt) = function
   | Ptheory th -> mm, add_theory lib path mt th
-  | Pmodule _m -> assert false (*TODO*)
+  | Pmodule m -> add_module lib path mm mt m
 
