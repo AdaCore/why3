@@ -663,7 +663,6 @@ let is_empty_sm sm =
   Mls.is_empty sm.sm_ls &&
   Mpr.is_empty sm.sm_pr
 
-
 (** Meta properties *)
 
 let get_meta_arg_type = function

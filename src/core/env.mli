@@ -114,7 +114,7 @@ val env_of_library : 'a library -> env
 val list_formats : unit -> (fformat * extension list) list
 (** [list_formats ()] returns the list of registered formats *)
 
-val read_lib_file : 'a library -> pathname -> 'a
+val read_lib_file : 'a library -> pathname -> 'a * theory Mstr.t
 (** [read_lib_file lib path] retrieves the contents of a library file
 
     @raise LibFileNotFound [path] if the library file was not found *)

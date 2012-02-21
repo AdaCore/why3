@@ -34,8 +34,6 @@ type position
 val extract : Lexing.position * Lexing.position -> position
 val join : position -> position -> position
 
-exception Located of position * exn
-
 val dummy_position : position
 
 val user_position : string -> int -> int -> int -> position
@@ -50,3 +48,19 @@ val gen_report_position : formatter -> position -> unit
 
 val report_position : formatter -> position -> unit
 
+(* located exceptions *)
+
+exception Located of position * exn
+
+val try1: position -> ('a -> 'b) -> 'a -> 'b
+val try2: position -> ('a -> 'b -> 'c) -> 'a -> 'b -> 'c
+val try3: position -> ('a -> 'b -> 'c -> 'd) -> 'a -> 'b -> 'c -> 'd
+val try4: position -> ('a -> 'b -> 'c -> 'd -> 'e) -> 'a -> 'b -> 'c -> 'd -> 'e
+
+val error: ?loc:position -> exn -> 'a
+
+(* messages *)
+
+exception Message of string
+
+val errorm: ?loc:position -> ('a, Format.formatter, unit, 'b) format4 -> 'a

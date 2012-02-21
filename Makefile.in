@@ -390,12 +390,12 @@ $(PGMCMO) $(PGMCMX): INCLUDES += -I src/programs
 byte: bin/why3ml.byte
 opt:  bin/why3ml.opt
 
-bin/why3ml.opt: src/why3.cmxa $(PGMCMX) src/main.cmx
+bin/why3ml.opt: src/why3.cmxa $(PGMCMX) $(MLWCMX) src/main.cmx
 	$(if $(QUIET), @echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
 	$(STRIP) $@
 
-bin/why3ml.byte: src/why3.cma $(PGMCMO) src/main.cmo
+bin/why3ml.byte: src/why3.cma $(PGMCMO) $(MLWCMO) src/main.cmo
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
 
@@ -573,12 +573,12 @@ bin/why3ide.opt bin/why3ide.byte: INCLUDES += -I @LABLGTK2LIB@
 bin/why3ide.opt bin/why3ide.byte: EXTOBJS +=
 bin/why3ide.opt bin/why3ide.byte: EXTLIBS += lablgtk lablgtksourceview2
 
-bin/why3ide.opt: src/why3.cmxa $(PGMCMX) $(IDECMX)
+bin/why3ide.opt: src/why3.cmxa $(PGMCMX) $(MLWCMX) $(IDECMX)
 	$(if $(QUIET), @echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
 	$(STRIP) $@
 
-bin/why3ide.byte: src/why3.cma $(PGMCMO) $(IDECMO)
+bin/why3ide.byte: src/why3.cma $(PGMCMO) $(MLWCMO) $(IDECMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
 

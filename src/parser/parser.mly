@@ -62,6 +62,7 @@ module Incremental = struct
   let new_use_clone d =
     let env = ref_get env_ref in let lenv = ref_get lenv_ref in
     ref_set uc_ref (Typing.add_use_clone env lenv (ref_get uc_ref) d)
+
 end
 
   open Ptree
@@ -183,6 +184,9 @@ end
       | Term.IConstOctal   s -> int_of_string ("0o"^s)
       | Term.IConstBinary  s -> int_of_string ("0b"^s)
     with Failure _ -> raise Parsing.Parse_error
+
+  let qualid_last = function
+    | Qident x | Qdot (_, x) -> x.id
 
 %}
 
@@ -316,7 +320,7 @@ namespace_import:
 ;
 
 namespace_name:
-| uident      { Some $1 }
+| uident      { Some $1.id }
 | UNDERSCORE  { None }
 ;
 
@@ -354,17 +358,17 @@ use_clone:
 
 use:
 | imp_exp tqualid
-    { { use_theory = $2; use_as = None; use_imp_exp = $1 } }
+    { { use_theory = $2; use_as = Some (qualid_last $2); use_imp_exp = $1 } }
 | imp_exp tqualid AS uident
-    { { use_theory = $2; use_as = Some (Some $4); use_imp_exp = $1 } }
+    { { use_theory = $2; use_as = Some $4.id; use_imp_exp = $1 } }
 | imp_exp tqualid AS UNDERSCORE
-    { { use_theory = $2; use_as = Some None; use_imp_exp = $1 } }
+    { { use_theory = $2; use_as = None; use_imp_exp = $1 } }
 ;
 
 imp_exp:
-| IMPORT        { Import }
-| EXPORT        { Export }
-| /* epsilon */ { Nothing }
+| IMPORT        { Some true }
+| EXPORT        { None }
+| /* epsilon */ { Some false }
 ;
 
 clone_subst:
@@ -378,13 +382,13 @@ list1_comma_subst:
 ;
 
 subst:
-| NAMESPACE ns     EQUAL ns     { CSns   ($2, $4) }
-| TYPE      qualid EQUAL qualid { CStsym ($2, $4) }
-| CONSTANT  qualid EQUAL qualid { CSfsym ($2, $4) }
-| FUNCTION  qualid EQUAL qualid { CSfsym ($2, $4) }
-| PREDICATE qualid EQUAL qualid { CSpsym ($2, $4) }
-| LEMMA     qualid              { CSlemma $2 }
-| GOAL      qualid              { CSgoal  $2 }
+| NAMESPACE ns     EQUAL ns     { CSns   (floc (), $2, $4) }
+| TYPE      qualid EQUAL qualid { CStsym (floc (), $2, $4) }
+| CONSTANT  qualid EQUAL qualid { CSfsym (floc (), $2, $4) }
+| FUNCTION  qualid EQUAL qualid { CSfsym (floc (), $2, $4) }
+| PREDICATE qualid EQUAL qualid { CSpsym (floc (), $2, $4) }
+| LEMMA     qualid              { CSlemma (floc (), $2) }
+| GOAL      qualid              { CSgoal  (floc (), $2) }
 ;
 
 ns:
@@ -1062,9 +1066,9 @@ opt_semicolon:
 
 use_module:
 | imp_exp MODULE tqualid
-    { Duse ($3, $1, None) }
+    { Duse ($3, $1, Some (qualid_last $3)) }
 | imp_exp MODULE tqualid AS uident
-    { Duse ($3, $1, Some $5) }
+    { Duse ($3, $1, Some $5.id) }
 ;
 
 list1_recfun_sep_and:

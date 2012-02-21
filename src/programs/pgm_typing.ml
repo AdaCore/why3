@@ -2262,7 +2262,7 @@ let find_module penv lmod q id = match q with
       Mstr.find id lmod
   | _ :: _ ->
       (* module in file f *)
-      Mstr.find id (Env.read_lib_file penv q)
+      Mstr.find id (fst (Env.read_lib_file penv q))
 
 (* env  = to retrieve theories and modules from the loadpath
    lmod = local modules *)
@@ -2346,22 +2346,13 @@ let rec decl ~wp env ltm lmod uc = function
         with Not_found ->
           errorm ~loc "@[unbound module %a@]" print_qualid qid
       in
-      let n = match use_as with
-        | None -> Some (m.m_name.id_string)
-        | Some x -> Some x.id
-      in
       begin try match imp_exp with
-        | Nothing ->
+        | Some imp ->
             (* use T = namespace T use_export T end *)
             let uc = open_namespace uc in
             let uc = use_export uc m in
-            close_namespace uc false n
-        | Import ->
-            (* use import T = namespace T use_export T end import T *)
-            let uc = open_namespace uc in
-            let uc = use_export uc m in
-            close_namespace uc true n
-        | Export ->
+            close_namespace uc imp use_as
+        | None ->
             use_export uc m
       with ClashSymbol s ->
         errorm ~loc "clash with previous symbol %s" s
@@ -2369,7 +2360,6 @@ let rec decl ~wp env ltm lmod uc = function
   | Ptree.Dnamespace (loc, id, import, dl) ->
       let uc = open_namespace uc in
       let uc = List.fold_left (decl ~wp env ltm lmod) uc dl in
-      let id = option_map (fun id -> id.id) id in
       begin try close_namespace uc import id
       with ClashSymbol s -> errorm ~loc "clash with previous symbol %s" s end
   | Ptree.Dlogic (TypeDecl d) ->

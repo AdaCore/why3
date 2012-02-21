@@ -124,6 +124,7 @@ val close_theory  : theory_uc -> theory
 
 val open_namespace  : theory_uc -> theory_uc
 val close_namespace : theory_uc -> bool -> string option -> theory_uc
+  (* the Boolean indicates [import]; the string option indicates [as T] *)
 
 val get_namespace : theory_uc -> namespace
 val get_known : theory_uc -> known_map

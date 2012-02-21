@@ -179,8 +179,6 @@ let read_lib_theory lib path th =
   try Mstr.find th mth with Not_found ->
   raise (TheoryNotFound (path,th))
 
-let read_lib_file lib path = fst (read_lib_file lib path)
-
 let register_format name exts read =
   if Hashtbl.mem read_format_table name then raise (KnownFormat name);
   let getlib = Wenv.memoize 5 (mk_library read exts) in
