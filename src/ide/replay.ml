@@ -51,10 +51,25 @@ let set_opt_smoke = function
   | "deep" ->  opt_smoke := SD_Deep
   | _ -> assert false
 
+let opt_config = ref None
+let opt_extra = ref []
+
 let spec = Arg.align [
-  ("-I",
+  ("-L",
    Arg.String (fun s -> includes := s :: !includes),
    "<s> add s to loadpath") ;
+  ("--library",
+   Arg.String (fun s -> includes := s :: !includes),
+   " same as -L") ;
+  ("-I",
+   Arg.String (fun s -> includes := s :: !includes),
+   " same as -L (obsolete)") ;
+  ("-C", Arg.String (fun s -> opt_config := Some s),
+   "<file> Read configuration from <file>") ;
+  ("--config", Arg.String (fun s -> opt_config := Some s),
+   " same as -C") ;
+  ("--extra-config", Arg.String (fun s -> opt_extra := !opt_extra @ [s]),
+   "<file> Read additional configuration from <file>") ;
   ("-force",
    Arg.Set opt_force,
    " enforce saving of session even if replay failed") ;
@@ -122,7 +137,8 @@ let fname = match !file with
   | Some f ->
       f
 
-let config = Whyconf.read_config None
+let config = Whyconf.read_config !opt_config
+let config = List.fold_left Whyconf.merge_config config !opt_extra
 
 let loadpath = (Whyconf.loadpath (Whyconf.get_main config))
   @ List.rev !includes
