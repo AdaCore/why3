@@ -45,6 +45,7 @@ type t =
       mutable error_color : string;
       mutable env : Why3.Env.env;
       mutable config : Whyconf.config;
+      original_config : Whyconf.config;
       mutable altern_provers : prover option Mprover.t;
       mutable replace_prover : conf_replace_prover;
     }
