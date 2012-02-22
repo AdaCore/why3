@@ -397,7 +397,7 @@ loaded@."
           set_timelimit timelimit a;
           schedule_proof_attempt
             ~timelimit ~memlimit:0
-            ?old ~command:npc.prover_config.Whyconf.command
+            ?old ~command:(String.concat " " (npc.prover_config.Whyconf.command :: npc.prover_config.Whyconf.extra_options))
             ~driver:npc.prover_driver
             ~callback
             eT
@@ -629,7 +629,7 @@ let check_external_proof eS eT todo a =
           in
           schedule_proof_attempt eT
             ~timelimit:a.proof_timelimit ~memlimit:0
-            ?old ~command:npc.prover_config.Whyconf.command
+            ?old ~command:(String.concat " " (npc.prover_config.Whyconf.command :: npc.prover_config.Whyconf.extra_options))
             ~driver:npc.prover_driver
             ~callback
             (goal_task g)
@@ -755,7 +755,7 @@ let edit_proof eS sched ~default_editor a =
           let editor =
             match npc.prover_config.Whyconf.editor with
               | "" -> default_editor
-              | s -> s
+              | s -> String.concat " " (s :: npc.prover_config.Whyconf.extra_options)
           in
           (*
             eprintf "[Editing] goal %s with command %s %s@."
