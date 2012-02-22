@@ -48,7 +48,7 @@ let check_tl ty t = ty_equal_check ty (t_type t)
 
 let make_ls_defn ls vl t =
   (* check for duplicate arguments *)
-  let add_v s v = Svs.add_new v (DuplicateVar v) s in
+  let add_v s v = Svs.add_new (DuplicateVar v) v s in
   ignore (List.fold_left add_v Svs.empty vl);
   (* build the definition axiom *)
   let hd = t_app ls (List.map t_var vl) t.t_ty in
@@ -149,7 +149,7 @@ let rec match_term vm t acc p = match t.t_node, p.pat_node with
 let build_call_graph cgr syms ls =
   let call vm s tl =
     let desc t = match t.t_node with
-      | Tvar v -> Mvs.find_default v Unknown vm
+      | Tvar v -> Mvs.find_def Unknown v vm
       | _ -> Unknown
     in
     Hls.add cgr s (ls, Array.of_list (List.map desc tl))
@@ -399,7 +399,7 @@ exception EmptyIndDecl of lsymbol
 
 exception NonPositiveTypeDecl of tysymbol * lsymbol * ty
 
-let news_id s id = Sid.add_new id (ClashIdent id) s
+let news_id s id = Sid.add_new (ClashIdent id) id s
 
 let syms_ts s ts = Sid.add ts.ts_name s
 let syms_ls s ls = Sid.add ls.ls_name s

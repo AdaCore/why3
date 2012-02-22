@@ -62,8 +62,8 @@ module Lsmap = struct
       | None -> Some (create_lsymbol (id_clone ls.ls_name) tyl tyv)
       | nls  -> nls
     in
-    let insts = Mls.find_default ls Mtyl.empty lsmap in
-    Mls.add ls (Mtyl.change (oty_cons tyl tyv) newls insts) lsmap
+    let insts = Mls.find_def Mtyl.empty ls lsmap in
+    Mls.add ls (Mtyl.change newls (oty_cons tyl tyv) insts) lsmap
 
   let print_env fmt menv =
     Format.fprintf fmt "defined_lsymbol (%a)@."
@@ -85,7 +85,7 @@ module Lsmap = struct
         | [MAls ls; MAls lsinst] ->
           let tydisl = oty_cons lsinst.ls_args lsinst.ls_value in
           if not (List.for_all Ty.ty_closed tydisl) then env else
-          let insts = Mls.find_default ls Mtyl.empty env in
+          let insts = Mls.find_def Mtyl.empty ls env in
           Mls.add ls (Mtyl.add tydisl lsinst insts) env
         | _ -> assert false
     in
@@ -98,9 +98,9 @@ let find_logic env ls tyl tyv =
   try Mtyl.find (oty_cons tyl tyv) (Mls.find ls env)
   with Not_found -> ls
 
-module Ssubst =
-  Set.Make(struct type t = ty Mtv.t
-                  let compare = Mtv.compare OHTy.compare end)
+module Ssubst = Set.Make(struct
+  type t = ty Mtv.t
+  let compare = Mtv.compare OHTy.compare end)
 
 (* find all the possible instantiation which can create a kept instantiation *)
 let ty_quant env t =
@@ -112,7 +112,7 @@ let ty_quant env t =
         let fold_inst inst _ acc =
           let fold_subst subst acc =
             try
-              let subst = List.fold_left2 ty_match subst tyl inst  in
+              let subst = List.fold_left2 ty_match subst tyl inst in
               Ssubst.add subst acc
             with TypeMismatch _ -> acc
           in
@@ -129,7 +129,7 @@ let ts_of_ls env ls decls =
   let add_ts sts ts = Sts.add ts sts in
   let add_ty sts ty = ty_s_fold add_ts sts ty in
   let add_tyl tyl _ sts = List.fold_left add_ty sts tyl in
-  let insts = Mls.find_default ls Mtyl.empty env in
+  let insts = Mls.find_def Mtyl.empty ls env in
   let sts = Mtyl.fold add_tyl insts Sts.empty in
   let add_ts ts dl = create_ty_decl [ts,Tabstract] :: dl in
   Sts.fold add_ts sts decls
@@ -141,7 +141,7 @@ let map env d = match d.d_node with
       "Algebraic and recursively-defined types are \
             not supported, run eliminate_algebraic"
   | Dlogic [ls, None] ->
-      let lls = Mtyl.values (Mls.find_default ls Mtyl.empty env) in
+      let lls = Mtyl.values (Mls.find_def Mtyl.empty ls env) in
       let lds = List.map (fun ls -> create_logic_decl [ls,None]) lls in
       ts_of_ls env ls (d::lds)
   | Dlogic [ls, Some ld] when not (Sid.mem ls.ls_name d.d_syms) ->

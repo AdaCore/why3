@@ -300,7 +300,7 @@ exception NoTask
 let goal_task g = Util.exn_option NoTask g.goal_task
 let goal_task_option g = g.goal_task
 
-let goal_expl g = Util.default_option g.goal_name.Ident.id_string g.goal_expl
+let goal_expl g = Util.def_option g.goal_name.Ident.id_string g.goal_expl
 
 (************************)
 (* saving state on disk *)
@@ -1105,7 +1105,7 @@ let load_prover eS prover =
     PHprover.find eS.loaded_provers prover
   with Not_found ->
     let provers = Whyconf.get_provers eS.whyconf in
-    let r = Mprover.find_option prover provers in
+    let r = Mprover.find_opt prover provers in
     let r = match r with
       | None -> None
       | Some pr ->
@@ -1147,11 +1147,11 @@ let copy_external_proof
   let session = match env_session with
     | Some eS -> Some eS.session
     | _ -> session in
-  let obsolete = default_option a.proof_obsolete obsolete in
-  let archived = default_option a.proof_archived archived in
-  let timelimit = default_option a.proof_timelimit timelimit in
-  let pas = default_option a.proof_state attempt_status in
-  let ngoal = default_option a.proof_parent goal in
+  let obsolete = def_option a.proof_obsolete obsolete in
+  let archived = def_option a.proof_archived archived in
+  let timelimit = def_option a.proof_timelimit timelimit in
+  let pas = def_option a.proof_state attempt_status in
+  let ngoal = def_option a.proof_parent goal in
   let nprover = match prover with
     | None -> a.proof_prover
     | Some prover -> prover in

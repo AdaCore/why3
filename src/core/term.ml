@@ -155,7 +155,7 @@ let pat_wild ty = mk_pattern Pwild Svs.empty ty
 let pat_var v   = mk_pattern (Pvar v) (Svs.singleton v) v.vs_ty
 
 let pat_as p v =
-  let s = Svs.add_new v (DuplicateVar v) p.pat_vars in
+  let s = Svs.add_new (DuplicateVar v) v p.pat_vars in
   mk_pattern (Pas (p,v)) s v.vs_ty
 
 let pat_or p q =
@@ -599,7 +599,7 @@ let rec t_subst_unsafe m t =
   let nosubst (_,b,_) = Mvs.set_disjoint m b.bv_vars in
   match t.t_node with
   | Tvar u ->
-      Mvs.find_default u t m
+      Mvs.find_def t u m
   | Tlet (e, bt) ->
       let d = t_subst e in
       if t_equal d e && nosubst bt then t else
@@ -878,7 +878,7 @@ let rec t_gen_map fnT fnL m t =
   let fn = t_gen_map fnT fnL m in
   t_label_copy t (match t.t_node with
     | Tvar v ->
-        let u = Mvs.find_default v v m in
+        let u = Mvs.find_def v v m in
         ty_equal_check (fnT v.vs_ty) u.vs_ty;
         t_var u
     | Tconst _ ->
@@ -1253,7 +1253,7 @@ let rec t_hash_alpha c m t =
   let fn = t_hash_alpha c m in
   match t.t_node with
   | Tvar v ->
-      Hashcons.combine 0 (Mvs.find_default v (vs_hash v) m)
+      Hashcons.combine 0 (Mvs.find_def (vs_hash v) v m)
   | Tconst c ->
       Hashcons.combine 1 (Hashtbl.hash c)
   | Tapp (s,l) ->
@@ -1428,7 +1428,7 @@ let small t = match t.t_node with
   | _ -> false
 
 let t_let_simp e ((v,b,t) as bt) =
-  let n = Mvs.find_default v 0 t.t_vars in
+  let n = Mvs.find_def 0 v t.t_vars in
   if n = 0 then
     t_subst_unsafe b.bv_subst t else
   if n = 1 || small e then begin
@@ -1438,7 +1438,7 @@ let t_let_simp e ((v,b,t) as bt) =
     t_let e bt
 
 let t_let_close_simp v e t =
-  let n = Mvs.find_default v 0 t.t_vars in
+  let n = Mvs.find_def 0 v t.t_vars in
   if n = 0 then t else
   if n = 1 || small e then
     t_subst_single v e t

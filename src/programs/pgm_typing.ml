@@ -374,7 +374,7 @@ let rec dexpr ~ghost ~userloc env e =
   let loc = e.Ptree.expr_loc in
   let labs, userloc, d = extract_labels [] userloc e in
   let d, ty = dexpr_desc ~ghost ~userloc env loc d in
-  let loc = default_option loc userloc in
+  let loc = def_option loc userloc in
   let e = {
     dexpr_desc = d; dexpr_loc = loc; dexpr_lab = labs; dexpr_type = ty; }
   in
@@ -480,7 +480,7 @@ and dexpr_desc ~ghost ~userloc env loc = function
       let s = fs_tuple n in
       let tyl = List.map (fun _ -> create_type_var loc) el in
       let ty = tyapp (ts_tuple n) tyl in
-      let uloc = default_option loc userloc in
+      let uloc = def_option loc userloc in
       let create d ty = { dexpr_desc = d; dexpr_type = ty;
                           dexpr_loc = uloc; dexpr_lab = [] } in
       let apply e1 e2 ty2 =
@@ -498,7 +498,7 @@ and dexpr_desc ~ghost ~userloc env loc = function
       new_regions_vars ();
       let tyl, ty = specialize_lsymbol ~loc (Htv.create 17) cs in
       let ty = of_option ty in
-      let uloc = default_option loc userloc in
+      let uloc = def_option loc userloc in
       let create d ty = { dexpr_desc = d; dexpr_type = ty;
                           dexpr_loc = uloc; dexpr_lab = [] } in
       let constructor d f tyf = match f with
@@ -550,7 +550,7 @@ and dexpr_desc ~ghost ~userloc env loc = function
             Queue.push v q
       in
       List.iter2 set_pat_var_ty fl tyl;
-      let uloc = default_option loc userloc in
+      let uloc = def_option loc userloc in
       let create d ty = { dexpr_desc = d; dexpr_type = ty;
                           dexpr_loc = uloc; dexpr_lab = [] } in
       let apply t f tyf = match f with

@@ -57,13 +57,13 @@ let rec merge_ns chk ns1 ns2 =
     ns_pr = ns_union pr_equal chk ns1.ns_pr ns2.ns_pr;
     ns_ns = Mstr.union fusion     ns1.ns_ns ns2.ns_ns; }
 
-let nm_add chk x ns m = Mstr.change x (function
+let nm_add chk x ns m = Mstr.change (function
   | None -> Some ns
-  | Some os -> Some (merge_ns chk ns os)) m
+  | Some os -> Some (merge_ns chk ns os)) x m
 
-let ns_add eq chk x v m = Mstr.change x (function
+let ns_add eq chk x v m = Mstr.change (function
   | None -> Some v
-  | Some vo -> Some (ns_replace eq chk x vo v)) m
+  | Some vo -> Some (ns_replace eq chk x vo v)) x m
 
 let ts_add = ns_add ts_equal
 let ls_add = ns_add ls_equal
@@ -627,9 +627,9 @@ let clone_export uc th inst =
   let g_ts _ ts = not (Mts.mem ts inst.inst_ts) in
   let g_ls _ ls = not (Mls.mem ls inst.inst_ls) in
 
-  let f_ts ts = Mts.find_default ts ts cl.ts_table in
-  let f_ls ls = Mls.find_default ls ls cl.ls_table in
-  let f_pr pr = Mpr.find_default pr pr cl.pr_table in
+  let f_ts ts = Mts.find_def ts ts cl.ts_table in
+  let f_ls ls = Mls.find_def ls ls cl.ls_table in
+  let f_pr pr = Mpr.find_def pr pr cl.pr_table in
 
   let rec f_ns ns = {
     ns_ts = Mstr.map f_ts (Mstr.filter g_ts ns.ns_ts);
@@ -694,9 +694,9 @@ let add_meta uc s al = add_tdecl uc (create_meta s al)
 
 let clone_meta tdt sm = match tdt.td_node with
   | Meta (t,al) ->
-      let find_ts ts = Mts.find_default ts ts sm.sm_ts in
-      let find_ls ls = Mls.find_default ls ls sm.sm_ls in
-      let find_pr pr = Mpr.find_default pr pr sm.sm_pr in
+      let find_ts ts = Mts.find_def ts ts sm.sm_ts in
+      let find_ls ls = Mls.find_def ls ls sm.sm_ls in
+      let find_pr pr = Mpr.find_def pr pr sm.sm_pr in
       let cl_marg = function
         | MAty ty -> MAty (ty_s_map find_ts ty)
         | MAts ts -> MAts (find_ts ts)

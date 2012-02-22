@@ -45,7 +45,7 @@ let convert_unknown_prover ~keygen env_session =
     let unknown_provers =
       Mprover.mapi (utkp known_provers) unknown_provers in
     session_iter_proof_attempt (fun pr ->
-      let pks = Mprover.find_default pr.proof_prover [] unknown_provers in
+      let pks = Mprover.find_def [] pr.proof_prover unknown_provers in
       List.iter (fun pk ->
         (** If such a prover already exists we add nothing *)
         if not (PHprover.mem pr.proof_parent.goal_external_proofs pk) then

@@ -473,7 +473,7 @@ let do_theory env drv fname tname th glist =
   end
 
 let do_global_theory env drv (tname,p,t,glist) =
-  let format = Util.default_option "why" !opt_parser in
+  let format = Util.def_option "why" !opt_parser in
   let th = try Env.read_theory ~format env p t with Env.TheoryNotFound _ ->
     eprintf "Theory '%s' not found.@." tname;
     exit 1

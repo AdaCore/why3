@@ -246,7 +246,7 @@ let is_projection uc ls =
       | _ -> (* not a function with 1 argument *) raise Exit
     in
     ignore (List.fold_left (fun tvs t -> match t.ty_node with
-      | Ty.Tyvar tv -> Stv.add_new tv Exit tvs
+      | Ty.Tyvar tv -> Stv.add_new Exit tv tvs
       | _ -> (* not a generic type *) raise Exit) Stv.empty tl);
     let kn = get_known uc in
     let lsc = match Decl.find_constructors kn ts with

@@ -65,7 +65,7 @@ let find_module loc lib path s =
   let m, thm =
     try
       let mm, mt = Env.read_lib_file lib path in
-      Mstr.find_option s mm, Mstr.find_option s mt
+      Mstr.find_opt s mm, Mstr.find_opt s mt
     with
       | LibFileNotFound _ -> None, None
   in

@@ -148,8 +148,8 @@ let print_prelude fmt pl =
 
 let print_prelude_of_theories th_used fmt pm =
   List.iter (fun th ->
-               let prel = Mid.find_default th.th_name [] pm in
-               print_prelude fmt prel) th_used
+    let prel = Mid.find_def [] th.th_name pm in
+    print_prelude fmt prel) th_used
 
 let print_th_prelude task fmt pm =
   let th_used = task_fold (fun acc -> function
@@ -186,11 +186,11 @@ let remove_prop pr =
 type syntax_map = string Mid.t
 
 let sm_add_ts sm = function
-  | [MAts ts; MAstr rs] -> Mid.add_new ts.ts_name rs (KnownTypeSyntax ts) sm
+  | [MAts ts; MAstr rs] -> Mid.add_new (KnownTypeSyntax ts) ts.ts_name rs sm
   | _ -> assert false
 
 let sm_add_ls sm = function
-  | [MAls ls; MAstr rs] -> Mid.add_new ls.ls_name rs (KnownLogicSyntax ls) sm
+  | [MAls ls; MAstr rs] -> Mid.add_new (KnownLogicSyntax ls) ls.ls_name rs sm
   | _ -> assert false
 
 let sm_add_pr sm = function
@@ -213,7 +213,7 @@ let get_syntax_map_of_theory theory =
   sm
 *)
 
-let query_syntax sm id = Mid.find_option id sm
+let query_syntax sm id = Mid.find_opt id sm
 
 let fold_tdecls fn acc =
   Trans.on_meta meta_syntax_type (fun sts ->

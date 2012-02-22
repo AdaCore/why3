@@ -347,8 +347,8 @@ and let_defn denv env impl { e_node = n ; e_loc = loc } =
   let rec check ss vl al = match vl,al with
     | [],[] -> ()
     | (v,_)::vl, { e_node = Evar u }::al when u = v ->
-        let ss = Sstr.change v (fun b ->
-          not (b && error ~loc MalformedLet)) ss in
+        let ss = Sstr.change (fun b ->
+          not (b && error ~loc MalformedLet)) v ss in
         check ss vl al
     | _,_ -> error ~loc MalformedLet in
   let dig vl d isf e = match d.e_node with

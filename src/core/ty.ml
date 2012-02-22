@@ -157,7 +157,7 @@ exception DuplicateTypeVar of tvsymbol
 exception UnboundTypeVar of tvsymbol
 
 let create_tysymbol name args def =
-  let add s v = Stv.add_new v (DuplicateTypeVar v) s in
+  let add s v = Stv.add_new (DuplicateTypeVar v) v s in
   let s = List.fold_left add Stv.empty args in
   let check v = Stv.mem v s || raise (UnboundTypeVar v) in
   ignore (option_map (ty_v_all check) def);
@@ -194,7 +194,7 @@ let ty_s_any pr ty =
 (* type matching *)
 
 let rec ty_inst s ty = match ty.ty_node with
-  | Tyvar n -> Mtv.find_default n ty s
+  | Tyvar n -> Mtv.find_def ty n s
   | _ -> ty_map (ty_inst s) ty
 
 let rec ty_match s ty1 ty2 =
@@ -206,7 +206,7 @@ let rec ty_match s ty1 ty2 =
   match ty1.ty_node, ty2.ty_node with
     | Tyapp (f1,l1), Tyapp (f2,l2) when ts_equal f1 f2 ->
         List.fold_left2 ty_match s l1 l2
-    | Tyvar n1, _ -> Mtv.change n1 set s
+    | Tyvar n1, _ -> Mtv.change set n1 s
     | _ -> raise Exit
 
 exception TypeMismatch of ty * ty

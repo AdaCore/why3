@@ -141,7 +141,7 @@ let load_driver = let driver_tag = ref (-1) in fun env file ->
   in
   let add_local th = function
     | Rprelude s ->
-        let l = Mid.find_default th.th_name [] !thprelude in
+        let l = Mid.find_def [] th.th_name !thprelude in
         thprelude := Mid.add th.th_name (s::l) !thprelude
     | Rsyntaxts (c,q,s) ->
         let td = syntax_type (find_ts th q) s in

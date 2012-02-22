@@ -179,13 +179,13 @@ module type S =
 
     (** {3} Added into why stdlib version *)
 
-    val change : key -> ('a option -> 'a option) -> 'a t -> 'a t
-    (** [change x f m] returns a map containing the same bindings as
+    val change : ('a option -> 'a option) -> key -> 'a t -> 'a t
+    (** [change f x m] returns a map containing the same bindings as
         [m], except the binding of [x] in [m] is changed from [y] to
         [f (Some y)] if [m] contains a binding of [x], otherwise the
         binding of [x] becomes [f None].
 
-        [change x f m] corresponds to a more efficient way to do
+        [change f x m] corresponds to a more efficient way to do
         [add x (try f (Some (find x m)) with Not_found -> f None) m] *)
 
     val union : (key -> 'a -> 'a -> 'a option) -> 'a t -> 'a t -> 'a t
@@ -224,12 +224,12 @@ module type S =
     val set_disjoint : 'a t -> 'b t -> bool
     (** [set_disjoint = disjoint (fun _ _ _ -> false)] *)
 
-    val find_default : key -> 'a -> 'a t -> 'a
-    (** [find_default x d m] returns the current binding of [x] in [m],
+    val find_def : 'a -> key -> 'a t -> 'a
+    (** [find_def x d m] returns the current binding of [x] in [m],
         or return [d] if no such binding exists. *)
 
-    val find_option : key -> 'a t -> 'a option
-    (** [find_default x d m] returns the [Some] of the current binding
+    val find_opt : key -> 'a t -> 'a option
+    (** [find_opt x m] returns the [Some] of the current binding
         of [x] in [m], or return [None] if no such binding exists. *)
 
     val find_exn : exn -> key -> 'a t -> 'a
@@ -249,9 +249,9 @@ module type S =
     val fold2_inter: (key -> 'a -> 'b -> 'c -> 'c) -> 'a t -> 'b t -> 'c -> 'c
     (** fold the common keys of two map at the same time *)
 
-    val fold2_union: (key -> 'a option -> 'b option -> 'c -> 'c)
-      -> 'a t -> 'b t -> 'c -> 'c
-    (** fold the keys which appear in one of the two map at the same time  *)
+    val fold2_union:
+      (key -> 'a option -> 'b option -> 'c -> 'c) -> 'a t -> 'b t -> 'c -> 'c
+    (** fold the keys which appear in one of the two maps *)
 
     val translate : (key -> key) -> 'a t -> 'a t
     (** [translate f m] translates the keys in the map [m] by the
@@ -262,10 +262,9 @@ module type S =
       (key -> 'a -> 'acc -> 'acc * 'b option) -> 'a t -> 'acc -> 'acc * 'b t
     (** Same as {!Map.S.mapi_fold}, but may remove bindings. *)
 
-
-    val add_new : key -> 'a -> exn -> 'a t -> 'a t
-    (** [add_new x v e m] binds [x] to [v] in [m] if [x] is not bound,
-        and raises [exn] otherwise. *)
+    val add_new : exn -> key -> 'a -> 'a t -> 'a t
+    (** [add_new e x v m] binds [x] to [v] in [m] if [x] is not bound,
+        and raises [e] otherwise. *)
 
     val keys: 'a t -> key list
     (** Return the list of all keys of the given map.
@@ -380,8 +379,8 @@ module type S =
           strictly greater than [x];
           [mem] is [true] if [x] belongs to [s] and [false] otherwise. *)
 
-      val change : elt -> (bool -> bool) -> t -> t
-      (** [change x f s] returns a set containing the same elements as
+      val change : (bool -> bool) -> elt -> t -> t
+      (** [change f x s] returns a set containing the same elements as
           [s], except [x] which is added to [s] if [f (mem x s)] returns
           [true] and removed otherwise. *)
 
@@ -395,8 +394,8 @@ module type S =
       (** [diss f s1 s2] computes the difference of two sets *)
 
       val fold2:  (elt -> 'a -> 'a) -> t -> t -> 'a -> 'a
-      (** [fold f s1 s2 a] computes [(f eN ... (f e1 a)...)],
-          where [e1 ... eN] are the element of [s1] and [s2]
+      (** [fold2 f s1 s2 a] computes [(f eN ... (f e1 a) ...)],
+          where [e1 ... eN] are the elements of [union s1 s2]
           in increasing order. *)
 
       val translate : (elt -> elt) -> t -> t
@@ -404,9 +403,9 @@ module type S =
           function [f]. [f] must be strictly monotone on the elements of [s].
           Otherwise it raises invalid_arg *)
 
-      val add_new : elt -> exn -> t -> t
-      (** [add_new x e s] adds [x] to [s] if [s] does not contain [x],
-          and raises [exn] otherwise. *)
+      val add_new : exn -> elt -> t -> t
+      (** [add_new e x s] adds [x] to [s] if [s] does not contain [x],
+          and raises [e] otherwise. *)
     end
 
     module Set : Set

@@ -68,9 +68,9 @@ module Compile (X : Action) = struct
         (* dispatch every case to a primitive constructor/wild case *)
         let cases,wilds =
           let add_case fs pl a cases =
-            Mls.change fs (function
+            Mls.change (function
               | None -> Some [pl,a]
-              | Some rl -> Some ((pl,a)::rl)) cases
+              | Some rl -> Some ((pl,a)::rl)) fs cases
           in
           let union_cases pl a types cases =
             let add pl q = pat_wild q.pat_ty :: pl in

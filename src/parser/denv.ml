@@ -146,7 +146,7 @@ let create_user_id { id = x ; id_lab = ll ; id_loc = loc } =
     | Lpos p -> ll, Some p
   in
   let label,p = List.fold_left get_labels (Slab.empty,None) ll in
-  id_user ~label x (default_option loc p)
+  id_user ~label x (def_option loc p)
 
 let create_user_vs id ty = create_vsymbol (create_user_id id) ty
 

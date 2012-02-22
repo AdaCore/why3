@@ -40,7 +40,7 @@ let of_option = function None -> assert false | Some x -> x
 
 let exn_option exn = function None -> raise exn | Some x -> x
 
-let default_option d = function None -> d | Some x -> x
+let def_option d = function None -> d | Some x -> x
 
 let option_map f = function None -> None | Some x -> Some (f x)
 

@@ -233,7 +233,7 @@ let quantify env rm sreg f =
         | Tyvar _ -> assert false
       in
       let id = Spv.fold test vars None in
-      let id = id_clone (default_option r.R.r_tv.tv_name id) in
+      let id = id_clone (def_option r.R.r_tv.tv_name id) in
       let r' = create_vsymbol id (purify r.R.r_ty) in
       Mtv.add r.R.r_tv r' m
     in

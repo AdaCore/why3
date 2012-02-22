@@ -219,8 +219,8 @@ let ity_subst_empty = {
 
 let ity_inst s ity =
   ity_v_map
-    (fun v -> Mtv.find_default v (ity_var v) s.ity_subst_tv)
-    (fun r -> Mreg.find_default r r s.ity_subst_reg)
+    (fun v -> Mtv.find_def (ity_var v) v s.ity_subst_tv)
+    (fun r -> Mreg.find_def r r s.ity_subst_reg)
     ity
 
 let rec ity_match s ity1 ity2 =
@@ -238,7 +238,7 @@ let rec ity_match s ity1 ity2 =
   (* | Itymod (s1, ity1), Itymod (s2, ity2) when ts_equal s1 s2 -> *)
   (*     ity_match s ity1 ity2 *)
   | Ityvar tv1, _ ->
-      { s with ity_subst_tv = Mtv.change tv1 set s.ity_subst_tv }
+      { s with ity_subst_tv = Mtv.change set tv1 s.ity_subst_tv }
   | _ ->
       raise Exit
 
@@ -249,7 +249,7 @@ and reg_match s r1 r2 =
     | Some r3 as r when reg_equal r3 r2 -> r
     | _ -> raise Exit
   in
-  let reg_map = Mreg.change r1 set s.ity_subst_reg in
+  let reg_map = Mreg.change set r1 s.ity_subst_reg in
   let s = { s with ity_subst_reg = reg_map } in
   if !is_new then ity_match s r1.reg_ity r2.reg_ity else s
 
@@ -307,7 +307,7 @@ let create_itysymbol name args regs def (* model *) =
   let puredef = option_map ty_of_ity def in
   let purets = create_tysymbol name args puredef in
   (* all regions *)
-  let add s v = Sreg.add_new v (DuplicateRegion v) s in
+  let add s v = Sreg.add_new (DuplicateRegion v) v s in
   let sregs = List.fold_left add Sreg.empty regs in
   (* all type variables *)
   let sargs = List.fold_right Stv.add args Stv.empty in

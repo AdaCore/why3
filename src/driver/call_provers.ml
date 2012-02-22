@@ -175,7 +175,7 @@ let call_on_file ~command ?(timelimit=0) ?(memlimit=0)
               (try List.assoc n exitcodes with Not_found -> grep out regexps)
         in
         Debug.dprintf debug "Call_provers: prover output:@\n%s@." out;
-        let time = Util.default_option time (grep_time out timeregexps) in
+        let time = Util.def_option time (grep_time out timeregexps) in
         let ans = match ans with
           | HighFailure when !on_timelimit && timelimit > 0
             && time >= (0.9 *. float timelimit) -> Timeout

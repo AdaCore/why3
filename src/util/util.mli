@@ -40,7 +40,7 @@ val of_option : 'a option -> 'a
 
 val exn_option : exn -> 'a option -> 'a
 
-val default_option : 'a -> 'a option -> 'a
+val def_option : 'a -> 'a option -> 'a
 
 val option_map : ('a -> 'b) -> 'a option -> 'b option
 

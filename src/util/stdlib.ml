@@ -31,8 +31,8 @@ module type S =
     val add: key -> 'a -> 'a t -> 'a t
     val singleton: key -> 'a -> 'a t
     val remove: key -> 'a t -> 'a t
-    val merge: (key -> 'a option -> 'b option -> 'c option)
-      -> 'a t -> 'b t -> 'c t
+    val merge:
+      (key -> 'a option -> 'b option -> 'c option) -> 'a t -> 'b t -> 'c t
     val compare: ('a -> 'a -> int) -> 'a t -> 'a t -> int
     val equal: ('a -> 'a -> bool) -> 'a t -> 'a t -> bool
     val iter: (key -> 'a -> unit) -> 'a t -> unit
@@ -52,7 +52,7 @@ module type S =
     val mapi: (key -> 'a -> 'b) -> 'a t -> 'b t
 
     (** Added into why stdlib version *)
-    val change : key -> ('a option -> 'a option) -> 'a t -> 'a t
+    val change : ('a option -> 'a option) -> key -> 'a t -> 'a t
     val union : (key -> 'a -> 'a -> 'a option) -> 'a t -> 'a t -> 'a t
     val inter : (key -> 'a -> 'b -> 'c option) -> 'a t -> 'b t -> 'c t
     val diff : (key -> 'a -> 'b -> 'a option) -> 'a t -> 'b t -> 'a t
@@ -62,20 +62,20 @@ module type S =
     val set_diff : 'a t -> 'b t -> 'a t
     val set_submap : 'a t -> 'b t -> bool
     val set_disjoint : 'a t -> 'b t -> bool
-    val find_default : key -> 'a -> 'a t -> 'a
-    val find_option : key -> 'a t -> 'a option
+    val find_def : 'a -> key -> 'a t -> 'a
+    val find_opt : key -> 'a t -> 'a option
     val find_exn : exn -> key -> 'a t -> 'a
     val map_filter: ('a -> 'b option) -> 'a t -> 'b t
     val mapi_filter: (key -> 'a -> 'b option) -> 'a t -> 'b t
     val mapi_fold:
       (key -> 'a -> 'acc -> 'acc * 'b) -> 'a t -> 'acc -> 'acc * 'b t
     val fold2_inter: (key -> 'a -> 'b -> 'c -> 'c) -> 'a t -> 'b t -> 'c -> 'c
-    val fold2_union: (key -> 'a option -> 'b option -> 'c -> 'c) ->
-      'a t -> 'b t -> 'c -> 'c
+    val fold2_union:
+      (key -> 'a option -> 'b option -> 'c -> 'c) -> 'a t -> 'b t -> 'c -> 'c
     val translate : (key -> key) -> 'a t -> 'a t
     val mapi_filter_fold:
       (key -> 'a -> 'acc -> 'acc * 'b option) -> 'a t -> 'acc -> 'acc * 'b t
-    val add_new : key -> 'a -> exn -> 'a t -> 'a t
+    val add_new : exn -> key -> 'a -> 'a t -> 'a t
     val keys: 'a t -> key list
     val values: 'a t -> 'a list
 
@@ -107,13 +107,13 @@ module type S =
       val max_elt: t -> elt
       val choose: t -> elt
       val split: elt -> t -> t * bool * t
-      val change : elt -> (bool -> bool) -> t -> t
+      val change : (bool -> bool) -> elt -> t -> t
       val union : t -> t -> t
       val inter : t -> t -> t
       val diff : t -> t -> t
       val fold2:  (elt -> 'a -> 'a) -> t -> t -> 'a -> 'a
       val translate : (elt -> elt) -> t -> t
-      val add_new : elt -> exn -> t -> t
+      val add_new : exn -> elt -> t -> t
     end
 
     module Set : Set
@@ -401,7 +401,7 @@ module Make(Ord: OrderedType) = struct
 
     (** Added into why stdlib version *)
 
-    let rec change x f = function
+    let rec change f x = function
       | Empty ->
         begin match f None with
           | None -> Empty
@@ -415,9 +415,9 @@ module Make(Ord: OrderedType) = struct
               | None -> merge_bal l r
               | Some d -> Node(l, x, d, r, h)
           else if c < 0 then
-            bal (change x f l) v d r
+            bal (change f x l) v d r
           else
-            bal l v d (change x f r)
+            bal l v d (change f x r)
 
     let rec union f s1 s2 =
       match (s1, s2) with
@@ -426,7 +426,7 @@ module Make(Ord: OrderedType) = struct
       | (Node(l1, v1, d1, r1, h1), Node(l2, v2, d2, r2, h2)) ->
           if h1 >= h2 then
             if h2 = 1 then
-              change v2 (function None -> Some d2 | Some d1 -> f v2 d1 d2) s1
+              change (function None -> Some d2 | Some d1 -> f v2 d1 d2) v2 s1
             else begin
               let (l2, d2, r2) = split v1 s2 in
               match d2 with
@@ -437,7 +437,7 @@ module Make(Ord: OrderedType) = struct
             end
           else
             if h1 = 1 then
-              change v1 (function None -> Some d1 | Some d2 -> f v1 d1 d2) s2
+              change (function None -> Some d1 | Some d2 -> f v1 d1 d2) v1 s2
             else begin
               let (l1, d1, r1) = split v2 s1 in
               match d1 with
@@ -504,19 +504,19 @@ module Make(Ord: OrderedType) = struct
     let set_disjoint m1 m2 = disjoint (fun _ _ _ -> false) m1 m2
 
 
-    let rec find_default x def = function
+    let rec find_def def x = function
         Empty -> def
       | Node(l, v, d, r, _) ->
           let c = Ord.compare x v in
           if c = 0 then d
-          else find_default x def (if c < 0 then l else r)
+          else find_def def x (if c < 0 then l else r)
 
-    let rec find_option x = function
+    let rec find_opt x = function
         Empty -> None
       | Node(l, v, d, r, _) ->
           let c = Ord.compare x v in
           if c = 0 then Some d
-          else find_option x (if c < 0 then l else r)
+          else find_opt x (if c < 0 then l else r)
 
     let rec find_exn exn x = function
         Empty -> raise exn
@@ -604,9 +604,9 @@ module Make(Ord: OrderedType) = struct
           let acc,r' = mapi_filter_fold f r acc in
           acc, concat_or_join l' v d' r'
 
-    let add_new x v e m = change x (function
+    let add_new e x v m = change (function
       | Some _ -> raise e
-      | None -> Some v) m
+      | None -> Some v) x m
 
     module type Set =
     sig
@@ -636,13 +636,13 @@ module Make(Ord: OrderedType) = struct
       val max_elt: t -> elt
       val choose: t -> elt
       val split: elt -> t -> t * bool * t
-      val change : elt -> (bool -> bool) -> t -> t
+      val change : (bool -> bool) -> elt -> t -> t
       val union : t -> t -> t
       val inter : t -> t -> t
       val diff : t -> t -> t
       val fold2:  (elt -> 'a -> 'a) -> t -> t -> 'a -> 'a
       val translate : (elt -> elt) -> t -> t
-      val add_new : elt -> exn -> t -> t
+      val add_new : exn -> elt -> t -> t
     end
 
     module Set =
@@ -658,7 +658,7 @@ module Make(Ord: OrderedType) = struct
         let empty = empty
         let is_empty = is_empty
         let mem = mem
-        let add e = add e ()
+        let add e s = add e () s
         let singleton e = singleton e ()
         let remove = remove
         let merge f = merge (fun e a b ->
@@ -679,13 +679,13 @@ module Make(Ord: OrderedType) = struct
         let max_elt t = fst (max_binding t)
         let choose t = fst (choose t)
         let split e t = let l,m,r = split e t in l,(m <> None),r
-        let change e f = change e (fun a -> is_true (f (is_some a)))
+        let change f x s = change (fun a -> is_true (f (is_some a))) x s
         let union = union (fun _ _ _ -> Some ())
         let inter = inter (fun _ _ _ -> Some ())
         let diff = diff (fun _ _ _ -> None)
         let fold2 f = fold2_union (fun k _ _ acc -> f k acc)
         let translate = translate
-        let add_new x = add_new x ()
+        let add_new e x s = add_new e x () s
       end
 
 end

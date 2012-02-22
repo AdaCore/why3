@@ -66,13 +66,13 @@ let rec merge_ns chk ns1 ns2 =
     ns_ps = ns_union ps_equal chk ns1.ns_ps ns2.ns_ps;
     ns_ns = Mstr.union fusion     ns1.ns_ns ns2.ns_ns; }
 
-let nm_add chk x ns m = Mstr.change x (function
+let nm_add chk x ns m = Mstr.change (function
   | None -> Some ns
-  | Some os -> Some (merge_ns chk ns os)) m
+  | Some os -> Some (merge_ns chk ns os)) x m
 
-let ns_add eq chk x v m = Mstr.change x (function
+let ns_add eq chk x v m = Mstr.change (function
   | None -> Some v
-  | Some vo -> Some (ns_replace eq chk x vo v)) m
+  | Some vo -> Some (ns_replace eq chk x vo v)) x m
 
 let it_add = ns_add its_equal
 let ps_add = ns_add ps_equal
