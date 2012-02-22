@@ -26,20 +26,19 @@ open Theory
 type fformat = string (* format name *)
 type filename = string (* file name *)
 type extension = string (* file extension *)
-type pathname = string list (* path in an environment *)
+type pathname = string list (* library path *)
 
 exception KnownFormat of fformat
 exception UnknownFormat of fformat
 exception UnknownExtension of extension
 exception UnspecifiedFormat
 
-exception ChannelNotFound of pathname
+exception LibFileNotFound of pathname
 exception TheoryNotFound of pathname * string
 exception AmbiguousPath of filename * filename
 
 type env = {
   env_path : filename list;
-  env_memo : (pathname, theory Mstr.t) Hashtbl.t;
   env_tag  : Hashweak.tag;
 }
 
@@ -47,27 +46,30 @@ let env_tag env = env.env_tag
 
 module Wenv = Hashweak.Make(struct type t = env let tag = env_tag end)
 
-(** Input formats *)
+(** Environment construction and utilisation *)
 
-type read_channel =
-  env -> pathname -> filename -> in_channel -> theory Mstr.t
+let create_env = let c = ref (-1) in fun lp -> {
+  env_path = lp;
+  env_tag  = (incr c; Hashweak.create_tag !c)
+}
 
-let read_channel_table = Hashtbl.create 17 (* format name -> read_channel *)
-let extensions_table   = Hashtbl.create 17 (* suffix -> format name *)
+let get_loadpath env = env.env_path
 
-let register_format name exts rc =
-  if Hashtbl.mem read_channel_table name then raise (KnownFormat name);
-  Hashtbl.add read_channel_table name (rc,exts);
-  List.iter (fun s -> Hashtbl.replace extensions_table ("." ^ s) name) exts
+let read_format_table = Hashtbl.create 17 (* format name -> read_format *)
+let extensions_table  = Hashtbl.create 17 (* suffix -> format name *)
 
 let lookup_format name =
-  try Hashtbl.find read_channel_table name
+  try Hashtbl.find read_format_table name
   with Not_found -> raise (UnknownFormat name)
+
+let list_formats () =
+  let add n (_,_,l) acc = (n,l)::acc in
+  Hashtbl.fold add read_format_table []
 
 let get_extension file =
   let s = try Filename.chop_extension file
     with Invalid_argument _ -> raise UnspecifiedFormat in
-  let n = String.length s in
+  let n = String.length s + 1 in
   String.sub file n (String.length file - n)
 
 let get_format file =
@@ -75,15 +77,12 @@ let get_format file =
   try Hashtbl.find extensions_table ext
   with Not_found -> raise (UnknownExtension ext)
 
-let real_read_channel ?format env path file ic =
+let read_channel ?format env file ic =
   let name = match format with
     | Some name -> name
     | None -> get_format file in
-  let rc,_ = lookup_format name in
-  rc env path file ic
-
-let read_channel ?format env file ic =
-  real_read_channel ?format env [] file ic
+  let rc,_,_ = lookup_format name in
+  rc env file ic
 
 let read_file ?format env file =
   let ic = open_in file in
@@ -93,39 +92,13 @@ let read_file ?format env file =
     mth
   with e -> close_in ic; raise e
 
-let list_formats () =
-  let add n (_,l) acc = (n,l)::acc in
-  Hashtbl.fold add read_channel_table []
+let read_theory ~format env path th =
+  let _,rl,_ = lookup_format format in
+  rl env path th
 
+let find_theory = read_theory ~format:"why"
 
-(** Environment construction and utilisation *)
-
-let create_env = let c = ref (-1) in fun lp -> {
-  env_path = lp;
-  env_memo = Hashtbl.create 17;
-  env_tag  = (incr c; Hashweak.create_tag !c)
-}
-
-let create_env_of_loadpath lp =
-  Format.eprintf "WARNING: Env.create_env_of_loadpath is deprecated
-    and will be removed in future versions of Why3.
-    Replace it with Env.create_env.@.";
-  create_env lp
-
-let get_loadpath env = env.env_path
-
-(* looks for file [file] of format [name] in loadpath [lp] *)
-let locate_file name lp path =
-  let file = List.fold_left Filename.concat "" path in
-  let _,sl = lookup_format name in
-  let add_sf sf = file ^ "." ^ sf in
-  let fl = if sl = [] then [file] else List.map add_sf sl in
-  let add_dir dir = List.map (Filename.concat dir) fl in
-  let fl = List.concat (List.map add_dir lp) in
-  match List.filter Sys.file_exists fl with
-  | [] -> raise (ChannelNotFound path)
-  | [file] -> file
-  | file1 :: file2 :: _ -> raise (AmbiguousPath (file1, file2))
+(** Navigation in the library *)
 
 exception InvalidQualifier of string
 
@@ -135,51 +108,103 @@ let check_qualifier s =
       Filename.basename s <> s)
   then raise (InvalidQualifier s)
 
-let find_channel env f sl =
-  List.iter check_qualifier sl;
-  let file = locate_file f env.env_path sl in
-  file, open_in file
+let locate_lib_file env path exts =
+  List.iter check_qualifier path;
+  let file = List.fold_left Filename.concat "" path in
+  let add_ext ext = file ^ "." ^ ext in
+  let fl = if exts = [] then [file] else List.map add_ext exts in
+  let add_dir dir = List.map (Filename.concat dir) fl in
+  let fl = List.concat (List.map add_dir env.env_path) in
+  match List.filter Sys.file_exists fl with
+  | [] -> raise (LibFileNotFound path)
+  | [file] -> file
+  | file1 :: file2 :: _ -> raise (AmbiguousPath (file1, file2))
 
-let find_library env sl =
-  let file, ic = find_channel env "why" sl in
+(** Input formats *)
+
+exception CircularDependency of pathname
+
+type 'a contents = 'a * theory Mstr.t
+
+type 'a library = {
+  lib_env  : env;
+  lib_read : 'a read_format;
+  lib_exts : extension list;
+  lib_memo : (pathname, 'a contents option) Hashtbl.t;
+}
+
+and 'a read_format =
+  'a library -> pathname -> filename -> in_channel -> 'a contents
+
+let mk_library read exts env = {
+  lib_env  = env;
+  lib_read = read;
+  lib_exts = exts;
+  lib_memo = Hashtbl.create 17;
+}
+
+let env_of_library lib = lib.lib_env
+
+let read_lib_file lib path =
+  let file = locate_lib_file lib.lib_env path lib.lib_exts in
+  let ic = open_in file in
   try
-    Hashtbl.replace env.env_memo sl Mstr.empty;
-    let mth = real_read_channel ~format:"why" env sl file ic in
-    Hashtbl.replace env.env_memo sl mth;
+    Hashtbl.replace lib.lib_memo path None;
+    let res = lib.lib_read lib path file ic in
+    Hashtbl.replace lib.lib_memo path (Some res);
     close_in ic;
-    mth
+    res
   with e ->
-    Hashtbl.remove env.env_memo sl;
+    Hashtbl.remove lib.lib_memo path;
     close_in ic;
     raise e
 
-let find_library env sl =
-  try Hashtbl.find env.env_memo sl
-  with Not_found -> find_library env sl
+let read_lib_file lib path =
+  try match Hashtbl.find lib.lib_memo path with
+    | Some res -> res
+    | None -> raise (CircularDependency path)
+  with Not_found -> read_lib_file lib path
 
 let get_builtin s =
   if s = builtin_theory.th_name.id_string then builtin_theory else
+  if s = bool_theory.th_name.id_string then bool_theory else
   if s = highord_theory.th_name.id_string then highord_theory else
   match tuple_theory_name s with
   | Some n -> tuple_theory n
   | None -> raise (TheoryNotFound ([],s))
 
-let find_theory env sl s =
-  if sl = [] then get_builtin s else
-  let mth = find_library env sl in
-  try Mstr.find s mth with Not_found ->
-  raise (TheoryNotFound (sl,s))
+let read_lib_theory lib path th =
+  if path = [] then get_builtin th else
+  let _,mth = read_lib_file lib path in
+  try Mstr.find th mth with Not_found ->
+  raise (TheoryNotFound (path,th))
+
+let register_format name exts read =
+  if Hashtbl.mem read_format_table name then raise (KnownFormat name);
+  let getlib = Wenv.memoize 5 (mk_library read exts) in
+  let rc env file ic = snd (read (getlib env) [] file ic) in
+  let rl env path th = read_lib_theory (getlib env) path th in
+  Hashtbl.add read_format_table name (rc,rl,exts);
+  List.iter (fun s -> Hashtbl.replace extensions_table s name) exts;
+  getlib
+
+let locate_lib_file env format path =
+  let _,_,exts = lookup_format format in
+  locate_lib_file env path exts
 
 (* Exception reporting *)
 
+let print_path fmt sl =
+  Pp.print_list (Pp.constant_string ".") Format.pp_print_string fmt sl
+
 let () = Exn_printer.register
   begin fun fmt exn -> match exn with
-  | ChannelNotFound sl ->
-      Format.fprintf fmt "Library not found: %a"
-        (Pp.print_list (Pp.constant_string ".") Format.pp_print_string) sl
+  | CircularDependency sl ->
+      Format.fprintf fmt "Circular dependency in %a" print_path sl
+  | LibFileNotFound sl ->
+      Format.fprintf fmt "Library file not found: %a" print_path sl
   | TheoryNotFound (sl,s) ->
-      Format.fprintf fmt "Theory not found: %a.%s"
-        (Pp.print_list (Pp.constant_string ".") Format.pp_print_string) sl s
+      Format.fprintf fmt "Theory not found: %a" print_path (sl @ [s])
   | KnownFormat s ->
       Format.fprintf fmt "Format %s is already registered" s
   | UnknownFormat s ->

@@ -663,7 +663,6 @@ let is_empty_sm sm =
   Mls.is_empty sm.sm_ls &&
   Mpr.is_empty sm.sm_pr
 
-
 (** Meta properties *)
 
 let get_meta_arg_type = function
@@ -745,6 +744,14 @@ let builtin_theory =
   let uc = add_logic_decl uc [ps_equ, None] in
   close_theory uc
 
+let create_theory ?(path=[]) n =
+  use_export (empty_theory n path) builtin_theory
+
+let bool_theory =
+  let uc = empty_theory (id_fresh "Bool") [] in
+  let uc = add_ty_decl uc [ts_bool, Talgebraic [fs_true; fs_false]] in
+  close_theory uc
+
 let highord_theory =
   let uc = empty_theory (id_fresh "HighOrd") [] in
   let uc = add_ty_decl uc [ts_func, Tabstract] in
@@ -752,9 +759,6 @@ let highord_theory =
   let uc = add_logic_decl uc [fs_func_app, None] in
   let uc = add_logic_decl uc [ps_pred_app, None] in
   close_theory uc
-
-let create_theory ?(path=[]) n =
-  use_export (empty_theory n path) builtin_theory
 
 let tuple_theory = Util.memo_int 17 (fun n ->
   let uc = empty_theory (id_fresh ("Tuple" ^ string_of_int n)) [] in

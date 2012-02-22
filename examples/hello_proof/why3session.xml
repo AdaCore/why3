@@ -5,11 +5,11 @@
  <prover
   id="alt-ergo"
   name="Alt-Ergo"
-  version="0.93"/>
+  version="0.94"/>
  <prover
   id="coq"
   name="Coq"
-  version="8.3pl2"/>
+  version="8.3pl3"/>
  <prover
   id="cvc3-2.2"
   name="CVC3"
@@ -21,7 +21,7 @@
  <prover
   id="eprover"
   name="Eprover"
-  version="1.4 Namring"/>
+  version="1.4"/>
  <prover
   id="gappa"
   name="Gappa"
@@ -69,7 +69,7 @@
     expanded="true"
     shape="t">
     <proof
-     prover="alt-ergo"
+     prover="z3-2"
      timelimit="5"
      edited=""
      obsolete="false">
@@ -78,6 +78,13 @@
     <proof
      prover="z3-3"
      timelimit="2"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="alt-ergo"
+     timelimit="5"
      edited=""
      obsolete="false">
      <result status="valid" time="0.00"/>
@@ -92,13 +99,6 @@
     <proof
      prover="simplify"
      timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="z3-2"
-     timelimit="5"
      edited=""
      obsolete="false">
      <result status="valid" time="0.00"/>
@@ -142,7 +142,7 @@
        <result status="unknown" time="0.50"/>
       </proof>
       <proof
-       prover="alt-ergo"
+       prover="z3-2"
        timelimit="5"
        edited=""
        obsolete="false">
@@ -156,15 +156,15 @@
        <result status="unknown" time="0.00"/>
       </proof>
       <proof
-       prover="simplify"
-       timelimit="10"
+       prover="alt-ergo"
+       timelimit="5"
        edited=""
        obsolete="false">
        <result status="unknown" time="0.00"/>
       </proof>
       <proof
-       prover="z3-2"
-       timelimit="5"
+       prover="simplify"
+       timelimit="10"
        edited=""
        obsolete="false">
        <result status="unknown" time="0.00"/>
@@ -177,7 +177,7 @@
       expanded="true"
       shape="fOt">
       <proof
-       prover="alt-ergo"
+       prover="z3-2"
        timelimit="5"
        edited=""
        obsolete="false">
@@ -186,6 +186,13 @@
       <proof
        prover="z3-3"
        timelimit="2"
+       edited=""
+       obsolete="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="alt-ergo"
+       timelimit="5"
        edited=""
        obsolete="false">
        <result status="valid" time="0.00"/>
@@ -205,13 +212,6 @@
        <result status="valid" time="0.00"/>
       </proof>
       <proof
-       prover="z3-2"
-       timelimit="5"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-      <proof
        prover="cvc3-2.4"
        timelimit="5"
        edited=""
@@ -223,12 +223,12 @@
    </goal>
    <goal
     name="G3"
-    sum="7fe60c475f2475c85d5b44f460c0a030"
+    sum="30f7a9e2b4315fc204f5d5e6bd9b23e3"
     proved="true"
     expanded="true"
     shape="ainfix >=ainfix *V0V0c0F">
     <proof
-     prover="alt-ergo"
+     prover="z3-2"
      timelimit="5"
      edited=""
      obsolete="false">
@@ -237,6 +237,13 @@
     <proof
      prover="z3-3"
      timelimit="2"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="alt-ergo"
+     timelimit="5"
      edited=""
      obsolete="false">
      <result status="valid" time="0.00"/>
@@ -254,13 +261,6 @@
      edited=""
      obsolete="false">
      <result status="unknown" time="0.00"/>
-    </proof>
-    <proof
-     prover="z3-2"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.00"/>
     </proof>
     <proof
      prover="cvc3-2.4"

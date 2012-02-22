@@ -64,6 +64,7 @@ module type S =
     val set_disjoint : 'a t -> 'b t -> bool
     val find_default : key -> 'a -> 'a t -> 'a
     val find_option : key -> 'a t -> 'a option
+    val find_exn : exn -> key -> 'a t -> 'a
     val map_filter: ('a -> 'b option) -> 'a t -> 'b t
     val mapi_filter: (key -> 'a -> 'b option) -> 'a t -> 'b t
     val mapi_fold:
@@ -516,6 +517,13 @@ module Make(Ord: OrderedType) = struct
           let c = Ord.compare x v in
           if c = 0 then Some d
           else find_option x (if c < 0 then l else r)
+
+    let rec find_exn exn x = function
+        Empty -> raise exn
+      | Node(l, v, d, r, _) ->
+          let c = Ord.compare x v in
+          if c = 0 then d
+          else find_exn exn x (if c < 0 then l else r)
 
     let rec map_filter f = function
         Empty -> Empty

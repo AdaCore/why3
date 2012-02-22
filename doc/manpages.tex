@@ -52,7 +52,7 @@ make install
 Installation can be tested as follows: 
 \begin{enumerate}
 \item install some external provers (see~Section\ref{provers} below)
-\item run \texttt{why3config --detect}
+\item run \verb|why3config --detect|
 \item run some examples from the distribution, \emph{e.g.} you should
 obtain the following:
 \begin{verbatim}
@@ -164,10 +164,10 @@ printer, as explained in the corresponding section.
 If the user's configuration file is already present,
 \texttt{why3config} will only reset unset variables to default value,
 but will not try to detect provers.
-The option \texttt{--detect-provers} should be used to force
+The option \verb|--detect-provers| should be used to force
 \why to detect again the available
 provers and to replace them in the configuration file. The option
-\texttt{--detect-plugins} will do the same for plugins.
+\verb|--detect-plugins| will do the same for plugins.
 
 \section{The \texttt{why3} command-line tool}
 \label{sec:why3ref}
@@ -187,28 +187,28 @@ The \texttt{why3} tool executes the following steps:
   stop if some plugin fails to load.
 \item Parse and typecheck the given files using the correct parser in order
   to obtain a set of \why theories for each file. It uses
-  the filename extension or the \texttt{--format} option to choose
-  among the available parsers. The \texttt{--list-format} option gives
+  the filename extension or the \verb|--format| option to choose
+  among the available parsers. The \verb|--list-format| option gives
   the list of registered parsers.
 \item Extract the selected goals inside each of the selected theories
   into tasks. The goals and theories are selected using the options
-  \texttt{-G/--goal} and \texttt{-T/--theory}. The option
-  \texttt{-T/--theory} applies to the last file appearing on the
-  command line, the option \texttt{-G/--goal} applies to the last theory
+  \verb|-G/--goal| and \verb|-T/--theory|. The option
+  \verb|-T/--theory| applies to the last file appearing on the
+  command line, the option \verb|-G/--goal| applies to the last theory
   appearing on the command line. If no theories are selected in a file,
   then every theory is considered as selected. If no goals are selected
   in a theory, then every goal is considered as selected.
 \item Apply the transformation requested
-  with \texttt{-a/--apply-transform} in their order of appearance on the
-  command line. \texttt{--list-transforms} list the known
+  with \verb|-a/--apply-transform| in their order of appearance on the
+  command line. \verb|--list-transforms| list the known
   transformations, plugins can add more of them.
-\item Apply the driver selected with the \texttt{-D/--driver} option,
-  or the driver of the prover selected with \texttt{-P/--prover}
-  option. \texttt{--list-provers} lists the known provers, i.e.~the ones
+\item Apply the driver selected with the \verb|-D/--driver| option,
+  or the driver of the prover selected with \verb|-P/--prover|
+  option. \verb|--list-provers| lists the known provers, i.e.~the ones
   which appear in the configuration file.
-\item If the option \texttt{-P/--prover} is given, call the selected prover
+\item If the option \verb|-P/--prover| is given, call the selected prover
   on each generated task and print the results. If the option
-  \texttt{-D/--driver} is given, print each generated task using
+  \verb|-D/--driver| is given, print each generated task using
   the format specified in the selected driver.
 \end{enumerate}
 
@@ -231,15 +231,15 @@ The provers can answer the following output:
 % \item TO BE COMPLETED *)
 % \end{itemize} *)
 
-The option \texttt{--bisect} change the behaviors of why3. With this
-option, \texttt{-P/--prover} and \texttt{-o/--output} must be given
+The option \verb|--bisect| change the behaviors of why3. With this
+option, \verb|-P/--prover| and \verb|-o/--output| must be given
 and a valid goal must be selected. The last step executed by why3 is
 replaced by computing a minimal set (in the great majority of the
 case) of declarations which still prove the goal. Currently it doesn't
 use any information provided by the prover, it call the prover
 multiple time with reduced context. The minimal set of declarations is
 then written in the prover syntax into a file located in the directory
-given to the \texttt{-o/--output} option.
+given to the \verb|-o/--output| option.
 
 \section{The \texttt{why3ide} GUI}
 \label{sec:ideref}
@@ -487,9 +487,9 @@ not and you have to use the IDE to update it.
 \begin{itemize}
 \item The exit code is 0 if no difference was detected, 1 if there
   was. Other exit codes mean some failure in running the replay.
-\item option \texttt{-s}: suppresses the output of the final tree view.
+\item option \verb|-s|: suppresses the output of the final tree view.
 \item option \texttt{-I \textsl{<path>}}: add \textsl{<path>} to the loadpath.
-\item option \texttt{-force}: force writing a new session file even if
+\item option \verb|-force|: force writing a new session file even if
   some proofs did not replay correctly.
 \item option \texttt{-smoke-detector \{none|top|deep\}} try to detect
   if the context is self-contradicting.
@@ -568,8 +568,117 @@ output.
 Figure~\ref{fig:replayer} proposes some suggestions for these macros, together
 with the table obtained from the hello proof example of Section~\ref{chap:starting}.
 
+\section{The \texttt{why3session} tool}
+\label{sec:why3session}
+
+The program \texttt{why3session} allows to manipulate why3 session on
+the command line. It thus allow to batch modifications to several
+sessions at once. This tool is subdivided into sub-commands:
+\texttt{info}, \texttt{rm}, \texttt{copy}, \texttt{mod}.
+
+Currently this tool report or modify only proof attempts.
+
+\texttt{why3session info} reports informations:
+\begin{itemize}
+\item the option \verb|--provers| prints the provers which appear
+  inside the session. One by line.
+\item the option \verb|--edited-files| prints all the files which
+  appear in the session as edited proofs.
+\item the option \verb|--tree| print the structure of the session as
+  an ASCII tree. The files, theories, goals are marked with a question
+  mark \verb|?|, if they are not verified. A proof is usually said verified
+  if it the proof result is \verb|valid| and the proof is not
+  obsolete. However here specially
+  we separate these two properties. On the one hand if the proof suffers from an internal
+  failure we mark it with an exclamation mark \verb|!|, otherwise if
+  it's not valid we mark it with a question mark \verb|?|, finally
+  if it's valid we add nothing. On the other hand if the proof is obsolete we mark it
+  with an \verb|O| and if it is archived we mark it with a
+  \verb|A|.
+\item the option \verb|--print0| separates the results of the options
+  \verb|provers| and \verb|--edited-files| by the character number
+  0 instead of end of line \verb|\n|. That can allows you to
+  safely use (even if the filename contains space or carriage return)
+  the result with other commands. For example you can count the number
+  of proof line in all the coq edited files in a session with:
+\begin{verbatim}
+why3session info --edited-files vstte12_bfs --print0 | xargs -0 coqwc
+\end{verbatim}
+  or you can add all the edited files in your favorite repository
+  with:
+\begin{verbatim}
+why3session info --edited-files --print0 vstte12_bfs.mlw | \
+    xargs -0 git add
+\end{verbatim}
+
+\end{itemize}
+
+The sub-commands \verb|why3session mod|, \verb|why3session copy|,
+\verb|why3session rm| share the same set of commands for selecting the
+proof attempts to work on:
+\begin{itemize}
+\item the option \verb|--filter-prover| selects only the proof attempt with
+  the given prover. This option can be specified multiple times to
+  allow to select all the proofs that corresponds to one of the given
+  prover. If this option is not specified the proof are simply not
+  filtered by there corresponding prover.
+\item the option \verb|--filter-verified yes| restricts the selection to
+  the proofs that are valids and not obsoletes. On contrary the option
+  \verb|--filter-verified no| select the ones that are not verified.
+  \verb|--filter-verified all|, the default, doesn't select on this property.
+\item the option \verb|--filter-verified-goal yes| restricts the selection
+  to the proofs of verified goals (that doesn't mean that the proof is
+  verified). Same for the other cases \verb|no| and \verb|all|.
+\item the option \verb|--filter-archived yes| restricts the selection
+  to the proofs that are archived. Same for the other cases \verb|no|
+  and \verb|all| except the default is \verb|no|.
+\end{itemize}
+
+The sub-command \verb|why3session mod| modifies properties of proof
+attempts:
+\begin{itemize}
+\item the option \verb|--set-obsolete| set the selected proofs to
+  obsolete
+\item the option \verb|--set-archived| set the selected proofs to archived
+\item the option \verb|--unset-archived| unset the selected proofs
+  from the archived
+\end{itemize}
+
+The commands \verb|why3session copy| copies a proof attempt to another
+provers but to the same goal. The new prover is specified by the option
+\verb|--to-prover|, for example \verb|--to-prover Alt-Ergo,0.94|.
+A question can arise if a proof with this prover already exists.
+You can choose between four behaviors of why3session:
+\begin{itemize}
+\item replace the proof regardless of it (\verb|-f, --force|)
+\item never replace such a proof (\verb|-n, --never|)
+\item replace the proof except if the proof is verified (valid and not
+  obsolete) (\verb|-c, --conservative|). It's the default
+\item ask the user each time the case arise (\verb|-i, --interactive|)
+\end{itemize}
 
 
+If you just want to update one session with updated provers you can
+use \verb|--convert-unknown| instead of the option \verb|--to-prover|.
+\begin{verbatim}
+why3session copy  --convert-unknown
+\end{verbatim}
+For each proof attempt not archived which correspond to an unknown
+prover, a prover which is not in \verb|.why3.conf|, it will try to find
+a known prover with the same name. If it finds one the proof is copied
+(the corresponding edited files are copied and regenerated for the known
+prover) to this known prover and
+the old proof is set to archived. An archived proof is not replayed by
+why3replayer.
+
+The sub-command \verb|why3session rm| removes the selected proof
+attempts. The option \verb|-i, --interactive|, \verb|-f, --force| and
+\verb|-c, --conservative| can also be used to respectively ask before
+each suppression, suppress all the selected proof (default) and remove
+only the proof that are not verified. The macro option \verb|--clean|
+corresponds to \verb|--filter-verified-goal --conservative| and
+removes the proof attempts that are not verified but which correspond
+to verified goals.
 
 \section{The \texttt{why3.conf} configuration file}
 \label{sec:whyconffile}

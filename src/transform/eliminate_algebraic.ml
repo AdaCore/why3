@@ -385,6 +385,9 @@ let eliminate_algebraic = Trans.compose compile_match
   (Trans.fold_map comp (empty_state false) None)
 
 let () =
+  Trans.register_transform "compile_match" compile_match
+
+let () =
   Trans.register_transform "eliminate_algebraic_smt" eliminate_algebraic_smt
 
 let () =

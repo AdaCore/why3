@@ -94,22 +94,21 @@ type plogic_type =
   | PPredicate of pty list
   | PFunction  of pty list * pty
 
-type imp_exp =
-  | Import | Export | Nothing
-
 type use = {
   use_theory  : qualid;
-  use_as      : ident option option;
-  use_imp_exp : imp_exp;
+  use_as      : string option;
+    (* None = as _, Some id = as id *)
+  use_imp_exp : bool option;
+    (* None = export, Some false = default, Some true = import *)
 }
 
 type clone_subst =
-  | CSns    of qualid option * qualid option
-  | CStsym  of qualid * qualid
-  | CSfsym  of qualid * qualid
-  | CSpsym  of qualid * qualid
-  | CSlemma of qualid
-  | CSgoal  of qualid
+  | CSns    of loc * qualid option * qualid option
+  | CStsym  of loc * qualid * qualid
+  | CSfsym  of loc * qualid * qualid
+  | CSpsym  of loc * qualid * qualid
+  | CSlemma of loc * qualid
+  | CSgoal  of loc * qualid
 
 type is_mutable = bool
 
@@ -153,14 +152,14 @@ type metarg =
   | PMAstr of string
   | PMAint of int
 
+type use_clone = loc * use * clone_subst list option
+
 type decl =
   | TypeDecl of type_decl list
   | LogicDecl of logic_decl list
   | IndDecl of ind_decl list
   | PropDecl of loc * prop_kind * ident * lexpr
-  | UseClone of loc * use * clone_subst list option
   | Meta of loc * ident * metarg list
-
 
 (* program files *)
 
@@ -242,11 +241,12 @@ type program_decl =
   | Dlet    of ident * expr
   | Dletrec of (ident * binder list * variant option * triple) list
   | Dlogic  of decl
+  | Duseclone of use_clone
   | Dparam  of ident * type_v
   | Dexn    of ident * pty option
   (* modules *)
-  | Duse    of qualid * imp_exp * (*as:*) ident option
-  | Dnamespace of loc * ident option * (* import: *) bool * program_decl list
+  | Duse    of qualid * bool option * (*as:*) string option
+  | Dnamespace of loc * string option * (* import: *) bool * program_decl list
 
 type theory = {
   pth_name   : ident;

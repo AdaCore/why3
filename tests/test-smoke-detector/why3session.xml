@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session SYSTEM "why3session.dtd">
+<why3session
+ name="tests/test-smoke-detector/why3session.xml">
+ <prover
+  id="0"
+  prover_id="alt-ergo" name="Alt-Ergo"
+  version="0.92.3"/>
+ <prover
+  id="1"
+  prover_id="cvc3" name="CVC3"
+  version="2.2"/>
+ <prover
+  id="2"
+  prover_id="z3" name="Z3"
+  version="2.19"/>
+ <file
+  name="../test-smoke-detector.why"
+  verified="false"
+  expanded="true">
+  <theory
+   name="T"
+   locfile="tests/test-smoke-detector/../test-smoke-detector.why"
+   loclnum="1" loccnumb="7" loccnume="8"
+   verified="false"
+   expanded="true">
+   <goal
+    name="G1_true"
+    locfile="tests/test-smoke-detector/../test-smoke-detector.why"
+    loclnum="6" loccnumb="5" loccnume="12"
+    sum="8cb3b08ce41cd6c1e9beb57f8bb7817c"
+    proved="true"
+    expanded="true"
+    shape="ainfix =ainfix -afV0c1V0F">
+    <proof
+     prover="2"
+     timelimit="10"
+     obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="0"
+     timelimit="10"
+     obsolete="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="10"
+     obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
+    name="G2_false"
+    locfile="tests/test-smoke-detector/../test-smoke-detector.why"
+    loclnum="8" loccnumb="5" loccnume="13"
+    sum="fed8a0d537059768f6e889a95156f7c1"
+    proved="false"
+    expanded="true"
+    shape="ainfix =afV0V0F">
+    <proof
+     prover="2"
+     timelimit="10"
+     obsolete="false">
+     <result status="unknown" time="0.00"/>
+    </proof>
+    <proof
+     prover="0"
+     timelimit="10"
+     obsolete="false">
+     <result status="unknown" time="0.01"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="10"
+     obsolete="false">
+     <result status="unknown" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
+    name="G1W"
+    locfile="tests/test-smoke-detector/../test-smoke-detector.why"
+    loclnum="12" loccnumb="5" loccnume="8"
+    sum="ca7a21f69f4882da29696957144e0b92"
+    proved="true"
+    expanded="true"
+    shape="ainfix =ainfix -afV0c1V0F">
+    <proof
+     prover="2"
+     timelimit="10"
+     obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="0"
+     timelimit="10"
+     obsolete="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="10"
+     obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
+    name="G2W"
+    locfile="tests/test-smoke-detector/../test-smoke-detector.why"
+    loclnum="14" loccnumb="5" loccnume="8"
+    sum="690a3390cad61fb168e3dbf434e84373"
+    proved="true"
+    expanded="true"
+    shape="ainfix =afV0V0F">
+    <proof
+     prover="2"
+     timelimit="10"
+     obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="0"
+     timelimit="10"
+     obsolete="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="10"
+     obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
+    name="G3W"
+    locfile="tests/test-smoke-detector/../test-smoke-detector.why"
+    loclnum="16" loccnumb="5" loccnume="8"
+    sum="a412f237b6aeba36b4eb099898d037aa"
+    proved="true"
+    expanded="true"
+    shape="ainfix =afV0ainfix *c2V0F">
+    <proof
+     prover="2"
+     timelimit="10"
+     obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="0"
+     timelimit="10"
+     obsolete="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="10"
+     obsolete="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+  </theory>
+ </file>
+</why3session>

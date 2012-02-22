@@ -1,103 +1,70 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
 <why3session
- name="bts/12475/why3session.xml">
+ name="examples/bts/12475/why3session.xml">
  <prover
-  id="alt-ergo"
+  id="0"
   name="Alt-Ergo"
   version="0.94"/>
  <prover
-  id="alt-ergo-0.93.1"
-  name="Alt-Ergo"
-  version="0.93.1"/>
- <prover
-  id="coq"
-  name="Coq"
-  version="8.3pl2"/>
- <prover
-  id="cvc3-2.2"
+  id="1"
   name="CVC3"
   version="2.2"/>
  <prover
-  id="cvc3-2.4"
-  name="CVC3"
-  version="2.4.1"/>
- <prover
-  id="eprover"
-  name="Eprover"
-  version="1.4 Namring"/>
- <prover
-  id="gappa"
+  id="2"
   name="Gappa"
-  version="0.15.1"/>
+  version="0.16.0"/>
  <prover
-  id="simplify"
-  name="Simplify"
-  version="1.5.4"/>
- <prover
-  id="spass"
-  name="Spass"
-  version="3.7"/>
- <prover
-  id="vampire"
-  name="Vampire"
-  version="0.6"/>
- <prover
-  id="verit"
-  name="veriT"
-  version="dev"/>
- <prover
-  id="yices"
-  name="Yices"
-  version="1.0.25"/>
- <prover
-  id="z3-2"
+  id="3"
   name="Z3"
   version="2.19"/>
- <prover
-  id="z3-3"
-  name="Z3"
-  version="3.2"/>
  <file
   name="../12475.why"
   verified="true"
   expanded="true">
   <theory
    name="Stmt"
+   locfile="examples/bts/12475/../12475.why"
+   loclnum="1" loccnumb="7" loccnume="11"
    verified="true"
    expanded="true">
+   <label
+    name="some_statement">
+    </label>
    <goal
     name="toto"
-    sum="165013fe8031c756d7de7572f7f8946f"
+    locfile="examples/bts/12475/../12475.why"
+    loclnum="6" loccnumb="7" loccnume="11"
+    sum="2ba9689c5337113bcea3af15657e9144"
     proved="true"
     expanded="true"
     shape="ainfix <V0ainfix +aroundaUpV0c1.F">
     <proof
-     prover="z3-2"
+     prover="3"
      timelimit="2"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="cvc3-2.2"
+     prover="1"
      timelimit="2"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="alt-ergo"
+     prover="0"
      timelimit="2"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="gappa"
-     timelimit="2"
-     edited=""
-     obsolete="false">
+     prover="2"
+     timelimit="5"
+     obsolete="false"
+     archived="false">
      <result status="unknown" time="0.00"/>
     </proof>
    </goal>

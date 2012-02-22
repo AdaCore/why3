@@ -43,3 +43,18 @@ end
 module Make (T : Tree) : sig
   val print : Format.formatter -> T.t -> unit
 end
+
+
+(** With type variable *)
+module type PTree = sig
+  type 'a t
+  val decomp : 'a t -> string * 'a t list
+end
+
+(*s The functor [Make] takes a tree structure [T] as argument and provides a
+    single function [print: formatter -> T.t -> unit] to print a tree on a
+    given formatter. *)
+
+module PMake (T : PTree) : sig
+  val print : Format.formatter -> 'a T.t -> unit
+end

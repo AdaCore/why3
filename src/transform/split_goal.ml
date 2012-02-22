@@ -41,21 +41,20 @@ let split_case forig spl c acc tl bl =
   apply_append fn acc bll
 
 let asym_split = Term.asym_label
-let stop_split = "stop_split"
+let stop_split = Ident.create_label "stop_split"
 
-let asym f = List.mem asym_split f.t_label
-let stop f = List.mem stop_split f.t_label
+let asym f = Slab.mem asym_split f.t_label
+let stop f = Slab.mem stop_split f.t_label
 
 let unstop f =
-  let ll = List.filter ((<>) stop_split) f.t_label in
-  t_label ?loc:f.t_loc ll f
+  t_label ?loc:f.t_loc (Slab.remove stop_split f.t_label) f
 
 let rec split_pos ro acc f = match f.t_node with
   | _ when ro && stop f -> unstop f :: acc
   | Ttrue -> acc
   | Tfalse -> f::acc
   | Tapp _ -> f::acc
-  | Tbinop (Tand,f1,f2) when asym f ->
+  | Tbinop (Tand,f1,f2) when asym f1 ->
       split_pos ro (split_pos ro acc (t_implies f1 f2)) f1
   | Tbinop (Tand,f1,f2) ->
       split_pos ro (split_pos ro acc f2) f1
@@ -102,7 +101,7 @@ and split_neg ro acc f = match f.t_node with
   | Tbinop (Tand,f1,f2) ->
       let fn f1 f2 = t_label_copy f (t_and f1 f2) in
       apply_append2 fn acc (split_neg ro [] f1) (split_neg ro [] f2)
-  | Tbinop (Timplies,f1,f2) when asym f ->
+  | Tbinop (Timplies,f1,f2) when asym f1 ->
       split_neg ro (split_neg ro acc (t_and f1 f2)) (t_not f1)
   | Tbinop (Timplies,f1,f2) ->
       split_neg ro (split_neg ro acc f2) (t_not f1)
@@ -110,7 +109,7 @@ and split_neg ro acc f = match f.t_node with
       let f12 = t_label_copy f (t_and f1 f2) in
       let f21 = t_label_copy f (t_and (t_not f1) (t_not f2)) in
       split_neg ro (split_neg ro acc f21) f12
-  | Tbinop (Tor,f1,f2) when asym f ->
+  | Tbinop (Tor,f1,f2) when asym f1 ->
       split_neg ro (split_neg ro acc (t_and (t_not f1) f2)) f1
   | Tbinop (Tor,f1,f2) ->
       split_neg ro (split_neg ro acc f2) f1
@@ -184,7 +183,7 @@ let rec split_intro pr dl acc f =
   let rsp = split_intro pr dl in
   match f.t_node with
   | Ttrue -> acc
-  | Tbinop (Tand,f1,f2) when asym f ->
+  | Tbinop (Tand,f1,f2) when asym f1 ->
       rsp (rsp acc (t_implies f1 f2)) f1
   | Tbinop (Tand,f1,f2) ->
       rsp (rsp acc f2) f1

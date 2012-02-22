@@ -19,8 +19,8 @@
 
 open Format
 open Why3
+module C = Whyconf
 
-let includes = ref []
 let files = Queue.create ()
 let opt_version = ref false
 let output_dir = ref ""
@@ -49,9 +49,6 @@ let set_opt_pp_in,set_opt_pp_cmd,set_opt_pp_out =
   (fun s -> opt_pp := (!suf,(!cmd,s))::!opt_pp)
 
 let spec = Arg.align [
-  ("-I",
-   Arg.String (fun s -> includes := s :: !includes),
-   "<s> Add s to loadpath") ;
   ("-v",
    Arg.Set opt_version,
    " Print version information") ;
@@ -83,7 +80,10 @@ replace by the input file and '%o' which will be replaced by the output file.";
     "--coqdoc",
   Arg.Unit (fun ()->
     opt_pp := (".v",("coqdoc --no-index --html -o %o %i",".html"))::!opt_pp),
-  " same as '--add_pp .v \"coqdoc --no-index --html -o %o %i\" .html'"
+  " same as '--add_pp .v \"coqdoc --no-index --html -o %o %i\" .html'";
+    Debug.Opt.desc_debug_list;
+    Debug.Opt.desc_debug_all;
+    Debug.Opt.desc_debug;
 ]
 
 
@@ -109,6 +109,10 @@ let () =
 (*   List.iter (fun (in_,(cmd,out)) -> *)
 (*     printf "in : %s, cmd : %s, out : %s@." in_ cmd out) !opt_pp *)
 
+let () =
+  Debug.Opt.set_flags_selected ();
+  if  Debug.Opt.option_list () then exit 0
+
 let output_dir =
   match !output_dir with
     | "" -> printf
@@ -122,25 +126,20 @@ let output_dir =
 
 let edited_dst = Filename.concat output_dir "edited"
 
-let allow_obsolete = !allow_obsolete
-let includes = List.rev !includes
+let whyconf = Whyconf.read_config !opt_config
 
-open Session_ro
-
-let env = read_config ~includes !opt_config
-
+open Session
 open Util
-
 
 type context =
     (string ->
-     (formatter -> Session_ro.session -> unit) -> Session_ro.session
+     (formatter -> notask session -> unit) -> notask session
      -> unit, formatter, unit) format
 
 let run_file (context : context) print_session f =
   let session_path = get_project_dir f in
   let basename = Filename.basename session_path in
-  let session = read_project_dir ~allow_obsolete ~env session_path in
+  let session = read_session session_path in
   let cout = if output_dir = "-" then stdout else
       open_out (Filename.concat output_dir (basename^".html")) in
   let fmt = formatter_of_out_channel cout in
@@ -154,47 +153,48 @@ let run_file (context : context) print_session f =
 module Simple =
 struct
 
-  let print_prover fmt pd = fprintf fmt "%s" pd.prover_name
+  let print_prover = Whyconf.print_prover
 
   let print_proof_status fmt = function
-    | Undone -> fprintf fmt "Undone"
+    | Undone _ -> fprintf fmt "Undone"
     | Done pr -> fprintf fmt "Done : %a" Call_provers.print_prover_result pr
     | InternalFailure exn ->
       fprintf fmt "Failure : %a"Exn_printer.exn_printer exn
 
   let print_proof_attempt fmt pa =
     fprintf fmt "<li>%a : %a</li>"
-      print_prover pa.prover
+      print_prover pa.proof_prover
       print_proof_status pa.proof_state
 
   let rec print_transf fmt tr =
     fprintf fmt "<li>%s : <ul>%a</ul></li>"
       tr.transf_name
-      (Pp.print_list Pp.newline print_goal) tr.subgoals
+      (Pp.print_list Pp.newline print_goal) tr.transf_goals
 
   and print_goal fmt g =
     fprintf fmt "<li>%s : <ul>%a%a</ul></li>"
-      g.goal_name
-      (Pp.print_iter2 Mstr.iter Pp.newline Pp.nothing
+      g.goal_name.Ident.id_string
+      (Pp.print_iter2 PHprover.iter Pp.newline Pp.nothing
          Pp.nothing print_proof_attempt)
-      g.external_proofs
-      (Pp.print_iter2 Mstr.iter Pp.newline Pp.nothing
+      g.goal_external_proofs
+      (Pp.print_iter2 PHstr.iter Pp.newline Pp.nothing
          Pp.nothing print_transf)
-      g.transformations
+      g.goal_transformations
 
   let print_theory fmt th =
     fprintf fmt "<li>%s : <ul>%a</ul></li>"
-      th.theory_name
-      (Pp.print_list Pp.newline print_goal) th.goals
+      th.theory_name.Ident.id_string
+      (Pp.print_list Pp.newline print_goal) th.theory_goals
 
   let print_file fmt f =
     fprintf fmt "<li>%s : <ul>%a</ul></li>"
       f.file_name
-      (Pp.print_list Pp.newline print_theory) f.theories
+      (Pp.print_list Pp.newline print_theory) f.file_theories
 
   let print_session _name fmt s =
     fprintf fmt "<ul>%a</ul>"
-      (Pp.print_list Pp.newline print_file) s.files
+      (Pp.print_iter2 PHstr.iter Pp.newline Pp.nothing Pp.nothing
+         print_file) s.session_files
 
 
   let context : context = "<!DOCTYPE html
@@ -223,10 +223,10 @@ struct
     then fprintf fmt "class='verified'"
     else fprintf fmt "class='notverified'"
 
-  let print_prover fmt pd = fprintf fmt "%s" pd.prover_name
+  let print_prover = Whyconf.print_prover
 
   let print_proof_status fmt = function
-    | Undone -> fprintf fmt "<span class='notverified'>Undone</span>"
+    | Undone _ -> fprintf fmt "<span class='notverified'>Undone</span>"
     | Done pr -> fprintf fmt "<span class='verified'>Done : %a</span>"
       Call_provers.print_prover_result pr
     | InternalFailure exn ->
@@ -268,17 +268,17 @@ struct
       base_dst
 
   let print_proof_attempt fmt pa =
-    match pa.edited_as with
+    match pa.proof_edited_as with
       | None ->
         fprintf fmt "@[<hov><li rel='prover' ><a href='#'>%a : %a</a></li>@]"
-          print_prover pa.prover
+          print_prover pa.proof_prover
           print_proof_status pa.proof_state
       | Some f ->
         let output = find_pp f in
         fprintf fmt "@[<hov><li rel='prover' ><a href='#' \
 onclick=\"showedited('%s'); return false;\">%a : %a</a></li>@]"
           output
-          print_prover pa.prover
+          print_prover pa.proof_prover
           print_proof_status pa.proof_state
 
   let rec print_transf fmt tr =
@@ -287,28 +287,28 @@ onclick=\"showedited('%s'); return false;\">%a : %a</a></li>@]"
 <span %a>%s</span></a>@,<ul>%a</ul></li>@]"
       print_verified tr.transf_verified
       tr.transf_name
-      (Pp.print_list Pp.newline print_goal) tr.subgoals
+      (Pp.print_list Pp.newline print_goal) tr.transf_goals
 
   and print_goal fmt g =
     fprintf fmt
       "@[<hov><li rel='goal'><a href='#'>\
 <span %a>%s</a></a>@,<ul>%a%a</ul></li>@]"
       print_verified g.goal_verified
-      g.goal_name
-      (Pp.print_iter2 Mstr.iter Pp.newline Pp.nothing
+      g.goal_name.Ident.id_string
+      (Pp.print_iter2 PHprover.iter Pp.newline Pp.nothing
          Pp.nothing print_proof_attempt)
-      g.external_proofs
-      (Pp.print_iter2 Mstr.iter Pp.newline Pp.nothing
+      g.goal_external_proofs
+      (Pp.print_iter2 PHstr.iter Pp.newline Pp.nothing
          Pp.nothing print_transf)
-      g.transformations
+      g.goal_transformations
 
   let print_theory fmt th =
     fprintf fmt
       "@[<hov><li rel='theory'><a href='#'>\
 <span %a>%s</span></a>@,<ul>%a</ul></li>@]"
       print_verified th.theory_verified
-      th.theory_name
-      (Pp.print_list Pp.newline print_goal) th.goals
+      th.theory_name.Ident.id_string
+      (Pp.print_list Pp.newline print_goal) th.theory_goals
 
   let print_file fmt f =
     fprintf fmt
@@ -316,12 +316,13 @@ onclick=\"showedited('%s'); return false;\">%a : %a</a></li>@]"
 <span %a>%s</span></a>@,<ul>%a</ul></li>@]"
       print_verified f.file_verified
       f.file_name
-      (Pp.print_list Pp.newline print_theory) f.theories
+      (Pp.print_list Pp.newline print_theory) f.file_theories
 
   let print_session_aux name fmt s =
     fprintf fmt "@[<hov><ul><a href='#'>%s</a>@,%a</ul>@]"
       name
-      (Pp.print_list Pp.newline print_file) s.files
+      (Pp.print_iter2 PHstr.iter Pp.newline Pp.nothing Pp.nothing print_file)
+      s.session_files
 
 
   let print_session name fmt s =
@@ -398,7 +399,7 @@ $(function () {
       if not (Sys.file_exists edited_dst) then Unix.mkdir edited_dst 0o755;
     Queue.iter (run_file context print_session) files;
     if !opt_context then
-      let data_dir = Whyconf.datadir (Whyconf.get_main env.config) in
+      let data_dir = Whyconf.datadir (Whyconf.get_main whyconf) in
       (** copy images *)
       let img_dir_src = Filename.concat data_dir "images" in
       let img_dir_dst = Filename.concat output_dir "images" in

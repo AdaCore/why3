@@ -219,9 +219,11 @@ let ty_match s ty1 ty2 =
 
 let ts_int  = create_tysymbol (id_fresh "int")  [] None
 let ts_real = create_tysymbol (id_fresh "real") [] None
+let ts_bool = create_tysymbol (id_fresh "bool") [] None
 
 let ty_int  = ty_app ts_int  []
 let ty_real = ty_app ts_real []
+let ty_bool = ty_app ts_bool []
 
 let ts_func =
   let tv_a = create_tvsymbol (id_fresh "a") in

@@ -13,7 +13,7 @@ module McCarthy91
       f91 (f91 (n + 11))
     else
       n - 10
-    { (n <= 100 /\ result = 91) \/ (n >= 101 /\ result = n - 10) }
+    { result = if n <= 100 then 91 else n - 10 }
 
 
   (* non-recursive implementation using a while loop *)
@@ -21,7 +21,7 @@ module McCarthy91
   use import module ref.Ref
   use import int.Lex2
 
-  function f (x: int) : int = if x >= 101 then x-10 else 91
+  function f (x: int) : int = if x <= 100 then 91 else x-10
 
   (* iter k x = f^k(x) *)
   clone import int.Iter with type t = int, function f = f

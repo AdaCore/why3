@@ -22,13 +22,40 @@ open Util
 
 (** Labels *)
 
-type label = string
+type label = {
+  lab_string : string;
+  lab_tag    : int;
+}
+
+module Lab = StructMake (struct
+  type t = label
+  let tag lab = lab.lab_tag
+end)
+
+module Slab = Lab.S
+module Mlab = Lab.M
+
+module Hslab = Hashcons.Make (struct
+  type t = label
+  let equal lab1 lab2 = lab1.lab_string = lab2.lab_string
+  let hash lab = Hashtbl.hash lab.lab_string
+  let tag n lab = { lab with lab_tag = n }
+end)
+
+let create_label s = Hslab.hashcons {
+  lab_string = s;
+  lab_tag    = -1
+}
+
+let lab_equal : label -> label -> bool = (==)
+
+let lab_hash (lab : label) = lab.lab_tag
 
 (** Identifiers *)
 
 type ident = {
   id_string : string;               (* non-unique name *)
-  id_label  : label list;           (* identifier labels *)
+  id_label  : Slab.t;               (* identifier labels *)
   id_loc    : Loc.position option;  (* optional location *)
   id_tag    : Hashweak.tag;         (* unique magical tag *)
 }
@@ -60,17 +87,19 @@ let create_ident name labels loc = {
   id_tag    = Hashweak.dummy_tag;
 }
 
-let id_fresh ?(label = []) ?loc nm =
+let id_fresh ?(label = Slab.empty) ?loc nm =
   create_ident nm label loc
 
-let id_user ?(label = []) nm loc =
+let id_user ?(label = Slab.empty) nm loc =
   create_ident nm label (Some loc)
 
-let id_clone ?(label = []) id =
-  create_ident id.id_string (label @ id.id_label) id.id_loc
+let id_clone ?(label = Slab.empty) id =
+  let ll = Slab.union label id.id_label in
+  create_ident id.id_string ll id.id_loc
 
-let id_derive ?(label = []) nm id =
-  create_ident nm (label @ id.id_label) id.id_loc
+let id_derive ?(label = Slab.empty) nm id =
+  let ll = Slab.union label id.id_label in
+  create_ident nm ll id.id_loc
 
 (** Unique names for pretty printing *)
 
@@ -164,8 +193,14 @@ let char_to_ualpha c = String.capitalize (char_to_alpha c)
 let char_to_alnum c =
   match c with '0'..'9' -> String.make 1 c | _ -> char_to_alpha c
 
+let char_to_lalnum c =
+  match c with '0'..'9' -> String.make 1 c | _ -> char_to_lalpha c
+
 let char_to_alnumus c =
   match c with '_' | ' ' -> "_" | _ -> char_to_alnum c
+
+let char_to_lalnumus c =
+  match c with '_' | ' ' -> "_" | _ -> char_to_lalnum c
 
 let sanitizer head rest n =
   let lst = ref [] in

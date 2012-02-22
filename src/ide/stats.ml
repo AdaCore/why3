@@ -16,7 +16,9 @@
 open Format
 open Why3
 open Util
-open Session_ro
+module C = Whyconf
+
+open Session
 
 let includes = ref []
 let files = Queue.create ()
@@ -39,6 +41,9 @@ let spec = Arg.align [
   ("-v",
    Arg.Set opt_version,
    " print version information") ;
+    Debug.Opt.desc_debug_list;
+    Debug.Opt.desc_debug_all;
+    Debug.Opt.desc_debug;
 ]
 
 let version_msg = Format.sprintf "Why3 statistics, version 0.1"
@@ -59,34 +64,37 @@ let () =
 
 let allow_obsolete = !allow_obsolete
 
-let env = read_config ~includes:!includes !opt_config
+let () =
+  Debug.Opt.set_flags_selected ();
+  if  Debug.Opt.option_list () then exit 0
 
+let string_of_prover p = Pp.string_of_wnl C.print_prover p
 
 type proof_stats =
     { mutable no_proof : Sstr.t;
       mutable only_one_proof : Sstr.t;
-      prover_min_time : (string, float) Hashtbl.t;
-      prover_avg_time : (string, float) Hashtbl.t;
-      prover_max_time : (string, float) Hashtbl.t;
-      prover_num_proofs : (string, int) Hashtbl.t;
-      prover_data : (string, string) Hashtbl.t
+      prover_min_time : float C.Hprover.t;
+      prover_avg_time : float C.Hprover.t;
+      prover_max_time : float C.Hprover.t;
+      prover_num_proofs : int C.Hprover.t;
+      prover_data : (string) C.Hprover.t
     }
 
 let new_proof_stats () =
   { no_proof = Sstr.empty;
     only_one_proof = Sstr.empty;
-    prover_min_time = Hashtbl.create 3;
-    prover_avg_time = Hashtbl.create 3;
-    prover_max_time = Hashtbl.create 3;
-    prover_num_proofs =  Hashtbl.create 3;
-    prover_data = Hashtbl.create 3 }
+    prover_min_time = C.Hprover.create 3;
+    prover_avg_time = C.Hprover.create 3;
+    prover_max_time = C.Hprover.create 3;
+    prover_num_proofs =  C.Hprover.create 3;
+    prover_data = C.Hprover.create 3 }
 
 let apply_f_on_hashtbl_entry ~tbl ~f ~name  =
   try
-    let cur_time = Hashtbl.find tbl name in
-    Hashtbl.replace tbl name (f (Some cur_time))
+    let cur_time = C.Hprover.find tbl name in
+    C.Hprover.replace tbl name (f (Some cur_time))
   with Not_found ->
-    Hashtbl.add tbl name (f None)
+    C.Hprover.add tbl name (f None)
 
 let update_min_time tbl (prover, time) =
   apply_f_on_hashtbl_entry
@@ -127,10 +135,10 @@ let update_perf_stats stats prover_and_time =
   update_count stats.prover_num_proofs prover_and_time
 
 let rec stats_of_goal prefix_name stats goal =
-  let ext_proofs = goal.external_proofs in
-  let proof_id = prefix_name ^ goal.goal_name in
+  let ext_proofs = goal.goal_external_proofs in
+  let proof_id = prefix_name ^ goal.goal_name.Ident.id_string in
   let proof_list =
-    Mstr.fold
+    PHprover.fold
       (fun prover proof_attempt acc ->
         match proof_attempt.proof_state with
           | Done result ->
@@ -144,45 +152,47 @@ let rec stats_of_goal prefix_name stats goal =
           | _ -> acc)
       ext_proofs
       [] in
-  let no_transf = Mstr.is_empty goal.transformations in
+  let no_transf = PHstr.length goal.goal_transformations = 0 in
   begin match proof_list with
     | [] when no_transf ->
       stats.no_proof <- Sstr.add proof_id stats.no_proof
     | [ (prover, time) ] when no_transf ->
       stats.only_one_proof <-
-        Sstr.add (proof_id ^ " : " ^ prover) stats.only_one_proof;
+        Sstr.add
+        (proof_id ^ " : " ^ (string_of_prover prover))
+           stats.only_one_proof;
       update_perf_stats stats (prover, time)
     | _ ->
       List.iter (update_perf_stats stats) proof_list end;
-  Mstr.iter (stats_of_transf prefix_name stats) goal.transformations
+  PHstr.iter (stats_of_transf prefix_name stats) goal.goal_transformations
 
 and stats_of_transf prefix_name stats _ transf =
   let prefix_name = prefix_name ^ transf.transf_name  ^ " / " in
-  List.iter (stats_of_goal prefix_name stats) transf.subgoals
+  List.iter (stats_of_goal prefix_name stats) transf.transf_goals
 
 let stats_of_theory file stats theory =
-  let goals = theory.goals in
-  let prefix_name = file.file_name ^ " / " ^ theory.theory_name
+  let goals = theory.theory_goals in
+  let prefix_name = file.file_name ^ " / " ^ theory.theory_name.Ident.id_string
     ^  " / " in
   List.iter (stats_of_goal prefix_name stats) goals
 
-let stats_of_file stats file =
-  let theories = file.theories in
+let stats_of_file stats _ file =
+  let theories = file.file_theories in
   List.iter (stats_of_theory file stats) theories
 
 let fill_prover_data stats session =
-  Mstr.iter
-    (fun prover data ->
-      Hashtbl.add stats.prover_data prover
-        (data.prover_name ^ " " ^ data.prover_version))
-    session.provers
+  C.Sprover.iter
+    (fun prover ->
+      C.Hprover.add stats.prover_data prover
+        (prover.C.prover_name ^ " " ^ prover.C.prover_version))
+    (get_used_provers session)
 
 let extract_stats_from_file stats fname =
   let project_dir = get_project_dir fname in
   try
-    let session = read_project_dir ~allow_obsolete ~env project_dir in
+    let session = read_session project_dir in
     fill_prover_data stats session;
-    List.iter (stats_of_file stats) session.files
+    PHstr.iter (stats_of_file stats) session.session_files
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "Error while opening session with database '%s' : %a@." project_dir
       Exn_printer.exn_printer e;
@@ -190,15 +200,17 @@ let extract_stats_from_file stats fname =
     exit 1
 
 let finalize_stats stats =
-  Hashtbl.iter
+  C.Hprover.iter
     (fun prover time ->
-      let n = Hashtbl.find stats.prover_num_proofs prover in
-      Hashtbl.replace stats.prover_avg_time prover (time /. (float_of_int n)))
+      let n = C.Hprover.find stats.prover_num_proofs prover in
+      C.Hprover.replace stats.prover_avg_time prover
+        (time /. (float_of_int n)))
     stats.prover_avg_time
 
 let print_stats stats =
   printf "== Provers available ==@\n  @[";
-  Hashtbl.iter (fun prover data -> printf "%-10s: %s@\n" prover data)
+  C.Hprover.iter (fun prover data -> printf "%-10s: %s@\n"
+    (string_of_prover prover) data)
     stats.prover_data;
   printf "@]@\n";
 
@@ -211,22 +223,26 @@ let print_stats stats =
   printf "@]@\n";
 
   printf "== Number of proofs per prover ==@\n  @[";
-  Hashtbl.iter (fun prover n -> printf "%-10s: %d@\n" prover n)
+  C.Hprover.iter (fun prover n -> printf "%-10s: %d@\n"
+    (string_of_prover prover) n)
     stats.prover_num_proofs;
   printf "@]@\n";
 
   printf "== Minimum time per prover ==@\n  @[";
-  Hashtbl.iter (fun prover time -> printf "%-10s : %.3f s@\n" prover time)
+  C.Hprover.iter (fun prover time -> printf "%-10s : %.3f s@\n"
+    (string_of_prover prover) time)
     stats.prover_min_time;
   printf "@]@\n";
 
   printf "== Maximum time per prover ==@\n  @[";
-  Hashtbl.iter (fun prover time -> printf "%-10s : %.3f s@\n" prover time)
+  C.Hprover.iter (fun prover time -> printf "%-10s : %.3f s@\n"
+    (string_of_prover prover) time)
     stats.prover_max_time;
   printf "@]@\n";
 
   printf "== Average time per prover ==@\n  @[";
-  Hashtbl.iter (fun prover time -> printf "%-10s : %.3f s@\n" prover time)
+  C.Hprover.iter (fun prover time -> printf "%-10s : %.3f s@\n"
+    (string_of_prover prover) time)
     stats.prover_avg_time;
   printf "@]@\n"
 

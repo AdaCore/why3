@@ -27,12 +27,15 @@ theory BuiltIn
   syntax predicate  (=)   "(%1 = %2)"
 end
 
-theory bool.Bool
+theory Bool
 
   syntax type bool   "bool"
 
   syntax function True  "true"
   syntax function False "false"
+end
+
+theory bool.Bool
 
   syntax function andb  "(andb %1 %2)"
   syntax function orb   "(orb %1 %2)"
@@ -72,6 +75,7 @@ theory int.Int
   remove prop NonTrivialRing
   remove prop CompatOrderAdd
   remove prop CompatOrderMult
+  remove prop ZeroLessOne
 
 end
 
@@ -168,6 +172,7 @@ theory real.Real
   remove prop NonTrivialRing
   remove prop CompatOrderAdd
   remove prop CompatOrderMult
+  remove prop ZeroLessOne
   remove prop Refl
   remove prop Trans
   remove prop Antisymm

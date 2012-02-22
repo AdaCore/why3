@@ -19,3 +19,5 @@
 
 val eliminate_inductive : Task.task Trans.trans
 
+(* exported to be used in the PVS printer *)
+val exi: Term.term list -> 'a * Term.term -> Term.term

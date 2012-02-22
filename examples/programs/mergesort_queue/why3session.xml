@@ -1,0 +1,618 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session SYSTEM "why3session.dtd">
+<why3session
+ name="examples/programs/mergesort_queue/why3session.xml">
+ <prover
+  id="0"
+  prover_id="alt-ergo" name="Alt-Ergo"
+  version="0.94"/>
+ <prover
+  id="1"
+  prover_id="coq" name="Coq"
+  version="8.3pl3"/>
+ <prover
+  id="2"
+  prover_id="cvc3-2.2" name="CVC3"
+  version="2.2"/>
+ <file
+  name="../mergesort_queue.mlw"
+  verified="true"
+  expanded="true">
+  <theory
+   name="WP MergesortQueue"
+   locfile="examples/programs/mergesort_queue/../mergesort_queue.mlw"
+   loclnum="2" loccnumb="7" loccnume="21"
+   verified="true"
+   expanded="true">
+   <goal
+    name="WP_parameter merge"
+    locfile="examples/programs/mergesort_queue/../mergesort_queue.mlw"
+    loclnum="20" loccnumb="6" loccnume="11"
+    expl="parameter merge"
+    sum="d5e9a7f80ec4cdce742e51f81cc5ca6e"
+    proved="true"
+    expanded="true"
+    shape="iainfix >alengthV5c0iainfix =alengthV5c0ainfix =V4aNilAainfix =V6V4NFAainfix <ainfix +alengthV5alengthV7ainfix +alengthV5alengthV4Aainfix <=c0ainfix +alengthV5alengthV4Aapermutainfix ++ainfix ++V9V5V7ainfix ++V2V1Iainfix =V9ainfix ++V3aConsV8aNilFICV4aNilfaConsVVainfix =V7V11Aainfix =V8V10FFiainfix =alengthV4c0ainfix =V5aNilAainfix =V12V5NFAainfix <ainfix +alengthV13alengthV4ainfix +alengthV5alengthV4Aainfix <=c0ainfix +alengthV5alengthV4Aapermutainfix ++ainfix ++V15V13V4ainfix ++V2V1Iainfix =V15ainfix ++V3aConsV14aNilFICV5aNilfaConsVVainfix =V13V17Aainfix =V14V16FFainfix =V5aNilNAainfix =V4aNilNAialeV18V19ainfix =V5aNilAainfix =V20V5NFAainfix <ainfix +alengthV21alengthV4ainfix +alengthV5alengthV4Aainfix <=c0ainfix +alengthV5alengthV4Aapermutainfix ++ainfix ++V23V21V4ainfix ++V2V1Iainfix =V23ainfix ++V3aConsV22aNilFICV5aNilfaConsVVainfix =V21V25Aainfix =V22V24FFainfix =V4aNilAainfix =V26V4NFAainfix <ainfix +alengthV5alengthV27ainfix +alengthV5alengthV4Aainfix <=c0ainfix +alengthV5alengthV4Aapermutainfix ++ainfix ++V29V5V27ainfix ++V2V1Iainfix =V29ainfix ++V3aConsV28aNilFICV4aNilfaConsVVainfix =V27V31Aainfix =V28V30FFICV4aNilfaConsVwainfix =V19V32FICV5aNilfaConsVwainfix =V18V33Fiainfix >alengthV4c0iainfix =alengthV5c0ainfix =V4aNilAainfix =V34V4NFAainfix <ainfix +alengthV5alengthV35ainfix +alengthV5alengthV4Aainfix <=c0ainfix +alengthV5alengthV4Aapermutainfix ++ainfix ++V37V5V35ainfix ++V2V1Iainfix =V37ainfix ++V3aConsV36aNilFICV4aNilfaConsVVainfix =V35V39Aainfix =V36V38FFiainfix =alengthV4c0ainfix =V5aNilAainfix =V40V5NFAainfix <ainfix +alengthV41alengthV4ainfix +alengthV5alengthV4Aainfix <=c0ainfix +alengthV5alengthV4Aapermutainfix ++ainfix ++V43V41V4ainfix ++V2V1Iainfix =V43ainfix ++V3aConsV42aNilFICV5aNilfaConsVVainfix =V41V45Aainfix =V42V44FFainfix =V5aNilNAainfix =V4aNilNAialeV46V47ainfix =V5aNilAainfix =V48V5NFAainfix <ainfix +alengthV49alengthV4ainfix +alengthV5alengthV4Aainfix <=c0ainfix +alengthV5alengthV4Aapermutainfix ++ainfix ++V51V49V4ainfix ++V2V1Iainfix =V51ainfix ++V3aConsV50aNilFICV5aNilfaConsVVainfix =V49V53Aainfix =V50V52FFainfix =V4aNilAainfix =V54V4NFAainfix <ainfix +alengthV5alengthV55ainfix +alengthV5alengthV4Aainfix <=c0ainfix +alengthV5alengthV4Aapermutainfix ++ainfix ++V57V5V55ainfix ++V2V1Iainfix =V57ainfix ++V3aConsV56aNilFICV4aNilfaConsVVainfix =V55V59Aainfix =V56V58FFICV4aNilfaConsVwainfix =V47V60FICV5aNilfaConsVwainfix =V46V61FapermutV3ainfix ++V2V1Iapermutainfix ++ainfix ++V3V5V4ainfix ++V2V1FFFAapermutainfix ++ainfix ++V0V2V1ainfix ++V2V1Iainfix =V0aNilFFF">
+    <label
+     name="expl:parameter merge">
+     </label>
+    <transf
+     name="split_goal"
+     proved="true"
+     expanded="true">
+     <goal
+      name="WP_parameter merge.0"
+      locfile="examples/programs/mergesort_queue/../mergesort_queue.mlw"
+      loclnum="20" loccnumb="6" loccnume="11"
+      expl="loop invariant init"
+      sum="95333564bdf6372bfdafb79dd8b3356f"
+      proved="true"
+      expanded="false"
+      shape="apermutainfix ++ainfix ++V0V2V1ainfix ++V2V1Iainfix =V0aNilFFF">
+      <label
+       name="expl:parameter merge">
+       </label>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter merge.1"
+      locfile="examples/programs/mergesort_queue/../mergesort_queue.mlw"
+      loclnum="20" loccnumb="6" loccnume="11"
+      expl="loop invariant preservation"
+      sum="6fedd462adc43125f587b1d9bc998948"
+      proved="true"
+      expanded="false"
+      shape="apermutainfix ++ainfix ++V8V5V6ainfix ++V2V1Iainfix =V8ainfix ++V3aConsV7aNilFICV4aNilfaConsVVainfix =V6V10Aainfix =V7V9FFIainfix =alengthV5c0Iainfix >alengthV5c0Iapermutainfix ++ainfix ++V3V5V4ainfix ++V2V1FFFIainfix =V0aNilFFF">
+      <label
+       name="expl:parameter merge">
+       </label>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter merge.2"
+      locfile="examples/programs/mergesort_queue/../mergesort_queue.mlw"
+      loclnum="20" loccnumb="6" loccnume="11"
+      expl="loop variant decreases"
+      sum="96de9e5dc5f8257912b27aa9201c54dc"
+      proved="true"
+      expanded="false"
+      shape="ainfix <ainfix +alengthV5alengthV6ainfix +alengthV5alengthV4Aainfix <=c0ainfix +alengthV5alengthV4Iapermutainfix ++ainfix ++V8V5V6ainfix ++V2V1Iainfix =V8ainfix ++V3aConsV7aNilFICV4aNilfaConsVVainfix =V6V10Aainfix =V7V9FFIainfix =alengthV5c0Iainfix >alengthV5c0Iapermutainfix ++ainfix ++V3V5V4ainfix ++V2V1FFFIainfix =V0aNilFFF">
+      <label
+       name="expl:parameter merge">
+       </label>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter merge.3"
+      locfile="examples/programs/mergesort_queue/../mergesort_queue.mlw"
+      loclnum="20" loccnumb="6" loccnume="11"
+      expl="parameter merge"
+      sum="4c6db46e359a42c5e238d554b5e8e07d"
+      proved="true"
+      expanded="false"
+      shape="ainfix =V4aNilAainfix =V6V4NFIainfix <ainfix +alengthV5alengthV7ainfix +alengthV5alengthV4Aainfix <=c0ainfix +alengthV5alengthV4Aapermutainfix ++ainfix ++V9V5V7ainfix ++V2V1Iainfix =V9ainfix ++V3aConsV8aNilFICV4aNilfaConsVVainfix =V7V11Aainfix =V8V10FFIainfix =alengthV5c0Iainfix >alengthV5c0Iapermutainfix ++ainfix ++V3V5V4ainfix ++V2V1FFFIainfix =V0aNilFFF">
+      <label
+       name="expl:parameter merge">
+       </label>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter merge.4"
+      locfile="examples/programs/mergesort_queue/../mergesort_queue.mlw"
+      loclnum="20" loccnumb="6" loccnume="11"
+      expl="loop invariant preservation"
+      sum="7dea9b69807967d8336c93ab30982cbb"
+      proved="true"
+      expanded="false"
+      shape="apermutainfix ++ainfix ++V8V6V4ainfix ++V2V1Iainfix =V8ainfix ++V3aConsV7aNilFICV5aNilfaConsVVainfix =V6V10Aainfix =V7V9FFIainfix =alengthV4c0Iainfix =alengthV5c0NIainfix >alengthV5c0Iapermutainfix ++ainfix ++V3V5V4ainfix ++V2V1FFFIainfix =V0aNilFFF">
+      <label
+       name="expl:parameter merge">
+       </label>
+      <proof
+       prover="2"
+       timelimit="10"
+       obsolete="false">
+       <result status="valid" time="0.10"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter merge.5"
+      locfile="examples/programs/mergesort_queue/../mergesort_queue.mlw"
+      loclnum="20" loccnumb="6" loccnume="11"
+      expl="loop variant decreases"
+      sum="456b9df215049b73353279aa5d5aad39"
+      proved="true"
+      expanded="false"
+      shape="ainfix <ainfix +alengthV6alengthV4ainfix +alengthV5alengthV4Aainfix <=c0ainfix +alengthV5alengthV4Iapermutainfix ++ainfix ++V8V6V4ainfix ++V2V1Iainfix =V8ainfix ++V3aConsV7aNilFICV5aNilfaConsVVainfix =V6V10Aainfix =V7V9FFIainfix =alengthV4c0Iainfix =alengthV5c0NIainfix >alengthV5c0Iapermutainfix ++ainfix ++V3V5V4ainfix ++V2V1FFFIainfix =V0aNilFFF">
+      <label
+       name="expl:parameter merge">
+       </label>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter merge.6"
+      locfile="examples/programs/mergesort_queue/../mergesort_queue.mlw"
+      loclnum="20" loccnumb="6" loccnume="11"
+      expl="parameter merge"
+      sum="5d77e6ef67a89415c369c243f273cbcf"
+      proved="true"
+      expanded="false"
+      shape="ainfix =V5aNilAainfix =V6V5NFIainfix <ainfix +alengthV7alengthV4ainfix +alengthV5alengthV4Aainfix <=c0ainfix +alengthV5alengthV4Aapermutainfix ++ainfix ++V9V7V4ainfix ++V2V1Iainfix =V9ainfix ++V3aConsV8aNilFICV5aNilfaConsVVainfix =V7V11Aainfix =V8V10FFIainfix =alengthV4c0Iainfix =alengthV5c0NIainfix >alengthV5c0Iapermutainfix ++ainfix ++V3V5V4ainfix ++V2V1FFFIainfix =V0aNilFFF">
+      <label
+       name="expl:parameter merge">
+       </label>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter merge.7"
+      locfile="examples/programs/mergesort_queue/../mergesort_queue.mlw"
+      loclnum="20" loccnumb="6" loccnume="11"
+      expl="loop invariant preservation"
+      sum="a5776fab72049c70b8cb9772d4f83eb7"
+      proved="true"
+      expanded="true"
+      shape="apermutainfix ++ainfix ++V10V8V4ainfix ++V2V1Iainfix =V10ainfix ++V3aConsV9aNilFICV5aNilfaConsVVainfix =V8V12Aainfix =V9V11FFIaleV6V7ICV4aNilfaConsVwainfix =V7V13FICV5aNilfaConsVwainfix =V6V14FIainfix =alengthV4c0NIainfix =alengthV5c0NIainfix >alengthV5c0Iapermutainfix ++ainfix ++V3V5V4ainfix ++V2V1FFFIainfix =V0aNilFFF">
+      <label
+       name="expl:parameter merge">
+       </label>
+      <proof
+       prover="2"
+       timelimit="10"
+       obsolete="false">
+       <result status="valid" time="0.12"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter merge.8"
+      locfile="examples/programs/mergesort_queue/../mergesort_queue.mlw"
+      loclnum="20" loccnumb="6" loccnume="11"
+      expl="loop variant decreases"
+      sum="c28a3a2776cbc33a3e3d6f80447a89c1"
+      proved="true"
+      expanded="false"
+      shape="ainfix <ainfix +alengthV8alengthV4ainfix +alengthV5alengthV4Aainfix <=c0ainfix +alengthV5alengthV4Iapermutainfix ++ainfix ++V10V8V4ainfix ++V2V1Iainfix =V10ainfix ++V3aConsV9aNilFICV5aNilfaConsVVainfix =V8V12Aainfix =V9V11FFIaleV6V7ICV4aNilfaConsVwainfix =V7V13FICV5aNilfaConsVwainfix =V6V14FIainfix =alengthV4c0NIainfix =alengthV5c0NIainfix >alengthV5c0Iapermutainfix ++ainfix ++V3V5V4ainfix ++V2V1FFFIainfix =V0aNilFFF">
+      <label
+       name="expl:parameter merge">
+       </label>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false">
+       <result status="valid" time="0.08"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter merge.9"
+      locfile="examples/programs/mergesort_queue/../mergesort_queue.mlw"
+      loclnum="20" loccnumb="6" loccnume="11"
+      expl="parameter merge"
+      sum="17ced3bfb8c2460aad57c3a31608b63f"
+      proved="true"
+      expanded="false"
+      shape="ainfix =V5aNilAainfix =V8V5NFIainfix <ainfix +alengthV9alengthV4ainfix +alengthV5alengthV4Aainfix <=c0ainfix +alengthV5alengthV4Aapermutainfix ++ainfix ++V11V9V4ainfix ++V2V1Iainfix =V11ainfix ++V3aConsV10aNilFICV5aNilfaConsVVainfix =V9V13Aainfix =V10V12FFIaleV6V7ICV4aNilfaConsVwainfix =V7V14FICV5aNilfaConsVwainfix =V6V15FIainfix =alengthV4c0NIainfix =alengthV5c0NIainfix >alengthV5c0Iapermutainfix ++ainfix ++V3V5V4ainfix ++V2V1FFFIainfix =V0aNilFFF">
+      <label
+       name="expl:parameter merge">
+       </label>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter merge.10"
+      locfile="examples/programs/mergesort_queue/../mergesort_queue.mlw"
+      loclnum="20" loccnumb="6" loccnume="11"
+      expl="loop invariant preservation"
+      sum="4b164f2b5ed7a99beb0dd60ce170787d"
+      proved="true"
+      expanded="true"
+      shape="apermutainfix ++ainfix ++V10V5V8ainfix ++V2V1Iainfix =V10ainfix ++V3aConsV9aNilFICV4aNilfaConsVVainfix =V8V12Aainfix =V9V11FFIaleV6V7NICV4aNilfaConsVwainfix =V7V13FICV5aNilfaConsVwainfix =V6V14FIainfix =alengthV4c0NIainfix =alengthV5c0NIainfix >alengthV5c0Iapermutainfix ++ainfix ++V3V5V4ainfix ++V2V1FFFIainfix =V0aNilFFF">
+      <label
+       name="expl:parameter merge">
+       </label>
+      <proof
+       prover="1"
+       timelimit="10"
+       edited="mergesort_queue_WP_MergesortQueue_WP_parameter_merge_1.v"
+       obsolete="false">
+       <result status="valid" time="0.75"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter merge.11"
+      locfile="examples/programs/mergesort_queue/../mergesort_queue.mlw"
+      loclnum="20" loccnumb="6" loccnume="11"
+      expl="loop variant decreases"
+      sum="b0d273a91e1999a8dd73ec8bb3ba4ab0"
+      proved="true"
+      expanded="false"
+      shape="ainfix <ainfix +alengthV5alengthV8ainfix +alengthV5alengthV4Aainfix <=c0ainfix +alengthV5alengthV4Iapermutainfix ++ainfix ++V10V5V8ainfix ++V2V1Iainfix =V10ainfix ++V3aConsV9aNilFICV4aNilfaConsVVainfix =V8V12Aainfix =V9V11FFIaleV6V7NICV4aNilfaConsVwainfix =V7V13FICV5aNilfaConsVwainfix =V6V14FIainfix =alengthV4c0NIainfix =alengthV5c0NIainfix >alengthV5c0Iapermutainfix ++ainfix ++V3V5V4ainfix ++V2V1FFFIainfix =V0aNilFFF">
+      <label
+       name="expl:parameter merge">
+       </label>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false">
+       <result status="valid" time="0.08"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter merge.12"
+      locfile="examples/programs/mergesort_queue/../mergesort_queue.mlw"
+      loclnum="20" loccnumb="6" loccnume="11"
+      expl="parameter merge"
+      sum="c81195f453e76a1445f22cf574130d16"
+      proved="true"
+      expanded="false"
+      shape="ainfix =V4aNilAainfix =V8V4NFIainfix <ainfix +alengthV5alengthV9ainfix +alengthV5alengthV4Aainfix <=c0ainfix +alengthV5alengthV4Aapermutainfix ++ainfix ++V11V5V9ainfix ++V2V1Iainfix =V11ainfix ++V3aConsV10aNilFICV4aNilfaConsVVainfix =V9V13Aainfix =V10V12FFIaleV6V7NICV4aNilfaConsVwainfix =V7V14FICV5aNilfaConsVwainfix =V6V15FIainfix =alengthV4c0NIainfix =alengthV5c0NIainfix >alengthV5c0Iapermutainfix ++ainfix ++V3V5V4ainfix ++V2V1FFFIainfix =V0aNilFFF">
+      <label
+       name="expl:parameter merge">
+       </label>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter merge.13"
+      locfile="examples/programs/mergesort_queue/../mergesort_queue.mlw"
+      loclnum="20" loccnumb="6" loccnume="11"
+      expl="parameter merge"
+      sum="fd84033fee4b35f6d878d151e1ed7d92"
+      proved="true"
+      expanded="false"
+      shape="ainfix =V4aNilNIialeV6V7ainfix =V5aNilAainfix =V8V5NFAainfix <ainfix +alengthV9alengthV4ainfix +alengthV5alengthV4Aainfix <=c0ainfix +alengthV5alengthV4Aapermutainfix ++ainfix ++V11V9V4ainfix ++V2V1Iainfix =V11ainfix ++V3aConsV10aNilFICV5aNilfaConsVVainfix =V9V13Aainfix =V10V12FFainfix =V4aNilAainfix =V14V4NFAainfix <ainfix +alengthV5alengthV15ainfix +alengthV5alengthV4Aainfix <=c0ainfix +alengthV5alengthV4Aapermutainfix ++ainfix ++V17V5V15ainfix ++V2V1Iainfix =V17ainfix ++V3aConsV16aNilFICV4aNilfaConsVVainfix =V15V19Aainfix =V16V18FFICV4aNilfaConsVwainfix =V7V20FICV5aNilfaConsVwainfix =V6V21FIainfix =alengthV4c0NIainfix =alengthV5c0NIainfix >alengthV5c0Iapermutainfix ++ainfix ++V3V5V4ainfix ++V2V1FFFIainfix =V0aNilFFF">
+      <label
+       name="expl:parameter merge">
+       </label>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter merge.14"
+      locfile="examples/programs/mergesort_queue/../mergesort_queue.mlw"
+      loclnum="20" loccnumb="6" loccnume="11"
+      expl="parameter merge"
+      sum="3246eb56a052e240d81b68ba1d3feaa9"
+      proved="true"
+      expanded="false"
+      shape="ainfix =V5aNilNIainfix =V4aNilNAialeV6V7ainfix =V5aNilAainfix =V8V5NFAainfix <ainfix +alengthV9alengthV4ainfix +alengthV5alengthV4Aainfix <=c0ainfix +alengthV5alengthV4Aapermutainfix ++ainfix ++V11V9V4ainfix ++V2V1Iainfix =V11ainfix ++V3aConsV10aNilFICV5aNilfaConsVVainfix =V9V13Aainfix =V10V12FFainfix =V4aNilAainfix =V14V4NFAainfix <ainfix +alengthV5alengthV15ainfix +alengthV5alengthV4Aainfix <=c0ainfix +alengthV5alengthV4Aapermutainfix ++ainfix ++V17V5V15ainfix ++V2V1Iainfix =V17ainfix ++V3aConsV16aNilFICV4aNilfaConsVVainfix =V15V19Aainfix =V16V18FFICV4aNilfaConsVwainfix =V7V20FICV5aNilfaConsVwainfix =V6V21FIainfix =alengthV4c0NIainfix =alengthV5c0NIainfix >alengthV5c0Iapermutainfix ++ainfix ++V3V5V4ainfix ++V2V1FFFIainfix =V0aNilFFF">
+      <label
+       name="expl:parameter merge">
+       </label>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter merge.15"
+      locfile="examples/programs/mergesort_queue/../mergesort_queue.mlw"
+      loclnum="20" loccnumb="6" loccnume="11"
+      expl="loop invariant preservation"
+      sum="daaa7d4f278445be6fbdcad07337d550"
+      proved="true"
+      expanded="false"
+      shape="apermutainfix ++ainfix ++V8V5V6ainfix ++V2V1Iainfix =V8ainfix ++V3aConsV7aNilFICV4aNilfaConsVVainfix =V6V10Aainfix =V7V9FFIainfix =alengthV5c0Iainfix >alengthV4c0Iainfix >alengthV5c0NIapermutainfix ++ainfix ++V3V5V4ainfix ++V2V1FFFIainfix =V0aNilFFF">
+      <label
+       name="expl:parameter merge">
+       </label>
+      <proof
+       prover="2"
+       timelimit="10"
+       obsolete="false">
+       <result status="valid" time="2.21"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter merge.16"
+      locfile="examples/programs/mergesort_queue/../mergesort_queue.mlw"
+      loclnum="20" loccnumb="6" loccnume="11"
+      expl="loop variant decreases"
+      sum="0973502c62bc08ac7a021c2680898bb0"
+      proved="true"
+      expanded="false"
+      shape="ainfix <ainfix +alengthV5alengthV6ainfix +alengthV5alengthV4Aainfix <=c0ainfix +alengthV5alengthV4Iapermutainfix ++ainfix ++V8V5V6ainfix ++V2V1Iainfix =V8ainfix ++V3aConsV7aNilFICV4aNilfaConsVVainfix =V6V10Aainfix =V7V9FFIainfix =alengthV5c0Iainfix >alengthV4c0Iainfix >alengthV5c0NIapermutainfix ++ainfix ++V3V5V4ainfix ++V2V1FFFIainfix =V0aNilFFF">
+      <label
+       name="expl:parameter merge">
+       </label>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter merge.17"
+      locfile="examples/programs/mergesort_queue/../mergesort_queue.mlw"
+      loclnum="20" loccnumb="6" loccnume="11"
+      expl="parameter merge"
+      sum="32dd83345b1d7922c9e878e7e09116c4"
+      proved="true"
+      expanded="false"
+      shape="ainfix =V4aNilAainfix =V6V4NFIainfix <ainfix +alengthV5alengthV7ainfix +alengthV5alengthV4Aainfix <=c0ainfix +alengthV5alengthV4Aapermutainfix ++ainfix ++V9V5V7ainfix ++V2V1Iainfix =V9ainfix ++V3aConsV8aNilFICV4aNilfaConsVVainfix =V7V11Aainfix =V8V10FFIainfix =alengthV5c0Iainfix >alengthV4c0Iainfix >alengthV5c0NIapermutainfix ++ainfix ++V3V5V4ainfix ++V2V1FFFIainfix =V0aNilFFF">
+      <label
+       name="expl:parameter merge">
+       </label>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter merge.18"
+      locfile="examples/programs/mergesort_queue/../mergesort_queue.mlw"
+      loclnum="20" loccnumb="6" loccnume="11"
+      expl="loop invariant preservation"
+      sum="3e3f33d7642a39eb9c55e46cbfdb18c3"
+      proved="true"
+      expanded="false"
+      shape="apermutainfix ++ainfix ++V8V6V4ainfix ++V2V1Iainfix =V8ainfix ++V3aConsV7aNilFICV5aNilfaConsVVainfix =V6V10Aainfix =V7V9FFIainfix =alengthV4c0Iainfix =alengthV5c0NIainfix >alengthV4c0Iainfix >alengthV5c0NIapermutainfix ++ainfix ++V3V5V4ainfix ++V2V1FFFIainfix =V0aNilFFF">
+      <label
+       name="expl:parameter merge">
+       </label>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter merge.19"
+      locfile="examples/programs/mergesort_queue/../mergesort_queue.mlw"
+      loclnum="20" loccnumb="6" loccnume="11"
+      expl="loop variant decreases"
+      sum="645a48b6e7da37929222e34c6680986c"
+      proved="true"
+      expanded="false"
+      shape="ainfix <ainfix +alengthV6alengthV4ainfix +alengthV5alengthV4Aainfix <=c0ainfix +alengthV5alengthV4Iapermutainfix ++ainfix ++V8V6V4ainfix ++V2V1Iainfix =V8ainfix ++V3aConsV7aNilFICV5aNilfaConsVVainfix =V6V10Aainfix =V7V9FFIainfix =alengthV4c0Iainfix =alengthV5c0NIainfix >alengthV4c0Iainfix >alengthV5c0NIapermutainfix ++ainfix ++V3V5V4ainfix ++V2V1FFFIainfix =V0aNilFFF">
+      <label
+       name="expl:parameter merge">
+       </label>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter merge.20"
+      locfile="examples/programs/mergesort_queue/../mergesort_queue.mlw"
+      loclnum="20" loccnumb="6" loccnume="11"
+      expl="parameter merge"
+      sum="35edec2981de3e436a443a7c13bd8404"
+      proved="true"
+      expanded="false"
+      shape="ainfix =V5aNilAainfix =V6V5NFIainfix <ainfix +alengthV7alengthV4ainfix +alengthV5alengthV4Aainfix <=c0ainfix +alengthV5alengthV4Aapermutainfix ++ainfix ++V9V7V4ainfix ++V2V1Iainfix =V9ainfix ++V3aConsV8aNilFICV5aNilfaConsVVainfix =V7V11Aainfix =V8V10FFIainfix =alengthV4c0Iainfix =alengthV5c0NIainfix >alengthV4c0Iainfix >alengthV5c0NIapermutainfix ++ainfix ++V3V5V4ainfix ++V2V1FFFIainfix =V0aNilFFF">
+      <label
+       name="expl:parameter merge">
+       </label>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter merge.21"
+      locfile="examples/programs/mergesort_queue/../mergesort_queue.mlw"
+      loclnum="20" loccnumb="6" loccnume="11"
+      expl="loop invariant preservation"
+      sum="13300c7318255f87b6c159999c01f0df"
+      proved="true"
+      expanded="false"
+      shape="apermutainfix ++ainfix ++V10V8V4ainfix ++V2V1Iainfix =V10ainfix ++V3aConsV9aNilFICV5aNilfaConsVVainfix =V8V12Aainfix =V9V11FFIaleV6V7ICV4aNilfaConsVwainfix =V7V13FICV5aNilfaConsVwainfix =V6V14FIainfix =alengthV4c0NIainfix =alengthV5c0NIainfix >alengthV4c0Iainfix >alengthV5c0NIapermutainfix ++ainfix ++V3V5V4ainfix ++V2V1FFFIainfix =V0aNilFFF">
+      <label
+       name="expl:parameter merge">
+       </label>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false">
+       <result status="valid" time="1.88"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter merge.22"
+      locfile="examples/programs/mergesort_queue/../mergesort_queue.mlw"
+      loclnum="20" loccnumb="6" loccnume="11"
+      expl="loop variant decreases"
+      sum="fd69f4b5f87bf5dfbd8e511ad3d95dcf"
+      proved="true"
+      expanded="false"
+      shape="ainfix <ainfix +alengthV8alengthV4ainfix +alengthV5alengthV4Aainfix <=c0ainfix +alengthV5alengthV4Iapermutainfix ++ainfix ++V10V8V4ainfix ++V2V1Iainfix =V10ainfix ++V3aConsV9aNilFICV5aNilfaConsVVainfix =V8V12Aainfix =V9V11FFIaleV6V7ICV4aNilfaConsVwainfix =V7V13FICV5aNilfaConsVwainfix =V6V14FIainfix =alengthV4c0NIainfix =alengthV5c0NIainfix >alengthV4c0Iainfix >alengthV5c0NIapermutainfix ++ainfix ++V3V5V4ainfix ++V2V1FFFIainfix =V0aNilFFF">
+      <label
+       name="expl:parameter merge">
+       </label>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false">
+       <result status="valid" time="0.06"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter merge.23"
+      locfile="examples/programs/mergesort_queue/../mergesort_queue.mlw"
+      loclnum="20" loccnumb="6" loccnume="11"
+      expl="parameter merge"
+      sum="3a84f15c75503c38492fe0e1640476af"
+      proved="true"
+      expanded="false"
+      shape="ainfix =V5aNilAainfix =V8V5NFIainfix <ainfix +alengthV9alengthV4ainfix +alengthV5alengthV4Aainfix <=c0ainfix +alengthV5alengthV4Aapermutainfix ++ainfix ++V11V9V4ainfix ++V2V1Iainfix =V11ainfix ++V3aConsV10aNilFICV5aNilfaConsVVainfix =V9V13Aainfix =V10V12FFIaleV6V7ICV4aNilfaConsVwainfix =V7V14FICV5aNilfaConsVwainfix =V6V15FIainfix =alengthV4c0NIainfix =alengthV5c0NIainfix >alengthV4c0Iainfix >alengthV5c0NIapermutainfix ++ainfix ++V3V5V4ainfix ++V2V1FFFIainfix =V0aNilFFF">
+      <label
+       name="expl:parameter merge">
+       </label>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter merge.24"
+      locfile="examples/programs/mergesort_queue/../mergesort_queue.mlw"
+      loclnum="20" loccnumb="6" loccnume="11"
+      expl="loop invariant preservation"
+      sum="e5120e43c536e8e17b5c147ec81c2d02"
+      proved="true"
+      expanded="false"
+      shape="apermutainfix ++ainfix ++V10V5V8ainfix ++V2V1Iainfix =V10ainfix ++V3aConsV9aNilFICV4aNilfaConsVVainfix =V8V12Aainfix =V9V11FFIaleV6V7NICV4aNilfaConsVwainfix =V7V13FICV5aNilfaConsVwainfix =V6V14FIainfix =alengthV4c0NIainfix =alengthV5c0NIainfix >alengthV4c0Iainfix >alengthV5c0NIapermutainfix ++ainfix ++V3V5V4ainfix ++V2V1FFFIainfix =V0aNilFFF">
+      <label
+       name="expl:parameter merge">
+       </label>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false">
+       <result status="valid" time="1.28"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter merge.25"
+      locfile="examples/programs/mergesort_queue/../mergesort_queue.mlw"
+      loclnum="20" loccnumb="6" loccnume="11"
+      expl="loop variant decreases"
+      sum="38d3907f5b89b78323fa8659c8f6092c"
+      proved="true"
+      expanded="false"
+      shape="ainfix <ainfix +alengthV5alengthV8ainfix +alengthV5alengthV4Aainfix <=c0ainfix +alengthV5alengthV4Iapermutainfix ++ainfix ++V10V5V8ainfix ++V2V1Iainfix =V10ainfix ++V3aConsV9aNilFICV4aNilfaConsVVainfix =V8V12Aainfix =V9V11FFIaleV6V7NICV4aNilfaConsVwainfix =V7V13FICV5aNilfaConsVwainfix =V6V14FIainfix =alengthV4c0NIainfix =alengthV5c0NIainfix >alengthV4c0Iainfix >alengthV5c0NIapermutainfix ++ainfix ++V3V5V4ainfix ++V2V1FFFIainfix =V0aNilFFF">
+      <label
+       name="expl:parameter merge">
+       </label>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter merge.26"
+      locfile="examples/programs/mergesort_queue/../mergesort_queue.mlw"
+      loclnum="20" loccnumb="6" loccnume="11"
+      expl="parameter merge"
+      sum="8b618c8420eaf3eddc38e9e52e37893b"
+      proved="true"
+      expanded="false"
+      shape="ainfix =V4aNilAainfix =V8V4NFIainfix <ainfix +alengthV5alengthV9ainfix +alengthV5alengthV4Aainfix <=c0ainfix +alengthV5alengthV4Aapermutainfix ++ainfix ++V11V5V9ainfix ++V2V1Iainfix =V11ainfix ++V3aConsV10aNilFICV4aNilfaConsVVainfix =V9V13Aainfix =V10V12FFIaleV6V7NICV4aNilfaConsVwainfix =V7V14FICV5aNilfaConsVwainfix =V6V15FIainfix =alengthV4c0NIainfix =alengthV5c0NIainfix >alengthV4c0Iainfix >alengthV5c0NIapermutainfix ++ainfix ++V3V5V4ainfix ++V2V1FFFIainfix =V0aNilFFF">
+      <label
+       name="expl:parameter merge">
+       </label>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter merge.27"
+      locfile="examples/programs/mergesort_queue/../mergesort_queue.mlw"
+      loclnum="20" loccnumb="6" loccnume="11"
+      expl="parameter merge"
+      sum="c2d2312d7aa769bd6ff5d9359aeb5e61"
+      proved="true"
+      expanded="false"
+      shape="ainfix =V4aNilNIialeV6V7ainfix =V5aNilAainfix =V8V5NFAainfix <ainfix +alengthV9alengthV4ainfix +alengthV5alengthV4Aainfix <=c0ainfix +alengthV5alengthV4Aapermutainfix ++ainfix ++V11V9V4ainfix ++V2V1Iainfix =V11ainfix ++V3aConsV10aNilFICV5aNilfaConsVVainfix =V9V13Aainfix =V10V12FFainfix =V4aNilAainfix =V14V4NFAainfix <ainfix +alengthV5alengthV15ainfix +alengthV5alengthV4Aainfix <=c0ainfix +alengthV5alengthV4Aapermutainfix ++ainfix ++V17V5V15ainfix ++V2V1Iainfix =V17ainfix ++V3aConsV16aNilFICV4aNilfaConsVVainfix =V15V19Aainfix =V16V18FFICV4aNilfaConsVwainfix =V7V20FICV5aNilfaConsVwainfix =V6V21FIainfix =alengthV4c0NIainfix =alengthV5c0NIainfix >alengthV4c0Iainfix >alengthV5c0NIapermutainfix ++ainfix ++V3V5V4ainfix ++V2V1FFFIainfix =V0aNilFFF">
+      <label
+       name="expl:parameter merge">
+       </label>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter merge.28"
+      locfile="examples/programs/mergesort_queue/../mergesort_queue.mlw"
+      loclnum="20" loccnumb="6" loccnume="11"
+      expl="parameter merge"
+      sum="7b9fd7482e4799f86f4a60b2d64a67ab"
+      proved="true"
+      expanded="false"
+      shape="ainfix =V5aNilNIainfix =V4aNilNAialeV6V7ainfix =V5aNilAainfix =V8V5NFAainfix <ainfix +alengthV9alengthV4ainfix +alengthV5alengthV4Aainfix <=c0ainfix +alengthV5alengthV4Aapermutainfix ++ainfix ++V11V9V4ainfix ++V2V1Iainfix =V11ainfix ++V3aConsV10aNilFICV5aNilfaConsVVainfix =V9V13Aainfix =V10V12FFainfix =V4aNilAainfix =V14V4NFAainfix <ainfix +alengthV5alengthV15ainfix +alengthV5alengthV4Aainfix <=c0ainfix +alengthV5alengthV4Aapermutainfix ++ainfix ++V17V5V15ainfix ++V2V1Iainfix =V17ainfix ++V3aConsV16aNilFICV4aNilfaConsVVainfix =V15V19Aainfix =V16V18FFICV4aNilfaConsVwainfix =V7V20FICV5aNilfaConsVwainfix =V6V21FIainfix =alengthV4c0NIainfix =alengthV5c0NIainfix >alengthV4c0Iainfix >alengthV5c0NIapermutainfix ++ainfix ++V3V5V4ainfix ++V2V1FFFIainfix =V0aNilFFF">
+      <label
+       name="expl:parameter merge">
+       </label>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter merge.29"
+      locfile="examples/programs/mergesort_queue/../mergesort_queue.mlw"
+      loclnum="20" loccnumb="6" loccnume="11"
+      expl="normal postcondition"
+      sum="4e058a9542aa554789db1eb20844ca52"
+      proved="true"
+      expanded="false"
+      shape="apermutV3ainfix ++V2V1Iainfix >alengthV4c0NIainfix >alengthV5c0NIapermutainfix ++ainfix ++V3V5V4ainfix ++V2V1FFFIainfix =V0aNilFFF">
+      <label
+       name="expl:parameter merge">
+       </label>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false">
+       <result status="valid" time="0.47"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+  </theory>
+ </file>
+</why3session>

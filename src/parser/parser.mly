@@ -57,8 +57,12 @@ module Incremental = struct
     ref_set uc_ref (Typing.close_namespace loc import name (ref_get uc_ref))
 
   let new_decl d =
+    ref_set uc_ref (Typing.add_decl (ref_get uc_ref) d)
+
+  let new_use_clone d =
     let env = ref_get env_ref in let lenv = ref_get lenv_ref in
-    ref_set uc_ref (Typing.add_decl env lenv (ref_get uc_ref) d)
+    ref_set uc_ref (Typing.add_use_clone env lenv (ref_get uc_ref) d)
+
 end
 
   open Ptree
@@ -181,6 +185,9 @@ end
       | Term.IConstBinary  s -> int_of_string ("0b"^s)
     with Failure _ -> raise Parsing.Parse_error
 
+  let qualid_last = function
+    | Qident x | Qdot (_, x) -> x.id
+
 %}
 
 /* Tokens */
@@ -194,7 +201,7 @@ end
 
 /* keywords */
 
-%token AS AXIOM CLONE
+%token AS AXIOM CLONE CONSTANT
 %token ELSE END EPSILON EXISTS EXPORT FALSE FORALL FUNCTION
 %token GOAL IF IMPORT IN INDUCTIVE LEMMA
 %token LET MATCH META NAMESPACE NOT PROP PREDICATE
@@ -258,7 +265,7 @@ end
 
 /* Entry points */
 
-%type <Env.env -> string list -> unit> pre_logic_file
+%type <unit Env.library -> string list -> unit> pre_logic_file
 %start pre_logic_file
 %type <Theory.theory Util.Mstr.t> logic_file
 %start logic_file
@@ -297,6 +304,8 @@ list0_decl:
 new_decl:
 | decl
    { Incremental.new_decl $1 }
+| use_clone
+   { Incremental.new_use_clone $1 }
 | namespace_head namespace_import namespace_name list0_decl END
    { Incremental.close_namespace (floc_i 3) $2 $3 }
 ;
@@ -311,7 +320,7 @@ namespace_import:
 ;
 
 namespace_name:
-| uident      { Some $1 }
+| uident      { Some $1.id }
 | UNDERSCORE  { None }
 ;
 
@@ -320,6 +329,8 @@ namespace_name:
 decl:
 | TYPE list1_type_decl
     { TypeDecl $2 }
+| CONSTANT logic_decl_constant
+    { LogicDecl [$2] }
 | FUNCTION list1_logic_decl_function
     { LogicDecl $2 }
 | PREDICATE list1_logic_decl_predicate
@@ -332,29 +343,32 @@ decl:
     { PropDecl (floc (), Klemma, add_lab $2 $3, $5) }
 | GOAL ident labels COLON lexpr
     { PropDecl (floc (), Kgoal, add_lab $2 $3, $5) }
-| USE use
-    { UseClone (floc (), $2, None) }
-| CLONE use clone_subst
-    { UseClone (floc (), $2, Some $3) }
 | META sident list1_meta_arg_sep_comma
     { Meta (floc (), $2, $3) }
 ;
 
 /* Use and clone */
 
+use_clone:
+| USE use
+    { (floc (), $2, None) }
+| CLONE use clone_subst
+    { (floc (), $2, Some $3) }
+;
+
 use:
 | imp_exp tqualid
-    { { use_theory = $2; use_as = None; use_imp_exp = $1 } }
+    { { use_theory = $2; use_as = Some (qualid_last $2); use_imp_exp = $1 } }
 | imp_exp tqualid AS uident
-    { { use_theory = $2; use_as = Some (Some $4); use_imp_exp = $1 } }
+    { { use_theory = $2; use_as = Some $4.id; use_imp_exp = $1 } }
 | imp_exp tqualid AS UNDERSCORE
-    { { use_theory = $2; use_as = Some None; use_imp_exp = $1 } }
+    { { use_theory = $2; use_as = None; use_imp_exp = $1 } }
 ;
 
 imp_exp:
-| IMPORT        { Import }
-| EXPORT        { Export }
-| /* epsilon */ { Nothing }
+| IMPORT        { Some true }
+| EXPORT        { None }
+| /* epsilon */ { Some false }
 ;
 
 clone_subst:
@@ -368,12 +382,13 @@ list1_comma_subst:
 ;
 
 subst:
-| NAMESPACE ns     EQUAL ns     { CSns   ($2, $4) }
-| TYPE      qualid EQUAL qualid { CStsym ($2, $4) }
-| FUNCTION  qualid EQUAL qualid { CSfsym ($2, $4) }
-| PREDICATE qualid EQUAL qualid { CSpsym ($2, $4) }
-| LEMMA     qualid              { CSlemma $2 }
-| GOAL      qualid              { CSgoal  $2 }
+| NAMESPACE ns     EQUAL ns     { CSns   (floc (), $2, $4) }
+| TYPE      qualid EQUAL qualid { CStsym (floc (), $2, $4) }
+| CONSTANT  qualid EQUAL qualid { CSfsym (floc (), $2, $4) }
+| FUNCTION  qualid EQUAL qualid { CSfsym (floc (), $2, $4) }
+| PREDICATE qualid EQUAL qualid { CSpsym (floc (), $2, $4) }
+| LEMMA     qualid              { CSlemma (floc (), $2) }
+| GOAL      qualid              { CSgoal  (floc (), $2) }
 ;
 
 ns:
@@ -467,6 +482,12 @@ list1_logic_decl_predicate:
 list1_logic_decl:
 | logic_decl                        { [$1] }
 | logic_decl WITH list1_logic_decl  { $1 :: $3 }
+;
+
+logic_decl_constant:
+| lident_rich labels COLON primitive_type logic_def_option
+  { { ld_loc = floc (); ld_ident = add_lab $1 $2;
+      ld_params = []; ld_type = Some $4; ld_def = $5 } }
 ;
 
 logic_decl_function:
@@ -578,11 +599,11 @@ lexpr:
 | lexpr OR lexpr
    { infix_pp $1 PPor $3 }
 | lexpr BARBAR lexpr
-   { mk_pp (PPnamed (Lstr Term.asym_label, infix_pp $1 PPor $3)) }
+   { infix_pp (mk_pp (PPnamed (Lstr Term.asym_label, $1))) PPor $3 }
 | lexpr AND lexpr
    { infix_pp $1 PPand $3 }
 | lexpr AMPAMP lexpr
-   { mk_pp (PPnamed (Lstr Term.asym_label, infix_pp $1 PPand $3)) }
+   { infix_pp (mk_pp (PPnamed (Lstr Term.asym_label, $1))) PPand $3 }
 | NOT lexpr
    { prefix_pp PPnot $2 }
 | lexpr EQUAL lexpr
@@ -922,7 +943,7 @@ sident:
 /* Misc */
 
 label:
-| STRING    { Lstr $1 }
+| STRING    { Lstr (Ident.create_label $1) }
 | POSITION  { Lpos $1 }
 ;
 
@@ -978,10 +999,12 @@ list1_full_decl:
 ;
 
 full_decl:
-| NAMESPACE namespace_import namespace_name list0_full_decl END
-   { Dnamespace (floc_i 3, $3, $2, $4) }
 | decl
    { Dlogic $1 }
+| use_clone
+   { Duseclone $1 }
+| NAMESPACE namespace_import namespace_name list0_full_decl END
+   { Dnamespace (floc_i 3, $3, $2, $4) }
 ;
 
 list0_program_decl:
@@ -1001,6 +1024,8 @@ list1_program_decl:
 program_decl:
 | decl
     { Dlogic $1 }
+| use_clone
+    { Duseclone $1 }
 | LET lident_rich_pgm labels list1_type_v_binder opt_cast EQUAL triple
     { Dlet (add_lab $2 $3, mk_expr_i 7 (Efun ($4, cast_body $5 $7))) }
 | LET lident_rich_pgm labels EQUAL FUN list1_type_v_binder ARROW triple
@@ -1041,9 +1066,9 @@ opt_semicolon:
 
 use_module:
 | imp_exp MODULE tqualid
-    { Duse ($3, $1, None) }
+    { Duse ($3, $1, Some (qualid_last $3)) }
 | imp_exp MODULE tqualid AS uident
-    { Duse ($3, $1, Some $5) }
+    { Duse ($3, $1, Some $5.id) }
 ;
 
 list1_recfun_sep_and:

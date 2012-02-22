@@ -117,8 +117,9 @@ cloned:
 ;
 
 tqualid:
-| ident             { loc (), [$1] }
-| ident DOT tqualid { loc (), ($1 :: snd $3) }
+| ident              { loc (), [$1] }
+| ident DOT tqualid  { loc (), ($1 :: snd $3) }
+| STRING DOT tqualid { loc (), ($1 :: snd $3) }
 ;
 
 qualid:

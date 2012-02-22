@@ -44,6 +44,7 @@
         "as", AS;
         "axiom", AXIOM;
         "clone", CLONE;
+        "constant", CONSTANT;
         "else", ELSE;
         "end", END;
         "epsilon", EPSILON;
@@ -328,15 +329,16 @@ and string = parse
             then loop in_annot (a+1) p
             else loop in_annot a (p+1)
     in
-    loop false 0 0 
- 
+    loop false 0 0
+
   let read_channel env path file c =
     let lb = Lexing.from_channel c in
     Loc.set_file file lb;
-    parse_logic_file env path lb
+    (), parse_logic_file env path lb
 
-  let () = Env.register_format "why" ["why"] read_channel
+  let library_of_env = Env.register_format "why" ["why"] read_channel
 
+  let parse_logic_file env = parse_logic_file (library_of_env env)
 }
 
 (*

@@ -44,7 +44,6 @@ let opt_input = ref None
 let opt_theory = ref None
 let opt_trans = ref []
 let opt_metas = ref []
-let opt_debug = ref []
 
 let add_opt_file x =
   let tlist = Queue.create () in
@@ -85,8 +84,6 @@ let add_opt_goal x = match !opt_theory with
 
 let add_opt_trans x = opt_trans := x::!opt_trans
 
-let add_opt_debug x = opt_debug := x::!opt_debug
-
 let add_opt_meta meta =
   let meta_name, meta_arg =
     let index = String.index meta '=' in
@@ -112,9 +109,7 @@ let opt_list_printers = ref false
 let opt_list_provers = ref false
 let opt_list_formats = ref false
 let opt_list_metas = ref false
-let opt_list_flags = ref false
 
-let opt_debug_all = ref false
 let opt_version = ref false
 
 let opt_quiet = ref false
@@ -188,12 +183,9 @@ let option_list = Arg.align [
       " List known input formats";
   "--list-metas", Arg.Set opt_list_metas,
       " List known metas";
-  "--list-debug-flags", Arg.Set opt_list_flags,
-      " List known debug flags";
-  "--debug-all", Arg.Set opt_debug_all,
-      " Set all debug flags (except parse_only and type_only)";
-  "--debug", Arg.String add_opt_debug,
-      "<flag> Set a debug flag";
+    Debug.Opt.desc_debug_list;
+    Debug.Opt.desc_debug_all;
+    Debug.Opt.desc_debug;
   "--quiet", Arg.Set opt_quiet,
       " Print only what asked";
   "--version", Arg.Set opt_version,
@@ -208,15 +200,6 @@ let () =
   try
   Arg.parse option_list add_opt_file usage_msg;
 
-  (** Debug flag *)
-  if !opt_debug_all then begin
-    List.iter (fun (_,f,_) -> Debug.set_flag f) (Debug.list_flags ());
-    Debug.unset_flag Typing.debug_parse_only;
-    Debug.unset_flag Typing.debug_type_only
-  end;
-
-  List.iter (fun s -> Debug.set_flag (Debug.lookup_flag s)) !opt_debug;
-
   (** Configuration *)
   let config = try read_config !opt_config with Not_found ->
     option_iter (eprintf "Config file '%s' not found.@.") !opt_config;
@@ -226,6 +209,9 @@ let () =
   let main = get_main config in
   Whyconf.load_plugins main;
   Bench.BenchUtil.maximum_running_proofs := Whyconf.running_provers_max main;
+
+  Debug.Opt.set_flags_selected ();
+
   (** listings*)
 
   let opt_list = ref false in
@@ -261,8 +247,9 @@ let () =
   if !opt_list_provers then begin
     opt_list := true;
     let config = read_config !opt_config in
-    let print fmt s prover = fprintf fmt "%s (%s)@\n" s prover.name in
-    let print fmt m = Mstr.iter (print fmt) m in
+    let print fmt prover pc = fprintf fmt "%s (%a)@\n"
+      pc.id print_prover prover in
+    let print fmt m = Mprover.iter (print fmt) m in
     let provers = get_provers config in
     printf "@[<hov 2>Known provers:@\n%a@]@." print provers
   end;
@@ -278,13 +265,7 @@ let () =
     printf "@[<hov 2>Known metas:@\n%a@]@\n@."
       (Pp.print_list Pp.newline print) (List.sort cmp (Theory.list_metas ()))
   end;
-  if !opt_list_flags then begin
-    opt_list := true;
-    let print fmt (p,_,_) = fprintf fmt "%s" p in
-    printf "@[<hov 2>Known debug flags:@\n%a@]@."
-      (Pp.print_list Pp.newline print)
-      (List.sort Pervasives.compare (Debug.list_flags ()))
-  end;
+  opt_list := Debug.Opt.option_list () || !opt_list;
   if !opt_list then exit 0;
 
   (* Someting else using rc file intead of driver will be added later *)
@@ -353,9 +334,7 @@ let () =
 
 
   let map_prover s =
-    let prover = try Mstr.find s (get_provers config) with
-      | Not_found -> eprintf "Prover %s not found.@." s; exit 1
-    in
+    let prover = prover_by_id config s in
     { B.tval   = {B.tool_name = "cmdline"; prover_name = s; tool_db = None};
       ttrans   = [Trans.identity,None];
       tdriver  = load_driver env prover.driver prover.extra_drivers;

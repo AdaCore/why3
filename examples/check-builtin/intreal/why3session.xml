@@ -3,406 +3,338 @@
 <why3session
  name="check-builtin/intreal/why3session.xml">
  <prover
-  id="alt-ergo"
+  id="0"
   name="Alt-Ergo"
   version="0.94"/>
  <prover
-  id="coq"
-  name="Coq"
-  version="8.3pl2"/>
- <prover
-  id="cvc3-2.2"
+  id="1"
   name="CVC3"
   version="2.2"/>
  <prover
-  id="cvc3-2.4"
+  id="2"
   name="CVC3"
   version="2.4.1"/>
  <prover
-  id="eprover"
-  name="Eprover"
-  version="1.4 Namring"/>
- <prover
-  id="gappa"
-  name="Gappa"
-  version="0.15.1"/>
- <prover
-  id="simplify"
-  name="Simplify"
-  version="1.5.4"/>
- <prover
-  id="spass"
+  id="3"
   name="Spass"
   version="3.7"/>
  <prover
-  id="vampire"
-  name="Vampire"
-  version="0.6"/>
- <prover
-  id="verit"
-  name="veriT"
-  version="dev"/>
- <prover
-  id="yices"
-  name="Yices"
-  version="1.0.25"/>
- <prover
-  id="z3-2"
+  id="4"
   name="Z3"
   version="2.19"/>
  <prover
-  id="z3-3"
+  id="5"
   name="Z3"
   version="3.2"/>
  <file
   name="../intreal.why"
-  verified="true"
-  expanded="true">
+  verified="false"
+  expanded="false">
   <theory
    name="IntReal"
-   verified="true"
-   expanded="true">
+   locfile="check-builtin/intreal/../intreal.why"
+   loclnum="1" loccnumb="7" loccnume="14"
+   verified="false"
+   expanded="false">
    <goal
     name="G1"
-    sum="38a91bf2187e8061b54f721ae8c9692a"
+    locfile="check-builtin/intreal/../intreal.why"
+    loclnum="7" loccnumb="7" loccnume="9"
+    sum="20afd849649327f8ce871cf32df073a5"
     proved="true"
     expanded="false"
     shape="ainfix =afrom_intc2c2.0">
     <proof
-     prover="z3-2"
+     prover="4"
      timelimit="10"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.08"/>
     </proof>
     <proof
-     prover="z3-3"
+     prover="3"
      timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.06"/>
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="10.23"/>
     </proof>
     <proof
-     prover="alt-ergo"
+     prover="0"
      timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.10"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.04"/>
     </proof>
     <proof
-     prover="cvc3-2.2"
+     prover="1"
      timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="unknown" time="0.18"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="cvc3-2.4"
+     prover="2"
      timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="unknown" time="2.62"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="spass"
+     prover="5"
      timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="10.13"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.07"/>
     </proof>
    </goal>
    <goal
     name="G2"
-    sum="8d3b578b6fd9033695113c39e4dcc3be"
+    locfile="check-builtin/intreal/../intreal.why"
+    loclnum="8" loccnumb="7" loccnume="9"
+    sum="a57fa086b524e91e1f4709c5fffd0414"
     proved="true"
     expanded="false"
     shape="ainfix =afloorc1.5c1">
     <proof
-     prover="z3-2"
+     prover="4"
      timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="10.13"/>
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="10.08"/>
     </proof>
     <proof
-     prover="z3-3"
+     prover="3"
      timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="10.13"/>
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="10.36"/>
     </proof>
     <proof
-     prover="alt-ergo"
+     prover="0"
      timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="3.31"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="3.36"/>
     </proof>
     <proof
-     prover="cvc3-2.2"
+     prover="5"
      timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="10.73"/>
-    </proof>
-    <proof
-     prover="cvc3-2.4"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="10.03"/>
-    </proof>
-    <proof
-     prover="spass"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="10.56"/>
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="10.09"/>
     </proof>
    </goal>
    <goal
     name="G3"
-    sum="21b0e4fa01bc2d5e85dcf25560770785"
+    locfile="check-builtin/intreal/../intreal.why"
+    loclnum="9" loccnumb="7" loccnume="9"
+    sum="2ad04c0284892aba197a2bdb696ea487"
     proved="true"
     expanded="false"
     shape="ainfix =aceilc1.5c2">
     <proof
-     prover="z3-2"
+     prover="4"
      timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="10.04"/>
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="10.09"/>
     </proof>
     <proof
-     prover="z3-3"
+     prover="3"
      timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="10.14"/>
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="10.51"/>
     </proof>
     <proof
-     prover="alt-ergo"
+     prover="0"
      timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="4.09"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="4.08"/>
     </proof>
     <proof
-     prover="cvc3-2.2"
+     prover="5"
      timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="10.54"/>
-    </proof>
-    <proof
-     prover="cvc3-2.4"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="10.08"/>
-    </proof>
-    <proof
-     prover="spass"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="10.39"/>
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="10.09"/>
     </proof>
    </goal>
    <goal
     name="G4"
-    sum="ce7bc715ba9a79e8b47fd0b7afb52103"
-    proved="true"
+    locfile="check-builtin/intreal/../intreal.why"
+    loclnum="10" loccnumb="7" loccnume="9"
+    sum="c51d63dbcb75d556d2a4263d111c77e0"
+    proved="false"
     expanded="false"
     shape="ainfix =aflooraprefix -.c1.5aprefix -c2">
     <proof
-     prover="z3-2"
+     prover="4"
      timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="10.06"/>
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="10.09"/>
     </proof>
     <proof
-     prover="z3-3"
+     prover="3"
      timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="10.06"/>
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="10.28"/>
     </proof>
     <proof
-     prover="alt-ergo"
+     prover="0"
      timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="22.63"/>
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="10.08"/>
     </proof>
     <proof
-     prover="cvc3-2.2"
+     prover="5"
      timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="10.83"/>
-    </proof>
-    <proof
-     prover="cvc3-2.4"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="10.03"/>
-    </proof>
-    <proof
-     prover="spass"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="10.18"/>
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="10.10"/>
     </proof>
    </goal>
    <goal
     name="G5"
-    sum="85a9df1398b9750028efc860dd01286d"
-    proved="true"
-    expanded="true"
+    locfile="check-builtin/intreal/../intreal.why"
+    loclnum="11" loccnumb="7" loccnume="9"
+    sum="714563f1666f1a4fa77b3bd8828d1e0f"
+    proved="false"
+    expanded="false"
     shape="ainfix =aceilaprefix -.c1.5aprefix -c1">
     <proof
-     prover="z3-2"
+     prover="4"
      timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="10.13"/>
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="10.10"/>
     </proof>
     <proof
-     prover="z3-3"
+     prover="3"
      timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="10.13"/>
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="10.49"/>
     </proof>
     <proof
-     prover="alt-ergo"
+     prover="0"
      timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="27.53"/>
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="10.08"/>
     </proof>
     <proof
-     prover="cvc3-2.2"
+     prover="5"
      timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="10.13"/>
-    </proof>
-    <proof
-     prover="cvc3-2.4"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="10.03"/>
-    </proof>
-    <proof
-     prover="spass"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="10.82"/>
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="10.09"/>
     </proof>
    </goal>
    <goal
     name="G6"
-    sum="9c42b075e65ad8f48959b1221e509c08"
+    locfile="check-builtin/intreal/../intreal.why"
+    loclnum="12" loccnumb="7" loccnume="9"
+    sum="c4a1742575b0745b9ae2635176e84016"
     proved="true"
     expanded="false"
     shape="ainfix <=afloorV0aceilV0F">
     <proof
-     prover="z3-2"
+     prover="4"
      timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="10.13"/>
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="10.09"/>
     </proof>
     <proof
-     prover="z3-3"
+     prover="3"
      timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="10.13"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.31"/>
     </proof>
     <proof
-     prover="alt-ergo"
+     prover="0"
      timelimit="10"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.06"/>
     </proof>
     <proof
-     prover="cvc3-2.2"
+     prover="1"
      timelimit="10"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="cvc3-2.4"
+     prover="2"
      timelimit="10"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="spass"
+     prover="5"
      timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.29"/>
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="10.10"/>
     </proof>
    </goal>
    <goal
     name="G7"
-    sum="814ec468d113d7ff5fdbbc070a85e373"
+    locfile="check-builtin/intreal/../intreal.why"
+    loclnum="13" loccnumb="7" loccnume="9"
+    sum="5d3b163e24b215d6a71ec79674c9ec54"
     proved="true"
     expanded="false"
     shape="ainfix =afrom_intafloorV0V0NIainfix <afloorV0aceilV0F">
     <proof
-     prover="z3-2"
+     prover="4"
      timelimit="10"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.03"/>
     </proof>
     <proof
-     prover="z3-3"
+     prover="3"
      timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.01"/>
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="10.24"/>
     </proof>
     <proof
-     prover="alt-ergo"
+     prover="0"
      timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="cvc3-2.2"
-     timelimit="10"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="cvc3-2.4"
+     prover="1"
      timelimit="10"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="spass"
+     prover="2"
      timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="10.40"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="10"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
   </theory>

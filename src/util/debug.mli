@@ -24,9 +24,18 @@ val register_flag : string -> flag
 (** Register a new flag. If someone try to register two times the same
     flag the same one is used *)
 
+val register_stop_flag : string -> flag
+(** Register a new stop flag. If someone try to register two times the same
+    flag the same one is used.
+    A stop flag should be used when a flag change the behavior of the program.
+    It is not setted by debug-all *)
+
 val lookup_flag : string -> flag
 val list_flags : unit -> (string * flag * bool) list
 (** List the known flags *)
+
+val is_stop_flag : string -> bool
+(** test if the flag is a stop flag *)
 
 (** Modify the state of a flag *)
 val set_flag : flag -> unit
@@ -49,3 +58,31 @@ val dprintf : flag -> ('a, Format.formatter, unit) format -> 'a
 
 val stack_trace : flag
 (** stack_trace flag *)
+
+(** Command line arguments *)
+module Opt : sig
+  type spec = (Arg.key * Arg.spec * Arg.doc)
+
+  val desc_debug_list : spec
+  (** Option for printing the list of debug flags *)
+
+  val option_list : unit -> bool
+  (** Print the list of debug flag if requested (in this case return [true]).
+      You should run this function after the plugins have been started.
+  *)
+
+  val desc_debug_all : spec
+  (** Option for setting all the debug flags except the stopping one *)
+
+  val desc_debug : spec
+  (** Option for specifying a debug flag to set *)
+
+  val desc_shortcut : string -> Arg.key -> Arg.doc -> spec
+  (** Option for setting a specific flag *)
+
+  val set_flags_selected : unit -> unit
+  (** Set the flags selected by debug_all, debug or a shortcut.
+      You should run this function after the plugins have been started.
+  *)
+
+end

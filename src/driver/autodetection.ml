@@ -155,8 +155,11 @@ let detect_exec main data com =
                      supported, use it at your own risk!@." nam ver
           end;
         let c = make_command com data.prover_command in
-        Some {name = data.prover_name;
-              version = ver;
+        let prover = {Whyconf.prover_name = data.prover_name;
+                      prover_version = ver;
+                      prover_altern = ""} in
+        Some {prover = prover;
+              id = data.prover_id;
               command = c;
               driver  = Filename.concat (datadir main) data.prover_driver;
               editor = data.prover_editor;
@@ -182,7 +185,7 @@ let detect_prover main acc l =
       with Not_found -> None
     in
     let prover = Util.list_first detect_execs l in
-    Mstr.add prover_id prover acc
+    Mprover.add prover.prover prover acc
   with Not_found ->
     eprintf "Prover %s not found.@." prover_id;
     acc
@@ -204,7 +207,7 @@ let run_auto_detection config =
   let l = read_auto_detection_data main in
   let cmp p q = String.compare p.prover_id q.prover_id in
   let l = Util.list_part cmp l in
-  let detect = List.fold_left (detect_prover main) Mstr.empty l in
-  let length = Mstr.cardinal detect in
+  let detect = List.fold_left (detect_prover main) Mprover.empty l in
+  let length = Mprover.cardinal detect in
   eprintf "%d provers detected.@." length;
   set_provers config detect

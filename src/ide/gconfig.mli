@@ -18,6 +18,12 @@
 (**************************************************************************)
 
 open Why3
+open Whyconf
+
+(** Todo do something generic perhaps*)
+type conf_replace_prover =
+  | CRP_Ask
+  | CRP_Not_Obsolete
 
 type t =
     { mutable window_width : int;
@@ -39,6 +45,8 @@ type t =
       mutable error_color : string;
       mutable env : Why3.Env.env;
       mutable config : Whyconf.config;
+      mutable altern_provers : prover option Mprover.t;
+      mutable replace_prover : conf_replace_prover;
     }
 
 val read_config : string option -> string list -> unit
@@ -94,7 +102,10 @@ val image_failure_obs : GdkPixbuf.pixbuf ref
 val show_legend_window : unit -> unit
 val show_about_window : unit -> unit
 val preferences : t -> unit
-
+val unknown_prover :
+  t -> 'key Session.env_session -> Whyconf.prover -> Whyconf.prover option
+val replace_prover :
+  t -> 'key Session.proof_attempt -> 'key Session.proof_attempt -> bool
 (*
 Local Variables:
 compile-command: "unset LANG; make -C ../.. bin/why3ide.byte"

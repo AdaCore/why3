@@ -1,125 +1,92 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
 <why3session
- name="./my_cosine/why3session.xml">
+ name="examples/my_cosine/why3session.xml">
  <prover
-  id="alt-ergo"
+  id="0"
   name="Alt-Ergo"
   version="0.94"/>
  <prover
-  id="alt-ergo-0.93.1"
-  name="Alt-Ergo"
-  version="0.93.1"/>
- <prover
-  id="coq"
+  id="1"
   name="Coq"
-  version="8.3pl2"/>
+  version="8.3pl3"/>
  <prover
-  id="cvc3-2.2"
-  name="CVC3"
-  version="2.2"/>
- <prover
-  id="cvc3-2.4"
-  name="CVC3"
-  version="2.4.1"/>
- <prover
-  id="eprover"
-  name="Eprover"
-  version="1.4 Namring"/>
- <prover
-  id="gappa"
+  id="2"
   name="Gappa"
-  version="0.15.1"/>
- <prover
-  id="simplify"
-  name="Simplify"
-  version="1.5.4"/>
- <prover
-  id="spass"
-  name="Spass"
-  version="3.7"/>
- <prover
-  id="vampire"
-  name="Vampire"
-  version="0.6"/>
- <prover
-  id="verit"
-  name="veriT"
-  version="dev"/>
- <prover
-  id="yices"
-  name="Yices"
-  version="1.0.25"/>
- <prover
-  id="z3-2"
-  name="Z3"
-  version="2.19"/>
- <prover
-  id="z3-3"
-  name="Z3"
-  version="3.2"/>
+  version="0.16.0"/>
  <file
   name="../my_cosine.why"
   verified="true"
   expanded="true">
   <theory
    name="CosineSingle"
+   locfile="examples/my_cosine/../my_cosine.why"
+   loclnum="1" loccnumb="7" loccnume="19"
    verified="true"
    expanded="true">
    <goal
     name="MethodError"
-    sum="be147550e8f0cfe0d570293a2f27ba5c"
+    locfile="examples/my_cosine/../my_cosine.why"
+    loclnum="13" loccnumb="6" loccnume="17"
+    sum="5952f9383dbffe78b1fa14037bc54de0"
     proved="true"
     expanded="true"
     shape="ainfix <=aabsainfix -ainfix -c1.0ainfix *c0.5ainfix *V0V0acosV0c0x1.p-24Iainfix <=aabsV0c0x1.p-5F">
     <proof
-     prover="coq"
-     timelimit="2"
+     prover="1"
+     timelimit="10"
      edited="my_cosine_CosineSingle_MethodError_1.v"
-     obsolete="false">
-     <result status="valid" time="3.89"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="4.00"/>
     </proof>
    </goal>
    <goal
     name="TotalErrorFullyExpanded"
-    sum="7cfdaf7533c92da46732532f43550784"
+    locfile="examples/my_cosine/../my_cosine.why"
+    loclnum="20" loccnumb="6" loccnume="29"
+    sum="25f5a9c908fe4d1265b4f0f95504caa8"
     proved="true"
     expanded="true"
     shape="ainfix <=aabsainfix -V3acosavalueV0c0x1.p-23Iainfix =V3aroundaNearestTiesToEvenainfix -c1.0V2Iainfix =V2aroundaNearestTiesToEvenainfix *c0.5V1Iainfix =V1aroundaNearestTiesToEvenainfix *avalueV0avalueV0FIainfix <=aabsainfix -ainfix -c1.0ainfix *c0.5ainfix *avalueV0avalueV0acosavalueV0c0x1.p-24Iainfix <=aabsavalueV0c0x1.p-5F">
     <proof
-     prover="gappa"
+     prover="2"
      timelimit="2"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
     name="TotalErrorExpanded"
-    sum="a99d0e192454cbd9ebbc62a4b95ba60f"
+    locfile="examples/my_cosine/../my_cosine.why"
+    loclnum="31" loccnumb="6" loccnume="24"
+    sum="847de2c0fab20f50a5c8c20a22a7efcf"
     proved="true"
     expanded="true"
     shape="LaroundaNearestTiesToEvenainfix *avalueV0avalueV0LaroundaNearestTiesToEvenainfix *c0.5V1LaroundaNearestTiesToEvenainfix -c1.0V2ainfix <=aabsainfix -V3acosavalueV0c0x1.p-23Iainfix <=aabsavalueV0c0x1.p-5F">
     <proof
-     prover="alt-ergo"
+     prover="0"
      timelimit="2"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.86"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.83"/>
     </proof>
    </goal>
    <goal
     name="TotalError"
-    sum="a0bc9b91138462e58364e7ef3f1ece2b"
+    locfile="examples/my_cosine/../my_cosine.why"
+    loclnum="51" loccnumb="6" loccnume="16"
+    sum="5af50be8fb318e8a3b66da558f5685c7"
     proved="true"
     expanded="true"
     shape="Lacos_singleV0ainfix <=aabsainfix -avalueV1acosavalueV0c0x1.p-23Iainfix <=aabsavalueV0c0x1.p-5F">
     <proof
-     prover="alt-ergo"
+     prover="0"
      timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="3.17"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="3.05"/>
     </proof>
    </goal>
   </theory>

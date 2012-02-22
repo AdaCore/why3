@@ -127,3 +127,5 @@ val list_transforms_l : unit -> string list
 val named : string -> 'a trans -> 'a trans
 (** give transformation a name without registering *)
 
+val apply_transform : string -> Env.env -> task -> task list
+(** apply a registered 1-to-1 or a 1-to-n function directly *)

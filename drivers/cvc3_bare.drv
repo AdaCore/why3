@@ -65,6 +65,7 @@ theory int.Int
   remove prop Total
   remove prop NonTrivialRing
   remove prop CompatOrderAdd
+  remove prop ZeroLessOne
 
 end
 
@@ -103,20 +104,37 @@ theory real.Real
   remove prop Total
   remove prop NonTrivialRing
   remove prop CompatOrderAdd
+  remove prop ZeroLessOne
 
   meta "encoding : kept" type real
 
 end
 
-theory bool.Bool
+theory real.FromInt
+
+  syntax function from_int "%1"
+
+  remove prop Zero
+  remove prop One
+  remove prop Add
+  remove prop Sub
+  remove prop Mul
+  remove prop Neg
+
+end
+
+theory Bool
    syntax type     bool  "BITVECTOR(1)"
    syntax function True  "0bin1"
    syntax function False "0bin0"
+   meta "encoding : kept" type bool
+end
+
+theory bool.Bool
    syntax function andb  "(%1 & %2)"
    syntax function orb   "(%1 | %2)"
    syntax function xorb  "(BVXOR(%1,%2))"
    syntax function notb  "(~ %1)"
-   meta "encoding : kept" type bool
 end
 
 (*

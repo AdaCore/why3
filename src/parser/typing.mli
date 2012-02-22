@@ -29,10 +29,13 @@ val debug_type_only : Debug.flag
 
 (** incremental parsing *)
 
-val add_decl : Env.env -> theory Mstr.t -> theory_uc -> Ptree.decl -> theory_uc
+val add_decl : theory_uc -> Ptree.decl -> theory_uc
+
+val add_use_clone :
+  unit Env.library -> theory Mstr.t -> theory_uc -> Ptree.use_clone -> theory_uc
 
 val close_namespace :
-  Loc.position -> bool -> Ptree.ident option -> theory_uc -> theory_uc
+  Loc.position -> bool -> string option -> theory_uc -> theory_uc
 
 val close_theory : Loc.position -> theory Mstr.t -> theory_uc -> theory Mstr.t
 
@@ -92,3 +95,4 @@ val list_fields: theory_uc ->
   (** check that the given fields all belong to the same record type
       and do not appear several times *)
 
+val type_inst: theory_uc -> theory -> Ptree.clone_subst list -> th_inst

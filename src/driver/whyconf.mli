@@ -85,24 +85,53 @@ val load_plugins : main -> unit
 
 (** {2 Provers} *)
 
+(** {3 Prover's identifier} *)
+
+type prover =
+    { prover_name : string; (* "Alt-Ergo" *)
+      prover_version : string; (* "2.95" *)
+      prover_altern : string; (* "special" *)
+    }
+    (** record of necessary data for a given external prover *)
+
+val print_prover : Format.formatter -> prover -> unit
+(** Printer for prover *)
+module Prover   : Util.OrderedHash with type t = prover
+module Mprover  : Stdlib.Map.S with type key = prover
+module Sprover  : Mprover.Set
+module Hprover  : Hashtbl.S with type key = prover
+
+(** {3 Prover configuration} *)
+
 type config_prover = {
-  name    : string;   (* "Alt-Ergo v2.95 (special)" *)
+  prover : prover;  (* unique name for session *)
+  id      : string; (* unique name for command line *)
   command : string;   (* "exec why-limit %t %m alt-ergo %f" *)
   driver  : string;   (* "/usr/local/share/why/drivers/ergo-spec.drv" *)
-  version : string;   (* "v2.95" *)
   editor  : string;   (* Dedicated editor *)
   interactive : bool; (* Interative theorem prover *)
   extra_options : string list;
   extra_drivers : string list;
 }
 
-val get_provers : config  -> config_prover Mstr.t
+val get_provers : config  -> config_prover Mprover.t
 (** [get_provers config] get the prover family stored in the Rc file. The
     keys are the unique ids of the prover (argument of the family) *)
 
-val set_provers : config -> config_prover Mstr.t -> config
+val set_provers : config -> config_prover Mprover.t -> config
 (** [set_provers config provers] replace all the family prover by the
     one given *)
+
+val is_prover_known : config -> prover -> bool
+(** test if a prover is detected *)
+
+exception ProverNotFound of config * string
+
+val prover_by_id : config -> string -> config_prover
+(** return the configuration of the prover if found, otherwise return
+    ProverNotFound *)
+
+(** {2 For accesing other parts of the configuration } *)
 
 (** Access to the Rc.t *)
 val get_section : config -> string -> Rc.section option

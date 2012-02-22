@@ -54,8 +54,6 @@ let user_position fname lnum cnum1 cnum2 = (fname,lnum,cnum1,cnum2)
 
 let get loc = loc
 
-exception Located of position * exn
-
 let dummy_position = ("",0,0,0)
 
 let join (f1,l1,b1,e1) (f2,_,b2,e2) =
@@ -77,9 +75,44 @@ let gen_report_position fmt (f,l,b,e) =
 
 let report_position fmt = fprintf fmt "%a:@\n" gen_report_position
 
+(* located exceptions *)
+
+exception Located of position * exn
+
+let try1 loc f x =
+  try f x with Located _ as e -> raise e | e -> raise (Located (loc, e))
+let try2 loc f x y =
+  try f x y with Located _ as e -> raise e | e -> raise (Located (loc, e))
+let try3 loc f x y z =
+  try f x y z with Located _ as e -> raise e | e -> raise (Located (loc, e))
+let try4 loc f x y z t =
+  try f x y z t with Located _ as e -> raise e | e -> raise (Located (loc, e))
+
+let error ?loc e = match loc with
+  | None -> raise e
+  | Some loc -> raise (Located (loc, e))
+
+(* located messages *)
+
+exception Message of string
+
+let errorm ?loc f =
+  let buf = Buffer.create 512 in
+  let fmt = Format.formatter_of_buffer buf in
+  Format.kfprintf
+    (fun _ ->
+       Format.pp_print_flush fmt ();
+       let s = Buffer.contents buf in
+       Buffer.clear buf;
+       error ?loc (Message s))
+    fmt f
+
 let () = Exn_printer.register
   (fun fmt exn -> match exn with
     | Located (loc,e) ->
         fprintf fmt "%a%a" report_position loc Exn_printer.exn_printer e
-    | _ -> raise exn)
+    | Message s ->
+        fprintf fmt "%s" s
+    | _ ->
+        raise exn)
 

@@ -5,19 +5,23 @@
  <prover
   id="alt-ergo"
   name="Alt-Ergo"
-  version="0.93"/>
+  version="0.94"/>
  <prover
   id="coq"
   name="Coq"
-  version="8.3pl2"/>
+  version="8.3pl3"/>
  <prover
   id="cvc3-2.2"
   name="CVC3"
   version="2.2"/>
  <prover
+  id="cvc3-2.4"
+  name="CVC3"
+  version="2.4.1"/>
+ <prover
   id="eprover"
   name="Eprover"
-  version="1.4 Namring"/>
+  version="1.4"/>
  <prover
   id="gappa"
   name="Gappa"
@@ -46,6 +50,10 @@
   id="z3-2"
   name="Z3"
   version="2.19"/>
+ <prover
+  id="z3-3"
+  name="Z3"
+  version="3.2"/>
  <file
   name="../real.why"
   verified="true"
@@ -56,10 +64,17 @@
    expanded="true">
    <goal
     name="G1"
-    sum="96c87b82c5c292811bebf4514d489284"
+    sum="7025fd4fcb269e2f4be8d7be7faa5434"
     proved="true"
     expanded="true"
     shape="ainfix =ainfix *c5.5c10.c55.">
+    <proof
+     prover="z3-2"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
     <proof
      prover="cvc3-2.2"
      timelimit="10"
@@ -69,13 +84,6 @@
     </proof>
     <proof
      prover="alt-ergo"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="z3-2"
      timelimit="10"
      edited=""
      obsolete="false">
@@ -93,16 +101,23 @@
      timelimit="10"
      edited=""
      obsolete="false">
-     <result status="timeout" time="10.15"/>
+     <result status="timeout" time="9.99"/>
     </proof>
    </goal>
    <goal
     name="G2"
-    sum="487f0a7ef488eb9fe4c27873b1b31d8c"
+    sum="f543d11a55659535e80e937ed65ab5f5"
     proved="true"
     expanded="true"
     shape="ainfix =ainfix /c9.c3.c3.">
     <proof
+     prover="z3-2"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
      prover="cvc3-2.2"
      timelimit="10"
      edited=""
@@ -114,13 +129,6 @@
      timelimit="10"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="z3-2"
-     timelimit="10"
-     edited=""
-     obsolete="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
@@ -128,15 +136,22 @@
      timelimit="10"
      edited=""
      obsolete="false">
-     <result status="timeout" time="10.31"/>
+     <result status="timeout" time="10.03"/>
     </proof>
    </goal>
    <goal
     name="G3"
-    sum="d9194cffeaa312cfb5a18bf029d31b2e"
+    sum="0deb0bd14f74b9445c5db7a369be92dd"
     proved="true"
     expanded="true"
     shape="ainfix =ainvc5.c0.2">
+    <proof
+     prover="z3-2"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
     <proof
      prover="cvc3-2.2"
      timelimit="10"
@@ -149,13 +164,6 @@
      timelimit="10"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="z3-2"
-     timelimit="10"
-     edited=""
-     obsolete="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
@@ -163,7 +171,7 @@
      timelimit="10"
      edited=""
      obsolete="false">
-     <result status="timeout" time="10.00"/>
+     <result status="timeout" time="10.01"/>
     </proof>
    </goal>
   </theory>

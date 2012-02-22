@@ -1763,9 +1763,9 @@ and expr_desc gl env loc ty = function
       let c = type_c env c in
       Eany c, c.c_result_type, c.c_effect
 
-and triple gl env (p, e, q) =
+and triple ?(sat_exn=true) gl env (p, e, q) =
   let e = expr gl env e in
-  let q = saturation e.expr_loc e.expr_effect q in
+  let q = if sat_exn then saturation e.expr_loc e.expr_effect q else q in
   let ef = e.expr_effect in
   let ef, p = term_effect ef p in
   let ef, q = post_effect ef q in
@@ -1811,11 +1811,11 @@ and letrec gl env dl = (* : env * recfun list *)
     in
     List.fold_left add1 env dl
   in
-  let one_step m0 =
+  let one_step ?(sat_exn=false) m0 =
     let type1 m (i, bl, env, var, t) =
       let decvar = option_map (fun (v,_,_) -> v.pv_pure) var in
       let env = make_env env ?decvar m0 in
-      let t, c = triple gl env t in
+      let t, c = triple ~sat_exn gl env t in
       let v = create_pvsymbol (id_clone i.i_impure.vs_name) (tarrow bl c)
         ~effect:i.i_effect ~pure:i.i_pure
       in
@@ -1825,7 +1825,7 @@ and letrec gl env dl = (* : env * recfun list *)
   in
   let rec fixpoint m =
     (* printf "fixpoint...@\n"; *)
-    let m', dl' = one_step m in
+    let m', _ = one_step m in
     let same_effect (i,bl,_,_,_) =
       let c = Mvs.find i.i_impure m and c' = Mvs.find i.i_impure m' in
       let v = tarrow bl c and v' = tarrow bl c' in
@@ -1834,7 +1834,10 @@ and letrec gl env dl = (* : env * recfun list *)
       eq_type_v v v'
       (* E.equal c.c_effect c'.c_effect *)
     in
-    if List.for_all same_effect dl then m, dl' else fixpoint m'
+    if List.for_all same_effect dl then
+      one_step ~sat_exn:true m
+    else
+      fixpoint m'
   in
   let add_empty_effect m (i, bl, _, _, (p, _, q)) =
     let tyl, ty = uncurrying i.i_impure.vs_ty in
@@ -1934,9 +1937,9 @@ let add_global_fun loc ~labels x tyv uc =
       List.fold_left
         (fun (labels,loc) lab ->
            match lab with
-             | Lstr s -> (s::labels,loc)
+             | Lstr s -> (Ident.Slab.add s labels,loc)
              | Lpos l -> (labels,l))
-        ([],loc)
+        (Slab.empty,loc)
         labels
     in
     let ls, ps = create_psymbol_fun (id_user ~label x loc) tyv in
@@ -2009,10 +2012,10 @@ let add_logic_ps ?(nofail=false) uc x =
     (* can fail if x is a constructor of a model type (record or algebraic) *)
     assert nofail
 
-let add_types env ltm uc dl =
+let add_types uc dl =
   (* 1. type check the pure def, to have all sanity checks performed *)
   let dlp = List.map make_immutable_type dl in
-  let uc = Pgm_module.add_pure_pdecl env ltm (TypeDecl dlp) uc in
+  let uc = Pgm_module.add_pure_pdecl (TypeDecl dlp) uc in
   (* 2. compute number of regions for each type *)
   let def = List.fold_left
     (fun def d -> Mstr.add d.td_ident.id d def) Mstr.empty dl
@@ -2129,9 +2132,9 @@ let add_types env ltm uc dl =
     { d with td_params = params; td_model = false; td_def = def }
   in
   let dli = List.map (add_regions ~effect:false) dl in
-  let uc = Pgm_module.add_impure_pdecl env ltm (Ptree.TypeDecl dli) uc in
+  let uc = Pgm_module.add_impure_pdecl (Ptree.TypeDecl dli) uc in
   let dle = List.map (add_regions ~effect:true) dl in
-  let uc = Pgm_module.add_effect_pdecl env ltm (Ptree.TypeDecl dle) uc in
+  let uc = Pgm_module.add_effect_pdecl (Ptree.TypeDecl dle) uc in
   (* 4. add mtsymbols in module *)
   let add_mt d =
     let x = d.td_ident.id in
@@ -2209,8 +2212,8 @@ let add_types env ltm uc dl =
   List.iter (fun d -> visit d.td_ident.id) dl;
   uc
 
-let add_logics env ltm uc d =
-  let uc = Pgm_module.add_pure_pdecl env ltm d uc in
+let add_logics uc d =
+  let uc = Pgm_module.add_pure_pdecl d uc in
   let region =
     let c = ref (-1) in
     fun loc ->
@@ -2239,8 +2242,8 @@ let add_logics env ltm uc d =
   in
   let add uc d0 =
     let d = LogicDecl [add_regions d0] in
-    let uc = Pgm_module.add_impure_pdecl env ltm d uc in
-    let uc = Pgm_module.add_effect_pdecl env ltm d uc in
+    let uc = Pgm_module.add_impure_pdecl d uc in
+    let uc = Pgm_module.add_effect_pdecl d uc in
     add_logic_ps uc d0.ld_ident.id;
     uc
   in
@@ -2251,20 +2254,19 @@ let add_logics env ltm uc d =
   match d with
     | LogicDecl dl -> List.fold_left add uc dl
     | IndDecl dl -> List.fold_left addi uc dl
-    | Meta _ | UseClone _ | PropDecl _ | TypeDecl _ -> assert false
+    | Meta _ | PropDecl _ | TypeDecl _ -> assert false
 
 let find_module penv lmod q id = match q with
   | [] ->
       (* local module *)
       Mstr.find id lmod
   | _ :: _ ->
-      (* theory in file f *)
-      Pgm_env.find_module penv q id
+      (* module in file f *)
+      Mstr.find id (fst (Env.read_lib_file penv q))
 
-(* env  = to retrieve theories from the loadpath
-   penv = to retrieve modules from the loadpath
+(* env  = to retrieve theories and modules from the loadpath
    lmod = local modules *)
-let rec decl ~wp env penv ltm lmod uc = function
+let rec decl ~wp env ltm lmod uc = function
   | Ptree.Dlet (id, e) ->
       let denv = create_denv uc in
       let e = dexpr ~ghost:false ~userloc:None denv e in
@@ -2340,44 +2342,34 @@ let rec decl ~wp env penv ltm lmod uc = function
       let q, id = Typing.split_qualid qid in
       let m =
         try
-          find_module penv lmod q id
-        with Not_found | Pgm_env.ModuleNotFound _ ->
+          find_module env lmod q id
+        with Not_found ->
           errorm ~loc "@[unbound module %a@]" print_qualid qid
       in
-      let n = match use_as with
-        | None -> Some (m.m_name.id_string)
-        | Some x -> Some x.id
-      in
       begin try match imp_exp with
-        | Nothing ->
+        | Some imp ->
             (* use T = namespace T use_export T end *)
             let uc = open_namespace uc in
             let uc = use_export uc m in
-            close_namespace uc false n
-        | Import ->
-            (* use import T = namespace T use_export T end import T *)
-            let uc = open_namespace uc in
-            let uc = use_export uc m in
-            close_namespace uc true n
-        | Export ->
+            close_namespace uc imp use_as
+        | None ->
             use_export uc m
       with ClashSymbol s ->
         errorm ~loc "clash with previous symbol %s" s
       end
   | Ptree.Dnamespace (loc, id, import, dl) ->
       let uc = open_namespace uc in
-      let uc = List.fold_left (decl ~wp env penv ltm lmod) uc dl in
-      let id = option_map (fun id -> id.id) id in
+      let uc = List.fold_left (decl ~wp env ltm lmod) uc dl in
       begin try close_namespace uc import id
       with ClashSymbol s -> errorm ~loc "clash with previous symbol %s" s end
   | Ptree.Dlogic (TypeDecl d) ->
-      add_types env ltm uc d
+      add_types uc d
   | Ptree.Dlogic (LogicDecl _ | IndDecl _ as d) ->
-      add_logics env ltm uc d
+      add_logics uc d
   | Ptree.Dlogic (PropDecl _ | Meta _ as d) ->
-      Pgm_module.add_pure_pdecl env ltm d uc
-  | Ptree.Dlogic (UseClone _ as d) ->
-      Pgm_module.add_pdecl env ltm d uc
+      Pgm_module.add_pure_pdecl d uc
+  | Ptree.Duseclone d ->
+      Pgm_module.add_use_clone env ltm d uc
 
 (*
 Local Variables:

@@ -19,12 +19,14 @@
 
 (** parsing entry points *)
 
+val library_of_env : Env.env -> unit Env.library
+
 val parse_logic_file :
   Env.env -> string list -> Lexing.lexbuf -> Theory.theory Util.Mstr.t
 
 val parse_program_file : Lexing.lexbuf -> Ptree.program_file
 
-val token_counter : Lexing.lexbuf -> int * int 
+val token_counter : Lexing.lexbuf -> int * int
 
 (** other functions to be re-used in other lexers/parsers *)
 

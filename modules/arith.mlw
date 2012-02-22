@@ -11,6 +11,30 @@ module Int
 end
 
 (* machine arithmetic (32-bit integers, etc.) will go here *)
+module Int32
+
+  use export int.Int
+
+  function min_int : int = -2147483648
+  function max_int : int =  2147483647
+
+  let (+) (x: int) (y:int) =
+    { min_int <= x + y <= max_int } x + y { result = x + y }
+  let (-) (x: int) (y:int) =
+    { min_int <= x - y <= max_int } x - y { result = x - y }
+
+  let (-_) (x: int) =
+    { min_int <= -x <= max_int } -x { result = -x  }
+
+  let ( * ) (x: int) (y:int) =
+    { min_int <= x * y <= max_int } x * y { result = x * y }
+
+  use export int.ComputerDivision
+
+  let (/) (x: int) (y:int) =
+    { y <> 0 && min_int <= div x y <= max_int } div x y { result = div x y }
+
+end
 
 module Real
 

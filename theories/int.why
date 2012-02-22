@@ -1,15 +1,15 @@
 
 theory Int
 
-  function zero : int = 0
-  function one  : int = 1
+  constant zero : int = 0
+  constant one  : int = 1
 
   predicate (< ) int int
   predicate (> ) (x y : int) = y < x
   predicate (<=) (x y : int) = x < y \/ x = y
 
   clone export algebra.OrderedUnitaryCommutativeRing with type t = int,
-    function zero = zero, function one = one, predicate (<=) = (<=)
+    constant zero = zero, constant one = one, predicate (<=) = (<=)
 
 end
 
@@ -70,6 +70,10 @@ theory EuclideanDivision
   lemma Mod_1: forall x:int. mod x 1 = 0
 
   lemma Div_1: forall x:int. div x 1 = x
+
+  lemma Div_inf: forall x y:int. 0 <= x < y -> div x y = 0
+
+  lemma Mod_0: forall y:int. y <> 0 -> mod 0 y = 0
 
 end
 
@@ -132,7 +136,7 @@ theory Exponentiation
   use import Int
 
   type t
-  function one : t
+  constant one : t
   function (*) t t : t
 
   function power t int : t
@@ -156,7 +160,7 @@ theory Power
   use import Int
 
   clone export
-    Exponentiation with type t = int, function one = one, function (*) = (*)
+    Exponentiation with type t = int, constant one = one, function (*) = (*)
 
 end
 
@@ -284,7 +288,7 @@ theory Induction
     (forall n:int. 0 <= n -> (forall k:int. 0 <= k < n -> p k) -> p n) ->
     forall n:int. 0 <= n -> p n
 
-  function bound : int
+  constant bound : int
 
   lemma Induction_bound :
     (forall n:int. bound <= n ->

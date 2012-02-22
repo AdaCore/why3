@@ -174,7 +174,8 @@ let load_driver = let driver_tag = ref (-1) in fun env file extra_files ->
   let add_theory { thr_name = (loc,q); thr_rules = trl } =
     let f,id = let l = List.rev q in List.rev (List.tl l),List.hd l in
     let th =
-      try Env.find_theory env f id with e -> raise (Loc.Located (loc,e))
+      try Env.read_theory ~format:"why" env f id
+      with e -> raise (Loc.Located (loc,e))
     in
     qualid := q;
     List.iter (add_local th) trl

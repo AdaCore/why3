@@ -2,6 +2,13 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import ZArith.
 Require Import Rbase.
+Require int.Int.
+Definition implb(x:bool) (y:bool): bool := match (x,
+  y) with
+  | (true, false) => false
+  | (_, _) => true
+  end.
+
 Parameter pow2: Z -> Z.
 
 
@@ -148,6 +155,8 @@ Parameter size: Z.
 
 Parameter bv : Type.
 
+Axiom size_positive : (1%Z <  size)%Z.
+
 Parameter nth: bv -> Z -> bool.
 
 
@@ -211,13 +220,13 @@ Axiom Nth_bw_not : forall (v:bv) (n:Z), ((0%Z <= n)%Z /\ (n <  size)%Z) ->
 Parameter lsr: bv -> Z -> bv.
 
 
-Axiom lsr_nth_low : forall (b:bv) (n:Z) (s:Z), ((0%Z <= n)%Z /\
-  (n <  size)%Z) -> ((0%Z <= s)%Z -> (((n + s)%Z <  size)%Z -> ((nth (lsr b
-  s) n) = (nth b (n + s)%Z)))).
+Axiom lsr_nth_low : forall (b:bv) (n:Z) (s:Z), (((0%Z <= n)%Z /\
+  (n <  size)%Z) /\ (((0%Z <= s)%Z /\ (s <  size)%Z) /\
+  ((n + s)%Z <  size)%Z)) -> ((nth (lsr b s) n) = (nth b (n + s)%Z)).
 
-Axiom lsr_nth_high : forall (b:bv) (n:Z) (s:Z), ((0%Z <= n)%Z /\
-  (n <  size)%Z) -> ((0%Z <= s)%Z -> ((size <= (n + s)%Z)%Z -> ((nth (lsr b
-  s) n) = false))).
+Axiom lsr_nth_high : forall (b:bv) (n:Z) (s:Z), (((0%Z <= n)%Z /\
+  (n <  size)%Z) /\ (((0%Z <= s)%Z /\ (s <  size)%Z) /\
+  (size <= (n + s)%Z)%Z)) -> ((nth (lsr b s) n) = false).
 
 Parameter asr: bv -> Z -> bv.
 
@@ -244,35 +253,43 @@ Axiom lsl_nth_low : forall (b:bv) (n:Z) (s:Z), ((0%Z <= n)%Z /\
 Parameter to_nat_sub: bv -> Z -> Z -> Z.
 
 
-Axiom to_nat_sub_zero : forall (b:bv) (j:Z) (i:Z), ((0%Z <= i)%Z /\
-  (i <= j)%Z) -> (((nth b j) = false) -> ((to_nat_sub b j i) = (to_nat_sub b
-  (j - 1%Z)%Z i))).
+Axiom to_nat_sub_zero : forall (b:bv) (j:Z) (i:Z), (((0%Z <= i)%Z /\
+  (i <= j)%Z) /\ (j <  size)%Z) -> (((nth b j) = false) -> ((to_nat_sub b j
+  i) = (to_nat_sub b (j - 1%Z)%Z i))).
 
-Axiom to_nat_sub_one : forall (b:bv) (j:Z) (i:Z), ((0%Z <= i)%Z /\
-  (i <= j)%Z) -> (((nth b j) = true) -> ((to_nat_sub b j
+Axiom to_nat_sub_one : forall (b:bv) (j:Z) (i:Z), (((0%Z <= i)%Z /\
+  (i <= j)%Z) /\ (j <  size)%Z) -> (((nth b j) = true) -> ((to_nat_sub b j
   i) = ((pow2 (j - i)%Z) + (to_nat_sub b (j - 1%Z)%Z i))%Z)).
 
 Axiom to_nat_sub_high : forall (b:bv) (j:Z) (i:Z), (j <  i)%Z ->
   ((to_nat_sub b j i) = 0%Z).
 
-Axiom to_nat_of_zero2 : forall (b:bv) (i:Z) (j:Z), ((i <= j)%Z /\
-  (0%Z <= i)%Z) -> ((forall (k:Z), ((k <= j)%Z /\ (i <  k)%Z) -> ((nth b
-  k) = false)) -> ((to_nat_sub b j 0%Z) = (to_nat_sub b i 0%Z))).
+Axiom to_nat_of_zero2 : forall (b:bv) (i:Z) (j:Z), (((j <  size)%Z /\
+  (i <= j)%Z) /\ (0%Z <= i)%Z) -> ((forall (k:Z), ((k <= j)%Z /\
+  (i <  k)%Z) -> ((nth b k) = false)) -> ((to_nat_sub b j
+  0%Z) = (to_nat_sub b i 0%Z))).
 
 (* YOU MAY EDIT THE CONTEXT BELOW *)
 
 (* DO NOT EDIT BELOW *)
 
-Theorem to_nat_of_zero : forall (b:bv) (i:Z) (j:Z), ((i <= j)%Z /\
-  (0%Z <= i)%Z) -> ((forall (k:Z), ((k <= j)%Z /\ (i <= k)%Z) -> ((nth b
-  k) = false)) -> ((to_nat_sub b j i) = 0%Z)).
+Theorem to_nat_of_zero : forall (b:bv) (i:Z) (j:Z), (((j <  size)%Z /\
+  (i <= j)%Z) /\ (0%Z <= i)%Z) -> ((forall (k:Z), ((k <= j)%Z /\
+  (i <= k)%Z) -> ((nth b k) = false)) -> ((to_nat_sub b j i) = 0%Z)).
 (* YOU MAY EDIT THE PROOF BELOW *)
 Open Scope Z_scope.
 intros b i j Hij.
+cut(j<size).
 apply Zlt_lower_bound_ind with (z:=i)
+                    (P:= fun j=>  j < size ->
+(forall k : Z, k <= j /\ i <= k -> nth b k = false) -> to_nat_sub b j i = 0).
+
+(*apply Zlt_lower_bound_ind with (z:=i)
                     (P:= fun j=> (forall k : Z, (k <= j)%Z /\ (i <= k)%Z -> nth b k = false) ->
 to_nat_sub b j i = 0%Z).
-intros x Hind Hxi.
+*)
+
+intros x Hind Hxi Hxsize.
 assert (h: (i=x \/ i<x)) by omega.
 destruct h.
 subst x;auto.
@@ -281,7 +298,12 @@ rewrite to_nat_sub_zero;auto with zarith.
 rewrite to_nat_sub_high;auto with zarith.
 intro.
 rewrite to_nat_sub_zero;auto with zarith.
-apply Hij.
+destruct Hij.
+destruct H.
+exact H1.
+destruct Hij.
+destruct H.
+exact H.
 Qed.
 (* DO NOT EDIT BELOW *)
 

@@ -63,6 +63,7 @@ theory int.Int
   remove prop Total
   remove prop NonTrivialRing
   remove prop CompatOrderAdd
+  remove prop ZeroLessOne
 
 end
 
@@ -101,20 +102,24 @@ theory real.Real
   remove prop Total
   remove prop NonTrivialRing
   remove prop CompatOrderAdd
+  remove prop ZeroLessOne
 
   meta "encoding : kept" type real
 
 end
 
-theory bool.Bool
+theory Bool
    syntax type bool      "bool"
    syntax function True  "true"
    syntax function False "false"
+   meta "encoding : kept" type bool
+end
+
+theory bool.Bool
    syntax function andb  "(and %1 %2)"
    syntax function orb   "(or %1 %2)"
    syntax function xorb  "(xor %1 %2)"
    syntax function notb  "(not %1)"
-   meta "encoding : kept" type bool
 end
 
 

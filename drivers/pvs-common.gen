@@ -1,0 +1,263 @@
+
+valid 0
+unknown "Error: \\(.*\\)$" "\\1"
+fail "Syntax error: \\(.*\\)$" "\\1"
+time "why3cpulimit time : %s s"
+
+transformation "inline_trivial"
+transformation "eliminate_builtin"
+
+(* PVS does not support mutual recursion *)
+transformation "eliminate_mutual_recursion"
+transformation "simplify_recursive_definition"
+(* though we could do better, we only use recursion on one argument *)
+transformation "eliminate_non_struct_recursion"
+
+(* PVS only has simple patterns *)
+transformation "compile_match"
+
+transformation "simplify_formula"
+
+theory BuiltIn
+  syntax type   int   "int"
+  syntax type   real  "real"
+  syntax predicate  (=)   "(%1 = %2)"
+end
+
+theory Tuple0
+  syntax type     tuple0 "tuple0"
+  syntax function Tuple0 "Tuple0"
+end
+
+theory map.Map
+  syntax type  map "[%1 -> %2]"
+
+  syntax function get "%1(%2)"
+  syntax function set "(%1 WITH [(%2) |-> %3])"
+
+  remove prop Select_eq
+  remove prop Select_neq
+
+  (* %t0 is "map a b"
+     %t1 is the type of const's argument, that is "b"
+     but we need type "a" instead, i.e. the first type argument
+
+  syntax function const "(LAMBDA (x:%t1): %1)"
+  remove prop Const
+  *)
+end
+
+theory Bool
+  syntax type bool   "bool"
+
+  syntax function True  "TRUE"
+  syntax function False "FALSE"
+end
+
+theory bool.Bool
+
+  syntax function andb  "(%1 AND %2)"
+  syntax function orb   "(%1 OR %2)"
+  syntax function xorb  "(%1 XOR %2)"
+  syntax function notb  "(NOT %1)"
+  syntax function implb "(%1 => %2)"
+
+end
+
+
+theory int.Int
+
+  syntax function zero "0"
+  syntax function one  "1"
+
+  syntax function (+)  "(%1 + %2)"
+  syntax function (-)  "(%1 - %2)"
+  syntax function (*)  "(%1 * %2)"
+  syntax function (-_) "(-%1)"
+
+  syntax predicate (<=) "(%1 <= %2)"
+  syntax predicate (<)  "(%1 <  %2)"
+  syntax predicate (>=) "(%1 >= %2)"
+  syntax predicate (>)  "(%1 >  %2)"
+
+  remove prop CommutativeGroup.Comm.Comm
+  remove prop CommutativeGroup.Assoc.Assoc
+  remove prop CommutativeGroup.Unit_def
+  remove prop CommutativeGroup.Inv_def
+  remove prop Assoc.Assoc
+  remove prop Mul_distr
+  remove prop Comm.Comm
+  remove prop Unitary
+  remove prop Refl
+  remove prop Trans
+  remove prop Antisymm
+  remove prop Total
+  remove prop NonTrivialRing
+  remove prop CompatOrderAdd
+  remove prop CompatOrderMult
+  remove prop ZeroLessOne
+
+end
+
+theory int.Abs
+
+  syntax function abs "abs(%1)"
+
+  remove prop Abs_pos
+
+end
+
+theory int.MinMax
+
+  syntax function min "min(%1, %2)"
+  syntax function max "max(%1, %2)"
+
+end
+
+theory int.EuclideanDivision
+
+  syntax function div "ndiv(%1, %2)"
+  syntax function mod "mod(%1, %2)"
+
+  remove prop Div_mod
+  remove prop Div_bound
+  remove prop Mod_bound
+  remove prop Mod_1
+  remove prop Div_1
+
+end
+
+(***
+theory int.ComputerDivision
+
+  syntax function div "(ZOdiv %1 %2)"
+  syntax function mod "(ZOmod %1 %2)"
+
+  remove prop Div_mod
+  remove prop Div_bound
+  remove prop Mod_bound
+  remove prop Div_sign_pos
+  remove prop Div_sign_neg
+  remove prop Mod_sign_pos
+  remove prop Mod_sign_neg
+  remove prop Rounds_toward_zero
+  remove prop Div_1
+  remove prop Mod_1
+  remove prop Div_inf
+  remove prop Mod_inf
+  remove prop Div_mult
+  remove prop Mod_mult
+
+end
+***)
+
+theory real.Real
+
+  syntax function zero "0"
+  syntax function one  "1"
+
+  syntax function (+)  "(%1 + %2)"
+  syntax function (-)  "(%1 - %2)"
+  syntax function (-_) "(-%1)"
+  syntax function (*)  "(%1 * %2)"
+  syntax function (/)  "(%1 / %2)"
+  syntax function inv  "(1 / %1)"
+
+  syntax predicate (<=) "(%1 <= %2)"
+  syntax predicate (<)  "(%1 <  %2)"
+  syntax predicate (>=) "(%1 >= %2)"
+  syntax predicate (>)  "(%1 >  %2)"
+
+  remove prop CommutativeGroup.Comm.Comm
+  remove prop CommutativeGroup.Assoc.Assoc
+  remove prop CommutativeGroup.Unit_def
+  remove prop CommutativeGroup.Inv_def
+  remove prop Assoc.Assoc
+  remove prop Mul_distr
+  remove prop Comm.Comm
+  remove prop Unitary
+  remove prop Inverse
+  remove prop NonTrivialRing
+  remove prop CompatOrderAdd
+  remove prop CompatOrderMult
+  remove prop ZeroLessOne
+  remove prop Refl
+  remove prop Trans
+  remove prop Antisymm
+  remove prop Total
+  remove prop assoc_mul_div
+  remove prop assoc_div_mul
+  remove prop assoc_div_div
+
+end
+
+theory real.RealInfix
+
+  syntax function (+.)  "(%1 + %2)"
+  syntax function (-.)  "(%1 - %2)"
+  syntax function (-._) "(-%1)"
+  syntax function ( *.) "(%1 * %2)"
+  syntax function (/.)  "(%1 / %2)"
+
+  syntax predicate (<=.) "(%1 <= %2)"
+  syntax predicate (<.)  "(%1 <  %2)"
+  syntax predicate (>=.) "(%1 >= %2)"
+  syntax predicate (>.)  "(%1 >  %2)"
+
+end
+
+theory real.Abs
+
+  syntax function abs "abs(%1)"
+
+  remove prop Abs_le
+  remove prop Abs_pos
+
+end
+
+theory real.FromInt
+
+  syntax function from_int "(%1 :: real)"
+
+  remove prop Zero
+  remove prop One
+  remove prop Add
+  remove prop Sub
+  remove prop Mul
+  remove prop Neg
+
+end
+
+theory real.Square
+
+  syntax function sqrt "SQRT(%1)"
+
+end
+
+theory real.ExpLog
+
+  syntax function exp "EXP(%1)"
+  syntax function log "LOG(%1)"
+
+end
+
+theory real.Power
+
+  syntax function pow "(%1 ^ %2)"
+
+  remove prop Pow_x_zero
+  remove prop Pow_x_one
+  remove prop Pow_one_y
+
+end
+
+theory real.Trigonometry
+
+  syntax function cos "COS(%1)"
+  syntax function sin "SIN(%1)"
+
+  syntax function pi "PI"
+
+  syntax function tan "TAN(%1)"
+
+end

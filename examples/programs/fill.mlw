@@ -1,0 +1,50 @@
+
+(* From Rustan Leino's tutorial on Dafny at VSTTE 2012 *)
+
+module Fill
+
+  use import int.Int
+  use import module array.Array
+
+  type elt
+  type tree = Null | Node tree elt tree
+
+  predicate contains (t: tree) (x: elt) = match t with
+    | Null       -> false
+    | Node l y r -> contains l x || x = y || contains r x
+  end
+
+  (* the size of a tree, to prove termination *)
+  function size (t: tree) : int = match t with
+    | Null       -> 0
+    | Node l _ r -> size l + size r + 1
+  end
+
+  lemma size_nonneg: forall t: tree. size t >= 0
+
+  let rec fill (t: tree) (a: array elt) (start: int) : int
+    variant { size t }
+  =
+    { 0 <= start <= length a }
+    match t with
+    | Null ->
+        start
+    | Node l x r ->
+        let res = fill l a start in
+        if res <> length a then begin
+          a[res] <- x;
+          fill r a (res + 1)
+        end else
+          res
+     end
+    { start <= result <= length a /\
+      (forall i: int. 0 <= i < start -> a[i] = (old a)[i]) /\
+      (forall i: int. start <= i < result -> contains t a[i]) }
+
+end
+
+(*
+Local Variables:
+compile-command: "unset LANG; make -C ../.. examples/programs/fill.gui"
+End:
+*)
