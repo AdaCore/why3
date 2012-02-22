@@ -87,6 +87,7 @@ let add_opt_meta meta =
   opt_metas := (meta_name,meta_arg)::!opt_metas
 
 let opt_config = ref None
+let opt_extra = ref []
 let opt_parser = ref None
 let opt_prover = ref None
 let opt_loadpath = ref []
@@ -130,6 +131,8 @@ let option_list = Arg.align [
       "<file> Read configuration from <file>";
   "--config", Arg.String (fun s -> opt_config := Some s),
       " same as -C";
+  "--extra-config", Arg.String (fun s -> opt_extra := !opt_extra @ [s]),
+      "<file> Read additional configuration from <file>";
   "-L", Arg.String (fun s -> opt_loadpath := s :: !opt_loadpath),
       "<dir> Add <dir> to the library search path";
   "--library", Arg.String (fun s -> opt_loadpath := s :: !opt_loadpath),
@@ -160,9 +163,9 @@ let option_list = Arg.align [
       "<meta_name>=<string> Add a string meta to every task";
   "--meta", Arg.String add_opt_meta,
       " same as -M";
-  "-D", Arg.String (fun s -> opt_driver := Some s),
+  "-D", Arg.String (fun s -> opt_driver := Some (s, [])),
       "<file> Specify a prover's driver (conflicts with -P)";
-  "--driver", Arg.String (fun s -> opt_driver := Some s),
+  "--driver", Arg.String (fun s -> opt_driver := Some (s, [])),
       " same as -D";
   "-o", Arg.String (fun s -> opt_output := Some s),
       "<dir> Print the selected goals to separate files in <dir>";
@@ -256,6 +259,7 @@ let () = try
   if !opt_list_provers then begin
     opt_list := true;
     let config = read_config !opt_config in
+    let config = List.fold_left merge_config config !opt_extra in
     let print fmt prover pc = fprintf fmt "%s (%a)@\n"
       pc.id print_prover prover in
     let print fmt m = Mprover.iter (print fmt) m in
@@ -319,9 +323,9 @@ let () = try
   if !opt_memlimit  = None then opt_memlimit  := Some (Whyconf.memlimit main);
   begin match !opt_prover with
   | Some s ->
-    let prover = Whyconf.prover_by_id config s in
-    opt_command := Some prover.command;
-    opt_driver := Some prover.driver
+      let prover = Whyconf.prover_by_id config s in
+      opt_command := Some (String.concat " " (prover.command :: prover.extra_options));
+      opt_driver := Some (prover.driver, prover.extra_drivers)
   | None ->
       ()
   end;
@@ -534,7 +538,7 @@ let do_input env drv = function
 let () =
   try
     let env = Env.create_env !opt_loadpath in
-    let drv = Util.option_map (load_driver env) !opt_driver in
+    let drv = Util.option_map (fun (f,ef) -> load_driver env f ef) !opt_driver in
     Queue.iter (do_input env drv) opt_queue;
     if !opt_token_count then
       Format.printf "Total: %d annot/%d programs, ratio = %.3f@."

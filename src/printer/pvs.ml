@@ -781,7 +781,7 @@ let init_printer th =
 
 (* TODO: add a driver meta and make lookup for realized theories a bit
    more efficient *)
-let realized_theories = Coq_config.realized_theories
+let realized_theories = []
 
 let print_task _env pr thpr realize ?old fmt task =
   forget_all ();

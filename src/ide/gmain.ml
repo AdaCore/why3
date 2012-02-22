@@ -43,6 +43,7 @@ let includes = ref []
 let file = ref None
 let opt_version = ref false
 let opt_config = ref None
+let opt_extra = ref []
 
 let spec = Arg.align [
   ("-L",
@@ -58,6 +59,8 @@ let spec = Arg.align [
       "<file> Read configuration from <file>";
   "--config", Arg.String (fun s -> opt_config := Some s),
       " same as -C";
+  "--extra-config", Arg.String (fun s -> opt_extra := !opt_extra @ [s]),
+      "<file> Read additional configuration from <file>";
 (*
   ("-f",
    Arg.String (fun s -> input_files := s :: !input_files),
@@ -92,7 +95,7 @@ let () =
     exit 0
   end
 
-let () = Gconfig.read_config !opt_config
+let () = Gconfig.read_config !opt_config !opt_extra
 
 let fname = match !file with
   | None ->

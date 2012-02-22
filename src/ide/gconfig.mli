@@ -45,11 +45,12 @@ type t =
       mutable error_color : string;
       mutable env : Why3.Env.env;
       mutable config : Whyconf.config;
+      original_config : Whyconf.config;
       mutable altern_provers : prover option Mprover.t;
       mutable replace_prover : conf_replace_prover;
     }
 
-val read_config : string option -> unit
+val read_config : string option -> string list -> unit
 (** None use the default config *)
 
 val save_config : unit -> unit

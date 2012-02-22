@@ -171,6 +171,7 @@ exception KnownLogicSyntax of lsymbol
 let meta_syntax_type  = register_meta "syntax_type" [MTtysymbol; MTstring]
 let meta_syntax_logic = register_meta "syntax_logic" [MTlsymbol; MTstring]
 let meta_remove_prop  = register_meta "remove_prop" [MTprsymbol]
+let meta_realized     = register_meta "realized" [MTstring; MTstring]
 
 let syntax_type ts s =
   check_syntax s (List.length ts.ts_args);

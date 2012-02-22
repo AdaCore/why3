@@ -43,6 +43,9 @@ val read_config : string option -> config
     "$USERPROFILE/.why3.conf" under Windows) and, if not present, we return
     the built-in default_config with default configuration filename *)
 
+val merge_config : config -> string -> config
+(** [merge_config config filename] merge the content of [filename] into [config] *)
+
 val save_config : config -> unit
 (** [save_config config] save the configuration *)
 
@@ -107,10 +110,12 @@ type config_prover = {
   driver  : string;   (* "/usr/local/share/why/drivers/ergo-spec.drv" *)
   editor  : string;   (* Dedicated editor *)
   interactive : bool; (* Interative theorem prover *)
+  extra_options : string list;
+  extra_drivers : string list;
 }
 
 val get_provers : config  -> config_prover Mprover.t
-(** [get_main config] get the prover family stored in the Rc file. The
+(** [get_provers config] get the prover family stored in the Rc file. The
     keys are the unique ids of the prover (argument of the family) *)
 
 val set_provers : config -> config_prover Mprover.t -> config

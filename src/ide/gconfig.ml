@@ -55,6 +55,7 @@ type t =
       (** colors *)
       mutable env : Env.env;
       mutable config : Whyconf.config;
+      original_config : Whyconf.config;
       mutable altern_provers : altern_provers;
       mutable replace_prover : conf_replace_prover;
     }
@@ -169,7 +170,7 @@ let load_altern alterns (_,section) =
         } in
   Mprover.add unknown known alterns
 
-let load_config config =
+let load_config config original_config =
   let main = get_main config in
   let ide  = match get_section config "ide" with
     | None -> default_ide
@@ -199,6 +200,7 @@ let load_config config =
     max_running_processes = Whyconf.running_provers_max main;
     default_editor = ide.ide_default_editor;
     config         = config;
+    original_config = original_config;
     env            = env;
     altern_provers = alterns;
     replace_prover = ide.ide_replace_prover;
@@ -219,7 +221,7 @@ let save_altern unknown known (id,family) =
   (id+1,(sprintf "alt%i" id,alt)::family)
 
 let save_config t =
-  let config = t.config in
+  let config = t.original_config in
   let config = set_main config
     (set_limits (get_main config)
        t.time_limit t.mem_limit t.max_running_processes)
@@ -252,10 +254,11 @@ let save_config t =
 *)
   save_config config
 
-let read_config conf_file =
+let read_config conf_file extra_files =
   try
     let config = Whyconf.read_config conf_file in
-    load_config config
+    let merged_config = List.fold_left Whyconf.merge_config config extra_files in
+    load_config merged_config config
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "@.%a@." Exn_printer.exn_printer e;
     exit 1
@@ -266,9 +269,9 @@ let config,read_config =
     match !config with
       | None -> invalid_arg "configuration not yet loaded"
       | Some conf -> conf),
-  (fun conf_file ->
+  (fun conf_file extra_files ->
     eprintf "[Info] reading IDE config file...@?";
-    let c = read_config conf_file in
+    let c = read_config conf_file extra_files in
     eprintf " done.@.";
     config := Some c)
 
@@ -774,7 +777,7 @@ let replace_prover c to_be_removed to_be_copied =
   dialog#destroy ();
   res
 
-  let read_config conf_file = read_config conf_file; init ()
+let read_config conf_file extra_files = read_config conf_file extra_files; init ()
 
 (*
 Local Variables:

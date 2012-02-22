@@ -106,8 +106,7 @@ plugins: plugins.@OCAMLBEST@
 LIBGENERATED = src/util/rc.ml src/parser/lexer.ml \
 	       src/parser/parser.mli src/parser/parser.ml \
 	       src/driver/driver_parser.mli src/driver/driver_parser.ml \
-	       src/driver/driver_lexer.ml src/coq_config.ml \
-               src/session/xml.ml
+	       src/driver/driver_lexer.ml src/session/xml.ml
 
 LIB_UTIL = stdlib exn_printer pp debug loc print_tree print_number \
 	   cmdline hashweak hashcons util sysutil rc plugin
@@ -136,7 +135,7 @@ LIB_PRINTER = alt_ergo why3printer smtv1 smtv2 coq pvs simplify gappa \
 
 LIB_SESSION = xml termcode session session_tools session_scheduler
 
-LIBMODULES = src/config src/coq_config \
+LIBMODULES = src/config \
 	      $(addprefix src/util/, $(LIB_UTIL)) \
 	      $(addprefix src/core/, $(LIB_CORE)) \
 	      $(addprefix src/parser/, $(LIB_PARSER)) \
@@ -942,16 +941,15 @@ COQVO = $(addsuffix .vo, $(COQLIBS_FILES))
 %.vo: %.v
 	$(COQC) -R lib/coq Why3 $<
 
-src/coq_config.ml:
-	echo "let realized_theories = [" > $@
-	for f in $(COQLIBS_INT_FILES); do echo '  ["int"; "'"$$f"'"];'; done >> $@
-	for f in $(COQLIBS_REAL_FILES); do echo '  ["real"; "'"$$f"'"];'; done >> $@
+drivers/coq-realizations.aux:
+	echo "(* generated automatically at compilation time *)" > $@
+	for f in $(COQLIBS_INT_FILES); do echo 'theory int.'"$$f"' meta "realized" "int.'"$$f"'", "" end'; done >> $@
+	for f in $(COQLIBS_REAL_FILES); do echo 'theory real.'"$$f"' meta "realized" "real.'"$$f"'", "" end'; done >> $@
 ifeq (@enable_coq_fp_libs@,yes)
-	for f in $(COQLIBS_FP_FILES); do echo '  ["floating_point"; "'"$$f"'"];'; done >> $@
+	for f in $(COQLIBS_FP_FILES); do echo 'theory floating_point.'"$$f"' meta "realized" "floating_point.'"$$f"'", "" end'; done >> $@
 endif
-	echo "]" >> $@
 
-all: $(COQVO)
+opt byte: $(COQVO)
 
 install_no_local::
 	mkdir -p $(LIBDIR)/why3/coq
@@ -963,8 +961,9 @@ ifeq (@enable_coq_fp_libs@,yes)
 	mkdir -p $(LIBDIR)/why3/coq/floating_point
 	cp $(addsuffix .vo, $(COQLIBS_FP)) $(LIBDIR)/why3/coq/floating_point/
 endif
+	cp drivers/coq-realizations.aux $(DATADIR)/why3/drivers/
 
-install_local: $(COQVO)
+install_local: $(COQVO) drivers/coq-realizations.aux
 
 ifneq "$(MAKECMDGOALS)" "clean"
 include .depend.coq-libs
@@ -981,10 +980,15 @@ clean::
 
 else
 
-src/coq_config.ml:
-	echo "let realized_theories = []" > $@
+drivers/coq-realizations.aux:
+	echo "(* generated automatically at compilation time *)" > $@
 
 endif
+
+opt byte: drivers/coq-realizations.aux
+
+clean::
+	rm -f drivers/coq-realizations.aux
 
 #######
 # tools

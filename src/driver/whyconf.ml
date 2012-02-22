@@ -102,6 +102,8 @@ type config_prover = {
   driver  : string;
   editor  : string;
   interactive : bool;
+  extra_options : string list;
+  extra_drivers : string list;
 }
 
 type main = {
@@ -237,6 +239,8 @@ let load_prover dirname provers (id,section) =
       driver  = absolute_filename dirname (get_string section "driver");
       editor  = get_string ~default:"" section "editor";
       interactive = get_bool ~default:false section "interactive";
+      extra_options = [];
+      extra_drivers = [];
     } provers
 
 let load_main dirname section =
@@ -305,6 +309,30 @@ let read_config conf_file =
     let b = Buffer.create 40 in
     Format.bprintf b "%a" Exn_printer.exn_printer e;
     raise (ConfigFailure (fst filenamerc, Buffer.contents b))
+
+let merge_config config filename =
+  let dirname = Filename.dirname filename in
+  let rc = Rc.from_file filename in
+  let main = match get_section rc "main" with
+    | None -> config.main
+    | Some rc ->
+      let loadpath = (List.map (absolute_filename dirname)
+        (get_stringl ~default:[] rc "loadpath")) @ config.main.loadpath in
+      let plugins = (get_stringl ~default:[] rc "plugin") @ config.main.plugins in
+      { config.main with loadpath = loadpath; plugins = plugins } in
+  let provers = get_family rc "prover" in
+  let provers = List.fold_left
+    (fun provers (id, section) ->
+      try
+        let key,c = Mprover.choose (Mprover.filter (fun _ p -> p.id = id) provers) in
+        let opt = (get_stringl ~default:[] section "option") @ c.extra_options in
+        let drv = (List.map (absolute_filename dirname)
+          (get_stringl ~default:[] section "driver")) @ c.extra_options in
+        Mprover.add key { c with extra_options = opt ; extra_drivers = drv } provers
+      with
+        Not_found -> load_prover dirname provers (id, section)
+    ) config.provers provers in
+  { config with main = main; provers = provers }
 
 let save_config config =
   let filename = config.conf_file in

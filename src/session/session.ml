@@ -1109,7 +1109,7 @@ let load_prover eS prover =
     let r = match r with
       | None -> None
       | Some pr ->
-        let dr = Driver.load_driver eS.env pr.Whyconf.driver in
+        let dr = Driver.load_driver eS.env pr.Whyconf.driver pr.Whyconf.extra_drivers in
         Some { prover_config = pr;
                prover_driver = dr}
     in
