@@ -41,12 +41,11 @@ and ity_node = private
   | Ityvar of tvsymbol
   | Itypur of tysymbol * ity list
   | Ityapp of itysymbol * ity list * region list
-  (* | Itymod of tysymbol * ity *)
 
 and region = private {
+  reg_name  : ident;
   reg_ity   : ity;
   reg_ghost : bool;
-  reg_tag   : Hashweak.tag;
 }
 
 module Mits : Map.S with type key = itysymbol
@@ -79,7 +78,7 @@ exception DuplicateRegion of region
 exception UnboundRegion of region
 exception InvalidRegion of region
 
-val create_region : ?ghost:bool -> ity -> region
+val create_region : preid -> ?ghost:bool -> ity -> region
 
 val create_itysymbol :
   preid -> tvsymbol list -> region list -> ity option -> itysymbol
@@ -88,9 +87,6 @@ val ity_var : tvsymbol -> ity
 val ity_pur : tysymbol -> ity list -> ity
 
 val ity_app : itysymbol -> ity list -> region list -> ity
-
-(* erases all [Itymod] *)
-(* val ity_unmod : ity -> ity *)
 
 (* all aliases expanded, all regions removed *)
 val ty_of_ity : ity -> ty
@@ -118,9 +114,11 @@ val ity_v_any : (tvsymbol -> bool) -> (region -> bool) -> ity -> bool
 
 (** {3 symbol-wise map/fold} *)
 (** visits every symbol of the type *)
+
+val ity_s_fold :
+  ('a -> itysymbol -> 'a) -> ('a -> tysymbol -> 'a) -> 'a -> ity -> 'a
 (*
 val ity_s_map : (itysymbol -> itysymbol) -> ity -> ity
-val ity_s_fold : ('a -> itysymbol -> 'a) -> 'a -> ity -> 'a
 val ity_s_all : (itysymbol -> bool) -> ity -> bool
 val ity_s_any : (itysymbol -> bool) -> ity -> bool
 *)
@@ -169,6 +167,7 @@ val eff_empty: effect
 val eff_union: effect -> effect -> effect
 val eff_read: region -> effect
 val eff_write: region -> effect
+val eff_erase: region -> effect
 val eff_raise: xsymbol -> effect
 val eff_remove_raise: xsymbol -> effect -> effect
 
@@ -181,6 +180,8 @@ type pvsymbol = private {
 }
 
 val create_pvsymbol: preid -> ?mut:region -> ?ghost:bool -> ity -> pvsymbol
+
+val pv_equal : pvsymbol -> pvsymbol -> bool
 
 (* value types *)
 type vty = private
@@ -199,7 +200,9 @@ and cty = private {
 and xpost = (pvsymbol * term) Mexn.t
 
 (* smart constructors *)
+val create_cty:
+  ?pre:term -> ?post:term -> ?xpost:xpost -> ?effect:effect -> vty -> cty
+
 val vty_value: pvsymbol -> vty
-val vty_arrow:
-  pvsymbol -> ?pre:term -> ?post:term -> ?xpost:xpost -> vty -> effect -> vty
+val vty_arrow: pvsymbol -> cty -> vty
 

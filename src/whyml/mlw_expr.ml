@@ -24,7 +24,7 @@ open Mlw_ty
 
 (* program symbols *)
 type psymbol = {
-  p_ident: ident;
+  p_name: ident;
   p_tvs:   Stv.t;
   p_reg:   Sreg.t;
   p_vty:   vty;
@@ -33,7 +33,7 @@ type psymbol = {
 
 let create_psymbol id tvars regs vty =
   (* TODO? check that tvars/regs are in vty *)
-  { p_ident = id_register id;
+  { p_name = id_register id;
     p_tvs   = tvars;
     p_reg   = regs;
     p_vty   = vty; }

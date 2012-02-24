@@ -86,12 +86,13 @@
         "exception", EXCEPTION;
         "for", FOR;
         "fun", FUN;
-        (* "ghost", GHOST; *)
+        "ghost", GHOST;
         "invariant", INVARIANT;
         "loop", LOOP;
         "model", MODEL;
         "module", MODULE;
         "mutable", MUTABLE;
+        "private", PRIVATE;
         "raise", RAISE;
         "raises", RAISES;
         "reads", READS;
