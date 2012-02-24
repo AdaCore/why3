@@ -417,6 +417,27 @@ let read_old_proof =
     Query (name, Vernacular, s)
   with StringValue s -> Other s
 
+(* Load old-style proofs where users were confined to a few sections. *)
+let read_deprecated_script ch =
+  let sc = ref [] in
+  let context = ref true in
+  try
+    while true do
+      let pos = pos_in ch in
+      let s = input_line ch in
+      if !context then
+        if s = "(* DO NOT EDIT BELOW *)" then context := false else
+        sc := Other s :: !sc
+      else if s <> "" then begin
+        seek_in ch pos;
+        sc := read_old_proof ch :: Other "" :: !sc;
+        raise End_of_file
+      end
+    done;
+    assert false
+  with
+  | End_of_file -> !sc
+
 let read_old_script =
   let axm = Str.regexp "\\(Axiom\\|Parameter\\)[ ]+\\([^ :(.]+\\)" in
   fun ch ->
@@ -433,6 +454,8 @@ let read_old_script =
         (let name = Str.matched_group 2 s in sc := Axiom name :: !sc;
         skip_to_empty := true) else
       if s = "(* Why3 goal *)" then sc := read_old_proof ch :: !sc else
+      if s = "(* YOU MAY EDIT THE CONTEXT BELOW *)" then
+        (sc := read_deprecated_script ch; raise End_of_file) else
       sc := Other s :: !sc
     done;
     assert false
