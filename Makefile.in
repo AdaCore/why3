@@ -945,13 +945,13 @@ COQVD = $(addsuffix .vd, $(COQLIBS_FILES))
 %.vd: %.v
 	$(if $(QUIET),@echo 'Coqdep $<' &&) $(COQDEP) -slash -R lib/coq Why3 $< > $@
 
-drivers/coq-realizations.aux:
-	echo "(* generated automatically at compilation time *)" > $@
-	for f in $(COQLIBS_INT_FILES); do echo 'theory int.'"$$f"' meta "realized" "int.'"$$f"'", "" end'; done >> $@
-	for f in $(COQLIBS_REAL_FILES); do echo 'theory real.'"$$f"' meta "realized" "real.'"$$f"'", "" end'; done >> $@
-ifeq (@enable_coq_fp_libs@,yes)
-	for f in $(COQLIBS_FP_FILES); do echo 'theory floating_point.'"$$f"' meta "realized" "floating_point.'"$$f"'", "" end'; done >> $@
-endif
+drivers/coq-realizations.aux: Makefile
+	$(if $(QUIET),@echo 'Generate $@' &&) \
+	(echo "(* generated automatically at compilation time *)"; \
+	for f in $(COQLIBS_INT_FILES); do echo 'theory int.'"$$f"' meta "realized" "int.'"$$f"'", "" end'; done; \
+	for f in $(COQLIBS_REAL_FILES); do echo 'theory real.'"$$f"' meta "realized" "real.'"$$f"'", "" end'; done; \
+	for f in $(COQLIBS_FP_FILES); do echo 'theory floating_point.'"$$f"' meta "realized" "floating_point.'"$$f"'", "" end'; done; \
+	) > $@
 
 opt byte: $(COQVO)
 
