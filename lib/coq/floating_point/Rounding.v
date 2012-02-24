@@ -2,9 +2,13 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import ZArith.
 Require Import Rbase.
+
+(* Why3 assumption *)
 Inductive mode  :=
-  | NearestTiesToEven : mode
-  | ToZero : mode
-  | Up : mode
-  | Down : mode
+  | NearestTiesToEven : mode 
+  | ToZero : mode 
+  | Up : mode 
+  | Down : mode 
   | NearestTiesToAway : mode .
+
+

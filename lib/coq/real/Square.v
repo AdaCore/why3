@@ -3,47 +3,30 @@
 Require Import ZArith.
 Require Import Rbase.
 Require Import R_sqrt.
-(*Add Rec LoadPath "/home/guillaume/bin/why3/share/why3/theories".*)
-(*Add Rec LoadPath "/home/guillaume/bin/why3/share/why3/modules".*)
 Require real.Real.
+
+(* Why3 assumption *)
 Definition sqr(x:R): R := (x * x)%R.
 
+(* Why3 goal *)
 Definition sqrt: R -> R.
-(* YOU MAY EDIT THE PROOF BELOW *)
 exact sqrt.
 Defined.
-(* DO NOT EDIT BELOW *)
 
-
-(* YOU MAY EDIT THE CONTEXT BELOW *)
-
-(* DO NOT EDIT BELOW *)
-
+(* Why3 goal *)
 Lemma Sqrt_positive : forall (x:R), (0%R <= x)%R -> (0%R <= (sqrt x))%R.
-(* YOU MAY EDIT THE PROOF BELOW *)
 intros x _.
 apply sqrt_pos.
 Qed.
-(* DO NOT EDIT BELOW *)
 
-(* YOU MAY EDIT THE CONTEXT BELOW *)
-
-(* DO NOT EDIT BELOW *)
-
+(* Why3 goal *)
 Lemma Sqrt_square : forall (x:R), (0%R <= x)%R -> ((sqr (sqrt x)) = x).
-(* YOU MAY EDIT THE PROOF BELOW *)
 exact sqrt_sqrt.
 Qed.
-(* DO NOT EDIT BELOW *)
 
-(* YOU MAY EDIT THE CONTEXT BELOW *)
-
-(* DO NOT EDIT BELOW *)
-
+(* Why3 goal *)
 Lemma Square_sqrt : forall (x:R), (0%R <= x)%R -> ((sqrt (x * x)%R) = x).
-(* YOU MAY EDIT THE PROOF BELOW *)
 exact sqrt_square.
 Qed.
-(* DO NOT EDIT BELOW *)
 
 

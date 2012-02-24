@@ -2,46 +2,30 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import ZArith.
 Require Import Rbase.
-(*Add Rec LoadPath "/home/guillaume/bin/why3/share/why3/theories".*)
-(*Add Rec LoadPath "/home/guillaume/bin/why3/share/why3/modules".*)
 Require real.Real.
 
-(* no editable section? *)
 Require Import Rbasic_fun.
 
+(* Why3 goal *)
 Definition min: R -> R -> R.
-(* YOU MAY EDIT THE PROOF BELOW *)
 exact Rmin.
 Defined.
-(* DO NOT EDIT BELOW *)
 
-
+(* Why3 goal *)
 Definition max: R -> R -> R.
-(* YOU MAY EDIT THE PROOF BELOW *)
 exact Rmax.
 Defined.
-(* DO NOT EDIT BELOW *)
 
-
-(* YOU MAY EDIT THE CONTEXT BELOW *)
-
-(* DO NOT EDIT BELOW *)
-
+(* Why3 goal *)
 Lemma Max_is_ge : forall (x:R) (y:R), (x <= (max x y))%R /\ (y <= (max x
   y))%R.
-(* YOU MAY EDIT THE PROOF BELOW *)
 split.
 apply Rmax_l.
 apply Rmax_r.
 Qed.
-(* DO NOT EDIT BELOW *)
 
-(* YOU MAY EDIT THE CONTEXT BELOW *)
-
-(* DO NOT EDIT BELOW *)
-
+(* Why3 goal *)
 Lemma Max_is_some : forall (x:R) (y:R), ((max x y) = x) \/ ((max x y) = y).
-(* YOU MAY EDIT THE PROOF BELOW *)
 intros x y.
 destruct (Rle_or_lt x y) as [H|H].
 right.
@@ -50,27 +34,17 @@ left.
 apply Rmax_left.
 now apply Rlt_le.
 Qed.
-(* DO NOT EDIT BELOW *)
 
-(* YOU MAY EDIT THE CONTEXT BELOW *)
-
-(* DO NOT EDIT BELOW *)
-
+(* Why3 goal *)
 Lemma Min_is_le : forall (x:R) (y:R), ((min x y) <= x)%R /\ ((min x
   y) <= y)%R.
-(* YOU MAY EDIT THE PROOF BELOW *)
 split.
 apply Rmin_l.
 apply Rmin_r.
 Qed.
-(* DO NOT EDIT BELOW *)
 
-(* YOU MAY EDIT THE CONTEXT BELOW *)
-
-(* DO NOT EDIT BELOW *)
-
+(* Why3 goal *)
 Lemma Min_is_some : forall (x:R) (y:R), ((min x y) = x) \/ ((min x y) = y).
-(* YOU MAY EDIT THE PROOF BELOW *)
 intros x y.
 destruct (Rle_or_lt x y) as [H|H].
 left.
@@ -79,6 +53,5 @@ right.
 apply Rmin_right.
 now apply Rlt_le.
 Qed.
-(* DO NOT EDIT BELOW *)
 
 
