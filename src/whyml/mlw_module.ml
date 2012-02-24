@@ -202,10 +202,48 @@ let create_module ?(path=[]) n =
 
 (** Program decls *)
 
-(*
-val add_pdecl : module_uc -> pdecl -> module_uc
-val add_pdecl_with_tuples : module_uc -> pdecl -> module_uc
-*)
+let add_symbol add id v uc =
+  match uc.muc_import, uc.muc_export with
+  | i0 :: sti, e0 :: ste -> { uc with
+      muc_import = add false id.id_string v i0 :: sti;
+      muc_export = add true  id.id_string v e0 :: ste }
+  | _ -> assert false
+
+let add_type uc (its,def) =
+  let add_ps uc {ps=ps} = add_symbol add_ps ps.p_name ps uc in
+  let add_proj = option_fold add_ps in
+  let add_constr uc (ps,pjl) = List.fold_left add_proj (add_ps uc ps) pjl in
+  let uc = add_symbol add_it its.its_pure.ts_name its uc in
+  match def with
+    | ITabstract -> uc
+    | ITalgebraic lfs -> List.fold_left add_constr uc lfs
+
+let add_pdecl uc d =
+  let uc =  { uc with
+    muc_decls = d :: uc.muc_decls;
+    muc_known = known_add_decl (Theory.get_known uc.muc_theory) uc.muc_known d;
+    muc_local = Sid.union uc.muc_local d.pd_news }
+  in
+  match d.pd_node with
+  | PDtype dl ->
+      let uc = List.fold_left add_type uc dl in
+      let constructor (ps, _) = ps.ls in
+      let defn = function
+        | ITabstract -> Decl.Tabstract
+        | ITalgebraic cl -> Decl.Talgebraic (List.map constructor cl)
+      in
+      let dl = List.map (fun (its, d) -> its.its_pure, defn d) dl in
+      add_to_theory Theory.add_ty_decl uc dl
+
+let add_pdecl_with_tuples uc d =
+  let ids = Mid.set_diff d.pd_syms uc.muc_known in
+  let ids = Mid.set_diff ids (Theory.get_known uc.muc_theory) in
+  let add id s = match is_ts_tuple_id id with
+    | Some n -> Sint.add n s
+    | None -> s in
+  let ixs = Sid.fold add ids Sint.empty in
+  let add n uc = use_export_theory uc (tuple_theory n) in
+  add_pdecl (Sint.fold add ixs uc) d
 
 (** Clone *)
 

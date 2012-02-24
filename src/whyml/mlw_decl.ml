@@ -26,7 +26,9 @@ open Decl
 open Mlw_ty
 open Mlw_expr
 
-type pconstructor = psymbol * psymbol option list
+type ps_ls = { ps: psymbol; ls: lsymbol }
+
+type pconstructor = ps_ls * ps_ls option list
 
 type ity_defn =
   | ITabstract
@@ -82,7 +84,7 @@ let create_ity_decl tdl =
   let syms = ref Sid.empty in
   let add s (its,_) = news_id s its.its_pure.ts_name in
   let news = ref (List.fold_left add Sid.empty tdl) in
-  let projections = Hvs.create 17 in (* vs -> psymbol *)
+  let projections = Hvs.create 17 in (* vs -> ps_ls *)
   let build_constructor its (id, al) =
     (* check well-formedness *)
     let tvs = List.fold_right Stv.add its.its_args Stv.empty in
@@ -110,6 +112,7 @@ let create_ity_decl tdl =
     let arrow (pv,_) c = create_cty (vty_arrow pv c) in
     let v = (List.fold_right arrow al c).c_vty in
     let ps = create_psymbol id Stv.empty Sreg.empty v in
+    let ps_ls = { ps = ps; ls = ls } in
     news := Sid.add ps.p_name !news;
     (* build the projections, if any *)
     let build_proj pv id =
@@ -120,16 +123,17 @@ let create_ity_decl tdl =
       let effect = option_fold add_read eff_empty pv.pv_mutable in
       let vty = vty_arrow result (create_cty ~post ~effect (vty_value pv)) in
       let ps = create_psymbol id Stv.empty Sreg.empty vty in
+      let ps_ls = { ps = ps; ls = ls } in
       news := Sid.add ps.p_name !news;
-      Hvs.add projections pv.pv_vs ps;
-      ps
+      Hvs.add projections pv.pv_vs ps_ls;
+      ps_ls
     in
     let build_proj pv =
       try Hvs.find projections pv.pv_vs with Not_found -> build_proj pv id in
     let build_proj (pv, pj) =
       syms := ity_s_fold syms_its syms_ts !syms pv.pv_ity;
       if pj then Some (build_proj pv) else None in
-    ps, List.map build_proj al
+    ps_ls, List.map build_proj al
   in
   let build_type (its, defn) = its, match defn with
     | PITabstract -> ITabstract
@@ -155,7 +159,7 @@ let merge_known kn1 kn2 =
   in
   Mid.union check_known kn1 kn2
 
-let known_add_decl kn0 decl =
+let known_add_decl lkn0 kn0 decl =
   let kn = Mid.map (const decl) decl.pd_news in
   let check id decl0 _ =
     if pd_equal decl0 decl
@@ -164,5 +168,6 @@ let known_add_decl kn0 decl =
   in
   let kn = Mid.union check kn0 kn in
   let unk = Mid.set_diff decl.pd_syms kn in
+  let unk = Mid.set_diff unk lkn0 in
   if Sid.is_empty unk then kn
   else raise (UnknownIdent (Sid.choose unk))

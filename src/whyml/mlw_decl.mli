@@ -20,12 +20,15 @@
 open Why3
 open Ident
 open Ty
+open Term
 open Mlw_ty
 open Mlw_expr
 
 (** {2 Type declaration} *)
 
-type pconstructor = psymbol * psymbol option list
+type ps_ls = private { ps: psymbol; ls: lsymbol }
+
+type pconstructor = ps_ls * ps_ls option list
 
 type ity_defn =
   | ITabstract
@@ -62,5 +65,5 @@ val create_ity_decl : pre_ity_decl list -> pdecl
 type known_map = pdecl Mid.t
 
 val known_id : known_map -> ident -> unit
-val known_add_decl : known_map -> pdecl -> known_map
+val known_add_decl : Decl.known_map -> known_map -> pdecl -> known_map
 val merge_known: known_map -> known_map -> known_map
