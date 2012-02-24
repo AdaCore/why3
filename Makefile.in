@@ -937,9 +937,13 @@ COQLIBS_FILES = $(COQLIBS_INT) $(COQLIBS_REAL) $(COQLIBS_FP)
 
 COQV  = $(addsuffix .v,  $(COQLIBS_FILES))
 COQVO = $(addsuffix .vo, $(COQLIBS_FILES))
+COQVD = $(addsuffix .vd, $(COQLIBS_FILES))
 
 %.vo: %.v
-	$(COQC) -R lib/coq Why3 $<
+	$(if $(QUIET),@echo 'Coqc $<' &&) $(COQC) -R lib/coq Why3 $<
+
+%.vd: %.v
+	$(if $(QUIET),@echo 'Coqdep $<' &&) $(COQDEP) -slash -R lib/coq Why3 $< > $@
 
 drivers/coq-realizations.aux:
 	echo "(* generated automatically at compilation time *)" > $@
@@ -966,17 +970,13 @@ endif
 install_local: $(COQVO) drivers/coq-realizations.aux
 
 ifneq "$(MAKECMDGOALS)" "clean"
-include .depend.coq-libs
+include $(COQVD)
 endif
 
-.depend.coq-libs:
-	$(COQDEP) -slash -R lib/coq Why3 $(COQV) > $@
-
-depend: .depend.coq-libs
+depend: $(COQVD)
 
 clean::
-	rm -f $(COQVO) $(addsuffix .glob, $(COQLIBS_FILES))
-	rm -f .depend.coq-libs
+	rm -f $(COQVO) $(COQVD) $(addsuffix .glob, $(COQLIBS_FILES))
 
 else
 
