@@ -369,182 +369,156 @@ let print_implicits fmt ls ty_vars_args ty_vars_value all_ty_params =
       if need_context then fprintf fmt "Unset Contextual Implicit.@\n"
     end
 
-let definition fmt info =
-  fprintf fmt "%s" (if info.realization then "Definition" else "Parameter")
-
 (*
 
   copy of old user scripts
 
 *)
 
-let copy_user_script begin_string end_string ch fmt =
-  fprintf fmt "%s@\n" begin_string;
+type content_type =
+  (*Notation | Gallina |*) Vernacular
+
+type statement =
+  | Axiom of string (* name *)
+  | Query of string * content_type * string (* name and content *)
+  | Other of string (* content *)
+
+exception StringValue of string
+
+let read_generated_name =
+  let def = Str.regexp "\\(Definition\\|Fixpoint\\|Inductive\\)[ ]+\\([^ :(.]+\\)" in
+  fun ch ->
   try
     while true do
       let s = input_line ch in
-      fprintf fmt "%s@\n" s;
-      if s = end_string then raise Exit
-    done
+      if Str.string_match def s 0 then
+        raise (StringValue (Str.matched_group 2 s))
+    done;
+    assert false
+  with StringValue name -> name
+
+let read_old_proof =
+  let def = Str.regexp "\\(Definition\\|Lemma\\|Theorem\\)[ ]+\\([^ :(.]+\\)" in
+  let def_end = Str.regexp ".*[.]$" in
+  let qed = Str.regexp "\\(Qed\\|Defined\\|Save\\|Admitted\\)[.]" in
+  fun ch ->
+  try
+    let s = input_line ch in
+    if not (Str.string_match def s 0) then raise (StringValue s);
+    let name = Str.matched_group 2 s in
+    if not (Str.string_match def_end s (Str.match_end ())) then
+      while not (Str.string_match def_end (input_line ch) 0) do () done;
+    let start = pos_in ch in
+    while not (Str.string_match qed (input_line ch) 0) do () done;
+    let len = pos_in ch - start in
+    let s = String.create len in
+    seek_in ch start;
+    really_input ch s 0 len;
+    Query (name, Vernacular, s)
+  with StringValue s -> Other s
+
+let read_old_script =
+  let axm = Str.regexp "\\(Axiom\\|Parameter\\)[ ]+\\([^ :(.]+\\)" in
+  fun ch ->
+  let skip_to_empty = ref true in
+  let sc = ref [] in
+  try
+    while true do
+      let s = input_line ch in
+      if !skip_to_empty then (if s = "" then skip_to_empty := false) else
+      if s = "(* Why3 assumption *)" then
+        (let name = read_generated_name ch in sc := Axiom name :: !sc;
+        skip_to_empty := true) else
+      if Str.string_match axm s 0 then
+        (let name = Str.matched_group 2 s in sc := Axiom name :: !sc;
+        skip_to_empty := true) else
+      if s = "(* Why3 goal *)" then sc := read_old_proof ch :: !sc else
+      sc := Other s :: !sc
+    done;
+    assert false
   with
-    | Exit -> fprintf fmt "@\n"
-    | End_of_file -> fprintf fmt "%s@\n@\n" end_string
+  | End_of_file ->
+    let rec rmv = function
+      | Other "" :: t -> rmv t
+      | l -> l in
+    List.rev (rmv !sc)
 
-let proof_begin = "(* YOU MAY EDIT THE PROOF BELOW *)"
-let proof_end = "(* DO NOT EDIT BELOW *)"
-let context_begin = "(* YOU MAY EDIT THE CONTEXT BELOW *)"
-let context_end = "(* DO NOT EDIT BELOW *)"
+(* Output all the Other entries of the script that occur before the
+   location of name. Modify the script by removing the name entry and all
+   these outputs. Return the user content. *)
+let output_till_statement fmt script name =
+  let print i =
+    let rec aux acc = function
+      | h :: l when h == i -> script := List.rev_append acc l
+      | Other o :: l -> fprintf fmt "%s@\n" o; aux acc l
+      | h :: l -> aux (h :: acc) l
+      | [] -> assert false in
+    aux [] !script in
+  let rec find = function
+    | Axiom n as o :: _ when n = name -> print o; Some o
+    | Query (n,_,_) as o :: _ when n = name -> print o; Some o
+    | [] -> None
+    | _ :: t -> find t in
+  find !script
 
-(* current kind of script in an old file *)
-type old_file_state = InContext | InProof | NoWhere
+let rec output_remaining fmt ?(in_other=false) script =
+  match script with
+  | Axiom _ :: t -> output_remaining fmt t
+  | Query (n,_,c) :: t ->
+    if in_other then fprintf fmt "*)@\n";
+    fprintf fmt "(* Unused content named %s@\n%s *)@\n" n c;
+    output_remaining fmt t
+  | Other c :: t ->
+    if not in_other then fprintf fmt "(* ";
+    fprintf fmt "%s@\n" c;
+    output_remaining fmt ~in_other:true t
+  | [] ->
+    if in_other then fprintf fmt "*)@\n"
 
-let copy_proof s ch fmt =
-  copy_user_script proof_begin proof_end ch fmt;
-  s := NoWhere
-
-let copy_context s ch fmt =
-  copy_user_script context_begin context_end ch fmt;
-  s := NoWhere
-
-let lookup_context_or_proof old_state old_channel =
-  match !old_state with
-    | InProof | InContext -> ()
-    | NoWhere ->
-        let rec loop () =
-          let s = input_line old_channel in
-          if s = proof_begin then old_state := InProof else
-            if s = context_begin then old_state := InContext else
-              loop ()
-        in
-        try loop ()
-        with End_of_file -> ()
-
-let print_empty_context fmt =
-  fprintf fmt "%s@\n" context_begin;
-  fprintf fmt "@\n";
-  fprintf fmt "%s@\n@\n" context_end
-
-let print_empty_proof ?(def=false) fmt =
-  fprintf fmt "%s@\n" proof_begin;
+let print_empty_proof fmt def =
   if not def then fprintf fmt "intuition.@\n";
   fprintf fmt "@\n";
-  fprintf fmt "%s.@\n" (if def then "Defined" else "Qed");
-  fprintf fmt "%s@\n@\n" proof_end
+  fprintf fmt "%s.@\n" (if def then "Defined" else "Qed")
 
-(*
-let print_next_proof ?def ch fmt =
-  try
-    while true do
-      let s = input_line ch in
-      if s = proof_begin then
-        begin
-          fprintf fmt "%s@\n" proof_begin;
-          while true do
-            let s = input_line ch in
-            fprintf fmt "%s@\n" s;
-            if s = proof_end then raise Exit
-          done
-        end
-    done
-  with
-    | End_of_file -> print_empty_proof ?def fmt
-    | Exit -> fprintf fmt "@\n"
-*)
-
-let print_context ~old fmt =
-  match old with
-    | None -> print_empty_context fmt
-    | Some(s,ch) ->
-        lookup_context_or_proof s ch;
-        match !s with
-          | InProof | NoWhere -> print_empty_context fmt
-          | InContext -> copy_context s ch fmt
-
-let print_proof ~old ?def fmt =
-  match old with
-    | None -> print_empty_proof ?def fmt
-    | Some(s,ch) ->
-        lookup_context_or_proof s ch;
-        match !s with
-          | InContext | NoWhere -> print_empty_proof ?def fmt
-          | InProof -> copy_proof s ch fmt
-
-let produce_remaining_contexts_and_proofs ~old fmt =
-  match old with
-    | None -> ()
-    | Some(s,ch) ->
-        let rec loop () =
-          lookup_context_or_proof s ch;
-          match !s with
-            | NoWhere -> ()
-            | InContext -> copy_context s ch fmt; loop ()
-            | InProof -> copy_proof s ch fmt; loop ()
-        in
-        loop ()
-
-(*
-let produce_remaining_proofs ~old fmt =
-  match old with
-    | None -> ()
-    | Some ch ->
-  try
-    while true do
-      let s = input_line ch in
-      if s = proof_begin then
-        begin
-          fprintf fmt "(* OBSOLETE PROOF *)@\n";
-          try while true do
-            let s = input_line ch in
-            if s = proof_end then
-              begin
-                fprintf fmt "(* END OF OBSOLETE PROOF *)@\n@\n";
-                raise Exit
-              end;
-            fprintf fmt "%s@\n" s;
-          done
-          with Exit -> ()
-        end
-    done
-  with
-    | End_of_file -> fprintf fmt "@\n"
-*)
-
-let realization ~old ?def fmt produce_realization =
-  if produce_realization then
-    print_proof ~old ?def fmt
-(*
-    begin match old with
-      | None -> print_empty_proof ?def fmt
-      | Some ch -> print_next_proof ?def ch fmt
-    end
-*)
-  else
-    fprintf fmt "@\n"
+let print_previous_proof def fmt previous =
+  match previous with
+  | None | Some (Axiom _) ->
+    print_empty_proof fmt def
+  | Some (Query (_,Vernacular,c)) ->
+    fprintf fmt "%s" c
+  | Some (Other _) ->
+    assert false
 
 let print_type_decl ~old info fmt (ts,def) =
   if is_ts_tuple ts then () else
+  let name = id_unique iprinter ts.ts_name in
+  let prev = output_till_statement fmt old name in
   match def with
-    | Tabstract -> begin match ts.ts_def with
-        | None ->
-            fprintf fmt "@[<hov 2>%a %a : %aType.@]@\n%a"
-              definition info
-              print_ts ts print_params_list ts.ts_args
-              (realization ~old ~def:true) info.realization
-        | Some ty ->
-            fprintf fmt "@[<hov 2>Definition %a %a :=@ %a.@]@\n@\n"
-              print_ts ts (print_list space print_tv_binder) ts.ts_args
-              (print_ty info) ty
-      end
-    | Talgebraic csl ->
-        fprintf fmt "@[<hov 2>Inductive %a %a :=@\n@[<hov>%a@].@]@\n"
-          print_ts ts (print_list space print_tv_binder) ts.ts_args
-          (print_list newline (print_constr info ts)) csl;
-        List.iter
-          (fun cs ->
-             let ty_vars_args, ty_vars_value, all_ty_params = ls_ty_vars cs in
-             print_implicits fmt cs ty_vars_args ty_vars_value all_ty_params)
-          csl;
-        fprintf fmt "@\n"
+  | Tabstract ->
+    begin match ts.ts_def with
+    | None ->
+      if info.realization then
+        fprintf fmt "(* Why3 goal *)@\n@[<hov 2>Definition %s : %aType.@]@\n%a"
+          name print_params_list ts.ts_args
+          (print_previous_proof true) prev
+      else
+        fprintf fmt "@[<hov 2>Parameter %s : %aType.@]@\n@\n"
+          name print_params_list ts.ts_args
+    | Some ty ->
+      fprintf fmt "(* Why3 assumption *)@\n@[<hov 2>Definition %s %a :=@ %a.@]@\n@\n"
+        name (print_list space print_tv_binder) ts.ts_args
+        (print_ty info) ty
+    end
+  | Talgebraic csl ->
+    fprintf fmt "(* Why3 assumption *)@\n@[<hov 2>Inductive %s %a :=@\n@[<hov>%a@].@]@\n"
+      name (print_list space print_tv_binder) ts.ts_args
+      (print_list newline (print_constr info ts)) csl;
+    List.iter
+      (fun cs ->
+        let ty_vars_args, ty_vars_value, all_ty_params = ls_ty_vars cs in
+        print_implicits fmt cs ty_vars_args ty_vars_value all_ty_params)
+      csl;
+    fprintf fmt "@\n"
 
 let print_type_decl ~old info fmt d =
   if not (Mid.mem (fst d).ts_name info.info_syn) then
@@ -558,25 +532,30 @@ let print_ls_type ?(arrow=false) info fmt ls =
 
 let print_logic_decl ~old info fmt (ls,ld) =
   let ty_vars_args, ty_vars_value, all_ty_params = ls_ty_vars ls in
-  begin
-    match ld with
+  let name = id_unique iprinter ls.ls_name in
+  let prev = output_till_statement fmt old name in
+  begin match ld with
       | Some ld ->
           let vl,e = open_ls_defn ld in
-          fprintf fmt "@[<hov 2>Definition %a%a%a: %a :=@ %a.@]@\n"
+          fprintf fmt "(* Why3 assumption *)@\n@[<hov 2>Definition %a%a%a: %a :=@ %a.@]@\n"
             print_ls ls
             print_ne_params all_ty_params
             (print_space_list (print_vsty info)) vl
             (print_ls_type info) ls.ls_value
             (print_expr info) e;
           List.iter forget_var vl
-      | None ->
-          fprintf fmt "@[<hov 2>%a %a: %a%a%a.@]@\n%a"
-            definition info
-            print_ls ls
-            print_params all_ty_params
-            (print_arrow_list (print_ty info)) ls.ls_args
-            (print_ls_type ~arrow:(ls.ls_args <> []) info) ls.ls_value
-            (realization ~old ~def:true) info.realization
+  | None ->
+    if info.realization then
+      fprintf fmt "(* Why3 goal *)@\n@[<hov 2>Definition %s: %a%a%a.@]@\n%a"
+        name print_params all_ty_params
+        (print_arrow_list (print_ty info)) ls.ls_args
+        (print_ls_type ~arrow:(ls.ls_args <> []) info) ls.ls_value
+        (print_previous_proof true) prev
+    else
+      fprintf fmt "@[<hov 2>Parameter %s: %a%a%a.@]@\n"
+        name print_params all_ty_params
+        (print_arrow_list (print_ty info)) ls.ls_args
+        (print_ls_type ~arrow:(ls.ls_args <> []) info) ls.ls_value
   end;
   print_implicits fmt ls ty_vars_args ty_vars_value all_ty_params;
   fprintf fmt "@\n"
@@ -606,7 +585,7 @@ let print_recursive_decl info tm fmt (ls,ld) =
 
 let print_recursive_decl info fmt dl =
   let tm = check_termination dl in
-  fprintf fmt "Set Implicit Arguments.@\n";
+  fprintf fmt "(* Why3 assumption *)@\nSet Implicit Arguments.@\n";
   print_list_delim
     ~start:(fun fmt () -> fprintf fmt "@[<hov 2>Fixpoint ")
     ~stop:(fun fmt () -> fprintf fmt ".@\n")
@@ -620,7 +599,7 @@ let print_ind info fmt (pr,f) =
 
 let print_ind_decl info fmt (ps,bl) =
   let ty_vars_args, ty_vars_value, all_ty_params = ls_ty_vars ps in
-  fprintf fmt "@[<hov 2>Inductive %a%a : %a -> Prop :=@ @[<hov>%a@].@]@\n"
+  fprintf fmt "(* Why3 assumption *)@\n@[<hov 2>Inductive %a%a : %a -> Prop :=@ @[<hov>%a@].@]@\n"
      print_ls ps print_implicit_params all_ty_params
     (print_arrow_list (print_ty info)) ps.ls_args
      (print_list newline (print_ind info)) bl;
@@ -631,29 +610,26 @@ let print_ind_decl info fmt d =
   if not (Mid.mem (fst d).ls_name info.info_syn) then
     (print_ind_decl info fmt d; forget_tvs ())
 
-let print_pkind info fmt = function
-  | Paxiom ->
-      if info.realization then
-        fprintf fmt "Lemma"
-      else
-        fprintf fmt "Axiom"
-  | Plemma -> fprintf fmt "Lemma"
-  | Pgoal  -> fprintf fmt "Theorem"
-  | Pskip  -> assert false (* impossible *)
-
-let print_proof ~old info fmt = function
-  | Plemma | Pgoal ->
-      realization ~old fmt true
-  | Paxiom ->
-      realization ~old fmt info.realization
-  | Pskip -> ()
-
-let print_proof_context ~old info fmt = function
-  | Plemma | Pgoal ->
-      print_context ~old fmt
-  | Paxiom ->
-      if info.realization then print_context ~old fmt
-  | Pskip -> ()
+let print_prop_decl ~old info fmt (k,pr,f) =
+  let params = t_ty_freevars Stv.empty f in
+  let name = id_unique iprinter pr.pr_name in
+  let prev = output_till_statement fmt old name in
+  let stt = match k with
+    | Paxiom when info.realization -> "Lemma"
+    | Paxiom -> ""
+    | Plemma -> "Lemma"
+    | Pgoal -> "Theorem"
+    | Pskip -> assert false (* impossible *) in
+  if stt <> "" then
+    fprintf fmt "(* Why3 goal *)@\n@[<hov 2>%s %s : %a%a.@]@\n%a"
+      stt name print_params params
+      (print_fmla info) f
+      (print_previous_proof false) prev
+  else
+    fprintf fmt "@[<hov 2>Axiom %s : %a%a.@]@\n@\n"
+      name print_params params
+      (print_fmla info) f;
+  forget_tvs ()
 
 let print_decl ~old info fmt d = match d.d_node with
   | Dtype tl  ->
@@ -666,18 +642,11 @@ let print_decl ~old info fmt d = match d.d_node with
       print_list nothing (print_ind_decl info) fmt il
   | Dprop (_,pr,_) when Mid.mem pr.pr_name info.info_syn ->
       ()
-  | Dprop (k,pr,f) ->
-      print_proof_context ~old info fmt k;
-      let params = t_ty_freevars Stv.empty f in
-      fprintf fmt "@[<hov 2>%a %a : %a%a.@]@\n%a"
-        (print_pkind info) k
-        print_pr pr
-        print_params params
-        (print_fmla info) f (print_proof ~old info) k;
-      forget_tvs ()
+  | Dprop pr ->
+      print_prop_decl ~old info fmt pr
 
 let print_decls ~old info fmt dl =
-  fprintf fmt "@[<hov>%a@\n@]" (print_list nothing (print_decl ~old info)) dl
+  fprintf fmt "@\n@[<hov>%a@\n@]" (print_list nothing (print_decl ~old info)) dl
 
 let print_task env pr thpr realize ?old fmt task =
   forget_all ();
@@ -724,11 +693,11 @@ let print_task env pr thpr realize ?old fmt task =
     realization = realize;
   }
   in
-  let old = match old with
-    | None -> None
-    | Some ch -> Some(ref NoWhere,ch)
-  in
-  print_decls ~old info fmt local_decls
+  let old = ref (match old with
+    | None -> []
+    | Some ch -> read_old_script ch) in
+  print_decls ~old info fmt local_decls;
+  output_remaining fmt !old
 
 let print_task_full env pr thpr ?old fmt task =
   print_task env pr thpr false ?old fmt task
