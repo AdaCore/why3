@@ -41,19 +41,18 @@ and ity_node =
   | Ityvar of tvsymbol
   | Itypur of tysymbol * ity list
   | Ityapp of itysymbol * ity list * region list
-  (* | Itymod of tysymbol * ity *)
 
 and region = {
-  reg_ity : ity;
+  reg_name : ident;
+  reg_ity  : ity;
   reg_ghost: bool;
-  reg_tag : Hashweak.tag;
 }
 
 (** regions *)
 
 module Reg = WeakStructMake (struct
   type t = region
-  let tag r = r.reg_tag
+  let tag r = r.reg_name.id_tag
 end)
 
 module Sreg = Reg.S
@@ -62,13 +61,10 @@ module Hreg = Reg.H
 module Wreg = Reg.W
 
 let reg_equal : region -> region -> bool = (==)
-let reg_hash r = Hashweak.tag_hash r.reg_tag
+let reg_hash r = id_hash r.reg_name
 
-let create_region =
-  let r = ref 0 in
-  fun ?(ghost=false) ty ->
-    incr r;
-    { reg_ity = ty; reg_ghost = ghost; reg_tag = Hashweak.create_tag !r }
+let create_region id ?(ghost=false) ty =
+  { reg_name = id_register id; reg_ity = ty; reg_ghost = ghost }
 
 (* value type symbols *)
 
@@ -99,8 +95,6 @@ module Hsity = Hashcons.Make (struct
     | Ityapp (s1,l1,r1), Ityapp (s2,l2,r2) ->
         its_equal s1 s2 && List.for_all2 ity_equal l1 l2
           && List.for_all2 reg_equal r1 r2
-    (* | Itymod (s1, ity1), Itymod (s2, ity2) -> *)
-    (*     ts_equal s1 s2 && ity_equal ity1 ity2 *)
     | _ ->
         false
 
@@ -110,8 +104,6 @@ module Hsity = Hashcons.Make (struct
     | Ityapp (s,tl,rl) ->
         Hashcons.combine_list reg_hash
           (Hashcons.combine_list ity_hash (its_hash s) tl) rl
-    (* | Itymod (ts, ity) -> *)
-    (*     Hashcons.combine (ts_hash ts) (ity_hash ity) *)
 
   let tag n ity = { ity with ity_tag = Hashweak.create_tag n }
 end)
@@ -134,7 +126,6 @@ let mk_ity n = {
 let ity_var n = Hsity.hashcons (mk_ity (Ityvar n))
 let ity_pur s tl = Hsity.hashcons (mk_ity (Itypur (s,tl)))
 let ity_app s tl rl = Hsity.hashcons (mk_ity (Ityapp (s,tl,rl)))
-(* let ity_mod ts ity = Hsity.hashcons (mk_ity (Itymod (ts,ity))) *)
 
 (* generic traversal functions *)
 
@@ -142,19 +133,26 @@ let ity_map fn ity = match ity.ity_node with
   | Ityvar _ -> ity
   | Itypur (f,tl) -> ity_pur f (List.map fn tl)
   | Ityapp (f,tl,rl) -> ity_app f (List.map fn tl) rl
-  (* | Itymod (ts, ity) -> ity_mod ts (fn ity) *)
 
 let ity_fold fn acc ity = match ity.ity_node with
   | Ityvar _ -> acc
   | Itypur (_,tl)
   | Ityapp (_,tl,_) -> List.fold_left fn acc tl
-  (* | Itymod (_,ity) -> fn acc ity *)
 
 let ity_all pr ity =
   try ity_fold (all_fn pr) true ity with FoldSkip -> false
 
 let ity_any pr ity =
   try ity_fold (any_fn pr) false ity with FoldSkip -> true
+
+(* symbol-wise map/fold *)
+
+let rec ity_s_fold fn fts acc ity = match ity.ity_node with
+  | Ityvar _ -> acc
+  | Itypur (ts, tl) -> List.fold_left (ity_s_fold fn fts) (fts acc ts) tl
+  | Ityapp (f, tl, rl) ->
+      let acc = List.fold_left (ity_s_fold fn fts) (fn acc f) tl in
+      List.fold_left (fun acc r -> ity_s_fold fn fts acc r.reg_ity) acc rl
 
 (* traversal functions on type variables and regions *)
 
@@ -165,8 +163,6 @@ let rec ity_v_map fnv fnr ity = match ity.ity_node with
       ity_pur f (List.map (ity_v_map fnv fnr) tl)
   | Ityapp (f,tl,rl) ->
       ity_app f (List.map (ity_v_map fnv fnr) tl) (List.map fnr rl)
-  (* | Itymod (ts, ity) -> *)
-  (*     ity_mod ts (ity_v_map fnv fnr ity) *)
 
 let rec ity_v_fold fnv fnr acc ity = match ity.ity_node with
   | Ityvar v ->
@@ -175,8 +171,6 @@ let rec ity_v_fold fnv fnr acc ity = match ity.ity_node with
       List.fold_left (ity_v_fold fnv fnr) acc tl
   | Ityapp (_,tl,rl) ->
       List.fold_left (ity_v_fold fnv fnr) (List.fold_left fnr acc rl) tl
-  (* | Itymod (_, ity) -> *)
-  (*     ity_v_fold fnv fnr acc ity *)
 
 let ity_v_all prv prr ity =
   try ity_v_fold (all_fn prv) (all_fn prr) true ity with FoldSkip -> false
@@ -235,8 +229,6 @@ let rec ity_match s ity1 ity2 =
       List.fold_left2 reg_match s r1 r2
   | Itypur (s1, l1), Itypur (s2, l2) when ts_equal s1 s2 ->
       List.fold_left2 ity_match s l1 l2
-  (* | Itymod (s1, ity1), Itymod (s2, ity2) when ts_equal s1 s2 -> *)
-  (*     ity_match s ity1 ity2 *)
   | Ityvar tv1, _ ->
       { s with ity_subst_tv = Mtv.change set tv1 s.ity_subst_tv }
   | _ ->
@@ -261,7 +253,6 @@ let rec ty_of_ity ity = match ity.ity_node with
   | Ityvar v -> ty_var v
   | Itypur (s,tl) -> ty_app s (List.map ty_of_ity tl)
   | Ityapp (s,tl,_) -> ty_app s.its_pure (List.map ty_of_ity tl)
-  (* | Itymod (_,ity) -> ty_of_ity ity *)
 
 let rec ity_of_ty ty = match ty.ty_node with
   | Tyvar v -> ity_var v
@@ -288,12 +279,6 @@ let ity_app s tl rl =
       ity_full_inst mv mr ity
   | None ->
       ity_app s tl rl
-
-(* let rec ity_unmod ity = match ity.ity_node with *)
-(*   | Ityvar _ -> ity *)
-(*   | Itypur (s,tl) -> ity_pur s (List.map ity_unmod tl) *)
-(*   | Ityapp (s,tl,rl) -> ity_app s (List.map ity_unmod tl) rl *)
-(*   | Itymod (_,ity) -> ity_unmod ity *)
 
 let ity_pur s tl = match s.ts_def with
   | Some ty ->
@@ -371,7 +356,7 @@ let eff_union x y =
   let ry = Mreg.diff (fun _ _ _ -> None) y.eff_renames e in
   let rn = Mreg.union
       (fun _ r1 r2 -> if reg_equal r1 r2 then Some r1 else None) rx ry in
-  let re = Mreg.inter 
+  let re = Mreg.inter
       (fun _ r1 r2 -> if reg_equal r1 r2 then None else Some ()) rx ry in
   { eff_reads = Sreg.union x.eff_reads y.eff_reads;
     eff_writes = Sreg.union x.eff_writes y.eff_writes;
@@ -381,6 +366,7 @@ let eff_union x y =
 
 let eff_read r = { eff_empty with eff_reads = Sreg.singleton r }
 let eff_write r = { eff_empty with eff_writes = Sreg.singleton r }
+let eff_erase r = { eff_empty with eff_erases = Sreg.singleton r }
 let eff_raise xs = { eff_empty with eff_raises = Sexn.singleton xs }
 let eff_remove_raise xs e = { e with eff_raises = Sexn.remove xs e.eff_raises }
 
@@ -408,6 +394,8 @@ let create_pvsymbol id ?mut ?(ghost=false) ity =
     pv_ghost = ghost;
     pv_mutable = mut; }
 
+let pv_equal : pvsymbol -> pvsymbol -> bool = (==)
+
 (* value types *)
 type vty =
   | VTvalue of pvsymbol
@@ -425,18 +413,22 @@ and cty = {
 and xpost = (pvsymbol * term) Mexn.t
 
 (* smart constructors *)
-let vty_value pvs = VTvalue pvs
-(* let vty_arrow pvs cty = VTarrow (pvs, cty) *)
-
-let vty_arrow x ?(pre=t_true) ?(post=t_true) ?(xpost=Mexn.empty) vty eff =
-  let cty = {
-    c_pre = pre;
+let create_cty
+  ?(pre=t_true) ?(post=t_true) ?(xpost=Mexn.empty) ?(effect=eff_empty) vty =
+  { c_pre = pre;
     c_vty = vty;
-    c_eff = eff;
+    c_eff = effect;
     c_post = post;
-    c_xpost = xpost;
-  }
+    c_xpost = xpost; }
+
+let vty_value pvs = VTvalue pvs
+
+let vty_arrow x cty =
+  (* check that x does not appear in cty *)
+  let rec check = function
+    | VTvalue y -> if pv_equal x y then raise (DuplicateVar x.pv_vs)
+    | VTarrow (y, c) ->
+        if pv_equal x y then raise (DuplicateVar x.pv_vs); check c.c_vty
   in
+  check cty.c_vty;
   VTarrow (x, cty)
-
-

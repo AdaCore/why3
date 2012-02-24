@@ -21,6 +21,19 @@ open Why3
 open Ident
 open Ty
 open Mlw_ty
+open Mlw_expr
+
+(** {2 Type declaration} *)
+
+type pconstructor = psymbol * psymbol option list
+
+type ity_defn =
+  | ITabstract
+  | ITalgebraic of pconstructor list
+
+type ity_decl = itysymbol * ity_defn
+
+(** {2 Declaration type} *)
 
 type pdecl = private {
   pd_node : pdecl_node;
@@ -29,11 +42,25 @@ type pdecl = private {
   pd_tag  : int;           (* unique tag *)
 }
 
-and pdecl_node
+and pdecl_node =
+  | PDtype of ity_decl list
+
+(** {2 Declaration constructors} *)
+
+type pre_pconstructor = preid * (pvsymbol * bool) list
+
+type pre_ity_defn =
+  | PITabstract
+  | PITalgebraic of pre_pconstructor list
+
+type pre_ity_decl = itysymbol * pre_ity_defn
+
+val create_ity_decl : pre_ity_decl list -> pdecl
+
+(** {2 Known identifiers} *)
 
 type known_map = pdecl Mid.t
 
 val known_id : known_map -> ident -> unit
 val known_add_decl : known_map -> pdecl -> known_map
 val merge_known: known_map -> known_map -> known_map
-

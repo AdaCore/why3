@@ -24,9 +24,9 @@ open Mlw_ty
 
 (* program symbols *)
 type psymbol = private {
-  p_ident: ident;
-  p_tvs:   Stv.t;
-  p_reg:   Sreg.t;
+  p_name: ident;
+  p_tvs:   Stv.t;  (* type variables that cannot be instantiated *)
+  p_reg:   Sreg.t; (* regions that cannot be instantiated *)
   p_vty:   vty;
   (* pv_ghost: bool; *)
 }

@@ -90,6 +90,7 @@ val add_meta : module_uc -> meta -> meta_arg list -> module_uc
 (** Program decls *)
 
 (*
+val add_ty_pdecl : module_uc -> ty_pdecl list -> module_uc
 val add_pdecl : module_uc -> pdecl -> module_uc
 val add_pdecl_with_tuples : module_uc -> pdecl -> module_uc
 *)
