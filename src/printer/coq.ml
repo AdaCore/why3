@@ -418,9 +418,9 @@ let read_old_proof =
   with StringValue s -> Other s
 
 (* Load old-style proofs where users were confined to a few sections. *)
-let read_deprecated_script ch =
+let read_deprecated_script ch in_context =
   let sc = ref [] in
-  let context = ref true in
+  let context = ref in_context in
   try
     while true do
       let pos = pos_in ch in
@@ -442,10 +442,12 @@ let read_old_script =
   let axm = Str.regexp "\\(Axiom\\|Parameter\\)[ ]+\\([^ :(.]+\\)" in
   fun ch ->
   let skip_to_empty = ref true in
+  let last_empty_line = ref 0 in
   let sc = ref [] in
   try
     while true do
       let s = input_line ch in
+      if s = "" then last_empty_line := pos_in ch;
       if !skip_to_empty then (if s = "" then skip_to_empty := false) else
       if s = "(* Why3 assumption *)" then
         (let name = read_generated_name ch in sc := Axiom name :: !sc;
@@ -455,7 +457,11 @@ let read_old_script =
         skip_to_empty := true) else
       if s = "(* Why3 goal *)" then sc := read_old_proof ch :: !sc else
       if s = "(* YOU MAY EDIT THE CONTEXT BELOW *)" then
-        (sc := read_deprecated_script ch; raise End_of_file) else
+        (sc := read_deprecated_script ch true; raise End_of_file) else
+      if s = "(* YOU MAY EDIT THE PROOF BELOW *)" then
+        (seek_in ch !last_empty_line;
+        sc := read_deprecated_script ch false;
+        raise End_of_file) else
       sc := Other s :: !sc
     done;
     assert false
