@@ -1991,8 +1991,8 @@ let check_type_vars ~loc vars ty =
   check ty
 
 let make_immutable_type td =
-  let td = { td with td_model = false } in
-  let make_immutable_field (loc, _, id, ty) = (loc, false, id, ty) in
+  let td = { td with td_model = false; td_vis = Public } in
+  let make_immutable_field f = { f with f_mutable = false; f_ghost = false } in
   match td.td_def with
 (*     | TDrecord [_, _, _, ty] -> (\* singleton record *\) *)
 (*         { td with td_def = TDalias ty } *)
@@ -2045,7 +2045,7 @@ let add_types uc dl =
         | TDrecord fl ->
             let nf = List.length fl in
             List.fold_left
-              (fun n (loc, mut, _, ty) ->
+              (fun n { f_loc=loc; f_mutable=mut; f_pty=ty } ->
                  if mut && nf = 1 then Hashtbl.add singletons x ();
                  let nty = nregions_of_type ty in
                  if mut then begin
@@ -2119,17 +2119,19 @@ let add_types uc dl =
           let constructor (loc, id, pl) = (loc, id, List.map add pl) in
           TDalgebraic (List.map constructor cl)
       | TDrecord fl ->
-          let add i (loc, mut, id, ty) =
+          let add i ({ f_mutable=mut; f_ident=id; f_pty=ty } as f) =
             add_projection id;
             if mut then begin
               let j, _ = region () in
               if effect then Hashtbl.add mutable_field (x, i) j
             end;
-            (loc, false, id, add_regions_to_type ty)
+            { f with f_mutable = false; f_ghost = false;
+              f_pty = add_regions_to_type ty }
           in
           TDrecord (list_mapi add fl)
     in
-    { d with td_params = params; td_model = false; td_def = def }
+    { d with
+      td_params = params; td_model = false; td_vis = Public; td_def = def }
   in
   let dli = List.map (add_regions ~effect:false) dl in
   let uc = Pgm_module.add_impure_pdecl (Ptree.TypeDecl dli) uc in

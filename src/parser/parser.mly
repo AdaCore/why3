@@ -211,7 +211,7 @@ end
 
 %token ABSTRACT ABSURD ANY ASSERT ASSUME BEGIN CHECK DO DONE DOWNTO
 %token EXCEPTION FOR
-%token FUN INVARIANT LOOP MODEL MODULE MUTABLE RAISE
+%token FUN GHOST INVARIANT LOOP MODEL MODULE MUTABLE PRIVATE RAISE
 %token RAISES READS REC TO TRY VAL VARIANT WHILE WRITES
 
 /* symbols */
@@ -421,9 +421,9 @@ list1_type_decl:
 
 type_decl:
 | lident labels type_args typedefn
-  { let model, def = $4 in
+  { let model, vis, def = $4 in
     { td_loc = floc (); td_ident = add_lab $1 $2;
-      td_params = $3; td_model = model; td_def = def } }
+      td_params = $3; td_model = model; td_vis = vis; td_def = def } }
 ;
 
 type_args:
@@ -432,11 +432,20 @@ type_args:
 ;
 
 typedefn:
-| /* epsilon */                 { false, TDabstract }
-| equal_model primitive_type    { $1, TDalias $2 }
-| equal_model typecases         { $1, TDalgebraic $2 }
-| equal_model BAR typecases     { $1, TDalgebraic $3 }
-| equal_model record_type       { $1, TDrecord $2 }
+| /* epsilon */                         { false, Public, TDabstract }
+| equal_model visibility typecases      { $1,    $2,     TDalgebraic $3 }
+| equal_model visibility BAR typecases  { $1,    $2,     TDalgebraic $4 }
+| equal_model visibility record_type    { $1,    $2,     TDrecord $3 }
+/* abstract/private is not allowed for alias type */
+| equal_model visibility primitive_type
+    { if $2 <> Public then Loc.error ~loc:(floc_i 2) Parsing.Parse_error;
+      $1, Public, TDalias $3 }
+;
+
+visibility:
+| /* epsilon */ { Public }
+| PRIVATE       { Private }
+| ABSTRACT      { Abstract }
 ;
 
 equal_model:
@@ -453,9 +462,21 @@ list1_record_field:
 | list1_record_field SEMICOLON record_field { $3 :: $1 }
 ;
 
+field_modifiers:
+| /* epsilon */ { false, false }
+| MUTABLE       { true,  false }
+| GHOST         { false, true  }
+| GHOST MUTABLE { true,  true  }
+| MUTABLE GHOST { true,  true  }
+;
+
 record_field:
-| opt_mutable lident labels COLON primitive_type
-   { floc (), $1, add_lab $2 $3, $5 }
+| field_modifiers lident labels COLON primitive_type
+   { { f_loc = floc ();
+       f_ident = add_lab $2 $3;
+       f_mutable = fst $1;
+       f_ghost = snd $1;
+       f_pty = $5 } }
 ;
 
 typecases:
@@ -1052,11 +1073,6 @@ lident_rich_pgm:
     { $1 }
 | LEFTPAR LEFTSQ RIGHTSQ LARROW RIGHTPAR
     { mk_id (mixfix "[]<-") (floc ()) }
-;
-
-opt_mutable:
-| /* epsilon */ { false }
-| MUTABLE       { true  }
 ;
 
 opt_semicolon:

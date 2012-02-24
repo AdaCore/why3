@@ -110,19 +110,28 @@ type clone_subst =
   | CSlemma of loc * qualid
   | CSgoal  of loc * qualid
 
-type is_mutable = bool
+type field = {
+  f_loc     : loc;
+  f_ident   : ident;
+  f_pty     : pty;
+  f_mutable : bool;
+  f_ghost   : bool
+}
 
 type type_def =
   | TDabstract
   | TDalias     of pty
   | TDalgebraic of (loc * ident * param list) list
-  | TDrecord    of (loc * is_mutable * ident * pty) list
+  | TDrecord    of field list
+
+type visibility = Public | Private | Abstract
 
 type type_decl = {
   td_loc    : loc;
   td_ident  : ident;
   td_params : ident list;
   td_model  : bool;
+  td_vis    : visibility;
   td_def    : type_def;
 }
 

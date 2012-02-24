@@ -912,12 +912,16 @@ let add_types dl th =
 let prepare_typedef td =
   if td.td_model then
     errorm ~loc:td.td_loc "model types are not allowed in the logic";
+  if td.td_vis <> Public then
+    errorm ~loc:td.td_loc "a logic type cannot be abstract or private";
   match td.td_def with
   | TDabstract | TDalgebraic _ | TDalias _ ->
       td
   | TDrecord fl ->
-      let field (loc, mut, id, ty) =
+      let field { f_loc = loc; f_ident = id; f_pty = ty;
+                  f_mutable = mut; f_ghost = gh } =
         if mut then errorm ~loc "a logic record field cannot be mutable";
+        if gh then errorm ~loc "a logic record field cannot be ghost";
         Some id, ty
       in
       (* constructor for type t is "mk t" (and not String.capitalize t) *)
