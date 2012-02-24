@@ -478,7 +478,11 @@ let read_old_script =
 let output_till_statement fmt script name =
   let print i =
     let rec aux acc = function
-      | h :: l when h == i -> script := List.rev_append acc l
+      | h :: l when h == i ->
+        let l = match l with
+          | Other "" :: l -> l
+          | _ -> l in
+        script := List.rev_append acc l
       | Other o :: l -> fprintf fmt "%s@\n" o; aux acc l
       | h :: l -> aux (h :: acc) l
       | [] -> assert false in
@@ -650,7 +654,7 @@ let print_prop_decl ~old info fmt (k,pr,f) =
     | Pgoal -> "Theorem"
     | Pskip -> assert false (* impossible *) in
   if stt <> "" then
-    fprintf fmt "(* Why3 goal *)@\n@[<hov 2>%s %s : %a%a.@]@\n%a"
+    fprintf fmt "(* Why3 goal *)@\n@[<hov 2>%s %s : %a%a.@]@\n%a@\n"
       stt name print_params params
       (print_fmla info) f
       (print_previous_proof false) prev
