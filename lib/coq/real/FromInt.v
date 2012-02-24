@@ -2,78 +2,45 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import ZArith.
 Require Import Rbase.
-(*Add Rec LoadPath "/home/guillaume/bin/why3/share/why3/theories".*)
-(*Add Rec LoadPath "/home/guillaume/bin/why3/share/why3/modules".*)
 Require int.Int.
 Require real.Real.
+
+(* Why3 goal *)
 Definition from_int: Z -> R.
-(* YOU MAY EDIT THE PROOF BELOW *)
 exact IZR.
 Defined.
-(* DO NOT EDIT BELOW *)
 
-
-(* YOU MAY EDIT THE CONTEXT BELOW *)
-
-(* DO NOT EDIT BELOW *)
-
+(* Why3 goal *)
 Lemma Zero : ((from_int 0%Z) = 0%R).
-(* YOU MAY EDIT THE PROOF BELOW *)
 split.
 Qed.
-(* DO NOT EDIT BELOW *)
 
-(* YOU MAY EDIT THE CONTEXT BELOW *)
-
-(* DO NOT EDIT BELOW *)
-
+(* Why3 goal *)
 Lemma One : ((from_int 1%Z) = 1%R).
-(* YOU MAY EDIT THE PROOF BELOW *)
 split.
 Qed.
-(* DO NOT EDIT BELOW *)
 
-(* YOU MAY EDIT THE CONTEXT BELOW *)
-
-(* DO NOT EDIT BELOW *)
-
+(* Why3 goal *)
 Lemma Add : forall (x:Z) (y:Z),
   ((from_int (x + y)%Z) = ((from_int x) + (from_int y))%R).
-(* YOU MAY EDIT THE PROOF BELOW *)
 exact plus_IZR.
 Qed.
-(* DO NOT EDIT BELOW *)
 
-(* YOU MAY EDIT THE CONTEXT BELOW *)
-
-(* DO NOT EDIT BELOW *)
-
+(* Why3 goal *)
 Lemma Sub : forall (x:Z) (y:Z),
   ((from_int (x - y)%Z) = ((from_int x) - (from_int y))%R).
-(* YOU MAY EDIT THE PROOF BELOW *)
 exact minus_IZR.
 Qed.
-(* DO NOT EDIT BELOW *)
 
-(* YOU MAY EDIT THE CONTEXT BELOW *)
-
-(* DO NOT EDIT BELOW *)
-
+(* Why3 goal *)
 Lemma Mul : forall (x:Z) (y:Z),
   ((from_int (x * y)%Z) = ((from_int x) * (from_int y))%R).
-(* YOU MAY EDIT THE PROOF BELOW *)
 exact mult_IZR.
 Qed.
-(* DO NOT EDIT BELOW *)
 
-(* YOU MAY EDIT THE CONTEXT BELOW *)
-
-(* DO NOT EDIT BELOW *)
-
+(* Why3 goal *)
 Lemma Neg : forall (x:Z), ((from_int (-x)%Z) = (-(from_int x))%R).
-(* YOU MAY EDIT THE PROOF BELOW *)
 exact opp_IZR.
 Qed.
-(* DO NOT EDIT BELOW *)
 
 

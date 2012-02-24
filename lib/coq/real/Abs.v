@@ -3,38 +3,26 @@
 Require Import ZArith.
 Require Import Rbase.
 Require Import Rbasic_fun.
-(*Add Rec LoadPath "/home/guillaume/bin/why3/share/why3/theories".*)
-(*Add Rec LoadPath "/home/guillaume/bin/why3/share/why3/modules".*)
 Require real.Real.
+
+(* Why3 goal *)
 Definition abs: R -> R.
-(* YOU MAY EDIT THE PROOF BELOW *)
 exact Rabs.
 Defined.
-(* DO NOT EDIT BELOW *)
 
-
-(* YOU MAY EDIT THE CONTEXT BELOW *)
-
-(* DO NOT EDIT BELOW *)
-
+(* Why3 goal *)
 Lemma abs_def : forall (x:R), ((0%R <= x)%R -> ((abs x) = x)) /\
   ((~ (0%R <= x)%R) -> ((abs x) = (-x)%R)).
-(* YOU MAY EDIT THE PROOF BELOW *)
 split ; intros H.
 apply Rabs_right.
 now apply Rle_ge.
 apply Rabs_left.
 now apply Rnot_le_lt.
 Qed.
-(* DO NOT EDIT BELOW *)
 
-(* YOU MAY EDIT THE CONTEXT BELOW *)
-
-(* DO NOT EDIT BELOW *)
-
+(* Why3 goal *)
 Lemma Abs_le : forall (x:R) (y:R), ((abs x) <= y)%R <-> (((-y)%R <= x)%R /\
   (x <= y)%R).
-(* YOU MAY EDIT THE PROOF BELOW *)
 intros x y.
 unfold abs, Rabs.
 case Rcase_abs ; intros H ; (split ; [intros H0;split | intros (H0,H1)]).
@@ -57,16 +45,30 @@ now apply Ropp_le_contravar.
 exact H0.
 exact H1.
 Qed.
-(* DO NOT EDIT BELOW *)
 
-(* YOU MAY EDIT THE CONTEXT BELOW *)
-
-(* DO NOT EDIT BELOW *)
-
+(* Why3 goal *)
 Lemma Abs_pos : forall (x:R), (0%R <= (abs x))%R.
-(* YOU MAY EDIT THE PROOF BELOW *)
 exact Rabs_pos.
 Qed.
-(* DO NOT EDIT BELOW *)
+
+(* Why3 goal *)
+Lemma Abs_sum : forall (x:R) (y:R),
+  ((abs (x + y)%R) <= ((abs x) + (abs y))%R)%R.
+exact Rabs_triang.
+Qed.
+
+(* Why3 goal *)
+Lemma Abs_prod : forall (x:R) (y:R),
+  ((abs (x * y)%R) = ((abs x) * (abs y))%R).
+exact Rabs_mult.
+Qed.
+
+(* Why3 goal *)
+Lemma triangular_inequality : forall (x:R) (y:R) (z:R),
+  ((abs (x - z)%R) <= ((abs (x - y)%R) + (abs (y - z)%R))%R)%R.
+intros x y z.
+replace (x - z)%R with ((x - y) + (y - z))%R by ring.
+apply Rabs_triang.
+Qed.
 
 
