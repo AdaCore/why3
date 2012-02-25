@@ -981,7 +981,7 @@ clean::
 update-coq: bin/why3 drivers/coq-realizations.aux
 	for f in $(COQLIBS_INT_FILES); do bin/why3 --realize -D drivers/coq-realize.drv -T int.$$f -o lib/coq/int/; done
 	for f in $(COQLIBS_REAL_FILES); do bin/why3 --realize -D drivers/coq-realize.drv -T real.$$f -o lib/coq/real/; done
-	#for f in $(COQLIBS_FP_FILES); do bin/why3 --realize -D drivers/coq-realize.drv -T floating_point.$$f -o lib/coq/floating_point/; done
+	for f in $(COQLIBS_FP_FILES); do bin/why3 --realize -D drivers/coq-realize.drv -T floating_point.$$f -o lib/coq/floating_point/; done
 
 else
 
