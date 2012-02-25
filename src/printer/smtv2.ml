@@ -56,6 +56,8 @@ let ident_printer =
       "Bool";"unsat";"sat";"true";"false";"select";"store";
        (** arrays -- this really belongs to the driver! (esp. const) *)
       "Array";"select";"store";"const";
+       (** div and mod are builtin *)
+      "div";"mod";
       ]
   in
   let san = sanitizer char_to_alpha char_to_alnumus in
