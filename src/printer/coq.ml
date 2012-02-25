@@ -376,7 +376,7 @@ let print_implicits fmt ls ty_vars_args ty_vars_value all_ty_params =
 *)
 
 type content_type =
-  (*Notation | Gallina |*) Vernacular
+  Notation | (*Gallina |*) Vernacular
 
 type statement =
   | Axiom of string (* name *)
@@ -398,23 +398,30 @@ let read_generated_name =
   with StringValue name -> name
 
 let read_old_proof =
-  let def = Str.regexp "\\(Definition\\|Lemma\\|Theorem\\)[ ]+\\([^ :(.]+\\)" in
+  let def = Str.regexp "\\(Definition\\|Notation\\|Lemma\\|Theorem\\)[ ]+\\([^ :(.]+\\)" in
   let def_end = Str.regexp ".*[.]$" in
   let qed = Str.regexp "\\(Qed\\|Defined\\|Save\\|Admitted\\)[.]" in
   fun ch ->
   try
+    let start = ref (pos_in ch) in
     let s = input_line ch in
     if not (Str.string_match def s 0) then raise (StringValue s);
+    let kind = Str.matched_group 1 s in
     let name = Str.matched_group 2 s in
     if not (Str.string_match def_end s (Str.match_end ())) then
       while not (Str.string_match def_end (input_line ch) 0) do () done;
-    let start = pos_in ch in
-    while not (Str.string_match qed (input_line ch) 0) do () done;
-    let len = pos_in ch - start in
+    let k =
+      if kind = "Notation" then Notation
+      else begin
+        start := pos_in ch;
+        while not (Str.string_match qed (input_line ch) 0) do () done;
+        Vernacular
+      end in
+    let len = pos_in ch - !start in
     let s = String.create len in
-    seek_in ch start;
+    seek_in ch !start;
     really_input ch s 0 len;
-    Query (name, Vernacular, s)
+    Query (name, k, s)
   with StringValue s -> Other s
 
 (* Load old-style proofs where users were confined to a few sections. *)
@@ -519,6 +526,7 @@ let print_previous_proof def fmt previous =
     print_empty_proof fmt def
   | Some (Query (_,Vernacular,c)) ->
     fprintf fmt "%s" c
+  | Some (Query (_,Notation,_))
   | Some (Other _) ->
     assert false
 
@@ -531,9 +539,13 @@ let print_type_decl ~old info fmt (ts,def) =
     begin match ts.ts_def with
     | None ->
       if info.realization then
-        fprintf fmt "(* Why3 goal *)@\n@[<hov 2>Definition %s : %aType.@]@\n%a"
-          name print_params_list ts.ts_args
-          (print_previous_proof true) prev
+        match prev with
+        | Some (Query (_,Notation,c)) ->
+          fprintf fmt "(* Why3 goal *)@\n%s@\n" c
+        | _ ->
+          fprintf fmt "(* Why3 goal *)@\n@[<hov 2>Definition %s : %aType.@]@\n%a"
+            name print_params_list ts.ts_args
+            (print_previous_proof true) prev
       else
         fprintf fmt "@[<hov 2>Parameter %s : %aType.@]@\n@\n"
           name print_params_list ts.ts_args
@@ -579,11 +591,15 @@ let print_logic_decl ~old info fmt (ls,ld) =
           List.iter forget_var vl
   | None ->
     if info.realization then
-      fprintf fmt "(* Why3 goal *)@\n@[<hov 2>Definition %s: %a%a%a.@]@\n%a"
-        name print_params all_ty_params
-        (print_arrow_list (print_ty info)) ls.ls_args
-        (print_ls_type ~arrow:(ls.ls_args <> []) info) ls.ls_value
-        (print_previous_proof true) prev
+      match prev with
+      | Some (Query (_,Notation,c)) ->
+        fprintf fmt "(* Why3 goal *)@\n%s" c
+      | _ ->
+        fprintf fmt "(* Why3 goal *)@\n@[<hov 2>Definition %s: %a%a%a.@]@\n%a"
+          name print_params all_ty_params
+          (print_arrow_list (print_ty info)) ls.ls_args
+          (print_ls_type ~arrow:(ls.ls_args <> []) info) ls.ls_value
+          (print_previous_proof true) prev
     else
       fprintf fmt "@[<hov 2>Parameter %s: %a%a%a.@]@\n"
         name print_params all_ty_params
