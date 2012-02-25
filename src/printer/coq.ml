@@ -543,7 +543,7 @@ let print_type_decl ~old info fmt (ts,def) =
         | Some (Query (_,Notation,c)) ->
           fprintf fmt "(* Why3 goal *)@\n%s@\n" c
         | _ ->
-          fprintf fmt "(* Why3 goal *)@\n@[<hov 2>Definition %s : %aType.@]@\n%a"
+          fprintf fmt "(* Why3 goal *)@\n@[<hov 2>Definition %s : %aType.@]@\n%a@\n"
             name print_params_list ts.ts_args
             (print_previous_proof true) prev
       else
