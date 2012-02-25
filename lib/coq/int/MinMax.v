@@ -2,33 +2,24 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import ZArith.
 Require Import Rbase.
-(*Add Rec LoadPath "/home/guillaume/bin/why3/share/why3/theories".*)
-(*Add Rec LoadPath "/home/guillaume/bin/why3/share/why3/modules".*)
 Require int.Int.
 
+(* Why3 goal *)
 Notation min := Zmin (only parsing).
 
+(* Why3 goal *)
 Notation max := Zmax (only parsing).
 
-(* YOU MAY EDIT THE CONTEXT BELOW *)
-
-(* DO NOT EDIT BELOW *)
-
+(* Why3 goal *)
 Lemma Max_is_ge : forall (x:Z) (y:Z), (x <= (max x y))%Z /\ (y <= (max x
   y))%Z.
-(* YOU MAY EDIT THE PROOF BELOW *)
 split.
 apply Zle_max_l.
 apply Zle_max_r.
 Qed.
-(* DO NOT EDIT BELOW *)
 
-(* YOU MAY EDIT THE CONTEXT BELOW *)
-
-(* DO NOT EDIT BELOW *)
-
+(* Why3 goal *)
 Lemma Max_is_some : forall (x:Z) (y:Z), ((max x y) = x) \/ ((max x y) = y).
-(* YOU MAY EDIT THE PROOF BELOW *)
 intros x y.
 unfold Zmax.
 case Zcompare.
@@ -36,27 +27,17 @@ now left.
 now right.
 now left.
 Qed.
-(* DO NOT EDIT BELOW *)
 
-(* YOU MAY EDIT THE CONTEXT BELOW *)
-
-(* DO NOT EDIT BELOW *)
-
+(* Why3 goal *)
 Lemma Min_is_le : forall (x:Z) (y:Z), ((min x y) <= x)%Z /\ ((min x
   y) <= y)%Z.
-(* YOU MAY EDIT THE PROOF BELOW *)
 split.
 apply Zle_min_l.
 apply Zle_min_r.
 Qed.
-(* DO NOT EDIT BELOW *)
 
-(* YOU MAY EDIT THE CONTEXT BELOW *)
-
-(* DO NOT EDIT BELOW *)
-
+(* Why3 goal *)
 Lemma Min_is_some : forall (x:Z) (y:Z), ((min x y) = x) \/ ((min x y) = y).
-(* YOU MAY EDIT THE PROOF BELOW *)
 intros x y.
 unfold Zmin.
 case Zcompare.
@@ -64,68 +45,37 @@ now left.
 now left.
 now right.
 Qed.
-(* DO NOT EDIT BELOW *)
 
-(* YOU MAY EDIT THE CONTEXT BELOW *)
-
-(* DO NOT EDIT BELOW *)
-
+(* Why3 goal *)
 Lemma Max_x : forall (x:Z) (y:Z), (y <= x)%Z -> ((max x y) = x).
-(* YOU MAY EDIT THE PROOF BELOW *)
 exact Zmax_l.
 Qed.
-(* DO NOT EDIT BELOW *)
 
-(* YOU MAY EDIT THE CONTEXT BELOW *)
-
-(* DO NOT EDIT BELOW *)
-
+(* Why3 goal *)
 Lemma Max_y : forall (x:Z) (y:Z), (x <= y)%Z -> ((max x y) = y).
-(* YOU MAY EDIT THE PROOF BELOW *)
 exact Zmax_r.
 Qed.
-(* DO NOT EDIT BELOW *)
 
-(* YOU MAY EDIT THE CONTEXT BELOW *)
-
-(* DO NOT EDIT BELOW *)
-
+(* Why3 goal *)
 Lemma Min_x : forall (x:Z) (y:Z), (x <= y)%Z -> ((min x y) = x).
-(* YOU MAY EDIT THE PROOF BELOW *)
 exact Zmin_l.
 Qed.
-(* DO NOT EDIT BELOW *)
 
-(* YOU MAY EDIT THE CONTEXT BELOW *)
-
-(* DO NOT EDIT BELOW *)
-
+(* Why3 goal *)
 Lemma Min_y : forall (x:Z) (y:Z), (y <= x)%Z -> ((min x y) = y).
-(* YOU MAY EDIT THE PROOF BELOW *)
 exact Zmin_r.
 Qed.
-(* DO NOT EDIT BELOW *)
 
-(* YOU MAY EDIT THE CONTEXT BELOW *)
-
-(* DO NOT EDIT BELOW *)
-
+(* Why3 goal *)
 Lemma Max_sym : forall (x:Z) (y:Z), (y <= x)%Z -> ((max x y) = (max y x)).
-(* YOU MAY EDIT THE PROOF BELOW *)
 intros x y _.
 apply Zmax_comm.
 Qed.
-(* DO NOT EDIT BELOW *)
 
-(* YOU MAY EDIT THE CONTEXT BELOW *)
-
-(* DO NOT EDIT BELOW *)
-
+(* Why3 goal *)
 Lemma Min_sym : forall (x:Z) (y:Z), (y <= x)%Z -> ((min x y) = (min y x)).
-(* YOU MAY EDIT THE PROOF BELOW *)
 intros x y _.
 apply Zmin_comm.
 Qed.
-(* DO NOT EDIT BELOW *)
 
 
