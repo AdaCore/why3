@@ -2,36 +2,44 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import ZArith.
 Require Import Rbase.
+Require int.Int.
+
+(* Why3 assumption *)
 Definition unit  := unit.
 
-Parameter mark : Type.
+Parameter qtmark : Type.
 
-Parameter at1: forall (a:Type), a -> mark -> a.
-
+Parameter at1: forall (a:Type), a -> qtmark -> a.
 Implicit Arguments at1.
 
 Parameter old: forall (a:Type), a -> a.
-
 Implicit Arguments old.
 
+(* Why3 assumption *)
+Definition implb(x:bool) (y:bool): bool := match (x,
+  y) with
+  | (true, false) => false
+  | (_, _) => true
+  end.
+
+(* Why3 assumption *)
 Inductive ref (a:Type) :=
   | mk_ref : a -> ref a.
 Implicit Arguments mk_ref.
 
+(* Why3 assumption *)
 Definition contents (a:Type)(u:(ref a)): a :=
   match u with
-  | mk_ref contents1 => contents1
+  | (mk_ref contents1) => contents1
   end.
 Implicit Arguments contents.
 
 Parameter map : forall (a:Type) (b:Type), Type.
 
 Parameter get: forall (a:Type) (b:Type), (map a b) -> a -> b.
-
 Implicit Arguments get.
 
 Parameter set: forall (a:Type) (b:Type), (map a b) -> a -> b -> (map a b).
-
 Implicit Arguments set.
 
 Axiom Select_eq : forall (a:Type) (b:Type), forall (m:(map a b)),
@@ -43,53 +51,62 @@ Axiom Select_neq : forall (a:Type) (b:Type), forall (m:(map a b)),
   a2) = (get m a2)).
 
 Parameter const: forall (b:Type) (a:Type), b -> (map a b).
-
 Set Contextual Implicit.
 Implicit Arguments const.
 Unset Contextual Implicit.
 
-Axiom Const : forall (b:Type) (a:Type), forall (b1:b) (a1:a), ((get (const(
-  b1):(map a b)) a1) = b1).
+Axiom Const : forall (b:Type) (a:Type), forall (b1:b) (a1:a),
+  ((get (const b1:(map a b)) a1) = b1).
 
+(* Why3 assumption *)
 Inductive array (a:Type) :=
   | mk_array : Z -> (map Z a) -> array a.
 Implicit Arguments mk_array.
 
+(* Why3 assumption *)
 Definition elts (a:Type)(u:(array a)): (map Z a) :=
   match u with
-  | mk_array _ elts1 => elts1
+  | (mk_array _ elts1) => elts1
   end.
 Implicit Arguments elts.
 
+(* Why3 assumption *)
 Definition length (a:Type)(u:(array a)): Z :=
   match u with
-  | mk_array length1 _ => length1
+  | (mk_array length1 _) => length1
   end.
 Implicit Arguments length.
 
+(* Why3 assumption *)
 Definition get1 (a:Type)(a1:(array a)) (i:Z): a := (get (elts a1) i).
 Implicit Arguments get1.
 
+(* Why3 assumption *)
 Definition set1 (a:Type)(a1:(array a)) (i:Z) (v:a): (array a) :=
   match a1 with
-  | mk_array xcl0 _ => (mk_array xcl0 (set (elts a1) i v))
+  | (mk_array xcl0 _) => (mk_array xcl0 (set (elts a1) i v))
   end.
 Implicit Arguments set1.
 
+(* Why3 assumption *)
 Definition sorted_sub(a:(map Z Z)) (l:Z) (u:Z): Prop := forall (i1:Z) (i2:Z),
   (((l <= i1)%Z /\ (i1 <= i2)%Z) /\ (i2 <  u)%Z) -> ((get a i1) <= (get a
   i2))%Z.
 
+(* Why3 assumption *)
 Definition sorted_sub1(a:(array Z)) (l:Z) (u:Z): Prop := (sorted_sub (elts a)
   l u).
 
+(* Why3 assumption *)
 Definition sorted(a:(array Z)): Prop := (sorted_sub (elts a) 0%Z (length a)).
 
+(* Why3 assumption *)
 Definition map_eq_sub (a:Type)(a1:(map Z a)) (a2:(map Z a)) (l:Z)
   (u:Z): Prop := forall (i:Z), ((l <= i)%Z /\ (i <  u)%Z) -> ((get a1
   i) = (get a2 i)).
 Implicit Arguments map_eq_sub.
 
+(* Why3 assumption *)
 Definition exchange (a:Type)(a1:(map Z a)) (a2:(map Z a)) (i:Z)
   (j:Z): Prop := ((get a1 i) = (get a2 j)) /\ (((get a2 i) = (get a1 j)) /\
   forall (k:Z), ((~ (k = i)) /\ ~ (k = j)) -> ((get a1 k) = (get a2 k))).
@@ -98,6 +115,7 @@ Implicit Arguments exchange.
 Axiom exchange_set : forall (a:Type), forall (a1:(map Z a)), forall (i:Z)
   (j:Z), (exchange a1 (set (set a1 i (get a1 j)) j (get a1 i)) i j).
 
+(* Why3 assumption *)
 Inductive permut_sub{a:Type}  : (map Z a) -> (map Z a) -> Z -> Z -> Prop :=
   | permut_refl : forall (a1:(map Z a)) (a2:(map Z a)), forall (l:Z) (u:Z),
       (map_eq_sub a1 a2 l u) -> (permut_sub a1 a2 l u)
@@ -124,14 +142,17 @@ Axiom permut_exists : forall (a:Type), forall (a1:(map Z a)) (a2:(map Z a)),
   (i <  u)%Z) -> exists j:Z, ((l <= j)%Z /\ (j <  u)%Z) /\ ((get a2
   i) = (get a1 j)).
 
+(* Why3 assumption *)
 Definition exchange1 (a:Type)(a1:(array a)) (a2:(array a)) (i:Z)
   (j:Z): Prop := (exchange (elts a1) (elts a2) i j).
 Implicit Arguments exchange1.
 
+(* Why3 assumption *)
 Definition permut_sub1 (a:Type)(a1:(array a)) (a2:(array a)) (l:Z)
   (u:Z): Prop := (permut_sub (elts a1) (elts a2) l u).
 Implicit Arguments permut_sub1.
 
+(* Why3 assumption *)
 Definition permut (a:Type)(a1:(array a)) (a2:(array a)): Prop :=
   ((length a1) = (length a2)) /\ (permut_sub (elts a1) (elts a2) 0%Z
   (length a1)).
@@ -148,10 +169,12 @@ Axiom permut_sym1 : forall (a:Type), forall (a1:(array a)) (a2:(array a)),
 Axiom permut_trans1 : forall (a:Type), forall (a1:(array a)) (a2:(array a))
   (a3:(array a)), (permut a1 a2) -> ((permut a2 a3) -> (permut a1 a3)).
 
+(* Why3 assumption *)
 Definition array_eq_sub (a:Type)(a1:(array a)) (a2:(array a)) (l:Z)
   (u:Z): Prop := (map_eq_sub (elts a1) (elts a2) l u).
 Implicit Arguments array_eq_sub.
 
+(* Why3 assumption *)
 Definition array_eq (a:Type)(a1:(array a)) (a2:(array a)): Prop :=
   ((length a1) = (length a2)) /\ (array_eq_sub a1 a2 0%Z (length a1)).
 Implicit Arguments array_eq.
@@ -162,41 +185,30 @@ Axiom array_eq_sub_permut : forall (a:Type), forall (a1:(array a)) (a2:(array
 Axiom array_eq_permut : forall (a:Type), forall (a1:(array a)) (a2:(array
   a)), (array_eq a1 a2) -> (permut a1 a2).
 
-(* YOU MAY EDIT THE CONTEXT BELOW *)
-
-(* DO NOT EDIT BELOW *)
-
+(* Why3 goal *)
 Theorem WP_parameter_insertion_sort : forall (a:Z), forall (a1:(map Z Z)),
   let a2 := (mk_array a a1) in ((1%Z <= (a - 1%Z)%Z)%Z -> forall (a3:(map Z
   Z)), forall (i:Z), ((1%Z <= i)%Z /\ (i <= (a - 1%Z)%Z)%Z) ->
   (((sorted_sub a3 0%Z i) /\ (permut a2 (mk_array a a3))) ->
   (((0%Z <= i)%Z /\ (i <  a)%Z) -> let result := (get a3 i) in forall (j:Z),
-  forall (a4:(map Z Z)), let a5 := (mk_array a a4) in ((((0%Z <= j)%Z /\
-  (j <= i)%Z) /\ ((permut a2 (set1 a5 j result)) /\ ((forall (k1:Z) (k2:Z),
+  forall (a4:(map Z Z)), (((0%Z <= j)%Z /\ (j <= i)%Z) /\ ((permut a2
+  (mk_array a (set a4 j result))) /\ ((forall (k1:Z) (k2:Z),
   (((0%Z <= k1)%Z /\ (k1 <= k2)%Z) /\ (k2 <= i)%Z) -> ((~ (k1 = j)) ->
   ((~ (k2 = j)) -> ((get a4 k1) <= (get a4 k2))%Z))) /\ forall (k:Z),
   (((j + 1%Z)%Z <= k)%Z /\ (k <= i)%Z) -> (result <  (get a4 k))%Z))) ->
   ((0%Z <  j)%Z -> (((0%Z <= (j - 1%Z)%Z)%Z /\ ((j - 1%Z)%Z <  a)%Z) ->
   ((result <  (get a4 (j - 1%Z)%Z))%Z -> (((0%Z <= (j - 1%Z)%Z)%Z /\
-  ((j - 1%Z)%Z <  a)%Z) -> (((0%Z <= j)%Z /\ (j <  a)%Z) -> forall (a6:(map Z
-  Z)), let a7 := (mk_array a a6) in ((a6 = (set a4 j (get a4
-  (j - 1%Z)%Z))) -> ((exchange match (set1 a5 j
-  result) with
-  | mk_array _ elts1 => elts1
-  end match (set1 a7 (j - 1%Z)%Z result) with
-  | mk_array _ elts1 => elts1
-  end (j - 1%Z)%Z j) -> forall (j1:Z), (j1 = (j - 1%Z)%Z) -> (permut a2
-  (set1 a7 j1 result))))))))))))).
-(* YOU MAY EDIT THE PROOF BELOW *)
+  ((j - 1%Z)%Z <  a)%Z) -> (((0%Z <= j)%Z /\ (j <  a)%Z) -> forall (a5:(map Z
+  Z)), (a5 = (set a4 j (get a4 (j - 1%Z)%Z))) -> ((exchange (set a4 j result)
+  (set a5 (j - 1%Z)%Z result) (j - 1%Z)%Z j) -> forall (j1:Z),
+  (j1 = (j - 1%Z)%Z) -> (permut a2 (mk_array a (set a5 j1 result)))))))))))).
 intuition.
 intuition.
-simpl in H20.
-unfold set1.
 unfold permut.
 split.
 simpl.
 auto.
-subst a6.
+subst a5.
 simpl.
 apply permut_trans with (elts (set1 (mk_array a a4) j (get a3 i))); auto.
 subst j1.
@@ -207,6 +219,5 @@ simpl; omega.
 simpl; omega.
 subst j1; assumption.
 Qed.
-(* DO NOT EDIT BELOW *)
 
 

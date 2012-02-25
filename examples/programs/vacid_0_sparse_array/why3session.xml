@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
 <why3session
- name="examples/programs/vacid_0_sparse_array/why3session.xml">
+ name="programs/vacid_0_sparse_array/why3session.xml">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -21,19 +21,19 @@
  <file
   name="../vacid_0_sparse_array.mlw"
   verified="true"
-  expanded="true">
+  expanded="false">
   <theory
    name="WP SparseArray"
-   locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+   locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
    loclnum="1" loccnumb="7" loccnume="18"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter create"
-    locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+    locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
     loclnum="58" loccnumb="6" loccnume="12"
     expl="normal postcondition"
-    sum="32e027086fe73d0ce11d8ddd44ca94ac"
+    sum="27fca2ff2a939bfcfbfeb554285a32ca"
     proved="true"
     expanded="true"
     shape="ainfix =V2V0Aainfix =V1V1Aainfix =c0c0Aasa_invamk sparse_arrayamk arrayV2V3amk arrayV4V5amk arrayV6V7c0V1Iainfix =V6V0FIainfix =V4V0FIainfix =V2V0FIainfix <=V0amaxlenAainfix <=c0V0FF">
@@ -64,10 +64,10 @@
    </goal>
    <goal
     name="WP_parameter test"
-    locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+    locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
     loclnum="70" loccnumb="6" loccnume="10"
     expl="parameter test"
-    sum="ad6125859f4815bb6c67ef370092566f"
+    sum="22b827a76781f4950480d4261976768e"
     proved="true"
     expanded="true"
     shape="Lamk sparse_arrayamk arrayV0V8amk arrayV1V7amk arrayV2V6V5V3iainfix <=c0agetV7V4iainfix <agetV7V4V5LagetV7V4ais_eltV9V4qainfix =agetV6V10V4Aainfix <V10V2Aainfix <=c0V10Aainfix <V4V1Aainfix <=c0V4ais_eltV9V4NAainfix <V4V1Aainfix <=c0V4ais_eltV9V4NAainfix <V4V1Aainfix <=c0V4Iasa_invV9Aainfix <V4V0Aainfix <=c0V4FFFFFF">
@@ -98,10 +98,10 @@
    </goal>
    <goal
     name="WP_parameter get"
-    locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+    locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
     loclnum="75" loccnumb="6" loccnume="9"
     expl="parameter get"
-    sum="f5e37632d429aaf1215366fc358549c8"
+    sum="da58654101fc34fbab4d688e6c26242f"
     proved="true"
     expanded="true"
     shape="Lamk sparse_arrayamk arrayV0V8amk arrayV1V7amk arrayV2V6V5V3iainfix =V10aTrueainfix =agetV8V4avalueV9V4Aainfix <V4V0Aainfix <=c0V4ainfix =V3avalueV9V4Iais_eltV9V4qainfix =V10aTrueFAasa_invV9Aainfix <V4V0Aainfix <=c0V4Iasa_invV9Aainfix <V4V0Aainfix <=c0V4FFFFFF">
@@ -120,7 +120,7 @@
      timelimit="5"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.02"/>
     </proof>
     <proof
      prover="0"
@@ -132,9 +132,9 @@
    </goal>
    <goal
     name="permutation"
-    locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+    locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
     loclnum="87" loccnumb="8" loccnume="19"
-    sum="52317a2d8959f21b10e630a0dce207aa"
+    sum="3b503874b4201ff51cb2b2dc06c0c204"
     proved="true"
     expanded="true"
     shape="ais_eltV0V1Iainfix <V1alengthV0Aainfix <=c0V1FIainfix =acardV0alengthV0Iasa_invV0F">
@@ -144,15 +144,15 @@
      edited="vacid_0_sparse_array_WP_SparseArray_permutation_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.69"/>
+     <result status="valid" time="0.67"/>
     </proof>
    </goal>
    <goal
     name="WP_parameter set"
-    locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+    locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
     loclnum="92" loccnumb="6" loccnume="9"
     expl="parameter set"
-    sum="5d2548ffef8934dc1da265c309f9b513"
+    sum="ce84fabccb916f6fe9a05d4b1ea52c00"
     proved="true"
     expanded="true"
     shape="Lamk sparse_arrayamk arrayV0V9amk arrayV1V8amk arrayV2V7V6V3Lamk sparse_arrayamk arrayV0V11amk arrayV1V8amk arrayV2V7V6V3iainfix =V13aTrueNLamk sparse_arrayamk arrayV0V11amk arrayV1V14amk arrayV2V15V16V3ainfix =avalueV17V18avalueV10V18Iainfix =V18V4NFAainfix =avalueV17V4V5Aasa_invV17Iainfix =V16ainfix +V6c1FIainfix =V15asetV7V6V4FAainfix <V6V2Aainfix <=c0V6Iainfix =V14asetV8V4V6FAainfix <V4V1Aainfix <=c0V4Aainfix <V6V0ainfix =avalueV12V19avalueV10V19Iainfix =V19V4NFAainfix =avalueV12V4V5Aasa_invV12Iais_eltV12V4qainfix =V13aTrueFAasa_invV12Aainfix <V4V0Aainfix <=c0V4Iainfix =V11asetV9V4V5FAainfix <V4V0Aainfix <=c0V4Iasa_invV10Aainfix <V4V0Aainfix <=c0V4FFFFFFF">
@@ -165,10 +165,10 @@
      expanded="true">
      <goal
       name="WP_parameter set.1"
-      locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+      locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
       loclnum="92" loccnumb="6" loccnume="9"
       expl="precondition"
-      sum="a229dae0443f06d672d427002a8c5b59"
+      sum="7e01c791a817e8d0d84adcc8a99bd83a"
       proved="true"
       expanded="true"
       shape="Lamk sparse_arrayamk arrayV0V9amk arrayV1V8amk arrayV2V7V6V3ainfix <V4V0Aainfix <=c0V4Iasa_invV10Aainfix <V4V0Aainfix <=c0V4FFFFFFF">
@@ -194,15 +194,15 @@
        timelimit="10"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter set.2"
-      locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+      locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
       loclnum="92" loccnumb="6" loccnume="9"
       expl="precondition"
-      sum="440d4bf550cf4abbb7999bd3def91649"
+      sum="9aaca6f85674a76cfe69cd494e2ceca2"
       proved="true"
       expanded="true"
       shape="Lamk sparse_arrayamk arrayV0V9amk arrayV1V8amk arrayV2V7V6V3Lamk sparse_arrayamk arrayV0V11amk arrayV1V8amk arrayV2V7V6V3asa_invV12Aainfix <V4V0Aainfix <=c0V4Iainfix =V11asetV9V4V5FIainfix <V4V0Aainfix <=c0V4Iasa_invV10Aainfix <V4V0Aainfix <=c0V4FFFFFFF">
@@ -214,7 +214,7 @@
        timelimit="5"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.03"/>
+       <result status="valid" time="0.02"/>
       </proof>
       <proof
        prover="1"
@@ -233,10 +233,10 @@
      </goal>
      <goal
       name="WP_parameter set.3"
-      locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+      locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
       loclnum="92" loccnumb="6" loccnume="9"
       expl="assertion"
-      sum="d7fa5764fb73bc56bf32192bc5300157"
+      sum="cafd344994b68fb0607e13e693cc0cad"
       proved="true"
       expanded="true"
       shape="Lamk sparse_arrayamk arrayV0V9amk arrayV1V8amk arrayV2V7V6V3Lamk sparse_arrayamk arrayV0V11amk arrayV1V8amk arrayV2V7V6V3ainfix <V6V0Iainfix =V13aTrueNIais_eltV12V4qainfix =V13aTrueFIasa_invV12Aainfix <V4V0Aainfix <=c0V4Iainfix =V11asetV9V4V5FIainfix <V4V0Aainfix <=c0V4Iasa_invV10Aainfix <V4V0Aainfix <=c0V4FFFFFFF">
@@ -248,7 +248,7 @@
        timelimit="5"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.03"/>
+       <result status="valid" time="0.02"/>
       </proof>
       <proof
        prover="1"
@@ -267,10 +267,10 @@
      </goal>
      <goal
       name="WP_parameter set.4"
-      locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+      locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
       loclnum="92" loccnumb="6" loccnume="9"
       expl="precondition"
-      sum="7490bb4fc01894770b842d81daf1f8d1"
+      sum="2c2c456221ac227fccfaffe934669437"
       proved="true"
       expanded="true"
       shape="Lamk sparse_arrayamk arrayV0V9amk arrayV1V8amk arrayV2V7V6V3Lamk sparse_arrayamk arrayV0V11amk arrayV1V8amk arrayV2V7V6V3ainfix <V4V1Aainfix <=c0V4Iainfix <V6V0Iainfix =V13aTrueNIais_eltV12V4qainfix =V13aTrueFIasa_invV12Aainfix <V4V0Aainfix <=c0V4Iainfix =V11asetV9V4V5FIainfix <V4V0Aainfix <=c0V4Iasa_invV10Aainfix <V4V0Aainfix <=c0V4FFFFFFF">
@@ -296,15 +296,15 @@
        timelimit="10"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.04"/>
+       <result status="valid" time="0.05"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter set.5"
-      locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+      locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
       loclnum="92" loccnumb="6" loccnume="9"
       expl="precondition"
-      sum="abc93691fc25859525122ad1fd5ee662"
+      sum="135bd324e89db6fe2d29a5ee827453a1"
       proved="true"
       expanded="true"
       shape="Lamk sparse_arrayamk arrayV0V9amk arrayV1V8amk arrayV2V7V6V3Lamk sparse_arrayamk arrayV0V11amk arrayV1V8amk arrayV2V7V6V3ainfix <V6V2Aainfix <=c0V6Iainfix =V14asetV8V4V6FIainfix <V4V1Aainfix <=c0V4Iainfix <V6V0Iainfix =V13aTrueNIais_eltV12V4qainfix =V13aTrueFIasa_invV12Aainfix <V4V0Aainfix <=c0V4Iainfix =V11asetV9V4V5FIainfix <V4V0Aainfix <=c0V4Iasa_invV10Aainfix <V4V0Aainfix <=c0V4FFFFFFF">
@@ -335,10 +335,10 @@
      </goal>
      <goal
       name="WP_parameter set.6"
-      locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+      locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
       loclnum="92" loccnumb="6" loccnume="9"
       expl="normal postcondition"
-      sum="031bc476e3cb9fa4ae554f188838e7ec"
+      sum="1c52f3dba59d89412cd04c03ae7dec43"
       proved="true"
       expanded="true"
       shape="Lamk sparse_arrayamk arrayV0V9amk arrayV1V8amk arrayV2V7V6V3Lamk sparse_arrayamk arrayV0V11amk arrayV1V8amk arrayV2V7V6V3Lamk sparse_arrayamk arrayV0V11amk arrayV1V14amk arrayV2V15V16V3ainfix =avalueV17V18avalueV10V18Iainfix =V18V4NFAainfix =avalueV17V4V5Aasa_invV17Iainfix =V16ainfix +V6c1FIainfix =V15asetV7V6V4FIainfix <V6V2Aainfix <=c0V6Iainfix =V14asetV8V4V6FIainfix <V4V1Aainfix <=c0V4Iainfix <V6V0Iainfix =V13aTrueNIais_eltV12V4qainfix =V13aTrueFIasa_invV12Aainfix <V4V0Aainfix <=c0V4Iainfix =V11asetV9V4V5FIainfix <V4V0Aainfix <=c0V4Iasa_invV10Aainfix <V4V0Aainfix <=c0V4FFFFFFF">
@@ -351,10 +351,10 @@
        expanded="true">
        <goal
         name="WP_parameter set.6.1"
-        locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+        locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
         loclnum="92" loccnumb="6" loccnume="9"
         expl="parameter set"
-        sum="bcb704465f0759828e831ee9489e1690"
+        sum="c675145f25f022968b3d69beaa7589ae"
         proved="true"
         expanded="true"
         shape="Lamk sparse_arrayamk arrayV0V9amk arrayV1V8amk arrayV2V7V6V3Lamk sparse_arrayamk arrayV0V11amk arrayV1V8amk arrayV2V7V6V3Lamk sparse_arrayamk arrayV0V11amk arrayV1V14amk arrayV2V15V16V3asa_invV17Iainfix =V16ainfix +V6c1FIainfix =V15asetV7V6V4FIainfix <V6V2Aainfix <=c0V6Iainfix =V14asetV8V4V6FIainfix <V4V1Aainfix <=c0V4Iainfix <V6V0Iainfix =V13aTrueNIais_eltV12V4qainfix =V13aTrueFIasa_invV12Aainfix <V4V0Aainfix <=c0V4Iainfix =V11asetV9V4V5FIainfix <V4V0Aainfix <=c0V4Iasa_invV10Aainfix <V4V0Aainfix <=c0V4FFFFFFF">
@@ -366,22 +366,22 @@
          timelimit="5"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.13"/>
+         <result status="valid" time="0.14"/>
         </proof>
         <proof
          prover="1"
          timelimit="5"
          obsolete="false"
          archived="false">
-         <result status="valid" time="2.08"/>
+         <result status="valid" time="2.02"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter set.6.2"
-        locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+        locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
         loclnum="92" loccnumb="6" loccnume="9"
         expl="parameter set"
-        sum="57a7a3e8a996308c24d090a1e4aba08f"
+        sum="533d8bab1207da39a1601342ddb9415c"
         proved="true"
         expanded="true"
         shape="Lamk sparse_arrayamk arrayV0V9amk arrayV1V8amk arrayV2V7V6V3Lamk sparse_arrayamk arrayV0V11amk arrayV1V8amk arrayV2V7V6V3Lamk sparse_arrayamk arrayV0V11amk arrayV1V14amk arrayV2V15V16V3ainfix =avalueV17V4V5Iainfix =V16ainfix +V6c1FIainfix =V15asetV7V6V4FIainfix <V6V2Aainfix <=c0V6Iainfix =V14asetV8V4V6FIainfix <V4V1Aainfix <=c0V4Iainfix <V6V0Iainfix =V13aTrueNIais_eltV12V4qainfix =V13aTrueFIasa_invV12Aainfix <V4V0Aainfix <=c0V4Iainfix =V11asetV9V4V5FIainfix <V4V0Aainfix <=c0V4Iasa_invV10Aainfix <V4V0Aainfix <=c0V4FFFFFFF">
@@ -400,15 +400,15 @@
          timelimit="5"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.81"/>
+         <result status="valid" time="0.82"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter set.6.3"
-        locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+        locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
         loclnum="92" loccnumb="6" loccnume="9"
         expl="parameter set"
-        sum="2673dbebb5e7f5c9c1349d3da0aa81d0"
+        sum="40c87270108b1d2534998a20f44ef6d7"
         proved="true"
         expanded="true"
         shape="Lamk sparse_arrayamk arrayV0V9amk arrayV1V8amk arrayV2V7V6V3Lamk sparse_arrayamk arrayV0V11amk arrayV1V8amk arrayV2V7V6V3Lamk sparse_arrayamk arrayV0V11amk arrayV1V14amk arrayV2V15V16V3ainfix =avalueV17V18avalueV10V18Iainfix =V18V4NFIainfix =V16ainfix +V6c1FIainfix =V15asetV7V6V4FIainfix <V6V2Aainfix <=c0V6Iainfix =V14asetV8V4V6FIainfix <V4V1Aainfix <=c0V4Iainfix <V6V0Iainfix =V13aTrueNIais_eltV12V4qainfix =V13aTrueFIasa_invV12Aainfix <V4V0Aainfix <=c0V4Iainfix =V11asetV9V4V5FIainfix <V4V0Aainfix <=c0V4Iasa_invV10Aainfix <V4V0Aainfix <=c0V4FFFFFFF">
@@ -420,24 +420,24 @@
          timelimit="5"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.06"/>
+         <result status="valid" time="0.07"/>
         </proof>
         <proof
          prover="1"
          timelimit="5"
          obsolete="false"
          archived="false">
-         <result status="valid" time="3.65"/>
+         <result status="valid" time="3.13"/>
         </proof>
        </goal>
       </transf>
      </goal>
      <goal
       name="WP_parameter set.7"
-      locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+      locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
       loclnum="92" loccnumb="6" loccnume="9"
       expl="normal postcondition"
-      sum="f02928639680292547bce3a83061eaf1"
+      sum="aca6298fe55385ff74cd98f19d204ad0"
       proved="true"
       expanded="true"
       shape="Lamk sparse_arrayamk arrayV0V9amk arrayV1V8amk arrayV2V7V6V3Lamk sparse_arrayamk arrayV0V11amk arrayV1V8amk arrayV2V7V6V3ainfix =avalueV12V14avalueV10V14Iainfix =V14V4NFAainfix =avalueV12V4V5Aasa_invV12Iainfix =V13aTrueNNIais_eltV12V4qainfix =V13aTrueFIasa_invV12Aainfix <V4V0Aainfix <=c0V4Iainfix =V11asetV9V4V5FIainfix <V4V0Aainfix <=c0V4Iasa_invV10Aainfix <V4V0Aainfix <=c0V4FFFFFFF">
@@ -463,7 +463,7 @@
        timelimit="5"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.36"/>
+       <result status="valid" time="0.38"/>
       </proof>
      </goal>
     </transf>
@@ -471,16 +471,16 @@
   </theory>
   <theory
    name="WP Harness"
-   locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+   locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
    loclnum="107" loccnumb="7" loccnume="14"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter harness"
-    locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+    locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
     loclnum="117" loccnumb="6" loccnume="13"
     expl="parameter harness"
-    sum="b5488ddd03dd1966aff07c2cdd7fbd64"
+    sum="70704c662817bf4bb4d3e8802aa9fbfc"
     proved="true"
     expanded="true"
     shape="Lamk sparse_arrayamk arrayV0V1amk arrayV2V3amk arrayV4V5V6V7Lamk sparse_arrayamk arrayV9V10amk arrayV11V12amk arrayV13V14V15V16Lamk sparse_arrayamk arrayV0V21amk arrayV2V20amk arrayV4V19V18V7Lamk sparse_arrayamk arrayV9V26amk arrayV11V25amk arrayV13V24V23V16ainfix =avalueV27c0adefAasa_invV27Aainfix <c0V9Aainfix <=c0c0Aainfix =avalueV22c0adefAasa_invV22Aainfix <c0V0Aainfix <=c0c0Aainfix =avalueV27c5adefAasa_invV27Aainfix <c5V9Aainfix <=c0c5Aainfix =avalueV22c7adefAasa_invV22Aainfix <c7V0Aainfix <=c0c7Aainfix =avalueV27c7ac2Aasa_invV27Aainfix <c7V9Aainfix <=c0c7Aainfix =avalueV22c5ac1Aasa_invV22Aainfix <c5V0Aainfix <=c0c5Iainfix =avalueV27V28avalueV17V28Iainfix =V28c7NFAainfix =avalueV27c7ac2Aasa_invV27FFFFAasa_invV17Aainfix <c7V9Aainfix <=c0c7Iainfix =avalueV22V29avalueV8V29Iainfix =V29c5NFAainfix =avalueV22c5ac1Aasa_invV22FFFFAasa_invV8Aainfix <c5V0Aainfix <=c0c5Aainfix =avalueV17c7adefAasa_invV17Aainfix <c7V9Aainfix <=c0c7Aainfix =avalueV8c5adefAasa_invV8Aainfix <c5V0Aainfix <=c0c5Iainfix =V9c20Aainfix =V16adefAainfix =V15c0Aasa_invV17FAainfix <=c20amaxlenAainfix <=c0c20Iainfix =V0c10Aainfix =V7adefAainfix =V6c0Aasa_invV8FAainfix <=c10amaxlenAainfix <=c0c10">
@@ -493,10 +493,10 @@
      expanded="true">
      <goal
       name="WP_parameter harness.1"
-      locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+      locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
       loclnum="117" loccnumb="6" loccnume="13"
       expl="precondition"
-      sum="6fc61d9ba6bf9f3fa41880ea6d85bd26"
+      sum="f3bd962994103fe623a7c9ff8896e47a"
       proved="true"
       expanded="true"
       shape="ainfix <=c10amaxlenAainfix <=c0c10">
@@ -527,10 +527,10 @@
      </goal>
      <goal
       name="WP_parameter harness.2"
-      locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+      locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
       loclnum="117" loccnumb="6" loccnume="13"
       expl="precondition"
-      sum="e4596ba3cae01a65423caeafd7ea407b"
+      sum="baf7290d5f67264e9d9f1208ffcf1581"
       proved="true"
       expanded="true"
       shape="Lamk sparse_arrayamk arrayV0V1amk arrayV2V3amk arrayV4V5V6V7ainfix <=c20amaxlenAainfix <=c0c20Iainfix =V0c10Aainfix =V7adefAainfix =V6c0Aasa_invV8FIainfix <=c10amaxlenAainfix <=c0c10">
@@ -561,10 +561,10 @@
      </goal>
      <goal
       name="WP_parameter harness.3"
-      locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+      locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
       loclnum="117" loccnumb="6" loccnume="13"
       expl="precondition"
-      sum="de49c1237552400a52386d3ada30fd93"
+      sum="a03cda9de92fff73688ffaf92bbabcdc"
       proved="true"
       expanded="true"
       shape="Lamk sparse_arrayamk arrayV0V1amk arrayV2V3amk arrayV4V5V6V7Lamk sparse_arrayamk arrayV9V10amk arrayV11V12amk arrayV13V14V15V16asa_invV8Aainfix <c5V0Aainfix <=c0c5Iainfix =V9c20Aainfix =V16adefAainfix =V15c0Aasa_invV17FIainfix <=c20amaxlenAainfix <=c0c20Iainfix =V0c10Aainfix =V7adefAainfix =V6c0Aasa_invV8FIainfix <=c10amaxlenAainfix <=c0c10">
@@ -583,22 +583,22 @@
        timelimit="5"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.02"/>
       </proof>
       <proof
        prover="0"
        timelimit="10"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.00"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter harness.4"
-      locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+      locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
       loclnum="117" loccnumb="6" loccnume="13"
       expl="assertion"
-      sum="433b14205bea2a8aa19d2d0088c94102"
+      sum="3975b464e38ed204f51a18c58bdc4221"
       proved="true"
       expanded="true"
       shape="Lamk sparse_arrayamk arrayV0V1amk arrayV2V3amk arrayV4V5V6V7Lamk sparse_arrayamk arrayV9V10amk arrayV11V12amk arrayV13V14V15V16ainfix =avalueV8c5adefIasa_invV8Aainfix <c5V0Aainfix <=c0c5Iainfix =V9c20Aainfix =V16adefAainfix =V15c0Aasa_invV17FIainfix <=c20amaxlenAainfix <=c0c20Iainfix =V0c10Aainfix =V7adefAainfix =V6c0Aasa_invV8FIainfix <=c10amaxlenAainfix <=c0c10">
@@ -629,10 +629,10 @@
      </goal>
      <goal
       name="WP_parameter harness.5"
-      locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+      locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
       loclnum="117" loccnumb="6" loccnume="13"
       expl="precondition"
-      sum="3bb703f3be19cca52d39cedbc4c09ee6"
+      sum="cadeed5f09d3f49b4928d3a2edb5d35d"
       proved="true"
       expanded="true"
       shape="Lamk sparse_arrayamk arrayV0V1amk arrayV2V3amk arrayV4V5V6V7Lamk sparse_arrayamk arrayV9V10amk arrayV11V12amk arrayV13V14V15V16asa_invV17Aainfix <c7V9Aainfix <=c0c7Iainfix =avalueV8c5adefIasa_invV8Aainfix <c5V0Aainfix <=c0c5Iainfix =V9c20Aainfix =V16adefAainfix =V15c0Aasa_invV17FIainfix <=c20amaxlenAainfix <=c0c20Iainfix =V0c10Aainfix =V7adefAainfix =V6c0Aasa_invV8FIainfix <=c10amaxlenAainfix <=c0c10">
@@ -663,10 +663,10 @@
      </goal>
      <goal
       name="WP_parameter harness.6"
-      locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+      locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
       loclnum="117" loccnumb="6" loccnume="13"
       expl="assertion"
-      sum="13ed3a44c655658cf3e10ef569d71f47"
+      sum="ae59867a4dfbcc6541b894fd847db14a"
       proved="true"
       expanded="true"
       shape="Lamk sparse_arrayamk arrayV0V1amk arrayV2V3amk arrayV4V5V6V7Lamk sparse_arrayamk arrayV9V10amk arrayV11V12amk arrayV13V14V15V16ainfix =avalueV17c7adefIasa_invV17Aainfix <c7V9Aainfix <=c0c7Iainfix =avalueV8c5adefIasa_invV8Aainfix <c5V0Aainfix <=c0c5Iainfix =V9c20Aainfix =V16adefAainfix =V15c0Aasa_invV17FIainfix <=c20amaxlenAainfix <=c0c20Iainfix =V0c10Aainfix =V7adefAainfix =V6c0Aasa_invV8FIainfix <=c10amaxlenAainfix <=c0c10">
@@ -692,15 +692,15 @@
        timelimit="10"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.03"/>
+       <result status="valid" time="0.04"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter harness.7"
-      locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+      locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
       loclnum="117" loccnumb="6" loccnume="13"
       expl="precondition"
-      sum="aba9700484f12bb92cf709c140575da9"
+      sum="5626f54640d8db6f7c7ab302d4803520"
       proved="true"
       expanded="true"
       shape="Lamk sparse_arrayamk arrayV0V1amk arrayV2V3amk arrayV4V5V6V7Lamk sparse_arrayamk arrayV9V10amk arrayV11V12amk arrayV13V14V15V16asa_invV8Aainfix <c5V0Aainfix <=c0c5Iainfix =avalueV17c7adefIasa_invV17Aainfix <c7V9Aainfix <=c0c7Iainfix =avalueV8c5adefIasa_invV8Aainfix <c5V0Aainfix <=c0c5Iainfix =V9c20Aainfix =V16adefAainfix =V15c0Aasa_invV17FIainfix <=c20amaxlenAainfix <=c0c20Iainfix =V0c10Aainfix =V7adefAainfix =V6c0Aasa_invV8FIainfix <=c10amaxlenAainfix <=c0c10">
@@ -726,15 +726,15 @@
        timelimit="10"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter harness.8"
-      locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+      locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
       loclnum="117" loccnumb="6" loccnume="13"
       expl="precondition"
-      sum="20fd400f6608f7dd177eb370b7725c5a"
+      sum="a5e89b55d3dc2a9cda4572472c17fad4"
       proved="true"
       expanded="true"
       shape="Lamk sparse_arrayamk arrayV0V1amk arrayV2V3amk arrayV4V5V6V7Lamk sparse_arrayamk arrayV9V10amk arrayV11V12amk arrayV13V14V15V16Lamk sparse_arrayamk arrayV0V21amk arrayV2V20amk arrayV4V19V18V7asa_invV17Aainfix <c7V9Aainfix <=c0c7Iainfix =avalueV22V23avalueV8V23Iainfix =V23c5NFAainfix =avalueV22c5ac1Aasa_invV22FFFFIasa_invV8Aainfix <c5V0Aainfix <=c0c5Iainfix =avalueV17c7adefIasa_invV17Aainfix <c7V9Aainfix <=c0c7Iainfix =avalueV8c5adefIasa_invV8Aainfix <c5V0Aainfix <=c0c5Iainfix =V9c20Aainfix =V16adefAainfix =V15c0Aasa_invV17FIainfix <=c20amaxlenAainfix <=c0c20Iainfix =V0c10Aainfix =V7adefAainfix =V6c0Aasa_invV8FIainfix <=c10amaxlenAainfix <=c0c10">
@@ -760,15 +760,15 @@
        timelimit="10"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.00"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter harness.9"
-      locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+      locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
       loclnum="117" loccnumb="6" loccnume="13"
       expl="precondition"
-      sum="8ece54b35a161eeb36ae43abcc1ac3c8"
+      sum="4208f6bb34e84f5e5df4e974e2296f9a"
       proved="true"
       expanded="true"
       shape="Lamk sparse_arrayamk arrayV0V1amk arrayV2V3amk arrayV4V5V6V7Lamk sparse_arrayamk arrayV9V10amk arrayV11V12amk arrayV13V14V15V16Lamk sparse_arrayamk arrayV0V21amk arrayV2V20amk arrayV4V19V18V7Lamk sparse_arrayamk arrayV9V26amk arrayV11V25amk arrayV13V24V23V16asa_invV22Aainfix <c5V0Aainfix <=c0c5Iainfix =avalueV27V28avalueV17V28Iainfix =V28c7NFAainfix =avalueV27c7ac2Aasa_invV27FFFFIasa_invV17Aainfix <c7V9Aainfix <=c0c7Iainfix =avalueV22V29avalueV8V29Iainfix =V29c5NFAainfix =avalueV22c5ac1Aasa_invV22FFFFIasa_invV8Aainfix <c5V0Aainfix <=c0c5Iainfix =avalueV17c7adefIasa_invV17Aainfix <c7V9Aainfix <=c0c7Iainfix =avalueV8c5adefIasa_invV8Aainfix <c5V0Aainfix <=c0c5Iainfix =V9c20Aainfix =V16adefAainfix =V15c0Aasa_invV17FIainfix <=c20amaxlenAainfix <=c0c20Iainfix =V0c10Aainfix =V7adefAainfix =V6c0Aasa_invV8FIainfix <=c10amaxlenAainfix <=c0c10">
@@ -787,7 +787,7 @@
        timelimit="5"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.01"/>
       </proof>
       <proof
        prover="0"
@@ -799,10 +799,10 @@
      </goal>
      <goal
       name="WP_parameter harness.10"
-      locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+      locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
       loclnum="117" loccnumb="6" loccnume="13"
       expl="assertion"
-      sum="550ced66a892e0cdb4964daebd4ed034"
+      sum="11ea5de9d3c73942e50f0eaedffbfdf2"
       proved="true"
       expanded="true"
       shape="Lamk sparse_arrayamk arrayV0V1amk arrayV2V3amk arrayV4V5V6V7Lamk sparse_arrayamk arrayV9V10amk arrayV11V12amk arrayV13V14V15V16Lamk sparse_arrayamk arrayV0V21amk arrayV2V20amk arrayV4V19V18V7Lamk sparse_arrayamk arrayV9V26amk arrayV11V25amk arrayV13V24V23V16ainfix =avalueV22c5ac1Iasa_invV22Aainfix <c5V0Aainfix <=c0c5Iainfix =avalueV27V28avalueV17V28Iainfix =V28c7NFAainfix =avalueV27c7ac2Aasa_invV27FFFFIasa_invV17Aainfix <c7V9Aainfix <=c0c7Iainfix =avalueV22V29avalueV8V29Iainfix =V29c5NFAainfix =avalueV22c5ac1Aasa_invV22FFFFIasa_invV8Aainfix <c5V0Aainfix <=c0c5Iainfix =avalueV17c7adefIasa_invV17Aainfix <c7V9Aainfix <=c0c7Iainfix =avalueV8c5adefIasa_invV8Aainfix <c5V0Aainfix <=c0c5Iainfix =V9c20Aainfix =V16adefAainfix =V15c0Aasa_invV17FIainfix <=c20amaxlenAainfix <=c0c20Iainfix =V0c10Aainfix =V7adefAainfix =V6c0Aasa_invV8FIainfix <=c10amaxlenAainfix <=c0c10">
@@ -833,10 +833,10 @@
      </goal>
      <goal
       name="WP_parameter harness.11"
-      locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+      locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
       loclnum="117" loccnumb="6" loccnume="13"
       expl="precondition"
-      sum="5dac4ad6dc83b5b67e3d210265cc82b8"
+      sum="6a77daea481e82514434a2b479a4e325"
       proved="true"
       expanded="true"
       shape="Lamk sparse_arrayamk arrayV0V1amk arrayV2V3amk arrayV4V5V6V7Lamk sparse_arrayamk arrayV9V10amk arrayV11V12amk arrayV13V14V15V16Lamk sparse_arrayamk arrayV0V21amk arrayV2V20amk arrayV4V19V18V7Lamk sparse_arrayamk arrayV9V26amk arrayV11V25amk arrayV13V24V23V16asa_invV27Aainfix <c7V9Aainfix <=c0c7Iainfix =avalueV22c5ac1Iasa_invV22Aainfix <c5V0Aainfix <=c0c5Iainfix =avalueV27V28avalueV17V28Iainfix =V28c7NFAainfix =avalueV27c7ac2Aasa_invV27FFFFIasa_invV17Aainfix <c7V9Aainfix <=c0c7Iainfix =avalueV22V29avalueV8V29Iainfix =V29c5NFAainfix =avalueV22c5ac1Aasa_invV22FFFFIasa_invV8Aainfix <c5V0Aainfix <=c0c5Iainfix =avalueV17c7adefIasa_invV17Aainfix <c7V9Aainfix <=c0c7Iainfix =avalueV8c5adefIasa_invV8Aainfix <c5V0Aainfix <=c0c5Iainfix =V9c20Aainfix =V16adefAainfix =V15c0Aasa_invV17FIainfix <=c20amaxlenAainfix <=c0c20Iainfix =V0c10Aainfix =V7adefAainfix =V6c0Aasa_invV8FIainfix <=c10amaxlenAainfix <=c0c10">
@@ -862,15 +862,15 @@
        timelimit="10"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter harness.12"
-      locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+      locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
       loclnum="117" loccnumb="6" loccnume="13"
       expl="assertion"
-      sum="f546986c89578e52e2a4ae70a137a31d"
+      sum="729f27622dc6aa47bcbcc83f4094f113"
       proved="true"
       expanded="true"
       shape="Lamk sparse_arrayamk arrayV0V1amk arrayV2V3amk arrayV4V5V6V7Lamk sparse_arrayamk arrayV9V10amk arrayV11V12amk arrayV13V14V15V16Lamk sparse_arrayamk arrayV0V21amk arrayV2V20amk arrayV4V19V18V7Lamk sparse_arrayamk arrayV9V26amk arrayV11V25amk arrayV13V24V23V16ainfix =avalueV27c7ac2Iasa_invV27Aainfix <c7V9Aainfix <=c0c7Iainfix =avalueV22c5ac1Iasa_invV22Aainfix <c5V0Aainfix <=c0c5Iainfix =avalueV27V28avalueV17V28Iainfix =V28c7NFAainfix =avalueV27c7ac2Aasa_invV27FFFFIasa_invV17Aainfix <c7V9Aainfix <=c0c7Iainfix =avalueV22V29avalueV8V29Iainfix =V29c5NFAainfix =avalueV22c5ac1Aasa_invV22FFFFIasa_invV8Aainfix <c5V0Aainfix <=c0c5Iainfix =avalueV17c7adefIasa_invV17Aainfix <c7V9Aainfix <=c0c7Iainfix =avalueV8c5adefIasa_invV8Aainfix <c5V0Aainfix <=c0c5Iainfix =V9c20Aainfix =V16adefAainfix =V15c0Aasa_invV17FIainfix <=c20amaxlenAainfix <=c0c20Iainfix =V0c10Aainfix =V7adefAainfix =V6c0Aasa_invV8FIainfix <=c10amaxlenAainfix <=c0c10">
@@ -901,10 +901,10 @@
      </goal>
      <goal
       name="WP_parameter harness.13"
-      locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+      locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
       loclnum="117" loccnumb="6" loccnume="13"
       expl="precondition"
-      sum="18491d86b63edcbf61751f5721229239"
+      sum="126fdf1908289e5f51233984a1727b37"
       proved="true"
       expanded="true"
       shape="Lamk sparse_arrayamk arrayV0V1amk arrayV2V3amk arrayV4V5V6V7Lamk sparse_arrayamk arrayV9V10amk arrayV11V12amk arrayV13V14V15V16Lamk sparse_arrayamk arrayV0V21amk arrayV2V20amk arrayV4V19V18V7Lamk sparse_arrayamk arrayV9V26amk arrayV11V25amk arrayV13V24V23V16asa_invV22Aainfix <c7V0Aainfix <=c0c7Iainfix =avalueV27c7ac2Iasa_invV27Aainfix <c7V9Aainfix <=c0c7Iainfix =avalueV22c5ac1Iasa_invV22Aainfix <c5V0Aainfix <=c0c5Iainfix =avalueV27V28avalueV17V28Iainfix =V28c7NFAainfix =avalueV27c7ac2Aasa_invV27FFFFIasa_invV17Aainfix <c7V9Aainfix <=c0c7Iainfix =avalueV22V29avalueV8V29Iainfix =V29c5NFAainfix =avalueV22c5ac1Aasa_invV22FFFFIasa_invV8Aainfix <c5V0Aainfix <=c0c5Iainfix =avalueV17c7adefIasa_invV17Aainfix <c7V9Aainfix <=c0c7Iainfix =avalueV8c5adefIasa_invV8Aainfix <c5V0Aainfix <=c0c5Iainfix =V9c20Aainfix =V16adefAainfix =V15c0Aasa_invV17FIainfix <=c20amaxlenAainfix <=c0c20Iainfix =V0c10Aainfix =V7adefAainfix =V6c0Aasa_invV8FIainfix <=c10amaxlenAainfix <=c0c10">
@@ -916,7 +916,7 @@
        timelimit="5"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.03"/>
       </proof>
       <proof
        prover="1"
@@ -935,10 +935,10 @@
      </goal>
      <goal
       name="WP_parameter harness.14"
-      locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+      locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
       loclnum="117" loccnumb="6" loccnume="13"
       expl="assertion"
-      sum="b2b5a9718fa2fce6531ae53c1df61aea"
+      sum="4d8d67a6adc9658b6f36b76fab68f05b"
       proved="true"
       expanded="true"
       shape="Lamk sparse_arrayamk arrayV0V1amk arrayV2V3amk arrayV4V5V6V7Lamk sparse_arrayamk arrayV9V10amk arrayV11V12amk arrayV13V14V15V16Lamk sparse_arrayamk arrayV0V21amk arrayV2V20amk arrayV4V19V18V7Lamk sparse_arrayamk arrayV9V26amk arrayV11V25amk arrayV13V24V23V16ainfix =avalueV22c7adefIasa_invV22Aainfix <c7V0Aainfix <=c0c7Iainfix =avalueV27c7ac2Iasa_invV27Aainfix <c7V9Aainfix <=c0c7Iainfix =avalueV22c5ac1Iasa_invV22Aainfix <c5V0Aainfix <=c0c5Iainfix =avalueV27V28avalueV17V28Iainfix =V28c7NFAainfix =avalueV27c7ac2Aasa_invV27FFFFIasa_invV17Aainfix <c7V9Aainfix <=c0c7Iainfix =avalueV22V29avalueV8V29Iainfix =V29c5NFAainfix =avalueV22c5ac1Aasa_invV22FFFFIasa_invV8Aainfix <c5V0Aainfix <=c0c5Iainfix =avalueV17c7adefIasa_invV17Aainfix <c7V9Aainfix <=c0c7Iainfix =avalueV8c5adefIasa_invV8Aainfix <c5V0Aainfix <=c0c5Iainfix =V9c20Aainfix =V16adefAainfix =V15c0Aasa_invV17FIainfix <=c20amaxlenAainfix <=c0c20Iainfix =V0c10Aainfix =V7adefAainfix =V6c0Aasa_invV8FIainfix <=c10amaxlenAainfix <=c0c10">
@@ -957,22 +957,22 @@
        timelimit="5"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.12"/>
+       <result status="valid" time="0.13"/>
       </proof>
       <proof
        prover="0"
        timelimit="10"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.48"/>
+       <result status="valid" time="0.46"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter harness.15"
-      locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+      locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
       loclnum="117" loccnumb="6" loccnume="13"
       expl="precondition"
-      sum="52281d17ebe9f67b29fd85cc4fa3fbfb"
+      sum="80b590c0685a40dc6d26da166916a4d0"
       proved="true"
       expanded="true"
       shape="Lamk sparse_arrayamk arrayV0V1amk arrayV2V3amk arrayV4V5V6V7Lamk sparse_arrayamk arrayV9V10amk arrayV11V12amk arrayV13V14V15V16Lamk sparse_arrayamk arrayV0V21amk arrayV2V20amk arrayV4V19V18V7Lamk sparse_arrayamk arrayV9V26amk arrayV11V25amk arrayV13V24V23V16asa_invV27Aainfix <c5V9Aainfix <=c0c5Iainfix =avalueV22c7adefIasa_invV22Aainfix <c7V0Aainfix <=c0c7Iainfix =avalueV27c7ac2Iasa_invV27Aainfix <c7V9Aainfix <=c0c7Iainfix =avalueV22c5ac1Iasa_invV22Aainfix <c5V0Aainfix <=c0c5Iainfix =avalueV27V28avalueV17V28Iainfix =V28c7NFAainfix =avalueV27c7ac2Aasa_invV27FFFFIasa_invV17Aainfix <c7V9Aainfix <=c0c7Iainfix =avalueV22V29avalueV8V29Iainfix =V29c5NFAainfix =avalueV22c5ac1Aasa_invV22FFFFIasa_invV8Aainfix <c5V0Aainfix <=c0c5Iainfix =avalueV17c7adefIasa_invV17Aainfix <c7V9Aainfix <=c0c7Iainfix =avalueV8c5adefIasa_invV8Aainfix <c5V0Aainfix <=c0c5Iainfix =V9c20Aainfix =V16adefAainfix =V15c0Aasa_invV17FIainfix <=c20amaxlenAainfix <=c0c20Iainfix =V0c10Aainfix =V7adefAainfix =V6c0Aasa_invV8FIainfix <=c10amaxlenAainfix <=c0c10">
@@ -998,15 +998,15 @@
        timelimit="10"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter harness.16"
-      locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+      locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
       loclnum="117" loccnumb="6" loccnume="13"
       expl="assertion"
-      sum="9c4188f0ba38a16703f9f09e547589b1"
+      sum="378cd79e5cf3950a1e2d2fd2e53311ee"
       proved="true"
       expanded="true"
       shape="Lamk sparse_arrayamk arrayV0V1amk arrayV2V3amk arrayV4V5V6V7Lamk sparse_arrayamk arrayV9V10amk arrayV11V12amk arrayV13V14V15V16Lamk sparse_arrayamk arrayV0V21amk arrayV2V20amk arrayV4V19V18V7Lamk sparse_arrayamk arrayV9V26amk arrayV11V25amk arrayV13V24V23V16ainfix =avalueV27c5adefIasa_invV27Aainfix <c5V9Aainfix <=c0c5Iainfix =avalueV22c7adefIasa_invV22Aainfix <c7V0Aainfix <=c0c7Iainfix =avalueV27c7ac2Iasa_invV27Aainfix <c7V9Aainfix <=c0c7Iainfix =avalueV22c5ac1Iasa_invV22Aainfix <c5V0Aainfix <=c0c5Iainfix =avalueV27V28avalueV17V28Iainfix =V28c7NFAainfix =avalueV27c7ac2Aasa_invV27FFFFIasa_invV17Aainfix <c7V9Aainfix <=c0c7Iainfix =avalueV22V29avalueV8V29Iainfix =V29c5NFAainfix =avalueV22c5ac1Aasa_invV22FFFFIasa_invV8Aainfix <c5V0Aainfix <=c0c5Iainfix =avalueV17c7adefIasa_invV17Aainfix <c7V9Aainfix <=c0c7Iainfix =avalueV8c5adefIasa_invV8Aainfix <c5V0Aainfix <=c0c5Iainfix =V9c20Aainfix =V16adefAainfix =V15c0Aasa_invV17FIainfix <=c20amaxlenAainfix <=c0c20Iainfix =V0c10Aainfix =V7adefAainfix =V6c0Aasa_invV8FIainfix <=c10amaxlenAainfix <=c0c10">
@@ -1037,81 +1037,13 @@
      </goal>
      <goal
       name="WP_parameter harness.17"
-      locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+      locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
       loclnum="117" loccnumb="6" loccnume="13"
       expl="precondition"
-      sum="3879641fb50e1ffd26a038ccb8f40197"
+      sum="3af5398459564f7fb6488fd5293885e8"
       proved="true"
       expanded="true"
       shape="Lamk sparse_arrayamk arrayV0V1amk arrayV2V3amk arrayV4V5V6V7Lamk sparse_arrayamk arrayV9V10amk arrayV11V12amk arrayV13V14V15V16Lamk sparse_arrayamk arrayV0V21amk arrayV2V20amk arrayV4V19V18V7Lamk sparse_arrayamk arrayV9V26amk arrayV11V25amk arrayV13V24V23V16asa_invV22Aainfix <c0V0Aainfix <=c0c0Iainfix =avalueV27c5adefIasa_invV27Aainfix <c5V9Aainfix <=c0c5Iainfix =avalueV22c7adefIasa_invV22Aainfix <c7V0Aainfix <=c0c7Iainfix =avalueV27c7ac2Iasa_invV27Aainfix <c7V9Aainfix <=c0c7Iainfix =avalueV22c5ac1Iasa_invV22Aainfix <c5V0Aainfix <=c0c5Iainfix =avalueV27V28avalueV17V28Iainfix =V28c7NFAainfix =avalueV27c7ac2Aasa_invV27FFFFIasa_invV17Aainfix <c7V9Aainfix <=c0c7Iainfix =avalueV22V29avalueV8V29Iainfix =V29c5NFAainfix =avalueV22c5ac1Aasa_invV22FFFFIasa_invV8Aainfix <c5V0Aainfix <=c0c5Iainfix =avalueV17c7adefIasa_invV17Aainfix <c7V9Aainfix <=c0c7Iainfix =avalueV8c5adefIasa_invV8Aainfix <c5V0Aainfix <=c0c5Iainfix =V9c20Aainfix =V16adefAainfix =V15c0Aasa_invV17FIainfix <=c20amaxlenAainfix <=c0c20Iainfix =V0c10Aainfix =V7adefAainfix =V6c0Aasa_invV8FIainfix <=c10amaxlenAainfix <=c0c10">
-      <label
-       name="expl:parameter harness">
-       </label>
-      <proof
-       prover="3"
-       timelimit="5"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.04"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="5"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof
-       prover="0"
-       timelimit="10"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter harness.18"
-      locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
-      loclnum="117" loccnumb="6" loccnume="13"
-      expl="assertion"
-      sum="b2ea161b1adf077e9c5a5922b17e8c9a"
-      proved="true"
-      expanded="true"
-      shape="Lamk sparse_arrayamk arrayV0V1amk arrayV2V3amk arrayV4V5V6V7Lamk sparse_arrayamk arrayV9V10amk arrayV11V12amk arrayV13V14V15V16Lamk sparse_arrayamk arrayV0V21amk arrayV2V20amk arrayV4V19V18V7Lamk sparse_arrayamk arrayV9V26amk arrayV11V25amk arrayV13V24V23V16ainfix =avalueV22c0adefIasa_invV22Aainfix <c0V0Aainfix <=c0c0Iainfix =avalueV27c5adefIasa_invV27Aainfix <c5V9Aainfix <=c0c5Iainfix =avalueV22c7adefIasa_invV22Aainfix <c7V0Aainfix <=c0c7Iainfix =avalueV27c7ac2Iasa_invV27Aainfix <c7V9Aainfix <=c0c7Iainfix =avalueV22c5ac1Iasa_invV22Aainfix <c5V0Aainfix <=c0c5Iainfix =avalueV27V28avalueV17V28Iainfix =V28c7NFAainfix =avalueV27c7ac2Aasa_invV27FFFFIasa_invV17Aainfix <c7V9Aainfix <=c0c7Iainfix =avalueV22V29avalueV8V29Iainfix =V29c5NFAainfix =avalueV22c5ac1Aasa_invV22FFFFIasa_invV8Aainfix <c5V0Aainfix <=c0c5Iainfix =avalueV17c7adefIasa_invV17Aainfix <c7V9Aainfix <=c0c7Iainfix =avalueV8c5adefIasa_invV8Aainfix <c5V0Aainfix <=c0c5Iainfix =V9c20Aainfix =V16adefAainfix =V15c0Aasa_invV17FIainfix <=c20amaxlenAainfix <=c0c20Iainfix =V0c10Aainfix =V7adefAainfix =V6c0Aasa_invV8FIainfix <=c10amaxlenAainfix <=c0c10">
-      <label
-       name="expl:parameter harness">
-       </label>
-      <proof
-       prover="3"
-       timelimit="5"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.04"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="5"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.25"/>
-      </proof>
-      <proof
-       prover="0"
-       timelimit="10"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.64"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter harness.19"
-      locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
-      loclnum="117" loccnumb="6" loccnume="13"
-      expl="precondition"
-      sum="42a484c19a4ba4c8ccf288148b8c1d4f"
-      proved="true"
-      expanded="true"
-      shape="Lamk sparse_arrayamk arrayV0V1amk arrayV2V3amk arrayV4V5V6V7Lamk sparse_arrayamk arrayV9V10amk arrayV11V12amk arrayV13V14V15V16Lamk sparse_arrayamk arrayV0V21amk arrayV2V20amk arrayV4V19V18V7Lamk sparse_arrayamk arrayV9V26amk arrayV11V25amk arrayV13V24V23V16asa_invV27Aainfix <c0V9Aainfix <=c0c0Iainfix =avalueV22c0adefIasa_invV22Aainfix <c0V0Aainfix <=c0c0Iainfix =avalueV27c5adefIasa_invV27Aainfix <c5V9Aainfix <=c0c5Iainfix =avalueV22c7adefIasa_invV22Aainfix <c7V0Aainfix <=c0c7Iainfix =avalueV27c7ac2Iasa_invV27Aainfix <c7V9Aainfix <=c0c7Iainfix =avalueV22c5ac1Iasa_invV22Aainfix <c5V0Aainfix <=c0c5Iainfix =avalueV27V28avalueV17V28Iainfix =V28c7NFAainfix =avalueV27c7ac2Aasa_invV27FFFFIasa_invV17Aainfix <c7V9Aainfix <=c0c7Iainfix =avalueV22V29avalueV8V29Iainfix =V29c5NFAainfix =avalueV22c5ac1Aasa_invV22FFFFIasa_invV8Aainfix <c5V0Aainfix <=c0c5Iainfix =avalueV17c7adefIasa_invV17Aainfix <c7V9Aainfix <=c0c7Iainfix =avalueV8c5adefIasa_invV8Aainfix <c5V0Aainfix <=c0c5Iainfix =V9c20Aainfix =V16adefAainfix =V15c0Aasa_invV17FIainfix <=c20amaxlenAainfix <=c0c20Iainfix =V0c10Aainfix =V7adefAainfix =V6c0Aasa_invV8FIainfix <=c10amaxlenAainfix <=c0c10">
       <label
        name="expl:parameter harness">
        </label>
@@ -1138,11 +1070,79 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter harness.20"
-      locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+      name="WP_parameter harness.18"
+      locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
       loclnum="117" loccnumb="6" loccnume="13"
       expl="assertion"
-      sum="522fb9691a4f4f3bd24bca5e546b0b3e"
+      sum="666047187fbb58b4a0ffe1f7d940f295"
+      proved="true"
+      expanded="true"
+      shape="Lamk sparse_arrayamk arrayV0V1amk arrayV2V3amk arrayV4V5V6V7Lamk sparse_arrayamk arrayV9V10amk arrayV11V12amk arrayV13V14V15V16Lamk sparse_arrayamk arrayV0V21amk arrayV2V20amk arrayV4V19V18V7Lamk sparse_arrayamk arrayV9V26amk arrayV11V25amk arrayV13V24V23V16ainfix =avalueV22c0adefIasa_invV22Aainfix <c0V0Aainfix <=c0c0Iainfix =avalueV27c5adefIasa_invV27Aainfix <c5V9Aainfix <=c0c5Iainfix =avalueV22c7adefIasa_invV22Aainfix <c7V0Aainfix <=c0c7Iainfix =avalueV27c7ac2Iasa_invV27Aainfix <c7V9Aainfix <=c0c7Iainfix =avalueV22c5ac1Iasa_invV22Aainfix <c5V0Aainfix <=c0c5Iainfix =avalueV27V28avalueV17V28Iainfix =V28c7NFAainfix =avalueV27c7ac2Aasa_invV27FFFFIasa_invV17Aainfix <c7V9Aainfix <=c0c7Iainfix =avalueV22V29avalueV8V29Iainfix =V29c5NFAainfix =avalueV22c5ac1Aasa_invV22FFFFIasa_invV8Aainfix <c5V0Aainfix <=c0c5Iainfix =avalueV17c7adefIasa_invV17Aainfix <c7V9Aainfix <=c0c7Iainfix =avalueV8c5adefIasa_invV8Aainfix <c5V0Aainfix <=c0c5Iainfix =V9c20Aainfix =V16adefAainfix =V15c0Aasa_invV17FIainfix <=c20amaxlenAainfix <=c0c20Iainfix =V0c10Aainfix =V7adefAainfix =V6c0Aasa_invV8FIainfix <=c10amaxlenAainfix <=c0c10">
+      <label
+       name="expl:parameter harness">
+       </label>
+      <proof
+       prover="3"
+       timelimit="5"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.25"/>
+      </proof>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.63"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter harness.19"
+      locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+      loclnum="117" loccnumb="6" loccnume="13"
+      expl="precondition"
+      sum="b27d0a3eaaa7624e77ee80283cf9e6e7"
+      proved="true"
+      expanded="true"
+      shape="Lamk sparse_arrayamk arrayV0V1amk arrayV2V3amk arrayV4V5V6V7Lamk sparse_arrayamk arrayV9V10amk arrayV11V12amk arrayV13V14V15V16Lamk sparse_arrayamk arrayV0V21amk arrayV2V20amk arrayV4V19V18V7Lamk sparse_arrayamk arrayV9V26amk arrayV11V25amk arrayV13V24V23V16asa_invV27Aainfix <c0V9Aainfix <=c0c0Iainfix =avalueV22c0adefIasa_invV22Aainfix <c0V0Aainfix <=c0c0Iainfix =avalueV27c5adefIasa_invV27Aainfix <c5V9Aainfix <=c0c5Iainfix =avalueV22c7adefIasa_invV22Aainfix <c7V0Aainfix <=c0c7Iainfix =avalueV27c7ac2Iasa_invV27Aainfix <c7V9Aainfix <=c0c7Iainfix =avalueV22c5ac1Iasa_invV22Aainfix <c5V0Aainfix <=c0c5Iainfix =avalueV27V28avalueV17V28Iainfix =V28c7NFAainfix =avalueV27c7ac2Aasa_invV27FFFFIasa_invV17Aainfix <c7V9Aainfix <=c0c7Iainfix =avalueV22V29avalueV8V29Iainfix =V29c5NFAainfix =avalueV22c5ac1Aasa_invV22FFFFIasa_invV8Aainfix <c5V0Aainfix <=c0c5Iainfix =avalueV17c7adefIasa_invV17Aainfix <c7V9Aainfix <=c0c7Iainfix =avalueV8c5adefIasa_invV8Aainfix <c5V0Aainfix <=c0c5Iainfix =V9c20Aainfix =V16adefAainfix =V15c0Aasa_invV17FIainfix <=c20amaxlenAainfix <=c0c20Iainfix =V0c10Aainfix =V7adefAainfix =V6c0Aasa_invV8FIainfix <=c10amaxlenAainfix <=c0c10">
+      <label
+       name="expl:parameter harness">
+       </label>
+      <proof
+       prover="3"
+       timelimit="5"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter harness.20"
+      locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+      loclnum="117" loccnumb="6" loccnume="13"
+      expl="assertion"
+      sum="12ebf9d640217846e3a03e28665714a8"
       proved="true"
       expanded="true"
       shape="Lamk sparse_arrayamk arrayV0V1amk arrayV2V3amk arrayV4V5V6V7Lamk sparse_arrayamk arrayV9V10amk arrayV11V12amk arrayV13V14V15V16Lamk sparse_arrayamk arrayV0V21amk arrayV2V20amk arrayV4V19V18V7Lamk sparse_arrayamk arrayV9V26amk arrayV11V25amk arrayV13V24V23V16ainfix =avalueV27c0adefIasa_invV27Aainfix <c0V9Aainfix <=c0c0Iainfix =avalueV22c0adefIasa_invV22Aainfix <c0V0Aainfix <=c0c0Iainfix =avalueV27c5adefIasa_invV27Aainfix <c5V9Aainfix <=c0c5Iainfix =avalueV22c7adefIasa_invV22Aainfix <c7V0Aainfix <=c0c7Iainfix =avalueV27c7ac2Iasa_invV27Aainfix <c7V9Aainfix <=c0c7Iainfix =avalueV22c5ac1Iasa_invV22Aainfix <c5V0Aainfix <=c0c5Iainfix =avalueV27V28avalueV17V28Iainfix =V28c7NFAainfix =avalueV27c7ac2Aasa_invV27FFFFIasa_invV17Aainfix <c7V9Aainfix <=c0c7Iainfix =avalueV22V29avalueV8V29Iainfix =V29c5NFAainfix =avalueV22c5ac1Aasa_invV22FFFFIasa_invV8Aainfix <c5V0Aainfix <=c0c5Iainfix =avalueV17c7adefIasa_invV17Aainfix <c7V9Aainfix <=c0c7Iainfix =avalueV8c5adefIasa_invV8Aainfix <c5V0Aainfix <=c0c5Iainfix =V9c20Aainfix =V16adefAainfix =V15c0Aasa_invV17FIainfix <=c20amaxlenAainfix <=c0c20Iainfix =V0c10Aainfix =V7adefAainfix =V6c0Aasa_invV8FIainfix <=c10amaxlenAainfix <=c0c10">
@@ -1161,14 +1161,14 @@
        timelimit="5"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.30"/>
+       <result status="valid" time="0.31"/>
       </proof>
       <proof
        prover="0"
        timelimit="10"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.57"/>
+       <result status="valid" time="0.55"/>
       </proof>
      </goal>
     </transf>

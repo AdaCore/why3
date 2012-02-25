@@ -3,92 +3,58 @@
 <why3session
  name="programs/foveoos11_challenge2/why3session.xml">
  <prover
-  id="alt-ergo"
+  id="0"
   name="Alt-Ergo"
   version="0.94"/>
  <prover
-  id="coq"
+  id="1"
   name="Coq"
   version="8.3pl3"/>
- <prover
-  id="cvc3-2.2"
-  name="CVC3"
-  version="2.2"/>
- <prover
-  id="cvc3-2.4"
-  name="CVC3"
-  version="2.4.1"/>
- <prover
-  id="eprover"
-  name="Eprover"
-  version="1.4"/>
- <prover
-  id="gappa"
-  name="Gappa"
-  version="0.15.1"/>
- <prover
-  id="simplify"
-  name="Simplify"
-  version="1.5.4"/>
- <prover
-  id="spass"
-  name="Spass"
-  version="3.7"/>
- <prover
-  id="vampire"
-  name="Vampire"
-  version="0.6"/>
- <prover
-  id="verit"
-  name="veriT"
-  version="dev"/>
- <prover
-  id="yices"
-  name="Yices"
-  version="1.0.25"/>
- <prover
-  id="z3-2"
-  name="Z3"
-  version="2.19"/>
- <prover
-  id="z3-3"
-  name="Z3"
-  version="3.2"/>
  <file
   name="../foveoos11_challenge2.mlw"
   verified="true"
-  expanded="true">
+  expanded="false">
   <theory
    name="WP MaximumTree"
+   locfile="programs/foveoos11_challenge2/../foveoos11_challenge2.mlw"
+   loclnum="8" loccnumb="7" loccnume="18"
    verified="true"
    expanded="true">
    <goal
     name="size_nonneg"
-    sum="8e381a76ae2b5da84be25b14fc467fdd"
+    locfile="programs/foveoos11_challenge2/../foveoos11_challenge2.mlw"
+    loclnum="20" loccnumb="8" loccnume="19"
+    sum="bae6b04358e2a57ad46d91e5530f5767"
     proved="true"
     expanded="true"
     shape="ainfix >=asizeV0c0F">
     <proof
-     prover="coq"
+     prover="1"
      timelimit="10"
      edited="foveoos11_challenge2_WP_MaximumTree_size_nonneg_1.v"
-     obsolete="false">
-     <result status="valid" time="0.48"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.47"/>
     </proof>
    </goal>
    <goal
     name="WP_parameter maximum"
+    locfile="programs/foveoos11_challenge2/../foveoos11_challenge2.mlw"
+    loclnum="27" loccnumb="10" loccnume="17"
     expl="parameter maximum"
-    sum="edbeed25b4e11e099d452abee62ad63f"
+    sum="8d6c48b663f569fe78a200ac343e6a19"
     proved="true"
     expanded="true"
     shape="CV0aEmptyfaNodeaEmptyVaEmptyainfix <=V2V1IamemV2V0FAamemV1V0aNodeVVaEmptyOaNodeaEmptyVVainfix <=V6amaxV5V3IamemV6V0FAamemamaxV5V3V0Iainfix <=V7V5IamemV7V4FAamemV5V4FAainfix =V4aEmptyNAainfix <asizeV4asizeV0Aainfix <=c0asizeV0aNodeVVVainfix <=V13amaxV11amaxV9V12IamemV13V0FAamemamaxV11amaxV9V12V0Iainfix <=V14V12IamemV14V10FAamemV12V10FAainfix =V10aEmptyNAainfix <asizeV10asizeV0Aainfix <=c0asizeV0Iainfix <=V15V11IamemV15V8FAamemV11V8FAainfix =V8aEmptyNAainfix <asizeV8asizeV0Aainfix <=c0asizeV0Iainfix =V0aEmptyNF">
+    <label
+     name="expl:parameter maximum">
+     </label>
     <proof
-     prover="alt-ergo"
+     prover="0"
      timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.47"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.48"/>
     </proof>
    </goal>
   </theory>

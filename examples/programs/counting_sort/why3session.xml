@@ -12,37 +12,45 @@
   version="2.2"/>
  <prover
   id="2"
+  name="CVC3"
+  version="2.4.1"/>
+ <prover
+  id="3"
   name="Coq"
   version="8.3pl3"/>
  <prover
-  id="3"
+  id="4"
   name="Z3"
   version="2.19"/>
+ <prover
+  id="5"
+  name="Z3"
+  version="3.2"/>
  <file
   name="../counting_sort.mlw"
   verified="true"
-  expanded="true">
+  expanded="false">
   <theory
    name="WP Spec"
    locfile="examples/programs/counting_sort/../counting_sort.mlw"
    loclnum="18" loccnumb="7" loccnume="11"
    verified="true"
-   expanded="true">
+   expanded="false">
    <goal
     name="eqlt"
     locfile="examples/programs/counting_sort/../counting_sort.mlw"
     loclnum="45" loccnumb="8" loccnume="12"
-    sum="403d7e518d42f755ba4960b0e2536498"
+    sum="fa908cfae7cdc3a7089d416a9e8de63f"
     proved="true"
-    expanded="true"
+    expanded="false"
     shape="ainfix =ainfix +anumltV0V1V2V3anumeqV0V1V2V3anumltV0ainfix +V1c1V2V3Iainfix <=V3alengthV0Aainfix <V2V3Aainfix <=c0V2FIainfix <V1akAainfix <=c0V1FIak_valuesV0F">
     <proof
-     prover="2"
+     prover="3"
      timelimit="10"
      edited="counting_sort_WP_Spec_eqlt_2.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="1.79"/>
+     <result status="valid" time="1.70"/>
     </proof>
    </goal>
   </theory>
@@ -51,31 +59,31 @@
    locfile="examples/programs/counting_sort/../counting_sort.mlw"
    loclnum="59" loccnumb="7" loccnume="19"
    verified="true"
-   expanded="true">
+   expanded="false">
    <goal
     name="WP_parameter counting_sort"
     locfile="examples/programs/counting_sort/../counting_sort.mlw"
     loclnum="65" loccnumb="6" loccnume="19"
     expl="parameter counting_sort"
-    sum="7a6e60557754f7a329ae56e013a0020b"
+    sum="51f11b90c066baec82a3ef38af8d0852"
     proved="true"
-    expanded="true"
-    shape="Lamk arrayV1V2Lamk arrayV0V3Lamk arrayV1V8apermutV5V9AasortedV9Aainfix =V7V1Iainfix =anum_ofaTuple2V8V10c0V7anum_ofaTuple2V3V10c0V0Iainfix <V10ainfix +ainfix -akc1c1Aainfix <=c0V10FAainfix <agetV8V11ainfix +ainfix -akc1c1Aainfix <=c0agetV8V11Iainfix <V11V7Aainfix <=c0V11FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V3ainfix +ainfix -akc1c1c0V0ALagetV6V12ainfix =anum_ofaTuple2V15V16c0V14anum_ofaTuple2V3V16c0V0Iainfix <V16ainfix +V12c1Aainfix <=c0V16FAainfix <agetV15V17ainfix +V12c1Aainfix <=c0agetV15V17Iainfix <V17V14Aainfix <=c0V17FAasorted_subV15c0V14Aainfix =V14anum_ofaTuple2V3ainfix +V12c1c0V0Iainfix =anum_ofaTuple2V15V12c0V14ainfix -ainfix +V13c1c1Aainfix =anum_ofaTuple2V15V18c0V14anum_ofaTuple2V3V18c0V0Iainfix <V18V12Aainfix <=c0V18FAainfix <=agetV15V19V12Aainfix <=c0agetV15V19Iainfix <V19V14Aainfix <=c0V19FAasorted_subV15c0V14Aainfix =ainfix +ainfix -V14ainfix +V13c1c1anum_ofaTuple2V3V12c0V0Aainfix =anum_ofaTuple2V21V12c0V22ainfix -ainfix +V20c1c1Aainfix =anum_ofaTuple2V21V23c0V22anum_ofaTuple2V3V23c0V0Iainfix <V23V12Aainfix <=c0V23FAainfix <=agetV21V24V12Aainfix <=c0agetV21V24Iainfix <V24V22Aainfix <=c0V24FAasorted_subV21c0V22Aainfix =ainfix +ainfix -V22ainfix +V20c1c1anum_ofaTuple2V3V12c0V0Iainfix =V22ainfix +V14c1FIainfix =V21asetV15V14V12FAainfix <V14V1Aainfix <=c0V14Iainfix =anum_ofaTuple2V15V12c0V14ainfix -V20c1Aainfix =anum_ofaTuple2V15V25c0V14anum_ofaTuple2V3V25c0V0Iainfix <V25V12Aainfix <=c0V25FAainfix <=agetV15V26V12Aainfix <=c0agetV15V26Iainfix <V26V14Aainfix <=c0V26FAasorted_subV15c0V14Aainfix =ainfix +ainfix -V14V20c1anum_ofaTuple2V3V12c0V0Iainfix <=V20V13Aainfix <=c1V20FFFAainfix =anum_ofaTuple2V8V12c0V7ainfix -c1c1Aainfix =anum_ofaTuple2V8V27c0V7anum_ofaTuple2V3V27c0V0Iainfix <V27V12Aainfix <=c0V27FAainfix <=agetV8V28V12Aainfix <=c0agetV8V28Iainfix <V28V7Aainfix <=c0V28FAasorted_subV8c0V7Aainfix =ainfix +ainfix -V7c1c1anum_ofaTuple2V3V12c0V0Iainfix <=c1V13Aainfix =anum_ofaTuple2V8V29c0V7anum_ofaTuple2V3V29c0V0Iainfix <V29ainfix +V12c1Aainfix <=c0V29FAainfix <agetV8V30ainfix +V12c1Aainfix <=c0agetV8V30Iainfix <V30V7Aainfix <=c0V30FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V3ainfix +V12c1c0V0Iainfix >c1V13Aainfix <V12akAainfix <=c0V12Iainfix =anum_ofaTuple2V8V31c0V7anum_ofaTuple2V3V31c0V0Iainfix <V31V12Aainfix <=c0V31FAainfix <agetV8V32V12Aainfix <=c0agetV8V32Iainfix <V32V7Aainfix <=c0V32FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V3V12c0V0Iainfix <=V12ainfix -akc1Aainfix <=c0V12FFFAainfix =anum_ofaTuple2V2V33c0c0anum_ofaTuple2V3V33c0V0Iainfix <V33c0Aainfix <=c0V33FAainfix <agetV2V34c0Aainfix <=c0agetV2V34Iainfix <V34c0Aainfix <=c0V34FAasorted_subV2c0c0Aainfix =c0anum_ofaTuple2V3c0c0V0Iainfix <=c0ainfix -akc1AapermutV5V4AasortedV4Aainfix =c0V1Iainfix >c0ainfix -akc1Iainfix =agetV6V35anum_ofaTuple2V3V35c0ainfix +ainfix -V0c1c1Iainfix <V35akAainfix <=c0V35FALagetV3V36ainfix =agetV38V39anum_ofaTuple2V3V39c0ainfix +V36c1Iainfix <V39akAainfix <=c0V39FIainfix =V38asetV6V37ainfix +agetV6V37c1FAainfix <V37akAainfix <=c0V37Aainfix <V37akAainfix <=c0V37Aainfix <V36V0Aainfix <=c0V36Iainfix =agetV6V40anum_ofaTuple2V3V40c0V36Iainfix <V40akAainfix <=c0V40FIainfix <=V36ainfix -V0c1Aainfix <=c0V36FFAainfix =agetaconstc0V41anum_ofaTuple2V3V41c0c0Iainfix <V41akAainfix <=c0V41FIainfix <=c0ainfix -V0c1ALamk arrayV1V43apermutV5V44AasortedV44Aainfix =V42V1Iainfix =anum_ofaTuple2V43V45c0V42anum_ofaTuple2V3V45c0V0Iainfix <V45ainfix +ainfix -akc1c1Aainfix <=c0V45FAainfix <agetV43V46ainfix +ainfix -akc1c1Aainfix <=c0agetV43V46Iainfix <V46V42Aainfix <=c0V46FAasorted_subV43c0V42Aainfix =V42anum_ofaTuple2V3ainfix +ainfix -akc1c1c0V0ALagetaconstc0V47ainfix =anum_ofaTuple2V50V51c0V49anum_ofaTuple2V3V51c0V0Iainfix <V51ainfix +V47c1Aainfix <=c0V51FAainfix <agetV50V52ainfix +V47c1Aainfix <=c0agetV50V52Iainfix <V52V49Aainfix <=c0V52FAasorted_subV50c0V49Aainfix =V49anum_ofaTuple2V3ainfix +V47c1c0V0Iainfix =anum_ofaTuple2V50V47c0V49ainfix -ainfix +V48c1c1Aainfix =anum_ofaTuple2V50V53c0V49anum_ofaTuple2V3V53c0V0Iainfix <V53V47Aainfix <=c0V53FAainfix <=agetV50V54V47Aainfix <=c0agetV50V54Iainfix <V54V49Aainfix <=c0V54FAasorted_subV50c0V49Aainfix =ainfix +ainfix -V49ainfix +V48c1c1anum_ofaTuple2V3V47c0V0Aainfix =anum_ofaTuple2V56V47c0V57ainfix -ainfix +V55c1c1Aainfix =anum_ofaTuple2V56V58c0V57anum_ofaTuple2V3V58c0V0Iainfix <V58V47Aainfix <=c0V58FAainfix <=agetV56V59V47Aainfix <=c0agetV56V59Iainfix <V59V57Aainfix <=c0V59FAasorted_subV56c0V57Aainfix =ainfix +ainfix -V57ainfix +V55c1c1anum_ofaTuple2V3V47c0V0Iainfix =V57ainfix +V49c1FIainfix =V56asetV50V49V47FAainfix <V49V1Aainfix <=c0V49Iainfix =anum_ofaTuple2V50V47c0V49ainfix -V55c1Aainfix =anum_ofaTuple2V50V60c0V49anum_ofaTuple2V3V60c0V0Iainfix <V60V47Aainfix <=c0V60FAainfix <=agetV50V61V47Aainfix <=c0agetV50V61Iainfix <V61V49Aainfix <=c0V61FAasorted_subV50c0V49Aainfix =ainfix +ainfix -V49V55c1anum_ofaTuple2V3V47c0V0Iainfix <=V55V48Aainfix <=c1V55FFFAainfix =anum_ofaTuple2V43V47c0V42ainfix -c1c1Aainfix =anum_ofaTuple2V43V62c0V42anum_ofaTuple2V3V62c0V0Iainfix <V62V47Aainfix <=c0V62FAainfix <=agetV43V63V47Aainfix <=c0agetV43V63Iainfix <V63V42Aainfix <=c0V63FAasorted_subV43c0V42Aainfix =ainfix +ainfix -V42c1c1anum_ofaTuple2V3V47c0V0Iainfix <=c1V48Aainfix =anum_ofaTuple2V43V64c0V42anum_ofaTuple2V3V64c0V0Iainfix <V64ainfix +V47c1Aainfix <=c0V64FAainfix <agetV43V65ainfix +V47c1Aainfix <=c0agetV43V65Iainfix <V65V42Aainfix <=c0V65FAasorted_subV43c0V42Aainfix =V42anum_ofaTuple2V3ainfix +V47c1c0V0Iainfix >c1V48Aainfix <V47akAainfix <=c0V47Iainfix =anum_ofaTuple2V43V66c0V42anum_ofaTuple2V3V66c0V0Iainfix <V66V47Aainfix <=c0V66FAainfix <agetV43V67V47Aainfix <=c0agetV43V67Iainfix <V67V42Aainfix <=c0V67FAasorted_subV43c0V42Aainfix =V42anum_ofaTuple2V3V47c0V0Iainfix <=V47ainfix -akc1Aainfix <=c0V47FFFAainfix =anum_ofaTuple2V2V68c0c0anum_ofaTuple2V3V68c0V0Iainfix <V68c0Aainfix <=c0V68FAainfix <agetV2V69c0Aainfix <=c0agetV2V69Iainfix <V69c0Aainfix <=c0V69FAasorted_subV2c0c0Aainfix =c0anum_ofaTuple2V3c0c0V0Iainfix <=c0ainfix -akc1AapermutV5V4AasortedV4Aainfix =c0V1Iainfix >c0ainfix -akc1Iainfix >c0ainfix -V0c1Aainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
+    expanded="false"
+    shape="Lamk arrayV1V2Lamk arrayV0V3apermutV5amk arrayV1V8Aasorted_subV8c0V1Aainfix =V7V1Iainfix =anum_ofaTuple2V8V9c0V7anum_ofaTuple2V3V9c0V0Iainfix <V9ainfix +ainfix -akc1c1Aainfix <=c0V9FAainfix <agetV8V10ainfix +ainfix -akc1c1Aainfix <=c0agetV8V10Iainfix <V10V7Aainfix <=c0V10FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V3ainfix +ainfix -akc1c1c0V0ALagetV6V11ainfix =anum_ofaTuple2V14V15c0V13anum_ofaTuple2V3V15c0V0Iainfix <V15ainfix +V11c1Aainfix <=c0V15FAainfix <agetV14V16ainfix +V11c1Aainfix <=c0agetV14V16Iainfix <V16V13Aainfix <=c0V16FAasorted_subV14c0V13Aainfix =V13anum_ofaTuple2V3ainfix +V11c1c0V0Iainfix =anum_ofaTuple2V14V11c0V13ainfix -ainfix +V12c1c1Aainfix =anum_ofaTuple2V14V17c0V13anum_ofaTuple2V3V17c0V0Iainfix <V17V11Aainfix <=c0V17FAainfix <=agetV14V18V11Aainfix <=c0agetV14V18Iainfix <V18V13Aainfix <=c0V18FAasorted_subV14c0V13Aainfix =ainfix +ainfix -V13ainfix +V12c1c1anum_ofaTuple2V3V11c0V0Aainfix =anum_ofaTuple2V20V11c0V21ainfix -ainfix +V19c1c1Aainfix =anum_ofaTuple2V20V22c0V21anum_ofaTuple2V3V22c0V0Iainfix <V22V11Aainfix <=c0V22FAainfix <=agetV20V23V11Aainfix <=c0agetV20V23Iainfix <V23V21Aainfix <=c0V23FAasorted_subV20c0V21Aainfix =ainfix +ainfix -V21ainfix +V19c1c1anum_ofaTuple2V3V11c0V0Iainfix =V21ainfix +V13c1FIainfix =V20asetV14V13V11FAainfix <V13V1Aainfix <=c0V13Iainfix =anum_ofaTuple2V14V11c0V13ainfix -V19c1Aainfix =anum_ofaTuple2V14V24c0V13anum_ofaTuple2V3V24c0V0Iainfix <V24V11Aainfix <=c0V24FAainfix <=agetV14V25V11Aainfix <=c0agetV14V25Iainfix <V25V13Aainfix <=c0V25FAasorted_subV14c0V13Aainfix =ainfix +ainfix -V13V19c1anum_ofaTuple2V3V11c0V0Iainfix <=V19V12Aainfix <=c1V19FFFAainfix =anum_ofaTuple2V8V11c0V7ainfix -c1c1Aainfix =anum_ofaTuple2V8V26c0V7anum_ofaTuple2V3V26c0V0Iainfix <V26V11Aainfix <=c0V26FAainfix <=agetV8V27V11Aainfix <=c0agetV8V27Iainfix <V27V7Aainfix <=c0V27FAasorted_subV8c0V7Aainfix =ainfix +ainfix -V7c1c1anum_ofaTuple2V3V11c0V0Iainfix <=c1V12Aainfix =anum_ofaTuple2V8V28c0V7anum_ofaTuple2V3V28c0V0Iainfix <V28ainfix +V11c1Aainfix <=c0V28FAainfix <agetV8V29ainfix +V11c1Aainfix <=c0agetV8V29Iainfix <V29V7Aainfix <=c0V29FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V3ainfix +V11c1c0V0Iainfix >c1V12Aainfix <V11akAainfix <=c0V11Iainfix =anum_ofaTuple2V8V30c0V7anum_ofaTuple2V3V30c0V0Iainfix <V30V11Aainfix <=c0V30FAainfix <agetV8V31V11Aainfix <=c0agetV8V31Iainfix <V31V7Aainfix <=c0V31FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V3V11c0V0Iainfix <=V11ainfix -akc1Aainfix <=c0V11FFFAainfix =anum_ofaTuple2V2V32c0c0anum_ofaTuple2V3V32c0V0Iainfix <V32c0Aainfix <=c0V32FAainfix <agetV2V33c0Aainfix <=c0agetV2V33Iainfix <V33c0Aainfix <=c0V33FAasorted_subV2c0c0Aainfix =c0anum_ofaTuple2V3c0c0V0Iainfix <=c0ainfix -akc1AapermutV5V4Aasorted_subV2c0V1Aainfix =c0V1Iainfix >c0ainfix -akc1Iainfix =agetV6V34anum_ofaTuple2V3V34c0ainfix +ainfix -V0c1c1Iainfix <V34akAainfix <=c0V34FALagetV3V35ainfix =agetV37V38anum_ofaTuple2V3V38c0ainfix +V35c1Iainfix <V38akAainfix <=c0V38FIainfix =V37asetV6V36ainfix +agetV6V36c1FAainfix <V36akAainfix <=c0V36Aainfix <V36akAainfix <=c0V36Aainfix <V35V0Aainfix <=c0V35Iainfix =agetV6V39anum_ofaTuple2V3V39c0V35Iainfix <V39akAainfix <=c0V39FIainfix <=V35ainfix -V0c1Aainfix <=c0V35FFAainfix =agetaconstc0V40anum_ofaTuple2V3V40c0c0Iainfix <V40akAainfix <=c0V40FIainfix <=c0ainfix -V0c1AapermutV5amk arrayV1V42Aasorted_subV42c0V1Aainfix =V41V1Iainfix =anum_ofaTuple2V42V43c0V41anum_ofaTuple2V3V43c0V0Iainfix <V43ainfix +ainfix -akc1c1Aainfix <=c0V43FAainfix <agetV42V44ainfix +ainfix -akc1c1Aainfix <=c0agetV42V44Iainfix <V44V41Aainfix <=c0V44FAasorted_subV42c0V41Aainfix =V41anum_ofaTuple2V3ainfix +ainfix -akc1c1c0V0ALagetaconstc0V45ainfix =anum_ofaTuple2V48V49c0V47anum_ofaTuple2V3V49c0V0Iainfix <V49ainfix +V45c1Aainfix <=c0V49FAainfix <agetV48V50ainfix +V45c1Aainfix <=c0agetV48V50Iainfix <V50V47Aainfix <=c0V50FAasorted_subV48c0V47Aainfix =V47anum_ofaTuple2V3ainfix +V45c1c0V0Iainfix =anum_ofaTuple2V48V45c0V47ainfix -ainfix +V46c1c1Aainfix =anum_ofaTuple2V48V51c0V47anum_ofaTuple2V3V51c0V0Iainfix <V51V45Aainfix <=c0V51FAainfix <=agetV48V52V45Aainfix <=c0agetV48V52Iainfix <V52V47Aainfix <=c0V52FAasorted_subV48c0V47Aainfix =ainfix +ainfix -V47ainfix +V46c1c1anum_ofaTuple2V3V45c0V0Aainfix =anum_ofaTuple2V54V45c0V55ainfix -ainfix +V53c1c1Aainfix =anum_ofaTuple2V54V56c0V55anum_ofaTuple2V3V56c0V0Iainfix <V56V45Aainfix <=c0V56FAainfix <=agetV54V57V45Aainfix <=c0agetV54V57Iainfix <V57V55Aainfix <=c0V57FAasorted_subV54c0V55Aainfix =ainfix +ainfix -V55ainfix +V53c1c1anum_ofaTuple2V3V45c0V0Iainfix =V55ainfix +V47c1FIainfix =V54asetV48V47V45FAainfix <V47V1Aainfix <=c0V47Iainfix =anum_ofaTuple2V48V45c0V47ainfix -V53c1Aainfix =anum_ofaTuple2V48V58c0V47anum_ofaTuple2V3V58c0V0Iainfix <V58V45Aainfix <=c0V58FAainfix <=agetV48V59V45Aainfix <=c0agetV48V59Iainfix <V59V47Aainfix <=c0V59FAasorted_subV48c0V47Aainfix =ainfix +ainfix -V47V53c1anum_ofaTuple2V3V45c0V0Iainfix <=V53V46Aainfix <=c1V53FFFAainfix =anum_ofaTuple2V42V45c0V41ainfix -c1c1Aainfix =anum_ofaTuple2V42V60c0V41anum_ofaTuple2V3V60c0V0Iainfix <V60V45Aainfix <=c0V60FAainfix <=agetV42V61V45Aainfix <=c0agetV42V61Iainfix <V61V41Aainfix <=c0V61FAasorted_subV42c0V41Aainfix =ainfix +ainfix -V41c1c1anum_ofaTuple2V3V45c0V0Iainfix <=c1V46Aainfix =anum_ofaTuple2V42V62c0V41anum_ofaTuple2V3V62c0V0Iainfix <V62ainfix +V45c1Aainfix <=c0V62FAainfix <agetV42V63ainfix +V45c1Aainfix <=c0agetV42V63Iainfix <V63V41Aainfix <=c0V63FAasorted_subV42c0V41Aainfix =V41anum_ofaTuple2V3ainfix +V45c1c0V0Iainfix >c1V46Aainfix <V45akAainfix <=c0V45Iainfix =anum_ofaTuple2V42V64c0V41anum_ofaTuple2V3V64c0V0Iainfix <V64V45Aainfix <=c0V64FAainfix <agetV42V65V45Aainfix <=c0agetV42V65Iainfix <V65V41Aainfix <=c0V65FAasorted_subV42c0V41Aainfix =V41anum_ofaTuple2V3V45c0V0Iainfix <=V45ainfix -akc1Aainfix <=c0V45FFFAainfix =anum_ofaTuple2V2V66c0c0anum_ofaTuple2V3V66c0V0Iainfix <V66c0Aainfix <=c0V66FAainfix <agetV2V67c0Aainfix <=c0agetV2V67Iainfix <V67c0Aainfix <=c0V67FAasorted_subV2c0c0Aainfix =c0anum_ofaTuple2V3c0c0V0Iainfix <=c0ainfix -akc1AapermutV5V4Aasorted_subV2c0V1Aainfix =c0V1Iainfix >c0ainfix -akc1Iainfix >c0ainfix -V0c1Aainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
     <label
      name="expl:parameter counting_sort">
      </label>
     <transf
      name="split_goal"
      proved="true"
-     expanded="true">
+     expanded="false">
      <goal
       name="WP_parameter counting_sort.1"
       locfile="examples/programs/counting_sort/../counting_sort.mlw"
       loclnum="65" loccnumb="6" loccnume="19"
       expl="precondition"
-      sum="e613af1db4e73d4ddc390118791b6e73"
+      sum="2128bed0979d896398ad74c72f380247"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="Lamk arrayV1V2Lamk arrayV0V3ainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
       <label
        name="expl:parameter counting_sort">
@@ -93,9 +101,9 @@
       locfile="examples/programs/counting_sort/../counting_sort.mlw"
       loclnum="65" loccnumb="6" loccnume="19"
       expl="assertion"
-      sum="cdd72a6b9e1f3a9cd8a262c14576c8cd"
+      sum="e317f75d8fb9efd5b28cf5295aee1154"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="Lamk arrayV1V2Lamk arrayV0V3ainfix =c0V1Iainfix >c0ainfix -akc1Iainfix >c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
       <label
        name="expl:parameter counting_sort">
@@ -113,10 +121,10 @@
       locfile="examples/programs/counting_sort/../counting_sort.mlw"
       loclnum="65" loccnumb="6" loccnume="19"
       expl="normal postcondition"
-      sum="226971a9f3a67aa48b782d665e27e991"
+      sum="897586da5716a602bee760548ddbb595"
       proved="true"
-      expanded="true"
-      shape="Lamk arrayV1V2Lamk arrayV0V3apermutV5V4AasortedV4Iainfix =c0V1Iainfix >c0ainfix -akc1Iainfix >c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
+      expanded="false"
+      shape="Lamk arrayV1V2Lamk arrayV0V3apermutV5V4Aasorted_subV2c0V1Iainfix =c0V1Iainfix >c0ainfix -akc1Iainfix >c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
       <label
        name="expl:parameter counting_sort">
        </label>
@@ -133,9 +141,9 @@
       locfile="examples/programs/counting_sort/../counting_sort.mlw"
       loclnum="65" loccnumb="6" loccnume="19"
       expl="for loop initialization"
-      sum="5a90f83504151ffc3cac42affbd45327"
+      sum="2bc6889a9f672fb1f8b28eb72a76fbd9"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="Lamk arrayV1V2Lamk arrayV0V3ainfix =anum_ofaTuple2V2V6c0c0anum_ofaTuple2V3V6c0V0Iainfix <V6c0Aainfix <=c0V6FAainfix <agetV2V7c0Aainfix <=c0agetV2V7Iainfix <V7c0Aainfix <=c0V7FAasorted_subV2c0c0Aainfix =c0anum_ofaTuple2V3c0c0V0Iainfix <=c0ainfix -akc1Iainfix >c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
       <label
        name="expl:parameter counting_sort">
@@ -153,10 +161,10 @@
       locfile="examples/programs/counting_sort/../counting_sort.mlw"
       loclnum="65" loccnumb="6" loccnume="19"
       expl="for loop preservation"
-      sum="9d81efe4add96f3e48f3e6f9c401d60d"
+      sum="7ad345577cae96696a9cf21f36c3d531"
       proved="true"
-      expanded="true"
-      shape="Lamk arrayV1V2Lamk arrayV0V3Lamk arrayV1V7Lagetaconstc0V9ainfix =anum_ofaTuple2V12V13c0V11anum_ofaTuple2V3V13c0V0Iainfix <V13ainfix +V9c1Aainfix <=c0V13FAainfix <agetV12V14ainfix +V9c1Aainfix <=c0agetV12V14Iainfix <V14V11Aainfix <=c0V14FAasorted_subV12c0V11Aainfix =V11anum_ofaTuple2V3ainfix +V9c1c0V0Iainfix =anum_ofaTuple2V12V9c0V11ainfix -ainfix +V10c1c1Aainfix =anum_ofaTuple2V12V15c0V11anum_ofaTuple2V3V15c0V0Iainfix <V15V9Aainfix <=c0V15FAainfix <=agetV12V16V9Aainfix <=c0agetV12V16Iainfix <V16V11Aainfix <=c0V16FAasorted_subV12c0V11Aainfix =ainfix +ainfix -V11ainfix +V10c1c1anum_ofaTuple2V3V9c0V0Aainfix =anum_ofaTuple2V18V9c0V19ainfix -ainfix +V17c1c1Aainfix =anum_ofaTuple2V18V20c0V19anum_ofaTuple2V3V20c0V0Iainfix <V20V9Aainfix <=c0V20FAainfix <=agetV18V21V9Aainfix <=c0agetV18V21Iainfix <V21V19Aainfix <=c0V21FAasorted_subV18c0V19Aainfix =ainfix +ainfix -V19ainfix +V17c1c1anum_ofaTuple2V3V9c0V0Iainfix =V19ainfix +V11c1FIainfix =V18asetV12V11V9FAainfix <V11V1Aainfix <=c0V11Iainfix =anum_ofaTuple2V12V9c0V11ainfix -V17c1Aainfix =anum_ofaTuple2V12V22c0V11anum_ofaTuple2V3V22c0V0Iainfix <V22V9Aainfix <=c0V22FAainfix <=agetV12V23V9Aainfix <=c0agetV12V23Iainfix <V23V11Aainfix <=c0V23FAasorted_subV12c0V11Aainfix =ainfix +ainfix -V11V17c1anum_ofaTuple2V3V9c0V0Iainfix <=V17V10Aainfix <=c1V17FFFAainfix =anum_ofaTuple2V7V9c0V6ainfix -c1c1Aainfix =anum_ofaTuple2V7V24c0V6anum_ofaTuple2V3V24c0V0Iainfix <V24V9Aainfix <=c0V24FAainfix <=agetV7V25V9Aainfix <=c0agetV7V25Iainfix <V25V6Aainfix <=c0V25FAasorted_subV7c0V6Aainfix =ainfix +ainfix -V6c1c1anum_ofaTuple2V3V9c0V0Iainfix <=c1V10Aainfix =anum_ofaTuple2V7V26c0V6anum_ofaTuple2V3V26c0V0Iainfix <V26ainfix +V9c1Aainfix <=c0V26FAainfix <agetV7V27ainfix +V9c1Aainfix <=c0agetV7V27Iainfix <V27V6Aainfix <=c0V27FAasorted_subV7c0V6Aainfix =V6anum_ofaTuple2V3ainfix +V9c1c0V0Iainfix >c1V10Aainfix <V9akAainfix <=c0V9Iainfix =anum_ofaTuple2V7V28c0V6anum_ofaTuple2V3V28c0V0Iainfix <V28V9Aainfix <=c0V28FAainfix <agetV7V29V9Aainfix <=c0agetV7V29Iainfix <V29V6Aainfix <=c0V29FAasorted_subV7c0V6Aainfix =V6anum_ofaTuple2V3V9c0V0Iainfix <=V9ainfix -akc1Aainfix <=c0V9FFFIainfix <=c0ainfix -akc1Iainfix >c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
+      expanded="false"
+      shape="Lamk arrayV1V2Lamk arrayV0V3Lagetaconstc0V8ainfix =anum_ofaTuple2V11V12c0V10anum_ofaTuple2V3V12c0V0Iainfix <V12ainfix +V8c1Aainfix <=c0V12FAainfix <agetV11V13ainfix +V8c1Aainfix <=c0agetV11V13Iainfix <V13V10Aainfix <=c0V13FAasorted_subV11c0V10Aainfix =V10anum_ofaTuple2V3ainfix +V8c1c0V0Iainfix =anum_ofaTuple2V11V8c0V10ainfix -ainfix +V9c1c1Aainfix =anum_ofaTuple2V11V14c0V10anum_ofaTuple2V3V14c0V0Iainfix <V14V8Aainfix <=c0V14FAainfix <=agetV11V15V8Aainfix <=c0agetV11V15Iainfix <V15V10Aainfix <=c0V15FAasorted_subV11c0V10Aainfix =ainfix +ainfix -V10ainfix +V9c1c1anum_ofaTuple2V3V8c0V0Aainfix =anum_ofaTuple2V17V8c0V18ainfix -ainfix +V16c1c1Aainfix =anum_ofaTuple2V17V19c0V18anum_ofaTuple2V3V19c0V0Iainfix <V19V8Aainfix <=c0V19FAainfix <=agetV17V20V8Aainfix <=c0agetV17V20Iainfix <V20V18Aainfix <=c0V20FAasorted_subV17c0V18Aainfix =ainfix +ainfix -V18ainfix +V16c1c1anum_ofaTuple2V3V8c0V0Iainfix =V18ainfix +V10c1FIainfix =V17asetV11V10V8FAainfix <V10V1Aainfix <=c0V10Iainfix =anum_ofaTuple2V11V8c0V10ainfix -V16c1Aainfix =anum_ofaTuple2V11V21c0V10anum_ofaTuple2V3V21c0V0Iainfix <V21V8Aainfix <=c0V21FAainfix <=agetV11V22V8Aainfix <=c0agetV11V22Iainfix <V22V10Aainfix <=c0V22FAasorted_subV11c0V10Aainfix =ainfix +ainfix -V10V16c1anum_ofaTuple2V3V8c0V0Iainfix <=V16V9Aainfix <=c1V16FFFAainfix =anum_ofaTuple2V7V8c0V6ainfix -c1c1Aainfix =anum_ofaTuple2V7V23c0V6anum_ofaTuple2V3V23c0V0Iainfix <V23V8Aainfix <=c0V23FAainfix <=agetV7V24V8Aainfix <=c0agetV7V24Iainfix <V24V6Aainfix <=c0V24FAasorted_subV7c0V6Aainfix =ainfix +ainfix -V6c1c1anum_ofaTuple2V3V8c0V0Iainfix <=c1V9Aainfix =anum_ofaTuple2V7V25c0V6anum_ofaTuple2V3V25c0V0Iainfix <V25ainfix +V8c1Aainfix <=c0V25FAainfix <agetV7V26ainfix +V8c1Aainfix <=c0agetV7V26Iainfix <V26V6Aainfix <=c0V26FAasorted_subV7c0V6Aainfix =V6anum_ofaTuple2V3ainfix +V8c1c0V0Iainfix >c1V9Aainfix <V8akAainfix <=c0V8Iainfix =anum_ofaTuple2V7V27c0V6anum_ofaTuple2V3V27c0V0Iainfix <V27V8Aainfix <=c0V27FAainfix <agetV7V28V8Aainfix <=c0agetV7V28Iainfix <V28V6Aainfix <=c0V28FAasorted_subV7c0V6Aainfix =V6anum_ofaTuple2V3V8c0V0Iainfix <=V8ainfix -akc1Aainfix <=c0V8FFFIainfix <=c0ainfix -akc1Iainfix >c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
       <label
        name="expl:parameter counting_sort">
        </label>
@@ -165,7 +173,7 @@
        timelimit="20"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.08"/>
+       <result status="valid" time="0.09"/>
       </proof>
      </goal>
      <goal
@@ -173,10 +181,10 @@
       locfile="examples/programs/counting_sort/../counting_sort.mlw"
       loclnum="65" loccnumb="6" loccnume="19"
       expl="assertion"
-      sum="da5df085c0b490e97223d55e169273c6"
+      sum="85cff0d22f3b069e84405afcb555eb9f"
       proved="true"
-      expanded="true"
-      shape="Lamk arrayV1V2Lamk arrayV0V3Lamk arrayV1V7ainfix =V6V1Iainfix =anum_ofaTuple2V7V9c0V6anum_ofaTuple2V3V9c0V0Iainfix <V9ainfix +ainfix -akc1c1Aainfix <=c0V9FAainfix <agetV7V10ainfix +ainfix -akc1c1Aainfix <=c0agetV7V10Iainfix <V10V6Aainfix <=c0V10FAasorted_subV7c0V6Aainfix =V6anum_ofaTuple2V3ainfix +ainfix -akc1c1c0V0FFIainfix <=c0ainfix -akc1Iainfix >c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
+      expanded="false"
+      shape="Lamk arrayV1V2Lamk arrayV0V3ainfix =V6V1Iainfix =anum_ofaTuple2V7V8c0V6anum_ofaTuple2V3V8c0V0Iainfix <V8ainfix +ainfix -akc1c1Aainfix <=c0V8FAainfix <agetV7V9ainfix +ainfix -akc1c1Aainfix <=c0agetV7V9Iainfix <V9V6Aainfix <=c0V9FAasorted_subV7c0V6Aainfix =V6anum_ofaTuple2V3ainfix +ainfix -akc1c1c0V0FFIainfix <=c0ainfix -akc1Iainfix >c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
       <label
        name="expl:parameter counting_sort">
        </label>
@@ -193,19 +201,19 @@
       locfile="examples/programs/counting_sort/../counting_sort.mlw"
       loclnum="65" loccnumb="6" loccnume="19"
       expl="normal postcondition"
-      sum="80e0d282a362d24c3f464b37c79db9c1"
+      sum="75c296cbe9e6156d8b8908faa07d458a"
       proved="true"
-      expanded="true"
-      shape="Lamk arrayV1V2Lamk arrayV0V3Lamk arrayV1V7apermutV5V8AasortedV8Iainfix =V6V1Iainfix =anum_ofaTuple2V7V9c0V6anum_ofaTuple2V3V9c0V0Iainfix <V9ainfix +ainfix -akc1c1Aainfix <=c0V9FAainfix <agetV7V10ainfix +ainfix -akc1c1Aainfix <=c0agetV7V10Iainfix <V10V6Aainfix <=c0V10FAasorted_subV7c0V6Aainfix =V6anum_ofaTuple2V3ainfix +ainfix -akc1c1c0V0FFIainfix <=c0ainfix -akc1Iainfix >c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
+      expanded="false"
+      shape="Lamk arrayV1V2Lamk arrayV0V3apermutV5amk arrayV1V7Aasorted_subV7c0V1Iainfix =V6V1Iainfix =anum_ofaTuple2V7V8c0V6anum_ofaTuple2V3V8c0V0Iainfix <V8ainfix +ainfix -akc1c1Aainfix <=c0V8FAainfix <agetV7V9ainfix +ainfix -akc1c1Aainfix <=c0agetV7V9Iainfix <V9V6Aainfix <=c0V9FAasorted_subV7c0V6Aainfix =V6anum_ofaTuple2V3ainfix +ainfix -akc1c1c0V0FFIainfix <=c0ainfix -akc1Iainfix >c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
       <label
        name="expl:parameter counting_sort">
        </label>
       <proof
        prover="0"
-       timelimit="20"
+       timelimit="10"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.16"/>
+       <result status="valid" time="0.14"/>
       </proof>
      </goal>
      <goal
@@ -213,9 +221,9 @@
       locfile="examples/programs/counting_sort/../counting_sort.mlw"
       loclnum="65" loccnumb="6" loccnume="19"
       expl="for loop initialization"
-      sum="7f3d8952504f3b8c286e5bbe6d37a15e"
+      sum="31356af46aaf426eda3adacb2f6840bc"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="Lamk arrayV1V2Lamk arrayV0V3ainfix =agetaconstc0V6anum_ofaTuple2V3V6c0c0Iainfix <V6akAainfix <=c0V6FIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
       <label
        name="expl:parameter counting_sort">
@@ -233,9 +241,9 @@
       locfile="examples/programs/counting_sort/../counting_sort.mlw"
       loclnum="65" loccnumb="6" loccnume="19"
       expl="for loop preservation"
-      sum="2e4b7ca67e08a558e45f4e369b9eb54e"
+      sum="54ee30185c4c4a22f2b7717c88b2ab63"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="Lamk arrayV1V2Lamk arrayV0V3LagetV3V7ainfix =agetV9V10anum_ofaTuple2V3V10c0ainfix +V7c1Iainfix <V10akAainfix <=c0V10FIainfix =V9asetV6V8ainfix +agetV6V8c1FAainfix <V8akAainfix <=c0V8Aainfix <V8akAainfix <=c0V8Aainfix <V7V0Aainfix <=c0V7Iainfix =agetV6V11anum_ofaTuple2V3V11c0V7Iainfix <V11akAainfix <=c0V11FIainfix <=V7ainfix -V0c1Aainfix <=c0V7FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
       <label
        name="expl:parameter counting_sort">
@@ -245,7 +253,7 @@
        timelimit="20"
        obsolete="false"
        archived="false">
-       <result status="valid" time="1.84"/>
+       <result status="valid" time="1.86"/>
       </proof>
      </goal>
      <goal
@@ -253,9 +261,9 @@
       locfile="examples/programs/counting_sort/../counting_sort.mlw"
       loclnum="65" loccnumb="6" loccnume="19"
       expl="assertion"
-      sum="e0ec227d5e724c1a5b4a07a1c7bc0284"
+      sum="72863b3a4300922f6e80c4593b681863"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="Lamk arrayV1V2Lamk arrayV0V3ainfix =c0V1Iainfix >c0ainfix -akc1Iainfix =agetV6V7anum_ofaTuple2V3V7c0ainfix +ainfix -V0c1c1Iainfix <V7akAainfix <=c0V7FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
       <label
        name="expl:parameter counting_sort">
@@ -265,7 +273,7 @@
        timelimit="20"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.00"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
@@ -273,10 +281,10 @@
       locfile="examples/programs/counting_sort/../counting_sort.mlw"
       loclnum="65" loccnumb="6" loccnume="19"
       expl="normal postcondition"
-      sum="a877ea3627b72848851ce9494c0b0da2"
+      sum="28305fb8425fa1cf2b8e23e8a2f7eac0"
       proved="true"
-      expanded="true"
-      shape="Lamk arrayV1V2Lamk arrayV0V3apermutV5V4AasortedV4Iainfix =c0V1Iainfix >c0ainfix -akc1Iainfix =agetV6V7anum_ofaTuple2V3V7c0ainfix +ainfix -V0c1c1Iainfix <V7akAainfix <=c0V7FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
+      expanded="false"
+      shape="Lamk arrayV1V2Lamk arrayV0V3apermutV5V4Aasorted_subV2c0V1Iainfix =c0V1Iainfix >c0ainfix -akc1Iainfix =agetV6V7anum_ofaTuple2V3V7c0ainfix +ainfix -V0c1c1Iainfix <V7akAainfix <=c0V7FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
       <label
        name="expl:parameter counting_sort">
        </label>
@@ -285,7 +293,7 @@
        timelimit="20"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.00"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
@@ -293,9 +301,9 @@
       locfile="examples/programs/counting_sort/../counting_sort.mlw"
       loclnum="65" loccnumb="6" loccnume="19"
       expl="for loop initialization"
-      sum="f3b01e8f8f51fdc06dd945a93130baa0"
+      sum="14df921a7164014ebe2119178ffc1fef"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="Lamk arrayV1V2Lamk arrayV0V3ainfix =anum_ofaTuple2V2V7c0c0anum_ofaTuple2V3V7c0V0Iainfix <V7c0Aainfix <=c0V7FAainfix <agetV2V8c0Aainfix <=c0agetV2V8Iainfix <V8c0Aainfix <=c0V8FAasorted_subV2c0c0Aainfix =c0anum_ofaTuple2V3c0c0V0Iainfix <=c0ainfix -akc1Iainfix =agetV6V9anum_ofaTuple2V3V9c0ainfix +ainfix -V0c1c1Iainfix <V9akAainfix <=c0V9FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
       <label
        name="expl:parameter counting_sort">
@@ -303,15 +311,15 @@
       <transf
        name="split_goal"
        proved="true"
-       expanded="true">
+       expanded="false">
        <goal
         name="WP_parameter counting_sort.12.1"
         locfile="examples/programs/counting_sort/../counting_sort.mlw"
         loclnum="65" loccnumb="6" loccnume="19"
         expl="parameter counting_sort"
-        sum="c0f02f8bdca11bf3b38e814e6fd5e72f"
+        sum="98f8633182da56664800ce8bc2b45b6f"
         proved="true"
-        expanded="true"
+        expanded="false"
         shape="Lamk arrayV1V2Lamk arrayV0V3ainfix =c0anum_ofaTuple2V3c0c0V0Iainfix <=c0ainfix -akc1Iainfix =agetV6V7anum_ofaTuple2V3V7c0ainfix +ainfix -V0c1c1Iainfix <V7akAainfix <=c0V7FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
         <label
          name="expl:parameter counting_sort">
@@ -321,7 +329,7 @@
          timelimit="10"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.08"/>
+         <result status="valid" time="0.09"/>
         </proof>
        </goal>
        <goal
@@ -329,9 +337,9 @@
         locfile="examples/programs/counting_sort/../counting_sort.mlw"
         loclnum="65" loccnumb="6" loccnume="19"
         expl="parameter counting_sort"
-        sum="4eb80fa68f0a975dd30050a891f0878b"
+        sum="549fdfd4a9548b2b06d973b7d87a48b4"
         proved="true"
-        expanded="true"
+        expanded="false"
         shape="Lamk arrayV1V2Lamk arrayV0V3asorted_subV2c0c0Iainfix <=c0ainfix -akc1Iainfix =agetV6V7anum_ofaTuple2V3V7c0ainfix +ainfix -V0c1c1Iainfix <V7akAainfix <=c0V7FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
         <label
          name="expl:parameter counting_sort">
@@ -341,7 +349,7 @@
          timelimit="10"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.01"/>
+         <result status="valid" time="0.00"/>
         </proof>
        </goal>
        <goal
@@ -349,9 +357,9 @@
         locfile="examples/programs/counting_sort/../counting_sort.mlw"
         loclnum="65" loccnumb="6" loccnume="19"
         expl="parameter counting_sort"
-        sum="ee8bb4b757755e06d77cf5628acfef01"
+        sum="faa306b1d526dcc756da7eed365cf6a6"
         proved="true"
-        expanded="true"
+        expanded="false"
         shape="Lamk arrayV1V2Lamk arrayV0V3ainfix <=c0agetV2V7Iainfix <V7c0Aainfix <=c0V7FIainfix <=c0ainfix -akc1Iainfix =agetV6V8anum_ofaTuple2V3V8c0ainfix +ainfix -V0c1c1Iainfix <V8akAainfix <=c0V8FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
         <label
          name="expl:parameter counting_sort">
@@ -369,9 +377,9 @@
         locfile="examples/programs/counting_sort/../counting_sort.mlw"
         loclnum="65" loccnumb="6" loccnume="19"
         expl="parameter counting_sort"
-        sum="956949a37d15d3cf6a018d3fd25e7233"
+        sum="49c52e8368c973f44b28c16affaf40de"
         proved="true"
-        expanded="true"
+        expanded="false"
         shape="Lamk arrayV1V2Lamk arrayV0V3ainfix <agetV2V7c0Iainfix <V7c0Aainfix <=c0V7FIainfix <=c0ainfix -akc1Iainfix =agetV6V8anum_ofaTuple2V3V8c0ainfix +ainfix -V0c1c1Iainfix <V8akAainfix <=c0V8FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
         <label
          name="expl:parameter counting_sort">
@@ -381,7 +389,7 @@
          timelimit="10"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.01"/>
+         <result status="valid" time="0.00"/>
         </proof>
        </goal>
        <goal
@@ -389,9 +397,9 @@
         locfile="examples/programs/counting_sort/../counting_sort.mlw"
         loclnum="65" loccnumb="6" loccnume="19"
         expl="parameter counting_sort"
-        sum="e6a4f7fffc492efaefce8e31b57d120e"
+        sum="2b7de3c5742a102c7cffa2d6ff688ab6"
         proved="true"
-        expanded="true"
+        expanded="false"
         shape="Lamk arrayV1V2Lamk arrayV0V3ainfix =anum_ofaTuple2V2V7c0c0anum_ofaTuple2V3V7c0V0Iainfix <V7c0Aainfix <=c0V7FIainfix <=c0ainfix -akc1Iainfix =agetV6V8anum_ofaTuple2V3V8c0ainfix +ainfix -V0c1c1Iainfix <V8akAainfix <=c0V8FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
         <label
          name="expl:parameter counting_sort">
@@ -411,26 +419,26 @@
       locfile="examples/programs/counting_sort/../counting_sort.mlw"
       loclnum="65" loccnumb="6" loccnume="19"
       expl="for loop preservation"
-      sum="b7dfe9dbb068a609d8caf3a430b15df1"
+      sum="91a049a44f2d43610716bf387bc11bab"
       proved="true"
-      expanded="true"
-      shape="Lamk arrayV1V2Lamk arrayV0V3Lamk arrayV1V8LagetV6V10ainfix =anum_ofaTuple2V13V14c0V12anum_ofaTuple2V3V14c0V0Iainfix <V14ainfix +V10c1Aainfix <=c0V14FAainfix <agetV13V15ainfix +V10c1Aainfix <=c0agetV13V15Iainfix <V15V12Aainfix <=c0V15FAasorted_subV13c0V12Aainfix =V12anum_ofaTuple2V3ainfix +V10c1c0V0Iainfix =anum_ofaTuple2V13V10c0V12ainfix -ainfix +V11c1c1Aainfix =anum_ofaTuple2V13V16c0V12anum_ofaTuple2V3V16c0V0Iainfix <V16V10Aainfix <=c0V16FAainfix <=agetV13V17V10Aainfix <=c0agetV13V17Iainfix <V17V12Aainfix <=c0V17FAasorted_subV13c0V12Aainfix =ainfix +ainfix -V12ainfix +V11c1c1anum_ofaTuple2V3V10c0V0Aainfix =anum_ofaTuple2V19V10c0V20ainfix -ainfix +V18c1c1Aainfix =anum_ofaTuple2V19V21c0V20anum_ofaTuple2V3V21c0V0Iainfix <V21V10Aainfix <=c0V21FAainfix <=agetV19V22V10Aainfix <=c0agetV19V22Iainfix <V22V20Aainfix <=c0V22FAasorted_subV19c0V20Aainfix =ainfix +ainfix -V20ainfix +V18c1c1anum_ofaTuple2V3V10c0V0Iainfix =V20ainfix +V12c1FIainfix =V19asetV13V12V10FAainfix <V12V1Aainfix <=c0V12Iainfix =anum_ofaTuple2V13V10c0V12ainfix -V18c1Aainfix =anum_ofaTuple2V13V23c0V12anum_ofaTuple2V3V23c0V0Iainfix <V23V10Aainfix <=c0V23FAainfix <=agetV13V24V10Aainfix <=c0agetV13V24Iainfix <V24V12Aainfix <=c0V24FAasorted_subV13c0V12Aainfix =ainfix +ainfix -V12V18c1anum_ofaTuple2V3V10c0V0Iainfix <=V18V11Aainfix <=c1V18FFFAainfix =anum_ofaTuple2V8V10c0V7ainfix -c1c1Aainfix =anum_ofaTuple2V8V25c0V7anum_ofaTuple2V3V25c0V0Iainfix <V25V10Aainfix <=c0V25FAainfix <=agetV8V26V10Aainfix <=c0agetV8V26Iainfix <V26V7Aainfix <=c0V26FAasorted_subV8c0V7Aainfix =ainfix +ainfix -V7c1c1anum_ofaTuple2V3V10c0V0Iainfix <=c1V11Aainfix =anum_ofaTuple2V8V27c0V7anum_ofaTuple2V3V27c0V0Iainfix <V27ainfix +V10c1Aainfix <=c0V27FAainfix <agetV8V28ainfix +V10c1Aainfix <=c0agetV8V28Iainfix <V28V7Aainfix <=c0V28FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V3ainfix +V10c1c0V0Iainfix >c1V11Aainfix <V10akAainfix <=c0V10Iainfix =anum_ofaTuple2V8V29c0V7anum_ofaTuple2V3V29c0V0Iainfix <V29V10Aainfix <=c0V29FAainfix <agetV8V30V10Aainfix <=c0agetV8V30Iainfix <V30V7Aainfix <=c0V30FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V3V10c0V0Iainfix <=V10ainfix -akc1Aainfix <=c0V10FFFIainfix <=c0ainfix -akc1Iainfix =agetV6V31anum_ofaTuple2V3V31c0ainfix +ainfix -V0c1c1Iainfix <V31akAainfix <=c0V31FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
+      expanded="false"
+      shape="Lamk arrayV1V2Lamk arrayV0V3LagetV6V9ainfix =anum_ofaTuple2V12V13c0V11anum_ofaTuple2V3V13c0V0Iainfix <V13ainfix +V9c1Aainfix <=c0V13FAainfix <agetV12V14ainfix +V9c1Aainfix <=c0agetV12V14Iainfix <V14V11Aainfix <=c0V14FAasorted_subV12c0V11Aainfix =V11anum_ofaTuple2V3ainfix +V9c1c0V0Iainfix =anum_ofaTuple2V12V9c0V11ainfix -ainfix +V10c1c1Aainfix =anum_ofaTuple2V12V15c0V11anum_ofaTuple2V3V15c0V0Iainfix <V15V9Aainfix <=c0V15FAainfix <=agetV12V16V9Aainfix <=c0agetV12V16Iainfix <V16V11Aainfix <=c0V16FAasorted_subV12c0V11Aainfix =ainfix +ainfix -V11ainfix +V10c1c1anum_ofaTuple2V3V9c0V0Aainfix =anum_ofaTuple2V18V9c0V19ainfix -ainfix +V17c1c1Aainfix =anum_ofaTuple2V18V20c0V19anum_ofaTuple2V3V20c0V0Iainfix <V20V9Aainfix <=c0V20FAainfix <=agetV18V21V9Aainfix <=c0agetV18V21Iainfix <V21V19Aainfix <=c0V21FAasorted_subV18c0V19Aainfix =ainfix +ainfix -V19ainfix +V17c1c1anum_ofaTuple2V3V9c0V0Iainfix =V19ainfix +V11c1FIainfix =V18asetV12V11V9FAainfix <V11V1Aainfix <=c0V11Iainfix =anum_ofaTuple2V12V9c0V11ainfix -V17c1Aainfix =anum_ofaTuple2V12V22c0V11anum_ofaTuple2V3V22c0V0Iainfix <V22V9Aainfix <=c0V22FAainfix <=agetV12V23V9Aainfix <=c0agetV12V23Iainfix <V23V11Aainfix <=c0V23FAasorted_subV12c0V11Aainfix =ainfix +ainfix -V11V17c1anum_ofaTuple2V3V9c0V0Iainfix <=V17V10Aainfix <=c1V17FFFAainfix =anum_ofaTuple2V8V9c0V7ainfix -c1c1Aainfix =anum_ofaTuple2V8V24c0V7anum_ofaTuple2V3V24c0V0Iainfix <V24V9Aainfix <=c0V24FAainfix <=agetV8V25V9Aainfix <=c0agetV8V25Iainfix <V25V7Aainfix <=c0V25FAasorted_subV8c0V7Aainfix =ainfix +ainfix -V7c1c1anum_ofaTuple2V3V9c0V0Iainfix <=c1V10Aainfix =anum_ofaTuple2V8V26c0V7anum_ofaTuple2V3V26c0V0Iainfix <V26ainfix +V9c1Aainfix <=c0V26FAainfix <agetV8V27ainfix +V9c1Aainfix <=c0agetV8V27Iainfix <V27V7Aainfix <=c0V27FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V3ainfix +V9c1c0V0Iainfix >c1V10Aainfix <V9akAainfix <=c0V9Iainfix =anum_ofaTuple2V8V28c0V7anum_ofaTuple2V3V28c0V0Iainfix <V28V9Aainfix <=c0V28FAainfix <agetV8V29V9Aainfix <=c0agetV8V29Iainfix <V29V7Aainfix <=c0V29FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V3V9c0V0Iainfix <=V9ainfix -akc1Aainfix <=c0V9FFFIainfix <=c0ainfix -akc1Iainfix =agetV6V30anum_ofaTuple2V3V30c0ainfix +ainfix -V0c1c1Iainfix <V30akAainfix <=c0V30FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
       <label
        name="expl:parameter counting_sort">
        </label>
       <transf
        name="split_goal"
        proved="true"
-       expanded="true">
+       expanded="false">
        <goal
-        name="WP_parameter counting_sort.13.1"
+        name="WP_parameter counting_sort.13.0"
         locfile="examples/programs/counting_sort/../counting_sort.mlw"
         loclnum="65" loccnumb="6" loccnume="19"
         expl="for loop preservation"
-        sum="d58ae440898c85022c2117066604ef9e"
+        sum="cbe85a719a9c2a880470e39010a680b4"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV1V2Lamk arrayV0V3Lamk arrayV1V8ainfix <V10akAainfix <=c0V10Iainfix =anum_ofaTuple2V8V11c0V7anum_ofaTuple2V3V11c0V0Iainfix <V11V10Aainfix <=c0V11FAainfix <agetV8V12V10Aainfix <=c0agetV8V12Iainfix <V12V7Aainfix <=c0V12FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V3V10c0V0Iainfix <=V10ainfix -akc1Aainfix <=c0V10FFFIainfix <=c0ainfix -akc1Iainfix =agetV6V13anum_ofaTuple2V3V13c0ainfix +ainfix -V0c1c1Iainfix <V13akAainfix <=c0V13FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
+        expanded="false"
+        shape="Lamk arrayV1V2Lamk arrayV0V3ainfix <V9akAainfix <=c0V9Iainfix =anum_ofaTuple2V8V10c0V7anum_ofaTuple2V3V10c0V0Iainfix <V10V9Aainfix <=c0V10FAainfix <agetV8V11V9Aainfix <=c0agetV8V11Iainfix <V11V7Aainfix <=c0V11FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V3V9c0V0Iainfix <=V9ainfix -akc1Aainfix <=c0V9FFFIainfix <=c0ainfix -akc1Iainfix =agetV6V12anum_ofaTuple2V3V12c0ainfix +ainfix -V0c1c1Iainfix <V12akAainfix <=c0V12FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
         <label
          name="expl:parameter counting_sort">
          </label>
@@ -443,23 +451,50 @@
         </proof>
        </goal>
        <goal
-        name="WP_parameter counting_sort.13.2"
+        name="WP_parameter counting_sort.13.1"
         locfile="examples/programs/counting_sort/../counting_sort.mlw"
         loclnum="65" loccnumb="6" loccnume="19"
         expl="for loop preservation"
-        sum="644d3e652fd2393410fa619a645de2ce"
+        sum="f8abbac0c6f6a86aceaf933ad5a4bb71"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV1V2Lamk arrayV0V3Lamk arrayV1V8LagetV6V10ainfix =V7anum_ofaTuple2V3ainfix +V10c1c0V0Iainfix >c1V11Iainfix <V10akAainfix <=c0V10Iainfix =anum_ofaTuple2V8V12c0V7anum_ofaTuple2V3V12c0V0Iainfix <V12V10Aainfix <=c0V12FAainfix <agetV8V13V10Aainfix <=c0agetV8V13Iainfix <V13V7Aainfix <=c0V13FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V3V10c0V0Iainfix <=V10ainfix -akc1Aainfix <=c0V10FFFIainfix <=c0ainfix -akc1Iainfix =agetV6V14anum_ofaTuple2V3V14c0ainfix +ainfix -V0c1c1Iainfix <V14akAainfix <=c0V14FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
+        expanded="false"
+        shape="Lamk arrayV1V2Lamk arrayV0V3LagetV6V9ainfix =V7anum_ofaTuple2V3ainfix +V9c1c0V0Iainfix >c1V10Iainfix <V9akAainfix <=c0V9Iainfix =anum_ofaTuple2V8V11c0V7anum_ofaTuple2V3V11c0V0Iainfix <V11V9Aainfix <=c0V11FAainfix <agetV8V12V9Aainfix <=c0agetV8V12Iainfix <V12V7Aainfix <=c0V12FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V3V9c0V0Iainfix <=V9ainfix -akc1Aainfix <=c0V9FFFIainfix <=c0ainfix -akc1Iainfix =agetV6V13anum_ofaTuple2V3V13c0ainfix +ainfix -V0c1c1Iainfix <V13akAainfix <=c0V13FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
         <label
          name="expl:parameter counting_sort">
          </label>
         <proof
-         prover="1"
+         prover="0"
          timelimit="10"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.09"/>
+         <result status="timeout" time="10.03"/>
+        </proof>
+        <proof
+         prover="2"
+         timelimit="10"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.10"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter counting_sort.13.2"
+        locfile="examples/programs/counting_sort/../counting_sort.mlw"
+        loclnum="65" loccnumb="6" loccnume="19"
+        expl="for loop preservation"
+        sum="65eee7216ee6ec729554f5e2c4dc65ab"
+        proved="true"
+        expanded="false"
+        shape="Lamk arrayV1V2Lamk arrayV0V3LagetV6V9asorted_subV8c0V7Iainfix >c1V10Iainfix <V9akAainfix <=c0V9Iainfix =anum_ofaTuple2V8V11c0V7anum_ofaTuple2V3V11c0V0Iainfix <V11V9Aainfix <=c0V11FAainfix <agetV8V12V9Aainfix <=c0agetV8V12Iainfix <V12V7Aainfix <=c0V12FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V3V9c0V0Iainfix <=V9ainfix -akc1Aainfix <=c0V9FFFIainfix <=c0ainfix -akc1Iainfix =agetV6V13anum_ofaTuple2V3V13c0ainfix +ainfix -V0c1c1Iainfix <V13akAainfix <=c0V13FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
+        <label
+         name="expl:parameter counting_sort">
+         </label>
+        <proof
+         prover="0"
+         timelimit="10"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
        <goal
@@ -467,10 +502,10 @@
         locfile="examples/programs/counting_sort/../counting_sort.mlw"
         loclnum="65" loccnumb="6" loccnume="19"
         expl="for loop preservation"
-        sum="12f760df88700fb659cb207c51774c77"
+        sum="5f1aebd2b1a1cabfa59270bdc19bf259"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV1V2Lamk arrayV0V3Lamk arrayV1V8LagetV6V10asorted_subV8c0V7Iainfix >c1V11Iainfix <V10akAainfix <=c0V10Iainfix =anum_ofaTuple2V8V12c0V7anum_ofaTuple2V3V12c0V0Iainfix <V12V10Aainfix <=c0V12FAainfix <agetV8V13V10Aainfix <=c0agetV8V13Iainfix <V13V7Aainfix <=c0V13FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V3V10c0V0Iainfix <=V10ainfix -akc1Aainfix <=c0V10FFFIainfix <=c0ainfix -akc1Iainfix =agetV6V14anum_ofaTuple2V3V14c0ainfix +ainfix -V0c1c1Iainfix <V14akAainfix <=c0V14FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
+        expanded="false"
+        shape="Lamk arrayV1V2Lamk arrayV0V3LagetV6V9ainfix <=c0agetV8V11Iainfix <V11V7Aainfix <=c0V11FIainfix >c1V10Iainfix <V9akAainfix <=c0V9Iainfix =anum_ofaTuple2V8V12c0V7anum_ofaTuple2V3V12c0V0Iainfix <V12V9Aainfix <=c0V12FAainfix <agetV8V13V9Aainfix <=c0agetV8V13Iainfix <V13V7Aainfix <=c0V13FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V3V9c0V0Iainfix <=V9ainfix -akc1Aainfix <=c0V9FFFIainfix <=c0ainfix -akc1Iainfix =agetV6V14anum_ofaTuple2V3V14c0ainfix +ainfix -V0c1c1Iainfix <V14akAainfix <=c0V14FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
         <label
          name="expl:parameter counting_sort">
          </label>
@@ -487,30 +522,10 @@
         locfile="examples/programs/counting_sort/../counting_sort.mlw"
         loclnum="65" loccnumb="6" loccnume="19"
         expl="for loop preservation"
-        sum="e13db1b8cf69296da643fa14db0de4b5"
+        sum="2db9b8e1a6559ceded2269af2f7e87fe"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV1V2Lamk arrayV0V3Lamk arrayV1V8LagetV6V10ainfix <=c0agetV8V12Iainfix <V12V7Aainfix <=c0V12FIainfix >c1V11Iainfix <V10akAainfix <=c0V10Iainfix =anum_ofaTuple2V8V13c0V7anum_ofaTuple2V3V13c0V0Iainfix <V13V10Aainfix <=c0V13FAainfix <agetV8V14V10Aainfix <=c0agetV8V14Iainfix <V14V7Aainfix <=c0V14FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V3V10c0V0Iainfix <=V10ainfix -akc1Aainfix <=c0V10FFFIainfix <=c0ainfix -akc1Iainfix =agetV6V15anum_ofaTuple2V3V15c0ainfix +ainfix -V0c1c1Iainfix <V15akAainfix <=c0V15FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
-        <label
-         name="expl:parameter counting_sort">
-         </label>
-        <proof
-         prover="0"
-         timelimit="10"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.00"/>
-        </proof>
-       </goal>
-       <goal
-        name="WP_parameter counting_sort.13.5"
-        locfile="examples/programs/counting_sort/../counting_sort.mlw"
-        loclnum="65" loccnumb="6" loccnume="19"
-        expl="for loop preservation"
-        sum="f12800c23a08062a768a0446020c26bb"
-        proved="true"
-        expanded="true"
-        shape="Lamk arrayV1V2Lamk arrayV0V3Lamk arrayV1V8LagetV6V10ainfix <agetV8V12ainfix +V10c1Iainfix <V12V7Aainfix <=c0V12FIainfix >c1V11Iainfix <V10akAainfix <=c0V10Iainfix =anum_ofaTuple2V8V13c0V7anum_ofaTuple2V3V13c0V0Iainfix <V13V10Aainfix <=c0V13FAainfix <agetV8V14V10Aainfix <=c0agetV8V14Iainfix <V14V7Aainfix <=c0V14FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V3V10c0V0Iainfix <=V10ainfix -akc1Aainfix <=c0V10FFFIainfix <=c0ainfix -akc1Iainfix =agetV6V15anum_ofaTuple2V3V15c0ainfix +ainfix -V0c1c1Iainfix <V15akAainfix <=c0V15FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
+        expanded="false"
+        shape="Lamk arrayV1V2Lamk arrayV0V3LagetV6V9ainfix <agetV8V11ainfix +V9c1Iainfix <V11V7Aainfix <=c0V11FIainfix >c1V10Iainfix <V9akAainfix <=c0V9Iainfix =anum_ofaTuple2V8V12c0V7anum_ofaTuple2V3V12c0V0Iainfix <V12V9Aainfix <=c0V12FAainfix <agetV8V13V9Aainfix <=c0agetV8V13Iainfix <V13V7Aainfix <=c0V13FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V3V9c0V0Iainfix <=V9ainfix -akc1Aainfix <=c0V9FFFIainfix <=c0ainfix -akc1Iainfix =agetV6V14anum_ofaTuple2V3V14c0ainfix +ainfix -V0c1c1Iainfix <V14akAainfix <=c0V14FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
         <label
          name="expl:parameter counting_sort">
          </label>
@@ -523,23 +538,50 @@
         </proof>
        </goal>
        <goal
-        name="WP_parameter counting_sort.13.6"
+        name="WP_parameter counting_sort.13.5"
         locfile="examples/programs/counting_sort/../counting_sort.mlw"
         loclnum="65" loccnumb="6" loccnume="19"
         expl="for loop preservation"
-        sum="f9dedc12ce18385d41ac4d3a0ac2ec04"
+        sum="973663863fb5f85f16fe543f6d536377"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV1V2Lamk arrayV0V3Lamk arrayV1V8LagetV6V10ainfix =anum_ofaTuple2V8V12c0V7anum_ofaTuple2V3V12c0V0Iainfix <V12ainfix +V10c1Aainfix <=c0V12FIainfix >c1V11Iainfix <V10akAainfix <=c0V10Iainfix =anum_ofaTuple2V8V13c0V7anum_ofaTuple2V3V13c0V0Iainfix <V13V10Aainfix <=c0V13FAainfix <agetV8V14V10Aainfix <=c0agetV8V14Iainfix <V14V7Aainfix <=c0V14FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V3V10c0V0Iainfix <=V10ainfix -akc1Aainfix <=c0V10FFFIainfix <=c0ainfix -akc1Iainfix =agetV6V15anum_ofaTuple2V3V15c0ainfix +ainfix -V0c1c1Iainfix <V15akAainfix <=c0V15FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
+        expanded="false"
+        shape="Lamk arrayV1V2Lamk arrayV0V3LagetV6V9ainfix =anum_ofaTuple2V8V11c0V7anum_ofaTuple2V3V11c0V0Iainfix <V11ainfix +V9c1Aainfix <=c0V11FIainfix >c1V10Iainfix <V9akAainfix <=c0V9Iainfix =anum_ofaTuple2V8V12c0V7anum_ofaTuple2V3V12c0V0Iainfix <V12V9Aainfix <=c0V12FAainfix <agetV8V13V9Aainfix <=c0agetV8V13Iainfix <V13V7Aainfix <=c0V13FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V3V9c0V0Iainfix <=V9ainfix -akc1Aainfix <=c0V9FFFIainfix <=c0ainfix -akc1Iainfix =agetV6V14anum_ofaTuple2V3V14c0ainfix +ainfix -V0c1c1Iainfix <V14akAainfix <=c0V14FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
         <label
          name="expl:parameter counting_sort">
          </label>
         <proof
-         prover="1"
+         prover="0"
          timelimit="10"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.14"/>
+         <result status="timeout" time="10.13"/>
+        </proof>
+        <proof
+         prover="2"
+         timelimit="10"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.12"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter counting_sort.13.6"
+        locfile="examples/programs/counting_sort/../counting_sort.mlw"
+        loclnum="65" loccnumb="6" loccnume="19"
+        expl="for loop preservation"
+        sum="223eed15969382b834fe07b67472bf6f"
+        proved="true"
+        expanded="false"
+        shape="Lamk arrayV1V2Lamk arrayV0V3LagetV6V9ainfix =anum_ofaTuple2V8V9c0V7ainfix -c1c1Aainfix =anum_ofaTuple2V8V11c0V7anum_ofaTuple2V3V11c0V0Iainfix <V11V9Aainfix <=c0V11FAainfix <=agetV8V12V9Aainfix <=c0agetV8V12Iainfix <V12V7Aainfix <=c0V12FAasorted_subV8c0V7Aainfix =ainfix +ainfix -V7c1c1anum_ofaTuple2V3V9c0V0Iainfix <=c1V10Iainfix <V9akAainfix <=c0V9Iainfix =anum_ofaTuple2V8V13c0V7anum_ofaTuple2V3V13c0V0Iainfix <V13V9Aainfix <=c0V13FAainfix <agetV8V14V9Aainfix <=c0agetV8V14Iainfix <V14V7Aainfix <=c0V14FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V3V9c0V0Iainfix <=V9ainfix -akc1Aainfix <=c0V9FFFIainfix <=c0ainfix -akc1Iainfix =agetV6V15anum_ofaTuple2V3V15c0ainfix +ainfix -V0c1c1Iainfix <V15akAainfix <=c0V15FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
+        <label
+         name="expl:parameter counting_sort">
+         </label>
+        <proof
+         prover="0"
+         timelimit="10"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="9.61"/>
         </proof>
        </goal>
        <goal
@@ -547,66 +589,53 @@
         locfile="examples/programs/counting_sort/../counting_sort.mlw"
         loclnum="65" loccnumb="6" loccnume="19"
         expl="for loop preservation"
-        sum="6d048dec19230d5e2efc10272585b768"
+        sum="a3c0e92182671b8c470a8ab45208d771"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV1V2Lamk arrayV0V3Lamk arrayV1V8LagetV6V10ainfix =anum_ofaTuple2V8V10c0V7ainfix -c1c1Aainfix =anum_ofaTuple2V8V12c0V7anum_ofaTuple2V3V12c0V0Iainfix <V12V10Aainfix <=c0V12FAainfix <=agetV8V13V10Aainfix <=c0agetV8V13Iainfix <V13V7Aainfix <=c0V13FAasorted_subV8c0V7Aainfix =ainfix +ainfix -V7c1c1anum_ofaTuple2V3V10c0V0Iainfix <=c1V11Iainfix <V10akAainfix <=c0V10Iainfix =anum_ofaTuple2V8V14c0V7anum_ofaTuple2V3V14c0V0Iainfix <V14V10Aainfix <=c0V14FAainfix <agetV8V15V10Aainfix <=c0agetV8V15Iainfix <V15V7Aainfix <=c0V15FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V3V10c0V0Iainfix <=V10ainfix -akc1Aainfix <=c0V10FFFIainfix <=c0ainfix -akc1Iainfix =agetV6V16anum_ofaTuple2V3V16c0ainfix +ainfix -V0c1c1Iainfix <V16akAainfix <=c0V16FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
-        <label
-         name="expl:parameter counting_sort">
-         </label>
-        <proof
-         prover="1"
-         timelimit="10"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.05"/>
-        </proof>
-       </goal>
-       <goal
-        name="WP_parameter counting_sort.13.8"
-        locfile="examples/programs/counting_sort/../counting_sort.mlw"
-        loclnum="65" loccnumb="6" loccnume="19"
-        expl="for loop preservation"
-        sum="b50dc7e4f59101e7d6492bcf45e3233c"
-        proved="true"
-        expanded="true"
-        shape="Lamk arrayV1V2Lamk arrayV0V3Lamk arrayV1V8LagetV6V10ainfix =anum_ofaTuple2V15V10c0V16ainfix -ainfix +V14c1c1Aainfix =anum_ofaTuple2V15V17c0V16anum_ofaTuple2V3V17c0V0Iainfix <V17V10Aainfix <=c0V17FAainfix <=agetV15V18V10Aainfix <=c0agetV15V18Iainfix <V18V16Aainfix <=c0V18FAasorted_subV15c0V16Aainfix =ainfix +ainfix -V16ainfix +V14c1c1anum_ofaTuple2V3V10c0V0Iainfix =V16ainfix +V12c1FIainfix =V15asetV13V12V10FAainfix <V12V1Aainfix <=c0V12Iainfix =anum_ofaTuple2V13V10c0V12ainfix -V14c1Aainfix =anum_ofaTuple2V13V19c0V12anum_ofaTuple2V3V19c0V0Iainfix <V19V10Aainfix <=c0V19FAainfix <=agetV13V20V10Aainfix <=c0agetV13V20Iainfix <V20V12Aainfix <=c0V20FAasorted_subV13c0V12Aainfix =ainfix +ainfix -V12V14c1anum_ofaTuple2V3V10c0V0Iainfix <=V14V11Aainfix <=c1V14FFFIainfix <=c1V11Iainfix <V10akAainfix <=c0V10Iainfix =anum_ofaTuple2V8V21c0V7anum_ofaTuple2V3V21c0V0Iainfix <V21V10Aainfix <=c0V21FAainfix <agetV8V22V10Aainfix <=c0agetV8V22Iainfix <V22V7Aainfix <=c0V22FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V3V10c0V0Iainfix <=V10ainfix -akc1Aainfix <=c0V10FFFIainfix <=c0ainfix -akc1Iainfix =agetV6V23anum_ofaTuple2V3V23c0ainfix +ainfix -V0c1c1Iainfix <V23akAainfix <=c0V23FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
+        expanded="false"
+        shape="Lamk arrayV1V2Lamk arrayV0V3LagetV6V9ainfix =anum_ofaTuple2V14V9c0V15ainfix -ainfix +V13c1c1Aainfix =anum_ofaTuple2V14V16c0V15anum_ofaTuple2V3V16c0V0Iainfix <V16V9Aainfix <=c0V16FAainfix <=agetV14V17V9Aainfix <=c0agetV14V17Iainfix <V17V15Aainfix <=c0V17FAasorted_subV14c0V15Aainfix =ainfix +ainfix -V15ainfix +V13c1c1anum_ofaTuple2V3V9c0V0Iainfix =V15ainfix +V11c1FIainfix =V14asetV12V11V9FAainfix <V11V1Aainfix <=c0V11Iainfix =anum_ofaTuple2V12V9c0V11ainfix -V13c1Aainfix =anum_ofaTuple2V12V18c0V11anum_ofaTuple2V3V18c0V0Iainfix <V18V9Aainfix <=c0V18FAainfix <=agetV12V19V9Aainfix <=c0agetV12V19Iainfix <V19V11Aainfix <=c0V19FAasorted_subV12c0V11Aainfix =ainfix +ainfix -V11V13c1anum_ofaTuple2V3V9c0V0Iainfix <=V13V10Aainfix <=c1V13FFFIainfix <=c1V10Iainfix <V9akAainfix <=c0V9Iainfix =anum_ofaTuple2V8V20c0V7anum_ofaTuple2V3V20c0V0Iainfix <V20V9Aainfix <=c0V20FAainfix <agetV8V21V9Aainfix <=c0agetV8V21Iainfix <V21V7Aainfix <=c0V21FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V3V9c0V0Iainfix <=V9ainfix -akc1Aainfix <=c0V9FFFIainfix <=c0ainfix -akc1Iainfix =agetV6V22anum_ofaTuple2V3V22c0ainfix +ainfix -V0c1c1Iainfix <V22akAainfix <=c0V22FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
         <label
          name="expl:parameter counting_sort">
          </label>
         <transf
          name="split_goal"
          proved="true"
-         expanded="true">
+         expanded="false">
          <goal
-          name="WP_parameter counting_sort.13.8.1"
+          name="WP_parameter counting_sort.13.7.0"
           locfile="examples/programs/counting_sort/../counting_sort.mlw"
           loclnum="65" loccnumb="6" loccnume="19"
           expl="for loop preservation"
-          sum="8ab988458632c5c11ebb479c1b8b1333"
+          sum="9c31193280c1abb76618bee818b66f71"
           proved="true"
-          expanded="true"
-          shape="Lamk arrayV1V2Lamk arrayV0V3Lamk arrayV1V8LagetV6V10ainfix <V12V1Aainfix <=c0V12Iainfix =anum_ofaTuple2V13V10c0V12ainfix -V14c1Aainfix =anum_ofaTuple2V13V15c0V12anum_ofaTuple2V3V15c0V0Iainfix <V15V10Aainfix <=c0V15FAainfix <=agetV13V16V10Aainfix <=c0agetV13V16Iainfix <V16V12Aainfix <=c0V16FAasorted_subV13c0V12Aainfix =ainfix +ainfix -V12V14c1anum_ofaTuple2V3V10c0V0Iainfix <=V14V11Aainfix <=c1V14FFFIainfix <=c1V11Iainfix <V10akAainfix <=c0V10Iainfix =anum_ofaTuple2V8V17c0V7anum_ofaTuple2V3V17c0V0Iainfix <V17V10Aainfix <=c0V17FAainfix <agetV8V18V10Aainfix <=c0agetV8V18Iainfix <V18V7Aainfix <=c0V18FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V3V10c0V0Iainfix <=V10ainfix -akc1Aainfix <=c0V10FFFIainfix <=c0ainfix -akc1Iainfix =agetV6V19anum_ofaTuple2V3V19c0ainfix +ainfix -V0c1c1Iainfix <V19akAainfix <=c0V19FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
+          expanded="false"
+          shape="Lamk arrayV1V2Lamk arrayV0V3LagetV6V9ainfix <V11V1Aainfix <=c0V11Iainfix =anum_ofaTuple2V12V9c0V11ainfix -V13c1Aainfix =anum_ofaTuple2V12V14c0V11anum_ofaTuple2V3V14c0V0Iainfix <V14V9Aainfix <=c0V14FAainfix <=agetV12V15V9Aainfix <=c0agetV12V15Iainfix <V15V11Aainfix <=c0V15FAasorted_subV12c0V11Aainfix =ainfix +ainfix -V11V13c1anum_ofaTuple2V3V9c0V0Iainfix <=V13V10Aainfix <=c1V13FFFIainfix <=c1V10Iainfix <V9akAainfix <=c0V9Iainfix =anum_ofaTuple2V8V16c0V7anum_ofaTuple2V3V16c0V0Iainfix <V16V9Aainfix <=c0V16FAainfix <agetV8V17V9Aainfix <=c0agetV8V17Iainfix <V17V7Aainfix <=c0V17FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V3V9c0V0Iainfix <=V9ainfix -akc1Aainfix <=c0V9FFFIainfix <=c0ainfix -akc1Iainfix =agetV6V18anum_ofaTuple2V3V18c0ainfix +ainfix -V0c1c1Iainfix <V18akAainfix <=c0V18FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
           <label
            name="expl:parameter counting_sort">
            </label>
           <proof
-           prover="1"
+           prover="0"
            timelimit="10"
            obsolete="false"
            archived="false">
-           <result status="valid" time="0.80"/>
+           <result status="timeout" time="10.09"/>
+          </proof>
+          <proof
+           prover="2"
+           timelimit="10"
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="4.42"/>
           </proof>
          </goal>
          <goal
-          name="WP_parameter counting_sort.13.8.2"
+          name="WP_parameter counting_sort.13.7.1"
           locfile="examples/programs/counting_sort/../counting_sort.mlw"
           loclnum="65" loccnumb="6" loccnume="19"
           expl="for loop preservation"
-          sum="9a6ec37f59613239dd06fd25835c4ce7"
+          sum="ed909fe65b38cfacd96143c0a0b28957"
           proved="true"
-          expanded="true"
-          shape="Lamk arrayV1V2Lamk arrayV0V3Lamk arrayV1V8LagetV6V10ainfix =ainfix +ainfix -V16ainfix +V14c1c1anum_ofaTuple2V3V10c0V0Iainfix =V16ainfix +V12c1FIainfix =V15asetV13V12V10FIainfix <V12V1Aainfix <=c0V12Iainfix =anum_ofaTuple2V13V10c0V12ainfix -V14c1Aainfix =anum_ofaTuple2V13V17c0V12anum_ofaTuple2V3V17c0V0Iainfix <V17V10Aainfix <=c0V17FAainfix <=agetV13V18V10Aainfix <=c0agetV13V18Iainfix <V18V12Aainfix <=c0V18FAasorted_subV13c0V12Aainfix =ainfix +ainfix -V12V14c1anum_ofaTuple2V3V10c0V0Iainfix <=V14V11Aainfix <=c1V14FFFIainfix <=c1V11Iainfix <V10akAainfix <=c0V10Iainfix =anum_ofaTuple2V8V19c0V7anum_ofaTuple2V3V19c0V0Iainfix <V19V10Aainfix <=c0V19FAainfix <agetV8V20V10Aainfix <=c0agetV8V20Iainfix <V20V7Aainfix <=c0V20FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V3V10c0V0Iainfix <=V10ainfix -akc1Aainfix <=c0V10FFFIainfix <=c0ainfix -akc1Iainfix =agetV6V21anum_ofaTuple2V3V21c0ainfix +ainfix -V0c1c1Iainfix <V21akAainfix <=c0V21FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
+          expanded="false"
+          shape="Lamk arrayV1V2Lamk arrayV0V3LagetV6V9ainfix =ainfix +ainfix -V15ainfix +V13c1c1anum_ofaTuple2V3V9c0V0Iainfix =V15ainfix +V11c1FIainfix =V14asetV12V11V9FIainfix <V11V1Aainfix <=c0V11Iainfix =anum_ofaTuple2V12V9c0V11ainfix -V13c1Aainfix =anum_ofaTuple2V12V16c0V11anum_ofaTuple2V3V16c0V0Iainfix <V16V9Aainfix <=c0V16FAainfix <=agetV12V17V9Aainfix <=c0agetV12V17Iainfix <V17V11Aainfix <=c0V17FAasorted_subV12c0V11Aainfix =ainfix +ainfix -V11V13c1anum_ofaTuple2V3V9c0V0Iainfix <=V13V10Aainfix <=c1V13FFFIainfix <=c1V10Iainfix <V9akAainfix <=c0V9Iainfix =anum_ofaTuple2V8V18c0V7anum_ofaTuple2V3V18c0V0Iainfix <V18V9Aainfix <=c0V18FAainfix <agetV8V19V9Aainfix <=c0agetV8V19Iainfix <V19V7Aainfix <=c0V19FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V3V9c0V0Iainfix <=V9ainfix -akc1Aainfix <=c0V9FFFIainfix <=c0ainfix -akc1Iainfix =agetV6V20anum_ofaTuple2V3V20c0ainfix +ainfix -V0c1c1Iainfix <V20akAainfix <=c0V20FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
           <label
            name="expl:parameter counting_sort">
            </label>
@@ -619,14 +648,14 @@
           </proof>
          </goal>
          <goal
-          name="WP_parameter counting_sort.13.8.3"
+          name="WP_parameter counting_sort.13.7.2"
           locfile="examples/programs/counting_sort/../counting_sort.mlw"
           loclnum="65" loccnumb="6" loccnume="19"
           expl="for loop preservation"
-          sum="fa8351f67db3282a2faa3161eb2d3c18"
+          sum="a2f6bff44347bba538c9487342c0ea22"
           proved="true"
-          expanded="true"
-          shape="Lamk arrayV1V2Lamk arrayV0V3Lamk arrayV1V8LagetV6V10asorted_subV15c0V16Iainfix =V16ainfix +V12c1FIainfix =V15asetV13V12V10FIainfix <V12V1Aainfix <=c0V12Iainfix =anum_ofaTuple2V13V10c0V12ainfix -V14c1Aainfix =anum_ofaTuple2V13V17c0V12anum_ofaTuple2V3V17c0V0Iainfix <V17V10Aainfix <=c0V17FAainfix <=agetV13V18V10Aainfix <=c0agetV13V18Iainfix <V18V12Aainfix <=c0V18FAasorted_subV13c0V12Aainfix =ainfix +ainfix -V12V14c1anum_ofaTuple2V3V10c0V0Iainfix <=V14V11Aainfix <=c1V14FFFIainfix <=c1V11Iainfix <V10akAainfix <=c0V10Iainfix =anum_ofaTuple2V8V19c0V7anum_ofaTuple2V3V19c0V0Iainfix <V19V10Aainfix <=c0V19FAainfix <agetV8V20V10Aainfix <=c0agetV8V20Iainfix <V20V7Aainfix <=c0V20FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V3V10c0V0Iainfix <=V10ainfix -akc1Aainfix <=c0V10FFFIainfix <=c0ainfix -akc1Iainfix =agetV6V21anum_ofaTuple2V3V21c0ainfix +ainfix -V0c1c1Iainfix <V21akAainfix <=c0V21FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
+          expanded="false"
+          shape="Lamk arrayV1V2Lamk arrayV0V3LagetV6V9asorted_subV14c0V15Iainfix =V15ainfix +V11c1FIainfix =V14asetV12V11V9FIainfix <V11V1Aainfix <=c0V11Iainfix =anum_ofaTuple2V12V9c0V11ainfix -V13c1Aainfix =anum_ofaTuple2V12V16c0V11anum_ofaTuple2V3V16c0V0Iainfix <V16V9Aainfix <=c0V16FAainfix <=agetV12V17V9Aainfix <=c0agetV12V17Iainfix <V17V11Aainfix <=c0V17FAasorted_subV12c0V11Aainfix =ainfix +ainfix -V11V13c1anum_ofaTuple2V3V9c0V0Iainfix <=V13V10Aainfix <=c1V13FFFIainfix <=c1V10Iainfix <V9akAainfix <=c0V9Iainfix =anum_ofaTuple2V8V18c0V7anum_ofaTuple2V3V18c0V0Iainfix <V18V9Aainfix <=c0V18FAainfix <agetV8V19V9Aainfix <=c0agetV8V19Iainfix <V19V7Aainfix <=c0V19FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V3V9c0V0Iainfix <=V9ainfix -akc1Aainfix <=c0V9FFFIainfix <=c0ainfix -akc1Iainfix =agetV6V20anum_ofaTuple2V3V20c0ainfix +ainfix -V0c1c1Iainfix <V20akAainfix <=c0V20FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
           <label
            name="expl:parameter counting_sort">
            </label>
@@ -635,18 +664,18 @@
            timelimit="10"
            obsolete="false"
            archived="false">
-           <result status="valid" time="3.02"/>
+           <result status="valid" time="3.06"/>
           </proof>
          </goal>
          <goal
-          name="WP_parameter counting_sort.13.8.4"
+          name="WP_parameter counting_sort.13.7.3"
           locfile="examples/programs/counting_sort/../counting_sort.mlw"
           loclnum="65" loccnumb="6" loccnume="19"
           expl="for loop preservation"
-          sum="c58e0747875106ffd231c30625dc7ec3"
+          sum="66c7f4aaddd3272dae4265092aff713e"
           proved="true"
-          expanded="true"
-          shape="Lamk arrayV1V2Lamk arrayV0V3Lamk arrayV1V8LagetV6V10ainfix <=c0agetV15V17Iainfix <V17V16Aainfix <=c0V17FIainfix =V16ainfix +V12c1FIainfix =V15asetV13V12V10FIainfix <V12V1Aainfix <=c0V12Iainfix =anum_ofaTuple2V13V10c0V12ainfix -V14c1Aainfix =anum_ofaTuple2V13V18c0V12anum_ofaTuple2V3V18c0V0Iainfix <V18V10Aainfix <=c0V18FAainfix <=agetV13V19V10Aainfix <=c0agetV13V19Iainfix <V19V12Aainfix <=c0V19FAasorted_subV13c0V12Aainfix =ainfix +ainfix -V12V14c1anum_ofaTuple2V3V10c0V0Iainfix <=V14V11Aainfix <=c1V14FFFIainfix <=c1V11Iainfix <V10akAainfix <=c0V10Iainfix =anum_ofaTuple2V8V20c0V7anum_ofaTuple2V3V20c0V0Iainfix <V20V10Aainfix <=c0V20FAainfix <agetV8V21V10Aainfix <=c0agetV8V21Iainfix <V21V7Aainfix <=c0V21FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V3V10c0V0Iainfix <=V10ainfix -akc1Aainfix <=c0V10FFFIainfix <=c0ainfix -akc1Iainfix =agetV6V22anum_ofaTuple2V3V22c0ainfix +ainfix -V0c1c1Iainfix <V22akAainfix <=c0V22FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
+          expanded="false"
+          shape="Lamk arrayV1V2Lamk arrayV0V3LagetV6V9ainfix <=c0agetV14V16Iainfix <V16V15Aainfix <=c0V16FIainfix =V15ainfix +V11c1FIainfix =V14asetV12V11V9FIainfix <V11V1Aainfix <=c0V11Iainfix =anum_ofaTuple2V12V9c0V11ainfix -V13c1Aainfix =anum_ofaTuple2V12V17c0V11anum_ofaTuple2V3V17c0V0Iainfix <V17V9Aainfix <=c0V17FAainfix <=agetV12V18V9Aainfix <=c0agetV12V18Iainfix <V18V11Aainfix <=c0V18FAasorted_subV12c0V11Aainfix =ainfix +ainfix -V11V13c1anum_ofaTuple2V3V9c0V0Iainfix <=V13V10Aainfix <=c1V13FFFIainfix <=c1V10Iainfix <V9akAainfix <=c0V9Iainfix =anum_ofaTuple2V8V19c0V7anum_ofaTuple2V3V19c0V0Iainfix <V19V9Aainfix <=c0V19FAainfix <agetV8V20V9Aainfix <=c0agetV8V20Iainfix <V20V7Aainfix <=c0V20FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V3V9c0V0Iainfix <=V9ainfix -akc1Aainfix <=c0V9FFFIainfix <=c0ainfix -akc1Iainfix =agetV6V21anum_ofaTuple2V3V21c0ainfix +ainfix -V0c1c1Iainfix <V21akAainfix <=c0V21FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
           <label
            name="expl:parameter counting_sort">
            </label>
@@ -655,18 +684,18 @@
            timelimit="10"
            obsolete="false"
            archived="false">
-           <result status="valid" time="0.01"/>
+           <result status="valid" time="0.02"/>
           </proof>
          </goal>
          <goal
-          name="WP_parameter counting_sort.13.8.5"
+          name="WP_parameter counting_sort.13.7.4"
           locfile="examples/programs/counting_sort/../counting_sort.mlw"
           loclnum="65" loccnumb="6" loccnume="19"
           expl="for loop preservation"
-          sum="3bb5211460d42eef3367834b756768cd"
+          sum="7d303b0b262aaf41e8834809cdba2d3b"
           proved="true"
-          expanded="true"
-          shape="Lamk arrayV1V2Lamk arrayV0V3Lamk arrayV1V8LagetV6V10ainfix <=agetV15V17V10Iainfix <V17V16Aainfix <=c0V17FIainfix =V16ainfix +V12c1FIainfix =V15asetV13V12V10FIainfix <V12V1Aainfix <=c0V12Iainfix =anum_ofaTuple2V13V10c0V12ainfix -V14c1Aainfix =anum_ofaTuple2V13V18c0V12anum_ofaTuple2V3V18c0V0Iainfix <V18V10Aainfix <=c0V18FAainfix <=agetV13V19V10Aainfix <=c0agetV13V19Iainfix <V19V12Aainfix <=c0V19FAasorted_subV13c0V12Aainfix =ainfix +ainfix -V12V14c1anum_ofaTuple2V3V10c0V0Iainfix <=V14V11Aainfix <=c1V14FFFIainfix <=c1V11Iainfix <V10akAainfix <=c0V10Iainfix =anum_ofaTuple2V8V20c0V7anum_ofaTuple2V3V20c0V0Iainfix <V20V10Aainfix <=c0V20FAainfix <agetV8V21V10Aainfix <=c0agetV8V21Iainfix <V21V7Aainfix <=c0V21FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V3V10c0V0Iainfix <=V10ainfix -akc1Aainfix <=c0V10FFFIainfix <=c0ainfix -akc1Iainfix =agetV6V22anum_ofaTuple2V3V22c0ainfix +ainfix -V0c1c1Iainfix <V22akAainfix <=c0V22FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
+          expanded="false"
+          shape="Lamk arrayV1V2Lamk arrayV0V3LagetV6V9ainfix <=agetV14V16V9Iainfix <V16V15Aainfix <=c0V16FIainfix =V15ainfix +V11c1FIainfix =V14asetV12V11V9FIainfix <V11V1Aainfix <=c0V11Iainfix =anum_ofaTuple2V12V9c0V11ainfix -V13c1Aainfix =anum_ofaTuple2V12V17c0V11anum_ofaTuple2V3V17c0V0Iainfix <V17V9Aainfix <=c0V17FAainfix <=agetV12V18V9Aainfix <=c0agetV12V18Iainfix <V18V11Aainfix <=c0V18FAasorted_subV12c0V11Aainfix =ainfix +ainfix -V11V13c1anum_ofaTuple2V3V9c0V0Iainfix <=V13V10Aainfix <=c1V13FFFIainfix <=c1V10Iainfix <V9akAainfix <=c0V9Iainfix =anum_ofaTuple2V8V19c0V7anum_ofaTuple2V3V19c0V0Iainfix <V19V9Aainfix <=c0V19FAainfix <agetV8V20V9Aainfix <=c0agetV8V20Iainfix <V20V7Aainfix <=c0V20FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V3V9c0V0Iainfix <=V9ainfix -akc1Aainfix <=c0V9FFFIainfix <=c0ainfix -akc1Iainfix =agetV6V21anum_ofaTuple2V3V21c0ainfix +ainfix -V0c1c1Iainfix <V21akAainfix <=c0V21FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
           <label
            name="expl:parameter counting_sort">
            </label>
@@ -675,23 +704,37 @@
            timelimit="10"
            obsolete="false"
            archived="false">
-           <result status="valid" time="0.01"/>
+           <result status="valid" time="0.02"/>
           </proof>
          </goal>
          <goal
-          name="WP_parameter counting_sort.13.8.6"
+          name="WP_parameter counting_sort.13.7.5"
           locfile="examples/programs/counting_sort/../counting_sort.mlw"
           loclnum="65" loccnumb="6" loccnume="19"
           expl="for loop preservation"
-          sum="c8f92a529fdbb2b3cad535fc92f67d65"
+          sum="b2f7eb607528dfa5b693be5d9ad538de"
           proved="true"
-          expanded="true"
-          shape="Lamk arrayV1V2Lamk arrayV0V3Lamk arrayV1V8LagetV6V10ainfix =anum_ofaTuple2V15V17c0V16anum_ofaTuple2V3V17c0V0Iainfix <V17V10Aainfix <=c0V17FIainfix =V16ainfix +V12c1FIainfix =V15asetV13V12V10FIainfix <V12V1Aainfix <=c0V12Iainfix =anum_ofaTuple2V13V10c0V12ainfix -V14c1Aainfix =anum_ofaTuple2V13V18c0V12anum_ofaTuple2V3V18c0V0Iainfix <V18V10Aainfix <=c0V18FAainfix <=agetV13V19V10Aainfix <=c0agetV13V19Iainfix <V19V12Aainfix <=c0V19FAasorted_subV13c0V12Aainfix =ainfix +ainfix -V12V14c1anum_ofaTuple2V3V10c0V0Iainfix <=V14V11Aainfix <=c1V14FFFIainfix <=c1V11Iainfix <V10akAainfix <=c0V10Iainfix =anum_ofaTuple2V8V20c0V7anum_ofaTuple2V3V20c0V0Iainfix <V20V10Aainfix <=c0V20FAainfix <agetV8V21V10Aainfix <=c0agetV8V21Iainfix <V21V7Aainfix <=c0V21FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V3V10c0V0Iainfix <=V10ainfix -akc1Aainfix <=c0V10FFFIainfix <=c0ainfix -akc1Iainfix =agetV6V22anum_ofaTuple2V3V22c0ainfix +ainfix -V0c1c1Iainfix <V22akAainfix <=c0V22FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
+          expanded="false"
+          shape="Lamk arrayV1V2Lamk arrayV0V3LagetV6V9ainfix =anum_ofaTuple2V14V16c0V15anum_ofaTuple2V3V16c0V0Iainfix <V16V9Aainfix <=c0V16FIainfix =V15ainfix +V11c1FIainfix =V14asetV12V11V9FIainfix <V11V1Aainfix <=c0V11Iainfix =anum_ofaTuple2V12V9c0V11ainfix -V13c1Aainfix =anum_ofaTuple2V12V17c0V11anum_ofaTuple2V3V17c0V0Iainfix <V17V9Aainfix <=c0V17FAainfix <=agetV12V18V9Aainfix <=c0agetV12V18Iainfix <V18V11Aainfix <=c0V18FAasorted_subV12c0V11Aainfix =ainfix +ainfix -V11V13c1anum_ofaTuple2V3V9c0V0Iainfix <=V13V10Aainfix <=c1V13FFFIainfix <=c1V10Iainfix <V9akAainfix <=c0V9Iainfix =anum_ofaTuple2V8V19c0V7anum_ofaTuple2V3V19c0V0Iainfix <V19V9Aainfix <=c0V19FAainfix <agetV8V20V9Aainfix <=c0agetV8V20Iainfix <V20V7Aainfix <=c0V20FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V3V9c0V0Iainfix <=V9ainfix -akc1Aainfix <=c0V9FFFIainfix <=c0ainfix -akc1Iainfix =agetV6V21anum_ofaTuple2V3V21c0ainfix +ainfix -V0c1c1Iainfix <V21akAainfix <=c0V21FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
           <label
            name="expl:parameter counting_sort">
            </label>
           <proof
-           prover="3"
+           prover="0"
+           timelimit="10"
+           obsolete="false"
+           archived="false">
+           <result status="timeout" time="10.05"/>
+          </proof>
+          <proof
+           prover="2"
+           timelimit="10"
+           obsolete="false"
+           archived="false">
+           <result status="timeout" time="10.09"/>
+          </proof>
+          <proof
+           prover="5"
            timelimit="10"
            obsolete="false"
            archived="false">
@@ -699,19 +742,33 @@
           </proof>
          </goal>
          <goal
-          name="WP_parameter counting_sort.13.8.7"
+          name="WP_parameter counting_sort.13.7.6"
           locfile="examples/programs/counting_sort/../counting_sort.mlw"
           loclnum="65" loccnumb="6" loccnume="19"
           expl="for loop preservation"
-          sum="42cfc6efdb6217634f146c817818d1b4"
+          sum="3ee3ee10c0d23c42368641fd43f72c23"
           proved="true"
-          expanded="true"
-          shape="Lamk arrayV1V2Lamk arrayV0V3Lamk arrayV1V8LagetV6V10ainfix =anum_ofaTuple2V15V10c0V16ainfix -ainfix +V14c1c1Iainfix =V16ainfix +V12c1FIainfix =V15asetV13V12V10FIainfix <V12V1Aainfix <=c0V12Iainfix =anum_ofaTuple2V13V10c0V12ainfix -V14c1Aainfix =anum_ofaTuple2V13V17c0V12anum_ofaTuple2V3V17c0V0Iainfix <V17V10Aainfix <=c0V17FAainfix <=agetV13V18V10Aainfix <=c0agetV13V18Iainfix <V18V12Aainfix <=c0V18FAasorted_subV13c0V12Aainfix =ainfix +ainfix -V12V14c1anum_ofaTuple2V3V10c0V0Iainfix <=V14V11Aainfix <=c1V14FFFIainfix <=c1V11Iainfix <V10akAainfix <=c0V10Iainfix =anum_ofaTuple2V8V19c0V7anum_ofaTuple2V3V19c0V0Iainfix <V19V10Aainfix <=c0V19FAainfix <agetV8V20V10Aainfix <=c0agetV8V20Iainfix <V20V7Aainfix <=c0V20FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V3V10c0V0Iainfix <=V10ainfix -akc1Aainfix <=c0V10FFFIainfix <=c0ainfix -akc1Iainfix =agetV6V21anum_ofaTuple2V3V21c0ainfix +ainfix -V0c1c1Iainfix <V21akAainfix <=c0V21FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
+          expanded="false"
+          shape="Lamk arrayV1V2Lamk arrayV0V3LagetV6V9ainfix =anum_ofaTuple2V14V9c0V15ainfix -ainfix +V13c1c1Iainfix =V15ainfix +V11c1FIainfix =V14asetV12V11V9FIainfix <V11V1Aainfix <=c0V11Iainfix =anum_ofaTuple2V12V9c0V11ainfix -V13c1Aainfix =anum_ofaTuple2V12V16c0V11anum_ofaTuple2V3V16c0V0Iainfix <V16V9Aainfix <=c0V16FAainfix <=agetV12V17V9Aainfix <=c0agetV12V17Iainfix <V17V11Aainfix <=c0V17FAasorted_subV12c0V11Aainfix =ainfix +ainfix -V11V13c1anum_ofaTuple2V3V9c0V0Iainfix <=V13V10Aainfix <=c1V13FFFIainfix <=c1V10Iainfix <V9akAainfix <=c0V9Iainfix =anum_ofaTuple2V8V18c0V7anum_ofaTuple2V3V18c0V0Iainfix <V18V9Aainfix <=c0V18FAainfix <agetV8V19V9Aainfix <=c0agetV8V19Iainfix <V19V7Aainfix <=c0V19FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V3V9c0V0Iainfix <=V9ainfix -akc1Aainfix <=c0V9FFFIainfix <=c0ainfix -akc1Iainfix =agetV6V20anum_ofaTuple2V3V20c0ainfix +ainfix -V0c1c1Iainfix <V20akAainfix <=c0V20FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
           <label
            name="expl:parameter counting_sort">
            </label>
           <proof
-           prover="3"
+           prover="0"
+           timelimit="10"
+           obsolete="false"
+           archived="false">
+           <result status="timeout" time="10.06"/>
+          </proof>
+          <proof
+           prover="2"
+           timelimit="10"
+           obsolete="false"
+           archived="false">
+           <result status="timeout" time="10.09"/>
+          </proof>
+          <proof
+           prover="5"
            timelimit="10"
            obsolete="false"
            archived="false">
@@ -721,23 +778,50 @@
         </transf>
        </goal>
        <goal
-        name="WP_parameter counting_sort.13.9"
+        name="WP_parameter counting_sort.13.8"
         locfile="examples/programs/counting_sort/../counting_sort.mlw"
         loclnum="65" loccnumb="6" loccnume="19"
         expl="for loop preservation"
-        sum="c17e51fe6ff98051ebf3049d1368f6cd"
+        sum="cce94c10cd8d268aa86f78717508415e"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV1V2Lamk arrayV0V3Lamk arrayV1V8LagetV6V10ainfix =V12anum_ofaTuple2V3ainfix +V10c1c0V0Iainfix =anum_ofaTuple2V13V10c0V12ainfix -ainfix +V11c1c1Aainfix =anum_ofaTuple2V13V14c0V12anum_ofaTuple2V3V14c0V0Iainfix <V14V10Aainfix <=c0V14FAainfix <=agetV13V15V10Aainfix <=c0agetV13V15Iainfix <V15V12Aainfix <=c0V15FAasorted_subV13c0V12Aainfix =ainfix +ainfix -V12ainfix +V11c1c1anum_ofaTuple2V3V10c0V0FFIainfix <=c1V11Iainfix <V10akAainfix <=c0V10Iainfix =anum_ofaTuple2V8V16c0V7anum_ofaTuple2V3V16c0V0Iainfix <V16V10Aainfix <=c0V16FAainfix <agetV8V17V10Aainfix <=c0agetV8V17Iainfix <V17V7Aainfix <=c0V17FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V3V10c0V0Iainfix <=V10ainfix -akc1Aainfix <=c0V10FFFIainfix <=c0ainfix -akc1Iainfix =agetV6V18anum_ofaTuple2V3V18c0ainfix +ainfix -V0c1c1Iainfix <V18akAainfix <=c0V18FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
+        expanded="false"
+        shape="Lamk arrayV1V2Lamk arrayV0V3LagetV6V9ainfix =V11anum_ofaTuple2V3ainfix +V9c1c0V0Iainfix =anum_ofaTuple2V12V9c0V11ainfix -ainfix +V10c1c1Aainfix =anum_ofaTuple2V12V13c0V11anum_ofaTuple2V3V13c0V0Iainfix <V13V9Aainfix <=c0V13FAainfix <=agetV12V14V9Aainfix <=c0agetV12V14Iainfix <V14V11Aainfix <=c0V14FAasorted_subV12c0V11Aainfix =ainfix +ainfix -V11ainfix +V10c1c1anum_ofaTuple2V3V9c0V0FFIainfix <=c1V10Iainfix <V9akAainfix <=c0V9Iainfix =anum_ofaTuple2V8V15c0V7anum_ofaTuple2V3V15c0V0Iainfix <V15V9Aainfix <=c0V15FAainfix <agetV8V16V9Aainfix <=c0agetV8V16Iainfix <V16V7Aainfix <=c0V16FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V3V9c0V0Iainfix <=V9ainfix -akc1Aainfix <=c0V9FFFIainfix <=c0ainfix -akc1Iainfix =agetV6V17anum_ofaTuple2V3V17c0ainfix +ainfix -V0c1c1Iainfix <V17akAainfix <=c0V17FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
         <label
          name="expl:parameter counting_sort">
          </label>
         <proof
-         prover="1"
+         prover="0"
          timelimit="10"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.23"/>
+         <result status="timeout" time="10.01"/>
+        </proof>
+        <proof
+         prover="2"
+         timelimit="10"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.24"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter counting_sort.13.9"
+        locfile="examples/programs/counting_sort/../counting_sort.mlw"
+        loclnum="65" loccnumb="6" loccnume="19"
+        expl="for loop preservation"
+        sum="892cf946e28a735ffc7802277a1f6584"
+        proved="true"
+        expanded="false"
+        shape="Lamk arrayV1V2Lamk arrayV0V3LagetV6V9asorted_subV12c0V11Iainfix =anum_ofaTuple2V12V9c0V11ainfix -ainfix +V10c1c1Aainfix =anum_ofaTuple2V12V13c0V11anum_ofaTuple2V3V13c0V0Iainfix <V13V9Aainfix <=c0V13FAainfix <=agetV12V14V9Aainfix <=c0agetV12V14Iainfix <V14V11Aainfix <=c0V14FAasorted_subV12c0V11Aainfix =ainfix +ainfix -V11ainfix +V10c1c1anum_ofaTuple2V3V9c0V0FFIainfix <=c1V10Iainfix <V9akAainfix <=c0V9Iainfix =anum_ofaTuple2V8V15c0V7anum_ofaTuple2V3V15c0V0Iainfix <V15V9Aainfix <=c0V15FAainfix <agetV8V16V9Aainfix <=c0agetV8V16Iainfix <V16V7Aainfix <=c0V16FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V3V9c0V0Iainfix <=V9ainfix -akc1Aainfix <=c0V9FFFIainfix <=c0ainfix -akc1Iainfix =agetV6V17anum_ofaTuple2V3V17c0ainfix +ainfix -V0c1c1Iainfix <V17akAainfix <=c0V17FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
+        <label
+         name="expl:parameter counting_sort">
+         </label>
+        <proof
+         prover="0"
+         timelimit="10"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
        <goal
@@ -745,10 +829,10 @@
         locfile="examples/programs/counting_sort/../counting_sort.mlw"
         loclnum="65" loccnumb="6" loccnume="19"
         expl="for loop preservation"
-        sum="913d620b4fde7b919e517455d349457b"
+        sum="314cc5bba5ddf29b8a2e1b9066449e86"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV1V2Lamk arrayV0V3Lamk arrayV1V8LagetV6V10asorted_subV13c0V12Iainfix =anum_ofaTuple2V13V10c0V12ainfix -ainfix +V11c1c1Aainfix =anum_ofaTuple2V13V14c0V12anum_ofaTuple2V3V14c0V0Iainfix <V14V10Aainfix <=c0V14FAainfix <=agetV13V15V10Aainfix <=c0agetV13V15Iainfix <V15V12Aainfix <=c0V15FAasorted_subV13c0V12Aainfix =ainfix +ainfix -V12ainfix +V11c1c1anum_ofaTuple2V3V10c0V0FFIainfix <=c1V11Iainfix <V10akAainfix <=c0V10Iainfix =anum_ofaTuple2V8V16c0V7anum_ofaTuple2V3V16c0V0Iainfix <V16V10Aainfix <=c0V16FAainfix <agetV8V17V10Aainfix <=c0agetV8V17Iainfix <V17V7Aainfix <=c0V17FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V3V10c0V0Iainfix <=V10ainfix -akc1Aainfix <=c0V10FFFIainfix <=c0ainfix -akc1Iainfix =agetV6V18anum_ofaTuple2V3V18c0ainfix +ainfix -V0c1c1Iainfix <V18akAainfix <=c0V18FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
+        expanded="false"
+        shape="Lamk arrayV1V2Lamk arrayV0V3LagetV6V9ainfix <=c0agetV12V13Iainfix <V13V11Aainfix <=c0V13FIainfix =anum_ofaTuple2V12V9c0V11ainfix -ainfix +V10c1c1Aainfix =anum_ofaTuple2V12V14c0V11anum_ofaTuple2V3V14c0V0Iainfix <V14V9Aainfix <=c0V14FAainfix <=agetV12V15V9Aainfix <=c0agetV12V15Iainfix <V15V11Aainfix <=c0V15FAasorted_subV12c0V11Aainfix =ainfix +ainfix -V11ainfix +V10c1c1anum_ofaTuple2V3V9c0V0FFIainfix <=c1V10Iainfix <V9akAainfix <=c0V9Iainfix =anum_ofaTuple2V8V16c0V7anum_ofaTuple2V3V16c0V0Iainfix <V16V9Aainfix <=c0V16FAainfix <agetV8V17V9Aainfix <=c0agetV8V17Iainfix <V17V7Aainfix <=c0V17FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V3V9c0V0Iainfix <=V9ainfix -akc1Aainfix <=c0V9FFFIainfix <=c0ainfix -akc1Iainfix =agetV6V18anum_ofaTuple2V3V18c0ainfix +ainfix -V0c1c1Iainfix <V18akAainfix <=c0V18FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
         <label
          name="expl:parameter counting_sort">
          </label>
@@ -765,10 +849,10 @@
         locfile="examples/programs/counting_sort/../counting_sort.mlw"
         loclnum="65" loccnumb="6" loccnume="19"
         expl="for loop preservation"
-        sum="768049f7933d01dc00b2260d39dfa36e"
+        sum="19fbd919151663bfc2619ebb338eafa4"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV1V2Lamk arrayV0V3Lamk arrayV1V8LagetV6V10ainfix <=c0agetV13V14Iainfix <V14V12Aainfix <=c0V14FIainfix =anum_ofaTuple2V13V10c0V12ainfix -ainfix +V11c1c1Aainfix =anum_ofaTuple2V13V15c0V12anum_ofaTuple2V3V15c0V0Iainfix <V15V10Aainfix <=c0V15FAainfix <=agetV13V16V10Aainfix <=c0agetV13V16Iainfix <V16V12Aainfix <=c0V16FAasorted_subV13c0V12Aainfix =ainfix +ainfix -V12ainfix +V11c1c1anum_ofaTuple2V3V10c0V0FFIainfix <=c1V11Iainfix <V10akAainfix <=c0V10Iainfix =anum_ofaTuple2V8V17c0V7anum_ofaTuple2V3V17c0V0Iainfix <V17V10Aainfix <=c0V17FAainfix <agetV8V18V10Aainfix <=c0agetV8V18Iainfix <V18V7Aainfix <=c0V18FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V3V10c0V0Iainfix <=V10ainfix -akc1Aainfix <=c0V10FFFIainfix <=c0ainfix -akc1Iainfix =agetV6V19anum_ofaTuple2V3V19c0ainfix +ainfix -V0c1c1Iainfix <V19akAainfix <=c0V19FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
+        expanded="false"
+        shape="Lamk arrayV1V2Lamk arrayV0V3LagetV6V9ainfix <agetV12V13ainfix +V9c1Iainfix <V13V11Aainfix <=c0V13FIainfix =anum_ofaTuple2V12V9c0V11ainfix -ainfix +V10c1c1Aainfix =anum_ofaTuple2V12V14c0V11anum_ofaTuple2V3V14c0V0Iainfix <V14V9Aainfix <=c0V14FAainfix <=agetV12V15V9Aainfix <=c0agetV12V15Iainfix <V15V11Aainfix <=c0V15FAasorted_subV12c0V11Aainfix =ainfix +ainfix -V11ainfix +V10c1c1anum_ofaTuple2V3V9c0V0FFIainfix <=c1V10Iainfix <V9akAainfix <=c0V9Iainfix =anum_ofaTuple2V8V16c0V7anum_ofaTuple2V3V16c0V0Iainfix <V16V9Aainfix <=c0V16FAainfix <agetV8V17V9Aainfix <=c0agetV8V17Iainfix <V17V7Aainfix <=c0V17FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V3V9c0V0Iainfix <=V9ainfix -akc1Aainfix <=c0V9FFFIainfix <=c0ainfix -akc1Iainfix =agetV6V18anum_ofaTuple2V3V18c0ainfix +ainfix -V0c1c1Iainfix <V18akAainfix <=c0V18FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
         <label
          name="expl:parameter counting_sort">
          </label>
@@ -785,30 +869,10 @@
         locfile="examples/programs/counting_sort/../counting_sort.mlw"
         loclnum="65" loccnumb="6" loccnume="19"
         expl="for loop preservation"
-        sum="50fdfe4458b7774d9aaf284a555c56ea"
+        sum="d584550b9e9272ae6f5d2d0b3b9a28c9"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV1V2Lamk arrayV0V3Lamk arrayV1V8LagetV6V10ainfix <agetV13V14ainfix +V10c1Iainfix <V14V12Aainfix <=c0V14FIainfix =anum_ofaTuple2V13V10c0V12ainfix -ainfix +V11c1c1Aainfix =anum_ofaTuple2V13V15c0V12anum_ofaTuple2V3V15c0V0Iainfix <V15V10Aainfix <=c0V15FAainfix <=agetV13V16V10Aainfix <=c0agetV13V16Iainfix <V16V12Aainfix <=c0V16FAasorted_subV13c0V12Aainfix =ainfix +ainfix -V12ainfix +V11c1c1anum_ofaTuple2V3V10c0V0FFIainfix <=c1V11Iainfix <V10akAainfix <=c0V10Iainfix =anum_ofaTuple2V8V17c0V7anum_ofaTuple2V3V17c0V0Iainfix <V17V10Aainfix <=c0V17FAainfix <agetV8V18V10Aainfix <=c0agetV8V18Iainfix <V18V7Aainfix <=c0V18FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V3V10c0V0Iainfix <=V10ainfix -akc1Aainfix <=c0V10FFFIainfix <=c0ainfix -akc1Iainfix =agetV6V19anum_ofaTuple2V3V19c0ainfix +ainfix -V0c1c1Iainfix <V19akAainfix <=c0V19FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
-        <label
-         name="expl:parameter counting_sort">
-         </label>
-        <proof
-         prover="0"
-         timelimit="10"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.01"/>
-        </proof>
-       </goal>
-       <goal
-        name="WP_parameter counting_sort.13.13"
-        locfile="examples/programs/counting_sort/../counting_sort.mlw"
-        loclnum="65" loccnumb="6" loccnume="19"
-        expl="for loop preservation"
-        sum="da223b64090eefe311af5b8279389507"
-        proved="true"
-        expanded="true"
-        shape="Lamk arrayV1V2Lamk arrayV0V3Lamk arrayV1V8LagetV6V10ainfix =anum_ofaTuple2V13V14c0V12anum_ofaTuple2V3V14c0V0Iainfix <V14ainfix +V10c1Aainfix <=c0V14FIainfix =anum_ofaTuple2V13V10c0V12ainfix -ainfix +V11c1c1Aainfix =anum_ofaTuple2V13V15c0V12anum_ofaTuple2V3V15c0V0Iainfix <V15V10Aainfix <=c0V15FAainfix <=agetV13V16V10Aainfix <=c0agetV13V16Iainfix <V16V12Aainfix <=c0V16FAasorted_subV13c0V12Aainfix =ainfix +ainfix -V12ainfix +V11c1c1anum_ofaTuple2V3V10c0V0FFIainfix <=c1V11Iainfix <V10akAainfix <=c0V10Iainfix =anum_ofaTuple2V8V17c0V7anum_ofaTuple2V3V17c0V0Iainfix <V17V10Aainfix <=c0V17FAainfix <agetV8V18V10Aainfix <=c0agetV8V18Iainfix <V18V7Aainfix <=c0V18FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V3V10c0V0Iainfix <=V10ainfix -akc1Aainfix <=c0V10FFFIainfix <=c0ainfix -akc1Iainfix =agetV6V19anum_ofaTuple2V3V19c0ainfix +ainfix -V0c1c1Iainfix <V19akAainfix <=c0V19FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
+        expanded="false"
+        shape="Lamk arrayV1V2Lamk arrayV0V3LagetV6V9ainfix =anum_ofaTuple2V12V13c0V11anum_ofaTuple2V3V13c0V0Iainfix <V13ainfix +V9c1Aainfix <=c0V13FIainfix =anum_ofaTuple2V12V9c0V11ainfix -ainfix +V10c1c1Aainfix =anum_ofaTuple2V12V14c0V11anum_ofaTuple2V3V14c0V0Iainfix <V14V9Aainfix <=c0V14FAainfix <=agetV12V15V9Aainfix <=c0agetV12V15Iainfix <V15V11Aainfix <=c0V15FAasorted_subV12c0V11Aainfix =ainfix +ainfix -V11ainfix +V10c1c1anum_ofaTuple2V3V9c0V0FFIainfix <=c1V10Iainfix <V9akAainfix <=c0V9Iainfix =anum_ofaTuple2V8V16c0V7anum_ofaTuple2V3V16c0V0Iainfix <V16V9Aainfix <=c0V16FAainfix <agetV8V17V9Aainfix <=c0agetV8V17Iainfix <V17V7Aainfix <=c0V17FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V3V9c0V0Iainfix <=V9ainfix -akc1Aainfix <=c0V9FFFIainfix <=c0ainfix -akc1Iainfix =agetV6V18anum_ofaTuple2V3V18c0ainfix +ainfix -V0c1c1Iainfix <V18akAainfix <=c0V18FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
         <label
          name="expl:parameter counting_sort">
          </label>
@@ -827,10 +891,10 @@
       locfile="examples/programs/counting_sort/../counting_sort.mlw"
       loclnum="65" loccnumb="6" loccnume="19"
       expl="assertion"
-      sum="424ec1a2b31b07e391451a5d584c4fb0"
+      sum="8fa94a03f5e752c2a4e4390c8cf148b7"
       proved="true"
-      expanded="true"
-      shape="Lamk arrayV1V2Lamk arrayV0V3Lamk arrayV1V8ainfix =V7V1Iainfix =anum_ofaTuple2V8V10c0V7anum_ofaTuple2V3V10c0V0Iainfix <V10ainfix +ainfix -akc1c1Aainfix <=c0V10FAainfix <agetV8V11ainfix +ainfix -akc1c1Aainfix <=c0agetV8V11Iainfix <V11V7Aainfix <=c0V11FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V3ainfix +ainfix -akc1c1c0V0FFIainfix <=c0ainfix -akc1Iainfix =agetV6V12anum_ofaTuple2V3V12c0ainfix +ainfix -V0c1c1Iainfix <V12akAainfix <=c0V12FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
+      expanded="false"
+      shape="Lamk arrayV1V2Lamk arrayV0V3ainfix =V7V1Iainfix =anum_ofaTuple2V8V9c0V7anum_ofaTuple2V3V9c0V0Iainfix <V9ainfix +ainfix -akc1c1Aainfix <=c0V9FAainfix <agetV8V10ainfix +ainfix -akc1c1Aainfix <=c0agetV8V10Iainfix <V10V7Aainfix <=c0V10FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V3ainfix +ainfix -akc1c1c0V0FFIainfix <=c0ainfix -akc1Iainfix =agetV6V11anum_ofaTuple2V3V11c0ainfix +ainfix -V0c1c1Iainfix <V11akAainfix <=c0V11FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
       <label
        name="expl:parameter counting_sort">
        </label>
@@ -839,7 +903,7 @@
        timelimit="10"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.16"/>
+       <result status="valid" time="0.17"/>
       </proof>
      </goal>
      <goal
@@ -847,10 +911,10 @@
       locfile="examples/programs/counting_sort/../counting_sort.mlw"
       loclnum="65" loccnumb="6" loccnume="19"
       expl="normal postcondition"
-      sum="85f4f3efa9b6f0075a6406d117de3cf0"
+      sum="8fde8a3fedae33cead60e318e569e2d6"
       proved="true"
-      expanded="true"
-      shape="Lamk arrayV1V2Lamk arrayV0V3Lamk arrayV1V8apermutV5V9AasortedV9Iainfix =V7V1Iainfix =anum_ofaTuple2V8V10c0V7anum_ofaTuple2V3V10c0V0Iainfix <V10ainfix +ainfix -akc1c1Aainfix <=c0V10FAainfix <agetV8V11ainfix +ainfix -akc1c1Aainfix <=c0agetV8V11Iainfix <V11V7Aainfix <=c0V11FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V3ainfix +ainfix -akc1c1c0V0FFIainfix <=c0ainfix -akc1Iainfix =agetV6V12anum_ofaTuple2V3V12c0ainfix +ainfix -V0c1c1Iainfix <V12akAainfix <=c0V12FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
+      expanded="false"
+      shape="Lamk arrayV1V2Lamk arrayV0V3apermutV5amk arrayV1V8Aasorted_subV8c0V1Iainfix =V7V1Iainfix =anum_ofaTuple2V8V9c0V7anum_ofaTuple2V3V9c0V0Iainfix <V9ainfix +ainfix -akc1c1Aainfix <=c0V9FAainfix <agetV8V10ainfix +ainfix -akc1c1Aainfix <=c0agetV8V10Iainfix <V10V7Aainfix <=c0V10FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V3ainfix +ainfix -akc1c1c0V0FFIainfix <=c0ainfix -akc1Iainfix =agetV6V11anum_ofaTuple2V3V11c0ainfix +ainfix -V0c1c1Iainfix <V11akAainfix <=c0V11FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix =V0V1Aainfix <=c0V0Aak_valuesV5FFFF">
       <label
        name="expl:parameter counting_sort">
        </label>
@@ -859,7 +923,7 @@
        timelimit="20"
        obsolete="false"
        archived="false">
-       <result status="valid" time="5.76"/>
+       <result status="valid" time="6.10"/>
       </proof>
      </goal>
     </transf>
@@ -870,31 +934,31 @@
    locfile="examples/programs/counting_sort/../counting_sort.mlw"
    loclnum="94" loccnumb="7" loccnume="26"
    verified="true"
-   expanded="true">
+   expanded="false">
    <goal
     name="WP_parameter in_place_counting_sort"
     locfile="examples/programs/counting_sort/../counting_sort.mlw"
     loclnum="100" loccnumb="6" loccnume="28"
     expl="parameter in_place_counting_sort"
-    sum="25b8aa9a968fbb73c1689e89cff6b268"
+    sum="00cd251f7ec43d33b6bdeec8552fc84b"
     proved="true"
-    expanded="true"
-    shape="Lamk arrayV0V1Lamk arrayV0V5apermutV2V6AasortedV6Aainfix =V4V0Iainfix =anum_ofaTuple2V5V7c0V4anum_ofaTuple2V1V7c0V0Iainfix <V7ainfix +ainfix -akc1c1Aainfix <=c0V7FAainfix <agetV5V8ainfix +ainfix -akc1c1Aainfix <=c0agetV5V8Iainfix <V8V4Aainfix <=c0V8FAasorted_subV5c0V4Aainfix =V4anum_ofaTuple2V1ainfix +ainfix -akc1c1c0V0ALagetV3V9ainfix =anum_ofaTuple2V12V13c0V11anum_ofaTuple2V1V13c0V0Iainfix <V13ainfix +V9c1Aainfix <=c0V13FAainfix <agetV12V14ainfix +V9c1Aainfix <=c0agetV12V14Iainfix <V14V11Aainfix <=c0V14FAasorted_subV12c0V11Aainfix =V11anum_ofaTuple2V1ainfix +V9c1c0V0Iainfix =anum_ofaTuple2V12V9c0V11ainfix -ainfix +V10c1c1Aainfix =anum_ofaTuple2V12V15c0V11anum_ofaTuple2V1V15c0V0Iainfix <V15V9Aainfix <=c0V15FAainfix <=agetV12V16V9Aainfix <=c0agetV12V16Iainfix <V16V11Aainfix <=c0V16FAasorted_subV12c0V11Aainfix =ainfix +ainfix -V11ainfix +V10c1c1anum_ofaTuple2V1V9c0V0Aainfix =anum_ofaTuple2V18V9c0V19ainfix -ainfix +V17c1c1Aainfix =anum_ofaTuple2V18V20c0V19anum_ofaTuple2V1V20c0V0Iainfix <V20V9Aainfix <=c0V20FAainfix <=agetV18V21V9Aainfix <=c0agetV18V21Iainfix <V21V19Aainfix <=c0V21FAasorted_subV18c0V19Aainfix =ainfix +ainfix -V19ainfix +V17c1c1anum_ofaTuple2V1V9c0V0Iainfix =V19ainfix +V11c1FIainfix =V18asetV12V11V9FAainfix <V11V0Aainfix <=c0V11Iainfix =anum_ofaTuple2V12V9c0V11ainfix -V17c1Aainfix =anum_ofaTuple2V12V22c0V11anum_ofaTuple2V1V22c0V0Iainfix <V22V9Aainfix <=c0V22FAainfix <=agetV12V23V9Aainfix <=c0agetV12V23Iainfix <V23V11Aainfix <=c0V23FAasorted_subV12c0V11Aainfix =ainfix +ainfix -V11V17c1anum_ofaTuple2V1V9c0V0Iainfix <=V17V10Aainfix <=c1V17FFFAainfix =anum_ofaTuple2V5V9c0V4ainfix -c1c1Aainfix =anum_ofaTuple2V5V24c0V4anum_ofaTuple2V1V24c0V0Iainfix <V24V9Aainfix <=c0V24FAainfix <=agetV5V25V9Aainfix <=c0agetV5V25Iainfix <V25V4Aainfix <=c0V25FAasorted_subV5c0V4Aainfix =ainfix +ainfix -V4c1c1anum_ofaTuple2V1V9c0V0Iainfix <=c1V10Aainfix =anum_ofaTuple2V5V26c0V4anum_ofaTuple2V1V26c0V0Iainfix <V26ainfix +V9c1Aainfix <=c0V26FAainfix <agetV5V27ainfix +V9c1Aainfix <=c0agetV5V27Iainfix <V27V4Aainfix <=c0V27FAasorted_subV5c0V4Aainfix =V4anum_ofaTuple2V1ainfix +V9c1c0V0Iainfix >c1V10Aainfix <V9akAainfix <=c0V9Iainfix =anum_ofaTuple2V5V28c0V4anum_ofaTuple2V1V28c0V0Iainfix <V28V9Aainfix <=c0V28FAainfix <agetV5V29V9Aainfix <=c0agetV5V29Iainfix <V29V4Aainfix <=c0V29FAasorted_subV5c0V4Aainfix =V4anum_ofaTuple2V1V9c0V0Iainfix <=V9ainfix -akc1Aainfix <=c0V9FFFAainfix =anum_ofaTuple2V1V30c0c0anum_ofaTuple2V1V30c0V0Iainfix <V30c0Aainfix <=c0V30FAainfix <agetV1V31c0Aainfix <=c0agetV1V31Iainfix <V31c0Aainfix <=c0V31FAasorted_subV1c0c0Aainfix =c0anum_ofaTuple2V1c0c0V0Iainfix <=c0ainfix -akc1AapermutV2V2AasortedV2Aainfix =c0V0Iainfix >c0ainfix -akc1Iainfix =agetV3V32anum_ofaTuple2V1V32c0ainfix +ainfix -V0c1c1Iainfix <V32akAainfix <=c0V32FALagetV1V33ainfix =agetV35V36anum_ofaTuple2V1V36c0ainfix +V33c1Iainfix <V36akAainfix <=c0V36FIainfix =V35asetV3V34ainfix +agetV3V34c1FAainfix <V34akAainfix <=c0V34Aainfix <V34akAainfix <=c0V34Aainfix <V33V0Aainfix <=c0V33Iainfix =agetV3V37anum_ofaTuple2V1V37c0V33Iainfix <V37akAainfix <=c0V37FIainfix <=V33ainfix -V0c1Aainfix <=c0V33FFAainfix =agetaconstc0V38anum_ofaTuple2V1V38c0c0Iainfix <V38akAainfix <=c0V38FIainfix <=c0ainfix -V0c1ALamk arrayV0V40apermutV2V41AasortedV41Aainfix =V39V0Iainfix =anum_ofaTuple2V40V42c0V39anum_ofaTuple2V1V42c0V0Iainfix <V42ainfix +ainfix -akc1c1Aainfix <=c0V42FAainfix <agetV40V43ainfix +ainfix -akc1c1Aainfix <=c0agetV40V43Iainfix <V43V39Aainfix <=c0V43FAasorted_subV40c0V39Aainfix =V39anum_ofaTuple2V1ainfix +ainfix -akc1c1c0V0ALagetaconstc0V44ainfix =anum_ofaTuple2V47V48c0V46anum_ofaTuple2V1V48c0V0Iainfix <V48ainfix +V44c1Aainfix <=c0V48FAainfix <agetV47V49ainfix +V44c1Aainfix <=c0agetV47V49Iainfix <V49V46Aainfix <=c0V49FAasorted_subV47c0V46Aainfix =V46anum_ofaTuple2V1ainfix +V44c1c0V0Iainfix =anum_ofaTuple2V47V44c0V46ainfix -ainfix +V45c1c1Aainfix =anum_ofaTuple2V47V50c0V46anum_ofaTuple2V1V50c0V0Iainfix <V50V44Aainfix <=c0V50FAainfix <=agetV47V51V44Aainfix <=c0agetV47V51Iainfix <V51V46Aainfix <=c0V51FAasorted_subV47c0V46Aainfix =ainfix +ainfix -V46ainfix +V45c1c1anum_ofaTuple2V1V44c0V0Aainfix =anum_ofaTuple2V53V44c0V54ainfix -ainfix +V52c1c1Aainfix =anum_ofaTuple2V53V55c0V54anum_ofaTuple2V1V55c0V0Iainfix <V55V44Aainfix <=c0V55FAainfix <=agetV53V56V44Aainfix <=c0agetV53V56Iainfix <V56V54Aainfix <=c0V56FAasorted_subV53c0V54Aainfix =ainfix +ainfix -V54ainfix +V52c1c1anum_ofaTuple2V1V44c0V0Iainfix =V54ainfix +V46c1FIainfix =V53asetV47V46V44FAainfix <V46V0Aainfix <=c0V46Iainfix =anum_ofaTuple2V47V44c0V46ainfix -V52c1Aainfix =anum_ofaTuple2V47V57c0V46anum_ofaTuple2V1V57c0V0Iainfix <V57V44Aainfix <=c0V57FAainfix <=agetV47V58V44Aainfix <=c0agetV47V58Iainfix <V58V46Aainfix <=c0V58FAasorted_subV47c0V46Aainfix =ainfix +ainfix -V46V52c1anum_ofaTuple2V1V44c0V0Iainfix <=V52V45Aainfix <=c1V52FFFAainfix =anum_ofaTuple2V40V44c0V39ainfix -c1c1Aainfix =anum_ofaTuple2V40V59c0V39anum_ofaTuple2V1V59c0V0Iainfix <V59V44Aainfix <=c0V59FAainfix <=agetV40V60V44Aainfix <=c0agetV40V60Iainfix <V60V39Aainfix <=c0V60FAasorted_subV40c0V39Aainfix =ainfix +ainfix -V39c1c1anum_ofaTuple2V1V44c0V0Iainfix <=c1V45Aainfix =anum_ofaTuple2V40V61c0V39anum_ofaTuple2V1V61c0V0Iainfix <V61ainfix +V44c1Aainfix <=c0V61FAainfix <agetV40V62ainfix +V44c1Aainfix <=c0agetV40V62Iainfix <V62V39Aainfix <=c0V62FAasorted_subV40c0V39Aainfix =V39anum_ofaTuple2V1ainfix +V44c1c0V0Iainfix >c1V45Aainfix <V44akAainfix <=c0V44Iainfix =anum_ofaTuple2V40V63c0V39anum_ofaTuple2V1V63c0V0Iainfix <V63V44Aainfix <=c0V63FAainfix <agetV40V64V44Aainfix <=c0agetV40V64Iainfix <V64V39Aainfix <=c0V64FAasorted_subV40c0V39Aainfix =V39anum_ofaTuple2V1V44c0V0Iainfix <=V44ainfix -akc1Aainfix <=c0V44FFFAainfix =anum_ofaTuple2V1V65c0c0anum_ofaTuple2V1V65c0V0Iainfix <V65c0Aainfix <=c0V65FAainfix <agetV1V66c0Aainfix <=c0agetV1V66Iainfix <V66c0Aainfix <=c0V66FAasorted_subV1c0c0Aainfix =c0anum_ofaTuple2V1c0c0V0Iainfix <=c0ainfix -akc1AapermutV2V2AasortedV2Aainfix =c0V0Iainfix >c0ainfix -akc1Iainfix >c0ainfix -V0c1Aainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
+    expanded="false"
+    shape="Lamk arrayV0V1apermutV2amk arrayV0V5Aasorted_subV5c0V0Aainfix =V4V0Iainfix =anum_ofaTuple2V5V6c0V4anum_ofaTuple2V1V6c0V0Iainfix <V6ainfix +ainfix -akc1c1Aainfix <=c0V6FAainfix <agetV5V7ainfix +ainfix -akc1c1Aainfix <=c0agetV5V7Iainfix <V7V4Aainfix <=c0V7FAasorted_subV5c0V4Aainfix =V4anum_ofaTuple2V1ainfix +ainfix -akc1c1c0V0ALagetV3V8ainfix =anum_ofaTuple2V11V12c0V10anum_ofaTuple2V1V12c0V0Iainfix <V12ainfix +V8c1Aainfix <=c0V12FAainfix <agetV11V13ainfix +V8c1Aainfix <=c0agetV11V13Iainfix <V13V10Aainfix <=c0V13FAasorted_subV11c0V10Aainfix =V10anum_ofaTuple2V1ainfix +V8c1c0V0Iainfix =anum_ofaTuple2V11V8c0V10ainfix -ainfix +V9c1c1Aainfix =anum_ofaTuple2V11V14c0V10anum_ofaTuple2V1V14c0V0Iainfix <V14V8Aainfix <=c0V14FAainfix <=agetV11V15V8Aainfix <=c0agetV11V15Iainfix <V15V10Aainfix <=c0V15FAasorted_subV11c0V10Aainfix =ainfix +ainfix -V10ainfix +V9c1c1anum_ofaTuple2V1V8c0V0Aainfix =anum_ofaTuple2V17V8c0V18ainfix -ainfix +V16c1c1Aainfix =anum_ofaTuple2V17V19c0V18anum_ofaTuple2V1V19c0V0Iainfix <V19V8Aainfix <=c0V19FAainfix <=agetV17V20V8Aainfix <=c0agetV17V20Iainfix <V20V18Aainfix <=c0V20FAasorted_subV17c0V18Aainfix =ainfix +ainfix -V18ainfix +V16c1c1anum_ofaTuple2V1V8c0V0Iainfix =V18ainfix +V10c1FIainfix =V17asetV11V10V8FAainfix <V10V0Aainfix <=c0V10Iainfix =anum_ofaTuple2V11V8c0V10ainfix -V16c1Aainfix =anum_ofaTuple2V11V21c0V10anum_ofaTuple2V1V21c0V0Iainfix <V21V8Aainfix <=c0V21FAainfix <=agetV11V22V8Aainfix <=c0agetV11V22Iainfix <V22V10Aainfix <=c0V22FAasorted_subV11c0V10Aainfix =ainfix +ainfix -V10V16c1anum_ofaTuple2V1V8c0V0Iainfix <=V16V9Aainfix <=c1V16FFFAainfix =anum_ofaTuple2V5V8c0V4ainfix -c1c1Aainfix =anum_ofaTuple2V5V23c0V4anum_ofaTuple2V1V23c0V0Iainfix <V23V8Aainfix <=c0V23FAainfix <=agetV5V24V8Aainfix <=c0agetV5V24Iainfix <V24V4Aainfix <=c0V24FAasorted_subV5c0V4Aainfix =ainfix +ainfix -V4c1c1anum_ofaTuple2V1V8c0V0Iainfix <=c1V9Aainfix =anum_ofaTuple2V5V25c0V4anum_ofaTuple2V1V25c0V0Iainfix <V25ainfix +V8c1Aainfix <=c0V25FAainfix <agetV5V26ainfix +V8c1Aainfix <=c0agetV5V26Iainfix <V26V4Aainfix <=c0V26FAasorted_subV5c0V4Aainfix =V4anum_ofaTuple2V1ainfix +V8c1c0V0Iainfix >c1V9Aainfix <V8akAainfix <=c0V8Iainfix =anum_ofaTuple2V5V27c0V4anum_ofaTuple2V1V27c0V0Iainfix <V27V8Aainfix <=c0V27FAainfix <agetV5V28V8Aainfix <=c0agetV5V28Iainfix <V28V4Aainfix <=c0V28FAasorted_subV5c0V4Aainfix =V4anum_ofaTuple2V1V8c0V0Iainfix <=V8ainfix -akc1Aainfix <=c0V8FFFAainfix =anum_ofaTuple2V1V29c0c0anum_ofaTuple2V1V29c0V0Iainfix <V29c0Aainfix <=c0V29FAainfix <agetV1V30c0Aainfix <=c0agetV1V30Iainfix <V30c0Aainfix <=c0V30FAasorted_subV1c0c0Aainfix =c0anum_ofaTuple2V1c0c0V0Iainfix <=c0ainfix -akc1AapermutV2V2Aasorted_subV1c0V0Aainfix =c0V0Iainfix >c0ainfix -akc1Iainfix =agetV3V31anum_ofaTuple2V1V31c0ainfix +ainfix -V0c1c1Iainfix <V31akAainfix <=c0V31FALagetV1V32ainfix =agetV34V35anum_ofaTuple2V1V35c0ainfix +V32c1Iainfix <V35akAainfix <=c0V35FIainfix =V34asetV3V33ainfix +agetV3V33c1FAainfix <V33akAainfix <=c0V33Aainfix <V33akAainfix <=c0V33Aainfix <V32V0Aainfix <=c0V32Iainfix =agetV3V36anum_ofaTuple2V1V36c0V32Iainfix <V36akAainfix <=c0V36FIainfix <=V32ainfix -V0c1Aainfix <=c0V32FFAainfix =agetaconstc0V37anum_ofaTuple2V1V37c0c0Iainfix <V37akAainfix <=c0V37FIainfix <=c0ainfix -V0c1AapermutV2amk arrayV0V39Aasorted_subV39c0V0Aainfix =V38V0Iainfix =anum_ofaTuple2V39V40c0V38anum_ofaTuple2V1V40c0V0Iainfix <V40ainfix +ainfix -akc1c1Aainfix <=c0V40FAainfix <agetV39V41ainfix +ainfix -akc1c1Aainfix <=c0agetV39V41Iainfix <V41V38Aainfix <=c0V41FAasorted_subV39c0V38Aainfix =V38anum_ofaTuple2V1ainfix +ainfix -akc1c1c0V0ALagetaconstc0V42ainfix =anum_ofaTuple2V45V46c0V44anum_ofaTuple2V1V46c0V0Iainfix <V46ainfix +V42c1Aainfix <=c0V46FAainfix <agetV45V47ainfix +V42c1Aainfix <=c0agetV45V47Iainfix <V47V44Aainfix <=c0V47FAasorted_subV45c0V44Aainfix =V44anum_ofaTuple2V1ainfix +V42c1c0V0Iainfix =anum_ofaTuple2V45V42c0V44ainfix -ainfix +V43c1c1Aainfix =anum_ofaTuple2V45V48c0V44anum_ofaTuple2V1V48c0V0Iainfix <V48V42Aainfix <=c0V48FAainfix <=agetV45V49V42Aainfix <=c0agetV45V49Iainfix <V49V44Aainfix <=c0V49FAasorted_subV45c0V44Aainfix =ainfix +ainfix -V44ainfix +V43c1c1anum_ofaTuple2V1V42c0V0Aainfix =anum_ofaTuple2V51V42c0V52ainfix -ainfix +V50c1c1Aainfix =anum_ofaTuple2V51V53c0V52anum_ofaTuple2V1V53c0V0Iainfix <V53V42Aainfix <=c0V53FAainfix <=agetV51V54V42Aainfix <=c0agetV51V54Iainfix <V54V52Aainfix <=c0V54FAasorted_subV51c0V52Aainfix =ainfix +ainfix -V52ainfix +V50c1c1anum_ofaTuple2V1V42c0V0Iainfix =V52ainfix +V44c1FIainfix =V51asetV45V44V42FAainfix <V44V0Aainfix <=c0V44Iainfix =anum_ofaTuple2V45V42c0V44ainfix -V50c1Aainfix =anum_ofaTuple2V45V55c0V44anum_ofaTuple2V1V55c0V0Iainfix <V55V42Aainfix <=c0V55FAainfix <=agetV45V56V42Aainfix <=c0agetV45V56Iainfix <V56V44Aainfix <=c0V56FAasorted_subV45c0V44Aainfix =ainfix +ainfix -V44V50c1anum_ofaTuple2V1V42c0V0Iainfix <=V50V43Aainfix <=c1V50FFFAainfix =anum_ofaTuple2V39V42c0V38ainfix -c1c1Aainfix =anum_ofaTuple2V39V57c0V38anum_ofaTuple2V1V57c0V0Iainfix <V57V42Aainfix <=c0V57FAainfix <=agetV39V58V42Aainfix <=c0agetV39V58Iainfix <V58V38Aainfix <=c0V58FAasorted_subV39c0V38Aainfix =ainfix +ainfix -V38c1c1anum_ofaTuple2V1V42c0V0Iainfix <=c1V43Aainfix =anum_ofaTuple2V39V59c0V38anum_ofaTuple2V1V59c0V0Iainfix <V59ainfix +V42c1Aainfix <=c0V59FAainfix <agetV39V60ainfix +V42c1Aainfix <=c0agetV39V60Iainfix <V60V38Aainfix <=c0V60FAasorted_subV39c0V38Aainfix =V38anum_ofaTuple2V1ainfix +V42c1c0V0Iainfix >c1V43Aainfix <V42akAainfix <=c0V42Iainfix =anum_ofaTuple2V39V61c0V38anum_ofaTuple2V1V61c0V0Iainfix <V61V42Aainfix <=c0V61FAainfix <agetV39V62V42Aainfix <=c0agetV39V62Iainfix <V62V38Aainfix <=c0V62FAasorted_subV39c0V38Aainfix =V38anum_ofaTuple2V1V42c0V0Iainfix <=V42ainfix -akc1Aainfix <=c0V42FFFAainfix =anum_ofaTuple2V1V63c0c0anum_ofaTuple2V1V63c0V0Iainfix <V63c0Aainfix <=c0V63FAainfix <agetV1V64c0Aainfix <=c0agetV1V64Iainfix <V64c0Aainfix <=c0V64FAasorted_subV1c0c0Aainfix =c0anum_ofaTuple2V1c0c0V0Iainfix <=c0ainfix -akc1AapermutV2V2Aasorted_subV1c0V0Aainfix =c0V0Iainfix >c0ainfix -akc1Iainfix >c0ainfix -V0c1Aainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
     <label
      name="expl:parameter in_place_counting_sort">
      </label>
     <transf
      name="split_goal"
      proved="true"
-     expanded="true">
+     expanded="false">
      <goal
       name="WP_parameter in_place_counting_sort.1"
       locfile="examples/programs/counting_sort/../counting_sort.mlw"
       loclnum="100" loccnumb="6" loccnume="28"
       expl="precondition"
-      sum="dff12ed52119d396cb88833dfab3b31f"
+      sum="a0c3c3e1eb45f7890956b4debdd94dd2"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="Lamk arrayV0V1ainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
       <label
        name="expl:parameter in_place_counting_sort">
@@ -904,7 +968,7 @@
        timelimit="10"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.00"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
@@ -912,9 +976,9 @@
       locfile="examples/programs/counting_sort/../counting_sort.mlw"
       loclnum="100" loccnumb="6" loccnume="28"
       expl="assertion"
-      sum="4e091eb3f178cb126a67d0e2092faee7"
+      sum="165cdbea2fcd53a18604b97ac168dc78"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="Lamk arrayV0V1ainfix =c0V0Iainfix >c0ainfix -akc1Iainfix >c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
       <label
        name="expl:parameter in_place_counting_sort">
@@ -932,10 +996,10 @@
       locfile="examples/programs/counting_sort/../counting_sort.mlw"
       loclnum="100" loccnumb="6" loccnume="28"
       expl="normal postcondition"
-      sum="cb0132dc169a8ca691d197481d9605d0"
+      sum="211be22ba3200ab3e657692af918cef9"
       proved="true"
-      expanded="true"
-      shape="Lamk arrayV0V1apermutV2V2AasortedV2Iainfix =c0V0Iainfix >c0ainfix -akc1Iainfix >c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
+      expanded="false"
+      shape="Lamk arrayV0V1apermutV2V2Aasorted_subV1c0V0Iainfix =c0V0Iainfix >c0ainfix -akc1Iainfix >c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
       <label
        name="expl:parameter in_place_counting_sort">
        </label>
@@ -944,7 +1008,7 @@
        timelimit="10"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.00"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
@@ -952,9 +1016,9 @@
       locfile="examples/programs/counting_sort/../counting_sort.mlw"
       loclnum="100" loccnumb="6" loccnume="28"
       expl="for loop initialization"
-      sum="5477f065f20892d0b4c3647f9b036be1"
+      sum="e57665dfb28cb45ea60b1fbe11ba8adb"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="Lamk arrayV0V1ainfix =anum_ofaTuple2V1V3c0c0anum_ofaTuple2V1V3c0V0Iainfix <V3c0Aainfix <=c0V3FAainfix <agetV1V4c0Aainfix <=c0agetV1V4Iainfix <V4c0Aainfix <=c0V4FAasorted_subV1c0c0Aainfix =c0anum_ofaTuple2V1c0c0V0Iainfix <=c0ainfix -akc1Iainfix >c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
       <label
        name="expl:parameter in_place_counting_sort">
@@ -964,7 +1028,7 @@
        timelimit="10"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
@@ -972,10 +1036,10 @@
       locfile="examples/programs/counting_sort/../counting_sort.mlw"
       loclnum="100" loccnumb="6" loccnume="28"
       expl="for loop preservation"
-      sum="2e7ee149319f526e8f5bc52c7580476e"
+      sum="d1f61e18737163f90f31bb973bdba578"
       proved="true"
-      expanded="true"
-      shape="Lamk arrayV0V1Lamk arrayV0V4Lagetaconstc0V6ainfix =anum_ofaTuple2V9V10c0V8anum_ofaTuple2V1V10c0V0Iainfix <V10ainfix +V6c1Aainfix <=c0V10FAainfix <agetV9V11ainfix +V6c1Aainfix <=c0agetV9V11Iainfix <V11V8Aainfix <=c0V11FAasorted_subV9c0V8Aainfix =V8anum_ofaTuple2V1ainfix +V6c1c0V0Iainfix =anum_ofaTuple2V9V6c0V8ainfix -ainfix +V7c1c1Aainfix =anum_ofaTuple2V9V12c0V8anum_ofaTuple2V1V12c0V0Iainfix <V12V6Aainfix <=c0V12FAainfix <=agetV9V13V6Aainfix <=c0agetV9V13Iainfix <V13V8Aainfix <=c0V13FAasorted_subV9c0V8Aainfix =ainfix +ainfix -V8ainfix +V7c1c1anum_ofaTuple2V1V6c0V0Aainfix =anum_ofaTuple2V15V6c0V16ainfix -ainfix +V14c1c1Aainfix =anum_ofaTuple2V15V17c0V16anum_ofaTuple2V1V17c0V0Iainfix <V17V6Aainfix <=c0V17FAainfix <=agetV15V18V6Aainfix <=c0agetV15V18Iainfix <V18V16Aainfix <=c0V18FAasorted_subV15c0V16Aainfix =ainfix +ainfix -V16ainfix +V14c1c1anum_ofaTuple2V1V6c0V0Iainfix =V16ainfix +V8c1FIainfix =V15asetV9V8V6FAainfix <V8V0Aainfix <=c0V8Iainfix =anum_ofaTuple2V9V6c0V8ainfix -V14c1Aainfix =anum_ofaTuple2V9V19c0V8anum_ofaTuple2V1V19c0V0Iainfix <V19V6Aainfix <=c0V19FAainfix <=agetV9V20V6Aainfix <=c0agetV9V20Iainfix <V20V8Aainfix <=c0V20FAasorted_subV9c0V8Aainfix =ainfix +ainfix -V8V14c1anum_ofaTuple2V1V6c0V0Iainfix <=V14V7Aainfix <=c1V14FFFAainfix =anum_ofaTuple2V4V6c0V3ainfix -c1c1Aainfix =anum_ofaTuple2V4V21c0V3anum_ofaTuple2V1V21c0V0Iainfix <V21V6Aainfix <=c0V21FAainfix <=agetV4V22V6Aainfix <=c0agetV4V22Iainfix <V22V3Aainfix <=c0V22FAasorted_subV4c0V3Aainfix =ainfix +ainfix -V3c1c1anum_ofaTuple2V1V6c0V0Iainfix <=c1V7Aainfix =anum_ofaTuple2V4V23c0V3anum_ofaTuple2V1V23c0V0Iainfix <V23ainfix +V6c1Aainfix <=c0V23FAainfix <agetV4V24ainfix +V6c1Aainfix <=c0agetV4V24Iainfix <V24V3Aainfix <=c0V24FAasorted_subV4c0V3Aainfix =V3anum_ofaTuple2V1ainfix +V6c1c0V0Iainfix >c1V7Aainfix <V6akAainfix <=c0V6Iainfix =anum_ofaTuple2V4V25c0V3anum_ofaTuple2V1V25c0V0Iainfix <V25V6Aainfix <=c0V25FAainfix <agetV4V26V6Aainfix <=c0agetV4V26Iainfix <V26V3Aainfix <=c0V26FAasorted_subV4c0V3Aainfix =V3anum_ofaTuple2V1V6c0V0Iainfix <=V6ainfix -akc1Aainfix <=c0V6FFFIainfix <=c0ainfix -akc1Iainfix >c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
+      expanded="false"
+      shape="Lamk arrayV0V1Lagetaconstc0V5ainfix =anum_ofaTuple2V8V9c0V7anum_ofaTuple2V1V9c0V0Iainfix <V9ainfix +V5c1Aainfix <=c0V9FAainfix <agetV8V10ainfix +V5c1Aainfix <=c0agetV8V10Iainfix <V10V7Aainfix <=c0V10FAasorted_subV8c0V7Aainfix =V7anum_ofaTuple2V1ainfix +V5c1c0V0Iainfix =anum_ofaTuple2V8V5c0V7ainfix -ainfix +V6c1c1Aainfix =anum_ofaTuple2V8V11c0V7anum_ofaTuple2V1V11c0V0Iainfix <V11V5Aainfix <=c0V11FAainfix <=agetV8V12V5Aainfix <=c0agetV8V12Iainfix <V12V7Aainfix <=c0V12FAasorted_subV8c0V7Aainfix =ainfix +ainfix -V7ainfix +V6c1c1anum_ofaTuple2V1V5c0V0Aainfix =anum_ofaTuple2V14V5c0V15ainfix -ainfix +V13c1c1Aainfix =anum_ofaTuple2V14V16c0V15anum_ofaTuple2V1V16c0V0Iainfix <V16V5Aainfix <=c0V16FAainfix <=agetV14V17V5Aainfix <=c0agetV14V17Iainfix <V17V15Aainfix <=c0V17FAasorted_subV14c0V15Aainfix =ainfix +ainfix -V15ainfix +V13c1c1anum_ofaTuple2V1V5c0V0Iainfix =V15ainfix +V7c1FIainfix =V14asetV8V7V5FAainfix <V7V0Aainfix <=c0V7Iainfix =anum_ofaTuple2V8V5c0V7ainfix -V13c1Aainfix =anum_ofaTuple2V8V18c0V7anum_ofaTuple2V1V18c0V0Iainfix <V18V5Aainfix <=c0V18FAainfix <=agetV8V19V5Aainfix <=c0agetV8V19Iainfix <V19V7Aainfix <=c0V19FAasorted_subV8c0V7Aainfix =ainfix +ainfix -V7V13c1anum_ofaTuple2V1V5c0V0Iainfix <=V13V6Aainfix <=c1V13FFFAainfix =anum_ofaTuple2V4V5c0V3ainfix -c1c1Aainfix =anum_ofaTuple2V4V20c0V3anum_ofaTuple2V1V20c0V0Iainfix <V20V5Aainfix <=c0V20FAainfix <=agetV4V21V5Aainfix <=c0agetV4V21Iainfix <V21V3Aainfix <=c0V21FAasorted_subV4c0V3Aainfix =ainfix +ainfix -V3c1c1anum_ofaTuple2V1V5c0V0Iainfix <=c1V6Aainfix =anum_ofaTuple2V4V22c0V3anum_ofaTuple2V1V22c0V0Iainfix <V22ainfix +V5c1Aainfix <=c0V22FAainfix <agetV4V23ainfix +V5c1Aainfix <=c0agetV4V23Iainfix <V23V3Aainfix <=c0V23FAasorted_subV4c0V3Aainfix =V3anum_ofaTuple2V1ainfix +V5c1c0V0Iainfix >c1V6Aainfix <V5akAainfix <=c0V5Iainfix =anum_ofaTuple2V4V24c0V3anum_ofaTuple2V1V24c0V0Iainfix <V24V5Aainfix <=c0V24FAainfix <agetV4V25V5Aainfix <=c0agetV4V25Iainfix <V25V3Aainfix <=c0V25FAasorted_subV4c0V3Aainfix =V3anum_ofaTuple2V1V5c0V0Iainfix <=V5ainfix -akc1Aainfix <=c0V5FFFIainfix <=c0ainfix -akc1Iainfix >c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
       <label
        name="expl:parameter in_place_counting_sort">
        </label>
@@ -992,50 +1056,10 @@
       locfile="examples/programs/counting_sort/../counting_sort.mlw"
       loclnum="100" loccnumb="6" loccnume="28"
       expl="assertion"
-      sum="62692060c6c88c1cefa9a7f0c202f175"
+      sum="aac965ae7ed8299f93c48252595df8a1"
       proved="true"
-      expanded="true"
-      shape="Lamk arrayV0V1Lamk arrayV0V4ainfix =V3V0Iainfix =anum_ofaTuple2V4V6c0V3anum_ofaTuple2V1V6c0V0Iainfix <V6ainfix +ainfix -akc1c1Aainfix <=c0V6FAainfix <agetV4V7ainfix +ainfix -akc1c1Aainfix <=c0agetV4V7Iainfix <V7V3Aainfix <=c0V7FAasorted_subV4c0V3Aainfix =V3anum_ofaTuple2V1ainfix +ainfix -akc1c1c0V0FFIainfix <=c0ainfix -akc1Iainfix >c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
-      <label
-       name="expl:parameter in_place_counting_sort">
-       </label>
-      <proof
-       prover="0"
-       timelimit="10"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter in_place_counting_sort.7"
-      locfile="examples/programs/counting_sort/../counting_sort.mlw"
-      loclnum="100" loccnumb="6" loccnume="28"
-      expl="normal postcondition"
-      sum="cb480af363bf591e27b79ab96a4fdac8"
-      proved="true"
-      expanded="true"
-      shape="Lamk arrayV0V1Lamk arrayV0V4apermutV2V5AasortedV5Iainfix =V3V0Iainfix =anum_ofaTuple2V4V6c0V3anum_ofaTuple2V1V6c0V0Iainfix <V6ainfix +ainfix -akc1c1Aainfix <=c0V6FAainfix <agetV4V7ainfix +ainfix -akc1c1Aainfix <=c0agetV4V7Iainfix <V7V3Aainfix <=c0V7FAasorted_subV4c0V3Aainfix =V3anum_ofaTuple2V1ainfix +ainfix -akc1c1c0V0FFIainfix <=c0ainfix -akc1Iainfix >c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
-      <label
-       name="expl:parameter in_place_counting_sort">
-       </label>
-      <proof
-       prover="0"
-       timelimit="10"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.16"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter in_place_counting_sort.8"
-      locfile="examples/programs/counting_sort/../counting_sort.mlw"
-      loclnum="100" loccnumb="6" loccnume="28"
-      expl="for loop initialization"
-      sum="7267872dce4f4322ee25d0c5e594a66e"
-      proved="true"
-      expanded="true"
-      shape="Lamk arrayV0V1ainfix =agetaconstc0V3anum_ofaTuple2V1V3c0c0Iainfix <V3akAainfix <=c0V3FIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
+      expanded="false"
+      shape="Lamk arrayV0V1ainfix =V3V0Iainfix =anum_ofaTuple2V4V5c0V3anum_ofaTuple2V1V5c0V0Iainfix <V5ainfix +ainfix -akc1c1Aainfix <=c0V5FAainfix <agetV4V6ainfix +ainfix -akc1c1Aainfix <=c0agetV4V6Iainfix <V6V3Aainfix <=c0V6FAasorted_subV4c0V3Aainfix =V3anum_ofaTuple2V1ainfix +ainfix -akc1c1c0V0FFIainfix <=c0ainfix -akc1Iainfix >c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
       <label
        name="expl:parameter in_place_counting_sort">
        </label>
@@ -1048,13 +1072,53 @@
       </proof>
      </goal>
      <goal
+      name="WP_parameter in_place_counting_sort.7"
+      locfile="examples/programs/counting_sort/../counting_sort.mlw"
+      loclnum="100" loccnumb="6" loccnume="28"
+      expl="normal postcondition"
+      sum="12cdf7a59d4a45a374fa81c393cb011e"
+      proved="true"
+      expanded="false"
+      shape="Lamk arrayV0V1apermutV2amk arrayV0V4Aasorted_subV4c0V0Iainfix =V3V0Iainfix =anum_ofaTuple2V4V5c0V3anum_ofaTuple2V1V5c0V0Iainfix <V5ainfix +ainfix -akc1c1Aainfix <=c0V5FAainfix <agetV4V6ainfix +ainfix -akc1c1Aainfix <=c0agetV4V6Iainfix <V6V3Aainfix <=c0V6FAasorted_subV4c0V3Aainfix =V3anum_ofaTuple2V1ainfix +ainfix -akc1c1c0V0FFIainfix <=c0ainfix -akc1Iainfix >c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
+      <label
+       name="expl:parameter in_place_counting_sort">
+       </label>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.15"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter in_place_counting_sort.8"
+      locfile="examples/programs/counting_sort/../counting_sort.mlw"
+      loclnum="100" loccnumb="6" loccnume="28"
+      expl="for loop initialization"
+      sum="fd09450a47f3cb23629341e6e3717bbd"
+      proved="true"
+      expanded="false"
+      shape="Lamk arrayV0V1ainfix =agetaconstc0V3anum_ofaTuple2V1V3c0c0Iainfix <V3akAainfix <=c0V3FIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
+      <label
+       name="expl:parameter in_place_counting_sort">
+       </label>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
       name="WP_parameter in_place_counting_sort.9"
       locfile="examples/programs/counting_sort/../counting_sort.mlw"
       loclnum="100" loccnumb="6" loccnume="28"
       expl="for loop preservation"
-      sum="113adc7e0982669de0c58dbcf53879aa"
+      sum="f6a802179e63bdeb4894b3b01c178b66"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="Lamk arrayV0V1LagetV1V4ainfix =agetV6V7anum_ofaTuple2V1V7c0ainfix +V4c1Iainfix <V7akAainfix <=c0V7FIainfix =V6asetV3V5ainfix +agetV3V5c1FAainfix <V5akAainfix <=c0V5Aainfix <V5akAainfix <=c0V5Aainfix <V4V0Aainfix <=c0V4Iainfix =agetV3V8anum_ofaTuple2V1V8c0V4Iainfix <V8akAainfix <=c0V8FIainfix <=V4ainfix -V0c1Aainfix <=c0V4FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
       <label
        name="expl:parameter in_place_counting_sort">
@@ -1064,7 +1128,7 @@
        timelimit="10"
        obsolete="false"
        archived="false">
-       <result status="valid" time="1.86"/>
+       <result status="valid" time="1.84"/>
       </proof>
      </goal>
      <goal
@@ -1072,9 +1136,9 @@
       locfile="examples/programs/counting_sort/../counting_sort.mlw"
       loclnum="100" loccnumb="6" loccnume="28"
       expl="assertion"
-      sum="e4e7eed50a356d84f27f43f0962b3cec"
+      sum="6e79c9a90bd64e31244c4367dc6010cc"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="Lamk arrayV0V1ainfix =c0V0Iainfix >c0ainfix -akc1Iainfix =agetV3V4anum_ofaTuple2V1V4c0ainfix +ainfix -V0c1c1Iainfix <V4akAainfix <=c0V4FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
       <label
        name="expl:parameter in_place_counting_sort">
@@ -1092,10 +1156,10 @@
       locfile="examples/programs/counting_sort/../counting_sort.mlw"
       loclnum="100" loccnumb="6" loccnume="28"
       expl="normal postcondition"
-      sum="1baf0c479ddea49ecdf65945dbff35f4"
+      sum="910305123b80d566b6ab9ea8d68cba02"
       proved="true"
-      expanded="true"
-      shape="Lamk arrayV0V1apermutV2V2AasortedV2Iainfix =c0V0Iainfix >c0ainfix -akc1Iainfix =agetV3V4anum_ofaTuple2V1V4c0ainfix +ainfix -V0c1c1Iainfix <V4akAainfix <=c0V4FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
+      expanded="false"
+      shape="Lamk arrayV0V1apermutV2V2Aasorted_subV1c0V0Iainfix =c0V0Iainfix >c0ainfix -akc1Iainfix =agetV3V4anum_ofaTuple2V1V4c0ainfix +ainfix -V0c1c1Iainfix <V4akAainfix <=c0V4FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
       <label
        name="expl:parameter in_place_counting_sort">
        </label>
@@ -1104,7 +1168,7 @@
        timelimit="10"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.00"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
@@ -1112,9 +1176,9 @@
       locfile="examples/programs/counting_sort/../counting_sort.mlw"
       loclnum="100" loccnumb="6" loccnume="28"
       expl="for loop initialization"
-      sum="6f33f51ee8378cbe276d496bc5e56b27"
+      sum="abe20198f89f97f529bf57082ee20fad"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="Lamk arrayV0V1ainfix =anum_ofaTuple2V1V4c0c0anum_ofaTuple2V1V4c0V0Iainfix <V4c0Aainfix <=c0V4FAainfix <agetV1V5c0Aainfix <=c0agetV1V5Iainfix <V5c0Aainfix <=c0V5FAasorted_subV1c0c0Aainfix =c0anum_ofaTuple2V1c0c0V0Iainfix <=c0ainfix -akc1Iainfix =agetV3V6anum_ofaTuple2V1V6c0ainfix +ainfix -V0c1c1Iainfix <V6akAainfix <=c0V6FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
       <label
        name="expl:parameter in_place_counting_sort">
@@ -1122,15 +1186,15 @@
       <transf
        name="split_goal"
        proved="true"
-       expanded="true">
+       expanded="false">
        <goal
         name="WP_parameter in_place_counting_sort.12.1"
         locfile="examples/programs/counting_sort/../counting_sort.mlw"
         loclnum="100" loccnumb="6" loccnume="28"
         expl="parameter in_place_counting_sort"
-        sum="3e1be4b9de2431ee90f9ca2fd9cea075"
+        sum="9004b2744d855a96da653773c8950512"
         proved="true"
-        expanded="true"
+        expanded="false"
         shape="Lamk arrayV0V1ainfix =c0anum_ofaTuple2V1c0c0V0Iainfix <=c0ainfix -akc1Iainfix =agetV3V4anum_ofaTuple2V1V4c0ainfix +ainfix -V0c1c1Iainfix <V4akAainfix <=c0V4FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
         <label
          name="expl:parameter in_place_counting_sort">
@@ -1140,7 +1204,7 @@
          timelimit="10"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.08"/>
+         <result status="valid" time="0.09"/>
         </proof>
        </goal>
        <goal
@@ -1148,9 +1212,9 @@
         locfile="examples/programs/counting_sort/../counting_sort.mlw"
         loclnum="100" loccnumb="6" loccnume="28"
         expl="parameter in_place_counting_sort"
-        sum="f1327f443bf24f5e07dab8cc8334e1d1"
+        sum="e20e106d7cc69658bda2423acccc9625"
         proved="true"
-        expanded="true"
+        expanded="false"
         shape="Lamk arrayV0V1asorted_subV1c0c0Iainfix <=c0ainfix -akc1Iainfix =agetV3V4anum_ofaTuple2V1V4c0ainfix +ainfix -V0c1c1Iainfix <V4akAainfix <=c0V4FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
         <label
          name="expl:parameter in_place_counting_sort">
@@ -1168,9 +1232,9 @@
         locfile="examples/programs/counting_sort/../counting_sort.mlw"
         loclnum="100" loccnumb="6" loccnume="28"
         expl="parameter in_place_counting_sort"
-        sum="79b8f0054d5530bb4c09c694a963e172"
+        sum="6630162d51919d88a80618fb166a56ac"
         proved="true"
-        expanded="true"
+        expanded="false"
         shape="Lamk arrayV0V1ainfix <=c0agetV1V4Iainfix <V4c0Aainfix <=c0V4FIainfix <=c0ainfix -akc1Iainfix =agetV3V5anum_ofaTuple2V1V5c0ainfix +ainfix -V0c1c1Iainfix <V5akAainfix <=c0V5FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
         <label
          name="expl:parameter in_place_counting_sort">
@@ -1180,7 +1244,7 @@
          timelimit="10"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.00"/>
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
        <goal
@@ -1188,9 +1252,9 @@
         locfile="examples/programs/counting_sort/../counting_sort.mlw"
         loclnum="100" loccnumb="6" loccnume="28"
         expl="parameter in_place_counting_sort"
-        sum="68498e20f8e115fd016ff1f54c482c2b"
+        sum="e1b16b42940f80984b718ac231656e5f"
         proved="true"
-        expanded="true"
+        expanded="false"
         shape="Lamk arrayV0V1ainfix <agetV1V4c0Iainfix <V4c0Aainfix <=c0V4FIainfix <=c0ainfix -akc1Iainfix =agetV3V5anum_ofaTuple2V1V5c0ainfix +ainfix -V0c1c1Iainfix <V5akAainfix <=c0V5FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
         <label
          name="expl:parameter in_place_counting_sort">
@@ -1208,9 +1272,9 @@
         locfile="examples/programs/counting_sort/../counting_sort.mlw"
         loclnum="100" loccnumb="6" loccnume="28"
         expl="parameter in_place_counting_sort"
-        sum="b32e415588de07d0902bc275dad1fcb1"
+        sum="7a0dde85e59f0842ae1a52bb97a77102"
         proved="true"
-        expanded="true"
+        expanded="false"
         shape="Lamk arrayV0V1ainfix =anum_ofaTuple2V1V4c0c0anum_ofaTuple2V1V4c0V0Iainfix <V4c0Aainfix <=c0V4FIainfix <=c0ainfix -akc1Iainfix =agetV3V5anum_ofaTuple2V1V5c0ainfix +ainfix -V0c1c1Iainfix <V5akAainfix <=c0V5FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
         <label
          name="expl:parameter in_place_counting_sort">
@@ -1230,26 +1294,26 @@
       locfile="examples/programs/counting_sort/../counting_sort.mlw"
       loclnum="100" loccnumb="6" loccnume="28"
       expl="for loop preservation"
-      sum="70679d734157f3816b2f31474e875097"
+      sum="da35f420709b5d82042abc967a66dbee"
       proved="true"
-      expanded="true"
-      shape="Lamk arrayV0V1Lamk arrayV0V5LagetV3V7ainfix =anum_ofaTuple2V10V11c0V9anum_ofaTuple2V1V11c0V0Iainfix <V11ainfix +V7c1Aainfix <=c0V11FAainfix <agetV10V12ainfix +V7c1Aainfix <=c0agetV10V12Iainfix <V12V9Aainfix <=c0V12FAasorted_subV10c0V9Aainfix =V9anum_ofaTuple2V1ainfix +V7c1c0V0Iainfix =anum_ofaTuple2V10V7c0V9ainfix -ainfix +V8c1c1Aainfix =anum_ofaTuple2V10V13c0V9anum_ofaTuple2V1V13c0V0Iainfix <V13V7Aainfix <=c0V13FAainfix <=agetV10V14V7Aainfix <=c0agetV10V14Iainfix <V14V9Aainfix <=c0V14FAasorted_subV10c0V9Aainfix =ainfix +ainfix -V9ainfix +V8c1c1anum_ofaTuple2V1V7c0V0Aainfix =anum_ofaTuple2V16V7c0V17ainfix -ainfix +V15c1c1Aainfix =anum_ofaTuple2V16V18c0V17anum_ofaTuple2V1V18c0V0Iainfix <V18V7Aainfix <=c0V18FAainfix <=agetV16V19V7Aainfix <=c0agetV16V19Iainfix <V19V17Aainfix <=c0V19FAasorted_subV16c0V17Aainfix =ainfix +ainfix -V17ainfix +V15c1c1anum_ofaTuple2V1V7c0V0Iainfix =V17ainfix +V9c1FIainfix =V16asetV10V9V7FAainfix <V9V0Aainfix <=c0V9Iainfix =anum_ofaTuple2V10V7c0V9ainfix -V15c1Aainfix =anum_ofaTuple2V10V20c0V9anum_ofaTuple2V1V20c0V0Iainfix <V20V7Aainfix <=c0V20FAainfix <=agetV10V21V7Aainfix <=c0agetV10V21Iainfix <V21V9Aainfix <=c0V21FAasorted_subV10c0V9Aainfix =ainfix +ainfix -V9V15c1anum_ofaTuple2V1V7c0V0Iainfix <=V15V8Aainfix <=c1V15FFFAainfix =anum_ofaTuple2V5V7c0V4ainfix -c1c1Aainfix =anum_ofaTuple2V5V22c0V4anum_ofaTuple2V1V22c0V0Iainfix <V22V7Aainfix <=c0V22FAainfix <=agetV5V23V7Aainfix <=c0agetV5V23Iainfix <V23V4Aainfix <=c0V23FAasorted_subV5c0V4Aainfix =ainfix +ainfix -V4c1c1anum_ofaTuple2V1V7c0V0Iainfix <=c1V8Aainfix =anum_ofaTuple2V5V24c0V4anum_ofaTuple2V1V24c0V0Iainfix <V24ainfix +V7c1Aainfix <=c0V24FAainfix <agetV5V25ainfix +V7c1Aainfix <=c0agetV5V25Iainfix <V25V4Aainfix <=c0V25FAasorted_subV5c0V4Aainfix =V4anum_ofaTuple2V1ainfix +V7c1c0V0Iainfix >c1V8Aainfix <V7akAainfix <=c0V7Iainfix =anum_ofaTuple2V5V26c0V4anum_ofaTuple2V1V26c0V0Iainfix <V26V7Aainfix <=c0V26FAainfix <agetV5V27V7Aainfix <=c0agetV5V27Iainfix <V27V4Aainfix <=c0V27FAasorted_subV5c0V4Aainfix =V4anum_ofaTuple2V1V7c0V0Iainfix <=V7ainfix -akc1Aainfix <=c0V7FFFIainfix <=c0ainfix -akc1Iainfix =agetV3V28anum_ofaTuple2V1V28c0ainfix +ainfix -V0c1c1Iainfix <V28akAainfix <=c0V28FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
+      expanded="false"
+      shape="Lamk arrayV0V1LagetV3V6ainfix =anum_ofaTuple2V9V10c0V8anum_ofaTuple2V1V10c0V0Iainfix <V10ainfix +V6c1Aainfix <=c0V10FAainfix <agetV9V11ainfix +V6c1Aainfix <=c0agetV9V11Iainfix <V11V8Aainfix <=c0V11FAasorted_subV9c0V8Aainfix =V8anum_ofaTuple2V1ainfix +V6c1c0V0Iainfix =anum_ofaTuple2V9V6c0V8ainfix -ainfix +V7c1c1Aainfix =anum_ofaTuple2V9V12c0V8anum_ofaTuple2V1V12c0V0Iainfix <V12V6Aainfix <=c0V12FAainfix <=agetV9V13V6Aainfix <=c0agetV9V13Iainfix <V13V8Aainfix <=c0V13FAasorted_subV9c0V8Aainfix =ainfix +ainfix -V8ainfix +V7c1c1anum_ofaTuple2V1V6c0V0Aainfix =anum_ofaTuple2V15V6c0V16ainfix -ainfix +V14c1c1Aainfix =anum_ofaTuple2V15V17c0V16anum_ofaTuple2V1V17c0V0Iainfix <V17V6Aainfix <=c0V17FAainfix <=agetV15V18V6Aainfix <=c0agetV15V18Iainfix <V18V16Aainfix <=c0V18FAasorted_subV15c0V16Aainfix =ainfix +ainfix -V16ainfix +V14c1c1anum_ofaTuple2V1V6c0V0Iainfix =V16ainfix +V8c1FIainfix =V15asetV9V8V6FAainfix <V8V0Aainfix <=c0V8Iainfix =anum_ofaTuple2V9V6c0V8ainfix -V14c1Aainfix =anum_ofaTuple2V9V19c0V8anum_ofaTuple2V1V19c0V0Iainfix <V19V6Aainfix <=c0V19FAainfix <=agetV9V20V6Aainfix <=c0agetV9V20Iainfix <V20V8Aainfix <=c0V20FAasorted_subV9c0V8Aainfix =ainfix +ainfix -V8V14c1anum_ofaTuple2V1V6c0V0Iainfix <=V14V7Aainfix <=c1V14FFFAainfix =anum_ofaTuple2V5V6c0V4ainfix -c1c1Aainfix =anum_ofaTuple2V5V21c0V4anum_ofaTuple2V1V21c0V0Iainfix <V21V6Aainfix <=c0V21FAainfix <=agetV5V22V6Aainfix <=c0agetV5V22Iainfix <V22V4Aainfix <=c0V22FAasorted_subV5c0V4Aainfix =ainfix +ainfix -V4c1c1anum_ofaTuple2V1V6c0V0Iainfix <=c1V7Aainfix =anum_ofaTuple2V5V23c0V4anum_ofaTuple2V1V23c0V0Iainfix <V23ainfix +V6c1Aainfix <=c0V23FAainfix <agetV5V24ainfix +V6c1Aainfix <=c0agetV5V24Iainfix <V24V4Aainfix <=c0V24FAasorted_subV5c0V4Aainfix =V4anum_ofaTuple2V1ainfix +V6c1c0V0Iainfix >c1V7Aainfix <V6akAainfix <=c0V6Iainfix =anum_ofaTuple2V5V25c0V4anum_ofaTuple2V1V25c0V0Iainfix <V25V6Aainfix <=c0V25FAainfix <agetV5V26V6Aainfix <=c0agetV5V26Iainfix <V26V4Aainfix <=c0V26FAasorted_subV5c0V4Aainfix =V4anum_ofaTuple2V1V6c0V0Iainfix <=V6ainfix -akc1Aainfix <=c0V6FFFIainfix <=c0ainfix -akc1Iainfix =agetV3V27anum_ofaTuple2V1V27c0ainfix +ainfix -V0c1c1Iainfix <V27akAainfix <=c0V27FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
       <label
        name="expl:parameter in_place_counting_sort">
        </label>
       <transf
        name="split_goal"
        proved="true"
-       expanded="true">
+       expanded="false">
        <goal
-        name="WP_parameter in_place_counting_sort.13.1"
+        name="WP_parameter in_place_counting_sort.13.0"
         locfile="examples/programs/counting_sort/../counting_sort.mlw"
         loclnum="100" loccnumb="6" loccnume="28"
         expl="for loop preservation"
-        sum="7fafddceed7c47533273f1f4d87ea9c5"
+        sum="9e6bafe351fc0fe5cef89ccd1821633f"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V1Lamk arrayV0V5ainfix <V7akAainfix <=c0V7Iainfix =anum_ofaTuple2V5V8c0V4anum_ofaTuple2V1V8c0V0Iainfix <V8V7Aainfix <=c0V8FAainfix <agetV5V9V7Aainfix <=c0agetV5V9Iainfix <V9V4Aainfix <=c0V9FAasorted_subV5c0V4Aainfix =V4anum_ofaTuple2V1V7c0V0Iainfix <=V7ainfix -akc1Aainfix <=c0V7FFFIainfix <=c0ainfix -akc1Iainfix =agetV3V10anum_ofaTuple2V1V10c0ainfix +ainfix -V0c1c1Iainfix <V10akAainfix <=c0V10FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
+        expanded="false"
+        shape="Lamk arrayV0V1ainfix <V6akAainfix <=c0V6Iainfix =anum_ofaTuple2V5V7c0V4anum_ofaTuple2V1V7c0V0Iainfix <V7V6Aainfix <=c0V7FAainfix <agetV5V8V6Aainfix <=c0agetV5V8Iainfix <V8V4Aainfix <=c0V8FAasorted_subV5c0V4Aainfix =V4anum_ofaTuple2V1V6c0V0Iainfix <=V6ainfix -akc1Aainfix <=c0V6FFFIainfix <=c0ainfix -akc1Iainfix =agetV3V9anum_ofaTuple2V1V9c0ainfix +ainfix -V0c1c1Iainfix <V9akAainfix <=c0V9FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
         <label
          name="expl:parameter in_place_counting_sort">
          </label>
@@ -1262,23 +1326,50 @@
         </proof>
        </goal>
        <goal
-        name="WP_parameter in_place_counting_sort.13.2"
+        name="WP_parameter in_place_counting_sort.13.1"
         locfile="examples/programs/counting_sort/../counting_sort.mlw"
         loclnum="100" loccnumb="6" loccnume="28"
         expl="for loop preservation"
-        sum="8213cf7c3f09885b49b226efcc0fd7ec"
+        sum="ea7410d9b462ce4a7aed99ab3ba1237c"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V1Lamk arrayV0V5LagetV3V7ainfix =V4anum_ofaTuple2V1ainfix +V7c1c0V0Iainfix >c1V8Iainfix <V7akAainfix <=c0V7Iainfix =anum_ofaTuple2V5V9c0V4anum_ofaTuple2V1V9c0V0Iainfix <V9V7Aainfix <=c0V9FAainfix <agetV5V10V7Aainfix <=c0agetV5V10Iainfix <V10V4Aainfix <=c0V10FAasorted_subV5c0V4Aainfix =V4anum_ofaTuple2V1V7c0V0Iainfix <=V7ainfix -akc1Aainfix <=c0V7FFFIainfix <=c0ainfix -akc1Iainfix =agetV3V11anum_ofaTuple2V1V11c0ainfix +ainfix -V0c1c1Iainfix <V11akAainfix <=c0V11FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
+        expanded="false"
+        shape="Lamk arrayV0V1LagetV3V6ainfix =V4anum_ofaTuple2V1ainfix +V6c1c0V0Iainfix >c1V7Iainfix <V6akAainfix <=c0V6Iainfix =anum_ofaTuple2V5V8c0V4anum_ofaTuple2V1V8c0V0Iainfix <V8V6Aainfix <=c0V8FAainfix <agetV5V9V6Aainfix <=c0agetV5V9Iainfix <V9V4Aainfix <=c0V9FAasorted_subV5c0V4Aainfix =V4anum_ofaTuple2V1V6c0V0Iainfix <=V6ainfix -akc1Aainfix <=c0V6FFFIainfix <=c0ainfix -akc1Iainfix =agetV3V10anum_ofaTuple2V1V10c0ainfix +ainfix -V0c1c1Iainfix <V10akAainfix <=c0V10FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
         <label
          name="expl:parameter in_place_counting_sort">
          </label>
         <proof
-         prover="1"
+         prover="0"
          timelimit="10"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.09"/>
+         <result status="timeout" time="10.09"/>
+        </proof>
+        <proof
+         prover="2"
+         timelimit="10"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.10"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter in_place_counting_sort.13.2"
+        locfile="examples/programs/counting_sort/../counting_sort.mlw"
+        loclnum="100" loccnumb="6" loccnume="28"
+        expl="for loop preservation"
+        sum="96dfa408dbd601c07c33d3d17233e62b"
+        proved="true"
+        expanded="false"
+        shape="Lamk arrayV0V1LagetV3V6asorted_subV5c0V4Iainfix >c1V7Iainfix <V6akAainfix <=c0V6Iainfix =anum_ofaTuple2V5V8c0V4anum_ofaTuple2V1V8c0V0Iainfix <V8V6Aainfix <=c0V8FAainfix <agetV5V9V6Aainfix <=c0agetV5V9Iainfix <V9V4Aainfix <=c0V9FAasorted_subV5c0V4Aainfix =V4anum_ofaTuple2V1V6c0V0Iainfix <=V6ainfix -akc1Aainfix <=c0V6FFFIainfix <=c0ainfix -akc1Iainfix =agetV3V10anum_ofaTuple2V1V10c0ainfix +ainfix -V0c1c1Iainfix <V10akAainfix <=c0V10FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
+        <label
+         name="expl:parameter in_place_counting_sort">
+         </label>
+        <proof
+         prover="0"
+         timelimit="10"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
        <goal
@@ -1286,10 +1377,10 @@
         locfile="examples/programs/counting_sort/../counting_sort.mlw"
         loclnum="100" loccnumb="6" loccnume="28"
         expl="for loop preservation"
-        sum="c76af474e7f0ad86b89353893d59a155"
+        sum="da8eff529e0a5b614a2189b068fea496"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V1Lamk arrayV0V5LagetV3V7asorted_subV5c0V4Iainfix >c1V8Iainfix <V7akAainfix <=c0V7Iainfix =anum_ofaTuple2V5V9c0V4anum_ofaTuple2V1V9c0V0Iainfix <V9V7Aainfix <=c0V9FAainfix <agetV5V10V7Aainfix <=c0agetV5V10Iainfix <V10V4Aainfix <=c0V10FAasorted_subV5c0V4Aainfix =V4anum_ofaTuple2V1V7c0V0Iainfix <=V7ainfix -akc1Aainfix <=c0V7FFFIainfix <=c0ainfix -akc1Iainfix =agetV3V11anum_ofaTuple2V1V11c0ainfix +ainfix -V0c1c1Iainfix <V11akAainfix <=c0V11FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
+        expanded="false"
+        shape="Lamk arrayV0V1LagetV3V6ainfix <=c0agetV5V8Iainfix <V8V4Aainfix <=c0V8FIainfix >c1V7Iainfix <V6akAainfix <=c0V6Iainfix =anum_ofaTuple2V5V9c0V4anum_ofaTuple2V1V9c0V0Iainfix <V9V6Aainfix <=c0V9FAainfix <agetV5V10V6Aainfix <=c0agetV5V10Iainfix <V10V4Aainfix <=c0V10FAasorted_subV5c0V4Aainfix =V4anum_ofaTuple2V1V6c0V0Iainfix <=V6ainfix -akc1Aainfix <=c0V6FFFIainfix <=c0ainfix -akc1Iainfix =agetV3V11anum_ofaTuple2V1V11c0ainfix +ainfix -V0c1c1Iainfix <V11akAainfix <=c0V11FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
         <label
          name="expl:parameter in_place_counting_sort">
          </label>
@@ -1306,10 +1397,10 @@
         locfile="examples/programs/counting_sort/../counting_sort.mlw"
         loclnum="100" loccnumb="6" loccnume="28"
         expl="for loop preservation"
-        sum="2c89129303bf8f0ba985d891a0452998"
+        sum="3f048508f6b4d18369e5175a27add5b4"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V1Lamk arrayV0V5LagetV3V7ainfix <=c0agetV5V9Iainfix <V9V4Aainfix <=c0V9FIainfix >c1V8Iainfix <V7akAainfix <=c0V7Iainfix =anum_ofaTuple2V5V10c0V4anum_ofaTuple2V1V10c0V0Iainfix <V10V7Aainfix <=c0V10FAainfix <agetV5V11V7Aainfix <=c0agetV5V11Iainfix <V11V4Aainfix <=c0V11FAasorted_subV5c0V4Aainfix =V4anum_ofaTuple2V1V7c0V0Iainfix <=V7ainfix -akc1Aainfix <=c0V7FFFIainfix <=c0ainfix -akc1Iainfix =agetV3V12anum_ofaTuple2V1V12c0ainfix +ainfix -V0c1c1Iainfix <V12akAainfix <=c0V12FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
+        expanded="false"
+        shape="Lamk arrayV0V1LagetV3V6ainfix <agetV5V8ainfix +V6c1Iainfix <V8V4Aainfix <=c0V8FIainfix >c1V7Iainfix <V6akAainfix <=c0V6Iainfix =anum_ofaTuple2V5V9c0V4anum_ofaTuple2V1V9c0V0Iainfix <V9V6Aainfix <=c0V9FAainfix <agetV5V10V6Aainfix <=c0agetV5V10Iainfix <V10V4Aainfix <=c0V10FAasorted_subV5c0V4Aainfix =V4anum_ofaTuple2V1V6c0V0Iainfix <=V6ainfix -akc1Aainfix <=c0V6FFFIainfix <=c0ainfix -akc1Iainfix =agetV3V11anum_ofaTuple2V1V11c0ainfix +ainfix -V0c1c1Iainfix <V11akAainfix <=c0V11FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
         <label
          name="expl:parameter in_place_counting_sort">
          </label>
@@ -1318,7 +1409,7 @@
          timelimit="10"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.00"/>
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
        <goal
@@ -1326,10 +1417,10 @@
         locfile="examples/programs/counting_sort/../counting_sort.mlw"
         loclnum="100" loccnumb="6" loccnume="28"
         expl="for loop preservation"
-        sum="5291cd28fe4c75bba40c5b455ab00637"
+        sum="1acf585592ed47a74ab0a876125fc1af"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V1Lamk arrayV0V5LagetV3V7ainfix <agetV5V9ainfix +V7c1Iainfix <V9V4Aainfix <=c0V9FIainfix >c1V8Iainfix <V7akAainfix <=c0V7Iainfix =anum_ofaTuple2V5V10c0V4anum_ofaTuple2V1V10c0V0Iainfix <V10V7Aainfix <=c0V10FAainfix <agetV5V11V7Aainfix <=c0agetV5V11Iainfix <V11V4Aainfix <=c0V11FAasorted_subV5c0V4Aainfix =V4anum_ofaTuple2V1V7c0V0Iainfix <=V7ainfix -akc1Aainfix <=c0V7FFFIainfix <=c0ainfix -akc1Iainfix =agetV3V12anum_ofaTuple2V1V12c0ainfix +ainfix -V0c1c1Iainfix <V12akAainfix <=c0V12FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
+        expanded="false"
+        shape="Lamk arrayV0V1LagetV3V6ainfix =anum_ofaTuple2V5V8c0V4anum_ofaTuple2V1V8c0V0Iainfix <V8ainfix +V6c1Aainfix <=c0V8FIainfix >c1V7Iainfix <V6akAainfix <=c0V6Iainfix =anum_ofaTuple2V5V9c0V4anum_ofaTuple2V1V9c0V0Iainfix <V9V6Aainfix <=c0V9FAainfix <agetV5V10V6Aainfix <=c0agetV5V10Iainfix <V10V4Aainfix <=c0V10FAasorted_subV5c0V4Aainfix =V4anum_ofaTuple2V1V6c0V0Iainfix <=V6ainfix -akc1Aainfix <=c0V6FFFIainfix <=c0ainfix -akc1Iainfix =agetV3V11anum_ofaTuple2V1V11c0ainfix +ainfix -V0c1c1Iainfix <V11akAainfix <=c0V11FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
         <label
          name="expl:parameter in_place_counting_sort">
          </label>
@@ -1338,23 +1429,10 @@
          timelimit="10"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.00"/>
+         <result status="timeout" time="10.03"/>
         </proof>
-       </goal>
-       <goal
-        name="WP_parameter in_place_counting_sort.13.6"
-        locfile="examples/programs/counting_sort/../counting_sort.mlw"
-        loclnum="100" loccnumb="6" loccnume="28"
-        expl="for loop preservation"
-        sum="7ba8ae2764656b50d9c7699ef5e447f0"
-        proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V1Lamk arrayV0V5LagetV3V7ainfix =anum_ofaTuple2V5V9c0V4anum_ofaTuple2V1V9c0V0Iainfix <V9ainfix +V7c1Aainfix <=c0V9FIainfix >c1V8Iainfix <V7akAainfix <=c0V7Iainfix =anum_ofaTuple2V5V10c0V4anum_ofaTuple2V1V10c0V0Iainfix <V10V7Aainfix <=c0V10FAainfix <agetV5V11V7Aainfix <=c0agetV5V11Iainfix <V11V4Aainfix <=c0V11FAasorted_subV5c0V4Aainfix =V4anum_ofaTuple2V1V7c0V0Iainfix <=V7ainfix -akc1Aainfix <=c0V7FFFIainfix <=c0ainfix -akc1Iainfix =agetV3V12anum_ofaTuple2V1V12c0ainfix +ainfix -V0c1c1Iainfix <V12akAainfix <=c0V12FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
-        <label
-         name="expl:parameter in_place_counting_sort">
-         </label>
         <proof
-         prover="1"
+         prover="2"
          timelimit="10"
          obsolete="false"
          archived="false">
@@ -1362,70 +1440,124 @@
         </proof>
        </goal>
        <goal
-        name="WP_parameter in_place_counting_sort.13.7"
+        name="WP_parameter in_place_counting_sort.13.6"
         locfile="examples/programs/counting_sort/../counting_sort.mlw"
         loclnum="100" loccnumb="6" loccnume="28"
         expl="for loop preservation"
-        sum="8c7e749600e1274675fab775c95e64bf"
+        sum="7aaa83541721d1e5d8b2e64bfd1dd04d"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V1Lamk arrayV0V5LagetV3V7ainfix =anum_ofaTuple2V5V7c0V4ainfix -c1c1Aainfix =anum_ofaTuple2V5V9c0V4anum_ofaTuple2V1V9c0V0Iainfix <V9V7Aainfix <=c0V9FAainfix <=agetV5V10V7Aainfix <=c0agetV5V10Iainfix <V10V4Aainfix <=c0V10FAasorted_subV5c0V4Aainfix =ainfix +ainfix -V4c1c1anum_ofaTuple2V1V7c0V0Iainfix <=c1V8Iainfix <V7akAainfix <=c0V7Iainfix =anum_ofaTuple2V5V11c0V4anum_ofaTuple2V1V11c0V0Iainfix <V11V7Aainfix <=c0V11FAainfix <agetV5V12V7Aainfix <=c0agetV5V12Iainfix <V12V4Aainfix <=c0V12FAasorted_subV5c0V4Aainfix =V4anum_ofaTuple2V1V7c0V0Iainfix <=V7ainfix -akc1Aainfix <=c0V7FFFIainfix <=c0ainfix -akc1Iainfix =agetV3V13anum_ofaTuple2V1V13c0ainfix +ainfix -V0c1c1Iainfix <V13akAainfix <=c0V13FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
+        expanded="false"
+        shape="Lamk arrayV0V1LagetV3V6ainfix =anum_ofaTuple2V5V6c0V4ainfix -c1c1Aainfix =anum_ofaTuple2V5V8c0V4anum_ofaTuple2V1V8c0V0Iainfix <V8V6Aainfix <=c0V8FAainfix <=agetV5V9V6Aainfix <=c0agetV5V9Iainfix <V9V4Aainfix <=c0V9FAasorted_subV5c0V4Aainfix =ainfix +ainfix -V4c1c1anum_ofaTuple2V1V6c0V0Iainfix <=c1V7Iainfix <V6akAainfix <=c0V6Iainfix =anum_ofaTuple2V5V10c0V4anum_ofaTuple2V1V10c0V0Iainfix <V10V6Aainfix <=c0V10FAainfix <agetV5V11V6Aainfix <=c0agetV5V11Iainfix <V11V4Aainfix <=c0V11FAasorted_subV5c0V4Aainfix =V4anum_ofaTuple2V1V6c0V0Iainfix <=V6ainfix -akc1Aainfix <=c0V6FFFIainfix <=c0ainfix -akc1Iainfix =agetV3V12anum_ofaTuple2V1V12c0ainfix +ainfix -V0c1c1Iainfix <V12akAainfix <=c0V12FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
         <label
          name="expl:parameter in_place_counting_sort">
          </label>
         <proof
-         prover="1"
+         prover="0"
          timelimit="10"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.05"/>
+         <result status="timeout" time="10.11"/>
+        </proof>
+        <proof
+         prover="2"
+         timelimit="10"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.12"/>
         </proof>
        </goal>
        <goal
-        name="WP_parameter in_place_counting_sort.13.8"
+        name="WP_parameter in_place_counting_sort.13.7"
         locfile="examples/programs/counting_sort/../counting_sort.mlw"
         loclnum="100" loccnumb="6" loccnume="28"
         expl="for loop preservation"
-        sum="7865508d993b1e8ad498e95bec606b21"
+        sum="b19b9ed623ec7c4a85c8f5a0ca4f1423"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V1Lamk arrayV0V5LagetV3V7ainfix =anum_ofaTuple2V12V7c0V13ainfix -ainfix +V11c1c1Aainfix =anum_ofaTuple2V12V14c0V13anum_ofaTuple2V1V14c0V0Iainfix <V14V7Aainfix <=c0V14FAainfix <=agetV12V15V7Aainfix <=c0agetV12V15Iainfix <V15V13Aainfix <=c0V15FAasorted_subV12c0V13Aainfix =ainfix +ainfix -V13ainfix +V11c1c1anum_ofaTuple2V1V7c0V0Iainfix =V13ainfix +V9c1FIainfix =V12asetV10V9V7FAainfix <V9V0Aainfix <=c0V9Iainfix =anum_ofaTuple2V10V7c0V9ainfix -V11c1Aainfix =anum_ofaTuple2V10V16c0V9anum_ofaTuple2V1V16c0V0Iainfix <V16V7Aainfix <=c0V16FAainfix <=agetV10V17V7Aainfix <=c0agetV10V17Iainfix <V17V9Aainfix <=c0V17FAasorted_subV10c0V9Aainfix =ainfix +ainfix -V9V11c1anum_ofaTuple2V1V7c0V0Iainfix <=V11V8Aainfix <=c1V11FFFIainfix <=c1V8Iainfix <V7akAainfix <=c0V7Iainfix =anum_ofaTuple2V5V18c0V4anum_ofaTuple2V1V18c0V0Iainfix <V18V7Aainfix <=c0V18FAainfix <agetV5V19V7Aainfix <=c0agetV5V19Iainfix <V19V4Aainfix <=c0V19FAasorted_subV5c0V4Aainfix =V4anum_ofaTuple2V1V7c0V0Iainfix <=V7ainfix -akc1Aainfix <=c0V7FFFIainfix <=c0ainfix -akc1Iainfix =agetV3V20anum_ofaTuple2V1V20c0ainfix +ainfix -V0c1c1Iainfix <V20akAainfix <=c0V20FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
+        expanded="false"
+        shape="Lamk arrayV0V1LagetV3V6ainfix =anum_ofaTuple2V11V6c0V12ainfix -ainfix +V10c1c1Aainfix =anum_ofaTuple2V11V13c0V12anum_ofaTuple2V1V13c0V0Iainfix <V13V6Aainfix <=c0V13FAainfix <=agetV11V14V6Aainfix <=c0agetV11V14Iainfix <V14V12Aainfix <=c0V14FAasorted_subV11c0V12Aainfix =ainfix +ainfix -V12ainfix +V10c1c1anum_ofaTuple2V1V6c0V0Iainfix =V12ainfix +V8c1FIainfix =V11asetV9V8V6FAainfix <V8V0Aainfix <=c0V8Iainfix =anum_ofaTuple2V9V6c0V8ainfix -V10c1Aainfix =anum_ofaTuple2V9V15c0V8anum_ofaTuple2V1V15c0V0Iainfix <V15V6Aainfix <=c0V15FAainfix <=agetV9V16V6Aainfix <=c0agetV9V16Iainfix <V16V8Aainfix <=c0V16FAasorted_subV9c0V8Aainfix =ainfix +ainfix -V8V10c1anum_ofaTuple2V1V6c0V0Iainfix <=V10V7Aainfix <=c1V10FFFIainfix <=c1V7Iainfix <V6akAainfix <=c0V6Iainfix =anum_ofaTuple2V5V17c0V4anum_ofaTuple2V1V17c0V0Iainfix <V17V6Aainfix <=c0V17FAainfix <agetV5V18V6Aainfix <=c0agetV5V18Iainfix <V18V4Aainfix <=c0V18FAasorted_subV5c0V4Aainfix =V4anum_ofaTuple2V1V6c0V0Iainfix <=V6ainfix -akc1Aainfix <=c0V6FFFIainfix <=c0ainfix -akc1Iainfix =agetV3V19anum_ofaTuple2V1V19c0ainfix +ainfix -V0c1c1Iainfix <V19akAainfix <=c0V19FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
         <label
          name="expl:parameter in_place_counting_sort">
          </label>
         <transf
          name="split_goal"
          proved="true"
-         expanded="true">
+         expanded="false">
          <goal
-          name="WP_parameter in_place_counting_sort.13.8.1"
+          name="WP_parameter in_place_counting_sort.13.7.0"
           locfile="examples/programs/counting_sort/../counting_sort.mlw"
           loclnum="100" loccnumb="6" loccnume="28"
           expl="for loop preservation"
-          sum="877d7468531640d080907e752624583f"
+          sum="4044e9e91e1322bd1a1c7ca9b3e21d6f"
           proved="true"
-          expanded="true"
-          shape="Lamk arrayV0V1Lamk arrayV0V5LagetV3V7ainfix <V9V0Aainfix <=c0V9Iainfix =anum_ofaTuple2V10V7c0V9ainfix -V11c1Aainfix =anum_ofaTuple2V10V12c0V9anum_ofaTuple2V1V12c0V0Iainfix <V12V7Aainfix <=c0V12FAainfix <=agetV10V13V7Aainfix <=c0agetV10V13Iainfix <V13V9Aainfix <=c0V13FAasorted_subV10c0V9Aainfix =ainfix +ainfix -V9V11c1anum_ofaTuple2V1V7c0V0Iainfix <=V11V8Aainfix <=c1V11FFFIainfix <=c1V8Iainfix <V7akAainfix <=c0V7Iainfix =anum_ofaTuple2V5V14c0V4anum_ofaTuple2V1V14c0V0Iainfix <V14V7Aainfix <=c0V14FAainfix <agetV5V15V7Aainfix <=c0agetV5V15Iainfix <V15V4Aainfix <=c0V15FAasorted_subV5c0V4Aainfix =V4anum_ofaTuple2V1V7c0V0Iainfix <=V7ainfix -akc1Aainfix <=c0V7FFFIainfix <=c0ainfix -akc1Iainfix =agetV3V16anum_ofaTuple2V1V16c0ainfix +ainfix -V0c1c1Iainfix <V16akAainfix <=c0V16FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
+          expanded="false"
+          shape="Lamk arrayV0V1LagetV3V6ainfix <V8V0Aainfix <=c0V8Iainfix =anum_ofaTuple2V9V6c0V8ainfix -V10c1Aainfix =anum_ofaTuple2V9V11c0V8anum_ofaTuple2V1V11c0V0Iainfix <V11V6Aainfix <=c0V11FAainfix <=agetV9V12V6Aainfix <=c0agetV9V12Iainfix <V12V8Aainfix <=c0V12FAasorted_subV9c0V8Aainfix =ainfix +ainfix -V8V10c1anum_ofaTuple2V1V6c0V0Iainfix <=V10V7Aainfix <=c1V10FFFIainfix <=c1V7Iainfix <V6akAainfix <=c0V6Iainfix =anum_ofaTuple2V5V13c0V4anum_ofaTuple2V1V13c0V0Iainfix <V13V6Aainfix <=c0V13FAainfix <agetV5V14V6Aainfix <=c0agetV5V14Iainfix <V14V4Aainfix <=c0V14FAasorted_subV5c0V4Aainfix =V4anum_ofaTuple2V1V6c0V0Iainfix <=V6ainfix -akc1Aainfix <=c0V6FFFIainfix <=c0ainfix -akc1Iainfix =agetV3V15anum_ofaTuple2V1V15c0ainfix +ainfix -V0c1c1Iainfix <V15akAainfix <=c0V15FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
           <label
            name="expl:parameter in_place_counting_sort">
            </label>
           <proof
-           prover="1"
+           prover="0"
            timelimit="10"
            obsolete="false"
            archived="false">
-           <result status="valid" time="0.80"/>
+           <result status="timeout" time="10.03"/>
+          </proof>
+          <proof
+           prover="2"
+           timelimit="10"
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="6.05"/>
           </proof>
          </goal>
          <goal
-          name="WP_parameter in_place_counting_sort.13.8.2"
+          name="WP_parameter in_place_counting_sort.13.7.1"
           locfile="examples/programs/counting_sort/../counting_sort.mlw"
           loclnum="100" loccnumb="6" loccnume="28"
           expl="for loop preservation"
-          sum="dc0d49c7a37118bdf79a11f7240c88f4"
+          sum="6549dbba5d53ac7ee853929826b10faa"
           proved="true"
-          expanded="true"
-          shape="Lamk arrayV0V1Lamk arrayV0V5LagetV3V7ainfix =ainfix +ainfix -V13ainfix +V11c1c1anum_ofaTuple2V1V7c0V0Iainfix =V13ainfix +V9c1FIainfix =V12asetV10V9V7FIainfix <V9V0Aainfix <=c0V9Iainfix =anum_ofaTuple2V10V7c0V9ainfix -V11c1Aainfix =anum_ofaTuple2V10V14c0V9anum_ofaTuple2V1V14c0V0Iainfix <V14V7Aainfix <=c0V14FAainfix <=agetV10V15V7Aainfix <=c0agetV10V15Iainfix <V15V9Aainfix <=c0V15FAasorted_subV10c0V9Aainfix =ainfix +ainfix -V9V11c1anum_ofaTuple2V1V7c0V0Iainfix <=V11V8Aainfix <=c1V11FFFIainfix <=c1V8Iainfix <V7akAainfix <=c0V7Iainfix =anum_ofaTuple2V5V16c0V4anum_ofaTuple2V1V16c0V0Iainfix <V16V7Aainfix <=c0V16FAainfix <agetV5V17V7Aainfix <=c0agetV5V17Iainfix <V17V4Aainfix <=c0V17FAasorted_subV5c0V4Aainfix =V4anum_ofaTuple2V1V7c0V0Iainfix <=V7ainfix -akc1Aainfix <=c0V7FFFIainfix <=c0ainfix -akc1Iainfix =agetV3V18anum_ofaTuple2V1V18c0ainfix +ainfix -V0c1c1Iainfix <V18akAainfix <=c0V18FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
+          expanded="false"
+          shape="Lamk arrayV0V1LagetV3V6ainfix =ainfix +ainfix -V12ainfix +V10c1c1anum_ofaTuple2V1V6c0V0Iainfix =V12ainfix +V8c1FIainfix =V11asetV9V8V6FIainfix <V8V0Aainfix <=c0V8Iainfix =anum_ofaTuple2V9V6c0V8ainfix -V10c1Aainfix =anum_ofaTuple2V9V13c0V8anum_ofaTuple2V1V13c0V0Iainfix <V13V6Aainfix <=c0V13FAainfix <=agetV9V14V6Aainfix <=c0agetV9V14Iainfix <V14V8Aainfix <=c0V14FAasorted_subV9c0V8Aainfix =ainfix +ainfix -V8V10c1anum_ofaTuple2V1V6c0V0Iainfix <=V10V7Aainfix <=c1V10FFFIainfix <=c1V7Iainfix <V6akAainfix <=c0V6Iainfix =anum_ofaTuple2V5V15c0V4anum_ofaTuple2V1V15c0V0Iainfix <V15V6Aainfix <=c0V15FAainfix <agetV5V16V6Aainfix <=c0agetV5V16Iainfix <V16V4Aainfix <=c0V16FAasorted_subV5c0V4Aainfix =V4anum_ofaTuple2V1V6c0V0Iainfix <=V6ainfix -akc1Aainfix <=c0V6FFFIainfix <=c0ainfix -akc1Iainfix =agetV3V17anum_ofaTuple2V1V17c0ainfix +ainfix -V0c1c1Iainfix <V17akAainfix <=c0V17FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
+          <label
+           name="expl:parameter in_place_counting_sort">
+           </label>
+          <proof
+           prover="0"
+           timelimit="10"
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="0.01"/>
+          </proof>
+         </goal>
+         <goal
+          name="WP_parameter in_place_counting_sort.13.7.2"
+          locfile="examples/programs/counting_sort/../counting_sort.mlw"
+          loclnum="100" loccnumb="6" loccnume="28"
+          expl="for loop preservation"
+          sum="933df90a688f1456e0ea089094712a25"
+          proved="true"
+          expanded="false"
+          shape="Lamk arrayV0V1LagetV3V6asorted_subV11c0V12Iainfix =V12ainfix +V8c1FIainfix =V11asetV9V8V6FIainfix <V8V0Aainfix <=c0V8Iainfix =anum_ofaTuple2V9V6c0V8ainfix -V10c1Aainfix =anum_ofaTuple2V9V13c0V8anum_ofaTuple2V1V13c0V0Iainfix <V13V6Aainfix <=c0V13FAainfix <=agetV9V14V6Aainfix <=c0agetV9V14Iainfix <V14V8Aainfix <=c0V14FAasorted_subV9c0V8Aainfix =ainfix +ainfix -V8V10c1anum_ofaTuple2V1V6c0V0Iainfix <=V10V7Aainfix <=c1V10FFFIainfix <=c1V7Iainfix <V6akAainfix <=c0V6Iainfix =anum_ofaTuple2V5V15c0V4anum_ofaTuple2V1V15c0V0Iainfix <V15V6Aainfix <=c0V15FAainfix <agetV5V16V6Aainfix <=c0agetV5V16Iainfix <V16V4Aainfix <=c0V16FAasorted_subV5c0V4Aainfix =V4anum_ofaTuple2V1V6c0V0Iainfix <=V6ainfix -akc1Aainfix <=c0V6FFFIainfix <=c0ainfix -akc1Iainfix =agetV3V17anum_ofaTuple2V1V17c0ainfix +ainfix -V0c1c1Iainfix <V17akAainfix <=c0V17FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
+          <label
+           name="expl:parameter in_place_counting_sort">
+           </label>
+          <proof
+           prover="0"
+           timelimit="10"
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="2.98"/>
+          </proof>
+         </goal>
+         <goal
+          name="WP_parameter in_place_counting_sort.13.7.3"
+          locfile="examples/programs/counting_sort/../counting_sort.mlw"
+          loclnum="100" loccnumb="6" loccnume="28"
+          expl="for loop preservation"
+          sum="b7352dcf3af68dac7dc2b80af426a1db"
+          proved="true"
+          expanded="false"
+          shape="Lamk arrayV0V1LagetV3V6ainfix <=c0agetV11V13Iainfix <V13V12Aainfix <=c0V13FIainfix =V12ainfix +V8c1FIainfix =V11asetV9V8V6FIainfix <V8V0Aainfix <=c0V8Iainfix =anum_ofaTuple2V9V6c0V8ainfix -V10c1Aainfix =anum_ofaTuple2V9V14c0V8anum_ofaTuple2V1V14c0V0Iainfix <V14V6Aainfix <=c0V14FAainfix <=agetV9V15V6Aainfix <=c0agetV9V15Iainfix <V15V8Aainfix <=c0V15FAasorted_subV9c0V8Aainfix =ainfix +ainfix -V8V10c1anum_ofaTuple2V1V6c0V0Iainfix <=V10V7Aainfix <=c1V10FFFIainfix <=c1V7Iainfix <V6akAainfix <=c0V6Iainfix =anum_ofaTuple2V5V16c0V4anum_ofaTuple2V1V16c0V0Iainfix <V16V6Aainfix <=c0V16FAainfix <agetV5V17V6Aainfix <=c0agetV5V17Iainfix <V17V4Aainfix <=c0V17FAasorted_subV5c0V4Aainfix =V4anum_ofaTuple2V1V6c0V0Iainfix <=V6ainfix -akc1Aainfix <=c0V6FFFIainfix <=c0ainfix -akc1Iainfix =agetV3V18anum_ofaTuple2V1V18c0ainfix +ainfix -V0c1c1Iainfix <V18akAainfix <=c0V18FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
           <label
            name="expl:parameter in_place_counting_sort">
            </label>
@@ -1438,14 +1570,14 @@
           </proof>
          </goal>
          <goal
-          name="WP_parameter in_place_counting_sort.13.8.3"
+          name="WP_parameter in_place_counting_sort.13.7.4"
           locfile="examples/programs/counting_sort/../counting_sort.mlw"
           loclnum="100" loccnumb="6" loccnume="28"
           expl="for loop preservation"
-          sum="aa2cb322c1006537897bead9330a1e76"
+          sum="f1cdf5cd6ad626680849fffc606e76a8"
           proved="true"
-          expanded="true"
-          shape="Lamk arrayV0V1Lamk arrayV0V5LagetV3V7asorted_subV12c0V13Iainfix =V13ainfix +V9c1FIainfix =V12asetV10V9V7FIainfix <V9V0Aainfix <=c0V9Iainfix =anum_ofaTuple2V10V7c0V9ainfix -V11c1Aainfix =anum_ofaTuple2V10V14c0V9anum_ofaTuple2V1V14c0V0Iainfix <V14V7Aainfix <=c0V14FAainfix <=agetV10V15V7Aainfix <=c0agetV10V15Iainfix <V15V9Aainfix <=c0V15FAasorted_subV10c0V9Aainfix =ainfix +ainfix -V9V11c1anum_ofaTuple2V1V7c0V0Iainfix <=V11V8Aainfix <=c1V11FFFIainfix <=c1V8Iainfix <V7akAainfix <=c0V7Iainfix =anum_ofaTuple2V5V16c0V4anum_ofaTuple2V1V16c0V0Iainfix <V16V7Aainfix <=c0V16FAainfix <agetV5V17V7Aainfix <=c0agetV5V17Iainfix <V17V4Aainfix <=c0V17FAasorted_subV5c0V4Aainfix =V4anum_ofaTuple2V1V7c0V0Iainfix <=V7ainfix -akc1Aainfix <=c0V7FFFIainfix <=c0ainfix -akc1Iainfix =agetV3V18anum_ofaTuple2V1V18c0ainfix +ainfix -V0c1c1Iainfix <V18akAainfix <=c0V18FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
+          expanded="false"
+          shape="Lamk arrayV0V1LagetV3V6ainfix <=agetV11V13V6Iainfix <V13V12Aainfix <=c0V13FIainfix =V12ainfix +V8c1FIainfix =V11asetV9V8V6FIainfix <V8V0Aainfix <=c0V8Iainfix =anum_ofaTuple2V9V6c0V8ainfix -V10c1Aainfix =anum_ofaTuple2V9V14c0V8anum_ofaTuple2V1V14c0V0Iainfix <V14V6Aainfix <=c0V14FAainfix <=agetV9V15V6Aainfix <=c0agetV9V15Iainfix <V15V8Aainfix <=c0V15FAasorted_subV9c0V8Aainfix =ainfix +ainfix -V8V10c1anum_ofaTuple2V1V6c0V0Iainfix <=V10V7Aainfix <=c1V10FFFIainfix <=c1V7Iainfix <V6akAainfix <=c0V6Iainfix =anum_ofaTuple2V5V16c0V4anum_ofaTuple2V1V16c0V0Iainfix <V16V6Aainfix <=c0V16FAainfix <agetV5V17V6Aainfix <=c0agetV5V17Iainfix <V17V4Aainfix <=c0V17FAasorted_subV5c0V4Aainfix =V4anum_ofaTuple2V1V6c0V0Iainfix <=V6ainfix -akc1Aainfix <=c0V6FFFIainfix <=c0ainfix -akc1Iainfix =agetV3V18anum_ofaTuple2V1V18c0ainfix +ainfix -V0c1c1Iainfix <V18akAainfix <=c0V18FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
           <label
            name="expl:parameter in_place_counting_sort">
            </label>
@@ -1454,18 +1586,18 @@
            timelimit="10"
            obsolete="false"
            archived="false">
-           <result status="valid" time="3.04"/>
+           <result status="valid" time="0.02"/>
           </proof>
          </goal>
          <goal
-          name="WP_parameter in_place_counting_sort.13.8.4"
+          name="WP_parameter in_place_counting_sort.13.7.5"
           locfile="examples/programs/counting_sort/../counting_sort.mlw"
           loclnum="100" loccnumb="6" loccnume="28"
           expl="for loop preservation"
-          sum="ed9cb6c8efc66b70158421315432700a"
+          sum="7b91909b66ecc10a6fc632a9e47493c1"
           proved="true"
-          expanded="true"
-          shape="Lamk arrayV0V1Lamk arrayV0V5LagetV3V7ainfix <=c0agetV12V14Iainfix <V14V13Aainfix <=c0V14FIainfix =V13ainfix +V9c1FIainfix =V12asetV10V9V7FIainfix <V9V0Aainfix <=c0V9Iainfix =anum_ofaTuple2V10V7c0V9ainfix -V11c1Aainfix =anum_ofaTuple2V10V15c0V9anum_ofaTuple2V1V15c0V0Iainfix <V15V7Aainfix <=c0V15FAainfix <=agetV10V16V7Aainfix <=c0agetV10V16Iainfix <V16V9Aainfix <=c0V16FAasorted_subV10c0V9Aainfix =ainfix +ainfix -V9V11c1anum_ofaTuple2V1V7c0V0Iainfix <=V11V8Aainfix <=c1V11FFFIainfix <=c1V8Iainfix <V7akAainfix <=c0V7Iainfix =anum_ofaTuple2V5V17c0V4anum_ofaTuple2V1V17c0V0Iainfix <V17V7Aainfix <=c0V17FAainfix <agetV5V18V7Aainfix <=c0agetV5V18Iainfix <V18V4Aainfix <=c0V18FAasorted_subV5c0V4Aainfix =V4anum_ofaTuple2V1V7c0V0Iainfix <=V7ainfix -akc1Aainfix <=c0V7FFFIainfix <=c0ainfix -akc1Iainfix =agetV3V19anum_ofaTuple2V1V19c0ainfix +ainfix -V0c1c1Iainfix <V19akAainfix <=c0V19FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
+          expanded="false"
+          shape="Lamk arrayV0V1LagetV3V6ainfix =anum_ofaTuple2V11V13c0V12anum_ofaTuple2V1V13c0V0Iainfix <V13V6Aainfix <=c0V13FIainfix =V12ainfix +V8c1FIainfix =V11asetV9V8V6FIainfix <V8V0Aainfix <=c0V8Iainfix =anum_ofaTuple2V9V6c0V8ainfix -V10c1Aainfix =anum_ofaTuple2V9V14c0V8anum_ofaTuple2V1V14c0V0Iainfix <V14V6Aainfix <=c0V14FAainfix <=agetV9V15V6Aainfix <=c0agetV9V15Iainfix <V15V8Aainfix <=c0V15FAasorted_subV9c0V8Aainfix =ainfix +ainfix -V8V10c1anum_ofaTuple2V1V6c0V0Iainfix <=V10V7Aainfix <=c1V10FFFIainfix <=c1V7Iainfix <V6akAainfix <=c0V6Iainfix =anum_ofaTuple2V5V16c0V4anum_ofaTuple2V1V16c0V0Iainfix <V16V6Aainfix <=c0V16FAainfix <agetV5V17V6Aainfix <=c0agetV5V17Iainfix <V17V4Aainfix <=c0V17FAasorted_subV5c0V4Aainfix =V4anum_ofaTuple2V1V6c0V0Iainfix <=V6ainfix -akc1Aainfix <=c0V6FFFIainfix <=c0ainfix -akc1Iainfix =agetV3V18anum_ofaTuple2V1V18c0ainfix +ainfix -V0c1c1Iainfix <V18akAainfix <=c0V18FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
           <label
            name="expl:parameter in_place_counting_sort">
            </label>
@@ -1474,18 +1606,32 @@
            timelimit="10"
            obsolete="false"
            archived="false">
-           <result status="valid" time="0.01"/>
+           <result status="timeout" time="10.40"/>
+          </proof>
+          <proof
+           prover="2"
+           timelimit="10"
+           obsolete="false"
+           archived="false">
+           <result status="timeout" time="10.16"/>
+          </proof>
+          <proof
+           prover="5"
+           timelimit="10"
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="0.18"/>
           </proof>
          </goal>
          <goal
-          name="WP_parameter in_place_counting_sort.13.8.5"
+          name="WP_parameter in_place_counting_sort.13.7.6"
           locfile="examples/programs/counting_sort/../counting_sort.mlw"
           loclnum="100" loccnumb="6" loccnume="28"
           expl="for loop preservation"
-          sum="25ac8f89f999744f4eda99b8bbee4e9b"
+          sum="d7897a439fece63c4ac16bc5e43827a5"
           proved="true"
-          expanded="true"
-          shape="Lamk arrayV0V1Lamk arrayV0V5LagetV3V7ainfix <=agetV12V14V7Iainfix <V14V13Aainfix <=c0V14FIainfix =V13ainfix +V9c1FIainfix =V12asetV10V9V7FIainfix <V9V0Aainfix <=c0V9Iainfix =anum_ofaTuple2V10V7c0V9ainfix -V11c1Aainfix =anum_ofaTuple2V10V15c0V9anum_ofaTuple2V1V15c0V0Iainfix <V15V7Aainfix <=c0V15FAainfix <=agetV10V16V7Aainfix <=c0agetV10V16Iainfix <V16V9Aainfix <=c0V16FAasorted_subV10c0V9Aainfix =ainfix +ainfix -V9V11c1anum_ofaTuple2V1V7c0V0Iainfix <=V11V8Aainfix <=c1V11FFFIainfix <=c1V8Iainfix <V7akAainfix <=c0V7Iainfix =anum_ofaTuple2V5V17c0V4anum_ofaTuple2V1V17c0V0Iainfix <V17V7Aainfix <=c0V17FAainfix <agetV5V18V7Aainfix <=c0agetV5V18Iainfix <V18V4Aainfix <=c0V18FAasorted_subV5c0V4Aainfix =V4anum_ofaTuple2V1V7c0V0Iainfix <=V7ainfix -akc1Aainfix <=c0V7FFFIainfix <=c0ainfix -akc1Iainfix =agetV3V19anum_ofaTuple2V1V19c0ainfix +ainfix -V0c1c1Iainfix <V19akAainfix <=c0V19FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
+          expanded="false"
+          shape="Lamk arrayV0V1LagetV3V6ainfix =anum_ofaTuple2V11V6c0V12ainfix -ainfix +V10c1c1Iainfix =V12ainfix +V8c1FIainfix =V11asetV9V8V6FIainfix <V8V0Aainfix <=c0V8Iainfix =anum_ofaTuple2V9V6c0V8ainfix -V10c1Aainfix =anum_ofaTuple2V9V13c0V8anum_ofaTuple2V1V13c0V0Iainfix <V13V6Aainfix <=c0V13FAainfix <=agetV9V14V6Aainfix <=c0agetV9V14Iainfix <V14V8Aainfix <=c0V14FAasorted_subV9c0V8Aainfix =ainfix +ainfix -V8V10c1anum_ofaTuple2V1V6c0V0Iainfix <=V10V7Aainfix <=c1V10FFFIainfix <=c1V7Iainfix <V6akAainfix <=c0V6Iainfix =anum_ofaTuple2V5V15c0V4anum_ofaTuple2V1V15c0V0Iainfix <V15V6Aainfix <=c0V15FAainfix <agetV5V16V6Aainfix <=c0agetV5V16Iainfix <V16V4Aainfix <=c0V16FAasorted_subV5c0V4Aainfix =V4anum_ofaTuple2V1V6c0V0Iainfix <=V6ainfix -akc1Aainfix <=c0V6FFFIainfix <=c0ainfix -akc1Iainfix =agetV3V17anum_ofaTuple2V1V17c0ainfix +ainfix -V0c1c1Iainfix <V17akAainfix <=c0V17FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
           <label
            name="expl:parameter in_place_counting_sort">
            </label>
@@ -1494,43 +1640,17 @@
            timelimit="10"
            obsolete="false"
            archived="false">
-           <result status="valid" time="0.01"/>
+           <result status="timeout" time="10.31"/>
           </proof>
-         </goal>
-         <goal
-          name="WP_parameter in_place_counting_sort.13.8.6"
-          locfile="examples/programs/counting_sort/../counting_sort.mlw"
-          loclnum="100" loccnumb="6" loccnume="28"
-          expl="for loop preservation"
-          sum="1d88267c4092327b437dc7bac1e31caa"
-          proved="true"
-          expanded="true"
-          shape="Lamk arrayV0V1Lamk arrayV0V5LagetV3V7ainfix =anum_ofaTuple2V12V14c0V13anum_ofaTuple2V1V14c0V0Iainfix <V14V7Aainfix <=c0V14FIainfix =V13ainfix +V9c1FIainfix =V12asetV10V9V7FIainfix <V9V0Aainfix <=c0V9Iainfix =anum_ofaTuple2V10V7c0V9ainfix -V11c1Aainfix =anum_ofaTuple2V10V15c0V9anum_ofaTuple2V1V15c0V0Iainfix <V15V7Aainfix <=c0V15FAainfix <=agetV10V16V7Aainfix <=c0agetV10V16Iainfix <V16V9Aainfix <=c0V16FAasorted_subV10c0V9Aainfix =ainfix +ainfix -V9V11c1anum_ofaTuple2V1V7c0V0Iainfix <=V11V8Aainfix <=c1V11FFFIainfix <=c1V8Iainfix <V7akAainfix <=c0V7Iainfix =anum_ofaTuple2V5V17c0V4anum_ofaTuple2V1V17c0V0Iainfix <V17V7Aainfix <=c0V17FAainfix <agetV5V18V7Aainfix <=c0agetV5V18Iainfix <V18V4Aainfix <=c0V18FAasorted_subV5c0V4Aainfix =V4anum_ofaTuple2V1V7c0V0Iainfix <=V7ainfix -akc1Aainfix <=c0V7FFFIainfix <=c0ainfix -akc1Iainfix =agetV3V19anum_ofaTuple2V1V19c0ainfix +ainfix -V0c1c1Iainfix <V19akAainfix <=c0V19FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
-          <label
-           name="expl:parameter in_place_counting_sort">
-           </label>
           <proof
-           prover="3"
+           prover="2"
            timelimit="10"
            obsolete="false"
            archived="false">
-           <result status="valid" time="0.05"/>
+           <result status="timeout" time="10.06"/>
           </proof>
-         </goal>
-         <goal
-          name="WP_parameter in_place_counting_sort.13.8.7"
-          locfile="examples/programs/counting_sort/../counting_sort.mlw"
-          loclnum="100" loccnumb="6" loccnume="28"
-          expl="for loop preservation"
-          sum="bf39e3185b66e0a38e0d4d61da23c7cd"
-          proved="true"
-          expanded="true"
-          shape="Lamk arrayV0V1Lamk arrayV0V5LagetV3V7ainfix =anum_ofaTuple2V12V7c0V13ainfix -ainfix +V11c1c1Iainfix =V13ainfix +V9c1FIainfix =V12asetV10V9V7FIainfix <V9V0Aainfix <=c0V9Iainfix =anum_ofaTuple2V10V7c0V9ainfix -V11c1Aainfix =anum_ofaTuple2V10V14c0V9anum_ofaTuple2V1V14c0V0Iainfix <V14V7Aainfix <=c0V14FAainfix <=agetV10V15V7Aainfix <=c0agetV10V15Iainfix <V15V9Aainfix <=c0V15FAasorted_subV10c0V9Aainfix =ainfix +ainfix -V9V11c1anum_ofaTuple2V1V7c0V0Iainfix <=V11V8Aainfix <=c1V11FFFIainfix <=c1V8Iainfix <V7akAainfix <=c0V7Iainfix =anum_ofaTuple2V5V16c0V4anum_ofaTuple2V1V16c0V0Iainfix <V16V7Aainfix <=c0V16FAainfix <agetV5V17V7Aainfix <=c0agetV5V17Iainfix <V17V4Aainfix <=c0V17FAasorted_subV5c0V4Aainfix =V4anum_ofaTuple2V1V7c0V0Iainfix <=V7ainfix -akc1Aainfix <=c0V7FFFIainfix <=c0ainfix -akc1Iainfix =agetV3V18anum_ofaTuple2V1V18c0ainfix +ainfix -V0c1c1Iainfix <V18akAainfix <=c0V18FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
-          <label
-           name="expl:parameter in_place_counting_sort">
-           </label>
           <proof
-           prover="3"
+           prover="5"
            timelimit="10"
            obsolete="false"
            archived="false">
@@ -1540,23 +1660,50 @@
         </transf>
        </goal>
        <goal
-        name="WP_parameter in_place_counting_sort.13.9"
+        name="WP_parameter in_place_counting_sort.13.8"
         locfile="examples/programs/counting_sort/../counting_sort.mlw"
         loclnum="100" loccnumb="6" loccnume="28"
         expl="for loop preservation"
-        sum="37c1a434669e569a04a7051585925fee"
+        sum="77e3470021267034b44e2a62ca55d301"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V1Lamk arrayV0V5LagetV3V7ainfix =V9anum_ofaTuple2V1ainfix +V7c1c0V0Iainfix =anum_ofaTuple2V10V7c0V9ainfix -ainfix +V8c1c1Aainfix =anum_ofaTuple2V10V11c0V9anum_ofaTuple2V1V11c0V0Iainfix <V11V7Aainfix <=c0V11FAainfix <=agetV10V12V7Aainfix <=c0agetV10V12Iainfix <V12V9Aainfix <=c0V12FAasorted_subV10c0V9Aainfix =ainfix +ainfix -V9ainfix +V8c1c1anum_ofaTuple2V1V7c0V0FFIainfix <=c1V8Iainfix <V7akAainfix <=c0V7Iainfix =anum_ofaTuple2V5V13c0V4anum_ofaTuple2V1V13c0V0Iainfix <V13V7Aainfix <=c0V13FAainfix <agetV5V14V7Aainfix <=c0agetV5V14Iainfix <V14V4Aainfix <=c0V14FAasorted_subV5c0V4Aainfix =V4anum_ofaTuple2V1V7c0V0Iainfix <=V7ainfix -akc1Aainfix <=c0V7FFFIainfix <=c0ainfix -akc1Iainfix =agetV3V15anum_ofaTuple2V1V15c0ainfix +ainfix -V0c1c1Iainfix <V15akAainfix <=c0V15FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
+        expanded="false"
+        shape="Lamk arrayV0V1LagetV3V6ainfix =V8anum_ofaTuple2V1ainfix +V6c1c0V0Iainfix =anum_ofaTuple2V9V6c0V8ainfix -ainfix +V7c1c1Aainfix =anum_ofaTuple2V9V10c0V8anum_ofaTuple2V1V10c0V0Iainfix <V10V6Aainfix <=c0V10FAainfix <=agetV9V11V6Aainfix <=c0agetV9V11Iainfix <V11V8Aainfix <=c0V11FAasorted_subV9c0V8Aainfix =ainfix +ainfix -V8ainfix +V7c1c1anum_ofaTuple2V1V6c0V0FFIainfix <=c1V7Iainfix <V6akAainfix <=c0V6Iainfix =anum_ofaTuple2V5V12c0V4anum_ofaTuple2V1V12c0V0Iainfix <V12V6Aainfix <=c0V12FAainfix <agetV5V13V6Aainfix <=c0agetV5V13Iainfix <V13V4Aainfix <=c0V13FAasorted_subV5c0V4Aainfix =V4anum_ofaTuple2V1V6c0V0Iainfix <=V6ainfix -akc1Aainfix <=c0V6FFFIainfix <=c0ainfix -akc1Iainfix =agetV3V14anum_ofaTuple2V1V14c0ainfix +ainfix -V0c1c1Iainfix <V14akAainfix <=c0V14FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
         <label
          name="expl:parameter in_place_counting_sort">
          </label>
         <proof
-         prover="1"
+         prover="0"
          timelimit="10"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.22"/>
+         <result status="timeout" time="10.00"/>
+        </proof>
+        <proof
+         prover="2"
+         timelimit="10"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.23"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter in_place_counting_sort.13.9"
+        locfile="examples/programs/counting_sort/../counting_sort.mlw"
+        loclnum="100" loccnumb="6" loccnume="28"
+        expl="for loop preservation"
+        sum="bc86f4ecbc0e873883dde371c12d3e04"
+        proved="true"
+        expanded="false"
+        shape="Lamk arrayV0V1LagetV3V6asorted_subV9c0V8Iainfix =anum_ofaTuple2V9V6c0V8ainfix -ainfix +V7c1c1Aainfix =anum_ofaTuple2V9V10c0V8anum_ofaTuple2V1V10c0V0Iainfix <V10V6Aainfix <=c0V10FAainfix <=agetV9V11V6Aainfix <=c0agetV9V11Iainfix <V11V8Aainfix <=c0V11FAasorted_subV9c0V8Aainfix =ainfix +ainfix -V8ainfix +V7c1c1anum_ofaTuple2V1V6c0V0FFIainfix <=c1V7Iainfix <V6akAainfix <=c0V6Iainfix =anum_ofaTuple2V5V12c0V4anum_ofaTuple2V1V12c0V0Iainfix <V12V6Aainfix <=c0V12FAainfix <agetV5V13V6Aainfix <=c0agetV5V13Iainfix <V13V4Aainfix <=c0V13FAasorted_subV5c0V4Aainfix =V4anum_ofaTuple2V1V6c0V0Iainfix <=V6ainfix -akc1Aainfix <=c0V6FFFIainfix <=c0ainfix -akc1Iainfix =agetV3V14anum_ofaTuple2V1V14c0ainfix +ainfix -V0c1c1Iainfix <V14akAainfix <=c0V14FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
+        <label
+         name="expl:parameter in_place_counting_sort">
+         </label>
+        <proof
+         prover="0"
+         timelimit="10"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
        <goal
@@ -1564,10 +1711,10 @@
         locfile="examples/programs/counting_sort/../counting_sort.mlw"
         loclnum="100" loccnumb="6" loccnume="28"
         expl="for loop preservation"
-        sum="b84a25e8de765d732e53c5a30a51e90d"
+        sum="63a56b42387e21f06bb205d524b51aba"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V1Lamk arrayV0V5LagetV3V7asorted_subV10c0V9Iainfix =anum_ofaTuple2V10V7c0V9ainfix -ainfix +V8c1c1Aainfix =anum_ofaTuple2V10V11c0V9anum_ofaTuple2V1V11c0V0Iainfix <V11V7Aainfix <=c0V11FAainfix <=agetV10V12V7Aainfix <=c0agetV10V12Iainfix <V12V9Aainfix <=c0V12FAasorted_subV10c0V9Aainfix =ainfix +ainfix -V9ainfix +V8c1c1anum_ofaTuple2V1V7c0V0FFIainfix <=c1V8Iainfix <V7akAainfix <=c0V7Iainfix =anum_ofaTuple2V5V13c0V4anum_ofaTuple2V1V13c0V0Iainfix <V13V7Aainfix <=c0V13FAainfix <agetV5V14V7Aainfix <=c0agetV5V14Iainfix <V14V4Aainfix <=c0V14FAasorted_subV5c0V4Aainfix =V4anum_ofaTuple2V1V7c0V0Iainfix <=V7ainfix -akc1Aainfix <=c0V7FFFIainfix <=c0ainfix -akc1Iainfix =agetV3V15anum_ofaTuple2V1V15c0ainfix +ainfix -V0c1c1Iainfix <V15akAainfix <=c0V15FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
+        expanded="false"
+        shape="Lamk arrayV0V1LagetV3V6ainfix <=c0agetV9V10Iainfix <V10V8Aainfix <=c0V10FIainfix =anum_ofaTuple2V9V6c0V8ainfix -ainfix +V7c1c1Aainfix =anum_ofaTuple2V9V11c0V8anum_ofaTuple2V1V11c0V0Iainfix <V11V6Aainfix <=c0V11FAainfix <=agetV9V12V6Aainfix <=c0agetV9V12Iainfix <V12V8Aainfix <=c0V12FAasorted_subV9c0V8Aainfix =ainfix +ainfix -V8ainfix +V7c1c1anum_ofaTuple2V1V6c0V0FFIainfix <=c1V7Iainfix <V6akAainfix <=c0V6Iainfix =anum_ofaTuple2V5V13c0V4anum_ofaTuple2V1V13c0V0Iainfix <V13V6Aainfix <=c0V13FAainfix <agetV5V14V6Aainfix <=c0agetV5V14Iainfix <V14V4Aainfix <=c0V14FAasorted_subV5c0V4Aainfix =V4anum_ofaTuple2V1V6c0V0Iainfix <=V6ainfix -akc1Aainfix <=c0V6FFFIainfix <=c0ainfix -akc1Iainfix =agetV3V15anum_ofaTuple2V1V15c0ainfix +ainfix -V0c1c1Iainfix <V15akAainfix <=c0V15FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
         <label
          name="expl:parameter in_place_counting_sort">
          </label>
@@ -1584,10 +1731,10 @@
         locfile="examples/programs/counting_sort/../counting_sort.mlw"
         loclnum="100" loccnumb="6" loccnume="28"
         expl="for loop preservation"
-        sum="a4eb2d980312b95b5758c87e8b35548f"
+        sum="a3a0bef16d364a35b4b645d72518ec93"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V1Lamk arrayV0V5LagetV3V7ainfix <=c0agetV10V11Iainfix <V11V9Aainfix <=c0V11FIainfix =anum_ofaTuple2V10V7c0V9ainfix -ainfix +V8c1c1Aainfix =anum_ofaTuple2V10V12c0V9anum_ofaTuple2V1V12c0V0Iainfix <V12V7Aainfix <=c0V12FAainfix <=agetV10V13V7Aainfix <=c0agetV10V13Iainfix <V13V9Aainfix <=c0V13FAasorted_subV10c0V9Aainfix =ainfix +ainfix -V9ainfix +V8c1c1anum_ofaTuple2V1V7c0V0FFIainfix <=c1V8Iainfix <V7akAainfix <=c0V7Iainfix =anum_ofaTuple2V5V14c0V4anum_ofaTuple2V1V14c0V0Iainfix <V14V7Aainfix <=c0V14FAainfix <agetV5V15V7Aainfix <=c0agetV5V15Iainfix <V15V4Aainfix <=c0V15FAasorted_subV5c0V4Aainfix =V4anum_ofaTuple2V1V7c0V0Iainfix <=V7ainfix -akc1Aainfix <=c0V7FFFIainfix <=c0ainfix -akc1Iainfix =agetV3V16anum_ofaTuple2V1V16c0ainfix +ainfix -V0c1c1Iainfix <V16akAainfix <=c0V16FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
+        expanded="false"
+        shape="Lamk arrayV0V1LagetV3V6ainfix <agetV9V10ainfix +V6c1Iainfix <V10V8Aainfix <=c0V10FIainfix =anum_ofaTuple2V9V6c0V8ainfix -ainfix +V7c1c1Aainfix =anum_ofaTuple2V9V11c0V8anum_ofaTuple2V1V11c0V0Iainfix <V11V6Aainfix <=c0V11FAainfix <=agetV9V12V6Aainfix <=c0agetV9V12Iainfix <V12V8Aainfix <=c0V12FAasorted_subV9c0V8Aainfix =ainfix +ainfix -V8ainfix +V7c1c1anum_ofaTuple2V1V6c0V0FFIainfix <=c1V7Iainfix <V6akAainfix <=c0V6Iainfix =anum_ofaTuple2V5V13c0V4anum_ofaTuple2V1V13c0V0Iainfix <V13V6Aainfix <=c0V13FAainfix <agetV5V14V6Aainfix <=c0agetV5V14Iainfix <V14V4Aainfix <=c0V14FAasorted_subV5c0V4Aainfix =V4anum_ofaTuple2V1V6c0V0Iainfix <=V6ainfix -akc1Aainfix <=c0V6FFFIainfix <=c0ainfix -akc1Iainfix =agetV3V15anum_ofaTuple2V1V15c0ainfix +ainfix -V0c1c1Iainfix <V15akAainfix <=c0V15FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
         <label
          name="expl:parameter in_place_counting_sort">
          </label>
@@ -1604,30 +1751,10 @@
         locfile="examples/programs/counting_sort/../counting_sort.mlw"
         loclnum="100" loccnumb="6" loccnume="28"
         expl="for loop preservation"
-        sum="606032b8ce430c66dc500ff3b4ede930"
+        sum="a675e03e46bb12c562b2e73e88d6a4ec"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V1Lamk arrayV0V5LagetV3V7ainfix <agetV10V11ainfix +V7c1Iainfix <V11V9Aainfix <=c0V11FIainfix =anum_ofaTuple2V10V7c0V9ainfix -ainfix +V8c1c1Aainfix =anum_ofaTuple2V10V12c0V9anum_ofaTuple2V1V12c0V0Iainfix <V12V7Aainfix <=c0V12FAainfix <=agetV10V13V7Aainfix <=c0agetV10V13Iainfix <V13V9Aainfix <=c0V13FAasorted_subV10c0V9Aainfix =ainfix +ainfix -V9ainfix +V8c1c1anum_ofaTuple2V1V7c0V0FFIainfix <=c1V8Iainfix <V7akAainfix <=c0V7Iainfix =anum_ofaTuple2V5V14c0V4anum_ofaTuple2V1V14c0V0Iainfix <V14V7Aainfix <=c0V14FAainfix <agetV5V15V7Aainfix <=c0agetV5V15Iainfix <V15V4Aainfix <=c0V15FAasorted_subV5c0V4Aainfix =V4anum_ofaTuple2V1V7c0V0Iainfix <=V7ainfix -akc1Aainfix <=c0V7FFFIainfix <=c0ainfix -akc1Iainfix =agetV3V16anum_ofaTuple2V1V16c0ainfix +ainfix -V0c1c1Iainfix <V16akAainfix <=c0V16FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
-        <label
-         name="expl:parameter in_place_counting_sort">
-         </label>
-        <proof
-         prover="0"
-         timelimit="10"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.01"/>
-        </proof>
-       </goal>
-       <goal
-        name="WP_parameter in_place_counting_sort.13.13"
-        locfile="examples/programs/counting_sort/../counting_sort.mlw"
-        loclnum="100" loccnumb="6" loccnume="28"
-        expl="for loop preservation"
-        sum="203c36221e85113bfba9b8882648ac76"
-        proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V1Lamk arrayV0V5LagetV3V7ainfix =anum_ofaTuple2V10V11c0V9anum_ofaTuple2V1V11c0V0Iainfix <V11ainfix +V7c1Aainfix <=c0V11FIainfix =anum_ofaTuple2V10V7c0V9ainfix -ainfix +V8c1c1Aainfix =anum_ofaTuple2V10V12c0V9anum_ofaTuple2V1V12c0V0Iainfix <V12V7Aainfix <=c0V12FAainfix <=agetV10V13V7Aainfix <=c0agetV10V13Iainfix <V13V9Aainfix <=c0V13FAasorted_subV10c0V9Aainfix =ainfix +ainfix -V9ainfix +V8c1c1anum_ofaTuple2V1V7c0V0FFIainfix <=c1V8Iainfix <V7akAainfix <=c0V7Iainfix =anum_ofaTuple2V5V14c0V4anum_ofaTuple2V1V14c0V0Iainfix <V14V7Aainfix <=c0V14FAainfix <agetV5V15V7Aainfix <=c0agetV5V15Iainfix <V15V4Aainfix <=c0V15FAasorted_subV5c0V4Aainfix =V4anum_ofaTuple2V1V7c0V0Iainfix <=V7ainfix -akc1Aainfix <=c0V7FFFIainfix <=c0ainfix -akc1Iainfix =agetV3V16anum_ofaTuple2V1V16c0ainfix +ainfix -V0c1c1Iainfix <V16akAainfix <=c0V16FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
+        expanded="false"
+        shape="Lamk arrayV0V1LagetV3V6ainfix =anum_ofaTuple2V9V10c0V8anum_ofaTuple2V1V10c0V0Iainfix <V10ainfix +V6c1Aainfix <=c0V10FIainfix =anum_ofaTuple2V9V6c0V8ainfix -ainfix +V7c1c1Aainfix =anum_ofaTuple2V9V11c0V8anum_ofaTuple2V1V11c0V0Iainfix <V11V6Aainfix <=c0V11FAainfix <=agetV9V12V6Aainfix <=c0agetV9V12Iainfix <V12V8Aainfix <=c0V12FAasorted_subV9c0V8Aainfix =ainfix +ainfix -V8ainfix +V7c1c1anum_ofaTuple2V1V6c0V0FFIainfix <=c1V7Iainfix <V6akAainfix <=c0V6Iainfix =anum_ofaTuple2V5V13c0V4anum_ofaTuple2V1V13c0V0Iainfix <V13V6Aainfix <=c0V13FAainfix <agetV5V14V6Aainfix <=c0agetV5V14Iainfix <V14V4Aainfix <=c0V14FAasorted_subV5c0V4Aainfix =V4anum_ofaTuple2V1V6c0V0Iainfix <=V6ainfix -akc1Aainfix <=c0V6FFFIainfix <=c0ainfix -akc1Iainfix =agetV3V15anum_ofaTuple2V1V15c0ainfix +ainfix -V0c1c1Iainfix <V15akAainfix <=c0V15FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
         <label
          name="expl:parameter in_place_counting_sort">
          </label>
@@ -1646,10 +1773,10 @@
       locfile="examples/programs/counting_sort/../counting_sort.mlw"
       loclnum="100" loccnumb="6" loccnume="28"
       expl="assertion"
-      sum="dc03adcc920a8614b5683ee8d00712a7"
+      sum="57d4f93d1b54b6abe0907c3d520675a4"
       proved="true"
-      expanded="true"
-      shape="Lamk arrayV0V1Lamk arrayV0V5ainfix =V4V0Iainfix =anum_ofaTuple2V5V7c0V4anum_ofaTuple2V1V7c0V0Iainfix <V7ainfix +ainfix -akc1c1Aainfix <=c0V7FAainfix <agetV5V8ainfix +ainfix -akc1c1Aainfix <=c0agetV5V8Iainfix <V8V4Aainfix <=c0V8FAasorted_subV5c0V4Aainfix =V4anum_ofaTuple2V1ainfix +ainfix -akc1c1c0V0FFIainfix <=c0ainfix -akc1Iainfix =agetV3V9anum_ofaTuple2V1V9c0ainfix +ainfix -V0c1c1Iainfix <V9akAainfix <=c0V9FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
+      expanded="false"
+      shape="Lamk arrayV0V1ainfix =V4V0Iainfix =anum_ofaTuple2V5V6c0V4anum_ofaTuple2V1V6c0V0Iainfix <V6ainfix +ainfix -akc1c1Aainfix <=c0V6FAainfix <agetV5V7ainfix +ainfix -akc1c1Aainfix <=c0agetV5V7Iainfix <V7V4Aainfix <=c0V7FAasorted_subV5c0V4Aainfix =V4anum_ofaTuple2V1ainfix +ainfix -akc1c1c0V0FFIainfix <=c0ainfix -akc1Iainfix =agetV3V8anum_ofaTuple2V1V8c0ainfix +ainfix -V0c1c1Iainfix <V8akAainfix <=c0V8FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
       <label
        name="expl:parameter in_place_counting_sort">
        </label>
@@ -1658,7 +1785,7 @@
        timelimit="10"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.16"/>
+       <result status="valid" time="0.17"/>
       </proof>
      </goal>
      <goal
@@ -1666,10 +1793,10 @@
       locfile="examples/programs/counting_sort/../counting_sort.mlw"
       loclnum="100" loccnumb="6" loccnume="28"
       expl="normal postcondition"
-      sum="2aa25ff3752af9a28453db56f68baa54"
+      sum="70dc412ed1c271ae8635198d02341b4c"
       proved="true"
-      expanded="true"
-      shape="Lamk arrayV0V1Lamk arrayV0V5apermutV2V6AasortedV6Iainfix =V4V0Iainfix =anum_ofaTuple2V5V7c0V4anum_ofaTuple2V1V7c0V0Iainfix <V7ainfix +ainfix -akc1c1Aainfix <=c0V7FAainfix <agetV5V8ainfix +ainfix -akc1c1Aainfix <=c0agetV5V8Iainfix <V8V4Aainfix <=c0V8FAasorted_subV5c0V4Aainfix =V4anum_ofaTuple2V1ainfix +ainfix -akc1c1c0V0FFIainfix <=c0ainfix -akc1Iainfix =agetV3V9anum_ofaTuple2V1V9c0ainfix +ainfix -V0c1c1Iainfix <V9akAainfix <=c0V9FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
+      expanded="false"
+      shape="Lamk arrayV0V1apermutV2amk arrayV0V5Aasorted_subV5c0V0Iainfix =V4V0Iainfix =anum_ofaTuple2V5V6c0V4anum_ofaTuple2V1V6c0V0Iainfix <V6ainfix +ainfix -akc1c1Aainfix <=c0V6FAainfix <agetV5V7ainfix +ainfix -akc1c1Aainfix <=c0agetV5V7Iainfix <V7V4Aainfix <=c0V7FAasorted_subV5c0V4Aainfix =V4anum_ofaTuple2V1ainfix +ainfix -akc1c1c0V0FFIainfix <=c0ainfix -akc1Iainfix =agetV3V8anum_ofaTuple2V1V8c0ainfix +ainfix -V0c1c1Iainfix <V8akAainfix <=c0V8FFIainfix <=c0ainfix -V0c1Iainfix >=akc0Iainfix <=c0V0Aak_valuesV2FF">
       <label
        name="expl:parameter in_place_counting_sort">
        </label>
@@ -1678,7 +1805,7 @@
        timelimit="10"
        obsolete="false"
        archived="false">
-       <result status="valid" time="5.29"/>
+       <result status="valid" time="5.62"/>
       </proof>
      </goal>
     </transf>
@@ -1689,31 +1816,31 @@
    locfile="examples/programs/counting_sort/../counting_sort.mlw"
    loclnum="131" loccnumb="7" loccnume="14"
    verified="true"
-   expanded="true">
+   expanded="false">
    <goal
     name="WP_parameter harness"
     locfile="examples/programs/counting_sort/../counting_sort.mlw"
     loclnum="136" loccnumb="6" loccnume="13"
     expl="parameter harness"
-    sum="905a70aaf4f615e9f3b409763ad1c0ea"
+    sum="70c0c6348c2832ae500d56c3de0c4be5"
     proved="true"
-    expanded="true"
-    shape="Lamk arrayc3V0Lamk arrayc3V2ainfix =agetV2c2c1Aainfix =agetV2c1c0Aainfix =agetV2c0c0Aainfix =anum_ofaTuple2V2c1c0c3c1Aainfix =anum_ofaTuple2V2c0c0c3c2IapermutV1V3AasortedV3FAainfix <=c0c3Aak_valuesV1Iainfix =V0asetaconstc0c1c1FAainfix <c1c3Aainfix <=c0c1Aainfix >=c3c0Iainfix =akc2">
+    expanded="false"
+    shape="Lamk arrayc3V0ainfix =agetV2c2c1Aainfix =agetV2c1c0Aainfix =agetV2c0c0Aainfix =anum_ofaTuple2V2c1c0c3c1Aainfix =anum_ofaTuple2V2c0c0c3c2IapermutV1amk arrayc3V2Aasorted_subV2c0c3FAainfix <=c0c3Aak_valuesV1Iainfix =V0asetaconstc0c1c1FAainfix <c1c3Aainfix <=c0c1Aainfix >=c3c0Iainfix =akc2">
     <label
      name="expl:parameter harness">
      </label>
     <transf
      name="split_goal"
      proved="true"
-     expanded="true">
+     expanded="false">
      <goal
       name="WP_parameter harness.1"
       locfile="examples/programs/counting_sort/../counting_sort.mlw"
       loclnum="136" loccnumb="6" loccnume="13"
       expl="precondition"
-      sum="0ba6f22cf4bb87f7a1cc67d8f12e9065"
+      sum="9ad600d00c8ffa584f684bf36ebea85e"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="ainfix >=c3c0Iainfix =akc2">
       <label
        name="expl:parameter harness">
@@ -1731,9 +1858,9 @@
       locfile="examples/programs/counting_sort/../counting_sort.mlw"
       loclnum="136" loccnumb="6" loccnume="13"
       expl="precondition"
-      sum="0072327de37b99bb05a2a3f6aaecbec9"
+      sum="dc168863a4c01e907586a7378a8b804f"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="ainfix <c1c3Aainfix <=c0c1Iainfix >=c3c0Iainfix =akc2">
       <label
        name="expl:parameter harness">
@@ -1743,7 +1870,7 @@
        timelimit="20"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.00"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
@@ -1751,9 +1878,9 @@
       locfile="examples/programs/counting_sort/../counting_sort.mlw"
       loclnum="136" loccnumb="6" loccnume="13"
       expl="precondition"
-      sum="98e03d013843074d1660593ccffbfc88"
+      sum="8ee06a3f2835f42dea81957f883c79fb"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="Lamk arrayc3V0ainfix <=c0c3Aak_valuesV1Iainfix =V0asetaconstc0c1c1FIainfix <c1c3Aainfix <=c0c1Iainfix >=c3c0Iainfix =akc2">
       <label
        name="expl:parameter harness">
@@ -1771,19 +1898,19 @@
       locfile="examples/programs/counting_sort/../counting_sort.mlw"
       loclnum="136" loccnumb="6" loccnume="13"
       expl="assertion"
-      sum="040626d8466ff9a152d6856786475eb8"
+      sum="56aa54cdd5fdd07567ac209efeefb9d0"
       proved="true"
-      expanded="true"
-      shape="Lamk arrayc3V0Lamk arrayc3V2ainfix =anum_ofaTuple2V2c0c0c3c2IapermutV1V3AasortedV3FIainfix <=c0c3Aak_valuesV1Iainfix =V0asetaconstc0c1c1FIainfix <c1c3Aainfix <=c0c1Iainfix >=c3c0Iainfix =akc2">
+      expanded="false"
+      shape="Lamk arrayc3V0ainfix =anum_ofaTuple2V2c0c0c3c2IapermutV1amk arrayc3V2Aasorted_subV2c0c3FIainfix <=c0c3Aak_valuesV1Iainfix =V0asetaconstc0c1c1FIainfix <c1c3Aainfix <=c0c1Iainfix >=c3c0Iainfix =akc2">
       <label
        name="expl:parameter harness">
        </label>
       <proof
-       prover="3"
+       prover="5"
        timelimit="10"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.05"/>
+       <result status="valid" time="0.41"/>
       </proof>
      </goal>
      <goal
@@ -1791,19 +1918,19 @@
       locfile="examples/programs/counting_sort/../counting_sort.mlw"
       loclnum="136" loccnumb="6" loccnume="13"
       expl="assertion"
-      sum="388f8b1783d69add4b111af04822af48"
+      sum="3da15970a14d4cf80e5f4486b37396b4"
       proved="true"
-      expanded="true"
-      shape="Lamk arrayc3V0Lamk arrayc3V2ainfix =anum_ofaTuple2V2c1c0c3c1Iainfix =anum_ofaTuple2V2c0c0c3c2IapermutV1V3AasortedV3FIainfix <=c0c3Aak_valuesV1Iainfix =V0asetaconstc0c1c1FIainfix <c1c3Aainfix <=c0c1Iainfix >=c3c0Iainfix =akc2">
+      expanded="false"
+      shape="Lamk arrayc3V0ainfix =anum_ofaTuple2V2c1c0c3c1Iainfix =anum_ofaTuple2V2c0c0c3c2IapermutV1amk arrayc3V2Aasorted_subV2c0c3FIainfix <=c0c3Aak_valuesV1Iainfix =V0asetaconstc0c1c1FIainfix <c1c3Aainfix <=c0c1Iainfix >=c3c0Iainfix =akc2">
       <label
        name="expl:parameter harness">
        </label>
       <proof
-       prover="3"
+       prover="5"
        timelimit="10"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.18"/>
+       <result status="valid" time="1.19"/>
       </proof>
      </goal>
      <goal
@@ -1811,86 +1938,50 @@
       locfile="examples/programs/counting_sort/../counting_sort.mlw"
       loclnum="136" loccnumb="6" loccnume="13"
       expl="assertion"
-      sum="b14a546267c75b2f8d6972e5234b852f"
+      sum="79f214ae90a6b38675eea4c9e4dce0f9"
       proved="true"
-      expanded="true"
-      shape="Lamk arrayc3V0Lamk arrayc3V2ainfix =agetV2c0c0Iainfix =anum_ofaTuple2V2c1c0c3c1Iainfix =anum_ofaTuple2V2c0c0c3c2IapermutV1V3AasortedV3FIainfix <=c0c3Aak_valuesV1Iainfix =V0asetaconstc0c1c1FIainfix <c1c3Aainfix <=c0c1Iainfix >=c3c0Iainfix =akc2">
+      expanded="false"
+      shape="Lamk arrayc3V0ainfix =agetV2c0c0Iainfix =anum_ofaTuple2V2c1c0c3c1Iainfix =anum_ofaTuple2V2c0c0c3c2IapermutV1amk arrayc3V2Aasorted_subV2c0c3FIainfix <=c0c3Aak_valuesV1Iainfix =V0asetaconstc0c1c1FIainfix <c1c3Aainfix <=c0c1Iainfix >=c3c0Iainfix =akc2">
       <label
        name="expl:parameter harness">
        </label>
-      <transf
-       name="inline_goal"
-       proved="true"
-       expanded="true">
-       <goal
-        name="WP_parameter harness.6.1"
-        locfile="examples/programs/counting_sort/../counting_sort.mlw"
-        loclnum="136" loccnumb="6" loccnume="13"
-        expl="assertion"
-        sum="bcf9eadb0f4762b765a0cabc84242e84"
-        proved="true"
-        expanded="true"
-        shape="Lamk arrayc3V0Lamk arrayc3V2ainfix =agetV2c0c0Iainfix =anum_ofaTuple2V2c1c0c3c1Iainfix =anum_ofaTuple2V2c0c0c3c2Iainfix =anumeqV1V4c0alengthV1anumeqV3V4c0alengthV3Iainfix <V4akAainfix <=c0V4FAainfix =alengthV1alengthV3Aasorted_subaeltsV3c0alengthV3FIainfix =c0c3Oainfix <c0c3Aainfix <amixfix []V1V5akAainfix <=c0amixfix []V1V5Iainfix <V5alengthV1Aainfix <=c0V5FIainfix =V0asetaconstc0c1c1FIainfix <c1c3Aainfix =c0c1Oainfix <c0c1Iainfix <=c0c3Iainfix =akc2">
-        <label
-         name="expl:parameter harness">
-         </label>
-        <proof
-         prover="3"
-         timelimit="10"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.04"/>
-        </proof>
-       </goal>
-      </transf>
+      <proof
+       prover="4"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.05"/>
+      </proof>
      </goal>
      <goal
       name="WP_parameter harness.7"
       locfile="examples/programs/counting_sort/../counting_sort.mlw"
       loclnum="136" loccnumb="6" loccnume="13"
       expl="assertion"
-      sum="27732b42ec3a8c87c9691f2cb600274c"
+      sum="092f4418d2233b81ef8c6b271f6f3f6c"
       proved="true"
-      expanded="true"
-      shape="Lamk arrayc3V0Lamk arrayc3V2ainfix =agetV2c1c0Iainfix =agetV2c0c0Iainfix =anum_ofaTuple2V2c1c0c3c1Iainfix =anum_ofaTuple2V2c0c0c3c2IapermutV1V3AasortedV3FIainfix <=c0c3Aak_valuesV1Iainfix =V0asetaconstc0c1c1FIainfix <c1c3Aainfix <=c0c1Iainfix >=c3c0Iainfix =akc2">
+      expanded="false"
+      shape="Lamk arrayc3V0ainfix =agetV2c1c0Iainfix =agetV2c0c0Iainfix =anum_ofaTuple2V2c1c0c3c1Iainfix =anum_ofaTuple2V2c0c0c3c2IapermutV1amk arrayc3V2Aasorted_subV2c0c3FIainfix <=c0c3Aak_valuesV1Iainfix =V0asetaconstc0c1c1FIainfix <c1c3Aainfix <=c0c1Iainfix >=c3c0Iainfix =akc2">
       <label
        name="expl:parameter harness">
        </label>
-      <transf
-       name="inline_goal"
-       proved="true"
-       expanded="true">
-       <goal
-        name="WP_parameter harness.7.1"
-        locfile="examples/programs/counting_sort/../counting_sort.mlw"
-        loclnum="136" loccnumb="6" loccnume="13"
-        expl="assertion"
-        sum="0bb69d732312b743fd4f057aa0c8d419"
-        proved="true"
-        expanded="true"
-        shape="Lamk arrayc3V0Lamk arrayc3V2ainfix =agetV2c1c0Iainfix =agetV2c0c0Iainfix =anum_ofaTuple2V2c1c0c3c1Iainfix =anum_ofaTuple2V2c0c0c3c2Iainfix =anumeqV1V4c0alengthV1anumeqV3V4c0alengthV3Iainfix <V4akAainfix <=c0V4FAainfix =alengthV1alengthV3Aasorted_subaeltsV3c0alengthV3FIainfix =c0c3Oainfix <c0c3Aainfix <amixfix []V1V5akAainfix <=c0amixfix []V1V5Iainfix <V5alengthV1Aainfix <=c0V5FIainfix =V0asetaconstc0c1c1FIainfix <c1c3Aainfix =c0c1Oainfix <c0c1Iainfix <=c0c3Iainfix =akc2">
-        <label
-         name="expl:parameter harness">
-         </label>
-        <proof
-         prover="3"
-         timelimit="10"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.03"/>
-        </proof>
-       </goal>
-      </transf>
+      <proof
+       prover="4"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
      </goal>
      <goal
       name="WP_parameter harness.8"
       locfile="examples/programs/counting_sort/../counting_sort.mlw"
       loclnum="136" loccnumb="6" loccnume="13"
       expl="assertion"
-      sum="c65f496b822df80fbb805becfaa97d69"
+      sum="bd8819437de9b725ec89aa907986ea9b"
       proved="true"
-      expanded="true"
-      shape="Lamk arrayc3V0Lamk arrayc3V2ainfix =agetV2c2c1Iainfix =agetV2c1c0Iainfix =agetV2c0c0Iainfix =anum_ofaTuple2V2c1c0c3c1Iainfix =anum_ofaTuple2V2c0c0c3c2IapermutV1V3AasortedV3FIainfix <=c0c3Aak_valuesV1Iainfix =V0asetaconstc0c1c1FIainfix <c1c3Aainfix <=c0c1Iainfix >=c3c0Iainfix =akc2">
+      expanded="false"
+      shape="Lamk arrayc3V0ainfix =agetV2c2c1Iainfix =agetV2c1c0Iainfix =agetV2c0c0Iainfix =anum_ofaTuple2V2c1c0c3c1Iainfix =anum_ofaTuple2V2c0c0c3c2IapermutV1amk arrayc3V2Aasorted_subV2c0c3FIainfix <=c0c3Aak_valuesV1Iainfix =V0asetaconstc0c1c1FIainfix <c1c3Aainfix <=c0c1Iainfix >=c3c0Iainfix =akc2">
       <label
        name="expl:parameter harness">
        </label>
@@ -1899,7 +1990,7 @@
        timelimit="10"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.19"/>
+       <result status="valid" time="0.18"/>
       </proof>
      </goal>
     </transf>

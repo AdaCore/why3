@@ -37,14 +37,6 @@ let is_constructor kn ls = match Mid.find ls.ls_name kn with
   | { d_node = Dtype _ } -> true
   | _ -> false
 
-let rec dive env t = match t.t_node with
-  | Tvar x ->
-      (try dive env (Mvs.find x env) with Not_found -> t)
-  | Tlet (t1, tb) ->
-      let x, t2 = t_open_bound tb in
-      dive (Mvs.add x t1 env) t2
-  | _ -> t_map (dive env) t
-
 let make_flat_case kn t bl =
   let mk_b b = let p,t = t_open_branch b in [p],t in
   Pattern.CompileTerm.compile (find_constructors kn) [t] (List.map mk_b bl)
@@ -67,44 +59,42 @@ let rec add_quant kn (vl,tl,f) v =
     | _ ->
         (v::vl, tl, f)
 
+let let_map fn env t1 tb =
+  let x,t2,close = t_open_bound_cb tb in
+  let t2 = fn (Mvs.add x t1 env) t2 in
+  t_let_simp t1 (close x t2)
+
+let branch_map fn env t1 bl =
+  let mk_b b =
+    let p,t2,close = t_open_branch_cb b in close p (fn env t2) in
+  t_case t1 (List.map mk_b bl)
+
+let dive_to_constructor kn fn env t =
+  let rec dive env t = t_label_copy t (match t.t_node with
+    | Tvar x -> dive env (Mvs.find_exn Exit x env)
+    | Tlet (t1,tb) -> let_map dive env t1 tb
+    | Tcase (t1,bl) -> branch_map dive env t1 bl
+    | Tif (f,t1,t2) -> t_if_simp f (dive env t1) (dive env t2)
+    | Tapp (ls,_) when is_constructor kn ls -> fn env t
+    | _ -> raise Exit)
+  in
+  dive env t
+
 let eval_match ~inline kn t =
   let rec eval env t = t_label_copy t (match t.t_node with
     | Tapp (ls, tl) when inline kn ls (List.map t_type tl) t.t_ty ->
         begin match find_logic_definition kn ls with
-          | None ->
-              t_map (eval env) t
-          | Some def ->
-              eval env (unfold def tl t.t_ty)
+          | None -> t_map (eval env) t
+          | Some def -> eval env (unfold def tl t.t_ty)
         end
     | Tlet (t1, tb2) ->
         let t1 = eval env t1 in
-        let x, t2, close = t_open_bound_cb tb2 in
-        let t2 = eval (Mvs.add x t1 env) t2 in
-        t_let_simp t1 (close x t2)
+        let_map eval env t1 tb2
     | Tcase (t1, bl1) ->
         let t1 = eval env t1 in
-        let t1flat = dive env t1 in
-        begin try match t1flat.t_node with
-          | Tapp (ls,_) when is_constructor kn ls ->
-              eval env (make_flat_case kn t1flat bl1)
-          | Tcase (t2, bl2) ->
-              let mk_b b =
-                let p,t = t_open_branch b in
-                match t.t_node with
-                  | Tapp (ls,_) when is_constructor kn ls ->
-                      t_close_branch p (eval env (make_flat_case kn t bl1))
-                  | _ -> raise Exit
-              in
-              t_case t2 (List.map mk_b bl2)
-          | _ -> raise Exit
-        with
-          | Exit ->
-              let mk_b b =
-                let p,t,close = t_open_branch_cb b in
-                close p (eval env t)
-              in
-              t_case t1 (List.map mk_b bl1)
-        end
+        let fn env t = eval env (make_flat_case kn t bl1) in
+        begin try dive_to_constructor kn fn env t1
+        with Exit -> branch_map eval env t1 bl1 end
     | Tquant (q, qf) ->
         let vl,tl,f,close = t_open_quant_cb qf in
         let vl,tl,f = List.fold_left (add_quant kn) ([],tl,f) vl in
@@ -115,8 +105,7 @@ let eval_match ~inline kn t =
   eval Mvs.empty t
 
 let rec linear vars t = match t.t_node with
-  | Tvar x when Svs.mem x vars -> raise Exit
-  | Tvar x -> Svs.add x vars
+  | Tvar x -> Svs.add_new Exit x vars
   | _ -> t_fold linear vars t
 
 let linear t =
@@ -144,7 +133,8 @@ let rec inline_nonrec_linear kn ls tyl ty =
   match d.d_node with
     | Dlogic [_, Some def] ->
         begin try Wdecl.find inline_cache d with Not_found ->
-          let _, t = open_ls_defn def in
+          let vl,t = open_ls_defn def in
+          let _,_,t = List.fold_left (add_quant kn) ([],[],t) vl in
           let t = eval_match ~inline:inline_nonrec_linear kn t in
           let res = linear t in
           Wdecl.set inline_cache d res;

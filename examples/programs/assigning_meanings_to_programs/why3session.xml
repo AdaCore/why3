@@ -3,97 +3,67 @@
 <why3session
  name="programs/assigning_meanings_to_programs/why3session.xml">
  <prover
-  id="alt-ergo"
+  id="0"
   name="Alt-Ergo"
   version="0.94"/>
  <prover
-  id="coq"
-  name="Coq"
-  version="8.3pl3"/>
- <prover
-  id="cvc3-2.2"
+  id="1"
   name="CVC3"
   version="2.2"/>
- <prover
-  id="cvc3-2.4"
-  name="CVC3"
-  version="2.4.1"/>
- <prover
-  id="eprover"
-  name="Eprover"
-  version="1.4"/>
- <prover
-  id="gappa"
-  name="Gappa"
-  version="0.15.1"/>
- <prover
-  id="simplify"
-  name="Simplify"
-  version="1.5.4"/>
- <prover
-  id="spass"
-  name="Spass"
-  version="3.7"/>
- <prover
-  id="vampire"
-  name="Vampire"
-  version="0.6"/>
- <prover
-  id="verit"
-  name="veriT"
-  version="dev"/>
- <prover
-  id="yices"
-  name="Yices"
-  version="1.0.25"/>
- <prover
-  id="z3-2"
-  name="Z3"
-  version="2.19"/>
- <prover
-  id="z3-3"
-  name="Z3"
-  version="3.2"/>
  <file
   name="../assigning_meanings_to_programs.mlw"
   verified="true"
-  expanded="true">
+  expanded="false">
   <theory
    name="WP Sum"
+   locfile="programs/assigning_meanings_to_programs/../assigning_meanings_to_programs.mlw"
+   loclnum="4" loccnumb="7" loccnume="10"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter sum"
+    locfile="programs/assigning_meanings_to_programs/../assigning_meanings_to_programs.mlw"
+    loclnum="13" loccnumb="6" loccnume="9"
     expl="parameter sum"
-    sum="ac7ea50a728198affd2e552d9ccb013c"
+    sum="ab6ece0ccf048de22ee253bbefd81b26"
     proved="true"
     expanded="true"
     shape="iainfix <=V4V1ainfix <ainfix -V1V6ainfix -V1V4Aainfix <=c0ainfix -V1V4Aainfix =V5asumV2c1V6Aainfix <=V6ainfix +V1c1Aainfix <=c1V6Iainfix =V6ainfix +V4c1FIainfix =V5ainfix +V3agetV2V4FAainfix <V4V0Aainfix <=c0V4ainfix =V3asumV2c1ainfix +V1c1Iainfix =V3asumV2c1V4Aainfix <=V4ainfix +V1c1Aainfix <=c1V4FFAainfix =c0asumV2c1c1Aainfix <=c1ainfix +V1c1Aainfix <=c1c1Iainfix <V1V0Aainfix <=c0V1FFF">
+    <label
+     name="expl:parameter sum">
+     </label>
     <proof
-     prover="alt-ergo"
+     prover="0"
      timelimit="10"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
   </theory>
   <theory
    name="WP Division"
+   locfile="programs/assigning_meanings_to_programs/../assigning_meanings_to_programs.mlw"
+   loclnum="28" loccnumb="7" loccnume="15"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter division"
+    locfile="programs/assigning_meanings_to_programs/../assigning_meanings_to_programs.mlw"
+    loclnum="39" loccnumb="6" loccnume="14"
     expl="parameter division"
-    sum="90864aa1fddf212df2ea743e1dd1aaa4"
+    sum="4ae56abf35642f92abc882dea8823761"
     proved="true"
     expanded="true"
     shape="iainfix >=V2V1ainfix <V4V2Aainfix <=c0V2Aainfix =V0ainfix +ainfix *V5V1V4Aainfix <=c0V4Iainfix =V5ainfix +V3c1FIainfix =V4ainfix -V2V1Fainfix =V0ainfix +ainfix *V3V1V2Aainfix <V2V1Aainfix <=c0V2Iainfix =V0ainfix +ainfix *V3V1V2Aainfix <=c0V2FFAainfix =V0ainfix +ainfix *c0V1V0Aainfix <=c0V0Iainfix <c0V1Aainfix <=c0V0FF">
+    <label
+     name="expl:parameter division">
+     </label>
     <proof
-     prover="cvc3-2.2"
+     prover="1"
      timelimit="10"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.00"/>
     </proof>
    </goal>
