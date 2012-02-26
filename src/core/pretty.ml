@@ -296,13 +296,16 @@ let print_tv_arg fmt tv = fprintf fmt "@ %a" print_tv tv
 let print_ty_arg fmt ty = fprintf fmt "@ %a" (print_ty_node true) ty
 let print_vs_arg fmt vs = fprintf fmt "@ (%a)" print_vsty vs
 
-let print_constr ty fmt cs =
-  let ty_val = of_option cs.ls_value in
-  let m = ty_match Mtv.empty ty_val ty in
-  let tl = List.map (ty_inst m) cs.ls_args in
+let print_constr fmt (cs,pjl) =
+  let add_pj pj ty pjl = (pj,ty)::pjl in
+  let print_pj fmt (pj,ty) = match pj with
+    | Some ls -> fprintf fmt "@ (%a:@,%a)" print_ls ls print_ty ty
+    | None -> print_ty_arg fmt ty
+  in
   fprintf fmt "@[<hov 4>| %a%a%a@]" print_cs cs
     print_ident_labels cs.ls_name
-    (print_list nothing print_ty_arg) tl
+    (print_list nothing print_pj)
+    (List.fold_right2 add_pj pjl cs.ls_args [])
 
 let print_type_decl fst fmt (ts,def) = match def with
   | Tabstract -> begin match ts.ts_def with
@@ -318,12 +321,11 @@ let print_type_decl fst fmt (ts,def) = match def with
             (print_list nothing print_tv_arg) ts.ts_args print_ty ty
       end
   | Talgebraic csl ->
-      let ty = ty_app ts (List.map ty_var ts.ts_args) in
       fprintf fmt "@[<hov 2>%s %a%a%a =@\n@[<hov>%a@]@]"
         (if fst then "type" else "with") print_ts ts
         print_ident_labels ts.ts_name
         (print_list nothing print_tv_arg) ts.ts_args
-        (print_list newline (print_constr ty)) csl
+        (print_list newline print_constr) csl
 
 let print_type_decl first fmt d =
   print_type_decl first fmt d; forget_tvs ()
@@ -534,6 +536,14 @@ let () = Exn_printer.register
   | Pattern.NonExhaustive pl ->
       fprintf fmt "Non-exhaustive pattern list:@\n@[<hov 2>%a@]"
         (print_list newline print_pat) pl
+  | Decl.BadConstructor ls ->
+      fprintf fmt "Bad constructor symbol: %a" print_ls ls
+  | Decl.BadRecordField ls ->
+      fprintf fmt "Not a record field: %a" print_ls ls
+  | Decl.RecordFieldMissing ls ->
+      fprintf fmt "Record field missing: %a" print_ls ls
+  | Decl.DuplicateRecordField ls ->
+      fprintf fmt "Duplicate record field: %a" print_ls ls
   | Decl.IllegalTypeAlias ts ->
       fprintf fmt
         "Type symbol %a is a type alias and cannot be declared as algebraic"

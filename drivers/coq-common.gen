@@ -13,6 +13,8 @@ transformation "eliminate_non_struct_recursion"
 
 transformation "eliminate_if"
 
+transformation "eliminate_projections"
+
 transformation "simplify_formula"
 (*transformation "simplify_trivial_quantification_in_goal"*)
 
@@ -96,7 +98,7 @@ end
 
 (* removed: Coq Zdiv is NOT true Euclidean division:
    Zmod can be negative, in fact (Zmod x y) has the same sign as y,
-   which is not the usual convention of programming language either. 
+   which is not the usual convention of programming language either.
 
 theory int.EuclideanDivision
 

@@ -34,11 +34,38 @@ let unfold def tl ty =
   t_ty_subst mt mv e
 
 let is_constructor kn ls = match Mid.find ls.ls_name kn with
-  | { d_node = Dtype _ } -> true
+  | { d_node = Dtype dl } ->
+      let constr = function
+        | _, Talgebraic csl -> List.exists (fun (cs,_) -> ls_equal cs ls) csl
+        | _, Tabstract -> false in
+      List.exists constr dl
   | _ -> false
+
+let is_projection kn ls = match Mid.find ls.ls_name kn with
+  | { d_node = Dtype dl } ->
+      let constr = function
+        | _, Talgebraic csl -> List.exists (fun (cs,_) -> ls_equal cs ls) csl
+        | _, Tabstract -> false in
+      not (List.exists constr dl)
+  | _ -> false
+
+let apply_projection kn ls t = t_label_copy t (match t.t_node with
+  | Tapp (cs,tl) ->
+      let ts = match cs.ls_value with
+        | Some { ty_node = Tyapp (ts,_) } -> ts
+        | _ -> assert false in
+      let pjl =
+        try List.assq cs (find_constructors kn ts)
+        with Not_found -> assert false in
+      let find acc v = function
+        | Some pj when ls_equal pj ls -> v
+        | _ -> acc in
+      List.fold_left2 find t_true tl pjl
+  | _ -> assert false)
 
 let make_flat_case kn t bl =
   let mk_b b = let p,t = t_open_branch b in [p],t in
+  let find_constructors kn ts = List.map fst (find_constructors kn ts) in
   Pattern.CompileTerm.compile (find_constructors kn) [t] (List.map mk_b bl)
 
 let rec add_quant kn (vl,tl,f) v =
@@ -48,7 +75,7 @@ let rec add_quant kn (vl,tl,f) v =
     | _ -> []
   in
   match cl with
-    | [ls] ->
+    | [ls,_] ->
         let s = ty_match Mtv.empty (Util.of_option ls.ls_value) ty in
         let mk_v ty = create_vsymbol (id_clone v.vs_name) (ty_inst s ty) in
         let nvl = List.map mk_v ls.ls_args in
@@ -82,6 +109,11 @@ let dive_to_constructor kn fn env t =
 
 let eval_match ~inline kn t =
   let rec eval env t = t_label_copy t (match t.t_node with
+    | Tapp (ls, [t1]) when is_projection kn ls ->
+        let t1 = eval env t1 in
+        let fn _env t = apply_projection kn ls t in
+        begin try dive_to_constructor kn fn env t1
+        with Exit -> t_app ls [t1] t.t_ty end
     | Tapp (ls, tl) when inline kn ls (List.map t_type tl) t.t_ty ->
         begin match find_logic_definition kn ls with
           | None -> t_map (eval env) t

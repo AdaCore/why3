@@ -143,7 +143,8 @@ let print_tv_args fmt = function
 let print_ty_arg fmt ty = fprintf fmt "%a" (print_ty_node true) ty
 let print_vs_arg fmt vs = fprintf fmt "(%a)" print_vsty vs
 
-let print_constr ty fmt cs =
+(* FIXME: print projections! *)
+let print_constr ty fmt (cs,_) =
   let ty_val = of_option cs.ls_value in
   let m = ty_match Mtv.empty ty_val ty in
   let tl = List.map (ty_inst m) cs.ls_args in

@@ -345,7 +345,7 @@ let print_expr info fmt =
 
 (** Declarations *)
 
-let print_constr info ts fmt cs =
+let print_constr info ts fmt (cs,_) =
   match cs.ls_args with
     | [] ->
         fprintf fmt "@[<hov 4>| %a : %a %a@]" print_ls cs
@@ -559,7 +559,7 @@ let print_type_decl ~old info fmt (ts,def) =
       name (print_list space print_tv_binder) ts.ts_args
       (print_list newline (print_constr info ts)) csl;
     List.iter
-      (fun cs ->
+      (fun (cs,_) ->
         let ty_vars_args, ty_vars_value, all_ty_params = ls_ty_vars cs in
         print_implicits fmt cs ty_vars_args ty_vars_value all_ty_params)
       csl;

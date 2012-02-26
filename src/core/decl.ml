@@ -25,9 +25,12 @@ open Term
 
 (** Type declaration *)
 
+type constructor = lsymbol * lsymbol option list
+(** constructor symbol with the list of projections *)
+
 type ty_defn =
   | Tabstract
-  | Talgebraic of lsymbol list
+  | Talgebraic of constructor list
 
 type ty_decl = tysymbol * ty_defn
 
@@ -319,9 +322,12 @@ module Hsdecl = Hashcons.Make (struct
 
   type t = decl
 
+  let cs_equal (cs1,pl1) (cs2,pl2) =
+    ls_equal cs1 cs2 && list_all2 (option_eq ls_equal) pl1 pl2
+
   let eq_td (ts1,td1) (ts2,td2) = ts_equal ts1 ts2 && match td1,td2 with
     | Tabstract, Tabstract -> true
-    | Talgebraic l1, Talgebraic l2 -> list_all2 ls_equal l1 l2
+    | Talgebraic l1, Talgebraic l2 -> list_all2 cs_equal l1 l2
     | _ -> false
 
   let eq_ld (ls1,ld1) (ls2,ld2) = ls_equal ls1 ls2 && match ld1,ld2 with
@@ -343,9 +349,12 @@ module Hsdecl = Hashcons.Make (struct
         k1 = k2 && pr_equal pr1 pr2 && t_equal f1 f2
     | _,_ -> false
 
+  let cs_hash (cs,pl) =
+    Hashcons.combine_list (Hashcons.combine_option ls_hash) (ls_hash cs) pl
+
   let hs_td (ts,td) = match td with
     | Tabstract -> ts_hash ts
-    | Talgebraic l -> 1 + Hashcons.combine_list ls_hash (ts_hash ts) l
+    | Talgebraic l -> 1 + Hashcons.combine_list cs_hash (ts_hash ts) l
 
   let hs_ld (ls,ld) = Hashcons.combine (ls_hash ls)
     (Hashcons.combine_option (fun (_,f) -> t_hash f) ld)
@@ -392,6 +401,11 @@ let mk_decl node syms news = Hsdecl.hashcons {
 exception IllegalTypeAlias of tysymbol
 exception ClashIdent of ident
 exception BadLogicDecl of lsymbol * lsymbol
+exception BadConstructor of lsymbol
+
+exception BadRecordField of lsymbol
+exception RecordFieldMissing of lsymbol
+exception DuplicateRecordField of lsymbol
 
 exception EmptyDecl
 exception EmptyAlgDecl of tysymbol
@@ -411,8 +425,21 @@ let create_ty_decl tdl =
   if tdl = [] then raise EmptyDecl;
   let add s (ts,_) = Sts.add ts s in
   let tss = List.fold_left add Sts.empty tdl in
-  let check_constr tys ty (syms,news) fs =
-    ty_equal_check ty (of_option fs.ls_value);
+  let check_proj tyv s tya ls = match ls with
+    | None -> s
+    | Some ({ ls_args = [ptyv]; ls_value = Some ptya } as ls) ->
+        ty_equal_check tyv ptyv;
+        ty_equal_check tya ptya;
+        Sls.add_new (DuplicateRecordField ls) ls s
+    | Some ls -> raise (BadRecordField ls)
+  in
+  let check_constr tys ty pjs (syms,news) (fs,pl) =
+    ty_equal_check ty (exn_option (BadConstructor fs) fs.ls_value);
+    let fs_pjs =
+      try List.fold_left2 (check_proj ty) Sls.empty fs.ls_args pl
+      with Invalid_argument _ -> raise (BadConstructor fs) in
+    if not (Sls.equal pjs fs_pjs) then
+      raise (RecordFieldMissing (Sls.choose (Sls.diff pjs fs_pjs)));
     let vs = ty_freevars Stv.empty ty in
     let rec check seen ty = match ty.ty_node with
       | Tyvar v when Stv.mem v vs -> ()
@@ -435,8 +462,11 @@ let create_ty_decl tdl =
         if cl = [] then raise (EmptyAlgDecl ts);
         if ts.ts_def <> None then raise (IllegalTypeAlias ts);
         let news = news_id news ts.ts_name in
+        let pjs = List.fold_left (fun s (_,pl) -> List.fold_left
+          (option_fold (fun s ls -> Sls.add ls s)) s pl) Sls.empty cl in
+        let news = Sls.fold (fun pj s -> news_id s pj.ls_name) pjs news in
         let ty = ty_app ts (List.map ty_var ts.ts_args) in
-        List.fold_left (check_constr ts ty) (syms,news) cl
+        List.fold_left (check_constr ts ty pjs) (syms,news) cl
   in
   let (syms,news) = List.fold_left check_decl (Sid.empty,Sid.empty) tdl in
   mk_decl (Dtype tdl) syms news
@@ -658,6 +688,7 @@ exception NonExhaustiveCase of pattern list * term
 let rec check_matchT kn () t = match t.t_node with
   | Tcase (t1,bl) ->
       let bl = List.map (fun b -> let p,t = t_open_branch b in [p],t) bl in
+      let find_constructors kn ts = List.map fst (find_constructors kn ts) in
       ignore (try Pattern.CompileTerm.compile (find_constructors kn) [t1] bl
       with Pattern.NonExhaustive p -> raise (NonExhaustiveCase (p,t)));
       t_fold (check_matchT kn) () t
@@ -679,7 +710,7 @@ let rec check_foundness kn d =
        we can build a value of this type *)
     let tss = Sts.add ts tss in
     List.exists (check_constr tss tvs) cl
-  and check_constr tss tvs ls =
+  and check_constr tss tvs (ls,_) =
     (* we can construct a value iff every
        argument is of an inhabited type *)
     List.for_all (check_type tss tvs) ls.ls_args
@@ -718,7 +749,7 @@ let rec ts_extract_pos kn sts ts =
                 if pos then get_ty acc else ty_freevars acc in
               List.fold_left2 get stv (ts_extract_pos kn sts ts) tl
         in
-        let get_cs acc ls = List.fold_left get_ty acc ls.ls_args in
+        let get_cs acc (ls,_) = List.fold_left get_ty acc ls.ls_args in
         let negs = List.fold_left get_cs Stv.empty csl in
         List.map (fun v -> not (Stv.mem v negs)) ts.ts_args
 
@@ -726,7 +757,7 @@ let check_positivity kn d = match d.d_node with
   | Dtype tdl ->
       let add s (ts,_) = Sts.add ts s in
       let tss = List.fold_left add Sts.empty tdl in
-      let check_constr tys cs =
+      let check_constr tys (cs,_) =
         let rec check_ty ty = match ty.ty_node with
           | Tyvar _ -> ()
           | Tyapp (ts,tl) ->
@@ -752,4 +783,45 @@ let known_add_decl kn d =
   check_foundness kn d;
   check_match kn d;
   kn
+
+(** Records *)
+
+exception EmptyRecord
+
+let parse_record kn fll =
+  let fs = match fll with
+    | [] -> raise EmptyRecord
+    | (fs,_)::_ -> fs in
+  let ts = match fs.ls_args with
+    | [{ ty_node = Tyapp (ts,_) }] -> ts
+    | _ -> raise (BadRecordField fs) in
+  let cs, pjl = match find_constructors kn ts with
+    | [cs,pjl] -> cs, List.map (exn_option (BadRecordField fs)) pjl
+    | _ -> raise (BadRecordField fs) in
+  let pjs = List.fold_left (fun s pj -> Sls.add pj s) Sls.empty pjl in
+  let flm = List.fold_left (fun m (pj,v) ->
+    if not (Sls.mem pj pjs) then raise (BadRecordField pj) else
+    Mls.add_new (DuplicateRecordField pj) pj v m) Mls.empty fll in
+  cs,pjl,flm
+
+let make_record kn fll ty =
+  let cs,pjl,flm = parse_record kn fll in
+  let get_arg pj = Mls.find_exn (RecordFieldMissing pj) pj flm in
+  fs_app cs (List.map get_arg pjl) ty
+
+let make_record_update kn t fll ty =
+  let cs,pjl,flm = parse_record kn fll in
+  let get_arg pj = match Mls.find_opt pj flm with
+    | Some v -> v
+    | None -> t_app_infer pj [t] in
+  fs_app cs (List.map get_arg pjl) ty
+
+let make_record_pattern kn fll ty =
+  let cs,pjl,flm = parse_record kn fll in
+  let s = ty_match Mtv.empty (of_option cs.ls_value) ty in
+  let get_arg pj = match Mls.find_opt pj flm with
+    | Some v -> v
+    | None -> pat_wild (ty_inst s (of_option pj.ls_value))
+  in
+  pat_app cs (List.map get_arg pjl) ty
 

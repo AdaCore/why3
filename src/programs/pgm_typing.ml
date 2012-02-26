@@ -36,26 +36,8 @@ open Pgm_module
 let debug = Debug.register_flag "program_typing"
 let is_debug () = Debug.test_flag debug
 
-exception Message of string
-
-let error ?loc e = match loc with
-  | None -> raise e
-  | Some loc -> raise (Loc.Located (loc, e))
-
-let errorm ?loc f =
-  let buf = Buffer.create 512 in
-  let fmt = Format.formatter_of_buffer buf in
-  Format.kfprintf
-    (fun _ ->
-       Format.pp_print_flush fmt ();
-       let s = Buffer.contents buf in
-       Buffer.clear buf;
-       error ?loc (Message s))
-    fmt f
-
-let () = Exn_printer.register (fun fmt e -> match e with
-  | Message s -> fprintf fmt "%s" s
-  | _ -> raise e)
+let error = Loc.error
+let errorm = Loc.errorm
 
 let id_result = "result"
 
@@ -292,7 +274,8 @@ let rec dtype ~user env = function
       tyvar (Typing.find_user_type_var x env.denv)
   | PPTtyapp (p, x) ->
       let loc = Typing.qloc x in
-      let ts, a = Typing.specialize_tysymbol loc x (impure_uc env.uc) in
+      let ts = Typing.specialize_tysymbol loc x (impure_uc env.uc) in
+      let a = List.length ts.ts_args in
       let mt = get_mtsymbol ts in
       let np = List.length p in
       if np <> a - mt.mt_regions then
@@ -367,6 +350,35 @@ let rec extract_labels labs loc e = match e.Ptree.expr_desc with
       let labs, loc, d = extract_labels labs loc e in
       labs, loc, Ptree.Ecast ({ e with Ptree.expr_desc = d }, ty)
   | e -> List.rev labs, loc, e
+
+
+(* compatibility functions from Typing *)
+
+let find_qualid_ls uc p =
+  let loc = Typing.qloc p in
+  let sl = Typing.string_list_of_qualid [] p in
+  try ns_find_ls (get_namespace uc) sl with Not_found ->
+    errorm ~loc "unbound symbol %a" print_qualid p
+
+let is_projection uc ls =
+  try
+    let ts = match ls.ls_args with
+      | [{ty_node = Ty.Tyapp (ts,_)}] -> ts
+      | _ -> raise Exit in
+    match Decl.find_constructors (get_known uc) ts with
+      | [cs,pjl] ->
+          let find (i,r) = function
+            | Some pj when ls_equal ls pj -> (succ i, i)
+            | _ -> (succ i, r) in
+          let (_,r) = List.fold_left find (0,-1) pjl in
+          if r < 0 then None else Some (ts,cs,r)
+      | _ -> None
+  with Exit -> None
+
+let list_fields uc fl =
+  let field (q,e) = find_qualid_ls uc q, (Typing.qloc q, e) in
+  let cs,pjl,flm = Decl.parse_record (get_known uc) (List.map field fl) in
+  cs, List.map (fun pj -> Mls.find_opt pj flm) pjl
 
 (* [dexpr] translates ptree into dexpr *)
 
@@ -494,7 +506,7 @@ and dexpr_desc ~ghost ~userloc env loc = function
       let e = List.fold_left2 apply e el tyl in
       e.dexpr_desc, ty
   | Ptree.Erecord fl ->
-      let _, cs, fl = Typing.list_fields (impure_uc env.uc) fl in
+      let cs, fl = list_fields (impure_uc env.uc) fl in
       new_regions_vars ();
       let tyl, ty = specialize_lsymbol ~loc (Htv.create 17) cs in
       let ty = of_option ty in
@@ -519,7 +531,7 @@ and dexpr_desc ~ghost ~userloc env loc = function
       d.dexpr_desc, ty
   | Ptree.Eupdate (e1, fl) ->
       let e1 = dexpr ~ghost ~userloc env e1 in
-      let _, cs, fl = Typing.list_fields (impure_uc env.uc) fl in
+      let cs, fl = list_fields (impure_uc env.uc) fl in
       let tyl, ty = Denv.specialize_lsymbol ~loc cs in
       let ty = of_option ty in
       expected_type e1 ty;
@@ -589,7 +601,7 @@ and dexpr_desc ~ghost ~userloc env loc = function
         | _ ->
             assert false
       end;
-      begin match Typing.is_projection (impure_uc env.uc) ls with
+      begin match is_projection (impure_uc env.uc) ls with
         | Some (ts, _, i)  ->
             let mt = get_mtsymbol ts in
             let j =
@@ -844,7 +856,7 @@ let iuregion env ({ pp_loc = loc; pp_desc = d } as t) = match d with
   | PPapp (f, [t]) ->
       let th = effect_uc env.i_uc in
       let ls, _, _ = Typing.specialize_lsymbol f th in
-      begin match Typing.is_projection th ls with
+      begin match is_projection th ls with
         | Some (ts, _, i) ->
             let j =
               try
@@ -2189,7 +2201,7 @@ let add_types uc dl =
             begin match Decl.find_constructors km ts with
               | [] -> (* abstract *)
                   ()
-              | [ls] -> (* record *)
+              | [ls,_] -> (* record *)
                   add_logic_ps ~nofail:true uc ls.ls_name.id_string;
                   let field i ty =
                     if Hashtbl.mem mutable_field (x, i) then
@@ -2198,7 +2210,7 @@ let add_types uc dl =
                   in
                   list_iteri field ls.ls_args
               | cl -> (* algebraic *)
-                  let constructor ls =
+                  let constructor (ls,_) =
                     add_logic_ps ~nofail:true uc ls.ls_name.id_string;
                     List.iter visit_type ls.ls_args
                   in

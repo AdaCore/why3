@@ -53,7 +53,7 @@ val specialize_psymbol :
   Ptree.qualid -> theory_uc -> lsymbol * Denv.dty list
 
 val specialize_tysymbol :
-  Loc.position -> Ptree.qualid -> theory_uc -> Ty.tysymbol * int
+  Loc.position -> Ptree.qualid -> theory_uc -> Ty.tysymbol
 
 type denv
 
@@ -84,6 +84,7 @@ val split_qualid : Ptree.qualid -> string list * string
 val string_list_of_qualid : string list -> Ptree.qualid -> string list
 val qloc : Ptree.qualid -> Loc.position
 
+(*
 val is_projection : theory_uc -> lsymbol -> (tysymbol * lsymbol * int) option
   (** [is_projection uc ls] returns
       - [Some (ts, lsc, i)] if [ls] is the i-th projection of an
@@ -94,5 +95,6 @@ val list_fields: theory_uc ->
   (Ptree.qualid * 'a) list -> tysymbol * lsymbol * (Ptree.loc * 'a) option list
   (** check that the given fields all belong to the same record type
       and do not appear several times *)
+*)
 
 val type_inst: theory_uc -> theory -> Ptree.clone_subst list -> th_inst

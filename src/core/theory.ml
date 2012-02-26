@@ -352,7 +352,12 @@ let add_symbol add id v uc =
   | _ -> assert false
 
 let add_type uc (ts,def) =
-  let add_constr uc fs = add_symbol add_ls fs.ls_name fs uc in
+  let add_proj uc = function
+    | Some pj -> add_symbol add_ls pj.ls_name pj uc
+    | None -> uc in
+  let add_constr uc (fs,pl) =
+    let uc = add_symbol add_ls fs.ls_name fs uc in
+    List.fold_left add_proj uc pl in
   let uc = add_symbol add_ts ts.ts_name ts uc in
   match def with
     | Tabstract -> uc
@@ -513,10 +518,13 @@ let cl_init th inst =
 (* clone declarations *)
 
 let cl_type cl inst tdl =
-  let add_constr ls =
+  let add_ls ls =
     if Mls.mem ls inst.inst_ls
       then raise (CannotInstantiate ls.ls_name)
       else cl_find_ls cl ls
+  in
+  let add_constr (ls,pl) =
+      add_ls ls, List.map (option_map add_ls) pl
   in
   let add_type (ts,td) acc =
     if Mts.mem ts inst.inst_ts then
@@ -749,7 +757,7 @@ let create_theory ?(path=[]) n =
 
 let bool_theory =
   let uc = empty_theory (id_fresh "Bool") [] in
-  let uc = add_ty_decl uc [ts_bool, Talgebraic [fs_true; fs_false]] in
+  let uc = add_ty_decl uc [ts_bool, Talgebraic [fs_true,[]; fs_false,[]]] in
   close_theory uc
 
 let highord_theory =
@@ -761,8 +769,10 @@ let highord_theory =
   close_theory uc
 
 let tuple_theory = Util.memo_int 17 (fun n ->
+  let ts = ts_tuple n and fs = fs_tuple n in
+  let pl = List.map (fun _ -> None) ts.ts_args in
   let uc = empty_theory (id_fresh ("Tuple" ^ string_of_int n)) [] in
-  let uc = add_ty_decl uc [ts_tuple n, Talgebraic [fs_tuple n]] in
+  let uc = add_ty_decl uc [ts, Talgebraic [fs,pl]] in
   close_theory uc)
 
 let tuple_theory_name s =

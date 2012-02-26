@@ -164,7 +164,7 @@ let rec update env mreg x ty =
       if cl = [] then failwith "WP: cannot update a value of this type";
       (* TODO: print the type *)
       let s = get_ty_subst ty in
-      let branch cs =
+      let branch (cs,_) =
         let cs_pure = (get_psymbol cs).ps_pure in
         let mk_var ty =
           let ty = ty_inst s ty in

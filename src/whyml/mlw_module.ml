@@ -227,7 +227,8 @@ let add_pdecl uc d =
   match d.pd_node with
   | PDtype dl ->
       let uc = List.fold_left add_type uc dl in
-      let constructor (ps, _) = ps.ls in
+      let projection = option_map (fun ps -> ps.ls) in
+      let constructor (ps,pjl) = ps.ls, List.map projection pjl in
       let defn = function
         | ITabstract -> Decl.Tabstract
         | ITalgebraic cl -> Decl.Talgebraic (List.map constructor cl)

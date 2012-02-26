@@ -443,7 +443,7 @@ let print_expr info fmt =
 
 (** Declarations *)
 
-let print_constr info _ts fmt cs =
+let print_constr info _ts fmt (cs,_) =
   match cs.ls_args with
     | [] ->
         fprintf fmt "@[<hov 4>%a: %a?@]" print_ls cs print_ls cs
