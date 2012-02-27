@@ -201,3 +201,9 @@ let session_iter_proof_attempt_by_filter filters f session =
 
 
 let set_filter_verified_goal t = opt_filter_verified_goal := t
+
+let opt_force_obsolete = ref false
+
+let force_obsolete_spec =
+  ["-F", Arg.Set opt_force_obsolete,
+   " transform obsolete session"]

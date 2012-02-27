@@ -23,19 +23,22 @@ open Why3session_lib
 
 let cmds =
   [|
-    Why3session_mod.cmd;
-    Why3session_copy.cmd;
+    Why3session_copy.cmd_mod;
+    Why3session_copy.cmd_copy;
+    Why3session_copy.cmd_archive;
     Why3session_info.cmd;
     Why3session_rm.cmd;
   |]
 
-let usage = "why3session cmd [opts]:"
+let usage = "why3session cmd [opts]"
 
 let print_usage () =
+  let maxl = Array.fold_left
+    (fun acc e -> max acc (String.length e.cmd_name)) 0 cmds in
   eprintf "%s@.@.command:@.@[<hov>%a@]@."
     usage (Pp.print_iter1 Array.iter Pp.newline
-             (fun fmt e -> fprintf fmt "%s     @[<hov>%s@]"
-               e.cmd_name e.cmd_desc)) cmds;
+             (fun fmt e -> fprintf fmt "%s   @[<hov>%s@]"
+               (Util.padd_string ' ' e.cmd_name maxl) e.cmd_desc)) cmds;
   exit 1
 
 

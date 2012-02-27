@@ -80,3 +80,7 @@ val session_iter_proof_attempt_by_filter :
 (* quite ad-hoc *)
 type filter_three = | FT_Yes | FT_No | FT_All
 val set_filter_verified_goal : filter_three -> unit
+
+(** force obsolete *)
+val opt_force_obsolete : bool ref
+val force_obsolete_spec : spec_list

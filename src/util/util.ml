@@ -207,6 +207,17 @@ let ends_with s suf =
   let suflen = String.length suf in
   slen >= suflen && aux s suf suflen (slen - suflen) 0
 
+let padd_string c s i =
+  let sl = String.length s in
+  if sl < i then
+    let p = String.create i in
+    String.blit s 0 p 0 sl;
+    String.fill p sl (i-sl) c;
+    p
+  else if sl > i
+  then String.sub s 0 i
+  else s
+
 (** usefule function on char *)
 let is_uppercase c = 'A' <= c && c <= 'Z'
 

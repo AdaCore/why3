@@ -88,8 +88,7 @@ let run () =
 
 let cmd =
   { cmd_spec = spec;
-    cmd_desc     = "remove proof based on a filter. \
-No filter means all the possibilities (except for --filter-archived).";
+    cmd_desc     = "remove proof based on a filter.";
     cmd_name     = "rm";
     cmd_run      = run;
   }
