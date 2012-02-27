@@ -1,0 +1,18 @@
+theory T
+  use import int.Int
+
+function f (x : int) : int = x + 1
+
+goal G1_true : forall x : int. f x - 1 = x
+
+goal G2_false : forall x : int. f x = x
+
+axiom A_false : forall x : int. f x = x
+
+goal G1W : forall x : int. f x - 1 = x
+
+goal G2W : forall x : int. f x = x
+
+goal G3W : forall x : int. f x = 2*x
+
+end

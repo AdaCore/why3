@@ -34,9 +34,9 @@ val print_list_par :
   (Format.formatter -> unit -> 'a) ->
   (Format.formatter -> 'b -> unit) -> Format.formatter -> 'b list -> unit
 val print_list_delim :
-  (Format.formatter -> unit -> unit) ->
-  (Format.formatter -> unit -> unit) ->
-  (Format.formatter -> unit -> unit) ->
+  start:(Format.formatter -> unit -> unit) ->
+  stop:(Format.formatter -> unit -> unit) ->
+  sep:(Format.formatter -> unit -> unit) ->
   (Format.formatter -> 'b -> unit) -> Format.formatter -> 'b list -> unit
 
 val print_pair_delim :
@@ -101,6 +101,7 @@ val rchevron : formatter -> unit -> unit
 val nothing : formatter -> 'a -> unit
 val string : formatter -> string -> unit
 val constant_string : string -> formatter -> unit -> unit
+val print0 : formatter -> unit -> unit
 val hov : int -> formatter -> ('a -> unit) -> 'a -> unit
 val add_flush : (formatter -> 'a -> unit) -> formatter -> 'a -> unit
 
@@ -124,6 +125,12 @@ val string_of_wnl : (Format.formatter -> 'a -> unit) -> 'a -> string
   (** same as {!string_of} but without newline *)
 
 val wnl : Format.formatter -> unit
+
+val sprintf :
+  ('b,  formatter, unit, string) Pervasives.format4 -> 'b
+
+val sprintf_wnl :
+  ('b,  formatter, unit, string) Pervasives.format4 -> 'b
 
 module Ansi :
 sig

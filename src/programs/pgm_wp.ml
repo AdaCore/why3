@@ -57,7 +57,7 @@ let get_mutable_field ts i =
 
 let wp_label e f =
   let loc = if f.t_loc = None then Some e.expr_loc else f.t_loc in
-  let lab = Slab.union f.t_label e.expr_lab in
+  let lab = Ident.Slab.fold Ident.Slab.add e.expr_lab f.t_label in
   t_label ?loc lab f
 
 let wp_and ?(sym=false) f1 f2 =
@@ -123,23 +123,23 @@ let old_mark lab t = t_subst_single vs_old (t_var lab) t
 (* replace [at(t,lab)] with [at(t,'now)] everywhere in formula [f] *)
 let erase_mark lab t = t_subst_single lab (t_var vs_now) t
 
-let rec unref s t = match t.t_node with
-  | Tvar vs ->
+let rec unref ~now s t = match t.t_node with
+  | Tvar vs when now ->
       begin try t_var (Mvs.find vs s) with Not_found -> t end
   | Tapp (ls, _) when ls_equal ls fs_old ->
       assert false
   | Tapp (ls, [e;{t_node = Tvar lab}]) when ls_equal ls fs_at ->
       if vs_equal lab vs_old then assert false else
-      if vs_equal lab vs_now then unref s e else
-      (* do not recurse in at(...) *)
-      t
+      if vs_equal lab vs_now then unref ~now:true s e else
+      (* no longer assume that unmarked variables are at mark 'now *)
+      t_map (unref ~now:false s) t
   | Tlet _ | Tcase _ | Teps _ | Tquant _ ->
       (* do not open unless necessary *)
       let s = Mvs.set_inter s t.t_vars in
       if Mvs.is_empty s then t else
-      t_map (unref s) t
+      t_map (unref ~now s) t
   | _ ->
-      t_map (unref s) t
+      t_map (unref ~now s) t
 
 let find_constructor env ts =
   let km = get_known (pure_uc env) in
@@ -164,7 +164,7 @@ let rec update env mreg x ty =
       if cl = [] then failwith "WP: cannot update a value of this type";
       (* TODO: print the type *)
       let s = get_ty_subst ty in
-      let branch cs =
+      let branch (cs,_) =
         let cs_pure = (get_psymbol cs).ps_pure in
         let mk_var ty =
           let ty = ty_inst s ty in
@@ -233,7 +233,7 @@ let quantify env rm sreg f =
         | Tyvar _ -> assert false
       in
       let id = Spv.fold test vars None in
-      let id = id_clone (default_option r.R.r_tv.tv_name id) in
+      let id = id_clone (def_option r.R.r_tv.tv_name id) in
       let r' = create_vsymbol id (purify r.R.r_ty) in
       Mtv.add r.R.r_tv r' m
     in
@@ -247,7 +247,7 @@ let quantify env rm sreg f =
     in
     Spv.fold add vars Mvs.empty
   in
-  let f = unref vv' f in
+  let f = unref ~now:true vv' f in
   let f =
     let add_update x f =
       let v' = Mvs.find x.pv_pure vv' in
@@ -375,8 +375,8 @@ let term_at lab t =
   t_app fs_at [t; t_var lab] t.t_ty
 
 let wp_expl l f =
-  let l = mk_label ("expl:"^l) in
-  let lab = Slab.add l (Slab.add Split_goal.stop_split f.t_label) in
+  let lab = Slab.add Split_goal.stop_split f.t_label in
+  let lab = Slab.add (Ident.create_label ("expl:" ^ l)) lab in
   t_label ?loc:f.t_loc lab f
 
 (* 0 <= phi0 and phi < phi0 *)
@@ -461,7 +461,10 @@ and wp_desc env rm e q = match e.expr_desc with
         wp_expr env rm e2 (filter_post e2.expr_effect q)
       in
       let v1 = v_result x.pv_pure.vs_ty in
-      let t1 = t_label ~loc:e1.expr_loc (singleton "let") (t_var v1) in
+      (* (* FIXME? Why do we need this label? *)
+      let ll = Slab.singleton (Ident.create_label "let") in
+      let t1 = t_label ~loc:e1.expr_loc ll (t_var v1) in *)
+      let t1 = t_label ~loc:e1.expr_loc Slab.empty (t_var v1) in
       let q1 = v1, t_subst_single x.pv_pure t1 w2 in
       let q1 = saturate_post e1.expr_effect q1 q in
       wp_label e (wp_expr env rm e1 q1)
@@ -617,9 +620,8 @@ and wp_desc env rm e q = match e.expr_desc with
   | Eany c ->
       (* TODO: propagate call labels into c.c_post *)
       let w = opaque_wp env rm c.c_effect.E.writes c.c_post q in
-      let p = wp_expl "precondition" c.c_pre in
-      let lab = Slab.union p.t_label e.expr_lab in
-      let p = t_label ~loc:e.expr_loc lab p in
+      let p = wp_label e (wp_expl "precondition" c.c_pre) in
+      let p = t_label ~loc:e.expr_loc p.t_label p in
       wp_and p w
 
 and wp_triple env rm bl (p, e, q) =
@@ -627,8 +629,7 @@ and wp_triple env rm bl (p, e, q) =
   let q =
     let (v, q), l = q in
     (v, wp_expl "normal postcondition" q),
-    List.map (fun (e, (v, q)) ->
-                e, (v, wp_expl "exceptional postcondition" q)) l
+    List.map (fun (e,(v,q)) -> e,(v,wp_expl "exceptional postcondition" q)) l
   in
   let f = wp_expr env rm e q in
   let f = wp_implies p f in
@@ -662,6 +663,18 @@ let bool_to_prop env f =
   let ls_True  = find_ls ~pure:true env "True" in
   let ls_False = find_ls ~pure:true env "False" in
   let t_True   = fs_app ls_True [] (ty_app ts_bool []) in
+  let is_bool ls = ls_equal ls ls_True || ls_equal ls ls_False in
+  let rec t_iff_bool f1 f2 = match f1.t_node, f2.t_node with
+    | Tnot f1, _ -> t_not_simp (t_iff_bool f1 f2)
+    | _, Tnot f2 -> t_not_simp (t_iff_bool f1 f2)
+    | Tapp (ps1, [t1; { t_node = Tapp (ls1, []) }]),
+      Tapp (ps2, [t2; { t_node = Tapp (ls2, []) }])
+      when ls_equal ps1 ps_equ && ls_equal ps2 ps_equ &&
+           is_bool ls1 && is_bool ls2 ->
+        if ls_equal ls1 ls2 then t_equ t1 t2 else t_neq t1 t2
+    | _ ->
+        t_iff_simp f1 f2
+  in
   let rec t_btop t = t_label ?loc:t.t_loc t.t_label (* t_label_copy? *)
     (match t.t_node with
     | Tif (f,t1,t2) ->
@@ -680,10 +693,10 @@ let bool_to_prop env f =
         t_equ_simp (f_btop t) t_True)
   and f_btop f = match f.t_node with
     | Tapp (ls, [{t_ty = Some {ty_node = Tyapp (ts, [])}} as l; r])
-    when ls_equal ls ps_equ && ts_equal ts ts_bool ->
-        t_label ?loc:f.t_loc f.t_label
-          (t_iff_simp (t_btop l) (t_btop r))
-    | _ -> t_map_simp f_btop f
+      when ls_equal ls ps_equ && ts_equal ts ts_bool ->
+        t_label ?loc:f.t_loc f.t_label (t_iff_bool (t_btop l) (t_btop r))
+    | _ ->
+        t_map_simp f_btop f
   in
   f_btop f
 
@@ -706,15 +719,22 @@ let add_wp_decl ps f uc =
   (* prepare a proposition symbol *)
   let name = ps.ps_pure.ls_name in
   let s = "WP_" ^ name.id_string in
-  let label = Slab.add (mk_label ("expl:" ^ name.id_string)) name.id_label in
+  let lab = Ident.create_label ("expl:" ^ name.id_string) in
+  let label = Slab.add lab name.id_label in
   let id = id_fresh ~label ?loc:name.id_loc s in
   let pr = create_prsymbol id in
   (* prepare the VC formula *)
-  let km = get_known (pure_uc uc) in
   let f = remove_at f in
   let f = bool_to_prop uc f in
-  let f = eval_match ~inline:inline_nonrec_linear km f in
   let f = unabsurd f in
+  (* get a known map with tuples added *)
+  let km =
+    let d = create_prop_decl Pgoal pr f in
+    let uc = add_pure_decl d uc in
+    get_known (pure_uc uc)
+  in
+  (* simplify f *)
+  let f = eval_match ~inline:inline_nonrec_linear km f in
   (* printf "wp: f=%a@." print_term f; *)
   let d = create_prop_decl Pgoal pr f in
   add_pure_decl d uc

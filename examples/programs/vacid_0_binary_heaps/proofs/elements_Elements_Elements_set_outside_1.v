@@ -222,5 +222,3 @@ destruct h.
  apply H_induc;intuition.
 Qed.
 (* DO NOT EDIT BELOW *)
-
-

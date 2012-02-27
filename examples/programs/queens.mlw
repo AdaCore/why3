@@ -49,7 +49,7 @@ theory Solution
   use export map.Map
 
   (* the number of queens *)
-  function n : int
+  constant n : int
 
   type solution = map int int
 
@@ -260,11 +260,11 @@ module NQueensBits
           sorted !sol (at !s 'L) !s /\
           (forall i j: int. mem i (diff (at (bits !e) 'L) (bits !e)) ->
              mem j (bits !e) -> i < j) /\
-          (forall t: solution.
-           (solution t /\ eq_prefix !col t !k /\
-            mem t[!k] (diff (at (bits !e) 'L) (bits !e)))
+          (forall u: solution.
+           (solution u /\ eq_prefix !col u !k /\
+            mem u[!k] (diff (at (bits !e) 'L) (bits !e)))
            <->
-           (exists i: int. (at !s 'L) <= i < !s /\ eq_sol t !sol[i])) /\
+           (exists i: int. (at !s 'L) <= i < !s /\ eq_sol u !sol[i])) /\
           (* assigns *)
           eq_prefix (at !col 'L) !col !k /\
           eq_prefix (at !sol 'L) !sol (at !s 'L) }
@@ -284,9 +284,9 @@ module NQueensBits
     end
     { result = !s - old !s >= 0 /\ !k = old !k /\
       sorted !sol (old !s) !s /\
-      (forall t: solution.
-         ((solution t /\ eq_prefix !col t !k) <->
-          (exists i: int. old !s <= i < !s /\ eq_sol t !sol[i]))) /\
+      (forall u: solution.
+         ((solution u /\ eq_prefix !col u !k) <->
+          (exists i: int. old !s <= i < !s /\ eq_sol u !sol[i]))) /\
       (* assigns *)
       eq_prefix (old !col) !col !k /\
       eq_prefix (old !sol) !sol (old !s) }
@@ -295,8 +295,8 @@ module NQueensBits
     { 0 <= q = n <= size /\ !s = 0 /\ !k = 0 }
     t (~(~0 << q)) 0 0
     { result = !s /\ sorted !sol 0 !s /\
-      forall t: solution.
-        solution t <-> (exists i: int. 0 <= i < result /\ eq_sol t !sol[i]) }
+      forall u: solution.
+        solution u <-> (exists i: int. 0 <= i < result /\ eq_sol u !sol[i]) }
 
 end
 

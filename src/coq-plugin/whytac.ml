@@ -894,7 +894,7 @@ let whytac s gl =
   try
     tr_goal gl;
     let cp, drv = get_prover s in
-    let command = cp.command in
+    let command = String.concat " " (cp.command :: cp.extra_options) in
     if debug then Format.printf "@[%a@]@\n---@." Pretty.print_task !task;
     if debug then Format.printf "@[%a@]@\n---@." (Driver.print_task drv) !task;
     let res = Driver.prove_task ~command ~timelimit drv !task () () in

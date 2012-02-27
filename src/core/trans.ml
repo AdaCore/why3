@@ -282,6 +282,24 @@ let lookup_transform_l s =
 let list_transforms ()   = Hashtbl.fold (fun k _ acc -> k::acc) transforms []
 let list_transforms_l () = Hashtbl.fold (fun k _ acc -> k::acc) transforms_l []
 
+(** fast transform *)
+type gentrans =
+  | Trans_one of Task.task trans
+  | Trans_list of Task.task tlist
+
+let lookup_trans env name =
+  try
+    let t = lookup_transform name env in
+    Trans_one t
+  with UnknownTrans _ ->
+    let t = lookup_transform_l name env in
+    Trans_list t
+
+let apply_transform tr_name env task =
+   match lookup_trans env tr_name with
+    | Trans_one t -> [apply t task]
+    | Trans_list t -> apply t task
+
 (** Flag-dependent transformations *)
 
 exception UnknownFlagTrans of meta * string * string list

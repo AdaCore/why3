@@ -19,7 +19,7 @@ theory Set
     forall s1 s2 s3: set 'a. subset s1 s2 -> subset s2 s3 -> subset s1 s3
 
   (* empty set *)
-  function empty : set 'a
+  constant empty : set 'a
 
   predicate is_empty (s: set 'a) = forall x: 'a. not (mem x s)
 
@@ -67,6 +67,37 @@ theory Set
 
   lemma subset_diff:
     forall s1 s2: set 'a. subset (diff s1 s2) s1
+
+  (* the set of all x of type 'a *)
+  constant all: set 'a
+
+  axiom all_def: forall x: 'a. mem x all
+
+end
+
+theory SetComprehension
+
+  use export Set
+  use HighOrd as HO
+
+  (* { x | p x } *)
+  function comprehension (p: HO.pred 'a) : set 'a
+
+  axiom comprehension_def:
+    forall p: HO.pred 'a.
+    forall x: 'a. mem x (comprehension p) <-> p x
+
+  (* { x | x in U and p(x) *)
+  function filter (p: HO.pred 'a) (u: set 'a) : set 'a =
+    comprehension (\ x: 'a. p x /\ mem x u)
+
+  (* { f x | x in U } *)
+  function map (f: HO.func 'a 'b) (u: set 'a) : set 'b =
+    comprehension (\ y: 'b. exists x: 'a. mem x u /\ y = f x)
+
+  lemma map_def:
+    forall f: HO.func 'a 'b, u: set 'a.
+    forall x: 'a. mem x u -> mem (f x) (map f u)
 
 end
 
@@ -144,7 +175,7 @@ theory SetMap
 
   predicate mem (x:'a) (s:set 'a) = s[x] = True
 
-  function empty : set 'a = const False
+  constant empty : set 'a = const False
 
   predicate is_empty (s : set 'a) = forall x : 'a. not (mem x s)
 

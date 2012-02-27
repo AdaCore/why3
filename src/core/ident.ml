@@ -28,38 +28,28 @@ type label = {
 }
 
 module Lab = StructMake (struct
-   type t = label
-   let tag l = l.lab_tag
+  type t = label
+  let tag lab = lab.lab_tag
 end)
 
 module Slab = Lab.S
 module Mlab = Lab.M
 
-let label_hash (x : label) = x.lab_tag
-
-let label_equal (a : label) (b : label) = a == b
-
 module Hslab = Hashcons.Make (struct
-   type t = label
-
-   let equal l1 l2 = l1.lab_string = l2.lab_string
-
-   let hash l = Hashtbl.hash l.lab_string
-
-   let tag t l = {l with lab_tag = t}
+  type t = label
+  let equal lab1 lab2 = lab1.lab_string = lab2.lab_string
+  let hash lab = Hashtbl.hash lab.lab_string
+  let tag n lab = { lab with lab_tag = n }
 end)
 
-let mk_label s = Hslab.hashcons { lab_string = s ; lab_tag = -1 }
+let create_label s = Hslab.hashcons {
+  lab_string = s;
+  lab_tag    = -1
+}
 
-let hash_labelset s =
-   Slab.fold (fun x acc -> Hashcons.combine acc x.lab_tag) s 17
+let lab_equal : label -> label -> bool = (==)
 
-let singleton s =
-   Slab.singleton (mk_label s)
-
-let singl_pair s =
-   let x = mk_label s in
-   x, Slab.singleton x
+let lab_hash (lab : label) = lab.lab_tag
 
 (** Identifiers *)
 
@@ -104,10 +94,12 @@ let id_user ?(label = Slab.empty) nm loc =
   create_ident nm label (Some loc)
 
 let id_clone ?(label = Slab.empty) id =
-  create_ident id.id_string (Slab.union label id.id_label) id.id_loc
+  let ll = Slab.union label id.id_label in
+  create_ident id.id_string ll id.id_loc
 
 let id_derive ?(label = Slab.empty) nm id =
-  create_ident nm (Slab.union label id.id_label) id.id_loc
+  let ll = Slab.union label id.id_label in
+  create_ident nm ll id.id_loc
 
 (** Unique names for pretty printing *)
 
@@ -201,8 +193,14 @@ let char_to_ualpha c = String.capitalize (char_to_alpha c)
 let char_to_alnum c =
   match c with '0'..'9' -> String.make 1 c | _ -> char_to_alpha c
 
+let char_to_lalnum c =
+  match c with '0'..'9' -> String.make 1 c | _ -> char_to_lalpha c
+
 let char_to_alnumus c =
   match c with '_' | ' ' -> "_" | _ -> char_to_alnum c
+
+let char_to_lalnumus c =
+  match c with '_' | ' ' -> "_" | _ -> char_to_lalnum c
 
 let sanitizer head rest n =
   let lst = ref [] in

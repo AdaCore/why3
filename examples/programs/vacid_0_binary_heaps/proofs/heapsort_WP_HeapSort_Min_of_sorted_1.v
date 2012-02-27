@@ -2,6 +2,8 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import ZArith.
 Require Import Rbase.
+Require int.Int.
+Require int.MinMax.
 Definition unit  := unit.
 
 Parameter qtmark : Type.
@@ -13,6 +15,12 @@ Implicit Arguments at1.
 Parameter old: forall (a:Type), a -> a.
 
 Implicit Arguments old.
+
+Definition implb(x:bool) (y:bool): bool := match (x,
+  y) with
+  | (true, false) => false
+  | (_, _) => true
+  end.
 
 Parameter bag : forall (a:Type), Type.
 
@@ -101,28 +109,6 @@ Axiom Card_union : forall (a:Type), forall (x:(bag a)) (y:(bag a)),
 
 Axiom Card_zero_empty : forall (a:Type), forall (x:(bag a)),
   ((card x) = 0%Z) -> (x = (empty_bag:(bag a))).
-
-Axiom Max_is_ge : forall (x:Z) (y:Z), (x <= (Zmax x y))%Z /\
-  (y <= (Zmax x y))%Z.
-
-Axiom Max_is_some : forall (x:Z) (y:Z), ((Zmax x y) = x) \/ ((Zmax x y) = y).
-
-Axiom Min_is_le : forall (x:Z) (y:Z), ((Zmin x y) <= x)%Z /\
-  ((Zmin x y) <= y)%Z.
-
-Axiom Min_is_some : forall (x:Z) (y:Z), ((Zmin x y) = x) \/ ((Zmin x y) = y).
-
-Axiom Max_x : forall (x:Z) (y:Z), (y <= x)%Z -> ((Zmax x y) = x).
-
-Axiom Max_y : forall (x:Z) (y:Z), (x <= y)%Z -> ((Zmax x y) = y).
-
-Axiom Min_x : forall (x:Z) (y:Z), (x <= y)%Z -> ((Zmin x y) = x).
-
-Axiom Min_y : forall (x:Z) (y:Z), (y <= x)%Z -> ((Zmin x y) = y).
-
-Axiom Max_sym : forall (x:Z) (y:Z), (y <= x)%Z -> ((Zmax x y) = (Zmax y x)).
-
-Axiom Min_sym : forall (x:Z) (y:Z), (y <= x)%Z -> ((Zmin x y) = (Zmin y x)).
 
 Parameter diff: forall (a:Type), (bag a) -> (bag a) -> (bag a).
 
@@ -310,7 +296,7 @@ assert (h: (i = j-1 \/ i < j-1)%Z) by omega.
      auto.
    assert (h: (get a i <= get a (n-1))%Z).
       apply H_sorted; intuition.
-   rewrite Min_y; auto.
+   rewrite Zmin_r; auto.
    rewrite <- (H_induc (j-1)%Z); auto with zarith.
    unfold sorted_sub; auto with zarith.
    pattern (min_bag (elements a i (j-1))); 
@@ -318,3 +304,5 @@ assert (h: (i = j-1 \/ i < j-1)%Z) by omega.
    unfold sorted_sub; auto with zarith.
 Qed.
 (* DO NOT EDIT BELOW *)
+
+

@@ -39,7 +39,6 @@ let opt_input = ref None
 let opt_theory = ref None
 let opt_trans = ref []
 let opt_metas = ref []
-let opt_debug = ref []
 
 let add_opt_file x =
   let tlist = Queue.create () in
@@ -80,8 +79,6 @@ let add_opt_goal x = match !opt_theory with
 
 let add_opt_trans x = opt_trans := x::!opt_trans
 
-let add_opt_debug x = opt_debug := x::!opt_debug
-
 let add_opt_meta meta =
   let meta_name, meta_arg =
     let index = String.index meta '=' in
@@ -90,6 +87,7 @@ let add_opt_meta meta =
   opt_metas := (meta_name,meta_arg)::!opt_metas
 
 let opt_config = ref None
+let opt_extra = ref []
 let opt_parser = ref None
 let opt_prover = ref None
 let opt_loadpath = ref []
@@ -112,11 +110,10 @@ let opt_list_printers = ref false
 let opt_list_provers = ref false
 let opt_list_formats = ref false
 let opt_list_metas = ref false
-let opt_list_flags = ref false
 
+let opt_token_count = ref false
 let opt_parse_only = ref false
 let opt_type_only = ref false
-let opt_debug_all = ref false
 let opt_version = ref false
 
 let option_list = Arg.align [
@@ -134,6 +131,8 @@ let option_list = Arg.align [
       "<file> Read configuration from <file>";
   "--config", Arg.String (fun s -> opt_config := Some s),
       " same as -C";
+  "--extra-config", Arg.String (fun s -> opt_extra := !opt_extra @ [s]),
+      "<file> Read additional configuration from <file>";
   "-L", Arg.String (fun s -> opt_loadpath := s :: !opt_loadpath),
       "<dir> Add <dir> to the library search path";
   "--library", Arg.String (fun s -> opt_loadpath := s :: !opt_loadpath),
@@ -164,9 +163,9 @@ let option_list = Arg.align [
       "<meta_name>=<string> Add a string meta to every task";
   "--meta", Arg.String add_opt_meta,
       " same as -M";
-  "-D", Arg.String (fun s -> opt_driver := Some s),
+  "-D", Arg.String (fun s -> opt_driver := Some (s, [])),
       "<file> Specify a prover's driver (conflicts with -P)";
-  "--driver", Arg.String (fun s -> opt_driver := Some s),
+  "--driver", Arg.String (fun s -> opt_driver := Some (s, [])),
       " same as -D";
   "-o", Arg.String (fun s -> opt_output := Some s),
       "<dir> Print the selected goals to separate files in <dir>";
@@ -191,16 +190,14 @@ let option_list = Arg.align [
       " List known input formats";
   "--list-metas", Arg.Set opt_list_metas,
       " List known metas";
-  "--list-debug-flags", Arg.Set opt_list_flags,
-      " List known debug flags";
-  "--parse-only", Arg.Set opt_parse_only,
-      " Stop after parsing (same as --debug parse_only)";
-  "--type-only", Arg.Set opt_type_only,
-      " Stop after type checking (same as --debug type_only)";
-  "--debug-all", Arg.Set opt_debug_all,
-      " Set all debug flags (except parse_only and type_only)";
-  "--debug", Arg.String add_opt_debug,
-      "<flag> Set a debug flag";
+  Debug.Opt.desc_debug_list;
+  "--token-count", Arg.Set opt_token_count,
+      " Only lexing, and give numbers of tokens in spec vs in program";
+  Debug.Opt.desc_shortcut "parse_only" "--parse-only" " Stop after parsing";
+  Debug.Opt.desc_shortcut
+    "type_only" "--type-only" " Stop after type checking";
+  Debug.Opt.desc_debug_all;
+  Debug.Opt.desc_debug;
   "--print-libdir", Arg.Set opt_print_libdir,
       " Print location of binary components (plugins, etc)";
   "--print-datadir", Arg.Set opt_print_datadir,
@@ -224,22 +221,12 @@ let () = try
     exit 0
   end;
 
-  (** Debug flag *)
-  if !opt_debug_all then begin
-    List.iter (fun (_,f,_) -> Debug.set_flag f) (Debug.list_flags ());
-    Debug.unset_flag Typing.debug_parse_only;
-    Debug.unset_flag Typing.debug_type_only
-  end;
-
-  List.iter (fun s -> Debug.set_flag (Debug.lookup_flag s)) !opt_debug;
-
-  if !opt_parse_only then Debug.set_flag Typing.debug_parse_only;
-  if !opt_type_only then Debug.set_flag Typing.debug_type_only;
-
   (** Configuration *)
   let config = read_config !opt_config in
   let main = get_main config in
   Whyconf.load_plugins main;
+
+  Debug.Opt.set_flags_selected ();
 
   (** listings*)
 
@@ -272,8 +259,10 @@ let () = try
   if !opt_list_provers then begin
     opt_list := true;
     let config = read_config !opt_config in
-    let print fmt s prover = fprintf fmt "%s (%s)@\n" s prover.name in
-    let print fmt m = Mstr.iter (print fmt) m in
+    let config = List.fold_left merge_config config !opt_extra in
+    let print fmt prover pc = fprintf fmt "%s (%a)@\n"
+      pc.id print_prover prover in
+    let print fmt m = Mprover.iter (print fmt) m in
     let provers = get_provers config in
     printf "@[<hov 2>Known provers:@\n%a@]@." print provers
   end;
@@ -289,13 +278,7 @@ let () = try
     printf "@[<hov 2>Known metas:@\n%a@]@\n@."
       (Pp.print_list Pp.newline print) (List.sort cmp (Theory.list_metas ()))
   end;
-  if !opt_list_flags then begin
-    opt_list := true;
-    let print fmt (p,_,_) = fprintf fmt "%s" p in
-    printf "@[<hov 2>Known debug flags:@\n%a@]@."
-      (Pp.print_list Pp.newline print)
-      (List.sort Pervasives.compare (Debug.list_flags ()))
-  end;
+  opt_list :=  Debug.Opt.option_list () || !opt_list;
   if !opt_list then exit 0;
 
   if Queue.is_empty opt_queue then begin
@@ -340,12 +323,9 @@ let () = try
   if !opt_memlimit  = None then opt_memlimit  := Some (Whyconf.memlimit main);
   begin match !opt_prover with
   | Some s ->
-      let prover = try Mstr.find s (get_provers config) with
-        | Not_found -> eprintf "Prover '%s' not found in %s@."
-            s (Whyconf.get_conf_file config); exit 1
-      in
-      opt_command := Some prover.command;
-      opt_driver := Some prover.driver
+      let prover = Whyconf.prover_by_id config s in
+      opt_command := Some (String.concat " " (prover.command :: prover.extra_options));
+      opt_driver := Some (prover.driver, prover.extra_drivers)
   | None ->
       ()
   end;
@@ -418,18 +398,13 @@ let output_theory drv fname _tname th task dir =
   Driver.print_task ?old drv (formatter_of_out_channel cout) task;
   close_out cout
 
-let do_task env drv fname tname (th : Theory.theory) (task : Task.task) =
+let do_task drv fname tname (th : Theory.theory) (task : Task.task) =
   match !opt_output, !opt_command with
     | Some dir, _ when !opt_realize ->
         output_theory drv fname tname th task dir
     | None, _ when !opt_realize ->
-        (* FIXME: we should be able to realize other formats *)
-        let file,ich = Env.find_channel env "why" th.th_path in
-        let dir = try Filename.chop_extension file with _ ->
-          eprintf "File %s does not have an extension.@." file;
-          exit 1 in
-        close_in ich;
-        output_theory drv fname tname th task dir
+        eprintf "Output directory (-o) is required.@.";
+        exit 1
     | Some dir, Some command when !opt_bisect ->
         let test task =
           let call = Driver.prove_task_prepared
@@ -467,7 +442,7 @@ let do_tasks env drv fname tname th task =
       List.rev_append (Trans.apply tr task) acc) [] tasks)
   in
   let tasks = List.fold_left apply [task] trans in
-  List.iter (do_task env drv fname tname th) tasks
+  List.iter (do_task drv fname tname th) tasks
 
 let do_theory env drv fname tname th glist =
   if !opt_print_theory then
@@ -502,7 +477,8 @@ let do_theory env drv fname tname th glist =
   end
 
 let do_global_theory env drv (tname,p,t,glist) =
-  let th = try Env.find_theory env p t with Env.TheoryNotFound _ ->
+  let format = Util.def_option "why" !opt_parser in
+  let th = try Env.read_theory ~format env p t with Env.TheoryNotFound _ ->
     eprintf "Theory '%s' not found.@." tname;
     exit 1
   in
@@ -515,6 +491,9 @@ let do_local_theory env drv fname m (tname,_,t,glist) =
   in
   do_theory env drv fname tname th glist
 
+let total_annot_tokens = ref 0
+let total_program_tokens = ref 0
+
 let do_input env drv = function
   | None, _ when !opt_parse_only || !opt_type_only ->
       ()
@@ -525,24 +504,46 @@ let do_input env drv = function
         | "-" -> "stdin", stdin
         | f   -> f, open_in f
       in
-      let m = Env.read_channel ?format:!opt_parser env fname cin in
-      close_in cin;
-      if !opt_type_only then
-        ()
-      else
-        if Queue.is_empty tlist then
-          let glist = Queue.create () in
-          let add_th t th mi = Ident.Mid.add th.th_name (t,th) mi in
-          let do_th _ (t,th) = do_theory env drv fname t th glist in
-          Ident.Mid.iter do_th (Mstr.fold add_th m Ident.Mid.empty)
+      if !opt_token_count then
+        let lb = Lexing.from_channel cin in
+        let a,p = Lexer.token_counter lb in
+        close_in cin;
+        if a = 0 then
+          begin
+            (* hack: we assume it is a why file and not a mlw *)
+            total_annot_tokens := !total_annot_tokens + p;
+            Format.printf "File %s: %d tokens@." f p;
+          end
         else
-          Queue.iter (do_local_theory env drv fname m) tlist
+          begin
+            total_program_tokens := !total_program_tokens + p;
+            total_annot_tokens := !total_annot_tokens + a;
+            Format.printf "File %s: %d tokens in annotations@." f a;
+            Format.printf "File %s: %d tokens in programs@." f p
+          end
+      else
+        let m = Env.read_channel ?format:!opt_parser env fname cin in
+        close_in cin;
+        if !opt_type_only then
+          ()
+        else
+          if Queue.is_empty tlist then
+            let glist = Queue.create () in
+            let add_th t th mi = Ident.Mid.add th.th_name (t,th) mi in
+            let do_th _ (t,th) = do_theory env drv fname t th glist in
+            Ident.Mid.iter do_th (Mstr.fold add_th m Ident.Mid.empty)
+          else
+            Queue.iter (do_local_theory env drv fname m) tlist
 
 let () =
   try
     let env = Env.create_env !opt_loadpath in
-    let drv = Util.option_map (load_driver env) !opt_driver in
-    Queue.iter (do_input env drv) opt_queue
+    let drv = Util.option_map (fun (f,ef) -> load_driver env f ef) !opt_driver in
+    Queue.iter (do_input env drv) opt_queue;
+    if !opt_token_count then
+      Format.printf "Total: %d annot/%d programs, ratio = %.3f@."
+        !total_annot_tokens !total_program_tokens
+        ((float !total_annot_tokens) /. (float !total_program_tokens))
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1

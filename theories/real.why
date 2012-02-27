@@ -1,15 +1,15 @@
 
 theory Real
 
-  function zero : real = 0.0
-  function one  : real = 1.0
+  constant zero : real = 0.0
+  constant one  : real = 1.0
 
   predicate (< ) real real
   predicate (> ) (x y : real) = y < x
   predicate (<=) (x y : real) = x < y \/ x = y
 
   clone export algebra.OrderedField with type t = real,
-    function zero = zero, function one = one, predicate (<=) = (<=)
+    constant zero = zero, constant one = one, predicate (<=) = (<=)
 
 (*
   lemma sub_zero: forall x y:real. x - y = 0.0 -> x = y
@@ -47,6 +47,13 @@ theory Abs
 (*
   lemma Abs_zero: forall x:real. abs x = 0.0 -> x = 0.0
 *)
+
+  lemma Abs_sum: forall x y:real. abs(x+y) <= abs x + abs y
+
+  lemma Abs_prod: forall x y:real. abs(x*y) = abs x * abs y
+
+  lemma triangular_inequality:
+    forall x y z:real. abs(x-z) <= abs(x-y) + abs(y-z)
 
 end
 
@@ -134,7 +141,7 @@ theory Truncate
     forall i:int. floor (from_int i) = i
 
   axiom Ceil_int :
-    forall i:int. floor (from_int i) = i
+    forall i:int. ceil (from_int i) = i
 
   axiom Floor_down:
     forall x:real. from_int (floor x) <= x < from_int (Int.(+) (floor x) 1)
@@ -188,7 +195,7 @@ theory ExpLog
   axiom Exp_zero : exp(0.0) = 1.0
   axiom Exp_sum : forall x y:real. exp (x+y) = exp x * exp y
 
-  function e : real = exp 1.0
+  constant e : real = exp 1.0
 
   function log real : real
   axiom Log_one : log 1.0 = 0.0
@@ -275,7 +282,7 @@ theory Trigonometry
   axiom Cos_0: cos 0.0 = 1.0
   axiom Sin_0: sin 0.0 = 0.0
 
-  function pi : real
+  constant pi : real
 
   axiom Pi_interval:
    3.14159265358979323846264338327950288419716939937510582097494459230781640628620899862803482534211706798214808651328230664709384460955058223172535940812848111745028410270193852110555964462294895493038196

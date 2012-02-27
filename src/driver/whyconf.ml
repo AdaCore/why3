@@ -20,6 +20,7 @@
 open Format
 open Util
 open Rc
+open Stdlib
 
 (* magicnumber for the configuration :
   - 0 before the magic number
@@ -28,11 +29,14 @@ open Rc
   - 5 cvc3 native
   - 6 driver renaming
   - 7 yices native (used for release 0.70)
-  - 8 for release 0.71 
+  - 8 for release 0.71
+  - 9 coq realizations
+  - 10 require %f in editor lines
+  - 11 change prover identifiers in provers-detection-data.conf
 
 If a configuration doesn't contain the actual magic number we don't use it.*)
 
-let magicnumber = 8
+let magicnumber = 11
 
 exception WrongMagicNumber
 
@@ -47,15 +51,59 @@ let default_conf_file =
     | None -> Filename.concat (Rc.get_home_dir ()) ".why3.conf"
     | Some d -> Filename.concat d "why3.conf"
 
+(* Prover *)
+
+type prover =
+    { prover_name : string;
+      prover_version : string;
+      prover_altern : string;
+    }
+
+let print_prover fmt p =
+  Format.fprintf fmt "%s(%s%s%s)"
+    p.prover_name p.prover_version
+    (if p.prover_altern = "" then "" else " ") p.prover_altern
+
+module Prover = struct
+  type t = prover
+  let compare s1 s2 =
+    if s1 == s2 then 0 else
+    let c = String.compare s1.prover_name s2.prover_name in
+    if c <> 0 then c else
+    let c = String.compare s1.prover_version s2.prover_version in
+    if c <> 0 then c else
+    let c = String.compare s1.prover_altern s2.prover_altern in
+    c
+
+  let equal s1 s2 =
+    s1 == s2 ||
+      (s1.prover_name = s2.prover_name &&
+       s1.prover_version = s2.prover_version &&
+       s1.prover_altern = s2.prover_altern)
+
+  let hash s1 =
+      2 * Hashtbl.hash s1.prover_name +
+      3 * Hashtbl.hash s1.prover_version +
+      5 * Hashtbl.hash s1.prover_altern
+
+
+end
+
+module Mprover = Map.Make(Prover)
+module Sprover = Mprover.Set
+module Hprover = Hashtbl.Make(Prover)
+
 (* Configuration file *)
 
 type config_prover = {
-  name    : string;   (* "Alt-Ergo v2.95 (special)" *)
-  command : string;   (* "exec why-limit %t %m alt-ergo %f" *)
-  driver  : string;   (* "/usr/local/share/why/drivers/ergo-spec.drv" *)
-  version : string;   (* "v2.95" *)
+  prover  : prover;
+  id      : string;
+  command : string;
+  driver  : string;
   editor  : string;
   interactive : bool;
+  extra_options : string list;
+  extra_drivers : string list;
 }
 
 type main = {
@@ -112,7 +160,7 @@ let add_plugin m p =
   then m
   else { m with plugins = List.rev (p::(List.rev m.plugins))}
 
-let pluginsdir m = m.libdir
+let pluginsdir m = Filename.concat m.libdir "plugins"
 let load_plugins m =
   let load x =
     try Plugin.load x
@@ -125,7 +173,7 @@ type config = {
   conf_file : string;       (* "/home/innocent_user/.why3.conf" *)
   config    : Rc.t;
   main      : main;
-  provers   : config_prover Mstr.t;
+  provers   : config_prover Mprover.t;
 }
 
 let default_main =
@@ -154,30 +202,45 @@ let set_main rc main =
   let section = set_stringl section "plugin" main.plugins in
   set_section rc "main" section
 
-let set_prover id prover family =
+exception NonUniqueId
+
+let set_prover _ prover (ids,family) =
+  if Sstr.mem prover.id ids then raise NonUniqueId;
   let section = empty_section in
-  let section = set_string section "name" prover.name in
+  let section = set_string section "name" prover.prover.prover_name in
   let section = set_string section "command" prover.command in
   let section = set_string section "driver" prover.driver in
-  let section = set_string section "version" prover.version in
+  let section = set_string section "version" prover.prover.prover_version in
+  let section = set_string ~default:""
+    section "alternative" prover.prover.prover_altern in
   let section = set_string section "editor" prover.editor in
   let section = set_bool section "interactive" prover.interactive in
-  (id,section)::family
+  (Sstr.add prover.id ids,(prover.id,section)::family)
 
 let set_provers rc provers =
-  let family = Mstr.fold set_prover provers [] in
+  let _,family = Mprover.fold set_prover provers (Sstr.empty,[]) in
   set_family rc "prover" family
 
 let absolute_filename = Sysutil.absolutize_filename
 
 let load_prover dirname provers (id,section) =
-  Mstr.add id
-    { name    = get_string section "name";
+  let version = get_string ~default:"" section "version" in
+  let altern = get_string ~default:"" section "alternative" in
+  let name = get_string section "name" in
+  let prover =
+    { prover_name = name;
+      prover_version = version;
+      prover_altern = altern}
+  in
+  Mprover.add prover
+    { id = id;
+      prover  = prover;
       command = get_string section "command";
       driver  = absolute_filename dirname (get_string section "driver");
-      version = get_string ~default:"" section "version";
       editor  = get_string ~default:"" section "editor";
       interactive = get_bool ~default:false section "interactive";
+      extra_options = [];
+      extra_drivers = [];
     } provers
 
 let load_main dirname section =
@@ -211,6 +274,8 @@ let () = Exn_printer.register (fun fmt e -> match e with
       Format.fprintf fmt "error in config file %s: %s" f s
   | WrongMagicNumber ->
       Format.fprintf fmt "outdated config file; rerun why3config"
+  | NonUniqueId ->
+    Format.fprintf fmt "InternalError : two provers share the same id"
   | _ -> raise e)
 
 let get_config (filename,rc) =
@@ -221,7 +286,7 @@ let get_config (filename,rc) =
       | Some main -> rc, load_main dirname main
   in
   let provers = get_family rc "prover" in
-  let provers = List.fold_left (load_prover dirname) Mstr.empty provers in
+  let provers = List.fold_left (load_prover dirname) Mprover.empty provers in
   { conf_file = filename;
     config    = rc;
     main      = main;
@@ -245,9 +310,33 @@ let read_config conf_file =
     Format.bprintf b "%a" Exn_printer.exn_printer e;
     raise (ConfigFailure (fst filenamerc, Buffer.contents b))
 
+let merge_config config filename =
+  let dirname = Filename.dirname filename in
+  let rc = Rc.from_file filename in
+  let main = match get_section rc "main" with
+    | None -> config.main
+    | Some rc ->
+      let loadpath = (List.map (absolute_filename dirname)
+        (get_stringl ~default:[] rc "loadpath")) @ config.main.loadpath in
+      let plugins = (get_stringl ~default:[] rc "plugin") @ config.main.plugins in
+      { config.main with loadpath = loadpath; plugins = plugins } in
+  let provers = get_family rc "prover" in
+  let provers = List.fold_left
+    (fun provers (id, section) ->
+      try
+        let key,c = Mprover.choose (Mprover.filter (fun _ p -> p.id = id) provers) in
+        let opt = (get_stringl ~default:[] section "option") @ c.extra_options in
+        let drv = (List.map (absolute_filename dirname)
+          (get_stringl ~default:[] section "driver")) @ c.extra_options in
+        Mprover.add key { c with extra_options = opt ; extra_drivers = drv } provers
+      with
+        Not_found -> load_prover dirname provers (id, section)
+    ) config.provers provers in
+  { config with main = main; provers = provers }
+
 let save_config config =
   let filename = config.conf_file in
-  if Sys.file_exists filename then Sys.rename filename (filename ^ ".bak");
+  Sysutil.backup_file filename;
   to_file filename config.config
 
 let get_main config = config.main
@@ -265,8 +354,37 @@ let set_provers config provers =
     provers = provers;
   }
 
+(*******)
+
 let set_conf_file config conf_file = {config with conf_file = conf_file}
 let get_conf_file config           =  config.conf_file
+
+(*******)
+
+let is_prover_known whyconf prover =
+  Mprover.mem prover (get_provers whyconf)
+
+exception ProverNotFound of config * string
+
+let prover_by_id whyconf id =
+  let potentials =
+    Mprover.filter (fun _ p -> p.id = id) whyconf.provers in
+  match Mprover.keys potentials with
+    | [] -> raise (ProverNotFound(whyconf,id))
+    | [_] -> snd (Mprover.choose potentials)
+    |  _  -> assert false (** by the verification done by set_provers *)
+
+let () = Exn_printer.register
+  (fun fmt exn ->
+    match exn with
+      | ProverNotFound (config,s) ->
+        fprintf fmt "Prover '%s' not found in %s@."
+          s (get_conf_file config)
+      | e -> raise e
+  )
+
+
+(******)
 
 let get_section config name = assert (name <> "main");
   get_section config.config name
@@ -280,3 +398,4 @@ let set_section config name section = assert (name <> "main");
 
 let set_family config name section = assert (name <> "prover");
   {config with config = set_family config.config name section}
+

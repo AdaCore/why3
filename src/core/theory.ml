@@ -57,13 +57,13 @@ let rec merge_ns chk ns1 ns2 =
     ns_pr = ns_union pr_equal chk ns1.ns_pr ns2.ns_pr;
     ns_ns = Mstr.union fusion     ns1.ns_ns ns2.ns_ns; }
 
-let nm_add chk x ns m = Mstr.change x (function
+let nm_add chk x ns m = Mstr.change (function
   | None -> Some ns
-  | Some os -> Some (merge_ns chk ns os)) m
+  | Some os -> Some (merge_ns chk ns os)) x m
 
-let ns_add eq chk x v m = Mstr.change x (function
+let ns_add eq chk x v m = Mstr.change (function
   | None -> Some v
-  | Some vo -> Some (ns_replace eq chk x vo v)) m
+  | Some vo -> Some (ns_replace eq chk x vo v)) x m
 
 let ts_add = ns_add ts_equal
 let ls_add = ns_add ls_equal
@@ -352,7 +352,12 @@ let add_symbol add id v uc =
   | _ -> assert false
 
 let add_type uc (ts,def) =
-  let add_constr uc fs = add_symbol add_ls fs.ls_name fs uc in
+  let add_proj uc = function
+    | Some pj -> add_symbol add_ls pj.ls_name pj uc
+    | None -> uc in
+  let add_constr uc (fs,pl) =
+    let uc = add_symbol add_ls fs.ls_name fs uc in
+    List.fold_left add_proj uc pl in
   let uc = add_symbol add_ts ts.ts_name ts uc in
   match def with
     | Tabstract -> uc
@@ -513,10 +518,13 @@ let cl_init th inst =
 (* clone declarations *)
 
 let cl_type cl inst tdl =
-  let add_constr ls =
+  let add_ls ls =
     if Mls.mem ls inst.inst_ls
       then raise (CannotInstantiate ls.ls_name)
       else cl_find_ls cl ls
+  in
+  let add_constr (ls,pl) =
+      add_ls ls, List.map (option_map add_ls) pl
   in
   let add_type (ts,td) acc =
     if Mts.mem ts inst.inst_ts then
@@ -627,9 +635,9 @@ let clone_export uc th inst =
   let g_ts _ ts = not (Mts.mem ts inst.inst_ts) in
   let g_ls _ ls = not (Mls.mem ls inst.inst_ls) in
 
-  let f_ts ts = Mts.find_default ts ts cl.ts_table in
-  let f_ls ls = Mls.find_default ls ls cl.ls_table in
-  let f_pr pr = Mpr.find_default pr pr cl.pr_table in
+  let f_ts ts = Mts.find_def ts ts cl.ts_table in
+  let f_ls ls = Mls.find_def ls ls cl.ls_table in
+  let f_pr pr = Mpr.find_def pr pr cl.pr_table in
 
   let rec f_ns ns = {
     ns_ts = Mstr.map f_ts (Mstr.filter g_ts ns.ns_ts);
@@ -663,7 +671,6 @@ let is_empty_sm sm =
   Mls.is_empty sm.sm_ls &&
   Mpr.is_empty sm.sm_pr
 
-
 (** Meta properties *)
 
 let get_meta_arg_type = function
@@ -695,9 +702,9 @@ let add_meta uc s al = add_tdecl uc (create_meta s al)
 
 let clone_meta tdt sm = match tdt.td_node with
   | Meta (t,al) ->
-      let find_ts ts = Mts.find_default ts ts sm.sm_ts in
-      let find_ls ls = Mls.find_default ls ls sm.sm_ls in
-      let find_pr pr = Mpr.find_default pr pr sm.sm_pr in
+      let find_ts ts = Mts.find_def ts ts sm.sm_ts in
+      let find_ls ls = Mls.find_def ls ls sm.sm_ls in
+      let find_pr pr = Mpr.find_def pr pr sm.sm_pr in
       let cl_marg = function
         | MAty ty -> MAty (ty_s_map find_ts ty)
         | MAts ts -> MAts (find_ts ts)
@@ -745,6 +752,14 @@ let builtin_theory =
   let uc = add_logic_decl uc [ps_equ, None] in
   close_theory uc
 
+let create_theory ?(path=[]) n =
+  use_export (empty_theory n path) builtin_theory
+
+let bool_theory =
+  let uc = empty_theory (id_fresh "Bool") [] in
+  let uc = add_ty_decl uc [ts_bool, Talgebraic [fs_true,[]; fs_false,[]]] in
+  close_theory uc
+
 let highord_theory =
   let uc = empty_theory (id_fresh "HighOrd") [] in
   let uc = add_ty_decl uc [ts_func, Tabstract] in
@@ -753,12 +768,11 @@ let highord_theory =
   let uc = add_logic_decl uc [ps_pred_app, None] in
   close_theory uc
 
-let create_theory ?(path=[]) n =
-  use_export (empty_theory n path) builtin_theory
-
 let tuple_theory = Util.memo_int 17 (fun n ->
+  let ts = ts_tuple n and fs = fs_tuple n in
+  let pl = List.map (fun _ -> None) ts.ts_args in
   let uc = empty_theory (id_fresh ("Tuple" ^ string_of_int n)) [] in
-  let uc = add_ty_decl uc [ts_tuple n, Talgebraic [fs_tuple n]] in
+  let uc = add_ty_decl uc [ts, Talgebraic [fs,pl]] in
   close_theory uc)
 
 let tuple_theory_name s =

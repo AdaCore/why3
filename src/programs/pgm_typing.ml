@@ -36,26 +36,8 @@ open Pgm_module
 let debug = Debug.register_flag "program_typing"
 let is_debug () = Debug.test_flag debug
 
-exception Message of string
-
-let error ?loc e = match loc with
-  | None -> raise e
-  | Some loc -> raise (Loc.Located (loc, e))
-
-let errorm ?loc f =
-  let buf = Buffer.create 512 in
-  let fmt = Format.formatter_of_buffer buf in
-  Format.kfprintf
-    (fun _ ->
-       Format.pp_print_flush fmt ();
-       let s = Buffer.contents buf in
-       Buffer.clear buf;
-       error ?loc (Message s))
-    fmt f
-
-let () = Exn_printer.register (fun fmt e -> match e with
-  | Message s -> fprintf fmt "%s" s
-  | _ -> raise e)
+let error = Loc.error
+let errorm = Loc.errorm
 
 let id_result = "result"
 
@@ -292,7 +274,8 @@ let rec dtype ~user env = function
       tyvar (Typing.find_user_type_var x env.denv)
   | PPTtyapp (p, x) ->
       let loc = Typing.qloc x in
-      let ts, a = Typing.specialize_tysymbol loc x (impure_uc env.uc) in
+      let ts = Typing.specialize_tysymbol loc x (impure_uc env.uc) in
+      let a = List.length ts.ts_args in
       let mt = get_mtsymbol ts in
       let np = List.length p in
       if np <> a - mt.mt_regions then
@@ -368,13 +351,42 @@ let rec extract_labels labs loc e = match e.Ptree.expr_desc with
       labs, loc, Ptree.Ecast ({ e with Ptree.expr_desc = d }, ty)
   | e -> labs, loc, e
 
+
+(* compatibility functions from Typing *)
+
+let find_qualid_ls uc p =
+  let loc = Typing.qloc p in
+  let sl = Typing.string_list_of_qualid [] p in
+  try ns_find_ls (get_namespace uc) sl with Not_found ->
+    errorm ~loc "unbound symbol %a" print_qualid p
+
+let is_projection uc ls =
+  try
+    let ts = match ls.ls_args with
+      | [{ty_node = Ty.Tyapp (ts,_)}] -> ts
+      | _ -> raise Exit in
+    match Decl.find_constructors (get_known uc) ts with
+      | [cs,pjl] ->
+          let find (i,r) = function
+            | Some pj when ls_equal ls pj -> (succ i, i)
+            | _ -> (succ i, r) in
+          let (_,r) = List.fold_left find (0,-1) pjl in
+          if r < 0 then None else Some (ts,cs,r)
+      | _ -> None
+  with Exit -> None
+
+let list_fields uc fl =
+  let field (q,e) = find_qualid_ls uc q, (Typing.qloc q, e) in
+  let cs,pjl,flm = Decl.parse_record (get_known uc) (List.map field fl) in
+  cs, List.map (fun pj -> Mls.find_opt pj flm) pjl
+
 (* [dexpr] translates ptree into dexpr *)
 
 let rec dexpr ~ghost ~userloc env e =
   let loc = e.Ptree.expr_loc in
   let labs, userloc, d = extract_labels Slab.empty userloc e in
   let d, ty = dexpr_desc ~ghost ~userloc env loc d in
-  let loc = default_option loc userloc in
+  let loc = def_option loc userloc in
   let e = {
     dexpr_desc = d; dexpr_loc = loc; dexpr_lab = labs; dexpr_type = ty; }
   in
@@ -480,7 +492,7 @@ and dexpr_desc ~ghost ~userloc env loc = function
       let s = fs_tuple n in
       let tyl = List.map (fun _ -> create_type_var loc) el in
       let ty = tyapp (ts_tuple n) tyl in
-      let uloc = default_option loc userloc in
+      let uloc = def_option loc userloc in
       let create d ty = { dexpr_desc = d; dexpr_type = ty;
                           dexpr_loc = uloc; dexpr_lab = Slab.empty } in
       let apply e1 e2 ty2 =
@@ -494,11 +506,11 @@ and dexpr_desc ~ghost ~userloc env loc = function
       let e = List.fold_left2 apply e el tyl in
       e.dexpr_desc, ty
   | Ptree.Erecord fl ->
-      let _, cs, fl = Typing.list_fields (impure_uc env.uc) fl in
+      let cs, fl = list_fields (impure_uc env.uc) fl in
       new_regions_vars ();
       let tyl, ty = specialize_lsymbol ~loc (Htv.create 17) cs in
       let ty = of_option ty in
-      let uloc = default_option loc userloc in
+      let uloc = def_option loc userloc in
       let create d ty = { dexpr_desc = d; dexpr_type = ty;
                           dexpr_loc = uloc; dexpr_lab = Slab.empty } in
       let constructor d f tyf = match f with
@@ -519,7 +531,7 @@ and dexpr_desc ~ghost ~userloc env loc = function
       d.dexpr_desc, ty
   | Ptree.Eupdate (e1, fl) ->
       let e1 = dexpr ~ghost ~userloc env e1 in
-      let _, cs, fl = Typing.list_fields (impure_uc env.uc) fl in
+      let cs, fl = list_fields (impure_uc env.uc) fl in
       let tyl, ty = Denv.specialize_lsymbol ~loc cs in
       let ty = of_option ty in
       expected_type e1 ty;
@@ -550,7 +562,7 @@ and dexpr_desc ~ghost ~userloc env loc = function
             Queue.push v q
       in
       List.iter2 set_pat_var_ty fl tyl;
-      let uloc = default_option loc userloc in
+      let uloc = def_option loc userloc in
       let create d ty = { dexpr_desc = d; dexpr_type = ty;
                           dexpr_loc = uloc; dexpr_lab = Slab.empty } in
       let apply t f tyf = match f with
@@ -589,7 +601,7 @@ and dexpr_desc ~ghost ~userloc env loc = function
         | _ ->
             assert false
       end;
-      begin match Typing.is_projection (impure_uc env.uc) ls with
+      begin match is_projection (impure_uc env.uc) ls with
         | Some (ts, _, i)  ->
             let mt = get_mtsymbol ts in
             let j =
@@ -844,7 +856,7 @@ let iuregion env ({ pp_loc = loc; pp_desc = d } as t) = match d with
   | PPapp (f, [t]) ->
       let th = effect_uc env.i_uc in
       let ls, _, _ = Typing.specialize_lsymbol f th in
-      begin match Typing.is_projection th ls with
+      begin match is_projection th ls with
         | Some (ts, _, i) ->
             let j =
               try
@@ -1763,9 +1775,9 @@ and expr_desc gl env loc ty = function
       let c = type_c env c in
       Eany c, c.c_result_type, c.c_effect
 
-and triple gl env (p, e, q) =
+and triple ?(sat_exn=true) gl env (p, e, q) =
   let e = expr gl env e in
-  let q = saturation e.expr_loc e.expr_effect q in
+  let q = if sat_exn then saturation e.expr_loc e.expr_effect q else q in
   let ef = e.expr_effect in
   let ef, p = term_effect ef p in
   let ef, q = post_effect ef q in
@@ -1811,11 +1823,11 @@ and letrec gl env dl = (* : env * recfun list *)
     in
     List.fold_left add1 env dl
   in
-  let one_step m0 =
+  let one_step ?(sat_exn=false) m0 =
     let type1 m (i, bl, env, var, t) =
       let decvar = option_map (fun (v,_,_) -> v.pv_pure) var in
       let env = make_env env ?decvar m0 in
-      let t, c = triple gl env t in
+      let t, c = triple ~sat_exn gl env t in
       let v = create_pvsymbol (id_clone i.i_impure.vs_name) (tarrow bl c)
         ~effect:i.i_effect ~pure:i.i_pure
       in
@@ -1825,7 +1837,7 @@ and letrec gl env dl = (* : env * recfun list *)
   in
   let rec fixpoint m =
     (* printf "fixpoint...@\n"; *)
-    let m', dl' = one_step m in
+    let m', _ = one_step m in
     let same_effect (i,bl,_,_,_) =
       let c = Mvs.find i.i_impure m and c' = Mvs.find i.i_impure m' in
       let v = tarrow bl c and v' = tarrow bl c' in
@@ -1834,7 +1846,10 @@ and letrec gl env dl = (* : env * recfun list *)
       eq_type_v v v'
       (* E.equal c.c_effect c'.c_effect *)
     in
-    if List.for_all same_effect dl then m, dl' else fixpoint m'
+    if List.for_all same_effect dl then
+      one_step ~sat_exn:true m
+    else
+      fixpoint m'
   in
   let add_empty_effect m (i, bl, _, _, (p, _, q)) =
     let tyl, ty = uncurrying i.i_impure.vs_ty in
@@ -1934,7 +1949,7 @@ let add_global_fun loc ~labels x tyv uc =
       List.fold_left
         (fun (labels,loc) lab ->
            match lab with
-             | Lstr s -> (Slab.add s labels,loc)
+             | Lstr s -> (Ident.Slab.add s labels,loc)
              | Lpos l -> (labels,l))
         (Slab.empty,loc)
         labels
@@ -1988,8 +2003,8 @@ let check_type_vars ~loc vars ty =
   check ty
 
 let make_immutable_type td =
-  let td = { td with td_model = false } in
-  let make_immutable_field (loc, _, id, ty) = (loc, false, id, ty) in
+  let td = { td with td_model = false; td_vis = Public } in
+  let make_immutable_field f = { f with f_mutable = false; f_ghost = false } in
   match td.td_def with
 (*     | TDrecord [_, _, _, ty] -> (\* singleton record *\) *)
 (*         { td with td_def = TDalias ty } *)
@@ -2009,10 +2024,10 @@ let add_logic_ps ?(nofail=false) uc x =
     (* can fail if x is a constructor of a model type (record or algebraic) *)
     assert nofail
 
-let add_types env ltm uc dl =
+let add_types uc dl =
   (* 1. type check the pure def, to have all sanity checks performed *)
   let dlp = List.map make_immutable_type dl in
-  let uc = Pgm_module.add_pure_pdecl env ltm (TypeDecl dlp) uc in
+  let uc = Pgm_module.add_pure_pdecl (TypeDecl dlp) uc in
   (* 2. compute number of regions for each type *)
   let def = List.fold_left
     (fun def d -> Mstr.add d.td_ident.id d def) Mstr.empty dl
@@ -2042,7 +2057,7 @@ let add_types env ltm uc dl =
         | TDrecord fl ->
             let nf = List.length fl in
             List.fold_left
-              (fun n (loc, mut, _, ty) ->
+              (fun n { f_loc=loc; f_mutable=mut; f_pty=ty } ->
                  if mut && nf = 1 then Hashtbl.add singletons x ();
                  let nty = nregions_of_type ty in
                  if mut then begin
@@ -2116,22 +2131,24 @@ let add_types env ltm uc dl =
           let constructor (loc, id, pl) = (loc, id, List.map add pl) in
           TDalgebraic (List.map constructor cl)
       | TDrecord fl ->
-          let add i (loc, mut, id, ty) =
+          let add i ({ f_mutable=mut; f_ident=id; f_pty=ty } as f) =
             add_projection id;
             if mut then begin
               let j, _ = region () in
               if effect then Hashtbl.add mutable_field (x, i) j
             end;
-            (loc, false, id, add_regions_to_type ty)
+            { f with f_mutable = false; f_ghost = false;
+              f_pty = add_regions_to_type ty }
           in
           TDrecord (list_mapi add fl)
     in
-    { d with td_params = params; td_model = false; td_def = def }
+    { d with
+      td_params = params; td_model = false; td_vis = Public; td_def = def }
   in
   let dli = List.map (add_regions ~effect:false) dl in
-  let uc = Pgm_module.add_impure_pdecl env ltm (Ptree.TypeDecl dli) uc in
+  let uc = Pgm_module.add_impure_pdecl (Ptree.TypeDecl dli) uc in
   let dle = List.map (add_regions ~effect:true) dl in
-  let uc = Pgm_module.add_effect_pdecl env ltm (Ptree.TypeDecl dle) uc in
+  let uc = Pgm_module.add_effect_pdecl (Ptree.TypeDecl dle) uc in
   (* 4. add mtsymbols in module *)
   let add_mt d =
     let x = d.td_ident.id in
@@ -2184,7 +2201,7 @@ let add_types env ltm uc dl =
             begin match Decl.find_constructors km ts with
               | [] -> (* abstract *)
                   ()
-              | [ls] -> (* record *)
+              | [ls,_] -> (* record *)
                   add_logic_ps ~nofail:true uc ls.ls_name.id_string;
                   let field i ty =
                     if Hashtbl.mem mutable_field (x, i) then
@@ -2193,7 +2210,7 @@ let add_types env ltm uc dl =
                   in
                   list_iteri field ls.ls_args
               | cl -> (* algebraic *)
-                  let constructor ls =
+                  let constructor (ls,_) =
                     add_logic_ps ~nofail:true uc ls.ls_name.id_string;
                     List.iter visit_type ls.ls_args
                   in
@@ -2209,8 +2226,8 @@ let add_types env ltm uc dl =
   List.iter (fun d -> visit d.td_ident.id) dl;
   uc
 
-let add_logics env ltm uc d =
-  let uc = Pgm_module.add_pure_pdecl env ltm d uc in
+let add_logics uc d =
+  let uc = Pgm_module.add_pure_pdecl d uc in
   let region =
     let c = ref (-1) in
     fun loc ->
@@ -2239,8 +2256,8 @@ let add_logics env ltm uc d =
   in
   let add uc d0 =
     let d = LogicDecl [add_regions d0] in
-    let uc = Pgm_module.add_impure_pdecl env ltm d uc in
-    let uc = Pgm_module.add_effect_pdecl env ltm d uc in
+    let uc = Pgm_module.add_impure_pdecl d uc in
+    let uc = Pgm_module.add_effect_pdecl d uc in
     add_logic_ps uc d0.ld_ident.id;
     uc
   in
@@ -2251,20 +2268,19 @@ let add_logics env ltm uc d =
   match d with
     | LogicDecl dl -> List.fold_left add uc dl
     | IndDecl dl -> List.fold_left addi uc dl
-    | Meta _ | UseClone _ | PropDecl _ | TypeDecl _ -> assert false
+    | Meta _ | PropDecl _ | TypeDecl _ -> assert false
 
 let find_module penv lmod q id = match q with
   | [] ->
       (* local module *)
       Mstr.find id lmod
   | _ :: _ ->
-      (* theory in file f *)
-      Pgm_env.find_module penv q id
+      (* module in file f *)
+      Mstr.find id (fst (Env.read_lib_file penv q))
 
-(* env  = to retrieve theories from the loadpath
-   penv = to retrieve modules from the loadpath
+(* env  = to retrieve theories and modules from the loadpath
    lmod = local modules *)
-let rec decl ~wp env penv ltm lmod uc = function
+let rec decl ~wp env ltm lmod uc = function
   | Ptree.Dlet (id, e) ->
       let denv = create_denv uc in
       let e = dexpr ~ghost:false ~userloc:None denv e in
@@ -2340,44 +2356,34 @@ let rec decl ~wp env penv ltm lmod uc = function
       let q, id = Typing.split_qualid qid in
       let m =
         try
-          find_module penv lmod q id
-        with Not_found | Pgm_env.ModuleNotFound _ ->
+          find_module env lmod q id
+        with Not_found ->
           errorm ~loc "@[unbound module %a@]" print_qualid qid
       in
-      let n = match use_as with
-        | None -> Some (m.m_name.id_string)
-        | Some x -> Some x.id
-      in
       begin try match imp_exp with
-        | Nothing ->
+        | Some imp ->
             (* use T = namespace T use_export T end *)
             let uc = open_namespace uc in
             let uc = use_export uc m in
-            close_namespace uc false n
-        | Import ->
-            (* use import T = namespace T use_export T end import T *)
-            let uc = open_namespace uc in
-            let uc = use_export uc m in
-            close_namespace uc true n
-        | Export ->
+            close_namespace uc imp use_as
+        | None ->
             use_export uc m
       with ClashSymbol s ->
         errorm ~loc "clash with previous symbol %s" s
       end
   | Ptree.Dnamespace (loc, id, import, dl) ->
       let uc = open_namespace uc in
-      let uc = List.fold_left (decl ~wp env penv ltm lmod) uc dl in
-      let id = option_map (fun id -> id.id) id in
+      let uc = List.fold_left (decl ~wp env ltm lmod) uc dl in
       begin try close_namespace uc import id
       with ClashSymbol s -> errorm ~loc "clash with previous symbol %s" s end
   | Ptree.Dlogic (TypeDecl d) ->
-      add_types env ltm uc d
+      add_types uc d
   | Ptree.Dlogic (LogicDecl _ | IndDecl _ as d) ->
-      add_logics env ltm uc d
+      add_logics uc d
   | Ptree.Dlogic (PropDecl _ | Meta _ as d) ->
-      Pgm_module.add_pure_pdecl env ltm d uc
-  | Ptree.Dlogic (UseClone _ as d) ->
-      Pgm_module.add_pdecl env ltm d uc
+      Pgm_module.add_pure_pdecl d uc
+  | Ptree.Duseclone d ->
+      Pgm_module.add_use_clone env ltm d uc
 
 (*
 Local Variables:

@@ -1,38 +1,29 @@
 
-theory TestCoq
-  use import list.List
-  use import list.Append
+theory T
 
-  lemma append_nil: forall l: list 'a. Nil ++ l = l
+  use import int.Int
+  goal G: let x,y = (1,2) in x=y
+
 end
 
-theory Bijection
-  use export int.Int
-  function n : int
-  function f int : int
-  axiom dom_f : forall i: int. 0 <= i < n -> 0 <= f i < n
-  function g int : int
-  axiom gf : forall i: int. 0 <= i < n -> g (f i) = i
-end
+theory TestPVS
 
-theory Test1
-  function id (i: int) : int = i
-  clone import Bijection with function f = id, lemma dom_f
-  goal G: n > 4 -> g (id 4) = 4
-end
+  use import bool.Bool
+  use import int.Int
+  use import map.Map
 
-theory Order
-  type t
-  predicate (<=) t t
+  function m: map int bool
 
-  axiom le_refl : forall x : t. x <= x
-  axiom le_asym : forall x y : t. x <= y -> y <= x -> x = y
-  axiom le_trans: forall x y z : t. x <= y -> y <= z -> x <= z
+  axiom a: get m 0 = True
+  axiom b: get m 1 = False
+
+  goal G: get (const False) 42 = False
+
 end
 
 (*
-Local Variables: 
+Local Variables:
 compile-command: "make -C .. tests/test-jcf.gui"
-End: 
+End:
 *)
 

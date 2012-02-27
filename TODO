@@ -28,6 +28,10 @@ sémantique
     is not changed by a transformation, it will stay in the hash table forever,
     since the key is the value. Should we use generation numbers in arguments
     and results of transformations?
+     François -- I don't get that point the weak Hashtbl that we use
+   are designed to work on this case, even with the identity function.
+   What we should do is a way to remove the task from a session when
+   they are not needed anymore.
 
   - uses : pour l'instant, l'ordre des théories dans le fichier est important 
     i.e. les théories mentionnées par uses doivent être définies précédemment
@@ -41,3 +45,17 @@ error reporting
   - should we create a common [exception Why.Error of exn] to facilitate
     integration of the library? This would require a special [raise] call:
         why_raise e = raise (Why.Error e)
+
+session
+-------
+  - save the output of the prover
+  - escape the string in the xml
+
+tools
+-----
+
+  - the tools should verify that the provers have the same version
+   than reported in the configuration
+  - Maybe : make something generic for the dialog box with memory.
+  - autodetection can be modified now that only name/version/altern
+   are taken into account in session.

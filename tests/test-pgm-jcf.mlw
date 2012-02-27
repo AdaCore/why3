@@ -1,4 +1,26 @@
+module M0
+  type t = private int
+end
 
+
+(*
+module ExcepAndRec
+
+use import int.Int
+
+exception E
+
+let rec f (x:int) : int =
+  if x = 42 then raise E else
+  try
+    let n = f (x-1) in
+    n
+  with E -> 42
+  end
+
+end
+*)
+(*
 module Test
 
   use import module ref.Ref
@@ -21,14 +43,39 @@ module Test
 
 end
 
+*)
 module M
 
   use import int.Int
   use import module ref.Ref
 
+  type t 'a 'b = (int, 'a, ('b, int))
+
+  use import list.List
+
+  type tree 'a = E | N (forest 'a)
+  with forest 'b = list (tree 'b)
+
+  inductive even int int int =
+    | even0: even 0 1 2
+  with odd int int =
+    | odd0: odd 1 2
+
+  function c : int = 0b010101010
+
+  function f (x:int) : int = g (x+1)
+  with g (x:int) : int
+
+  predicate p (x:int) = forall y: int. q x y
+  with q (x:int) (y:int) = x >= y
+
+  predicate is_zero (a:int) = a=0
+
+  val foo: x:ref int -> unit
+
   let test1 () =
     let x = ref 0 in
-    while !x = 0 do variant { !x } () done
+    while is_zero !x do variant { !x } () done
 
 (*
   use import option.Option

@@ -56,6 +56,8 @@ let ident_printer =
       "Bool";"unsat";"sat";"true";"false";"select";"store";
        (** arrays -- this really belongs to the driver! (esp. const) *)
       "Array";"select";"store";"const";
+       (** div and mod are builtin *)
+      "div";"mod";
       ]
   in
   let san = sanitizer char_to_alpha char_to_alnumus in
@@ -206,10 +208,10 @@ and print_fmla info fmt f = match f.t_node with
   | Tbinop (Tor, f1, f2) ->
       fprintf fmt "@[(or@ %a@ %a)@]" (print_fmla info) f1 (print_fmla info) f2
   | Tbinop (Timplies, f1, f2) ->
-      fprintf fmt "@[(implies@ %a@ %a)@]"
+      fprintf fmt "@[(=>@ %a@ %a)@]"
         (print_fmla info) f1 (print_fmla info) f2
   | Tbinop (Tiff, f1, f2) ->
-      fprintf fmt "@[(iff@ %a@ %a)@]" (print_fmla info) f1 (print_fmla info) f2
+      fprintf fmt "@[(=@ %a@ %a)@]" (print_fmla info) f1 (print_fmla info) f2
   | Tnot f ->
       fprintf fmt "@[(not@ %a)@]" (print_fmla info) f
   | Ttrue ->
@@ -217,7 +219,7 @@ and print_fmla info fmt f = match f.t_node with
   | Tfalse ->
       fprintf fmt "false"
   | Tif (f1, f2, f3) ->
-      fprintf fmt "@[(if_then_else %a@ %a@ %a)@]"
+      fprintf fmt "@[(ite %a@ %a@ %a)@]"
         (print_fmla info) f1 (print_fmla info) f2 (print_fmla info) f3
   | Tlet (t1, tb) ->
       let v, f2 = t_open_bound tb in
@@ -231,7 +233,7 @@ and print_fmla info fmt f = match f.t_node with
 and print_expr info fmt =
   TermTF.t_select (print_term info fmt) (print_fmla info fmt)
 
-and print_trigger info fmt e = fprintf fmt "(%a)" (print_expr info) e
+and print_trigger info fmt e = fprintf fmt "%a" (print_expr info) e
 
 and print_triggers info fmt = function
   | [] -> ()

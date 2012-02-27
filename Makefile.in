@@ -44,6 +44,7 @@ EXE   = @EXE@
 STRIP = @STRIP@
 
 # other variables
+CC        = @CC@
 OCAMLC    = @OCAMLC@
 OCAMLOPT  = @OCAMLOPT@
 OCAMLDEP  = @OCAMLDEP@
@@ -54,17 +55,13 @@ OCAMLLIB  = @OCAMLLIB@
 OCAMLBEST = @OCAMLBEST@
 OCAMLVERSION = @OCAMLVERSION@
 CC        = gcc
-
+COQC      = @COQC@
+COQDEP    = @COQDEP@
 CAMLP5O   = @CAMLP5O@
 
-ifeq (@enable_menhirlib@,yes)
-  MENHIR    = @MENHIR@ --table
-  MENHIRINC = -I @MENHIRLIB@
-  MENHIRLIB = menhirLib
-else
-  MENHIR    = @MENHIR@
-  MENHIRINC =
-  MENHIRLIB =
+DEPFLAGS  = -slash -I src
+ifeq (@OCAMLBEST@,opt)
+DEPFLAGS += -native
 endif
 
 RUBBER = @RUBBER@
@@ -83,7 +80,7 @@ endif
 # external libraries common to all binaries
 
 EXTOBJS =
-EXTLIBS = str unix nums @META_DYNLINK@
+EXTLIBS = str unix nums dynlink
 
 EXTCMA	= $(addsuffix .cma,$(EXTLIBS)) $(addsuffix .cmo,$(EXTOBJS))
 EXTCMXA = $(addsuffix .cmxa,$(EXTLIBS)) $(addsuffix .cmx,$(EXTOBJS))
@@ -92,7 +89,7 @@ EXTCMXA = $(addsuffix .cmxa,$(EXTLIBS)) $(addsuffix .cmx,$(EXTOBJS))
 # main target
 ###############
 
-all: @OCAMLBEST@
+all: @OCAMLBEST@ plugins
 
 ifeq (@enable_local@,yes)
 all: install_local
@@ -110,9 +107,9 @@ plugins: plugins.@OCAMLBEST@
 LIBGENERATED = src/util/rc.ml src/parser/lexer.ml \
 	       src/parser/parser.mli src/parser/parser.ml \
 	       src/driver/driver_parser.mli src/driver/driver_parser.ml \
-	       src/driver/driver_lexer.ml
+	       src/driver/driver_lexer.ml src/session/xml.ml
 
-LIB_UTIL = stdlib exn_printer debug pp loc print_tree \
+LIB_UTIL = stdlib exn_printer pp debug loc print_tree print_number \
 	   cmdline hashweak hashcons util sysutil rc plugin
 
 LIB_CORE = ident ty term pattern decl theory task pretty env trans printer
@@ -132,10 +129,12 @@ LIB_TRANSFORM = simplify_recursive_definition simplify_formula \
 		encoding_explicit encoding_guard encoding_sort \
 		encoding_instantiate simplify_array filter_trigger \
 		introduction abstraction close_epsilon lift_epsilon \
-		eval_match instantiate_predicate
+		eval_match instantiate_predicate smoke_detector
 
-LIB_PRINTER = print_number alt_ergo why3printer smtv1 smtv2 \
-		coq tptp simplify gappa cvc3 yices
+LIB_PRINTER = alt_ergo why3printer smtv1 smtv2 coq pvs simplify gappa \
+	      cvc3 yices
+
+LIB_SESSION = xml termcode session session_tools session_scheduler
 
 LIBMODULES = src/config \
 	      $(addprefix src/util/, $(LIB_UTIL)) \
@@ -143,9 +142,10 @@ LIBMODULES = src/config \
 	      $(addprefix src/parser/, $(LIB_PARSER)) \
 	      $(addprefix src/driver/, $(LIB_DRIVER)) \
 	      $(addprefix src/transform/, $(LIB_TRANSFORM)) \
-	      $(addprefix src/printer/, $(LIB_PRINTER))
+	      $(addprefix src/printer/, $(LIB_PRINTER)) \
+	      $(addprefix src/session/, $(LIB_SESSION))
 
-LIBDIRS = util core parser driver transform printer
+LIBDIRS = util core parser driver transform printer session
 LIBINCLUDES = $(addprefix -I src/, $(LIBDIRS))
 
 ifeq (@enable_hypothesis_selection@,yes)
@@ -154,13 +154,15 @@ ifeq (@enable_hypothesis_selection@,yes)
   EXTLIBS += graph
 endif
 
-LIBML  = $(addsuffix .ml,  $(LIBMODULES))
-LIBMLI = $(addsuffix .mli, $(LIBMODULES))
+LIBDEP = $(addsuffix .dep, $(LIBMODULES))
 LIBCMO = $(addsuffix .cmo, $(LIBMODULES))
 LIBCMX = $(addsuffix .cmx, $(LIBMODULES))
 
+$(LIBDEP): DEPFLAGS += $(LIBINCLUDES)
 $(LIBCMO) $(LIBCMX): INCLUDES += $(LIBINCLUDES)
 $(LIBCMX): OFLAGS += -for-pack Why3
+
+$(LIBDEP): $(LIBGENERATED)
 
 # build targets
 
@@ -179,29 +181,26 @@ src/why3.cmo: $(LIBCMO)
 src/why3.cmx: $(LIBCMX)
 	$(OCAMLOPT) $(OFLAGS) -pack -o $@ $^
 
-# depend target
+# clean and depend
 
-include .depend.lib
+ifneq "$(MAKECMDGOALS)" "clean"
+include $(LIBDEP)
+endif
 
-.depend.lib: src/config.ml $(LIBGENERATED)
-	$(OCAMLDEP) -slash -I src $(LIBINCLUDES) $(LIBML) $(LIBMLI) > $@
-
-depend: .depend.lib
-
-# clean target
+depend: $(LIBDEP)
 
 LIBSDIRS = src $(addprefix src/, $(LIBDIRS))
 LIBCLEAN = $(addsuffix /*.cm[iox], $(LIBSDIRS)) \
 	   $(addsuffix /*.annot, $(LIBSDIRS)) \
 	   $(addsuffix /*.output, $(LIBSDIRS)) \
 	   $(addsuffix /*.automaton, $(LIBSDIRS)) \
+	   $(addsuffix /*.dep, $(LIBSDIRS)) \
 	   $(addsuffix /*.o, $(LIBSDIRS)) \
 	   $(addsuffix /*~, $(LIBSDIRS))
 
 clean::
 	rm -f $(LIBCLEAN) $(LIBGENERATED)
 	rm -f src/why3.cm[aiox] src/why3.[ao] src/why3.cmxa
-	rm -f .depend.lib
 
 ###############
 # installation
@@ -209,7 +208,6 @@ clean::
 
 install_no_local::
 	mkdir -p $(BINDIR)
-	mkdir -p $(LIBDIR)/why3
 	mkdir -p $(DATADIR)/why3/images
 	mkdir -p $(DATADIR)/why3/emacs
 	mkdir -p $(DATADIR)/why3/lang
@@ -221,6 +219,7 @@ install_no_local::
 	cp -f drivers/*.drv drivers/*.gen $(DATADIR)/why3/drivers
 	cp -f share/provers-detection-data.conf $(DATADIR)/why3/
 	cp -f share/images/*.png $(DATADIR)/why3/images
+	cp -rf share/javascript $(DATADIR)/why3/javascript
 	cp -f share/emacs/why.el $(DATADIR)/why3/emacs/why.el
 	cp -f share/lang/why.lang $(DATADIR)/why3/lang/why.lang
 
@@ -229,6 +228,7 @@ install_no_local_lib::
 	cp -f src/why3.cm* $(OCAMLLIB)/why3
 	cp -f META $(OCAMLLIB)/why3
 	if test -f src/why3.a; then cp -f src/why3.a $(OCAMLLIB)/why3; fi
+	if test -f src/why3.o; then cp -f src/why3.o $(OCAMLLIB)/why3; fi
 
 ifeq (@enable_local@,yes)
 install install-lib:
@@ -240,6 +240,102 @@ install-lib: install_no_local_lib
 endif
 
 install-all: install install-lib
+
+##################
+# Why plugins
+##################
+
+PLUGGENERATED = plugins/tptp/tptp_lexer.ml \
+		plugins/tptp/tptp_parser.ml plugins/tptp/tptp_parser.mli
+
+PLUG_PARSER = genequlin
+PLUG_PRINTER = tptpfof
+PLUG_TRANSFORM =
+PLUG_TPTP = tptp_ast tptp_parser tptp_typing tptp_lexer
+
+PLUGINS = genequlin tptpfof tptp
+
+TPTPMODULES = $(addprefix plugins/tptp/, $(PLUG_TPTP))
+
+TPTPCMO = $(addsuffix .cmo, $(TPTPMODULES))
+TPTPCMX = $(addsuffix .cmx, $(TPTPMODULES))
+
+PLUGMODULES = $(addprefix plugins/parser/, $(PLUG_PARSER)) \
+	      $(addprefix plugins/printer/, $(PLUG_PRINTER)) \
+	      $(addprefix plugins/transform/, $(PLUG_TRANSFORM)) \
+	      $(TPTPMODULES)
+
+PLUGDEP = $(addsuffix .dep, $(PLUGMODULES))
+PLUGCMO = $(addsuffix .cmo, $(PLUGMODULES))
+PLUGCMX = $(addsuffix .cmx, $(PLUGMODULES))
+
+PLUGDIRS = parser printer transform tptp
+PLUGINCLUDES = $(addprefix -I plugins/, $(PLUGDIRS))
+
+$(PLUGDEP): DEPFLAGS += $(PLUGINCLUDES)
+$(PLUGCMO) $(PLUGCMX): INCLUDES += $(PLUGINCLUDES)
+
+$(PLUGDEP): $(PLUGGENERATED)
+
+plugins.byte: $(addsuffix .cmo, $(addprefix lib/plugins/, $(PLUGINS)))
+plugins.opt : $(addsuffix .cmxs, $(addprefix lib/plugins/, $(PLUGINS)))
+
+lib/plugins/%.cmxs: plugins/parser/%.cmx
+	$(if $(QUIET), @echo 'Linking  $@' &&) \
+	    $(OCAMLOPT) $(OFLAGS) -shared -o $@ $<
+
+lib/plugins/%.cmo: plugins/parser/%.cmo
+	$(if $(QUIET),@echo 'Linking  $@' &&) \
+	    $(OCAMLC) $(BFLAGS) -pack -o $@ $<
+
+lib/plugins/%.cmxs: plugins/printer/%.cmx
+	$(if $(QUIET), @echo 'Linking  $@' &&) \
+	    $(OCAMLOPT) $(OFLAGS) -shared -o $@ $<
+
+lib/plugins/%.cmo: plugins/printer/%.cmo
+	$(if $(QUIET),@echo 'Linking  $@' &&) \
+	    $(OCAMLC) $(BFLAGS) -pack -o $@ $<
+
+lib/plugins/%.cmxs: plugins/transform/%.cmx
+	$(if $(QUIET), @echo 'Linking  $@' &&) \
+	    $(OCAMLOPT) $(OFLAGS) -shared -o $@ $<
+
+lib/plugins/%.cmo: plugins/transform/%.cmo
+	$(if $(QUIET),@echo 'Linking  $@' &&) \
+	    $(OCAMLC) $(BFLAGS) -pack -o $@ $<
+
+lib/plugins/tptp.cmxs: $(TPTPCMX)
+	$(if $(QUIET), @echo 'Linking  $@' &&) \
+	    $(OCAMLOPT) $(OFLAGS) -shared -o $@ $^
+
+lib/plugins/tptp.cmo: $(TPTPCMO)
+	$(if $(QUIET),@echo 'Linking  $@' &&) \
+	    $(OCAMLC) $(BFLAGS) -pack -o $@ $^
+
+PLUGSDIRS = plugins $(addprefix plugins/, $(PLUGDIRS))
+PLUGCLEAN = $(addsuffix /*.cm[iox], $(PLUGSDIRS)) \
+	    $(addsuffix /*.annot, $(PLUGSDIRS)) \
+	    $(addsuffix /*.output, $(PLUGSDIRS)) \
+	    $(addsuffix /*.automaton, $(PLUGSDIRS)) \
+	    $(addsuffix /*.dep, $(PLUGSDIRS)) \
+	    $(addsuffix /*.o, $(PLUGSDIRS)) \
+	    $(addsuffix /*~, $(PLUGSDIRS))
+
+# depend and clean targets
+
+ifneq "$(MAKECMDGOALS)" "clean"
+include $(PLUGDEP)
+endif
+
+depend: $(PLUGDEP)
+
+clean::
+	rm -f $(PLUGCLEAN) $(PLUGGENERATED)
+	rm -f lib/plugins/*
+
+install_no_local::
+	mkdir -p $(LIBDIR)/why3/plugins
+	cp -f lib/plugins/* $(LIBDIR)/why3/plugins
 
 
 ##################
@@ -273,51 +369,53 @@ install_no_local::
 
 install_local: bin/why3
 
-##################
-# Why realize binary
-##################
+########
+# Whyml (new API)
+########
 
-byte: bin/why3realize.byte
-opt:  bin/why3realize.opt
+MLW_FILES = mlw_ty mlw_expr mlw_decl mlw_module mlw_typing mlw_main
 
-bin/why3realize.opt: src/why3.cmxa src/realize.cmx
-	$(if $(QUIET),@echo 'Linking  $@' &&) \
-	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
-	$(STRIP) $@
+MLWMODULES = $(addprefix src/whyml/, $(MLW_FILES))
 
-bin/why3realize.byte: src/why3.cma src/realize.cmo
-	$(if $(QUIET),@echo 'Linking  $@' &&) \
-	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
+MLWDEP = $(addsuffix .dep, $(MLWMODULES))
+MLWCMO = $(addsuffix .cmo, $(MLWMODULES))
+MLWCMX = $(addsuffix .cmx, $(MLWMODULES))
 
-bin/why3realize: bin/why3realize.@OCAMLBEST@
-	ln -sf why3realize.@OCAMLBEST@ $@
+$(MLWDEP): DEPFLAGS += -I src/whyml
+$(MLWCMO) $(MLWCMX): INCLUDES += -I src/whyml
 
-src/realize.cmo: src/why3.cma
-src/realize.cmx: src/why3.cmxa
+# build targets
+
+byte: $(MLWCMO)
+opt:  $(MLWCMX)
+
+# depend and clean targets
+
+ifneq "$(MAKECMDGOALS)" "clean"
+include $(MLWDEP)
+endif
+
+depend: $(MLWDEP)
 
 clean::
-	rm -f src/realize.cm[iox] src/realize.annot src/realize.o
-	rm -f bin/realize.byte bin/realize.opt bin/realize
-
-install_no_local::
-	cp -f bin/why3realize.@OCAMLBEST@ $(BINDIR)/why3realize
-
-install_local: bin/why3realize
+	rm -f src/whyml/*.cm[iox] src/whyml/*.o
+	rm -f src/whyml/*.annot src/whyml/*.dep src/whyml/*~
+#	rm -f bin/why3ml.byte bin/why3ml.opt bin/why3ml
 
 ########
 # Whyml
 ########
 
 PGM_FILES = pgm_ttree pgm_types pgm_pretty \
-	    pgm_module pgm_wp pgm_env pgm_typing pgm_main
+	    pgm_module pgm_wp pgm_typing pgm_ocaml pgm_main
 
 PGMMODULES = $(addprefix src/programs/, $(PGM_FILES))
 
-PGMML  = $(addsuffix .ml,  $(PGMMODULES))
-PGMMLI = $(addsuffix .mli, $(PGMMODULES))
+PGMDEP = $(addsuffix .dep, $(PGMMODULES))
 PGMCMO = $(addsuffix .cmo, $(PGMMODULES))
 PGMCMX = $(addsuffix .cmx, $(PGMMODULES))
 
+$(PGMDEP): DEPFLAGS += -I src/programs
 $(PGMCMO) $(PGMCMX): INCLUDES += -I src/programs
 
 # build targets
@@ -325,12 +423,12 @@ $(PGMCMO) $(PGMCMX): INCLUDES += -I src/programs
 byte: bin/why3ml.byte
 opt:  bin/why3ml.opt
 
-bin/why3ml.opt: src/why3.cmxa $(PGMCMX) src/main.cmx
+bin/why3ml.opt: src/why3.cmxa $(PGMCMX) $(MLWCMX) src/main.cmx
 	$(if $(QUIET), @echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
 	$(STRIP) $@
 
-bin/why3ml.byte: src/why3.cma $(PGMCMO) src/main.cmo
+bin/why3ml.byte: src/why3.cma $(PGMCMO) $(MLWCMO) src/main.cmo
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
 
@@ -349,18 +447,16 @@ adacore-patch:
 
 # depend and clean targets
 
-include .depend.programs
+ifneq "$(MAKECMDGOALS)" "clean"
+include $(PGMDEP)
+endif
 
-.depend.programs:
-	$(OCAMLDEP) -slash -I src -I src/programs $(PGMML) $(PGMMLI) > $@
-
-depend: .depend.programs
+depend: $(PGMDEP)
 
 clean::
 	rm -f src/programs/*.cm[iox] src/programs/*.o
-	rm -f src/programs/*.annot src/programs/*~
+	rm -f src/programs/*.annot src/programs/*.dep src/programs/*~
 	rm -f bin/why3ml.byte bin/why3ml.opt bin/why3ml
-	rm -f .depend.programs
 
 # test target
 
@@ -461,11 +557,11 @@ CONFIG_FILES = whyconfig
 
 CONFIGMODULES = $(addprefix src/config/, $(CONFIG_FILES))
 
-CONFIGML  = $(addsuffix .ml,  $(CONFIGMODULES))
-CONFIGMLI = $(addsuffix .mli, $(CONFIGMODULES))
+CONFIGDEP = $(addsuffix .dep, $(CONFIGMODULES))
 CONFIGCMO = $(addsuffix .cmo, $(CONFIGMODULES))
 CONFIGCMX = $(addsuffix .cmx, $(CONFIGMODULES))
 
+$(CONFIGDEP): DEPFLAGS += -I src/programs
 $(CONFIGCMO) $(CONFIGCMX): INCLUDES += -I src/programs
 
 # build targets
@@ -487,20 +583,17 @@ bin/why3config: bin/why3config.@OCAMLBEST@
 
 # depend and clean targets
 
-include .depend.config
+ifneq "$(MAKECMDGOALS)" "clean"
+include $(CONFIGDEP)
+endif
 
-.depend.config: $(CONFIGGENERATED)
-	$(OCAMLDEP) -slash -I src -I src/config $(CONFIGML) $(CONFIGMLI) > $@
-
-depend: .depend.config
+depend: $(CONFIGDEP)
 
 clean::
 	rm -f src/config/*.cm[iox] src/config/*.o
-	rm -f src/config/*.annot src/config/*~
+	rm -f src/config/*.annot src/config/*.dep src/config/*~
 	rm -f src/config/*.output src/config/*.automaton
 	rm -f bin/why3config.byte bin/why3config.opt bin/why3config
-	rm -f .why.conf
-	rm -f .depend.config
 
 local_config: bin/why3config.@OCAMLBEST@
 	WHY3LIB=$(PWD) WHY3DATA=$(PWD)/share bin/why3config.@OCAMLBEST@ \
@@ -517,15 +610,15 @@ install_local: bin/why3config
 
 ifeq (@enable_ide@,yes)
 
-IDE_FILES = xml termcode session gconfig gmain
+IDE_FILES = gconfig gmain
 
 IDEMODULES = $(addprefix src/ide/, $(IDE_FILES))
 
-IDEML  = $(addsuffix .ml,  $(IDEMODULES))
-IDEMLI = $(addsuffix .mli, $(IDEMODULES))
+IDEDEP = $(addsuffix .dep, $(IDEMODULES))
 IDECMO = $(addsuffix .cmo, $(IDEMODULES))
 IDECMX = $(addsuffix .cmx, $(IDEMODULES))
 
+$(IDEDEP): DEPFLAGS += -I src/ide
 $(IDECMO) $(IDECMX): INCLUDES += -I src/ide
 
 # build targets
@@ -537,12 +630,12 @@ bin/why3ide.opt bin/why3ide.byte: INCLUDES += -I @LABLGTK2LIB@
 bin/why3ide.opt bin/why3ide.byte: EXTOBJS +=
 bin/why3ide.opt bin/why3ide.byte: EXTLIBS += lablgtk lablgtksourceview2
 
-bin/why3ide.opt: src/why3.cmxa $(PGMCMX) $(IDECMX)
+bin/why3ide.opt: src/why3.cmxa $(PGMCMX) $(MLWCMX) $(IDECMX)
 	$(if $(QUIET), @echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
 	$(STRIP) $@
 
-bin/why3ide.byte: src/why3.cma $(PGMCMO) $(IDECMO)
+bin/why3ide.byte: src/why3.cma $(PGMCMO) $(MLWCMO) $(IDECMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
 
@@ -551,19 +644,17 @@ bin/why3ide: bin/why3ide.@OCAMLBEST@
 
 # depend and clean targets
 
-include .depend.ide
+ifneq "$(MAKECMDGOALS)" "clean"
+include $(IDEDEP)
+endif
 
-.depend.ide: src/ide/xml.ml
-	$(OCAMLDEP) -slash -I src -I src/ide $(IDEML) $(IDEMLI) > $@
-
-depend: .depend.ide
+depend: $(IDEDEP)
 
 clean::
 	rm -f src/ide/xml.ml
 	rm -f src/ide/*.cm[iox] src/ide/*.o
-	rm -f src/ide/*.annot src/ide/*~
+	rm -f src/ide/*.annot src/ide/*.dep src/ide/*~
 	rm -f bin/why3ide.byte bin/why3ide.opt bin/why3ide
-	rm -f .depend.ide
 
 install_no_local::
 	cp -f bin/why3ide.@OCAMLBEST@ $(BINDIR)/why3ide$(EXE)
@@ -577,15 +668,15 @@ endif
 # Replayer
 ###############
 
-REPLAYER_FILES = xml termcode session replay
+REPLAYER_FILES = replay
 
 REPLAYERMODULES = $(addprefix src/ide/, $(REPLAYER_FILES))
 
-REPLAYERML  = $(addsuffix .ml,  $(REPLAYERMODULES))
-REPLAYERMLI = $(addsuffix .mli, $(REPLAYERMODULES))
+REPLAYERDEP = $(addsuffix .dep, $(REPLAYERMODULES))
 REPLAYERCMO = $(addsuffix .cmo, $(REPLAYERMODULES))
 REPLAYERCMX = $(addsuffix .cmx, $(REPLAYERMODULES))
 
+$(REPLAYERDEP): DEPFLAGS += -I src/ide
 $(REPLAYERCMO) $(REPLAYERCMX): INCLUDES += -I src/ide
 
 # build targets
@@ -607,19 +698,14 @@ bin/why3replayer: bin/why3replayer.@OCAMLBEST@
 
 # depend and clean targets
 
-include .depend.replayer
+ifneq "$(MAKECMDGOALS)" "clean"
+include $(REPLAYERDEP)
+endif
 
-.depend.replayer: src/ide/xml.ml
-	$(OCAMLDEP) -slash -I src -I src/ide $(REPLAYERML) $(REPLAYERMLI) > $@
-
-depend: .depend.replayer
+depend: $(REPLAYERDEP)
 
 clean::
-	rm -f src/ide/xml.ml
-	rm -f src/ide/*.cm[iox] src/ide/*.o
-	rm -f src/ide/*.annot src/ide/*~
 	rm -f bin/why3replayer.byte bin/why3replayer.opt bin/why3replayer
-	rm -f .depend.replayer
 
 install_no_local::
 	cp -f bin/why3replayer.@OCAMLBEST@ $(BINDIR)/why3replayer$(EXE)
@@ -628,23 +714,169 @@ install_local: bin/why3replayer
 
 
 ###############
+# Session
+###############
+
+SESSION_FILES = why3session_lib why3session_mod why3session_copy \
+		why3session_info why3session_rm why3session
+
+SESSIONMODULES = $(addprefix src/why3session/, $(SESSION_FILES))
+
+SESSIONDEP = $(addsuffix .dep, $(SESSIONMODULES))
+SESSIONCMO = $(addsuffix .cmo, $(SESSIONMODULES))
+SESSIONCMX = $(addsuffix .cmx, $(SESSIONMODULES))
+
+$(SESSIONDEP): DEPFLAGS += -I src/why3session
+$(SESSIONCMO) $(SESSIONCMX): INCLUDES += -I src/why3session
+
+# build targets
+
+byte: bin/why3session.byte
+opt:  bin/why3session.opt
+
+bin/why3session.opt: src/why3.cmxa $(PGMCMX) $(SESSIONCMX)
+	$(if $(QUIET), @echo 'Linking  $@' &&) \
+	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
+	$(STRIP) $@
+
+bin/why3session.byte: src/why3.cma $(PGMCMO) $(SESSIONCMO)
+	$(if $(QUIET),@echo 'Linking  $@' &&) \
+	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
+
+bin/why3session: bin/why3session.@OCAMLBEST@
+	ln -sf why3session.@OCAMLBEST@ $@
+
+# depend and clean targets
+
+ifneq "$(MAKECMDGOALS)" "clean"
+include $(SESSIONDEP)
+endif
+
+depend: $(SESSIONDEP)
+
+clean::
+	rm -f src/why3session/*.cm[iox] src/why3session/*.o
+	rm -f src/why3session/*.annot src/why3session/*.dep src/why3session/*~
+	rm -f bin/why3session.byte bin/why3session.opt bin/why3session
+
+install_no_local::
+	cp -f bin/why3session.@OCAMLBEST@ $(BINDIR)/why3session$(EXE)
+
+install_local: bin/why3session
+
+###############
+# Stats
+###############
+
+STATS_FILES = stats
+
+STATSMODULES = $(addprefix src/ide/, $(STATS_FILES))
+
+STATSDEP = $(addsuffix .dep, $(STATSMODULES))
+STATSCMO = $(addsuffix .cmo, $(STATSMODULES))
+STATSCMX = $(addsuffix .cmx, $(STATSMODULES))
+
+$(STATSDEP): DEPFLAGS += -I src/ide
+$(STATSCMO) $(STATSCMX): INCLUDES += -I src/ide
+
+# build targets
+
+byte: bin/why3stats.byte
+opt:  bin/why3stats.opt
+
+bin/why3stats.opt: src/why3.cmxa $(PGMCMX) $(STATSCMX)
+	$(if $(QUIET), @echo 'Linking  $@' &&) \
+	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
+	$(STRIP) $@
+
+bin/why3stats.byte: src/why3.cma $(PGMCMO) $(STATSCMO)
+	$(if $(QUIET),@echo 'Linking  $@' &&) \
+	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
+
+bin/why3stats: bin/why3stats.@OCAMLBEST@
+	ln -sf why3stats.@OCAMLBEST@ $@
+
+# depend and clean targets
+
+ifneq "$(MAKECMDGOALS)" "clean"
+include $(STATSDEP)
+endif
+
+depend: $(STATSDEP)
+
+clean::
+	rm -f bin/why3stats.byte bin/why3stats.opt bin/why3stats
+
+install_no_local::
+	cp -f bin/why3stats.@OCAMLBEST@ $(BINDIR)/why3stats
+
+install_local: bin/why3stats
+
+###############
+# Html
+###############
+
+HTML_FILES = html_session
+
+HTMLMODULES = $(addprefix src/ide/, $(HTML_FILES))
+
+HTMLDEP = $(addsuffix .dep, $(HTMLMODULES))
+HTMLCMO = $(addsuffix .cmo, $(HTMLMODULES))
+HTMLCMX = $(addsuffix .cmx, $(HTMLMODULES))
+
+$(HTMLDEP): DEPFLAGS += -I src/ide
+$(HTMLCMO) $(HTMLCMX): INCLUDES += -I src/ide
+
+# build targets
+
+byte: bin/why3html.byte
+opt:  bin/why3html.opt
+
+bin/why3html.opt: src/why3.cmxa $(PGMCMX) $(HTMLCMX)
+	$(if $(QUIET), @echo 'Linking  $@' &&) \
+	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
+	$(STRIP) $@
+
+bin/why3html.byte: src/why3.cma $(PGMCMO) $(HTMLCMO)
+	$(if $(QUIET),@echo 'Linking  $@' &&) \
+	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
+
+bin/why3html: bin/why3html.@OCAMLBEST@
+	ln -sf why3html.@OCAMLBEST@ $@
+
+# depend and clean targets
+
+ifneq "$(MAKECMDGOALS)" "clean"
+include $(HTMLDEP)
+endif
+
+depend: $(HTMLDEP)
+
+clean::
+	rm -f bin/why3html.byte bin/why3html.opt bin/why3html
+
+install_no_local::
+	cp -f bin/why3html.@OCAMLBEST@ $(BINDIR)/why3html
+
+install_local: bin/why3html
+
+
+###############
 # Bench
 ###############
 
 ifeq (@enable_bench@,yes)
 
-BENCH_FILES = bench benchrc benchdb whybench
+BENCH_FILES = worker db bench benchrc benchdb whybench
 
 BENCHMODULES := $(addprefix src/bench/, $(BENCH_FILES))
 
-BENCHMODULES := src/ide/worker src/ide/db $(BENCHMODULES)
-
-BENCHML  = $(addsuffix .ml,  $(BENCHMODULES))
-BENCHMLI = $(addsuffix .mli, $(BENCHMODULES))
+BENCHDEP = $(addsuffix .dep, $(BENCHMODULES))
 BENCHCMO = $(addsuffix .cmo, $(BENCHMODULES))
 BENCHCMX = $(addsuffix .cmx, $(BENCHMODULES))
 
-$(BENCHCMO) $(BENCHCMX): INCLUDES += -I src/ide -I src/bench -I @SQLITE3LIB@
+$(BENCHDEP): DEPFLAGS += -I src/bench
+$(BENCHCMO) $(BENCHCMX): INCLUDES += -I src/bench -I @SQLITE3LIB@
 
 # build targets
 
@@ -668,18 +900,16 @@ bin/why3bench: bin/why3bench.@OCAMLBEST@
 
 # depend and clean targets
 
-include .depend.bench
+ifneq "$(MAKECMDGOALS)" "clean"
+include $(BENCHDEP)
+endif
 
-.depend.bench:
-	$(OCAMLDEP) -slash -I src -I src/bench -I src/ide $(BENCHML) $(BENCHMLI) > $@
-
-depend: .depend.bench
+depend: $(BENCHDEP)
 
 clean::
 	rm -f src/bench/*.cm[iox] src/bench/*.o
-	rm -f src/bench/*.annot src/bench/*~
+	rm -f src/bench/*.annot src/bench/*.dep src/bench/*~
 	rm -f bin/why3bench.byte bin/why3bench.opt bin/why3bench
-	rm -f .depend.bench
 
 install_no_local::
 	cp -f bin/why3bench.@OCAMLBEST@ $(BINDIR)/why3bench$(EXE)
@@ -692,7 +922,7 @@ endif
 # Coq plugin
 ##############
 
-ifeq (@enable_coq_support@,yes)
+ifeq (@enable_coq_plugin@,yes)
 
 COQGENERATED = src/coq-plugin/g_whytac.ml
 
@@ -700,14 +930,17 @@ COQ_FILES = whytac g_whytac
 
 COQMODULES = $(addprefix src/coq-plugin/, $(COQ_FILES))
 
-COQML  = $(addsuffix .ml,  $(COQMODULES))
+COQDEP = $(addsuffix .dep, $(COQMODULES))
 COQCMO = $(addsuffix .cmo, $(COQMODULES))
 COQCMX = $(addsuffix .cmx, $(COQMODULES))
 
 COQTREES = kernel lib interp parsing proofs pretyping tactics library toplevel
 COQINCLUDES = -I src/coq-plugin $(addprefix -I @COQLIB@/, $(COQTREES))
 
+$(COQDEP): DEPFLAGS += -I src/coq-plugin
 $(COQCMO) $(COQCMX): INCLUDES += $(COQINCLUDES)
+
+$(COQDEP): $(COQGENERATED)
 
 byte: src/coq-plugin/whytac.cma
 opt:  src/coq-plugin/whytac.cmxs
@@ -726,80 +959,99 @@ src/coq-plugin/g_whytac.ml: src/coq-plugin/g_whytac.ml4
 
 # depend and clean targets
 
-include .depend.coq
+ifneq "$(MAKECMDGOALS)" "clean"
+include $(COQDEP)
+endif
 
-.depend.coq: $(COQGENERATED)
-	$(OCAMLDEP) -slash -I src -I src/coq-plugin $(COQML) > $@
-
-depend: .depend.coq
+depend: $(COQDEP)
 
 clean::
 	rm -f src/coq-plugin/*.cm[iox] src/coq-plugin/*.o
 	rm -f src/coq-plugin/*.cma src/coq-plugin/*.cmxs
-	rm -f src/coq-plugin/*.annot src/coq-plugin/*~
+	rm -f src/coq-plugin/*.annot src/coq-plugin/*.dep src/coq-plugin/*~
 	rm -f $(COQGENERATED)
-	rm -f .depend.coq
 
 endif
 
-########
-# Tptp2why
-########
+####################
+# Coq realizations
+####################
 
-ifeq (@enable_whytptp@,yes)
+ifeq (@enable_coq_libs@,yes)
 
-TPTPGENERATED = src/tptp2why/tptpLexer.ml \
-	src/tptp2why/tptpParser.ml src/tptp2why/tptpParser.mli
+COQLIBS_INT_FILES = Abs ComputerDivision EuclideanDivision Int MinMax
+COQLIBS_INT = $(addprefix lib/coq/int/, $(COQLIBS_INT_FILES))
 
-TPTP_FILES = tptpTree tptpParser tptpLexer tptpTranslate tptp2whymain
+COQLIBS_REAL_FILES = Abs ExpLog FromInt MinMax Real Square
+COQLIBS_REAL = $(addprefix lib/coq/real/, $(COQLIBS_REAL_FILES))
 
-TPTPMODULES = $(addprefix src/tptp2why/, $(TPTP_FILES))
+ifeq (@enable_coq_fp_libs@,yes)
+COQLIBS_FP_FILES = Rounding Single Double
+COQLIBS_FP_ALL_FILES = GenFloat $(COQLIBS_FP_FILES)
+COQLIBS_FP = $(addprefix lib/coq/floating_point/, $(COQLIBS_FP_ALL_FILES))
+endif
 
-TPTPML  = $(addsuffix .ml,  $(TPTPMODULES))
-TPTPMLI = $(addsuffix .mli, $(TPTPMODULES))
-TPTPCMO = $(addsuffix .cmo, $(TPTPMODULES))
-TPTPCMX = $(addsuffix .cmx, $(TPTPMODULES))
+COQLIBS_FILES = $(COQLIBS_INT) $(COQLIBS_REAL) $(COQLIBS_FP)
 
-$(TPTPML) $(TPTPMLI): OCAMLYACC = $(MENHIR)
-$(TPTPCMO) $(TPTPCMX): INCLUDES += -I src/tptp2why
+COQV  = $(addsuffix .v,  $(COQLIBS_FILES))
+COQVO = $(addsuffix .vo, $(COQLIBS_FILES))
+COQVD = $(addsuffix .vd, $(COQLIBS_FILES))
 
-# build targets
+%.vo: %.v
+	$(if $(QUIET),@echo 'Coqc $<' &&) $(COQC) -R lib/coq Why3 $<
 
-plugins.byte byte: plugins/whytptp.cmo
-plugins.opt  opt : plugins/whytptp.cmxs
+%.vd: %.v
+	$(if $(QUIET),@echo 'Coqdep $<' &&) $(COQDEP) -slash -R lib/coq Why3 $< > $@
 
-plugins/whytptp.cmxs plugins/whytptp.cmo: EXTOBJS += $(MENHIRLIB)
-plugins/whytptp.cmxs plugins/whytptp.cmo: INCLUDES += $(MENHIRINC)
+drivers/coq-realizations.aux: Makefile
+	$(if $(QUIET),@echo 'Generate $@' &&) \
+	(echo "(* generated automatically at compilation time *)"; \
+	for f in $(COQLIBS_INT_FILES); do echo 'theory int.'"$$f"' meta "realized" "int.'"$$f"'", "" end'; done; \
+	for f in $(COQLIBS_REAL_FILES); do echo 'theory real.'"$$f"' meta "realized" "real.'"$$f"'", "" end'; done; \
+	for f in $(COQLIBS_FP_FILES); do echo 'theory floating_point.'"$$f"' meta "realized" "floating_point.'"$$f"'", "" end'; done; \
+	) > $@
 
-plugins/whytptp.cmxs: $(TPTPCMX)
-	$(if $(QUIET), @echo 'Linking  $@' &&) \
-	    $(OCAMLOPT) $(OFLAGS) -shared -o $@ $^
-
-plugins/whytptp.cmo: $(TPTPCMO)
-	$(if $(QUIET),@echo 'Linking  $@' &&) \
-	    $(OCAMLC) $(BFLAGS) -pack -o $@ $^
+opt byte: $(COQVO)
 
 install_no_local::
-	cp -f plugins/whytptp.cm* $(LIBDIR)/why3/
+	mkdir -p $(LIBDIR)/why3/coq
+	mkdir -p $(LIBDIR)/why3/coq/int
+	cp $(addsuffix .vo, $(COQLIBS_INT)) $(LIBDIR)/why3/coq/int/
+	mkdir -p $(LIBDIR)/why3/coq/real
+	cp $(addsuffix .vo, $(COQLIBS_REAL)) $(LIBDIR)/why3/coq/real/
+ifeq (@enable_coq_fp_libs@,yes)
+	mkdir -p $(LIBDIR)/why3/coq/floating_point
+	cp $(addsuffix .vo, $(COQLIBS_FP)) $(LIBDIR)/why3/coq/floating_point/
+endif
+	cp drivers/coq-realizations.aux $(DATADIR)/why3/drivers/
 
-# depend and clean targets
+install_local: $(COQVO) drivers/coq-realizations.aux
 
-include .depend.tptp2why
+ifneq "$(MAKECMDGOALS)" "clean"
+include $(COQVD)
+endif
 
-.depend.tptp2why: $(TPTPGENERATED)
-	$(OCAMLDEP) -slash -I src -I src/tptp2why $(TPTPML) $(TPTPMLI) > $@
-
-depend: .depend.tptp2why
+depend: $(COQVD)
 
 clean::
-	rm -f $(TPTPGENERATED)
-	rm -f src/tptp2why/*.cm* src/tptp2why/*.o
-	rm -f src/tptp2why/*.annot src/tptp2why/*.conflicts
-	rm -f src/tptp2why/*.output src/tptp2why/*.automaton
-	rm -f plugins/whytptp.cm* plugins/whytptp.o
-	rm -f .depend.tptp2why
+	rm -f $(COQVO) $(COQVD) $(addsuffix .glob, $(COQLIBS_FILES))
+
+update-coq: bin/why3 drivers/coq-realizations.aux
+	for f in $(COQLIBS_INT_FILES); do bin/why3 --realize -D drivers/coq-realize.drv -T int.$$f -o lib/coq/int/; done
+	for f in $(COQLIBS_REAL_FILES); do bin/why3 --realize -D drivers/coq-realize.drv -T real.$$f -o lib/coq/real/; done
+	for f in $(COQLIBS_FP_FILES); do bin/why3 --realize -D drivers/coq-realize.drv -T floating_point.$$f -o lib/coq/floating_point/; done
+
+else
+
+drivers/coq-realizations.aux:
+	echo "(* generated automatically at compilation time *)" > $@
 
 endif
+
+opt byte: drivers/coq-realizations.aux
+
+clean::
+	rm -f drivers/coq-realizations.aux
 
 #######
 # tools
@@ -822,17 +1074,21 @@ install_no_local::
 # why3doc
 #########
 
+WHY3DOCGENERATED = src/why3doc/to_html.ml
+
 # WHY3DOC_FILES = doc_html doc_main
 WHY3DOC_FILES = to_html
 
 WHY3DOCMODULES = $(addprefix src/why3doc/, $(WHY3DOC_FILES))
 
-WHY3DOCML  = $(addsuffix .ml,  $(WHY3DOCMODULES))
-WHY3DOCMLI = $(addsuffix .mli, $(WHY3DOCMODULES))
+WHY3DOCDEP = $(addsuffix .dep, $(WHY3DOCMODULES))
 WHY3DOCCMO = $(addsuffix .cmo, $(WHY3DOCMODULES))
 WHY3DOCCMX = $(addsuffix .cmx, $(WHY3DOCMODULES))
 
+$(WHY3DOCDEP): DEPFLAGS += -I src/why3doc
 $(WHY3DOCCMO) $(WHY3DOCCMX): INCLUDES += -I src/why3doc
+
+$(WHY3DOCDEP): $(WHY3DOCGENERATED)
 
 # build targets
 
@@ -853,24 +1109,22 @@ bin/why3doc: bin/why3doc.@OCAMLBEST@
 
 install_no_local::
 	cp -f bin/why3doc.@OCAMLBEST@ $(BINDIR)/why3doc$(EXE)
-
 # depend and clean targets
 
-WHY3DOCGENERATED=src/why3doc/to_html.ml
+ifneq "$(MAKECMDGOALS)" "clean"
+include $(WHY3DOCDEP)
+endif
 
-include .depend.why3doc
-
-.depend.why3doc: $(WHY3DOCGENERATED)
-	$(OCAMLDEP) -slash -I src -I src/why3doc $(WHY3DOCML) $(WHY3DOCMLI) > $@
-
-depend: .depend.why3doc
+depend: $(WHY3DOCDEP)
 
 clean::
 	rm -f $(WHY3DOCGENERATED)
 	rm -f src/why3doc/*.cm[iox] src/why3doc/*.o
-	rm -f src/why3doc/*.annot src/why3doc/*~
+	rm -f src/why3doc/*.annot src/why3doc/*.dep src/why3doc/*~
 	rm -f bin/why3doc.byte bin/why3doc.opt bin/why3doc
-	rm -f .depend.why3doc
+
+install_no_local::
+	cp -f bin/why3doc.@OCAMLBEST@ $(BINDIR)/why3doc$(EXE)
 
 install_local: bin/why3doc
 
@@ -878,25 +1132,13 @@ install_local: bin/why3doc
 # bench
 ########
 
-.PHONY: bench test comp_bench_plugins
+.PHONY: bench test
 
 bench:: bin/why3.@OCAMLBEST@ bin/why3ml.@OCAMLBEST@ bin/why3config.@OCAMLBEST@ plugins $(TOOLS)
 	$(MAKE) test-api
 	sh bench/bench \
 	    "bin/why3.@OCAMLBEST@" \
 	    "bin/why3ml.@OCAMLBEST@"
-
-BENCH_PLUGINS_CMO := helloworld.cmo
-BENCH_PLUGINS_CMO := $(addprefix bench/plugins/,$(BENCH_PLUGINS_CMO))
-BENCH_PLUGINS_CMXS := $(BENCH_PLUGINS_CMO:.cmo=.cmxs)
-
-comp_bench_plugins:: $(BENCH_PLUGINS_CMO) $(BENCH_PLUGINS_CMXS)
-
-# bench_plugins:: $(BENCH_PLUGINS_CMO) $(BENCH_PLUGINS_CMXS) byte $(TOOLS)
-# 	bin/why3.byte -D bench/plugins/helloworld.drv \
-# 	tests/test-jcf.why -T Test -G G
-# 	bin/why3.$(OCAMLBEST) -D bench/plugins/helloworld.drv  \
-# 	tests/test-jcf.why -T Test -G G
 
 ###############
 # test targets
@@ -941,57 +1183,12 @@ test-api: src/why3.cma
 	ocaml -I src/ $(INCLUDES) $(EXTCMA) src/why3.cma examples/use_api.ml \
 	|| (printf "Test of Why API calls failed. Please fix it"; exit 2)
 
-test-shape: src/why3.cma src/ide/termcode.cmo
-	ocaml -I src/ -I src/ide/ $(INCLUDES) $(EXTCMA) $? examples/test_shape.ml
+test-shape: src/why3.cma
+	ocaml -I src/ $(INCLUDES) $(EXTCMA) $? examples/test_shape.ml
 
 bts12244: src/why3.cma
 	ocaml -I src/ $(INCLUDES) $(EXTCMA) src/why3.cma examples/bts12244.ml
 
-
-## Examples : Plugins ##
-
-ifeq (@enable_plugins@,yes)
-
-PLUGDIR = examples/plugins/
-PLUG_FILES = genequlin
-
-PLUGMODULES = $(addprefix $(PLUGDIR), $(PLUG_FILES))
-
-PLUGML  = $(addsuffix .ml,  $(PLUGMODULES))
-PLUGCMO = $(addsuffix .cmo, $(PLUGMODULES))
-PLUGCMX = $(addsuffix .cmx, $(PLUGMODULES))
-PLUGCMXS = $(addsuffix .cmxs, $(PLUGMODULES))
-
-# ifeq (@enable_plug_support@,yes)
-# byte: src/plug-plugin/whytac.cma
-# opt:  src/plug-plugin/whytac.cmxs
-# endif
-
-# $(PLUGCMO):  src/why3.cma
-# $(PLUGCMXS): src/why3.cmxa
-
-.PHONY: examples_plugins.byte examples_plugins.opt
-
-examples_plugins.byte : $(PLUGCMO)
-examples_plugins.opt : $(PLUGCMXS)
-
-# depend and clean targets
-
-include .depend.plug
-
-.depend.plug: $(PLUGGENERATED)
-	$(OCAMLDEP) -slash -I src -I $(PLUGDIR) $(PLUGML) | sed "s/cmx/cmxs/" > $@
-
-depend: .depend.plug
-
-clean::
-	rm -f $(PLUGDIR)/*.cm[iox] $(PLUGDIR)/*.o
-	rm -f $(PLUGDIR)/*.cma $(PLUGDIR)/*.cmxs
-	rm -f $(PLUGDIR)/*.annot $(PLUGDIR)/*~
-	rm -f $(PLUGGENERATED)
-	rm -f .depend.plug
-
-endif
 
 ################
 # documentation
@@ -1045,7 +1242,7 @@ MODULESTODOC = util/util util/hashweak \
 	core/ident core/ty core/term core/decl core/theory \
 	core/env core/task \
 	driver/whyconf driver/driver \
-	ide/session
+	session/session session/session_tools session/session_scheduler
 #	transform/introduction \
 #	ide/db
 
@@ -1055,7 +1252,6 @@ apidoc: $(FILESTODOC)
 	mkdir -p doc/apidoc
 	$(OCAMLDOC) -d doc/apidoc -html -keep-code $(INCLUDES) \
 		$(LIBINCLUDES) -I src $(FILESTODOC)
-# $(LIBML)
 
 install_apidoc: apidoc
 	rsync -av doc/apidoc/ marche@scm.gforge.inria.fr:/home/groups/why3/htdocs/apidoc/
@@ -1063,7 +1259,6 @@ install_apidoc: apidoc
 doc/apidoc.tex: $(FILESTODOC)
 	$(OCAMLDOC) -o doc/apidoc.tex -latex -noheader -notrailer $(INCLUDES) \
 		$(LIBINCLUDES) -I src $(FILESTODOC)
-# $(LIBML)
 
 clean::
 	rm -f doc/apidoc/*
@@ -1090,14 +1285,11 @@ clean::
 %.ml %.mli: %.mly
 	$(OCAMLYACC) -v $<
 
+%.dep: %.ml
+	$(if $(QUIET),@echo 'Ocamldep $<' &&) $(OCAMLDEP) $(DEPFLAGS) $< $<i > $@
+
 # .ml4.ml:
 # 	$(CAMLP4) pr_o.cmo -impl $< > $@
-
-# lib/coq/%.vo: lib/coq/%.v
-# 	$(COQC8) -I lib/coq $<
-
-# lib/coq-v7/%.vo: lib/coq-v7/%.v
-# 	$(COQC7) -I lib/coq-v7 $<
 
 # jc/jc_ai.ml: jc/jc_annot_inference.ml jc/jc_annot_fail.ml Makefile
 # 	if test "@enable_apron@" = "yes" ; then \
@@ -1139,8 +1331,8 @@ otags-vi:
 wc:
 	ocamlwc -p src/*.ml* src/*/*.ml*
 
-dep: depend
-	cat .depend* | ocamldot | dot -Tpdf > dep.pdf
+#dep: depend
+#	cat .depend* | ocamldot | dot -Tpdf > dep.pdf
 #	$(PDFVIEWER) dep.pdf
 
 # distrib
@@ -1151,10 +1343,10 @@ DISTRIB_DIR = distrib/$(NAME)
 DISTRIB_TAR = $(DISTRIB_DIR).tar.gz
 
 # CHANGES (not up-to-date, moreover is in French)
-DISTRIB_FILES = Version Makefile.in configure.in META.in configure .depend.* \
-      README INSTALL OCAML-LICENSE LICENSE \
-      src/*.ml* src/*/*.ml* src/*/*.c \
-      src/config.sh.in \
+DISTRIB_FILES = Version Makefile.in configure.in META.in configure \
+      README INSTALL OCAML-LICENSE LICENSE src/config.sh.in \
+      src/*.ml* src/*.dep src/*/*.ml* src/*/*.dep src/*/*.c \
+      plugins/*.ml* plugins/*.dep plugins/*/*.ml* plugins/*/*.dep \
       doc/version.tex.in doc/manual.pdf \
       drivers/*.drv drivers/*.gen \
       examples/*.why examples/programs/*.mlw examples/tptp/*.why \
@@ -1163,6 +1355,7 @@ DISTRIB_FILES = Version Makefile.in configure.in META.in configure .depend.* \
       examples/use_api.ml \
       theories/*.why \
       modules/*.mlw \
+      lib/coq/*/*.v \
       share/provers-detection-data.conf.in \
       share/emacs/why.el share/images/*.png share/lang/*.lang
 
@@ -1185,14 +1378,16 @@ $(DISTRIB_TAR): doc/manual.pdf
 	mkdir -p $(DISTRIB_DIR)
 	mkdir -p $(DISTRIB_DIR)/bin
 	mkdir -p $(DISTRIB_DIR)/share
-	mkdir -p $(DISTRIB_DIR)/plugins
+	mkdir -p $(DISTRIB_DIR)/lib
+	mkdir -p $(DISTRIB_DIR)/lib/plugins
+	mkdir -p $(DISTRIB_DIR)/lib/coq
 	ln -s ../drivers $(DISTRIB_DIR)/share/drivers
 	ln -s ../modules $(DISTRIB_DIR)/share/modules
 	ln -s ../theories $(DISTRIB_DIR)/share/theories
 	cp --parents $(DISTRIB_FILES) $(DISTRIB_DIR)
 	rm -f $(DISTRIB_DIR)/src/config.ml
-	cd $(DISTRIB_DIR); rm -f $(LIBGENERATED) $(TPTPGENERATED) \
-          $(COQGENERATED) $(WHY3DOCGENERATED)
+	cd $(DISTRIB_DIR); rm -f $(LIBGENERATED) \
+          $(COQGENERATED) $(WHY3DOCGENERATED) $(PLUGGENERATED)
 	cd distrib; tar cf $(NAME).tar $(NAME); gzip -f --best $(NAME).tar
 
 # distrib export: source export-doc export-www export-examples export-examples-c linux
@@ -1263,8 +1458,7 @@ headers:
 	    src/transform/close_epsilon.ml* \
 	    src/transform/lift_epsilon.ml*
 	headache -c misc/headache_config.txt -h misc/header_sc.txt \
-	    src/transform/hypothesis_selection.ml* \
-	    src/tptp2why/*.ml*
+	    src/transform/hypothesis_selection.ml*
 	sed -i -f misc/fixnames.sed -- \
 	    Makefile.in configure.in src/*.ml* src/*/*.ml* \
 	    src/tools/cpulimit.c

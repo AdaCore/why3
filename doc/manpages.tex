@@ -21,6 +21,7 @@ It is also installable from sources, downloadable from the site
 \url{http://caml.inria.fr/ocaml/}
 \end{itemize}
 
+\noindent
 For some tools, additional OCaml libraries are needed:
 \begin{itemize}
 \item For the IDE: the Lablgtk2 library for OCaml bindings of the gtk2
@@ -52,7 +53,7 @@ make install
 Installation can be tested as follows: 
 \begin{enumerate}
 \item install some external provers (see~Section\ref{provers} below)
-\item run \texttt{why3config --detect}
+\item run \verb|why3config --detect|
 \item run some examples from the distribution, \emph{e.g.} you should
 obtain the following:
 \begin{verbatim}
@@ -113,7 +114,7 @@ For configuring \why to use the provers, follow instructions given in
 Section~\ref{sec:why3config}.
 
 \section{The \texttt{why3config} command-line tool}
-\label{sec:why3config}.
+\label{sec:why3config}
 
 \why must be configured to access external provers. Typically, this is done
 by running either the command line tool
@@ -164,10 +165,10 @@ printer, as explained in the corresponding section.
 If the user's configuration file is already present,
 \texttt{why3config} will only reset unset variables to default value,
 but will not try to detect provers.
-The option \texttt{--detect-provers} should be used to force
+The option \verb|--detect-provers| should be used to force
 \why to detect again the available
 provers and to replace them in the configuration file. The option
-\texttt{--detect-plugins} will do the same for plugins.
+\verb|--detect-plugins| will do the same for plugins.
 
 \section{The \texttt{why3} command-line tool}
 \label{sec:why3ref}
@@ -187,41 +188,42 @@ The \texttt{why3} tool executes the following steps:
   stop if some plugin fails to load.
 \item Parse and typecheck the given files using the correct parser in order
   to obtain a set of \why theories for each file. It uses
-  the filename extension or the \texttt{--format} option to choose
-  among the available parsers. The \texttt{--list-format} option gives
+  the filename extension or the \verb|--format| option to choose
+  among the available parsers. The \verb|--list-format| option gives
   the list of registered parsers.
 \item Extract the selected goals inside each of the selected theories
   into tasks. The goals and theories are selected using the options
-  \texttt{-G/--goal} and \texttt{-T/--theory}. The option
-  \texttt{-T/--theory} applies to the last file appearing on the
-  command line, the option \texttt{-G/--goal} applies to the last theory
+  \verb|-G/--goal| and \verb|-T/--theory|. The option
+  \verb|-T/--theory| applies to the last file appearing on the
+  command line, the option \verb|-G/--goal| applies to the last theory
   appearing on the command line. If no theories are selected in a file,
   then every theory is considered as selected. If no goals are selected
   in a theory, then every goal is considered as selected.
 \item Apply the transformation requested
-  with \texttt{-a/--apply-transform} in their order of appearance on the
-  command line. \texttt{--list-transforms} list the known
+  with \verb|-a/--apply-transform| in their order of appearance on the
+  command line. \verb|--list-transforms| list the known
   transformations, plugins can add more of them.
-\item Apply the driver selected with the \texttt{-D/--driver} option,
-  or the driver of the prover selected with \texttt{-P/--prover}
-  option. \texttt{--list-provers} lists the known provers, i.e.~the ones
+\item Apply the driver selected with the \verb|-D/--driver| option,
+  or the driver of the prover selected with \verb|-P/--prover|
+  option. \verb|--list-provers| lists the known provers, i.e.~the ones
   which appear in the configuration file.
-\item If the option \texttt{-P/--prover} is given, call the selected prover
+\item If the option \verb|-P/--prover| is given, call the selected prover
   on each generated task and print the results. If the option
-  \texttt{-D/--driver} is given, print each generated task using
+  \verb|-D/--driver| is given, print each generated task using
   the format specified in the selected driver.
 \end{enumerate}
 
 %\texttt{why3} calls the provers sequentially, use \texttt{why3bench} if *)
 %you want to call the provers concurrently.  *)
 
-The provers can answer the following output:
+\noindent
+The provers can give the following output:
 \begin{description}
 \item[Valid] the goal is proved in the given context,
-\item[Unknown] the prover stop by itself to search,
-\item[Timeout] the prover doesn't have enough time,
-\item[Failure] an error occured,
-\item[Invalid] the prover know the goal can't be proved
+\item[Unknown] the prover has stopped its search,
+\item[Timeout] the prover has reached the time limit,
+\item[Failure] an error has occurred,
+\item[Invalid] the prover knows the goal cannot be proved.
 \end{description}
 % \why can also be *)
 % used to provide other informations : *)
@@ -231,15 +233,15 @@ The provers can answer the following output:
 % \item TO BE COMPLETED *)
 % \end{itemize} *)
 
-The option \texttt{--bisect} change the behaviors of why3. With this
-option, \texttt{-P/--prover} and \texttt{-o/--output} must be given
+The option \verb|--bisect| changes the behavior of why3. With this
+option, \verb|-P/--prover| and \verb|-o/--output| must be given
 and a valid goal must be selected. The last step executed by why3 is
 replaced by computing a minimal set (in the great majority of the
-case) of declarations which still prove the goal. Currently it doesn't
+case) of declarations that still prove the goal. Currently it does not
 use any information provided by the prover, it call the prover
-multiple time with reduced context. The minimal set of declarations is
+multiple times with reduced context. The minimal set of declarations is
 then written in the prover syntax into a file located in the directory
-given to the \texttt{-o/--output} option.
+given to the \verb|-o/--output| option.
 
 \section{The \texttt{why3ide} GUI}
 \label{sec:ideref}
@@ -300,46 +302,48 @@ the actions of the various menus and buttons of the interface.
 
 \subsection{Menus}
 
-\paragraph{Menu \textsf{File}}
 \begin{description}
-\item[Add File] adds a file in the GUI
+\item[Menu \textsf{File}]~
+\begin{description}
+\item[Add File] adds a file in the GUI.
 %\item[Detect provers] runs provers auto-detection
 \item[Preferences] opens a window for modifying preferred
-  configuration parameters, see details below
-\item[Reload] reloads the input files from disk, and update the session state accordingly
-\item[Save session] Save current session state on disk. The policy to decide when to save the session is configurable, as described in the preferences below.
-\item[Quit] exits the GUI
+  configuration parameters, see details below.
+\item[Reload] reloads the input files from disk, and update the session state accordingly.
+\item[Save session] saves current session state on disk. The policy to decide when to save the session is configurable, as described in the preferences below.
+\item[Quit] exits the GUI.
 \end{description}
 
-\paragraph{Menu \textsf{View}}
+\item[Menu \textsf{View}]~
 \begin{description}
-\item[Expand All] expands all the rows of the tree view
+\item[Expand All] expands all the rows of the tree view.
 \item[Collapse proved goals] closes all the rows of the tree view
   which are proved.
 % \item[Hide proved goals] completely hides the proved rows of the tree
 %   view [EXPERIMENTAL]
 \end{description}
 
-\paragraph{Menu \textsf{Tools}}
+\item[Menu \textsf{Tools}]
 A copy of the tools already available in the left toolbar, plus:
-\begin{itemize}
+\begin{description}
 \item[Mark as obsolete] marks all the proof as obsolete. This allows to
   replay every proofs.
-\end{itemize}
+\end{description}
 
-\paragraph{Menu \textsf{Help}}
+\item[Menu \textsf{Help}]
 A very short online help, and some information about this software.
+\end{description}
 
 \subsection{Preferences}
 
 The preferences window allows you customize
 \begin{itemize}
 \item the default editor to use when the \textsf{Edit} button is
-  pressed. This might be overidden for a specific prover (the only way
-  to do that for the moment is to manually edit the config file)
+  pressed\footnote{This might be overridden for a specific prover. The only way
+  to do that for the moment is to manually edit the configuration file.}
 \item the time limit given to provers, in seconds
 \item the maximal number of simultaneous provers allowed to run in parallel.
-\item The policy for saving session:
+\item the policy for saving session:
   \begin{itemize}
   \item always save on exit (default): the current state of the proof session is saving on exit
   \item never save on exit: the current state of the session is never save automatically, you must use menu \textsf{File/Save session} to save when wanted
@@ -353,18 +357,17 @@ The preferences window allows you customize
 The session state is stored in an XML file named
 \texttt{\textsl{<dir>}/why3session.xml}, where \texttt{\textsl{<dir>}}
 is the directory of the project.
-
 The XML file follows the DTD given in \texttt{share/why3session.dtd} and reproduced below.
 \verbatiminput{../share/why3session.dtd}
 
 \section{The \texttt{why3ml} tool}
 
-\texttt{why3ml} is an additional layer on \why library for
+The \texttt{why3ml} tool is a layer on  top of the \why library for
 generating verification conditions from \whyml programs.
 The command-line of \texttt{why3ml} is identical to that of
 \texttt{why3}, but also accepts files with extension \texttt{.mlw} as
-input files containing \whyml modules (see chapter~\ref{chap:whyml}
-and section~\ref{sec:syntax:whyml}). Modules are turned into
+input files containing \whyml modules (see Chapter~\ref{chap:whyml}
+and Section~\ref{sec:syntax:whyml}). Modules are turned into
 theories containing verification conditions as goals, and then
 \texttt{why3ml} behaves exactly as \texttt{why3} for the remaining of
 the process.
@@ -386,7 +389,7 @@ comparison in various formats:
 \item csv: the simpler and more informative format, the results are
   represented in an array, the rows corresponds to the
   compared components, the columns correspond to the result
-  (Valid,Unknown,Timout,Failure,Invalid) and the CPU time taken in seconds.
+  (Valid, Unknown, Timeout, Failure, Invalid) and the CPU time taken in seconds.
 \item average: summarizes the number of the five different answers
   for each component. It also gives the average time taken.
 \item timeline: for each component it gives the number of valid goals
@@ -435,17 +438,18 @@ generally a bench configuration file:
    csv = "prgbench.csv"
 \end{verbatim}
 
-Such a file can define three families \texttt{tools,probs,bench}. The
-sections \texttt{tools} define a set of components to compare, the
-sections \texttt{probs} define a set of goals on which to compare some
-components and the sections \texttt{bench} define which components to
-compare using which goals. It refers by name to the sections
+Such a file can define three families \texttt{tools}, \texttt{probs},
+\texttt{bench}. A \texttt{tools} section defines a set of components to
+compare. A \texttt{probs} section defines a set of goals on which to compare some
+components. A \texttt{bench} section defines which components to
+compare using which goals. It refers by name to some sections
 \texttt{tools} and \texttt{probs} defined in the same file. The order
-of the definitions is irrelevant. Notice that \texttt{loadpath} in a family
-\texttt{tools} can be used to compare different axiomatizations.
+of the definitions is irrelevant. Notice that one can use
+\texttt{loadpath} in a \texttt{tools} section to compare different
+axiomatizations.
 
 One can run all the bench given in one bench configuration file with
-\texttt{why3bench} :
+\texttt{why3bench}:
 \begin{verbatim}
 why3bench -B path_to_my_bench.rc
 \end{verbatim}
@@ -465,39 +469,76 @@ The tool is invoked in a terminal or a script using
 \end{flushleft}
 The session file \texttt{why3session.xml} stored in the given
 directory is loaded and all the proofs it contains are rerun. Then,
-any difference between the information stored in the session file and
+all the differences between the information stored in the session file and
 the new run are shown.
 
-Nothing is shown when there is no change in the results, independently
-of the fact the considered goal is proved or not. When all the proof
+Nothing is shown when there is no change in the results, whether the
+considered goal is proved or not. When all the proof
 runs are done, a summary of what is proved or not is displayed using a
 tree-shape pretty print, similar to the IDE tree view after doing
-``Collapse proved goals'', that is when a goal, a theory or a file is
-fully proved the subtree is not shown.
+``Collapse proved goals''. In other words, when a goal, a theory, or a
+file is fully proved, the subtree is not shown.
 
 \paragraph{Obsolete proofs}
 
-When some proofs store in the session file are obsolete, the replay is
-attempt anyway, as for the replay button in the IDE. Then, if all the
-replayed proofs went OK, the session file is updated, otherwise it is
-not and you have to use the IDE to update it.
+When some proofs stored in the session file are obsolete, the replay is
+run anyway, as with the replay button in the IDE. Then, if all the
+replayed proofs went OK, the session file is updated. Otherwise you have
+to use the IDE to update it.
 
 \paragraph{Exit code and options}
 
 \begin{itemize}
 \item The exit code is 0 if no difference was detected, 1 if there
   was. Other exit codes mean some failure in running the replay.
-\item option \texttt{-s}: suppresses the output of the final tree view
-\item option \texttt{-I \textsl{<path>}}: add \textsl{<path>} to the loadpath
-\item option \texttt{-force}: force writing a new session file even if some proofs did not replay correctly.
-\item option \texttt{-latex \textsl{<dir>}}: produce a summary of
+\item Option \verb|-s| suppresses the output of the final tree view.
+\item Option \texttt{-I \textsl{<path>}} adds \texttt{\textsl{<path>}} to the loadpath.
+\item Option \verb|-force| writes a new session file even if
+  some proofs did not replay correctly.
+\item Option \texttt{-smoke-detector \{none|top|deep\}} tries to detect
+  if the context is self-contradicting.
+\item Option \texttt{-latex \textsl{<dir>}} produces a summary of
   the replay under the form of a tabular environment in LaTeX, one
   tabular for each theory, one per file, in directory \texttt{\textsl{<dir>}}.
-\item option \texttt{-latex2 \textsl{<dir>}}: alternate version of
+\item Option \texttt{-latex2 \textsl{<dir>}} produces an alternate version of
   LaTeX output, with a different layout of the tables.
 % \item option \texttt{-html \textsl{<file.html>}}: produce a summary of
 %   the replay in HTML syntax.
 \end{itemize}
+
+\paragraph{Smoke Detector}
+The smoke detector tries to detect if the context is self-contradicting
+ and, thus, that anything can be proved in this context. The smoke
+ detector can't be run on outdated session and does not modify the session.
+ It has three possible configurations:
+ \begin{itemize}
+\item \texttt{none}: Do not run the smoke detector.
+\item \texttt{top}: The negation of each proved goal is sent with the
+same timeout to the prover that proved the original goal.
+\begin{verbatim}
+Goal G : forall x:int. q x -> (p1 x \/ p2 x)
+\end{verbatim}
+becomes
+\begin{verbatim}
+Goal G : ~ (forall x:int. q x -> (p1 x \/ p2 x))
+\end{verbatim}
+\item \texttt{deep}: This is the same technique as \texttt{top} but the
+   negation is pushed under the universal quantification (without
+   changing them) and under the implication. The previous example becomes
+\begin{verbatim}
+Goal G : forall x:int. q x /\ ~ (p1 x \/ p2 x)
+\end{verbatim}
+ \end{itemize}
+
+\noindent
+The name of the goals that triggered the smoke detector are printed:
+\begin{verbatim}
+   goal 'G', prover 'Alt-Ergo 0.93.1': Smoke detected!!!
+\end{verbatim}
+Moreover \texttt{Smoke detected} (exit code 1) is printed at the end if the smoke
+detector has been triggered, or \texttt{No smoke detected} (exit code 0)
+otherwise.
+
 
 \paragraph{Customizing LaTeX output}
 
@@ -510,7 +551,7 @@ output.
 \item \verb|\noresult|: macro without parameter, used where no result
   exists for the corresponding prover
 \item \verb|\timeout|: macro without parameter, used where the corresponding prover reached the time limit
-\item \verb|\explanation|: macro with one parameter, the goal name or its explnation
+\item \verb|\explanation|: macro with one parameter, the goal name or its explanation
 \end{itemize}
 
 \begin{figure}[t]
@@ -525,8 +566,115 @@ output.
 Figure~\ref{fig:replayer} proposes some suggestions for these macros, together
 with the table obtained from the hello proof example of Section~\ref{chap:starting}.
 
+\section{The \texttt{why3session} tool}
+\label{sec:why3session}
+
+The program \texttt{why3session} allows to manipulate why3 session on
+the command line. It thus allows to batch modifications to several
+sessions at once. This tool provides several subcommands:
+\texttt{info}, \texttt{rm}, \texttt{copy}, \texttt{mod}.
+
+Currently this tool reports or modifies only proof attempts.
+
+\texttt{why3session info} reports informations:
+\begin{itemize}
+\item Option \verb|--provers| prints the provers that appear
+  inside the session, one by line.
+\item Option \verb|--edited-files| prints all the files that
+  appear in the session as edited proofs.
+\item Option \verb|--tree| prints the structure of the session as
+  an ASCII tree. The files, theories, goals are marked with a question
+  mark \verb|?|, if they are not verified. A proof is usually said to be verified
+  if the proof result is \verb|valid| and the proof is not
+  obsolete. However here specially
+  we separate these two properties. On the one hand if the proof suffers from an internal
+  failure we mark it with an exclamation mark \verb|!|, otherwise if
+  it is not valid we mark it with a question mark \verb|?|, finally
+  if it is valid we add nothing. On the other hand if the proof is obsolete we mark it
+  with an \verb|O| and if it is archived we mark it with an
+  \verb|A|.
+\item Option \verb|--print0| separates the results of the options
+  \verb|provers| and \verb|--edited-files| by the character number
+  0 instead of end of line \verb|\n|. That allows you to
+  safely use (even if the filename contains space or carriage return)
+  the result with other commands. For example you can count the number
+  of proof line in all the coq edited files in a session with:
+\begin{verbatim}
+why3session info --edited-files vstte12_bfs --print0 | xargs -0 coqwc
+\end{verbatim}
+  or you can add all the edited files in your favorite repository
+  with:
+\begin{verbatim}
+why3session info --edited-files --print0 vstte12_bfs.mlw | \
+    xargs -0 git add
+\end{verbatim}
+
+\end{itemize}
+
+The subcommands \texttt{mod}, \texttt{copy}, and \texttt{rm} share the
+same set of options for selecting the proof attempts to work on:
+\begin{itemize}
+\item Option \verb|--filter-prover| selects only the proof attempt with
+  the given prover. This option can be specified multiple times to
+  allow to select all the proofs that corresponds to one of the given
+  provers. If this option is not specified, the proof are simply not
+  filtered by there corresponding prover.
+\item Option \verb|--filter-verified yes| restricts the selection to
+  the proofs that are valid and not obsoletes. On contrary the option
+  \verb|--filter-verified no| select the ones that are not verified.
+  \verb|--filter-verified all|, the default, does not select on this property.
+\item Option \verb|--filter-verified-goal yes| restricts the selection
+  to the proofs of verified goals (that does not mean that the proof is
+  verified). Same for the other cases \verb|no| and \verb|all|.
+\item Option \verb|--filter-archived yes| restricts the selection
+  to the proofs that are archived. Same for the other cases \verb|no|
+  and \verb|all| except the default is \verb|no|.
+\end{itemize}
+
+\noindent
+The subcommand \texttt{mod} modifies properties of proof
+attempts:
+\begin{itemize}
+\item Option \verb|--set-obsolete| marks the selected proofs as
+  obsolete.
+\item Option \verb|--set-archived| marks the selected proofs as archived.
+\item Option \verb|--unset-archived| removes the archived mark from the selected proofs.
+\end{itemize}
+
+The subcommand \texttt{copy} copies the proof attempt of a given goal to another
+prover. The new prover is specified by the option
+\verb|--to-prover|, for example \texttt{-{}-to-prover Alt-Ergo,0.94}.
+A conflict arises if a proof with this prover already exists.
+You can choose between four behaviors of \texttt{why3session}:
+\begin{itemize}
+\item replace the proof (\verb|-f|, \verb|--force|);
+\item do not replace thr proof (\verb|-n|, \verb|--never|);
+\item replace the proof unless it is verified (valid and not
+  obsolete) (\verb|-c|, \verb|--conservative|); this is the default;
+\item ask the user each time the case arises (\verb|-i|, \verb|--interactive|).
+\end{itemize}
 
 
+If you just want to update one session with updated provers you can
+use \verb|--convert-unknown| instead of the option \verb|--to-prover|.
+\begin{verbatim}
+why3session copy  --convert-unknown
+\end{verbatim}
+For each proof attempt associated to an unknown prover (a prover not in
+\verb|.why3.conf|) and not archived, it will try to find a known prover
+with the same name. If it finds one, the proof attempt is copied to this
+prover and the old proof is set to archived. The corresponding edited
+files, if any, are copied and regenerated for the new prover An archived
+proof is not replayed by why3replayer.
+
+The subcommand \texttt{rm} removes the selected proof
+attempts. The options \verb|-i, --interactive|, \verb|-f, --force| and
+\verb|-c, --conservative| can also be used to respectively ask before
+each suppression, suppress all the selected proof (default) and remove
+only the proof that are not verified. The macro option \verb|--clean|
+corresponds to \verb|--filter-verified-goal --conservative| and
+removes the proof attempts that are not verified but which correspond
+to verified goals.
 
 \section{The \texttt{why3.conf} configuration file}
 \label{sec:whyconffile}
@@ -593,7 +741,7 @@ the example, or it can be composed by a family name and one family
 argument, \texttt{prover} is one family name, \texttt{coq} and
 \texttt{alt-ergo} are the family argument.
 
-Inside a section, one key can be associated with an integer (.eg -555),
+Inside a section, one key can be associated with an integer (\eg{} -555),
 a boolean (true, false) or a string (\eg{} "emacs"). One key can appear
 only once except if its a multi-value key. The order of apparition of
 the keys inside a section matter only for the multi-value key.

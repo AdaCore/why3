@@ -28,26 +28,19 @@ type label = private {
   lab_tag    : int;
 }
 
-val mk_label : string -> label
-
 module Mlab : Map.S with type key = label
 module Slab : Mlab.Set
 
-val hash_labelset : Slab.t -> int
-(** a hash that only depends on the elements of the list *)
+val lab_equal : label -> label -> bool
+val lab_hash  : label -> int
 
-val singleton : string -> Slab.t
-(** return the set of labels that only contains the given string *)
-
-val singl_pair : string -> label * Slab.t
-(** return the set of label corresponding to a given string, along with its
-   singleton set *)
+val create_label : string -> label
 
 (** {2 Identifiers} *)
 
 type ident = private {
   id_string : string;               (* non-unique name *)
-  id_label  : Slab.t;           (* identifier labels *)
+  id_label  : Slab.t;               (* identifier labels *)
   id_loc    : Loc.position option;  (* optional location *)
   id_tag    : Hashweak.tag;         (* unique magical tag *)
 }
@@ -67,8 +60,7 @@ type preid
 val id_register : preid -> ident
 
 (* create a fresh pre-ident *)
-val id_fresh :
-   ?label:Slab.t -> ?loc:Loc.position -> string -> preid
+val id_fresh : ?label:Slab.t -> ?loc:Loc.position -> string -> preid
 
 (* create a localized pre-ident *)
 val id_user : ?label:Slab.t -> string -> Loc.position -> preid
@@ -110,5 +102,7 @@ val char_to_alpha : char -> string
 val char_to_lalpha : char -> string
 val char_to_ualpha : char -> string
 val char_to_alnum : char -> string
+val char_to_lalnum : char -> string
 val char_to_alnumus : char -> string
+val char_to_lalnumus : char -> string
 

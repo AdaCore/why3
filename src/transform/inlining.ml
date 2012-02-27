@@ -26,7 +26,7 @@ open Theory
 open Task
 
 let t_unfold env fs tl ty =
-  match Mls.find_option fs env with
+  match Mls.find_opt fs env with
   | None ->
       t_app fs tl ty
   | Some (vl,e) ->

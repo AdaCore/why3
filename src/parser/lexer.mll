@@ -29,14 +29,11 @@
   exception IllegalCharacter of char
   exception UnterminatedComment
   exception UnterminatedString
-  exception AmbiguousPath of string * string
 
   let () = Exn_printer.register (fun fmt e -> match e with
     | IllegalCharacter c -> fprintf fmt "illegal character %c" c
     | UnterminatedComment -> fprintf fmt "unterminated comment"
     | UnterminatedString -> fprintf fmt "unterminated string"
-    | AmbiguousPath (f1, f2) ->
-        fprintf fmt "ambiguous path:@ both `%s'@ and `%s'@ match" f1 f2
     | _ -> raise e)
 
   let keywords = Hashtbl.create 97
@@ -47,6 +44,7 @@
         "as", AS;
         "axiom", AXIOM;
         "clone", CLONE;
+        "constant", CONSTANT;
         "else", ELSE;
         "end", END;
         "epsilon", EPSILON;
@@ -88,12 +86,13 @@
         "exception", EXCEPTION;
         "for", FOR;
         "fun", FUN;
-        (* "ghost", GHOST; *)
+        "ghost", GHOST;
         "invariant", INVARIANT;
         "loop", LOOP;
         "model", MODEL;
         "module", MODULE;
         "mutable", MUTABLE;
+        "private", PRIVATE;
         "raise", RAISE;
         "raises", RAISES;
         "reads", READS;
@@ -320,12 +319,27 @@ and string = parse
 
   let parse_program_file = with_location (program_file token)
 
+  let token_counter lb =
+    let rec loop in_annot a p =
+      match token lb with
+        | LEFTBRC -> assert (not in_annot); loop true a p
+        | RIGHTBRC -> assert in_annot; loop false a p
+        | EOF -> assert (not in_annot); (a,p)
+        | _ ->
+            if in_annot
+            then loop in_annot (a+1) p
+            else loop in_annot a (p+1)
+    in
+    loop false 0 0
+
   let read_channel env path file c =
     let lb = Lexing.from_channel c in
     Loc.set_file file lb;
-    parse_logic_file env path lb
+    (), parse_logic_file env path lb
 
-  let () = Env.register_format "why" ["why"] read_channel
+  let library_of_env = Env.register_format "why" ["why"] read_channel
+
+  let parse_logic_file env = parse_logic_file (library_of_env env)
 }
 
 (*

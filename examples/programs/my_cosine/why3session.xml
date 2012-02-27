@@ -3,141 +3,138 @@
 <why3session
  name="programs/my_cosine/why3session.xml">
  <prover
-  id="alt-ergo"
-  name="Alt-Ergo"
-  version="0.93"/>
- <prover
-  id="coq"
+  id="0"
   name="Coq"
-  version="8.3pl2"/>
+  version="8.3pl3"/>
  <prover
-  id="cvc3"
-  name="CVC3"
-  version="2.2"/>
- <prover
-  id="eprover"
-  name="Eprover"
-  version="1.4 Namring"/>
- <prover
-  id="gappa"
+  id="1"
   name="Gappa"
-  version="0.15.1"/>
- <prover
-  id="simplify"
-  name="Simplify"
-  version="1.5.4"/>
- <prover
-  id="spass"
-  name="Spass"
-  version="3.7"/>
- <prover
-  id="vampire"
-  name="Vampire"
-  version="0.6"/>
- <prover
-  id="verit"
-  name="veriT"
-  version="dev"/>
- <prover
-  id="yices"
-  name="Yices"
-  version="1.0.25"/>
- <prover
-  id="z3"
-  name="Z3"
-  version="2.19"/>
+  version="0.16.0"/>
  <file
   name="../my_cosine.mlw"
   verified="true"
-  expanded="true">
+  expanded="false">
   <theory
    name="WP M"
+   locfile="programs/my_cosine/../my_cosine.mlw"
+   loclnum="1" loccnumb="7" loccnume="8"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter my_cosine"
+    locfile="programs/my_cosine/../my_cosine.mlw"
+    loclnum="30" loccnumb="4" loccnume="13"
     expl="parameter my_cosine"
-    sum="f1c4172215536d79139ce383915a6221"
+    sum="46ad5ca4d14dc0267c5ecaef9e5d643d"
     proved="true"
     expanded="true"
     shape="ainfix <=.aabsainfix -.avalueV5acosavalueV0c0x1.p-23Iainfix =avalueV5aroundaNearestTiesToEvenainfix -.avalueV1avalueV4FAainfix <=aabsaroundaNearestTiesToEvenainfix -.avalueV1avalueV4amax_singleIainfix =avalueV4aroundaNearestTiesToEvenainfix *.avalueV2avalueV3FAainfix <=aabsaroundaNearestTiesToEvenainfix *.avalueV2avalueV3amax_singleIainfix =avalueV3c0.5FIainfix =avalueV2aroundaNearestTiesToEvenainfix *.avalueV0avalueV0FAainfix <=aabsaroundaNearestTiesToEvenainfix *.avalueV0avalueV0amax_singleIainfix =avalueV1c1.0FAainfix <=.aabsainfix -.ainfix -.c1.0ainfix *.ainfix *.avalueV0avalueV0c0.5acosavalueV0c0x1.p-24Iainfix <=.aabsavalueV0c0x1.p-5F">
+    <label
+     name="expl:parameter my_cosine">
+     </label>
     <transf
      name="split_goal"
      proved="true"
      expanded="true">
      <goal
       name="WP_parameter my_cosine.1"
+      locfile="programs/my_cosine/../my_cosine.mlw"
+      loclnum="30" loccnumb="4" loccnume="13"
       expl="assertion"
-      sum="d7f4bbbd7f89014710cb3135c7ec4c6a"
+      sum="0647d26db8bfc9dad6ef26ec17855ce2"
       proved="true"
       expanded="true"
       shape="ainfix <=.aabsainfix -.ainfix -.c1.0ainfix *.ainfix *.avalueV0avalueV0c0.5acosavalueV0c0x1.p-24Iainfix <=.aabsavalueV0c0x1.p-5F">
+      <label
+       name="expl:parameter my_cosine">
+       </label>
       <proof
-       prover="coq"
+       prover="0"
        timelimit="2"
        edited="my_cosine_M_WP_parameter_my_cosine_1.v"
-       obsolete="false">
-       <result status="valid" time="3.55"/>
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="3.78"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter my_cosine.2"
+      locfile="programs/my_cosine/../my_cosine.mlw"
+      loclnum="30" loccnumb="4" loccnume="13"
       expl="precondition"
-      sum="e1fc2078a7966d3c9c22bf6260a2a651"
+      sum="b45d4b78cee6c83b24cd7128b4b5bb45"
       proved="true"
       expanded="true"
       shape="ainfix <=aabsaroundaNearestTiesToEvenainfix *.avalueV0avalueV0amax_singleIainfix =avalueV1c1.0FIainfix <=.aabsainfix -.ainfix -.c1.0ainfix *.ainfix *.avalueV0avalueV0c0.5acosavalueV0c0x1.p-24Iainfix <=.aabsavalueV0c0x1.p-5F">
+      <label
+       name="expl:parameter my_cosine">
+       </label>
       <proof
-       prover="gappa"
+       prover="1"
        timelimit="2"
-       edited=""
-       obsolete="false">
+       obsolete="false"
+       archived="false">
        <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter my_cosine.3"
+      locfile="programs/my_cosine/../my_cosine.mlw"
+      loclnum="30" loccnumb="4" loccnume="13"
       expl="precondition"
-      sum="148a3ba8bcb69af320e4bd63b8fece25"
+      sum="eca67b576ddad0f37e4de64ad5f2add6"
       proved="true"
       expanded="true"
       shape="ainfix <=aabsaroundaNearestTiesToEvenainfix *.avalueV2avalueV3amax_singleIainfix =avalueV3c0.5FIainfix =avalueV2aroundaNearestTiesToEvenainfix *.avalueV0avalueV0FIainfix <=aabsaroundaNearestTiesToEvenainfix *.avalueV0avalueV0amax_singleIainfix =avalueV1c1.0FIainfix <=.aabsainfix -.ainfix -.c1.0ainfix *.ainfix *.avalueV0avalueV0c0.5acosavalueV0c0x1.p-24Iainfix <=.aabsavalueV0c0x1.p-5F">
+      <label
+       name="expl:parameter my_cosine">
+       </label>
       <proof
-       prover="gappa"
+       prover="1"
        timelimit="2"
-       edited=""
-       obsolete="false">
+       obsolete="false"
+       archived="false">
        <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter my_cosine.4"
+      locfile="programs/my_cosine/../my_cosine.mlw"
+      loclnum="30" loccnumb="4" loccnume="13"
       expl="precondition"
-      sum="17ca90641ab2e134c3df3c85bcc4a0e6"
+      sum="12f87c88cda43c7077459ec80f3c1a69"
       proved="true"
       expanded="true"
       shape="ainfix <=aabsaroundaNearestTiesToEvenainfix -.avalueV1avalueV4amax_singleIainfix =avalueV4aroundaNearestTiesToEvenainfix *.avalueV2avalueV3FIainfix <=aabsaroundaNearestTiesToEvenainfix *.avalueV2avalueV3amax_singleIainfix =avalueV3c0.5FIainfix =avalueV2aroundaNearestTiesToEvenainfix *.avalueV0avalueV0FIainfix <=aabsaroundaNearestTiesToEvenainfix *.avalueV0avalueV0amax_singleIainfix =avalueV1c1.0FIainfix <=.aabsainfix -.ainfix -.c1.0ainfix *.ainfix *.avalueV0avalueV0c0.5acosavalueV0c0x1.p-24Iainfix <=.aabsavalueV0c0x1.p-5F">
+      <label
+       name="expl:parameter my_cosine">
+       </label>
       <proof
-       prover="gappa"
+       prover="1"
        timelimit="2"
-       edited=""
-       obsolete="false">
+       obsolete="false"
+       archived="false">
        <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter my_cosine.5"
+      locfile="programs/my_cosine/../my_cosine.mlw"
+      loclnum="30" loccnumb="4" loccnume="13"
       expl="normal postcondition"
-      sum="549207e16474625d6268c302c1ae313d"
+      sum="b68b64a5dc4853c622e370b738362f81"
       proved="true"
       expanded="true"
       shape="ainfix <=.aabsainfix -.avalueV5acosavalueV0c0x1.p-23Iainfix =avalueV5aroundaNearestTiesToEvenainfix -.avalueV1avalueV4FIainfix <=aabsaroundaNearestTiesToEvenainfix -.avalueV1avalueV4amax_singleIainfix =avalueV4aroundaNearestTiesToEvenainfix *.avalueV2avalueV3FIainfix <=aabsaroundaNearestTiesToEvenainfix *.avalueV2avalueV3amax_singleIainfix =avalueV3c0.5FIainfix =avalueV2aroundaNearestTiesToEvenainfix *.avalueV0avalueV0FIainfix <=aabsaroundaNearestTiesToEvenainfix *.avalueV0avalueV0amax_singleIainfix =avalueV1c1.0FIainfix <=.aabsainfix -.ainfix -.c1.0ainfix *.ainfix *.avalueV0avalueV0c0.5acosavalueV0c0x1.p-24Iainfix <=.aabsavalueV0c0x1.p-5F">
+      <label
+       name="expl:parameter my_cosine">
+       </label>
       <proof
-       prover="gappa"
+       prover="1"
        timelimit="2"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.01"/>
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
     </transf>

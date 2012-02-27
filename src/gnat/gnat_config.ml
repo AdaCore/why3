@@ -101,12 +101,18 @@ let config_main = Whyconf.get_main (config)
 let env =
    Env.create_env (Whyconf.loadpath config_main)
 
-let provers : Whyconf.config_prover Util.Mstr.t =
+let provers : Whyconf.config_prover Whyconf.Mprover.t =
    Whyconf.get_provers config
+
+let alt_ergo_conf =
+   { Whyconf.prover_name = "Alt-Ergo";
+     prover_version      = "0.94";
+     prover_altern       = "";
+   }
 
 let alt_ergo : Whyconf.config_prover =
   try
-    Util.Mstr.find "alt-ergo" provers
+    Whyconf.Mprover.find alt_ergo_conf provers
   with Not_found ->
     Gnat_util.abort_with_message
       "Prover alt-ergo not installed or not configured."
@@ -115,6 +121,7 @@ let alt_ergo : Whyconf.config_prover =
 let altergo_driver : Driver.driver =
   try
     Driver.load_driver env alt_ergo.Whyconf.driver
+      alt_ergo.Whyconf.extra_drivers
   with e ->
     Format.eprintf "Failed to load driver for alt-ergo: %a"
        Exn_printer.exn_printer e;

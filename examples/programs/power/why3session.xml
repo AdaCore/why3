@@ -3,348 +3,391 @@
 <why3session
  name="programs/power/why3session.xml">
  <prover
-  id="alt-ergo"
+  id="0"
   name="Alt-Ergo"
-  version="0.93"/>
+  version="0.94"/>
  <prover
-  id="coq"
-  name="Coq"
-  version="8.3pl2"/>
- <prover
-  id="cvc3"
+  id="1"
   name="CVC3"
   version="2.2"/>
  <prover
-  id="eprover"
-  name="Eprover"
-  version="1.4 Namring"/>
+  id="2"
+  name="Coq"
+  version="8.3pl3"/>
  <prover
-  id="gappa"
-  name="Gappa"
-  version="0.15.1"/>
- <prover
-  id="simplify"
-  name="Simplify"
-  version="1.5.4"/>
- <prover
-  id="spass"
-  name="Spass"
-  version="3.7"/>
- <prover
-  id="vampire"
-  name="Vampire"
-  version="0.6"/>
- <prover
-  id="verit"
-  name="veriT"
-  version="dev"/>
- <prover
-  id="yices"
-  name="Yices"
-  version="1.0.25"/>
- <prover
-  id="z3"
+  id="3"
   name="Z3"
   version="2.19"/>
  <file
   name="../power.mlw"
   verified="true"
-  expanded="true">
+  expanded="false">
   <theory
    name="Power"
+   locfile="programs/power/../power.mlw"
+   loclnum="2" loccnumb="7" loccnume="12"
    verified="true"
    expanded="true">
    <goal
     name="Power_1"
-    sum="4ff312ceb777570cc4028436ea93b1cf"
+    locfile="programs/power/../power.mlw"
+    loclnum="12" loccnumb="8" loccnume="15"
+    sum="15f1cf989e1c6da8f7fde70df7b32d23"
     proved="true"
     expanded="true"
     shape="ainfix =apowerV0c1V0F">
     <proof
-     prover="cvc3"
+     prover="3"
      timelimit="2"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="z3"
+     prover="1"
      timelimit="2"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.01"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
     name="Power_sum"
-    sum="f7a7e8e23305412a8e99d43a72fa991e"
+    locfile="programs/power/../power.mlw"
+    loclnum="14" loccnumb="8" loccnume="17"
+    sum="12ee4104e7e9a6cffc5e2fd32fb6126a"
     proved="true"
     expanded="true"
     shape="ainfix =apowerV0ainfix +V1V2ainfix *apowerV0V1apowerV0V2Iainfix <=c0V2Iainfix <=c0V1F">
     <proof
-     prover="coq"
+     prover="2"
      timelimit="2"
      edited="power_Power_Power_sum_1.v"
-     obsolete="false">
-     <result status="valid" time="0.53"/>
-    </proof>
-   </goal>
-   <goal
-    name="Power_mult"
-    sum="a96d39f3fe11b45ebeaa3cda17db865f"
-    proved="true"
-    expanded="true"
-    shape="ainfix =apowerV0ainfix *V1V2apowerapowerV0V1V2Iainfix <=c0V2Iainfix <=c0V1F">
-    <proof
-     prover="coq"
-     timelimit="2"
-     edited="power_Power_Power_mult_1.v"
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.56"/>
     </proof>
    </goal>
    <goal
+    name="Power_mult"
+    locfile="programs/power/../power.mlw"
+    loclnum="17" loccnumb="8" loccnume="18"
+    sum="98d7aa1697e7146e112ded83bbd5e84e"
+    proved="true"
+    expanded="true"
+    shape="ainfix =apowerV0ainfix *V1V2apowerapowerV0V1V2Iainfix <=c0V2Iainfix <=c0V1F">
+    <proof
+     prover="2"
+     timelimit="2"
+     edited="power_Power_Power_mult_1.v"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.55"/>
+    </proof>
+   </goal>
+   <goal
     name="Power_mult2"
-    sum="2c402193e450095a29cc59e2b27165a2"
+    locfile="programs/power/../power.mlw"
+    loclnum="20" loccnumb="8" loccnume="19"
+    sum="46445a498bf50fded0a35ca7f935956e"
     proved="true"
     expanded="true"
     shape="ainfix =apowerainfix *V0V1V2ainfix *apowerV0V2apowerV1V2Iainfix <=c0V2F">
     <proof
-     prover="coq"
+     prover="2"
      timelimit="5"
      edited="power_Power_Power_mult2_1.v"
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.51"/>
     </proof>
    </goal>
   </theory>
   <theory
    name="WP M"
+   locfile="programs/power/../power.mlw"
+   loclnum="25" loccnumb="7" loccnume="8"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter fast_exp"
+    locfile="programs/power/../power.mlw"
+    loclnum="33" loccnumb="10" loccnume="18"
     expl="parameter fast_exp"
-    sum="138a122f676af425c9956b6a66f9b10a"
+    sum="94713069ca3c191f77c2d05a8a7b49c9"
     proved="true"
     expanded="true"
     shape="iainfix =V1c0ainfix =c1apowerV0V1LapowerV0adivV1c2ainfix =iainfix =amodV1c2c0ainfix *V2V2ainfix *ainfix *V2V2V0apowerV0V1Aainfix <=c0adivV1c2Aainfix <adivV1c2V1Aainfix <=c0V1Iainfix <=c0V1FF">
+    <label
+     name="expl:parameter fast_exp">
+     </label>
     <proof
-     prover="alt-ergo"
+     prover="0"
      timelimit="2"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.82"/>
     </proof>
    </goal>
    <goal
     name="WP_parameter fast_exp_imperative"
+    locfile="programs/power/../power.mlw"
+    loclnum="47" loccnumb="6" loccnume="25"
     expl="parameter fast_exp_imperative"
-    sum="1bfa5f8aae253f128687a98b555396f1"
+    sum="3209c15f010dd625ed075bb7a04e01ad"
     proved="true"
     expanded="true"
     shape="iainfix >V2c0iainfix =amodV2c2c1ainfix <V7V2Aainfix <=c0V2Aainfix =ainfix *V5apowerV6V7apowerV0V1Aainfix <=c0V7Iainfix =V7adivV2c2FIainfix =V6ainfix *V3V3FIainfix =V5ainfix *V4V3Fainfix <V9V2Aainfix <=c0V2Aainfix =ainfix *V4apowerV8V9apowerV0V1Aainfix <=c0V9Iainfix =V9adivV2c2FIainfix =V8ainfix *V3V3Fainfix =V4apowerV0V1Iainfix =ainfix *V4apowerV3V2apowerV0V1Aainfix <=c0V2FFFAainfix =ainfix *c1apowerV0V1apowerV0V1Aainfix <=c0V1Iainfix <=c0V1FF">
+    <label
+     name="expl:parameter fast_exp_imperative">
+     </label>
     <transf
      name="split_goal"
      proved="true"
      expanded="true">
      <goal
       name="WP_parameter fast_exp_imperative.1"
+      locfile="programs/power/../power.mlw"
+      loclnum="47" loccnumb="6" loccnume="25"
       expl="loop invariant init"
-      sum="3f317e48bc67711f270621402ee924d4"
+      sum="f628425938af5f46b6c672d86c0b167d"
       proved="true"
       expanded="true"
       shape="ainfix =ainfix *c1apowerV0V1apowerV0V1Aainfix <=c0V1Iainfix <=c0V1FF">
+      <label
+       name="expl:parameter fast_exp_imperative">
+       </label>
       <proof
-       prover="alt-ergo"
+       prover="3"
        timelimit="5"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof
-       prover="cvc3"
-       timelimit="10"
-       edited=""
-       obsolete="false">
+       obsolete="false"
+       archived="false">
        <result status="valid" time="0.00"/>
       </proof>
       <proof
-       prover="z3"
+       prover="0"
        timelimit="5"
-       edited=""
-       obsolete="false">
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
        <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter fast_exp_imperative.2"
+      locfile="programs/power/../power.mlw"
+      loclnum="47" loccnumb="6" loccnume="25"
       expl="loop invariant preservation"
-      sum="4ba96c1abe2eda08403100993de35f77"
+      sum="cccf7774d7655c26c34a98e8ee8af3df"
       proved="true"
       expanded="true"
       shape="ainfix =ainfix *V5apowerV6V7apowerV0V1Aainfix <=c0V7Iainfix =V7adivV2c2FIainfix =V6ainfix *V3V3FIainfix =V5ainfix *V4V3FIainfix =amodV2c2c1Iainfix >V2c0Iainfix =ainfix *V4apowerV3V2apowerV0V1Aainfix <=c0V2FFFIainfix <=c0V1FF">
+      <label
+       name="expl:parameter fast_exp_imperative">
+       </label>
       <proof
-       prover="cvc3"
+       prover="1"
        timelimit="5"
-       edited=""
-       obsolete="false">
+       obsolete="false"
+       archived="false">
        <result status="valid" time="0.06"/>
       </proof>
       <proof
-       prover="alt-ergo"
+       prover="0"
        timelimit="10"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.38"/>
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.37"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter fast_exp_imperative.3"
+      locfile="programs/power/../power.mlw"
+      loclnum="47" loccnumb="6" loccnume="25"
       expl="loop variant decreases"
-      sum="efc11ed31f3de8d910fca90ac9230f7c"
+      sum="37f6e63ff4926e9e6411fce0f32475a3"
       proved="true"
       expanded="true"
       shape="ainfix <V7V2Aainfix <=c0V2Iainfix =ainfix *V5apowerV6V7apowerV0V1Aainfix <=c0V7Iainfix =V7adivV2c2FIainfix =V6ainfix *V3V3FIainfix =V5ainfix *V4V3FIainfix =amodV2c2c1Iainfix >V2c0Iainfix =ainfix *V4apowerV3V2apowerV0V1Aainfix <=c0V2FFFIainfix <=c0V1FF">
+      <label
+       name="expl:parameter fast_exp_imperative">
+       </label>
       <proof
-       prover="cvc3"
+       prover="3"
        timelimit="5"
-       edited=""
-       obsolete="false">
+       obsolete="false"
+       archived="false">
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="alt-ergo"
+       prover="1"
+       timelimit="5"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="0"
        timelimit="10"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.10"/>
-      </proof>
-      <proof
-       prover="z3"
-       timelimit="5"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.01"/>
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.09"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter fast_exp_imperative.4"
+      locfile="programs/power/../power.mlw"
+      loclnum="47" loccnumb="6" loccnume="25"
       expl="loop invariant preservation"
-      sum="4c6df521a7885cbb29378e241e49e5a6"
+      sum="cc4c79597edffc72f70711e6c8f73203"
       proved="true"
       expanded="true"
       shape="ainfix =ainfix *V4apowerV5V6apowerV0V1Aainfix <=c0V6Iainfix =V6adivV2c2FIainfix =V5ainfix *V3V3FIainfix =amodV2c2c1NIainfix >V2c0Iainfix =ainfix *V4apowerV3V2apowerV0V1Aainfix <=c0V2FFFIainfix <=c0V1FF">
+      <label
+       name="expl:parameter fast_exp_imperative">
+       </label>
       <transf
        name="split_goal"
        proved="true"
        expanded="true">
        <goal
         name="WP_parameter fast_exp_imperative.4.1"
+        locfile="programs/power/../power.mlw"
+        loclnum="47" loccnumb="6" loccnume="25"
         expl="parameter fast_exp_imperative"
-        sum="2df0f104b7caf79ce54fbaa67de25d83"
+        sum="6dba56778706940f79b8065bf7e4f0c1"
         proved="true"
         expanded="true"
         shape="ainfix <=c0V6Iainfix =V6adivV2c2FIainfix =V5ainfix *V3V3FIainfix =amodV2c2c1NIainfix >V2c0Iainfix =ainfix *V4apowerV3V2apowerV0V1Aainfix <=c0V2FFFIainfix <=c0V1FF">
+        <label
+         name="expl:parameter fast_exp_imperative">
+         </label>
         <proof
-         prover="cvc3"
+         prover="3"
          timelimit="5"
-         edited=""
-         obsolete="false">
+         obsolete="false"
+         archived="false">
          <result status="valid" time="0.01"/>
         </proof>
         <proof
-         prover="alt-ergo"
+         prover="1"
          timelimit="5"
-         edited=""
-         obsolete="false">
+         obsolete="false"
+         archived="false">
          <result status="valid" time="0.01"/>
         </proof>
         <proof
-         prover="z3"
+         prover="0"
          timelimit="5"
-         edited=""
-         obsolete="false">
-         <result status="valid" time="0.01"/>
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.00"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter fast_exp_imperative.4.2"
+        locfile="programs/power/../power.mlw"
+        loclnum="47" loccnumb="6" loccnume="25"
         expl="parameter fast_exp_imperative"
-        sum="e67b01e460b057f40f79606c22488172"
+        sum="f053822ab0daceb36f9cea5ea65d7318"
         proved="true"
         expanded="true"
         shape="ainfix =ainfix *V4apowerV5V6apowerV0V1Iainfix =V6adivV2c2FIainfix =V5ainfix *V3V3FIainfix =amodV2c2c1NIainfix >V2c0Iainfix =ainfix *V4apowerV3V2apowerV0V1Aainfix <=c0V2FFFIainfix <=c0V1FF">
+        <label
+         name="expl:parameter fast_exp_imperative">
+         </label>
         <proof
-         prover="coq"
+         prover="2"
          timelimit="5"
          edited="power_WP_M_WP_parameter_fast_exp_imperative_3.v"
-         obsolete="false">
-         <result status="valid" time="0.62"/>
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.64"/>
         </proof>
        </goal>
       </transf>
      </goal>
      <goal
       name="WP_parameter fast_exp_imperative.5"
+      locfile="programs/power/../power.mlw"
+      loclnum="47" loccnumb="6" loccnume="25"
       expl="loop variant decreases"
-      sum="e39cae8e2b35acce68bc756912e4c345"
+      sum="72ff45ace7faa630b5678887f52d2b1f"
       proved="true"
       expanded="true"
       shape="ainfix <V6V2Aainfix <=c0V2Iainfix =ainfix *V4apowerV5V6apowerV0V1Aainfix <=c0V6Iainfix =V6adivV2c2FIainfix =V5ainfix *V3V3FIainfix =amodV2c2c1NIainfix >V2c0Iainfix =ainfix *V4apowerV3V2apowerV0V1Aainfix <=c0V2FFFIainfix <=c0V1FF">
+      <label
+       name="expl:parameter fast_exp_imperative">
+       </label>
       <proof
-       prover="cvc3"
+       prover="3"
        timelimit="5"
-       edited=""
-       obsolete="false">
+       obsolete="false"
+       archived="false">
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="alt-ergo"
+       prover="1"
+       timelimit="5"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="0"
        timelimit="10"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.06"/>
-      </proof>
-      <proof
-       prover="z3"
-       timelimit="5"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.01"/>
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter fast_exp_imperative.6"
+      locfile="programs/power/../power.mlw"
+      loclnum="47" loccnumb="6" loccnume="25"
       expl="normal postcondition"
-      sum="1ca01c1212f2d22a5535e5aec3200848"
+      sum="5d84f1c8957048119d232e36cc4c01a8"
       proved="true"
       expanded="true"
       shape="ainfix =V4apowerV0V1Iainfix >V2c0NIainfix =ainfix *V4apowerV3V2apowerV0V1Aainfix <=c0V2FFFIainfix <=c0V1FF">
+      <label
+       name="expl:parameter fast_exp_imperative">
+       </label>
       <transf
        name="split_goal"
        proved="true"
        expanded="true">
        <goal
         name="WP_parameter fast_exp_imperative.6.1"
+        locfile="programs/power/../power.mlw"
+        loclnum="47" loccnumb="6" loccnume="25"
         expl="normal postcondition"
-        sum="1ca01c1212f2d22a5535e5aec3200848"
+        sum="5d84f1c8957048119d232e36cc4c01a8"
         proved="true"
         expanded="true"
         shape="ainfix =V4apowerV0V1Iainfix >V2c0NIainfix =ainfix *V4apowerV3V2apowerV0V1Aainfix <=c0V2FFFIainfix <=c0V1FF">
+        <label
+         name="expl:parameter fast_exp_imperative">
+         </label>
         <proof
-         prover="cvc3"
+         prover="1"
          timelimit="5"
-         edited=""
-         obsolete="false">
+         obsolete="false"
+         archived="false">
          <result status="valid" time="0.00"/>
         </proof>
         <proof
-         prover="alt-ergo"
+         prover="0"
          timelimit="5"
-         edited=""
-         obsolete="false">
-         <result status="valid" time="0.02"/>
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.00"/>
         </proof>
        </goal>
       </transf>

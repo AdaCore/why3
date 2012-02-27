@@ -54,13 +54,13 @@ let rec merge_ns chk ns1 ns2 =
   { ns_ex = ns_union ls_equal chk ns1.ns_ex ns2.ns_ex;
     ns_ns = Mstr.union fusion      ns1.ns_ns ns2.ns_ns; }
 
-let nm_add chk x ns m = Mstr.change x (function
+let nm_add chk x ns m = Mstr.change (function
   | None -> Some ns
-  | Some os -> Some (merge_ns chk ns os)) m
+  | Some os -> Some (merge_ns chk ns os)) x m
 
-let ns_add eq chk x v m = Mstr.change x (function
+let ns_add eq chk x v m = Mstr.change (function
   | None -> Some v
-  | Some vo -> Some (ns_replace eq chk x vo v)) m
+  | Some vo -> Some (ns_replace eq chk x vo v)) x m
 
 let ex_add = ns_add ls_equal
 let mt_add = ns_add mt_equal
@@ -271,21 +271,21 @@ let create_module ?(path=[]) id =
   let uc = empty_module path id in
   use_export_theory uc th_prelude
 
-let add_impure_pdecl env ltm d uc =
-  { uc with uc_impure = Typing.add_decl env ltm uc.uc_impure d }
+let add_impure_pdecl d uc =
+  { uc with uc_impure = Typing.add_decl uc.uc_impure d }
 
-let add_effect_pdecl env ltm d uc =
-  { uc with uc_effect = Typing.add_decl env ltm uc.uc_effect d; }
+let add_effect_pdecl d uc =
+  { uc with uc_effect = Typing.add_decl uc.uc_effect d; }
 
-let add_pure_pdecl env ltm d uc =
-  { uc with uc_pure = Typing.add_decl env ltm uc.uc_pure d; }
+let add_pure_pdecl d uc =
+  { uc with uc_pure = Typing.add_decl uc.uc_pure d; }
 
-let add_pdecl env ltm d uc =
+let add_use_clone env ltm d uc =
+  let env = Lexer.library_of_env (Env.env_of_library env) in
   { uc with
-      uc_impure = Typing.add_decl env ltm uc.uc_impure d;
-      uc_effect = Typing.add_decl env ltm uc.uc_effect d;
-      uc_pure   = Typing.add_decl env ltm uc.uc_pure   d; }
-
+      uc_impure = Typing.add_use_clone env ltm uc.uc_impure d;
+      uc_effect = Typing.add_use_clone env ltm uc.uc_effect d;
+      uc_pure   = Typing.add_use_clone env ltm uc.uc_pure   d; }
 
 (*
 Local Variables:

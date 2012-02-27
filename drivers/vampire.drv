@@ -1,12 +1,12 @@
 (* Why driver for first-order tptp provers *)
 
-printer "tptp"
+printer "tptp-fof"
 filename "%f-%t-%g.p"
 
 valid   "Refutation found"
-timeout "Aborted by signal SIGXCPU on"
-timeout "Time limit reached"
-unknown   "Refutation not found" "Unknown"
+(* timeout "Aborted by signal SIGXCPU on" *)
+unknown "Time limit reached" "Time out"
+unknown "Refutation not found" "Unknown"
 (* invalid "Completion found" *)
 (* invalid "SZS status CounterSatisfiable" *)
 (* timeout "Ran out of time" *)

@@ -1,0 +1,2580 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session SYSTEM "why3session.dtd">
+<why3session
+ name="programs/vacid_0_red_black_trees/why3session.xml">
+ <prover
+  id="0"
+  name="Alt-Ergo"
+  version="0.94"/>
+ <prover
+  id="1"
+  name="CVC3"
+  version="2.2"/>
+ <prover
+  id="2"
+  name="CVC3"
+  version="2.4.1"/>
+ <prover
+  id="3"
+  name="Coq"
+  version="8.3pl3"/>
+ <prover
+  id="4"
+  name="Z3"
+  version="2.19"/>
+ <prover
+  id="5"
+  name="Z3"
+  version="3.2"/>
+ <file
+  name="../vacid_0_red_black_trees.mlw"
+  verified="true"
+  expanded="false">
+  <theory
+   name="WP RedBlackTree"
+   locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+   loclnum="2" loccnumb="7" loccnume="19"
+   verified="true"
+   expanded="true">
+   <goal
+    name="memt_color"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    loclnum="23" loccnumb="8" loccnume="18"
+    sum="ec5925357b1698b05c8b10e54630c48d"
+    proved="true"
+    expanded="false"
+    shape="amemtaNodeV7V0V2V4V1V3V5IamemtaNodeV6V0V2V4V1V3V5F">
+    <proof
+     prover="0"
+     timelimit="10"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
+    name="lt_leaf"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    loclnum="37" loccnumb="8" loccnume="15"
+    sum="5d2c57fc0a964fc5ef828c6d8edf81f0"
+    proved="true"
+    expanded="false"
+    shape="alt_treeV0aLeafF">
+    <proof
+     prover="0"
+     timelimit="10"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+   <goal
+    name="gt_leaf"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    loclnum="39" loccnumb="8" loccnume="15"
+    sum="504cbb28e67bab6770b4a46f90f518a7"
+    proved="true"
+    expanded="false"
+    shape="agt_treeV0aLeafF">
+    <proof
+     prover="0"
+     timelimit="10"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
+    name="lt_tree_node"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    loclnum="41" loccnumb="8" loccnume="20"
+    sum="88e12f31d4ec3654a849877c413b1da8"
+    proved="true"
+    expanded="false"
+    shape="alt_treeV0aNodeV5V3V1V2V4Iainfix <V1V0Ialt_treeV0V4Ialt_treeV0V3F">
+    <proof
+     prover="0"
+     timelimit="10"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
+    name="gt_tree_node"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    loclnum="45" loccnumb="8" loccnume="20"
+    sum="9cf7e7eb5a4bcaacee85fcc798a020d4"
+    proved="true"
+    expanded="false"
+    shape="agt_treeV0aNodeV5V3V1V2V4Iainfix <V0V1Iagt_treeV0V4Iagt_treeV0V3F">
+    <proof
+     prover="0"
+     timelimit="10"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+   <goal
+    name="lt_node_lt"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    loclnum="49" loccnumb="8" loccnume="18"
+    sum="6f02dd0af4453b7fd03196c3bd12b510"
+    proved="true"
+    expanded="false"
+    shape="ainfix <V1V0Ialt_treeV0aNodeV5V3V1V2V4F">
+    <proof
+     prover="3"
+     timelimit="10"
+     edited="vacid_0_red_black_trees_WP_RedBlackTree_lt_node_lt_1.v"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.50"/>
+    </proof>
+   </goal>
+   <goal
+    name="gt_node_gt"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    loclnum="53" loccnumb="8" loccnume="18"
+    sum="a37e546a6304a1ae29365f580b24c500"
+    proved="true"
+    expanded="false"
+    shape="ainfix <V0V1Iagt_treeV0aNodeV5V3V1V2V4F">
+    <proof
+     prover="3"
+     timelimit="10"
+     edited="vacid_0_red_black_trees_WP_RedBlackTree_gt_node_gt_1.v"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.50"/>
+    </proof>
+   </goal>
+   <goal
+    name="lt_left"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    loclnum="57" loccnumb="8" loccnume="15"
+    sum="09d87734595bb5565b6ff7a883c80f38"
+    proved="true"
+    expanded="false"
+    shape="alt_treeV0V3Ialt_treeV0aNodeV5V3V1V2V4F">
+    <proof
+     prover="1"
+     timelimit="10"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.06"/>
+    </proof>
+   </goal>
+   <goal
+    name="lt_right"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    loclnum="61" loccnumb="8" loccnume="16"
+    sum="1d06cf3c05595fc6cb35dbe7fef1f5da"
+    proved="true"
+    expanded="false"
+    shape="alt_treeV0V4Ialt_treeV0aNodeV5V3V1V2V4F">
+    <proof
+     prover="1"
+     timelimit="10"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.06"/>
+    </proof>
+   </goal>
+   <goal
+    name="gt_left"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    loclnum="65" loccnumb="8" loccnume="15"
+    sum="88f9b296a69456f9dec9f7357a989064"
+    proved="true"
+    expanded="false"
+    shape="agt_treeV0V3Iagt_treeV0aNodeV5V3V1V2V4F">
+    <proof
+     prover="1"
+     timelimit="10"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.06"/>
+    </proof>
+   </goal>
+   <goal
+    name="gt_right"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    loclnum="69" loccnumb="8" loccnume="16"
+    sum="b0e4dcc60e07d6de24d5907f13df2468"
+    proved="true"
+    expanded="false"
+    shape="agt_treeV0V4Iagt_treeV0aNodeV5V3V1V2V4F">
+    <proof
+     prover="1"
+     timelimit="10"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.06"/>
+    </proof>
+   </goal>
+   <goal
+    name="lt_tree_not_in"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    loclnum="73" loccnumb="8" loccnume="22"
+    sum="ff224412106688ea81691ccf8304efaa"
+    proved="true"
+    expanded="false"
+    shape="amemtV1V0V2NFIalt_treeV0V1F">
+    <proof
+     prover="0"
+     timelimit="10"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+   <goal
+    name="lt_tree_trans"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    loclnum="76" loccnumb="8" loccnume="21"
+    sum="d1f265850f39ea7d8a759c4983dbddf4"
+    proved="true"
+    expanded="false"
+    shape="alt_treeV1V2Ialt_treeV0V2FIainfix <V0V1F">
+    <proof
+     prover="0"
+     timelimit="10"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
+    name="gt_tree_not_in"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    loclnum="79" loccnumb="8" loccnume="22"
+    sum="b841ddcd785dd2c0c5080185425ad77b"
+    proved="true"
+    expanded="false"
+    shape="amemtV1V0V2NFIagt_treeV0V1F">
+    <proof
+     prover="0"
+     timelimit="10"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
+    name="gt_tree_trans"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    loclnum="82" loccnumb="8" loccnume="21"
+    sum="2befa5f07b650074834b8deb324e8e5d"
+    proved="true"
+    expanded="false"
+    shape="agt_treeV1V2Iagt_treeV0V2FIainfix <V1V0F">
+    <proof
+     prover="0"
+     timelimit="10"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
+    name="bst_Leaf"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    loclnum="91" loccnumb="8" loccnume="16"
+    sum="9b383aa7ea7ce6b905da5eb210f82d32"
+    proved="true"
+    expanded="false"
+    shape="abstaLeaf">
+    <proof
+     prover="0"
+     timelimit="10"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+   <goal
+    name="bst_left"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    loclnum="93" loccnumb="8" loccnume="16"
+    sum="b377d97a1aebf18434d9f1cf5ab38cbf"
+    proved="true"
+    expanded="false"
+    shape="abstV2IabstaNodeV4V2V0V1V3F">
+    <proof
+     prover="0"
+     timelimit="10"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+   <goal
+    name="bst_right"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    loclnum="96" loccnumb="8" loccnume="17"
+    sum="ce8fc261f09ad16caf9f0403337dc943"
+    proved="true"
+    expanded="false"
+    shape="abstV3IabstaNodeV4V2V0V1V3F">
+    <proof
+     prover="0"
+     timelimit="10"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
+    name="bst_color"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    loclnum="99" loccnumb="8" loccnume="17"
+    sum="ded4d1ae5bbda300a67555775e9f0d1d"
+    proved="true"
+    expanded="false"
+    shape="abstaNodeV1V4V2V3V5IabstaNodeV0V4V2V3V5F">
+    <proof
+     prover="0"
+     timelimit="10"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+   <goal
+    name="rotate_left"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    loclnum="103" loccnumb="8" loccnume="19"
+    sum="faaa3c5fbc1abb5c50b820ad93470950"
+    proved="true"
+    expanded="false"
+    shape="abstaNodeV9aNodeV10V4V0V2V5V1V3V6IabstaNodeV7V4V0V2aNodeV8V5V1V3V6F">
+    <proof
+     prover="4"
+     timelimit="100"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="0"
+     timelimit="10"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.09"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="100"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="rotate_right"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    loclnum="108" loccnumb="8" loccnume="20"
+    sum="64bdfee9f0a454043b7f22833aae26f4"
+    proved="true"
+    expanded="false"
+    shape="abstaNodeV7V4V0V2aNodeV8V5V1V3V6IabstaNodeV9aNodeV10V4V0V2V5V1V3V6F">
+    <proof
+     prover="0"
+     timelimit="10"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.09"/>
+    </proof>
+   </goal>
+   <goal
+    name="rbtree_Leaf"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    loclnum="136" loccnumb="8" loccnume="19"
+    sum="74cc3fae8d264d913bef1615f963ec79"
+    proved="true"
+    expanded="false"
+    shape="arbtreec0aLeaf">
+    <proof
+     prover="0"
+     timelimit="10"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
+    name="rbtree_Node1"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    loclnum="139" loccnumb="8" loccnume="20"
+    sum="4d9ee3f6b14a2cf1677f9c948c821f96"
+    proved="true"
+    expanded="false"
+    shape="arbtreec0aNodeaRedaLeafV0V1aLeafF">
+    <proof
+     prover="0"
+     timelimit="10"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+   </goal>
+   <goal
+    name="rbtree_left"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    loclnum="142" loccnumb="8" loccnume="19"
+    sum="5a795f36462892580d46f914b49f3853"
+    proved="true"
+    expanded="false"
+    shape="arbtreeV5V2EIarbtreeV6aNodeV4V2V0V1V3EF">
+    <proof
+     prover="1"
+     timelimit="10"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.06"/>
+    </proof>
+   </goal>
+   <goal
+    name="rbtree_right"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    loclnum="146" loccnumb="8" loccnume="20"
+    sum="0ac871a36bbe4af57fc9f17d8f3cd4fc"
+    proved="true"
+    expanded="false"
+    shape="arbtreeV5V3EIarbtreeV6aNodeV4V2V0V1V3EF">
+    <proof
+     prover="1"
+     timelimit="10"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.10"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter find"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    loclnum="154" loccnumb="10" loccnume="14"
+    expl="parameter find"
+    sum="31b49c921bced8255f0f79cee7288c14"
+    proved="true"
+    expanded="false"
+    shape="CV0aLeafamemtV0V1V2NFaNodewVVVViainfix =V1V4amemtV0V1V5iainfix <V1V4amemtV0V1V7NFIamemtV3V1V8NFAamemtV0V1V9IamemtV3V1V9FAabstV3amemtV0V1V10NFIamemtV6V1V11NFAamemtV0V1V12IamemtV6V1V12FAabstV6IabstV0FF">
+    <label
+     name="expl:parameter find">
+     </label>
+    <proof
+     prover="0"
+     timelimit="10"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="rbtree_almost_rbtree"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    loclnum="180" loccnumb="8" loccnume="28"
+    sum="3c9c711c5e3a0be24624f72ef09ca37b"
+    proved="true"
+    expanded="false"
+    shape="aalmost_rbtreeV0V1IarbtreeV0V1F">
+    <proof
+     prover="0"
+     timelimit="10"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+   <goal
+    name="rbtree_almost_rbtree_ex"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    loclnum="183" loccnumb="8" loccnume="31"
+    sum="d857917b62b16b07b9fb22b5ec534e80"
+    proved="true"
+    expanded="false"
+    shape="aalmost_rbtreeV1V0EIarbtreeV2V0EF">
+    <proof
+     prover="0"
+     timelimit="10"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
+    name="almost_rbtree_rbtree_black"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    loclnum="187" loccnumb="8" loccnume="34"
+    sum="3dde5f79d40600a13a23f24ce7f1ab71"
+    proved="true"
+    expanded="false"
+    shape="arbtreeV4aNodeaBlackV2V0V1V3Iaalmost_rbtreeV4aNodeaBlackV2V0V1V3F">
+    <proof
+     prover="0"
+     timelimit="10"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter lbalance"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    loclnum="201" loccnumb="6" loccnume="14"
+    expl="parameter lbalance"
+    sum="b46331886803d7e74b1fac05900923fc"
+    proved="true"
+    expanded="false"
+    shape="CV0aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVViainfix =V11V1ainfix =V12V2amemtV3V11V12OamemtV0V11V12qamemtaNodeaRedaNodeaBlackV4V5V6V7V8V9aNodeaBlackV10V1V2V3V11V12FAarbtreeainfix +V13c1aNodeaRedaNodeaBlackV4V5V6V7V8V9aNodeaBlackV10V1V2V3IarbtreeV13V3Iaalmost_rbtreeV13V0FAabstaNodeaRedaNodeaBlackV4V5V6V7V8V9aNodeaBlackV10V1V2V3wiainfix =V14V1ainfix =V15V2amemtV3V14V15OamemtV0V14V15qamemtaNodeaBlackV0V1V2V3V14V15FAarbtreeainfix +V16c1aNodeaBlackV0V1V2V3IarbtreeV16V3Iaalmost_rbtreeV16V0FAabstaNodeaBlackV0V1V2V3IabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
+    <label
+     name="expl:parameter lbalance">
+     </label>
+    <transf
+     name="split_goal"
+     proved="true"
+     expanded="true">
+     <goal
+      name="WP_parameter lbalance.1"
+      locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+      loclnum="201" loccnumb="6" loccnume="14"
+      expl="parameter lbalance"
+      sum="fc3da87dd558e4fd7e3a5530bf4712b3"
+      proved="true"
+      expanded="false"
+      shape="CV0aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVViainfix =V11V1ainfix =V12V2amemtV3V11V12OamemtV0V11V12qamemtaNodeaRedaNodeaBlackV4V5V6V7V8V9aNodeaBlackV10V1V2V3V11V12FAarbtreeainfix +V13c1aNodeaRedaNodeaBlackV4V5V6V7V8V9aNodeaBlackV10V1V2V3IarbtreeV13V3Iaalmost_rbtreeV13V0FAabstaNodeaRedaNodeaBlackV4V5V6V7V8V9aNodeaBlackV10V1V2V3wtIabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
+      <label
+       name="expl:parameter lbalance">
+       </label>
+      <transf
+       name="split_goal"
+       proved="true"
+       expanded="true">
+       <goal
+        name="WP_parameter lbalance.1.1"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        loclnum="201" loccnumb="6" loccnume="14"
+        expl="parameter lbalance"
+        sum="c89aa88872308525aa7ab6b7ade0dbd7"
+        proved="true"
+        expanded="false"
+        shape="CV0aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVabstaNodeaRedaNodeaBlackV4V5V6V7V8V9aNodeaBlackV10V1V2V3wtIabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
+        <label
+         name="expl:parameter lbalance">
+         </label>
+        <proof
+         prover="0"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="3.80"/>
+        </proof>
+        <proof
+         prover="5"
+         timelimit="10"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="1.43"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter lbalance.1.2"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        loclnum="201" loccnumb="6" loccnume="14"
+        expl="parameter lbalance"
+        sum="70f15b72f6790148d5476dafa3a37c0f"
+        proved="true"
+        expanded="false"
+        shape="CV0aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVarbtreeainfix +V11c1aNodeaRedaNodeaBlackV4V5V6V7V8V9aNodeaBlackV10V1V2V3IarbtreeV11V3Iaalmost_rbtreeV11V0FwtIabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
+        <label
+         name="expl:parameter lbalance">
+         </label>
+        <proof
+         prover="3"
+         timelimit="100"
+         edited="vacid_0_red_black_trees_WP_RedBlackTree_WP_parameter_lbalance_1.v"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.57"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter lbalance.1.3"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        loclnum="201" loccnumb="6" loccnume="14"
+        expl="parameter lbalance"
+        sum="1219064aa28f40d72ed59dc4c2efac30"
+        proved="true"
+        expanded="false"
+        shape="CV0aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVainfix =V12V2Iainfix =V11V1IamemtaNodeaRedaNodeaBlackV4V5V6V7V8V9aNodeaBlackV10V1V2V3V11V12FwtIabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
+        <label
+         name="expl:parameter lbalance">
+         </label>
+        <proof
+         prover="0"
+         timelimit="100"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="10.65"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter lbalance.1.4"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        loclnum="201" loccnumb="6" loccnume="14"
+        expl="parameter lbalance"
+        sum="987019667df0b5be6ef466212a272cba"
+        proved="true"
+        expanded="false"
+        shape="CV0aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVamemtV3V11V12OamemtV0V11V12Iainfix =V11V1NIamemtaNodeaRedaNodeaBlackV4V5V6V7V8V9aNodeaBlackV10V1V2V3V11V12FwtIabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
+        <label
+         name="expl:parameter lbalance">
+         </label>
+        <proof
+         prover="1"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="1.78"/>
+        </proof>
+        <proof
+         prover="0"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="2.23"/>
+        </proof>
+        <proof
+         prover="2"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="1.82"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter lbalance.1.5"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        loclnum="201" loccnumb="6" loccnume="14"
+        expl="parameter lbalance"
+        sum="415261793042430722142a7775ebad5d"
+        proved="true"
+        expanded="false"
+        shape="CV0aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVamemtaNodeaRedaNodeaBlackV4V5V6V7V8V9aNodeaBlackV10V1V2V3V11V12Iiainfix =V11V1ainfix =V12V2amemtV3V11V12OamemtV0V11V12FwtIabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
+        <label
+         name="expl:parameter lbalance">
+         </label>
+        <proof
+         prover="0"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="1.88"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter lbalance.2"
+      locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+      loclnum="201" loccnumb="6" loccnume="14"
+      expl="parameter lbalance"
+      sum="8284f41e57d2dfaa59c02ce0f1d52976"
+      proved="true"
+      expanded="false"
+      shape="CV0aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVtwiainfix =V11V1ainfix =V12V2amemtV3V11V12OamemtV0V11V12qamemtaNodeaBlackV0V1V2V3V11V12FAarbtreeainfix +V13c1aNodeaBlackV0V1V2V3IarbtreeV13V3Iaalmost_rbtreeV13V0FAabstaNodeaBlackV0V1V2V3IabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
+      <label
+       name="expl:parameter lbalance">
+       </label>
+      <transf
+       name="split_goal"
+       proved="true"
+       expanded="true">
+       <goal
+        name="WP_parameter lbalance.2.1"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        loclnum="201" loccnumb="6" loccnume="14"
+        expl="parameter lbalance"
+        sum="fafaa296e1656663cae342e0f9a34b60"
+        proved="true"
+        expanded="false"
+        shape="CV0aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVtwabstaNodeaBlackV0V1V2V3IabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
+        <label
+         name="expl:parameter lbalance">
+         </label>
+        <proof
+         prover="1"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof
+         prover="0"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof
+         prover="2"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter lbalance.2.2"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        loclnum="201" loccnumb="6" loccnume="14"
+        expl="parameter lbalance"
+        sum="0b9ae7b26daf031d02dd6d999c54a98c"
+        proved="true"
+        expanded="false"
+        shape="CV0aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVtwarbtreeainfix +V11c1aNodeaBlackV0V1V2V3IarbtreeV11V3Iaalmost_rbtreeV11V0FIabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
+        <label
+         name="expl:parameter lbalance">
+         </label>
+        <proof
+         prover="1"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.71"/>
+        </proof>
+        <proof
+         prover="2"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.77"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter lbalance.2.3"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        loclnum="201" loccnumb="6" loccnume="14"
+        expl="parameter lbalance"
+        sum="af36cc894e64c81dfab5c525617436a7"
+        proved="true"
+        expanded="false"
+        shape="CV0aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVtwainfix =V12V2Iainfix =V11V1IamemtaNodeaBlackV0V1V2V3V11V12FIabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
+        <label
+         name="expl:parameter lbalance">
+         </label>
+        <proof
+         prover="1"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="3.38"/>
+        </proof>
+        <proof
+         prover="0"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.69"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter lbalance.2.4"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        loclnum="201" loccnumb="6" loccnume="14"
+        expl="parameter lbalance"
+        sum="39f948a38021c1a109422a317b4f3509"
+        proved="true"
+        expanded="false"
+        shape="CV0aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVtwamemtV3V11V12OamemtV0V11V12Iainfix =V11V1NIamemtaNodeaBlackV0V1V2V3V11V12FIabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
+        <label
+         name="expl:parameter lbalance">
+         </label>
+        <proof
+         prover="1"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.38"/>
+        </proof>
+        <proof
+         prover="0"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.12"/>
+        </proof>
+        <proof
+         prover="2"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.36"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter lbalance.2.5"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        loclnum="201" loccnumb="6" loccnume="14"
+        expl="parameter lbalance"
+        sum="0eb26df00cadc1f11917eff60f7a8c47"
+        proved="true"
+        expanded="false"
+        shape="CV0aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVtwamemtaNodeaBlackV0V1V2V3V11V12Iiainfix =V11V1ainfix =V12V2amemtV3V11V12OamemtV0V11V12FIabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
+        <label
+         name="expl:parameter lbalance">
+         </label>
+        <proof
+         prover="1"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.17"/>
+        </proof>
+        <proof
+         prover="0"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.12"/>
+        </proof>
+        <proof
+         prover="2"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.13"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+    </transf>
+   </goal>
+   <goal
+    name="WP_parameter rbalance"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    loclnum="226" loccnumb="6" loccnume="14"
+    expl="parameter rbalance"
+    sum="cae61b91244401f64decf309eab7c5ab"
+    proved="true"
+    expanded="false"
+    shape="CV3aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVViainfix =V11V1ainfix =V12V2amemtV3V11V12OamemtV0V11V12qamemtaNodeaRedaNodeaBlackV0V1V2V4V5V6aNodeaBlackV7V8V9V10V11V12FAarbtreeainfix +V13c1aNodeaRedaNodeaBlackV0V1V2V4V5V6aNodeaBlackV7V8V9V10IarbtreeV13V0Iaalmost_rbtreeV13V3FAabstaNodeaRedaNodeaBlackV0V1V2V4V5V6aNodeaBlackV7V8V9V10wiainfix =V14V1ainfix =V15V2amemtV3V14V15OamemtV0V14V15qamemtaNodeaBlackV0V1V2V3V14V15FAarbtreeainfix +V16c1aNodeaBlackV0V1V2V3IarbtreeV16V0Iaalmost_rbtreeV16V3FAabstaNodeaBlackV0V1V2V3IabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
+    <label
+     name="expl:parameter rbalance">
+     </label>
+    <transf
+     name="split_goal"
+     proved="true"
+     expanded="true">
+     <goal
+      name="WP_parameter rbalance.1"
+      locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+      loclnum="226" loccnumb="6" loccnume="14"
+      expl="parameter rbalance"
+      sum="f1401666d505b5304fb1f43c1037e581"
+      proved="true"
+      expanded="false"
+      shape="CV3aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVViainfix =V11V1ainfix =V12V2amemtV3V11V12OamemtV0V11V12qamemtaNodeaRedaNodeaBlackV0V1V2V4V5V6aNodeaBlackV7V8V9V10V11V12FAarbtreeainfix +V13c1aNodeaRedaNodeaBlackV0V1V2V4V5V6aNodeaBlackV7V8V9V10IarbtreeV13V0Iaalmost_rbtreeV13V3FAabstaNodeaRedaNodeaBlackV0V1V2V4V5V6aNodeaBlackV7V8V9V10wtIabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
+      <label
+       name="expl:parameter rbalance">
+       </label>
+      <transf
+       name="split_goal"
+       proved="true"
+       expanded="true">
+       <goal
+        name="WP_parameter rbalance.1.1"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        loclnum="226" loccnumb="6" loccnume="14"
+        expl="parameter rbalance"
+        sum="d60c81b0bda631ff7d6e0e0801f6107d"
+        proved="true"
+        expanded="false"
+        shape="CV3aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVabstaNodeaRedaNodeaBlackV0V1V2V4V5V6aNodeaBlackV7V8V9V10wtIabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
+        <label
+         name="expl:parameter rbalance">
+         </label>
+        <proof
+         prover="0"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="4.66"/>
+        </proof>
+        <proof
+         prover="5"
+         timelimit="30"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="1.21"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter rbalance.1.2"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        loclnum="226" loccnumb="6" loccnume="14"
+        expl="parameter rbalance"
+        sum="506637a8f2213fb4a46fca14b5bbe900"
+        proved="true"
+        expanded="false"
+        shape="CV3aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVarbtreeainfix +V11c1aNodeaRedaNodeaBlackV0V1V2V4V5V6aNodeaBlackV7V8V9V10IarbtreeV11V0Iaalmost_rbtreeV11V3FwtIabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
+        <label
+         name="expl:parameter rbalance">
+         </label>
+        <proof
+         prover="3"
+         timelimit="100"
+         edited="vacid_0_red_black_trees_WP_RedBlackTree_WP_parameter_rbalance_1.v"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.58"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter rbalance.1.3"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        loclnum="226" loccnumb="6" loccnume="14"
+        expl="parameter rbalance"
+        sum="178d032028ff996d863d55c980d991ad"
+        proved="true"
+        expanded="false"
+        shape="CV3aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVainfix =V12V2Iainfix =V11V1IamemtaNodeaRedaNodeaBlackV0V1V2V4V5V6aNodeaBlackV7V8V9V10V11V12FwtIabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
+        <label
+         name="expl:parameter rbalance">
+         </label>
+        <proof
+         prover="0"
+         timelimit="100"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="10.87"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter rbalance.1.4"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        loclnum="226" loccnumb="6" loccnume="14"
+        expl="parameter rbalance"
+        sum="abf127f56eaef7227bc5c46e0ca1072c"
+        proved="true"
+        expanded="false"
+        shape="CV3aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVamemtV3V11V12OamemtV0V11V12Iainfix =V11V1NIamemtaNodeaRedaNodeaBlackV0V1V2V4V5V6aNodeaBlackV7V8V9V10V11V12FwtIabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
+        <label
+         name="expl:parameter rbalance">
+         </label>
+        <proof
+         prover="1"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="1.72"/>
+        </proof>
+        <proof
+         prover="0"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="2.13"/>
+        </proof>
+        <proof
+         prover="2"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="1.94"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter rbalance.1.5"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        loclnum="226" loccnumb="6" loccnume="14"
+        expl="parameter rbalance"
+        sum="d295cae4f40a3afaf14ae6c5cb64205e"
+        proved="true"
+        expanded="false"
+        shape="CV3aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVamemtaNodeaRedaNodeaBlackV0V1V2V4V5V6aNodeaBlackV7V8V9V10V11V12Iiainfix =V11V1ainfix =V12V2amemtV3V11V12OamemtV0V11V12FwtIabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
+        <label
+         name="expl:parameter rbalance">
+         </label>
+        <proof
+         prover="0"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="1.93"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter rbalance.2"
+      locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+      loclnum="226" loccnumb="6" loccnume="14"
+      expl="parameter rbalance"
+      sum="1855137374b75ad9ec42bc5678b24e7b"
+      proved="true"
+      expanded="false"
+      shape="CV3aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVtwiainfix =V11V1ainfix =V12V2amemtV3V11V12OamemtV0V11V12qamemtaNodeaBlackV0V1V2V3V11V12FAarbtreeainfix +V13c1aNodeaBlackV0V1V2V3IarbtreeV13V0Iaalmost_rbtreeV13V3FAabstaNodeaBlackV0V1V2V3IabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
+      <label
+       name="expl:parameter rbalance">
+       </label>
+      <proof
+       prover="1"
+       timelimit="100"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="8.54"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="100"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="9.42"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+   <goal
+    name="WP_parameter insert"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    loclnum="246" loccnumb="10" loccnume="16"
+    expl="parameter insert"
+    sum="b997a311206898c055fbbd4ba7a614f0"
+    proved="true"
+    expanded="true"
+    shape="CV0aLeafiainfix =V3V1ainfix =V4V2amemtV0V3V4qamemtaNodeaRedaLeafV1V2aLeafV3V4FAamemtaNodeaRedaLeafV1V2aLeafV1V2AarbtreeV5aNodeaRedaLeafV1V2aLeafICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV5aNodeaRedaLeafV1V2aLeafIarbtreeV5V0FAabstaNodeaRedaLeafV1V2aLeafaNodeaRedVVVViainfix <V1V7iainfix =V11V1ainfix =V12V2amemtV0V11V12qamemtaNodeaRedV10V7V8V9V11V12FAamemtaNodeaRedV10V7V8V9V1V2AarbtreeV13aNodeaRedV10V7V8V9ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV13aNodeaRedV10V7V8V9IarbtreeV13V0FAabstaNodeaRedV10V7V8V9Iiainfix =V14V1ainfix =V15V2amemtV6V14V15qamemtV10V14V15FAamemtV10V1V2AarbtreeV16V10ICV6aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV16V10IarbtreeV16V6FAabstV10FAarbtreeV17V6EAabstV6iainfix <V7V1iainfix =V19V1ainfix =V20V2amemtV0V19V20qamemtaNodeaRedV6V7V8V18V19V20FAamemtaNodeaRedV6V7V8V18V1V2AarbtreeV21aNodeaRedV6V7V8V18ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV21aNodeaRedV6V7V8V18IarbtreeV21V0FAabstaNodeaRedV6V7V8V18Iiainfix =V22V1ainfix =V23V2amemtV9V22V23qamemtV18V22V23FAamemtV18V1V2AarbtreeV24V18ICV9aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV24V18IarbtreeV24V9FAabstV18FAarbtreeV25V9EAabstV9iainfix =V26V1ainfix =V27V2amemtV0V26V27qamemtaNodeaRedV6V7V2V9V26V27FAamemtaNodeaRedV6V7V2V9V1V2AarbtreeV28aNodeaRedV6V7V2V9ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV28aNodeaRedV6V7V2V9IarbtreeV28V0FAabstaNodeaRedV6V7V2V9aNodeaBlackVVVViainfix <V1V30iainfix =V35V1ainfix =V36V2amemtV0V35V36qamemtV34V35V36FAamemtV34V1V2AarbtreeV37V34ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV37V34IarbtreeV37V0FAabstV34Iiainfix =V38V30ainfix =V39V31amemtV32V38V39OamemtV33V38V39qamemtV34V38V39FAarbtreeainfix +V40c1V34IarbtreeV40V32Iaalmost_rbtreeV40V33FAabstV34FAabstV32AabstV33Aagt_treeV30V32Aalt_treeV30V33Iiainfix =V41V1ainfix =V42V2amemtV29V41V42qamemtV33V41V42FAamemtV33V1V2AarbtreeV43V33ICV29aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV43V33IarbtreeV43V29FAabstV33FAarbtreeV44V29EAabstV29iainfix <V30V1iainfix =V47V1ainfix =V48V2amemtV0V47V48qamemtV46V47V48FAamemtV46V1V2AarbtreeV49V46ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV49V46IarbtreeV49V0FAabstV46Iiainfix =V50V30ainfix =V51V31amemtV45V50V51OamemtV29V50V51qamemtV46V50V51FAarbtreeainfix +V52c1V46IarbtreeV52V29Iaalmost_rbtreeV52V45FAabstV46FAabstV45AabstV29Aagt_treeV30V45Aalt_treeV30V29Iiainfix =V53V1ainfix =V54V2amemtV32V53V54qamemtV45V53V54FAamemtV45V1V2AarbtreeV55V45ICV32aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV55V45IarbtreeV55V32FAabstV45FAarbtreeV56V32EAabstV32iainfix =V57V1ainfix =V58V2amemtV0V57V58qamemtaNodeaBlackV29V30V2V32V57V58FAamemtaNodeaBlackV29V30V2V32V1V2AarbtreeV59aNodeaBlackV29V30V2V32ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV59aNodeaBlackV29V30V2V32IarbtreeV59V0FAabstaNodeaBlackV29V30V2V32IarbtreeV60V0EAabstV0FFF">
+    <label
+     name="expl:parameter insert">
+     </label>
+    <transf
+     name="split_goal"
+     proved="true"
+     expanded="true">
+     <goal
+      name="WP_parameter insert.1"
+      locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+      loclnum="246" loccnumb="10" loccnume="16"
+      expl="parameter insert"
+      sum="326c58ee54c6c5182a269cd280c3a570"
+      proved="true"
+      expanded="false"
+      shape="CV0aLeafiainfix =V3V1ainfix =V4V2amemtV0V3V4qamemtaNodeaRedaLeafV1V2aLeafV3V4FAamemtaNodeaRedaLeafV1V2aLeafV1V2AarbtreeV5aNodeaRedaLeafV1V2aLeafICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV5aNodeaRedaLeafV1V2aLeafIarbtreeV5V0FAabstaNodeaRedaLeafV1V2aLeafaNodeaRedVVVVtaNodeaBlackVVVVtIarbtreeV14V0EAabstV0FFF">
+      <label
+       name="expl:parameter insert">
+       </label>
+      <proof
+       prover="1"
+       timelimit="5"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof
+       prover="0"
+       timelimit="5"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.10"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insert.2"
+      locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+      loclnum="246" loccnumb="10" loccnume="16"
+      expl="parameter insert"
+      sum="47c6d820fe2c0596c64de9cbbf7d9ea6"
+      proved="true"
+      expanded="false"
+      shape="CV0aLeaftaNodeaRedVVVVarbtreeV7V3EAabstV3Iainfix <V1V4aNodeaBlackVVVVtIarbtreeV12V0EAabstV0FFF">
+      <label
+       name="expl:parameter insert">
+       </label>
+      <proof
+       prover="1"
+       timelimit="5"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="0"
+       timelimit="5"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insert.3"
+      locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+      loclnum="246" loccnumb="10" loccnume="16"
+      expl="parameter insert"
+      sum="67d6d027e6f1bffbc0f69b0e521b79ea"
+      proved="true"
+      expanded="false"
+      shape="CV0aLeaftaNodeaRedVVVViainfix =V8V1ainfix =V9V2amemtV0V8V9qamemtaNodeaRedV7V4V5V6V8V9FAamemtaNodeaRedV7V4V5V6V1V2AarbtreeV10aNodeaRedV7V4V5V6ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV10aNodeaRedV7V4V5V6IarbtreeV10V0FAabstaNodeaRedV7V4V5V6Iiainfix =V11V1ainfix =V12V2amemtV3V11V12qamemtV7V11V12FAamemtV7V1V2AarbtreeV13V7ICV3aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV13V7IarbtreeV13V3FAabstV7FIarbtreeV14V3EAabstV3Iainfix <V1V4aNodeaBlackVVVVtIarbtreeV19V0EAabstV0FFF">
+      <label
+       name="expl:parameter insert">
+       </label>
+      <transf
+       name="split_goal"
+       proved="true"
+       expanded="true">
+       <goal
+        name="WP_parameter insert.3.1"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        loclnum="246" loccnumb="10" loccnume="16"
+        expl="parameter insert"
+        sum="c1ac152525d1e3567538b89f9915585f"
+        proved="true"
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVabstaNodeaRedV7V4V5V6Iiainfix =V8V1ainfix =V9V2amemtV3V8V9qamemtV7V8V9FAamemtV7V1V2AarbtreeV10V7ICV3aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV10V7IarbtreeV10V3FAabstV7FIarbtreeV11V3EAabstV3Iainfix <V1V4aNodeaBlackVVVVtIarbtreeV16V0EAabstV0FFF">
+        <label
+         name="expl:parameter insert">
+         </label>
+        <proof
+         prover="0"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.04"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter insert.3.2"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        loclnum="246" loccnumb="10" loccnume="16"
+        expl="parameter insert"
+        sum="af76d48f447a2b67eaea19cc52da663e"
+        proved="true"
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVaalmost_rbtreeV8aNodeaRedV7V4V5V6IarbtreeV8V0FIiainfix =V9V1ainfix =V10V2amemtV3V9V10qamemtV7V9V10FAamemtV7V1V2AarbtreeV11V7ICV3aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV11V7IarbtreeV11V3FAabstV7FIarbtreeV12V3EAabstV3Iainfix <V1V4aNodeaBlackVVVVtIarbtreeV17V0EAabstV0FFF">
+        <label
+         name="expl:parameter insert">
+         </label>
+        <proof
+         prover="1"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="2.57"/>
+        </proof>
+        <proof
+         prover="2"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="2.69"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter insert.3.3"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        loclnum="246" loccnumb="10" loccnume="16"
+        expl="parameter insert"
+        sum="97004b3aba1ee80c0dcecac8fbc1dd8f"
+        proved="true"
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVarbtreeV8aNodeaRedV7V4V5V6ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftIarbtreeV8V0FIiainfix =V9V1ainfix =V10V2amemtV3V9V10qamemtV7V9V10FAamemtV7V1V2AarbtreeV11V7ICV3aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV11V7IarbtreeV11V3FAabstV7FIarbtreeV12V3EAabstV3Iainfix <V1V4aNodeaBlackVVVVtIarbtreeV17V0EAabstV0FFF">
+        <label
+         name="expl:parameter insert">
+         </label>
+        <proof
+         prover="1"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof
+         prover="0"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.10"/>
+        </proof>
+        <proof
+         prover="2"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter insert.3.4"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        loclnum="246" loccnumb="10" loccnume="16"
+        expl="parameter insert"
+        sum="4c90e2b4cc786f5c8f945618ebeabe08"
+        proved="true"
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVamemtaNodeaRedV7V4V5V6V1V2Iiainfix =V8V1ainfix =V9V2amemtV3V8V9qamemtV7V8V9FAamemtV7V1V2AarbtreeV10V7ICV3aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV10V7IarbtreeV10V3FAabstV7FIarbtreeV11V3EAabstV3Iainfix <V1V4aNodeaBlackVVVVtIarbtreeV16V0EAabstV0FFF">
+        <label
+         name="expl:parameter insert">
+         </label>
+        <proof
+         prover="1"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof
+         prover="0"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.00"/>
+        </proof>
+        <proof
+         prover="2"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter insert.3.5"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        loclnum="246" loccnumb="10" loccnume="16"
+        expl="parameter insert"
+        sum="e466b7b65dce1eef4ec72c0dc853594f"
+        proved="true"
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVainfix =V9V2Iainfix =V8V1IamemtaNodeaRedV7V4V5V6V8V9FIiainfix =V10V1ainfix =V11V2amemtV3V10V11qamemtV7V10V11FAamemtV7V1V2AarbtreeV12V7ICV3aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV12V7IarbtreeV12V3FAabstV7FIarbtreeV13V3EAabstV3Iainfix <V1V4aNodeaBlackVVVVtIarbtreeV18V0EAabstV0FFF">
+        <label
+         name="expl:parameter insert">
+         </label>
+        <proof
+         prover="0"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.10"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter insert.3.6"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        loclnum="246" loccnumb="10" loccnume="16"
+        expl="parameter insert"
+        sum="0e7ef55cd167abb8bbcc8b2e02e1a55b"
+        proved="true"
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVamemtV0V8V9Iainfix =V8V1NIamemtaNodeaRedV7V4V5V6V8V9FIiainfix =V10V1ainfix =V11V2amemtV3V10V11qamemtV7V10V11FAamemtV7V1V2AarbtreeV12V7ICV3aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV12V7IarbtreeV12V3FAabstV7FIarbtreeV13V3EAabstV3Iainfix <V1V4aNodeaBlackVVVVtIarbtreeV18V0EAabstV0FFF">
+        <label
+         name="expl:parameter insert">
+         </label>
+        <proof
+         prover="1"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="3.88"/>
+        </proof>
+        <proof
+         prover="0"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.09"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter insert.3.7"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        loclnum="246" loccnumb="10" loccnume="16"
+        expl="parameter insert"
+        sum="9015d2e89f8cf5052bcdc85a39c2f72d"
+        proved="true"
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVamemtaNodeaRedV7V4V5V6V8V9Iiainfix =V8V1ainfix =V9V2amemtV0V8V9FIiainfix =V10V1ainfix =V11V2amemtV3V10V11qamemtV7V10V11FAamemtV7V1V2AarbtreeV12V7ICV3aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV12V7IarbtreeV12V3FAabstV7FIarbtreeV13V3EAabstV3Iainfix <V1V4aNodeaBlackVVVVtIarbtreeV18V0EAabstV0FFF">
+        <label
+         name="expl:parameter insert">
+         </label>
+        <proof
+         prover="1"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="3.63"/>
+        </proof>
+        <proof
+         prover="0"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.03"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter insert.4"
+      locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+      loclnum="246" loccnumb="10" loccnume="16"
+      expl="parameter insert"
+      sum="cd338b3f4414ea497fc831b8c235a043"
+      proved="true"
+      expanded="false"
+      shape="CV0aLeaftaNodeaRedVVVVarbtreeV7V6EAabstV6Iainfix <V4V1Iainfix <V1V4NaNodeaBlackVVVVtIarbtreeV12V0EAabstV0FFF">
+      <label
+       name="expl:parameter insert">
+       </label>
+      <proof
+       prover="1"
+       timelimit="5"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="0"
+       timelimit="5"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insert.5"
+      locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+      loclnum="246" loccnumb="10" loccnume="16"
+      expl="parameter insert"
+      sum="e0d5a53febecb031a3a21c64149924cd"
+      proved="true"
+      expanded="true"
+      shape="CV0aLeaftaNodeaRedVVVViainfix =V8V1ainfix =V9V2amemtV0V8V9qamemtaNodeaRedV3V4V5V7V8V9FAamemtaNodeaRedV3V4V5V7V1V2AarbtreeV10aNodeaRedV3V4V5V7ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV10aNodeaRedV3V4V5V7IarbtreeV10V0FAabstaNodeaRedV3V4V5V7Iiainfix =V11V1ainfix =V12V2amemtV6V11V12qamemtV7V11V12FAamemtV7V1V2AarbtreeV13V7ICV6aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV13V7IarbtreeV13V6FAabstV7FIarbtreeV14V6EAabstV6Iainfix <V4V1Iainfix <V1V4NaNodeaBlackVVVVtIarbtreeV19V0EAabstV0FFF">
+      <label
+       name="expl:parameter insert">
+       </label>
+      <transf
+       name="split_goal"
+       proved="true"
+       expanded="true">
+       <goal
+        name="WP_parameter insert.5.1"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        loclnum="246" loccnumb="10" loccnume="16"
+        expl="parameter insert"
+        sum="a243f763e07198e4d0093d71afc35c9a"
+        proved="true"
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVabstaNodeaRedV3V4V5V7Iiainfix =V8V1ainfix =V9V2amemtV6V8V9qamemtV7V8V9FAamemtV7V1V2AarbtreeV10V7ICV6aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV10V7IarbtreeV10V6FAabstV7FIarbtreeV11V6EAabstV6Iainfix <V4V1Iainfix <V1V4NaNodeaBlackVVVVtIarbtreeV16V0EAabstV0FFF">
+        <label
+         name="expl:parameter insert">
+         </label>
+        <proof
+         prover="0"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.04"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter insert.5.2"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        loclnum="246" loccnumb="10" loccnume="16"
+        expl="parameter insert"
+        sum="e3504ad577c66fe4901ce0e4b572697e"
+        proved="true"
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVaalmost_rbtreeV8aNodeaRedV3V4V5V7IarbtreeV8V0FIiainfix =V9V1ainfix =V10V2amemtV6V9V10qamemtV7V9V10FAamemtV7V1V2AarbtreeV11V7ICV6aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV11V7IarbtreeV11V6FAabstV7FIarbtreeV12V6EAabstV6Iainfix <V4V1Iainfix <V1V4NaNodeaBlackVVVVtIarbtreeV17V0EAabstV0FFF">
+        <label
+         name="expl:parameter insert">
+         </label>
+        <proof
+         prover="1"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="2.47"/>
+        </proof>
+        <proof
+         prover="2"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="2.77"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter insert.5.3"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        loclnum="246" loccnumb="10" loccnume="16"
+        expl="parameter insert"
+        sum="1197491ae07536ab62db92b40cad6283"
+        proved="true"
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVarbtreeV8aNodeaRedV3V4V5V7ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftIarbtreeV8V0FIiainfix =V9V1ainfix =V10V2amemtV6V9V10qamemtV7V9V10FAamemtV7V1V2AarbtreeV11V7ICV6aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV11V7IarbtreeV11V6FAabstV7FIarbtreeV12V6EAabstV6Iainfix <V4V1Iainfix <V1V4NaNodeaBlackVVVVtIarbtreeV17V0EAabstV0FFF">
+        <label
+         name="expl:parameter insert">
+         </label>
+        <proof
+         prover="1"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof
+         prover="0"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.14"/>
+        </proof>
+        <proof
+         prover="2"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.03"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter insert.5.4"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        loclnum="246" loccnumb="10" loccnume="16"
+        expl="parameter insert"
+        sum="23b1e7da40d8ea8c50ac9de5ae8e1f09"
+        proved="true"
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVamemtaNodeaRedV3V4V5V7V1V2Iiainfix =V8V1ainfix =V9V2amemtV6V8V9qamemtV7V8V9FAamemtV7V1V2AarbtreeV10V7ICV6aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV10V7IarbtreeV10V6FAabstV7FIarbtreeV11V6EAabstV6Iainfix <V4V1Iainfix <V1V4NaNodeaBlackVVVVtIarbtreeV16V0EAabstV0FFF">
+        <label
+         name="expl:parameter insert">
+         </label>
+        <proof
+         prover="1"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof
+         prover="0"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+        <proof
+         prover="2"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter insert.5.5"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        loclnum="246" loccnumb="10" loccnume="16"
+        expl="parameter insert"
+        sum="bb9e884677b24f00cc87ea08b490d14c"
+        proved="true"
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVainfix =V9V2Iainfix =V8V1IamemtaNodeaRedV3V4V5V7V8V9FIiainfix =V10V1ainfix =V11V2amemtV6V10V11qamemtV7V10V11FAamemtV7V1V2AarbtreeV12V7ICV6aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV12V7IarbtreeV12V6FAabstV7FIarbtreeV13V6EAabstV6Iainfix <V4V1Iainfix <V1V4NaNodeaBlackVVVVtIarbtreeV18V0EAabstV0FFF">
+        <label
+         name="expl:parameter insert">
+         </label>
+        <proof
+         prover="1"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="3.58"/>
+        </proof>
+        <proof
+         prover="0"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.13"/>
+        </proof>
+        <proof
+         prover="2"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="4.13"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter insert.5.6"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        loclnum="246" loccnumb="10" loccnume="16"
+        expl="parameter insert"
+        sum="ab256d5dfedd5dd41f53209cbdade2fd"
+        proved="true"
+        expanded="true"
+        shape="CV0aLeaftaNodeaRedVVVVamemtV0V8V9Iainfix =V8V1NIamemtaNodeaRedV3V4V5V7V8V9FIiainfix =V10V1ainfix =V11V2amemtV6V10V11qamemtV7V10V11FAamemtV7V1V2AarbtreeV12V7ICV6aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV12V7IarbtreeV12V6FAabstV7FIarbtreeV13V6EAabstV6Iainfix <V4V1Iainfix <V1V4NaNodeaBlackVVVVtIarbtreeV18V0EAabstV0FFF">
+        <label
+         name="expl:parameter insert">
+         </label>
+        <proof
+         prover="1"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="3.95"/>
+        </proof>
+        <proof
+         prover="0"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.09"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter insert.5.7"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        loclnum="246" loccnumb="10" loccnume="16"
+        expl="parameter insert"
+        sum="d325db6f515a897d50d5ddcec6ddbdde"
+        proved="true"
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVamemtaNodeaRedV3V4V5V7V8V9Iiainfix =V8V1ainfix =V9V2amemtV0V8V9FIiainfix =V10V1ainfix =V11V2amemtV6V10V11qamemtV7V10V11FAamemtV7V1V2AarbtreeV12V7ICV6aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV12V7IarbtreeV12V6FAabstV7FIarbtreeV13V6EAabstV6Iainfix <V4V1Iainfix <V1V4NaNodeaBlackVVVVtIarbtreeV18V0EAabstV0FFF">
+        <label
+         name="expl:parameter insert">
+         </label>
+        <proof
+         prover="1"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="4.02"/>
+        </proof>
+        <proof
+         prover="0"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.04"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter insert.6"
+      locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+      loclnum="246" loccnumb="10" loccnume="16"
+      expl="parameter insert"
+      sum="20e0a4343e0fa4702f0a355f9abb7ace"
+      proved="true"
+      expanded="false"
+      shape="CV0aLeaftaNodeaRedVVVViainfix =V7V1ainfix =V8V2amemtV0V7V8qamemtaNodeaRedV3V4V2V6V7V8FAamemtaNodeaRedV3V4V2V6V1V2AarbtreeV9aNodeaRedV3V4V2V6ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV9aNodeaRedV3V4V2V6IarbtreeV9V0FAabstaNodeaRedV3V4V2V6Iainfix <V4V1NIainfix <V1V4NaNodeaBlackVVVVtIarbtreeV14V0EAabstV0FFF">
+      <label
+       name="expl:parameter insert">
+       </label>
+      <proof
+       prover="0"
+       timelimit="5"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.11"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insert.7"
+      locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+      loclnum="246" loccnumb="10" loccnume="16"
+      expl="parameter insert"
+      sum="a69276b73e4895d20f3a9e0f86698d81"
+      proved="true"
+      expanded="false"
+      shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVarbtreeV11V7EAabstV7Iainfix <V1V8IarbtreeV12V0EAabstV0FFF">
+      <label
+       name="expl:parameter insert">
+       </label>
+      <proof
+       prover="1"
+       timelimit="5"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="0"
+       timelimit="5"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.15"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insert.8"
+      locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+      loclnum="246" loccnumb="10" loccnume="16"
+      expl="parameter insert"
+      sum="2510c892fd9e965b3ce35bfac003acdd"
+      proved="true"
+      expanded="false"
+      shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVabstV10AabstV11Aagt_treeV8V10Aalt_treeV8V11Iiainfix =V12V1ainfix =V13V2amemtV7V12V13qamemtV11V12V13FAamemtV11V1V2AarbtreeV14V11ICV7aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV14V11IarbtreeV14V7FAabstV11FIarbtreeV15V7EAabstV7Iainfix <V1V8IarbtreeV16V0EAabstV0FFF">
+      <label
+       name="expl:parameter insert">
+       </label>
+      <proof
+       prover="0"
+       timelimit="5"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.06"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insert.9"
+      locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+      loclnum="246" loccnumb="10" loccnume="16"
+      expl="parameter insert"
+      sum="b3bd43047455d13c4bbbbf85ab83d46f"
+      proved="true"
+      expanded="false"
+      shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVViainfix =V13V1ainfix =V14V2amemtV0V13V14qamemtV12V13V14FAamemtV12V1V2AarbtreeV15V12ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV15V12IarbtreeV15V0FAabstV12Iiainfix =V16V8ainfix =V17V9amemtV10V16V17OamemtV11V16V17qamemtV12V16V17FAarbtreeainfix +V18c1V12IarbtreeV18V10Iaalmost_rbtreeV18V11FAabstV12FIabstV10AabstV11Aagt_treeV8V10Aalt_treeV8V11Iiainfix =V19V1ainfix =V20V2amemtV7V19V20qamemtV11V19V20FAamemtV11V1V2AarbtreeV21V11ICV7aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV21V11IarbtreeV21V7FAabstV11FIarbtreeV22V7EAabstV7Iainfix <V1V8IarbtreeV23V0EAabstV0FFF">
+      <label
+       name="expl:parameter insert">
+       </label>
+      <transf
+       name="split_goal"
+       proved="true"
+       expanded="true">
+       <goal
+        name="WP_parameter insert.9.1"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        loclnum="246" loccnumb="10" loccnume="16"
+        expl="parameter insert"
+        sum="06383930d7860fbbeadf31bd94f8a924"
+        proved="true"
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVabstV12Iiainfix =V13V8ainfix =V14V9amemtV10V13V14OamemtV11V13V14qamemtV12V13V14FAarbtreeainfix +V15c1V12IarbtreeV15V10Iaalmost_rbtreeV15V11FAabstV12FIabstV10AabstV11Aagt_treeV8V10Aalt_treeV8V11Iiainfix =V16V1ainfix =V17V2amemtV7V16V17qamemtV11V16V17FAamemtV11V1V2AarbtreeV18V11ICV7aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV18V11IarbtreeV18V7FAabstV11FIarbtreeV19V7EAabstV7Iainfix <V1V8IarbtreeV20V0EAabstV0FFF">
+        <label
+         name="expl:parameter insert">
+         </label>
+        <proof
+         prover="1"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof
+         prover="0"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+        <proof
+         prover="2"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter insert.9.2"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        loclnum="246" loccnumb="10" loccnume="16"
+        expl="parameter insert"
+        sum="b50bb3adfc63aa2a57a378c63bd3ee97"
+        proved="true"
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVaalmost_rbtreeV13V12IarbtreeV13V0FIiainfix =V14V8ainfix =V15V9amemtV10V14V15OamemtV11V14V15qamemtV12V14V15FAarbtreeainfix +V16c1V12IarbtreeV16V10Iaalmost_rbtreeV16V11FAabstV12FIabstV10AabstV11Aagt_treeV8V10Aalt_treeV8V11Iiainfix =V17V1ainfix =V18V2amemtV7V17V18qamemtV11V17V18FAamemtV11V1V2AarbtreeV19V11ICV7aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV19V11IarbtreeV19V7FAabstV11FIarbtreeV20V7EAabstV7Iainfix <V1V8IarbtreeV21V0EAabstV0FFF">
+        <label
+         name="expl:parameter insert">
+         </label>
+        <proof
+         prover="1"
+         timelimit="100"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="27.56"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter insert.9.3"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        loclnum="246" loccnumb="10" loccnume="16"
+        expl="parameter insert"
+        sum="a2c49fdb0dd8f3947fa84ed93c2cc882"
+        proved="true"
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVarbtreeV13V12ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftIarbtreeV13V0FIiainfix =V14V8ainfix =V15V9amemtV10V14V15OamemtV11V14V15qamemtV12V14V15FAarbtreeainfix +V16c1V12IarbtreeV16V10Iaalmost_rbtreeV16V11FAabstV12FIabstV10AabstV11Aagt_treeV8V10Aalt_treeV8V11Iiainfix =V17V1ainfix =V18V2amemtV7V17V18qamemtV11V17V18FAamemtV11V1V2AarbtreeV19V11ICV7aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV19V11IarbtreeV19V7FAabstV11FIarbtreeV20V7EAabstV7Iainfix <V1V8IarbtreeV21V0EAabstV0FFF">
+        <label
+         name="expl:parameter insert">
+         </label>
+        <proof
+         prover="1"
+         timelimit="100"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="54.51"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter insert.9.4"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        loclnum="246" loccnumb="10" loccnume="16"
+        expl="parameter insert"
+        sum="67531f54805f0953528f44340a6bf5d5"
+        proved="true"
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVamemtV12V1V2Iiainfix =V13V8ainfix =V14V9amemtV10V13V14OamemtV11V13V14qamemtV12V13V14FAarbtreeainfix +V15c1V12IarbtreeV15V10Iaalmost_rbtreeV15V11FAabstV12FIabstV10AabstV11Aagt_treeV8V10Aalt_treeV8V11Iiainfix =V16V1ainfix =V17V2amemtV7V16V17qamemtV11V16V17FAamemtV11V1V2AarbtreeV18V11ICV7aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV18V11IarbtreeV18V7FAabstV11FIarbtreeV19V7EAabstV7Iainfix <V1V8IarbtreeV20V0EAabstV0FFF">
+        <label
+         name="expl:parameter insert">
+         </label>
+        <proof
+         prover="1"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.08"/>
+        </proof>
+        <proof
+         prover="0"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+        <proof
+         prover="2"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.10"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter insert.9.5"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        loclnum="246" loccnumb="10" loccnume="16"
+        expl="parameter insert"
+        sum="c83d75f21650fb044bec52c6a53451e1"
+        proved="true"
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVainfix =V14V2Iainfix =V13V1IamemtV12V13V14FIiainfix =V15V8ainfix =V16V9amemtV10V15V16OamemtV11V15V16qamemtV12V15V16FAarbtreeainfix +V17c1V12IarbtreeV17V10Iaalmost_rbtreeV17V11FAabstV12FIabstV10AabstV11Aagt_treeV8V10Aalt_treeV8V11Iiainfix =V18V1ainfix =V19V2amemtV7V18V19qamemtV11V18V19FAamemtV11V1V2AarbtreeV20V11ICV7aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV20V11IarbtreeV20V7FAabstV11FIarbtreeV21V7EAabstV7Iainfix <V1V8IarbtreeV22V0EAabstV0FFF">
+        <label
+         name="expl:parameter insert">
+         </label>
+        <proof
+         prover="1"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="1.00"/>
+        </proof>
+        <proof
+         prover="0"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.29"/>
+        </proof>
+        <proof
+         prover="2"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.82"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter insert.9.6"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        loclnum="246" loccnumb="10" loccnume="16"
+        expl="parameter insert"
+        sum="cfe62447dc2027e0d4fbd93375dc55b3"
+        proved="true"
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVamemtV0V13V14Iainfix =V13V1NIamemtV12V13V14FIiainfix =V15V8ainfix =V16V9amemtV10V15V16OamemtV11V15V16qamemtV12V15V16FAarbtreeainfix +V17c1V12IarbtreeV17V10Iaalmost_rbtreeV17V11FAabstV12FIabstV10AabstV11Aagt_treeV8V10Aalt_treeV8V11Iiainfix =V18V1ainfix =V19V2amemtV7V18V19qamemtV11V18V19FAamemtV11V1V2AarbtreeV20V11ICV7aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV20V11IarbtreeV20V7FAabstV11FIarbtreeV21V7EAabstV7Iainfix <V1V8IarbtreeV22V0EAabstV0FFF">
+        <label
+         name="expl:parameter insert">
+         </label>
+        <proof
+         prover="1"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="1.16"/>
+        </proof>
+        <proof
+         prover="0"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.24"/>
+        </proof>
+        <proof
+         prover="2"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="1.05"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter insert.9.7"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        loclnum="246" loccnumb="10" loccnume="16"
+        expl="parameter insert"
+        sum="19cd453419e33329a8937cc10f31f82a"
+        proved="true"
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVamemtV12V13V14Iiainfix =V13V1ainfix =V14V2amemtV0V13V14FIiainfix =V15V8ainfix =V16V9amemtV10V15V16OamemtV11V15V16qamemtV12V15V16FAarbtreeainfix +V17c1V12IarbtreeV17V10Iaalmost_rbtreeV17V11FAabstV12FIabstV10AabstV11Aagt_treeV8V10Aalt_treeV8V11Iiainfix =V18V1ainfix =V19V2amemtV7V18V19qamemtV11V18V19FAamemtV11V1V2AarbtreeV20V11ICV7aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV20V11IarbtreeV20V7FAabstV11FIarbtreeV21V7EAabstV7Iainfix <V1V8IarbtreeV22V0EAabstV0FFF">
+        <label
+         name="expl:parameter insert">
+         </label>
+        <proof
+         prover="0"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.09"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter insert.10"
+      locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+      loclnum="246" loccnumb="10" loccnume="16"
+      expl="parameter insert"
+      sum="9da6e65047dce23c3ce5cc1d1bd29c52"
+      proved="true"
+      expanded="false"
+      shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVarbtreeV11V10EAabstV10Iainfix <V8V1Iainfix <V1V8NIarbtreeV12V0EAabstV0FFF">
+      <label
+       name="expl:parameter insert">
+       </label>
+      <proof
+       prover="1"
+       timelimit="5"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="0"
+       timelimit="5"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.14"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insert.11"
+      locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+      loclnum="246" loccnumb="10" loccnume="16"
+      expl="parameter insert"
+      sum="3a35da936c9f6699abad52d9c30514bb"
+      proved="true"
+      expanded="false"
+      shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVabstV11AabstV7Aagt_treeV8V11Aalt_treeV8V7Iiainfix =V12V1ainfix =V13V2amemtV10V12V13qamemtV11V12V13FAamemtV11V1V2AarbtreeV14V11ICV10aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV14V11IarbtreeV14V10FAabstV11FIarbtreeV15V10EAabstV10Iainfix <V8V1Iainfix <V1V8NIarbtreeV16V0EAabstV0FFF">
+      <label
+       name="expl:parameter insert">
+       </label>
+      <proof
+       prover="0"
+       timelimit="5"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.06"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insert.12"
+      locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+      loclnum="246" loccnumb="10" loccnume="16"
+      expl="parameter insert"
+      sum="0d8f6eed1fa3b4ab5841271ca3d277d4"
+      proved="true"
+      expanded="true"
+      shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVViainfix =V13V1ainfix =V14V2amemtV0V13V14qamemtV12V13V14FAamemtV12V1V2AarbtreeV15V12ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV15V12IarbtreeV15V0FAabstV12Iiainfix =V16V8ainfix =V17V9amemtV11V16V17OamemtV7V16V17qamemtV12V16V17FAarbtreeainfix +V18c1V12IarbtreeV18V7Iaalmost_rbtreeV18V11FAabstV12FIabstV11AabstV7Aagt_treeV8V11Aalt_treeV8V7Iiainfix =V19V1ainfix =V20V2amemtV10V19V20qamemtV11V19V20FAamemtV11V1V2AarbtreeV21V11ICV10aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV21V11IarbtreeV21V10FAabstV11FIarbtreeV22V10EAabstV10Iainfix <V8V1Iainfix <V1V8NIarbtreeV23V0EAabstV0FFF">
+      <label
+       name="expl:parameter insert">
+       </label>
+      <transf
+       name="split_goal"
+       proved="true"
+       expanded="true">
+       <goal
+        name="WP_parameter insert.12.1"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        loclnum="246" loccnumb="10" loccnume="16"
+        expl="parameter insert"
+        sum="d9c58c4d080903cd54daa9e8103132d8"
+        proved="true"
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVabstV12Iiainfix =V13V8ainfix =V14V9amemtV11V13V14OamemtV7V13V14qamemtV12V13V14FAarbtreeainfix +V15c1V12IarbtreeV15V7Iaalmost_rbtreeV15V11FAabstV12FIabstV11AabstV7Aagt_treeV8V11Aalt_treeV8V7Iiainfix =V16V1ainfix =V17V2amemtV10V16V17qamemtV11V16V17FAamemtV11V1V2AarbtreeV18V11ICV10aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV18V11IarbtreeV18V10FAabstV11FIarbtreeV19V10EAabstV10Iainfix <V8V1Iainfix <V1V8NIarbtreeV20V0EAabstV0FFF">
+        <label
+         name="expl:parameter insert">
+         </label>
+        <proof
+         prover="1"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof
+         prover="0"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+        <proof
+         prover="2"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter insert.12.2"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        loclnum="246" loccnumb="10" loccnume="16"
+        expl="parameter insert"
+        sum="7bd78e604e6c96c0814a69e50a869ded"
+        proved="true"
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVaalmost_rbtreeV13V12IarbtreeV13V0FIiainfix =V14V8ainfix =V15V9amemtV11V14V15OamemtV7V14V15qamemtV12V14V15FAarbtreeainfix +V16c1V12IarbtreeV16V7Iaalmost_rbtreeV16V11FAabstV12FIabstV11AabstV7Aagt_treeV8V11Aalt_treeV8V7Iiainfix =V17V1ainfix =V18V2amemtV10V17V18qamemtV11V17V18FAamemtV11V1V2AarbtreeV19V11ICV10aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV19V11IarbtreeV19V10FAabstV11FIarbtreeV20V10EAabstV10Iainfix <V8V1Iainfix <V1V8NIarbtreeV21V0EAabstV0FFF">
+        <label
+         name="expl:parameter insert">
+         </label>
+        <proof
+         prover="1"
+         timelimit="100"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="33.87"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter insert.12.3"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        loclnum="246" loccnumb="10" loccnume="16"
+        expl="parameter insert"
+        sum="da2aaae467a45b7e1b9b4f9f939f4845"
+        proved="true"
+        expanded="true"
+        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVarbtreeV13V12ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftIarbtreeV13V0FIiainfix =V14V8ainfix =V15V9amemtV11V14V15OamemtV7V14V15qamemtV12V14V15FAarbtreeainfix +V16c1V12IarbtreeV16V7Iaalmost_rbtreeV16V11FAabstV12FIabstV11AabstV7Aagt_treeV8V11Aalt_treeV8V7Iiainfix =V17V1ainfix =V18V2amemtV10V17V18qamemtV11V17V18FAamemtV11V1V2AarbtreeV19V11ICV10aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV19V11IarbtreeV19V10FAabstV11FIarbtreeV20V10EAabstV10Iainfix <V8V1Iainfix <V1V8NIarbtreeV21V0EAabstV0FFF">
+        <label
+         name="expl:parameter insert">
+         </label>
+        <proof
+         prover="1"
+         timelimit="100"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="58.65"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter insert.12.4"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        loclnum="246" loccnumb="10" loccnume="16"
+        expl="parameter insert"
+        sum="0500c29f3320434e4e65981b2321e14f"
+        proved="true"
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVamemtV12V1V2Iiainfix =V13V8ainfix =V14V9amemtV11V13V14OamemtV7V13V14qamemtV12V13V14FAarbtreeainfix +V15c1V12IarbtreeV15V7Iaalmost_rbtreeV15V11FAabstV12FIabstV11AabstV7Aagt_treeV8V11Aalt_treeV8V7Iiainfix =V16V1ainfix =V17V2amemtV10V16V17qamemtV11V16V17FAamemtV11V1V2AarbtreeV18V11ICV10aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV18V11IarbtreeV18V10FAabstV11FIarbtreeV19V10EAabstV10Iainfix <V8V1Iainfix <V1V8NIarbtreeV20V0EAabstV0FFF">
+        <label
+         name="expl:parameter insert">
+         </label>
+        <proof
+         prover="1"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.09"/>
+        </proof>
+        <proof
+         prover="0"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+        <proof
+         prover="2"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.09"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter insert.12.5"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        loclnum="246" loccnumb="10" loccnume="16"
+        expl="parameter insert"
+        sum="efe0a94c43f289d09cc89130279f8cc8"
+        proved="true"
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVainfix =V14V2Iainfix =V13V1IamemtV12V13V14FIiainfix =V15V8ainfix =V16V9amemtV11V15V16OamemtV7V15V16qamemtV12V15V16FAarbtreeainfix +V17c1V12IarbtreeV17V7Iaalmost_rbtreeV17V11FAabstV12FIabstV11AabstV7Aagt_treeV8V11Aalt_treeV8V7Iiainfix =V18V1ainfix =V19V2amemtV10V18V19qamemtV11V18V19FAamemtV11V1V2AarbtreeV20V11ICV10aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV20V11IarbtreeV20V10FAabstV11FIarbtreeV21V10EAabstV10Iainfix <V8V1Iainfix <V1V8NIarbtreeV22V0EAabstV0FFF">
+        <label
+         name="expl:parameter insert">
+         </label>
+        <proof
+         prover="0"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.36"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter insert.12.6"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        loclnum="246" loccnumb="10" loccnume="16"
+        expl="parameter insert"
+        sum="eccb7df9c9ffc7cadd16edb6f9a57689"
+        proved="true"
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVamemtV0V13V14Iainfix =V13V1NIamemtV12V13V14FIiainfix =V15V8ainfix =V16V9amemtV11V15V16OamemtV7V15V16qamemtV12V15V16FAarbtreeainfix +V17c1V12IarbtreeV17V7Iaalmost_rbtreeV17V11FAabstV12FIabstV11AabstV7Aagt_treeV8V11Aalt_treeV8V7Iiainfix =V18V1ainfix =V19V2amemtV10V18V19qamemtV11V18V19FAamemtV11V1V2AarbtreeV20V11ICV10aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV20V11IarbtreeV20V10FAabstV11FIarbtreeV21V10EAabstV10Iainfix <V8V1Iainfix <V1V8NIarbtreeV22V0EAabstV0FFF">
+        <label
+         name="expl:parameter insert">
+         </label>
+        <proof
+         prover="1"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="1.16"/>
+        </proof>
+        <proof
+         prover="0"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.24"/>
+        </proof>
+        <proof
+         prover="2"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="1.02"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter insert.12.7"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        loclnum="246" loccnumb="10" loccnume="16"
+        expl="parameter insert"
+        sum="84177a3c7c0ef1ff543498e163e28baf"
+        proved="true"
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVamemtV12V13V14Iiainfix =V13V1ainfix =V14V2amemtV0V13V14FIiainfix =V15V8ainfix =V16V9amemtV11V15V16OamemtV7V15V16qamemtV12V15V16FAarbtreeainfix +V17c1V12IarbtreeV17V7Iaalmost_rbtreeV17V11FAabstV12FIabstV11AabstV7Aagt_treeV8V11Aalt_treeV8V7Iiainfix =V18V1ainfix =V19V2amemtV10V18V19qamemtV11V18V19FAamemtV11V1V2AarbtreeV20V11ICV10aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV20V11IarbtreeV20V10FAabstV11FIarbtreeV21V10EAabstV10Iainfix <V8V1Iainfix <V1V8NIarbtreeV22V0EAabstV0FFF">
+        <label
+         name="expl:parameter insert">
+         </label>
+        <proof
+         prover="0"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.10"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter insert.13"
+      locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+      loclnum="246" loccnumb="10" loccnume="16"
+      expl="parameter insert"
+      sum="1004c53024921724eae82990ac0c3599"
+      proved="true"
+      expanded="false"
+      shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVViainfix =V11V1ainfix =V12V2amemtV0V11V12qamemtaNodeaBlackV7V8V2V10V11V12FAamemtaNodeaBlackV7V8V2V10V1V2AarbtreeV13aNodeaBlackV7V8V2V10ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV13aNodeaBlackV7V8V2V10IarbtreeV13V0FAabstaNodeaBlackV7V8V2V10Iainfix <V8V1NIainfix <V1V8NIarbtreeV14V0EAabstV0FFF">
+      <label
+       name="expl:parameter insert">
+       </label>
+      <proof
+       prover="0"
+       timelimit="5"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.22"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+   <goal
+    name="WP_parameter add"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    loclnum="269" loccnumb="6" loccnume="9"
+    expl="parameter add"
+    sum="c8cd9beab6254b7379aac490a151f74f"
+    proved="true"
+    expanded="false"
+    shape="CV3aNodewVVVViainfix =V8V1ainfix =V9V2amemtV0V8V9qamemtaNodeaBlackV4V5V6V7V8V9FAamemtaNodeaBlackV4V5V6V7V1V2AarbtreeV10aNodeaBlackV4V5V6V7EAabstaNodeaBlackV4V5V6V7aLeaffIiainfix =V11V1ainfix =V12V2amemtV0V11V12qamemtV3V11V12FAamemtV3V1V2AarbtreeV13V3ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV13V3IarbtreeV13V0FAabstV3FAarbtreeV14V0EAabstV0IarbtreeV15V0EAabstV0FFF">
+    <label
+     name="expl:parameter add">
+     </label>
+    <transf
+     name="split_goal"
+     proved="true"
+     expanded="true">
+     <goal
+      name="WP_parameter add.1"
+      locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+      loclnum="269" loccnumb="6" loccnume="9"
+      expl="precondition"
+      sum="08f8b620c36fe7fa96e7b811a3779ddd"
+      proved="true"
+      expanded="false"
+      shape="arbtreeV3V0EAabstV0IarbtreeV4V0EAabstV0FFF">
+      <label
+       name="expl:parameter add">
+       </label>
+      <proof
+       prover="1"
+       timelimit="5"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="0"
+       timelimit="5"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter add.2"
+      locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+      loclnum="269" loccnumb="6" loccnume="9"
+      expl="parameter add"
+      sum="35346021b124ac923dfa0683eca1d417"
+      proved="true"
+      expanded="false"
+      shape="CV3aNodewVVVViainfix =V8V1ainfix =V9V2amemtV0V8V9qamemtaNodeaBlackV4V5V6V7V8V9FAamemtaNodeaBlackV4V5V6V7V1V2AarbtreeV10aNodeaBlackV4V5V6V7EAabstaNodeaBlackV4V5V6V7aLeaftIiainfix =V11V1ainfix =V12V2amemtV0V11V12qamemtV3V11V12FAamemtV3V1V2AarbtreeV13V3ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV13V3IarbtreeV13V0FAabstV3FIarbtreeV14V0EAabstV0IarbtreeV15V0EAabstV0FFF">
+      <label
+       name="expl:parameter add">
+       </label>
+      <transf
+       name="split_goal"
+       proved="true"
+       expanded="true">
+       <goal
+        name="WP_parameter add.2.1"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        loclnum="269" loccnumb="6" loccnume="9"
+        expl="parameter add"
+        sum="6d22a9f694169b9697654103b8ed3e0f"
+        proved="true"
+        expanded="false"
+        shape="CV3aNodewVVVVabstaNodeaBlackV4V5V6V7aLeaftIiainfix =V8V1ainfix =V9V2amemtV0V8V9qamemtV3V8V9FAamemtV3V1V2AarbtreeV10V3ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV10V3IarbtreeV10V0FAabstV3FIarbtreeV11V0EAabstV0IarbtreeV12V0EAabstV0FFF">
+        <label
+         name="expl:parameter add">
+         </label>
+        <proof
+         prover="1"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+        <proof
+         prover="0"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+        <proof
+         prover="2"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter add.2.2"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        loclnum="269" loccnumb="6" loccnume="9"
+        expl="parameter add"
+        sum="24ca99fd23aec1bf03fe50f00a2e8193"
+        proved="true"
+        expanded="false"
+        shape="CV3aNodewVVVVarbtreeV8aNodeaBlackV4V5V6V7EaLeaftIiainfix =V9V1ainfix =V10V2amemtV0V9V10qamemtV3V9V10FAamemtV3V1V2AarbtreeV11V3ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV11V3IarbtreeV11V0FAabstV3FIarbtreeV12V0EAabstV0IarbtreeV13V0EAabstV0FFF">
+        <label
+         name="expl:parameter add">
+         </label>
+        <transf
+         name="inline_goal"
+         proved="true"
+         expanded="true">
+         <goal
+          name="WP_parameter add.2.2.1"
+          locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+          loclnum="269" loccnumb="6" loccnume="9"
+          expl="parameter add"
+          sum="1953e6601e048d7f87bfee2f001bcecb"
+          proved="true"
+          expanded="false"
+          shape="CV3aNodewVVVVarbtreeV8aNodeaBlackV4V5V6V7EaLeaftIiainfix =V9V1ainfix =V10V2amemtV0V9V10qamemtV3V9V10FAamemtV3V1V2AarbtreeV11V3ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftACV3aLeafainfix =V11c0aNodeaRedVwwVarbtreeV11V13AarbtreeV11V12aNodeaBlackVwwVarbtreeainfix -V11c1V15Aarbtreeainfix -V11c1V14IarbtreeV11V0FAabstV3FIarbtreeV16V0EAabstV0IarbtreeV17V0EAabstV0FFF">
+          <label
+           name="expl:parameter add">
+           </label>
+          <proof
+           prover="3"
+           timelimit="10"
+           edited="vacid_0_red_black_trees_WP_RedBlackTree_WP_parameter_add_1.v"
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="0.54"/>
+          </proof>
+         </goal>
+        </transf>
+       </goal>
+       <goal
+        name="WP_parameter add.2.3"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        loclnum="269" loccnumb="6" loccnume="9"
+        expl="parameter add"
+        sum="f5acea239c2a0caf0a4f5ae15aa0cbde"
+        proved="true"
+        expanded="false"
+        shape="CV3aNodewVVVVamemtaNodeaBlackV4V5V6V7V1V2aLeaftIiainfix =V8V1ainfix =V9V2amemtV0V8V9qamemtV3V8V9FAamemtV3V1V2AarbtreeV10V3ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV10V3IarbtreeV10V0FAabstV3FIarbtreeV11V0EAabstV0IarbtreeV12V0EAabstV0FFF">
+        <label
+         name="expl:parameter add">
+         </label>
+        <proof
+         prover="1"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+        <proof
+         prover="0"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+        <proof
+         prover="2"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter add.2.4"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        loclnum="269" loccnumb="6" loccnume="9"
+        expl="parameter add"
+        sum="3bb9e1f187197a1e63e8878e8c1124b2"
+        proved="true"
+        expanded="false"
+        shape="CV3aNodewVVVVainfix =V9V2Iainfix =V8V1IamemtaNodeaBlackV4V5V6V7V8V9FaLeaftIiainfix =V10V1ainfix =V11V2amemtV0V10V11qamemtV3V10V11FAamemtV3V1V2AarbtreeV12V3ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV12V3IarbtreeV12V0FAabstV3FIarbtreeV13V0EAabstV0IarbtreeV14V0EAabstV0FFF">
+        <label
+         name="expl:parameter add">
+         </label>
+        <proof
+         prover="1"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.12"/>
+        </proof>
+        <proof
+         prover="2"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.14"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter add.2.5"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        loclnum="269" loccnumb="6" loccnume="9"
+        expl="parameter add"
+        sum="39c7a57c52ad93b3a276250aaa61b64e"
+        proved="true"
+        expanded="false"
+        shape="CV3aNodewVVVVamemtV0V8V9Iainfix =V8V1NIamemtaNodeaBlackV4V5V6V7V8V9FaLeaftIiainfix =V10V1ainfix =V11V2amemtV0V10V11qamemtV3V10V11FAamemtV3V1V2AarbtreeV12V3ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV12V3IarbtreeV12V0FAabstV3FIarbtreeV13V0EAabstV0IarbtreeV14V0EAabstV0FFF">
+        <label
+         name="expl:parameter add">
+         </label>
+        <proof
+         prover="1"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+        <proof
+         prover="2"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter add.2.6"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        loclnum="269" loccnumb="6" loccnume="9"
+        expl="parameter add"
+        sum="eee186ad7828937193c20e9714363e1a"
+        proved="true"
+        expanded="false"
+        shape="CV3aNodewVVVVamemtaNodeaBlackV4V5V6V7V8V9Iiainfix =V8V1ainfix =V9V2amemtV0V8V9FaLeaftIiainfix =V10V1ainfix =V11V2amemtV0V10V11qamemtV3V10V11FAamemtV3V1V2AarbtreeV12V3ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV12V3IarbtreeV12V0FAabstV3FIarbtreeV13V0EAabstV0IarbtreeV14V0EAabstV0FFF">
+        <label
+         name="expl:parameter add">
+         </label>
+        <proof
+         prover="1"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof
+         prover="2"
+         timelimit="5"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter add.3"
+      locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+      loclnum="269" loccnumb="6" loccnume="9"
+      expl="parameter add"
+      sum="19091ab4a108c28a376fa62c78b78e76"
+      proved="true"
+      expanded="false"
+      shape="CV3aNodewVVVVtaLeaffIiainfix =V8V1ainfix =V9V2amemtV0V8V9qamemtV3V8V9FAamemtV3V1V2AarbtreeV10V3ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV10V3IarbtreeV10V0FAabstV3FIarbtreeV11V0EAabstV0IarbtreeV12V0EAabstV0FFF">
+      <label
+       name="expl:parameter add">
+       </label>
+      <proof
+       prover="1"
+       timelimit="5"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="0"
+       timelimit="5"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+  </theory>
+  <theory
+   name="WP Vacid0"
+   locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+   loclnum="282" loccnumb="7" loccnume="13"
+   verified="true"
+   expanded="false">
+   <goal
+    name="WP_parameter create"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    loclnum="301" loccnumb="6" loccnume="12"
+    expl="normal postcondition"
+    sum="7037c138c23b8d3df9737ddd9bce7d06"
+    proved="true"
+    expanded="false"
+    shape="ainfix =V2V0qamemaTuple2V0aLeafV1V2FAainfix =V0V0AainvaTuple2V0aLeafF">
+    <label
+     name="expl:parameter create">
+     </label>
+    <proof
+     prover="1"
+     timelimit="5"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="0"
+     timelimit="5"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter replace"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    loclnum="308" loccnumb="6" loccnume="13"
+    expl="parameter replace"
+    sum="291c8855c7b8d4c8bfbd90ca330a0e66"
+    proved="true"
+    expanded="false"
+    shape="iainfix =V7V0ainfix =V8V1amemaTuple2V2V3V7V8qamemaTuple2V5V6V7V8FAainfix =V5V2AainvaTuple2V5V6Iainfix =aTuple2V5V6aTuple2V2V4FIiainfix =V9V0ainfix =V10V1amemtV3V9V10qamemtV4V9V10FAamemtV4V0V1AarbtreeV11V4EAabstV4FAarbtreeV12V3EAabstV3IainvaTuple2V2V3FFF">
+    <label
+     name="expl:parameter replace">
+     </label>
+    <proof
+     prover="1"
+     timelimit="5"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.04"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter lookup"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    loclnum="317" loccnumb="6" loccnume="12"
+    expl="parameter lookup"
+    sum="0fae503ee7b70f1e9f826459ceeb5e6a"
+    proved="true"
+    expanded="false"
+    shape="amemaTuple2V1V2V0V1IamemtV2V0V3NFAamemaTuple2V1V2V0V4IamemtV2V0V4FAabstV2IainvaTuple2V1V2FF">
+    <label
+     name="expl:parameter lookup">
+     </label>
+    <proof
+     prover="1"
+     timelimit="5"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="0"
+     timelimit="5"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter remove"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    loclnum="324" loccnumb="6" loccnume="12"
+    expl="parameter remove"
+    sum="1cd2778b4c4334104650e585d30618a9"
+    proved="true"
+    expanded="false"
+    shape="iainfix =V5V0ainfix =V6V3amemaTuple2V1V2V5V6qamemaTuple2V3V4V5V6FAainfix =V3V1AainvaTuple2V3V4Iiainfix =V7V0ainfix =V8V1amemaTuple2V1V2V7V8qamemaTuple2V3V4V7V8FAainfix =V3V1AainvaTuple2V3V4FAainvaTuple2V1V2IainvaTuple2V1V2FF">
+    <label
+     name="expl:parameter remove">
+     </label>
+    <proof
+     prover="1"
+     timelimit="5"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="0"
+     timelimit="5"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.04"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+  </theory>
+ </file>
+</why3session>

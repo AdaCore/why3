@@ -73,15 +73,29 @@ let config : Whyconf.config = Whyconf.read_config None
 (* the [main] section of the config file *)
 let main : Whyconf.main = Whyconf.get_main config
 (* all the provers detected, from the config file *)
-let provers : Whyconf.config_prover Util.Mstr.t = Whyconf.get_provers config
+let provers : Whyconf.config_prover Whyconf.Mprover.t =
+  Whyconf.get_provers config
 
 (* the [prover alt-ergo] section of the config file *)
 let alt_ergo : Whyconf.config_prover =
   try
-    Util.Mstr.find "alt-ergo" provers
+    Whyconf.prover_by_id config "alt-ergo"
+  with Whyconf.ProverNotFound _ ->
+    eprintf "Prover alt-ergo not installed or not configured@.";
+    exit 0
+
+(*
+(* the [prover alt-ergo] section of the config file *)
+let alt_ergo : Whyconf.config_prover =
+  try
+    let prover = {Whyconf.prover_name = "Alt-Ergo";
+                  prover_version = "0.92.3";
+                  prover_altern = ""} in
+    Whyconf.Mprover.find prover provers
   with Not_found ->
     eprintf "Prover alt-ergo not installed or not configured@.";
     exit 0
+*)
 
 (* builds the environment from the [loadpath] *)
 let env : Env.env = Env.create_env (Whyconf.loadpath main)
@@ -89,7 +103,7 @@ let env : Env.env = Env.create_env (Whyconf.loadpath main)
 (* loading the Alt-Ergo driver *)
 let alt_ergo_driver : Driver.driver =
   try
-    Driver.load_driver env alt_ergo.Whyconf.driver
+    Driver.load_driver env alt_ergo.Whyconf.driver []
   with e ->
     eprintf "Failed to load driver for alt-ergo: %a@."
       Exn_printer.exn_printer e;

@@ -291,6 +291,9 @@ val t_neq : term -> term -> term
 val t_equ_simp : term -> term -> term
 val t_neq_simp : term -> term -> term
 
+val fs_true : lsymbol
+val fs_false: lsymbol
+
 val fs_tuple : int -> lsymbol   (* n-tuple *)
 val t_tuple : term list -> term
 

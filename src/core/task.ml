@@ -54,16 +54,16 @@ let tds_hash tds = Hashweak.tag_hash tds.tds_tag
 type clone_map = tdecl_set Mid.t
 type meta_map = tdecl_set Mmeta.t
 
-let cm_find cm th = Mid.find_default th.th_name tds_empty cm
-let mm_find mm t = Mmeta.find_default t tds_empty mm
+let cm_find cm th = Mid.find_def tds_empty th.th_name cm
+let mm_find mm t = Mmeta.find_def tds_empty t mm
 
-let cm_add cm th td = Mid.change th.th_name (function
+let cm_add cm th td = Mid.change (function
   | None -> Some (tds_singleton td)
-  | Some tds -> Some (tds_add td tds)) cm
+  | Some tds -> Some (tds_add td tds)) th.th_name cm
 
-let mm_add mm t td = Mmeta.change t (function
+let mm_add mm t td = Mmeta.change (function
   | None -> Some (tds_singleton td)
-  | Some tds -> Some (tds_add td tds)) mm
+  | Some tds -> Some (tds_add td tds)) t mm
 
 let mm_add mm t td = if t.meta_excl
   then Mmeta.add t (tds_singleton td) mm

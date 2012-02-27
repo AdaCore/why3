@@ -1,0 +1,22 @@
+(*
+
+BTS 13515
+
+https://gforge.inria.fr/tracker/index.php?func=detail&aid=13515&group_id=2990
+*)
+
+module ExcepAndRec
+
+use import int.Int
+
+exception E
+
+let rec f (x:int) : int =
+  if x = 42 then raise E else
+  try
+    let n = f (x-1) in
+    n
+  with E -> 42
+  end
+
+end

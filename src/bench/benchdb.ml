@@ -53,10 +53,11 @@ let rec goal whyconf env path dbgoal wgoal =
         Db.status_and_time proof_attempt in
       if obsolete then () else
       let prover_name = Db.prover_name prover_id in
-      let driver,command =
+      let driver, extra, command =
         try
-          let p = Mstr.find prover_name (Whyconf.get_provers whyconf) in
-          p.Whyconf.driver ,p.Whyconf.command
+          let p = Whyconf.prover_by_id whyconf prover_name in
+          p.Whyconf.driver, p.Whyconf.extra_drivers,
+          String.concat " " (p.Whyconf.command :: p.Whyconf.extra_options)
         with
       (* TODO add exceptions pehaps inside rc.ml in fact*)
           | Not_found ->
@@ -84,7 +85,7 @@ let rec goal whyconf env path dbgoal wgoal =
       let call_prover : Call_provers.pre_prover_call =
         Driver.prove_task
           ~timelimit:(truncate (ceil (0.1 +. time *. 1.1)))
-          ~command (load_driver env driver) ?old wgoal in
+          ~command (load_driver env driver extra) ?old wgoal in
       BenchUtil.new_external_proof (call_prover,cb)
     with Exit -> ()
   in

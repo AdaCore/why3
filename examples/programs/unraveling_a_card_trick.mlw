@@ -1,0 +1,115 @@
+
+(*
+  Unraveling a Card Trick
+  Tony Hoare and Natarajan Shankar
+  Time for Verification
+  Lecture Notes in Computer Science, 2010, Volume 6200/2010, 195-201,
+  DOI: 10.1007/978-3-642-13754-9_10
+  http://www.springerlink.com/content/gn18673357154448/
+*)
+
+theory GilbreathCardTrick
+
+  use export int.Int
+  use export list.List
+  use export list.Length
+  use export list.Append
+  use export list.Reverse
+  use import list.Nth
+
+  constant m: int
+  axiom m_positive: 0 < m
+
+  constant n: int
+  axiom n_nonnegative: 0 <= n
+
+  (* c is a riffle shuffle of a and b *)
+  inductive shuffle (a b c: list 'a) =
+  | Shuffle_nil_left:
+      forall l: list 'a. shuffle l Nil l
+  | Shuffle_nil_right:
+      forall l: list 'a. shuffle Nil l l
+  | Shuffle_cons_left:
+      forall x: 'a, a b c: list 'a.
+      shuffle a b c -> shuffle (Cons x a) b (Cons x c)
+  | Shuffle_cons_right:
+      forall x: 'a, a b c: list 'a.
+      shuffle a b c -> shuffle a (Cons x b) (Cons x c)
+
+  lemma shuffle_nil_nil_nil: shuffle Nil Nil (Nil: list 'a)
+
+  lemma shuffle_sym:
+     forall a b c: list 'a. shuffle a b c -> shuffle b a c
+
+  lemma shuffle_length:
+    forall a b c: list 'a. shuffle a b c -> length a + length b = length c
+
+  (* the list l is composed of n blocks, each being 0,1,...,m-1 *)
+  predicate suit_ordered (l: list int) =
+    forall i j: int. 0 <= i < n -> 0 <= j < m -> nth (i * m + j) l = Some j
+
+  (* the list l is a sequence of n blocks,
+     each being a permutation of 0,1,...,m-1 *)
+  predicate suit_sorted (l: list int) =
+    (forall i v: int. nth i l = Some v -> 0 <= v < m) /\
+    (forall i j1 j2: int. 0 <= i < n -> 0 <= j1 < m -> 0 <= j2 < m ->
+     nth (i * m + j1) l <> nth (i * m + j2) l)
+
+  (* TODO: prove it! *)
+  axiom gilbreath_card_trick:
+    forall a: list int. length a = n * m -> suit_ordered a ->
+    forall c d: list int. a = c ++ d ->
+    forall b: list int. shuffle c (reverse d) b -> suit_sorted b
+
+end
+
+(* a program implementing the card trick using stacks *)
+module GilbreathCardTrick
+
+  use import GilbreathCardTrick
+  use import module stack.Stack
+
+  let shuffle (a b: t int) =
+    {}
+    'Init:
+    let c = create () in
+    while not (is_empty a && is_empty b) do
+      invariant {
+        exists a' b': list int.
+          reverse (at a.elts 'Init) = reverse a.elts ++ a' /\
+          reverse (at b.elts 'Init) = reverse b.elts ++ b' /\
+          shuffle a' b' c.elts
+      }
+      variant { length a + length b }
+      if not (is_empty a) && (is_empty b || any bool) then
+        push (pop a) c
+      else
+        push (pop b) c
+    done;
+    c
+    { a.elts = Nil /\ b.elts = Nil /\
+      shuffle (reverse (old a.elts)) (reverse (old b.elts)) result.elts }
+
+  let card_trick (a: t int) =
+    { length a = n*m /\ suit_ordered a.elts }
+    'Init:
+    (* cut a into c;d and reverse d in d_ *)
+    let d_ = create () in
+    let cut = any {} int { 0 <= result <= n*m } in
+    for i = 1 to cut do
+      invariant { length a = n*m-i+1 /\ length d_ = i-1 /\
+                  at a.elts 'Init = reverse d_.elts ++ a.elts }
+      push (pop a) d_
+    done;
+    assert { at a.elts 'Init = reverse d_.elts ++ a.elts };
+    (* then suffle c (that is a) and d_ to get b *)
+    shuffle a d_
+    { length result = n*m && suit_sorted result.elts }
+
+end
+
+(*
+Local Variables:
+compile-command: "unset LANG; make -C ../.. examples/programs/unraveling_a_card_trick.gui"
+End:
+*)

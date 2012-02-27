@@ -134,17 +134,17 @@ theory BitVector
   use export bool.Bool
   use import int.Int
 
-  function size : int
+  constant size : int
 
   type bv
 
   function nth bv int: bool
 
-  function bvzero : bv
+  constant bvzero : bv
   axiom Nth_zero:
     forall n:int. 0 <= n < size -> nth bvzero n = False
 
-  function bvone : bv
+  constant bvone : bv
   axiom Nth_one:
     forall n:int. 0 <= n < size -> nth bvone n = True
 
@@ -188,9 +188,9 @@ end
 
 theory BV32
 
-  function size : int = 32
+  constant size : int = 32
 
-  clone export BitVector with function size = size
+  clone export BitVector with constant size = size
 
 end
 

@@ -29,10 +29,13 @@ val debug_type_only : Debug.flag
 
 (** incremental parsing *)
 
-val add_decl : Env.env -> theory Mstr.t -> theory_uc -> Ptree.decl -> theory_uc
+val add_decl : theory_uc -> Ptree.decl -> theory_uc
+
+val add_use_clone :
+  unit Env.library -> theory Mstr.t -> theory_uc -> Ptree.use_clone -> theory_uc
 
 val close_namespace :
-  Loc.position -> bool -> Ptree.ident option -> theory_uc -> theory_uc
+  Loc.position -> bool -> string option -> theory_uc -> theory_uc
 
 val close_theory : Loc.position -> theory Mstr.t -> theory_uc -> theory Mstr.t
 
@@ -50,7 +53,7 @@ val specialize_psymbol :
   Ptree.qualid -> theory_uc -> lsymbol * Denv.dty list
 
 val specialize_tysymbol :
-  Loc.position -> Ptree.qualid -> theory_uc -> Ty.tysymbol * int
+  Loc.position -> Ptree.qualid -> theory_uc -> Ty.tysymbol
 
 type denv
 
@@ -81,6 +84,7 @@ val split_qualid : Ptree.qualid -> string list * string
 val string_list_of_qualid : string list -> Ptree.qualid -> string list
 val qloc : Ptree.qualid -> Loc.position
 
+(*
 val is_projection : theory_uc -> lsymbol -> (tysymbol * lsymbol * int) option
   (** [is_projection uc ls] returns
       - [Some (ts, lsc, i)] if [ls] is the i-th projection of an
@@ -91,4 +95,6 @@ val list_fields: theory_uc ->
   (Ptree.qualid * 'a) list -> tysymbol * lsymbol * (Ptree.loc * 'a) option list
   (** check that the given fields all belong to the same record type
       and do not appear several times *)
+*)
 
+val type_inst: theory_uc -> theory -> Ptree.clone_subst list -> th_inst

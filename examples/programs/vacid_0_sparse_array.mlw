@@ -40,7 +40,7 @@ back   +-+-+-+-------------------+
 
   (* invariant *)
 
-  function maxlen : int = 1000
+  constant maxlen : int = 1000
 
   function length (a: sparse_array 'a) : int = A.length a.values
 
@@ -109,10 +109,10 @@ module Harness
   use import module SparseArray
 
   type elt
-  function def : elt
+  constant def : elt
 
-  function c1 : elt
-  function c2 : elt
+  constant c1 : elt
+  constant c2 : elt
 
   let harness () =
     let a = create 10 def in

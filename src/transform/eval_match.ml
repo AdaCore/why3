@@ -34,19 +34,38 @@ let unfold def tl ty =
   t_ty_subst mt mv e
 
 let is_constructor kn ls = match Mid.find ls.ls_name kn with
-  | { d_node = Dtype _ } -> true
+  | { d_node = Dtype dl } ->
+      let constr = function
+        | _, Talgebraic csl -> List.exists (fun (cs,_) -> ls_equal cs ls) csl
+        | _, Tabstract -> false in
+      List.exists constr dl
   | _ -> false
 
-let rec dive env t = match t.t_node with
-  | Tvar x ->
-      (try dive env (Mvs.find x env) with Not_found -> t)
-  | Tlet (t1, tb) ->
-      let x, t2 = t_open_bound tb in
-      dive (Mvs.add x t1 env) t2
-  | _ -> t_map (dive env) t
+let is_projection kn ls = match Mid.find ls.ls_name kn with
+  | { d_node = Dtype dl } ->
+      let constr = function
+        | _, Talgebraic csl -> List.exists (fun (cs,_) -> ls_equal cs ls) csl
+        | _, Tabstract -> false in
+      not (List.exists constr dl)
+  | _ -> false
+
+let apply_projection kn ls t = t_label_copy t (match t.t_node with
+  | Tapp (cs,tl) ->
+      let ts = match cs.ls_value with
+        | Some { ty_node = Tyapp (ts,_) } -> ts
+        | _ -> assert false in
+      let pjl =
+        try List.assq cs (find_constructors kn ts)
+        with Not_found -> assert false in
+      let find acc v = function
+        | Some pj when ls_equal pj ls -> v
+        | _ -> acc in
+      List.fold_left2 find t_true tl pjl
+  | _ -> assert false)
 
 let make_flat_case kn t bl =
   let mk_b b = let p,t = t_open_branch b in [p],t in
+  let find_constructors kn ts = List.map fst (find_constructors kn ts) in
   Pattern.CompileTerm.compile (find_constructors kn) [t] (List.map mk_b bl)
 
 let rec add_quant kn (vl,tl,f) v =
@@ -56,7 +75,7 @@ let rec add_quant kn (vl,tl,f) v =
     | _ -> []
   in
   match cl with
-    | [ls] ->
+    | [ls,_] ->
         let s = ty_match Mtv.empty (Util.of_option ls.ls_value) ty in
         let mk_v ty = create_vsymbol (id_clone v.vs_name) (ty_inst s ty) in
         let nvl = List.map mk_v ls.ls_args in
@@ -67,65 +86,59 @@ let rec add_quant kn (vl,tl,f) v =
     | _ ->
         (v::vl, tl, f)
 
-let t_label_merge { t_label = l; t_loc = p } t =
-  let p = if t.t_loc = None then p else t.t_loc in
-  t_label ?loc:p (Slab.union l t.t_label) t
+let let_map fn env t1 tb =
+  let x,t2,close = t_open_bound_cb tb in
+  let t2 = fn (Mvs.add x t1 env) t2 in
+  t_let_simp t1 (close x t2)
+
+let branch_map fn env t1 bl =
+  let mk_b b =
+    let p,t2,close = t_open_branch_cb b in close p (fn env t2) in
+  t_case t1 (List.map mk_b bl)
+
+let dive_to_constructor kn fn env t =
+  let rec dive env t = t_label_copy t (match t.t_node with
+    | Tvar x -> dive env (Mvs.find_exn Exit x env)
+    | Tlet (t1,tb) -> let_map dive env t1 tb
+    | Tcase (t1,bl) -> branch_map dive env t1 bl
+    | Tif (f,t1,t2) -> t_if_simp f (dive env t1) (dive env t2)
+    | Tapp (ls,_) when is_constructor kn ls -> fn env t
+    | _ -> raise Exit)
+  in
+  dive env t
 
 let eval_match ~inline kn t =
-  let rec eval env t = match t.t_node with
+  let rec eval env t = t_label_copy t (match t.t_node with
+    | Tapp (ls, [t1]) when is_projection kn ls ->
+        let t1 = eval env t1 in
+        let fn _env t = apply_projection kn ls t in
+        begin try dive_to_constructor kn fn env t1
+        with Exit -> t_app ls [t1] t.t_ty end
     | Tapp (ls, tl) when inline kn ls (List.map t_type tl) t.t_ty ->
         begin match find_logic_definition kn ls with
-          | None ->
-              t_map (eval env) t
-          | Some def ->
-              t_label_merge t (eval env (unfold def tl t.t_ty))
+          | None -> t_map (eval env) t
+          | Some def -> eval env (unfold def tl t.t_ty)
         end
     | Tlet (t1, tb2) ->
         let t1 = eval env t1 in
-        let x, t2, close = t_open_bound_cb tb2 in
-        let t2 = eval (Mvs.add x t1 env) t2 in
-        t_label_merge t (t_let_simp t1 (close x t2))
+        let_map eval env t1 tb2
     | Tcase (t1, bl1) ->
         let t1 = eval env t1 in
-        let t1flat = dive env t1 in
-        let r = try match t1flat.t_node with
-          | Tapp (ls,_) when is_constructor kn ls ->
-              eval env (make_flat_case kn t1flat bl1)
-          | Tcase (t2, bl2) ->
-              let mk_b b =
-                let p,t = t_open_branch b in
-                match t.t_node with
-                  | Tapp (ls,_) when is_constructor kn ls ->
-                      t_close_branch p (eval env (make_flat_case kn t bl1))
-                  | _ -> raise Exit
-              in
-              t_case t2 (List.map mk_b bl2)
-          | _ -> raise Exit
-        with
-          | Exit ->
-              let mk_b b =
-                let p,t,close = t_open_branch_cb b in
-                close p (eval env t)
-              in
-              t_case t1 (List.map mk_b bl1)
-        in
-        t_label_merge t r
+        let fn env t = eval env (make_flat_case kn t bl1) in
+        begin try dive_to_constructor kn fn env t1
+        with Exit -> branch_map eval env t1 bl1 end
     | Tquant (q, qf) ->
         let vl,tl,f,close = t_open_quant_cb qf in
         let vl,tl,f = List.fold_left (add_quant kn) ([],tl,f) vl in
-        t_label_merge t (t_quant_simp q (close (List.rev vl) tl (eval env f)))
+        t_quant_simp q (close (List.rev vl) tl (eval env f))
     | _ ->
-        t_map_simp (eval env) t
+        t_map_simp (eval env) t)
   in
   eval Mvs.empty t
 
 let rec linear vars t = match t.t_node with
-  | Tvar x when Svs.mem x vars ->
-      raise Exit
-  | Tvar x ->
-      Svs.add x vars
-  | _ ->
-      t_fold linear vars t
+  | Tvar x -> Svs.add_new Exit x vars
+  | _ -> t_fold linear vars t
 
 let linear t =
   try ignore (linear Svs.empty t); true with Exit -> false
@@ -152,7 +165,8 @@ let rec inline_nonrec_linear kn ls tyl ty =
   match d.d_node with
     | Dlogic [_, Some def] ->
         begin try Wdecl.find inline_cache d with Not_found ->
-          let _, t = open_ls_defn def in
+          let vl,t = open_ls_defn def in
+          let _,_,t = List.fold_left (add_quant kn) ([],[],t) vl in
           let t = eval_match ~inline:inline_nonrec_linear kn t in
           let res = linear t in
           Wdecl.set inline_cache d res;

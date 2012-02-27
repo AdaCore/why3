@@ -157,7 +157,7 @@ let prio_binop = function
   | Tiff -> 1
 
 let print_label = Pretty.print_label
-let print_labels = Pretty.print_labels
+let print_labels = print_iter1 Slab.iter space print_label
 
 let print_ident_labels fmt id =
   if not (Slab.is_empty id.id_label) then
@@ -166,11 +166,9 @@ let print_ident_labels fmt id =
 let rec print_term fmt t = print_lterm 0 fmt t
 
 and print_lterm pri fmt t =
-  if Slab.is_empty t.t_label then
-     print_tnode pri fmt t
-  else
-     fprintf fmt (protect_on (pri > 0) "%a %a")
-       Pretty.print_labels t.t_label (print_tnode 0) t
+  if Slab.is_empty t.t_label then print_tnode pri fmt t
+  else fprintf fmt (protect_on (pri > 0) "%a %a")
+      print_labels t.t_label (print_tnode 0) t
 
 and print_app pri fs fmt tl =
   match query_syntax fs.ls_name with
@@ -217,7 +215,7 @@ and print_tnode pri fmt t = match t.t_node with
   | Tfalse ->
       fprintf fmt "false"
   | Tbinop (b,f1,f2) ->
-      let asym = Slab.mem Term.asym_label t.t_label in
+      let asym = Slab.mem Term.asym_label f1.t_label in
       let p = prio_binop b in
       fprintf fmt (protect_on (pri > p) "%a %a@ %a")
         (print_lterm (p + 1)) f1 (print_binop ~asym) b (print_lterm p) f2
@@ -239,13 +237,16 @@ let print_tv_arg fmt tv = fprintf fmt "@ %a" print_tv tv
 let print_ty_arg fmt ty = fprintf fmt "@ %a" (print_ty_node true) ty
 let print_vs_arg fmt vs = fprintf fmt "@ (%a)" print_vsty vs
 
-let print_constr ty fmt cs =
-  let ty_val = of_option cs.ls_value in
-  let m = ty_match Mtv.empty ty_val ty in
-  let tl = List.map (ty_inst m) cs.ls_args in
+let print_constr fmt (cs,pjl) =
+  let add_pj pj ty pjl = (pj,ty)::pjl in
+  let print_pj fmt (pj,ty) = match pj with
+    | Some ls -> fprintf fmt "@ (%a:@,%a)" print_ls ls print_ty ty
+    | None -> print_ty_arg fmt ty
+  in
   fprintf fmt "@[<hov 4>| %a%a%a@]" print_cs cs
     print_ident_labels cs.ls_name
-    (print_list nothing print_ty_arg) tl
+    (print_list nothing print_pj)
+    (List.fold_right2 add_pj pjl cs.ls_args [])
 
 let print_type_decl fst fmt (ts,def) = match def with
   | Tabstract -> begin match ts.ts_def with
@@ -261,12 +262,11 @@ let print_type_decl fst fmt (ts,def) = match def with
             (print_list nothing print_tv_arg) ts.ts_args print_ty ty
       end
   | Talgebraic csl ->
-      let ty = ty_app ts (List.map ty_var ts.ts_args) in
       fprintf fmt "@[<hov 2>%s %a%a%a =@\n@[<hov>%a@]@]@\n@\n"
         (if fst then "type" else "with") print_ts ts
         print_ident_labels ts.ts_name
         (print_list nothing print_tv_arg) ts.ts_args
-        (print_list newline (print_constr ty)) csl
+        (print_list newline print_constr) csl
 
 let print_type_decl first fmt d =
   if not (query_remove (fst d).ts_name) then

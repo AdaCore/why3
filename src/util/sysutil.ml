@@ -17,6 +17,13 @@
 (*                                                                        *)
 (**************************************************************************)
 
+let backup_file f =
+  if Sys.file_exists f then begin
+    let fb = f ^ ".bak" in
+    if Sys.file_exists fb then Sys.remove fb;
+    Sys.rename f fb
+  end
+
 let channel_contents_fmt cin fmt =
   let buff = String.make 1024 ' ' in
   let n = ref 0 in
@@ -120,6 +127,18 @@ let copy_file from to_ =
     output cout buff 0 !n
   done
 
+let rec copy_dir from to_ =
+  if not (Sys.file_exists to_) then Unix.mkdir to_ 0o755;
+  let files = Sys.readdir from in
+  let copy fname =
+    let src = Filename.concat from fname in
+    let dst = Filename.concat to_ fname in
+    if Sys.is_directory src
+    then copy_dir src dst
+    else copy_file src dst in
+  Array.iter copy files
+
+
 (* return the absolute path of a given file name.
    this code has been designed to be architecture-independant so
    be very careful if you modify this *)
@@ -194,5 +213,22 @@ let safe_remove =
 (*
 let p1 = relativize_filename "/bin/bash" "src/f.why"
 
-let p1 = relativize_filename "test" "/home/cmarche/recherche/why3/src/ide/f.why"
+let p1 = relativize_filename "test"
+  "/home/cmarche/recherche/why3/src/ide/f.why"
 *)
+
+let uniquify file =
+  (* Uniquify the filename if it exists on disk *)
+  let i =
+    try String.rindex file '.'
+    with _ -> String.length file
+  in
+  let name = String.sub file 0 i in
+  let ext = String.sub file i (String.length file - i) in
+  let i = ref 1 in
+  while Sys.file_exists
+    (name ^ "_" ^ (string_of_int !i) ^ ext) do
+    incr i
+  done;
+  let file = name ^ "_" ^ (string_of_int !i) ^ ext in
+  file

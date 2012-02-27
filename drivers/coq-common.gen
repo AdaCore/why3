@@ -13,6 +13,8 @@ transformation "eliminate_non_struct_recursion"
 
 transformation "eliminate_if"
 
+transformation "eliminate_projections"
+
 transformation "simplify_formula"
 (*transformation "simplify_trivial_quantification_in_goal"*)
 
@@ -27,12 +29,15 @@ theory BuiltIn
   syntax predicate  (=)   "(%1 = %2)"
 end
 
-theory bool.Bool
+theory Bool
 
   syntax type bool   "bool"
 
   syntax function True  "true"
   syntax function False "false"
+end
+
+theory bool.Bool
 
   syntax function andb  "(andb %1 %2)"
   syntax function orb   "(orb %1 %2)"
@@ -72,6 +77,7 @@ theory int.Int
   remove prop NonTrivialRing
   remove prop CompatOrderAdd
   remove prop CompatOrderMult
+  remove prop ZeroLessOne
 
 end
 
@@ -92,7 +98,7 @@ end
 
 (* removed: Coq Zdiv is NOT true Euclidean division:
    Zmod can be negative, in fact (Zmod x y) has the same sign as y,
-   which is not the usual convention of programming language either. 
+   which is not the usual convention of programming language either.
 
 theory int.EuclideanDivision
 
@@ -168,6 +174,7 @@ theory real.Real
   remove prop NonTrivialRing
   remove prop CompatOrderAdd
   remove prop CompatOrderMult
+  remove prop ZeroLessOne
   remove prop Refl
   remove prop Trans
   remove prop Antisymm
@@ -280,3 +287,6 @@ theory real.Trigonometry
   remove prop Sin_pi2
 
 end
+
+(* this file has an extension .aux rather than .gen since it should not be distributed *)
+import "coq-realizations.aux"

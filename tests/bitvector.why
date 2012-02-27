@@ -180,7 +180,8 @@ theory BitVector
     forall n:int. mod n 2 <> 0 -> nth (from_int n) 0 = True
 
   axiom nth_from_int_high:
-     forall n i:int. i > 0 -> nth (from_int n) i = nth (from_int (div n 2)) (i-1)
+     forall n i:int. size>i > 0 -> nth (from_int n) i = nth (from_int (div n 2)) (i-1)
+
 
 end
 

@@ -155,7 +155,7 @@ let pat_wild ty = mk_pattern Pwild Svs.empty ty
 let pat_var v   = mk_pattern (Pvar v) (Svs.singleton v) v.vs_ty
 
 let pat_as p v =
-  let s = Svs.add_new v (DuplicateVar v) p.pat_vars in
+  let s = Svs.add_new (DuplicateVar v) v p.pat_vars in
   mk_pattern (Pas (p,v)) s v.vs_ty
 
 let pat_or p q =
@@ -427,9 +427,10 @@ module Hsterm = Hashcons.Make (struct
     | Tfalse -> 1
 
   let hash t =
+    let comb l = Hashcons.combine (lab_hash l) in
     Hashcons.combine2 (t_hash_node t.t_node)
       (Hashcons.combine_option Loc.hash t.t_loc)
-      (hash_labelset t.t_label)
+      (Slab.fold comb t.t_label (oty_hash t.t_ty))
 
   let t_vars_node = function
     | Tvar v -> Mvs.singleton v 1
@@ -483,13 +484,16 @@ let t_not f         = mk_term (Tnot f) None
 let t_true          = mk_term (Ttrue) None
 let t_false         = mk_term (Tfalse) None
 
-let t_label ?loc l t = Hsterm.hashcons { t with t_label = l; t_loc = loc }
-let t_label_add  l t =
-   Hsterm.hashcons { t with t_label = Slab.add l t.t_label }
+let t_label ?loc l t =
+  Hsterm.hashcons { t with t_label = l; t_loc = loc }
 
-let t_label_copy { t_label = l; t_loc = p } t =
-  let p = if t.t_loc <> None then t.t_loc else p in
-  t_label ?loc:p (Slab.union l t.t_label) t
+let t_label_add l t =
+  Hsterm.hashcons { t with t_label = Slab.add l t.t_label }
+
+let t_label_copy { t_label = lab; t_loc = loc } t =
+  let lab = Slab.union lab t.t_label in
+  let loc = if t.t_loc = None then loc else t.t_loc in
+  Hsterm.hashcons { t with t_label = lab; t_loc = loc }
 
 (* unsafe map *)
 
@@ -595,7 +599,7 @@ let rec t_subst_unsafe m t =
   let nosubst (_,b,_) = Mvs.set_disjoint m b.bv_vars in
   match t.t_node with
   | Tvar u ->
-      Mvs.find_default u t m
+      Mvs.find_def t u m
   | Tlet (e, bt) ->
       let d = t_subst e in
       if t_equal d e && nosubst bt then t else
@@ -772,10 +776,10 @@ let t_or      = t_binary Tor
 let t_implies = t_binary Timplies
 let t_iff     = t_binary Tiff
 
-let asym_label, asym_label_s = singl_pair "asym_split"
+let asym_label = create_label "asym_split"
 
-let t_and_asym t1 t2 = t_label asym_label_s (t_and t1 t2)
-let t_or_asym  t1 t2 = t_label asym_label_s (t_or  t1 t2)
+let t_and_asym t1 t2 = t_and (t_label_add asym_label t1) t2
+let t_or_asym  t1 t2 = t_or  (t_label_add asym_label t1) t2
 
 (* closing constructors *)
 
@@ -797,6 +801,9 @@ let ps_equ =
 
 let t_equ t1 t2 = ps_app ps_equ [t1; t2]
 let t_neq t1 t2 = t_not (ps_app ps_equ [t1; t2])
+
+let fs_true  = create_fsymbol (id_fresh "True") [] ty_bool
+let fs_false = create_fsymbol (id_fresh "False") [] ty_bool
 
 let fs_tuple_ids = Hid.create 17
 
@@ -871,7 +878,7 @@ let rec t_gen_map fnT fnL m t =
   let fn = t_gen_map fnT fnL m in
   t_label_copy t (match t.t_node with
     | Tvar v ->
-        let u = Mvs.find_default v v m in
+        let u = Mvs.find_def v v m in
         ty_equal_check (fnT v.vs_ty) u.vs_ty;
         t_var u
     | Tconst _ ->
@@ -1246,7 +1253,7 @@ let rec t_hash_alpha c m t =
   let fn = t_hash_alpha c m in
   match t.t_node with
   | Tvar v ->
-      Hashcons.combine 0 (Mvs.find_default v (vs_hash v) m)
+      Hashcons.combine 0 (Mvs.find_def (vs_hash v) v m)
   | Tconst c ->
       Hashcons.combine 1 (Hashtbl.hash c)
   | Tapp (s,l) ->
@@ -1421,7 +1428,7 @@ let small t = match t.t_node with
   | _ -> false
 
 let t_let_simp e ((v,b,t) as bt) =
-  let n = Mvs.find_default v 0 t.t_vars in
+  let n = Mvs.find_def 0 v t.t_vars in
   if n = 0 then
     t_subst_unsafe b.bv_subst t else
   if n = 1 || small e then begin
@@ -1431,7 +1438,7 @@ let t_let_simp e ((v,b,t) as bt) =
     t_let e bt
 
 let t_let_close_simp v e t =
-  let n = Mvs.find_default v 0 t.t_vars in
+  let n = Mvs.find_def 0 v t.t_vars in
   if n = 0 then t else
   if n = 1 || small e then
     t_subst_single v e t

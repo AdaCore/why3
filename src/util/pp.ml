@@ -43,7 +43,7 @@ let print_list_or_default default sep print fmt = function
 let print_list_par sep pr fmt l =
   print_list sep (fun fmt x -> fprintf fmt "(%a)" pr x) fmt l
 
-let print_list_delim start stop sep pr fmt = function
+let print_list_delim ~start ~stop ~sep pr fmt = function
   | [] -> ()
   | l -> fprintf fmt "%a%a%a" start () (print_list sep pr) l stop ()
 
@@ -100,6 +100,7 @@ let rchevron fmt () = fprintf fmt ">"
 let nothing _fmt _ = ()
 let string fmt s = fprintf fmt "%s" s
 let constant_string s fmt () = string fmt s
+let print0 fmt () = pp_print_string fmt "\000"
 let add_flush sep fmt x = sep fmt x; pp_print_flush fmt ()
 
 let print_pair pr1 = print_pair_delim lparen comma rparen pr1
@@ -167,6 +168,18 @@ let string_of_wnl p x =
   wnl fmt;
   fprintf fmt "%a@?" p x;
   Buffer.contents b
+
+let sprintf p =
+  let b = Buffer.create 100 in
+  let fmt = formatter_of_buffer b in
+  kfprintf (fun fmt -> Format.pp_print_flush fmt (); Buffer.contents b) fmt p
+
+let sprintf_wnl p =
+  let b = Buffer.create 100 in
+  let fmt = formatter_of_buffer b in
+  wnl fmt;
+  kfprintf (fun fmt -> Format.pp_print_flush fmt (); Buffer.contents b) fmt p
+
 
 module Ansi =
   struct

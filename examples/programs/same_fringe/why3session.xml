@@ -3,110 +3,96 @@
 <why3session
  name="programs/same_fringe/why3session.xml">
  <prover
-  id="alt-ergo"
+  id="0"
   name="Alt-Ergo"
-  version="0.93"/>
+  version="0.94"/>
  <prover
-  id="coq"
-  name="Coq"
-  version="8.3pl2"/>
- <prover
-  id="cvc3"
+  id="1"
   name="CVC3"
   version="2.2"/>
- <prover
-  id="eprover"
-  name="Eprover"
-  version="1.4 Namring"/>
- <prover
-  id="gappa"
-  name="Gappa"
-  version="0.15.1"/>
- <prover
-  id="simplify"
-  name="Simplify"
-  version="1.5.4"/>
- <prover
-  id="spass"
-  name="Spass"
-  version="3.7"/>
- <prover
-  id="vampire"
-  name="Vampire"
-  version="0.6"/>
- <prover
-  id="verit"
-  name="veriT"
-  version="dev"/>
- <prover
-  id="yices"
-  name="Yices"
-  version="1.0.25"/>
- <prover
-  id="z3"
-  name="Z3"
-  version="2.19"/>
  <file
   name="../same_fringe.mlw"
   verified="true"
-  expanded="true">
+  expanded="false">
   <theory
    name="WP SameFringe"
+   locfile="programs/same_fringe/../same_fringe.mlw"
+   loclnum="8" loccnumb="7" loccnume="17"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter enum"
+    locfile="programs/same_fringe/../same_fringe.mlw"
+    loclnum="41" loccnumb="10" loccnume="14"
     expl="parameter enum"
-    sum="f4c7cbd2b5ffcf76c1aba00c55bb0220"
+    sum="b3811ee857d1c604089863194596e7ff"
     proved="true"
     expanded="true"
     shape="CV0aEmptyainfix =aenum_elementsV1ainfix ++aelementsV0aenum_elementsV1aNodeVVVainfix =aenum_elementsV5ainfix ++aelementsV0aenum_elementsV1Iainfix =aenum_elementsV5ainfix ++aelementsV2aenum_elementsaNextV3V4V1FAainfix <alengthaelementsV2alengthaelementsV0Aainfix <=c0alengthaelementsV0FF">
+    <label
+     name="expl:parameter enum">
+     </label>
     <transf
      name="split_goal"
      proved="true"
      expanded="true">
      <goal
       name="WP_parameter enum.1"
+      locfile="programs/same_fringe/../same_fringe.mlw"
+      loclnum="41" loccnumb="10" loccnume="14"
       expl="parameter enum"
-      sum="f94db1e62092a6e57c71f337d82de393"
+      sum="9a66d839ec2f21c8e55d1f8908ad7d77"
       proved="true"
       expanded="true"
       shape="CV0aEmptyainfix =aenum_elementsV1ainfix ++aelementsV0aenum_elementsV1aNodeVVVtFF">
+      <label
+       name="expl:parameter enum">
+       </label>
       <proof
-       prover="alt-ergo"
+       prover="0"
        timelimit="10"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.02"/>
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter enum.2"
+      locfile="programs/same_fringe/../same_fringe.mlw"
+      loclnum="41" loccnumb="10" loccnume="14"
       expl="parameter enum"
-      sum="a13645d88ef7a2fb3e019391a90efcb6"
+      sum="3fa1eb26d439dca8600ce1e1632fc00e"
       proved="true"
       expanded="true"
       shape="CV0aEmptytaNodeVVVainfix <alengthaelementsV2alengthaelementsV0Aainfix <=c0alengthaelementsV0FF">
+      <label
+       name="expl:parameter enum">
+       </label>
       <proof
-       prover="alt-ergo"
+       prover="0"
        timelimit="10"
-       edited=""
-       obsolete="false">
+       obsolete="false"
+       archived="false">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter enum.3"
+      locfile="programs/same_fringe/../same_fringe.mlw"
+      loclnum="41" loccnumb="10" loccnume="14"
       expl="parameter enum"
-      sum="40db8a153924623d35ec9e1690ab1126"
+      sum="43c1e33c0f53e23e9c5919aea03f0588"
       proved="true"
       expanded="true"
       shape="CV0aEmptytaNodeVVVainfix =aenum_elementsV5ainfix ++aelementsV0aenum_elementsV1Iainfix =aenum_elementsV5ainfix ++aelementsV2aenum_elementsaNextV3V4V1FIainfix <alengthaelementsV2alengthaelementsV0Aainfix <=c0alengthaelementsV0FF">
+      <label
+       name="expl:parameter enum">
+       </label>
       <proof
-       prover="alt-ergo"
+       prover="0"
        timelimit="10"
-       edited=""
-       obsolete="false">
+       obsolete="false"
+       archived="false">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
@@ -114,127 +100,167 @@
    </goal>
    <goal
     name="WP_parameter eq_enum"
+    locfile="programs/same_fringe/../same_fringe.mlw"
+    loclnum="49" loccnumb="10" loccnume="17"
     expl="parameter eq_enum"
-    sum="ed109dd1902aebb6e6d782f02a2823cb"
+    sum="ea6eddcecfe8a8b11e85353882cdf740"
     proved="true"
     expanded="true"
     shape="CV1aNextVVVCV0aNextVVViainfix =V5V2ainfix =aenum_elementsV0aenum_elementsV1qainfix =V10aTrueIainfix =aenum_elementsV8aenum_elementsV9qainfix =V10aTrueFAainfix <alengthaenum_elementsV8alengthaenum_elementsV0Aainfix <=c0alengthaenum_elementsV0Iainfix =aenum_elementsV9ainfix ++aelementsV3aenum_elementsV4FIainfix =aenum_elementsV8ainfix ++aelementsV6aenum_elementsV7Fainfix =aenum_elementsV0aenum_elementsV1Nwainfix =aenum_elementsV0aenum_elementsV1NaDoneCV0aDoneainfix =aenum_elementsV0aenum_elementsV1wainfix =aenum_elementsV0aenum_elementsV1NFF">
+    <label
+     name="expl:parameter eq_enum">
+     </label>
     <transf
      name="split_goal"
      proved="true"
      expanded="true">
      <goal
       name="WP_parameter eq_enum.1"
+      locfile="programs/same_fringe/../same_fringe.mlw"
+      loclnum="49" loccnumb="10" loccnume="17"
       expl="parameter eq_enum"
-      sum="37e0f77f90c586c694d4d9bc1db5c6af"
+      sum="65aae0c4513c5615dd7ecce0bf09a11f"
       proved="true"
       expanded="true"
       shape="CV1aNextVVVCV0aNextVVVainfix <alengthaenum_elementsV8alengthaenum_elementsV0Aainfix <=c0alengthaenum_elementsV0Iainfix =aenum_elementsV9ainfix ++aelementsV3aenum_elementsV4FIainfix =aenum_elementsV8ainfix ++aelementsV6aenum_elementsV7FIainfix =V5V2wtaDonetFF">
+      <label
+       name="expl:parameter eq_enum">
+       </label>
       <proof
-       prover="cvc3"
+       prover="1"
        timelimit="10"
-       edited=""
-       obsolete="false">
+       obsolete="false"
+       archived="false">
        <result status="valid" time="0.04"/>
       </proof>
       <proof
-       prover="alt-ergo"
+       prover="0"
        timelimit="10"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.03"/>
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter eq_enum.2"
+      locfile="programs/same_fringe/../same_fringe.mlw"
+      loclnum="49" loccnumb="10" loccnume="17"
       expl="parameter eq_enum"
-      sum="caf876b9f98c764e2afea585a0bc0fd6"
+      sum="76f830259aad3473d7311845b8d5952f"
       proved="true"
       expanded="true"
       shape="CV1aNextVVVCV0aNextVVVainfix =aenum_elementsV0aenum_elementsV1qainfix =V10aTrueIainfix =aenum_elementsV8aenum_elementsV9qainfix =V10aTrueFIainfix <alengthaenum_elementsV8alengthaenum_elementsV0Aainfix <=c0alengthaenum_elementsV0Iainfix =aenum_elementsV9ainfix ++aelementsV3aenum_elementsV4FIainfix =aenum_elementsV8ainfix ++aelementsV6aenum_elementsV7FIainfix =V5V2wtaDonetFF">
+      <label
+       name="expl:parameter eq_enum">
+       </label>
       <proof
-       prover="alt-ergo"
+       prover="0"
        timelimit="10"
-       edited=""
-       obsolete="false">
+       obsolete="false"
+       archived="false">
        <result status="valid" time="0.04"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter eq_enum.3"
+      locfile="programs/same_fringe/../same_fringe.mlw"
+      loclnum="49" loccnumb="10" loccnume="17"
       expl="parameter eq_enum"
-      sum="eca9657a02ad247d4bd8b20595616642"
+      sum="476f789fcb2cc0f5a18ff59c202cb9cc"
       proved="true"
       expanded="true"
       shape="CV1aNextVVVCV0aNextVVVainfix =aenum_elementsV0aenum_elementsV1NIainfix =V5V2NwtaDonetFF">
+      <label
+       name="expl:parameter eq_enum">
+       </label>
       <proof
-       prover="alt-ergo"
+       prover="0"
        timelimit="10"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.02"/>
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter eq_enum.4"
+      locfile="programs/same_fringe/../same_fringe.mlw"
+      loclnum="49" loccnumb="10" loccnume="17"
       expl="parameter eq_enum"
-      sum="55a7d3bf68d3350a968bcfa715d2b846"
+      sum="066b75d4634e599037d97ad86f5f3ba9"
       proved="true"
       expanded="true"
       shape="CV1aNextVVVCV0aNextVVVtwainfix =aenum_elementsV0aenum_elementsV1NaDonetFF">
+      <label
+       name="expl:parameter eq_enum">
+       </label>
       <proof
-       prover="alt-ergo"
+       prover="0"
        timelimit="10"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.02"/>
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter eq_enum.5"
+      locfile="programs/same_fringe/../same_fringe.mlw"
+      loclnum="49" loccnumb="10" loccnume="17"
       expl="parameter eq_enum"
-      sum="9a2dba3a1b3d31c4f8f98183b20c306b"
+      sum="4f2f2f9a34cd34871b6ca028d79da9b1"
       proved="true"
       expanded="true"
       shape="CV1aNextVVVtaDoneCV0aDoneainfix =aenum_elementsV0aenum_elementsV1wtFF">
+      <label
+       name="expl:parameter eq_enum">
+       </label>
       <proof
-       prover="alt-ergo"
+       prover="0"
        timelimit="10"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.00"/>
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter eq_enum.6"
+      locfile="programs/same_fringe/../same_fringe.mlw"
+      loclnum="49" loccnumb="10" loccnume="17"
       expl="parameter eq_enum"
-      sum="badf738d223340c1e681ac43e26604cc"
+      sum="9e662b552a172a4fcaafd8ae91b80387"
       proved="true"
       expanded="true"
       shape="CV1aNextVVVtaDoneCV0aDonetwainfix =aenum_elementsV0aenum_elementsV1NFF">
+      <label
+       name="expl:parameter eq_enum">
+       </label>
       <proof
-       prover="alt-ergo"
+       prover="0"
        timelimit="10"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.02"/>
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
     </transf>
    </goal>
    <goal
     name="WP_parameter same_fringe"
+    locfile="programs/same_fringe/../same_fringe.mlw"
+    loclnum="61" loccnumb="6" loccnume="17"
     expl="normal postcondition"
-    sum="8cd6ddc87ef3d6f43b5c1c5cd047a098"
+    sum="c2307648d7611536dedf17f017c4d96e"
     proved="true"
     expanded="true"
     shape="ainfix =aelementsV0aelementsV1qainfix =V4aTrueIainfix =aenum_elementsV2aenum_elementsV3qainfix =V4aTrueFIainfix =aenum_elementsV3ainfix ++aelementsV1aenum_elementsaDoneFIainfix =aenum_elementsV2ainfix ++aelementsV0aenum_elementsaDoneFFF">
+    <label
+     name="expl:parameter same_fringe">
+     </label>
     <proof
-     prover="alt-ergo"
+     prover="0"
      timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.02"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
   </theory>

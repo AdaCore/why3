@@ -152,13 +152,11 @@ let ls_of_const =
 
 (* unprotected and unprotecting idents *)
 
-let unprotected_label, unprotected_label_set =
-   singl_pair "encoding : unprotected"
-let unprotecting_label, unprotecting_label_set =
-   singl_pair "encoding : unprotecting"
+let unprotected_label = Ident.create_label "encoding : unprotected"
+let unprotecting_label = Ident.create_label "encoding : unprotecting"
 
-let id_unprotected n = id_fresh ~label:unprotected_label_set n
-let id_unprotecting n = id_fresh ~label:unprotecting_label_set n
+let id_unprotected n = id_fresh ~label:(Slab.singleton unprotected_label) n
+let id_unprotecting n = id_fresh ~label:(Slab.singleton unprotecting_label) n
 
 let is_protected_id id = not (Slab.mem unprotected_label id.id_label)
 let is_protecting_id id = not (Slab.mem unprotecting_label id.id_label)

@@ -75,8 +75,9 @@ let read_tools absf wc map (name,section) =
   (* provers *)
   let provers = get_stringl ~default:[] section "prover" in
   let find_provers s =
-    try let p = Mstr.find s (get_provers wc) in
-        s,p.driver ,p.command
+    try let p = prover_by_id wc s in
+        s, p.driver, p.extra_drivers,
+        String.concat " " (p.command :: p.extra_options)
     with
       (* TODO add exceptions pehaps inside rc.ml in fact*)
       | Not_found -> eprintf "Prover %s not found.@." s; exit 1 in
@@ -85,12 +86,12 @@ let read_tools absf wc map (name,section) =
     try
       let driver = get_string section "driver" in
       let command = get_string section "command" in
-      ("driver",absf driver,command) :: provers
+      ("driver", absf driver, [], command) :: provers
     with MissingField _ -> provers in
-  let load_driver (n,d,c) = n,Driver.load_driver env d,c in
+  let load_driver (n,d,e,c) = n, (Driver.load_driver env d e), c in
   let provers = List.map load_driver provers in
   let create_tool (n,driver,command) =
-    { tval = {tool_name = name; prover_name = n; tool_db =
+    { tval = {Bench.tool_name = name; prover_name = n; tool_db =
         if Db.is_initialized () then Some (Db.prover_from_name n) else None};
       ttrans = transforms;
       tdriver = driver;

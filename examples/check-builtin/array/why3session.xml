@@ -5,19 +5,23 @@
  <prover
   id="alt-ergo"
   name="Alt-Ergo"
-  version="0.93"/>
+  version="0.94"/>
  <prover
   id="coq"
   name="Coq"
-  version="8.3pl2"/>
+  version="8.3pl3"/>
  <prover
-  id="cvc3"
+  id="cvc3-2.2"
   name="CVC3"
   version="2.2"/>
  <prover
+  id="cvc3-2.4"
+  name="CVC3"
+  version="2.4.1"/>
+ <prover
   id="eprover"
   name="Eprover"
-  version="1.4 Namring"/>
+  version="1.4"/>
  <prover
   id="gappa"
   name="Gappa"
@@ -43,9 +47,13 @@
   name="Yices"
   version="1.0.25"/>
  <prover
-  id="z3"
+  id="z3-2"
   name="Z3"
   version="2.19"/>
+ <prover
+  id="z3-3"
+  name="Z3"
+  version="3.2"/>
  <file
   name="../array.why"
   verified="true"
@@ -56,12 +64,19 @@
    expanded="true">
    <goal
     name="G1"
-    sum="bacc88b1086b3ebd586dbbaca50d4fee"
+    sum="6ac7b14e664f7c570fa1c141483dae7f"
     proved="true"
     expanded="true"
     shape="ainfix =agetasetV2V1V0V1V0FF">
     <proof
-     prover="cvc3"
+     prover="z3-2"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="cvc3-2.2"
      timelimit="10"
      edited=""
      obsolete="false">
@@ -72,13 +87,6 @@
      timelimit="10"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="z3"
-     timelimit="10"
-     edited=""
-     obsolete="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
@@ -86,17 +94,24 @@
      timelimit="10"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
     name="G2"
-    sum="d0b4373dd121cec555de03978775b663"
+    sum="2416a5181e1123834c475dca4280126f"
     proved="true"
     expanded="true"
     shape="ainfix =agetasetV5V0V4V3V1Iainfix =agetV5V3V1Iainfix =V3V0NFF">
     <proof
-     prover="cvc3"
+     prover="z3-2"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="cvc3-2.2"
      timelimit="10"
      edited=""
      obsolete="false">
@@ -110,28 +125,28 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="z3"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
      prover="spass"
      timelimit="10"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.02"/>
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="G3"
-    sum="6ae604e4f05d34cfca040accc5548015"
+    sum="0e53b3897988fa72f807a146e9cf9620"
     proved="true"
     expanded="true"
     shape="ainfix =agetasetV2c1V1c0V0Iainfix =agetV2c0V0FF">
     <proof
-     prover="cvc3"
+     prover="z3-2"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="cvc3-2.2"
      timelimit="10"
      edited=""
      obsolete="false">
@@ -142,13 +157,6 @@
      timelimit="10"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="z3"
-     timelimit="10"
-     edited=""
-     obsolete="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
@@ -156,17 +164,24 @@
      timelimit="10"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.15"/>
+     <result status="valid" time="0.14"/>
     </proof>
    </goal>
    <goal
     name="G4"
-    sum="4b8d214718d344bac7b206bb433df5ea"
+    sum="31901caf34b2cb9e49a702d11f0840fb"
     proved="true"
     expanded="true"
     shape="ainfix =agetasetasetV2c1V1c0V0c1V1FF">
     <proof
-     prover="cvc3"
+     prover="z3-2"
+     timelimit="10"
+     edited=""
+     obsolete="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="cvc3-2.2"
      timelimit="10"
      edited=""
      obsolete="false">
@@ -177,13 +192,6 @@
      timelimit="10"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="z3"
-     timelimit="10"
-     edited=""
-     obsolete="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
@@ -191,7 +199,7 @@
      timelimit="10"
      edited=""
      obsolete="false">
-     <result status="valid" time="0.19"/>
+     <result status="valid" time="0.23"/>
     </proof>
    </goal>
   </theory>

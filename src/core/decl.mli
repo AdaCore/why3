@@ -27,9 +27,12 @@ open Term
 
 (** {2 Type declaration} *)
 
+type constructor = lsymbol * lsymbol option list
+(** constructor symbol with the list of projections *)
+
 type ty_defn =
   | Tabstract
-  | Talgebraic of lsymbol list
+  | Talgebraic of constructor list
 
 type ty_decl = tysymbol * ty_defn
 
@@ -135,6 +138,11 @@ exception EmptyDecl
 exception EmptyAlgDecl of tysymbol
 exception EmptyIndDecl of lsymbol
 
+exception BadConstructor of lsymbol
+exception BadRecordField of lsymbol
+exception RecordFieldMissing of lsymbol
+exception DuplicateRecordField of lsymbol
+
 (** {2 Utilities} *)
 
 val decl_map : (term -> term) -> decl -> decl
@@ -168,9 +176,29 @@ exception NonExhaustiveCase of pattern list * term
 exception NonFoundedTypeDecl of tysymbol
 
 val find_type_definition : known_map -> tysymbol -> ty_defn
-val find_constructors : known_map -> tysymbol -> lsymbol list
+val find_constructors : known_map -> tysymbol -> constructor list
 val find_inductive_cases : known_map -> lsymbol -> (prsymbol * term) list
 val find_logic_definition : known_map -> lsymbol -> ls_defn option
 val find_prop : known_map -> prsymbol -> term
 val find_prop_decl : known_map -> prsymbol -> prop_kind * term
+
+(** Records *)
+
+exception EmptyRecord
+
+val parse_record :
+  known_map -> (lsymbol * 'a) list -> lsymbol * lsymbol list * 'a Mls.t
+(** [parse_record kn field_list] takes a list of record field assignments,
+    checks it for well-formedness and returns the corresponding constructor,
+    the full list of projection symbols, and the map from projection symbols
+    to assigned values. *)
+
+val make_record :
+  known_map -> (lsymbol * term) list -> ty -> term
+
+val make_record_update :
+  known_map -> term -> (lsymbol * term) list -> ty -> term
+
+val make_record_pattern :
+  known_map -> (lsymbol * pattern) list -> ty -> pattern
 

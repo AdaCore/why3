@@ -26,5 +26,5 @@ val register : exn_printer -> unit
 (* Register a formatter of exception *)
 
 val exn_printer : exn_printer
-(* exn_printer fmt exn : print the exception using all the previously
-   registered printer and return *)
+(* [exn_printer fmt exn] prints exception [exn] using all previously
+   registered printers and returns *)

@@ -65,14 +65,14 @@ module M
   val x : array int
 
   (* the number of digits of X *)
-  function n : int
+  constant n : int
 
   (* the target digit sum *)
-  function y : int
+  constant y : int
 
   axiom Hypotheses: n >= 0 /\ y > 0
 
-  function m : int = 1 + max n (div y 9)
+  constant m : int = 1 + max n (div y 9)
 
 exception Success
 

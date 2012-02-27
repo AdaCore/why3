@@ -1,6 +1,5 @@
-module M
 
-  use import module ref.Ref
+module RedBlackTree
 
   (* Red-black trees (data type) *)
 
@@ -35,6 +34,54 @@ module M
   predicate gt_tree (x : key) (t : tree) =
     forall k : key. forall v : value. memt t k v -> x < k
 
+  lemma lt_leaf: forall x: key. lt_tree x Leaf
+
+  lemma gt_leaf: forall x: key. gt_tree x Leaf
+
+  lemma lt_tree_node:
+    forall x y: key, v: value, l r: tree, c: color.
+    lt_tree x l -> lt_tree x r -> y < x -> lt_tree x (Node c l y v r)
+
+  lemma gt_tree_node:
+    forall x y: key, v: value, l r: tree, c: color.
+    gt_tree x l -> gt_tree x r -> x < y -> gt_tree x (Node c l y v r)
+
+  lemma lt_node_lt:
+    forall x y: key, v: value, l r: tree, c: color.
+    lt_tree x (Node c l y v r) -> y < x
+
+  lemma gt_node_gt:
+    forall x y: key, v: value, l r: tree, c: color.
+    gt_tree x (Node c l y v r) -> x < y
+
+  lemma lt_left:
+    forall x y: key, v: value, l r: tree, c : color.
+    lt_tree x (Node c l y v r) -> lt_tree x l
+
+  lemma lt_right:
+    forall x y: key, v: value,  l r: tree, c: color.
+    lt_tree x (Node c l y v r) -> lt_tree x r
+
+  lemma gt_left:
+    forall x y: key, v: value, l r: tree, c: color.
+    gt_tree x (Node c l y v r) -> gt_tree x l
+
+  lemma gt_right:
+    forall x y: key, v: value, l r: tree, c: color.
+    gt_tree x (Node c l y v r) -> gt_tree x r
+
+  lemma lt_tree_not_in:
+    forall x: key, t: tree. lt_tree x t -> forall v: value. not (memt t x v)
+
+  lemma lt_tree_trans:
+    forall x y: key. x < y -> forall t: tree. lt_tree x t -> lt_tree y t
+
+  lemma gt_tree_not_in :
+    forall x: key, t: tree. gt_tree x t -> forall v: value. not (memt t x v)
+
+  lemma gt_tree_trans :
+    forall x y: key. y < x -> forall t: tree. gt_tree x t -> gt_tree y t
+
   predicate bst (t : tree) =
     match t with
     | Leaf -> true
@@ -42,6 +89,26 @@ module M
     end
 
   lemma bst_Leaf : bst Leaf
+
+  lemma bst_left:
+    forall k: key, v: value, l r: tree, c: color. bst (Node c l k v r) -> bst l
+
+  lemma bst_right:
+    forall k: key, v: value, l r: tree, c: color. bst (Node c l k v r) -> bst r
+
+  lemma bst_color:
+    forall c c': color, k: key, v: value, l r: tree.
+    bst (Node c l k v r) -> bst (Node c' l k v r)
+
+  lemma rotate_left:
+    forall kx ky: key, vx vy: value, a b c: tree, c1 c2 c3 c4: color.
+    bst (Node c1 a kx vx (Node c2 b ky vy c)) ->
+    bst (Node c3 (Node c4 a kx vx b) ky vy c)
+
+  lemma rotate_right:
+    forall kx ky: key, vx vy: value, a b c: tree, c1 c2 c3 c4: color.
+    bst (Node c3 (Node c4 a kx vx b) ky vy c) ->
+    bst (Node c1 a kx vx (Node c2 b ky vy c))
 
   (* [rbtree n t]: red black tree invariant
      [t] is a properly balanced red-black tree, i.e. it
@@ -66,10 +133,19 @@ module M
         rbtree (n-1) l /\ rbtree (n-1) r
     end
 
-  lemma rbtree_Leaf   : rbtree 0 Leaf
+  lemma rbtree_Leaf:
+    rbtree 0 Leaf
 
-  lemma rbtree_Node1  :
+  lemma rbtree_Node1:
     forall k:key, v:value. rbtree 0 (Node Red Leaf k v Leaf)
+
+  lemma rbtree_left:
+    forall x: key, v: value, l r: tree, c: color.
+    (exists n: int. rbtree n (Node c l x v r)) -> exists n: int. rbtree n l
+
+  lemma rbtree_right:
+    forall x: key, v: value, l r: tree, c: color.
+    (exists n: int. rbtree n (Node c l x v r)) -> exists n: int. rbtree n r
 
   (* lookup *)
 
@@ -100,6 +176,17 @@ module M
     | Node Black l _ _ r ->
         rbtree (n-1) l /\ rbtree (n-1) r
     end
+
+  lemma rbtree_almost_rbtree:
+    forall n: int, t: tree. rbtree n t -> almost_rbtree n t
+
+  lemma rbtree_almost_rbtree_ex:
+    forall s: tree.
+    (exists n: int. rbtree n s) -> exists n: int. almost_rbtree n s
+
+  lemma almost_rbtree_rbtree_black:
+    forall x: key, v: value, l r: tree, n: int.
+    almost_rbtree n (Node Black l x v r) -> rbtree n (Node Black l x v r)
 
   (** [lbalance c x l r] acts as a black node constructor,
       solving a possible red-red conflict on [l], using the following
@@ -157,7 +244,7 @@ module M
      conflict when [s] is red. *)
 
   let rec insert (t : tree) (k : key) (v : value) : tree =
-    { bst t }
+    { bst t /\ exists n: int. rbtree n t }
     match t with
     | Leaf ->
         Node Red Leaf k v Leaf
@@ -190,7 +277,14 @@ module M
       forall k':key, v':value.
       memt result k' v' <-> if k' = k then v' = v else memt t k' v' }
 
+end
+
+module Vacid0
+
   (* the VACID-0 interface = mutable map with default value*)
+
+  use import module ref.Ref
+  use import module RedBlackTree
 
   type rbt = (value, tree)
 
@@ -239,6 +333,6 @@ end
 
 (*
 Local Variables:
-compile-command: "unset LANG; make -C ../.. examples/programs/vacid_0_red_black_trees"
+compile-command: "unset LANG; make -C ../.. examples/programs/vacid_0_red_black_trees.gui"
 End:
 *)

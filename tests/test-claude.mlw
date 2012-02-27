@@ -1,0 +1,18 @@
+
+
+module M
+
+  use import int.Int
+  use import module ref.Ref
+
+  val x : ref int
+
+  goal A : !x = 0
+
+  goal B : (old !x) = 0
+
+  function f (n:int) : int = n + ! x
+
+  goal C : f(3) = 4
+
+end

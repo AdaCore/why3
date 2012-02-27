@@ -31,7 +31,7 @@ let debug_print_labels = Debug.register_flag "print_labels"
 let debug_print_locs = Debug.register_flag "print_locs"
 
 let iprinter,aprinter,tprinter,pprinter =
-  let bl = ["theory"; "type"; "function"; "predicate"; "inductive";
+  let bl = ["theory"; "type"; "constant"; "function"; "predicate"; "inductive";
             "axiom"; "lemma"; "goal"; "use"; "clone"; "prop"; "meta";
             "namespace"; "import"; "export"; "end";
             "forall"; "exists"; "not"; "true"; "false"; "if"; "then"; "else";
@@ -185,8 +185,8 @@ let prio_binop = function
   | Timplies -> 1
   | Tiff -> 1
 
-let print_label fmt l =
-  if l.lab_string = "" then () else fprintf fmt "\"%s\"" l.lab_string
+let print_label fmt l = fprintf fmt "\"%s\"" l.lab_string
+let print_labels = print_iter1 Slab.iter space print_label
 
 let print_loc fmt l =
   let (f,l,b,e) = Loc.get l in
@@ -198,7 +198,8 @@ let print_labels fmt s =
       fprintf fmt " ") s
 
 let print_ident_labels fmt id =
-  if Debug.test_flag debug_print_labels && not (Slab.is_empty id.id_label) then
+  if Debug.test_flag debug_print_labels &&
+      not (Slab.is_empty id.id_label) then
     fprintf fmt "@ %a" print_labels id.id_label;
   if Debug.test_flag debug_print_locs then
     Util.option_iter (fprintf fmt "@ %a" print_loc) id.id_loc
@@ -207,10 +208,9 @@ let rec print_term fmt t = print_lterm 0 fmt t
 
 and print_lterm pri fmt t =
   let print_tlab pri fmt t =
-    if Debug.test_flag debug_print_labels && Slab.is_empty t.t_label
+    if Debug.test_flag debug_print_labels && not (Slab.is_empty t.t_label)
     then fprintf fmt (protect_on (pri > 0) "@[<hov 0>%a@ %a@]")
-      print_labels
-      t.t_label (print_tnode 0) t
+      print_labels t.t_label (print_tnode 0) t
     else print_tnode pri fmt t in
   let print_tloc pri fmt t =
     if Debug.test_flag debug_print_locs && t.t_loc <> None
@@ -279,7 +279,7 @@ and print_tnode pri fmt t = match t.t_node with
   | Tfalse ->
       fprintf fmt "false"
   | Tbinop (b,f1,f2) ->
-      let asym = Slab.mem Term.asym_label t.t_label in
+      let asym = Slab.mem Term.asym_label f1.t_label in
       let p = prio_binop b in
       fprintf fmt (protect_on (pri > p) "@[<hov 1>%a %a@ %a@]")
         (print_lterm (p + 1)) f1 (print_binop ~asym) b (print_lterm p) f2
@@ -301,13 +301,16 @@ let print_tv_arg fmt tv = fprintf fmt "@ %a" print_tv tv
 let print_ty_arg fmt ty = fprintf fmt "@ %a" (print_ty_node true) ty
 let print_vs_arg fmt vs = fprintf fmt "@ (%a)" print_vsty vs
 
-let print_constr ty fmt cs =
-  let ty_val = of_option cs.ls_value in
-  let m = ty_match Mtv.empty ty_val ty in
-  let tl = List.map (ty_inst m) cs.ls_args in
+let print_constr fmt (cs,pjl) =
+  let add_pj pj ty pjl = (pj,ty)::pjl in
+  let print_pj fmt (pj,ty) = match pj with
+    | Some ls -> fprintf fmt "@ (%a:@,%a)" print_ls ls print_ty ty
+    | None -> print_ty_arg fmt ty
+  in
   fprintf fmt "@[<hov 4>| %a%a%a@]" print_cs cs
     print_ident_labels cs.ls_name
-    (print_list nothing print_ty_arg) tl
+    (print_list nothing print_pj)
+    (List.fold_right2 add_pj pjl cs.ls_args [])
 
 let print_type_decl fst fmt (ts,def) = match def with
   | Tabstract -> begin match ts.ts_def with
@@ -323,19 +326,20 @@ let print_type_decl fst fmt (ts,def) = match def with
             (print_list nothing print_tv_arg) ts.ts_args print_ty ty
       end
   | Talgebraic csl ->
-      let ty = ty_app ts (List.map ty_var ts.ts_args) in
       fprintf fmt "@[<hov 2>%s %a%a%a =@\n@[<hov>%a@]@]"
         (if fst then "type" else "with") print_ts ts
         print_ident_labels ts.ts_name
         (print_list nothing print_tv_arg) ts.ts_args
-        (print_list newline (print_constr ty)) csl
+        (print_list newline print_constr) csl
 
 let print_type_decl first fmt d =
   print_type_decl first fmt d; forget_tvs ()
 
 let print_ls_type fmt = fprintf fmt " :@ %a" print_ty
 
-let ls_kind ls = if ls.ls_value = None then "predicate" else "function"
+let ls_kind ls =
+  if ls.ls_value = None then "predicate"
+  else if ls.ls_args = [] then "constant" else "function"
 
 let print_logic_decl fst fmt (ls,ld) = match ld with
   | Some ld ->
@@ -537,6 +541,14 @@ let () = Exn_printer.register
   | Pattern.NonExhaustive pl ->
       fprintf fmt "Non-exhaustive pattern list:@\n@[<hov 2>%a@]"
         (print_list newline print_pat) pl
+  | Decl.BadConstructor ls ->
+      fprintf fmt "Bad constructor symbol: %a" print_ls ls
+  | Decl.BadRecordField ls ->
+      fprintf fmt "Not a record field: %a" print_ls ls
+  | Decl.RecordFieldMissing ls ->
+      fprintf fmt "Record field missing: %a" print_ls ls
+  | Decl.DuplicateRecordField ls ->
+      fprintf fmt "Duplicate record field: %a" print_ls ls
   | Decl.IllegalTypeAlias ts ->
       fprintf fmt
         "Type symbol %a is a type alias and cannot be declared as algebraic"

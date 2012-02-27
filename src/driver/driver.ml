@@ -49,13 +49,10 @@ type driver = {
 
 (** parse a driver file *)
 
-exception NoPlugins
-
 let load_plugin dir (byte,nat) =
-  if not Config.plugins then raise NoPlugins;
-  let file = if Config.Dynlink.is_native then nat else byte in
+  let file = if Dynlink.is_native then nat else byte in
   let file = Filename.concat dir file in
-  Config.Dynlink.loadfile_private file
+  Dynlink.loadfile_private file
 
 let load_file file =
   let basename = Filename.dirname file in
@@ -83,7 +80,7 @@ exception UnknownProp  of (string list * string list)
 exception FSymExpected of lsymbol
 exception PSymExpected of lsymbol
 
-let load_driver = let driver_tag = ref (-1) in fun env file ->
+let load_driver = let driver_tag = ref (-1) in fun env file extra_files ->
   let prelude   = ref [] in
   let regexps   = ref [] in
   let exitcodes = ref [] in
@@ -144,7 +141,7 @@ let load_driver = let driver_tag = ref (-1) in fun env file ->
   in
   let add_local th = function
     | Rprelude s ->
-        let l = Mid.find_default th.th_name [] !thprelude in
+        let l = Mid.find_def [] th.th_name !thprelude in
         thprelude := Mid.add th.th_name (s::l) !thprelude
     | Rsyntaxts (c,q,s) ->
         let td = syntax_type (find_ts th q) s in
@@ -177,12 +174,14 @@ let load_driver = let driver_tag = ref (-1) in fun env file ->
   let add_theory { thr_name = (loc,q); thr_rules = trl } =
     let f,id = let l = List.rev q in List.rev (List.tl l),List.hd l in
     let th =
-      try Env.find_theory env f id with e -> raise (Loc.Located (loc,e))
+      try Env.read_theory ~format:"why" env f id
+      with e -> raise (Loc.Located (loc,e))
     in
     qualid := q;
     List.iter (add_local th) trl
   in
   List.iter add_theory f.f_rules;
+  List.iter (fun f -> List.iter add_theory (load_file f).f_rules) extra_files;
   incr driver_tag;
   {
     drv_env         = env;
@@ -321,8 +320,6 @@ let string_of_qualid thl idl =
 let () = Exn_printer.register (fun fmt exn -> match exn with
   | NoPrinter -> Format.fprintf fmt
       "No printer specified in the driver file"
-  | NoPlugins -> Format.fprintf fmt
-      "Plugins are not supported, recomplie Why3"
   | Duplicate s -> Format.fprintf fmt
       "Duplicate %s specification" s
   | UnknownType (thl,idl) -> Format.fprintf fmt

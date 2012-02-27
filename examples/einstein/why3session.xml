@@ -3,224 +3,295 @@
 <why3session
  name="examples/einstein/why3session.xml">
  <prover
-  id="alt-ergo"
+  id="0"
   name="Alt-Ergo"
-  version="0.93"/>
+  version="0.94"/>
  <prover
-  id="coq"
-  name="Coq"
-  version="8.3pl2"/>
- <prover
-  id="cvc3"
+  id="1"
   name="CVC3"
   version="2.2"/>
  <prover
-  id="eprover"
+  id="2"
+  name="CVC3"
+  version="2.4.1"/>
+ <prover
+  id="3"
   name="Eprover"
-  version="1.4 Namring"/>
+  version="1.4"/>
  <prover
-  id="gappa"
-  name="Gappa"
-  version="0.15.1"/>
- <prover
-  id="simplify"
-  name="Simplify"
-  version="1.5.4"/>
- <prover
-  id="spass"
+  id="4"
   name="Spass"
   version="3.7"/>
  <prover
-  id="vampire"
+  id="5"
   name="Vampire"
   version="0.6"/>
  <prover
-  id="verit"
-  name="veriT"
-  version="dev"/>
- <prover
-  id="yices"
+  id="6"
   name="Yices"
   version="1.0.25"/>
  <prover
-  id="z3"
+  id="7"
   name="Z3"
   version="2.19"/>
+ <prover
+  id="8"
+  name="Z3"
+  version="3.2"/>
  <file
   name="../einstein.why"
   verified="false"
   expanded="true">
   <theory
    name="Bijection"
+   locfile="examples/einstein/../einstein.why"
+   loclnum="7" loccnumb="7" loccnume="16"
    verified="true"
    expanded="true">
   </theory>
   <theory
    name="Einstein"
+   locfile="examples/einstein/../einstein.why"
+   loclnum="18" loccnumb="7" loccnume="15"
    verified="true"
    expanded="true">
+   <label
+    name="Einstein's problem">
+    </label>
   </theory>
   <theory
    name="EinsteinClues"
+   locfile="examples/einstein/../einstein.why"
+   loclnum="51" loccnumb="7" loccnume="20"
    verified="true"
    expanded="true">
+   <label
+    name="Clues">
+    </label>
   </theory>
   <theory
    name="Goals"
+   locfile="examples/einstein/../einstein.why"
+   loclnum="107" loccnumb="7" loccnume="12"
    verified="false"
    expanded="true">
+   <label
+    name="Goals about Einstein's problem">
+    </label>
    <goal
     name="G1"
-    sum="4e666b5243bdb1064743ec6e271cb8ec"
+    locfile="examples/einstein/../einstein.why"
+    loclnum="125" loccnumb="7" loccnume="9"
+    sum="b29963ab2946f6e953e24adc18bc2422"
     proved="true"
     expanded="true"
     shape="ainfix =ato_aFishaGerman">
     <proof
-     prover="cvc3"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="2.44"/>
-    </proof>
-    <proof
-     prover="eprover"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="4.98"/>
-    </proof>
-    <proof
-     prover="z3"
-     timelimit="2"
-     edited=""
-     obsolete="false">
+     prover="7"
+     timelimit="10"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.03"/>
     </proof>
     <proof
-     prover="yices"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="5.11"/>
-    </proof>
-    <proof
-     prover="vampire"
-     timelimit="5"
-     edited=""
-     obsolete="false">
+     prover="4"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
      <result status="timeout" time="2.99"/>
     </proof>
     <proof
-     prover="spass"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="5.00"/>
+     prover="0"
+     timelimit="10"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.17"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="10"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="2.53"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="10"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="2.27"/>
+    </proof>
+    <proof
+     prover="8"
+     timelimit="2"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.06"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="2.99"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.02"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="2.98"/>
     </proof>
    </goal>
    <goal
     name="Wrong"
-    sum="1a0ed387ff3cda5c8323f4eb21fd248c"
+    locfile="examples/einstein/../einstein.why"
+    loclnum="126" loccnumb="7" loccnume="12"
+    sum="b6ada39e4ed1ac554d7bdbccbfadcff3"
     proved="false"
     expanded="true"
     shape="ainfix =ato_aCatsaSwede">
     <proof
-     prover="simplify"
+     prover="7"
+     timelimit="10"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="10.08"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.00"/>
+    </proof>
+    <proof
+     prover="0"
+     timelimit="10"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.17"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="10"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="10.08"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="10"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="10.08"/>
+    </proof>
+    <proof
+     prover="8"
      timelimit="2"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="2.31"/>
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="2.02"/>
     </proof>
     <proof
-     prover="cvc3"
-     timelimit="2"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="5.02"/>
+     prover="5"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="2.99"/>
     </proof>
     <proof
-     prover="eprover"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="4.98"/>
+     prover="6"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.02"/>
     </proof>
     <proof
-     prover="z3"
-     timelimit="2"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="5.03"/>
-    </proof>
-    <proof
-     prover="yices"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="5.12"/>
-    </proof>
-    <proof
-     prover="vampire"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="3.08"/>
-    </proof>
-    <proof
-     prover="spass"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="5.04"/>
+     prover="3"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="2.98"/>
     </proof>
    </goal>
    <goal
     name="G2"
-    sum="44df905be1d95d899616a903f2a08529"
+    locfile="examples/einstein/../einstein.why"
+    loclnum="127" loccnumb="7" loccnume="9"
+    sum="ad118f1b69459bb42f50fa8c2063d069"
     proved="true"
     expanded="true"
     shape="ainfix =ato_aCatsaNorwegian">
     <proof
-     prover="cvc3"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="1.88"/>
-    </proof>
-    <proof
-     prover="eprover"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="4.99"/>
-    </proof>
-    <proof
-     prover="z3"
-     timelimit="2"
-     edited=""
-     obsolete="false">
+     prover="7"
+     timelimit="10"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.03"/>
     </proof>
     <proof
-     prover="yices"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="5.02"/>
+     prover="4"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.05"/>
     </proof>
     <proof
-     prover="vampire"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="3.08"/>
+     prover="0"
+     timelimit="10"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.18"/>
     </proof>
     <proof
-     prover="spass"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="4.99"/>
+     prover="1"
+     timelimit="10"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="1.99"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="10"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="2.21"/>
+    </proof>
+    <proof
+     prover="8"
+     timelimit="2"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.05"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="3.01"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.02"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="2.98"/>
     </proof>
    </goal>
   </theory>

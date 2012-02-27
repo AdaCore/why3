@@ -115,7 +115,7 @@ let elt d =
                    end
                | Talgebraic l ->
                    List.fold_left
-                     (fun acc {ls_args = tyl; ls_value = ty} ->
+                     (fun acc ({ls_args = tyl; ls_value = ty},_) ->
                         let ty = of_option ty in
                         List.fold_left
                           (fun acc ty -> ty_s_fold tyoccurences acc ty)

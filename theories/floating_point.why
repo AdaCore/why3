@@ -3,7 +3,7 @@
 (* definition of IEEE-754 rounding modes *)
 theory Rounding
 
-  type mode = NearestTiesToEven | ToZero | Up | Down | NearTiesToAway
+  type mode = NearestTiesToEven | ToZero | Up | Down | NearestTiesToAway
     (** nearest ties to even, to zero, upward, downward, nearest ties to away *)
 
 end
@@ -44,7 +44,7 @@ theory GenFloat
   function round_error (x : t) : real = abs (value x - exact x)
   function total_error (x : t) : real = abs (value x - model x)
 
-  function max : real
+  constant max : real
 
   predicate no_overflow (m:mode) (x:real) = abs (round m x) <= max
 
@@ -63,7 +63,7 @@ theory GenFloat
   axiom Bounded_value :
     forall x:t. abs (value x) <= max
 
-  function max_representable_integer : int
+  constant max_representable_integer : int
 
   axiom Exact_rounding_for_integers:
     forall m:mode,i:int.
@@ -87,13 +87,13 @@ theory Single
 
   type single
 
-  function max_single : real = 0x1.FFFFFEp127
-  function max_int : int = 16777216 (* 2^24 *)
+  constant max_single : real = 0x1.FFFFFEp127
+  constant max_int : int = 16777216 (* 2^24 *)
 
   clone export GenFloat with
     type t = single,
-    function max = max_single,
-    function max_representable_integer = max_int
+    constant max = max_single,
+    constant max_representable_integer = max_int
 
 end
 
@@ -103,13 +103,13 @@ theory Double
 
   type double
 
-  function max_double : real = 0x1.FFFFFFFFFFFFFp1023
-  function max_int : int = 9007199254740992 (* 2^53 *)
+  constant max_double : real = 0x1.FFFFFFFFFFFFFp1023
+  constant max_int : int = 9007199254740992 (* 2^53 *)
 
   clone export GenFloat with
     type t = double,
-    function max = max_double,
-    function max_representable_integer = max_int
+    constant max = max_double,
+    constant max_representable_integer = max_int
 
 end
 
@@ -188,13 +188,13 @@ theory SingleFull
 
   type single
 
-  function max_single : real = 0x1.FFFFFEp127
-  function max_int : int = 16777216 (* 2^24 *)
+  constant max_single : real = 0x1.FFFFFEp127
+  constant max_int : int = 16777216 (* 2^24 *)
 
   clone export GenFloatFull with
     type t = single,
-    function max = max_single,
-    function max_representable_integer = max_int
+    constant max = max_single,
+    constant max_representable_integer = max_int
 
 end
 
@@ -204,12 +204,12 @@ theory DoubleFull
 
   type double
 
-  function max_double : real = 0x1.FFFFFFFFFFFFFp1023
-  function max_int : int = 9007199254740992 (* 2^23 *)
+  constant max_double : real = 0x1.FFFFFFFFFFFFFp1023
+  constant max_int : int = 9007199254740992 (* 2^23 *)
 
   clone export GenFloatFull with
     type t = double,
-    function max = max_double,
-    function max_representable_integer = max_int
+    constant max = max_double,
+    constant max_representable_integer = max_int
 
 end

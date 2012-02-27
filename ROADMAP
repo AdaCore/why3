@@ -8,14 +8,12 @@
 
 * more libraries (theories and modules)
 
-* WhyML
-  ** regions : strong update
-  ** clone module
-  ** ghost code
-  ** extraction of Ocaml code
-  ** logic symbols used in programs
+* A true Jessie3 front-end ?
 
-* Jessie3
+* Why3ML
+** Fast WP a la Leino
+** assert qui ne donne pas une hypothese dans la suite -> "check"
+   also: in a black box
 
 * traceability: Partially done
   (Claude)
@@ -25,6 +23,9 @@
   commande why3 et why3bench + le path
 
 * Add more examples in the regression tests and in the proval gallery
+  ** add all examples from the VSTTE 2012 competition (JCF, ANDREI)
+
+* A literate programming tool for Why3 (JCF)
 
 * Papers to write
 
@@ -39,39 +40,113 @@
   * system description (e.g. at CAD, TACAS)
   * rapports recherche ?
 
-* choose a logo -> done ?
-
-* Coq plugin
-
-* Coq realization of theories
-
-* prover support
-** avoid bug of CVC3, e.g in examples/my_cosine.why
-** understand bug reports 12792-12794 and 12907
-
 * IDE:
 ** edition, navigation (partially done)
-** restore provers detection in the middle of a session.
-  + todo: run detection immediately at start up if conf file absent or
-    outdated
 ** reimplement "hide proved goals" feature
   + suggested solution: replace model + filter_model by a custom model
   (JC + ?)
-** saving session
-   * DONE add a "cancel" choice in the "ask" window
-   * add "ctrl-S" to save the session explicitly
-     (partially done, but no shortcut)
+
+=== Roadmap for next release ========================
+
+* stages
+** M1. preuve d'un petit compilateur, pas de pb de lieur,
+   eventuellement outils pour les preuves par recurrence
+   a la Leino, + fct size automatique
+** M2. Lieur en Why3, POPLmark challenge. vers
+   un theorie et/ou un module réutilisable de lieurs
+** (M2?) Stage Airbus, "TIP" avec Frama-C/Jessie ou WP/Why/Coq
+   besoin du plugin Coq?
+
+* INSTALLATION
+  ** configure.in: detect dynlink.cmxa, and switch to bytecode if not found
+
+* PRIORITAIRE, JCF et ANDREI, clone de module
+** demarche: ecrire une API avec smart constructors garantissant
+   le bon typage, et clone sera en premier lieu un de ces constructors
+** cas d'utilisation: range d'entiers de Jessie, Flottants -> double ou single
+   containeurs pour Adacore et Claire
+NON PRIORITAIRE ?
+** regions : strong update
+** ghost code
+** logic symbols used in programs
+
+* extraction vers Caml
+** PRIORITAIRE, JCF, ANDREI
+
+* FRANCOIS new tools
+** merge why3html and why3stats into a new executable why3report
+** move -latex from why3replayer to why3report
+** document why3report
+
+* FRANCOIS
+** document smoke detector
+
+* CLAUDE provers
+** fix support for newer Z3, CVC3 and Alt-Ergo, allow several version
+  of them at the same time. Allow why3config --detect to find e.g z3
+  under names like z3-3.2 (how ? command-line option ? e.g. -p z3 /usr/local/bin/z3-3.2)
+** Ensure that we kill a prover after some time (ressurect %T ? with a
+   meaning like twice the value of %t ?), because we cannot be sure they always
+   honor their own -timeout option.
+** fix CVC3 printer: prints predicate def using LAMBDA
+** better use of Alt-Ergo's builtin theories: records, enumeration types
+   (Alt-Ergo >= 0.94) => at least two drivers for Alt-Ergo, depending on its
+   version number
+
+* FRANCOIS CLAUDE, move Session module and its dependencies into the Why3 library
+** but avoid duplication with session_ro
+** avoid also duplication of type like prover_data record
+** do not include task and transf in the data type, so that
+   one can reload, and redetect provers
+** session + session_ro -> session_data + session_dynamic
+
+
+* efficiency issues
+** understand problems when large number of goals (cf D Mentré examples)
+** also: BTS 13736
+https://gforge.inria.fr/tracker/index.php?func=detail&aid=13736&group_id=2990
+
+* ALL fix bug and update the BTS
+** reject global "val"s in typing environment for logic decls.
+
+* DELAYED Coq plugin
+
+* Coq realization of theories
+** corriger l'incoherence, comprendre si on veut vraiment accepter
+
+  function x : 'a
+  (cf: en caml cela ne marche pas)
+
+** make it really usable
+** understand problems when trying to realize set.why.
+   Status of equality, relation with clone module feature
+
 
 * DOC:
+** document new tools why3stats and others if any
 ** complete api.tex: explain how to build theories, apply
    transformations, write new functions on terms (A)
 ** complete manpages.tex: section "Drivers of external provers" (A+F)
 ** make the glossary available
 
+* IDE:
+** enlarge font (menu + shortcut Ctrl-+)
+** Ctrl-A to select all rows
+** saving session
+   * add "ctrl-S" to save the session explicitly
+     (partially done, but no shortcut)
+   * do not save if no change was made
+** restore provers detection in the middle of a session.
+  + todo: run detection immediately at start up if conf file absent or
+    outdated. should become doable with the new Session module
+** syntax highlighting
+   some keywords are not colored in the bottom-right window
+   (but they are in the top-right window)
+** add a scrollbar for the left panel
 
 === Roadmap for release 0.71 ========================
 
-* Final preparation:
+* DONE Final preparation:
 ** put on the web page
 *** why3-0.71.tar.gz
 *** manual in PDF: check that macro \todo is commented out

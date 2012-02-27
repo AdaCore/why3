@@ -232,5 +232,3 @@ apply f_equal.
 apply Union_comm.
 Qed.
 (* DO NOT EDIT BELOW *)
-
-

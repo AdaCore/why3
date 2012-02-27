@@ -42,7 +42,7 @@ theory int.Int
   syntax function (+)  "(+ %1 %2)"
   syntax function (-)  "(- %1 %2)"
   syntax function (*)  "(* %1 %2)"
-  syntax function (-_) "(- %1)"
+  syntax function (-_) "(- 0 %1)"
 
   syntax predicate (<=) "(<= %1 %2)"
   syntax predicate (<)  "(< %1 %2)"
@@ -63,6 +63,7 @@ theory int.Int
   remove prop Total
   remove prop NonTrivialRing
   remove prop CompatOrderAdd
+  remove prop ZeroLessOne
 
 end
 
@@ -80,7 +81,7 @@ theory real.Real
   (* Yices division doesn't accept anything else than constant on
   denominator so we don't use it (except for constant cf printer) *)
   (* syntax function (/)  "(/ %1 %2)" *)
-  syntax function (-_) "(- %1)"
+  syntax function (-_) "(- 0 %1)"
   (* syntax function inv  "(/ 1 %1)" *)
 
   syntax predicate (<=) "(<= %1 %2)"
@@ -103,19 +104,22 @@ theory real.Real
   remove prop Total
   remove prop NonTrivialRing
   remove prop CompatOrderAdd
+  remove prop ZeroLessOne
 
   meta "encoding : kept" type real
 
 end
 
-theory bool.Bool
+theory Bool
    syntax type     bool  "bool"
    syntax function True  "true"
    syntax function False "false"
+   meta "encoding : kept" type bool
+end
+theory bool.Bool
    syntax function andb  "(and %1 %2)"
    syntax function orb   "(or %1 %2)"
    syntax function notb  "(not %1)"
-   meta "encoding : kept" type bool
 end
 
 

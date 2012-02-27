@@ -209,32 +209,32 @@ Axiom Elements_set_inside2 : forall (a:Type), forall (a1:(map Z a)) (i:Z)
 Axiom Abs_le : forall (x:Z) (y:Z), ((Zabs x) <= y)%Z <-> (((-y)%Z <= x)%Z /\
   (x <= y)%Z).
 
-Definition left(i:Z): Z := ((2%Z * i)%Z + 1%Z)%Z.
+Definition left1(i:Z): Z := ((2%Z * i)%Z + 1%Z)%Z.
 
-Definition right(i:Z): Z := ((2%Z * i)%Z + 2%Z)%Z.
+Definition right1(i:Z): Z := ((2%Z * i)%Z + 2%Z)%Z.
 
 Definition parent(i:Z): Z := (ZOdiv (i - 1%Z)%Z 2%Z).
 
 Axiom Parent_inf : forall (i:Z), (0%Z <  i)%Z -> ((parent i) <  i)%Z.
 
-Axiom Left_sup : forall (i:Z), (0%Z <= i)%Z -> (i <  (left i))%Z.
+Axiom Left_sup : forall (i:Z), (0%Z <= i)%Z -> (i <  (left1 i))%Z.
 
-Axiom Right_sup : forall (i:Z), (0%Z <= i)%Z -> (i <  (right i))%Z.
+Axiom Right_sup : forall (i:Z), (0%Z <= i)%Z -> (i <  (right1 i))%Z.
 
-Axiom Parent_right : forall (i:Z), (0%Z <= i)%Z -> ((parent (right i)) = i).
+Axiom Parent_right : forall (i:Z), (0%Z <= i)%Z -> ((parent (right1 i)) = i).
 
-Axiom Parent_left : forall (i:Z), (0%Z <= i)%Z -> ((parent (left i)) = i).
+Axiom Parent_left : forall (i:Z), (0%Z <= i)%Z -> ((parent (left1 i)) = i).
 
 Axiom Inf_parent : forall (i:Z) (j:Z), ((0%Z <  j)%Z /\
-  (j <= (right i))%Z) -> ((parent j) <= i)%Z.
+  (j <= (right1 i))%Z) -> ((parent j) <= i)%Z.
 
 Axiom Child_parent : forall (i:Z), (0%Z <  i)%Z ->
-  ((i = (left (parent i))) \/ (i = (right (parent i)))).
+  ((i = (left1 (parent i))) \/ (i = (right1 (parent i)))).
 
 Axiom Parent_pos : forall (j:Z), (0%Z <  j)%Z -> (0%Z <= (parent j))%Z.
 
 Definition parentChild(i:Z) (j:Z): Prop := ((0%Z <= i)%Z /\ (i <  j)%Z) ->
-  ((j = (left i)) \/ (j = (right i))).
+  ((j = (left1 i)) \/ (j = (right1 i))).
 
 Definition map1  := (map Z Z).
 
@@ -260,9 +260,9 @@ Axiom Is_heap_sub2 : forall (a:(map Z Z)) (n:Z), (is_heap_array a 0%Z n) ->
 
 Axiom Is_heap_when_node_modified : forall (a:(map Z Z)) (n:Z) (e:Z) (idx:Z)
   (i:Z), ((0%Z <= i)%Z /\ (i <  n)%Z) -> ((is_heap_array a idx n) ->
-  (((0%Z <  i)%Z -> ((get a (parent i)) <= e)%Z) -> ((((left i) <  n)%Z ->
-  (e <= (get a (left i)))%Z) -> ((((right i) <  n)%Z -> (e <= (get a
-  (right i)))%Z) -> (is_heap_array (set a i e) idx n))))).
+  (((0%Z <  i)%Z -> ((get a (parent i)) <= e)%Z) -> ((((left1 i) <  n)%Z ->
+  (e <= (get a (left1 i)))%Z) -> ((((right1 i) <  n)%Z -> (e <= (get a
+  (right1 i)))%Z) -> (is_heap_array (set a i e) idx n))))).
 
 Axiom Is_heap_add_last : forall (a:(map Z Z)) (n:Z) (e:Z), (0%Z <  n)%Z ->
   (((is_heap_array a 0%Z n) /\ ((get a (parent n)) <= e)%Z) ->
@@ -273,12 +273,12 @@ Axiom Parent_inf_el : forall (a:(map Z Z)) (n:Z), (is_heap_array a 0%Z n) ->
   j))%Z.
 
 Axiom Left_sup_el : forall (a:(map Z Z)) (n:Z), (is_heap_array a 0%Z n) ->
-  forall (j:Z), ((0%Z <= j)%Z /\ (j <  n)%Z) -> (((left j) <  n)%Z -> ((get a
-  j) <= (get a (left j)))%Z).
+  forall (j:Z), ((0%Z <= j)%Z /\ (j <  n)%Z) -> (((left1 j) <  n)%Z ->
+  ((get a j) <= (get a (left1 j)))%Z).
 
 Axiom Right_sup_el : forall (a:(map Z Z)) (n:Z), (is_heap_array a 0%Z n) ->
-  forall (j:Z), ((0%Z <= j)%Z /\ (j <  n)%Z) -> (((right j) <  n)%Z ->
-  ((get a j) <= (get a (right j)))%Z).
+  forall (j:Z), ((0%Z <= j)%Z /\ (j <  n)%Z) -> (((right1 j) <  n)%Z ->
+  ((get a j) <= (get a (right1 j)))%Z).
 
 Axiom Is_heap_relation : forall (a:(map Z Z)) (n:Z), (0%Z <  n)%Z ->
   ((is_heap_array a 0%Z n) -> forall (j:Z), (0%Z <= j)%Z -> ((j <  n)%Z ->
@@ -299,13 +299,12 @@ Axiom Model_singleton : forall (a:(map Z Z)), ((model (a,
 
 (* DO NOT EDIT BELOW *)
 
-Theorem Model_set : forall (a:(map Z Z)) (aqt:(map Z Z)) (v:Z) (i:Z) (n:Z),
-  ((0%Z <= i)%Z /\ (i <  n)%Z) -> ((aqt = (set a i v)) -> ((add (get a i)
-  (model (aqt, n))) = (add v (model (a, n))))).
+Theorem Model_set : forall (a:(map Z Z)) (v:Z) (i:Z) (n:Z), ((0%Z <= i)%Z /\
+  (i <  n)%Z) -> ((add (get a i) (model ((set a i v), n))) = (add v (model (
+  a, n)))).
 (* YOU MAY EDIT THE PROOF BELOW *)
-intros a a0 v i n H_i H_a0.
+intros a v i n H_is.
 unfold model in *.
-subst a0.
 rewrite Elements_union with (i:= 0) (j:=i) (k:=n); auto with *.
 pattern (elements (set a i v) 0 i); rewrite Elements_set_outside; auto with *.
 rewrite Elements_add1 with (i:= i) (j:=n); auto with *.

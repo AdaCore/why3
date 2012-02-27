@@ -1,0 +1,22 @@
+
+(* BTS 13849 *)
+
+theory T
+
+  type t = T
+
+  type x 'a 'b =
+  | X t 'a
+  | Y t 'b
+
+ type a = A0 | A1
+
+ type b = B
+
+ function b1 : x a b =  (X T A0)
+ function b2 : x a b =  (X T A1)
+
+ goal x : b1 = b2
+ (* Theorem x1 : ((X(T, A0):(x a b)) = (X(T, A1):(x a b))).*)
+
+end

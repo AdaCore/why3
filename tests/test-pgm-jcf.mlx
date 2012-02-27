@@ -1,0 +1,22 @@
+
+theory T
+  type t = int
+end
+
+module M
+  use import int.Int
+  use import T
+  function f (x: t) : t = x+1
+  goal G: forall x: t. x=x
+end
+
+module N
+  use import M
+  goal G1: f 41 = 42
+end
+
+(*
+Local Variables:
+compile-command: "unset LANG; ../bin/why3ide test-pgm-jcf.mlx"
+End:
+*)

@@ -17,6 +17,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(* create a backup copy of a file if it exists *)
+val backup_file : string -> unit
+
 (* return the content of an in-channel *)
 val channel_contents : in_channel -> string
 
@@ -62,6 +65,12 @@ val call_asynchronous : (unit -> 'a) -> (unit -> 'a)
 val copy_file : string -> string -> unit
 (** [copy_file from to] copy the file from [from] to [to] *)
 
+val copy_dir : string -> string -> unit
+(** [copy_dir from to] copy the directory recursively from [from] to [to],
+    currently the directory must contains only directories and common files
+*)
+
+
 val path_of_file : string -> string list
 (** [path_of_file filename] return the absolute path of [filename] *)
 
@@ -78,3 +87,7 @@ val safe_remove : string -> unit
     simple Sys.remove fails. This allows to delete files unter windows, where
     it may take a few milliseconds to liberate a handle. The function stops
     trying when we have waited for too long. *)
+val uniquify : string -> string
+(** find filename that doesn't exists based on the given filename.
+    Be careful the file can be taken after the return of this function.
+*)

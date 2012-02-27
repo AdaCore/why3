@@ -9,6 +9,10 @@ why3.conf
 *.cmi
 *.cmxs
 *.annot
+*.dep
+*.vo
+*.vd
+*.glob
 \#*\#
 
 # /
@@ -17,6 +21,7 @@ why3.conf
 /autom4te.cache
 /Makefile
 /.depend.*
+/configure
 /semantic.cache
 /TAGS
 /output_why3
@@ -69,6 +74,15 @@ why3.conf
 /bin/why3replayer.byte
 /bin/why3replayer.opt
 /bin/why3replayer
+/bin/why3html.byte
+/bin/why3html.opt
+/bin/why3html
+/bin/why3stats.byte
+/bin/why3stats.opt
+/bin/why3stats
+/bin/why3session.opt
+/bin/why3session.byte
+/bin/why3session
 
 # /doc/
 /doc/version.tex
@@ -109,6 +123,7 @@ why3.conf
 # /src/
 /src/config.sh
 /src/config.ml
+/src/coq_config.ml
 /src/*.cma
 /src/*.cmxa
 /src/*.a
@@ -128,14 +143,6 @@ why3.conf
 /src/parser/parser.mli
 /src/parser/parser.output
 
-# /src/tptp2why/
-/src/tptp2why/tptpLexer.ml
-/src/tptp2why/tptpParser.ml
-/src/tptp2why/tptpParser.mli
-/src/tptp2why/tptpParser.output
-/src/tptp2why/tptpParser.automaton
-/src/tptp2why/tptpParser.conflicts
-
 # /src/ide/
 /src/ide/xml.ml
 
@@ -144,6 +151,18 @@ why3.conf
 
 # /src/util/
 /src/util/rc.ml
+
+# /src/session
+/src/session/xml.ml
+
+# /plugins/tptp/
+/plugins/tptp/tptp_lexer.ml
+/plugins/tptp/tptp_parser.ml
+/plugins/tptp/tptp_parser.mli
+/plugins/tptp/tptp_parser.output
+
+# /drivers
+/drivers/coq-realizations.aux
 
 # /tests/
 /tests/test-jcf/
@@ -155,7 +174,6 @@ why3.conf
 /examples/programs/course/
 /examples/programs/wcet_hull/
 /examples/programs/binary_search2/
-/examples/programs/vacid_0_red_black_trees/
 /examples/programs/vacid_0_red_black_trees_harness/
 /examples/programs/next_digit_sum/
 /examples/programs/algo63/

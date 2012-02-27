@@ -3,90 +3,64 @@
 <why3session
  name="programs/fact/why3session.xml">
  <prover
-  id="alt-ergo"
+  id="0"
   name="Alt-Ergo"
-  version="0.93"/>
- <prover
-  id="coq"
-  name="Coq"
-  version="8.3pl2"/>
- <prover
-  id="cvc3"
-  name="CVC3"
-  version="2.2"/>
- <prover
-  id="eprover"
-  name="Eprover"
-  version="1.4 Namring"/>
- <prover
-  id="gappa"
-  name="Gappa"
-  version="0.15.1"/>
- <prover
-  id="simplify"
-  name="Simplify"
-  version="1.5.4"/>
- <prover
-  id="spass"
-  name="Spass"
-  version="3.7"/>
- <prover
-  id="vampire"
-  name="Vampire"
-  version="0.6"/>
- <prover
-  id="verit"
-  name="veriT"
-  version="dev"/>
- <prover
-  id="yices"
-  name="Yices"
-  version="1.0.25"/>
- <prover
-  id="z3"
-  name="Z3"
-  version="2.19"/>
+  version="0.94"/>
  <file
   name="../fact.mlw"
   verified="true"
-  expanded="true">
+  expanded="false">
   <theory
    name="WP FactRecursive"
+   locfile="programs/fact/../fact.mlw"
+   loclnum="4" loccnumb="7" loccnume="20"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter fact_rec"
+    locfile="programs/fact/../fact.mlw"
+    loclnum="8" loccnumb="10" loccnume="18"
     expl="parameter fact_rec"
-    sum="cf2d66c57865c093c868c368b9fd839f"
+    sum="49284db94500b02f79b6afdc80c60e37"
     proved="true"
     expanded="true"
     shape="iainfix =V0c0ainfix =c1afactV0ainfix =ainfix *V0afactainfix -V0c1afactV0Aainfix >=ainfix -V0c1c0Aainfix <ainfix -V0c1V0Aainfix <=c0V0Iainfix >=V0c0F">
+    <label
+     name="expl:parameter fact_rec">
+     </label>
     <proof
-     prover="alt-ergo"
+     prover="0"
      timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.02"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
   </theory>
   <theory
    name="WP FactImperative"
+   locfile="programs/fact/../fact.mlw"
+   loclnum="15" loccnumb="7" loccnume="21"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter fact_imp"
+    locfile="programs/fact/../fact.mlw"
+    loclnum="20" loccnumb="6" loccnume="14"
     expl="parameter fact_imp"
-    sum="01340af4bf98b554248a6373ac09d5ff"
+    sum="16a4f681480c265ca504f1d4f7553234"
     proved="true"
     expanded="true"
     shape="iainfix <V2V0ainfix =V4afactV3Aainfix <=V3V0Aainfix <=c0V3Iainfix =V4ainfix *V1V3FIainfix =V3ainfix +V2c1Fainfix =V1afactV0Iainfix =V1afactV2Aainfix <=V2V0Aainfix <=c0V2FFAainfix =c1afactc0Aainfix <=c0V0Aainfix <=c0c0Iainfix >=V0c0F">
+    <label
+     name="expl:parameter fact_imp">
+     </label>
     <proof
-     prover="alt-ergo"
+     prover="0"
      timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.02"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
   </theory>

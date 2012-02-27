@@ -1,0 +1,67 @@
+
+module MergesortQueue
+
+  use import int.Int
+  use import list.Length
+  use import list.Append
+  use import list.Permut
+  use import module queue.Queue
+
+  type elt
+  predicate le elt elt
+
+  axiom total_preorder1:
+    forall x y: elt. le x y \/ le y x
+  axiom total_preorder2:
+    forall x y z: elt. le x y -> le y z -> le x z
+
+  clone import list.Sorted with type t = elt, predicate le = le
+
+  let merge (q1: t elt) (q2: t elt) (q: t elt) =
+    { q.elts = Nil (* /\ sorted q1.elts /\ sorted q2.elts *) }
+    'L:
+    while length q1 > 0 || length q2 > 0 do
+      invariant { permut (q.elts ++ q1.elts ++ q2.elts)
+                         (at q1.elts 'L ++ at q2.elts 'L) }
+      variant { length q1.elts + length q2.elts }
+      if length q1 = 0 then
+        push (pop q2) q
+      else if length q2 = 0 then
+        push (pop q1) q
+      else
+        let x1 = peek q1 in
+        let x2 = peek q2 in
+        if le x1 x2 then push (pop q1) q else push (pop q2) q
+    done
+    { permut q.elts (old q1.elts ++ old q2.elts) }
+
+(*
+  let rec mergesort (q: t elt) =
+    { }
+   'L:
+    if length q > 1 then begin
+      let q1 = create () : t elt in
+      let q2 = create () : t elt in
+      while not (is_empty q) do
+        invariant { permut (q1.elts ++ q2.elts ++ q.elts) (at q.elts 'L) }
+        variant { length q.elts }
+        let x = pop q in push x q1;
+        if not (is_empty q) then let x = pop q in push x q2
+      done;
+      assert { q.elts = Nil };
+      assert { permut (q1.elts ++ q2.elts) (at q.elts 'L) };
+      mergesort q1;
+      mergesort q2;
+      merge q1 q2 q
+    end
+    { (* sorted q.elts /\ *) permut q.elts (old q.elts) }
+*)
+
+end
+
+(*
+Local Variables:
+compile-command: "unset LANG; make -C ../.. examples/programs/mergesort_queue.gui"
+End:
+*)
+ 
