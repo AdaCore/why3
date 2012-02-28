@@ -2,10 +2,10 @@ open Why3
 
 (* Configuration settings given more or less by the why3.conf file *)
 
+val config : Whyconf.config
 val env : Env.env
-val split_trans : Task.task Trans.tlist
-val alt_ergo_command : string
 val altergo_driver : Driver.driver
+val alt_ergo_conf : Whyconf.prover
 
 (* Configuration settings given or determined by the command line *)
 
@@ -27,17 +27,16 @@ val report : report_mode
 val debug : bool
 (* true if option --debug was present *)
 
-(* Configuration settings related to input and output *)
+val force : bool
+(* true of option --force/-f was present *)
 
-val result_file : string
-(* the name of the output file *)
+(* Configuration settings related to input and output *)
 
 val filename : string
 (* the name of the input file *)
 
-val report_mode : bool
-(* true if the output file exists and is newer than the input file, and we are
- * not in force mode (--force or -f) *)
-
 val noproof : bool
 (* true if option --no-proof was present *)
+
+val split_name : string
+(* name of the "split_goal" transformation *)

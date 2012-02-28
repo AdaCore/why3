@@ -94,4 +94,9 @@ end
 
 module MExpl = Stdlib.Map.Make(ExplCmp)
 module SExpl = MExpl.Set
+module HExpl = Hashtbl.Make (struct
+   type t = expl
+   let equal = (=)
+   let hash = Hashtbl.hash
+end)
 

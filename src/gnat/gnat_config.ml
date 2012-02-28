@@ -4,7 +4,6 @@ type report_mode = Fail | Verbose | Detailed
 
 let opt_verbose = ref false
 let opt_timeout = ref 10
-let opt_steps = ref 0
 let opt_report = ref Fail
 let opt_debug = ref false
 let opt_force = ref false
@@ -39,10 +38,6 @@ let options = Arg.align [
    "--timeout", Arg.Set_int opt_timeout,
           "Set the timeout in seconds (default is 10 seconds)";
 
-   "-s", Arg.Set_int opt_steps,
-          "Set the maximal number of proof steps";
-   "--steps", Arg.Set_int opt_steps,
-          "Set the maximal number of proof steps";
    "-f", Arg.Set opt_force,
           "Rerun VC generation and proofs, even when the result is up to date";
    "--force", Arg.Set opt_force,
@@ -67,29 +62,6 @@ let filename =
             Gnat_util.abort_with_message
               (Printf.sprintf "Not a Why input file: %s." s);
          s
-
-let result_file =
-   let base = Filename.chop_extension filename in
-   base ^ ".proof"
-
-let report_mode =
-   if !opt_force then false
-   else
-      if Sys.file_exists result_file then begin
-         if Gnat_util.cmp_timestamps filename result_file < 0 then begin
-            if !opt_verbose then
-               Format.printf "gnatwhy3: entering report mode@.";
-            true
-         end else begin
-            if !opt_verbose then
-               Format.printf "gnatwhy3: result file older than input file@.";
-            false
-         end
-      end else begin
-         if !opt_verbose then
-            Format.printf "gnatwhy3: result file does not exist@.";
-         false
-      end
 
 let config =
    try Whyconf.read_config (Some "why3.conf")
@@ -127,13 +99,6 @@ let altergo_driver : Driver.driver =
        Exn_printer.exn_printer e;
     Gnat_util.abort_with_message ""
 
-let alt_ergo_command =
-   let command = alt_ergo.Whyconf.command in
-   if !opt_steps = 0 then command
-   else command ^ Printf.sprintf " -steps %d" !opt_steps
-
-let split_trans = Trans.lookup_transform_l "split_goal" env
-
 (* freeze values *)
 
 let timeout = !opt_timeout
@@ -142,3 +107,4 @@ let report  = !opt_report
 let debug = !opt_debug
 let force = !opt_force
 let noproof = !opt_noproof
+let split_name = "split_goal"

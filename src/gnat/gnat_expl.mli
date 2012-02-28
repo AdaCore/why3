@@ -23,3 +23,4 @@ val to_filename : expl -> string
 (* print a representation of an explanation that could serve as a filename *)
 
 module MExpl : Stdlib.Map.S with type key = expl
+module HExpl : Hashtbl.S with type key = expl

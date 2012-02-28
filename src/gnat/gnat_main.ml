@@ -2,6 +2,12 @@ open Why3
 open Term
 open Ident
 
+(*
+let _ =
+   Debug.set_flag (Debug.lookup_flag "scheduler");
+   Debug.set_flag (Debug.lookup_flag "session")
+*)
+
 let rec extract_explanation expl gnat s =
    if Slab.is_empty s then expl, gnat
    else
@@ -44,132 +50,351 @@ let rec search_labels acc f =
                let _,_,t = t_open_quant tq in
                search_labels acc t
 
-let expl_map = ref Gnat_expl.MExpl.empty
 let nb_vcs   = ref 0
 let nb_po    = ref 0
 
-let find_expl e =
-   try Gnat_expl.MExpl.find e !expl_map
-   with Not_found ->
-      incr nb_po;
-      []
+type key = int
+type goal = key Session.goal
 
-let add_entry e t =
-   expl_map := Gnat_expl.MExpl.add e t !expl_map
+module GoalHash = struct
+   type t = goal
+   let equal a b = a.Session.goal_key = b.Session.goal_key
+   let hash a = a.Session.goal_key
+end
+module GoalMap = Hashtbl.Make (GoalHash)
 
-let add_task e t =
-   let l = find_expl e in
-   incr nb_vcs;
-   add_entry e (t::l)
+module GoalSet : sig
+   type t
+   val empty : unit -> t
+   val is_empty : t -> bool
+   val add : t -> goal -> unit
+   val remove : t -> goal -> unit
+   val choose : t -> goal
+   val mem    : t -> goal -> bool
+end =
+struct
+   type t = unit GoalMap.t
 
-let add_empty_task e =
-   let l = find_expl e in
-   add_entry e l
+   let empty () = GoalMap.create 3
+   let is_empty t = GoalMap.length t = 0
+   let add t x = GoalMap.add t x ()
+   let remove t x = GoalMap.remove t x
+   let mem t x = GoalMap.mem t x
 
-let do_task t =
-   let fml = Task.task_goal_fmla t in
-   match fml.t_node , search_labels None fml with
-   | Ttrue, None -> ()
-   | Ttrue, Some e -> add_empty_task e
-   | _, None ->
-         Gnat_util.abort_with_message "Task has no tracability label."
-   | _, Some e -> add_task e t
+   exception Found of goal
+   let choose t =
+      try
+         GoalMap.iter (fun k () -> raise (Found k)) t;
+         raise Not_found
+      with Found k -> k
+end
 
-let do_unsplitted_task t =
-   let tasks = Trans.apply Gnat_config.split_trans t in
-   List.iter do_task tasks
+module Objectives : sig
+   val add_to_expl : Gnat_expl.expl -> goal -> unit
+   val add_expl         : Gnat_expl.expl -> unit
+   val discharge        : goal -> GoalSet.t
 
-let do_theory _ th =
-   let tasks = Task.split_theory th None None in
-   List.iter do_unsplitted_task tasks
+   val set_not_interesting : goal -> unit
+   val is_not_interesting : goal -> bool
+   val is_interesting : goal -> bool
 
-let vc_name expl n =
-   let base = Gnat_expl.to_filename expl in
-   let suffix = ".why" in
-   if n = 1 then base ^ suffix
-   else base ^ "_" ^ string_of_int n ^ suffix
+   val get_goals : Gnat_expl.expl -> GoalSet.t
+   val get_objective : goal -> Gnat_expl.expl
 
-let save_vc t expl n =
-   let dr = Gnat_config.altergo_driver in
-   let vc_fn = vc_name expl n in
-   let cout = open_out vc_fn in
-   let fmt  = Format.formatter_of_out_channel cout in
-   Driver.print_task dr fmt t;
-   Format.printf "saved VC to %s@." vc_fn
+   val iter : (Gnat_expl.expl -> GoalSet.t -> unit) -> unit
 
+   val stat : unit -> unit
 
-let prove_task t expl n =
-   if Gnat_config.debug then save_vc t expl n;
-   let pr_call =
-      Driver.prove_task ~command:Gnat_config.alt_ergo_command
-                        ~timelimit:Gnat_config.timeout
-                        Gnat_config.altergo_driver t () in
-   let res = Call_provers.wait_on_call pr_call () in
-   (* if there was a problem, always report something to stderr *)
-   let answer = res.Call_provers.pr_answer in
-   if answer = Call_provers.HighFailure then begin
-      Format.eprintf "An error occured when calling alt-ergo:@.";
-      Format.eprintf "%s@." res.Call_provers.pr_output;
-   end;
-   answer
+end = struct
 
-let report =
-   let print fmt ?(endline=true) b expl =
-      if endline then
-         Format.fprintf fmt "%a@." (Gnat_expl.print_expl b) expl
+   let nb_objectives = ref 0
+   let nb_goals = ref 0
+
+   let explmap : GoalSet.t Gnat_expl.HExpl.t = Gnat_expl.HExpl.create 17
+   (* maps proof objectives to goals *)
+
+   let goalmap : Gnat_expl.expl GoalMap.t = GoalMap.create 17
+   (* maps goals to their objectives *)
+
+   let get_goals expl = Gnat_expl.HExpl.find explmap expl
+   let get_objective goal = GoalMap.find goalmap goal
+
+   let find e =
+      try get_goals e
+      with Not_found ->
+         let r = GoalSet.empty () in
+         Gnat_expl.HExpl.add explmap e r;
+         incr nb_objectives;
+         r
+
+   let add_to_expl ex go =
+      incr nb_goals;
+      GoalMap.add goalmap go ex;
+      let set = find ex in
+      GoalSet.add set go
+
+   let add_expl e = ignore (find e)
+
+   let discharge goal =
+      let expl = get_objective goal in
+      let goalset = get_goals expl in
+      GoalSet.remove goalset goal;
+      goalset
+
+   let not_interesting : GoalSet.t = GoalSet.empty ()
+   let set_not_interesting x = GoalSet.add not_interesting x
+   let is_not_interesting x = GoalSet.mem not_interesting x
+   let is_interesting x = not (is_not_interesting x)
+
+   let iter f = Gnat_expl.HExpl.iter f explmap
+
+   let stat () =
+      Format.printf "Obtained %d proof objectives and %d VCs@."
+        !nb_objectives !nb_goals
+
+end
+
+let print ?(endline=true) b expl =
+   if endline then
+      Format.printf "%a@." (Gnat_expl.print_expl b) expl
+   else
+      Format.printf "%a" (Gnat_expl.print_expl b) expl
+
+let has_parent g =
+  match g.Session.goal_parent with
+  | Session.Parent_transf _ -> true
+  | _ -> false
+
+let count = ref 0
+
+let keygen ?parent () =
+   ignore (parent);
+   incr count;
+   !count
+
+module Scheduler = Session_scheduler.Base_scheduler (struct end)
+module Implem =
+  struct
+
+     type key = int
+
+     let create = keygen
+
+     let remove _ = ()
+
+     let reset () = ()
+
+     let notify _ = ()
+     let init _ _ = ()
+     let timeout ~ms x = Scheduler.timeout ~ms x
+     let idle x    = Scheduler.idle x
+     let notify_timer_state _ _ _= ()
+
+     let unknown_prover _ _ = None
+     let replace_prover _ _ = false
+  end
+
+module M = Session_scheduler.Make (Implem)
+
+let sched_state = M.init 5
+let project_dir = Session.get_project_dir Gnat_config.filename
+
+let env_session, is_new_session =
+   let session, is_new_session =
+      if Sys.file_exists project_dir then
+         Session.read_session project_dir, false
       else
-         Format.fprintf fmt "%a" (Gnat_expl.print_expl b) expl
-   in
-   fun fmt result expl ->
-      (* always print to output file *)
-      print fmt (result = Call_provers.Valid) expl;
-      (* now print (possibly detailed) messages to stdout *)
-      let print = print Format.std_formatter in
-      if result = Call_provers.Valid then begin
-         match Gnat_config.report with
-         | (Gnat_config.Verbose | Gnat_config.Detailed) -> print true expl
-         | _ -> ()
-      end else
-         if Gnat_config.report = Gnat_config.Detailed then begin
-            print ~endline:false false expl;
-            Format.printf " (%a)@." Call_provers.print_prover_answer result
-         end else print false expl
+         Session.create_session project_dir, true in
+   let env_session, (_:bool) =
+      M.update_session ~allow_obsolete:true session Gnat_config.env
+      Gnat_config.config in
+   env_session, is_new_session
 
 exception Not_Proven of Call_provers.prover_answer
 
-let prove_objective fmt expl tl =
+let iter_leaf_goals f =
+   let rec iter_f any =
+      match any with
+      | Session.Goal g when has_parent g -> f g
+      | Session.Goal g -> Session.goal_iter iter_f g
+      | Session.File f -> Session.file_iter iter_f f
+      | Session.Theory t -> Session.theory_iter iter_f t
+      | Session.Transf t -> Session.transf_iter iter_f t
+      | Session.Proof_attempt _ -> ()
+   in
+   Session.session_iter iter_f env_session.Session.session
+
+let register_goal goal =
+   let task = Session.goal_task goal in
+   let fml = Task.task_goal_fmla task in
+   match fml.t_node , search_labels None fml with
+   | Ttrue, None -> Objectives.set_not_interesting goal
+   | _, None ->
+         Gnat_util.abort_with_message
+         "Task has no tracability label."
+   | _, Some e -> Objectives.add_to_expl e goal
+
+
+let goal_has_been_tried g =
+   try
+      Session.goal_iter_proof_attempt
+         (fun pa ->
+            if pa.Session.proof_prover = Gnat_config.alt_ergo_conf &&
+               pa.Session.proof_timelimit = Gnat_config.timeout then
+                  raise Exit
+         ) g;
+      false
+   with Exit -> true
+
+module Save_VCs : sig
+   val save_vc : goal -> unit
+end = struct
+
+   let count_map : (int ref) Gnat_expl.HExpl.t = Gnat_expl.HExpl.create 17
+
+   let find expl =
+      try Gnat_expl.HExpl.find count_map expl
+      with Not_found ->
+         let r = ref 0 in
+         Gnat_expl.HExpl.add count_map expl r;
+         r
+
+   let vc_name expl =
+      let r = find expl in
+      incr r;
+      let n = !r in
+      let base = Gnat_expl.to_filename expl in
+      let suffix = ".why" in
+      if n = 1 then base ^ suffix
+      else base ^ "_" ^ string_of_int n ^ suffix
+
+   let save_vc goal =
+      let expl = Objectives.get_objective goal in
+      let task = Session.goal_task goal in
+      let dr = Gnat_config.altergo_driver in
+      let vc_fn = vc_name expl in
+      let cout = open_out vc_fn in
+      let fmt  = Format.formatter_of_out_channel cout in
+      Driver.print_task dr fmt task;
+      Format.printf "saved VC to %s@." vc_fn
+
+end
+
+let rec handle_vc_result goal result detailed =
+   if result then begin
+      let remaining = Objectives.discharge goal in
+      if GoalSet.is_empty remaining then begin
+         match Gnat_config.report with
+         | (Gnat_config.Verbose | Gnat_config.Detailed) ->
+               print true (Objectives.get_objective goal)
+         | _ -> ()
+      end else begin
+         schedule_goal (GoalSet.choose remaining)
+      end
+   end else begin
+      if Gnat_config.report = Gnat_config.Detailed && detailed <> None then
+      begin
+         let detailed =
+            match detailed with None -> assert false | Some x -> x in
+         print ~endline:false false (Objectives.get_objective goal);
+         Format.printf " (%a)@." Call_provers.print_prover_answer detailed
+      end else begin
+         print false (Objectives.get_objective goal)
+      end
+   end
+
+and interpret_result pa pas =
+   match pas with
+   | Session.Done r ->
+         let goal = pa.Session.proof_parent in
+         if (Objectives.is_interesting goal) then begin
+            let answer = r.Call_provers.pr_answer in
+            if answer = Call_provers.HighFailure then begin
+               Format.eprintf "An error occured when calling alt-ergo:@.";
+               Format.eprintf "%s@." r.Call_provers.pr_output;
+            end;
+            handle_vc_result goal (answer = Call_provers.Valid) (Some answer)
+         end
+   | _ -> ()
+
+
+and schedule_goal g =
+   (* first deal with command line options *)
+   if Gnat_config.debug then
+      Save_VCs.save_vc g;
    if Gnat_config.noproof then
-      Format.printf "%a@." Gnat_expl.print_skipped expl
+      Format.printf "%a@." Gnat_expl.print_skipped (Objectives.get_objective g)
+   else if Gnat_config.force then
+      actually_schedule_goal g
    else
-      try
-         let cnt = ref 0 in
-         List.iter (fun t ->
-            incr cnt;
-            let result = prove_task t expl !cnt in
-            if result <> Call_provers.Valid then raise (Not_Proven result)) tl;
-         report fmt Call_provers.Valid expl
-      with Not_Proven result -> report fmt result expl
+      (* then implement reproving logic *)
+      begin
+      (* Maybe the goal is already proved *)
+      if g.Session.goal_verified then begin
+         handle_vc_result g true None
+      (* Maybe there was a previous proof attempt with identical parameters *)
+      end else if goal_has_been_tried g then begin
+         (* the proof attempt was necessarily false *)
+         handle_vc_result g false None
+      end else begin
+         actually_schedule_goal g
+      end
+   end
+
+and actually_schedule_goal g =
+      M.prover_on_goal env_session sched_state
+        ~callback:interpret_result
+        ~timelimit:Gnat_config.timeout
+        Gnat_config.alt_ergo_conf g
+
+let apply_split_goal_if_needed g =
+   if Session.PHstr.mem g.Session.goal_transformations Gnat_config.split_name
+   then ()
+   else
+      ignore
+        (Session.add_registered_transformation
+           ~keygen env_session Gnat_config.split_name g)
 
 let _ =
-   if Gnat_config.report_mode then begin
-      let filter =
-         if not (Gnat_config.report = Gnat_config.Fail) then (fun _ -> true)
-         else (fun s -> Gnat_util.ends_with s "not proved")
-      in
-      Gnat_util.cat filter Gnat_config.result_file;
-      exit 0
-   end;
    try
-      let m = Env.read_file Gnat_config.env Gnat_config.filename in
-      (* fill map of explanations *)
-      Util.Mstr.iter do_theory m;
-      if Gnat_config.verbose then
-         Format.printf "Obtained %d proof objectives and %d VCs@."
-            !nb_po !nb_vcs;
-      let outbuf = Buffer.create 1024 in
-      let fmt = Format.formatter_of_buffer outbuf in
-      Gnat_expl.MExpl.iter (prove_objective fmt) !expl_map;
-      Gnat_util.output_buffer outbuf Gnat_config.result_file
+      if is_new_session then begin
+         (* This is a brand new session, simply apply the transformation
+            "split_goal" to the entire file *)
+         let file = M.add_file env_session
+           (Sysutil.relativize_filename project_dir Gnat_config.filename) in
+         M.transform env_session sched_state ~context_unproved_goals_only:false
+         Gnat_config.split_name (Session.File file)
+      end else begin
+         (* We need to add the transformation "split_goal" to subgoals that do
+            not have the transformation yet, and that are in the following
+            hierarchy: session -> file -> theory -> subgoal
+                                                    *here*
+         *)
+         Session.session_iter (fun any ->
+            match any with
+            | Session.File f ->
+                  Session.file_iter (fun any ->
+                     match any with
+                     | Session.Theory t ->
+                           Session.theory_iter (fun any ->
+                              match any with
+                              | Session.Goal g ->
+                                    apply_split_goal_if_needed g
+                              | _ -> ()) t
+                     | _ -> ()) f
+            | _ -> ()) env_session.Session.session
+      end;
+      (* apply transformation *)
+      Scheduler.main_loop ();
+      iter_leaf_goals register_goal;
+      if Gnat_config.verbose then begin
+         Objectives.stat ()
+      end;
+      Objectives.iter (fun _ goalset ->
+         let g = GoalSet.choose goalset in
+         schedule_goal g);
+      Scheduler.main_loop ();
+      Session.save_session env_session.Session.session
     with e when not (Debug.test_flag Debug.stack_trace) ->
        Format.eprintf "%a.@." Exn_printer.exn_printer e;
        Gnat_util.abort_with_message ""
