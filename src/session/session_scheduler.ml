@@ -809,6 +809,77 @@ let convert_unknown_prover =
   Session_tools.convert_unknown_prover ~keygen:O.create
 
 end
+
+
+module Base_scheduler (X : sig end)  =
+  (struct
+
+    let usleep t = ignore (Unix.select [] [] [] t)
+
+
+    let idle_handler = ref None
+    let timeout_handler = ref None
+
+     let idle f =
+       match !idle_handler with
+         | None -> idle_handler := Some f;
+         | Some _ -> failwith "Replay.idle: already one handler installed"
+
+     let timeout ~ms f =
+       match !timeout_handler with
+         | None -> timeout_handler := Some(float ms /. 1000.0 ,f);
+         | Some _ -> failwith "Replay.timeout: already one handler installed"
+
+     let notify_timer_state w s r =
+       Printf.eprintf "Progress: %d/%d/%d                       \r%!" w s r
+
+     let main_loop () =
+       let last = ref (Unix.gettimeofday ()) in
+       try while true do
+           let time = Unix.gettimeofday () -. !last in
+           (* attempt to run timeout handler *)
+           let timeout =
+             match !timeout_handler with
+               | None -> false
+               | Some(ms,f) ->
+                 if time > ms then
+                   let b = f () in
+                   if b then true else
+                     begin
+                       timeout_handler := None;
+                       true
+                     end
+                 else false
+           in
+           if timeout then
+             last := Unix.gettimeofday ()
+           else
+      (* attempt to run the idle handler *)
+             match !idle_handler with
+               | None ->
+                 begin
+                   let ms =
+                     match !timeout_handler with
+                       | None -> raise Exit
+                       | Some(ms,_) -> ms
+                   in
+                   usleep (ms -. time)
+                 end
+               | Some f ->
+                 let b = f () in
+                 if b then () else
+                   begin
+                     idle_handler := None;
+                   end
+         done
+       with Exit -> ()
+
+end)
+
+
+
+
+
 (*
 Local Variables:
 compile-command: "unset LANG; make -C ../.. bin/why3ide.byte"

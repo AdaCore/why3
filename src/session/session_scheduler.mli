@@ -227,6 +227,21 @@ module Make(O: OBSERVER) : sig
 end
 
 
+(** A functor (a state is hidden) that provide a working scheduler
+    and which can be used as base for an OBSERVER *)
+module Base_scheduler (X : sig end) : sig
+
+  val timeout: ms:int -> (unit -> bool) -> unit
+  val idle: (unit -> bool) -> unit
+  val notify_timer_state : int -> int -> int -> unit
+  (** These functions have the properties required by OBSERVER *)
+
+  val main_loop : unit -> unit
+  (** [main_loop ()] run the main loop. Run the timeout handler and the
+      the idle handler registered until the two of them are done. Nothing is run
+      until this function is called *)
+
+end
 
 (*
 Local Variables:
