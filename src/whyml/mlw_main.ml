@@ -28,6 +28,12 @@ let read_channel env path file c =
   if Debug.test_flag Typing.debug_parse_only then
     Mstr.empty, Mstr.empty
   else
-    List.fold_left (add_theory_module env path) (Mstr.empty, Mstr.empty) ml
+    let mm, tm =
+      List.fold_left (add_theory_module env path) (Mstr.empty, Mstr.empty) ml
+    in
+    Mstr.iter (fun _ m ->
+      Mlw_pretty.print_module Format.err_formatter m;
+      Format.pp_print_newline Format.err_formatter ()) mm;
+    mm, tm
 
 let library_of_env = Env.register_format "whyml-exp" ["mlx"] read_channel

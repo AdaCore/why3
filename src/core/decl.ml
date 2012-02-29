@@ -404,8 +404,8 @@ exception BadLogicDecl of lsymbol * lsymbol
 exception BadConstructor of lsymbol
 
 exception BadRecordField of lsymbol
-exception RecordFieldMissing of lsymbol
-exception DuplicateRecordField of lsymbol
+exception RecordFieldMissing of lsymbol * lsymbol
+exception DuplicateRecordField of lsymbol * lsymbol
 
 exception EmptyDecl
 exception EmptyAlgDecl of tysymbol
@@ -425,21 +425,21 @@ let create_ty_decl tdl =
   if tdl = [] then raise EmptyDecl;
   let add s (ts,_) = Sts.add ts s in
   let tss = List.fold_left add Sts.empty tdl in
-  let check_proj tyv s tya ls = match ls with
+  let check_proj cs tyv s tya ls = match ls with
     | None -> s
     | Some ({ ls_args = [ptyv]; ls_value = Some ptya } as ls) ->
         ty_equal_check tyv ptyv;
         ty_equal_check tya ptya;
-        Sls.add_new (DuplicateRecordField ls) ls s
+        Sls.add_new (DuplicateRecordField (cs,ls)) ls s
     | Some ls -> raise (BadRecordField ls)
   in
   let check_constr tys ty pjs (syms,news) (fs,pl) =
     ty_equal_check ty (exn_option (BadConstructor fs) fs.ls_value);
     let fs_pjs =
-      try List.fold_left2 (check_proj ty) Sls.empty fs.ls_args pl
+      try List.fold_left2 (check_proj fs ty) Sls.empty fs.ls_args pl
       with Invalid_argument _ -> raise (BadConstructor fs) in
     if not (Sls.equal pjs fs_pjs) then
-      raise (RecordFieldMissing (Sls.choose (Sls.diff pjs fs_pjs)));
+      raise (RecordFieldMissing (fs, Sls.choose (Sls.diff pjs fs_pjs)));
     let vs = ty_freevars Stv.empty ty in
     let rec check seen ty = match ty.ty_node with
       | Tyvar v when Stv.mem v vs -> ()
@@ -801,12 +801,12 @@ let parse_record kn fll =
   let pjs = List.fold_left (fun s pj -> Sls.add pj s) Sls.empty pjl in
   let flm = List.fold_left (fun m (pj,v) ->
     if not (Sls.mem pj pjs) then raise (BadRecordField pj) else
-    Mls.add_new (DuplicateRecordField pj) pj v m) Mls.empty fll in
+    Mls.add_new (DuplicateRecordField (cs,pj)) pj v m) Mls.empty fll in
   cs,pjl,flm
 
 let make_record kn fll ty =
   let cs,pjl,flm = parse_record kn fll in
-  let get_arg pj = Mls.find_exn (RecordFieldMissing pj) pj flm in
+  let get_arg pj = Mls.find_exn (RecordFieldMissing (cs,pj)) pj flm in
   fs_app cs (List.map get_arg pjl) ty
 
 let make_record_update kn t fll ty =

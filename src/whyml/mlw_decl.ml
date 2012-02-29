@@ -69,9 +69,6 @@ let syms_ity s ity = ity_s_fold syms_its syms_ts s ity
 
 (** {2 Declaration constructors} *)
 
-exception BadConstructor of psymbol
-exception BadRecordField of psymbol
-
 type pre_pconstructor = preid * (pvsymbol * bool) list
 
 type pre_ity_defn =
@@ -115,7 +112,8 @@ let create_ity_decl tdl =
     let ps_ls = { ps = ps; ls = ls } in
     news := Sid.add ps.p_name !news;
     (* build the projections, if any *)
-    let build_proj pv id =
+    let build_proj pv =
+      let id = id_clone pv.pv_vs.vs_name in
       let ls = create_fsymbol id [result.pv_vs.vs_ty] pv.pv_vs.vs_ty in
       let t = fs_app ls [t_var result.pv_vs] pv.pv_vs.vs_ty in
       let post = t_equ (t_var pv.pv_vs) t in
@@ -129,7 +127,7 @@ let create_ity_decl tdl =
       ps_ls
     in
     let build_proj pv =
-      try Hvs.find projections pv.pv_vs with Not_found -> build_proj pv id in
+      try Hvs.find projections pv.pv_vs with Not_found -> build_proj pv in
     let build_proj (pv, pj) =
       syms := ity_s_fold syms_its syms_ts !syms pv.pv_ity;
       if pj then Some (build_proj pv) else None in

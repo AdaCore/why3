@@ -140,8 +140,8 @@ exception EmptyIndDecl of lsymbol
 
 exception BadConstructor of lsymbol
 exception BadRecordField of lsymbol
-exception RecordFieldMissing of lsymbol
-exception DuplicateRecordField of lsymbol
+exception RecordFieldMissing of lsymbol * lsymbol
+exception DuplicateRecordField of lsymbol * lsymbol
 
 (** {2 Utilities} *)
 

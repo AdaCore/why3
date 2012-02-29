@@ -50,8 +50,6 @@ let empty_ns = {
   ns_ns = Mstr.empty;
 }
 
-exception ClashSymbol of string
-
 let ns_replace eq chk x vo vn =
   if not chk then vn else
   if eq vo vn then vo else

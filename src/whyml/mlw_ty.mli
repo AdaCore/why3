@@ -78,7 +78,6 @@ exception BadItyArity of itysymbol * int * int
 exception BadRegArity of itysymbol * int * int
 exception DuplicateRegion of region
 exception UnboundRegion of region
-exception InvalidRegion of region
 
 val create_region : preid -> ?ghost:bool -> ity -> region
 

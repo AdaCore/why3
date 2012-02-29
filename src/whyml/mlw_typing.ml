@@ -33,7 +33,7 @@ open Mlw_module
 
 (** errors *)
 
-exception DuplicateVar of string
+exception DuplicateProgVar of string
 exception DuplicateTypeVar of string
 (*
 exception PredicateExpected
@@ -56,9 +56,9 @@ let rec print_qualid fmt = function
 
 let () = Exn_printer.register (fun fmt e -> match e with
   | DuplicateTypeVar s ->
-      Format.fprintf fmt "Duplicate type parameter %s" s
-  | DuplicateVar s ->
-      Format.fprintf fmt "Duplicate variable %s" s
+      Format.fprintf fmt "Type parameter %s is used twice" s
+  | DuplicateProgVar s ->
+      Format.fprintf fmt "Parameter %s is used twice" s
 (*
   | PredicateExpected ->
       Format.fprintf fmt "syntax error: predicate expected"
@@ -100,7 +100,9 @@ let find_tysymbol q uc =
 let look_for_loc tdl s =
   let look_id loc id = if id.id = s then Some id.id_loc else loc in
   let look_pj loc (id,_) = option_fold look_id loc id in
-  let look_cs loc (_,id,pjl) = List.fold_left look_pj (look_id loc id) pjl in
+  let look_cs loc (csloc,id,pjl) =
+    let loc = if id.id = s then Some csloc else loc in
+    List.fold_left look_pj loc pjl in
   let look_fl loc f = look_id loc f.f_ident in
   let look loc d =
     let loc = look_id loc d.td_ident in
@@ -313,6 +315,8 @@ let add_types uc tdl =
               | Some id ->
                   try
                     let pv = Hashtbl.find projs id.id in
+                    (* once we have ghost/mutable fields in algebraics,
+                       don't forget to check here that they coincide, too *)
                     Loc.try2 id.id_loc ity_equal_check pv.pv_ity ity;
                     pv, true
                   with Not_found ->
@@ -376,7 +380,15 @@ let add_types uc tdl =
       let d = create_ty_decl def in
       add_decl_with_tuples uc d
   with
-    | ClashSymbol s -> error ?loc:(look_for_loc tdl s) (ClashSymbol s)
+    | ClashSymbol s ->
+        error ?loc:(look_for_loc tdl s) (ClashSymbol s)
+    | RecordFieldMissing ({ ls_name = { id_string = s }} as cs,ls) ->
+        error ?loc:(look_for_loc tdl s) (RecordFieldMissing (cs,ls))
+    | DuplicateRecordField ({ ls_name = { id_string = s }} as cs,ls) ->
+        error ?loc:(look_for_loc tdl s) (DuplicateRecordField (cs,ls))
+    | DuplicateVar { vs_name = { id_string = s }} ->
+        errorm ?loc:(look_for_loc tdl s)
+          "Field %s is used twice in the same constructor" s
 
 (** Use/Clone of theories and modules *)
 

@@ -575,7 +575,7 @@ and dterm_node ~localize loc uc env = function
             let e = dterm ~localize uc env e in
             unify_raise ~loc e.dt_ty ty;
             e
-        | None -> error ~loc (RecordFieldMissing pj)
+        | None -> error ~loc (RecordFieldMissing (cs,pj))
       in
       let al = List.map2 get_val pjl tyl in
       Tapp (cs,al), Util.of_option ty
@@ -861,13 +861,17 @@ let add_types dl th =
           let projection (id,_) fty = match id with
             | None -> None
             | Some id ->
-                begin try Hashtbl.find ht id.id
+                try
+                  let pj = Hashtbl.find ht id.id in
+                  let ty = of_option pj.ls_value in
+                  ignore (Loc.try2 id.id_loc ty_equal_check ty fty);
+                  Some pj
                 with Not_found ->
                   let fn = create_user_id id in
-                  let pj = Some (create_fsymbol fn [ty] fty) in
+                  let pj = create_fsymbol fn [ty] fty in
+                  Hashtbl.replace csymbols id.id id.id_loc;
                   Hashtbl.replace ht id.id pj;
-                  pj
-                end
+                  Some pj
           in
           let constructor (loc, id, pl) =
             let tyl = List.map param pl in
@@ -881,10 +885,14 @@ let add_types dl th =
     in
     ts, d
   in
-  let th = try add_ty_decl th (List.map decl dl)
-    with ClashSymbol s -> error ~loc:(Hashtbl.find csymbols s) (ClashSymbol s)
-  in
-  th
+  try add_ty_decl th (List.map decl dl)
+  with
+    | ClashSymbol s ->
+        error ~loc:(Hashtbl.find csymbols s) (ClashSymbol s)
+    | RecordFieldMissing ({ ls_name = { id_string = s }} as cs,ls) ->
+        error ~loc:(Hashtbl.find csymbols s) (RecordFieldMissing (cs,ls))
+    | DuplicateRecordField ({ ls_name = { id_string = s }} as cs,ls) ->
+        error ~loc:(Hashtbl.find csymbols s) (DuplicateRecordField (cs,ls))
 
 let prepare_typedef td =
   if td.td_model then

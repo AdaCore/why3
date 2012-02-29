@@ -17,35 +17,31 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Format
 open Why3
-open Ident
-open Ty
 open Mlw_ty
+open Mlw_expr
+open Mlw_decl
+open Mlw_module
 
-(* program symbols *)
-type psymbol = {
-  p_name : ident;
-  p_tvs  : Stv.t;
-  p_reg  : Sreg.t;
-  p_vty  : vty;
-}
+val forget_all      : unit -> unit     (* flush id_unique *)
+val forget_regs     : unit -> unit     (* flush id_unique for regions *)
+val forget_tvs_regs : unit -> unit     (* flush for type vars and regions *)
+val forget_pv       : pvsymbol -> unit (* flush for a program variable *)
 
-let create_psymbol id tvars regs vty = {
-  (* TODO? check that tvars/regs are in vty *)
-  p_name = id_register id;
-  p_tvs  = tvars;
-  p_reg  = regs;
-  p_vty  = vty;
-}
+val print_reg : formatter -> region -> unit       (* region *)
+val print_pv  : formatter -> pvsymbol -> unit     (* program variable *)
 
-let ps_equal : psymbol -> psymbol -> bool = (==)
+val print_its : formatter -> itysymbol -> unit    (* type symbol *)
+val print_mod : formatter -> modul -> unit        (* module name *)
 
-type expr = private {
-  e_node  : expr_node;
-  e_vty   : vty;
-  e_eff   : effect;
-  e_label : Slab.t;
-  e_loc   : Loc.position option;
-}
+val print_ity : formatter -> ity -> unit          (* individual type *)
+val print_pvty : formatter -> pvsymbol -> unit    (* variable : type *)
 
-and expr_node
+val print_type_decl : formatter -> ity_decl -> unit
+val print_next_type_decl : formatter -> ity_decl -> unit
+
+val print_pdecl : formatter -> pdecl -> unit
+
+val print_module : formatter -> modul -> unit
+

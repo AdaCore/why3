@@ -24,16 +24,15 @@ open Mlw_ty
 
 (* program symbols *)
 type psymbol = private {
-  p_name: ident;
-  p_tvs:   Stv.t;  (* type variables that cannot be instantiated *)
-  p_reg:   Sreg.t; (* regions that cannot be instantiated *)
-  p_vty:   vty;
-  (* pv_ghost: bool; *)
+  p_name : ident;
+  p_tvs  : Stv.t;  (* type variables that cannot be instantiated *)
+  p_reg  : Sreg.t; (* regions that cannot be instantiated *)
+  p_vty  : vty;
 }
 
-val create_psymbol: preid -> Stv.t -> Sreg.t -> vty -> psymbol
+val create_psymbol : preid -> Stv.t -> Sreg.t -> vty -> psymbol
 
-val ps_equal: psymbol -> psymbol -> bool
+val ps_equal : psymbol -> psymbol -> bool
 
 (* program expressions *)
 

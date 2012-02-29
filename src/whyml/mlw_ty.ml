@@ -160,7 +160,7 @@ let ity_s_all pr pts ity =
   try ity_s_fold (all_fn pr) (all_fn pts) true ity with FoldSkip -> false
 
 let ity_s_any pr pts ity =
-  try ity_s_fold (any_fn pr) (all_fn pts) false ity with FoldSkip -> true
+  try ity_s_fold (any_fn pr) (any_fn pts) false ity with FoldSkip -> true
 
 (* traversal functions on type variables and regions *)
 
@@ -202,7 +202,6 @@ exception BadRegArity of itysymbol * int * int
 
 exception DuplicateRegion of region
 exception UnboundRegion of region
-exception InvalidRegion of region
 
 exception RegionMismatch of region * region
 exception TypeMismatch of ity * ity
