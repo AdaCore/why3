@@ -46,6 +46,10 @@ let option_map f = function None -> None | Some x -> Some (f x)
 
 let option_apply d f = function None -> d | Some x -> f x
 
+let apply_option d f x = match f with None -> d | Some f -> f x
+
+let apply_option2 d f x y = match f with None -> d | Some f -> f x y
+
 let option_fold f d = function None -> d | Some x -> f d x
 
 let option_iter f = function None -> () | Some x -> f x
@@ -206,6 +210,17 @@ let ends_with s suf =
   let slen = String.length s in
   let suflen = String.length suf in
   slen >= suflen && aux s suf suflen (slen - suflen) 0
+
+let padd_string c s i =
+  let sl = String.length s in
+  if sl < i then
+    let p = String.create i in
+    String.blit s 0 p 0 sl;
+    String.fill p sl (i-sl) c;
+    p
+  else if sl > i
+  then String.sub s 0 i
+  else s
 
 (** usefule function on char *)
 let is_uppercase c = 'A' <= c && c <= 'Z'

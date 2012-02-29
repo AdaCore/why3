@@ -23,13 +23,305 @@ open Ident
 open Theory
 open Env
 open Ptree
+open Mlw_ty
+open Mlw_expr
+open Mlw_decl
 open Mlw_module
+
+(** errors *)
+
+exception DuplicateVar of string
+exception DuplicateTypeVar of string
+(*
+exception PredicateExpected
+exception TermExpected
+exception FSymExpected of lsymbol
+exception PSymExpected of lsymbol
+exception ClashTheory of string
+exception UnboundTheory of qualid
+exception UnboundType of string list
+*)
+exception UnboundTypeVar of string
+exception UnboundSymbol of string list
+
+let error = Loc.error
+let errorm = Loc.errorm
+
+let rec print_qualid fmt = function
+  | Qident s -> Format.fprintf fmt "%s" s.id
+  | Qdot (m, s) -> Format.fprintf fmt "%a.%s" print_qualid m s.id
+
+let () = Exn_printer.register (fun fmt e -> match e with
+  | DuplicateTypeVar s ->
+      Format.fprintf fmt "Duplicate type parameter %s" s
+  | DuplicateVar s ->
+      Format.fprintf fmt "Duplicate variable %s" s
+(*
+  | PredicateExpected ->
+      Format.fprintf fmt "syntax error: predicate expected"
+  | TermExpected ->
+      Format.fprintf fmt "syntax error: term expected"
+  | FSymExpected ls ->
+      Format.fprintf fmt "%a is not a function symbol" Pretty.print_ls ls
+  | PSymExpected ls ->
+      Format.fprintf fmt "%a is not a predicate symbol" Pretty.print_ls ls
+  | ClashTheory s ->
+      Format.fprintf fmt "Clash with previous theory %s" s
+  | UnboundTheory q ->
+      Format.fprintf fmt "unbound theory %a" print_qualid q
+  | UnboundType sl ->
+      Format.fprintf fmt "Unbound type '%a'"
+        (Pp.print_list Pp.dot Pp.pp_print_string) sl
+*)
+  | UnboundTypeVar s ->
+      Format.fprintf fmt "unbound type variable '%s" s
+  | UnboundSymbol sl ->
+      Format.fprintf fmt "Unbound symbol '%a'"
+        (Pp.print_list Pp.dot Format.pp_print_string) sl
+  | _ -> raise e)
+
+(* TODO: let type_only = Debug.test_flag Typing.debug_type_only in *)
+
+(** Type declaration *)
+
+type tys = ProgTS of itysymbol | PureTS of Ty.tysymbol
+
+let find_tysymbol q uc =
+  let loc = Typing.qloc q in
+  let sl = Typing.string_list_of_qualid [] q in
+  try ProgTS (ns_find_it (get_namespace uc) sl)
+  with Not_found ->
+  try PureTS (ns_find_ts (Theory.get_namespace (get_theory uc)) sl)
+  with Not_found -> error ~loc (UnboundSymbol sl)
+
+let add_types uc tdl =
+  let add m d =
+    let id = d.td_ident.id in
+    Mstr.add_new (Loc.Located (d.td_loc, ClashSymbol id)) id d m in
+  let def = List.fold_left add Mstr.empty tdl in
+
+  (* detect cycles *)
+
+  let rec cyc_visit x d seen = match Mstr.find_opt x seen with
+    | Some true -> seen
+    | Some false -> errorm ~loc:d.td_loc "Cyclic type definition"
+    | None ->
+        let ts_seen seen = function
+          | Qident { id = x } ->
+              begin try cyc_visit x (Mstr.find x def) seen
+              with Not_found -> seen end
+          | _ -> seen in
+        let rec check seen = function
+          | PPTtyvar _ -> seen
+          | PPTtyapp (tyl,q) -> List.fold_left check (ts_seen seen q) tyl
+          | PPTtuple tyl -> List.fold_left check seen tyl in
+        let seen = match d.td_def with
+          | TDabstract | TDalgebraic _ | TDrecord _ -> seen
+          | TDalias ty -> check (Mstr.add x false seen) ty in
+        Mstr.add x true seen in
+  ignore (Mstr.fold cyc_visit def Mstr.empty);
+
+  (* detect mutable types *)
+
+  let mutables = Hashtbl.create 5 in
+  let rec mut_visit x =
+    try Hashtbl.find mutables x
+    with Not_found ->
+      let ts_mut = function
+        | Qident { id = x } when Mstr.mem x def -> mut_visit x
+        | q ->
+            begin match find_tysymbol q uc with
+              | ProgTS s -> s.its_regs <> []
+              | PureTS _ -> false end in
+      let rec check = function
+        | PPTtyvar _ -> false
+        | PPTtyapp (tyl,q) -> ts_mut q || List.exists check tyl
+        | PPTtuple tyl -> List.exists check tyl in
+      Hashtbl.replace mutables x false;
+      let mut = match (Mstr.find x def).td_def with
+        | TDabstract -> false
+        | TDalias ty -> check ty
+        | TDalgebraic csl ->
+            let proj (_,pty) = check pty in
+            List.exists (fun (_,_,l) -> List.exists proj l) csl
+        | TDrecord fl ->
+            let field f = f.f_mutable || check f.f_pty in
+            List.exists field fl in
+      Hashtbl.replace mutables x mut;
+      mut
+  in
+  Mstr.iter (fun x _ -> ignore (mut_visit x)) def;
+
+  (* create type symbols and predefinitions for mutable types *)
+
+  let tysymbols = Hashtbl.create 5 in
+  let predefs = Hashtbl.create 5 in
+  let rec its_visit x =
+    try match Hashtbl.find tysymbols x with
+      | Some ts -> ts
+      | None ->
+          let loc = (Mstr.find x def).td_loc in
+          errorm ~loc "Mutable type in a recursive type definition"
+    with Not_found ->
+      let d = Mstr.find x def in
+      let add_tv acc id =
+        let e = Loc.Located (id.id_loc, DuplicateTypeVar id.id) in
+        let tv = Ty.create_tvsymbol (Denv.create_user_id id) in
+        Mstr.add_new e id.id tv acc in
+      let vars = List.fold_left add_tv Mstr.empty d.td_params in
+      let vl = List.map (fun id -> Mstr.find id.id vars) d.td_params in
+      let id = Denv.create_user_id d.td_ident in
+      let abst = d.td_vis = Abstract in
+      let priv = d.td_vis = Private in
+      Hashtbl.add tysymbols x None;
+      let get_ts = function
+        | Qident { id = x } when Mstr.mem x def -> ProgTS (its_visit x)
+        | q -> find_tysymbol q uc
+      in
+      let rec parse = function
+        | PPTtyvar { id = v ; id_loc = loc } ->
+            let e = Loc.Located (loc, UnboundTypeVar v) in
+            ity_var (Mstr.find_exn e v vars)
+        | PPTtyapp (tyl,q) ->
+            let tyl = List.map parse tyl in
+            begin match get_ts q with
+              | PureTS ts -> Loc.try2 (Typing.qloc q) ity_pur ts tyl
+              | ProgTS ts -> Loc.try2 (Typing.qloc q) ity_app_fresh ts tyl
+            end
+        | PPTtuple tyl ->
+            let ts = Ty.ts_tuple (List.length tyl) in
+            ity_pur ts (List.map parse tyl)
+      in
+      let ts = match d.td_def with
+        | TDalias ty ->
+            let def = parse ty in
+            let s = ity_topregions Sreg.empty def in
+            create_itysymbol id ~abst ~priv vl (Sreg.elements s) (Some def)
+        | TDalgebraic csl when Hashtbl.mem mutables x ->
+            let projs = Hashtbl.create 5 in
+            (* to check projections' types we must fix the tyvars *)
+            let add s v = let t = ity_var v in ity_match s t t in
+            let sbs = List.fold_left add ity_subst_empty vl in
+            let mk_proj s (id,pty) =
+              let ity = parse pty in
+              match id with
+                | None ->
+                    let pv = create_pvsymbol (id_fresh "pj") ity in
+                    ity_topregions s ity, (pv, false)
+                | Some id ->
+                    try
+                      let pv = Hashtbl.find projs id.id in
+                      ignore (ity_match sbs pv.pv_ity ity);
+                      s, (pv, true)
+                    with Not_found ->
+                      let pv = create_pvsymbol (Denv.create_user_id id) ity in
+                      Hashtbl.replace projs id.id pv;
+                      ity_topregions s ity, (pv, true)
+            in
+            let mk_constr s (_loc,cid,pjl) =
+              let s,pjl = Util.map_fold_left mk_proj s pjl in
+              s, (Denv.create_user_id cid, pjl)
+            in
+            let s,def = Util.map_fold_left mk_constr Sreg.empty csl in
+            Hashtbl.replace predefs x (PITalgebraic def);
+            create_itysymbol id ~abst ~priv vl (Sreg.elements s) None
+        | TDrecord fl when Hashtbl.mem mutables x ->
+            let mk_field s f =
+              let ghost = f.f_ghost in
+              let ity = parse f.f_pty in
+              let fid = Denv.create_user_id f.f_ident in
+              let s,mut = if f.f_mutable then
+                let r = create_region fid ~ghost ity in
+                Sreg.add r s, Some r
+              else
+                ity_topregions s ity, None
+              in
+              s, (create_pvsymbol fid ?mut ~ghost ity, true)
+            in
+            let s,pjl = Util.map_fold_left mk_field Sreg.empty fl in
+            let cid = { d.td_ident with id = "mk " ^ d.td_ident.id } in
+            let def = PITalgebraic [Denv.create_user_id cid, pjl] in
+            Hashtbl.replace predefs x def;
+            create_itysymbol id ~abst ~priv vl (Sreg.elements s) None
+        | TDalgebraic _ | TDrecord _ | TDabstract ->
+            create_itysymbol id ~abst ~priv vl [] None
+      in
+      Hashtbl.add tysymbols x (Some ts);
+      ts
+  in
+  Mstr.iter (fun x _ -> ignore (its_visit x)) def;
+
+  (* create predefinitions for immutable types *)
+
+  let def_visit d =
+    let x = d.td_ident.id in
+    let ts = Util.of_option (Hashtbl.find tysymbols x) in
+    let add_tv s x v = Mstr.add x.id v s in
+    let vars = List.fold_left2 add_tv Mstr.empty d.td_params ts.its_args in
+    let get_ts = function
+      | Qident { id = x } when Mstr.mem x def ->
+          ProgTS (Util.of_option (Hashtbl.find tysymbols x))
+      | q -> find_tysymbol q uc
+    in
+    let rec parse = function
+      | PPTtyvar { id = v ; id_loc = loc } ->
+          let e = Loc.Located (loc, UnboundTypeVar v) in
+          ity_var (Mstr.find_exn e v vars)
+      | PPTtyapp (tyl,q) ->
+          let tyl = List.map parse tyl in
+          begin match get_ts q with
+            | PureTS ts -> Loc.try2 (Typing.qloc q) ity_pur ts tyl
+            | ProgTS ts -> Loc.try3 (Typing.qloc q) ity_app ts tyl []
+          end
+      | PPTtuple tyl ->
+          let ts = Ty.ts_tuple (List.length tyl) in
+          ity_pur ts (List.map parse tyl)
+    in
+    match d.td_def with
+      | TDabstract | TDalias _ ->
+          ts, PITabstract
+      | TDalgebraic _ when Hashtbl.mem mutables x ->
+          ts, Hashtbl.find predefs x
+      | TDrecord _ when Hashtbl.mem mutables x ->
+          ts, Hashtbl.find predefs x
+      | TDalgebraic csl ->
+          let projs = Hashtbl.create 5 in
+          let mk_proj (id,pty) =
+            let ity = parse pty in
+            match id with
+              | None ->
+                  create_pvsymbol (id_fresh "pj") ity, false
+              | Some id ->
+                  try
+                    let pv = Hashtbl.find projs id.id in
+                    ity_equal_check pv.pv_ity ity;
+                    pv, true
+                  with Not_found ->
+                    let pv = create_pvsymbol (Denv.create_user_id id) ity in
+                    Hashtbl.replace projs id.id pv;
+                    pv, true
+          in
+          let mk_constr (_loc,cid,pjl) =
+            Denv.create_user_id cid, List.map mk_proj pjl in
+          ts, PITalgebraic (List.map mk_constr csl)
+      | TDrecord fl ->
+          let mk_field f =
+            let fid = Denv.create_user_id f.f_ident in
+            create_pvsymbol fid ~ghost:f.f_ghost (parse f.f_pty), true in
+          let cid = { d.td_ident with id = "mk " ^ d.td_ident.id } in
+          ts, PITalgebraic [Denv.create_user_id cid, List.map mk_field fl]
+  in
+  (* TODO: localize exceptions *)
+  let pd = create_ity_decl (List.map def_visit tdl) in
+  add_pdecl_with_tuples uc pd
+
+(* TODO: if type declaration is pure, declare it in the theory *)
+
+(** Use/Clone of theories and modules *)
 
 type mlw_contents = modul Mstr.t
 type mlw_library = mlw_contents library
 type mlw_file = mlw_contents * Theory.theory Mstr.t
-
-(* TODO: let type_only = Debug.test_flag Typing.debug_type_only in *)
 
 let find_theory loc lib path s =
   (* search first in .mlw files (using lib) *)
@@ -92,11 +384,15 @@ let find_module loc lib mm mt path s = match path with
   | _ :: _ -> (* module/theory in file path *)
       find_module loc lib path s
 
+(** Main loop *)
+
 let add_theory lib path mt m =
   let { id = id; id_loc = loc } = m.pth_name in
   if Mstr.mem id mt then Loc.errorm ~loc "clash with previous theory %s" id;
   let uc = Theory.create_theory ~path (Denv.create_user_id m.pth_name) in
   let rec add_decl uc = function
+    | Dlogic d ->
+        Typing.add_decl uc d
     | Duseclone (loc, use, inst) ->
         let path, s = Typing.split_qualid use.use_theory in
         let th = find_theory loc lib mt path s in
@@ -115,8 +411,6 @@ let add_theory lib path mt m =
           | None -> uc
           | Some imp -> Theory.close_namespace uc imp use.use_as
         end
-    | Dlogic d ->
-        Typing.add_decl uc d
     | Dnamespace (loc, name, import, dl) ->
         let uc = Theory.open_namespace uc in
         let uc = List.fold_left add_decl uc dl in
@@ -134,6 +428,10 @@ let add_module lib path mm mt m =
   if Mstr.mem id mt then Loc.errorm ~loc "clash with previous theory %s" id;
   let uc = create_module ~path (Denv.create_user_id m.mod_name) in
   let rec add_decl uc = function
+    | Dlogic (TypeDecl tdl) ->
+        add_types uc tdl
+    | Dlogic d ->
+        add_to_theory Typing.add_decl uc d
     | Duseclone (loc, use, inst) ->
         let path, s = Typing.split_qualid use.use_theory in
         let mth = find_module loc lib mm mt path s in
@@ -155,9 +453,6 @@ let add_module lib path mm mt m =
           | None -> uc
           | Some imp -> close_namespace uc imp use.use_as
         end
-    (* TODO: handle types differently *)
-    | Dlogic d ->
-        add_to_theory Typing.add_decl uc d
     | Dnamespace (loc, name, import, dl) ->
         let uc = open_namespace uc in
         let uc = List.fold_left add_decl uc dl in

@@ -103,9 +103,10 @@ module Make(O: OBSERVER) : sig
     *)
 
   val add_file : O.key env_session -> string -> O.key Session.file
-    (** [add_file f] adds the file [f] in the proof session,
-        the file name must be given relatively to the session dir
-        given to [open_session] *)
+    (** [add_file es f] adds the file with filename [f] in the proof
+        session, the file name must be given relatively to the session
+        dir given to [open_session]
+    *)
 
 (** {2 Actions} *)
 
@@ -113,10 +114,31 @@ module Make(O: OBSERVER) : sig
     O.key env_session -> t ->
     context_unproved_goals_only:bool ->
     timelimit:int -> Whyconf.prover -> O.key any -> unit
-    (** [run_prover p a] runs prover [p] on all goals under [a]
+    (** [run_prover es sched p a] runs prover [p] on all goals under [a]
         the proof attempts are only scheduled for running, and they
-        will be started asynchronously when processors are available
+        will be started asynchronously when processors are available.
+
+        ~context_unproved_goals_only indicates if verified goals must be
+        discarded
     *)
+
+
+  val run_external_proof :
+    O.key env_session -> t ->
+    ?callback:(O.key proof_attempt -> proof_attempt_status -> unit) ->
+    O.key proof_attempt -> unit
+  (** [redo_external_proof es sched ?timelimit p g] run 
+  *)
+
+
+  val prover_on_goal :
+    O.key env_session -> t ->
+    ?callback:(O.key proof_attempt -> proof_attempt_status -> unit) ->
+    timelimit:int -> Whyconf.prover -> O.key goal -> unit
+  (** [prover_on_goal es sched ?timelimit p g] same as
+      {!redo_external_proof} but create or reuse existing proof_attempt
+  *)
+
 
   val cancel_scheduled_proofs : t -> unit
     (** cancels all currently scheduled proof attempts.
@@ -124,12 +146,33 @@ module Make(O: OBSERVER) : sig
         stopped, the corresponding processes must terminate
         by their own. *)
 
+
+  val transform_goal :
+    O.key env_session -> t ->
+    ?keep_dumb_transformation:bool ->
+    ?callback:(O.key transf option -> unit) ->
+    string -> O.key goal -> unit
+    (** [transform es sched tr g] applies registered
+        transformation [tr] on the given goal.
+
+        If keep_dumb_transformation is false (default)
+        and the transformation gives one task equal to [g]
+        the transformation is not added (the callback is called with None).
+        Otherwise the transformation is added and given to the callback.
+    *)
+
+
   val transform :
     O.key env_session -> t ->
     context_unproved_goals_only:bool ->
+    ?callback:(O.key transf option -> unit) ->
     string -> O.key any -> unit
-    (** [apply_transformation tr a] applies transformation [trp]
-        on all goals under [a] *)
+    (** [transform es sched tr a] applies registered
+        transformation [tr] on all leaf goals under [a].
+
+        ~context_unproved_goals_only indicates if verified goals must be
+        discarded
+    *)
 
   val edit_proof :
     O.key env_session -> t ->
@@ -141,10 +184,11 @@ module Make(O: OBSERVER) : sig
     O.key env_session -> t ->
     obsolete_only:bool ->
     context_unproved_goals_only:bool -> O.key any -> unit
-    (** [replay a] reruns proofs under [a]
+    (** [replay es sched ~obsolete_only ~context_unproved_goals_only a]
+        reruns proofs under [a]
         if obsolete_only is set then does not rerun non-obsolete proofs
-        if context_unproved_goals_only is set then reruns only proofs
-        with result was 'valid'
+        if context_unproved_goals_only is set then don't rerun proofs
+        already 'valid'
     *)
 
   val cancel : O.key any -> unit
@@ -171,12 +215,11 @@ module Make(O: OBSERVER) : sig
   val check_all:
     O.key env_session -> t ->
     callback:((Ident.ident * Whyconf.prover * report) list -> unit) -> unit
-    (** [check_all ()] reruns all the proofs of the session, and reports
-        for all proofs the current result and the new one
-        (does not change the session state)
-        When finished, calls the callback with the reports
-        which are triples (goal name, prover, report)
-    *)
+    (** [check_all session callback] reruns all the proofs of the
+        session, and reports for all proofs the current result and the
+        new one (does not change the session state) When finished,
+        calls the callback with the reports which are triples (goal
+        name, prover, report) *)
 
   val convert_unknown_prover : O.key env_session -> unit
     (** Same as {!Session_tools.convert_unknown_prover} *)
@@ -184,6 +227,21 @@ module Make(O: OBSERVER) : sig
 end
 
 
+(** A functor (a state is hidden) that provide a working scheduler
+    and which can be used as base for an OBSERVER *)
+module Base_scheduler (X : sig end) : sig
+
+  val timeout: ms:int -> (unit -> bool) -> unit
+  val idle: (unit -> bool) -> unit
+  val notify_timer_state : int -> int -> int -> unit
+  (** These functions have the properties required by OBSERVER *)
+
+  val main_loop : unit -> unit
+  (** [main_loop ()] run the main loop. Run the timeout handler and the
+      the idle handler registered until the two of them are done. Nothing is run
+      until this function is called *)
+
+end
 
 (*
 Local Variables:

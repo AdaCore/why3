@@ -26,7 +26,7 @@ open Mlw_expr
 
 (** {2 Type declaration} *)
 
-type ps_ls = private { ps: psymbol; ls: lsymbol }
+type ps_ls = private { ps : psymbol; ls : lsymbol }
 
 type pconstructor = ps_ls * ps_ls option list
 
@@ -66,4 +66,4 @@ type known_map = pdecl Mid.t
 
 val known_id : known_map -> ident -> unit
 val known_add_decl : Decl.known_map -> known_map -> pdecl -> known_map
-val merge_known: known_map -> known_map -> known_map
+val merge_known : known_map -> known_map -> known_map

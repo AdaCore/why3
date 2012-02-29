@@ -352,7 +352,8 @@ val add_file :
   'key env_session ->
   string ->
   'key file
-(** Add a real file by its filename *)
+(** Add a real file by its filename. The filename must be relative to
+    session_dir *)
 
 val remove_file : 'key file -> unit
 (** Remove a file *)

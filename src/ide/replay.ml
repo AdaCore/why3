@@ -151,14 +151,8 @@ let () =
   Debug.Opt.set_flags_selected ();
   if Debug.Opt.option_list () then exit 0
 
-let usleep t = ignore (Unix.select [] [] [] t)
-
-
-let idle_handler = ref None
-let timeout_handler = ref None
-
 module O =
-  (struct
+  struct
      type key = int
 
      let create ?parent () =
@@ -169,20 +163,6 @@ module O =
      let remove _row = ()
 
      let reset () = ()
-
-     let idle f =
-       match !idle_handler with
-         | None -> idle_handler := Some f;
-         | Some _ -> failwith "Replay.idle: already one handler installed"
-
-     let timeout ~ms f =
-       match !timeout_handler with
-         | None -> timeout_handler := Some(float ms /. 1000.0 ,f);
-         | Some _ -> failwith "Replay.timeout: already one handler installed"
-
-     let notify_timer_state w s r =
-       Printf.eprintf "Progress: %d/%d/%d                       \r%!" w s r
-
 
 let init =
 (*
@@ -232,7 +212,11 @@ let unknown_prover _ _ = None
 
 let replace_prover _ _ = false
 
-   end)
+module Scheduler = Session_scheduler.Base_scheduler(struct end)
+
+include Scheduler
+
+end
 
 module M = Session_scheduler.Make(O)
 
@@ -246,46 +230,7 @@ let print_result fmt
   if ans == Call_provers.HighFailure then
     fprintf fmt "@\nProver output:@\n%s@." out
 
-let main_loop () =
-  let last = ref (Unix.gettimeofday ()) in
-  while true do
-    let time = Unix.gettimeofday () -. !last in
-    (* attempt to run timeout handler *)
-    let timeout =
-      match !timeout_handler with
-        | None -> false
-        | Some(ms,f) ->
-            if time > ms then
-              let b = f () in
-              if b then true else
-                begin
-                  timeout_handler := None;
-                  true
-                end
-            else false
-    in
-    if timeout then
-      last := Unix.gettimeofday ()
-    else
-      (* attempt to run the idle handler *)
-      match !idle_handler with
-        | None ->
-            begin
-              let ms =
-                match !timeout_handler with
-                  | None -> 100.0 (* raise Exit *)
-                  | Some(ms,_) -> ms
-              in
-              usleep (ms -. time)
-            end
-        | Some f ->
-            let b = f () in
-            if b then () else
-              begin
-                idle_handler := None;
-              end
-  done
-
+let main_loop = O.main_loop
 (*
 let model_index = Hashtbl.create 257
 *)
@@ -723,8 +668,7 @@ let () =
       else
 	begin
           add_to_check found_obs env_session sched;
-          try main_loop ()
-          with Exit -> eprintf "main replayer exited unexpectedly@."
+          main_loop (); eprintf "main replayer exited unexpectedly@."; exit 1
 	end
   with
     | S.OutdatedSession ->

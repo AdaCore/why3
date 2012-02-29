@@ -26,10 +26,12 @@ open Term
 (** value types (w/o effects) *)
 
 type itysymbol = {
-  its_pure  : tysymbol;
-  its_args  : tvsymbol list;
-  its_regs  : region   list;
-  its_def   : ity option;
+  its_pure : tysymbol;
+  its_args : tvsymbol list;
+  its_regs : region   list;
+  its_def  : ity option;
+  its_abst : bool;
+  its_priv : bool;
 }
 
 and ity = {
@@ -43,9 +45,9 @@ and ity_node =
   | Ityapp of itysymbol * ity list * region list
 
 and region = {
-  reg_name : ident;
-  reg_ity  : ity;
-  reg_ghost: bool;
+  reg_name  : ident;
+  reg_ity   : ity;
+  reg_ghost : bool;
 }
 
 (** regions *)
@@ -181,10 +183,11 @@ let ity_v_any prv prr ity =
 let ity_full_inst mv mr ity =
   ity_v_map (fun v -> Mtv.find v mv) (fun r -> Mreg.find r mr) ity
 
-let ity_freevars s ity = ity_v_fold (fun s v -> Stv.add v s) Util.const s ity
+let ity_freevars = ity_v_fold (fun s v -> Stv.add v s) Util.const
+let ity_topregions = ity_v_fold Util.const (fun s r -> Sreg.add r s)
 
-let ity_closed ity = ity_v_all Util.ffalse Util.ttrue ity
-let ity_pure ity = ity_v_all Util.ttrue Util.ffalse ity
+let ity_closed = ity_v_all Util.ffalse Util.ttrue
+let ity_pure = ity_v_all Util.ttrue Util.ffalse
 
 (* smart constructors *)
 
@@ -202,8 +205,8 @@ let ity_equal_check ty1 ty2 =
   if not (ity_equal ty1 ty2) then raise (TypeMismatch (ty1, ty2))
 
 type ity_subst = {
-  ity_subst_tv:  ity Mtv.t;
-  ity_subst_reg: region Mreg.t;
+  ity_subst_tv  : ity Mtv.t;
+  ity_subst_reg : region Mreg.t;
 }
 
 let ity_subst_empty = {
@@ -258,27 +261,58 @@ let rec ity_of_ty ty = match ty.ty_node with
   | Tyvar v -> ity_var v
   | Tyapp (s,tl) -> ity_pur s (List.map ity_of_ty tl)
 
-let ity_app s tl rl =
-  let tll = List.length tl in
-  let rll = List.length rl in
-  let stl = List.length s.its_args in
-  let srl = List.length s.its_regs in
-  if tll <> stl then raise (BadItyArity (s,stl,tll));
-  if rll <> srl then raise (BadRegArity (s,srl,rll));
+let rec ity_inst_fresh mv mr ity = match ity.ity_node with
+  | Ityvar v ->
+      mr, Mtv.find v mv
+  | Itypur (s,tl) ->
+      let mr,tl = Util.map_fold_left (ity_inst_fresh mv) mr tl in
+      mr, ity_pur s tl
+  | Ityapp (s,tl,rl) ->
+      let mr,tl = Util.map_fold_left (ity_inst_fresh mv) mr tl in
+      let mr,rl = Util.map_fold_left (reg_refresh mv) mr rl in
+      mr, ity_app s tl rl
+
+and reg_refresh mv mr r = match Mreg.find_opt r mr with
+  | Some r ->
+      mr, r
+  | None ->
+      let mr,ity = ity_inst_fresh mv mr r.reg_ity in
+      let id = id_clone r.reg_name and ghost = r.reg_ghost in
+      let reg = create_region id ~ghost ity in
+      Mreg.add r reg mr, reg
+
+let ity_app_fresh s tl =
+  (* type variable map *)
   let add m v t = Mtv.add v t m in
-  let mv = List.fold_left2 add Mtv.empty s.its_args tl in
+  let mv = try List.fold_left2 add Mtv.empty s.its_args tl
+    with Invalid_argument _ ->
+      raise (BadItyArity (s, List.length s.its_args, List.length tl)) in
+  (* refresh regions *)
+  let mr,rl = Util.map_fold_left (reg_refresh mv) Mreg.empty s.its_regs in
+  (* every external region in def is guaranteed to be in mr *)
+  match s.its_def with
+  | Some ity -> ity_full_inst mv mr ity
+  | None -> ity_app s tl rl
+
+let ity_app s tl rl =
+  (* type variable map *)
+  let add m v t = Mtv.add v t m in
+  let mv = try List.fold_left2 add Mtv.empty s.its_args tl
+    with Invalid_argument _ ->
+      raise (BadItyArity (s, List.length s.its_args, List.length tl)) in
+  (* region map *)
   let add m v r = Mreg.add v r m in
-  let mr = List.fold_left2 add Mreg.empty s.its_regs rl in
+  let mr = try List.fold_left2 add Mreg.empty s.its_regs rl
+    with Invalid_argument _ ->
+      raise (BadRegArity (s, List.length s.its_regs, List.length rl)) in
   (* check that region types do unify *)
   let sub = { ity_subst_tv = mv; ity_subst_reg = mr } in
   let rmatch sub r1 r2 = ity_match sub r1.reg_ity r2.reg_ity in
   ignore (List.fold_left2 rmatch sub s.its_regs rl);
   (* to instantiate def, mv and mr are enough *)
   match s.its_def with
-  | Some ity ->
-      ity_full_inst mv mr ity
-  | None ->
-      ity_app s tl rl
+  | Some ity -> ity_full_inst mv mr ity
+  | None -> ity_app s tl rl
 
 let ity_pur s tl = match s.ts_def with
   | Some ty ->
@@ -288,7 +322,7 @@ let ity_pur s tl = match s.ts_def with
   | None ->
       ity_pur s tl
 
-let create_itysymbol name args regs def (* model *) =
+let create_itysymbol name ?(abst=false) ?(priv=false) args regs def =
   let puredef = option_map ty_of_ity def in
   let purets = create_tysymbol name args puredef in
   (* all regions *)
@@ -302,19 +336,20 @@ let create_itysymbol name args regs def (* model *) =
   (* all regions in [def] must be in [regs] *)
   let check r = Sreg.mem r sregs || raise (UnboundRegion r) in
   ignore (option_map (ity_v_all Util.ttrue check) def);
-  (* if a type is a model alias, expand everything on the RHS *)
-  (* let def = if model then option_map (ity_mod purets) def else def in *)
+  (* if a type is an alias then abst and priv will be ignored *)
   { its_pure  = purets;
     its_args  = args;
     its_regs  = regs;
-    its_def   = def; }
+    its_def   = def;
+    its_abst  = abst;
+    its_priv  = priv }
 
 (** computation types (with effects) *)
 
 (* exception symbols *)
 type xsymbol = {
   xs_name : ident;
-  xs_ity:   ity; (* closed and pure *)
+  xs_ity  : ity; (* closed and pure *)
 }
 
 exception PolymorphicException of ident * ity
@@ -330,24 +365,25 @@ module Exn = StructMake (struct
   type t = xsymbol
   let tag xs = Hashweak.tag_hash xs.xs_name.id_tag
 end)
+
 module Sexn = Exn.S
 module Mexn = Exn.M
 
 (* effects *)
 type effect = {
-  eff_reads:   Sreg.t;
-  eff_writes:  Sreg.t;
-  eff_erases:  Sreg.t;
-  eff_renames: region Mreg.t; (* if r1->r2 then r1 appears in ty(r2) *)
-  eff_raises:  Sexn.t;
+  eff_reads   : Sreg.t;
+  eff_writes  : Sreg.t;
+  eff_erases  : Sreg.t;
+  eff_renames : region Mreg.t; (* if r1->r2 then r1 appears in ty(r2) *)
+  eff_raises  : Sexn.t;
 }
 
 let eff_empty = {
-  eff_reads = Sreg.empty;
-  eff_writes = Sreg.empty;
-  eff_erases = Sreg.empty;
+  eff_reads   = Sreg.empty;
+  eff_writes  = Sreg.empty;
+  eff_erases  = Sreg.empty;
   eff_renames = Mreg.empty;
-  eff_raises = Sexn.empty
+  eff_raises  = Sexn.empty
 }
 
 let eff_union x y =
@@ -372,10 +408,10 @@ let eff_remove_raise xs e = { e with eff_raises = Sexn.remove xs e.eff_raises }
 
 (* program variables *)
 type pvsymbol = {
-  pv_vs:      vsymbol;
-  pv_ity:     ity;
-  pv_ghost:   bool;
-  pv_mutable: region option;
+  pv_vs      : vsymbol;
+  pv_ity     : ity;
+  pv_ghost   : bool;
+  pv_mutable : region option;
 }
 
 exception InvalidPVsymbol of ident
@@ -403,11 +439,11 @@ type vty =
 
 (* computation types *)
 and cty = {
-  c_pre: term;
-  c_vty: vty;
-  c_eff: effect;
-  c_post: term;
-  c_xpost: xpost;
+  c_pre   : term;
+  c_vty   : vty;
+  c_eff   : effect;
+  c_post  : term;
+  c_xpost : xpost;
 }
 
 and xpost = (pvsymbol * term) Mexn.t

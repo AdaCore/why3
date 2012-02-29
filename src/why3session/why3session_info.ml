@@ -69,7 +69,7 @@ let run () =
 
 let cmd =
   { cmd_spec = spec;
-    cmd_desc = "print informations about session";
+    cmd_desc = "print informations about session.";
     cmd_name = "info";
     cmd_run  = run;
   }
