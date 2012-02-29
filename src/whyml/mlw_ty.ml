@@ -156,6 +156,12 @@ let rec ity_s_fold fn fts acc ity = match ity.ity_node with
       let acc = List.fold_left (ity_s_fold fn fts) (fn acc f) tl in
       List.fold_left (fun acc r -> ity_s_fold fn fts acc r.reg_ity) acc rl
 
+let ity_s_all pr pts ity =
+  try ity_s_fold (all_fn pr) (all_fn pts) true ity with FoldSkip -> false
+
+let ity_s_any pr pts ity =
+  try ity_s_fold (any_fn pr) (all_fn pts) false ity with FoldSkip -> true
+
 (* traversal functions on type variables and regions *)
 
 let rec ity_v_map fnv fnr ity = match ity.ity_node with

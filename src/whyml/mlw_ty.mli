@@ -104,27 +104,23 @@ val ity_fold : ('a -> ity -> 'a) -> 'a -> ity -> 'a
 val ity_all : (ity -> bool) -> ity -> bool
 val ity_any : (ity -> bool) -> ity -> bool
 
+(* traversal functions on type symbols *)
+
+val ity_s_fold :
+  ('a -> itysymbol -> 'a) -> ('a -> tysymbol -> 'a) -> 'a -> ity -> 'a
+
+val ity_s_all : (itysymbol -> bool) -> (tysymbol -> bool) -> ity -> bool
+val ity_s_any : (itysymbol -> bool) -> (tysymbol -> bool) -> ity -> bool
+
 (* traversal functions on type variables and regions *)
 
-val ity_v_map :
-  (tvsymbol -> ity) -> (region -> region) -> ity -> ity
+val ity_v_map : (tvsymbol -> ity) -> (region -> region) -> ity -> ity
 
 val ity_v_fold :
   ('a -> tvsymbol -> 'a) -> ('a -> region -> 'a) -> 'a -> ity -> 'a
 
 val ity_v_all : (tvsymbol -> bool) -> (region -> bool) -> ity -> bool
 val ity_v_any : (tvsymbol -> bool) -> (region -> bool) -> ity -> bool
-
-(** {3 symbol-wise map/fold} *)
-(** visits every symbol of the type *)
-
-val ity_s_fold :
-  ('a -> itysymbol -> 'a) -> ('a -> tysymbol -> 'a) -> 'a -> ity -> 'a
-(*
-val ity_s_map : (itysymbol -> itysymbol) -> ity -> ity
-val ity_s_all : (itysymbol -> bool) -> ity -> bool
-val ity_s_any : (itysymbol -> bool) -> ity -> bool
-*)
 
 val ity_freevars : Stv.t -> ity -> Stv.t
 val ity_topregions : Sreg.t -> ity -> Sreg.t

@@ -20,6 +20,9 @@
 open Why3
 open Util
 open Ident
+open Ty
+open Term
+open Decl
 open Theory
 open Env
 open Ptree
@@ -84,7 +87,7 @@ let () = Exn_printer.register (fun fmt e -> match e with
 
 (** Type declaration *)
 
-type tys = ProgTS of itysymbol | PureTS of Ty.tysymbol
+type tys = ProgTS of itysymbol | PureTS of tysymbol
 
 let find_tysymbol q uc =
   let loc = Typing.qloc q in
@@ -93,6 +96,20 @@ let find_tysymbol q uc =
   with Not_found ->
   try PureTS (ns_find_ts (Theory.get_namespace (get_theory uc)) sl)
   with Not_found -> error ~loc (UnboundSymbol sl)
+
+let look_for_loc tdl s =
+  let look_id loc id = if id.id = s then Some id.id_loc else loc in
+  let look_pj loc (id,_) = option_fold look_id loc id in
+  let look_cs loc (_,id,pjl) = List.fold_left look_pj (look_id loc id) pjl in
+  let look_fl loc f = look_id loc f.f_ident in
+  let look loc d =
+    let loc = look_id loc d.td_ident in
+    match d.td_def with
+      | TDabstract | TDalias _ -> loc
+      | TDalgebraic csl -> List.fold_left look_cs loc csl
+      | TDrecord fl -> List.fold_left look_fl loc fl
+  in
+  List.fold_left look None tdl
 
 let add_types uc tdl =
   let add m d =
@@ -166,7 +183,7 @@ let add_types uc tdl =
       let d = Mstr.find x def in
       let add_tv acc id =
         let e = Loc.Located (id.id_loc, DuplicateTypeVar id.id) in
-        let tv = Ty.create_tvsymbol (Denv.create_user_id id) in
+        let tv = create_tvsymbol (Denv.create_user_id id) in
         Mstr.add_new e id.id tv acc in
       let vars = List.fold_left add_tv Mstr.empty d.td_params in
       let vl = List.map (fun id -> Mstr.find id.id vars) d.td_params in
@@ -189,7 +206,7 @@ let add_types uc tdl =
               | ProgTS ts -> Loc.try2 (Typing.qloc q) ity_app_fresh ts tyl
             end
         | PPTtuple tyl ->
-            let ts = Ty.ts_tuple (List.length tyl) in
+            let ts = ts_tuple (List.length tyl) in
             ity_pur ts (List.map parse tyl)
       in
       let ts = match d.td_def with
@@ -211,7 +228,9 @@ let add_types uc tdl =
                 | Some id ->
                     try
                       let pv = Hashtbl.find projs id.id in
-                      ignore (ity_match sbs pv.pv_ity ity);
+                      (* once we have ghost/mutable fields in algebraics,
+                         don't forget to check here that they coincide, too *)
+                      ignore (Loc.try3 id.id_loc ity_match sbs pv.pv_ity ity);
                       s, (pv, true)
                     with Not_found ->
                       let pv = create_pvsymbol (Denv.create_user_id id) ity in
@@ -274,7 +293,7 @@ let add_types uc tdl =
             | ProgTS ts -> Loc.try3 (Typing.qloc q) ity_app ts tyl []
           end
       | PPTtuple tyl ->
-          let ts = Ty.ts_tuple (List.length tyl) in
+          let ts = ts_tuple (List.length tyl) in
           ity_pur ts (List.map parse tyl)
     in
     match d.td_def with
@@ -294,7 +313,7 @@ let add_types uc tdl =
               | Some id ->
                   try
                     let pv = Hashtbl.find projs id.id in
-                    ity_equal_check pv.pv_ity ity;
+                    Loc.try2 id.id_loc ity_equal_check pv.pv_ity ity;
                     pv, true
                   with Not_found ->
                     let pv = create_pvsymbol (Denv.create_user_id id) ity in
@@ -311,11 +330,53 @@ let add_types uc tdl =
           let cid = { d.td_ident with id = "mk " ^ d.td_ident.id } in
           ts, PITalgebraic [Denv.create_user_id cid, List.map mk_field fl]
   in
-  (* TODO: localize exceptions *)
-  let pd = create_ity_decl (List.map def_visit tdl) in
-  add_pdecl_with_tuples uc pd
+  let def = List.map def_visit tdl in
 
-(* TODO: if type declaration is pure, declare it in the theory *)
+  (* detect pure type declarations *)
+
+  let kn = get_known uc in
+  let check its = Mid.mem its.its_pure.ts_name kn in
+  let check ity = ity_s_any check Util.ffalse ity in
+  let is_impure_decl (ts,d) =
+    ts.its_abst || ts.its_priv || ts.its_regs <> [] ||
+    option_apply false check ts.its_def || match d with
+      | PITabstract -> false
+      | PITalgebraic csl ->
+          let check (pv,_) =
+            pv.pv_ghost || pv.pv_mutable <> None || check pv.pv_ity in
+          List.exists (fun (_,l) -> List.exists check l) csl
+  in
+  let mk_pure_decl (ts,d) = ts.its_pure, match d with
+    | PITabstract -> Tabstract
+    | PITalgebraic csl ->
+        let pjt = Hvs.create 3 in
+        let ty = ty_app ts.its_pure (List.map ty_var ts.its_args) in
+        let mk_proj (pv,f) =
+          let vs = pv.pv_vs in
+          if f then try vs.vs_ty, Some (Hvs.find pjt vs) with Not_found ->
+            let pj = create_fsymbol (id_clone vs.vs_name) [ty] vs.vs_ty in
+            Hvs.replace pjt vs pj;
+            vs.vs_ty, Some pj
+          else
+            vs.vs_ty, None
+        in
+        let mk_constr (id,pjl) =
+          let pjl = List.map mk_proj pjl in
+          let cs = create_fsymbol id (List.map fst pjl) ty in
+          cs, List.map snd pjl
+        in
+        Talgebraic (List.map mk_constr csl)
+  in
+  try
+    if List.exists is_impure_decl def then
+      let d = create_ity_decl def in
+      add_pdecl_with_tuples uc d
+    else
+      let def = List.map mk_pure_decl def in
+      let d = create_ty_decl def in
+      add_decl_with_tuples uc d
+  with
+    | ClashSymbol s -> error ?loc:(look_for_loc tdl s) (ClashSymbol s)
 
 (** Use/Clone of theories and modules *)
 
@@ -389,7 +450,7 @@ let find_module loc lib mm mt path s = match path with
 let add_theory lib path mt m =
   let { id = id; id_loc = loc } = m.pth_name in
   if Mstr.mem id mt then Loc.errorm ~loc "clash with previous theory %s" id;
-  let uc = Theory.create_theory ~path (Denv.create_user_id m.pth_name) in
+  let uc = create_theory ~path (Denv.create_user_id m.pth_name) in
   let rec add_decl uc = function
     | Dlogic d ->
         Typing.add_decl uc d
@@ -419,7 +480,7 @@ let add_theory lib path mt m =
         assert false
   in
   let uc = List.fold_left add_decl uc m.pth_decl in
-  let th = Theory.close_theory uc in
+  let th = close_theory uc in
   Mstr.add id th mt
 
 let add_module lib path mm mt m =
