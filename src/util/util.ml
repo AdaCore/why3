@@ -46,6 +46,10 @@ let option_map f = function None -> None | Some x -> Some (f x)
 
 let option_apply d f = function None -> d | Some x -> f x
 
+let apply_option d f x = match f with None -> d | Some f -> f x
+
+let apply_option2 d f x y = match f with None -> d | Some f -> f x y
+
 let option_fold f d = function None -> d | Some x -> f d x
 
 let option_iter f = function None -> () | Some x -> f x

@@ -122,15 +122,50 @@ module Make(O: OBSERVER) : sig
         discarded
     *)
 
+
+  val run_external_proof :
+    O.key env_session -> t ->
+    ?callback:(O.key proof_attempt -> proof_attempt_status -> unit) ->
+    O.key proof_attempt -> unit
+  (** [redo_external_proof es sched ?timelimit p g] run 
+  *)
+
+
+  val prover_on_goal :
+    O.key env_session -> t ->
+    ?callback:(O.key proof_attempt -> proof_attempt_status -> unit) ->
+    timelimit:int -> Whyconf.prover -> O.key goal -> unit
+  (** [prover_on_goal es sched ?timelimit p g] same as
+      {!redo_external_proof} but create or reuse existing proof_attempt
+  *)
+
+
   val cancel_scheduled_proofs : t -> unit
     (** cancels all currently scheduled proof attempts.
         note that the already running proof attempts are not
         stopped, the corresponding processes must terminate
         by their own. *)
 
+
+  val transform_goal :
+    O.key env_session -> t ->
+    ?keep_dumb_transformation:bool ->
+    ?callback:(O.key transf option -> unit) ->
+    string -> O.key goal -> unit
+    (** [transform es sched tr g] applies registered
+        transformation [tr] on the given goal.
+
+        If keep_dumb_transformation is false (default)
+        and the transformation gives one task equal to [g]
+        the transformation is not added (the callback is called with None).
+        Otherwise the transformation is added and given to the callback.
+    *)
+
+
   val transform :
     O.key env_session -> t ->
     context_unproved_goals_only:bool ->
+    ?callback:(O.key transf option -> unit) ->
     string -> O.key any -> unit
     (** [transform es sched tr a] applies registered
         transformation [tr] on all leaf goals under [a].

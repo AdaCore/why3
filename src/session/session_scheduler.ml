@@ -334,14 +334,11 @@ let rec find_loadable_prover eS prover =
     | Some npc -> Some (prover,npc)
 
 
-let redo_external_proof eS eT ?timelimit a =
+let run_external_proof eS eT ?callback a =
+  (** Perhaps this test, a.proof_archived, should be done somewhere else *)
   if a.proof_archived || running a then ()
   else
-    let timelimit = match timelimit with
-      | None -> Whyconf.timelimit (Whyconf.get_main eS.whyconf)
-      | Some t -> t in
     (* check that the state is not Scheduled or Running *)
-    let previous_result,previous_obs = a.proof_state,a.proof_obsolete in
     (* info_window `ERROR "Proof already in progress" *)
     let ap = a.proof_prover in
     match find_loadable_prover eS a.proof_prover with
@@ -372,14 +369,16 @@ loaded@."
           set_proof_state ~notify ~obsolete:false ~archived:false
             (Undone Unedited) a
         else begin
+          let previous_result,previous_obs = a.proof_state,a.proof_obsolete in
           let callback result =
-            match result with
+            begin match result with
               | Undone Interrupted ->
                   set_proof_state ~notify
                     ~obsolete:previous_obs ~archived:false previous_result a
               | _ ->
                   set_proof_state ~notify ~obsolete:false
-                    ~archived:false result a;
+                    ~archived:false result a end;
+            Util.apply_option2 () callback a result
           in
           let old =
             match get_edited_as_abs eS.session a with
@@ -394,12 +393,11 @@ loaded@."
                   None
                 end
           in
-          set_timelimit timelimit a;
           let command =
             String.concat " " (npc.prover_config.Whyconf.command ::
                                  npc.prover_config.Whyconf.extra_options) in
           schedule_proof_attempt
-            ~timelimit ~memlimit:0
+            ~timelimit:a.proof_timelimit ~memlimit:0
             ?old ~command
             ~driver:npc.prover_driver
             ~callback
@@ -407,9 +405,12 @@ loaded@."
             (goal_task g)
         end
 
-let rec prover_on_goal eS eT ~timelimit p g =
+let rec prover_on_goal eS eT ?callback ~timelimit p g =
   let a =
-    try PHprover.find g.goal_external_proofs p
+    try
+      let a = PHprover.find g.goal_external_proofs p in
+      set_timelimit timelimit a;
+      a
     with Not_found ->
       let ep = add_external_proof ~keygen:O.create ~obsolete:false
         ~archived:false ~timelimit
@@ -417,24 +418,12 @@ let rec prover_on_goal eS eT ~timelimit p g =
       O.init ep.proof_key (Proof_attempt ep);
       ep
   in
-  let () = redo_external_proof eS eT ~timelimit a in
-  PHstr.iter
-    (fun _ t -> List.iter (prover_on_goal eS eT ~timelimit p) t.transf_goals)
-    g.goal_transformations
+  run_external_proof eS eT ?callback a
 
 let rec prover_on_goal_or_children eS eT
     ~context_unproved_goals_only ~timelimit p g =
-  if not (g.goal_verified && context_unproved_goals_only) then
-    begin
-      let r = ref true in
-      PHstr.iter
-        (fun _ t ->
-           r := false;
-           List.iter (prover_on_goal_or_children eS eT
-                        ~context_unproved_goals_only ~timelimit p)
-             t.transf_goals) g.goal_transformations;
-      if !r then prover_on_goal eS eT ~timelimit p g
-    end
+  goal_iter_leaf_goal ~unproved_only:context_unproved_goals_only
+    (prover_on_goal eS eT ~timelimit p) g
 
 let run_prover eS eT ~context_unproved_goals_only ~timelimit pr a =
   match a with
@@ -478,7 +467,7 @@ let rec replay_on_goal_or_children eS eT
     (fun _ a ->
        if not obsolete_only || a.proof_obsolete then
          if not context_unproved_goals_only || proof_successful a
-         then redo_external_proof eS eT ~timelimit:a.proof_timelimit a)
+         then run_external_proof eS eT a)
     g.goal_external_proofs;
   PHstr.iter
     (fun _ t ->
@@ -668,9 +657,9 @@ let check_all eS eT ~callback =
 
 (** Transformation *)
 
-let transformation_on_goal eS g tr =
+let transformation_on_goal_aux eS tr keep_dumb_transformation g =
   let subgoals = Trans.apply_transform tr eS.env (goal_task g) in
-  let b =
+  let b = keep_dumb_transformation ||
     match subgoals with
       | [task] ->
               (* let s1 = task_checksum (get_task g) in *)
@@ -699,20 +688,30 @@ let transformation_on_goal eS g tr =
         let gid = Ident.id_register gid in
         gid,expl,task)
       tr g subgoals in
-    init_any (Transf ntr)
+    init_any (Transf ntr);
+    Some ntr
+  else None
+
+let transform_goal eS sched ?(keep_dumb_transformation=false)
+    ?callback tr g =
+  schedule_delayed_action sched
+    (fun () -> let ntr = transformation_on_goal_aux eS tr
+                 keep_dumb_transformation g in
+               Util.apply_option () callback ntr)
 
 
+let transform_goal_or_children ~context_unproved_goals_only eS sched ?callback
+    tr g =
+  goal_iter_leaf_goal ~unproved_only:context_unproved_goals_only
+    (transform_goal eS sched ~keep_dumb_transformation:false
+       ?callback tr) g
 
-let transform_goal_or_children ~context_unproved_goals_only eS sched tr =
-  goal_iter_leaf_goal ~unproved_only:context_unproved_goals_only (fun g ->
-    schedule_delayed_action sched
-      (fun () -> transformation_on_goal eS g tr))
-
-let rec transform eS sched ~context_unproved_goals_only tr a =
+let rec transform eS sched ~context_unproved_goals_only ?callback tr a =
   match a with
     | Goal g | Proof_attempt {proof_parent = g} ->
-      transform_goal_or_children ~context_unproved_goals_only eS sched tr g
-    | _ -> iter (transform ~context_unproved_goals_only eS sched tr) a
+      transform_goal_or_children ~context_unproved_goals_only eS sched
+        ?callback tr g
+    | _ -> iter (transform ~context_unproved_goals_only eS sched ?callback tr) a
 
 (*****************************)
 (* method: edit current goal *)

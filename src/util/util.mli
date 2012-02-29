@@ -48,6 +48,10 @@ val option_iter : ('a -> unit) -> 'a option -> unit
 
 val option_apply : 'b -> ('a -> 'b) -> 'a option -> 'b
 
+val apply_option : 'b -> ('a -> 'b) option -> 'a -> 'b
+
+val apply_option2 : 'c -> ('a -> 'b -> 'c) option -> 'a -> 'b -> 'c
+
 val option_fold : ('b -> 'a -> 'b) -> 'b -> 'a option -> 'b
 (** [option_fold f d o] returns [d] if [o] is [None], and
     [f d x] if [o] is [Some x] *)
