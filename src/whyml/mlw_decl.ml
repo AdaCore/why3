@@ -26,7 +26,7 @@ open Decl
 open Mlw_ty
 open Mlw_expr
 
-type ps_ls = { ps: psymbol; ls: lsymbol }
+type ps_ls = { ps : psymbol; ls : lsymbol }
 
 type pconstructor = ps_ls * ps_ls option list
 
