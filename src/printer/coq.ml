@@ -462,7 +462,8 @@ let read_old_script =
       if Str.string_match axm s 0 then
         (let name = Str.matched_group 2 s in sc := Axiom name :: !sc;
         skip_to_empty := true) else
-      if s = "(* Why3 goal *)" then sc := read_old_proof ch :: !sc else
+      if s = "(* Why3 goal *)" then
+        (sc := read_old_proof ch :: !sc; skip_to_empty := true) else
       if s = "(* YOU MAY EDIT THE CONTEXT BELOW *)" then
         (sc := read_deprecated_script ch true; raise End_of_file) else
       if s = "(* YOU MAY EDIT THE PROOF BELOW *)" then
