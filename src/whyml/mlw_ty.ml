@@ -461,6 +461,8 @@ let create_cty
     c_eff = effect;
     c_post = post;
     c_xpost = xpost; }
+(* TODO/FIXME: in xpost, the type of pvsymbol must coincide with
+   that of the exception *)
 
 let vty_value pvs = VTvalue pvs
 

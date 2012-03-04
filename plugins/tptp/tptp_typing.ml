@@ -28,21 +28,10 @@ open Term
 open Decl
 open Theory
 
-exception Message of string
+let error = Loc.error
+let errorm = Loc.errorm
 
-let error ?loc e = match loc with
-  | None -> raise e
-  | Some loc -> raise (Loc.Located (loc,e))
-
-let errorm ?loc f =
-  let buf = Buffer.create 512 in
-  let fmt = Format.formatter_of_buffer buf in
-  Format.kfprintf (fun _ ->
-    Format.pp_print_flush fmt ();
-    let s = Buffer.contents buf in
-    Buffer.clear buf;
-    error ?loc (Message s)) fmt f
-
+exception DuplicateVar of string
 exception TypeExpected
 exception TermExpected
 exception FmlaExpected
@@ -52,7 +41,7 @@ exception DependentTy
 exception BadArity
 
 let () = Exn_printer.register (fun fmt e -> match e with
-  | Message s -> fprintf fmt "%s" s
+  | DuplicateVar s -> fprintf fmt "variable %s is used twice" s
   | TypeExpected -> fprintf fmt "type expression expected"
   | TermExpected -> fprintf fmt "term expression expected"
   | FmlaExpected -> fprintf fmt "formula expression expected"
@@ -67,22 +56,26 @@ type symbol =
   | STVar of tvsymbol
   | SVar  of vsymbol
   | SType of tysymbol
-  | SFunc of tvsymbol list * tvsymbol list * lsymbol
-  | SPred of tvsymbol list * tvsymbol list * lsymbol
-  | SletF of tvsymbol list * vsymbol list * term
-  | SletP of tvsymbol list * vsymbol list * term
+  | SFunc of tvsymbol list * tvsymbol list * Stv.t * lsymbol
+  | SPred of tvsymbol list * tvsymbol list * Stv.t * lsymbol
+  | SletF of tvsymbol list * Stv.t * vsymbol list * term
+  | SletP of tvsymbol list * Stv.t * vsymbol list * term
 
 type env = symbol Mstr.t
 
 type implicit = (string,symbol) Hashtbl.t
 
-let ts_univ = create_tysymbol (id_fresh "$iType") [] None
+let nm_univ = "$iType"
+let ts_univ = create_tysymbol (id_fresh nm_univ) [] None
 let ty_univ = ty_app ts_univ []
-let d_univ  = create_ty_decl [ts_univ, Tabstract]
 
 let nm_ghost = "$ghost"
+let id_ghost = id_fresh nm_ghost
 let tv_ghost = create_tvsymbol (id_fresh "a")
-let fs_ghost = create_fsymbol (id_fresh nm_ghost) [] (ty_var tv_ghost)
+let ts_ghost = create_tysymbol id_ghost [tv_ghost] None
+let ty_ghost ty = ty_app ts_ghost [ty]
+let fs_ghost = create_fsymbol id_ghost [] (ty_ghost (ty_var tv_ghost))
+let t_ghost ty = fs_app fs_ghost [] (ty_ghost ty)
 
 let find_tv ~loc env impl s =
   let tv = try Mstr.find s env with Not_found ->
@@ -99,6 +92,7 @@ let find_vs ~loc env impl s =
   let vs = try Mstr.find s env with Not_found ->
     try Hashtbl.find impl s with Not_found ->
       let vs = SVar (create_vsymbol (id_user s loc) ty_univ) in
+      Hashtbl.replace impl nm_univ (SType ts_univ);
       Hashtbl.add impl s vs;
       vs in
   match vs with
@@ -122,7 +116,8 @@ let find_fs ~loc env impl s args =
     try Hashtbl.find impl s with Not_found ->
       let args = List.map (fun _ -> ty_univ) args in
       let fs = create_fsymbol (id_user s loc) args ty_univ in
-      let fs = SFunc ([],[],fs) in
+      let fs = SFunc ([],[],Stv.empty,fs) in
+      Hashtbl.replace impl nm_univ (SType ts_univ);
       Hashtbl.add impl s fs;
       fs
 
@@ -131,15 +126,15 @@ let find_ps ~loc env impl s args =
     try Hashtbl.find impl s with Not_found ->
       let args = List.map (fun _ -> ty_univ) args in
       let ps = create_psymbol (id_user s loc) args in
-      let ps = SPred ([],[],ps) in
+      let ps = SPred ([],[],Stv.empty,ps) in
+      Hashtbl.replace impl nm_univ (SType ts_univ);
       Hashtbl.add impl s ps;
       ps
 
 let ty_check loc s ty1 t =
-  let ty1 = ty_inst s ty1 in
-  let ty2 = of_option t.t_ty in
-  if ty_equal ty1 ty2 then () else
-  error ~loc (Ty.TypeMismatch (ty1,ty2))
+  Loc.try3 loc ty_match s ty1 (of_option t.t_ty)
+
+let ty_full_inst m ty = ty_v_map (fun v -> Mtv.find v m) ty
 
 let rec ty denv env impl { e_loc = loc; e_node = n } = match n with
   | Eapp (aw,al) ->
@@ -148,14 +143,16 @@ let rec ty denv env impl { e_loc = loc; e_node = n } = match n with
       ty_app ts tys
   | Edef (dw,al) ->
       let ts = match dw with
-        | DT DTuniv -> ts_univ (* TODO: arity of defined symbols *)
+        | DT DTuniv ->
+            Hashtbl.replace impl nm_univ (SType ts_univ);
+            ts_univ
         | DT DTint
         | DT DTrat
         | DT DTreal -> assert false (* TODO: arithmetic *)
         | DT DTdummy -> error ~loc InvalidDummy
         | DT DTtype | DT DTprop | DF _ | DP _ -> error ~loc TypeExpected in
       let tys = List.map (ty denv env impl) al in
-      ty_app ts tys
+      Loc.try2 loc ty_app ts tys
   | Evar v ->
       find_tv ~loc env impl v
   | Elet _ | Eite _ | Eqnt _ | Ebin _
@@ -164,8 +161,8 @@ let rec ty denv env impl { e_loc = loc; e_node = n } = match n with
 let rec term denv env impl { e_loc = loc; e_node = n } = match n with
   | Eapp (aw,al) ->
       begin match find_fs ~loc env impl aw al with
-        | SFunc (tvl,gl,fs) -> ls_args denv env impl loc fs tvl gl al
-        | SletF (tvl,vl,e) -> let_args denv env impl loc e tvl vl al
+        | SFunc (tvl,gl,mvs,fs) -> ls_args denv env impl loc fs tvl gl mvs al
+        | SletF (tvl,mvs,vl,e) -> let_args denv env impl loc e tvl mvs vl al
         | SVar v -> t_var v
         | _ -> error ~loc TermExpected
       end
@@ -187,7 +184,7 @@ let rec term denv env impl { e_loc = loc; e_node = n } = match n with
   | Elet (def,e) ->
       let env,s = let_defn denv env impl def in
       begin match Mstr.find s env with
-        | SletF ([],[],t) ->
+        | SletF ([],_,[],t) ->
             let id = id_user s def.e_loc in
             let vs = create_vsymbol id (of_option t.t_ty) in
             let env = Mstr.add s (SVar vs) env in
@@ -208,10 +205,10 @@ let rec term denv env impl { e_loc = loc; e_node = n } = match n with
 and fmla denv env impl pol tvl { e_loc = loc; e_node = n } = match n with
   | Eapp (aw,al) ->
       begin match find_ps ~loc env impl aw al with
-        | SPred (tvl,gl,ps) -> ls_args denv env impl loc ps tvl gl al, false
-        | SletP (tvl,vl,e) -> let_args denv env impl loc e tvl vl al, false
+        | SPred (tvl,gl,mvs,ps) -> ls_args denv env impl loc ps tvl gl mvs al
+        | SletP (tvl,mvs,vl,e) -> let_args denv env impl loc e tvl mvs vl al
         | _ -> error ~loc FmlaExpected
-      end
+      end, false
   | Edef (DP DPtrue,[]) -> t_true, false
   | Edef (DP DPfalse,[]) -> t_false, false
   | Edef (DP (DPtrue|DPfalse),_) -> error ~loc BadArity
@@ -232,7 +229,7 @@ and fmla denv env impl pol tvl { e_loc = loc; e_node = n } = match n with
   | Elet (def,e) ->
       let env,s = let_defn denv env impl def in
       begin match Mstr.find s env with
-        | SletF ([],[],t) ->
+        | SletF ([],_,[],t) ->
             let id = id_user s def.e_loc in
             let vs = create_vsymbol id (of_option t.t_ty) in
             let env = Mstr.add s (SVar vs) env in
@@ -348,19 +345,23 @@ and let_defn denv env impl { e_node = n ; e_loc = loc } =
     | [],[] -> ()
     | (v,_)::vl, { e_node = Evar u }::al when u = v ->
         let ss = Sstr.change (fun b ->
-          not (b && error ~loc MalformedLet)) v ss in
+          not (b && error ~loc (DuplicateVar v))) v ss in
         check ss vl al
     | _,_ -> error ~loc MalformedLet in
   let dig vl d isf e = match d.e_node with
     | Eapp (s,al) ->
         check Sstr.empty vl al;
         let enw,tvl,vl = newenv env [] [] vl in
+        let fvs s v = ty_freevars s v.vs_ty in
+        let tvs = List.fold_left fvs Stv.empty vl in
+        let add s v = if Stv.mem v tvs then s else Stv.add v s in
+        let mvs = List.fold_left add Stv.empty tvl in
         if isf then
           let f,_ = fmla denv enw impl None [] e in
-          Mstr.add s (SletP (tvl,vl,f)) env, s
+          Mstr.add s (SletP (tvl,mvs,vl,f)) env, s
         else
           let t = term denv enw impl e in
-          Mstr.add s (SletF (tvl,vl,t)) env, s
+          Mstr.add s (SletF (tvl,mvs,vl,t)) env, s
     | _ -> assert false (* impossible *) in
   let dig vl = function
     | Ebin (BOequ,e1,e2) -> dig vl e1 true e2
@@ -370,37 +371,41 @@ and let_defn denv env impl { e_node = n ; e_loc = loc } =
     | Eqnt (Qforall,vl,d) -> dig vl d.e_node
     | d -> dig [] d
 
-and ls_args denv env impl loc fs tvl gl al =
+and ls_args denv env impl loc fs tvl gl mvs al =
   let rec args tvm tvl al = match tvl,al with
+    | (tv::tvl),({e_node = Edef (DT DTdummy,[]); e_loc = loc}::al) ->
+        if Stv.mem tv mvs then error ~loc InvalidDummy;
+        args tvm tvl al
     | (tv::tvl),(a::al) ->
         let ty = ty denv env impl a in
         let tvm = Mtv.add tv ty tvm in
         args tvm tvl al
     | [],al ->
-        (* TODO: dummies *)
-        let ghost v = fs_app fs_ghost [] (Mtv.find v tvm) in
-        let ty = option_map (ty_inst tvm) fs.ls_value in
-        let tl = List.map (term denv env impl) al in
-        let tl = List.map ghost gl @ tl in
-        List.iter2 (ty_check loc tvm) fs.ls_args tl;
+        let ghost v = t_ghost (Mtv.find v tvm) in
+        let tl = List.map ghost gl @ List.map (term denv env impl) al in
+        let tvm = List.fold_left2 (ty_check loc) tvm fs.ls_args tl in
+        let ty = option_map (ty_full_inst tvm) fs.ls_value in
         t_app fs tl ty
     | _ -> error ~loc BadArity
   in
-  if gl <> [] && not (Mstr.mem nm_ghost env) then begin
-    let ghfs = SFunc ([tv_ghost],[tv_ghost],fs_ghost) in
-    Hashtbl.add impl nm_ghost ghfs
-  end;
+  (* we put ts_ghost in impl because it's simpler, but in fact,
+     ts_ghost has already been declared, and we actually want
+     to declare fs_ghost *)
+  if gl <> [] then Hashtbl.replace impl nm_ghost (SType ts_ghost);
   args Mtv.empty tvl al
 
-and let_args denv env impl loc e tvl vl al =
+and let_args denv env impl loc e tvl mvs vl al =
   let rec args tvm vm tvl vl al = match tvl,vl,al with
+    | (tv::tvl),_,({e_node = Edef (DT DTdummy,[]); e_loc = loc}::al) ->
+        if Stv.mem tv mvs then error ~loc InvalidDummy;
+        args tvm vm tvl vl al
     | (tv::tvl),_,(a::al) ->
         let ty = ty denv env impl a in
         let tvm = Mtv.add tv ty tvm in
         args tvm vm tvl vl al
     | _,(v::vl),(a::al) ->
         let t = term denv env impl a in
-        ty_check loc tvm v.vs_ty t;
+        let tvm = ty_check loc tvm v.vs_ty t in
         let vm = Mvs.add v t vm in
         args tvm vm tvl vl al
     | [],[],[] ->
@@ -427,28 +432,46 @@ let typedecl denv env impl loc s (tvl,(el,e)) =
       | _ -> error ~loc DependentTy
     in
     let tvl = List.map ntv tvl in
-    let add e v = Mstr.add v.tv_name.id_string (STVar v) e in
+    let add e v =
+      let s = v.tv_name.id_string in
+      Mstr.add_new (DuplicateVar s) s (STVar v) e
+    in
     let env = List.fold_left add env tvl in
     let tyl = List.map (ty denv env impl) el in
+    let tvs = List.fold_left ty_freevars Stv.empty tyl in
+    let add s v = if Stv.mem v tvs then s else Stv.add v s in
+    let mvs = List.fold_left add Stv.empty tvl in
     if e.e_node = Edef (DT DTprop, []) then
-      let tvs = List.fold_left ty_freevars Stv.empty tyl in
       let gvl = List.filter (fun v -> not (Stv.mem v tvs)) tvl in
-      let tyl = List.map ty_var gvl @ tyl in
+      let tyl = List.map (fun v -> ty_ghost (ty_var v)) gvl @ tyl in
       let ls = create_psymbol (id_user s loc) tyl in
-      Hashtbl.add impl s (SPred (tvl,gvl,ls))
+      Hashtbl.add impl s (SPred (tvl,gvl,mvs,ls))
     else
       let tyv = ty denv env impl e in
-      let tvs = List.fold_left ty_freevars Stv.empty (tyv::tyl) in
+      let tvs = ty_freevars tvs tyv in
       let gvl = List.filter (fun v -> not (Stv.mem v tvs)) tvl in
-      let tyl = List.map ty_var gvl @ tyl in
+      let tyl = List.map (fun v -> ty_ghost (ty_var v)) gvl @ tyl in
       let ls = create_fsymbol (id_user s loc) tyl tyv in
-      Hashtbl.add impl s (SFunc (tvl,gvl,ls))
+      Hashtbl.add impl s (SFunc (tvl,gvl,mvs,ls))
 
 let flush_impl ~strict env uc impl =
   let update s e (env,uc) = match e with
+    | SType ts when ts_equal ts ts_univ ->
+        let uc =
+          if Mid.mem ts_univ.ts_name (get_known uc)
+          then uc else add_ty_decl uc [ts_univ,Tabstract] in
+        env, uc
+    | SType ts when ts_equal ts ts_ghost ->
+        let uc =
+          if Mid.mem fs_ghost.ls_name (get_known uc)
+          then uc else add_logic_decl uc [fs_ghost,None] in
+        env, uc
     | SType ts ->
         Mstr.add s e env, add_ty_decl uc [ts,Tabstract]
-    | SFunc (_,_,ls) | SPred (_,_,ls) ->
+    | SFunc (_,gvl,_,ls) | SPred (_,gvl,_,ls) ->
+        let uc =
+          if gvl = [] || Mid.mem ts_ghost.ts_name (get_known uc)
+          then uc else add_ty_decl uc [ts_ghost,Tabstract] in
         Mstr.add s e env, add_logic_decl uc [ls,None]
     | STVar tv when strict ->
         errorm ?loc:tv.tv_name.id_loc "Unbound type variable %s" s
@@ -518,7 +541,6 @@ let typecheck _genv path ast =
   let env = Mstr.empty in
   (* FIXME: localize the identifier *)
   let uc = create_theory ~path (id_fresh "T") in
-  let uc = add_decl uc d_univ in
   let _,uc = List.fold_left input (env,uc) ast in
   let uc = if not !negc then uc else
     let pr = create_prsymbol (id_fresh "contradiction") in
