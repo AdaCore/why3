@@ -355,9 +355,18 @@ let apply_split_goal_if_needed g =
         (Session.add_registered_transformation
            ~keygen env_session Gnat_config.split_name g)
 
+let has_file session =
+   try
+      Session.session_iter (fun any ->
+         match any with
+         | Session.File _ -> raise Exit
+         | _ -> ()) session.Session.session;
+      false
+   with Exit -> true
+
 let _ =
    try
-      if is_new_session then begin
+      if is_new_session || not (has_file env_session) then begin
          (* This is a brand new session, simply apply the transformation
             "split_goal" to the entire file *)
          let file = M.add_file env_session
