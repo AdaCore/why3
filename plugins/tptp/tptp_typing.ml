@@ -38,6 +38,7 @@ exception FmlaExpected
 exception InvalidDummy
 exception MalformedLet
 exception DependentTy
+exception NonNumeric
 exception BadArity
 
 let () = Exn_printer.register (fun fmt e -> match e with
@@ -45,9 +46,10 @@ let () = Exn_printer.register (fun fmt e -> match e with
   | TypeExpected -> fprintf fmt "type expression expected"
   | TermExpected -> fprintf fmt "term expression expected"
   | FmlaExpected -> fprintf fmt "formula expression expected"
-  | InvalidDummy -> fprintf fmt "invalid type placeholder"
+  | InvalidDummy -> fprintf fmt "unexpected type placeholder"
   | MalformedLet -> fprintf fmt "malformed let-expression"
   | DependentTy  -> fprintf fmt "dependent type"
+  | NonNumeric   -> fprintf fmt "non-numeric argument"
   | BadArity     -> fprintf fmt "bad arity"
   | _ -> raise e)
 
@@ -60,22 +62,57 @@ type symbol =
   | SPred of tvsymbol list * tvsymbol list * Stv.t * lsymbol
   | SletF of tvsymbol list * Stv.t * vsymbol list * term
   | SletP of tvsymbol list * Stv.t * vsymbol list * term
+  | Suse  of theory
 
 type env = symbol Mstr.t
 
 type implicit = (string,symbol) Hashtbl.t
 
-let nm_univ = "$iType"
-let ts_univ = create_tysymbol (id_fresh nm_univ) [] None
-let ty_univ = ty_app ts_univ []
+type denv = {
+  de_env   : Env.env;
 
-let nm_ghost = "$ghost"
-let id_ghost = id_fresh nm_ghost
-let tv_ghost = create_tvsymbol (id_fresh "a")
-let ts_ghost = create_tysymbol id_ghost [tv_ghost] None
-let ty_ghost ty = ty_app ts_ghost [ty]
-let fs_ghost = create_fsymbol id_ghost [] (ty_ghost (ty_var tv_ghost))
-let t_ghost ty = fs_app fs_ghost [] (ty_ghost ty)
+  th_univ  : theory;
+  ts_univ  : tysymbol;
+  ty_univ  : ty;
+
+  th_ghost : theory;
+  ts_ghost : tysymbol;
+  fs_ghost : lsymbol;
+
+  th_int   : theory;
+  th_real  : theory;
+
+  th_rat   : theory;
+  ts_rat   : tysymbol;
+}
+
+let make_denv lib =
+  let env = Env.env_of_library lib in
+  let get_theory = Env.read_theory ~format:"why" env ["tptp"] in
+  let th_univ = get_theory "Univ" in
+  let th_ghost = get_theory "Ghost" in
+  let th_rat = get_theory "Rat" in
+  let ts_univ = ns_find_ts th_univ.th_export ["iType"] in
+  { de_env   = env;
+
+    th_univ  = th_univ;
+    ts_univ  = ts_univ;
+    ty_univ  = ty_app ts_univ [];
+
+    th_ghost = th_ghost;
+    ts_ghost = ns_find_ts th_ghost.th_export ["gh"];
+    fs_ghost = ns_find_ls th_ghost.th_export ["gh"];
+
+    th_int   = get_theory "Int";
+    th_real  = get_theory "Real";
+
+    th_rat   = th_rat;
+    ts_rat   = ns_find_ts th_rat.th_export ["rat"];
+  }
+
+let add_theory env impl th =
+  let s = "$th$" ^ th.th_name.id_string in
+  if not (Mstr.mem s env) then Hashtbl.replace impl s (Suse th)
 
 let find_tv ~loc env impl s =
   let tv = try Mstr.find s env with Not_found ->
@@ -88,11 +125,10 @@ let find_tv ~loc env impl s =
     | STSko ty -> ty
     | _ -> error ~loc TypeExpected
 
-let find_vs ~loc env impl s =
+let find_vs ~loc denv env impl s =
   let vs = try Mstr.find s env with Not_found ->
     try Hashtbl.find impl s with Not_found ->
-      let vs = SVar (create_vsymbol (id_user s loc) ty_univ) in
-      Hashtbl.replace impl nm_univ (SType ts_univ);
+      let vs = SVar (create_vsymbol (id_user s loc) denv.ty_univ) in
       Hashtbl.add impl s vs;
       vs in
   match vs with
@@ -111,23 +147,21 @@ let find_ts ~loc env impl s args =
     | SType ts -> ts
     | _ -> error ~loc TypeExpected
 
-let find_fs ~loc env impl s args =
+let find_fs ~loc denv env impl s args =
   try Mstr.find s env with Not_found ->
     try Hashtbl.find impl s with Not_found ->
-      let args = List.map (fun _ -> ty_univ) args in
-      let fs = create_fsymbol (id_user s loc) args ty_univ in
+      let args = List.map (fun _ -> denv.ty_univ) args in
+      let fs = create_fsymbol (id_user s loc) args denv.ty_univ in
       let fs = SFunc ([],[],Stv.empty,fs) in
-      Hashtbl.replace impl nm_univ (SType ts_univ);
       Hashtbl.add impl s fs;
       fs
 
-let find_ps ~loc env impl s args =
+let find_ps ~loc denv env impl s args =
   try Mstr.find s env with Not_found ->
     try Hashtbl.find impl s with Not_found ->
-      let args = List.map (fun _ -> ty_univ) args in
+      let args = List.map (fun _ -> denv.ty_univ) args in
       let ps = create_psymbol (id_user s loc) args in
       let ps = SPred ([],[],Stv.empty,ps) in
-      Hashtbl.replace impl nm_univ (SType ts_univ);
       Hashtbl.add impl s ps;
       ps
 
@@ -143,14 +177,13 @@ let rec ty denv env impl { e_loc = loc; e_node = n } = match n with
       ty_app ts tys
   | Edef (dw,al) ->
       let ts = match dw with
-        | DT DTuniv ->
-            Hashtbl.replace impl nm_univ (SType ts_univ);
-            ts_univ
-        | DT DTint
-        | DT DTrat
-        | DT DTreal -> assert false (* TODO: arithmetic *)
+        | DT DTuniv -> denv.ts_univ
+        | DT DTint -> ts_int
+        | DT DTreal -> ts_real
+        | DT DTrat -> add_theory env impl denv.th_rat; denv.ts_rat
         | DT DTdummy -> error ~loc InvalidDummy
-        | DT DTtype | DT DTprop | DF _ | DP _ -> error ~loc TypeExpected in
+        | DT DTtype | DT DTprop | DF _ | DP _ ->
+            error ~loc TypeExpected in
       let tys = List.map (ty denv env impl) al in
       Loc.try2 loc ty_app ts tys
   | Evar v ->
@@ -158,29 +191,92 @@ let rec ty denv env impl { e_loc = loc; e_node = n } = match n with
   | Elet _ | Eite _ | Eqnt _ | Ebin _
   | Enot _ | Eequ _ | Edob _ | Enum _ -> error ~loc TypeExpected
 
+let get_theory ~loc denv env impl dw tl =
+  let get_theory = Env.read_theory ~format:"why" denv.de_env ["tptp"] in
+  match tl with
+  | { t_ty = Some {ty_node = Tyapp (ts,[]) }}::_ ->
+      let th =
+        if ts_equal ts ts_int then match dw with
+          | DF DFquot -> errorm ~loc "$quotient/2 is not defined on $int"
+          | DF (DFquot_e|DFrem_e) -> get_theory "IntDivE"
+          | DF (DFquot_t|DFrem_t) -> get_theory "IntDivT"
+          | DF (DFquot_f|DFrem_f) -> get_theory "IntDivF"
+          | DF (DFfloor|DFceil|DFtrunc|DFround|DFtoint)
+          | DP (DPisint|DPisrat) -> get_theory "IntTrunc"
+          | DF DFtorat -> get_theory "IntToRat"
+          | DF DFtoreal -> get_theory "IntToReal"
+          | _ -> denv.th_int else
+        if ts_equal ts denv.ts_rat then match dw with
+          | DF (DFquot_e|DFrem_e) -> get_theory "RatDivE"
+          | DF (DFquot_t|DFrem_t) -> get_theory "RatDivT"
+          | DF (DFquot_f|DFrem_f) -> get_theory "RatDivF"
+          | DF (DFfloor|DFceil|DFtrunc|DFround|DFtoint) ->
+              get_theory "RatTrunc"
+          | DF DFtoreal -> get_theory "RatToReal"
+          | _ -> denv.th_rat else
+        if ts_equal ts ts_real then match dw with
+          | DF (DFquot_e|DFrem_e) -> get_theory "RealDivE"
+          | DF (DFquot_t|DFrem_t) -> get_theory "RealDivT"
+          | DF (DFquot_f|DFrem_f) -> get_theory "RealDivF"
+          | DF (DFfloor|DFceil|DFtrunc|DFround|DFtoint)
+          | DP (DPisint|DPisrat) -> get_theory "RealTrunc"
+          | DF DFtorat -> get_theory "RealToRat"
+          | _ -> denv.th_real else
+        error ~loc NonNumeric
+      in
+      add_theory env impl th;
+      th
+  | _::_ -> error ~loc NonNumeric
+  | [] -> error ~loc BadArity
+
 let rec term denv env impl { e_loc = loc; e_node = n } = match n with
   | Eapp (aw,al) ->
-      begin match find_fs ~loc env impl aw al with
+      begin match find_fs ~loc denv env impl aw al with
         | SFunc (tvl,gl,mvs,fs) -> ls_args denv env impl loc fs tvl gl mvs al
         | SletF (tvl,mvs,vl,e) -> let_args denv env impl loc e tvl mvs vl al
         | SVar v -> t_var v
         | _ -> error ~loc TermExpected
       end
   | Edef (dw,al) ->
+      let tl = List.map (term denv env impl) al in
+      let th = get_theory ~loc denv env impl dw tl in
       let fs = match dw with
-        | DF _ -> assert false (* TODO: arithmetic *)
+        | DF DFumin -> ns_find_ls th.th_export ["prefix -"]
+        | DF DFsum -> ns_find_ls th.th_export ["infix +"]
+        | DF DFdiff -> ns_find_ls th.th_export ["infix -"]
+        | DF DFprod -> ns_find_ls th.th_export ["infix *"]
+        | DF DFquot -> ns_find_ls th.th_export ["infix /"]
+        | DF DFquot_e -> ns_find_ls th.th_export ["div"]
+        | DF DFquot_t -> ns_find_ls th.th_export ["div_t"]
+        | DF DFquot_f -> ns_find_ls th.th_export ["div_f"]
+        | DF DFrem_e -> ns_find_ls th.th_export ["mod"]
+        | DF DFrem_t -> ns_find_ls th.th_export ["mod_t"]
+        | DF DFrem_f -> ns_find_ls th.th_export ["mod_f"]
+        | DF DFfloor -> ns_find_ls th.th_export ["floor"]
+        | DF DFceil -> ns_find_ls th.th_export ["ceil"]
+        | DF DFtrunc -> ns_find_ls th.th_export ["truncate"]
+        | DF DFround -> ns_find_ls th.th_export ["round"]
+        | DF DFtoint -> ns_find_ls th.th_export ["to_int"]
+        | DF DFtorat -> ns_find_ls th.th_export ["to_rat"]
+        | DF DFtoreal -> ns_find_ls th.th_export ["to_real"]
         | DT DTdummy -> error ~loc InvalidDummy
         | DT _ | DP _ -> error ~loc TermExpected in
       let tl = List.map (term denv env impl) al in
       t_app_infer fs tl
   | Evar v ->
-      find_vs ~loc env impl v
+      find_vs ~loc denv env impl v
   | Edob _ ->
       (* TODO: distinct objects *)
       assert false
-  | Enum _ ->
-      (* TODO: arithmetic *)
-      assert false
+  | Enum (Nint s) ->
+      t_int_const s
+  | Enum (Nreal (i,f,e)) ->
+      t_real_const (RConstDecimal (i,Util.def_option "0" f,e))
+  | Enum (Nrat (n,d)) ->
+      let n = t_int_const n and d = t_int_const d in
+      let frac = ns_find_ls denv.th_rat.th_export ["frac"] in
+      add_theory env impl denv.th_rat;
+      t_app_infer frac [n;d]
   | Elet (def,e) ->
       let env,s = let_defn denv env impl def in
       begin match Mstr.find s env with
@@ -204,7 +300,7 @@ let rec term denv env impl { e_loc = loc; e_node = n } = match n with
 
 and fmla denv env impl pol tvl { e_loc = loc; e_node = n } = match n with
   | Eapp (aw,al) ->
-      begin match find_ps ~loc env impl aw al with
+      begin match find_ps ~loc denv env impl aw al with
         | SPred (tvl,gl,mvs,ps) -> ls_args denv env impl loc ps tvl gl mvs al
         | SletP (tvl,mvs,vl,e) -> let_args denv env impl loc e tvl mvs vl al
         | _ -> error ~loc FmlaExpected
@@ -220,11 +316,18 @@ and fmla denv env impl pol tvl { e_loc = loc; e_node = n } = match n with
         | _ -> acc in
       dist t_true (List.map (term denv env impl) al), false
   | Edef (dw,al) ->
-      let ps = match dw with
-        | DP _ -> assert false (* TODO: arithmetic *)
-        | DT DTdummy -> error ~loc InvalidDummy
-        | DT _ | DF _ -> error ~loc FmlaExpected in
       let tl = List.map (term denv env impl) al in
+      let th = get_theory ~loc denv env impl dw tl in
+      let ps = match dw with
+        | DP DPless -> ns_find_ls th.th_export ["infix <"]
+        | DP DPlesseq -> ns_find_ls th.th_export ["infix <="]
+        | DP DPgreater -> ns_find_ls th.th_export ["infix >"]
+        | DP DPgreatereq -> ns_find_ls th.th_export ["infix >="]
+        | DP DPisint -> ns_find_ls th.th_export ["is_int"]
+        | DP DPisrat -> ns_find_ls th.th_export ["is_rat"]
+        | DT DTdummy -> error ~loc InvalidDummy
+        | DT _ | DF _ -> error ~loc FmlaExpected
+        | DP (DPtrue|DPfalse|DPdistinct) -> assert false in
       ps_app ps tl, false
   | Elet (def,e) ->
       let env,s = let_defn denv env impl def in
@@ -381,17 +484,14 @@ and ls_args denv env impl loc fs tvl gl mvs al =
         let tvm = Mtv.add tv ty tvm in
         args tvm tvl al
     | [],al ->
-        let ghost v = t_ghost (Mtv.find v tvm) in
+        let ghost v =
+          fs_app denv.fs_ghost [] (ty_app denv.ts_ghost [Mtv.find v tvm]) in
         let tl = List.map ghost gl @ List.map (term denv env impl) al in
         let tvm = List.fold_left2 (ty_check loc) tvm fs.ls_args tl in
         let ty = option_map (ty_full_inst tvm) fs.ls_value in
         t_app fs tl ty
     | _ -> error ~loc BadArity
   in
-  (* we put ts_ghost in impl because it's simpler, but in fact,
-     ts_ghost has already been declared, and we actually want
-     to declare fs_ghost *)
-  if gl <> [] then Hashtbl.replace impl nm_ghost (SType ts_ghost);
   args Mtv.empty tvl al
 
 and let_args denv env impl loc e tvl mvs vl al =
@@ -441,54 +541,56 @@ let typedecl denv env impl loc s (tvl,(el,e)) =
     let tvs = List.fold_left ty_freevars Stv.empty tyl in
     let add s v = if Stv.mem v tvs then s else Stv.add v s in
     let mvs = List.fold_left add Stv.empty tvl in
+    let ghost v = ty_app denv.ts_ghost [ty_var v] in
     if e.e_node = Edef (DT DTprop, []) then
       let gvl = List.filter (fun v -> not (Stv.mem v tvs)) tvl in
-      let tyl = List.map (fun v -> ty_ghost (ty_var v)) gvl @ tyl in
+      let tyl = List.map ghost gvl @ tyl in
       let ls = create_psymbol (id_user s loc) tyl in
+      if gvl <> [] then add_theory env impl denv.th_ghost;
       Hashtbl.add impl s (SPred (tvl,gvl,mvs,ls))
     else
       let tyv = ty denv env impl e in
       let tvs = ty_freevars tvs tyv in
       let gvl = List.filter (fun v -> not (Stv.mem v tvs)) tvl in
-      let tyl = List.map (fun v -> ty_ghost (ty_var v)) gvl @ tyl in
+      let tyl = List.map ghost gvl @ tyl in
       let ls = create_fsymbol (id_user s loc) tyl tyv in
+      if gvl <> [] then add_theory env impl denv.th_ghost;
       Hashtbl.add impl s (SFunc (tvl,gvl,mvs,ls))
 
 let flush_impl ~strict env uc impl =
+  let update_th _ e uc = match e with
+    | Suse th ->
+        let uc = open_namespace uc in
+        let uc = use_export uc th in
+        close_namespace uc false None
+    | _ -> uc
+  in
   let update s e (env,uc) = match e with
-    | SType ts when ts_equal ts ts_univ ->
-        let uc =
-          if Mid.mem ts_univ.ts_name (get_known uc)
-          then uc else add_ty_decl uc [ts_univ,Tabstract] in
-        env, uc
-    | SType ts when ts_equal ts ts_ghost ->
-        let uc =
-          if Mid.mem fs_ghost.ls_name (get_known uc)
-          then uc else add_logic_decl uc [fs_ghost,None] in
-        env, uc
     | SType ts ->
         Mstr.add s e env, add_ty_decl uc [ts,Tabstract]
-    | SFunc (_,gvl,_,ls) | SPred (_,gvl,_,ls) ->
-        let uc =
-          if gvl = [] || Mid.mem ts_ghost.ts_name (get_known uc)
-          then uc else add_ty_decl uc [ts_ghost,Tabstract] in
+    | SFunc (_,_,_,ls) | SPred (_,_,_,ls) ->
         Mstr.add s e env, add_logic_decl uc [ls,None]
     | STVar tv when strict ->
         errorm ?loc:tv.tv_name.id_loc "Unbound type variable %s" s
     | SVar vs when strict ->
         errorm ?loc:vs.vs_name.id_loc "Unbound variable %s" s
     | STVar _ | SVar _ -> env,uc
+    | Suse _ -> Mstr.add s e env, uc
     (* none of these is possible in implicit *)
     | SletF _ | SletP _ | STSko _ -> assert false
   in
+  let uc = Hashtbl.fold update_th impl uc in
   let res = Hashtbl.fold update impl (env,uc) in
   Hashtbl.clear impl;
   res
 
-let typecheck _genv path ast =
-  (* TODO: built-ins *)
-  let denv = () in
+let typecheck lib path ast =
+  (* initial environment *)
+  let env  = Mstr.empty in
+  let denv = make_denv lib in
   let impl = Hashtbl.create 17 in
+  add_theory env impl denv.th_univ;
+  (* parsing function *)
   let conj = ref false in
   let negc = ref false in
   let input (env,uc) = function
@@ -538,7 +640,6 @@ let typecheck _genv path ast =
     | Include (_,_,loc) ->
         errorm ~loc "Formula selection is not supported"
   in
-  let env = Mstr.empty in
   (* FIXME: localize the identifier *)
   let uc = create_theory ~path (id_fresh "T") in
   let _,uc = List.fold_left input (env,uc) ast in
