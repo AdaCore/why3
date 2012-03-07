@@ -665,10 +665,8 @@ let typecheck lib path ast =
           let pr = create_prsymbol (id_fresh "contradiction") in
           env, add_prop_decl uc Pgoal pr t_false
     (* includes *)
-    | Include (_f,[],_loc) ->
-        assert false (* TODO: include *)
     | Include (_,_,loc) ->
-        errorm ~loc "Formula selection is not supported"
+        errorm ~loc "Inclusion is not supported"
   in
   (* FIXME: localize the identifier *)
   let uc = create_theory ~path (id_fresh "T") in
