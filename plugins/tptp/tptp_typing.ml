@@ -62,11 +62,14 @@ type symbol =
   | SPred of tvsymbol list * tvsymbol list * Stv.t * lsymbol
   | SletF of tvsymbol list * Stv.t * vsymbol list * term
   | SletP of tvsymbol list * Stv.t * vsymbol list * term
+  | Sdobj of lsymbol
   | Suse  of theory
 
 type env = symbol Mstr.t
 
 type implicit = (string,symbol) Hashtbl.t
+
+(** Defined symbols : arithmetic etc... *)
 
 type denv = {
   de_env   : Env.env;
@@ -81,7 +84,6 @@ type denv = {
 
   th_int   : theory;
   th_real  : theory;
-
   th_rat   : theory;
   ts_rat   : tysymbol;
 }
@@ -105,7 +107,6 @@ let make_denv lib =
 
     th_int   = get_theory "Int";
     th_real  = get_theory "Real";
-
     th_rat   = th_rat;
     ts_rat   = ns_find_ts th_rat.th_export ["rat"];
   }
@@ -113,6 +114,103 @@ let make_denv lib =
 let add_theory env impl th =
   let s = "$th$" ^ th.th_name.id_string in
   if not (Mstr.mem s env) then Hashtbl.replace impl s (Suse th)
+
+let defined_ty ~loc denv env impl dw tyl =
+  let ts = match dw with
+    | DT DTuniv -> denv.ts_univ
+    | DT DTint -> ts_int
+    | DT DTreal -> ts_real
+    | DT DTrat -> add_theory env impl denv.th_rat; denv.ts_rat
+    | DT DTdummy -> error ~loc InvalidDummy
+    | DT (DTtype|DTprop) | DF _ | DP _ -> error ~loc TypeExpected
+  in
+  Loc.try2 loc ty_app ts tyl
+
+let defined_arith ~loc denv env impl dw tl =
+  let ts = match tl with
+    | { t_ty = Some {ty_node = Tyapp (ts,[]) }}::_ -> ts
+    | _::_ -> error ~loc NonNumeric
+    | [] -> error ~loc BadArity in
+  let get_theory = Env.read_theory ~format:"why" denv.de_env ["tptp"] in
+  let get_int_theory = function
+    | DF DFquot -> errorm ~loc "$quotient/2 is not defined on $int"
+    | DF (DFquot_e|DFrem_e) -> get_theory "IntDivE"
+    | DF (DFquot_t|DFrem_t) -> get_theory "IntDivT"
+    | DF (DFquot_f|DFrem_f) -> get_theory "IntDivF"
+    | DF (DFfloor|DFceil|DFtrunc|DFround|DFtoint)
+    | DP (DPisint|DPisrat) -> get_theory "IntTrunc"
+    | DF DFtorat -> get_theory "IntToRat"
+    | DF DFtoreal -> get_theory "IntToReal"
+    | _ -> denv.th_int in
+  let get_rat_theory = function
+    | DF (DFquot_e|DFrem_e) -> get_theory "RatDivE"
+    | DF (DFquot_t|DFrem_t) -> get_theory "RatDivT"
+    | DF (DFquot_f|DFrem_f) -> get_theory "RatDivF"
+    | DF (DFfloor|DFceil|DFtrunc|DFround|DFtoint) -> get_theory "RatTrunc"
+    | DF DFtoreal -> get_theory "RatToReal"
+    | _ -> denv.th_rat in
+  let get_real_theory = function
+    | DF (DFquot_e|DFrem_e) -> get_theory "RealDivE"
+    | DF (DFquot_t|DFrem_t) -> get_theory "RealDivT"
+    | DF (DFquot_f|DFrem_f) -> get_theory "RealDivF"
+    | DF (DFfloor|DFceil|DFtrunc|DFround|DFtoint)
+    | DP (DPisint|DPisrat) -> get_theory "RealTrunc"
+    | DF DFtorat -> get_theory "RealToRat"
+    | _ -> denv.th_real in
+  let th =
+    if ts_equal ts ts_int then get_int_theory dw else
+    if ts_equal ts denv.ts_rat then get_rat_theory dw else
+    if ts_equal ts ts_real then get_real_theory dw else
+    error ~loc NonNumeric
+  in
+  add_theory env impl th;
+  let ls = match dw with
+    | DF DFumin -> ns_find_ls th.th_export ["prefix -"]
+    | DF DFsum -> ns_find_ls th.th_export ["infix +"]
+    | DF DFdiff -> ns_find_ls th.th_export ["infix -"]
+    | DF DFprod -> ns_find_ls th.th_export ["infix *"]
+    | DF DFquot -> ns_find_ls th.th_export ["infix /"]
+    | DF DFquot_e -> ns_find_ls th.th_export ["div"]
+    | DF DFquot_t -> ns_find_ls th.th_export ["div_t"]
+    | DF DFquot_f -> ns_find_ls th.th_export ["div_f"]
+    | DF DFrem_e -> ns_find_ls th.th_export ["mod"]
+    | DF DFrem_t -> ns_find_ls th.th_export ["mod_t"]
+    | DF DFrem_f -> ns_find_ls th.th_export ["mod_f"]
+    | DF DFfloor -> ns_find_ls th.th_export ["floor"]
+    | DF DFceil -> ns_find_ls th.th_export ["ceil"]
+    | DF DFtrunc -> ns_find_ls th.th_export ["truncate"]
+    | DF DFround -> ns_find_ls th.th_export ["round"]
+    | DF DFtoint -> ns_find_ls th.th_export ["to_int"]
+    | DF DFtorat -> ns_find_ls th.th_export ["to_rat"]
+    | DF DFtoreal -> ns_find_ls th.th_export ["to_real"]
+    | DP DPless -> ns_find_ls th.th_export ["infix <"]
+    | DP DPlesseq -> ns_find_ls th.th_export ["infix <="]
+    | DP DPgreater -> ns_find_ls th.th_export ["infix >"]
+    | DP DPgreatereq -> ns_find_ls th.th_export ["infix >="]
+    | DP DPisint -> ns_find_ls th.th_export ["is_int"]
+    | DP DPisrat -> ns_find_ls th.th_export ["is_rat"]
+    | DP (DPtrue|DPfalse|DPdistinct) | DT _ -> assert false
+  in
+  Loc.try2 loc t_app_infer ls tl
+
+let defined_expr ~loc is_fmla denv env impl dw tl = match dw, tl with
+  | (DT DTdummy), _ -> error ~loc InvalidDummy
+  | (DF _|DT _), _ when is_fmla -> error ~loc FmlaExpected
+  | (DP _|DT _), _ when not is_fmla -> error ~loc TermExpected
+  | (DP DPtrue|DP DPfalse), _::_ -> error ~loc BadArity
+  | DP DPtrue, [] -> t_true
+  | DP DPfalse, [] -> t_false
+  | DP DPdistinct, _ ->
+      let rec dist acc = function
+        | t::tl ->
+            let add acc s = t_and_simp acc (t_neq t s) in
+            dist (List.fold_left add acc tl) tl
+        | _ -> acc
+      in
+      Loc.try2 loc dist t_true tl
+  | _ -> defined_arith ~loc denv env impl dw tl
+
+(** TPTP environment *)
 
 let find_tv ~loc env impl s =
   let tv = try Mstr.find s env with Not_found ->
@@ -165,69 +263,33 @@ let find_ps ~loc denv env impl s args =
       Hashtbl.add impl s ps;
       ps
 
+let find_dobj ~loc denv env impl s =
+  let ds = "$do$" ^ s in
+  let fs = try Mstr.find ds env with Not_found ->
+    try Hashtbl.find impl ds with Not_found ->
+      let id = id_user ("do_" ^ s) loc in
+      let fs = Sdobj (create_fsymbol id [] denv.ty_univ) in
+      Hashtbl.add impl ds fs;
+      fs in
+  match fs with
+    | Sdobj fs -> fs_app fs [] denv.ty_univ
+    | _ -> assert false (* impossible *)
+
 let ty_check loc s ty1 t =
   Loc.try3 loc ty_match s ty1 (of_option t.t_ty)
-
-let ty_full_inst m ty = ty_v_map (fun v -> Mtv.find v m) ty
 
 let rec ty denv env impl { e_loc = loc; e_node = n } = match n with
   | Eapp (aw,al) ->
       let ts = find_ts ~loc env impl aw al in
-      let tys = List.map (ty denv env impl) al in
-      ty_app ts tys
+      let tyl = List.map (ty denv env impl) al in
+      Loc.try2 loc ty_app ts tyl
   | Edef (dw,al) ->
-      let ts = match dw with
-        | DT DTuniv -> denv.ts_univ
-        | DT DTint -> ts_int
-        | DT DTreal -> ts_real
-        | DT DTrat -> add_theory env impl denv.th_rat; denv.ts_rat
-        | DT DTdummy -> error ~loc InvalidDummy
-        | DT DTtype | DT DTprop | DF _ | DP _ ->
-            error ~loc TypeExpected in
-      let tys = List.map (ty denv env impl) al in
-      Loc.try2 loc ty_app ts tys
+      let tyl = List.map (ty denv env impl) al in
+      defined_ty ~loc denv env impl dw tyl
   | Evar v ->
       find_tv ~loc env impl v
   | Elet _ | Eite _ | Eqnt _ | Ebin _
   | Enot _ | Eequ _ | Edob _ | Enum _ -> error ~loc TypeExpected
-
-let get_theory ~loc denv env impl dw tl =
-  let get_theory = Env.read_theory ~format:"why" denv.de_env ["tptp"] in
-  match tl with
-  | { t_ty = Some {ty_node = Tyapp (ts,[]) }}::_ ->
-      let th =
-        if ts_equal ts ts_int then match dw with
-          | DF DFquot -> errorm ~loc "$quotient/2 is not defined on $int"
-          | DF (DFquot_e|DFrem_e) -> get_theory "IntDivE"
-          | DF (DFquot_t|DFrem_t) -> get_theory "IntDivT"
-          | DF (DFquot_f|DFrem_f) -> get_theory "IntDivF"
-          | DF (DFfloor|DFceil|DFtrunc|DFround|DFtoint)
-          | DP (DPisint|DPisrat) -> get_theory "IntTrunc"
-          | DF DFtorat -> get_theory "IntToRat"
-          | DF DFtoreal -> get_theory "IntToReal"
-          | _ -> denv.th_int else
-        if ts_equal ts denv.ts_rat then match dw with
-          | DF (DFquot_e|DFrem_e) -> get_theory "RatDivE"
-          | DF (DFquot_t|DFrem_t) -> get_theory "RatDivT"
-          | DF (DFquot_f|DFrem_f) -> get_theory "RatDivF"
-          | DF (DFfloor|DFceil|DFtrunc|DFround|DFtoint) ->
-              get_theory "RatTrunc"
-          | DF DFtoreal -> get_theory "RatToReal"
-          | _ -> denv.th_rat else
-        if ts_equal ts ts_real then match dw with
-          | DF (DFquot_e|DFrem_e) -> get_theory "RealDivE"
-          | DF (DFquot_t|DFrem_t) -> get_theory "RealDivT"
-          | DF (DFquot_f|DFrem_f) -> get_theory "RealDivF"
-          | DF (DFfloor|DFceil|DFtrunc|DFround|DFtoint)
-          | DP (DPisint|DPisrat) -> get_theory "RealTrunc"
-          | DF DFtorat -> get_theory "RealToRat"
-          | _ -> denv.th_real else
-        error ~loc NonNumeric
-      in
-      add_theory env impl th;
-      th
-  | _::_ -> error ~loc NonNumeric
-  | [] -> error ~loc BadArity
 
 let rec term denv env impl { e_loc = loc; e_node = n } = match n with
   | Eapp (aw,al) ->
@@ -239,35 +301,11 @@ let rec term denv env impl { e_loc = loc; e_node = n } = match n with
       end
   | Edef (dw,al) ->
       let tl = List.map (term denv env impl) al in
-      let th = get_theory ~loc denv env impl dw tl in
-      let fs = match dw with
-        | DF DFumin -> ns_find_ls th.th_export ["prefix -"]
-        | DF DFsum -> ns_find_ls th.th_export ["infix +"]
-        | DF DFdiff -> ns_find_ls th.th_export ["infix -"]
-        | DF DFprod -> ns_find_ls th.th_export ["infix *"]
-        | DF DFquot -> ns_find_ls th.th_export ["infix /"]
-        | DF DFquot_e -> ns_find_ls th.th_export ["div"]
-        | DF DFquot_t -> ns_find_ls th.th_export ["div_t"]
-        | DF DFquot_f -> ns_find_ls th.th_export ["div_f"]
-        | DF DFrem_e -> ns_find_ls th.th_export ["mod"]
-        | DF DFrem_t -> ns_find_ls th.th_export ["mod_t"]
-        | DF DFrem_f -> ns_find_ls th.th_export ["mod_f"]
-        | DF DFfloor -> ns_find_ls th.th_export ["floor"]
-        | DF DFceil -> ns_find_ls th.th_export ["ceil"]
-        | DF DFtrunc -> ns_find_ls th.th_export ["truncate"]
-        | DF DFround -> ns_find_ls th.th_export ["round"]
-        | DF DFtoint -> ns_find_ls th.th_export ["to_int"]
-        | DF DFtorat -> ns_find_ls th.th_export ["to_rat"]
-        | DF DFtoreal -> ns_find_ls th.th_export ["to_real"]
-        | DT DTdummy -> error ~loc InvalidDummy
-        | DT _ | DP _ -> error ~loc TermExpected in
-      let tl = List.map (term denv env impl) al in
-      t_app_infer fs tl
+      defined_expr ~loc false denv env impl dw tl
   | Evar v ->
       find_vs ~loc denv env impl v
-  | Edob _ ->
-      (* TODO: distinct objects *)
-      assert false
+  | Edob s ->
+      find_dobj ~loc denv env impl s
   | Enum (Nint s) ->
       t_int_const s
   | Enum (Nreal (i,f,e)) ->
@@ -305,30 +343,9 @@ and fmla denv env impl pol tvl { e_loc = loc; e_node = n } = match n with
         | SletP (tvl,mvs,vl,e) -> let_args denv env impl loc e tvl mvs vl al
         | _ -> error ~loc FmlaExpected
       end, false
-  | Edef (DP DPtrue,[]) -> t_true, false
-  | Edef (DP DPfalse,[]) -> t_false, false
-  | Edef (DP (DPtrue|DPfalse),_) -> error ~loc BadArity
-  | Edef (DP DPdistinct,al) ->
-      let rec dist acc = function
-        | t::tl ->
-            let add acc s = t_and_simp acc (t_neq t s) in
-            dist (List.fold_left add acc tl) tl
-        | _ -> acc in
-      dist t_true (List.map (term denv env impl) al), false
   | Edef (dw,al) ->
       let tl = List.map (term denv env impl) al in
-      let th = get_theory ~loc denv env impl dw tl in
-      let ps = match dw with
-        | DP DPless -> ns_find_ls th.th_export ["infix <"]
-        | DP DPlesseq -> ns_find_ls th.th_export ["infix <="]
-        | DP DPgreater -> ns_find_ls th.th_export ["infix >"]
-        | DP DPgreatereq -> ns_find_ls th.th_export ["infix >="]
-        | DP DPisint -> ns_find_ls th.th_export ["is_int"]
-        | DP DPisrat -> ns_find_ls th.th_export ["is_rat"]
-        | DT DTdummy -> error ~loc InvalidDummy
-        | DT _ | DF _ -> error ~loc FmlaExpected
-        | DP (DPtrue|DPfalse|DPdistinct) -> assert false in
-      ps_app ps tl, false
+      defined_expr ~loc true denv env impl dw tl, false
   | Elet (def,e) ->
       let env,s = let_defn denv env impl def in
       begin match Mstr.find s env with
@@ -488,7 +505,7 @@ and ls_args denv env impl loc fs tvl gl mvs al =
           fs_app denv.fs_ghost [] (ty_app denv.ts_ghost [Mtv.find v tvm]) in
         let tl = List.map ghost gl @ List.map (term denv env impl) al in
         let tvm = List.fold_left2 (ty_check loc) tvm fs.ls_args tl in
-        let ty = option_map (ty_full_inst tvm) fs.ls_value in
+        let ty = option_map (ty_inst tvm) fs.ls_value in
         t_app fs tl ty
     | _ -> error ~loc BadArity
   in
@@ -575,7 +592,20 @@ let flush_impl ~strict env uc impl =
     | SVar vs when strict ->
         errorm ?loc:vs.vs_name.id_loc "Unbound variable %s" s
     | STVar _ | SVar _ -> env,uc
-    | Suse _ -> Mstr.add s e env, uc
+    | Sdobj ls ->
+        let uc = add_logic_decl uc [ls,None] in
+        let t = t_app ls [] ls.ls_value in
+        let add _ s f = match s with
+          | Sdobj fs -> t_and_simp f (t_neq (t_app fs [] fs.ls_value) t)
+          | _ -> f in
+        let f = Mstr.fold add env t_true in
+        let uc = if t_equal f t_true then uc else
+          let id = ls.ls_name.id_string ^ "_def" in
+          let pr = create_prsymbol (id_fresh id) in
+          add_prop_decl uc Paxiom pr f in
+        Mstr.add s e env, uc
+    | Suse _ ->
+        Mstr.add s e env, uc
     (* none of these is possible in implicit *)
     | SletF _ | SletP _ | STSko _ -> assert false
   in
