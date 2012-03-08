@@ -186,7 +186,7 @@ let ity_v_all prv prr ity =
 let ity_v_any prv prr ity =
   try ity_v_fold (any_fn prv) (any_fn prr) false ity with FoldSkip -> true
 
-let ity_full_inst mv mr ity =
+let ity_subst mv mr ity =
   ity_v_map (fun v -> Mtv.find v mv) (fun r -> Mreg.find r mr) ity
 
 let ity_freevars = ity_v_fold (fun s v -> Stv.add v s) Util.const
@@ -209,6 +209,9 @@ exception TypeMismatch of ity * ity
 let ity_equal_check ty1 ty2 =
   if not (ity_equal ty1 ty2) then raise (TypeMismatch (ty1, ty2))
 
+let reg_equal_check r1 r2 =
+  if not (reg_equal r1 r2) then raise (RegionMismatch (r1, r2))
+
 type ity_subst = {
   ity_subst_tv  : ity Mtv.t;
   ity_subst_reg : region Mreg.t;
@@ -219,11 +222,26 @@ let ity_subst_empty = {
   ity_subst_reg = Mreg.empty;
 }
 
+let ity_subst_union s1 s2 =
+  let check_ity _ ity1 ity2 = ity_equal_check ity1 ity2; Some ity1 in
+  let check_reg _ r1 r2 = reg_equal_check r1 r2; Some r1 in
+  { ity_subst_tv  = Mtv.union  check_ity s1.ity_subst_tv  s2.ity_subst_tv;
+    ity_subst_reg = Mreg.union check_reg s1.ity_subst_reg s2.ity_subst_reg }
+
+let reg_inst s r =
+  Mreg.find_def r r s.ity_subst_reg
+
+let reg_full_inst s r =
+  Mreg.find r s.ity_subst_reg
+
 let ity_inst s ity =
   ity_v_map
     (fun v -> Mtv.find_def (ity_var v) v s.ity_subst_tv)
     (fun r -> Mreg.find_def r r s.ity_subst_reg)
     ity
+
+let ity_full_inst s ity =
+  ity_subst s.ity_subst_tv s.ity_subst_reg ity
 
 let rec ity_match s ity1 ity2 =
   let set = function
@@ -296,7 +314,7 @@ let ity_app_fresh s tl =
   let mr,rl = Util.map_fold_left (reg_refresh mv) Mreg.empty s.its_regs in
   (* every external region in def is guaranteed to be in mr *)
   match s.its_def with
-  | Some ity -> ity_full_inst mv mr ity
+  | Some ity -> ity_subst mv mr ity
   | None -> ity_app s tl rl
 
 let ity_app s tl rl =
@@ -316,14 +334,14 @@ let ity_app s tl rl =
   ignore (List.fold_left2 rmatch sub s.its_regs rl);
   (* to instantiate def, mv and mr are enough *)
   match s.its_def with
-  | Some ity -> ity_full_inst mv mr ity
+  | Some ity -> ity_subst mv mr ity
   | None -> ity_app s tl rl
 
 let ity_pur s tl = match s.ts_def with
   | Some ty ->
       let add m v t = Mtv.add v t m in
       let m = List.fold_left2 add Mtv.empty s.ts_args tl in
-      ity_full_inst m Mreg.empty (ity_of_ty ty)
+      ity_subst m Mreg.empty (ity_of_ty ty)
   | None ->
       ity_pur s tl
 
@@ -411,6 +429,9 @@ let eff_erase r = { eff_empty with eff_erases = Sreg.singleton r }
 let eff_raise xs = { eff_empty with eff_raises = Sexn.singleton xs }
 let eff_remove_raise xs e = { e with eff_raises = Sexn.remove xs e.eff_raises }
 
+let eff_full_inst _s _ef =
+  assert false (*TODO*)
+
 (* program variables *)
 type pvsymbol = {
   pv_vs      : vsymbol;
@@ -418,6 +439,16 @@ type pvsymbol = {
   pv_ghost   : bool;
   pv_mutable : region option;
 }
+
+module Pv = StructMake (struct
+  type t = pvsymbol
+  let tag pv = Hashweak.tag_hash pv.pv_vs.vs_name.id_tag
+end)
+
+module Spv = Pv.S
+module Mpv = Pv.M
+
+let pv_equal : pvsymbol -> pvsymbol -> bool = (==)
 
 exception InvalidPVsymbol of ident
 
@@ -435,43 +466,93 @@ let create_pvsymbol id ?mut ?(ghost=false) ity =
     pv_ghost = ghost;
     pv_mutable = mut; }
 
-let pv_equal : pvsymbol -> pvsymbol -> bool = (==)
+let pv_full_inst s pv =
+  let ghost = pv.pv_ghost in
+  let mut = option_map (reg_full_inst s) pv.pv_mutable in
+  let ity = ity_full_inst s pv.pv_ity in
+  create_pvsymbol (id_clone pv.pv_vs.vs_name) ~ghost ?mut ity
 
 (* value types *)
+type pre = term
+type post = term
+type xpost = (pvsymbol * post) Mexn.t
+
 type vty =
   | VTvalue of pvsymbol
-  | VTarrow of pvsymbol * cty
+  | VTarrow of vty_arrow
 
 (* computation types *)
-and cty = {
-  c_pre   : term;
+and vty_arrow = {
+  c_arg   : pvsymbol; (* formal argument *)
+  c_pre   : pre;
   c_vty   : vty;
   c_eff   : effect;
-  c_post  : term;
+  c_post  : post;
   c_xpost : xpost;
+  c_subst : ity_subst;      (* not yet applied to the 5 fields above *)
+  c_pvmap : pvsymbol Mpv.t; (* idem *)
 }
 
-and xpost = (pvsymbol * term) Mexn.t
-
 (* smart constructors *)
-let create_cty
-  ?(pre=t_true) ?(post=t_true) ?(xpost=Mexn.empty) ?(effect=eff_empty) vty =
-  { c_pre = pre;
-    c_vty = vty;
-    c_eff = effect;
-    c_post = post;
-    c_xpost = xpost; }
-(* TODO/FIXME: in xpost, the type of pvsymbol must coincide with
-   that of the exception *)
 
 let vty_value pvs = VTvalue pvs
 
-let vty_arrow x cty =
+exception InvalidExceptionPost of xsymbol * pvsymbol
+
+let check_xpost xs (pv, _) =
+  if not (ity_equal xs.xs_ity pv.pv_ity) then
+    raise (InvalidExceptionPost (xs, pv))
+
+let vty_arrow
+  x ?(pre=t_true) ?(post=t_true) ?(xpost=Mexn.empty) ?(effect=eff_empty) vty =
   (* check that x does not appear in cty *)
   let rec check = function
-    | VTvalue y -> if pv_equal x y then raise (DuplicateVar x.pv_vs)
-    | VTarrow (y, c) ->
-        if pv_equal x y then raise (DuplicateVar x.pv_vs); check c.c_vty
+    | VTvalue y | VTarrow { c_arg = y } when pv_equal x y ->
+        raise (DuplicateVar x.pv_vs)
+    | VTarrow { c_vty = v } ->
+        check v
+    | VTvalue _ ->
+        ()
   in
-  check cty.c_vty;
-  VTarrow (x, cty)
+  check vty;
+  Mexn.iter check_xpost xpost;
+  VTarrow {
+    c_arg = x;
+    c_pre = pre;
+    c_vty = vty;
+    c_eff = effect;
+    c_post = post;
+    c_xpost = xpost;
+    c_subst = ity_subst_empty;
+    c_pvmap = Mpv.empty;
+  }
+
+exception NotAFunction
+
+let get_arrow = function
+  | VTvalue _ -> raise NotAFunction
+  | VTarrow a -> a
+
+let vty_full_inst ~ghost s = function
+  | VTvalue pv ->
+      let pv = pv_full_inst s pv in
+      VTvalue { pv with pv_ghost = ghost || pv.pv_ghost }
+  | VTarrow _a ->
+      assert false (*TODO*)
+
+let vty_app_arrow subst a pv =
+  let s = ity_subst_union subst a.c_subst in
+  let s = ity_match s a.c_arg.pv_ity pv.pv_ity in
+  eff_full_inst s a.c_eff, vty_full_inst ~ghost:pv.pv_ghost s a.c_vty
+
+let vty_app subst v pv =
+  vty_app_arrow subst (get_arrow v) pv
+
+let vty_app_spec _subst _v _pv (* : pre * post * xpost *) =
+  assert false (*TODO*)
+
+let open_vty_arrow a =
+  let pv = pv_full_inst a.c_subst a.c_arg in
+  pv, snd (vty_app_arrow ity_subst_empty a pv)
+
+

@@ -182,6 +182,11 @@ let rec chop n l =
   else if n < 0 || l = [] then invalid_arg "Util.chop"
   else chop (n - 1) (List.tl l)
 
+let rec chop_last = function
+  | [] -> invalid_arg "Util.chop_last"
+  | [r] -> [], r
+  | x :: s -> let s, r = chop_last s in x :: s, r
+
 (* boolean fold accumulators *)
 
 exception FoldSkip

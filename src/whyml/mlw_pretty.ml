@@ -108,8 +108,9 @@ let print_ty_arg fmt ty = fprintf fmt "@ %a" (print_ity_node true) ty
 let print_constr fmt (cs,pjl) =
   let rec cs_args vty pjl = match vty, pjl with
     | VTvalue _, [] -> []
-    | VTarrow (pv,cty), pj::pjl ->
-        (pv,pj) :: cs_args cty.c_vty pjl
+    | VTarrow a, pj::pjl ->
+        let pv, vty = open_vty_arrow a in
+        (pv,pj) :: cs_args vty pjl
     | _, _ -> assert false
   in
   let pjl = cs_args cs.ps.p_vty pjl in

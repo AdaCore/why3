@@ -54,7 +54,7 @@ type expr = private {
 and expr_node = private
   | Elogic  of term
   | Esym    of psymbol (* function *)
-  | Eapp    of psymbol * expr * cty
+  | Eapp    of psymbol * expr
   | Elet    of psymbol * expr * expr
   | Eletrec of recfun list * expr
   | Efun    of lambda

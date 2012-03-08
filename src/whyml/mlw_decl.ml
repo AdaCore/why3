@@ -77,12 +77,15 @@ type pre_ity_defn =
 
 type pre_ity_decl = itysymbol * pre_ity_defn
 
+exception ConstantConstructor of ident
+
 let create_ity_decl tdl =
   let syms = ref Sid.empty in
   let add s (its,_) = news_id s its.its_pure.ts_name in
   let news = ref (List.fold_left add Sid.empty tdl) in
   let projections = Hvs.create 17 in (* vs -> ps_ls *)
   let build_constructor its (id, al) =
+    if al = [] then raise (ConstantConstructor (id_register id));
     (* check well-formedness *)
     let tvs = List.fold_right Stv.add its.its_args Stv.empty in
     let regs = List.fold_right Sreg.add its.its_regs Sreg.empty in
@@ -105,9 +108,10 @@ let create_ity_decl tdl =
     let add_erase ef r = eff_union ef (eff_erase r) in
     let add_erase ef (pv,_) = option_fold add_erase ef pv.pv_mutable in
     let effect = List.fold_left add_erase eff_empty al in
-    let c = create_cty ~post ~effect (vty_value result) in
-    let arrow (pv,_) c = create_cty (vty_arrow pv c) in
-    let v = (List.fold_right arrow al c).c_vty in
+    let al, (a, _) = Util.chop_last al in
+    let c = vty_arrow a ~post ~effect (vty_value result) in
+    let arrow (pv,_) c = vty_arrow pv c in
+    let v = List.fold_right arrow al c in
     let ps = create_psymbol id Stv.empty Sreg.empty v in
     let ps_ls = { ps = ps; ls = ls } in
     news := Sid.add ps.p_name !news;
@@ -119,7 +123,7 @@ let create_ity_decl tdl =
       let post = t_equ (t_var pv.pv_vs) t in
       let add_read ef r = eff_union ef (eff_read r) in
       let effect = option_fold add_read eff_empty pv.pv_mutable in
-      let vty = vty_arrow result (create_cty ~post ~effect (vty_value pv)) in
+      let vty = vty_arrow result ~post ~effect (vty_value pv) in
       let ps = create_psymbol id Stv.empty Sreg.empty vty in
       let ps_ls = { ps = ps; ls = ls } in
       news := Sid.add ps.p_name !news;

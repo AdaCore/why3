@@ -185,25 +185,29 @@ val create_pvsymbol : preid -> ?mut:region -> ?ghost:bool -> ity -> pvsymbol
 val pv_equal : pvsymbol -> pvsymbol -> bool
 
 (* value types *)
+type vty_arrow
+
 type vty = private
   | VTvalue of pvsymbol
-  | VTarrow of pvsymbol * cty
-
-(* computation types *)
-and cty = private {
-  c_pre   : term;
-  c_vty   : vty;
-  c_eff   : effect;
-  c_post  : term;
-  c_xpost : xpost;
-}
-
-and xpost = (pvsymbol * term) Mexn.t
+  | VTarrow of vty_arrow
 
 (* smart constructors *)
-val create_cty :
-  ?pre:term -> ?post:term -> ?xpost:xpost -> ?effect:effect -> vty -> cty
-
 val vty_value : pvsymbol -> vty
-val vty_arrow : pvsymbol -> cty -> vty
+
+type pre = term
+type post = term
+type xpost = (pvsymbol * post) Mexn.t
+
+val vty_arrow :
+  pvsymbol ->
+  ?pre:term -> ?post:term -> ?xpost:xpost -> ?effect:effect -> vty -> vty
+
+val vty_app : ity_subst -> vty -> pvsymbol -> effect * vty
+
+val vty_app_spec : ity_subst -> vty -> pvsymbol -> pre * post * xpost
+
+val open_vty_arrow : vty_arrow -> pvsymbol * vty
+
+
+
 
