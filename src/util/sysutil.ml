@@ -151,10 +151,13 @@ let path_of_file f =
     let d = Filename.dirname f in
     if d = Filename.current_dir_name then
       (* f is relative to the current dir *)
-      aux (f::acc) (Sys.getcwd ())
+      let b = Filename.basename f in
+      aux (b::acc) (Sys.getcwd ())
+    else if f=d then
+      (* we are at the root *)
+      acc
     else
       let b = Filename.basename f in
-      if b=Filename.current_dir_name then acc else
         if f=b then b::acc else
           aux (b::acc) d
   in
