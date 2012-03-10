@@ -40,21 +40,21 @@ let deco_term kept tvar =
     | Tvar v ->
         if is_protected_vs kept v
         then t else decorate tvar t
-    | Tapp (ls,_) ->
-        let t = t_map deco t in
-        if ls.ls_value = None || is_protected_ls kept ls
-        then t else decorate tvar t
+    | Tapp (ls,_) when ls.ls_value <> None && not (is_protected_ls kept ls) ->
+        decorate tvar (expl t)
     | Tconst _ ->
         if Sty.mem (t_type t) kept
         then t else decorate tvar t
-    | Tlet (t1,tb) ->
-        let v,e,close = t_open_bound_cb tb in
-        t_let (t_map deco t1) (close v (deco e))
     | Teps tb ->
         let v,f,close = t_open_bound_cb tb in
         let t = t_eps (close v (deco f)) in
         if is_protected_vs kept v
         then t else decorate tvar t
+    | _ -> expl t
+  and expl t = match t.t_node with
+    | Tlet (t1,tb) ->
+        let v,e,close = t_open_bound_cb tb in
+        t_let (expl t1) (close v (deco e))
     | _ -> t_map deco t
   in
   deco
