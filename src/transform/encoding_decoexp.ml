@@ -72,6 +72,8 @@ let deco_term kept tvar =
 let ls_inf_type = create_psymbol (id_fresh "infinite") [ty_type]
 
 let deco_decl kept enum phmap d = match d.d_node with
+  | Dtype ([ts,Tabstract] as tdl) when ts.ts_def <> None ->
+      d :: lsdecl_of_tydecl tdl
   | Dtype ([ts,Tabstract] as tdl) when not (Mts.mem ts enum) ->
       let ls = ls_of_ts ts in
       let vs_of_tv v = create_vsymbol (id_clone v.tv_name) ty_type in
@@ -89,7 +91,7 @@ let deco_decl kept enum phmap d = match d.d_node with
         let t = fs_app ls_poly_deco [t; t_arg] ty_arg in
         let f = t_forall_close (vs_arg::vl) [] (t_equ t t_arg) in
         create_prop_decl Paxiom (create_prsymbol id) f in
-      (d :: lsdecl_of_tydecl tdl) @ [inf_ts; sort_id]
+      d :: lsdecl_of_tydecl tdl @ [inf_ts; sort_id]
   | Dtype ([ts,Tabstract] as tdl) ->
       let ls = ls_of_ts ts in
       let vs_of_tv v = create_vsymbol (id_clone v.tv_name) ty_type in
@@ -104,7 +106,7 @@ let deco_decl kept enum phmap d = match d.d_node with
         let f = t_forall_close vl [] (t_implies h f) in
         create_prop_decl Paxiom (create_prsymbol id) f :: l in
       let inf_tss = List.fold_right2 add phl vl [] in
-      (d :: lsdecl_of_tydecl tdl) @ inf_tss
+      d :: lsdecl_of_tydecl tdl @ inf_tss
   | Dtype _ -> Printer.unsupportedDecl d
       "Algebraic and recursively-defined types are \
             not supported, run eliminate_algebraic"
