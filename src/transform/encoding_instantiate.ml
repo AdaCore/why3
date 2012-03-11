@@ -28,9 +28,6 @@ open Task
 open Decl
 open Encoding
 
-let meta_complete = register_meta_excl
-  "encoding_instantiate : complete" [MTstring]
-
 exception TooMuchInstantiation of int
 let max_instantiation = 512 (* 7 ** 3 = 343 *)
 
@@ -522,36 +519,19 @@ let is_ty_mono ~only_mono ty =
 
 let create_trans_complete kept complete =
   let task = use_export None builtin_theory in
-  let tenv = match complete with
-    | None | Some [MAstr "yes"] -> Complete
-    | Some [MAstr "no"] ->  Incomplete
-    | _ -> failwith "instantiate complete wrong argument" in
-  let init_task,env = create_env task tenv kept in
+  let init_task,env = create_env task complete kept in
   Trans.fold_map fold_map env init_task
 
-let encoding_instantiate =
+let encoding_instantiate complete =
   Trans.compose Libencoding.close_kept
   (Trans.on_tagged_ty Libencoding.meta_kept (fun kept ->
-    Trans.on_meta_excl meta_complete (fun complete ->
-      create_trans_complete kept complete)))
+    create_trans_complete kept complete))
 
 let () = Hashtbl.replace Encoding.ft_enco_kept "instantiate"
-  (const encoding_instantiate)
+  (const (encoding_instantiate Incomplete))
 
-
-let create_trans_complete create_env kept complete =
-  let task = use_export None builtin_theory in
-  let tenv = match complete with
-    | None | Some [MAstr "yes"] -> Complete
-    | Some [MAstr "no"] ->  Incomplete
-    | _ -> failwith "instantiate complete wrong argument" in
-  let init_task,env = create_env task tenv kept in
-  Trans.fold_map fold_map env init_task
-
-let t create_env =
-  Trans.on_tagged_ty Libencoding.meta_kept (fun kept ->
-  Trans.on_meta_excl meta_complete (fun complete ->
-      create_trans_complete create_env kept complete))
+let () = Hashtbl.replace Encoding.ft_enco_kept "instantiate_complete"
+  (const (encoding_instantiate Complete))
 
 (*
 Local Variables:
