@@ -86,9 +86,13 @@ let add_opt_trans x = opt_trans := x::!opt_trans
 
 let add_opt_meta meta =
   let meta_name, meta_arg =
-    let index = String.index meta '=' in
-    (String.sub meta 0 index),
-    (String.sub meta (index+1) (String.length meta - (index + 1))) in
+    try
+      let index = String.index meta '=' in
+      (String.sub meta 0 index),
+      Some (String.sub meta (index+1) (String.length meta - (index + 1)))
+    with Not_found ->
+      meta, None
+  in
   opt_metas := (meta_name,meta_arg)::!opt_metas
 
 let opt_config = ref None
@@ -162,7 +166,7 @@ let option_list = Arg.align [
   "--apply-transform", Arg.String add_opt_trans,
       " same as -a";
   "-M", Arg.String add_opt_meta,
-      "<meta_name>=<string> Add a string meta to every task";
+      "<meta_name>[=<string>] Add a meta to every task";
   "--meta", Arg.String add_opt_meta,
       " same as -M";
   "-o", Arg.String (fun s -> opt_output := Some s),
@@ -316,8 +320,12 @@ let () =
   if !opt_timelimit = None then opt_timelimit := Some (Whyconf.timelimit main);
   if !opt_memlimit  = None then opt_memlimit  := Some (Whyconf.memlimit main);
   let add_meta theory (meta,s) =
-    let meta = lookup_meta meta in
-    Theory.add_meta theory meta [MAstr s]
+    let meta = Theory.lookup_meta meta in
+    let args = match s with
+      | Some s -> [MAstr s]
+      | None -> []
+    in
+    Theory.add_meta theory meta args
   in
   let opt_theo = Theory.close_theory (List.fold_left add_meta
     (Theory.create_theory (Ident.id_fresh "cmdline"))

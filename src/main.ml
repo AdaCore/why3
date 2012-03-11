@@ -81,9 +81,13 @@ let add_opt_trans x = opt_trans := x::!opt_trans
 
 let add_opt_meta meta =
   let meta_name, meta_arg =
-    let index = String.index meta '=' in
-    (String.sub meta 0 index),
-    (String.sub meta (index+1) (String.length meta - (index + 1))) in
+    try
+      let index = String.index meta '=' in
+      (String.sub meta 0 index),
+      Some (String.sub meta (index+1) (String.length meta - (index + 1)))
+    with Not_found ->
+      meta, None
+  in
   opt_metas := (meta_name,meta_arg)::!opt_metas
 
 let opt_config = ref None
@@ -160,7 +164,7 @@ let option_list = Arg.align [
   "--apply-transform", Arg.String add_opt_trans,
       " same as -a";
   "-M", Arg.String add_opt_meta,
-      "<meta_name>=<string> Add a string meta to every task";
+      "<meta_name>[=<string>] Add a meta to every task";
   "--meta", Arg.String add_opt_meta,
       " same as -M";
   "-D", Arg.String (fun s -> opt_driver := Some (s, [])),
@@ -331,7 +335,11 @@ let () = try
   end;
   let add_meta task (meta,s) =
     let meta = lookup_meta meta in
-    add_meta task meta [MAstr s]
+    let args = match s with
+      | Some s -> [MAstr s]
+      | None -> []
+    in
+    add_meta task meta args
   in
   opt_task := List.fold_left add_meta !opt_task !opt_metas
 
