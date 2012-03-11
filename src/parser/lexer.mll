@@ -243,7 +243,7 @@ rule token = parse
       { AND }
   | "\\/"
       { OR }
-   | "\\"
+  | "\\"
       { LAMBDA }
   | "\\?"
       { PRED }
