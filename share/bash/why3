@@ -1,0 +1,103 @@
+# bash completion for Why3
+
+# To use this script you should have bash-completion package installed
+# Put it in /etc/bash_completion.d or just source it from your .bashrc
+
+_why3metas ()
+{
+    $1 --list-metas | grep -v '^Known ' | sed -e 's/[([].*//'
+}
+
+_why3()
+{
+    local cur prev words cword split
+    _init_completion || return
+
+    case $prev in
+        -T|--theory)
+            # this only completes the first '-T' option
+            # also, we cannot complete library theories
+            unset words[cword]
+            words[cword-1]="--print-namespace"
+            theories=$(${words[@]} 2>/dev/null | grep '^[^ ]' | cut -d '-' -f 1)
+            COMPREPLY=( $( compgen -W "$theories" -- "$cur" ) )
+            return 0
+            ;;
+        -G|--goal)
+            unset words[cword]
+            words[cword-1]="--print-namespace"
+            goals=$(${words[@]} 2>/dev/null | grep -- '-goal ' | sed -e 's/.*-goal //')
+            COMPREPLY=( $( compgen -W "$goals" -- "$cur" ) )
+            return 0
+            ;;
+        -C|--config|--extra-config)
+            _filedir
+            return 0
+            ;;
+        -L|--library|-I)
+            _filedir -d
+            return 0
+            ;;
+        -P|--prover)
+            provers=$($1 --list-provers | grep -v '^Known ' | cut -d ' ' -f 3)
+            COMPREPLY=( $( compgen -W "$provers" -- "$cur" ) )
+            return 0
+            ;;
+        -F|--format)
+            formats=$($1 --list-formats | grep -v '^Known ' | cut -d ' ' -f 3)
+            COMPREPLY=( $( compgen -W "$formats" -- "$cur" ) )
+            return 0
+            ;;
+        -t|--timelimit|-m|--memlimit)
+            return 0
+            ;;
+        -a|--apply-transform)
+            transforms=$($1 --list-transforms | grep -v '^Known ')
+            COMPREPLY=( $( compgen -W "$transforms" -- "$cur" ) )
+            return 0
+            ;;
+        -M|--meta)
+            while read line ; do
+                COMPREPLY[${#COMPREPLY[@]}]="\"$line\""
+            done <<-END
+		$(compgen -W "$(_why3metas $1)" -- "$cur")
+		END
+            return 0
+            ;;
+        -D|--driver)
+            _filedir
+            return 0
+            ;;
+        -o|--output)
+            _filedir -d
+            return 0
+            ;;
+        --install-plugin)
+            _filedir
+            return 0
+            ;;
+        -smoke-detector|--smoke-detector)
+            COMPREPLY=( $( compgen -W 'none top deep' -- "$cur" ) )
+            return 0
+            ;;
+        -latex|--latex|-latex2|--latex2)
+            _filedir -d
+            return 0
+            ;;
+        --debug)
+            flags=$($1 --list-debug-flags | grep -v '^Known ' | cut -d ' ' -f 3)
+            COMPREPLY=( $( compgen -W "$flags" -- "$cur" ) )
+            return 0
+            ;;
+    esac
+
+    _filedir
+    COMPREPLY+=( $( compgen -W '$( _parse_help "$1" )' -- "$cur" ) )
+
+} && complete -F _why3 \
+    why3 why3ml why3ide why3config why3doc why3html why3replayer why3session \
+    why3.opt why3ml.opt why3ide.opt why3config.opt why3doc.opt \
+    why3html.opt why3replayer.opt why3session.opt \
+    why3.byte why3ml.byte why3ide.byte why3config.byte why3doc.byte \
+    why3html.byte why3replayer.byte why3session.byte
+
