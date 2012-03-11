@@ -29,12 +29,6 @@ open Theory
 open Task
 open Printer
 
-(** Options of this printer *)
-let use_trigger = Theory.register_meta_excl "Smt : trigger" []
-let use_builtin_array = Theory.register_meta_excl "Smt : builtin array" []
-
-(** *)
-
 let ident_printer =
   let bls = ["and";"benchmark";"distinct";"exists";"false";"flet";"forall";
      "if then else";"iff";"implies";"ite";"let";"logic";"not";"or";
@@ -58,7 +52,6 @@ let print_var fmt {vs_name = id} =
 
 type info = {
   info_syn : syntax_map;
-  use_trigger : bool;
 }
 
 let rec print_type info fmt ty = match ty.ty_node with
@@ -234,7 +227,6 @@ let print_task pr thpr fmt task =
   print_th_prelude task fmt thpr;
   let info = {
     info_syn = get_syntax_map task;
-    use_trigger = false;
   }
   in
   let decls = Task.task_decls task in

@@ -29,12 +29,6 @@ open Theory
 open Task
 open Printer
 
-(** Options of this printer *)
-let use_trigger = Theory.register_meta_excl "Smt : trigger" []
-let use_builtin_array = Theory.register_meta_excl "Smt : builtin array" []
-
-(** *)
-
 let ident_printer =
   let bls = (*["and";" benchmark";" distinct";"exists";"false";"flet";"forall";
      "if then else";"iff";"implies";"ite";"let";"logic";"not";"or";
@@ -69,7 +63,6 @@ let print_ident fmt id =
 (** type *)
 type info = {
   info_syn : syntax_map;
-  use_trigger : bool;
 (*  complex_type : ty Hty.t; *)
 }
 
@@ -332,7 +325,6 @@ let print_task_old pr thpr fmt task =
   let info = {
     info_syn = Mid.union (fun _ _ s -> Some s)
       (get_syntax_map task) (Trans.apply distingued task);
-    use_trigger = false;
     (* complex_type = Hty.create 5; *)
   }
   in
@@ -354,7 +346,7 @@ let print_decls =
   let print dls sm fmt d =
     let info = {
       info_syn = List.fold_left (add_ls sm) sm dls;
-      use_trigger = false } in
+    } in
     print_decl info fmt d in
   Trans.on_meta Discriminate.meta_lsinst (fun dls ->
     Printer.sprint_decls (print dls))
