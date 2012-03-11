@@ -3,17 +3,17 @@
 # To use this script you should have bash-completion package installed
 # Put it in /etc/bash_completion.d or just source it from your .bashrc
 
-_why3metas ()
-{
-    $1 --list-metas | grep -v '^Known ' | sed -e 's/[([].*//'
-}
-
 _why3()
 {
     local cur prev words cword split
-    _init_completion || return
 
-    case $prev in
+    if declare -F _init_completion > /dev/null ; then
+        _init_completion -n = || return
+    else
+        _get_comp_words_by_ref -n = cur prev words cword
+    fi
+
+    case "$prev" in
         -T|--theory)
             # this only completes the first '-T' option
             # also, we cannot complete library theories
@@ -57,11 +57,12 @@ _why3()
             return 0
             ;;
         -M|--meta)
-            while read line ; do
-                COMPREPLY[${#COMPREPLY[@]}]="\"$line\""
-            done <<-END
-		$(compgen -W "$(_why3metas $1)" -- "$cur")
-		END
+            metas=$($1 --list-metas | grep -v '^Known ' |
+                grep -v '\[\(function/predicate\|type\) symbol\]' |
+                grep -v '\[\(type\|proposition\|integer\)\]' |
+                grep -v '\] \[' | sed -e 's/(flag) //' |
+                sed -e 's/ \[string\]/=/')
+            COMPREPLY=( $(compgen -W "$metas" -- "$cur") )
             return 0
             ;;
         -D|--driver)
@@ -92,7 +93,12 @@ _why3()
     esac
 
     _filedir
-    COMPREPLY+=( $( compgen -W '$( _parse_help "$1" )' -- "$cur" ) )
+
+    case "$cur" in
+        -*) COMPREPLY+=( $( compgen -W '$( _parse_help "$1" )' -- "$cur" ) )
+            return 0
+            ;;
+    esac
 
 } && complete -F _why3 \
     why3 why3ml why3ide why3config why3doc why3html why3replayer why3session \
