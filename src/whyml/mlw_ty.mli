@@ -155,22 +155,24 @@ module Sexn: Mexn.Set
 
 (* effects *)
 type effect = private {
-  eff_reads   : Sreg.t;
-  eff_writes  : Sreg.t;
-  eff_erases  : Sreg.t;
-  eff_renames : region Mreg.t; (* if r1->r2 then r1 appears in ty(r2) *)
-  eff_raises  : Sexn.t;
+  eff_reads  : Sreg.t;
+  eff_writes : Sreg.t;
+  (* if r1 -> Some r2 then r1 appears in ty(r2) *)
+  eff_resets : region option Mreg.t;
+  eff_raises : Sexn.t;
 }
 
 val eff_empty : effect
 val eff_union : effect -> effect -> effect
 
-val eff_read  : region -> effect
-val eff_write : region -> effect
-val eff_erase : region -> effect
-val eff_raise : xsymbol -> effect
+val eff_read  : effect -> region -> effect
+val eff_write : effect -> region -> effect
+val eff_reset : effect -> region -> effect
+val eff_raise : effect -> xsymbol -> effect
 
-val eff_remove_raise : xsymbol -> effect -> effect
+val eff_assign : effect -> region -> ity -> effect
+
+val eff_remove_raise : effect -> xsymbol -> effect
 
 (* program variables *)
 type pvsymbol = private {

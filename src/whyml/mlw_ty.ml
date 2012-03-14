@@ -394,40 +394,55 @@ module Mexn = Exn.M
 
 (* effects *)
 type effect = {
-  eff_reads   : Sreg.t;
-  eff_writes  : Sreg.t;
-  eff_erases  : Sreg.t;
-  eff_renames : region Mreg.t; (* if r1->r2 then r1 appears in ty(r2) *)
-  eff_raises  : Sexn.t;
+  eff_reads  : Sreg.t;
+  eff_writes : Sreg.t;
+  (* if r1 -> Some r2 then r1 appears in ty(r2) *)
+  eff_resets : region option Mreg.t;
+  eff_raises : Sexn.t;
 }
 
 let eff_empty = {
-  eff_reads   = Sreg.empty;
-  eff_writes  = Sreg.empty;
-  eff_erases  = Sreg.empty;
-  eff_renames = Mreg.empty;
-  eff_raises  = Sexn.empty
+  eff_reads  = Sreg.empty;
+  eff_writes = Sreg.empty;
+  eff_resets = Mreg.empty;
+  eff_raises = Sexn.empty
 }
 
+let join_reset _key v1 v2 =
+  Some (if option_eq reg_equal v1 v2 then v1 else None)
+
 let eff_union x y =
-  let e = Sreg.union x.eff_erases y.eff_erases in
-  let rx = Mreg.diff (fun _ _ _ -> None) x.eff_renames e in
-  let ry = Mreg.diff (fun _ _ _ -> None) y.eff_renames e in
-  let rn = Mreg.union
-      (fun _ r1 r2 -> if reg_equal r1 r2 then Some r1 else None) rx ry in
-  let re = Mreg.inter
-      (fun _ r1 r2 -> if reg_equal r1 r2 then None else Some ()) rx ry in
-  { eff_reads = Sreg.union x.eff_reads y.eff_reads;
+  { eff_reads  = Sreg.union x.eff_reads  y.eff_reads;
     eff_writes = Sreg.union x.eff_writes y.eff_writes;
-    eff_erases = Sreg.union e re;
-    eff_renames = rn;
+    eff_resets = Mreg.union join_reset x.eff_resets y.eff_resets;
     eff_raises = Sexn.union x.eff_raises y.eff_raises; }
 
-let eff_read r = { eff_empty with eff_reads = Sreg.singleton r }
-let eff_write r = { eff_empty with eff_writes = Sreg.singleton r }
-let eff_erase r = { eff_empty with eff_erases = Sreg.singleton r }
-let eff_raise xs = { eff_empty with eff_raises = Sexn.singleton xs }
-let eff_remove_raise xs e = { e with eff_raises = Sexn.remove xs e.eff_raises }
+let eff_read  e r = { e with eff_reads  = Sreg.add r e.eff_reads }
+let eff_write e r = { e with eff_writes = Sreg.add r e.eff_writes }
+let eff_raise e x = { e with eff_raises = Sexn.add x e.eff_raises }
+let eff_reset e r = { e with eff_resets = Mreg.add r None e.eff_resets }
+
+exception IllegalAlias of region
+
+let eff_assign e r ty =
+  let e = eff_write e r in
+  let sub = ity_match ity_subst_empty r.reg_ity ty in
+  (* assignment cannot instantiate type variables *)
+  if not (Mtv.is_empty sub.ity_subst_tv) then
+    raise (TypeMismatch (r.reg_ity,ty));
+  let sub = sub.ity_subst_reg in
+  (* r:t[r1,r2] <- t[r1,r1] introduces an alias *)
+  let add_right _ v s = Sreg.add_new (IllegalAlias v) v s in
+  ignore (Mreg.fold add_right sub Sreg.empty);
+  (* every region on the rhs must be erased *)
+  let add_right k v m = if reg_equal k v then m else Mreg.add v None m in
+  let reset = Mreg.fold add_right sub Mreg.empty in
+  (* ...except those which occur on the lhs : they are preserved under r *)
+  let add_left k v m = if reg_equal k v then m else Mreg.add v (Some r) m in
+  let reset = Mreg.fold add_left sub reset in
+  { e with eff_resets = Mreg.union join_reset e.eff_resets reset }
+
+let eff_remove_raise e x = { e with eff_raises = Sexn.remove x e.eff_raises }
 
 let eff_full_inst _s _ef =
   assert false (*TODO*)
