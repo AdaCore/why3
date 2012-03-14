@@ -430,22 +430,42 @@ let eff_assign e r ty =
   (* assignment cannot instantiate type variables *)
   if not (Mtv.is_empty sub.ity_subst_tv) then
     raise (TypeMismatch (r.reg_ity,ty));
-  let sub = sub.ity_subst_reg in
   (* r:t[r1,r2] <- t[r1,r1] introduces an alias *)
   let add_right _ v s = Sreg.add_new (IllegalAlias v) v s in
-  ignore (Mreg.fold add_right sub Sreg.empty);
+  ignore (Mreg.fold add_right sub.ity_subst_reg Sreg.empty);
   (* every region on the rhs must be erased *)
   let add_right k v m = if reg_equal k v then m else Mreg.add v None m in
-  let reset = Mreg.fold add_right sub Mreg.empty in
+  let reset = Mreg.fold add_right sub.ity_subst_reg Mreg.empty in
   (* ...except those which occur on the lhs : they are preserved under r *)
   let add_left k v m = if reg_equal k v then m else Mreg.add v (Some r) m in
-  let reset = Mreg.fold add_left sub reset in
+  let reset = Mreg.fold add_left sub.ity_subst_reg reset in
   { e with eff_resets = Mreg.union join_reset e.eff_resets reset }
 
 let eff_remove_raise e x = { e with eff_raises = Sexn.remove x e.eff_raises }
 
-let eff_full_inst _s _ef =
-  assert false (*TODO*)
+let eff_full_inst s e =
+  let s = s.ity_subst_reg in
+  (* modified or reset regions in e *)
+  let wr = Mreg.map (Util.const ()) e.eff_resets in
+  let wr = Sreg.union e.eff_writes wr in
+  (* read-only regions in e *)
+  let ro = Sreg.diff e.eff_reads wr in
+  (* all modified or reset regions are instantiated into distinct regions *)
+  let add_affected r acc =
+    let r = Mreg.find r s in Sreg.add_new (IllegalAlias r) r acc in
+  let wr = Sreg.fold add_affected wr Sreg.empty in
+  (* all read-only regions are instantiated outside wr *)
+  let add_readonly r =
+    let r = Mreg.find r s in if Sreg.mem r wr then raise (IllegalAlias r) in
+  Sreg.iter add_readonly ro;
+  (* calculate instantiated effect *)
+  let add_inst r acc = Sreg.add (Mreg.find r s) acc in
+  let reads  = Sreg.fold add_inst e.eff_reads  Sreg.empty in
+  let writes = Sreg.fold add_inst e.eff_writes Sreg.empty in
+  let add_inst r v acc =
+    Mreg.add (Mreg.find r s) (option_map (fun v -> Mreg.find v s) v) acc in
+  let resets = Mreg.fold add_inst e.eff_resets Mreg.empty in
+  { e with eff_reads = reads ; eff_writes = writes ; eff_resets = resets }
 
 (* program variables *)
 type pvsymbol = {
