@@ -76,15 +76,19 @@ let anon_file _ = Arg.usage option_list usage_msg; exit 1
 
 let install_plugin main p =
   begin match Plugin.check_plugin p with
-    | Plugin.Plubad -> eprintf "Unknown extension (.cmo|.cmxs) : %s@." p;
-      raise Exit
+    | Plugin.Plubad ->
+        Debug.dprintf Plugin.debug "Unknown extension (.cmo|.cmxs) : %s@." p;
+        raise Exit
     | Plugin.Pluother ->
-      eprintf "The plugin %s will not be used with this kind of compilation \
-and it has not been tested@."
-        p
-    | Plugin.Plugood -> ()
-    | Plugin.Plufail exn -> eprintf "The plugin %s dynlink failed :@.%a@."
-      p Exn_printer.exn_printer exn; raise Exit
+        Debug.dprintf Plugin.debug
+          "The plugin %s cannot be used with this kind of compilation@." p;
+        raise Exit
+    | Plugin.Plufail exn ->
+        eprintf "The plugin %s dynlink failed :@.%a@."
+          p Exn_printer.exn_printer exn;
+        raise Exit
+    | Plugin.Plugood ->
+        eprintf "== Found %s ==@." p
   end;
   let base = Filename.basename p in
   let plugindir = Whyconf.pluginsdir main in
@@ -104,7 +108,7 @@ let plugins_auto_detection config =
   let fold main p =
     if p.[0] == '.' then main else
     let p = Filename.concat dir p in
-    try eprintf "== Found %s ==@." p;
+    try
         install_plugin main p
     with Exit -> main
   in

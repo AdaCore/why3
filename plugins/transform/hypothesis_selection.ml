@@ -21,6 +21,7 @@
 (*s Transformation which removes most hypothesis, only keeping the one
 a graph-based heuristic finds close enough to the goal *)
 
+open Why3
 open Util
 open Ident
 open Ty

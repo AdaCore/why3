@@ -68,8 +68,11 @@ RUBBER = @RUBBER@
 #PSVIEWER  = @PSVIEWER@
 #PDFVIEWER = @PDFVIEWER@
 
-BFLAGS = -w Aer-29 -dtypes -g -I src $(INCLUDES)
 OFLAGS = -w Aer-29 -dtypes    -I src $(INCLUDES)
+BFLAGS = -w Aer-29 -dtypes -g -I src $(INCLUDES)
+
+OLINKFLAGS = -linkall $(EXTCMXA)
+BLINKFLAGS = -linkall $(EXTCMA)
 
 ifeq (@enable_profiling@,yes)
 OFLAGS += -g -p
@@ -88,13 +91,14 @@ EXTCMXA = $(addsuffix .cmxa,$(EXTLIBS)) $(addsuffix .cmx,$(EXTOBJS))
 # main target
 ###############
 
-all: @OCAMLBEST@ plugins
+all: @OCAMLBEST@
+plugins: plugins.@OCAMLBEST@
+opt: plugins.opt
+byte: plugins.byte
 
 ifeq (@enable_local@,yes)
 all: install_local
 endif
-
-plugins: plugins.@OCAMLBEST@
 
 .PHONY: byte opt clean depend all install install_local install_no_local
 .PHONY: plugins plugins.byte plugins.opt
@@ -146,12 +150,6 @@ LIBMODULES = src/config \
 
 LIBDIRS = util core parser driver transform printer session
 LIBINCLUDES = $(addprefix -I src/, $(LIBDIRS))
-
-ifeq (@enable_hypothesis_selection@,yes)
-  LIB_TRANSFORM += hypothesis_selection
-  INCLUDES += -I @OCAMLGRAPHLIB@
-  EXTLIBS += graph
-endif
 
 LIBDEP = $(addsuffix .dep, $(LIBMODULES))
 LIBCMO = $(addsuffix .cmo, $(LIBMODULES))
@@ -259,6 +257,16 @@ TPTPMODULES = $(addprefix plugins/tptp/, $(PLUG_TPTP))
 TPTPCMO = $(addsuffix .cmo, $(TPTPMODULES))
 TPTPCMX = $(addsuffix .cmx, $(TPTPMODULES))
 
+ifeq (@enable_hypothesis_selection@,yes)
+PLUG_TRANSFORM += hypothesis_selection
+PLUGINS += hypothesis_selection
+
+lib/plugins/hypothesis_selection.cmxs: INCLUDES += -I @OCAMLGRAPHLIB@
+lib/plugins/hypothesis_selection.cmo:  INCLUDES += -I @OCAMLGRAPHLIB@
+lib/plugins/hypothesis_selection.cmxs: OFLAGS += graph.cmxa
+lib/plugins/hypothesis_selection.cmo:  BFLAGS += graph.cmo
+endif
+
 PLUGMODULES = $(addprefix plugins/parser/, $(PLUG_PARSER)) \
 	      $(addprefix plugins/printer/, $(PLUG_PRINTER)) \
 	      $(addprefix plugins/transform/, $(PLUG_TRANSFORM)) \
@@ -346,12 +354,12 @@ opt:  bin/why3.opt
 
 bin/why3.opt: src/why3.cmxa src/main.cmx
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
-	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
+	    $(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
 	$(STRIP) $@
 
 bin/why3.byte: src/why3.cma src/main.cmo
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
-	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
+	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 
 bin/why3: bin/why3.@OCAMLBEST@
 	ln -sf why3.@OCAMLBEST@ $@
@@ -425,12 +433,12 @@ opt:  bin/why3ml.opt
 
 bin/why3ml.opt: src/why3.cmxa $(PGMCMX) $(MLWCMX) src/main.cmx
 	$(if $(QUIET), @echo 'Linking  $@' &&) \
-	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
+	    $(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
 	$(STRIP) $@
 
 bin/why3ml.byte: src/why3.cma $(PGMCMO) $(MLWCMO) src/main.cmo
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
-	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
+	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 
 bin/why3ml: bin/why3ml.@OCAMLBEST@
 	ln -sf why3ml.@OCAMLBEST@ $@
@@ -514,12 +522,12 @@ opt:  bin/why3config.opt
 
 bin/why3config.opt: src/why3.cmxa $(CONFIGCMX)
 	$(if $(QUIET), @echo 'Linking  $@' &&) \
-	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
+	    $(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
 	$(STRIP) $@
 
 bin/why3config.byte: src/why3.cma $(CONFIGCMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
-	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
+	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 
 bin/why3config: bin/why3config.@OCAMLBEST@
 	ln -sf why3config.@OCAMLBEST@ $@
@@ -570,17 +578,16 @@ byte: bin/why3ide.byte
 opt:  bin/why3ide.opt
 
 bin/why3ide.opt bin/why3ide.byte: INCLUDES += -I @LABLGTK2LIB@
-bin/why3ide.opt bin/why3ide.byte: EXTOBJS +=
 bin/why3ide.opt bin/why3ide.byte: EXTLIBS += lablgtk lablgtksourceview2
 
 bin/why3ide.opt: src/why3.cmxa $(PGMCMX) $(MLWCMX) $(IDECMX)
 	$(if $(QUIET), @echo 'Linking  $@' &&) \
-	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
+	    $(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
 	$(STRIP) $@
 
 bin/why3ide.byte: src/why3.cma $(PGMCMO) $(MLWCMO) $(IDECMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
-	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
+	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 
 bin/why3ide: bin/why3ide.@OCAMLBEST@
 	ln -sf why3ide.@OCAMLBEST@ $@
@@ -629,12 +636,12 @@ opt:  bin/why3replayer.opt
 
 bin/why3replayer.opt: src/why3.cmxa $(PGMCMX) $(REPLAYERCMX)
 	$(if $(QUIET), @echo 'Linking  $@' &&) \
-	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
+	    $(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
 	$(STRIP) $@
 
 bin/why3replayer.byte: src/why3.cma $(PGMCMO) $(REPLAYERCMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
-	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
+	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 
 bin/why3replayer: bin/why3replayer.@OCAMLBEST@
 	ln -sf why3replayer.@OCAMLBEST@ $@
@@ -679,12 +686,12 @@ opt:  bin/why3session.opt
 
 bin/why3session.opt: src/why3.cmxa $(PGMCMX) $(SESSIONCMX)
 	$(if $(QUIET), @echo 'Linking  $@' &&) \
-	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
+	    $(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
 	$(STRIP) $@
 
 bin/why3session.byte: src/why3.cma $(PGMCMO) $(SESSIONCMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
-	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
+	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 
 bin/why3session: bin/why3session.@OCAMLBEST@
 	ln -sf why3session.@OCAMLBEST@ $@
@@ -729,12 +736,12 @@ opt:  bin/why3stats.opt
 
 bin/why3stats.opt: src/why3.cmxa $(PGMCMX) $(STATSCMX)
 	$(if $(QUIET), @echo 'Linking  $@' &&) \
-	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
+	    $(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
 	$(STRIP) $@
 
 bin/why3stats.byte: src/why3.cma $(PGMCMO) $(STATSCMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
-	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
+	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 
 bin/why3stats: bin/why3stats.@OCAMLBEST@
 	ln -sf why3stats.@OCAMLBEST@ $@
@@ -777,12 +784,12 @@ opt:  bin/why3html.opt
 
 bin/why3html.opt: src/why3.cmxa $(PGMCMX) $(HTMLCMX)
 	$(if $(QUIET), @echo 'Linking  $@' &&) \
-	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
+	    $(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
 	$(STRIP) $@
 
 bin/why3html.byte: src/why3.cma $(PGMCMO) $(HTMLCMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
-	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
+	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 
 bin/why3html: bin/why3html.@OCAMLBEST@
 	ln -sf why3html.@OCAMLBEST@ $@
@@ -831,12 +838,12 @@ bin/why3bench.opt bin/why3bench.byte: EXTLIBS += threads sqlite3
 
 bin/why3bench.opt: src/why3.cmxa $(PGMCMX) $(BENCHCMX)
 	$(if $(QUIET), @echo 'Linking  $@' &&) \
-	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
+	    $(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
 	$(STRIP) $@
 
 bin/why3bench.byte: src/why3.cma  $(PGMCMO) $(BENCHCMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
-	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
+	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 
 bin/why3bench: bin/why3bench.@OCAMLBEST@
 	ln -sf why3bench.@OCAMLBEST@ $@
@@ -1040,12 +1047,12 @@ opt:  bin/why3doc.opt
 
 bin/why3doc.opt: src/why3.cmxa $(WHY3DOCCMX)
 	$(if $(QUIET), @echo 'Linking  $@' &&) \
-	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
+	    $(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
 	$(STRIP) $@
 
 bin/why3doc.byte: src/why3.cma $(WHY3DOCCMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
-	    $(OCAMLC) $(BFLAGS) -o $@ $(EXTCMA) $^
+	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 
 bin/why3doc: bin/why3doc.@OCAMLBEST@
 	ln -sf why3doc.@OCAMLBEST@ $@
