@@ -172,7 +172,7 @@ Fixpoint subst(f:fmla) (x:Z) (v:Z) {struct f}: fmla :=
   | (Fand f1 f2) => (Fand (subst f1 x v) (subst f2 x v))
   | (Fnot f1) => (Fnot (subst f1 x v))
   | (Fimplies f1 f2) => (Fimplies (subst f1 x v) (subst f2 x v))
-  | (Flet y t f1) => (Flet y t (subst f1 x v))
+  | (Flet y t f1) => (Flet y (subst_term t x v) (subst f1 x v))
   | (Fforall y ty f1) => (Fforall y ty (subst f1 x v))
   end.
 Unset Implicit Arguments.
@@ -197,6 +197,24 @@ rewrite IHf1; auto.
 rewrite IHf2; tauto.
 
 simpl; intros (F1&F2&F3).
+rewrite IHf; auto.
+rewrite Select_neq; auto.
+rewrite eval_subst_term; tauto.
+
+simpl; intros (F1&F2).
+destruct d; simpl.
+split; intros.
+generalize (H n).
+intro h.
+rewrite IHf in h; auto.
+rewrite Select_neq in h; auto.
+rewrite IHf; auto.
+rewrite Select_neq; auto.
+split; intros.
+generalize (H b).
+intro h.
+rewrite IHf in h; auto.
+rewrite Select_neq in h; auto.
 rewrite IHf; auto.
 rewrite Select_neq; auto.
 

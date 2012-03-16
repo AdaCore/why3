@@ -135,7 +135,7 @@ function subst (f:fmla) (x:ident) (v:ident) : fmla =
   | Fand f1 f2 -> Fand (subst f1 x v) (subst f2 x v)
   | Fnot f -> Fnot (subst f x v)
   | Fimplies f1 f2 -> Fimplies (subst f1 x v) (subst f2 x v)
-  | Flet y t f -> Flet y t (subst f x v)
+  | Flet y t f -> Flet y (subst_term t x v) (subst f x v)
   | Fforall y ty f -> Fforall y ty (subst f x v)
   end
 
