@@ -38,7 +38,7 @@ exception TheoryNotFound of pathname * string
 exception AmbiguousPath of filename * filename
 
 type env = {
-  env_path : filename list;
+  env_path : Sstr.t;
   env_tag  : Hashweak.tag;
 }
 
@@ -49,11 +49,11 @@ module Wenv = Hashweak.Make(struct type t = env let tag = env_tag end)
 (** Environment construction and utilisation *)
 
 let create_env = let c = ref (-1) in fun lp -> {
-  env_path = lp;
+  env_path = List.fold_left (fun acc s -> Sstr.add s acc) Sstr.empty lp;
   env_tag  = (incr c; Hashweak.create_tag !c)
 }
 
-let get_loadpath env = env.env_path
+let get_loadpath env = Sstr.elements env.env_path
 
 let read_format_table = Hashtbl.create 17 (* format name -> read_format *)
 let extensions_table  = Hashtbl.create 17 (* suffix -> format name *)
@@ -114,7 +114,7 @@ let locate_lib_file env path exts =
   let add_ext ext = file ^ "." ^ ext in
   let fl = if exts = [] then [file] else List.map add_ext exts in
   let add_dir dir = List.map (Filename.concat dir) fl in
-  let fl = List.concat (List.map add_dir env.env_path) in
+  let fl = List.concat (List.map add_dir (get_loadpath env)) in
   match List.filter Sys.file_exists fl with
   | [] -> raise (LibFileNotFound path)
   | [file] -> file
