@@ -3,11 +3,36 @@ Require Export ZArith.
 Open Scope Z_scope.
 Require Export List.
 
-Ltac ae := why "alt-ergo".
-Ltac z3 := why "z3".
-Ltac spass := why "spass".
+Ltac ae := why3 "alt-ergo".
+Ltac Z3 := why3 "z3-2".
+Ltac spass := why3 "spass".
 
-Print length.
+(*
+Inductive sorted (a: Set) : list a -> Prop :=
+  c: sorted _ (@nil a)
+| d: forall x: a, sorted _ (cons x nil).
+
+
+Goal sorted _ (@nil Z).
+ae.
+*)
+
+Parameter p: Z -> Prop.
+
+(* let in *)
+Goal
+  let t := Z in
+  let f := p 0 in
+  (forall x:t, p x -> p (let y := x+1 in y)) ->
+  f -> p 1.
+ae.
+
+(* cast *)
+Goal
+  (
+  (forall x:Z, p x -> p (x+1)) -> p (0 : Z) -> p 1 : Prop).
+ae.
+Qed.
 
 
 (* type definitions *)
@@ -24,9 +49,9 @@ Qed.
 
 (* predicate definition *)
 
-Definition p (x:nat) := x=O.
+Definition p' (x:nat) := x=O.
 
-Goal p O.
+Goal p' O.
 ae.
 Qed.
 
@@ -36,9 +61,11 @@ Goal plus O O = O.
 ae.
 Qed.
 
-Definition eq (A:Set) (x y : A) := x=y.
 
-Goal eq nat O O.
+Definition eq' (A:Set) (x y : A) := x=y.
+
+Goal
+  eq' nat O O.
 ae.
 (*
 why "z3".  (* BUG encoding decorate ici ? *)
@@ -80,9 +107,7 @@ Qed.
 Print In.
 
 Goal In 0 (cons 1 (cons 0 nil)).
-spass.
-(*ae.*)
-(* ICI *)
+ae.
 Qed.
 
 (* inductive types *)
@@ -106,13 +131,15 @@ ae.
 Qed.
 
 Goal (match (S (S (S O))) with (S (S _)) => True | _ => False end).
-spass.
+ae.
 Qed.
 
 
-Goal forall a, forall (x: list (list a)), 1<=2 -> match x with nil => 1 | x :: r => 2 end <= 2.
+Goal
+  forall a, forall (x: list (list a)), 
+  1<=2 -> match x with nil => 1 | x :: r => 2 end <= 2.
 intros a x.
-spass.
+Z3.
 Qed.
 
 
@@ -156,6 +183,17 @@ Goal forall x : ptree Z, x=x.
 ae.
 Qed.
 
+Definition a := 0+0.
+Definition b := a.
+
+Goal b=0.
+ae.
+Qed.
+
+Goal b=0.
+ae.
+
+
 Fixpoint ptree_size (a:Set) (t:ptree a) : Z := match t with
   | PLeaf => 0
   | PNode _ f => 1 + pforest_size _ f end
@@ -167,10 +205,10 @@ Goal ptree_size _ (@PLeaf Z) = 0.
 ae.
 Qed.
 
-Goal forall (a:Set), ptree_size a (PLeaf _) = 0.
+Goal forall (a:Set), ptree_size a (PLeaf a) = 0.
 intros.
 (* BUG ICI *)
-spass.
+ae.
 (* TODO: intro context *)
 Admitted.
 

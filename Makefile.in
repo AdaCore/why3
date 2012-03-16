@@ -875,23 +875,23 @@ endif
 
 ifeq (@enable_coq_plugin@,yes)
 
-COQGENERATED = src/coq-plugin/g_whytac.ml
+COQPGENERATED = src/coq-plugin/g_whytac.ml
 
-COQ_FILES = whytac g_whytac
+COQP_FILES = whytac g_whytac
 
-COQMODULES = $(addprefix src/coq-plugin/, $(COQ_FILES))
+COQPMODULES = $(addprefix src/coq-plugin/, $(COQP_FILES))
 
-COQDEP = $(addsuffix .dep, $(COQMODULES))
-COQCMO = $(addsuffix .cmo, $(COQMODULES))
-COQCMX = $(addsuffix .cmx, $(COQMODULES))
+COQPDEP = $(addsuffix .dep, $(COQPMODULES))
+COQPCMO = $(addsuffix .cmo, $(COQPMODULES))
+COQPCMX = $(addsuffix .cmx, $(COQPMODULES))
 
-COQTREES = kernel lib interp parsing proofs pretyping tactics library toplevel
-COQINCLUDES = -I src/coq-plugin $(addprefix -I @COQLIB@/, $(COQTREES))
+COQPTREES = kernel lib interp parsing proofs pretyping tactics library toplevel
+COQPINCLUDES = -I src/coq-plugin $(addprefix -I @COQLIB@/, $(COQPTREES))
 
-$(COQDEP): DEPFLAGS += -I src/coq-plugin
-$(COQCMO) $(COQCMX): INCLUDES += $(COQINCLUDES)
+$(COQPDEP): DEPFLAGS += -I src/coq-plugin
+$(COQPCMO) $(COQPCMX): INCLUDES += $(COQPINCLUDES)
 
-$(COQDEP): $(COQGENERATED)
+$(COQPDEP): $(COQPGENERATED)
 
 byte: src/coq-plugin/whytac.cma
 opt:  src/coq-plugin/whytac.cmxs
@@ -899,10 +899,10 @@ opt:  src/coq-plugin/whytac.cmxs
 src/coq-plugin/whytac.cma:  BFLAGS+=-rectypes -I +camlp5
 src/coq-plugin/whytac.cmxs: OFLAGS+=-rectypes -I +camlp5
 
-src/coq-plugin/whytac.cmxs: src/why3.cmxa $(COQCMX)
+src/coq-plugin/whytac.cmxs: src/why3.cmxa $(COQPCMX)
 	$(OCAMLOPT) $(OFLAGS) -o $@ -shared $^
 
-src/coq-plugin/whytac.cma: src/why3.cma $(COQCMO)
+src/coq-plugin/whytac.cma: src/why3.cma $(COQPCMO)
 	$(OCAMLC) -a $(BFLAGS) -o $@ $^
 
 src/coq-plugin/g_whytac.ml: src/coq-plugin/g_whytac.ml4
@@ -911,16 +911,16 @@ src/coq-plugin/g_whytac.ml: src/coq-plugin/g_whytac.ml4
 # depend and clean targets
 
 ifneq "$(MAKECMDGOALS)" "clean"
-include $(COQDEP)
+include $(COQPDEP)
 endif
 
-depend: $(COQDEP)
+depend: $(COQPDEP)
 
 clean::
 	rm -f src/coq-plugin/*.cm[iox] src/coq-plugin/*.o
 	rm -f src/coq-plugin/*.cma src/coq-plugin/*.cmxs
 	rm -f src/coq-plugin/*.annot src/coq-plugin/*.dep src/coq-plugin/*~
-	rm -f $(COQGENERATED)
+	rm -f $(COQPGENERATED)
 
 endif
 
