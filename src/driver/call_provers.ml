@@ -126,6 +126,7 @@ let call_on_file ~command ?(timelimit=0) ?(memlimit=0)
     | "%" -> "%"
     | "f" -> fin
     | "t" -> on_timelimit := true; string_of_int timelimit
+    | "T" -> string_of_int (16 * succ timelimit)
     | "m" -> string_of_int memlimit
     (* FIXME: libdir and datadir can be changed in the configuration file
        Should we pass them as additional arguments? Or would it be better

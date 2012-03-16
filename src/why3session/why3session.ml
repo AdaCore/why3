@@ -28,6 +28,7 @@ let cmds =
     Why3session_copy.cmd_archive;
     Why3session_info.cmd;
     Why3session_rm.cmd;
+    Why3session_output.cmd;
   |]
 
 let usage = "why3session cmd [opts]"
