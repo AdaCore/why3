@@ -199,7 +199,6 @@ rewrite IHf2; tauto.
 simpl; intros (F1&F2&F3).
 rewrite IHf; auto.
 rewrite Select_neq; auto.
-rewrite eval_subst_term; tauto.
 
 Qed.
 

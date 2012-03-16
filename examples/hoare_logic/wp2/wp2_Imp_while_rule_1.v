@@ -5,24 +5,6 @@ Require Import Rbase.
 Require int.Int.
 
 (* Why3 assumption *)
-Definition unit  := unit.
-
-Parameter qtmark : Type.
-
-Parameter at1: forall (a:Type), a -> qtmark -> a.
-Implicit Arguments at1.
-
-Parameter old: forall (a:Type), a -> a.
-Implicit Arguments old.
-
-(* Why3 assumption *)
-Definition implb(x:bool) (y:bool): bool := match (x,
-  y) with
-  | (true, false) => false
-  | (_, _) => true
-  end.
-
-(* Why3 assumption *)
 Inductive datatype  :=
   | Tint : datatype 
   | Tbool : datatype .
@@ -52,6 +34,13 @@ Inductive fmla  :=
   | Fimplies : fmla -> fmla -> fmla 
   | Flet : Z -> term -> fmla -> fmla 
   | Fforall : Z -> datatype -> fmla -> fmla .
+
+(* Why3 assumption *)
+Definition implb(x:bool) (y:bool): bool := match (x,
+  y) with
+  | (true, false) => false
+  | (_, _) => true
+  end.
 
 (* Why3 assumption *)
 Inductive value  :=
@@ -295,144 +284,39 @@ Axiom assert_rule : forall (f:fmla) (p:fmla), (valid_fmla (Fimplies p f)) ->
 Axiom assert_rule_ext : forall (f:fmla) (p:fmla), (valid_triple (Fimplies f
   p) (Sassert f) p).
 
-Axiom while_rule : forall (e:term) (inv:fmla) (i:stmt),
+(* Why3 goal *)
+Theorem while_rule : forall (e:term) (inv:fmla) (i:stmt),
   (valid_triple (Fand (Fterm e) inv) i inv) -> (valid_triple inv (Swhile e
   inv i) (Fand (Fnot (Fterm e)) inv)).
-
-Axiom while_rule_ext : forall (e:term) (inv:fmla) (invqt:fmla) (i:stmt),
-  (valid_fmla (Fimplies invqt inv)) -> ((valid_triple (Fand (Fterm e) invqt)
-  i invqt) -> (valid_triple invqt (Swhile e inv i) (Fand (Fnot (Fterm e))
-  invqt))).
-
-Axiom consequence_rule : forall (p:fmla) (pqt:fmla) (q:fmla) (qqt:fmla)
-  (i:stmt), (valid_fmla (Fimplies pqt p)) -> ((valid_triple p i q) ->
-  ((valid_fmla (Fimplies q qqt)) -> (valid_triple pqt i qqt))).
-
-Parameter set1 : forall (a:Type), Type.
-
-Parameter mem: forall (a:Type), a -> (set1 a) -> Prop.
-Implicit Arguments mem.
-
-(* Why3 assumption *)
-Definition infix_eqeq (a:Type)(s1:(set1 a)) (s2:(set1 a)): Prop :=
-  forall (x:a), (mem x s1) <-> (mem x s2).
-Implicit Arguments infix_eqeq.
-
-Axiom extensionality : forall (a:Type), forall (s1:(set1 a)) (s2:(set1 a)),
-  (infix_eqeq s1 s2) -> (s1 = s2).
-
-(* Why3 assumption *)
-Definition subset (a:Type)(s1:(set1 a)) (s2:(set1 a)): Prop := forall (x:a),
-  (mem x s1) -> (mem x s2).
-Implicit Arguments subset.
-
-Axiom subset_trans : forall (a:Type), forall (s1:(set1 a)) (s2:(set1 a))
-  (s3:(set1 a)), (subset s1 s2) -> ((subset s2 s3) -> (subset s1 s3)).
-
-Parameter empty: forall (a:Type), (set1 a).
-Set Contextual Implicit.
-Implicit Arguments empty.
-Unset Contextual Implicit.
-
-(* Why3 assumption *)
-Definition is_empty (a:Type)(s:(set1 a)): Prop := forall (x:a), ~ (mem x s).
-Implicit Arguments is_empty.
-
-Axiom empty_def1 : forall (a:Type), (is_empty (empty :(set1 a))).
-
-Parameter add: forall (a:Type), a -> (set1 a) -> (set1 a).
-Implicit Arguments add.
-
-Axiom add_def1 : forall (a:Type), forall (x:a) (y:a), forall (s:(set1 a)),
-  (mem x (add y s)) <-> ((x = y) \/ (mem x s)).
-
-Parameter remove: forall (a:Type), a -> (set1 a) -> (set1 a).
-Implicit Arguments remove.
-
-Axiom remove_def1 : forall (a:Type), forall (x:a) (y:a) (s:(set1 a)), (mem x
-  (remove y s)) <-> ((~ (x = y)) /\ (mem x s)).
-
-Axiom subset_remove : forall (a:Type), forall (x:a) (s:(set1 a)),
-  (subset (remove x s) s).
-
-Parameter union: forall (a:Type), (set1 a) -> (set1 a) -> (set1 a).
-Implicit Arguments union.
-
-Axiom union_def1 : forall (a:Type), forall (s1:(set1 a)) (s2:(set1 a)) (x:a),
-  (mem x (union s1 s2)) <-> ((mem x s1) \/ (mem x s2)).
-
-Parameter inter: forall (a:Type), (set1 a) -> (set1 a) -> (set1 a).
-Implicit Arguments inter.
-
-Axiom inter_def1 : forall (a:Type), forall (s1:(set1 a)) (s2:(set1 a)) (x:a),
-  (mem x (inter s1 s2)) <-> ((mem x s1) /\ (mem x s2)).
-
-Parameter diff: forall (a:Type), (set1 a) -> (set1 a) -> (set1 a).
-Implicit Arguments diff.
-
-Axiom diff_def1 : forall (a:Type), forall (s1:(set1 a)) (s2:(set1 a)) (x:a),
-  (mem x (diff s1 s2)) <-> ((mem x s1) /\ ~ (mem x s2)).
-
-Axiom subset_diff : forall (a:Type), forall (s1:(set1 a)) (s2:(set1 a)),
-  (subset (diff s1 s2) s1).
-
-Parameter all: forall (a:Type), (set1 a).
-Set Contextual Implicit.
-Implicit Arguments all.
-Unset Contextual Implicit.
-
-Axiom all_def : forall (a:Type), forall (x:a), (mem x (all :(set1 a))).
-
-(* Why3 assumption *)
-Definition assigns(sigma:(map Z value)) (a:(set1 Z)) (sigmaqt:(map Z
-  value)): Prop := forall (i:Z), (~ (mem i a)) -> ((get sigma
-  i) = (get sigmaqt i)).
-
-Axiom assigns_refl : forall (sigma:(map Z value)) (a:(set1 Z)),
-  (assigns sigma a sigma).
-
-Axiom assigns_trans : forall (sigma1:(map Z value)) (sigma2:(map Z value))
-  (sigma3:(map Z value)) (a:(set1 Z)), ((assigns sigma1 a sigma2) /\
-  (assigns sigma2 a sigma3)) -> (assigns sigma1 a sigma3).
-
-Axiom assigns_union_left : forall (sigma:(map Z value)) (sigmaqt:(map Z
-  value)) (s1:(set1 Z)) (s2:(set1 Z)), (assigns sigma s1 sigmaqt) ->
-  (assigns sigma (union s1 s2) sigmaqt).
-
-Axiom assigns_union_right : forall (sigma:(map Z value)) (sigmaqt:(map Z
-  value)) (s1:(set1 Z)) (s2:(set1 Z)), (assigns sigma s2 sigmaqt) ->
-  (assigns sigma (union s1 s2) sigmaqt).
-
-(* Why3 assumption *)
-Set Implicit Arguments.
-Fixpoint stmt_writes(i:stmt) (w:(set1 Z)) {struct i}: Prop :=
-  match i with
-  | (Sskip|(Sassert _)) => True
-  | (Sassign id _) => (mem id w)
-  | ((Sseq s1 s2)|(Sif _ s1 s2)) => (stmt_writes s1 w) /\ (stmt_writes s2 w)
-  | (Swhile _ _ s) => (stmt_writes s w)
-  end.
-Unset Implicit Arguments.
-
-(* Why3 goal *)
-Theorem WP_parameter_wp : forall (i:stmt), forall (q:fmla),
-  match i with
-  | Sskip => True
-  | (Sseq i1 i2) => True
-  | (Sassign x e) => True
-  | (Sif e i1 i2) => True
-  | (Sassert f) => True
-  | (Swhile e inv i1) => forall (result:fmla), (valid_triple result i1
-      inv) -> forall (result1:fmla), (forall (sigma:(map Z value)) (pi:(map Z
-      value)) (sigmaqt:(map Z value)) (piqt:(map Z value)) (w:(set1 Z)),
-      ((eval_fmla sigma pi (Fand (Fimplies (Fand (Fterm e) inv) result)
-      (Fimplies (Fand (Fnot (Fterm e)) inv) q))) /\ ((stmt_writes i1 w) /\
-      (assigns sigma w sigmaqt))) -> (eval_fmla sigmaqt piqt
-      (Fand (Fimplies (Fand (Fterm e) inv) result)
-      (Fimplies (Fand (Fnot (Fterm e)) inv) q)))) -> (valid_triple (Fand inv
-      result1) i q)
-  end.
-
+unfold valid_triple.
+intros e inv i Hinv_preserved.
+intros s pi Hinv_init s' pi' n Hred.
+generalize (steps_non_neg _ _ _ _ _ _ _ Hred); intro Hn_pos.
+generalize Hred; clear Hred.
+generalize s pi Hinv_init; clear s pi Hinv_init.
+apply Z_lt_induction
+ with (P := fun n =>
+  forall s pi,
+  eval_fmla s pi inv ->
+  many_steps s pi (Swhile e inv i) s' pi' Sskip n ->
+  eval_fmla s' pi' (Fand (Fnot (Fterm e)) inv)
+); auto.
+intros.
+inversion H1; subst; clear H1.
+inversion H2; subst; clear H2.
+(* case cond true *)
+generalize (many_steps_seq _ _ _ _ _ _ _ H3).
+intros (s3&pi3&n1&n2&h1&h2&h3).
+apply H with (y:=n2) (s:=s3) (pi:=pi3); auto.
+generalize (steps_non_neg _ _ _ _ _ _ _ h1).
+generalize (steps_non_neg _ _ _ _ _ _ _ h2).
+now (auto with zarith).
+apply Hinv_preserved with (sigma:=sigma2) (pi:=pi2) (n:=n1); simpl; auto.
+(* case cond false *)
+inversion H3; subst.
+simpl; rewrite H12; intuition.
+discriminate.
+now inversion H1.
 Qed.
 
 

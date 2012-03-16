@@ -356,6 +356,14 @@ lemma assigns_union_right:
     assigns sigma s2 sigma' -> assigns sigma (Set.union s1 s2) sigma'
 
 
+predicate stmt_writes (i:stmt) (w:Set.set ident) =
+  match i with
+  | Sskip | Sassert _ -> true
+  | Sassign id _ -> Set.mem id w
+  | Sseq s1 s2 | Sif _ s1 s2 -> stmt_writes s1 w /\ stmt_writes s2 w
+  | Swhile _ _ s -> stmt_writes s w
+  end
+
 end
 
 
@@ -387,9 +395,9 @@ module WP
   val abstract_effects (i:stmt) (f:fmla) :
     { }
     fmla
-    { forall sigma pi sigma' pi':env .
-        eval_fmla sigma pi f /\
-        assigns sigma pi (stmt_writes i) sigma' pi' ->
+    { forall sigma pi sigma' pi':env, w:Set.set ident .
+        eval_fmla sigma pi f /\ stmt_writes i w /\
+        assigns sigma w sigma' ->
         eval_fmla sigma' pi' f
      }
 
