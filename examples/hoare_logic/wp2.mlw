@@ -122,7 +122,7 @@ lemma eval_term_change_free :
 predicate fresh_in_fmla (id:ident) (f:fmla) =
   match f with
   | Fterm e -> fresh_in_term id e
-  | Fand f1 f2   | Fimplies f1 f2 -> 
+  | Fand f1 f2   | Fimplies f1 f2 ->
       fresh_in_fmla id f1 /\ fresh_in_fmla id f2
   | Fnot f -> fresh_in_fmla id f
   | Flet y t f -> id <> y /\ fresh_in_term id t /\ fresh_in_fmla id f
@@ -149,7 +149,7 @@ lemma eval_subst:
 lemma eval_swap:
   forall f:fmla, sigma pi:env, id1 id2:ident, v1 v2:value.
     id1 <> id2 ->
-    (eval_fmla sigma (IdMap.set (IdMap.set pi id1 v1) id2 v2) f <-> 
+    (eval_fmla sigma (IdMap.set (IdMap.set pi id1 v1) id2 v2) f <->
     eval_fmla sigma (IdMap.set (IdMap.set pi id2 v2) id1 v1) f)
 
 lemma eval_change_free :
@@ -335,19 +335,26 @@ lemma consequence_rule:
 
 use set.Set
 
-predicate assigns (sigma pi:env) (a:Set.set ident) (sigma' pi':env) =
+predicate assigns (sigma:env) (a:Set.set ident) (sigma':env) =
   forall i:ident. not (Set.mem i a) ->
-    eval_term sigma pi (Tderef i) = eval_term sigma' pi' (Tderef i)
+    IdMap.get sigma i = IdMap.get sigma' i
 
-function stmt_writes (s:stmt) : Set.set ident =
-  match s with
-  | Sskip -> Set.empty
-  | Sassign i _ -> Set.singleton i
-  | Sseq s1 s2 -> Set.union (stmt_writes s1) (stmt_writes s2)
-  | Sif _ s1 s2 -> Set.union (stmt_writes s1) (stmt_writes s2)
-  | Swhile _ _ s -> stmt_writes s
-  | Sassert _ -> Set.empty
-  end
+lemma assigns_refl:
+  forall sigma:env, a:Set.set ident. assigns sigma a sigma
+
+lemma assigns_trans:
+  forall sigma1 sigma2 sigma3:env, a:Set.set ident.
+    assigns sigma1 a sigma2 /\ assigns sigma2 a sigma3 ->
+    assigns sigma1 a sigma3
+
+lemma assigns_union_left:
+  forall sigma sigma':env, s1 s2:Set.set ident.
+    assigns sigma s1 sigma' -> assigns sigma (Set.union s1 s2) sigma'
+
+lemma assigns_union_right:
+  forall sigma sigma':env, s1 s2:Set.set ident.
+    assigns sigma s2 sigma' -> assigns sigma (Set.union s1 s2) sigma'
+
 
 end
 
@@ -356,7 +363,23 @@ module WP
 
   use import Imp
 
-  val fresh_from_fmla (q:fmla) : 
+  use set.Set
+
+  let rec compute_writes (s:stmt) : Set.set ident =
+   { }
+    match s with
+    | Sskip -> Set.empty
+    | Sassign i _ -> Set.singleton i
+    | Sseq s1 s2 -> Set.union (compute_writes s1) (compute_writes s2)
+    | Sif _ s1 s2 -> Set.union (compute_writes s1) (compute_writes s2)
+    | Swhile _ _ s -> compute_writes s
+    | Sassert _ -> Set.empty
+    end
+   { forall sigma pi sigma' pi':env, n:int.
+       many_steps sigma pi s sigma' pi' Sskip n ->
+       assigns sigma result sigma' }
+
+  val fresh_from_fmla (q:fmla) :
      { }
      ident
      { fresh_in_fmla result q }
@@ -378,7 +401,7 @@ module WP
         Fand inv
           ((*Fforall*) (Fand
                      (Fimplies (Fand (Fterm e) inv) (wp i inv))
-                     (Fimplies (Fand (Fnot (Fterm e)) inv) q))) 
+                     (Fimplies (Fand (Fnot (Fterm e)) inv) q)))
 
     end
     { valid_triple result i q }
