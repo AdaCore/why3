@@ -461,6 +461,8 @@ let rec print_expr fmt e = match e.expr_desc with
       fprintf fmt "<todo: Eletrec>"
   | Eabsurd ->
       fprintf fmt "assert false (* absurd *)"
+  | ESandbox _ ->
+      fprintf fmt "assert false (* sandbox *)"
 
 and print_lexpr fmt e =
   print_expr fmt e
