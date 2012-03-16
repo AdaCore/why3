@@ -470,6 +470,8 @@ let (_:GtkSignal.id) =
 let (_:GtkSignal.id) =
   goals_view#connect#row_expanded ~callback:(row_expanded true)
 
+let session_needs_saving = ref false
+
 module M = Session_scheduler.Make
   (struct
      type key = GTree.row_reference
@@ -507,6 +509,7 @@ module M = Session_scheduler.Make
               "Running: " ^ (string_of_int r)^ " " ^ (fan (!c / 10)))
 
 let notify any =
+  session_needs_saving := true;
   let row,exp =
     match any with
       | S.Goal g ->
@@ -653,6 +656,7 @@ let env_session,sched =
     in
     let sched = M.init gconfig.max_running_processes in
     dprintf debug "@]@\n[Info] Opening session: done@.";
+    session_needs_saving := false;
     ref env_session, sched
   with e ->
     eprintf "@[Error while opening session:@ %a@.@]"
@@ -673,6 +677,7 @@ let () =
           dprintf debug "[Info] file %s already in database@." fn
         else
           try
+            dprintf debug "[Info] adding file %s in database@." fn;
             ignore (M.add_file !env_session fn)
           with e ->
             eprintf "@[Error while reading file@ '%s':@ %a@.@]" fn
@@ -840,8 +845,12 @@ let (_ : GMenu.image_menu_item) =
 *)
 
 let save_session () =
-  eprintf "[Info] saving session@.";
-  S.save_session !env_session.S.session
+  if !session_needs_saving then begin
+    eprintf "[Info] saving session@.";
+    S.save_session !env_session.S.session;
+    session_needs_saving := false;
+  end
+
 
 let exit_function ?(destroy=false) () =
   eprintf "[Info] saving IDE config file@.";
@@ -866,6 +875,7 @@ let exit_function ?(destroy=false) () =
     "xmllint --noout --dtdvalid share/why3session.dtd essai.xml" in
   if ret = 0 then eprintf "DTD validation succeeded, good!@.";
   *)
+  if not !session_needs_saving then GMain.quit () else
   match (Gconfig.config ()).saving_policy with
     | 0 -> save_session (); GMain.quit ()
     | 1 -> GMain.quit ()
