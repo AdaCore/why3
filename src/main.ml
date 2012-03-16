@@ -213,11 +213,11 @@ let () = try
     exit 0
   end;
   if !opt_print_libdir then begin
-    printf "%s@." Config.libdir;
+    printf "%s@." Relocatable.libdir;
     exit 0
   end;
   if !opt_print_datadir then begin
-    printf "%s@." Config.datadir;
+    printf "%s@." Relocatable.datadir;
     exit 0
   end;
 

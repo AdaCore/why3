@@ -43,8 +43,8 @@ exception WrongMagicNumber
 (* lib and shared dirs *)
 
 let default_loadpath =
-  [ Filename.concat Config.datadir "theories";
-    Filename.concat Config.datadir "modules"; ]
+  [ Filename.concat Relocatable.datadir "theories";
+    Filename.concat Relocatable.datadir "modules"; ]
 
 let default_conf_file =
   match Config.localdir with
@@ -178,8 +178,8 @@ type config = {
 
 let default_main =
   {
-    libdir = Config.libdir;
-    datadir = Config.datadir;
+    libdir = Relocatable.libdir;
+    datadir = Relocatable.datadir;
     loadpath = default_loadpath;
     timelimit = 10;
     memlimit = 0;
