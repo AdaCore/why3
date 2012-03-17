@@ -311,7 +311,8 @@ let add_projections (state,task) _ts _ty csl =
       let ax = t_forall_close (List.rev vl) [] (t_equ hh t) in
       let mal = [MAls ls; MAls cs; MAint (!c - 1); MApr pr] in
       let tsk = add_prop_decl tsk Paxiom pr ax in
-      ls::pjl, add_meta tsk meta_proj mal
+      let tsk = if state.keep_t then add_meta tsk meta_proj mal else tsk in
+      ls::pjl, tsk
     in
     let pjl,tsk = List.fold_left2 add ([],tsk) tl pl in
     Mls.add cs (List.rev pjl) m, tsk

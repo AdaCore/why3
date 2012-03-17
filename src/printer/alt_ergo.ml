@@ -59,6 +59,9 @@ let forget_tvs () = forget_all tv_printer
 type info = {
   info_syn : syntax_map;
   info_ac  : Sls.t;
+  info_csm : lsymbol list Mls.t;
+  info_pjs : Sls.t;
+  info_axs : Spr.t;
 }
 
 let rec print_type info fmt ty = match ty.ty_node with
@@ -93,7 +96,15 @@ let rec print_term info fmt t = match t.t_node with
       print_ident fmt id
   | Tapp (ls, tl) -> begin match query_syntax info.info_syn ls.ls_name with
       | Some s -> syntax_arguments s (print_term info) fmt tl
-      | None -> fprintf fmt "%a%a" print_ident ls.ls_name (print_tapp info) tl
+      | None when Mls.mem ls info.info_csm ->
+          let print_field fmt ({ls_name = id},t) =
+            fprintf fmt "%a =@ %a" print_ident id (print_term info) t in
+          fprintf fmt "{@ %a@ }" (print_list semi print_field)
+            (List.combine (Mls.find ls info.info_csm) tl)
+      | None when Sls.mem ls info.info_pjs ->
+          fprintf fmt "%a.%a" (print_tapp info) tl print_ident ls.ls_name
+      | None ->
+          fprintf fmt "%a%a" print_ident ls.ls_name (print_tapp info) tl
     end
   | Tlet _ -> unsupportedTerm t
       "alt-ergo : you must eliminate let in term"
@@ -170,11 +181,11 @@ let print_logic_binder info fmt v =
   fprintf fmt "%a: %a" print_ident v.vs_name (print_type info) v.vs_ty
 
 let print_type_decl fmt ts = match ts.ts_args with
-  | [] -> fprintf fmt "type %a@\n@\n"
+  | [] -> fprintf fmt "type %a"
       print_ident ts.ts_name
-  | [tv] -> fprintf fmt "type %a %a@\n@\n"
+  | [tv] -> fprintf fmt "type %a %a"
       print_tvsymbol tv print_ident ts.ts_name
-  | tl -> fprintf fmt "type (%a) %a@\n@\n"
+  | tl -> fprintf fmt "type (%a) %a"
       (print_list comma print_tvsymbol) tl print_ident ts.ts_name
 
 let print_enum_decl fmt ts csl =
@@ -184,10 +195,19 @@ let print_enum_decl fmt ts csl =
 
 let print_type_decl info fmt = function
   | ts, Tabstract when Mid.mem ts.ts_name info.info_syn -> ()
-  | ts, Tabstract -> print_type_decl fmt ts; forget_tvs ()
+  | ts, Tabstract ->
+      fprintf fmt "%a@\n@\n" print_type_decl ts; forget_tvs ()
   | ts, Talgebraic csl (* monomorphic enumeration *)
     when ts.ts_args = [] && List.for_all (fun (_,l) -> l = []) csl ->
       print_enum_decl fmt ts csl
+  | ts, Talgebraic [cs,_] (* non-recursive records *)
+    when Mls.mem cs info.info_csm ->
+      let pjl = Mls.find cs info.info_csm in
+      let print_field fmt ls =
+        fprintf fmt "%a@ :@ %a" print_ident ls.ls_name
+          (print_type info) (Util.of_option ls.ls_value) in
+      fprintf fmt "%a@ =@ {@ %a@ }@\n@\n" print_type_decl ts
+        (print_list semi print_field) pjl
   | _, Talgebraic _ -> unsupported
       "alt-ergo : algebraic datatype are not supported"
 
@@ -218,8 +238,8 @@ let print_logic_decl info fmt ls = function
         List.iter forget_var vl
 
 let print_logic_decl info fmt (ls,ld) =
-  if Mid.mem ls.ls_name info.info_syn then () else
-  print_logic_decl info fmt ls ld; forget_tvs ()
+  if Mid.mem ls.ls_name info.info_syn || Sls.mem ls info.info_pjs
+    then () else (print_logic_decl info fmt ls ld; forget_tvs ())
 
 let print_prop_decl info fmt k pr f = match k with
   | Paxiom ->
@@ -231,8 +251,8 @@ let print_prop_decl info fmt k pr f = match k with
   | Plemma| Pskip -> assert false
 
 let print_prop_decl info fmt k pr f =
-  if Mid.mem pr.pr_name info.info_syn then () else
-  print_prop_decl info fmt k pr f; forget_tvs ()
+  if Mid.mem pr.pr_name info.info_syn || Spr.mem pr info.info_axs
+    then () else (print_prop_decl info fmt k pr f; forget_tvs ())
 
 let print_decl info fmt d = match d.d_node with
   | Dtype dl ->
@@ -250,8 +270,11 @@ let print_task_old pr thpr fmt task =
   print_th_prelude task fmt thpr;
   let info = {
     info_syn = get_syntax_map task;
-    info_ac  = Task.on_tagged_ls meta_ac task }
-  in
+    info_ac  = Task.on_tagged_ls meta_ac task;
+    info_csm = Mls.empty;
+    info_pjs = Sls.empty;
+    info_axs = Spr.empty;
+  } in
   let decls = Task.task_decls task in
   fprintf fmt "%a@." (print_list nothing (print_decl info)) decls
 
@@ -261,13 +284,29 @@ let () = register_printer "alt-ergo-old"
      print_task_old pr thpr fmt task)
 
 let print_decls =
-  let print ac sm fmt d =
+  let print ac csm pjs axs sm fmt d =
     let info = {
       info_syn = sm;
-      info_ac  = ac } in
+      info_ac  = ac;
+      info_csm = csm;
+      info_pjs = pjs;
+      info_axs = axs;
+    } in
     print_decl info fmt d in
   Trans.on_tagged_ls meta_ac (fun ac ->
-    Printer.sprint_decls (print ac))
+  Trans.on_meta Eliminate_algebraic.meta_proj (fun mal ->
+    let add (csm,pjs,axs) = function
+      | [Theory.MAls ls; Theory.MAls cs; Theory.MAint ind; Theory.MApr pr] ->
+          let csm = try Array.set (Mls.find cs csm) ind ls; csm
+          with Not_found ->
+            Mls.add cs (Array.make (List.length cs.ls_args) ls) csm in
+          csm, Sls.add ls pjs, Spr.add pr axs
+      | _ -> assert false
+    in
+    let csm,pjs,axs =
+      List.fold_left add (Mls.empty,Sls.empty,Spr.empty) mal in
+    let csm = Mls.map Array.to_list csm in
+    Printer.sprint_decls (print ac csm pjs axs)))
 
 let print_task _env pr thpr ?old:_ fmt task =
   (* In trans-based p-printing [forget_all] is a no-no *)
