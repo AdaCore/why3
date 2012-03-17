@@ -93,7 +93,7 @@ syn keyword  whyKeyword  not predicate
 syn keyword  whyKeyword  then true type with
 
 syn keyword  whyKeyword  abstract absurd any assert assume
-syn keyword  whyKeyword  check do exception fun ghost
+syn keyword  whyKeyword  check exception fun ghost
 syn keyword  whyKeyword  invariant model mutable
 syn keyword  whyKeyword  private raise raises reads rec
 syn keyword  whyKeyword  variant while writes
