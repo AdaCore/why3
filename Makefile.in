@@ -715,38 +715,6 @@ install_no_local::
 
 install_local: bin/why3session
 
-# depend and clean targets
-
-ifneq "$(MAKECMDGOALS)" "clean"
-include $(STATSDEP)
-endif
-
-depend: $(STATSDEP)
-
-clean::
-	rm -f bin/why3stats.byte bin/why3stats.opt bin/why3stats
-
-install_no_local::
-	cp -f bin/why3stats.@OCAMLBEST@ $(BINDIR)/why3stats
-
-install_local: bin/why3stats
-
-# depend and clean targets
-
-ifneq "$(MAKECMDGOALS)" "clean"
-include $(HTMLDEP)
-endif
-
-depend: $(HTMLDEP)
-
-clean::
-	rm -f bin/why3html.byte bin/why3html.opt bin/why3html
-
-install_no_local::
-	cp -f bin/why3html.@OCAMLBEST@ $(BINDIR)/why3html
-
-install_local: bin/why3html
-
 
 ###############
 # Bench
