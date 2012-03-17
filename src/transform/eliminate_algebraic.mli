@@ -19,6 +19,9 @@
 
 val compile_match : Task.task Trans.trans
 
+val meta_proj : Theory.meta (* [MTlsymbol; MTlsymbol; MTint; MTprsymbol] *)
+(* projection symbol, constructor symbol, position, defining axiom *)
+
 (* a type constructor tagged "enumeration" generates a finite type
    if and only if all of its non-phantom arguments are finite types *)
 

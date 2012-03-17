@@ -28,10 +28,8 @@ open Task
 (* a type constructor tagged "enumeration" generates a finite type
    if and only if all of its non-phantom arguments are finite types *)
 
-let meta_enum = Theory.register_meta "enumeration_type" [Theory.MTtysymbol]
-
-let meta_phantom =
-  Theory.register_meta "phantom_type_arg" [Theory.MTtysymbol;Theory.MTint]
+let meta_enum = register_meta "enumeration_type" [MTtysymbol]
+let meta_phantom = register_meta "phantom_type_arg" [MTtysymbol;MTint]
 
 let rec enum_ts kn sts ts =
   assert (ts.ts_def = None);
@@ -99,17 +97,25 @@ let compile_match = Trans.fold comp None
 type state = {
   mt_map : lsymbol Mts.t;       (* from type symbols to selector functions *)
   pj_map : lsymbol list Mls.t;  (* from constructors to projections *)
-  tp_map : (tysymbol * constructor list) Mid.t; (* skipped tuple symbols *)
-  elim_t : bool;                (* eliminate algebraic type definitions *)
+  tp_map : decl Mid.t;          (* skipped tuple symbols *)
+  keep_t : bool;                (* keep algebraic type definitions *)
+  keep_e : bool;                (* keep monomorphic enumeration types *)
+  keep_r : bool;                (* keep non-recursive records *)
+(*
   in_smt : bool;                (* generate indexing funcitons *)
+*)
 }
 
-let empty_state elt smt = {
+let empty_state = {
   mt_map = Mts.empty;
   pj_map = Mls.empty;
   tp_map = Mid.empty;
-  elim_t = elt;
-  in_smt = smt;
+  keep_t = false;
+  keep_e = false;
+  keep_r = false;
+(*
+  in_smt = false;
+*)
 }
 
 let uncompiled = "eliminate_algebraic: compile_match required"
@@ -277,11 +283,17 @@ let add_discriminator (state,task) ts ty csl =
 
 let add_indexer acc ts ty = function
   | [_] -> acc
-  | _ when not (fst acc).elim_t -> acc
+  | _ when (fst acc).keep_t -> acc
+(*
   (* FIXME? swap the two following cases *)
   | csl when (fst acc).in_smt -> add_indexer acc ts ty csl
+*)
   | csl when List.length csl <= 16 -> add_discriminator acc ts ty csl
   | _ -> acc
+
+let meta_proj =
+  (* projection symbol, constructor symbol, position, defining axiom *)
+  register_meta "algtype projection" [MTlsymbol;MTlsymbol;MTint;MTprsymbol]
 
 let add_projections (state,task) _ts _ty csl =
   (* declare and define the projection functions *)
@@ -304,7 +316,9 @@ let add_projections (state,task) _ts _ty csl =
       let pr = create_prsymbol id in
       let hh = t_app ls [hd] t.t_ty in
       let ax = t_forall_close (List.rev vl) [] (t_equ hh t) in
-      ls::pjl, add_prop_decl tsk Paxiom pr ax
+      let mal = [MAls ls; MAls cs; MAint (!c - 1); MApr pr] in
+      let tsk = add_prop_decl tsk Paxiom pr ax in
+      ls::pjl, add_meta tsk meta_proj mal
     in
     let pjl,tsk = List.fold_left2 add ([],tsk) tl pl in
     Mls.add cs (List.rev pjl) m, tsk
@@ -313,7 +327,7 @@ let add_projections (state,task) _ts _ty csl =
   { state with pj_map = pjmap }, task
 
 let add_inversion (state,task) ts ty csl =
-  if not state.elim_t then state, task else
+  if state.keep_t then state, task else
   (* add the inversion axiom *)
   let ax_id = ts.ts_name.id_string ^ "_inversion" in
   let ax_pr = create_prsymbol (id_derive ax_id ts.ts_name) in
@@ -330,8 +344,8 @@ let add_inversion (state,task) ts ty csl =
 let add_type kn (state,task) ts csl =
   (* declare constructors as abstract functions *)
   let cs_add tsk (cs,_) = add_logic_decl tsk [cs, None] in
-  let task = if state.elim_t
-    then List.fold_left cs_add task csl else task in
+  let task =
+    if state.keep_t then task else List.fold_left cs_add task csl in
   (* add selector, projections, and inversion axiom *)
   let ty = ty_app ts (List.map ty_var ts.ts_args) in
   let state,task = add_selector (state,task) ts ty csl in
@@ -360,7 +374,7 @@ let comp t (state,task) = match t.task_decl.td_node with
       let conv (cs,pjl) = cs, List.map (fun _ -> None) pjl in
       let conv (ts,df) = ts, match df with
         | Tabstract -> Tabstract
-        | Talgebraic _ when state.elim_t -> Tabstract
+        | Talgebraic _ when not state.keep_t -> Tabstract
         | Talgebraic csl -> Talgebraic (List.map conv csl)
       in
       let ty_all = List.map conv dl in
@@ -388,16 +402,33 @@ let comp t (state,task) = match t.task_decl.td_node with
       state, add_tdecl task t.task_decl
 
 let comp t (state,task) = match t.task_decl.td_node with
-  | Decl { d_node = Dtype [ts, Talgebraic csl] } when is_ts_tuple ts ->
-      let tp_map = Mid.add ts.ts_name (ts,csl) state.tp_map in
+  | Decl ({ d_node = Dtype dl } as d) ->
+      (* are we going to keep this type? *)
+      let old_keep_t = state.keep_t in
+      let state = match dl with
+        | _ when state.keep_t -> state
+        | [ts, Talgebraic [_]]
+          when state.keep_r && not (Sid.mem ts.ts_name d.d_syms) ->
+            { state with keep_t = true }
+        | [_, Talgebraic csl]
+          when state.keep_e && List.for_all (fun (_,l) -> l = []) csl ->
+            { state with keep_t = true }
+        | _ -> state
+      in
+      let state,task = comp t (state,task) in
+      { state with keep_t = old_keep_t }, task
+  | _ ->
+      comp t (state,task)
+
+let comp t (state,task) = match t.task_decl.td_node with
+  | Decl ({ d_node = Dtype [ts,_] } as d) when is_ts_tuple ts ->
+      let tp_map = Mid.add ts.ts_name d state.tp_map in
       { state with tp_map = tp_map }, task
   | Decl d ->
       let rstate,rtask = ref state, ref task in
-      let add _ (ts,csl) () =
-        let task = if state.elim_t
-          then add_ty_decl !rtask [ts,Tabstract]
-          else add_ty_decl !rtask [ts,Talgebraic csl] in
-        let state,task = add_type t.task_known (!rstate,task) ts csl in
+      let add _ d () =
+        let t = Util.of_option (add_decl None d) in
+        let state,task = comp t (!rstate,!rtask) in
         rstate := state ; rtask := task ; None
       in
       let tp_map = Mid.diff add state.tp_map d.d_syms in
@@ -406,13 +437,24 @@ let comp t (state,task) = match t.task_decl.td_node with
       comp t (state,task)
 
 let eliminate_match = Trans.compose compile_match
-  (Trans.fold_map comp (empty_state false false) None)
+  (Trans.fold_map comp empty_state None)
+
+let meta_elim = register_meta "eliminate_algebraic" [MTstring]
 
 let eliminate_algebraic = Trans.compose compile_match
-  (Trans.fold_map comp (empty_state true false) None)
-
-let eliminate_algebraic_smt = Trans.compose compile_match
-  (Trans.fold_map comp (empty_state true true) None)
+  (Trans.on_meta meta_elim (fun ml ->
+    let st = empty_state in
+    let check st = function
+      | [MAstr "keep_types"] -> { st with keep_t = true }
+      | [MAstr "keep_enums"] -> { st with keep_e = true }
+      | [MAstr "keep_recs"]  -> { st with keep_r = true }
+(*
+      | [MAstr "index_cs"]   -> { st with in_smt = true }
+*)
+      | _ -> raise (Invalid_argument "meta eliminate_algebraic")
+    in
+    let st = List.fold_left check st ml in
+    Trans.fold_map comp st None))
 
 (** Eliminate user-supplied projection functions *)
 
@@ -462,6 +504,5 @@ let () =
   Trans.register_transform "compile_match" compile_match;
   Trans.register_transform "eliminate_match" eliminate_match;
   Trans.register_transform "eliminate_algebraic" eliminate_algebraic;
-  Trans.register_transform "eliminate_algebraic_smt" eliminate_algebraic_smt;
   Trans.register_transform "eliminate_projections" eliminate_projections
 
