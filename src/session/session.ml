@@ -37,6 +37,7 @@ type undone_proof =
     | Interrupted
     | Running (** external proof attempt is in progress *)
     | Unedited
+    | JustEdited
 
 type proof_attempt_status =
     | Undone of undone_proof

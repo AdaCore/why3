@@ -366,12 +366,55 @@ let goals_model,goals_view =
   eprintf " done@.";
   model,view
 
+
+(******************************)
+(* vertical paned on the right*)
+(******************************)
+
+let right_vb = GPack.vbox ~packing:hp#add ()
+
+let vp =
+  try
+    GPack.paned `VERTICAL ~packing:right_vb#add ()
+  with Gtk.Error _ -> assert false
+
+let right_hb = GPack.hbox ~packing:(right_vb#pack ~expand:false) ()
+
+(******************)
+(* goal text view *)
+(******************)
+
+let scrolled_task_view =
+  GBin.scrolled_window
+    ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
+    ~shadow_type:`ETCHED_OUT ~packing:vp#add ()
+
+let (_ : GtkSignal.id) =
+  scrolled_task_view#misc#connect#size_allocate
+    ~callback:
+    (fun {Gtk.width=_w;Gtk.height=h} ->
+       gconfig.task_height <- h)
+
+let task_view =
+  GSourceView2.source_view
+    ~editable:false
+    ~show_line_numbers:true
+    ~packing:scrolled_task_view#add
+    ~height:gconfig.task_height
+    ()
+
+let modifiable_font_views = ref [goals_view#misc ; task_view#misc]
+let () = task_view#source_buffer#set_language why_lang
+let () = task_view#set_highlight_current_line true
+
+
 let clear model = model#clear ()
 
 let image_of_result ~obsolete result =
   match result with
     | Session.Undone Session.Interrupted -> !image_undone
-    | Session.Undone Session.Unedited -> !image_unknown
+    | Session.Undone Session.Unedited 
+    | Session.Undone Session.JustEdited -> !image_unknown
     | Session.Undone Session.Scheduled -> !image_scheduled
     | Session.Undone Session.Running -> !image_running
     | Session.InternalFailure _ -> !image_failure
@@ -419,7 +462,8 @@ let set_proof_state a =
           Format.sprintf "%.2f [%d.0]" time a.S.proof_timelimit
         else
           Format.sprintf "%.2f" time
-    | S.Undone S.Unedited -> "(not yet edited, edit with \"Edit\" button)"
+    | S.Undone S.Unedited -> "(not yet edited)"
+    | S.Undone S.JustEdited -> "(edited)"
     | S.InternalFailure _ -> "(internal failure)"
     | S.Undone S.Interrupted -> "(interrupted)"
     | S.Undone (S.Scheduled | S.Running) ->
@@ -900,8 +944,6 @@ let exit_function ?(destroy=false) () =
 (* View menu *)
 (*************)
 
-let modifiable_font_views = ref [goals_view#misc]
-
 let font_family = "Monospace"
 let font_size = ref 10
 
@@ -1167,46 +1209,6 @@ let (_ : GMenu.image_menu_item) =
     ~callback:show_about_window
     ()
 
-
-(******************************)
-(* vertical paned on the right*)
-(******************************)
-
-let right_vb = GPack.vbox ~packing:hp#add ()
-
-let vp =
-  try
-    GPack.paned `VERTICAL ~packing:right_vb#add ()
-  with Gtk.Error _ -> assert false
-
-let right_hb = GPack.hbox ~packing:(right_vb#pack ~expand:false) ()
-
-(******************)
-(* goal text view *)
-(******************)
-
-let scrolled_task_view =
-  GBin.scrolled_window
-    ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
-    ~shadow_type:`ETCHED_OUT ~packing:vp#add ()
-
-let (_ : GtkSignal.id) =
-  scrolled_task_view#misc#connect#size_allocate
-    ~callback:
-    (fun {Gtk.width=_w;Gtk.height=h} ->
-       gconfig.task_height <- h)
-
-let task_view =
-  GSourceView2.source_view
-    ~editable:false
-    ~show_line_numbers:true
-    ~packing:scrolled_task_view#add
-    ~height:gconfig.task_height
-    ()
-
-let () = modifiable_font_views := task_view#misc :: !modifiable_font_views
-let () = task_view#source_buffer#set_language why_lang
-let () = task_view#set_highlight_current_line true
 
 (***************)
 (* source view *)
@@ -1619,35 +1621,31 @@ let () =
 (* Bind events *)
 (***************)
 
-let display_task g t =
+let display_task t =
   let task_text = Pp.string_of Pretty.print_task t in
   task_view#source_buffer#set_text task_text;
-  task_view#scroll_to_mark `INSERT;
-  scroll_to_source_goal g
+  task_view#scroll_to_mark `INSERT
 
-(* to be run when a row in the tree view is selected *)
-let select_row r =
-  let a = get_any_from_row_reference r in
+let update_task_view a =
   match a with
     | S.Goal g ->
-        if (Gconfig.config ()).intro_premises then
-          let trans =
-            Trans.lookup_transform intro_transformation !env_session.S.env in
-          display_task g (Trans.apply trans (S.goal_task g))
-        else
-          display_task g (S.goal_task g)
-    | S.Theory th ->
-        task_view#source_buffer#set_text "";
-        scroll_to_theory th
+      if (Gconfig.config ()).intro_premises then
+        let trans =
+          Trans.lookup_transform intro_transformation !env_session.S.env in
+        display_task (Trans.apply trans (S.goal_task g))
+      else
+        display_task (S.goal_task g)
+    | S.Theory _th ->
+        task_view#source_buffer#set_text ""
     | S.File _file ->
-        task_view#source_buffer#set_text "";
-        (* scroll_to_file file *)
+        task_view#source_buffer#set_text ""
     | S.Proof_attempt a ->
         let o =
           match a.S.proof_state with
             | S.Undone S.Interrupted ->
               "proof not yet scheduled for running"
-            | S.Undone S.Unedited -> "proof not yet edited"
+            | S.Undone S.Unedited -> "Interactive proof, not yet edited. Edit with \"Edit\" button"
+            | S.Undone S.JustEdited -> "Edited interactive proof. Run it with \"Replay\" button"
             | S.Done r -> r.Call_provers.pr_output
             | S.Undone S.Scheduled-> "proof scheduled but not running yet"
             | S.Undone S.Running -> "prover currently running"
@@ -1656,10 +1654,25 @@ let select_row r =
               bprintf b "%a" Exn_printer.exn_printer e;
               Buffer.contents b
         in
-        task_view#source_buffer#set_text o;
+        task_view#source_buffer#set_text o
+    | S.Transf _tr ->
+        task_view#source_buffer#set_text ""
+
+ 
+(* to be run when a row in the tree view is selected *)
+let select_row r =
+  let a = get_any_from_row_reference r in
+  update_task_view a;
+  match a with
+    | S.Goal g ->
+       scroll_to_source_goal g
+    | S.Theory th ->
+        scroll_to_theory th
+    | S.File _file -> ()
+        (* scroll_to_file file *)
+    | S.Proof_attempt a ->
         scroll_to_source_goal a.S.proof_parent
     | S.Transf tr ->
-        task_view#source_buffer#set_text "";
         scroll_to_source_goal tr.S.transf_parent
 
 (* row selection on tree view on the left *)

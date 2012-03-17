@@ -79,7 +79,8 @@ let theory_expanded t = t.theory_expanded
 
 let running a = match a.proof_state with
   | Undone (Scheduled | Running) -> true
-  | Undone (Unedited  | Interrupted) | Done _ | InternalFailure _ -> false
+  | Undone (Unedited | JustEdited | Interrupted)
+  | Done _ | InternalFailure _ -> false
 
 (*************************)
 (*         Scheduler     *)
@@ -456,9 +457,10 @@ let run_prover eS eT ~context_unproved_goals_only ~timelimit pr a =
 (* method: replay obsolete proofs *)
 (**********************************)
 
-let proof_successful a =
+let proof_successful_or_just_edited a =
   match a.proof_state with
-    | Done { Call_provers.pr_answer = Call_provers.Valid } -> true
+    | Done { Call_provers.pr_answer = Call_provers.Valid } 
+    | Undone JustEdited -> true
     | _ -> false
 
 let rec replay_on_goal_or_children eS eT
@@ -466,7 +468,7 @@ let rec replay_on_goal_or_children eS eT
   PHprover.iter
     (fun _ a ->
        if not obsolete_only || a.proof_obsolete then
-         if not context_unproved_goals_only || proof_successful a
+         if not context_unproved_goals_only || proof_successful_or_just_edited a
          then run_external_proof eS eT a)
     g.goal_external_proofs;
   PHstr.iter
@@ -595,7 +597,7 @@ let check_external_proof eS eT todo a =
           let callback result =
               match result with
                 | Undone Scheduled | Undone Running | Undone Interrupted -> ()
-                | Undone Unedited -> assert false
+                | Undone (Unedited | JustEdited) -> assert false
                 | InternalFailure msg ->
                   Todo._done todo (g,ap,(CallFailed msg));
                   set_proof_state ~notify ~obsolete:false ~archived:false
@@ -751,8 +753,15 @@ let edit_proof eS sched ~default_editor a =
           let callback res =
             match res with
               | Done _ ->
-                  set_proof_state ~notify ~obsolete:true ~archived:false
-                    old_res a
+                begin
+                  match old_res with
+                    | Undone Unedited ->
+                      set_proof_state ~notify ~obsolete:true ~archived:false
+                        (Undone JustEdited) a
+                    | _ ->
+                      set_proof_state ~notify ~obsolete:true ~archived:false
+                        old_res a
+                end
               | _ ->
                   set_proof_state ~notify ~obsolete:false ~archived:false
                     res a
@@ -792,7 +801,7 @@ let rec clean = function
   | Goal g when g.goal_verified ->
     iter_goal
       (fun a ->
-        if a.proof_obsolete || not (proof_successful a) then
+        if a.proof_obsolete || not (proof_successful_or_just_edited a) then
           remove_proof_attempt a)
       (fun t ->
         if not t.transf_verified then remove_transformation t
