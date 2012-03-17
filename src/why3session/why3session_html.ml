@@ -87,6 +87,7 @@ replace by the input file and '%o' which will be replaced by the output file.";
 ]
 
 
+(*
 let version_msg = sprintf
   "Why3 html session output, version %s (build date: %s)"
   Config.version Config.builddate
@@ -104,24 +105,29 @@ let () =
     printf "%s@." version_msg;
     exit 0
   end
+*)
 
 (* let () = *)
 (*   List.iter (fun (in_,(cmd,out)) -> *)
 (*     printf "in : %s, cmd : %s, out : %s@." in_ cmd out) !opt_pp *)
 
+(*
 let () =
   Debug.Opt.set_flags_selected ();
   if  Debug.Opt.option_list () then exit 0
+*)
 
 let output_dir =
   match !output_dir with
-    | "" -> printf
-      "Error: output_dir must be set@.";
+ (*
+   | "" -> 
+      printf "Error: output_dir must be set@.";
       exit 1
     | "-" when !opt_context ->
       printf
         "Error: context and stdout output can't be set at the same time@.";
       exit 1
+ *)
     | _ -> !output_dir
 
 let edited_dst = Filename.concat output_dir "edited"
@@ -417,7 +423,26 @@ $(function () {
 end
 
 
+(*
 let () =
   match !opt_style with
     | Simple -> Simple.run_files ()
     | Jstree -> Jstree.run_files ()
+*)
+
+let run_one _fname = ()
+
+open Why3session_lib
+
+let run () =
+  let should_exit1 = read_simple_spec () in
+  if should_exit1 then exit 1;
+  iter_files run_one
+
+
+let cmd =
+  { cmd_spec = spec;
+    cmd_desc = "output session in HTML format.";
+    cmd_name = "html";
+    cmd_run  = run;
+  }

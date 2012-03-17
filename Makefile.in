@@ -669,7 +669,7 @@ install_local: bin/why3replayer
 ###############
 
 SESSION_FILES = why3session_lib why3session_copy why3session_info \
-		why3session_output why3session_rm why3session
+		why3session_latex why3session_html why3session_rm why3session
 
 SESSIONMODULES = $(addprefix src/why3session/, $(SESSION_FILES))
 
@@ -715,38 +715,6 @@ install_no_local::
 
 install_local: bin/why3session
 
-###############
-# Stats
-###############
-
-STATS_FILES = stats
-
-STATSMODULES = $(addprefix src/ide/, $(STATS_FILES))
-
-STATSDEP = $(addsuffix .dep, $(STATSMODULES))
-STATSCMO = $(addsuffix .cmo, $(STATSMODULES))
-STATSCMX = $(addsuffix .cmx, $(STATSMODULES))
-
-$(STATSDEP): DEPFLAGS += -I src/ide
-$(STATSCMO) $(STATSCMX): INCLUDES += -I src/ide
-
-# build targets
-
-byte: bin/why3stats.byte
-opt:  bin/why3stats.opt
-
-bin/why3stats.opt: src/why3.cmxa $(PGMCMX) $(STATSCMX)
-	$(if $(QUIET), @echo 'Linking  $@' &&) \
-	    $(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
-	$(STRIP) $@
-
-bin/why3stats.byte: src/why3.cma $(PGMCMO) $(STATSCMO)
-	$(if $(QUIET),@echo 'Linking  $@' &&) \
-	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
-
-bin/why3stats: bin/why3stats.@OCAMLBEST@
-	ln -sf why3stats.@OCAMLBEST@ $@
-
 # depend and clean targets
 
 ifneq "$(MAKECMDGOALS)" "clean"
@@ -762,38 +730,6 @@ install_no_local::
 	cp -f bin/why3stats.@OCAMLBEST@ $(BINDIR)/why3stats
 
 install_local: bin/why3stats
-
-###############
-# Html
-###############
-
-HTML_FILES = html_session
-
-HTMLMODULES = $(addprefix src/ide/, $(HTML_FILES))
-
-HTMLDEP = $(addsuffix .dep, $(HTMLMODULES))
-HTMLCMO = $(addsuffix .cmo, $(HTMLMODULES))
-HTMLCMX = $(addsuffix .cmx, $(HTMLMODULES))
-
-$(HTMLDEP): DEPFLAGS += -I src/ide
-$(HTMLCMO) $(HTMLCMX): INCLUDES += -I src/ide
-
-# build targets
-
-byte: bin/why3html.byte
-opt:  bin/why3html.opt
-
-bin/why3html.opt: src/why3.cmxa $(PGMCMX) $(HTMLCMX)
-	$(if $(QUIET), @echo 'Linking  $@' &&) \
-	    $(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
-	$(STRIP) $@
-
-bin/why3html.byte: src/why3.cma $(PGMCMO) $(HTMLCMO)
-	$(if $(QUIET),@echo 'Linking  $@' &&) \
-	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
-
-bin/why3html: bin/why3html.@OCAMLBEST@
-	ln -sf why3html.@OCAMLBEST@ $@
 
 # depend and clean targets
 

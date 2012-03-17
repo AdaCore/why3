@@ -25,23 +25,21 @@ open Format
 
 module S = Session
 
-let opt_latex = ref ""
-let opt_latex2 = ref ""
+let opt_style = ref 1
+let opt_output_dir = ref ""
 let opt_longtable = ref false
 
 let spec =
-  ("-latex",
-   Arg.Set_string opt_latex,
-   " [Dir_output] produce latex statistics") ::
-  ("-latex2",
-   Arg.Set_string opt_latex2,
-   " [Dir_output] produce latex statistics") ::
+  ("-style <n>",
+   Arg.Set_int opt_style,
+   " sets output style (1 or 2, default 1)") ::
+  ("-dir <path>",
+   Arg.Set_string opt_output_dir,
+   " where to produce LaTeX files (default: session dir)") ::
   ("-longtable",
    Arg.Set opt_longtable,
-   " produce latex statistics using longtable package") ::
+   " produce tables using longtable package instead of tabular") ::
   simple_spec
-
-
 
 
 (* Statistics in LaTeX*)
@@ -292,24 +290,12 @@ let print_latex_statistics n table dir session =
 let table () = if !opt_longtable then "longtable" else "tabular"
 
 let run_one fname =
-  if !opt_longtable && !opt_latex == "" && !opt_latex2 == "" then
-    begin
-      eprintf
-	"[Error] I can't use option longtable without latex ou latex2@.";
-      exit 1
-    end;
   let project_dir = Session.get_project_dir fname in
   let session = Session.read_session project_dir in
-  if !opt_latex <> "" then
-    print_latex_statistics 1 (table ()) !opt_latex session
-  else
-    if !opt_latex2 <> "" then
-	print_latex_statistics 2 (table()) !opt_latex2 session
-    else
-      begin
-        eprintf "Specify output format e.g. --latex@.";
-        exit 1
-      end
+  let dir = if !opt_output_dir = "" then project_dir else
+      !opt_output_dir
+  in
+  print_latex_statistics !opt_style (table ()) dir session
 
 let run () =
   let should_exit1 = read_simple_spec () in
@@ -319,7 +305,7 @@ let run () =
 
 let cmd =
   { cmd_spec = spec;
-    cmd_desc = "output session in some formats.";
-    cmd_name = "output";
+    cmd_desc = "output session in LaTeX format.";
+    cmd_name = "latex";
     cmd_run  = run;
   }
