@@ -1,5 +1,9 @@
 import "alt_ergo_bare.drv"
 
+theory BuiltIn
+  meta "eliminate_algebraic" "keep_enums"
+end
+
 theory map.Map
   syntax type  map "(%1,%2) farray"
 

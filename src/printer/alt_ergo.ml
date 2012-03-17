@@ -144,7 +144,7 @@ let rec print_fmla info fmt f = match f.t_node with
   | Tfalse ->
       fprintf fmt "false"
   | Tif (f1, f2, f3) ->
-      fprintf fmt "((%a and %a) or (not %a and %a))"
+      fprintf fmt "((%a and@ %a)@ or@ (not@ %a and@ %a))"
         (print_fmla info) f1 (print_fmla info) f2 (print_fmla info)
         f1 (print_fmla info) f3
   | Tlet _ -> unsupportedTerm f
@@ -177,9 +177,17 @@ let print_type_decl fmt ts = match ts.ts_args with
   | tl -> fprintf fmt "type (%a) %a@\n@\n"
       (print_list comma print_tvsymbol) tl print_ident ts.ts_name
 
+let print_enum_decl fmt ts csl =
+  let print_cs fmt (ls,_) = print_ident fmt ls.ls_name in
+  fprintf fmt "type %a =@ %a@\n@\n" print_ident ts.ts_name
+    (print_list alt print_cs) csl
+
 let print_type_decl info fmt = function
   | ts, Tabstract when Mid.mem ts.ts_name info.info_syn -> ()
   | ts, Tabstract -> print_type_decl fmt ts; forget_tvs ()
+  | ts, Talgebraic csl (* monomorphic enumeration *)
+    when ts.ts_args = [] && List.for_all (fun (_,l) -> l = []) csl ->
+      print_enum_decl fmt ts csl
   | _, Talgebraic _ -> unsupported
       "alt-ergo : algebraic datatype are not supported"
 

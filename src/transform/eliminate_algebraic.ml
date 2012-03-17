@@ -403,7 +403,7 @@ let comp t (state,task) = match t.task_decl.td_node with
         | [ts, Talgebraic [_]]
           when state.keep_r && not (Sid.mem ts.ts_name d.d_syms) ->
             { state with keep_t = true }
-        | [_, Talgebraic csl]
+        | [{ ts_args = [] }, Talgebraic csl]
           when state.keep_e && List.for_all (fun (_,l) -> l = []) csl ->
             { state with keep_t = true }
         | _ -> state
