@@ -101,9 +101,7 @@ type state = {
   keep_t : bool;                (* keep algebraic type definitions *)
   keep_e : bool;                (* keep monomorphic enumeration types *)
   keep_r : bool;                (* keep non-recursive records *)
-(*
-  in_smt : bool;                (* generate indexing funcitons *)
-*)
+  no_ind : bool;                (* do not generate indexing funcitons *)
 }
 
 let empty_state = {
@@ -113,9 +111,7 @@ let empty_state = {
   keep_t = false;
   keep_e = false;
   keep_r = false;
-(*
-  in_smt = false;
-*)
+  no_ind = false;
 }
 
 let uncompiled = "eliminate_algebraic: compile_match required"
@@ -284,10 +280,7 @@ let add_discriminator (state,task) ts ty csl =
 let add_indexer acc ts ty = function
   | [_] -> acc
   | _ when (fst acc).keep_t -> acc
-(*
-  (* FIXME? swap the two following cases *)
-  | csl when (fst acc).in_smt -> add_indexer acc ts ty csl
-*)
+  | csl when not ((fst acc).no_ind) -> add_indexer acc ts ty csl
   | csl when List.length csl <= 16 -> add_discriminator acc ts ty csl
   | _ -> acc
 
@@ -448,9 +441,7 @@ let eliminate_algebraic = Trans.compose compile_match
       | [MAstr "keep_types"] -> { st with keep_t = true }
       | [MAstr "keep_enums"] -> { st with keep_e = true }
       | [MAstr "keep_recs"]  -> { st with keep_r = true }
-(*
-      | [MAstr "index_cs"]   -> { st with in_smt = true }
-*)
+      | [MAstr "no_index"]   -> { st with no_ind = true }
       | _ -> raise (Invalid_argument "meta eliminate_algebraic")
     in
     let st = List.fold_left check st ml in
