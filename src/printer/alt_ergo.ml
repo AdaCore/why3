@@ -270,15 +270,25 @@ let print_decl info fmt d = match d.d_node with
 
 let print_decl info fmt = catch_unsupportedDecl (print_decl info fmt)
 
+let add_projection (csm,pjs,axs) = function
+  | [Theory.MAls ls; Theory.MAls cs; Theory.MAint ind; Theory.MApr pr] ->
+      let csm = try Array.set (Mls.find cs csm) ind ls; csm
+      with Not_found ->
+        Mls.add cs (Array.make (List.length cs.ls_args) ls) csm in
+      csm, Sls.add ls pjs, Spr.add pr axs
+  | _ -> assert false
+
 let print_task_old pr thpr fmt task =
   print_prelude fmt pr;
   print_th_prelude task fmt thpr;
+  let csm,pjs,axs = Task.on_meta Eliminate_algebraic.meta_proj
+    add_projection (Mls.empty,Sls.empty,Spr.empty) task in
   let info = {
     info_syn = get_syntax_map task;
     info_ac  = Task.on_tagged_ls meta_ac task;
-    info_csm = Mls.empty;
-    info_pjs = Sls.empty;
-    info_axs = Spr.empty;
+    info_csm = Mls.map Array.to_list csm;
+    info_pjs = pjs;
+    info_axs = axs;
   } in
   let decls = Task.task_decls task in
   fprintf fmt "%a@." (print_list nothing (print_decl info)) decls
@@ -293,24 +303,15 @@ let print_decls =
     let info = {
       info_syn = sm;
       info_ac  = ac;
-      info_csm = csm;
+      info_csm = Mls.map Array.to_list csm;
       info_pjs = pjs;
       info_axs = axs;
     } in
     print_decl info fmt d in
   Trans.on_tagged_ls meta_ac (fun ac ->
   Trans.on_meta Eliminate_algebraic.meta_proj (fun mal ->
-    let add (csm,pjs,axs) = function
-      | [Theory.MAls ls; Theory.MAls cs; Theory.MAint ind; Theory.MApr pr] ->
-          let csm = try Array.set (Mls.find cs csm) ind ls; csm
-          with Not_found ->
-            Mls.add cs (Array.make (List.length cs.ls_args) ls) csm in
-          csm, Sls.add ls pjs, Spr.add pr axs
-      | _ -> assert false
-    in
-    let csm,pjs,axs =
-      List.fold_left add (Mls.empty,Sls.empty,Spr.empty) mal in
-    let csm = Mls.map Array.to_list csm in
+    let csm,pjs,axs = List.fold_left
+      add_projection (Mls.empty,Sls.empty,Spr.empty) mal in
     Printer.sprint_decls (print ac csm pjs axs)))
 
 let print_task _env pr thpr ?old:_ fmt task =
