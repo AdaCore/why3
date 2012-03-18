@@ -106,23 +106,17 @@ _why3()
             ;;
     esac
 
-    help="--help"
-
-    case "$1" in
-        *why3session*)
-            if [ "$cword" -eq 1 ] ; then
-                cmds=$($1 --help 2>&1 | tail -n +4 | head -n -2 | cut -d ' ' -f 1)
-                COMPREPLY=( $( compgen -W "$cmds -v --version -h --help" -- "$cur" ) )
-                return 0
-            fi
-            help="${words[1]} --help"
-            ;;
-    esac
+    if [[ $cword -eq 1 && "$1" == *why3session* ]] ; then
+        cmds=$($1 --help 2>&1 | tail -n +4 | head -n -2 | cut -d ' ' -f 1)
+        COMPREPLY=( $( compgen -W "$cmds -v --version -h --help" -- "$cur" ) )
+        return 0
+    fi
 
     _filedir
 
     case "$cur" in
-        -*) COMPREPLY+=( $( compgen -W '$( _parse_help "$1" "$help" )' -- "$cur" ) )
+        -*) help="--help" ; [[ "$1" == *why3session* ]] && help="${words[1]} --help"
+            COMPREPLY+=( $( compgen -W '$( _parse_help "$1" "$help" )' -- "$cur" ) )
             return 0
             ;;
     esac
