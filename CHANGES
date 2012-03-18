@@ -5,6 +5,14 @@
   o fix BTS 13849
   o [syntax] new syntax "constant x:ty" and "constant x:ty = e" to
     introduce constants, as an alternative to "function"
+  o [TPTP] new parser for TPTP files with support for the newest
+    TFA1 format (TPTP with polymorphic types and arithmetic)
+  o [API] Dtype declaration kind is split into two: Dtype for
+    declarations of a single abstract type or type alias, and
+    Ddata for a list of (mutually recursive) algebraic types.
+    Similarly, Dlogic declaration kind is split into Dparam for
+    a single abstract function/predicate symbol and Dlogic for
+    a list of (mutually recursive) defined symbols.
 
 version 0.71, October 13, 2011
 ==============================

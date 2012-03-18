@@ -81,29 +81,52 @@ _why3()
             COMPREPLY=( $( compgen -W 'none top deep' -- "$cur" ) )
             return 0
             ;;
-        -latex|--latex|-latex2|--latex2)
-            _filedir -d
-            return 0
-            ;;
         --debug)
             flags=$($1 --list-debug-flags | grep -v '^Known ' | cut -d ' ' -f 3)
             COMPREPLY=( $( compgen -W "$flags" -- "$cur" ) )
             return 0
+            ;;
+# Why3session options
+        --filter-prover)
+            provers=$(${1/session/} --list-provers | grep -v '^Known ' | cut -d ' ' -f 3)
+            COMPREPLY=( $( compgen -W "$provers" -- "$cur" ) )
+            return 0
+            ;;
+        --filter-obsolete|--filter-archived|--filter-verified-goal|--filter-verified)
+            COMPREPLY=( $( compgen -W 'yes no all' -- "$cur" ) )
+            return 0
+            ;;
+        --style)
+            COMPREPLY=( $( compgen -W 'simple jstree' -- "$cur" ) )
+            return 0
+            ;;
+    esac
+
+    help="--help"
+
+    case "$1" in
+        *why3session*)
+            if [ "$cword" -eq 1 ] ; then
+                cmds=$($1 --help 2>&1 | tail -n +4 | head -n -2 | cut -d ' ' -f 1)
+                COMPREPLY=( $( compgen -W "$cmds -v --version -h --help" -- "$cur" ) )
+                return 0
+            fi
+            help="${words[1]} --help"
             ;;
     esac
 
     _filedir
 
     case "$cur" in
-        -*) COMPREPLY+=( $( compgen -W '$( _parse_help "$1" )' -- "$cur" ) )
+        -*) COMPREPLY+=( $( compgen -W '$( _parse_help "$1" "$help" )' -- "$cur" ) )
             return 0
             ;;
     esac
 
 } && complete -F _why3 \
-    why3 why3ml why3ide why3config why3doc why3html why3replayer why3session \
+    why3 why3ml why3ide why3config why3doc why3replayer why3session \
     why3.opt why3ml.opt why3ide.opt why3config.opt why3doc.opt \
-    why3html.opt why3replayer.opt why3session.opt \
+    why3replayer.opt why3session.opt \
     why3.byte why3ml.byte why3ide.byte why3config.byte why3doc.byte \
-    why3html.byte why3replayer.byte why3session.byte
+    why3replayer.byte why3session.byte
 

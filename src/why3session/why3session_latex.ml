@@ -33,7 +33,7 @@ let spec =
   ("-style <n>",
    Arg.Set_int opt_style,
    " sets output style (1 or 2, default 1)") ::
-  ("-dir <path>",
+  ("-o <path>",
    Arg.Set_string opt_output_dir,
    " where to produce LaTeX files (default: session dir)") ::
   ("-longtable",
