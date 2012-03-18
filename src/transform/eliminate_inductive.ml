@@ -22,7 +22,7 @@ open Term
 open Decl
 open Task
 
-let log acc (ps,_) = create_logic_decl [ps, None] :: acc
+let log acc (ps,_) = create_param_decl ps :: acc
 let axm acc (pr,f) = create_prop_decl Paxiom pr f :: acc
 let imp acc (_,al) = List.fold_left axm acc al
 

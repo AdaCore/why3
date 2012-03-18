@@ -28,13 +28,9 @@ open Mlw_expr
 
 type ps_ls = { ps : psymbol; ls : lsymbol }
 
-type pconstructor = ps_ls * ps_ls option list
+type constructor = ps_ls * ps_ls option list
 
-type ity_defn =
-  | ITabstract
-  | ITalgebraic of pconstructor list
-
-type ity_decl = itysymbol * ity_defn
+type data_decl = itysymbol * constructor list
 
 type pdecl = {
   pd_node : pdecl_node;
@@ -44,7 +40,8 @@ type pdecl = {
 }
 
 and pdecl_node =
-  | PDtype of ity_decl list
+  | PDtype of itysymbol
+  | PDdata of data_decl list
 
 let pd_equal : pdecl -> pdecl -> bool = (==)
 
@@ -69,17 +66,18 @@ let syms_ity s ity = ity_s_fold syms_its syms_ts s ity
 
 (** {2 Declaration constructors} *)
 
-type pre_pconstructor = preid * (pvsymbol * bool) list
+let create_ty_decl its =
+  let syms = Util.option_fold syms_ity Sid.empty its.its_def in
+  let news = news_id Sid.empty its.its_pure.ts_name in
+  mk_decl (PDtype its) syms news
 
-type pre_ity_defn =
-  | PITabstract
-  | PITalgebraic of pre_pconstructor list
+type pre_constructor = preid * (pvsymbol * bool) list
 
-type pre_ity_decl = itysymbol * pre_ity_defn
+type pre_data_decl = itysymbol * pre_constructor list
 
 exception ConstantConstructor of ident
 
-let create_ity_decl tdl =
+let create_data_decl tdl =
   let syms = ref Sid.empty in
   let add s (its,_) = news_id s its.its_pure.ts_name in
   let news = ref (List.fold_left add Sid.empty tdl) in
@@ -135,14 +133,12 @@ let create_ity_decl tdl =
       if pj then Some (build_proj pv) else None in
     ps_ls, List.map build_proj al
   in
-  let build_type (its, defn) = its, match defn with
-    | PITabstract -> ITabstract
-    | PITalgebraic cl ->
-        Hvs.clear projections;
-        ITalgebraic (List.map (build_constructor its) cl)
+  let build_type (its, cl) =
+    Hvs.clear projections;
+    its, List.map (build_constructor its) cl
   in
   let tdl = List.map build_type tdl in
-  mk_decl (PDtype tdl) !syms !news
+  mk_decl (PDdata tdl) !syms !news
 
 
 (** {2 Known identifiers} *)

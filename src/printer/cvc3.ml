@@ -233,46 +233,56 @@ let print_logic_binder info fmt v =
   fprintf fmt "%a: %a" print_ident v.vs_name
     (print_type info) v.vs_ty
 
-let print_type_decl info fmt = function
-  | ts, Tabstract when Mid.mem ts.ts_name info.info_syn -> false
-  | ts, Tabstract when ts.ts_args = [] ->
-    fprintf fmt "%a : TYPE;" print_ident ts.ts_name; true
-  | _, Tabstract -> false
-  | _, Talgebraic _ -> unsupported
-    "cvc3 : algebraic type are not supported"
+let print_type_decl info fmt ts =
+  if Mid.mem ts.ts_name info.info_syn then false else
+  if ts.ts_args = [] then
+  (fprintf fmt "%a : TYPE;" print_ident ts.ts_name; true)
+  else false
 
-let print_logic_decl info fmt (ls,ld) =
-  if not (Mid.mem ls.ls_name info.info_syn) then
-    let print_lsargs info fmt = function
-      | [] -> ()
-      | l ->  fprintf fmt "(%a) -> "
-        (print_list comma (print_type info)) l in
+let print_param_decl info fmt ls =
+  let print_lsargs info fmt = function
+    | [] -> ()
+    | l ->  fprintf fmt "(%a) -> "
+      (print_list comma (print_type info)) l in
   List.iter (iter_complex_type info fmt ()) ls.ls_args;
   Util.option_iter (iter_complex_type info fmt ()) ls.ls_value;
-  match ld with
-  | None ->
-    fprintf fmt "@[<hov 2>%a: %a%a;@]@\n"
-      print_ident ls.ls_name
-      (print_lsargs info) ls.ls_args
-      (print_type_value info) ls.ls_value
-  | Some def ->
-    let vsl,expr = Decl.open_ls_defn def  in
-    find_complex_type_expr info fmt expr;
-    fprintf fmt "@[<hov 2>%a: %a%a = LAMBDA (%a): %a;@]@\n"
-      print_ident ls.ls_name
-      (print_lsargs info) ls.ls_args
-      (print_type_value info) ls.ls_value
-      (print_var_list info) vsl
-      (print_expr info) expr;
-    List.iter forget_var vsl
+  fprintf fmt "@[<hov 2>%a: %a%a;@]@\n"
+    print_ident ls.ls_name
+    (print_lsargs info) ls.ls_args
+    (print_type_value info) ls.ls_value
+
+let print_param_decl info fmt ls =
+  if Mid.mem ls.ls_name info.info_syn then
+    false else (print_param_decl info fmt ls; true)
+
+let print_logic_decl info fmt (ls,def) =
+  let print_lsargs info fmt = function
+    | [] -> ()
+    | l ->  fprintf fmt "(%a) -> "
+      (print_list comma (print_type info)) l in
+  List.iter (iter_complex_type info fmt ()) ls.ls_args;
+  Util.option_iter (iter_complex_type info fmt ()) ls.ls_value;
+  let vsl,expr = Decl.open_ls_defn def in
+  find_complex_type_expr info fmt expr;
+  fprintf fmt "@[<hov 2>%a: %a%a = LAMBDA (%a): %a;@]@\n"
+    print_ident ls.ls_name
+    (print_lsargs info) ls.ls_args
+    (print_type_value info) ls.ls_value
+    (print_var_list info) vsl
+    (print_expr info) expr;
+  List.iter forget_var vsl
 
 let print_logic_decl info fmt d =
   if Mid.mem (fst d).ls_name info.info_syn then
     false else (print_logic_decl info fmt d; true)
 
 let print_decl info fmt d = match d.d_node with
-  | Dtype dl ->
-      print_list_opt newline (print_type_decl info) fmt dl
+  | Dtype ts ->
+      print_type_decl info fmt ts
+  | Ddata _ -> unsupportedDecl d
+      "cvc3 : algebraic type are not supported"
+  | Dparam ls ->
+      print_param_decl info fmt ls
   | Dlogic dl ->
       print_list_opt newline (print_logic_decl info) fmt dl
   | Dind _ -> unsupportedDecl d

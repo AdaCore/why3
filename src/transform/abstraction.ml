@@ -47,7 +47,7 @@ let abstraction (keep : lsymbol -> bool) =
   let abstract_decl (d : decl) : decl list =
     let d = decl_map abstract d in
     let l = List.fold_left
-      (fun acc ls -> create_logic_decl [ls,None] :: acc)
+      (fun acc ls -> create_param_decl ls :: acc)
       [d] !extra_decls in
     extra_decls := []; l in
 

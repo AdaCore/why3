@@ -419,7 +419,7 @@ and tr_global_ts dep env r =
             | None ->
                 Ty.create_tysymbol id vars None
           in
-          let decl = Decl.create_ty_decl [ts, Decl.Tabstract] in
+          let decl = Decl.create_ty_decl ts in
           add_dep dep decl;
           add_table global_ts r (Some ts);
           global_decl := Ident.Mid.add ts.ts_name decl !global_decl;
@@ -466,11 +466,11 @@ and tr_global_ts dep env r =
               ls, List.map (fun _ -> None) ls.ls_args
             in
             let ls = Array.to_list (Array.mapi mk_constructor oib.mind_nf_lc) in
-            ts, Decl.Talgebraic ls
+            ts, ls
           in
           let decl = Array.mapi make_one mib.mind_packets in
           let decl = Array.to_list decl in
-          let decl = Decl.create_ty_decl decl in
+          let decl = Decl.create_data_decl decl in
           (* Format.printf "decl = %a@." Pretty.print_decl decl; *)
           add_dep dep decl;
           List.iter
@@ -512,19 +512,18 @@ and tr_global_ls dep env r =
           ignore (tr_type dep' tvm env t);
           lookup_table global_ls r
       | ConstRef c ->
-          let ld = decompose_definition dep' env c in
+          let decl = decompose_definition dep' env c in
 (*           let ld = match defl with *)
 (*             | [] -> *)
 (*                 [make_def_decl dep env r None] *)
 (*             | _ -> *)
 (*                 List.map (fun (r, t) -> make_def_decl dep env r (Some t)) defl *)
 (*           in *)
-          let decl = Decl.create_logic_decl ld in
           add_dep dep decl;
-          List.iter
-            (fun (ls, _) ->
-               global_decl := Ident.Mid.add ls.ls_name decl !global_decl)
-            ld;
+          Ident.Sid.iter
+            (fun id ->
+               global_decl := Ident.Mid.add id decl !global_decl)
+            decl.Decl.d_news;
           global_dep := Decl.Mdecl.add decl !dep' !global_dep;
           lookup_table global_ls r
       | VarRef _ | IndRef _ ->
@@ -586,7 +585,7 @@ and decompose_definition dep env c =
     let ls = lookup_table global_ls r in
     match b with
       | None ->
-          ls, None
+          assert false
       | Some b ->
           let tvs = List.fold_left Ty.ty_freevars Stv.empty
             (Ty.oty_cons ls.ls_args ls.ls_value) in
@@ -609,7 +608,11 @@ and decompose_definition dep env c =
                 Decl.make_ls_defn ls vsl b
           end
   in
-  List.map make_one_decl dl
+  match dl with
+    | [r,None] ->
+        Decl.create_param_decl (lookup_table global_ls r)
+    | _ ->
+        Decl.create_logic_decl (List.map make_one_decl dl)
 
 (***
           (* is it defined? *)

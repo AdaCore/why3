@@ -38,7 +38,7 @@ let lift kind =
         let tys = List.map (fun x -> x.vs_ty) fv in
         let xs = Ident.id_derive "epsilon" x.vs_name in
         let xl = create_fsymbol xs tys x.vs_ty in
-        let acc = add_decl acc (Decl.create_logic_decl [xl,None]) in
+        let acc = add_decl acc (Decl.create_param_decl xl) in
         let axs =
           Decl.create_prsymbol (Ident.id_derive ("epsilon_def") x.vs_name) in
         let xlapp = t_app xl (List.map t_var fv) t.t_ty in

@@ -184,6 +184,8 @@ let add_to_theory f uc x = { uc with muc_theory = f uc.muc_theory x }
 let add_decl = add_to_theory Theory.add_decl
 let add_decl_with_tuples = add_to_theory Theory.add_decl_with_tuples
 let add_ty_decl = add_to_theory Theory.add_ty_decl
+let add_data_decl = add_to_theory Theory.add_data_decl
+let add_param_decl = add_to_theory Theory.add_param_decl
 let add_logic_decl = add_to_theory Theory.add_logic_decl
 let add_ind_decl = add_to_theory Theory.add_ind_decl
 let add_prop_decl uc k pr f =
@@ -207,14 +209,15 @@ let add_symbol add id v uc =
       muc_export = add true  id.id_string v e0 :: ste }
   | _ -> assert false
 
-let add_type uc (its,def) =
+let add_type uc its =
+  add_symbol add_it its.its_pure.ts_name its uc
+
+let add_data uc (its,csl) =
   let add_ps uc {ps=ps} = add_symbol add_ps ps.p_name ps uc in
   let add_proj = option_fold add_ps in
   let add_constr uc (ps,pjl) = List.fold_left add_proj (add_ps uc ps) pjl in
   let uc = add_symbol add_it its.its_pure.ts_name its uc in
-  match def with
-    | ITabstract -> uc
-    | ITalgebraic lfs -> List.fold_left add_constr uc lfs
+  List.fold_left add_constr uc csl
 
 let add_pdecl uc d =
   let uc =  { uc with
@@ -223,16 +226,16 @@ let add_pdecl uc d =
     muc_local = Sid.union uc.muc_local d.pd_news }
   in
   match d.pd_node with
-  | PDtype dl ->
-      let uc = List.fold_left add_type uc dl in
+  | PDtype its ->
+      let uc = add_type uc its in
+      add_to_theory Theory.add_ty_decl uc its.its_pure
+  | PDdata dl ->
+      let uc = List.fold_left add_data uc dl in
       let projection = option_map (fun ps -> ps.ls) in
       let constructor (ps,pjl) = ps.ls, List.map projection pjl in
-      let defn = function
-        | ITabstract -> Decl.Tabstract
-        | ITalgebraic cl -> Decl.Talgebraic (List.map constructor cl)
-      in
-      let dl = List.map (fun (its, d) -> its.its_pure, defn d) dl in
-      add_to_theory Theory.add_ty_decl uc dl
+      let defn cl = List.map constructor cl in
+      let dl = List.map (fun (its,cl) -> its.its_pure, defn cl) dl in
+      add_to_theory Theory.add_data_decl uc dl
 
 let add_pdecl_with_tuples uc d =
   let ids = Mid.set_diff d.pd_syms uc.muc_known in

@@ -238,41 +238,28 @@ let print_logic_binder info fmt v =
   fprintf fmt "%a: %a" print_ident v.vs_name
     (print_type info) v.vs_ty
 
-let print_type_decl _info fmt ts = function
-(*
-  | Tabstract when ts.ts_args = [] ->
-      fprintf fmt "(declare-sort %a 0)@\n@\n"
-        print_ident ts.ts_name
-*)
-  | Tabstract when ts.ts_def = None ->
-      fprintf fmt "(declare-sort %a %i)@\n@\n"
-        print_ident ts.ts_name (List.length ts.ts_args)
-  | Tabstract -> ()
-  | Talgebraic _ -> unsupported
-          "smtv2 : algebraic type are not supported"
-
-let print_type_decl info fmt (ts,td) =
+let print_type_decl info fmt ts =
+  if ts.ts_def <> None then () else
   if Mid.mem ts.ts_name info.info_syn then () else
-  print_type_decl info fmt ts td
+  fprintf fmt "(declare-sort %a %i)@\n@\n"
+    print_ident ts.ts_name (List.length ts.ts_args)
 
-let print_logic_decl info fmt ls = function
-  | None ->
-      fprintf fmt "@[<hov 2>(declare-fun %a (%a) %a)@]@\n@\n"
-        print_ident ls.ls_name
-        (print_list space (print_type info)) ls.ls_args
-        (print_type_value info) ls.ls_value
-  | Some def ->
-      let vsl,expr = Decl.open_ls_defn def in
-      fprintf fmt "@[<hov 2>(declare-fun %a (%a) %a %a)@]@\n@\n"
-        print_ident ls.ls_name
-        (print_var_list info) vsl
-        (print_type_value info) ls.ls_value
-        (print_expr info) expr;
-      List.iter forget_var vsl
-
-let print_logic_decl info fmt (ls,ld) =
+let print_param_decl info fmt ls =
   if Mid.mem ls.ls_name info.info_syn then () else
-  print_logic_decl info fmt ls ld
+  fprintf fmt "@[<hov 2>(declare-fun %a (%a) %a)@]@\n@\n"
+    print_ident ls.ls_name
+    (print_list space (print_type info)) ls.ls_args
+    (print_type_value info) ls.ls_value
+
+let print_logic_decl info fmt (ls,def) =
+  if Mid.mem ls.ls_name info.info_syn then () else
+  let vsl,expr = Decl.open_ls_defn def in
+  fprintf fmt "@[<hov 2>(declare-fun %a (%a) %a %a)@]@\n@\n"
+    print_ident ls.ls_name
+    (print_var_list info) vsl
+    (print_type_value info) ls.ls_value
+    (print_expr info) expr;
+  List.iter forget_var vsl
 
 let print_prop_decl info fmt k pr f = match k with
   | Paxiom ->
@@ -291,12 +278,16 @@ let print_prop_decl info fmt k pr f = match k with
   | Plemma| Pskip -> assert false
 
 let print_decl info fmt d = match d.d_node with
-  | Dtype dl ->
-      print_list nothing (print_type_decl info) fmt dl
+  | Dtype ts ->
+      print_type_decl info fmt ts
+  | Ddata _ -> unsupportedDecl d
+      "smtv2 : algebraic type are not supported"
+  | Dparam ls ->
+      print_param_decl info fmt ls
   | Dlogic dl ->
       print_list nothing (print_logic_decl info) fmt dl
   | Dind _ -> unsupportedDecl d
-      "smt : inductive definition are not supported"
+      "smtv2 : inductive definition are not supported"
   | Dprop (k,pr,f) ->
       if Mid.mem pr.pr_name info.info_syn then () else
       print_prop_decl info fmt k pr f

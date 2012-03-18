@@ -83,12 +83,13 @@ module Transform = struct
     let add _ ty acc = term_of_ty varM ty :: acc in
     Mtv.fold add tv_to_ty args
 
+  let param_transform ls = [Decl.create_param_decl (findL ls)]
+
   (** transforms a list of logic declarations into another.
   Declares new lsymbols with explicit polymorphic signatures. *)
   let logic_transform decls =
     (* if there is a definition, we must take it into account *)
-    let helper = function
-    | (lsymbol, Some ldef) ->
+    let helper (lsymbol, ldef) =
       let new_lsymbol = findL lsymbol in (* new lsymbol *)
       let vars,expr,close = open_ls_defn_cb ldef in
       let add v (vl,vm) =
@@ -98,8 +99,6 @@ module Transform = struct
       let vars,varM = Stv.fold add (ls_ty_freevars lsymbol) (vars,Mtv.empty) in
       let t = term_transform varM expr in
       close new_lsymbol vars t
-    | (lsymbol, None) ->
-      (findL lsymbol, None)
     in
     [Decl.create_logic_decl (List.map helper decls)]
 
@@ -119,7 +118,12 @@ end
 (** {2 main part} *)
 
 let decl d = match d.d_node with
-  | Dtype tdl -> d :: Libencoding.lsdecl_of_tydecl tdl
+  | Dtype { ts_def = Some _ } -> []
+  | Dtype ts -> [d; Libencoding.lsdecl_of_ts ts]
+  | Ddata _ -> Printer.unsupportedDecl d
+      "Algebraic and recursively-defined types are \
+            not supported, run eliminate_algebraic"
+  | Dparam ls -> Transform.param_transform ls
   | Dlogic ldl -> Transform.logic_transform ldl
   | Dind idl -> Transform.ind_transform idl
   | Dprop prop -> Transform.prop_transform prop
@@ -154,7 +158,7 @@ let lsmap kept = Wls.memoize 63 (fun ls ->
      List.for_all2 ty_equal ty_arg ls.ls_args then ls
   else create_lsymbol (id_clone ls.ls_name) ty_arg ty_res)
 
-let d_ts_base = create_ty_decl [ts_base, Tabstract]
+let d_ts_base = create_ty_decl ts_base
 
 let monomorph = Trans.on_tagged_ty Libencoding.meta_kept (fun kept ->
   let kept = Sty.add ty_type kept in

@@ -244,7 +244,7 @@ let add_types uc tdl =
               s, (Denv.create_user_id cid, pjl)
             in
             let s,def = Util.map_fold_left mk_constr Sreg.empty csl in
-            Hashtbl.replace predefs x (PITalgebraic def);
+            Hashtbl.replace predefs x def;
             create_itysymbol id ~abst ~priv vl (Sreg.elements s) None
         | TDrecord fl when Hashtbl.mem mutables x ->
             let mk_field s f =
@@ -261,8 +261,7 @@ let add_types uc tdl =
             in
             let s,pjl = Util.map_fold_left mk_field Sreg.empty fl in
             let cid = { d.td_ident with id = "mk " ^ d.td_ident.id } in
-            let def = PITalgebraic [Denv.create_user_id cid, pjl] in
-            Hashtbl.replace predefs x def;
+            Hashtbl.replace predefs x [Denv.create_user_id cid, pjl];
             create_itysymbol id ~abst ~priv vl (Sreg.elements s) None
         | TDalgebraic _ | TDrecord _ | TDabstract ->
             create_itysymbol id ~abst ~priv vl [] None
@@ -274,7 +273,7 @@ let add_types uc tdl =
 
   (* create predefinitions for immutable types *)
 
-  let def_visit d =
+  let def_visit d (abstr,algeb,alias) =
     let x = d.td_ident.id in
     let ts = Util.of_option (Hashtbl.find tysymbols x) in
     let add_tv s x v = Mstr.add x.id v s in
@@ -299,12 +298,12 @@ let add_types uc tdl =
           ity_pur ts (List.map parse tyl)
     in
     match d.td_def with
-      | TDabstract | TDalias _ ->
-          ts, PITabstract
-      | TDalgebraic _ when Hashtbl.mem mutables x ->
-          ts, Hashtbl.find predefs x
-      | TDrecord _ when Hashtbl.mem mutables x ->
-          ts, Hashtbl.find predefs x
+      | TDabstract ->
+          ts :: abstr, algeb, alias
+      | TDalias _ ->
+          abstr, algeb, ts :: alias
+      | (TDalgebraic _ | TDrecord _) when Hashtbl.mem mutables x ->
+          abstr, (ts, Hashtbl.find predefs x) :: algeb, alias
       | TDalgebraic csl ->
           let projs = Hashtbl.create 5 in
           let mk_proj (id,pty) =
@@ -326,59 +325,68 @@ let add_types uc tdl =
           in
           let mk_constr (_loc,cid,pjl) =
             Denv.create_user_id cid, List.map mk_proj pjl in
-          ts, PITalgebraic (List.map mk_constr csl)
+          abstr, (ts, List.map mk_constr csl) :: algeb, alias
       | TDrecord fl ->
           let mk_field f =
             let fid = Denv.create_user_id f.f_ident in
             create_pvsymbol fid ~ghost:f.f_ghost (parse f.f_pty), true in
           let cid = { d.td_ident with id = "mk " ^ d.td_ident.id } in
-          ts, PITalgebraic [Denv.create_user_id cid, List.map mk_field fl]
+          let csl = [Denv.create_user_id cid, List.map mk_field fl] in
+          abstr, (ts, csl) :: algeb, alias
   in
-  let def = List.map def_visit tdl in
+  let abstr,algeb,alias = List.fold_right def_visit tdl ([],[],[]) in
 
   (* detect pure type declarations *)
 
   let kn = get_known uc in
   let check its = Mid.mem its.its_pure.ts_name kn in
   let check ity = ity_s_any check Util.ffalse ity in
-  let is_impure_decl (ts,d) =
+  let is_impure_type ts =
     ts.its_abst || ts.its_priv || ts.its_regs <> [] ||
-    option_apply false check ts.its_def || match d with
-      | PITabstract -> false
-      | PITalgebraic csl ->
-          let check (pv,_) =
-            pv.pv_ghost || pv.pv_mutable <> None || check pv.pv_ity in
-          List.exists (fun (_,l) -> List.exists check l) csl
+    option_apply false check ts.its_def
   in
-  let mk_pure_decl (ts,d) = ts.its_pure, match d with
-    | PITabstract -> Tabstract
-    | PITalgebraic csl ->
-        let pjt = Hvs.create 3 in
-        let ty = ty_app ts.its_pure (List.map ty_var ts.its_args) in
-        let mk_proj (pv,f) =
-          let vs = pv.pv_vs in
-          if f then try vs.vs_ty, Some (Hvs.find pjt vs) with Not_found ->
-            let pj = create_fsymbol (id_clone vs.vs_name) [ty] vs.vs_ty in
-            Hvs.replace pjt vs pj;
-            vs.vs_ty, Some pj
-          else
-            vs.vs_ty, None
-        in
-        let mk_constr (id,pjl) =
-          let pjl = List.map mk_proj pjl in
-          let cs = create_fsymbol id (List.map fst pjl) ty in
-          cs, List.map snd pjl
-        in
-        Talgebraic (List.map mk_constr csl)
+  let check (pv,_) =
+    pv.pv_ghost || pv.pv_mutable <> None || check pv.pv_ity in
+  let is_impure_data (ts,csl) =
+    is_impure_type ts ||
+    List.exists (fun (_,l) -> List.exists check l) csl
+  in
+  let mk_pure_decl (ts,csl) =
+    let pjt = Hvs.create 3 in
+    let ty = ty_app ts.its_pure (List.map ty_var ts.its_args) in
+    let mk_proj (pv,f) =
+      let vs = pv.pv_vs in
+      if f then try vs.vs_ty, Some (Hvs.find pjt vs) with Not_found ->
+        let pj = create_fsymbol (id_clone vs.vs_name) [ty] vs.vs_ty in
+        Hvs.replace pjt vs pj;
+        vs.vs_ty, Some pj
+      else
+        vs.vs_ty, None
+    in
+    let mk_constr (id,pjl) =
+      let pjl = List.map mk_proj pjl in
+      let cs = create_fsymbol id (List.map fst pjl) ty in
+      cs, List.map snd pjl
+    in
+    ts.its_pure, List.map mk_constr csl
+  in
+  let add_type_decl uc ts =
+    if is_impure_type ts then
+      add_pdecl_with_tuples uc (create_ty_decl ts)
+    else
+      add_decl_with_tuples uc (Decl.create_ty_decl ts.its_pure)
   in
   try
-    if List.exists is_impure_decl def then
-      let d = create_ity_decl def in
-      add_pdecl_with_tuples uc d
-    else
-      let def = List.map mk_pure_decl def in
-      let d = create_ty_decl def in
-      add_decl_with_tuples uc d
+    let uc = List.fold_left add_type_decl uc abstr in
+    let uc = if algeb = [] then uc else
+      if List.exists is_impure_data algeb then
+        add_pdecl_with_tuples uc (create_data_decl algeb)
+      else
+        let d = List.map mk_pure_decl algeb in
+        add_decl_with_tuples uc (Decl.create_data_decl d)
+    in
+    let uc = List.fold_left add_type_decl uc alias in
+    uc
   with
     | ClashSymbol s ->
         error ?loc:(look_for_loc tdl s) (ClashSymbol s)

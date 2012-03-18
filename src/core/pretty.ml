@@ -307,28 +307,24 @@ let print_constr fmt (cs,pjl) =
     (print_list nothing print_pj)
     (List.fold_right2 add_pj pjl cs.ls_args [])
 
-let print_type_decl fst fmt (ts,def) = match def with
-  | Tabstract -> begin match ts.ts_def with
-      | None ->
-          fprintf fmt "@[<hov 2>%s %a%a%a@]"
-            (if fst then "type" else "with") print_ts ts
-            print_ident_labels ts.ts_name
-            (print_list nothing print_tv_arg) ts.ts_args
-      | Some ty ->
-          fprintf fmt "@[<hov 2>%s %a%a%a =@ %a@]"
-            (if fst then "type" else "with") print_ts ts
-            print_ident_labels ts.ts_name
-            (print_list nothing print_tv_arg) ts.ts_args print_ty ty
-      end
-  | Talgebraic csl ->
-      fprintf fmt "@[<hov 2>%s %a%a%a =@\n@[<hov>%a@]@]"
-        (if fst then "type" else "with") print_ts ts
-        print_ident_labels ts.ts_name
-        (print_list nothing print_tv_arg) ts.ts_args
-        (print_list newline print_constr) csl
+let print_ty_decl fmt ts =
+  let print_def fmt = function
+    | None -> ()
+    | Some ty -> fprintf fmt " =@ %a" print_ty ty
+  in
+  fprintf fmt "@[<hov 2>type %a%a%a%a@]"
+    print_ts ts print_ident_labels ts.ts_name
+    (print_list nothing print_tv_arg) ts.ts_args
+    print_def ts.ts_def;
+  forget_tvs ()
 
-let print_type_decl first fmt d =
-  print_type_decl first fmt d; forget_tvs ()
+let print_data_decl fst fmt (ts,csl) =
+  fprintf fmt "@[<hov 2>%s %a%a%a =@\n@[<hov>%a@]@]"
+    (if fst then "type" else "with") print_ts ts
+    print_ident_labels ts.ts_name
+    (print_list nothing print_tv_arg) ts.ts_args
+    (print_list newline print_constr) csl;
+  forget_tvs ()
 
 let print_ls_type fmt = fprintf fmt " :@ %a" print_ty
 
@@ -336,24 +332,23 @@ let ls_kind ls =
   if ls.ls_value = None then "predicate"
   else if ls.ls_args = [] then "constant" else "function"
 
-let print_logic_decl fst fmt (ls,ld) = match ld with
-  | Some ld ->
-      let vl,e = open_ls_defn ld in
-      fprintf fmt "@[<hov 2>%s %a%a%a%a =@ %a@]"
-        (if fst then ls_kind ls else "with") print_ls ls
-        print_ident_labels ls.ls_name
-        (print_list nothing print_vs_arg) vl
-        (print_option print_ls_type) ls.ls_value print_term e;
-      List.iter forget_var vl
-  | None ->
-      fprintf fmt "@[<hov 2>%s %a%a%a%a@]"
-        (if fst then ls_kind ls else "with") print_ls ls
-        print_ident_labels ls.ls_name
-        (print_list nothing print_ty_arg) ls.ls_args
-        (print_option print_ls_type) ls.ls_value
+let print_param_decl fmt ls =
+  fprintf fmt "@[<hov 2>%s %a%a%a%a@]"
+    (ls_kind ls) print_ls ls
+    print_ident_labels ls.ls_name
+    (print_list nothing print_ty_arg) ls.ls_args
+    (print_option print_ls_type) ls.ls_value;
+  forget_tvs ()
 
-let print_logic_decl first fmt d =
-  print_logic_decl first fmt d; forget_tvs ()
+let print_logic_decl fst fmt (ls,ld) =
+  let vl,e = open_ls_defn ld in
+  fprintf fmt "@[<hov 2>%s %a%a%a%a =@ %a@]"
+    (if fst then ls_kind ls else "with") print_ls ls
+    print_ident_labels ls.ls_name
+    (print_list nothing print_vs_arg) vl
+    (print_option print_ls_type) ls.ls_value print_term e;
+  List.iter forget_var vl;
+  forget_tvs ()
 
 let print_ind fmt (pr,f) =
   fprintf fmt "@[<hov 4>| %a%a :@ %a@]"
@@ -364,10 +359,8 @@ let print_ind_decl fst fmt (ps,bl) =
     (if fst then "inductive" else "with") print_ls ps
     print_ident_labels ps.ls_name
     (print_list nothing print_ty_arg) ps.ls_args
-    (print_list newline print_ind) bl
-
-let print_ind_decl first fmt d =
-  print_ind_decl first fmt d; forget_tvs ()
+    (print_list newline print_ind) bl;
+  forget_tvs ()
 
 let sprint_pkind = function
   | Paxiom -> "axiom"
@@ -389,13 +382,15 @@ let print_list_next sep print fmt = function
       print_list sep (print false) fmt r
 
 let print_decl fmt d = match d.d_node with
-  | Dtype tl  -> print_list_next newline print_type_decl fmt tl
+  | Dtype ts  -> print_ty_decl fmt ts
+  | Ddata tl  -> print_list_next newline print_data_decl fmt tl
+  | Dparam ls -> print_param_decl fmt ls
   | Dlogic ll -> print_list_next newline print_logic_decl fmt ll
   | Dind il   -> print_list_next newline print_ind_decl fmt il
   | Dprop p   -> print_prop_decl fmt p
 
-let print_next_type_decl  = print_type_decl false
-let print_type_decl       = print_type_decl true
+let print_next_data_decl  = print_data_decl false
+let print_data_decl       = print_data_decl true
 let print_next_logic_decl = print_logic_decl false
 let print_logic_decl      = print_logic_decl true
 let print_next_ind_decl   = print_ind_decl false

@@ -128,7 +128,7 @@ and rewrite_fmla tenv ud vm f =
   | _ -> TermTF.t_map (fnT vm) (fnF vm) f
 
 let decl_ud ud task =
-  let add ts () task = add_ty_decl task [ts,Tabstract] in
+  let add ts () task = add_ty_decl task ts in
   Hts.fold add ud task
 
 let fold tenv taskpre task =
@@ -137,21 +137,17 @@ let fold tenv taskpre task =
   match taskpre.task_decl.td_node with
     | Decl d ->
       begin match d.d_node with
-        | Dtype dl ->
-          let add acc = function
-            | ({ts_def = Some _} | {ts_args = _::_}), Tabstract -> acc
-            | _, Tabstract as d -> d::acc
-            | _ -> Printer.unsupportedDecl d "use eliminate_algebraic"
-          in
-          let l = List.rev (List.fold_left add [] dl) in
-          if l = [] then task else add_ty_decl task l
-        | Dlogic ll ->
+        | Dtype { ts_def = Some _ }
+        | Dtype { ts_args = _::_ } -> task
+        | Dtype ts -> add_ty_decl task ts
+        | Ddata _ ->
+          Printer.unsupportedDecl d "use eliminate_algebraic"
+        | Dparam ls ->
           let ud = Hts.create 3 in
-          let conv = function
-            | ls, None -> conv_ls tenv ud ls, None
-            | _ -> Printer.unsupportedDecl d "use eliminate_definition"
-          in
-          add_logic_decl (decl_ud ud task) (List.map conv ll)
+          let ls = conv_ls tenv ud ls in
+          add_param_decl (decl_ud ud task) ls
+        | Dlogic _ ->
+          Printer.unsupportedDecl d "use eliminate_definition"
         | Dind _ ->
           Printer.unsupportedDecl d "use eliminate_inductive"
         | Dprop _ ->

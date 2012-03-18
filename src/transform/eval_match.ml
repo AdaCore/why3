@@ -34,18 +34,14 @@ let unfold def tl ty =
   t_ty_subst mt mv e
 
 let is_constructor kn ls = match Mid.find ls.ls_name kn with
-  | { d_node = Dtype dl } ->
-      let constr = function
-        | _, Talgebraic csl -> List.exists (fun (cs,_) -> ls_equal cs ls) csl
-        | _, Tabstract -> false in
+  | { d_node = Ddata dl } ->
+      let constr (_,csl) = List.exists (fun (cs,_) -> ls_equal cs ls) csl in
       List.exists constr dl
   | _ -> false
 
 let is_projection kn ls = match Mid.find ls.ls_name kn with
-  | { d_node = Dtype dl } ->
-      let constr = function
-        | _, Talgebraic csl -> List.exists (fun (cs,_) -> ls_equal cs ls) csl
-        | _, Tabstract -> false in
+  | { d_node = Ddata dl } ->
+      let constr (_,csl) = List.exists (fun (cs,_) -> ls_equal cs ls) csl in
       not (List.exists constr dl)
   | _ -> false
 
@@ -163,7 +159,7 @@ let rec inline_nonrec_linear kn ls tyl ty =
   let d = Mid.find ls.ls_name kn in
   if Mid.mem ls.ls_name d.d_syms then false else
   match d.d_node with
-    | Dlogic [_, Some def] ->
+    | Dlogic [_,def] ->
         begin try Wdecl.find inline_cache d with Not_found ->
           let vl,t = open_ls_defn def in
           let _,_,t = List.fold_left (add_quant kn) ([],[],t) vl in

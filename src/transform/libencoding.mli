@@ -62,11 +62,11 @@ val type_close : Stv.t -> (term Mtv.t -> 'a -> term) -> 'a -> term
 (* rewrite a closed formula modulo its free typevars *)
 val t_type_close : (term Mtv.t -> term -> term) -> term -> term
 
-(* convert a type declaration to a list of lsymbol declarations *)
-val lsdecl_of_tydecl : ty_decl list -> decl list
+(* convert a type declaration to a lsymbol declaration *)
+val lsdecl_of_ts : tysymbol -> decl
 
 (* convert a type declaration to a list of lsymbol declarations *)
-val lsdecl_of_tydecl_select : ty_decl list -> decl list
+val lsdecl_of_ts_select : tysymbol -> decl list
 
 (* a pre-id for vsymbols and lsymbols that produce non-kept values *)
 val id_unprotected : string -> Ident.preid

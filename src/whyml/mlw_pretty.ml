@@ -132,30 +132,29 @@ let print_constr fmt (cs,pjl) =
     print_ident_labels cs.ls.ls_name
     (print_list nothing print_pj) pjl
 
-let print_type_decl fst fmt (ts,def) =
-  let print_head fmt ts =
-    fprintf fmt "%s %s%s%a%a <%a>%a"
-      (if fst then "type" else "with")
-      (if ts.its_abst then "abstract " else "")
-      (if ts.its_priv then "private " else "")
-      print_its ts
-      print_ident_labels ts.its_pure.ts_name
-      (print_list comma print_regty) ts.its_regs
-      (print_list nothing print_tv_arg) ts.its_args
-  in
-  match def with
-  | ITabstract -> begin match ts.its_def with
-      | None ->
-          fprintf fmt "@[<hov 2>%a@]" print_head ts
-      | Some ty ->
-          fprintf fmt "@[<hov 2>%a =@ %a@]" print_head ts print_ity ty
-      end
-  | ITalgebraic csl ->
-      fprintf fmt "@[<hov 2>%a =@\n@[<hov>%a@]@]"
-        print_head ts (print_list newline print_constr) csl
+let print_head fst fmt ts =
+  fprintf fmt "%s %s%s%a%a <%a>%a"
+    (if fst then "type" else "with")
+    (if ts.its_abst then "abstract " else "")
+    (if ts.its_priv then "private " else "")
+    print_its ts
+    print_ident_labels ts.its_pure.ts_name
+    (print_list comma print_regty) ts.its_regs
+    (print_list nothing print_tv_arg) ts.its_args
 
-let print_type_decl first fmt d =
-  print_type_decl first fmt d; forget_tvs_regs ()
+let print_ty_decl fmt ts = match ts.its_def with
+  | None ->
+      fprintf fmt "@[<hov 2>%a@]" (print_head true) ts
+  | Some ty ->
+      fprintf fmt "@[<hov 2>%a =@ %a@]" (print_head true) ts print_ity ty
+
+let print_ty_decl fmt ts =
+  print_ty_decl fmt ts; forget_tvs_regs ()
+
+let print_data_decl fst fmt (ts,csl) =
+  fprintf fmt "@[<hov 2>%a =@\n@[<hov>%a@]@]"
+    (print_head fst) ts (print_list newline print_constr) csl;
+  forget_tvs_regs ()
 
 (* Declarations *)
 
@@ -166,10 +165,11 @@ let print_list_next sep print fmt = function
       print_list sep (print false) fmt r
 
 let print_pdecl fmt d = match d.pd_node with
-  | PDtype tl -> print_list_next newline print_type_decl fmt tl
+  | PDtype ts -> print_ty_decl fmt ts
+  | PDdata tl -> print_list_next newline print_data_decl fmt tl
 
-let print_next_type_decl  = print_type_decl false
-let print_type_decl       = print_type_decl true
+let print_next_data_decl  = print_data_decl false
+let print_data_decl       = print_data_decl true
 
 let print_module fmt m =
   fprintf fmt "@[<hov 2>module %a%a@\n%a@]@\nend@."

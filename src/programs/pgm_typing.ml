@@ -1932,15 +1932,15 @@ let type_type uc ty =
 
 let add_pure_decl uc ?loc ls =
   try
-    Pgm_module.add_pure_decl (Decl.create_logic_decl [ls, None]) uc
+    Pgm_module.add_pure_decl (Decl.create_param_decl ls) uc
   with Theory.ClashSymbol _ ->
     errorm ?loc "clash with previous symbol %s" ls.ls_name.id_string
 
 let add_effect_decl uc ls =
-  Pgm_module.add_effect_decl (Decl.create_logic_decl [ls, None]) uc
+  Pgm_module.add_effect_decl (Decl.create_param_decl ls) uc
 
 let add_impure_decl uc ls =
-  Pgm_module.add_impure_decl (Decl.create_logic_decl [ls, None]) uc
+  Pgm_module.add_impure_decl (Decl.create_param_decl ls) uc
 
 let add_global_fun loc ~labels x tyv uc =
   let x = parameter x in
@@ -1955,7 +1955,7 @@ let add_global_fun loc ~labels x tyv uc =
         labels
     in
     let ls, ps = create_psymbol_fun (id_user ~label x loc) tyv in
-    let d = Decl.create_logic_decl [ls, None] in
+    let d = Decl.create_param_decl ls in
     ps, Pgm_module.add_impure_decl d uc
   with Pgm_module.ClashSymbol _ ->
     errorm ~loc "clash with previous symbol %s" x

@@ -131,20 +131,20 @@ let ts_of_ls env ls decls =
   let add_tyl tyl _ sts = List.fold_left add_ty sts tyl in
   let insts = Mls.find_def Mtyl.empty ls env in
   let sts = Mtyl.fold add_tyl insts Sts.empty in
-  let add_ts ts dl = create_ty_decl [ts,Tabstract] :: dl in
+  let add_ts ts dl = create_ty_decl ts :: dl in
   Sts.fold add_ts sts decls
 
 (* The Core of the transformation *)
 let map env d = match d.d_node with
-  | Dtype [_,Tabstract] -> [d]
-  | Dtype _ -> Printer.unsupportedDecl d
+  | Dtype _ -> [d]
+  | Ddata _ -> Printer.unsupportedDecl d
       "Algebraic and recursively-defined types are \
             not supported, run eliminate_algebraic"
-  | Dlogic [ls, None] ->
+  | Dparam ls ->
       let lls = Mtyl.values (Mls.find_def Mtyl.empty ls env) in
-      let lds = List.map (fun ls -> create_logic_decl [ls,None]) lls in
+      let lds = List.map create_param_decl lls in
       ts_of_ls env ls (d::lds)
-  | Dlogic [ls, Some ld] when not (Sid.mem ls.ls_name d.d_syms) ->
+  | Dlogic [ls,ld] when not (Sid.mem ls.ls_name d.d_syms) ->
       let f = ls_defn_axiom ld in
       let substs = ty_quant env f in
       let conv_f tvar (defns,axioms) =

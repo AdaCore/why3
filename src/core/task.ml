@@ -167,7 +167,9 @@ let new_meta task t td =
 
 let add_decl task d = new_decl task d (create_decl d)
 
-let add_ty_decl tk dl = add_decl tk (create_ty_decl dl)
+let add_ty_decl tk ts = add_decl tk (create_ty_decl ts)
+let add_data_decl tk dl = add_decl tk (create_data_decl dl)
+let add_param_decl tk ls = add_decl tk (create_param_decl ls)
 let add_logic_decl tk dl = add_decl tk (create_logic_decl dl)
 let add_ind_decl tk dl = add_decl tk (create_ind_decl dl)
 let add_prop_decl tk k p f = add_decl tk (create_prop_decl k p f)

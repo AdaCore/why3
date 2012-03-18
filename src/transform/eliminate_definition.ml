@@ -24,22 +24,17 @@ open Decl
 
 (** Discard definitions of built-in symbols *)
 
-let add_ld q = function
-  | ls, Some _ when Sls.mem ls q -> (ls, None)
-  | d -> d
-
-let add_id q (ld,id) = function
-  | ls, _ when Sls.mem ls q -> (ls, None)::ld, id
-  | d -> ld, d::id
+let add_id q (ls,ld) (abst,defn) = if Sls.mem ls q
+  then create_param_decl ls :: abst, defn
+  else abst, (ls,ld) :: defn
 
 let elim q spr d = match d.d_node with
   | Dlogic l ->
-      [create_logic_decl (List.map (add_ld q) l)]
+      let ld, id = List.fold_right (add_id q) l ([],[]) in
+      ld @ (if id = [] then [] else [create_logic_decl id])
   | Dind l ->
-      let ld, id = List.fold_left (add_id q) ([],[]) l in
-      let ld = if ld = [] then [] else [create_logic_decl (List.rev ld)] in
-      let id = if id = [] then [] else [create_ind_decl   (List.rev id)] in
-      ld @ id
+      let ld, id = List.fold_right (add_id q) l ([],[]) in
+      ld @ (if id = [] then [] else [create_ind_decl id])
   | Dprop (Paxiom,pr,_) when Spr.mem pr spr -> []
   | _ -> [d]
 
@@ -66,20 +61,23 @@ let rec t_insert hd t = match t.t_node with
       t_case tl (List.map br bl)
   | _ -> TermTF.t_selecti t_equ_simp t_iff_simp hd t
 
-let add_ld func pred axl = function
-  | ls, Some ld when (if ls.ls_value = None then pred else func) ->
-      let vl,e = open_ls_defn ld in
-      let nm = ls.ls_name.id_string ^ "_def" in
-      let hd = t_app ls (List.map t_var vl) e.t_ty in
-      let ax = t_forall_close vl [] (t_insert hd e) in
-      let pr = create_prsymbol (id_derive nm ls.ls_name) in
-      create_prop_decl Paxiom pr ax :: axl, (ls, None)
-  | d ->
-      axl, d
+let add_ld func pred (ls,ld) (abst,defn,axl) =
+  if (if ls.ls_value = None then pred else func) then
+    let vl,e = open_ls_defn ld in
+    let nm = ls.ls_name.id_string ^ "_def" in
+    let pr = create_prsymbol (id_derive nm ls.ls_name) in
+    let hd = t_app ls (List.map t_var vl) e.t_ty in
+    let ax = t_forall_close vl [] (t_insert hd e) in
+    let ax = create_prop_decl Paxiom pr ax in
+    let ld = create_param_decl ls in
+    ld :: abst, defn, ax :: axl
+  else
+    abst, (ls,ld) :: defn, axl
 
 let elim_decl func pred l =
-  let axl, l = map_fold_left (add_ld func pred) [] l in
-  create_logic_decl l :: List.rev axl
+  let abst,defn,axl = List.fold_right (add_ld func pred) l ([],[],[]) in
+  let defn = if defn = [] then [] else [create_logic_decl defn] in
+  abst @ defn @ axl
 
 let elim func pred d = match d.d_node with
   | Dlogic l -> elim_decl func pred l

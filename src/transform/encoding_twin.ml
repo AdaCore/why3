@@ -36,8 +36,8 @@ let make_pont ty () =
     let tb2t_name = "tb2t" in
     let tb2t_id = Libencoding.id_unprotecting tb2t_name in
     create_fsymbol tb2t_id [ty] ty in
-  let t2tb_def = create_logic_decl [t2tb,None] in
-  let tb2t_def = create_logic_decl [tb2t,None] in
+  let t2tb_def = create_param_decl t2tb in
+  let tb2t_def = create_param_decl tb2t in
   let bridge_l =
     let x_vs = create_vsymbol (id_fresh "i") ty in
     let x_t = t_var x_vs in
@@ -102,12 +102,11 @@ let rec rewrite tenv t = match t.t_node with
   | _ -> t_map (rewrite tenv) t
 
 let decl tenv d = match d.d_node with
-  | Dtype [_,Tabstract] -> [d]
-  | Dtype _ -> Printer.unsupportedDecl d
+  | Dtype _ | Dparam _ -> [d]
+  | Ddata _ -> Printer.unsupportedDecl d
       "Algebraic and recursively-defined types are \
             not supported, run eliminate_algebraic"
-  | Dlogic [_, None] -> [d]
-  | Dlogic [ls, Some ld] when not (Sid.mem ls.ls_name d.d_syms) ->
+  | Dlogic [ls,ld] when not (Sid.mem ls.ls_name d.d_syms) ->
       let f = rewrite tenv (ls_defn_axiom ld) in
       Libencoding.defn_or_axiom ls f
   | Dlogic _ -> Printer.unsupportedDecl d

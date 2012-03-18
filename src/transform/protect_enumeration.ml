@@ -42,15 +42,14 @@ let rec rewrite_term tenv hls t = match t.t_node with
   | _ -> t_map (rewrite_term tenv hls) t
 
 let decl tenv d = match d.d_node with
-  | Dtype [_,Tabstract] -> [d]
-  | Dtype _ -> Printer.unsupportedDecl d
+  | Dtype _ | Dparam _ -> [d]
+  | Ddata _ -> Printer.unsupportedDecl d
       "Algebraic and recursively-defined types are \
             not supported, run eliminate_algebraic"
-  | Dlogic [_, None] -> [d]
-  | Dlogic [ls, Some ld] when not (Sid.mem ls.ls_name d.d_syms) ->
+  | Dlogic [ls,ld] when not (Sid.mem ls.ls_name d.d_syms) ->
       let hls = Hls.create 7 in
       let f = rewrite_term tenv hls (ls_defn_axiom ld) in
-      let decl fs () decls = create_logic_decl [fs,None] :: decls in
+      let decl fs () decls = create_param_decl fs :: decls in
       Hls.fold decl hls (Libencoding.defn_or_axiom ls f)
   | Dlogic _ -> Printer.unsupportedDecl d
       "Recursively-defined symbols are not supported, run eliminate_recursion"
@@ -59,7 +58,7 @@ let decl tenv d = match d.d_node with
   | _ ->
       let hls = Hls.create 7 in
       let d = decl_map (rewrite_term tenv hls) d in
-      let decl fs () decls = create_logic_decl [fs,None] :: decls in
+      let decl fs () decls = create_param_decl fs :: decls in
       Hls.fold decl hls [d]
 
 let protect_enumeration =

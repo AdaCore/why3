@@ -370,8 +370,8 @@ let filter_goal pr f =
 
 let prepare info defs ((eqs,hyps,goal) as acc) d =
   match d.d_node with
-    | Dtype _ -> acc
-    | Dlogic _ -> acc
+    | Dtype _ | Ddata _ -> acc
+    | Dparam _ | Dlogic _ -> acc
     | Dind _ ->
         unsupportedDecl d
           "please remove inductive definitions before calling gappa printer"

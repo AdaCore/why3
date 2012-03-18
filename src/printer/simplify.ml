@@ -131,22 +131,13 @@ and print_triggers info fmt = function
   | [] -> ()
   | tl -> fprintf fmt "@ (PATS %a)" (print_list space (print_trigger info)) tl
 
-let print_logic_decl _drv _fmt (_ls,ld) = match ld with
-  | None ->
-      ()
-  | Some _ ->
-      (* TODO: predicate definitions could actually be passed to Simplify *)
-      unsupported "Predicate and function definition aren't supported"
-
-let print_logic_decl info fmt d =
-  if Mid.mem (fst d).ls_name info.info_syn then false
-  else begin print_logic_decl info fmt d; true end
-
 let print_decl info fmt d = match d.d_node with
-  | Dtype _ ->
+  | Dtype _ | Dparam _ ->
       false
-  | Dlogic dl ->
-      print_list_opt newline (print_logic_decl info) fmt dl
+  | Ddata _ ->
+      unsupportedDecl d "Algebraic datatypes are not supported"
+  | Dlogic _ ->
+      unsupportedDecl d "Predicate and function definition aren't supported"
   | Dind _ ->
       unsupportedDecl d "simplify : inductive definition are not supported"
   | Dprop (Paxiom, pr, _) when Mid.mem pr.pr_name info.info_syn ->

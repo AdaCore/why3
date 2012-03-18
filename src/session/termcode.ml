@@ -47,6 +47,8 @@ let tag_app = "a"
 let tag_case = "C"
 let tag_const = "c"
 let tag_Dtype = "Dt"
+let tag_Ddata = "Dd"
+let tag_Dparam = "Dv"
 let tag_Dlogic = "Dl"
 let tag_Dind = "Di"
 let tag_Dprop = "Dp"
@@ -164,15 +166,15 @@ let pr_shape_list fmt t =
 
 (* shape of a task *)
 
-let logic_decl_shape ~(push:string->'a->'a) (acc:'a) (ls,d) : 'a =
+let param_decl_shape ~(push:string->'a->'a) (acc:'a) ls : 'a =
+  push (ls.ls_name.Ident.id_string) acc
+
+let logic_decl_shape ~(push:string->'a->'a) (acc:'a) (ls,def) : 'a =
   let acc = push (ls.ls_name.Ident.id_string) acc in
-  match d with
-    | None -> acc
-    | Some def ->
-        let vl,t = Decl.open_ls_defn def in
-        let c = ref (-1) in
-        let m = vl_rename_alpha c Mvs.empty vl in
-        t_shape ~push c m acc t
+  let vl,t = Decl.open_ls_defn def in
+  let c = ref (-1) in
+  let m = vl_rename_alpha c Mvs.empty vl in
+  t_shape ~push c m acc t
 
 let logic_ind_decl_shape ~(push:string->'a->'a) (acc:'a) (ls,cl) : 'a =
   let acc = push (ls.ls_name.Ident.id_string) acc in
@@ -193,10 +195,14 @@ let propdecl_shape ~(push:string->'a->'a) (acc:'a) (k,n,t) : 'a =
 
 let decl_shape ~(push:string->'a->'a) (acc:'a) d : 'a =
   match d.Decl.d_node with
-    | Decl.Dtype tyl ->
+    | Decl.Dtype _ts ->
+        push tag_Dtype acc
+    | Decl.Ddata tyl ->
         List.fold_right
           (fun _ty acc -> acc)
-          tyl (push tag_Dtype acc)
+          tyl (push tag_Ddata acc)
+    | Decl.Dparam ls ->
+        param_decl_shape ~push (push tag_Dparam acc) ls
     | Decl.Dlogic ldl ->
         List.fold_right
           (fun d acc -> logic_decl_shape ~push acc d)

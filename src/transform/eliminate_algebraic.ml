@@ -34,9 +34,9 @@ let meta_phantom = register_meta "phantom_type_arg" [MTtysymbol;MTint]
 let rec enum_ts kn sts ts =
   assert (ts.ts_def = None);
   if Sts.mem ts sts then raise Exit else
-  match find_type_definition kn ts with
-    | Tabstract -> raise Exit
-    | Talgebraic csl ->
+  match find_constructors kn ts with
+    | [] -> raise Exit
+    | csl ->
         let sts = Sts.add ts sts in
         let rec finite_ty stv ty = match ty.ty_node with
           | Tyvar tv -> Stv.add tv stv
@@ -215,7 +215,7 @@ let add_selector (state,task) ts ty csl =
   let mt_al = ty :: List.rev_map (fun _ -> mt_ty) csl in
   let mt_ls = create_fsymbol mt_id mt_al mt_ty in
   let mtmap = Mts.add ts mt_ls state.mt_map in
-  let task  = add_logic_decl task [mt_ls, None] in
+  let task  = add_param_decl task mt_ls in
   (* define the selector function *)
   let mt_vs _ = create_vsymbol (id_fresh "z") mt_ty in
   let mt_vl = List.rev_map mt_vs csl in
@@ -241,7 +241,7 @@ let add_indexer (state,task) ts ty csl =
   (* declare the indexer function *)
   let mt_id = id_derive ("index_" ^ ts.ts_name.id_string) ts.ts_name in
   let mt_ls = create_fsymbol mt_id [ty] ty_int in
-  let task  = add_logic_decl task [mt_ls, None] in
+  let task  = add_param_decl task mt_ls in
   (* define the indexer function *)
   let index = ref (-1) in
   let mt_add tsk (cs,_) =
@@ -304,7 +304,7 @@ let add_projections (state,task) _ts _ty csl =
             let id = id_derive (id ^ cn) cs.ls_name in
             create_lsymbol id [of_option cs.ls_value] t.t_ty
       in
-      let tsk = add_logic_decl tsk [ls, None] in
+      let tsk = add_param_decl tsk ls in
       let id = id_derive (ls.ls_name.id_string ^ "_def") ls.ls_name in
       let pr = create_prsymbol id in
       let hh = t_app ls [hd] t.t_ty in
@@ -337,7 +337,7 @@ let add_inversion (state,task) ts ty csl =
 
 let add_type kn (state,task) ts csl =
   (* declare constructors as abstract functions *)
-  let cs_add tsk (cs,_) = add_logic_decl tsk [cs, None] in
+  let cs_add tsk (cs,_) = add_param_decl tsk cs in
   let task =
     if state.keep_t then task else List.fold_left cs_add task csl in
   (* add selector, projections, and inversion axiom *)
@@ -363,30 +363,16 @@ let add_type kn (state,task) ts csl =
   state, task
 
 let comp t (state,task) = match t.task_decl.td_node with
-  | Decl { d_node = Dtype dl } ->
+  | Decl { d_node = Ddata dl } ->
       (* add type declarations *)
       let conv (cs,pjl) = cs, List.map (fun _ -> None) pjl in
-      let conv (ts,df) = ts, match df with
-        | Tabstract -> Tabstract
-        | Talgebraic _ when not state.keep_t -> Tabstract
-        | Talgebraic csl -> Talgebraic (List.map conv csl)
+      let conv (ts,csl) = ts, List.map conv csl in
+      let task = if state.keep_t
+        then add_data_decl task (List.map conv dl)
+        else List.fold_left (fun t (ts,_) -> add_ty_decl t ts) task dl
       in
-      let ty_all = List.map conv dl in
-      (* FIXME: this should probably be part of add_ty_decl *)
-      let ts_abstr (ts,df) = ts.ts_def = None && df = Tabstract in
-      let ts_alias (ts,_)  = ts.ts_def <> None in
-      let ts_algeb (_,df)  = df <> Tabstract in
-      let ty_abstr = List.filter ts_abstr ty_all in
-      let ty_alias = List.filter ts_alias ty_all in
-      let ty_algeb = List.filter ts_algeb ty_all in
-      let task = List.fold_left (fun t x -> add_ty_decl t [x]) task ty_abstr in
-      let task = if ty_algeb = [] then task else add_ty_decl task ty_algeb in
-      let task = List.fold_left (fun t x -> add_ty_decl t [x]) task ty_alias in
       (* add needed functions and axioms *)
-      let add acc (ts,df) = match df with
-        | Tabstract      -> acc
-        | Talgebraic csl -> add_type t.task_known acc ts csl
-      in
+      let add acc (ts,csl) = add_type t.task_known acc ts csl in
       List.fold_left add (state,task) dl
   | Decl d ->
       let fnT = rewriteT t.task_known state in
@@ -396,15 +382,15 @@ let comp t (state,task) = match t.task_decl.td_node with
       state, add_tdecl task t.task_decl
 
 let comp t (state,task) = match t.task_decl.td_node with
-  | Decl ({ d_node = Dtype dl } as d) ->
+  | Decl ({ d_node = Ddata dl } as d) ->
       (* are we going to keep this type? *)
       let old_keep_t = state.keep_t in
       let state = match dl with
         | _ when state.keep_t -> state
-        | [ts, Talgebraic [_]]
+        | [ts, [_]]
           when state.keep_r && not (Sid.mem ts.ts_name d.d_syms) ->
             { state with keep_t = true }
-        | [{ ts_args = [] }, Talgebraic csl]
+        | [{ ts_args = [] }, csl]
           when state.keep_e && List.for_all (fun (_,l) -> l = []) csl ->
             { state with keep_t = true }
         | _ -> state
@@ -415,7 +401,7 @@ let comp t (state,task) = match t.task_decl.td_node with
       comp t (state,task)
 
 let comp t (state,task) = match t.task_decl.td_node with
-  | Decl ({ d_node = Dtype [ts,_] } as d) when is_ts_tuple ts ->
+  | Decl ({ d_node = Ddata [ts,_] } as d) when is_ts_tuple ts ->
       let tp_map = Mid.add ts.ts_name d state.tp_map in
       { state with tp_map = tp_map }, task
   | Decl d ->
@@ -451,14 +437,11 @@ let eliminate_algebraic = Trans.compose compile_match
 (** Eliminate user-supplied projection functions *)
 
 let elim d = match d.d_node with
-  | Dtype dl ->
+  | Ddata dl ->
       (* add type declarations *)
       let conv (cs,pjl) = cs, List.map (fun _ -> None) pjl in
-      let conv (ts,df) = ts, match df with
-        | Tabstract -> Tabstract
-        | Talgebraic csl -> Talgebraic (List.map conv csl)
-      in
-      let td = create_ty_decl (List.map conv dl) in
+      let conv (ts,csl) = ts, List.map conv csl in
+      let td = create_data_decl (List.map conv dl) in
       (* add projection definitions *)
       let add vs csl acc pj =
         let mk_b (cs,pjl) =
@@ -475,17 +458,13 @@ let elim d = match d.d_node with
         let def = make_ls_defn pj [vs] f in
         create_logic_decl [def] :: acc
       in
-      let add acc csl =
+      let add acc (_,csl) =
         let (cs,pjl) = List.hd csl in
         let ty = of_option cs.ls_value in
         let vs = create_vsymbol (id_fresh "v") ty in
         let get l = function Some p -> p::l | _ -> l in
         let pjl = List.fold_left get [] pjl in
         List.fold_left (add vs csl) acc pjl
-      in
-      let add acc (_,df) = match df with
-        | Tabstract      -> acc
-        | Talgebraic csl -> add acc csl
       in
       td :: List.rev (List.fold_left add [] dl)
   | _ -> [d]

@@ -38,8 +38,9 @@ val print_mod : formatter -> modul -> unit        (* module name *)
 val print_ity : formatter -> ity -> unit          (* individual type *)
 val print_pvty : formatter -> pvsymbol -> unit    (* variable : type *)
 
-val print_type_decl : formatter -> ity_decl -> unit
-val print_next_type_decl : formatter -> ity_decl -> unit
+val print_ty_decl : formatter -> itysymbol -> unit
+val print_data_decl : formatter -> data_decl -> unit
+val print_next_data_decl : formatter -> data_decl -> unit
 
 val print_pdecl : formatter -> pdecl -> unit
 

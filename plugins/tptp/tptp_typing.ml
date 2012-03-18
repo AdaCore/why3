@@ -584,16 +584,16 @@ let flush_impl ~strict env uc impl =
   in
   let update s e (env,uc) = match e with
     | SType ts ->
-        Mstr.add s e env, add_ty_decl uc [ts,Tabstract]
+        Mstr.add s e env, add_ty_decl uc ts
     | SFunc (_,_,_,ls) | SPred (_,_,_,ls) ->
-        Mstr.add s e env, add_logic_decl uc [ls,None]
+        Mstr.add s e env, add_param_decl uc ls
     | STVar tv when strict ->
         errorm ?loc:tv.tv_name.id_loc "Unbound type variable %s" s
     | SVar vs when strict ->
         errorm ?loc:vs.vs_name.id_loc "Unbound variable %s" s
     | STVar _ | SVar _ -> env,uc
     | Sdobj ls ->
-        let uc = add_logic_decl uc [ls,None] in
+        let uc = add_param_decl uc ls in
         let t = t_app ls [] ls.ls_value in
         let add _ s f = match s with
           | Sdobj fs -> t_and_simp f (t_neq (t_app fs [] fs.ls_value) t)

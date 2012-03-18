@@ -204,7 +204,7 @@ let rec split_intro pr dl acc f =
       let lls = List.map ls_of_var vsl in
       let add s vs ls = Mvs.add vs (fs_app ls [] vs.vs_ty) s in
       let f = t_subst (List.fold_left2 add Mvs.empty vsl lls) f in
-      let add dl ls = create_logic_decl [ls, None] :: dl in
+      let add dl ls = create_param_decl ls :: dl in
       let dl = List.fold_left add dl lls in
       split_intro pr dl acc f
   | _ ->

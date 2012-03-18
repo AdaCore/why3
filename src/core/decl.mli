@@ -30,17 +30,13 @@ open Term
 type constructor = lsymbol * lsymbol option list
 (** constructor symbol with the list of projections *)
 
-type ty_defn =
-  | Tabstract
-  | Talgebraic of constructor list
-
-type ty_decl = tysymbol * ty_defn
+type data_decl = tysymbol * constructor list
 
 (** {2 Logic symbols declaration} *)
 
 type ls_defn
 
-type logic_decl = lsymbol * ls_defn option
+type logic_decl = lsymbol * ls_defn
 
 val make_ls_defn : lsymbol -> vsymbol list -> term -> logic_decl
 
@@ -102,8 +98,10 @@ type decl = private {
 }
 
 and decl_node =
-  | Dtype  of ty_decl list      (* recursive types *)
-  | Dlogic of logic_decl list   (* recursive functions/predicates *)
+  | Dtype  of tysymbol          (* abstract types and aliases *)
+  | Ddata  of data_decl list    (* recursive algebraic types *)
+  | Dparam of lsymbol           (* abstract functions and predicates *)
+  | Dlogic of logic_decl list   (* recursive functions and predicates *)
   | Dind   of ind_decl list     (* inductive predicates *)
   | Dprop  of prop_decl         (* axiom / lemma / goal *)
 
@@ -116,7 +114,9 @@ val d_hash : decl -> int
 
 (** {2 Declaration constructors} *)
 
-val create_ty_decl : ty_decl list -> decl
+val create_ty_decl : tysymbol -> decl
+val create_data_decl : data_decl list -> decl
+val create_param_decl : lsymbol -> decl
 val create_logic_decl : logic_decl list -> decl
 val create_ind_decl : ind_decl list -> decl
 val create_prop_decl : prop_kind -> prsymbol -> term -> decl
@@ -175,7 +175,6 @@ exception RedeclaredIdent of ident
 exception NonExhaustiveCase of pattern list * term
 exception NonFoundedTypeDecl of tysymbol
 
-val find_type_definition : known_map -> tysymbol -> ty_defn
 val find_constructors : known_map -> tysymbol -> constructor list
 val find_inductive_cases : known_map -> lsymbol -> (prsymbol * term) list
 val find_logic_definition : known_map -> lsymbol -> ls_defn option

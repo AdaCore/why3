@@ -75,7 +75,9 @@ val add_meta : task -> meta -> meta_arg list -> task
 
 (** {2 declaration constructors + add_decl} *)
 
-val add_ty_decl : task -> ty_decl list -> task
+val add_ty_decl : task -> tysymbol -> task
+val add_data_decl : task -> data_decl list -> task
+val add_param_decl : task -> lsymbol -> task
 val add_logic_decl : task -> logic_decl list -> task
 val add_ind_decl : task -> ind_decl list -> task
 val add_prop_decl : task -> prop_kind -> prsymbol -> term -> task

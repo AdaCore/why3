@@ -151,7 +151,9 @@ let specialize_tysymbol loc p uc =
 
 (* lazy declaration of tuples *)
 
-let add_ty_decl uc dl = add_decl_with_tuples uc (create_ty_decl dl)
+let add_ty_decl uc ts = add_decl_with_tuples uc (create_ty_decl ts)
+let add_data_decl uc dl = add_decl_with_tuples uc (create_data_decl dl)
+let add_param_decl uc ls = add_decl_with_tuples uc (create_param_decl ls)
 let add_logic_decl uc dl = add_decl_with_tuples uc (create_logic_decl dl)
 let add_ind_decl uc dl = add_decl_with_tuples uc (create_ind_decl dl)
 let add_prop_decl uc k p f = add_decl_with_tuples uc (create_prop_decl k p f)
@@ -832,12 +834,19 @@ let add_types dl th =
       Hashtbl.add tysymbols x (Some ts);
       ts
   in
-  let tsl = List.rev_map (fun d -> visit d.td_ident.id, Tabstract) dl in
-  let th' = try add_ty_decl th tsl
+  let th' =
+    let add_ts (abstr,alias) d =
+      let ts = visit d.td_ident.id in
+      if ts.ts_def = None then ts::abstr, alias else abstr, ts::alias in
+    let abstr,alias = List.fold_left add_ts ([],[]) dl in
+    try
+      let th = List.fold_left add_ty_decl th abstr in
+      let th = List.fold_left add_ty_decl th alias in
+      th
     with ClashSymbol s -> error ~loc:(Mstr.find s def).td_loc (ClashSymbol s)
   in
   let csymbols = Hashtbl.create 17 in
-  let decl d =
+  let decl d (abstr,algeb,alias) =
     let ts, denv' = match Hashtbl.find tysymbols d.td_ident.id with
       | None ->
           assert false
@@ -851,9 +860,9 @@ let add_types dl th =
             ts.ts_args;
           ts, denv'
     in
-    let d = match d.td_def with
-      | TDabstract | TDalias _ ->
-          Tabstract
+    match d.td_def with
+      | TDabstract -> ts::abstr, algeb, alias
+      | TDalias _ -> abstr, algeb, ts::alias
       | TDalgebraic cl ->
           let ht = Hashtbl.create 17 in
           let ty = ty_app ts (List.map ty_var ts.ts_args) in
@@ -879,13 +888,16 @@ let add_types dl th =
             Hashtbl.replace csymbols id.id loc;
             create_fsymbol (create_user_id id) tyl ty, pjl
           in
-          Talgebraic (List.map constructor cl)
+          abstr, (ts, List.map constructor cl) :: algeb, alias
       | TDrecord _ ->
           assert false
-    in
-    ts, d
   in
-  try add_ty_decl th (List.map decl dl)
+  let abstr,algeb,alias = List.fold_right decl dl ([],[],[]) in
+  try
+    let th = List.fold_left add_ty_decl th abstr in
+    let th = if algeb = [] then th else add_data_decl th algeb in
+    let th = List.fold_left add_ty_decl th alias in
+    th
   with
     | ClashSymbol s ->
         error ~loc:(Hashtbl.find csymbols s) (ClashSymbol s)
@@ -935,18 +947,18 @@ let add_logics dl th =
       | None -> (* predicate *)
           let ps = create_psymbol v pl in
           Hashtbl.add psymbols id ps;
-          add_logic_decl th [ps, None]
+          add_param_decl th ps
       | Some t -> (* function *)
           let t = type_ty (None, t) in
           let fs = create_fsymbol v pl t in
           Hashtbl.add fsymbols id fs;
-          add_logic_decl th [fs, None]
+          add_param_decl th fs
     in
     Loc.try1 d.ld_loc add d
   in
   let th' = List.fold_left create_symbol th dl in
   (* 2. then type-check all definitions *)
-  let type_decl d =
+  let type_decl d (abst,defn) =
     let id = d.ld_ident.id in
     check_quant_linearity d.ld_params;
     let dadd_var denv (x, ty) = match x with
@@ -969,7 +981,7 @@ let add_logics dl th =
     | None -> (* predicate *)
         let ps = Hashtbl.find psymbols id in
         begin match d.ld_def with
-          | None -> ps,None
+          | None -> ps :: abst, defn
           | Some f ->
               let f = dfmla th' denv f in
               let vl = match ps.ls_value with
@@ -977,12 +989,12 @@ let add_logics dl th =
                 | _ -> assert false
               in
               let env = env_of_vsymbol_list vl in
-              make_ls_defn ps vl (fmla env f)
+              abst, make_ls_defn ps vl (fmla env f) :: defn
         end
     | Some ty -> (* function *)
         let fs = Hashtbl.find fsymbols id in
         begin match d.ld_def with
-          | None -> fs,None
+          | None -> fs :: abst, defn
           | Some t ->
               let loc = t.pp_loc in
               let ty = dty th' denv ty in
@@ -993,10 +1005,13 @@ let add_logics dl th =
                 | _ -> assert false
               in
               let env = env_of_vsymbol_list vl in
-              make_ls_defn fs vl (term env t)
+              abst, make_ls_defn fs vl (term env t) :: defn
         end
   in
-  add_logic_decl th (List.map type_decl dl)
+  let abst,defn = List.fold_right type_decl dl ([],[]) in
+  let th = List.fold_left add_param_decl th abst in
+  let th = if defn = [] then th else add_logic_decl th defn in
+  th
 
 let type_term uc denv env t =
   let t = dterm uc denv t in
@@ -1024,7 +1039,7 @@ let add_inductives dl th =
     let pl = List.map type_ty d.in_params in
     let ps = create_psymbol v pl in
     Hashtbl.add psymbols id ps;
-    Loc.try2 d.in_loc add_logic_decl th [ps, None]
+    Loc.try2 d.in_loc add_param_decl th ps
   in
   let th' = List.fold_left create_symbol th dl in
   (* 2. then type-check all definitions *)

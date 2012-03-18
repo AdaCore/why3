@@ -193,14 +193,15 @@ let print_enum_decl fmt ts csl =
   fprintf fmt "type %a =@ %a@\n@\n" print_ident ts.ts_name
     (print_list alt print_cs) csl
 
-let print_type_decl info fmt = function
-  | ts, Tabstract when Mid.mem ts.ts_name info.info_syn -> ()
-  | ts, Tabstract ->
-      fprintf fmt "%a@\n@\n" print_type_decl ts; forget_tvs ()
-  | ts, Talgebraic csl (* monomorphic enumeration *)
+let print_ty_decl info fmt ts =
+  if Mid.mem ts.ts_name info.info_syn then () else
+  (fprintf fmt "%a@\n@\n" print_type_decl ts; forget_tvs ())
+
+let print_data_decl info fmt = function
+  | ts, csl (* monomorphic enumeration *)
     when ts.ts_args = [] && List.for_all (fun (_,l) -> l = []) csl ->
       print_enum_decl fmt ts csl
-  | ts, Talgebraic [cs,_] (* non-recursive records *)
+  | ts, [cs,_] (* non-recursive records *)
     when Mls.mem cs info.info_csm ->
       let pjl = Mls.find cs info.info_csm in
       let print_field fmt ls =
@@ -208,34 +209,34 @@ let print_type_decl info fmt = function
           (print_type info) (Util.of_option ls.ls_value) in
       fprintf fmt "%a@ =@ {@ %a@ }@\n@\n" print_type_decl ts
         (print_list semi print_field) pjl
-  | _, Talgebraic _ -> unsupported
+  | _, _ -> unsupported
       "alt-ergo : algebraic datatype are not supported"
 
-let print_logic_decl info fmt ls = function
+let print_param_decl info fmt ls =
+  let sac = if Sls.mem ls info.info_ac then "ac " else "" in
+  fprintf fmt "@[<hov 2>logic %s%a : %a%s%a@]@\n@\n"
+    sac print_ident ls.ls_name
+    (print_list comma (print_type info)) ls.ls_args
+    (if ls.ls_args = [] then "" else " -> ")
+    (print_option_or_default "prop" (print_type info)) ls.ls_value
+
+let print_logic_decl info fmt ls ld =
+  let vl,e = open_ls_defn ld in
+  begin match e.t_ty with
+    | Some _ ->
+        (* TODO AC? *)
+        fprintf fmt "@[<hov 2>function %a(%a) : %a =@ %a@]@\n@\n"
+          print_ident ls.ls_name
+          (print_list comma (print_logic_binder info)) vl
+          (print_type info) (Util.of_option ls.ls_value)
+          (print_term info) e
     | None ->
-        let sac = if Sls.mem ls info.info_ac then "ac " else "" in
-        fprintf fmt "@[<hov 2>logic %s%a : %a%s%a@]@\n@\n"
-          sac print_ident ls.ls_name
-          (print_list comma (print_type info)) ls.ls_args
-          (if ls.ls_args = [] then "" else " -> ")
-          (print_option_or_default "prop" (print_type info)) ls.ls_value
-    | Some ld ->
-        let vl,e = open_ls_defn ld in
-        begin match e.t_ty with
-          | Some _ ->
-              (* TODO AC? *)
-              fprintf fmt "@[<hov 2>function %a(%a) : %a =@ %a@]@\n@\n"
-                print_ident ls.ls_name
-                (print_list comma (print_logic_binder info)) vl
-                (print_type info) (Util.of_option ls.ls_value)
-                (print_term info) e
-          | None ->
-              fprintf fmt "@[<hov 2>predicate %a(%a) =@ %a@]@\n@\n"
-                print_ident ls.ls_name
-                (print_list comma (print_logic_binder info)) vl
-                (print_fmla info) e
-        end;
-        List.iter forget_var vl
+        fprintf fmt "@[<hov 2>predicate %a(%a) =@ %a@]@\n@\n"
+          print_ident ls.ls_name
+          (print_list comma (print_logic_binder info)) vl
+          (print_fmla info) e
+  end;
+  List.iter forget_var vl
 
 let print_logic_decl info fmt (ls,ld) =
   if Mid.mem ls.ls_name info.info_syn || Sls.mem ls info.info_pjs
@@ -255,8 +256,12 @@ let print_prop_decl info fmt k pr f =
     then () else (print_prop_decl info fmt k pr f; forget_tvs ())
 
 let print_decl info fmt d = match d.d_node with
-  | Dtype dl ->
-      print_list nothing (print_type_decl info) fmt dl
+  | Dtype ts ->
+      print_ty_decl info fmt ts
+  | Ddata dl ->
+      print_list nothing (print_data_decl info) fmt dl
+  | Dparam ls ->
+      print_param_decl info fmt ls
   | Dlogic dl ->
       print_list nothing (print_logic_decl info) fmt dl
   | Dind _ -> unsupportedDecl d

@@ -67,7 +67,7 @@ let fold in_goal notdeft notdeff notls d (env, task) =
         decl_map (t_replace_all env) d
   in
   match d.d_node with
-    | Dlogic [ls,Some ld] when not (notls ls) ->
+    | Dlogic [ls,ld] when not (notls ls) ->
         let vl,e = open_ls_defn ld in
         let inline =
           not (TermTF.t_select notdeft notdeff e

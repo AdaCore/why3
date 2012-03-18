@@ -28,13 +28,9 @@ open Mlw_expr
 
 type ps_ls = private { ps : psymbol; ls : lsymbol }
 
-type pconstructor = ps_ls * ps_ls option list
+type constructor = ps_ls * ps_ls option list
 
-type ity_defn =
-  | ITabstract
-  | ITalgebraic of pconstructor list
-
-type ity_decl = itysymbol * ity_defn
+type data_decl = itysymbol * constructor list
 
 (** {2 Declaration type} *)
 
@@ -46,19 +42,18 @@ type pdecl = private {
 }
 
 and pdecl_node =
-  | PDtype of ity_decl list
+  | PDtype of itysymbol
+  | PDdata of data_decl list
 
 (** {2 Declaration constructors} *)
 
-type pre_pconstructor = preid * (pvsymbol * bool) list
+type pre_constructor = preid * (pvsymbol * bool) list
 
-type pre_ity_defn =
-  | PITabstract
-  | PITalgebraic of pre_pconstructor list
+type pre_data_decl = itysymbol * pre_constructor list
 
-type pre_ity_decl = itysymbol * pre_ity_defn
+val create_data_decl : pre_data_decl list -> pdecl
 
-val create_ity_decl : pre_ity_decl list -> pdecl
+val create_ty_decl : itysymbol -> pdecl
 
 (** {2 Known identifiers} *)
 
