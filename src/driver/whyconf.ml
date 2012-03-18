@@ -60,7 +60,7 @@ type prover =
     }
 
 let print_prover fmt p =
-  Format.fprintf fmt "%s(%s%s%s)"
+  Format.fprintf fmt "%s (%s%s%s)"
     p.prover_name p.prover_version
     (if p.prover_altern = "" then "" else " ") p.prover_altern
 

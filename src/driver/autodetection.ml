@@ -19,6 +19,7 @@
 
 open Format
 open Util
+open Ident
 open Whyconf
 open Rc
 
@@ -101,13 +102,13 @@ let make_command exec com =
 let sanitize_exec =
   let first c = match c with
     | '_' | ' ' -> "_"
-    | _ -> Ident.char_to_alpha c
+    | _ -> char_to_alpha c
   in
   let rest c = match c with
     | '+' | '-' | '.' -> String.make 1 c
-    | _ -> Ident.char_to_alnumus c
+    | _ -> char_to_alnumus c
   in
-  Ident.sanitizer first rest
+  sanitizer first rest
 
 let detect_exec main data com =
   let out = Filename.temp_file "out" "" in
@@ -215,6 +216,18 @@ let list_prover_ids () =
   let s = List.fold_left (fun s p -> Sstr.add p.prover_id s) Sstr.empty l in
   Sstr.elements s
 
+let get_altern id path =
+  let alt = Filename.basename path in
+  let ilen = String.length id in
+  let alen = String.length alt in
+  let rec get_suffix i =
+    if i = alen then "alt" else
+    if i = ilen then String.sub alt i (alen-i) else
+    if id.[i] = alt.[i] then get_suffix (i+1) else
+    String.sub alt i (alen-i)
+  in
+  get_suffix 0
+
 let add_prover_binary config id path =
   let main = get_main config in
   let l = read_auto_detection_data main in
@@ -225,4 +238,12 @@ let add_prover_binary config id path =
   with Not_found ->
     Loc.errorm "File %s does not correspond to the prover id %s" path id
   in
+  (* alternative name *)
+  let alt = get_altern id path in
+  let provers = get_provers config in
+  (* is a prover with this name and version already in config? *)
+  let p = if not (Mprover.mem p.prover provers) then p else
+    { p with prover = { p.prover with prover_altern = alt } } in
+  let alt = sanitizer char_to_alnumus char_to_alnumus alt in
+  let p = { p with id = p.id ^ "-" ^ alt } in
   set_provers config (Mprover.add p.prover p (get_provers config))
