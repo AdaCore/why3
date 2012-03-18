@@ -32,7 +32,7 @@ type data_decl = tysymbol * constructor list
 
 (** Logic declaration *)
 
-type ls_defn = lsymbol * term
+type ls_defn = lsymbol * term * int list
 
 type logic_decl = lsymbol * ls_defn
 
@@ -62,9 +62,9 @@ let make_ls_defn ls vl t =
   List.iter2 check_vl ls.ls_args vl;
   t_ty_check t ls.ls_value;
   (* return the definition *)
-  ls, (ls, fd)
+  ls, (ls, fd, [])
 
-let open_ls_defn (_,f) =
+let open_ls_defn (_,f,_) =
   let vl,_,f = match f.t_node with
     | Tquant (Tforall,b) -> t_open_quant b
     | _ -> [],[],f in
@@ -74,7 +74,7 @@ let open_ls_defn (_,f) =
     | _ -> assert false
 
 let open_ls_defn_cb ld =
-  let ls,_ = ld in
+  let ls,_,_ = ld in
   let vl,t = open_ls_defn ld in
   let close ls' vl' t' =
     if t_equal t t' && list_all2 vs_equal vl vl' && ls_equal ls ls'
@@ -82,7 +82,9 @@ let open_ls_defn_cb ld =
   in
   vl,t,close
 
-let ls_defn_axiom (_,f) = f
+let ls_defn_decrease (_,_,l) = l
+
+let ls_defn_axiom (_,f,_) = f
 
 let ls_defn_of_axiom f =
   let _,_,f = match f.t_node with
@@ -258,7 +260,8 @@ let check_termination ldl =
     let cl = build_call_list cgr ls in
     check_call_list ls cl
   in
-  Mls.mapi check syms
+  let res = Mls.mapi check syms in
+  List.map (fun (ls,(_,f,_)) -> (ls,(ls,f,Mls.find ls res))) ldl
 
 (** Inductive predicate declaration *)
 
@@ -323,7 +326,7 @@ module Hsdecl = Hashcons.Make (struct
   let eq_td (ts1,td1) (ts2,td2) =
     ts_equal ts1 ts2 && list_all2 cs_equal td1 td2
 
-  let eq_ld (ls1,(_,f1)) (ls2,(_,f2)) =
+  let eq_ld (ls1,(_,f1,_)) (ls2,(_,f2,_)) =
     ls_equal ls1 ls2 && t_equal f1 f2
 
   let eq_iax (pr1,fr1) (pr2,fr2) =
@@ -347,7 +350,7 @@ module Hsdecl = Hashcons.Make (struct
 
   let hs_td (ts,td) = Hashcons.combine_list cs_hash (ts_hash ts) td
 
-  let hs_ld (ls,(_,f)) = Hashcons.combine (ls_hash ls) (t_hash f)
+  let hs_ld (ls,(_,f,_)) = Hashcons.combine (ls_hash ls) (t_hash f)
 
   let hs_prop (pr,f) = Hashcons.combine (pr_hash pr) (t_hash f)
 
@@ -472,14 +475,14 @@ let create_param_decl ls =
 
 let create_logic_decl ldl =
   if ldl = [] then raise EmptyDecl;
-  let check_decl (syms,news) (ls,((s,_) as ld)) =
+  let check_decl (syms,news) (ls,((s,_,_) as ld)) =
     if not (ls_equal s ls) then raise (BadLogicDecl (ls, s));
     let _, e = open_ls_defn ld in
     let syms = List.fold_left syms_ty syms ls.ls_args in
     syms_term syms e, news_id news ls.ls_name
   in
   let (syms,news) = List.fold_left check_decl (Sid.empty,Sid.empty) ldl in
-  ignore (check_termination ldl);
+  let ldl = check_termination ldl in
   mk_decl (Dlogic ldl) syms news
 
 exception InvalidIndDecl of lsymbol * prsymbol

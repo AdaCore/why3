@@ -89,12 +89,10 @@ let elim_recursion d = match d.d_node with
   | Dlogic l when List.length l > 1 -> elim_decl true true l
   | _ -> [d]
 
-let is_struct dl =
-  try
-    Mls.for_all (fun _ il -> List.length il = 1) (check_termination dl)
-  with NoTerminationProof _ ->
-    false
+let is_struct dl = (* FIXME? Shouldn't 0 be allowed too? *)
+  List.for_all (fun (_,ld) -> List.length (ls_defn_decrease ld) = 1) dl
 
+(* FIXME? We can have non-recursive functions in a group *)
 let elim_non_struct_recursion d = match d.d_node with
   | Dlogic ((s,_) :: _ as dl)
     when Sid.mem s.ls_name d.d_syms && not (is_struct dl) ->

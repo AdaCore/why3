@@ -52,12 +52,14 @@ val ls_defn_of_axiom : term -> logic_decl option
     this to recursive definitions: it may successfully build a logic_decl,
     which will fail later because of non-assured termination *)
 
-val check_termination : logic_decl list -> (int list) Mls.t
-(** [check_termination ldl] returns a mapping of every logical
-    symbol defined in [ldl] to a list of its argument positions
+val ls_defn_decrease : ls_defn -> int list
+(** [ls_defn_decrease ld] returns a list of argument positions
     (numbered from 0) that ensures a lexicographical structural
     descent for every recursive call. Triggers are ignored.
-    @raise NoTerminationProof [ls] when no such list is found for [ls] *)
+
+    NOTE: This is only meaningful if the [ls_defn] comes
+    from a declaration; on the result of [make_ls_defn],
+    [ls_defn_decrease] will always return an empty list. *)
 
 (** {2 Inductive predicate declaration} *)
 

@@ -624,10 +624,10 @@ let print_logic_decl info fmt d =
   if not (Mid.mem (fst d).ls_name info.info_syn) then
     (print_logic_decl info fmt d; forget_tvs ())
 
-let print_recursive_decl info tm fmt (ls,ld) =
+let print_recursive_decl info fmt (ls,ld) =
   let _, _, all_ty_params = ls_ty_vars ls in
-  let il = try Mls.find ls tm with Not_found -> assert false in
-  let i = match il with [i] -> i | _ -> assert false in
+  let i = match Decl.ls_defn_decrease ld with
+    | [i] -> i | _ -> assert false in
   let vl,e = open_ls_defn ld in
   fprintf fmt "%a%a%a {struct %a}: %a :=@ %a@]"
     print_ls ls
@@ -639,13 +639,12 @@ let print_recursive_decl info tm fmt (ls,ld) =
   List.iter forget_var vl
 
 let print_recursive_decl info fmt dl =
-  let tm = check_termination dl in
   fprintf fmt "(* Why3 assumption *)@\nSet Implicit Arguments.@\n";
   print_list_delim
     ~start:(fun fmt () -> fprintf fmt "@[<hov 2>Fixpoint ")
     ~stop:(fun fmt () -> fprintf fmt ".@\n")
     ~sep:(fun fmt () -> fprintf fmt "@\n@[<hov 2>with ")
-    (fun fmt d -> print_recursive_decl info tm fmt d; forget_tvs ())
+    (fun fmt d -> print_recursive_decl info fmt d; forget_tvs ())
     fmt dl;
   fprintf fmt "Unset Implicit Arguments.@\n@\n"
 

@@ -688,10 +688,10 @@ let print_logic_decl ~old info fmt d =
   if not (Mid.mem (fst d).ls_name info.info_syn) then
     (print_logic_decl ~old info fmt d; forget_tvs ())
 
-let print_recursive_decl info tm fmt (ls,ld) =
+let print_recursive_decl info fmt (ls,ld) =
   let _, _, all_ty_params = ls_ty_vars ls in
-  let il = try Mls.find ls tm with Not_found -> assert false in
-  let i = match il with [i] -> i | _ -> assert false in
+  let i = match Decl.ls_defn_decrease ld with
+    | [i] -> i | _ -> assert false in
   let vl,e = open_ls_defn ld in
   fprintf fmt "@[<hov 2>%a%a(%a): RECURSIVE %a =@ %a@\n"
     print_ls ls print_params all_ty_params
@@ -703,15 +703,14 @@ let print_recursive_decl info tm fmt (ls,ld) =
   List.iter forget_var vl
 
 let print_recursive_decl info fmt dl =
-  let tm = check_termination dl in
   let d, dl = match dl with
     | [d] -> d, []
     | d :: dl -> d, dl (* PVS does not support mutual recursion *)
     | [] -> assert false
   in
   fprintf fmt "@[<hov 2>";
-  print_recursive_decl info tm fmt d; forget_tvs ();
-  List.iter (print_recursive_decl info tm fmt) dl;
+  print_recursive_decl info fmt d; forget_tvs ();
+  List.iter (print_recursive_decl info fmt) dl;
   fprintf fmt "@]@\n"
 
 let print_ind info fmt (pr,f) =
