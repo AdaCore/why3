@@ -479,11 +479,13 @@ and wp_desc env rm e q = match e.expr_desc with
       let q1 =
         try
           let r2 = match e2.expr_desc with
+            | Elogic ({ t_ty = None } as t) -> mk_t_if env t
             | Elogic t -> t
             | Elocal pv -> t_var pv.pv_pure
             | Eglobal { ps_kind = PSvar pv } -> t_var pv.pv_pure
             | _ -> raise Exit in
           let r3 = match e3.expr_desc with
+            | Elogic ({ t_ty = None } as t) -> mk_t_if env t
             | Elogic t -> t
             | Elocal pv -> t_var pv.pv_pure
             | Eglobal { ps_kind = PSvar pv } -> t_var pv.pv_pure
