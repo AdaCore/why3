@@ -39,9 +39,25 @@ let autoprovers = ref false
 let autoplugins = ref false
 let opt_version = ref false
 
+let opt_list_prover_ids = ref false
+
 let save = ref true
 
 let set_oref r = (fun s -> r := Some s)
+
+let prover_bins = Queue.create ()
+
+let add_prover arg =
+  let res =
+    try
+      let index = String.index arg ':' in
+      (String.sub arg 0 index),
+      (String.sub arg (index+1) (String.length arg - (index + 1)))
+    with Not_found ->
+      eprintf "Error: provide a path to the prover binary.@.";
+      exit 1
+  in
+  Queue.add res prover_bins
 
 let plugins = Queue.create ()
 let add_plugin x = Queue.add x plugins
@@ -61,8 +77,12 @@ let option_list = Arg.align [
   " Search for plugins in the default library directory";
   "--detect", Arg.Unit (fun () -> autoprovers := true; autoplugins := true),
   " Search for both provers and plugins";
+  "--add-prover", Arg.String add_prover,
+  "<id>:<file> Add a new prover executable";
+  "--list-prover-ids", Arg.Set opt_list_prover_ids,
+  " List known prover families";
   "--install-plugin", Arg.String add_plugin,
-  " Install a plugin to the actual libdir";
+  "<file> Install a plugin to the actual libdir";
   "--dont-save", Arg.Clear save,
   " Do not modify the config file";
   Debug.Opt.desc_debug_list;
@@ -73,6 +93,9 @@ let option_list = Arg.align [
 ]
 
 let anon_file _ = Arg.usage option_list usage_msg; exit 1
+
+let add_prover_binary config (id,file) =
+  Autodetection.add_prover_binary config id file
 
 let install_plugin main p =
   begin match Plugin.check_plugin p with
@@ -128,6 +151,13 @@ let main () =
   (** Debug flag *)
   Debug.Opt.set_flags_selected ();
 
+  if !opt_list_prover_ids then begin
+    opt_list := true;
+    printf "@[<hov 2>Known prover families:@\n%a@]@\n@."
+      (Pp.print_list Pp.newline Pp.string)
+      (List.sort String.compare (Autodetection.list_prover_ids ()))
+  end;
+
   opt_list :=  Debug.Opt.option_list () || !opt_list;
   if !opt_list then exit 0;
 
@@ -150,6 +180,9 @@ let main () =
      !datadir in *)
   let main = try Queue.fold install_plugin main plugins with Exit -> exit 1 in
   let config = set_main config main in
+  let config =
+    try Queue.fold add_prover_binary config prover_bins with Exit -> exit 1 in
+
   let conf_file = get_conf_file config in
   if not (Sys.file_exists conf_file) then begin
     autoprovers := true;

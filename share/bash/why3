@@ -77,6 +77,11 @@ _why3()
             _filedir
             return 0
             ;;
+        --add-prover)
+            ids=$($1 --list-prover-ids | grep -v '^Known \|^$' | sed -e 's/$/:/')
+            COMPREPLY=( $(compgen -W "$ids" -- "$cur") )
+            return 0
+            ;;
         -smoke-detector|--smoke-detector)
             COMPREPLY=( $( compgen -W 'none top deep' -- "$cur" ) )
             return 0
@@ -86,7 +91,6 @@ _why3()
             COMPREPLY=( $( compgen -W "$flags" -- "$cur" ) )
             return 0
             ;;
-# Why3session options
         --filter-prover)
             provers=$(${1/session/} --list-provers | grep -v '^Known ' | cut -d ' ' -f 3)
             COMPREPLY=( $( compgen -W "$provers" -- "$cur" ) )
