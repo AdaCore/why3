@@ -1,0 +1,130 @@
+# bash completion for Why3
+
+# To use this script you should have bash-completion package installed
+# Put it in /etc/bash_completion.d or just source it from your .bashrc
+
+_why3()
+{
+    local cur prev words cword split
+
+    if declare -F _init_completion > /dev/null ; then
+        _init_completion -n = || return
+    else
+        _get_comp_words_by_ref -n = cur prev words cword
+    fi
+
+    case "$prev" in
+        -T|--theory)
+            # this only completes the first '-T' option
+            # also, we cannot complete library theories
+            unset words[cword]
+            words[cword-1]="--print-namespace"
+            theories=$(${words[@]} 2>/dev/null | grep '^[^ ]' | cut -d '-' -f 1)
+            COMPREPLY=( $( compgen -W "$theories" -- "$cur" ) )
+            return 0
+            ;;
+        -G|--goal)
+            unset words[cword]
+            words[cword-1]="--print-namespace"
+            goals=$(${words[@]} 2>/dev/null | grep -- '-goal ' | sed -e 's/.*-goal //')
+            COMPREPLY=( $( compgen -W "$goals" -- "$cur" ) )
+            return 0
+            ;;
+        -C|--config|--extra-config)
+            _filedir
+            return 0
+            ;;
+        -L|--library|-I)
+            _filedir -d
+            return 0
+            ;;
+        -P|--prover)
+            provers=$($1 --list-provers | grep -v '^Known ' | cut -d ' ' -f 3)
+            COMPREPLY=( $( compgen -W "$provers" -- "$cur" ) )
+            return 0
+            ;;
+        -F|--format)
+            formats=$($1 --list-formats | grep -v '^Known ' | cut -d ' ' -f 3)
+            COMPREPLY=( $( compgen -W "$formats" -- "$cur" ) )
+            return 0
+            ;;
+        -t|--timelimit|-m|--memlimit)
+            return 0
+            ;;
+        -a|--apply-transform)
+            transforms=$($1 --list-transforms | grep -v '^Known ')
+            COMPREPLY=( $( compgen -W "$transforms" -- "$cur" ) )
+            return 0
+            ;;
+        -M|--meta)
+            metas=$($1 --list-metas | grep -v '^Known ' |
+                grep -v '\[\(function/predicate\|type\) symbol\]' |
+                grep -v '\[\(type\|proposition\|integer\)\]' |
+                grep -v '\] \[' | sed -e 's/(flag) //' |
+                sed -e 's/ \[string\]/=/')
+            COMPREPLY=( $(compgen -W "$metas" -- "$cur") )
+            return 0
+            ;;
+        -D|--driver)
+            _filedir
+            return 0
+            ;;
+        -o|--output)
+            _filedir -d
+            return 0
+            ;;
+        --install-plugin)
+            _filedir
+            return 0
+            ;;
+        --add-prover)
+            ids=$($1 --list-prover-ids | grep -v '^Known \|^$' | sed -e 's/$/:/')
+            COMPREPLY=( $(compgen -W "$ids" -- "$cur") )
+            return 0
+            ;;
+        -smoke-detector|--smoke-detector)
+            COMPREPLY=( $( compgen -W 'none top deep' -- "$cur" ) )
+            return 0
+            ;;
+        --debug)
+            flags=$($1 --list-debug-flags | grep -v '^Known ' | cut -d ' ' -f 3)
+            COMPREPLY=( $( compgen -W "$flags" -- "$cur" ) )
+            return 0
+            ;;
+        --filter-prover)
+            provers=$(${1/session/} --list-provers | grep -v '^Known ' | cut -d ' ' -f 3)
+            COMPREPLY=( $( compgen -W "$provers" -- "$cur" ) )
+            return 0
+            ;;
+        --filter-obsolete|--filter-archived|--filter-verified-goal|--filter-verified)
+            COMPREPLY=( $( compgen -W 'yes no all' -- "$cur" ) )
+            return 0
+            ;;
+        --style)
+            COMPREPLY=( $( compgen -W 'simple jstree' -- "$cur" ) )
+            return 0
+            ;;
+    esac
+
+    if [[ $cword -eq 1 && "$1" == *why3session* ]] ; then
+        cmds=$($1 --help 2>&1 | tail -n +4 | head -n -2 | cut -d ' ' -f 1)
+        COMPREPLY=( $( compgen -W "$cmds -v --version -h --help" -- "$cur" ) )
+        return 0
+    fi
+
+    _filedir
+
+    case "$cur" in
+        -*) help="--help" ; [[ "$1" == *why3session* ]] && help="${words[1]} --help"
+            COMPREPLY+=( $( compgen -W '$( _parse_help "$1" "$help" )' -- "$cur" ) )
+            return 0
+            ;;
+    esac
+
+} && complete -F _why3 \
+    why3 why3ml why3ide why3config why3doc why3replayer why3session \
+    why3.opt why3ml.opt why3ide.opt why3config.opt why3doc.opt \
+    why3replayer.opt why3session.opt \
+    why3.byte why3ml.byte why3ide.byte why3config.byte why3doc.byte \
+    why3replayer.byte why3session.byte
+

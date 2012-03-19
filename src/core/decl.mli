@@ -30,17 +30,13 @@ open Term
 type constructor = lsymbol * lsymbol option list
 (** constructor symbol with the list of projections *)
 
-type ty_defn =
-  | Tabstract
-  | Talgebraic of constructor list
-
-type ty_decl = tysymbol * ty_defn
+type data_decl = tysymbol * constructor list
 
 (** {2 Logic symbols declaration} *)
 
 type ls_defn
 
-type logic_decl = lsymbol * ls_defn option
+type logic_decl = lsymbol * ls_defn
 
 val make_ls_defn : lsymbol -> vsymbol list -> term -> logic_decl
 
@@ -56,12 +52,14 @@ val ls_defn_of_axiom : term -> logic_decl option
     this to recursive definitions: it may successfully build a logic_decl,
     which will fail later because of non-assured termination *)
 
-val check_termination : logic_decl list -> (int list) Mls.t
-(** [check_termination ldl] returns a mapping of every logical
-    symbol defined in [ldl] to a list of its argument positions
+val ls_defn_decrease : ls_defn -> int list
+(** [ls_defn_decrease ld] returns a list of argument positions
     (numbered from 0) that ensures a lexicographical structural
     descent for every recursive call. Triggers are ignored.
-    @raise NoTerminationProof [ls] when no such list is found for [ls] *)
+
+    NOTE: This is only meaningful if the [ls_defn] comes
+    from a declaration; on the result of [make_ls_defn],
+    [ls_defn_decrease] will always return an empty list. *)
 
 (** {2 Inductive predicate declaration} *)
 
@@ -102,8 +100,10 @@ type decl = private {
 }
 
 and decl_node =
-  | Dtype  of ty_decl list      (* recursive types *)
-  | Dlogic of logic_decl list   (* recursive functions/predicates *)
+  | Dtype  of tysymbol          (* abstract types and aliases *)
+  | Ddata  of data_decl list    (* recursive algebraic types *)
+  | Dparam of lsymbol           (* abstract functions and predicates *)
+  | Dlogic of logic_decl list   (* recursive functions and predicates *)
   | Dind   of ind_decl list     (* inductive predicates *)
   | Dprop  of prop_decl         (* axiom / lemma / goal *)
 
@@ -116,7 +116,9 @@ val d_hash : decl -> int
 
 (** {2 Declaration constructors} *)
 
-val create_ty_decl : ty_decl list -> decl
+val create_ty_decl : tysymbol -> decl
+val create_data_decl : data_decl list -> decl
+val create_param_decl : lsymbol -> decl
 val create_logic_decl : logic_decl list -> decl
 val create_ind_decl : ind_decl list -> decl
 val create_prop_decl : prop_kind -> prsymbol -> term -> decl
@@ -140,8 +142,8 @@ exception EmptyIndDecl of lsymbol
 
 exception BadConstructor of lsymbol
 exception BadRecordField of lsymbol
-exception RecordFieldMissing of lsymbol
-exception DuplicateRecordField of lsymbol
+exception RecordFieldMissing of lsymbol * lsymbol
+exception DuplicateRecordField of lsymbol * lsymbol
 
 (** {2 Utilities} *)
 
@@ -175,7 +177,6 @@ exception RedeclaredIdent of ident
 exception NonExhaustiveCase of pattern list * term
 exception NonFoundedTypeDecl of tysymbol
 
-val find_type_definition : known_map -> tysymbol -> ty_defn
 val find_constructors : known_map -> tysymbol -> constructor list
 val find_inductive_cases : known_map -> lsymbol -> (prsymbol * term) list
 val find_logic_definition : known_map -> lsymbol -> ls_defn option

@@ -21,6 +21,7 @@
 (*s Transformation which removes most hypothesis, only keeping the one
 a graph-based heuristic finds close enough to the goal *)
 
+open Why3
 open Util
 open Ident
 open Ty
@@ -548,7 +549,7 @@ module Select = struct
       This is the function directly used to filter axioms. *)
   let filter fTbl tTbl symTbl goal_clauses (gc,gp) decl =
     match decl.d_node with
-      | Dtype _ | Dlogic _ | Dind _ -> [decl]
+      | Dtype _ | Ddata _ | Dparam _ | Dlogic _ | Dind _ -> [decl]
       | Dprop (Paxiom,_,fmla) -> (* filter only axioms *)
           Format.eprintf "filter : @[%a@]@." Pretty.print_term fmla;
           let goal_exprs = goal_clauses in

@@ -36,6 +36,7 @@ val print_ts : formatter -> tysymbol -> unit      (* type symbol *)
 val print_ls : formatter -> lsymbol -> unit       (* logic symbol *)
 val print_cs : formatter -> lsymbol -> unit       (* constructor symbol *)
 val print_pr : formatter -> prsymbol -> unit      (* proposition name *)
+val print_th : formatter -> theory -> unit        (* theory name *)
 
 val print_ty : formatter -> ty -> unit            (* type *)
 val print_vsty : formatter -> vsymbol -> unit     (* variable : type *)
@@ -53,10 +54,12 @@ val print_pkind : formatter -> prop_kind -> unit
 val print_meta_arg : formatter -> meta_arg -> unit
 val print_meta_arg_type : formatter -> meta_arg_type -> unit
 
-val print_type_decl : formatter -> ty_decl -> unit
+val print_ty_decl : formatter -> tysymbol -> unit
+val print_data_decl : formatter -> data_decl -> unit
+val print_param_decl : formatter -> lsymbol -> unit
 val print_logic_decl : formatter -> logic_decl -> unit
 val print_ind_decl : formatter -> ind_decl -> unit
-val print_next_type_decl : formatter -> ty_decl -> unit
+val print_next_data_decl : formatter -> data_decl -> unit
 val print_next_logic_decl : formatter -> logic_decl -> unit
 val print_next_ind_decl : formatter -> ind_decl -> unit
 val print_prop_decl : formatter -> prop_decl -> unit

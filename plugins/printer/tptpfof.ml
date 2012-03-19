@@ -110,19 +110,13 @@ and print_fmla info fmt f = match f.t_node with
       "tptp : you must eliminate match"
   | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
 
-let print_logic_decl _ _ (_,ld) = match ld with
-  | None -> ()
-  | Some _ -> unsupported "Predicate and function definition aren't supported"
-
-let print_logic_decl info fmt d =
-  if Mid.mem (fst d).ls_name info.info_syn then
-    false else (print_logic_decl info fmt d; true)
-
 let print_decl info fmt d = match d.d_node with
-  | Dtype _ -> false
+  | Dtype _ | Dparam _ -> false
       (* print_list_opt newline (print_type_decl info) fmt dl *)
-  | Dlogic dl ->
-      print_list_opt newline (print_logic_decl info) fmt dl
+  | Ddata _ -> unsupportedDecl d
+      "Algebraic datatypes are not supported"
+  | Dlogic _ -> unsupportedDecl d
+      "Predicate and function definition aren't supported"
   | Dind _ -> unsupportedDecl d
       "tptp : inductive definition are not supported"
   | Dprop (Paxiom, pr, _) when Mid.mem pr.pr_name info.info_syn -> false

@@ -28,17 +28,13 @@ open Term
 type constructor = lsymbol * lsymbol option list
 (** constructor symbol with the list of projections *)
 
-type ty_defn =
-  | Tabstract
-  | Talgebraic of constructor list
-
-type ty_decl = tysymbol * ty_defn
+type data_decl = tysymbol * constructor list
 
 (** Logic declaration *)
 
-type ls_defn = lsymbol * term
+type ls_defn = lsymbol * term * int list
 
-type logic_decl = lsymbol * ls_defn option
+type logic_decl = lsymbol * ls_defn
 
 exception UnboundVar of vsymbol
 
@@ -66,9 +62,9 @@ let make_ls_defn ls vl t =
   List.iter2 check_vl ls.ls_args vl;
   t_ty_check t ls.ls_value;
   (* return the definition *)
-  ls, Some (ls, fd)
+  ls, (ls, fd, [])
 
-let open_ls_defn (_,f) =
+let open_ls_defn (_,f,_) =
   let vl,_,f = match f.t_node with
     | Tquant (Tforall,b) -> t_open_quant b
     | _ -> [],[],f in
@@ -78,15 +74,17 @@ let open_ls_defn (_,f) =
     | _ -> assert false
 
 let open_ls_defn_cb ld =
-  let ls,_ = ld in
+  let ls,_,_ = ld in
   let vl,t = open_ls_defn ld in
   let close ls' vl' t' =
     if t_equal t t' && list_all2 vs_equal vl vl' && ls_equal ls ls'
-    then ls, Some ld else make_ls_defn ls' vl' t'
+    then ls,ld else make_ls_defn ls' vl' t'
   in
   vl,t,close
 
-let ls_defn_axiom (_,f) = f
+let ls_defn_decrease (_,_,l) = l
+
+let ls_defn_axiom (_,f,_) = f
 
 let ls_defn_of_axiom f =
   let _,_,f = match f.t_node with
@@ -255,17 +253,15 @@ let check_call_list ls cl =
 
 let check_termination ldl =
   let cgr = Hls.create 5 in
-  let add acc (ls,ld) = match ld with
-    | Some ld -> Mls.add ls (open_ls_defn ld) acc
-    | None -> acc
-  in
+  let add acc (ls,ld) = Mls.add ls (open_ls_defn ld) acc in
   let syms = List.fold_left add Mls.empty ldl in
   Mls.iter (build_call_graph cgr syms) syms;
   let check ls _ =
     let cl = build_call_list cgr ls in
     check_call_list ls cl
   in
-  Mls.mapi check syms
+  let res = Mls.mapi check syms in
+  List.map (fun (ls,(_,f,_)) -> (ls,(ls,f,Mls.find ls res))) ldl
 
 (** Inductive predicate declaration *)
 
@@ -311,8 +307,10 @@ type decl = {
 }
 
 and decl_node =
-  | Dtype  of ty_decl list      (* recursive types *)
-  | Dlogic of logic_decl list   (* recursive functions/predicates *)
+  | Dtype  of tysymbol          (* abstract types and aliases *)
+  | Ddata  of data_decl list    (* recursive algebraic types *)
+  | Dparam of lsymbol           (* abstract functions and predicates *)
+  | Dlogic of logic_decl list   (* recursive functions and predicates *)
   | Dind   of ind_decl list     (* inductive predicates *)
   | Dprop  of prop_decl         (* axiom / lemma / goal *)
 
@@ -325,15 +323,11 @@ module Hsdecl = Hashcons.Make (struct
   let cs_equal (cs1,pl1) (cs2,pl2) =
     ls_equal cs1 cs2 && list_all2 (option_eq ls_equal) pl1 pl2
 
-  let eq_td (ts1,td1) (ts2,td2) = ts_equal ts1 ts2 && match td1,td2 with
-    | Tabstract, Tabstract -> true
-    | Talgebraic l1, Talgebraic l2 -> list_all2 cs_equal l1 l2
-    | _ -> false
+  let eq_td (ts1,td1) (ts2,td2) =
+    ts_equal ts1 ts2 && list_all2 cs_equal td1 td2
 
-  let eq_ld (ls1,ld1) (ls2,ld2) = ls_equal ls1 ls2 && match ld1,ld2 with
-    | Some (_,f1), Some (_,f2) -> t_equal f1 f2
-    | None, None -> true
-    | _ -> false
+  let eq_ld (ls1,(_,f1,_)) (ls2,(_,f2,_)) =
+    ls_equal ls1 ls2 && t_equal f1 f2
 
   let eq_iax (pr1,fr1) (pr2,fr2) =
     pr_equal pr1 pr2 && t_equal fr1 fr2
@@ -342,7 +336,9 @@ module Hsdecl = Hashcons.Make (struct
     ls_equal ps1 ps2 && list_all2 eq_iax al1 al2
 
   let equal d1 d2 = match d1.d_node, d2.d_node with
-    | Dtype  l1, Dtype  l2 -> list_all2 eq_td l1 l2
+    | Dtype  s1, Dtype  s2 -> ts_equal s1 s2
+    | Ddata  l1, Ddata  l2 -> list_all2 eq_td l1 l2
+    | Dparam s1, Dparam s2 -> ls_equal s1 s2
     | Dlogic l1, Dlogic l2 -> list_all2 eq_ld l1 l2
     | Dind   l1, Dind   l2 -> list_all2 eq_ind l1 l2
     | Dprop (k1,pr1,f1), Dprop (k2,pr2,f2) ->
@@ -352,12 +348,9 @@ module Hsdecl = Hashcons.Make (struct
   let cs_hash (cs,pl) =
     Hashcons.combine_list (Hashcons.combine_option ls_hash) (ls_hash cs) pl
 
-  let hs_td (ts,td) = match td with
-    | Tabstract -> ts_hash ts
-    | Talgebraic l -> 1 + Hashcons.combine_list cs_hash (ts_hash ts) l
+  let hs_td (ts,td) = Hashcons.combine_list cs_hash (ts_hash ts) td
 
-  let hs_ld (ls,ld) = Hashcons.combine (ls_hash ls)
-    (Hashcons.combine_option (fun (_,f) -> t_hash f) ld)
+  let hs_ld (ls,(_,f,_)) = Hashcons.combine (ls_hash ls) (t_hash f)
 
   let hs_prop (pr,f) = Hashcons.combine (pr_hash pr) (t_hash f)
 
@@ -367,7 +360,9 @@ module Hsdecl = Hashcons.Make (struct
     | Plemma -> 11 | Paxiom -> 13 | Pgoal  -> 17 | Pskip  -> 19
 
   let hash d = match d.d_node with
-    | Dtype  l -> Hashcons.combine_list hs_td 3 l
+    | Dtype  s -> ts_hash s
+    | Ddata  l -> Hashcons.combine_list hs_td 3 l
+    | Dparam s -> ls_hash s
     | Dlogic l -> Hashcons.combine_list hs_ld 5 l
     | Dind   l -> Hashcons.combine_list hs_ind 7 l
     | Dprop (k,pr,f) -> Hashcons.combine (hs_kind k) (hs_prop (pr,f))
@@ -404,8 +399,8 @@ exception BadLogicDecl of lsymbol * lsymbol
 exception BadConstructor of lsymbol
 
 exception BadRecordField of lsymbol
-exception RecordFieldMissing of lsymbol
-exception DuplicateRecordField of lsymbol
+exception RecordFieldMissing of lsymbol * lsymbol
+exception DuplicateRecordField of lsymbol * lsymbol
 
 exception EmptyDecl
 exception EmptyAlgDecl of tysymbol
@@ -421,25 +416,30 @@ let syms_ls s ls = Sid.add ls.ls_name s
 let syms_ty s ty = ty_s_fold syms_ts s ty
 let syms_term s t = t_s_fold syms_ty syms_ls s t
 
-let create_ty_decl tdl =
+let create_ty_decl ts =
+  let syms = Util.option_fold syms_ty Sid.empty ts.ts_def in
+  let news = Sid.singleton ts.ts_name in
+  mk_decl (Dtype ts) syms news
+
+let create_data_decl tdl =
   if tdl = [] then raise EmptyDecl;
   let add s (ts,_) = Sts.add ts s in
   let tss = List.fold_left add Sts.empty tdl in
-  let check_proj tyv s tya ls = match ls with
+  let check_proj cs tyv s tya ls = match ls with
     | None -> s
     | Some ({ ls_args = [ptyv]; ls_value = Some ptya } as ls) ->
         ty_equal_check tyv ptyv;
         ty_equal_check tya ptya;
-        Sls.add_new (DuplicateRecordField ls) ls s
+        Sls.add_new (DuplicateRecordField (cs,ls)) ls s
     | Some ls -> raise (BadRecordField ls)
   in
   let check_constr tys ty pjs (syms,news) (fs,pl) =
     ty_equal_check ty (exn_option (BadConstructor fs) fs.ls_value);
     let fs_pjs =
-      try List.fold_left2 (check_proj ty) Sls.empty fs.ls_args pl
+      try List.fold_left2 (check_proj fs ty) Sls.empty fs.ls_args pl
       with Invalid_argument _ -> raise (BadConstructor fs) in
     if not (Sls.equal pjs fs_pjs) then
-      raise (RecordFieldMissing (Sls.choose (Sls.diff pjs fs_pjs)));
+      raise (RecordFieldMissing (fs, Sls.choose (Sls.diff pjs fs_pjs)));
     let vs = ty_freevars Stv.empty ty in
     let rec check seen ty = match ty.ty_node with
       | Tyvar v when Stv.mem v vs -> ()
@@ -454,39 +454,35 @@ let create_ty_decl tdl =
     let syms = List.fold_left syms_ty syms fs.ls_args in
     syms, news_id news fs.ls_name
   in
-  let check_decl (syms,news) (ts,td) = match td with
-    | Tabstract ->
-        let syms = option_apply syms (syms_ty syms) ts.ts_def in
-        syms, news_id news ts.ts_name
-    | Talgebraic cl ->
-        if cl = [] then raise (EmptyAlgDecl ts);
-        if ts.ts_def <> None then raise (IllegalTypeAlias ts);
-        let news = news_id news ts.ts_name in
-        let pjs = List.fold_left (fun s (_,pl) -> List.fold_left
-          (option_fold (fun s ls -> Sls.add ls s)) s pl) Sls.empty cl in
-        let news = Sls.fold (fun pj s -> news_id s pj.ls_name) pjs news in
-        let ty = ty_app ts (List.map ty_var ts.ts_args) in
-        List.fold_left (check_constr ts ty pjs) (syms,news) cl
+  let check_decl (syms,news) (ts,cl) =
+    if cl = [] then raise (EmptyAlgDecl ts);
+    if ts.ts_def <> None then raise (IllegalTypeAlias ts);
+    let news = news_id news ts.ts_name in
+    let pjs = List.fold_left (fun s (_,pl) -> List.fold_left
+      (option_fold (fun s ls -> Sls.add ls s)) s pl) Sls.empty cl in
+    let news = Sls.fold (fun pj s -> news_id s pj.ls_name) pjs news in
+    let ty = ty_app ts (List.map ty_var ts.ts_args) in
+    List.fold_left (check_constr ts ty pjs) (syms,news) cl
   in
   let (syms,news) = List.fold_left check_decl (Sid.empty,Sid.empty) tdl in
-  mk_decl (Dtype tdl) syms news
+  mk_decl (Ddata tdl) syms news
+
+let create_param_decl ls =
+  let syms = Util.option_fold syms_ty Sid.empty ls.ls_value in
+  let syms = List.fold_left syms_ty syms ls.ls_args in
+  let news = Sid.singleton ls.ls_name in
+  mk_decl (Dparam ls) syms news
 
 let create_logic_decl ldl =
   if ldl = [] then raise EmptyDecl;
-  let check_decl (syms,news) (ls,ld) = match ld with
-    | Some (s,_) when not (ls_equal s ls) ->
-        raise (BadLogicDecl (ls, s))
-    | Some ld ->
-        let _, e = open_ls_defn ld in
-        let syms = List.fold_left syms_ty syms ls.ls_args in
-        syms_term syms e, news_id news ls.ls_name
-    | None ->
-        let syms = option_apply syms (syms_ty syms) ls.ls_value in
-        let syms = List.fold_left syms_ty syms ls.ls_args in
-        syms, news_id news ls.ls_name
+  let check_decl (syms,news) (ls,((s,_,_) as ld)) =
+    if not (ls_equal s ls) then raise (BadLogicDecl (ls, s));
+    let _, e = open_ls_defn ld in
+    let syms = List.fold_left syms_ty syms ls.ls_args in
+    syms_term syms e, news_id news ls.ls_name
   in
   let (syms,news) = List.fold_left check_decl (Sid.empty,Sid.empty) ldl in
-  ignore (check_termination ldl);
+  let ldl = check_termination ldl in
   mk_decl (Dlogic ldl) syms news
 
 exception InvalidIndDecl of lsymbol * prsymbol
@@ -550,13 +546,11 @@ let create_prop_decl k p f =
 (** Utilities *)
 
 let decl_map fn d = match d.d_node with
-  | Dtype _ -> d
+  | Dtype _ | Ddata _ | Dparam _ -> d
   | Dlogic l ->
-      let fn = function
-        | ls, Some ld ->
-            let vl,e,close = open_ls_defn_cb ld in
-            close ls vl (fn e)
-        | ld -> ld
+      let fn (ls,ld) =
+        let vl,e,close = open_ls_defn_cb ld in
+        close ls vl (fn e)
       in
       create_logic_decl (List.map fn l)
   | Dind l ->
@@ -567,13 +561,11 @@ let decl_map fn d = match d.d_node with
       create_prop_decl k pr (fn f)
 
 let decl_fold fn acc d = match d.d_node with
-  | Dtype _ -> acc
+  | Dtype _ | Ddata _ | Dparam _ -> acc
   | Dlogic l ->
-      let fn acc = function
-        | _, Some ld ->
-            let _,e = open_ls_defn ld in
-            fn acc e
-        | _ -> acc
+      let fn acc (_,ld) =
+        let _,e = open_ls_defn ld in
+        fn acc e
       in
       List.fold_left fn acc l
   | Dind l ->
@@ -589,14 +581,12 @@ let list_rpair_map_fold fn =
   Util.map_fold_left fn
 
 let decl_map_fold fn acc d = match d.d_node with
-  | Dtype _ -> acc, d
+  | Dtype _ | Ddata _ | Dparam _ -> acc, d
   | Dlogic l ->
-      let fn acc = function
-        | ls, Some ld ->
-            let vl,e,close = open_ls_defn_cb ld in
-            let acc,e = fn acc e in
-            acc, close ls vl e
-        | ld -> acc, ld
+      let fn acc (ls,ld) =
+        let vl,e,close = open_ls_defn_cb ld in
+        let acc,e = fn acc e in
+        acc, close ls vl e
       in
       let acc,l = Util.map_fold_left fn acc l in
       acc, create_logic_decl l
@@ -643,15 +633,11 @@ let known_add_decl kn0 decl =
   if Sid.is_empty unk then kn
   else raise (UnknownIdent (Sid.choose unk))
 
-let find_type_definition kn ts =
-  match (Mid.find ts.ts_name kn).d_node with
-  | Dtype dl -> List.assq ts dl
-  | _ -> assert false
-
 let find_constructors kn ts =
-  match find_type_definition kn ts with
-  | Talgebraic cl -> cl
-  | Tabstract -> []
+  match (Mid.find ts.ts_name kn).d_node with
+  | Dtype _ -> []
+  | Ddata dl -> List.assq ts dl
+  | _ -> assert false
 
 let find_inductive_cases kn ps =
   match (Mid.find ps.ls_name kn).d_node with
@@ -662,9 +648,8 @@ let find_inductive_cases kn ps =
 
 let find_logic_definition kn ls =
   match (Mid.find ls.ls_name kn).d_node with
-  | Dlogic dl -> List.assq ls dl
-  | Dind _ -> None
-  | Dtype _ -> None
+  | Dlogic dl -> Some (List.assq ls dl)
+  | Dparam _ | Dind _ | Dtype _ -> None
   | _ -> assert false
 
 let find_prop kn pr =
@@ -698,7 +683,7 @@ let check_match kn d = decl_fold (check_matchT kn) () d
 
 exception NonFoundedTypeDecl of tysymbol
 
-let rec check_foundness kn d =
+let check_foundness kn d =
   let rec check_ts tss tvs ts =
     (* recursive data type, abandon *)
     if Sts.mem ts tss then false else
@@ -724,7 +709,7 @@ let rec check_foundness kn d =
         check_ts tss tvs ts
   in
   match d.d_node with
-  | Dtype tdl ->
+  | Ddata tdl ->
       let check () (ts,_) =
         if check_ts Sts.empty Stv.empty ts
         then () else raise (NonFoundedTypeDecl ts)
@@ -737,10 +722,10 @@ let rec ts_extract_pos kn sts ts =
   if ts_equal ts ts_func then [false;true] else
   if ts_equal ts ts_pred then [false] else
   if Sts.mem ts sts then List.map Util.ttrue ts.ts_args else
-  match find_type_definition kn ts with
-    | Tabstract ->
+  match find_constructors kn ts with
+    | [] ->
         List.map Util.ffalse ts.ts_args
-    | Talgebraic csl ->
+    | csl ->
         let sts = Sts.add ts sts in
         let rec get_ty stv ty = match ty.ty_node with
           | Tyvar _ -> stv
@@ -754,7 +739,7 @@ let rec ts_extract_pos kn sts ts =
         List.map (fun v -> not (Stv.mem v negs)) ts.ts_args
 
 let check_positivity kn d = match d.d_node with
-  | Dtype tdl ->
+  | Ddata tdl ->
       let add s (ts,_) = Sts.add ts s in
       let tss = List.fold_left add Sts.empty tdl in
       let check_constr tys (cs,_) =
@@ -770,10 +755,7 @@ let check_positivity kn d = match d.d_node with
         in
         List.iter check_ty cs.ls_args
       in
-      let check_decl (ts,td) = match td with
-        | Tabstract -> ()
-        | Talgebraic cl -> List.iter (check_constr ts) cl
-      in
+      let check_decl (ts,cl) = List.iter (check_constr ts) cl in
       List.iter check_decl tdl
   | _ -> ()
 
@@ -801,12 +783,12 @@ let parse_record kn fll =
   let pjs = List.fold_left (fun s pj -> Sls.add pj s) Sls.empty pjl in
   let flm = List.fold_left (fun m (pj,v) ->
     if not (Sls.mem pj pjs) then raise (BadRecordField pj) else
-    Mls.add_new (DuplicateRecordField pj) pj v m) Mls.empty fll in
+    Mls.add_new (DuplicateRecordField (cs,pj)) pj v m) Mls.empty fll in
   cs,pjl,flm
 
 let make_record kn fll ty =
   let cs,pjl,flm = parse_record kn fll in
-  let get_arg pj = Mls.find_exn (RecordFieldMissing pj) pj flm in
+  let get_arg pj = Mls.find_exn (RecordFieldMissing (cs,pj)) pj flm in
   fs_app cs (List.map get_arg pjl) ty
 
 let make_record_update kn t fll ty =

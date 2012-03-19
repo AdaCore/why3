@@ -399,8 +399,8 @@ if test "$enable_coq_plugin" = yes -a "$CAMLP5O" = no; then
 fi
 
 # coq-plugin currently disabled
-enable_coq_plugin=no
-reason_coq_plugin=" (not yet implemented)"
+dnl enable_coq_plugin=no
+dnl reason_coq_plugin=" (not yet implemented)"
 
 if test "$enable_coq_libs" = yes; then
    AC_CHECK_PROG(COQDEP,coqdep,coqdep,no)

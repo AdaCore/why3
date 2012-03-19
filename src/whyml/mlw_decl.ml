@@ -28,13 +28,9 @@ open Mlw_expr
 
 type ps_ls = { ps : psymbol; ls : lsymbol }
 
-type pconstructor = ps_ls * ps_ls option list
+type constructor = ps_ls * ps_ls option list
 
-type ity_defn =
-  | ITabstract
-  | ITalgebraic of pconstructor list
-
-type ity_decl = itysymbol * ity_defn
+type data_decl = itysymbol * constructor list
 
 type pdecl = {
   pd_node : pdecl_node;
@@ -44,7 +40,8 @@ type pdecl = {
 }
 
 and pdecl_node =
-  | PDtype of ity_decl list
+  | PDtype of itysymbol
+  | PDdata of data_decl list
 
 let pd_equal : pdecl -> pdecl -> bool = (==)
 
@@ -69,23 +66,24 @@ let syms_ity s ity = ity_s_fold syms_its syms_ts s ity
 
 (** {2 Declaration constructors} *)
 
-exception BadConstructor of psymbol
-exception BadRecordField of psymbol
+let create_ty_decl its =
+  let syms = Util.option_fold syms_ity Sid.empty its.its_def in
+  let news = news_id Sid.empty its.its_pure.ts_name in
+  mk_decl (PDtype its) syms news
 
-type pre_pconstructor = preid * (pvsymbol * bool) list
+type pre_constructor = preid * (pvsymbol * bool) list
 
-type pre_ity_defn =
-  | PITabstract
-  | PITalgebraic of pre_pconstructor list
+type pre_data_decl = itysymbol * pre_constructor list
 
-type pre_ity_decl = itysymbol * pre_ity_defn
+exception ConstantConstructor of ident
 
-let create_ity_decl tdl =
+let create_data_decl tdl =
   let syms = ref Sid.empty in
   let add s (its,_) = news_id s its.its_pure.ts_name in
   let news = ref (List.fold_left add Sid.empty tdl) in
   let projections = Hvs.create 17 in (* vs -> ps_ls *)
   let build_constructor its (id, al) =
+    if al = [] then raise (ConstantConstructor (id_register id));
     (* check well-formedness *)
     let tvs = List.fold_right Stv.add its.its_args Stv.empty in
     let regs = List.fold_right Sreg.add its.its_regs Sreg.empty in
@@ -103,25 +101,25 @@ let create_ity_decl tdl =
     let result = create_pvsymbol (id_fresh "result") ity in
     let ty_args = List.map (fun (pv, _) -> pv.pv_vs.vs_ty) al in
     let ls = create_fsymbol id ty_args (ty_of_ity ity) in
-    let t = t_app ls (List.map (fun (pv,_) -> t_var pv.pv_vs) al) ls.ls_value in
-    let post = t_equ (t_var result.pv_vs) t in
-    let add_erase ef r = eff_union ef (eff_erase r) in
-    let add_erase ef (pv,_) = option_fold add_erase ef pv.pv_mutable in
+    let tl = List.map (fun (pv,_) -> t_var pv.pv_vs) al in
+    let post = t_equ (t_var result.pv_vs) (t_app ls tl ls.ls_value) in
+    let add_erase ef (pv,_) = option_fold eff_reset ef pv.pv_mutable in
     let effect = List.fold_left add_erase eff_empty al in
-    let c = create_cty ~post ~effect (vty_value result) in
-    let arrow (pv,_) c = create_cty (vty_arrow pv c) in
-    let v = (List.fold_right arrow al c).c_vty in
+    let al, (a, _) = Util.chop_last al in
+    let c = vty_arrow a ~post ~effect (vty_value result) in
+    let arrow (pv,_) c = vty_arrow pv c in
+    let v = List.fold_right arrow al c in
     let ps = create_psymbol id Stv.empty Sreg.empty v in
     let ps_ls = { ps = ps; ls = ls } in
     news := Sid.add ps.p_name !news;
     (* build the projections, if any *)
-    let build_proj pv id =
+    let build_proj pv =
+      let id = id_clone pv.pv_vs.vs_name in
       let ls = create_fsymbol id [result.pv_vs.vs_ty] pv.pv_vs.vs_ty in
       let t = fs_app ls [t_var result.pv_vs] pv.pv_vs.vs_ty in
       let post = t_equ (t_var pv.pv_vs) t in
-      let add_read ef r = eff_union ef (eff_read r) in
-      let effect = option_fold add_read eff_empty pv.pv_mutable in
-      let vty = vty_arrow result (create_cty ~post ~effect (vty_value pv)) in
+      let effect = option_fold eff_read eff_empty pv.pv_mutable in
+      let vty = vty_arrow result ~post ~effect (vty_value pv) in
       let ps = create_psymbol id Stv.empty Sreg.empty vty in
       let ps_ls = { ps = ps; ls = ls } in
       news := Sid.add ps.p_name !news;
@@ -129,20 +127,18 @@ let create_ity_decl tdl =
       ps_ls
     in
     let build_proj pv =
-      try Hvs.find projections pv.pv_vs with Not_found -> build_proj pv id in
+      try Hvs.find projections pv.pv_vs with Not_found -> build_proj pv in
     let build_proj (pv, pj) =
       syms := ity_s_fold syms_its syms_ts !syms pv.pv_ity;
       if pj then Some (build_proj pv) else None in
     ps_ls, List.map build_proj al
   in
-  let build_type (its, defn) = its, match defn with
-    | PITabstract -> ITabstract
-    | PITalgebraic cl ->
-        Hvs.clear projections;
-        ITalgebraic (List.map (build_constructor its) cl)
+  let build_type (its, cl) =
+    Hvs.clear projections;
+    its, List.map (build_constructor its) cl
   in
   let tdl = List.map build_type tdl in
-  mk_decl (PDtype tdl) !syms !news
+  mk_decl (PDdata tdl) !syms !news
 
 
 (** {2 Known identifiers} *)

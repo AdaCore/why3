@@ -263,7 +263,7 @@ and print_tnode opl opr info fmt t = match t.t_node with
         (print_vsty info) v (print_opl_fmla info) f;
       forget_var v
   | Tapp (fs,[]) when is_fs_tuple fs ->
-      fprintf fmt "tt" 
+      fprintf fmt "tt"
   | Tapp (fs,pl) when is_fs_tuple fs ->
       fprintf fmt "%a" (print_paren_r (print_term info)) pl
   | Tapp (fs, tl) ->
@@ -462,7 +462,8 @@ let read_old_script =
       if Str.string_match axm s 0 then
         (let name = Str.matched_group 2 s in sc := Axiom name :: !sc;
         skip_to_empty := true) else
-      if s = "(* Why3 goal *)" then sc := read_old_proof ch :: !sc else
+      if s = "(* Why3 goal *)" then
+        (sc := read_old_proof ch :: !sc; skip_to_empty := true) else
       if s = "(* YOU MAY EDIT THE CONTEXT BELOW *)" then
         (sc := read_deprecated_script ch true; raise End_of_file) else
       if s = "(* YOU MAY EDIT THE PROOF BELOW *)" then
@@ -530,13 +531,11 @@ let print_previous_proof def fmt previous =
   | Some (Other _) ->
     assert false
 
-let print_type_decl ~old info fmt (ts,def) =
+let print_type_decl ~old info fmt ts =
   if is_ts_tuple ts then () else
   let name = id_unique iprinter ts.ts_name in
   let prev = output_till_statement fmt old name in
-  match def with
-  | Tabstract ->
-    begin match ts.ts_def with
+  match ts.ts_def with
     | None ->
       if info.realization then
         match prev with
@@ -553,21 +552,27 @@ let print_type_decl ~old info fmt (ts,def) =
       fprintf fmt "(* Why3 assumption *)@\n@[<hov 2>Definition %s %a :=@ %a.@]@\n@\n"
         name (print_list space print_tv_binder) ts.ts_args
         (print_ty info) ty
-    end
-  | Talgebraic csl ->
-    fprintf fmt "(* Why3 assumption *)@\n@[<hov 2>Inductive %s %a :=@\n@[<hov>%a@].@]@\n"
-      name (print_list space print_tv_binder) ts.ts_args
-      (print_list newline (print_constr info ts)) csl;
-    List.iter
-      (fun (cs,_) ->
-        let ty_vars_args, ty_vars_value, all_ty_params = ls_ty_vars cs in
-        print_implicits fmt cs ty_vars_args ty_vars_value all_ty_params)
-      csl;
-    fprintf fmt "@\n"
 
-let print_type_decl ~old info fmt d =
+let print_type_decl ~old info fmt ts =
+  if not (Mid.mem ts.ts_name info.info_syn) then
+    (print_type_decl ~old info fmt ts; forget_tvs ())
+
+let print_data_decl info fmt (ts,csl) =
+  if is_ts_tuple ts then () else
+  let name = id_unique iprinter ts.ts_name in
+  fprintf fmt "(* Why3 assumption *)@\n@[<hov 2>Inductive %s %a :=@\n@[<hov>%a@].@]@\n"
+    name (print_list space print_tv_binder) ts.ts_args
+    (print_list newline (print_constr info ts)) csl;
+  List.iter
+    (fun (cs,_) ->
+      let ty_vars_args, ty_vars_value, all_ty_params = ls_ty_vars cs in
+      print_implicits fmt cs ty_vars_args ty_vars_value all_ty_params)
+    csl;
+  fprintf fmt "@\n"
+
+let print_data_decl info fmt d =
   if not (Mid.mem (fst d).ts_name info.info_syn) then
-    (print_type_decl ~old info fmt d; forget_tvs ())
+    (print_data_decl info fmt d; forget_tvs ())
 
 let print_ls_type ?(arrow=false) info fmt ls =
   if arrow then fprintf fmt " ->@ ";
@@ -575,23 +580,12 @@ let print_ls_type ?(arrow=false) info fmt ls =
   | None -> fprintf fmt "Prop"
   | Some ty -> print_ty info fmt ty
 
-let print_logic_decl ~old info fmt (ls,ld) =
+let print_param_decl ~old info fmt ls =
   let ty_vars_args, ty_vars_value, all_ty_params = ls_ty_vars ls in
   let name = id_unique iprinter ls.ls_name in
   let prev = output_till_statement fmt old name in
-  begin match ld with
-      | Some ld ->
-          let vl,e = open_ls_defn ld in
-          fprintf fmt "(* Why3 assumption *)@\n@[<hov 2>Definition %a%a%a: %a :=@ %a.@]@\n"
-            print_ls ls
-            print_ne_params all_ty_params
-            (print_space_list (print_vsty info)) vl
-            (print_ls_type info) ls.ls_value
-            (print_expr info) e;
-          List.iter forget_var vl
-  | None ->
-    if info.realization then
-      match prev with
+  begin if info.realization then
+    match prev with
       | Some (Query (_,Notation,c)) ->
         fprintf fmt "(* Why3 goal *)@\n%s" c
       | _ ->
@@ -609,37 +603,48 @@ let print_logic_decl ~old info fmt (ls,ld) =
   print_implicits fmt ls ty_vars_args ty_vars_value all_ty_params;
   fprintf fmt "@\n"
 
-let print_logic_decl ~old info fmt d =
-  if not (Mid.mem (fst d).ls_name info.info_syn) then
-    (print_logic_decl ~old info fmt d; forget_tvs ())
+let print_param_decl ~old info fmt ls =
+  if not (Mid.mem ls.ls_name info.info_syn) then
+    (print_param_decl ~old info fmt ls; forget_tvs ())
 
-let print_recursive_decl info tm fmt (ls,ld) =
+let print_logic_decl info fmt (ls,ld) =
+  let ty_vars_args, ty_vars_value, all_ty_params = ls_ty_vars ls in
+  let vl,e = open_ls_defn ld in
+  fprintf fmt "(* Why3 assumption *)@\n@[<hov 2>Definition %a%a%a: %a :=@ %a.@]@\n"
+    print_ls ls
+    print_ne_params all_ty_params
+    (print_space_list (print_vsty info)) vl
+    (print_ls_type info) ls.ls_value
+    (print_expr info) e;
+  List.iter forget_var vl;
+  print_implicits fmt ls ty_vars_args ty_vars_value all_ty_params;
+  fprintf fmt "@\n"
+
+let print_logic_decl info fmt d =
+  if not (Mid.mem (fst d).ls_name info.info_syn) then
+    (print_logic_decl info fmt d; forget_tvs ())
+
+let print_recursive_decl info fmt (ls,ld) =
   let _, _, all_ty_params = ls_ty_vars ls in
-  let il = try Mls.find ls tm with Not_found -> assert false in
-  let i = match il with [i] -> i | _ -> assert false in
-  begin match ld with
-    | Some ld ->
-        let vl,e = open_ls_defn ld in
-        fprintf fmt "%a%a%a {struct %a}: %a :=@ %a@]"
-          print_ls ls
-          print_ne_params all_ty_params
-          (print_space_list (print_vsty info)) vl
-          print_vs (List.nth vl i)
-          (print_ls_type info) ls.ls_value
-          (print_expr info) e;
-        List.iter forget_var vl
-    | None ->
-        assert false
-  end
+  let i = match Decl.ls_defn_decrease ld with
+    | [i] -> i | _ -> assert false in
+  let vl,e = open_ls_defn ld in
+  fprintf fmt "%a%a%a {struct %a}: %a :=@ %a@]"
+    print_ls ls
+    print_ne_params all_ty_params
+    (print_space_list (print_vsty info)) vl
+    print_vs (List.nth vl i)
+    (print_ls_type info) ls.ls_value
+    (print_expr info) e;
+  List.iter forget_var vl
 
 let print_recursive_decl info fmt dl =
-  let tm = check_termination dl in
   fprintf fmt "(* Why3 assumption *)@\nSet Implicit Arguments.@\n";
   print_list_delim
     ~start:(fun fmt () -> fprintf fmt "@[<hov 2>Fixpoint ")
     ~stop:(fun fmt () -> fprintf fmt ".@\n")
     ~sep:(fun fmt () -> fprintf fmt "@\n@[<hov 2>with ")
-    (fun fmt d -> print_recursive_decl info tm fmt d; forget_tvs ())
+    (fun fmt d -> print_recursive_decl info fmt d; forget_tvs ())
     fmt dl;
   fprintf fmt "Unset Implicit Arguments.@\n@\n"
 
@@ -681,13 +686,17 @@ let print_prop_decl ~old info fmt (k,pr,f) =
   forget_tvs ()
 
 let print_decl ~old info fmt d = match d.d_node with
-  | Dtype tl  ->
-      print_list nothing (print_type_decl ~old info) fmt tl
+  | Dtype ts ->
+      print_type_decl ~old info fmt ts
+  | Ddata tl ->
+      print_list nothing (print_data_decl info) fmt tl
+  | Dparam ls ->
+      print_param_decl ~old info fmt ls
   | Dlogic [s,_ as ld] when not (Sid.mem s.ls_name d.d_syms) ->
-      print_logic_decl ~old info fmt ld
+      print_logic_decl info fmt ld
   | Dlogic ll ->
       print_recursive_decl info fmt ll
-  | Dind il   ->
+  | Dind il ->
       print_list nothing (print_ind_decl info) fmt il
   | Dprop (_,pr,_) when Mid.mem pr.pr_name info.info_syn ->
       ()

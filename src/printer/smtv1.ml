@@ -29,12 +29,6 @@ open Theory
 open Task
 open Printer
 
-(** Options of this printer *)
-let use_trigger = Theory.register_meta_excl "Smt : trigger" []
-let use_builtin_array = Theory.register_meta_excl "Smt : builtin array" []
-
-(** *)
-
 let ident_printer =
   let bls = ["and";"benchmark";"distinct";"exists";"false";"flet";"forall";
      "if then else";"iff";"implies";"ite";"let";"logic";"not";"or";
@@ -58,7 +52,6 @@ let print_var fmt {vs_name = id} =
 
 type info = {
   info_syn : syntax_map;
-  use_trigger : bool;
 }
 
 let rec print_type info fmt ty = match ty.ty_node with
@@ -173,40 +166,36 @@ and print_triggers info fmt tl = print_list comma (print_expr info) fmt tl
 let print_logic_binder info fmt v =
   fprintf fmt "%a: %a" print_ident v.vs_name (print_type info) v.vs_ty
 
-let print_type_decl info fmt = function
-  | ts, Tabstract when Mid.mem ts.ts_name info.info_syn -> false
-  | ts, Tabstract when ts.ts_args = [] ->
-      fprintf fmt ":extrasorts (%a)" print_ident ts.ts_name; true
-  | _, Tabstract -> unsupported
-          "smtv1 : type with argument are not supported"
-  | _, Talgebraic _ -> unsupported
-          "smtv1 : algebraic type are not supported"
+let print_type_decl info fmt ts =
+  if Mid.mem ts.ts_name info.info_syn then false else
+  if ts.ts_args = [] then
+    (fprintf fmt ":extrasorts (%a)" print_ident ts.ts_name; true)
+  else unsupported "smtv1 : type with argument are not supported"
 
-let print_logic_decl info fmt (ls,ld) = match ld with
+let print_param_decl info fmt ls = match ls.ls_value with
   | None ->
-      begin match ls.ls_value with
-        | None ->
-            fprintf fmt "@[<hov 2>:extrapreds ((%a %a))@]@\n"
-              print_ident ls.ls_name
-              (print_list space (print_type info)) ls.ls_args
-        | Some value ->
-            fprintf fmt "@[<hov 2>:extrafuns ((%a %a %a))@]@\n"
-              print_ident ls.ls_name
-              (print_list space (print_type info)) ls.ls_args
-              (print_type info) value
-      end
-  | Some _ -> unsupported
-      "Predicate and function definition aren't supported"
+      fprintf fmt "@[<hov 2>:extrapreds ((%a %a))@]@\n"
+        print_ident ls.ls_name
+        (print_list space (print_type info)) ls.ls_args
+  | Some value ->
+      fprintf fmt "@[<hov 2>:extrafuns ((%a %a %a))@]@\n"
+        print_ident ls.ls_name
+        (print_list space (print_type info)) ls.ls_args
+        (print_type info) value
 
-let print_logic_decl info fmt d =
-  if Mid.mem (fst d).ls_name info.info_syn then
-    false else (print_logic_decl info fmt d; true)
+let print_param_decl info fmt ls =
+  if Mid.mem ls.ls_name info.info_syn then
+    false else (print_param_decl info fmt ls; true)
 
 let print_decl info fmt d = match d.d_node with
-  | Dtype dl ->
-      print_list_opt newline (print_type_decl info) fmt dl
-  | Dlogic dl ->
-      print_list_opt newline (print_logic_decl info) fmt dl
+  | Dtype ts ->
+      print_type_decl info fmt ts
+  | Ddata _ -> unsupported
+          "smtv1 : algebraic type are not supported"
+  | Dparam ls ->
+      print_param_decl info fmt ls
+  | Dlogic _ -> unsupported
+      "Predicate and function definition aren't supported"
   | Dind _ -> unsupportedDecl d
       "smt : inductive definition are not supported"
   | Dprop (Paxiom, pr, _) when Mid.mem pr.pr_name info.info_syn -> false
@@ -234,7 +223,6 @@ let print_task pr thpr fmt task =
   print_th_prelude task fmt thpr;
   let info = {
     info_syn = get_syntax_map task;
-    use_trigger = false;
   }
   in
   let decls = Task.task_decls task in

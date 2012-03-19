@@ -19,20 +19,14 @@
 
 open Format
 open Why3
-module C = Whyconf
+open Why3session_lib
 
-let files = Queue.create ()
-let opt_version = ref false
 let output_dir = ref ""
-let allow_obsolete = ref true
-let opt_config = ref None
 let opt_context = ref false
 
-type style =
-  | Simple
-  | Jstree
+type style = Simple | Jstree
 
-let opt_style = ref Jstree
+let opt_style = ref Simple
 
 let set_opt_style = function
   | "simple" -> opt_style := Simple
@@ -48,45 +42,32 @@ let set_opt_pp_in,set_opt_pp_cmd,set_opt_pp_out =
   (fun s -> cmd := s),
   (fun s -> opt_pp := (!suf,(!cmd,s))::!opt_pp)
 
-let spec = Arg.align [
-  ("-v",
-   Arg.Set opt_version,
-   " Print version information") ;
+let spec =
   ("-o",
    Arg.Set_string output_dir,
-   " The directory to output the files ('-' for stdout)");
-  ("--strict",
-   Arg.Clear allow_obsolete,
-   " Forbid obsolete session");
-  "-C", Arg.String (fun s -> opt_config := Some s),
-      "<file> Read configuration from <file>";
-  "--config", Arg.String (fun s -> opt_config := Some s),
-      " Same as -C";
-  "--context", Arg.Set opt_context,
-  " Add context around the generated code in order to allow direct \
+   " The directory to output the files ('-' for stdout)") ::
+  ("--context", Arg.Set opt_context,
+   " Add context around the generated code in order to allow direct \
     visualisation (header, css, ...). It also add in the directory \
-    all the needed external file. It can't be set with stdout output";
-  "--style", Arg.Symbol (["simple";"jstree"], set_opt_style),
-  " Set the style to use. 'simple' use only 'ul' and 'il' tag. 'jstree' use \
-    the 'jstree' plugin of the javascript library 'jquery'.";
-  "--add_pp", Arg.Tuple
+    all the needed external file. It can't be set with stdout output") ::
+  ("--style", Arg.Symbol (["simple";"jstree"], set_opt_style),
+   " Set the style to use. 'simple' use only 'ul' and 'il' tag. 'jstree' use \
+    the 'jstree' plugin of the javascript library 'jquery'.") ::
+  ("--add_pp", Arg.Tuple
     [Arg.String set_opt_pp_in;
      Arg.String set_opt_pp_cmd;
      Arg.String set_opt_pp_out],
   "<suffix> <cmd> <out_suffix> \
 Add for the given prefix the given pretty-printer, \
 the new file as the given out_suffix. cmd must contain '%i' which will be \
-replace by the input file and '%o' which will be replaced by the output file.";
-    "--coqdoc",
-  Arg.Unit (fun ()->
+replace by the input file and '%o' which will be replaced by the output file.") ::
+  ("--coqdoc",
+   Arg.Unit (fun ()->
     opt_pp := (".v",("coqdoc --no-index --html -o %o %i",".html"))::!opt_pp),
-  " same as '--add_pp .v \"coqdoc --no-index --html -o %o %i\" .html'";
-    Debug.Opt.desc_debug_list;
-    Debug.Opt.desc_debug_all;
-    Debug.Opt.desc_debug;
-]
+  " same as '--add_pp .v \"coqdoc --no-index --html -o %o %i\" .html'") ::
+  simple_spec
 
-
+(*
 let version_msg = sprintf
   "Why3 html session output, version %s (build date: %s)"
   Config.version Config.builddate
@@ -104,19 +85,23 @@ let () =
     printf "%s@." version_msg;
     exit 0
   end
+*)
 
 (* let () = *)
 (*   List.iter (fun (in_,(cmd,out)) -> *)
 (*     printf "in : %s, cmd : %s, out : %s@." in_ cmd out) !opt_pp *)
 
+(*
 let () =
   Debug.Opt.set_flags_selected ();
   if  Debug.Opt.option_list () then exit 0
+*)
 
+(*
 let output_dir =
   match !output_dir with
-    | "" -> printf
-      "Error: output_dir must be set@.";
+   | "" ->
+      printf "Error: output_dir must be set@.";
       exit 1
     | "-" when !opt_context ->
       printf
@@ -127,6 +112,7 @@ let output_dir =
 let edited_dst = Filename.concat output_dir "edited"
 
 let whyconf = Whyconf.read_config !opt_config
+  *)
 
 open Session
 open Util
@@ -136,12 +122,17 @@ type context =
      (formatter -> notask session -> unit) -> notask session
      -> unit, formatter, unit) format
 
-let run_file (context : context) print_session f =
-  let session_path = get_project_dir f in
-  let basename = Filename.basename session_path in
-  let session = read_session session_path in
-  let cout = if output_dir = "-" then stdout else
-      open_out (Filename.concat output_dir (basename^".html")) in
+let run_file (context : context) print_session fname =
+  let project_dir = Session.get_project_dir fname in
+  let session = Session.read_session project_dir in
+  let output_dir =
+    if !output_dir = "" then project_dir else !output_dir
+  in
+  let basename = Filename.basename project_dir in
+  let cout =
+    if output_dir = "-" then stdout else
+      open_out (Filename.concat output_dir (basename^".html"))
+  in
   let fmt = formatter_of_out_channel cout in
   if !opt_context
   then fprintf fmt context basename (print_session basename) session
@@ -210,10 +201,11 @@ PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"
 </html>
 "
 
-  let run_files () =
-  Queue.iter (run_file context print_session) files
+  let run_one = run_file context print_session
 
 end
+
+(*
 
 module Jstree =
 struct
@@ -337,7 +329,7 @@ close all
 </div>
 <script type=\"text/javascript\" class=\"source\">
 $(function () {
-  $(\"#%s_session\").jstree({ 
+  $(\"#%s_session\").jstree({
       \"types\" : {
 	   \"types\" : {
 	   \"file\" : {
@@ -415,9 +407,35 @@ $(function () {
       Sysutil.copy_dir js_dir_src js_dir_dst
 
 end
+*)
 
 
-let () =
+let run_one fname =
   match !opt_style with
-    | Simple -> Simple.run_files ()
-    | Jstree -> Jstree.run_files ()
+    | Simple -> Simple.run_one fname
+    | Jstree ->
+      eprintf "style jstree not yet available@.";
+      exit 1
+      (* Jstree.run_files () *)
+
+open Why3session_lib
+
+let run () =
+  let should_exit1 = read_simple_spec () in
+  if should_exit1 then exit 1;
+  iter_files run_one
+
+
+let cmd =
+  { cmd_spec = spec;
+    cmd_desc = "output session in HTML format.";
+    cmd_name = "html";
+    cmd_run  = run;
+  }
+
+
+(*
+Local Variables:
+compile-command: "unset LANG; make -C ../.. bin/why3session.byte"
+End:
+*)

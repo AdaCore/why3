@@ -28,17 +28,21 @@ let cmds =
     Why3session_copy.cmd_archive;
     Why3session_info.cmd;
     Why3session_rm.cmd;
+    Why3session_latex.cmd;
+    Why3session_html.cmd;
   |]
 
-let usage = "why3session cmd [opts]"
+let exec_name = Sys.argv.(0)
 
 let print_usage () =
   let maxl = Array.fold_left
     (fun acc e -> max acc (String.length e.cmd_name)) 0 cmds in
-  eprintf "%s@.@.command:@.@[<hov>%a@]@."
-    usage (Pp.print_iter1 Array.iter Pp.newline
-             (fun fmt e -> fprintf fmt "%s   @[<hov>%s@]"
-               (Util.padd_string ' ' e.cmd_name maxl) e.cmd_desc)) cmds;
+  eprintf "%s <command> [options]@.@.available commands:@.@[<hov>%a@]@\n@."
+    exec_name 
+    (Pp.print_iter1 Array.iter Pp.newline
+       (fun fmt e -> fprintf fmt "%s   @[<hov>%s@]"
+         (Util.padd_string ' ' e.cmd_name maxl) e.cmd_desc)) cmds;
+  eprintf "detailed command options: %s <command> -help@." exec_name;
   exit 1
 
 
@@ -60,6 +64,6 @@ let () =
     with M.Found cmd -> cmd
   in
   incr Arg.current;
-  let cmd_usage = sprintf "why3session %s [opts]:" cmd_name in
+  let cmd_usage = sprintf "%s %s [options]:" Sys.argv.(0) cmd_name in
   Arg.parse (Arg.align cmd.cmd_spec) anon_fun cmd_usage;
   cmd.cmd_run ()

@@ -39,6 +39,7 @@ type undone_proof =
                       has never been scheduled*)
     | Running (** external proof attempt is in progress *)
     | Unedited (** unedited but editable *)
+    | JustEdited (** edited by not run yet *)
 
 (** State of a proof *)
 type proof_attempt_status =

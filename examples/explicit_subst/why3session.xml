@@ -1,892 +1,908 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
 <why3session
- name="explicit_subst/why3session.xml">
+ name="./explicit_subst/why3session.xml">
  <prover
-  id="alt-ergo"
+  id="0"
   name="Alt-Ergo"
   version="0.94"/>
  <prover
-  id="coq"
-  name="Coq"
-  version="8.3pl3"/>
- <prover
-  id="cvc3-2.2"
+  id="1"
   name="CVC3"
   version="2.2"/>
  <prover
-  id="cvc3-2.4"
+  id="2"
   name="CVC3"
   version="2.4.1"/>
  <prover
-  id="eprover"
+  id="3"
   name="Eprover"
   version="1.4"/>
  <prover
-  id="gappa"
-  name="Gappa"
-  version="0.15.1"/>
- <prover
-  id="simplify"
-  name="Simplify"
-  version="1.5.4"/>
- <prover
-  id="spass"
+  id="4"
   name="Spass"
   version="3.7"/>
  <prover
-  id="vampire"
+  id="5"
   name="Vampire"
   version="0.6"/>
  <prover
-  id="verit"
-  name="veriT"
-  version="dev"/>
- <prover
-  id="yices"
-  name="Yices"
-  version="1.0.25"/>
- <prover
-  id="z3-2"
+  id="6"
   name="Z3"
   version="2.19"/>
  <prover
-  id="z3-3"
+  id="7"
   name="Z3"
   version="3.2"/>
  <file
   name="../explicit_subst.why"
   verified="true"
-  expanded="true">
+  expanded="false">
   <theory
    name="LambdaCalc"
+   locfile="./explicit_subst/../explicit_subst.why"
+   loclnum="7" loccnumb="7" loccnume="17"
    verified="true"
    expanded="true">
   </theory>
   <theory
    name="Example"
+   locfile="./explicit_subst/../explicit_subst.why"
+   loclnum="65" loccnumb="7" loccnume="14"
    verified="true"
    expanded="true">
    <goal
     name="G1"
-    sum="24b2f3277d56c08e93bdb2d62d76db3d"
+    locfile="./explicit_subst/../explicit_subst.why"
+    loclnum="75" loccnumb="7" loccnume="9"
+    sum="137a5691a495d488639102d1f7692edd"
     proved="true"
     expanded="true"
     shape="ainfix =aappaLambdaaVaraZeroaaaa">
     <proof
-     prover="z3-2"
+     prover="6"
      timelimit="5"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="z3-3"
+     prover="4"
      timelimit="5"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="alt-ergo"
+     prover="0"
      timelimit="5"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="cvc3-2.2"
+     prover="1"
      timelimit="5"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="eprover"
+     prover="2"
      timelimit="5"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="cvc3-2.4"
+     prover="7"
      timelimit="5"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="vampire"
+     prover="5"
      timelimit="5"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="spass"
+     prover="3"
      timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.01"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
     name="G2"
-    sum="a67cc0a78fa1e9caee25d21e7afbcc8f"
+    locfile="./explicit_subst/../explicit_subst.why"
+    loclnum="81" loccnumb="7" loccnume="9"
+    sum="f33cbcd65c12ee1fb3249be04cf813cf"
     proved="true"
     expanded="true"
     shape="ainfix =aappaLambdaaVaraZeroaaab">
     <proof
-     prover="z3-2"
+     prover="6"
      timelimit="5"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="z3-3"
+     prover="4"
      timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.02"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="2.22"/>
     </proof>
     <proof
-     prover="alt-ergo"
+     prover="0"
      timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="13.37"/>
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="10.05"/>
     </proof>
     <proof
-     prover="cvc3-2.2"
+     prover="1"
      timelimit="5"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.10"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.13"/>
     </proof>
     <proof
-     prover="eprover"
+     prover="7"
      timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="1.40"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="cvc3-2.4"
+     prover="5"
      timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.16"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="2.10"/>
     </proof>
     <proof
-     prover="vampire"
+     prover="3"
      timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="2.23"/>
-    </proof>
-    <proof
-     prover="spass"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="2.53"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="1.14"/>
     </proof>
    </goal>
    <goal
     name="G5b"
-    sum="fb95438f5c3a6ce5c6be158b383e5720"
+    locfile="./explicit_subst/../explicit_subst.why"
+    loclnum="85" loccnumb="7" loccnume="10"
+    sum="24d8f3d46544b3c101fcfdd045627645"
     proved="true"
     expanded="true"
     shape="LaLambdaasubstaVaraSaZeroaSaZeroaaLaLambdaaaainfix =V0V1">
     <proof
-     prover="z3-2"
+     prover="6"
      timelimit="5"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="z3-3"
+     prover="4"
      timelimit="5"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="alt-ergo"
+     prover="0"
      timelimit="5"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="cvc3-2.2"
+     prover="1"
      timelimit="5"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="eprover"
+     prover="2"
      timelimit="5"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="cvc3-2.4"
+     prover="7"
      timelimit="5"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="vampire"
+     prover="5"
      timelimit="5"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="spass"
+     prover="3"
      timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.01"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
     name="G5c"
-    sum="c660be8adb396e6fb4f7691d1e2bd98a"
+    locfile="./explicit_subst/../explicit_subst.why"
+    loclnum="90" loccnumb="7" loccnume="10"
+    sum="873d4513281800c074e10dc2bfc64730"
     proved="true"
     expanded="true"
     shape="LasubstaLambdaaVaraSaZeroaZeroaaLaLambdaaaainfix =V0V1">
     <proof
-     prover="z3-2"
+     prover="6"
      timelimit="5"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="z3-3"
+     prover="4"
      timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="alt-ergo"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="6.86"/>
-    </proof>
-    <proof
-     prover="cvc3-2.2"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="eprover"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="cvc3-2.4"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="vampire"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="spass"
-     timelimit="5"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.06"/>
+    </proof>
+    <proof
+     prover="0"
+     timelimit="5"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.02"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="5"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="5"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="G5"
-    sum="76da7b7af086ff9fe0fba0720ec2d0d9"
+    locfile="./explicit_subst/../explicit_subst.why"
+    loclnum="95" loccnumb="7" loccnume="9"
+    sum="07419a7d25509b969ad4d9a5be17e551"
     proved="true"
     expanded="true"
     shape="LaLambdaaLambdaaVaraSaZeroLaLambdaaaainfix =aappV0aaV1">
     <proof
-     prover="z3-2"
+     prover="6"
      timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="z3-3"
-     timelimit="5"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="alt-ergo"
+     prover="4"
      timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="5.75"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.05"/>
     </proof>
     <proof
-     prover="cvc3-2.2"
+     prover="0"
      timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.22"/>
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.02"/>
     </proof>
     <proof
-     prover="eprover"
+     prover="1"
      timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.06"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.20"/>
     </proof>
     <proof
-     prover="cvc3-2.4"
+     prover="2"
      timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.34"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.26"/>
     </proof>
     <proof
-     prover="vampire"
+     prover="7"
      timelimit="5"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="5"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="spass"
+     prover="3"
      timelimit="5"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.06"/>
     </proof>
    </goal>
    <goal
     name="G3"
-    sum="da480e8ef1622e8f0baef1a2282626f5"
+    locfile="./explicit_subst/../explicit_subst.why"
+    loclnum="100" loccnumb="7" loccnume="9"
+    sum="0012eb4de0a62ca30f115a44d74865a3"
     proved="true"
     expanded="true"
     shape="LaLambdaaLambdaaappaVaraZeroaVaraSaZeroainfix =aappaappV0aaaidaa">
     <proof
-     prover="z3-2"
+     prover="6"
      timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.05"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.04"/>
     </proof>
     <proof
-     prover="z3-3"
+     prover="4"
+     timelimit="8"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="3.68"/>
+    </proof>
+    <proof
+     prover="0"
      timelimit="5"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="1.10"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.02"/>
+    </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.03"/>
     </proof>
     <proof
-     prover="alt-ergo"
+     prover="5"
      timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="unknown" time="1.24"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="2.37"/>
     </proof>
     <proof
-     prover="eprover"
+     prover="3"
      timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.24"/>
-    </proof>
-    <proof
-     prover="cvc3-2.4"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="5.95"/>
-    </proof>
-    <proof
-     prover="vampire"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="2.56"/>
-    </proof>
-    <proof
-     prover="spass"
-     timelimit="8"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="4.19"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.22"/>
     </proof>
    </goal>
    <goal
     name="G4"
-    sum="d6ae53c3e2361d23b4f615974d614d12"
+    locfile="./explicit_subst/../explicit_subst.why"
+    loclnum="104" loccnumb="7" loccnume="9"
+    sum="b9c367f95a4495be77064c26471458da"
     proved="true"
     expanded="true"
     shape="LaLambdaaLambdaaappaVaraZeroaVaraSaZeroLaLambdaaappaVaraZeroaaainfix =aappV0aaV1">
     <proof
-     prover="z3-2"
+     prover="6"
      timelimit="5"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="z3-3"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="alt-ergo"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="unknown" time="1.03"/>
-    </proof>
-    <proof
-     prover="cvc3-2.2"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="5.02"/>
-    </proof>
-    <proof
-     prover="eprover"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.25"/>
-    </proof>
-    <proof
-     prover="cvc3-2.4"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="6.55"/>
-    </proof>
-    <proof
-     prover="vampire"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="2.54"/>
-    </proof>
-    <proof
-     prover="spass"
+     prover="4"
      timelimit="7"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="3.69"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="3.25"/>
+    </proof>
+    <proof
+     prover="0"
+     timelimit="5"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="1.00"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="10"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="4.58"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.03"/>
+    </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="5"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="2.38"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.21"/>
     </proof>
    </goal>
   </theory>
   <theory
    name="LambdaCalc2"
+   locfile="./explicit_subst/../explicit_subst.why"
+   loclnum="114" loccnumb="7" loccnume="18"
    verified="true"
    expanded="true">
   </theory>
   <theory
    name="Example2"
+   locfile="./explicit_subst/../explicit_subst.why"
+   loclnum="159" loccnumb="7" loccnume="15"
    verified="true"
    expanded="true">
    <goal
     name="G1"
-    sum="b3658e42aff1eb6338c20cfe0fbded9a"
+    locfile="./explicit_subst/../explicit_subst.why"
+    loclnum="168" loccnumb="7" loccnume="9"
+    sum="9f66f6710bf89c0991aa15516ee3908e"
     proved="true"
     expanded="true"
     shape="ainfix =aappalambdaavaraZeroaaaa">
     <proof
-     prover="z3-2"
+     prover="6"
      timelimit="5"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="z3-3"
+     prover="4"
      timelimit="5"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="alt-ergo"
+     prover="0"
      timelimit="5"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="unknown" time="0.00"/>
     </proof>
     <proof
-     prover="eprover"
+     prover="2"
      timelimit="5"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.03"/>
+    </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="5"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="cvc3-2.4"
+     prover="3"
      timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="5.33"/>
-    </proof>
-    <proof
-     prover="vampire"
-     timelimit="5"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="spass"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.02"/>
     </proof>
    </goal>
    <goal
     name="G2"
-    sum="0a102f832a4d1e971935ab43ddcf1a13"
+    locfile="./explicit_subst/../explicit_subst.why"
+    loclnum="174" loccnumb="7" loccnume="9"
+    sum="50948e41c5172a350eb58f9cbf47cfc8"
     proved="true"
     expanded="true"
     shape="ainfix =aappalambdaavaraZeroaaab">
     <proof
-     prover="z3-2"
+     prover="6"
      timelimit="6"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="3.02"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="2.90"/>
     </proof>
     <proof
-     prover="z3-3"
+     prover="4"
      timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="2.08"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="alt-ergo"
+     prover="0"
      timelimit="5"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="unknown" time="0.00"/>
     </proof>
     <proof
-     prover="eprover"
+     prover="2"
      timelimit="5"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.02"/>
+    </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="2.07"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="5"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="cvc3-2.4"
+     prover="3"
      timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="5.94"/>
-    </proof>
-    <proof
-     prover="vampire"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="spass"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.02"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
     name="G5b"
-    sum="867709c12cddd6dad30d2e74a6ffe910"
+    locfile="./explicit_subst/../explicit_subst.why"
+    loclnum="178" loccnumb="7" loccnume="10"
+    sum="53f144bf3b2a3023e31642f9fac9da74"
     proved="true"
     expanded="true"
     shape="LalambdaasubstavaraSaZeroaSaZeroaaLalambdaaaainfix =V0V1">
     <proof
-     prover="z3-2"
+     prover="6"
      timelimit="5"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="z3-3"
+     prover="4"
      timelimit="5"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="alt-ergo"
+     prover="0"
      timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="5.74"/>
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.02"/>
     </proof>
     <proof
-     prover="eprover"
+     prover="2"
      timelimit="5"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.02"/>
+    </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="5"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="cvc3-2.4"
+     prover="3"
      timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="6.25"/>
-    </proof>
-    <proof
-     prover="vampire"
-     timelimit="5"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="spass"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="G5c"
-    sum="099b38fa56b6fd11a84753b756725172"
+    locfile="./explicit_subst/../explicit_subst.why"
+    loclnum="183" loccnumb="7" loccnume="10"
+    sum="c7e27b687114a30fdb74d6c273986cb0"
     proved="true"
     expanded="true"
     shape="LasubstalambdaavaraSaZeroaZeroaaLalambdaaaainfix =V0V1">
     <proof
-     prover="z3-2"
+     prover="6"
      timelimit="5"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="z3-3"
+     prover="4"
      timelimit="5"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="alt-ergo"
+     prover="0"
      timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="6.67"/>
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.02"/>
     </proof>
     <proof
-     prover="eprover"
+     prover="2"
      timelimit="5"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.02"/>
+    </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="cvc3-2.4"
+     prover="5"
      timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="6.14"/>
-    </proof>
-    <proof
-     prover="vampire"
-     timelimit="5"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="spass"
+     prover="3"
      timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.01"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
     name="G5"
-    sum="e716f5e84a74b57e6c0aad5d77f470b2"
+    locfile="./explicit_subst/../explicit_subst.why"
+    loclnum="188" loccnumb="7" loccnume="9"
+    sum="1be80eaccf1aa2d1a7676389c57b53f0"
     proved="true"
     expanded="true"
     shape="LalambdaalambdaavaraSaZeroLalambdaaaainfix =aappV0aaV1">
     <proof
-     prover="z3-2"
+     prover="6"
      timelimit="5"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="z3-3"
+     prover="4"
      timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="alt-ergo"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="6.35"/>
-    </proof>
-    <proof
-     prover="eprover"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="cvc3-2.4"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="6.04"/>
-    </proof>
-    <proof
-     prover="vampire"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="spass"
-     timelimit="5"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="0"
+     timelimit="5"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.02"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.02"/>
+    </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="5"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
     name="G3"
-    sum="5733f934bfc366e6973ebcd42ee1a863"
+    locfile="./explicit_subst/../explicit_subst.why"
+    loclnum="193" loccnumb="7" loccnume="9"
+    sum="95123425d7e0c2bb90e1e10ccc5d4421"
     proved="true"
     expanded="true"
     shape="LalambdaalambdaaappavaraZeroavaraSaZeroainfix =aappaappV0aaaidaa">
     <proof
-     prover="z3-3"
+     prover="4"
      timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="5.65"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="alt-ergo"
+     prover="0"
      timelimit="5"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="unknown" time="0.02"/>
     </proof>
     <proof
-     prover="eprover"
+     prover="2"
      timelimit="5"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.02"/>
+    </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.02"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="5"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="cvc3-2.4"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="6.55"/>
-    </proof>
-    <proof
-     prover="vampire"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="spass"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="G4"
-    sum="4f2913cc344a2c93df948e83ed396194"
+    locfile="./explicit_subst/../explicit_subst.why"
+    loclnum="197" loccnumb="7" loccnume="9"
+    sum="79068dfa7dab0710aa5af02e64b9df90"
     proved="true"
     expanded="true"
     shape="LalambdaalambdaaappavaraZeroavaraSaZeroLalambdaaappavaraZeroaaainfix =aappV0aaV1">
     <proof
-     prover="z3-3"
+     prover="4"
      timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="5.14"/>
-    </proof>
-    <proof
-     prover="alt-ergo"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="unknown" time="0.02"/>
-    </proof>
-    <proof
-     prover="eprover"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="cvc3-2.4"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="5.34"/>
-    </proof>
-    <proof
-     prover="vampire"
-     timelimit="5"
-     edited=""
-     obsolete="false">
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="spass"
+     prover="0"
      timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.02"/>
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.02"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.02"/>
+    </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.02"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="5"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
     </proof>
    </goal>
   </theory>

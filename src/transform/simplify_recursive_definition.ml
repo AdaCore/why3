@@ -91,29 +91,21 @@ let elt d =
         let loccurences acc ls =
           if Hid.mem mem ls.ls_name then Sid.add ls.ls_name acc else acc in
         let m = List.fold_left
-          (fun acc (ls,ld) -> match ld with
-             | None -> Mid.add ls.ls_name Sid.empty acc
-             | Some ld ->
+          (fun acc (ls,ld) ->
                  let fd = ls_defn_axiom ld in
                  let s = t_s_fold tyoccurences loccurences Sid.empty fd in
                  Mid.add ls.ls_name s acc) Mid.empty l in
-          let l = connexe m in
-          List.map (fun e -> create_logic_decl (List.map (Hid.find mem) e)) l
-    | Dtype l ->
+        let l = connexe m in
+        List.map (fun e -> create_logic_decl (List.map (Hid.find mem) e)) l
+    | Ddata l ->
         let mem = Hid.create 16 in
         List.iter (fun ((ts,_) as a) -> Hid.add mem ts.ts_name a) l;
         let tyoccurences acc ts =
           if Hid.mem mem ts.ts_name then Sid.add ts.ts_name acc else acc
         in
         let m = List.fold_left
-          (fun m (ts,def) ->
-             let s = match def with
-               | Tabstract ->
-                   begin match ts.ts_def with
-                     | None -> Sid.empty
-                     | Some ty -> ty_s_fold tyoccurences Sid.empty ty
-                   end
-               | Talgebraic l ->
+          (fun m (ts,l) ->
+             let s =
                    List.fold_left
                      (fun acc ({ls_args = tyl; ls_value = ty},_) ->
                         let ty = of_option ty in
@@ -125,9 +117,9 @@ let elt d =
              Mid.add ts.ts_name s m) Mid.empty l
         in
         let l = connexe m in
-        List.map (fun e -> create_ty_decl (List.map (Hid.find mem) e)) l
+        List.map (fun e -> create_data_decl (List.map (Hid.find mem) e)) l
     | Dind _ -> [d] (* TODO *)
-    | Dprop _ -> [d]
+    | Dtype _ | Dparam _ | Dprop _ -> [d]
 
 let t = Trans.decl elt None
 

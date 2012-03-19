@@ -21,10 +21,8 @@ type fmla =
   | Fand fmla fmla
   | Fnot fmla
   | Fimplies fmla fmla
-(*
   | Flet ident term fmla
   | Fforall ident datatype fmla
-*)
 
 (* program states: 2 stack env for refs and local vars  *)
 
@@ -55,15 +53,6 @@ function eval_bin (x:value) (op:operator) (y:value) : value =
      end
   | _,_ -> Vbool False
   end
-
-(*
-inductive get_env (i:int) (env:list value) (res:value) =
-  | Get_first:
-    forall x:value, l:list value. get_env 0 (Cons x l) x
-  | Get_next:
-    forall i:int, x r:value, l:list value. i > 0 ->
-      get_env (i-1) l r -> get_env i (Cons x l) x
-*)
 
 function get_env (i:ident) (e:env) : value = IdMap.get e i
 
@@ -98,7 +87,6 @@ predicate eval_fmla (s:state) (f:fmla) =
   | Fand f1 f2 -> eval_fmla s f1 /\ eval_fmla s f2
   | Fnot f -> not (eval_fmla s f)
   | Fimplies f1 f2 -> eval_fmla s f1 -> eval_fmla s f2
-(*
   | Flet x t f ->
       eval_fmla
         {| var_env = IdMap.set s.var_env x (eval_term s t) ;
@@ -116,7 +104,6 @@ predicate eval_fmla (s:state) (f:fmla) =
           {| var_env = IdMap.set s.var_env x (Vbool b);
              ref_env = s.ref_env |}
           f
-*)
   end
 
 (* substitution of a *reference* by a term *)
@@ -142,10 +129,8 @@ function subst (f:fmla) (x:ident) (t:term) : fmla =
   | Fand f1 f2 -> Fand (subst f1 x t) (subst f2 x t)
   | Fnot f -> Fnot (subst f x t)
   | Fimplies f1 f2 -> Fimplies (subst f1 x t) (subst f2 x t)
-(*
   | Flet y t' f -> Flet y t' (subst f x t)
   | Fforall y ty f -> Fforall y ty (subst f x t)
-*)
   end
 
 (* faux pour let *)

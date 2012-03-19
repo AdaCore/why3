@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
 <why3session
- name="examples/my_cosine/why3session.xml">
+ name="./my_cosine/why3session.xml">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -17,18 +17,18 @@
  <file
   name="../my_cosine.why"
   verified="true"
-  expanded="true">
+  expanded="false">
   <theory
    name="CosineSingle"
-   locfile="examples/my_cosine/../my_cosine.why"
+   locfile="./my_cosine/../my_cosine.why"
    loclnum="1" loccnumb="7" loccnume="19"
    verified="true"
    expanded="true">
    <goal
     name="MethodError"
-    locfile="examples/my_cosine/../my_cosine.why"
+    locfile="./my_cosine/../my_cosine.why"
     loclnum="13" loccnumb="6" loccnume="17"
-    sum="5952f9383dbffe78b1fa14037bc54de0"
+    sum="3c8f109e9526409d3a58944a15966059"
     proved="true"
     expanded="true"
     shape="ainfix <=aabsainfix -ainfix -c1.0ainfix *c0.5ainfix *V0V0acosV0c0x1.p-24Iainfix <=aabsV0c0x1.p-5F">
@@ -38,14 +38,14 @@
      edited="my_cosine_CosineSingle_MethodError_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="4.00"/>
+     <result status="valid" time="3.99"/>
     </proof>
    </goal>
    <goal
     name="TotalErrorFullyExpanded"
-    locfile="examples/my_cosine/../my_cosine.why"
+    locfile="./my_cosine/../my_cosine.why"
     loclnum="20" loccnumb="6" loccnume="29"
-    sum="25f5a9c908fe4d1265b4f0f95504caa8"
+    sum="b1c922a6bbe338d1b5da11e1ac5e8528"
     proved="true"
     expanded="true"
     shape="ainfix <=aabsainfix -V3acosavalueV0c0x1.p-23Iainfix =V3aroundaNearestTiesToEvenainfix -c1.0V2Iainfix =V2aroundaNearestTiesToEvenainfix *c0.5V1Iainfix =V1aroundaNearestTiesToEvenainfix *avalueV0avalueV0FIainfix <=aabsainfix -ainfix -c1.0ainfix *c0.5ainfix *avalueV0avalueV0acosavalueV0c0x1.p-24Iainfix <=aabsavalueV0c0x1.p-5F">
@@ -59,9 +59,9 @@
    </goal>
    <goal
     name="TotalErrorExpanded"
-    locfile="examples/my_cosine/../my_cosine.why"
+    locfile="./my_cosine/../my_cosine.why"
     loclnum="31" loccnumb="6" loccnume="24"
-    sum="847de2c0fab20f50a5c8c20a22a7efcf"
+    sum="bab80788960674e26b765752e8b625e0"
     proved="true"
     expanded="true"
     shape="LaroundaNearestTiesToEvenainfix *avalueV0avalueV0LaroundaNearestTiesToEvenainfix *c0.5V1LaroundaNearestTiesToEvenainfix -c1.0V2ainfix <=aabsainfix -V3acosavalueV0c0x1.p-23Iainfix <=aabsavalueV0c0x1.p-5F">
@@ -70,14 +70,14 @@
      timelimit="2"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.83"/>
+     <result status="valid" time="0.84"/>
     </proof>
    </goal>
    <goal
     name="TotalError"
-    locfile="examples/my_cosine/../my_cosine.why"
+    locfile="./my_cosine/../my_cosine.why"
     loclnum="51" loccnumb="6" loccnume="16"
-    sum="5af50be8fb318e8a3b66da558f5685c7"
+    sum="9ced418984a6db143301068d43116a64"
     proved="true"
     expanded="true"
     shape="Lacos_singleV0ainfix <=aabsainfix -avalueV1acosavalueV0c0x1.p-23Iainfix <=aabsavalueV0c0x1.p-5F">
@@ -86,7 +86,7 @@
      timelimit="10"
      obsolete="false"
      archived="false">
-     <result status="valid" time="3.05"/>
+     <result status="valid" time="3.02"/>
     </proof>
    </goal>
   </theory>

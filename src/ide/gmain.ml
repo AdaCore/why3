@@ -366,12 +366,55 @@ let goals_model,goals_view =
   eprintf " done@.";
   model,view
 
+
+(******************************)
+(* vertical paned on the right*)
+(******************************)
+
+let right_vb = GPack.vbox ~packing:hp#add ()
+
+let vp =
+  try
+    GPack.paned `VERTICAL ~packing:right_vb#add ()
+  with Gtk.Error _ -> assert false
+
+let right_hb = GPack.hbox ~packing:(right_vb#pack ~expand:false) ()
+
+(******************)
+(* goal text view *)
+(******************)
+
+let scrolled_task_view =
+  GBin.scrolled_window
+    ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
+    ~shadow_type:`ETCHED_OUT ~packing:vp#add ()
+
+let (_ : GtkSignal.id) =
+  scrolled_task_view#misc#connect#size_allocate
+    ~callback:
+    (fun {Gtk.width=_w;Gtk.height=h} ->
+       gconfig.task_height <- h)
+
+let task_view =
+  GSourceView2.source_view
+    ~editable:false
+    ~show_line_numbers:true
+    ~packing:scrolled_task_view#add
+    ~height:gconfig.task_height
+    ()
+
+let modifiable_font_views = ref [goals_view#misc ; task_view#misc]
+let () = task_view#source_buffer#set_language why_lang
+let () = task_view#set_highlight_current_line true
+
+
 let clear model = model#clear ()
 
 let image_of_result ~obsolete result =
   match result with
     | Session.Undone Session.Interrupted -> !image_undone
-    | Session.Undone Session.Unedited -> !image_unknown
+    | Session.Undone Session.Unedited 
+    | Session.Undone Session.JustEdited -> !image_unknown
     | Session.Undone Session.Scheduled -> !image_scheduled
     | Session.Undone Session.Running -> !image_running
     | Session.InternalFailure _ -> !image_failure
@@ -419,7 +462,8 @@ let set_proof_state a =
           Format.sprintf "%.2f [%d.0]" time a.S.proof_timelimit
         else
           Format.sprintf "%.2f" time
-    | S.Undone S.Unedited -> "(not yet edited, edit with \"Edit\" button)"
+    | S.Undone S.Unedited -> "(not yet edited)"
+    | S.Undone S.JustEdited -> "(edited)"
     | S.InternalFailure _ -> "(internal failure)"
     | S.Undone S.Interrupted -> "(interrupted)"
     | S.Undone (S.Scheduled | S.Running) ->
@@ -431,7 +475,6 @@ let set_proof_state a =
   goals_model#set ~row:row#iter ~column:time_column t
 
 let model_index = Hashtbl.create 17
-
 
 let get_any_from_iter row =
   try
@@ -470,6 +513,56 @@ let (_:GtkSignal.id) =
 let (_:GtkSignal.id) =
   goals_view#connect#row_expanded ~callback:(row_expanded true)
 
+let session_needs_saving = ref false
+let current_selected_row = ref None
+let current_env_session = ref None
+let env_session () =
+  match !current_env_session with
+    | None -> assert false
+    | Some e -> e
+
+let display_task t =
+  let task_text = Pp.string_of Pretty.print_task t in
+  task_view#source_buffer#set_text task_text;
+  task_view#scroll_to_mark `INSERT
+
+let split_transformation = "split_goal"
+let inline_transformation = "inline_goal"
+let intro_transformation = "introduce_premises"
+
+let update_task_view a =
+  match a with
+    | S.Goal g ->
+      if (Gconfig.config ()).intro_premises then
+        let trans =
+          Trans.lookup_transform intro_transformation (env_session()).S.env 
+        in
+        display_task (Trans.apply trans (S.goal_task g))
+      else
+        display_task (S.goal_task g)
+    | S.Theory _th ->
+        task_view#source_buffer#set_text ""
+    | S.File _file ->
+        task_view#source_buffer#set_text ""
+    | S.Proof_attempt a ->
+        let o =
+          match a.S.proof_state with
+            | S.Undone S.Interrupted ->
+              "proof not yet scheduled for running"
+            | S.Undone S.Unedited -> "Interactive proof, not yet edited. Edit with \"Edit\" button"
+            | S.Undone S.JustEdited -> "Edited interactive proof. Run it with \"Replay\" button"
+            | S.Done r -> r.Call_provers.pr_output
+            | S.Undone S.Scheduled-> "proof scheduled but not running yet"
+            | S.Undone S.Running -> "prover currently running"
+            | S.InternalFailure e ->
+              let b = Buffer.create 37 in
+              bprintf b "%a" Exn_printer.exn_printer e;
+              Buffer.contents b
+        in
+        task_view#source_buffer#set_text o
+    | S.Transf _tr ->
+        task_view#source_buffer#set_text ""
+
 module M = Session_scheduler.Make
   (struct
      type key = GTree.row_reference
@@ -506,7 +599,9 @@ module M = Session_scheduler.Make
            (if r=0 then "Running: 0" else
               "Running: " ^ (string_of_int r)^ " " ^ (fan (!c / 10)))
 
+
 let notify any =
+  session_needs_saving := true;
   let row,exp =
     match any with
       | S.Goal g ->
@@ -516,6 +611,13 @@ let notify any =
       | S.Proof_attempt a -> a.S.proof_key,false
       | S.Transf tr -> tr.S.transf_key,tr.S.transf_expanded
   in
+  let ind = goals_model#get ~row:row#iter ~column:index_column in
+  begin
+    match !current_selected_row with
+      | Some r when r == ind ->
+        update_task_view any
+      | _ -> ()
+  end;  
   if exp then goals_view#expand_to_path row#path else
     goals_view#collapse_row row#path;
   match any with
@@ -641,19 +743,21 @@ let () =
       exit 2;
     end
 
-let env_session,sched =
+let sched =
   try
     eprintf "[Info] Opening session...@\n@[<v 2>  ";
     let session =
       if Sys.file_exists project_dir then S.read_session project_dir
       else S.create_session project_dir in
-    let env_session,(_:bool) =
+    let env,(_:bool) =
       M.update_session ~allow_obsolete:true session gconfig.env
         gconfig.Gconfig.config
     in
     let sched = M.init gconfig.max_running_processes in
     dprintf debug "@]@\n[Info] Opening session: done@.";
-    ref env_session, sched
+    session_needs_saving := false;
+    current_env_session := Some env;
+    sched
   with e ->
     eprintf "@[Error while opening session:@ %a@.@]"
       Exn_printer.exn_printer e;
@@ -669,11 +773,12 @@ let () =
   match file_to_read with
     | None -> ()
     | Some fn ->
-        if S.PHstr.mem !env_session.S.session.S.session_files fn then
+        if S.PHstr.mem (env_session()).S.session.S.session_files fn then
           dprintf debug "[Info] file %s already in database@." fn
         else
           try
-            ignore (M.add_file !env_session fn)
+            dprintf debug "[Info] adding file %s in database@." fn;
+            ignore (M.add_file (env_session()) fn)
           with e ->
             eprintf "@[Error while reading file@ '%s':@ %a@.@]" fn
               Exn_printer.exn_printer e;
@@ -692,7 +797,7 @@ let prover_on_selected_goals pr =
       try
        let a = get_any_from_row_reference row in
        M.run_prover
-         !env_session sched
+         (env_session()) sched
          ~context_unproved_goals_only:!context_unproved_goals_only
          ~timelimit:gconfig.time_limit
          pr a
@@ -709,7 +814,7 @@ let replay_obsolete_proofs () =
   List.iter
     (fun r ->
        let a = get_any_from_row_reference r in
-       M.replay !env_session sched ~obsolete_only:true
+       M.replay (env_session()) sched ~obsolete_only:true
          ~context_unproved_goals_only:!context_unproved_goals_only a)
     (get_selected_row_references ())
 
@@ -739,16 +844,12 @@ let set_archive_proofs b () =
 (* method: split selected goals *)
 (*****************************************************)
 
-let split_transformation = "split_goal"
-let inline_transformation = "inline_goal"
-let intro_transformation = "introduce_premises"
-
 
 let apply_trans_on_selection tr =
   List.iter
     (fun r ->
        let a = get_any_from_row_reference r in
-        M.transform !env_session sched
+        M.transform (env_session()) sched
           ~context_unproved_goals_only:!context_unproved_goals_only
           tr
           a)
@@ -787,7 +888,7 @@ let select_file () =
               let f = Sysutil.relativize_filename project_dir f in
               eprintf "Adding file '%s'@." f;
               try
-                ignore (M.add_file !env_session f)
+                ignore (M.add_file (env_session()) f)
               with e ->
                 fprintf str_formatter
                   "@[Error while reading file@ '%s':@ %a@]" f
@@ -840,8 +941,12 @@ let (_ : GMenu.image_menu_item) =
 *)
 
 let save_session () =
-  eprintf "[Info] saving session@.";
-  S.save_session !env_session.S.session
+  if !session_needs_saving then begin
+    eprintf "[Info] saving session@.";
+    S.save_session (env_session()).S.session;
+    session_needs_saving := false;
+  end
+
 
 let exit_function ?(destroy=false) () =
   eprintf "[Info] saving IDE config file@.";
@@ -866,6 +971,7 @@ let exit_function ?(destroy=false) () =
     "xmllint --noout --dtdvalid share/why3session.dtd essai.xml" in
   if ret = 0 then eprintf "DTD validation succeeded, good!@.";
   *)
+  if not !session_needs_saving then GMain.quit () else
   match (Gconfig.config ()).saving_policy with
     | 0 -> save_session (); GMain.quit ()
     | 1 -> GMain.quit ()
@@ -889,8 +995,6 @@ let exit_function ?(destroy=false) () =
 (*************)
 (* View menu *)
 (*************)
-
-let modifiable_font_views = ref [goals_view#misc]
 
 let font_family = "Monospace"
 let font_size = ref 10
@@ -948,7 +1052,7 @@ let rec collapse_verified = function
   | any -> S.iter collapse_verified any
 
 let collapse_all_verified_things () =
-  S.session_iter collapse_verified !env_session.S.session
+  S.session_iter collapse_verified (env_session()).S.session
 
 let (_ : GMenu.image_menu_item) =
   view_factory#add_image_item ~key:GdkKeysyms._C
@@ -1158,46 +1262,6 @@ let (_ : GMenu.image_menu_item) =
     ()
 
 
-(******************************)
-(* vertical paned on the right*)
-(******************************)
-
-let right_vb = GPack.vbox ~packing:hp#add ()
-
-let vp =
-  try
-    GPack.paned `VERTICAL ~packing:right_vb#add ()
-  with Gtk.Error _ -> assert false
-
-let right_hb = GPack.hbox ~packing:(right_vb#pack ~expand:false) ()
-
-(******************)
-(* goal text view *)
-(******************)
-
-let scrolled_task_view =
-  GBin.scrolled_window
-    ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
-    ~shadow_type:`ETCHED_OUT ~packing:vp#add ()
-
-let (_ : GtkSignal.id) =
-  scrolled_task_view#misc#connect#size_allocate
-    ~callback:
-    (fun {Gtk.width=_w;Gtk.height=h} ->
-       gconfig.task_height <- h)
-
-let task_view =
-  GSourceView2.source_view
-    ~editable:false
-    ~show_line_numbers:true
-    ~packing:scrolled_task_view#add
-    ~height:gconfig.task_height
-    ()
-
-let () = modifiable_font_views := task_view#misc :: !modifiable_font_views
-let () = task_view#source_buffer#set_language why_lang
-let () = task_view#set_highlight_current_line true
-
 (***************)
 (* source view *)
 (***************)
@@ -1346,12 +1410,12 @@ let reload () =
         (in order to reload the files which are "use") *)
     gconfig.env <- Env.create_env loadpath;
     (** reload the session *)
-    let old_session = (!env_session).S.session in
+    let old_session = (env_session()).S.session in
     let new_env_session,(_:bool) =
       M.update_session ~allow_obsolete:true old_session gconfig.env
         gconfig.Gconfig.config
     in
-    env_session := new_env_session
+    current_env_session := Some new_env_session
   with
     | e ->
         let e = match e with
@@ -1427,7 +1491,7 @@ let edit_selected_row r =
         ()
     | S.Proof_attempt a ->
         M.edit_proof
-          !env_session sched ~default_editor:gconfig.default_editor a
+          (env_session()) sched ~default_editor:gconfig.default_editor a
     | S.Transf _ -> ()
 
 let edit_current_proof () =
@@ -1609,47 +1673,24 @@ let () =
 (* Bind events *)
 (***************)
 
-let display_task g t =
-  let task_text = Pp.string_of Pretty.print_task t in
-  task_view#source_buffer#set_text task_text;
-  task_view#scroll_to_mark `INSERT;
-  scroll_to_source_goal g
 
+ 
 (* to be run when a row in the tree view is selected *)
 let select_row r =
+  let ind = goals_model#get ~row:r#iter ~column:index_column in
+  current_selected_row := Some ind;
   let a = get_any_from_row_reference r in
+  update_task_view a;
   match a with
     | S.Goal g ->
-        if (Gconfig.config ()).intro_premises then
-          let trans =
-            Trans.lookup_transform intro_transformation !env_session.S.env in
-          display_task g (Trans.apply trans (S.goal_task g))
-        else
-          display_task g (S.goal_task g)
+       scroll_to_source_goal g
     | S.Theory th ->
-        task_view#source_buffer#set_text "";
         scroll_to_theory th
-    | S.File _file ->
-        task_view#source_buffer#set_text "";
+    | S.File _file -> ()
         (* scroll_to_file file *)
     | S.Proof_attempt a ->
-        let o =
-          match a.S.proof_state with
-            | S.Undone S.Interrupted ->
-              "proof not yet scheduled for running"
-            | S.Undone S.Unedited -> "proof not yet edited"
-            | S.Done r -> r.Call_provers.pr_output
-            | S.Undone S.Scheduled-> "proof scheduled but not running yet"
-            | S.Undone S.Running -> "prover currently running"
-            | S.InternalFailure e ->
-              let b = Buffer.create 37 in
-              bprintf b "%a" Exn_printer.exn_printer e;
-              Buffer.contents b
-        in
-        task_view#source_buffer#set_text o;
         scroll_to_source_goal a.S.proof_parent
     | S.Transf tr ->
-        task_view#source_buffer#set_text "";
         scroll_to_source_goal tr.S.transf_parent
 
 (* row selection on tree view on the left *)

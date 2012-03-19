@@ -197,10 +197,11 @@ module Transform = struct
         Decl.create_prop_decl Paxiom
           (create_prsymbol (id_clone lsymbol.ls_name)) fmla::acc
 
+  let param_transform kept ls =
+    Decl.create_param_decl (findL ls) :: logic_guard kept [] ls
+
   let logic_transform kept d = function
-    | [ls, None] ->
-        Decl.create_logic_decl [findL ls, None] :: logic_guard kept [] ls
-    | [ls, Some ld] when not (Sid.mem ls.ls_name d.d_syms) ->
+    | [ls,ld] when not (Sid.mem ls.ls_name d.d_syms) ->
         let f = f_type_close_select kept (ls_defn_axiom ld) in
         Libencoding.defn_or_axiom (findL ls) f @ logic_guard kept [] ls
     | _ -> Printer.unsupportedDecl d
@@ -222,7 +223,12 @@ end
 (** {2 main part} *)
 
 let decl kept d = match d.d_node with
-  | Dtype tdl -> d :: Libencoding.lsdecl_of_tydecl_select tdl
+  | Dtype { ts_def = Some _ } -> []
+  | Dtype ts -> d :: Libencoding.lsdecl_of_ts_select ts
+  | Ddata _ -> Printer.unsupportedDecl d
+      "Algebraic and recursively-defined types are \
+            not supported, run eliminate_algebraic"
+  | Dparam ls -> Transform.param_transform kept ls
   | Dlogic ldl -> Transform.logic_transform kept d ldl
   | Dind idl -> Transform.ind_transform kept idl
   | Dprop prop -> Transform.prop_transform kept prop
@@ -230,8 +236,8 @@ let decl kept d = match d.d_node with
 let empty_th =
   let task = use_export None Theory.builtin_theory in
   let task = Task.add_decl task d_ts_type in
-  let task = Task.add_logic_decl task [ls_int_of_ty,None] in
-  let task = Task.add_logic_decl task [Transform.fs_type,None] in
+  let task = Task.add_param_decl task ls_int_of_ty in
+  let task = Task.add_param_decl task Transform.fs_type in
   task
 
 let guard =
@@ -253,7 +259,7 @@ let lsmap kept = Wls.memoize 63 (fun ls ->
      List.for_all2 ty_equal ty_arg ls.ls_args then ls
   else create_lsymbol (id_clone ls.ls_name) ty_arg ty_res)
 
-let d_ts_base = create_ty_decl [ts_base, Tabstract]
+let d_ts_base = create_ty_decl ts_base
 
 let monomorph = Trans.on_tagged_ty Libencoding.meta_kept (fun kept ->
   let kept = Sty.add ty_type kept in

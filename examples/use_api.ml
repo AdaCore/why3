@@ -57,8 +57,8 @@ let () = printf "@[task 1 is:@\n%a@]@." Pretty.print_task task1
 
 (* task for formula 2 *)
 let task2 = None
-let task2 = Task.add_logic_decl task2 [prop_var_A, None]
-let task2 = Task.add_logic_decl task2 [prop_var_B, None]
+let task2 = Task.add_param_decl task2 prop_var_A
+let task2 = Task.add_param_decl task2 prop_var_B
 let goal_id2 = Decl.create_prsymbol (Ident.id_fresh "goal2")
 let task2 = Task.add_prop_decl task2 Decl.Pgoal goal_id2 fmla2
 

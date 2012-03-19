@@ -155,26 +155,26 @@ let print_constr ty fmt (cs,_) =
         fprintf fmt "@[<hov 4>| %a of %a@]" print_cs cs
           (print_list star print_ty_arg) tl
 
-let print_type_decl fst fmt (ts,def) = match def with
-  | Tabstract -> begin match ts.ts_def with
-      | None ->
-          fprintf fmt "@[<hov 2>%s %a%a@]"
-            (if fst then "type" else "and")
-            print_tv_args ts.ts_args print_ts ts
-      | Some ty ->
-          fprintf fmt "@[<hov 2>%s %a%a =@ %a@]"
-            (if fst then "type" else "and")
-            print_tv_args ts.ts_args print_ts ts print_ty ty
-      end
-  | Talgebraic csl ->
-      let ty = ty_app ts (List.map ty_var ts.ts_args) in
-      fprintf fmt "@[<hov 2>%s %a%a =@\n@[<hov>%a@]@]"
-        (if fst then "type" else "and")
+let print_type_decl fmt ts = match ts.ts_def with
+  | None ->
+      fprintf fmt "@[<hov 2>type %a%a@]"
         print_tv_args ts.ts_args print_ts ts
-        (print_list newline (print_constr ty)) csl
+  | Some ty ->
+      fprintf fmt "@[<hov 2>type %a%a =@ %a@]"
+        print_tv_args ts.ts_args print_ts ts print_ty ty
 
-let print_type_decl first fmt d =
-  print_type_decl first fmt d; forget_tvs ()
+let print_type_decl fmt ts =
+  print_type_decl fmt ts; forget_tvs ()
+
+let print_data_decl fst fmt (ts,csl) =
+  let ty = ty_app ts (List.map ty_var ts.ts_args) in
+  fprintf fmt "@[<hov 2>%s %a%a =@\n@[<hov>%a@]@]"
+    (if fst then "type" else "and")
+    print_tv_args ts.ts_args print_ts ts
+    (print_list newline (print_constr ty)) csl
+
+let print_data_decl first fmt d =
+  print_data_decl first fmt d; forget_tvs ()
 
 (** Inductive *)
 
@@ -356,25 +356,24 @@ let print_defn fmt e =
   if is_exec_term e then print_term fmt e
   else to_be_implemented fmt "not executable"
 
-let print_logic_decl fst fmt (ls,ld) = match ld with
-  | Some ld ->
-      let vl,e = open_ls_defn ld in
-      fprintf fmt "@[<hov 2>%s %a %a : %a =@ %a@]"
-        (if fst then "let rec" else "and") print_ls ls
-        (print_list space print_vs_arg) vl
-        print_ls_type ls.ls_value print_defn e;
-      forget_vars vl
-  | None ->
-      let vars = name_args ls.ls_args in
-      fprintf fmt "@[<hov 2>%s %a %a : %a =@ %a@]"
-        (if fst then "let rec" else "and") print_ls ls
-        (print_list space print_vs_arg) vars
-        print_ls_type ls.ls_value
-        to_be_implemented "uninterpreted symbol";
-      forget_vars vars
+let print_param_decl fmt ls =
+  let vars = name_args ls.ls_args in
+  fprintf fmt "@[<hov 2>let %a %a : %a =@ %a@]"
+    print_ls ls
+    (print_list space print_vs_arg) vars
+    print_ls_type ls.ls_value
+    to_be_implemented "uninterpreted symbol";
+  forget_vars vars;
+  forget_tvs ()
 
-let print_logic_decl first fmt d =
-  print_logic_decl first fmt d; forget_tvs ()
+let print_logic_decl fst fmt (ls,ld) =
+  let vl,e = open_ls_defn ld in
+  fprintf fmt "@[<hov 2>%s %a %a : %a =@ %a@]"
+    (if fst then "let rec" else "and") print_ls ls
+    (print_list space print_vs_arg) vl
+    print_ls_type ls.ls_value print_defn e;
+  forget_vars vl;
+  forget_tvs ()
 
 (** Logic Declarations *)
 
@@ -388,8 +387,12 @@ let print_list_next sep print fmt = function
       print_list sep (print false) fmt r
 
 let logic_decl fmt d = match d.d_node with
-  | Dtype tl ->
-      print_list_next newline print_type_decl fmt tl
+  | Dtype ts ->
+      print_type_decl fmt ts
+  | Ddata tl ->
+      print_list_next newline print_data_decl fmt tl
+  | Decl.Dparam ls ->
+      print_param_decl fmt ls
   | Dlogic ll ->
       print_list_next newline print_logic_decl fmt ll
   | Dind il ->
@@ -495,7 +498,7 @@ let decl fmt = function
   | Dletrec _dl ->
       fprintf fmt "(* pgm let rec *)" (* TODO *)
   | Dparam ps ->
-      print_logic_decl true fmt (ps.ps_pure, None)
+      print_param_decl fmt ps.ps_pure
 
 (** Modules *)
 

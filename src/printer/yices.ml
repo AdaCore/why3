@@ -29,11 +29,6 @@ open Theory
 open Task
 open Printer
 
-(** Options of this printer *)
-let use_builtin_array = Theory.register_meta_excl "Smt : builtin array" []
-
-(** *)
-
 let ident_printer =
   let bls = (*["and";" benchmark";" distinct";"exists";"false";"flet";"forall";
      "if then else";"iff";"implies";"ite";"let";"logic";"not";"or";
@@ -245,41 +240,39 @@ let print_logic_binder info fmt v =
   fprintf fmt "%a: %a" print_ident v.vs_name
     (print_type info) v.vs_ty
 
-let print_type_decl info fmt = function
-  | ts, Tabstract when Mid.mem ts.ts_name info.info_syn -> false
-  | ts, Tabstract when ts.ts_args = [] ->
-    fprintf fmt "(define-type %a)" print_ident ts.ts_name; true
-  | _, Tabstract -> false
-  | _, Talgebraic _ -> unsupported
-    "yices : algebraic type are not supported"
+let print_type_decl info fmt ts =
+  if Mid.mem ts.ts_name info.info_syn then false else
+  if ts.ts_args = [] then
+  (fprintf fmt "(define-type %a)" print_ident ts.ts_name; true)
+  else false
 
-let print_logic_decl info fmt (ls,ld) =
-  if not (Mid.mem ls.ls_name info.info_syn) then begin
+let print_param_decl info fmt ls =
   List.iter (iter_complex_type info fmt ()) ls.ls_args;
   Util.option_iter (iter_complex_type info fmt ()) ls.ls_value;
-  match ld, ls.ls_args with
-  | None,[] ->
+  match ls.ls_args with
+  | [] ->
     fprintf fmt "@[<hov 2>(define %a::%a)@]@\n"
       print_ident ls.ls_name
       (print_type_value info) ls.ls_value
-  | None,_ ->
+  | _ ->
     fprintf fmt "@[<hov 2>(define %a::(-> %a %a))@]@\n"
       print_ident ls.ls_name
       (print_list space (print_type info)) ls.ls_args
       (print_type_value info) ls.ls_value
-  | Some _,_ ->
-    unsupported "yices : function and predicate definitions are not supported"
-  end
 
-let print_logic_decl info fmt d =
-  if Mid.mem (fst d).ls_name info.info_syn then
-    false else (print_logic_decl info fmt d; true)
+let print_param_decl info fmt ls =
+  if Mid.mem ls.ls_name info.info_syn then
+    false else (print_param_decl info fmt ls; true)
 
 let print_decl info fmt d = match d.d_node with
-  | Dtype dl ->
-      print_list_opt newline (print_type_decl info) fmt dl
-  | Dlogic dl ->
-      print_list_opt newline (print_logic_decl info) fmt dl
+  | Dtype ts ->
+      print_type_decl info fmt ts
+  | Ddata _ -> unsupportedDecl d
+      "yices : algebraic type are not supported"
+  | Dparam ls ->
+      print_param_decl info fmt ls
+  | Dlogic _ -> unsupportedDecl d
+      "yices : function and predicate definitions are not supported"
   | Dind _ -> unsupportedDecl d
       "yices : inductive definition are not supported"
   | Dprop (Paxiom, pr, _) when Mid.mem pr.pr_name info.info_syn -> false

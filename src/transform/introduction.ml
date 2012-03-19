@@ -44,7 +44,7 @@ let rec intros pr f = match f.t_node with
       let intro_var subst vs =
         let ls = create_lsymbol (id_clone vs.vs_name) [] (Some vs.vs_ty) in
         Mvs.add vs (fs_app ls [] vs.vs_ty) subst,
-        create_logic_decl [ls,None]
+        create_param_decl ls
       in
       let subst, dl = Util.map_fold_left intro_var Mvs.empty vsl in
       let f = t_subst subst f in

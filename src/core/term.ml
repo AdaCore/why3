@@ -1352,61 +1352,70 @@ let t_replace_alpha t1 t2 t =
 
 (* constructors with propositional simplification *)
 
+let keep_on_simp_label = create_label "keep_on_simp"
+let can_simp t = not (Slab.mem keep_on_simp_label t.t_label)
+
 let t_not_simp f = match f.t_node with
-  | Ttrue  -> t_false
-  | Tfalse -> t_true
-  | Tnot f -> f
+  | Ttrue  -> t_label_copy f t_false
+  | Tfalse -> t_label_copy f t_true
+  | Tnot g -> t_label_copy f g
   | _      -> t_not f
 
 let t_and_simp f1 f2 = match f1.t_node, f2.t_node with
-  | Ttrue, _  -> f2
-  | _, Ttrue  -> f1
-  | Tfalse, _ -> f1
-  | _, Tfalse -> f2
-  | _, _      -> if t_equal f1 f2 then f1 else t_and f1 f2
+  | Ttrue, _  when can_simp f1 -> f2
+  | _, Ttrue  when can_simp f2 -> f1
+  | Tfalse, _ when can_simp f2 -> f1
+  | _, Tfalse when can_simp f1 -> f2
+  | _, _ when t_equal f1 f2    -> f1
+  | _, _ -> t_and f1 f2
 
 let t_and_simp_l l = List.fold_left t_and_simp t_true l
 
 let t_or_simp f1 f2 = match f1.t_node, f2.t_node with
-  | Ttrue, _  -> f1
-  | _, Ttrue  -> f2
-  | Tfalse, _ -> f2
-  | _, Tfalse -> f1
-  | _, _      -> if t_equal f1 f2 then f1 else t_or f1 f2
+  | Ttrue, _  when can_simp f2 -> f1
+  | _, Ttrue  when can_simp f1 -> f2
+  | Tfalse, _ when can_simp f1 -> f2
+  | _, Tfalse when can_simp f2 -> f1
+  | _, _ when t_equal f1 f2    -> f1
+  | _, _ -> t_or f1 f2
 
 let t_or_simp_l l = List.fold_left t_or_simp t_false l
 
 let t_and_asym_simp f1 f2 = match f1.t_node, f2.t_node with
-  | Ttrue, _  -> f2
-  | _, Ttrue  -> f1
-  | Tfalse, _ -> f1
-  | _, Tfalse -> f2
-  | _, _      -> if t_equal f1 f2 then f1 else t_and_asym f1 f2
+  | Ttrue, _  when can_simp f1 -> f2
+  | _, Ttrue  when can_simp f2 -> f1
+  | Tfalse, _ when can_simp f2 -> f1
+  | _, Tfalse when can_simp f1 -> f2
+  | _, _ when t_equal f1 f2    -> f1
+  | _, _ -> t_and_asym f1 f2
 
 let t_and_asym_simp_l l = List.fold_left t_and_asym_simp t_true l
 
 let t_or_asym_simp f1 f2 = match f1.t_node, f2.t_node with
-  | Ttrue, _  -> f1
-  | _, Ttrue  -> f2
-  | Tfalse, _ -> f2
-  | _, Tfalse -> f1
-  | _, _      -> if t_equal f1 f2 then f1 else t_or_asym f1 f2
+  | Ttrue, _  when can_simp f2 -> f1
+  | _, Ttrue  when can_simp f1 -> f2
+  | Tfalse, _ when can_simp f1 -> f2
+  | _, Tfalse when can_simp f2 -> f1
+  | _, _ when t_equal f1 f2    -> f1
+  | _, _ -> t_or_asym f1 f2
 
 let t_or_asym_simp_l l = List.fold_left t_or_asym_simp t_false l
 
 let t_implies_simp f1 f2 = match f1.t_node, f2.t_node with
-  | Ttrue, _  -> f2
-  | _, Ttrue  -> f2
-  | Tfalse, _ -> t_true
-  | _, Tfalse -> t_not_simp f1
-  | _, _      -> if t_equal f1 f2 then t_true else t_implies f1 f2
+  | Ttrue, _  when can_simp f1 -> f2
+  | _, Ttrue  when can_simp f1 -> f2
+  | Tfalse, _ when can_simp f2 -> t_label_copy f1 t_true
+  | _, Tfalse when can_simp f2 -> t_not_simp f1
+  | _, _ when t_equal f1 f2    -> t_label_copy f1 t_true
+  | _, _ -> t_implies f1 f2
 
 let t_iff_simp f1 f2 = match f1.t_node, f2.t_node with
-  | Ttrue, _  -> f2
-  | _, Ttrue  -> f1
-  | Tfalse, _ -> t_not_simp f2
-  | _, Tfalse -> t_not_simp f1
-  | _, _      -> if t_equal f1 f2 then t_true else t_iff f1 f2
+  | Ttrue, _  when can_simp f1 -> f2
+  | _, Ttrue  when can_simp f2 -> f1
+  | Tfalse, _ when can_simp f1 -> t_not_simp f2
+  | _, Tfalse when can_simp f2 -> t_not_simp f1
+  | _, _ when t_equal f1 f2    -> t_label_copy f1 t_true
+  | _, _ -> t_iff f1 f2
 
 let t_binary_simp op = match op with
   | Tand     -> t_and_simp
@@ -1415,13 +1424,14 @@ let t_binary_simp op = match op with
   | Tiff     -> t_iff_simp
 
 let t_if_simp f1 f2 f3 = match f1.t_node, f2.t_node, f3.t_node with
-  | Ttrue, _, _  -> f2
-  | Tfalse, _, _ -> f3
-  | _, Ttrue, _  -> t_implies_simp (t_not_simp f1) f3
-  | _, Tfalse, _ -> t_and_simp (t_not_simp f1) f3
-  | _, _, Ttrue  -> t_implies_simp f1 f2
-  | _, _, Tfalse -> t_and_simp f1 f2
-  | _, _, _      -> if t_equal f2 f3 then f2 else t_if f1 f2 f3
+  | Ttrue, _, _  when can_simp f1 && can_simp f3 -> f2
+  | Tfalse, _, _ when can_simp f1 && can_simp f2 -> f3
+  | _, Ttrue, _  when can_simp f2 -> t_implies_simp (t_not_simp f1) f3
+  | _, Tfalse, _ when can_simp f2 -> t_and_simp (t_not_simp f1) f3
+  | _, _, Ttrue  when can_simp f3 -> t_implies_simp f1 f2
+  | _, _, Tfalse when can_simp f3 -> t_and_simp f1 f2
+  | _, _, _ when t_equal f2 f3 && can_simp f1 -> f2
+  | _, _, _ -> t_if f1 f2 f3
 
 let small t = match t.t_node with
   | Tvar _ | Tconst _ -> true
@@ -1429,7 +1439,7 @@ let small t = match t.t_node with
 
 let t_let_simp e ((v,b,t) as bt) =
   let n = Mvs.find_def 0 v t.t_vars in
-  if n = 0 then
+  if n = 0 && can_simp e then
     t_subst_unsafe b.bv_subst t else
   if n = 1 || small e then begin
     vs_check v e;
@@ -1439,7 +1449,7 @@ let t_let_simp e ((v,b,t) as bt) =
 
 let t_let_close_simp v e t =
   let n = Mvs.find_def 0 v t.t_vars in
-  if n = 0 then t else
+  if n = 0 && can_simp e then t else
   if n = 1 || small e then
     t_subst_single v e t
   else
@@ -1472,8 +1482,11 @@ let t_exists_simp = t_quant_simp Texists
 let t_forall_close_simp = t_quant_close_simp Tforall
 let t_exists_close_simp = t_quant_close_simp Texists
 
-let t_equ_simp t1 t2 = if t_equal t1 t2 then t_true  else t_equ t1 t2
-let t_neq_simp t1 t2 = if t_equal t1 t2 then t_false else t_neq t1 t2
+let t_equ_simp t1 t2 =
+  if t_equal t1 t2 && can_simp t1 then t_true  else t_equ t1 t2
+
+let t_neq_simp t1 t2 =
+  if t_equal t1 t2 && can_simp t1 then t_false else t_neq t1 t2
 
 let t_forall_close_merge vs f =
   match f.t_node with

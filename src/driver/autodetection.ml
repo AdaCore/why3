@@ -19,6 +19,7 @@
 
 open Format
 open Util
+open Ident
 open Whyconf
 open Rc
 
@@ -81,12 +82,9 @@ let read_auto_detection_data main =
     load rc
   with
     | Failure "lexing" ->
-        eprintf "Syntax error in provers-detection-data.conf@.";
-        exit 2
+        Loc.errorm "Syntax error in provers-detection-data.conf@."
     | Not_found ->
-        eprintf "provers-detection-data.conf not found at %s@." filename;
-        exit 2
-
+        Loc.errorm "provers-detection-data.conf not found at %s@." filename
 
 let provers_found = ref 0
 
@@ -104,13 +102,13 @@ let make_command exec com =
 let sanitize_exec =
   let first c = match c with
     | '_' | ' ' -> "_"
-    | _ -> Ident.char_to_alpha c
+    | _ -> char_to_alpha c
   in
   let rest c = match c with
     | '+' | '-' | '.' -> String.make 1 c
-    | _ -> Ident.char_to_alnumus c
+    | _ -> char_to_alnumus c
   in
-  Ident.sanitizer first rest
+  sanitizer first rest
 
 let detect_exec main data com =
   let out = Filename.temp_file "out" "" in
@@ -178,7 +176,6 @@ let detect_exec main data com =
       end
 
 let detect_prover main acc l =
-  let prover_id = (List.hd l).prover_id in
   try
     let detect_execs data =
       try Some (Util.list_first (detect_exec main data) data.execs)
@@ -187,7 +184,7 @@ let detect_prover main acc l =
     let prover = Util.list_first detect_execs l in
     Mprover.add prover.prover prover acc
   with Not_found ->
-    eprintf "Prover %s not found.@." prover_id;
+    eprintf "Prover %s not found.@." (List.hd l).prover_id;
     acc
 (* does not work
   List.fold_left
@@ -211,3 +208,42 @@ let run_auto_detection config =
   let length = Mprover.cardinal detect in
   eprintf "%d provers detected.@." length;
   set_provers config detect
+
+let list_prover_ids () =
+  let config = default_config "/dev/null" in
+  let main = get_main config in
+  let l = read_auto_detection_data main in
+  let s = List.fold_left (fun s p -> Sstr.add p.prover_id s) Sstr.empty l in
+  Sstr.elements s
+
+let get_altern id path =
+  let alt = Filename.basename path in
+  let ilen = String.length id in
+  let alen = String.length alt in
+  let rec get_suffix i =
+    if i = alen then "alt" else
+    if i = ilen then String.sub alt i (alen-i) else
+    if id.[i] = alt.[i] then get_suffix (i+1) else
+    String.sub alt i (alen-i)
+  in
+  get_suffix 0
+
+let add_prover_binary config id path =
+  let main = get_main config in
+  let l = read_auto_detection_data main in
+  let l = List.filter (fun p -> p.prover_id = id) l in
+  if l = [] then Loc.errorm "Unknown prover id: %s" id;
+  let p = try
+    Util.list_first (fun d -> detect_exec main d path) (List.rev l)
+  with Not_found ->
+    Loc.errorm "File %s does not correspond to the prover id %s" path id
+  in
+  (* alternative name *)
+  let alt = get_altern id path in
+  let provers = get_provers config in
+  (* is a prover with this name and version already in config? *)
+  let p = if not (Mprover.mem p.prover provers) then p else
+    { p with prover = { p.prover with prover_altern = alt } } in
+  let alt = sanitizer char_to_alnumus char_to_alnumus alt in
+  let p = { p with id = p.id ^ "-" ^ alt } in
+  set_provers config (Mprover.add p.prover p (get_provers config))

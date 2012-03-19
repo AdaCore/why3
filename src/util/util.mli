@@ -126,6 +126,8 @@ val prefix : int -> 'a list -> 'a list
 val chop : int -> 'a list -> 'a list
   (** removes the first n elements of a list;
       raises Invalid_argument if the list is not long enough *)
+val chop_last : 'a list -> 'a list * 'a
+  (** removes (and returns) the last element of a list *)
 
 (* boolean fold accumulators *)
 

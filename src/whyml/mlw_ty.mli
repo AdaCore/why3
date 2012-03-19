@@ -78,7 +78,6 @@ exception BadItyArity of itysymbol * int * int
 exception BadRegArity of itysymbol * int * int
 exception DuplicateRegion of region
 exception UnboundRegion of region
-exception InvalidRegion of region
 
 val create_region : preid -> ?ghost:bool -> ity -> region
 
@@ -104,27 +103,23 @@ val ity_fold : ('a -> ity -> 'a) -> 'a -> ity -> 'a
 val ity_all : (ity -> bool) -> ity -> bool
 val ity_any : (ity -> bool) -> ity -> bool
 
+(* traversal functions on type symbols *)
+
+val ity_s_fold :
+  ('a -> itysymbol -> 'a) -> ('a -> tysymbol -> 'a) -> 'a -> ity -> 'a
+
+val ity_s_all : (itysymbol -> bool) -> (tysymbol -> bool) -> ity -> bool
+val ity_s_any : (itysymbol -> bool) -> (tysymbol -> bool) -> ity -> bool
+
 (* traversal functions on type variables and regions *)
 
-val ity_v_map :
-  (tvsymbol -> ity) -> (region -> region) -> ity -> ity
+val ity_v_map : (tvsymbol -> ity) -> (region -> region) -> ity -> ity
 
 val ity_v_fold :
   ('a -> tvsymbol -> 'a) -> ('a -> region -> 'a) -> 'a -> ity -> 'a
 
 val ity_v_all : (tvsymbol -> bool) -> (region -> bool) -> ity -> bool
 val ity_v_any : (tvsymbol -> bool) -> (region -> bool) -> ity -> bool
-
-(** {3 symbol-wise map/fold} *)
-(** visits every symbol of the type *)
-
-val ity_s_fold :
-  ('a -> itysymbol -> 'a) -> ('a -> tysymbol -> 'a) -> 'a -> ity -> 'a
-(*
-val ity_s_map : (itysymbol -> itysymbol) -> ity -> ity
-val ity_s_all : (itysymbol -> bool) -> ity -> bool
-val ity_s_any : (itysymbol -> bool) -> ity -> bool
-*)
 
 val ity_freevars : Stv.t -> ity -> Stv.t
 val ity_topregions : Sreg.t -> ity -> Sreg.t
@@ -160,22 +155,24 @@ module Sexn: Mexn.Set
 
 (* effects *)
 type effect = private {
-  eff_reads   : Sreg.t;
-  eff_writes  : Sreg.t;
-  eff_erases  : Sreg.t;
-  eff_renames : region Mreg.t; (* if r1->r2 then r1 appears in ty(r2) *)
-  eff_raises  : Sexn.t;
+  eff_reads  : Sreg.t;
+  eff_writes : Sreg.t;
+  (* if r1 -> Some r2 then r1 appears in ty(r2) *)
+  eff_resets : region option Mreg.t;
+  eff_raises : Sexn.t;
 }
 
 val eff_empty : effect
 val eff_union : effect -> effect -> effect
 
-val eff_read  : region -> effect
-val eff_write : region -> effect
-val eff_erase : region -> effect
-val eff_raise : xsymbol -> effect
+val eff_read  : effect -> region -> effect
+val eff_write : effect -> region -> effect
+val eff_reset : effect -> region -> effect
+val eff_raise : effect -> xsymbol -> effect
 
-val eff_remove_raise : xsymbol -> effect -> effect
+val eff_assign : effect -> region -> ity -> effect
+
+val eff_remove_raise : effect -> xsymbol -> effect
 
 (* program variables *)
 type pvsymbol = private {
@@ -190,25 +187,29 @@ val create_pvsymbol : preid -> ?mut:region -> ?ghost:bool -> ity -> pvsymbol
 val pv_equal : pvsymbol -> pvsymbol -> bool
 
 (* value types *)
+type vty_arrow
+
 type vty = private
   | VTvalue of pvsymbol
-  | VTarrow of pvsymbol * cty
-
-(* computation types *)
-and cty = private {
-  c_pre   : term;
-  c_vty   : vty;
-  c_eff   : effect;
-  c_post  : term;
-  c_xpost : xpost;
-}
-
-and xpost = (pvsymbol * term) Mexn.t
+  | VTarrow of vty_arrow
 
 (* smart constructors *)
-val create_cty :
-  ?pre:term -> ?post:term -> ?xpost:xpost -> ?effect:effect -> vty -> cty
-
 val vty_value : pvsymbol -> vty
-val vty_arrow : pvsymbol -> cty -> vty
+
+type pre = term
+type post = term
+type xpost = (pvsymbol * post) Mexn.t
+
+val vty_arrow :
+  pvsymbol ->
+  ?pre:term -> ?post:term -> ?xpost:xpost -> ?effect:effect -> vty -> vty
+
+val vty_app : ity_subst -> vty -> pvsymbol -> effect * vty
+
+val vty_app_spec : ity_subst -> vty -> pvsymbol -> pre * post * xpost
+
+val open_vty_arrow : vty_arrow -> pvsymbol * vty
+
+
+
 

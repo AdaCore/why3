@@ -68,26 +68,26 @@ let elim_f f = elim_f (fun f -> f) f
 
 let rec elim_t t = TermTF.t_map elim_t elim_f t
 
-let add_ld axl d = match d with
-  | _, None -> axl, d
-  | ls, Some ld ->
-      let vl,e,close = open_ls_defn_cb ld in
-      begin match e.t_ty with
-        | Some _ when has_if e ->
-            let nm = ls.ls_name.id_string ^ "_def" in
-            let pr = create_prsymbol (id_derive nm ls.ls_name) in
-            let hd = t_app ls (List.map t_var vl) e.t_ty in
-            let f = t_forall_close vl [] (elim_f (t_equ hd e)) in
-            create_prop_decl Paxiom pr f :: axl, (ls, None)
-        | _ ->
-            axl, close ls vl (TermTF.t_select elim_t elim_f e)
-      end
+let add_ld (ls,ld) (abst,defn,axl) =
+  let vl,e,close = open_ls_defn_cb ld in
+  match e.t_ty with
+    | Some _ when has_if e ->
+        let nm = ls.ls_name.id_string ^ "_def" in
+        let pr = create_prsymbol (id_derive nm ls.ls_name) in
+        let hd = t_app ls (List.map t_var vl) e.t_ty in
+        let ax = t_forall_close vl [] (elim_f (t_equ hd e)) in
+        let ax = create_prop_decl Paxiom pr ax in
+        let ld = create_param_decl ls in
+        ld :: abst, defn, ax :: axl
+    | _ ->
+        let d = close ls vl (TermTF.t_select elim_t elim_f e) in
+        abst, d :: defn, axl
 
 let elim_d d = match d.d_node with
   | Dlogic l ->
-      let axl, l = map_fold_left add_ld [] l in
-      let d = create_logic_decl l in
-      d :: List.rev axl
+      let abst,defn,axl = List.fold_right add_ld l ([],[],[]) in
+      let defn = if defn = [] then [] else [create_logic_decl defn] in
+      abst @ defn @ axl
   | _ ->
       [DeclTF.decl_map (fun _ -> assert false) elim_f d]
 

@@ -99,7 +99,7 @@ let add_pervasives uc =
     Ty.create_tysymbol
       (id_fresh "unit") [] (Some (Ty.ty_app (Ty.ts_tuple 0) []))
   in
-  add_ty_decl uc [ts, Decl.Tabstract]
+  add_ty_decl uc ts
 
 let open_namespace uc = match uc.uc_import with
   | ns :: _ -> { uc with
@@ -187,10 +187,10 @@ let vs_now = create_vsymbol (id_fresh "'now") ty_mark
 let th_prelude =
   let uc = create_theory (id_fresh "Prelude") in
   let uc = use_export uc (tuple_theory 0) in
-  let uc = add_ty_decl uc [ts_unit, Tabstract] in
-  let uc = add_ty_decl uc [ts_mark, Tabstract] in
-  let uc = add_logic_decl uc [fs_at, None] in
-  let uc = add_logic_decl uc [fs_old, None] in
+  let uc = add_ty_decl uc ts_unit in
+  let uc = add_ty_decl uc ts_mark in
+  let uc = add_param_decl uc fs_at in
+  let uc = add_param_decl uc fs_old in
   close_theory uc
 
 let empty_module path n =

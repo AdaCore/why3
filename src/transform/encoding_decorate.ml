@@ -40,30 +40,33 @@ let deco_term kept tvar =
     | Tvar v ->
         if is_protected_vs kept v
         then t else decorate tvar t
-    | Tapp (ls,_) ->
-        let t = t_map deco t in
-        if ls.ls_value = None || is_protected_ls kept ls
-        then t else decorate tvar t
+    | Tapp (ls,_) when ls.ls_value <> None && not (is_protected_ls kept ls) ->
+        decorate tvar (expl t)
     | Tconst _ ->
         if Sty.mem (t_type t) kept
         then t else decorate tvar t
-    | Tlet (t1,tb) ->
-        let v,e,close = t_open_bound_cb tb in
-        t_let (t_map deco t1) (close v (deco e))
     | Teps tb ->
         let v,f,close = t_open_bound_cb tb in
         let t = t_eps (close v (deco f)) in
         if is_protected_vs kept v
         then t else decorate tvar t
+    | _ -> expl t
+  and expl t = match t.t_node with
+    | Tlet (t1,tb) ->
+        let v,e,close = t_open_bound_cb tb in
+        t_let (expl t1) (close v (deco e))
     | _ -> t_map deco t
   in
   deco
 
 let deco_decl kept d = match d.d_node with
-  | Dtype tdl ->
-      d :: lsdecl_of_tydecl tdl
-  | Dlogic [_, None] -> [d]
-  | Dlogic [ls, Some ld] when not (Sid.mem ls.ls_name d.d_syms) ->
+  | Dtype { ts_def = Some _ } -> []
+  | Dtype ts -> [d; lsdecl_of_ts ts]
+  | Ddata _ -> Printer.unsupportedDecl d
+      "Algebraic and recursively-defined types are \
+            not supported, run eliminate_algebraic"
+  | Dparam _ -> [d]
+  | Dlogic [ls,ld] when not (Sid.mem ls.ls_name d.d_syms) ->
       let f = t_type_close (deco_term kept) (ls_defn_axiom ld) in
       defn_or_axiom ls f
   | Dlogic _ -> Printer.unsupportedDecl d
@@ -73,7 +76,7 @@ let deco_decl kept d = match d.d_node with
   | Dprop (k,pr,f) ->
       [create_prop_decl k pr (t_type_close (deco_term kept) f)]
 
-let d_poly_deco = create_logic_decl [ls_poly_deco, None]
+let d_poly_deco = create_param_decl ls_poly_deco
 
 let deco_init =
   let init = Task.add_decl None d_ts_type in
@@ -101,8 +104,8 @@ let lsmap kept = Wls.memoize 63 (fun ls ->
      && List.for_all2 ty_equal tyl ls.ls_args then ls
   else create_lsymbol (id_clone ls.ls_name) tyl tyr)
 
-let d_ts_base = create_ty_decl [ts_base, Tabstract]
-let d_ts_deco = create_ty_decl [ts_deco, Tabstract]
+let d_ts_base = create_ty_decl ts_base
+let d_ts_deco = create_ty_decl ts_deco
 
 let mono_init =
   let init = Task.add_decl None d_ts_base in

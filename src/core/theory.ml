@@ -351,7 +351,7 @@ let add_symbol add id v uc =
       uc_export = add true  id.id_string v e0 :: ste }
   | _ -> assert false
 
-let add_type uc (ts,def) =
+let add_data uc (ts,csl) =
   let add_proj uc = function
     | Some pj -> add_symbol add_ls pj.ls_name pj uc
     | None -> uc in
@@ -359,9 +359,7 @@ let add_type uc (ts,def) =
     let uc = add_symbol add_ls fs.ls_name fs uc in
     List.fold_left add_proj uc pl in
   let uc = add_symbol add_ts ts.ts_name ts uc in
-  match def with
-    | Tabstract -> uc
-    | Talgebraic lfs -> List.fold_left add_constr uc lfs
+  List.fold_left add_constr uc csl
 
 let add_logic uc (ls,_) = add_symbol add_ls ls.ls_name ls uc
 
@@ -377,14 +375,18 @@ let create_decl d = mk_tdecl (Decl d)
 let add_decl uc d =
   let uc = add_tdecl uc (create_decl d) in
   match d.d_node with
-    | Dtype dl  -> List.fold_left add_type uc dl
+    | Dtype ts  -> add_symbol add_ts ts.ts_name ts uc
+    | Ddata dl  -> List.fold_left add_data uc dl
+    | Dparam ls -> add_symbol add_ls ls.ls_name ls uc
     | Dlogic dl -> List.fold_left add_logic uc dl
     | Dind dl   -> List.fold_left add_ind uc dl
     | Dprop p   -> add_prop uc p
 
 (** Declaration constructors + add_decl *)
 
-let add_ty_decl uc dl = add_decl uc (create_ty_decl dl)
+let add_ty_decl uc ts = add_decl uc (create_ty_decl ts)
+let add_data_decl uc dl = add_decl uc (create_data_decl dl)
+let add_param_decl uc ls = add_decl uc (create_param_decl ls)
 let add_logic_decl uc dl = add_decl uc (create_logic_decl dl)
 let add_ind_decl uc dl = add_decl uc (create_ind_decl dl)
 let add_prop_decl uc k p f = add_decl uc (create_prop_decl k p f)
@@ -517,28 +519,29 @@ let cl_init th inst =
 
 (* clone declarations *)
 
-let cl_type cl inst tdl =
+let cl_type cl inst ts =
+  if Mts.mem ts inst.inst_ts then
+    if ts.ts_def = None then raise EmptyDecl
+    else raise (CannotInstantiate ts.ts_name);
+  create_ty_decl (cl_find_ts cl ts)
+
+let cl_data cl inst tdl =
   let add_ls ls =
-    if Mls.mem ls inst.inst_ls
-      then raise (CannotInstantiate ls.ls_name)
-      else cl_find_ls cl ls
+    if Mls.mem ls inst.inst_ls then
+      raise (CannotInstantiate ls.ls_name);
+    cl_find_ls cl ls
   in
   let add_constr (ls,pl) =
-      add_ls ls, List.map (option_map add_ls) pl
+    add_ls ls, List.map (option_map add_ls) pl
   in
-  let add_type (ts,td) acc =
+  let add_type (ts,csl) =
     if Mts.mem ts inst.inst_ts then
-      if ts.ts_def = None && td = Tabstract then acc
-      else raise (CannotInstantiate ts.ts_name)
-    else
-      let ts' = cl_find_ts cl ts in
-      let td' = match td with
-        | Tabstract -> Tabstract
-        | Talgebraic cl -> Talgebraic (List.map add_constr cl)
-      in
-      (ts',td') :: acc
+      raise (CannotInstantiate ts.ts_name);
+    let ts' = cl_find_ts cl ts in
+    let td' = List.map add_constr csl in
+    (ts',td')
   in
-  create_ty_decl (List.fold_right add_type tdl [])
+  create_data_decl (List.map add_type tdl)
 
 let extract_ls_defn f =
   let vl,_,f = match f.t_node with
@@ -549,19 +552,18 @@ let extract_ls_defn f =
     | Tbinop (_, {t_node = Tapp (ls,_)}, f) -> make_ls_defn ls vl f
     | _ -> assert false
 
+let cl_param cl inst ls =
+  if Mls.mem ls inst.inst_ls then raise EmptyDecl;
+  create_param_decl (cl_find_ls cl ls)
+
 let cl_logic cl inst ldl =
-  let add_logic (ls,ld) acc = match ld with
-    | None when Mls.mem ls inst.inst_ls ->
-        acc
-    | None ->
-        (cl_find_ls cl ls, None) :: acc
-    | Some _ when Mls.mem ls inst.inst_ls ->
-        raise (CannotInstantiate ls.ls_name)
-    | Some ld ->
-        let f = ls_defn_axiom ld in
-        extract_ls_defn (cl_trans_fmla cl f) :: acc
+  let add_logic (ls,ld) =
+    if Mls.mem ls inst.inst_ls then
+      raise (CannotInstantiate ls.ls_name);
+    let f = ls_defn_axiom ld in
+    extract_ls_defn (cl_trans_fmla cl f)
   in
-  create_logic_decl (List.fold_right add_logic ldl [])
+  create_logic_decl (List.map add_logic ldl)
 
 let cl_ind cl inst idl =
   let add_case (pr,f) =
@@ -589,7 +591,9 @@ let cl_prop cl inst (k,pr,f) =
   create_prop_decl k' pr' f'
 
 let cl_decl cl inst d = match d.d_node with
-  | Dtype tdl -> cl_type cl inst tdl
+  | Dtype ts -> cl_type cl inst ts
+  | Ddata tdl -> cl_data cl inst tdl
+  | Dparam ls -> cl_param cl inst ls
   | Dlogic ldl -> cl_logic cl inst ldl
   | Dind idl -> cl_ind cl inst idl
   | Dprop p -> cl_prop cl inst p
@@ -747,9 +751,9 @@ let on_meta _meta fn acc theory =
 
 let builtin_theory =
   let uc = empty_theory (id_fresh "BuiltIn") [] in
-  let uc = add_ty_decl uc [ts_int, Tabstract] in
-  let uc = add_ty_decl uc [ts_real, Tabstract] in
-  let uc = add_logic_decl uc [ps_equ, None] in
+  let uc = add_ty_decl uc ts_int in
+  let uc = add_ty_decl uc ts_real in
+  let uc = add_param_decl uc ps_equ in
   close_theory uc
 
 let create_theory ?(path=[]) n =
@@ -757,22 +761,22 @@ let create_theory ?(path=[]) n =
 
 let bool_theory =
   let uc = empty_theory (id_fresh "Bool") [] in
-  let uc = add_ty_decl uc [ts_bool, Talgebraic [fs_true,[]; fs_false,[]]] in
+  let uc = add_data_decl uc [ts_bool, [fs_true,[]; fs_false,[]]] in
   close_theory uc
 
 let highord_theory =
   let uc = empty_theory (id_fresh "HighOrd") [] in
-  let uc = add_ty_decl uc [ts_func, Tabstract] in
-  let uc = add_ty_decl uc [ts_pred, Tabstract] in
-  let uc = add_logic_decl uc [fs_func_app, None] in
-  let uc = add_logic_decl uc [ps_pred_app, None] in
+  let uc = add_ty_decl uc ts_func in
+  let uc = add_ty_decl uc ts_pred in
+  let uc = add_param_decl uc fs_func_app in
+  let uc = add_param_decl uc ps_pred_app in
   close_theory uc
 
 let tuple_theory = Util.memo_int 17 (fun n ->
   let ts = ts_tuple n and fs = fs_tuple n in
   let pl = List.map (fun _ -> None) ts.ts_args in
   let uc = empty_theory (id_fresh ("Tuple" ^ string_of_int n)) [] in
-  let uc = add_ty_decl uc [ts, Talgebraic [fs,pl]] in
+  let uc = add_data_decl uc [ts, [fs,pl]] in
   close_theory uc)
 
 let tuple_theory_name s =

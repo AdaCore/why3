@@ -254,8 +254,7 @@ and comment_line = parse
     let ast = with_location (tptp_file token) lb in
     (), Tptp_typing.typecheck env path ast
 
-(*  let library_of_env = Env.register_format "tptp" ["p";"ax"] read_channel *)
-  let library_of_env = Env.register_format "tff1" ["p";"ax"] read_channel
+  let library_of_env = Env.register_format "tptp" ["p";"ax"] read_channel
 }
 
 (*

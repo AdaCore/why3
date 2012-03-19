@@ -2,11 +2,28 @@
 name = "Alt-Ergo"
 exec = "alt-ergo"
 exec = "alt-ergo-0.94"
+version_switch = "-version"
+version_regexp = "\\([0-9.]+\\)"
+version_ok = "0.94"
+version_bad = "0.93.1"
+version_bad = "0.93"
+version_bad = "0.92.3"
+version_bad = "0.92.2"
+version_bad = "0.92.1"
+version_bad = "0.92"
+version_bad = "0.91"
+version_bad = "0.9"
+version_bad = "0.8"
+command = "@LOCALBIN@why3-cpulimit %t %m -s %e %f"
+driver = "drivers/alt_ergo.drv"
+
+[ATP alt-ergo]
+name = "Alt-Ergo"
+exec = "alt-ergo"
 exec = "alt-ergo-0.93.1"
 exec = "alt-ergo-0.93"
 version_switch = "-version"
 version_regexp = "\\([0-9.]+\\)"
-version_ok = "0.94"
 version_ok = "0.93.1"
 version_ok = "0.93"
 version_bad = "0.92.3"
@@ -17,7 +34,7 @@ version_bad = "0.91"
 version_bad = "0.9"
 version_bad = "0.8"
 command = "@LOCALBIN@why3-cpulimit %t %m -s %e %f"
-driver = "drivers/alt_ergo.drv"
+driver = "drivers/alt_ergo_0.93.drv"
 
 [ATP alt-ergo]
 name = "Alt-Ergo"
@@ -69,7 +86,7 @@ version_bad = "2.4"
 version_ok  = "2.2"
 version_old = "2.1"
 # we pass time 0 to why3-cpulimit to avoid race
-command = "@LOCALBIN@why3-cpulimit 0 %m -s %e -timeout %t %f"
+command = "@LOCALBIN@why3-cpulimit %T %m -s %e -timeout %t %f"
 driver = "drivers/cvc3.drv"
 
 [ATP yices]
@@ -94,7 +111,7 @@ version_switch = "--version"
 version_regexp = "E \\([-0-9.]+\\) [^\n]+"
 version_ok = "1.4"
 # we pass time 0 to why3-cpulimit to avoid race
-command = "@LOCALBIN@why3-cpulimit 0 %m -s %e -s -R -xAuto -tAuto --cpu-limit=%t --tstp-in %f"
+command = "@LOCALBIN@why3-cpulimit %T %m -s %e -s -R -xAuto -tAuto --cpu-limit=%t --tstp-in %f"
 driver = "drivers/tptp.drv"
 
 [ATP gappa]
@@ -136,7 +153,7 @@ version_switch = "-TPTP || true"
 version_regexp = "SPASS V \\([^ \n\t]+\\)"
 version_ok = "3.7"
 # we pass time 0 to why3-cpulimit to avoid race
-command = "@LOCALBIN@why3-cpulimit 0 %m -s %e -TPTP -PGiven=0 -PProblem=0 -TimeLimit=%t %f"
+command = "@LOCALBIN@why3-cpulimit %T %m -s %e -TPTP -PGiven=0 -PProblem=0 -TimeLimit=%t %f"
 driver = "drivers/tptp.drv"
 
 [ATP vampire]
@@ -145,7 +162,7 @@ exec = "vampire"
 version_switch = "--version"
 version_regexp = "Vampire \\([0-9.]+\\)"
 # we pass time 0 to why3-cpulimit to avoid race
-command = "@LOCALBIN@why3-cpulimit 0 %m -s %e -t %t"
+command = "@LOCALBIN@why3-cpulimit %T %m -s %e -t %t"
 driver = "drivers/vampire.drv"
 version_ok = "0.6"
 

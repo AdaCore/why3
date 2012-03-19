@@ -21,6 +21,6 @@
 
 open Whytac
 
-TACTIC EXTEND Why
-  [ "why" string(s) ] -> [ whytac s ]
+TACTIC EXTEND Why3
+  [ "why3" string(s) ] -> [ whytac s ]
 END

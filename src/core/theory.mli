@@ -135,7 +135,9 @@ val create_decl : decl -> tdecl
 
 val add_decl : theory_uc -> decl -> theory_uc
 
-val add_ty_decl : theory_uc -> ty_decl list -> theory_uc
+val add_ty_decl : theory_uc -> tysymbol -> theory_uc
+val add_data_decl : theory_uc -> data_decl list -> theory_uc
+val add_param_decl : theory_uc -> lsymbol -> theory_uc
 val add_logic_decl : theory_uc -> logic_decl list -> theory_uc
 val add_ind_decl : theory_uc -> ind_decl list -> theory_uc
 val add_prop_decl : theory_uc -> prop_kind -> prsymbol -> term -> theory_uc

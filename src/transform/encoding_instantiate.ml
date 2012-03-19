@@ -28,9 +28,6 @@ open Task
 open Decl
 open Encoding
 
-let meta_complete = register_meta_excl
-  "encoding_instantiate : complete" [MTstring]
-
 exception TooMuchInstantiation of int
 let max_instantiation = 512 (* 7 ** 3 = 343 *)
 
@@ -366,10 +363,10 @@ let ty_quant =
 
 let add_decl_ud menv task =
   let task = Sts.fold
-    (fun ts task -> add_ty_decl task [ts,Tabstract])
+    (fun ts task -> add_ty_decl task ts)
     menv.undef_tsymbol task in
   let task = Sls.fold
-    (fun ls task -> add_logic_decl task [ls,None])
+    (fun ls task -> add_param_decl task ls)
     menv.undef_lsymbol task in
   task
 
@@ -410,21 +407,18 @@ let fold_map task_hd ((env:env),task) =
         | Exit -> env,add_tdecl task task_hd.task_decl
       end
     | Decl d -> match d.d_node with
-    | Dtype [_,Tabstract] -> (env,task)
+    | Dtype _ -> (env,task)
     (* Nothing here since the type kept are already defined and the other
        will be lazily defined *)
-    | Dtype _ -> Printer.unsupportedDecl
+    | Ddata _ -> Printer.unsupportedDecl
         d "encoding_decorate : I can work only on abstract\
             type which are not in recursive bloc."
-    | Dlogic l ->
-        let fn = function
-          | _, Some _ ->
-              Printer.unsupportedDecl
-                d "encoding_decorate : I can't encode definition. \
+    | Dparam _ ->
+        (* Noting here since the logics are lazily defined *)
+        (env,task)
+    | Dlogic _ -> Printer.unsupportedDecl
+        d "encoding_decorate : I can't encode definition. \
 Perhaps you could use eliminate_definition"
-          | _, None -> () in
-            (* Noting here since the logics are lazily defined *)
-            List.iter fn l; (env,task)
     | Dind _ -> Printer.unsupportedDecl
         d "encoding_decorate : I can't work on inductive"
         (* let fn (pr,f) = pr, fnF f in *)
@@ -486,7 +480,7 @@ let monomorphise_goal =
     let f = t_ty_subst mty Mvs.empty f in
     let acc = [create_prop_decl Pgoal pr f] in
     let acc = List.fold_left
-      (fun acc ts -> (create_ty_decl [ts,Tabstract]) :: acc)
+      (fun acc ts -> (create_ty_decl ts) :: acc)
       acc ltv in
     acc)
 
@@ -497,7 +491,7 @@ let create_env task tenv keep =
     Mty.add ty ty ty_ty)
     keep Mty.empty in
   let task = Sty.fold (fun ty task ->
-    let add_ts task ts = add_ty_decl task [ts,Tabstract] in
+    let add_ts task ts = add_ty_decl task ts in
     let task = ty_s_fold add_ts task ty in
     task (* the meta is yet here *)) keep task in
   task,{
@@ -522,36 +516,19 @@ let is_ty_mono ~only_mono ty =
 
 let create_trans_complete kept complete =
   let task = use_export None builtin_theory in
-  let tenv = match complete with
-    | None | Some [MAstr "yes"] -> Complete
-    | Some [MAstr "no"] ->  Incomplete
-    | _ -> failwith "instantiate complete wrong argument" in
-  let init_task,env = create_env task tenv kept in
+  let init_task,env = create_env task complete kept in
   Trans.fold_map fold_map env init_task
 
-let encoding_instantiate =
+let encoding_instantiate complete =
   Trans.compose Libencoding.close_kept
   (Trans.on_tagged_ty Libencoding.meta_kept (fun kept ->
-    Trans.on_meta_excl meta_complete (fun complete ->
-      create_trans_complete kept complete)))
+    create_trans_complete kept complete))
 
 let () = Hashtbl.replace Encoding.ft_enco_kept "instantiate"
-  (const encoding_instantiate)
+  (const (encoding_instantiate Incomplete))
 
-
-let create_trans_complete create_env kept complete =
-  let task = use_export None builtin_theory in
-  let tenv = match complete with
-    | None | Some [MAstr "yes"] -> Complete
-    | Some [MAstr "no"] ->  Incomplete
-    | _ -> failwith "instantiate complete wrong argument" in
-  let init_task,env = create_env task tenv kept in
-  Trans.fold_map fold_map env init_task
-
-let t create_env =
-  Trans.on_tagged_ty Libencoding.meta_kept (fun kept ->
-  Trans.on_meta_excl meta_complete (fun complete ->
-      create_trans_complete create_env kept complete))
+let () = Hashtbl.replace Encoding.ft_enco_kept "instantiate_complete"
+  (const (encoding_instantiate Complete))
 
 (*
 Local Variables:

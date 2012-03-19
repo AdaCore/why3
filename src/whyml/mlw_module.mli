@@ -78,7 +78,9 @@ val add_to_theory :
 val add_decl : module_uc -> decl -> module_uc
 val add_decl_with_tuples : module_uc -> decl -> module_uc
 
-val add_ty_decl : module_uc -> ty_decl list -> module_uc
+val add_ty_decl : module_uc -> tysymbol -> module_uc
+val add_data_decl : module_uc -> Decl.data_decl list -> module_uc
+val add_param_decl : module_uc -> lsymbol -> module_uc
 val add_logic_decl : module_uc -> logic_decl list -> module_uc
 val add_ind_decl : module_uc -> ind_decl list -> module_uc
 val add_prop_decl : module_uc -> prop_kind -> prsymbol -> term -> module_uc

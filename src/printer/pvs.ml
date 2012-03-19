@@ -84,7 +84,7 @@ let black_list =
     "challenge"; "endif"; "judgement"; "recursive";
     "claim"; "endtable"; "lambda"; "sublemma";
     "closure"; "exists"; "law"; "subtypes";
-    "cond"; "exporting"; "lemma"; "subtype"; "of"; 
+    "cond"; "exporting"; "lemma"; "subtype"; "of";
     (* PVS prelude *)
     "even";
     (* introduced by Why3 *)
@@ -619,30 +619,33 @@ let realization ~old ?def fmt produce_realization =
   else
     fprintf fmt "@\n"
 
-let print_type_decl ~old info fmt (ts,def) =
+let print_type_decl ~old info fmt ts =
   if is_ts_tuple ts then () else
-  match def with
-    | Tabstract -> begin match ts.ts_def with
-        | None ->
-            fprintf fmt "@[<hov 2>%a%a: TYPE@]@\n%a"
-              print_ts ts print_params_list ts.ts_args
-              (realization ~old ~def:true) info.realization
-        | Some ty ->
-            fprintf fmt "@[<hov 2>%a%a: TYPE =@ %a@]@\n@\n"
-              print_ts ts print_params_list ts.ts_args
-              (print_ty info) ty
-        end
-    | Talgebraic csl ->
-        fprintf fmt
-          "@[<hov 1>%a%a: DATATYPE@\n@[<hov 1>BEGIN@\n%a@]@\nEND %a@]@\n"
+  match ts.ts_def with
+    | None ->
+        fprintf fmt "@[<hov 2>%a%a: TYPE@]@\n%a"
           print_ts ts print_params_list ts.ts_args
-          (print_list newline (print_constr info ts)) csl
-          print_ts ts;
-        fprintf fmt "@\n"
+          (realization ~old ~def:true) info.realization
+    | Some ty ->
+        fprintf fmt "@[<hov 2>%a%a: TYPE =@ %a@]@\n@\n"
+          print_ts ts print_params_list ts.ts_args
+          (print_ty info) ty
 
-let print_type_decl ~old info fmt d =
+let print_type_decl ~old info fmt ts =
+  if not (Mid.mem ts.ts_name info.info_syn) then
+    (print_type_decl ~old info fmt ts; forget_tvs ())
+
+let print_data_decl info fmt (ts,csl) =
+  if is_ts_tuple ts then () else
+  fprintf fmt
+    "@[<hov 1>%a%a: DATATYPE@\n@[<hov 1>BEGIN@\n%a@]@\nEND %a@]@\n@\n"
+    print_ts ts print_params_list ts.ts_args
+    (print_list newline (print_constr info ts)) csl
+    print_ts ts
+
+let print_data_decl info fmt d =
   if not (Mid.mem (fst d).ts_name info.info_syn) then
-    (print_type_decl ~old info fmt d; forget_tvs ())
+    (print_data_decl info fmt d; forget_tvs ())
 
 let print_ls_type info fmt ls =
   begin match ls with
@@ -650,65 +653,64 @@ let print_ls_type info fmt ls =
     | Some ty -> print_ty info fmt ty
   end
 
-let print_logic_decl ~old info fmt (ls,ld) =
+let print_param_decl ~old info fmt ls =
   ignore old;
   let _ty_vars_args, _ty_vars_value, all_ty_params = ls_ty_vars ls in
-  begin match ld with
-    | Some ld ->
-        let vl,e = open_ls_defn ld in
-	fprintf fmt "@[<hov 2>%a%a(%a): %a =@ %a@]@\n"
-          print_ls ls print_params all_ty_params
-          (print_comma_list (print_vsty_nopar info)) vl
-          (print_ls_type info) ls.ls_value
-          (print_expr info) e;
-	List.iter forget_var vl
-    | None when ls.ls_args = [] ->
-        fprintf fmt "@[<hov 2>%a%a: %a@]@\n"
+  match ls.ls_args with
+    | [] ->
+        fprintf fmt "@[<hov 2>%a%a: %a@]@\n@\n"
           print_ls ls
           print_params all_ty_params
           (print_ls_type info) ls.ls_value
-    | None ->
-        fprintf fmt "@[<hov 2>%a%a: [%a -> %a]@]@\n"
+    | _ ->
+        fprintf fmt "@[<hov 2>%a%a: [%a -> %a]@]@\n@\n"
           print_ls ls print_params all_ty_params
           (print_comma_list (print_ty info)) ls.ls_args
           (print_ls_type info) ls.ls_value
           (* (realization ~old ~def:true) info.realization *)
-  end;
-  fprintf fmt "@\n"
+
+let print_param_decl ~old info fmt ls =
+  if not (Mid.mem ls.ls_name info.info_syn) then
+    (print_param_decl ~old info fmt ls; forget_tvs ())
+
+let print_logic_decl ~old info fmt (ls,ld) =
+  ignore old;
+  let _ty_vars_args, _ty_vars_value, all_ty_params = ls_ty_vars ls in
+  let vl,e = open_ls_defn ld in
+  fprintf fmt "@[<hov 2>%a%a(%a): %a =@ %a@]@\n@\n"
+    print_ls ls print_params all_ty_params
+    (print_comma_list (print_vsty_nopar info)) vl
+    (print_ls_type info) ls.ls_value
+    (print_expr info) e;
+  List.iter forget_var vl
 
 let print_logic_decl ~old info fmt d =
   if not (Mid.mem (fst d).ls_name info.info_syn) then
     (print_logic_decl ~old info fmt d; forget_tvs ())
 
-let print_recursive_decl info tm fmt (ls,ld) =
+let print_recursive_decl info fmt (ls,ld) =
   let _, _, all_ty_params = ls_ty_vars ls in
-  let il = try Mls.find ls tm with Not_found -> assert false in
-  let i = match il with [i] -> i | _ -> assert false in
-  begin match ld with
-    | Some ld ->
-        let vl,e = open_ls_defn ld in
-        fprintf fmt "@[<hov 2>%a%a(%a): RECURSIVE %a =@ %a@\n"
-          print_ls ls print_params all_ty_params
-          (print_comma_list (print_vsty_nopar info)) vl
-          (print_ls_type info) ls.ls_value
-          (print_expr info) e;
-        fprintf fmt "MEASURE %a BY <<@\n@]"
-          print_vs (List.nth vl i);
-        List.iter forget_var vl
-    | None ->
-        assert false
-  end
+  let i = match Decl.ls_defn_decrease ld with
+    | [i] -> i | _ -> assert false in
+  let vl,e = open_ls_defn ld in
+  fprintf fmt "@[<hov 2>%a%a(%a): RECURSIVE %a =@ %a@\n"
+    print_ls ls print_params all_ty_params
+    (print_comma_list (print_vsty_nopar info)) vl
+    (print_ls_type info) ls.ls_value
+    (print_expr info) e;
+  fprintf fmt "MEASURE %a BY <<@\n@]"
+    print_vs (List.nth vl i);
+  List.iter forget_var vl
 
 let print_recursive_decl info fmt dl =
-  let tm = check_termination dl in
   let d, dl = match dl with
     | [d] -> d, []
     | d :: dl -> d, dl (* PVS does not support mutual recursion *)
     | [] -> assert false
   in
   fprintf fmt "@[<hov 2>";
-  print_recursive_decl info tm fmt d; forget_tvs ();
-  List.iter (print_recursive_decl info tm fmt) dl;
+  print_recursive_decl info fmt d; forget_tvs ();
+  List.iter (print_recursive_decl info fmt) dl;
   fprintf fmt "@]@\n"
 
 let print_ind info fmt (pr,f) =
@@ -751,8 +753,12 @@ let print_proof_context ~old info fmt = function
   | Pskip -> ()
 
 let print_decl ~old info fmt d = match d.d_node with
-  | Dtype tl  ->
-      print_list nothing (print_type_decl ~old info) fmt tl
+  | Dtype ts ->
+      print_type_decl ~old info fmt ts
+  | Ddata tl ->
+      print_list nothing (print_data_decl info) fmt tl
+  | Dparam ls ->
+      print_param_decl ~old info fmt ls
   | Dlogic [s, _ as ld] when not (Sid.mem s.ls_name d.d_syms) ->
       print_logic_decl ~old info fmt ld
   | Dlogic ll ->

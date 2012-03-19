@@ -36,7 +36,7 @@ let ts_base = create_tysymbol (id_fresh "uni") [] None
 let ty_base = ty_app ts_base []
 
 (* ts_base declaration *)
-let d_ts_base = create_ty_decl [ts_base, Tabstract]
+let d_ts_base = create_ty_decl ts_base
 
 (* sort symbol of (polymorphic) types *)
 let ts_type = create_tysymbol (id_fresh "ty") [] None
@@ -45,7 +45,7 @@ let ts_type = create_tysymbol (id_fresh "ty") [] None
 let ty_type = ty_app ts_type []
 
 (* ts_type declaration *)
-let d_ts_type = create_ty_decl [ts_type, Tabstract]
+let d_ts_type = create_ty_decl ts_type
 
 (* function symbol mapping ty_type^n to ty_type *)
 let ls_of_ts = Wts.memoize 63 (fun ts ->
@@ -93,7 +93,7 @@ let ls_selects_def_of_ts acc ts =
   let props =
     List.fold_left2 (fun acc x y -> create_props x y::acc)
       acc ls_selects fmlas in
-  let add acc fs = create_logic_decl [fs,None] :: acc in
+  let add acc fs = create_param_decl fs :: acc in
   List.fold_left add props ls_selects
 
 (* convert a type to a term of type ty_type *)
@@ -116,26 +116,12 @@ let t_type_close fn f =
   type_close tvs fn f
 
 (* convert a type declaration to a list of lsymbol declarations *)
-let lsdecl_of_tydecl acc td = match td with
-    | ts, Talgebraic _ ->
-        let ty = ty_app ts (List.map ty_var ts.ts_args) in
-        Printer.unsupportedType ty "no algebraic types at this point"
-    | { ts_def = Some _ }, _ -> acc
-    | ts, _ -> create_logic_decl [ls_of_ts ts, None] :: acc
+let lsdecl_of_ts ts = create_param_decl (ls_of_ts ts)
 
 (* convert a type declaration to a list of lsymbol declarations *)
-let lsdecl_of_tydecl_select tdl =
-  let add acc td = match td with
-    | ts, Talgebraic _ ->
-        let ty = ty_app ts (List.map ty_var ts.ts_args) in
-        Printer.unsupportedType ty "no algebraic types at this point"
-    | { ts_def = Some _ }, _ -> acc
-    | ts, _ -> ls_selects_def_of_ts acc ts
-  in
-  let defs = List.fold_left add [] tdl in
-  List.fold_left lsdecl_of_tydecl defs tdl
-
-let lsdecl_of_tydecl tdl = List.fold_left lsdecl_of_tydecl [] tdl
+let lsdecl_of_ts_select ts =
+  let defs = ls_selects_def_of_ts [] ts in
+  create_param_decl (ls_of_ts ts) :: defs
 
 (* convert a constant to a functional symbol of type ty_base *)
 let ls_of_const =
@@ -222,29 +208,23 @@ let d_monomorph kept lsmap d =
   let kept = Sty.add ty_base kept in
   let t_mono = t_monomorph kept lsmap consts in
   let dl = match d.d_node with
-    | Dtype tdl ->
-        let add td acc = match td with
-          | _, Talgebraic _ ->
-              Printer.unsupportedDecl d "no algebraic types at this point"
-          | { ts_def = Some _ }, _ -> acc
-          | ts, _ when not (Sty.exists (ty_s_any (ts_equal ts)) kept) -> acc
-          | _ -> create_ty_decl [td] :: acc
-        in
-        List.fold_right add tdl []
+    | Dtype { ts_def = Some _ } -> []
+    | Dtype ts when not (Sty.exists (ty_s_any (ts_equal ts)) kept) -> []
+    | Dtype ts ->
+        [create_ty_decl ts]
+    | Ddata _ ->
+        Printer.unsupportedDecl d "no algebraic types at this point"
+    | Dparam ls ->
+        let ls = if ls_equal ls ps_equ then ls else lsmap ls in
+        [create_param_decl ls]
     | Dlogic ldl ->
         let conv (ls,ld) =
-          let ls =
-            if ls_equal ls ps_equ then ls else lsmap ls
-          in
-          match ld with
-          | Some ld ->
-              let ul,e,close = open_ls_defn_cb ld in
-              let vl = List.map (vs_monomorph kept) ul in
-              let add acc u v = Mvs.add u (t_var v) acc in
-              let vmap = List.fold_left2 add Mvs.empty ul vl in
-              close ls vl (t_mono vmap e)
-          | None ->
-              ls, None
+          let ls = if ls_equal ls ps_equ then ls else lsmap ls in
+          let ul,e,close = open_ls_defn_cb ld in
+          let vl = List.map (vs_monomorph kept) ul in
+          let add acc u v = Mvs.add u (t_var v) acc in
+          let vmap = List.fold_left2 add Mvs.empty ul vl in
+          close ls vl (t_mono vmap e)
         in
         [create_logic_decl (List.map conv ldl)]
     | Dind idl ->
@@ -254,7 +234,7 @@ let d_monomorph kept lsmap d =
     | Dprop (k,pr,f) ->
         [create_prop_decl k pr (t_mono Mvs.empty f)]
   in
-  let add ls acc = create_logic_decl [ls,None] :: acc in
+  let add ls acc = create_param_decl ls :: acc in
   Sls.fold add !consts dl
 
 (* replace type variables in a goal with fresh type constants *)
@@ -266,7 +246,7 @@ let monomorphise_goal = Trans.goal (fun pr f ->
     Mtv.add tv (ty_app ts []) mty, ts::ltv) stv (Mtv.empty,[]) in
   let f = t_ty_subst mty Mvs.empty f in
   List.fold_left
-    (fun acc ts -> create_ty_decl [ts,Tabstract] :: acc)
+    (fun acc ts -> create_ty_decl ts :: acc)
     [create_prop_decl Pgoal pr f] ltv)
 
 (* close by subtype the set of types tagged by meta_kept *)
@@ -287,4 +267,4 @@ let defn_or_axiom ls f =
     | None ->
         let nm = ls.ls_name.id_string ^ "_def" in
         let pr = create_prsymbol (id_derive nm ls.ls_name) in
-        [create_logic_decl [ls,None]; create_prop_decl Paxiom pr f]
+        [create_param_decl ls; create_prop_decl Paxiom pr f]

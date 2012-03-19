@@ -60,7 +60,7 @@ module InPlaceRev
 
   lemma list_seg_sublistl:
     forall next:map loc loc, l1 l2:list loc, p q: loc.
-      list_seg p next (l1++Cons q l2) null -> 
+      list_seg p next (l1++Cons q l2) null ->
         list_seg q next (Cons q l2) null
 
   lemma list_seg_no_repet:
@@ -94,7 +94,7 @@ module InPlaceRev
         pM := tail !pM
     done;
     !r
-    { list_seg result !next (reverse lM) null } 
+    { list_seg result !next (reverse lM) null }
 
 end
 

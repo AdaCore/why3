@@ -252,6 +252,8 @@ val t_label_copy : term -> term -> term
 
 (** Constructors with propositional simplification *)
 
+val keep_on_simp_label : label
+
 val t_if_simp : term -> term -> term -> term
 val t_let_simp : term -> term_bound -> term
 val t_quant_simp : quant -> term_quant -> term

@@ -248,49 +248,54 @@ let print_constr fmt (cs,pjl) =
     (print_list nothing print_pj)
     (List.fold_right2 add_pj pjl cs.ls_args [])
 
-let print_type_decl fst fmt (ts,def) = match def with
-  | Tabstract -> begin match ts.ts_def with
-      | None ->
-          fprintf fmt "@[<hov 2>%s %a%a%a@]@\n@\n"
-            (if fst then "type" else "with") print_ts ts
-            print_ident_labels ts.ts_name
-            (print_list nothing print_tv_arg) ts.ts_args
-      | Some ty ->
-          fprintf fmt "@[<hov 2>%s %a%a%a =@ %a@]@\n@\n"
-            (if fst then "type" else "with") print_ts ts
-            print_ident_labels ts.ts_name
-            (print_list nothing print_tv_arg) ts.ts_args print_ty ty
-      end
-  | Talgebraic csl ->
-      fprintf fmt "@[<hov 2>%s %a%a%a =@\n@[<hov>%a@]@]@\n@\n"
-        (if fst then "type" else "with") print_ts ts
-        print_ident_labels ts.ts_name
+let print_type_decl fmt ts = match ts.ts_def with
+  | None ->
+      fprintf fmt "@[<hov 2>type %a%a%a@]@\n@\n"
+        print_ts ts print_ident_labels ts.ts_name
         (print_list nothing print_tv_arg) ts.ts_args
-        (print_list newline print_constr) csl
+  | Some ty ->
+      fprintf fmt "@[<hov 2>type %a%a%a =@ %a@]@\n@\n"
+        print_ts ts print_ident_labels ts.ts_name
+        (print_list nothing print_tv_arg) ts.ts_args print_ty ty
 
-let print_type_decl first fmt d =
+let print_type_decl fmt ts =
+  if not (query_remove ts.ts_name) then
+    (print_type_decl fmt ts; forget_tvs ())
+
+let print_data_decl fst fmt (ts,csl) =
+  fprintf fmt "@[<hov 2>%s %a%a%a =@\n@[<hov>%a@]@]@\n@\n"
+    (if fst then "type" else "with") print_ts ts
+    print_ident_labels ts.ts_name
+    (print_list nothing print_tv_arg) ts.ts_args
+    (print_list newline print_constr) csl
+
+let print_data_decl first fmt d =
   if not (query_remove (fst d).ts_name) then
-    (print_type_decl first fmt d; forget_tvs ())
+    (print_data_decl first fmt d; forget_tvs ())
 
 let print_ls_type fmt = fprintf fmt " :@ %a" print_ty
 
 let ls_kind ls = if ls.ls_value = None then "predicate" else "function"
 
-let print_logic_decl fst fmt (ls,ld) = match ld with
-  | Some ld ->
-      let vl,e = open_ls_defn ld in
-      fprintf fmt "@[<hov 2>%s %a%a%a%a =@ %a@]@\n@\n"
-        (if fst then ls_kind ls else "with") print_ls ls
-        print_ident_labels ls.ls_name
-        (print_list nothing print_vs_arg) vl
-        (print_option print_ls_type) ls.ls_value print_term e;
-      List.iter forget_var vl
-  | None ->
-      fprintf fmt "@[<hov 2>%s %a%a%a%a@]@\n@\n"
-        (if fst then ls_kind ls else "with") print_ls ls
-        print_ident_labels ls.ls_name
-        (print_list nothing print_ty_arg) ls.ls_args
-        (print_option print_ls_type) ls.ls_value
+let print_param_decl fmt ls =
+  fprintf fmt "@[<hov 2>%s %a%a%a%a@]@\n@\n"
+    (ls_kind ls) print_ls ls
+    print_ident_labels ls.ls_name
+    (print_list nothing print_ty_arg) ls.ls_args
+    (print_option print_ls_type) ls.ls_value
+
+let print_param_decl fmt ls =
+  if not (query_remove ls.ls_name) then
+    (print_param_decl fmt ls; forget_tvs ())
+
+let print_logic_decl fst fmt (ls,ld) =
+  let vl,e = open_ls_defn ld in
+  fprintf fmt "@[<hov 2>%s %a%a%a%a =@ %a@]@\n@\n"
+    (if fst then ls_kind ls else "with") print_ls ls
+    print_ident_labels ls.ls_name
+    (print_list nothing print_vs_arg) vl
+    (print_option print_ls_type) ls.ls_value print_term e;
+  List.iter forget_var vl
 
 let print_logic_decl first fmt d =
   if not (query_remove (fst d).ls_name) then
@@ -328,7 +333,9 @@ let print_list_next sep print fmt = function
       print_list sep (print false) fmt r
 
 let print_decl fmt d = match d.d_node with
-  | Dtype tl  -> print_list_next nothing print_type_decl fmt tl
+  | Dtype ts  -> print_type_decl fmt ts
+  | Ddata tl  -> print_list_next nothing print_data_decl fmt tl
+  | Dparam ls -> print_param_decl fmt ls
   | Dlogic ll -> print_list_next nothing print_logic_decl fmt ll
   | Dind il   -> print_list_next nothing print_ind_decl fmt il
   | Dprop p   -> print_prop_decl fmt p
