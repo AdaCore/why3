@@ -2,12 +2,6 @@ open Why3
 open Term
 open Ident
 
-(*
-let _ =
-   Debug.set_flag (Debug.lookup_flag "scheduler");
-   Debug.set_flag (Debug.lookup_flag "session")
-*)
-
 let rec extract_explanation expl gnat s =
    if Slab.is_empty s then expl, gnat
    else
@@ -212,27 +206,67 @@ let env_session, is_new_session =
 
 exception Not_Proven of Call_provers.prover_answer
 
-let iter_leaf_goals f =
-   let rec iter_f any =
+let iter_main_goals fu =
+   (* Main goals are at the following point in the theory:
+        session -> file -> theory -> subgoal
+                                     *here*
+   *)
+   Session.session_iter (fun any ->
       match any with
-      | Session.Goal g when has_parent g -> f g
-      | Session.Goal g -> Session.goal_iter iter_f g
-      | Session.File f -> Session.file_iter iter_f f
-      | Session.Theory t -> Session.theory_iter iter_f t
-      | Session.Transf t -> Session.transf_iter iter_f t
-      | Session.Proof_attempt _ -> ()
-   in
-   Session.session_iter iter_f env_session.Session.session
+      | Session.File f ->
+            Session.file_iter (fun any ->
+               match any with
+               | Session.Theory t ->
+                     Session.theory_iter (fun any ->
+                        match any with
+                        | Session.Goal g ->
+                              fu g
+                        | _ -> ()) t
+               | _ -> ()) f
+      | _ -> ()) env_session.Session.session
+
+let iter_leaf_goals f =
+   iter_main_goals (fun g ->
+      Session.goal_iter (fun any ->
+         match any with
+         | Session.Transf t
+            when t.Session.transf_name = Gnat_config.split_name ->
+               Session.transf_iter (fun any ->
+                  match any with
+                  | Session.Goal g -> f g
+                  | _ -> ()) t
+         | _ -> ()) g)
+
+let rec is_trivial_autogen fml =
+   match fml.t_node with
+   | Ttrue ->
+         Slab.mem Gnat_config.autogen_label fml.t_label 
+   | Tquant (_,tq) ->
+         let _,_,t = t_open_quant tq in
+         is_trivial_autogen t
+   | Tlet (_,tb) ->
+         let _, t = t_open_bound tb in
+         is_trivial_autogen t
+   | Tbinop (Timplies,_,t2) ->
+         is_trivial_autogen t2
+   | Tcase (_,tbl) ->
+         List.for_all (fun b ->
+            let _, t = t_open_branch b in
+            is_trivial_autogen t) tbl
+   | _ ->
+         false
 
 let register_goal goal =
    let task = Session.goal_task goal in
    let fml = Task.task_goal_fmla task in
-   match fml.t_node , search_labels None fml with
-   | Ttrue, None -> Objectives.set_not_interesting goal
+   match is_trivial_autogen fml, search_labels None fml with
+   | true, _ ->
+         Objectives.set_not_interesting goal
    | _, None ->
          Gnat_util.abort_with_message
          "Task has no tracability label."
-   | _, Some e -> Objectives.add_to_expl e goal
+   | _, Some e ->
+         Objectives.add_to_expl e goal
 
 
 let goal_has_been_tried g =
@@ -374,24 +408,7 @@ let _ =
          M.transform env_session sched_state ~context_unproved_goals_only:false
          Gnat_config.split_name (Session.File file)
       end else begin
-         (* We need to add the transformation "split_goal" to subgoals that do
-            not have the transformation yet, and that are in the following
-            hierarchy: session -> file -> theory -> subgoal
-                                                    *here*
-         *)
-         Session.session_iter (fun any ->
-            match any with
-            | Session.File f ->
-                  Session.file_iter (fun any ->
-                     match any with
-                     | Session.Theory t ->
-                           Session.theory_iter (fun any ->
-                              match any with
-                              | Session.Goal g ->
-                                    apply_split_goal_if_needed g
-                              | _ -> ()) t
-                     | _ -> ()) f
-            | _ -> ()) env_session.Session.session
+         iter_main_goals apply_split_goal_if_needed
       end;
       (* apply transformation *)
       Scheduler.main_loop ();
