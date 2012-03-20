@@ -398,7 +398,7 @@ module WP
     { forall sigma pi sigma' pi':env, w:Set.set ident .
         eval_fmla sigma pi f /\ stmt_writes i w /\
         assigns sigma w sigma' ->
-        eval_fmla sigma' pi' f
+        eval_fmla sigma' pi' result
      }
 
   let rec wp (i:stmt) (q:fmla) =

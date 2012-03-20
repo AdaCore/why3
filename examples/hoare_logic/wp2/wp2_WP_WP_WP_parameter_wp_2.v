@@ -183,7 +183,7 @@ Fixpoint subst(f:fmla) (x:Z) (v:Z) {struct f}: fmla :=
   | (Fand f1 f2) => (Fand (subst f1 x v) (subst f2 x v))
   | (Fnot f1) => (Fnot (subst f1 x v))
   | (Fimplies f1 f2) => (Fimplies (subst f1 x v) (subst f2 x v))
-  | (Flet y t f1) => (Flet y t (subst f1 x v))
+  | (Flet y t f1) => (Flet y (subst_term t x v) (subst f1 x v))
   | (Fforall y ty f1) => (Fforall y ty (subst f1 x v))
   end.
 Unset Implicit Arguments.
@@ -427,11 +427,33 @@ Theorem WP_parameter_wp : forall (i:stmt), forall (q:fmla),
       value)) (sigmaqt:(map Z value)) (piqt:(map Z value)) (w:(set1 Z)),
       ((eval_fmla sigma pi (Fand (Fimplies (Fand (Fterm e) inv) result)
       (Fimplies (Fand (Fnot (Fterm e)) inv) q))) /\ ((stmt_writes i1 w) /\
-      (assigns sigma w sigmaqt))) -> (eval_fmla sigmaqt piqt
-      (Fand (Fimplies (Fand (Fterm e) inv) result)
-      (Fimplies (Fand (Fnot (Fterm e)) inv) q)))) -> (valid_triple (Fand inv
-      result1) i q)
+      (assigns sigma w sigmaqt))) -> (eval_fmla sigmaqt piqt result1)) ->
+      (valid_triple (Fand inv result1) i q)
   end.
+destruct i; trivial.
+rename t into cond.
+rename f into inv.
+rename i into body.
+intros Post WP_body H_WP_body.
+intros abstracted_fmla H_abstracted.
+red.
+intros s1 p1 H1 s2 p2 n Hsteps.
+generalize (steps_non_neg _ _ _ _ _ _ _ Hsteps).
+intro H_n_pos.
+generalize s1 p1 H1 Hsteps; clear s1 p1 H1 Hsteps.
+apply Z_lt_induction with (P := 
+  fun n => forall s1 p1 : map Z value,
+    eval_fmla s1 p1 (Fand inv abstracted_fmla) ->
+    many_steps s1 p1 (Swhile cond inv body) s2 p2 Sskip n ->
+    eval_fmla s2 p2 Post); auto.
+intros.
+inversion H1; subst; clear H1.
+inversion H2; subst; clear H2.
+generalize (many_steps_seq _ _ _ _ _ _ _ H3); clear H3.
+intros (s3 & p3 & n1 & n2 & First_iter & Next_iter & Hn1n2).
+generalize (steps_non_neg _ _ _ _ _ _ _ First_iter); intro Hn1_pos.
+generalize (steps_non_neg _ _ _ _ _ _ _ Next_iter); intro Hn2_pos.
+apply H with (3:=Next_iter); auto with zarith.
 
 Qed.
 
