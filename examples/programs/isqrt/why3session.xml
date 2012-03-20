@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
 <why3session
- name="examples/programs/isqrt/why3session.xml">
+ name="programs/isqrt/why3session.xml">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -29,19 +29,19 @@
  <file
   name="../isqrt.mlw"
   verified="false"
-  expanded="true">
+  expanded="false">
   <theory
    name="WP Simple"
-   locfile="examples/programs/isqrt/../isqrt.mlw"
+   locfile="programs/isqrt/../isqrt.mlw"
    loclnum="4" loccnumb="7" loccnume="13"
    verified="true"
    expanded="false">
    <goal
     name="WP_parameter isqrt"
-    locfile="examples/programs/isqrt/../isqrt.mlw"
+    locfile="programs/isqrt/../isqrt.mlw"
     loclnum="11" loccnumb="6" loccnume="11"
     expl="parameter isqrt"
-    sum="6e274e86a58043fd1d6ea37e0ea4c81a"
+    sum="ab231719695ec5b5452b6d8e3d44dac6"
     proved="true"
     expanded="false"
     shape="iainfix <=V1V0ainfix <ainfix -V0V3ainfix -V0V2Aainfix <=c0ainfix -V0V2Aainfix =V4asqrainfix +V3c1Aainfix >=V0asqrV3Aainfix >=V3c0Iainfix =V4ainfix +ainfix +V1ainfix *c2V3c1FIainfix =V3ainfix +V2c1Fainfix <V0asqrainfix +V2c1Aainfix <=asqrV2V0Aainfix >=V2c0Iainfix =V1asqrainfix +V2c1Aainfix >=V0asqrV2Aainfix >=V2c0FFAainfix =c1asqrainfix +c0c1Aainfix >=V0asqrc0Aainfix >=c0c0Iainfix >=V0c0F">
@@ -65,10 +65,10 @@
    </goal>
    <goal
     name="WP_parameter main"
-    locfile="examples/programs/isqrt/../isqrt.mlw"
+    locfile="programs/isqrt/../isqrt.mlw"
     loclnum="24" loccnumb="6" loccnume="10"
     expl="parameter main"
-    sum="95e99b51a9d10c4c48c715339ba2a1a8"
+    sum="e9e630cabc49ebb5db70b68b7f798666"
     proved="true"
     expanded="false"
     shape="ainfix =V0c4Iainfix <c17asqrainfix +V0c1Aainfix <=asqrV0c17Aainfix >=V0c0FAainfix >=c17c0">
@@ -86,16 +86,16 @@
   </theory>
   <theory
    name="WP NewtonMethod"
-   locfile="examples/programs/isqrt/../isqrt.mlw"
+   locfile="programs/isqrt/../isqrt.mlw"
    loclnum="33" loccnumb="7" loccnume="19"
    verified="false"
    expanded="true">
    <goal
     name="WP_parameter sqrt"
-    locfile="examples/programs/isqrt/../isqrt.mlw"
+    locfile="programs/isqrt/../isqrt.mlw"
     loclnum="39" loccnumb="6" loccnume="10"
     expl="parameter sqrt"
-    sum="58ea4d91d0cf0505891bfd8854febea6"
+    sum="55b0132ccacf4693b33706fd8bf81f12"
     proved="false"
     expanded="true"
     shape="iainfix =V0c0ainfix <V0ainfix *ainfix +c0c1ainfix +c0c1Aainfix <=ainfix *c0c0V0iainfix <=V0c3ainfix <V0ainfix *ainfix +c1c1ainfix +c1c1Aainfix <=ainfix *c1c1V0iainfix <V1V2ainfix <V3V2Aainfix <=c0V2Aainfix <V0ainfix *ainfix +V4c1ainfix +V4c1Aainfix <V0ainfix *ainfix +V3c1ainfix +V3c1Aainfix =V4adivainfix +adivV0V3V3c2Aainfix >V3c0Aainfix >V4c0Iainfix =V4adivainfix +adivV0V1V1c2FIainfix =V3V1Fainfix <V0ainfix *ainfix +V2c1ainfix +V2c1Aainfix <=ainfix *V2V2V0Iainfix <V0ainfix *ainfix +V1c1ainfix +V1c1Aainfix <V0ainfix *ainfix +V2c1ainfix +V2c1Aainfix =V1adivainfix +adivV0V2V2c2Aainfix >V2c0Aainfix >V1c0FFAainfix <V0ainfix *ainfix +adivainfix +V0c1c2c1ainfix +adivainfix +V0c1c2c1Aainfix <V0ainfix *ainfix +V0c1ainfix +V0c1Aainfix =adivainfix +V0c1c2adivainfix +adivV0V0V0c2Aainfix >V0c0Aainfix >adivainfix +V0c1c2c0Iainfix >=V0c0F">
@@ -108,10 +108,10 @@
      expanded="true">
      <goal
       name="WP_parameter sqrt.1"
-      locfile="examples/programs/isqrt/../isqrt.mlw"
+      locfile="programs/isqrt/../isqrt.mlw"
       loclnum="39" loccnumb="6" loccnume="10"
       expl="normal postcondition"
-      sum="cf9e3f069b54726e5a707684ac00e45b"
+      sum="2bac94036af94ed73785a28b4972c6cb"
       proved="true"
       expanded="false"
       shape="ainfix <V0ainfix *ainfix +c0c1ainfix +c0c1Aainfix <=ainfix *c0c0V0Iainfix =V0c0Iainfix >=V0c0F">
@@ -142,10 +142,10 @@
      </goal>
      <goal
       name="WP_parameter sqrt.2"
-      locfile="examples/programs/isqrt/../isqrt.mlw"
+      locfile="programs/isqrt/../isqrt.mlw"
       loclnum="39" loccnumb="6" loccnume="10"
       expl="normal postcondition"
-      sum="ce43ad787bf358dc35b16fd72479a65d"
+      sum="ca658fe76283f01b26a13750e677281b"
       proved="true"
       expanded="false"
       shape="ainfix <V0ainfix *ainfix +c1c1ainfix +c1c1Aainfix <=ainfix *c1c1V0Iainfix <=V0c3Iainfix =V0c0NIainfix >=V0c0F">
@@ -176,10 +176,10 @@
      </goal>
      <goal
       name="WP_parameter sqrt.3"
-      locfile="examples/programs/isqrt/../isqrt.mlw"
+      locfile="programs/isqrt/../isqrt.mlw"
       loclnum="39" loccnumb="6" loccnume="10"
       expl="loop invariant init"
-      sum="82dab6461b18ec6402870cba1ea73961"
+      sum="e7e659592bb2ae13c62bbfee0fe4bb70"
       proved="true"
       expanded="true"
       shape="ainfix <V0ainfix *ainfix +adivainfix +V0c1c2c1ainfix +adivainfix +V0c1c2c1Aainfix <V0ainfix *ainfix +V0c1ainfix +V0c1Aainfix =adivainfix +V0c1c2adivainfix +adivV0V0V0c2Aainfix >V0c0Aainfix >adivainfix +V0c1c2c0Iainfix <=V0c3NIainfix =V0c0NIainfix >=V0c0F">
@@ -192,10 +192,10 @@
        expanded="true">
        <goal
         name="WP_parameter sqrt.3.1"
-        locfile="examples/programs/isqrt/../isqrt.mlw"
+        locfile="programs/isqrt/../isqrt.mlw"
         loclnum="39" loccnumb="6" loccnume="10"
         expl="parameter sqrt"
-        sum="726f054611fb1c27eab78421d77f2ddf"
+        sum="d26df8a56b47f425f7bfb0e2963d6939"
         proved="true"
         expanded="false"
         shape="ainfix >adivainfix +V0c1c2c0Iainfix <=V0c3NIainfix =V0c0NIainfix >=V0c0F">
@@ -221,15 +221,15 @@
          timelimit="10"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.01"/>
+         <result status="valid" time="0.00"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter sqrt.3.2"
-        locfile="examples/programs/isqrt/../isqrt.mlw"
+        locfile="programs/isqrt/../isqrt.mlw"
         loclnum="39" loccnumb="6" loccnume="10"
         expl="parameter sqrt"
-        sum="42f75c75ba06fa3cddf659b81d913ef0"
+        sum="def44d60edc1e1af127d3c82dae90bfb"
         proved="true"
         expanded="false"
         shape="ainfix >V0c0Iainfix <=V0c3NIainfix =V0c0NIainfix >=V0c0F">
@@ -260,10 +260,10 @@
        </goal>
        <goal
         name="WP_parameter sqrt.3.3"
-        locfile="examples/programs/isqrt/../isqrt.mlw"
+        locfile="programs/isqrt/../isqrt.mlw"
         loclnum="39" loccnumb="6" loccnume="10"
         expl="parameter sqrt"
-        sum="4332a408c72676e4833401d63bc8dae9"
+        sum="1d13568646f5fbee5ce1b7f6cfa1d63f"
         proved="true"
         expanded="false"
         shape="ainfix =adivainfix +V0c1c2adivainfix +adivV0V0V0c2Iainfix <=V0c3NIainfix =V0c0NIainfix >=V0c0F">
@@ -280,10 +280,10 @@
        </goal>
        <goal
         name="WP_parameter sqrt.3.4"
-        locfile="examples/programs/isqrt/../isqrt.mlw"
+        locfile="programs/isqrt/../isqrt.mlw"
         loclnum="39" loccnumb="6" loccnume="10"
         expl="parameter sqrt"
-        sum="4a5a4c3db06e776c108b0f71af54c853"
+        sum="50fd09183279b23cbd0dab584359ca77"
         proved="true"
         expanded="false"
         shape="ainfix <V0ainfix *ainfix +V0c1ainfix +V0c1Iainfix <=V0c3NIainfix =V0c0NIainfix >=V0c0F">
@@ -314,10 +314,10 @@
        </goal>
        <goal
         name="WP_parameter sqrt.3.5"
-        locfile="examples/programs/isqrt/../isqrt.mlw"
+        locfile="programs/isqrt/../isqrt.mlw"
         loclnum="39" loccnumb="6" loccnume="10"
         expl="parameter sqrt"
-        sum="24bacb4a5fa44040a9f18e34e6fc0eed"
+        sum="a4e8886e3a5da1022b8d9e270ecebe40"
         proved="true"
         expanded="false"
         shape="ainfix <V0ainfix *ainfix +adivainfix +V0c1c2c1ainfix +adivainfix +V0c1c2c1Iainfix <=V0c3NIainfix =V0c0NIainfix >=V0c0F">
@@ -350,10 +350,10 @@
      </goal>
      <goal
       name="WP_parameter sqrt.4"
-      locfile="examples/programs/isqrt/../isqrt.mlw"
+      locfile="programs/isqrt/../isqrt.mlw"
       loclnum="39" loccnumb="6" loccnume="10"
       expl="loop invariant preservation"
-      sum="7500e7b56e07c6a4094f07c6aded4f76"
+      sum="d8d251db3857f55d55241256ed23f02d"
       proved="false"
       expanded="true"
       shape="ainfix <V0ainfix *ainfix +V4c1ainfix +V4c1Aainfix <V0ainfix *ainfix +V3c1ainfix +V3c1Aainfix =V4adivainfix +adivV0V3V3c2Aainfix >V3c0Aainfix >V4c0Iainfix =V4adivainfix +adivV0V1V1c2FIainfix =V3V1FIainfix <V1V2Iainfix <V0ainfix *ainfix +V1c1ainfix +V1c1Aainfix <V0ainfix *ainfix +V2c1ainfix +V2c1Aainfix =V1adivainfix +adivV0V2V2c2Aainfix >V2c0Aainfix >V1c0FFIainfix <=V0c3NIainfix =V0c0NIainfix >=V0c0F">
@@ -366,10 +366,10 @@
        expanded="true">
        <goal
         name="WP_parameter sqrt.4.1"
-        locfile="examples/programs/isqrt/../isqrt.mlw"
+        locfile="programs/isqrt/../isqrt.mlw"
         loclnum="39" loccnumb="6" loccnume="10"
         expl="parameter sqrt"
-        sum="056976a964b58d029283fe6e6237ca91"
+        sum="f133ffeefd37638d2e57430aa42245da"
         proved="true"
         expanded="false"
         shape="ainfix >V4c0Iainfix =V4adivainfix +adivV0V1V1c2FIainfix =V3V1FIainfix <V1V2Iainfix <V0ainfix *ainfix +V1c1ainfix +V1c1Aainfix <V0ainfix *ainfix +V2c1ainfix +V2c1Aainfix =V1adivainfix +adivV0V2V2c2Aainfix >V2c0Aainfix >V1c0FFIainfix <=V0c3NIainfix =V0c0NIainfix >=V0c0F">
@@ -388,22 +388,22 @@
          timelimit="10"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.07"/>
+         <result status="valid" time="0.06"/>
         </proof>
         <proof
          prover="0"
          timelimit="10"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.64"/>
+         <result status="valid" time="1.60"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter sqrt.4.2"
-        locfile="examples/programs/isqrt/../isqrt.mlw"
+        locfile="programs/isqrt/../isqrt.mlw"
         loclnum="39" loccnumb="6" loccnume="10"
         expl="parameter sqrt"
-        sum="e577a39219ddef7fbfa32b40150ade20"
+        sum="bb375c976411945efedd34eede5d439f"
         proved="true"
         expanded="false"
         shape="ainfix >V3c0Iainfix =V4adivainfix +adivV0V1V1c2FIainfix =V3V1FIainfix <V1V2Iainfix <V0ainfix *ainfix +V1c1ainfix +V1c1Aainfix <V0ainfix *ainfix +V2c1ainfix +V2c1Aainfix =V1adivainfix +adivV0V2V2c2Aainfix >V2c0Aainfix >V1c0FFIainfix <=V0c3NIainfix =V0c0NIainfix >=V0c0F">
@@ -422,7 +422,7 @@
          timelimit="10"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.00"/>
+         <result status="valid" time="0.01"/>
         </proof>
         <proof
          prover="0"
@@ -434,10 +434,10 @@
        </goal>
        <goal
         name="WP_parameter sqrt.4.3"
-        locfile="examples/programs/isqrt/../isqrt.mlw"
+        locfile="programs/isqrt/../isqrt.mlw"
         loclnum="39" loccnumb="6" loccnume="10"
         expl="parameter sqrt"
-        sum="19befb2ec52dbfbbbc52c6a4fc87d0ed"
+        sum="aec9c69fd73b518b6806ca0d58cb70b9"
         proved="true"
         expanded="false"
         shape="ainfix =V4adivainfix +adivV0V3V3c2Iainfix =V4adivainfix +adivV0V1V1c2FIainfix =V3V1FIainfix <V1V2Iainfix <V0ainfix *ainfix +V1c1ainfix +V1c1Aainfix <V0ainfix *ainfix +V2c1ainfix +V2c1Aainfix =V1adivainfix +adivV0V2V2c2Aainfix >V2c0Aainfix >V1c0FFIainfix <=V0c3NIainfix =V0c0NIainfix >=V0c0F">
@@ -468,10 +468,10 @@
        </goal>
        <goal
         name="WP_parameter sqrt.4.4"
-        locfile="examples/programs/isqrt/../isqrt.mlw"
+        locfile="programs/isqrt/../isqrt.mlw"
         loclnum="39" loccnumb="6" loccnume="10"
         expl="parameter sqrt"
-        sum="8df2cf326286a58287a72181a89ac588"
+        sum="d751ded627674f1ec4f4fd3fee89f1c1"
         proved="true"
         expanded="false"
         shape="ainfix <V0ainfix *ainfix +V3c1ainfix +V3c1Iainfix =V4adivainfix +adivV0V1V1c2FIainfix =V3V1FIainfix <V1V2Iainfix <V0ainfix *ainfix +V1c1ainfix +V1c1Aainfix <V0ainfix *ainfix +V2c1ainfix +V2c1Aainfix =V1adivainfix +adivV0V2V2c2Aainfix >V2c0Aainfix >V1c0FFIainfix <=V0c3NIainfix =V0c0NIainfix >=V0c0F">
@@ -483,22 +483,22 @@
          timelimit="10"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.01"/>
+         <result status="valid" time="0.00"/>
         </proof>
         <proof
          prover="0"
          timelimit="10"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.01"/>
+         <result status="valid" time="0.00"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter sqrt.4.5"
-        locfile="examples/programs/isqrt/../isqrt.mlw"
+        locfile="programs/isqrt/../isqrt.mlw"
         loclnum="39" loccnumb="6" loccnume="10"
         expl="parameter sqrt"
-        sum="1a9d1dfea45a589d67b3870e73a229fa"
+        sum="70bffbc1492354c8ea902c720e48d052"
         proved="false"
         expanded="true"
         shape="ainfix <V0ainfix *ainfix +V4c1ainfix +V4c1Iainfix =V4adivainfix +adivV0V1V1c2FIainfix =V3V1FIainfix <V1V2Iainfix <V0ainfix *ainfix +V1c1ainfix +V1c1Aainfix <V0ainfix *ainfix +V2c1ainfix +V2c1Aainfix =V1adivainfix +adivV0V2V2c2Aainfix >V2c0Aainfix >V1c0FFIainfix <=V0c3NIainfix =V0c0NIainfix >=V0c0F">
@@ -510,28 +510,28 @@
          timelimit="5"
          obsolete="false"
          archived="false">
-         <result status="timeout" time="5.05"/>
+         <result status="timeout" time="5.01"/>
         </proof>
         <proof
          prover="1"
          timelimit="5"
          obsolete="false"
          archived="false">
-         <result status="timeout" time="5.09"/>
+         <result status="timeout" time="5.11"/>
         </proof>
         <proof
          prover="0"
          timelimit="10"
          obsolete="false"
          archived="false">
-         <result status="unknown" time="1.68"/>
+         <result status="unknown" time="1.70"/>
         </proof>
         <proof
          prover="2"
          timelimit="5"
          obsolete="false"
          archived="false">
-         <result status="timeout" time="5.08"/>
+         <result status="timeout" time="5.12"/>
         </proof>
         <proof
          prover="3"
@@ -545,17 +545,17 @@
          timelimit="5"
          obsolete="false"
          archived="false">
-         <result status="timeout" time="5.09"/>
+         <result status="timeout" time="5.02"/>
         </proof>
        </goal>
       </transf>
      </goal>
      <goal
       name="WP_parameter sqrt.5"
-      locfile="examples/programs/isqrt/../isqrt.mlw"
+      locfile="programs/isqrt/../isqrt.mlw"
       loclnum="39" loccnumb="6" loccnume="10"
       expl="loop variant decreases"
-      sum="9d6a7b9a44d50d4dcea1f769d32455c2"
+      sum="40783ad7a646cbd07bb5115cc1daa453"
       proved="true"
       expanded="false"
       shape="ainfix <V3V2Aainfix <=c0V2Iainfix <V0ainfix *ainfix +V4c1ainfix +V4c1Aainfix <V0ainfix *ainfix +V3c1ainfix +V3c1Aainfix =V4adivainfix +adivV0V3V3c2Aainfix >V3c0Aainfix >V4c0Iainfix =V4adivainfix +adivV0V1V1c2FIainfix =V3V1FIainfix <V1V2Iainfix <V0ainfix *ainfix +V1c1ainfix +V1c1Aainfix <V0ainfix *ainfix +V2c1ainfix +V2c1Aainfix =V1adivainfix +adivV0V2V2c2Aainfix >V2c0Aainfix >V1c0FFIainfix <=V0c3NIainfix =V0c0NIainfix >=V0c0F">
@@ -586,10 +586,10 @@
      </goal>
      <goal
       name="WP_parameter sqrt.6"
-      locfile="examples/programs/isqrt/../isqrt.mlw"
+      locfile="programs/isqrt/../isqrt.mlw"
       loclnum="39" loccnumb="6" loccnume="10"
       expl="normal postcondition"
-      sum="fb0d2f4bcfacd2f4d7d1a129753f662a"
+      sum="34e20bd488b899d4be56841a300e6468"
       proved="true"
       expanded="false"
       shape="ainfix <V0ainfix *ainfix +V2c1ainfix +V2c1Aainfix <=ainfix *V2V2V0Iainfix <V1V2NIainfix <V0ainfix *ainfix +V1c1ainfix +V1c1Aainfix <V0ainfix *ainfix +V2c1ainfix +V2c1Aainfix =V1adivainfix +adivV0V2V2c2Aainfix >V2c0Aainfix >V1c0FFIainfix <=V0c3NIainfix =V0c0NIainfix >=V0c0F">
