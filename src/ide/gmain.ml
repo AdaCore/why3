@@ -913,7 +913,7 @@ let file_menu = factory#add_submenu "_File"
 let file_factory = new GMenu.factory file_menu ~accel_group
 
 let (_ : GMenu.image_menu_item) =
-  file_factory#add_image_item ~key:GdkKeysyms._A
+  file_factory#add_image_item (* ~key:GdkKeysyms._A *)
     ~label:"_Add file" ~callback:select_file
     ()
 
@@ -1026,6 +1026,10 @@ let reduce_font () =
 
 let view_menu = factory#add_submenu "_View"
 let view_factory = new GMenu.factory view_menu ~accel_group
+
+let (_ : GMenu.image_menu_item) =
+  view_factory#add_image_item ~key:GdkKeysyms._A
+    ~label:"Select all" ~callback:(fun () -> goals_view#selection#select_all ()) ()
 
 let (_ : GMenu.menu_item) =
   view_factory#add_item ~key:GdkKeysyms._plus
