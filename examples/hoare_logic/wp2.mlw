@@ -59,21 +59,6 @@ function eval_term (sigma:env) (pi:env) (t:term) : value =
      eval_bin (eval_term sigma pi t1) op (eval_term sigma pi t2)
   end
 
-function my_sigma : env = IdMap.const (Vint 42)
-function my_pi : env = IdMap.const (Vint 0)
-
-goal Test13 :
-  eval_term my_sigma my_pi (Tconst 13) = Vint 13
-
-goal Test42 :
-  eval_term my_sigma my_pi (Tvar 0) = Vint 42
-
-goal Test0 :
-  eval_term my_sigma my_pi (Tderef 0) = Vint 0
-
-goal Test55 :
-  eval_term my_sigma my_pi (Tbin (Tvar 0) Oplus (Tconst 13)) = Vint 55
-
 predicate eval_fmla (sigma:env) (pi:env) (f:fmla) =
   match f with
   | Fterm t -> eval_term sigma pi t = Vbool True
@@ -216,23 +201,6 @@ inductive one_step env env stmt env env stmt =
         eval_term sigma pi e = (Vbool False) ->
           one_step sigma pi (Swhile e inv i) sigma pi Sskip
 
-  goal Ass42 :
-    let x = 0 in
-    forall sigma' pi':env.
-      one_step my_sigma my_pi (Sassign x (Tconst 42)) sigma' pi' Sskip ->
-        IdMap.get sigma' x = Vint 42
-
-  goal If42 :
-    let x = 0 in
-    forall sigma1 pi1 sigma2 pi2:env, i:stmt.
-      one_step my_sigma my_pi
-        (Sif (Tbin (Tderef x) Ole (Tconst 10))
-             (Sassign x (Tconst 13))
-             (Sassign x (Tconst 42)))
-        sigma1 pi1 i ->
-      one_step sigma1 pi1 i sigma2 pi2 Sskip ->
-        IdMap.get sigma2 x = Vint 13
-
 (*
 
   lemma progress:
@@ -266,6 +234,7 @@ lemma many_steps_seq:
       n = 1 + n1 + n2
 
 
+
 predicate valid_fmla (p:fmla) = forall sigma pi:env. eval_fmla sigma pi p
 
 (*** Hoare triples ***)
@@ -284,7 +253,60 @@ predicate total_valid_triple (p:fmla) (i:stmt) (q:fmla) =
         eval_fmla s' q
 *)
 
+end
+
+theory TestSemantics
+
+use import Imp
+
+function my_sigma : env = IdMap.const (Vint 42)
+function my_pi : env = IdMap.const (Vint 0)
+
+goal Test13 :
+  eval_term my_sigma my_pi (Tconst 13) = Vint 13
+
+goal Test42 :
+  eval_term my_sigma my_pi (Tvar 0) = Vint 42
+
+goal Test0 :
+  eval_term my_sigma my_pi (Tderef 0) = Vint 0
+
+goal Test55 :
+  eval_term my_sigma my_pi (Tbin (Tvar 0) Oplus (Tconst 13)) = Vint 55
+
+goal Ass42 :
+    let x = 0 in
+    forall sigma' pi':env.
+      one_step my_sigma my_pi (Sassign x (Tconst 42)) sigma' pi' Sskip ->
+        IdMap.get sigma' x = Vint 42
+
+goal If42 :
+    let x = 0 in
+    forall sigma1 pi1 sigma2 pi2:env, i:stmt.
+      one_step my_sigma my_pi
+        (Sif (Tbin (Tderef x) Ole (Tconst 10))
+             (Sassign x (Tconst 13))
+             (Sassign x (Tconst 42)))
+        sigma1 pi1 i ->
+      one_step sigma1 pi1 i sigma2 pi2 Sskip ->
+        IdMap.get sigma2 x = Vint 13
+
+end
+
+
+theory HoareLogic
+
+use import Imp
+
+
 (* Hoare logic rules (partial correctness) *)
+
+lemma consequence_rule:
+  forall p p' q q':fmla, i:stmt.
+  valid_fmla (Fimplies p' p) ->
+  valid_triple p i q ->
+  valid_fmla (Fimplies q q') ->
+  valid_triple p' i q'
 
 lemma skip_rule:
   forall q:fmla. valid_triple q Sskip q
@@ -324,14 +346,14 @@ lemma while_rule_ext:
   valid_triple (Fand (Fterm e) inv') i inv' ->
   valid_triple inv' (Swhile e inv i) (Fand (Fnot (Fterm e)) inv')
 
-lemma consequence_rule:
-  forall p p' q q':fmla, i:stmt.
-  valid_fmla (Fimplies p' p) ->
-  valid_triple p i q ->
-  valid_fmla (Fimplies q q') ->
-  valid_triple p' i q'
+(* frame rule ? *)
 
-(* frame rule *)
+end
+
+
+module WP
+
+use import Imp
 
 use set.Set
 
@@ -364,14 +386,6 @@ predicate stmt_writes (i:stmt) (w:Set.set ident) =
   | Swhile _ _ s -> stmt_writes s w
   end
 
-end
-
-
-module WP
-
-  use import Imp
-
-  use set.Set
 
   let rec compute_writes (s:stmt) : Set.set ident =
    { }
@@ -400,6 +414,8 @@ module WP
         assigns sigma w sigma' ->
         eval_fmla sigma' pi' result
      }
+
+  use HoareLogic
 
   let rec wp (i:stmt) (q:fmla) =
     { true }

@@ -371,6 +371,14 @@ loaded@."
             (Undone Unedited) a
         else begin
           let previous_result,previous_obs = a.proof_state,a.proof_obsolete in
+          let timelimit =
+            match previous_result with
+              | Done { Call_provers.pr_answer = Call_provers.Valid ; Call_provers.pr_time = t } ->
+                let time = max a.proof_timelimit (truncate (2.0*.t)) in
+                set_timelimit time a;
+                time
+              | _ -> a.proof_timelimit
+          in
           let callback result =
             begin match result with
               | Undone Interrupted ->
@@ -398,7 +406,7 @@ loaded@."
             String.concat " " (npc.prover_config.Whyconf.command ::
                                  npc.prover_config.Whyconf.extra_options) in
           schedule_proof_attempt
-            ~timelimit:a.proof_timelimit ~memlimit:0
+            ~timelimit ~memlimit:0
             ?old ~command
             ~driver:npc.prover_driver
             ~callback
