@@ -262,6 +262,7 @@ use import Imp
 function my_sigma : env = IdMap.const (Vint 42)
 function my_pi : env = IdMap.const (Vint 0)
 
+(*
 goal Test13 :
   eval_term my_sigma my_pi (Tconst 13) = Vint 13
 
@@ -290,6 +291,7 @@ goal If42 :
         sigma1 pi1 i ->
       one_step sigma1 pi1 i sigma2 pi2 Sskip ->
         IdMap.get sigma2 x = Vint 13
+*)
 
 end
 
@@ -409,10 +411,11 @@ predicate stmt_writes (i:stmt) (w:Set.set ident) =
   val abstract_effects (i:stmt) (f:fmla) :
     { }
     fmla
-    { forall sigma pi sigma' pi':env, w:Set.set ident .
-        eval_fmla sigma pi f /\ stmt_writes i w /\
-        assigns sigma w sigma' ->
-        eval_fmla sigma' pi' result
+    { forall sigma pi. eval_fmla sigma pi result ->
+        eval_fmla sigma pi f /\
+        forall sigma':env, w:Set.set ident.
+        stmt_writes i w /\ assigns sigma w sigma' ->
+        eval_fmla sigma' pi result 
      }
 
   use HoareLogic

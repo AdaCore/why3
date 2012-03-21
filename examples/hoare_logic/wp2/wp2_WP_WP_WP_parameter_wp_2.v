@@ -276,38 +276,6 @@ Definition valid_triple(p:fmla) (i:stmt) (q:fmla): Prop := forall (sigma:(map
   forall (sigmaqt:(map Z value)) (piqt:(map Z value)) (n:Z),
   (many_steps sigma pi i sigmaqt piqt Sskip n) -> (eval_fmla sigmaqt piqt q).
 
-Axiom skip_rule : forall (q:fmla), (valid_triple q Sskip q).
-
-Axiom assign_rule : forall (q:fmla) (x:Z) (id:Z) (e:term), (fresh_in_fmla id
-  q) -> (valid_triple (Flet id e (subst q x id)) (Sassign x e) q).
-
-Axiom seq_rule : forall (p:fmla) (q:fmla) (r:fmla) (i1:stmt) (i2:stmt),
-  ((valid_triple p i1 r) /\ (valid_triple r i2 q)) -> (valid_triple p
-  (Sseq i1 i2) q).
-
-Axiom if_rule : forall (e:term) (p:fmla) (q:fmla) (i1:stmt) (i2:stmt),
-  ((valid_triple (Fand p (Fterm e)) i1 q) /\ (valid_triple (Fand p
-  (Fnot (Fterm e))) i2 q)) -> (valid_triple p (Sif e i1 i2) q).
-
-Axiom assert_rule : forall (f:fmla) (p:fmla), (valid_fmla (Fimplies p f)) ->
-  (valid_triple p (Sassert f) p).
-
-Axiom assert_rule_ext : forall (f:fmla) (p:fmla), (valid_triple (Fimplies f
-  p) (Sassert f) p).
-
-Axiom while_rule : forall (e:term) (inv:fmla) (i:stmt),
-  (valid_triple (Fand (Fterm e) inv) i inv) -> (valid_triple inv (Swhile e
-  inv i) (Fand (Fnot (Fterm e)) inv)).
-
-Axiom while_rule_ext : forall (e:term) (inv:fmla) (invqt:fmla) (i:stmt),
-  (valid_fmla (Fimplies invqt inv)) -> ((valid_triple (Fand (Fterm e) invqt)
-  i invqt) -> (valid_triple invqt (Swhile e inv i) (Fand (Fnot (Fterm e))
-  invqt))).
-
-Axiom consequence_rule : forall (p:fmla) (pqt:fmla) (q:fmla) (qqt:fmla)
-  (i:stmt), (valid_fmla (Fimplies pqt p)) -> ((valid_triple p i q) ->
-  ((valid_fmla (Fimplies q qqt)) -> (valid_triple pqt i qqt))).
-
 Parameter set1 : forall (a:Type), Type.
 
 Parameter mem: forall (a:Type), a -> (set1 a) -> Prop.
@@ -413,6 +381,38 @@ Fixpoint stmt_writes(i:stmt) (w:(set1 Z)) {struct i}: Prop :=
   | (Swhile _ _ s) => (stmt_writes s w)
   end.
 Unset Implicit Arguments.
+
+Axiom consequence_rule : forall (p:fmla) (pqt:fmla) (q:fmla) (qqt:fmla)
+  (i:stmt), (valid_fmla (Fimplies pqt p)) -> ((valid_triple p i q) ->
+  ((valid_fmla (Fimplies q qqt)) -> (valid_triple pqt i qqt))).
+
+Axiom skip_rule : forall (q:fmla), (valid_triple q Sskip q).
+
+Axiom assign_rule : forall (q:fmla) (x:Z) (id:Z) (e:term), (fresh_in_fmla id
+  q) -> (valid_triple (Flet id e (subst q x id)) (Sassign x e) q).
+
+Axiom seq_rule : forall (p:fmla) (q:fmla) (r:fmla) (i1:stmt) (i2:stmt),
+  ((valid_triple p i1 r) /\ (valid_triple r i2 q)) -> (valid_triple p
+  (Sseq i1 i2) q).
+
+Axiom if_rule : forall (e:term) (p:fmla) (q:fmla) (i1:stmt) (i2:stmt),
+  ((valid_triple (Fand p (Fterm e)) i1 q) /\ (valid_triple (Fand p
+  (Fnot (Fterm e))) i2 q)) -> (valid_triple p (Sif e i1 i2) q).
+
+Axiom assert_rule : forall (f:fmla) (p:fmla), (valid_fmla (Fimplies p f)) ->
+  (valid_triple p (Sassert f) p).
+
+Axiom assert_rule_ext : forall (f:fmla) (p:fmla), (valid_triple (Fimplies f
+  p) (Sassert f) p).
+
+Axiom while_rule : forall (e:term) (inv:fmla) (i:stmt),
+  (valid_triple (Fand (Fterm e) inv) i inv) -> (valid_triple inv (Swhile e
+  inv i) (Fand (Fnot (Fterm e)) inv)).
+
+Axiom while_rule_ext : forall (e:term) (inv:fmla) (invqt:fmla) (i:stmt),
+  (valid_fmla (Fimplies invqt inv)) -> ((valid_triple (Fand (Fterm e) invqt)
+  i invqt) -> (valid_triple invqt (Swhile e inv i) (Fand (Fnot (Fterm e))
+  invqt))).
 
 (* Why3 goal *)
 Theorem WP_parameter_wp : forall (i:stmt), forall (q:fmla),
