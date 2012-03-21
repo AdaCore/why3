@@ -42,17 +42,19 @@ let print_usage () =
     (Pp.print_iter1 Array.iter Pp.newline
        (fun fmt e -> fprintf fmt "%s   @[<hov>%s@]"
          (Util.padd_string ' ' e.cmd_name maxl) e.cmd_desc)) cmds;
-  eprintf "detailed command options: %s <command> -help@." exec_name;
+  Arg.usage (Arg.align Why3session_lib.env_spec) "common options:";
+  eprintf "@\nspecific command options: %s <command> -help@." exec_name;
   exit 1
-
-
 
 let () =
   if Array.length Sys.argv < 2 then print_usage ();
   let cmd_name = Sys.argv.(1) in
-  match cmd_name with "-h" | "--help" -> print_usage ()
-    | "-v" | "--version" -> print_version ()
-    | _ -> ();
+  begin
+    match cmd_name with 
+      | "-h" | "--help" -> print_usage ()
+      | "-v" | "--version" -> print_version (); exit 0
+      | _ -> ()
+  end;
   let module M = struct exception Found of cmd end in
   let cmd =
     try

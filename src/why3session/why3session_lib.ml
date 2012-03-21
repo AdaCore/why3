@@ -60,22 +60,28 @@ let read_simple_spec () =
 let includes = ref []
 let opt_config = ref None
 let opt_loadpath = ref []
+let opt_extra = ref []
 
-let env_spec = [
+let common_options = [
   "-C", Arg.String (fun s -> opt_config := Some s),
       "<file> Read configuration from <file>";
   "--config", Arg.String (fun s -> opt_config := Some s),
       " same as -C";
+  "--extra-config", Arg.String (fun s -> opt_extra := !opt_extra @ [s]),
+      "<file> Read additional configuration from <file>";
   "-L", Arg.String (fun s -> opt_loadpath := s :: !opt_loadpath),
       "<dir> Add <dir> to the library search path";
   "--library", Arg.String (fun s -> opt_loadpath := s :: !opt_loadpath),
       " same as -L";
-]@simple_spec
+]
+
+let env_spec = common_options @ simple_spec
 
 
 let read_env_spec () =
   (** Configuration *)
   let config = Whyconf.read_config !opt_config in
+  let config = List.fold_left Whyconf.merge_config config !opt_extra in
   let main = Whyconf.get_main config in
   Whyconf.load_plugins main;
   let loadpath = (Whyconf.loadpath (Whyconf.get_main config))

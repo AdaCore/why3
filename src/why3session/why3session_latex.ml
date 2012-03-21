@@ -39,7 +39,7 @@ let spec =
   ("-longtable",
    Arg.Set opt_longtable,
    " produce tables using longtable package instead of tabular") ::
-  simple_spec
+  env_spec
 
 
 (* Statistics in LaTeX*)
