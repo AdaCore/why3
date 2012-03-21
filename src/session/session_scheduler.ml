@@ -757,19 +757,11 @@ let edit_proof eS sched ~default_editor a =
               O.init a.proof_key (Proof_attempt a);
               a in
           (** Now [a] is a proof_attempt of the lodable prover [nap] *)
-          let old_res = a.proof_state in
           let callback res =
             match res with
               | Done _ ->
-                begin
-                  match old_res with
-                    | Undone Unedited ->
-                      set_proof_state ~notify ~obsolete:true ~archived:false
-                        (Undone JustEdited) a
-                    | _ ->
-                      set_proof_state ~notify ~obsolete:true ~archived:false
-                        old_res a
-                end
+                set_proof_state ~notify ~obsolete:true ~archived:false
+                  (Undone JustEdited) a
               | _ ->
                   set_proof_state ~notify ~obsolete:false ~archived:false
                     res a
