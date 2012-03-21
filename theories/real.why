@@ -93,14 +93,6 @@ theory FromInt
 
 end
 
-theory FromIntTest
-
-  use import FromInt
-
-  lemma Test1: from_int 2 = 2.0
-
-end
-
 theory Truncate
 
   use import Real
@@ -178,16 +170,6 @@ theory Square
 
 end
 
-theory SquareTest
-
-  use import Square
-
-  lemma Sqrt_zero: sqrt 0.0 = 0.0
-  lemma Sqrt_one: sqrt 1.0 = 1.0
-  lemma Sqrt_four: sqrt 4.0 = 2.0
-
-end
-
 theory ExpLog
 
   use import Real
@@ -212,15 +194,6 @@ theory ExpLog
 
 end
 
-theory ExpLogTest
-
-  use import ExpLog
-
-  lemma Log_e : log e = 1.0
-
-end
-
-
 theory PowerInt
 
   use int.Int
@@ -231,15 +204,6 @@ theory PowerInt
 
 
 end
-
-theory PowerIntTest
-
-  use import PowerInt
-
-  lemma Pow_2_2 : power 2.0 2 = 4.0
-
-end
-
 
 theory PowerReal
 
@@ -271,15 +235,6 @@ theory PowerReal
     forall x y:real. x > 0.0 -> pow x y = exp (y * log x)
 
 end
-
-theory PowerRealTest
-
-  use import PowerReal
-
-  lemma Pow_2_2 : pow 2.0 2.0 = 4.0
-
-end
-
 
 
 (** Trigonometric functions
@@ -336,19 +291,6 @@ theory Trigonometry
   function atan real : real
   axiom Tan_atan:
     forall x:real. tan (atan x) = x
-
-end
-
-theory TrigonometryTest
-
-  use import Real
-  use import Trigonometry
-  use import Square
-
-  lemma Cos_2_pi : cos (2.0 * pi) = 1.0
-  lemma Sin_2_pi : sin (2.0 * pi) = 0.
-  lemma Tan_pi_3 : tan (pi / 2.0) = sqrt 3.0
-  lemma Atan_1   : atan 1.0 = pi / 4.0
 
 end
 

@@ -14,3 +14,59 @@ theory TestInfix
   goal Div : 9. /. 2. = 4.5
   goal Inv : inv 5. = 0.2
 end
+
+
+theory SquareTest
+
+  use import real.Square
+
+  lemma Sqrt_zero: sqrt 0.0 = 0.0
+  lemma Sqrt_one: sqrt 1.0 = 1.0
+  lemma Sqrt_four: sqrt 4.0 = 2.0
+
+end
+
+theory ExpLogTest
+
+  use import real.ExpLog
+
+  lemma Log_e : log e = 1.0
+
+end
+
+
+theory PowerIntTest
+
+  use import real.PowerInt
+
+  lemma Pow_2_2 : power 2.0 2 = 4.0
+
+end
+
+
+theory PowerRealTest
+
+  use import real.PowerReal
+
+  lemma Pow_2_2 : pow 2.0 2.0 = 4.0
+
+end
+
+
+theory TrigonometryTest
+
+  use import Real
+  use import Trigonometry
+  use import Square
+
+  lemma Cos_2_pi : cos (2.0 * pi) = 1.0
+  lemma Sin_2_pi : sin (2.0 * pi) = 0.
+  lemma Tan_pi_3 : tan (pi / 2.0) = sqrt 3.0
+  lemma Atan_1   : atan 1.0 = pi / 4.0
+
+end
+
+
+
+
+
