@@ -2,5 +2,15 @@ theory Test
   use import real.Real
   goal G1 : 5.5 * 10. = 55.
   goal G2 : 9. / 3. = 3.
-  goal G3 : inv(5.) = 0.2
+  goal G3 : inv 5. = 0.2
+end
+
+theory TestInfix
+  use import real.RealInfix
+  goal Add : 5.5 +. 10. = 15.5
+  goal Sub : 9. -. 3. = 6.
+  goal Neg : -. 5. +. 3.5 = -. 1.5
+  goal Mul : 5.5 *. 10. = 55.
+  goal Div : 9. /. 2. = 4.5
+  goal Inv : inv 5. = 0.2
 end

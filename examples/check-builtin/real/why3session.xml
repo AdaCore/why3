@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
 <why3session
- name="check-builtin/real/why3session.xml">
+ name="real/why3session.xml">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -12,64 +12,86 @@
   version="2.2"/>
  <prover
   id="2"
-  name="Spass"
-  version="3.7"/>
+  name="CVC3"
+  version="2.4.1"/>
  <prover
   id="3"
+  name="Gappa"
+  version="0.16.0"/>
+ <prover
+  id="4"
   name="Yices"
   version="1.0.25"/>
  <prover
-  id="4"
+  id="5"
   name="Z3"
   version="2.19"/>
+ <prover
+  id="6"
+  name="Z3"
+  version="3.2"/>
  <file
   name="../real.why"
   verified="true"
-  expanded="false">
+  expanded="true">
   <theory
    name="Test"
-   locfile="check-builtin/real/../real.why"
+   locfile="real/../real.why"
    loclnum="1" loccnumb="7" loccnume="11"
    verified="true"
    expanded="true">
    <goal
     name="G1"
-    locfile="check-builtin/real/../real.why"
+    locfile="real/../real.why"
     loclnum="3" loccnumb="7" loccnume="9"
     sum="7961c96b42f34e5cb3280ce85643dffb"
     proved="true"
     expanded="true"
     shape="ainfix =ainfix *c5.5c10.c55.">
     <proof
-     prover="4"
-     timelimit="10"
+     prover="5"
+     timelimit="3"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="2"
-     timelimit="10"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="10.20"/>
-    </proof>
-    <proof
      prover="1"
-     timelimit="10"
+     timelimit="3"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
      prover="0"
-     timelimit="10"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="3"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
      prover="3"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="4"
      timelimit="10"
      obsolete="false"
      archived="false">
@@ -78,36 +100,50 @@
    </goal>
    <goal
     name="G2"
-    locfile="check-builtin/real/../real.why"
+    locfile="real/../real.why"
     loclnum="4" loccnumb="7" loccnume="9"
     sum="b18a4b0fb8e663468863ba1c86a7cc64"
     proved="true"
     expanded="true"
     shape="ainfix =ainfix /c9.c3.c3.">
     <proof
-     prover="4"
-     timelimit="10"
+     prover="5"
+     timelimit="3"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="2"
-     timelimit="10"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="10.47"/>
-    </proof>
-    <proof
      prover="1"
-     timelimit="10"
+     timelimit="3"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
      prover="0"
-     timelimit="10"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="3"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
@@ -115,36 +151,363 @@
    </goal>
    <goal
     name="G3"
-    locfile="check-builtin/real/../real.why"
+    locfile="real/../real.why"
     loclnum="5" loccnumb="7" loccnume="9"
     sum="297dff92907d47bda80a8ffe2d186396"
     proved="true"
     expanded="true"
     shape="ainfix =ainvc5.c0.2">
     <proof
-     prover="4"
-     timelimit="10"
+     prover="5"
+     timelimit="3"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="2"
-     timelimit="10"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="10.08"/>
-    </proof>
-    <proof
      prover="1"
-     timelimit="10"
+     timelimit="3"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
      prover="0"
-     timelimit="10"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="failure" time="0.00"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+  </theory>
+  <theory
+   name="TestInfix"
+   locfile="real/../real.why"
+   loclnum="8" loccnumb="7" loccnume="16"
+   verified="true"
+   expanded="true">
+   <goal
+    name="Add"
+    locfile="real/../real.why"
+    loclnum="10" loccnumb="7" loccnume="10"
+    sum="43afbf3638f15444ec33376879694c6b"
+    proved="true"
+    expanded="true"
+    shape="ainfix =ainfix +.c5.5c10.c15.5">
+    <proof
+     prover="5"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="0"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
+    name="Sub"
+    locfile="real/../real.why"
+    loclnum="11" loccnumb="7" loccnume="10"
+    sum="9e26dca43231665f3c20276262e0e4ef"
+    proved="true"
+    expanded="true"
+    shape="ainfix =ainfix -.c9.c3.c6.">
+    <proof
+     prover="5"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="0"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
+    name="Neg"
+    locfile="real/../real.why"
+    loclnum="12" loccnumb="7" loccnume="10"
+    sum="4f3a94d0b96c33ec0276c6802921cd6a"
+    proved="true"
+    expanded="true"
+    shape="ainfix =ainfix +.aprefix -.c5.c3.5aprefix -.c1.5">
+    <proof
+     prover="5"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="0"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
+    name="Mul"
+    locfile="real/../real.why"
+    loclnum="13" loccnumb="7" loccnume="10"
+    sum="547a086bd1da4bd6a329f80d539f9e4f"
+    proved="true"
+    expanded="true"
+    shape="ainfix =ainfix *.c5.5c10.c55.">
+    <proof
+     prover="5"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="0"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
+    name="Div"
+    locfile="real/../real.why"
+    loclnum="14" loccnumb="7" loccnume="10"
+    sum="11f3cf0fd8346c98624030a58cf9940a"
+    proved="true"
+    expanded="true"
+    shape="ainfix =ainfix /.c9.c2.c4.5">
+    <proof
+     prover="5"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="0"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
+    name="Inv"
+    locfile="real/../real.why"
+    loclnum="15" loccnumb="7" loccnume="10"
+    sum="70900cabfcc887614c28215d0ac16b18"
+    proved="true"
+    expanded="true"
+    shape="ainfix =ainvc5.c0.2">
+    <proof
+     prover="5"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="0"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="failure" time="0.00"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="3"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>

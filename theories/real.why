@@ -26,6 +26,7 @@ theory RealInfix
   function ( *.) (x:real) (y:real) : real = x * y
   function (/.) (x:real) (y:real) : real = x / y
   function (-._) (x:real) : real = - x
+  function inv (x:real) : real = Real.inv x
 
   predicate (<=.) (x:real) (y:real) = x <= y
   predicate (>=.) (x:real) (y:real) = x >= y
@@ -220,7 +221,27 @@ theory ExpLogTest
 end
 
 
-theory Power
+theory PowerInt
+
+  use int.Int
+  use Real
+
+  clone export int.Exponentiation with
+    type t = real, constant one = Real.one, function (*) = Real.(*)
+
+
+end
+
+theory PowerIntTest
+
+  use import PowerInt
+
+  lemma Pow_2_2 : power 2.0 2 = 4.0
+
+end
+
+
+theory PowerReal
 
   use import Real
   use import Square
@@ -251,9 +272,9 @@ theory Power
 
 end
 
-theory PowerTest
+theory PowerRealTest
 
-  use import Power
+  use import PowerReal
 
   lemma Pow_2_2 : pow 2.0 2.0 = 4.0
 

@@ -256,11 +256,20 @@ theory real.ExpLog
 end
 
 
-theory real.Power
+theory real.PowerInt
 
   prelude "Require Import Rpower."
 
-  (* no power: R -> R -> R in Coq ? (only powerRZ: R -> Z -> R) *)
+  syntax function power "(powerRZ %1)"
+
+end
+
+theory real.PowerReal
+
+  prelude "Require Import Rpower."
+
+  syntax function pow "(Rpower %1)"
+
 end
 
 theory real.Trigonometry

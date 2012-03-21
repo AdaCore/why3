@@ -837,7 +837,7 @@ ifeq (@enable_coq_libs@,yes)
 COQLIBS_INT_FILES = Abs ComputerDivision EuclideanDivision Int MinMax
 COQLIBS_INT = $(addprefix lib/coq/int/, $(COQLIBS_INT_FILES))
 
-COQLIBS_REAL_FILES = Abs ExpLog FromInt MinMax Real Square
+COQLIBS_REAL_FILES = Abs ExpLog FromInt MinMax Real Square RealInfix
 COQLIBS_REAL = $(addprefix lib/coq/real/, $(COQLIBS_REAL_FILES))
 
 ifeq (@enable_coq_fp_libs@,yes)
