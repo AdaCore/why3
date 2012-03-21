@@ -260,7 +260,14 @@ theory real.PowerInt
 
   prelude "Require Import Rfunctions."
 
-  syntax function power "(powerRZ %1)"
+  syntax function power "(powerRZ %1 %2)"
+
+  remove prop Power_0 (* already as powerRZ_O *)
+  (* remove prop Power_s *)
+  remove prop Power_1 (* already as powerRZ_1 *)
+  (* remove prop Power_sum *) (* not the same as powerRZ_add *)
+  (* remove prop Power_mult *)
+
 
 end
 
@@ -268,7 +275,7 @@ theory real.PowerReal
 
   prelude "Require Import Rpower."
 
-  syntax function pow "(Rpower %1)"
+  syntax function pow "(Rpower %1 %2)"
 
 end
 
