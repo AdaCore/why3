@@ -411,11 +411,16 @@ predicate stmt_writes (i:stmt) (w:Set.set ident) =
   val abstract_effects (i:stmt) (f:fmla) :
     { }
     fmla
-    { forall sigma pi. eval_fmla sigma pi result ->
+    { forall sigma pi:env. eval_fmla sigma pi result ->
         eval_fmla sigma pi f /\
+(*
         forall sigma':env, w:Set.set ident.
         stmt_writes i w /\ assigns sigma w sigma' ->
-        eval_fmla sigma' pi result 
+        eval_fmla sigma' pi result
+*)
+        forall sigma' pi':env, n:int.
+           many_steps sigma pi i sigma' pi' Sskip n ->
+           eval_fmla sigma' pi' result
      }
 
   use HoareLogic

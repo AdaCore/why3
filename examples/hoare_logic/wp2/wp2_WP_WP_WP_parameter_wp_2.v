@@ -424,10 +424,11 @@ Theorem WP_parameter_wp : forall (i:stmt), forall (q:fmla),
   | (Sassert f) => True
   | (Swhile e inv i1) => forall (result:fmla), (valid_triple result i1
       inv) -> forall (result1:fmla), (forall (sigma:(map Z value)) (pi:(map Z
-      value)) (sigmaqt:(map Z value)) (piqt:(map Z value)) (w:(set1 Z)),
-      ((eval_fmla sigma pi (Fand (Fimplies (Fand (Fterm e) inv) result)
-      (Fimplies (Fand (Fnot (Fterm e)) inv) q))) /\ ((stmt_writes i1 w) /\
-      (assigns sigma w sigmaqt))) -> (eval_fmla sigmaqt piqt result1)) ->
+      value)), (eval_fmla sigma pi result1) -> ((eval_fmla sigma pi
+      (Fand (Fimplies (Fand (Fterm e) inv) result)
+      (Fimplies (Fand (Fnot (Fterm e)) inv) q))) /\ forall (sigmaqt:(map Z
+      value)) (piqt:(map Z value)) (n:Z), (many_steps sigma pi i1 sigmaqt
+      piqt Sskip n) -> (eval_fmla sigmaqt piqt result1))) ->
       (valid_triple (Fand inv result1) i q)
   end.
 destruct i; trivial.
@@ -447,14 +448,32 @@ apply Z_lt_induction with (P :=
     many_steps s1 p1 (Swhile cond inv body) s2 p2 Sskip n ->
     eval_fmla s2 p2 Post); auto.
 intros.
+elim H0; clear H0; intros H_inv_in_s2 H_abstr_in_s2.
 inversion H1; subst; clear H1.
-inversion H2; subst; clear H2.
-generalize (many_steps_seq _ _ _ _ _ _ _ H3); clear H3.
+inversion H0; subst; clear H0.
+(* case cond = true *)
+generalize (many_steps_seq _ _ _ _ _ _ _ H2); clear H2.
 intros (s3 & p3 & n1 & n2 & First_iter & Next_iter & Hn1n2).
-generalize (steps_non_neg _ _ _ _ _ _ _ First_iter); intro Hn1_pos.
-generalize (steps_non_neg _ _ _ _ _ _ _ Next_iter); intro Hn2_pos.
-apply H with (3:=Next_iter); auto with zarith.
-
+apply H with (3:=Next_iter).
+  generalize (steps_non_neg _ _ _ _ _ _ _ First_iter); intro Hn1_pos.
+  generalize (steps_non_neg _ _ _ _ _ _ _ Next_iter); intro Hn2_pos.
+  omega.
+generalize (H_abstracted sigma2 pi2 H_abstr_in_s2); clear H_abstracted.
+simpl.
+intros ((Htrue,_) & Hnext).
+generalize (Hnext s3 p3 n1 First_iter); clear Hnext.
+intro H_abstr_in_s3.
+split; auto.
+red in H_WP_body.
+apply H_WP_body with (2:=First_iter).
+apply Htrue; auto.
+(* case cond = false *)
+inversion H2; [subst; clear H2 | inversion H0].
+generalize (H_abstracted s2 p2 H_abstr_in_s2); clear H_abstracted.
+simpl.
+intros ((_,Hfalse) & Hnext).
+apply Hfalse; split; auto.
+rewrite H11; discriminate.
 Qed.
 
 
