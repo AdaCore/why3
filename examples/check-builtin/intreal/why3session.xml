@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
 <why3session
- name="check-builtin/intreal/why3session.xml">
+ name="intreal/why3session.xml">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -16,43 +16,55 @@
   version="2.4.1"/>
  <prover
   id="3"
+  name="Gappa"
+  version="0.16.0"/>
+ <prover
+  id="4"
+  name="Simplify"
+  version="1.5.4"/>
+ <prover
+  id="5"
   name="Spass"
   version="3.7"/>
  <prover
-  id="4"
+  id="6"
+  name="Yices"
+  version="1.0.25"/>
+ <prover
+  id="7"
   name="Z3"
   version="2.19"/>
  <prover
-  id="5"
+  id="8"
   name="Z3"
   version="3.2"/>
  <file
   name="../intreal.why"
-  verified="false"
-  expanded="false">
+  verified="true"
+  expanded="true">
   <theory
    name="IntReal"
-   locfile="check-builtin/intreal/../intreal.why"
+   locfile="intreal/../intreal.why"
    loclnum="1" loccnumb="7" loccnume="14"
-   verified="false"
-   expanded="false">
+   verified="true"
+   expanded="true">
    <goal
     name="G1"
-    locfile="check-builtin/intreal/../intreal.why"
+    locfile="intreal/../intreal.why"
     loclnum="7" loccnumb="7" loccnume="9"
     sum="f471c6c924b564aee8f4934746236ec5"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =afrom_intc2c2.0">
     <proof
-     prover="4"
+     prover="7"
      timelimit="10"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.08"/>
     </proof>
     <proof
-     prover="3"
+     prover="5"
      timelimit="10"
      obsolete="false"
      archived="false">
@@ -80,7 +92,14 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="5"
+     prover="3"
+     timelimit="2"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="8"
      timelimit="10"
      obsolete="false"
      archived="false">
@@ -89,21 +108,21 @@
    </goal>
    <goal
     name="G2"
-    locfile="check-builtin/intreal/../intreal.why"
+    locfile="intreal/../intreal.why"
     loclnum="8" loccnumb="7" loccnume="9"
     sum="a03422ffac4ca142a1a0e2945b8150b1"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =afloorc1.5c1">
     <proof
-     prover="4"
+     prover="7"
      timelimit="10"
      obsolete="false"
      archived="false">
      <result status="timeout" time="10.12"/>
     </proof>
     <proof
-     prover="3"
+     prover="5"
      timelimit="10"
      obsolete="false"
      archived="false">
@@ -117,7 +136,14 @@
      <result status="valid" time="3.42"/>
     </proof>
     <proof
-     prover="5"
+     prover="3"
+     timelimit="2"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="8"
      timelimit="10"
      obsolete="false"
      archived="false">
@@ -126,21 +152,21 @@
    </goal>
    <goal
     name="G3"
-    locfile="check-builtin/intreal/../intreal.why"
+    locfile="intreal/../intreal.why"
     loclnum="9" loccnumb="7" loccnume="9"
     sum="5a0b387c12f9700c3e3c3646efbd68aa"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =aceilc1.5c2">
     <proof
-     prover="4"
+     prover="7"
      timelimit="10"
      obsolete="false"
      archived="false">
      <result status="timeout" time="10.13"/>
     </proof>
     <proof
-     prover="3"
+     prover="5"
      timelimit="10"
      obsolete="false"
      archived="false">
@@ -154,7 +180,14 @@
      <result status="valid" time="3.94"/>
     </proof>
     <proof
-     prover="5"
+     prover="3"
+     timelimit="2"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="8"
      timelimit="10"
      obsolete="false"
      archived="false">
@@ -163,58 +196,72 @@
    </goal>
    <goal
     name="G4"
-    locfile="check-builtin/intreal/../intreal.why"
+    locfile="intreal/../intreal.why"
     loclnum="10" loccnumb="7" loccnume="9"
     sum="350db14fcb4c074460205c9f3bdfb7d7"
-    proved="false"
-    expanded="false"
+    proved="true"
+    expanded="true"
     shape="ainfix =aflooraprefix -.c1.5aprefix -c2">
     <proof
-     prover="4"
+     prover="7"
      timelimit="10"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="10.13"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="10"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="10.10"/>
+     <result status="timeout" time="10.08"/>
     </proof>
     <proof
      prover="0"
      timelimit="10"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="10.03"/>
+     <result status="timeout" time="10.01"/>
     </proof>
     <proof
-     prover="5"
-     timelimit="10"
+     prover="3"
+     timelimit="2"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="10.13"/>
+     <result status="valid" time="0.00"/>
     </proof>
-   </goal>
-   <goal
-    name="G5"
-    locfile="check-builtin/intreal/../intreal.why"
-    loclnum="11" loccnumb="7" loccnume="9"
-    sum="fe76735f57427088f9dc7c492260de1d"
-    proved="false"
-    expanded="false"
-    shape="ainfix =aceilaprefix -.c1.5aprefix -c1">
     <proof
      prover="4"
      timelimit="10"
      obsolete="false"
      archived="false">
+     <result status="timeout" time="10.04"/>
+    </proof>
+    <proof
+     prover="8"
+     timelimit="10"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="10.08"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="10"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
+    name="G5"
+    locfile="intreal/../intreal.why"
+    loclnum="11" loccnumb="7" loccnume="9"
+    sum="fe76735f57427088f9dc7c492260de1d"
+    proved="true"
+    expanded="true"
+    shape="ainfix =aceilaprefix -.c1.5aprefix -c1">
+    <proof
+     prover="7"
+     timelimit="10"
+     obsolete="false"
+     archived="false">
      <result status="timeout" time="10.13"/>
     </proof>
     <proof
-     prover="3"
+     prover="5"
      timelimit="10"
      obsolete="false"
      archived="false">
@@ -228,7 +275,14 @@
      <result status="timeout" time="10.02"/>
     </proof>
     <proof
-     prover="5"
+     prover="3"
+     timelimit="2"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="8"
      timelimit="10"
      obsolete="false"
      archived="false">
@@ -237,21 +291,21 @@
    </goal>
    <goal
     name="G6"
-    locfile="check-builtin/intreal/../intreal.why"
+    locfile="intreal/../intreal.why"
     loclnum="12" loccnumb="7" loccnume="9"
     sum="35b4ccc44d873f0925f27ecf4bc7ebe1"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix <=afloorV0aceilV0F">
     <proof
-     prover="4"
+     prover="7"
      timelimit="10"
      obsolete="false"
      archived="false">
      <result status="timeout" time="10.13"/>
     </proof>
     <proof
-     prover="3"
+     prover="5"
      timelimit="10"
      obsolete="false"
      archived="false">
@@ -279,7 +333,14 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="5"
+     prover="3"
+     timelimit="2"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="8"
      timelimit="10"
      obsolete="false"
      archived="false">
@@ -288,21 +349,21 @@
    </goal>
    <goal
     name="G7"
-    locfile="check-builtin/intreal/../intreal.why"
+    locfile="intreal/../intreal.why"
     loclnum="13" loccnumb="7" loccnume="9"
     sum="ef9cf6577bfe5fa811d8cab87076ba52"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =afrom_intafloorV0V0NIainfix <afloorV0aceilV0F">
     <proof
-     prover="4"
+     prover="7"
      timelimit="10"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.03"/>
     </proof>
     <proof
-     prover="3"
+     prover="5"
      timelimit="10"
      obsolete="false"
      archived="false">
@@ -330,7 +391,14 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="5"
+     prover="3"
+     timelimit="2"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="8"
      timelimit="10"
      obsolete="false"
      archived="false">
