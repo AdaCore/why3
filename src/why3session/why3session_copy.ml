@@ -81,7 +81,7 @@ let spec =
    "-c", Arg.Unit (set_replace Not_valid), " same as --conservative";
    "--never", Arg.Unit (set_replace Never), " never replace a proof";
    "-n", Arg.Unit (set_replace Never), " same as --never"]@
-    (force_obsolete_spec @ filter_spec @ env_spec)
+    (force_obsolete_spec @ filter_spec @ common_options)
 
 type action =
   | Copy

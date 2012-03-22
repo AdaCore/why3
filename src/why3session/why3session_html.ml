@@ -21,17 +21,24 @@ open Format
 open Why3
 open Why3session_lib
 
+module S = Session
+
 let output_dir = ref ""
 let opt_context = ref false
 
-type style = Simple | Jstree
+type style = SimpleTree | Jstree | Table
 
-let opt_style = ref Simple
+let opt_style = ref Table
+let default_style = "table"
 
 let set_opt_style = function
-  | "simple" -> opt_style := Simple
+  | "simple" -> opt_style := SimpleTree
   | "jstree" -> opt_style := Jstree
-  | _ -> assert false
+  | "table" -> opt_style := Table
+  | _ -> 
+    eprintf "Unknown html style, ignored@."
+
+let () = set_opt_style default_style
 
 let opt_pp = ref []
 
@@ -50,9 +57,11 @@ let spec =
    " Add context around the generated code in order to allow direct \
     visualisation (header, css, ...). It also add in the directory \
     all the needed external file. It can't be set with stdout output") ::
-  ("--style", Arg.Symbol (["simple";"jstree"], set_opt_style),
-   " Set the style to use. 'simple' use only 'ul' and 'il' tag. 'jstree' use \
-    the 'jstree' plugin of the javascript library 'jquery'.") ::
+  ("--style", Arg.Symbol (["simpletree";"jstree";"table"], set_opt_style),
+   " Set the style to use, defaults to '" ^ default_style ^ "'."
+(* "'simple' use only 'ul' and 'il' tag. 'jstree' use \
+    the 'jstree' plugin of the javascript library 'jquery'." *)
+) ::
   ("--add_pp", Arg.Tuple
     [Arg.String set_opt_pp_in;
      Arg.String set_opt_pp_cmd;
@@ -65,7 +74,7 @@ replace by the input file and '%o' which will be replaced by the output file.") 
    Arg.Unit (fun ()->
     opt_pp := (".v",("coqdoc --no-index --html -o %o %i",".html"))::!opt_pp),
   " same as '--add_pp .v \"coqdoc --no-index --html -o %o %i\" .html'") ::
-  simple_spec
+  common_options
 
 (*
 let version_msg = sprintf
@@ -139,6 +148,144 @@ let run_file (context : context) print_session fname =
   else print_session basename fmt session;
   pp_print_flush fmt ();
   if output_dir <> "-" then close_out cout
+
+
+module Table =
+struct
+
+
+  let rec transf_depth tr =
+    List.fold_left
+      (fun depth g -> max depth (goal_depth g)) 0 tr.S.transf_goals
+  and goal_depth g =
+    S.PHstr.fold
+      (fun _st tr depth -> max depth (1 + transf_depth tr))
+      g.S.goal_transformations 1
+
+  let theory_depth t =
+    List.fold_left
+      (fun depth g -> max depth (goal_depth g)) 0 t.S.theory_goals
+
+  let rec provers_stats provers theory =
+    S.theory_iter_proof_attempt (fun a ->
+      Hashtbl.replace provers a.S.proof_prover a.S.proof_prover) theory
+
+  let print_prover = Whyconf.print_prover
+
+
+  let color_of_status ?(dark=false) fmt b = 
+    fprintf fmt "%s" (if b then 
+        if dark then "008000" else "C0FFC0" 
+      else "FF0000")
+
+let print_results fmt provers proofs =
+  List.iter (fun p ->
+    fprintf fmt "<td bgcolor=\"#";
+    begin
+      try
+        let pr = S.PHprover.find proofs p in
+        let s = pr.S.proof_state in
+        match s with
+	  | S.Done res ->
+	    begin
+	      match res.Call_provers.pr_answer with
+		| Call_provers.Valid ->
+                  fprintf fmt "C0FFC0\">%.2f" res.Call_provers.pr_time
+		| Call_provers.Invalid ->
+                  fprintf fmt "FF0000\">Invalid"
+		| Call_provers.Timeout ->
+                  fprintf fmt "FF8000\">Timeout"
+		| Call_provers.Unknown _ ->
+                  fprintf fmt "FF8000\">Unknown"
+		| _ ->
+                  fprintf fmt "Failure "
+	    end
+	  | _ -> fprintf fmt "Undone"
+      with Not_found -> fprintf fmt "E0E0E0\">"
+    end;
+    fprintf fmt "</td>") provers
+
+  let rec print_transf fmt depth max_depth provers tr =
+    fprintf fmt "<tr>";
+    for i=1 to 0 (* depth-1 *) do fprintf fmt "<td></td>" done;
+    fprintf fmt "<td bgcolor=\"#%a\">" (color_of_status ~dark:false) tr.S.transf_verified;
+    for i=1 to depth-1 do fprintf fmt "&nbsp;&nbsp;&nbsp;&nbsp;" done;
+    fprintf fmt "%s</td>" tr.transf_name;
+    for i=1 (* depth *) to (*max_depth - 1 + *) List.length provers do
+      fprintf fmt "<td bgcolor=\"#E0E0E0\"></td>"
+    done;
+    fprintf fmt "</tr>@\n";
+    List.iter
+      (print_goal fmt (depth+1) max_depth provers)
+      tr.transf_goals
+
+  and print_goal fmt depth max_depth provers g =
+    fprintf fmt "<tr>";
+    for i=1 to 0 (* depth-1 *) do fprintf fmt "<td></td>" done;
+    fprintf fmt "<td bgcolor=\"#%a\">" (color_of_status ~dark:false) g.S.goal_verified;
+    for i=1 to depth-1 do fprintf fmt "&nbsp;&nbsp;&nbsp;&nbsp;" done;
+    fprintf fmt "%s</td>" (S.goal_expl g);
+(*    for i=depth to max_depth-1 do fprintf fmt "<td></td>" done; *)
+    print_results fmt provers g.goal_external_proofs;
+    fprintf fmt "</tr>@\n";
+    PHstr.iter
+      (fun _ tr -> print_transf fmt depth max_depth provers tr)
+      g.goal_transformations
+
+  let print_theory fmt th =
+    let depth = theory_depth th in
+    if depth > 0 then
+    let provers = Hashtbl.create 9 in
+    provers_stats provers th;
+    let provers =
+      Hashtbl.fold (fun _ pr acc -> pr :: acc) provers []
+    in
+    let provers = List.sort Whyconf.Prover.compare provers in
+    let name = th.S.theory_name.Ident.id_string in
+    fprintf fmt "<h2><font color=\"#%a\">Theory \"%s\": %s</font></h2>@\n" 
+      (color_of_status ~dark:true) th.S.theory_verified
+      name (if th.S.theory_verified then "fully verified" else "not fully verified")
+    ;
+(*
+    fprintf fmt "<table border=\"1\"><tr><td colspan=\"%d\">Obligations</td>" depth;
+*)
+    fprintf fmt "<table border=\"1\"><tr><td>Obligations</td>";
+    List.iter
+      (fun pr -> fprintf fmt "<td text-rotation=\"90\">%a</td>" print_prover pr)
+      provers;
+    fprintf fmt "</td></tr>@\n";
+    List.iter (print_goal fmt 1 depth provers) th.theory_goals;
+    fprintf fmt "</table>@\n"
+
+  let print_file fmt f =
+    (* fprintf fmt "<h1>File %s</h1>@\n" f.file_name; *)
+    fprintf fmt "%a"
+      (Pp.print_list Pp.newline print_theory) f.file_theories
+
+  let print_session name fmt s =
+    fprintf fmt "<h1>Why3 Proof Results for Project \"%s\"</h1>@\n" name;
+    fprintf fmt "%a"
+      (Pp.print_iter2 PHstr.iter Pp.newline Pp.nothing Pp.nothing
+         print_file) s.session_files
+
+
+  let context : context = "<!DOCTYPE html
+PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"
+\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">
+<html xmlns=\"http://www.w3.org/1999/xhtml\">
+<head>
+<title>Why3 session of %s</title>
+</head>
+<body>
+%a
+</body>
+</html>
+"
+
+  let run_one = run_file context print_session
+
+end
+
 
 
 module Simple =
@@ -412,7 +559,8 @@ end
 
 let run_one fname =
   match !opt_style with
-    | Simple -> Simple.run_one fname
+    | Table -> Table.run_one fname
+    | SimpleTree -> Simple.run_one fname
     | Jstree ->
       eprintf "style jstree not yet available@.";
       exit 1

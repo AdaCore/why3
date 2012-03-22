@@ -42,7 +42,7 @@ let spec =
   ("--print0", Arg.Set opt_print0,
    " use the null character instead of newline to separate the output of \
 --provers and --edited-files" ) ::
-  simple_spec
+  common_options
 
 let run_one fname =
   let project_dir = Session.get_project_dir fname in

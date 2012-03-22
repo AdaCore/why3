@@ -55,7 +55,7 @@ associated to proved goals (same as --filter-verified-goal --conservative)")::
 (*  ("--never", Arg.Unit (set_remove Never),
    " never remove a proof")::
   ("-n", Arg.Unit (set_remove Never), " same as --never")::*)
-  (filter_spec @ env_spec)
+  (filter_spec @ common_options)
 
 let rec interactive to_remove =
   eprintf "Do you want to remove the external proof %a (y/n)@."

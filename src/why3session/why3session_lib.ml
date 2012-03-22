@@ -41,13 +41,6 @@ let print_version () =
   Format.printf "Why3 session, version %s (build date: %s)@."
     Config.version Config.builddate
 
-let simple_spec = [
-  ("-v", Arg.Set opt_version, " print version information") ;
-  Debug.Opt.desc_debug_list;
-  Debug.Opt.desc_debug_all;
-  Debug.Opt.desc_debug;
-]
-
 let read_simple_spec () =
   if !opt_version then begin
     print_version (); exit 0
@@ -73,9 +66,13 @@ let common_options = [
       "<dir> Add <dir> to the library search path";
   "--library", Arg.String (fun s -> opt_loadpath := s :: !opt_loadpath),
       " same as -L";
+  "-v", Arg.Set opt_version, " print version information" ;
+  Debug.Opt.desc_debug_list;
+  Debug.Opt.desc_debug_all;
+  Debug.Opt.desc_debug;
 ]
 
-let env_spec = common_options @ simple_spec
+let env_spec = common_options 
 
 
 let read_env_spec () =

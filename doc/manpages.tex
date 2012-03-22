@@ -100,7 +100,8 @@ make byte opt
 make install_lib
 \end{verbatim}
 
-\section{Installation of external provers}\label{provers}
+\section{Installation of external provers}
+\label{provers}
 
 \why can use a wide range of external theorem provers. These need to
 be installed separately, and then \why needs to be configured to use
@@ -268,6 +269,8 @@ the actions of the various menus and buttons of the interface.
 \item[-I] $d$: adds $d$ in the load path, to search for theories.
 \end{description}
 
+\todo{option -extra-config and others}
+
 \subsection{Left toolbar actions}
 
 \begin{description}
@@ -371,6 +374,8 @@ The session state is stored in an XML file named
 is the directory of the project.
 The XML file follows the DTD given in \texttt{share/why3session.dtd} and reproduced below.
 \verbatiminput{../share/why3session.dtd}
+
+\todo{The DTD is certainly outdated}
 
 \section{The \texttt{why3ml} tool}
 
@@ -509,16 +514,10 @@ to use the IDE to update it.
   some proofs did not replay correctly.
 \item Option \texttt{-smoke-detector \{none|top|deep\}} tries to detect
   if the context is self-contradicting.
-\item Option \texttt{-latex \textsl{<dir>}} produces a summary of
-  the replay under the form of a tabular environment in LaTeX, one
-  tabular for each theory, one per file, in directory \texttt{\textsl{<dir>}}.
-\item Option \texttt{-latex2 \textsl{<dir>}} produces an alternate version of
-  LaTeX output, with a different layout of the tables.
-% \item option \texttt{-html \textsl{<file.html>}}: produce a summary of
-%   the replay in HTML syntax.
 \end{itemize}
 
 \paragraph{Smoke Detector}
+
 The smoke detector tries to detect if the context is self-contradicting
  and, thus, that anything can be proved in this context. The smoke
  detector can't be run on outdated session and does not modify the session.
@@ -552,31 +551,6 @@ detector has been triggered, or \texttt{No smoke detected} (exit code 0)
 otherwise.
 
 
-\paragraph{Customizing LaTeX output}
-
-The generated LaTeX files contain some macros that must be defined
-externally.  Various definitions can be given to them to customize the
-output. 
-\begin{itemize}
-\item \verb|\provername|: macro with one parameter, a prover name
-\item \verb|\valid|: macro with one parameter, used where the corresponding prover answers that the goal is valid. The parameter is the time in seconds.
-\item \verb|\noresult|: macro without parameter, used where no result
-  exists for the corresponding prover
-\item \verb|\timeout|: macro without parameter, used where the corresponding prover reached the time limit
-\item \verb|\explanation|: macro with one parameter, the goal name or its explanation
-\end{itemize}
-
-\begin{figure}[t]
-  \begin{center}
-    \input{HelloProof.tex}
-  \end{center}
-  \verbatiminput{./replayer_macros.tex}
-  \caption{Sample macros for the LaTeX option of why3replayer}
-\label{fig:replayer}
-\end{figure}
-
-Figure~\ref{fig:replayer} proposes some suggestions for these macros, together
-with the table obtained from the hello proof example of Section~\ref{chap:starting}.
 
 \section{The \texttt{why3session} tool}
 \label{sec:why3session}
@@ -688,9 +662,55 @@ corresponds to \verb|--filter-verified-goal --conservative| and
 removes the proof attempts that are not verified but which correspond
 to verified goals.
 
+\subsubsection{Session Statistics}
+
+\todo{DETAILLER why3session stats}
+
+\subsubsection{Session Dump in LaTeX or HTML Format}
+
+\begin{itemize}
+\item Command \texttt{latex} produces a summary of the
+  replay under the form of a tabular environment in LaTeX, one tabular
+  for each theory, one per file.
+
+  Option \texttt{-style 2} produces an alternate
+  version of LaTeX output, with a different layout of the tables.
+\item command \texttt{html} produces a summary of the replay in HTML syntax.
+\end{itemize}
+
+\todo{DETAILLER}
+
+\paragraph{Customizing LaTeX output}
+
+The generated LaTeX files contain some macros that must be defined
+externally.  Various definitions can be given to them to customize the
+output.
+\begin{itemize}
+\item \verb|\provername|: macro with one parameter, a prover name
+\item \verb|\valid|: macro with one parameter, used where the corresponding prover answers that the goal is valid. The parameter is the time in seconds.
+\item \verb|\noresult|: macro without parameter, used where no result
+  exists for the corresponding prover
+\item \verb|\timeout|: macro without parameter, used where the corresponding prover reached the time limit
+\item \verb|\explanation|: macro with one parameter, the goal name or its explanation
+\end{itemize}
+
+\begin{figure}[t]
+  \begin{center}
+    \input{HelloProof.tex}
+  \end{center}
+  \verbatiminput{./replayer_macros.tex}
+  \caption{Sample macros for the LaTeX option of why3replayer}
+\label{fig:replayer}
+\end{figure}
+
+Figure~\ref{fig:replayer} proposes some suggestions for these macros,
+together with the table obtained from the hello proof example of
+Section~\ref{chap:starting}.
+
 \section{The \texttt{why3.conf} configuration file}
 \label{sec:whyconffile}
 
+\todo{THIS SECTION IS OUTDATED}
 
 \begin{figure}[t]
 \begin{verbatim}

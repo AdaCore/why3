@@ -42,7 +42,7 @@ let print_usage () =
     (Pp.print_iter1 Array.iter Pp.newline
        (fun fmt e -> fprintf fmt "%s   @[<hov>%s@]"
          (Util.padd_string ' ' e.cmd_name maxl) e.cmd_desc)) cmds;
-  Arg.usage (Arg.align Why3session_lib.env_spec) "common options:";
+  Arg.usage (Arg.align Why3session_lib.common_options) "common options:";
   eprintf "@\nspecific command options: %s <command> -help@." exec_name;
   exit 1
 
