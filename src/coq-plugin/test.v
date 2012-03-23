@@ -7,15 +7,14 @@ Ltac ae := why3 "alt-ergo".
 Ltac Z3 := why3 "z3-2".
 Ltac spass := why3 "spass".
 
-(*
-Inductive sorted (a: Set) : list a -> Prop :=
+Inductive sorted (a:Set) : list a -> Prop :=
   c: sorted _ (@nil a)
 | d: forall x: a, sorted _ (cons x nil).
 
 
 Goal sorted _ (@nil Z).
 ae.
-*)
+
 
 Parameter p: Z -> Prop.
 
@@ -139,7 +138,10 @@ Goal
   forall a, forall (x: list (list a)), 
   1<=2 -> match x with nil => 1 | x :: r => 2 end <= 2.
 intros a x.
-Z3.
+assert (x=nil \/ exists y: list a, exists z:list (list a),
+                 x = cons y z).
+destruct x; ae.
+ae.
 Qed.
 
 
@@ -207,10 +209,8 @@ Qed.
 
 Goal forall (a:Set), ptree_size a (PLeaf a) = 0.
 intros.
-(* BUG ICI *)
 ae.
-(* TODO: intro context *)
-Admitted.
+Qed.
 
 (* the same, without parameters *)
 
