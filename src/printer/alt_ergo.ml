@@ -190,8 +190,8 @@ let print_type_decl fmt ts = match ts.ts_args with
 
 let print_enum_decl fmt ts csl =
   let print_cs fmt (ls,_) = print_ident fmt ls.ls_name in
-  fprintf fmt "type %a =@ %a@\n@\n" print_ident ts.ts_name
-    (print_list alt print_cs) csl
+  fprintf fmt "@[<hov 2>type %a =@ %a@]@\n@\n" print_ident ts.ts_name
+    (print_list alt2 print_cs) csl
 
 let print_ty_decl info fmt ts =
   if Mid.mem ts.ts_name info.info_syn then () else
