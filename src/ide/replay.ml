@@ -28,7 +28,7 @@ let opt_version = ref false
 let opt_stats = ref true
 let opt_force = ref false
 let opt_convert_unknown_provers = ref false
-
+let opt_bench = ref false
 
 (** {2 Smoke detector} *)
 
@@ -72,6 +72,8 @@ let spec = Arg.align [
   ("-smoke-detector",
    Arg.Symbol (["none";"top";"deep"],set_opt_smoke),
    " try to detect if the context is self-contradicting") ;
+  ("-bench",
+   Arg.Set opt_bench, " run as bench (experimental)");
   ("-s",
    Arg.Clear opt_stats,
    " do not print statistics") ;
@@ -369,12 +371,35 @@ let transform_smoke env_session =
     | SD_Deep -> trans "smoke_detector_deep" env_session
 
 
+let run_as_bench env_session =
+  let sched =
+    M.init (Whyconf.running_provers_max (Whyconf.get_main config))
+  in
+  let provers = 
+    Session.PHprover.fold 
+      (fun _ p acc ->
+        match p with
+          | None -> acc
+          | Some p -> p.Session.prover_config.Whyconf.prover :: acc)
+      env_session.Session.loaded_provers []
+  in
+  let callback () =
+    eprintf "We should now save the session...@.";
+    exit 0
+  in
+  M.play_all env_session sched ~callback ~timelimit:2 provers;
+  main_loop (); 
+  eprintf "main replayer (in bench mode) exited unexpectedly@."; 
+  exit 1
+
 let () =
   try
     eprintf "Opening session...@?";
     let env_session,found_obs =
       let session = S.read_session project_dir in
-      M.update_session ~allow_obsolete:true session env config in
+      M.update_session ~allow_obsolete:true session env config
+    in
+    if !opt_bench then run_as_bench env_session;
     transform_smoke env_session;
     if !opt_convert_unknown_provers then M.convert_unknown_prover env_session;
     let sched =

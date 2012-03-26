@@ -515,33 +515,6 @@ let replay eS eT ~obsolete_only ~context_unproved_goals_only a =
           tr.transf_goals
 
 (***********************************)
-(* play all                        *)
-(***********************************)
-
-let rec play_on_goal_and_children eS eT ~timelimit l g =
-  List.iter
-    (fun p -> prover_on_goal eS eT ~timelimit p g)
-    l;
-  PHstr.iter
-    (fun _ t ->
-       List.iter
-         (play_on_goal_and_children eS eT ~timelimit l)
-         t.transf_goals)
-    g.goal_transformations
-
-
-let play_all eS eT ~timelimit l =
-  PHstr.iter
-    (fun _ file ->
-       List.iter
-         (fun th ->
-            List.iter
-              (play_on_goal_and_children eS eT ~timelimit l)
-              th.theory_goals)
-         file.file_theories)
-    eS.session.session_files
- 
-(***********************************)
 (* method: mark proofs as obsolete *)
 (***********************************)
 
@@ -691,6 +664,43 @@ let check_all eS eT ~callback =
   in
   (* incr maximum_running_proofs; *)
   schedule_any_timeout eT timeout
+
+
+(***********************************)
+(* play all                        *)
+(***********************************)
+
+let rec play_on_goal_and_children eS eT ~timelimit l g =
+  List.iter
+    (fun p -> prover_on_goal eS eT ~timelimit p g)
+    l;
+  PHstr.iter
+    (fun _ t ->
+       List.iter
+         (play_on_goal_and_children eS eT ~timelimit l)
+         t.transf_goals)
+    g.goal_transformations
+
+
+let play_all eS eT ~callback ~timelimit l =
+  let todo = Todo.create (ref ()) (fun _ _ -> ())  in
+ PHstr.iter
+    (fun _ file ->
+       List.iter
+         (fun th ->
+            List.iter
+              (play_on_goal_and_children eS eT ~timelimit l)
+              th.theory_goals)
+         file.file_theories)
+    eS.session.session_files;
+  let timeout () =
+    match Todo._end todo with
+      | None ->  true
+      | Some _ -> callback (); false
+  in
+  schedule_any_timeout eT timeout
+
+ 
 
 (** Transformation *)
 

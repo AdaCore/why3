@@ -180,24 +180,6 @@ module Make(O: OBSERVER) : sig
     O.key proof_attempt -> unit
     (** edit the given proof attempt using the appropriate editor *)
 
-  val replay :
-    O.key env_session -> t ->
-    obsolete_only:bool ->
-    context_unproved_goals_only:bool -> O.key any -> unit
-    (** [replay es sched ~obsolete_only ~context_unproved_goals_only a]
-        reruns proofs under [a]
-        if obsolete_only is set then does not rerun non-obsolete proofs
-        if context_unproved_goals_only is set then don't rerun proofs
-        already 'valid'
-    *)
-
-  val play_all : 
-    O.key env_session -> t -> timelimit:int -> Whyconf.prover list -> unit
-    (** [play_all es sched l] runs every prover of list [l] on all
-        goals and sub-goals of the session, with the given time limit.
-        Useful for benchmarking provers
-    *)
-
   val cancel : O.key any -> unit
     (** [cancel a] marks all proofs under [a] as obsolete *)
 
@@ -219,6 +201,17 @@ module Make(O: OBSERVER) : sig
     | Prover_not_installed
     | No_former_result of Call_provers.prover_result
 
+  val replay :
+    O.key env_session -> t ->
+    obsolete_only:bool ->
+    context_unproved_goals_only:bool -> O.key any -> unit
+    (** [replay es sched ~obsolete_only ~context_unproved_goals_only a]
+        reruns proofs under [a]
+        if obsolete_only is set then does not rerun non-obsolete proofs
+        if context_unproved_goals_only is set then don't rerun proofs
+        already 'valid'
+    *)
+
   val check_all:
     O.key env_session -> t ->
     callback:((Ident.ident * Whyconf.prover * report) list -> unit) -> unit
@@ -227,6 +220,15 @@ module Make(O: OBSERVER) : sig
         new one (does not change the session state) When finished,
         calls the callback with the reports which are triples (goal
         name, prover, report) *)
+
+  val play_all : 
+    O.key env_session -> t -> callback:(unit-> unit) ->
+    timelimit:int -> Whyconf.prover list -> unit
+    (** [play_all es sched l] runs every prover of list [l] on all
+        goals and sub-goals of the session, with the given time limit.
+        [callback] is called when all tasks are finished.
+        Useful for benchmarking provers
+    *)
 
   val convert_unknown_prover : O.key env_session -> unit
     (** Same as {!Session_tools.convert_unknown_prover} *)
