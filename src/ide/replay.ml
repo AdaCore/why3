@@ -375,13 +375,24 @@ let run_as_bench env_session =
   let sched =
     M.init (Whyconf.running_provers_max (Whyconf.get_main config))
   in
+  eprintf "Provers:@.";
   let provers = 
-    Session.PHprover.fold 
+    Whyconf.Mprover.fold
+      (fun _ p acc -> 
+        eprintf "prover: %a@." Whyconf.print_prover p.Whyconf.prover;
+        p.Whyconf.prover :: acc)
+      (Whyconf.get_provers env_session.Session.whyconf) []
+(*
+    Session.PHprover.fold
       (fun _ p acc ->
         match p with
           | None -> acc
-          | Some p -> p.Session.prover_config.Whyconf.prover :: acc)
+          | Some p -> 
+            let p = p.Session.prover_config.Whyconf.prover in
+            eprintf "prover: %a@." Whyconf.print_prover p;
+            p :: acc)
       env_session.Session.loaded_provers []
+*)
   in
   let callback () =
     eprintf "We should now save the session...@.";
@@ -399,6 +410,7 @@ let () =
       let session = S.read_session project_dir in
       M.update_session ~allow_obsolete:true session env config
     in
+    eprintf " done.@.";
     if !opt_bench then run_as_bench env_session;
     transform_smoke env_session;
     if !opt_convert_unknown_provers then M.convert_unknown_prover env_session;

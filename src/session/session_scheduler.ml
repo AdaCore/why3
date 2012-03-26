@@ -348,6 +348,8 @@ let run_external_proof eS eT ?callback a =
 loaded@."
         Whyconf.print_prover a.proof_prover
       | Some (nap,npc) ->
+        eprintf "prover %a on goal %s@."
+          Whyconf.print_prover a.proof_prover a.proof_parent.goal_name.Ident.id_string;
         let g = a.proof_parent in
         try
           if nap == ap then raise Not_found;
@@ -405,6 +407,7 @@ loaded@."
           let command =
             String.concat " " (npc.prover_config.Whyconf.command ::
                                  npc.prover_config.Whyconf.extra_options) in
+          eprintf "scheduling it...@.";
           schedule_proof_attempt
             ~timelimit ~memlimit:0
             ?old ~command
@@ -414,7 +417,7 @@ loaded@."
             (goal_task g)
         end
 
-let rec prover_on_goal eS eT ?callback ~timelimit p g =
+let prover_on_goal eS eT ?callback ~timelimit p g =
   let a =
     try
       let a = PHprover.find g.goal_external_proofs p in
@@ -429,7 +432,7 @@ let rec prover_on_goal eS eT ?callback ~timelimit p g =
   in
   run_external_proof eS eT ?callback a
 
-let rec prover_on_goal_or_children eS eT
+let prover_on_goal_or_children eS eT
     ~context_unproved_goals_only ~timelimit p g =
   goal_iter_leaf_goal ~unproved_only:context_unproved_goals_only
     (prover_on_goal eS eT ~timelimit p) g
@@ -670,30 +673,35 @@ let check_all eS eT ~callback =
 (* play all                        *)
 (***********************************)
 
-let rec play_on_goal_and_children eS eT ~timelimit l g =
+let rec play_on_goal_and_children eS eT ~timelimit todo l g =
   List.iter
-    (fun p -> prover_on_goal eS eT ~timelimit p g)
+    (fun p -> 
+      Todo.todo todo;
+      eprintf "prover %a on goal %s@."
+        Whyconf.print_prover p g.goal_name.Ident.id_string;
+      prover_on_goal eS eT ~timelimit p g)
     l;
   PHstr.iter
     (fun _ t ->
        List.iter
-         (play_on_goal_and_children eS eT ~timelimit l)
+         (play_on_goal_and_children eS eT ~timelimit todo l)
          t.transf_goals)
     g.goal_transformations
 
 
 let play_all eS eT ~callback ~timelimit l =
   let todo = Todo.create (ref ()) (fun _ _ -> ())  in
- PHstr.iter
+  PHstr.iter
     (fun _ file ->
-       List.iter
-         (fun th ->
-            List.iter
-              (play_on_goal_and_children eS eT ~timelimit l)
-              th.theory_goals)
-         file.file_theories)
+      List.iter
+        (fun th ->
+          List.iter
+            (play_on_goal_and_children eS eT ~timelimit todo l)
+            th.theory_goals)
+        file.file_theories)
     eS.session.session_files;
   let timeout () =
+    (* eprintf "Timeout handler@."; *)
     match Todo._end todo with
       | None ->  true
       | Some _ -> callback (); false
