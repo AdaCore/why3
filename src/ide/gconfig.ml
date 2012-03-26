@@ -753,6 +753,7 @@ an alternative?" Whyconf.print_prover unknown in
     c.altern_provers <- Mprover.add unknown !prover_choosed c.altern_provers;
   !prover_choosed
 
+(**)
 let replace_prover c to_be_removed to_be_copied =
   if not to_be_removed.Session.proof_obsolete &&
     c.replace_prover = CRP_Not_Obsolete
@@ -776,6 +777,7 @@ let replace_prover c to_be_removed to_be_copied =
     | `DELETE_EVENT | `Keep -> false in
   dialog#destroy ();
   res
+(**)
 
 let read_config conf_file extra_files = read_config conf_file extra_files; init ()
 

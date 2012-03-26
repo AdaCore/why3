@@ -669,7 +669,9 @@ let init =
 
 let unknown_prover = Gconfig.unknown_prover gconfig
 
+(**)
 let replace_prover = Gconfig.replace_prover gconfig
+(**)
 
    end)
 
@@ -945,7 +947,7 @@ let (_ : GMenu.image_menu_item) =
 let save_session () =
   if !session_needs_saving then begin
     eprintf "[Info] saving session@.";
-    S.save_session (env_session()).S.session;
+    S.save_session gconfig.config (env_session()).S.session;
     session_needs_saving := false;
   end
 

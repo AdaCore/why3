@@ -358,7 +358,7 @@ let save_ident fmt id =
         file lnum cnumb cnume
 
 let save_label fmt s =
-  fprintf fmt "@\n@[<v 1><label@ name=\"%s\">@,</label>@]" s.Ident.lab_string
+  fprintf fmt "@\n@[<v 1><label@ name=\"%s\"/>@]" s.Ident.lab_string
 
 let rec save_goal provers fmt g =
   assert (g.goal_shape <> "");
@@ -403,11 +403,12 @@ name=\"%s\"@ version=\"%s\"%a/>@]"
     p.C.prover_altern;
   Mprover.add p id provers, id+1
 
-let save fname session =
+let save fname config session =
   let ch = open_out fname in
   let fmt = formatter_of_out_channel ch in
   fprintf fmt "<?xml version=\"1.0\" encoding=\"UTF-8\"?>@\n";
-  fprintf fmt "<!DOCTYPE why3session SYSTEM \"why3session.dtd\">@\n";
+  fprintf fmt "<!DOCTYPE why3session SYSTEM \"%s\">@\n"
+    (Filename.concat (Whyconf.datadir (Whyconf.get_main config)) "why3session.dtd");
   fprintf fmt "@[<v 1><why3session@ name=\"%s\">" fname;
   let provers,_ = Sprover.fold (save_prover fmt) (get_used_provers session)
     (Mprover.empty,0) in
@@ -416,10 +417,10 @@ let save fname session =
   fprintf fmt "@.";
   close_out ch
 
-let save_session session =
+let save_session config session =
   let f = Filename.concat session.session_dir db_filename in
   Sysutil.backup_file f;
-  save f session
+  save f config session
 
 (*******************************)
 (*          explanations       *)

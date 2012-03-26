@@ -170,7 +170,7 @@ let run_one ~action env config filters pk fname =
           | Mod when to_prover <> SameProver -> remove_external_proof pr
           | _ -> ()
   ) s;
-  save_session env_session.session
+  save_session config env_session.session
 
 let read_to_prover config =
   match !opt_to_prover with

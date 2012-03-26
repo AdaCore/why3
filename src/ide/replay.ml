@@ -288,7 +288,7 @@ let same_result r1 r2 =
     | Call_provers.Failure _, Call_provers.Failure _-> true
     | _ -> false
 
-let add_to_check_no_smoke found_obs env_session sched =
+let add_to_check_no_smoke config found_obs env_session sched =
       let session = env_session.S.session in
       let callback report =
         eprintf "@.";
@@ -318,7 +318,7 @@ session NOT updated)@." n m
             if found_obs && (n=m || !opt_force) then
               begin
                 eprintf "Updating obsolete session...@?";
-                S.save_session session;
+                S.save_session config session;
                 eprintf " done@."
               end;
             exit 0
@@ -354,9 +354,9 @@ let add_to_check_smoke env_session sched =
   in
   M.check_all ~callback env_session sched
 
-let add_to_check found_obs =
+let add_to_check config found_obs =
   match !opt_smoke with
-    | SD_None -> add_to_check_no_smoke found_obs;
+    | SD_None -> add_to_check_no_smoke config found_obs;
     | _ -> assert (not found_obs); add_to_check_smoke
 
 let transform_smoke env_session =
@@ -389,7 +389,7 @@ let () =
     end;
     (* M.smoke_detector := !opt_smoke; *)
     eprintf " done.";
-    add_to_check found_obs env_session sched;
+    add_to_check config found_obs env_session sched;
     main_loop (); 
     eprintf "main replayer exited unexpectedly@."; 
     exit 1

@@ -155,7 +155,7 @@ val read_session : string -> notask session
 (** Read a session stored on the disk. It returns a session without any
     task attached to goals *)
 
-val save_session : 'key session -> unit
+val save_session : Whyconf.config -> 'key session -> unit
 (** Save a session on disk *)
 
 (** {2 Context of a session} *)

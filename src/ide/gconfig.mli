@@ -105,8 +105,13 @@ val show_about_window : unit -> unit
 val preferences : t -> unit
 val unknown_prover :
   t -> 'key Session.env_session -> Whyconf.prover -> Whyconf.prover option
+
+(**)
 val replace_prover :
   t -> 'key Session.proof_attempt -> 'key Session.proof_attempt -> bool
+(**)
+
+
 (*
 Local Variables:
 compile-command: "unset LANG; make -C ../.. bin/why3ide.byte"
