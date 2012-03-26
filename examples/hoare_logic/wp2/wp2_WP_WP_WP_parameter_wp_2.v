@@ -439,8 +439,7 @@ intros Post WP_body H_WP_body.
 intros abstracted_fmla H_abstracted.
 red.
 intros s1 p1 H1 s2 p2 n Hsteps.
-generalize (steps_non_neg _ _ _ _ _ _ _ Hsteps).
-intro H_n_pos.
+assert (H_n_pos := steps_non_neg _ _ _ _ _ _ _ Hsteps).
 generalize s1 p1 H1 Hsteps; clear s1 p1 H1 Hsteps.
 apply Z_lt_induction with (P := 
   fun n => forall s1 p1 : map Z value,
@@ -452,26 +451,24 @@ elim H0; clear H0; intros H_inv_in_s2 H_abstr_in_s2.
 inversion H1; subst; clear H1.
 inversion H0; subst; clear H0.
 (* case cond = true *)
-generalize (many_steps_seq _ _ _ _ _ _ _ H2); clear H2.
-intros (s3 & p3 & n1 & n2 & First_iter & Next_iter & Hn1n2).
+destruct (many_steps_seq _ _ _ _ _ _ _ H2) as 
+  (s3 & p3 & n1 & n2 & First_iter & Next_iter & Hn1n2).
+clear H2.
 apply H with (3:=Next_iter).
-  generalize (steps_non_neg _ _ _ _ _ _ _ First_iter); intro Hn1_pos.
-  generalize (steps_non_neg _ _ _ _ _ _ _ Next_iter); intro Hn2_pos.
+  assert (Hn1_pos := steps_non_neg _ _ _ _ _ _ _ First_iter).
+  assert (Hn2_pos := steps_non_neg _ _ _ _ _ _ _ Next_iter).
   omega.
-generalize (H_abstracted sigma2 pi2 H_abstr_in_s2); clear H_abstracted.
-simpl.
-intros ((Htrue,_) & Hnext).
-generalize (Hnext s3 p3 n1 First_iter); clear Hnext.
-intro H_abstr_in_s3.
+destruct (H_abstracted sigma2 pi2 H_abstr_in_s2) as ((Htrue,_) & Hnext).
+clear H_abstracted.
+assert (H_abstr_in_s3 := Hnext s3 p3 n1 First_iter); clear Hnext.
 split; auto.
 red in H_WP_body.
 apply H_WP_body with (2:=First_iter).
 apply Htrue; auto.
 (* case cond = false *)
 inversion H2; [subst; clear H2 | inversion H0].
-generalize (H_abstracted s2 p2 H_abstr_in_s2); clear H_abstracted.
-simpl.
-intros ((_,Hfalse) & Hnext).
+destruct (H_abstracted s2 p2 H_abstr_in_s2) as ((_,Hfalse) & Hnext).
+clear H_abstracted.
 apply Hfalse; split; auto.
 rewrite H11; discriminate.
 Qed.

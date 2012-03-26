@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "why3session.dtd">
 <why3session
- name="programs/linked_list_rev/why3session.xml">
+ name="linked_list_rev/why3session.xml">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -29,23 +29,23 @@
  <file
   name="../linked_list_rev.mlw"
   verified="true"
-  expanded="false">
+  expanded="true">
   <theory
    name="ListReverse"
-   locfile="programs/linked_list_rev/../linked_list_rev.mlw"
+   locfile="linked_list_rev/../linked_list_rev.mlw"
    loclnum="10" loccnumb="7" loccnume="18"
    verified="true"
    expanded="true">
   </theory>
   <theory
    name="WP InPlaceRev"
-   locfile="programs/linked_list_rev/../linked_list_rev.mlw"
+   locfile="linked_list_rev/../linked_list_rev.mlw"
    loclnum="36" loccnumb="7" loccnume="17"
    verified="true"
    expanded="true">
    <goal
     name="list_seg_frame"
-    locfile="programs/linked_list_rev/../linked_list_rev.mlw"
+    locfile="linked_list_rev/../linked_list_rev.mlw"
     loclnum="52" loccnumb="8" loccnume="22"
     sum="199148e72ae73c52cf612b302ffd7309"
     proved="true"
@@ -62,7 +62,7 @@
    </goal>
    <goal
     name="list_seg_functional"
-    locfile="programs/linked_list_rev/../linked_list_rev.mlw"
+    locfile="linked_list_rev/../linked_list_rev.mlw"
     loclnum="57" loccnumb="8" loccnume="27"
     sum="9f829cebe9f8f33c94f138498d4907fd"
     proved="true"
@@ -74,12 +74,12 @@
      edited="linked_list_rev_WP_InPlaceRev_list_seg_functional_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.56"/>
+     <result status="valid" time="0.55"/>
     </proof>
    </goal>
    <goal
     name="list_seg_sublistl"
-    locfile="programs/linked_list_rev/../linked_list_rev.mlw"
+    locfile="linked_list_rev/../linked_list_rev.mlw"
     loclnum="61" loccnumb="8" loccnume="25"
     sum="705ce136fbaff7fab1adcebc73e92168"
     proved="true"
@@ -96,7 +96,7 @@
    </goal>
    <goal
     name="list_seg_no_repet"
-    locfile="programs/linked_list_rev/../linked_list_rev.mlw"
+    locfile="linked_list_rev/../linked_list_rev.mlw"
     loclnum="66" loccnumb="8" loccnume="25"
     sum="d3607d0f32701fed47425280db0d5788"
     proved="true"
@@ -108,17 +108,17 @@
      edited="linked_list_rev_WP_InPlaceRev_list_seg_no_repet_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.54"/>
+     <result status="valid" time="0.53"/>
     </proof>
    </goal>
    <goal
     name="WP_parameter in_place_reverse"
-    locfile="programs/linked_list_rev/../linked_list_rev.mlw"
+    locfile="linked_list_rev/../linked_list_rev.mlw"
     loclnum="74" loccnumb="6" loccnume="22"
     expl="parameter in_place_reverse"
     sum="62efbae2ad15158c3672fddc3b35f83d"
     proved="true"
-    expanded="true"
+    expanded="false"
     shape="iainfix =V6anullNainfix =ainfix ++areverseV12V11areverseV1AadisjointV12V11Aalist_segV9V8V11anullAalist_segV10V8V12anullIainfix =V12atailV5FIainfix =V11aConsaheadV5V3FIainfix =V10agetV7V6FIainfix =V9V6FAalist_segV4V8V3anullIainfix =V8asetV7V6V4Falist_segV4V7areverseV1anullIainfix =ainfix ++areverseV5V3areverseV1AadisjointV5V3Aalist_segV4V7V3anullAalist_segV6V7V5anullFFFFFAainfix =ainfix ++areverseV1aNilareverseV1AadisjointV1aNilAalist_seganullV2aNilanullAalist_segV0V2V1anullIalist_segV0V2V1anullFFF">
     <label
      name="expl:parameter in_place_reverse">
@@ -126,10 +126,10 @@
     <transf
      name="split_goal"
      proved="true"
-     expanded="true">
+     expanded="false">
      <goal
       name="WP_parameter in_place_reverse.1"
-      locfile="programs/linked_list_rev/../linked_list_rev.mlw"
+      locfile="linked_list_rev/../linked_list_rev.mlw"
       loclnum="74" loccnumb="6" loccnume="22"
       expl="loop invariant init"
       sum="f8f27efde23daad3bcea08754c4586ed"
@@ -177,7 +177,7 @@
      </goal>
      <goal
       name="WP_parameter in_place_reverse.2"
-      locfile="programs/linked_list_rev/../linked_list_rev.mlw"
+      locfile="linked_list_rev/../linked_list_rev.mlw"
       loclnum="74" loccnumb="6" loccnume="22"
       expl="assertion"
       sum="d99a0745a698e5ee003866f68a1d477c"
@@ -197,12 +197,12 @@
      </goal>
      <goal
       name="WP_parameter in_place_reverse.3"
-      locfile="programs/linked_list_rev/../linked_list_rev.mlw"
+      locfile="linked_list_rev/../linked_list_rev.mlw"
       loclnum="74" loccnumb="6" loccnume="22"
       expl="loop invariant preservation"
       sum="37a75132d15c997a62f3d5eb1eef7f6c"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="ainfix =ainfix ++areverseV12V11areverseV1AadisjointV12V11Aalist_segV9V8V11anullAalist_segV10V8V12anullIainfix =V12atailV5FIainfix =V11aConsaheadV5V3FIainfix =V10agetV7V6FIainfix =V9V6FIalist_segV4V8V3anullIainfix =V8asetV7V6V4FIainfix =V6anullNIainfix =ainfix ++areverseV5V3areverseV1AadisjointV5V3Aalist_segV4V7V3anullAalist_segV6V7V5anullFFFFFIalist_segV0V2V1anullFFF">
       <label
        name="expl:parameter in_place_reverse">
@@ -210,10 +210,10 @@
       <transf
        name="split_goal"
        proved="true"
-       expanded="true">
+       expanded="false">
        <goal
         name="WP_parameter in_place_reverse.3.1"
-        locfile="programs/linked_list_rev/../linked_list_rev.mlw"
+        locfile="linked_list_rev/../linked_list_rev.mlw"
         loclnum="74" loccnumb="6" loccnume="22"
         expl="parameter in_place_reverse"
         sum="2623660ebb98f883b6300e10438f3216"
@@ -233,7 +233,7 @@
        </goal>
        <goal
         name="WP_parameter in_place_reverse.3.2"
-        locfile="programs/linked_list_rev/../linked_list_rev.mlw"
+        locfile="linked_list_rev/../linked_list_rev.mlw"
         loclnum="74" loccnumb="6" loccnume="22"
         expl="parameter in_place_reverse"
         sum="014f05198841f49f7e4fb5015fcd36fa"
@@ -267,7 +267,7 @@
        </goal>
        <goal
         name="WP_parameter in_place_reverse.3.3"
-        locfile="programs/linked_list_rev/../linked_list_rev.mlw"
+        locfile="linked_list_rev/../linked_list_rev.mlw"
         loclnum="74" loccnumb="6" loccnume="22"
         expl="parameter in_place_reverse"
         sum="488bd635d0768e4b260822aac3f5964a"
@@ -294,7 +294,7 @@
        </goal>
        <goal
         name="WP_parameter in_place_reverse.3.4"
-        locfile="programs/linked_list_rev/../linked_list_rev.mlw"
+        locfile="linked_list_rev/../linked_list_rev.mlw"
         loclnum="74" loccnumb="6" loccnume="22"
         expl="parameter in_place_reverse"
         sum="83adea0a38c33bab803c668c111970d0"
@@ -323,7 +323,7 @@
      </goal>
      <goal
       name="WP_parameter in_place_reverse.4"
-      locfile="programs/linked_list_rev/../linked_list_rev.mlw"
+      locfile="linked_list_rev/../linked_list_rev.mlw"
       loclnum="74" loccnumb="6" loccnume="22"
       expl="normal postcondition"
       sum="b6e199d88724103484d8b23bbc1c6856"
