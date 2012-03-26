@@ -191,6 +191,13 @@ module Make(O: OBSERVER) : sig
         already 'valid'
     *)
 
+  val play_all : 
+    O.key env_session -> t -> timelimit:int -> Whyconf.prover list -> unit
+    (** [play_all es sched l] runs every prover of list [l] on all
+        goals and sub-goals of the session, with the given time limit.
+        Useful for benchmarking provers
+    *)
+
   val cancel : O.key any -> unit
     (** [cancel a] marks all proofs under [a] as obsolete *)
 

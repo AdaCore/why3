@@ -515,6 +515,33 @@ let replay eS eT ~obsolete_only ~context_unproved_goals_only a =
           tr.transf_goals
 
 (***********************************)
+(* play all                        *)
+(***********************************)
+
+let rec play_on_goal_and_children eS eT ~timelimit l g =
+  List.iter
+    (fun p -> prover_on_goal eS eT ~timelimit p g)
+    l;
+  PHstr.iter
+    (fun _ t ->
+       List.iter
+         (play_on_goal_and_children eS eT ~timelimit l)
+         t.transf_goals)
+    g.goal_transformations
+
+
+let play_all eS eT ~timelimit l =
+  PHstr.iter
+    (fun _ file ->
+       List.iter
+         (fun th ->
+            List.iter
+              (play_on_goal_and_children eS eT ~timelimit l)
+              th.theory_goals)
+         file.file_theories)
+    eS.session.session_files
+ 
+(***********************************)
 (* method: mark proofs as obsolete *)
 (***********************************)
 
