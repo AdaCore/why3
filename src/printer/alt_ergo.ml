@@ -220,6 +220,10 @@ let print_param_decl info fmt ls =
     (if ls.ls_args = [] then "" else " -> ")
     (print_option_or_default "prop" (print_type info)) ls.ls_value
 
+let print_param_decl info fmt ls =
+  if Mid.mem ls.ls_name info.info_syn || Sls.mem ls info.info_pjs
+    then () else (print_param_decl info fmt ls; forget_tvs ())
+
 let print_logic_decl info fmt ls ld =
   let vl,e = open_ls_defn ld in
   begin match e.t_ty with
