@@ -63,7 +63,7 @@ let run_one fname =
     printf "%a@." S.print_session session
 
 let run () =
-  let should_exit1 = read_simple_spec () in
+  let _,_,should_exit1 = read_env_spec () in
   if should_exit1 then exit 1;
   iter_files run_one
 

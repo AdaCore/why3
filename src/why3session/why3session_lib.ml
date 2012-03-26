@@ -50,7 +50,6 @@ let read_simple_spec () =
 
 
 
-let includes = ref []
 let opt_config = ref None
 let opt_loadpath = ref []
 let opt_extra = ref []
@@ -82,7 +81,7 @@ let read_env_spec () =
   let main = Whyconf.get_main config in
   Whyconf.load_plugins main;
   let loadpath = (Whyconf.loadpath (Whyconf.get_main config))
-    @ List.rev !includes in
+    @ List.rev !opt_loadpath in
   let env = Env.create_env loadpath in
   env,config,read_simple_spec ()
 

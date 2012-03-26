@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "why3session.dtd">
+<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
 <why3session
- name="programs/gcd_bezout/why3session.xml">
+ name="./programs/gcd_bezout/why3session.xml">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -20,13 +20,13 @@
   expanded="false">
   <theory
    name="WP GcdBezout"
-   locfile="programs/gcd_bezout/../gcd_bezout.mlw"
+   locfile="./programs/gcd_bezout/../gcd_bezout.mlw"
    loclnum="4" loccnumb="7" loccnume="16"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter gcd"
-    locfile="programs/gcd_bezout/../gcd_bezout.mlw"
+    locfile="./programs/gcd_bezout/../gcd_bezout.mlw"
     loclnum="11" loccnumb="6" loccnume="9"
     expl="parameter gcd"
     sum="e4a2c5a5d4862daa55c1df00cc730951"
@@ -34,15 +34,14 @@
     expanded="true"
     shape="iainfix >V6c0ainfix <V9V6Aainfix <=c0V6Aainfix =ainfix +ainfix *V12V0ainfix *V13V1V9Aainfix =ainfix +ainfix *V10V0ainfix *V11V1V8Aainfix =agcdV8V9agcdV0V1Aainfix >=V9c0Aainfix >=V8c0Iainfix =V13ainfix -V4ainfix *V2adivV7V6FIainfix =V12ainfix -V5ainfix *V3adivV7V6FIainfix =V11V2FIainfix =V10V3FIainfix =V9amodV7V6FIainfix =V8V6Fainfix =ainfix +ainfix *V14V0ainfix *V15V1V7EAainfix =V7agcdV0V1Iainfix =ainfix +ainfix *V3V0ainfix *V2V1V6Aainfix =ainfix +ainfix *V5V0ainfix *V4V1V7Aainfix =agcdV7V6agcdV0V1Aainfix >=V6c0Aainfix >=V7c0FFFFFFAainfix =ainfix +ainfix *c0V0ainfix *c1V1V1Aainfix =ainfix +ainfix *c1V0ainfix *c0V1V0Aainfix =agcdV0V1agcdV0V1Aainfix >=V1c0Aainfix >=V0c0Iainfix >=V1c0Aainfix >=V0c0FF">
     <label
-     name="expl:parameter gcd">
-     </label>
+     name="expl:parameter gcd"/>
     <transf
      name="split_goal"
      proved="true"
      expanded="true">
      <goal
       name="WP_parameter gcd.1"
-      locfile="programs/gcd_bezout/../gcd_bezout.mlw"
+      locfile="./programs/gcd_bezout/../gcd_bezout.mlw"
       loclnum="11" loccnumb="6" loccnume="9"
       expl="loop invariant init"
       sum="79bb0c1f17a0a39178611ac5f1bc2262"
@@ -50,8 +49,7 @@
       expanded="true"
       shape="ainfix =ainfix +ainfix *c0V0ainfix *c1V1V1Aainfix =ainfix +ainfix *c1V0ainfix *c0V1V0Aainfix =agcdV0V1agcdV0V1Aainfix >=V1c0Aainfix >=V0c0Iainfix >=V1c0Aainfix >=V0c0FF">
       <label
-       name="expl:parameter gcd">
-       </label>
+       name="expl:parameter gcd"/>
       <proof
        prover="0"
        timelimit="10"
@@ -62,7 +60,7 @@
      </goal>
      <goal
       name="WP_parameter gcd.2"
-      locfile="programs/gcd_bezout/../gcd_bezout.mlw"
+      locfile="./programs/gcd_bezout/../gcd_bezout.mlw"
       loclnum="11" loccnumb="6" loccnume="9"
       expl="loop invariant preservation"
       sum="6514f3426b86561d591f90dc6738aa3c"
@@ -70,15 +68,14 @@
       expanded="true"
       shape="ainfix =ainfix +ainfix *V12V0ainfix *V13V1V9Aainfix =ainfix +ainfix *V10V0ainfix *V11V1V8Aainfix =agcdV8V9agcdV0V1Aainfix >=V9c0Aainfix >=V8c0Iainfix =V13ainfix -V4ainfix *V2adivV7V6FIainfix =V12ainfix -V5ainfix *V3adivV7V6FIainfix =V11V2FIainfix =V10V3FIainfix =V9amodV7V6FIainfix =V8V6FIainfix >V6c0Iainfix =ainfix +ainfix *V3V0ainfix *V2V1V6Aainfix =ainfix +ainfix *V5V0ainfix *V4V1V7Aainfix =agcdV7V6agcdV0V1Aainfix >=V6c0Aainfix >=V7c0FFFFFFIainfix >=V1c0Aainfix >=V0c0FF">
       <label
-       name="expl:parameter gcd">
-       </label>
+       name="expl:parameter gcd"/>
       <transf
        name="split_goal"
        proved="true"
        expanded="true">
        <goal
         name="WP_parameter gcd.2.1"
-        locfile="programs/gcd_bezout/../gcd_bezout.mlw"
+        locfile="./programs/gcd_bezout/../gcd_bezout.mlw"
         loclnum="11" loccnumb="6" loccnume="9"
         expl="parameter gcd"
         sum="0689068fda4b9499a26d8c19e952f93a"
@@ -86,8 +83,7 @@
         expanded="true"
         shape="ainfix >=V8c0Iainfix =V13ainfix -V4ainfix *V2adivV7V6FIainfix =V12ainfix -V5ainfix *V3adivV7V6FIainfix =V11V2FIainfix =V10V3FIainfix =V9amodV7V6FIainfix =V8V6FIainfix >V6c0Iainfix =ainfix +ainfix *V3V0ainfix *V2V1V6Aainfix =ainfix +ainfix *V5V0ainfix *V4V1V7Aainfix =agcdV7V6agcdV0V1Aainfix >=V6c0Aainfix >=V7c0FFFFFFIainfix >=V1c0Aainfix >=V0c0FF">
         <label
-         name="expl:parameter gcd">
-         </label>
+         name="expl:parameter gcd"/>
         <proof
          prover="1"
          timelimit="10"
@@ -105,7 +101,7 @@
        </goal>
        <goal
         name="WP_parameter gcd.2.2"
-        locfile="programs/gcd_bezout/../gcd_bezout.mlw"
+        locfile="./programs/gcd_bezout/../gcd_bezout.mlw"
         loclnum="11" loccnumb="6" loccnume="9"
         expl="parameter gcd"
         sum="5785593adcf06f7a2e2b61ccc4a4606b"
@@ -113,8 +109,7 @@
         expanded="true"
         shape="ainfix >=V9c0Iainfix =V13ainfix -V4ainfix *V2adivV7V6FIainfix =V12ainfix -V5ainfix *V3adivV7V6FIainfix =V11V2FIainfix =V10V3FIainfix =V9amodV7V6FIainfix =V8V6FIainfix >V6c0Iainfix =ainfix +ainfix *V3V0ainfix *V2V1V6Aainfix =ainfix +ainfix *V5V0ainfix *V4V1V7Aainfix =agcdV7V6agcdV0V1Aainfix >=V6c0Aainfix >=V7c0FFFFFFIainfix >=V1c0Aainfix >=V0c0FF">
         <label
-         name="expl:parameter gcd">
-         </label>
+         name="expl:parameter gcd"/>
         <proof
          prover="1"
          timelimit="10"
@@ -132,7 +127,7 @@
        </goal>
        <goal
         name="WP_parameter gcd.2.3"
-        locfile="programs/gcd_bezout/../gcd_bezout.mlw"
+        locfile="./programs/gcd_bezout/../gcd_bezout.mlw"
         loclnum="11" loccnumb="6" loccnume="9"
         expl="parameter gcd"
         sum="2123ec7126e7bb899606e5e84c3383c1"
@@ -140,8 +135,7 @@
         expanded="true"
         shape="ainfix =agcdV8V9agcdV0V1Iainfix =V13ainfix -V4ainfix *V2adivV7V6FIainfix =V12ainfix -V5ainfix *V3adivV7V6FIainfix =V11V2FIainfix =V10V3FIainfix =V9amodV7V6FIainfix =V8V6FIainfix >V6c0Iainfix =ainfix +ainfix *V3V0ainfix *V2V1V6Aainfix =ainfix +ainfix *V5V0ainfix *V4V1V7Aainfix =agcdV7V6agcdV0V1Aainfix >=V6c0Aainfix >=V7c0FFFFFFIainfix >=V1c0Aainfix >=V0c0FF">
         <label
-         name="expl:parameter gcd">
-         </label>
+         name="expl:parameter gcd"/>
         <proof
          prover="2"
          timelimit="10"
@@ -153,7 +147,7 @@
        </goal>
        <goal
         name="WP_parameter gcd.2.4"
-        locfile="programs/gcd_bezout/../gcd_bezout.mlw"
+        locfile="./programs/gcd_bezout/../gcd_bezout.mlw"
         loclnum="11" loccnumb="6" loccnume="9"
         expl="parameter gcd"
         sum="8aeec7a08671ff3b0229de6143467b18"
@@ -161,8 +155,7 @@
         expanded="true"
         shape="ainfix =ainfix +ainfix *V10V0ainfix *V11V1V8Iainfix =V13ainfix -V4ainfix *V2adivV7V6FIainfix =V12ainfix -V5ainfix *V3adivV7V6FIainfix =V11V2FIainfix =V10V3FIainfix =V9amodV7V6FIainfix =V8V6FIainfix >V6c0Iainfix =ainfix +ainfix *V3V0ainfix *V2V1V6Aainfix =ainfix +ainfix *V5V0ainfix *V4V1V7Aainfix =agcdV7V6agcdV0V1Aainfix >=V6c0Aainfix >=V7c0FFFFFFIainfix >=V1c0Aainfix >=V0c0FF">
         <label
-         name="expl:parameter gcd">
-         </label>
+         name="expl:parameter gcd"/>
         <proof
          prover="1"
          timelimit="10"
@@ -180,7 +173,7 @@
        </goal>
        <goal
         name="WP_parameter gcd.2.5"
-        locfile="programs/gcd_bezout/../gcd_bezout.mlw"
+        locfile="./programs/gcd_bezout/../gcd_bezout.mlw"
         loclnum="11" loccnumb="6" loccnume="9"
         expl="parameter gcd"
         sum="18fdf83b194828ef616e9676cfafea02"
@@ -188,8 +181,7 @@
         expanded="true"
         shape="ainfix =ainfix +ainfix *V12V0ainfix *V13V1V9Iainfix =V13ainfix -V4ainfix *V2adivV7V6FIainfix =V12ainfix -V5ainfix *V3adivV7V6FIainfix =V11V2FIainfix =V10V3FIainfix =V9amodV7V6FIainfix =V8V6FIainfix >V6c0Iainfix =ainfix +ainfix *V3V0ainfix *V2V1V6Aainfix =ainfix +ainfix *V5V0ainfix *V4V1V7Aainfix =agcdV7V6agcdV0V1Aainfix >=V6c0Aainfix >=V7c0FFFFFFIainfix >=V1c0Aainfix >=V0c0FF">
         <label
-         name="expl:parameter gcd">
-         </label>
+         name="expl:parameter gcd"/>
         <proof
          prover="1"
          timelimit="10"
@@ -202,7 +194,7 @@
      </goal>
      <goal
       name="WP_parameter gcd.3"
-      locfile="programs/gcd_bezout/../gcd_bezout.mlw"
+      locfile="./programs/gcd_bezout/../gcd_bezout.mlw"
       loclnum="11" loccnumb="6" loccnume="9"
       expl="loop variant decreases"
       sum="bd15228e8313441e41d4cb4edbfe28e7"
@@ -210,8 +202,7 @@
       expanded="true"
       shape="ainfix <V9V6Aainfix <=c0V6Iainfix =ainfix +ainfix *V12V0ainfix *V13V1V9Aainfix =ainfix +ainfix *V10V0ainfix *V11V1V8Aainfix =agcdV8V9agcdV0V1Aainfix >=V9c0Aainfix >=V8c0Iainfix =V13ainfix -V4ainfix *V2adivV7V6FIainfix =V12ainfix -V5ainfix *V3adivV7V6FIainfix =V11V2FIainfix =V10V3FIainfix =V9amodV7V6FIainfix =V8V6FIainfix >V6c0Iainfix =ainfix +ainfix *V3V0ainfix *V2V1V6Aainfix =ainfix +ainfix *V5V0ainfix *V4V1V7Aainfix =agcdV7V6agcdV0V1Aainfix >=V6c0Aainfix >=V7c0FFFFFFIainfix >=V1c0Aainfix >=V0c0FF">
       <label
-       name="expl:parameter gcd">
-       </label>
+       name="expl:parameter gcd"/>
       <proof
        prover="1"
        timelimit="10"
@@ -222,7 +213,7 @@
      </goal>
      <goal
       name="WP_parameter gcd.4"
-      locfile="programs/gcd_bezout/../gcd_bezout.mlw"
+      locfile="./programs/gcd_bezout/../gcd_bezout.mlw"
       loclnum="11" loccnumb="6" loccnume="9"
       expl="normal postcondition"
       sum="49fdf592e8c24d6b4165b01938d10969"
@@ -230,15 +221,14 @@
       expanded="true"
       shape="ainfix =ainfix +ainfix *V8V0ainfix *V9V1V7EAainfix =V7agcdV0V1Iainfix >V6c0NIainfix =ainfix +ainfix *V3V0ainfix *V2V1V6Aainfix =ainfix +ainfix *V5V0ainfix *V4V1V7Aainfix =agcdV7V6agcdV0V1Aainfix >=V6c0Aainfix >=V7c0FFFFFFIainfix >=V1c0Aainfix >=V0c0FF">
       <label
-       name="expl:parameter gcd">
-       </label>
+       name="expl:parameter gcd"/>
       <transf
        name="split_goal"
        proved="true"
        expanded="true">
        <goal
         name="WP_parameter gcd.4.1"
-        locfile="programs/gcd_bezout/../gcd_bezout.mlw"
+        locfile="./programs/gcd_bezout/../gcd_bezout.mlw"
         loclnum="11" loccnumb="6" loccnume="9"
         expl="parameter gcd"
         sum="099f9a5ebd3154d28dcdfb6f4a80c753"
@@ -246,8 +236,7 @@
         expanded="true"
         shape="ainfix =V7agcdV0V1Iainfix >V6c0NIainfix =ainfix +ainfix *V3V0ainfix *V2V1V6Aainfix =ainfix +ainfix *V5V0ainfix *V4V1V7Aainfix =agcdV7V6agcdV0V1Aainfix >=V6c0Aainfix >=V7c0FFFFFFIainfix >=V1c0Aainfix >=V0c0FF">
         <label
-         name="expl:parameter gcd">
-         </label>
+         name="expl:parameter gcd"/>
         <proof
          prover="0"
          timelimit="10"
@@ -258,7 +247,7 @@
        </goal>
        <goal
         name="WP_parameter gcd.4.2"
-        locfile="programs/gcd_bezout/../gcd_bezout.mlw"
+        locfile="./programs/gcd_bezout/../gcd_bezout.mlw"
         loclnum="11" loccnumb="6" loccnume="9"
         expl="parameter gcd"
         sum="b29847646f3bf08e778e5f844f0a74b6"
@@ -266,8 +255,7 @@
         expanded="true"
         shape="ainfix =ainfix +ainfix *V8V0ainfix *V9V1V7EIainfix >V6c0NIainfix =ainfix +ainfix *V3V0ainfix *V2V1V6Aainfix =ainfix +ainfix *V5V0ainfix *V4V1V7Aainfix =agcdV7V6agcdV0V1Aainfix >=V6c0Aainfix >=V7c0FFFFFFIainfix >=V1c0Aainfix >=V0c0FF">
         <label
-         name="expl:parameter gcd">
-         </label>
+         name="expl:parameter gcd"/>
         <proof
          prover="0"
          timelimit="10"

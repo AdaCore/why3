@@ -502,6 +502,17 @@ gallery::
 	done
 
 ########
+# XML DTD validation
+########
+
+.PHONY: xml-validate
+
+xml-validate:
+	@for x in `find examples/ -name why3session.xml`; do \
+	  xmllint --noout --valid $$x 2>&1 | head -1; \
+	done
+
+########
 # Config
 ########
 

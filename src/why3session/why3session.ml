@@ -68,4 +68,8 @@ let () =
   incr Arg.current;
   let cmd_usage = sprintf "%s %s [options]:" Sys.argv.(0) cmd_name in
   Arg.parse (Arg.align cmd.cmd_spec) anon_fun cmd_usage;
-  cmd.cmd_run ()
+  try
+    cmd.cmd_run ()
+  with e when not (Debug.test_flag Debug.stack_trace) ->
+    eprintf "@.%a@." Exn_printer.exn_printer e;
+    exit 1

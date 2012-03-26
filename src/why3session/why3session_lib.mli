@@ -43,8 +43,10 @@ val print_version : unit -> unit
 (** {2 Spec for version, debug} *)
 (* val simple_spec : spec_list *)
 
+(*
 val read_simple_spec : unit -> bool 
 (** return if we must exit *)
+*)
 
 (** {2 Spec for configuration, loadpath} *)
 val common_options : spec_list

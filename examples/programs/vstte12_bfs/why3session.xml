@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "why3session.dtd">
+<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
 <why3session
- name="programs/vstte12_bfs/why3session.xml">
+ name="./programs/vstte12_bfs/why3session.xml">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -24,13 +24,13 @@
   expanded="false">
   <theory
    name="Graph"
-   locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+   locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
    loclnum="8" loccnumb="7" loccnume="12"
    verified="true"
    expanded="false">
    <goal
     name="path_nonneg"
-    locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+    locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
     loclnum="27" loccnumb="8" loccnume="19"
     sum="5f42986243ecbf719911aa8c82550b27"
     proved="true"
@@ -47,7 +47,7 @@
    </goal>
    <goal
     name="path_inversion"
-    locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+    locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
     loclnum="31" loccnumb="8" loccnume="22"
     sum="645880ac5c8178b9c8d2fde7d10edb09"
     proved="true"
@@ -64,7 +64,7 @@
    </goal>
    <goal
     name="path_closure"
-    locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+    locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
     loclnum="37" loccnumb="8" loccnume="20"
     sum="8b5c33528e22840333b481186f2e35ce"
     proved="true"
@@ -82,20 +82,20 @@
   </theory>
   <theory
    name="WP Bag"
-   locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+   locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
    loclnum="51" loccnumb="7" loccnume="10"
    verified="true"
    expanded="false">
   </theory>
   <theory
    name="WP BFS"
-   locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+   locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
    loclnum="72" loccnumb="7" loccnume="10"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter fill_next"
-    locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+    locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
     loclnum="105" loccnumb="6" loccnume="15"
     expl="parameter fill_next"
     sum="a5c844ec2b4060ccfcd38e72bef1eb9e"
@@ -103,15 +103,14 @@
     expanded="true"
     shape="iainfix =V10aTrueNiamemV12V9NaclosureV13V3V14V15Iainfix =V15V2NFAasubsetadiffasuccV2V11V13AasubsetV11asuccV2AainvV0V1V13V3V14V4Iainfix =V14aaddV12V8FIainfix =V13aaddV12V9FaclosureV9V3V8V16Iainfix =V16V2NFAasubsetadiffasuccV2V11V9AasubsetV11asuccV2AainvV0V1V9V3V8V4Iainfix =V11aremoveV12V7AamemV12V7FFAais_emptyV7NaclosureV9V3V8V17FAasubsetasuccV2V9AainvV0V1V9V3V8V4Iais_emptyV7qainfix =V10aTrueFIaclosureV9V3V8V18Iainfix =V18V2NFAasubsetadiffasuccV2V7V9AasubsetV7asuccV2AainvV0V1V9V3V8V4FFFAaclosureV6V3V5V19Iainfix =V19V2NFAasubsetadiffasuccV2asuccV2V6AasubsetasuccV2asuccV2AainvV0V1V6V3V5V4IaclosureV6V3V5V20Iainfix =V20V2NFAashortest_pathV0V2V4AainvV0V1V6V3V5V4FFFFFFF">
     <label
-     name="expl:parameter fill_next">
-     </label>
+     name="expl:parameter fill_next"/>
     <transf
      name="split_goal"
      proved="true"
      expanded="true">
      <goal
       name="WP_parameter fill_next.1"
-      locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+      locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
       loclnum="105" loccnumb="6" loccnume="15"
       expl="loop invariant init"
       sum="7fe45e2e066a393dfb691abcab8343e3"
@@ -119,8 +118,7 @@
       expanded="false"
       shape="aclosureV6V3V5V7Iainfix =V7V2NFAasubsetadiffasuccV2asuccV2V6AasubsetasuccV2asuccV2AainvV0V1V6V3V5V4IaclosureV6V3V5V8Iainfix =V8V2NFAashortest_pathV0V2V4AainvV0V1V6V3V5V4FFFFFFF">
       <label
-       name="expl:parameter fill_next">
-       </label>
+       name="expl:parameter fill_next"/>
       <proof
        prover="1"
        timelimit="10"
@@ -131,7 +129,7 @@
      </goal>
      <goal
       name="WP_parameter fill_next.2"
-      locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+      locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
       loclnum="105" loccnumb="6" loccnume="15"
       expl="precondition"
       sum="4a90a32af53a83f5e5545dff58624d6a"
@@ -139,8 +137,7 @@
       expanded="false"
       shape="ais_emptyV7NIainfix =V10aTrueNIais_emptyV7qainfix =V10aTrueFIaclosureV9V3V8V11Iainfix =V11V2NFAasubsetadiffasuccV2V7V9AasubsetV7asuccV2AainvV0V1V9V3V8V4FFFIaclosureV6V3V5V12Iainfix =V12V2NFAashortest_pathV0V2V4AainvV0V1V6V3V5V4FFFFFFF">
       <label
-       name="expl:parameter fill_next">
-       </label>
+       name="expl:parameter fill_next"/>
       <proof
        prover="0"
        timelimit="10"
@@ -151,7 +148,7 @@
      </goal>
      <goal
       name="WP_parameter fill_next.3"
-      locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+      locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
       loclnum="105" loccnumb="6" loccnume="15"
       expl="loop invariant preservation"
       sum="42957a4dc505b7ee9d66fbdc62b64678"
@@ -159,15 +156,14 @@
       expanded="true"
       shape="aclosureV13V3V14V15Iainfix =V15V2NFAasubsetadiffasuccV2V11V13AasubsetV11asuccV2AainvV0V1V13V3V14V4Iainfix =V14aaddV12V8FIainfix =V13aaddV12V9FIamemV12V9NIainfix =V11aremoveV12V7AamemV12V7FFIais_emptyV7NIainfix =V10aTrueNIais_emptyV7qainfix =V10aTrueFIaclosureV9V3V8V16Iainfix =V16V2NFAasubsetadiffasuccV2V7V9AasubsetV7asuccV2AainvV0V1V9V3V8V4FFFIaclosureV6V3V5V17Iainfix =V17V2NFAashortest_pathV0V2V4AainvV0V1V6V3V5V4FFFFFFF">
       <label
-       name="expl:parameter fill_next">
-       </label>
+       name="expl:parameter fill_next"/>
       <transf
        name="split_goal"
        proved="true"
        expanded="true">
        <goal
         name="WP_parameter fill_next.3.1"
-        locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+        locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
         loclnum="105" loccnumb="6" loccnume="15"
         expl="parameter fill_next"
         sum="d5cdb6207b86fd25f055832fe0f751a0"
@@ -175,8 +171,7 @@
         expanded="false"
         shape="ainvV0V1V13V3V14V4Iainfix =V14aaddV12V8FIainfix =V13aaddV12V9FIamemV12V9NIainfix =V11aremoveV12V7AamemV12V7FFIais_emptyV7NIainfix =V10aTrueNIais_emptyV7qainfix =V10aTrueFIaclosureV9V3V8V15Iainfix =V15V2NFAasubsetadiffasuccV2V7V9AasubsetV7asuccV2AainvV0V1V9V3V8V4FFFIaclosureV6V3V5V16Iainfix =V16V2NFAashortest_pathV0V2V4AainvV0V1V6V3V5V4FFFFFFF">
         <label
-         name="expl:parameter fill_next">
-         </label>
+         name="expl:parameter fill_next"/>
         <proof
          prover="1"
          timelimit="10"
@@ -187,7 +182,7 @@
        </goal>
        <goal
         name="WP_parameter fill_next.3.2"
-        locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+        locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
         loclnum="105" loccnumb="6" loccnume="15"
         expl="parameter fill_next"
         sum="1d277cca45db122eeb3191b616f487b7"
@@ -195,8 +190,7 @@
         expanded="false"
         shape="asubsetV11asuccV2Iainfix =V14aaddV12V8FIainfix =V13aaddV12V9FIamemV12V9NIainfix =V11aremoveV12V7AamemV12V7FFIais_emptyV7NIainfix =V10aTrueNIais_emptyV7qainfix =V10aTrueFIaclosureV9V3V8V15Iainfix =V15V2NFAasubsetadiffasuccV2V7V9AasubsetV7asuccV2AainvV0V1V9V3V8V4FFFIaclosureV6V3V5V16Iainfix =V16V2NFAashortest_pathV0V2V4AainvV0V1V6V3V5V4FFFFFFF">
         <label
-         name="expl:parameter fill_next">
-         </label>
+         name="expl:parameter fill_next"/>
         <proof
          prover="0"
          timelimit="10"
@@ -207,7 +201,7 @@
        </goal>
        <goal
         name="WP_parameter fill_next.3.3"
-        locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+        locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
         loclnum="105" loccnumb="6" loccnume="15"
         expl="parameter fill_next"
         sum="35dc39d69d5e4f6ae631c6b041cfb7b9"
@@ -215,8 +209,7 @@
         expanded="false"
         shape="asubsetadiffasuccV2V11V13Iainfix =V14aaddV12V8FIainfix =V13aaddV12V9FIamemV12V9NIainfix =V11aremoveV12V7AamemV12V7FFIais_emptyV7NIainfix =V10aTrueNIais_emptyV7qainfix =V10aTrueFIaclosureV9V3V8V15Iainfix =V15V2NFAasubsetadiffasuccV2V7V9AasubsetV7asuccV2AainvV0V1V9V3V8V4FFFIaclosureV6V3V5V16Iainfix =V16V2NFAashortest_pathV0V2V4AainvV0V1V6V3V5V4FFFFFFF">
         <label
-         name="expl:parameter fill_next">
-         </label>
+         name="expl:parameter fill_next"/>
         <proof
          prover="0"
          timelimit="10"
@@ -227,7 +220,7 @@
        </goal>
        <goal
         name="WP_parameter fill_next.3.4"
-        locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+        locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
         loclnum="105" loccnumb="6" loccnume="15"
         expl="parameter fill_next"
         sum="12e0c8ca286d7936e7a985108f04d784"
@@ -235,8 +228,7 @@
         expanded="false"
         shape="aclosureV13V3V14V15Iainfix =V15V2NFIainfix =V14aaddV12V8FIainfix =V13aaddV12V9FIamemV12V9NIainfix =V11aremoveV12V7AamemV12V7FFIais_emptyV7NIainfix =V10aTrueNIais_emptyV7qainfix =V10aTrueFIaclosureV9V3V8V16Iainfix =V16V2NFAasubsetadiffasuccV2V7V9AasubsetV7asuccV2AainvV0V1V9V3V8V4FFFIaclosureV6V3V5V17Iainfix =V17V2NFAashortest_pathV0V2V4AainvV0V1V6V3V5V4FFFFFFF">
         <label
-         name="expl:parameter fill_next">
-         </label>
+         name="expl:parameter fill_next"/>
         <proof
          prover="3"
          timelimit="10"
@@ -249,7 +241,7 @@
      </goal>
      <goal
       name="WP_parameter fill_next.4"
-      locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+      locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
       loclnum="105" loccnumb="6" loccnume="15"
       expl="loop invariant preservation"
       sum="8e7759486bb075074bb19d6b337b8ee6"
@@ -257,15 +249,14 @@
       expanded="true"
       shape="aclosureV9V3V8V13Iainfix =V13V2NFAasubsetadiffasuccV2V11V9AasubsetV11asuccV2AainvV0V1V9V3V8V4IamemV12V9NNIainfix =V11aremoveV12V7AamemV12V7FFIais_emptyV7NIainfix =V10aTrueNIais_emptyV7qainfix =V10aTrueFIaclosureV9V3V8V14Iainfix =V14V2NFAasubsetadiffasuccV2V7V9AasubsetV7asuccV2AainvV0V1V9V3V8V4FFFIaclosureV6V3V5V15Iainfix =V15V2NFAashortest_pathV0V2V4AainvV0V1V6V3V5V4FFFFFFF">
       <label
-       name="expl:parameter fill_next">
-       </label>
+       name="expl:parameter fill_next"/>
       <transf
        name="split_goal"
        proved="true"
        expanded="true">
        <goal
         name="WP_parameter fill_next.4.1"
-        locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+        locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
         loclnum="105" loccnumb="6" loccnume="15"
         expl="parameter fill_next"
         sum="801f214379eb1be822b907bdf771b9b5"
@@ -273,8 +264,7 @@
         expanded="false"
         shape="ainvV0V1V9V3V8V4IamemV12V9NNIainfix =V11aremoveV12V7AamemV12V7FFIais_emptyV7NIainfix =V10aTrueNIais_emptyV7qainfix =V10aTrueFIaclosureV9V3V8V13Iainfix =V13V2NFAasubsetadiffasuccV2V7V9AasubsetV7asuccV2AainvV0V1V9V3V8V4FFFIaclosureV6V3V5V14Iainfix =V14V2NFAashortest_pathV0V2V4AainvV0V1V6V3V5V4FFFFFFF">
         <label
-         name="expl:parameter fill_next">
-         </label>
+         name="expl:parameter fill_next"/>
         <proof
          prover="0"
          timelimit="10"
@@ -285,7 +275,7 @@
        </goal>
        <goal
         name="WP_parameter fill_next.4.2"
-        locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+        locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
         loclnum="105" loccnumb="6" loccnume="15"
         expl="parameter fill_next"
         sum="ab972373121a5001e172cbdd6e09fe89"
@@ -293,8 +283,7 @@
         expanded="false"
         shape="asubsetV11asuccV2IamemV12V9NNIainfix =V11aremoveV12V7AamemV12V7FFIais_emptyV7NIainfix =V10aTrueNIais_emptyV7qainfix =V10aTrueFIaclosureV9V3V8V13Iainfix =V13V2NFAasubsetadiffasuccV2V7V9AasubsetV7asuccV2AainvV0V1V9V3V8V4FFFIaclosureV6V3V5V14Iainfix =V14V2NFAashortest_pathV0V2V4AainvV0V1V6V3V5V4FFFFFFF">
         <label
-         name="expl:parameter fill_next">
-         </label>
+         name="expl:parameter fill_next"/>
         <proof
          prover="0"
          timelimit="10"
@@ -305,7 +294,7 @@
        </goal>
        <goal
         name="WP_parameter fill_next.4.3"
-        locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+        locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
         loclnum="105" loccnumb="6" loccnume="15"
         expl="parameter fill_next"
         sum="5cb84bd4f2db085ac2c91e1ec1ba5e02"
@@ -313,8 +302,7 @@
         expanded="false"
         shape="asubsetadiffasuccV2V11V9IamemV12V9NNIainfix =V11aremoveV12V7AamemV12V7FFIais_emptyV7NIainfix =V10aTrueNIais_emptyV7qainfix =V10aTrueFIaclosureV9V3V8V13Iainfix =V13V2NFAasubsetadiffasuccV2V7V9AasubsetV7asuccV2AainvV0V1V9V3V8V4FFFIaclosureV6V3V5V14Iainfix =V14V2NFAashortest_pathV0V2V4AainvV0V1V6V3V5V4FFFFFFF">
         <label
-         name="expl:parameter fill_next">
-         </label>
+         name="expl:parameter fill_next"/>
         <proof
          prover="0"
          timelimit="10"
@@ -325,7 +313,7 @@
        </goal>
        <goal
         name="WP_parameter fill_next.4.4"
-        locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+        locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
         loclnum="105" loccnumb="6" loccnume="15"
         expl="parameter fill_next"
         sum="1f398118cf83bfdcc0c93ec3631e23ec"
@@ -333,8 +321,7 @@
         expanded="false"
         shape="aclosureV9V3V8V13Iainfix =V13V2NFIamemV12V9NNIainfix =V11aremoveV12V7AamemV12V7FFIais_emptyV7NIainfix =V10aTrueNIais_emptyV7qainfix =V10aTrueFIaclosureV9V3V8V14Iainfix =V14V2NFAasubsetadiffasuccV2V7V9AasubsetV7asuccV2AainvV0V1V9V3V8V4FFFIaclosureV6V3V5V15Iainfix =V15V2NFAashortest_pathV0V2V4AainvV0V1V6V3V5V4FFFFFFF">
         <label
-         name="expl:parameter fill_next">
-         </label>
+         name="expl:parameter fill_next"/>
         <proof
          prover="0"
          timelimit="10"
@@ -347,7 +334,7 @@
      </goal>
      <goal
       name="WP_parameter fill_next.5"
-      locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+      locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
       loclnum="105" loccnumb="6" loccnume="15"
       expl="normal postcondition"
       sum="3d3f88adaf23744acaed57bdb7fca210"
@@ -355,15 +342,14 @@
       expanded="true"
       shape="aclosureV9V3V8V11FAasubsetasuccV2V9AainvV0V1V9V3V8V4Iainfix =V10aTrueNNIais_emptyV7qainfix =V10aTrueFIaclosureV9V3V8V12Iainfix =V12V2NFAasubsetadiffasuccV2V7V9AasubsetV7asuccV2AainvV0V1V9V3V8V4FFFIaclosureV6V3V5V13Iainfix =V13V2NFAashortest_pathV0V2V4AainvV0V1V6V3V5V4FFFFFFF">
       <label
-       name="expl:parameter fill_next">
-       </label>
+       name="expl:parameter fill_next"/>
       <transf
        name="split_goal"
        proved="true"
        expanded="true">
        <goal
         name="WP_parameter fill_next.5.1"
-        locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+        locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
         loclnum="105" loccnumb="6" loccnume="15"
         expl="parameter fill_next"
         sum="260911db635b5013e86a3b67aa877f71"
@@ -371,8 +357,7 @@
         expanded="false"
         shape="ainvV0V1V9V3V8V4Iainfix =V10aTrueNNIais_emptyV7qainfix =V10aTrueFIaclosureV9V3V8V11Iainfix =V11V2NFAasubsetadiffasuccV2V7V9AasubsetV7asuccV2AainvV0V1V9V3V8V4FFFIaclosureV6V3V5V12Iainfix =V12V2NFAashortest_pathV0V2V4AainvV0V1V6V3V5V4FFFFFFF">
         <label
-         name="expl:parameter fill_next">
-         </label>
+         name="expl:parameter fill_next"/>
         <proof
          prover="0"
          timelimit="10"
@@ -383,7 +368,7 @@
        </goal>
        <goal
         name="WP_parameter fill_next.5.2"
-        locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+        locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
         loclnum="105" loccnumb="6" loccnume="15"
         expl="parameter fill_next"
         sum="cba35ab88013a4a58ec98acade29d702"
@@ -391,8 +376,7 @@
         expanded="false"
         shape="asubsetasuccV2V9Iainfix =V10aTrueNNIais_emptyV7qainfix =V10aTrueFIaclosureV9V3V8V11Iainfix =V11V2NFAasubsetadiffasuccV2V7V9AasubsetV7asuccV2AainvV0V1V9V3V8V4FFFIaclosureV6V3V5V12Iainfix =V12V2NFAashortest_pathV0V2V4AainvV0V1V6V3V5V4FFFFFFF">
         <label
-         name="expl:parameter fill_next">
-         </label>
+         name="expl:parameter fill_next"/>
         <proof
          prover="0"
          timelimit="10"
@@ -403,7 +387,7 @@
        </goal>
        <goal
         name="WP_parameter fill_next.5.3"
-        locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+        locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
         loclnum="105" loccnumb="6" loccnume="15"
         expl="parameter fill_next"
         sum="ad6c25847539a05de6e00470cdd9567e"
@@ -411,15 +395,14 @@
         expanded="true"
         shape="aclosureV9V3V8V11FIainfix =V10aTrueNNIais_emptyV7qainfix =V10aTrueFIaclosureV9V3V8V12Iainfix =V12V2NFAasubsetadiffasuccV2V7V9AasubsetV7asuccV2AainvV0V1V9V3V8V4FFFIaclosureV6V3V5V13Iainfix =V13V2NFAashortest_pathV0V2V4AainvV0V1V6V3V5V4FFFFFFF">
         <label
-         name="expl:parameter fill_next">
-         </label>
+         name="expl:parameter fill_next"/>
         <transf
          name="inline_goal"
          proved="true"
          expanded="true">
          <goal
           name="WP_parameter fill_next.5.3.1"
-          locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+          locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
           loclnum="105" loccnumb="6" loccnume="15"
           expl="parameter fill_next"
           sum="dfe8a1ba71386fdf25fed97ff2a94bb2"
@@ -427,8 +410,7 @@
           expanded="false"
           shape="amemV12V9IamemV12asuccV11FIamemV11V8NIamemV11V3NIamemV11V9FIainfix =V10aTrueNNIamemV13V7NFqainfix =V10aTrueFIamemV15V9IamemV15asuccV14FIamemV14V8NIamemV14V3NIamemV14V9Iainfix =V14V2NFAamemV16V9IamemV16adiffasuccV2V7FAamemV17asuccV2IamemV17V7FAamemV1V8OamemV1V3IamemV1V9AamemV18V9NOamemV18V8Iashortest_pathV0V18ainfix +V4c1FAainfix <=V20ainfix +V4c1AapathV0V19V20EIamemV19V9FAamemV21V9Iainfix <=V22V4IapathV0V21V22FAashortest_pathV0V23ainfix +V4c1IamemV23V8FAasubsetV8V9Aashortest_pathV0V24V4IamemV24V3FAasubsetV3V9FFFIamemV26V6IamemV26asuccV25FIamemV25V5NIamemV25V3NIamemV25V6Iainfix =V25V2NFAapathV0V2V27NIainfix <V27V4FAapathV0V2V4AamemV1V5OamemV1V3IamemV1V6AamemV28V6NOamemV28V5Iashortest_pathV0V28ainfix +V4c1FAainfix <=V30ainfix +V4c1AapathV0V29V30EIamemV29V6FAamemV31V6Iainfix <=V32V4IapathV0V31V32FAashortest_pathV0V33ainfix +V4c1IamemV33V5FAasubsetV5V6Aashortest_pathV0V34V4IamemV34V3FAasubsetV3V6FFFFFFF">
           <label
-           name="expl:parameter fill_next">
-           </label>
+           name="expl:parameter fill_next"/>
           <proof
            prover="0"
            timelimit="10"
@@ -445,7 +427,7 @@
    </goal>
    <goal
     name="WP_parameter bfs"
-    locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+    locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
     loclnum="127" loccnumb="6" loccnume="9"
     expl="parameter bfs"
     sum="81a66a006ffd84b53fcae48394722c9c"
@@ -453,15 +435,14 @@
     expanded="true"
     shape="iainfix =V6aTrueNiainfix =V8V1ashortest_pathV0V1V2iainfix =V11aTrueainfix <=c0V14AaclosureV10V12V13V15FAais_emptyV13Iais_emptyV12AainvV0V1V10V12V13V14Iainfix =V14ainfix +V2c1FIainfix =V13aemptyFIainfix =V12V9Fainfix <=c0V2AaclosureV10V7V9V16FAais_emptyV9Iais_emptyV7AainvV0V1V10V7V9V2Iais_emptyV7qainfix =V11aTrueFIaclosureV10V7V9V17FAasubsetasuccV8V10AainvV0V1V10V7V9V2FFAaclosureV5V7V3V18Iainfix =V18V8NFAashortest_pathV0V8V2AainvV0V1V5V7V3V2Iainfix =V7aremoveV8V4AamemV8V4FFAais_emptyV4NapathV0V1V19NFAamemV1V5NIais_emptyV4qainfix =V6aTrueFIainfix <=c0V2AaclosureV5V4V3V20FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FFFFAainfix <=c0c0AaclosureasingletonV0asingletonV0aemptyV21FAais_emptyaemptyIais_emptyasingletonV0AainvV0V1asingletonV0asingletonV0aemptyc0FF">
     <label
-     name="expl:parameter bfs">
-     </label>
+     name="expl:parameter bfs"/>
     <transf
      name="split_goal"
      proved="true"
      expanded="true">
      <goal
       name="WP_parameter bfs.1"
-      locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+      locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
       loclnum="127" loccnumb="6" loccnume="9"
       expl="loop invariant init"
       sum="34f7a35d13f3dec0537ef86662fcbc92"
@@ -469,15 +450,14 @@
       expanded="true"
       shape="ainfix <=c0c0AaclosureasingletonV0asingletonV0aemptyV2FAais_emptyaemptyIais_emptyasingletonV0AainvV0V1asingletonV0asingletonV0aemptyc0FF">
       <label
-       name="expl:parameter bfs">
-       </label>
+       name="expl:parameter bfs"/>
       <transf
        name="split_goal"
        proved="true"
        expanded="true">
        <goal
         name="WP_parameter bfs.1.1"
-        locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+        locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
         loclnum="127" loccnumb="6" loccnume="9"
         expl="parameter bfs"
         sum="691f120129dc8728e742c1131e891af6"
@@ -485,8 +465,7 @@
         expanded="false"
         shape="ainvV0V1asingletonV0asingletonV0aemptyc0FF">
         <label
-         name="expl:parameter bfs">
-         </label>
+         name="expl:parameter bfs"/>
         <proof
          prover="1"
          timelimit="10"
@@ -497,7 +476,7 @@
        </goal>
        <goal
         name="WP_parameter bfs.1.2"
-        locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+        locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
         loclnum="127" loccnumb="6" loccnume="9"
         expl="parameter bfs"
         sum="4ddead301557d026ac085972893d190b"
@@ -505,8 +484,7 @@
         expanded="false"
         shape="ais_emptyaemptyIais_emptyasingletonV0FF">
         <label
-         name="expl:parameter bfs">
-         </label>
+         name="expl:parameter bfs"/>
         <proof
          prover="0"
          timelimit="10"
@@ -517,7 +495,7 @@
        </goal>
        <goal
         name="WP_parameter bfs.1.3"
-        locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+        locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
         loclnum="127" loccnumb="6" loccnume="9"
         expl="parameter bfs"
         sum="025c55c3d7ee90dd749cfe52870248c9"
@@ -525,15 +503,14 @@
         expanded="true"
         shape="aclosureasingletonV0asingletonV0aemptyV2FFF">
         <label
-         name="expl:parameter bfs">
-         </label>
+         name="expl:parameter bfs"/>
         <transf
          name="inline_goal"
          proved="true"
          expanded="true">
          <goal
           name="WP_parameter bfs.1.3.1"
-          locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+          locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
           loclnum="127" loccnumb="6" loccnume="9"
           expl="parameter bfs"
           sum="db0c226bd12395d84d069df32d7999d4"
@@ -541,8 +518,7 @@
           expanded="false"
           shape="amemV3asingletonV0IamemV3asuccV2FIamemV2aemptyNIamemV2asingletonV0NIamemV2asingletonV0FFF">
           <label
-           name="expl:parameter bfs">
-           </label>
+           name="expl:parameter bfs"/>
           <proof
            prover="0"
            timelimit="10"
@@ -555,7 +531,7 @@
        </goal>
        <goal
         name="WP_parameter bfs.1.4"
-        locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+        locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
         loclnum="127" loccnumb="6" loccnume="9"
         expl="parameter bfs"
         sum="3ab0c142ec90c2a3dafbb4837bb9d977"
@@ -563,8 +539,7 @@
         expanded="false"
         shape="ainfix <=c0c0FF">
         <label
-         name="expl:parameter bfs">
-         </label>
+         name="expl:parameter bfs"/>
         <proof
          prover="0"
          timelimit="10"
@@ -577,7 +552,7 @@
      </goal>
      <goal
       name="WP_parameter bfs.2"
-      locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+      locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
       loclnum="127" loccnumb="6" loccnume="9"
       expl="precondition"
       sum="4d4627ed289c7026eae064500576774d"
@@ -585,8 +560,7 @@
       expanded="false"
       shape="ais_emptyV4NIainfix =V6aTrueNIais_emptyV4qainfix =V6aTrueFIainfix <=c0V2AaclosureV5V4V3V7FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FFFFFF">
       <label
-       name="expl:parameter bfs">
-       </label>
+       name="expl:parameter bfs"/>
       <proof
        prover="0"
        timelimit="10"
@@ -597,7 +571,7 @@
      </goal>
      <goal
       name="WP_parameter bfs.3"
-      locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+      locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
       loclnum="127" loccnumb="6" loccnume="9"
       expl="exceptional postcondition"
       sum="6e64ef76b0ebab742d8c3b0eb81c07de"
@@ -605,8 +579,7 @@
       expanded="false"
       shape="ashortest_pathV0V1V2Iainfix =V8V1Iainfix =V7aremoveV8V4AamemV8V4FFIais_emptyV4NIainfix =V6aTrueNIais_emptyV4qainfix =V6aTrueFIainfix <=c0V2AaclosureV5V4V3V9FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FFFFFF">
       <label
-       name="expl:parameter bfs">
-       </label>
+       name="expl:parameter bfs"/>
       <proof
        prover="0"
        timelimit="10"
@@ -617,7 +590,7 @@
      </goal>
      <goal
       name="WP_parameter bfs.4"
-      locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+      locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
       loclnum="127" loccnumb="6" loccnume="9"
       expl="precondition"
       sum="9ae64ecac798a992d3ee8f1827b18d66"
@@ -625,15 +598,14 @@
       expanded="true"
       shape="aclosureV5V7V3V9Iainfix =V9V8NFAashortest_pathV0V8V2AainvV0V1V5V7V3V2Iainfix =V8V1NIainfix =V7aremoveV8V4AamemV8V4FFIais_emptyV4NIainfix =V6aTrueNIais_emptyV4qainfix =V6aTrueFIainfix <=c0V2AaclosureV5V4V3V10FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FFFFFF">
       <label
-       name="expl:parameter bfs">
-       </label>
+       name="expl:parameter bfs"/>
       <transf
        name="split_goal"
        proved="true"
        expanded="true">
        <goal
         name="WP_parameter bfs.4.1"
-        locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+        locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
         loclnum="127" loccnumb="6" loccnume="9"
         expl="parameter bfs"
         sum="c4883fad5261c8219a06614c86035c3c"
@@ -641,8 +613,7 @@
         expanded="false"
         shape="ainvV0V1V5V7V3V2Iainfix =V8V1NIainfix =V7aremoveV8V4AamemV8V4FFIais_emptyV4NIainfix =V6aTrueNIais_emptyV4qainfix =V6aTrueFIainfix <=c0V2AaclosureV5V4V3V9FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FFFFFF">
         <label
-         name="expl:parameter bfs">
-         </label>
+         name="expl:parameter bfs"/>
         <proof
          prover="0"
          timelimit="10"
@@ -653,7 +624,7 @@
        </goal>
        <goal
         name="WP_parameter bfs.4.2"
-        locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+        locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
         loclnum="127" loccnumb="6" loccnume="9"
         expl="parameter bfs"
         sum="3c0954a1fe5a5a08bb2d90756299ebed"
@@ -661,8 +632,7 @@
         expanded="false"
         shape="ashortest_pathV0V8V2Iainfix =V8V1NIainfix =V7aremoveV8V4AamemV8V4FFIais_emptyV4NIainfix =V6aTrueNIais_emptyV4qainfix =V6aTrueFIainfix <=c0V2AaclosureV5V4V3V9FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FFFFFF">
         <label
-         name="expl:parameter bfs">
-         </label>
+         name="expl:parameter bfs"/>
         <proof
          prover="0"
          timelimit="10"
@@ -673,7 +643,7 @@
        </goal>
        <goal
         name="WP_parameter bfs.4.3"
-        locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+        locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
         loclnum="127" loccnumb="6" loccnume="9"
         expl="parameter bfs"
         sum="e58c6f97299d5db74fe9b005d86d9960"
@@ -681,15 +651,14 @@
         expanded="true"
         shape="aclosureV5V7V3V9Iainfix =V9V8NFIainfix =V8V1NIainfix =V7aremoveV8V4AamemV8V4FFIais_emptyV4NIainfix =V6aTrueNIais_emptyV4qainfix =V6aTrueFIainfix <=c0V2AaclosureV5V4V3V10FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FFFFFF">
         <label
-         name="expl:parameter bfs">
-         </label>
+         name="expl:parameter bfs"/>
         <transf
          name="inline_goal"
          proved="true"
          expanded="true">
          <goal
           name="WP_parameter bfs.4.3.1"
-          locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+          locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
           loclnum="127" loccnumb="6" loccnume="9"
           expl="parameter bfs"
           sum="dbbda84a9c2cc32197038715863e8b5f"
@@ -697,8 +666,7 @@
           expanded="false"
           shape="amemV10V5IamemV10asuccV9FIamemV9V3NIamemV9V7NIamemV9V5Iainfix =V9V8NFIainfix =V8V1NIainfix =V7aremoveV8V4AamemV8V4FFIamemV11V4NFNIainfix =V6aTrueNIamemV12V4NFqainfix =V6aTrueFIainfix =c0V2Oainfix <c0V2AamemV14V5IamemV14asuccV13FIamemV13V3NIamemV13V4NIamemV13V5FAamemV15V3NFIamemV16V4NFAamemV1V3OamemV1V4IamemV1V5AamemV17V5NOamemV17V3Iashortest_pathV0V17ainfix +V2c1FAainfix <=V19ainfix +V2c1AapathV0V18V19EIamemV18V5FAamemV20V5Iainfix <=V21V2IapathV0V20V21FAashortest_pathV0V22ainfix +V2c1IamemV22V3FAasubsetV3V5Aashortest_pathV0V23V2IamemV23V4FAasubsetV4V5FFFFFF">
           <label
-           name="expl:parameter bfs">
-           </label>
+           name="expl:parameter bfs"/>
           <proof
            prover="0"
            timelimit="10"
@@ -713,7 +681,7 @@
      </goal>
      <goal
       name="WP_parameter bfs.5"
-      locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+      locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
       loclnum="127" loccnumb="6" loccnume="9"
       expl="loop invariant preservation"
       sum="1cb983011437ac2143be7673bb6448ad"
@@ -721,15 +689,14 @@
       expanded="true"
       shape="ainfix <=c0V14AaclosureV10V12V13V15FAais_emptyV13Iais_emptyV12AainvV0V1V10V12V13V14Iainfix =V14ainfix +V2c1FIainfix =V13aemptyFIainfix =V12V9FIainfix =V11aTrueIais_emptyV7qainfix =V11aTrueFIaclosureV10V7V9V16FAasubsetasuccV8V10AainvV0V1V10V7V9V2FFIaclosureV5V7V3V17Iainfix =V17V8NFAashortest_pathV0V8V2AainvV0V1V5V7V3V2Iainfix =V8V1NIainfix =V7aremoveV8V4AamemV8V4FFIais_emptyV4NIainfix =V6aTrueNIais_emptyV4qainfix =V6aTrueFIainfix <=c0V2AaclosureV5V4V3V18FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FFFFFF">
       <label
-       name="expl:parameter bfs">
-       </label>
+       name="expl:parameter bfs"/>
       <transf
        name="split_goal"
        proved="true"
        expanded="true">
        <goal
         name="WP_parameter bfs.5.1"
-        locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+        locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
         loclnum="127" loccnumb="6" loccnume="9"
         expl="parameter bfs"
         sum="3cc5c0a5c87cedb88ae5c79d610d6379"
@@ -737,15 +704,14 @@
         expanded="true"
         shape="ainvV0V1V10V12V13V14Iainfix =V14ainfix +V2c1FIainfix =V13aemptyFIainfix =V12V9FIainfix =V11aTrueIais_emptyV7qainfix =V11aTrueFIaclosureV10V7V9V15FAasubsetasuccV8V10AainvV0V1V10V7V9V2FFIaclosureV5V7V3V16Iainfix =V16V8NFAashortest_pathV0V8V2AainvV0V1V5V7V3V2Iainfix =V8V1NIainfix =V7aremoveV8V4AamemV8V4FFIais_emptyV4NIainfix =V6aTrueNIais_emptyV4qainfix =V6aTrueFIainfix <=c0V2AaclosureV5V4V3V17FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FFFFFF">
         <label
-         name="expl:parameter bfs">
-         </label>
+         name="expl:parameter bfs"/>
         <transf
          name="inline_goal"
          proved="true"
          expanded="true">
          <goal
           name="WP_parameter bfs.5.1.1"
-          locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+          locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
           loclnum="127" loccnumb="6" loccnume="9"
           expl="parameter bfs"
           sum="eff5125abfe5a0b3efeec1ca710107e6"
@@ -753,15 +719,14 @@
           expanded="true"
           shape="amemV1V13OamemV1V12IamemV1V10AamemV15V10NOamemV15V13Iashortest_pathV0V15ainfix +V14c1FAainfix <=V17ainfix +V14c1AapathV0V16V17EIamemV16V10FAamemV18V10Iainfix <=V19V14IapathV0V18V19FAashortest_pathV0V20ainfix +V14c1IamemV20V13FAasubsetV13V10Aashortest_pathV0V21V14IamemV21V12FAasubsetV12V10Iainfix =V14ainfix +V2c1FIainfix =V13aemptyFIainfix =V12V9FIainfix =V11aTrueIamemV22V7NFqainfix =V11aTrueFIamemV24V10IamemV24asuccV23FIamemV23V9NIamemV23V7NIamemV23V10FAamemV25V10IamemV25asuccV8FAamemV1V9OamemV1V7IamemV1V10AamemV26V10NOamemV26V9Iashortest_pathV0V26ainfix +V2c1FAainfix <=V28ainfix +V2c1AapathV0V27V28EIamemV27V10FAamemV29V10Iainfix <=V30V2IapathV0V29V30FAashortest_pathV0V31ainfix +V2c1IamemV31V9FAasubsetV9V10Aashortest_pathV0V32V2IamemV32V7FAasubsetV7V10FFIamemV34V5IamemV34asuccV33FIamemV33V3NIamemV33V7NIamemV33V5Iainfix =V33V8NFAapathV0V8V35NIainfix <V35V2FAapathV0V8V2AamemV1V3OamemV1V7IamemV1V5AamemV36V5NOamemV36V3Iashortest_pathV0V36ainfix +V2c1FAainfix <=V38ainfix +V2c1AapathV0V37V38EIamemV37V5FAamemV39V5Iainfix <=V40V2IapathV0V39V40FAashortest_pathV0V41ainfix +V2c1IamemV41V3FAasubsetV3V5Aashortest_pathV0V42V2IamemV42V7FAasubsetV7V5Iainfix =V8V1NIainfix =V7aremoveV8V4AamemV8V4FFIamemV43V4NFNIainfix =V6aTrueNIamemV44V4NFqainfix =V6aTrueFIainfix =c0V2Oainfix <c0V2AamemV46V5IamemV46asuccV45FIamemV45V3NIamemV45V4NIamemV45V5FAamemV47V3NFIamemV48V4NFAamemV1V3OamemV1V4IamemV1V5AamemV49V5NOamemV49V3Iashortest_pathV0V49ainfix +V2c1FAainfix <=V51ainfix +V2c1AapathV0V50V51EIamemV50V5FAamemV52V5Iainfix <=V53V2IapathV0V52V53FAashortest_pathV0V54ainfix +V2c1IamemV54V3FAasubsetV3V5Aashortest_pathV0V55V2IamemV55V4FAasubsetV4V5FFFFFF">
           <label
-           name="expl:parameter bfs">
-           </label>
+           name="expl:parameter bfs"/>
           <transf
            name="split_goal"
            proved="true"
            expanded="true">
            <goal
             name="WP_parameter bfs.5.1.1.1"
-            locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+            locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
             loclnum="127" loccnumb="6" loccnume="9"
             expl="parameter bfs"
             sum="a5ef9712614a4bb0f49ebc6249b9609c"
@@ -769,8 +734,7 @@
             expanded="false"
             shape="asubsetV12V10Iainfix =V14ainfix +V2c1FIainfix =V13aemptyFIainfix =V12V9FIainfix =V11aTrueIamemV15V7NFqainfix =V11aTrueFIamemV17V10IamemV17asuccV16FIamemV16V9NIamemV16V7NIamemV16V10FAamemV18V10IamemV18asuccV8FAamemV1V9OamemV1V7IamemV1V10AamemV19V10NOamemV19V9Iashortest_pathV0V19ainfix +V2c1FAainfix <=V21ainfix +V2c1AapathV0V20V21EIamemV20V10FAamemV22V10Iainfix <=V23V2IapathV0V22V23FAashortest_pathV0V24ainfix +V2c1IamemV24V9FAasubsetV9V10Aashortest_pathV0V25V2IamemV25V7FAasubsetV7V10FFIamemV27V5IamemV27asuccV26FIamemV26V3NIamemV26V7NIamemV26V5Iainfix =V26V8NFAapathV0V8V28NIainfix <V28V2FAapathV0V8V2AamemV1V3OamemV1V7IamemV1V5AamemV29V5NOamemV29V3Iashortest_pathV0V29ainfix +V2c1FAainfix <=V31ainfix +V2c1AapathV0V30V31EIamemV30V5FAamemV32V5Iainfix <=V33V2IapathV0V32V33FAashortest_pathV0V34ainfix +V2c1IamemV34V3FAasubsetV3V5Aashortest_pathV0V35V2IamemV35V7FAasubsetV7V5Iainfix =V8V1NIainfix =V7aremoveV8V4AamemV8V4FFIamemV36V4NFNIainfix =V6aTrueNIamemV37V4NFqainfix =V6aTrueFIainfix =c0V2Oainfix <c0V2AamemV39V5IamemV39asuccV38FIamemV38V3NIamemV38V4NIamemV38V5FAamemV40V3NFIamemV41V4NFAamemV1V3OamemV1V4IamemV1V5AamemV42V5NOamemV42V3Iashortest_pathV0V42ainfix +V2c1FAainfix <=V44ainfix +V2c1AapathV0V43V44EIamemV43V5FAamemV45V5Iainfix <=V46V2IapathV0V45V46FAashortest_pathV0V47ainfix +V2c1IamemV47V3FAasubsetV3V5Aashortest_pathV0V48V2IamemV48V4FAasubsetV4V5FFFFFF">
             <label
-             name="expl:parameter bfs">
-             </label>
+             name="expl:parameter bfs"/>
             <proof
              prover="0"
              timelimit="10"
@@ -781,7 +745,7 @@
            </goal>
            <goal
             name="WP_parameter bfs.5.1.1.2"
-            locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+            locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
             loclnum="127" loccnumb="6" loccnume="9"
             expl="parameter bfs"
             sum="74550d698810154f8a8ee3ffc42425a7"
@@ -789,8 +753,7 @@
             expanded="false"
             shape="ashortest_pathV0V15V14IamemV15V12FIainfix =V14ainfix +V2c1FIainfix =V13aemptyFIainfix =V12V9FIainfix =V11aTrueIamemV16V7NFqainfix =V11aTrueFIamemV18V10IamemV18asuccV17FIamemV17V9NIamemV17V7NIamemV17V10FAamemV19V10IamemV19asuccV8FAamemV1V9OamemV1V7IamemV1V10AamemV20V10NOamemV20V9Iashortest_pathV0V20ainfix +V2c1FAainfix <=V22ainfix +V2c1AapathV0V21V22EIamemV21V10FAamemV23V10Iainfix <=V24V2IapathV0V23V24FAashortest_pathV0V25ainfix +V2c1IamemV25V9FAasubsetV9V10Aashortest_pathV0V26V2IamemV26V7FAasubsetV7V10FFIamemV28V5IamemV28asuccV27FIamemV27V3NIamemV27V7NIamemV27V5Iainfix =V27V8NFAapathV0V8V29NIainfix <V29V2FAapathV0V8V2AamemV1V3OamemV1V7IamemV1V5AamemV30V5NOamemV30V3Iashortest_pathV0V30ainfix +V2c1FAainfix <=V32ainfix +V2c1AapathV0V31V32EIamemV31V5FAamemV33V5Iainfix <=V34V2IapathV0V33V34FAashortest_pathV0V35ainfix +V2c1IamemV35V3FAasubsetV3V5Aashortest_pathV0V36V2IamemV36V7FAasubsetV7V5Iainfix =V8V1NIainfix =V7aremoveV8V4AamemV8V4FFIamemV37V4NFNIainfix =V6aTrueNIamemV38V4NFqainfix =V6aTrueFIainfix =c0V2Oainfix <c0V2AamemV40V5IamemV40asuccV39FIamemV39V3NIamemV39V4NIamemV39V5FAamemV41V3NFIamemV42V4NFAamemV1V3OamemV1V4IamemV1V5AamemV43V5NOamemV43V3Iashortest_pathV0V43ainfix +V2c1FAainfix <=V45ainfix +V2c1AapathV0V44V45EIamemV44V5FAamemV46V5Iainfix <=V47V2IapathV0V46V47FAashortest_pathV0V48ainfix +V2c1IamemV48V3FAasubsetV3V5Aashortest_pathV0V49V2IamemV49V4FAasubsetV4V5FFFFFF">
             <label
-             name="expl:parameter bfs">
-             </label>
+             name="expl:parameter bfs"/>
             <proof
              prover="0"
              timelimit="10"
@@ -801,7 +764,7 @@
            </goal>
            <goal
             name="WP_parameter bfs.5.1.1.3"
-            locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+            locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
             loclnum="127" loccnumb="6" loccnume="9"
             expl="parameter bfs"
             sum="88ced4974284b58b116a1d7a40de0a24"
@@ -809,8 +772,7 @@
             expanded="false"
             shape="asubsetV13V10Iainfix =V14ainfix +V2c1FIainfix =V13aemptyFIainfix =V12V9FIainfix =V11aTrueIamemV15V7NFqainfix =V11aTrueFIamemV17V10IamemV17asuccV16FIamemV16V9NIamemV16V7NIamemV16V10FAamemV18V10IamemV18asuccV8FAamemV1V9OamemV1V7IamemV1V10AamemV19V10NOamemV19V9Iashortest_pathV0V19ainfix +V2c1FAainfix <=V21ainfix +V2c1AapathV0V20V21EIamemV20V10FAamemV22V10Iainfix <=V23V2IapathV0V22V23FAashortest_pathV0V24ainfix +V2c1IamemV24V9FAasubsetV9V10Aashortest_pathV0V25V2IamemV25V7FAasubsetV7V10FFIamemV27V5IamemV27asuccV26FIamemV26V3NIamemV26V7NIamemV26V5Iainfix =V26V8NFAapathV0V8V28NIainfix <V28V2FAapathV0V8V2AamemV1V3OamemV1V7IamemV1V5AamemV29V5NOamemV29V3Iashortest_pathV0V29ainfix +V2c1FAainfix <=V31ainfix +V2c1AapathV0V30V31EIamemV30V5FAamemV32V5Iainfix <=V33V2IapathV0V32V33FAashortest_pathV0V34ainfix +V2c1IamemV34V3FAasubsetV3V5Aashortest_pathV0V35V2IamemV35V7FAasubsetV7V5Iainfix =V8V1NIainfix =V7aremoveV8V4AamemV8V4FFIamemV36V4NFNIainfix =V6aTrueNIamemV37V4NFqainfix =V6aTrueFIainfix =c0V2Oainfix <c0V2AamemV39V5IamemV39asuccV38FIamemV38V3NIamemV38V4NIamemV38V5FAamemV40V3NFIamemV41V4NFAamemV1V3OamemV1V4IamemV1V5AamemV42V5NOamemV42V3Iashortest_pathV0V42ainfix +V2c1FAainfix <=V44ainfix +V2c1AapathV0V43V44EIamemV43V5FAamemV45V5Iainfix <=V46V2IapathV0V45V46FAashortest_pathV0V47ainfix +V2c1IamemV47V3FAasubsetV3V5Aashortest_pathV0V48V2IamemV48V4FAasubsetV4V5FFFFFF">
             <label
-             name="expl:parameter bfs">
-             </label>
+             name="expl:parameter bfs"/>
             <proof
              prover="1"
              timelimit="10"
@@ -821,7 +783,7 @@
            </goal>
            <goal
             name="WP_parameter bfs.5.1.1.4"
-            locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+            locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
             loclnum="127" loccnumb="6" loccnume="9"
             expl="parameter bfs"
             sum="8f6953394c27199ecaa93dea3724c70b"
@@ -829,8 +791,7 @@
             expanded="false"
             shape="ashortest_pathV0V15ainfix +V14c1IamemV15V13FIainfix =V14ainfix +V2c1FIainfix =V13aemptyFIainfix =V12V9FIainfix =V11aTrueIamemV16V7NFqainfix =V11aTrueFIamemV18V10IamemV18asuccV17FIamemV17V9NIamemV17V7NIamemV17V10FAamemV19V10IamemV19asuccV8FAamemV1V9OamemV1V7IamemV1V10AamemV20V10NOamemV20V9Iashortest_pathV0V20ainfix +V2c1FAainfix <=V22ainfix +V2c1AapathV0V21V22EIamemV21V10FAamemV23V10Iainfix <=V24V2IapathV0V23V24FAashortest_pathV0V25ainfix +V2c1IamemV25V9FAasubsetV9V10Aashortest_pathV0V26V2IamemV26V7FAasubsetV7V10FFIamemV28V5IamemV28asuccV27FIamemV27V3NIamemV27V7NIamemV27V5Iainfix =V27V8NFAapathV0V8V29NIainfix <V29V2FAapathV0V8V2AamemV1V3OamemV1V7IamemV1V5AamemV30V5NOamemV30V3Iashortest_pathV0V30ainfix +V2c1FAainfix <=V32ainfix +V2c1AapathV0V31V32EIamemV31V5FAamemV33V5Iainfix <=V34V2IapathV0V33V34FAashortest_pathV0V35ainfix +V2c1IamemV35V3FAasubsetV3V5Aashortest_pathV0V36V2IamemV36V7FAasubsetV7V5Iainfix =V8V1NIainfix =V7aremoveV8V4AamemV8V4FFIamemV37V4NFNIainfix =V6aTrueNIamemV38V4NFqainfix =V6aTrueFIainfix =c0V2Oainfix <c0V2AamemV40V5IamemV40asuccV39FIamemV39V3NIamemV39V4NIamemV39V5FAamemV41V3NFIamemV42V4NFAamemV1V3OamemV1V4IamemV1V5AamemV43V5NOamemV43V3Iashortest_pathV0V43ainfix +V2c1FAainfix <=V45ainfix +V2c1AapathV0V44V45EIamemV44V5FAamemV46V5Iainfix <=V47V2IapathV0V46V47FAashortest_pathV0V48ainfix +V2c1IamemV48V3FAasubsetV3V5Aashortest_pathV0V49V2IamemV49V4FAasubsetV4V5FFFFFF">
             <label
-             name="expl:parameter bfs">
-             </label>
+             name="expl:parameter bfs"/>
             <proof
              prover="1"
              timelimit="10"
@@ -841,7 +802,7 @@
            </goal>
            <goal
             name="WP_parameter bfs.5.1.1.5"
-            locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+            locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
             loclnum="127" loccnumb="6" loccnume="9"
             expl="parameter bfs"
             sum="7319c646b1743ed1454b7e121a6ee54d"
@@ -849,8 +810,7 @@
             expanded="false"
             shape="amemV15V10Iainfix <=V16V14IapathV0V15V16FIainfix =V14ainfix +V2c1FIainfix =V13aemptyFIainfix =V12V9FIainfix =V11aTrueIamemV17V7NFqainfix =V11aTrueFIamemV19V10IamemV19asuccV18FIamemV18V9NIamemV18V7NIamemV18V10FAamemV20V10IamemV20asuccV8FAamemV1V9OamemV1V7IamemV1V10AamemV21V10NOamemV21V9Iashortest_pathV0V21ainfix +V2c1FAainfix <=V23ainfix +V2c1AapathV0V22V23EIamemV22V10FAamemV24V10Iainfix <=V25V2IapathV0V24V25FAashortest_pathV0V26ainfix +V2c1IamemV26V9FAasubsetV9V10Aashortest_pathV0V27V2IamemV27V7FAasubsetV7V10FFIamemV29V5IamemV29asuccV28FIamemV28V3NIamemV28V7NIamemV28V5Iainfix =V28V8NFAapathV0V8V30NIainfix <V30V2FAapathV0V8V2AamemV1V3OamemV1V7IamemV1V5AamemV31V5NOamemV31V3Iashortest_pathV0V31ainfix +V2c1FAainfix <=V33ainfix +V2c1AapathV0V32V33EIamemV32V5FAamemV34V5Iainfix <=V35V2IapathV0V34V35FAashortest_pathV0V36ainfix +V2c1IamemV36V3FAasubsetV3V5Aashortest_pathV0V37V2IamemV37V7FAasubsetV7V5Iainfix =V8V1NIainfix =V7aremoveV8V4AamemV8V4FFIamemV38V4NFNIainfix =V6aTrueNIamemV39V4NFqainfix =V6aTrueFIainfix =c0V2Oainfix <c0V2AamemV41V5IamemV41asuccV40FIamemV40V3NIamemV40V4NIamemV40V5FAamemV42V3NFIamemV43V4NFAamemV1V3OamemV1V4IamemV1V5AamemV44V5NOamemV44V3Iashortest_pathV0V44ainfix +V2c1FAainfix <=V46ainfix +V2c1AapathV0V45V46EIamemV45V5FAamemV47V5Iainfix <=V48V2IapathV0V47V48FAashortest_pathV0V49ainfix +V2c1IamemV49V3FAasubsetV3V5Aashortest_pathV0V50V2IamemV50V4FAasubsetV4V5FFFFFF">
             <label
-             name="expl:parameter bfs">
-             </label>
+             name="expl:parameter bfs"/>
             <proof
              prover="0"
              timelimit="10"
@@ -861,7 +821,7 @@
            </goal>
            <goal
             name="WP_parameter bfs.5.1.1.6"
-            locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+            locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
             loclnum="127" loccnumb="6" loccnume="9"
             expl="parameter bfs"
             sum="1276ff7c5ab4ea3123b58d128ad3ec7e"
@@ -869,8 +829,7 @@
             expanded="false"
             shape="ainfix <=V16ainfix +V14c1AapathV0V15V16EIamemV15V10FIainfix =V14ainfix +V2c1FIainfix =V13aemptyFIainfix =V12V9FIainfix =V11aTrueIamemV17V7NFqainfix =V11aTrueFIamemV19V10IamemV19asuccV18FIamemV18V9NIamemV18V7NIamemV18V10FAamemV20V10IamemV20asuccV8FAamemV1V9OamemV1V7IamemV1V10AamemV21V10NOamemV21V9Iashortest_pathV0V21ainfix +V2c1FAainfix <=V23ainfix +V2c1AapathV0V22V23EIamemV22V10FAamemV24V10Iainfix <=V25V2IapathV0V24V25FAashortest_pathV0V26ainfix +V2c1IamemV26V9FAasubsetV9V10Aashortest_pathV0V27V2IamemV27V7FAasubsetV7V10FFIamemV29V5IamemV29asuccV28FIamemV28V3NIamemV28V7NIamemV28V5Iainfix =V28V8NFAapathV0V8V30NIainfix <V30V2FAapathV0V8V2AamemV1V3OamemV1V7IamemV1V5AamemV31V5NOamemV31V3Iashortest_pathV0V31ainfix +V2c1FAainfix <=V33ainfix +V2c1AapathV0V32V33EIamemV32V5FAamemV34V5Iainfix <=V35V2IapathV0V34V35FAashortest_pathV0V36ainfix +V2c1IamemV36V3FAasubsetV3V5Aashortest_pathV0V37V2IamemV37V7FAasubsetV7V5Iainfix =V8V1NIainfix =V7aremoveV8V4AamemV8V4FFIamemV38V4NFNIainfix =V6aTrueNIamemV39V4NFqainfix =V6aTrueFIainfix =c0V2Oainfix <c0V2AamemV41V5IamemV41asuccV40FIamemV40V3NIamemV40V4NIamemV40V5FAamemV42V3NFIamemV43V4NFAamemV1V3OamemV1V4IamemV1V5AamemV44V5NOamemV44V3Iashortest_pathV0V44ainfix +V2c1FAainfix <=V46ainfix +V2c1AapathV0V45V46EIamemV45V5FAamemV47V5Iainfix <=V48V2IapathV0V47V48FAashortest_pathV0V49ainfix +V2c1IamemV49V3FAasubsetV3V5Aashortest_pathV0V50V2IamemV50V4FAasubsetV4V5FFFFFF">
             <label
-             name="expl:parameter bfs">
-             </label>
+             name="expl:parameter bfs"/>
             <proof
              prover="0"
              timelimit="10"
@@ -881,7 +840,7 @@
            </goal>
            <goal
             name="WP_parameter bfs.5.1.1.7"
-            locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+            locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
             loclnum="127" loccnumb="6" loccnume="9"
             expl="parameter bfs"
             sum="c9d4fc7561885d01ec9024ab779a11c8"
@@ -889,8 +848,7 @@
             expanded="false"
             shape="amemV15V10NOamemV15V13Iashortest_pathV0V15ainfix +V14c1FIainfix =V14ainfix +V2c1FIainfix =V13aemptyFIainfix =V12V9FIainfix =V11aTrueIamemV16V7NFqainfix =V11aTrueFIamemV18V10IamemV18asuccV17FIamemV17V9NIamemV17V7NIamemV17V10FAamemV19V10IamemV19asuccV8FAamemV1V9OamemV1V7IamemV1V10AamemV20V10NOamemV20V9Iashortest_pathV0V20ainfix +V2c1FAainfix <=V22ainfix +V2c1AapathV0V21V22EIamemV21V10FAamemV23V10Iainfix <=V24V2IapathV0V23V24FAashortest_pathV0V25ainfix +V2c1IamemV25V9FAasubsetV9V10Aashortest_pathV0V26V2IamemV26V7FAasubsetV7V10FFIamemV28V5IamemV28asuccV27FIamemV27V3NIamemV27V7NIamemV27V5Iainfix =V27V8NFAapathV0V8V29NIainfix <V29V2FAapathV0V8V2AamemV1V3OamemV1V7IamemV1V5AamemV30V5NOamemV30V3Iashortest_pathV0V30ainfix +V2c1FAainfix <=V32ainfix +V2c1AapathV0V31V32EIamemV31V5FAamemV33V5Iainfix <=V34V2IapathV0V33V34FAashortest_pathV0V35ainfix +V2c1IamemV35V3FAasubsetV3V5Aashortest_pathV0V36V2IamemV36V7FAasubsetV7V5Iainfix =V8V1NIainfix =V7aremoveV8V4AamemV8V4FFIamemV37V4NFNIainfix =V6aTrueNIamemV38V4NFqainfix =V6aTrueFIainfix =c0V2Oainfix <c0V2AamemV40V5IamemV40asuccV39FIamemV39V3NIamemV39V4NIamemV39V5FAamemV41V3NFIamemV42V4NFAamemV1V3OamemV1V4IamemV1V5AamemV43V5NOamemV43V3Iashortest_pathV0V43ainfix +V2c1FAainfix <=V45ainfix +V2c1AapathV0V44V45EIamemV44V5FAamemV46V5Iainfix <=V47V2IapathV0V46V47FAashortest_pathV0V48ainfix +V2c1IamemV48V3FAasubsetV3V5Aashortest_pathV0V49V2IamemV49V4FAasubsetV4V5FFFFFF">
             <label
-             name="expl:parameter bfs">
-             </label>
+             name="expl:parameter bfs"/>
             <proof
              prover="0"
              timelimit="10"
@@ -901,7 +859,7 @@
            </goal>
            <goal
             name="WP_parameter bfs.5.1.1.8"
-            locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+            locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
             loclnum="127" loccnumb="6" loccnume="9"
             expl="parameter bfs"
             sum="173bf305014e27c7d89a12d8fbc4fce5"
@@ -909,8 +867,7 @@
             expanded="false"
             shape="amemV1V13OamemV1V12IamemV1V10Iainfix =V14ainfix +V2c1FIainfix =V13aemptyFIainfix =V12V9FIainfix =V11aTrueIamemV15V7NFqainfix =V11aTrueFIamemV17V10IamemV17asuccV16FIamemV16V9NIamemV16V7NIamemV16V10FAamemV18V10IamemV18asuccV8FAamemV1V9OamemV1V7IamemV1V10AamemV19V10NOamemV19V9Iashortest_pathV0V19ainfix +V2c1FAainfix <=V21ainfix +V2c1AapathV0V20V21EIamemV20V10FAamemV22V10Iainfix <=V23V2IapathV0V22V23FAashortest_pathV0V24ainfix +V2c1IamemV24V9FAasubsetV9V10Aashortest_pathV0V25V2IamemV25V7FAasubsetV7V10FFIamemV27V5IamemV27asuccV26FIamemV26V3NIamemV26V7NIamemV26V5Iainfix =V26V8NFAapathV0V8V28NIainfix <V28V2FAapathV0V8V2AamemV1V3OamemV1V7IamemV1V5AamemV29V5NOamemV29V3Iashortest_pathV0V29ainfix +V2c1FAainfix <=V31ainfix +V2c1AapathV0V30V31EIamemV30V5FAamemV32V5Iainfix <=V33V2IapathV0V32V33FAashortest_pathV0V34ainfix +V2c1IamemV34V3FAasubsetV3V5Aashortest_pathV0V35V2IamemV35V7FAasubsetV7V5Iainfix =V8V1NIainfix =V7aremoveV8V4AamemV8V4FFIamemV36V4NFNIainfix =V6aTrueNIamemV37V4NFqainfix =V6aTrueFIainfix =c0V2Oainfix <c0V2AamemV39V5IamemV39asuccV38FIamemV38V3NIamemV38V4NIamemV38V5FAamemV40V3NFIamemV41V4NFAamemV1V3OamemV1V4IamemV1V5AamemV42V5NOamemV42V3Iashortest_pathV0V42ainfix +V2c1FAainfix <=V44ainfix +V2c1AapathV0V43V44EIamemV43V5FAamemV45V5Iainfix <=V46V2IapathV0V45V46FAashortest_pathV0V47ainfix +V2c1IamemV47V3FAasubsetV3V5Aashortest_pathV0V48V2IamemV48V4FAasubsetV4V5FFFFFF">
             <label
-             name="expl:parameter bfs">
-             </label>
+             name="expl:parameter bfs"/>
             <proof
              prover="0"
              timelimit="10"
@@ -925,7 +882,7 @@
        </goal>
        <goal
         name="WP_parameter bfs.5.2"
-        locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+        locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
         loclnum="127" loccnumb="6" loccnume="9"
         expl="parameter bfs"
         sum="b1aafc32b7168734d73d37b6d1f2655f"
@@ -933,8 +890,7 @@
         expanded="false"
         shape="ais_emptyV13Iais_emptyV12Iainfix =V14ainfix +V2c1FIainfix =V13aemptyFIainfix =V12V9FIainfix =V11aTrueIais_emptyV7qainfix =V11aTrueFIaclosureV10V7V9V15FAasubsetasuccV8V10AainvV0V1V10V7V9V2FFIaclosureV5V7V3V16Iainfix =V16V8NFAashortest_pathV0V8V2AainvV0V1V5V7V3V2Iainfix =V8V1NIainfix =V7aremoveV8V4AamemV8V4FFIais_emptyV4NIainfix =V6aTrueNIais_emptyV4qainfix =V6aTrueFIainfix <=c0V2AaclosureV5V4V3V17FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FFFFFF">
         <label
-         name="expl:parameter bfs">
-         </label>
+         name="expl:parameter bfs"/>
         <proof
          prover="0"
          timelimit="10"
@@ -945,7 +901,7 @@
        </goal>
        <goal
         name="WP_parameter bfs.5.3"
-        locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+        locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
         loclnum="127" loccnumb="6" loccnume="9"
         expl="parameter bfs"
         sum="c998b2ded3646a4a14fb92bbe6022931"
@@ -953,8 +909,7 @@
         expanded="false"
         shape="aclosureV10V12V13V15FIainfix =V14ainfix +V2c1FIainfix =V13aemptyFIainfix =V12V9FIainfix =V11aTrueIais_emptyV7qainfix =V11aTrueFIaclosureV10V7V9V16FAasubsetasuccV8V10AainvV0V1V10V7V9V2FFIaclosureV5V7V3V17Iainfix =V17V8NFAashortest_pathV0V8V2AainvV0V1V5V7V3V2Iainfix =V8V1NIainfix =V7aremoveV8V4AamemV8V4FFIais_emptyV4NIainfix =V6aTrueNIais_emptyV4qainfix =V6aTrueFIainfix <=c0V2AaclosureV5V4V3V18FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FFFFFF">
         <label
-         name="expl:parameter bfs">
-         </label>
+         name="expl:parameter bfs"/>
         <proof
          prover="3"
          timelimit="10"
@@ -965,7 +920,7 @@
        </goal>
        <goal
         name="WP_parameter bfs.5.4"
-        locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+        locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
         loclnum="127" loccnumb="6" loccnume="9"
         expl="parameter bfs"
         sum="5bd1ba003de3d221c5614b1097a2c89e"
@@ -973,8 +928,7 @@
         expanded="false"
         shape="ainfix <=c0V14Iainfix =V14ainfix +V2c1FIainfix =V13aemptyFIainfix =V12V9FIainfix =V11aTrueIais_emptyV7qainfix =V11aTrueFIaclosureV10V7V9V15FAasubsetasuccV8V10AainvV0V1V10V7V9V2FFIaclosureV5V7V3V16Iainfix =V16V8NFAashortest_pathV0V8V2AainvV0V1V5V7V3V2Iainfix =V8V1NIainfix =V7aremoveV8V4AamemV8V4FFIais_emptyV4NIainfix =V6aTrueNIais_emptyV4qainfix =V6aTrueFIainfix <=c0V2AaclosureV5V4V3V17FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FFFFFF">
         <label
-         name="expl:parameter bfs">
-         </label>
+         name="expl:parameter bfs"/>
         <proof
          prover="0"
          timelimit="10"
@@ -987,7 +941,7 @@
      </goal>
      <goal
       name="WP_parameter bfs.6"
-      locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+      locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
       loclnum="127" loccnumb="6" loccnume="9"
       expl="loop invariant preservation"
       sum="bbc3502175342c80e670f70108aa717a"
@@ -995,15 +949,14 @@
       expanded="true"
       shape="ainfix <=c0V2AaclosureV10V7V9V12FAais_emptyV9Iais_emptyV7AainvV0V1V10V7V9V2Iainfix =V11aTrueNIais_emptyV7qainfix =V11aTrueFIaclosureV10V7V9V13FAasubsetasuccV8V10AainvV0V1V10V7V9V2FFIaclosureV5V7V3V14Iainfix =V14V8NFAashortest_pathV0V8V2AainvV0V1V5V7V3V2Iainfix =V8V1NIainfix =V7aremoveV8V4AamemV8V4FFIais_emptyV4NIainfix =V6aTrueNIais_emptyV4qainfix =V6aTrueFIainfix <=c0V2AaclosureV5V4V3V15FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FFFFFF">
       <label
-       name="expl:parameter bfs">
-       </label>
+       name="expl:parameter bfs"/>
       <transf
        name="split_goal"
        proved="true"
        expanded="true">
        <goal
         name="WP_parameter bfs.6.1"
-        locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+        locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
         loclnum="127" loccnumb="6" loccnume="9"
         expl="parameter bfs"
         sum="f0ca64e0942fde9d6912cf769a63d161"
@@ -1011,8 +964,7 @@
         expanded="false"
         shape="ainvV0V1V10V7V9V2Iainfix =V11aTrueNIais_emptyV7qainfix =V11aTrueFIaclosureV10V7V9V12FAasubsetasuccV8V10AainvV0V1V10V7V9V2FFIaclosureV5V7V3V13Iainfix =V13V8NFAashortest_pathV0V8V2AainvV0V1V5V7V3V2Iainfix =V8V1NIainfix =V7aremoveV8V4AamemV8V4FFIais_emptyV4NIainfix =V6aTrueNIais_emptyV4qainfix =V6aTrueFIainfix <=c0V2AaclosureV5V4V3V14FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FFFFFF">
         <label
-         name="expl:parameter bfs">
-         </label>
+         name="expl:parameter bfs"/>
         <proof
          prover="0"
          timelimit="10"
@@ -1023,7 +975,7 @@
        </goal>
        <goal
         name="WP_parameter bfs.6.2"
-        locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+        locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
         loclnum="127" loccnumb="6" loccnume="9"
         expl="parameter bfs"
         sum="651c058d3d85d392fc613ae0e071f230"
@@ -1031,8 +983,7 @@
         expanded="false"
         shape="ais_emptyV9Iais_emptyV7Iainfix =V11aTrueNIais_emptyV7qainfix =V11aTrueFIaclosureV10V7V9V12FAasubsetasuccV8V10AainvV0V1V10V7V9V2FFIaclosureV5V7V3V13Iainfix =V13V8NFAashortest_pathV0V8V2AainvV0V1V5V7V3V2Iainfix =V8V1NIainfix =V7aremoveV8V4AamemV8V4FFIais_emptyV4NIainfix =V6aTrueNIais_emptyV4qainfix =V6aTrueFIainfix <=c0V2AaclosureV5V4V3V14FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FFFFFF">
         <label
-         name="expl:parameter bfs">
-         </label>
+         name="expl:parameter bfs"/>
         <proof
          prover="0"
          timelimit="10"
@@ -1043,7 +994,7 @@
        </goal>
        <goal
         name="WP_parameter bfs.6.3"
-        locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+        locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
         loclnum="127" loccnumb="6" loccnume="9"
         expl="parameter bfs"
         sum="d09f52639bf80e0a0e109b3779d236e7"
@@ -1051,8 +1002,7 @@
         expanded="false"
         shape="aclosureV10V7V9V12FIainfix =V11aTrueNIais_emptyV7qainfix =V11aTrueFIaclosureV10V7V9V13FAasubsetasuccV8V10AainvV0V1V10V7V9V2FFIaclosureV5V7V3V14Iainfix =V14V8NFAashortest_pathV0V8V2AainvV0V1V5V7V3V2Iainfix =V8V1NIainfix =V7aremoveV8V4AamemV8V4FFIais_emptyV4NIainfix =V6aTrueNIais_emptyV4qainfix =V6aTrueFIainfix <=c0V2AaclosureV5V4V3V15FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FFFFFF">
         <label
-         name="expl:parameter bfs">
-         </label>
+         name="expl:parameter bfs"/>
         <proof
          prover="0"
          timelimit="10"
@@ -1063,7 +1013,7 @@
        </goal>
        <goal
         name="WP_parameter bfs.6.4"
-        locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+        locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
         loclnum="127" loccnumb="6" loccnume="9"
         expl="parameter bfs"
         sum="e73a6ad5b5cf86fb4affcad274077377"
@@ -1071,8 +1021,7 @@
         expanded="false"
         shape="ainfix <=c0V2Iainfix =V11aTrueNIais_emptyV7qainfix =V11aTrueFIaclosureV10V7V9V12FAasubsetasuccV8V10AainvV0V1V10V7V9V2FFIaclosureV5V7V3V13Iainfix =V13V8NFAashortest_pathV0V8V2AainvV0V1V5V7V3V2Iainfix =V8V1NIainfix =V7aremoveV8V4AamemV8V4FFIais_emptyV4NIainfix =V6aTrueNIais_emptyV4qainfix =V6aTrueFIainfix <=c0V2AaclosureV5V4V3V14FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FFFFFF">
         <label
-         name="expl:parameter bfs">
-         </label>
+         name="expl:parameter bfs"/>
         <proof
          prover="0"
          timelimit="10"
@@ -1085,7 +1034,7 @@
      </goal>
      <goal
       name="WP_parameter bfs.7"
-      locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+      locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
       loclnum="127" loccnumb="6" loccnume="9"
       expl="assertion"
       sum="7c7f94a665064eea6264c300d6524c8e"
@@ -1093,15 +1042,14 @@
       expanded="true"
       shape="amemV1V5NIainfix =V6aTrueNNIais_emptyV4qainfix =V6aTrueFIainfix <=c0V2AaclosureV5V4V3V7FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FFFFFF">
       <label
-       name="expl:parameter bfs">
-       </label>
+       name="expl:parameter bfs"/>
       <transf
        name="split_goal"
        proved="true"
        expanded="true">
        <goal
         name="WP_parameter bfs.7.1"
-        locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+        locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
         loclnum="127" loccnumb="6" loccnume="9"
         expl="assertion"
         sum="7c7f94a665064eea6264c300d6524c8e"
@@ -1109,8 +1057,7 @@
         expanded="false"
         shape="amemV1V5NIainfix =V6aTrueNNIais_emptyV4qainfix =V6aTrueFIainfix <=c0V2AaclosureV5V4V3V7FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FFFFFF">
         <label
-         name="expl:parameter bfs">
-         </label>
+         name="expl:parameter bfs"/>
         <proof
          prover="0"
          timelimit="10"
@@ -1130,7 +1077,7 @@
      </goal>
      <goal
       name="WP_parameter bfs.8"
-      locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+      locfile="./programs/vstte12_bfs/../vstte12_bfs.mlw"
       loclnum="127" loccnumb="6" loccnume="9"
       expl="normal postcondition"
       sum="d7ba7712ebc7db299d5d9abd6436d3cf"
@@ -1138,8 +1085,7 @@
       expanded="false"
       shape="apathV0V1V7NFIamemV1V5NIainfix =V6aTrueNNIais_emptyV4qainfix =V6aTrueFIainfix <=c0V2AaclosureV5V4V3V8FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FFFFFF">
       <label
-       name="expl:parameter bfs">
-       </label>
+       name="expl:parameter bfs"/>
       <proof
        prover="2"
        timelimit="10"

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "why3session.dtd">
+<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
 <why3session
- name="programs/fibonacci/why3session.xml">
+ name="./programs/fibonacci/why3session.xml">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -36,23 +36,22 @@
   expanded="false">
   <theory
    name="Fibonacci"
-   locfile="programs/fibonacci/../fibonacci.mlw"
+   locfile="./programs/fibonacci/../fibonacci.mlw"
    loclnum="2" loccnumb="7" loccnume="16"
    verified="true"
    expanded="true">
    <label
-    name="Fibonacci numbers">
-    </label>
+    name="Fibonacci numbers"/>
   </theory>
   <theory
    name="FibonacciTest"
-   locfile="programs/fibonacci/../fibonacci.mlw"
+   locfile="./programs/fibonacci/../fibonacci.mlw"
    loclnum="14" loccnumb="7" loccnume="20"
    verified="true"
    expanded="false">
    <goal
     name="isfib_2_1"
-    locfile="programs/fibonacci/../fibonacci.mlw"
+    locfile="./programs/fibonacci/../fibonacci.mlw"
     loclnum="18" loccnumb="8" loccnume="17"
     sum="53cb43c962b6ac473353e3b02dc4b67b"
     proved="true"
@@ -68,7 +67,7 @@
    </goal>
    <goal
     name="isfib_6_8"
-    locfile="programs/fibonacci/../fibonacci.mlw"
+    locfile="./programs/fibonacci/../fibonacci.mlw"
     loclnum="19" loccnumb="8" loccnume="17"
     sum="23ec2eb87c0bebe1406c9b91f62e2d92"
     proved="true"
@@ -84,7 +83,7 @@
    </goal>
    <goal
     name="not_isfib_2_2"
-    locfile="programs/fibonacci/../fibonacci.mlw"
+    locfile="./programs/fibonacci/../fibonacci.mlw"
     loclnum="21" loccnumb="8" loccnume="21"
     sum="f3cd71efc59ece547b8cfe0932c063ca"
     proved="true"
@@ -129,13 +128,13 @@
   </theory>
   <theory
    name="WP FibonacciLinear"
-   locfile="programs/fibonacci/../fibonacci.mlw"
+   locfile="./programs/fibonacci/../fibonacci.mlw"
    loclnum="25" loccnumb="7" loccnume="22"
    verified="true"
    expanded="false">
    <goal
     name="WP_parameter fib"
-    locfile="programs/fibonacci/../fibonacci.mlw"
+    locfile="./programs/fibonacci/../fibonacci.mlw"
     loclnum="31" loccnumb="6" loccnume="9"
     expl="parameter fib"
     sum="f3284f8a4c3dd0d37652a73e8670ea20"
@@ -143,8 +142,7 @@
     expanded="false"
     shape="ainfix =afibV0V2Iainfix =afibainfix +ainfix -V0c1c1V2Aainfix =afibainfix +ainfix +ainfix -V0c1c1c1V1Aainfix <=ainfix +ainfix -V0c1c1V0Aainfix <=c0ainfix +ainfix -V0c1c1Aainfix =afibainfix +V3c1V4Aainfix =afibainfix +ainfix +V3c1c1V5Aainfix <=ainfix +V3c1V0Aainfix <=c0ainfix +V3c1Iainfix =V5ainfix +V1V2FIainfix =V4V1FIainfix =afibV3V2Aainfix =afibainfix +V3c1V1Aainfix <=V3V0Aainfix <=c0V3Iainfix <=V3ainfix -V0c1Aainfix <=c0V3FFFAainfix =afibc0c0Aainfix =afibainfix +c0c1c1Aainfix <=c0V0Aainfix <=c0c0Iainfix <=c0ainfix -V0c1Aainfix =afibV0c0Iainfix >c0ainfix -V0c1Iainfix >=V0c0F">
     <label
-     name="expl:parameter fib">
-     </label>
+     name="expl:parameter fib"/>
     <proof
      prover="1"
      timelimit="5"
@@ -156,23 +154,22 @@
   </theory>
   <theory
    name="Mat22"
-   locfile="programs/fibonacci/../fibonacci.mlw"
+   locfile="./programs/fibonacci/../fibonacci.mlw"
    loclnum="46" loccnumb="7" loccnume="12"
    verified="true"
    expanded="true">
    <label
-    name="2x2 integer matrices">
-    </label>
+    name="2x2 integer matrices"/>
   </theory>
   <theory
    name="WP FibonacciLogarithmic"
-   locfile="programs/fibonacci/../fibonacci.mlw"
+   locfile="./programs/fibonacci/../fibonacci.mlw"
    loclnum="68" loccnumb="7" loccnume="27"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter logfib"
-    locfile="programs/fibonacci/../fibonacci.mlw"
+    locfile="./programs/fibonacci/../fibonacci.mlw"
     loclnum="82" loccnumb="10" loccnume="16"
     expl="parameter logfib"
     sum="3bee82b2160325a15346a5c53057a94b"
@@ -180,15 +177,14 @@
     expanded="false"
     shape="iainfix =V0c0ainfix =apoweramk tc1c1c1c0V0amk tainfix +c1c0c0c0c1iainfix =amodV0c2c0Lainfix +ainfix *V1V1ainfix *V2V2Lainfix *V2ainfix +V1ainfix +V1V2ainfix =apoweramk tc1c1c1c0V0amk tainfix +V3V4V4V4V3Lainfix *V2ainfix +V1ainfix +V1V2Lainfix +ainfix *ainfix +V1V2ainfix +V1V2ainfix *V2V2ainfix =apoweramk tc1c1c1c0V0amk tainfix +V5V6V6V6V5Iainfix =apoweramk tc1c1c1c0adivV0c2amk tainfix +V1V2V2V2V1FAainfix >=adivV0c2c0Aainfix <adivV0c2V0Aainfix <=c0V0Iainfix >=V0c0F">
     <label
-     name="expl:parameter logfib">
-     </label>
+     name="expl:parameter logfib"/>
     <transf
      name="split_goal"
      proved="true"
      expanded="true">
      <goal
       name="WP_parameter logfib.1"
-      locfile="programs/fibonacci/../fibonacci.mlw"
+      locfile="./programs/fibonacci/../fibonacci.mlw"
       loclnum="82" loccnumb="10" loccnume="16"
       expl="normal postcondition"
       sum="1d3cd60f1327fd53ef9954e16c41d661"
@@ -196,8 +192,7 @@
       expanded="false"
       shape="ainfix =apoweramk tc1c1c1c0V0amk tainfix +c1c0c0c0c1Iainfix =V0c0Iainfix >=V0c0F">
       <label
-       name="expl:parameter logfib">
-       </label>
+       name="expl:parameter logfib"/>
       <proof
        prover="6"
        timelimit="5"
@@ -229,7 +224,7 @@
      </goal>
      <goal
       name="WP_parameter logfib.2"
-      locfile="programs/fibonacci/../fibonacci.mlw"
+      locfile="./programs/fibonacci/../fibonacci.mlw"
       loclnum="82" loccnumb="10" loccnume="16"
       expl="precondition"
       sum="71af7c58a810381aec2d991e4ab91892"
@@ -237,8 +232,7 @@
       expanded="false"
       shape="ainfix >=adivV0c2c0Aainfix <adivV0c2V0Aainfix <=c0V0Iainfix =V0c0NIainfix >=V0c0F">
       <label
-       name="expl:parameter logfib">
-       </label>
+       name="expl:parameter logfib"/>
       <proof
        prover="6"
        timelimit="5"
@@ -256,7 +250,7 @@
      </goal>
      <goal
       name="WP_parameter logfib.3"
-      locfile="programs/fibonacci/../fibonacci.mlw"
+      locfile="./programs/fibonacci/../fibonacci.mlw"
       loclnum="82" loccnumb="10" loccnume="16"
       expl="normal postcondition"
       sum="0f7cfed40374362fe53b6e53b5ab5968"
@@ -264,8 +258,7 @@
       expanded="false"
       shape="iainfix =amodV0c2c0Lainfix +ainfix *V1V1ainfix *V2V2Lainfix *V2ainfix +V1ainfix +V1V2ainfix =apoweramk tc1c1c1c0V0amk tainfix +V3V4V4V4V3Lainfix *V2ainfix +V1ainfix +V1V2Lainfix +ainfix *ainfix +V1V2ainfix +V1V2ainfix *V2V2ainfix =apoweramk tc1c1c1c0V0amk tainfix +V5V6V6V6V5Iainfix =apoweramk tc1c1c1c0adivV0c2amk tainfix +V1V2V2V2V1FIainfix >=adivV0c2c0Aainfix <adivV0c2V0Aainfix <=c0V0Iainfix =V0c0NIainfix >=V0c0F">
       <label
-       name="expl:parameter logfib">
-       </label>
+       name="expl:parameter logfib"/>
       <proof
        prover="2"
        timelimit="10"
@@ -279,7 +272,7 @@
    </goal>
    <goal
     name="fib_m"
-    locfile="programs/fibonacci/../fibonacci.mlw"
+    locfile="./programs/fibonacci/../fibonacci.mlw"
     loclnum="105" loccnumb="8" loccnume="13"
     sum="d1c53d543ada9827021c2406c765ac18"
     proved="true"
@@ -296,7 +289,7 @@
    </goal>
    <goal
     name="WP_parameter fibo"
-    locfile="programs/fibonacci/../fibonacci.mlw"
+    locfile="./programs/fibonacci/../fibonacci.mlw"
     loclnum="109" loccnumb="6" loccnume="10"
     expl="parameter fibo"
     sum="fd564a2ba8960a780506cf3bdb4fb943"
@@ -304,8 +297,7 @@
     expanded="false"
     shape="ainfix =V2afibV0Iainfix =apoweramk tc1c1c1c0V0amk tainfix +V1V2V2V2V1FAainfix >=V0c0Iainfix >=V0c0F">
     <label
-     name="expl:parameter fibo">
-     </label>
+     name="expl:parameter fibo"/>
     <proof
      prover="1"
      timelimit="5"

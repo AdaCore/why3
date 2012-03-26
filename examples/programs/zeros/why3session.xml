@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "why3session.dtd">
+<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
 <why3session
- name="programs/zeros/why3session.xml">
+ name="./programs/zeros/why3session.xml">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -20,13 +20,13 @@
   expanded="false">
   <theory
    name="WP SetZeros"
-   locfile="programs/zeros/../zeros.mlw"
+   locfile="./programs/zeros/../zeros.mlw"
    loclnum="2" loccnumb="7" loccnume="15"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter set_zeros"
-    locfile="programs/zeros/../zeros.mlw"
+    locfile="./programs/zeros/../zeros.mlw"
     loclnum="7" loccnumb="6" loccnume="15"
     expl="parameter set_zeros"
     sum="2099d9f73c99ac43db9e3a0e9b5bd6b9"
@@ -34,15 +34,14 @@
     expanded="true"
     shape="ainfix =agetV2V3c0Iainfix <V3V0Aainfix <=c0V3FIainfix =agetV2V4c0Iainfix <V4ainfix +ainfix -V0c1c1Aainfix <=c0V4FAainfix =agetV6V7c0Iainfix <V7ainfix +V5c1Aainfix <=c0V7FIainfix =V6asetV2V5c0FAainfix <V5V0Aainfix <=c0V5Iainfix =agetV2V8c0Iainfix <V8V5Aainfix <=c0V8FIainfix <=V5ainfix -V0c1Aainfix <=c0V5FFAainfix =agetV1V9c0Iainfix <V9c0Aainfix <=c0V9FIainfix <=c0ainfix -V0c1Aainfix =agetV1V10c0Iainfix <V10V0Aainfix <=c0V10FIainfix >c0ainfix -V0c1FF">
     <label
-     name="expl:parameter set_zeros">
-     </label>
+     name="expl:parameter set_zeros"/>
     <transf
      name="split_goal"
      proved="true"
      expanded="true">
      <goal
       name="WP_parameter set_zeros.1"
-      locfile="programs/zeros/../zeros.mlw"
+      locfile="./programs/zeros/../zeros.mlw"
       loclnum="7" loccnumb="6" loccnume="15"
       expl="normal postcondition"
       sum="9d26dd172843a5d22e88fda1e66907bb"
@@ -50,8 +49,7 @@
       expanded="true"
       shape="ainfix =agetV1V2c0Iainfix <V2V0Aainfix <=c0V2FIainfix >c0ainfix -V0c1FF">
       <label
-       name="expl:parameter set_zeros">
-       </label>
+       name="expl:parameter set_zeros"/>
       <proof
        prover="0"
        timelimit="10"
@@ -62,7 +60,7 @@
      </goal>
      <goal
       name="WP_parameter set_zeros.2"
-      locfile="programs/zeros/../zeros.mlw"
+      locfile="./programs/zeros/../zeros.mlw"
       loclnum="7" loccnumb="6" loccnume="15"
       expl="for loop initialization"
       sum="827f6a586793ed332eb3a0ffac4db1a2"
@@ -70,8 +68,7 @@
       expanded="true"
       shape="ainfix =agetV1V2c0Iainfix <V2c0Aainfix <=c0V2FIainfix <=c0ainfix -V0c1FF">
       <label
-       name="expl:parameter set_zeros">
-       </label>
+       name="expl:parameter set_zeros"/>
       <proof
        prover="0"
        timelimit="10"
@@ -82,7 +79,7 @@
      </goal>
      <goal
       name="WP_parameter set_zeros.3"
-      locfile="programs/zeros/../zeros.mlw"
+      locfile="./programs/zeros/../zeros.mlw"
       loclnum="7" loccnumb="6" loccnume="15"
       expl="for loop preservation"
       sum="078f1651fe9e17b8b7e9d01a22d454a5"
@@ -90,8 +87,7 @@
       expanded="true"
       shape="ainfix =agetV4V5c0Iainfix <V5ainfix +V3c1Aainfix <=c0V5FIainfix =V4asetV2V3c0FAainfix <V3V0Aainfix <=c0V3Iainfix =agetV2V6c0Iainfix <V6V3Aainfix <=c0V6FIainfix <=V3ainfix -V0c1Aainfix <=c0V3FFIainfix <=c0ainfix -V0c1FF">
       <label
-       name="expl:parameter set_zeros">
-       </label>
+       name="expl:parameter set_zeros"/>
       <proof
        prover="2"
        timelimit="10"
@@ -109,7 +105,7 @@
      </goal>
      <goal
       name="WP_parameter set_zeros.4"
-      locfile="programs/zeros/../zeros.mlw"
+      locfile="./programs/zeros/../zeros.mlw"
       loclnum="7" loccnumb="6" loccnume="15"
       expl="normal postcondition"
       sum="d4146da4eacf17e4f4989f4cdac1ebc9"
@@ -117,8 +113,7 @@
       expanded="true"
       shape="ainfix =agetV2V3c0Iainfix <V3V0Aainfix <=c0V3FIainfix =agetV2V4c0Iainfix <V4ainfix +ainfix -V0c1c1Aainfix <=c0V4FFIainfix <=c0ainfix -V0c1FF">
       <label
-       name="expl:parameter set_zeros">
-       </label>
+       name="expl:parameter set_zeros"/>
       <proof
        prover="0"
        timelimit="10"
@@ -131,7 +126,7 @@
    </goal>
    <goal
     name="WP_parameter harness"
-    locfile="programs/zeros/../zeros.mlw"
+    locfile="./programs/zeros/../zeros.mlw"
     loclnum="15" loccnumb="6" loccnume="13"
     expl="parameter harness"
     sum="3f99b549727200f93484077a8fd5b49e"
@@ -139,15 +134,14 @@
     expanded="true"
     shape="ainfix =agetV0c12c0Aainfix =c42c42Iainfix =agetV0V1c0Iainfix <V1c42Aainfix <=c0V1FFAainfix >=c42c0">
     <label
-     name="expl:parameter harness">
-     </label>
+     name="expl:parameter harness"/>
     <transf
      name="split_goal"
      proved="true"
      expanded="true">
      <goal
       name="WP_parameter harness.1"
-      locfile="programs/zeros/../zeros.mlw"
+      locfile="./programs/zeros/../zeros.mlw"
       loclnum="15" loccnumb="6" loccnume="13"
       expl="precondition"
       sum="bbac29da4519e9e339e7bcfb195fe06f"
@@ -155,8 +149,7 @@
       expanded="true"
       shape="ainfix >=c42c0">
       <label
-       name="expl:parameter harness">
-       </label>
+       name="expl:parameter harness"/>
       <proof
        prover="0"
        timelimit="10"
@@ -167,7 +160,7 @@
      </goal>
      <goal
       name="WP_parameter harness.2"
-      locfile="programs/zeros/../zeros.mlw"
+      locfile="./programs/zeros/../zeros.mlw"
       loclnum="15" loccnumb="6" loccnume="13"
       expl="assertion"
       sum="bf2dafa6e083cc239d05af56eb4c552b"
@@ -175,8 +168,7 @@
       expanded="true"
       shape="ainfix =c42c42Iainfix =agetV0V1c0Iainfix <V1c42Aainfix <=c0V1FFIainfix >=c42c0">
       <label
-       name="expl:parameter harness">
-       </label>
+       name="expl:parameter harness"/>
       <proof
        prover="0"
        timelimit="10"
@@ -187,7 +179,7 @@
      </goal>
      <goal
       name="WP_parameter harness.3"
-      locfile="programs/zeros/../zeros.mlw"
+      locfile="./programs/zeros/../zeros.mlw"
       loclnum="15" loccnumb="6" loccnume="13"
       expl="assertion"
       sum="6768c0febac8f920608c49491354e13b"
@@ -195,8 +187,7 @@
       expanded="true"
       shape="ainfix =agetV0c12c0Iainfix =c42c42Iainfix =agetV0V1c0Iainfix <V1c42Aainfix <=c0V1FFIainfix >=c42c0">
       <label
-       name="expl:parameter harness">
-       </label>
+       name="expl:parameter harness"/>
       <proof
        prover="0"
        timelimit="10"

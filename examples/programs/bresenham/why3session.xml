@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "why3session.dtd">
+<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
 <why3session
- name="programs/bresenham/why3session.xml">
+ name="./programs/bresenham/why3session.xml">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -24,13 +24,13 @@
   expanded="false">
   <theory
    name="WP M"
-   locfile="programs/bresenham/../bresenham.mlw"
+   locfile="./programs/bresenham/../bresenham.mlw"
    loclnum="3" loccnumb="7" loccnume="8"
    verified="true"
    expanded="true">
    <goal
     name="invariant_is_ok"
-    locfile="programs/bresenham/../bresenham.mlw"
+    locfile="./programs/bresenham/../bresenham.mlw"
     loclnum="35" loccnumb="8" loccnume="23"
     sum="a41fe1b98a28097af423bd38a00a4a22"
     proved="true"
@@ -47,7 +47,7 @@
    </goal>
    <goal
     name="WP_parameter bresenham"
-    locfile="programs/bresenham/../bresenham.mlw"
+    locfile="./programs/bresenham/../bresenham.mlw"
     loclnum="37" loccnumb="6" loccnume="15"
     expl="parameter bresenham"
     sum="e81d7be5695705ac002d51a9e58f8740"
@@ -55,15 +55,14 @@
     expanded="true"
     shape="iainfix <V0c0ainfix <ainfix -ainfix +ax2c1V4ainfix -ainfix +ax2c1V2Aainfix <=c0ainfix -ainfix +ax2c1V2Aainvariant_V4V1V3Aainfix <=V4ainfix +ax2c1Aainfix <=c0V4Iainfix =V4ainfix +V2c1FIainfix =V3ainfix +V0ainfix *c2ay2Fainfix <ainfix -ainfix +ax2c1V7ainfix -ainfix +ax2c1V2Aainfix <=c0ainfix -ainfix +ax2c1V2Aainvariant_V7V5V6Aainfix <=V7ainfix +ax2c1Aainfix <=c0V7Iainfix =V7ainfix +V2c1FIainfix =V6ainfix +V0ainfix *c2ainfix -ay2ax2FIainfix =V5ainfix +V1c1FAabestV2V1Iainfix <=V2ax2Iainvariant_V2V1V0Aainfix <=V2ainfix +ax2c1Aainfix <=c0V2FFFAainvariant_c0c0ainfix -ainfix *c2ay2ax2Aainfix <=c0ainfix +ax2c1Aainfix <=c0c0">
     <label
-     name="expl:parameter bresenham">
-     </label>
+     name="expl:parameter bresenham"/>
     <transf
      name="split_goal"
      proved="true"
      expanded="true">
      <goal
       name="WP_parameter bresenham.1"
-      locfile="programs/bresenham/../bresenham.mlw"
+      locfile="./programs/bresenham/../bresenham.mlw"
       loclnum="37" loccnumb="6" loccnume="15"
       expl="loop invariant init"
       sum="21b9401dda4709bd596536dc4dddd7ad"
@@ -71,8 +70,7 @@
       expanded="true"
       shape="ainvariant_c0c0ainfix -ainfix *c2ay2ax2Aainfix <=c0ainfix +ax2c1Aainfix <=c0c0">
       <label
-       name="expl:parameter bresenham">
-       </label>
+       name="expl:parameter bresenham"/>
       <proof
        prover="3"
        timelimit="10"
@@ -97,7 +95,7 @@
      </goal>
      <goal
       name="WP_parameter bresenham.2"
-      locfile="programs/bresenham/../bresenham.mlw"
+      locfile="./programs/bresenham/../bresenham.mlw"
       loclnum="37" loccnumb="6" loccnume="15"
       expl="assertion"
       sum="91145413bdada19d5a3375d503b40e45"
@@ -105,8 +103,7 @@
       expanded="true"
       shape="abestV2V1Iainfix <=V2ax2Iainvariant_V2V1V0Aainfix <=V2ainfix +ax2c1Aainfix <=c0V2FFF">
       <label
-       name="expl:parameter bresenham">
-       </label>
+       name="expl:parameter bresenham"/>
       <proof
        prover="1"
        timelimit="10"
@@ -124,7 +121,7 @@
      </goal>
      <goal
       name="WP_parameter bresenham.3"
-      locfile="programs/bresenham/../bresenham.mlw"
+      locfile="./programs/bresenham/../bresenham.mlw"
       loclnum="37" loccnumb="6" loccnume="15"
       expl="loop invariant preservation"
       sum="e41a96093c7cff6e48b6c79b25b5f771"
@@ -132,8 +129,7 @@
       expanded="true"
       shape="ainvariant_V4V1V3Aainfix <=V4ainfix +ax2c1Aainfix <=c0V4Iainfix =V4ainfix +V2c1FIainfix =V3ainfix +V0ainfix *c2ay2FIainfix <V0c0IabestV2V1Iainfix <=V2ax2Iainvariant_V2V1V0Aainfix <=V2ainfix +ax2c1Aainfix <=c0V2FFF">
       <label
-       name="expl:parameter bresenham">
-       </label>
+       name="expl:parameter bresenham"/>
       <proof
        prover="3"
        timelimit="10"
@@ -151,7 +147,7 @@
      </goal>
      <goal
       name="WP_parameter bresenham.4"
-      locfile="programs/bresenham/../bresenham.mlw"
+      locfile="./programs/bresenham/../bresenham.mlw"
       loclnum="37" loccnumb="6" loccnume="15"
       expl="loop variant decreases"
       sum="73b18dd18f1f9177121aceab9d4e8d7f"
@@ -159,8 +155,7 @@
       expanded="true"
       shape="ainfix <ainfix -ainfix +ax2c1V4ainfix -ainfix +ax2c1V2Aainfix <=c0ainfix -ainfix +ax2c1V2Iainvariant_V4V1V3Aainfix <=V4ainfix +ax2c1Aainfix <=c0V4Iainfix =V4ainfix +V2c1FIainfix =V3ainfix +V0ainfix *c2ay2FIainfix <V0c0IabestV2V1Iainfix <=V2ax2Iainvariant_V2V1V0Aainfix <=V2ainfix +ax2c1Aainfix <=c0V2FFF">
       <label
-       name="expl:parameter bresenham">
-       </label>
+       name="expl:parameter bresenham"/>
       <proof
        prover="3"
        timelimit="10"
@@ -185,7 +180,7 @@
      </goal>
      <goal
       name="WP_parameter bresenham.5"
-      locfile="programs/bresenham/../bresenham.mlw"
+      locfile="./programs/bresenham/../bresenham.mlw"
       loclnum="37" loccnumb="6" loccnume="15"
       expl="loop invariant preservation"
       sum="9e566fd33cabca8c229cf3064fd39aaa"
@@ -193,8 +188,7 @@
       expanded="true"
       shape="ainvariant_V5V3V4Aainfix <=V5ainfix +ax2c1Aainfix <=c0V5Iainfix =V5ainfix +V2c1FIainfix =V4ainfix +V0ainfix *c2ainfix -ay2ax2FIainfix =V3ainfix +V1c1FIainfix <V0c0NIabestV2V1Iainfix <=V2ax2Iainvariant_V2V1V0Aainfix <=V2ainfix +ax2c1Aainfix <=c0V2FFF">
       <label
-       name="expl:parameter bresenham">
-       </label>
+       name="expl:parameter bresenham"/>
       <proof
        prover="3"
        timelimit="10"
@@ -212,7 +206,7 @@
      </goal>
      <goal
       name="WP_parameter bresenham.6"
-      locfile="programs/bresenham/../bresenham.mlw"
+      locfile="./programs/bresenham/../bresenham.mlw"
       loclnum="37" loccnumb="6" loccnume="15"
       expl="loop variant decreases"
       sum="ee16e7f8f842af49b76a5d3f67df00aa"
@@ -220,8 +214,7 @@
       expanded="true"
       shape="ainfix <ainfix -ainfix +ax2c1V5ainfix -ainfix +ax2c1V2Aainfix <=c0ainfix -ainfix +ax2c1V2Iainvariant_V5V3V4Aainfix <=V5ainfix +ax2c1Aainfix <=c0V5Iainfix =V5ainfix +V2c1FIainfix =V4ainfix +V0ainfix *c2ainfix -ay2ax2FIainfix =V3ainfix +V1c1FIainfix <V0c0NIabestV2V1Iainfix <=V2ax2Iainvariant_V2V1V0Aainfix <=V2ainfix +ax2c1Aainfix <=c0V2FFF">
       <label
-       name="expl:parameter bresenham">
-       </label>
+       name="expl:parameter bresenham"/>
       <proof
        prover="3"
        timelimit="10"
