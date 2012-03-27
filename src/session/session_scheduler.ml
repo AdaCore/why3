@@ -343,21 +343,24 @@ let run_external_proof eS eT ?callback a =
     (* info_window `ERROR "Proof already in progress" *)
     let ap = a.proof_prover in
     match find_loadable_prover eS a.proof_prover with
-      | None -> Debug.dprintf debug
-        "[Info] Can't redo an external proof since the prover %a is not \
-loaded@."
-        Whyconf.print_prover a.proof_prover
+      | None -> 
+        Debug.dprintf debug
+          "[Info] Can't redo an external proof since the prover %a is not loaded@."
+          Whyconf.print_prover a.proof_prover;
+        Util.apply_option2 () callback a a.proof_state 
       | Some (nap,npc) ->
-        eprintf "prover %a on goal %s@."
-          Whyconf.print_prover a.proof_prover a.proof_parent.goal_name.Ident.id_string;
+        (* eprintf "prover %a on goal %s@." *)
+        (*   Whyconf.print_prover a.proof_prover a.proof_parent.goal_name.Ident.id_string; *)
         let g = a.proof_parent in
         try
           if nap == ap then raise Not_found;
           let np_a = PHprover.find g.goal_external_proofs nap in
-          if O.replace_prover np_a a then begin
+          if O.replace_prover np_a a then 
+            begin
             (** The notification will be done by the new proof_attempt *)
-            O.remove np_a.proof_key;
-            raise Not_found end
+              O.remove np_a.proof_key;
+              raise Not_found 
+            end
         with Not_found ->
           (** replace [a] by a new_proof attempt if [a.proof_prover] was not
               loadable *)
@@ -366,12 +369,17 @@ loaded@."
             let a = copy_external_proof
               ~notify ~keygen:O.create ~prover:nap ~env_session:eS a in
             O.init a.proof_key (Proof_attempt a);
-            a in
+            a 
+        in
         if a.proof_edited_as = None &&
           npc.prover_config.Whyconf.interactive then
-          set_proof_state ~notify ~obsolete:false ~archived:false
-            (Undone Unedited) a
-        else begin
+          begin
+            set_proof_state ~notify ~obsolete:false ~archived:false
+              (Undone Unedited) a;
+            Util.apply_option2 () callback a a.proof_state
+          end
+        else 
+          begin
           let previous_result,previous_obs = a.proof_state,a.proof_obsolete in
           let timelimit =
             match previous_result with
@@ -407,7 +415,7 @@ loaded@."
           let command =
             String.concat " " (npc.prover_config.Whyconf.command ::
                                  npc.prover_config.Whyconf.extra_options) in
-          eprintf "scheduling it...@.";
+          (* eprintf "scheduling it...@."; *)
           schedule_proof_attempt
             ~timelimit ~memlimit:0
             ?old ~command
@@ -674,12 +682,20 @@ let check_all eS eT ~callback =
 (***********************************)
 
 let rec play_on_goal_and_children eS eT ~timelimit todo l g =
+  let callback _key status = 
+    match status with
+      | Undone Running | Undone Scheduled -> ()
+      |  _ ->
+        Todo._done todo ();
+        (* eprintf "todo decreased to %d@." todo.Todo.todo *)
+  in
   List.iter
     (fun p -> 
       Todo.todo todo;
-      eprintf "prover %a on goal %s@."
-        Whyconf.print_prover p g.goal_name.Ident.id_string;
-      prover_on_goal eS eT ~timelimit p g)
+      (* eprintf "todo increased to %d@." todo.Todo.todo; *)
+      (* eprintf "prover %a on goal %s@." *)
+      (*   Whyconf.print_prover p g.goal_name.Ident.id_string; *)
+      prover_on_goal eS eT ~callback ~timelimit p g)
     l;
   PHstr.iter
     (fun _ t ->

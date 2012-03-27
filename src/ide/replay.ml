@@ -375,12 +375,15 @@ let run_as_bench env_session =
   let sched =
     M.init (Whyconf.running_provers_max (Whyconf.get_main config))
   in
-  eprintf "Provers:@.";
+  eprintf "Provers:@ ";
   let provers = 
     Whyconf.Mprover.fold
       (fun _ p acc -> 
-        eprintf "prover: %a@." Whyconf.print_prover p.Whyconf.prover;
-        p.Whyconf.prover :: acc)
+        if p.Whyconf.interactive then acc else
+          begin
+            eprintf "%a@ " Whyconf.print_prover p.Whyconf.prover;
+            p.Whyconf.prover :: acc
+          end)
       (Whyconf.get_provers env_session.Session.whyconf) []
 (*
     Session.PHprover.fold
@@ -394,8 +397,11 @@ let run_as_bench env_session =
       env_session.Session.loaded_provers []
 *)
   in
+  eprintf "@.";
   let callback () =
-    eprintf "We should now save the session...@.";
+    eprintf "Saving session...@?";
+    Session.save_session config env_session.Session.session;
+    eprintf " done.@.";
     exit 0
   in
   M.play_all env_session sched ~callback ~timelimit:2 provers;

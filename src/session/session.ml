@@ -329,7 +329,7 @@ let save_status fmt s =
         fprintf fmt "<undone/>@\n"
     | InternalFailure msg ->
         fprintf fmt "<internalfailure reason=\"%s\"/>@\n"
-          (Printexc.to_string msg)
+          (String.escaped (Printexc.to_string msg))
     | Done r -> save_result fmt r
 
 
