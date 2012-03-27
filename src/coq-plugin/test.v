@@ -7,12 +7,56 @@ Ltac ae := why3 "alt-ergo".
 Ltac Z3 := why3 "z3-2".
 Ltac spass := why3 "spass".
 
-Inductive sorted (a:Set) : list a -> Prop :=
-  c: sorted _ (@nil a)
-| d: forall x: a, sorted _ (cons x nil).
+Definition t (a:Type) := list a.
+
+Inductive foo : Set :=
+  | OO : foo
+  | SS : forall x:nat, p x -> foo
+with p : nat -> Prop :=
+  | cc : p O.
+
+Goal p O.
+ae.
+
+Inductive foo : nat -> Prop :=
+  c : bar O -> foo O
+with bar : nat -> Prop :=
+  d : forall f:nat->nat, bar (f O).
+
+Goal foo O.
+ae.
+
+Parameter f : (nat -> nat) -> nat.
+
+Goal f (plus O) = f (plus O).
+ae.
+Qed.
 
 
-Goal sorted _ (@nil Z).
+Section S.
+
+Variable a:Set.
+
+Inductive sorted : list a -> Prop :=
+  c: sorted (@nil a)
+| d: forall x: a, sorted (cons x nil).
+
+Variable f : a -> a.
+
+Goal forall x: a, f (f x) = f x -> f (f (f x)) = f x.
+intros.
+ae.
+Qed.
+
+Goal forall l: list a, l=l.
+ae.
+Qed.
+
+End S.
+
+Print sorted.
+
+Goal sorted _ (@nil nat).
 ae.
 
 

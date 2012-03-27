@@ -185,7 +185,7 @@ let decomp_type_lambdas tvm env vars t =
         let tvm = Idmap.add id (Ty.ty_var tv) tvm in
         loop tvm env vars t
     | _ ->
-        assert false (*TODO: eta-expansion*)
+        raise NotFO (*TODO: eta-expansion*)
   in
   loop tvm env vars t
 
@@ -196,6 +196,10 @@ let decompose_arrows =
     | _ -> List.rev l, c
   in
   arrows_rec []
+
+let is_fo_kind ty =
+  let _, ty = decompose_arrows ty in
+  is_Set ty || is_Type ty
 
 let decomp_lambdas _dep _tvm bv env vars t =
   let rec loop bv vsl env vars t = match vars, kind_of_term t with
@@ -208,11 +212,9 @@ let decomp_lambdas _dep _tvm bv env vars t =
         let bv = Idmap.add id vs bv in
         loop bv (vs :: vsl) env vars t
     | _ ->
-        assert false (*TODO: eta-expansion*)
+        raise NotFO (*TODO: eta-expansion*)
   in
   loop bv [] env vars t
-
-
 
 let rec skip_k_args k cl = match k, cl with
   | 0, _ -> cl
@@ -428,8 +430,17 @@ and tr_global_ts dep env r =
     add_table global_ts r None;
     let dep' = empty_dep () in
     match r with
-      | VarRef _id ->
-          assert false (*TODO*)
+      | VarRef id ->
+          let ty = Global.type_of_global r in
+          let (_,vars), _, t = decomp_type_quantifiers env ty in
+          if not (is_Set t) && not (is_Type t) then raise NotFO;
+          let id = preid_of_id id in
+          let ts = Ty.create_tysymbol id vars None in
+          let decl = Decl.create_ty_decl ts in
+          add_table global_ts r (Some ts);
+          global_decl := Ident.Mid.add ts.ts_name decl !global_decl;
+          global_dep := Decl.Mdecl.add decl !dep' !global_dep;
+          ts
       | ConstructRef _ ->
           assert false
       | ConstRef c ->
@@ -540,26 +551,68 @@ and tr_global_ls dep env r =
           ignore (tr_type dep' tvm env t);
           lookup_table global_ls r
       | ConstRef c ->
-          let decl = decompose_definition dep' env c in
-          add_dep dep decl;
-          Ident.Sid.iter
-            (fun id ->
-               global_decl := Ident.Mid.add id decl !global_decl)
-            decl.Decl.d_news;
-          global_dep := Decl.Mdecl.add decl !dep' !global_dep;
+          let pl, d = decompose_definition dep' env c in
+          let add decl =
+            add_dep dep decl;
+            Ident.Sid.iter
+              (fun id ->
+                global_decl := Ident.Mid.add id decl !global_decl)
+              decl.Decl.d_news;
+            global_dep := Decl.Mdecl.add decl !dep' !global_dep;
+          in
+          List.iter add pl;
+          List.iter (add_dep dep') pl;
+          Util.option_iter add d;
           lookup_table global_ls r
       | IndRef i ->
           assert (is_Prop t);
-          let decl = decompose_inductive dep' env i in
+          let pl, d = decompose_inductive dep' env i in
+          let add decl =
+            add_dep dep decl;
+            Ident.Sid.iter
+              (fun id ->
+                global_decl := Ident.Mid.add id decl !global_decl)
+              decl.Decl.d_news;
+            global_dep := Decl.Mdecl.add decl !dep' !global_dep
+          in
+          List.iter add pl;
+          List.iter (add_dep dep') pl;
+          Util.option_iter add d;
+          lookup_table global_ls r
+      | VarRef _ ->
+          make_one_ls dep' env r;
+          let ls = lookup_table global_ls r in
+          let decl = Decl.create_param_decl ls in
           add_dep dep decl;
           Ident.Sid.iter
             (fun id ->
                global_decl := Ident.Mid.add id decl !global_decl)
             decl.Decl.d_news;
           global_dep := Decl.Mdecl.add decl !dep' !global_dep;
-          lookup_table global_ls r
-      | VarRef _ ->
-          raise NotFO
+          ls
+
+and make_one_ls dep env r =
+  let ty = Global.type_of_global r in
+  let (tvm, vars), env, t = decomp_type_quantifiers env ty in
+  if is_Set t || is_Type t then raise NotFO;
+  let l, t = decompose_arrows t in
+  let args = List.map (tr_type dep tvm env) l in
+  let ls =
+    let id = preid_of_id (Nametab.basename_of_global r) in
+    if is_Prop t then
+        (* predicate definition *)
+      create_lsymbol id args None
+    else
+      let s = type_of env Evd.empty t in
+      if is_Set s || is_Type s then
+          (* function definition *)
+        let ty = tr_type dep tvm env t in
+        create_lsymbol id args (Some ty)
+      else
+        raise NotFO
+  in
+  add_table global_ls r (Some ls);
+  add_poly_arity ls (List.length vars)
 
 and decompose_definition dep env c =
   let dl = match (Global.lookup_constant c).const_body with
@@ -589,30 +642,7 @@ and decompose_definition dep env c =
         in
         decomp [] b
   in
-  let make_one_ls r =
-    let ty = Global.type_of_global r in
-    let (tvm, vars), env, t = decomp_type_quantifiers env ty in
-    if is_Set t || is_Type t then raise NotFO;
-    let l, t = decompose_arrows t in
-    let args = List.map (tr_type dep tvm env) l in
-    let ls =
-      let id = preid_of_id (Nametab.basename_of_global r) in
-      if is_Prop t then
-        (* predicate definition *)
-        create_lsymbol id args None
-      else
-        let s = type_of env Evd.empty t in
-        if is_Set s || is_Type s then
-          (* function definition *)
-          let ty = tr_type dep tvm env t in
-          create_lsymbol id args (Some ty)
-        else
-          raise NotFO
-    in
-    add_table global_ls r (Some ls);
-    add_poly_arity ls (List.length vars)
-  in
-  List.iter (fun (r, _) -> make_one_ls r) dl;
+  List.iter (fun (r, _) -> make_one_ls dep env r) dl;
   let make_one_decl (r, b) =
     let ls = lookup_table global_ls r in
     match b with
@@ -641,10 +671,17 @@ and decompose_definition dep env c =
           end
   in
   match dl with
-    | [r,None] ->
-        Decl.create_param_decl (lookup_table global_ls r)
+    | [r, None] ->
+        [Decl.create_param_decl (lookup_table global_ls r)], None
     | _ ->
-        Decl.create_logic_decl (List.map make_one_decl dl)
+        let add (r, _ as d) (pl, dl) =
+          try
+            pl, make_one_decl d :: dl
+          with NotFO ->
+            Decl.create_param_decl (lookup_table global_ls r) :: pl, dl
+        in
+        let pl, dl = List.fold_right add dl ([], []) in
+        pl, if dl = [] then None else Some (Decl.create_logic_decl dl)
 
 and decompose_inductive dep env i =
   let mib, _ = Global.lookup_inductive i in
@@ -685,12 +722,19 @@ and decompose_inductive dep env i =
       let pr = Decl.create_prsymbol id in
       pr, f
     in
-    let cl = Array.to_list (Array.mapi mk_constructor oib.mind_nf_lc) in
+    let cl =
+      try Array.to_list (Array.mapi mk_constructor oib.mind_nf_lc)
+      with NotFO -> []
+    in
     ls, cl
   in
-  let decl = Array.mapi make_one mib.mind_packets in
-  let decl = Array.to_list decl in
-  Decl.create_ind_decl decl
+  let dl = Array.mapi make_one mib.mind_packets in
+  let dl = Array.to_list dl in
+  let add (ls, cl as d) (pl, dl) =
+    if cl = [] then Decl.create_param_decl ls :: pl, dl else pl, d :: dl
+  in
+  let pl, dl = List.fold_right add dl ([], []) in
+  pl, if dl = [] then None else Some (Decl.create_ind_decl dl)
 
 (* translation of a Coq term
    assumption: t:T:Set *)
@@ -768,7 +812,7 @@ and tr_term dep tvm bv env t =
         let _ty = tr_type dep tvm env ty in
         t_case e (Array.to_list (Array.mapi branch br))
     | LetIn (x, e1, ty1, e2) ->
-        if is_Prop ty1 || is_Set ty1 || is_Type ty1 then
+        if is_Prop ty1 || is_fo_kind ty1 then
           let e2 = subst1 e1 e2 in
           tr_term dep tvm bv env e2
         else begin
@@ -940,13 +984,19 @@ and tr_formula dep tvm bv env f = match kind_of_term f with
           raise NotFO
       end
 
+let is_global_var id =
+  try ignore (Environ.lookup_named id (Global.env ())); true
+  with Not_found -> false
+
 let tr_goal gl =
   let env = pf_env gl in
   let dep = empty_dep () in
   let rec tr_ctxt tvm bv = function
     | [] ->
         tr_formula dep tvm bv env (pf_concl gl)
-    | (id, None, ty) :: ctxt when is_Set ty || is_Type ty ->
+    | (id, _, _) :: ctxt when is_global_var id ->
+        tr_ctxt tvm bv ctxt
+    | (id, None, ty) :: ctxt when is_fo_kind ty ->
         let v = Ty.create_tvsymbol (preid_of_id id) in
         let tvm = Idmap.add id (Ty.ty_var v) tvm in
         tr_ctxt tvm bv ctxt
@@ -987,11 +1037,59 @@ let tr_goal gl =
 
 let () = Printexc.record_backtrace true
 
+let tr_top_decl = function
+  | (sp, kn as _oname), Lib.Leaf lobj ->
+    let dep = empty_dep () in
+    let env = Global.env () in
+    let tvm = Idmap.empty in
+    let bv = Idmap.empty in
+    let id = Ident.id_fresh (string_of_id (Libnames.basename sp)) in
+Format.printf "tr_top_decl: %s@." (string_of_id (Libnames.basename sp));
+    begin try match Libobject.object_tag lobj with
+      | "VARIABLE" ->
+          assert false (*TODO*)
+      | "CONSTANT" ->
+          let c = constant_of_kn kn in
+Format.printf "ICI@.";
+          let r = ConstRef c in
+          let c = constr_of_reference r in
+Format.printf "ICI 2 @.";
+          let ty = type_of env Evd.empty c in
+          if is_fo_kind ty then
+            ignore (tr_task_ts (empty_dep ()) env r)
+          else
+            let t = type_of env Evd.empty ty in
+            if is_Set t || is_Type t then
+              ignore (tr_task_ls (empty_dep ()) env r)
+            else if is_Prop t then
+              let f = tr_formula dep tvm bv env ty in
+              let pr = Decl.create_prsymbol id in
+              task := Task.add_prop_decl !task Decl.Paxiom pr f
+            else
+              raise NotFO
+      | "INDUCTIVE" ->
+          () (*TODO*)
+      | _ ->
+          ()
+      with NotFO -> ()
+    end
+  | _, Lib.CompilingLibrary _
+  | _, Lib.OpenedModule _
+  | _, Lib.ClosedModule  _
+  | _, Lib.OpenedModtype _
+  | _, Lib.ClosedModtype _
+  | _, Lib.OpenedSection _
+  | _, Lib.ClosedSection _
+  | _, Lib.FrozenState _ -> ()
+
 let whytac s gl =
   (* print_dep Format.err_formatter; *)
   let concl_type = pf_type_of gl (pf_concl gl) in
   if not (is_Prop concl_type) then error "Conclusion is not a Prop";
   task := Task.use_export None Theory.builtin_theory;
+  (* add global declarations from module Top *)
+  List.iter tr_top_decl (Lib.contents_after None);
+  (* then translate the goal *)
   try
     tr_goal gl;
     let cp, drv = get_prover s in
@@ -1012,6 +1110,7 @@ let whytac s gl =
     | NotFO ->
         error "Not a first order goal"
     | e ->
+        Format.eprintf "@[exception: %a@]@." Exn_printer.exn_printer e;
         Printexc.print_backtrace stderr;
         raise e
 
