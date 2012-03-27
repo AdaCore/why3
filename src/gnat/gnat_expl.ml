@@ -100,3 +100,12 @@ module HExpl = Hashtbl.Make (struct
    let hash = Hashtbl.hash
 end)
 
+let mk_loc fn l c =
+   { file = fn; line = l; col = c }
+
+let mk_loc_line fn l = mk_loc fn l 0
+
+let equal_line l1 l2 =
+   l1.line = l2.line && l1.file = l2.file
+
+let get_loc e = e.loc

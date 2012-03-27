@@ -416,9 +416,15 @@ let _ =
       if Gnat_config.verbose then begin
          Objectives.stat ()
       end;
-      Objectives.iter (fun _ goalset ->
-         let g = GoalSet.choose goalset in
-         schedule_goal g);
+      Objectives.iter (fun e goalset ->
+         let filter =
+            match Gnat_config.limit_line with
+            | None -> true
+            | Some l -> Gnat_expl.equal_line l (Gnat_expl.get_loc e) in
+         if filter then begin
+            let g = GoalSet.choose goalset in
+            schedule_goal g
+         end);
       Scheduler.main_loop ();
       Session.save_session env_session.Session.session
     with e when not (Debug.test_flag Debug.stack_trace) ->

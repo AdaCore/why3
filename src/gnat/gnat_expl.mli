@@ -22,5 +22,14 @@ val print_skipped : Format.formatter -> expl -> unit
 val to_filename : expl -> string
 (* print a representation of an explanation that could serve as a filename *)
 
+type loc
+
+val mk_loc : string -> int -> int -> loc
+val mk_loc_line : string -> int -> loc
+val get_loc : expl -> loc
+
+val equal_line : loc -> loc -> bool
+(* compare two locations by file and line only, ignoring the column *)
+
 module MExpl : Stdlib.Map.S with type key = expl
 module HExpl : Hashtbl.S with type key = expl
