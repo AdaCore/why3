@@ -196,12 +196,12 @@ let print_results fmt provers proofs =
 		| Call_provers.Timeout ->
                   fprintf fmt "FF8000\">Timeout"
 		| Call_provers.Unknown _ ->
-                  fprintf fmt "FF8000\">Unknown"
+                  fprintf fmt "FF8000\">%.2f" res.Call_provers.pr_time
 		| _ ->
-                  fprintf fmt "Failure "
+                  fprintf fmt "FF8000\">Failure "
 	    end
-	  | _ -> fprintf fmt "Undone"
-      with Not_found -> fprintf fmt "E0E0E0\">"
+	  | _ -> fprintf fmt "E0E0E0\">Undone"
+      with Not_found -> fprintf fmt "E0E0E0\">---"
     end;
     fprintf fmt "</td>") provers
 
