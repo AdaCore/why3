@@ -205,25 +205,39 @@ let print_results fmt provers proofs =
     end;
     fprintf fmt "</td>") provers
 
+let rec num_lines acc tr =
+  List.fold_left
+    (fun acc g -> 1 + 
+      PHstr.fold (fun _ tr acc -> 1 + num_lines acc tr) 
+      g.goal_transformations acc)
+    acc tr.transf_goals
+
   let rec print_transf fmt depth max_depth provers tr =
     fprintf fmt "<tr>";
     for i=1 to 0 (* depth-1 *) do fprintf fmt "<td></td>" done;
-    fprintf fmt "<td bgcolor=\"#%a\">" (color_of_status ~dark:false) tr.S.transf_verified;
-    for i=1 to depth-1 do fprintf fmt "&nbsp;&nbsp;&nbsp;&nbsp;" done;
-    fprintf fmt "%s</td>" tr.transf_name;
+    fprintf fmt "<td bgcolor=\"#%a\" colspan=\"%d\">" 
+      (color_of_status ~dark:false) tr.S.transf_verified 
+      (max_depth - depth + 1);
+    (* for i=1 to depth-1 do fprintf fmt "&nbsp;&nbsp;&nbsp;&nbsp;" done; *)
+    fprintf fmt "%s</td>" tr.transf_name ;
     for i=1 (* depth *) to (*max_depth - 1 + *) List.length provers do
       fprintf fmt "<td bgcolor=\"#E0E0E0\"></td>"
     done;
     fprintf fmt "</tr>@\n";
-    List.iter
-      (print_goal fmt (depth+1) max_depth provers)
-      tr.transf_goals
+    fprintf fmt "<td rowspan=\"%d\">&nbsp;&nbsp;</td>" (num_lines 0 tr);
+    let (_:bool) = List.fold_left
+      (fun is_first g ->
+        print_goal fmt is_first (depth+1) max_depth provers g;
+        false)
+      true tr.transf_goals
+    in ()
 
-  and print_goal fmt depth max_depth provers g =
-    fprintf fmt "<tr>";
-    for i=1 to 0 (* depth-1 *) do fprintf fmt "<td></td>" done;
-    fprintf fmt "<td bgcolor=\"#%a\">" (color_of_status ~dark:false) g.S.goal_verified;
-    for i=1 to depth-1 do fprintf fmt "&nbsp;&nbsp;&nbsp;&nbsp;" done;
+  and print_goal fmt is_first depth max_depth provers g =
+    if not is_first then fprintf fmt "<tr>";
+    (* for i=1 to 0 (\* depth-1 *\) do fprintf fmt "<td></td>" done; *)
+    fprintf fmt "<td bgcolor=\"#%a\" colspan=\"%d\">" 
+      (color_of_status ~dark:false) g.S.goal_verified (max_depth - depth + 1);
+    (* for i=1 to depth-1 do fprintf fmt "&nbsp;&nbsp;&nbsp;&nbsp;" done; *)
     fprintf fmt "%s</td>" (S.goal_expl g);
 (*    for i=depth to max_depth-1 do fprintf fmt "<td></td>" done; *)
     print_results fmt provers g.goal_external_proofs;
@@ -246,15 +260,14 @@ let print_results fmt provers proofs =
       (color_of_status ~dark:true) th.S.theory_verified
       name (if th.S.theory_verified then "fully verified" else "not fully verified")
     ;
-(*
+
     fprintf fmt "<table border=\"1\"><tr><td colspan=\"%d\">Obligations</td>" depth;
-*)
-    fprintf fmt "<table border=\"1\"><tr><td>Obligations</td>";
+    (* fprintf fmt "<table border=\"1\"><tr><td>Obligations</td>"; *)
     List.iter
       (fun pr -> fprintf fmt "<td text-rotation=\"90\">%a</td>" print_prover pr)
       provers;
     fprintf fmt "</td></tr>@\n";
-    List.iter (print_goal fmt 1 depth provers) th.theory_goals;
+    List.iter (print_goal fmt true 1 depth provers) th.theory_goals;
     fprintf fmt "</table>@\n"
 
   let print_file fmt f =
