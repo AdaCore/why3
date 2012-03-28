@@ -61,10 +61,14 @@ let get_prover s =
 
 let print_constr fmt c = pp_with fmt (Termops.print_constr c)
 let print_tvm fmt m =
-  Idmap.iter (fun id tv -> Format.fprintf fmt "%s->%a@ "
+  Idmap.iter (fun id tv -> match tv with
+    | None -> Format.fprintf fmt "%s->not FO@ " (string_of_id id)
+    | Some tv -> Format.fprintf fmt "%s->%a@ "
                  (string_of_id id) Why3.Pretty.print_tv tv) m
 let print_bv fmt m =
-  Idmap.iter (fun id vs -> Format.fprintf fmt "%s->%a@ "
+  Idmap.iter (fun id vs -> match vs with
+    | None -> Format.fprintf fmt "%s->not FO@ " (string_of_id id)
+    | Some vs -> Format.fprintf fmt "%s->%a@ "
                  (string_of_id id) Why3.Pretty.print_vsty vs) m
 
 (* Coq constants *)
@@ -161,13 +165,13 @@ let rec_names_for c =
 let decomp_type_quantifiers env t =
   let rec loop vars t = match kind_of_term t with
     | Prod (n, a, t) when is_Set a || is_Type a ->
-        loop ((n,a) :: vars) t
+        loop ((n, a) :: vars) t
     | _ ->
         let vars, env = coq_rename_vars env vars in
         let t = substl (List.map mkVar vars) t in
         let add m id =
           let tv = Ty.create_tvsymbol (preid_of_id id) in
-          Idmap.add id (Ty.ty_var tv) m, tv
+          Idmap.add id (Some (Ty.ty_var tv)) m, tv
         in
         Util.map_fold_left add Idmap.empty vars, env, t
   in
@@ -182,7 +186,7 @@ let decomp_type_lambdas tvm env vars t =
     | tv :: vars, Lambda (n, a, t) when is_Set a || is_Type a ->
         let id, env = coq_rename_var env (n, a) in
         let t = subst1 (mkVar id) t in
-        let tvm = Idmap.add id (Ty.ty_var tv) tvm in
+        let tvm = Idmap.add id (Some (Ty.ty_var tv)) tvm in
         loop tvm env vars t
     | _ ->
         raise NotFO (*TODO: eta-expansion*)
@@ -209,7 +213,7 @@ let decomp_lambdas _dep _tvm bv env vars t =
         let id, env = coq_rename_var env (n, a) in
         let t = subst1 (mkVar id) t in
         let vs = create_vsymbol (preid_of_id id) ty in
-        let bv = Idmap.add id vs bv in
+        let bv = Idmap.add id (Some vs) bv in
         loop bv (vs :: vsl) env vars t
     | _ ->
         raise NotFO (*TODO: eta-expansion*)
@@ -401,13 +405,17 @@ let rec tr_type dep tvm env t =
     Ty.ty_real
   else match kind_of_term t with
     | Var x when Idmap.mem x tvm ->
-        Idmap.find x tvm
+        begin match Idmap.find x tvm with
+          | None -> raise NotFO
+          | Some ty -> ty
+        end
     | _ ->
         let f, cl = decompose_app t in
         begin try
           let r = global_of_constr f in
           let ts = tr_task_ts dep env r in
-          assert (List.length ts.Ty.ts_args = List.length cl); (* since t:Set *)
+          assert (List.length ts.Ty.ts_args = List.length cl);
+          (* since t:Set *)
           Ty.ty_app ts (List.map (tr_type dep tvm env) cl)
         with
           | Not_found ->
@@ -439,7 +447,7 @@ and tr_global_ts dep env r =
     let dep' = empty_dep () in
     match r with
       | VarRef id ->
-          let ty = Global.type_of_global r in
+          let ty = try Global.type_of_global r with Not_found -> raise NotFO in
           let (_,vars), _, t = decomp_type_quantifiers env ty in
           if not (is_Set t) && not (is_Type t) then raise NotFO;
           let id = preid_of_id id in
@@ -493,7 +501,7 @@ and tr_global_ts dep env r =
               let (_,vars), env, t = decomp_type_quantifiers env ty in
               let tvm =
                 let add v1 v2 tvm =
-                  let v2 = Ty.ty_var v2 in
+                  let v2 = Some (Ty.ty_var v2) in
                   Idmap.add (id_of_string v1.tv_name.Ident.id_string) v2 tvm
                 in
                 List.fold_right2 add vars ts.Ty.ts_args Idmap.empty
@@ -547,7 +555,8 @@ and tr_global_ls dep env r =
   with Not_found ->
     add_table global_ls r None;
     let dep' = empty_dep () in
-    let ty = Global.type_of_global r in
+    (* type_of_global may fail on a local, higher-order variable *)
+    let ty = try Global.type_of_global r with Not_found -> raise NotFO in
     let (tvm, _), env, t = decomp_type_quantifiers env ty in
     if is_Set t || is_Type t then raise NotFO;
     let _, t = decompose_arrows t in
@@ -687,7 +696,7 @@ and decompose_inductive dep env i =
       let (_,vars), env, f = decomp_type_quantifiers env ty in
       let tvm =
         let add v1 v2 tvm =
-          let v2 = Ty.ty_var v2 in
+          let v2 = Some (Ty.ty_var v2) in
           Idmap.add (id_of_string v1.tv_name.Ident.id_string) v2 tvm
         in
         List.fold_right2 add vars (get_poly_arity ls) Idmap.empty
@@ -762,10 +771,11 @@ and tr_term dep tvm bv env t =
         Term.fs_app ls [tr_term dep tvm bv env a] Ty.ty_real
           (* first-order terms *)
     | Var id when Idmap.mem id bv ->
-        Term.t_var (Idmap.find id bv)
-    | Var _ ->
-        (* Format.eprintf "tr_term: unbound variable %s@." (string_of_id id); *)
-        assert false
+        let vs = match Idmap.find id bv with
+          | None -> raise NotFO
+          | Some vs -> vs
+        in
+        Term.t_var vs
     | Case (ci, _, e, br) ->
         let ty = type_of env Evd.empty e in
         let ty = tr_type dep tvm env ty in
@@ -804,8 +814,13 @@ and tr_term dep tvm bv env t =
         assert false
     | Cast (t, _, _) ->
         tr_term dep tvm bv env t
-    | App _ | Construct _ | Ind _ | Const _ ->
+    | Var _ | App _ | Construct _ | Ind _ | Const _ ->
         let f, cl = decompose_app t in
+        (* a local variable cannot be applied (not FO) *)
+        begin match kind_of_term f with
+          | Var id when Idmap.mem id bv -> raise NotFO
+          | _ -> ()
+        end;
         let r = try global_of_constr f with _ -> raise NotFO in
         let ls = tr_task_ls dep env r in
         begin match ls.Term.ls_value with
@@ -841,7 +856,7 @@ and quantifiers n a b dep tvm bv env =
   let b = subst1 (mkVar id) b in
   let t = tr_type dep tvm env a in
   let vs = Term.create_vsymbol (preid_of_id id) t in
-  let bv = Idmap.add id vs bv in
+  let bv = Idmap.add id (Some vs) bv in
   vs, t, bv, env, b
 
 (* translation of a Coq formula
@@ -971,9 +986,12 @@ let tr_goal gl =
         tr_formula dep tvm bv env (pf_concl gl)
     | (id, _, _) :: ctxt when is_global_var id ->
         tr_ctxt tvm bv ctxt
-    | (id, None, ty) :: ctxt when is_fo_kind ty ->
+    | (id, None, ty) :: ctxt when is_Set ty || is_Type ty ->
         let v = Ty.create_tvsymbol (preid_of_id id) in
-        let tvm = Idmap.add id (Ty.ty_var v) tvm in
+        let tvm = Idmap.add id (Some (Ty.ty_var v)) tvm in
+        tr_ctxt tvm bv ctxt
+    | (id, None, ty) :: ctxt when is_fo_kind ty ->
+        let tvm = Idmap.add id None tvm in
         tr_ctxt tvm bv ctxt
     | (id, None, ty) :: ctxt ->
         let t = type_of env Evd.empty ty in
@@ -981,7 +999,7 @@ let tr_goal gl =
           if is_Set t || is_Type t then
             let ty = tr_type dep tvm env ty in (* DO NOT INLINE! *)
             let vs = Term.create_vsymbol (preid_of_id id) ty in
-            let bv = Idmap.add id vs bv in
+            let bv = Idmap.add id (Some vs) bv in
             Term.t_forall_close [vs] [] (tr_ctxt tvm bv ctxt)
           else if is_Prop t then
             let h = tr_formula dep tvm bv env ty in (* DO NOT INLINE! *)
@@ -989,6 +1007,7 @@ let tr_goal gl =
           else
             raise NotFO
         with NotFO ->
+          let bv = Idmap.add id None bv in
           tr_ctxt tvm bv ctxt
         end
     | (id, Some d, ty) :: ctxt ->
@@ -999,9 +1018,10 @@ let tr_goal gl =
           let d = tr_term dep tvm bv env d in
           let ty = tr_type dep tvm env ty in
           let vs = Term.create_vsymbol (preid_of_id id) ty in
-          let bv = Idmap.add id vs bv in
+          let bv = Idmap.add id (Some vs) bv in
           Term.t_let_close vs d (tr_ctxt tvm bv ctxt)
         with NotFO ->
+          let bv = Idmap.add id None bv in
           tr_ctxt tvm bv ctxt
         end
   in
@@ -1090,6 +1110,7 @@ let whytac s gl =
           error ("Prover failure\n" ^ res.pr_output ^ "\n")
   with
     | NotFO ->
+        if debug then Printexc.print_backtrace stderr; flush stderr;
         error "Not a first order goal"
     | e ->
         Printexc.print_backtrace stderr; flush stderr;

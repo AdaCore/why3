@@ -7,6 +7,19 @@ Ltac ae := why3 "alt-ergo".
 Ltac Z3 := why3 "z3-2".
 Ltac spass := why3 "spass".
 
+Section S0.
+  Variable a:Set->Set.
+
+  Goal forall b:Set->Set, forall x:a nat, x=x.
+    intros; ae.
+  Qed.
+
+Goal
+  forall f: (nat->nat)->nat, f S = O -> True.
+intros; ae.
+Qed.
+
+End S0.
 
 (* Mutually inductive types *)
 
@@ -139,6 +152,7 @@ Goal
   (forall x:t, p x -> p (let y := x+1 in y)) ->
   f -> p 1.
 ae.
+Qed.
 
 (* cast *)
 Goal
