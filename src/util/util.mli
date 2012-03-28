@@ -157,6 +157,8 @@ val padd_string : char -> string -> int -> string
 (* useful function on char *)
 val is_uppercase : char -> bool
 
+val colon_split : string -> string list
+
 (* Set and Map on ints and strings *)
 
 module Mint : Map.S with type key = int

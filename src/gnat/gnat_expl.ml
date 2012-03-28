@@ -13,7 +13,22 @@ type reason =
    | VC_Assert
 
 type loc  = { file : string; line : int ; col : int }
-type expl = { loc : loc ; reason : reason }
+
+
+type expl = { loc : loc ; reason : reason ; subp : loc }
+(* The subp field should not differentiate two otherwise equal explanations *)
+
+let expl_compare e1 e2 =
+   let c = Pervasives.compare e1.loc e2.loc in
+   if c = 0 then Pervasives.compare e1.reason e2.reason
+   else c
+
+let expl_equal e1 e2 =
+   e1.loc = e2.loc && e1.reason = e2.reason
+
+let expl_hash e =
+   Hashcons.combine (Hashtbl.hash e.loc) (Hashtbl.hash e.reason)
+
 
 let reason_from_string s =
    match s with
@@ -42,6 +57,18 @@ let string_of_reason s =
    | VC_Loop_Invariant_Preserv    -> "loop invariant preservation"
    | VC_Assert                    -> "assertion"
 
+
+let mk_loc fn l c =
+   { file = fn; line = l; col = c }
+
+let mk_loc_line fn l = mk_loc fn l 0
+
+let equal_line l1 l2 =
+   l1.line = l2.line && l1.file = l2.file
+
+let get_loc e = e.loc
+let get_subp_loc e = e.subp
+
 let to_filename expl =
    let s = string_of_reason expl.reason in
    for i = 0 to String.length s - 1 do
@@ -54,8 +81,9 @@ let loc_of_pos l =
    let f,l,c,_ = Loc.get l in
    { file = f; line = l; col = c }
 
-let expl_from_label_info pos gnat_expl why_expl =
+let expl_from_label_info pos gnat_expl why_expl subp line =
    let loc = loc_of_pos pos in
+   let subp_loc = mk_loc_line subp line in
    let reason = reason_from_string gnat_expl in
    let reason =
       if reason = VC_Loop_Invariant then
@@ -67,7 +95,7 @@ let expl_from_label_info pos gnat_expl why_expl =
             assert false
       else
          reason in
-   { loc = loc ; reason = reason }
+   { loc = loc ; reason = reason; subp = subp_loc }
 
 let print_loc fmt l =
    Format.fprintf fmt "%s:%d:%d" l.file l.line l.col
@@ -89,23 +117,14 @@ let print_skipped fmt p =
 
 module ExplCmp = struct
    type t = expl
-   let compare = Pervasives.compare
+   let compare = expl_compare
 end
 
 module MExpl = Stdlib.Map.Make(ExplCmp)
 module SExpl = MExpl.Set
 module HExpl = Hashtbl.Make (struct
    type t = expl
-   let equal = (=)
-   let hash = Hashtbl.hash
+   let equal = expl_equal
+
+   let hash = expl_hash
 end)
-
-let mk_loc fn l c =
-   { file = fn; line = l; col = c }
-
-let mk_loc_line fn l = mk_loc fn l 0
-
-let equal_line l1 l2 =
-   l1.line = l2.line && l1.file = l2.file
-
-let get_loc e = e.loc

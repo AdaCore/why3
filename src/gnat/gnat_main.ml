@@ -2,28 +2,35 @@ open Why3
 open Term
 open Ident
 
-let rec extract_explanation expl gnat s =
-   if Slab.is_empty s then expl, gnat
+let rec extract_explanation expl gnat subp line s =
+   if Slab.is_empty s then expl, gnat, subp, line
    else
       let x = Slab.choose s in
       let rest = Slab.remove x s in
       let x = x.lab_string in
       if Gnat_util.starts_with x "expl:" then
          let s = String.sub x 5 (String.length x - 5) in
-         extract_explanation s gnat rest
+         extract_explanation s gnat subp line rest
       else if Gnat_util.starts_with x "gnatprove:" then
-         let s = String.sub x 10 (String.length x - 10) in
-         extract_explanation expl s rest
+         let l = Util.colon_split x in
+         let gnat, subp, line =
+            match l with
+            | [_;gnat; subp; line] -> gnat, subp, int_of_string line
+            | _ -> gnat, subp, line in
+         extract_explanation expl gnat subp line rest
       else
-         extract_explanation expl gnat rest
+         extract_explanation expl gnat subp line rest
+
+let extract_explanation set =
+   extract_explanation "" "" "" 0 set
 
 let rec search_labels acc f =
    if acc <> None then acc
    else
-      let expl, gnat = extract_explanation "" "" f.t_label in
+      let expl, gnat, subp, line = extract_explanation f.t_label in
       if gnat <> "" then begin
          let pos = Util.of_option f.t_loc in
-         Some (Gnat_expl.expl_from_label_info pos gnat expl)
+         Some (Gnat_expl.expl_from_label_info pos gnat expl subp line)
       end else
          match f.t_node with
          | Ttrue | Tfalse | Tconst _ | Tvar _ | Tapp _  -> None
@@ -419,8 +426,12 @@ let _ =
       Objectives.iter (fun e goalset ->
          let filter =
             match Gnat_config.limit_line with
-            | None -> true
-            | Some l -> Gnat_expl.equal_line l (Gnat_expl.get_loc e) in
+            | Some l -> Gnat_expl.equal_line l (Gnat_expl.get_loc e)
+            | None ->
+                  match Gnat_config.limit_subp with
+                  | None -> true
+                  | Some l -> Gnat_expl.equal_line l (Gnat_expl.get_subp_loc e)
+         in
          if filter then begin
             let g = GoalSet.choose goalset in
             schedule_goal g
