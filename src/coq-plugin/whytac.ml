@@ -143,18 +143,18 @@ let preid_of_id id = Ident.id_fresh (string_of_id id)
 
 (* rec_names_for c [|n1;...;nk|] builds the list of constant names for
    identifiers n1...nk with the same path as c, if they exist; otherwise
-   raises Not_found *)
+   raises NotFO *)
 let rec_names_for c =
   let mp,dp,_ = Names.repr_con c in
   array_map_to_list
     (function
        | Name id ->
            let c' = Names.make_con mp dp (label_of_id id) in
-           ignore (Global.lookup_constant c');
-           (* msgnl (Printer.pr_constr (mkConst c')); *)
+           ignore
+             (try Global.lookup_constant c' with Not_found -> raise NotFO);
            c'
        | Anonymous ->
-           raise Not_found)
+           raise NotFO)
 
 (* extract the prenex type quantifications i.e.
    type_quantifiers env (A1:Set)...(Ak:Set)t = A1...An, (env+Ai), t *)
@@ -1012,42 +1012,49 @@ let tr_goal gl =
 
 let () = Printexc.record_backtrace true
 
+let is_goal s =
+  let n = String.length s in
+  n >= 11 && String.sub s 0 11 = "Unnamed_thm" ||
+  n >= 9 && String.sub s (n - 9) 9 = "_admitted"
+
 let tr_top_decl = function
   | (sp, kn as _oname), Lib.Leaf lobj ->
     let dep = empty_dep () in
     let env = Global.env () in
     let tvm = Idmap.empty in
     let bv = Idmap.empty in
-    let id = Ident.id_fresh (string_of_id (Libnames.basename sp)) in
-Format.printf "tr_top_decl: %s@." (string_of_id (Libnames.basename sp));
-    begin try match Libobject.object_tag lobj with
-      | "VARIABLE" ->
-          assert false (*TODO*)
-      | "CONSTANT" ->
-          let c = constant_of_kn kn in
-Format.printf "ICI@.";
-          let r = ConstRef c in
-          let c = constr_of_reference r in
-Format.printf "ICI 2 @.";
-          let ty = type_of env Evd.empty c in
-          if is_fo_kind ty then
-            ignore (tr_task_ts (empty_dep ()) env r)
-          else
-            let t = type_of env Evd.empty ty in
-            if is_Set t || is_Type t then
-              ignore (tr_task_ls (empty_dep ()) env r)
-            else if is_Prop t then
-              let f = tr_formula dep tvm bv env ty in
-              let pr = Decl.create_prsymbol id in
-              task := Task.add_prop_decl !task Decl.Paxiom pr f
-            else
-              raise NotFO
-      | "INDUCTIVE" ->
-          () (*TODO*)
-      | _ ->
-          ()
+    let bn = basename sp in
+    let s = string_of_id bn in
+(* Format.printf "tr_top_decl: %s @?" s; *)
+    begin try
+      if is_goal s then raise NotFO;
+      let id = Ident.id_fresh s in
+      let r = match Libobject.object_tag lobj with
+        | "VARIABLE" ->
+            (* ignore variables out of sections *)
+            ignore (try Global.lookup_named bn with Not_found -> raise NotFO);
+            VarRef bn
+        | "CONSTANT" -> ConstRef (constant_of_kn kn)
+        | "INDUCTIVE" -> IndRef (mind_of_kn kn, 0)
+        | _ -> raise NotFO
+      in
+      let c = constr_of_reference r in
+      let ty = type_of env Evd.empty c in
+      if is_fo_kind ty then
+        ignore (tr_task_ts (empty_dep ()) env r)
+      else
+        let t = type_of env Evd.empty ty in
+        if is_Set t || is_Type t then
+          ignore (tr_task_ls (empty_dep ()) env r)
+        else if is_Prop t then
+          let f = tr_formula dep tvm bv env ty in
+          let pr = Decl.create_prsymbol id in
+          task := Task.add_prop_decl !task Decl.Paxiom pr f
+        else
+          raise NotFO
       with NotFO -> ()
     end
+(* Format.printf "done@." *)
   | _, Lib.CompilingLibrary _
   | _, Lib.OpenedModule _
   | _, Lib.ClosedModule  _
@@ -1062,10 +1069,10 @@ let whytac s gl =
   let concl_type = pf_type_of gl (pf_concl gl) in
   if not (is_Prop concl_type) then error "Conclusion is not a Prop";
   task := Task.use_export None Theory.builtin_theory;
-  (* add global declarations from module Top *)
-  List.iter tr_top_decl (Lib.contents_after None);
-  (* then translate the goal *)
   try
+    (* add global declarations from module Top *)
+    List.iter tr_top_decl (List.rev (Lib.contents_after None));
+    (* then translate the goal *)
     tr_goal gl;
     let cp, drv = get_prover s in
     let command = String.concat " " (cp.command :: cp.extra_options) in
@@ -1085,8 +1092,8 @@ let whytac s gl =
     | NotFO ->
         error "Not a first order goal"
     | e ->
+        Printexc.print_backtrace stderr; flush stderr;
         Format.eprintf "@[exception: %a@]@." Exn_printer.exn_printer e;
-        Printexc.print_backtrace stderr;
         raise e
 
 

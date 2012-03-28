@@ -7,8 +7,41 @@ Ltac ae := why3 "alt-ergo".
 Ltac Z3 := why3 "z3-2".
 Ltac spass := why3 "spass".
 
+
+(* Mutually inductive types *)
+
+Inductive tree : Set :=
+  | Leaf : tree
+  | Node : Z -> forest -> tree
+with forest : Set :=
+  | Nil : forest
+  | Cons : tree -> forest -> forest.
+
+Print plus.
+
+Print tree_rect.
+
+
+Fixpoint tree_size (t:tree) : Z := match t with
+  | Leaf => 0
+  | Node _ f => 1 + forest_size f end
+with forest_size (f:forest) : Z := match f with
+  | Nil => 0
+  | Cons t f => tree_size t + forest_size f end.
+
+
+Goal tree_size (Node 42 (Cons Leaf Nil)) = 1.
+ae.
+Qed.
+
+Goal (match Leaf with Leaf => 1 | Node z f => 2 end)=1.
+ae.
+Qed.
+
+
 Definition t (a:Type) := list a.
 
+(*
 Inductive foo : Set :=
   | OO : foo
   | SS : forall x:nat, p x -> foo
@@ -17,31 +50,62 @@ with p : nat -> Prop :=
 
 Goal p O.
 ae.
+*)
 
 Inductive foo : nat -> Prop :=
   c : bar O -> foo O
 with bar : nat -> Prop :=
   d : forall f:nat->nat, bar (f O).
 
+(*
 Goal foo O.
 ae.
+*)
 
+Inductive tree' : Set :=
+  | Empty' : tree'
+  | Node' : forest' -> tree'
+with forest' : Set :=
+  | Forest' : (nat -> tree') -> forest'.
+
+(*
+Goal forall f: nat ->tree, True.
+intros.
+ae.
+*)
+
+(*
 Parameter f : (nat -> nat) -> nat.
 
 Goal f (plus O) = f (plus O).
 ae.
+Qed.*)
+
+Parameter f: nat -> nat.
+
+Axiom f_def: f O = O.
+
+Goal f (f O) = O.
+ae.
 Qed.
 
+Variable b:Set.
 
 Section S.
+
+Variable b:Set->Set.
 
 Variable a:Set.
 
 Inductive sorted : list a -> Prop :=
-  c: sorted (@nil a)
-| d: forall x: a, sorted (cons x nil).
+  cc: sorted (@nil a)
+| dd: forall x: a, sorted (cons x nil).
 
 Variable f : a -> a.
+
+Goal True.
+ae.
+Qed.
 
 Goal forall x: a, f (f x) = f x -> f (f (f x)) = f x.
 intros.
@@ -54,11 +118,17 @@ Qed.
 
 End S.
 
+Print All.
+
+Goal True.
+ae.
+Qed.
+
 Print sorted.
 
 Goal sorted _ (@nil nat).
 ae.
-
+Qed.
 
 Parameter p: Z -> Prop.
 
@@ -80,12 +150,10 @@ Qed.
 
 (* type definitions *)
 
-Definition t := list.
+Inductive foobar : Set :=
+  C : list nat -> foobar.
 
-Inductive foo : Set :=
-  C : t nat -> foo.
-
-Goal forall x:foo, x=x.
+Goal forall x:foobar, x=x.
 intros.
 ae.
 Qed.
@@ -127,9 +195,9 @@ Qed.
 
 (* function definition *)
 
-Definition f (x:Z) (y:Z) := x+y.
+Definition ff (x:Z) (y:Z) := x+y.
 
-Goal f 1 2 = 3.
+Goal ff 1 2 = 3.
 ae.
 Qed.
 
@@ -189,32 +257,6 @@ ae.
 Qed.
 
 
-(* Mutually inductive types *)
-
-Inductive tree : Set :=
-  | Leaf : tree
-  | Node : Z -> forest -> tree
-
-with forest : Set :=
-  | Nil : forest
-  | Cons : tree -> forest -> forest.
-
-Fixpoint tree_size (t:tree) : Z := match t with
-  | Leaf => 0
-  | Node _ f => 1 + forest_size f end
-with forest_size (f:forest) : Z := match f with
-  | Nil => 0
-  | Cons t f => tree_size t + forest_size f end.
-
-
-Goal tree_size Leaf = 0.
-ae.
-Qed.
-
-Goal (match Leaf with Leaf => 1 | Node z f => 2 end)=1.
-ae.
-Qed.
-
 (* Polymorphic, Mutually inductive types *)
 
 Inductive ptree (a:Set) : Set :=
@@ -230,15 +272,15 @@ ae.
 Qed.
 
 Definition a := 0+0.
-Definition b := a.
+Definition bb := a.
 
-Goal b=0.
+Goal bb=0.
 ae.
 Qed.
 
-Goal b=0.
+Goal bb=0.
 ae.
-
+Qed.
 
 Fixpoint ptree_size (a:Set) (t:ptree a) : Z := match t with
   | PLeaf => 0
