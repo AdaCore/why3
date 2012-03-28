@@ -217,8 +217,8 @@ let decomp_lambdas _dep _tvm bv env vars t =
   loop bv [] env vars t
 
 let rec skip_k_args k cl = match k, cl with
-  | 0, _ -> cl
-  | _, _ :: cl -> skip_k_args (k-1) cl
+  | [], _ -> cl
+  | _ :: k, _ :: cl -> skip_k_args k cl
   | _, [] -> raise NotFO
 
 (* Coq globals *)
@@ -253,6 +253,14 @@ let add_dep r v = r := { !r with dep_decls = Decl.Sdecl.add v !r.dep_decls }
 
 (* dependencies: decl -> dep *)
 let global_dep = ref Decl.Mdecl.empty
+
+let add_new_decl dep dep' decl =
+  add_dep dep decl;
+  Ident.Sid.iter
+    (fun id ->
+       global_decl := Ident.Mid.add id decl !global_decl)
+    decl.Decl.d_news;
+  global_dep := Decl.Mdecl.add decl dep' !global_dep
 
 let print_dep fmt =
   let print1 d { dep_decls = dl } =
@@ -438,8 +446,7 @@ and tr_global_ts dep env r =
           let ts = Ty.create_tysymbol id vars None in
           let decl = Decl.create_ty_decl ts in
           add_table global_ts r (Some ts);
-          global_decl := Ident.Mid.add ts.ts_name decl !global_decl;
-          global_dep := Decl.Mdecl.add decl !dep' !global_dep;
+          add_new_decl dep !dep' decl;
           ts
       | ConstructRef _ ->
           assert false
@@ -459,13 +466,10 @@ and tr_global_ts dep env r =
                 Ty.create_tysymbol id vars None
           in
           let decl = Decl.create_ty_decl ts in
-          add_dep dep decl;
           add_table global_ts r (Some ts);
-          global_decl := Ident.Mid.add ts.ts_name decl !global_decl;
-          global_dep := Decl.Mdecl.add decl !dep' !global_dep;
+          add_new_decl dep !dep' decl;
           ts
       | IndRef i ->
-          let all_ids = ref [] in
           let mib, _ = Global.lookup_inductive i in
           (* first, the inductive types *)
           let make_one_ts j _ = (* j-th inductive *)
@@ -475,7 +479,6 @@ and tr_global_ts dep env r =
             if not (is_Set t) && not (is_Type t) then raise NotFO;
             let id = preid_of_id (Nametab.basename_of_global r) in
             let ts = Ty.create_tysymbol id vars None in
-            all_ids := ts.ts_name :: !all_ids;
             add_table global_ts r (Some ts)
           in
           Array.iteri make_one_ts mib.mind_packets;
@@ -499,24 +502,29 @@ and tr_global_ts dep env r =
               let l = List.map (tr_type dep' tvm env) l in
               let id = preid_of_id (Nametab.basename_of_global r) in
               let ls = Term.create_lsymbol id l (Some tyj) in
-              all_ids := ls.Term.ls_name :: !all_ids;
               add_table global_ls r (Some ls);
-              add_poly_arity ls (List.length vars);
+              add_poly_arity ls vars;
               ls, List.map (fun _ -> None) ls.ls_args
             in
-            let ls = Array.to_list (Array.mapi mk_constructor oib.mind_nf_lc) in
-            ts, ls
+            let cl =
+              try Array.to_list (Array.mapi mk_constructor oib.mind_nf_lc)
+              with NotFO -> []
+            in
+            ts, cl
           in
-          let decl = Array.mapi make_one mib.mind_packets in
-          let decl = Array.to_list decl in
-          let decl = Decl.create_data_decl decl in
+          let dl = Array.mapi make_one mib.mind_packets in
+          let dl = Array.to_list dl in
+          let add (ts, cl as d) (tl, dl) =
+            if cl = [] then Decl.create_ty_decl ts :: tl, dl else tl, d :: dl
+          in
+          let tl, dl = List.fold_right add dl ([], []) in
+          let decl =
+            if dl = [] then None else Some (Decl.create_data_decl dl)
+          in
           (* Format.printf "decl = %a@." Pretty.print_decl decl; *)
-          add_dep dep decl;
-          List.iter
-            (fun id ->
-               global_decl := Ident.Mid.add id decl !global_decl)
-            !all_ids;
-          global_dep := Decl.Mdecl.add decl !dep' !global_dep;
+          List.iter (add_new_decl dep !dep') tl;
+          List.iter (add_dep dep') tl;
+          Util.option_iter (add_new_decl dep !dep') decl;
           lookup_table global_ts r
 
 (* the function/predicate symbol for r *)
@@ -552,43 +560,22 @@ and tr_global_ls dep env r =
           lookup_table global_ls r
       | ConstRef c ->
           let pl, d = decompose_definition dep' env c in
-          let add decl =
-            add_dep dep decl;
-            Ident.Sid.iter
-              (fun id ->
-                global_decl := Ident.Mid.add id decl !global_decl)
-              decl.Decl.d_news;
-            global_dep := Decl.Mdecl.add decl !dep' !global_dep;
-          in
-          List.iter add pl;
+          List.iter (add_new_decl dep !dep') pl;
           List.iter (add_dep dep') pl;
-          Util.option_iter add d;
+          Util.option_iter (add_new_decl dep !dep') d;
           lookup_table global_ls r
       | IndRef i ->
           assert (is_Prop t);
           let pl, d = decompose_inductive dep' env i in
-          let add decl =
-            add_dep dep decl;
-            Ident.Sid.iter
-              (fun id ->
-                global_decl := Ident.Mid.add id decl !global_decl)
-              decl.Decl.d_news;
-            global_dep := Decl.Mdecl.add decl !dep' !global_dep
-          in
-          List.iter add pl;
+          List.iter (add_new_decl dep !dep') pl;
           List.iter (add_dep dep') pl;
-          Util.option_iter add d;
+          Util.option_iter (add_new_decl dep !dep') d;
           lookup_table global_ls r
       | VarRef _ ->
           make_one_ls dep' env r;
           let ls = lookup_table global_ls r in
           let decl = Decl.create_param_decl ls in
-          add_dep dep decl;
-          Ident.Sid.iter
-            (fun id ->
-               global_decl := Ident.Mid.add id decl !global_decl)
-            decl.Decl.d_news;
-          global_dep := Decl.Mdecl.add decl !dep' !global_dep;
+          add_new_decl dep !dep' decl;
           ls
 
 and make_one_ls dep env r =
@@ -612,7 +599,7 @@ and make_one_ls dep env r =
         raise NotFO
   in
   add_table global_ls r (Some ls);
-  add_poly_arity ls (List.length vars)
+  add_poly_arity ls vars
 
 and decompose_definition dep env c =
   let dl = match (Global.lookup_constant c).const_body with
@@ -685,27 +672,15 @@ and decompose_definition dep env c =
 
 and decompose_inductive dep env i =
   let mib, _ = Global.lookup_inductive i in
-  let ls_vars = Hls.create 3 in
   (* first, the inductive types *)
   let make_one_ls j _ = (* j-th inductive *)
-    let r = IndRef (ith_mutual_inductive i j) in
-    let ty = Global.type_of_global r in
-    let (tvm, vars), env, t = decomp_type_quantifiers env ty in
-    let l, t = decompose_arrows t in
-    if not (is_Prop t) then raise NotFO;
-    let args = List.map (tr_type dep tvm env) l in
-    let id = preid_of_id (Nametab.basename_of_global r) in
-    let ls = create_lsymbol id args None in
-    Hls.add ls_vars ls vars;
-    add_table global_ls r (Some ls);
-    add_poly_arity ls (List.length vars)
+    make_one_ls dep env (IndRef (ith_mutual_inductive i j))
   in
   Array.iteri make_one_ls mib.mind_packets;
   (* second, the inductive predicate declarations *)
   let make_one j oib = (* j-th inductive *)
     let j = ith_mutual_inductive i j in
     let ls = lookup_table global_ls (IndRef j) in
-    (* let tyj = Ty.ty_app ts (List.map Ty.ty_var ts.Ty.ts_args) in *)
     let mk_constructor k _tyk = (* k-th constructor *)
       let r = ConstructRef (j, k+1) in
       let ty = Global.type_of_global r in
@@ -715,7 +690,7 @@ and decompose_inductive dep env i =
           let v2 = Ty.ty_var v2 in
           Idmap.add (id_of_string v1.tv_name.Ident.id_string) v2 tvm
         in
-        List.fold_right2 add vars (Hls.find ls_vars ls) Idmap.empty
+        List.fold_right2 add vars (get_poly_arity ls) Idmap.empty
       in
       let f = tr_formula dep tvm Idmap.empty env f in
       let id = preid_of_id (Nametab.basename_of_global r) in
