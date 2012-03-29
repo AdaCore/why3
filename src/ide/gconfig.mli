@@ -48,6 +48,7 @@ type t =
       original_config : Whyconf.config;
       mutable altern_provers : prover option Mprover.t;
       mutable replace_prover : conf_replace_prover;
+      mutable hidden_provers : string list;
     }
 
 val read_config : string option -> string list -> unit

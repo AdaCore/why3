@@ -58,6 +58,8 @@ type t =
       original_config : Whyconf.config;
       mutable altern_provers : altern_provers;
       mutable replace_prover : conf_replace_prover;
+      (* hidden prover buttons *)
+      mutable hidden_provers : string list;
     }
 
 
@@ -77,6 +79,7 @@ type ide = {
   ide_error_color : string;
   ide_default_editor : string;
   ide_replace_prover : conf_replace_prover;
+  ide_hidden_provers : string list;
 }
 
 let default_ide =
@@ -95,8 +98,9 @@ let default_ide =
     ide_error_color = "orange";
     ide_replace_prover = CRP_Ask;
     ide_default_editor =
-      try Sys.getenv "EDITOR" ^ " %f"
-      with Not_found -> "editor %f"
+      (try Sys.getenv "EDITOR" ^ " %f"
+       with Not_found -> "editor %f");
+    ide_hidden_provers = [];
   }
 
 let load_ide section =
@@ -135,11 +139,13 @@ let load_ide section =
       get_string section ~default:default_ide.ide_default_editor
         "default_editor";
     ide_replace_prover =
-      match get_stringo section "replace_prover" with
+      begin
+        match get_stringo section "replace_prover" with
         | None -> default_ide.ide_replace_prover
         | Some "never not obsolete" -> CRP_Not_Obsolete
         | Some "ask" | Some _ -> CRP_Ask
-
+      end;
+    ide_hidden_provers = get_stringl ~default:default_ide.ide_hidden_provers section "hidden_prover";
   }
 
 
@@ -174,7 +180,11 @@ let load_config config original_config =
   let main = get_main config in
   let ide  = match get_section config "ide" with
     | None -> default_ide
-    | Some s -> load_ide s in
+    | Some s -> load_ide s
+  in
+  Format.eprintf "hidden provers : ";
+  List.iter (fun p -> Format.eprintf "%s" p) ide.ide_hidden_provers;
+  Format.eprintf "@.";
   let alterns =
     List.fold_left load_altern
       Mprover.empty (get_family config "alternative_prover") in
@@ -204,7 +214,9 @@ let load_config config original_config =
     env            = env;
     altern_provers = alterns;
     replace_prover = ide.ide_replace_prover;
+    hidden_provers = ide.ide_hidden_provers;
   }
+
 
 let save_altern unknown known (id,family) =
   let alt = empty_section in
@@ -247,6 +259,7 @@ let save_config t =
     (match t.replace_prover with
       | CRP_Ask -> "ask"
       | CRP_Not_Obsolete -> "never not obsolete")  in
+  let ide = set_stringl ide "hidden_prover" t.hidden_provers in
   let config = set_section config "ide" ide in
 (* TODO: store newly detected provers !
   let config = set_provers config
@@ -493,7 +506,7 @@ let alternatives_frame c (notebook:GPack.notebook) =
     in () in
   Mprover.iter iter c.altern_provers
 
-let preferences c =
+let preferences (c : t) =
   let dialog = GWindow.dialog ~title:"Why3: preferences" () in
   let vbox = dialog#vbox in
   let notebook = GPack.notebook ~packing:vbox#add () in
@@ -573,10 +586,34 @@ let preferences c =
 *)
   (** page 3 **)
   let label3 = GMisc.label ~text:"Provers" () in
-  let _page3 = GMisc.label ~text:"This page should display detected provers"
-    ~packing:(fun w -> ignore(notebook#append_page
-                                ~tab_label:label3#coerce w)) ()
+  let page3 =
+    GPack.vbox ~homogeneous:false ~packing:
+      (fun w -> ignore(notebook#append_page ~tab_label:label3#coerce w)) ()
   in
+  let provers_box =
+    GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
+      ~packing:page3#add ()
+  in
+  let hidden_provers = Hashtbl.create 7 in
+  Mprover.iter
+    (fun _ p ->
+      let p = p.prover in
+      let label = p.prover_name ^ " " ^ p.prover_version in
+      let hidden = ref (List.mem label c.hidden_provers) in
+      Hashtbl.add hidden_provers label hidden;
+      let b =
+        GButton.check_button ~label ~packing:provers_box#add ()
+          ~active:(not !hidden)
+      in
+      let (_ : GtkSignal.id) =
+        b#connect#toggled ~callback:
+          (fun () -> hidden := not !hidden;
+            c.hidden_provers <-
+              Hashtbl.fold
+              (fun l h acc -> if !h then l::acc else acc) hidden_provers [])
+      in ())
+    (Whyconf.get_provers c.config);
+
   (** page 1 **)
   let display_options_frame =
     GBin.frame ~label:"Display options"

@@ -921,14 +921,15 @@ let (_ : GMenu.image_menu_item) =
     ~label:"_Add file" ~callback:select_file
     ()
 
+let refresh_provers = ref (fun () -> ())
+
 let (_ : GMenu.image_menu_item) =
   file_factory#add_image_item ~label:"_Preferences" ~callback:
     (fun () ->
-       Gconfig.preferences gconfig;
-       M.set_maximum_running_proofs gconfig.max_running_processes sched)
+      Gconfig.preferences gconfig;
+      !refresh_provers ();
+      M.set_maximum_running_proofs gconfig.max_running_processes sched)
     ()
-
-let refresh_provers = ref (fun () -> ())
 
 let add_refresh_provers f _msg =
 (*
@@ -1170,6 +1171,17 @@ let () = add_refresh_provers (fun () ->
 
 let () =
   let add_item_provers () =
+    let provers = C.get_provers gconfig.Gconfig.config in
+    let provers =
+      C.Mprover.fold
+        (fun k p acc ->
+          let pr = p.prover in
+          if List.mem (pr.prover_name ^ " " ^ pr.prover_version)
+            gconfig.hidden_provers
+          then acc
+          else C.Mprover.add k p acc)
+        provers C.Mprover.empty
+    in
     C.Mprover.iter
       (fun p _ ->
          let n = Pp.string_of_wnl C.print_prover p in
@@ -1191,7 +1203,7 @@ let () =
            b#connect#pressed
              ~callback:(fun () -> prover_on_selected_goals p)
          in ())
-      (C.get_provers gconfig.Gconfig.config)
+      provers
   in
   add_refresh_provers add_item_provers "Add in tools menu and provers box";
   add_item_provers ()
