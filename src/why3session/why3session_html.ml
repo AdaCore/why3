@@ -318,7 +318,6 @@ PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"
 
 end
 
-(*
 
 module Jstree =
 struct
@@ -351,6 +350,8 @@ struct
     let c = Sys.command cmd in
     if c <> 0 then
       eprintf "[Error] '%s' stopped abnormaly : code %i" cmd c
+
+ let edited_dst = Filename.concat !output_dir "edited"
 
   let find_pp edited =
     let basename = Filename.basename edited in
@@ -499,15 +500,15 @@ $(function () {
 </html>
 "
 
-  let run_files () =
+  let run_files config =
     if !opt_context then
       if not (Sys.file_exists edited_dst) then Unix.mkdir edited_dst 0o755;
-    Queue.iter (run_file context print_session) files;
+    iter_files (run_file context print_session);
     if !opt_context then
-      let data_dir = Whyconf.datadir (Whyconf.get_main whyconf) in
+      let data_dir = Whyconf.datadir (Whyconf.get_main config) in
       (** copy images *)
       let img_dir_src = Filename.concat data_dir "images" in
-      let img_dir_dst = Filename.concat output_dir "images" in
+      let img_dir_dst = Filename.concat !output_dir "images" in
       if not (Sys.file_exists img_dir_dst) then Unix.mkdir img_dir_dst 0o755;
       List.iter (fun img_name ->
         let from = Filename.concat img_dir_src img_name in
@@ -516,28 +517,20 @@ $(function () {
         ["folder16.png";"file16.png";"wizard16.png";"configure16.png"];
       (** copy javascript *)
       let js_dir_src = Filename.concat data_dir "javascript" in
-      let js_dir_dst = Filename.concat output_dir "javascript" in
+      let js_dir_dst = Filename.concat !output_dir "javascript" in
       Sysutil.copy_dir js_dir_src js_dir_dst
 
 end
-*)
 
 
-let run_one fname =
-  match !opt_style with
-    | Table -> Table.run_one fname
-    | SimpleTree -> Simple.run_one fname
-    | Jstree ->
-      eprintf "style jstree not yet available@.";
-      exit 1
-      (* Jstree.run_files () *)
-
-open Why3session_lib
 
 let run () =
-  let _,_,should_exit1 = read_env_spec () in
+  let _,config,should_exit1 = read_env_spec () in
   if should_exit1 then exit 1;
-  iter_files run_one
+  match !opt_style with
+    | Table -> iter_files Table.run_one
+    | SimpleTree -> iter_files Simple.run_one
+    | Jstree -> Jstree.run_files config
 
 
 let cmd =

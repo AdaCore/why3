@@ -231,7 +231,7 @@ let run_one fname =
       session;
   if !opt_tree_print then
     printf "%a@." print_session session;
-  if !opt_stats_print then 
+  if !opt_stats_print then
     begin
       let stats = new_proof_stats () in
       fill_prover_data stats session;
@@ -239,7 +239,7 @@ let run_one fname =
       finalize_stats stats;
       print_stats stats
     end
-      
+
 
 let run () =
   let _,_,should_exit1 = read_env_spec () in
