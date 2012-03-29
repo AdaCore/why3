@@ -263,7 +263,7 @@ let rec ity_match s ity1 ity2 =
 and reg_match s r1 r2 =
   let is_new = ref false in
   let set = function
-    | None -> is_new := true; Some r2
+    | None when r1.reg_ghost = r2.reg_ghost -> is_new := true; Some r2
     | Some r3 as r when reg_equal r3 r2 -> r
     | _ -> raise Exit
   in
@@ -501,6 +501,11 @@ let create_pvsymbol id ?mut ?(ghost=false) ity =
     pv_ghost = ghost;
     pv_mutable = mut; }
 
+let pv_clone pv =
+  let id = id_clone pv.pv_vs.vs_name in
+  let vs = create_vsymbol id pv.pv_vs.vs_ty in
+  { pv with pv_vs = vs }
+
 let pv_full_inst s pv =
   let ghost = pv.pv_ghost in
   let mut = option_map (reg_full_inst s) pv.pv_mutable in
@@ -508,9 +513,6 @@ let pv_full_inst s pv =
   create_pvsymbol (id_clone pv.pv_vs.vs_name) ~ghost ?mut ity
 
 (* value types *)
-type pre = term
-type post = term
-type xpost = (pvsymbol * post) Mexn.t
 
 type vty =
   | VTvalue of pvsymbol
@@ -518,56 +520,131 @@ type vty =
 
 (* computation types *)
 and vty_arrow = {
-  c_arg   : pvsymbol; (* formal argument *)
-  c_pre   : pre;
+  a_arg   : pvsymbol;
+  a_vty   : vty;
+  a_eff   : effect;
+  a_pre   : term; (* epsilon under a dummy variable, to accumulate substs *)
+  a_post  : term; (* epsilon under the value variable or under a dummy vs *)
+  a_xpost : (vsymbol * term) Mexn.t; (* epsilon under the value variable *)
+}
+
+type pre = term
+type post = term
+type xpost = (vsymbol * post) Mexn.t
+
+type vty_comp = {
   c_vty   : vty;
   c_eff   : effect;
+  c_pre   : pre;
   c_post  : post;
   c_xpost : xpost;
-  c_subst : ity_subst;      (* not yet applied to the 5 fields above *)
-  c_pvmap : pvsymbol Mpv.t; (* idem *)
 }
 
 (* smart constructors *)
 
 let vty_value pvs = VTvalue pvs
 
-exception InvalidExceptionPost of xsymbol * pvsymbol
+exception InvalidExceptionPost of xsymbol
 
-let check_xpost xs (pv, _) =
-  if not (ity_equal xs.xs_ity pv.pv_ity) then
-    raise (InvalidExceptionPost (xs, pv))
+(* this vs is used to close pre- and post-conditions in order
+   to accumulate substitutions into a_arg pvsymbols *)
+
+let close_spec =
+  let dummy = create_vsymbol (id_fresh "dummy") ty_int in
+  let dumbf = t_eps_close dummy t_true in
+  function
+    | { t_node = Ttrue } -> dumbf
+    | f -> t_eps_close dummy f
+
+let open_spec = function
+  | { t_node = Teps bf } -> t_open_bound bf
+  | _ -> assert false
 
 let vty_arrow
   x ?(pre=t_true) ?(post=t_true) ?(xpost=Mexn.empty) ?(effect=eff_empty) vty =
-  (* check that x does not appear in cty *)
+  (* check for clashes *)
+  let check_vs y = if vs_equal x.pv_vs y then raise (DuplicateVar y) in
+  let check_pv y = if pv_equal x y then raise (DuplicateVar x.pv_vs) in
   let rec check = function
-    | VTvalue y | VTarrow { c_arg = y } when pv_equal x y ->
-        raise (DuplicateVar x.pv_vs)
-    | VTarrow { c_vty = v } ->
-        check v
-    | VTvalue _ ->
-        ()
+    | VTarrow a ->
+        Mexn.iter (fun _ (y,_) -> check_vs y) a.a_xpost;
+        check_pv a.a_arg;
+        check a.a_vty
+    | VTvalue y ->
+        check_pv y
   in
   check vty;
-  Mexn.iter check_xpost xpost;
+  (* check that every raised exception is mentioned in xpost *)
+  if not (Mexn.set_submap effect.eff_raises xpost) then
+    (let d = Mexn.set_diff xpost effect.eff_raises in
+    raise (InvalidExceptionPost (fst (Mexn.choose d))));
+  (* check that every exception mentioned in xpost is raised *)
+  if not (Mexn.set_submap xpost effect.eff_raises) then
+    (let d = Mexn.set_diff effect.eff_raises xpost in
+    raise (InvalidExceptionPost (fst (Mexn.choose d))));
+  (* check that vsymbols in xpost have valid types *)
+  let conv_xpost xs (vs,f) =
+    if not (ty_equal (ty_of_ity xs.xs_ity) vs.vs_ty)
+    then raise (InvalidExceptionPost xs);
+    check_vs vs;
+    vs, t_eps_close vs f
+  in
+  let post = match vty with
+    | VTvalue pv -> t_eps_close pv.pv_vs post
+    | VTarrow _  -> close_spec post
+  in
   VTarrow {
-    c_arg = x;
-    c_pre = pre;
-    c_vty = vty;
-    c_eff = effect;
-    c_post = post;
-    c_xpost = xpost;
-    c_subst = ity_subst_empty;
-    c_pvmap = Mpv.empty;
+    a_arg   = x;
+    a_vty   = vty;
+    a_eff   = effect;
+    a_pre   = close_spec pre;
+    a_post  = post;
+    a_xpost = Mexn.mapi conv_xpost xpost;
   }
 
+(*
 exception NotAFunction
 
 let get_arrow = function
   | VTvalue _ -> raise NotAFunction
   | VTarrow a -> a
+*)
 
+let vty_app_arrow arr x =
+  ity_equal_check arr.a_arg.pv_ity x.pv_ity;
+  let subst f = t_subst_single arr.a_arg.pv_vs (t_var x.pv_vs) f in
+  let _,pre = open_spec (subst arr.a_pre) in
+  let res,post = open_spec (subst arr.a_post) in
+  let xsubst (_,e) = open_spec (subst e) in
+  let rec arr_subst arr = { arr with
+    a_vty   = (match arr.a_vty with
+      | VTarrow a -> VTarrow (arr_subst a)
+      | VTvalue _ -> arr.a_vty);
+    a_pre   = subst arr.a_pre;
+    a_post  = subst arr.a_post;
+    a_xpost = Mexn.map (fun (x,e) -> x, subst e) arr.a_xpost;
+  }
+  in
+  let vty = match arr.a_vty with
+    (* here we make a new pvsymbol in a bad fashion. It should however
+       be safe, since res comes from t_open_bound and is guaranteed to
+       be fresh, so there can be no illegal sharing of idents *)
+    | VTvalue pv -> VTvalue { pv with pv_vs = res }
+    | VTarrow a  -> VTarrow (arr_subst a)
+  in {
+    c_vty   = vty;
+    c_eff   = arr.a_eff;
+    c_pre   = pre;
+    c_post  = post;
+    c_xpost = Mexn.map xsubst arr.a_xpost;
+  }
+
+let open_vty_arrow arr =
+  let pv = pv_clone arr.a_arg in
+  let c = vty_app_arrow arr pv in
+  pv, c.c_vty
+
+(*
 let vty_full_inst ~ghost s = function
   | VTvalue pv ->
       let pv = pv_full_inst s pv in
@@ -575,19 +652,6 @@ let vty_full_inst ~ghost s = function
   | VTarrow _a ->
       assert false (*TODO*)
 
-let vty_app_arrow subst a pv =
-  let s = ity_subst_union subst a.c_subst in
-  let s = ity_match s a.c_arg.pv_ity pv.pv_ity in
-  eff_full_inst s a.c_eff, vty_full_inst ~ghost:pv.pv_ghost s a.c_vty
-
-let vty_app subst v pv =
-  vty_app_arrow subst (get_arrow v) pv
-
 let vty_app_spec _subst _v _pv (* : pre * post * xpost *) =
   assert false (*TODO*)
-
-let open_vty_arrow a =
-  let pv = pv_full_inst a.c_subst a.c_arg in
-  pv, snd (vty_app_arrow ity_subst_empty a pv)
-
-
+*)

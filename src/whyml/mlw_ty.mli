@@ -140,7 +140,9 @@ val ity_match : ity_subst -> ity -> ity -> ity_subst
 
 val ity_equal_check : ity -> ity -> unit
 
-(** computation types (with effects) *)
+val ity_subst_union : ity_subst -> ity_subst -> ity_subst
+
+(** vty_comp types (with effects) *)
 
 (* exception symbols *)
 type xsymbol = private {
@@ -187,29 +189,32 @@ val create_pvsymbol : preid -> ?mut:region -> ?ghost:bool -> ity -> pvsymbol
 val pv_equal : pvsymbol -> pvsymbol -> bool
 
 (* value types *)
-type vty_arrow
+
+type pre   = term (* precondition *)
+type post  = term (* postcondition *)
+type xpost = (vsymbol * post) Mexn.t (* exceptional postconditions *)
+
+type vty_arrow  (* pvsymbol -> vty_comp *)
 
 type vty = private
   | VTvalue of pvsymbol
   | VTarrow of vty_arrow
 
+type vty_comp = private {
+  c_vty   : vty;
+  c_eff   : effect;
+  c_pre   : pre;
+  c_post  : post;
+  c_xpost : xpost;
+}
+
 (* smart constructors *)
 val vty_value : pvsymbol -> vty
 
-type pre = term
-type post = term
-type xpost = (pvsymbol * post) Mexn.t
-
-val vty_arrow :
-  pvsymbol ->
+val vty_arrow : pvsymbol ->
   ?pre:term -> ?post:term -> ?xpost:xpost -> ?effect:effect -> vty -> vty
 
-val vty_app : ity_subst -> vty -> pvsymbol -> effect * vty
-
-val vty_app_spec : ity_subst -> vty -> pvsymbol -> pre * post * xpost
+val vty_app_arrow : vty_arrow -> pvsymbol -> vty_comp
 
 val open_vty_arrow : vty_arrow -> pvsymbol * vty
-
-
-
 
