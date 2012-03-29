@@ -76,53 +76,6 @@ replace by the input file and '%o' which will be replaced by the output file.") 
   " same as '--add_pp .v \"coqdoc --no-index --html -o %o %i\" .html'") ::
   common_options
 
-(*
-let version_msg = sprintf
-  "Why3 html session output, version %s (build date: %s)"
-  Config.version Config.builddate
-
-let usage_str = sprintf
-  "Usage: %s [options] [<file.why>|<project directory>] ... "
-  (Filename.basename Sys.argv.(0))
-
-let set_file f = Queue.push f files
-
-let () = Arg.parse spec set_file usage_str
-
-let () =
-  if !opt_version then begin
-    printf "%s@." version_msg;
-    exit 0
-  end
-*)
-
-(* let () = *)
-(*   List.iter (fun (in_,(cmd,out)) -> *)
-(*     printf "in : %s, cmd : %s, out : %s@." in_ cmd out) !opt_pp *)
-
-(*
-let () =
-  Debug.Opt.set_flags_selected ();
-  if  Debug.Opt.option_list () then exit 0
-*)
-
-(*
-let output_dir =
-  match !output_dir with
-   | "" ->
-      printf "Error: output_dir must be set@.";
-      exit 1
-    | "-" when !opt_context ->
-      printf
-        "Error: context and stdout output can't be set at the same time@.";
-      exit 1
-    | _ -> !output_dir
-
-let edited_dst = Filename.concat output_dir "edited"
-
-let whyconf = Whyconf.read_config !opt_config
-  *)
-
 open Session
 open Util
 
