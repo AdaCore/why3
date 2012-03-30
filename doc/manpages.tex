@@ -555,12 +555,44 @@ otherwise.
 \section{The \texttt{why3session} tool}
 \label{sec:why3session}
 
-The program \texttt{why3session} allows to manipulate why3 session on
-the command line. It thus allows to batch modifications to several
-sessions at once. This tool provides several subcommands:
-\texttt{info}, \texttt{rm}, \texttt{copy}, \texttt{mod}.
+The program \texttt{why3session} allows to extract informations from
+proof sessions on the command line, or even modify them to some
+extent. The invocation of this program is done under the form
+\begin{verbatim}
+why3session <command> [options] <session directories>
+\end{verbatim}
+The available commands are the following:
+\begin{description}
+\item[\texttt{info}] prints informations and statistics about sessions.
+\item[\texttt{latex}] outputs session contents in LaTeX format.
+\item[\texttt{html}] outputs session contents in HTML format.
+\item[\texttt{mod}] modifies some of the proofs, selected by a filter.
+\item[\texttt{copy}] duplicates some of the proofs, selected by a filter.
+\item[\texttt{copy-archive}] same as copy but also archives the
+  original proofs.
+\item[\texttt{rm}] remove some of the proofs, selected by a filter.
+\end{description}
 
-Currently this tool reports or modifies only proof attempts.
+The first three commands do not modify the sessions, whereas the four
+last modify them. Only the proof attempts recorded are modified. No
+prover is called on the modified or created proof attempts, and
+consequently the proof status is always marked as obsolete.
+
+All the commands above share the following common set of options:
+common options:
+\begin{description}
+\item[\texttt{-C <file>}] reads configuration from \texttt{file}
+\item[\texttt{--config}]  same as \texttt{-C}
+\item[\texttt{--extra-config <file>}] reads additional configuration from \texttt{<file>}
+\item[\texttt{-L <dir>}]              adds \texttt{<dir>} to the library search path
+\item[\texttt{--library}]             same as \texttt{-L}
+\item[\texttt{-v}]                    prints version information
+\item[\texttt{--list-debug-flags}]    lists known debug flags
+\item[\texttt{--debug-all}]           sets all debug flags (except flags which change the behavior)
+\item[\texttt{--debug <flag>}]        sets a debug flag
+\end{description}
+
+\subsection{Command \texttt{info}}
 
 \texttt{why3session info} reports informations:
 \begin{itemize}
@@ -596,6 +628,88 @@ why3session info --edited-files --print0 vstte12_bfs.mlw | \
 \end{verbatim}
 
 \end{itemize}
+
+\paragraph{Session Statistics}
+
+\todo{DETAILLER why3session info --stats}
+
+\subsection{Command \texttt{latex}}
+
+  Command \texttt{latex} produces a summary of the replay under the
+  form of a tabular environment in LaTeX, one tabular for each theory,
+  one per file.
+
+  Option \texttt{-style 2} produces an alternate
+  version of LaTeX output, with a different layout of the tables.
+
+
+
+\paragraph{Customizing LaTeX output}
+
+The generated LaTeX files contain some macros that must be defined
+externally.  Various definitions can be given to them to customize the
+output.
+\begin{itemize}
+\item \verb|\provername|: macro with one parameter, a prover name
+\item \verb|\valid|: macro with one parameter, used where the corresponding prover answers that the goal is valid. The parameter is the time in seconds.
+\item \verb|\noresult|: macro without parameter, used where no result
+  exists for the corresponding prover
+\item \verb|\timeout|: macro without parameter, used where the corresponding prover reached the time limit
+\item \verb|\explanation|: macro with one parameter, the goal name or its explanation
+\end{itemize}
+
+\begin{figure}[t]
+  \begin{center}
+    \input{HelloProof.tex}
+  \end{center}
+  \verbatiminput{./replayer_macros.tex}
+  \caption{Sample macros for the LaTeX option of why3replayer}
+\label{fig:replayer}
+\end{figure}
+
+Figure~\ref{fig:replayer} proposes some suggestions for these macros,
+together with the table obtained from the hello proof example of
+Section~\ref{chap:starting}.
+
+\subsection{Command \texttt{html}}
+
+This command produces a summary of the proof session in HTML syntax.
+
+There are three styles of output: table, simpletree, jstree
+
+'simple' use only 'ul' and 'il' tag. 'jstree' use the 'jstree' plugin
+of the javascript library 'jquery'.
+
+\todo{Detailler}
+
+
+Specific options for this command are as follows.
+\begin{description}
+\item[\texttt{-o}] 
+the directory to output the produces files ('-' for stdout)
+
+\item[\texttt{--context}] adds context around the generated code in
+  order to allow direct visualisation (header, css, ...). It also adds
+  in the directory all the needed external files. It can't be set with
+  stdout output.
+
+\item[\texttt{--style <s>}] sets the style to
+  use, among \texttt{simpletree}, \texttt{jstree} and \texttt{table}, defaults to \texttt{table}.
+
+\item[\texttt{--add\_pp <suffix> <cmd> <out\_suffix>}] adds for the
+  given prefix the given pretty-printer, the new file as the given
+  out\_suffix. cmd must contain
+  '\%i' which will be replaced by the input file
+                         and '\%o' which will be replaced by the
+                         output file.
+
+\item[\texttt{--coqdoc}] use the coqdoc command to display Coq proof
+  scripts. This is equivalent to \texttt{--add\_pp .v "coqdoc
+    --no-index --html -o \%o \%i" .html}
+
+\end{description}
+ 
+\subsection{Commands modifying the proof attempts}
 
 The subcommands \texttt{mod}, \texttt{copy}, and \texttt{rm} share the
 same set of options for selecting the proof attempts to work on:
@@ -662,50 +776,6 @@ corresponds to \verb|--filter-verified-goal --conservative| and
 removes the proof attempts that are not verified but which correspond
 to verified goals.
 
-\subsubsection{Session Statistics}
-
-\todo{DETAILLER why3session stats}
-
-\subsubsection{Session Dump in LaTeX or HTML Format}
-
-\begin{itemize}
-\item Command \texttt{latex} produces a summary of the
-  replay under the form of a tabular environment in LaTeX, one tabular
-  for each theory, one per file.
-
-  Option \texttt{-style 2} produces an alternate
-  version of LaTeX output, with a different layout of the tables.
-\item command \texttt{html} produces a summary of the replay in HTML syntax.
-\end{itemize}
-
-\todo{DETAILLER}
-
-\paragraph{Customizing LaTeX output}
-
-The generated LaTeX files contain some macros that must be defined
-externally.  Various definitions can be given to them to customize the
-output.
-\begin{itemize}
-\item \verb|\provername|: macro with one parameter, a prover name
-\item \verb|\valid|: macro with one parameter, used where the corresponding prover answers that the goal is valid. The parameter is the time in seconds.
-\item \verb|\noresult|: macro without parameter, used where no result
-  exists for the corresponding prover
-\item \verb|\timeout|: macro without parameter, used where the corresponding prover reached the time limit
-\item \verb|\explanation|: macro with one parameter, the goal name or its explanation
-\end{itemize}
-
-\begin{figure}[t]
-  \begin{center}
-    \input{HelloProof.tex}
-  \end{center}
-  \verbatiminput{./replayer_macros.tex}
-  \caption{Sample macros for the LaTeX option of why3replayer}
-\label{fig:replayer}
-\end{figure}
-
-Figure~\ref{fig:replayer} proposes some suggestions for these macros,
-together with the table obtained from the hello proof example of
-Section~\ref{chap:starting}.
 
 \section{The \texttt{why3.conf} configuration file}
 \label{sec:whyconffile}

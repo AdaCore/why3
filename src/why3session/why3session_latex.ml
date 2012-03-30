@@ -35,10 +35,10 @@ let spec =
    "<n> sets output style (1 or 2, default 1)") ::
   ("-o",
    Arg.Set_string opt_output_dir,
-   " <path> where to produce LaTeX files (default: session dir)") ::
+   "<path> where to produce LaTeX files (default: session dir)") ::
   ("-longtable",
    Arg.Set opt_longtable,
-   " produce tables using longtable package instead of tabular") ::
+   " use 'longtable' environment instead of 'tabular'") ::
   common_options
 
 

@@ -38,18 +38,17 @@ let opt_print0 = ref false
 
 let spec =
   ("--provers", Arg.Set opt_print_provers,
-   " the prover used in the session are listed" ) ::
+   " provers used in the session" ) ::
   ("--edited-files", Arg.Set opt_print_edited,
-   " the edited files used in the session are listed" ) ::
+   " edited proof scripts in the session" ) ::
   ("--stats", Arg.Set opt_stats_print,
-   " prints provers statistics" ) ::
+   " prints various proofs statistics" ) ::
   ("--tree", Arg.Set opt_tree_print,
-   " the session is pretty printed in an ascii tree format" ) ::
+   " session contents as a tree in textual format" ) ::
   ("--dir", Arg.Set opt_project_dir,
-   " print the directory of the session" ) ::
+   " prints the directory of the session" ) ::
   ("--print0", Arg.Set opt_print0,
-   " use the null character instead of newline to separate the output of \
---provers and --edited-files" ) ::
+   " use the null character instead of newline" ) ::
     common_options
 
 
@@ -249,7 +248,7 @@ let run () =
 
 let cmd =
   { cmd_spec = spec;
-    cmd_desc = "print informations about session.";
+    cmd_desc = "print informations and statistics about a session.";
     cmd_name = "info";
     cmd_run  = run;
   }

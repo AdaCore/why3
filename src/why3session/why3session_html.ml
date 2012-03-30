@@ -52,28 +52,21 @@ let set_opt_pp_in,set_opt_pp_cmd,set_opt_pp_out =
 let spec =
   ("-o",
    Arg.Set_string output_dir,
-   " The directory to output the files ('-' for stdout)") ::
+   "<path> output directory ('-' for stdout)") ::
   ("--context", Arg.Set opt_context,
-   " Add context around the generated code in order to allow direct \
-    visualisation (header, css, ...). It also add in the directory \
-    all the needed external file. It can't be set with stdout output") ::
+   " adds context around the generated HTML code") ::
   ("--style", Arg.Symbol (["simpletree";"jstree";"table"], set_opt_style),
-   " Set the style to use, defaults to '" ^ default_style ^ "'."
-(* "'simple' use only 'ul' and 'il' tag. 'jstree' use \
-    the 'jstree' plugin of the javascript library 'jquery'." *)
+   " style to use, defaults to '" ^ default_style ^ "'."
 ) ::
   ("--add_pp", Arg.Tuple
     [Arg.String set_opt_pp_in;
      Arg.String set_opt_pp_cmd;
      Arg.String set_opt_pp_out],
-  "<suffix> <cmd> <out_suffix> \
-Add for the given prefix the given pretty-printer, \
-the new file as the given out_suffix. cmd must contain '%i' which will be \
-replace by the input file and '%o' which will be replaced by the output file.") ::
+  "<suffix> <cmd> <out_suffix> declares a pretty-printer for edited proofs") ::
   ("--coqdoc",
    Arg.Unit (fun ()->
     opt_pp := (".v",("coqdoc --no-index --html -o %o %i",".html"))::!opt_pp),
-  " same as '--add_pp .v \"coqdoc --no-index --html -o %o %i\" .html'") ::
+  " use coqdoc to print Coq proofs") ::
   common_options
 
 open Session

@@ -23,13 +23,13 @@ open Why3session_lib
 
 let cmds =
   [|
+    Why3session_info.cmd;
+    Why3session_latex.cmd;
+    Why3session_html.cmd;
     Why3session_copy.cmd_mod;
     Why3session_copy.cmd_copy;
     Why3session_copy.cmd_archive;
-    Why3session_info.cmd;
     Why3session_rm.cmd;
-    Why3session_latex.cmd;
-    Why3session_html.cmd;
   |]
 
 let exec_name = Sys.argv.(0)
@@ -37,7 +37,7 @@ let exec_name = Sys.argv.(0)
 let print_usage () =
   let maxl = Array.fold_left
     (fun acc e -> max acc (String.length e.cmd_name)) 0 cmds in
-  eprintf "%s <command> [options]@.@.available commands:@.@[<hov>%a@]@\n@."
+  eprintf "%s <command> [options] <session directories>@\n@\navailable commands:@.@[<hov>%a@]@\n@."
     exec_name 
     (Pp.print_iter1 Array.iter Pp.newline
        (fun fmt e -> fprintf fmt "%s   @[<hov>%s@]"
