@@ -375,8 +375,6 @@ is the directory of the project.
 The XML file follows the DTD given in \texttt{share/why3session.dtd} and reproduced below.
 \verbatiminput{../share/why3session.dtd}
 
-\todo{The DTD is certainly outdated}
-
 \section{The \texttt{why3ml} tool}
 
 The \texttt{why3ml} tool is a layer on  top of the \why library for
@@ -596,27 +594,27 @@ common options:
 
 \texttt{why3session info} reports informations:
 \begin{itemize}
-\item Option \verb|--provers| prints the provers that appear
-  inside the session, one by line.
-\item Option \verb|--edited-files| prints all the files that
-  appear in the session as edited proofs.
-\item Option \verb|--tree| prints the structure of the session as
-  an ASCII tree. The files, theories, goals are marked with a question
-  mark \verb|?|, if they are not verified. A proof is usually said to be verified
-  if the proof result is \verb|valid| and the proof is not
-  obsolete. However here specially
-  we separate these two properties. On the one hand if the proof suffers from an internal
+\item Option \verb|--provers| prints the provers that appear inside
+  the session, one by line.
+\item Option \verb|--edited-files| prints all the files that appear in
+  the session as edited proofs.
+\item Option \verb|--tree| prints the structure of the session as an
+  ASCII tree. The files, theories, goals are marked with a question
+  mark \verb|?|, if they are not verified. A proof is usually said to
+  be verified if the proof result is \verb|valid| and the proof is not
+  obsolete. However here specially we separate these two
+  properties. On the one hand if the proof suffers from an internal
   failure we mark it with an exclamation mark \verb|!|, otherwise if
-  it is not valid we mark it with a question mark \verb|?|, finally
-  if it is valid we add nothing. On the other hand if the proof is obsolete we mark it
-  with an \verb|O| and if it is archived we mark it with an
-  \verb|A|.
+  it is not valid we mark it with a question mark \verb|?|, finally if
+  it is valid we add nothing. On the other hand if the proof is
+  obsolete we mark it with an \verb|O| and if it is archived we mark
+  it with an \verb|A|.
 \item Option \verb|--print0| separates the results of the options
-  \verb|provers| and \verb|--edited-files| by the character number
-  0 instead of end of line \verb|\n|. That allows you to
-  safely use (even if the filename contains space or carriage return)
-  the result with other commands. For example you can count the number
-  of proof line in all the coq edited files in a session with:
+  \verb|provers| and \verb|--edited-files| by the character number 0
+  instead of end of line \verb|\n|. That allows you to safely use
+  (even if the filename contains space or carriage return) the result
+  with other commands. For example you can count the number of proof
+  line in all the coq edited files in a session with:
 \begin{verbatim}
 why3session info --edited-files vstte12_bfs --print0 | xargs -0 coqwc
 \end{verbatim}
@@ -635,12 +633,19 @@ why3session info --edited-files --print0 vstte12_bfs.mlw | \
 
 \subsection{Command \texttt{latex}}
 
-  Command \texttt{latex} produces a summary of the replay under the
-  form of a tabular environment in LaTeX, one tabular for each theory,
-  one per file.
+Command \texttt{latex} produces a summary of the replay under the form
+of a tabular environment in LaTeX, one tabular for each theory, one
+per file.
 
-  Option \texttt{-style 2} produces an alternate
-  version of LaTeX output, with a different layout of the tables.
+The specific options are
+\begin{description}
+\item[\texttt{-style <n>}] sets output style (1 or 2, default 1)
+  Option \texttt{-style 2} produces an alternate version of LaTeX
+  output, with a different layout of the tables.
+\item[\texttt{-o <path>}] where
+  to produce LaTeX files (default: session dir) 
+\item[\texttt{-longtable}] use 'longtable' environment instead of 'tabular'
+\end{description}
 
 
 
@@ -663,21 +668,34 @@ output.
     \input{HelloProof.tex}
   \end{center}
   \verbatiminput{./replayer_macros.tex}
-  \caption{Sample macros for the LaTeX option of why3replayer}
-\label{fig:replayer}
+  \caption{Sample macros for the LaTeX command}
+\label{fig:latex}
 \end{figure}
 
-Figure~\ref{fig:replayer} proposes some suggestions for these macros,
-together with the table obtained from the hello proof example of
+Figure~\ref{fig:latex} proposes some suggestions for these macros,
+together with the table obtained from the HelloProof example of
 Section~\ref{chap:starting}.
 
 \subsection{Command \texttt{html}}
 
 This command produces a summary of the proof session in HTML syntax.
+There are three styles of output: 'table', 'simpletree' and
+'jstree'. The default is 'table'.
 
-There are three styles of output: table, simpletree, jstree
+\begin{figure}[t]
+  \begin{center}
+    \includegraphics[width=\textwidth]{hello_proof.png}
+  \end{center}
+  \caption{HTML table produced for the HelloProof example}
+\label{fig:html}
+\end{figure}
 
-'simple' use only 'ul' and 'il' tag. 'jstree' use the 'jstree' plugin
+The style 'table' outputs the contents of the session as a table,
+similar to the LaTeX output above. Figure~\ref{fig:html} is the HTML table
+produced for the 'HelloProof' example, as typically shown in a Web
+browser.
+
+The style ''simple' use only 'ul' and 'il' tag. 'jstree' use the 'jstree' plugin
 of the javascript library 'jquery'.
 
 \todo{Detailler}
