@@ -360,15 +360,26 @@ let save_ident fmt id =
 let save_label fmt s =
   fprintf fmt "@\n@[<v 1><label@ name=\"%s\"/>@]" s.Ident.lab_string
 
+let save_string fmt s =
+  for i=0 to String.length s - 1 do
+    match String.get s i with
+      | '\"' -> pp_print_string fmt "&quot;"
+      | '\'' -> pp_print_string fmt "&apos;"
+      | '<' -> pp_print_string fmt "&lt;"
+      | '>' -> pp_print_string fmt "&gt;"
+      | '&' -> pp_print_string fmt "&amp;"
+      | c -> pp_print_char fmt c
+  done
+
 let rec save_goal provers fmt g =
   assert (g.goal_shape <> "");
   fprintf fmt
     "@\n@[<v 1><goal@ %a@ %asum=\"%s\"@ proved=\"%b\"@ \
-expanded=\"%b\"@ shape=\"%s\">"
+expanded=\"%b\"@ shape=\"%a\">"
     save_ident g.goal_name
     (opt "expl") g.goal_expl
     g.goal_checksum g.goal_verified  g.goal_expanded
-    g.goal_shape;
+    save_string g.goal_shape;
   Ident.Slab.iter (save_label fmt) g.goal_name.Ident.id_label;
   PHprover.iter (save_proof_attempt provers fmt) g.goal_external_proofs;
   PHstr.iter (save_trans provers fmt) g.goal_transformations;

@@ -167,9 +167,25 @@ and value = parse
 and string_val = parse
   | '"'
       { Buffer.contents buf }
+  | "&lt;"
+      { Buffer.add_char buf '<';
+        string_val lexbuf }
+  | "&gt;"
+      { Buffer.add_char buf '>';
+        string_val lexbuf }
+  | "&quot;"
+      { Buffer.add_char buf '"';
+        string_val lexbuf }
+  | "&apos;"
+      { Buffer.add_char buf '\'';
+        string_val lexbuf }
+  | "&amp;"
+      { Buffer.add_char buf '&';
+        string_val lexbuf }
   | [^ '\\' '"'] as c
       { Buffer.add_char buf c;
         string_val lexbuf }
+(*
   | '\\' (['\\''\"'] as c)
       { Buffer.add_char buf c;
         string_val lexbuf }
@@ -180,6 +196,7 @@ and string_val = parse
       { Buffer.add_char buf '\\';
         Buffer.add_char buf c;
         string_val lexbuf }
+*)
   | eof
       { parse_error "unterminated string" }
 
