@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
+<!DOCTYPE why3session SYSTEM "/usr/local/share/why3/why3session.dtd">
 <why3session
- name="./check-builtin/array/why3session.xml">
+ name="examples/check-builtin/array/why3session.xml">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -12,39 +12,51 @@
   version="2.2"/>
  <prover
   id="2"
+  name="CVC3"
+  version="2.4.1"/>
+ <prover
+  id="3"
+  name="Simplify"
+  version="1.5.4"/>
+ <prover
+  id="4"
   name="Spass"
   version="3.7"/>
  <prover
-  id="3"
+  id="5"
   name="Z3"
   version="2.19"/>
+ <prover
+  id="6"
+  name="Z3"
+  version="3.2"/>
  <file
   name="../array.why"
   verified="true"
-  expanded="false">
+  expanded="true">
   <theory
    name="Test_simplify_array"
-   locfile="./check-builtin/array/../array.why"
+   locfile="examples/check-builtin/array/../array.why"
    loclnum="1" loccnumb="7" loccnume="26"
    verified="true"
    expanded="true">
    <goal
     name="G1"
-    locfile="./check-builtin/array/../array.why"
+    locfile="examples/check-builtin/array/../array.why"
     loclnum="4" loccnumb="7" loccnume="9"
     sum="4b45d6270f4a53daefb6fce54b8ebff7"
     proved="true"
     expanded="true"
     shape="ainfix =agetasetV2V1V0V1V0FF">
     <proof
-     prover="3"
+     prover="5"
      timelimit="10"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="2"
+     prover="4"
      timelimit="10"
      obsolete="false"
      archived="false">
@@ -60,6 +72,27 @@
     <proof
      prover="0"
      timelimit="10"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="3"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
@@ -67,21 +100,21 @@
    </goal>
    <goal
     name="G2"
-    locfile="./check-builtin/array/../array.why"
+    locfile="examples/check-builtin/array/../array.why"
     loclnum="6" loccnumb="7" loccnume="9"
     sum="6ccca0aeacb41ec5118c79435eb055a1"
     proved="true"
     expanded="true"
     shape="ainfix =agetasetV5V0V4V3V1Iainfix =agetV5V3V1Iainfix =V3V0NFF">
     <proof
-     prover="3"
+     prover="5"
      timelimit="10"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="2"
+     prover="4"
      timelimit="10"
      obsolete="false"
      archived="false">
@@ -101,24 +134,45 @@
      archived="false">
      <result status="valid" time="0.00"/>
     </proof>
+    <proof
+     prover="2"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
    </goal>
    <goal
     name="G3"
-    locfile="./check-builtin/array/../array.why"
+    locfile="examples/check-builtin/array/../array.why"
     loclnum="10" loccnumb="7" loccnume="9"
     sum="6108a9e01a2539ed185406b5ade7ca86"
     proved="true"
     expanded="true"
     shape="ainfix =agetasetV2c1V1c0V0Iainfix =agetV2c0V0FF">
     <proof
-     prover="3"
+     prover="5"
      timelimit="10"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="2"
+     prover="4"
      timelimit="10"
      obsolete="false"
      archived="false">
@@ -138,24 +192,45 @@
      archived="false">
      <result status="valid" time="0.00"/>
     </proof>
+    <proof
+     prover="2"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
    </goal>
    <goal
     name="G4"
-    locfile="./check-builtin/array/../array.why"
+    locfile="examples/check-builtin/array/../array.why"
     loclnum="13" loccnumb="7" loccnume="9"
     sum="34fa3208c06f03a03e0897d791b6fa13"
     proved="true"
     expanded="true"
     shape="ainfix =agetasetasetV2c1V1c0V0c1V1FF">
     <proof
-     prover="3"
+     prover="5"
      timelimit="10"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="2"
+     prover="4"
      timelimit="10"
      obsolete="false"
      archived="false">
@@ -171,6 +246,27 @@
     <proof
      prover="0"
      timelimit="10"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="3"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="3"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>

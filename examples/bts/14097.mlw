@@ -1,0 +1,14 @@
+
+
+module M
+
+  use import module ref.Ref
+
+  val x : ref int
+
+  let f () : int =
+  { }
+    !x
+  { result = !x }
+
+end
