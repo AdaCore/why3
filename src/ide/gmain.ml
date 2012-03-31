@@ -570,6 +570,7 @@ module M = Session_scheduler.Make
      type key = GTree.row_reference
 
      let create ?parent () =
+       session_needs_saving := true;
        let parent = match parent with
          | None -> None
          | Some r -> Some r#iter
@@ -580,9 +581,12 @@ module M = Session_scheduler.Make
 
 
      let remove row =
+       session_needs_saving := true;
        let (_:bool) = goals_model#remove row#iter in ()
 
-     let reset () = goals_model#clear ()
+     let reset () = 
+       session_needs_saving := true;
+       goals_model#clear ()
 
      let idle f =
        let (_ : GMain.Idle.id) = GMain.Idle.add f in ()
