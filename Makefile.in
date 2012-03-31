@@ -74,6 +74,11 @@ BFLAGS = -w Aer-29 -dtypes -g -I src $(INCLUDES)
 OLINKFLAGS = -linkall $(EXTCMXA)
 BLINKFLAGS = -linkall $(EXTCMA)
 
+ifeq (@enable_debug@,yes)
+OFLAGS += -g
+STRIP = true
+endif
+
 ifeq (@enable_profiling@,yes)
 OFLAGS += -g -p
 STRIP = true
