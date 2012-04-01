@@ -182,6 +182,8 @@ type pvsymbol = private {
   pv_ity     : ity;
   pv_ghost   : bool;
   pv_mutable : region option;
+  pv_tvs     : Stv.t;
+  pv_regs    : Sreg.t;
 }
 
 val create_pvsymbol : preid -> ?mut:region -> ?ghost:bool -> ity -> pvsymbol
@@ -218,3 +220,10 @@ val vty_app_arrow : vty_arrow -> pvsymbol -> vty_comp
 
 val open_vty_arrow : vty_arrow -> pvsymbol * vty
 
+val vty_freevars : Stv.t -> vty -> Stv.t (* only args and values count... *)
+val vty_topregions : Sreg.t -> vty -> Sreg.t (* ...not eff/pre/post/xpost *)
+
+(* the substitution must cover not only the vty_freevars and
+   vty_topregions of vty, but also every type variable and
+   every region in effects and pre/post/xpost formulas *)
+val vty_full_inst : ity_subst -> vty -> vty

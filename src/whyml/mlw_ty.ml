@@ -65,6 +65,15 @@ module Wreg = Reg.W
 let reg_equal : region -> region -> bool = (==)
 let reg_hash r = id_hash r.reg_name
 
+(* a region is ghost if and only if it corresponds to a ghost mutable field
+   in a record. The "contents" region of an ordinary reference is not ghost
+   even if the reference itself is ghost. This is because we can alias
+   a non-ghost reference with a ghost reference as follows:
+     let ghost_ref<ro> = K nonghost_ref<ro> ghost_value
+   Here, ghost_ref is ghost by contamination, but it shares <ro> with
+   a non-ghost reference. Notice that any write in ghost_ref is forbidden
+   (such a write would be a ghost expression touching a non-ghost region). *)
+
 let create_region id ?(ghost=false) ty =
   { reg_name = id_register id; reg_ity = ty; reg_ghost = ghost }
 
@@ -164,13 +173,13 @@ let ity_s_any pr pts ity =
 
 (* traversal functions on type variables and regions *)
 
-let rec ity_v_map fnv fnr ity = match ity.ity_node with
+let rec ity_v_map_unsafe fnv fnr ity = match ity.ity_node with
   | Ityvar v ->
       fnv v
   | Itypur (f,tl) ->
-      ity_pur f (List.map (ity_v_map fnv fnr) tl)
+      ity_pur f (List.map (ity_v_map_unsafe fnv fnr) tl)
   | Ityapp (f,tl,rl) ->
-      ity_app f (List.map (ity_v_map fnv fnr) tl) (List.map fnr rl)
+      ity_app f (List.map (ity_v_map_unsafe fnv fnr) tl) (List.map fnr rl)
 
 let rec ity_v_fold fnv fnr acc ity = match ity.ity_node with
   | Ityvar v ->
@@ -186,8 +195,8 @@ let ity_v_all prv prr ity =
 let ity_v_any prv prr ity =
   try ity_v_fold (any_fn prv) (any_fn prr) false ity with FoldSkip -> true
 
-let ity_subst mv mr ity =
-  ity_v_map (fun v -> Mtv.find v mv) (fun r -> Mreg.find r mr) ity
+let ity_subst_unsafe mv mr ity =
+  ity_v_map_unsafe (fun v -> Mtv.find v mv) (fun r -> Mreg.find r mr) ity
 
 let ity_freevars = ity_v_fold (fun s v -> Stv.add v s) Util.const
 let ity_topregions = ity_v_fold Util.const (fun s r -> Sreg.add r s)
@@ -212,9 +221,16 @@ let ity_equal_check ty1 ty2 =
 let reg_equal_check r1 r2 =
   if not (reg_equal r1 r2) then raise (RegionMismatch (r1, r2))
 
+let reg_protect fn r =
+  let nr = fn r in
+  if nr.reg_ghost <> r.reg_ghost then raise (RegionMismatch (r, nr));
+  nr
+
+let ity_v_map fnv fnr ity = ity_v_map_unsafe fnv (reg_protect fnr) ity
+
 type ity_subst = {
   ity_subst_tv  : ity Mtv.t;
-  ity_subst_reg : region Mreg.t;
+  ity_subst_reg : region Mreg.t; (* must preserve ghost-ness *)
 }
 
 let ity_subst_empty = {
@@ -235,13 +251,13 @@ let reg_full_inst s r =
   Mreg.find r s.ity_subst_reg
 
 let ity_inst s ity =
-  ity_v_map
+  ity_v_map_unsafe
     (fun v -> Mtv.find_def (ity_var v) v s.ity_subst_tv)
     (fun r -> Mreg.find_def r r s.ity_subst_reg)
     ity
 
 let ity_full_inst s ity =
-  ity_subst s.ity_subst_tv s.ity_subst_reg ity
+  ity_subst_unsafe s.ity_subst_tv s.ity_subst_reg ity
 
 let rec ity_match s ity1 ity2 =
   let set = function
@@ -262,7 +278,7 @@ let rec ity_match s ity1 ity2 =
 
 and reg_match s r1 r2 =
   let is_new = ref false in
-  let set = function
+  let set = function (* must preserve ghost-ness of regions *)
     | None when r1.reg_ghost = r2.reg_ghost -> is_new := true; Some r2
     | Some r3 as r when reg_equal r3 r2 -> r
     | _ -> raise Exit
@@ -300,7 +316,8 @@ and reg_refresh mv mr r = match Mreg.find_opt r mr with
       mr, r
   | None ->
       let mr,ity = ity_inst_fresh mv mr r.reg_ity in
-      let id = id_clone r.reg_name and ghost = r.reg_ghost in
+      let id = id_clone r.reg_name in
+      let ghost = r.reg_ghost in
       let reg = create_region id ~ghost ity in
       Mreg.add r reg mr, reg
 
@@ -312,9 +329,9 @@ let ity_app_fresh s tl =
       raise (BadItyArity (s, List.length s.its_args, List.length tl)) in
   (* refresh regions *)
   let mr,rl = Util.map_fold_left (reg_refresh mv) Mreg.empty s.its_regs in
-  (* every external region in def is guaranteed to be in mr *)
+  (* every top region in def is guaranteed to be in mr *)
   match s.its_def with
-  | Some ity -> ity_subst mv mr ity
+  | Some ity -> ity_subst_unsafe mv mr ity
   | None -> ity_app s tl rl
 
 let ity_app s tl rl =
@@ -324,24 +341,20 @@ let ity_app s tl rl =
     with Invalid_argument _ ->
       raise (BadItyArity (s, List.length s.its_args, List.length tl)) in
   (* region map *)
-  let add m v r = Mreg.add v r m in
-  let mr = try List.fold_left2 add Mreg.empty s.its_regs rl
+  let sub = { ity_subst_tv = mv; ity_subst_reg = Mreg.empty } in
+  let sub = try List.fold_left2 reg_match sub s.its_regs rl
     with Invalid_argument _ ->
       raise (BadRegArity (s, List.length s.its_regs, List.length rl)) in
-  (* check that region types do unify *)
-  let sub = { ity_subst_tv = mv; ity_subst_reg = mr } in
-  let rmatch sub r1 r2 = ity_match sub r1.reg_ity r2.reg_ity in
-  ignore (List.fold_left2 rmatch sub s.its_regs rl);
-  (* to instantiate def, mv and mr are enough *)
+  (* every type var and top region in def are in its_args and its_regs *)
   match s.its_def with
-  | Some ity -> ity_subst mv mr ity
+  | Some ity -> ity_full_inst sub ity
   | None -> ity_app s tl rl
 
 let ity_pur s tl = match s.ts_def with
   | Some ty ->
       let add m v t = Mtv.add v t m in
       let m = List.fold_left2 add Mtv.empty s.ts_args tl in
-      ity_subst m Mreg.empty (ity_of_ty ty)
+      ity_subst_unsafe m Mreg.empty (ity_of_ty ty)
   | None ->
       ity_pur s tl
 
@@ -415,7 +428,8 @@ let eff_union x y =
   { eff_reads  = Sreg.union x.eff_reads  y.eff_reads;
     eff_writes = Sreg.union x.eff_writes y.eff_writes;
     eff_resets = Mreg.union join_reset x.eff_resets y.eff_resets;
-    eff_raises = Sexn.union x.eff_raises y.eff_raises; }
+    eff_raises = Sexn.union x.eff_raises y.eff_raises;
+  }
 
 let eff_read  e r = { e with eff_reads  = Sreg.add r e.eff_reads }
 let eff_write e r = { e with eff_writes = Sreg.add r e.eff_writes }
@@ -473,6 +487,8 @@ type pvsymbol = {
   pv_ity     : ity;
   pv_ghost   : bool;
   pv_mutable : region option;
+  pv_tvs     : Stv.t;
+  pv_regs    : Sreg.t;
 }
 
 module Pv = StructMake (struct
@@ -491,15 +507,24 @@ let create_pvsymbol id ?mut ?(ghost=false) ity =
   let ty = ty_of_ity ity in
   let vs = create_vsymbol id ty in
   begin match mut with
-    | Some r when not (ity_equal r.reg_ity ity) || ghost <> r.reg_ghost ->
+    | Some r when
+      (* A ghost variable may contain a non-ghost region.
+         No writes are allowed in such a ghost variable. *)
+      not (ity_equal r.reg_ity ity) || (r.reg_ghost && not ghost) ->
         raise (InvalidPVsymbol vs.vs_name)
     | _ ->
         ()
   end;
-  { pv_vs = vs;
-    pv_ity = ity;
-    pv_ghost = ghost;
-    pv_mutable = mut; }
+  let tvs = ity_freevars Stv.empty ity in
+  let regs = ity_topregions Sreg.empty ity in
+  let regs = option_fold (fun s r -> Sreg.add r s) regs mut in
+  { pv_vs      = vs;
+    pv_ity     = ity;
+    pv_ghost   = ghost;
+    pv_mutable = mut;
+    pv_tvs     = tvs;
+    pv_regs    = regs;
+  }
 
 let pv_clone pv =
   let id = id_clone pv.pv_vs.vs_name in
@@ -525,7 +550,9 @@ and vty_arrow = {
   a_eff   : effect;
   a_pre   : term; (* epsilon under a dummy variable, to accumulate substs *)
   a_post  : term; (* epsilon under the value variable or under a dummy vs *)
-  a_xpost : (vsymbol * term) Mexn.t; (* epsilon under the value variable *)
+  a_xpost : term Mexn.t; (* epsilon under the exception value variable *)
+  a_tvs   : Stv.t; (* we do not count type variables in eff/pre/post/xpost *)
+  a_regs  : Sreg.t; (* we do not count regions in eff/pre/post/xpost *)
 }
 
 type pre = term
@@ -539,6 +566,14 @@ type vty_comp = {
   c_post  : post;
   c_xpost : xpost;
 }
+
+let vty_freevars s = function
+  | VTvalue pv -> Stv.union s pv.pv_tvs
+  | VTarrow a  -> Stv.union s a.a_tvs
+
+let vty_topregions s = function
+  | VTvalue pv -> Sreg.union s pv.pv_regs
+  | VTarrow a  -> Sreg.union s a.a_regs
 
 (* smart constructors *)
 
@@ -563,11 +598,11 @@ let open_spec = function
 let vty_arrow
   x ?(pre=t_true) ?(post=t_true) ?(xpost=Mexn.empty) ?(effect=eff_empty) vty =
   (* check for clashes *)
-  let check_vs y = if vs_equal x.pv_vs y then raise (DuplicateVar y) in
+(* let check_vs y = if vs_equal x.pv_vs y then raise (DuplicateVar y) in *)
   let check_pv y = if pv_equal x y then raise (DuplicateVar x.pv_vs) in
   let rec check = function
     | VTarrow a ->
-        Mexn.iter (fun _ (y,_) -> check_vs y) a.a_xpost;
+     (* Mexn.iter (fun _ (y,_) -> check_vs y) a.a_xpost; *)
         check_pv a.a_arg;
         check a.a_vty
     | VTvalue y ->
@@ -586,8 +621,8 @@ let vty_arrow
   let conv_xpost xs (vs,f) =
     if not (ty_equal (ty_of_ity xs.xs_ity) vs.vs_ty)
     then raise (InvalidExceptionPost xs);
-    check_vs vs;
-    vs, t_eps_close vs f
+    (* check_vs vs; *)
+    t_eps_close vs f
   in
   let post = match vty with
     | VTvalue pv -> t_eps_close pv.pv_vs post
@@ -600,6 +635,8 @@ let vty_arrow
     a_pre   = close_spec pre;
     a_post  = post;
     a_xpost = Mexn.mapi conv_xpost xpost;
+    a_tvs   = vty_freevars x.pv_tvs vty;
+    a_regs  = vty_topregions x.pv_regs vty;
   }
 
 (*
@@ -615,14 +652,14 @@ let vty_app_arrow arr x =
   let subst f = t_subst_single arr.a_arg.pv_vs (t_var x.pv_vs) f in
   let _,pre = open_spec (subst arr.a_pre) in
   let res,post = open_spec (subst arr.a_post) in
-  let xsubst (_,e) = open_spec (subst e) in
+  let xsubst e = open_spec (subst e) in
   let rec arr_subst arr = { arr with
     a_vty   = (match arr.a_vty with
       | VTarrow a -> VTarrow (arr_subst a)
       | VTvalue _ -> arr.a_vty);
     a_pre   = subst arr.a_pre;
     a_post  = subst arr.a_post;
-    a_xpost = Mexn.map (fun (x,e) -> x, subst e) arr.a_xpost;
+    a_xpost = Mexn.map subst arr.a_xpost;
   }
   in
   let vty = match arr.a_vty with
@@ -644,14 +681,28 @@ let open_vty_arrow arr =
   let c = vty_app_arrow arr pv in
   pv, c.c_vty
 
-(*
-let vty_full_inst ~ghost s = function
-  | VTvalue pv ->
-      let pv = pv_full_inst s pv in
-      VTvalue { pv with pv_ghost = ghost || pv.pv_ghost }
-  | VTarrow _a ->
-      assert false (*TODO*)
+let vty_full_inst s vty =
+  let subT = Mtv.map ty_of_ity s.ity_subst_tv in
+  let rec inst subV = function
+    | VTvalue pv ->
+        (* this is not the same vsymbol anymore that is bound in
+           the preceding post. However, this should not matter. *)
+        VTvalue (pv_full_inst s pv)
+    | VTarrow a ->
+        let x = pv_full_inst s a.a_arg in
+        let subV = Mvs.add a.a_arg.pv_vs (t_var x.pv_vs) subV in
+        let subst = t_ty_subst subT subV in
+        let vty = inst subV a.a_vty in
+        VTarrow {
+          a_arg   = x;
+          a_vty   = vty;
+          a_eff   = eff_full_inst s a.a_eff;
+          a_pre   = subst a.a_pre;
+          a_post  = subst a.a_post;
+          a_xpost = Mexn.map subst a.a_xpost;
+          a_tvs   = vty_freevars x.pv_tvs vty;
+          a_regs  = vty_topregions x.pv_regs vty;
+        }
+  in
+  inst Mvs.empty vty
 
-let vty_app_spec _subst _v _pv (* : pre * post * xpost *) =
-  assert false (*TODO*)
-*)
