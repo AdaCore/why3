@@ -1,0 +1,38 @@
+
+(* a bag is simply a reference containing a finite set *)
+module Bag
+
+  use export set.Fset
+  use export module ref.Ref
+
+  type t 'a = ref (set 'a)
+
+  let empty () =
+    {}
+    ref (empty : set 'a)
+    { is_empty !result }
+
+  let create (s: set 'a) =
+    {}
+    ref s
+    { !result = s }
+
+  let is_empty (b: t 'a) =
+    {}
+    is_empty !b
+    { result=True <-> is_empty !b }
+
+  let push (x: 'a) (b: t 'a) =
+    {}
+    b := add x !b
+    { !b = add x (old !b) }
+
+  let pop (b: t 'a) =
+    { not (is_empty !b) }
+    let x = choose !b in
+    b := remove x !b;
+    x
+    { mem result (old !b) /\ !b = remove result (old !b) }
+
+end
+

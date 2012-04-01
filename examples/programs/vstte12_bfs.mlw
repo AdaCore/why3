@@ -1,5 +1,5 @@
 
-(* The 2nd Verified Software Competition (VSTTE 2012) 
+(* The 2nd Verified Software Competition (VSTTE 2012)
    https://sites.google.com/site/vstte2012/compet
 
    Problem 5:
@@ -7,13 +7,12 @@
 
 theory Graph
 
-  use import set.Fset
+  use import int.Int
+  use export set.Fset
 
   type vertex
 
   function succ vertex : set vertex
-
-  use import int.Int
 
   (* there is a path of length n from v1 to v2 *)
   inductive path (v1 v2: vertex) (n: int) =
@@ -47,33 +46,11 @@ theory Graph
 
 end
 
-(* a bag is simply a reference containing a finite set *)
-module Bag
-
-  use export set.Fset
-  use export module ref.Ref
-
-  type bag 'a = ref (set 'a)
-
-  val is_empty (b: bag 'a) :
-    {} bool { result=True <-> is_empty !b }
-
-  val push (x: 'a) (b: bag 'a) :
-    {} unit writes b { !b = add x (old !b) }
-
-  val take (b: bag 'a) :
-    { not (is_empty !b) }
-    'a
-    writes b
-    { mem result (old !b) /\ !b = remove result (old !b) }
-
-end
-
 module BFS
 
   use import int.Int
   use import Graph
-  use import module Bag
+  use module bag.Bag as B
   use import module ref.Refint
 
   exception Found int
@@ -102,22 +79,22 @@ module BFS
     forall y: vertex. mem y (succ x) -> mem y visited
 
   (* function fill_next fills set next with the unvisited successors of v *)
-  let fill_next (s t v: vertex) (visited current next: bag vertex) (d:ref int) =
+  let fill_next (s t v: vertex) (visited current next: B.t vertex) (d:ref int) =
     { inv s t !visited !current !next !d /\
       shortest_path s v !d /\
       (forall x: vertex. x<> v -> closure !visited !current !next x) }
     let acc = ref (succ v) in
-    while not (is_empty acc) do
+    while not (B.is_empty acc) do
       invariant {
         inv s t !visited !current !next !d /\
         subset !acc (succ v) /\
         subset (diff (succ v) !acc) !visited /\
         (forall x: vertex. x<> v -> closure !visited !current !next x)
       }
-      let w = take acc in
+      let w = B.pop acc in
       if not (mem w !visited) then begin
-        push w visited;
-        push w next
+        B.push w visited;
+        B.push w next
       end
     done
     { inv s t !visited !current !next !d /\
@@ -130,17 +107,17 @@ module BFS
     let current = ref (singleton s) in
     let next    = ref empty in
     let d = ref 0 in
-    while not (is_empty current) do
+    while not (B.is_empty current) do
       invariant {
         inv s t !visited !current !next !d /\
         (is_empty !current -> is_empty !next) /\
         (forall x: vertex. closure !visited !current !next x) /\
         0 <= !d
       }
-      let v = take current in
+      let v = B.pop current in
       if v = t then raise (Found !d);
       fill_next s t v visited current next d;
-      if is_empty current then begin
+      if B.is_empty current then begin
         current := !next;
         next    := empty;
         incr d
