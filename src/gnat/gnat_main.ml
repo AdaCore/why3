@@ -200,7 +200,7 @@ module Implem =
 
 module M = Session_scheduler.Make (Implem)
 
-let sched_state = M.init 1
+let sched_state = M.init Gnat_config.parallel
 let project_dir = Session.get_project_dir Gnat_config.filename
 
 let env_session, is_new_session =

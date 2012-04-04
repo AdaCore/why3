@@ -55,3 +55,6 @@ val autogen_label : Ident.label
 val ide_progress_bar : bool
 (* set if option --ide-progress-bar was given, to issue formatted output on
    current numbers of VCs proved *)
+
+val parallel : int
+(* number of parallel processes that can be run in parallel for proving VCs *)
