@@ -46,7 +46,6 @@ let opt_config = ref None
 let opt_extra = ref []
 
 let spec = Arg.align [
-(*
   ("-L",
    Arg.String (fun s -> includes := s :: !includes),
    "<s> add s to loadpath") ;
@@ -56,7 +55,6 @@ let spec = Arg.align [
   ("-I",
    Arg.String (fun s -> includes := s :: !includes),
    " same as -L (obsolete)") ;
-*)
   "-C", Arg.String (fun s -> opt_config := Some s),
       "<file> Read configuration from <file>";
   "--config", Arg.String (fun s -> opt_config := Some s),
