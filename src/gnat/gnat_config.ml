@@ -54,31 +54,31 @@ let usage_msg =
   "Usage: gnatwhy3 [options] file"
 
 let options = Arg.align [
-   "-v", Arg.Set opt_verbose, "Output extra verbose information";
-   "--verbose", Arg.Set opt_verbose, "Output extra verbose information";
+   "-v", Arg.Set opt_verbose, " Output extra verbose information";
+   "--verbose", Arg.Set opt_verbose, " Output extra verbose information";
 
    "-t", Arg.Set_int opt_timeout,
-          "Set the timeout in seconds (default is 10 seconds)";
+          " Set the timeout in seconds (default is 10 seconds)";
    "--timeout", Arg.Set_int opt_timeout,
-          "Set the timeout in seconds (default is 10 seconds)";
+          " Set the timeout in seconds (default is 10 seconds)";
    "-j", Arg.Set_int opt_parallel,
-          "Set the number of parallel processes (default is 1)";
+          " Set the number of parallel processes (default is 1)";
    "-f", Arg.Set opt_force,
-          "Rerun VC generation and proofs, even when the result is up to date";
+          " Rerun VC generation and proofs, even when the result is up to date";
    "--force", Arg.Set opt_force,
-          "Rerun VC generation and proofs, even when the result is up to date";
+          " Rerun VC generation and proofs, even when the result is up to date";
    "--no-proof", Arg.Set opt_noproof,
-          "Do not call the prover";
+          " Do not call the prover";
    "--report", Arg.String set_report,
-          "set report mode, one of (fail | all | detailed), default is fail";
+          " Set report mode, one of (fail | all | detailed), default is fail";
    "--limit-line", Arg.String set_limit_line,
-          "limit proof to a file and line, given by \"file:line\"";
+          " Limit proof to a file and line, given by \"file:line\"";
    "--limit-subp", Arg.String set_limit_subp,
-          "limit proof to a subprogram defined by \"file:line\"";
+          " Limit proof to a subprogram defined by \"file:line\"";
    "--ide-progress-bar", Arg.Set opt_ide_progress_bar,
-          "Issue information on number of VCs proved";
+          " Issue information on number of VCs proved";
    "--debug", Arg.Set opt_debug,
-          "Enable debug mode";
+          " Enable debug mode";
 ]
 
 let filename =
