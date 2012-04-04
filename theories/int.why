@@ -278,6 +278,41 @@ theory Iter
 
 end
 
+(* integers extended with infinity *)
+theory IntInf
+
+  use import Int
+
+  type t = Finite int | Infinite
+
+  function add (x: t) (y: t) : t =
+    match x with
+      | Infinite -> Infinite
+      | Finite x ->
+        match y with
+          | Infinite -> Infinite
+          | Finite y -> Finite (x + y)
+        end
+    end
+
+  predicate lt (x y: t) =
+    match x with
+      | Infinite -> false
+      | Finite x ->
+        match y with
+          | Infinite -> true
+          | Finite y -> x < y
+        end
+    end
+
+  predicate le (x y: t) = lt x y \/ x = y
+
+  clone export relations.TotalOrder with type t = t, predicate rel = le,
+    lemma Refl, lemma Antisymm, lemma Trans, lemma Total
+
+end
+
+
 theory Induction
 
   use import Int
