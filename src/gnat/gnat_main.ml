@@ -72,6 +72,7 @@ module GoalSet : sig
    val remove : t -> goal -> unit
    val choose : t -> goal
    val mem    : t -> goal -> bool
+   val count  : t -> int
 end =
 struct
    type t = unit GoalMap.t
@@ -81,6 +82,7 @@ struct
    let add t x = GoalMap.add t x ()
    let remove t x = GoalMap.remove t x
    let mem t x = GoalMap.mem t x
+   let count t = GoalMap.length t
 
    exception Found of goal
    let choose t =
@@ -105,7 +107,7 @@ module Objectives : sig
    val iter : (Gnat_expl.expl -> GoalSet.t -> unit) -> unit
 
    val stat : unit -> unit
-
+   val get_num_goals : unit -> int
 end = struct
 
    let nb_objectives = ref 0
@@ -153,6 +155,7 @@ end = struct
       Format.printf "Obtained %d proof objectives and %d VCs@."
         !nb_objectives !nb_goals
 
+   let get_num_goals () = !nb_goals
 end
 
 let print ?(endline=true) b expl =
@@ -197,7 +200,7 @@ module Implem =
 
 module M = Session_scheduler.Make (Implem)
 
-let sched_state = M.init 5
+let sched_state = M.init 1
 let project_dir = Session.get_project_dir Gnat_config.filename
 
 let env_session, is_new_session =
@@ -247,7 +250,7 @@ let iter_leaf_goals f =
 let rec is_trivial_autogen fml =
    match fml.t_node with
    | Ttrue ->
-         Slab.mem Gnat_config.autogen_label fml.t_label 
+         Slab.mem Gnat_config.autogen_label fml.t_label
    | Tquant (_,tq) ->
          let _,_,t = t_open_quant tq in
          is_trivial_autogen t
@@ -321,9 +324,29 @@ end = struct
 
 end
 
+module Display_Progress : sig
+  val set_num_goals : int -> unit
+  val complete_goals : int -> unit
+end = struct
+
+  let total_num_goals = ref 0
+  let current_num_goals = ref 0
+
+  let set_num_goals num = total_num_goals := num
+
+  let complete_goals num =
+    if Gnat_config.ide_progress_bar then begin
+      current_num_goals := !current_num_goals + num;
+      Format.printf "completed %d out of %d (%d%%)...@."
+        !current_num_goals !total_num_goals
+        (!current_num_goals * 100 / !total_num_goals)
+    end
+end
+
 let rec handle_vc_result goal result detailed =
+   let remaining = Objectives.discharge goal in
    if result then begin
-      let remaining = Objectives.discharge goal in
+      Display_Progress.complete_goals 1;
       if GoalSet.is_empty remaining then begin
          match Gnat_config.report with
          | (Gnat_config.Verbose | Gnat_config.Detailed) ->
@@ -333,6 +356,7 @@ let rec handle_vc_result goal result detailed =
          schedule_goal (GoalSet.choose remaining)
       end
    end else begin
+      Display_Progress.complete_goals (GoalSet.count remaining + 1);
       if Gnat_config.report = Gnat_config.Detailed && detailed <> None then
       begin
          let detailed =
@@ -423,6 +447,7 @@ let _ =
       if Gnat_config.verbose then begin
          Objectives.stat ()
       end;
+      Display_Progress.set_num_goals (Objectives.get_num_goals ());
       Objectives.iter (fun e goalset ->
          let filter =
             match Gnat_config.limit_line with
