@@ -1,11 +1,7 @@
-Declare ML Module "whytac".
+Require Import Why3.
 Require Export ZArith.
 Open Scope Z_scope.
 Require Export List.
-
-Ltac ae := why3 "alt-ergo".
-Ltac Z3 := why3 "z3-2".
-Ltac spass := why3 "spass".
 
 Section S0.
   Variable a:Set->Set.

@@ -1084,7 +1084,7 @@ let tr_top_decl = function
   | _, Lib.ClosedSection _
   | _, Lib.FrozenState _ -> ()
 
-let whytac s gl =
+let why3tac s gl =
   (* print_dep Format.err_formatter; *)
   let concl_type = pf_type_of gl (pf_concl gl) in
   if not (is_Prop concl_type) then error "Conclusion is not a Prop";
@@ -1117,10 +1117,8 @@ let whytac s gl =
         Format.eprintf "@[exception: %a@]@." Exn_printer.exn_printer e;
         raise e
 
-
-
 (*
 Local Variables:
-compile-command: "unset LANG; make -C ../.. src/coq-plugin/whytac.cmxs"
+compile-command: "unset LANG; make -C ../.. src/coq-plugin/why3tac.cmxs"
 End:
 *)

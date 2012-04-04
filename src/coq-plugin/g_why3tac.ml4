@@ -19,8 +19,8 @@
 
 (*i camlp4deps: "parsing/grammar.cma" i*)
 
-open Whytac
+open Why3tac
 
 TACTIC EXTEND Why3
-  [ "why3" string(s) ] -> [ whytac s ]
+  [ "why3" string(s) ] -> [ why3tac s ]
 END

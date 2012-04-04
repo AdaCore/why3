@@ -797,9 +797,9 @@ endif
 
 ifeq (@enable_coq_plugin@,yes)
 
-COQPGENERATED = src/coq-plugin/g_whytac.ml
+COQPGENERATED = src/coq-plugin/g_why3tac.ml
 
-COQP_FILES = whytac g_whytac
+COQP_FILES = why3tac g_why3tac
 
 COQPMODULES = $(addprefix src/coq-plugin/, $(COQP_FILES))
 
@@ -815,20 +815,29 @@ $(COQPCMO) $(COQPCMX): INCLUDES += $(COQPINCLUDES)
 
 $(COQPDEP): $(COQPGENERATED)
 
-byte: src/coq-plugin/whytac.cma
-opt:  src/coq-plugin/whytac.cmxs
+byte: lib/coq-plugin/why3tac.cma  lib/coq-plugin/Why3.vo
+opt:  lib/coq-plugin/why3tac.cmxs lib/coq-plugin/Why3.vo
 
-src/coq-plugin/whytac.cma:  BFLAGS+=-rectypes -I +camlp5
-src/coq-plugin/whytac.cmxs: OFLAGS+=-rectypes -I +camlp5
+byte: WHY3TAC = lib/coq-plugin/why3tac.cma
+opt:  WHY3TAC = lib/coq-plugin/why3tac.cmxs
 
-src/coq-plugin/whytac.cmxs: src/why3.cmxa $(COQPCMX)
+byte: WHY3COQ = $(COQC) -byte
+opt:  WHY3COQ = $(COQC) -opt
+
+lib/coq-plugin/why3tac.cma:  BFLAGS+=-rectypes -I +camlp5
+lib/coq-plugin/why3tac.cmxs: OFLAGS+=-rectypes -I +camlp5
+
+lib/coq-plugin/why3tac.cmxs: src/why3.cmxa $(COQPCMX)
 	$(OCAMLOPT) $(OFLAGS) -o $@ -shared $^
 
-src/coq-plugin/whytac.cma: src/why3.cma $(COQPCMO)
+lib/coq-plugin/why3tac.cma: src/why3.cma $(COQPCMO)
 	$(OCAMLC) -a $(BFLAGS) -o $@ $^
 
-src/coq-plugin/g_whytac.ml: src/coq-plugin/g_whytac.ml4
+src/coq-plugin/g_why3tac.ml: src/coq-plugin/g_why3tac.ml4
 	$(CAMLP5O) pr_o.cmo @COQLIB@/parsing/grammar.cma -impl $^ -o $@
+
+lib/coq-plugin/Why3.vo: lib/coq-plugin/Why3.v $(WHY3TAC)
+	$(WHY3COQ) -I lib/coq-plugin/ $<
 
 # depend and clean targets
 
@@ -840,9 +849,13 @@ depend: $(COQPDEP)
 
 clean::
 	rm -f src/coq-plugin/*.cm[iox] src/coq-plugin/*.o
-	rm -f src/coq-plugin/*.cma src/coq-plugin/*.cmxs
+	rm -f lib/coq-plugin/*.cma lib/coq-plugin/*.cmxs
 	rm -f src/coq-plugin/*.annot src/coq-plugin/*.dep src/coq-plugin/*~
 	rm -f $(COQPGENERATED)
+
+install_no_local::
+	mkdir -p $(LIBDIR)/why3/coq-plugin
+	cp -f lib/coq-plugin/* $(LIBDIR)/why3/coq-plugin
 
 endif
 
@@ -1226,7 +1239,7 @@ DISTRIB_FILES = Version Makefile.in configure.in META.in configure \
       examples/use_api.ml \
       theories/*.why \
       modules/*.mlw \
-      lib/coq/*/*.v \
+      lib/coq/*/*.v lib/coq-plugin/*.v \
       share/provers-detection-data.conf.in \
       share/emacs/why.el share/images/*.png share/lang/*.lang \
       share/bash/why3 share/zsh/_why3 share/vim/why3.vim
@@ -1253,6 +1266,7 @@ $(DISTRIB_TAR): doc/manual.pdf
 	mkdir -p $(DISTRIB_DIR)/lib
 	mkdir -p $(DISTRIB_DIR)/lib/plugins
 	mkdir -p $(DISTRIB_DIR)/lib/coq
+	mkdir -p $(DISTRIB_DIR)/lib/coq-plugin
 	ln -s ../drivers $(DISTRIB_DIR)/share/drivers
 	ln -s ../modules $(DISTRIB_DIR)/share/modules
 	ln -s ../theories $(DISTRIB_DIR)/share/theories

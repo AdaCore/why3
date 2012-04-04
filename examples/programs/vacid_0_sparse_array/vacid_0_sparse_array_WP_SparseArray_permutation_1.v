@@ -166,6 +166,8 @@ Declare ML Module "whytac".
 Ltac ae := why3 "alt-ergo".
 *)
 
+Require Import Why3.
+
 (* Why3 goal *)
 Theorem permutation : forall (a:Type), forall (a1:(sparse_array a)),
   (sa_inv a1) -> (((card a1) = (length1 a1)) -> forall (i:Z),
@@ -177,35 +179,11 @@ intro H; decompose [and] H; clear H.
 clear a_values a_def H0 H3 H4.
 subst n1 n2.
 intros. subst a_card.
-assert (inj: injective a_back n0) (* by ae *).
-
-  red; intros.
-  red; intro.
-  generalize (H5 i0 H).
-  generalize (H5 j H1).
-  intuition.
-  apply H2.
-  rewrite <- H11.
-  rewrite <- H12.
-  apply f_equal; assumption.
-
-assert (rng: range a_back n0) (* by ae *).
-
-  red; intros.
-  generalize (H5 i0); intuition.
-
+assert (inj: injective a_back n0) by ae.
+assert (rng: range a_back n0) by ae.
 generalize (injective_surjective a_back n0 inj rng); intro surj.
 destruct (surj i H0) as (j, (hj1, hj2)).
-(* ae. *)
-
-  generalize (H5 j hj1); intros (hi1, hi2).
-  split.
-  rewrite <- hj2.
-  rewrite hi2; auto.
-  rewrite <- hj2.
-  generalize (H5 j hj1); intuition.
-  rewrite H8; auto.
-
+ae.
 Qed.
 
 
