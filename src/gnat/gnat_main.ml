@@ -51,9 +51,6 @@ let rec search_labels acc f =
                let _,_,t = t_open_quant tq in
                search_labels acc t
 
-let nb_vcs   = ref 0
-let nb_po    = ref 0
-
 type key = int
 type goal = key Session.goal
 
