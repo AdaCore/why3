@@ -24,54 +24,62 @@ open Term
 open Mlw_ty
 
 (*
+  - A "proper type" of a vty [v] is [v] with empty specification
+    (effect/pre/post/xpost). Basically, it is formed from pv_ity's
+    of pvsymbols in the arguments and the result of [v].
 
-  1. A "proper type" of a vty [v] is [v] with all effects and specs
-     (pre/post/xpost) removed. Basically, it is formed from the ity's
-     of pvsymbols in the arguments and the result of [v].
+  - Given a vty [v], [vty_freevars v] and [vty_topregions v] return
+    the sets of type variables and regions, respectively, that occur
+    in the proper type of [v]. We will call them "proper" type vars
+    and regions of [v].
 
-  2. Given a vty [v], [vty_freevars v] and [vty_topregions v] return 
-     the sets of type variables and regions, respectively, that occur 
-     in the proper type of [v]. We will call them "proper" type variables
-     and regions of [v].
+  - The specification (effect/pre/post/xpost) of a vty [v] may contain
+    type vars and regions that do not occur in the proper type of [v].
+    We will call them "extra" type vars and regions of [v].
 
-  3. The specs (pre/post/xpost) and the effects in a vty [v] may contain
-     type variables and regions that do not occur in the proper type of [v].
-     We will call them "extra" type variables and regions of [v].
+  - An expression [e] provides the maps [e.e_tvs] and [e.e_regs] from
+    idents (vsymbols, pvsymbols, psymbols, ppsymbols) occurring in [e]
+    (including asserts, variant, pre- and post-conditions) to sets of
+    type vars and regions, respectively, that are "associated" to
+    those idents.
 
-  4. A substitution given to [vty_full_inst] MUST instantiate every extra
-     type variable and region to itself. We do not verify this invariant,
-     but it is going to be ensured by the following.
+  - Every type var in [vs.vs_ty] is associated to [vs].
 
-  5. An expression [e] provides the maps [e.e_tvs] and [e.e_regs] from
-     idents (vsymbols, pvsymbols, psymbols, ppsymbols) occurring in [e]
-     to sets of type variables and regions, respectively, that are 
-     "related" to these idents. For example, every type variable and
-     region that occurs in a pv_ity of a pvsymbol [x] is related to [x].
-     For psymbols and ppsymbols, the meaning of "related" is explained below.
+  - Every type var and region in [pv.pv_ity] is associated to [pv].
 
-  6. It is possible that [e.e_vty] contains a proper type variable or 
-     a proper region that does not appear in the range of [e.e_tvs] or 
-     [e.e_regs]. However, every extra type variable and region of
-     [e.e_vty] MUST occur in the range of [e.e_tvs] and [e.e_regs].
+  - A psymbol (monomorphic program symbol) [p] provides the sets [p.p_tvs]
+    and [p.p_regs] of its associated type vars and regions, respectively.
+    These are exactly the unions of the proper type vars and regions of
+    [p.p_vty] with the type vars and regions in the range of [e.e_tvs]
+    and [e.e_regs], where [e] is the defining expression of [p].
 
-  7. A psymbol (monomorphic program symbol) [p] provides the sets [p.p_tvs]
-     and [p.p_regs] of its related type variables and regions, respectively, 
-     that cover both proper and extra type variables and regions of [p.p_vty].
+  - A ppsymbol (polymorphic program symbol) [pp] provides the sets
+    [pp.pp_tvs] and [pp.pp_regs] of its associated type vars and regions.
+    Given a mutually recursive definition
+      let rec pp1 pv11 pv12 = expr1 { spec1 }
+      with    pp2 pv21 pv22 = expr2 { spec2 }
+    we compute the associated type vars of [pp1] as follows:
+      1. we combine [expr1.e_tvs] with the corresponding map of [spec1]
+      2. we remove from the resulting map the idents of [pv11] and [pv12]
+      3. we remove from the resulting map the idents of [pp1] and [pp2]
+      4. [pp1.pp_tvs] is the union of the range of the resulting map
+    Region sets are computed in the same way. (Don't forget to refresh
+    [expr1] and [expr2] if the sets of [pp1] and [pp2] have changed.)
 
-     One way to ensure this is to put into [p.p_tvs] the union of the proper
-     type variables of [p.p_vty] and all the type variables in the range of
-     [e.e_tvs], where [e] is the defining expression of [p] (similarly for
-     regions). However, this will relate to [p] more that just proper and
-     extra variables of [p.p_vty]. It is unclear whether this is a problem,
-     but my guess is it's not.
+  - Every proper type var and region of [pp.pp_vty] that is not associated
+    to [pp] is generalized. Every extra type var and region of [pp.pp_vty]
+    must be associated to [pp] <*> and is not generalized. A substitution
+    given to [vty_full_inst] must instantiate every type var and region in
+    [pp.pp_tvs] and [pp.pp_regs] to itself.
 
-  8. A ppsymbol  
+    In the specialized expression [e], the type vars and regions introduced
+    by the substitution will appear in the [e.e_vty], but not in the range
+    of [e.e_tvs] and [e.e_regs], as they are related to no ident.
+
+  - The invariant <*> above is not verified explicitly, but is maintained
+    by construction of ppsymbols. In particular, every extra type var and
+    region in [e.e_vty] appear in the range of [e.e_tvs] and [e.e_regs].
 *)
-
-
-
-
-
 
 type variant = {
   v_term : term;           (* : tau *)
