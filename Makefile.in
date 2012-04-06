@@ -791,51 +791,51 @@ endif
 
 ifeq (@enable_coq_plugin@,yes)
 
-COQPGENERATED = src/coq-plugin/g_why3tac.ml
+COQPGENERATED = src/coq-tactic/g_why3tac.ml
 
 COQP_FILES = why3tac g_why3tac
 
-COQPMODULES = $(addprefix src/coq-plugin/, $(COQP_FILES))
+COQPMODULES = $(addprefix src/coq-tactic/, $(COQP_FILES))
 
 COQPDEP = $(addsuffix .dep, $(COQPMODULES))
 COQPCMO = $(addsuffix .cmo, $(COQPMODULES))
 COQPCMX = $(addsuffix .cmx, $(COQPMODULES))
 
 COQPTREES = kernel lib interp parsing proofs pretyping tactics library toplevel
-COQPINCLUDES = -I src/coq-plugin $(addprefix -I @COQLIB@/, $(COQPTREES))
+COQPINCLUDES = -I src/coq-tactic $(addprefix -I @COQLIB@/, $(COQPTREES))
 
-$(COQPDEP): DEPFLAGS += -I src/coq-plugin
+$(COQPDEP): DEPFLAGS += -I src/coq-tactic
 $(COQPCMO) $(COQPCMX): INCLUDES += $(COQPINCLUDES)
 
 $(COQPDEP): $(COQPGENERATED)
 
-byte: src/coq-plugin/.why3-vo-byte
-opt:  src/coq-plugin/.why3-vo-opt
+byte: src/coq-tactic/.why3-vo-byte
+opt:  src/coq-tactic/.why3-vo-opt
 
-lib/coq-plugin/why3tac.cma:  BFLAGS+=-rectypes -I +camlp5
-lib/coq-plugin/why3tac.cmxs: OFLAGS+=-rectypes -I +camlp5
+lib/coq-tactic/why3tac.cma:  BFLAGS+=-rectypes -I +camlp5
+lib/coq-tactic/why3tac.cmxs: OFLAGS+=-rectypes -I +camlp5
 
-lib/coq-plugin/why3tac.cmxs: src/why3.cmxa $(COQPCMX)
+lib/coq-tactic/why3tac.cmxs: src/why3.cmxa $(COQPCMX)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ -shared $^
 
-lib/coq-plugin/why3tac.cma: src/why3.cma $(COQPCMO)
+lib/coq-tactic/why3tac.cma: src/why3.cma $(COQPCMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) -a $(BFLAGS) -o $@ $^
 
-src/coq-plugin/g_why3tac.ml: src/coq-plugin/g_why3tac.ml4
+src/coq-tactic/g_why3tac.ml: src/coq-tactic/g_why3tac.ml4
 	$(if $(QUIET),@echo 'Camlp5   $<' &&) \
 	    $(CAMLP5O) pr_o.cmo @COQLIB@/parsing/grammar.cma -impl $^ -o $@
 
-src/coq-plugin/.why3-vo-byte: lib/coq-plugin/Why3.v lib/coq-plugin/why3tac.cma
+src/coq-tactic/.why3-vo-byte: lib/coq-tactic/Why3.v lib/coq-tactic/why3tac.cma
 	$(if $(QUIET),@echo 'Coqc     $<' &&) \
-	    $(COQC) -byte -I lib/coq-plugin/ $< && \
-	    touch src/coq-plugin/.why3-vo-byte
+	    $(COQC) -byte -I lib/coq-tactic/ $< && \
+	    touch src/coq-tactic/.why3-vo-byte
 
-src/coq-plugin/.why3-vo-opt: lib/coq-plugin/Why3.v lib/coq-plugin/why3tac.cmxs
+src/coq-tactic/.why3-vo-opt: lib/coq-tactic/Why3.v lib/coq-tactic/why3tac.cmxs
 	$(if $(QUIET),@echo 'Coqc     $<' &&) \
-	    $(COQC) -opt -I lib/coq-plugin/ $< && \
-	    touch src/coq-plugin/.why3-vo-opt
+	    $(COQC) -opt -I lib/coq-tactic/ $< && \
+	    touch src/coq-tactic/.why3-vo-opt
 
 # depend and clean targets
 
@@ -846,16 +846,16 @@ endif
 depend: $(COQPDEP)
 
 clean::
-	rm -f src/coq-plugin/*.cm[iox] src/coq-plugin/*.o
-	rm -f lib/coq-plugin/*.cma lib/coq-plugin/*.cmxs
-	rm -f lib/coq-plugin/*.vo lib/coq-plugin/*.glob
-	rm -f src/coq-plugin/*.annot src/coq-plugin/*.dep src/coq-plugin/*~
-	rm -f src/coq-plugin/.why3-vo-*
+	rm -f src/coq-tactic/*.cm[iox] src/coq-tactic/*.o
+	rm -f lib/coq-tactic/*.cma lib/coq-tactic/*.cmxs
+	rm -f lib/coq-tactic/*.vo lib/coq-tactic/*.glob
+	rm -f src/coq-tactic/*.annot src/coq-tactic/*.dep src/coq-tactic/*~
+	rm -f src/coq-tactic/.why3-vo-*
 	rm -f $(COQPGENERATED)
 
 install_no_local::
-	mkdir -p $(LIBDIR)/why3/coq-plugin
-	cp -f lib/coq-plugin/* $(LIBDIR)/why3/coq-plugin
+	mkdir -p $(LIBDIR)/why3/coq-tactic
+	cp -f lib/coq-tactic/* $(LIBDIR)/why3/coq-tactic
 
 endif
 
@@ -1103,8 +1103,8 @@ doc/bnf: doc/bnf.mll
 	$(OCAMLLEX) $<
 	$(OCAMLOPT) -o $@ doc/bnf.ml
 
-DOC = api glossary ide intro library macros manpages \
-      manual starting syntax syntaxref version whyml
+DOC = api glossary ide intro library macros manpages coq_tactic \
+      realizations manual starting syntax syntaxref version whyml
 
 DOCTEX = $(addprefix doc/, $(addsuffix .tex, $(DOC)))
 
@@ -1246,7 +1246,7 @@ DISTRIB_FILES = Version Makefile.in configure.in META.in configure \
       examples/use_api.ml \
       theories/*.why \
       modules/*.mlw \
-      lib/coq/*/*.v lib/coq-plugin/*.v \
+      lib/coq/*/*.v lib/coq-tactic/*.v \
       share/provers-detection-data.conf.in \
       share/emacs/why.el share/images/*.png share/lang/*.lang \
       share/bash/why3 share/zsh/_why3 share/vim/why3.vim
@@ -1273,7 +1273,7 @@ $(DISTRIB_TAR): doc/manual.pdf
 	mkdir -p $(DISTRIB_DIR)/lib
 	mkdir -p $(DISTRIB_DIR)/lib/plugins
 	mkdir -p $(DISTRIB_DIR)/lib/coq
-	mkdir -p $(DISTRIB_DIR)/lib/coq-plugin
+	mkdir -p $(DISTRIB_DIR)/lib/coq-tactic
 	ln -s ../drivers $(DISTRIB_DIR)/share/drivers
 	ln -s ../modules $(DISTRIB_DIR)/share/modules
 	ln -s ../theories $(DISTRIB_DIR)/share/theories
