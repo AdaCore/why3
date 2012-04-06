@@ -72,6 +72,7 @@
  - PRIORITAIRE, JCF, ANDREI
 
 * Coq plugin
+** ajout de bases de hint
 
 * Coq output
  - corriger l'incoherence, comprendre si on veut vraiment accepter
@@ -89,8 +90,9 @@ https://gforge.inria.fr/tracker/index.php?func=detail&aid=13736&group_id=2990
 
 == New Features to announce ==
 
-* Coq Realizations
-* tool why3session with commands latex, html, etc
+* Coq realizations
+* Coq plugin
+* tool why3session, including commands latex, html, stats
 * tool why3doc
 * Support for several versions of the same prover
 * Improved IDE:
@@ -118,7 +120,7 @@ https://gforge.inria.fr/tracker/index.php?func=detail&aid=13736&group_id=2990
  - standard library online, using why3doc
  - API doc, produced using ocamldoc, to http://why3.lri.fr/api/
     Note: check that URL of API doc is correct in doc/api.tex line 9.
- - update the main HTML page (where is the sources ?)
+ - update the main HTML page (sources are in why3-papers/www)
  - add links to extra resources like
    http://why3.lri.fr/jfla-2012/, http://www.lri.fr/~marche/MPRI-2-36-1/,
    http://proval.lri.fr/gallery/index.en.html
@@ -126,16 +128,25 @@ https://gforge.inria.fr/tracker/index.php?func=detail&aid=13736&group_id=2990
 * Announce the distrib
  - What to put in the announcement: see New Features above
 * The next commit : add +git to the version in file Version
+* Announce the why3 tactic on Coq Club
 
 == TODOs ==
 
+
+* Document the Coq plugin and tactic
+** option timelimit <n>
+** renommer "coq-plugin" en "coq-tactic"
+
 * (JCF, ANDREI) add all examples from the VSTTE 2012 competition
+
+* (CLAUDE) Ajouter page provers sur le site web why3
 
 * Documentation
  - (GUILLAUME) Realisations Coq, comment fait l'utilisateur pour faire ses realisations
    ne pas oublier de dire que les dependances avec le .why ou .mlw: ne sera pas vérifié
- - (WHO?) revoir documentation du smoke detector
- - (WHO?) Documenter l'utilisation de plusieurs version du meme prouveur comme CVC3 et Z3
+ - (CLAUDE) revoir documentation du smoke detector
+ - Documenter l'utilisation de plusieurs versions du meme prouveur comme CVC3 et Z3
+   DONE, mais reorganiser la section, lien sur la page web des prouveurs
  - (CLAUDE) Documenter les popups qui peuvent apparaitre dans why3ide quand les prouveurs ont changé. Et les mettre au point:
    . Lors d'un replay, le dialogue "replace proof" apparait un nombre important de fois,
      il faut absolument pouvoir interrompre, ou donner une reponse qui soit appliquée pour le reste.
@@ -143,13 +154,18 @@ https://gforge.inria.fr/tracker/index.php?func=detail&aid=13736&group_id=2990
    . le dialogue "replace proof" est de toute facon trop large, et les choix possibles sont confus.
 
  - DONE (ANDREI) ajouter option a why3config pour ajouter association ident-executable
+   mais remplacer le ":" par " " (Arg.Tuple)
  - (CLAUDE) meme ordre d'idee: ne pas ecraser "default editor" et "timelimit"
+   DONE, en fait c'était déjà le cas
  - (WHO?) complete api.tex: explain how to build theories, apply
    transformations, write new functions on terms (A)
  - (ANDREI?) complete manpages.tex: section "Drivers of external provers"
  - (WHO?) make the glossary available
 
+* permettre d'utiliser emacs/proof general a la place de coqide depuis why3ide
+
 * (CLAUDE) why3session
+ - deplacer option -bench de why3replayer dans une commande de why3session
  - passe sur la documentation ecrite par Francois reecrite par Guillaume
  - DONE "why3replayer -latex" remplacé par "why3session latex"
  - DONE "why3html" remplacé par "why3session html"
@@ -159,7 +175,6 @@ https://gforge.inria.fr/tracker/index.php?func=detail&aid=13736&group_id=2990
  - rajouter la production des liens
  - entree makefile pour produire la bibliotheque standard de Why3 en HTML
    (pour mettre sur le site Web)
-
 
 * provers
  - DONE (CLAUDE) Ensure that we kill a prover after some time (ressurect %T ? with a
