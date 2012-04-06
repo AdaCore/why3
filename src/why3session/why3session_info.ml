@@ -53,7 +53,9 @@ let spec =
 
 
 type proof_stats =
-    { mutable no_proof : Sstr.t;
+    { mutable nb_goals : int;
+      mutable nb_proved_goals : int;
+      mutable no_proof : Sstr.t;
       mutable only_one_proof : Sstr.t;
       prover_min_time : float Hprover.t;
       prover_avg_time : float Hprover.t;
@@ -63,7 +65,9 @@ type proof_stats =
     }
 
 let new_proof_stats () =
-  { no_proof = Sstr.empty;
+  { nb_goals = 0;
+    nb_proved_goals = 0;
+    no_proof = Sstr.empty;
     only_one_proof = Sstr.empty;
     prover_min_time = Hprover.create 3;
     prover_avg_time = Hprover.create 3;
@@ -119,8 +123,7 @@ let update_perf_stats stats prover_and_time =
 let string_of_prover p = Pp.string_of_wnl print_prover p
 
 let rec stats_of_goal prefix_name stats goal =
-  let ext_proofs = goal.goal_external_proofs in
-  let proof_id = prefix_name ^ goal.goal_name.Ident.id_string in
+  stats.nb_goals <- stats.nb_goals + 1;
   let proof_list =
     PHprover.fold
       (fun prover proof_attempt acc ->
@@ -134,22 +137,26 @@ let rec stats_of_goal prefix_name stats goal =
                   acc
             end
           | _ -> acc)
-      ext_proofs
-      [] in
-  let no_transf = PHstr.length goal.goal_transformations = 0 in
-  begin match proof_list with
-    | [] when no_transf ->
-      stats.no_proof <- Sstr.add proof_id stats.no_proof
-    | [ (prover, time) ] when no_transf ->
-      stats.only_one_proof <-
-        Sstr.add
-        (proof_id ^ " : " ^ (string_of_prover prover))
-        stats.only_one_proof;
-      update_perf_stats stats (prover, time)
-    | _ ->
-      List.iter (update_perf_stats stats) proof_list end;
-  PHstr.iter (stats_of_transf prefix_name stats) goal.goal_transformations
-
+      goal.goal_external_proofs
+      []
+  in
+  List.iter (update_perf_stats stats) proof_list;
+  PHstr.iter (stats_of_transf prefix_name stats) goal.goal_transformations;
+  if not goal.goal_verified then
+    let goal_name = prefix_name ^ goal.goal_name.Ident.id_string in
+    stats.no_proof <- Sstr.add goal_name stats.no_proof
+  else
+    begin
+      stats.nb_proved_goals <- stats.nb_proved_goals + 1;
+      match proof_list with
+      | [ (prover, _) ] ->
+        let goal_name = prefix_name ^ goal.goal_name.Ident.id_string in
+        stats.only_one_proof <-
+          Sstr.add
+          (goal_name ^ " : " ^ (string_of_prover prover))
+          stats.only_one_proof
+      | _ -> ()
+    end
 
 and stats_of_transf prefix_name stats _ transf =
   let prefix_name = prefix_name ^ transf.transf_name  ^ " / " in
@@ -181,6 +188,9 @@ let finalize_stats stats =
     stats.prover_avg_time
 
 let print_stats stats =
+  printf "== Number of goals ==@\n  total: %d  proved: %d@\n@\n"
+    stats.nb_goals stats.nb_proved_goals;
+
   printf "== Goals not proved ==@\n  @[";
   Sstr.iter (fun s -> printf "%s@\n" s) stats.no_proof;
   printf "@]@\n";
