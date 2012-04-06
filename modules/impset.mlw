@@ -1,6 +1,6 @@
 
-(* a bag is simply a reference containing a finite set *)
-module Bag
+(* An imperative set is simply a reference containing a finite set *)
+module Impset
 
   use export set.Fset
   use export module ref.Ref
@@ -36,3 +36,8 @@ module Bag
 
 end
 
+(*
+Local Variables:
+compile-command: "unset LANG; make -C .. modules/impset"
+End:
+*)
