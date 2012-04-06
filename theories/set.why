@@ -130,6 +130,10 @@ theory Fset
   axiom cardinal_subset:
     forall s1 s2 : set 'a. subset s1 s2 -> cardinal s1 <= cardinal s2
 
+  lemma cardinal1:
+    forall s: set 'a. cardinal s = 1 ->
+    forall x: 'a. mem x s -> x = choose s
+
 end
 
 (* finite sets of integers *)

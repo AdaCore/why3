@@ -23,6 +23,12 @@ theory Path
     forall x y z: vertex, l: list vertex.
     path x l y -> edge y z -> path x (l ++ Cons y Nil) z
 
+  lemma path_right_inversion:
+    forall x z: vertex, l: list vertex. path x l z ->
+       (x = z /\ l = Nil)
+    \/ (exists y: vertex, l': list vertex.
+        path x l' y /\ edge y z /\ l = l' ++ Cons y Nil)
+
   lemma path_trans:
     forall x y z: vertex, l1 l2: list vertex.
     path x l1 y -> path y l2 z -> path x (l1 ++ l2) z
