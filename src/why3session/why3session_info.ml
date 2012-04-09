@@ -61,7 +61,7 @@ type proof_stats =
       prover_avg_time : float Hprover.t;
       prover_max_time : float Hprover.t;
       prover_num_proofs : int Hprover.t;
-      prover_data : (string) Hprover.t
+      (* prover_data : (string) Hprover.t *)
     }
 
 let new_proof_stats () =
@@ -73,7 +73,7 @@ let new_proof_stats () =
     prover_avg_time = Hprover.create 3;
     prover_max_time = Hprover.create 3;
     prover_num_proofs =  Hprover.create 3;
-    prover_data = Hprover.create 3 }
+    (* prover_data = Hprover.create 3  *)}
 
 let apply_f_on_hashtbl_entry ~tbl ~f ~name  =
   try
@@ -172,12 +172,117 @@ let stats_of_file stats _ file =
   let theories = file.file_theories in
   List.iter (stats_of_theory file stats) theories
 
+
+
+type 'a goal_stat =
+  | No of ('a transf * ('a goal * 'a goal_stat) list) list
+  | Yes of (prover * float) list * ('a transf * ('a goal * 'a goal_stat) list) list
+
+let rec stats2_of_goal ~nb_proofs g : notask goal_stat = 
+  let proof_list =
+    PHprover.fold
+      (fun prover proof_attempt acc ->
+        match proof_attempt.proof_state with
+          | Done result ->
+            begin
+              match result.Call_provers.pr_answer with
+                | Call_provers.Valid ->
+                  (prover, result.Call_provers.pr_time) :: acc
+                | _ ->
+                  acc
+            end
+          | _ -> acc)
+      g.goal_external_proofs
+      []
+  in
+  let l =
+    PHstr.fold
+      (fun _ tr acc ->
+        match stats2_of_transf ~nb_proofs tr with
+          | [] -> acc
+          | r -> (tr,List.rev r)::acc)
+      g.goal_transformations
+      []
+  in
+  if match nb_proofs with
+    | 0 -> not g.goal_verified
+    | 1 -> List.length proof_list = 1
+    | _ -> assert false
+      then Yes(proof_list,l) else No(l)
+
+and stats2_of_transf ~nb_proofs tr : (notask goal * notask goal_stat) list =
+  List.fold_left
+    (fun acc g ->
+      match stats2_of_goal ~nb_proofs g with
+        | No [] -> acc
+        | r -> (g,r)::acc)
+    [] tr.transf_goals
+
+let print_res fmt (p,t) = fprintf fmt "%a (%.2f)" print_prover p t
+
+let rec print_goal_stats depth (g,l) = 
+  for i=1 to depth do printf "  " done;
+  printf "+-- goal %s" g.goal_name.Ident.id_string;
+  match l with
+    | No l ->
+      printf "@\n";
+      List.iter (print_transf_stats (depth+1)) l
+    | Yes(pl,l) ->
+      begin
+        match pl with
+          | [] -> printf "@\n"
+          | _ -> printf ": %a@\n" (Pp.print_list pp_print_space print_res) pl
+      end;
+      List.iter (print_transf_stats (depth+1)) l
+
+and print_transf_stats depth (tr,l) =
+  for i=1 to depth do printf "  " done;
+  printf "+-- transformation %s@\n" tr.transf_name;
+  List.iter (print_goal_stats (depth+1)) l
+
+let stats2_of_theory ~nb_proofs th =
+  List.fold_left
+    (fun acc g ->
+      match stats2_of_goal ~nb_proofs g with
+        | No [] -> acc
+        | r -> (g,r)::acc)
+    [] th.theory_goals
+
+let print_theory_stats (th,r) =
+  printf "  +-- theory %s@\n" th.theory_name.Ident.id_string;
+  List.iter (print_goal_stats 2) r
+
+let stats2_of_file ~nb_proofs file =
+  List.fold_left
+    (fun acc th ->
+      match stats2_of_theory ~nb_proofs th with
+        | [] -> acc
+        | r -> (th,List.rev r)::acc)
+    [] file.file_theories
+
+let stats2_of_session ~nb_proofs s =
+  PHstr.fold
+    (fun _ f acc ->
+      match stats2_of_file ~nb_proofs f with
+        | [] -> acc
+        | r -> (f,List.rev r)::acc)
+    s.session_files []
+
+let print_file_stats (f,r) =
+  printf "+-- file %s@\n" f.file_name;
+  List.iter print_theory_stats r
+
+let print_session_stats = List.iter print_file_stats
+
+
+(*
 let fill_prover_data stats session =
   Sprover.iter
     (fun prover ->
       Hprover.add stats.prover_data prover
-        (prover.prover_name ^ " " ^ prover.prover_version))
+        (string_of_prover prover))
     (get_used_provers session)
+*)
 
 let finalize_stats stats =
   Hprover.iter
@@ -187,41 +292,29 @@ let finalize_stats stats =
         (time /. (float_of_int n)))
     stats.prover_avg_time
 
-let print_stats stats =
+let print_stats r0 r1 stats =
   printf "== Number of goals ==@\n  total: %d  proved: %d@\n@\n"
     stats.nb_goals stats.nb_proved_goals;
 
   printf "== Goals not proved ==@\n  @[";
-  Sstr.iter (fun s -> printf "%s@\n" s) stats.no_proof;
+  print_session_stats r0;
+  (* Sstr.iter (fun s -> printf "%s@\n" s) stats.no_proof; *)
   printf "@]@\n";
 
   printf "== Goals proved by only one prover ==@\n  @[";
-  Sstr.iter (fun s -> printf "%s@\n" s) stats.only_one_proof;
+  print_session_stats r1;
+  (* Sstr.iter (fun s -> printf "%s@\n" s) stats.only_one_proof; *)
   printf "@]@\n";
 
-  printf "== Number of proofs per prover ==@\n  @[";
-  Hprover.iter (fun prover n -> printf "%-10s: %d@\n"
-    (string_of_prover prover) n)
+  printf "== Statistics per prover: number of proofs, time (minimum/maximum/average) in seconds ==@\n  @[";
+  Hprover.iter (fun prover n -> printf "%-20s : %3d %6.2f %6.2f %6.2f@\n"
+    (string_of_prover prover) n
+    (Hprover.find stats.prover_min_time prover)
+    (Hprover.find stats.prover_max_time prover)
+    (Hprover.find stats.prover_avg_time prover))
     stats.prover_num_proofs;
-  printf "@]@\n";
-
-  printf "== Minimum time per prover ==@\n  @[";
-  Hprover.iter (fun prover time -> printf "%-10s : %.3f s@\n"
-    (string_of_prover prover) time)
-    stats.prover_min_time;
-  printf "@]@\n";
-
-  printf "== Maximum time per prover ==@\n  @[";
-  Hprover.iter (fun prover time -> printf "%-10s : %.3f s@\n"
-    (string_of_prover prover) time)
-    stats.prover_max_time;
-  printf "@]@\n";
-
-  printf "== Average time per prover ==@\n  @[";
-  Hprover.iter (fun prover time -> printf "%-10s : %.3f s@\n"
-    (string_of_prover prover) time)
-    stats.prover_avg_time;
   printf "@]@\n"
+
 
 let run_one fname =
   let project_dir = Session.get_project_dir fname in
@@ -243,10 +336,12 @@ let run_one fname =
   if !opt_stats_print then
     begin
       let stats = new_proof_stats () in
-      fill_prover_data stats session;
+      (* fill_prover_data stats session; *)
       PHstr.iter (stats_of_file stats) session.session_files;
+      let r0 = stats2_of_session ~nb_proofs:0 session in
+      let r1 = stats2_of_session ~nb_proofs:1 session in
       finalize_stats stats;
-      print_stats stats
+      print_stats r0 r1 stats;
     end
 
 
