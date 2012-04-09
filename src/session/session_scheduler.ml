@@ -824,14 +824,14 @@ let edit_proof eS sched ~default_editor a =
           in
           let editor =
             match npc.prover_config.Whyconf.editor with
-              | "" -> default_editor
-              | s ->
-                String.concat " "(s :: npc.prover_config.Whyconf.extra_options)
+            | "" -> default_editor
+            | s ->
+              try
+                let ed = Whyconf.editor_by_id eS.whyconf s in
+                String.concat " "(ed.Whyconf.editor_command ::
+                  ed.Whyconf.editor_options)
+              with Not_found -> default_editor
           in
-          (*
-            eprintf "[Editing] goal %s with command %s %s@."
-            g.Decl.pr_name.id_string editor file;
-          *)
           let file = update_edit_external_proof eS a in
           dprintf debug "[Editing] goal %a with command %s %s@."
             (fun fmt a -> pp_print_string fmt

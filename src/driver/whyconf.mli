@@ -131,6 +131,20 @@ val prover_by_id : config -> string -> config_prover
 (** return the configuration of the prover if found, otherwise return
     ProverNotFound *)
 
+type config_editor = {
+  editor_command : string;
+  editor_options : string list;
+}
+
+module Meditor : Stdlib.Map.S with type key = string
+
+val set_editors : config -> config_editor Meditor.t -> config
+(** replace the set of editors *)
+
+val editor_by_id : config -> string -> config_editor
+(** return the configuration of the editor if found, otherwise return
+    Not_found *)
+
 (** {2 For accesing other parts of the configuration } *)
 
 (** Access to the Rc.t *)

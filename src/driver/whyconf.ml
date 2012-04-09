@@ -33,10 +33,11 @@ open Stdlib
   - 9 coq realizations
   - 10 require %f in editor lines
   - 11 change prover identifiers in provers-detection-data.conf
+  - 12 split editors out of provers
 
 If a configuration doesn't contain the actual magic number we don't use it.*)
 
-let magicnumber = 11
+let magicnumber = 12
 
 exception WrongMagicNumber
 
@@ -85,13 +86,18 @@ module Prover = struct
       2 * Hashtbl.hash s1.prover_name +
       3 * Hashtbl.hash s1.prover_version +
       5 * Hashtbl.hash s1.prover_altern
-
-
 end
 
 module Mprover = Map.Make(Prover)
 module Sprover = Mprover.Set
 module Hprover = Hashtbl.Make(Prover)
+
+module Editor = struct
+  type t = string
+  let compare = Pervasives.compare
+end
+
+module Meditor = Map.Make(Editor)
 
 (* Configuration file *)
 
@@ -104,6 +110,11 @@ type config_prover = {
   interactive : bool;
   extra_options : string list;
   extra_drivers : string list;
+}
+
+type config_editor = {
+  editor_command : string;
+  editor_options : string list;
 }
 
 type main = {
@@ -174,6 +185,7 @@ type config = {
   config    : Rc.t;
   main      : main;
   provers   : config_prover Mprover.t;
+  editors   : config_editor Meditor.t;
 }
 
 let default_main =
@@ -221,6 +233,16 @@ let set_provers rc provers =
   let _,family = Mprover.fold set_prover provers (Sstr.empty,[]) in
   set_family rc "prover" family
 
+let set_editor id editor (ids, family) =
+  if Sstr.mem id ids then raise NonUniqueId;
+  let section = empty_section in
+  let section = set_string section "command" editor.editor_command in
+  (Sstr.add id ids, (id, section)::family)
+
+let set_editors rc editors =
+  let _,family = Meditor.fold set_editor editors (Sstr.empty,[]) in
+  set_family rc "editor" family
+
 let absolute_filename = Sysutil.absolutize_filename
 
 let load_prover dirname provers (id,section) =
@@ -242,6 +264,12 @@ let load_prover dirname provers (id,section) =
       extra_options = [];
       extra_drivers = [];
     } provers
+
+let load_editor editors (id, section) =
+  Meditor.add id
+    { editor_command = get_string section "command";
+      editor_options = [];
+    } editors
 
 let load_main dirname section =
   if get_int ~default:0 section "magic" <> magicnumber then
@@ -287,10 +315,13 @@ let get_config (filename,rc) =
   in
   let provers = get_family rc "prover" in
   let provers = List.fold_left (load_prover dirname) Mprover.empty provers in
+  let editors = get_family rc "editor" in
+  let editors = List.fold_left load_editor Meditor.empty editors in
   { conf_file = filename;
     config    = rc;
     main      = main;
     provers   = provers;
+    editors   = editors;
   }
 
 let default_config conf_file =
@@ -332,7 +363,17 @@ let merge_config config filename =
       with
         Not_found -> load_prover dirname provers (id, section)
     ) config.provers provers in
-  { config with main = main; provers = provers }
+  let editors = get_family rc "editor" in
+  let editors = List.fold_left
+    (fun editors (id, section) ->
+      try
+        let c = Meditor.find id editors in
+        let opt = (get_stringl ~default:[] section "option") @ c.editor_options in
+        Meditor.add id { c with editor_options = opt } editors
+      with
+        Not_found -> load_editor editors (id, section)
+    ) config.editors editors in
+  { config with main = main; provers = provers; editors = editors }
 
 let save_config config =
   let filename = config.conf_file in
@@ -352,6 +393,12 @@ let set_provers config provers =
   {config with
     config = set_provers config.config provers;
     provers = provers;
+  }
+
+let set_editors config editors =
+  { config with
+    config = set_editors config.config editors;
+    editors = editors;
   }
 
 (*******)
@@ -383,6 +430,8 @@ let () = Exn_printer.register
       | e -> raise e
   )
 
+let editor_by_id whyconf id =
+  Meditor.find id whyconf.editors
 
 (******)
 

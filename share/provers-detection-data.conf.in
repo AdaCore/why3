@@ -270,7 +270,7 @@ version_old = "8.1"
 version_old = "8.0"
 command = "@LOCALBIN@why3-cpulimit 0 %m -s %e -I %l/coq-tactic -R %l/coq Why3 -l %f"
 driver = "drivers/coq.drv"
-editor = "coqide -I %l/coq-tactic -R %l/coq Why3 %f"
+editor = "coqide"
 
 [ITP pvs]
 name = "PVS"
@@ -281,3 +281,9 @@ version_ok = "5.0"
 command = "@LOCALBIN@why3-cpulimit 0 %m -s proveit %f"
 driver = "drivers/pvs.drv"
 editor = "pvs %f"
+
+[editor coqide]
+command = "coqide -I %l/coq-tactic -R %l/coq Why3 %f"
+
+[editor proofgeneral-coq]
+command = "emacs23 --eval \"(setq coq-load-path '((\\\"%l/coq\\\" \\\"Why3\\\")))\" %f"
