@@ -1,9 +1,10 @@
 ##########################################################################
 #                                                                        #
-#  Copyright (C) 2010-2011                                               #
+#  Copyright (C) 2010-2012                                               #
 #    François Bobot                                                      #
 #    Jean-Christophe Filliâtre                                           #
 #    Claude Marché                                                       #
+#    Guillaume Melquiond                                                 #
 #    Andrei Paskevich                                                    #
 #                                                                        #
 #  This software is free software; you can redistribute it and/or        #
@@ -1340,21 +1341,21 @@ $(DISTRIB_TAR): doc/manual.pdf
 headers:
 	headache -c misc/headache_config.txt -h misc/header.txt \
 	    Makefile.in configure.in src/*.ml* src/*/*.ml* \
-	    src/tools/cpulimit.c
+	    plugins/*/*.ml* src/tools/cpulimit.c
 	headache -c misc/headache_config.txt -h misc/header_gm.txt \
 	    src/transform/abstraction.ml* \
 	    src/transform/instantiate_predicate.ml* \
 	    src/transform/simplify_formula.ml* \
-	    src/printer/print_number.ml* \
+	    src/util/print_number.ml* \
 	    src/printer/gappa.ml*
 	headache -c misc/headache_config.txt -h misc/header_jk.txt \
 	    src/transform/close_epsilon.ml* \
 	    src/transform/lift_epsilon.ml*
 	headache -c misc/headache_config.txt -h misc/header_sc.txt \
-	    src/transform/hypothesis_selection.ml*
+	    plugins/transform/hypothesis_selection.ml*
 	sed -i -f misc/fixnames.sed -- \
 	    Makefile.in configure.in src/*.ml* src/*/*.ml* \
-	    src/tools/cpulimit.c
+	    plugins/*/*.ml* src/tools/cpulimit.c
 
 #########
 # myself
