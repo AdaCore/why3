@@ -272,7 +272,7 @@ let cancel_scheduled_proofs t =
         callback (Undone Interrupted)
       done
     with
-      | Queue.Empty -> 
+      | Queue.Empty ->
           O.notify_timer_state 0 0 (List.length t.running_proofs)
 
 
@@ -334,6 +334,15 @@ let rec find_loadable_prover eS prover =
     end
     | Some npc -> Some (prover,npc)
 
+let adapt_timelimit a =
+  match a.proof_state with
+    | Done { Call_provers.pr_answer = Call_provers.Valid ;
+             Call_provers.pr_time = t } ->
+      let time = max a.proof_timelimit (1 + truncate (2.0 *. t)) in
+      set_timelimit time a;
+      time
+    | _ -> a.proof_timelimit
+
 
 let run_external_proof eS eT ?callback a =
   (** Perhaps this test, a.proof_archived, should be done somewhere else *)
@@ -343,11 +352,11 @@ let run_external_proof eS eT ?callback a =
     (* info_window `ERROR "Proof already in progress" *)
     let ap = a.proof_prover in
     match find_loadable_prover eS a.proof_prover with
-      | None -> 
+      | None ->
         Debug.dprintf debug
           "[Info] Can't redo an external proof since the prover %a is not loaded@."
           Whyconf.print_prover a.proof_prover;
-        Util.apply_option2 () callback a a.proof_state 
+        Util.apply_option2 () callback a a.proof_state
       | Some (nap,npc) ->
         (* eprintf "prover %a on goal %s@." *)
         (*   Whyconf.print_prover a.proof_prover a.proof_parent.goal_name.Ident.id_string; *)
@@ -355,11 +364,11 @@ let run_external_proof eS eT ?callback a =
         try
           if nap == ap then raise Not_found;
           let np_a = PHprover.find g.goal_external_proofs nap in
-          if O.replace_prover np_a a then 
+          if O.replace_prover np_a a then
             begin
             (** The notification will be done by the new proof_attempt *)
               O.remove np_a.proof_key;
-              raise Not_found 
+              raise Not_found
             end
         with Not_found ->
           (** replace [a] by a new_proof attempt if [a.proof_prover] was not
@@ -369,7 +378,7 @@ let run_external_proof eS eT ?callback a =
             let a = copy_external_proof
               ~notify ~keygen:O.create ~prover:nap ~env_session:eS a in
             O.init a.proof_key (Proof_attempt a);
-            a 
+            a
         in
         if a.proof_edited_as = None &&
           npc.prover_config.Whyconf.interactive then
@@ -378,17 +387,10 @@ let run_external_proof eS eT ?callback a =
               (Undone Unedited) a;
             Util.apply_option2 () callback a a.proof_state
           end
-        else 
+        else
           begin
           let previous_result,previous_obs = a.proof_state,a.proof_obsolete in
-          let timelimit =
-            match previous_result with
-              | Done { Call_provers.pr_answer = Call_provers.Valid ; Call_provers.pr_time = t } ->
-                let time = max a.proof_timelimit (truncate (2.0*.t)) in
-                set_timelimit time a;
-                time
-              | _ -> a.proof_timelimit
-          in
+          let timelimit = adapt_timelimit a in
           let callback result =
             begin match result with
               | Undone Interrupted ->
@@ -478,7 +480,7 @@ let run_prover eS eT ~context_unproved_goals_only ~timelimit pr a =
 
 let proof_successful_or_just_edited a =
   match a.proof_state with
-    | Done { Call_provers.pr_answer = Call_provers.Valid } 
+    | Done { Call_provers.pr_answer = Call_provers.Valid }
     | Undone JustEdited -> true
     | _ -> false
 
@@ -575,8 +577,8 @@ module Todo = struct
     dprintf debug "[Sched] todo : %i@." todo.todo
 end
 
-let push_report report (g,p,r) =
-  report := (g.goal_name,p,r)::!report
+let push_report report (g,p,t,r) =
+  report := (g.goal_name,p,t,r)::!report
 
 (** When no smoke *)
 let check_external_proof eS eT todo a =
@@ -593,7 +595,7 @@ let check_external_proof eS eT todo a =
         | None ->
           dprintf debug "[sched] prover not found : %a@."
             Whyconf.print_prover ap;
-            Todo._done todo (g,ap,Prover_not_installed)
+            Todo._done todo (g,ap,0,Prover_not_installed)
             (* set_proof_state ~notify ~obsolete:false a Undone *)
         | Some (nap,npc) ->
           let g = a.proof_parent in
@@ -613,21 +615,24 @@ let check_external_proof eS eT todo a =
                  ~notify ~keygen:O.create ~prover:nap ~env_session:eS a in
               O.init a.proof_key (Proof_attempt a);
               a in
+          let timelimit = adapt_timelimit a in
           let callback result =
               match result with
                 | Undone Scheduled | Undone Running | Undone Interrupted -> ()
                 | Undone (Unedited | JustEdited) -> assert false
                 | InternalFailure msg ->
-                  Todo._done todo (g,ap,(CallFailed msg));
+                  Todo._done todo (g,ap,timelimit,(CallFailed msg));
                   set_proof_state ~notify ~obsolete:false ~archived:false
                     result a
                 | Done new_res ->
                   begin
                     match a.proof_state with
                       | Done old_res ->
-                          Todo._done todo (g,ap,(Result(new_res,old_res)))
+                          Todo._done todo
+                            (g,ap,timelimit,(Result(new_res,old_res)))
                       | _ ->
-                        Todo._done todo (g,ap,No_former_result new_res)
+                        Todo._done todo
+                          (g,ap,timelimit,No_former_result new_res)
                   end;
                   set_proof_state ~notify ~obsolete:false ~archived:false
                     result a
@@ -644,7 +649,7 @@ let check_external_proof eS eT todo a =
             String.concat " " (npc.prover_config.Whyconf.command ::
                                  npc.prover_config.Whyconf.extra_options) in
           schedule_proof_attempt eT
-            ~timelimit:a.proof_timelimit ~memlimit:0
+            ~timelimit ~memlimit:0
             ?old ~command
             ~driver:npc.prover_driver
             ~callback
@@ -661,19 +666,9 @@ let check_all eS eT ~callback =
     eS.session;
   let timeout () =
     match Todo._end todo with
-      | None ->
-        (*
-          Printf.eprintf "Progress: %d/%d\r%!" !proofs_done !proofs_to_do;
-        *)
-        true
-      | Some reports ->
-        (*
-          Printf.eprintf "\n%!";
-        *)
-        callback !reports;false
-        (* decr maximum_running_proofs; *)
+      | None -> true
+      | Some reports -> callback !reports;false
   in
-  (* incr maximum_running_proofs; *)
   schedule_any_timeout eT timeout
 
 
@@ -682,7 +677,7 @@ let check_all eS eT ~callback =
 (***********************************)
 
 let rec play_on_goal_and_children eS eT ~timelimit todo l g =
-  let callback _key status = 
+  let callback _key status =
     match status with
       | Undone Running | Undone Scheduled -> ()
       |  _ ->
@@ -690,7 +685,7 @@ let rec play_on_goal_and_children eS eT ~timelimit todo l g =
         (* eprintf "todo decreased to %d@." todo.Todo.todo *)
   in
   List.iter
-    (fun p -> 
+    (fun p ->
       Todo.todo todo;
       (* eprintf "todo increased to %d@." todo.Todo.todo; *)
       (* eprintf "prover %a on goal %s@." *)
@@ -724,7 +719,7 @@ let play_all eS eT ~callback ~timelimit l =
   in
   schedule_any_timeout eT timeout
 
- 
+
 
 (** Transformation *)
 

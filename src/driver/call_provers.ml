@@ -86,6 +86,8 @@ let print_prover_answer fmt = function
   | Valid -> fprintf fmt "Valid"
   | Invalid -> fprintf fmt "Invalid"
   | Timeout -> fprintf fmt "Timeout"
+  | Unknown "" -> fprintf fmt "Unknown"
+  | Failure "" -> fprintf fmt "Failure"
   | Unknown s -> fprintf fmt "Unknown: %s" s
   | Failure s -> fprintf fmt "Failure: %s" s
   | HighFailure -> fprintf fmt "HighFailure"

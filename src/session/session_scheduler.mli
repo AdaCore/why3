@@ -127,7 +127,7 @@ module Make(O: OBSERVER) : sig
     O.key env_session -> t ->
     ?callback:(O.key proof_attempt -> proof_attempt_status -> unit) ->
     O.key proof_attempt -> unit
-  (** [redo_external_proof es sched ?timelimit p g] run 
+  (** [redo_external_proof es sched ?timelimit p g] run
   *)
 
 
@@ -214,14 +214,15 @@ module Make(O: OBSERVER) : sig
 
   val check_all:
     O.key env_session -> t ->
-    callback:((Ident.ident * Whyconf.prover * report) list -> unit) -> unit
+    callback:((Ident.ident * Whyconf.prover * int * report) list -> unit) ->
+    unit
     (** [check_all session callback] reruns all the proofs of the
         session, and reports for all proofs the current result and the
         new one (does not change the session state) When finished,
-        calls the callback with the reports which are triples (goal
-        name, prover, report) *)
+        calls the callback with the reports which are 4-uples (goal
+        name, prover, timelimit, report) *)
 
-  val play_all : 
+  val play_all :
     O.key env_session -> t -> callback:(unit-> unit) ->
     timelimit:int -> Whyconf.prover list -> unit
     (** [play_all es sched l] runs every prover of list [l] on all
