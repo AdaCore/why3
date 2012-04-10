@@ -13,6 +13,8 @@ Axiom Power_s : forall (x:Z) (n:Z), (0%Z <  n)%Z -> ((power x
 
 Axiom Power_1 : forall (x:Z), ((power x 1%Z) = x).
 
+Require Import Why3.
+
 (* Why3 goal *)
 Theorem Power_sum : forall (x:Z) (n:Z) (m:Z), (0%Z <= n)%Z ->
   ((0%Z <= m)%Z -> ((power x (n + m)%Z) = ((power x n) * (power x m))%Z)).
@@ -21,11 +23,8 @@ intros x n m Hn Hm.
 generalize Hm.
 pattern m.
 apply Z_lt_induction; auto.
+why3 "alt-ergo".
 (*
-ae.
-
-ca marche !!
-*)
 intros n0 Hind Hn0.
 assert (h:(n0 = 0 \/ n0 > 0)%Z) by omega.
 destruct h.
@@ -36,6 +35,7 @@ rewrite Hind; auto with zarith.
 rewrite (Power_s x n0).
 ring.
 omega.
+*)
 Qed.
 
 

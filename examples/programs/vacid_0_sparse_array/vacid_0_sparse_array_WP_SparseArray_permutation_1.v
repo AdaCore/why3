@@ -160,13 +160,8 @@ Definition range(a:(map Z Z)) (n:Z): Prop := forall (i:Z), ((0%Z <= i)%Z /\
 Axiom injective_surjective : forall (a:(map Z Z)) (n:Z), (injective a n) ->
   ((range a n) -> (surjective a n)).
 
-(*
-Add LoadPath "~/why3/src/coq-plugin".
-Declare ML Module "whytac".
-Ltac ae := why3 "alt-ergo".
-*)
-
 Require Import Why3.
+Ltac ae := why3 "alt-ergo".
 
 (* Why3 goal *)
 Theorem permutation : forall (a:Type), forall (a1:(sparse_array a)),

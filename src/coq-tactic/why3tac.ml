@@ -1085,7 +1085,7 @@ let tr_top_decl = function
   | _, Lib.ClosedSection _
   | _, Lib.FrozenState _ -> ()
 
-let why3tac s gl =
+let why3tac ?(timelimit=timelimit) s gl =
   (* print_dep Format.err_formatter; *)
   let concl_type = pf_type_of gl (pf_concl gl) in
   if not (is_Prop concl_type) then error "Conclusion is not a Prop";
@@ -1113,6 +1113,13 @@ let why3tac s gl =
     | NotFO ->
         if debug then Printexc.print_backtrace stderr; flush stderr;
         error "Not a first order goal"
+    | Whyconf.ProverNotFound (_, s) ->
+        let pl = Mprover.fold (fun _ p l -> p.id :: l)
+          (get_provers config) [] in
+        let msg = pr_str "No such prover `" ++ pr_str s ++ pr_str "'." ++
+          pr_spc () ++ pr_str "Available provers are:" ++ pr_fnl () ++
+          prlist (fun s -> pr_str s ++ pr_fnl ()) (List.rev pl) in
+        errorlabstrm "Whyconf.ProverNotFound" msg
     | e ->
         Printexc.print_backtrace stderr; flush stderr;
         Format.eprintf "@[exception: %a@]@." Exn_printer.exn_printer e;
@@ -1120,6 +1127,6 @@ let why3tac s gl =
 
 (*
 Local Variables:
-compile-command: "unset LANG; make -C ../.. src/coq-plugin/why3tac.cmxs"
+compile-command: "unset LANG; make -C ../.. lib/coq-tactic/why3tac.cmxs"
 End:
 *)

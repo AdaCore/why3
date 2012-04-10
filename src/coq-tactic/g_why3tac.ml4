@@ -24,4 +24,5 @@ open Why3tac
 
 TACTIC EXTEND Why3
   [ "why3" string(s) ] -> [ why3tac s ]
+| [ "why3" string(s) "timelimit" integer(n) ] -> [ why3tac ~timelimit:n s ]
 END
