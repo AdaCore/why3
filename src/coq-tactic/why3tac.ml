@@ -42,7 +42,15 @@ let debug =
   try let _ = Sys.getenv "WHY3DEBUG" in true
   with Not_found -> false
 
-let config = Whyconf.read_config None
+let config =
+  try
+    let _ = Sys.getenv "WHY3NOCONFIG" in
+    Whyconf.default_config ""
+  with Not_found -> try
+    Whyconf.read_config None
+  with Whyconf.ConfigFailure(file, msg) ->
+    error (file ^ ": " ^ msg)
+
 let main = Whyconf.get_main config
 
 let timelimit = timelimit main
@@ -1114,7 +1122,8 @@ let why3tac ?(timelimit=timelimit) s gl =
         if debug then Printexc.print_backtrace stderr; flush stderr;
         error "Not a first order goal"
     | Whyconf.ProverNotFound (_, s) ->
-        let pl = Mprover.fold (fun _ p l -> p.id :: l)
+        let pl =
+          Mprover.fold (fun _ p l -> if not p.interactive then p.id :: l else l)
           (get_provers config) [] in
         let msg = pr_str "No such prover `" ++ pr_str s ++ pr_str "'." ++
           pr_spc () ++ pr_str "Available provers are:" ++ pr_fnl () ++
