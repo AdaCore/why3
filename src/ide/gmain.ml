@@ -552,6 +552,10 @@ let update_task_view a =
               "proof not yet scheduled for running"
             | S.Undone S.Unedited -> "Interactive proof, not yet edited. Edit with \"Edit\" button"
             | S.Undone S.JustEdited -> "Edited interactive proof. Run it with \"Replay\" button"
+            | S.Done ({Call_provers.pr_answer = Call_provers.HighFailure} as r) ->
+              let b = Buffer.create 37 in
+              bprintf b "%a" Call_provers.print_prover_result r;
+              Buffer.contents b
             | S.Done r -> r.Call_provers.pr_output
             | S.Undone S.Scheduled-> "proof scheduled but not running yet"
             | S.Undone S.Running -> "prover currently running"
