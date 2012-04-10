@@ -816,7 +816,7 @@ let edit_proof eS sched ~default_editor a =
           (** Now [a] is a proof_attempt of the lodable prover [nap] *)
           let callback res =
             match res with
-              | Done _ ->
+              | Done {Call_provers.pr_answer = Call_provers.Unknown ""} ->
                 set_proof_state ~notify ~obsolete:true ~archived:false
                   (Undone JustEdited) a
               | _ ->
