@@ -22,9 +22,9 @@ open Why3
 open Whyconf
 
 (** Todo do something generic perhaps*)
-type conf_replace_prover =
-  | CRP_Ask
-  | CRP_Not_Obsolete
+(* type conf_replace_prover = *)
+(*   | CRP_Ask *)
+(*   | CRP_Not_Obsolete *)
 
 type t =
     { mutable window_width : int;
@@ -48,7 +48,7 @@ type t =
       mutable config : Whyconf.config;
       original_config : Whyconf.config;
       mutable altern_provers : prover option Mprover.t;
-      mutable replace_prover : conf_replace_prover;
+      (* mutable replace_prover : conf_replace_prover; *)
       mutable hidden_provers : string list;
     }
 
@@ -108,10 +108,10 @@ val preferences : t -> unit
 val unknown_prover :
   t -> 'key Session.env_session -> Whyconf.prover -> Whyconf.prover option
 
-(**)
+(* obsolete dialog
 val replace_prover :
   t -> 'key Session.proof_attempt -> 'key Session.proof_attempt -> bool
-(**)
+*)
 
 
 (*

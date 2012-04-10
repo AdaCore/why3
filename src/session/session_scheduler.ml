@@ -346,11 +346,10 @@ let adapt_timelimit a =
 
 
 let run_external_proof eS eT ?callback a =
-  (** Perhaps this test, a.proof_archived, should be done somewhere else *)
+  (* check that the state is not Scheduled or Running *)
+  (* Perhaps this test, a.proof_archived, should be done somewhere else *)
   if a.proof_archived || running a then ()
   else
-    (* check that the state is not Scheduled or Running *)
-    (* info_window `ERROR "Proof already in progress" *)
     let ap = a.proof_prover in
     match find_loadable_prover eS a.proof_prover with
       | None ->

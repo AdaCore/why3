@@ -30,9 +30,11 @@ open Whyconf
 type altern_provers = prover option Mprover.t
 
 (** Todo do something generic perhaps*)
+(*
 type conf_replace_prover =
   | CRP_Ask
   | CRP_Not_Obsolete
+*)
 
 type t =
     { mutable window_width : int;
@@ -58,7 +60,7 @@ type t =
       mutable config : Whyconf.config;
       original_config : Whyconf.config;
       mutable altern_provers : altern_provers;
-      mutable replace_prover : conf_replace_prover;
+      (* mutable replace_prover : conf_replace_prover; *)
       (* hidden prover buttons *)
       mutable hidden_provers : string list;
     }
@@ -79,7 +81,7 @@ type ide = {
   ide_goal_color : string;
   ide_error_color : string;
   ide_default_editor : string;
-  ide_replace_prover : conf_replace_prover;
+  (* ide_replace_prover : conf_replace_prover; *)
   ide_hidden_provers : string list;
 }
 
@@ -97,7 +99,7 @@ let default_ide =
     ide_premise_color = "chartreuse";
     ide_goal_color = "gold";
     ide_error_color = "orange";
-    ide_replace_prover = CRP_Ask;
+    (* ide_replace_prover = CRP_Ask; *)
     ide_default_editor =
       (try Sys.getenv "EDITOR" ^ " %f"
        with Not_found -> "editor %f");
@@ -139,13 +141,15 @@ let load_ide section =
     ide_default_editor =
       get_string section ~default:default_ide.ide_default_editor
         "default_editor";
-    ide_replace_prover =
+ (*
+   ide_replace_prover =
       begin
         match get_stringo section "replace_prover" with
         | None -> default_ide.ide_replace_prover
         | Some "never not obsolete" -> CRP_Not_Obsolete
         | Some "ask" | Some _ -> CRP_Ask
       end;
+ *)
     ide_hidden_provers = get_stringl ~default:default_ide.ide_hidden_provers section "hidden_prover";
   }
 
@@ -214,7 +218,7 @@ let load_config config original_config =
     original_config = original_config;
     env            = env;
     altern_provers = alterns;
-    replace_prover = ide.ide_replace_prover;
+    (* replace_prover = ide.ide_replace_prover; *)
     hidden_provers = ide.ide_hidden_provers;
   }
 
@@ -256,10 +260,10 @@ let save_config t =
   let ide = set_string ide "goal_color" t.goal_color in
   let ide = set_string ide "error_color" t.error_color in
   let ide = set_string ide "default_editor" t.default_editor in
-  let ide = set_string ~default:"ask" ide "replace_prover"
-    (match t.replace_prover with
-      | CRP_Ask -> "ask"
-      | CRP_Not_Obsolete -> "never not obsolete")  in
+  (* let ide = set_string ~default:"ask" ide "replace_prover" *)
+  (*   (match t.replace_prover with *)
+  (*     | CRP_Ask -> "ask" *)
+  (*     | CRP_Not_Obsolete -> "never not obsolete")  in *)
   let ide = set_stringl ide "hidden_prover" t.hidden_provers in
   let config = set_section config "ide" ide in
 (* TODO: store newly detected provers !
@@ -471,6 +475,7 @@ let alternatives_frame c (notebook:GPack.notebook) =
     GPack.vbox ~homogeneous:false ~packing:
       (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) ()
   in
+(*
   let replace_prover =
     GButton.check_button ~label:"never replace not obsolete external proof"
       ~packing:page#add ()
@@ -484,6 +489,7 @@ let alternatives_frame c (notebook:GPack.notebook) =
         else c.replace_prover <- CRP_Ask
       )
   in
+*)
   let frame =
     GBin.frame ~label:"Click for removing an association"
       ~packing:page#add ()
@@ -791,7 +797,7 @@ an alternative?" Whyconf.print_prover unknown in
     c.altern_provers <- Mprover.add unknown !prover_choosed c.altern_provers;
   !prover_choosed
 
-(**)
+(* obsolete dialog 
 let replace_prover c to_be_removed to_be_copied =
   if not to_be_removed.Session.proof_obsolete &&
     c.replace_prover = CRP_Not_Obsolete
@@ -815,7 +821,7 @@ let replace_prover c to_be_removed to_be_copied =
     | `DELETE_EVENT | `Keep -> false in
   dialog#destroy ();
   res
-(**)
+*)
 
 let read_config conf_file extra_files = read_config conf_file extra_files; init ()
 

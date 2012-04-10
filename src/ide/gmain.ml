@@ -672,9 +672,7 @@ let init =
 
 let unknown_prover = Gconfig.unknown_prover gconfig
 
-(**)
-let replace_prover = Gconfig.replace_prover gconfig
-(**)
+let replace_prover _ _ = false (* Gconfig.replace_prover gconfig *)
 
    end)
 
