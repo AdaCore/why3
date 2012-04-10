@@ -78,7 +78,7 @@ _why3()
             return 0
             ;;
         --add-prover)
-            ids=$($1 --list-prover-ids | grep -v '^Known \|^$' | sed -e 's/$/:/')
+            ids=$($1 --list-prover-ids | grep -v '^Known \|^$')
             COMPREPLY=( $(compgen -W "$ids" -- "$cur") )
             return 0
             ;;

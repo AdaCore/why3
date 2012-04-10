@@ -181,9 +181,9 @@ the option \verb|--add-prover| will add a specified binary
 to the configuration. For example, an Alt-Ergo executable
 \verb|/home/me/bin/alt-ergo-trunc| can be added as follows:
 \begin{verbatim}
-why3config --add-prover alt-ergo:/home/me/bin/alt-ergo-trunc
+why3config --add-prover alt-ergo /home/me/bin/alt-ergo-trunc
 \end{verbatim}
-To the left of the colon \verb|:| one should put a prover
+As the first argument, one should put a prover
 identification string. The list of known prover identifiers
 can be obtained by the option \verb|--list-prover-ids|.
 
