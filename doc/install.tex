@@ -140,7 +140,7 @@ located in \verb|/usr/local/share/why3| after installation.
 
 If you happen to upgrade a prover, e.g. installing CVC3 2.4.1 in place
 of CVC3 2.2, then the proof sessions formerly recorded will still
-refer to the old version of the proer. If you open one such a session
+refer to the old version of the prover. If you open one such a session
 with the GUI, and replay the proofs, you will be asked to choose
 between 3 options:
 \begin{itemize}
@@ -156,7 +156,7 @@ between 3 options:
   prover marked as obsolete.
 \end{itemize}
 
-Notice that the prover under consideration is an interactive one, then
+Notice that if the prover under consideration is an interactive one, then
 the copy option will duplicate also the edited proof scripts, whereas
 the upgrade-without-archive option will just reuse the former proof scripts.
 
@@ -164,27 +164,18 @@ Your choice between the three options above will be recorded, one for
 each prover, in the \why configuration file. Within the GUI, you can
 discard these choices via the \textsf{Preferences} dialog.
 
-Outside the GUI, the prover upgrades are handled as follows. First,
-the \texttt{why3replayer} tool will just ignore proof attempts where
-the recorded prover does not appear to be installed. Second, the tool
+Outside the GUI, the prover upgrades are handled as follows. The
+\texttt{why3replayer} tool will just ignore proof attempts marked as
+archived. Conversely, a non-archived proof attempt with a
+non-existent prover will be reported as a replay failure. The tool
 \texttt{why3session} allows you to perform move or copy operations on
 proof attempts in a fine-grain way, using filters, as detailed in Section~\ref{sec:why3session}.
 
 
-\todo{Que faire de ce qui suit ?}
-
-If you just want to update one session with updated provers you can
-use \verb|--to-known-prover| instead of the option \verb|--to-prover|.
-\begin{verbatim}
-why3session copy  --to-known-prover
-\end{verbatim}
-For each proof attempt associated to an unknown prover (a prover not in
-\verb|.why3.conf|) and not archived, it will try to find a known prover
-with the same name. If it finds one, the proof attempt is copied to this
-prover and the old proof is set to archived. The corresponding edited
-files, if any, are copied and regenerated for the new prover. An archived
-proof is not replayed by why3replayer.
-
+\todo{que devient l'option -to-known-prover de why3session ?
+  (d'ailleurs documenté en tant que --convert-unknown ??) Pourrait-on
+  permettre à why3session d'appliquer les choix d'association
+  vieux-prover/nouveau-prouveur stockés par l'IDE ?}
 
 %%% Local Variables:
 %%% mode: latex
