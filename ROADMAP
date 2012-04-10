@@ -124,6 +124,8 @@ https://gforge.inria.fr/tracker/index.php?func=detail&aid=13736&group_id=2990
  - add links to extra resources like
    http://why3.lri.fr/jfla-2012/, http://www.lri.fr/~marche/MPRI-2-36-1/,
    http://proval.lri.fr/gallery/index.en.html
+   page du cours de l'X (in french ? using Krakatoa/why3 bridge)
+
 * produce the Why3 part of ProVal gallery ?
 * Announce the distrib
  - What to put in the announcement: see New Features above
@@ -140,29 +142,51 @@ https://gforge.inria.fr/tracker/index.php?func=detail&aid=13736&group_id=2990
 * (JCF, ANDREI) add all examples from the VSTTE 2012 competition
 
 * (CLAUDE) Ajouter page provers sur le site web why3
+** DONE, merci de relire...
 
 * Documentation
- - (GUILLAUME) Realisations Coq, comment fait l'utilisateur pour faire ses realisations
-   ne pas oublier de dire que les dependances avec le .why ou .mlw: ne sera pas vérifié
- - (CLAUDE) revoir documentation du smoke detector
- - Documenter l'utilisation de plusieurs versions du meme prouveur comme CVC3 et Z3
-   DONE, mais reorganiser la section, lien sur la page web des prouveurs
- - DONE (ANDREI) ajouter option a why3config pour ajouter association ident-executable
-   DONE remplacer le ":" par " " (Arg.Tuple)
- - (CLAUDE) Documenter les popups qui peuvent apparaitre dans why3ide quand les prouveurs ont changé. Et les mettre au point:
-   . Lors d'un replay, le dialogue "replace proof" apparait un nombre important de fois,
-     il faut absolument pouvoir interrompre, ou donner une reponse qui soit appliquée pour le reste.
-     (le 3e bouton "never replace..." ne semble pas jourer ce role...)
-   . le dialogue "replace proof" est de toute facon trop large, et les choix possibles sont confus.
 
- - (CLAUDE) meme ordre d'idee: ne pas ecraser "default editor" et "timelimit"
+ - (GUILLAUME) Realisations Coq, comment fait l'utilisateur pour faire
+   ses realisations ne pas oublier de dire que les dependances avec le
+   .why ou .mlw: ne sera pas vérifié
+
+ - (CLAUDE) revoir documentation du smoke detector
+
+ - DONE Documenter l'utilisation de plusieurs versions du meme
+   prouveur comme CVC3 et Z3
+
+ - DONE (ANDREI) ajouter option a why3config pour ajouter association
+   ident-executable
+   DONE remplacer le ":" par " " (Arg.Tuple)
+
+ - (CLAUDE) Documenter les popups qui peuvent apparaitre dans why3ide
+   quand les prouveurs ont changé. Et les mettre au point:
+
+   . Lors d'un replay, le dialogue "replace proof" apparait un nombre
+     important de fois, il faut absolument pouvoir interrompre, ou
+     donner une reponse qui soit appliquée pour le reste.  (le 3e
+     bouton "never replace..." ne semble pas jourer ce role...)
+
+   . le dialogue "replace proof" est de toute facon trop large, et les
+   choix possibles sont confus.
+
+ - (CLAUDE) meme ordre d'idee: ne pas ecraser "default editor" et
+   "timelimit"
    DONE, en fait c'était déjà le cas
+
  - (WHO?) complete api.tex: explain how to build theories, apply
    transformations, write new functions on terms (A)
- - (ANDREI?) complete manpages.tex: section "Drivers of external provers"
+
+ - (ANDREI?) complete manpages.tex: section "Drivers of external
+   provers"
+
  - (WHO?) make the glossary available
 
-* permettre d'utiliser emacs/proof general a la place de coqide depuis why3ide
+* permettre d'utiliser emacs/proof general a la place de coqide depuis
+  why3ide
+** partially done:
+*** check if coqide resp emacs is installed
+*** allow to choose which one the IDe Preferences
 
 * (CLAUDE) why3session
  - deplacer option -bench de why3replayer dans une commande de why3session
@@ -177,12 +201,14 @@ https://gforge.inria.fr/tracker/index.php?func=detail&aid=13736&group_id=2990
    (pour mettre sur le site Web)
 
 * provers
- - DONE (CLAUDE) Ensure that we kill a prover after some time (ressurect %T ? with a
-   meaning like twice the value of %t ?), because we cannot be sure they always
-   honor their own -timeout option.
- - DONE (ANDREI) better use of Alt-Ergo's builtin theories: records, enumeration types
-   (Alt-Ergo >= 0.94) => at least two drivers for Alt-Ergo, depending on its
-   version number
+ - DONE (CLAUDE) Ensure that we kill a prover after some time
+   (ressurect %T ? with a meaning like twice the value of %t ?),
+   because we cannot be sure they always honor their own -timeout
+   option.
+
+ - DONE (ANDREI) better use of Alt-Ergo's builtin theories: records,
+   enumeration types (Alt-Ergo >= 0.94) => at least two drivers for
+   Alt-Ergo, depending on its version number
 
 * fix bugs and update the BTS
  - (JCF) reject global "val"s in typing environment for logic decls.
@@ -201,7 +227,8 @@ https://gforge.inria.fr/tracker/index.php?func=detail&aid=13736&group_id=2990
    NEED FEEDBACK which ones ???
  - DONE add a scrollbar for the left panel
 
-* DONE (FRANCOIS) move Session module and its dependencies into the Why3 library
+* DONE (FRANCOIS) move Session module and its dependencies into the
+  Why3 library
  - but avoid duplication with session_ro
  - avoid also duplication of type like prover_data record
  - do not include task and transf in the data type, so that
