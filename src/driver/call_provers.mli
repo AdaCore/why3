@@ -37,11 +37,13 @@ type prover_answer =
 
 type prover_result = {
   pr_answer : prover_answer;
-  (* The answer of the prover on the given task *)
+  (** The answer of the prover on the given task *)
+  pr_status : Unix.process_status;
+  (** The process exit status *)
   pr_output : string;
-  (* The output of the prover currently stderr and stdout *)
+  (** The output of the prover currently stderr and stdout *)
   pr_time   : float;
-  (* The time taken by the prover *)
+  (** The time taken by the prover *)
 }
 
 val print_prover_answer : Format.formatter -> prover_answer -> unit

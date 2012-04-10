@@ -741,6 +741,7 @@ let load_result r =
           Call_provers.pr_answer = answer;
           Call_provers.pr_time = time;
           Call_provers.pr_output = "";
+          Call_provers.pr_status = Unix.WEXITED 0
         }
     | "undone" -> Undone Interrupted
     | "unedited" -> Undone Unedited

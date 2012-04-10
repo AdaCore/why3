@@ -79,6 +79,7 @@ type prover_answer =
 
 type prover_result = {
   pr_answer : prover_answer;
+  pr_status : Unix.process_status;
   pr_output : string;
   pr_time   : float;
 }
@@ -93,9 +94,17 @@ let print_prover_answer fmt = function
   | Failure s -> fprintf fmt "Failure: %s" s
   | HighFailure -> fprintf fmt "HighFailure"
 
-let print_prover_result fmt {pr_answer=ans; pr_output=out; pr_time=t} =
+let print_prover_status fmt = function
+  | Unix.WSTOPPED n -> fprintf fmt "stopped by signal %d" n
+  | Unix.WSIGNALED n -> fprintf fmt "killed by signal %d" n
+  | Unix.WEXITED n -> fprintf fmt "exited with status %d" n
+
+let print_prover_result fmt
+  {pr_answer=ans; pr_status=status; pr_output=out; pr_time=t} =
   fprintf fmt "%a (%.2fs)" print_prover_answer ans t;
-  if ans == HighFailure then fprintf fmt "@\nProver output:@\n%s@." out
+  if ans == HighFailure then
+    fprintf fmt "@\nProver exit status: %a@\nProver output:@\n%s@."
+      print_prover_status status out
 
 let rec grep out l = match l with
   | [] ->
@@ -186,6 +195,7 @@ let call_on_file ~command ?(timelimit=0) ?(memlimit=0)
           | _ -> ans
         in
         { pr_answer = ans;
+          pr_status = ret;
           pr_output = out;
           pr_time   = time }
 
