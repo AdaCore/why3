@@ -1,0 +1,1493 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session SYSTEM "/home/jcf/why3/share/why3session.dtd">
+<why3session
+ name="vstte12_ring_buffer/why3session.xml">
+ <prover
+  id="0"
+  name="Alt-Ergo"
+  version="0.94"/>
+ <prover
+  id="1"
+  name="CVC3"
+  version="2.2"/>
+ <prover
+  id="2"
+  name="Coq"
+  version="8.3pl3"/>
+ <prover
+  id="3"
+  name="Z3"
+  version="2.19"/>
+ <file
+  name="../vstte12_ring_buffer.mlw"
+  verified="true"
+  expanded="true">
+  <theory
+   name="WP RingBuffer"
+   locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+   loclnum="8" loccnumb="7" loccnume="17"
+   verified="true"
+   expanded="true">
+   <goal
+    name="sequence_ind_1"
+    locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+    loclnum="51" loccnumb="8" loccnume="22"
+    sum="de0aa812b09c2a6bb79f30066e4ca1b7"
+    proved="true"
+    expanded="true"
+    shape="ainfix =asequenceV0ainfix ++asequenceamk bufferafirstV0ainfix -alenV0c1adataV0aConsamixfix []adataV0ainfix -ainfix +afirstV0alenV0c1aNilIainfix &lt;ainfix -ainfix +afirstV0alenV0c1asizeV0Iainfix &gt;alenV0c0Iabuffer_invariantV0F">
+    <proof
+     prover="2"
+     timelimit="10"
+     edited="vstte12_ring_buffer_WP_RingBuffer_sequence_ind_1_1.v"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="1.43"/>
+    </proof>
+   </goal>
+   <goal
+    name="sequence_ind_2"
+    locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+    loclnum="57" loccnumb="8" loccnume="22"
+    sum="3ec53ad7eaef47fe7a886a75cc60b2c2"
+    proved="true"
+    expanded="true"
+    shape="ainfix =asequenceV0ainfix ++asequenceamk bufferafirstV0ainfix -alenV0c1adataV0aConsamixfix []adataV0ainfix -ainfix -ainfix +afirstV0alenV0c1asizeV0aNilIainfix &gt;=ainfix -ainfix +afirstV0alenV0c1asizeV0Iainfix &gt;alenV0c0Iabuffer_invariantV0F">
+    <proof
+     prover="2"
+     timelimit="10"
+     edited="vstte12_ring_buffer_WP_RingBuffer_sequence_ind_2_1.v"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="1.30"/>
+    </proof>
+   </goal>
+   <goal
+    name="sequence_invariance"
+    locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+    loclnum="63" loccnumb="8" loccnume="27"
+    sum="a5ad65cae11828b6d67164ef7b3f75a9"
+    proved="true"
+    expanded="true"
+    shape="ainfix =asequenceV0asequenceV1Iainfix =amixfix []adataV0V2amixfix []adataV1V2Iainfix &lt;V2ainfix -ainfix +afirstV0alenV0asizeV0Aainfix &lt;=c0V2FIainfix =amixfix []adataV0V3amixfix []adataV1V3Iainfix &lt;V3asizeV0Iainfix &lt;V3ainfix +afirstV0alenV0Aainfix &lt;=afirstV0V3FIainfix =asizeV0asizeV1Iainfix =alenV0alenV1Iainfix =afirstV0afirstV1Iabuffer_invariantV1Iabuffer_invariantV0F">
+    <proof
+     prover="2"
+     timelimit="10"
+     edited="vstte12_ring_buffer_WP_RingBuffer_sequence_invariance_1.v"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="1.89"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter create"
+    locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+    loclnum="74" loccnumb="6" loccnume="12"
+    expl="parameter create"
+    sum="437c5cd993c230755a803dd42bc34cfe"
+    proved="true"
+    expanded="true"
+    shape="Lamk arrayV0aconstV1ainfix =asequenceamk bufferc0c0V2aNilAainfix =V0V0Aabuffer_invariantamk bufferc0c0V2Aainfix &gt;=V0c0Iainfix &gt;V0c0FF">
+    <label
+     name="expl:parameter create"/>
+    <proof
+     prover="0"
+     timelimit="10"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter length"
+    locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+    loclnum="79" loccnumb="6" loccnume="12"
+    expl="normal postcondition"
+    sum="f24104bc59fdab951781a4249cf8e4a9"
+    proved="true"
+    expanded="true"
+    shape="ainfix =V2V2Iabuffer_invariantamk bufferV3V2amk arrayV0V1FFFF">
+    <label
+     name="expl:parameter length"/>
+    <proof
+     prover="0"
+     timelimit="10"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter clear"
+    locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+    loclnum="84" loccnumb="6" loccnume="11"
+    expl="normal postcondition"
+    sum="0c2758fecf34224087fee5cc5eb29fd6"
+    proved="true"
+    expanded="true"
+    shape="Lamk bufferV3V4amk arrayV0V1ainfix =asequenceV5aNilAainfix =V4c0Aabuffer_invariantV5Iainfix =V4c0FIabuffer_invariantamk bufferV3V2amk arrayV0V1FFFF">
+    <label
+     name="expl:parameter clear"/>
+    <proof
+     prover="0"
+     timelimit="10"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter push"
+    locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+    loclnum="89" loccnumb="6" loccnume="10"
+    expl="parameter push"
+    sum="c7c49dd4e577ada602e295e5327bdf20"
+    proved="true"
+    expanded="true"
+    shape="Lamk bufferV4V3amk arrayV0V2Lamk bufferV4V7amk arrayV0V6ainfix =asequenceV8ainfix ++asequenceV5aConsV1aNilAainfix =V7ainfix +V3c1Aabuffer_invariantV8Iainfix =V7ainfix +V3c1FIainfix =V6asetV2iainfix &gt;=ainfix +V4V3V0ainfix -ainfix +V4V3V0ainfix +V4V3V1FAainfix &lt;iainfix &gt;=ainfix +V4V3V0ainfix -ainfix +V4V3V0ainfix +V4V3V0Aainfix &lt;=c0iainfix &gt;=ainfix +V4V3V0ainfix -ainfix +V4V3V0ainfix +V4V3Iabuffer_invariantV5Aainfix &lt;V3V0FFFFF">
+    <label
+     name="expl:parameter push"/>
+    <transf
+     name="split_goal"
+     proved="true"
+     expanded="true">
+     <goal
+      name="WP_parameter push.1"
+      locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      loclnum="89" loccnumb="6" loccnume="10"
+      expl="precondition"
+      sum="c08c34b6f5f92f7cd8599b919b9bb98a"
+      proved="true"
+      expanded="true"
+      shape="Lamk bufferV4V3amk arrayV0V2ainfix &lt;iainfix &gt;=ainfix +V4V3V0ainfix -ainfix +V4V3V0ainfix +V4V3V0Aainfix &lt;=c0iainfix &gt;=ainfix +V4V3V0ainfix -ainfix +V4V3V0ainfix +V4V3Iabuffer_invariantV5Aainfix &lt;V3V0FFFFF">
+      <label
+       name="expl:parameter push"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter push.2"
+      locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      loclnum="89" loccnumb="6" loccnume="10"
+      expl="normal postcondition"
+      sum="11cd4117a4c2677d67ef3d24690d9201"
+      proved="true"
+      expanded="true"
+      shape="Lamk bufferV4V3amk arrayV0V2Lamk bufferV4V7amk arrayV0V6ainfix =asequenceV8ainfix ++asequenceV5aConsV1aNilAainfix =V7ainfix +V3c1Aabuffer_invariantV8Iainfix =V7ainfix +V3c1FIainfix =V6asetV2iainfix &gt;=ainfix +V4V3V0ainfix -ainfix +V4V3V0ainfix +V4V3V1FIainfix &lt;iainfix &gt;=ainfix +V4V3V0ainfix -ainfix +V4V3V0ainfix +V4V3V0Aainfix &lt;=c0iainfix &gt;=ainfix +V4V3V0ainfix -ainfix +V4V3V0ainfix +V4V3Iabuffer_invariantV5Aainfix &lt;V3V0FFFFF">
+      <label
+       name="expl:parameter push"/>
+      <transf
+       name="split_goal"
+       proved="true"
+       expanded="true">
+       <goal
+        name="WP_parameter push.2.1"
+        locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+        loclnum="89" loccnumb="6" loccnume="10"
+        expl="parameter push"
+        sum="a43681a60e4b738378ef42788b156b43"
+        proved="true"
+        expanded="true"
+        shape="Lamk bufferV4V3amk arrayV0V2Lamk bufferV4V7amk arrayV0V6abuffer_invariantV8Iainfix =V7ainfix +V3c1FIainfix =V6asetV2iainfix &gt;=ainfix +V4V3V0ainfix -ainfix +V4V3V0ainfix +V4V3V1FIainfix &lt;iainfix &gt;=ainfix +V4V3V0ainfix -ainfix +V4V3V0ainfix +V4V3V0Aainfix &lt;=c0iainfix &gt;=ainfix +V4V3V0ainfix -ainfix +V4V3V0ainfix +V4V3Iabuffer_invariantV5Aainfix &lt;V3V0FFFFF">
+        <label
+         name="expl:parameter push"/>
+        <proof
+         prover="0"
+         timelimit="10"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.03"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter push.2.2"
+        locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+        loclnum="89" loccnumb="6" loccnume="10"
+        expl="parameter push"
+        sum="bd1643b709b8a65d1d706419d656caeb"
+        proved="true"
+        expanded="true"
+        shape="Lamk bufferV4V3amk arrayV0V2Lamk bufferV4V7amk arrayV0V6ainfix =V7ainfix +V3c1Iainfix =V7ainfix +V3c1FIainfix =V6asetV2iainfix &gt;=ainfix +V4V3V0ainfix -ainfix +V4V3V0ainfix +V4V3V1FIainfix &lt;iainfix &gt;=ainfix +V4V3V0ainfix -ainfix +V4V3V0ainfix +V4V3V0Aainfix &lt;=c0iainfix &gt;=ainfix +V4V3V0ainfix -ainfix +V4V3V0ainfix +V4V3Iabuffer_invariantV5Aainfix &lt;V3V0FFFFF">
+        <label
+         name="expl:parameter push"/>
+        <proof
+         prover="0"
+         timelimit="10"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.03"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter push.2.3"
+        locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+        loclnum="89" loccnumb="6" loccnume="10"
+        expl="parameter push"
+        sum="9a0f93076d672f4bdae3f3c12fd160b5"
+        proved="true"
+        expanded="true"
+        shape="Lamk bufferV4V3amk arrayV0V2Lamk bufferV4V7amk arrayV0V6ainfix =asequenceV8ainfix ++asequenceV5aConsV1aNilIainfix =V7ainfix +V3c1FIainfix =V6asetV2iainfix &gt;=ainfix +V4V3V0ainfix -ainfix +V4V3V0ainfix +V4V3V1FIainfix &lt;iainfix &gt;=ainfix +V4V3V0ainfix -ainfix +V4V3V0ainfix +V4V3V0Aainfix &lt;=c0iainfix &gt;=ainfix +V4V3V0ainfix -ainfix +V4V3V0ainfix +V4V3Iabuffer_invariantV5Aainfix &lt;V3V0FFFFF">
+        <label
+         name="expl:parameter push"/>
+        <proof
+         prover="2"
+         timelimit="10"
+         edited="vstte12_ring_buffer_WP_RingBuffer_WP_parameter_push_1.v"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="1.33"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+    </transf>
+   </goal>
+   <goal
+    name="WP_parameter head"
+    locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+    loclnum="98" loccnumb="6" loccnume="10"
+    expl="parameter head"
+    sum="b3baa802aeb599a36467d436572e189b"
+    proved="true"
+    expanded="true"
+    shape="Lamk bufferV3V2amk arrayV0V1CasequenceV4aNilfaConsVwainfix =agetV1V3V5Aainfix &lt;V3V0Aainfix &lt;=c0V3Iabuffer_invariantV4Aainfix &gt;V2c0FFFF">
+    <label
+     name="expl:parameter head"/>
+    <transf
+     name="split_goal"
+     proved="true"
+     expanded="true">
+     <goal
+      name="WP_parameter head.1"
+      locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      loclnum="98" loccnumb="6" loccnume="10"
+      expl="precondition"
+      sum="175cbc5f26c06563da133336299f29ed"
+      proved="true"
+      expanded="true"
+      shape="Lamk bufferV3V2amk arrayV0V1ainfix &lt;V3V0Aainfix &lt;=c0V3Iabuffer_invariantV4Aainfix &gt;V2c0FFFF">
+      <label
+       name="expl:parameter head"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter head.2"
+      locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      loclnum="98" loccnumb="6" loccnume="10"
+      expl="normal postcondition"
+      sum="fbcc2e381aee089ba19c5574449fbeb8"
+      proved="true"
+      expanded="true"
+      shape="Lamk bufferV3V2amk arrayV0V1CasequenceV4aNilfaConsVwainfix =agetV1V3V5Iainfix &lt;V3V0Aainfix &lt;=c0V3Iabuffer_invariantV4Aainfix &gt;V2c0FFFF">
+      <label
+       name="expl:parameter head"/>
+      <proof
+       prover="1"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.13"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+   <goal
+    name="WP_parameter pop"
+    locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+    loclnum="103" loccnumb="6" loccnume="9"
+    expl="parameter pop"
+    sum="d153cc08bf63cb6b27c0979c3f85e061"
+    proved="true"
+    expanded="true"
+    shape="Lamk bufferV3V2amk arrayV0V1LagetV1V3Lamk bufferV7V6amk arrayV0V1iainfix =V7V0Lamk bufferV9V6amk arrayV0V1CasequenceV4aNilfaConsVVainfix =asequenceV10V12Aainfix =V5V11Aainfix =V6ainfix -V2c1Aabuffer_invariantV10Iainfix =V9c0FCasequenceV4aNilfaConsVVainfix =asequenceV8V14Aainfix =V5V13Aainfix =V6ainfix -V2c1Aabuffer_invariantV8Iainfix =V7ainfix +V3c1FIainfix =V6ainfix -V2c1FAainfix &lt;V3V0Aainfix &lt;=c0V3Iabuffer_invariantV4Aainfix &gt;V2c0FFFF">
+    <label
+     name="expl:parameter pop"/>
+    <transf
+     name="split_goal"
+     proved="true"
+     expanded="true">
+     <goal
+      name="WP_parameter pop.1"
+      locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      loclnum="103" loccnumb="6" loccnume="9"
+      expl="precondition"
+      sum="17d3ec5c3557b4064174b25bd23e8d65"
+      proved="true"
+      expanded="true"
+      shape="Lamk bufferV3V2amk arrayV0V1ainfix &lt;V3V0Aainfix &lt;=c0V3Iabuffer_invariantV4Aainfix &gt;V2c0FFFF">
+      <label
+       name="expl:parameter pop"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter pop.2"
+      locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      loclnum="103" loccnumb="6" loccnume="9"
+      expl="normal postcondition"
+      sum="872e882398ec541ada24cb3a0c24ecd1"
+      proved="true"
+      expanded="true"
+      shape="Lamk bufferV3V2amk arrayV0V1LagetV1V3Lamk bufferV7V6amk arrayV0V1Lamk bufferV9V6amk arrayV0V1CasequenceV4aNilfaConsVVainfix =asequenceV10V12Aainfix =V5V11Aainfix =V6ainfix -V2c1Aabuffer_invariantV10Iainfix =V9c0FIainfix =V7V0Iainfix =V7ainfix +V3c1FIainfix =V6ainfix -V2c1FIainfix &lt;V3V0Aainfix &lt;=c0V3Iabuffer_invariantV4Aainfix &gt;V2c0FFFF">
+      <label
+       name="expl:parameter pop"/>
+      <transf
+       name="split_goal"
+       proved="true"
+       expanded="true">
+       <goal
+        name="WP_parameter pop.2.1"
+        locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+        loclnum="103" loccnumb="6" loccnume="9"
+        expl="parameter pop"
+        sum="d8cd0ec4913b5c8b05694515ca59ca90"
+        proved="true"
+        expanded="true"
+        shape="Lamk bufferV3V2amk arrayV0V1LagetV1V3Lamk bufferV7V6amk arrayV0V1Lamk bufferV9V6amk arrayV0V1abuffer_invariantV10Iainfix =V9c0FIainfix =V7V0Iainfix =V7ainfix +V3c1FIainfix =V6ainfix -V2c1FIainfix &lt;V3V0Aainfix &lt;=c0V3Iabuffer_invariantV4Aainfix &gt;V2c0FFFF">
+        <label
+         name="expl:parameter pop"/>
+        <proof
+         prover="0"
+         timelimit="10"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter pop.2.2"
+        locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+        loclnum="103" loccnumb="6" loccnume="9"
+        expl="parameter pop"
+        sum="902899d2e65a8cf94bfa42128fb55e1a"
+        proved="true"
+        expanded="true"
+        shape="Lamk bufferV3V2amk arrayV0V1LagetV1V3Lamk bufferV7V6amk arrayV0V1Lamk bufferV9V6amk arrayV0V1ainfix =V6ainfix -V2c1Iainfix =V9c0FIainfix =V7V0Iainfix =V7ainfix +V3c1FIainfix =V6ainfix -V2c1FIainfix &lt;V3V0Aainfix &lt;=c0V3Iabuffer_invariantV4Aainfix &gt;V2c0FFFF">
+        <label
+         name="expl:parameter pop"/>
+        <proof
+         prover="0"
+         timelimit="10"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.00"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter pop.2.3"
+        locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+        loclnum="103" loccnumb="6" loccnume="9"
+        expl="parameter pop"
+        sum="2778392c789182f99706f7844e3b7ea1"
+        proved="true"
+        expanded="true"
+        shape="Lamk bufferV3V2amk arrayV0V1LagetV1V3Lamk bufferV7V6amk arrayV0V1Lamk bufferV9V6amk arrayV0V1CasequenceV4aNilfaConsVVtIainfix =V9c0FIainfix =V7V0Iainfix =V7ainfix +V3c1FIainfix =V6ainfix -V2c1FIainfix &lt;V3V0Aainfix &lt;=c0V3Iabuffer_invariantV4Aainfix &gt;V2c0FFFF">
+        <label
+         name="expl:parameter pop"/>
+        <proof
+         prover="3"
+         timelimit="10"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.09"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter pop.2.4"
+        locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+        loclnum="103" loccnumb="6" loccnume="9"
+        expl="parameter pop"
+        sum="94d89812de85bc20c070572801e01a2c"
+        proved="true"
+        expanded="true"
+        shape="Lamk bufferV3V2amk arrayV0V1LagetV1V3Lamk bufferV7V6amk arrayV0V1Lamk bufferV9V6amk arrayV0V1CasequenceV4aNiltaConsVVainfix =V5V11Iainfix =V9c0FIainfix =V7V0Iainfix =V7ainfix +V3c1FIainfix =V6ainfix -V2c1FIainfix &lt;V3V0Aainfix &lt;=c0V3Iabuffer_invariantV4Aainfix &gt;V2c0FFFF">
+        <label
+         name="expl:parameter pop"/>
+        <proof
+         prover="1"
+         timelimit="10"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.10"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter pop.2.5"
+        locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+        loclnum="103" loccnumb="6" loccnume="9"
+        expl="parameter pop"
+        sum="45f8314135337c125444564ad114bd54"
+        proved="true"
+        expanded="true"
+        shape="Lamk bufferV3V2amk arrayV0V1LagetV1V3Lamk bufferV7V6amk arrayV0V1Lamk bufferV9V6amk arrayV0V1CasequenceV4aNiltaConsVVainfix =asequenceV10V12Iainfix =V9c0FIainfix =V7V0Iainfix =V7ainfix +V3c1FIainfix =V6ainfix -V2c1FIainfix &lt;V3V0Aainfix &lt;=c0V3Iabuffer_invariantV4Aainfix &gt;V2c0FFFF">
+        <label
+         name="expl:parameter pop"/>
+        <proof
+         prover="1"
+         timelimit="10"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.09"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter pop.3"
+      locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      loclnum="103" loccnumb="6" loccnume="9"
+      expl="normal postcondition"
+      sum="f3b5cc630ac569621443f4685ece5b95"
+      proved="true"
+      expanded="true"
+      shape="Lamk bufferV3V2amk arrayV0V1LagetV1V3Lamk bufferV7V6amk arrayV0V1CasequenceV4aNilfaConsVVainfix =asequenceV8V10Aainfix =V5V9Aainfix =V6ainfix -V2c1Aabuffer_invariantV8Iainfix =V7V0NIainfix =V7ainfix +V3c1FIainfix =V6ainfix -V2c1FIainfix &lt;V3V0Aainfix &lt;=c0V3Iabuffer_invariantV4Aainfix &gt;V2c0FFFF">
+      <label
+       name="expl:parameter pop"/>
+      <transf
+       name="split_goal"
+       proved="true"
+       expanded="true">
+       <goal
+        name="WP_parameter pop.3.1"
+        locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+        loclnum="103" loccnumb="6" loccnume="9"
+        expl="parameter pop"
+        sum="d6a4d7e22d23af2e2896c529a61dac18"
+        proved="true"
+        expanded="true"
+        shape="Lamk bufferV3V2amk arrayV0V1LagetV1V3Lamk bufferV7V6amk arrayV0V1abuffer_invariantV8Iainfix =V7V0NIainfix =V7ainfix +V3c1FIainfix =V6ainfix -V2c1FIainfix &lt;V3V0Aainfix &lt;=c0V3Iabuffer_invariantV4Aainfix &gt;V2c0FFFF">
+        <label
+         name="expl:parameter pop"/>
+        <proof
+         prover="0"
+         timelimit="10"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter pop.3.2"
+        locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+        loclnum="103" loccnumb="6" loccnume="9"
+        expl="parameter pop"
+        sum="9c87b98e4d9539f0cf1f9e55c17fdaff"
+        proved="true"
+        expanded="true"
+        shape="Lamk bufferV3V2amk arrayV0V1LagetV1V3Lamk bufferV7V6amk arrayV0V1ainfix =V6ainfix -V2c1Iainfix =V7V0NIainfix =V7ainfix +V3c1FIainfix =V6ainfix -V2c1FIainfix &lt;V3V0Aainfix &lt;=c0V3Iabuffer_invariantV4Aainfix &gt;V2c0FFFF">
+        <label
+         name="expl:parameter pop"/>
+        <proof
+         prover="0"
+         timelimit="10"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter pop.3.3"
+        locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+        loclnum="103" loccnumb="6" loccnume="9"
+        expl="parameter pop"
+        sum="76e8da0dddd25c58111e2904d4a8e8ca"
+        proved="true"
+        expanded="true"
+        shape="Lamk bufferV3V2amk arrayV0V1LagetV1V3Lamk bufferV7V6amk arrayV0V1CasequenceV4aNilfaConsVVtIainfix =V7V0NIainfix =V7ainfix +V3c1FIainfix =V6ainfix -V2c1FIainfix &lt;V3V0Aainfix &lt;=c0V3Iabuffer_invariantV4Aainfix &gt;V2c0FFFF">
+        <label
+         name="expl:parameter pop"/>
+        <proof
+         prover="3"
+         timelimit="10"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.06"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter pop.3.4"
+        locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+        loclnum="103" loccnumb="6" loccnume="9"
+        expl="parameter pop"
+        sum="96c13dfd571e9d2bfc598d420a214462"
+        proved="true"
+        expanded="true"
+        shape="Lamk bufferV3V2amk arrayV0V1LagetV1V3Lamk bufferV7V6amk arrayV0V1CasequenceV4aNiltaConsVVainfix =V5V9Iainfix =V7V0NIainfix =V7ainfix +V3c1FIainfix =V6ainfix -V2c1FIainfix &lt;V3V0Aainfix &lt;=c0V3Iabuffer_invariantV4Aainfix &gt;V2c0FFFF">
+        <label
+         name="expl:parameter pop"/>
+        <proof
+         prover="1"
+         timelimit="10"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.11"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter pop.3.5"
+        locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+        loclnum="103" loccnumb="6" loccnume="9"
+        expl="parameter pop"
+        sum="5955f6e4a04dd709c387b329a55381c1"
+        proved="true"
+        expanded="true"
+        shape="Lamk bufferV3V2amk arrayV0V1LagetV1V3Lamk bufferV7V6amk arrayV0V1CasequenceV4aNiltaConsVVainfix =asequenceV8V10Iainfix =V7V0NIainfix =V7ainfix +V3c1FIainfix =V6ainfix -V2c1FIainfix &lt;V3V0Aainfix &lt;=c0V3Iabuffer_invariantV4Aainfix &gt;V2c0FFFF">
+        <label
+         name="expl:parameter pop"/>
+        <proof
+         prover="1"
+         timelimit="10"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.09"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+    </transf>
+   </goal>
+  </theory>
+  <theory
+   name="WP Harness"
+   locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+   loclnum="117" loccnumb="7" loccnume="14"
+   verified="true"
+   expanded="true">
+   <goal
+    name="WP_parameter harness"
+    locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+    loclnum="122" loccnumb="6" loccnume="13"
+    expl="parameter harness"
+    sum="98eee1b05081e0c37c2dccc16d762ec5"
+    proved="true"
+    expanded="true"
+    shape="Lamk bufferV0V1amk arrayV2V3Lamk bufferV0V6amk arrayV2V5Lamk bufferV0V9amk arrayV2V8Lamk bufferV0V12amk arrayV2V11Lamk bufferV15V14amk arrayV2V11Lamk bufferV19V18amk arrayV2V11Lamk bufferV23V22amk arrayV2V11ainfix =V25c3ICasequenceV20aNilfaConsVVainfix =asequenceV24V27Aainfix =V25V26Aainfix =V22ainfix -V18c1Aabuffer_invariantV24FFFAabuffer_invariantV20Aainfix &gt;V18c0Aainfix =V21c2ICasequenceV16aNilfaConsVVainfix =asequenceV20V29Aainfix =V21V28Aainfix =V18ainfix -V14c1Aabuffer_invariantV20FFFAabuffer_invariantV16Aainfix &gt;V14c0Aainfix =V17c1ICasequenceV13aNilfaConsVVainfix =asequenceV16V31Aainfix =V17V30Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FFFAabuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13ainfix ++asequenceV10aConsc3aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13FFAabuffer_invariantV10Aainfix &lt;V9V2Iainfix =asequenceV10ainfix ++asequenceV7aConsc2aNilAainfix =V9ainfix +V6c1Aabuffer_invariantV10FFAabuffer_invariantV7Aainfix &lt;V6V2Iainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7FFAabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c10Aabuffer_invariantV4FAainfix &gt;c10c0">
+    <label
+     name="expl:parameter harness"/>
+    <transf
+     name="split_goal"
+     proved="true"
+     expanded="true">
+     <goal
+      name="WP_parameter harness.1"
+      locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      loclnum="122" loccnumb="6" loccnume="13"
+      expl="precondition"
+      sum="bfaece0054829d1933b331fedcb4ad10"
+      proved="true"
+      expanded="true"
+      shape="ainfix &gt;c10c0">
+      <label
+       name="expl:parameter harness"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter harness.2"
+      locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      loclnum="122" loccnumb="6" loccnume="13"
+      expl="precondition"
+      sum="c92a2eb0c7738566db8d51c0b594063a"
+      proved="true"
+      expanded="true"
+      shape="Lamk bufferV0V1amk arrayV2V3abuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c10Aabuffer_invariantV4FIainfix &gt;c10c0">
+      <label
+       name="expl:parameter harness"/>
+      <proof
+       prover="3"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.07"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter harness.3"
+      locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      loclnum="122" loccnumb="6" loccnume="13"
+      expl="precondition"
+      sum="1509f0d7d05368e84c5c1c718790930f"
+      proved="true"
+      expanded="true"
+      shape="Lamk bufferV0V1amk arrayV2V3Lamk bufferV0V6amk arrayV2V5abuffer_invariantV7Aainfix &lt;V6V2Iainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7FFIabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c10Aabuffer_invariantV4FIainfix &gt;c10c0">
+      <label
+       name="expl:parameter harness"/>
+      <proof
+       prover="1"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter harness.4"
+      locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      loclnum="122" loccnumb="6" loccnume="13"
+      expl="precondition"
+      sum="b06de19029aad1483d06da14d0392955"
+      proved="true"
+      expanded="true"
+      shape="Lamk bufferV0V1amk arrayV2V3Lamk bufferV0V6amk arrayV2V5Lamk bufferV0V9amk arrayV2V8abuffer_invariantV10Aainfix &lt;V9V2Iainfix =asequenceV10ainfix ++asequenceV7aConsc2aNilAainfix =V9ainfix +V6c1Aabuffer_invariantV10FFIabuffer_invariantV7Aainfix &lt;V6V2Iainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7FFIabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c10Aabuffer_invariantV4FIainfix &gt;c10c0">
+      <label
+       name="expl:parameter harness"/>
+      <proof
+       prover="1"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.08"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter harness.5"
+      locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      loclnum="122" loccnumb="6" loccnume="13"
+      expl="precondition"
+      sum="6d6e2040dea40d1ee4410c8d67adf185"
+      proved="true"
+      expanded="true"
+      shape="Lamk bufferV0V1amk arrayV2V3Lamk bufferV0V6amk arrayV2V5Lamk bufferV0V9amk arrayV2V8Lamk bufferV0V12amk arrayV2V11abuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13ainfix ++asequenceV10aConsc3aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13FFIabuffer_invariantV10Aainfix &lt;V9V2Iainfix =asequenceV10ainfix ++asequenceV7aConsc2aNilAainfix =V9ainfix +V6c1Aabuffer_invariantV10FFIabuffer_invariantV7Aainfix &lt;V6V2Iainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7FFIabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c10Aabuffer_invariantV4FIainfix &gt;c10c0">
+      <label
+       name="expl:parameter harness"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter harness.6"
+      locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      loclnum="122" loccnumb="6" loccnume="13"
+      expl="assertion"
+      sum="8bf2fb11aa1f8b5e3ec093fa576bacb4"
+      proved="true"
+      expanded="true"
+      shape="Lamk bufferV0V1amk arrayV2V3Lamk bufferV0V6amk arrayV2V5Lamk bufferV0V9amk arrayV2V8Lamk bufferV0V12amk arrayV2V11Lamk bufferV15V14amk arrayV2V11ainfix =V17c1ICasequenceV13aNilfaConsVVainfix =asequenceV16V19Aainfix =V17V18Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FFFIabuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13ainfix ++asequenceV10aConsc3aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13FFIabuffer_invariantV10Aainfix &lt;V9V2Iainfix =asequenceV10ainfix ++asequenceV7aConsc2aNilAainfix =V9ainfix +V6c1Aabuffer_invariantV10FFIabuffer_invariantV7Aainfix &lt;V6V2Iainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7FFIabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c10Aabuffer_invariantV4FIainfix &gt;c10c0">
+      <label
+       name="expl:parameter harness"/>
+      <proof
+       prover="1"
+       timelimit="15"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="5.83"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter harness.7"
+      locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      loclnum="122" loccnumb="6" loccnume="13"
+      expl="precondition"
+      sum="7411a7d5197eaea88c09791e54da21d9"
+      proved="true"
+      expanded="true"
+      shape="Lamk bufferV0V1amk arrayV2V3Lamk bufferV0V6amk arrayV2V5Lamk bufferV0V9amk arrayV2V8Lamk bufferV0V12amk arrayV2V11Lamk bufferV15V14amk arrayV2V11abuffer_invariantV16Aainfix &gt;V14c0Iainfix =V17c1ICasequenceV13aNilfaConsVVainfix =asequenceV16V19Aainfix =V17V18Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FFFIabuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13ainfix ++asequenceV10aConsc3aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13FFIabuffer_invariantV10Aainfix &lt;V9V2Iainfix =asequenceV10ainfix ++asequenceV7aConsc2aNilAainfix =V9ainfix +V6c1Aabuffer_invariantV10FFIabuffer_invariantV7Aainfix &lt;V6V2Iainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7FFIabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c10Aabuffer_invariantV4FIainfix &gt;c10c0">
+      <label
+       name="expl:parameter harness"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter harness.8"
+      locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      loclnum="122" loccnumb="6" loccnume="13"
+      expl="assertion"
+      sum="0a714614676be09381e428ba307fbb82"
+      proved="true"
+      expanded="true"
+      shape="Lamk bufferV0V1amk arrayV2V3Lamk bufferV0V6amk arrayV2V5Lamk bufferV0V9amk arrayV2V8Lamk bufferV0V12amk arrayV2V11Lamk bufferV15V14amk arrayV2V11Lamk bufferV19V18amk arrayV2V11ainfix =V21c2ICasequenceV16aNilfaConsVVainfix =asequenceV20V23Aainfix =V21V22Aainfix =V18ainfix -V14c1Aabuffer_invariantV20FFFIabuffer_invariantV16Aainfix &gt;V14c0Iainfix =V17c1ICasequenceV13aNilfaConsVVainfix =asequenceV16V25Aainfix =V17V24Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FFFIabuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13ainfix ++asequenceV10aConsc3aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13FFIabuffer_invariantV10Aainfix &lt;V9V2Iainfix =asequenceV10ainfix ++asequenceV7aConsc2aNilAainfix =V9ainfix +V6c1Aabuffer_invariantV10FFIabuffer_invariantV7Aainfix &lt;V6V2Iainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7FFIabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c10Aabuffer_invariantV4FIainfix &gt;c10c0">
+      <label
+       name="expl:parameter harness"/>
+      <proof
+       prover="2"
+       timelimit="10"
+       edited="vstte12_ring_buffer_WP_Harness_WP_parameter_harness_1.v"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="1.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter harness.9"
+      locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      loclnum="122" loccnumb="6" loccnume="13"
+      expl="precondition"
+      sum="8853902a0188de2823ef853d1edb0de2"
+      proved="true"
+      expanded="true"
+      shape="Lamk bufferV0V1amk arrayV2V3Lamk bufferV0V6amk arrayV2V5Lamk bufferV0V9amk arrayV2V8Lamk bufferV0V12amk arrayV2V11Lamk bufferV15V14amk arrayV2V11Lamk bufferV19V18amk arrayV2V11abuffer_invariantV20Aainfix &gt;V18c0Iainfix =V21c2ICasequenceV16aNilfaConsVVainfix =asequenceV20V23Aainfix =V21V22Aainfix =V18ainfix -V14c1Aabuffer_invariantV20FFFIabuffer_invariantV16Aainfix &gt;V14c0Iainfix =V17c1ICasequenceV13aNilfaConsVVainfix =asequenceV16V25Aainfix =V17V24Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FFFIabuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13ainfix ++asequenceV10aConsc3aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13FFIabuffer_invariantV10Aainfix &lt;V9V2Iainfix =asequenceV10ainfix ++asequenceV7aConsc2aNilAainfix =V9ainfix +V6c1Aabuffer_invariantV10FFIabuffer_invariantV7Aainfix &lt;V6V2Iainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7FFIabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c10Aabuffer_invariantV4FIainfix &gt;c10c0">
+      <label
+       name="expl:parameter harness"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.08"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter harness.10"
+      locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      loclnum="122" loccnumb="6" loccnume="13"
+      expl="assertion"
+      sum="c23b15a43df856d3e519d64959991272"
+      proved="true"
+      expanded="true"
+      shape="Lamk bufferV0V1amk arrayV2V3Lamk bufferV0V6amk arrayV2V5Lamk bufferV0V9amk arrayV2V8Lamk bufferV0V12amk arrayV2V11Lamk bufferV15V14amk arrayV2V11Lamk bufferV19V18amk arrayV2V11Lamk bufferV23V22amk arrayV2V11ainfix =V25c3ICasequenceV20aNilfaConsVVainfix =asequenceV24V27Aainfix =V25V26Aainfix =V22ainfix -V18c1Aabuffer_invariantV24FFFIabuffer_invariantV20Aainfix &gt;V18c0Iainfix =V21c2ICasequenceV16aNilfaConsVVainfix =asequenceV20V29Aainfix =V21V28Aainfix =V18ainfix -V14c1Aabuffer_invariantV20FFFIabuffer_invariantV16Aainfix &gt;V14c0Iainfix =V17c1ICasequenceV13aNilfaConsVVainfix =asequenceV16V31Aainfix =V17V30Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FFFIabuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13ainfix ++asequenceV10aConsc3aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13FFIabuffer_invariantV10Aainfix &lt;V9V2Iainfix =asequenceV10ainfix ++asequenceV7aConsc2aNilAainfix =V9ainfix +V6c1Aabuffer_invariantV10FFIabuffer_invariantV7Aainfix &lt;V6V2Iainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7FFIabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c10Aabuffer_invariantV4FIainfix &gt;c10c0">
+      <label
+       name="expl:parameter harness"/>
+      <proof
+       prover="3"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.16"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+   <goal
+    name="WP_parameter harness2"
+    locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+    loclnum="132" loccnumb="6" loccnume="14"
+    expl="parameter harness2"
+    sum="ee982d1cc277fbb730d994f0f1b15d25"
+    proved="true"
+    expanded="true"
+    shape="Lamk bufferV0V1amk arrayV2V3Lamk bufferV0V6amk arrayV2V5Lamk bufferV0V9amk arrayV2V8Lamk bufferV0V12amk arrayV2V11Lamk bufferV15V14amk arrayV2V11Lamk bufferV15V19amk arrayV2V18Lamk bufferV22V21amk arrayV2V18Lamk bufferV26V25amk arrayV2V18Lamk bufferV30V29amk arrayV2V18ainfix =V32c4ICasequenceV27aNilfaConsVVainfix =asequenceV31V34Aainfix =V32V33Aainfix =V29ainfix -V25c1Aabuffer_invariantV31FFFAabuffer_invariantV27Aainfix &gt;V25c0Aainfix =asequenceV27aConsc4aNilAainfix =V28c3ICasequenceV23aNilfaConsVVainfix =asequenceV27V36Aainfix =V28V35Aainfix =V25ainfix -V21c1Aabuffer_invariantV27FFFAabuffer_invariantV23Aainfix &gt;V21c0Aainfix =asequenceV23aConsc3aConsc4aNilAainfix =V24c2ICasequenceV20aNilfaConsVVainfix =asequenceV23V38Aainfix =V24V37Aainfix =V21ainfix -V19c1Aabuffer_invariantV23FFFAabuffer_invariantV20Aainfix &gt;V19c0Aainfix =asequenceV20aConsc2aConsc3aConsc4aNilIainfix =asequenceV20ainfix ++asequenceV16aConsc4aNilAainfix =V19ainfix +V14c1Aabuffer_invariantV20FFAabuffer_invariantV16Aainfix &lt;V14V2Aainfix =asequenceV16aConsc2aConsc3aNilAainfix =V17c1ICasequenceV13aNilfaConsVVainfix =asequenceV16V40Aainfix =V17V39Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FFFAabuffer_invariantV13Aainfix &gt;V12c0Aainfix =asequenceV13aConsc1aConsc2aConsc3aNilIainfix =asequenceV13ainfix ++asequenceV10aConsc3aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13FFAabuffer_invariantV10Aainfix &lt;V9V2Aainfix =asequenceV10aConsc1aConsc2aNilIainfix =asequenceV10ainfix ++asequenceV7aConsc2aNilAainfix =V9ainfix +V6c1Aabuffer_invariantV10FFAabuffer_invariantV7Aainfix &lt;V6V2Aainfix =asequenceV7aConsc1aNilIainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7FFAabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c3Aabuffer_invariantV4FAainfix &gt;c3c0">
+    <label
+     name="expl:parameter harness2"/>
+    <transf
+     name="split_goal"
+     proved="true"
+     expanded="true">
+     <goal
+      name="WP_parameter harness2.1"
+      locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      loclnum="132" loccnumb="6" loccnume="14"
+      expl="precondition"
+      sum="29405e2de089cab02aa8ece57ea5c0b9"
+      proved="true"
+      expanded="true"
+      shape="ainfix &gt;c3c0">
+      <label
+       name="expl:parameter harness2"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter harness2.2"
+      locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      loclnum="132" loccnumb="6" loccnume="14"
+      expl="precondition"
+      sum="e8d5aeb13259378296ecf3022508ae68"
+      proved="true"
+      expanded="true"
+      shape="Lamk bufferV0V1amk arrayV2V3abuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c3Aabuffer_invariantV4FIainfix &gt;c3c0">
+      <label
+       name="expl:parameter harness2"/>
+      <transf
+       name="split_goal"
+       proved="true"
+       expanded="true">
+       <goal
+        name="WP_parameter harness2.2.1"
+        locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+        loclnum="132" loccnumb="6" loccnume="14"
+        expl="parameter harness2"
+        sum="8320651e7e360076d8e2fb3f9ff11dca"
+        proved="true"
+        expanded="true"
+        shape="Lamk bufferV0V1amk arrayV2V3ainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c3Aabuffer_invariantV4FIainfix &gt;c3c0">
+        <label
+         name="expl:parameter harness2"/>
+        <proof
+         prover="3"
+         timelimit="10"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.06"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter harness2.2.2"
+        locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+        loclnum="132" loccnumb="6" loccnume="14"
+        expl="parameter harness2"
+        sum="ee3b68adc7550e051bab14a8940e0cb2"
+        proved="true"
+        expanded="true"
+        shape="Lamk bufferV0V1amk arrayV2V3abuffer_invariantV4Iainfix =asequenceV4aNilAainfix =V2c3Aabuffer_invariantV4FIainfix &gt;c3c0">
+        <label
+         name="expl:parameter harness2"/>
+        <proof
+         prover="0"
+         timelimit="10"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.00"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter harness2.3"
+      locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      loclnum="132" loccnumb="6" loccnume="14"
+      expl="assertion"
+      sum="57648dce65b55ea5ff2ccb0cd2b4045c"
+      proved="true"
+      expanded="true"
+      shape="Lamk bufferV0V1amk arrayV2V3Lamk bufferV0V6amk arrayV2V5ainfix =asequenceV7aConsc1aNilIainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7FFIabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c3Aabuffer_invariantV4FIainfix &gt;c3c0">
+      <label
+       name="expl:parameter harness2"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter harness2.4"
+      locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      loclnum="132" loccnumb="6" loccnume="14"
+      expl="precondition"
+      sum="c9ccb07551b987abb2d610e2d11fdb5e"
+      proved="true"
+      expanded="true"
+      shape="Lamk bufferV0V1amk arrayV2V3Lamk bufferV0V6amk arrayV2V5abuffer_invariantV7Aainfix &lt;V6V2Iainfix =asequenceV7aConsc1aNilIainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7FFIabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c3Aabuffer_invariantV4FIainfix &gt;c3c0">
+      <label
+       name="expl:parameter harness2"/>
+      <proof
+       prover="1"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.06"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter harness2.5"
+      locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      loclnum="132" loccnumb="6" loccnume="14"
+      expl="assertion"
+      sum="327f811ae63ca3ad1497491e2e0e2a37"
+      proved="true"
+      expanded="true"
+      shape="Lamk bufferV0V1amk arrayV2V3Lamk bufferV0V6amk arrayV2V5Lamk bufferV0V9amk arrayV2V8ainfix =asequenceV10aConsc1aConsc2aNilIainfix =asequenceV10ainfix ++asequenceV7aConsc2aNilAainfix =V9ainfix +V6c1Aabuffer_invariantV10FFIabuffer_invariantV7Aainfix &lt;V6V2Iainfix =asequenceV7aConsc1aNilIainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7FFIabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c3Aabuffer_invariantV4FIainfix &gt;c3c0">
+      <label
+       name="expl:parameter harness2"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.17"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter harness2.6"
+      locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      loclnum="132" loccnumb="6" loccnume="14"
+      expl="precondition"
+      sum="1211b0bd1b2535da41168b8de975ddbc"
+      proved="true"
+      expanded="true"
+      shape="Lamk bufferV0V1amk arrayV2V3Lamk bufferV0V6amk arrayV2V5Lamk bufferV0V9amk arrayV2V8abuffer_invariantV10Aainfix &lt;V9V2Iainfix =asequenceV10aConsc1aConsc2aNilIainfix =asequenceV10ainfix ++asequenceV7aConsc2aNilAainfix =V9ainfix +V6c1Aabuffer_invariantV10FFIabuffer_invariantV7Aainfix &lt;V6V2Iainfix =asequenceV7aConsc1aNilIainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7FFIabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c3Aabuffer_invariantV4FIainfix &gt;c3c0">
+      <label
+       name="expl:parameter harness2"/>
+      <proof
+       prover="1"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.07"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter harness2.7"
+      locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      loclnum="132" loccnumb="6" loccnume="14"
+      expl="assertion"
+      sum="a46f0a96108d5be23f7ee00a0e301f6f"
+      proved="true"
+      expanded="true"
+      shape="Lamk bufferV0V1amk arrayV2V3Lamk bufferV0V6amk arrayV2V5Lamk bufferV0V9amk arrayV2V8Lamk bufferV0V12amk arrayV2V11ainfix =asequenceV13aConsc1aConsc2aConsc3aNilIainfix =asequenceV13ainfix ++asequenceV10aConsc3aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13FFIabuffer_invariantV10Aainfix &lt;V9V2Iainfix =asequenceV10aConsc1aConsc2aNilIainfix =asequenceV10ainfix ++asequenceV7aConsc2aNilAainfix =V9ainfix +V6c1Aabuffer_invariantV10FFIabuffer_invariantV7Aainfix &lt;V6V2Iainfix =asequenceV7aConsc1aNilIainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7FFIabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c3Aabuffer_invariantV4FIainfix &gt;c3c0">
+      <label
+       name="expl:parameter harness2"/>
+      <proof
+       prover="1"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter harness2.8"
+      locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      loclnum="132" loccnumb="6" loccnume="14"
+      expl="precondition"
+      sum="ba66abcca28af8e2b0158cfc1d3b4bdb"
+      proved="true"
+      expanded="true"
+      shape="Lamk bufferV0V1amk arrayV2V3Lamk bufferV0V6amk arrayV2V5Lamk bufferV0V9amk arrayV2V8Lamk bufferV0V12amk arrayV2V11abuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13aConsc1aConsc2aConsc3aNilIainfix =asequenceV13ainfix ++asequenceV10aConsc3aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13FFIabuffer_invariantV10Aainfix &lt;V9V2Iainfix =asequenceV10aConsc1aConsc2aNilIainfix =asequenceV10ainfix ++asequenceV7aConsc2aNilAainfix =V9ainfix +V6c1Aabuffer_invariantV10FFIabuffer_invariantV7Aainfix &lt;V6V2Iainfix =asequenceV7aConsc1aNilIainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7FFIabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c3Aabuffer_invariantV4FIainfix &gt;c3c0">
+      <label
+       name="expl:parameter harness2"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter harness2.9"
+      locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      loclnum="132" loccnumb="6" loccnume="14"
+      expl="assertion"
+      sum="60827dff837d3a77e84a9374276e5ec1"
+      proved="true"
+      expanded="true"
+      shape="Lamk bufferV0V1amk arrayV2V3Lamk bufferV0V6amk arrayV2V5Lamk bufferV0V9amk arrayV2V8Lamk bufferV0V12amk arrayV2V11Lamk bufferV15V14amk arrayV2V11ainfix =V17c1ICasequenceV13aNilfaConsVVainfix =asequenceV16V19Aainfix =V17V18Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FFFIabuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13aConsc1aConsc2aConsc3aNilIainfix =asequenceV13ainfix ++asequenceV10aConsc3aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13FFIabuffer_invariantV10Aainfix &lt;V9V2Iainfix =asequenceV10aConsc1aConsc2aNilIainfix =asequenceV10ainfix ++asequenceV7aConsc2aNilAainfix =V9ainfix +V6c1Aabuffer_invariantV10FFIabuffer_invariantV7Aainfix &lt;V6V2Iainfix =asequenceV7aConsc1aNilIainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7FFIabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c3Aabuffer_invariantV4FIainfix &gt;c3c0">
+      <label
+       name="expl:parameter harness2"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.11"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter harness2.10"
+      locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      loclnum="132" loccnumb="6" loccnume="14"
+      expl="assertion"
+      sum="87a162ff39939f8c83ba965c96220496"
+      proved="true"
+      expanded="true"
+      shape="Lamk bufferV0V1amk arrayV2V3Lamk bufferV0V6amk arrayV2V5Lamk bufferV0V9amk arrayV2V8Lamk bufferV0V12amk arrayV2V11Lamk bufferV15V14amk arrayV2V11ainfix =asequenceV16aConsc2aConsc3aNilIainfix =V17c1ICasequenceV13aNilfaConsVVainfix =asequenceV16V19Aainfix =V17V18Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FFFIabuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13aConsc1aConsc2aConsc3aNilIainfix =asequenceV13ainfix ++asequenceV10aConsc3aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13FFIabuffer_invariantV10Aainfix &lt;V9V2Iainfix =asequenceV10aConsc1aConsc2aNilIainfix =asequenceV10ainfix ++asequenceV7aConsc2aNilAainfix =V9ainfix +V6c1Aabuffer_invariantV10FFIabuffer_invariantV7Aainfix &lt;V6V2Iainfix =asequenceV7aConsc1aNilIainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7FFIabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c3Aabuffer_invariantV4FIainfix &gt;c3c0">
+      <label
+       name="expl:parameter harness2"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.09"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter harness2.11"
+      locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      loclnum="132" loccnumb="6" loccnume="14"
+      expl="precondition"
+      sum="228575df95c83a93e9474ea5e70f9e4d"
+      proved="true"
+      expanded="true"
+      shape="Lamk bufferV0V1amk arrayV2V3Lamk bufferV0V6amk arrayV2V5Lamk bufferV0V9amk arrayV2V8Lamk bufferV0V12amk arrayV2V11Lamk bufferV15V14amk arrayV2V11abuffer_invariantV16Aainfix &lt;V14V2Iainfix =asequenceV16aConsc2aConsc3aNilIainfix =V17c1ICasequenceV13aNilfaConsVVainfix =asequenceV16V19Aainfix =V17V18Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FFFIabuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13aConsc1aConsc2aConsc3aNilIainfix =asequenceV13ainfix ++asequenceV10aConsc3aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13FFIabuffer_invariantV10Aainfix &lt;V9V2Iainfix =asequenceV10aConsc1aConsc2aNilIainfix =asequenceV10ainfix ++asequenceV7aConsc2aNilAainfix =V9ainfix +V6c1Aabuffer_invariantV10FFIabuffer_invariantV7Aainfix &lt;V6V2Iainfix =asequenceV7aConsc1aNilIainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7FFIabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c3Aabuffer_invariantV4FIainfix &gt;c3c0">
+      <label
+       name="expl:parameter harness2"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter harness2.12"
+      locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      loclnum="132" loccnumb="6" loccnume="14"
+      expl="assertion"
+      sum="d15a10b6485262708763edfef8517872"
+      proved="true"
+      expanded="true"
+      shape="Lamk bufferV0V1amk arrayV2V3Lamk bufferV0V6amk arrayV2V5Lamk bufferV0V9amk arrayV2V8Lamk bufferV0V12amk arrayV2V11Lamk bufferV15V14amk arrayV2V11Lamk bufferV15V19amk arrayV2V18ainfix =asequenceV20aConsc2aConsc3aConsc4aNilIainfix =asequenceV20ainfix ++asequenceV16aConsc4aNilAainfix =V19ainfix +V14c1Aabuffer_invariantV20FFIabuffer_invariantV16Aainfix &lt;V14V2Iainfix =asequenceV16aConsc2aConsc3aNilIainfix =V17c1ICasequenceV13aNilfaConsVVainfix =asequenceV16V22Aainfix =V17V21Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FFFIabuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13aConsc1aConsc2aConsc3aNilIainfix =asequenceV13ainfix ++asequenceV10aConsc3aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13FFIabuffer_invariantV10Aainfix &lt;V9V2Iainfix =asequenceV10aConsc1aConsc2aNilIainfix =asequenceV10ainfix ++asequenceV7aConsc2aNilAainfix =V9ainfix +V6c1Aabuffer_invariantV10FFIabuffer_invariantV7Aainfix &lt;V6V2Iainfix =asequenceV7aConsc1aNilIainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7FFIabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c3Aabuffer_invariantV4FIainfix &gt;c3c0">
+      <label
+       name="expl:parameter harness2"/>
+      <proof
+       prover="1"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.08"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter harness2.13"
+      locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      loclnum="132" loccnumb="6" loccnume="14"
+      expl="precondition"
+      sum="8ebbb0b25de8aa48fc8d0a925f42abce"
+      proved="true"
+      expanded="true"
+      shape="Lamk bufferV0V1amk arrayV2V3Lamk bufferV0V6amk arrayV2V5Lamk bufferV0V9amk arrayV2V8Lamk bufferV0V12amk arrayV2V11Lamk bufferV15V14amk arrayV2V11Lamk bufferV15V19amk arrayV2V18abuffer_invariantV20Aainfix &gt;V19c0Iainfix =asequenceV20aConsc2aConsc3aConsc4aNilIainfix =asequenceV20ainfix ++asequenceV16aConsc4aNilAainfix =V19ainfix +V14c1Aabuffer_invariantV20FFIabuffer_invariantV16Aainfix &lt;V14V2Iainfix =asequenceV16aConsc2aConsc3aNilIainfix =V17c1ICasequenceV13aNilfaConsVVainfix =asequenceV16V22Aainfix =V17V21Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FFFIabuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13aConsc1aConsc2aConsc3aNilIainfix =asequenceV13ainfix ++asequenceV10aConsc3aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13FFIabuffer_invariantV10Aainfix &lt;V9V2Iainfix =asequenceV10aConsc1aConsc2aNilIainfix =asequenceV10ainfix ++asequenceV7aConsc2aNilAainfix =V9ainfix +V6c1Aabuffer_invariantV10FFIabuffer_invariantV7Aainfix &lt;V6V2Iainfix =asequenceV7aConsc1aNilIainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7FFIabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c3Aabuffer_invariantV4FIainfix &gt;c3c0">
+      <label
+       name="expl:parameter harness2"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter harness2.14"
+      locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      loclnum="132" loccnumb="6" loccnume="14"
+      expl="assertion"
+      sum="fd706aef27204e3c24f5801b702ee319"
+      proved="true"
+      expanded="true"
+      shape="Lamk bufferV0V1amk arrayV2V3Lamk bufferV0V6amk arrayV2V5Lamk bufferV0V9amk arrayV2V8Lamk bufferV0V12amk arrayV2V11Lamk bufferV15V14amk arrayV2V11Lamk bufferV15V19amk arrayV2V18Lamk bufferV22V21amk arrayV2V18ainfix =V24c2ICasequenceV20aNilfaConsVVainfix =asequenceV23V26Aainfix =V24V25Aainfix =V21ainfix -V19c1Aabuffer_invariantV23FFFIabuffer_invariantV20Aainfix &gt;V19c0Iainfix =asequenceV20aConsc2aConsc3aConsc4aNilIainfix =asequenceV20ainfix ++asequenceV16aConsc4aNilAainfix =V19ainfix +V14c1Aabuffer_invariantV20FFIabuffer_invariantV16Aainfix &lt;V14V2Iainfix =asequenceV16aConsc2aConsc3aNilIainfix =V17c1ICasequenceV13aNilfaConsVVainfix =asequenceV16V28Aainfix =V17V27Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FFFIabuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13aConsc1aConsc2aConsc3aNilIainfix =asequenceV13ainfix ++asequenceV10aConsc3aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13FFIabuffer_invariantV10Aainfix &lt;V9V2Iainfix =asequenceV10aConsc1aConsc2aNilIainfix =asequenceV10ainfix ++asequenceV7aConsc2aNilAainfix =V9ainfix +V6c1Aabuffer_invariantV10FFIabuffer_invariantV7Aainfix &lt;V6V2Iainfix =asequenceV7aConsc1aNilIainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7FFIabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c3Aabuffer_invariantV4FIainfix &gt;c3c0">
+      <label
+       name="expl:parameter harness2"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.20"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter harness2.15"
+      locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      loclnum="132" loccnumb="6" loccnume="14"
+      expl="assertion"
+      sum="de8d3bf4d74afe2ea5df81a57283d7c5"
+      proved="true"
+      expanded="true"
+      shape="Lamk bufferV0V1amk arrayV2V3Lamk bufferV0V6amk arrayV2V5Lamk bufferV0V9amk arrayV2V8Lamk bufferV0V12amk arrayV2V11Lamk bufferV15V14amk arrayV2V11Lamk bufferV15V19amk arrayV2V18Lamk bufferV22V21amk arrayV2V18ainfix =asequenceV23aConsc3aConsc4aNilIainfix =V24c2ICasequenceV20aNilfaConsVVainfix =asequenceV23V26Aainfix =V24V25Aainfix =V21ainfix -V19c1Aabuffer_invariantV23FFFIabuffer_invariantV20Aainfix &gt;V19c0Iainfix =asequenceV20aConsc2aConsc3aConsc4aNilIainfix =asequenceV20ainfix ++asequenceV16aConsc4aNilAainfix =V19ainfix +V14c1Aabuffer_invariantV20FFIabuffer_invariantV16Aainfix &lt;V14V2Iainfix =asequenceV16aConsc2aConsc3aNilIainfix =V17c1ICasequenceV13aNilfaConsVVainfix =asequenceV16V28Aainfix =V17V27Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FFFIabuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13aConsc1aConsc2aConsc3aNilIainfix =asequenceV13ainfix ++asequenceV10aConsc3aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13FFIabuffer_invariantV10Aainfix &lt;V9V2Iainfix =asequenceV10aConsc1aConsc2aNilIainfix =asequenceV10ainfix ++asequenceV7aConsc2aNilAainfix =V9ainfix +V6c1Aabuffer_invariantV10FFIabuffer_invariantV7Aainfix &lt;V6V2Iainfix =asequenceV7aConsc1aNilIainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7FFIabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c3Aabuffer_invariantV4FIainfix &gt;c3c0">
+      <label
+       name="expl:parameter harness2"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.18"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter harness2.16"
+      locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      loclnum="132" loccnumb="6" loccnume="14"
+      expl="precondition"
+      sum="aa65943c486aa9c126c18d0d1a8c209a"
+      proved="true"
+      expanded="true"
+      shape="Lamk bufferV0V1amk arrayV2V3Lamk bufferV0V6amk arrayV2V5Lamk bufferV0V9amk arrayV2V8Lamk bufferV0V12amk arrayV2V11Lamk bufferV15V14amk arrayV2V11Lamk bufferV15V19amk arrayV2V18Lamk bufferV22V21amk arrayV2V18abuffer_invariantV23Aainfix &gt;V21c0Iainfix =asequenceV23aConsc3aConsc4aNilIainfix =V24c2ICasequenceV20aNilfaConsVVainfix =asequenceV23V26Aainfix =V24V25Aainfix =V21ainfix -V19c1Aabuffer_invariantV23FFFIabuffer_invariantV20Aainfix &gt;V19c0Iainfix =asequenceV20aConsc2aConsc3aConsc4aNilIainfix =asequenceV20ainfix ++asequenceV16aConsc4aNilAainfix =V19ainfix +V14c1Aabuffer_invariantV20FFIabuffer_invariantV16Aainfix &lt;V14V2Iainfix =asequenceV16aConsc2aConsc3aNilIainfix =V17c1ICasequenceV13aNilfaConsVVainfix =asequenceV16V28Aainfix =V17V27Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FFFIabuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13aConsc1aConsc2aConsc3aNilIainfix =asequenceV13ainfix ++asequenceV10aConsc3aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13FFIabuffer_invariantV10Aainfix &lt;V9V2Iainfix =asequenceV10aConsc1aConsc2aNilIainfix =asequenceV10ainfix ++asequenceV7aConsc2aNilAainfix =V9ainfix +V6c1Aabuffer_invariantV10FFIabuffer_invariantV7Aainfix &lt;V6V2Iainfix =asequenceV7aConsc1aNilIainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7FFIabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c3Aabuffer_invariantV4FIainfix &gt;c3c0">
+      <label
+       name="expl:parameter harness2"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter harness2.17"
+      locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      loclnum="132" loccnumb="6" loccnume="14"
+      expl="assertion"
+      sum="f2faeabb91d347f5799e30d06b4c413f"
+      proved="true"
+      expanded="true"
+      shape="Lamk bufferV0V1amk arrayV2V3Lamk bufferV0V6amk arrayV2V5Lamk bufferV0V9amk arrayV2V8Lamk bufferV0V12amk arrayV2V11Lamk bufferV15V14amk arrayV2V11Lamk bufferV15V19amk arrayV2V18Lamk bufferV22V21amk arrayV2V18Lamk bufferV26V25amk arrayV2V18ainfix =V28c3ICasequenceV23aNilfaConsVVainfix =asequenceV27V30Aainfix =V28V29Aainfix =V25ainfix -V21c1Aabuffer_invariantV27FFFIabuffer_invariantV23Aainfix &gt;V21c0Iainfix =asequenceV23aConsc3aConsc4aNilIainfix =V24c2ICasequenceV20aNilfaConsVVainfix =asequenceV23V32Aainfix =V24V31Aainfix =V21ainfix -V19c1Aabuffer_invariantV23FFFIabuffer_invariantV20Aainfix &gt;V19c0Iainfix =asequenceV20aConsc2aConsc3aConsc4aNilIainfix =asequenceV20ainfix ++asequenceV16aConsc4aNilAainfix =V19ainfix +V14c1Aabuffer_invariantV20FFIabuffer_invariantV16Aainfix &lt;V14V2Iainfix =asequenceV16aConsc2aConsc3aNilIainfix =V17c1ICasequenceV13aNilfaConsVVainfix =asequenceV16V34Aainfix =V17V33Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FFFIabuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13aConsc1aConsc2aConsc3aNilIainfix =asequenceV13ainfix ++asequenceV10aConsc3aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13FFIabuffer_invariantV10Aainfix &lt;V9V2Iainfix =asequenceV10aConsc1aConsc2aNilIainfix =asequenceV10ainfix ++asequenceV7aConsc2aNilAainfix =V9ainfix +V6c1Aabuffer_invariantV10FFIabuffer_invariantV7Aainfix &lt;V6V2Iainfix =asequenceV7aConsc1aNilIainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7FFIabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c3Aabuffer_invariantV4FIainfix &gt;c3c0">
+      <label
+       name="expl:parameter harness2"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.26"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter harness2.18"
+      locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      loclnum="132" loccnumb="6" loccnume="14"
+      expl="assertion"
+      sum="db71bff6b63b379df7784c78a3c45400"
+      proved="true"
+      expanded="true"
+      shape="Lamk bufferV0V1amk arrayV2V3Lamk bufferV0V6amk arrayV2V5Lamk bufferV0V9amk arrayV2V8Lamk bufferV0V12amk arrayV2V11Lamk bufferV15V14amk arrayV2V11Lamk bufferV15V19amk arrayV2V18Lamk bufferV22V21amk arrayV2V18Lamk bufferV26V25amk arrayV2V18ainfix =asequenceV27aConsc4aNilIainfix =V28c3ICasequenceV23aNilfaConsVVainfix =asequenceV27V30Aainfix =V28V29Aainfix =V25ainfix -V21c1Aabuffer_invariantV27FFFIabuffer_invariantV23Aainfix &gt;V21c0Iainfix =asequenceV23aConsc3aConsc4aNilIainfix =V24c2ICasequenceV20aNilfaConsVVainfix =asequenceV23V32Aainfix =V24V31Aainfix =V21ainfix -V19c1Aabuffer_invariantV23FFFIabuffer_invariantV20Aainfix &gt;V19c0Iainfix =asequenceV20aConsc2aConsc3aConsc4aNilIainfix =asequenceV20ainfix ++asequenceV16aConsc4aNilAainfix =V19ainfix +V14c1Aabuffer_invariantV20FFIabuffer_invariantV16Aainfix &lt;V14V2Iainfix =asequenceV16aConsc2aConsc3aNilIainfix =V17c1ICasequenceV13aNilfaConsVVainfix =asequenceV16V34Aainfix =V17V33Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FFFIabuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13aConsc1aConsc2aConsc3aNilIainfix =asequenceV13ainfix ++asequenceV10aConsc3aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13FFIabuffer_invariantV10Aainfix &lt;V9V2Iainfix =asequenceV10aConsc1aConsc2aNilIainfix =asequenceV10ainfix ++asequenceV7aConsc2aNilAainfix =V9ainfix +V6c1Aabuffer_invariantV10FFIabuffer_invariantV7Aainfix &lt;V6V2Iainfix =asequenceV7aConsc1aNilIainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7FFIabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c3Aabuffer_invariantV4FIainfix &gt;c3c0">
+      <label
+       name="expl:parameter harness2"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.23"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter harness2.19"
+      locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      loclnum="132" loccnumb="6" loccnume="14"
+      expl="precondition"
+      sum="bed271e582b24f4a5c7ae36526552560"
+      proved="true"
+      expanded="true"
+      shape="Lamk bufferV0V1amk arrayV2V3Lamk bufferV0V6amk arrayV2V5Lamk bufferV0V9amk arrayV2V8Lamk bufferV0V12amk arrayV2V11Lamk bufferV15V14amk arrayV2V11Lamk bufferV15V19amk arrayV2V18Lamk bufferV22V21amk arrayV2V18Lamk bufferV26V25amk arrayV2V18abuffer_invariantV27Aainfix &gt;V25c0Iainfix =asequenceV27aConsc4aNilIainfix =V28c3ICasequenceV23aNilfaConsVVainfix =asequenceV27V30Aainfix =V28V29Aainfix =V25ainfix -V21c1Aabuffer_invariantV27FFFIabuffer_invariantV23Aainfix &gt;V21c0Iainfix =asequenceV23aConsc3aConsc4aNilIainfix =V24c2ICasequenceV20aNilfaConsVVainfix =asequenceV23V32Aainfix =V24V31Aainfix =V21ainfix -V19c1Aabuffer_invariantV23FFFIabuffer_invariantV20Aainfix &gt;V19c0Iainfix =asequenceV20aConsc2aConsc3aConsc4aNilIainfix =asequenceV20ainfix ++asequenceV16aConsc4aNilAainfix =V19ainfix +V14c1Aabuffer_invariantV20FFIabuffer_invariantV16Aainfix &lt;V14V2Iainfix =asequenceV16aConsc2aConsc3aNilIainfix =V17c1ICasequenceV13aNilfaConsVVainfix =asequenceV16V34Aainfix =V17V33Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FFFIabuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13aConsc1aConsc2aConsc3aNilIainfix =asequenceV13ainfix ++asequenceV10aConsc3aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13FFIabuffer_invariantV10Aainfix &lt;V9V2Iainfix =asequenceV10aConsc1aConsc2aNilIainfix =asequenceV10ainfix ++asequenceV7aConsc2aNilAainfix =V9ainfix +V6c1Aabuffer_invariantV10FFIabuffer_invariantV7Aainfix &lt;V6V2Iainfix =asequenceV7aConsc1aNilIainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7FFIabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c3Aabuffer_invariantV4FIainfix &gt;c3c0">
+      <label
+       name="expl:parameter harness2"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.07"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter harness2.20"
+      locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      loclnum="132" loccnumb="6" loccnume="14"
+      expl="assertion"
+      sum="4c5c52fdd1e64c474b3021c348dbd45d"
+      proved="true"
+      expanded="true"
+      shape="Lamk bufferV0V1amk arrayV2V3Lamk bufferV0V6amk arrayV2V5Lamk bufferV0V9amk arrayV2V8Lamk bufferV0V12amk arrayV2V11Lamk bufferV15V14amk arrayV2V11Lamk bufferV15V19amk arrayV2V18Lamk bufferV22V21amk arrayV2V18Lamk bufferV26V25amk arrayV2V18Lamk bufferV30V29amk arrayV2V18ainfix =V32c4ICasequenceV27aNilfaConsVVainfix =asequenceV31V34Aainfix =V32V33Aainfix =V29ainfix -V25c1Aabuffer_invariantV31FFFIabuffer_invariantV27Aainfix &gt;V25c0Iainfix =asequenceV27aConsc4aNilIainfix =V28c3ICasequenceV23aNilfaConsVVainfix =asequenceV27V36Aainfix =V28V35Aainfix =V25ainfix -V21c1Aabuffer_invariantV27FFFIabuffer_invariantV23Aainfix &gt;V21c0Iainfix =asequenceV23aConsc3aConsc4aNilIainfix =V24c2ICasequenceV20aNilfaConsVVainfix =asequenceV23V38Aainfix =V24V37Aainfix =V21ainfix -V19c1Aabuffer_invariantV23FFFIabuffer_invariantV20Aainfix &gt;V19c0Iainfix =asequenceV20aConsc2aConsc3aConsc4aNilIainfix =asequenceV20ainfix ++asequenceV16aConsc4aNilAainfix =V19ainfix +V14c1Aabuffer_invariantV20FFIabuffer_invariantV16Aainfix &lt;V14V2Iainfix =asequenceV16aConsc2aConsc3aNilIainfix =V17c1ICasequenceV13aNilfaConsVVainfix =asequenceV16V40Aainfix =V17V39Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FFFIabuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13aConsc1aConsc2aConsc3aNilIainfix =asequenceV13ainfix ++asequenceV10aConsc3aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13FFIabuffer_invariantV10Aainfix &lt;V9V2Iainfix =asequenceV10aConsc1aConsc2aNilIainfix =asequenceV10ainfix ++asequenceV7aConsc2aNilAainfix =V9ainfix +V6c1Aabuffer_invariantV10FFIabuffer_invariantV7Aainfix &lt;V6V2Iainfix =asequenceV7aConsc1aNilIainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7FFIabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c3Aabuffer_invariantV4FIainfix &gt;c3c0">
+      <label
+       name="expl:parameter harness2"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.29"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+   <goal
+    name="WP_parameter test"
+    locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+    loclnum="153" loccnumb="6" loccnume="10"
+    expl="parameter test"
+    sum="26cabf3d8c6474dcf5b0890298f93702"
+    proved="true"
+    expanded="true"
+    shape="Lamk bufferV3V4amk arrayV5V6Lamk bufferV3V9amk arrayV5V8Lamk bufferV3V12amk arrayV5V11Lamk bufferV15V14amk arrayV5V11Lamk bufferV15V19amk arrayV5V18Lamk bufferV22V21amk arrayV5V18Lamk bufferV26V25amk arrayV5V18ainfix =V28V2ICasequenceV23aNilfaConsVVainfix =asequenceV27V30Aainfix =V28V29Aainfix =V25ainfix -V21c1Aabuffer_invariantV27FFFAabuffer_invariantV23Aainfix &gt;V21c0Aainfix =V24V1ICasequenceV20aNilfaConsVVainfix =asequenceV23V32Aainfix =V24V31Aainfix =V21ainfix -V19c1Aabuffer_invariantV23FFFAabuffer_invariantV20Aainfix &gt;V19c0Aainfix =asequenceV20aConsV1aConsV2aNilIainfix =asequenceV20ainfix ++asequenceV16aConsV2aNilAainfix =V19ainfix +V14c1Aabuffer_invariantV20FFAabuffer_invariantV16Aainfix &lt;V14V5Aainfix =asequenceV16aConsV1aNilAainfix =V17V0ICasequenceV13aNilfaConsVVainfix =asequenceV16V34Aainfix =V17V33Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FFFAabuffer_invariantV13Aainfix &gt;V12c0Aainfix =asequenceV13aConsV0aConsV1aNilIainfix =asequenceV13ainfix ++asequenceV10aConsV1aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13FFAabuffer_invariantV10Aainfix &lt;V9V5Iainfix =asequenceV10ainfix ++asequenceV7aConsV0aNilAainfix =V9ainfix +V4c1Aabuffer_invariantV10FFAabuffer_invariantV7Aainfix &lt;V4V5Iainfix =asequenceV7aNilAainfix =V5c2Aabuffer_invariantV7FAainfix &gt;c2c0FFF">
+    <label
+     name="expl:parameter test"/>
+    <transf
+     name="split_goal"
+     proved="true"
+     expanded="true">
+     <goal
+      name="WP_parameter test.1"
+      locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      loclnum="153" loccnumb="6" loccnume="10"
+      expl="precondition"
+      sum="e7b443cb1d99b56f9bcc36cb43fdcaa1"
+      proved="true"
+      expanded="true"
+      shape="ainfix &gt;c2c0FFF">
+      <label
+       name="expl:parameter test"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter test.2"
+      locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      loclnum="153" loccnumb="6" loccnume="10"
+      expl="precondition"
+      sum="e69abd9059c6334d51a158fe2f703b43"
+      proved="true"
+      expanded="true"
+      shape="Lamk bufferV3V4amk arrayV5V6abuffer_invariantV7Aainfix &lt;V4V5Iainfix =asequenceV7aNilAainfix =V5c2Aabuffer_invariantV7FIainfix &gt;c2c0FFF">
+      <label
+       name="expl:parameter test"/>
+      <proof
+       prover="3"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.07"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter test.3"
+      locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      loclnum="153" loccnumb="6" loccnume="10"
+      expl="precondition"
+      sum="f3cf3ee7bea48c656e999e3fbea495cb"
+      proved="true"
+      expanded="true"
+      shape="Lamk bufferV3V4amk arrayV5V6Lamk bufferV3V9amk arrayV5V8abuffer_invariantV10Aainfix &lt;V9V5Iainfix =asequenceV10ainfix ++asequenceV7aConsV0aNilAainfix =V9ainfix +V4c1Aabuffer_invariantV10FFIabuffer_invariantV7Aainfix &lt;V4V5Iainfix =asequenceV7aNilAainfix =V5c2Aabuffer_invariantV7FIainfix &gt;c2c0FFF">
+      <label
+       name="expl:parameter test"/>
+      <proof
+       prover="3"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.06"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter test.4"
+      locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      loclnum="153" loccnumb="6" loccnume="10"
+      expl="assertion"
+      sum="838fe393b9bee6bccb8c979ac30a021a"
+      proved="true"
+      expanded="true"
+      shape="Lamk bufferV3V4amk arrayV5V6Lamk bufferV3V9amk arrayV5V8Lamk bufferV3V12amk arrayV5V11ainfix =asequenceV13aConsV0aConsV1aNilIainfix =asequenceV13ainfix ++asequenceV10aConsV1aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13FFIabuffer_invariantV10Aainfix &lt;V9V5Iainfix =asequenceV10ainfix ++asequenceV7aConsV0aNilAainfix =V9ainfix +V4c1Aabuffer_invariantV10FFIabuffer_invariantV7Aainfix &lt;V4V5Iainfix =asequenceV7aNilAainfix =V5c2Aabuffer_invariantV7FIainfix &gt;c2c0FFF">
+      <label
+       name="expl:parameter test"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="1.89"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter test.5"
+      locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      loclnum="153" loccnumb="6" loccnume="10"
+      expl="precondition"
+      sum="ea5542bd2216a571ea0914d1dc3887fd"
+      proved="true"
+      expanded="true"
+      shape="Lamk bufferV3V4amk arrayV5V6Lamk bufferV3V9amk arrayV5V8Lamk bufferV3V12amk arrayV5V11abuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13aConsV0aConsV1aNilIainfix =asequenceV13ainfix ++asequenceV10aConsV1aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13FFIabuffer_invariantV10Aainfix &lt;V9V5Iainfix =asequenceV10ainfix ++asequenceV7aConsV0aNilAainfix =V9ainfix +V4c1Aabuffer_invariantV10FFIabuffer_invariantV7Aainfix &lt;V4V5Iainfix =asequenceV7aNilAainfix =V5c2Aabuffer_invariantV7FIainfix &gt;c2c0FFF">
+      <label
+       name="expl:parameter test"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter test.6"
+      locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      loclnum="153" loccnumb="6" loccnume="10"
+      expl="assertion"
+      sum="25950f51e2ecd4829f242a00ccfe28ad"
+      proved="true"
+      expanded="true"
+      shape="Lamk bufferV3V4amk arrayV5V6Lamk bufferV3V9amk arrayV5V8Lamk bufferV3V12amk arrayV5V11Lamk bufferV15V14amk arrayV5V11ainfix =V17V0ICasequenceV13aNilfaConsVVainfix =asequenceV16V19Aainfix =V17V18Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FFFIabuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13aConsV0aConsV1aNilIainfix =asequenceV13ainfix ++asequenceV10aConsV1aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13FFIabuffer_invariantV10Aainfix &lt;V9V5Iainfix =asequenceV10ainfix ++asequenceV7aConsV0aNilAainfix =V9ainfix +V4c1Aabuffer_invariantV10FFIabuffer_invariantV7Aainfix &lt;V4V5Iainfix =asequenceV7aNilAainfix =V5c2Aabuffer_invariantV7FIainfix &gt;c2c0FFF">
+      <label
+       name="expl:parameter test"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter test.7"
+      locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      loclnum="153" loccnumb="6" loccnume="10"
+      expl="assertion"
+      sum="9cfee6f09493f84b65c043675a79a532"
+      proved="true"
+      expanded="true"
+      shape="Lamk bufferV3V4amk arrayV5V6Lamk bufferV3V9amk arrayV5V8Lamk bufferV3V12amk arrayV5V11Lamk bufferV15V14amk arrayV5V11ainfix =asequenceV16aConsV1aNilIainfix =V17V0ICasequenceV13aNilfaConsVVainfix =asequenceV16V19Aainfix =V17V18Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FFFIabuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13aConsV0aConsV1aNilIainfix =asequenceV13ainfix ++asequenceV10aConsV1aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13FFIabuffer_invariantV10Aainfix &lt;V9V5Iainfix =asequenceV10ainfix ++asequenceV7aConsV0aNilAainfix =V9ainfix +V4c1Aabuffer_invariantV10FFIabuffer_invariantV7Aainfix &lt;V4V5Iainfix =asequenceV7aNilAainfix =V5c2Aabuffer_invariantV7FIainfix &gt;c2c0FFF">
+      <label
+       name="expl:parameter test"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.06"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter test.8"
+      locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      loclnum="153" loccnumb="6" loccnume="10"
+      expl="precondition"
+      sum="82d85cfe721d9f82c25f94a81ad6e4ea"
+      proved="true"
+      expanded="true"
+      shape="Lamk bufferV3V4amk arrayV5V6Lamk bufferV3V9amk arrayV5V8Lamk bufferV3V12amk arrayV5V11Lamk bufferV15V14amk arrayV5V11abuffer_invariantV16Aainfix &lt;V14V5Iainfix =asequenceV16aConsV1aNilIainfix =V17V0ICasequenceV13aNilfaConsVVainfix =asequenceV16V19Aainfix =V17V18Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FFFIabuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13aConsV0aConsV1aNilIainfix =asequenceV13ainfix ++asequenceV10aConsV1aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13FFIabuffer_invariantV10Aainfix &lt;V9V5Iainfix =asequenceV10ainfix ++asequenceV7aConsV0aNilAainfix =V9ainfix +V4c1Aabuffer_invariantV10FFIabuffer_invariantV7Aainfix &lt;V4V5Iainfix =asequenceV7aNilAainfix =V5c2Aabuffer_invariantV7FIainfix &gt;c2c0FFF">
+      <label
+       name="expl:parameter test"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter test.9"
+      locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      loclnum="153" loccnumb="6" loccnume="10"
+      expl="assertion"
+      sum="bb58802e765c79a450d65814b3659e17"
+      proved="true"
+      expanded="true"
+      shape="Lamk bufferV3V4amk arrayV5V6Lamk bufferV3V9amk arrayV5V8Lamk bufferV3V12amk arrayV5V11Lamk bufferV15V14amk arrayV5V11Lamk bufferV15V19amk arrayV5V18ainfix =asequenceV20aConsV1aConsV2aNilIainfix =asequenceV20ainfix ++asequenceV16aConsV2aNilAainfix =V19ainfix +V14c1Aabuffer_invariantV20FFIabuffer_invariantV16Aainfix &lt;V14V5Iainfix =asequenceV16aConsV1aNilIainfix =V17V0ICasequenceV13aNilfaConsVVainfix =asequenceV16V22Aainfix =V17V21Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FFFIabuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13aConsV0aConsV1aNilIainfix =asequenceV13ainfix ++asequenceV10aConsV1aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13FFIabuffer_invariantV10Aainfix &lt;V9V5Iainfix =asequenceV10ainfix ++asequenceV7aConsV0aNilAainfix =V9ainfix +V4c1Aabuffer_invariantV10FFIabuffer_invariantV7Aainfix &lt;V4V5Iainfix =asequenceV7aNilAainfix =V5c2Aabuffer_invariantV7FIainfix &gt;c2c0FFF">
+      <label
+       name="expl:parameter test"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.60"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter test.10"
+      locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      loclnum="153" loccnumb="6" loccnume="10"
+      expl="precondition"
+      sum="4469d05231928f8ff38b977e19a9319c"
+      proved="true"
+      expanded="true"
+      shape="Lamk bufferV3V4amk arrayV5V6Lamk bufferV3V9amk arrayV5V8Lamk bufferV3V12amk arrayV5V11Lamk bufferV15V14amk arrayV5V11Lamk bufferV15V19amk arrayV5V18abuffer_invariantV20Aainfix &gt;V19c0Iainfix =asequenceV20aConsV1aConsV2aNilIainfix =asequenceV20ainfix ++asequenceV16aConsV2aNilAainfix =V19ainfix +V14c1Aabuffer_invariantV20FFIabuffer_invariantV16Aainfix &lt;V14V5Iainfix =asequenceV16aConsV1aNilIainfix =V17V0ICasequenceV13aNilfaConsVVainfix =asequenceV16V22Aainfix =V17V21Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FFFIabuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13aConsV0aConsV1aNilIainfix =asequenceV13ainfix ++asequenceV10aConsV1aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13FFIabuffer_invariantV10Aainfix &lt;V9V5Iainfix =asequenceV10ainfix ++asequenceV7aConsV0aNilAainfix =V9ainfix +V4c1Aabuffer_invariantV10FFIabuffer_invariantV7Aainfix &lt;V4V5Iainfix =asequenceV7aNilAainfix =V5c2Aabuffer_invariantV7FIainfix &gt;c2c0FFF">
+      <label
+       name="expl:parameter test"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter test.11"
+      locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      loclnum="153" loccnumb="6" loccnume="10"
+      expl="assertion"
+      sum="ba3f2be8747d767570927de821ee227f"
+      proved="true"
+      expanded="true"
+      shape="Lamk bufferV3V4amk arrayV5V6Lamk bufferV3V9amk arrayV5V8Lamk bufferV3V12amk arrayV5V11Lamk bufferV15V14amk arrayV5V11Lamk bufferV15V19amk arrayV5V18Lamk bufferV22V21amk arrayV5V18ainfix =V24V1ICasequenceV20aNilfaConsVVainfix =asequenceV23V26Aainfix =V24V25Aainfix =V21ainfix -V19c1Aabuffer_invariantV23FFFIabuffer_invariantV20Aainfix &gt;V19c0Iainfix =asequenceV20aConsV1aConsV2aNilIainfix =asequenceV20ainfix ++asequenceV16aConsV2aNilAainfix =V19ainfix +V14c1Aabuffer_invariantV20FFIabuffer_invariantV16Aainfix &lt;V14V5Iainfix =asequenceV16aConsV1aNilIainfix =V17V0ICasequenceV13aNilfaConsVVainfix =asequenceV16V28Aainfix =V17V27Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FFFIabuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13aConsV0aConsV1aNilIainfix =asequenceV13ainfix ++asequenceV10aConsV1aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13FFIabuffer_invariantV10Aainfix &lt;V9V5Iainfix =asequenceV10ainfix ++asequenceV7aConsV0aNilAainfix =V9ainfix +V4c1Aabuffer_invariantV10FFIabuffer_invariantV7Aainfix &lt;V4V5Iainfix =asequenceV7aNilAainfix =V5c2Aabuffer_invariantV7FIainfix &gt;c2c0FFF">
+      <label
+       name="expl:parameter test"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.13"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter test.12"
+      locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      loclnum="153" loccnumb="6" loccnume="10"
+      expl="precondition"
+      sum="6694ff039735c277f39c8fa50e900401"
+      proved="true"
+      expanded="true"
+      shape="Lamk bufferV3V4amk arrayV5V6Lamk bufferV3V9amk arrayV5V8Lamk bufferV3V12amk arrayV5V11Lamk bufferV15V14amk arrayV5V11Lamk bufferV15V19amk arrayV5V18Lamk bufferV22V21amk arrayV5V18abuffer_invariantV23Aainfix &gt;V21c0Iainfix =V24V1ICasequenceV20aNilfaConsVVainfix =asequenceV23V26Aainfix =V24V25Aainfix =V21ainfix -V19c1Aabuffer_invariantV23FFFIabuffer_invariantV20Aainfix &gt;V19c0Iainfix =asequenceV20aConsV1aConsV2aNilIainfix =asequenceV20ainfix ++asequenceV16aConsV2aNilAainfix =V19ainfix +V14c1Aabuffer_invariantV20FFIabuffer_invariantV16Aainfix &lt;V14V5Iainfix =asequenceV16aConsV1aNilIainfix =V17V0ICasequenceV13aNilfaConsVVainfix =asequenceV16V28Aainfix =V17V27Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FFFIabuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13aConsV0aConsV1aNilIainfix =asequenceV13ainfix ++asequenceV10aConsV1aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13FFIabuffer_invariantV10Aainfix &lt;V9V5Iainfix =asequenceV10ainfix ++asequenceV7aConsV0aNilAainfix =V9ainfix +V4c1Aabuffer_invariantV10FFIabuffer_invariantV7Aainfix &lt;V4V5Iainfix =asequenceV7aNilAainfix =V5c2Aabuffer_invariantV7FIainfix &gt;c2c0FFF">
+      <label
+       name="expl:parameter test"/>
+      <proof
+       prover="3"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.06"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.08"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter test.13"
+      locfile="vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      loclnum="153" loccnumb="6" loccnume="10"
+      expl="assertion"
+      sum="d3e2f66c49b85c70871c7749d4f5b101"
+      proved="true"
+      expanded="true"
+      shape="Lamk bufferV3V4amk arrayV5V6Lamk bufferV3V9amk arrayV5V8Lamk bufferV3V12amk arrayV5V11Lamk bufferV15V14amk arrayV5V11Lamk bufferV15V19amk arrayV5V18Lamk bufferV22V21amk arrayV5V18Lamk bufferV26V25amk arrayV5V18ainfix =V28V2ICasequenceV23aNilfaConsVVainfix =asequenceV27V30Aainfix =V28V29Aainfix =V25ainfix -V21c1Aabuffer_invariantV27FFFIabuffer_invariantV23Aainfix &gt;V21c0Iainfix =V24V1ICasequenceV20aNilfaConsVVainfix =asequenceV23V32Aainfix =V24V31Aainfix =V21ainfix -V19c1Aabuffer_invariantV23FFFIabuffer_invariantV20Aainfix &gt;V19c0Iainfix =asequenceV20aConsV1aConsV2aNilIainfix =asequenceV20ainfix ++asequenceV16aConsV2aNilAainfix =V19ainfix +V14c1Aabuffer_invariantV20FFIabuffer_invariantV16Aainfix &lt;V14V5Iainfix =asequenceV16aConsV1aNilIainfix =V17V0ICasequenceV13aNilfaConsVVainfix =asequenceV16V34Aainfix =V17V33Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FFFIabuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13aConsV0aConsV1aNilIainfix =asequenceV13ainfix ++asequenceV10aConsV1aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13FFIabuffer_invariantV10Aainfix &lt;V9V5Iainfix =asequenceV10ainfix ++asequenceV7aConsV0aNilAainfix =V9ainfix +V4c1Aabuffer_invariantV10FFIabuffer_invariantV7Aainfix &lt;V4V5Iainfix =asequenceV7aNilAainfix =V5c2Aabuffer_invariantV7FIainfix &gt;c2c0FFF">
+      <label
+       name="expl:parameter test"/>
+      <proof
+       prover="3"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.06"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+  </theory>
+ </file>
+</why3session>
