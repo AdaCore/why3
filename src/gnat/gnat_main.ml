@@ -280,7 +280,9 @@ let goal_has_been_tried g =
    try
       Session.goal_iter_proof_attempt
          (fun pa ->
-            if pa.Session.proof_prover = Gnat_config.alt_ergo_conf &&
+            (* only count non-obsolete proof attempts with identical options *)
+            if not pa.Session.proof_obsolete &&
+               pa.Session.proof_prover = Gnat_config.alt_ergo_conf &&
                pa.Session.proof_timelimit = Gnat_config.timeout then
                   raise Exit
          ) g;
