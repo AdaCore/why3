@@ -575,7 +575,12 @@ let set_proof_state ?(notify=notify) ~obsolete ~archived res a =
   notify (Proof_attempt a);
   check_goal_proved notify a.proof_parent
 
-let change_prover a p = a.proof_prover <- p
+let change_prover a p =
+  let g = a.proof_parent in
+  PHprover.remove g.goal_external_proofs a.proof_prover;
+  PHprover.add g.goal_external_proofs p a;
+  a.proof_prover <- p;
+  a.proof_obsolete <- true
 
 let set_edited_as edited_as a = a.proof_edited_as <- edited_as
 
