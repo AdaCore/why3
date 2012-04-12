@@ -593,7 +593,7 @@ There are three styles of output: 'table', 'simpletree' and
 
 \begin{figure}[t]
   \begin{center}
-    \includegraphics[width=\textwidth]{hello_proof.png}
+    \fbox{\includegraphics[width=0.9\textwidth]{hello_proof.png}}
   \end{center}
   \caption{HTML table produced for the HelloProof example}
 \label{fig:html}
@@ -604,38 +604,40 @@ similar to the LaTeX output above. Figure~\ref{fig:html} is the HTML table
 produced for the 'HelloProof' example, as typically shown in a Web
 browser.
 
-The style ''simple' use only 'ul' and 'il' tag. 'jstree' use the 'jstree' plugin
-of the javascript library 'jquery'.
+The style ''simpletree' displays the contents of the session under the form of tree, similar to the tree view in the IDE. It uses only basic HTMl tags such as \verb|<ul>| and \verb|<li>|. 
 
-\todo{Detailler}
-
+The style 'jstree' displays a dynamic tree view of the session, where
+you can click on various parts to expand or shrink some part of the
+tree. Clicking on a edited proof script also shows the contents of
+this script. Technically, it use the 'jstree' plugin of the javascript
+library 'jquery'.
 
 Specific options for this command are as follows.
 \begin{description}
-\item[\texttt{-o}] 
-the directory to output the produces files ('-' for stdout)
+\item[\texttt{-{}-style <s>}] sets the style to use, among
+  \texttt{simpletree}, \texttt{jstree} and \texttt{table}, defaults to
+  \texttt{table}.
+
+\item[\texttt{-o}] the directory to output the produces files ('-' for
+  stdout). The default is to output in the same directory as the session
+  itself.
 
 \item[\texttt{-{}-context}] adds context around the generated code in
   order to allow direct visualisation (header, css, ...). It also adds
-  in the directory all the needed external files. It can't be set with
+  in the output directory all the needed external files. It can't be set with
   stdout output.
-
-\item[\texttt{-{}-style <s>}] sets the style to
-  use, among \texttt{simpletree}, \texttt{jstree} and \texttt{table}, defaults to \texttt{table}.
 
 \item[\texttt{-{}-add\_pp <suffix> <cmd> <out\_suffix>}] adds for the
   given prefix the given pretty-printer, the new file as the given
-  out\_suffix. cmd must contain
-  '\%i' which will be replaced by the input file
-                         and '\%o' which will be replaced by the
-                         output file.
+  out\_suffix. cmd must contain '\%i' which will be replaced by the
+  input file and '\%o' which will be replaced by the output file.
 
-\item[\texttt{-{}-coqdoc}] use the coqdoc command to display Coq proof
+\item[\texttt{-{}-coqdoc}] use the \verb|coqdoc| command to display Coq proof
   scripts. This is equivalent to \texttt{-{}-add\_pp .v "coqdoc
     -{}-no-index -{}-html -o \%o \%i" .html}
 
 \end{description}
- 
+
 \subsection{Commands modifying the proof attempts}
 
 The subcommands \texttt{mod}, \texttt{copy}, and \texttt{rm} share the
