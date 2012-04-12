@@ -91,6 +91,8 @@ end
 
 module Objectives : sig
    val add_to_expl : Gnat_expl.expl -> goal -> unit
+   (* Mark goal for proof if in the requested target *)
+
    val add_expl         : Gnat_expl.expl -> unit
    val discharge        : goal -> GoalSet.t
 
@@ -128,10 +130,20 @@ end = struct
          r
 
    let add_to_expl ex go =
-      incr nb_goals;
-      GoalMap.add goalmap go ex;
-      let set = find ex in
-      GoalSet.add set go
+      let filter =
+         match Gnat_config.limit_line with
+         | Some l -> Gnat_expl.equal_line l (Gnat_expl.get_loc ex)
+         | None ->
+             match Gnat_config.limit_subp with
+             | None -> true
+             | Some l -> Gnat_expl.equal_line l (Gnat_expl.get_subp_loc ex)
+      in
+      if filter then begin
+         incr nb_goals;
+         GoalMap.add goalmap go ex;
+         let set = find ex in
+         GoalSet.add set go
+      end
 
    let add_expl e = ignore (find e)
 
@@ -447,19 +459,7 @@ let _ =
          Objectives.stat ()
       end;
       Display_Progress.set_num_goals (Objectives.get_num_goals ());
-      Objectives.iter (fun e goalset ->
-         let filter =
-            match Gnat_config.limit_line with
-            | Some l -> Gnat_expl.equal_line l (Gnat_expl.get_loc e)
-            | None ->
-                  match Gnat_config.limit_subp with
-                  | None -> true
-                  | Some l -> Gnat_expl.equal_line l (Gnat_expl.get_subp_loc e)
-         in
-         if filter then begin
-            let g = GoalSet.choose goalset in
-            schedule_goal g
-         end);
+      Objectives.iter (fun e goalset -> schedule_goal (GoalSet.choose goalset));
       Scheduler.main_loop ();
       Session.save_session env_session.Session.session
     with e when not (Debug.test_flag Debug.stack_trace) ->
