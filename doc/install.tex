@@ -119,7 +119,7 @@ Section~\ref{sec:why3config}.
 
 \section{Multiple Versions of the Same Prover}
 
-Since version 0.72, \why is able to several versions of the same
+Since version 0.72, \why is able to use several versions of the same
 prover, e.g. it can use both CVC3 2.2 and CVC3 2.4.1 at the same time.
 The automatic detection of provers looks for typical names for their
 executable command, e.g. \texttt{cvc3} for CVC3. However, if you
@@ -129,11 +129,12 @@ use specialized executable names, such as \texttt{cvc3-2.2} or
 these, you can use the option \verb|--add-prover| to
 \texttt{why3config}, e.g.
 \begin{verbatim}
-why3config --detect --add-prover cvc3-2.4:/usr/local/bin/cvc3-2.4.1
+why3config --detect --add-prover cvc3-2.4 /usr/local/bin/cvc3-2.4.1
 \end{verbatim}
 the first argument (here \verb|cvc3-2.4|) must be one of the class of
 provers known in the file \verb|provers-detection-data.conf| typically
-located in \verb|/usr/local/share/why3| after installation.
+located in \verb|/usr/local/share/why3| after installation. See
+Appendix~\ref{sec:proverdetecttiondata} for details.
 
 
 \section{Session Update after Prover Upgrade}
