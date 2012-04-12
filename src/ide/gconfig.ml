@@ -747,11 +747,9 @@ let run_auto_detection gconfig =
 (* let () = eprintf "[Info] end of configuration initialization@." *)
 
 let uninstalled_prover c eS unknown =
-  Format.eprintf "uninstalled_prover@.";
   try
     Whyconf.get_prover_upgrade_policy c.config unknown
   with Not_found ->
-    Format.eprintf "making dialog@.";
     let others,names,versions = Session_tools.unknown_to_known_provers
       (Whyconf.get_provers eS.Session.whyconf) unknown in
     let dialog = GWindow.dialog

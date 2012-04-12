@@ -368,7 +368,29 @@ let find_prover eS a =
                     *)
                     None
             end
-          | Whyconf.CPU_duplicate _p -> assert false (* TODO *)
+          | Whyconf.CPU_duplicate new_p -> 
+            (* does a proof using new_p already exists ? *)
+            let g = a.proof_parent in
+            begin
+              try
+                let _ = PHprover.find g.goal_external_proofs new_p in
+                (* yes, then we do nothing *)
+                None
+              with Not_found ->
+                (* we duplicate the proof_attempt *)
+                let new_a = copy_external_proof
+                  ~notify ~keygen:O.create ~prover:new_p ~env_session:eS a 
+                in
+                O.init new_a.proof_key (Proof_attempt new_a);
+                match load_prover eS new_p with
+                  | Some p -> Some (new_p,p,new_a)
+                  | None -> 
+                    (* should never happen because at loading, config
+                       ignores uninstalled prover targets.
+                       Nevertheless, we can safely return None.
+                    *)
+                    None
+            end
 
 
 let adapt_timelimit a =
