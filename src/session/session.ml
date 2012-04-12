@@ -63,7 +63,7 @@ type 'a goal =
 
 and 'a proof_attempt =
     { proof_key : 'a;
-      proof_prover : Whyconf.prover;
+      mutable proof_prover : Whyconf.prover;
       proof_parent : 'a goal;
       mutable proof_state : proof_attempt_status;
       mutable proof_timelimit : int;
@@ -574,6 +574,8 @@ let set_proof_state ?(notify=notify) ~obsolete ~archived res a =
   a.proof_archived <- archived;
   notify (Proof_attempt a);
   check_goal_proved notify a.proof_parent
+
+let change_prover a p = a.proof_prover <- p
 
 let set_edited_as edited_as a = a.proof_edited_as <- edited_as
 

@@ -608,25 +608,33 @@ module M = Session_scheduler.Make
            (if r=0 then "Running: 0" else
               "Running: " ^ (string_of_int r)^ " " ^ (fan (!c / 10)))
 
-
 let notify any =
   session_needs_saving := true;
   let row,exp =
     match any with
-      | S.Goal g ->
-          g.S.goal_key, g.S.goal_expanded
+      | S.Goal g -> g.S.goal_key, g.S.goal_expanded
       | S.Theory t -> t.S.theory_key, t.S.theory_expanded
       | S.File f -> f.S.file_key, f.S.file_expanded
       | S.Proof_attempt a -> a.S.proof_key,false
       | S.Transf tr -> tr.S.transf_key,tr.S.transf_expanded
   in
+  (* name is set by notify since upgrade policy may update the prover name *)
+  goals_model#set ~row:row#iter ~column:name_column
+    (match any with
+      | S.Goal g -> S.goal_expl g
+      | S.Theory th -> th.S.theory_name.Ident.id_string
+      | S.File f -> Filename.basename f.S.file_name
+      | S.Proof_attempt a ->
+        let p = a.S.proof_prover in
+        Pp.string_of_wnl C.print_prover p
+      | S.Transf tr -> tr.S.transf_name);
   let ind = goals_model#get ~row:row#iter ~column:index_column in
   begin
     match !current_selected_row with
       | Some r when r == ind ->
         update_task_view any
       | _ -> ()
-  end;  
+  end;
   if exp then goals_view#expand_to_path row#path else
     goals_view#collapse_row row#path;
   match any with
@@ -663,20 +671,15 @@ let init =
          | S.File _ -> !image_directory
          | S.Proof_attempt _ -> !image_prover
          | S.Transf _ -> !image_transf);
-    goals_model#set ~row:row#iter ~column:name_column
-      (match any with
-         | S.Goal g -> S.goal_expl g
-         | S.Theory th -> th.S.theory_name.Ident.id_string
-         | S.File f -> Filename.basename f.S.file_name
-         | S.Proof_attempt a ->
-           let p = a.S.proof_prover in
-           Pp.string_of_wnl C.print_prover p
-         | S.Transf tr -> tr.S.transf_name);
     notify any
 
+(*
 let unknown_prover = Gconfig.unknown_prover gconfig
 
 let replace_prover _ _ = false (* Gconfig.replace_prover gconfig *)
+*)
+
+let uninstalled_prover = Gconfig.uninstalled_prover gconfig
 
    end)
 
@@ -961,26 +964,6 @@ let save_session () =
 let exit_function ?(destroy=false) () =
   eprintf "[Info] saving IDE config file@.";
   save_config ();
-  (*
-  eprintf "saving session (testing only)@.";
-  begin
-    M.test_save ();
-    try
-      let l = M.test_load () in
-      eprintf "reloaded successfully %d elements@." (List.length l);
-      match l with
-        | [] -> ()
-        | f :: _ ->
-            eprintf "first element is a '%s' with %d sub-elements@."
-              f.Xml.name (List.length f.Xml.elements);
-
-    with e -> eprintf "test reloading failed with exception %s@."
-      (Printexc.to_string e)
-  end;
-  let ret = Sys.command
-    "xmllint --noout --dtdvalid share/why3session.dtd essai.xml" in
-  if ret = 0 then eprintf "DTD validation succeeded, good!@.";
-  *)
   if not !session_needs_saving then GMain.quit () else
   match (Gconfig.config ()).saving_policy with
     | 0 -> save_session (); GMain.quit ()

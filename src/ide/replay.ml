@@ -198,9 +198,17 @@ let notify _any = ()
           (Session.transformation_id tr.M.transf) tr.M.transf_proved
 *)
 
+(*
 let unknown_prover _ _ = None
 
 let replace_prover _ _ = false
+*)
+
+let uninstalled_prover _eS unknown =
+  try
+    Whyconf.get_prover_upgrade_policy config unknown 
+  with Not_found ->
+    Whyconf.CPU_keep 
 
 module Scheduler = Session_scheduler.Base_scheduler(struct end)
 

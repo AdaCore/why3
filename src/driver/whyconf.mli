@@ -146,6 +146,28 @@ val editor_by_id : config -> string -> config_editor
 (** return the configuration of the editor if found, otherwise return
     Not_found *)
 
+
+(** prover upgrade policy *)
+
+type prover_upgrade_policy =
+  | CPU_keep
+  | CPU_upgrade of prover
+  | CPU_duplicate of prover
+
+val set_prover_upgrade_policy :
+  config -> prover -> prover_upgrade_policy -> config
+(** [set_prover_upgrade c p cpu] sets or updates the policy to follow if the
+    prover [p] is absent from the system *)
+
+val get_prover_upgrade_policy : config -> prover -> prover_upgrade_policy
+(** [get_prover_upgrade config] returns a map providing the policy to
+    follow for each absent prover (if it has already been decided
+    by the user and thus stored in the config) *)
+
+val get_policies : config -> prover_upgrade_policy Mprover.t
+
+val set_policies : config -> prover_upgrade_policy Mprover.t -> config
+
 (** {2 For accesing other parts of the configuration } *)
 
 (** Access to the Rc.t *)

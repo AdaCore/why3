@@ -63,6 +63,7 @@ module type OBSERVER = sig
   val notify : key any -> unit
     (** notify modification of node of the session *)
 
+(*
   val unknown_prover : key env_session -> Whyconf.prover ->
     Whyconf.prover option
     (** When a prover must be called on a task but it is currently
@@ -74,7 +75,12 @@ module type OBSERVER = sig
       proof attempt attached to the goal, this function is fired. If
       [replace_prover to_be_removed to_be_copied] return [true] the
       proof_attempt is replaced *)
+*)
 
+  val uninstalled_prover : 
+    key env_session -> Whyconf.prover -> Whyconf.prover_upgrade_policy
+    (** When a prover must be called on a task but it is currently 
+        not installed, what policy to apply *)
 end
 
 (** {2 Main functor} *)

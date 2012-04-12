@@ -47,7 +47,7 @@ type t =
       mutable env : Why3.Env.env;
       mutable config : Whyconf.config;
       original_config : Whyconf.config;
-      mutable altern_provers : prover option Mprover.t;
+      (* mutable altern_provers : prover option Mprover.t; *)
       (* mutable replace_prover : conf_replace_prover; *)
       mutable hidden_provers : string list;
     }
@@ -105,8 +105,14 @@ val image_failure_obs : GdkPixbuf.pixbuf ref
 val show_legend_window : unit -> unit
 val show_about_window : unit -> unit
 val preferences : t -> unit
+
+val uninstalled_prover :
+  t -> 'key Session.env_session -> Whyconf.prover -> Whyconf.prover_upgrade_policy
+
+(*
 val unknown_prover :
   t -> 'key Session.env_session -> Whyconf.prover -> Whyconf.prover option
+*)
 
 (* obsolete dialog
 val replace_prover :

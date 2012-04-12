@@ -80,7 +80,7 @@ type 'a goal = private
 
 and 'a proof_attempt = private
     { proof_key : 'a;
-      proof_prover : Whyconf.prover;
+      mutable proof_prover : Whyconf.prover;
       proof_parent : 'a goal;
       mutable proof_state : proof_attempt_status;
       mutable proof_timelimit : int;
@@ -274,6 +274,8 @@ val set_proof_state :
   archived:bool ->
   proof_attempt_status ->
   'key proof_attempt -> unit
+
+val change_prover : 'a proof_attempt -> Whyconf.prover -> unit
 
 val set_obsolete : ?notify:'key notify -> 'key proof_attempt -> unit
 

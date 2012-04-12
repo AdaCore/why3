@@ -43,10 +43,15 @@ module type OBSERVER = sig
 
   val notify : key any -> unit
 
+(*
   val unknown_prover :
     key env_session -> Whyconf.prover -> Whyconf.prover option
 
   val replace_prover : key proof_attempt -> key proof_attempt -> bool
+*)
+
+  val uninstalled_prover :
+    key env_session -> Whyconf.prover -> Whyconf.prover_upgrade_policy
 
 end
 
@@ -324,6 +329,7 @@ let add_file env_session f =
 (*****************************************************)
 (* method: run a given prover on each unproved goals *)
 (*****************************************************)
+(*
 let rec find_loadable_prover eS prover =
   (** try the default one *)
   match load_prover eS prover with
@@ -334,6 +340,36 @@ let rec find_loadable_prover eS prover =
         | Some prover -> find_loadable_prover eS prover
     end
     | Some npc -> Some (prover,npc)
+*)
+
+let find_prover eS a =
+  match load_prover eS a.proof_prover with
+    | Some p -> Some (a.proof_prover, p,a)
+    | None ->
+        match O.uninstalled_prover eS a.proof_prover with
+          | Whyconf.CPU_keep -> None
+          | Whyconf.CPU_upgrade new_p ->
+            (* does a proof using new_p already exists ? *)
+            let g = a.proof_parent in
+            begin
+              try
+                let _ = PHprover.find g.goal_external_proofs new_p in
+                (* yes, then we do nothing *)
+                None
+              with Not_found ->
+                (* we modify the prover in-place *)
+                Session.change_prover a new_p;
+                match load_prover eS new_p with
+                  | Some p -> Some (new_p,p,a)
+                  | None -> 
+                    (* should never happen because at loading, config
+                       ignores uninstalled prover targets.
+                       Nevertheless, we can safely return None.
+                    *)
+                    None
+            end
+          | Whyconf.CPU_duplicate _p -> assert false (* TODO *)
+
 
 let adapt_timelimit a =
   match a.proof_state with
@@ -351,6 +387,12 @@ let run_external_proof eS eT ?callback a =
   (* Perhaps this test, a.proof_archived, should be done somewhere else *)
   if a.proof_archived || running a then ()
   else
+    match find_prover eS a with
+      | None ->
+        (* nothing to do *)
+        Util.apply_option2 () callback a a.proof_state
+      | Some(_,npc,a) ->
+(* 
     let ap = a.proof_prover in
     match find_loadable_prover eS a.proof_prover with
       | None ->
@@ -381,6 +423,8 @@ let run_external_proof eS eT ?callback a =
             O.init a.proof_key (Proof_attempt a);
             a
         in
+*)
+        let g = a.proof_parent in
         if a.proof_edited_as = None &&
           npc.prover_config.Whyconf.interactive then
           begin
@@ -591,6 +635,14 @@ let check_external_proof eS eT todo a =
   else
     begin
       Todo.todo todo;
+      match find_prover eS a with
+        | None ->
+          (* nothing to do 
+             TODO: report an non replayable proof if some option is set
+          *)
+          ()
+        | Some(ap,npc,a) ->
+(*
       let ap = a.proof_prover in
       match find_loadable_prover eS ap with
         | None ->
@@ -616,6 +668,7 @@ let check_external_proof eS eT todo a =
                  ~notify ~keygen:O.create ~prover:nap ~env_session:eS a in
               O.init a.proof_key (Proof_attempt a);
               a in
+          *)
           let timelimit = adapt_timelimit a in
           let callback result =
               match result with
@@ -791,6 +844,14 @@ let edit_proof eS sched ~default_editor a =
     info_window `ERROR "Edition already in progress"
 *)
   else
+      match find_prover eS a with
+        | None ->
+          (* nothing to do 
+             TODO: report an non replayable proof if some option is set
+          *)
+          ()
+        | Some(_,npc,a) ->
+(*
     let ap = a.proof_prover in
     match find_loadable_prover eS a.proof_prover with
       | None -> ()
@@ -814,6 +875,8 @@ let edit_proof eS sched ~default_editor a =
               O.init a.proof_key (Proof_attempt a);
               a in
           (** Now [a] is a proof_attempt of the lodable prover [nap] *)
+*)
+
           let callback res =
             match res with
               | Done {Call_provers.pr_answer = Call_provers.Unknown ""} ->

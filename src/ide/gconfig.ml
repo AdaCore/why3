@@ -27,7 +27,7 @@ open Whyconf
 
 (* config file *)
 
-type altern_provers = prover option Mprover.t
+(* type altern_provers = prover option Mprover.t *)
 
 (** Todo do something generic perhaps*)
 (*
@@ -59,7 +59,7 @@ type t =
       mutable env : Env.env;
       mutable config : Whyconf.config;
       original_config : Whyconf.config;
-      mutable altern_provers : altern_provers;
+      (* mutable altern_provers : altern_provers; *)
       (* mutable replace_prover : conf_replace_prover; *)
       (* hidden prover buttons *)
       mutable hidden_provers : string list;
@@ -190,9 +190,9 @@ let load_config config original_config =
   Format.eprintf "hidden provers : ";
   List.iter (fun p -> Format.eprintf "%s" p) ide.ide_hidden_provers;
   Format.eprintf "@.";
-  let alterns =
-    List.fold_left load_altern
-      Mprover.empty (get_family config "alternative_prover") in
+  (* let alterns = *)
+  (*   List.fold_left load_altern *)
+  (*     Mprover.empty (get_family config "alternative_prover") in *)
   (* temporary sets env to empty *)
   let env = Env.create_env [] in
   set_labels_flag ide.ide_show_labels;
@@ -217,13 +217,15 @@ let load_config config original_config =
     config         = config;
     original_config = original_config;
     env            = env;
-    altern_provers = alterns;
+    (* altern_provers = alterns; *)
     (* replace_prover = ide.ide_replace_prover; *)
     hidden_provers = ide.ide_hidden_provers;
   }
 
 
-let save_altern unknown known (id,family) =
+(*
+
+  let save_altern unknown known (id,family) =
   let alt = empty_section in
   let alt = set_string alt "unknown_name" unknown.prover_name in
   let alt = set_string alt "unknown_version" unknown.prover_version in
@@ -237,14 +239,17 @@ let save_altern unknown known (id,family) =
       set_string ~default:"" alt "known_alternative" known.prover_altern in
   (id+1,(sprintf "alt%i" id,alt)::family)
 
+  *)
+
 let save_config t =
   let config = t.original_config in
   let config = set_main config
     (set_limits (get_main config)
        t.time_limit t.mem_limit t.max_running_processes)
   in
-  let _,alterns = Mprover.fold save_altern t.altern_provers (0,[]) in
-  let config = set_family config "alternative_prover" alterns in
+  (* let _,alterns = Mprover.fold save_altern t.altern_provers (0,[]) in *)
+  (* let config = set_family config "alternative_prover" alterns in *)
+  let config = set_policies config (get_policies t.config) in 
   let ide = empty_section in
   let ide = set_int ide "window_height" t.window_height in
   let ide = set_int ide "window_width" t.window_width in
@@ -469,7 +474,7 @@ let show_about_window () =
   let ( _ : GWindow.Buttons.about) = about_dialog#run () in
   about_dialog#destroy ()
 
-let alternatives_frame c (notebook:GPack.notebook) =
+let alternatives_frame _c (notebook:GPack.notebook) =
   let label = GMisc.label ~text:"Alternative provers" () in
   let page =
     GPack.vbox ~homogeneous:false ~packing:
@@ -494,13 +499,16 @@ let alternatives_frame c (notebook:GPack.notebook) =
     GBin.frame ~label:"Click for removing an association"
       ~packing:page#add ()
   in
-  let box =
+  let _box =
     GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
       ~packing:frame#add ()
   in
-  let remove button unknown () =
+  let _remove button _unknown () =
     button#destroy ();
-    c.altern_provers <- Mprover.remove unknown c.altern_provers in
+    assert false (* TODO *)
+    (* c.altern_provers <- Mprover.remove unknown c.altern_provers  *)
+  in
+(*
   let iter unknown known =
     let label =
       match known with
@@ -512,6 +520,8 @@ let alternatives_frame c (notebook:GPack.notebook) =
       button#connect#released ~callback:(remove button unknown)
     in () in
   Mprover.iter iter c.altern_provers
+*)
+  ()
 
 let preferences (c : t) =
   let dialog = GWindow.dialog ~title:"Why3: preferences" () in
@@ -742,9 +752,87 @@ let run_auto_detection gconfig =
 
 (* let () = eprintf "[Info] end of configuration initialization@." *)
 
-let unknown_prover c eS unknown =
-  try Mprover.find unknown c.altern_provers
+let uninstalled_prover c eS unknown =
+  Format.eprintf "uninstalled_prover@.";
+  try
+    Whyconf.get_prover_upgrade_policy c.config unknown 
   with Not_found ->
+    Format.eprintf "making dialog@.";
+    let others,names,versions = Session_tools.unknown_to_known_provers
+      (Whyconf.get_provers eS.Session.whyconf) unknown in
+    let dialog = GWindow.dialog ~title:"Why3: Uninstalled prover" () in
+    let vbox = dialog#vbox in
+    let label = Pp.sprintf "The prover %a is not installed. Please select \
+a policy for associated proof attemtps" Whyconf.print_prover unknown in
+    let policy_frame = GBin.frame ~label ~packing:vbox#add () in
+    let choice = ref 0 in
+    let prover_choosed = ref None in
+    let set_prover prover () = prover_choosed := Some prover in
+    let box =
+      GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
+        ~packing:policy_frame#add ()
+    in
+    let choice0 = GButton.radio_button
+      ~label:"keep proofs as they are, do not try to play them"
+      ~active:true 
+      ~packing:box#add () in
+    ignore (choice0#connect#toggled
+              ~callback:(fun () -> choice := 0));
+    let choice1 = GButton.radio_button
+      ~label:"move proofs to the selected prover below"
+      ~active:false ~group:choice0#group
+      ~packing:box#add () in
+    ignore (choice1#connect#toggled
+              ~callback:(fun () -> choice := 1));
+    let choice2 = GButton.radio_button
+      ~label:"duplicate proofs to the selected prover below"
+      ~active:false ~group:choice0#group
+      ~packing:box#add () in
+    ignore (choice2#connect#toggled
+              ~callback:(fun () -> choice := 2));
+    let first = ref None in
+    let alternatives_section label alternatives =
+      if alternatives <> [] then
+        let frame = GBin.frame ~label ~packing:vbox#add () in
+        let box =
+          GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
+            ~packing:frame#add ()
+    in
+    let iter_alter prover =
+      let choice =
+        let label = Pp.string_of_wnl print_prover prover in
+        match !first with
+          | None ->
+            let choice =
+              GButton.radio_button ~label ~active:true ~packing:box#add ()
+            in
+            prover_choosed := Some prover;
+            first := Some choice;
+            choice
+          | Some first ->
+            GButton.radio_button ~label ~group:first#group
+            ~active:false ~packing:box#add ()
+      in
+      ignore (choice#connect#toggled ~callback:(set_prover prover))
+    in
+    List.iter iter_alter alternatives in
+    alternatives_section "Same name and same version" versions;
+    alternatives_section "Same name and different version" names;
+    alternatives_section "Different name and different version" others;
+    dialog#add_button "Ok" `CLOSE ;
+    ignore (dialog#run ());
+    dialog#destroy ();
+    let policy =
+      match !choice, !prover_choosed with
+        | 0,_ -> CPU_keep
+        | 1, Some p -> CPU_upgrade p
+        | 2, Some p -> CPU_duplicate p
+        | _ -> assert false
+    in
+    c.config <- set_prover_upgrade_policy c.config unknown policy;
+    policy
+(*
+let unknown_prover c eS unknown =
   let others,names,versions = Session_tools.unknown_to_known_provers
   (Whyconf.get_provers eS.Session.whyconf) unknown in
   let dialog = GWindow.dialog ~title:"Why3: Unknown prover" () in
@@ -796,8 +884,9 @@ an alternative?" Whyconf.print_prover unknown in
   if save#active then
     c.altern_provers <- Mprover.add unknown !prover_choosed c.altern_provers;
   !prover_choosed
+*)
 
-(* obsolete dialog 
+(* obsolete dialog  
 let replace_prover c to_be_removed to_be_copied =
   if not to_be_removed.Session.proof_obsolete &&
     c.replace_prover = CRP_Not_Obsolete
