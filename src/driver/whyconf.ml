@@ -482,11 +482,6 @@ let set_prover_upgrade_policy config prover target =
   }
 
 let set_policies config policies = 
-  Format.eprintf "set_policies:";
-  Mprover.iter
-    (fun p _ -> Format.eprintf " %a, " print_prover p)
-    policies;
-  Format.eprintf "@.";
   { config with
     config = set_policies config.config policies;
     provers_upgrade_policy = policies }

@@ -249,7 +249,7 @@ let save_config t =
   in
   (* let _,alterns = Mprover.fold save_altern t.altern_provers (0,[]) in *)
   (* let config = set_family config "alternative_prover" alterns in *)
-  let config = set_policies config (get_policies t.config) in 
+  let config = set_policies config (get_policies t.config) in
   let ide = empty_section in
   let ide = set_int ide "window_height" t.window_height in
   let ide = set_int ide "window_width" t.window_width in
@@ -474,54 +474,44 @@ let show_about_window () =
   let ( _ : GWindow.Buttons.about) = about_dialog#run () in
   about_dialog#destroy ()
 
-let alternatives_frame _c (notebook:GPack.notebook) =
-  let label = GMisc.label ~text:"Alternative provers" () in
+let alternatives_frame c (notebook:GPack.notebook) =
+  let label = GMisc.label ~text:"Uninstalled provers" () in
   let page =
     GPack.vbox ~homogeneous:false ~packing:
       (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) ()
   in
-(*
-  let replace_prover =
-    GButton.check_button ~label:"never replace not obsolete external proof"
-      ~packing:page#add ()
-      ~active:(c.replace_prover = CRP_Not_Obsolete)
-  in
-  let (_ : GtkSignal.id) =
-    replace_prover#connect#toggled ~callback:
-      (fun () ->
-        if replace_prover#active
-        then c.replace_prover <- CRP_Not_Obsolete
-        else c.replace_prover <- CRP_Ask
-      )
-  in
-*)
   let frame =
-    GBin.frame ~label:"Click for removing an association"
-      ~packing:page#add ()
+    GBin.frame ~label:"Click to remove a setting" 
+      ~packing:page#pack ()
   in
-  let _box =
-    GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
+  let box =
+    GPack.button_box `VERTICAL ~border_width:5 ~spacing:5 
       ~packing:frame#add ()
   in
-  let _remove button _unknown () =
+  let remove button p () =
     button#destroy ();
-    assert false (* TODO *)
-    (* c.altern_provers <- Mprover.remove unknown c.altern_provers  *)
+    c.config <- set_policies c.config (Mprover.remove p (get_policies c.config))
   in
-(*
-  let iter unknown known =
+  let iter p policy =
     let label =
-      match known with
-        | None -> Pp.sprintf_wnl "%a ignored" print_prover unknown
-        | Some known ->
-          Pp.sprintf_wnl "%a -> %a" print_prover unknown print_prover known in
+      match policy with
+        | CPU_keep -> Pp.sprintf_wnl "proofs with %a kept as they are" print_prover p
+        | CPU_upgrade t ->
+          Pp.sprintf_wnl "proofs with %a moved to %a" print_prover p print_prover t
+        | CPU_duplicate t ->
+          Pp.sprintf_wnl "proofs with %a duplicated to %a" print_prover p print_prover t
+    in
     let button = GButton.button ~label ~packing:box#add () in
     let (_ : GtkSignal.id) =
-      button#connect#released ~callback:(remove button unknown)
-    in () in
-  Mprover.iter iter c.altern_provers
-*)
+      button#connect#released ~callback:(remove button p)
+    in ()
+  in
+  Mprover.iter iter (get_policies c.config);
+  let _fillbox =
+    GPack.vbox ~packing:(page#pack ~expand:true) ()
+  in
   ()
+
 
 let preferences (c : t) =
   let dialog = GWindow.dialog ~title:"Why3: preferences" () in
@@ -607,9 +597,13 @@ let preferences (c : t) =
     GPack.vbox ~homogeneous:false ~packing:
       (fun w -> ignore(notebook#append_page ~tab_label:label3#coerce w)) ()
   in
+  let frame =
+    GBin.frame ~label:"Provers button shown in the left toolbar"
+      ~packing:page3#add ()
+  in
   let provers_box =
     GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
-      ~packing:page3#add ()
+      ~packing:frame#add ()
   in
   let hidden_provers = Hashtbl.create 7 in
   Mprover.iter
@@ -755,15 +749,24 @@ let run_auto_detection gconfig =
 let uninstalled_prover c eS unknown =
   Format.eprintf "uninstalled_prover@.";
   try
-    Whyconf.get_prover_upgrade_policy c.config unknown 
+    Whyconf.get_prover_upgrade_policy c.config unknown
   with Not_found ->
     Format.eprintf "making dialog@.";
     let others,names,versions = Session_tools.unknown_to_known_provers
       (Whyconf.get_provers eS.Session.whyconf) unknown in
-    let dialog = GWindow.dialog ~title:"Why3: Uninstalled prover" () in
+    let dialog = GWindow.dialog
+      ~icon:(!why_icon)
+      ~title:"Why3: Uninstalled prover" ()
+    in
     let vbox = dialog#vbox in
-    let label = Pp.sprintf "The prover %a is not installed. Please select \
-a policy for associated proof attemtps" Whyconf.print_prover unknown in
+    let hb = GPack.hbox ~packing:vbox#add () in
+    let _i = GMisc.image ~stock:`DIALOG_WARNING ~packing:hb#add () in
+    let text =
+      Pp.sprintf "The prover %a is not installed"
+        Whyconf.print_prover unknown
+    in
+    let _label1 = GMisc.label ~ypad:10 ~text ~xalign:0.5 ~packing:hb#add () in
+    let label = "Please select a policy for associated proof attemtps" in
     let policy_frame = GBin.frame ~label ~packing:vbox#add () in
     let choice = ref 0 in
     let prover_choosed = ref None in
@@ -774,51 +777,57 @@ a policy for associated proof attemtps" Whyconf.print_prover unknown in
     in
     let choice0 = GButton.radio_button
       ~label:"keep proofs as they are, do not try to play them"
-      ~active:true 
+      ~active:true
       ~packing:box#add () in
-    ignore (choice0#connect#toggled
-              ~callback:(fun () -> choice := 0));
     let choice1 = GButton.radio_button
       ~label:"move proofs to the selected prover below"
       ~active:false ~group:choice0#group
       ~packing:box#add () in
-    ignore (choice1#connect#toggled
-              ~callback:(fun () -> choice := 1));
     let choice2 = GButton.radio_button
       ~label:"duplicate proofs to the selected prover below"
       ~active:false ~group:choice0#group
       ~packing:box#add () in
-    ignore (choice2#connect#toggled
-              ~callback:(fun () -> choice := 2));
     let first = ref None in
-    let alternatives_section label alternatives =
+    let alternatives_section acc label alternatives =
       if alternatives <> [] then
         let frame = GBin.frame ~label ~packing:vbox#add () in
         let box =
           GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
             ~packing:frame#add ()
+        in
+        let iter_alter prover =
+          let choice =
+            let label = Pp.string_of_wnl print_prover prover in
+            match !first with
+              | None ->
+                let choice =
+                  GButton.radio_button ~label ~active:true ~packing:box#add ()
+                in
+                prover_choosed := Some prover;
+                first := Some choice;
+                choice
+              | Some first ->
+                GButton.radio_button ~label ~group:first#group
+                  ~active:false ~packing:box#add ()
+          in
+          ignore (choice#connect#toggled ~callback:(set_prover prover))
+        in
+        List.iter iter_alter alternatives;
+        frame#misc :: (* box#misc :: *) acc
+      else acc
     in
-    let iter_alter prover =
-      let choice =
-        let label = Pp.string_of_wnl print_prover prover in
-        match !first with
-          | None ->
-            let choice =
-              GButton.radio_button ~label ~active:true ~packing:box#add ()
-            in
-            prover_choosed := Some prover;
-            first := Some choice;
-            choice
-          | Some first ->
-            GButton.radio_button ~label ~group:first#group
-            ~active:false ~packing:box#add ()
-      in
-      ignore (choice#connect#toggled ~callback:(set_prover prover))
-    in
-    List.iter iter_alter alternatives in
-    alternatives_section "Same name and same version" versions;
-    alternatives_section "Same name and different version" names;
-    alternatives_section "Different name and different version" others;
+    let boxes = alternatives_section [] "Same name and same version" versions in
+    let boxes = alternatives_section boxes "Same name and different version" names in
+    let boxes = alternatives_section boxes "Different name" others in
+    let hide_provers () = List.iter (fun b -> b#set_sensitive false) boxes in
+    let show_provers () = List.iter (fun b -> b#set_sensitive true) boxes in
+    hide_provers ();
+    ignore (choice0#connect#toggled
+              ~callback:(fun () -> choice := 0; hide_provers ()));
+    ignore (choice1#connect#toggled
+              ~callback:(fun () -> choice := 1; show_provers ()));
+    ignore (choice2#connect#toggled
+              ~callback:(fun () -> choice := 2; show_provers ()));
     dialog#add_button "Ok" `CLOSE ;
     ignore (dialog#run ());
     dialog#destroy ();
@@ -886,7 +895,7 @@ an alternative?" Whyconf.print_prover unknown in
   !prover_choosed
 *)
 
-(* obsolete dialog  
+(* obsolete dialog
 let replace_prover c to_be_removed to_be_copied =
   if not to_be_removed.Session.proof_obsolete &&
     c.replace_prover = CRP_Not_Obsolete
