@@ -753,7 +753,7 @@ let uninstalled_prover c eS unknown =
     let others,names,versions = Session_tools.unknown_to_known_provers
       (Whyconf.get_provers eS.Session.whyconf) unknown in
     let dialog = GWindow.dialog
-      ~icon:(!why_icon)
+      ~icon:(!why_icon) ~modal:true
       ~title:"Why3: Uninstalled prover" ()
     in
     let vbox = dialog#vbox in
@@ -763,8 +763,8 @@ let uninstalled_prover c eS unknown =
       Pp.sprintf "The prover %a is not installed"
         Whyconf.print_prover unknown
     in
-    let _label1 = GMisc.label ~ypad:10 ~text ~xalign:0.5 ~packing:hb#add () in
-    let label = "Please select a policy for associated proof attemtps" in
+    let _label1 = GMisc.label ~ypad:20 ~text ~xalign:0.5 ~packing:hb#add () in
+    let label = "Please select a policy for associated proof attempts" in
     let policy_frame = GBin.frame ~label ~packing:vbox#add () in
     let choice = ref 0 in
     let prover_choosed = ref None in
