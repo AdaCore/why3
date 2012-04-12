@@ -1,8 +1,48 @@
 \chapter{Reference Manuals for the \why Tools}
 \label{chap:manpages}
 
+This chapter details the usage of each of the command-line tools
+provided by the \why environment. These are as follows:
+\begin{description}
+\item[\texttt{why3config}] tool for managing the user's configuration,
+  including the detection of installed provers.
+\item[\texttt{why3}] \todo{}
+\item[\texttt{why3ide}] graphical interface to display goals, run
+  provers and transformations on them.
+\item[\texttt{why3ml}] \todo{}
+\item[\texttt{why3replayer}] replay the proofs stored in a session,
+  for regression test purposes
+\item[\texttt{why3bench}] \todo{}
+\item[\texttt{why3session}] dumps various informations from a proof
+  session, and possibly modifies the session.
+\end{description}
 
-\todo{Expliquer les options génériques}
+All these tools accept a common subset of command-line options. In
+particular the option -help which displays the usage and options.
+\begin{description}
+\item[\texttt{-L} $d$]
+  adds $d$ in the load path, to search for theories.
+\item[\texttt{-{}-library} $d$]
+  same as \verb|-L|
+\item[\texttt{-I} $d$]
+  same as \verb|-L| (deprecated)
+\item[\texttt{-C} $file$]
+  reads configuration from $file$
+\item[\texttt{-{}-config} $file$]
+  same as \verb|-C|
+\item[\texttt{-{}-extra-config} $file$]
+  reads additional configuration from $file$
+\item[\texttt{-{}-list-debug-flags}]
+  lists known debug flags
+\item[\texttt{-{}-debug-all}]
+  sets all debug flags (except flags which change the behavior)
+\item[\texttt{-{}-debug} $flag$]
+  set a debug flag
+\item[\texttt{-v}]
+  print version information
+\item[\texttt{-help}]
+  displays the usage and the exact list of options for the given tool
+\end{description}
 
 \section{The \texttt{why3config} command-line tool}
 \label{sec:why3config}
@@ -135,32 +175,9 @@ given to the \verb|-o/--output| option.
 \label{sec:ideref}
 
 The basic usage of the GUI is described by the tutorial of
-Section~\ref{sec:gui}. We describe here the command-line options and
-the actions of the various menus and buttons of the interface.
-
-\subsection{Command-line options}
-
-\begin{description}
-\item[-I] $d$: adds $d$ in the load path, to search for theories.
-\end{description}
-
-\todo{option -extra-config and others:}
-
-\begin{verbatim}
-  -L <s>                add s to loadpath
-  --library             same as -L
-  -I                    same as -L (obsolete)
-  -C <file>             Read configuration from <file>
-  --config              same as -C
-  --extra-config <file> Read additional configuration from <file>
-  --list-debug-flags    List known debug flags
-  --debug-all           Set all debug flags (except flags which change the behavior)
-  --debug <flag>        Set a debug flag
-  -v                    print version information
-\end{verbatim}
-
-\todo{Si ces options sont generales a toutes les commandes, il
-  faudrait les mettre dans une section preliminaire a ce chapitre}
+Section~\ref{sec:gui}. There are no specific command-line options,
+apart from the common options detailed in introduction to this chapter.
+We describe the actions of the various menus and buttons of the interface.
 
 \subsection{Left toolbar actions}
 
@@ -256,6 +273,8 @@ The preferences window allows you customize
   \item ask whether to save: on exit, a popup window ask whether you
     want to save or not.
   \end{itemize}
+
+\todo{manque des choses}
 \end{itemize}
 
 \section{The \texttt{why3ml} tool}
@@ -372,7 +391,7 @@ the new run are shown.
 
 Nothing is shown when there is no change in the results, whether the
 considered goal is proved or not. When all the proof
-runs are done, a summary of what is proved or not is displayed using a
+
 tree-shape pretty print, similar to the IDE tree view after doing
 ``Collapse proved goals''. In other words, when a goal, a theory, or a
 file is fully proved, the subtree is not shown.
@@ -553,7 +572,7 @@ The specific options are
   Option \texttt{-style 2} produces an alternate version of LaTeX
   output, with a different layout of the tables.
 \item[\texttt{-o <path>}] where
-  to produce LaTeX files (default: session dir) 
+  to produce LaTeX files (default: session dir)
 \item[\texttt{-longtable}] use 'longtable' environment instead of 'tabular'
 \end{description}
 
@@ -604,7 +623,7 @@ similar to the LaTeX output above. Figure~\ref{fig:html} is the HTML table
 produced for the 'HelloProof' example, as typically shown in a Web
 browser.
 
-The style ''simpletree' displays the contents of the session under the form of tree, similar to the tree view in the IDE. It uses only basic HTMl tags such as \verb|<ul>| and \verb|<li>|. 
+The style ''simpletree' displays the contents of the session under the form of tree, similar to the tree view in the IDE. It uses only basic HTMl tags such as \verb|<ul>| and \verb|<li>|.
 
 The style 'jstree' displays a dynamic tree view of the session, where
 you can click on various parts to expand or shrink some part of the
