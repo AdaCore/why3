@@ -78,7 +78,9 @@ let escape_string s =
           String.unsafe_set s' !n '\\'; incr n
         | _ -> ()
       end;
-      String.unsafe_set s' !n c; incr n
+      String.unsafe_set s' !n
+        (match c with '\n' -> 'n' | '\r' -> 'r' | '\t' -> 't' | _ -> c);
+      incr n
     done;
     s'
   end
@@ -349,7 +351,7 @@ and string_val key = parse
       { Buffer.add_char buf c;
         string_val key lexbuf }
   | '\\' (['\\' '"' 'n' 'r' 't'] as c)
-      { Buffer.add_char buf
+      { Buffer.add_char buf 
           (match c with 'n' -> '\n' | 'r' -> '\r' | 't' -> '\t' | _ -> c);
         string_val key lexbuf }
   | '\\' '\n'
