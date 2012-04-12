@@ -60,11 +60,34 @@ let error ?loc e = match loc with
 
 (* conf files *)
 
+let escape_string s =
+  let n = ref 0 in
+  for i = 0 to String.length s - 1 do
+    n := !n +
+      (match String.unsafe_get s i with
+         | '"' | '\\' | '\n' | '\r' | '\t' -> 2
+         | _ -> 1)
+  done;
+  if !n = String.length s then s else begin
+    let s' = String.create !n in
+    n := 0;
+    for i = 0 to String.length s - 1 do
+      let c = String.unsafe_get s i in
+      begin match c with
+        | ('"' | '\\' | '\n' | '\r' | '\t') ->
+          String.unsafe_set s' !n '\\'; incr n
+        | _ -> ()
+      end;
+      String.unsafe_set s' !n c; incr n
+    done;
+    s'
+  end
+
 let print_rc_value fmt = function
   | RCint i -> fprintf fmt "%d" i
   | RCbool b -> fprintf fmt "%B" b
   | RCfloat f -> fprintf fmt "%f" f
-  | RCstring s -> fprintf fmt "%S" s (* "%s"  %S ? *)
+  | RCstring s -> fprintf fmt "\"%s\"" (escape_string s)
   | RCident s -> fprintf fmt "%s" s
 
 let () = Exn_printer.register (fun fmt e -> match e with
@@ -325,11 +348,9 @@ and string_val key = parse
   | [^ '\\' '"'] as c
       { Buffer.add_char buf c;
         string_val key lexbuf }
-  | '\\' (['\\''\"'] as c)
-      { Buffer.add_char buf c;
-        string_val key lexbuf }
-  | '\\' 'n'
-      { Buffer.add_char buf '\n';
+  | '\\' (['\\' '"' 'n' 'r' 't'] as c)
+      { Buffer.add_char buf
+          (match c with 'n' -> '\n' | 'r' -> '\r' | 't' -> '\t' | _ -> c);
         string_val key lexbuf }
   | '\\' '\n'
       { string_val key lexbuf }
