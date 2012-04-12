@@ -278,7 +278,7 @@ let print_report (g,p,t,r) =
     (*     printf "Smoke detected!!!@." *)
     (* end *)
   | M.No_former_result new_res ->
-      printf "no former result available : %a@." print_result new_res
+      printf "no former result available, new result is: %a@." print_result new_res
   | M.CallFailed msg ->
       printf "internal failure '%a'@." Exn_printer.exn_printer msg;
   | M.Prover_not_installed ->

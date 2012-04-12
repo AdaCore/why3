@@ -337,7 +337,8 @@ let rec find_loadable_prover eS prover =
 
 let adapt_timelimit a =
   match a.proof_state with
-    | Done { Call_provers.pr_answer = Call_provers.Valid ;
+    | Done { Call_provers.pr_answer = 
+        (Call_provers.Valid | Call_provers.Unknown _ | Call_provers.Invalid);
              Call_provers.pr_time = t } ->
       let time = max a.proof_timelimit (1 + truncate (2.0 *. t)) in
       set_timelimit time a;
