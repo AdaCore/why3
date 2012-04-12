@@ -2,6 +2,7 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import ZArith.
 Require Import Rbase.
+Require int.Int.
 
 (* Why3 assumption *)
 Definition unit  := unit.
@@ -102,54 +103,68 @@ Axiom reducible_or_value : forall (t:term), (exists tqt:term, (infix_mnmngt t
 Definition irreducible(t:term): Prop := forall (tqt:term), ~ (infix_mnmngt t
   tqt).
 
-Hint Constructors infix_mnmngt.
-Hint Unfold is_value.
+Axiom irreducible_is_value : forall (t:term), (irreducible t) <->
+  (is_value t).
+
+(* Why3 assumption *)
+Inductive only_K : term -> Prop :=
+  | only_K_K : (only_K K)
+  | only_K_App : forall (t1:term) (t2:term), (only_K t1) -> ((only_K t2) ->
+      (only_K (App t1 t2))).
+
+Axiom only_K_reduces : forall (t:term), (only_K t) -> exists v:term, (relTR t
+  v) /\ ((is_value v) /\ (only_K v)).
+
+(* Why3 assumption *)
+Set Implicit Arguments.
+Fixpoint size(t:term) {struct t}: Z :=
+  match t with
+  | (K|S) => 0%Z
+  | (App t1 t2) => ((1%Z + (size t1))%Z + (size t2))%Z
+  end.
+Unset Implicit Arguments.
+
+Axiom size_nonneg : forall (t:term), (0%Z <= (size t))%Z.
+
+Parameter ks: Z -> term.
+
+Axiom ksO : ((ks 0%Z) = K).
+
+Axiom ksS : forall (n:Z), (0%Z <= n)%Z -> ((ks (n + 1%Z)%Z) = (App (ks n)
+  K)).
+
+Axiom ks1 : ((ks 1%Z) = (App K K)).
+
+Axiom only_K_ks : forall (n:Z), (0%Z <= n)%Z -> (only_K (ks n)).
+
+Axiom ks_inversion : forall (n:Z), (0%Z <= n)%Z -> ((n = 0%Z) \/
+  ((0%Z <  n)%Z /\ ((ks n) = (App (ks (n - 1%Z)%Z) K)))).
+
 Require Import Why3. Ltac ae := why3 "alt-ergo".
 
 (* Why3 goal *)
-Theorem irreducible_is_value : forall (t:term), (irreducible t) <->
-  (is_value t).
-split.
-destruct (reducible_or_value t).
-destruct H as (t',h').
-intro.
-elim H with t'; auto.
-auto.
-(* is_value -> irreducible *)
-induction t; intuition.
-red; intros t' ht'.
-inversion ht'.
-destruct c; simpl in H0; ae.
-destruct c; simpl in H0; ae.
-(* irreducible K *)
-red; intros t' ht'.
-inversion ht'.
-destruct c; simpl in H0; ae.
-destruct c; simpl in H0; ae.
-(* irreducible (App t1 t2) *)
-red; intros t' ht'.
-inversion ht'.
-
-assert (forall c: context, ~ (is_value (subst c (App (App K v1) v2)))).
-  induction c0; auto.
-  simpl.
-  destruct c0; simpl.
-  intuition.
-  destruct c0; simpl; intuition.
-  destruct t0; simpl; intuition.
-  destruct t; simpl; intuition.
-  destruct t3; ae.
+Theorem ks_injective : forall (n1:Z) (n2:Z), (0%Z <= n1)%Z ->
+  ((0%Z <= n2)%Z -> (((ks n1) = (ks n2)) -> (n1 = n2))).
+intros n1 n2 h1 h2.
+cut (n1 + n2 <= n1 + n2)%Z. 2:omega.
+cut (0 <= n1 + n2)%Z. 2: omega.
+generalize (n1+n2)%Z at 1 3.
+intros z hz.
+generalize n1 n2 h1 h2. clear n1 n2 h1 h2.
+pattern z; apply Z_lt_induction.
+2: auto.
+intros n IH.
+intros n1 n2 h1 h2 h12.
+destruct (ks_inversion n1); intuition.
+subst n1.
+destruct (ks_inversion n2); intuition.
 ae.
-
-assert (forall c: context, ~ (is_value (subst c (App (App (App S v1) v2) v3)))).
-  induction c0; simpl; intuition.
-  destruct c0; simpl; intuition.
-  destruct c0; simpl; intuition.
-  destruct t0; simpl; intuition.
-  ae.
-  destruct t; simpl; intuition.
-  destruct t3; ae.
+destruct (ks_inversion n2); intuition.
 ae.
+assert (n1 - 1 = n2 - 1)%Z.
+apply (IH (n1-1+n2-1)%Z); clear IH; try omega.
+ae.
+omega.
 Qed.
 
 

@@ -2,6 +2,9 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import ZArith.
 Require Import Rbase.
+Require int.Int.
+Require int.Abs.
+Require int.EuclideanDivision.
 
 (* Why3 assumption *)
 Definition unit  := unit.
@@ -102,54 +105,99 @@ Axiom reducible_or_value : forall (t:term), (exists tqt:term, (infix_mnmngt t
 Definition irreducible(t:term): Prop := forall (tqt:term), ~ (infix_mnmngt t
   tqt).
 
-Hint Constructors infix_mnmngt.
-Hint Unfold is_value.
+Axiom irreducible_is_value : forall (t:term), (irreducible t) <->
+  (is_value t).
+
+(* Why3 assumption *)
+Inductive only_K : term -> Prop :=
+  | only_K_K : (only_K K)
+  | only_K_App : forall (t1:term) (t2:term), (only_K t1) -> ((only_K t2) ->
+      (only_K (App t1 t2))).
+
+Axiom only_K_reduces : forall (t:term), (only_K t) -> exists v:term, (relTR t
+  v) /\ ((is_value v) /\ (only_K v)).
+
+(* Why3 assumption *)
+Set Implicit Arguments.
+Fixpoint size(t:term) {struct t}: Z :=
+  match t with
+  | (K|S) => 0%Z
+  | (App t1 t2) => ((1%Z + (size t1))%Z + (size t2))%Z
+  end.
+Unset Implicit Arguments.
+
+Axiom size_nonneg : forall (t:term), (0%Z <= (size t))%Z.
+
+Parameter ks: Z -> term.
+
+Axiom ksO : ((ks 0%Z) = K).
+
+Axiom ksS : forall (n:Z), (0%Z <= n)%Z -> ((ks (n + 1%Z)%Z) = (App (ks n)
+  K)).
+
+Axiom ks1 : ((ks 1%Z) = (App K K)).
+
+Axiom only_K_ks : forall (n:Z), (0%Z <= n)%Z -> (only_K (ks n)).
+
+Axiom ks_inversion : forall (n:Z), (0%Z <= n)%Z -> ((n = 0%Z) \/
+  ((0%Z <  n)%Z /\ ((ks n) = (App (ks (n - 1%Z)%Z) K)))).
+
+Axiom ks_injective : forall (n1:Z) (n2:Z), (0%Z <= n1)%Z -> ((0%Z <= n2)%Z ->
+  (((ks n1) = (ks n2)) -> (n1 = n2))).
+
 Require Import Why3. Ltac ae := why3 "alt-ergo".
+Require Import int.EuclideanDivision.
+Lemma div2: forall n: Z, (0 <= n)%Z ->
+     (exists n': Z, 0 <= n' /\ n = 2 * n')%Z
+  \/ (exists n': Z, 0 <= n' /\ n = 2 * n' + 1)%Z.
+intros n hn.
+generalize (Div_mod n 2).
+generalize (Mod_bound n 2).
+intuition.
+assert (e: (Zabs 2 = 2)%Z) by (simpl; auto).
+rewrite e in H2.
+assert (mod1 n 2 = 0 \/ mod1 n 2 = 1)%Z by omega.
+destruct H0.
+left; exists (div n 2); ae.
+right; exists (div n 2); ae.
+Qed.
 
 (* Why3 goal *)
-Theorem irreducible_is_value : forall (t:term), (irreducible t) <->
-  (is_value t).
-split.
-destruct (reducible_or_value t).
-destruct H as (t',h').
-intro.
-elim H with t'; auto.
-auto.
-(* is_value -> irreducible *)
-induction t; intuition.
-red; intros t' ht'.
-inversion ht'.
-destruct c; simpl in H0; ae.
-destruct c; simpl in H0; ae.
-(* irreducible K *)
-red; intros t' ht'.
-inversion ht'.
-destruct c; simpl in H0; ae.
-destruct c; simpl in H0; ae.
-(* irreducible (App t1 t2) *)
-red; intros t' ht'.
-inversion ht'.
-
-assert (forall c: context, ~ (is_value (subst c (App (App K v1) v2)))).
-  induction c0; auto.
-  simpl.
-  destruct c0; simpl.
-  intuition.
-  destruct c0; simpl; intuition.
-  destruct t0; simpl; intuition.
-  destruct t; simpl; intuition.
-  destruct t3; ae.
-ae.
-
-assert (forall c: context, ~ (is_value (subst c (App (App (App S v1) v2) v3)))).
-  induction c0; simpl; intuition.
-  destruct c0; simpl; intuition.
-  destruct c0; simpl; intuition.
-  destruct t0; simpl; intuition.
-  ae.
-  destruct t; simpl; intuition.
-  destruct t3; ae.
-ae.
+Theorem WP_parameter_reduction3 : forall (t:term), (exists n:Z,
+  (0%Z <= n)%Z /\ (t = (ks n))) ->
+  match t with
+  | S => True
+  | K => True
+  | (App t1 t2) => (exists n:Z, (0%Z <= n)%Z /\ (t1 = (ks n))) ->
+      forall (result:term), ((is_value result) /\ forall (n:Z),
+      (0%Z <= n)%Z -> (((t1 = (ks (2%Z * n)%Z)) -> (result = K)) /\
+      ((t1 = (ks ((2%Z * n)%Z + 1%Z)%Z)) -> (result = (App K K))))) ->
+      match result with
+      | K => True
+      | S => (exists n:Z, (0%Z <= n)%Z /\ (t2 = (ks n))) ->
+          forall (result1:term), ((is_value result1) /\ forall (n:Z),
+          (0%Z <= n)%Z -> (((t2 = (ks (2%Z * n)%Z)) -> (result1 = K)) /\
+          ((t2 = (ks ((2%Z * n)%Z + 1%Z)%Z)) -> (result1 = (App K K))))) ->
+          ((is_value (App S result1)) /\ forall (n:Z), (0%Z <= n)%Z ->
+          (((t = (ks (2%Z * n)%Z)) -> ((App S result1) = K)) /\
+          ((t = (ks ((2%Z * n)%Z + 1%Z)%Z)) -> ((App S result1) = (App K
+          K)))))
+      | (App K v1) => True
+      | (App S v1) => True
+      | (App (App S v1) v2) => True
+      | _ => True
+      end
+  end.
+intros t (n, (h1, h2)).
+destruct t; auto.
+intros (n1, (h3, h4)).
+destruct result; auto.
+intros (_, ht1).
+elimtype False.
+destruct (div2 n1 h3) as [(n',h')|(n',h')].
+ae. ae.
+destruct result1; auto.
+destruct result1_1; auto.
 Qed.
 
 

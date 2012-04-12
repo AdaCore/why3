@@ -136,14 +136,17 @@ module Combinators
   function ks (n: int) : term
 
   axiom ksO: ks 0 = K
-  axiom ksS: forall n: int. 0 <= n -> ks (n+1) = App (ks n) K
+  axiom ksS: forall n: int. n >= 0 -> ks (n+1) = App (ks n) K
 
   lemma ks1: ks 1 = App K K
 
   lemma only_K_ks: forall n: int. n >= 0 -> only_K (ks n)
 
   lemma ks_inversion: forall n: int. n >= 0 ->
-     n = 0 \/ n > 0 /\ ks n = App (ks (n-1)) K
+    n = 0 \/ n > 0 /\ ks n = App (ks (n-1)) K
+
+  lemma ks_injective:
+    forall n1 n2: int. n1 >= 0 -> n2 >= 0 -> ks n1 = ks n2 -> n1 = n2
 
   use import int.EuclideanDivision
 
@@ -163,7 +166,8 @@ module Combinators
       end
     end
     { is_value result /\
-      forall n: int. n >= 0 -> t = ks n -> result = ks (mod n 2) }
+      forall n: int. n >= 0 -> (t = ks (2*n)   -> result = K)
+                            /\ (t = ks (2*n+1) -> result = App K K) }
 
    lemma ks_value:
      forall n: int. 0 <= n -> is_value (ks n) -> 0 <= n <= 1

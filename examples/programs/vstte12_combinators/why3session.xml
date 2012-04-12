@@ -9,28 +9,24 @@
  <prover
   id="1"
   name="CVC3"
-  version="2.2"/>
- <prover
-  id="2"
-  name="CVC3"
   version="2.4.1"/>
  <prover
-  id="3"
+  id="2"
   name="Coq"
   version="8.3pl3"/>
  <prover
-  id="4"
+  id="3"
   name="Z3"
   version="3.2"/>
  <file
   name="../vstte12_combinators.mlw"
-  verified="false"
+  verified="true"
   expanded="true">
   <theory
    name="WP Combinators"
    locfile="vstte12_combinators/../vstte12_combinators.mlw"
    loclnum="8" loccnumb="7" loccnume="18"
-   verified="false"
+   verified="true"
    expanded="true">
    <goal
     name="red_left"
@@ -41,7 +37,7 @@
     expanded="false"
     shape="ainfix --&gt;aAppV0V2aAppV1V2Iainfix --&gt;V0V1F">
     <proof
-     prover="4"
+     prover="3"
      timelimit="10"
      obsolete="false"
      archived="false">
@@ -57,7 +53,7 @@
     expanded="false"
     shape="ainfix --&gt;aAppV0V1aAppV0V2Iainfix --&gt;V1V2Iais_valueV0F">
     <proof
-     prover="4"
+     prover="3"
      timelimit="10"
      obsolete="false"
      archived="false">
@@ -73,7 +69,7 @@
     expanded="false"
     shape="ainfix --&gt;*aAppV0V2aAppV1V2Iainfix --&gt;*V0V1F">
     <proof
-     prover="3"
+     prover="2"
      timelimit="10"
      edited="vstte12_combinators_WP_Combinators_red_star_left_1.v"
      obsolete="false"
@@ -90,7 +86,7 @@
     expanded="false"
     shape="ainfix --&gt;*aAppV0V1aAppV0V2Iainfix --&gt;*V1V2Iais_valueV0F">
     <proof
-     prover="3"
+     prover="2"
      timelimit="10"
      edited="vstte12_combinators_WP_Combinators_red_star_right_1.v"
      obsolete="false"
@@ -105,14 +101,14 @@
     expl="parameter reduction"
     sum="294c655dff463b894676e714ebf629d6"
     proved="true"
-    expanded="true"
+    expanded="false"
     shape="CV0aSais_valueaSAarelTRV0aSaKais_valueaKAarelTRV0aKaAppVVCV3aKais_valueaAppaKV4AarelTRV0aAppaKV4Iais_valueV4AarelTRV2V4FaSais_valueaAppaSV5AarelTRV0aAppaSV5Iais_valueV5AarelTRV2V5FaAppaKVais_valueV6AarelTRV0V6Iais_valueV7AarelTRV2V7FaAppaSVais_valueaAppaAppaSV8V9AarelTRV0aAppaAppaSV8V9Iais_valueV9AarelTRV2V9FaAppaAppaSVVais_valueV13AarelTRV0V13Iais_valueV13AarelTRaAppaAppV10V12aAppV11V12V13FIais_valueV12AarelTRV2V12FwfIais_valueV3AarelTRV1V3FF">
     <label
      name="expl:parameter reduction"/>
     <transf
      name="split_goal"
      proved="true"
-     expanded="true">
+     expanded="false">
      <goal
       name="WP_parameter reduction.1"
       locfile="vstte12_combinators/../vstte12_combinators.mlw"
@@ -158,14 +154,14 @@
       expl="parameter reduction"
       sum="7d167c065c92bbee687dd7f89b914897"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="CV0aStaKtaAppVVCV3aKais_valueaAppaKV4AarelTRV0aAppaKV4Iais_valueV4AarelTRV2V4FaStaAppaKVtaAppaSVtaAppaAppaSVVtwtIais_valueV3AarelTRV1V3FF">
       <label
        name="expl:parameter reduction"/>
       <transf
        name="split_goal"
        proved="true"
-       expanded="true">
+       expanded="false">
        <goal
         name="WP_parameter reduction.3.1"
         locfile="vstte12_combinators/../vstte12_combinators.mlw"
@@ -178,7 +174,7 @@
         <label
          name="expl:parameter reduction"/>
         <proof
-         prover="3"
+         prover="2"
          timelimit="10"
          edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction_1.v"
          obsolete="false"
@@ -214,14 +210,14 @@
       expl="parameter reduction"
       sum="9b3c1eecaac7256eae9aedb56f68c67b"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="CV0aStaKtaAppVVCV3aKtaSais_valueaAppaSV4AarelTRV0aAppaSV4Iais_valueV4AarelTRV2V4FaAppaKVtaAppaSVtaAppaAppaSVVtwtIais_valueV3AarelTRV1V3FF">
       <label
        name="expl:parameter reduction"/>
       <transf
        name="split_goal"
        proved="true"
-       expanded="true">
+       expanded="false">
        <goal
         name="WP_parameter reduction.4.1"
         locfile="vstte12_combinators/../vstte12_combinators.mlw"
@@ -234,7 +230,7 @@
         <label
          name="expl:parameter reduction"/>
         <proof
-         prover="3"
+         prover="2"
          timelimit="10"
          edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction_2.v"
          obsolete="false"
@@ -270,14 +266,14 @@
       expl="parameter reduction"
       sum="1830ea4a4f7813a126004fca26909365"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVais_valueV4AarelTRV0V4Iais_valueV5AarelTRV2V5FaAppaSVtaAppaAppaSVVtwtIais_valueV3AarelTRV1V3FF">
       <label
        name="expl:parameter reduction"/>
       <transf
        name="split_goal"
        proved="true"
-       expanded="true">
+       expanded="false">
        <goal
         name="WP_parameter reduction.5.1"
         locfile="vstte12_combinators/../vstte12_combinators.mlw"
@@ -290,7 +286,7 @@
         <label
          name="expl:parameter reduction"/>
         <proof
-         prover="3"
+         prover="2"
          timelimit="10"
          edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction_3.v"
          obsolete="false"
@@ -326,14 +322,14 @@
       expl="parameter reduction"
       sum="1d41e8821a3e646320992db6e17457fb"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVtaAppaSVais_valueaAppaAppaSV5V6AarelTRV0aAppaAppaSV5V6Iais_valueV6AarelTRV2V6FaAppaAppaSVVtwtIais_valueV3AarelTRV1V3FF">
       <label
        name="expl:parameter reduction"/>
       <transf
        name="split_goal"
        proved="true"
-       expanded="true">
+       expanded="false">
        <goal
         name="WP_parameter reduction.6.1"
         locfile="vstte12_combinators/../vstte12_combinators.mlw"
@@ -346,7 +342,7 @@
         <label
          name="expl:parameter reduction"/>
         <proof
-         prover="3"
+         prover="2"
          timelimit="10"
          edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction_4.v"
          obsolete="false"
@@ -382,14 +378,14 @@
       expl="parameter reduction"
       sum="9343dd0f978d3267dd08cf1a73b7e305"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVtaAppaSVtaAppaAppaSVVais_valueV9AarelTRV0V9Iais_valueV9AarelTRaAppaAppV6V8aAppV7V8V9FIais_valueV8AarelTRV2V8FwtIais_valueV3AarelTRV1V3FF">
       <label
        name="expl:parameter reduction"/>
       <transf
        name="split_goal"
        proved="true"
-       expanded="true">
+       expanded="false">
        <goal
         name="WP_parameter reduction.7.1"
         locfile="vstte12_combinators/../vstte12_combinators.mlw"
@@ -402,7 +398,7 @@
         <label
          name="expl:parameter reduction"/>
         <proof
-         prover="3"
+         prover="2"
          timelimit="10"
          edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction_5.v"
          obsolete="false"
@@ -461,7 +457,7 @@
     expanded="false"
     shape="ais_valueV0Oainfix --&gt;V0V1EF">
     <proof
-     prover="3"
+     prover="2"
      timelimit="10"
      edited="vstte12_combinators_WP_Combinators_reducible_or_value_1.v"
      obsolete="false"
@@ -474,37 +470,16 @@
     locfile="vstte12_combinators/../vstte12_combinators.mlw"
     loclnum="93" loccnumb="8" loccnume="28"
     sum="4466bb7d2aa5ed096282ffb44ca87f6e"
-    proved="false"
-    expanded="false"
+    proved="true"
+    expanded="true"
     shape="ais_valueV0qairreducibleV0F">
-    <proof
-     prover="1"
-     timelimit="10"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="10.12"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="10"
-     edited="vstte12_combinators_WP_Combinators_irreducible_is_value_1.v"
-     obsolete="true"
-     archived="false"><undone/>
-     
-    </proof>
     <proof
      prover="2"
      timelimit="10"
+     edited="vstte12_combinators_WP_Combinators_irreducible_is_value_1.v"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="10.16"/>
-    </proof>
-    <proof
-     prover="4"
-     timelimit="10"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="10.31"/>
+     <result status="valid" time="4.03"/>
     </proof>
    </goal>
    <goal
@@ -516,7 +491,7 @@
     expanded="false"
     shape="aonly_KV1Aais_valueV1Aainfix --&gt;*V0V1EIaonly_KV0F">
     <proof
-     prover="3"
+     prover="2"
      timelimit="10"
      edited="vstte12_combinators_WP_Combinators_only_K_reduces_1.v"
      obsolete="false"
@@ -533,7 +508,7 @@
     expanded="false"
     shape="ainfix &gt;=asizeV0c0F">
     <proof
-     prover="3"
+     prover="2"
      timelimit="10"
      edited="vstte12_combinators_WP_Combinators_size_nonneg_1.v"
      obsolete="false"
@@ -548,14 +523,14 @@
     expl="parameter reduction2"
     sum="552e83ee56039db4294146d50cc99540"
     proved="true"
-    expanded="true"
+    expanded="false"
     shape="CV0aSais_valueaSAaonly_KaSaKais_valueaKAaonly_KaKaAppVVCV3aKais_valueaAppaKV4Aaonly_KaAppaKV4Iais_valueV4Aaonly_KV4FAaonly_KV2Aainfix &lt;asizeV2asizeV0Aainfix &lt;=c0asizeV0aSais_valueaAppaSV5Aaonly_KaAppaSV5Iais_valueV5Aaonly_KV5FAaonly_KV2Aainfix &lt;asizeV2asizeV0Aainfix &lt;=c0asizeV0aAppaKVais_valueV6Aaonly_KV6Iais_valueV7Aaonly_KV7FAaonly_KV2Aainfix &lt;asizeV2asizeV0Aainfix &lt;=c0asizeV0aAppaSVais_valueaAppaAppaSV8V9Aaonly_KaAppaAppaSV8V9Iais_valueV9Aaonly_KV9FAaonly_KV2Aainfix &lt;asizeV2asizeV0Aainfix &lt;=c0asizeV0aAppaAppaSVVais_valueV13Aaonly_KV13Iais_valueV13Aaonly_KV13FAaonly_KaAppaAppV10V12aAppV11V12Aainfix &lt;asizeaAppaAppV10V12aAppV11V12asizeV0Aainfix &lt;=c0asizeV0Iais_valueV12Aaonly_KV12FAaonly_KV2Aainfix &lt;asizeV2asizeV0Aainfix &lt;=c0asizeV0wfIais_valueV3Aaonly_KV3FAaonly_KV1Aainfix &lt;asizeV1asizeV0Aainfix &lt;=c0asizeV0Iaonly_KV0F">
     <label
      name="expl:parameter reduction2"/>
     <transf
      name="split_goal"
      proved="true"
-     expanded="true">
+     expanded="false">
      <goal
       name="WP_parameter reduction2.1"
       locfile="vstte12_combinators/../vstte12_combinators.mlw"
@@ -791,14 +766,14 @@
       expl="parameter reduction2"
       sum="e00c063e51af8138e6d2f80bfdb6fe45"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVtaAppaSVtaAppaAppaSVVaonly_KaAppaAppV6V8aAppV7V8Aainfix &lt;asizeaAppaAppV6V8aAppV7V8asizeV0Aainfix &lt;=c0asizeV0Iais_valueV8Aaonly_KV8FIaonly_KV2Aainfix &lt;asizeV2asizeV0Aainfix &lt;=c0asizeV0wtIais_valueV3Aaonly_KV3FIaonly_KV1Aainfix &lt;asizeV1asizeV0Aainfix &lt;=c0asizeV0Iaonly_KV0F">
       <label
        name="expl:parameter reduction2"/>
       <transf
        name="split_goal"
        proved="true"
-       expanded="true">
+       expanded="false">
        <goal
         name="WP_parameter reduction2.13.1"
         locfile="vstte12_combinators/../vstte12_combinators.mlw"
@@ -830,7 +805,7 @@
         <label
          name="expl:parameter reduction2"/>
         <proof
-         prover="3"
+         prover="2"
          timelimit="10"
          edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction2_1.v"
          obsolete="false"
@@ -850,7 +825,7 @@
         <label
          name="expl:parameter reduction2"/>
         <proof
-         prover="3"
+         prover="2"
          timelimit="10"
          edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction2_2.v"
          obsolete="false"
@@ -904,7 +879,7 @@
     name="ks1"
     locfile="vstte12_combinators/../vstte12_combinators.mlw"
     loclnum="141" loccnumb="8" loccnume="11"
-    sum="8daf9c98be32008abc3d2889afa318b4"
+    sum="30a4c394b5c436d3bd30237dbe831e50"
     proved="true"
     expanded="false"
     shape="ainfix =aksc1aAppaKaK">
@@ -920,52 +895,76 @@
     name="only_K_ks"
     locfile="vstte12_combinators/../vstte12_combinators.mlw"
     loclnum="143" loccnumb="8" loccnume="17"
-    sum="6b5474622d661b886930dee991a782ab"
+    sum="d1ec487ed37828af4017debccf693aa9"
     proved="true"
     expanded="false"
     shape="aonly_KaksV0Iainfix &gt;=V0c0F">
     <proof
-     prover="3"
+     prover="2"
      timelimit="10"
      edited="vstte12_combinators_WP_Combinators_only_K_ks_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.74"/>
+     <result status="valid" time="0.71"/>
     </proof>
    </goal>
    <goal
     name="ks_inversion"
     locfile="vstte12_combinators/../vstte12_combinators.mlw"
     loclnum="145" loccnumb="8" loccnume="20"
-    sum="555194b9cb1d590971a94a73ddefbc65"
-    proved="false"
+    sum="56d6e240a66f9cab711cb7fced895696"
+    proved="true"
     expanded="false"
     shape="ainfix =aksV0aAppaksainfix -V0c1aKAainfix &gt;V0c0Oainfix =V0c0Iainfix &gt;=V0c0F">
+    <proof
+     prover="0"
+     timelimit="10"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
+    name="ks_injective"
+    locfile="vstte12_combinators/../vstte12_combinators.mlw"
+    loclnum="148" loccnumb="8" loccnume="20"
+    sum="bfd321f7701ec5fa9161ea7f94095ced"
+    proved="true"
+    expanded="false"
+    shape="ainfix =V0V1Iainfix =aksV0aksV1Iainfix &gt;=V1c0Iainfix &gt;=V0c0F">
+    <proof
+     prover="2"
+     timelimit="10"
+     edited="vstte12_combinators_WP_Combinators_ks_injective_1.v"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="1.36"/>
+    </proof>
    </goal>
    <goal
     name="WP_parameter reduction3"
     locfile="vstte12_combinators/../vstte12_combinators.mlw"
-    loclnum="150" loccnumb="10" loccnume="20"
+    loclnum="153" loccnumb="10" loccnume="20"
     expl="parameter reduction3"
-    sum="4f112cfda2b8308e57091f8c9d85df44"
-    proved="false"
+    sum="8b599e55b01eada523770cbd3eb381e2"
+    proved="true"
     expanded="true"
-    shape="CV0aSainfix =aSaksamodV1c2Iainfix =V0aksV1Iainfix &gt;=V1c0FAais_valueaSaKainfix =aKaksamodV2c2Iainfix =V0aksV2Iainfix &gt;=V2c0FAais_valueaKaAppVVCV5aKainfix =aAppaKV6aksamodV7c2Iainfix =V0aksV7Iainfix &gt;=V7c0FAais_valueaAppaKV6Iainfix =V6aksamodV8c2Iainfix =V4aksV8Iainfix &gt;=V8c0FAais_valueV6FAainfix =V4aksV9Aainfix &gt;=V9c0EaSainfix =aAppaSV10aksamodV11c2Iainfix =V0aksV11Iainfix &gt;=V11c0FAais_valueaAppaSV10Iainfix =V10aksamodV12c2Iainfix =V4aksV12Iainfix &gt;=V12c0FAais_valueV10FAainfix =V4aksV13Aainfix &gt;=V13c0EaAppaKVainfix =V14aksamodV16c2Iainfix =V0aksV16Iainfix &gt;=V16c0FAais_valueV14Iainfix =V15aksamodV17c2Iainfix =V4aksV17Iainfix &gt;=V17c0FAais_valueV15FAainfix =V4aksV18Aainfix &gt;=V18c0EaAppaSVainfix =aAppaAppaSV19V20aksamodV21c2Iainfix =V0aksV21Iainfix &gt;=V21c0FAais_valueaAppaAppaSV19V20Iainfix =V20aksamodV22c2Iainfix =V4aksV22Iainfix &gt;=V22c0FAais_valueV20FAainfix =V4aksV23Aainfix &gt;=V23c0EaAppaAppaSVVainfix =V27aksamodV28c2Iainfix =V0aksV28Iainfix &gt;=V28c0FAais_valueV27Iainfix =V27aksamodV29c2Iainfix =aAppaAppV24V26aAppV25V26aksV29Iainfix &gt;=V29c0FAais_valueV27FAainfix =aAppaAppV24V26aAppV25V26aksV30Aainfix &gt;=V30c0EIainfix =V26aksamodV31c2Iainfix =V4aksV31Iainfix &gt;=V31c0FAais_valueV26FAainfix =V4aksV32Aainfix &gt;=V32c0EwfIainfix =V5aksamodV33c2Iainfix =V3aksV33Iainfix &gt;=V33c0FAais_valueV5FAainfix =V3aksV34Aainfix &gt;=V34c0EIainfix =V0aksV35Aainfix &gt;=V35c0EF">
+    shape="CV0aSainfix =aSaAppaKaKIainfix =V0aksainfix +ainfix *c2V1c1Aainfix =aSaKIainfix =V0aksainfix *c2V1Iainfix &gt;=V1c0FAais_valueaSaKainfix =aKaAppaKaKIainfix =V0aksainfix +ainfix *c2V2c1Aainfix =aKaKIainfix =V0aksainfix *c2V2Iainfix &gt;=V2c0FAais_valueaKaAppVVCV5aKainfix =aAppaKV6aAppaKaKIainfix =V0aksainfix +ainfix *c2V7c1Aainfix =aAppaKV6aKIainfix =V0aksainfix *c2V7Iainfix &gt;=V7c0FAais_valueaAppaKV6Iainfix =V6aAppaKaKIainfix =V4aksainfix +ainfix *c2V8c1Aainfix =V6aKIainfix =V4aksainfix *c2V8Iainfix &gt;=V8c0FAais_valueV6FAainfix =V4aksV9Aainfix &gt;=V9c0EaSainfix =aAppaSV10aAppaKaKIainfix =V0aksainfix +ainfix *c2V11c1Aainfix =aAppaSV10aKIainfix =V0aksainfix *c2V11Iainfix &gt;=V11c0FAais_valueaAppaSV10Iainfix =V10aAppaKaKIainfix =V4aksainfix +ainfix *c2V12c1Aainfix =V10aKIainfix =V4aksainfix *c2V12Iainfix &gt;=V12c0FAais_valueV10FAainfix =V4aksV13Aainfix &gt;=V13c0EaAppaKVainfix =V14aAppaKaKIainfix =V0aksainfix +ainfix *c2V16c1Aainfix =V14aKIainfix =V0aksainfix *c2V16Iainfix &gt;=V16c0FAais_valueV14Iainfix =V15aAppaKaKIainfix =V4aksainfix +ainfix *c2V17c1Aainfix =V15aKIainfix =V4aksainfix *c2V17Iainfix &gt;=V17c0FAais_valueV15FAainfix =V4aksV18Aainfix &gt;=V18c0EaAppaSVainfix =aAppaAppaSV19V20aAppaKaKIainfix =V0aksainfix +ainfix *c2V21c1Aainfix =aAppaAppaSV19V20aKIainfix =V0aksainfix *c2V21Iainfix &gt;=V21c0FAais_valueaAppaAppaSV19V20Iainfix =V20aAppaKaKIainfix =V4aksainfix +ainfix *c2V22c1Aainfix =V20aKIainfix =V4aksainfix *c2V22Iainfix &gt;=V22c0FAais_valueV20FAainfix =V4aksV23Aainfix &gt;=V23c0EaAppaAppaSVVainfix =V27aAppaKaKIainfix =V0aksainfix +ainfix *c2V28c1Aainfix =V27aKIainfix =V0aksainfix *c2V28Iainfix &gt;=V28c0FAais_valueV27Iainfix =V27aAppaKaKIainfix =aAppaAppV24V26aAppV25V26aksainfix +ainfix *c2V29c1Aainfix =V27aKIainfix =aAppaAppV24V26aAppV25V26aksainfix *c2V29Iainfix &gt;=V29c0FAais_valueV27FAainfix =aAppaAppV24V26aAppV25V26aksV30Aainfix &gt;=V30c0EIainfix =V26aAppaKaKIainfix =V4aksainfix +ainfix *c2V31c1Aainfix =V26aKIainfix =V4aksainfix *c2V31Iainfix &gt;=V31c0FAais_valueV26FAainfix =V4aksV32Aainfix &gt;=V32c0EwfIainfix =V5aAppaKaKIainfix =V3aksainfix +ainfix *c2V33c1Aainfix =V5aKIainfix =V3aksainfix *c2V33Iainfix &gt;=V33c0FAais_valueV5FAainfix =V3aksV34Aainfix &gt;=V34c0EIainfix =V0aksV35Aainfix &gt;=V35c0EF">
     <label
      name="expl:parameter reduction3"/>
     <transf
      name="split_goal"
-     proved="false"
+     proved="true"
      expanded="true">
      <goal
       name="WP_parameter reduction3.1"
       locfile="vstte12_combinators/../vstte12_combinators.mlw"
-      loclnum="150" loccnumb="10" loccnume="20"
+      loclnum="153" loccnumb="10" loccnume="20"
       expl="parameter reduction3"
-      sum="4ebddfeaf58a8cfc6cdebff7cb9bc0fb"
+      sum="4736deae5b49033c1a213078ee902ad3"
       proved="true"
       expanded="false"
-      shape="CV0aSainfix =aSaksamodV1c2Iainfix =V0aksV1Iainfix &gt;=V1c0FAais_valueaSaKtaAppVVtIainfix =V0aksV4Aainfix &gt;=V4c0EF">
+      shape="CV0aSainfix =aSaAppaKaKIainfix =V0aksainfix +ainfix *c2V1c1Aainfix =aSaKIainfix =V0aksainfix *c2V1Iainfix &gt;=V1c0FAais_valueaSaKtaAppVVtIainfix =V0aksV4Aainfix &gt;=V4c0EF">
       <label
        name="expl:parameter reduction3"/>
       <proof
@@ -973,30 +972,30 @@
        timelimit="10"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.80"/>
+       <result status="valid" time="6.01"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter reduction3.2"
       locfile="vstte12_combinators/../vstte12_combinators.mlw"
-      loclnum="150" loccnumb="10" loccnume="20"
+      loclnum="153" loccnumb="10" loccnume="20"
       expl="parameter reduction3"
-      sum="132d25dc2b4f10423e278f3b6332e497"
+      sum="22d910786dedd956d8fd033c001b9842"
       proved="true"
-      expanded="true"
-      shape="CV0aStaKainfix =aKaksamodV1c2Iainfix =V0aksV1Iainfix &gt;=V1c0FAais_valueaKaAppVVtIainfix =V0aksV4Aainfix &gt;=V4c0EF">
+      expanded="false"
+      shape="CV0aStaKainfix =aKaAppaKaKIainfix =V0aksainfix +ainfix *c2V1c1Aainfix =aKaKIainfix =V0aksainfix *c2V1Iainfix &gt;=V1c0FAais_valueaKaAppVVtIainfix =V0aksV4Aainfix &gt;=V4c0EF">
       <label
        name="expl:parameter reduction3"/>
       <transf
        name="split_goal"
        proved="true"
-       expanded="true">
+       expanded="false">
        <goal
         name="WP_parameter reduction3.2.1"
         locfile="vstte12_combinators/../vstte12_combinators.mlw"
-        loclnum="150" loccnumb="10" loccnume="20"
+        loclnum="153" loccnumb="10" loccnume="20"
         expl="parameter reduction3"
-        sum="64dea8bd5e9604cc555c08c327eba892"
+        sum="8c93415dee3e307a041f51a1af7ab0d6"
         proved="true"
         expanded="false"
         shape="CV0aStaKais_valueaKaAppVVtIainfix =V0aksV3Aainfix &gt;=V3c0EF">
@@ -1007,17 +1006,17 @@
          timelimit="10"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.03"/>
+         <result status="valid" time="0.01"/>
         </proof>
         <proof
-         prover="2"
+         prover="1"
          timelimit="10"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="4"
+         prover="3"
          timelimit="10"
          obsolete="false"
          archived="false">
@@ -1027,21 +1026,39 @@
        <goal
         name="WP_parameter reduction3.2.2"
         locfile="vstte12_combinators/../vstte12_combinators.mlw"
-        loclnum="150" loccnumb="10" loccnume="20"
+        loclnum="153" loccnumb="10" loccnume="20"
         expl="parameter reduction3"
-        sum="b582667d7c7694dd2130ed952d3c8070"
+        sum="dee63400cfbec0ea8621df2d050c27bc"
         proved="true"
         expanded="false"
-        shape="CV0aStaKainfix =aKaksamodV1c2Iainfix =V0aksV1Iainfix &gt;=V1c0FaAppVVtIainfix =V0aksV4Aainfix &gt;=V4c0EF">
+        shape="CV0aStaKainfix =aKaKIainfix =V0aksainfix *c2V1Iainfix &gt;=V1c0FaAppVVtIainfix =V0aksV4Aainfix &gt;=V4c0EF">
         <label
          name="expl:parameter reduction3"/>
         <proof
-         prover="3"
+         prover="0"
          timelimit="10"
-         edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction3_1.v"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.05"/>
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter reduction3.2.3"
+        locfile="vstte12_combinators/../vstte12_combinators.mlw"
+        loclnum="153" loccnumb="10" loccnume="20"
+        expl="parameter reduction3"
+        sum="8cad5d7d3fa5cc85a8679e9812184ab9"
+        proved="true"
+        expanded="false"
+        shape="CV0aStaKainfix =aKaAppaKaKIainfix =V0aksainfix +ainfix *c2V1c1Iainfix &gt;=V1c0FaAppVVtIainfix =V0aksV4Aainfix &gt;=V4c0EF">
+        <label
+         name="expl:parameter reduction3"/>
+        <proof
+         prover="0"
+         timelimit="10"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
         </proof>
        </goal>
       </transf>
@@ -1049,86 +1066,65 @@
      <goal
       name="WP_parameter reduction3.3"
       locfile="vstte12_combinators/../vstte12_combinators.mlw"
-      loclnum="150" loccnumb="10" loccnume="20"
+      loclnum="153" loccnumb="10" loccnume="20"
       expl="parameter reduction3"
-      sum="8d5835193ef878a0768e95fa24c6ef2d"
+      sum="8a295b2581b715d8b5ba3f59df0550ca"
       proved="true"
       expanded="false"
       shape="CV0aStaKtaAppVVainfix =V1aksV3Aainfix &gt;=V3c0EIainfix =V0aksV4Aainfix &gt;=V4c0EF">
       <label
        name="expl:parameter reduction3"/>
       <proof
-       prover="2"
+       prover="1"
        timelimit="10"
        obsolete="false"
        archived="false">
-       <result status="valid" time="1.01"/>
+       <result status="valid" time="1.00"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter reduction3.4"
       locfile="vstte12_combinators/../vstte12_combinators.mlw"
-      loclnum="150" loccnumb="10" loccnume="20"
+      loclnum="153" loccnumb="10" loccnume="20"
       expl="parameter reduction3"
-      sum="68880344ef64ea588a9bce68f3892a71"
+      sum="ad12052bebd23fe3deb548cd864f6a98"
       proved="true"
       expanded="false"
-      shape="CV0aStaKtaAppVVCV3aKainfix =V2aksV4Aainfix &gt;=V4c0EaStaAppaKVtaAppaSVtaAppaAppaSVVtwtIainfix =V3aksamodV9c2Iainfix =V1aksV9Iainfix &gt;=V9c0FAais_valueV3FIainfix =V1aksV10Aainfix &gt;=V10c0EIainfix =V0aksV11Aainfix &gt;=V11c0EF">
-      <label
-       name="expl:parameter reduction3"/>
-      <proof
-       prover="2"
-       timelimit="10"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.08"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter reduction3.5"
-      locfile="vstte12_combinators/../vstte12_combinators.mlw"
-      loclnum="150" loccnumb="10" loccnume="20"
-      expl="parameter reduction3"
-      sum="4cdbdfbbde0ca8b97ad006f29b4dc617"
-      proved="false"
-      expanded="true"
-      shape="CV0aStaKtaAppVVCV3aKainfix =aAppaKV4aksamodV5c2Iainfix =V0aksV5Iainfix &gt;=V5c0FAais_valueaAppaKV4Iainfix =V4aksamodV6c2Iainfix =V2aksV6Iainfix &gt;=V6c0FAais_valueV4FIainfix =V2aksV7Aainfix &gt;=V7c0EaStaAppaKVtaAppaSVtaAppaAppaSVVtwtIainfix =V3aksamodV12c2Iainfix =V1aksV12Iainfix &gt;=V12c0FAais_valueV3FIainfix =V1aksV13Aainfix &gt;=V13c0EIainfix =V0aksV14Aainfix &gt;=V14c0EF">
+      shape="CV0aStaKtaAppVVCV3aKainfix =V2aksV4Aainfix &gt;=V4c0EaStaAppaKVtaAppaSVtaAppaAppaSVVtwtIainfix =V3aAppaKaKIainfix =V1aksainfix +ainfix *c2V9c1Aainfix =V3aKIainfix =V1aksainfix *c2V9Iainfix &gt;=V9c0FAais_valueV3FIainfix =V1aksV10Aainfix &gt;=V10c0EIainfix =V0aksV11Aainfix &gt;=V11c0EF">
       <label
        name="expl:parameter reduction3"/>
       <proof
        prover="1"
        timelimit="10"
-       obsolete="true"
+       obsolete="false"
        archived="false">
-       <result status="timeout" time="10.11"/>
+       <result status="valid" time="0.09"/>
       </proof>
-      <proof
-       prover="0"
-       timelimit="10"
-       obsolete="true"
-       archived="false">
-       <result status="timeout" time="10.03"/>
-      </proof>
-      <proof
-       prover="4"
-       timelimit="10"
-       obsolete="true"
-       archived="false">
-       <result status="timeout" time="10.06"/>
-      </proof>
+     </goal>
+     <goal
+      name="WP_parameter reduction3.5"
+      locfile="vstte12_combinators/../vstte12_combinators.mlw"
+      loclnum="153" loccnumb="10" loccnume="20"
+      expl="parameter reduction3"
+      sum="0cf4a5ac03fe58ecc3ae72db6492453b"
+      proved="true"
+      expanded="false"
+      shape="CV0aStaKtaAppVVCV3aKainfix =aAppaKV4aAppaKaKIainfix =V0aksainfix +ainfix *c2V5c1Aainfix =aAppaKV4aKIainfix =V0aksainfix *c2V5Iainfix &gt;=V5c0FAais_valueaAppaKV4Iainfix =V4aAppaKaKIainfix =V2aksainfix +ainfix *c2V6c1Aainfix =V4aKIainfix =V2aksainfix *c2V6Iainfix &gt;=V6c0FAais_valueV4FIainfix =V2aksV7Aainfix &gt;=V7c0EaStaAppaKVtaAppaSVtaAppaAppaSVVtwtIainfix =V3aAppaKaKIainfix =V1aksainfix +ainfix *c2V12c1Aainfix =V3aKIainfix =V1aksainfix *c2V12Iainfix &gt;=V12c0FAais_valueV3FIainfix =V1aksV13Aainfix &gt;=V13c0EIainfix =V0aksV14Aainfix &gt;=V14c0EF">
+      <label
+       name="expl:parameter reduction3"/>
       <transf
        name="split_goal"
-       proved="false"
-       expanded="true">
+       proved="true"
+       expanded="false">
        <goal
         name="WP_parameter reduction3.5.1"
         locfile="vstte12_combinators/../vstte12_combinators.mlw"
-        loclnum="150" loccnumb="10" loccnume="20"
+        loclnum="153" loccnumb="10" loccnume="20"
         expl="parameter reduction3"
-        sum="c0c68ecf0289098f871a83cfcca56573"
+        sum="5aa2937ce3d98d829b1686ee33a40888"
         proved="true"
         expanded="false"
-        shape="CV0aStaKtaAppVVCV3aKais_valueaAppaKV4Iainfix =V4aksamodV5c2Iainfix =V2aksV5Iainfix &gt;=V5c0FAais_valueV4FIainfix =V2aksV6Aainfix &gt;=V6c0EaStaAppaKVtaAppaSVtaAppaAppaSVVtwtIainfix =V3aksamodV11c2Iainfix =V1aksV11Iainfix &gt;=V11c0FAais_valueV3FIainfix =V1aksV12Aainfix &gt;=V12c0EIainfix =V0aksV13Aainfix &gt;=V13c0EF">
+        shape="CV0aStaKtaAppVVCV3aKais_valueaAppaKV4Iainfix =V4aAppaKaKIainfix =V2aksainfix +ainfix *c2V5c1Aainfix =V4aKIainfix =V2aksainfix *c2V5Iainfix &gt;=V5c0FAais_valueV4FIainfix =V2aksV6Aainfix &gt;=V6c0EaStaAppaKVtaAppaSVtaAppaAppaSVVtwtIainfix =V3aAppaKaKIainfix =V1aksainfix +ainfix *c2V11c1Aainfix =V3aKIainfix =V1aksainfix *c2V11Iainfix &gt;=V11c0FAais_valueV3FIainfix =V1aksV12Aainfix &gt;=V12c0EIainfix =V0aksV13Aainfix &gt;=V13c0EF">
         <label
          name="expl:parameter reduction3"/>
         <proof
@@ -1138,52 +1134,45 @@
          archived="false">
          <result status="valid" time="0.01"/>
         </proof>
-        <proof
-         prover="2"
-         timelimit="10"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.05"/>
-        </proof>
-        <proof
-         prover="4"
-         timelimit="10"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.04"/>
-        </proof>
        </goal>
        <goal
         name="WP_parameter reduction3.5.2"
         locfile="vstte12_combinators/../vstte12_combinators.mlw"
-        loclnum="150" loccnumb="10" loccnume="20"
+        loclnum="153" loccnumb="10" loccnume="20"
         expl="parameter reduction3"
-        sum="7e1c868ba6f24c79f1fd4594fde665d6"
-        proved="false"
-        expanded="true"
-        shape="CV0aStaKtaAppVVCV3aKainfix =aAppaKV4aksamodV5c2Iainfix =V0aksV5Iainfix &gt;=V5c0FIainfix =V4aksamodV6c2Iainfix =V2aksV6Iainfix &gt;=V6c0FAais_valueV4FIainfix =V2aksV7Aainfix &gt;=V7c0EaStaAppaKVtaAppaSVtaAppaAppaSVVtwtIainfix =V3aksamodV12c2Iainfix =V1aksV12Iainfix &gt;=V12c0FAais_valueV3FIainfix =V1aksV13Aainfix &gt;=V13c0EIainfix =V0aksV14Aainfix &gt;=V14c0EF">
+        sum="b32c0c48659303de923618738535e2a6"
+        proved="true"
+        expanded="false"
+        shape="CV0aStaKtaAppVVCV3aKainfix =aAppaKV4aKIainfix =V0aksainfix *c2V5Iainfix &gt;=V5c0FIainfix =V4aAppaKaKIainfix =V2aksainfix +ainfix *c2V6c1Aainfix =V4aKIainfix =V2aksainfix *c2V6Iainfix &gt;=V6c0FAais_valueV4FIainfix =V2aksV7Aainfix &gt;=V7c0EaStaAppaKVtaAppaSVtaAppaAppaSVVtwtIainfix =V3aAppaKaKIainfix =V1aksainfix +ainfix *c2V12c1Aainfix =V3aKIainfix =V1aksainfix *c2V12Iainfix &gt;=V12c0FAais_valueV3FIainfix =V1aksV13Aainfix &gt;=V13c0EIainfix =V0aksV14Aainfix &gt;=V14c0EF">
         <label
          name="expl:parameter reduction3"/>
         <proof
-         prover="0"
+         prover="2"
          timelimit="10"
+         edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction3_3.v"
          obsolete="false"
          archived="false">
-         <result status="timeout" time="10.02"/>
+         <result status="valid" time="4.68"/>
         </proof>
+       </goal>
+       <goal
+        name="WP_parameter reduction3.5.3"
+        locfile="vstte12_combinators/../vstte12_combinators.mlw"
+        loclnum="153" loccnumb="10" loccnume="20"
+        expl="parameter reduction3"
+        sum="6c725eb8897f47285502087220fdd466"
+        proved="true"
+        expanded="false"
+        shape="CV0aStaKtaAppVVCV3aKainfix =aAppaKV4aAppaKaKIainfix =V0aksainfix +ainfix *c2V5c1Iainfix &gt;=V5c0FIainfix =V4aAppaKaKIainfix =V2aksainfix +ainfix *c2V6c1Aainfix =V4aKIainfix =V2aksainfix *c2V6Iainfix &gt;=V6c0FAais_valueV4FIainfix =V2aksV7Aainfix &gt;=V7c0EaStaAppaKVtaAppaSVtaAppaAppaSVVtwtIainfix =V3aAppaKaKIainfix =V1aksainfix +ainfix *c2V12c1Aainfix =V3aKIainfix =V1aksainfix *c2V12Iainfix &gt;=V12c0FAais_valueV3FIainfix =V1aksV13Aainfix &gt;=V13c0EIainfix =V0aksV14Aainfix &gt;=V14c0EF">
+        <label
+         name="expl:parameter reduction3"/>
         <proof
          prover="2"
          timelimit="10"
+         edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction3_4.v"
          obsolete="false"
          archived="false">
-         <result status="timeout" time="10.11"/>
-        </proof>
-        <proof
-         prover="4"
-         timelimit="10"
-         obsolete="false"
-         archived="false">
-         <result status="timeout" time="10.05"/>
+         <result status="valid" time="2.04"/>
         </proof>
        </goal>
       </transf>
@@ -1191,105 +1180,85 @@
      <goal
       name="WP_parameter reduction3.6"
       locfile="vstte12_combinators/../vstte12_combinators.mlw"
-      loclnum="150" loccnumb="10" loccnume="20"
+      loclnum="153" loccnumb="10" loccnume="20"
       expl="parameter reduction3"
-      sum="923fada75581e190f21e4dda2fd7daed"
+      sum="c7354408907ce04232e22f2ac9526515"
       proved="true"
       expanded="false"
-      shape="CV0aStaKtaAppVVCV3aKtaSainfix =V2aksV4Aainfix &gt;=V4c0EaAppaKVtaAppaSVtaAppaAppaSVVtwtIainfix =V3aksamodV9c2Iainfix =V1aksV9Iainfix &gt;=V9c0FAais_valueV3FIainfix =V1aksV10Aainfix &gt;=V10c0EIainfix =V0aksV11Aainfix &gt;=V11c0EF">
-      <label
-       name="expl:parameter reduction3"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.23"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter reduction3.7"
-      locfile="vstte12_combinators/../vstte12_combinators.mlw"
-      loclnum="150" loccnumb="10" loccnume="20"
-      expl="parameter reduction3"
-      sum="8be526543118eff8a473574822a3c37d"
-      proved="true"
-      expanded="false"
-      shape="CV0aStaKtaAppVVCV3aKtaSainfix =aAppaSV4aksamodV5c2Iainfix =V0aksV5Iainfix &gt;=V5c0FAais_valueaAppaSV4Iainfix =V4aksamodV6c2Iainfix =V2aksV6Iainfix &gt;=V6c0FAais_valueV4FIainfix =V2aksV7Aainfix &gt;=V7c0EaAppaKVtaAppaSVtaAppaAppaSVVtwtIainfix =V3aksamodV12c2Iainfix =V1aksV12Iainfix &gt;=V12c0FAais_valueV3FIainfix =V1aksV13Aainfix &gt;=V13c0EIainfix =V0aksV14Aainfix &gt;=V14c0EF">
-      <label
-       name="expl:parameter reduction3"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="1.35"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter reduction3.8"
-      locfile="vstte12_combinators/../vstte12_combinators.mlw"
-      loclnum="150" loccnumb="10" loccnume="20"
-      expl="parameter reduction3"
-      sum="d3e0404bed7e65c68a6ddb298e8d58ab"
-      proved="true"
-      expanded="false"
-      shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVainfix =V2aksV5Aainfix &gt;=V5c0EaAppaSVtaAppaAppaSVVtwtIainfix =V3aksamodV9c2Iainfix =V1aksV9Iainfix &gt;=V9c0FAais_valueV3FIainfix =V1aksV10Aainfix &gt;=V10c0EIainfix =V0aksV11Aainfix &gt;=V11c0EF">
-      <label
-       name="expl:parameter reduction3"/>
-      <proof
-       prover="2"
-       timelimit="10"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.13"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter reduction3.9"
-      locfile="vstte12_combinators/../vstte12_combinators.mlw"
-      loclnum="150" loccnumb="10" loccnume="20"
-      expl="parameter reduction3"
-      sum="531a048dfb980bddc2b13d0433bf3174"
-      proved="false"
-      expanded="true"
-      shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVainfix =V4aksamodV6c2Iainfix =V0aksV6Iainfix &gt;=V6c0FAais_valueV4Iainfix =V5aksamodV7c2Iainfix =V2aksV7Iainfix &gt;=V7c0FAais_valueV5FIainfix =V2aksV8Aainfix &gt;=V8c0EaAppaSVtaAppaAppaSVVtwtIainfix =V3aksamodV12c2Iainfix =V1aksV12Iainfix &gt;=V12c0FAais_valueV3FIainfix =V1aksV13Aainfix &gt;=V13c0EIainfix =V0aksV14Aainfix &gt;=V14c0EF">
+      shape="CV0aStaKtaAppVVCV3aKtaSainfix =V2aksV4Aainfix &gt;=V4c0EaAppaKVtaAppaSVtaAppaAppaSVVtwtIainfix =V3aAppaKaKIainfix =V1aksainfix +ainfix *c2V9c1Aainfix =V3aKIainfix =V1aksainfix *c2V9Iainfix &gt;=V9c0FAais_valueV3FIainfix =V1aksV10Aainfix &gt;=V10c0EIainfix =V0aksV11Aainfix &gt;=V11c0EF">
       <label
        name="expl:parameter reduction3"/>
       <proof
        prover="1"
        timelimit="10"
-       obsolete="true"
+       obsolete="false"
        archived="false">
-       <result status="timeout" time="10.13"/>
+       <result status="valid" time="0.08"/>
       </proof>
+     </goal>
+     <goal
+      name="WP_parameter reduction3.7"
+      locfile="vstte12_combinators/../vstte12_combinators.mlw"
+      loclnum="153" loccnumb="10" loccnume="20"
+      expl="parameter reduction3"
+      sum="583e252bf93a1cd6c19efa3b29e6c61f"
+      proved="true"
+      expanded="false"
+      shape="CV0aStaKtaAppVVCV3aKtaSainfix =aAppaSV4aAppaKaKIainfix =V0aksainfix +ainfix *c2V5c1Aainfix =aAppaSV4aKIainfix =V0aksainfix *c2V5Iainfix &gt;=V5c0FAais_valueaAppaSV4Iainfix =V4aAppaKaKIainfix =V2aksainfix +ainfix *c2V6c1Aainfix =V4aKIainfix =V2aksainfix *c2V6Iainfix &gt;=V6c0FAais_valueV4FIainfix =V2aksV7Aainfix &gt;=V7c0EaAppaKVtaAppaSVtaAppaAppaSVVtwtIainfix =V3aAppaKaKIainfix =V1aksainfix +ainfix *c2V12c1Aainfix =V3aKIainfix =V1aksainfix *c2V12Iainfix &gt;=V12c0FAais_valueV3FIainfix =V1aksV13Aainfix &gt;=V13c0EIainfix =V0aksV14Aainfix &gt;=V14c0EF">
+      <label
+       name="expl:parameter reduction3"/>
       <proof
-       prover="0"
+       prover="2"
        timelimit="10"
-       obsolete="true"
+       edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction3_6.v"
+       obsolete="false"
        archived="false">
-       <result status="timeout" time="10.07"/>
+       <result status="valid" time="1.59"/>
       </proof>
+     </goal>
+     <goal
+      name="WP_parameter reduction3.8"
+      locfile="vstte12_combinators/../vstte12_combinators.mlw"
+      loclnum="153" loccnumb="10" loccnume="20"
+      expl="parameter reduction3"
+      sum="71a28bba1de2556692a08c9fe028a47e"
+      proved="true"
+      expanded="false"
+      shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVainfix =V2aksV5Aainfix &gt;=V5c0EaAppaSVtaAppaAppaSVVtwtIainfix =V3aAppaKaKIainfix =V1aksainfix +ainfix *c2V9c1Aainfix =V3aKIainfix =V1aksainfix *c2V9Iainfix &gt;=V9c0FAais_valueV3FIainfix =V1aksV10Aainfix &gt;=V10c0EIainfix =V0aksV11Aainfix &gt;=V11c0EF">
+      <label
+       name="expl:parameter reduction3"/>
       <proof
-       prover="4"
+       prover="1"
        timelimit="10"
-       obsolete="true"
+       obsolete="false"
        archived="false">
-       <result status="timeout" time="10.07"/>
+       <result status="valid" time="0.11"/>
       </proof>
+     </goal>
+     <goal
+      name="WP_parameter reduction3.9"
+      locfile="vstte12_combinators/../vstte12_combinators.mlw"
+      loclnum="153" loccnumb="10" loccnume="20"
+      expl="parameter reduction3"
+      sum="91f074c5a156fec96653107224045fd7"
+      proved="true"
+      expanded="false"
+      shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVainfix =V4aAppaKaKIainfix =V0aksainfix +ainfix *c2V6c1Aainfix =V4aKIainfix =V0aksainfix *c2V6Iainfix &gt;=V6c0FAais_valueV4Iainfix =V5aAppaKaKIainfix =V2aksainfix +ainfix *c2V7c1Aainfix =V5aKIainfix =V2aksainfix *c2V7Iainfix &gt;=V7c0FAais_valueV5FIainfix =V2aksV8Aainfix &gt;=V8c0EaAppaSVtaAppaAppaSVVtwtIainfix =V3aAppaKaKIainfix =V1aksainfix +ainfix *c2V12c1Aainfix =V3aKIainfix =V1aksainfix *c2V12Iainfix &gt;=V12c0FAais_valueV3FIainfix =V1aksV13Aainfix &gt;=V13c0EIainfix =V0aksV14Aainfix &gt;=V14c0EF">
+      <label
+       name="expl:parameter reduction3"/>
       <transf
        name="split_goal"
-       proved="false"
-       expanded="true">
+       proved="true"
+       expanded="false">
        <goal
         name="WP_parameter reduction3.9.1"
         locfile="vstte12_combinators/../vstte12_combinators.mlw"
-        loclnum="150" loccnumb="10" loccnume="20"
+        loclnum="153" loccnumb="10" loccnume="20"
         expl="parameter reduction3"
-        sum="447e516c6b8a01771f92058f57104791"
+        sum="ae8347c725220203a2359ffc4ea97c3e"
         proved="true"
         expanded="false"
-        shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVais_valueV4Iainfix =V5aksamodV6c2Iainfix =V2aksV6Iainfix &gt;=V6c0FAais_valueV5FIainfix =V2aksV7Aainfix &gt;=V7c0EaAppaSVtaAppaAppaSVVtwtIainfix =V3aksamodV11c2Iainfix =V1aksV11Iainfix &gt;=V11c0FAais_valueV3FIainfix =V1aksV12Aainfix &gt;=V12c0EIainfix =V0aksV13Aainfix &gt;=V13c0EF">
+        shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVais_valueV4Iainfix =V5aAppaKaKIainfix =V2aksainfix +ainfix *c2V6c1Aainfix =V5aKIainfix =V2aksainfix *c2V6Iainfix &gt;=V6c0FAais_valueV5FIainfix =V2aksV7Aainfix &gt;=V7c0EaAppaSVtaAppaAppaSVVtwtIainfix =V3aAppaKaKIainfix =V1aksainfix +ainfix *c2V11c1Aainfix =V3aKIainfix =V1aksainfix *c2V11Iainfix &gt;=V11c0FAais_valueV3FIainfix =V1aksV12Aainfix &gt;=V12c0EIainfix =V0aksV13Aainfix &gt;=V13c0EF">
         <label
          name="expl:parameter reduction3"/>
         <proof
@@ -1297,17 +1266,17 @@
          timelimit="10"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.39"/>
+         <result status="valid" time="0.07"/>
         </proof>
         <proof
-         prover="2"
+         prover="1"
          timelimit="10"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.04"/>
         </proof>
         <proof
-         prover="4"
+         prover="3"
          timelimit="10"
          obsolete="false"
          archived="false">
@@ -1317,12 +1286,32 @@
        <goal
         name="WP_parameter reduction3.9.2"
         locfile="vstte12_combinators/../vstte12_combinators.mlw"
-        loclnum="150" loccnumb="10" loccnume="20"
+        loclnum="153" loccnumb="10" loccnume="20"
         expl="parameter reduction3"
-        sum="eca96013383b177df20a21e38fa25367"
-        proved="false"
+        sum="fca8b8867126c1fb7394aabf43bb7397"
+        proved="true"
         expanded="false"
-        shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVainfix =V4aksamodV6c2Iainfix =V0aksV6Iainfix &gt;=V6c0FIainfix =V5aksamodV7c2Iainfix =V2aksV7Iainfix &gt;=V7c0FAais_valueV5FIainfix =V2aksV8Aainfix &gt;=V8c0EaAppaSVtaAppaAppaSVVtwtIainfix =V3aksamodV12c2Iainfix =V1aksV12Iainfix &gt;=V12c0FAais_valueV3FIainfix =V1aksV13Aainfix &gt;=V13c0EIainfix =V0aksV14Aainfix &gt;=V14c0EF">
+        shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVainfix =V4aKIainfix =V0aksainfix *c2V6Iainfix &gt;=V6c0FIainfix =V5aAppaKaKIainfix =V2aksainfix +ainfix *c2V7c1Aainfix =V5aKIainfix =V2aksainfix *c2V7Iainfix &gt;=V7c0FAais_valueV5FIainfix =V2aksV8Aainfix &gt;=V8c0EaAppaSVtaAppaAppaSVVtwtIainfix =V3aAppaKaKIainfix =V1aksainfix +ainfix *c2V12c1Aainfix =V3aKIainfix =V1aksainfix *c2V12Iainfix &gt;=V12c0FAais_valueV3FIainfix =V1aksV13Aainfix &gt;=V13c0EIainfix =V0aksV14Aainfix &gt;=V14c0EF">
+        <label
+         name="expl:parameter reduction3"/>
+        <proof
+         prover="2"
+         timelimit="10"
+         edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction3_5.v"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="1.58"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter reduction3.9.3"
+        locfile="vstte12_combinators/../vstte12_combinators.mlw"
+        loclnum="153" loccnumb="10" loccnume="20"
+        expl="parameter reduction3"
+        sum="4bc2f82071f8d5d30a906bc25b4e6d3b"
+        proved="true"
+        expanded="false"
+        shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVainfix =V4aAppaKaKIainfix =V0aksainfix +ainfix *c2V6c1Iainfix &gt;=V6c0FIainfix =V5aAppaKaKIainfix =V2aksainfix +ainfix *c2V7c1Aainfix =V5aKIainfix =V2aksainfix *c2V7Iainfix &gt;=V7c0FAais_valueV5FIainfix =V2aksV8Aainfix &gt;=V8c0EaAppaSVtaAppaAppaSVVtwtIainfix =V3aAppaKaKIainfix =V1aksainfix +ainfix *c2V12c1Aainfix =V3aKIainfix =V1aksainfix *c2V12Iainfix &gt;=V12c0FAais_valueV3FIainfix =V1aksV13Aainfix &gt;=V13c0EIainfix =V0aksV14Aainfix &gt;=V14c0EF">
         <label
          name="expl:parameter reduction3"/>
         <proof
@@ -1330,21 +1319,7 @@
          timelimit="10"
          obsolete="false"
          archived="false">
-         <result status="timeout" time="10.01"/>
-        </proof>
-        <proof
-         prover="2"
-         timelimit="10"
-         obsolete="false"
-         archived="false"><undone/>
-         
-        </proof>
-        <proof
-         prover="4"
-         timelimit="10"
-         obsolete="false"
-         archived="false"><undone/>
-         
+         <result status="valid" time="0.93"/>
         </proof>
        </goal>
       </transf>
@@ -1352,107 +1327,12 @@
      <goal
       name="WP_parameter reduction3.10"
       locfile="vstte12_combinators/../vstte12_combinators.mlw"
-      loclnum="150" loccnumb="10" loccnume="20"
+      loclnum="153" loccnumb="10" loccnume="20"
       expl="parameter reduction3"
-      sum="14e9f5e650a04d662de7c96ee569bd29"
+      sum="ad6617fded52d4db20040f2c25e43615"
       proved="true"
       expanded="false"
-      shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVtaAppaSVainfix =V2aksV6Aainfix &gt;=V6c0EaAppaAppaSVVtwtIainfix =V3aksamodV9c2Iainfix =V1aksV9Iainfix &gt;=V9c0FAais_valueV3FIainfix =V1aksV10Aainfix &gt;=V10c0EIainfix =V0aksV11Aainfix &gt;=V11c0EF">
-      <label
-       name="expl:parameter reduction3"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.36"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter reduction3.11"
-      locfile="vstte12_combinators/../vstte12_combinators.mlw"
-      loclnum="150" loccnumb="10" loccnume="20"
-      expl="parameter reduction3"
-      sum="e24686915c74ba16b212265e133ac2cf"
-      proved="true"
-      expanded="false"
-      shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVtaAppaSVainfix =aAppaAppaSV5V6aksamodV7c2Iainfix =V0aksV7Iainfix &gt;=V7c0FAais_valueaAppaAppaSV5V6Iainfix =V6aksamodV8c2Iainfix =V2aksV8Iainfix &gt;=V8c0FAais_valueV6FIainfix =V2aksV9Aainfix &gt;=V9c0EaAppaAppaSVVtwtIainfix =V3aksamodV12c2Iainfix =V1aksV12Iainfix &gt;=V12c0FAais_valueV3FIainfix =V1aksV13Aainfix &gt;=V13c0EIainfix =V0aksV14Aainfix &gt;=V14c0EF">
-      <label
-       name="expl:parameter reduction3"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.66"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter reduction3.12"
-      locfile="vstte12_combinators/../vstte12_combinators.mlw"
-      loclnum="150" loccnumb="10" loccnume="20"
-      expl="parameter reduction3"
-      sum="0f0da4d0feb31da02e3bf84a83f6565b"
-      proved="true"
-      expanded="false"
-      shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVtaAppaSVtaAppaAppaSVVainfix =V2aksV8Aainfix &gt;=V8c0EwtIainfix =V3aksamodV9c2Iainfix =V1aksV9Iainfix &gt;=V9c0FAais_valueV3FIainfix =V1aksV10Aainfix &gt;=V10c0EIainfix =V0aksV11Aainfix &gt;=V11c0EF">
-      <label
-       name="expl:parameter reduction3"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.45"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter reduction3.13"
-      locfile="vstte12_combinators/../vstte12_combinators.mlw"
-      loclnum="150" loccnumb="10" loccnume="20"
-      expl="parameter reduction3"
-      sum="c98228cf65bf46bc0c7ef785d1711674"
-      proved="true"
-      expanded="false"
-      shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVtaAppaSVtaAppaAppaSVVainfix =aAppaAppV6V8aAppV7V8aksV9Aainfix &gt;=V9c0EIainfix =V8aksamodV10c2Iainfix =V2aksV10Iainfix &gt;=V10c0FAais_valueV8FIainfix =V2aksV11Aainfix &gt;=V11c0EwtIainfix =V3aksamodV12c2Iainfix =V1aksV12Iainfix &gt;=V12c0FAais_valueV3FIainfix =V1aksV13Aainfix &gt;=V13c0EIainfix =V0aksV14Aainfix &gt;=V14c0EF">
-      <label
-       name="expl:parameter reduction3"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="1.79"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter reduction3.14"
-      locfile="vstte12_combinators/../vstte12_combinators.mlw"
-      loclnum="150" loccnumb="10" loccnume="20"
-      expl="parameter reduction3"
-      sum="a1db7023128f670f8a124cfb53073169"
-      proved="true"
-      expanded="false"
-      shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVtaAppaSVtaAppaAppaSVVainfix =V9aksamodV10c2Iainfix =V0aksV10Iainfix &gt;=V10c0FAais_valueV9Iainfix =V9aksamodV11c2Iainfix =aAppaAppV6V8aAppV7V8aksV11Iainfix &gt;=V11c0FAais_valueV9FIainfix =aAppaAppV6V8aAppV7V8aksV12Aainfix &gt;=V12c0EIainfix =V8aksamodV13c2Iainfix =V2aksV13Iainfix &gt;=V13c0FAais_valueV8FIainfix =V2aksV14Aainfix &gt;=V14c0EwtIainfix =V3aksamodV15c2Iainfix =V1aksV15Iainfix &gt;=V15c0FAais_valueV3FIainfix =V1aksV16Aainfix &gt;=V16c0EIainfix =V0aksV17Aainfix &gt;=V17c0EF">
-      <label
-       name="expl:parameter reduction3"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="2.11"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter reduction3.15"
-      locfile="vstte12_combinators/../vstte12_combinators.mlw"
-      loclnum="150" loccnumb="10" loccnume="20"
-      expl="parameter reduction3"
-      sum="18481351fbc5ca278d6cb1eb81a7b19a"
-      proved="true"
-      expanded="false"
-      shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVtaAppaSVtaAppaAppaSVVtwfIainfix =V3aksamodV8c2Iainfix =V1aksV8Iainfix &gt;=V8c0FAais_valueV3FIainfix =V1aksV9Aainfix &gt;=V9c0EIainfix =V0aksV10Aainfix &gt;=V10c0EF">
+      shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVtaAppaSVainfix =V2aksV6Aainfix &gt;=V6c0EaAppaAppaSVVtwtIainfix =V3aAppaKaKIainfix =V1aksainfix +ainfix *c2V9c1Aainfix =V3aKIainfix =V1aksainfix *c2V9Iainfix &gt;=V9c0FAais_valueV3FIainfix =V1aksV10Aainfix &gt;=V10c0EIainfix =V0aksV11Aainfix &gt;=V11c0EF">
       <label
        name="expl:parameter reduction3"/>
       <proof
@@ -1460,21 +1340,119 @@
        timelimit="10"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.34"/>
+       <result status="valid" time="0.11"/>
       </proof>
+     </goal>
+     <goal
+      name="WP_parameter reduction3.11"
+      locfile="vstte12_combinators/../vstte12_combinators.mlw"
+      loclnum="153" loccnumb="10" loccnume="20"
+      expl="parameter reduction3"
+      sum="afc99626bf8f9d1863fcf2ef1cf5cedf"
+      proved="true"
+      expanded="true"
+      shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVtaAppaSVainfix =aAppaAppaSV5V6aAppaKaKIainfix =V0aksainfix +ainfix *c2V7c1Aainfix =aAppaAppaSV5V6aKIainfix =V0aksainfix *c2V7Iainfix &gt;=V7c0FAais_valueaAppaAppaSV5V6Iainfix =V6aAppaKaKIainfix =V2aksainfix +ainfix *c2V8c1Aainfix =V6aKIainfix =V2aksainfix *c2V8Iainfix &gt;=V8c0FAais_valueV6FIainfix =V2aksV9Aainfix &gt;=V9c0EaAppaAppaSVVtwtIainfix =V3aAppaKaKIainfix =V1aksainfix +ainfix *c2V12c1Aainfix =V3aKIainfix =V1aksainfix *c2V12Iainfix &gt;=V12c0FAais_valueV3FIainfix =V1aksV13Aainfix &gt;=V13c0EIainfix =V0aksV14Aainfix &gt;=V14c0EF">
+      <label
+       name="expl:parameter reduction3"/>
+      <proof
+       prover="2"
+       timelimit="10"
+       edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction3_9.v"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="1.74"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter reduction3.12"
+      locfile="vstte12_combinators/../vstte12_combinators.mlw"
+      loclnum="153" loccnumb="10" loccnume="20"
+      expl="parameter reduction3"
+      sum="ddc65721a6a7727344a0a56746949597"
+      proved="true"
+      expanded="false"
+      shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVtaAppaSVtaAppaAppaSVVainfix =V2aksV8Aainfix &gt;=V8c0EwtIainfix =V3aAppaKaKIainfix =V1aksainfix +ainfix *c2V9c1Aainfix =V3aKIainfix =V1aksainfix *c2V9Iainfix &gt;=V9c0FAais_valueV3FIainfix =V1aksV10Aainfix &gt;=V10c0EIainfix =V0aksV11Aainfix &gt;=V11c0EF">
+      <label
+       name="expl:parameter reduction3"/>
+      <proof
+       prover="1"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.12"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter reduction3.13"
+      locfile="vstte12_combinators/../vstte12_combinators.mlw"
+      loclnum="153" loccnumb="10" loccnume="20"
+      expl="parameter reduction3"
+      sum="1ff587e783c151a545f810a333ae3a6e"
+      proved="true"
+      expanded="false"
+      shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVtaAppaSVtaAppaAppaSVVainfix =aAppaAppV6V8aAppV7V8aksV9Aainfix &gt;=V9c0EIainfix =V8aAppaKaKIainfix =V2aksainfix +ainfix *c2V10c1Aainfix =V8aKIainfix =V2aksainfix *c2V10Iainfix &gt;=V10c0FAais_valueV8FIainfix =V2aksV11Aainfix &gt;=V11c0EwtIainfix =V3aAppaKaKIainfix =V1aksainfix +ainfix *c2V12c1Aainfix =V3aKIainfix =V1aksainfix *c2V12Iainfix &gt;=V12c0FAais_valueV3FIainfix =V1aksV13Aainfix &gt;=V13c0EIainfix =V0aksV14Aainfix &gt;=V14c0EF">
+      <label
+       name="expl:parameter reduction3"/>
+      <proof
+       prover="2"
+       timelimit="10"
+       edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction3_7.v"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="1.76"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter reduction3.14"
+      locfile="vstte12_combinators/../vstte12_combinators.mlw"
+      loclnum="153" loccnumb="10" loccnume="20"
+      expl="parameter reduction3"
+      sum="429edc72315dc3e02c64ddfeb502dd42"
+      proved="true"
+      expanded="true"
+      shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVtaAppaSVtaAppaAppaSVVainfix =V9aAppaKaKIainfix =V0aksainfix +ainfix *c2V10c1Aainfix =V9aKIainfix =V0aksainfix *c2V10Iainfix &gt;=V10c0FAais_valueV9Iainfix =V9aAppaKaKIainfix =aAppaAppV6V8aAppV7V8aksainfix +ainfix *c2V11c1Aainfix =V9aKIainfix =aAppaAppV6V8aAppV7V8aksainfix *c2V11Iainfix &gt;=V11c0FAais_valueV9FIainfix =aAppaAppV6V8aAppV7V8aksV12Aainfix &gt;=V12c0EIainfix =V8aAppaKaKIainfix =V2aksainfix +ainfix *c2V13c1Aainfix =V8aKIainfix =V2aksainfix *c2V13Iainfix &gt;=V13c0FAais_valueV8FIainfix =V2aksV14Aainfix &gt;=V14c0EwtIainfix =V3aAppaKaKIainfix =V1aksainfix +ainfix *c2V15c1Aainfix =V3aKIainfix =V1aksainfix *c2V15Iainfix &gt;=V15c0FAais_valueV3FIainfix =V1aksV16Aainfix &gt;=V16c0EIainfix =V0aksV17Aainfix &gt;=V17c0EF">
+      <label
+       name="expl:parameter reduction3"/>
+      <proof
+       prover="2"
+       timelimit="10"
+       edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction3_8.v"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="1.76"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter reduction3.15"
+      locfile="vstte12_combinators/../vstte12_combinators.mlw"
+      loclnum="153" loccnumb="10" loccnume="20"
+      expl="parameter reduction3"
+      sum="8529dfeca1f0163b18ca18a6104cf511"
+      proved="true"
+      expanded="false"
+      shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVtaAppaSVtaAppaAppaSVVtwfIainfix =V3aAppaKaKIainfix =V1aksainfix +ainfix *c2V8c1Aainfix =V3aKIainfix =V1aksainfix *c2V8Iainfix &gt;=V8c0FAais_valueV3FIainfix =V1aksV9Aainfix &gt;=V9c0EIainfix =V0aksV10Aainfix &gt;=V10c0EF">
+      <label
+       name="expl:parameter reduction3"/>
       <proof
        prover="0"
        timelimit="10"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.59"/>
+       <result status="valid" time="0.40"/>
       </proof>
       <proof
-       prover="4"
+       prover="1"
        timelimit="10"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.57"/>
+       <result status="valid" time="0.40"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="10"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.49"/>
       </proof>
      </goal>
     </transf>
@@ -1482,35 +1460,35 @@
    <goal
     name="ks_value"
     locfile="vstte12_combinators/../vstte12_combinators.mlw"
-    loclnum="168" loccnumb="9" loccnume="17"
-    sum="438e9d117a94e8e5e8b7032d7f7fb020"
+    loclnum="172" loccnumb="9" loccnume="17"
+    sum="32fb60ebf9835d294a5125659b830faf"
     proved="true"
-    expanded="true"
+    expanded="false"
     shape="ainfix &lt;=V0c1Aainfix &lt;=c0V0Iais_valueaksV0Iainfix &lt;=c0V0F">
     <proof
-     prover="3"
+     prover="2"
      timelimit="10"
      edited="vstte12_combinators_WP_Combinators_ks_value_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.78"/>
+     <result status="valid" time="0.89"/>
     </proof>
    </goal>
    <goal
     name="ks_even_odd"
     locfile="vstte12_combinators/../vstte12_combinators.mlw"
-    loclnum="171" loccnumb="9" loccnume="20"
-    sum="867c2ebf96ad6ec71222699be15b1bd2"
+    loclnum="175" loccnumb="9" loccnume="20"
+    sum="acf51d62919a4d2f88c743c46eb4b12a"
     proved="true"
-    expanded="true"
+    expanded="false"
     shape="ainfix --&gt;*aksainfix +ainfix *c2V0c1aAppaKaKAainfix --&gt;*aksainfix *c2V0aKIainfix &lt;=c0V0F">
     <proof
-     prover="3"
+     prover="2"
      timelimit="10"
      edited="vstte12_combinators_WP_Combinators_ks_even_odd_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.77"/>
+     <result status="valid" time="0.80"/>
     </proof>
    </goal>
   </theory>
