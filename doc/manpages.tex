@@ -6,13 +6,13 @@ provided by the \why environment. These are as follows:
 \begin{description}
 \item[\texttt{why3config}] tool for managing the user's configuration,
   including the detection of installed provers.
-\item[\texttt{why3}] \todo{}
+\item[\texttt{why3}] reads \why input files and call provers, on the command-line
 \item[\texttt{why3ide}] graphical interface to display goals, run
   provers and transformations on them.
-\item[\texttt{why3ml}] \todo{}
+\item[\texttt{why3ml}] as \texttt{why3} but reads \why{} ML programs instead
 \item[\texttt{why3replayer}] replay the proofs stored in a session,
   for regression test purposes
-\item[\texttt{why3bench}] \todo{}
+\item[\texttt{why3bench}] produces benchmarks
 \item[\texttt{why3session}] dumps various informations from a proof
   session, and possibly modifies the session.
 \end{description}
@@ -566,7 +566,20 @@ mark it with a question mark \verb|?|, finally if it is valid we add
 nothing. On the other hand if the proof is obsolete we mark it with an
 \verb|O| and if it is archived we mark it with an \verb|A|.
 
-\todo{Example}
+For example, here are the session tree produced on the ``hello
+proof'' example of Section~\ref{chap:starting}.
+\begin{verbatim}
+hello_proof---../hello_proof.why?---HelloProof?-+-G3-+-Alt-Ergo (0.93)
+                                                |    `-Simplify (1.5.4)?
+                                                |-G2?-+-split_goal?-+-G2.1-+-Alt-Ergo (0.93)
+                                                |     |             |      `-Simplify (1.5.4)
+                                                |     |             `-G2.0?-+-Alt-Ergo (0.93)?
+                                                |     |                     |-Simplify (1.5.4)?
+                                                |     |                     `-Coq (8.3pl3)?
+                                                |     |-Alt-Ergo (0.93)?
+                                                |     `-Simplify (1.5.4)?
+                                                `-G1---Simplify (1.5.4)
+\end{verbatim}
 
 \paragraph{Session Statistics}
 

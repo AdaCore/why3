@@ -24,38 +24,51 @@ file is reproduced below.
 \label{sec:whyconffile}
 \index{why3.conf@\texttt{why3.conf}}\index{configuration file}
 
-\todo{THIS SECTION IS OUTDATED}
-
-\begin{figure}[t]
+\begin{figure}[p]
 \begin{verbatim}
 [main ]
 loadpath = "/usr/local/share/why3/theories"
-magic = 2
+loadpath = "/usr/local/share/why3/modules"
+magic = 12
 memlimit = 0
-running_provers_max = 2
-timelimit = 10
+plugin = "/usr/local/lib/why3/plugins/tptp"
+plugin = "/usr/local/lib/why3/plugins/genequlin"
+plugin = "/usr/local/lib/why3/plugins/tptpfof"
+plugin = "/usr/local/lib/why3/plugins/hypothesis_selection"
+running_provers_max = 4
+timelimit = 2
 
 [ide ]
-default_editor = "emacs"
-task_height = 384
-tree_width = 438
+default_editor = "editor %f"
+error_color = "orange"
+goal_color = "gold"
+intro_premises = true
+premise_color = "chartreuse"
+print_labels = false
+print_locs = false
+print_time_limit = false
+saving_policy = 2
+task_height = 404
+tree_width = 512
 verbose = 0
-window_height = 779
-window_width = 638
+window_height = 1173
+window_width = 1024
 
 [prover coq]
-command = "coqc %f"
+command = "why3-cpulimit 0 %m -s coqtop -batch -I %l/coq-tactic -R %l/coq Why3 -l %f"
 driver = "/usr/local/share/why3/drivers/coq.drv"
 editor = "coqide"
+interactive = true
 name = "Coq"
-version = "8.2pl2"
+version = "8.3pl3"
 
 [prover alt-ergo]
-command = "why3-cpulimit %t %m alt-ergo %f"
-driver = "/usr/local/share/why3/drivers/alt_ergo.drv"
+command = "why3-cpulimit %t %m -s alt-ergo %f"
+driver = "/usr/local/share/why3/drivers/alt_ergo_0.93.drv"
 editor = ""
+interactive = false
 name = "Alt-Ergo"
-version = "0.91"
+version = "0.93"
 \end{verbatim}
   \caption{Sample why3.conf file}
 \label{fig:why3conf}
