@@ -3,8 +3,6 @@
 Require Import ZArith.
 Require Import Rbase.
 Require int.Int.
-Require int.Abs.
-Require int.EuclideanDivision.
 
 (* Why3 assumption *)
 Definition unit  := unit.
@@ -147,11 +145,6 @@ Axiom ks_injective : forall (n1:Z) (n2:Z), (0%Z <= n1)%Z -> ((0%Z <= n2)%Z ->
 
 Require Import Why3. Ltac ae := why3 "alt-ergo".
 
-Lemma mod_0_2: (EuclideanDivision.mod1 0 2 = 0)%Z.
-generalize (EuclideanDivision.Div_mod 0 2).
-generalize (EuclideanDivision.Mod_bound 0 2).
-rewrite Zabs_eq; ae.
-Qed.
 
 (* Why3 goal *)
 Theorem WP_parameter_reduction3 : forall (t:term), (exists n:Z,

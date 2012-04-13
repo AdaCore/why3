@@ -77,6 +77,16 @@ theory EuclideanDivision
 
 end
 
+(* the particular case of Euclidean division by 2 *)
+theory Div2
+
+  use import Int
+
+  lemma div2:
+    forall x: int. exists y: int. x = 2*y \/ x = 2*y+1
+
+end
+
 theory ComputerDivision
 
   (* division and modulo operators with the same conventions as

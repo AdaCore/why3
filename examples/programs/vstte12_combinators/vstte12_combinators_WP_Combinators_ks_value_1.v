@@ -3,8 +3,6 @@
 Require Import ZArith.
 Require Import Rbase.
 Require int.Int.
-Require int.Abs.
-Require int.EuclideanDivision.
 
 (* Why3 assumption *)
 Definition unit  := unit.
@@ -138,6 +136,12 @@ Axiom ksS : forall (n:Z), (0%Z <= n)%Z -> ((ks (n + 1%Z)%Z) = (App (ks n)
 Axiom ks1 : ((ks 1%Z) = (App K K)).
 
 Axiom only_K_ks : forall (n:Z), (0%Z <= n)%Z -> (only_K (ks n)).
+
+Axiom ks_inversion : forall (n:Z), (0%Z <= n)%Z -> ((n = 0%Z) \/
+  ((0%Z <  n)%Z /\ ((ks n) = (App (ks (n - 1%Z)%Z) K)))).
+
+Axiom ks_injective : forall (n1:Z) (n2:Z), (0%Z <= n1)%Z -> ((0%Z <= n2)%Z ->
+  (((ks n1) = (ks n2)) -> (n1 = n2))).
 
 (* Why3 goal *)
 Theorem ks_value : forall (n:Z), (0%Z <= n)%Z -> ((is_value (ks n)) ->

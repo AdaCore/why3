@@ -148,7 +148,7 @@ module Combinators
   lemma ks_injective:
     forall n1 n2: int. n1 >= 0 -> n2 >= 0 -> ks n1 = ks n2 -> n1 = n2
 
-  use import int.EuclideanDivision
+  use import int.Div2
 
   let rec reduction3 (t: term) : term =
     { exists n: int. n >= 0 /\ t = ks n }
@@ -177,7 +177,6 @@ module Combinators
                           /\ ks (2*n+1) -->* App K K
 
 end
-
 
 (*
 Local Variables:

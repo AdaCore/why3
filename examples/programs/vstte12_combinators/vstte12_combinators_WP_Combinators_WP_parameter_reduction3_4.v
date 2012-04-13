@@ -3,8 +3,6 @@
 Require Import ZArith.
 Require Import Rbase.
 Require int.Int.
-Require int.Abs.
-Require int.EuclideanDivision.
 
 (* Why3 assumption *)
 Definition unit  := unit.
@@ -145,22 +143,10 @@ Axiom ks_inversion : forall (n:Z), (0%Z <= n)%Z -> ((n = 0%Z) \/
 Axiom ks_injective : forall (n1:Z) (n2:Z), (0%Z <= n1)%Z -> ((0%Z <= n2)%Z ->
   (((ks n1) = (ks n2)) -> (n1 = n2))).
 
+Axiom div2 : forall (x:Z), exists y:Z, (x = (2%Z * y)%Z) \/
+  (x = ((2%Z * y)%Z + 1%Z)%Z).
+
 Require Import Why3. Ltac ae := why3 "alt-ergo".
-Require Import int.EuclideanDivision.
-Lemma div2: forall n: Z, (0 <= n)%Z ->
-     (exists n': Z, 0 <= n' /\ n = 2 * n')%Z
-  \/ (exists n': Z, 0 <= n' /\ n = 2 * n' + 1)%Z.
-intros n hn.
-generalize (Div_mod n 2).
-generalize (Mod_bound n 2).
-intuition.
-assert (e: (Zabs 2 = 2)%Z) by (simpl; auto).
-rewrite e in H2.
-assert (mod1 n 2 = 0 \/ mod1 n 2 = 1)%Z by omega.
-destruct H0.
-left; exists (div n 2); ae.
-right; exists (div n 2); ae.
-Qed.
 
 (* Why3 goal *)
 Theorem WP_parameter_reduction3 : forall (t:term), (exists n:Z,
@@ -196,8 +182,7 @@ assert (n2 = 0)%Z.
   destruct (ks_inversion n h1); ae.
 destruct result1; auto.
 intros (_, ht2).
-destruct (div2 n2 h5) as [(n',h')|(n',h')].
-ae.
+destruct (div2 n2).
 ae.
 intros (_, ht2).
 generalize (ht2 n2 h5); intuition.
