@@ -1,21 +1,24 @@
-module M0
-  use import module ref.Ref
+module Johannes
 
-  let gensym () =
-    let r = ref 0 in
-    (fun () -> {} r := 1 { !r = 1 })
+  type a = {| mutable f1 : int |}
+  type b =  {| f2 : a |}
 
-  region rho0
+  val r1 : a
+  val r2 : b
 
-  let rec loop ... =
+  let h () =
     {}
-    let g = f rho0 () erases rho0 in
-    ... g() writes rho0 ...
-    : erases rho0
-    {}
+    let x = r2.f2 in
+    x.f1 <- 5
+    { r2.f2.f1 = 5 }
+
+  let g () =
+    { }
+    let z = {|f2 = r1|} in
+    z.f2.f1 <- 5
+    { r1.f1 = 5 }
 
 end
-
 
 (*
 module ExcepAndRec
