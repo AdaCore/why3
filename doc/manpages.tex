@@ -18,7 +18,7 @@ provided by the \why environment. These are as follows:
 \end{description}
 
 All these tools accept a common subset of command-line options. In
-particular the option -help which displays the usage and options.
+particular the option \verb|-help| which displays the usage and options.
 \begin{description}
 \item[\texttt{-L} $d$]
   adds $d$ in the load path, to search for theories.
@@ -257,15 +257,38 @@ A copy of the tools already available in the left toolbar, plus:
 A very short online help, and some information about this software.
 \end{description}
 
-\subsection{Preferences}
+\subsection{Preferences Dialog}
 
-The preferences window allows you customize
+The preferences dialog allows you to customize various settings. These
+are groups together under several tabs
+
+\begin{description}
+\item[\textsf{General Settings} tab]
 \begin{itemize}
 \item the default editor to use when the \textsf{Edit} button is
   pressed\footnote{This might be overridden for a specific prover. The only way
   to do that for the moment is to manually edit the configuration file.}
 \item the time limit given to provers, in seconds
-\item the maximal number of simultaneous provers allowed to run in parallel.
+\item the maximal number of simultaneous provers allowed to run in
+  parallel.
+\item A few display settings:
+  \begin{itemize}
+  \item introduce premises: if selected, the goal of the task shownin
+    top-right window is displayed after introduction of universally
+    quantified variables and implications, e.g. a goal of the form
+    $\forall x: t. P \rightarrow Q$ is displayed as
+    \[
+    \begin{array}{l}
+      x : t \\
+      H : P \\
+      \hline
+      Q
+    \end{array}
+    \]
+  \item show labels in formulas
+  \item show source locations in formulas
+  \item show time limit for each proof
+  \end{itemize}
 \item the policy for saving session:
   \begin{itemize}
   \item always save on exit (default): the current state of the proof session is saving on exit
@@ -273,9 +296,16 @@ The preferences window allows you customize
   \item ask whether to save: on exit, a popup window ask whether you
     want to save or not.
   \end{itemize}
-
-\todo{manque des choses}
 \end{itemize}
+\item[\textsf{Provers} tab]
+  Here you can selected which of the installed provers you want to see
+  as buttons in the left toolbar
+\item[\textsf{Uninstalled Provers} tab]
+  Here are shown all the decision previously taken for uninstalled
+  provers, as described in
+  Section~\ref{sec:uninstalledprovers}. You can remove any recorded
+  decision by clicking on it.
+\end{description}
 
 \section{The \texttt{why3ml} tool}
 
@@ -558,7 +588,29 @@ The proof statistics given by option \verb|--stats| are as follows:
   goals \emph{where the prover was successfull}.
 \end{itemize}
 
-\todo{Example}
+For example, here are the session statistics produced on the ``hello
+proof'' example of Section~\ref{chap:starting}.
+\begin{verbatim}
+== Number of goals ==
+  total: 5  proved: 3
+
+== Goals not proved ==
+  +-- file ../hello_proof.why
+    +-- theory HelloProof
+      +-- goal G2
+        +-- transformation split_goal
+          +-- goal G2.0
+
+== Goals proved by only one prover ==
+  +-- file ../hello_proof.why
+    +-- theory HelloProof
+      +-- goal G1: Simplify (1.5.4) (0.01)
+      +-- goal G3: Alt-Ergo (0.93) (0.02)
+
+== Statistics per prover: number of proofs, time (minimum/maximum/average) in seconds ==
+  Alt-Ergo (0.93)      :   2   0.02   0.02   0.02
+  Simplify (1.5.4)     :   2   0.01   0.01   0.01
+\end{verbatim}
 
 \subsection{Command \texttt{latex}}
 
