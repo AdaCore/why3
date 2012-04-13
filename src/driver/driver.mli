@@ -47,6 +47,7 @@ val call_on_buffer :
   command    : string ->
   ?timelimit : int ->
   ?memlimit  : int ->
+  filename   : string ->
   driver -> Buffer.t -> Call_provers.pre_prover_call
 
 

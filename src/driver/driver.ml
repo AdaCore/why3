@@ -227,11 +227,10 @@ let file_of_task drv input_file theory_name task =
 let file_of_theory drv input_file th =
   get_filename drv input_file th.th_name.Ident.id_string "null"
 
-let call_on_buffer ~command ?timelimit ?memlimit drv buffer =
+let call_on_buffer ~command ?timelimit ?memlimit ~filename drv buffer =
   let regexps = drv.drv_regexps in
   let timeregexps = drv.drv_timeregexps in
   let exitcodes = drv.drv_exitcodes in
-  let filename = get_filename drv "" "" "" in
   Call_provers.call_on_buffer
     ~command ?timelimit ?memlimit ~regexps ~timeregexps
     ~exitcodes ~filename buffer
@@ -305,7 +304,15 @@ let prove_task_prepared ~command ?timelimit ?memlimit ?old drv task =
   let buf = Buffer.create 1024 in
   let fmt = formatter_of_buffer buf in
   print_task_prepared ?old drv fmt task; pp_print_flush fmt ();
-  let res = call_on_buffer ~command ?timelimit ?memlimit drv buf in
+  let filename =
+    let pr = Task.task_goal task in
+    let fn = match pr.pr_name.id_loc with
+      | Some loc -> let fn,_,_,_ = Loc.get loc in Filename.basename fn
+      | None -> "" in
+    let fn = try Filename.chop_extension fn with Invalid_argument _ -> fn in
+    get_filename drv fn "T" pr.pr_name.id_string
+  in
+  let res = call_on_buffer ~command ?timelimit ?memlimit ~filename drv buf in
   Buffer.reset buf;
   res
 
