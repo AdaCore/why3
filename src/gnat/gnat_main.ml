@@ -294,7 +294,7 @@ let goal_has_been_tried g =
          (fun pa ->
             (* only count non-obsolete proof attempts with identical options *)
             if not pa.Session.proof_obsolete &&
-               pa.Session.proof_prover = Gnat_config.alt_ergo_conf &&
+               pa.Session.proof_prover = Gnat_config.prover.Whyconf.prover &&
                pa.Session.proof_timelimit = Gnat_config.timeout then
                   raise Exit
          ) g;
@@ -326,7 +326,7 @@ end = struct
    let save_vc goal =
       let expl = Objectives.get_objective goal in
       let task = Session.goal_task goal in
-      let dr = Gnat_config.altergo_driver in
+      let dr = Gnat_config.prover_driver in
       let vc_fn = vc_name expl in
       let cout = open_out vc_fn in
       let fmt  = Format.formatter_of_out_channel cout in
@@ -418,10 +418,10 @@ and schedule_goal g =
    end
 
 and actually_schedule_goal g =
-      M.prover_on_goal env_session sched_state
-        ~callback:interpret_result
-        ~timelimit:Gnat_config.timeout
-        Gnat_config.alt_ergo_conf g
+   M.prover_on_goal env_session sched_state
+     ~callback:interpret_result
+     ~timelimit:Gnat_config.timeout
+     Gnat_config.prover.Whyconf.prover g
 
 let apply_split_goal_if_needed g =
    if Session.PHstr.mem g.Session.goal_transformations Gnat_config.split_name
@@ -459,7 +459,7 @@ let _ =
          Objectives.stat ()
       end;
       Display_Progress.set_num_goals (Objectives.get_num_goals ());
-      Objectives.iter (fun e goalset -> schedule_goal (GoalSet.choose goalset));
+      Objectives.iter (fun _ goalset -> schedule_goal (GoalSet.choose goalset));
       Scheduler.main_loop ();
       Session.save_session env_session.Session.session
     with e when not (Debug.test_flag Debug.stack_trace) ->

@@ -2,6 +2,8 @@ open Why3
 
 type report_mode = Fail | Verbose | Detailed
 
+let gnatprove_why3conf_file = "why3.conf"
+
 let opt_verbose = ref false
 let opt_timeout = ref 10
 let opt_report = ref Fail
@@ -11,6 +13,7 @@ let opt_noproof = ref false
 let opt_filename : string option ref = ref None
 let opt_ide_progress_bar = ref false
 let opt_parallel = ref 1
+let opt_prover : string option ref = ref None
 
 let opt_limit_line : Gnat_expl.loc option ref = ref None
 let opt_limit_subp : Gnat_expl.loc option ref = ref None
@@ -29,6 +32,9 @@ let set_report s =
    else if s <> "fail" then
       Gnat_util.abort_with_message
         "argument for option --report should be one of (fail|all|detailed)."
+
+let set_prover s =
+   opt_prover := Some s
 
 let parse_line_spec caller s =
    try
@@ -75,6 +81,8 @@ let options = Arg.align [
           " Limit proof to a file and line, given by \"file:line\"";
    "--limit-subp", Arg.String set_limit_subp,
           " Limit proof to a subprogram defined by \"file:line\"";
+   "--prover", Arg.String set_prover,
+          " Limit proof to a subprogram defined by \"file:line\"";
    "--ide-progress-bar", Arg.Set opt_ide_progress_bar,
           " Issue information on number of VCs proved";
    "--debug", Arg.Set opt_debug,
@@ -95,7 +103,13 @@ let filename =
          s
 
 let config =
-   try Whyconf.read_config (Some "why3.conf")
+   (* if a prover was given, read default config file and local config file *)
+   try
+      if !opt_prover = None then Whyconf.read_config (Some "why3.conf")
+      else begin
+         let conf = Whyconf.read_config None in
+         Whyconf.merge_config conf gnatprove_why3conf_file
+      end
    with Rc.CannotOpen _ ->
       Gnat_util.abort_with_message "Cannot read file why3.conf."
 
@@ -107,24 +121,27 @@ let env =
 let provers : Whyconf.config_prover Whyconf.Mprover.t =
    Whyconf.get_provers config
 
-let alt_ergo_conf =
-   { Whyconf.prover_name = "Alt-Ergo";
-     prover_version      = "0.94";
-     prover_altern       = "";
-   }
 
-let alt_ergo : Whyconf.config_prover =
+let prover : Whyconf.config_prover =
   try
-    Whyconf.Mprover.find alt_ergo_conf provers
+     match !opt_prover with
+      | Some s -> Whyconf.prover_by_id config s
+      | None ->
+            let conf =
+               { Whyconf.prover_name = "Alt-Ergo";
+                 prover_version      = "0.94";
+                 prover_altern       = "";
+               } in
+            Whyconf.Mprover.find conf provers
   with Not_found ->
     Gnat_util.abort_with_message
-      "Prover alt-ergo not installed or not configured."
+      "Prover not installed or not configured."
 
-(* loading the Alt-Ergo driver *)
-let altergo_driver : Driver.driver =
+(* loading the driver driver *)
+let prover_driver : Driver.driver =
   try
-    Driver.load_driver env alt_ergo.Whyconf.driver
-      alt_ergo.Whyconf.extra_drivers
+    Driver.load_driver env prover.Whyconf.driver
+      prover.Whyconf.extra_drivers
   with e ->
     Format.eprintf "Failed to load driver for alt-ergo: %a"
        Exn_printer.exn_printer e;

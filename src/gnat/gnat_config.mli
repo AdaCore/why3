@@ -4,8 +4,8 @@ open Why3
 
 val config : Whyconf.config
 val env : Env.env
-val altergo_driver : Driver.driver
-val alt_ergo_conf : Whyconf.prover
+val prover_driver : Driver.driver
+val prover : Whyconf.config_prover
 
 (* Configuration settings given or determined by the command line *)
 
