@@ -1050,11 +1050,10 @@ let tr_top_decl = function
   | (sp, kn as _oname), Lib.Leaf lobj ->
     let dep = empty_dep () in
     let env = Global.env () in
-    let tvm = Idmap.empty in
     let bv = Idmap.empty in
     let bn = basename sp in
     let s = string_of_id bn in
-(* Format.printf "tr_top_decl: %s @?" s; *)
+(* Format.printf "tr_top_decl: %s@." s; *)
     begin try
       if is_goal s then raise NotFO;
       let id = Ident.id_fresh s in
@@ -1076,12 +1075,15 @@ let tr_top_decl = function
         if is_Set t || is_Type t then
           ignore (tr_task_ls (empty_dep ()) env r)
         else if is_Prop t then
-          let f = tr_formula dep tvm bv env ty in
+          let (tvm,_), env, f = decomp_type_quantifiers env ty in
+          let f = tr_formula dep tvm bv env f in
           let pr = Decl.create_prsymbol id in
           task := Task.add_prop_decl !task Decl.Paxiom pr f
         else
           raise NotFO
-      with NotFO -> ()
+      with NotFO ->
+(* Format.printf "  IGNORING top decl %s@." s; *)
+        ()
     end
 (* Format.printf "done@." *)
   | _, Lib.CompilingLibrary _
