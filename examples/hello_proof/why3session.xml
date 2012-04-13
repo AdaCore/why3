@@ -1,42 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
+<!DOCTYPE why3session SYSTEM "/usr/local/share/why3/why3session.dtd">
 <why3session
- name="./hello_proof/why3session.xml">
+ name="examples/hello_proof/why3session.xml">
  <prover
   id="0"
   name="Alt-Ergo"
-  version="0.94"/>
+  version="0.93"/>
  <prover
   id="1"
-  name="CVC3"
-  version="2.2"/>
- <prover
-  id="2"
-  name="CVC3"
-  version="2.4.1"/>
- <prover
-  id="3"
   name="Coq"
   version="8.3pl3"/>
  <prover
-  id="4"
+  id="2"
   name="Simplify"
   version="1.5.4"/>
- <prover
-  id="5"
-  name="Z3"
-  version="2.19"/>
- <prover
-  id="6"
-  name="Z3"
-  version="3.2"/>
  <file
   name="../hello_proof.why"
   verified="false"
-  expanded="false">
+  expanded="true">
   <theory
    name="HelloProof"
-   locfile="./hello_proof/../hello_proof.why"
+   locfile="examples/hello_proof/../hello_proof.why"
    loclnum="1" loccnumb="7" loccnume="17"
    verified="false"
    expanded="true">
@@ -44,221 +28,123 @@
     name="My very first Why3 theory"/>
    <goal
     name="G1"
-    locfile="./hello_proof/../hello_proof.why"
+    locfile="examples/hello_proof/../hello_proof.why"
     loclnum="3" loccnumb="7" loccnume="9"
     sum="4daf9675e70ee6481b1153fe95f7c750"
     proved="true"
     expanded="true"
     shape="t">
     <proof
-     prover="5"
-     timelimit="5"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="0"
-     timelimit="5"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
      prover="2"
-     timelimit="5"
+     timelimit="4"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="2"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="4"
-     timelimit="10"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="G2"
-    locfile="./hello_proof/../hello_proof.why"
+    locfile="examples/hello_proof/../hello_proof.why"
     loclnum="5" loccnumb="7" loccnume="9"
     sum="b16d2c9608c416dc0059ba3e95264abe"
     proved="false"
     expanded="true"
     shape="fOtAfIt">
     <proof
-     prover="4"
-     timelimit="10"
+     prover="2"
+     timelimit="4"
      obsolete="false"
      archived="false">
-     <result status="unknown" time="0.00"/>
+     <result status="unknown" time="0.01"/>
+    </proof>
+    <proof
+     prover="0"
+     timelimit="4"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.03"/>
     </proof>
     <transf
      name="split_goal"
      proved="false"
      expanded="true">
      <goal
-      name="G2.1"
-      locfile="./hello_proof/../hello_proof.why"
+      name="G2.0"
+      locfile="examples/hello_proof/../hello_proof.why"
       loclnum="5" loccnumb="7" loccnume="9"
       sum="b84cad55140412a1b6f988cba7a0ebd1"
       proved="false"
       expanded="true"
       shape="fIt">
       <proof
-       prover="5"
-       timelimit="5"
+       prover="1"
+       timelimit="4"
+       edited="hello_proof_HelloProof_G2_3.v"
        obsolete="false"
        archived="false">
-       <result status="unknown" time="0.00"/>
+       <result status="unknown" time="0.76"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="4"
+       obsolete="false"
+       archived="false">
+       <result status="unknown" time="0.01"/>
       </proof>
       <proof
        prover="0"
-       timelimit="5"
+       timelimit="4"
        obsolete="false"
        archived="false">
-       <result status="unknown" time="0.00"/>
-      </proof>
-      <proof
-       prover="3"
-       timelimit="3"
-       edited="hello_proof_HelloProof_G2_1.v"
-       obsolete="false"
-       archived="false">
-       <result status="unknown" time="0.48"/>
-      </proof>
-      <proof
-       prover="6"
-       timelimit="2"
-       obsolete="false"
-       archived="false">
-       <result status="unknown" time="0.00"/>
-      </proof>
-      <proof
-       prover="4"
-       timelimit="10"
-       obsolete="false"
-       archived="false">
-       <result status="unknown" time="0.00"/>
+       <result status="unknown" time="0.03"/>
       </proof>
      </goal>
      <goal
-      name="G2.2"
-      locfile="./hello_proof/../hello_proof.why"
+      name="G2.1"
+      locfile="examples/hello_proof/../hello_proof.why"
       loclnum="5" loccnumb="7" loccnume="9"
       sum="fdf75c799e5829c6e57c69e76f88886a"
       proved="true"
       expanded="true"
       shape="fOt">
       <proof
-       prover="5"
-       timelimit="5"
+       prover="2"
+       timelimit="4"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.00"/>
+       <result status="valid" time="0.01"/>
       </proof>
       <proof
        prover="0"
-       timelimit="5"
+       timelimit="4"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="5"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-      <proof
-       prover="2"
-       timelimit="5"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-      <proof
-       prover="6"
-       timelimit="2"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-      <proof
-       prover="4"
-       timelimit="10"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.00"/>
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
     </transf>
    </goal>
    <goal
     name="G3"
-    locfile="./hello_proof/../hello_proof.why"
+    locfile="examples/hello_proof/../hello_proof.why"
     loclnum="9" loccnumb="7" loccnume="9"
     sum="d89b799516da55943a55251953e1068e"
     proved="true"
     expanded="true"
-    shape="ainfix >=ainfix *V0V0c0F">
+    shape="ainfix &gt;=ainfix *V0V0c0F">
     <proof
-     prover="5"
-     timelimit="5"
+     prover="2"
+     timelimit="4"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.00"/>
+     <result status="unknown" time="0.01"/>
     </proof>
     <proof
      prover="0"
-     timelimit="5"
+     timelimit="4"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="2"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="4"
-     timelimit="3"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="0.00"/>
+     <result status="valid" time="0.02"/>
     </proof>
    </goal>
   </theory>
