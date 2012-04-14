@@ -471,73 +471,16 @@ let show_about_window () =
   let ( _ : GWindow.Buttons.about) = about_dialog#run () in
   about_dialog#destroy ()
 
-let alternatives_frame c (notebook:GPack.notebook) =
-  let label = GMisc.label ~text:"Uninstalled provers" () in
+
+
+
+(**** Preferences Window ***)
+
+let general_settings c (notebook:GPack.notebook) =
+  let label = GMisc.label ~text:"General" () in
   let page =
     GPack.vbox ~homogeneous:false ~packing:
       (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) ()
-  in
-  let frame =
-    GBin.frame ~label:"Click to remove a setting" 
-      ~packing:page#pack ()
-  in
-  let box =
-    GPack.button_box `VERTICAL ~border_width:5 ~spacing:5 
-      ~packing:frame#add ()
-  in
-  let remove button p () =
-    button#destroy ();
-    c.config <- set_policies c.config (Mprover.remove p (get_policies c.config))
-  in
-  let iter p policy =
-    let label =
-      match policy with
-        | CPU_keep -> Pp.sprintf_wnl "proofs with %a kept as they are" print_prover p
-        | CPU_upgrade t ->
-          Pp.sprintf_wnl "proofs with %a moved to %a" print_prover p print_prover t
-        | CPU_duplicate t ->
-          Pp.sprintf_wnl "proofs with %a duplicated to %a" print_prover p print_prover t
-    in
-    let button = GButton.button ~label ~packing:box#add () in
-    let (_ : GtkSignal.id) =
-      button#connect#released ~callback:(remove button p)
-    in ()
-  in
-  Mprover.iter iter (get_policies c.config);
-  let _fillbox =
-    GPack.vbox ~packing:(page#pack ~expand:true) ()
-  in
-  ()
-
-
-let preferences (c : t) =
-  let dialog = GWindow.dialog ~title:"Why3: preferences" () in
-  let vbox = dialog#vbox in
-  let notebook = GPack.notebook ~packing:vbox#add () in
-  (** page 1 **)
-  let label1 = GMisc.label ~text:"General" () in
-  let page1 =
-    GPack.vbox ~homogeneous:false ~packing:
-      (fun w -> ignore(notebook#append_page ~tab_label:label1#coerce w)) ()
-  in
-  (* external processes frame *)
-  let external_processes_frame =
-    GBin.frame ~label:"External processes"
-      ~packing:page1#add ()
-  in
-  (* editor *)
- let hb =
-   GPack.hbox ~homogeneous:false ~packing:external_processes_frame#add ()
- in
- let _ =
-   GMisc.label ~text:"Default editor: " ~packing:(hb#pack ~expand:false) ()
- in
- let editor_entry =
-   GEdit.entry ~text:c.default_editor ~packing:hb#add ()
- in
- let (_ : GtkSignal.id) =
-    editor_entry#connect#changed ~callback:
-      (fun () -> c.default_editor <- editor_entry#text)
   in
   (* debug mode ? *)
 (*
@@ -551,7 +494,7 @@ let preferences (c : t) =
   in
 *)
   (* timelimit ? *)
-  let hb = GPack.hbox ~homogeneous:false ~packing:page1#add () in
+  let hb = GPack.hbox ~homogeneous:false ~packing:page#pack () in
   let _ = GMisc.label ~text:"Time limit: "
     ~packing:(hb#pack ~expand:false) () in
   let timelimit_spin = GEdit.spin_button ~digits:0 ~packing:hb#add () in
@@ -562,7 +505,7 @@ let preferences (c : t) =
       (fun () -> c.time_limit <- timelimit_spin#value_as_int)
   in
   (* nb of processes ? *)
-  let hb = GPack.hbox ~homogeneous:false ~packing:page1#add () in
+  let hb = GPack.hbox ~homogeneous:false ~packing:page#pack () in
   let _ = GMisc.label ~text:"Nb of processes: "
     ~packing:(hb#pack ~expand:false) () in
   let nb_processes_spin = GEdit.spin_button ~digits:0 ~packing:hb#add () in
@@ -574,60 +517,9 @@ let preferences (c : t) =
     nb_processes_spin#connect#value_changed ~callback:
       (fun () -> c.max_running_processes <- nb_processes_spin#value_as_int)
   in
-  (** page 2 **)
-(*
-  let label2 = GMisc.label ~text:"Colors" () in
-  let _color_sel = GMisc.color_selection (* ~title:"Goal color" *)
-    ~show:true
-    ~packing:(fun w -> ignore(notebook#append_page
-                                ~tab_label:label2#coerce w)) ()
-  in
-*)
-(*
-  let (_ : GtkSignal.id) =
-    color_sel#connect ColorSelection.S.color_changed ~callback:
-      (fun c -> Format.eprintf "Gconfig.color_sel : %s@."
-         c)
-  in
-*)
-  (** page 3 **)
-  let label3 = GMisc.label ~text:"Provers" () in
-  let page3 =
-    GPack.vbox ~homogeneous:false ~packing:
-      (fun w -> ignore(notebook#append_page ~tab_label:label3#coerce w)) ()
-  in
-  let frame =
-    GBin.frame ~label:"Provers button shown in the left toolbar"
-      ~packing:page3#add ()
-  in
-  let provers_box =
-    GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
-      ~packing:frame#add ()
-  in
-  let hidden_provers = Hashtbl.create 7 in
-  Mprover.iter
-    (fun _ p ->
-      let p = p.prover in
-      let label = p.prover_name ^ " " ^ p.prover_version in
-      let hidden = ref (List.mem label c.hidden_provers) in
-      Hashtbl.add hidden_provers label hidden;
-      let b =
-        GButton.check_button ~label ~packing:provers_box#add ()
-          ~active:(not !hidden)
-      in
-      let (_ : GtkSignal.id) =
-        b#connect#toggled ~callback:
-          (fun () -> hidden := not !hidden;
-            c.hidden_provers <-
-              Hashtbl.fold
-              (fun l h acc -> if !h then l::acc else acc) hidden_provers [])
-      in ())
-    (Whyconf.get_provers c.config);
-
-  (** page 1 **)
   let display_options_frame =
     GBin.frame ~label:"Display options"
-      ~packing:page1#add ()
+      ~packing:page#pack ()
   in
   (* options for task display *)
   let display_options_box =
@@ -689,7 +581,7 @@ let preferences (c : t) =
   (* session saving policy *)
   let saving_policy_frame =
     GBin.frame ~label:"Session saving policy"
-      ~packing:page1#add ()
+      ~packing:page#pack ()
   in
   let saving_policy_box =
     GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
@@ -722,9 +614,156 @@ let preferences (c : t) =
   let (_ : GtkSignal.id) =
     choice2#connect#toggled ~callback:(set_saving_policy 2)
   in
-  (* page 4 *)
+  let _fillbox =
+    GPack.vbox ~packing:(page#pack ~expand:true) ()
+  in
+  ()
+
+
+(* Page "Provers" *)
+
+let provers_page c (notebook:GPack.notebook) =
+  let label = GMisc.label ~text:"Provers" () in
+  let page =
+    GPack.vbox ~homogeneous:false ~packing:
+      (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) ()
+  in
+  let frame =
+    GBin.frame ~label:"Provers button shown in the left toolbar"
+      ~packing:page#pack ()
+  in
+  let provers_box =
+    GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
+      ~packing:frame#add ()
+  in
+  let hidden_provers = Hashtbl.create 7 in
+  Mprover.iter
+    (fun _ p ->
+      let p = p.prover in
+      let label = p.prover_name ^ " " ^ p.prover_version in
+      let hidden = ref (List.mem label c.hidden_provers) in
+      Hashtbl.add hidden_provers label hidden;
+      let b =
+        GButton.check_button ~label ~packing:provers_box#add ()
+          ~active:(not !hidden)
+      in
+      let (_ : GtkSignal.id) =
+        b#connect#toggled ~callback:
+          (fun () -> hidden := not !hidden;
+            c.hidden_provers <-
+              Hashtbl.fold
+              (fun l h acc -> if !h then l::acc else acc) hidden_provers [])
+      in ())
+    (Whyconf.get_provers c.config);
+  let _fillbox =
+    GPack.vbox ~packing:(page#pack ~expand:true) ()
+  in
+  ()
+
+(* Page "Uninstalled provers" *)
+
+let alternatives_frame c (notebook:GPack.notebook) =
+  let label = GMisc.label ~text:"Uninstalled provers" () in
+  let page =
+    GPack.vbox ~homogeneous:false ~packing:
+      (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) ()
+  in
+  let frame =
+    GBin.frame ~label:"Click to remove a setting"
+      ~packing:page#pack ()
+  in
+  let box =
+    GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
+      ~packing:frame#add ()
+  in
+  let remove button p () =
+    button#destroy ();
+    c.config <- set_policies c.config (Mprover.remove p (get_policies c.config))
+  in
+  let iter p policy =
+    let label =
+      match policy with
+        | CPU_keep -> Pp.sprintf_wnl "proofs with %a kept as they are" print_prover p
+        | CPU_upgrade t ->
+          Pp.sprintf_wnl "proofs with %a moved to %a" print_prover p print_prover t
+        | CPU_duplicate t ->
+          Pp.sprintf_wnl "proofs with %a duplicated to %a" print_prover p print_prover t
+    in
+    let button = GButton.button ~label ~packing:box#add () in
+    let (_ : GtkSignal.id) =
+      button#connect#released ~callback:(remove button p)
+    in ()
+  in
+  Mprover.iter iter (get_policies c.config);
+  let _fillbox =
+    GPack.vbox ~packing:(page#pack ~expand:true) ()
+  in
+  ()
+
+let editors_page c (notebook:GPack.notebook) =
+  let label = GMisc.label ~text:"Editors" () in
+  let page =
+    GPack.vbox ~homogeneous:false ~packing:
+      (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) ()
+  in
+  let default_editor_frame =
+    GBin.frame ~label:"Default editor" ~packing:page#pack ()
+  in
+  let editor_entry =
+   GEdit.entry ~text:c.default_editor ~packing:default_editor_frame#add ()
+  in
+  let (_ : GtkSignal.id) =
+    editor_entry#connect#changed ~callback:
+      (fun () -> c.default_editor <- editor_entry#text)
+  in
+  let frame = GBin.frame ~label:"Specific editors" ~packing:page#pack () in
+  let box = GPack.vbox ~border_width:5 ~packing:frame#add () in
+  let (combo, ((_ : GTree.list_store), column)) =
+    GEdit.combo_box_text ~packing:box#pack
+      ~strings:[ "default" ; "--" ; "Emacs" ; "CoqIDE"; "Emacs (proofgeneral, Coq)"] () in
+  combo#set_row_separator_func
+    (Some (fun m row -> m#get ~row ~column = "--")) ;
+  let ( _ : GtkSignal.id) = combo#connect#changed 
+    ~callback:(fun () ->
+      match combo#active_iter with
+        | None -> ()
+        | Some row -> 
+	  let data = combo#model#get ~row ~column in
+	  Format.eprintf "Combo: selected '%s'@." data) 
+  in
+  let _fillbox =
+    GPack.vbox ~packing:(page#pack ~expand:true) ()
+  in
+  ()
+
+
+                       let preferences (c : t) =
+  let dialog = GWindow.dialog ~title:"Why3: preferences" () in
+  let vbox = dialog#vbox in
+  let notebook = GPack.notebook ~packing:vbox#add () in
+  (** page "general settings" **)
+  general_settings c notebook;
+  (*** page "editors" **)
+  editors_page c notebook;
+  (** page "Provers" **)
+  provers_page c notebook;
+  (*** page "uninstalled provers" *)
   alternatives_frame c notebook;
-  (* buttons *)
+  (** page "Colors" **)
+(*
+  let label2 = GMisc.label ~text:"Colors" () in
+  let _color_sel = GMisc.color_selection (* ~title:"Goal color" *)
+    ~show:true
+    ~packing:(fun w -> ignore(notebook#append_page
+                                ~tab_label:label2#coerce w)) ()
+  in
+  let (_ : GtkSignal.id) =
+    color_sel#connect ColorSelection.S.color_changed ~callback:
+      (fun c -> Format.eprintf "Gconfig.color_sel : %s@."
+         c)
+  in
+*)
+  (** bottom button **)
   dialog#add_button "Close" `CLOSE ;
   let ( _ : GWindow.Buttons.about) = dialog#run () in
   eprintf "saving IDE config file@.";
