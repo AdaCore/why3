@@ -187,9 +187,6 @@ let load_config config original_config =
     | None -> default_ide
     | Some s -> load_ide s
   in
-  Format.eprintf "hidden provers : ";
-  List.iter (fun p -> Format.eprintf "%s" p) ide.ide_hidden_provers;
-  Format.eprintf "@.";
   (* let alterns = *)
   (*   List.fold_left load_altern *)
   (*     Mprover.empty (get_family config "alternative_prover") in *)
@@ -578,16 +575,18 @@ let preferences (c : t) =
       (fun () -> c.max_running_processes <- nb_processes_spin#value_as_int)
   in
   (** page 2 **)
+(*
   let label2 = GMisc.label ~text:"Colors" () in
   let _color_sel = GMisc.color_selection (* ~title:"Goal color" *)
     ~show:true
     ~packing:(fun w -> ignore(notebook#append_page
                                 ~tab_label:label2#coerce w)) ()
   in
+*)
 (*
   let (_ : GtkSignal.id) =
     color_sel#connect ColorSelection.S.color_changed ~callback:
-      (fun _ -> Format.eprintf "Gconfig.color_sel : %s@."
+      (fun c -> Format.eprintf "Gconfig.color_sel : %s@."
          c)
   in
 *)
