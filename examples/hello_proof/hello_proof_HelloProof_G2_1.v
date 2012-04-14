@@ -8,7 +8,6 @@ Require Import Rbase.
 
 Theorem G2 : False.
 (* YOU MAY EDIT THE PROOF BELOW *)
-intuition.
 
 Qed.
 (* DO NOT EDIT BELOW *)
