@@ -570,40 +570,34 @@ let general_settings c (notebook:GPack.notebook) =
       (fun () ->
          c.show_time_limit <- not c.show_time_limit)
   in
-  let set_saving_policy n () = c.saving_policy <- n in
-(*
-  let label3 = GMisc.label ~text:"IDE" () in
-  let page3 =
-    GPack.vbox ~homogeneous:false ~packing:
-      (fun w -> ignore(notebook#append_page ~tab_label:label3#coerce w)) ()
-  in
-*)
   (* session saving policy *)
+  let set_saving_policy n () = c.saving_policy <- n in
   let saving_policy_frame =
     GBin.frame ~label:"Session saving policy"
       ~packing:page#pack ()
   in
   let saving_policy_box =
-    GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
+    GPack.button_box
+      `VERTICAL ~border_width:5 ~spacing:5
       ~packing:saving_policy_frame#add ()
   in
   let choice0 =
     GButton.radio_button
       ~label:"always save on exit"
       ~active:(c.saving_policy = 0)
-      ~packing:saving_policy_box#add ()
+      ~packing:saving_policy_box#pack ()
   in
   let choice1 =
     GButton.radio_button
       ~label:"never save on exit" ~group:choice0#group
       ~active:(c.saving_policy = 1)
-      ~packing:saving_policy_box#add ()
+      ~packing:saving_policy_box#pack ()
   in
   let choice2 =
     GButton.radio_button
       ~label:"ask whether to save on exit" ~group:choice0#group
       ~active:(c.saving_policy = 2)
-      ~packing:saving_policy_box#add ()
+      ~packing:saving_policy_box#pack ()
   in
   let (_ : GtkSignal.id) =
     choice0#connect#toggled ~callback:(set_saving_policy 0)
@@ -718,26 +712,54 @@ let editors_page c (notebook:GPack.notebook) =
   in
   let frame = GBin.frame ~label:"Specific editors" ~packing:page#pack () in
   let box = GPack.vbox ~border_width:5 ~packing:frame#add () in
-  let (combo, ((_ : GTree.list_store), column)) =
-    GEdit.combo_box_text ~packing:box#pack
-      ~strings:[ "default" ; "--" ; "Emacs" ; "CoqIDE"; "Emacs (proofgeneral, Coq)"] () in
-  combo#set_row_separator_func
-    (Some (fun m row -> m#get ~row ~column = "--")) ;
-  let ( _ : GtkSignal.id) = combo#connect#changed 
-    ~callback:(fun () ->
-      match combo#active_iter with
-        | None -> ()
-        | Some row -> 
-	  let data = combo#model#get ~row ~column in
-	  Format.eprintf "Combo: selected '%s'@." data) 
+  let editors = Whyconf.get_editors c.config in
+  let _,strings,indexes =
+    Meditor.fold
+      (fun k _ (i,str,ind) -> (i+1,k::str,Meditor.add k i ind))
+      editors (2, [], Meditor.empty)
   in
+  let strings = "default" :: "--" :: (List.rev strings) in
+  let add_prover p pi =
+    let text = p.prover_name ^ " " ^ p.prover_version in
+    let hb = GPack.hbox ~homogeneous:false ~packing:box#pack () in
+    let _ = GMisc.label ~width:150 ~xalign:0.0 ~text ~packing:(hb#pack ~expand:false) () in
+    let (combo, ((_ : GTree.list_store), column)) =
+      GEdit.combo_box_text ~packing:hb#pack ~strings ()
+    in
+    combo#set_row_separator_func
+      (Some (fun m row -> m#get ~row ~column = "--"));
+    let i =
+      try Meditor.find pi.editor indexes with Not_found -> 0
+    in
+    combo#set_active i;
+    let ( _ : GtkSignal.id) = combo#connect#changed
+      ~callback:(fun () ->
+        match combo#active_iter with
+          | None -> ()
+          | Some row ->
+	    let data = 
+              match combo#model#get ~row ~column with
+                | "default" -> ""
+                | s -> s
+            in
+	    Format.eprintf "prover %a : selected editor '%s'@."
+              print_prover p data;
+            let provers = Whyconf.get_provers c.config in
+            c.config <-
+              Whyconf.set_provers c.config
+              (Mprover.add p { pi with editor = data} provers)
+      )
+    in
+    ()
+  in
+  Mprover.iter add_prover (Whyconf.get_provers c.config);
   let _fillbox =
     GPack.vbox ~packing:(page#pack ~expand:true) ()
   in
   ()
 
 
-                       let preferences (c : t) =
+let preferences (c : t) =
   let dialog = GWindow.dialog ~title:"Why3: preferences" () in
   let vbox = dialog#vbox in
   let notebook = GPack.notebook ~packing:vbox#add () in

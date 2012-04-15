@@ -517,6 +517,8 @@ let () = Exn_printer.register
       | e -> raise e
   )
 
+let get_editors c = c.editors
+
 let editor_by_id whyconf id =
   Meditor.find id whyconf.editors
 

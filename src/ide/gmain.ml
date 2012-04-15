@@ -935,7 +935,20 @@ let (_ : GMenu.image_menu_item) =
   file_factory#add_image_item ~label:"_Preferences" ~callback:
     (fun () ->
       Gconfig.preferences gconfig;
+      begin
+        match !current_env_session with
+          | None -> ()
+          | Some _e ->
+            (* Can't do that since field .whyconf is not mutable *)
+            (* e.Session.whyconf <- gconfig.config *)
+            ()
+      end;
       !refresh_provers ();
+      Mprover.iter
+        (fun p pi ->
+          Format.eprintf "editor for %a : %s@." Whyconf.print_prover p
+            pi.editor)
+        (Whyconf.get_provers gconfig.config);
       M.set_maximum_running_proofs gconfig.max_running_processes sched)
     ()
 

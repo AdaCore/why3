@@ -110,7 +110,7 @@ type config_prover = {
   command : string;   (* "exec why-limit %t %m alt-ergo %f" *)
   driver  : string;   (* "/usr/local/share/why/drivers/ergo-spec.drv" *)
   editor  : string;   (* Dedicated editor *)
-  interactive : bool; (* Interative theorem prover *)
+  interactive : bool; (* Interactive theorem prover *)
   extra_options : string list;
   extra_drivers : string list;
 }
@@ -141,6 +141,9 @@ module Meditor : Stdlib.Map.S with type key = string
 
 val set_editors : config -> config_editor Meditor.t -> config
 (** replace the set of editors *)
+
+val get_editors : config -> config_editor Meditor.t
+(** returns the set of editors *)
 
 val editor_by_id : config -> string -> config_editor
 (** return the configuration of the editor if found, otherwise return
