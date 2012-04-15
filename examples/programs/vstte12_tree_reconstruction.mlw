@@ -139,16 +139,24 @@ module ZipperBased
 
   exception Failure
 
+(*
+  predicate inv (left: list (int, tree)) = match left with
+  | Nil -> true
+  | Cons (d, _) Nil -> d <> 0
+  | Cons (d1, _) ((Cons (d2, _) _) as left') -> d1 <> d2 /\ inv left'
+  end
+*)
+
   let rec tc (left: list (int, tree)) (right: list (int, tree)) : tree
     variant { (length left + length right, length right) } with lex =
-    { (* forall t: tree. depths 0 t <> forest_depths (reverse left) *) }
+    { (* inv left *) }
     match left, right with
     | _, Nil ->
         raise Failure
     | Nil, Cons (v, t) Nil ->
         if v = 0 then t else raise Failure
-    | Nil, Cons vt right' ->
-        tc (Cons vt Nil) right'
+    | Nil, Cons (v, t) right' ->
+        tc (Cons (v, t) Nil) right'
     | Cons (v1, t1) left', Cons (v2, t2) right' ->
         if v1 = v2 then tc left' (Cons (v1 - 1, Node t1 t2) right')
         else tc (Cons (v2, t2) left) right'
