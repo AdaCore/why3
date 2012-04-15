@@ -662,7 +662,7 @@ let check_external_proof eS eT todo a =
           (* nothing to do 
              TODO: report an non replayable proof if some option is set
           *)
-          ()
+          Todo._done todo (g,a.proof_prover,0,Prover_not_installed);
         | Some(ap,npc,a) ->
 (*
       let ap = a.proof_prover in
