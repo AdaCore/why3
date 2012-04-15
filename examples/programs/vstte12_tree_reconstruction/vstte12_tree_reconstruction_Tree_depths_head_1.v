@@ -3,24 +3,26 @@
 Require Import ZArith.
 Require Import Rbase.
 Require int.Int.
+
+(* Why3 assumption *)
 Definition unit  := unit.
 
 Parameter qtmark : Type.
 
 Parameter at1: forall (a:Type), a -> qtmark -> a.
-
 Implicit Arguments at1.
 
 Parameter old: forall (a:Type), a -> a.
-
 Implicit Arguments old.
 
+(* Why3 assumption *)
 Definition implb(x:bool) (y:bool): bool := match (x,
   y) with
   | (true, false) => false
   | (_, _) => true
   end.
 
+(* Why3 assumption *)
 Inductive list (a:Type) :=
   | Nil : list a
   | Cons : a -> (list a) -> list a.
@@ -29,6 +31,7 @@ Implicit Arguments Nil.
 Unset Contextual Implicit.
 Implicit Arguments Cons.
 
+(* Why3 assumption *)
 Set Implicit Arguments.
 Fixpoint length (a:Type)(l:(list a)) {struct l}: Z :=
   match l with
@@ -43,6 +46,7 @@ Axiom Length_nonnegative : forall (a:Type), forall (l:(list a)),
 Axiom Length_nil : forall (a:Type), forall (l:(list a)),
   ((length l) = 0%Z) <-> (l = (Nil :(list a))).
 
+(* Why3 assumption *)
 Set Implicit Arguments.
 Fixpoint infix_plpl (a:Type)(l1:(list a)) (l2:(list a)) {struct l1}: (list
   a) :=
@@ -62,6 +66,7 @@ Axiom Append_l_nil : forall (a:Type), forall (l:(list a)), ((infix_plpl l
 Axiom Append_length : forall (a:Type), forall (l1:(list a)) (l2:(list a)),
   ((length (infix_plpl l1 l2)) = ((length l1) + (length l2))%Z).
 
+(* Why3 assumption *)
 Set Implicit Arguments.
 Fixpoint mem (a:Type)(x:a) (l:(list a)) {struct l}: Prop :=
   match l with
@@ -76,10 +81,12 @@ Axiom mem_append : forall (a:Type), forall (x:a) (l1:(list a)) (l2:(list a)),
 Axiom mem_decomp : forall (a:Type), forall (x:a) (l:(list a)), (mem x l) ->
   exists l1:(list a), exists l2:(list a), (l = (infix_plpl l1 (Cons x l2))).
 
+(* Why3 assumption *)
 Inductive tree  :=
   | Leaf : tree 
   | Node : tree -> tree -> tree .
 
+(* Why3 assumption *)
 Set Implicit Arguments.
 Fixpoint depths(d:Z) (t:tree) {struct t}: (list Z) :=
   match t with
@@ -88,10 +95,9 @@ Fixpoint depths(d:Z) (t:tree) {struct t}: (list Z) :=
   end.
 Unset Implicit Arguments.
 
-(* YOU MAY EDIT THE CONTEXT BELOW *)
 
-(* DO NOT EDIT BELOW *)
 
+(* Why3 goal *)
 Theorem depths_head : forall (t:tree) (d:Z), match (depths d
   t) with
   | (Cons x _) => (d <= x)%Z
@@ -108,6 +114,5 @@ intuition.
 simpl.
 intros; omega.
 Qed.
-(* DO NOT EDIT BELOW *)
 
 

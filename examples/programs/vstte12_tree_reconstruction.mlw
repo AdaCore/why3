@@ -9,12 +9,11 @@
    lists from Why3's standard library.
 *)
 
-module TreeReconstruction
+theory Tree
 
-  use import int.Int
-  use import list.List
-  use import list.Length
-  use import list.Append
+  use export int.Int
+  use export list.List
+  use export list.Append
 
   type tree = Leaf | Node tree tree
 
@@ -32,6 +31,17 @@ module TreeReconstruction
   lemma depths_unique:
     forall t1 t2: tree, d: int, s1 s2: list int.
     depths d t1 ++ s1 = depths d t2 ++ s2 -> t1 = t2 && s1 = s2
+
+  lemma depths_unique2:
+    forall t1 t2: tree, d1 d2: int.
+    depths d1 t1 = depths d2 t2 -> d1 = d2 && t1 = t2
+
+end
+
+module TreeReconstruction
+
+  use export Tree
+  use import list.Length
 
   (* termination of build_rec (below) requires a lexicographic order *)
   predicate lex (x1 x2: (list int, int)) =
@@ -79,7 +89,6 @@ end
 
 module Harness
 
-  use import list.List
   use import module TreeReconstruction
 
   let harness () =
@@ -93,6 +102,77 @@ module Harness
     { false } | Failure -> { true }
 
 end
+
+(*
+  A variant implementation proposed by Jayadev Misra
+  (and proved correct by Natarajan Shankar using PVS).
+
+  Given the input list [x1; x2; ...; xn], we first turn it into the
+  list of pairs [(x1, Leaf); (x2, Leaf); ...; (xn, Leaf)].  Then,
+  repeatedly, we scan this list from left to right, looking for two
+  consecutive pairs (v1, t1) and (v2, t2) with v1 = v2.  Then we
+  replace them with the pair (v1-1, Node t1 t2) and we start again.
+  We stop when there is only one pair left (v,t). Then we must have v=0.
+
+  The implementation below achieves linear complexity using a zipper
+  data structure to traverse the list of pairs. The left list contains
+  the elements already traversed (thus on the left), in reverse order,
+  and the right list contains the elements yet to be traversed.
+
+*)
+
+module ZipperBased
+
+  use import Tree
+  use import int.Lex2
+  use import list.Length
+  use import list.Reverse
+
+  function forest_depths (f: list (int, tree)) : list int = match f with
+  | Nil -> Nil
+  | Cons (d, t) r -> depths d t ++ forest_depths r
+  end
+
+  lemma forest_depths_append:
+    forall f1 f2: list (int, tree).
+    forest_depths (f1 ++ f2) = forest_depths f1 ++ forest_depths f2
+
+  exception Failure
+
+  let rec tc (left: list (int, tree)) (right: list (int, tree)) : tree
+    variant { (length left + length right, length right) } with lex =
+    { (* forall t: tree. depths 0 t <> forest_depths (reverse left) *) }
+    match left, right with
+    | _, Nil ->
+        raise Failure
+    | Nil, Cons (v, t) Nil ->
+        if v = 0 then t else raise Failure
+    | Nil, Cons vt right' ->
+        tc (Cons vt Nil) right'
+    | Cons (v1, t1) left', Cons (v2, t2) right' ->
+        if v1 = v2 then tc left' (Cons (v1 - 1, Node t1 t2) right')
+        else tc (Cons (v2, t2) left) right'
+    end
+    { depths 0 result = forest_depths (reverse left ++ right) }
+    | Failure ->
+    { forall t: tree. depths 0 t <> forest_depths (reverse left ++ right) }
+
+  function map_leaf (l: list int) : list (int, tree) = match l with
+  | Nil -> Nil
+  | Cons d r -> Cons (d, Leaf) (map_leaf r)
+  end
+
+  lemma map_leaf_depths:
+    forall l: list int. forest_depths (map_leaf l) = l
+
+  let build (s: list int) =
+    {}
+    tc Nil (map_leaf s)
+    { depths 0 result = s }
+    | Failure -> { forall t: tree. depths 0 t <> s }
+
+end
+
 
 (*
 Local Variables:
