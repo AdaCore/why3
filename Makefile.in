@@ -1134,6 +1134,7 @@ MODULESTODOC = util/util util/hashweak \
 	core/ident core/ty core/term core/decl core/theory \
 	core/env core/task \
 	driver/whyconf driver/driver \
+	util/rc \
 	session/session session/session_tools session/session_scheduler
 #	transform/introduction \
 #	ide/db
@@ -1142,11 +1143,17 @@ FILESTODOC = $(addsuffix .mli, $(addprefix src/, $(MODULESTODOC)))
 
 apidoc: $(FILESTODOC)
 	mkdir -p doc/apidoc
-	$(OCAMLDOC) -d doc/apidoc -html -keep-code $(INCLUDES) \
+	$(OCAMLDOC) -d doc/apidoc -html -t "Why3 API documentation" \
+		-keep-code $(INCLUDES) \
 		$(LIBINCLUDES) -I src $(FILESTODOC)
 
-install_apidoc: apidoc
-	rsync -av doc/apidoc/ marche@scm.gforge.inria.fr:/home/groups/why3/htdocs/apidoc/
+# could we include also the dependency graph ?
+# $(OCAMLDOC) -o doc/apidoc/dg.dot -dot $(INCLUDES) \
+# 	$(LIBINCLUDES) -I src $(FILESTODOC)
+
+# what is this ? api doc is in wh3.lri.fr/api instead...
+# install_apidoc: apidoc
+# 	rsync -av doc/apidoc/ marche@scm.gforge.inria.fr:/home/groups/why3/htdocs/apidoc/
 
 doc/apidoc.tex: $(FILESTODOC)
 	$(OCAMLDOC) -o doc/apidoc.tex -latex -noheader -notrailer $(INCLUDES) \
