@@ -82,7 +82,7 @@ let options = Arg.align [
    "--limit-subp", Arg.String set_limit_subp,
           " Limit proof to a subprogram defined by \"file:line\"";
    "--prover", Arg.String set_prover,
-          " Limit proof to a subprogram defined by \"file:line\"";
+          " Use prover given in argument instead of Alt-Ergo";
    "--ide-progress-bar", Arg.Set opt_ide_progress_bar,
           " Issue information on number of VCs proved";
    "--debug", Arg.Set opt_debug,
