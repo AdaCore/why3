@@ -12,9 +12,10 @@ provided by the \why environment. These are as follows:
 \item[\texttt{why3ml}] as \texttt{why3} but reads \why{} ML programs instead
 \item[\texttt{why3replayer}] replay the proofs stored in a session,
   for regression test purposes
-\item[\texttt{why3bench}] produces benchmarks
+\item[\texttt{why3bench}] produces benchmarks \todo{obsolete ?}
 \item[\texttt{why3session}] dumps various informations from a proof
   session, and possibly modifies the session.
+\item[\texttt{why3doc}] produces HTML versions of \why source codes.
 \end{description}
 
 All these tools accept a common subset of command-line options. In
@@ -790,6 +791,14 @@ with the same name. If it finds one, the proof attempt is copied to this
 prover and the old proof is set to archived. The corresponding edited
 files, if any, are copied and regenerated for the new prover An archived
 proof is not replayed by why3replayer.
+
+
+
+\section{The \texttt{why3doc} tool}
+\label{sec:why3doc}
+
+\todo{Documenter}
+
 
 
 
