@@ -84,6 +84,7 @@ and 'a proof_attempt = private
       proof_parent : 'a goal;
       mutable proof_state : proof_attempt_status;
       mutable proof_timelimit : int;
+      mutable proof_memlimit : int;
       mutable proof_obsolete : bool;
       mutable proof_archived : bool;
       mutable proof_edited_as : string option;
@@ -267,6 +268,7 @@ val add_external_proof :
   obsolete:bool ->
   archived:bool ->
   timelimit:int ->
+  memlimit:int ->
   edit:string option ->
   'key goal ->
   Whyconf.prover ->
@@ -300,6 +302,7 @@ val update_edit_external_proof :
 
 
 val set_timelimit : int -> 'key proof_attempt -> unit
+val set_memlimit : int -> 'key proof_attempt -> unit
 
 val copy_external_proof :
   ?notify:'key notify ->
@@ -307,6 +310,7 @@ val copy_external_proof :
   ?obsolete:bool ->
   ?archived:bool ->
   ?timelimit:int ->
+  ?memlimit:int ->
   ?edit:string option ->
   ?goal:'key goal ->
   ?prover:Whyconf.prover ->

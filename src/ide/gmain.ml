@@ -468,7 +468,8 @@ let set_proof_state a =
     | S.InternalFailure _ -> "(internal failure)"
     | S.Undone S.Interrupted -> "(interrupted)"
     | S.Undone (S.Scheduled | S.Running) ->
-        Format.sprintf "[limit=%d.0]" a.S.proof_timelimit
+        Format.sprintf "[limit=%d sec., %d M]" 
+          a.S.proof_timelimit a.S.proof_memlimit
   in
   let t = if obsolete then t ^ " (obsolete)" else t in
   (* TODO find a better way to signal arhived row *)
@@ -806,7 +807,9 @@ let () =
 (*****************************************************)
 
 let prover_on_selected_goals pr =
-  let timelimit = Whyconf.timelimit (Whyconf.get_main gconfig.config) in
+  let main = Whyconf.get_main gconfig.config in
+  let timelimit = Whyconf.timelimit main in
+  let memlimit = Whyconf.memlimit main in
   List.iter
     (fun row ->
       try
@@ -814,7 +817,7 @@ let prover_on_selected_goals pr =
        M.run_prover
          (env_session()) sched
          ~context_unproved_goals_only:!context_unproved_goals_only
-         ~timelimit
+         ~timelimit ~memlimit
          pr a
       with e ->
         eprintf "@[Exception raised while running a prover:@ %a@.@]"

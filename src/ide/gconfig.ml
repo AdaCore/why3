@@ -493,24 +493,36 @@ let general_settings c (notebook:GPack.notebook) =
       (fun () -> c.verbose <- 1 - c.verbose)
   in
 *)
-  (* timelimit ? *)
+  (* time limit *)
   let main = Whyconf.get_main c.config in
+  let width = 200 and xalign = 0.0 in
   let timelimit = ref (Whyconf.timelimit main) in
-  let memlimit = ref (Whyconf.memlimit main) in
   let hb = GPack.hbox ~homogeneous:false ~packing:page#pack () in
-  let _ = GMisc.label ~text:"Time limit: "
+  let _ = GMisc.label ~text:"Time limit (in sec.): " ~width ~xalign
     ~packing:(hb#pack ~expand:false) () in
   let timelimit_spin = GEdit.spin_button ~digits:0 ~packing:hb#add () in
-  timelimit_spin#adjustment#set_bounds ~lower:2. ~upper:300. ~step_incr:1. ();
+  timelimit_spin#adjustment#set_bounds ~lower:0. ~upper:300. ~step_incr:1. ();
   timelimit_spin#adjustment#set_value (float_of_int !timelimit);
   let (_ : GtkSignal.id) =
     timelimit_spin#connect#value_changed ~callback:
       (fun () -> timelimit := timelimit_spin#value_as_int)
   in
+  (* mem limit *)
+  let memlimit = ref (Whyconf.memlimit main) in
+  let hb = GPack.hbox ~homogeneous:false ~packing:page#pack () in
+  let _ = GMisc.label ~text:"Memory limit (in Mb): " ~width ~xalign
+    ~packing:(hb#pack ~expand:false) () in
+  let memlimit_spin = GEdit.spin_button ~digits:0 ~packing:hb#add () in
+  memlimit_spin#adjustment#set_bounds ~lower:0. ~upper:4000. ~step_incr:100. ();
+  memlimit_spin#adjustment#set_value (float_of_int !memlimit);
+  let (_ : GtkSignal.id) =
+    memlimit_spin#connect#value_changed ~callback:
+      (fun () -> memlimit := memlimit_spin#value_as_int)
+  in
   (* nb of processes ? *)
   let nb_processes = ref (Whyconf.running_provers_max main) in
   let hb = GPack.hbox ~homogeneous:false ~packing:page#pack () in
-  let _ = GMisc.label ~text:"Nb of processes: "
+  let _ = GMisc.label ~text:"Nb of processes: " ~width ~xalign
     ~packing:(hb#pack ~expand:false) () in
   let nb_processes_spin = GEdit.spin_button ~digits:0 ~packing:hb#add () in
   nb_processes_spin#adjustment#set_bounds

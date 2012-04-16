@@ -202,9 +202,9 @@ let default_main =
     libdir = Config.libdir;
     datadir = Config.datadir;
     loadpath = default_loadpath;
-    timelimit = 10;
-    memlimit = 0;
-    running_provers_max = 2;
+    timelimit = 5;   (* 5 seconds *)
+    memlimit = 1000; (* 1 Mb *)
+    running_provers_max = 2; (* two provers run in parallel *)
     plugins = [];
   }
 

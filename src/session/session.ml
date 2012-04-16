@@ -67,6 +67,7 @@ and 'a proof_attempt =
       proof_parent : 'a goal;
       mutable proof_state : proof_attempt_status;
       mutable proof_timelimit : int;
+      mutable proof_memlimit : int;
       mutable proof_obsolete : bool;
       mutable proof_archived : bool;
       mutable proof_edited_as : string option;
@@ -341,9 +342,10 @@ let opt lab fmt = function
 
 let save_proof_attempt provers fmt _key a =
   fprintf fmt
-    "@\n@[<v 1><proof@ prover=\"%i\"@ timelimit=\"%d\"@ %a\
-obsolete=\"%b\"@ archived=\"%b\">"
+    "@\n@[<v 1><proof@ prover=\"%i\"@ timelimit=\"%d\"@ \
+memlimit=\"%d\"@ %aobsolete=\"%b\"@ archived=\"%b\">"
     (Mprover.find a.proof_prover provers) a.proof_timelimit
+    a.proof_memlimit
     (opt "edited") a.proof_edited_as a.proof_obsolete
     a.proof_archived;
   save_status fmt a.proof_state;
@@ -546,7 +548,7 @@ type 'a keygen = ?parent:'a -> unit -> 'a
 let add_external_proof
     ?(notify=notify)
     ~(keygen:'a keygen) ~obsolete
-    ~archived ~timelimit ~edit (g:'a goal) p result =
+    ~archived ~timelimit ~memlimit ~edit (g:'a goal) p result =
   assert (edit <> Some "");
   let key = keygen ~parent:g.goal_key () in
   let a = { proof_prover = p;
@@ -556,6 +558,7 @@ let add_external_proof
             proof_archived = archived;
             proof_state = result;
             proof_timelimit = timelimit;
+            proof_memlimit = memlimit;
             proof_edited_as = edit;
           }
   in
@@ -586,6 +589,7 @@ let change_prover a p =
 let set_edited_as edited_as a = a.proof_edited_as <- edited_as
 
 let set_timelimit timelimit a = a.proof_timelimit <- timelimit
+let set_memlimit memlimit a = a.proof_memlimit <- memlimit
 
 let set_obsolete ?(notify=notify) a =
   a.proof_obsolete <- true;
@@ -825,16 +829,19 @@ and load_proof_or_transf ~old_provers mg a =
         let edit = match edit with None | Some "" -> None | _ -> edit in
         let obsolete = bool_attribute "obsolete" a true in
         let archived = bool_attribute "archived" a false in
-        let timelimit = int_attribute "timelimit" a (-1) in
+        let timelimit = int_attribute "timelimit" a 2 in
+        let memlimit = int_attribute "memlimit" a 0 in
+(*
         if timelimit < 0 then begin
-            eprintf "[Error] incorrector unspecified  timelimit '%i'@."
+            eprintf "[Error] incorrect or unspecified  timelimit '%i'@."
               timelimit;
             raise (LoadError (a,sprintf "incorrect or unspecified timelimit %i"
               timelimit))
         end;
+*)
         let (_ : 'a proof_attempt) =
           add_external_proof ~keygen ~archived ~obsolete
-            ~timelimit ~edit mg p res
+            ~timelimit ~memlimit ~edit mg p res
         in
         ()
     | "transf" ->
@@ -1167,7 +1174,7 @@ let ft_of_pa a =
     But since it will be perhaps removed...
  *)
 let copy_external_proof
-    ?notify ~keygen ?obsolete ?archived ?timelimit ?edit
+    ?notify ~keygen ?obsolete ?archived ?timelimit ?memlimit ?edit
     ?goal ?prover ?attempt_status ?env_session ?session a =
   let session = match env_session with
     | Some eS -> Some eS.session
@@ -1175,6 +1182,7 @@ let copy_external_proof
   let obsolete = def_option a.proof_obsolete obsolete in
   let archived = def_option a.proof_archived archived in
   let timelimit = def_option a.proof_timelimit timelimit in
+  let memlimit = def_option a.proof_memlimit memlimit in
   let pas = def_option a.proof_state attempt_status in
   let ngoal = def_option a.proof_parent goal in
   let nprover = match prover with
@@ -1221,7 +1229,7 @@ let copy_external_proof
             Some (dst_file)
   in
   add_external_proof ?notify ~keygen
-    ~obsolete ~archived ~timelimit ~edit ngoal nprover pas
+    ~obsolete ~archived ~timelimit ~memlimit ~edit ngoal nprover pas
 
 exception UnloadableProver of Whyconf.prover
 
@@ -1274,10 +1282,10 @@ let print_attempt_status fmt = function
   | InternalFailure _ -> pp_print_string fmt "Failure"
 
 let print_external_proof fmt p =
-  fprintf fmt "%a - %a (%i)%s%s%s"
+  fprintf fmt "%a - %a (%i, %i)%s%s%s"
     Whyconf.print_prover p.proof_prover
     print_attempt_status p.proof_state
-    p.proof_timelimit
+    p.proof_timelimit p.proof_memlimit
     (if p.proof_obsolete then " obsolete" else "")
     (if p.proof_archived then " archived" else "")
     (if p.proof_edited_as <> None then " edited" else "")
@@ -1607,6 +1615,7 @@ let merge_proof ~keygen obsolete to_goal _ from_proof =
        ~obsolete:(obsolete || from_proof.proof_obsolete)
        ~archived:from_proof.proof_archived
        ~timelimit:from_proof.proof_timelimit
+       ~memlimit:from_proof.proof_memlimit
        ~edit:from_proof.proof_edited_as
        to_goal
        from_proof.proof_prover

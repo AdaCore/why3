@@ -458,6 +458,7 @@ let run_external_proof eS eT ?callback a =
           begin
           let previous_result,previous_obs = a.proof_state,a.proof_obsolete in
           let timelimit = adapt_timelimit a in
+          let memlimit = a.proof_memlimit in
           let callback result =
             begin match result with
               | Undone Interrupted ->
@@ -486,7 +487,7 @@ let run_external_proof eS eT ?callback a =
                                  npc.prover_config.Whyconf.extra_options) in
           (* eprintf "scheduling it...@."; *)
           schedule_proof_attempt
-            ~timelimit ~memlimit:0
+            ~timelimit ~memlimit
             ?old ~command
             ~driver:npc.prover_driver
             ~callback
@@ -494,15 +495,16 @@ let run_external_proof eS eT ?callback a =
             (goal_task g)
         end
 
-let prover_on_goal eS eT ?callback ~timelimit p g =
+let prover_on_goal eS eT ?callback ~timelimit ~memlimit p g =
   let a =
     try
       let a = PHprover.find g.goal_external_proofs p in
       set_timelimit timelimit a;
+      set_memlimit memlimit a;
       a
     with Not_found ->
       let ep = add_external_proof ~keygen:O.create ~obsolete:false
-        ~archived:false ~timelimit
+        ~archived:false ~timelimit ~memlimit 
         ~edit:None g p (Undone Interrupted) in
       O.init ep.proof_key (Proof_attempt ep);
       ep
@@ -510,35 +512,35 @@ let prover_on_goal eS eT ?callback ~timelimit p g =
   run_external_proof eS eT ?callback a
 
 let prover_on_goal_or_children eS eT
-    ~context_unproved_goals_only ~timelimit p g =
+    ~context_unproved_goals_only ~timelimit ~memlimit p g =
   goal_iter_leaf_goal ~unproved_only:context_unproved_goals_only
-    (prover_on_goal eS eT ~timelimit p) g
+    (prover_on_goal eS eT ~timelimit ~memlimit p) g
 
-let run_prover eS eT ~context_unproved_goals_only ~timelimit pr a =
+let run_prover eS eT ~context_unproved_goals_only ~timelimit ~memlimit pr a =
   match a with
     | Goal g ->
         prover_on_goal_or_children eS eT
-          ~context_unproved_goals_only ~timelimit pr g
+          ~context_unproved_goals_only ~timelimit ~memlimit pr g
     | Theory th ->
         List.iter
           (prover_on_goal_or_children eS eT
-             ~context_unproved_goals_only ~timelimit pr)
+             ~context_unproved_goals_only ~timelimit ~memlimit pr)
           th.theory_goals
     | File file ->
         List.iter
           (fun th ->
              List.iter
                (prover_on_goal_or_children eS eT
-                  ~context_unproved_goals_only ~timelimit pr)
+                  ~context_unproved_goals_only ~timelimit ~memlimit pr)
                th.theory_goals)
           file.file_theories
     | Proof_attempt a ->
         prover_on_goal_or_children eS eT
-          ~context_unproved_goals_only ~timelimit pr a.proof_parent
+          ~context_unproved_goals_only ~timelimit ~memlimit pr a.proof_parent
     | Transf tr ->
         List.iter
           (prover_on_goal_or_children eS eT
-             ~context_unproved_goals_only ~timelimit pr)
+             ~context_unproved_goals_only ~timelimit ~memlimit pr)
           tr.transf_goals
 
 (**********************************)
@@ -692,6 +694,7 @@ let check_external_proof eS eT todo a =
               a in
           *)
           let timelimit = adapt_timelimit a in
+          let memlimit = a.proof_memlimit in
           let callback result =
               match result with
                 | Undone Scheduled | Undone Running | Undone Interrupted -> ()
@@ -725,7 +728,7 @@ let check_external_proof eS eT todo a =
             String.concat " " (npc.prover_config.Whyconf.command ::
                                  npc.prover_config.Whyconf.extra_options) in
           schedule_proof_attempt eT
-            ~timelimit ~memlimit:0
+            ~timelimit ~memlimit
             ?old ~command
             ~driver:npc.prover_driver
             ~callback
@@ -752,7 +755,7 @@ let check_all eS eT ~callback =
 (* play all                        *)
 (***********************************)
 
-let rec play_on_goal_and_children eS eT ~timelimit todo l g =
+let rec play_on_goal_and_children eS eT ~timelimit ~memlimit todo l g =
   let callback _key status =
     match status with
       | Undone Running | Undone Scheduled -> ()
@@ -766,24 +769,24 @@ let rec play_on_goal_and_children eS eT ~timelimit todo l g =
       (* eprintf "todo increased to %d@." todo.Todo.todo; *)
       (* eprintf "prover %a on goal %s@." *)
       (*   Whyconf.print_prover p g.goal_name.Ident.id_string; *)
-      prover_on_goal eS eT ~callback ~timelimit p g)
+      prover_on_goal eS eT ~callback ~timelimit ~memlimit p g)
     l;
   PHstr.iter
     (fun _ t ->
        List.iter
-         (play_on_goal_and_children eS eT ~timelimit todo l)
+         (play_on_goal_and_children eS eT ~timelimit ~memlimit todo l)
          t.transf_goals)
     g.goal_transformations
 
 
-let play_all eS eT ~callback ~timelimit l =
+let play_all eS eT ~callback ~timelimit ~memlimit l =
   let todo = Todo.create (ref ()) (fun _ _ -> ())  in
   PHstr.iter
     (fun _ file ->
       List.iter
         (fun th ->
           List.iter
-            (play_on_goal_and_children eS eT ~timelimit todo l)
+            (play_on_goal_and_children eS eT ~timelimit ~memlimit todo l)
             th.theory_goals)
         file.file_theories)
     eS.session.session_files;

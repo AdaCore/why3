@@ -413,7 +413,7 @@ let run_as_bench env_session =
     eprintf " done.@.";
     exit 0
   in
-  M.play_all env_session sched ~callback ~timelimit:2 provers;
+  M.play_all env_session sched ~callback ~timelimit:2 ~memlimit:0 provers;
   main_loop ();
   eprintf "main replayer (in bench mode) exited unexpectedly@.";
   exit 1
