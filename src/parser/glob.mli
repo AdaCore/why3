@@ -18,10 +18,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Format
+open Ident
 
-val print_header : formatter -> ?title:string -> ?css:string -> unit -> unit
-val print_footer : formatter -> unit -> unit
+val def: ident -> unit
+  (** [def id] registers the definition point for [id] *)
 
-val style_css : string -> unit
-  (* write a default CSS in the given file *)
+val use: Loc.position -> ident -> unit
+  (** [add loc id] registers that [id] was used at position [loc] *)
+
+val locate: fname:string -> line:int -> column:int -> ident

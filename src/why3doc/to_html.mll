@@ -24,54 +24,30 @@
 
   open Format
 
-  (* command line parsing *)
-
-  let usage_msg = sprintf
-    "Usage: %s [-o directory] [file...]"
-    (Filename.basename Sys.argv.(0))
-
-  let opt_output = ref None
-  let opt_queue = Queue.create ()
-  let opt_body = ref false
-
-  let option_list = Arg.align [
-    "-o", Arg.String (fun s -> opt_output := Some s),
-      "<dir>  Print files in <dir>";
-    "--output", Arg.String (fun s -> opt_output := Some s),
-      "  same as -o";
-    "-b", Arg.Set opt_body,
-      "  outputs HTML body only";
-  ]
-
-  let add_opt_file x = Queue.add x opt_queue
-
-  let () = Arg.parse option_list add_opt_file usage_msg
-
-  (* let count = ref 0 *)
-  (* let newline fmt () = incr count; fprintf fmt "\n%3d: " !count *)
-  (* let () = newline () *)
   let newline fmt () = fprintf fmt "\n"
 
-  let is_keyword =
+  let make_table l =
     let ht = Hashtbl.create 97 in
-    List.iter
-      (fun s -> Hashtbl.add ht s ())
-      [ "theory"; "end";
-        "type"; "function"; "predicate"; "clone"; "use";
-        "import"; "export"; "axiom"; "inductive"; "goal"; "lemma";
+    List.iter (fun s -> Hashtbl.add ht s ()) l;
+    Hashtbl.mem ht
 
-        "match"; "with"; "let"; "in"; "if"; "then"; "else";
-        "forall"; "exists";
+  let is_keyword1 = make_table
+    [ "theory"; "end";
+      "type"; "constant"; "function"; "predicate"; "inductive";
+      "clone"; "use";
+      "import"; "export"; "axiom"; "goal"; "lemma";]
+  let is_keyword2 = make_table
+    [ "match"; "with"; "let"; "in"; "if"; "then"; "else";
+      "forall"; "exists";
 
-        "as"; "assert"; "begin";
-        "do"; "done"; "downto"; "else";
-        "exception"; "val"; "for"; "fun";
-        "if"; "in";
-        "module"; "mutable";
-        "rec"; "then"; "to";
-        "try"; "while"; "invariant"; "variant"; "raise"; "label";
-      ];
-    fun s -> Hashtbl.mem ht s
+      "as"; "assert"; "begin";
+      "do"; "done"; "downto"; "else";
+      "exception"; "val"; "for"; "fun";
+      "if"; "in";
+      "module"; "mutable";
+      "rec"; "then"; "to";
+      "try"; "while"; "invariant"; "variant"; "raise"; "label";
+    ]
 
 }
 
@@ -79,17 +55,21 @@ let ident = ['A'-'Z' 'a'-'z' '_'] ['A'-'Z' 'a'-'z' '0'-'9' '_']*
 
 rule scan fmt = parse
   | "(*)"  { fprintf fmt "(*)"; scan fmt lexbuf }
-  | "(*"   { fprintf fmt "<font color=\"990000\">(*";
+  | "(*"   { fprintf fmt "<font class=\"comment\">(*";
              comment fmt lexbuf;
              fprintf fmt "</font>";
              scan fmt lexbuf }
   | eof    { () }
   | ident as s
-           { if is_keyword s then begin
-               fprintf fmt "<font color=\"green\">%s</font>" s
-             end else
-               fprintf fmt "%s" s;
-             scan fmt lexbuf }
+    { if is_keyword1 s then
+        fprintf fmt "<font class=\"keyword1\">%s</font>" s
+      else if is_keyword2 s then
+        fprintf fmt "<font class=\"keyword2\">%s</font>" s
+      else begin
+        (* let loc = get_loc lexbuf in *)
+        fprintf fmt "%s" s
+      end;
+      scan fmt lexbuf }
   | "<"    { fprintf fmt "&lt;"; scan fmt lexbuf }
   | "&"    { fprintf fmt "&amp;"; scan fmt lexbuf }
   | "\n"   { newline fmt (); scan fmt lexbuf }
@@ -117,92 +97,20 @@ and string fmt = parse
 
 {
 
-  let style_css fname =
-    let c = open_out fname in
-    output_string c
-"a:visited {color : #416DFF; text-decoration : none; }
-a:link {color : #416DFF; text-decoration : none;}
-a:hover {color : Red; text-decoration : none; background-color: #5FFF88}
-a:active {color : Red; text-decoration : underline; }
-.keyword { font-weight : bold ; color : Red }
-.keywordsign { color : #C04600 }
-.superscript { font-size : 4 }
-.subscript { font-size : 4 }
-.comment { color : Green }
-.constructor { color : Blue }
-.type { color : #5C6585 }
-.string { color : Maroon }
-.warning { color : Red ; font-weight : bold }
-.info { margin-left : 3em; margin-right : 3em }
-.code { color : #465F91 ; }
-h1 { font-size : 20pt ; text-align: center; }
-h2 { font-size : 20pt ; border: 1px solid #000000; margin-top: 5px; margin-bottom: 2px;text-align: center; background-color: #90BDFF ;padding: 2px; }
-h3 { font-size : 20pt ; border: 1px solid #000000; margin-top: 5px; margin-bottom: 2px;text-align: center; background-color: #90DDFF ;padding: 2px; }
-h4 { font-size : 20pt ; border: 1px solid #000000; margin-top: 5px; margin-bottom: 2px;text-align: center; background-color: #90EDFF ;padding: 2px; }
-h5 { font-size : 20pt ; border: 1px solid #000000; margin-top: 5px; margin-bottom: 2px;text-align: center; background-color: #90FDFF ;padding: 2px; }
-h6 { font-size : 20pt ; border: 1px solid #000000; margin-top: 5px; margin-bottom: 2px;text-align: center; background-color: #90BDFF ; padding: 2px; }
-div.h7 { font-size : 20pt ; border: 1px solid #000000; margin-top: 5px; margin-bottom: 2px;text-align: center; background-color: #90DDFF ; padding: 2px; }
-div.h8 { font-size : 20pt ; border: 1px solid #000000; margin-top: 5px; margin-bottom: 2px;text-align: center; background-color: #F0FFFF ; padding: 2px; }
-div.h9 { font-size : 20pt ; border: 1px solid #000000; margin-top: 5px; margin-bottom: 2px;text-align: center; background-color: #FFFFFF ; padding: 2px; }
-.typetable { border-style : hidden }
-.indextable { border-style : hidden }
-.paramstable { border-style : hidden ; padding: 5pt 5pt}
-body { background-color : White }
-tr { background-color : White }
-td.typefieldcomment { background-color : #FFFFFF }
-pre { margin-bottom: 4px }
-div.sig_block {margin-left: 2em}";
-    close_out c
-
-  let css =
-    let css_fname = match !opt_output with
-      | None -> "style.css"
-      | Some dir -> Filename.concat dir "style.css"
-    in
-    if !opt_body then
-      None
-    else begin
-      if not (Sys.file_exists css_fname) then style_css css_fname;
-      Some css_fname
-    end
-
-  let print_header fmt ?(title="") () =
-    fprintf fmt "<html>@\n<head>@\n";
-    begin match css with
-      | None -> ()
-      | Some f -> fprintf fmt
-          "<link rel=\"stylesheet\" href=\"%s\" type=\"text/css\">@\n" f
-    end;
-    fprintf fmt "<title>%s</title>@\n" title;
-    fprintf fmt "</head>@\n<body>@\n"
-
-  let print_footer fmt () =
-    fprintf fmt "</body></html>\n"
-
-  let do_file fname =
+  let do_file fmt fname =
     (* input *)
     let cin = open_in fname in
     let lb = Lexing.from_channel cin in
     (* output *)
-    let f = Filename.basename fname in
-    let base =
-      match !opt_output with
-        | None -> f
-        | Some dir -> Filename.concat dir f
-    in
-    let fhtml = base ^ ".html" in
-    let cout = open_out fhtml in
-    let fmt = formatter_of_out_channel cout in
-    if not !opt_body then print_header fmt ~title:f ();
     fprintf fmt "<pre>@\n";
     scan fmt lb;
     fprintf fmt "</pre>@\n";
-    if not !opt_body then print_footer fmt ();
-    close_out cout
+    close_in cin
 
+(*
   let () =
     Queue.iter do_file opt_queue
-
+*)
 }
 
 (*

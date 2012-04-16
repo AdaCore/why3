@@ -20,12 +20,13 @@
 
 open Format
 open Why3
+open Util
 open Theory
 
 (* command line parsing *)
 
 let usage_msg = sprintf
-  "Usage: %s [-L directory] [file...]"
+  "Usage: %s [options...] [files...]"
   (Filename.basename Sys.argv.(0))
 
 let opt_loadpath = ref []
@@ -59,27 +60,28 @@ let css =
 
 let do_file env fname =
   let m = Env.read_file env fname in
-  let base =
-    let f = Filename.basename fname in
-    match !opt_output with
-      | None -> f
-      | Some dir -> Filename.concat dir f
+  let add _s _th = () (* Glob.def th.th_name *) in
+  Mstr.iter add m
+
+let print_file fname =
+  let f = Filename.basename fname in
+  let base = match !opt_output with
+    | None -> f
+    | Some dir -> Filename.concat dir f
   in
-  let print_theory s th =
-    let fhtml = base ^ "." ^ s ^ ".html" in
-    let c = open_out fhtml in
-    let fmt = formatter_of_out_channel c in
-    Doc_html.print_header fmt ~title:s ~css ();
-    Doc_html.print_theory fmt th;
-    Doc_html.print_footer fmt ();
-    close_out c
-  in
-  Mstr.iter print_theory m
+  let fhtml = base ^ ".html" in
+  let c = open_out fhtml in
+  let fmt = formatter_of_out_channel c in
+  Doc_html.print_header fmt ~title:f ~css ();
+  To_html.do_file fmt fname;
+  Doc_html.print_footer fmt ();
+  close_out c
 
 let () =
   try
-    let env = Lexer.create_env !opt_loadpath in
-    Queue.iter (do_file env) opt_queue
+    let env = Env.create_env !opt_loadpath in
+    Queue.iter (do_file env) opt_queue;
+    Queue.iter print_file opt_queue
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1

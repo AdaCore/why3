@@ -120,7 +120,7 @@ LIB_UTIL = stdlib exn_printer pp debug loc print_tree print_number \
 
 LIB_CORE = ident ty term pattern decl theory task pretty env trans printer
 
-LIB_PARSER = ptree denv typing parser lexer
+LIB_PARSER = ptree denv glob typing parser lexer
 
 LIB_DRIVER = call_provers driver_ast driver_parser driver_lexer driver \
 	     whyconf autodetection
@@ -968,8 +968,7 @@ install_no_local::
 
 WHY3DOCGENERATED = src/why3doc/to_html.ml
 
-# WHY3DOC_FILES = doc_html doc_main
-WHY3DOC_FILES = to_html
+WHY3DOC_FILES = doc_html to_html doc_main
 
 WHY3DOCMODULES = $(addprefix src/why3doc/, $(WHY3DOC_FILES))
 
