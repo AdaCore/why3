@@ -119,10 +119,11 @@ type loaded_provers = loaded_prover option PHprover.t
 
 type 'a env_session =
     { env : Env.env;
-      whyconf : Whyconf.config;
+      mutable whyconf : Whyconf.config;
       loaded_provers : loaded_provers;
       session : 'a session}
 
+let update_env_session_config e c = e.whyconf <- c
 
 (*************************)
 (**       Iterators      *)
@@ -1137,6 +1138,8 @@ let load_prover eS prover =
     in
     PHprover.add eS.loaded_provers prover r;
     r
+
+let unload_provers eS = PHprover.clear eS.loaded_provers
 
 let () = Exn_printer.register
   (fun fmt exn ->

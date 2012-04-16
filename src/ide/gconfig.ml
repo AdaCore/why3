@@ -41,10 +41,7 @@ type t =
       mutable window_height : int;
       mutable tree_width : int;
       mutable task_height : int;
-      mutable time_limit : int;
-      mutable mem_limit : int;
       mutable verbose : int;
-      mutable max_running_processes : int;
       mutable default_editor : string;
       mutable intro_premises : bool;
       mutable show_labels : bool;
@@ -182,7 +179,7 @@ let load_altern alterns (_,section) =
   Mprover.add unknown known alterns
 
 let load_config config original_config =
-  let main = get_main config in
+  (* let main = get_main config in *)
   let ide  = match get_section config "ide" with
     | None -> default_ide
     | Some s -> load_ide s
@@ -198,8 +195,6 @@ let load_config config original_config =
     window_width  = ide.ide_window_width;
     tree_width    = ide.ide_tree_width;
     task_height   = ide.ide_task_height;
-    time_limit    = Whyconf.timelimit main;
-    mem_limit     = Whyconf.memlimit main;
     verbose       = ide.ide_verbose;
     intro_premises= ide.ide_intro_premises ;
     show_labels   = ide.ide_show_labels ;
@@ -209,7 +204,6 @@ let load_config config original_config =
     premise_color = ide.ide_premise_color;
     goal_color = ide.ide_goal_color;
     error_color = ide.ide_error_color;
-    max_running_processes = Whyconf.running_provers_max main;
     default_editor = ide.ide_default_editor;
     config         = config;
     original_config = original_config;
@@ -238,14 +232,28 @@ let load_config config original_config =
 
   *)
 
+let debug_save_config n c =
+  let coq = { prover_name = "Coq" ; prover_version = "8.3pl3"; 
+              prover_altern = "" } in
+  let p = Mprover.find coq (get_provers c) in
+  let time = Whyconf.timelimit (Whyconf.get_main c) in
+  Format.eprintf "[debug] save_config %d: timelimit=%d ; editor for Coq=%s@." 
+    n time p.editor
+
 let save_config t =
+  eprintf "[Info] saving IDE config file@.";
+  (* taking original config, without the extra_config *)
   let config = t.original_config in
-  let config = set_main config
-    (set_limits (get_main config)
-       t.time_limit t.mem_limit t.max_running_processes)
-  in
-  (* let _,alterns = Mprover.fold save_altern t.altern_provers (0,[]) in *)
-  (* let config = set_family config "alternative_prover" alterns in *)
+  (* copy possibly modified settings to original config *)
+  let new_main = Whyconf.get_main t.config in
+  let time = Whyconf.timelimit new_main in
+  let mem = Whyconf.memlimit new_main in
+  let nb = Whyconf.running_provers_max new_main in
+  let config = set_main config (set_limits (get_main config) time mem nb) in
+  (* copy also provers section since it may have changed (the editor
+     can be set via the preferences dialog) *)
+  let config = set_provers config (get_provers t.config) in
+  (* copy also the possibly changed policies *)
   let config = set_policies config (get_policies t.config) in
   let ide = empty_section in
   let ide = set_int ide "window_height" t.window_height in
@@ -262,17 +270,9 @@ let save_config t =
   let ide = set_string ide "goal_color" t.goal_color in
   let ide = set_string ide "error_color" t.error_color in
   let ide = set_string ide "default_editor" t.default_editor in
-  (* let ide = set_string ~default:"ask" ide "replace_prover" *)
-  (*   (match t.replace_prover with *)
-  (*     | CRP_Ask -> "ask" *)
-  (*     | CRP_Not_Obsolete -> "never not obsolete")  in *)
   let ide = set_stringl ide "hidden_prover" t.hidden_provers in
   let config = set_section config "ide" ide in
-(* TODO: store newly detected provers !
-  let config = set_provers config
-    (Mstr.fold save_prover t.provers Mstr.empty) in
-*)
-  save_config config
+  Whyconf.save_config config
 
 let read_config conf_file extra_files =
   try
@@ -494,17 +494,21 @@ let general_settings c (notebook:GPack.notebook) =
   in
 *)
   (* timelimit ? *)
+  let main = Whyconf.get_main c.config in
+  let timelimit = ref (Whyconf.timelimit main) in
+  let memlimit = ref (Whyconf.memlimit main) in
   let hb = GPack.hbox ~homogeneous:false ~packing:page#pack () in
   let _ = GMisc.label ~text:"Time limit: "
     ~packing:(hb#pack ~expand:false) () in
   let timelimit_spin = GEdit.spin_button ~digits:0 ~packing:hb#add () in
   timelimit_spin#adjustment#set_bounds ~lower:2. ~upper:300. ~step_incr:1. ();
-  timelimit_spin#adjustment#set_value (float_of_int c.time_limit);
+  timelimit_spin#adjustment#set_value (float_of_int !timelimit);
   let (_ : GtkSignal.id) =
     timelimit_spin#connect#value_changed ~callback:
-      (fun () -> c.time_limit <- timelimit_spin#value_as_int)
+      (fun () -> timelimit := timelimit_spin#value_as_int)
   in
   (* nb of processes ? *)
+  let nb_processes = ref (Whyconf.running_provers_max main) in
   let hb = GPack.hbox ~homogeneous:false ~packing:page#pack () in
   let _ = GMisc.label ~text:"Nb of processes: "
     ~packing:(hb#pack ~expand:false) () in
@@ -512,10 +516,10 @@ let general_settings c (notebook:GPack.notebook) =
   nb_processes_spin#adjustment#set_bounds
     ~lower:1. ~upper:16. ~step_incr:1. ();
   nb_processes_spin#adjustment#set_value
-    (float_of_int c.max_running_processes);
+    (float_of_int !nb_processes);
   let (_ : GtkSignal.id) =
     nb_processes_spin#connect#value_changed ~callback:
-      (fun () -> c.max_running_processes <- nb_processes_spin#value_as_int)
+      (fun () -> nb_processes := nb_processes_spin#value_as_int)
   in
   let display_options_frame =
     GBin.frame ~label:"Display options"
@@ -611,8 +615,7 @@ let general_settings c (notebook:GPack.notebook) =
   let _fillbox =
     GPack.vbox ~packing:(page#pack ~expand:true) ()
   in
-  ()
-
+  timelimit, memlimit, nb_processes
 
 (* Page "Provers" *)
 
@@ -742,8 +745,8 @@ let editors_page c (notebook:GPack.notebook) =
                 | "default" -> ""
                 | s -> s
             in
-	    Format.eprintf "prover %a : selected editor '%s'@."
-              print_prover p data;
+	    (* Format.eprintf "prover %a : selected editor '%s'@." *)
+            (*   print_prover p data; *)
             let provers = Whyconf.get_provers c.config in
             c.config <-
               Whyconf.set_provers c.config
@@ -764,7 +767,7 @@ let preferences (c : t) =
   let vbox = dialog#vbox in
   let notebook = GPack.notebook ~packing:vbox#add () in
   (** page "general settings" **)
-  general_settings c notebook;
+  let t,m,n = general_settings c notebook in
   (*** page "editors" **)
   editors_page c notebook;
   (** page "Provers" **)
@@ -788,7 +791,13 @@ let preferences (c : t) =
   (** bottom button **)
   dialog#add_button "Close" `CLOSE ;
   let ( _ : GWindow.Buttons.about) = dialog#run () in
-  eprintf "saving IDE config file@.";
+  (* let config = set_main config *)
+  (*   (set_limits (get_main config) *)
+  (*      t.time_limit t.mem_limit t.max_running_processes) *)
+  (* in *)
+
+  c.config <- Whyconf.set_main c.config
+    (Whyconf.set_limits (Whyconf.get_main c.config) !t !m !n);
   save_config ();
   dialog#destroy ()
 

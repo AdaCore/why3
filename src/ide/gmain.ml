@@ -414,7 +414,7 @@ let clear model = model#clear ()
 let image_of_result ~obsolete result =
   match result with
     | Session.Undone Session.Interrupted -> !image_undone
-    | Session.Undone Session.Unedited 
+    | Session.Undone Session.Unedited
     | Session.Undone Session.JustEdited -> !image_unknown
     | Session.Undone Session.Scheduled -> !image_scheduled
     | Session.Undone Session.Running -> !image_running
@@ -536,7 +536,7 @@ let update_task_view a =
     | S.Goal g ->
       if (Gconfig.config ()).intro_premises then
         let trans =
-          Trans.lookup_transform intro_transformation (env_session()).S.env 
+          Trans.lookup_transform intro_transformation (env_session()).S.env
         in
         display_task (Trans.apply trans (S.goal_task g))
       else
@@ -587,7 +587,7 @@ module M = Session_scheduler.Make
        session_needs_saving := true;
        let (_:bool) = goals_model#remove row#iter in ()
 
-     let reset () = 
+     let reset () =
        session_needs_saving := true;
        goals_model#clear ()
 
@@ -765,7 +765,9 @@ let sched =
       M.update_session ~allow_obsolete:true session gconfig.env
         gconfig.Gconfig.config
     in
-    let sched = M.init gconfig.max_running_processes in
+    let sched = M.init (Whyconf.running_provers_max
+                          (Whyconf.get_main gconfig.config))
+    in
     dprintf debug "@]@\n[Info] Opening session: done@.";
     session_needs_saving := false;
     current_env_session := Some env;
@@ -804,6 +806,7 @@ let () =
 (*****************************************************)
 
 let prover_on_selected_goals pr =
+  let timelimit = Whyconf.timelimit (Whyconf.get_main gconfig.config) in
   List.iter
     (fun row ->
       try
@@ -811,7 +814,7 @@ let prover_on_selected_goals pr =
        M.run_prover
          (env_session()) sched
          ~context_unproved_goals_only:!context_unproved_goals_only
-         ~timelimit:gconfig.time_limit
+         ~timelimit
          pr a
       with e ->
         eprintf "@[Exception raised while running a prover:@ %a@.@]"
@@ -938,18 +941,20 @@ let (_ : GMenu.image_menu_item) =
       begin
         match !current_env_session with
           | None -> ()
-          | Some _e ->
-            (* Can't do that since field .whyconf is not mutable *)
-            (* e.Session.whyconf <- gconfig.config *)
-            ()
+          | Some e ->
+              Session.update_env_session_config e gconfig.config;
+              Session.unload_provers e
       end;
       !refresh_provers ();
+(*
       Mprover.iter
         (fun p pi ->
           Format.eprintf "editor for %a : %s@." Whyconf.print_prover p
             pi.editor)
         (Whyconf.get_provers gconfig.config);
-      M.set_maximum_running_proofs gconfig.max_running_processes sched)
+*)
+      let nb = Whyconf.running_provers_max (Whyconf.get_main gconfig.config) in
+      M.set_maximum_running_proofs nb sched)
     ()
 
 let add_refresh_provers f _msg =
@@ -975,7 +980,6 @@ let save_session () =
 
 
 let exit_function ?(destroy=false) () =
-  eprintf "[Info] saving IDE config file@.";
   save_config ();
   if not !session_needs_saving then GMain.quit () else
   match (Gconfig.config ()).saving_policy with
@@ -1023,7 +1027,7 @@ let enlarge_font () =
   ()
 
 let reduce_font () =
-  decr font_size; 
+  decr font_size;
   change_font ();
 (*
   GConfig.save ()
@@ -1511,8 +1515,18 @@ let edit_selected_row r =
     | S.File _file ->
         ()
     | S.Proof_attempt a ->
-        M.edit_proof
-          (env_session()) sched ~default_editor:gconfig.default_editor a
+        let e = env_session () in
+(*
+        let coq = { prover_name = "Coq" ; prover_version = "8.3pl3";
+                    prover_altern = "" } in
+        let c = e.Session.whyconf in
+        let p = Mprover.find coq (get_provers c) in
+        let time = Whyconf.timelimit (Whyconf.get_main c) in
+        Format.eprintf
+          "[debug] save_config %d: timelimit=%d ; editor for Coq=%s@."
+          0 time p.editor;
+*)
+        M.edit_proof e sched ~default_editor:gconfig.default_editor a
     | S.Transf _ -> ()
 
 let edit_current_proof () =
@@ -1695,7 +1709,7 @@ let () =
 (***************)
 
 
- 
+
 (* to be run when a row in the tree view is selected *)
 let select_row r =
   let ind = goals_model#get ~row:r#iter ~column:index_column in

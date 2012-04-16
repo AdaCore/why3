@@ -173,12 +173,19 @@ type loaded_provers = loaded_prover option PHprover.t
 
 type 'a env_session = private
     { env : Env.env;
-      whyconf : Whyconf.config;
+      mutable whyconf : Whyconf.config;
       loaded_provers : loaded_provers;
       session : 'a session}
 
+val update_env_session_config : 'a env_session -> Whyconf.config -> unit
+(** updates the configuration *)
+
 val load_prover : 'a env_session -> Whyconf.prover -> loaded_prover option
 (** load a prover *)
+
+val unload_provers : 'a env_session -> unit
+(** forces unloading of all provers, 
+    to force reading again the configuration *)
 
 (** {2 Update session} *)
 

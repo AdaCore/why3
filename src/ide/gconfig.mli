@@ -21,20 +21,12 @@
 open Why3
 open Whyconf
 
-(** Todo do something generic perhaps*)
-(* type conf_replace_prover = *)
-(*   | CRP_Ask *)
-(*   | CRP_Not_Obsolete *)
-
 type t =
     { mutable window_width : int;
       mutable window_height : int;
       mutable tree_width : int;
       mutable task_height : int;
-      mutable time_limit : int;
-      mutable mem_limit : int;
       mutable verbose : int;
-      mutable max_running_processes : int;
       mutable default_editor : string;
       mutable intro_premises : bool;
       mutable show_labels : bool;
