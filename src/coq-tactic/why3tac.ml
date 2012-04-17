@@ -285,24 +285,24 @@ let print_dep fmt =
 (* the task under construction *)
 let task = ref None
 
-let th_int = Env.find_theory env ["int"] "Int"
-let th_eucl = Env.find_theory env ["int"] "EuclideanDivision"
-let th_real = Env.find_theory env ["real"] "Real"
+let th_int = lazy (Env.find_theory env ["int"] "Int")
+let th_eucl = lazy (Env.find_theory env ["int"] "EuclideanDivision")
+let th_real = lazy (Env.find_theory env ["real"] "Real")
 
 let why_constant_int dep s =
-  task := Task.use_export !task th_int;
+  task := Task.use_export !task (Lazy.force th_int);
   dep := { !dep with dep_use_int = true };
-  Theory.ns_find_ls th_int.Theory.th_export s
+  Theory.ns_find_ls (Lazy.force th_int).Theory.th_export s
 
 let why_constant_eucl dep s =
-  task := Task.use_export !task th_eucl;
+  task := Task.use_export !task (Lazy.force th_eucl);
   dep := { !dep with dep_use_eucl = true };
-  Theory.ns_find_ls th_int.Theory.th_export s
+  Theory.ns_find_ls (Lazy.force th_eucl).Theory.th_export s
 
 let why_constant_real dep s =
-  task := Task.use_export !task th_real;
+  task := Task.use_export !task (Lazy.force th_real);
   dep := { !dep with dep_use_real = true };
-  Theory.ns_find_ls th_real.Theory.th_export s
+  Theory.ns_find_ls (Lazy.force th_real).Theory.th_export s
 
 let rec add_local_decls d =
   let id = Ident.Sid.choose d.Decl.d_news in
@@ -310,9 +310,9 @@ let rec add_local_decls d =
     assert (Decl.Mdecl.mem d !global_dep);
     let dep = Decl.Mdecl.find d !global_dep in
     Decl.Sdecl.iter add_local_decls dep.dep_decls;
-    if dep.dep_use_int then task := Task.use_export !task th_int;
-    if dep.dep_use_eucl then task := Task.use_export !task th_eucl;
-    if dep.dep_use_real then task := Task.use_export !task th_real;
+    if dep.dep_use_int then task := Task.use_export !task (Lazy.force th_int);
+    if dep.dep_use_eucl then task := Task.use_export !task (Lazy.force th_eucl);
+    if dep.dep_use_real then task := Task.use_export !task (Lazy.force th_real);
     try
       task := Task.add_decl !task d
     with Decl.UnknownIdent id ->
