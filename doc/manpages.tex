@@ -786,19 +786,20 @@ corresponds to \verb|--filter-verified-goal --conservative| and
 removes the proof attempts that are not verified but which correspond
 to verified goals.
 
-\todo{A adapter en fonction de la decision sur l'upgrade de prover}
+% pour l'instant on ne documente pas
+% \todo{A adapter en fonction de la decision sur l'upgrade de prover}
 
-If you just want to update one session with updated provers you can
-use \verb|--convert-unknown| instead of the option \verb|--to-prover|.
-\begin{verbatim}
-why3session copy  --convert-unknown
-\end{verbatim}
-For each proof attempt associated to an unknown prover (a prover not in
-\verb|.why3.conf|) and not archived, it will try to find a known prover
-with the same name. If it finds one, the proof attempt is copied to this
-prover and the old proof is set to archived. The corresponding edited
-files, if any, are copied and regenerated for the new prover An archived
-proof is not replayed by why3replayer.
+% If you just want to update one session with updated provers you can
+% use \verb|--convert-unknown| instead of the option \verb|--to-prover|.
+% \begin{verbatim}
+% why3session copy  --convert-unknown
+% \end{verbatim}
+% For each proof attempt associated to an unknown prover (a prover not in
+% \verb|.why3.conf|) and not archived, it will try to find a known prover
+% with the same name. If it finds one, the proof attempt is copied to this
+% prover and the old proof is set to archived. The corresponding edited
+% files, if any, are copied and regenerated for the new prover An archived
+% proof is not replayed by why3replayer.
 
 
 

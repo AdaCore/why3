@@ -65,9 +65,11 @@ let spec =
    " the proof is set to archive" ) ::
   ("--unset-archive", Arg.Unit unset_opt_archived,
    " the proof is set to replayable" ) ::
+(*
   ("--to-known-prover",
    Arg.Set opt_to_known,
    " convert the unknown provers to the most similar known prover.")::
+*)
   ["--to-prover",
    Arg.String (fun s -> opt_to_prover := Some (read_opt_prover s)),
    " the proof is copied to this new prover";
