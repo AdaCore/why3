@@ -18,15 +18,54 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Format
+open Why3
 open Ident
 
-val flag: Debug.flag
+let loadpath = ref []
+let set_loadpath l = loadpath := l
 
-val dummy_id: ident
+let output_dir = ref None
+let set_output_dir d = output_dir := d
 
-val use: Loc.position -> ident -> unit
-  (** [add loc id] registers that [id] was used at position [loc] *)
+let output_file fname =
+  let f = Filename.basename fname in
+  let base = match !output_dir with
+    | None -> f
+    | Some dir -> Filename.concat dir f
+  in
+  base ^ ".html"
 
-val locate: string * int * int -> ident
-  (** [locate pos] returns the ident used at position [pos], if any,
-      or raises [Not_found] *)
+type tag = string
+
+type file = {
+  tags: (int * int, tag) Hashtbl.t; (* line, column -> tag *)
+}
+
+let files = Hashtbl.create 17
+
+let add_file fname =
+  Hashtbl.add files fname { tags = Hashtbl.create 17 }
+
+let add_ident id = match id.id_loc with
+  | None ->
+      ()
+  | Some loc ->
+      let f, l, c, _ = Loc.get loc in
+      try
+        let f = Hashtbl.find files f in
+        let t = id.id_string ^ "_" ^ string_of_int l in (* TODO: improve? *)
+        Hashtbl.add f.tags (l, c) t
+      with Not_found ->
+        ()
+
+let is_def (fn, l, c) =
+  let f = Hashtbl.find files fn in
+  Hashtbl.find f.tags (l, c)
+
+let locate id = match id.id_loc with
+  | None ->
+      raise Not_found
+  | Some loc ->
+      let fn, l, c, _ = Loc.get loc in
+      output_file fn, is_def (fn, l, c)

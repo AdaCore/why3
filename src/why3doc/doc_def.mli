@@ -18,15 +18,27 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Format
+open Why3
 open Ident
 
-val flag: Debug.flag
+(* records definition locations *)
 
-val dummy_id: ident
+val set_loadpath: string list -> unit
+val set_output_dir: string option -> unit
 
-val use: Loc.position -> ident -> unit
-  (** [add loc id] registers that [id] was used at position [loc] *)
+val output_file: string -> string
 
-val locate: string * int * int -> ident
-  (** [locate pos] returns the ident used at position [pos], if any,
-      or raises [Not_found] *)
+val add_file: string -> unit
+
+val add_ident: ident -> unit
+
+type tag = string
+
+val is_def: string * int * int -> tag
+  (* if [loc] is a definition point, returns the corresponding tag,
+     otrherwise raises [Not_found] *)
+
+val locate: ident -> string * tag
+  (* or raises [Not_found] *)
+

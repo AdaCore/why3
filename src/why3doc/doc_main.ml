@@ -23,6 +23,8 @@ open Why3
 open Util
 open Theory
 
+let () = Debug.set_flag Glob.flag
+
 (* command line parsing *)
 
 let usage_msg = sprintf
@@ -48,7 +50,9 @@ let () =
   Arg.parse option_list add_opt_file usage_msg;
   let config = Whyconf.read_config None in
   let main = Whyconf.get_main config in
-  opt_loadpath := List.rev_append !opt_loadpath (Whyconf.loadpath main)
+  opt_loadpath := List.rev_append !opt_loadpath (Whyconf.loadpath main);
+  Doc_def.set_loadpath !opt_loadpath;
+  Doc_def.set_output_dir !opt_output
 
 let css =
   let css_fname = match !opt_output with
@@ -60,24 +64,21 @@ let css =
 
 let do_file env fname =
   let m = Env.read_file env fname in
-  let add _s _th = () (* Glob.def th.th_name *) in
+  let add _s th = Doc_def.add_ident th.th_name in
   Mstr.iter add m
 
 let print_file fname =
-  let f = Filename.basename fname in
-  let base = match !opt_output with
-    | None -> f
-    | Some dir -> Filename.concat dir f
-  in
-  let fhtml = base ^ ".html" in
+  let fhtml = Doc_def.output_file fname in
   let c = open_out fhtml in
   let fmt = formatter_of_out_channel c in
+  let f = Filename.basename fname in
   Doc_html.print_header fmt ~title:f ~css ();
-  To_html.do_file fmt fname;
+  Doc_lexer.do_file fmt fname;
   Doc_html.print_footer fmt ();
   close_out c
 
 let () =
+  Queue.iter Doc_def.add_file opt_queue;
   try
     let env = Env.create_env !opt_loadpath in
     Queue.iter (do_file env) opt_queue;

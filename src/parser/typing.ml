@@ -171,19 +171,25 @@ let rec dty uc env = function
       let ts = ts_tuple (List.length tyl) in
       tyapp ts (List.map (dty uc env) tyl)
 
-let find_ns find p ns =
+let find_ns get_id find p ns =
   let loc = qloc p in
   let sl = string_list_of_qualid [] p in
-  try find ns sl
+  try
+    let r = find ns sl in
+    if Debug.test_flag Glob.flag then Glob.use loc (get_id r);
+    r
   with Not_found -> error ~loc (UnboundSymbol sl)
 
-let find_prop_ns = find_ns ns_find_pr
+let get_id_prop p = p.pr_name
+let find_prop_ns = find_ns get_id_prop ns_find_pr
 let find_prop p uc = find_prop_ns p (get_namespace uc)
 
-let find_tysymbol_ns = find_ns ns_find_ts
+let get_id_ts ts = ts.ts_name
+let find_tysymbol_ns = find_ns get_id_ts ns_find_ts
 let find_tysymbol q uc = find_tysymbol_ns q (get_namespace uc)
 
-let find_lsymbol_ns = find_ns ns_find_ls
+let get_id_ls ls = ls.ls_name
+let find_lsymbol_ns = find_ns get_id_ls ns_find_ls
 let find_lsymbol q uc = find_lsymbol_ns q (get_namespace uc)
 
 let find_fsymbol_ns q ns =
@@ -197,7 +203,8 @@ let find_psymbol_ns q ns =
 let find_fsymbol q uc = find_fsymbol_ns q (get_namespace uc)
 let find_psymbol q uc = find_psymbol_ns q (get_namespace uc)
 
-let find_namespace_ns = find_ns ns_find_ns
+let get_dummy_id _ = Glob.dummy_id
+let find_namespace_ns = find_ns get_dummy_id ns_find_ns
 let find_namespace q uc = find_namespace_ns q (get_namespace uc)
 
 let specialize_lsymbol p uc =
@@ -1170,6 +1177,7 @@ let add_use_clone env lenv th (loc, use, subst) =
   let use_or_clone th =
     let q, id = split_qualid use.use_theory in
     let t = find_theory env lenv q id in
+    if Debug.test_flag Glob.flag then Glob.use (qloc use.use_theory) t.th_name;
     match subst with
     | None -> use_export th t
     | Some s -> clone_export th t (type_inst th t s)

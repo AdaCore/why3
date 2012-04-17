@@ -20,20 +20,23 @@
 
 open Ident
 
+let flag = Debug.register_flag "glob"
+let () = Debug.unset_flag flag (* make sure it is unset by default *)
+
+let dummy_id = id_register (id_fresh "dummy")
+
 let glob = Hashtbl.create 5003
+  (* could be improved with nested hash tables *)
 
-let add id = match id.id_loc with
+let with_loc f = function
   | None -> ()
-  | Some loc ->
-      let f, l, c, _ = Loc.get loc in
-Format.eprintf "ADD GLOB: id=%s at %s/%d/%d@." id.id_string f l c;
-      Hashtbl.add glob (f, l, c) id
+  | Some loc when loc = Loc.dummy_position -> ()
+  | Some loc -> f loc
 
-let def _id =
-  assert false (*TODO*)
+let use loc id =
+  let f, l, c, _ = Loc.get loc in
+(* Format.eprintf "GLOB USE: id=%s at %s/%d/%d@." id.id_string f l c; *)
+  Hashtbl.add glob (f, l, c) id
 
-let use _loc _id =
-  assert false (*TODO*)
-
-let locate ~fname ~line ~column = Hashtbl.find glob (fname, line, column)
-
+let locate pos =
+  Hashtbl.find glob pos
