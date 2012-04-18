@@ -55,9 +55,12 @@ let () =
   Doc_def.set_output_dir !opt_output
 
 let css =
-  let css_fname = match !opt_output with
+  let css_fname = 
+   (* no ! it is relative file name 
+    match !opt_output with
     | None -> "style.css"
-    | Some dir -> Filename.concat dir "style.css"
+    | Some dir -> Filename.concat dir "style.css" *)
+    "style.css"
   in
   if not (Sys.file_exists css_fname) then Doc_html.style_css css_fname;
   css_fname

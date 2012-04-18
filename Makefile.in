@@ -1159,7 +1159,7 @@ apidoc: $(FILESTODOC)
 # $(OCAMLDOC) -o doc/apidoc/dg.dot -dot $(INCLUDES) \
 # 	$(LIBINCLUDES) -I src $(FILESTODOC)
 
-# what is this ? api doc is in wh3.lri.fr/api instead...
+# what is this ? api doc is in why3.lri.fr/api instead...
 # install_apidoc: apidoc
 # 	rsync -av doc/apidoc/ marche@scm.gforge.inria.fr:/home/groups/why3/htdocs/apidoc/
 
@@ -1169,6 +1169,26 @@ doc/apidoc.tex: $(FILESTODOC)
 
 clean::
 	rm -f doc/apidoc/*
+
+##########
+# Stdlib formatted with why3doc
+##########
+
+.PHONY: stdlibdoc
+
+STDLIBS = bool comparison relations \
+	algebra int real number floating_point \
+	option list map set bag graph
+# function ? sum ? tptp ?
+
+STDLIBFILES = $(addsuffix .why, $(addprefix theories/, $(STDLIBS)))
+
+stdlibdoc: $(STDLIBFILES) bin/why3doc
+	mkdir -p doc/stdlibdoc
+	bin/why3doc -o doc/stdlibdoc $(STDLIBFILES)
+
+clean::
+	rm -f doc/stdlibdoc/*
 
 ################
 # generic rules
