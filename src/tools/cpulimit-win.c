@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
   FILETIME ft_start, ft_stop, ft_system, ft_user;
   ULONGLONG ull_start, ull_stop, ull_system, ull_user;
   double cpu_time, wall_time;
-  int i;
+  int i,showtime,hidetime;
   unsigned ex;
   unsigned long s = 0; // length of args after concat
   char * p; // command line parameter
@@ -37,18 +37,16 @@ int main(int argc, char *argv[]) {
   si.cb = sizeof(si);
   ZeroMemory(&pi, sizeof(pi));
 
-  showtime = argc >= 4 && !strncmp("-s",argv[3],3);
-  hidetime = argc >= 4 && !strncmp("-h",argv[3],3);
-
-  if (argc < 5 || !(showtime || hidetime)) {
+  showtime = argc >= 3 && !strncmp("-s",argv[2],3);
+  hidetime = argc >= 3 && !strncmp("-h",argv[2],3);
+  if (argc < 4 || !(showtime || hidetime)) {
     fprintf(stderr, "usage: %s <time limit in seconds> <virtual memory limit in MiB>\n"
                     "          <show/hide cpu time: -s|-h> <command> <args>...\n\n"
                     "Zero sets no limit (keeps the actual limit)\n", argv[0]);
     return EXIT_FAILURE;
   }
-
-  // concats argv[4..] into a single command line parameter
-  for (i = 4; i < argc; i++)
+  // concats argv[3..] into a single command line parameter
+  for (i = 3; i < argc; i++)
     s += strlen(argv[i]) + 1;
   // CreateProcess does not allow more than 32767 bytes for command line parameter
   if (s > 32767) {
@@ -61,7 +59,7 @@ int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
   *p = '\0';
-  for (i = 4; i < argc; i++) {
+  for (i = 3; i < argc; i++) {
     strncat(p, argv[i], strlen(argv[i]));
     if (i < argc - 1) strcat(p, " ");
   }
@@ -82,7 +80,7 @@ int main(int argc, char *argv[]) {
     ull_user = (((ULONGLONG) ft_user.dwHighDateTime) << 32) + ft_user.dwLowDateTime;
     cpu_time = (double)((ull_system + ull_user + 0.0) / 10000000U);
     wall_time = (double)((ull_stop - ull_start + 0.0) / 10000000U);
-    fprintf(stdout, "why3cpulimit time : %f s\n", cpu_time);
+    fprintf(stdout, "why3cpulimit time : %f s\n", cpu_time, wall_time);
   }
   CloseHandle(pi.hProcess);
   CloseHandle(pi.hThread);
