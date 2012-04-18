@@ -838,6 +838,12 @@ src/coq-tactic/.why3-vo-opt: lib/coq-tactic/Why3.v lib/coq-tactic/why3tac.cmxs
 	    WHY3NOCONFIG=42 $(COQC) -opt -I lib/coq-tactic/ $< && \
 	    touch src/coq-tactic/.why3-vo-opt
 
+test-coq-tactic.byte: src/coq-tactic/.why3-vo-byte
+	$(COQC) -byte -I lib/coq-tactic/ src/coq-tactic/test.v
+
+test-coq-tactic.opt: src/coq-tactic/.why3-vo-opt
+	$(COQC) -opt -I lib/coq-tactic/ src/coq-tactic/test.v
+
 # depend and clean targets
 
 ifneq "$(MAKECMDGOALS)" "clean"
@@ -1025,6 +1031,9 @@ install_local: bin/why3doc
 bench:: bin/why3.@OCAMLBEST@ bin/why3ml.@OCAMLBEST@ bin/why3config.@OCAMLBEST@ plugins $(TOOLS)
 	$(MAKE) test-api.@OCAMLBEST@
 	sh bench/bench "bin/why3.@OCAMLBEST@" "bin/why3ml.@OCAMLBEST@"
+	@if test "@enable_coq_plugin@" = "yes"; then \
+	   echo "=== checking the Coq tactic ==="; \
+	   $(MAKE) test-coq-tactic.@OCAMLBEST@; fi
 
 ###############
 # test targets

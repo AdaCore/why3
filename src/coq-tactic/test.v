@@ -28,11 +28,6 @@ with forest : Set :=
   | Nil : forest
   | Cons : tree -> forest -> forest.
 
-Print plus.
-
-Print tree_rect.
-
-
 Fixpoint tree_size (t:tree) : Z := match t with
   | Leaf => 0
   | Node _ f => 1 + forest_size f end
@@ -129,13 +124,9 @@ Qed.
 
 End S.
 
-Print All.
-
 Goal True.
 ae.
 Qed.
-
-Print sorted.
 
 Goal sorted _ (@nil nat).
 ae.
@@ -177,8 +168,6 @@ Definition p' (x:nat) := x=O.
 Goal p' O.
 ae.
 Qed.
-
-Print plus.
 
 Goal plus O O = O.
 ae.
@@ -226,8 +215,6 @@ ae.
 Qed.
 
 (* recursive predicate definition *)
-
-Print In.
 
 Goal In 0 (cons 1 (cons 0 nil)).
 ae.
@@ -321,6 +308,17 @@ with pforest' : Type -> Type :=
   | PCons' : forall (a:Type), ptree' a -> pforest' a -> pforest' a.
 
 Goal forall x : ptree' Z, x=x.
+ae.
+Qed.
+
+(* order of type parameters matters *)
+
+Definition wgt (k:(nat * Z)%type) := match k with
+  | (_, p) => p
+  end.
+Implicit Arguments wgt.
+
+Goal wgt (S O, 3) = 3.
 ae.
 Qed.
 

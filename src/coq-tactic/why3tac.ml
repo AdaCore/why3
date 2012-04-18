@@ -182,7 +182,8 @@ let decomp_type_quantifiers env t =
           let tv = Ty.create_tvsymbol (preid_of_id id) in
           Idmap.add id (Some (Ty.ty_var tv)) m, tv
         in
-        Util.map_fold_left add Idmap.empty vars, env, t
+        let tvm, vars = Util.map_fold_left add Idmap.empty vars in
+        (tvm, List.rev vars), env, t
   in
   loop [] t
 
