@@ -28,11 +28,10 @@
 
   let output_comments = ref true
 
-  let newline lexbuf fmt =
+  let newline lexbuf =
     let pos = lexbuf.lex_curr_p in
     lexbuf.lex_curr_p <-
-      { pos with pos_lnum = pos.pos_lnum + 1; pos_bol = pos.pos_cnum };
-    fprintf fmt "\n"
+      { pos with pos_lnum = pos.pos_lnum + 1; pos_bol = pos.pos_cnum }
 
   let make_table l =
     let ht = Hashtbl.create 97 in
@@ -65,19 +64,37 @@
 
 let ident = ['A'-'Z' 'a'-'z' '_'] ['A'-'Z' 'a'-'z' '0'-'9' '_']*
 
-rule scan fmt = parse
-  | "(*)"  { fprintf fmt "(*)"; scan fmt lexbuf }
-  | "(**"  { fprintf fmt "</pre>@\n";
-             doc fmt [] lexbuf;
-             fprintf fmt "<pre>@\n";
-             scan fmt lexbuf }
-  | "(*i"  { comment fmt false lexbuf;
-             scan fmt lexbuf }
-  | "(*"   { fprintf fmt "<font class=\"comment\">(*";
-             comment fmt true lexbuf;
-             fprintf fmt "</font>";
-             scan fmt lexbuf }
-  | eof    { () }
+rule scan fmt embedded = parse
+  | "(*)" as s
+          { pp_print_string fmt s; scan fmt embedded lexbuf }
+  | "(***" as s
+          { if embedded then pp_print_string fmt s else
+              comment fmt false lexbuf;
+            scan fmt embedded lexbuf }
+  | "(**" as s
+          { if embedded then pp_print_string fmt s else
+              begin
+                fprintf fmt "</pre>@\n";
+                doc fmt [] lexbuf;
+                fprintf fmt "<pre>@\n";
+              end;
+            scan fmt embedded lexbuf }
+  | "(*" as s
+          { if embedded then pp_print_string fmt s else
+              begin
+                fprintf fmt "<font class=\"comment\">(*";
+                comment fmt true lexbuf;
+                fprintf fmt "</font>";
+              end;
+            scan fmt embedded lexbuf }
+  | ']' as c
+          { if embedded then () else
+              begin
+                pp_print_char fmt c;
+                scan fmt embedded lexbuf
+              end
+          }
+  | eof   { () }
   | ident as s
     { if is_keyword1 s then
         fprintf fmt "<font class=\"keyword1\">%s</font>" s
@@ -98,17 +115,17 @@ rule scan fmt = parse
           fprintf fmt "<a href=\"%s#%s\">%s</a>" fn t s
         with Not_found ->
         (* otherwise, just print it *)
-          fprintf fmt "%s" s
+          pp_print_string fmt s
       end;
-      scan fmt lexbuf }
-  | "<"    { fprintf fmt "&lt;"; scan fmt lexbuf }
-  | ">"    { fprintf fmt "&gt;"; scan fmt lexbuf }
-  | "&"    { fprintf fmt "&amp;"; scan fmt lexbuf }
-  | "\n"   { newline lexbuf fmt; scan fmt lexbuf }
+      scan fmt embedded lexbuf }
+  | "<"    { fprintf fmt "&lt;"; scan fmt embedded lexbuf }
+  | ">"    { fprintf fmt "&gt;"; scan fmt embedded lexbuf }
+  | "&"    { fprintf fmt "&amp;"; scan fmt embedded lexbuf }
+  | "\n"   { newline lexbuf; fprintf fmt "\n"; scan fmt embedded lexbuf }
   | '"'    { fprintf fmt "&quot;"; string fmt true lexbuf;
-             scan fmt lexbuf }
+             scan fmt embedded lexbuf }
   | "'\"'"
-  | _ as s { fprintf fmt "%s" s; scan fmt lexbuf }
+  | _ as s { pp_print_string fmt s; scan fmt embedded lexbuf }
 
 and comment fmt do_output = parse
   | "(*"   { if do_output then fprintf fmt "(*";
@@ -116,7 +133,8 @@ and comment fmt do_output = parse
              comment fmt do_output lexbuf }
   | "*)"   { if do_output then fprintf fmt "*)" }
   | eof    { () }
-  | "\n"   { if do_output then newline lexbuf fmt;
+  | "\n"   { newline lexbuf;
+             if do_output then fprintf fmt "\n";
              comment fmt do_output lexbuf }
   | '"'    { if do_output then fprintf fmt "&quot;";
              string fmt do_output lexbuf;
@@ -126,11 +144,12 @@ and comment fmt do_output = parse
   | "&"    { if do_output then fprintf fmt "&amp;";
              comment fmt do_output lexbuf }
   | "'\"'"
-  | _ as s { if do_output then fprintf fmt "%s" s;
+  | _ as s { if do_output then pp_print_string fmt s;
              comment fmt do_output lexbuf }
 
 and string fmt do_output = parse
-  | "\n"   { if do_output then newline lexbuf fmt;
+  | "\n"   { newline lexbuf;
+             if do_output then fprintf fmt "\n";
              string fmt do_output lexbuf }
   | '"'    { if do_output then fprintf fmt "&quot;" }
   | "<"    { if do_output then fprintf fmt "&lt;";
@@ -140,29 +159,56 @@ and string fmt do_output = parse
   | "&"    { if do_output then fprintf fmt "&amp;";
              string fmt do_output lexbuf }
   | "\\" _
-  | _ as s { if do_output then fprintf fmt "%s" s;
+  | _ as s { if do_output then pp_print_string fmt s;
              string fmt do_output lexbuf }
 
 and doc fmt headings = parse
   | "*)"   { () }
   | eof    { () }
-  | '{' (['1''2''3'] as c)
-           { let n = Char.code c - Char.code '0' + 1 in
+  | "\n"   { newline lexbuf;
+             fprintf fmt "\n";
+             doc fmt headings lexbuf }
+  | '{' (['1'-'6'] as c)
+           { let n = Char.code c - Char.code '0' in
              fprintf fmt "<h%d>" n;
              doc fmt (n::headings) lexbuf }
-  | '{' { fprintf fmt "{"; doc fmt (0::headings) lexbuf }
+  | '{''h' { raw_html fmt 0 lexbuf; doc fmt headings lexbuf }
+  | '{'    { fprintf fmt "{"; doc fmt (0::headings) lexbuf }
   | '}'    { match headings with
-      | [] -> fprintf fmt "}"; doc fmt headings lexbuf
-      | n :: r ->
-        if n >= 2 then fprintf fmt "</h%d>" n else fprintf fmt "}";
-        doc fmt r lexbuf
-  }
+              | [] -> fprintf fmt "}"; doc fmt headings lexbuf
+              | n :: r ->
+                  if n >= 1 then fprintf fmt "</h%d>" n else
+                    fprintf fmt "}";
+                  doc fmt r lexbuf
+           }
+  | '['    { pp_print_string fmt "<code>";
+             scan fmt true lexbuf; 
+             pp_print_string fmt "</code>";
+             doc fmt headings lexbuf }
   | '"'    { fprintf fmt "&quot;"; doc fmt headings lexbuf }
   | '\''   { fprintf fmt "&apos;"; doc fmt headings lexbuf }
   | '&'    { fprintf fmt "&amp;"; doc fmt headings lexbuf }
   | "<"    { fprintf fmt "&lt;"; doc fmt headings lexbuf }
   | ">"    { fprintf fmt "&gt;"; doc fmt headings lexbuf }
-  | _ as c { fprintf fmt "%c" c; doc fmt headings lexbuf }
+  | _ as c { pp_print_char fmt c; doc fmt headings lexbuf }
+
+
+and raw_html fmt depth = parse
+  | eof    { () }
+  | "\n"   { newline lexbuf;
+             fprintf fmt "\n";
+             raw_html fmt depth lexbuf }
+  | '{'    { fprintf fmt "{"; raw_html fmt (succ depth) lexbuf }
+  | '}'    { if depth = 0 then () else
+               begin
+                 fprintf fmt "{";
+                 raw_html fmt (pred depth) lexbuf
+               end }
+  | _ as c { pp_print_char fmt c; raw_html fmt depth lexbuf }
+
+
+
+
 {
 
   let do_file fmt fname =
@@ -172,9 +218,8 @@ and doc fmt headings = parse
     lb.Lexing.lex_curr_p <-
       { lb.Lexing.lex_curr_p with Lexing.pos_fname = fname };
     (* output *)
-    fprintf fmt "<h1>File %s</h1>" fname;
     fprintf fmt "<pre>@\n";
-    scan fmt lb;
+    scan fmt false lb;
     fprintf fmt "</pre>@\n";
     close_in cin
 

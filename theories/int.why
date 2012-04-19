@@ -1,4 +1,13 @@
 
+(** {1 Theory of integers} 
+
+This file provides the basic theory of integers, and several additional theories for classical functions
+
+*)
+
+
+(** {2 Integers and the basic operators} *)
+
 theory Int
 
   constant zero : int = 0
@@ -13,6 +22,8 @@ theory Int
 
 end
 
+(** {2 Absolute Value} *)
+
 theory Abs
 
   use import Int
@@ -23,11 +34,13 @@ theory Abs
 
   lemma Abs_pos: forall x:int. abs x >= 0
 
-(*
+(***
   lemma Abs_zero: forall x:int. abs x = 0 -> x = 0
 *)
 
 end
+
+(** {2 Minimum and Maximum} *)
 
 theory MinMax
 
@@ -35,6 +48,8 @@ theory MinMax
   clone export comparison.MinMax with type t = int, predicate ge = (>=)
 
 end
+
+(** {2 The Basic Well-Founded Order on Integers} *)
 
 theory Lex2
 
@@ -47,10 +62,15 @@ theory Lex2
 
 end
 
+(** {2 Euclidean Division}
+
+division and modulo operators with the convention that division
+     rounds down, and thus modulo is always non-negative
+
+*)
+
 theory EuclideanDivision
 
-  (** division and modulo operators with the convention that division
-     rounds down, and thus modulo is always non-negative *)
 
   use import Int
   use import Abs
@@ -77,7 +97,11 @@ theory EuclideanDivision
 
 end
 
-(** the particular case of Euclidean division by 2 *)
+(** {2 Division by 2}
+
+The particular case of Euclidean division by 2 
+
+*)
 theory Div2
 
   use import Int
@@ -87,12 +111,17 @@ theory Div2
 
 end
 
+(** {2 Computer Division}
+
+Division and modulo operators with the same conventions as
+     mainstream programming language such C, Java, OCaml, that is
+     division rounds towards zero, and thus [mod x y] has the same sign
+     as x 
+
+*)
+
 theory ComputerDivision
 
-  (** division and modulo operators with the same conventions as
-     mainstream programming language such C, Java, OCaml, that is
-     division rounds towards zero, and thus (x mod y) has the same sign
-     as x *)
 
   use import Int
   use import Abs
@@ -142,6 +171,7 @@ theory ComputerDivision
 
 end
 
+(** {2 Generic Exponentation of something to an integer exponent} *)
 theory Exponentiation
   use import Int
 
@@ -165,6 +195,7 @@ theory Exponentiation
 
 end
 
+(** {2 Power of an integer to an integer } *)
 theory Power
 
   use import Int
@@ -174,6 +205,12 @@ theory Power
 
 end
 
+(** {2 Number of elements satisfying a given predicate} 
+
+This theory is parametrized by a predicate [pr]. It is supposed to be cloned
+with needed instances for [pr]. It is also parametrized by a type [param] to be used as an additional parameter to [pr].
+
+*)
 theory NumOfParam
 
   type param
@@ -247,6 +284,13 @@ theory NumOfParam
 
 end
 
+(** {2 Specific version of number of elements satisfying a predicate}
+
+This is an instance of the above, where the type parameter is unused
+
+*)
+
+
 theory NumOf
 
   predicate pr int
@@ -259,7 +303,9 @@ theory NumOf
 
 end
 
-theory Fact "Factorial"
+(** {2 Factorial function} *)
+
+theory Fact 
 
   use export Int
 
@@ -269,6 +315,8 @@ theory Fact "Factorial"
   axiom factn: forall n:int. n >= 1 -> fact n = n * fact (n-1)
 
 end
+
+(** {2 Generic iteration of a function} *)
 
 theory Iter
 
@@ -288,7 +336,7 @@ theory Iter
 
 end
 
-(** integers extended with infinity *)
+(** {2 Integers extended with an infinite value} *)
 theory IntInf
 
   use import Int
@@ -322,6 +370,12 @@ theory IntInf
 
 end
 
+(** {2 Induction principle on integers}
+
+This theory can be cloned with the wanted predicate, to perform an induction, either
+on non-negative integers, or more generally on integers greater or equal a given bound.
+
+ *)
 
 theory Induction
 
@@ -342,7 +396,7 @@ theory Induction
 
 end
 
-(*i
+(***
 Local Variables:
 compile-command: "make -C .. theories/int.gui"
 End:

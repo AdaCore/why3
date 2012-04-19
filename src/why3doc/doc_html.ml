@@ -48,22 +48,19 @@ a:active {color : Red; text-decoration : underline; }
 .warning { color : Red ; font-weight : bold }
 .info { margin-left : 3em; margin-right : 3em }
 .code { color : #465F91 ; }
-h1 { font-size : 20pt ; text-align: center; }
-h2 { font-size : 20pt ; border: 1px solid #000000; margin-top: 5px; margin-bottom: 2px;text-align: center; background-color: #90BDFF ;padding: 2px; }
-h3 { font-size : 20pt ; border: 1px solid #000000; margin-top: 5px; margin-bottom: 2px;text-align: center; background-color: #90DDFF ;padding: 2px; }
-h4 { font-size : 20pt ; border: 1px solid #000000; margin-top: 5px; margin-bottom: 2px;text-align: center; background-color: #90EDFF ;padding: 2px; }
-h5 { font-size : 20pt ; border: 1px solid #000000; margin-top: 5px; margin-bottom: 2px;text-align: center; background-color: #90FDFF ;padding: 2px; }
-h6 { font-size : 20pt ; border: 1px solid #000000; margin-top: 5px; margin-bottom: 2px;text-align: center; background-color: #90BDFF ; padding: 2px; }
-div.h7 { font-size : 20pt ; border: 1px solid #000000; margin-top: 5px; margin-bottom: 2px;text-align: center; background-color: #90DDFF ; padding: 2px; }
-div.h8 { font-size : 20pt ; border: 1px solid #000000; margin-top: 5px; margin-bottom: 2px;text-align: center; background-color: #F0FFFF ; padding: 2px; }
-div.h9 { font-size : 20pt ; border: 1px solid #000000; margin-top: 5px; margin-bottom: 2px;text-align: center; background-color: #FFFFFF ; padding: 2px; }
+h1 { font-size : 20pt ; border: 1px solid #000000; margin-top: 10px; margin-bottom: 10px;text-align: center; background-color: #90BDFF ;padding: 10px; }
+h2 { font-size : 18pt ; border: 1px solid #000000; margin-top: 8px; margin-bottom: 8px;text-align: left; background-color: #90DDFF ;padding: 8px; }
+h3 { font-size : 16pt ; border: 1px solid #000000; margin-top: 6px; margin-bottom: 6px;text-align: left; background-color: #90EDFF ;padding: 6px; }
+h4 { font-size : 14pt ; border: 1px solid #000000; margin-top: 4px; margin-bottom: 4px;text-align: left; background-color: #90FDFF ;padding: 4px; }
+h5 { font-size : 12pt ; border: 1px solid #000000; margin-top: 2px; margin-bottom: 2px;text-align: left; background-color: #90BDFF ; padding: 2px; }
+h6 { font-size : 10pt ; border: 1px solid #000000; margin-top: 0px; margin-bottom: 0px;text-align: left; background-color: #90BDFF ; padding: 0px; }
 .typetable { border-style : hidden }
 .indextable { border-style : hidden }
 .paramstable { border-style : hidden ; padding: 5pt 5pt}
 body { background-color : White }
 tr { background-color : White }
 td.typefieldcomment { background-color : #FFFFFF }
-pre { margin-bottom: 4px }
+pre { margin-top: 1px ; margin-bottom: 2px; }
 div.sig_block {margin-left: 2em}";
   close_out c
 

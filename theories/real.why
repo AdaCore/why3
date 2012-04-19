@@ -1,4 +1,12 @@
 
+
+(** {1 Theory of reals} 
+
+This file provides the basic theory of real numbers, and several additional theories for classical real functions
+
+*)
+
+(** {2 Real numbers and the basic unary and binary operators} *)
 theory Real
 
   constant zero : real = 0.0
@@ -11,11 +19,17 @@ theory Real
   clone export algebra.OrderedField with type t = real,
     constant zero = zero, constant one = one, predicate (<=) = (<=)
 
-(*
+(***
   lemma sub_zero: forall x y:real. x - y = 0.0 -> x = y
 *)
 
 end
+
+(** {2 Alternative Infix Operators} 
+
+This theory should be used instead of Real when one wants to use both integer and real binary operators. 
+
+*)
 
 theory RealInfix
 
@@ -35,6 +49,8 @@ theory RealInfix
 
 end
 
+(** {2 Absolute Value} *)
+
 theory Abs
 
   use import Real
@@ -45,7 +61,7 @@ theory Abs
 
   lemma Abs_pos: forall x:real. abs x >= 0.0
 
-(*
+(***
   lemma Abs_zero: forall x:real. abs x = 0.0 -> x = 0.0
 *)
 
@@ -57,6 +73,8 @@ theory Abs
     forall x y z:real. abs(x-z) <= abs(x-y) + abs(y-z)
 
 end
+
+(** {2 Minimum and Maximum} *)
 
 theory MinMax
 
@@ -71,6 +89,8 @@ theory MinMax
   axiom Min_is_some : forall x y:real. min x y = x \/ min x y = y
 
 end
+
+(** {2 Injection of integers into reals} *)
 
 theory FromInt
 
@@ -92,6 +112,8 @@ theory FromInt
     forall x y:int. from_int (Int.(-_) (x)) = - from_int x
 
 end
+
+(** {2 Various truncation functions} *)
 
 theory Truncate
 
@@ -150,6 +172,7 @@ theory Truncate
 
 end
 
+(** {2 Square and Square Root} *)
 
 theory Square
 
@@ -169,6 +192,8 @@ theory Square
     forall x:real. x >= 0.0 -> sqrt (x*x) = x
 
 end
+
+(** {2 Exponential and Logarithm} *)
 
 theory ExpLog
 
@@ -194,6 +219,7 @@ theory ExpLog
 
 end
 
+(** {2 Power of a real to an integer} *)
 theory PowerInt
 
   use int.Int
@@ -205,6 +231,7 @@ theory PowerInt
 
 end
 
+(** {2 Power of a real to a real exponent} *)
 theory PowerReal
 
   use import Real
@@ -237,9 +264,9 @@ theory PowerReal
 end
 
 
-(** {2 Trigonometric functions}
+(** {2 Trigonometric Functions}
 
-    See [http://en.wikipedia.org/wiki/Trigonometric_function]
+    See {h <a href="http://en.wikipedia.org/wiki/Trigonometric_function">wikipedia page</a>}
 *)
 theory Trigonometry
 
@@ -295,8 +322,8 @@ theory Trigonometry
 
 end
 
-(** {2 hyperbolic functions}
-    See [http://en.wikipedia.org/wiki/Hyperbolic_function]
+(** {2 Hyperbolic Functions}
+    See {h <a href="http://en.wikipedia.org/wiki/Hyperbolic_function">wikipedia page</a>}
 *)
 theory Hyperbolic
 
@@ -318,8 +345,8 @@ theory Hyperbolic
 
 end
 
-(** {2 polar coordinates}
-    atan2, hypot, see [http://en.wikipedia.org/wiki/Atan2]
+(** {2 Polar Coordinates}
+    atan2, hypot, see {h <a href="http://en.wikipedia.org/wiki/Atan2">wikipedia page</a>}
 *)
 theory Polar
 

@@ -1185,6 +1185,7 @@ STDLIBFILES = $(addsuffix .why, $(addprefix theories/, $(STDLIBS)))
 
 stdlibdoc: $(STDLIBFILES) bin/why3doc
 	mkdir -p doc/stdlibdoc
+	rm -f doc/stdlibdoc/style.css
 	bin/why3doc -o doc/stdlibdoc $(STDLIBFILES)
 
 clean::
