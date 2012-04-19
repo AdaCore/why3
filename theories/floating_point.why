@@ -1,6 +1,7 @@
 
+(** {1 Formalization of Floating-Point Arithmetic, norm IEEE-754} *)
 
-(* definition of IEEE-754 rounding modes *)
+(** {2 definition of IEEE-754 rounding modes} *)
 theory Rounding
 
   type mode = NearestTiesToEven | ToZero | Up | Down | NearestTiesToAway
@@ -9,7 +10,7 @@ theory Rounding
 end
 
 
-(* handling of IEEE-754 special values +\infty, -\infty, NaN, +0, -0 *)
+(** {2 handling of IEEE-754 special values +\infty, -\infty, NaN, +0, -0} *)
 theory SpecialValues
 
   type class = Finite | Infinite | NaN
@@ -71,7 +72,7 @@ theory GenFloat
       Int.(<=) i max_representable_integer ->
         round m (from_int i) = from_int i
 
-  (* rounding up and down *)
+  (** rounding up and down *)
   axiom Round_down_le:
     forall x:real. round Down x <= x
   axiom Round_up_ge:
@@ -123,7 +124,7 @@ theory GenFloatFull
 
   clone export GenFloat
 
-  (* special values *)
+  (** special values *)
   function class t : class
 
   predicate is_finite (x:t) = class x = Finite

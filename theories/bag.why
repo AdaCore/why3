@@ -1,5 +1,5 @@
 
-(* Multisets (aka bags) *)
+(** {1 Multisets (aka bags)} *)
 
 theory Bag
 
@@ -7,7 +7,7 @@ theory Bag
 
   type bag 'a
 
-  (* the most basic operation is the number of occurrences *)
+  (** the most basic operation is the number of occurrences *)
 
   function nb_occ (x: 'a) (b: bag 'a): int
 
@@ -15,14 +15,14 @@ theory Bag
 
   predicate mem (x: 'a) (b: bag 'a) = nb_occ x b > 0
 
-  (* equality of bags *)
+  (** equality of bags *)
 
   predicate eq_bag (a b: bag 'a) =
     forall x:'a. nb_occ x a = nb_occ x b
 
   axiom bag_extensionality: forall a b: bag 'a. eq_bag a b -> a = b
 
-  (* basic constructors of bags *)
+  (** basic constructors of bags *)
 
   function empty_bag: bag 'a
 
@@ -48,7 +48,7 @@ theory Bag
     forall x: 'a, a b: bag 'a.
     nb_occ x (union a b) = nb_occ x a + nb_occ x b
 
-  (* union commutative, associative with identity empty_bag *)
+  (** union commutative, associative with identity empty_bag *)
 
   lemma Union_comm: forall a b: bag 'a. union a b = union b a
 
@@ -63,7 +63,7 @@ theory Bag
   lemma bag_simpl_left:
     forall a b c: bag 'a. union a b = union a c -> b = c
 
-  (* add operation *)
+  (** add operation *)
 
   function add (x: 'a) (b: bag 'a) : bag 'a = union (singleton x) b
 
@@ -74,7 +74,7 @@ theory Bag
   lemma occ_add_neq: forall b: bag 'a, x y: 'a.
     x <> y -> nb_occ y (add x b) = nb_occ y b
 
-  (* cardinality of bags *)
+  (** cardinality of bags *)
 
   function card (bag 'a): int
 
@@ -85,7 +85,7 @@ theory Bag
   axiom Card_union: forall x y: bag 'a. card (union x y) = card x + card y
   lemma Card_add: forall x: 'a, b: bag 'a. card (add x b) = 1 + card b
 
-  (* bag difference *)
+  (** bag difference *)
 
   use import int.MinMax
 
@@ -107,7 +107,7 @@ theory Bag
 
 end
 
-(*
+(*i
 Local Variables:
 compile-command: "why3ide bag.why"
 End:

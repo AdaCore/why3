@@ -49,7 +49,7 @@ end
 
 theory EuclideanDivision
 
-  (* division and modulo operators with the convention that division
+  (** division and modulo operators with the convention that division
      rounds down, and thus modulo is always non-negative *)
 
   use import Int
@@ -77,7 +77,7 @@ theory EuclideanDivision
 
 end
 
-(* the particular case of Euclidean division by 2 *)
+(** the particular case of Euclidean division by 2 *)
 theory Div2
 
   use import Int
@@ -89,7 +89,7 @@ end
 
 theory ComputerDivision
 
-  (* division and modulo operators with the same conventions as
+  (** division and modulo operators with the same conventions as
      mainstream programming language such C, Java, OCaml, that is
      division rounds towards zero, and thus (x mod y) has the same sign
      as x *)
@@ -288,7 +288,7 @@ theory Iter
 
 end
 
-(* integers extended with infinity *)
+(** integers extended with infinity *)
 theory IntInf
 
   use import Int
@@ -342,7 +342,7 @@ theory Induction
 
 end
 
-(*
+(*i
 Local Variables:
 compile-command: "make -C .. theories/int.gui"
 End:

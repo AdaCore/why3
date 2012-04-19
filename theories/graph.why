@@ -1,5 +1,5 @@
 
-(* Graph theory *)
+(** {1 Graph theory} *)
 
 theory Path
 
@@ -10,7 +10,7 @@ theory Path
 
   predicate edge vertex vertex
 
-  (* path v0 [v0; v1; ...; vn-1] vn
+  (** path v0 [v0; v1; ...; vn-1] vn
      means a path from v0 to vn composed of n edges (vi,vi+1) *)
   inductive path vertex (list vertex) vertex =
   | Path_empty:
@@ -49,7 +49,7 @@ theory IntPathWeight
 
   function weight vertex vertex : int
 
-  (* the total weight of a path [path _ l dst] *)
+  (** the total weight of a path [path _ l dst] *)
   function path_weight (l: list vertex) (dst: vertex) : int = match l with
     | Nil -> 0
     | Cons x Nil -> weight x dst
@@ -67,7 +67,7 @@ theory IntPathWeight
 
 end
 
-(*
+(*i
 theory SimplePath
 
   use import list.List
@@ -96,7 +96,7 @@ theory SimplePath
 end
 *)
 
-(*
+(*i
 Local Variables:
 compile-command: "make -C .. theories/graph.gui"
 End:

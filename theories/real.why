@@ -98,7 +98,7 @@ theory Truncate
   use import Real
   use import FromInt
 
-  (* truncate: rounds towards zero *)
+  (** truncate: rounds towards zero *)
 
   function truncate real : int
 
@@ -125,7 +125,7 @@ theory Truncate
   axiom Truncate_monotonic_int2:
     forall x:real, i:int. from_int i <= x -> Int.(<=) i (truncate x)
 
-  (* roundings up and down *)
+  (** roundings up and down *)
 
   function floor real : int
   function ceil real : int
@@ -237,8 +237,9 @@ theory PowerReal
 end
 
 
-(** Trigonometric functions
-    [http://en.wikipedia.org/wiki/Trigonometric_function]
+(** {2 Trigonometric functions}
+
+    See [http://en.wikipedia.org/wiki/Trigonometric_function]
 *)
 theory Trigonometry
 
@@ -294,8 +295,8 @@ theory Trigonometry
 
 end
 
-(** hyperbolic functions
-    [http://en.wikipedia.org/wiki/Hyperbolic_function]
+(** {2 hyperbolic functions}
+    See [http://en.wikipedia.org/wiki/Hyperbolic_function]
 *)
 theory Hyperbolic
 
@@ -317,8 +318,8 @@ theory Hyperbolic
 
 end
 
-(** polar coordinates: atan2, hypot
-    [http://en.wikipedia.org/wiki/Atan2]
+(** {2 polar coordinates}
+    atan2, hypot, see [http://en.wikipedia.org/wiki/Atan2]
 *)
 theory Polar
 
