@@ -26,7 +26,7 @@
 static void
 ErrorReport(char *function)
 {
-    VOID *message;
+    char *message;
     DWORD error = GetLastError();
 
     FormatMessage(
@@ -38,7 +38,7 @@ ErrorReport(char *function)
                   (LPTSTR) &message,
                   0, NULL );
 
-    printf("Fatal: %s failed with error %d: %s",
+    printf("Fatal: %s failed with error %ld: %s",
            function, error, message);
     LocalFree(message);
 }
