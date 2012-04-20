@@ -37,6 +37,13 @@ theory TestGappa
           sqrt ((value z - (value x)*(value x))*(value y - (value x)*(value x))) <= 0x1p-52
 
 
+   use import map.Map
+
+   lemma Test_eq:
+       forall x:double, m: map int double.
+          value x = round NearestTiesToEven (value m[0] * value m[0]) ->
+          m[1] = x -> value m[1] - value m[0] * value m[0] <= 2.0
+
 end
 
 
