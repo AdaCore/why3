@@ -1,7 +1,8 @@
 
-(** {1 Theory of integers} 
+(** {1 Theory of integers}
 
-This file provides the basic theory of integers, and several additional theories for classical functions
+This file provides the basic theory of integers, and several additional
+theories for classical functions
 
 *)
 
@@ -99,7 +100,7 @@ end
 
 (** {2 Division by 2}
 
-The particular case of Euclidean division by 2 
+The particular case of Euclidean division by 2
 
 *)
 theory Div2
@@ -113,10 +114,9 @@ end
 
 (** {2 Computer Division}
 
-Division and modulo operators with the same conventions as
-     mainstream programming language such C, Java, OCaml, that is
-     division rounds towards zero, and thus [mod x y] has the same sign
-     as x 
+Division and modulo operators with the same conventions as mainstream
+programming language such C, Java, OCaml, that is division rounds
+towards zero, and thus [mod x y] has the same sign as x
 
 *)
 
@@ -172,6 +172,7 @@ theory ComputerDivision
 end
 
 (** {2 Generic Exponentation of something to an integer exponent} *)
+
 theory Exponentiation
   use import Int
 
@@ -205,10 +206,11 @@ theory Power
 
 end
 
-(** {2 Number of elements satisfying a given predicate} 
+(** {2 Number of elements satisfying a given predicate}
 
-This theory is parametrized by a predicate [pr]. It is supposed to be cloned
-with needed instances for [pr]. It is also parametrized by a type [param] to be used as an additional parameter to [pr].
+This theory is parametrized by a predicate [pr]. It is supposed to be
+cloned with needed instances for [pr]. It is also parametrized by a
+type [param] to be used as an additional parameter to [pr].
 
 *)
 theory NumOfParam
@@ -305,7 +307,7 @@ end
 
 (** {2 Factorial function} *)
 
-theory Fact 
+theory Fact
 
   use export Int
 
@@ -337,6 +339,7 @@ theory Iter
 end
 
 (** {2 Integers extended with an infinite value} *)
+
 theory IntInf
 
   use import Int
@@ -372,8 +375,9 @@ end
 
 (** {2 Induction principle on integers}
 
-This theory can be cloned with the wanted predicate, to perform an induction, either
-on non-negative integers, or more generally on integers greater or equal a given bound.
+This theory can be cloned with the wanted predicate, to perform an
+induction, either on non-negative integers, or more generally on
+integers greater or equal a given bound.
 
  *)
 

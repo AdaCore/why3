@@ -1,5 +1,4 @@
 
-
 (** {1 Formalization of Floating-Point Arithmetic} 
 
 This formalization follows the {h <a href="http://ieeexplore.ieee.org/servlet/opac?punumber=4610933">IEEE-754 norm</a>}
@@ -15,7 +14,14 @@ theory Rounding
 end
 
 
-(** {2 handling of IEEE-754 special values +\infty, -\infty, NaN, +0, -0} *)
+(** {2 handling of IEEE-754 special values} 
+
+Special values are +infinity, -infinity; NaN, +0, -0.  These are
+handled as described in {h <a
+href="http://www.lri.fr/~marche/ayad10ijcar.pdf">[Ayad, March&eacute;,
+IJCAR, 2010]</a>}
+
+*)
 theory SpecialValues
 
   type class = Finite | Infinite | NaN
