@@ -289,7 +289,9 @@ let print_report (g,p,t,r) =
       printf "no former result available, new result is: %a@." print_result new_res
   | M.CallFailed msg ->
       printf "internal failure '%a'@." Exn_printer.exn_printer msg;
-  | M.Prover_not_installed ->
+  | M.Edited_file_absent f ->
+      printf "proof script absent (%s)@." f
+ | M.Prover_not_installed ->
       printf "not installed@."
 
 

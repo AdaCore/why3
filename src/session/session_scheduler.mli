@@ -208,6 +208,7 @@ module Make(O: OBSERVER) : sig
         (** Result(new_result,old_result) *)
     | CallFailed of exn
     | Prover_not_installed
+    | Edited_file_absent of string
     | No_former_result of Call_provers.prover_result
 
   val replay :
@@ -264,6 +265,6 @@ end
 
 (*
 Local Variables:
-compile-command: "unset LANG; make -C ../.. bin/why3ide.byte"
+compile-command: "unset LANG; make -C ../.. byte"
 End:
 *)

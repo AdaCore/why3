@@ -618,6 +618,7 @@ type report =
   | Result of Call_provers.prover_result * Call_provers.prover_result
   | CallFailed of exn
   | Prover_not_installed
+  | Edited_file_absent of string
   | No_former_result of Call_provers.prover_result
 
 module Todo = struct
@@ -649,6 +650,8 @@ end
 let push_report report (g,p,t,r) =
   report := (g.goal_name,p,t,r)::!report
 
+exception NoFile of string
+
 (** When no smoke *)
 let check_external_proof eS eT todo a =
   let g = a.proof_parent in
@@ -666,36 +669,23 @@ let check_external_proof eS eT todo a =
           *)
           Todo._done todo (g,a.proof_prover,0,Prover_not_installed);
         | Some(ap,npc,a) ->
-(*
-      let ap = a.proof_prover in
-      match find_loadable_prover eS ap with
-        | None ->
-          dprintf debug "[sched] prover not found : %a@."
-            Whyconf.print_prover ap;
-            Todo._done todo (g,ap,0,Prover_not_installed)
-            (* set_proof_state ~notify ~obsolete:false a Undone *)
-        | Some (nap,npc) ->
-          let g = a.proof_parent in
           try
-            if nap == ap then raise Not_found;
-            let np_a = PHprover.find g.goal_external_proofs nap in
-            if O.replace_prover np_a a then begin
-              (** The notification will be done by the new proof_attempt *)
-              O.remove np_a.proof_key;
-              raise Not_found end
-          with Not_found ->
-          (** replace [a] by a new_proof attempt if [a.proof_prover] was not
-              loadable *)
-          let a = if nap == ap then a
-            else
-              let a = copy_external_proof
-                 ~notify ~keygen:O.create ~prover:nap ~env_session:eS a in
-              O.init a.proof_key (Proof_attempt a);
-              a in
-          *)
-          let timelimit = adapt_timelimit a in
-          let memlimit = a.proof_memlimit in
-          let callback result =
+            let old =
+              match a.proof_edited_as with
+                | None -> None
+                | Some edited_as ->
+                  let f = Filename.concat eS.session.session_dir edited_as in
+                  if Sys.file_exists f then
+                    begin
+                    (* Format.eprintf "Info: proving using edited file %s@." f; *)
+                      (Some (open_in f))
+                    end
+                  else
+                    raise (NoFile f)
+            in
+            let timelimit = adapt_timelimit a in
+            let memlimit = a.proof_memlimit in
+            let callback result =
               match result with
                 | Undone Scheduled | Undone Running | Undone Interrupted -> ()
                 | Undone (Unedited | JustEdited) -> assert false
@@ -715,24 +705,18 @@ let check_external_proof eS eT todo a =
                   end;
                   set_proof_state ~notify ~obsolete:false ~archived:false
                     result a
-          in
-          let old =
-            match a.proof_edited_as with
-              | None -> None
-              | Some edited_as ->
-                let f = Filename.concat eS.session.session_dir edited_as in
-              (* Format.eprintf "Info: proving using edited file %s@." f; *)
-                (Some (open_in f))
-          in
-          let command =
-            String.concat " " (npc.prover_config.Whyconf.command ::
-                                 npc.prover_config.Whyconf.extra_options) in
-          schedule_proof_attempt eT
-            ~timelimit ~memlimit
-            ?old ~command
-            ~driver:npc.prover_driver
-            ~callback
-            (goal_task g)
+            in
+            let command =
+              String.concat " " (npc.prover_config.Whyconf.command ::
+                                   npc.prover_config.Whyconf.extra_options) in
+            schedule_proof_attempt eT
+              ~timelimit ~memlimit
+              ?old ~command
+              ~driver:npc.prover_driver
+              ~callback
+              (goal_task g)
+          with NoFile f ->
+            Todo._done todo (g,a.proof_prover,0,Edited_file_absent f);
     end
 
 let check_goal_and_children eS eT todo g =
