@@ -36,6 +36,18 @@ theory Tree
     forall t1 t2: tree, d1 d2: int.
     depths d1 t1 = depths d2 t2 -> d1 = d2 && t1 = t2
 
+  lemma depths_prefix:
+    forall t: tree, d1 d2: int, s1 s2: list int.
+    depths d1 t ++ s1 = depths d2 t ++ s2 -> d1 = d2
+
+  lemma depths_prefix_simple:
+    forall t: tree, d1 d2: int.
+    depths d1 t = depths d2 t -> d1 = d2
+
+  lemma depths_subtree:
+    forall t1 t2: tree, d1 d2: int, s1: list int.
+    depths d1 t1 ++ s1 = depths d2 t2 -> d1 >= d2
+
 end
 
 module TreeReconstruction
@@ -137,19 +149,39 @@ module ZipperBased
     forall f1 f2: list (int, tree).
     forest_depths (f1 ++ f2) = forest_depths f1 ++ forest_depths f2
 
+  predicate greedy (d1: int) (t1: tree) (l: list (int, tree)) =
+    forall d: int. d < d1 -> forall t: tree, s: list int.
+    depths d t ++ s <> forest_depths (Cons (d1, t1) l)
+
+  inductive g (l: list (int, tree)) =
+    | Gnil: g Nil
+    | Gone: forall d: int, t: tree. g (Cons (d, t) Nil)
+    | Gtwo: forall d: int, t: tree, l: list (int, tree).
+        greedy d t l -> g l -> g (Cons (d, t) l)
+
+  lemma g_append:
+    forall l1 l2: list (int, tree). g (l1 ++ l2) -> g l1
+
+  lemma g_tail:
+    forall l: list (int, tree), d: int, t: tree.
+    g (reverse (Cons (d, t) l)) -> g (reverse l)
+
+  lemma right_nil:
+    forall l: list (int, tree). length l >= 2 -> g l ->
+    forall t: tree. forest_depths l <> depths 0 t
+
+  lemma main_lemma:
+    forall l: list (int, tree), d1 d2: int, t1 t2: tree. d1 <> d2 ->
+    g (reverse (Cons (d1, t1) l)) ->
+    g (reverse (Cons (d2, t2) (Cons (d1, t1) l)))
+
   exception Failure
 
-(*
-  predicate inv (left: list (int, tree)) = match left with
-  | Nil -> true
-  | Cons (d, _) Nil -> d <> 0
-  | Cons (d1, _) ((Cons (d2, _) _) as left') -> d1 <> d2 /\ inv left'
-  end
-*)
-
   let rec tc (left: list (int, tree)) (right: list (int, tree)) : tree
-    variant { (length left + length right, length right) } with lex =
-    { (* inv left *) }
+    (* variant { (length left + length right, length right) } with lex *) =
+    { g (reverse left) /\
+      match left with Cons (d, t) Nil -> d <> 0 \/ right <> Nil
+                    | _               -> true                   end }
     match left, right with
     | _, Nil ->
         raise Failure
