@@ -36,6 +36,15 @@ theory SpecialValues
 
 end
 
+(** {2 Generic theory of floats}
+
+The theory is parametrized by the real constant [max] which denotes
+the maximal representable number, and the integer constant
+[max_representable_integer] which is the maximal integer [n] such that
+every integer between [0] and [n] are representable.
+
+*) 
+
 theory GenFloat
 
   use import Rounding
@@ -95,6 +104,11 @@ theory GenFloat
 
 end
 
+(** {2 single precision floats}
+
+a.k.a 32-bits floats
+ *)
+
 theory Single
 
   type single
@@ -111,6 +125,10 @@ end
 
 
 
+(** {2 Double precision floats}
+
+a.k.a 64-bits floats
+ *)
 theory Double
 
   type double
@@ -126,6 +144,11 @@ theory Double
 end
 
 
+(** {2 Generic Full theory of floats}
+
+this theory extends the generic theory above by adding the special values
+
+ *)
 
 theory GenFloatFull
 
@@ -194,7 +217,7 @@ theory GenFloatFull
 end
 
 
-
+(** {2 Full theory of single precision floats} *)
 
 theory SingleFull
 
@@ -211,6 +234,7 @@ theory SingleFull
 end
 
 
+(** {2 Full theory of double precision floats} *)
 
 theory DoubleFull
 

@@ -1,5 +1,7 @@
 
-(** Basic Algebra Theories *)
+(** {1 Basic Algebra Theories} *)
+
+(** {2 Associativity} *)
 
 theory Assoc
   type t
@@ -7,11 +9,15 @@ theory Assoc
   axiom Assoc : forall x y z : t. op (op x y) z = op x (op y z)
 end
 
+(** {2 Commutativity} *)
+
 theory Comm
   type t
   function op t t : t
   axiom Comm : forall x y : t. op x y = op y x
 end
+
+(** {2 Associativity and Commutativity} *)
 
 theory AC
   type t
@@ -20,6 +26,8 @@ theory AC
   clone Comm  with type t = t, function op = op
   meta AC function op (*, prop Assoc.Assoc, prop Comm.Comm*)
 end
+
+(** {2 Group theory} *)
 
 theory Group
   type t
@@ -35,17 +43,22 @@ theory Group
 
   axiom Inv_def : forall x:t. op x (inv x) = unit
 
-(*
+(***
   lemma Inv_unit : forall x y:t. op x (inv y) = unit -> x = y
 *)
 
 end
+
+(** {2 Commutative groups} *)
+
 
 theory CommutativeGroup
   clone export Group
   clone Comm with type t = t, function op = op
   meta AC function op (*, prop Assoc.Assoc, prop Comm.Comm*)
 end
+
+(** {2 Rings} *)
 
 theory Ring
   type t
@@ -66,11 +79,15 @@ theory Ring
   function (-) (x y : t) : t = x + -y
 end
 
+(** {2 Commutative Rings} *)
+
 theory CommutativeRing
   clone export Ring
   clone Comm with type t = t, function op = (*)
   meta AC function (*) (*, prop Assoc.Assoc, prop Comm.Comm*)
 end
+
+(** {2 Commutative Rings with Unit} *)
 
 theory UnitaryCommutativeRing
   clone export CommutativeRing
@@ -78,6 +95,8 @@ theory UnitaryCommutativeRing
   axiom Unitary : forall x:t. one * x = x
   axiom NonTrivialRing : zero <> one
 end
+
+(** {2 Ordered Commutative Rings} *)
 
 theory OrderedUnitaryCommutativeRing
   clone export UnitaryCommutativeRing
@@ -92,6 +111,8 @@ theory OrderedUnitaryCommutativeRing
   axiom CompatOrderMult :
     forall x y z : t. x <= y -> zero <= z -> x * z <= y * z
 end
+
+(** {2 Field theory} *)
 
 theory Field
   clone export UnitaryCommutativeRing
@@ -113,6 +134,8 @@ theory Field
 
 end
 
+(** {2 Ordered Fields} *)
+
 theory OrderedField
   clone export Field
 
@@ -127,7 +150,8 @@ theory OrderedField
     forall x y z : t. x <= y -> zero <= z -> x * z <= y * z
 end
 
-(* to be discussed: should we add the following lemmas, and where
+(***
+ to be discussed: should we add the following lemmas, and where
 
   lemma InvMult : forall x y : t. (-x) * y = - (x * y) = x * (-y)
   lemma InvSquare : forall x : t. x * x = (-x) * (-x)
