@@ -1177,7 +1177,8 @@ let add_use_clone env lenv th (loc, use, subst) =
   let use_or_clone th =
     let q, id = split_qualid use.use_theory in
     let t = find_theory env lenv q id in
-    if Debug.test_flag Glob.flag then Glob.use (qloc use.use_theory) t.th_name;
+    if Debug.test_flag Glob.flag then
+      Glob.use (match use.use_theory with Qident x | Qdot (_,x) -> x.id_loc) t.th_name;
     match subst with
     | None -> use_export th t
     | Some s -> clone_export th t (type_inst th t s)
