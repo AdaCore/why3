@@ -68,4 +68,4 @@ let locate id = match id.id_loc with
       raise Not_found
   | Some loc ->
       let fn, l, c, _ = Loc.get loc in
-      output_file fn, is_def (fn, l, c)
+      (Filename.basename fn ^ ".html"), is_def (fn, l, c)
