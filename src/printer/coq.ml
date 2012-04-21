@@ -532,10 +532,8 @@ let print_previous_proof def fmt previous =
   | Some (Other _) ->
     assert false
 
-let print_type_decl ~old info fmt ts =
+let print_type_decl ~prev info fmt ts =
   if is_ts_tuple ts then () else
-  let name = id_unique iprinter ts.ts_name in
-  let prev = output_till_statement fmt old name in
   match ts.ts_def with
     | None ->
       if info.realization then
@@ -543,20 +541,20 @@ let print_type_decl ~old info fmt ts =
         | Some (Query (_,Notation,c)) ->
           fprintf fmt "(* Why3 goal *)@\n%s@\n" c
         | _ ->
-          fprintf fmt "(* Why3 goal *)@\n@[<hov 2>Definition %s : %aType.@]@\n%a@\n"
-            name print_params_list ts.ts_args
+          fprintf fmt "(* Why3 goal *)@\n@[<hov 2>Definition %a : %aType.@]@\n%a@\n"
+            print_ts ts print_params_list ts.ts_args
             (print_previous_proof true) prev
       else
-        fprintf fmt "@[<hov 2>Parameter %s : %aType.@]@\n@\n"
-          name print_params_list ts.ts_args
+        fprintf fmt "@[<hov 2>Parameter %a : %aType.@]@\n@\n"
+          print_ts ts print_params_list ts.ts_args
     | Some ty ->
-      fprintf fmt "(* Why3 assumption *)@\n@[<hov 2>Definition %s %a :=@ %a.@]@\n@\n"
-        name (print_list space print_tv_binder) ts.ts_args
+      fprintf fmt "(* Why3 assumption *)@\n@[<hov 2>Definition %a %a :=@ %a.@]@\n@\n"
+        print_ts ts (print_list space print_tv_binder) ts.ts_args
         (print_ty info) ty
 
-let print_type_decl ~old info fmt ts =
+let print_type_decl ~prev info fmt ts =
   if not (Mid.mem ts.ts_name info.info_syn) then
-    (print_type_decl ~old info fmt ts; forget_tvs ())
+    (print_type_decl ~prev info fmt ts; forget_tvs ())
 
 let print_data_decl info fmt (ts,csl) =
   if is_ts_tuple ts then () else
@@ -581,32 +579,30 @@ let print_ls_type ?(arrow=false) info fmt ls =
   | None -> fprintf fmt "Prop"
   | Some ty -> print_ty info fmt ty
 
-let print_param_decl ~old info fmt ls =
+let print_param_decl ~prev info fmt ls =
   let ty_vars_args, ty_vars_value, all_ty_params = ls_ty_vars ls in
-  let name = id_unique iprinter ls.ls_name in
-  let prev = output_till_statement fmt old name in
   begin if info.realization then
     match prev with
       | Some (Query (_,Notation,c)) ->
         fprintf fmt "(* Why3 goal *)@\n%s" c
       | _ ->
-        fprintf fmt "(* Why3 goal *)@\n@[<hov 2>Definition %s: %a%a%a.@]@\n%a"
-          name print_params all_ty_params
+        fprintf fmt "(* Why3 goal *)@\n@[<hov 2>Definition %a: %a%a%a.@]@\n%a"
+          print_ls ls print_params all_ty_params
           (print_arrow_list (print_ty info)) ls.ls_args
           (print_ls_type ~arrow:(ls.ls_args <> []) info) ls.ls_value
           (print_previous_proof true) prev
     else
-      fprintf fmt "@[<hov 2>Parameter %s: %a%a%a.@]@\n"
-        name print_params all_ty_params
+      fprintf fmt "@[<hov 2>Parameter %a: %a%a%a.@]@\n"
+        print_ls ls print_params all_ty_params
         (print_arrow_list (print_ty info)) ls.ls_args
         (print_ls_type ~arrow:(ls.ls_args <> []) info) ls.ls_value
   end;
   print_implicits fmt ls ty_vars_args ty_vars_value all_ty_params;
   fprintf fmt "@\n"
 
-let print_param_decl ~old info fmt ls =
+let print_param_decl ~prev info fmt ls =
   if not (Mid.mem ls.ls_name info.info_syn) then
-    (print_param_decl ~old info fmt ls; forget_tvs ())
+    (print_param_decl ~prev info fmt ls; forget_tvs ())
 
 let print_logic_decl info fmt (ls,ld) =
   let ty_vars_args, ty_vars_value, all_ty_params = ls_ty_vars ls in
@@ -665,10 +661,8 @@ let print_ind_decl info fmt d =
   if not (Mid.mem (fst d).ls_name info.info_syn) then
     (print_ind_decl info fmt d; forget_tvs ())
 
-let print_prop_decl ~old info fmt (k,pr,f) =
+let print_prop_decl ~prev info fmt (k,pr,f) =
   let params = t_ty_freevars Stv.empty f in
-  let name = id_unique iprinter pr.pr_name in
-  let prev = output_till_statement fmt old name in
   let stt = match k with
     | Paxiom when info.realization -> "Lemma"
     | Paxiom -> ""
@@ -676,23 +670,36 @@ let print_prop_decl ~old info fmt (k,pr,f) =
     | Pgoal -> "Theorem"
     | Pskip -> assert false (* impossible *) in
   if stt <> "" then
-    fprintf fmt "(* Why3 goal *)@\n@[<hov 2>%s %s : %a%a.@]@\n%a@\n"
-      stt name print_params params
+    fprintf fmt "(* Why3 goal *)@\n@[<hov 2>%s %a : %a%a.@]@\n%a@\n"
+      stt print_pr pr print_params params
       (print_fmla info) f
       (print_previous_proof false) prev
   else
-    fprintf fmt "@[<hov 2>Axiom %s : %a%a.@]@\n@\n"
-      name print_params params
+    fprintf fmt "@[<hov 2>Axiom %a : %a%a.@]@\n@\n"
+      print_pr pr print_params params
       (print_fmla info) f;
   forget_tvs ()
 
-let print_decl ~old info fmt d = match d.d_node with
+let print_decl ~old info fmt d =
+  let name =
+    match d.d_node with
+    | Dtype ts
+    | Ddata ((ts, _)::_) -> id_unique iprinter ts.ts_name
+    | Dparam ls
+    | Dlogic ((ls,_)::_)
+    | Dind ((ls,_)::_) -> id_unique iprinter ls.ls_name
+    | Dprop (_,pr,_) -> id_unique iprinter pr.pr_name
+    | Ddata []
+    | Dlogic []
+    | Dind [] -> assert false in
+  let prev = output_till_statement fmt old name in
+  match d.d_node with
   | Dtype ts ->
-      print_type_decl ~old info fmt ts
+      print_type_decl ~prev info fmt ts
   | Ddata tl ->
       print_list nothing (print_data_decl info) fmt tl
   | Dparam ls ->
-      print_param_decl ~old info fmt ls
+      print_param_decl ~prev info fmt ls
   | Dlogic [s,_ as ld] when not (Sid.mem s.ls_name d.d_syms) ->
       print_logic_decl info fmt ld
   | Dlogic ll ->
@@ -702,7 +709,7 @@ let print_decl ~old info fmt d = match d.d_node with
   | Dprop (_,pr,_) when Mid.mem pr.pr_name info.info_syn ->
       ()
   | Dprop pr ->
-      print_prop_decl ~old info fmt pr
+      print_prop_decl ~prev info fmt pr
 
 let print_decls ~old info fmt dl =
   fprintf fmt "@\n@[<hov>%a@\n@]" (print_list nothing (print_decl ~old info)) dl
