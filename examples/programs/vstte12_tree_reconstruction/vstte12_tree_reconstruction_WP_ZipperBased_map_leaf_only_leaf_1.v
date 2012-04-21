@@ -191,108 +191,28 @@ Axiom g_tail : forall (l:(list (Z* tree)%type)) (d:Z) (t:tree),
 Axiom right_nil : forall (l:(list (Z* tree)%type)), (2%Z <= (length l))%Z ->
   ((g l) -> forall (t:tree), ~ ((forest_depths l) = (depths 0%Z t))).
 
-Require Import Why3. Ltac z := why3 "z3-3" timelimit 5.
-
-Lemma key_lemma:
-  forall t t1 t2 s d2 d d1, (d < d1)%Z -> 
-  match t2 with Leaf => True | Node left2 _ => g (Cons (d1, t1) (Cons ((d2+1)%Z, left2) Nil)) end ->
-  infix_plpl (depths d1 t1) (depths d2 t2) = infix_plpl (depths d t) s ->
-  d = (d1-1)%Z /\ d2 = d1.
-induction t; simpl.
-(* t = Leaf *)
-intros.
-assert (d >= d1)%Z.
-  clear H.
-  generalize H1; clear H1.
-  generalize (depths d2 t2).
-  generalize d1.
-  induction t1; simpl.
-  z.
-(*
-
-  z.
-omega.
-(* t = Node t1 t2 *)
-rename t1 into left, t2 into right.
-intros t1 t2 s d2 d d1 ineq.
-rewrite <- Append_assoc.
-intro eq.
-assert (case: (d+1 < d1 \/ d=d1-1)%Z) by omega. destruct case.
-(* d+1 < d1, by iH *)
-generalize (IHt1 t1 t2 (infix_plpl (depths (d + 1) right) s) d2 (d+1) d1 H eq)%Z.
-intuition.
-
-
-subst.
-replace (infix_plpl (depths d2 t1) (depths d2 t2))
-  with (depths (d2-1) (Node t1 t2))%Z in eq.
-rewrite H0 in eq.
-assert (Node t1 t2 = left) by z.
-rewrite H0 in eq.
-replace (depths (d2 - 1) left) with (infix_plpl (depths (d2 - 1) left) Nil) in eq by z.
-z.
-simpl.
-replace  (d2 - 1 + 1)%Z with d2; z.
-(* d+1 = d1 *)
-intuition.
-replace (d+1)%Z with d1 in eq by z.
-assert (t1 = left) by z.
-subst.
-assert (depths d2 t2 = infix_plpl (depths d1 right) s) by z.
-assert (d2 <= d1)%Z by z.
-assert (case: (d2 < d1 \/ d2=d1)%Z) by omega. destruct case. 2: auto.
-
-*)
-Admitted.
-
-Lemma key_lemma_greedy:
-  forall l d t t1 t2 d1 d2, d1 <> d2 ->
-  greedy d t (infix_plpl l (Cons (d1, t1) Nil)) ->
-  greedy d t (infix_plpl l (Cons (d1, t1) (Cons (d2, t2) Nil))).
-induction l; simpl.
-unfold greedy; simpl.
-intros d t t1 t2 d1 d2 ineq.
-do 2 rewrite Append_l_nil.
-(*
-z.
-unfold greedy; simpl.
-intros. z.
-Qed.
-*)
-Admitted.
-
-(* Why3 goal *)
-Theorem main_lemma : forall (l:(list (Z* tree)%type)) (d1:Z) (d2:Z) (t1:tree)
+Axiom main_lemma : forall (l:(list (Z* tree)%type)) (d1:Z) (d2:Z) (t1:tree)
   (t2:tree), (~ (d1 = d2)) -> ((g (reverse (Cons (d1, t1) l))) ->
   (match t2 with
   | (Node l2 _) => (g (reverse (Cons ((d2 + 1%Z)%Z, l2) (Cons (d1, t1) l))))
   | Leaf => True
   end -> (g (reverse (Cons (d2, t2) (Cons (d1, t1) l)))))).
-simpl.
-intro l; generalize (reverse l). clear l.
-induction l; simpl.
-(* length = 2 *)
-intros d1 d2 t1 t2 ineq _ ht2.
-apply Gtwo.
-red; intros.
-simpl.
-intros eq.
-z.
-z.
-(* length > 2 *)
-intros.
-assert (g ((infix_plpl l (Cons (d1,t1) Nil)))).
-  inversion H0; auto.
-  z.
-destruct a.
-inversion H0.
-z.
-apply Gtwo.
-replace 
-      (infix_plpl (infix_plpl l (Cons (d1, t1) Nil)) (Cons (d2, t2) Nil))
- with (infix_plpl l (Cons (d1, t1) (Cons (d2, t2) Nil))) by z.
-apply key_lemma_greedy; auto.
 
+(* Why3 assumption *)
+Set Implicit Arguments.
+Fixpoint map_leaf(l:(list Z)) {struct l}: (list (Z* tree)%type) :=
+  match l with
+  | Nil => (Nil :(list (Z* tree)%type))
+  | (Cons d r) => (Cons (d, Leaf) (map_leaf r))
+  end.
+Unset Implicit Arguments.
+
+Axiom map_leaf_depths : forall (l:(list Z)),
+  ((forest_depths (map_leaf l)) = l).
+
+(* Why3 goal *)
+Theorem map_leaf_only_leaf : forall (l:(list Z)), (only_leaf (map_leaf l)).
+induction l; simpl; auto.
 Qed.
 
 

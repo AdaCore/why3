@@ -35,7 +35,7 @@
    <goal
     name="depths_head"
     locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-    loclnum="27" loccnumb="8" loccnume="19"
+    loclnum="28" loccnumb="8" loccnume="19"
     sum="217db5876bf9b69f0a3905de3866fdee"
     proved="true"
     expanded="false"
@@ -53,7 +53,7 @@
    <goal
     name="depths_unique"
     locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-    loclnum="31" loccnumb="8" loccnume="21"
+    loclnum="32" loccnumb="8" loccnume="21"
     sum="9edf97ab6074e9854733b7dd8aef103e"
     proved="true"
     expanded="false"
@@ -71,10 +71,10 @@
    <goal
     name="depths_unique2"
     locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-    loclnum="35" loccnumb="8" loccnume="22"
+    loclnum="36" loccnumb="8" loccnume="22"
     sum="2ae4c874a4a94f10b52a47094ed624d9"
     proved="false"
-    expanded="true"
+    expanded="false"
     shape="ainfix =V0V1Aainfix =V2V3Iainfix =adepthsV2V0adepthsV3V1F">
     <proof
      prover="3"
@@ -89,25 +89,49 @@
    <goal
     name="depths_prefix"
     locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-    loclnum="39" loccnumb="8" loccnume="21"
+    loclnum="40" loccnumb="8" loccnume="21"
     sum="12472e01935f374992072e8a828706cb"
     proved="false"
     expanded="false"
     shape="ainfix =V1V2Iainfix =ainfix ++adepthsV1V0V3ainfix ++adepthsV2V0V4F">
+    <proof
+     prover="0"
+     timelimit="20"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.04"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="20"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="20.15"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="20"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="20.20"/>
+    </proof>
    </goal>
    <goal
     name="depths_prefix_simple"
     locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-    loclnum="43" loccnumb="8" loccnume="28"
+    loclnum="44" loccnumb="8" loccnume="28"
     sum="c6ee3e87ee10912ee1abe93bda6f6b57"
-    proved="false"
+    proved="true"
     expanded="false"
     shape="ainfix =V1V2Iainfix =adepthsV1V0adepthsV2V0F">
     <proof
      prover="0"
      timelimit="20"
      memlimit="0"
-     obsolete="true"
+     obsolete="false"
      archived="false">
      <result status="valid" time="0.01"/>
     </proof>
@@ -115,7 +139,7 @@
    <goal
     name="depths_subtree"
     locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-    loclnum="47" loccnumb="8" loccnume="22"
+    loclnum="48" loccnumb="8" loccnume="22"
     sum="dc34ce2a5ed26d8aab53d8c2d2c96748"
     proved="true"
     expanded="false"
@@ -134,13 +158,13 @@
   <theory
    name="WP TreeReconstruction"
    locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-   loclnum="53" loccnumb="7" loccnume="25"
+   loclnum="54" loccnumb="7" loccnume="25"
    verified="true"
    expanded="false">
    <goal
     name="WP_parameter build_rec"
     locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-    loclnum="72" loccnumb="10" loccnume="19"
+    loclnum="73" loccnumb="10" loccnume="19"
     expl="parameter build_rec"
     sum="42dd274072aca963826437feb55fe10e"
     proved="true"
@@ -155,7 +179,7 @@
      <goal
       name="WP_parameter build_rec.1"
       locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="72" loccnumb="10" loccnume="19"
+      loclnum="73" loccnumb="10" loccnume="19"
       expl="parameter build_rec"
       sum="d26a5cf4734b3f43ad5eab59f73e039c"
       proved="true"
@@ -175,7 +199,7 @@
      <goal
       name="WP_parameter build_rec.2"
       locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="72" loccnumb="10" loccnume="19"
+      loclnum="73" loccnumb="10" loccnume="19"
       expl="parameter build_rec"
       sum="3da64daa75b1485f5568929df91a9f5e"
       proved="true"
@@ -195,7 +219,7 @@
      <goal
       name="WP_parameter build_rec.3"
       locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="72" loccnumb="10" loccnume="19"
+      loclnum="73" loccnumb="10" loccnume="19"
       expl="parameter build_rec"
       sum="2b433fb9e079f669522de1f765321757"
       proved="true"
@@ -215,7 +239,7 @@
      <goal
       name="WP_parameter build_rec.4"
       locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="72" loccnumb="10" loccnume="19"
+      loclnum="73" loccnumb="10" loccnume="19"
       expl="parameter build_rec"
       sum="3118cbd66dd4f09735d971180d6b68f9"
       proved="true"
@@ -230,7 +254,7 @@
        <goal
         name="WP_parameter build_rec.4.1"
         locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-        loclnum="72" loccnumb="10" loccnume="19"
+        loclnum="73" loccnumb="10" loccnume="19"
         expl="parameter build_rec"
         sum="3118cbd66dd4f09735d971180d6b68f9"
         proved="true"
@@ -252,7 +276,7 @@
      <goal
       name="WP_parameter build_rec.5"
       locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="72" loccnumb="10" loccnume="19"
+      loclnum="73" loccnumb="10" loccnume="19"
       expl="parameter build_rec"
       sum="4e3e0bc64f006274a281025181ba4e07"
       proved="true"
@@ -272,7 +296,7 @@
      <goal
       name="WP_parameter build_rec.6"
       locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="72" loccnumb="10" loccnume="19"
+      loclnum="73" loccnumb="10" loccnume="19"
       expl="parameter build_rec"
       sum="cbb93fc380d3e33103d2b7695f967e64"
       proved="true"
@@ -292,7 +316,7 @@
      <goal
       name="WP_parameter build_rec.7"
       locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="72" loccnumb="10" loccnume="19"
+      loclnum="73" loccnumb="10" loccnume="19"
       expl="parameter build_rec"
       sum="8e3e33c4b3c4197e7679f0e39c0829ec"
       proved="true"
@@ -313,7 +337,7 @@
      <goal
       name="WP_parameter build_rec.8"
       locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="72" loccnumb="10" loccnume="19"
+      loclnum="73" loccnumb="10" loccnume="19"
       expl="parameter build_rec"
       sum="4c14300813842be057adb5616de5250d"
       proved="true"
@@ -336,7 +360,7 @@
    <goal
     name="WP_parameter build"
     locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-    loclnum="90" loccnumb="6" loccnume="11"
+    loclnum="91" loccnumb="6" loccnume="11"
     expl="parameter build"
     sum="741ce43f813cf6ce7f42ccbb6a9fc3bd"
     proved="true"
@@ -351,7 +375,7 @@
      <goal
       name="WP_parameter build.1"
       locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="90" loccnumb="6" loccnume="11"
+      loclnum="91" loccnumb="6" loccnume="11"
       expl="parameter build"
       sum="42515f207fd2c02be0a8478f19157850"
       proved="true"
@@ -371,7 +395,7 @@
      <goal
       name="WP_parameter build.2"
       locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="90" loccnumb="6" loccnume="11"
+      loclnum="91" loccnumb="6" loccnume="11"
       expl="parameter build"
       sum="a51bf7b554669762be15a972c716659f"
       proved="true"
@@ -392,7 +416,7 @@
      <goal
       name="WP_parameter build.3"
       locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="90" loccnumb="6" loccnume="11"
+      loclnum="91" loccnumb="6" loccnume="11"
       expl="exceptional postcondition"
       sum="d3542ed8310ba9217b239ec5a4b867c8"
       proved="true"
@@ -416,13 +440,13 @@
   <theory
    name="WP Harness"
    locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-   loclnum="102" loccnumb="7" loccnume="14"
+   loclnum="103" loccnumb="7" loccnume="14"
    verified="true"
    expanded="false">
    <goal
     name="WP_parameter harness"
     locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-    loclnum="106" loccnumb="6" loccnume="13"
+    loclnum="107" loccnumb="6" loccnume="13"
     expl="parameter harness"
     sum="295d5559fd111def546e506e3b20493d"
     proved="true"
@@ -437,7 +461,7 @@
      <goal
       name="WP_parameter harness.1"
       locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="106" loccnumb="6" loccnume="13"
+      loclnum="107" loccnumb="6" loccnume="13"
       expl="normal postcondition"
       sum="78a7b6beb9aee3799f277159b763db7c"
       proved="true"
@@ -458,7 +482,7 @@
      <goal
       name="WP_parameter harness.2"
       locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="106" loccnumb="6" loccnume="13"
+      loclnum="107" loccnumb="6" loccnume="13"
       expl="parameter harness"
       sum="2cdcdf7229d1d07e9ff3048883df4004"
       proved="true"
@@ -481,7 +505,7 @@
    <goal
     name="WP_parameter harness2"
     locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-    loclnum="111" loccnumb="6" loccnume="14"
+    loclnum="112" loccnumb="6" loccnume="14"
     expl="parameter harness2"
     sum="af4b49cb216206c2f964dded94229867"
     proved="true"
@@ -503,13 +527,13 @@
   <theory
    name="WP ZipperBased"
    locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-   loclnum="136" loccnumb="7" loccnume="18"
+   loclnum="137" loccnumb="7" loccnume="18"
    verified="false"
    expanded="true">
    <goal
     name="forest_depths_append"
     locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-    loclnum="148" loccnumb="8" loccnume="28"
+    loclnum="149" loccnumb="8" loccnume="28"
     sum="fa17aaebd23462dbb67b4368fd13a732"
     proved="true"
     expanded="false"
@@ -527,8 +551,8 @@
    <goal
     name="g_append"
     locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-    loclnum="162" loccnumb="8" loccnume="16"
-    sum="35e94d5736f23fb8392afd217b0485c9"
+    loclnum="168" loccnumb="8" loccnume="16"
+    sum="0b20199ebec48f7aed4345c14fa91e39"
     proved="true"
     expanded="false"
     shape="agV0Iagainfix ++V0V1F">
@@ -539,14 +563,14 @@
      edited="vstte12_tree_reconstruction_WP_ZipperBased_g_append_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="1.90"/>
+     <result status="valid" time="1.85"/>
     </proof>
    </goal>
    <goal
     name="g_tail"
     locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-    loclnum="165" loccnumb="8" loccnume="14"
-    sum="a731c011824bb8d03a2ce3801bbf61e5"
+    loclnum="171" loccnumb="8" loccnume="14"
+    sum="15bf08b8b7d65cdad04b39fbea278937"
     proved="true"
     expanded="false"
     shape="agareverseV0IagareverseaConsaTuple2V1V2V0F">
@@ -562,8 +586,8 @@
    <goal
     name="right_nil"
     locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-    loclnum="169" loccnumb="8" loccnume="17"
-    sum="ac76d71b4b4e8ce16ea04652590035f4"
+    loclnum="175" loccnumb="8" loccnume="17"
+    sum="0286445db1f609bb114bdcc16540b519"
     proved="true"
     expanded="false"
     shape="ainfix =aforest_depthsV0adepthsc0V1NFIagV0Iainfix &gt;=alengthV0c2F">
@@ -574,22 +598,22 @@
      edited="vstte12_tree_reconstruction_WP_ZipperBased_right_nil_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="1.70"/>
+     <result status="valid" time="2.46"/>
     </proof>
    </goal>
    <goal
     name="main_lemma"
     locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-    loclnum="173" loccnumb="8" loccnume="18"
-    sum="aca563207c5866c0a1e650c2a154afcd"
+    loclnum="179" loccnumb="8" loccnume="18"
+    sum="d88eef4d1662bea8180bf5e2a4ee06e4"
     proved="false"
     expanded="true"
-    shape="agareverseaConsaTuple2V2V4aConsaTuple2V1V3V0IagareverseaConsaTuple2V1V3V0Iainfix =V1V2NF">
+    shape="agareverseaConsaTuple2V2V4aConsaTuple2V1V3V0ICV4aNodeVwagareverseaConsaTuple2ainfix +V2c1V5aConsaTuple2V1V3V0aLeaftIagareverseaConsaTuple2V1V3V0Iainfix =V1V2NF">
     <proof
      prover="0"
      timelimit="20"
      memlimit="0"
-     obsolete="false"
+     obsolete="true"
      archived="false">
      <result status="timeout" time="20.29"/>
     </proof>
@@ -606,7 +630,7 @@
      prover="2"
      timelimit="20"
      memlimit="0"
-     obsolete="false"
+     obsolete="true"
      archived="false">
      <result status="timeout" time="20.10"/>
     </proof>
@@ -614,7 +638,7 @@
      prover="4"
      timelimit="20"
      memlimit="0"
-     obsolete="false"
+     obsolete="true"
      archived="false">
      <result status="timeout" time="20.08"/>
     </proof>
@@ -622,12 +646,12 @@
    <goal
     name="WP_parameter tc"
     locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-    loclnum="180" loccnumb="10" loccnume="12"
+    loclnum="188" loccnumb="10" loccnume="12"
     expl="parameter tc"
-    sum="cf08411a009638a6c31e606f9685a4f9"
+    sum="dddaec0424fb1cf19d334193c96113d3"
     proved="true"
     expanded="false"
-    shape="CV1aConsVVCV3aNilCV2aTuple2VVCV0aConsVVCV6aTuple2VViainfix =V8V4ainfix =adepthsc0V10aforest_depthsainfix ++areverseV0V1NFIainfix =adepthsc0V11aforest_depthsainfix ++areverseV7aConsaTuple2ainfix -V8c1aNodeV9V5V3NFAainfix =adepthsc0V12aforest_depthsainfix ++areverseV0V1Iainfix =adepthsc0V12aforest_depthsainfix ++areverseV7aConsaTuple2ainfix -V8c1aNodeV9V5V3FACV7aConsaTuple2VVaNilainfix =aConsaTuple2ainfix -V8c1aNodeV9V5V3aNilNOainfix =V13c0NwtAagareverseV7ainfix =adepthsc0V15aforest_depthsainfix ++areverseV0V1NFIainfix =adepthsc0V16aforest_depthsainfix ++areverseaConsaTuple2V4V5V0V3NFAainfix =adepthsc0V17aforest_depthsainfix ++areverseV0V1Iainfix =adepthsc0V17aforest_depthsainfix ++areverseaConsaTuple2V4V5V0V3FACV0aNilainfix =V3aNilNOainfix =V4c0NwtAagareverseaConsaTuple2V4V5V0aNiliainfix =V4c0ainfix =adepthsc0V5aforest_depthsainfix ++areverseV0V1ainfix =adepthsc0V18aforest_depthsainfix ++areverseV0V1NFwCV2aTuple2VVCV0aConsVVCV21aTuple2VViainfix =V23V19ainfix =adepthsc0V25aforest_depthsainfix ++areverseV0V1NFIainfix =adepthsc0V26aforest_depthsainfix ++areverseV22aConsaTuple2ainfix -V23c1aNodeV24V20V3NFAainfix =adepthsc0V27aforest_depthsainfix ++areverseV0V1Iainfix =adepthsc0V27aforest_depthsainfix ++areverseV22aConsaTuple2ainfix -V23c1aNodeV24V20V3FACV22aConsaTuple2VVaNilainfix =aConsaTuple2ainfix -V23c1aNodeV24V20V3aNilNOainfix =V28c0NwtAagareverseV22ainfix =adepthsc0V30aforest_depthsainfix ++areverseV0V1NFIainfix =adepthsc0V31aforest_depthsainfix ++areverseaConsaTuple2V19V20V0V3NFAainfix =adepthsc0V32aforest_depthsainfix ++areverseV0V1Iainfix =adepthsc0V32aforest_depthsainfix ++areverseaConsaTuple2V19V20V0V3FACV0aNilainfix =V3aNilNOainfix =V19c0NwtAagareverseaConsaTuple2V19V20V0aNilainfix =adepthsc0V33aforest_depthsainfix ++areverseV0V1NFIainfix =adepthsc0V34aforest_depthsainfix ++areverseaConsaTuple2V19V20aNilV3NFAainfix =adepthsc0V35aforest_depthsainfix ++areverseV0V1Iainfix =adepthsc0V35aforest_depthsainfix ++areverseaConsaTuple2V19V20aNilV3FAainfix =V3aNilNOainfix =V19c0NAagareverseaConsaTuple2V19V20aNilaNilainfix =adepthsc0V36aforest_depthsainfix ++areverseV0V1NFICV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V37c0NwtAagareverseV0FF">
+    shape="CV1aConsVVCV3aNilCV2aTuple2VVCV0aConsVVCV6aTuple2VViainfix =V8V4ainfix =adepthsc0V10aforest_depthsainfix ++areverseV0V1NFIainfix =adepthsc0V11aforest_depthsainfix ++areverseV7aConsaTuple2ainfix -V8c1aNodeV9V5V3NFAainfix =adepthsc0V12aforest_depthsainfix ++areverseV0V1Iainfix =adepthsc0V12aforest_depthsainfix ++areverseV7aConsaTuple2ainfix -V8c1aNodeV9V5V3FAagareverseaConsaTuple2ainfix +ainfix -V8c1c1V9V7Aaonly_leafV3ACV7aConsaTuple2VVaNilainfix =aConsaTuple2ainfix -V8c1aNodeV9V5V3aNilNOainfix =V13c0NwtAagareverseV7ainfix =adepthsc0V15aforest_depthsainfix ++areverseV0V1NFIainfix =adepthsc0V16aforest_depthsainfix ++areverseaConsaTuple2V4V5V0V3NFAainfix =adepthsc0V17aforest_depthsainfix ++areverseV0V1Iainfix =adepthsc0V17aforest_depthsainfix ++areverseaConsaTuple2V4V5V0V3FACV3aConsaTuple2VVVCV19aNodeVwagareverseaConsaTuple2ainfix +V18c1V21aConsaTuple2V4V5V0aLeaftAaonly_leafV20aNiltACV0aNilainfix =V3aNilNOainfix =V4c0NwtAagareverseaConsaTuple2V4V5V0aNiliainfix =V4c0ainfix =adepthsc0V5aforest_depthsainfix ++areverseV0V1ainfix =adepthsc0V22aforest_depthsainfix ++areverseV0V1NFwCV2aTuple2VVCV0aConsVVCV25aTuple2VViainfix =V27V23ainfix =adepthsc0V29aforest_depthsainfix ++areverseV0V1NFIainfix =adepthsc0V30aforest_depthsainfix ++areverseV26aConsaTuple2ainfix -V27c1aNodeV28V24V3NFAainfix =adepthsc0V31aforest_depthsainfix ++areverseV0V1Iainfix =adepthsc0V31aforest_depthsainfix ++areverseV26aConsaTuple2ainfix -V27c1aNodeV28V24V3FAagareverseaConsaTuple2ainfix +ainfix -V27c1c1V28V26Aaonly_leafV3ACV26aConsaTuple2VVaNilainfix =aConsaTuple2ainfix -V27c1aNodeV28V24V3aNilNOainfix =V32c0NwtAagareverseV26ainfix =adepthsc0V34aforest_depthsainfix ++areverseV0V1NFIainfix =adepthsc0V35aforest_depthsainfix ++areverseaConsaTuple2V23V24V0V3NFAainfix =adepthsc0V36aforest_depthsainfix ++areverseV0V1Iainfix =adepthsc0V36aforest_depthsainfix ++areverseaConsaTuple2V23V24V0V3FACV3aConsaTuple2VVVCV38aNodeVwagareverseaConsaTuple2ainfix +V37c1V40aConsaTuple2V23V24V0aLeaftAaonly_leafV39aNiltACV0aNilainfix =V3aNilNOainfix =V23c0NwtAagareverseaConsaTuple2V23V24V0aNilainfix =adepthsc0V41aforest_depthsainfix ++areverseV0V1NFIainfix =adepthsc0V42aforest_depthsainfix ++areverseaConsaTuple2V23V24aNilV3NFAainfix =adepthsc0V43aforest_depthsainfix ++areverseV0V1Iainfix =adepthsc0V43aforest_depthsainfix ++areverseaConsaTuple2V23V24aNilV3FACV3aConsaTuple2VVVCV45aNodeVwagareverseaConsaTuple2ainfix +V44c1V47aConsaTuple2V23V24aNilaLeaftAaonly_leafV46aNiltAainfix =V3aNilNOainfix =V23c0NAagareverseaConsaTuple2V23V24aNilaNilainfix =adepthsc0V48aforest_depthsainfix ++areverseV0V1NFICV1aConsaTuple2VVVCV50aNodeVwagareverseaConsaTuple2ainfix +V49c1V52V0aLeaftAaonly_leafV51aNiltACV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V53c0NwtAagareverseV0FF">
     <label
      name="expl:parameter tc"/>
     <transf
@@ -637,73 +661,12 @@
      <goal
       name="WP_parameter tc.1"
       locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="180" loccnumb="10" loccnume="12"
+      loclnum="188" loccnumb="10" loccnume="12"
       expl="parameter tc"
-      sum="57d097d7504691d65942084437a19ab0"
+      sum="abd64c9c69cb0e3117198a855a6a0034"
       proved="true"
       expanded="false"
-      shape="CV1aConsVVCV3aNilCV2aTuple2VVCV0aConsVVCV6aTuple2VVCV7aConsaTuple2VVaNilainfix =aConsaTuple2ainfix -V8c1aNodeV9V5V3aNilNOainfix =V10c0NwtAagareverseV7Iainfix =V8V4aNiltwtaNiltICV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V12c0NwtAagareverseV0FF">
-      <label
-       name="expl:parameter tc"/>
-      <proof
-       prover="4"
-       timelimit="20"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.14"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter tc.2"
-      locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="180" loccnumb="10" loccnume="12"
-      expl="parameter tc"
-      sum="814c9e6e0df7c05a88799c2edbd2c087"
-      proved="true"
-      expanded="false"
-      shape="CV1aConsVVCV3aNilCV2aTuple2VVCV0aConsVVCV6aTuple2VVainfix =adepthsc0V10aforest_depthsainfix ++areverseV0V1Iainfix =adepthsc0V10aforest_depthsainfix ++areverseV7aConsaTuple2ainfix -V8c1aNodeV9V5V3FICV7aConsaTuple2VVaNilainfix =aConsaTuple2ainfix -V8c1aNodeV9V5V3aNilNOainfix =V11c0NwtAagareverseV7Iainfix =V8V4aNiltwtaNiltICV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V13c0NwtAagareverseV0FF">
-      <label
-       name="expl:parameter tc"/>
-      <proof
-       prover="2"
-       timelimit="30"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="1.94"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter tc.3"
-      locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="180" loccnumb="10" loccnume="12"
-      expl="parameter tc"
-      sum="0772e3006b8ad3d4904661336282baae"
-      proved="true"
-      expanded="false"
-      shape="CV1aConsVVCV3aNilCV2aTuple2VVCV0aConsVVCV6aTuple2VVainfix =adepthsc0V10aforest_depthsainfix ++areverseV0V1NFIainfix =adepthsc0V11aforest_depthsainfix ++areverseV7aConsaTuple2ainfix -V8c1aNodeV9V5V3NFIainfix =adepthsc0V12aforest_depthsainfix ++areverseV0V1Iainfix =adepthsc0V12aforest_depthsainfix ++areverseV7aConsaTuple2ainfix -V8c1aNodeV9V5V3FICV7aConsaTuple2VVaNilainfix =aConsaTuple2ainfix -V8c1aNodeV9V5V3aNilNOainfix =V13c0NwtAagareverseV7Iainfix =V8V4aNiltwtaNiltICV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V15c0NwtAagareverseV0FF">
-      <label
-       name="expl:parameter tc"/>
-      <proof
-       prover="3"
-       timelimit="20"
-       memlimit="0"
-       edited="vstte12_tree_reconstruction_WP_ZipperBased_WP_parameter_tc_2.v"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="1.67"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter tc.4"
-      locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="180" loccnumb="10" loccnume="12"
-      expl="parameter tc"
-      sum="0314ddff4b012adb8dbac9e65f550e26"
-      proved="true"
-      expanded="false"
-      shape="CV1aConsVVCV3aNilCV2aTuple2VVCV0aConsVVCV6aTuple2VVCV0aNilainfix =V3aNilNOainfix =V4c0NwtAagareverseaConsaTuple2V4V5V0Iainfix =V8V4NaNiltwtaNiltICV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V10c0NwtAagareverseV0FF">
+      shape="CV1aConsVVCV3aNilCV2aTuple2VVCV0aConsVVCV6aTuple2VVagareverseaConsaTuple2ainfix +ainfix -V8c1c1V9V7Aaonly_leafV3ACV7aConsaTuple2VVaNilainfix =aConsaTuple2ainfix -V8c1aNodeV9V5V3aNilNOainfix =V10c0NwtAagareverseV7Iainfix =V8V4aNiltwtaNiltICV1aConsaTuple2VVVCV13aNodeVwagareverseaConsaTuple2ainfix +V12c1V15V0aLeaftAaonly_leafV14aNiltACV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V16c0NwtAagareverseV0FF">
       <label
        name="expl:parameter tc"/>
       <transf
@@ -711,34 +674,34 @@
        proved="true"
        expanded="false">
        <goal
-        name="WP_parameter tc.4.1"
+        name="WP_parameter tc.1.1"
         locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-        loclnum="180" loccnumb="10" loccnume="12"
+        loclnum="188" loccnumb="10" loccnume="12"
         expl="parameter tc"
-        sum="a2e350f145c6a2e38f5386ea0904859d"
+        sum="e3eaecc231da6dad87599ca7bc6d14a4"
         proved="true"
         expanded="false"
-        shape="CV1aConsVVCV3aNilCV2aTuple2VVCV0aConsVVCV6aTuple2VVagareverseaConsaTuple2V4V5V0Iainfix =V8V4NaNiltwtaNiltICV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V10c0NwtAagareverseV0FF">
+        shape="CV1aConsVVCV3aNilCV2aTuple2VVCV0aConsVVCV6aTuple2VVagareverseV7Iainfix =V8V4aNiltwtaNiltICV1aConsaTuple2VVVCV11aNodeVwagareverseaConsaTuple2ainfix +V10c1V13V0aLeaftAaonly_leafV12aNiltACV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V14c0NwtAagareverseV0FF">
         <label
          name="expl:parameter tc"/>
         <proof
-         prover="4"
+         prover="2"
          timelimit="20"
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.06"/>
+         <result status="valid" time="0.08"/>
         </proof>
        </goal>
        <goal
-        name="WP_parameter tc.4.2"
+        name="WP_parameter tc.1.2"
         locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-        loclnum="180" loccnumb="10" loccnume="12"
+        loclnum="188" loccnumb="10" loccnume="12"
         expl="parameter tc"
-        sum="3f49941d054d0d6d57124e9f662711ba"
+        sum="b32f8101c1df70c1336e74b0a57bad44"
         proved="true"
         expanded="false"
-        shape="CV1aConsVVCV3aNilCV2aTuple2VVCV0aConsVVCV6aTuple2VVCV0aNilainfix =V3aNilNOainfix =V4c0NwtIainfix =V8V4NaNiltwtaNiltICV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V10c0NwtAagareverseV0FF">
+        shape="CV1aConsVVCV3aNilCV2aTuple2VVCV0aConsVVCV6aTuple2VVCV7aConsaTuple2VVaNilainfix =aConsaTuple2ainfix -V8c1aNodeV9V5V3aNilNOainfix =V10c0NwtIainfix =V8V4aNiltwtaNiltICV1aConsaTuple2VVVCV13aNodeVwagareverseaConsaTuple2ainfix +V12c1V15V0aLeaftAaonly_leafV14aNiltACV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V16c0NwtAagareverseV0FF">
         <label
          name="expl:parameter tc"/>
         <proof
@@ -750,45 +713,195 @@
          <result status="valid" time="0.05"/>
         </proof>
        </goal>
+       <goal
+        name="WP_parameter tc.1.3"
+        locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+        loclnum="188" loccnumb="10" loccnume="12"
+        expl="parameter tc"
+        sum="6617344e365415dddbb2266b7d0ea5ad"
+        proved="true"
+        expanded="false"
+        shape="CV1aConsVVCV3aNilCV2aTuple2VVCV0aConsVVCV6aTuple2VVaonly_leafV3Iainfix =V8V4aNiltwtaNiltICV1aConsaTuple2VVVCV11aNodeVwagareverseaConsaTuple2ainfix +V10c1V13V0aLeaftAaonly_leafV12aNiltACV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V14c0NwtAagareverseV0FF">
+        <label
+         name="expl:parameter tc"/>
+        <proof
+         prover="2"
+         timelimit="20"
+         memlimit="0"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.04"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter tc.1.4"
+        locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+        loclnum="188" loccnumb="10" loccnume="12"
+        expl="parameter tc"
+        sum="21e9466aea200b24739505f8c1850340"
+        proved="true"
+        expanded="false"
+        shape="CV1aConsVVCV3aNilCV2aTuple2VVCV0aConsVVCV6aTuple2VVagareverseaConsaTuple2ainfix +ainfix -V8c1c1V9V7Iainfix =V8V4aNiltwtaNiltICV1aConsaTuple2VVVCV11aNodeVwagareverseaConsaTuple2ainfix +V10c1V13V0aLeaftAaonly_leafV12aNiltACV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V14c0NwtAagareverseV0FF">
+        <label
+         name="expl:parameter tc"/>
+        <proof
+         prover="4"
+         timelimit="20"
+         memlimit="0"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.04"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter tc.2"
+      locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+      loclnum="188" loccnumb="10" loccnume="12"
+      expl="parameter tc"
+      sum="d1c696d62879669114e634cc3bfee9d6"
+      proved="true"
+      expanded="false"
+      shape="CV1aConsVVCV3aNilCV2aTuple2VVCV0aConsVVCV6aTuple2VVainfix =adepthsc0V10aforest_depthsainfix ++areverseV0V1Iainfix =adepthsc0V10aforest_depthsainfix ++areverseV7aConsaTuple2ainfix -V8c1aNodeV9V5V3FIagareverseaConsaTuple2ainfix +ainfix -V8c1c1V9V7Aaonly_leafV3ACV7aConsaTuple2VVaNilainfix =aConsaTuple2ainfix -V8c1aNodeV9V5V3aNilNOainfix =V11c0NwtAagareverseV7Iainfix =V8V4aNiltwtaNiltICV1aConsaTuple2VVVCV14aNodeVwagareverseaConsaTuple2ainfix +V13c1V16V0aLeaftAaonly_leafV15aNiltACV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V17c0NwtAagareverseV0FF">
+      <label
+       name="expl:parameter tc"/>
+      <proof
+       prover="2"
+       timelimit="30"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="2.31"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter tc.3"
+      locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+      loclnum="188" loccnumb="10" loccnume="12"
+      expl="parameter tc"
+      sum="4d25b8eeabb4f95b7bf75aaf97ce0399"
+      proved="true"
+      expanded="false"
+      shape="CV1aConsVVCV3aNilCV2aTuple2VVCV0aConsVVCV6aTuple2VVainfix =adepthsc0V10aforest_depthsainfix ++areverseV0V1NFIainfix =adepthsc0V11aforest_depthsainfix ++areverseV7aConsaTuple2ainfix -V8c1aNodeV9V5V3NFIainfix =adepthsc0V12aforest_depthsainfix ++areverseV0V1Iainfix =adepthsc0V12aforest_depthsainfix ++areverseV7aConsaTuple2ainfix -V8c1aNodeV9V5V3FIagareverseaConsaTuple2ainfix +ainfix -V8c1c1V9V7Aaonly_leafV3ACV7aConsaTuple2VVaNilainfix =aConsaTuple2ainfix -V8c1aNodeV9V5V3aNilNOainfix =V13c0NwtAagareverseV7Iainfix =V8V4aNiltwtaNiltICV1aConsaTuple2VVVCV16aNodeVwagareverseaConsaTuple2ainfix +V15c1V18V0aLeaftAaonly_leafV17aNiltACV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V19c0NwtAagareverseV0FF">
+      <label
+       name="expl:parameter tc"/>
+      <proof
+       prover="3"
+       timelimit="20"
+       memlimit="0"
+       edited="vstte12_tree_reconstruction_WP_ZipperBased_WP_parameter_tc_2.v"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="1.95"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter tc.4"
+      locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+      loclnum="188" loccnumb="10" loccnume="12"
+      expl="parameter tc"
+      sum="3f4ca2ca78d02cab49d3220b994477c2"
+      proved="true"
+      expanded="false"
+      shape="CV1aConsVVCV3aNilCV2aTuple2VVCV0aConsVVCV6aTuple2VVCV3aConsaTuple2VVVCV11aNodeVwagareverseaConsaTuple2ainfix +V10c1V13aConsaTuple2V4V5V0aLeaftAaonly_leafV12aNiltACV0aNilainfix =V3aNilNOainfix =V4c0NwtAagareverseaConsaTuple2V4V5V0Iainfix =V8V4NaNiltwtaNiltICV1aConsaTuple2VVVCV15aNodeVwagareverseaConsaTuple2ainfix +V14c1V17V0aLeaftAaonly_leafV16aNiltACV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V18c0NwtAagareverseV0FF">
+      <label
+       name="expl:parameter tc"/>
+      <transf
+       name="split_goal"
+       proved="true"
+       expanded="false">
+       <goal
+        name="WP_parameter tc.4.1"
+        locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+        loclnum="188" loccnumb="10" loccnume="12"
+        expl="parameter tc"
+        sum="5261d0edc909d72d17183fd85eca7669"
+        proved="true"
+        expanded="false"
+        shape="CV1aConsVVCV3aNilCV2aTuple2VVCV0aConsVVCV6aTuple2VVagareverseaConsaTuple2V4V5V0Iainfix =V8V4NaNiltwtaNiltICV1aConsaTuple2VVVCV11aNodeVwagareverseaConsaTuple2ainfix +V10c1V13V0aLeaftAaonly_leafV12aNiltACV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V14c0NwtAagareverseV0FF">
+        <label
+         name="expl:parameter tc"/>
+        <proof
+         prover="0"
+         timelimit="20"
+         memlimit="0"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="1.61"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter tc.4.2"
+        locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+        loclnum="188" loccnumb="10" loccnume="12"
+        expl="parameter tc"
+        sum="b26d95946a77bb6060adb6fee03da18f"
+        proved="true"
+        expanded="false"
+        shape="CV1aConsVVCV3aNilCV2aTuple2VVCV0aConsVVCV6aTuple2VVCV0aNilainfix =V3aNilNOainfix =V4c0NwtIainfix =V8V4NaNiltwtaNiltICV1aConsaTuple2VVVCV11aNodeVwagareverseaConsaTuple2ainfix +V10c1V13V0aLeaftAaonly_leafV12aNiltACV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V14c0NwtAagareverseV0FF">
+        <label
+         name="expl:parameter tc"/>
+        <proof
+         prover="2"
+         timelimit="20"
+         memlimit="0"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.06"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter tc.4.3"
+        locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+        loclnum="188" loccnumb="10" loccnume="12"
+        expl="parameter tc"
+        sum="58866a72bb0e6a8d66f01c3b23a60cec"
+        proved="true"
+        expanded="false"
+        shape="CV1aConsVVCV3aNilCV2aTuple2VVCV0aConsVVCV6aTuple2VVCV3aConsaTuple2VVVaonly_leafV12aNiltIainfix =V8V4NaNiltwtaNiltICV1aConsaTuple2VVVCV14aNodeVwagareverseaConsaTuple2ainfix +V13c1V16V0aLeaftAaonly_leafV15aNiltACV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V17c0NwtAagareverseV0FF">
+        <label
+         name="expl:parameter tc"/>
+        <proof
+         prover="2"
+         timelimit="20"
+         memlimit="0"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.04"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter tc.4.4"
+        locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+        loclnum="188" loccnumb="10" loccnume="12"
+        expl="parameter tc"
+        sum="057deb519db00f2dd2b26f24c64253f1"
+        proved="true"
+        expanded="false"
+        shape="CV1aConsVVCV3aNilCV2aTuple2VVCV0aConsVVCV6aTuple2VVCV3aConsaTuple2VVVCV11aNodeVwagareverseaConsaTuple2ainfix +V10c1V13aConsaTuple2V4V5V0aLeaftaNiltIainfix =V8V4NaNiltwtaNiltICV1aConsaTuple2VVVCV15aNodeVwagareverseaConsaTuple2ainfix +V14c1V17V0aLeaftAaonly_leafV16aNiltACV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V18c0NwtAagareverseV0FF">
+        <label
+         name="expl:parameter tc"/>
+        <proof
+         prover="2"
+         timelimit="20"
+         memlimit="0"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.06"/>
+        </proof>
+       </goal>
       </transf>
      </goal>
      <goal
       name="WP_parameter tc.5"
       locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="180" loccnumb="10" loccnume="12"
+      loclnum="188" loccnumb="10" loccnume="12"
       expl="parameter tc"
-      sum="dedae12b76935077b0374dd611e29d20"
+      sum="4d439559144c4f17f60ead1b6f8aa163"
       proved="true"
       expanded="false"
-      shape="CV1aConsVVCV3aNilCV2aTuple2VVCV0aConsVVCV6aTuple2VVainfix =adepthsc0V10aforest_depthsainfix ++areverseV0V1Iainfix =adepthsc0V10aforest_depthsainfix ++areverseaConsaTuple2V4V5V0V3FICV0aNilainfix =V3aNilNOainfix =V4c0NwtAagareverseaConsaTuple2V4V5V0Iainfix =V8V4NaNiltwtaNiltICV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V11c0NwtAagareverseV0FF">
-      <label
-       name="expl:parameter tc"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof
-       prover="2"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.21"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter tc.6"
-      locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="180" loccnumb="10" loccnume="12"
-      expl="parameter tc"
-      sum="13870c9d5bd68b9d64b9ec109ea9c571"
-      proved="true"
-      expanded="false"
-      shape="CV1aConsVVCV3aNilCV2aTuple2VVCV0aConsVVCV6aTuple2VVainfix =adepthsc0V10aforest_depthsainfix ++areverseV0V1NFIainfix =adepthsc0V11aforest_depthsainfix ++areverseaConsaTuple2V4V5V0V3NFIainfix =adepthsc0V12aforest_depthsainfix ++areverseV0V1Iainfix =adepthsc0V12aforest_depthsainfix ++areverseaConsaTuple2V4V5V0V3FICV0aNilainfix =V3aNilNOainfix =V4c0NwtAagareverseaConsaTuple2V4V5V0Iainfix =V8V4NaNiltwtaNiltICV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V13c0NwtAagareverseV0FF">
+      shape="CV1aConsVVCV3aNilCV2aTuple2VVCV0aConsVVCV6aTuple2VVainfix =adepthsc0V10aforest_depthsainfix ++areverseV0V1Iainfix =adepthsc0V10aforest_depthsainfix ++areverseaConsaTuple2V4V5V0V3FICV3aConsaTuple2VVVCV12aNodeVwagareverseaConsaTuple2ainfix +V11c1V14aConsaTuple2V4V5V0aLeaftAaonly_leafV13aNiltACV0aNilainfix =V3aNilNOainfix =V4c0NwtAagareverseaConsaTuple2V4V5V0Iainfix =V8V4NaNiltwtaNiltICV1aConsaTuple2VVVCV16aNodeVwagareverseaConsaTuple2ainfix +V15c1V18V0aLeaftAaonly_leafV17aNiltACV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V19c0NwtAagareverseV0FF">
       <label
        name="expl:parameter tc"/>
       <proof
@@ -805,18 +918,46 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.09"/>
+       <result status="valid" time="0.22"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter tc.6"
+      locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+      loclnum="188" loccnumb="10" loccnume="12"
+      expl="parameter tc"
+      sum="e2430d04ffdd4b803afae8a86131df55"
+      proved="true"
+      expanded="false"
+      shape="CV1aConsVVCV3aNilCV2aTuple2VVCV0aConsVVCV6aTuple2VVainfix =adepthsc0V10aforest_depthsainfix ++areverseV0V1NFIainfix =adepthsc0V11aforest_depthsainfix ++areverseaConsaTuple2V4V5V0V3NFIainfix =adepthsc0V12aforest_depthsainfix ++areverseV0V1Iainfix =adepthsc0V12aforest_depthsainfix ++areverseaConsaTuple2V4V5V0V3FICV3aConsaTuple2VVVCV14aNodeVwagareverseaConsaTuple2ainfix +V13c1V16aConsaTuple2V4V5V0aLeaftAaonly_leafV15aNiltACV0aNilainfix =V3aNilNOainfix =V4c0NwtAagareverseaConsaTuple2V4V5V0Iainfix =V8V4NaNiltwtaNiltICV1aConsaTuple2VVVCV18aNodeVwagareverseaConsaTuple2ainfix +V17c1V20V0aLeaftAaonly_leafV19aNiltACV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V21c0NwtAagareverseV0FF">
+      <label
+       name="expl:parameter tc"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="10"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.19"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter tc.7"
       locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="180" loccnumb="10" loccnume="12"
+      loclnum="188" loccnumb="10" loccnume="12"
       expl="parameter tc"
-      sum="6d4308f94dcdf3666b850ae1aea99dfa"
+      sum="b977b2e23a747c35caf946d90a88dd99"
       proved="true"
       expanded="false"
-      shape="CV1aConsVVCV3aNilCV2aTuple2VVCV0aConsVVtaNilainfix =adepthsc0V5aforest_depthsainfix ++areverseV0V1Iainfix =V4c0wtaNiltICV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V8c0NwtAagareverseV0FF">
+      shape="CV1aConsVVCV3aNilCV2aTuple2VVCV0aConsVVtaNilainfix =adepthsc0V5aforest_depthsainfix ++areverseV0V1Iainfix =V4c0wtaNiltICV1aConsaTuple2VVVCV9aNodeVwagareverseaConsaTuple2ainfix +V8c1V11V0aLeaftAaonly_leafV10aNiltACV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V12c0NwtAagareverseV0FF">
       <label
        name="expl:parameter tc"/>
       <proof
@@ -831,12 +972,12 @@
      <goal
       name="WP_parameter tc.8"
       locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="180" loccnumb="10" loccnume="12"
+      loclnum="188" loccnumb="10" loccnume="12"
       expl="parameter tc"
-      sum="5b06aff51082ef369e64280a092b3cb9"
+      sum="e096a6b6675c1c818c66bac5fe3da8f4"
       proved="true"
       expanded="false"
-      shape="CV1aConsVVCV3aNilCV2aTuple2VVCV0aConsVVtaNilainfix =adepthsc0V8aforest_depthsainfix ++areverseV0V1NFIainfix =V4c0NwtaNiltICV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V9c0NwtAagareverseV0FF">
+      shape="CV1aConsVVCV3aNilCV2aTuple2VVCV0aConsVVtaNilainfix =adepthsc0V8aforest_depthsainfix ++areverseV0V1NFIainfix =V4c0NwtaNiltICV1aConsaTuple2VVVCV10aNodeVwagareverseaConsaTuple2ainfix +V9c1V12V0aLeaftAaonly_leafV11aNiltACV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V13c0NwtAagareverseV0FF">
       <label
        name="expl:parameter tc"/>
       <proof
@@ -845,18 +986,18 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.09"/>
+       <result status="valid" time="0.18"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter tc.9"
       locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="180" loccnumb="10" loccnume="12"
+      loclnum="188" loccnumb="10" loccnume="12"
       expl="parameter tc"
-      sum="c8f7af9f530cc0665fc1aff74d30041e"
+      sum="347eadfb1044c1b95502251c007b7f6f"
       proved="true"
       expanded="false"
-      shape="CV1aConsVVCV3aNiltwCV2aTuple2VVCV0aConsVVCV6aTuple2VVCV7aConsaTuple2VVaNilainfix =aConsaTuple2ainfix -V8c1aNodeV9V5V3aNilNOainfix =V10c0NwtAagareverseV7Iainfix =V8V4aNiltaNiltICV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V12c0NwtAagareverseV0FF">
+      shape="CV1aConsVVCV3aNiltwCV2aTuple2VVCV0aConsVVCV6aTuple2VVagareverseaConsaTuple2ainfix +ainfix -V8c1c1V9V7Aaonly_leafV3ACV7aConsaTuple2VVaNilainfix =aConsaTuple2ainfix -V8c1aNodeV9V5V3aNilNOainfix =V10c0NwtAagareverseV7Iainfix =V8V4aNiltaNiltICV1aConsaTuple2VVVCV13aNodeVwagareverseaConsaTuple2ainfix +V12c1V15V0aLeaftAaonly_leafV14aNiltACV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V16c0NwtAagareverseV0FF">
       <label
        name="expl:parameter tc"/>
       <transf
@@ -866,32 +1007,12 @@
        <goal
         name="WP_parameter tc.9.1"
         locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-        loclnum="180" loccnumb="10" loccnume="12"
+        loclnum="188" loccnumb="10" loccnume="12"
         expl="parameter tc"
-        sum="f6b4447c805826c570c270cd6f70f941"
+        sum="ae1b422f285eeea8925071d7dcb7164b"
         proved="true"
         expanded="false"
-        shape="CV1aConsVVCV3aNiltwCV2aTuple2VVCV0aConsVVCV6aTuple2VVagareverseV7Iainfix =V8V4aNiltaNiltICV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V10c0NwtAagareverseV0FF">
-        <label
-         name="expl:parameter tc"/>
-        <proof
-         prover="4"
-         timelimit="20"
-         memlimit="0"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.04"/>
-        </proof>
-       </goal>
-       <goal
-        name="WP_parameter tc.9.2"
-        locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-        loclnum="180" loccnumb="10" loccnume="12"
-        expl="parameter tc"
-        sum="8e9865a180c4973c74a3bf8cd2a513e1"
-        proved="true"
-        expanded="false"
-        shape="CV1aConsVVCV3aNiltwCV2aTuple2VVCV0aConsVVCV6aTuple2VVCV7aConsaTuple2VVaNilainfix =aConsaTuple2ainfix -V8c1aNodeV9V5V3aNilNOainfix =V10c0NwtIainfix =V8V4aNiltaNiltICV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V12c0NwtAagareverseV0FF">
+        shape="CV1aConsVVCV3aNiltwCV2aTuple2VVCV0aConsVVCV6aTuple2VVagareverseV7Iainfix =V8V4aNiltaNiltICV1aConsaTuple2VVVCV11aNodeVwagareverseaConsaTuple2ainfix +V10c1V13V0aLeaftAaonly_leafV12aNiltACV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V14c0NwtAagareverseV0FF">
         <label
          name="expl:parameter tc"/>
         <proof
@@ -900,7 +1021,67 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.04"/>
+         <result status="valid" time="0.08"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter tc.9.2"
+        locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+        loclnum="188" loccnumb="10" loccnume="12"
+        expl="parameter tc"
+        sum="2536a748836fd9f5b5b594b179428841"
+        proved="true"
+        expanded="false"
+        shape="CV1aConsVVCV3aNiltwCV2aTuple2VVCV0aConsVVCV6aTuple2VVCV7aConsaTuple2VVaNilainfix =aConsaTuple2ainfix -V8c1aNodeV9V5V3aNilNOainfix =V10c0NwtIainfix =V8V4aNiltaNiltICV1aConsaTuple2VVVCV13aNodeVwagareverseaConsaTuple2ainfix +V12c1V15V0aLeaftAaonly_leafV14aNiltACV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V16c0NwtAagareverseV0FF">
+        <label
+         name="expl:parameter tc"/>
+        <proof
+         prover="2"
+         timelimit="20"
+         memlimit="0"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.05"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter tc.9.3"
+        locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+        loclnum="188" loccnumb="10" loccnume="12"
+        expl="parameter tc"
+        sum="7f7363f61c23132e67b7127a1331b1c9"
+        proved="true"
+        expanded="false"
+        shape="CV1aConsVVCV3aNiltwCV2aTuple2VVCV0aConsVVCV6aTuple2VVaonly_leafV3Iainfix =V8V4aNiltaNiltICV1aConsaTuple2VVVCV11aNodeVwagareverseaConsaTuple2ainfix +V10c1V13V0aLeaftAaonly_leafV12aNiltACV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V14c0NwtAagareverseV0FF">
+        <label
+         name="expl:parameter tc"/>
+        <proof
+         prover="2"
+         timelimit="20"
+         memlimit="0"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.07"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter tc.9.4"
+        locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+        loclnum="188" loccnumb="10" loccnume="12"
+        expl="parameter tc"
+        sum="ef276e044767538f1c2b98cbb92e46d1"
+        proved="true"
+        expanded="false"
+        shape="CV1aConsVVCV3aNiltwCV2aTuple2VVCV0aConsVVCV6aTuple2VVagareverseaConsaTuple2ainfix +ainfix -V8c1c1V9V7Iainfix =V8V4aNiltaNiltICV1aConsaTuple2VVVCV11aNodeVwagareverseaConsaTuple2ainfix +V10c1V13V0aLeaftAaonly_leafV12aNiltACV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V14c0NwtAagareverseV0FF">
+        <label
+         name="expl:parameter tc"/>
+        <proof
+         prover="4"
+         timelimit="20"
+         memlimit="0"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.06"/>
         </proof>
        </goal>
       </transf>
@@ -908,12 +1089,12 @@
      <goal
       name="WP_parameter tc.10"
       locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="180" loccnumb="10" loccnume="12"
+      loclnum="188" loccnumb="10" loccnume="12"
       expl="parameter tc"
-      sum="26ce2dbcf773d2c0bb0236c48e0aac46"
+      sum="5cf0c34d51f605f4b218aef9cfb66c56"
       proved="true"
       expanded="false"
-      shape="CV1aConsVVCV3aNiltwCV2aTuple2VVCV0aConsVVCV6aTuple2VVainfix =adepthsc0V10aforest_depthsainfix ++areverseV0V1Iainfix =adepthsc0V10aforest_depthsainfix ++areverseV7aConsaTuple2ainfix -V8c1aNodeV9V5V3FICV7aConsaTuple2VVaNilainfix =aConsaTuple2ainfix -V8c1aNodeV9V5V3aNilNOainfix =V11c0NwtAagareverseV7Iainfix =V8V4aNiltaNiltICV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V13c0NwtAagareverseV0FF">
+      shape="CV1aConsVVCV3aNiltwCV2aTuple2VVCV0aConsVVCV6aTuple2VVainfix =adepthsc0V10aforest_depthsainfix ++areverseV0V1Iainfix =adepthsc0V10aforest_depthsainfix ++areverseV7aConsaTuple2ainfix -V8c1aNodeV9V5V3FIagareverseaConsaTuple2ainfix +ainfix -V8c1c1V9V7Aaonly_leafV3ACV7aConsaTuple2VVaNilainfix =aConsaTuple2ainfix -V8c1aNodeV9V5V3aNilNOainfix =V11c0NwtAagareverseV7Iainfix =V8V4aNiltaNiltICV1aConsaTuple2VVVCV14aNodeVwagareverseaConsaTuple2ainfix +V13c1V16V0aLeaftAaonly_leafV15aNiltACV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V17c0NwtAagareverseV0FF">
       <label
        name="expl:parameter tc"/>
       <proof
@@ -923,18 +1104,18 @@
        edited="vstte12_tree_reconstruction_WP_ZipperBased_WP_parameter_tc_3.v"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.95"/>
+       <result status="valid" time="0.86"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter tc.11"
       locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="180" loccnumb="10" loccnume="12"
+      loclnum="188" loccnumb="10" loccnume="12"
       expl="parameter tc"
-      sum="470bc5b8de142e261e56928942526c9a"
+      sum="811ab6b0d6f89abb9164f9ec84e33ca1"
       proved="true"
       expanded="false"
-      shape="CV1aConsVVCV3aNiltwCV2aTuple2VVCV0aConsVVCV6aTuple2VVainfix =adepthsc0V10aforest_depthsainfix ++areverseV0V1NFIainfix =adepthsc0V11aforest_depthsainfix ++areverseV7aConsaTuple2ainfix -V8c1aNodeV9V5V3NFIainfix =adepthsc0V12aforest_depthsainfix ++areverseV0V1Iainfix =adepthsc0V12aforest_depthsainfix ++areverseV7aConsaTuple2ainfix -V8c1aNodeV9V5V3FICV7aConsaTuple2VVaNilainfix =aConsaTuple2ainfix -V8c1aNodeV9V5V3aNilNOainfix =V13c0NwtAagareverseV7Iainfix =V8V4aNiltaNiltICV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V15c0NwtAagareverseV0FF">
+      shape="CV1aConsVVCV3aNiltwCV2aTuple2VVCV0aConsVVCV6aTuple2VVainfix =adepthsc0V10aforest_depthsainfix ++areverseV0V1NFIainfix =adepthsc0V11aforest_depthsainfix ++areverseV7aConsaTuple2ainfix -V8c1aNodeV9V5V3NFIainfix =adepthsc0V12aforest_depthsainfix ++areverseV0V1Iainfix =adepthsc0V12aforest_depthsainfix ++areverseV7aConsaTuple2ainfix -V8c1aNodeV9V5V3FIagareverseaConsaTuple2ainfix +ainfix -V8c1c1V9V7Aaonly_leafV3ACV7aConsaTuple2VVaNilainfix =aConsaTuple2ainfix -V8c1aNodeV9V5V3aNilNOainfix =V13c0NwtAagareverseV7Iainfix =V8V4aNiltaNiltICV1aConsaTuple2VVVCV16aNodeVwagareverseaConsaTuple2ainfix +V15c1V18V0aLeaftAaonly_leafV17aNiltACV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V19c0NwtAagareverseV0FF">
       <label
        name="expl:parameter tc"/>
       <proof
@@ -944,18 +1125,18 @@
        edited="vstte12_tree_reconstruction_WP_ZipperBased_WP_parameter_tc_4.v"
        obsolete="false"
        archived="false">
-       <result status="valid" time="1.57"/>
+       <result status="valid" time="2.23"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter tc.12"
       locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="180" loccnumb="10" loccnume="12"
+      loclnum="188" loccnumb="10" loccnume="12"
       expl="parameter tc"
-      sum="3c8c8fc8ed471ec348b717b731a49ec7"
+      sum="676b41cae77fa43a17b291ebd3690752"
       proved="true"
       expanded="false"
-      shape="CV1aConsVVCV3aNiltwCV2aTuple2VVCV0aConsVVCV6aTuple2VVCV0aNilainfix =V3aNilNOainfix =V4c0NwtAagareverseaConsaTuple2V4V5V0Iainfix =V8V4NaNiltaNiltICV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V10c0NwtAagareverseV0FF">
+      shape="CV1aConsVVCV3aNiltwCV2aTuple2VVCV0aConsVVCV6aTuple2VVCV3aConsaTuple2VVVCV11aNodeVwagareverseaConsaTuple2ainfix +V10c1V13aConsaTuple2V4V5V0aLeaftAaonly_leafV12aNiltACV0aNilainfix =V3aNilNOainfix =V4c0NwtAagareverseaConsaTuple2V4V5V0Iainfix =V8V4NaNiltaNiltICV1aConsaTuple2VVVCV15aNodeVwagareverseaConsaTuple2ainfix +V14c1V17V0aLeaftAaonly_leafV16aNiltACV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V18c0NwtAagareverseV0FF">
       <label
        name="expl:parameter tc"/>
       <transf
@@ -965,32 +1146,32 @@
        <goal
         name="WP_parameter tc.12.1"
         locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-        loclnum="180" loccnumb="10" loccnume="12"
+        loclnum="188" loccnumb="10" loccnume="12"
         expl="parameter tc"
-        sum="7fc8c7300f3f53391def5eefc3b87691"
+        sum="ef5224379b2bb7927794542051fe9021"
         proved="true"
         expanded="false"
-        shape="CV1aConsVVCV3aNiltwCV2aTuple2VVCV0aConsVVCV6aTuple2VVagareverseaConsaTuple2V4V5V0Iainfix =V8V4NaNiltaNiltICV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V10c0NwtAagareverseV0FF">
+        shape="CV1aConsVVCV3aNiltwCV2aTuple2VVCV0aConsVVCV6aTuple2VVagareverseaConsaTuple2V4V5V0Iainfix =V8V4NaNiltaNiltICV1aConsaTuple2VVVCV11aNodeVwagareverseaConsaTuple2ainfix +V10c1V13V0aLeaftAaonly_leafV12aNiltACV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V14c0NwtAagareverseV0FF">
         <label
          name="expl:parameter tc"/>
         <proof
-         prover="4"
+         prover="0"
          timelimit="20"
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.04"/>
+         <result status="valid" time="1.44"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter tc.12.2"
         locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-        loclnum="180" loccnumb="10" loccnume="12"
+        loclnum="188" loccnumb="10" loccnume="12"
         expl="parameter tc"
-        sum="f6662ec28cfb1e4bafee452ce2e44a5b"
+        sum="7d9493b385098a35d8ed78c25e3d43e3"
         proved="true"
         expanded="false"
-        shape="CV1aConsVVCV3aNiltwCV2aTuple2VVCV0aConsVVCV6aTuple2VVCV0aNilainfix =V3aNilNOainfix =V4c0NwtIainfix =V8V4NaNiltaNiltICV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V10c0NwtAagareverseV0FF">
+        shape="CV1aConsVVCV3aNiltwCV2aTuple2VVCV0aConsVVCV6aTuple2VVCV0aNilainfix =V3aNilNOainfix =V4c0NwtIainfix =V8V4NaNiltaNiltICV1aConsaTuple2VVVCV11aNodeVwagareverseaConsaTuple2ainfix +V10c1V13V0aLeaftAaonly_leafV12aNiltACV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V14c0NwtAagareverseV0FF">
         <label
          name="expl:parameter tc"/>
         <proof
@@ -999,7 +1180,47 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.04"/>
+         <result status="valid" time="0.06"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter tc.12.3"
+        locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+        loclnum="188" loccnumb="10" loccnume="12"
+        expl="parameter tc"
+        sum="a7d6fd7f71b427fec76bbc4d2ad8a396"
+        proved="true"
+        expanded="false"
+        shape="CV1aConsVVCV3aNiltwCV2aTuple2VVCV0aConsVVCV6aTuple2VVCV3aConsaTuple2VVVaonly_leafV12aNiltIainfix =V8V4NaNiltaNiltICV1aConsaTuple2VVVCV14aNodeVwagareverseaConsaTuple2ainfix +V13c1V16V0aLeaftAaonly_leafV15aNiltACV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V17c0NwtAagareverseV0FF">
+        <label
+         name="expl:parameter tc"/>
+        <proof
+         prover="2"
+         timelimit="20"
+         memlimit="0"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.18"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter tc.12.4"
+        locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+        loclnum="188" loccnumb="10" loccnume="12"
+        expl="parameter tc"
+        sum="156dcfdd7ab884579fff7992363c715c"
+        proved="true"
+        expanded="false"
+        shape="CV1aConsVVCV3aNiltwCV2aTuple2VVCV0aConsVVCV6aTuple2VVCV3aConsaTuple2VVVCV11aNodeVwagareverseaConsaTuple2ainfix +V10c1V13aConsaTuple2V4V5V0aLeaftaNiltIainfix =V8V4NaNiltaNiltICV1aConsaTuple2VVVCV15aNodeVwagareverseaConsaTuple2ainfix +V14c1V17V0aLeaftAaonly_leafV16aNiltACV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V18c0NwtAagareverseV0FF">
+        <label
+         name="expl:parameter tc"/>
+        <proof
+         prover="2"
+         timelimit="20"
+         memlimit="0"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.26"/>
         </proof>
        </goal>
       </transf>
@@ -1007,12 +1228,12 @@
      <goal
       name="WP_parameter tc.13"
       locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="180" loccnumb="10" loccnume="12"
+      loclnum="188" loccnumb="10" loccnume="12"
       expl="parameter tc"
-      sum="43db134719aa2d983ae2068a688862c7"
+      sum="5137b60564380824f49c82bba599ceb0"
       proved="true"
       expanded="false"
-      shape="CV1aConsVVCV3aNiltwCV2aTuple2VVCV0aConsVVCV6aTuple2VVainfix =adepthsc0V10aforest_depthsainfix ++areverseV0V1Iainfix =adepthsc0V10aforest_depthsainfix ++areverseaConsaTuple2V4V5V0V3FICV0aNilainfix =V3aNilNOainfix =V4c0NwtAagareverseaConsaTuple2V4V5V0Iainfix =V8V4NaNiltaNiltICV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V11c0NwtAagareverseV0FF">
+      shape="CV1aConsVVCV3aNiltwCV2aTuple2VVCV0aConsVVCV6aTuple2VVainfix =adepthsc0V10aforest_depthsainfix ++areverseV0V1Iainfix =adepthsc0V10aforest_depthsainfix ++areverseaConsaTuple2V4V5V0V3FICV3aConsaTuple2VVVCV12aNodeVwagareverseaConsaTuple2ainfix +V11c1V14aConsaTuple2V4V5V0aLeaftAaonly_leafV13aNiltACV0aNilainfix =V3aNilNOainfix =V4c0NwtAagareverseaConsaTuple2V4V5V0Iainfix =V8V4NaNiltaNiltICV1aConsaTuple2VVVCV16aNodeVwagareverseaConsaTuple2ainfix +V15c1V18V0aLeaftAaonly_leafV17aNiltACV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V19c0NwtAagareverseV0FF">
       <label
        name="expl:parameter tc"/>
       <proof
@@ -1021,67 +1242,11 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.03"/>
       </proof>
       <proof
        prover="2"
        timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.05"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter tc.14"
-      locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="180" loccnumb="10" loccnume="12"
-      expl="parameter tc"
-      sum="9ce68752cedbbfbc99cc3fb7da9e288b"
-      proved="true"
-      expanded="false"
-      shape="CV1aConsVVCV3aNiltwCV2aTuple2VVCV0aConsVVCV6aTuple2VVainfix =adepthsc0V10aforest_depthsainfix ++areverseV0V1NFIainfix =adepthsc0V11aforest_depthsainfix ++areverseaConsaTuple2V4V5V0V3NFIainfix =adepthsc0V12aforest_depthsainfix ++areverseV0V1Iainfix =adepthsc0V12aforest_depthsainfix ++areverseaConsaTuple2V4V5V0V3FICV0aNilainfix =V3aNilNOainfix =V4c0NwtAagareverseaConsaTuple2V4V5V0Iainfix =V8V4NaNiltaNiltICV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V13c0NwtAagareverseV0FF">
-      <label
-       name="expl:parameter tc"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof
-       prover="2"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.06"/>
-      </proof>
-      <proof
-       prover="4"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.05"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter tc.15"
-      locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="180" loccnumb="10" loccnume="12"
-      expl="parameter tc"
-      sum="39aee2af68289a96fade25fbe6f3081a"
-      proved="true"
-      expanded="false"
-      shape="CV1aConsVVCV3aNiltwCV2aTuple2VVCV0aConsVVtaNilainfix =V3aNilNOainfix =V4c0NAagareverseaConsaTuple2V4V5aNilaNiltICV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V8c0NwtAagareverseV0FF">
-      <label
-       name="expl:parameter tc"/>
-      <proof
-       prover="4"
-       timelimit="20"
        memlimit="0"
        obsolete="false"
        archived="false">
@@ -1089,14 +1254,14 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter tc.16"
+      name="WP_parameter tc.14"
       locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="180" loccnumb="10" loccnume="12"
+      loclnum="188" loccnumb="10" loccnume="12"
       expl="parameter tc"
-      sum="17e1c4ed0aedfd6c450be962401d2024"
+      sum="d3f654e4cc2b090de5014e887115aa7f"
       proved="true"
       expanded="false"
-      shape="CV1aConsVVCV3aNiltwCV2aTuple2VVCV0aConsVVtaNilainfix =adepthsc0V8aforest_depthsainfix ++areverseV0V1Iainfix =adepthsc0V8aforest_depthsainfix ++areverseaConsaTuple2V4V5aNilV3FIainfix =V3aNilNOainfix =V4c0NAagareverseaConsaTuple2V4V5aNilaNiltICV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V9c0NwtAagareverseV0FF">
+      shape="CV1aConsVVCV3aNiltwCV2aTuple2VVCV0aConsVVCV6aTuple2VVainfix =adepthsc0V10aforest_depthsainfix ++areverseV0V1NFIainfix =adepthsc0V11aforest_depthsainfix ++areverseaConsaTuple2V4V5V0V3NFIainfix =adepthsc0V12aforest_depthsainfix ++areverseV0V1Iainfix =adepthsc0V12aforest_depthsainfix ++areverseaConsaTuple2V4V5V0V3FICV3aConsaTuple2VVVCV14aNodeVwagareverseaConsaTuple2ainfix +V13c1V16aConsaTuple2V4V5V0aLeaftAaonly_leafV15aNiltACV0aNilainfix =V3aNilNOainfix =V4c0NwtAagareverseaConsaTuple2V4V5V0Iainfix =V8V4NaNiltaNiltICV1aConsaTuple2VVVCV18aNodeVwagareverseaConsaTuple2ainfix +V17c1V20V0aLeaftAaonly_leafV19aNiltACV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V21c0NwtAagareverseV0FF">
       <label
        name="expl:parameter tc"/>
       <proof
@@ -1105,10 +1270,18 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.03"/>
+       <result status="valid" time="0.04"/>
       </proof>
       <proof
        prover="2"
+       timelimit="10"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.09"/>
+      </proof>
+      <proof
+       prover="4"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -1117,14 +1290,42 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter tc.17"
+      name="WP_parameter tc.15"
       locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="180" loccnumb="10" loccnume="12"
+      loclnum="188" loccnumb="10" loccnume="12"
       expl="parameter tc"
-      sum="c349d08100ffd1e6ad921e029ffec618"
+      sum="e3ece255be1bcf6481fcf98cfd57aa8a"
       proved="true"
       expanded="false"
-      shape="CV1aConsVVCV3aNiltwCV2aTuple2VVCV0aConsVVtaNilainfix =adepthsc0V8aforest_depthsainfix ++areverseV0V1NFIainfix =adepthsc0V9aforest_depthsainfix ++areverseaConsaTuple2V4V5aNilV3NFIainfix =adepthsc0V10aforest_depthsainfix ++areverseV0V1Iainfix =adepthsc0V10aforest_depthsainfix ++areverseaConsaTuple2V4V5aNilV3FIainfix =V3aNilNOainfix =V4c0NAagareverseaConsaTuple2V4V5aNilaNiltICV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V11c0NwtAagareverseV0FF">
+      shape="CV1aConsVVCV3aNiltwCV2aTuple2VVCV0aConsVVtaNilCV3aConsaTuple2VVVCV9aNodeVwagareverseaConsaTuple2ainfix +V8c1V11aConsaTuple2V4V5aNilaLeaftAaonly_leafV10aNiltAainfix =V3aNilNOainfix =V4c0NAagareverseaConsaTuple2V4V5aNilaNiltICV1aConsaTuple2VVVCV13aNodeVwagareverseaConsaTuple2ainfix +V12c1V15V0aLeaftAaonly_leafV14aNiltACV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V16c0NwtAagareverseV0FF">
+      <label
+       name="expl:parameter tc"/>
+      <proof
+       prover="2"
+       timelimit="20"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.33"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="20"
+       memlimit="0"
+       obsolete="true"
+       archived="false">
+       <result status="timeout" time="20.33"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter tc.16"
+      locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+      loclnum="188" loccnumb="10" loccnume="12"
+      expl="parameter tc"
+      sum="4e6e71cc702b94121c2917e521299eca"
+      proved="true"
+      expanded="false"
+      shape="CV1aConsVVCV3aNiltwCV2aTuple2VVCV0aConsVVtaNilainfix =adepthsc0V8aforest_depthsainfix ++areverseV0V1Iainfix =adepthsc0V8aforest_depthsainfix ++areverseaConsaTuple2V4V5aNilV3FICV3aConsaTuple2VVVCV10aNodeVwagareverseaConsaTuple2ainfix +V9c1V12aConsaTuple2V4V5aNilaLeaftAaonly_leafV11aNiltAainfix =V3aNilNOainfix =V4c0NAagareverseaConsaTuple2V4V5aNilaNiltICV1aConsaTuple2VVVCV14aNodeVwagareverseaConsaTuple2ainfix +V13c1V16V0aLeaftAaonly_leafV15aNiltACV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V17c0NwtAagareverseV0FF">
       <label
        name="expl:parameter tc"/>
       <proof
@@ -1141,7 +1342,35 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.05"/>
+       <result status="valid" time="0.07"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter tc.17"
+      locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+      loclnum="188" loccnumb="10" loccnume="12"
+      expl="parameter tc"
+      sum="c6421d3d7139dd819b3b649c3fe4f887"
+      proved="true"
+      expanded="false"
+      shape="CV1aConsVVCV3aNiltwCV2aTuple2VVCV0aConsVVtaNilainfix =adepthsc0V8aforest_depthsainfix ++areverseV0V1NFIainfix =adepthsc0V9aforest_depthsainfix ++areverseaConsaTuple2V4V5aNilV3NFIainfix =adepthsc0V10aforest_depthsainfix ++areverseV0V1Iainfix =adepthsc0V10aforest_depthsainfix ++areverseaConsaTuple2V4V5aNilV3FICV3aConsaTuple2VVVCV12aNodeVwagareverseaConsaTuple2ainfix +V11c1V14aConsaTuple2V4V5aNilaLeaftAaonly_leafV13aNiltAainfix =V3aNilNOainfix =V4c0NAagareverseaConsaTuple2V4V5aNilaNiltICV1aConsaTuple2VVVCV16aNodeVwagareverseaConsaTuple2ainfix +V15c1V18V0aLeaftAaonly_leafV17aNiltACV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V19c0NwtAagareverseV0FF">
+      <label
+       name="expl:parameter tc"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="10"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.07"/>
       </proof>
       <proof
        prover="4"
@@ -1149,18 +1378,18 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.05"/>
+       <result status="valid" time="0.06"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter tc.18"
       locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="180" loccnumb="10" loccnume="12"
+      loclnum="188" loccnumb="10" loccnume="12"
       expl="parameter tc"
-      sum="112365b9b15b8d93abc80496fb183a2f"
+      sum="28bb36593633c810fcb15ebf756f15cf"
       proved="true"
       expanded="false"
-      shape="CV1aConsVVtaNilainfix =adepthsc0V4aforest_depthsainfix ++areverseV0V1NFICV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V5c0NwtAagareverseV0FF">
+      shape="CV1aConsVVtaNilainfix =adepthsc0V4aforest_depthsainfix ++areverseV0V1NFICV1aConsaTuple2VVVCV6aNodeVwagareverseaConsaTuple2ainfix +V5c1V8V0aLeaftAaonly_leafV7aNiltACV0aConsaTuple2VVaNilainfix =V1aNilNOainfix =V9c0NwtAagareverseV0FF">
       <label
        name="expl:parameter tc"/>
       <proof
@@ -1169,7 +1398,7 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.27"/>
+       <result status="valid" time="0.39"/>
       </proof>
      </goal>
     </transf>
@@ -1177,8 +1406,8 @@
    <goal
     name="map_leaf_depths"
     locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-    loclnum="205" loccnumb="8" loccnume="23"
-    sum="1277b0664aa0c25fea70c4ace2710d78"
+    loclnum="219" loccnumb="8" loccnume="23"
+    sum="78d3b0270f6edf5d908d348f86fcbc9b"
     proved="true"
     expanded="false"
     shape="ainfix =aforest_depthsamap_leafV0V0F">
@@ -1189,27 +1418,45 @@
      edited="vstte12_tree_reconstruction_WP_ZipperBased_map_leaf_depths_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.69"/>
+     <result status="valid" time="1.13"/>
+    </proof>
+   </goal>
+   <goal
+    name="map_leaf_only_leaf"
+    locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+    loclnum="222" loccnumb="8" loccnume="26"
+    sum="a1d8104776e5ec44ea2f5a1e71105f71"
+    proved="true"
+    expanded="false"
+    shape="aonly_leafamap_leafV0F">
+    <proof
+     prover="3"
+     timelimit="20"
+     memlimit="0"
+     edited="vstte12_tree_reconstruction_WP_ZipperBased_map_leaf_only_leaf_1.v"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.64"/>
     </proof>
    </goal>
    <goal
     name="WP_parameter build"
     locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-    loclnum="208" loccnumb="6" loccnume="11"
+    loclnum="225" loccnumb="6" loccnume="11"
     expl="parameter build"
-    sum="47b07f0dac68ad653a1866063f59df17"
+    sum="a6d7d3359401fa66fd8efee0b2174c39"
     proved="true"
     expanded="false"
-    shape="ainfix =adepthsc0V1V0NFIainfix =adepthsc0V2aforest_depthsainfix ++areverseaNilamap_leafV0NFAainfix =adepthsc0V3V0Iainfix =adepthsc0V3aforest_depthsainfix ++areverseaNilamap_leafV0FAagareverseaNilF">
+    shape="ainfix =adepthsc0V1V0NFIainfix =adepthsc0V2aforest_depthsainfix ++areverseaNilamap_leafV0NFAainfix =adepthsc0V3V0Iainfix =adepthsc0V3aforest_depthsainfix ++areverseaNilamap_leafV0FACamap_leafV0aConsaTuple2VVVCV5aNodeVwagareverseaConsaTuple2ainfix +V4c1V7aNilaLeaftAaonly_leafV6aNiltAagareverseaNilF">
     <label
      name="expl:parameter build"/>
     <proof
      prover="0"
-     timelimit="30"
+     timelimit="20"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.04"/>
+     <result status="valid" time="0.11"/>
     </proof>
    </goal>
   </theory>

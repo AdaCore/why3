@@ -23,7 +23,8 @@ theory Tree
     | Node l r -> depths (d+1) l ++ depths (d+1) r
   end
 
-  (* two lemmas on depths *)
+  (* lemmas on depths *)
+
   lemma depths_head:
     forall t: tree, d: int.
     match depths d t with Cons x _ -> x >= d | Nil -> false end
@@ -149,6 +150,11 @@ module ZipperBased
     forall f1 f2: list (int, tree).
     forest_depths (f1 ++ f2) = forest_depths f1 ++ forest_depths f2
 
+  predicate only_leaf (l: list (int, tree)) = match l with
+    | Nil -> true
+    | Cons (_, t) r -> t = Leaf /\ only_leaf r
+  end
+
   predicate greedy (d1: int) (t1: tree) (l: list (int, tree)) =
     forall d: int. d < d1 -> forall t: tree, s: list int.
     depths d t ++ s <> forest_depths (Cons (d1, t1) l)
@@ -173,6 +179,8 @@ module ZipperBased
   lemma main_lemma:
     forall l: list (int, tree), d1 d2: int, t1 t2: tree. d1 <> d2 ->
     g (reverse (Cons (d1, t1) l)) ->
+    match t2 with Node l2 _ ->
+      g (reverse (Cons (d2+1, l2) (Cons (d1, t1) l))) | Leaf -> true end ->
     g (reverse (Cons (d2, t2) (Cons (d1, t1) l)))
 
   exception Failure
@@ -180,8 +188,14 @@ module ZipperBased
   let rec tc (left: list (int, tree)) (right: list (int, tree)) : tree
     (* variant { (length left + length right, length right) } with lex *) =
     { g (reverse left) /\
-      match left with Cons (d, t) Nil -> d <> 0 \/ right <> Nil
-                    | _               -> true                   end }
+      match left with Cons (d1, t1) Nil -> d1 <> 0 \/ right <> Nil
+                    | _                 -> true                    end /\
+      match right with
+        | Cons (d2, t2) right' -> only_leaf right' /\
+            match t2 with Node l2 _ -> g (reverse (Cons (d2+1, l2) left))
+                        | Leaf      -> true end
+        | Nil -> true end
+    }
     match left, right with
     | _, Nil ->
         raise Failure
@@ -204,6 +218,9 @@ module ZipperBased
 
   lemma map_leaf_depths:
     forall l: list int. forest_depths (map_leaf l) = l
+
+  lemma map_leaf_only_leaf:
+    forall l: list int. only_leaf (map_leaf l)
 
   let build (s: list int) =
     {}
