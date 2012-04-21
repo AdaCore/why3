@@ -58,9 +58,9 @@ theory int.Int
   syntax function (-_) "(-%1)%Z"
 
   syntax predicate (<=) "(%1 <= %2)%Z"
-  syntax predicate (<)  "(%1 <  %2)%Z"
+  syntax predicate (<)  "(%1 < %2)%Z"
   syntax predicate (>=) "(%1 >= %2)%Z"
-  syntax predicate (>)  "(%1 >  %2)%Z"
+  syntax predicate (>)  "(%1 > %2)%Z"
 
   remove prop CommutativeGroup.Comm.Comm
   remove prop CommutativeGroup.Assoc.Assoc
@@ -158,9 +158,9 @@ theory real.Real
   syntax function inv  "(Rinv %1)"
 
   syntax predicate (<=) "(%1 <= %2)%R"
-  syntax predicate (<)  "(%1 <  %2)%R"
+  syntax predicate (<)  "(%1 < %2)%R"
   syntax predicate (>=) "(%1 >= %2)%R"
-  syntax predicate (>)  "(%1 >  %2)%R"
+  syntax predicate (>)  "(%1 > %2)%R"
 
   remove prop CommutativeGroup.Comm.Comm
   remove prop CommutativeGroup.Assoc.Assoc

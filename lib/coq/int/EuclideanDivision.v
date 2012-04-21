@@ -28,7 +28,7 @@ case Z_le_dec ; intros H ; ring.
 Qed.
 
 (* Why3 goal *)
-Lemma Div_bound : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (0%Z <  y)%Z) ->
+Lemma Div_bound : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (0%Z < y)%Z) ->
   ((0%Z <= (div x y))%Z /\ ((div x y) <= x)%Z).
 intros x y (Hx,Hy).
 unfold div.
@@ -49,7 +49,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma Mod_bound : forall (x:Z) (y:Z), (~ (y = 0%Z)) -> ((0%Z <= (mod1 x
-  y))%Z /\ ((mod1 x y) <  (Zabs y))%Z).
+  y))%Z /\ ((mod1 x y) < (Zabs y))%Z).
 intros x y Zy.
 zify.
 assert (H1 := Z_mod_neg x y).
@@ -79,7 +79,7 @@ now rewrite Zmod_1_r, Zdiv_1_r.
 Qed.
 
 (* Why3 goal *)
-Lemma Div_inf : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (x <  y)%Z) -> ((div x
+Lemma Div_inf : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (x < y)%Z) -> ((div x
   y) = 0%Z).
 intros x y Hxy.
 unfold div.

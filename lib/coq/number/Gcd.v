@@ -82,7 +82,7 @@ apply Zgcd_0.
 Qed.
 
 (* Why3 goal *)
-Lemma gcd_0_neg : forall (a:Z), (a <  0%Z)%Z -> ((gcd a 0%Z) = (-a)%Z).
+Lemma gcd_0_neg : forall (a:Z), (a < 0%Z)%Z -> ((gcd a 0%Z) = (-a)%Z).
 Proof.
 intros a H.
 rewrite <- Zabs_non_eq.

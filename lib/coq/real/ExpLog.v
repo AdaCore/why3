@@ -31,7 +31,7 @@ exact ln_1.
 Qed.
 
 (* Why3 goal *)
-Lemma Log_mul : forall (x:R) (y:R), ((0%R <  x)%R /\ (0%R <  y)%R) ->
+Lemma Log_mul : forall (x:R) (y:R), ((0%R < x)%R /\ (0%R < y)%R) ->
   ((log (x * y)%R) = ((log x) + (log y))%R).
 intros x y (Hx,Hy).
 now apply ln_mult.
@@ -43,7 +43,7 @@ exact ln_exp.
 Qed.
 
 (* Why3 goal *)
-Lemma Exp_log : forall (x:R), (0%R <  x)%R -> ((exp (log x)) = x).
+Lemma Exp_log : forall (x:R), (0%R < x)%R -> ((exp (log x)) = x).
 exact exp_ln.
 Qed.
 
