@@ -878,13 +878,16 @@ COQLIBS_INT = $(addprefix lib/coq/int/, $(COQLIBS_INT_FILES))
 COQLIBS_REAL_FILES = Abs ExpLog FromInt MinMax Real Square RealInfix
 COQLIBS_REAL = $(addprefix lib/coq/real/, $(COQLIBS_REAL_FILES))
 
+COQLIBS_NUMBER_FILES = Parity
+COQLIBS_NUMBER = $(addprefix lib/coq/number/, $(COQLIBS_NUMBER_FILES))
+
 ifeq (@enable_coq_fp_libs@,yes)
 COQLIBS_FP_FILES = Rounding Single Double
 COQLIBS_FP_ALL_FILES = GenFloat $(COQLIBS_FP_FILES)
 COQLIBS_FP = $(addprefix lib/coq/floating_point/, $(COQLIBS_FP_ALL_FILES))
 endif
 
-COQLIBS_FILES = $(COQLIBS_INT) $(COQLIBS_REAL) $(COQLIBS_FP)
+COQLIBS_FILES = $(COQLIBS_INT) $(COQLIBS_REAL) $(COQLIBS_NUMBER) $(COQLIBS_FP)
 
 COQV  = $(addsuffix .v,  $(COQLIBS_FILES))
 COQVO = $(addsuffix .vo, $(COQLIBS_FILES))
@@ -905,6 +908,8 @@ drivers/coq-realizations.aux: Makefile
 	echo 'theory int.'"$$f"' meta "realized" "int.'"$$f"'", "" end'; done; \
 	for f in $(COQLIBS_REAL_FILES); do \
 	echo 'theory real.'"$$f"' meta "realized" "real.'"$$f"'", "" end'; done; \
+	for f in $(COQLIBS_NUMBER_FILES); do \
+	echo 'theory number.'"$$f"' meta "realized" "number.'"$$f"'", "" end'; done; \
 	for f in $(COQLIBS_FP_FILES); do \
 	echo 'theory floating_point.'"$$f"' meta "realized" "floating_point.'"$$f"'", "" end'; done; \
 	) > $@
@@ -917,6 +922,8 @@ install_no_local::
 	cp $(addsuffix .vo, $(COQLIBS_INT)) $(LIBDIR)/why3/coq/int/
 	mkdir -p $(LIBDIR)/why3/coq/real
 	cp $(addsuffix .vo, $(COQLIBS_REAL)) $(LIBDIR)/why3/coq/real/
+	mkdir -p $(LIBDIR)/why3/coq/number
+	cp $(addsuffix .vo, $(COQLIBS_NUMBER)) $(LIBDIR)/why3/coq/number/
 ifeq (@enable_coq_fp_libs@,yes)
 	mkdir -p $(LIBDIR)/why3/coq/floating_point
 	cp $(addsuffix .vo, $(COQLIBS_FP)) $(LIBDIR)/why3/coq/floating_point/
@@ -937,6 +944,7 @@ clean::
 update-coq: bin/why3 drivers/coq-realizations.aux
 	for f in $(COQLIBS_INT_FILES); do bin/why3 --realize -D drivers/coq-realize.drv -T int.$$f -o lib/coq/int/; done
 	for f in $(COQLIBS_REAL_FILES); do bin/why3 --realize -D drivers/coq-realize.drv -T real.$$f -o lib/coq/real/; done
+	for f in $(COQLIBS_NUMBER_FILES); do bin/why3 --realize -D drivers/coq-realize.drv -T number.$$f -o lib/coq/number/; done
 	for f in $(COQLIBS_FP_FILES); do bin/why3 --realize -D drivers/coq-realize.drv -T floating_point.$$f -o lib/coq/floating_point/; done
 
 else
