@@ -245,14 +245,25 @@ assert (case: (d2 < d1 \/ d2=d1)%Z) by omega. destruct case. 2: auto.
 *)
 Admitted.
 
+(*
 Lemma key_lemma_greedy:
   forall l d t t1 t2 d1 d2, d1 <> d2 ->
-  greedy d t (infix_plpl l (Cons (d1, t1) Nil)) ->
+  g d t (infix_plpl l (Cons (d1, t1) Nil)) ->
+  match t2 with
+  | (Node l2 _) => g (infix_plpl l (Cons (d1, t1) (Cons ((d2 + 1%Z)%Z, l2))))
+  | Leaf => True end ->
   greedy d t (infix_plpl l (Cons (d1, t1) (Cons (d2, t2) Nil))).
 induction l; simpl.
 unfold greedy; simpl.
 intros d t t1 t2 d1 d2 ineq.
 do 2 rewrite Append_l_nil.
+(* l = Nil *)
+admit.
+(* l = Cons _ _ *)
+unfold greedy; simpl.
+intros.
+destruct a.
+z.
 (*
 z.
 unfold greedy; simpl.
@@ -260,6 +271,7 @@ intros. z.
 Qed.
 *)
 Admitted.
+*)
 
 (* Why3 goal *)
 Theorem main_lemma : forall (l:(list (Z* tree)%type)) (d1:Z) (d2:Z) (t1:tree)
@@ -288,11 +300,15 @@ destruct a.
 inversion H0.
 z.
 apply Gtwo.
+(* greedy *)
 replace 
       (infix_plpl (infix_plpl l (Cons (d1, t1) Nil)) (Cons (d2, t2) Nil))
  with (infix_plpl l (Cons (d1, t1) (Cons (d2, t2) Nil))) by z.
 apply key_lemma_greedy; auto.
-
+(* g *)
+apply IHl; auto.
+destruct t2; auto.
+inversion H1; z.
 Qed.
 
 

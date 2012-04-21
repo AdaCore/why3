@@ -33,10 +33,6 @@ theory Tree
     forall t1 t2: tree, d: int, s1 s2: list int.
     depths d t1 ++ s1 = depths d t2 ++ s2 -> t1 = t2 && s1 = s2
 
-  lemma depths_unique2:
-    forall t1 t2: tree, d1 d2: int.
-    depths d1 t1 = depths d2 t2 -> d1 = d2 && t1 = t2
-
   lemma depths_prefix:
     forall t: tree, d1 d2: int, s1 s2: list int.
     depths d1 t ++ s1 = depths d2 t ++ s2 -> d1 = d2
@@ -48,6 +44,10 @@ theory Tree
   lemma depths_subtree:
     forall t1 t2: tree, d1 d2: int, s1: list int.
     depths d1 t1 ++ s1 = depths d2 t2 -> d1 >= d2
+
+  lemma depths_unique2:
+    forall t1 t2: tree, d1 d2: int.
+    depths d1 t1 = depths d2 t2 -> d1 = d2 && t1 = t2
 
 end
 

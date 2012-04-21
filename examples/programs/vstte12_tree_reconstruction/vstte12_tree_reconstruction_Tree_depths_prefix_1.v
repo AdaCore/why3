@@ -87,26 +87,17 @@ Axiom depths_unique : forall (t1:tree) (t2:tree) (d:Z) (s1:(list Z))
   (s2:(list Z)), ((infix_plpl (depths d t1) s1) = (infix_plpl (depths d t2)
   s2)) -> ((t1 = t2) /\ (s1 = s2)).
 
-Axiom depths_prefix : forall (t:tree) (d1:Z) (d2:Z) (s1:(list Z)) (s2:(list
-  Z)), ((infix_plpl (depths d1 t) s1) = (infix_plpl (depths d2 t) s2)) ->
-  (d1 = d2).
-
-Axiom depths_prefix_simple : forall (t:tree) (d1:Z) (d2:Z), ((depths d1
-  t) = (depths d2 t)) -> (d1 = d2).
-
-Axiom depths_subtree : forall (t1:tree) (t2:tree) (d1:Z) (d2:Z) (s1:(list
-  Z)), ((infix_plpl (depths d1 t1) s1) = (depths d2 t2)) -> (d2 <= d1)%Z.
+Axiom depths_unique2 : forall (t1:tree) (t2:tree) (d1:Z) (d2:Z), ((depths d1
+  t1) = (depths d2 t2)) -> ((d1 = d2) /\ (t1 = t2)).
 
 Require Import Why3. Ltac z := why3 "z3-3" timelimit 5.
 
 (* Why3 goal *)
-Theorem depths_unique2 : forall (t1:tree) (t2:tree) (d1:Z) (d2:Z),
-  ((depths d1 t1) = (depths d2 t2)) -> ((d1 = d2) /\ (t1 = t2)).
-intros t1 t2 d1 d2 h.
-assert (depths d1 t1 = infix_plpl (depths d1 t1) Nil)  by z.
-assert (d1 >= d2)%Z by z.
-assert (depths d2 t2 = infix_plpl (depths d2 t2) Nil)  by z.
-assert (d1 = d2) by z.
+Theorem depths_prefix : forall (t:tree) (d1:Z) (d2:Z) (s1:(list Z)) (s2:(list
+  Z)), ((infix_plpl (depths d1 t) s1) = (infix_plpl (depths d2 t) s2)) ->
+  (d1 = d2).
+induction t; simpl.
+z.
 z.
 Qed.
 
