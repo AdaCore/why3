@@ -67,7 +67,9 @@ let css =
 
 let do_file env fname =
   let m = Env.read_file env fname in
-  let add _s th = Doc_def.add_ident th.th_name in
+  let add _s th =
+    Doc_def.add_ident th.th_name;
+    Ident.Sid.iter Doc_def.add_ident th.th_local in
   Mstr.iter add m
 
 let print_file fname =
