@@ -48,8 +48,17 @@ run_dir () {
     done
 }
 
+
 echo "=== Logic ==="
 run_dir .
+echo ""
+
+echo "=== Tests Provers ==="
+run_dir tests-provers
+echo ""
+
+echo "=== Check Builtin translation ==="
+run_dir check-builtin
 echo ""
 
 echo "=== BTS ==="
@@ -63,10 +72,7 @@ echo ""
 echo "=== Programs in their own subdir ==="
 run_dir programs/vacid_0_binary_heaps "-I programs/vacid_0_binary_heaps"
 run_dir hoare_logic "-I hoare_logic"
-echo ""
-
-echo "=== Check Builtin translation ==="
-run_dir check-builtin
+run_dir bitvectors "-I bitvectors"
 echo ""
 
 echo "Summary: $success/$total"
