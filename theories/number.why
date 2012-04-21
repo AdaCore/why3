@@ -122,14 +122,14 @@ theory Gcd
   use int.ComputerDivision
 
   lemma Gcd_computer_mod:
-    forall a b: int [gcd a (ComputerDivision.mod a b)].
-    b <> 0 -> gcd a (ComputerDivision.mod a b) = gcd a b
+    forall a b: int [gcd b (ComputerDivision.mod a b)].
+    b <> 0 -> gcd b (ComputerDivision.mod a b) = gcd a b
 
   use int.EuclideanDivision
 
   lemma Gcd_euclidean_mod:
-    forall a b g: int [gcd a (EuclideanDivision.mod a b)].
-    b <> 0 -> gcd a (EuclideanDivision.mod a b) = gcd a b
+    forall a b g: int [gcd b (EuclideanDivision.mod a b)].
+    b <> 0 -> gcd b (EuclideanDivision.mod a b) = gcd a b
 
   lemma gcd_mult: forall a b c: int. 0 <= c -> gcd (c * a) (c * b) = c * gcd a b
 

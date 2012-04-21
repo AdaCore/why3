@@ -878,7 +878,7 @@ COQLIBS_INT = $(addprefix lib/coq/int/, $(COQLIBS_INT_FILES))
 COQLIBS_REAL_FILES = Abs ExpLog FromInt MinMax Real Square RealInfix
 COQLIBS_REAL = $(addprefix lib/coq/real/, $(COQLIBS_REAL_FILES))
 
-COQLIBS_NUMBER_FILES = Divisibility Parity
+COQLIBS_NUMBER_FILES = Divisibility Gcd Parity
 COQLIBS_NUMBER = $(addprefix lib/coq/number/, $(COQLIBS_NUMBER_FILES))
 
 ifeq (@enable_coq_fp_libs@,yes)
