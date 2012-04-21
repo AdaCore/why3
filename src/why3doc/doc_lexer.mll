@@ -82,16 +82,16 @@ rule scan fmt embedded = parse
           { if embedded then pp_print_string fmt s else
               begin
                 fprintf fmt "</pre>@\n";
-                doc fmt [] lexbuf;
+                doc fmt false [] lexbuf;
                 fprintf fmt "<pre>@\n";
               end;
             scan fmt embedded lexbuf }
   | "(*" as s
           { if embedded then pp_print_string fmt s else
               begin
-                fprintf fmt "<font class=\"comment\">(*";
+                fprintf fmt "<span class=\"comment\">(*";
                 comment fmt true lexbuf;
-                fprintf fmt "</font>";
+                fprintf fmt "</span>";
               end;
             scan fmt embedded lexbuf }
   | ']' as c
@@ -104,9 +104,9 @@ rule scan fmt embedded = parse
   | eof   { () }
   | ident as s
     { if is_keyword1 s then
-        fprintf fmt "<font class=\"keyword1\">%s</font>" s
+        fprintf fmt "<span class=\"keyword1\">%s</span>" s
       else if is_keyword2 s then
-        fprintf fmt "<font class=\"keyword2\">%s</font>" s
+        fprintf fmt "<span class=\"keyword2\">%s</span>" s
       else begin
         let (* f,l,c as *) loc = get_loc lexbuf in
         (* Format.eprintf "  IDENT %s/%d/%d@." f l c; *)
@@ -164,34 +164,48 @@ and string fmt do_output = parse
   | _ as s { if do_output then pp_print_string fmt s;
              string fmt do_output lexbuf }
 
-and doc fmt headings = parse
-  | "*)"   { () }
+and doc fmt block headings = parse
+  | "*)"   { if block then fprintf fmt "</p>@\n" }
   | eof    { () }
   | "\n"   { newline lexbuf;
              fprintf fmt "\n";
-             doc fmt headings lexbuf }
+             doc fmt block headings lexbuf }
   | '{' (['1'-'6'] as c)
-           { let n = Char.code c - Char.code '0' in
+           { if block then fprintf fmt "</p>@\n";
+             let n = Char.code c - Char.code '0' in
              fprintf fmt "<h%d>" n;
-             doc fmt (n::headings) lexbuf }
-  | '{''h' { raw_html fmt 0 lexbuf; doc fmt headings lexbuf }
-  | '{'    { fprintf fmt "{"; doc fmt (0::headings) lexbuf }
-  | '}'    { match headings with
-              | [] -> fprintf fmt "}"; doc fmt headings lexbuf
+             doc fmt true (n::headings) lexbuf }
+  | '{''h' { if not block then pp_print_string fmt "<p>";
+             raw_html fmt 0 lexbuf; doc fmt true headings lexbuf }
+  | '{'    { if not block then pp_print_string fmt "<p>";
+             pp_print_char fmt '{';
+             doc fmt true (0::headings) lexbuf }
+  | '}'    { let brace r =
+               if not block then pp_print_string fmt "<p>";
+               fprintf fmt "}";
+               doc fmt true r lexbuf in
+             match headings with
+              | [] -> brace headings
               | n :: r ->
-                  if n >= 1 then fprintf fmt "</h%d>" n else
-                    fprintf fmt "}";
-                  doc fmt r lexbuf
+                if n >= 1 then begin
+                  fprintf fmt "</h%d>@\n" n;
+                  doc fmt (r <> []) r lexbuf
+                end else brace r
            }
-  | '['    { pp_print_string fmt "<code>";
+  | '['    { if not block then pp_print_string fmt "<p>";
+             pp_print_string fmt "<code>";
              scan fmt true lexbuf; 
              pp_print_string fmt "</code>";
-             doc fmt headings lexbuf }
-  | '"'    { fprintf fmt "&quot;"; doc fmt headings lexbuf }
-  | '\''   { fprintf fmt "&apos;"; doc fmt headings lexbuf }
+             doc fmt true headings lexbuf }
+  | ' '    { if block then pp_print_char fmt ' ';
+             doc fmt block headings lexbuf }
   | special as c
-           { html_char fmt c; doc fmt headings lexbuf }
-  | _ as c { pp_print_char fmt c; doc fmt headings lexbuf }
+           { if not block then pp_print_string fmt "<p>";
+             html_char fmt c;
+             doc fmt true headings lexbuf }
+  | _ as c { if not block then pp_print_string fmt "<p>";
+             pp_print_char fmt c;
+             doc fmt true headings lexbuf }
 
 
 and raw_html fmt depth = parse
