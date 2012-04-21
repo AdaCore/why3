@@ -1,61 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "why3session.dtd">
+<!DOCTYPE why3session SYSTEM "/usr/local/share/why3/why3session.dtd">
 <why3session
  name="bitvector1/why3session.xml">
  <prover
-  id="alt-ergo"
-  name="Alt-Ergo"
-  version="0.94"/>
- <prover
-  id="alt-ergo-0.93.1"
+  id="0"
   name="Alt-Ergo"
   version="0.93.1"/>
  <prover
-  id="coq"
-  name="Coq"
-  version="8.3pl2"/>
+  id="1"
+  name="Alt-Ergo"
+  version="0.94"/>
  <prover
-  id="cvc3"
+  id="2"
   name="CVC3"
   version="2.2"/>
  <prover
-  id="cvc3-2.4"
+  id="3"
   name="CVC3"
   version="2.4.1"/>
  <prover
-  id="eprover"
-  name="Eprover"
-  version="1.4 Namring"/>
+  id="4"
+  name="Coq"
+  version="8.3pl2"/>
  <prover
-  id="gappa"
+  id="5"
+  name="Coq"
+  version="8.3pl3"/>
+ <prover
+  id="6"
   name="Gappa"
-  version="0.15.1"/>
+  version="0.16.0"/>
  <prover
-  id="simplify"
-  name="Simplify"
-  version="1.5.4"/>
- <prover
-  id="spass"
-  name="Spass"
-  version="3.7"/>
- <prover
-  id="vampire"
-  name="Vampire"
-  version="0.6"/>
- <prover
-  id="verit"
-  name="veriT"
-  version="dev"/>
- <prover
-  id="yices"
-  name="Yices"
-  version="1.0.25"/>
- <prover
-  id="z3"
+  id="7"
   name="Z3"
   version="2.19"/>
  <prover
-  id="z3-3"
+  id="8"
   name="Z3"
   version="3.2"/>
  <file
@@ -64,2912 +44,3536 @@
   expanded="true">
   <theory
    name="Div"
-   verified="false"
+   locfile="bitvector1/../bitvector1.why"
+   loclnum="2" loccnumb="7" loccnume="10"
+   verified="true"
    expanded="true">
-   <goal
-    name="Div_inf"
-    sum="ff916027396baad05cf08c3ee2088714"
-    proved="false"
-    expanded="true"
-    shape="ainfix =adivV0V1c0Iainfix <V0V1Aainfix <=c0V0F">
-   </goal>
-   <goal
-    name="Mod_0"
-    sum="e922a6cf69b0b97d470cfc6b1f1fdc6e"
-    proved="false"
-    expanded="true"
-    shape="ainfix =amodc0V0c0Iainfix =V0c0NF">
-   </goal>
   </theory>
   <theory
    name="Pow2int"
+   locfile="bitvector1/../bitvector1.why"
+   loclnum="14" loccnumb="7" loccnume="14"
    verified="true"
    expanded="false">
    <goal
     name="Power_1"
-    sum="674358c47ca5ea6579240fb1bfe9379c"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="24" loccnumb="8" loccnume="15"
+    sum="33bc32635e211600fb0149bbdc4cf0c0"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c1c2">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.00"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="Power_sum"
-    sum="0759e56ec4a3fe459dec4827718a4812"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="26" loccnumb="8" loccnume="17"
+    sum="01d41b81dadfb478ff33dc9bdb7d39d1"
     proved="true"
     expanded="false"
-    shape="ainfix =apow2ainfix +V0V1ainfix *apow2V0apow2V1Iainfix >=V1c0Aainfix >=V0c0F">
+    shape="ainfix =apow2ainfix +V0V1ainfix *apow2V0apow2V1Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
     <proof
-     prover="coq"
+     prover="1"
      timelimit="10"
-     edited="bitvector1_Pow2int_Power_sum_1.v"
-     obsolete="false">
-     <result status="valid" time="0.51"/>
+     memlimit="0"
+     obsolete="true"
+     archived="false">
+     <result status="unknown" time="0.42"/>
     </proof>
     <proof
-     prover="alt-ergo"
+     prover="5"
      timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="unknown" time="0.42"/>
+     memlimit="0"
+     edited="bitvector1_Pow2int_Power_sum_1.v"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.92"/>
     </proof>
    </goal>
    <goal
     name="pow2_0"
-    sum="d384ce38663fa1bd30c01855e9cba20a"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="29" loccnumb="8" loccnume="14"
+    sum="9794b272135f9083d883502006a81613"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c0c1">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
     name="pow2_1"
-    sum="f7dad036535166984e18d6813fd4117f"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="30" loccnumb="8" loccnume="14"
+    sum="8ea4ae29afe088d53b9759d50cbb882d"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c1c2">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
     name="pow2_2"
-    sum="af89e4e90ef39bc6fd532a6739849bc2"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="31" loccnumb="8" loccnume="14"
+    sum="35b01a76a770a4157a52f3c1ea44358c"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c2c4">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
     name="pow2_3"
-    sum="144d08f1c25a6e9a3d211bde79219ded"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="32" loccnumb="8" loccnume="14"
+    sum="3db6574d1e708d6137a8b68bca07add7"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c3c8">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
     name="pow2_4"
-    sum="b6a1262e85f34827079bd432e66d2803"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="33" loccnumb="8" loccnume="14"
+    sum="5899844ea5662102656716c172083530"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c4c16">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.00"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="pow2_5"
-    sum="4720cc144718d48b5127e2795077228c"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="34" loccnumb="8" loccnume="14"
+    sum="123c05eece455b3dba4e97936010717e"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c5c32">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_6"
-    sum="1d17f8d4a1e47cdc2ebb31ebfe150bb9"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c6c64">
-    <proof
-     prover="alt-ergo"
-     timelimit="20"
-     edited=""
-     obsolete="false">
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
-    name="pow2_7"
-    sum="c0b5c5eaa27c042c2c87f174f511d903"
+    name="pow2_6"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="35" loccnumb="8" loccnume="14"
+    sum="e41d124a89a9602924028523a09eec1c"
     proved="true"
     expanded="false"
-    shape="ainfix =apow2c7c128">
+    shape="ainfix =apow2c6c64">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
+    name="pow2_7"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="36" loccnumb="8" loccnume="14"
+    sum="a9ddc51c774adf8a74f2a159a12e7d72"
+    proved="true"
+    expanded="false"
+    shape="ainfix =apow2c7c128">
+    <proof
+     prover="1"
+     timelimit="20"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
     name="pow2_8"
-    sum="6d2840699255fc310e3dbf1f504423dc"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="37" loccnumb="8" loccnume="14"
+    sum="472399ebbb7ad2ab31aeadabf4f1c40b"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c8c256">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="pow2_9"
-    sum="f9be5bbd4df90fb3d1eff339b2b70cf4"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="38" loccnumb="8" loccnume="14"
+    sum="509a8c58f5d388832ba585f63b129396"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c9c512">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.01"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
     name="pow2_10"
-    sum="ddf906d5144ae6fafaa5a6a77acd28b8"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="39" loccnumb="8" loccnume="15"
+    sum="d6adeef30108ccf3ca8ff96cc79c0384"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c10c1024">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
     name="pow2_11"
-    sum="fe986e89797f2f5ccd13b891c03b9232"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="40" loccnumb="8" loccnume="15"
+    sum="2fc6934a7c65a6cf9f7385120200d3cc"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c11c2048">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
     name="pow2_12"
-    sum="3a5377b42f4f05e76cc13a569a60ce52"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="41" loccnumb="8" loccnume="15"
+    sum="83b4da45905980037cbf27970a00d0f6"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c12c4096">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
     name="pow2_13"
-    sum="544d8654950d07ba5b8d227621d838ae"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="42" loccnumb="8" loccnume="15"
+    sum="0f0e7aa46846e876ad0cecf7a7e0ff1c"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c13c8192">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.00"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="pow2_14"
-    sum="18ca3dbb2cdee8ced6610e6e10bc714f"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="43" loccnumb="8" loccnume="15"
+    sum="e7c29541374bf9c94a7f532421e89694"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c14c16384">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.00"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="pow2_15"
-    sum="fd0d333fb5fd0969adda2268fed9ccdf"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="44" loccnumb="8" loccnume="15"
+    sum="094b5980d31b162d032b09386b18f360"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c15c32768">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="pow2_16"
-    sum="b3cd60537972589764538461e96ed31b"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="45" loccnumb="8" loccnume="15"
+    sum="ea51c4218ceaeb142fee6ff62106ae8f"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c16c65536">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.01"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
     name="pow2_17"
-    sum="c70b8e14abdf9914aa61854a3e604889"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="46" loccnumb="8" loccnume="15"
+    sum="12a737879085e2e075b9d3e70ac33e04"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c17c131072">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.00"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="pow2_18"
-    sum="c6a63399f05a289178cf3f6191057e7e"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="47" loccnumb="8" loccnume="15"
+    sum="290b228a2edc31070908c666cd3081df"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c18c262144">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.00"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
     </proof>
    </goal>
    <goal
     name="pow2_19"
-    sum="cbe4b4032f6b5a1c2c5c83468e75f88b"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="48" loccnumb="8" loccnume="15"
+    sum="547a19693be161698849a89a6d148ed1"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c19c524288">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="pow2_20"
-    sum="269430956b13836660c087062ea5ec77"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="49" loccnumb="8" loccnume="15"
+    sum="e1248f70278c0454eef86e8fb6a4f0d0"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c20c1048576">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="pow2_21"
-    sum="b5f4d0c63e29e1cece926833dddb3f6e"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="50" loccnumb="8" loccnume="15"
+    sum="1d2b4283b1db05305d5a6b064bffe241"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c21c2097152">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.01"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
     </proof>
    </goal>
    <goal
     name="pow2_22"
-    sum="1d97b8a57bf52009d103d450dd9d65eb"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="51" loccnumb="8" loccnume="15"
+    sum="8abe2ce42e2ef911d45a717b00e8424f"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c22c4194304">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="pow2_23"
-    sum="bed77adf1453e9f44e775494adfa8004"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="52" loccnumb="8" loccnume="15"
+    sum="bdd8a1eb83a44b5d793efd215129956e"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c23c8388608">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="pow2_24"
-    sum="d8ae885970f959e22fb5f2c92b6732fd"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="53" loccnumb="8" loccnume="15"
+    sum="4990ce4c33a449a56d1dabcdbbb469fe"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c24c16777216">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="pow2_25"
-    sum="cacf95dd423c5e3e050c8a61b0ebb5cd"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="54" loccnumb="8" loccnume="15"
+    sum="eb06671a314765ab02a4e9c53dc72ed1"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c25c33554432">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="pow2_26"
-    sum="eaca43dd146c2f8d07c34e76f10215d2"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="55" loccnumb="8" loccnume="15"
+    sum="d8858d06cafdf610fbb840adbc4e706b"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c26c67108864">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_27"
-    sum="159f49b889985b1e6dbd73156244f9e0"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c27c134217728">
-    <proof
-     prover="alt-ergo"
-     timelimit="20"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_28"
-    sum="41ab2139b323cbac7af4d63cf71c11e6"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c28c268435456">
-    <proof
-     prover="alt-ergo"
-     timelimit="20"
-     edited=""
-     obsolete="false">
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
+    name="pow2_27"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="56" loccnumb="8" loccnume="15"
+    sum="bf665a0e14089c4d061e073a2d6c825d"
+    proved="true"
+    expanded="false"
+    shape="ainfix =apow2c27c134217728">
+    <proof
+     prover="1"
+     timelimit="20"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="pow2_28"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="57" loccnumb="8" loccnume="15"
+    sum="3940a6d01f55ae1b3c46548d4ad151e4"
+    proved="true"
+    expanded="false"
+    shape="ainfix =apow2c28c268435456">
+    <proof
+     prover="1"
+     timelimit="20"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
     name="pow2_29"
-    sum="2497b131a1e24ce799d7a98009de4d19"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="58" loccnumb="8" loccnume="15"
+    sum="7fac9909e0eafa383177de67c5e75220"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c29c536870912">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="pow2_30"
-    sum="fc6496adbde87d4e49982d0a4baac90e"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="59" loccnumb="8" loccnume="15"
+    sum="ef293872f7cb7dfafecd26216bcf2e8b"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c30c1073741824">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.01"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
     </proof>
    </goal>
    <goal
     name="pow2_31"
-    sum="4ac19cb4d7b2c047f32c97b32cd86520"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="60" loccnumb="8" loccnume="15"
+    sum="cb4b8e74bd1f9883fbfb5825c8120052"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c31c2147483648">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="pow2_32"
-    sum="6cc1c8affe9d67d3b2c6182d69b70b87"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="61" loccnumb="8" loccnume="15"
+    sum="7b9e3af148c9f88a4580180c03f545e0"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c32c4294967296">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.01"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
     </proof>
    </goal>
    <goal
     name="pow2_33"
-    sum="3e260085668c526dbb6e19612f1384e9"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="62" loccnumb="8" loccnume="15"
+    sum="0c6f09e705a4175d88fc0365f86d7a7a"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c33c8589934592">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.01"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
     </proof>
    </goal>
    <goal
     name="pow2_34"
-    sum="1c49a5e16eea1ebd80f0077187b94b7b"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="63" loccnumb="8" loccnume="15"
+    sum="0b042dc50bf0e7a680e389047d3b6390"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c34c17179869184">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="pow2_35"
-    sum="750ae83a6b8a7f390a33c6b5ae3e4a85"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="64" loccnumb="8" loccnume="15"
+    sum="ae2727eb7ade2b9d139abc4ebc961268"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c35c34359738368">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.01"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
     </proof>
    </goal>
    <goal
     name="pow2_36"
-    sum="9ee7d67115829017f9d1d17a29638eca"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="65" loccnumb="8" loccnume="15"
+    sum="6ab27e9b63fe6411a03a743ed5965fde"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c36c68719476736">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.01"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
     </proof>
    </goal>
    <goal
     name="pow2_37"
-    sum="540a21f8313d0876cff219d1dd8eebf2"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="66" loccnumb="8" loccnume="15"
+    sum="78ad5ad66e8af2da00bdb152b5e4e824"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c37c137438953472">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="pow2_38"
-    sum="b1e7c6ab58319640098a9a1dd5fc5cbe"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="67" loccnumb="8" loccnume="15"
+    sum="276acf78adeb6b8d888de9fc764138b7"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c38c274877906944">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.01"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
     </proof>
    </goal>
    <goal
     name="pow2_39"
-    sum="63b262afd5bda6b34d9432cf60bbebe8"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="68" loccnumb="8" loccnume="15"
+    sum="14410890c7b738dfc513da7d8321a712"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c39c549755813888">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="pow2_40"
-    sum="e25b04eebe6852e27837579c79ca2a48"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="69" loccnumb="8" loccnume="15"
+    sum="91476c76798188591b1ea5e5dfd93bc7"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c40c1099511627776">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="pow2_41"
-    sum="df439d4eec5c51eb82cd6c740a5f555e"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="70" loccnumb="8" loccnume="15"
+    sum="c660f3b73805182e6a37905eb7f28a52"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c41c2199023255552">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.00"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="pow2_42"
-    sum="3490a2100ef0b4fe310a7e0181ac6dab"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="71" loccnumb="8" loccnume="15"
+    sum="7cd369fcccf9b6a7b6c5e0953ff14d52"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c42c4398046511104">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
    <goal
     name="pow2_43"
-    sum="922da2fde6268517148e9b8b3ca55396"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="72" loccnumb="8" loccnume="15"
+    sum="a053f993447f03a2213e58e3e661c3b3"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c43c8796093022208">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
    <goal
     name="pow2_44"
-    sum="78549f3a9c19adba5e20b21bf98ad5cd"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="73" loccnumb="8" loccnume="15"
+    sum="3d7ce098e4b05822d7664786379b561b"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c44c17592186044416">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.02"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="pow2_45"
-    sum="060de5464c8ddd8ea5783812d813560c"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="74" loccnumb="8" loccnume="15"
+    sum="d11513042064e38458afcdd745518fea"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c45c35184372088832">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.01"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
     </proof>
    </goal>
    <goal
     name="pow2_46"
-    sum="fc78394ac5c1addcec1a271057f35b0a"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="75" loccnumb="8" loccnume="15"
+    sum="71461f3d79ed1598d4dd25438d8d54d8"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c46c70368744177664">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.01"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
     </proof>
    </goal>
    <goal
     name="pow2_47"
-    sum="0210abc62fc410c201a33db605844ef2"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="76" loccnumb="8" loccnume="15"
+    sum="3b91e34a668cf1212e04d21377589a00"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c47c140737488355328">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.01"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
     </proof>
    </goal>
    <goal
     name="pow2_48"
-    sum="4d3f55d34ccac26063178c0b1d45ad8e"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="77" loccnumb="8" loccnume="15"
+    sum="c13dea3a7e10208ea33d571bb2801b4a"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c48c281474976710656">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="pow2_49"
-    sum="7fe77a1913a0e8bceced4786be085b62"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="78" loccnumb="8" loccnume="15"
+    sum="b02fd2869282ab1c22255dc82156e658"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c49c562949953421312">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
    <goal
     name="pow2_50"
-    sum="edae49fa6d3d19a34e2559312faaebbc"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="79" loccnumb="8" loccnume="15"
+    sum="12acc6953daaab058d1b876bd2772bf8"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c50c1125899906842624">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
    <goal
     name="pow2_51"
-    sum="9389f6efc50949f7b92868be8f08622c"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="80" loccnumb="8" loccnume="15"
+    sum="a022cca825c5af8c29fbb08e5172eca0"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c51c2251799813685248">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.02"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
     </proof>
    </goal>
    <goal
     name="pow2_52"
-    sum="f5127b5de3b589610740d7485300a7e8"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="81" loccnumb="8" loccnume="15"
+    sum="e8de7e58bb46ffad0f357d106e917592"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c52c4503599627370496">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
    <goal
     name="pow2_53"
-    sum="012a7133bd037e1c32a1223c64ed3277"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="82" loccnumb="8" loccnume="15"
+    sum="87afc9b602efd47d35fbfbd13fd20bda"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c53c9007199254740992">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
    <goal
     name="pow2_54"
-    sum="47775caefbf667eae505e951993cdfb3"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="83" loccnumb="8" loccnume="15"
+    sum="f37fc15a50c18db98edd105750fd8f60"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c54c18014398509481984">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
    <goal
     name="pow2_55"
-    sum="7f747a803b6fbeadeb9fe3ac94d09be3"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="84" loccnumb="8" loccnume="15"
+    sum="08f56546a3020a6958c11504d455090c"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c55c36028797018963968">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
    <goal
     name="pow2_56"
-    sum="f7f5989acb9886debf99b2064283b319"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="85" loccnumb="8" loccnume="15"
+    sum="710e72b621ada134e9fb7c5e6bb6f301"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c56c72057594037927936">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.02"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="pow2_57"
-    sum="3dfafd38ec15f1e4316503568ee04b66"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="86" loccnumb="8" loccnume="15"
+    sum="5999c3dc482f71d7b7a2501f683a6963"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c57c144115188075855872">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.02"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
     </proof>
    </goal>
    <goal
     name="pow2_58"
-    sum="2b2c36eea9a58139b5248aad62f93b84"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="87" loccnumb="8" loccnume="15"
+    sum="9f00971587c4b5fccf4317dc1fa87554"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c58c288230376151711744">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.02"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
     </proof>
    </goal>
    <goal
     name="pow2_59"
-    sum="6d057a14931d3646070404f98406dc4e"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="88" loccnumb="8" loccnume="15"
+    sum="51f4ed49f1ce278ae4ad90d15818e529"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c59c576460752303423488">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.02"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
     </proof>
    </goal>
    <goal
     name="pow2_60"
-    sum="1b05a7bade1e11f357551cfb4a58620b"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="89" loccnumb="8" loccnume="15"
+    sum="16c186a2d2f9d6368793d86d9eaf0406"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c60c1152921504606846976">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.02"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
     </proof>
    </goal>
    <goal
     name="pow2_61"
-    sum="71af4829d91a47f308219184db3b7899"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="90" loccnumb="8" loccnume="15"
+    sum="bf7bf7a47369493c8f26fc375e2136e9"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c61c2305843009213693952">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
    <goal
     name="pow2_62"
-    sum="e66a72df1b77dc931e9d400d4517ca25"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="91" loccnumb="8" loccnume="15"
+    sum="7f6273378ef33281b938ffeaa9b5f921"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c62c4611686018427387904">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.02"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
     </proof>
    </goal>
    <goal
     name="pow2_63"
-    sum="2bf03f5da0833360787d3d5bd6281ae2"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="92" loccnumb="8" loccnume="15"
+    sum="0e9efb9e5c8d9f985aaa6fa576c72e23"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c63c9223372036854775808">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.02"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
     </proof>
    </goal>
   </theory>
   <theory
    name="Pow2real"
+   locfile="bitvector1/../bitvector1.why"
+   loclnum="96" loccnumb="7" loccnume="15"
    verified="true"
    expanded="false">
    <goal
     name="Power_s_all"
-    sum="80ebf64742353f9da60598d5df6baab4"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="106" loccnumb="8" loccnume="19"
+    sum="6f696a9d2f07d6172a73d8dd30ac7b70"
     proved="true"
     expanded="false"
     shape="ainfix =apow2ainfix +V0c1ainfix *.c2.0apow2V0F">
     <proof
-     prover="z3-3"
+     prover="7"
      timelimit="5"
-     edited=""
-     obsolete="false">
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="alt-ergo-0.93.1"
+     prover="0"
      timelimit="5"
-     edited=""
-     obsolete="false">
+     memlimit="0"
+     obsolete="true"
+     archived="false">
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="cvc3"
+     prover="2"
      timelimit="5"
-     edited=""
-     obsolete="false">
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.00"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="z3"
+     prover="3"
      timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.00"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="cvc3-2.4"
+     prover="8"
      timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.00"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="Power_p_all"
-    sum="e1d8ba989a5c7fb367bff5f8e79b3532"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="108" loccnumb="8" loccnume="19"
+    sum="ede41bed7ccb894e2af4fcf008dbd14f"
     proved="true"
     expanded="false"
     shape="ainfix =apow2ainfix -V0c1ainfix *.c0.5apow2V0F">
     <proof
-     prover="z3-3"
+     prover="7"
      timelimit="5"
-     edited=""
-     obsolete="false">
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="alt-ergo-0.93.1"
+     prover="0"
      timelimit="5"
-     edited=""
-     obsolete="false">
+     memlimit="0"
+     obsolete="true"
+     archived="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="cvc3"
+     prover="2"
      timelimit="5"
-     edited=""
-     obsolete="false">
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="5"
-     edited=""
-     obsolete="false">
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="z3"
+     prover="3"
      timelimit="5"
-     edited=""
-     obsolete="false">
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="cvc3-2.4"
+     prover="8"
      timelimit="5"
-     edited=""
-     obsolete="false">
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
     name="Power_1_2"
-    sum="bf26324eb22f67ece4e28983722012a5"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="110" loccnumb="8" loccnume="17"
+    sum="84a753b158c26d8042cfabd64c4737e0"
     proved="true"
     expanded="false"
     shape="ainfix =c0.5ainfix /.c1.0c2.0">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="5"
-     edited=""
-     obsolete="false">
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
     name="Power_1"
-    sum="1a1d4a4566ae47675ef891012c90d276"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="112" loccnumb="8" loccnume="15"
+    sum="14d8bd428d2a57bb612ee84ae54e1aba"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c1c2.0">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
     name="Power_neg1"
-    sum="4f3d0cc78ae6efd7697326cf1eec1c0a"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="114" loccnumb="8" loccnume="18"
+    sum="c7a57a300a9ae5d0db11a4a441d0e606"
     proved="true"
     expanded="false"
     shape="ainfix =apow2aprefix -c1c0.5">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
     name="Power_non_null_aux"
-    sum="48ba15cef1552452f0fbef9a78b9dfc8"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="116" loccnumb="8" loccnume="26"
+    sum="742640b78c6f8972a42743290fdb56c5"
     proved="true"
     expanded="false"
-    shape="ainfix =apow2V0c0.0NIainfix >=V0c0F">
+    shape="ainfix =apow2V0c0.0NIainfix &gt;=V0c0F">
     <proof
-     prover="coq"
-     timelimit="5"
-     edited="bitvector1_Pow2real_Power_non_null_aux_1.v"
-     obsolete="false">
-     <result status="valid" time="0.79"/>
+     prover="1"
+     timelimit="10"
+     memlimit="0"
+     obsolete="true"
+     archived="false">
+     <result status="timeout" time="10.09"/>
     </proof>
     <proof
-     prover="alt-ergo"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="10.09"/>
+     prover="5"
+     timelimit="5"
+     memlimit="0"
+     edited="bitvector1_Pow2real_Power_non_null_aux_1.v"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="1.35"/>
     </proof>
    </goal>
    <goal
     name="Power_neg_aux"
-    sum="f8e30cec5efec7a71402f0f4f0a9dddd"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="118" loccnumb="8" loccnume="21"
+    sum="2cbd515615e025e022da59b7fe3978d4"
     proved="true"
     expanded="false"
-    shape="ainfix =apow2aprefix -V0ainfix /.c1.0apow2V0Iainfix >=V0c0F">
+    shape="ainfix =apow2aprefix -V0ainfix /.c1.0apow2V0Iainfix &gt;=V0c0F">
     <proof
-     prover="coq"
+     prover="1"
      timelimit="5"
-     edited="bitvector1_Pow2real_Power_neg_aux_1.v"
-     obsolete="false">
-     <result status="valid" time="0.57"/>
+     memlimit="0"
+     obsolete="true"
+     archived="false">
+     <result status="timeout" time="5.05"/>
     </proof>
     <proof
-     prover="alt-ergo"
+     prover="5"
      timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="5.05"/>
+     memlimit="0"
+     edited="bitvector1_Pow2real_Power_neg_aux_1.v"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="1.03"/>
     </proof>
    </goal>
    <goal
     name="Power_non_null"
-    sum="86363a1b110840e507acad668168996b"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="120" loccnumb="8" loccnume="22"
+    sum="e76a0e7bb90eb5890c701551fc6bc41c"
     proved="true"
     expanded="false"
     shape="ainfix =apow2V0c0.0NF">
     <proof
-     prover="coq"
-     timelimit="5"
-     edited="bitvector1_Pow2real_Power_non_null_2.v"
-     obsolete="false">
-     <result status="valid" time="0.50"/>
+     prover="1"
+     timelimit="10"
+     memlimit="0"
+     obsolete="true"
+     archived="false">
+     <result status="timeout" time="10.07"/>
     </proof>
     <proof
-     prover="alt-ergo"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="10.07"/>
+     prover="5"
+     timelimit="5"
+     memlimit="0"
+     edited="bitvector1_Pow2real_Power_non_null_2.v"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.91"/>
     </proof>
    </goal>
    <goal
     name="Power_neg"
-    sum="897b77705e6c9c9b3ad5df77503f9676"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="122" loccnumb="8" loccnume="17"
+    sum="c98172b037771dc004f33a01af8dc28b"
     proved="true"
     expanded="false"
     shape="ainfix =apow2aprefix -V0ainfix /.c1.0apow2V0F">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.01"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
     </proof>
    </goal>
    <goal
     name="Power_sum_aux"
-    sum="4307d009366b12b49918043b62c78575"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="124" loccnumb="8" loccnume="21"
+    sum="f172c7e0f52f667bb7b9c8653216ef40"
     proved="true"
     expanded="false"
-    shape="ainfix =apow2ainfix +V0V1ainfix *.apow2V0apow2V1Iainfix >=V1c0F">
+    shape="ainfix =apow2ainfix +V0V1ainfix *.apow2V0apow2V1Iainfix &gt;=V1c0F">
     <proof
-     prover="coq"
-     timelimit="5"
-     edited="bitvector1_Pow2real_Power_sum_aux_1.v"
-     obsolete="false">
-     <result status="valid" time="0.53"/>
+     prover="1"
+     timelimit="10"
+     memlimit="0"
+     obsolete="true"
+     archived="false">
+     <result status="timeout" time="10.07"/>
     </proof>
     <proof
-     prover="alt-ergo"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="10.07"/>
+     prover="5"
+     timelimit="5"
+     memlimit="0"
+     edited="bitvector1_Pow2real_Power_sum_aux_1.v"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.95"/>
     </proof>
    </goal>
    <goal
     name="Power_sum"
-    sum="57cb15f261efb7802a5f9a59e83460a2"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="126" loccnumb="8" loccnume="17"
+    sum="763c6533a99370f6102384b6bb2768d3"
     proved="true"
     expanded="false"
     shape="ainfix =apow2ainfix +V0V1ainfix *.apow2V0apow2V1F">
     <proof
-     prover="coq"
-     timelimit="2"
-     edited="bitvector1_Pow2real_Power_sum_1.v"
-     obsolete="false">
-     <result status="valid" time="0.51"/>
+     prover="1"
+     timelimit="10"
+     memlimit="0"
+     obsolete="true"
+     archived="false">
+     <result status="timeout" time="10.08"/>
     </proof>
     <proof
-     prover="alt-ergo"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="timeout" time="10.08"/>
+     prover="5"
+     timelimit="2"
+     memlimit="0"
+     edited="bitvector1_Pow2real_Power_sum_1.v"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.94"/>
     </proof>
    </goal>
    <goal
     name="Pow2_int_real"
-    sum="0f93e2abc85328fa0f4ff908043fe2c1"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="131" loccnumb="8" loccnume="21"
+    sum="514327c3c11c2e923c55fc4ee15c6412"
     proved="true"
     expanded="false"
-    shape="ainfix =apow2V0afrom_intapow2V0Iainfix >=V0c0F">
+    shape="ainfix =apow2V0afrom_intapow2V0Iainfix &gt;=V0c0F">
     <proof
-     prover="coq"
+     prover="5"
      timelimit="10"
+     memlimit="0"
      edited="bitvector1_Pow2real_Pow2_int_real_1.v"
-     obsolete="false">
-     <result status="valid" time="0.59"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="1.07"/>
     </proof>
    </goal>
   </theory>
   <theory
    name="BitVector"
+   locfile="bitvector1/../bitvector1.why"
+   loclnum="136" loccnumb="7" loccnume="16"
    verified="false"
-   expanded="true">
+   expanded="false">
    <goal
     name="Nth_bw_xor_v1true"
-    sum="88f8bb92324def1e6b262849f963837e"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="179" loccnumb="8" loccnume="25"
+    sum="f4055a08a84f47e363415170a6151518"
     proved="true"
     expanded="false"
-    shape="ainfix =anthabw_xorV0V1V2anotbanthV1V2Iainfix =anthV0V2aTrueAainfix <V2asizeAainfix <=c0V2F">
+    shape="ainfix =anthabw_xorV0V1V2anotbanthV1V2Iainfix =anthV0V2aTrueAainfix &lt;V2asizeAainfix &lt;=c0V2F">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.17"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.27"/>
     </proof>
    </goal>
    <goal
     name="Nth_bw_xor_v1false"
-    sum="0110ba3203806a3a1919caca71b42d49"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="183" loccnumb="8" loccnume="26"
+    sum="151b6a96d134757456935199951d5b35"
     proved="true"
     expanded="false"
-    shape="ainfix =anthabw_xorV0V1V2anthV1V2Iainfix =anthV0V2aFalseAainfix <V2asizeAainfix <=c0V2F">
+    shape="ainfix =anthabw_xorV0V1V2anthV1V2Iainfix =anthV0V2aFalseAainfix &lt;V2asizeAainfix &lt;=c0V2F">
     <proof
-     prover="coq"
+     prover="1"
      timelimit="10"
-     edited="bitvector1_BitVector_Nth_bw_xor_v1false_1.v"
-     obsolete="false">
-     <result status="valid" time="0.54"/>
-    </proof>
-    <proof
-     prover="alt-ergo"
-     timelimit="10"
-     edited=""
-     obsolete="true">
+     memlimit="0"
+     obsolete="true"
+     archived="false">
      <result status="timeout" time="10.07"/>
     </proof>
     <proof
-     prover="cvc3"
+     prover="2"
      timelimit="10"
-     edited=""
-     obsolete="true">
+     memlimit="0"
+     obsolete="true"
+     archived="false">
      <result status="failure" time="0.00"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="10"
+     memlimit="0"
+     edited="bitvector1_BitVector_Nth_bw_xor_v1false_1.v"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.97"/>
     </proof>
    </goal>
    <goal
     name="Nth_bw_xor_v2true"
-    sum="06bcfbebf47d0003b996a4e180ee2f4b"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="187" loccnumb="8" loccnume="25"
+    sum="bcb94308e26ad7d115475bf837d5fbd6"
     proved="true"
     expanded="false"
-    shape="ainfix =anthabw_xorV0V1V2anotbanthV0V2Iainfix =anthV1V2aTrueAainfix <V2asizeAainfix <=c0V2F">
+    shape="ainfix =anthabw_xorV0V1V2anotbanthV0V2Iainfix =anthV1V2aTrueAainfix &lt;V2asizeAainfix &lt;=c0V2F">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.04"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.08"/>
     </proof>
    </goal>
    <goal
     name="Nth_bw_xor_v2false"
-    sum="3dfc647500db0ad759fb5bf86d173039"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="191" loccnumb="8" loccnume="26"
+    sum="8301688caf57a855c158df910d3bd043"
     proved="true"
     expanded="false"
-    shape="ainfix =anthabw_xorV0V1V2anthV0V2Iainfix =anthV1V2aFalseAainfix <V2asizeAainfix <=c0V2F">
+    shape="ainfix =anthabw_xorV0V1V2anthV0V2Iainfix =anthV1V2aFalseAainfix &lt;V2asizeAainfix &lt;=c0V2F">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.18"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.27"/>
     </proof>
    </goal>
    <goal
     name="to_nat_of_zero2"
-    sum="9d07afef6b4a3e44e817b617006feb18"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="327" loccnumb="8" loccnume="23"
+    sum="7f64543adc67ee57719721c9e3008adc"
     proved="true"
     expanded="false"
-    shape="ainfix =ato_nat_subV0V2c0ato_nat_subV0V1c0Iainfix =anthV0V3aFalseIainfix >V3V1Aainfix >=V2V3FIainfix >=V1c0Aainfix >=V2V1Aainfix >asizeV2F">
+    shape="ainfix =ato_nat_subV0V2c0ato_nat_subV0V1c0Iainfix =anthV0V3aFalseIainfix &gt;V3V1Aainfix &gt;=V2V3FIainfix &gt;=V1c0Aainfix &gt;=V2V1Aainfix &gt;asizeV2F">
     <proof
-     prover="coq"
+     prover="5"
      timelimit="10"
+     memlimit="0"
      edited="bitvector1_BitVector_to_nat_of_zero2_2.v"
-     obsolete="false">
-     <result status="valid" time="0.65"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="1.12"/>
     </proof>
    </goal>
    <goal
     name="to_nat_of_zero"
-    sum="fa791ee9e4a64add5fa6203d3d394622"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="333" loccnumb="8" loccnume="22"
+    sum="7e4513c40ed4b921457bd4c09bf06a6b"
+    proved="true"
     expanded="false"
-    shape="ainfix =ato_nat_subV0V2V1c0Iainfix =anthV0V3aFalseIainfix >=V3V1Aainfix >=V2V3FIainfix >=V1c0Aainfix >asizeV2F">
+    shape="ainfix =ato_nat_subV0V2V1c0Iainfix =anthV0V3aFalseIainfix &gt;=V3V1Aainfix &gt;=V2V3FIainfix &gt;=V1c0Aainfix &gt;asizeV2F">
     <proof
-     prover="coq"
-     timelimit="10"
+     prover="5"
+     timelimit="5"
+     memlimit="1000"
      edited="bitvector1_BitVector_to_nat_of_zero_1.v"
-     obsolete="true">
-     <result status="valid" time="0.61"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.98"/>
     </proof>
    </goal>
    <goal
     name="to_nat_of_one"
-    sum="d8e9ebdc9ea7fd15b6b96b743e601d27"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="338" loccnumb="8" loccnume="21"
+    sum="767b48e07ed56de6b7f3db0ae6bfeac7"
+    proved="true"
     expanded="false"
-    shape="ainfix =ato_nat_subV0V2V1ainfix -apow2ainfix +ainfix -V2V1c1c1Iainfix =anthV0V3aTrueIainfix >=V3V1Aainfix >=V2V3FIainfix >=V1c0Aainfix >=V2V1Aainfix >asizeV2F">
+    shape="ainfix =ato_nat_subV0V2V1ainfix -apow2ainfix +ainfix -V2V1c1c1Iainfix =anthV0V3aTrueIainfix &gt;=V3V1Aainfix &gt;=V2V3FIainfix &gt;=V1c0Aainfix &gt;=V2V1Aainfix &gt;asizeV2F">
     <proof
-     prover="coq"
+     prover="5"
      timelimit="10"
+     memlimit="0"
      edited="bitvector1_BitVector_to_nat_of_one_2.v"
-     obsolete="true">
-     <result status="valid" time="0.71"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="1.09"/>
     </proof>
    </goal>
    <goal
     name="to_nat_sub_footprint"
-    sum="8e9f52969d9bca8cf705c08086f8a8ea"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="343" loccnumb="8" loccnume="28"
+    sum="0a8324dea32fba16bfe399439cb987b4"
+    proved="true"
     expanded="false"
-    shape="ainfix =ato_nat_subV0V2V3ato_nat_subV1V2V3Iainfix =anthV0V4anthV1V4Iainfix <=V4V2Aainfix <=V3V4FIainfix >=V3c0Aainfix >asizeV2F">
+    shape="ainfix =ato_nat_subV0V2V3ato_nat_subV1V2V3Iainfix =anthV0V4anthV1V4Iainfix &lt;=V4V2Aainfix &lt;=V3V4FIainfix &gt;=V3c0Aainfix &gt;asizeV2F">
     <proof
-     prover="coq"
+     prover="5"
      timelimit="60"
+     memlimit="0"
      edited="bitvector1_BitVector_to_nat_sub_footprint_3.v"
-     obsolete="true">
-     <result status="valid" time="0.75"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="1.31"/>
     </proof>
    </goal>
    <goal
     name="nth_from_int_low_even"
-    sum="bab459415db0aaf41d489bcc0f8e63b2"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="430" loccnumb="8" loccnume="29"
+    sum="983a963c8a4cd81390c5b1d977ffd618"
+    proved="true"
     expanded="false"
     shape="ainfix =anthafrom_intV0c0aFalseIainfix =amodV0c2c0F">
     <proof
-     prover="coq"
-     timelimit="5"
-     edited="bitvector1_BitVector_nth_from_int_low_even_2.v"
-     obsolete="true">
-     <result status="unknown" time="0.57"/>
-    </proof>
-    <proof
-     prover="alt-ergo"
-     timelimit="20"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.16"/>
-    </proof>
-    <proof
-     prover="cvc3"
-     timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="failure" time="0.00"/>
-    </proof>
-    <proof
-     prover="z3"
+     prover="7"
      timelimit="2"
-     edited=""
-     obsolete="true">
+     memlimit="0"
+     obsolete="true"
+     archived="false">
      <result status="failure" time="0.00"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="20"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.25"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="10"
+     memlimit="0"
+     obsolete="true"
+     archived="false">
+     <result status="failure" time="0.00"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="5"
+     memlimit="0"
+     edited="bitvector1_BitVector_nth_from_int_low_even_2.v"
+     obsolete="true"
+     archived="false">
+     <result status="unknown" time="0.57"/>
     </proof>
    </goal>
    <goal
     name="nth_from_int_low_odd"
-    sum="b9516382fce2526bd94e3aa00a17c34b"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="433" loccnumb="8" loccnume="28"
+    sum="e97101d47583d206657dff4e17ed51d3"
+    proved="true"
     expanded="false"
     shape="ainfix =anthafrom_intV0c0aTrueIainfix =amodV0c2c0NF">
     <proof
-     prover="alt-ergo"
-     timelimit="20"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.14"/>
-    </proof>
-    <proof
-     prover="cvc3"
-     timelimit="10"
-     edited=""
-     obsolete="true">
+     prover="7"
+     timelimit="2"
+     memlimit="0"
+     obsolete="true"
+     archived="false">
      <result status="failure" time="0.00"/>
     </proof>
     <proof
-     prover="z3"
-     timelimit="2"
-     edited=""
-     obsolete="true">
+     prover="1"
+     timelimit="20"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.21"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="10"
+     memlimit="0"
+     obsolete="true"
+     archived="false">
      <result status="failure" time="0.00"/>
     </proof>
    </goal>
    <goal
     name="pow2i"
-    sum="ab43bf86bc83b8c9a954de178f87e2d1"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="436" loccnumb="8" loccnume="13"
+    sum="b9297c080d23d5380511c1cf65562670"
+    proved="true"
     expanded="false"
-    shape="ainfix =apow2V0c0NIainfix >=V0c0F">
+    shape="ainfix =apow2V0c0NIainfix &gt;=V0c0F">
     <proof
-     prover="coq"
+     prover="1"
      timelimit="10"
-     edited="bitvector1_BitVector_pow2i_1.v"
-     obsolete="true">
-     <result status="valid" time="0.63"/>
+     memlimit="0"
+     obsolete="true"
+     archived="false">
+     <result status="timeout" time="10.11"/>
     </proof>
     <proof
-     prover="alt-ergo"
+     prover="5"
      timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="timeout" time="10.11"/>
+     memlimit="0"
+     edited="bitvector1_BitVector_pow2i_1.v"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="1.14"/>
     </proof>
    </goal>
    <goal
     name="nth_from_int_0"
-    sum="f1b2368153e6ec361da4cfc8fb187bca"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="439" loccnumb="8" loccnume="22"
+    sum="49ce59a5a80388677eacd82c4ded32c7"
+    proved="true"
     expanded="false"
-    shape="ainfix =anthafrom_intc0V0aFalseIainfix >=V0c0Aainfix >asizeV0F">
+    shape="ainfix =anthafrom_intc0V0aFalseIainfix &gt;=V0c0Aainfix &gt;asizeV0F">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.03"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.04"/>
     </proof>
    </goal>
    <goal
     name="nth_from_int2c_low_even"
-    sum="2f1aad4950ab15668176a18ddc3fd89d"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="475" loccnumb="8" loccnume="31"
+    sum="0f36c1597b117d1e19d696a1483e9fd7"
+    proved="true"
     expanded="false"
     shape="ainfix =anthafrom_int2cV0c0aFalseIainfix =amodV0c2c0F">
     <proof
-     prover="coq"
+     prover="5"
      timelimit="10"
+     memlimit="0"
      edited="bitvector1_BitVector_nth_from_int2c_low_even_1.v"
-     obsolete="true">
-     <result status="valid" time="0.62"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="1.11"/>
     </proof>
    </goal>
    <goal
     name="nth_from_int2c_low_odd"
-    sum="4e750306933b2f18e1bf5a01881779f5"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="478" loccnumb="8" loccnume="30"
+    sum="4059ef9ffa32a76df358acc145811cc0"
+    proved="true"
     expanded="false"
     shape="ainfix =anthafrom_int2cV0c0aTrueIainfix =amodV0c2c0NF">
     <proof
-     prover="coq"
+     prover="5"
      timelimit="10"
+     memlimit="0"
      edited="bitvector1_BitVector_nth_from_int2c_low_odd_1.v"
-     obsolete="true">
-     <result status="valid" time="0.55"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="1.02"/>
     </proof>
    </goal>
    <goal
     name="nth_from_int2c_0"
-    sum="0c6ad89d30381c5c24d59e15372f38ee"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="481" loccnumb="8" loccnume="24"
+    sum="70d9835815960596a1501796d9a8588a"
+    proved="true"
     expanded="false"
-    shape="ainfix =anthafrom_int2cc0V0aFalseIainfix >=V0c0Aainfix >asizeV0F">
+    shape="ainfix =anthafrom_int2cc0V0aFalseIainfix &gt;=V0c0Aainfix &gt;asizeV0F">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="5"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.06"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.10"/>
     </proof>
    </goal>
    <goal
     name="nth_from_int2c_plus_pow2"
-    sum="437f65d719c9e9b3745d36b5532c0607"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="485" loccnumb="8" loccnume="32"
+    sum="ad7d6b5fe1513e3c9dd2340ec63e7363"
     proved="false"
-    expanded="true"
-    shape="ainfix =anthafrom_int2cainfix +V0apow2V2V1anthafrom_int2cV0V1Iainfix <V1V2Aainfix <=c0V1F">
+    expanded="false"
+    shape="ainfix =anthafrom_int2cainfix +V0apow2V2V1anthafrom_int2cV0V1Iainfix &lt;V1V2Aainfix &lt;=c0V1F">
    </goal>
   </theory>
   <theory
    name="BV32"
+   locfile="bitvector1/../bitvector1.why"
+   loclnum="492" loccnumb="7" loccnume="11"
    verified="true"
    expanded="false">
   </theory>
   <theory
    name="BV64"
+   locfile="bitvector1/../bitvector1.why"
+   loclnum="501" loccnumb="7" loccnume="11"
    verified="true"
    expanded="false">
   </theory>
   <theory
    name="BV32_64"
+   locfile="bitvector1/../bitvector1.why"
+   loclnum="522" loccnumb="7" loccnume="14"
    verified="true"
    expanded="false">
   </theory>
   <theory
    name="BV_double"
+   locfile="bitvector1/../bitvector1.why"
+   loclnum="539" loccnumb="7" loccnume="16"
    verified="true"
    expanded="false">
   </theory>
   <theory
    name="TestDouble"
-   verified="false"
+   locfile="bitvector1/../bitvector1.why"
+   loclnum="601" loccnumb="7" loccnume="17"
+   verified="true"
    expanded="false">
    <goal
     name="nth_one1"
-    sum="f8b066cf9afd456b82a766c6ca1e737d"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="609" loccnumb="8" loccnume="16"
+    sum="4f4ca22125bedb3b9b60c1cecb007f01"
+    proved="true"
     expanded="false"
-    shape="ainfix =anthaoneV0aFalseIainfix <=V0c51Aainfix <=c0V0F">
+    shape="ainfix =anthaoneV0aFalseIainfix &lt;=V0c51Aainfix &lt;=c0V0F">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.07"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.10"/>
     </proof>
    </goal>
    <goal
     name="nth_one2"
-    sum="55ef722e361f6c40c8a43a976da68198"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="610" loccnumb="8" loccnume="16"
+    sum="fba6e00a33cfa0e7d11800bb22e5a5fa"
+    proved="true"
     expanded="false"
-    shape="ainfix =anthaoneV0aTrueIainfix <=V0c61Aainfix <=c52V0F">
+    shape="ainfix =anthaoneV0aTrueIainfix &lt;=V0c61Aainfix &lt;=c52V0F">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.06"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.08"/>
     </proof>
    </goal>
    <goal
     name="nth_one3"
-    sum="981ad9688c5c1edf40835655a1aad06d"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="611" loccnumb="8" loccnume="16"
+    sum="010bf8e5c3a68bd34b44bfa0066561cf"
+    proved="true"
     expanded="false"
-    shape="ainfix =anthaoneV0aFalseIainfix <=V0c63Aainfix <=c62V0F">
+    shape="ainfix =anthaoneV0aFalseIainfix &lt;=V0c63Aainfix &lt;=c62V0F">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.05"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.09"/>
     </proof>
    </goal>
    <goal
     name="sign_one"
-    sum="7197d9eee0da6e5c25468fea71f21672"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="613" loccnumb="8" loccnume="16"
+    sum="7582226cb4b0bd7b965fc9cadb2a47e2"
+    proved="true"
     expanded="false"
     shape="ainfix =asignaoneaFalse">
     <proof
-     prover="cvc3"
+     prover="2"
      timelimit="10"
-     edited=""
-     obsolete="true">
+     memlimit="0"
+     obsolete="true"
+     archived="false">
      <result status="failure" time="0.00"/>
     </proof>
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.02"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.04"/>
     </proof>
    </goal>
    <goal
     name="exp_one"
-    sum="8338eada98a06b6ead29fe733732d582"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="614" loccnumb="8" loccnume="15"
+    sum="0ec82d16fe4e827be61aa5ec2f1d4a5c"
+    proved="true"
     expanded="false"
     shape="ainfix =aexpaonec1023">
     <proof
-     prover="coq"
-     timelimit="5"
-     edited="bitvector1_TestDouble_exp_one_2.v"
-     obsolete="true">
-     <result status="valid" time="0.67"/>
-    </proof>
-    <proof
-     prover="cvc3"
+     prover="2"
      timelimit="20"
-     edited=""
-     obsolete="true">
+     memlimit="0"
+     obsolete="true"
+     archived="false">
      <result status="failure" time="0.00"/>
     </proof>
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="21"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="4.74"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="7.72"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="5"
+     memlimit="0"
+     edited="bitvector1_TestDouble_exp_one_2.v"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="1.15"/>
     </proof>
    </goal>
    <goal
     name="mantissa_one"
-    sum="1d33b1caff3bc976c53d9ddd4ceb93a4"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="615" loccnumb="8" loccnume="20"
+    sum="bad1113e6b18e43a9a8129cb5b451960"
+    proved="true"
     expanded="false"
     shape="ainfix =amantissaaonec0">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.26"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.38"/>
     </proof>
    </goal>
    <goal
     name="double_value_of_1"
-    sum="cfaccb72e2be349d366f409dd5b195df"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="617" loccnumb="8" loccnume="25"
+    sum="2ac37f4a6b0599d66bc867b1638e11c6"
+    proved="true"
     expanded="false"
     shape="ainfix =adouble_of_bv64aonec1.0">
     <proof
-     prover="cvc3"
+     prover="2"
      timelimit="10"
-     edited=""
-     obsolete="true">
+     memlimit="0"
+     obsolete="true"
+     archived="false">
      <result status="failure" time="0.00"/>
     </proof>
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.03"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.04"/>
     </proof>
    </goal>
   </theory>
   <theory
    name="TestNegAsXOR"
-   verified="false"
+   locfile="bitvector1/../bitvector1.why"
+   loclnum="622" loccnumb="7" loccnume="19"
+   verified="true"
    expanded="false">
    <goal
     name="Nth_j"
-    sum="d4a9b9969945e499bbb3a0f1f513a459"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="632" loccnumb="8" loccnume="13"
+    sum="07a1b34440c91dbe42eeb0f2969c5dd9"
+    proved="true"
     expanded="false"
-    shape="ainfix =anthajV0aFalseIainfix <=V0c62Aainfix <=c0V0F">
+    shape="ainfix =anthajV0aFalseIainfix &lt;=V0c62Aainfix &lt;=c0V0F">
     <proof
-     prover="alt-ergo-0.93.1"
+     prover="0"
      timelimit="5"
-     edited=""
-     obsolete="true">
+     memlimit="0"
+     obsolete="true"
+     archived="false">
      <result status="valid" time="0.28"/>
     </proof>
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.08"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.11"/>
     </proof>
    </goal>
    <goal
     name="sign_of_j"
-    sum="c3c6ea16a3336f0e58cf56aaf154e342"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="634" loccnumb="8" loccnume="17"
+    sum="f7c354ede730e9414a60a685ba041ce4"
+    proved="true"
     expanded="false"
     shape="ainfix =asignajaTrue">
     <proof
-     prover="alt-ergo-0.93.1"
+     prover="0"
      timelimit="5"
-     edited=""
-     obsolete="true">
+     memlimit="0"
+     obsolete="true"
+     archived="false">
      <result status="valid" time="0.07"/>
     </proof>
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="10"
-     edited=""
-     obsolete="true">
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.03"/>
     </proof>
    </goal>
    <goal
     name="mantissa_of_j"
-    sum="7aa44df788dbcc788f5980912161ce91"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="635" loccnumb="8" loccnume="21"
+    sum="5a4b1310ae3b9d15875fe8df65c956f0"
+    proved="true"
     expanded="false"
     shape="ainfix =amantissaajc0">
     <proof
-     prover="alt-ergo-0.93.1"
+     prover="0"
      timelimit="5"
-     edited=""
-     obsolete="true">
+     memlimit="0"
+     obsolete="true"
+     archived="false">
      <result status="valid" time="0.47"/>
     </proof>
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.16"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.22"/>
     </proof>
    </goal>
    <goal
     name="exp_of_j"
-    sum="e9a944c7009efbc067925e099c60129d"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="636" loccnumb="8" loccnume="16"
+    sum="aa37e69cdbab3f2131611066a8a66687"
+    proved="true"
     expanded="false"
     shape="ainfix =aexpajc0">
     <proof
-     prover="alt-ergo-0.93.1"
+     prover="0"
      timelimit="5"
-     edited=""
-     obsolete="true">
+     memlimit="0"
+     obsolete="true"
+     archived="false">
      <result status="valid" time="0.48"/>
     </proof>
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.16"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.22"/>
     </proof>
    </goal>
    <goal
     name="int_of_bv"
-    sum="244cb2466fb23e49e2a86013ec346cbd"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="637" loccnumb="8" loccnume="17"
+    sum="1d04361970c56003dae994f4c0bb2d63"
+    proved="true"
     expanded="false"
     shape="ainfix =adouble_of_bv64ajc0.0">
     <proof
-     prover="alt-ergo-0.93.1"
+     prover="0"
      timelimit="5"
-     edited=""
-     obsolete="true">
+     memlimit="0"
+     obsolete="true"
+     archived="false">
      <result status="valid" time="0.06"/>
     </proof>
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="10"
-     edited=""
-     obsolete="true">
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.04"/>
     </proof>
    </goal>
    <goal
     name="MainResultBits"
-    sum="170bba4794583038d02d44e45910d6b5"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="639" loccnumb="8" loccnume="22"
+    sum="dceed52939f21d5dac97ab7063699786"
+    proved="true"
     expanded="false"
-    shape="ainfix =anthabw_xorV0ajV1anthV0V1Iainfix <V1c63Aainfix <=c0V1FF">
+    shape="ainfix =anthabw_xorV0ajV1anthV0V1Iainfix &lt;V1c63Aainfix &lt;=c0V1FF">
     <proof
-     prover="alt-ergo-0.93.1"
+     prover="0"
      timelimit="5"
-     edited=""
-     obsolete="true">
+     memlimit="0"
+     obsolete="true"
+     archived="false">
      <result status="valid" time="0.23"/>
     </proof>
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.08"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.11"/>
     </proof>
    </goal>
    <goal
     name="MainResultSign"
-    sum="81f51872314678c8a32394f7372a12fc"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="642" loccnumb="8" loccnume="22"
+    sum="1b99a48face410652650ba05630c80d2"
+    proved="true"
     expanded="false"
     shape="ainfix =anthabw_xorV0ajc63anotbanthV0c63F">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.02"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
     </proof>
    </goal>
    <goal
     name="Sign_of_xor_j"
-    sum="585a18449a7d788b55998f51329d79bf"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="644" loccnumb="8" loccnume="21"
+    sum="30826c11d930d6e90f83ad3952dd3f83"
+    proved="true"
     expanded="false"
     shape="ainfix =asignabw_xorV0ajanotbasignV0F">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.02"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
     </proof>
    </goal>
    <goal
     name="Exp_of_xor_j"
-    sum="b68a9336b6ac701d4a843caf7da11391"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="646" loccnumb="8" loccnume="20"
+    sum="be1420311e1f57b65c5d95e1a65ee402"
+    proved="true"
     expanded="false"
     shape="ainfix =aexpabw_xorV0ajaexpV0F">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="18"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="1.03"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="1.40"/>
     </proof>
    </goal>
    <goal
     name="Mantissa_of_xor_j"
-    sum="d8b6302668bac43902d646d1da8b3d28"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="648" loccnumb="8" loccnume="25"
+    sum="796a6304e6cae0b21f422349e01d0ecb"
+    proved="true"
     expanded="false"
     shape="ainfix =amantissaabw_xorV0ajamantissaV0F">
     <proof
-     prover="alt-ergo-0.93.1"
+     prover="0"
      timelimit="8"
-     edited=""
-     obsolete="true">
+     memlimit="0"
+     obsolete="true"
+     archived="false">
      <result status="valid" time="3.55"/>
     </proof>
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.55"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.87"/>
     </proof>
    </goal>
    <goal
     name="MainResultZero"
-    sum="0c42f64ae16b6e50e08179379189c95d"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="650" loccnumb="8" loccnume="22"
+    sum="1e98ed00dfbc21660b9da9849befef17"
+    proved="true"
     expanded="false"
     shape="ainfix =adouble_of_bv64abw_xorV0ajaprefix -.adouble_of_bv64V0Iainfix =amantissaV0c0Aainfix =c0aexpV0F">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="1.70"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="2.74"/>
     </proof>
    </goal>
    <goal
     name="sign_neg"
-    sum="2712da5b8819235c69a9dbfffbaf8c4d"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="653" loccnumb="8" loccnume="16"
+    sum="f2d4a4e281cb975a67af37d763042dc0"
+    proved="true"
     expanded="false"
     shape="ainfix =asign_valueanotbasignV0aprefix -.asign_valueasignV0F">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="15"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="2.68"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="4.28"/>
     </proof>
    </goal>
    <goal
     name="MainResult"
-    sum="1a089ca5b2f54dbadd239a5f2008ba10"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="655" loccnumb="8" loccnume="18"
+    sum="07c09ea843d70dc81974afc4c6df0d66"
+    proved="true"
     expanded="false"
-    shape="ainfix =adouble_of_bv64abw_xorV0ajaprefix -.adouble_of_bv64V0Iainfix <aexpV0c2047Aainfix <c0aexpV0F">
+    shape="ainfix =adouble_of_bv64abw_xorV0ajaprefix -.adouble_of_bv64V0Iainfix &lt;aexpV0c2047Aainfix &lt;c0aexpV0F">
     <proof
-     prover="coq"
+     prover="5"
      timelimit="15"
+     memlimit="0"
      edited="bitvector1_TestNegAsXOR_MainResult_2.v"
-     obsolete="true">
-     <result status="valid" time="0.63"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="1.20"/>
     </proof>
    </goal>
   </theory>
   <theory
    name="TestDoubleOfInt"
+   locfile="bitvector1/../bitvector1.why"
+   loclnum="661" loccnumb="7" loccnume="22"
    verified="false"
-   expanded="true">
+   expanded="false">
    <goal
     name="jp0_30"
-    sum="4247cfc34f42b323d12ce74dd5d3f869"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="682" loccnumb="8" loccnume="14"
+    sum="256f16fa09df943ab6313c39374614b7"
+    proved="true"
     expanded="false"
-    shape="ainfix =anthaj'V0aFalseIainfix <V0c30Aainfix <=c0V0F">
+    shape="ainfix =anthaj&apos;V0aFalseIainfix &lt;V0c30Aainfix &lt;=c0V0F">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="5"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.06"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.09"/>
     </proof>
    </goal>
    <goal
     name="nth_const1"
-    sum="59af10492e343dbc1616b1c49ff4e291"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="698" loccnumb="8" loccnume="18"
+    sum="d4004c4cd6c71af10b3e596b25f3854a"
+    proved="true"
     expanded="false"
-    shape="ainfix =anthaconstV0aFalseIainfix <=V0c30Aainfix <=c0V0F">
+    shape="ainfix =anthaconstV0aFalseIainfix &lt;=V0c30Aainfix &lt;=c0V0F">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="5"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.06"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.07"/>
     </proof>
    </goal>
    <goal
     name="nth_const2"
-    sum="52b5bc00ca1813bf0e7c9ced1944eeb8"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="699" loccnumb="8" loccnume="18"
+    sum="5dee62d23ccb40ec5d40c1597bbd1d89"
+    proved="true"
     expanded="false"
     shape="ainfix =anthaconstc31aTrue">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="5"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.04"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.05"/>
     </proof>
    </goal>
    <goal
     name="nth_const3"
-    sum="0b87557ae2eeee44c251dc935e053ffb"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="700" loccnumb="8" loccnume="18"
+    sum="e30e835732c9284f02510ce599443ca6"
+    proved="true"
     expanded="false"
-    shape="ainfix =anthaconstV0aFalseIainfix <=V0c51Aainfix <=c32V0F">
+    shape="ainfix =anthaconstV0aFalseIainfix &lt;=V0c51Aainfix &lt;=c32V0F">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="5"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.97"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="1.55"/>
     </proof>
    </goal>
    <goal
     name="nth_const4"
-    sum="f61015b85be60770d4666c7c924df001"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="701" loccnumb="8" loccnume="18"
+    sum="33a46ed3a16663d8fd5bc3aa3165a233"
+    proved="true"
     expanded="false"
-    shape="ainfix =anthaconstV0aTrueIainfix <=V0c53Aainfix <=c52V0F">
+    shape="ainfix =anthaconstV0aTrueIainfix &lt;=V0c53Aainfix &lt;=c52V0F">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="5"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="1.02"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="1.60"/>
     </proof>
    </goal>
    <goal
     name="nth_const5"
-    sum="5427f9175efcd92bcca9165275298869"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="702" loccnumb="8" loccnume="18"
+    sum="386efa0cbb8b1496c6838803b89816b4"
+    proved="true"
     expanded="false"
-    shape="ainfix =anthaconstV0aFalseIainfix <=V0c55Aainfix <=c54V0F">
+    shape="ainfix =anthaconstV0aFalseIainfix &lt;=V0c55Aainfix &lt;=c54V0F">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="5"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="1.02"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="1.63"/>
     </proof>
    </goal>
    <goal
     name="nth_const6"
-    sum="bfa1810b1816bf2e51a575dc3a7b1094"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="703" loccnumb="8" loccnume="18"
+    sum="81cd040edd829b2357b2e9d6c1317797"
+    proved="true"
     expanded="false"
-    shape="ainfix =anthaconstV0aTrueIainfix <=V0c57Aainfix <=c56V0F">
+    shape="ainfix =anthaconstV0aTrueIainfix &lt;=V0c57Aainfix &lt;=c56V0F">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="5"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="1.00"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="1.62"/>
     </proof>
    </goal>
    <goal
     name="nth_const7"
-    sum="89bc21faab60e9b1f149313b0ba5599a"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="704" loccnumb="8" loccnume="18"
+    sum="ddf37306bee048cc9ae0eee70cbb5381"
+    proved="true"
     expanded="false"
-    shape="ainfix =anthaconstV0aFalseIainfix <=V0c61Aainfix <=c58V0F">
+    shape="ainfix =anthaconstV0aFalseIainfix &lt;=V0c61Aainfix &lt;=c58V0F">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="5"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="1.00"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="1.59"/>
     </proof>
    </goal>
    <goal
     name="nth_const8"
-    sum="23c0f08b27654766ffce5704e99c65e5"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="705" loccnumb="8" loccnume="18"
+    sum="0b964b78d9c1c2b7469e2b7e23aaefaa"
+    proved="true"
     expanded="false"
     shape="ainfix =anthaconstc62aTrue">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="5"
-     edited=""
-     obsolete="true">
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.04"/>
     </proof>
    </goal>
    <goal
     name="nth_const9"
-    sum="08be4353d1f9e9fa4bd5fe2b26f50abf"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="706" loccnumb="8" loccnume="18"
+    sum="cb3e81fa600947eba00c29c3654d6c79"
+    proved="true"
     expanded="false"
     shape="ainfix =anthaconstc63aFalse">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="5"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.04"/>
-    </proof>
-   </goal>
-   <goal
-    name="sign_const"
-    sum="2e8f9cd14d8ac941e820f0858cbd9e9a"
-    proved="false"
-    expanded="false"
-    shape="ainfix =asignaconstaFalse">
-    <proof
-     prover="alt-ergo"
-     timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.03"/>
-    </proof>
-   </goal>
-   <goal
-    name="exp_const"
-    sum="03aebb16675f868948841c5718e9591f"
-    proved="false"
-    expanded="false"
-    shape="ainfix =aexpaconstc1075">
-    <proof
-     prover="coq"
-     timelimit="5"
-     edited="bitvector1_TestDoubleOfInt_exp_const_1.v"
-     obsolete="true">
-     <result status="valid" time="0.99"/>
-    </proof>
-    <proof
-     prover="alt-ergo"
-     timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="timeout" time="10.02"/>
-    </proof>
-   </goal>
-   <goal
-    name="to_nat_mantissa_1"
-    sum="cd7146304a76bf5fd20f46f1f1837671"
-    proved="false"
-    expanded="false"
-    shape="ainfix =ato_nat_subaconstc30c0c0">
-    <proof
-     prover="alt-ergo"
-     timelimit="20"
-     edited=""
-     obsolete="true">
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.06"/>
     </proof>
    </goal>
    <goal
-    name="mantissa_const_nth2"
-    sum="9c125216e392598b48d3e8c32a591c2a"
-    proved="false"
+    name="sign_const"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="708" loccnumb="8" loccnume="18"
+    sum="5f3770394802a8bdd75c4d45c330fdec"
+    proved="true"
     expanded="false"
-    shape="ainfix =anthaconstV0aFalseIainfix <=V0c51Aainfix <=c32V0F">
+    shape="ainfix =asignaconstaFalse">
     <proof
-     prover="alt-ergo"
+     prover="1"
+     timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.04"/>
+    </proof>
+   </goal>
+   <goal
+    name="exp_const"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="710" loccnumb="8" loccnume="17"
+    sum="2a0f413ac1c3812a77bdc079631adcbb"
+    proved="true"
+    expanded="false"
+    shape="ainfix =aexpaconstc1075">
+    <proof
+     prover="1"
+     timelimit="10"
+     memlimit="0"
+     obsolete="true"
+     archived="false">
+     <result status="timeout" time="10.02"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="5"
+     memlimit="0"
+     edited="bitvector1_TestDoubleOfInt_exp_const_1.v"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="1.72"/>
+    </proof>
+   </goal>
+   <goal
+    name="to_nat_mantissa_1"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="712" loccnumb="8" loccnume="25"
+    sum="dce268d7e789e4ba8780f5fc5db73629"
+    proved="true"
+    expanded="false"
+    shape="ainfix =ato_nat_subaconstc30c0c0">
+    <proof
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.03"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.08"/>
+    </proof>
+   </goal>
+   <goal
+    name="mantissa_const_nth2"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="714" loccnumb="8" loccnume="27"
+    sum="02cab213bdd1cf475d3dd42bce679cc0"
+    proved="true"
+    expanded="false"
+    shape="ainfix =anthaconstV0aFalseIainfix &lt;=V0c51Aainfix &lt;=c32V0F">
+    <proof
+     prover="1"
+     timelimit="20"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.04"/>
     </proof>
    </goal>
    <goal
     name="mantissa_const_to_nat51"
-    sum="db84df9ade309b3f2f7dfed601405ef1"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="717" loccnumb="8" loccnume="31"
+    sum="df576de9da612b4b66a57a77e0d60ec9"
+    proved="true"
     expanded="false"
     shape="ainfix =ato_nat_subaconstc51c0ato_nat_subaconstc31c0">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.11"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.20"/>
     </proof>
    </goal>
    <goal
     name="mantissa_const"
-    sum="d854c9bbd08767b8bfc9d25d3c0b2f18"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="720" loccnumb="8" loccnume="22"
+    sum="865cafb40a99949daf8c8539420a899a"
+    proved="true"
     expanded="false"
     shape="ainfix =amantissaaconstapow2c31">
     <proof
-     prover="cvc3"
+     prover="2"
      timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.04"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.08"/>
     </proof>
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.55"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.89"/>
     </proof>
    </goal>
    <goal
     name="real1075m1023"
-    sum="c33ff67fedf2ad4b3e6bc0d25293ef98"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="722" loccnumb="8" loccnume="21"
+    sum="71383555f7eceb15b27cab1e547057be"
+    proved="true"
     expanded="false"
     shape="ainfix =afrom_intainfix -c1075c1023c52.0">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="10"
-     edited=""
-     obsolete="true">
+     memlimit="0"
+     obsolete="true"
+     archived="false">
      <result status="timeout" time="10.01"/>
     </proof>
     <proof
-     prover="gappa"
+     prover="6"
      timelimit="20"
-     edited=""
-     obsolete="true">
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
     name="real1075m1023_2"
-    sum="2f4790d1482bf49ee25e31f6b96d04a0"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="724" loccnumb="8" loccnume="23"
+    sum="3440ba6b7c47313549769c9475a27582"
+    proved="true"
     expanded="false"
     shape="ainfix =ainfix -.c1075.0c1023.0c52.0">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.03"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.04"/>
     </proof>
    </goal>
    <goal
     name="real52_a_m52"
-    sum="950f4f03b7848151d991fda96b0b60cd"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="726" loccnumb="8" loccnume="20"
+    sum="32a774be03a493aed1920f1acbcfe2f1"
+    proved="true"
     expanded="false"
     shape="ainfix =ainfix *.ainfix *.apow2ainfix -c1075c1023apow2c31apow2aprefix -c52apow2c31">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="30"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="12.03"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="19.52"/>
     </proof>
    </goal>
    <goal
     name="const_value0"
-    sum="918d519074ef148991a4410d101f8667"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="728" loccnumb="8" loccnume="20"
+    sum="1a9c06809da7492cd2442bdd3957ed81"
+    proved="true"
     expanded="false"
     shape="ainfix =aconst_as_doubleainfix *.ainfix *.c1.0apow2ainfix -c1075c1023ainfix +.c1.0ainfix *.apow2c31apow2aprefix -c52">
     <proof
-     prover="alt-ergo"
+     prover="7"
      timelimit="20"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.24"/>
-    </proof>
-    <proof
-     prover="cvc3"
-     timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="failure" time="0.04"/>
-    </proof>
-    <proof
-     prover="z3"
-     timelimit="20"
-     edited=""
-     obsolete="true">
+     memlimit="0"
+     obsolete="true"
+     archived="false">
      <result status="timeout" time="20.18"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="20"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.35"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="10"
+     memlimit="0"
+     obsolete="true"
+     archived="false">
+     <result status="failure" time="0.04"/>
     </proof>
    </goal>
    <goal
     name="const_value"
-    sum="9a09bf5050f04a3d580863f42ddee53b"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="731" loccnumb="8" loccnume="19"
+    sum="a8ad4dd5ecd3ae37af4643bb651a4343"
+    proved="true"
     expanded="false"
     shape="ainfix =aconst_as_doubleainfix +.apow2c52apow2c31">
     <proof
-     prover="coq"
-     timelimit="20"
-     edited=""
-     obsolete="true"><unedited/>
-     
+     prover="7"
+     timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.20"/>
     </proof>
     <proof
-     prover="cvc3"
+     prover="2"
      timelimit="10"
-     edited=""
-     obsolete="true">
+     memlimit="0"
+     obsolete="true"
+     archived="false">
      <result status="failure" time="0.04"/>
     </proof>
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.03"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.04"/>
     </proof>
     <proof
-     prover="z3"
-     timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.12"/>
+     prover="4"
+     timelimit="20"
+     memlimit="0"
+     obsolete="true"
+     archived="false"><unedited/>
+     
     </proof>
    </goal>
    <goal
     name="nth_0_30"
-    sum="c038f2b87a2b11a390524f4bdd673933"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="757" loccnumb="8" loccnume="16"
+    sum="6c69e748ddc090f99c61d03e3c611386"
+    proved="true"
     expanded="false"
-    shape="ainfix =anthabw_xoraj'afrom_int2cV0V1anthafrom_int2cV0V1Iainfix <=V1c30Aainfix <=c0V1Aais_int32V0FF">
+    shape="ainfix =anthabw_xoraj&apos;afrom_int2cV0V1anthafrom_int2cV0V1Iainfix &lt;=V1c30Aainfix &lt;=c0V1Aais_int32V0FF">
     <proof
-     prover="alt-ergo-0.93.1"
+     prover="0"
      timelimit="10"
-     edited=""
-     obsolete="true">
+     memlimit="0"
+     obsolete="true"
+     archived="false">
      <result status="valid" time="1.49"/>
     </proof>
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.46"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.68"/>
     </proof>
    </goal>
    <goal
     name="nth_jpxor_0_30"
-    sum="0e1e8825f72cf6a2c55c82b6323d963a"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="759" loccnumb="8" loccnume="22"
+    sum="83e888fa6135392d87fca54df26f47d0"
+    proved="true"
     expanded="false"
-    shape="ainfix =anthajpxorV0V1anthafrom_int2cV0V1Iainfix <=V1c30Aainfix <=c0V1Aais_int32V0FF">
+    shape="ainfix =anthajpxorV0V1anthafrom_int2cV0V1Iainfix &lt;=V1c30Aainfix &lt;=c0V1Aais_int32V0FF">
     <proof
-     prover="alt-ergo-0.93.1"
+     prover="0"
      timelimit="10"
-     edited=""
-     obsolete="true">
+     memlimit="0"
+     obsolete="true"
+     archived="false">
      <result status="valid" time="0.27"/>
     </proof>
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.08"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.11"/>
     </proof>
    </goal>
    <goal
     name="nth_var31"
-    sum="c2551c1d0f1465b01d69e2e11e2866dc"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="761" loccnumb="8" loccnume="17"
+    sum="385e09a03f600bdce9c13a65cbe4f55a"
+    proved="true"
     expanded="false"
     shape="ainfix =anthajpxorV0c31anotbanthafrom_int2cV0c31F">
     <proof
-     prover="alt-ergo-0.93.1"
+     prover="0"
      timelimit="10"
-     edited=""
-     obsolete="true">
+     memlimit="0"
+     obsolete="true"
+     archived="false">
      <result status="valid" time="3.50"/>
     </proof>
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="1.05"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="1.64"/>
     </proof>
    </goal>
    <goal
     name="to_nat_sub_0_30"
-    sum="0359d7a97e6943e53ef1798839112133"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="764" loccnumb="8" loccnume="23"
+    sum="be8bc732bd62c8d9f36612565509df3f"
+    proved="true"
     expanded="false"
-    shape="ainfix =ato_nat_subabw_xoraj'afrom_int2cV0c30c0ato_nat_subafrom_int2cV0c30c0Iais_int32V0F">
+    shape="ainfix =ato_nat_subabw_xoraj&apos;afrom_int2cV0c30c0ato_nat_subafrom_int2cV0c30c0Iais_int32V0F">
     <proof
-     prover="alt-ergo-0.93.1"
+     prover="0"
      timelimit="10"
-     edited=""
-     obsolete="true">
+     memlimit="0"
+     obsolete="true"
+     archived="false">
      <result status="valid" time="0.64"/>
     </proof>
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.21"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.34"/>
     </proof>
    </goal>
    <goal
     name="jpxorx_pos"
-    sum="6f453fdfc2519759b7c44698579b7118"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="771" loccnumb="8" loccnume="18"
+    sum="86ca976d13fa6b76041ce52c57b8170b"
+    proved="true"
     expanded="false"
-    shape="ainfix =anthabw_xoraj'afrom_int2cV0c31aTrueIainfix >=V0c0F">
+    shape="ainfix =anthabw_xoraj&apos;afrom_int2cV0c31aTrueIainfix &gt;=V0c0F">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="5"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.21"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.30"/>
     </proof>
    </goal>
    <goal
     name="from_int2c_to_nat_sub_gen"
-    sum="24dbc609bad2f4420e6accf3d254d472"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="778" loccnumb="8" loccnume="33"
+    sum="62161f6f5b9c90eafc7f037846c856c5"
     proved="false"
-    expanded="true"
-    shape="ainfix =ato_nat_subafrom_int2cV1ainfix -V0c1c0V1Iainfix <V1apow2V0Aainfix <=c0V1FIainfix <=V0c30Aainfix <=c0V0F">
+    expanded="false"
+    shape="ainfix =ato_nat_subafrom_int2cV1ainfix -V0c1c0V1Iainfix &lt;V1apow2V0Aainfix &lt;=c0V1FIainfix &lt;=V0c30Aainfix &lt;=c0V0F">
     <proof
-     prover="coq"
+     prover="5"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false"><unedited/>
+     
+    </proof>
+    <proof
+     prover="4"
      timelimit="10"
+     memlimit="0"
      edited="bitvector1_TestDoubleOfInt_from_int2c_to_nat_sub_gen_1.v"
-     obsolete="true"><undone/>
+     obsolete="true"
+     archived="false"><undone/>
      
     </proof>
    </goal>
    <goal
     name="from_int2c_to_nat_sub"
-    sum="7645ee89131563d78d43dd48eb7f61a9"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="783" loccnumb="8" loccnume="29"
+    sum="cb5841b82e8cb4c8a9e08ab053d7860c"
     proved="false"
-    expanded="true"
-    shape="ainfix =ato_nat_subafrom_int2cV0c30c0V0Iainfix >=V0c0Aais_int32V0F">
+    expanded="false"
+    shape="ainfix =ato_nat_subafrom_int2cV0c30c0V0Iainfix &gt;=V0c0Aais_int32V0F">
     <proof
-     prover="z3-3"
+     prover="7"
      timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="timeout" time="10.08"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="10.72"/>
     </proof>
     <proof
-     prover="alt-ergo-0.93.1"
+     prover="0"
      timelimit="10"
-     edited=""
-     obsolete="true">
+     memlimit="0"
+     obsolete="true"
+     archived="false">
      <result status="timeout" time="10.00"/>
     </proof>
     <proof
-     prover="cvc3"
+     prover="2"
      timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="failure" time="0.04"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="highfailure" time="0.32"/>
     </proof>
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="10"
-     edited=""
-     obsolete="true">
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="10.21"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="highfailure" time="0.72"/>
+    </proof>
+    <proof
+     prover="8"
+     timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="timeout" time="10.04"/>
-    </proof>
-    <proof
-     prover="z3"
-     timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="timeout" time="10.08"/>
-    </proof>
-    <proof
-     prover="cvc3-2.4"
-     timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="failure" time="0.04"/>
     </proof>
    </goal>
    <goal
     name="lemma1_pos"
-    sum="5d8f8638554c60b0026c0357bdbdcdb5"
-    proved="false"
-    expanded="true"
-    shape="ainfix =ato_nat_subajpxorV0c31c0ainfix +apow2c31V0Iainfix >=V0c0Aais_int32V0F">
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="786" loccnumb="8" loccnume="18"
+    sum="855b8663aa4abce854b96f525fe1c89b"
+    proved="true"
+    expanded="false"
+    shape="ainfix =ato_nat_subajpxorV0c31c0ainfix +apow2c31V0Iainfix &gt;=V0c0Aais_int32V0F">
     <proof
-     prover="coq"
-     timelimit="5"
-     edited="bitvector1_TestDoubleOfInt_lemma1_pos_1.v"
-     obsolete="true">
-     <result status="valid" time="0.71"/>
+     prover="1"
+     timelimit="16"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="7.88"/>
     </proof>
     <proof
-     prover="alt-ergo"
-     timelimit="16"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="5.28"/>
+     prover="5"
+     timelimit="5"
+     memlimit="0"
+     edited="bitvector1_TestDoubleOfInt_lemma1_pos_1.v"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="1.22"/>
     </proof>
    </goal>
    <goal
     name="to_nat_sub_0_30_neg"
-    sum="e43b75f9c9cda35ea587a8de71b9567c"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="790" loccnumb="8" loccnume="27"
+    sum="df3d1ed25863af4db80bbd6cbf9271a3"
+    proved="true"
     expanded="false"
-    shape="ainfix =ato_nat_subabw_xoraj'afrom_int2cV0c30c0ato_nat_subafrom_int2cV0c30c0Iainfix <V0c0Aais_int32V0F">
+    shape="ainfix =ato_nat_subabw_xoraj&apos;afrom_int2cV0c30c0ato_nat_subafrom_int2cV0c30c0Iainfix &lt;V0c0Aais_int32V0F">
     <proof
-     prover="coq"
+     prover="5"
      timelimit="5"
+     memlimit="0"
      edited="bitvector1_TestDoubleOfInt_to_nat_sub_0_30_neg_1.v"
-     obsolete="true">
-     <result status="valid" time="0.69"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="1.21"/>
     </proof>
    </goal>
    <goal
     name="to_nat_sub_0_30_neg1"
-    sum="93a30ea8a72c0d75495963b29b82bc29"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="793" loccnumb="8" loccnume="28"
+    sum="4a4148ba6a3d73832dfe606fa8ef8464"
     proved="false"
-    expanded="true"
-    shape="ainfix =ato_nat_subafrom_int2cV0c30c0ainfix +apow2c31V0Iainfix <V0c0Aais_int32V0F">
+    expanded="false"
+    shape="ainfix =ato_nat_subafrom_int2cV0c30c0ainfix +apow2c31V0Iainfix &lt;V0c0Aais_int32V0F">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="14"
-     edited=""
-     obsolete="true">
+     memlimit="0"
+     obsolete="true"
+     archived="false">
      <result status="timeout" time="14.02"/>
     </proof>
    </goal>
    <goal
     name="lemma1_neg"
-    sum="7ffd56c7347a0e6dc9be718d0b4910c0"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="796" loccnumb="8" loccnume="18"
+    sum="1731b8b313b5ba14c08ddf2565fd72cc"
     proved="false"
     expanded="false"
-    shape="ainfix =ato_nat_subajpxorV0c31c0ainfix +apow2c31V0Iainfix <V0c0Aais_int32V0F">
+    shape="ainfix =ato_nat_subajpxorV0c31c0ainfix +apow2c31V0Iainfix &lt;V0c0Aais_int32V0F">
     <proof
-     prover="coq"
+     prover="5"
      timelimit="5"
+     memlimit="0"
      edited="bitvector1_TestDoubleOfInt_lemma1_neg_1.v"
-     obsolete="true">
-     <result status="valid" time="0.71"/>
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="1.22"/>
     </proof>
    </goal>
    <goal
     name="lemma1"
-    sum="af25f2e39b747ded9d5df07a6293bcc5"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="800" loccnumb="8" loccnume="14"
+    sum="0c6093611ddd2efcd97e810e54746d86"
+    proved="true"
     expanded="false"
     shape="ainfix =ato_nat_subajpxorV0c31c0ainfix +apow2c31V0Iais_int32V0F">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="5"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.03"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.05"/>
     </proof>
    </goal>
    <goal
     name="nth_var_0_31"
-    sum="bdb6ac95f71c69de42dff8e734c0f303"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="807" loccnumb="8" loccnume="20"
+    sum="88e5217a2bbc59feaa5558a7bfe99f15"
+    proved="true"
     expanded="false"
-    shape="ainfix =anthavarV0V1anthajpxorV0V1Iainfix <=V1c31Aainfix <=c0V1Aais_int32V0FF">
+    shape="ainfix =anthavarV0V1anthajpxorV0V1Iainfix &lt;=V1c31Aainfix &lt;=c0V1Aais_int32V0FF">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="5"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="1.52"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="2.26"/>
     </proof>
    </goal>
    <goal
     name="to_nat_bv32_bv64_aux"
-    sum="8a6c642b5526e440e17f8e95c2b24ca3"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="809" loccnumb="8" loccnume="28"
+    sum="aa7b3a04f3e8f54b0cdcacb9b80555e4"
+    proved="true"
     expanded="false"
-    shape="ainfix =ato_nat_subaconcatV0V1V2c0ato_nat_subV1V2c0Iainfix <V2c32Aainfix <=c0V2FFF">
+    shape="ainfix =ato_nat_subaconcatV0V1V2c0ato_nat_subV1V2c0Iainfix &lt;V2c32Aainfix &lt;=c0V2FFF">
     <proof
-     prover="coq"
+     prover="5"
      timelimit="10"
+     memlimit="0"
      edited="bitvector1_TestDoubleOfInt_to_nat_bv32_bv64_aux_2.v"
-     obsolete="true">
-     <result status="valid" time="0.92"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="1.64"/>
     </proof>
    </goal>
    <goal
     name="to_nat_bv32_bv64"
-    sum="b8c3ca952c458dc70ab2404969e52b3c"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="810" loccnumb="8" loccnume="24"
+    sum="022b51f6ee685e3a244545ed8ab676ae"
+    proved="true"
     expanded="false"
     shape="ainfix =ato_nat_subaconcatV0V1c31c0ato_nat_subV1c31c0FF">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.04"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.05"/>
     </proof>
    </goal>
    <goal
     name="to_nat_var_0_31"
-    sum="ceb10ac85f31e69228528c3e69deadef"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="812" loccnumb="8" loccnume="23"
+    sum="448286e6565a904f085af11a72cb052a"
+    proved="true"
     expanded="false"
     shape="ainfix =ato_nat_subavarV0c31c0ato_nat_subajpxorV0c31c0Iais_int32V0F">
     <proof
-     prover="coq"
+     prover="5"
      timelimit="5"
+     memlimit="0"
      edited="bitvector1_TestDoubleOfInt_to_nat_var_0_31_1.v"
-     obsolete="true">
-     <result status="valid" time="0.69"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="1.30"/>
     </proof>
    </goal>
    <goal
     name="nth_var32to63"
-    sum="9d7d5b3f2f001bbc402c5168987d0325"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="814" loccnumb="8" loccnume="21"
+    sum="bce5e882598871677b3ca8f5deae89cc"
+    proved="true"
     expanded="false"
-    shape="ainfix =anthavarV0V1anthajainfix -V1c32Iainfix <=V1c63Aainfix <=c32V1F">
+    shape="ainfix =anthavarV0V1anthajainfix -V1c32Iainfix &lt;=V1c63Aainfix &lt;=c32V1F">
     <proof
-     prover="alt-ergo-0.93.1"
+     prover="0"
      timelimit="30"
-     edited=""
-     obsolete="true">
+     memlimit="0"
+     obsolete="true"
+     archived="false">
      <result status="valid" time="3.72"/>
     </proof>
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="30"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="1.13"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="2.05"/>
     </proof>
    </goal>
    <goal
     name="nth_var3"
-    sum="d32dcce23c3249b5be70a53c7d72ef17"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="817" loccnumb="8" loccnume="16"
+    sum="8718d3c5b47baed2ceee57514497e5a8"
+    proved="true"
     expanded="false"
-    shape="ainfix =anthavarV0V1aFalseIainfix <=V1c51Aainfix <=c32V1FF">
+    shape="ainfix =anthavarV0V1aFalseIainfix &lt;=V1c51Aainfix &lt;=c32V1FF">
     <proof
-     prover="alt-ergo-0.93.1"
+     prover="0"
      timelimit="15"
-     edited=""
-     obsolete="true">
+     memlimit="0"
+     obsolete="true"
+     archived="false">
      <result status="timeout" time="15.08"/>
     </proof>
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="20"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="8.28"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="13.53"/>
     </proof>
    </goal>
    <goal
     name="lemma2"
-    sum="fc9c72c9e17a31340b82034c9ec8b5b4"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="819" loccnumb="8" loccnume="14"
+    sum="0e680141ab92a3d9934f0e1ef4329c86"
+    proved="true"
     expanded="false"
     shape="ainfix =amantissaavarV0ainfix +apow2c31V0Iais_int32V0F">
     <proof
-     prover="coq"
+     prover="5"
      timelimit="30"
+     memlimit="0"
      edited="bitvector1_TestDoubleOfInt_lemma2_2.v"
-     obsolete="true">
-     <result status="valid" time="0.70"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="1.27"/>
     </proof>
    </goal>
    <goal
     name="nth_var4"
-    sum="0245d059179850ce9cdf75047f2f8b24"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="825" loccnumb="8" loccnume="16"
+    sum="80379f624c8b0f92d495d5bd2209b176"
+    proved="true"
     expanded="false"
-    shape="ainfix =anthavarV0V1aTrueIainfix <=V1c53Aainfix <=c52V1FF">
+    shape="ainfix =anthavarV0V1aTrueIainfix &lt;=V1c53Aainfix &lt;=c52V1FF">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="23"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="9.59"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="15.86"/>
     </proof>
    </goal>
    <goal
     name="nth_var5"
-    sum="a3b7a60932f8824ddeffd33f6475ee79"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="826" loccnumb="8" loccnume="16"
+    sum="45ad1d1f57c828a50a30ee0b875d151f"
+    proved="true"
     expanded="false"
-    shape="ainfix =anthavarV0V1aFalseIainfix <=V1c55Aainfix <=c54V1FF">
+    shape="ainfix =anthavarV0V1aFalseIainfix &lt;=V1c55Aainfix &lt;=c54V1FF">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="30"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="8.28"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="12.83"/>
     </proof>
    </goal>
    <goal
     name="nth_var6"
-    sum="d10f5dc787a64cb02654688dd1e89966"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="827" loccnumb="8" loccnume="16"
+    sum="dccb54542fd53a9656e3dd93266f8f89"
+    proved="true"
     expanded="false"
-    shape="ainfix =anthavarV0V1aTrueIainfix <=V1c57Aainfix <=c56V1FF">
+    shape="ainfix =anthavarV0V1aTrueIainfix &lt;=V1c57Aainfix &lt;=c56V1FF">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="30"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="9.57"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="14.96"/>
     </proof>
    </goal>
    <goal
     name="nth_var7"
-    sum="e1209322ad877ce2e8df9cd2fdfdd2ed"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="828" loccnumb="8" loccnume="16"
+    sum="a0e9f273647bdc778b97baadbbba6245"
+    proved="true"
     expanded="false"
-    shape="ainfix =anthavarV0V1aFalseIainfix <=V1c61Aainfix <=c58V1FF">
+    shape="ainfix =anthavarV0V1aFalseIainfix &lt;=V1c61Aainfix &lt;=c58V1FF">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="30"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="8.30"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="12.65"/>
     </proof>
    </goal>
    <goal
     name="nth_var8"
-    sum="717b1d511b955c3c129d5173a1aef191"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="829" loccnumb="8" loccnume="16"
+    sum="80417e5ade242e3a4eac10f6f5fb6aa0"
+    proved="true"
     expanded="false"
     shape="ainfix =anthavarV0c62aTrueF">
     <proof
-     prover="alt-ergo"
-     timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.08"/>
+     prover="7"
+     timelimit="5"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.22"/>
     </proof>
     <proof
-     prover="z3"
-     timelimit="5"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.13"/>
+     prover="1"
+     timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.21"/>
     </proof>
    </goal>
    <goal
     name="lemma3"
-    sum="c57057cb4a91e2a7f7daa48902b578f3"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="831" loccnumb="8" loccnume="14"
+    sum="573c52d92f482921f80d8f7da844f8ce"
+    proved="true"
     expanded="false"
     shape="ainfix =aexpavarV0c1075F">
     <proof
-     prover="coq"
+     prover="5"
      timelimit="5"
+     memlimit="0"
      edited="bitvector1_TestDoubleOfInt_lemma3_1.v"
-     obsolete="true">
-     <result status="valid" time="0.99"/>
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="1.62"/>
     </proof>
    </goal>
    <goal
     name="nth_var9"
-    sum="063dc0a997b4a12c692dadb3deaa284c"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="837" loccnumb="8" loccnume="16"
+    sum="e831093547176c93f6bebd2b1a5f6e2c"
+    proved="true"
     expanded="false"
     shape="ainfix =anthavarV0c63aFalseF">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.20"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.48"/>
     </proof>
    </goal>
    <goal
     name="lemma4"
-    sum="bf7c270a9a812dbccc4bc71a633aeec8"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="839" loccnumb="7" loccnume="13"
+    sum="2e42eaf4cae66a429aca1ade9fd57682"
+    proved="true"
     expanded="false"
     shape="ainfix =asignavarV0aFalseF">
     <proof
-     prover="z3-3"
+     prover="0"
      timelimit="5"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="alt-ergo-0.93.1"
-     timelimit="5"
-     edited=""
-     obsolete="true">
+     memlimit="0"
+     obsolete="true"
+     archived="false">
      <result status="valid" time="0.19"/>
     </proof>
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="5"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.06"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.07"/>
+    </proof>
+    <proof
+     prover="8"
+     timelimit="5"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
     name="sign_var"
-    sum="6751ed3903a18af9b342c436acb044d3"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="844" loccnumb="8" loccnume="16"
+    sum="75c6743ffcc57d530e501b34f49e688f"
+    proved="true"
     expanded="false"
     shape="ainfix =asignavarV0aFalseF">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.04"/>
-    </proof>
-   </goal>
-   <goal
-    name="var_value0"
-    sum="d611515ed756d46c81eb8ecf63c1e8e7"
-    proved="false"
-    expanded="false"
-    shape="ainfix =avar_as_doubleV0ainfix *.apow2ainfix -c1075c1023ainfix +.c1.0ainfix *.afrom_intainfix +apow2c31V0apow2aprefix -c52Iais_int32V0F">
-    <proof
-     prover="coq"
-     timelimit="20"
-     edited="bitvector1_TestDoubleOfInt_var_value0_3.v"
-     obsolete="true">
-     <result status="valid" time="0.71"/>
-    </proof>
-   </goal>
-   <goal
-    name="from_int_sum"
-    sum="2f4fbe35c55f95cc30d147bd3a4e1067"
-    proved="false"
-    expanded="false"
-    shape="ainfix =afrom_intainfix +apow2c31V0ainfix +.afrom_intapow2c31afrom_intV0Iais_int32V0F">
-    <proof
-     prover="alt-ergo"
-     timelimit="5"
-     edited=""
-     obsolete="true">
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.06"/>
     </proof>
    </goal>
    <goal
+    name="var_value0"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="846" loccnumb="8" loccnume="18"
+    sum="05a4291e8318d8c1bf942ef5ffead31f"
+    proved="true"
+    expanded="false"
+    shape="ainfix =avar_as_doubleV0ainfix *.apow2ainfix -c1075c1023ainfix +.c1.0ainfix *.afrom_intainfix +apow2c31V0apow2aprefix -c52Iais_int32V0F">
+    <proof
+     prover="5"
+     timelimit="20"
+     memlimit="0"
+     edited="bitvector1_TestDoubleOfInt_var_value0_3.v"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="1.20"/>
+    </proof>
+   </goal>
+   <goal
+    name="from_int_sum"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="850" loccnumb="8" loccnume="20"
+    sum="ba03097a58b973e69a51d7845de21285"
+    proved="true"
+    expanded="false"
+    shape="ainfix =afrom_intainfix +apow2c31V0ainfix +.afrom_intapow2c31afrom_intV0Iais_int32V0F">
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.09"/>
+    </proof>
+   </goal>
+   <goal
     name="var_value3"
-    sum="41c0c2e507d802dfaca348693df6fdfc"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="853" loccnumb="8" loccnume="18"
+    sum="52ff305f9de7bc0f32e2cf3eb20368de"
+    proved="true"
     expanded="false"
     shape="ainfix =avar_as_doubleV0ainfix +.apow2c52ainfix *.ainfix *.apow2c52ainfix +.afrom_intapow2c31afrom_intV0apow2aprefix -c52Iais_int32V0F">
     <proof
-     prover="coq"
-     timelimit="20"
-     edited="bitvector1_TestDoubleOfInt_var_value3_1.v"
-     obsolete="true">
-     <result status="valid" time="0.71"/>
+     prover="1"
+     timelimit="10"
+     memlimit="0"
+     obsolete="true"
+     archived="false">
+     <result status="timeout" time="10.01"/>
     </proof>
     <proof
-     prover="alt-ergo"
-     timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="timeout" time="10.01"/>
+     prover="5"
+     timelimit="20"
+     memlimit="0"
+     edited="bitvector1_TestDoubleOfInt_var_value3_1.v"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="1.17"/>
     </proof>
    </goal>
    <goal
     name="distr_pow52"
-    sum="15b3c8a5f459030ca1c58388a269c1a3"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="857" loccnumb="8" loccnume="19"
+    sum="e37ab51b48678dfe7ea12f1287410e5b"
+    proved="true"
     expanded="false"
     shape="ainfix =ainfix *.ainfix *.apow2c52V0apow2aprefix -c52V0F">
     <proof
-     prover="coq"
-     timelimit="15"
-     edited="bitvector1_TestDoubleOfInt_distr_pow52_1.v"
-     obsolete="true">
-     <result status="valid" time="0.69"/>
+     prover="1"
+     timelimit="10"
+     memlimit="0"
+     obsolete="true"
+     archived="false">
+     <result status="timeout" time="10.02"/>
     </proof>
     <proof
-     prover="alt-ergo"
-     timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="timeout" time="10.02"/>
+     prover="5"
+     timelimit="15"
+     memlimit="0"
+     edited="bitvector1_TestDoubleOfInt_distr_pow52_1.v"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="1.21"/>
     </proof>
    </goal>
    <goal
     name="var_value4"
-    sum="82edc815c6ca1f9812de2eeb2131c0c4"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="860" loccnumb="8" loccnume="18"
+    sum="bc1f2f38dbc500c26e96809a364e0266"
+    proved="true"
     expanded="false"
     shape="ainfix =avar_as_doubleV0ainfix +.ainfix +.apow2c52afrom_intapow2c31afrom_intV0Iais_int32V0F">
     <proof
-     prover="coq"
-     timelimit="5"
-     edited="bitvector1_TestDoubleOfInt_var_value4_2.v"
-     obsolete="true">
-     <result status="valid" time="0.71"/>
+     prover="1"
+     timelimit="33"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="19.61"/>
     </proof>
     <proof
-     prover="alt-ergo"
-     timelimit="33"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="12.80"/>
+     prover="5"
+     timelimit="5"
+     memlimit="0"
+     edited="bitvector1_TestDoubleOfInt_var_value4_2.v"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="1.15"/>
     </proof>
    </goal>
    <goal
     name="pow31"
-    sum="f46c21f07fd0d31a7cd0fc4bb66f1f7f"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="863" loccnumb="8" loccnume="13"
+    sum="6ef74f1d506a7d144fbe3de9f2f31f4f"
+    proved="true"
     expanded="false"
     shape="ainfix =afrom_intapow2c31apow2c31">
     <proof
-     prover="z3-3"
+     prover="0"
      timelimit="5"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.13"/>
-    </proof>
-    <proof
-     prover="alt-ergo-0.93.1"
-     timelimit="5"
-     edited=""
-     obsolete="true">
+     memlimit="0"
+     obsolete="true"
+     archived="false">
      <result status="valid" time="0.20"/>
     </proof>
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="5"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.04"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.06"/>
+    </proof>
+    <proof
+     prover="8"
+     timelimit="5"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.11"/>
     </proof>
    </goal>
    <goal
     name="lemma5"
-    sum="2d7ba0090a92946b8573bf4ec3a700c8"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="865" loccnumb="8" loccnume="14"
+    sum="fb7ca47f636dd4bd7f8f24cb8a08df27"
+    proved="true"
     expanded="false"
     shape="ainfix =avar_as_doubleV0ainfix +.ainfix +.apow2c52apow2c31afrom_intV0Iais_int32V0F">
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.04"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.05"/>
     </proof>
    </goal>
    <goal
     name="MainResult"
-    sum="f768616770c6e85d01eb19806ac666d9"
-    proved="false"
+    locfile="bitvector1/../bitvector1.why"
+    loclnum="875" loccnumb="8" loccnume="18"
+    sum="e488945ab885a1890046d7f229e9ffee"
+    proved="true"
     expanded="false"
     shape="ainfix =adouble_of_int32V0afrom_intV0Iais_int32V0F">
     <proof
-     prover="alt-ergo-0.93.1"
+     prover="7"
+     timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="1.18"/>
+    </proof>
+    <proof
+     prover="0"
      timelimit="5"
-     edited=""
-     obsolete="true">
+     memlimit="0"
+     obsolete="true"
+     archived="false">
      <result status="valid" time="0.13"/>
     </proof>
     <proof
-     prover="alt-ergo"
+     prover="1"
      timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="0.19"/>
-    </proof>
-    <proof
-     prover="z3"
-     timelimit="10"
-     edited=""
-     obsolete="true">
-     <result status="valid" time="1.94"/>
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.30"/>
     </proof>
    </goal>
   </theory>

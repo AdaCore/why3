@@ -3,8 +3,8 @@
 Require Import ZArith.
 Require Import Rbase.
 Require int.Int.
-Parameter pow2: Z -> Z.
 
+Parameter pow2: Z -> Z.
 
 Axiom Power_0 : ((pow2 0%Z) = 1%Z).
 
@@ -13,10 +13,9 @@ Axiom Power_s : forall (n:Z), (0%Z <= n)%Z ->
 
 Axiom Power_1 : ((pow2 1%Z) = 2%Z).
 
-(* YOU MAY EDIT THE CONTEXT BELOW *)
 Open Scope Z_scope.
-(* DO NOT EDIT BELOW *)
 
+(* Why3 goal *)
 Theorem Power_sum : forall (n:Z) (m:Z), ((0%Z <= n)%Z /\ (0%Z <= m)%Z) ->
   ((pow2 (n + m)%Z) = ((pow2 n) * (pow2 m))%Z).
 (* YOU MAY EDIT THE PROOF BELOW *)
@@ -42,6 +41,5 @@ rewrite Hind;auto with zarith.
 rewrite Zmult_permute.
 auto with zarith.
 Qed.
-(* DO NOT EDIT BELOW *)
 
 
