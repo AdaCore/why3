@@ -1,0 +1,127 @@
+theory Pow2int
+
+  use import int.Int
+
+  function pow2 (i:int) : int
+
+  axiom Power_0 : pow2 0 = 1
+
+  axiom Power_s : forall n: int. n >= 0 -> pow2 (n+1) = 2 * pow2 n
+
+  lemma Power_1 : pow2 1 = 2
+
+  lemma Power_sum :
+    forall n m: int. n >= 0 /\ m >= 0 -> pow2 (n+m) = pow2 n * pow2 m
+
+  lemma pow2_0: pow2 0   =                    1
+  lemma pow2_1: pow2 1   =                    2
+  lemma pow2_2: pow2 2   =                    4
+  lemma pow2_3: pow2 3   =                    8
+  lemma pow2_4: pow2 4   =                   16
+  lemma pow2_5: pow2 5   =                   32
+  lemma pow2_6: pow2 6   =                   64
+  lemma pow2_7: pow2 7   =                  128
+  lemma pow2_8: pow2 8   =                  256
+  lemma pow2_9: pow2 9   =                  512
+  lemma pow2_10: pow2 10 =                 1024
+  lemma pow2_11: pow2 11 =                 2048
+  lemma pow2_12: pow2 12 =                 4096
+  lemma pow2_13: pow2 13 =                 8192
+  lemma pow2_14: pow2 14 =                16384
+  lemma pow2_15: pow2 15 =                32768
+  lemma pow2_16: pow2 16 =                65536
+  lemma pow2_17: pow2 17 =               131072
+  lemma pow2_18: pow2 18 =               262144
+  lemma pow2_19: pow2 19 =               524288
+  lemma pow2_20: pow2 20 =              1048576
+  lemma pow2_21: pow2 21 =              2097152
+  lemma pow2_22: pow2 22 =              4194304
+  lemma pow2_23: pow2 23 =              8388608
+  lemma pow2_24: pow2 24 =             16777216
+  lemma pow2_25: pow2 25 =             33554432
+  lemma pow2_26: pow2 26 =             67108864
+  lemma pow2_27: pow2 27 =            134217728
+  lemma pow2_28: pow2 28 =            268435456
+  lemma pow2_29: pow2 29 =            536870912
+  lemma pow2_30: pow2 30 =           1073741824
+  lemma pow2_31: pow2 31 =           2147483648
+  lemma pow2_32: pow2 32 =           4294967296
+  lemma pow2_33: pow2 33 =           8589934592
+  lemma pow2_34: pow2 34 =          17179869184
+  lemma pow2_35: pow2 35 =          34359738368
+  lemma pow2_36: pow2 36 =          68719476736
+  lemma pow2_37: pow2 37 =         137438953472
+  lemma pow2_38: pow2 38 =         274877906944
+  lemma pow2_39: pow2 39 =         549755813888
+  lemma pow2_40: pow2 40 =        1099511627776
+  lemma pow2_41: pow2 41 =        2199023255552
+  lemma pow2_42: pow2 42 =        4398046511104
+  lemma pow2_43: pow2 43 =        8796093022208
+  lemma pow2_44: pow2 44 =       17592186044416
+  lemma pow2_45: pow2 45 =       35184372088832
+  lemma pow2_46: pow2 46 =       70368744177664
+  lemma pow2_47: pow2 47 =      140737488355328
+  lemma pow2_48: pow2 48 =      281474976710656
+  lemma pow2_49: pow2 49 =      562949953421312
+  lemma pow2_50: pow2 50 =     1125899906842624
+  lemma pow2_51: pow2 51 =     2251799813685248
+  lemma pow2_52: pow2 52 =     4503599627370496
+  lemma pow2_53: pow2 53 =     9007199254740992
+  lemma pow2_54: pow2 54 =    18014398509481984
+  lemma pow2_55: pow2 55 =    36028797018963968
+  lemma pow2_56: pow2 56 =    72057594037927936
+  lemma pow2_57: pow2 57 =   144115188075855872
+  lemma pow2_58: pow2 58 =   288230376151711744
+  lemma pow2_59: pow2 59 =   576460752303423488
+  lemma pow2_60: pow2 60 =  1152921504606846976
+  lemma pow2_61: pow2 61 =  2305843009213693952
+  lemma pow2_62: pow2 62 =  4611686018427387904
+  lemma pow2_63: pow2 63 =  9223372036854775808
+
+end
+
+theory Pow2real
+
+  use import int.Int
+  use import real.RealInfix
+
+  function pow2 (i:int) : real
+  axiom Power_0 : pow2 0 = 1.0
+  axiom Power_s : forall n: int. n >= 0 -> pow2 (n+1) = 2.0 *. pow2 n
+  axiom Power_p : forall n: int. n <= 0 -> pow2 (n-1) = 0.5 *. pow2 n
+
+  lemma Power_s_all : forall n:int. pow2 (n+1) = 2.0 *. pow2 n
+
+  lemma Power_p_all : forall n:int. pow2 (n-1) = 0.5 *. pow2 n
+
+  lemma Power_1_2: 0.5 = 1.0 /. 2.0
+
+  lemma Power_1 : pow2 1 = 2.0
+
+  lemma Power_neg1 : pow2 (-1) = 0.5
+
+  lemma Power_non_null_aux: forall n:int.n>=0 -> pow2 n <> 0.0
+
+  lemma Power_neg_aux : forall n:int. n>=0 -> pow2 (-n) = 1.0 /. pow2 n
+
+  lemma Power_non_null: forall n:int. pow2 n <> 0.0
+
+  lemma Power_neg : forall n:int. pow2 (-n) = 1.0 /. pow2 n
+
+  lemma Power_sum_aux : forall n m: int. m >= 0 -> pow2 (n+m) = pow2 n *. pow2 m
+
+  lemma Power_sum : forall n m: int. pow2 (n+m) = pow2 n *. pow2 m
+
+  use Pow2int
+  use import real.FromInt
+
+  lemma Pow2_int_real:
+    forall x:int. x >= 0 -> pow2 x = from_int (Pow2int.pow2 x)
+
+end
+
+(*
+Local Variables:
+compile-command: "why3ide power2.why"
+End:
+*)
