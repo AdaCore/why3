@@ -29,38 +29,25 @@ Axiom Power_neg1 : ((pow2 (-1%Z)%Z) = (05 / 10)%R).
 
 Axiom Power_non_null_aux : forall (n:Z), (0%Z <= n)%Z -> ~ ((pow2 n) = 0%R).
 
-Axiom Power_neg_aux : forall (n:Z), (0%Z <= n)%Z ->
-  ((pow2 (-n)%Z) = (Rdiv 1%R (pow2 n))%R).
-
-Axiom Power_non_null : forall (n:Z), ~ ((pow2 n) = 0%R).
-
-Axiom Power_neg : forall (n:Z), ((pow2 (-n)%Z) = (Rdiv 1%R (pow2 n))%R).
-
-Axiom Power_sum_aux : forall (n:Z) (m:Z), (0%Z <= m)%Z ->
-  ((pow2 (n + m)%Z) = ((pow2 n) * (pow2 m))%R).
-
+Require Import Why3.
+Ltac ae := why3 "alt-ergo" timelimit 2.
 Open Scope Z_scope.
 
 (* Why3 goal *)
-Theorem Power_sum : forall (n:Z) (m:Z),
-  ((pow2 (n + m)%Z) = ((pow2 n) * (pow2 m))%R).
-(* YOU MAY EDIT THE PROOF BELOW *)
-intros n m.
-assert (hm:m>=0 \/ m <=0) by omega.
-destruct hm.
-apply Power_sum_aux; auto with zarith.
-pose (m' := -m).
-replace m with (-m') by (subst m'; omega).
-replace (n+ - m') with (- ((-n) + m')) by omega.
-repeat rewrite Power_neg.
-rewrite Power_sum_aux.
-rewrite Power_neg.
-field.
-split.
-apply Power_non_null.
-apply Power_non_null.
-subst m'.
-auto with zarith.
+Theorem Power_neg_aux : forall (n:Z), (0%Z <= n)%Z ->
+  ((pow2 (-n)%Z) = (Rdiv 1%R (pow2 n))%R).
+intros n Hn.
+generalize Hn.
+pattern n; apply Z_lt_induction; auto.
+clear n Hn.
+intros n Hind Hn.
+assert (h:n=0\/n>0) by omega; destruct h.
+ae.
+replace n with (n-1+1) by omega.
+replace (- (n - 1 + 1)) with (-(n-1) -1)  by omega.
+rewrite Power_p;auto with zarith.
+rewrite Power_s;auto with zarith.
+ae.
 Qed.
 
 

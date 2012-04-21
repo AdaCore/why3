@@ -183,41 +183,30 @@ Axiom pow2_62 : ((pow21 62%Z) = 4611686018427387904%Z).
 
 Axiom pow2_63 : ((pow21 63%Z) = 9223372036854775808%Z).
 
+Require Import Why3.
+Ltac ae := why3 "alt-ergo" timelimit 2.
 Open Scope Z_scope.
 
 (* Why3 goal *)
 Theorem Pow2_int_real : forall (x:Z), (0%Z <= x)%Z ->
   ((pow2 x) = (IZR (pow21 x))).
-(* YOU MAY EDIT THE PROOF BELOW *)
-intros.
-(*assert (x = 0 \/ x >0) by omega.
-destruct H0.
+intros x Hx.
+generalize Hx.
+pattern x; apply Z_lt_induction; auto.
+clear x Hx.
+intros x Hind Hx.
+assert (h:x = 0 \/ x > 0) by omega; destruct h.
 subst x.
 rewrite Power_0.
 rewrite pow2_0.
 auto with zarith.
-*)
-cut (x>=0);auto with zarith.
-apply Z_lt_induction with
-  (P:= fun x =>x >= 0 -> pow2 x = IZR (pow21 x)).
-(*apply Zlt_lower_bound_ind with (z:=x)
- (P:= fun x =>x >= 0 -> pow2 x = IZR (pow21 x)).
-*)
-intros x0 Hind Hx0.
-assert(h:x0 = 0 \/ x0 > 0) by omega.
-destruct h.
-subst x0.
-rewrite Power_0.
-rewrite pow2_0.
-auto with zarith.
-replace (x0) with (x0-1+1) by omega.
-rewrite Power_s;auto with zarith.
-rewrite Power_sum1;auto with zarith.
+replace x with (x-1+1) by omega.
+rewrite Power_s; auto with zarith.
+rewrite Power_sum1; auto with zarith.
 rewrite pow2_1.
 rewrite Zmult_comm.
 rewrite mult_IZR.
-rewrite Hind;auto with zarith.
-exact H.
+rewrite Hind; auto with zarith.
 Qed.
 
 
