@@ -60,9 +60,16 @@
     let p = Lexing.lexeme_start_p lb in
     p.pos_fname, p.pos_lnum, p.pos_cnum - p.pos_bol
 
+  let html_char fmt c =
+    pp_print_string fmt (match c with
+      | '<' -> "&lt;"
+      | '>' -> "&gt;"
+      | '&' -> "&amp;"
+      | _ -> assert false)
 }
 
 let ident = ['A'-'Z' 'a'-'z' '_'] ['A'-'Z' 'a'-'z' '0'-'9' '_']*
+let special = ['<' '>' '&']
 
 rule scan fmt embedded = parse
   | "(*)" as s
@@ -118,9 +125,8 @@ rule scan fmt embedded = parse
           pp_print_string fmt s
       end;
       scan fmt embedded lexbuf }
-  | "<"    { fprintf fmt "&lt;"; scan fmt embedded lexbuf }
-  | ">"    { fprintf fmt "&gt;"; scan fmt embedded lexbuf }
-  | "&"    { fprintf fmt "&amp;"; scan fmt embedded lexbuf }
+  | special as c
+           { html_char fmt c; scan fmt embedded lexbuf }
   | "\n"   { newline lexbuf; fprintf fmt "\n"; scan fmt embedded lexbuf }
   | '"'    { fprintf fmt "&quot;"; string fmt true lexbuf;
              scan fmt embedded lexbuf }
@@ -139,9 +145,8 @@ and comment fmt do_output = parse
   | '"'    { if do_output then fprintf fmt "&quot;";
              string fmt do_output lexbuf;
              comment fmt do_output lexbuf }
-  | "<"    { if do_output then fprintf fmt "&lt;";
-             comment fmt do_output lexbuf }
-  | "&"    { if do_output then fprintf fmt "&amp;";
+  | special as c
+           { if do_output then html_char fmt c;
              comment fmt do_output lexbuf }
   | "'\"'"
   | _ as s { if do_output then pp_print_string fmt s;
@@ -152,11 +157,8 @@ and string fmt do_output = parse
              if do_output then fprintf fmt "\n";
              string fmt do_output lexbuf }
   | '"'    { if do_output then fprintf fmt "&quot;" }
-  | "<"    { if do_output then fprintf fmt "&lt;";
-             string fmt do_output lexbuf }
-  | ">"    { if do_output then fprintf fmt "&gt;";
-             string fmt do_output lexbuf }
-  | "&"    { if do_output then fprintf fmt "&amp;";
+  | special as c
+           { if do_output then html_char fmt c;
              string fmt do_output lexbuf }
   | "\\" _
   | _ as s { if do_output then pp_print_string fmt s;
@@ -187,9 +189,8 @@ and doc fmt headings = parse
              doc fmt headings lexbuf }
   | '"'    { fprintf fmt "&quot;"; doc fmt headings lexbuf }
   | '\''   { fprintf fmt "&apos;"; doc fmt headings lexbuf }
-  | '&'    { fprintf fmt "&amp;"; doc fmt headings lexbuf }
-  | "<"    { fprintf fmt "&lt;"; doc fmt headings lexbuf }
-  | ">"    { fprintf fmt "&gt;"; doc fmt headings lexbuf }
+  | special as c
+           { html_char fmt c; doc fmt headings lexbuf }
   | _ as c { pp_print_char fmt c; doc fmt headings lexbuf }
 
 
