@@ -1,8 +1,11 @@
 
+(** {1 A certified WP calculus} *)
+
+(** {2 A simple imperative language, syntax and semantics} *)
 
 theory Imp
 
-(* terms and formulas *)
+(** terms and formulas *)
 
 type datatype = Tint | Tbool
 
@@ -34,7 +37,7 @@ type value =
 use map.Map as IdMap
 type env = IdMap.map ident value
 
-(* semantics of formulas *)
+(** semantics of formulas *)
 
 function eval_bin (x:value) (op:operator) (y:value) : value =
   match x,y with
@@ -74,8 +77,8 @@ predicate eval_fmla (sigma:env) (pi:env) (f:fmla) =
         eval_fmla sigma (IdMap.set pi x (Vbool b)) f
   end
 
-(* substitution of a *reference* r by a logic variable v
-   warning: proper behavior only guaranted if v is fresh *)
+(** substitution of a reference [r] by a logic variable [v]
+   warning: proper behavior only guaranted if [v] is fresh *)
 
 function subst_term (e:term) (r:ident) (v:ident) : term =
   match e with
@@ -155,7 +158,7 @@ type stmt =
 lemma check_skip:
   forall s:stmt. s=Sskip \/s<>Sskip
 
-(* small-steps semantics for statements *)
+(** small-steps semantics for statements *)
 
 inductive one_step env env stmt env env stmt =
 
@@ -201,7 +204,7 @@ inductive one_step env env stmt env env stmt =
         eval_term sigma pi e = (Vbool False) ->
           one_step sigma pi (Swhile e inv i) sigma pi Sskip
 
-(*
+(***
 
   lemma progress:
     forall s:state, i:stmt.
@@ -210,7 +213,7 @@ inductive one_step env env stmt env env stmt =
 
 *)
 
- (* many steps of execution *)
+ (** many steps of execution *)
 
  inductive many_steps env env stmt env env stmt int =
    | many_steps_refl:
@@ -237,16 +240,16 @@ lemma many_steps_seq:
 
 predicate valid_fmla (p:fmla) = forall sigma pi:env. eval_fmla sigma pi p
 
-(*** Hoare triples ***)
+(** {3 Hoare triples} *)
 
-(* partial correctness *)
+(** partial correctness *)
 predicate valid_triple (p:fmla) (i:stmt) (q:fmla) =
     forall sigma pi:env. eval_fmla sigma pi p ->
       forall sigma' pi':env, n:int. many_steps sigma pi i sigma' pi' Sskip n ->
         eval_fmla sigma' pi' q
 
-(* total correctness *)
-(*
+(*** total correctness *)
+(***
 predicate total_valid_triple (p:fmla) (i:stmt) (q:fmla) =
     forall s:state. eval_fmla s p ->
       exists s':state, n:int. many_steps s i s' Sskip n /\
@@ -255,14 +258,14 @@ predicate total_valid_triple (p:fmla) (i:stmt) (q:fmla) =
 
 end
 
+
 theory TestSemantics
 
 use import Imp
 
-function my_sigma : env = IdMap.const (Vint 42)
-function my_pi : env = IdMap.const (Vint 0)
+function my_sigma : env = IdMap.const (Vint 0)
+function my_pi : env = IdMap.const (Vint 42)
 
-(*
 goal Test13 :
   eval_term my_sigma my_pi (Tconst 13) = Vint 13
 
@@ -291,17 +294,17 @@ goal If42 :
         sigma1 pi1 i ->
       one_step sigma1 pi1 i sigma2 pi2 Sskip ->
         IdMap.get sigma2 x = Vint 13
-*)
 
 end
 
+(** {2 Hoare logic} *)
 
 theory HoareLogic
 
 use import Imp
 
 
-(* Hoare logic rules (partial correctness) *)
+(** Hoare logic rules (partial correctness) *)
 
 lemma consequence_rule:
   forall p p' q q':fmla, i:stmt.
@@ -348,10 +351,11 @@ lemma while_rule_ext:
   valid_triple (Fand (Fterm e) inv') i inv' ->
   valid_triple inv' (Swhile e inv i) (Fand (Fnot (Fterm e)) inv')
 
-(* frame rule ? *)
+(*** frame rule ? *)
 
 end
 
+(** {2 WP calculus} *)
 
 module WP
 
@@ -413,7 +417,7 @@ predicate stmt_writes (i:stmt) (w:Set.set ident) =
     fmla
     { forall sigma pi:env. eval_fmla sigma pi result ->
         eval_fmla sigma pi f /\
-(*
+(***
         forall sigma':env, w:Set.set ident.
         stmt_writes i w /\ assigns sigma w sigma' ->
         eval_fmla sigma' pi result
@@ -453,7 +457,7 @@ end
 
 
 
-(*
+(***
 Local Variables:
 compile-command: "why3ide wp2.mlw"
 End:
