@@ -187,27 +187,54 @@ Inductive g : (list (Z* tree)%type) -> Prop :=
       tree)%type)), (greedy d1 d2 t2) -> ((g (Cons (d1, t1) l)) -> (g (Cons (
       d2, t2) (Cons (d1, t1) l)))).
 
+Axiom g_append : forall (l1:(list (Z* tree)%type)) (l2:(list (Z*
+  tree)%type)), (g (infix_plpl l1 l2)) -> (g l1).
+
+Axiom right_nil : forall (l:(list (Z* tree)%type)), (2%Z <= (length l))%Z ->
+  ((g l) -> forall (t:tree), ~ ((forest_depths l) = (depths 0%Z t))).
+
+Axiom main_lemma : forall (l:(list (Z* tree)%type)) (d1:Z) (d2:Z) (t1:tree)
+  (t2:tree), (~ (d1 = d2)) -> ((g (Cons (d1, t1) l)) ->
+  (match t2 with
+  | (Node l2 _) => (greedy d1 (d2 + 1%Z)%Z l2)
+  | Leaf => True
+  end -> (g (Cons (d2, t2) (Cons (d1, t1) l))))).
+
 Require Import Why3. Ltac z := why3 "z3-3" timelimit 5.
 
 (* Why3 goal *)
-Theorem g_append : forall (l1:(list (Z* tree)%type)) (l2:(list (Z*
-  tree)%type)), (g (infix_plpl l1 l2)) -> (g l1).
-induction l1; simpl.
+Theorem WP_parameter_tc : forall (left1:(list (Z* tree)%type)),
+  forall (right1:(list (Z* tree)%type)), ((g left1) /\
+  (match left1 with
+  | (Cons (d1, t1) Nil) => (~ (d1 = 0%Z)) \/ ~ (right1 = (Nil :(list (Z*
+      tree)%type)))
+  | _ => True
+  end /\
+  match right1 with
+  | (Cons (d2, t2) rightqt) => (only_leaf rightqt) /\
+      match t2 with
+      | (Node l2 _) => (g (Cons ((d2 + 1%Z)%Z, l2) left1))
+      | Leaf => True
+      end
+  | Nil => True
+  end)) ->
+  match right1 with
+  | (Cons x x1) => True
+  | Nil => forall (t:tree), ~ ((depths 0%Z
+      t) = (forest_depths (infix_plpl (reverse left1) right1)))
+  end.
+intuition.
+destruct right1; auto.
+rewrite Append_l_nil.
+destruct left1.
 z.
-intros l2.
-replace (Cons a (infix_plpl l1 l2))
-   with (infix_plpl (Cons a l1) l2).
-inversion 1.
-z.
-assert (g l1) by z.
-destruct l1.
-z.
-destruct p.
-apply Gtwo; auto.
-simpl in H1.
-z.
+destruct p; destruct left1.
+replace (reverse (Cons (z, t) Nil)) with (Cons (z, t) Nil) by z.
 simpl.
+rewrite Append_l_nil.
+intuition.
 z.
+
 Qed.
 
 

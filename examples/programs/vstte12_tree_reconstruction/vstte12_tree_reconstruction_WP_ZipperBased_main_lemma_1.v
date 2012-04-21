@@ -105,9 +105,6 @@ Axiom depths_unique : forall (t1:tree) (t2:tree) (d:Z) (s1:(list Z))
   (s2:(list Z)), ((infix_plpl (depths d t1) s1) = (infix_plpl (depths d t2)
   s2)) -> ((t1 = t2) /\ (s1 = s2)).
 
-Axiom depths_unique2 : forall (t1:tree) (t2:tree) (d1:Z) (d2:Z), ((depths d1
-  t1) = (depths d2 t2)) -> ((d1 = d2) /\ (t1 = t2)).
-
 Axiom depths_prefix : forall (t:tree) (d1:Z) (d2:Z) (s1:(list Z)) (s2:(list
   Z)), ((infix_plpl (depths d1 t) s1) = (infix_plpl (depths d2 t) s2)) ->
   (d1 = d2).
@@ -117,6 +114,9 @@ Axiom depths_prefix_simple : forall (t:tree) (d1:Z) (d2:Z), ((depths d1
 
 Axiom depths_subtree : forall (t1:tree) (t2:tree) (d1:Z) (d2:Z) (s1:(list
   Z)), ((infix_plpl (depths d1 t1) s1) = (depths d2 t2)) -> (d2 <= d1)%Z.
+
+Axiom depths_unique2 : forall (t1:tree) (t2:tree) (d1:Z) (d2:Z), ((depths d1
+  t1) = (depths d2 t2)) -> ((d1 = d2) /\ (t1 = t2)).
 
 (* Why3 assumption *)
 Definition lt_nat(x:Z) (y:Z): Prop := (0%Z <= y)%Z /\ (x <  y)%Z.
@@ -170,29 +170,33 @@ Fixpoint only_leaf(l:(list (Z* tree)%type)) {struct l}: Prop :=
 Unset Implicit Arguments.
 
 (* Why3 assumption *)
-Definition greedy(d1:Z) (t1:tree) (l:(list (Z* tree)%type)): Prop :=
-  forall (d:Z), (d <  d1)%Z -> forall (t:tree) (s:(list Z)),
-  ~ ((infix_plpl (depths d t) s) = (forest_depths (Cons (d1, t1) l))).
+Set Implicit Arguments.
+Fixpoint greedy(d:Z) (d1:Z) (t1:tree) {struct t1}: Prop := (~ (d = d1)) /\
+  match t1 with
+  | Leaf => True
+  | (Node l1 _) => (greedy d (d1 + 1%Z)%Z l1)
+  end.
+Unset Implicit Arguments.
 
 (* Why3 assumption *)
 Inductive g : (list (Z* tree)%type) -> Prop :=
   | Gnil : (g (Nil :(list (Z* tree)%type)))
   | Gone : forall (d:Z) (t:tree), (g (Cons (d, t) (Nil :(list (Z*
       tree)%type))))
-  | Gtwo : forall (d:Z) (t:tree) (l:(list (Z* tree)%type)), (greedy d t l) ->
-      ((g l) -> (g (Cons (d, t) l))).
+  | Gtwo : forall (d1:Z) (d2:Z) (t1:tree) (t2:tree) (l:(list (Z*
+      tree)%type)), (greedy d1 d2 t2) -> ((g (Cons (d1, t1) l)) -> (g (Cons (
+      d2, t2) (Cons (d1, t1) l)))).
 
 Axiom g_append : forall (l1:(list (Z* tree)%type)) (l2:(list (Z*
   tree)%type)), (g (infix_plpl l1 l2)) -> (g l1).
 
-Axiom g_tail : forall (l:(list (Z* tree)%type)) (d:Z) (t:tree),
-  (g (reverse (Cons (d, t) l))) -> (g (reverse l)).
-
 Axiom right_nil : forall (l:(list (Z* tree)%type)), (2%Z <= (length l))%Z ->
-  ((g l) -> forall (t:tree), ~ ((forest_depths l) = (depths 0%Z t))).
+  ((g l) -> forall (t:tree), ~ ((forest_depths (reverse l)) = (depths 0%Z
+  t))).
 
 Require Import Why3. Ltac z := why3 "z3-3" timelimit 5.
 
+(*
 Lemma key_lemma:
   forall t t1 t2 s d2 d d1, (d < d1)%Z -> 
   match t2 with Leaf => True | Node left2 _ => g (Cons (d1, t1) (Cons ((d2+1)%Z, left2) Nil)) end ->
@@ -244,6 +248,7 @@ assert (case: (d2 < d1 \/ d2=d1)%Z) by omega. destruct case. 2: auto.
 
 *)
 Admitted.
+*)
 
 (*
 Lemma key_lemma_greedy:
@@ -275,11 +280,15 @@ Admitted.
 
 (* Why3 goal *)
 Theorem main_lemma : forall (l:(list (Z* tree)%type)) (d1:Z) (d2:Z) (t1:tree)
-  (t2:tree), (~ (d1 = d2)) -> ((g (reverse (Cons (d1, t1) l))) ->
+  (t2:tree), (~ (d1 = d2)) -> ((g (Cons (d1, t1) l)) ->
   (match t2 with
-  | (Node l2 _) => (g (reverse (Cons ((d2 + 1%Z)%Z, l2) (Cons (d1, t1) l))))
+  | (Node l2 _) => (greedy d1 (d2 + 1%Z)%Z l2)
   | Leaf => True
-  end -> (g (reverse (Cons (d2, t2) (Cons (d1, t1) l)))))).
+  end -> (g (Cons (d2, t2) (Cons (d1, t1) l))))).
+intros; apply Gtwo.
+destruct t2; z.
+assumption.
+(**
 simpl.
 intro l; generalize (reverse l). clear l.
 induction l; simpl.
@@ -309,6 +318,7 @@ apply key_lemma_greedy; auto.
 apply IHl; auto.
 destruct t2; auto.
 inversion H1; z.
+**)
 Qed.
 
 
