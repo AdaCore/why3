@@ -167,6 +167,11 @@ and string fmt do_output = parse
 and doc fmt block headings = parse
   | ' '* "*)"   { if block then fprintf fmt "</p>@\n" }
   | eof    { () }
+  | "\n\n" { newline lexbuf;
+             newline lexbuf;
+             if block then pp_print_string fmt "</p>";
+             fprintf fmt "@\n";
+             doc fmt false headings lexbuf }
   | "\n"   { newline lexbuf;
              fprintf fmt "\n";
              doc fmt block headings lexbuf }
@@ -233,8 +238,8 @@ and raw_html fmt depth = parse
     lb.Lexing.lex_curr_p <-
       { lb.Lexing.lex_curr_p with Lexing.pos_fname = fname };
     (* output *)
-    fprintf fmt "<pre>@\n";
-    scan fmt false lb;
+    fprintf fmt "<pre>";
+    scan fmt lb;
     fprintf fmt "</pre>@\n";
     close_in cin
 
