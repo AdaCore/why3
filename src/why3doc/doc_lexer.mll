@@ -39,7 +39,7 @@
     Hashtbl.mem ht
 
   let is_keyword1 = make_table
-    [ "theory"; "end";
+    [ "theory"; "end"; "meta";
       "type"; "constant"; "function"; "predicate"; "inductive";
       "clone"; "use";
       "import"; "export"; "axiom"; "goal"; "lemma"; ]
