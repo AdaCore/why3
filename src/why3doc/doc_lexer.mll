@@ -66,72 +66,92 @@
       | '>' -> "&gt;"
       | '&' -> "&amp;"
       | _ -> assert false)
+
+  let print_ident fmt lexbuf s =
+    if is_keyword1 s then
+      fprintf fmt "<span class=\"keyword1\">%s</span>" s
+    else if is_keyword2 s then
+      fprintf fmt "<span class=\"keyword2\">%s</span>" s
+    else begin
+      let (* f,l,c as *) loc = get_loc lexbuf in
+      (* Format.eprintf "  IDENT %s/%d/%d@." f l c; *)
+      (* is this a def point? *)
+      try
+        let t = Doc_def.is_def loc in
+        fprintf fmt "<a name=\"%s\">%s</a>" t s
+      with Not_found ->
+      (* is this a use point? *)
+      try
+        let id = Glob.locate loc in
+        let fn, t = Doc_def.locate id in
+        fprintf fmt "<a href=\"%s#%s\">%s</a>" fn t s
+      with Not_found ->
+        (* otherwise, just print it *)
+        pp_print_string fmt s
+    end
+
 }
 
 let ident = ['A'-'Z' 'a'-'z' '_'] ['A'-'Z' 'a'-'z' '0'-'9' '_']*
 let special = ['<' '>' '&']
 
-rule scan fmt embedded = parse
+rule scan fmt = parse
   | "(*)" as s
-          { pp_print_string fmt s; scan fmt embedded lexbuf }
-  | "(***" as s
-          { if embedded then pp_print_string fmt s else
-              comment fmt false lexbuf;
-            scan fmt embedded lexbuf }
-  | "(**" as s
-          { if embedded then pp_print_string fmt s else
-              begin
-                fprintf fmt "</pre>@\n";
-                doc fmt false [] lexbuf;
-                fprintf fmt "<pre>@\n";
-              end;
-            scan fmt embedded lexbuf }
-  | "(*" as s
-          { if embedded then pp_print_string fmt s else
-              begin
-                fprintf fmt "<span class=\"comment\">(*";
-                comment fmt true lexbuf;
-                fprintf fmt "</span>";
-              end;
-            scan fmt embedded lexbuf }
-  | ']' as c
-          { if embedded then () else
-              begin
-                pp_print_char fmt c;
-                scan fmt embedded lexbuf
-              end
-          }
+          { pp_print_string fmt s;
+            scan fmt lexbuf }
+  | "(***"
+          { comment fmt false lexbuf;
+            scan fmt lexbuf }
+  | ' '* "(**"
+          { fprintf fmt "</pre>@\n";
+            doc fmt false [] lexbuf;
+            fprintf fmt "<pre>";
+            scan fmt lexbuf }
+  | "(*"
+          { fprintf fmt "<span class=\"comment\">(*";
+            comment fmt true lexbuf;
+            fprintf fmt "</span>";
+            scan fmt lexbuf }
   | eof   { () }
   | ident as s
-    { if is_keyword1 s then
-        fprintf fmt "<span class=\"keyword1\">%s</span>" s
-      else if is_keyword2 s then
-        fprintf fmt "<span class=\"keyword2\">%s</span>" s
-      else begin
-        let (* f,l,c as *) loc = get_loc lexbuf in
-        (* Format.eprintf "  IDENT %s/%d/%d@." f l c; *)
-        (* is this a def point? *)
-        try
-          let t = Doc_def.is_def loc in
-          fprintf fmt "<a name=\"%s\">%s</a>" t s
-        with Not_found ->
-        (* is this a use point? *)
-        try
-          let id = Glob.locate loc in
-          let fn, t = Doc_def.locate id in
-          fprintf fmt "<a href=\"%s#%s\">%s</a>" fn t s
-        with Not_found ->
-        (* otherwise, just print it *)
-          pp_print_string fmt s
-      end;
-      scan fmt embedded lexbuf }
+          { print_ident fmt lexbuf s;
+            scan fmt lexbuf }
   | special as c
-           { html_char fmt c; scan fmt embedded lexbuf }
-  | "\n"   { newline lexbuf; fprintf fmt "\n"; scan fmt embedded lexbuf }
-  | '"'    { fprintf fmt "&quot;"; string fmt true lexbuf;
-             scan fmt embedded lexbuf }
+           { html_char fmt c;
+             scan fmt lexbuf }
+  | "\n"   { newline lexbuf;
+             fprintf fmt "\n";
+             scan fmt lexbuf }
+  | '"'    { fprintf fmt "&quot;";
+             string fmt true lexbuf;
+             scan fmt lexbuf }
   | "'\"'"
-  | _ as s { pp_print_string fmt s; scan fmt embedded lexbuf }
+  | _ as s { pp_print_string fmt s;
+             scan fmt lexbuf }
+
+and scan_embedded fmt depth = parse
+  | '['   { pp_print_char fmt '[';
+            scan_embedded fmt (depth + 1) lexbuf }
+  | ']'   { if depth > 0 then begin
+              pp_print_char fmt ']';
+              scan_embedded fmt (depth - 1) lexbuf
+            end }
+  | eof   { () }
+  | ident as s
+          { print_ident fmt lexbuf s;
+            scan_embedded fmt depth lexbuf }
+  | special as c
+           { html_char fmt c;
+             scan_embedded fmt depth lexbuf }
+  | "\n"   { newline lexbuf;
+             fprintf fmt "\n";
+             scan_embedded fmt depth lexbuf }
+  | '"'    { fprintf fmt "&quot;";
+             string fmt true lexbuf;
+             scan_embedded fmt depth lexbuf }
+  | "'\"'"
+  | _ as s { pp_print_string fmt s;
+             scan_embedded fmt depth lexbuf }
 
 and comment fmt do_output = parse
   | "(*"   { if do_output then fprintf fmt "(*";
@@ -199,7 +219,7 @@ and doc fmt block headings = parse
            }
   | '['    { if not block then pp_print_string fmt "<p>";
              pp_print_string fmt "<code>";
-             scan fmt true lexbuf; 
+             scan_embedded fmt 0 lexbuf;
              pp_print_string fmt "</code>";
              doc fmt true headings lexbuf }
   | ' '    { if block then pp_print_char fmt ' ';
