@@ -165,12 +165,12 @@ and string fmt do_output = parse
              string fmt do_output lexbuf }
 
 and doc fmt block headings = parse
-  | "*)"   { if block then fprintf fmt "</p>@\n" }
+  | ' '* "*)"   { if block then fprintf fmt "</p>@\n" }
   | eof    { () }
   | "\n"   { newline lexbuf;
              fprintf fmt "\n";
              doc fmt block headings lexbuf }
-  | '{' (['1'-'6'] as c)
+  | '{' (['1'-'6'] as c) ' '*
            { if block then fprintf fmt "</p>@\n";
              let n = Char.code c - Char.code '0' in
              fprintf fmt "<h%d>" n;
@@ -188,7 +188,7 @@ and doc fmt block headings = parse
               | [] -> brace headings
               | n :: r ->
                 if n >= 1 then begin
-                  fprintf fmt "</h%d>@\n" n;
+                  fprintf fmt "</h%d>" n;
                   doc fmt (r <> []) r lexbuf
                 end else brace r
            }
