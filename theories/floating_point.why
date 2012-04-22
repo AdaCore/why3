@@ -1,11 +1,12 @@
 
-(** {1 Formalization of Floating-Point Arithmetic} 
+(** {1 Formalization of Floating-Point Arithmetic}
 
-This formalization follows the {h <a href="http://ieeexplore.ieee.org/servlet/opac?punumber=4610933">IEEE-754 norm</a>}
+This formalization follows the {h <a href="http://ieeexplore.ieee.org/servlet/opac?punumber=4610933">IEEE-754 standard</a>}.
 
 *)
 
-(** {2 definition of IEEE-754 rounding modes} *)
+(** {2 Definition of IEEE-754 rounding modes} *)
+
 theory Rounding
 
   type mode = NearestTiesToEven | ToZero | Up | Down | NearestTiesToAway
@@ -13,15 +14,15 @@ theory Rounding
 
 end
 
+(** {2 Handling of IEEE-754 special values} 
 
-(** {2 handling of IEEE-754 special values} 
-
-Special values are +infinity, -infinity; NaN, +0, -0.  These are
+Special values are +infinity, -infinity, NaN, +0, -0.  These are
 handled as described in {h <a
-href="http://www.lri.fr/~marche/ayad10ijcar.pdf">[Ayad, March&eacute;,
-IJCAR, 2010]</a>}
+href="http://www.lri.fr/~marche/ayad10ijcar.pdf">[Ayad, Marché,
+IJCAR, 2010]</a>}.
 
 *)
+
 theory SpecialValues
 
   type class = Finite | Infinite | NaN
@@ -43,7 +44,7 @@ the maximal representable number, and the integer constant
 [max_representable_integer] which is the maximal integer [n] such that
 every integer between [0] and [n] are representable.
 
-*) 
+*)
 
 theory GenFloat
 
@@ -104,10 +105,11 @@ theory GenFloat
 
 end
 
-(** {2 single precision floats}
+(** {2 Single precision floats}
 
-a.k.a 32-bits floats
- *)
+A.k.a. binary32 numbers.
+
+*)
 
 theory Single
 
@@ -123,12 +125,12 @@ theory Single
 
 end
 
-
-
 (** {2 Double precision floats}
 
-a.k.a 64-bits floats
- *)
+A.k.a. binary64 numbers.
+
+*)
+
 theory Double
 
   type double
@@ -143,12 +145,11 @@ theory Double
 
 end
 
-
 (** {2 Generic Full theory of floats}
 
-this theory extends the generic theory above by adding the special values
+This theory extends the generic theory above by adding the special values.
 
- *)
+*)
 
 theory GenFloatFull
 
@@ -216,7 +217,6 @@ theory GenFloatFull
 
 end
 
-
 (** {2 Full theory of single precision floats} *)
 
 theory SingleFull
@@ -233,7 +233,6 @@ theory SingleFull
 
 end
 
-
 (** {2 Full theory of double precision floats} *)
 
 theory DoubleFull
@@ -241,7 +240,7 @@ theory DoubleFull
   type double
 
   constant max_double : real = 0x1.FFFFFFFFFFFFFp1023
-  constant max_int : int = 9007199254740992 (* 2^23 *)
+  constant max_int : int = 9007199254740992 (* 2^53 *)
 
   clone export GenFloatFull with
     type t = double,

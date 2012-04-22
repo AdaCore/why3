@@ -10,8 +10,8 @@ theory Path
 
   predicate edge vertex vertex
 
-  (** path v0 [v0; v1; ...; vn-1] vn
-     means a path from v0 to vn composed of n edges (vi,vi+1) *)
+  (** [path v0 [v0; v1; ...; vn-1] vn]
+     means a path from [v0] to [vn] composed of [n] edges [(vi,vi+1)]. *)
   inductive path vertex (list vertex) vertex =
   | Path_empty:
       forall x: vertex. path x Nil x

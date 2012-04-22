@@ -12,6 +12,7 @@ end
 (** {2 Length of a list} *)
 
 theory Length
+
   use import int.Int
   use import List
 
@@ -42,6 +43,7 @@ end
 (** {2 Nth element of a list} *)
 
 theory Nth
+
   use export List
   use export option.Option
   use import int.Int
@@ -55,7 +57,7 @@ end
 
 (** {2 Head and tail} *)
 
-theory HdTl 
+theory HdTl
 
   use export List
   use export option.Option
@@ -72,7 +74,7 @@ theory HdTl
 
 end
 
-(** {2 Relation between head, tail and nth} *)
+(** {2 Relation between head, tail, and nth} *)
 
 theory NthHdTl
 
@@ -124,7 +126,7 @@ theory Append
 
 end
 
-(** {2 Rerversing a list} *)
+(** {2 Reversing a list} *)
 
 theory Reverse
 
@@ -192,7 +194,7 @@ theory NumOcc
   use import int.Int
   use import List
 
-  (* number of occurence of x in l *)
+  (* number of occurrence of x in l *)
   function num_occ (x: 'a) (l: list 'a) : int =
     match l with
     | Nil      -> 0
@@ -292,6 +294,7 @@ end
 (** {2 Induction on lists} *)
 
 theory Induction
+
   use import List
 
   type elt
@@ -308,6 +311,7 @@ end
 (** {2 Maps as lists of pairs} *)
 
 theory Map
+
   use import List
 
   type a
@@ -324,6 +328,7 @@ end
 (** {2 Generic recursors on lists} *)
 
 theory FoldLeft
+
   use import List
 
   type a
@@ -335,9 +340,11 @@ theory FoldLeft
     | Nil      -> acc
     | Cons x r -> fold_left (f acc x) r
     end
+
 end
 
 theory FoldRight
+
   use import List
 
   type a
@@ -349,11 +356,13 @@ theory FoldRight
     | Nil      -> acc
     | Cons x r -> f x (fold_right r acc)
     end
+
 end
 
 (** {2 Importation of all list theories in one} *)
 
 theory ListRich
+
   use export List
   use export Length
   use export Mem
@@ -365,6 +374,7 @@ theory ListRich
   use export Sorted
   use export NumOcc
   use export Permut
+
 end
 
 (***

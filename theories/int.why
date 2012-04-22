@@ -2,10 +2,9 @@
 (** {1 Theory of integers}
 
 This file provides the basic theory of integers, and several additional
-theories for classical functions
+theories for classical functions.
 
 *)
-
 
 (** {2 Integers and the basic operators} *)
 
@@ -65,7 +64,7 @@ end
 
 (** {2 Euclidean Division}
 
-division and modulo operators with the convention that division
+Division and modulo operators with the convention that division
      rounds down, and thus modulo is always non-negative
 
 *)
@@ -103,6 +102,7 @@ end
 The particular case of Euclidean division by 2
 
 *)
+
 theory Div2
 
   use import Int
@@ -115,13 +115,12 @@ end
 (** {2 Computer Division}
 
 Division and modulo operators with the same conventions as mainstream
-programming language such C, Java, OCaml, that is division rounds
+programming language such as C, Java, OCaml, that is, division rounds
 towards zero, and thus [mod x y] has the same sign as x
 
 *)
 
 theory ComputerDivision
-
 
   use import Int
   use import Abs
@@ -171,9 +170,10 @@ theory ComputerDivision
 
 end
 
-(** {2 Generic Exponentation of something to an integer exponent} *)
+(** {2 Generic Exponentiation of something to an integer exponent} *)
 
 theory Exponentiation
+
   use import Int
 
   type t
@@ -197,6 +197,7 @@ theory Exponentiation
 end
 
 (** {2 Power of an integer to an integer } *)
+
 theory Power
 
   use import Int
@@ -213,6 +214,7 @@ cloned with needed instances for [pr]. It is also parametrized by a
 type [param] to be used as an additional parameter to [pr].
 
 *)
+
 theory NumOfParam
 
   type param
@@ -288,10 +290,9 @@ end
 
 (** {2 Specific version of number of elements satisfying a predicate}
 
-This is an instance of the above, where the type parameter is unused
+This is an instance of the above, where the type parameter is unused.
 
 *)
-
 
 theory NumOf
 
@@ -376,10 +377,10 @@ end
 (** {2 Induction principle on integers}
 
 This theory can be cloned with the wanted predicate, to perform an
-induction, either on non-negative integers, or more generally on
+induction, either on nonnegative integers, or more generally on
 integers greater or equal a given bound.
 
- *)
+*)
 
 theory Induction
 

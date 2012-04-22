@@ -4,32 +4,39 @@
 (** {2 Associativity} *)
 
 theory Assoc
+
   type t
   function op t t : t
   axiom Assoc : forall x y z : t. op (op x y) z = op x (op y z)
+
 end
 
 (** {2 Commutativity} *)
 
 theory Comm
+
   type t
   function op t t : t
   axiom Comm : forall x y : t. op x y = op y x
+
 end
 
 (** {2 Associativity and Commutativity} *)
 
 theory AC
+
   type t
   function op t t : t
   clone Assoc with type t = t, function op = op
   clone Comm  with type t = t, function op = op
   meta AC function op (*, prop Assoc.Assoc, prop Comm.Comm*)
+
 end
 
 (** {2 Group theory} *)
 
 theory Group
+
   type t
 
   constant unit : t
@@ -51,16 +58,18 @@ end
 
 (** {2 Commutative groups} *)
 
-
 theory CommutativeGroup
+
   clone export Group
   clone Comm with type t = t, function op = op
   meta AC function op (*, prop Assoc.Assoc, prop Comm.Comm*)
+
 end
 
 (** {2 Rings} *)
 
 theory Ring
+
   type t
   constant zero : t
   function (+) t t : t
@@ -77,28 +86,34 @@ theory Ring
   axiom Mul_distr: forall x y z : t. x * (y + z) = x * y + x * z
 
   function (-) (x y : t) : t = x + -y
+
 end
 
 (** {2 Commutative Rings} *)
 
 theory CommutativeRing
+
   clone export Ring
   clone Comm with type t = t, function op = (*)
   meta AC function (*) (*, prop Assoc.Assoc, prop Comm.Comm*)
+
 end
 
 (** {2 Commutative Rings with Unit} *)
 
 theory UnitaryCommutativeRing
+
   clone export CommutativeRing
   constant one : t
   axiom Unitary : forall x:t. one * x = x
   axiom NonTrivialRing : zero <> one
+
 end
 
 (** {2 Ordered Commutative Rings} *)
 
 theory OrderedUnitaryCommutativeRing
+
   clone export UnitaryCommutativeRing
   predicate (<=) t t
   predicate (>=) (x y : t) = y <= x
@@ -110,11 +125,13 @@ theory OrderedUnitaryCommutativeRing
     forall x y z : t. x <= y -> x + z <= y + z
   axiom CompatOrderMult :
     forall x y z : t. x <= y -> zero <= z -> x * z <= y * z
+
 end
 
 (** {2 Field theory} *)
 
 theory Field
+
   clone export UnitaryCommutativeRing
   function inv t : t
   axiom Inverse : forall x:t. x <> zero -> x * inv x = one
@@ -137,6 +154,7 @@ end
 (** {2 Ordered Fields} *)
 
 theory OrderedField
+
   clone export Field
 
   predicate (<=) t t
@@ -148,6 +166,7 @@ theory OrderedField
   axiom CompatOrderAdd  : forall x y z : t. x <= y -> x + z <= y + z
   axiom CompatOrderMult :
     forall x y z : t. x <= y -> zero <= z -> x * z <= y * z
+
 end
 
 (***

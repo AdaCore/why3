@@ -19,10 +19,10 @@ theory Abs
   function abs(x : t) : t
   axiom Abs_def : if ge x zero then abs x = x else abs x = neg x
 *)
+
 end
 
-
-(** {2 minimum and maximum} *)
+(** {2 Minimum and maximum} *)
 
 theory MinMax
 
@@ -56,6 +56,5 @@ theory MinMax
   function min (x y : t) : t = if ge x y then y else x
   function max (x y : t) : t = if ge x y then x else y
 *)
-
 
 end

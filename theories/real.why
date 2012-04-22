@@ -1,12 +1,13 @@
 
-
 (** {1 Theory of reals} 
 
-This file provides the basic theory of real numbers, and several additional theories for classical real functions
+This file provides the basic theory of real numbers, and several
+additional theories for classical real functions.
 
 *)
 
 (** {2 Real numbers and the basic unary and binary operators} *)
+
 theory Real
 
   constant zero : real = 0.0
@@ -25,9 +26,10 @@ theory Real
 
 end
 
-(** {2 Alternative Infix Operators} 
+(** {2 Alternative Infix Operators}
 
-This theory should be used instead of Real when one wants to use both integer and real binary operators. 
+This theory should be used instead of Real when one wants to use both
+integer and real binary operators.
 
 *)
 
@@ -220,6 +222,7 @@ theory ExpLog
 end
 
 (** {2 Power of a real to an integer} *)
+
 theory PowerInt
 
   use int.Int
@@ -228,10 +231,10 @@ theory PowerInt
   clone export int.Exponentiation with
     type t = real, constant one = Real.one, function (*) = Real.(*)
 
-
 end
 
 (** {2 Power of a real to a real exponent} *)
+
 theory PowerReal
 
   use import Real
@@ -263,11 +266,12 @@ theory PowerReal
 
 end
 
-
 (** {2 Trigonometric Functions}
 
-    See {h <a href="http://en.wikipedia.org/wiki/Trigonometric_function">wikipedia page</a>}
+See the {h <a href="http://en.wikipedia.org/wiki/Trigonometric_function">wikipedia page</a>}.
+
 *)
+
 theory Trigonometry
 
   use import Real
@@ -323,8 +327,11 @@ theory Trigonometry
 end
 
 (** {2 Hyperbolic Functions}
-    See {h <a href="http://en.wikipedia.org/wiki/Hyperbolic_function">wikipedia page</a>}
+
+See the {h <a href="http://en.wikipedia.org/wiki/Hyperbolic_function">wikipedia page</a>}.
+
 *)
+
 theory Hyperbolic
 
   use import Real
@@ -346,8 +353,11 @@ theory Hyperbolic
 end
 
 (** {2 Polar Coordinates}
-    atan2, hypot, see {h <a href="http://en.wikipedia.org/wiki/Atan2">wikipedia page</a>}
+
+See the {h <a href="http://en.wikipedia.org/wiki/Atan2">wikipedia page</a>}.
+
 *)
+
 theory Polar
 
   use import Real
@@ -362,5 +372,6 @@ theory Polar
 
   axiom Y_from_polar:
     forall x y:real. y = hypot x y * sin (atan2 y x)
+
 end
 
