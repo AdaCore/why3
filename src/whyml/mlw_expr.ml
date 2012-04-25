@@ -43,34 +43,32 @@ module Mpv = Pv.M
 
 let pv_equal : pvsymbol -> pvsymbol -> bool = (==)
 
-let ts_dummy = create_tysymbol (id_fresh "arrow_dummy") [] None
-let ty_dummy = ty_app ts_dummy []
+let create_pvsymbol id vtv = {
+  pv_vs   = create_vsymbol id (ty_of_ity vtv.vtv_ity);
+  pv_vty  = VTvalue vtv;
+  pv_tvs  = vtv.vtv_tvs;
+  pv_regs = vtv.vtv_regs;
+}
 
-let create_pvsymbol id vtv =
-  let ty = ty_of_ity vtv.vtv_ity in
-  let vs = create_vsymbol id ty in
-  { pv_vs      = vs;
-    pv_vty     = VTvalue vtv;
-    pv_tvs     = vtv.vtv_tvs;
-    pv_regs    = vtv.vtv_regs;
-  }
-
-exception NotValue of pvsymbol
+exception ValueExpected of pvsymbol
+exception ArrowExpected of pvsymbol
 
 let vtv_of_pv pv = match pv.pv_vty with
   | VTvalue vtv -> vtv
-  | VTarrow _ -> raise (NotValue pv)
+  | VTarrow _ -> raise (ValueExpected pv)
+
+let vta_of_pv pv = match pv.pv_vty with
+  | VTarrow vta -> vta
+  | VTvalue _ -> raise (ArrowExpected pv)
 
 (** program symbols *)
 
 type psymbol = {
-  ps_name : ident;
-  ps_vty  : vty_arrow;
-  ps_tvs  : Stv.t;
-  ps_regs : Sreg.t;
-  (* these sets cover the type variables and regions of the defining
-     lambda that cannot be instantiated. Every other type variable
-     and region in ps_vty is generalized and can be instantiated. *)
+  ps_name  : ident;
+  ps_vta   : vty_arrow;
+  ps_tvs   : Stv.t;
+  ps_regs  : Sreg.t;
+  ps_subst : ity_subst;
 }
 
 let ps_equal : psymbol -> psymbol -> bool = (==)
@@ -112,7 +110,7 @@ type variant = {
   v_rel  : lsymbol option; (* tau tau : prop *)
 }
 
-type expr = private {
+type expr = {
   e_node   : expr_node;
   e_vty    : vty;
   e_effect : effect;
@@ -124,8 +122,8 @@ type expr = private {
 
 and expr_node =
   | Elogic  of term
-  | Esymb   of pvsymbol
-  | Ecast   of psymbol * ity_subst
+  | Evar    of pvsymbol
+  | Esym    of psymbol * ity_subst
   | Eapp    of pvsymbol * pvsymbol
   | Elet    of let_defn * expr
   | Erec    of rec_defn list * expr
@@ -151,6 +149,135 @@ and lambda = {
   l_post    : post;
   l_xpost   : xpost;
 }
+
+(* smart constructors *)
+
+let e_label ?loc l e = { e with e_label = l; e_loc = loc }
+
+let e_label_add l e = { e with e_label = Slab.add l e.e_label }
+
+let e_label_copy { e_label = lab; e_loc = loc } e =
+  let lab = Slab.union lab e.e_label in
+  let loc = if e.e_loc = None then loc else e.e_loc in
+  { e with e_label = lab; e_loc = loc }
+
+(* FIXME: this is ugly *)
+let e_dummy node vty = {
+  e_node   = node;
+  e_vty    = vty;
+  e_effect = eff_empty;
+  e_tvs    = Mid.empty;
+  e_regs   = Mid.empty;
+  e_label  = Slab.empty;
+  e_loc    = None;
+}
+
+let add_pv_tvs s pv  = Mid.add pv.pv_vs.vs_name pv.pv_tvs s
+let add_pv_regs s pv = Mid.add pv.pv_vs.vs_name pv.pv_regs s
+
+let add_expr_tvs m e =
+  Mid.union (fun _ s1 s2 -> Some (Stv.union s1 s2)) m e.e_tvs
+
+let add_expr_regs m e =
+  Mid.union (fun _ s1 s2 -> Some (Sreg.union s1 s2)) m e.e_regs
+
+let e_var pv =
+  let node = match pv.pv_vty with
+    | VTarrow _ -> Evar pv
+    | VTvalue _ -> Elogic (t_var pv.pv_vs)
+  in
+  { (e_dummy node pv.pv_vty) with
+    e_tvs  = add_pv_tvs Mid.empty pv;
+    e_regs = add_pv_regs Mid.empty pv; }
+
+let e_sym ps sbs =
+  let vty =
+    if not (Mtv.is_empty sbs.ity_subst_tv && Mreg.is_empty sbs.ity_subst_reg)
+    then VTarrow (vta_full_inst (ity_subst_union ps.ps_subst sbs) ps.ps_vta)
+    else VTarrow ps.ps_vta
+  in
+  { (e_dummy (Esym (ps,sbs)) vty) with
+    e_tvs  = Mid.singleton ps.ps_name ps.ps_tvs;
+    e_regs = Mid.singleton ps.ps_name ps.ps_regs; }
+  (* we only count the fixed type variables and regions of ps, so that
+     type variables and regions introduced by the substitution could be
+     generalized in this expression *)
+
+exception GhostWrite of expr * region
+exception GhostRaise of expr * xsymbol
+
+let ghost_effect e =
+  if vty_ghost e.e_vty then
+    let eff = e.e_effect in
+    let check r = not r.reg_ghost in
+    if Sreg.exists check eff.eff_writes then
+      let s = Sreg.filter check eff.eff_writes in
+      raise (GhostWrite (e, Sreg.choose s))
+    else e
+  else e
+
+let e_app pvf pva =
+  let eff,vty = vty_app_arrow (vta_of_pv pvf) (vtv_of_pv pva) in
+  ghost_effect { (e_dummy (Eapp (pvf,pva)) vty) with
+    e_effect = eff;
+    e_tvs    = add_pv_tvs (add_pv_tvs Mid.empty pvf) pva;
+    e_regs   = add_pv_regs (add_pv_regs Mid.empty pvf) pva; }
+
+let ts_dummy = create_tysymbol (id_fresh "arrow_dummy") [] None
+let ty_dummy = ty_app ts_dummy []
+
+let create_let_defn id e =
+  let pv = match e.e_vty with
+    | VTvalue vtv ->
+        create_pvsymbol id vtv
+    | VTarrow vta ->
+        { pv_vs   = create_vsymbol id ty_dummy;
+          pv_vty  = e.e_vty;
+          pv_tvs  = Mid.fold (fun _ -> Stv.union)  e.e_tvs  vta.vta_tvs;
+          pv_regs = Mid.fold (fun _ -> Sreg.union) e.e_regs vta.vta_regs; }
+  in
+  { ld_pv = pv ; ld_expr = e }
+
+exception StaleRegion of region * ident * expr
+
+let e_let ld e =
+  let { ld_pv = pv ; ld_expr = d } = ld in
+  let eff = d.e_effect in
+  let tvs = Mid.remove pv.pv_vs.vs_name e.e_tvs in
+  let regs = Mid.remove pv.pv_vs.vs_name e.e_regs in
+  (* If we reset some region in the first expression d, then it may only
+     pccur in the second expression e in association to pv. Otherwise,
+     this is a freshness violation: some symbol defined earlier carries
+     that region into e. *)
+  (* FIXME? bad complexity, we should be able to do better *)
+  let check_reset r u = (* does r occur in e? *)
+    let check_id id s = (* does r occur among the regions of id? *)
+      let rec check_reg reg =
+        reg_equal r reg || match u with
+          | Some u when reg_equal u reg -> false
+          | _ -> ity_v_any Util.ffalse check_reg reg.reg_ity
+      in
+      if Sreg.exists check_reg s then raise (StaleRegion (r,id,e))
+    in
+    Mid.iter check_id regs
+  in
+  Mreg.iter check_reset eff.eff_resets;
+  (* We should be able to raise and catch exceptions inside ghost expressions.
+     The problematic case is a ghost exception that escapes into reality. *)
+  (* FIXME: this test is too restrictive. If this let is embedded into a
+     bigger ghost expression, then an exception raised from d and catched
+     there is benign. A good test is to traverse top-level definitions
+     from top to bottom and check if exceptions escape from the outermost
+     ghost subexpressions. *)
+  if vty_ghost d.e_vty && not (vty_ghost e.e_vty) &&
+      not (Sexn.is_empty eff.eff_raises) then
+    raise (GhostRaise (e, Sexn.choose eff.eff_raises));
+  (* This should be the only expression constructor that deals with
+     sequence of effects *)
+  ghost_effect { (e_dummy (Elet (ld,e)) e.e_vty) with
+    e_effect = eff_union d.e_effect e.e_effect;
+    e_tvs    = add_expr_tvs tvs d;
+    e_regs   = add_expr_regs regs d; }
 
 (*
   - A "proper type" of a vty [v] is [v] with empty specification

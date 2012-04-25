@@ -46,9 +46,11 @@ val pv_equal : pvsymbol -> pvsymbol -> bool
 (* a value-typed pvsymbol to use in function arguments and patterns *)
 val create_pvsymbol : preid -> vty_value -> pvsymbol
 
-exception NotValue of pvsymbol
+exception ValueExpected of pvsymbol
+exception ArrowExpected of pvsymbol
 
 val vtv_of_pv : pvsymbol -> vty_value
+val vta_of_pv : pvsymbol -> vty_arrow
 
 (** program symbols *)
 
@@ -57,13 +59,16 @@ val vtv_of_pv : pvsymbol -> vty_value
    their type signature. *)
 
 type psymbol = private {
-  ps_name : ident;
-  ps_vty  : vty_arrow;
-  ps_tvs  : Stv.t;
-  ps_regs : Sreg.t;
+  ps_name  : ident;
+  ps_vta   : vty_arrow;
+  ps_tvs   : Stv.t;
+  ps_regs  : Sreg.t;
   (* these sets cover the type variables and regions of the defining
      lambda that cannot be instantiated. Every other type variable
      and region in ps_vty is generalized and can be instantiated. *)
+  ps_subst : ity_subst;
+  (* this substitution instantiates every type variable and region
+     in ps_tvs and ps_regs to itself *)
 }
 
 val ps_equal : psymbol -> psymbol -> bool
@@ -88,7 +93,7 @@ val pl_equal : plsymbol -> plsymbol -> bool
 
 val create_plsymbol : preid -> vty_value list -> vty_value -> plsymbol
   (* FIXME? Effect calculation is hardwired to correspond to constructors
-     and projections : mutable arguments are reset, mutable result is read. *)
+     and projections: mutable arguments are reset, mutable result is read. *)
 
 (* TODO: patterns *)
 
@@ -115,8 +120,8 @@ type expr = private {
 
 and expr_node = private
   | Elogic  of term
-  | Esymb   of pvsymbol
-  | Ecast   of psymbol * ity_subst
+  | Evar    of pvsymbol
+  | Esym    of psymbol * ity_subst
   | Eapp    of pvsymbol * pvsymbol
   | Elet    of let_defn * expr
   | Erec    of rec_defn list * expr
@@ -142,6 +147,32 @@ and lambda = {
   l_post    : post;
   l_xpost   : xpost;
 }
+
+val e_label : ?loc:Loc.position -> Slab.t -> expr -> expr
+val e_label_add : label -> expr -> expr
+val e_label_copy : expr -> expr -> expr
+
+val e_var : pvsymbol -> expr
+(* produces Elogic if a value or Evar if an arrow *)
+
+val e_sym : psymbol -> ity_subst -> expr
+(* FIXME? We store the substitution in the expr as given, though it could
+   be restricted to type variables and regions (both top and subordinate)
+   of ps_vta.vta_tvs/regs. *)
+
+exception GhostWrite of expr * region
+exception GhostRaise of expr * xsymbol
+(* a ghost expression writes in a non-ghost region or raises an exception *)
+
+val e_app : pvsymbol -> pvsymbol -> expr
+
+val create_let_defn : preid -> expr -> let_defn
+
+exception StaleRegion of region * ident * expr
+(* a previously reset region is associated to an ident occurring in expr.
+   In other terms, freshness violation. *)
+
+val e_let : let_defn -> expr -> expr
 
 (* TODO: when should we check for escaping identifiers (regions?)
    in pre/post/xpost/effects? Here or in WP? *)
