@@ -22,6 +22,7 @@ open Why3
 open Util
 open Ident
 open Ty
+open Term
 open Theory
 open Mlw_ty
 open Mlw_expr
@@ -39,9 +40,15 @@ open Mlw_decl
     2. logic decls (no types)
     3. program decls
 *)
+
+type prgsymbol =
+  | PV of pvsymbol
+  | PS of psymbol
+  | PL of plsymbol
+
 type namespace = {
   ns_it : itysymbol Mstr.t;  (* type symbols *)
-  ns_ps : psymbol Mstr.t;    (* program symbols *)
+  ns_ps : prgsymbol Mstr.t;  (* program symbols *)
   ns_ns : namespace Mstr.t;  (* inner namespaces *)
 }
 
@@ -59,11 +66,17 @@ let ns_replace eq chk x vo vn =
 let ns_union eq chk =
   Mstr.union (fun x vn vo -> Some (ns_replace eq chk x vo vn))
 
+let prg_equal p1 p2 = match p1,p2 with
+  | PV p1, PV p2 -> pv_equal p1 p2
+  | PS p1, PS p2 -> ps_equal p1 p2
+  | PL p1, PL p2 -> pl_equal p1 p2
+  | _, _ -> false
+
 let rec merge_ns chk ns1 ns2 =
   let fusion _ ns1 ns2 = Some (merge_ns chk ns1 ns2) in
   { ns_it = ns_union its_equal chk ns1.ns_it ns2.ns_it;
-    ns_ps = ns_union ps_equal chk ns1.ns_ps ns2.ns_ps;
-    ns_ns = Mstr.union fusion     ns1.ns_ns ns2.ns_ns; }
+    ns_ps = ns_union prg_equal chk ns1.ns_ps ns2.ns_ps;
+    ns_ns = Mstr.union fusion      ns1.ns_ns ns2.ns_ns; }
 
 let nm_add chk x ns m = Mstr.change (function
   | None -> Some ns
@@ -74,7 +87,7 @@ let ns_add eq chk x v m = Mstr.change (function
   | Some vo -> Some (ns_replace eq chk x vo v)) x m
 
 let it_add = ns_add its_equal
-let ps_add = ns_add ps_equal
+let ps_add = ns_add prg_equal
 
 let add_it chk x ts ns = { ns with ns_it = it_add chk x ts ns.ns_it }
 let add_ps chk x pf ns = { ns with ns_ps = ps_add chk x pf ns.ns_ps }
@@ -214,9 +227,9 @@ let add_type uc its =
   add_symbol add_it its.its_pure.ts_name its uc
 
 let add_data uc (its,csl) =
-  let add_ps uc {ps=ps} = add_symbol add_ps ps.p_name ps uc in
-  let add_proj = option_fold add_ps in
-  let add_constr uc (ps,pjl) = List.fold_left add_proj (add_ps uc ps) pjl in
+  let add_pls uc pls = add_symbol add_ps pls.pl_ls.ls_name (PL pls) uc in
+  let add_proj = option_fold add_pls in
+  let add_constr uc (ps,pjl) = List.fold_left add_proj (add_pls uc ps) pjl in
   let uc = add_symbol add_it its.its_pure.ts_name its uc in
   List.fold_left add_constr uc csl
 
@@ -232,8 +245,8 @@ let add_pdecl uc d =
       add_to_theory Theory.add_ty_decl uc its.its_pure
   | PDdata dl ->
       let uc = List.fold_left add_data uc dl in
-      let projection = option_map (fun ps -> ps.ls) in
-      let constructor (ps,pjl) = ps.ls, List.map projection pjl in
+      let projection = option_map (fun pls -> pls.pl_ls) in
+      let constructor (pls,pjl) = pls.pl_ls, List.map projection pjl in
       let defn cl = List.map constructor cl in
       let dl = List.map (fun (its,cl) -> its.its_pure, defn cl) dl in
       add_to_theory Theory.add_data_decl uc dl

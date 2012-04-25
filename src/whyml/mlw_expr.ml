@@ -24,6 +24,134 @@ open Ty
 open Term
 open Mlw_ty
 
+(** program variables *)
+
+type pvsymbol = {
+  pv_vs   : vsymbol; (* has a dummy type if pv_vty is an arrow *)
+  pv_vty  : vty;
+  pv_tvs  : Stv.t;
+  pv_regs : Sreg.t;
+}
+
+module Pv = Util.StructMake (struct
+  type t = pvsymbol
+  let tag pv = Hashweak.tag_hash pv.pv_vs.vs_name.id_tag
+end)
+
+module Spv = Pv.S
+module Mpv = Pv.M
+
+let pv_equal : pvsymbol -> pvsymbol -> bool = (==)
+
+let ts_dummy = create_tysymbol (id_fresh "arrow_dummy") [] None
+let ty_dummy = ty_app ts_dummy []
+
+let create_pvsymbol id vtv =
+  let ty = ty_of_ity vtv.vtv_ity in
+  let vs = create_vsymbol id ty in
+  { pv_vs      = vs;
+    pv_vty     = VTvalue vtv;
+    pv_tvs     = vtv.vtv_tvs;
+    pv_regs    = vtv.vtv_regs;
+  }
+
+exception NotValue of pvsymbol
+
+let vtv_of_pv pv = match pv.pv_vty with
+  | VTvalue vtv -> vtv
+  | VTarrow _ -> raise (NotValue pv)
+
+(** program symbols *)
+
+type psymbol = {
+  ps_name : ident;
+  ps_vty  : vty_arrow;
+  ps_tvs  : Stv.t;
+  ps_regs : Sreg.t;
+  (* these sets cover the type variables and regions of the defining
+     lambda that cannot be instantiated. Every other type variable
+     and region in ps_vty is generalized and can be instantiated. *)
+}
+
+let ps_equal : psymbol -> psymbol -> bool = (==)
+
+(** program/logic symbols *)
+
+type plsymbol = {
+  pl_ls     : lsymbol;
+  pl_args   : vty_value list;
+  pl_value  : vty_value;
+  pl_effect : effect;
+}
+
+let pl_equal : plsymbol -> plsymbol -> bool = (==)
+
+let create_plsymbol id args value =
+  let ty_of_vtv vtv = ty_of_ity vtv.vtv_ity in
+  let pure_args = List.map ty_of_vtv args in
+  let ls = create_fsymbol id pure_args (ty_of_vtv value) in
+  let effect = Util.option_fold eff_read eff_empty value.vtv_mut in
+  let arg_reset acc a = Util.option_fold eff_reset acc a.vtv_mut in
+  let effect = List.fold_left arg_reset effect args in {
+    pl_ls     = ls;
+    pl_args   = args;
+    pl_value  = value;
+    pl_effect = effect;
+  }
+
+(* TODO: patterns *)
+
+(* program expressions *)
+
+type pre   = term (* precondition *)
+type post  = term (* postcondition *)
+type xpost = (vsymbol * post) Mexn.t (* exceptional postconditions *)
+
+type variant = {
+  v_term : term;           (* : tau *)
+  v_rel  : lsymbol option; (* tau tau : prop *)
+}
+
+type expr = private {
+  e_node   : expr_node;
+  e_vty    : vty;
+  e_effect : effect;
+  e_tvs    : Stv.t Mid.t;
+  e_regs   : Sreg.t Mid.t;
+  e_label  : Slab.t;
+  e_loc    : Loc.position option;
+}
+
+and expr_node =
+  | Elogic  of term
+  | Esymb   of pvsymbol
+  | Ecast   of psymbol * ity_subst
+  | Eapp    of pvsymbol * pvsymbol
+  | Elet    of let_defn * expr
+  | Erec    of rec_defn list * expr
+  | Eif     of pvsymbol * expr * expr
+  | Eassign of pvsymbol * pvsymbol (* mutable pv <- expr *)
+  | Eany
+
+and let_defn = {
+  ld_pv   : pvsymbol;
+  ld_expr : expr;
+}
+
+and rec_defn = {
+  rd_ps     : psymbol;
+  rd_lambda : lambda;
+}
+
+and lambda = {
+  l_args    : pvsymbol list;
+  l_variant : variant list; (* lexicographic order *)
+  l_pre     : pre;
+  l_expr    : expr;
+  l_post    : post;
+  l_xpost   : xpost;
+}
+
 (*
   - A "proper type" of a vty [v] is [v] with empty specification
     (effect/pre/post/xpost). Basically, it is formed from pv_ity's
@@ -81,67 +209,4 @@ open Mlw_ty
     by construction of ppsymbols. In particular, every extra type var and
     region in [e.e_vty] appear in the range of [e.e_tvs] and [e.e_regs].
 *)
-
-type variant = {
-  v_term : term;           (* : tau *)
-  v_rel  : lsymbol option; (* tau tau : prop *)
-}
-
-(* program symbols *)
-type psymbol = {
-  p_name : ident;
-  p_tvs  : Stv.t;
-  p_reg  : Sreg.t;
-  p_vty  : vty;
-}
-
-let create_psymbol id tvars regs = function
-  | VTvalue pv ->
-      let pv =
-        create_pvsymbol id ?mut:pv.pv_mutable ~ghost:pv.pv_ghost pv.pv_ity in
-      { p_name = pv.pv_vs.vs_name;
-        p_tvs = tvars; p_reg = regs; p_vty = vty_value pv; }
-  | VTarrow _ as vty ->
-      (* TODO? check that tvars/regs are in vty *)
-      { p_name = id_register id; p_tvs = tvars; p_reg = regs; p_vty = vty; }
-
-let ps_equal : psymbol -> psymbol -> bool = (==)
-
-type expr = private {
-  e_node  : expr_node;
-  e_vty   : vty;
-  e_eff   : effect;
-  e_ghost : bool;
-  e_label : Slab.t;
-  e_loc   : Loc.position option;
-}
-
-and expr_node =
-  | Elogic  of term
-  | Esym    of psymbol (* function *)
-  | Eapp    of psymbol * expr
-  | Elet    of psymbol * expr * expr
-  | Eletrec of recfun list * expr
-  | Efun    of lambda
-  | Eif     of expr * expr * expr
-  | Eassign of pvsymbol * psymbol * region * expr (* e1.f<rho> <- e2 *)
-
-and recfun = psymbol * lambda
-
-and lambda = {
-  l_args    : pvsymbol list;
-  l_variant : variant list; (* lexicographic order *)
-  l_pre     : term;
-  l_body    : expr;
-  l_post    : term;
-  l_xpost   : xpost;
-}
-
-let lapp _ = assert false (*TODO*)
-let papp _ = assert false (*TODO*)
-let app _ = assert false (*TODO*)
-let plet _ = assert false (*TODO*)
-let pletrec _ = assert false (*TODO*)
-let pfun _ = assert false (*TODO*)
-let assign _ = assert false (*TODO*)
 

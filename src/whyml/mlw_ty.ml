@@ -482,6 +482,107 @@ let eff_full_inst s e =
   let resets = Mreg.fold add_inst e.eff_resets Mreg.empty in
   { e with eff_reads = reads ; eff_writes = writes ; eff_resets = resets }
 
+(* program types *)
+
+type vty_value = {
+  vtv_ity   : ity;
+  vtv_ghost : bool;
+  vtv_mut   : region option;
+  vtv_tvs   : Stv.t;
+  vtv_regs  : Sreg.t;
+}
+
+type vty =
+  | VTvalue of vty_value
+  | VTarrow of vty_arrow
+
+and vty_arrow = {
+  vta_arg    : vty_value;
+  vta_result : vty;
+  vta_effect : effect;
+  vta_ghost  : bool;
+  vta_tvs    : Stv.t;
+  vta_regs   : Sreg.t;
+  (* these sets cover every type variable and region in vta_arg
+     and vta_result, but may skip some type variables and regions
+     in vta_effect *)
+}
+
+(* smart constructors *)
+
+let vty_freevars s = function
+  | VTvalue vtv -> Stv.union s vtv.vtv_tvs
+  | VTarrow vta -> Stv.union s vta.vta_tvs
+
+let vty_topregions s = function
+  | VTvalue vtv -> Sreg.union s vtv.vtv_regs
+  | VTarrow vta -> Sreg.union s vta.vta_regs
+
+let vty_value ?(ghost=false) ?mut ity =
+  let regs = match mut with
+    | Some r ->
+        if r.reg_ghost && not ghost then
+          Loc.errorm "Ghost region in a non-ghost vty_value";
+        ity_equal_check ity r.reg_ity;
+        Sreg.singleton r
+    | None ->
+        Sreg.empty
+  in {
+    vtv_ity   = ity;
+    vtv_ghost = ghost;
+    vtv_mut   = mut;
+    vtv_tvs   = ity_freevars Stv.empty ity;
+    vtv_regs  = ity_topregions regs ity;
+  }
+
+let vty_arrow vtv ?(effect=eff_empty) ?(ghost=false) vty =
+  if vtv.vtv_mut <> None then
+    Loc.errorm "Mutable arguments are not allowed in vty_arrow"
+  else {
+    vta_arg    = vtv;
+    vta_result = vty;
+    vta_effect = effect;
+    vta_ghost  = ghost;
+    vta_tvs    = vty_freevars vtv.vtv_tvs vty;
+    vta_regs   = vty_topregions vtv.vtv_regs vty;
+  }
+
+let vty_ghost = function
+  | VTvalue vtv -> vtv.vtv_ghost
+  | VTarrow vta -> vta.vta_ghost
+
+let vtv_ghostify vtv = { vtv with vtv_ghost = true }
+let vta_ghostify vta = { vta with vta_ghost = true }
+
+let vty_ghostify = function
+  | VTvalue vtv -> VTvalue (vtv_ghostify vtv)
+  | VTarrow vta -> VTarrow (vta_ghostify vta)
+
+let vty_app_arrow vta vtv =
+  ity_equal_check vta.vta_arg.vtv_ity vtv.vtv_ity;
+  let ghost = vta.vta_ghost || (vtv.vtv_ghost && not vta.vta_arg.vtv_ghost) in
+  let result = if ghost then vty_ghostify vta.vta_result else vta.vta_result in
+  vta.vta_effect, result
+
+(* vty instantiation *)
+
+let vtv_full_inst s vtv =
+  vty_value ~ghost:vtv.vtv_ghost (ity_full_inst s vtv.vtv_ity)
+
+(* the substitution must cover not only vta.vta_tvs and vta.vta_regs
+   but also every type variable and every region in vta_effect *)
+let rec vta_full_inst s vta =
+  let vtv = vtv_full_inst s vta.vta_arg in
+  let vty = vty_full_inst s vta.vta_result in
+  let eff = eff_full_inst s vta.vta_effect in
+  vty_arrow ~ghost:vta.vta_ghost ~effect:eff vtv vty
+
+and vty_full_inst s = function
+  | VTvalue vtv -> VTvalue (vtv_full_inst s vtv)
+  | VTarrow vta -> VTarrow (vta_full_inst s vta)
+
+(** THE FOLLOWING CODE MIGHT BE USEFUL LATER FOR WPgen *)
+(*
 (* program variables *)
 type pvsymbol = {
   pv_vs      : vsymbol;
@@ -706,4 +807,4 @@ let vty_full_inst s vty =
         }
   in
   inst Mvs.empty vty
-
+*)

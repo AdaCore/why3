@@ -14,6 +14,11 @@ end
 module N
   use import M
   goal G1: f 41 = 42
+
+  type tree 'a = Node 'a (forest 'a) | Leaf
+  with forest 'a = Cons (tree 'a) (forest 'a) | Nil
+
+  type ref 'a = {| ghost mutable contents : 'a |}
 end
 
 (*

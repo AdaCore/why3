@@ -217,26 +217,28 @@ let add_types uc tdl =
             let def = parse ty in
             let s = ity_topregions Sreg.empty def in
             create_itysymbol id ~abst ~priv vl (Sreg.elements s) (Some def)
-        | TDalgebraic csl when Hashtbl.mem mutables x ->
+        | TDalgebraic csl when Hashtbl.find mutables x ->
             let projs = Hashtbl.create 5 in
             (* to check projections' types we must fix the tyvars *)
             let add s v = let t = ity_var v in ity_match s t t in
             let sbs = List.fold_left add ity_subst_empty vl in
             let mk_proj s (id,pty) =
               let ity = parse pty in
+              let vtv = vty_value ity in
               match id with
                 | None ->
-                    let pv = create_pvsymbol (id_fresh "pj") ity in
+                    let pv = create_pvsymbol (id_fresh "pj") vtv in
                     ity_topregions s ity, (pv, false)
                 | Some id ->
                     try
                       let pv = Hashtbl.find projs id.id in
+                      let ty = (vtv_of_pv pv).vtv_ity in
                       (* once we have ghost/mutable fields in algebraics,
                          don't forget to check here that they coincide, too *)
-                      ignore (Loc.try3 id.id_loc ity_match sbs pv.pv_ity ity);
+                      ignore (Loc.try3 id.id_loc ity_match sbs ty ity);
                       s, (pv, true)
                     with Not_found ->
-                      let pv = create_pvsymbol (Denv.create_user_id id) ity in
+                      let pv = create_pvsymbol (Denv.create_user_id id) vtv in
                       Hashtbl.replace projs id.id pv;
                       ity_topregions s ity, (pv, true)
             in
@@ -247,7 +249,7 @@ let add_types uc tdl =
             let s,def = Util.map_fold_left mk_constr Sreg.empty csl in
             Hashtbl.replace predefs x def;
             create_itysymbol id ~abst ~priv vl (Sreg.elements s) None
-        | TDrecord fl when Hashtbl.mem mutables x ->
+        | TDrecord fl when Hashtbl.find mutables x ->
             let mk_field s f =
               let ghost = f.f_ghost in
               let ity = parse f.f_pty in
@@ -258,7 +260,8 @@ let add_types uc tdl =
               else
                 ity_topregions s ity, None
               in
-              s, (create_pvsymbol fid ?mut ~ghost ity, true)
+              let vtv = vty_value ?mut ~ghost ity in
+              s, (create_pvsymbol fid vtv, true)
             in
             let s,pjl = Util.map_fold_left mk_field Sreg.empty fl in
             let cid = { d.td_ident with id = "mk " ^ d.td_ident.id } in
@@ -303,24 +306,26 @@ let add_types uc tdl =
           ts :: abstr, algeb, alias
       | TDalias _ ->
           abstr, algeb, ts :: alias
-      | (TDalgebraic _ | TDrecord _) when Hashtbl.mem mutables x ->
+      | (TDalgebraic _ | TDrecord _) when Hashtbl.find mutables x ->
           abstr, (ts, Hashtbl.find predefs x) :: algeb, alias
       | TDalgebraic csl ->
           let projs = Hashtbl.create 5 in
           let mk_proj (id,pty) =
             let ity = parse pty in
+            let vtv = vty_value ity in
             match id with
               | None ->
-                  create_pvsymbol (id_fresh "pj") ity, false
+                  create_pvsymbol (id_fresh "pj") vtv, false
               | Some id ->
                   try
                     let pv = Hashtbl.find projs id.id in
+                    let ty = (vtv_of_pv pv).vtv_ity in
                     (* once we have ghost/mutable fields in algebraics,
                        don't forget to check here that they coincide, too *)
-                    Loc.try2 id.id_loc ity_equal_check pv.pv_ity ity;
+                    Loc.try2 id.id_loc ity_equal_check ty ity;
                     pv, true
                   with Not_found ->
-                    let pv = create_pvsymbol (Denv.create_user_id id) ity in
+                    let pv = create_pvsymbol (Denv.create_user_id id) vtv in
                     Hashtbl.replace projs id.id pv;
                     pv, true
           in
@@ -330,7 +335,8 @@ let add_types uc tdl =
       | TDrecord fl ->
           let mk_field f =
             let fid = Denv.create_user_id f.f_ident in
-            create_pvsymbol fid ~ghost:f.f_ghost (parse f.f_pty), true in
+            let vtv = vty_value ~ghost:f.f_ghost (parse f.f_pty) in
+            create_pvsymbol fid vtv, true in
           let cid = { d.td_ident with id = "mk " ^ d.td_ident.id } in
           let csl = [Denv.create_user_id cid, List.map mk_field fl] in
           abstr, (ts, csl) :: algeb, alias
@@ -347,7 +353,8 @@ let add_types uc tdl =
     option_apply false check ts.its_def
   in
   let check (pv,_) =
-    pv.pv_ghost || pv.pv_mutable <> None || check pv.pv_ity in
+    let vtv = vtv_of_pv pv in
+    vtv.vtv_ghost || vtv.vtv_mut <> None || check vtv.vtv_ity in
   let is_impure_data (ts,csl) =
     is_impure_type ts ||
     List.exists (fun (_,l) -> List.exists check l) csl

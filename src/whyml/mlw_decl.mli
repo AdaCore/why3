@@ -27,9 +27,7 @@ open Mlw_expr
 
 (** {2 Type declaration} *)
 
-type ps_ls = private { ps : psymbol; ls : lsymbol }
-
-type constructor = ps_ls * ps_ls option list
+type constructor = plsymbol * plsymbol option list
 
 type data_decl = itysymbol * constructor list
 
@@ -42,7 +40,7 @@ type pdecl = private {
   pd_tag  : int;           (* unique tag *)
 }
 
-and pdecl_node =
+and pdecl_node = private
   | PDtype of itysymbol
   | PDdata of data_decl list
 

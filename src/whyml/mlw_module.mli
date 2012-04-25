@@ -29,14 +29,19 @@ open Mlw_ty
 open Mlw_expr
 open Mlw_decl
 
+type prgsymbol =
+  | PV of pvsymbol
+  | PS of psymbol
+  | PL of plsymbol
+
 type namespace = private {
   ns_it : itysymbol Mstr.t;  (* type symbols *)
-  ns_ps : psymbol Mstr.t;    (* program symbols *)
+  ns_ps : prgsymbol Mstr.t;  (* program symbols *)
   ns_ns : namespace Mstr.t;  (* inner namespaces *)
 }
 
 val ns_find_it : namespace -> string list -> itysymbol
-val ns_find_ps : namespace -> string list -> psymbol
+val ns_find_ps : namespace -> string list -> prgsymbol
 val ns_find_ns : namespace -> string list -> namespace
 
 (** Module *)

@@ -143,8 +143,6 @@ val ity_equal_check : ity -> ity -> unit
 
 val ity_subst_union : ity_subst -> ity_subst -> ity_subst
 
-(** vty_comp types (with effects) *)
-
 (* exception symbols *)
 type xsymbol = private {
   xs_name : ident;
@@ -177,6 +175,53 @@ val eff_assign : effect -> region -> ity -> effect
 
 val eff_remove_raise : effect -> xsymbol -> effect
 
+(** program types *)
+
+(* type of function arguments and values *)
+type vty_value = private {
+  vtv_ity   : ity;
+  vtv_ghost : bool;
+  vtv_mut   : region option;
+  vtv_tvs   : Stv.t;
+  vtv_regs  : Sreg.t;
+}
+
+type vty =
+  | VTvalue of vty_value
+  | VTarrow of vty_arrow
+
+and vty_arrow = private {
+  vta_arg    : vty_value;
+  vta_result : vty;
+  vta_effect : effect;
+  vta_ghost  : bool;
+  vta_tvs    : Stv.t;
+  vta_regs   : Sreg.t;
+  (* these sets cover every type variable and region in vta_arg
+     and vta_result, but may skip some type variables and regions
+     in vta_effect *)
+}
+
+(* smart constructors *)
+
+val vty_value : ?ghost:bool -> ?mut:region -> ity -> vty_value
+
+val vty_arrow : vty_value -> ?effect:effect -> ?ghost:bool -> vty -> vty_arrow
+
+val vty_app_arrow : vty_arrow -> vty_value -> effect * vty
+
+val vty_freevars : Stv.t -> vty -> Stv.t
+val vty_topregions : Sreg.t -> vty -> Sreg.t
+
+val vty_ghost : vty -> bool
+val vty_ghostify : vty -> vty
+
+(* the substitution must cover not only vta.vta_tvs and vta.vta_regs
+   but also every type variable and every region in vta_effect *)
+val vta_full_inst : ity_subst -> vty_arrow -> vty_arrow
+
+(** THE FOLLOWING CODE MIGHT BE USEFUL LATER FOR WPgen *)
+(*
 (* program variables *)
 type pvsymbol = private {
   pv_vs      : vsymbol;
@@ -228,3 +273,4 @@ val vty_topregions : Sreg.t -> vty -> Sreg.t (* ...not eff/pre/post/xpost *)
    vty_topregions of vty, but also every type variable and
    every region in effects and pre/post/xpost formulas *)
 val vty_full_inst : ity_subst -> vty -> vty
+*)
