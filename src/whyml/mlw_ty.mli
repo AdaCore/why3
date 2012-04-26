@@ -143,6 +143,10 @@ val ity_equal_check : ity -> ity -> unit
 
 val ity_subst_union : ity_subst -> ity_subst -> ity_subst
 
+val ity_full_inst : ity_subst -> ity -> ity
+
+val reg_full_inst : ity_subst -> region -> region
+
 (* exception symbols *)
 type xsymbol = private {
   xs_name : ident;
@@ -174,6 +178,8 @@ val eff_raise : effect -> xsymbol -> effect
 val eff_assign : effect -> region -> ity -> effect
 
 val eff_remove_raise : effect -> xsymbol -> effect
+
+val eff_full_inst : ity_subst -> effect -> effect
 
 (** program types *)
 

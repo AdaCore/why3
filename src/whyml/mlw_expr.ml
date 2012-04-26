@@ -297,6 +297,7 @@ exception ArrowExpected of expr
      Eapp pa pv [read ro]
    which is ok. If pa is computed before pv, then Eapp pa pv would
    violate the freshness of ro. *)
+
 let e_eapp e el =
   let rec app = function
     | [] -> e
@@ -317,10 +318,71 @@ let e_eapp e el =
               let pv = match ld.let_var with
                 | LetA _ -> raise (ValueExpected e)
                 | LetV pv -> pv in
-              left pv
+              e_let ld (left pv)
         end
   in
   app (List.rev el)
+
+let e_plapp pls el ity =
+  let rec app tl tvs regs ghost sbs vtvl argl =
+    match vtvl, argl with
+      | [],[] ->
+          let vtv = pls.pl_value in
+          let ghost = ghost || vtv.vtv_ghost in
+          let sbs = ity_match sbs vtv.vtv_ity ity in
+          let mut = Util.option_map (reg_full_inst sbs) vtv.vtv_mut in
+          let vty = VTvalue (vty_value ~ghost ?mut ity) in
+          let t = match pls.pl_ls.ls_value with
+            | Some _ -> fs_app pls.pl_ls tl (ty_of_ity ity)
+            | None   -> ps_app pls.pl_ls tl
+          in
+          ghost_effect { (e_dummy (Elogic t) vty) with
+            e_effect = eff_full_inst sbs pls.pl_effect;
+            e_tvs    = tvs;
+            e_regs   = regs; }
+      | [],_ | _,[] ->
+          raise (Term.BadArity
+            (pls.pl_ls, List.length pls.pl_args, List.length el))
+      | vtv::vtvl, ({ e_node = Elogic t } as e)::argl ->
+          let tvs = add_expr_tvs tvs e in
+          let regs = add_expr_regs regs e in
+          let evtv = match e.e_vty with
+            | VTvalue vtv -> vtv
+            | VTarrow _   -> assert false in
+          let ghost = ghost || (evtv.vtv_ghost && not vtv.vtv_ghost) in
+          let sbs = ity_match sbs vtv.vtv_ity evtv.vtv_ity in
+          app (t::tl) tvs regs ghost sbs vtvl argl
+      | vtv::vtvl, e::argl ->
+          let apply_to_pv pv =
+            let tl = t_var pv.pv_vs :: tl in
+            let tvs = add_pv_tvs tvs pv in
+            let regs = add_pv_regs regs pv in
+            let ghost = ghost || (pv.pv_vtv.vtv_ghost && not vtv.vtv_ghost) in
+            let sbs = ity_match sbs vtv.vtv_ity pv.pv_vtv.vtv_ity in
+            app tl tvs regs ghost sbs vtvl argl
+          in
+          begin match e.e_node with
+            | Evalue pv -> apply_to_pv pv
+            | _ ->
+                let ld = create_let_defn (id_fresh "o") e in
+                let pv = match ld.let_var with
+                  | LetA _ -> raise (ValueExpected e)
+                  | LetV pv -> pv in
+                e_let ld (apply_to_pv pv)
+          end
+  in
+  let vtvl = List.rev pls.pl_args in
+  let argl = List.rev el in
+  app [] Mid.empty Mid.empty false ity_subst_empty vtvl argl
+
+let e_lapp ls el ity =
+  let pls = {
+    pl_ls     = ls;
+    pl_args   = List.map (fun ty -> vty_value (ity_of_ty ty)) ls.ls_args;
+    pl_value  = vty_value (ity_of_ty (Util.def_option ty_bool ls.ls_value));
+    pl_effect = eff_empty; }
+  in
+  e_plapp pls el ity
 
 (*
   - A "proper type" of a vty [v] is [v] with empty specification

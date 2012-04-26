@@ -536,9 +536,17 @@ let vty_value ?(ghost=false) ?mut ity =
   }
 
 let vty_arrow vtv ?(effect=eff_empty) ?(ghost=false) vty =
+  (* mutable arguments are rejected outright *)
   if vtv.vtv_mut <> None then
-    Loc.errorm "Mutable arguments are not allowed in vty_arrow"
-  else {
+    Loc.errorm "Mutable arguments are not allowed in vty_arrow";
+  (* we accept a mutable vty_value for the result to simplify Mlw_expr,
+     but erase it in the signature: only projections return mutables *)
+  let vty = match vty with
+    | VTvalue ({ vtv_mut = Some r } as vtv) ->
+        let regs = Sreg.remove r vtv.vtv_regs in
+        VTvalue { vtv with vtv_mut = None ; vtv_regs = regs }
+    | _ -> vty
+  in {
     vta_arg    = vtv;
     vta_result = vty;
     vta_effect = effect;

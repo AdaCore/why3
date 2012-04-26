@@ -165,6 +165,9 @@ val e_inst : psymbol -> ity_subst -> expr
    be restricted to type variables and regions (both top and subordinate)
    of ps_vta.vta_tvs/regs. *)
 
+exception ValueExpected of expr
+exception ArrowExpected of expr
+
 exception GhostWrite of expr * region
 exception GhostRaise of expr * xsymbol
 (* a ghost expression writes in a non-ghost region or raises an exception *)
@@ -172,6 +175,10 @@ exception GhostRaise of expr * xsymbol
 val e_app : pasymbol -> pvsymbol -> expr
 
 val e_eapp : expr -> expr list -> expr
+
+val e_lapp : lsymbol -> expr list -> ity -> expr
+
+val e_plapp : plsymbol -> expr list -> ity -> expr
 
 val create_let_defn : preid -> expr -> let_defn
 
