@@ -111,6 +111,7 @@ type expr = {
 
 and expr_node =
   | Elogic  of term
+  | Evalue  of pvsymbol
   | Earrow  of pasymbol
   | Einst   of psymbol * ity_subst
   | Eapp    of pasymbol * pvsymbol
@@ -184,7 +185,7 @@ let add_expr_regs m e =
   Mid.union (fun _ s1 s2 -> Some (Sreg.union s1 s2)) m e.e_regs
 
 let e_value pv =
-  { (e_dummy (Elogic (t_var pv.pv_vs)) (VTvalue pv.pv_vtv)) with
+  { (e_dummy (Evalue pv) (VTvalue pv.pv_vtv)) with
     e_tvs  = add_pv_tvs Mid.empty pv;
     e_regs = add_pv_regs Mid.empty pv; }
 
@@ -248,7 +249,7 @@ let e_let ({ let_var = lv ; let_expr = d } as ld) e =
   let tvs = Mid.remove id e.e_tvs in
   let regs = Mid.remove id e.e_regs in
   (* If we reset some region in the first expression d, then it may only
-     pccur in the second expression e in association to pv. Otherwise,
+     occur in the second expression e in association to pv. Otherwise,
      this is a freshness violation: some symbol defined earlier carries
      that region into e. *)
   (* FIXME? bad complexity, we should be able to do better *)
@@ -280,6 +281,46 @@ let e_let ({ let_var = lv ; let_expr = d } as ld) e =
     e_effect = eff_union d.e_effect e.e_effect;
     e_tvs    = add_expr_tvs tvs d;
     e_regs   = add_expr_regs regs d; }
+
+exception ValueExpected of expr
+exception ArrowExpected of expr
+
+(* We adopt right-to-left evaluation order so that expression
+     get_ref (create_ref 5)
+   produces
+     let pv : ref<ro> int =
+        let pv1 : int = Elogic 5 in
+        let pa1 : int -> ref<ro> int = Einst create_ref in
+        Eapp pa1 pv1 [reset ro]
+     in
+     let pa : ref<ro> int -> int = Einst get_ref in
+     Eapp pa pv [read ro]
+   which is ok. If pa is computed before pv, then Eapp pa pv would
+   violate the freshness of ro. *)
+let e_eapp e el =
+  let rec app = function
+    | [] -> e
+    | e::el ->
+        let left pv = match app el with
+          | { e_node = Earrow pa } -> e_app pa pv
+          | e ->
+              let ld = create_let_defn (id_fresh "o") e in
+              let pa = match ld.let_var with
+                | LetV _ -> raise (ArrowExpected e)
+                | LetA pa -> pa in
+              e_let ld (e_app pa pv)
+        in
+        begin match e.e_node with
+          | Evalue pv -> left pv
+          | _ ->
+              let ld = create_let_defn (id_fresh "o") e in
+              let pv = match ld.let_var with
+                | LetA _ -> raise (ValueExpected e)
+                | LetV pv -> pv in
+              left pv
+        end
+  in
+  app (List.rev el)
 
 (*
   - A "proper type" of a vty [v] is [v] with empty specification

@@ -115,6 +115,7 @@ type expr = private {
 
 and expr_node = private
   | Elogic  of term
+  | Evalue  of pvsymbol
   | Earrow  of pasymbol
   | Einst   of psymbol * ity_subst
   | Eapp    of pasymbol * pvsymbol
@@ -169,6 +170,8 @@ exception GhostRaise of expr * xsymbol
 (* a ghost expression writes in a non-ghost region or raises an exception *)
 
 val e_app : pasymbol -> pvsymbol -> expr
+
+val e_eapp : expr -> expr list -> expr
 
 val create_let_defn : preid -> expr -> let_defn
 
