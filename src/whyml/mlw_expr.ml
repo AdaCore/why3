@@ -110,7 +110,7 @@ and expr_node =
   | Elet    of let_defn * expr
   | Erec    of rec_defn list * expr
   | Eif     of pvsymbol * expr * expr
-  | Eassign of pvsymbol * pvsymbol (* mutable pv <- expr *)
+  | Eassign of pvsymbol * region * pvsymbol (* mutable pv <- expr *)
   | Eany
 
 and let_defn = {
@@ -210,6 +210,9 @@ let e_inst ps sbs =
     else ps.ps_vta
   in
   mk_expr (Einst (ps,sbs)) (VTarrow vta) eff_empty tvs regs
+(* FIXME? We store the substitution in the expr as given, though it could
+   be restricted to type variables and regions (both top and subordinate)
+   of ps_vta.vta_tvs/regs. *)
 
 let e_app_real pa pv =
   let tvs = add_pv_tvs (add_pa_tvs Mid.empty pa) pv in
@@ -383,14 +386,33 @@ let e_if_real pv e1 e2 =
   let vtv2 = vtv_of_expr e2 in
   ity_equal_check vtv1.vtv_ity vtv2.vtv_ity;
   ity_equal_check pv.pv_vtv.vtv_ity ity_bool;
-  let ghost = pv.pv_vtv.vtv_ghost || vtv1.vtv_ghost || vtv2.vtv_ghost in
-  let vtv = vty_value ~ghost vtv1.vtv_ity in
   let eff = eff_union e1.e_effect e2.e_effect in
   let tvs = add_expr_tvs (add_expr_tvs (add_pv_tvs Mid.empty pv) e1) e2 in
   let regs = add_expr_regs (add_expr_regs (add_pv_regs Mid.empty pv) e1) e2 in
-  mk_expr (Eif (pv,e1,e2)) (VTvalue vtv) eff tvs regs
+  let ghost = pv.pv_vtv.vtv_ghost || vtv1.vtv_ghost || vtv2.vtv_ghost in
+  let vty = VTvalue (vty_value ~ghost vtv1.vtv_ity) in
+  mk_expr (Eif (pv,e1,e2)) vty eff tvs regs
 
 let e_if e e1 e2 = on_value (fun pv -> e_if_real pv e1 e2) e
+
+exception Immutable of pvsymbol
+
+let e_assign_real mpv pv =
+  let r = match mpv.pv_vtv.vtv_mut with
+    | Some r -> r
+    | None -> raise (Immutable mpv)
+  in
+  let eff = eff_assign eff_empty r pv.pv_vtv.vtv_ity in
+  let tvs = add_pv_tvs (add_pv_tvs Mid.empty mpv) pv in
+  let regs = add_pv_regs (add_pv_regs Mid.empty mpv) pv in
+  let ghost = mpv.pv_vtv.vtv_ghost || pv.pv_vtv.vtv_ghost in
+  let vty = VTvalue (vty_value ~ghost ity_unit) in
+  mk_expr (Eassign (mpv,r,pv)) vty eff tvs regs
+
+let e_assign me e =
+  let assign pv mpv = e_assign_real mpv pv in
+  let assign pv = on_value (assign pv) me in
+  on_value assign e
 
 (*
   - A "proper type" of a vty [v] is [v] with empty specification

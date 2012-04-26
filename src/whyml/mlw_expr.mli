@@ -122,7 +122,7 @@ and expr_node = private
   | Elet    of let_defn * expr
   | Erec    of rec_defn list * expr
   | Eif     of pvsymbol * expr * expr
-  | Eassign of pvsymbol * pvsymbol (* mutable pv <- expr *)
+  | Eassign of pvsymbol * region * pvsymbol (* mutable pv <- expr *)
   | Eany
 
 and let_defn = private {
@@ -161,9 +161,6 @@ val e_value : pvsymbol -> expr
 val e_arrow : pasymbol -> expr
 
 val e_inst : psymbol -> ity_subst -> expr
-(* FIXME? We store the substitution in the expr as given, though it could
-   be restricted to type variables and regions (both top and subordinate)
-   of ps_vta.vta_tvs/regs. *)
 
 exception ValueExpected of expr
 exception ArrowExpected of expr
@@ -185,6 +182,10 @@ exception StaleRegion of region * ident * expr
 val e_let : let_defn -> expr -> expr
 
 val e_if : expr -> expr -> expr -> expr
+
+exception Immutable of pvsymbol
+
+val e_assign : expr -> expr -> expr
 
 (* TODO: when should we check for escaping identifiers (regions?)
    in pre/post/xpost/effects? Here or in WP? *)

@@ -383,6 +383,7 @@ let create_itysymbol name ?(abst=false) ?(priv=false) args regs def =
 
 let ity_int  = ity_of_ty Ty.ty_int
 let ity_bool = ity_of_ty Ty.ty_bool
+let ity_unit = ity_of_ty (Ty.ty_tuple [])
 
 (** computation types (with effects) *)
 
@@ -446,7 +447,10 @@ let eff_assign e r ty =
   let e = eff_write e r in
   let sub = ity_match ity_subst_empty r.reg_ity ty in
   (* assignment cannot instantiate type variables *)
-  if not (Mtv.is_empty sub.ity_subst_tv) then
+  let check tv ity = match ity.ity_node with
+    | Ityvar tv' -> tv_equal tv tv'
+    | _ -> false in
+  if not (Mtv.for_all check sub.ity_subst_tv) then
     raise (TypeMismatch (r.reg_ity,ty));
   (* r:t[r1,r2] <- t[r1,r1] introduces an alias *)
   let add_right _ v s = Sreg.add_new (IllegalAlias v) v s in
@@ -455,7 +459,7 @@ let eff_assign e r ty =
   let add_right k v m = if reg_equal k v then m else Mreg.add v None m in
   let reset = Mreg.fold add_right sub.ity_subst_reg Mreg.empty in
   (* ...except those which occur on the lhs : they are preserved under r *)
-  let add_left k v m = if reg_equal k v then m else Mreg.add v (Some r) m in
+  let add_left k v m = if reg_equal k v then m else Mreg.add k (Some r) m in
   let reset = Mreg.fold add_left sub.ity_subst_reg reset in
   { e with eff_resets = Mreg.union join_reset e.eff_resets reset }
 

@@ -129,6 +129,7 @@ val ity_pure : ity -> bool
 
 val ity_int : ity
 val ity_bool : ity
+val ity_unit : ity
 
 exception RegionMismatch of region * region
 exception TypeMismatch of ity * ity
