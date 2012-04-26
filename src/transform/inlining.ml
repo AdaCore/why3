@@ -87,6 +87,8 @@ let fold in_goal notdeft notdeff notls task_hd (env, task) =
 
 (* transformations *)
 
+let inline_label = Ident.create_label "inline"
+
 let meta = Theory.register_meta "inline : no" [Theory.MTlsymbol]
 
 let t ?(use_meta=true) ?(in_goal=false) ~notdeft ~notdeff ~notls =
@@ -126,8 +128,17 @@ let notdeft t = match t.t_node with
 let trivial = t ~use_meta:true ~in_goal:false
   ~notdeft:notdeft ~notdeff:notdeft ~notls:ffalse
 
+(* inline_tagged *)
+
+let tagged =
+   let notdef _ = false in
+   let notls symbol = not (Slab.mem inline_label symbol.ls_name.id_label) in
+   t ~use_meta:true ~in_goal:false
+     ~notdeft:notdef ~notdeff:notdef ~notls:notls
+
 let () =
   Trans.register_transform "inline_all" all;
   Trans.register_transform "inline_goal" goal;
-  Trans.register_transform "inline_trivial" trivial
+  Trans.register_transform "inline_trivial" trivial;
+  Trans.register_transform "inline_tagged" tagged
 
