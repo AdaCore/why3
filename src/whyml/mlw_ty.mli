@@ -127,6 +127,9 @@ val ity_topregions : Sreg.t -> ity -> Sreg.t
 val ity_closed : ity -> bool
 val ity_pure : ity -> bool
 
+val ity_int : ity
+val ity_bool : ity
+
 exception RegionMismatch of region * region
 exception TypeMismatch of ity * ity
 

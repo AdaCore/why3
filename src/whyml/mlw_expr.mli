@@ -172,12 +172,8 @@ exception GhostWrite of expr * region
 exception GhostRaise of expr * xsymbol
 (* a ghost expression writes in a non-ghost region or raises an exception *)
 
-val e_app : pasymbol -> pvsymbol -> expr
-
-val e_eapp : expr -> expr list -> expr
-
+val e_app : expr -> expr list -> expr
 val e_lapp : lsymbol -> expr list -> ity -> expr
-
 val e_plapp : plsymbol -> expr list -> ity -> expr
 
 val create_let_defn : preid -> expr -> let_defn
@@ -188,15 +184,8 @@ exception StaleRegion of region * ident * expr
 
 val e_let : let_defn -> expr -> expr
 
+val e_if : expr -> expr -> expr -> expr
+
 (* TODO: when should we check for escaping identifiers (regions?)
    in pre/post/xpost/effects? Here or in WP? *)
 
-(*
-val lapp : lsymbol -> expr list -> expr
-val papp : psymbol -> expr list -> expr
-val app : expr -> expr -> expr
-val plet : psymbol -> expr -> expr -> expr
-val pletrec : recfun list -> expr -> expr
-val pfun : lambda -> expr
-val assign : expr -> psymbol -> expr -> expr
-*)

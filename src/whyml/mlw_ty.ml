@@ -381,6 +381,9 @@ let create_itysymbol name ?(abst=false) ?(priv=false) args regs def =
     its_abst  = abst;
     its_priv  = priv }
 
+let ity_int  = ity_of_ty Ty.ty_int
+let ity_bool = ity_of_ty Ty.ty_bool
+
 (** computation types (with effects) *)
 
 (* exception symbols *)
