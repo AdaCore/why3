@@ -27,10 +27,8 @@ open Mlw_ty
 (** program variables *)
 
 type pvsymbol = {
-  pv_vs   : vsymbol; (* has a dummy type if pv_vty is an arrow *)
-  pv_vty  : vty;
-  pv_tvs  : Stv.t;
-  pv_regs : Sreg.t;
+  pv_vs  : vsymbol;
+  pv_vtv : vty_value;
 }
 
 module Pv = Util.StructMake (struct
@@ -45,21 +43,17 @@ let pv_equal : pvsymbol -> pvsymbol -> bool = (==)
 
 let create_pvsymbol id vtv = {
   pv_vs   = create_vsymbol id (ty_of_ity vtv.vtv_ity);
-  pv_vty  = VTvalue vtv;
-  pv_tvs  = vtv.vtv_tvs;
-  pv_regs = vtv.vtv_regs;
+  pv_vtv  = vtv;
 }
 
-exception ValueExpected of pvsymbol
-exception ArrowExpected of pvsymbol
+type pasymbol = {
+  pa_name : ident;
+  pa_vta  : vty_arrow;
+  pa_tvs  : Stv.t;
+  pa_regs : Sreg.t;
+}
 
-let vtv_of_pv pv = match pv.pv_vty with
-  | VTvalue vtv -> vtv
-  | VTarrow _ -> raise (ValueExpected pv)
-
-let vta_of_pv pv = match pv.pv_vty with
-  | VTarrow vta -> vta
-  | VTvalue _ -> raise (ArrowExpected pv)
+let pa_equal : pasymbol -> pasymbol -> bool = (==)
 
 (** program symbols *)
 
@@ -105,11 +99,6 @@ type pre   = term (* precondition *)
 type post  = term (* postcondition *)
 type xpost = (vsymbol * post) Mexn.t (* exceptional postconditions *)
 
-type variant = {
-  v_term : term;           (* : tau *)
-  v_rel  : lsymbol option; (* tau tau : prop *)
-}
-
 type expr = {
   e_node   : expr_node;
   e_vty    : vty;
@@ -122,9 +111,9 @@ type expr = {
 
 and expr_node =
   | Elogic  of term
-  | Evar    of pvsymbol
-  | Esym    of psymbol * ity_subst
-  | Eapp    of pvsymbol * pvsymbol
+  | Earrow  of pasymbol
+  | Einst   of psymbol * ity_subst
+  | Eapp    of pasymbol * pvsymbol
   | Elet    of let_defn * expr
   | Erec    of rec_defn list * expr
   | Eif     of pvsymbol * expr * expr
@@ -132,13 +121,17 @@ and expr_node =
   | Eany
 
 and let_defn = {
-  ld_pv   : pvsymbol;
-  ld_expr : expr;
+  let_var  : let_var;
+  let_expr : expr;
 }
 
+and let_var =
+  | LetV of pvsymbol
+  | LetA of pasymbol
+
 and rec_defn = {
-  rd_ps     : psymbol;
-  rd_lambda : lambda;
+  rec_ps     : psymbol;
+  rec_lambda : lambda;
 }
 
 and lambda = {
@@ -149,6 +142,12 @@ and lambda = {
   l_post    : post;
   l_xpost   : xpost;
 }
+
+and variant = {
+  v_term : term;           (* : tau *)
+  v_rel  : lsymbol option; (* tau tau : prop *)
+}
+
 
 (* smart constructors *)
 
@@ -172,8 +171,11 @@ let e_dummy node vty = {
   e_loc    = None;
 }
 
-let add_pv_tvs s pv  = Mid.add pv.pv_vs.vs_name pv.pv_tvs s
-let add_pv_regs s pv = Mid.add pv.pv_vs.vs_name pv.pv_regs s
+let add_pv_tvs s pv  = Mid.add pv.pv_vs.vs_name pv.pv_vtv.vtv_tvs s
+let add_pv_regs s pv = Mid.add pv.pv_vs.vs_name pv.pv_vtv.vtv_regs s
+
+let add_pa_tvs s pa  = Mid.add pa.pa_name pa.pa_tvs s
+let add_pa_regs s pa = Mid.add pa.pa_name pa.pa_regs s
 
 let add_expr_tvs m e =
   Mid.union (fun _ s1 s2 -> Some (Stv.union s1 s2)) m e.e_tvs
@@ -181,22 +183,23 @@ let add_expr_tvs m e =
 let add_expr_regs m e =
   Mid.union (fun _ s1 s2 -> Some (Sreg.union s1 s2)) m e.e_regs
 
-let e_var pv =
-  let node = match pv.pv_vty with
-    | VTarrow _ -> Evar pv
-    | VTvalue _ -> Elogic (t_var pv.pv_vs)
-  in
-  { (e_dummy node pv.pv_vty) with
+let e_value pv =
+  { (e_dummy (Elogic (t_var pv.pv_vs)) (VTvalue pv.pv_vtv)) with
     e_tvs  = add_pv_tvs Mid.empty pv;
     e_regs = add_pv_regs Mid.empty pv; }
 
-let e_sym ps sbs =
+let e_arrow pa =
+  { (e_dummy (Earrow pa) (VTarrow pa.pa_vta)) with
+    e_tvs  = add_pa_tvs Mid.empty pa;
+    e_regs = add_pa_regs Mid.empty pa; }
+
+let e_inst ps sbs =
   let vty =
     if not (Mtv.is_empty sbs.ity_subst_tv && Mreg.is_empty sbs.ity_subst_reg)
     then VTarrow (vta_full_inst (ity_subst_union ps.ps_subst sbs) ps.ps_vta)
     else VTarrow ps.ps_vta
   in
-  { (e_dummy (Esym (ps,sbs)) vty) with
+  { (e_dummy (Einst (ps,sbs)) vty) with
     e_tvs  = Mid.singleton ps.ps_name ps.ps_tvs;
     e_regs = Mid.singleton ps.ps_name ps.ps_regs; }
   (* we only count the fixed type variables and regions of ps, so that
@@ -216,35 +219,34 @@ let ghost_effect e =
     else e
   else e
 
-let e_app pvf pva =
-  let eff,vty = vty_app_arrow (vta_of_pv pvf) (vtv_of_pv pva) in
-  ghost_effect { (e_dummy (Eapp (pvf,pva)) vty) with
+let e_app pa pv =
+  let eff,vty = vty_app_arrow pa.pa_vta pv.pv_vtv in
+  ghost_effect { (e_dummy (Eapp (pa,pv)) vty) with
     e_effect = eff;
-    e_tvs    = add_pv_tvs (add_pv_tvs Mid.empty pvf) pva;
-    e_regs   = add_pv_regs (add_pv_regs Mid.empty pvf) pva; }
-
-let ts_dummy = create_tysymbol (id_fresh "arrow_dummy") [] None
-let ty_dummy = ty_app ts_dummy []
+    e_tvs    = add_pv_tvs (add_pa_tvs Mid.empty pa) pv;
+    e_regs   = add_pv_regs (add_pa_regs Mid.empty pa) pv; }
 
 let create_let_defn id e =
-  let pv = match e.e_vty with
-    | VTvalue vtv ->
-        create_pvsymbol id vtv
-    | VTarrow vta ->
-        { pv_vs   = create_vsymbol id ty_dummy;
-          pv_vty  = e.e_vty;
-          pv_tvs  = Mid.fold (fun _ -> Stv.union)  e.e_tvs  vta.vta_tvs;
-          pv_regs = Mid.fold (fun _ -> Sreg.union) e.e_regs vta.vta_regs; }
+  let lv = match e.e_vty with
+    | VTvalue vtv -> LetV (create_pvsymbol id vtv)
+    | VTarrow vta -> LetA {
+        pa_name = Ident.id_register id;
+        pa_vta  = vta;
+        pa_tvs  = Mid.fold (fun _ -> Stv.union)  e.e_tvs  vta.vta_tvs;
+        pa_regs = Mid.fold (fun _ -> Sreg.union) e.e_regs vta.vta_regs; }
   in
-  { ld_pv = pv ; ld_expr = e }
+  { let_var = lv ; let_expr = e }
 
 exception StaleRegion of region * ident * expr
 
-let e_let ld e =
-  let { ld_pv = pv ; ld_expr = d } = ld in
+let e_let ({ let_var = lv ; let_expr = d } as ld) e =
   let eff = d.e_effect in
-  let tvs = Mid.remove pv.pv_vs.vs_name e.e_tvs in
-  let regs = Mid.remove pv.pv_vs.vs_name e.e_regs in
+  let id = match lv with
+    | LetV pv -> pv.pv_vs.vs_name
+    | LetA pa -> pa.pa_name
+  in
+  let tvs = Mid.remove id e.e_tvs in
+  let regs = Mid.remove id e.e_regs in
   (* If we reset some region in the first expression d, then it may only
      pccur in the second expression e in association to pv. Otherwise,
      this is a freshness violation: some symbol defined earlier carries

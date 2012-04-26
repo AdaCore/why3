@@ -26,31 +26,31 @@ open Mlw_ty
 
 (** program variables *)
 
-(* pvsymbols represent function arguments (then they must be VTvalue's),
-   pattern variables (again, VTvalue) or intermediate computation results
-   introduced by let-expressions. They cannot be type-instantiated. *)
+(* pvsymbols represent function arguments and pattern variables *)
 
 type pvsymbol = private {
-  pv_vs   : vsymbol; (* has a dummy type if pv_vty is an arrow *)
-  pv_vty  : vty;
-  pv_tvs  : Stv.t;
-  pv_regs : Sreg.t;
-  (* If pv_vty is a value, these sets coinside with pv_vty.vty_tvs/regs.
-     If pv_vty is an arrow, we additionally count all type variables
-     and regions of the defining expression, in order to cover effects
-     and specification and not overgeneralize. *)
+  pv_vs  : vsymbol;
+  pv_vtv : vty_value;
 }
 
 val pv_equal : pvsymbol -> pvsymbol -> bool
 
-(* a value-typed pvsymbol to use in function arguments and patterns *)
 val create_pvsymbol : preid -> vty_value -> pvsymbol
 
-exception ValueExpected of pvsymbol
-exception ArrowExpected of pvsymbol
+(* pasymbols represent higher-order intermediate computation results
+   introduced by let-expressions. They cannot be type-instantiated. *)
 
-val vtv_of_pv : pvsymbol -> vty_value
-val vta_of_pv : pvsymbol -> vty_arrow
+type pasymbol = private {
+  pa_name : ident;
+  pa_vta  : vty_arrow;
+  pa_tvs  : Stv.t;
+  pa_regs : Sreg.t;
+  (* these sets contain pa_vta.vta_tvs/regs together with all type
+     variables and regions of the defining expression, in order to
+     cover effects and specification and not overgeneralize *)
+}
+
+val pa_equal : pasymbol -> pasymbol -> bool
 
 (** program symbols *)
 
@@ -103,11 +103,6 @@ type pre   = term (* precondition *)
 type post  = term (* postcondition *)
 type xpost = (vsymbol * post) Mexn.t (* exceptional postconditions *)
 
-type variant = {
-  v_term : term;           (* : tau *)
-  v_rel  : lsymbol option; (* tau tau : prop *)
-}
-
 type expr = private {
   e_node   : expr_node;
   e_vty    : vty;
@@ -120,9 +115,9 @@ type expr = private {
 
 and expr_node = private
   | Elogic  of term
-  | Evar    of pvsymbol
-  | Esym    of psymbol * ity_subst
-  | Eapp    of pvsymbol * pvsymbol
+  | Earrow  of pasymbol
+  | Einst   of psymbol * ity_subst
+  | Eapp    of pasymbol * pvsymbol
   | Elet    of let_defn * expr
   | Erec    of rec_defn list * expr
   | Eif     of pvsymbol * expr * expr
@@ -130,13 +125,17 @@ and expr_node = private
   | Eany
 
 and let_defn = private {
-  ld_pv   : pvsymbol;
-  ld_expr : expr;
+  let_var  : let_var;
+  let_expr : expr;
 }
 
+and let_var =
+  | LetV of pvsymbol
+  | LetA of pasymbol
+
 and rec_defn = private {
-  rd_ps     : psymbol;
-  rd_lambda : lambda;
+  rec_ps     : psymbol;
+  rec_lambda : lambda;
 }
 
 and lambda = {
@@ -148,14 +147,19 @@ and lambda = {
   l_xpost   : xpost;
 }
 
+and variant = {
+  v_term : term;           (* : tau *)
+  v_rel  : lsymbol option; (* tau tau : prop *)
+}
+
 val e_label : ?loc:Loc.position -> Slab.t -> expr -> expr
 val e_label_add : label -> expr -> expr
 val e_label_copy : expr -> expr -> expr
 
-val e_var : pvsymbol -> expr
-(* produces Elogic if a value or Evar if an arrow *)
+val e_value : pvsymbol -> expr
+val e_arrow : pasymbol -> expr
 
-val e_sym : psymbol -> ity_subst -> expr
+val e_inst : psymbol -> ity_subst -> expr
 (* FIXME? We store the substitution in the expr as given, though it could
    be restricted to type variables and regions (both top and subordinate)
    of ps_vta.vta_tvs/regs. *)
@@ -164,7 +168,7 @@ exception GhostWrite of expr * region
 exception GhostRaise of expr * xsymbol
 (* a ghost expression writes in a non-ghost region or raises an exception *)
 
-val e_app : pvsymbol -> pvsymbol -> expr
+val e_app : pasymbol -> pvsymbol -> expr
 
 val create_let_defn : preid -> expr -> let_defn
 

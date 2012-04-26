@@ -50,7 +50,7 @@ let print_reg fmt reg =
     (id_unique rprinter reg.reg_name)
 
 let print_pv fmt pv =
-  fprintf fmt "%s%a" (if vty_ghost pv.pv_vty then "?" else "")
+  fprintf fmt "%s%a" (if pv.pv_vtv.vtv_ghost then "?" else "")
     print_vs pv.pv_vs
 
 let forget_pv pv = forget_var pv.pv_vs

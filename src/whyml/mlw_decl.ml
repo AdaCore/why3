@@ -81,7 +81,7 @@ let create_data_decl tdl =
   let projections = Hid.create 17 in (* id -> plsymbol *)
   let build_constructor its (id,al) =
     (* check well-formedness *)
-    let vtvs = List.map (fun (pv,_) -> vtv_of_pv pv) al in
+    let vtvs = List.map (fun (pv,_) -> pv.pv_vtv) al in
     let tvs = List.fold_right Stv.add its.its_args Stv.empty in
     let regs = List.fold_right Sreg.add its.its_regs Sreg.empty in
     let check_tv tv =
@@ -107,7 +107,7 @@ let create_data_decl tdl =
       pls
     in
     let build_proj (pv,pj) =
-      let vtv = vtv_of_pv pv in
+      let vtv = pv.pv_vtv in
       syms := ity_s_fold syms_its syms_ts !syms vtv.vtv_ity;
       if pj then Some (build_proj pv.pv_vs.vs_name vtv) else None
     in

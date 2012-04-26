@@ -232,7 +232,7 @@ let add_types uc tdl =
                 | Some id ->
                     try
                       let pv = Hashtbl.find projs id.id in
-                      let ty = (vtv_of_pv pv).vtv_ity in
+                      let ty = pv.pv_vtv.vtv_ity in
                       (* once we have ghost/mutable fields in algebraics,
                          don't forget to check here that they coincide, too *)
                       ignore (Loc.try3 id.id_loc ity_match sbs ty ity);
@@ -319,7 +319,7 @@ let add_types uc tdl =
               | Some id ->
                   try
                     let pv = Hashtbl.find projs id.id in
-                    let ty = (vtv_of_pv pv).vtv_ity in
+                    let ty = pv.pv_vtv.vtv_ity in
                     (* once we have ghost/mutable fields in algebraics,
                        don't forget to check here that they coincide, too *)
                     Loc.try2 id.id_loc ity_equal_check ty ity;
@@ -353,7 +353,7 @@ let add_types uc tdl =
     option_apply false check ts.its_def
   in
   let check (pv,_) =
-    let vtv = vtv_of_pv pv in
+    let vtv = pv.pv_vtv in
     vtv.vtv_ghost || vtv.vtv_mut <> None || check vtv.vtv_ity in
   let is_impure_data (ts,csl) =
     is_impure_type ts ||
