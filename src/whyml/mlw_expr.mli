@@ -101,7 +101,12 @@ val create_plsymbol : preid -> vty_value list -> vty_value -> plsymbol
 
 type pre   = term (* precondition *)
 type post  = term (* postcondition *)
-type xpost = (vsymbol * post) Mexn.t (* exceptional postconditions *)
+type xpost = post Mexn.t (* exceptional postconditions *)
+
+(* NOTE: postconditions (both post and xpost) are epsilon-terms, where
+   the bound variable is, respectively, "result" or throwed value.
+   In the final version of API, we might want to make post an abstract
+   type with appropriate close (=bind) and open functions. *)
 
 type expr = private {
   e_node   : expr_node;
@@ -137,6 +142,8 @@ and let_var =
 and rec_defn = private {
   rec_ps     : psymbol;
   rec_lambda : lambda;
+  rec_tvs    : Stv.t Mid.t;
+  rec_regs   : Sreg.t Mid.t;
 }
 
 and lambda = {
@@ -174,12 +181,14 @@ val e_lapp : lsymbol -> expr list -> ity -> expr
 val e_plapp : plsymbol -> expr list -> ity -> expr
 
 val create_let_defn : preid -> expr -> let_defn
+val create_fun_defn : preid -> lambda -> rec_defn
 
 exception StaleRegion of region * ident * expr
 (* a previously reset region is associated to an ident occurring in expr.
    In other terms, freshness violation. *)
 
 val e_let : let_defn -> expr -> expr
+val e_rec : rec_defn list -> expr -> expr
 
 val e_if : expr -> expr -> expr -> expr
 

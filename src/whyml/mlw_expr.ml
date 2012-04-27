@@ -89,7 +89,7 @@ let create_plsymbol id args value =
 
 type pre   = term (* precondition *)
 type post  = term (* postcondition *)
-type xpost = (vsymbol * post) Mexn.t (* exceptional postconditions *)
+type xpost = post Mexn.t (* exceptional postconditions *)
 
 type expr = {
   e_node   : expr_node;
@@ -125,6 +125,8 @@ and let_var =
 and rec_defn = {
   rec_ps     : psymbol;
   rec_lambda : lambda;
+  rec_tvs    : Stv.t Mid.t;
+  rec_regs   : Sreg.t Mid.t;
 }
 
 and lambda = {
@@ -273,6 +275,62 @@ let e_let ({ let_var = lv ; let_expr = d } as ld) e =
   let regs = add_expr_regs regs d in
   let eff = eff_union d.e_effect e.e_effect in
   mk_expr (Elet (ld,e)) e.e_vty eff tvs regs
+
+let create_fun_defn id lam =
+  (* sanity check *)
+  if lam.l_variant <> [] then
+    Loc.errorm "Variants are not allowed in a non-recursive definition";
+  (* compute rec_tvs and rec_regs *)
+  let tyvars s = Util.def_option Stv.empty s in
+  let add vs s = Some (ty_freevars (tyvars s) vs.vs_ty) in
+  let add vs _ m = Mid.change (add vs) vs.vs_name m in
+  let add_term_tvs t m = Mvs.fold add t.t_vars m in
+  let remove_pv m pv = Mid.remove pv.pv_vs.vs_name m in
+  let rectvs = lam.l_expr.e_tvs in
+  let rectvs = add_term_tvs lam.l_pre rectvs in
+  let rectvs = add_term_tvs lam.l_post rectvs in
+  let rectvs = Mexn.fold (fun _ -> add_term_tvs) lam.l_xpost rectvs in
+  let rectvs = List.fold_left remove_pv rectvs lam.l_args in
+  let recregs = List.fold_left remove_pv lam.l_expr.e_regs lam.l_args in
+  (* compute rec_ps.ps_tvs/regs/subst *)
+  let tvs = Mid.fold (fun _ -> Stv.union) rectvs Stv.empty in
+  let regs = Mid.fold (fun _ -> Sreg.union) recregs Sreg.empty in
+  let fix_tv tv subst = let ty = ity_var tv in ity_match subst ty ty in
+  let fix_reg reg subst = reg_match subst reg reg in
+  let subst = Stv.fold fix_tv tvs ity_subst_empty in
+  let subst = Sreg.fold fix_reg regs subst in
+  (* compute rec_ps.ps_vta *)
+  let e = lam.l_expr in
+  let arg, argl = match List.rev lam.l_args with
+    | [] -> Loc.errorm "Empty argument list"
+    | arg::argl -> arg, argl in
+  let vta = vty_arrow arg.pv_vtv ~effect:e.e_effect e.e_vty in
+  let add_arg vta pv = vty_arrow pv.pv_vtv (VTarrow vta) in
+  let vta = List.fold_left add_arg vta argl in
+  (* construct rec_ps and rec_defn *)
+  let ps = {
+    ps_name  = id_register id;
+    ps_vta   = vta;
+    ps_tvs   = tvs;
+    ps_regs  = regs;
+    ps_subst = subst; }
+  in {
+    rec_ps     = ps;
+    rec_lambda = lam;
+    rec_tvs    = rectvs;
+    rec_regs   = recregs; }
+
+let e_rec rdl e =
+  let add_tvs m rd =
+    Mid.union (fun _ s1 s2 -> Some (Stv.union s1 s2)) m rd.rec_tvs in
+  let add_regs m rd =
+    Mid.union (fun _ s1 s2 -> Some (Sreg.union s1 s2)) m rd.rec_regs in
+  let tvs = List.fold_left add_tvs e.e_tvs rdl in
+  let regs = List.fold_left add_regs e.e_regs rdl in
+  let remove_ps m rd = Mid.remove rd.rec_ps.ps_name m in
+  let tvs = List.fold_left remove_ps tvs rdl in
+  let regs = List.fold_left remove_ps regs rdl in
+  mk_expr (Erec (rdl,e)) e.e_vty e.e_effect tvs regs
 
 exception ValueExpected of expr
 exception ArrowExpected of expr

@@ -143,6 +143,8 @@ val ity_subst_empty : ity_subst
 
 val ity_match : ity_subst -> ity -> ity -> ity_subst
 
+val reg_match : ity_subst -> region -> region -> ity_subst
+
 val ity_equal_check : ity -> ity -> unit
 
 val ity_subst_union : ity_subst -> ity_subst -> ity_subst
