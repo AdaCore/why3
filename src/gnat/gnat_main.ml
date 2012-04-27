@@ -2,54 +2,77 @@ open Why3
 open Term
 open Ident
 
-let rec extract_explanation expl gnat subp line s =
-   if Slab.is_empty s then expl, gnat, subp, line
-   else
-      let x = Slab.choose s in
-      let rest = Slab.remove x s in
-      let x = x.lab_string in
-      if Gnat_util.starts_with x "expl:" then
-         let s = String.sub x 5 (String.length x - 5) in
-         extract_explanation s gnat subp line rest
-      else if Gnat_util.starts_with x "gnatprove:" then
-         let l = Util.colon_split x in
-         let gnat, subp, line =
-            match l with
-            | [_;gnat; subp; line] -> gnat, subp, int_of_string line
-            | _ -> gnat, subp, line in
-         extract_explanation expl gnat subp line rest
-      else
-         extract_explanation expl gnat subp line rest
+type loc  = { file : string; line : int ; col : int }
 
-let extract_explanation set =
-   extract_explanation "" "" "" 0 set
+
+type my_expl =
+   { mutable loc : Gnat_expl.loc option ;
+     mutable reason : Gnat_expl.reason option ;
+     mutable subp : Gnat_expl.loc option }
+
+let extract_explanation s =
+   (* We start with an empty record; We fill it up by iterating over all labels
+      of the node. If the record is entirely filled, we return it; otherwise we
+      return "None" *)
+   let b = { loc = None; reason = None; subp = None } in
+   Slab.iter
+     (fun x ->
+        let s = x.lab_string in
+        if Gnat_util.starts_with s "GP_" then
+           match Util.colon_split s with
+           | ["GP_Reason"; reason] ->
+                 b.reason <- Some (Gnat_expl.reason_from_string reason)
+           | ["GP_Subp"; file; line] ->
+                 b.subp <-
+                    Some (Gnat_expl.mk_loc_line file (int_of_string line))
+           | ["GP_Sloc"; file; line; col] ->
+                 b.loc <-
+                    Some (Gnat_expl.mk_loc file (int_of_string line)
+                          (int_of_string col))
+           | _ ->
+                 Gnat_util.abort_with_message
+                     "found malformed GNATprove label"
+     ) s;
+     (* We potentially need to rectify in the case of loop invariants: We need
+        to check whether the VC is for initialization or preservation *)
+     if b.reason = Some Gnat_expl.VC_Loop_Invariant then begin
+        Slab.iter (fun x ->
+           let s = x.lab_string in
+           if Gnat_util.starts_with s "expl:" then
+              if s = "expl:loop invariant init" then
+                 b.reason <- Some Gnat_expl.VC_Loop_Invariant_Init
+              else
+                 b.reason <- Some Gnat_expl.VC_Loop_Invariant_Preserv) s
+     end;
+     match b with
+     | { loc = Some sloc ; reason = Some reason; subp = Some subp } ->
+           Some (Gnat_expl.mk_expl reason sloc subp)
+     | _ ->
+           None
 
 let rec search_labels acc f =
-   if acc <> None then acc
-   else
-      let expl, gnat, subp, line = extract_explanation f.t_label in
-      if gnat <> "" then begin
-         let pos = Util.of_option f.t_loc in
-         Some (Gnat_expl.expl_from_label_info pos gnat expl subp line)
-      end else
-         match f.t_node with
-         | Ttrue | Tfalse | Tconst _ | Tvar _ | Tapp _  -> None
-         | Tif (_,t1,t2) ->
-               search_labels (search_labels acc t1) t2
-         | Tcase (_, tbl) ->
-               List.fold_left (fun acc b ->
-                  let _, t = t_open_branch b in
-                  search_labels acc t) acc tbl
-         | Tnot t -> search_labels acc t
-         | Tbinop (Timplies,_,t2) ->
-               search_labels acc t2
-         | Tbinop (_,t1,t2) -> search_labels (search_labels acc t1) t2
-         | Tlet (_,tb) | Teps tb ->
-               let _, t = t_open_bound tb in
-               search_labels acc t
-         | Tquant (_,tq) ->
-               let _,_,t = t_open_quant tq in
-               search_labels acc t
+   let acc =
+      match extract_explanation f.t_label with
+      | Some e -> e :: acc
+      | None -> acc in
+   match f.t_node with
+   | Ttrue | Tfalse | Tconst _ | Tvar _ | Tapp _  -> acc
+   | Tif (_,t1,t2) ->
+         search_labels (search_labels acc t1) t2
+   | Tcase (_, tbl) ->
+         List.fold_left (fun acc b ->
+            let _, t = t_open_branch b in
+            search_labels acc t) acc tbl
+   | Tnot t -> search_labels acc t
+   | Tbinop (Timplies,_,t2) ->
+         search_labels acc t2
+   | Tbinop (_,t1,t2) -> search_labels (search_labels acc t1) t2
+   | Tlet (_,tb) | Teps tb ->
+         let _, t = t_open_bound tb in
+         search_labels acc t
+   | Tquant (_,tq) ->
+         let _,_,t = t_open_quant tq in
+         search_labels acc t
 
 type key = int
 type goal = key Session.goal
@@ -278,13 +301,13 @@ let rec is_trivial_autogen fml =
 let register_goal goal =
    let task = Session.goal_task goal in
    let fml = Task.task_goal_fmla task in
-   match is_trivial_autogen fml, search_labels None fml with
+   match is_trivial_autogen fml, search_labels [] fml with
    | true, _ ->
          Objectives.set_not_interesting goal
-   | _, None ->
+   | _, [] ->
          Gnat_util.abort_with_message
          "Task has no tracability label."
-   | _, Some e ->
+   | _, e :: _ ->
          Objectives.add_to_expl e goal
 
 

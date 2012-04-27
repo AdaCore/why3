@@ -29,6 +29,8 @@ let expl_equal e1 e2 =
 let expl_hash e =
    Hashcons.combine (Hashtbl.hash e.loc) (Hashtbl.hash e.reason)
 
+let mk_expl reason sloc subp_sloc =
+   { reason = reason; loc = sloc; subp = subp_sloc }
 
 let reason_from_string s =
    match s with
@@ -80,22 +82,6 @@ let to_filename expl =
 let loc_of_pos l =
    let f,l,c,_ = Loc.get l in
    { file = f; line = l; col = c }
-
-let expl_from_label_info pos gnat_expl why_expl subp line =
-   let loc = loc_of_pos pos in
-   let subp_loc = mk_loc_line subp line in
-   let reason = reason_from_string gnat_expl in
-   let reason =
-      if reason = VC_Loop_Invariant then
-         if why_expl = "loop invariant init" then
-            VC_Loop_Invariant_Init
-         else if why_expl = "loop invariant preservation" then
-            VC_Loop_Invariant_Preserv
-         else
-            assert false
-      else
-         reason in
-   { loc = loc ; reason = reason; subp = subp_loc }
 
 let print_loc fmt l =
    Format.fprintf fmt "%s:%d:%d" l.file l.line l.col

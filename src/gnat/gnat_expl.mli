@@ -12,8 +12,7 @@ type reason =
 
 type expl
 
-val expl_from_label_info :
-   Why3.Loc.position -> string -> string -> string -> int -> expl
+val reason_from_string : string -> reason
 
 val print_expl : bool -> Format.formatter -> expl -> unit
 
@@ -23,6 +22,8 @@ val to_filename : expl -> string
 (* print a representation of an explanation that could serve as a filename *)
 
 type loc
+
+val mk_expl : reason -> loc -> loc -> expl
 
 val mk_loc : string -> int -> int -> loc
 val mk_loc_line : string -> int -> loc
