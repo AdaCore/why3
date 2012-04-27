@@ -8,8 +8,8 @@
   version="0.94"/>
  <prover
   id="1"
-  name="Gappa"
-  version="0.16.0"/>
+  name="Coq"
+  version="8.3pl3"/>
  <prover
   id="2"
   name="Z3"
@@ -20,19 +20,19 @@
   version="3.2"/>
  <file
   name="../neg_as_xor.why"
-  verified="false"
+  verified="true"
   expanded="true">
   <theory
    name="TestNegAsXOR"
    locfile="neg_as_xor/../neg_as_xor.why"
    loclnum="2" loccnumb="7" loccnume="19"
-   verified="false"
+   verified="true"
    expanded="true">
    <goal
     name="Nth_j"
     locfile="neg_as_xor/../neg_as_xor.why"
     loclnum="13" loccnumb="8" loccnume="13"
-    sum="965258186766d86070ff1726bee244ea"
+    sum="7ec4d7915c10debbadd32a08b1bba541"
     proved="true"
     expanded="false"
     shape="ainfix =anthajV0aFalseIainfix &lt;=V0c62Aainfix &lt;=c0V0F">
@@ -42,14 +42,14 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.11"/>
+     <result status="valid" time="0.13"/>
     </proof>
    </goal>
    <goal
     name="sign_of_j"
     locfile="neg_as_xor/../neg_as_xor.why"
     loclnum="15" loccnumb="8" loccnume="17"
-    sum="1c64b0e630c2a38d7393417bfdfdbe92"
+    sum="fa860d7163dfa79ef6d19648db1e3bf3"
     proved="true"
     expanded="false"
     shape="ainfix =asignajaTrue">
@@ -59,50 +59,17 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.03"/>
+     <result status="valid" time="0.04"/>
     </proof>
    </goal>
    <goal
     name="mantissa_of_j"
     locfile="neg_as_xor/../neg_as_xor.why"
     loclnum="16" loccnumb="8" loccnume="21"
-    sum="8ff70a8adba128f52043432ab27bd6b0"
+    sum="593bd2ae8ac1580cd936f7465278b56a"
     proved="true"
     expanded="false"
     shape="ainfix =amantissaajc0">
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="1.20"/>
-    </proof>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.19"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="4.48"/>
-    </proof>
-   </goal>
-   <goal
-    name="exp_of_j"
-    locfile="neg_as_xor/../neg_as_xor.why"
-    loclnum="17" loccnumb="8" loccnume="16"
-    sum="244a0b7b937457d53646d3048e5dd77b"
-    proved="true"
-    expanded="false"
-    shape="ainfix =aexpajc0">
     <proof
      prover="2"
      timelimit="5"
@@ -121,18 +88,51 @@
     </proof>
     <proof
      prover="3"
+     timelimit="9"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="4.62"/>
+    </proof>
+   </goal>
+   <goal
+    name="exp_of_j"
+    locfile="neg_as_xor/../neg_as_xor.why"
+    loclnum="17" loccnumb="8" loccnume="16"
+    sum="92d1d38910f3800cff767a0156f01ca4"
+    proved="true"
+    expanded="false"
+    shape="ainfix =aexpajc0">
+    <proof
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="5.14"/>
+     <result status="valid" time="1.13"/>
+    </proof>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.20"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="11"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="4.64"/>
     </proof>
    </goal>
    <goal
     name="int_of_bv"
     locfile="neg_as_xor/../neg_as_xor.why"
     loclnum="18" loccnumb="8" loccnume="17"
-    sum="340f6d3f4061e7c6315c5bad017617cc"
+    sum="5720bbc6be0a2fd678d97babf499bd80"
     proved="true"
     expanded="false"
     shape="ainfix =adouble_of_bv64ajc0.0">
@@ -150,7 +150,7 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.06"/>
+     <result status="valid" time="0.05"/>
     </proof>
     <proof
      prover="3"
@@ -165,7 +165,7 @@
     name="MainResultBits"
     locfile="neg_as_xor/../neg_as_xor.why"
     loclnum="20" loccnumb="8" loccnume="22"
-    sum="21e7c417c590651e0794046691bfdbfc"
+    sum="63b7e5215c95e3ef6b230f9d389e494a"
     proved="true"
     expanded="false"
     shape="ainfix =anthabw_xorV0ajV1anthV0V1Iainfix &lt;V1c63Aainfix &lt;=c0V1FF">
@@ -175,14 +175,14 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.10"/>
+     <result status="valid" time="0.11"/>
     </proof>
    </goal>
    <goal
     name="MainResultSign"
     locfile="neg_as_xor/../neg_as_xor.why"
     loclnum="23" loccnumb="8" loccnume="22"
-    sum="7265bbff1bb47fa247395b560672e85c"
+    sum="30826f815867c84380c4207b9e3ab0b6"
     proved="true"
     expanded="false"
     shape="ainfix =anthabw_xorV0ajc63anotbanthV0c63F">
@@ -192,14 +192,14 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.03"/>
+     <result status="valid" time="0.04"/>
     </proof>
    </goal>
    <goal
     name="Sign_of_xor_j"
     locfile="neg_as_xor/../neg_as_xor.why"
     loclnum="25" loccnumb="8" loccnume="21"
-    sum="03216ecf2af4a66b0fd3ccc87b232ae2"
+    sum="c3ffa2aae59ab871686c14e211d573d2"
     proved="true"
     expanded="false"
     shape="ainfix =asignabw_xorV0ajanotbasignV0F">
@@ -232,7 +232,7 @@
     name="Exp_of_xor_j"
     locfile="neg_as_xor/../neg_as_xor.why"
     loclnum="27" loccnumb="8" loccnume="20"
-    sum="75618bdf60050fccb456c9bd88072ee4"
+    sum="bdd1a3dd5cf05477f7cc8de0d890c8c1"
     proved="true"
     expanded="false"
     shape="ainfix =aexpabw_xorV0ajaexpV0F">
@@ -242,7 +242,7 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="1.21"/>
+     <result status="valid" time="1.16"/>
     </proof>
     <proof
      prover="0"
@@ -250,22 +250,22 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="1.42"/>
+     <result status="valid" time="1.38"/>
     </proof>
     <proof
      prover="3"
-     timelimit="5"
+     timelimit="10"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="4.80"/>
+     <result status="valid" time="4.40"/>
     </proof>
    </goal>
    <goal
     name="Mantissa_of_xor_j"
     locfile="neg_as_xor/../neg_as_xor.why"
     loclnum="29" loccnumb="8" loccnume="25"
-    sum="4ee87a7e6133536c2621bcf2ea1b579c"
+    sum="b997d22b0c326c06f927e5cdc38d194e"
     proved="true"
     expanded="false"
     shape="ainfix =amantissaabw_xorV0ajamantissaV0F">
@@ -275,7 +275,7 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="1.14"/>
+     <result status="valid" time="1.17"/>
     </proof>
     <proof
      prover="0"
@@ -283,22 +283,22 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.89"/>
+     <result status="valid" time="0.88"/>
     </proof>
     <proof
      prover="3"
-     timelimit="5"
+     timelimit="10"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="4.53"/>
+     <result status="valid" time="4.86"/>
     </proof>
    </goal>
    <goal
     name="MainResultZero"
     locfile="neg_as_xor/../neg_as_xor.why"
     loclnum="31" loccnumb="8" loccnume="22"
-    sum="84157c2f48db9388525f254a265f0f80"
+    sum="563c0cf0e2af6a9fc62ef235940036ba"
     proved="true"
     expanded="false"
     shape="ainfix =adouble_of_bv64abw_xorV0ajaprefix -.adouble_of_bv64V0Iainfix =amantissaV0c0Aainfix =c0aexpV0F">
@@ -308,81 +308,58 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="1.18"/>
+     <result status="valid" time="1.17"/>
     </proof>
     <proof
      prover="0"
-     timelimit="5"
+     timelimit="6"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="2.68"/>
+     <result status="valid" time="2.63"/>
     </proof>
     <proof
      prover="3"
-     timelimit="5"
+     timelimit="10"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="4.86"/>
+     <result status="valid" time="4.37"/>
     </proof>
    </goal>
    <goal
     name="sign_neg"
     locfile="neg_as_xor/../neg_as_xor.why"
     loclnum="34" loccnumb="8" loccnume="16"
-    sum="fab14a350a99733d2cb870f86091756d"
+    sum="abdf4c8e2fa5fd4e490a8315fd4c9548"
     proved="true"
     expanded="false"
     shape="ainfix =asign_valueanotbasignV0aprefix -.asign_valueasignV0F">
     <proof
      prover="0"
-     timelimit="5"
+     timelimit="9"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="4.21"/>
+     <result status="valid" time="4.28"/>
     </proof>
    </goal>
    <goal
     name="MainResult"
     locfile="neg_as_xor/../neg_as_xor.why"
     loclnum="36" loccnumb="8" loccnume="18"
-    sum="d674700d8e0b7793a621e52d65f50fd6"
-    proved="false"
+    sum="7885f90ac0dd14f66c73365f153f63a2"
+    proved="true"
     expanded="true"
     shape="ainfix =adouble_of_bv64abw_xorV0ajaprefix -.adouble_of_bv64V0Iainfix &lt;aexpV0c2047Aainfix &lt;c0aexpV0F">
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="6.56"/>
-    </proof>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="5.54"/>
-    </proof>
     <proof
      prover="1"
      timelimit="5"
      memlimit="1000"
+     edited="neg_as_xor_TestNegAsXOR_MainResult_1.v"
      obsolete="false"
      archived="false">
-     <result status="unknown" time="0.00"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="5.64"/>
+     <result status="valid" time="1.59"/>
     </proof>
    </goal>
   </theory>

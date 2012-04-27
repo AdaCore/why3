@@ -300,9 +300,6 @@ theory BitVector
   lemma nth_from_int_low_odd:
     forall n:int. mod n 2 <> 0 -> nth (from_int n) 0 = True
 
-  lemma pow2i:
-    forall i:int. i>=0 -> (pow2 i) <>0
-
   lemma nth_from_int_0:
      forall i:int. size > i >= 0 -> nth (from_int 0) i = False
 
@@ -416,6 +413,15 @@ theory TestBv32
 
   goal to_nat_0x00000000:
     to_nat bvzero = 0
+
+  goal to_nat_0x00000001:
+    to_nat (lsr bvone 31) = 1
+
+  goal to_nat_0x00000003:
+    to_nat (lsr bvone 30) = 3
+
+  goal to_nat_0x00000007:
+    to_nat (lsr bvone 29) = 7
 
   goal to_nat_0x0000000F:
     to_nat (lsr bvone 28) = 15

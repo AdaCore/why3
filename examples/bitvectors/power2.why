@@ -13,6 +13,8 @@ theory Pow2int
   lemma Power_sum :
     forall n m: int. n >= 0 /\ m >= 0 -> pow2 (n+m) = pow2 n * pow2 m
 
+  lemma pow2pos: forall i:int. i >= 0 -> pow2 i > 0
+
   lemma pow2_0: pow2 0   =                    1
   lemma pow2_1: pow2 1   =                    2
   lemma pow2_2: pow2 2   =                    4
@@ -79,6 +81,8 @@ theory Pow2int
   lemma pow2_63: pow2 63 =  9223372036854775808
 
 end
+
+
 
 theory Pow2real
 
