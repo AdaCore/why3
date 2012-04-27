@@ -259,7 +259,6 @@ Axiom to_nat_of_zero2 : forall (b:bv) (i:Z) (j:Z), (((j <  size)%Z /\
   (i <  k)%Z) -> ((nth b k) = false)) -> ((to_nat_sub b j
   0%Z) = (to_nat_sub b i 0%Z))).
 
-
 (* Why3 goal *)
 Theorem to_nat_of_zero : forall (b:bv) (i:Z) (j:Z), ((j <  size)%Z /\
   (0%Z <= i)%Z) -> ((forall (k:Z), ((k <= j)%Z /\ (i <= k)%Z) -> ((nth b
