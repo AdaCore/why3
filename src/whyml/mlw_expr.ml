@@ -395,10 +395,15 @@ let e_plapp pls el ity =
           let mut = Util.option_map (reg_full_inst sbs) vtv.vtv_mut in
           let vty = VTvalue (vty_value ~ghost ?mut ity) in
           let eff = eff_full_inst sbs pls.pl_effect in
+(* FIXME? We will need to check later in Mlw_module that all symbols
+   we use are defined: including lsymbols, plsymbols, itysymbols,
+   and tysymbols. We can care about lsymbols and plsymbols here.
+   What should we do about type symbols? *)
+          let tvs = Mid.add pls.pl_ls.ls_name Mtv.empty tvs in
+          let regs = Mid.add pls.pl_ls.ls_name Mreg.empty regs in
           let t = match pls.pl_ls.ls_value with
             | Some _ -> fs_app pls.pl_ls tl (ty_of_ity ity)
-            | None   -> ps_app pls.pl_ls tl
-          in
+            | None   -> ps_app pls.pl_ls tl in
           mk_expr (Elogic t) vty eff tvs regs
       | [],_ | _,[] ->
           raise (Term.BadArity
