@@ -83,9 +83,94 @@ let create_plsymbol id args value =
     pl_effect = effect;
   }
 
-(* TODO: patterns *)
+(** patterns *)
 
-(* program expressions *)
+type ppattern = {
+  ppat_pattern : pattern;
+  ppat_vtv     : vty_value;
+  ppat_effect  : effect;
+}
+
+let ppat_wild vtv =
+  if vtv.vtv_mut <> None then Loc.errorm "Wildcard patterns are immutable";
+  { ppat_pattern = pat_wild (ty_of_ity vtv.vtv_ity);
+    ppat_vtv     = vtv;
+    ppat_effect  = eff_empty; }
+
+let ppat_var pv =
+  { ppat_pattern = pat_var pv.pv_vs;
+    ppat_vtv     = pv.pv_vtv;
+    ppat_effect  = eff_empty; }
+
+let ppat_plapp pls ppl vtv =
+  if vtv.vtv_mut <> None then
+    Loc.errorm "Only variable patterns can be mutable";
+  (* FIXME? Since pls is a constructor, the result type vtv will
+     cover every type variable and region in the signature of pls.
+     Then the following ity_match call is enough to build the full
+     substitution. If, however, we are given a bad pls, say, a
+     projection, then the following code may break with a less
+     than understandable error message. Is it really important? *)
+  let sbs = ity_match ity_subst_empty pls.pl_value.vtv_ity vtv.vtv_ity in
+  let mtch eff arg pp =
+    ignore (ity_match sbs arg.vtv_ity pp.ppat_vtv.vtv_ity);
+    if pp.ppat_vtv.vtv_ghost <> (vtv.vtv_ghost || arg.vtv_ghost) then
+      Loc.errorm "Ghost pattern in a non-ghost context";
+    match arg.vtv_mut, pp.ppat_vtv.vtv_mut with
+      | Some r1, Some r2 ->
+          ignore (reg_match sbs r1 r2);
+          eff_read (eff_union eff pp.ppat_effect) (reg_full_inst sbs r1)
+      | Some r1, None ->
+          eff_read (eff_union eff pp.ppat_effect) (reg_full_inst sbs r1)
+      | None, None ->
+          eff_union eff pp.ppat_effect
+      | None, Some _ ->
+          Loc.errorm "Mutable pattern in a non-mutable position"
+  in
+  let eff = try List.fold_left2 mtch eff_empty pls.pl_args ppl
+    with Invalid_argument _ -> raise
+      (Term.BadArity (pls.pl_ls, List.length pls.pl_args, List.length ppl)) in
+  let pl = List.map (fun pp -> pp.ppat_pattern) ppl in
+  { ppat_pattern = pat_app pls.pl_ls pl (ty_of_ity vtv.vtv_ity);
+    ppat_vtv     = vtv;
+    ppat_effect  = eff; }
+
+let ppat_lapp ls ppl vtv =
+  let pls = {
+    pl_ls     = ls;
+    pl_args   = List.map (fun ty -> vty_value (ity_of_ty ty)) ls.ls_args;
+    pl_value  = vty_value (ity_of_ty (Util.def_option ty_bool ls.ls_value));
+    pl_effect = eff_empty; }
+  in
+  ppat_plapp pls ppl vtv
+
+let ppat_or p1 p2 =
+  ity_equal_check p1.ppat_vtv.vtv_ity p2.ppat_vtv.vtv_ity;
+  if p1.ppat_vtv.vtv_ghost <> p2.ppat_vtv.vtv_ghost then
+    Loc.errorm "Ghost pattern in a non-ghost context";
+  if p1.ppat_vtv.vtv_mut <> None || p2.ppat_vtv.vtv_mut <> None then
+    Loc.errorm "Mutable patterns are not allowed under OR";
+  { ppat_pattern = pat_or p1.ppat_pattern p2.ppat_pattern;
+    ppat_vtv     = p1.ppat_vtv;
+    ppat_effect  = eff_union p1.ppat_effect p2.ppat_effect; }
+
+let ppat_as pp pv =
+  ity_equal_check pp.ppat_vtv.vtv_ity pv.pv_vtv.vtv_ity;
+  if pp.ppat_vtv.vtv_ghost <> pv.pv_vtv.vtv_ghost then
+    Loc.errorm "Ghost pattern in a non-ghost context";
+  let vtv = match pp.ppat_vtv.vtv_mut, pv.pv_vtv.vtv_mut with
+    | Some r1, Some r2 ->
+        if not (reg_equal r1 r2) then raise (RegionMismatch (r1,r2));
+        pp.ppat_vtv (* the two vtv's are identical *)
+    | Some _, None -> pp.ppat_vtv
+    | None, Some _ -> pv.pv_vtv
+    | None, None -> pv.pv_vtv
+  in
+  { ppat_pattern = pat_as pp.ppat_pattern pv.pv_vs;
+    ppat_vtv     = vtv;
+    ppat_effect  = pp.ppat_effect; }
+
+(** program expressions *)
 
 type pre   = term (* precondition *)
 type post  = term (* postcondition *)

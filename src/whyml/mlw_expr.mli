@@ -95,7 +95,20 @@ val create_plsymbol : preid -> vty_value list -> vty_value -> plsymbol
   (* FIXME? Effect calculation is hardwired to correspond to constructors
      and projections: mutable arguments are reset, mutable result is read. *)
 
-(* TODO: patterns *)
+(** patterns *)
+
+type ppattern = private {
+  ppat_pattern : pattern;
+  ppat_vtv     : vty_value;
+  ppat_effect  : effect;
+}
+
+val ppat_wild : vty_value -> ppattern
+val ppat_var : pvsymbol -> ppattern
+val ppat_plapp : plsymbol -> ppattern list -> vty_value -> ppattern
+val ppat_lapp : lsymbol -> ppattern list -> vty_value -> ppattern
+val ppat_or : ppattern -> ppattern -> ppattern
+val ppat_as : ppattern -> pvsymbol -> ppattern
 
 (** program expressions *)
 
