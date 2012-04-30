@@ -30,6 +30,7 @@ val mk_loc_line : string -> int -> loc
 val get_loc : expl -> loc
 val get_subp_loc : expl -> loc
 
+val print_loc : Format.formatter -> loc -> unit
 val equal_line : loc -> loc -> bool
 (* compare two locations by file and line only, ignoring the column *)
 

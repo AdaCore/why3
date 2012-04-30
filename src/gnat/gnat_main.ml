@@ -10,6 +10,11 @@ type my_expl =
      mutable reason : Gnat_expl.reason option ;
      mutable subp : Gnat_expl.loc option }
 
+type node_info =
+   | Expl of Gnat_expl.expl
+   | Sloc of Gnat_expl.loc
+   | No_Info
+
 let extract_explanation s =
    (* We start with an empty record; We fill it up by iterating over all labels
       of the node. If the record is entirely filled, we return it; otherwise we
@@ -46,26 +51,38 @@ let extract_explanation s =
      end;
      match b with
      | { loc = Some sloc ; reason = Some reason; subp = Some subp } ->
-           Some (Gnat_expl.mk_expl reason sloc subp)
+           Expl (Gnat_expl.mk_expl reason sloc subp)
+     | { loc = Some sloc ; reason = _; subp = _ } ->
+           Sloc sloc
      | _ ->
-           None
+           No_Info
+
+type vc_info =
+   { expl : Gnat_expl.expl option; trace : Gnat_expl.loc list }
 
 let rec search_labels acc f =
    let acc =
       match extract_explanation f.t_label with
-      | Some e -> e :: acc
-      | None -> acc in
+      | Expl e ->
+            begin match acc.expl with
+            | Some e_old ->
+                  { expl = Some e;
+                    trace = Gnat_expl.get_loc e_old :: acc.trace }
+            | None -> { expl = Some e; trace = acc.trace }
+            end
+      | Sloc s -> { acc with trace = s :: acc.trace }
+      | No_Info -> acc in
    match f.t_node with
    | Ttrue | Tfalse | Tconst _ | Tvar _ | Tapp _  -> acc
-   | Tif (_,t1,t2) ->
-         search_labels (search_labels acc t1) t2
-   | Tcase (_, tbl) ->
+   | Tif (c,t1,t2) ->
+         search_labels (search_labels (search_labels acc c) t1) t2
+   | Tcase (c, tbl) ->
          List.fold_left (fun acc b ->
             let _, t = t_open_branch b in
-            search_labels acc t) acc tbl
+            search_labels acc t) (search_labels acc c) tbl
    | Tnot t -> search_labels acc t
-   | Tbinop (Timplies,_,t2) ->
-         search_labels acc t2
+   | Tbinop (Timplies,t1,t2) ->
+         search_labels (search_labels acc t1) t2
    | Tbinop (_,t1,t2) -> search_labels (search_labels acc t1) t2
    | Tlet (_,tb) | Teps tb ->
          let _, t = t_open_bound tb in
@@ -73,6 +90,9 @@ let rec search_labels acc f =
    | Tquant (_,tq) ->
          let _,_,t = t_open_quant tq in
          search_labels acc t
+
+let search_labels f =
+   search_labels { expl = None; trace = [] } f
 
 type key = int
 type goal = key Session.goal
@@ -113,7 +133,7 @@ struct
 end
 
 module Objectives : sig
-   val add_to_expl : Gnat_expl.expl -> goal -> unit
+   val add_to_expl : Gnat_expl.expl -> goal -> Gnat_expl.loc list -> unit
    (* Mark goal for proof if in the requested target *)
 
    val add_expl         : Gnat_expl.expl -> unit
@@ -125,6 +145,7 @@ module Objectives : sig
 
    val get_goals : Gnat_expl.expl -> GoalSet.t
    val get_objective : goal -> Gnat_expl.expl
+   val get_trace : goal -> Gnat_expl.loc list
 
    val iter : (Gnat_expl.expl -> GoalSet.t -> unit) -> unit
 
@@ -141,8 +162,11 @@ end = struct
    let goalmap : Gnat_expl.expl GoalMap.t = GoalMap.create 17
    (* maps goals to their objectives *)
 
+   let tracemap : Gnat_expl.loc list GoalMap.t = GoalMap.create 17
+
    let get_goals expl = Gnat_expl.HExpl.find explmap expl
    let get_objective goal = GoalMap.find goalmap goal
+   let get_trace goal = GoalMap.find tracemap goal
 
    let find e =
       try get_goals e
@@ -152,7 +176,7 @@ end = struct
          incr nb_objectives;
          r
 
-   let add_to_expl ex go =
+   let add_to_expl ex go trace_list =
       let filter =
          match Gnat_config.limit_line with
          | Some l -> Gnat_expl.equal_line l (Gnat_expl.get_loc ex)
@@ -165,7 +189,8 @@ end = struct
          incr nb_goals;
          GoalMap.add goalmap go ex;
          let set = find ex in
-         GoalSet.add set go
+         GoalSet.add set go;
+         GoalMap.add tracemap go trace_list
       end
 
    let add_expl e = ignore (find e)
@@ -301,14 +326,14 @@ let rec is_trivial_autogen fml =
 let register_goal goal =
    let task = Session.goal_task goal in
    let fml = Task.task_goal_fmla task in
-   match is_trivial_autogen fml, search_labels [] fml with
+   match is_trivial_autogen fml, search_labels fml with
    | true, _ ->
          Objectives.set_not_interesting goal
-   | _, [] ->
+   | _, { expl = None } ->
          Gnat_util.abort_with_message
          "Task has no tracability label."
-   | _, e :: _ ->
-         Objectives.add_to_expl e goal
+   | _, { expl = Some e ; trace = l } ->
+         Objectives.add_to_expl e goal l
 
 
 let goal_has_been_tried g =
@@ -326,6 +351,7 @@ let goal_has_been_tried g =
 
 module Save_VCs : sig
    val save_vc : goal -> unit
+   val save_trace : goal -> unit
 end = struct
 
    let count_map : (int ref) Gnat_expl.HExpl.t = Gnat_expl.HExpl.create 17
@@ -354,7 +380,17 @@ end = struct
       let cout = open_out vc_fn in
       let fmt  = Format.formatter_of_out_channel cout in
       Driver.print_task dr fmt task;
-      Format.printf "saved VC to %s@." vc_fn
+      Format.printf "saved VC to %s@." vc_fn;
+      close_out cout
+
+   let save_trace goal =
+      let expl = Objectives.get_objective goal in
+      let fn = Gnat_expl.to_filename expl ^ ".trace" in
+      let cout = open_out fn in
+      let fmt  = Format.formatter_of_out_channel cout in
+      List.iter (fun l -> Format.fprintf fmt "%a@." Gnat_expl.print_loc l)
+        (Objectives.get_trace goal);
+      close_out cout
 
 end
 
@@ -399,7 +435,8 @@ let rec handle_vc_result goal result detailed =
          Format.printf " (%a)@." Call_provers.print_prover_answer detailed
       end else begin
          print false (Objectives.get_objective goal)
-      end
+      end;
+      Save_VCs.save_trace goal
    end
 
 and interpret_result pa pas =
@@ -437,7 +474,7 @@ and schedule_goal g =
          handle_vc_result g false None
       end else begin
          actually_schedule_goal g
-      end
+      end;
    end
 
 and actually_schedule_goal g =
