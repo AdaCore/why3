@@ -99,14 +99,12 @@ val create_plsymbol : preid -> vty_value list -> vty_value -> plsymbol
 
 (** program expressions *)
 
-type pre   = term (* precondition *)
-type post  = term (* postcondition *)
+type pre = term          (* precondition *)
+type post                (* postcondition: a formula with a bound variable *)
 type xpost = post Mexn.t (* exceptional postconditions *)
 
-(* NOTE: postconditions (both post and xpost) are epsilon-terms, where
-   the bound variable is, respectively, "result" or throwed value.
-   In the final version of API, we might want to make post an abstract
-   type with appropriate close (=bind) and open functions. *)
+val create_post : vsymbol -> term -> post
+val open_post : post -> vsymbol * term
 
 type expr = private {
   e_node   : expr_node;
@@ -122,7 +120,7 @@ and expr_node = private
   | Elogic  of term
   | Evalue  of pvsymbol
   | Earrow  of pasymbol
-  | Einst   of psymbol * ity_subst
+  | Einst   of psymbol
   | Eapp    of pasymbol * pvsymbol
   | Elet    of let_defn * expr
   | Erec    of rec_defn list * expr

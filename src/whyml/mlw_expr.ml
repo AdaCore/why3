@@ -105,7 +105,7 @@ and expr_node =
   | Elogic  of term
   | Evalue  of pvsymbol
   | Earrow  of pasymbol
-  | Einst   of psymbol * ity_subst
+  | Einst   of psymbol
   | Eapp    of pasymbol * pvsymbol
   | Elet    of let_defn * expr
   | Erec    of rec_defn list * expr
@@ -211,10 +211,7 @@ let e_inst ps sbs =
     then vta_full_inst (ity_subst_union ps.ps_subst sbs) ps.ps_vta
     else ps.ps_vta
   in
-  mk_expr (Einst (ps,sbs)) (VTarrow vta) eff_empty tvs regs
-(* FIXME? We store the substitution in the expr as given, though it could
-   be restricted to type variables and regions (both top and subordinate)
-   of ps_vta.vta_tvs/regs. *)
+  mk_expr (Einst ps) (VTarrow vta) eff_empty tvs regs
 
 let e_app_real pa pv =
   let tvs = add_pv_tvs (add_pa_tvs Mid.empty pa) pv in
@@ -276,8 +273,27 @@ let e_let ({ let_var = lv ; let_expr = d } as ld) e =
   let eff = eff_union d.e_effect e.e_effect in
   mk_expr (Elet (ld,e)) e.e_vty eff tvs regs
 
+let create_post vs f = t_eps_close vs f
+
+let open_post f = match f.t_node with
+  | Teps bf -> t_open_bound bf
+  | _ -> assert false
+
 let create_fun_defn id lam =
   (* sanity check *)
+  if lam.l_pre.t_ty <> None then raise (FmlaExpected lam.l_pre);
+  let check_post ity post =
+    let ty = ty_of_ity ity in
+    if not (ty_equal ty (t_type post)) then
+      raise (Ty.TypeMismatch (ty, t_type post))
+  in
+  begin match lam.l_expr.e_vty with
+    | VTvalue vtv -> check_post vtv.vtv_ity lam.l_post
+    | VTarrow _ -> ()
+    (* FIXME? Should we check that the bound variable does not occur
+       in the postcondition formula when lam.l_expr.e_vty is an arrow? *)
+  end;
+  Mexn.iter (fun xs t -> check_post xs.xs_ity t) lam.l_xpost;
   if lam.l_variant <> [] then
     Loc.errorm "Variants are not allowed in a non-recursive definition";
   (* compute rec_tvs and rec_regs *)
