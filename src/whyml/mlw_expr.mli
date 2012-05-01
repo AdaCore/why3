@@ -138,8 +138,8 @@ and expr_node = private
   | Elet    of let_defn * expr
   | Erec    of rec_defn list * expr
   | Eif     of pvsymbol * expr * expr
+  | Ecase   of pvsymbol * (pattern * expr) list
   | Eassign of pvsymbol * region * pvsymbol (* mutable pv <- expr *)
-  | Eany
 
 and let_defn = private {
   let_var  : let_var;
