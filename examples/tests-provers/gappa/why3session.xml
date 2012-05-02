@@ -8,7 +8,7 @@
   version="0.16.0"/>
  <file
   name="../gappa.why"
-  verified="true"
+  verified="false"
   expanded="true">
   <theory
    name="TestGappa"
@@ -128,8 +128,8 @@
    <goal
     name="Test1"
     locfile="gappa/../gappa.why"
-    loclnum="52" loccnumb="8" loccnume="13"
-    sum="345de352b19b61f5c2777a487b74b999"
+    loclnum="53" loccnumb="8" loccnume="13"
+    sum="2fe71c9c60fb2a1dae0426af19a3174b"
     proved="true"
     expanded="false"
     shape="ainfix &lt;=aabsainfix -avalueaac0.1c0x1.p-53Iainfix =aaarIainfix =avalueararoundaNearestTiesToEvenc0.1">
@@ -145,8 +145,8 @@
    <goal
     name="Test2"
     locfile="gappa/../gappa.why"
-    loclnum="57" loccnumb="8" loccnume="13"
-    sum="4a04f8e7c92503df80076b2020c48f89"
+    loclnum="58" loccnumb="8" loccnume="13"
+    sum="d480649bec039f956c05ad4bccfdf3b8"
     proved="true"
     expanded="false"
     shape="ainfix &lt;=aabsainfix -avalueafc0c0.1c0x1.p-53Iainfix =afc0arIainfix =avalueararoundaNearestTiesToEvenc0.1">
@@ -157,6 +157,64 @@
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
+    name="Test3"
+    locfile="gappa/../gappa.why"
+    loclnum="63" loccnumb="8" loccnume="13"
+    sum="85e367570f184a60bfad8e958b16ad25"
+    proved="true"
+    expanded="false"
+    shape="ainfix &lt;=aabsainfix -avalueagc0c1c0.1c0x1.p-53Iainfix =agc0c1arIainfix =avalueararoundaNearestTiesToEvenc0.1">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+  </theory>
+  <theory
+   name="GappaEq2"
+   locfile="gappa/../gappa.why"
+   loclnum="72" loccnumb="7" loccnume="15"
+   verified="false"
+   expanded="true">
+   <goal
+    name="G1"
+    locfile="gappa/../gappa.why"
+    loclnum="89" loccnumb="7" loccnume="9"
+    sum="10127df3703deb4dc62eee6dd0e08f8f"
+    proved="true"
+    expanded="true"
+    shape="ainfix &lt;=ainfix -avaluearesultainfix *avalueaq1avalueaq2c0x1.p-52">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
+    name="G2"
+    locfile="gappa/../gappa.why"
+    loclnum="95" loccnumb="7" loccnume="9"
+    sum="c95bf026f3487c9617ff54cc4bf4902d"
+    proved="false"
+    expanded="true"
+    shape="ainfix &lt;=ainfix -avalueaqainfix *avalueaq1avalueaq2c0x1.p-52">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.00"/>
     </proof>
    </goal>
   </theory>

@@ -48,6 +48,7 @@ theory GappaEq
   constant a : double
   constant r : double
   function f int : double
+  function g int int : double
 
   lemma Test1:
      value r = round NearestTiesToEven 0.1 ->
@@ -59,6 +60,38 @@ theory GappaEq
      f 0 = r ->
      abs (value (f 0) - 0.1) <= 0x1.p-53
 
+  lemma Test3:
+     value r = round NearestTiesToEven 0.1 ->
+     g 0 1 = r ->
+     abs (value (g 0 1) - 0.1) <= 0x1.p-53
+
 end
 
 
+
+theory GappaEq2
+
+  use import real.Real
+
+  use import floating_point.Rounding
+  use import floating_point.Double
+
+  constant q1 : double
+  constant q2 : double
+  axiom H1 : -2.0 <= value q1 <= 2.0
+  axiom H2 : -2.0 <= value q2 <= 2.0
+
+  constant result : double
+  (* result = q1 * q2 *)
+  axiom H :
+    value result = round NearestTiesToEven (value q1 * value q2)
+
+  goal G1 : value result - value q1 * value q2 <= 0x1.p-52
+
+  constant q : double
+
+  axiom H3 : q = result
+
+  goal G2 : value q - value q1 * value q2 <= 0x1.p-52
+
+end
