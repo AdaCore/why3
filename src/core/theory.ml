@@ -762,7 +762,7 @@ let create_theory ?(path=[]) n =
 
 let bool_theory =
   let uc = empty_theory (id_fresh "Bool") [] in
-  let uc = add_data_decl uc [ts_bool, [fs_true,[]; fs_false,[]]] in
+  let uc = add_data_decl uc [ts_bool, [fs_bool_true,[]; fs_bool_false,[]]] in
   close_theory uc
 
 let highord_theory =

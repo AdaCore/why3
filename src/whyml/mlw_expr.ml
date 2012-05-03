@@ -510,6 +510,9 @@ let e_plapp pls el ity =
       | vtv::vtvl, ({ e_node = Elogic t } as e)::argl ->
           let tvs = add_expr_tvs tvs e in
           let regs = add_expr_regs regs e in
+          let t = match t.t_ty with
+            | Some _ -> t
+            | None -> t_if t t_bool_true t_bool_false in
           let evtv = match e.e_vty with
             | VTvalue vtv -> vtv
             | VTarrow _   -> assert false in
