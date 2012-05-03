@@ -72,7 +72,7 @@ let get_loc e = e.loc
 let get_subp_loc e = e.subp
 
 let to_filename expl =
-   let s = string_of_reason expl.reason in
+   let s = String.copy (string_of_reason expl.reason) in
    for i = 0 to String.length s - 1 do
       if s.[i] = ' ' then s.[i] <- '_'
    done;
