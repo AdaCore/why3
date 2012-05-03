@@ -62,8 +62,9 @@ int main(int argc, char *argv[]) {
   }
   *p = '\0';
   for (i = 4; i < argc; i++) {
+    strcat(p, "\"");
     strncat(p, argv[i], strlen(argv[i]));
-    if (i < argc - 1) strcat(p, " ");
+    if (i < argc - 1) strcat(p, "\" ");
   }
   // launches "child" process with command line parameter
   if (!CreateProcess(NULL, p, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) {
