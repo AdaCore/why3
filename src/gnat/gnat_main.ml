@@ -30,10 +30,8 @@ let extract_explanation s =
            | ["GP_Subp"; file; line] ->
                  b.subp <-
                     Some (Gnat_expl.mk_loc_line file (int_of_string line))
-           | ["GP_Sloc"; file; line; col] ->
-                 b.loc <-
-                    Some (Gnat_expl.mk_loc file (int_of_string line)
-                          (int_of_string col))
+           | "GP_Sloc" :: rest ->
+                 b.loc <- Some (Gnat_expl.parse_loc rest)
            | _ ->
                  Gnat_util.abort_with_message
                      "found malformed GNATprove label"
@@ -387,7 +385,9 @@ end = struct
       let fn = Gnat_expl.to_filename expl ^ ".trace" in
       let cout = open_out fn in
       let fmt  = Format.formatter_of_out_channel cout in
-      List.iter (fun l -> Format.fprintf fmt "%a@." Gnat_expl.print_loc l)
+      List.iter (fun l ->
+         Format.fprintf fmt "%a@." Gnat_expl.simple_print_loc
+         (Gnat_expl.orig_loc l))
         (Objectives.get_trace goal);
       close_out cout
 
