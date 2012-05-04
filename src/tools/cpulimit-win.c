@@ -102,9 +102,9 @@ int main(int argc, char *argv[]) {
                     "Zero sets no limit (keeps the actual limit)\n", argv[0]);
     return EXIT_FAILURE;
   }
-  // concats argv[4..] into a single command line parameter
+  // concats argv[4..] into a single command line parameter and puts quotes around arguments
   for (i = 4; i < argc; i++)
-    s += strlen(argv[i]) + 1;
+    s += strlen(argv[i]) + 3;
   // CreateProcess does not allow more than 32767 bytes for command line parameter
   if (s > 32767) {
     printf("%s: Error: parameter's length exceeds CreateProcess limits\n", argv[0]);
@@ -117,7 +117,9 @@ int main(int argc, char *argv[]) {
   }
   *p = '\0';
   for (i = 4; i < argc; i++) {
-    strncat(p, argv[i], strlen(argv[i]));
+    strcat(p, "\"");
+    strcat(p, argv[i]);
+    strcat(p, "\"");
     if (i < argc - 1) strcat(p, " ");
   }
   
