@@ -43,9 +43,8 @@ val create_pvsymbol : preid -> vty_value -> pvsymbol
 type pasymbol = private {
   pa_name : ident;
   pa_vta  : vty_arrow;
-  pa_tvs  : Stv.t;
-  pa_regs : Sreg.t;
-  (* these sets contain pa_vta.vta_tvs/regs together with all type
+  pa_vars : varset;
+  (* this varset contains pa_vta.vta_vars together with all type
      variables and regions of the defining expression, in order to
      cover effects and specification and not overgeneralize *)
 }
@@ -61,14 +60,13 @@ val pa_equal : pasymbol -> pasymbol -> bool
 type psymbol = private {
   ps_name  : ident;
   ps_vta   : vty_arrow;
-  ps_tvs   : Stv.t;
-  ps_regs  : Sreg.t;
-  (* these sets cover the type variables and regions of the defining
+  ps_vars  : varset;
+  (* this varset covers the type variables and regions of the defining
      lambda that cannot be instantiated. Every other type variable
      and region in ps_vty is generalized and can be instantiated. *)
   ps_subst : ity_subst;
   (* this substitution instantiates every type variable and region
-     in ps_tvs and ps_regs to itself *)
+     in ps_vars to itself *)
 }
 
 val ps_equal : psymbol -> psymbol -> bool
@@ -123,8 +121,7 @@ type expr = private {
   e_node   : expr_node;
   e_vty    : vty;
   e_effect : effect;
-  e_tvs    : Stv.t Mid.t;
-  e_regs   : Sreg.t Mid.t;
+  e_vars   : varset Mid.t;
   e_label  : Slab.t;
   e_loc    : Loc.position option;
 }
@@ -138,7 +135,7 @@ and expr_node = private
   | Elet    of let_defn * expr
   | Erec    of rec_defn list * expr
   | Eif     of pvsymbol * expr * expr
-  | Ecase   of pvsymbol * (pattern * expr) list
+  | Ecase   of pvsymbol * (ppattern * expr) list
   | Eassign of pvsymbol * region * pvsymbol (* mutable pv <- expr *)
 
 and let_defn = private {
@@ -153,8 +150,7 @@ and let_var =
 and rec_defn = private {
   rec_ps     : psymbol;
   rec_lambda : lambda;
-  rec_tvs    : Stv.t Mid.t;
-  rec_regs   : Sreg.t Mid.t;
+  rec_vars   : varset Mid.t;
 }
 
 and lambda = {
@@ -202,6 +198,7 @@ val e_let : let_defn -> expr -> expr
 val e_rec : rec_defn list -> expr -> expr
 
 val e_if : expr -> expr -> expr -> expr
+val e_case : expr -> (ppattern * expr) list -> expr
 
 exception Immutable of pvsymbol
 

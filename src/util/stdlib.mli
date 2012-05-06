@@ -212,6 +212,9 @@ module type S =
     (** [disjoint pr m1 m2] verifies that for every common key in m1
         and m2, pr is verified. *)
 
+    val set_union : 'a t -> 'a t -> 'a t
+    (** [set_union = union (fun _ x _ -> Some x)] *)
+
     val set_inter : 'a t -> 'b t -> 'a t
     (** [set_inter = inter (fun _ x _ -> Some x)] *)
 

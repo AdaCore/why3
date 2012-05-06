@@ -385,6 +385,33 @@ let ity_int  = ity_of_ty Ty.ty_int
 let ity_bool = ity_of_ty Ty.ty_bool
 let ity_unit = ity_of_ty (Ty.ty_tuple [])
 
+type varset = {
+  vars_tv  : Stv.t;
+  vars_reg : Sreg.t;
+}
+
+let vars_empty = { vars_tv = Stv.empty ; vars_reg = Sreg.empty }
+
+let ity_vars s ity = {
+  vars_tv  = ity_freevars s.vars_tv ity;
+  vars_reg = ity_topregions s.vars_reg ity;
+}
+
+let vs_vars s vs = {
+  vars_tv  = ty_freevars s.vars_tv vs.vs_ty;
+  vars_reg = s.vars_reg;
+}
+
+let vars_union s1 s2 = {
+  vars_tv  = Stv.union s1.vars_tv s2.vars_tv;
+  vars_reg = Sreg.union s1.vars_reg s2.vars_reg;
+}
+
+let vars_freeze s =
+  let sbs = Stv.fold (fun v -> Mtv.add v (ity_var v)) s.vars_tv Mtv.empty in
+  let sbs = { ity_subst_tv = sbs ; ity_subst_reg = Mreg.empty } in
+  Sreg.fold (fun r s -> reg_match s r r) s.vars_reg sbs
+
 (** computation types (with effects) *)
 
 (* exception symbols *)
@@ -495,8 +522,7 @@ type vty_value = {
   vtv_ity   : ity;
   vtv_ghost : bool;
   vtv_mut   : region option;
-  vtv_tvs   : Stv.t;
-  vtv_regs  : Sreg.t;
+  vtv_vars  : varset;
 }
 
 type vty =
@@ -508,38 +534,33 @@ and vty_arrow = {
   vta_result : vty;
   vta_effect : effect;
   vta_ghost  : bool;
-  vta_tvs    : Stv.t;
-  vta_regs   : Sreg.t;
-  (* these sets cover every type variable and region in vta_arg
+  vta_vars   : varset;
+  (* this varset covers every type variable and region in vta_arg
      and vta_result, but may skip some type variables and regions
      in vta_effect *)
 }
 
 (* smart constructors *)
 
-let vty_freevars s = function
-  | VTvalue vtv -> Stv.union s vtv.vtv_tvs
-  | VTarrow vta -> Stv.union s vta.vta_tvs
-
-let vty_topregions s = function
-  | VTvalue vtv -> Sreg.union s vtv.vtv_regs
-  | VTarrow vta -> Sreg.union s vta.vta_regs
+let vty_vars s = function
+  | VTvalue vtv -> vars_union s vtv.vtv_vars
+  | VTarrow vta -> vars_union s vta.vta_vars
 
 let vty_value ?(ghost=false) ?mut ity =
-  let regs = match mut with
+  let vars = ity_vars vars_empty ity in
+  let vars = match mut with
     | Some r ->
         if r.reg_ghost && not ghost then
           Loc.errorm "Ghost region in a non-ghost vty_value";
         ity_equal_check ity r.reg_ity;
-        Sreg.singleton r
+        { vars with vars_reg = Sreg.add r vars.vars_reg }
     | None ->
-        Sreg.empty
+        vars
   in {
     vtv_ity   = ity;
     vtv_ghost = ghost;
     vtv_mut   = mut;
-    vtv_tvs   = ity_freevars Stv.empty ity;
-    vtv_regs  = ity_topregions regs ity;
+    vtv_vars  = vars;
   }
 
 let vty_arrow vtv ?(effect=eff_empty) ?(ghost=false) vty =
@@ -549,17 +570,16 @@ let vty_arrow vtv ?(effect=eff_empty) ?(ghost=false) vty =
   (* we accept a mutable vty_value for the result to simplify Mlw_expr,
      but erase it in the signature: only projections return mutables *)
   let vty = match vty with
-    | VTvalue ({ vtv_mut = Some r } as vtv) ->
-        let regs = Sreg.remove r vtv.vtv_regs in
-        VTvalue { vtv with vtv_mut = None ; vtv_regs = regs }
+    | VTvalue ({ vtv_mut = Some r ; vtv_vars = vars } as vtv) ->
+        let vars = { vars with vars_reg = Sreg.remove r vars.vars_reg } in
+        VTvalue { vtv with vtv_mut = None ; vtv_vars = vars }
     | _ -> vty
   in {
     vta_arg    = vtv;
     vta_result = vty;
     vta_effect = effect;
     vta_ghost  = ghost;
-    vta_tvs    = vty_freevars vtv.vtv_tvs vty;
-    vta_regs   = vty_topregions vtv.vtv_regs vty;
+    vta_vars   = vty_vars vtv.vtv_vars vty;
   }
 
 let vty_ghost = function

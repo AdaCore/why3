@@ -153,6 +153,21 @@ val ity_full_inst : ity_subst -> ity -> ity
 
 val reg_full_inst : ity_subst -> region -> region
 
+type varset = private {
+  vars_tv  : Stv.t;
+  vars_reg : Sreg.t;
+}
+
+val vars_empty : varset
+
+val vars_union : varset -> varset -> varset
+
+val vars_freeze : varset -> ity_subst
+
+val ity_vars : varset -> ity -> varset
+
+val vs_vars : varset -> vsymbol -> varset
+
 (* exception symbols *)
 type xsymbol = private {
   xs_name : ident;
@@ -194,8 +209,7 @@ type vty_value = private {
   vtv_ity   : ity;
   vtv_ghost : bool;
   vtv_mut   : region option;
-  vtv_tvs   : Stv.t;
-  vtv_regs  : Sreg.t;
+  vtv_vars  : varset;
 }
 
 type vty =
@@ -207,9 +221,8 @@ and vty_arrow = private {
   vta_result : vty;
   vta_effect : effect;
   vta_ghost  : bool;
-  vta_tvs    : Stv.t;
-  vta_regs   : Sreg.t;
-  (* these sets cover every type variable and region in vta_arg
+  vta_vars   : varset;
+  (* this varset covers every type variable and region in vta_arg
      and vta_result, but may skip some type variables and regions
      in vta_effect *)
 }
@@ -222,8 +235,7 @@ val vty_arrow : vty_value -> ?effect:effect -> ?ghost:bool -> vty -> vty_arrow
 
 val vty_app_arrow : vty_arrow -> vty_value -> effect * vty
 
-val vty_freevars : Stv.t -> vty -> Stv.t
-val vty_topregions : Sreg.t -> vty -> Sreg.t
+val vty_vars : varset -> vty -> varset
 
 val vty_ghost : vty -> bool
 val vty_ghostify : vty -> vty
