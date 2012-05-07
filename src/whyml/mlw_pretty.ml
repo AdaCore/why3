@@ -28,6 +28,7 @@ open Term
 open Theory
 open Pretty
 open Mlw_ty
+open Mlw_ty.T
 open Mlw_expr
 open Mlw_decl
 open Mlw_module

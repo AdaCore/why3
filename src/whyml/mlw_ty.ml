@@ -19,6 +19,7 @@
 (**************************************************************************)
 
 open Why3
+open Stdlib
 open Util
 open Ident
 open Ty
@@ -26,37 +27,87 @@ open Term
 
 (** value types (w/o effects) *)
 
-type itysymbol = {
-  its_pure : tysymbol;
-  its_args : tvsymbol list;
-  its_regs : region   list;
-  its_def  : ity option;
-  its_abst : bool;
-  its_priv : bool;
-}
+module rec T : sig
 
-and ity = {
-  ity_node : ity_node;
-  ity_tag  : Hashweak.tag;
-}
+  type varset = {
+    vars_tv  : Stv.t;
+    vars_reg : Reg.S.t;
+  }
 
-and ity_node =
-  | Ityvar of tvsymbol
-  | Itypur of tysymbol * ity list
-  | Ityapp of itysymbol * ity list * region list
+  type itysymbol = {
+    its_pure : tysymbol;
+    its_args : tvsymbol list;
+    its_regs : region   list;
+    its_def  : ity option;
+    its_abst : bool;
+    its_priv : bool;
+  }
 
-and region = {
-  reg_name  : ident;
-  reg_ity   : ity;
-  reg_ghost : bool;
-}
+  and ity = {
+    ity_node : ity_node;
+    ity_vars : varset;
+    ity_tag  : Hashweak.tag;
+  }
+
+  and ity_node =
+    | Ityvar of tvsymbol
+    | Itypur of tysymbol * ity list
+    | Ityapp of itysymbol * ity list * region list
+
+  and region = {
+    reg_name  : ident;
+    reg_ity   : ity;
+    reg_ghost : bool;
+  }
+
+end = struct
+
+  type varset = {
+    vars_tv  : Stv.t;
+    vars_reg : Reg.S.t;
+  }
+
+  type itysymbol = {
+    its_pure : tysymbol;
+    its_args : tvsymbol list;
+    its_regs : region   list;
+    its_def  : ity option;
+    its_abst : bool;
+    its_priv : bool;
+  }
+
+  and ity = {
+    ity_node : ity_node;
+    ity_vars : varset;
+    ity_tag  : Hashweak.tag;
+  }
+
+  and ity_node =
+    | Ityvar of tvsymbol
+    | Itypur of tysymbol * ity list
+    | Ityapp of itysymbol * ity list * region list
+
+  and region = {
+    reg_name  : ident;
+    reg_ity   : ity;
+    reg_ghost : bool;
+  }
+
+end
+
+and Reg : sig
+  module M : Map.S with type key = T.region
+  module S : M.Set
+  module H : Hashtbl.S with type key = T.region
+  module W : Hashweak.S with type key = T.region
+end = WeakStructMake (struct
+  type t = T.region
+  let tag r = r.T.reg_name.id_tag
+end)
+
+open T
 
 (** regions *)
-
-module Reg = WeakStructMake (struct
-  type t = region
-  let tag r = r.reg_name.id_tag
-end)
 
 module Sreg = Reg.S
 module Mreg = Reg.M
@@ -77,6 +128,17 @@ let reg_hash r = id_hash r.reg_name
 
 let create_region id ?(ghost=false) ty =
   { reg_name = id_register id; reg_ity = ty; reg_ghost = ghost }
+
+(* variable sets *)
+
+let vars_empty = { vars_tv = Stv.empty ; vars_reg = Sreg.empty }
+
+let vars_union s1 s2 = {
+  vars_tv  = Stv.union s1.vars_tv s2.vars_tv;
+  vars_reg = Sreg.union s1.vars_reg s2.vars_reg;
+}
+
+let vs_vars s vs = { s with vars_tv = ty_freevars s.vars_tv vs.vs_ty }
 
 (* value type symbols *)
 
@@ -117,7 +179,21 @@ module Hsity = Hashcons.Make (struct
         Hashcons.combine_list reg_hash
           (Hashcons.combine_list ity_hash (its_hash s) tl) rl
 
-  let tag n ity = { ity with ity_tag = Hashweak.create_tag n }
+  let ity_vars s ity = vars_union s ity.ity_vars
+  let reg_vars s r = { s with vars_reg = Sreg.add r s.vars_reg }
+
+  let vars s ity = match ity.ity_node with
+    | Ityvar v ->
+        { s with vars_tv = Stv.add v s.vars_tv }
+    | Itypur (_,tl) ->
+        List.fold_left ity_vars s tl
+    | Ityapp (_,tl,rl) ->
+        List.fold_left reg_vars (List.fold_left ity_vars s tl) rl
+
+  let tag n ity = { ity with
+    ity_vars = vars vars_empty ity;
+    ity_tag  = Hashweak.create_tag n }
+
 end)
 
 module Ity = WeakStructMake (struct
@@ -132,6 +208,7 @@ module Wity = Ity.W
 
 let mk_ity n = {
   ity_node = n;
+  ity_vars = vars_empty;
   ity_tag  = Hashweak.dummy_tag;
 }
 
@@ -199,11 +276,8 @@ let ity_v_any prv prr ity =
 let ity_subst_unsafe mv mr ity =
   ity_v_map_unsafe (fun v -> Mtv.find v mv) (fun r -> Mreg.find r mr) ity
 
-let ity_freevars = ity_v_fold (fun s v -> Stv.add v s) Util.const
-let ity_topregions = ity_v_fold Util.const (fun s r -> Sreg.add r s)
-
-let ity_closed = ity_v_all Util.ffalse Util.ttrue
-let ity_pure = ity_v_all Util.ttrue Util.ffalse
+let ity_closed ity = Stv.is_empty ity.ity_vars.vars_tv
+let ity_pure ity = Sreg.is_empty ity.ity_vars.vars_reg
 
 (* smart constructors *)
 
@@ -385,28 +459,6 @@ let ity_int  = ity_of_ty Ty.ty_int
 let ity_bool = ity_of_ty Ty.ty_bool
 let ity_unit = ity_of_ty (Ty.ty_tuple [])
 
-type varset = {
-  vars_tv  : Stv.t;
-  vars_reg : Sreg.t;
-}
-
-let vars_empty = { vars_tv = Stv.empty ; vars_reg = Sreg.empty }
-
-let ity_vars s ity = {
-  vars_tv  = ity_freevars s.vars_tv ity;
-  vars_reg = ity_topregions s.vars_reg ity;
-}
-
-let vs_vars s vs = {
-  vars_tv  = ty_freevars s.vars_tv vs.vs_ty;
-  vars_reg = s.vars_reg;
-}
-
-let vars_union s1 s2 = {
-  vars_tv  = Stv.union s1.vars_tv s2.vars_tv;
-  vars_reg = Sreg.union s1.vars_reg s2.vars_reg;
-}
-
 let vars_freeze s =
   let sbs = Stv.fold (fun v -> Mtv.add v (ity_var v)) s.vars_tv Mtv.empty in
   let sbs = { ity_subst_tv = sbs ; ity_subst_reg = Mreg.empty } in
@@ -547,7 +599,7 @@ let vty_vars s = function
   | VTarrow vta -> vars_union s vta.vta_vars
 
 let vty_value ?(ghost=false) ?mut ity =
-  let vars = ity_vars vars_empty ity in
+  let vars = ity.ity_vars in
   let vars = match mut with
     | Some r ->
         if r.reg_ghost && not ghost then

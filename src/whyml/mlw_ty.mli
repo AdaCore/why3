@@ -26,30 +26,43 @@ open Term
 
 (** individual types (first-order types w/o effects) *)
 
-type itysymbol = private {
-  its_pure : tysymbol;
-  its_args : tvsymbol list;
-  its_regs : region   list;
-  its_def  : ity option;
-  its_abst : bool;
-  its_priv : bool;
-}
+module rec T : sig
 
-and ity = private {
-  ity_node : ity_node;
-  ity_tag  : Hashweak.tag;
-}
+  type varset = private {
+    vars_tv  : Stv.t;
+    vars_reg : Mreg.Set.t;
+  }
 
-and ity_node = private
-  | Ityvar of tvsymbol
-  | Itypur of tysymbol * ity list
-  | Ityapp of itysymbol * ity list * region list
+  type itysymbol = private {
+    its_pure : tysymbol;
+    its_args : tvsymbol list;
+    its_regs : region   list;
+    its_def  : ity option;
+    its_abst : bool;
+    its_priv : bool;
+  }
 
-and region = private {
-  reg_name  : ident;
-  reg_ity   : ity;
-  reg_ghost : bool;
-}
+  and ity = private {
+    ity_node : ity_node;
+    ity_vars : varset;
+    ity_tag  : Hashweak.tag;
+  }
+
+  and ity_node = private
+    | Ityvar of tvsymbol
+    | Itypur of tysymbol * ity list
+    | Ityapp of itysymbol * ity list * region list
+
+  and region = private {
+    reg_name  : ident;
+    reg_ity   : ity;
+    reg_ghost : bool;
+  }
+
+end
+and Mreg : sig include Map.S with type key = T.region end
+
+open T
 
 module Mits : Map.S with type key = itysymbol
 module Sits : Mits.Set
@@ -61,7 +74,6 @@ module Sity : Mity.Set
 module Hity : Hashtbl.S with type key = ity
 module Wity : Hashweak.S with type key = ity
 
-module Mreg : Map.S with type key = region
 module Sreg : Mreg.Set
 module Hreg : Hashtbl.S with type key = region
 module Wreg : Hashweak.S with type key = region
@@ -122,8 +134,6 @@ val ity_v_fold :
 val ity_v_all : (tvsymbol -> bool) -> (region -> bool) -> ity -> bool
 val ity_v_any : (tvsymbol -> bool) -> (region -> bool) -> ity -> bool
 
-val ity_freevars : Stv.t -> ity -> Stv.t
-val ity_topregions : Sreg.t -> ity -> Sreg.t
 val ity_closed : ity -> bool
 val ity_pure : ity -> bool
 
@@ -153,18 +163,11 @@ val ity_full_inst : ity_subst -> ity -> ity
 
 val reg_full_inst : ity_subst -> region -> region
 
-type varset = private {
-  vars_tv  : Stv.t;
-  vars_reg : Sreg.t;
-}
-
 val vars_empty : varset
 
 val vars_union : varset -> varset -> varset
 
 val vars_freeze : varset -> ity_subst
-
-val ity_vars : varset -> ity -> varset
 
 val vs_vars : varset -> vsymbol -> varset
 

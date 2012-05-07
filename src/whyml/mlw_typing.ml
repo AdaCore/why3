@@ -29,6 +29,7 @@ open Env
 open Ptree
 open Mlw_dtree
 open Mlw_ty
+open Mlw_ty.T
 open Mlw_expr
 open Mlw_decl
 open Mlw_module
@@ -300,8 +301,8 @@ let add_types uc tdl =
       let ts = match d.td_def with
         | TDalias ty ->
             let def = parse ty in
-            let s = ity_topregions Sreg.empty def in
-            create_itysymbol id ~abst ~priv vl (Sreg.elements s) (Some def)
+            let rl = Sreg.elements def.ity_vars.vars_reg in
+            create_itysymbol id ~abst ~priv vl rl (Some def)
         | TDalgebraic csl when Hashtbl.find mutables x ->
             let projs = Hashtbl.create 5 in
             (* to check projections' types we must fix the tyvars *)
@@ -313,7 +314,7 @@ let add_types uc tdl =
               match id with
                 | None ->
                     let pv = create_pvsymbol (id_fresh "pj") vtv in
-                    ity_topregions s ity, (pv, false)
+                    Sreg.union s ity.ity_vars.vars_reg, (pv, false)
                 | Some id ->
                     try
                       let pv = Hashtbl.find projs id.id in
@@ -325,7 +326,7 @@ let add_types uc tdl =
                     with Not_found ->
                       let pv = create_pvsymbol (Denv.create_user_id id) vtv in
                       Hashtbl.replace projs id.id pv;
-                      ity_topregions s ity, (pv, true)
+                      Sreg.union s ity.ity_vars.vars_reg, (pv, true)
             in
             let mk_constr s (_loc,cid,pjl) =
               let s,pjl = Util.map_fold_left mk_proj s pjl in
@@ -343,7 +344,7 @@ let add_types uc tdl =
                 let r = create_region fid ~ghost ity in
                 Sreg.add r s, Some r
               else
-                ity_topregions s ity, None
+                Sreg.union s ity.ity_vars.vars_reg, None
               in
               let vtv = vty_value ?mut ~ghost ity in
               s, (create_pvsymbol fid vtv, true)

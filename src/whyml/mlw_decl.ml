@@ -25,6 +25,7 @@ open Ty
 open Term
 open Decl
 open Mlw_ty
+open Mlw_ty.T
 open Mlw_expr
 
 type constructor = plsymbol * plsymbol option list
