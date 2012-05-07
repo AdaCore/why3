@@ -17,6 +17,11 @@ target directory already contains a file with the same name, \why
 extracts all the parts that it assumes to be user-made and prints them in
 the generated file.
 
+Note that \why does not track dependencies between realizations and
+theories, so a realization will become outdated if a theory is modified.
+It is up to the user to handle such dependencies, for instance by adding
+a Makefile rule.
+
 \section{Using realizations inside proofs}
 
 If a theory has been realized, a \why printer for an interactive prover
