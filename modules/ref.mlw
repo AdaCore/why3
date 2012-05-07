@@ -1,11 +1,15 @@
 
-(* References.
+(** {1 References}
 
    A mutable variable, or ``reference'' in ML terminology, is simply a
-   record with a single mutable field 'contents'.
+   record with a single mutable field [contents].
 
-   Creation, access, and assignment are provided as 'ref', prefix '!', and
-   infix ':=', respectively.
+*)
+
+(** {2 Generic references}
+
+   Creation, access, and assignment are provided as [ref], prefix [!], and
+   infix [:=], respectively.
 *)
 
 module Ref
@@ -22,7 +26,9 @@ module Ref
 
 end
 
-(* Module Refint adds a few operations specific to integer references. *)
+(** {2 Integer References}
+
+a few operations specific to integer references *)
 
 module Refint
 
@@ -38,7 +44,7 @@ module Refint
 
 end
 
-(*
+(***
 Local Variables:
 compile-command: "unset LANG; make -C .. modules/ref"
 End:

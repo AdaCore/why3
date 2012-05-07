@@ -1000,11 +1000,11 @@ $(WHY3DOCDEP): $(WHY3DOCGENERATED)
 byte: bin/why3doc.byte
 opt:  bin/why3doc.opt
 
-bin/why3doc.opt: src/why3.cmxa $(WHY3DOCCMX)
+bin/why3doc.opt: src/why3.cmxa $(PGMCMX) $(WHY3DOCCMX)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
 
-bin/why3doc.byte: src/why3.cma $(WHY3DOCCMO)
+bin/why3doc.byte: src/why3.cma $(PGMCMO) $(WHY3DOCCMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 
@@ -1189,12 +1189,16 @@ STDLIBS = bool comparison relations \
 	option list map set bag graph
 # function ? sum ? tptp ?
 
-STDLIBFILES = $(addsuffix .why, $(addprefix theories/, $(STDLIBS)))
+STDMODS = ref array arith hashtbl impset pqueue 	queue 	random 	stack 	string
 
-stdlibdoc: $(STDLIBFILES) bin/why3doc
+STDLIBFILES = $(addsuffix .why, $(addprefix theories/, $(STDLIBS)))
+STDMODFILES = $(addsuffix .mlw, $(addprefix modules/, $(STDMODS)))
+
+stdlibdoc: $(STDLIBFILES) $(STDMODFILES) bin/why3doc
 	mkdir -p doc/stdlibdoc
 	rm -f doc/stdlibdoc/style.css
-	WHY3LOADPATH=theories bin/why3doc -o doc/stdlibdoc $(STDLIBFILES)
+	WHY3LOADPATH=theories bin/why3doc -L modules -o doc/stdlibdoc \
+		$(STDLIBFILES) $(STDMODFILES)
 
 clean::
 	rm -f doc/stdlibdoc/*

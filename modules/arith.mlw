@@ -1,5 +1,11 @@
 
-(* Arithmetic for programs *)
+(** {1 Arithmetic for programs} *)
+
+(** {2 Integer Division} 
+
+ It is checked that divisor is not null
+
+*)
 
 module Int
 
@@ -8,9 +14,14 @@ module Int
 
   let (/) (x: int) (y:int) = { y <> 0 } div x y { result = div x y }
 
+ 
 end
 
-(* machine arithmetic (32-bit integers, etc.) will go here *)
+(** {2 Machine integers}
+
+ 32-bit integers and such go here 
+
+*)
 module Int32
 
   use export int.Int
@@ -36,6 +47,11 @@ module Int32
 
 end
 
+(** {2 Division on real numbers} 
+
+See also Floating-Point theories
+
+*)
 module Real
 
   use import real.Real
@@ -46,7 +62,7 @@ module Real
 
 end
 
-(*
+(***
 Local Variables:
 compile-command: "unset LANG; make -C .. modules/arith"
 End:

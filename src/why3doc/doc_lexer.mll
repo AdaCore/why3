@@ -99,7 +99,7 @@ rule scan fmt = parse
   | "(*)" as s
           { pp_print_string fmt s;
             scan fmt lexbuf }
-  | "(***"
+  | ' '* "(***"
           { comment fmt false lexbuf;
             scan fmt lexbuf }
   | ' '* "(**"

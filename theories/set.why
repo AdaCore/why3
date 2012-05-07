@@ -1,6 +1,8 @@
 
 (** {1 Set theories} *)
 
+(** {2 General Sets} *)
+
 theory Set
 
   type set 'a
@@ -82,6 +84,8 @@ theory Set
   axiom all_def: forall x: 'a. mem x all
 
 end
+
+(** {2 Set Comprehension} *)
 
 theory SetComprehension
 
@@ -183,6 +187,8 @@ theory Fsetint
 
 end
 
+(** {2 Set extensionality} *)
+
 theory FsetExt
 
   use export Fset
@@ -191,6 +197,8 @@ theory FsetExt
     s1 = s2 <-> (forall x : 'a. mem x s1 <-> mem x s2)
 
 end
+
+(** {2 Sets realized as maps} *)
 
 theory SetMap
 

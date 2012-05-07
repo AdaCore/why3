@@ -1,5 +1,8 @@
 
-(* number theory *)
+(** {1 Number theory} *)
+
+
+(** {2 Parity properties} *)
 
 theory Parity
 
@@ -23,6 +26,8 @@ theory Parity
   lemma odd_2k1: forall k: int. odd (2 * k + 1)
 
 end
+
+(** {2 Divisibility} *)
 
 theory Divisibility
 
@@ -88,6 +93,8 @@ theory Divisibility
 
 end
 
+(** {2 Greateast Common Divisor} *)
+
 theory Gcd
 
   use export int.Int
@@ -111,7 +118,7 @@ theory Gcd
   clone algebra.AC with type t = int, function op = gcd,
     lemma Comm.Comm, lemma Assoc.Assoc
 
-  (* FIXME: Alt-Ergo proves gcd_0_pos even without gcd_unique *)
+  (*** FIXME: Alt-Ergo proves gcd_0_pos even without gcd_unique *)
   lemma gcd_0_pos: forall a: int. 0 <= a -> gcd a 0 = a
   lemma gcd_0_neg: forall a: int. a <  0 -> gcd a 0 = -a
 
@@ -134,6 +141,8 @@ theory Gcd
   lemma gcd_mult: forall a b c: int. 0 <= c -> gcd (c * a) (c * b) = c * gcd a b
 
 end
+
+(** {2 Prime numbers} *)
 
 theory Prime
 
@@ -163,6 +172,8 @@ theory Prime
   lemma odd_prime: forall p: int. prime p -> p >= 3 -> odd p
 
 end
+
+(** {2 Coprime numbers} *)
 
 theory Coprime
 

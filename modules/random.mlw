@@ -1,22 +1,23 @@
 
-(* Pseudo-random generators.
+(** {1 Pseudo-random generators}
 
    This easiest way to get random numbers (of random values of any type)
    is to take advantage of the non-determinism of Hoare triples.
    Simply declaring a function
 
-      val random_int: unit -> {} int {}
+      [val random_int: unit -> {} int {}]
 
-   is typically enough. Two calls to random_int return values that can not
+   is typically enough. Two calls to [random_int] return values that can not
    be proved equal, which is exactly what we need.
 
    The following modules provide slightly more: pseudo-random generators
    which are deterministic according to a state. The state is either
-   explicit (module State) or global (module Random). Functions init allow
+   explicit (module [State]) or global (module [Random]). Functions init allow
    to reset the generators according to a given seed.
+
  *)
 
-(* Purely applicative generators. *)
+(** {2 Purely applicative generators} *)
 
 theory Generator
 
@@ -39,8 +40,9 @@ theory Generator
 
 end
 
-(* Mutable states of pseudo-random generators.
-   Basically a reference containing a pure generator. *)
+(** {2 Mutable states of pseudo-random generators}
+
+  Basically a reference containing a pure generator. *)
 
 module State
 
@@ -71,7 +73,7 @@ module State
 
 end
 
-(* A global pseudo-random generator. *)
+(** {2 A global pseudo-random generator} *)
 
 module Random
 
@@ -112,7 +114,7 @@ module Test
 
 end
 
-(*
+(***
 Local Variables:
 compile-command: "unset LANG; make -C .. modules/random"
 End:
