@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
+<!DOCTYPE why3session SYSTEM "/usr/local/share/why3/why3session.dtd">
 <why3session
- name="./programs/gcd/why3session.xml">
+ name="programs/gcd/why3session.xml">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -24,19 +24,19 @@
   expanded="false">
   <theory
    name="WP EuclideanAlgorithm"
-   locfile="./programs/gcd/../gcd.mlw"
+   locfile="programs/gcd/../gcd.mlw"
    loclnum="4" loccnumb="7" loccnume="25"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter gcd"
-    locfile="./programs/gcd/../gcd.mlw"
+    locfile="programs/gcd/../gcd.mlw"
     loclnum="10" loccnumb="10" loccnume="13"
     expl="parameter gcd"
-    sum="bb383fa960a8a7dc480acf5a9477f9b0"
+    sum="d8c4bc6f48381e84e04969b311efba00"
     proved="true"
     expanded="true"
-    shape="iainfix =V1c0ainfix =V0agcdV0V1ainfix =agcdV1amodV0V1agcdV0V1Aainfix >=amodV0V1c0Aainfix >=V1c0Aainfix <amodV0V1V1Aainfix <=c0V1Iainfix >=V1c0Aainfix >=V0c0FF">
+    shape="iainfix =V1c0ainfix =V0agcdV0V1ainfix =agcdV1amodV0V1agcdV0V1Aainfix &gt;=amodV0V1c0Aainfix &gt;=V1c0Aainfix &lt;amodV0V1V1Aainfix &lt;=c0V1Iainfix &gt;=V1c0Aainfix &gt;=V0c0FF">
     <label
      name="expl:parameter gcd"/>
     <transf
@@ -45,18 +45,19 @@
      expanded="true">
      <goal
       name="WP_parameter gcd.1"
-      locfile="./programs/gcd/../gcd.mlw"
+      locfile="programs/gcd/../gcd.mlw"
       loclnum="10" loccnumb="10" loccnume="13"
       expl="normal postcondition"
-      sum="fc52e4209870ce75f5a9e440c7653a9f"
+      sum="d5f9c6d980a45600967f0cbd467afea2"
       proved="true"
       expanded="true"
-      shape="ainfix =V0agcdV0V1Iainfix =V1c0Iainfix >=V1c0Aainfix >=V0c0FF">
+      shape="ainfix =V0agcdV0V1Iainfix =V1c0Iainfix &gt;=V1c0Aainfix &gt;=V0c0FF">
       <label
        name="expl:parameter gcd"/>
       <proof
        prover="3"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
@@ -64,13 +65,15 @@
       <proof
        prover="1"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.00"/>
+       <result status="valid" time="0.01"/>
       </proof>
       <proof
        prover="0"
        timelimit="2"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -78,18 +81,19 @@
      </goal>
      <goal
       name="WP_parameter gcd.2"
-      locfile="./programs/gcd/../gcd.mlw"
+      locfile="programs/gcd/../gcd.mlw"
       loclnum="10" loccnumb="10" loccnume="13"
       expl="precondition"
-      sum="8eb8ac0ff31fff39bc1fa9ff6822b257"
+      sum="ba5000dd7ab2a92ea5138c6f3d3950cd"
       proved="true"
       expanded="true"
-      shape="ainfix >=amodV0V1c0Aainfix >=V1c0Aainfix <amodV0V1V1Aainfix <=c0V1Iainfix =V1c0NIainfix >=V1c0Aainfix >=V0c0FF">
+      shape="ainfix &gt;=amodV0V1c0Aainfix &gt;=V1c0Aainfix &lt;amodV0V1V1Aainfix &lt;=c0V1Iainfix =V1c0NIainfix &gt;=V1c0Aainfix &gt;=V0c0FF">
       <label
        name="expl:parameter gcd"/>
       <proof
        prover="3"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
@@ -97,6 +101,7 @@
       <proof
        prover="1"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -104,29 +109,31 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.05"/>
+       <result status="valid" time="0.06"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter gcd.3"
-      locfile="./programs/gcd/../gcd.mlw"
+      locfile="programs/gcd/../gcd.mlw"
       loclnum="10" loccnumb="10" loccnume="13"
       expl="normal postcondition"
-      sum="b7f5a11a80c1407e1fce1c1292785688"
+      sum="92c5d9f0fadcfcaedc9ffd9ccc7e8bd2"
       proved="true"
       expanded="true"
-      shape="ainfix =agcdV1amodV0V1agcdV0V1Iainfix >=amodV0V1c0Aainfix >=V1c0Aainfix <amodV0V1V1Aainfix <=c0V1Iainfix =V1c0NIainfix >=V1c0Aainfix >=V0c0FF">
+      shape="ainfix =agcdV1amodV0V1agcdV0V1Iainfix &gt;=amodV0V1c0Aainfix &gt;=V1c0Aainfix &lt;amodV0V1V1Aainfix &lt;=c0V1Iainfix =V1c0NIainfix &gt;=V1c0Aainfix &gt;=V0c0FF">
       <label
        name="expl:parameter gcd"/>
       <proof
        prover="2"
        timelimit="10"
+       memlimit="0"
        edited="gcd_WP_EuclideanAlgorithm_WP_parameter_gcd_1.v"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.56"/>
+       <result status="valid" time="0.62"/>
       </proof>
      </goal>
     </transf>
