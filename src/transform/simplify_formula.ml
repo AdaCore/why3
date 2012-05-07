@@ -202,7 +202,7 @@ let rec fmla_cond_subst filter f =
             for j = 0 to subl - 1 do
               if j <> i then
                 let (f, s) = subf.(j) in
-                subf.(j) <- (t_replace t1 t2 f, s);
+                subf.(j) <- (t_replace_alpha t1 t2 f, s);
             done in
           let (f, s) = subf.(i) in
           match f.t_node with
