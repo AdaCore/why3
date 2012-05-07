@@ -122,6 +122,8 @@ rule token = parse
       Loc.transfer_loc lexbuf lex_dumb;
       match tok with
         | INPUT filename ->
+          let dirname = Filename.dirname lexbuf.lex_curr_p.pos_fname in
+          let filename = Sysutil.absolutize_filename dirname filename in
           Stack.push (input_lexbuf filename) s;
           multifile lex_dumb
         | EOF -> ignore (Stack.pop s);

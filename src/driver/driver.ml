@@ -56,14 +56,12 @@ let load_plugin dir (byte,nat) =
   Dynlink.loadfile_private file
 
 let load_file file =
-  let basename = Filename.dirname file in
   let c = open_in file in
   let lb = Lexing.from_channel c in
   Loc.set_file file lb;
   let to_close = Stack.create () in
   Stack.push c to_close;
-  let input_lexer s =
-    let filename = Sysutil.absolutize_filename basename s in
+  let input_lexer filename =
     let c = open_in filename in
     Stack.push c to_close;
     let lb = Lexing.from_channel c in
