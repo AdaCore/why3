@@ -27,6 +27,7 @@ open Decl
 open Theory
 open Env
 open Ptree
+open Mlw_dtree
 open Mlw_ty
 open Mlw_expr
 open Mlw_decl
@@ -85,6 +86,90 @@ let () = Exn_printer.register (fun fmt e -> match e with
   | _ -> raise e)
 
 (* TODO: let type_only = Debug.test_flag Typing.debug_type_only in *)
+
+(** Typing type expressions *)
+
+let ts_arrow =
+  let a = create_tvsymbol (Ident.id_fresh "a") in
+  let b = create_tvsymbol (Ident.id_fresh "b") in
+  Ty.create_tysymbol (Ident.id_fresh "arrow") [a; b] None
+
+let ts_region =
+  let a = create_tvsymbol (Ident.id_fresh "a") in
+  let b = create_tvsymbol (Ident.id_fresh "b") in
+  Ty.create_tysymbol (Ident.id_fresh "region") [a; b] None
+
+(* let rec ity_of_dty = function *)
+(*   | Tyvar { type_val = Some t } -> *)
+(*       ty_of_dty t *)
+(*   | Tyvar { type_val = None; user = false; type_var_loc = loc } -> *)
+(*       error ?loc (AnyMessage "undefined type variable") *)
+(*   | Tyvar { tvsymbol = tv } -> *)
+(*       ty_var tv *)
+(*   | Tyapp (s, tl) -> *)
+(*       ty_app s (List.map ty_of_dty tl) *)
+
+(** Typing program expressions *)
+
+let rec extract_labels labs loc e = match e.Ptree.expr_desc with
+  | Ptree.Enamed (Ptree.Lstr s, e) -> extract_labels (s :: labs) loc e
+  | Ptree.Enamed (Ptree.Lpos p, e) -> extract_labels labs (Some p) e
+  | Ptree.Ecast  (e, ty) ->
+      let labs, loc, d = extract_labels labs loc e in
+      labs, loc, Ptree.Ecast ({ e with Ptree.expr_desc = d }, ty)
+  | e -> List.rev labs, loc, e
+
+type denv = {
+  uc     : module_uc;
+  locals : Denv.dty Mstr.t;
+  denv   : Typing.denv; (* for user type variables only *)
+}
+
+let create_denv uc =
+  { uc = uc;
+    locals = Mstr.empty;
+    denv = Typing.create_denv (); }
+
+let rec dexpr ~userloc denv e =
+  let loc = e.Ptree.expr_loc in
+  let labs, userloc, d = extract_labels [] userloc e in
+  let d, ty = dexpr_desc ~userloc denv loc d in
+  let loc = def_option loc userloc in
+  let e = {
+    dexpr_desc = d; dexpr_loc = loc; dexpr_lab = labs; dexpr_type = ty; }
+  in
+  e
+
+and dexpr_desc ~userloc denv _loc = function
+  | Ptree.Eident (Qident {id=x}) when Mstr.mem x denv.locals ->
+      (* local variable *)
+      let tyv = Mstr.find x denv.locals in
+      DElocal x, tyv
+  | _ ->
+      ignore (userloc);
+      assert false (*TODO*)
+
+type local_var =
+  | Lpvsymbol of pvsymbol
+  | Lpasymbol of pasymbol
+  | Lpsymbol  of psymbol * Denv.type_var Mtv.t * Denv.type_var Mreg.t
+
+let region_table : region Htv.t =
+  Htv.create 17 (* FIXME: use Wtv instead *)
+
+let rec expr locals de = match de.dexpr_desc with
+  | DElocal x ->
+      assert (Mstr.mem x locals);
+      begin match Mstr.find x locals with
+      | Lpvsymbol pv -> e_value pv
+      | Lpasymbol pa -> e_arrow pa
+      | Lpsymbol  (_ps, _, _) ->
+          (* let ity = ity_of_dty de.dexpr_dty in *)
+          (* e_inst ps *)
+          assert false (*TODO*)
+      end
+  | _ ->
+      assert false (*TODO*)
 
 (** Type declaration *)
 
@@ -546,8 +631,14 @@ let add_module lib path mm mt m =
         let uc = open_namespace uc in
         let uc = List.fold_left add_decl uc dl in
         Loc.try3 loc close_namespace uc import name
-    | Dlet _ | Dletrec _ | Dparam _ | Dexn _ | Duse _ ->
-        assert false
+    | Dlet (_id, e) ->
+        let e = dexpr ~userloc:None (create_denv uc) e in
+        ignore (expr Mstr.empty e);
+        uc
+    | Dletrec _ | Dparam _ | Dexn _ ->
+        assert false (* TODO *)
+    | Duse _ ->
+        assert false (*TO BE REMOVED EVENTUALLY *)
   in
   let uc = List.fold_left add_decl uc m.mod_decl in
   let m = close_module uc in

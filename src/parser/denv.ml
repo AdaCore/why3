@@ -27,16 +27,6 @@ open Ty
 open Term
 open Theory
 
-exception AnyMessage of string
-
-let error ?loc e = match loc with
-  | None -> raise e
-  | Some loc -> raise (Loc.Located (loc,e))
-
-let () = Exn_printer.register (fun fmt e -> match e with
-  | AnyMessage s -> fprintf fmt "%s" s
-  | _ -> raise e)
-
 (** types with destructive type variables *)
 
 type dty_view =
@@ -124,7 +114,7 @@ let rec ty_of_dty = function
   | Tyvar { type_val = Some t } ->
       ty_of_dty t
   | Tyvar { type_val = None; user = false; type_var_loc = loc } ->
-      error ?loc (AnyMessage "undefined type variable")
+      Loc.errorm ?loc "undefined type variable"
   | Tyvar { tvsymbol = tv } ->
       ty_var tv
   | Tyapp (s, tl) ->
