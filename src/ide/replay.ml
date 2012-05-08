@@ -28,7 +28,9 @@ let file = ref None
 let opt_version = ref false
 let opt_stats = ref true
 let opt_force = ref false
+(*
 let opt_convert_unknown_provers = ref false
+*)
 let opt_bench = ref false
 
 (** {2 Smoke detector} *)
@@ -69,20 +71,24 @@ let spec = Arg.align [
    "<file> Read additional configuration from <file>") ;
   ("-force",
    Arg.Set opt_force,
-   " enforce saving of session even if replay failed") ;
+   " enforce saving the session after replay") ;
   ("-smoke-detector",
    Arg.Symbol (["none";"top";"deep"],set_opt_smoke),
    " try to detect if the context is self-contradicting") ;
+(*
   ("-bench",
    Arg.Set opt_bench, " run as bench (experimental)");
+*)
   ("-s",
    Arg.Clear opt_stats,
    " do not print statistics") ;
   ("-v",
    Arg.Set opt_version,
    " print version information") ;
+(*
   "--convert-unknown-provers", Arg.Set opt_convert_unknown_provers,
   " try to find compatible provers for all unknown provers";
+*)
   Debug.Opt.desc_debug_list;
   Debug.Opt.desc_shortcut "parse_only" "--parse-only" " Stop after parsing";
   Debug.Opt.desc_shortcut
@@ -321,24 +327,23 @@ let add_to_check_no_smoke config found_obs env_session sched =
             report
         in
         if report = [] then begin
+          if !opt_force then
+            printf " %d/%d (replay OK, session going to be saved since -force was given)@." n m
+          else
             if found_obs then
               if n=m then
                 printf " %d/%d (replay OK, all proved: obsolete session \
 updated)@." n m
               else
-                if !opt_force then
-                  printf " %d/%d (replay OK, but not all proved: obsolete \
-session updated since -force was given)@." n m
-                else
-                  printf " %d/%d (replay OK, but not all proved: obsolete \
+                printf " %d/%d (replay OK, but not all proved: obsolete \
 session NOT updated)@." n m
             else
               printf " %d/%d@." n m ;
             if !opt_stats && n<m then print_statistics files;
             eprintf "Everything replayed OK.@.";
-            if found_obs && (n=m || !opt_force) then
+            if (found_obs && n=m) || !opt_force then
               begin
-                eprintf "Updating obsolete session...@?";
+                eprintf "Saving session...@?";
                 S.save_session config session;
                 eprintf " done@."
               end;
@@ -430,7 +435,9 @@ let () =
     eprintf " done.@.";
     if !opt_bench then run_as_bench env_session;
     transform_smoke env_session;
+(*
     if !opt_convert_unknown_provers then M.convert_unknown_prover env_session;
+*)
     let sched =
       M.init (Whyconf.running_provers_max (Whyconf.get_main config)) in
     if found_obs then begin

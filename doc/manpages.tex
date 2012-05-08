@@ -430,7 +430,7 @@ the new run are shown.
 
 Nothing is shown when there is no change in the results, whether the
 considered goal is proved or not. When all the proof
-
+are done, a summary of what is proved or not is displayed using a
 tree-shape pretty print, similar to the IDE tree view after doing
 ``Collapse proved goals''. In other words, when a goal, a theory, or a
 file is fully proved, the subtree is not shown.
@@ -438,9 +438,15 @@ file is fully proved, the subtree is not shown.
 \paragraph{Obsolete proofs}
 
 When some proofs stored in the session file are obsolete, the replay is
-run anyway, as with the replay button in the IDE. Then, if all the
-replayed proofs went OK, the session file is updated. Otherwise you have
-to use the IDE to update it.
+run anyway, as with the replay button in the IDE. Then, the session
+file will be updated if both 
+\begin{itemize}
+\item all the replayed proof attempts give the same result as what
+  is stored in the session
+\item every goals are proved.
+\end{itemize}
+In other cases, you can use the IDE to update the session, or use the
+option \verb|-force| described below.
 
 \paragraph{Exit code and options}
 
@@ -449,8 +455,8 @@ to use the IDE to update it.
   was. Other exit codes mean some failure in running the replay.
 \item Option \verb|-s| suppresses the output of the final tree view.
 \item Option \texttt{-I \textsl{<path>}} adds \texttt{\textsl{<path>}} to the loadpath.
-\item Option \verb|-force| writes a new session file even if
-  some proofs did not replay correctly.
+\item Option \verb|-force| enforces saving the session, if all proof
+  attempts replayed correctly, even if some goals are not proved.
 \item Option \texttt{-smoke-detector \{none|top|deep\}} tries to detect
   if the context is self-contradicting.
 \end{itemize}
