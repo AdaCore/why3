@@ -2188,9 +2188,11 @@ let add_types uc dl =
         | Ty.Tyapp (ts, tyl) ->
             let y = ts.ts_name.id_string in
             let n =
+(**
               if Mstr.mem y def then begin
                 visit y; of_option (Hashtbl.find nregions y)
               end else
+**)
                 (get_mtsymbol ts).mt_regions
             in
             let rl = regions_tyapp ts n tyl in
