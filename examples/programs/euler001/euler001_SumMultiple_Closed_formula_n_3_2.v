@@ -28,8 +28,6 @@ Definition closed_formula(n:Z): Z := let n3 := (ZOdiv n 3%Z) in let n5 :=
 Definition p(n:Z): Prop :=
   ((sum_multiple_3_5_lt (n + 1%Z)%Z) = (closed_formula n)).
 
-Axiom Closed_formula_0 : (p 0%Z).
-
 Axiom mod_div_unique : forall (x:Z) (y:Z) (q:Z) (r:Z), ((0%Z <= x)%Z /\
   ((0%Z < y)%Z /\ ((x = ((q * y)%Z + r)%Z) /\ ((0%Z <= r)%Z /\
   (r < y)%Z)))) -> ((q = (ZOdiv x y)) /\ (r = (ZOmod x y))).
@@ -49,30 +47,42 @@ Axiom div_succ_2 : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (0%Z < y)%Z) ->
   ((~ ((ZOmod (x + 1%Z)%Z y) = 0%Z)) ->
   ((ZOdiv (x + 1%Z)%Z y) = (ZOdiv x y))).
 
-Axiom mod_15 : forall (n:Z), ((ZOmod n 15%Z) = 0%Z) <->
-  (((ZOmod n 3%Z) = 0%Z) /\ ((ZOmod n 5%Z) = 0%Z)).
-
-Axiom triangle_numbers : forall (n:Z),
-  ((ZOmod (n * (n + 1%Z)%Z)%Z 2%Z) = 0%Z).
-
 Axiom div2_simpl : forall (x:Z) (y:Z), ((2%Z * x)%Z = y) ->
   (x = (ZOdiv y 2%Z)).
 
-Axiom add_div2 : forall (x:Z) (y:Z), ((ZOmod x 2%Z) = 0%Z) ->
+Axiom add_div2 : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ ((0%Z <= y)%Z /\
+  ((ZOmod x 2%Z) = 0%Z))) ->
   ((ZOdiv (x + y)%Z 2%Z) = ((ZOdiv x 2%Z) + (ZOdiv y 2%Z))%Z).
+
+Axiom sub_div2a : forall (x:Z) (y:Z), (((y <= x)%Z /\ (0%Z <= y)%Z) /\
+  (((ZOmod x 2%Z) = 0%Z) /\ ((ZOmod y 2%Z) = 0%Z))) ->
+  ((ZOdiv (x - y)%Z 2%Z) = ((ZOdiv x 2%Z) - (ZOdiv y 2%Z))%Z).
+
+Axiom tr_mod_2 : forall (n:Z), (0%Z <= n)%Z ->
+  ((ZOmod (n * (n + 1%Z)%Z)%Z 2%Z) = 0%Z).
+
+(* Why3 assumption *)
+Definition tr(n:Z): Z := (ZOdiv (n * (n + 1%Z)%Z)%Z 2%Z).
+
+Axiom tr_repr : forall (n:Z), (0%Z <= n)%Z ->
+  ((n * (n + 1%Z)%Z)%Z = (2%Z * (tr n))%Z).
+
+Axiom tr_succ : forall (n:Z), (0%Z <= n)%Z ->
+  ((tr (n + 1%Z)%Z) = ((tr n) + n)%Z).
+
+Axiom mod_15 : forall (n:Z), ((ZOmod n 15%Z) = 0%Z) <->
+  (((ZOmod n 3%Z) = 0%Z) /\ ((ZOmod n 5%Z) = 0%Z)).
+
+Axiom Closed_formula_0 : (p 0%Z).
 
 Axiom Closed_formula_n : forall (n:Z), (0%Z <= n)%Z -> ((p n) ->
   (((~ ((ZOmod (n + 1%Z)%Z 3%Z) = 0%Z)) /\
   ~ ((ZOmod (n + 1%Z)%Z 5%Z) = 0%Z)) -> (p (n + 1%Z)%Z))).
 
-Require Import Why3.
-Ltac ae := why3 "alt-ergo" timelimit 2.
-
 (* Why3 goal *)
 Theorem Closed_formula_n_3 : forall (n:Z), (0%Z <= n)%Z -> ((p n) ->
   ((((ZOmod (n + 1%Z)%Z 3%Z) = 0%Z) /\ ~ ((ZOmod (n + 1%Z)%Z 5%Z) = 0%Z)) ->
   (p (n + 1%Z)%Z))).
-(* YOU MAY EDIT THE PROOF BELOW *)
 intros n Hn Hind (H3,H5).
 unfold p in *.
 rewrite SumYes; auto with zarith.
@@ -84,9 +94,9 @@ rewrite (div_succ_2 n 15); auto with zarith.
 2: generalize (mod_15 (n+1)); intuition.
 apply div2_simpl.
 ring_simplify.
+rewrite sub_div2a.
 rewrite add_div2.
-
-ae.
+ring_simplify.
 
 Qed.
 

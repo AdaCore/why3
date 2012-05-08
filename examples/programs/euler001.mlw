@@ -1,4 +1,4 @@
-(* Euler Project, problem 1
+(** {1 Euler Project, problem 1} 
 
 If we list all the natural numbers below 10 that are multiples of 3 or
 5, we get 3, 5, 6 and 9. The sum of these multiples is 23.
@@ -14,7 +14,7 @@ theory DivModHints
 
   lemma mod_div_unique :
     forall x y q r:int. x >= 0 /\ y > 0 /\ x = q*y + r /\ 0 <= r < y ->
-      q = div x y /\ r = mod x y 
+      q = div x y /\ r = mod x y
 
   lemma mod_succ_1 :
     forall x y:int. x >= 0 /\ y > 0 ->
@@ -31,6 +31,49 @@ theory DivModHints
   lemma div_succ_2 :
     forall x y:int. x >= 0 /\ y > 0 ->
       mod (x+1) y <> 0 -> div (x+1) y = (div x y)
+
+  lemma mod2_mul2:
+    forall x:int. mod (2 * x) 2 = 0
+
+  lemma mod2_mul2_aux:
+    forall x y:int. mod (y * (2 * x)) 2 = 0
+
+  lemma mod2_mul2_aux2:
+    forall x y z t:int. mod (y * (2 * x) + z * (2 * t)) 2 = 0
+
+  lemma div2_mul2:
+    forall x:int. div (2 * x) 2 = x
+
+  lemma div2_mul2_aux:
+    forall x y:int. div (y * (2 * x)) 2 = y * x
+
+  lemma div2_add:
+    forall x y:int. mod x 2 = 0 /\ mod y 2 = 0 ->
+      div (x+y) 2 = div x 2 + div y 2
+
+  lemma div2_sub:
+    forall x y:int. mod x 2 = 0 /\ mod y 2 = 0 ->
+      div (x-y) 2 = div x 2 - div y 2
+
+end
+
+theory TriangularNumbers
+
+  use import int.Int
+  use import int.ComputerDivision
+  use import int.Div2
+  use DivModHints
+
+  lemma tr_mod_2:
+    forall n:int. n >= 0 -> mod (n*(n+1)) 2 = 0
+
+  function tr (n:int) : int =  div (n*(n+1)) 2
+
+  lemma tr_repr:
+    forall n:int. n >= 0 -> n*(n+1) = 2 * tr n
+
+  lemma tr_succ:
+    forall n:int. n >= 0 -> tr (n+1) = tr n + n + 1
 
 end
 
@@ -54,48 +97,62 @@ theory SumMultiple
     mod n 3 = 0 \/ mod n 5 = 0 ->
     sum_multiple_3_5_lt (n+1) = sum_multiple_3_5_lt n + n
 
-  function closed_formula (n:int) : int =
+  use import TriangularNumbers
+
+  function closed_formula_aux (n:int) : int =
     let n3 = div n 3 in
     let n5 = div n 5 in
     let n15 = div n 15 in
-    div (3 * n3 * (n3+1) +
-         5 * n5 * (n5+1) -
-         15 * n15 * (n15+1)) 2
+    3 * tr n3 + 5 * tr n5 - 15 * tr n15
 
-  predicate p (n:int) = sum_multiple_3_5_lt (n+1) = closed_formula n
-
-  lemma Closed_formula_0: p 0
+  predicate p (n:int) = sum_multiple_3_5_lt (n+1) = closed_formula_aux n
 
   use DivModHints
+  use TriangularNumbers
 
   lemma mod_15:
     forall n:int.
       mod n 15 = 0 <-> mod n 3 = 0 /\ mod n 5 = 0
 
-  lemma triangle_numbers:
-    forall n:int.
-      2 * div (n*(n+1)) 2 = n*(n+1)
+  lemma Closed_formula_0: p 0
 
   lemma Closed_formula_n:
-    forall n:int. n >= 0 -> p n ->
-      mod (n+1) 3 <> 0 /\ mod (n+1) 5 <> 0 -> p (n+1)
+    forall n:int. n > 0 -> p (n-1) ->
+      mod n 3 <> 0 /\ mod n 5 <> 0 -> p n
 
   lemma Closed_formula_n_3:
-    forall n:int. n >= 0 -> p n ->
-      mod (n+1) 3 = 0 /\ mod (n+1) 5 <> 0 -> p (n+1)
+    forall n:int. n > 0 -> p (n-1) ->
+      mod n 3 = 0 /\ mod n 5 <> 0 -> p n
 
   lemma Closed_formula_n_5:
-    forall n:int. n >= 0 -> p n ->
-      mod (n+1) 3 <> 0 /\ mod (n+1) 5 = 0 -> p (n+1)
+    forall n:int. n > 0 -> p (n-1) ->
+      mod n 3 <> 0 /\ mod n 5 = 0 -> p n
 
   lemma Closed_formula_n_15:
-    forall n:int. n >= 0 -> p n ->
-      mod (n+1) 3 = 0 /\ mod (n+1) 5 = 0 -> p (n+1)
+    forall n:int. n > 0 -> p (n-1) ->
+      mod n 3 = 0 /\ mod n 5 = 0 -> p n
 
-  clone int.Induction as I with predicate p = p
+  constant b : int = 0
 
-  lemma Closed_formula:
+  clone int.Induction as I with constant bound = b, predicate p = p
+
+  lemma Closed_formula_ind:
     forall n:int. 0 <= n -> p n
+
+  function closed_formula (n:int) : int =
+    let n3 = div n 3 in
+    let n5 = div n 5 in
+    let n15 = div n 15 in
+    div (3 * (n3 * (n3+1)) +
+         5 * (n5 * (n5+1)) -
+         15 * (n15 * (n15+1))) 2
+
+  lemma div_15: forall n:int. 0 <= n -> div n 15 >= 0
+  lemma div_5: forall n:int. 0 <= n -> div n 5 >= 0
+  lemma div_3: forall n:int. 0 <= n -> div n 3 >= 0
+
+  lemma Closed_Formula:
+    forall n:int. 0 <= n -> sum_multiple_3_5_lt (n+1) = closed_formula n
 
 end
 
@@ -115,7 +172,7 @@ module Euler001
 
 end
 
-(*
+(***
 Local Variables:
 compile-command: "unset LANG; make -C ../.. examples/programs/euler001.gui"
 End:
