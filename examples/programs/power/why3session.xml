@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/home/jcf/why3/share/why3session.dtd">
+<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
 <why3session
- name="examples/programs/power/why3session.xml">
+ name="programs/power/why3session.xml">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -13,7 +13,7 @@
  <prover
   id="2"
   name="Coq"
-  version="8.3pl3"/>
+  version="8.3pl4"/>
  <prover
   id="3"
   name="Z3"
@@ -21,16 +21,16 @@
  <file
   name="../power.mlw"
   verified="true"
-  expanded="true">
+  expanded="false">
   <theory
    name="Power"
-   locfile="examples/programs/power/../power.mlw"
+   locfile="programs/power/../power.mlw"
    loclnum="2" loccnumb="7" loccnume="12"
    verified="true"
    expanded="true">
    <goal
     name="Power_1"
-    locfile="examples/programs/power/../power.mlw"
+    locfile="programs/power/../power.mlw"
     loclnum="12" loccnumb="8" loccnume="15"
     sum="bdeb3f9ad05e1dc3b13cd428c8946ebb"
     proved="true"
@@ -39,6 +39,7 @@
     <proof
      prover="3"
      timelimit="2"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.01"/>
@@ -46,6 +47,7 @@
     <proof
      prover="1"
      timelimit="2"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
@@ -53,7 +55,7 @@
    </goal>
    <goal
     name="Power_sum"
-    locfile="examples/programs/power/../power.mlw"
+    locfile="programs/power/../power.mlw"
     loclnum="14" loccnumb="8" loccnume="17"
     sum="9762280403897367fe27961be8abcd84"
     proved="true"
@@ -62,15 +64,16 @@
     <proof
      prover="2"
      timelimit="10"
+     memlimit="0"
      edited="power_Power_Power_sum_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="1.90"/>
+     <result status="valid" time="1.19"/>
     </proof>
    </goal>
    <goal
     name="Power_mult"
-    locfile="examples/programs/power/../power.mlw"
+    locfile="programs/power/../power.mlw"
     loclnum="17" loccnumb="8" loccnume="18"
     sum="e99359f55abd122604307bcf989669a8"
     proved="true"
@@ -79,15 +82,16 @@
     <proof
      prover="2"
      timelimit="2"
+     memlimit="0"
      edited="power_Power_Power_mult_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.58"/>
+     <result status="valid" time="0.51"/>
     </proof>
    </goal>
    <goal
     name="Power_mult2"
-    locfile="examples/programs/power/../power.mlw"
+    locfile="programs/power/../power.mlw"
     loclnum="20" loccnumb="8" loccnume="19"
     sum="b9b87f974a9380e1286402f7dae71e1b"
     proved="true"
@@ -96,22 +100,23 @@
     <proof
      prover="2"
      timelimit="5"
+     memlimit="0"
      edited="power_Power_Power_mult2_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.51"/>
+     <result status="valid" time="0.46"/>
     </proof>
    </goal>
   </theory>
   <theory
    name="WP M"
-   locfile="examples/programs/power/../power.mlw"
+   locfile="programs/power/../power.mlw"
    loclnum="25" loccnumb="7" loccnume="8"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter fast_exp"
-    locfile="examples/programs/power/../power.mlw"
+    locfile="programs/power/../power.mlw"
     loclnum="33" loccnumb="10" loccnume="18"
     expl="parameter fast_exp"
     sum="52fa687dcf1a4190fcc17725f0bcd80d"
@@ -123,14 +128,15 @@
     <proof
      prover="0"
      timelimit="2"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.66"/>
+     <result status="valid" time="0.65"/>
     </proof>
    </goal>
    <goal
     name="WP_parameter fast_exp_imperative"
-    locfile="examples/programs/power/../power.mlw"
+    locfile="programs/power/../power.mlw"
     loclnum="47" loccnumb="6" loccnume="25"
     expl="parameter fast_exp_imperative"
     sum="54bb42459f1b0e5d98f727d0b550ffaf"
@@ -145,7 +151,7 @@
      expanded="true">
      <goal
       name="WP_parameter fast_exp_imperative.1"
-      locfile="examples/programs/power/../power.mlw"
+      locfile="programs/power/../power.mlw"
       loclnum="47" loccnumb="6" loccnume="25"
       expl="loop invariant init"
       sum="c4fac372e5383b3478298856a5aa6edc"
@@ -157,6 +163,7 @@
       <proof
        prover="3"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -164,6 +171,7 @@
       <proof
        prover="0"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -171,6 +179,7 @@
       <proof
        prover="1"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -178,7 +187,7 @@
      </goal>
      <goal
       name="WP_parameter fast_exp_imperative.2"
-      locfile="examples/programs/power/../power.mlw"
+      locfile="programs/power/../power.mlw"
       loclnum="47" loccnumb="6" loccnume="25"
       expl="loop invariant preservation"
       sum="1802dccb142bbacf78c0b6cc5cc92fd4"
@@ -190,21 +199,23 @@
       <proof
        prover="1"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.05"/>
+       <result status="valid" time="0.06"/>
       </proof>
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.38"/>
+       <result status="valid" time="0.37"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter fast_exp_imperative.3"
-      locfile="examples/programs/power/../power.mlw"
+      locfile="programs/power/../power.mlw"
       loclnum="47" loccnumb="6" loccnume="25"
       expl="loop variant decreases"
       sum="407eb0177dbae812bbdd96bd08ae63eb"
@@ -216,28 +227,31 @@
       <proof
        prover="3"
        timelimit="5"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="0"
-       timelimit="10"
+       prover="1"
+       timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.09"/>
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.10"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter fast_exp_imperative.4"
-      locfile="examples/programs/power/../power.mlw"
+      locfile="programs/power/../power.mlw"
       loclnum="47" loccnumb="6" loccnume="25"
       expl="loop invariant preservation"
       sum="9516c33632eb87e3674420d6a7db3900"
@@ -252,7 +266,7 @@
        expanded="true">
        <goal
         name="WP_parameter fast_exp_imperative.4.1"
-        locfile="examples/programs/power/../power.mlw"
+        locfile="programs/power/../power.mlw"
         loclnum="47" loccnumb="6" loccnume="25"
         expl="parameter fast_exp_imperative"
         sum="8fb404c15f4b8e074f0ac4d521abc4b2"
@@ -264,6 +278,7 @@
         <proof
          prover="3"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -271,6 +286,7 @@
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -278,14 +294,15 @@
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.00"/>
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter fast_exp_imperative.4.2"
-        locfile="examples/programs/power/../power.mlw"
+        locfile="programs/power/../power.mlw"
         loclnum="47" loccnumb="6" loccnume="25"
         expl="parameter fast_exp_imperative"
         sum="fc7d5238adf8fc223ac176f55479ad14"
@@ -297,17 +314,18 @@
         <proof
          prover="2"
          timelimit="5"
+         memlimit="0"
          edited="power_WP_M_WP_parameter_fast_exp_imperative_3.v"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.63"/>
+         <result status="valid" time="0.60"/>
         </proof>
        </goal>
       </transf>
      </goal>
      <goal
       name="WP_parameter fast_exp_imperative.5"
-      locfile="examples/programs/power/../power.mlw"
+      locfile="programs/power/../power.mlw"
       loclnum="47" loccnumb="6" loccnume="25"
       expl="loop variant decreases"
       sum="dd6d50af777c7d10f7a97a5a9daf0c39"
@@ -319,6 +337,7 @@
       <proof
        prover="3"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -326,21 +345,23 @@
       <proof
        prover="1"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.00"/>
+       <result status="valid" time="0.01"/>
       </proof>
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.04"/>
+       <result status="valid" time="0.05"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter fast_exp_imperative.6"
-      locfile="examples/programs/power/../power.mlw"
+      locfile="programs/power/../power.mlw"
       loclnum="47" loccnumb="6" loccnume="25"
       expl="normal postcondition"
       sum="4256da97e8d3b66a11209149bf47594f"
@@ -355,7 +376,7 @@
        expanded="true">
        <goal
         name="WP_parameter fast_exp_imperative.6.1"
-        locfile="examples/programs/power/../power.mlw"
+        locfile="programs/power/../power.mlw"
         loclnum="47" loccnumb="6" loccnume="25"
         expl="normal postcondition"
         sum="4256da97e8d3b66a11209149bf47594f"
@@ -367,6 +388,7 @@
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.00"/>
@@ -374,9 +396,10 @@
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.01"/>
+         <result status="valid" time="0.00"/>
         </proof>
        </goal>
       </transf>

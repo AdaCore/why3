@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/home/jcf/why3/share/why3session.dtd">
+<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
 <why3session
- name="queens/why3session.xml">
+ name="programs/queens/why3session.xml">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -17,7 +17,7 @@
  <prover
   id="3"
   name="Coq"
-  version="8.3pl3"/>
+  version="8.3pl4"/>
  <prover
   id="4"
   name="Z3"
@@ -29,10 +29,10 @@
  <file
   name="../queens.mlw"
   verified="true"
-  expanded="true">
+  expanded="false">
   <theory
    name="S"
-   locfile="queens/../queens.mlw"
+   locfile="programs/queens/../queens.mlw"
    loclnum="8" loccnumb="7" loccnume="8"
    verified="true"
    expanded="false">
@@ -41,13 +41,13 @@
   </theory>
   <theory
    name="WP NQueensSetsTermination"
-   locfile="queens/../queens.mlw"
+   locfile="programs/queens/../queens.mlw"
    loclnum="24" loccnumb="7" loccnume="29"
    verified="true"
    expanded="false">
    <goal
     name="WP_parameter t"
-    locfile="queens/../queens.mlw"
+    locfile="programs/queens/../queens.mlw"
     loclnum="29" loccnumb="10" loccnume="11"
     expl="parameter t"
     sum="bc14d6a2cb0dfe460bf239d5db5617b6"
@@ -59,10 +59,10 @@
     <transf
      name="split_goal"
      proved="true"
-     expanded="false">
+     expanded="true">
      <goal
       name="WP_parameter t.1"
-      locfile="queens/../queens.mlw"
+      locfile="programs/queens/../queens.mlw"
       loclnum="29" loccnumb="10" loccnume="11"
       expl="loop invariant init"
       sum="eb70dc57effbb7c787ce561225380764"
@@ -82,7 +82,7 @@
      </goal>
      <goal
       name="WP_parameter t.2"
-      locfile="queens/../queens.mlw"
+      locfile="programs/queens/../queens.mlw"
       loclnum="29" loccnumb="10" loccnume="11"
       expl="precondition"
       sum="f11aff80235422ac78098b0910227986"
@@ -102,7 +102,7 @@
      </goal>
      <goal
       name="WP_parameter t.3"
-      locfile="queens/../queens.mlw"
+      locfile="programs/queens/../queens.mlw"
       loclnum="29" loccnumb="10" loccnume="11"
       expl="loop invariant preservation"
       sum="6fea50323f0a54f36f5ca78f5b6c7f00"
@@ -122,7 +122,7 @@
      </goal>
      <goal
       name="WP_parameter t.4"
-      locfile="queens/../queens.mlw"
+      locfile="programs/queens/../queens.mlw"
       loclnum="29" loccnumb="10" loccnume="11"
       expl="loop variant decreases"
       sum="871c7d975758b05c2a59eb4a3ee5311e"
@@ -137,7 +137,7 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.03"/>
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
     </transf>
@@ -145,13 +145,13 @@
   </theory>
   <theory
    name="Solution"
-   locfile="queens/../queens.mlw"
+   locfile="programs/queens/../queens.mlw"
    loclnum="46" loccnumb="7" loccnume="15"
    verified="true"
    expanded="false">
    <goal
     name="partial_solution_eq_prefix"
-    locfile="queens/../queens.mlw"
+    locfile="programs/queens/../queens.mlw"
     loclnum="72" loccnumb="8" loccnume="34"
     sum="5c14f4a4e9360f5c79a3d062f8efec75"
     proved="true"
@@ -168,7 +168,7 @@
    </goal>
    <goal
     name="no_duplicate"
-    locfile="queens/../queens.mlw"
+    locfile="programs/queens/../queens.mlw"
     loclnum="86" loccnumb="8" loccnume="20"
     sum="c3e6b2d752731d21119e696be3ebd88a"
     proved="true"
@@ -186,13 +186,13 @@
   </theory>
   <theory
    name="WP NQueensSets"
-   locfile="queens/../queens.mlw"
+   locfile="programs/queens/../queens.mlw"
    loclnum="94" loccnumb="7" loccnume="18"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter t3"
-    locfile="queens/../queens.mlw"
+    locfile="programs/queens/../queens.mlw"
     loclnum="106" loccnumb="10" loccnume="12"
     expl="parameter t3"
     sum="2fbdcb215e6dae15e3c09787b10da016"
@@ -207,7 +207,7 @@
      expanded="true">
      <goal
       name="WP_parameter t3.1"
-      locfile="queens/../queens.mlw"
+      locfile="programs/queens/../queens.mlw"
       loclnum="106" loccnumb="10" loccnume="12"
       expl="loop invariant init"
       sum="cc5727463ab95f0e5bdf31fbf0a78994"
@@ -235,7 +235,7 @@
      </goal>
      <goal
       name="WP_parameter t3.2"
-      locfile="queens/../queens.mlw"
+      locfile="programs/queens/../queens.mlw"
       loclnum="106" loccnumb="10" loccnume="12"
       expl="precondition"
       sum="6cd3b0dea30cccd82cea72435f093363"
@@ -250,7 +250,7 @@
        expanded="true">
        <goal
         name="WP_parameter t3.2.1"
-        locfile="queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="106" loccnumb="10" loccnume="12"
         expl="parameter t3"
         sum="fb87588f32d7e33223bcf5fd76f00fe0"
@@ -270,7 +270,7 @@
        </goal>
        <goal
         name="WP_parameter t3.2.2"
-        locfile="queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="106" loccnumb="10" loccnume="12"
         expl="parameter t3"
         sum="8f9af03c90de283199954088ac2170ae"
@@ -290,7 +290,7 @@
        </goal>
        <goal
         name="WP_parameter t3.2.3"
-        locfile="queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="106" loccnumb="10" loccnume="12"
         expl="parameter t3"
         sum="61fa1cd2169fdcd15e95e5a97dbecc5e"
@@ -310,7 +310,7 @@
        </goal>
        <goal
         name="WP_parameter t3.2.4"
-        locfile="queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="106" loccnumb="10" loccnume="12"
         expl="parameter t3"
         sum="0b42caa9b7fc1ba6eef1842c00b482d1"
@@ -325,12 +325,12 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.45"/>
+         <result status="valid" time="0.44"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter t3.2.5"
-        locfile="queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="106" loccnumb="10" loccnume="12"
         expl="parameter t3"
         sum="99139e2451c5f99591629eafd2513602"
@@ -350,7 +350,7 @@
        </goal>
        <goal
         name="WP_parameter t3.2.6"
-        locfile="queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="106" loccnumb="10" loccnume="12"
         expl="parameter t3"
         sum="bde430bb2af893dd78c373e23090a986"
@@ -365,12 +365,12 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.11"/>
+         <result status="valid" time="0.10"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter t3.2.7"
-        locfile="queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="106" loccnumb="10" loccnume="12"
         expl="parameter t3"
         sum="facfb455ab942de2db6d3849495a95bc"
@@ -390,7 +390,7 @@
        </goal>
        <goal
         name="WP_parameter t3.2.8"
-        locfile="queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="106" loccnumb="10" loccnume="12"
         expl="parameter t3"
         sum="ddaded9a2b4838ba81dd4f9a2cc1fc66"
@@ -405,12 +405,12 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.71"/>
+         <result status="valid" time="1.65"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter t3.2.9"
-        locfile="queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="106" loccnumb="10" loccnume="12"
         expl="parameter t3"
         sum="99625f313004a0fc5b78fa9170aebb1a"
@@ -426,12 +426,12 @@
          edited="queens_WP_NQueensSets_WP_parameter_t3_1.v"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.97"/>
+         <result status="valid" time="0.94"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter t3.2.10"
-        locfile="queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="106" loccnumb="10" loccnume="12"
         expl="parameter t3"
         sum="1644c0c0527ea15a0ef599b6491712ab"
@@ -442,16 +442,16 @@
          name="expl:parameter t3"/>
         <proof
          prover="1"
-         timelimit="10"
+         timelimit="19"
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="9.30"/>
+         <result status="valid" time="8.13"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter t3.2.11"
-        locfile="queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="106" loccnumb="10" loccnume="12"
         expl="parameter t3"
         sum="fb6847baa1504d8f1af7e0a87bda3b90"
@@ -467,12 +467,12 @@
          edited="queens_WP_NQueensSets_WP_parameter_t3_3.v"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.66"/>
+         <result status="valid" time="1.64"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter t3.2.12"
-        locfile="queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="106" loccnumb="10" loccnume="12"
         expl="parameter t3"
         sum="f97dc7e6677a68cc4e8097c93d5be544"
@@ -483,16 +483,16 @@
          name="expl:parameter t3"/>
         <proof
          prover="0"
-         timelimit="10"
+         timelimit="13"
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="6.13"/>
+         <result status="valid" time="6.06"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter t3.2.13"
-        locfile="queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="106" loccnumb="10" loccnume="12"
         expl="parameter t3"
         sum="6d60cbb3660d018edb4573cef394261f"
@@ -508,12 +508,12 @@
          edited="queens_WP_NQueensSets_WP_parameter_t3_4.v"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.68"/>
+         <result status="valid" time="1.62"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter t3.2.14"
-        locfile="queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="106" loccnumb="10" loccnume="12"
         expl="parameter t3"
         sum="e41200f02ac98534c3d267cd05a0b7d9"
@@ -528,7 +528,7 @@
          expanded="true">
          <goal
           name="WP_parameter t3.2.14.1"
-          locfile="queens/../queens.mlw"
+          locfile="programs/queens/../queens.mlw"
           loclnum="106" loccnumb="10" loccnume="12"
           expl="parameter t3"
           sum="74d7473eae8cc90f5fd9bd1186cebe04"
@@ -543,7 +543,7 @@
            expanded="true">
            <goal
             name="WP_parameter t3.2.14.1.1"
-            locfile="queens/../queens.mlw"
+            locfile="programs/queens/../queens.mlw"
             loclnum="106" loccnumb="10" loccnume="12"
             expl="parameter t3"
             sum="5f20971638b30640d32e2a10cb0d6572"
@@ -558,7 +558,7 @@
              memlimit="0"
              obsolete="false"
              archived="false">
-             <result status="valid" time="1.89"/>
+             <result status="valid" time="1.90"/>
             </proof>
             <proof
              prover="5"
@@ -566,12 +566,12 @@
              memlimit="0"
              obsolete="false"
              archived="false">
-             <result status="valid" time="0.76"/>
+             <result status="valid" time="0.74"/>
             </proof>
            </goal>
            <goal
             name="WP_parameter t3.2.14.1.2"
-            locfile="queens/../queens.mlw"
+            locfile="programs/queens/../queens.mlw"
             loclnum="106" loccnumb="10" loccnume="12"
             expl="parameter t3"
             sum="f00ccaa916d0b40c7f3b2fc1b8eafe35"
@@ -586,7 +586,7 @@
              memlimit="0"
              obsolete="false"
              archived="false">
-             <result status="valid" time="1.10"/>
+             <result status="valid" time="1.71"/>
             </proof>
             <proof
              prover="0"
@@ -594,7 +594,7 @@
              memlimit="0"
              obsolete="false"
              archived="false">
-             <result status="valid" time="0.22"/>
+             <result status="valid" time="0.21"/>
             </proof>
             <proof
              prover="2"
@@ -602,7 +602,7 @@
              memlimit="0"
              obsolete="false"
              archived="false">
-             <result status="valid" time="7.80"/>
+             <result status="valid" time="7.58"/>
             </proof>
             <proof
              prover="5"
@@ -610,12 +610,12 @@
              memlimit="0"
              obsolete="false"
              archived="false">
-             <result status="valid" time="0.76"/>
+             <result status="valid" time="0.74"/>
             </proof>
            </goal>
            <goal
             name="WP_parameter t3.2.14.1.3"
-            locfile="queens/../queens.mlw"
+            locfile="programs/queens/../queens.mlw"
             loclnum="106" loccnumb="10" loccnume="12"
             expl="parameter t3"
             sum="46f8228a82581600b9ef25d885f4ba93"
@@ -631,12 +631,12 @@
              edited="queens_WP_NQueensSets_WP_parameter_t3_7.v"
              obsolete="false"
              archived="false">
-             <result status="valid" time="3.34"/>
+             <result status="valid" time="3.29"/>
             </proof>
            </goal>
            <goal
             name="WP_parameter t3.2.14.1.4"
-            locfile="queens/../queens.mlw"
+            locfile="programs/queens/../queens.mlw"
             loclnum="106" loccnumb="10" loccnume="12"
             expl="parameter t3"
             sum="a12f0e3d40ba55fa67f3077ef01432c0"
@@ -652,12 +652,12 @@
              edited="queens_WP_NQueensSets_WP_parameter_t3_8.v"
              obsolete="false"
              archived="false">
-             <result status="valid" time="2.85"/>
+             <result status="valid" time="2.84"/>
             </proof>
            </goal>
            <goal
             name="WP_parameter t3.2.14.1.5"
-            locfile="queens/../queens.mlw"
+            locfile="programs/queens/../queens.mlw"
             loclnum="106" loccnumb="10" loccnume="12"
             expl="parameter t3"
             sum="012e7959f42a1c778dc3a7d7bcfa3bb8"
@@ -672,7 +672,7 @@
              memlimit="0"
              obsolete="false"
              archived="false">
-             <result status="valid" time="1.23"/>
+             <result status="valid" time="1.25"/>
             </proof>
            </goal>
           </transf>
@@ -683,7 +683,7 @@
      </goal>
      <goal
       name="WP_parameter t3.3"
-      locfile="queens/../queens.mlw"
+      locfile="programs/queens/../queens.mlw"
       loclnum="106" loccnumb="10" loccnume="12"
       expl="loop invariant preservation"
       sum="259b5ab53b158b530c1e69bd7f8d779f"
@@ -695,10 +695,10 @@
       <transf
        name="split_goal"
        proved="true"
-       expanded="false">
+       expanded="true">
        <goal
         name="WP_parameter t3.3.1"
-        locfile="queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="106" loccnumb="10" loccnume="12"
         expl="parameter t3"
         sum="ddac0583b4fce571842e10d1f71f3103"
@@ -718,7 +718,7 @@
        </goal>
        <goal
         name="WP_parameter t3.3.2"
-        locfile="queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="106" loccnumb="10" loccnume="12"
         expl="parameter t3"
         sum="0ebb48c614f8dde81246977356013b54"
@@ -738,7 +738,7 @@
        </goal>
        <goal
         name="WP_parameter t3.3.3"
-        locfile="queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="106" loccnumb="10" loccnume="12"
         expl="parameter t3"
         sum="80455ee606724c515359dec94c60c27d"
@@ -758,7 +758,7 @@
        </goal>
        <goal
         name="WP_parameter t3.3.4"
-        locfile="queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="106" loccnumb="10" loccnume="12"
         expl="parameter t3"
         sum="a56e8b22d4e2d2fbfa26c118bbf8d47c"
@@ -778,7 +778,7 @@
        </goal>
        <goal
         name="WP_parameter t3.3.5"
-        locfile="queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="106" loccnumb="10" loccnume="12"
         expl="parameter t3"
         sum="810d5c9fd0082695547bdcd52b7585d4"
@@ -798,7 +798,7 @@
        </goal>
        <goal
         name="WP_parameter t3.3.6"
-        locfile="queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="106" loccnumb="10" loccnume="12"
         expl="parameter t3"
         sum="941dba9067c6ac6447df43cf544a239e"
@@ -814,12 +814,12 @@
          edited="queens_WP_NQueensSets_WP_parameter_t3_5.v"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.67"/>
+         <result status="valid" time="1.63"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter t3.3.7"
-        locfile="queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="106" loccnumb="10" loccnume="12"
         expl="parameter t3"
         sum="59a604df4f94b8afbbc31de7c642c771"
@@ -835,12 +835,12 @@
          edited="queens_WP_NQueensSets_WP_parameter_t3_6.v"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.90"/>
+         <result status="valid" time="0.87"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter t3.3.8"
-        locfile="queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="106" loccnumb="10" loccnume="12"
         expl="parameter t3"
         sum="22c6961d51c5fc031be7cb1fd043ab53"
@@ -851,16 +851,16 @@
          name="expl:parameter t3"/>
         <proof
          prover="1"
-         timelimit="30"
+         timelimit="55"
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="27.29"/>
+         <result status="valid" time="6.34"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter t3.3.9"
-        locfile="queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="106" loccnumb="10" loccnume="12"
         expl="parameter t3"
         sum="7242073ef0b244213ee2f8096194ab19"
@@ -875,12 +875,12 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.02"/>
+         <result status="valid" time="0.56"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter t3.3.10"
-        locfile="queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="106" loccnumb="10" loccnume="12"
         expl="parameter t3"
         sum="68b6346ee8ce659f3e4ab6f68c7e411d"
@@ -895,12 +895,12 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="2.17"/>
+         <result status="valid" time="2.13"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter t3.3.11"
-        locfile="queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="106" loccnumb="10" loccnume="12"
         expl="parameter t3"
         sum="d52b3034c6f173a1af0efb3444038732"
@@ -915,12 +915,12 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="12.28"/>
+         <result status="valid" time="14.51"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter t3.3.12"
-        locfile="queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="106" loccnumb="10" loccnume="12"
         expl="parameter t3"
         sum="2ddeee9116e5ae4bf1f4d3487e367e97"
@@ -935,12 +935,12 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.03"/>
+         <result status="valid" time="0.02"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter t3.3.13"
-        locfile="queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="106" loccnumb="10" loccnume="12"
         expl="parameter t3"
         sum="3ffb46bf1fa4383c89a16aad1a90a036"
@@ -962,7 +962,7 @@
      </goal>
      <goal
       name="WP_parameter t3.4"
-      locfile="queens/../queens.mlw"
+      locfile="programs/queens/../queens.mlw"
       loclnum="106" loccnumb="10" loccnume="12"
       expl="loop variant decreases"
       sum="32941c64158e722914f9ab3db5ca4adf"
@@ -982,7 +982,7 @@
      </goal>
      <goal
       name="WP_parameter t3.5"
-      locfile="queens/../queens.mlw"
+      locfile="programs/queens/../queens.mlw"
       loclnum="106" loccnumb="10" loccnume="12"
       expl="normal postcondition"
       sum="a77590e8f5039947cfa17bc31859fadf"
@@ -994,10 +994,10 @@
       <transf
        name="split_goal"
        proved="true"
-       expanded="false">
+       expanded="true">
        <goal
         name="WP_parameter t3.5.1"
-        locfile="queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="106" loccnumb="10" loccnume="12"
         expl="parameter t3"
         sum="62c6cb6893d2e18be5b8f2888a35b8eb"
@@ -1017,7 +1017,7 @@
        </goal>
        <goal
         name="WP_parameter t3.5.2"
-        locfile="queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="106" loccnumb="10" loccnume="12"
         expl="parameter t3"
         sum="678b1256ed9da72f162c28364eb921f6"
@@ -1037,7 +1037,7 @@
        </goal>
        <goal
         name="WP_parameter t3.5.3"
-        locfile="queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="106" loccnumb="10" loccnume="12"
         expl="parameter t3"
         sum="b30b570b78a15c0e26077442de8b37b2"
@@ -1052,12 +1052,12 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.01"/>
+         <result status="valid" time="0.00"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter t3.5.4"
-        locfile="queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="106" loccnumb="10" loccnume="12"
         expl="parameter t3"
         sum="8477e434fc3b082c6b2ee8366bd91f31"
@@ -1077,7 +1077,7 @@
        </goal>
        <goal
         name="WP_parameter t3.5.5"
-        locfile="queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="106" loccnumb="10" loccnume="12"
         expl="parameter t3"
         sum="555392b02c4804882a7576fad3949291"
@@ -1093,12 +1093,12 @@
          edited="queens_WP_NQueensSets_WP_parameter_t3_2.v"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.12"/>
+         <result status="valid" time="1.11"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter t3.5.6"
-        locfile="queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="106" loccnumb="10" loccnume="12"
         expl="parameter t3"
         sum="36a199734c58ba0fbab40effad676c3f"
@@ -1118,7 +1118,7 @@
        </goal>
        <goal
         name="WP_parameter t3.5.7"
-        locfile="queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="106" loccnumb="10" loccnume="12"
         expl="parameter t3"
         sum="2e43c79632ae89650e5d16ae40883177"
@@ -1138,7 +1138,7 @@
        </goal>
        <goal
         name="WP_parameter t3.5.8"
-        locfile="queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="106" loccnumb="10" loccnume="12"
         expl="parameter t3"
         sum="99d933c174aff6cc9223f1364985fac1"
@@ -1161,12 +1161,12 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.01"/>
+         <result status="valid" time="0.00"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter t3.5.9"
-        locfile="queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="106" loccnumb="10" loccnume="12"
         expl="parameter t3"
         sum="91fb47e7a90cd2626c088803346189e3"
@@ -1196,7 +1196,7 @@
      </goal>
      <goal
       name="WP_parameter t3.6"
-      locfile="queens/../queens.mlw"
+      locfile="programs/queens/../queens.mlw"
       loclnum="106" loccnumb="10" loccnume="12"
       expl="normal postcondition"
       sum="267722ef2aa14c86fb21dd792753a7c4"
@@ -1208,10 +1208,10 @@
       <transf
        name="split_goal"
        proved="true"
-       expanded="false">
+       expanded="true">
        <goal
         name="WP_parameter t3.6.1"
-        locfile="queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="106" loccnumb="10" loccnume="12"
         expl="parameter t3"
         sum="a3e3f82da1004841b531a714d624039f"
@@ -1231,7 +1231,7 @@
        </goal>
        <goal
         name="WP_parameter t3.6.2"
-        locfile="queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="106" loccnumb="10" loccnume="12"
         expl="parameter t3"
         sum="e37b28e0a48b57a3ab2b4b2d2c143613"
@@ -1251,7 +1251,7 @@
        </goal>
        <goal
         name="WP_parameter t3.6.3"
-        locfile="queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="106" loccnumb="10" loccnume="12"
         expl="parameter t3"
         sum="e3feb850901939e23ed590c7c9902f23"
@@ -1271,7 +1271,7 @@
        </goal>
        <goal
         name="WP_parameter t3.6.4"
-        locfile="queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="106" loccnumb="10" loccnume="12"
         expl="parameter t3"
         sum="ae246325d0cc6a448998d5c16472b791"
@@ -1291,7 +1291,7 @@
        </goal>
        <goal
         name="WP_parameter t3.6.5"
-        locfile="queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="106" loccnumb="10" loccnume="12"
         expl="parameter t3"
         sum="08a41f152a8e6f36dab59784899e8459"
@@ -1311,7 +1311,7 @@
        </goal>
        <goal
         name="WP_parameter t3.6.6"
-        locfile="queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="106" loccnumb="10" loccnume="12"
         expl="parameter t3"
         sum="188589e723ee9d23c56540eb252f96cf"
@@ -1326,12 +1326,12 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.07"/>
+         <result status="valid" time="0.06"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter t3.6.7"
-        locfile="queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="106" loccnumb="10" loccnume="12"
         expl="parameter t3"
         sum="e38afe4bef6fb22d16d75f780860fc79"
@@ -1351,7 +1351,7 @@
        </goal>
        <goal
         name="WP_parameter t3.6.8"
-        locfile="queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="106" loccnumb="10" loccnume="12"
         expl="parameter t3"
         sum="6cea7ba2e81ad8f084597a1da7028318"
@@ -1371,7 +1371,7 @@
        </goal>
        <goal
         name="WP_parameter t3.6.9"
-        locfile="queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="106" loccnumb="10" loccnume="12"
         expl="parameter t3"
         sum="520c54c72d91d8fd21596ec702d3cd17"
@@ -1395,7 +1395,7 @@
    </goal>
    <goal
     name="WP_parameter queens3"
-    locfile="queens/../queens.mlw"
+    locfile="programs/queens/../queens.mlw"
     loclnum="155" loccnumb="6" loccnume="13"
     expl="parameter queens3"
     sum="38dae118fdd09ce22e474b3c7db918a7"
@@ -1407,10 +1407,10 @@
     <transf
      name="split_goal"
      proved="true"
-     expanded="false">
+     expanded="true">
      <goal
       name="WP_parameter queens3.1"
-      locfile="queens/../queens.mlw"
+      locfile="programs/queens/../queens.mlw"
       loclnum="155" loccnumb="6" loccnume="13"
       expl="precondition"
       sum="6342a022292781c1cdca5cf2674379b1"
@@ -1430,7 +1430,7 @@
      </goal>
      <goal
       name="WP_parameter queens3.2"
-      locfile="queens/../queens.mlw"
+      locfile="programs/queens/../queens.mlw"
       loclnum="155" loccnumb="6" loccnume="13"
       expl="normal postcondition"
       sum="9354812ea5d74d87b7c2f5a856f5b170"

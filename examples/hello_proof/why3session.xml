@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/usr/local/share/why3/why3session.dtd">
+<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
 <why3session
- name="examples/hello_proof/why3session.xml">
+ name="./hello_proof/why3session.xml">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -9,7 +9,7 @@
  <prover
   id="1"
   name="Coq"
-  version="8.3pl3"/>
+  version="8.3pl4"/>
  <prover
   id="2"
   name="Simplify"
@@ -17,10 +17,10 @@
  <file
   name="../hello_proof.why"
   verified="false"
-  expanded="true">
+  expanded="false">
   <theory
    name="HelloProof"
-   locfile="examples/hello_proof/../hello_proof.why"
+   locfile="./hello_proof/../hello_proof.why"
    loclnum="1" loccnumb="7" loccnume="17"
    verified="false"
    expanded="true">
@@ -28,7 +28,7 @@
     name="My very first Why3 theory"/>
    <goal
     name="G1"
-    locfile="examples/hello_proof/../hello_proof.why"
+    locfile="./hello_proof/../hello_proof.why"
     loclnum="3" loccnumb="7" loccnume="9"
     sum="4daf9675e70ee6481b1153fe95f7c750"
     proved="true"
@@ -37,6 +37,7 @@
     <proof
      prover="2"
      timelimit="4"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
@@ -44,7 +45,7 @@
    </goal>
    <goal
     name="G2"
-    locfile="examples/hello_proof/../hello_proof.why"
+    locfile="./hello_proof/../hello_proof.why"
     loclnum="5" loccnumb="7" loccnume="9"
     sum="b16d2c9608c416dc0059ba3e95264abe"
     proved="false"
@@ -53,13 +54,15 @@
     <proof
      prover="0"
      timelimit="4"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="unknown" time="0.02"/>
+     <result status="unknown" time="0.00"/>
     </proof>
     <proof
      prover="2"
      timelimit="4"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="unknown" time="0.00"/>
@@ -70,7 +73,7 @@
      expanded="true">
      <goal
       name="G2.1"
-      locfile="examples/hello_proof/../hello_proof.why"
+      locfile="./hello_proof/../hello_proof.why"
       loclnum="5" loccnumb="7" loccnume="9"
       sum="b84cad55140412a1b6f988cba7a0ebd1"
       proved="false"
@@ -79,29 +82,32 @@
       <proof
        prover="0"
        timelimit="4"
-       obsolete="false"
-       archived="false">
-       <result status="unknown" time="0.01"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="4"
-       edited="hello_proof_HelloProof_G2_1.v"
-       obsolete="false"
-       archived="false">
-       <result status="unknown" time="0.75"/>
-      </proof>
-      <proof
-       prover="2"
-       timelimit="4"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="unknown" time="0.00"/>
       </proof>
+      <proof
+       prover="2"
+       timelimit="4"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="unknown" time="0.00"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="4"
+       memlimit="0"
+       edited="hello_proof_HelloProof_G2_1.v"
+       obsolete="false"
+       archived="false">
+       <result status="unknown" time="0.42"/>
+      </proof>
      </goal>
      <goal
       name="G2.2"
-      locfile="examples/hello_proof/../hello_proof.why"
+      locfile="./hello_proof/../hello_proof.why"
       loclnum="5" loccnumb="7" loccnume="9"
       sum="fdf75c799e5829c6e57c69e76f88886a"
       proved="true"
@@ -110,6 +116,7 @@
       <proof
        prover="0"
        timelimit="4"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -117,6 +124,7 @@
       <proof
        prover="2"
        timelimit="4"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -126,7 +134,7 @@
    </goal>
    <goal
     name="G3"
-    locfile="examples/hello_proof/../hello_proof.why"
+    locfile="./hello_proof/../hello_proof.why"
     loclnum="9" loccnumb="7" loccnume="9"
     sum="d89b799516da55943a55251953e1068e"
     proved="true"
@@ -135,13 +143,15 @@
     <proof
      prover="0"
      timelimit="4"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.00"/>
     </proof>
     <proof
      prover="2"
      timelimit="4"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="unknown" time="0.00"/>

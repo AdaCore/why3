@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
 <why3session
- name="./programs/fib_memo/why3session.xml">
+ name="programs/fib_memo/why3session.xml">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -16,38 +16,39 @@
   expanded="false">
   <theory
    name="WP M"
-   locfile="./programs/fib_memo/../fib_memo.mlw"
+   locfile="programs/fib_memo/../fib_memo.mlw"
    loclnum="3" loccnumb="7" loccnume="8"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter fibo"
-    locfile="./programs/fib_memo/../fib_memo.mlw"
+    locfile="programs/fib_memo/../fib_memo.mlw"
     loclnum="37" loccnumb="10" loccnume="14"
     expl="parameter fibo"
     sum="1ef4bd5cf2859b084391754a1acbdd19"
     proved="true"
     expanded="true"
-    shape="iainfix <=V0c1ainvV1Aainfix =c1afibV0ainvV4Aainfix =ainfix +V3V5afibV0IainvV4Aainfix =V5afibainfix -V0c2FFAainvV2Aainfix <=c0ainfix -V0c2IainvV2Aainfix =V3afibainfix -V0c1FFAainvV1Aainfix <=c0ainfix -V0c1IainvV1Aainfix <=c0V0FF">
+    shape="iainfix &lt;=V0c1ainvV1Aainfix =c1afibV0ainvV4Aainfix =ainfix +V3V5afibV0IainvV4Aainfix =V5afibainfix -V0c2FFAainvV2Aainfix &lt;=c0ainfix -V0c2IainvV2Aainfix =V3afibainfix -V0c1FFAainvV1Aainfix &lt;=c0ainfix -V0c1IainvV1Aainfix &lt;=c0V0FF">
     <label
      name="expl:parameter fibo"/>
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.02"/>
     </proof>
    </goal>
    <goal
     name="WP_parameter memo_fibo"
-    locfile="./programs/fib_memo/../fib_memo.mlw"
+    locfile="programs/fib_memo/../fib_memo.mlw"
     loclnum="45" loccnumb="7" loccnume="16"
     expl="parameter memo_fibo"
     sum="a6f2c303d7430154b203ceceacde26f5"
     proved="true"
     expanded="true"
-    shape="ainvV4Aainfix =V3afibV0Iainfix =V4asetV2V0aSomeV3FIainvV2Aainfix =V3afibV0FFAainvV1Aainfix <=c0V0Iainfix =agetV1V0aNoneAainvV1Aainfix =V5afibV0Iainfix =agetV1V0aSomeV5FIainvV1Aainfix <=c0V0FF">
+    shape="ainvV4Aainfix =V3afibV0Iainfix =V4asetV2V0aSomeV3FIainvV2Aainfix =V3afibV0FFAainvV1Aainfix &lt;=c0V0Iainfix =agetV1V0aNoneAainvV1Aainfix =V5afibV0Iainfix =agetV1V0aSomeV5FIainvV1Aainfix &lt;=c0V0FF">
     <label
      name="expl:parameter memo_fibo"/>
     <transf
@@ -56,18 +57,19 @@
      expanded="true">
      <goal
       name="WP_parameter memo_fibo.1"
-      locfile="./programs/fib_memo/../fib_memo.mlw"
+      locfile="programs/fib_memo/../fib_memo.mlw"
       loclnum="45" loccnumb="7" loccnume="16"
       expl="normal postcondition"
       sum="261ba5e182306022c67b455a010bf153"
       proved="true"
       expanded="true"
-      shape="ainvV1Aainfix =V2afibV0Iainfix =agetV1V0aSomeV2FIainvV1Aainfix <=c0V0FF">
+      shape="ainvV1Aainfix =V2afibV0Iainfix =agetV1V0aSomeV2FIainvV1Aainfix &lt;=c0V0FF">
       <label
        name="expl:parameter memo_fibo"/>
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -75,18 +77,19 @@
      </goal>
      <goal
       name="WP_parameter memo_fibo.2"
-      locfile="./programs/fib_memo/../fib_memo.mlw"
+      locfile="programs/fib_memo/../fib_memo.mlw"
       loclnum="45" loccnumb="7" loccnume="16"
       expl="precondition"
       sum="905fe87e5deba90c1e0a1b873487f18b"
       proved="true"
       expanded="true"
-      shape="ainvV1Aainfix <=c0V0Iainfix =agetV1V0aNoneIainvV1Aainfix =V2afibV0Iainfix =agetV1V0aSomeV2FIainvV1Aainfix <=c0V0FF">
+      shape="ainvV1Aainfix &lt;=c0V0Iainfix =agetV1V0aNoneIainvV1Aainfix =V2afibV0Iainfix =agetV1V0aSomeV2FIainvV1Aainfix &lt;=c0V0FF">
       <label
        name="expl:parameter memo_fibo"/>
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -94,18 +97,19 @@
      </goal>
      <goal
       name="WP_parameter memo_fibo.3"
-      locfile="./programs/fib_memo/../fib_memo.mlw"
+      locfile="programs/fib_memo/../fib_memo.mlw"
       loclnum="45" loccnumb="7" loccnume="16"
       expl="normal postcondition"
       sum="64fbebf8251b399aa4ea40254fc09479"
       proved="true"
       expanded="true"
-      shape="ainvV4Aainfix =V3afibV0Iainfix =V4asetV2V0aSomeV3FIainvV2Aainfix =V3afibV0FFIainvV1Aainfix <=c0V0Iainfix =agetV1V0aNoneIainvV1Aainfix =V5afibV0Iainfix =agetV1V0aSomeV5FIainvV1Aainfix <=c0V0FF">
+      shape="ainvV4Aainfix =V3afibV0Iainfix =V4asetV2V0aSomeV3FIainvV2Aainfix =V3afibV0FFIainvV1Aainfix &lt;=c0V0Iainfix =agetV1V0aNoneIainvV1Aainfix =V5afibV0Iainfix =agetV1V0aSomeV5FIainvV1Aainfix &lt;=c0V0FF">
       <label
        name="expl:parameter memo_fibo"/>
       <proof
        prover="1"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>

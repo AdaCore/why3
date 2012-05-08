@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
 <why3session
- name="./programs/vstte10_aqueue/why3session.xml">
+ name="programs/vstte10_aqueue/why3session.xml">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -12,13 +12,13 @@
   expanded="false">
   <theory
    name="WP AmortizedQueue"
-   locfile="./programs/vstte10_aqueue/../vstte10_aqueue.mlw"
+   locfile="programs/vstte10_aqueue/../vstte10_aqueue.mlw"
    loclnum="9" loccnumb="7" loccnume="21"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter empty"
-    locfile="./programs/vstte10_aqueue/../vstte10_aqueue.mlw"
+    locfile="programs/vstte10_aqueue/../vstte10_aqueue.mlw"
     loclnum="23" loccnumb="6" loccnume="11"
     expl="normal postcondition"
     sum="08da32f05b47a6c6549f5105aefb73d0"
@@ -30,14 +30,15 @@
     <proof
      prover="0"
      timelimit="20"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.02"/>
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="WP_parameter head"
-    locfile="./programs/vstte10_aqueue/../vstte10_aqueue.mlw"
+    locfile="programs/vstte10_aqueue/../vstte10_aqueue.mlw"
     loclnum="28" loccnumb="6" loccnume="10"
     expl="parameter head"
     sum="5916ef6a02b8590c0eaa0b9b05831a82"
@@ -49,6 +50,7 @@
     <proof
      prover="0"
      timelimit="20"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.04"/>
@@ -56,18 +58,19 @@
    </goal>
    <goal
     name="WP_parameter create"
-    locfile="./programs/vstte10_aqueue/../vstte10_aqueue.mlw"
+    locfile="programs/vstte10_aqueue/../vstte10_aqueue.mlw"
     loclnum="36" loccnumb="6" loccnume="12"
     expl="parameter create"
     sum="3289aca43201b608a28e2ed8d194a445"
     proved="true"
     expanded="false"
-    shape="LalengthV2iainfix >=V1V3ainfix =ainfix ++V0areverseV2ainfix ++V0areverseV2Aainvamk queueV0V1V2V3ainfix =ainfix ++ainfix ++V0areverseV2areverseaNilainfix ++V0areverseV2Aainvamk queueainfix ++V0areverseV2ainfix +V1V3aNilc0Iainfix =V1alengthV0FFF">
+    shape="LalengthV2iainfix &gt;=V1V3ainfix =ainfix ++V0areverseV2ainfix ++V0areverseV2Aainvamk queueV0V1V2V3ainfix =ainfix ++ainfix ++V0areverseV2areverseaNilainfix ++V0areverseV2Aainvamk queueainfix ++V0areverseV2ainfix +V1V3aNilc0Iainfix =V1alengthV0FFF">
     <label
      name="expl:parameter create"/>
     <proof
      prover="0"
      timelimit="20"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.20"/>
@@ -75,7 +78,7 @@
    </goal>
    <goal
     name="WP_parameter tail"
-    locfile="./programs/vstte10_aqueue/../vstte10_aqueue.mlw"
+    locfile="programs/vstte10_aqueue/../vstte10_aqueue.mlw"
     loclnum="45" loccnumb="6" loccnume="10"
     expl="parameter tail"
     sum="87a45c9f0f21880bdfd308b156e1d7ea"
@@ -90,7 +93,7 @@
      expanded="true">
      <goal
       name="WP_parameter tail.1"
-      locfile="./programs/vstte10_aqueue/../vstte10_aqueue.mlw"
+      locfile="programs/vstte10_aqueue/../vstte10_aqueue.mlw"
       loclnum="45" loccnumb="6" loccnume="10"
       expl="parameter tail"
       sum="3efe2c28d74b81e987187fdd2869e472"
@@ -102,14 +105,15 @@
       <proof
        prover="0"
        timelimit="20"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter tail.2"
-      locfile="./programs/vstte10_aqueue/../vstte10_aqueue.mlw"
+      locfile="programs/vstte10_aqueue/../vstte10_aqueue.mlw"
       loclnum="45" loccnumb="6" loccnume="10"
       expl="parameter tail"
       sum="87c91c92a06386edc54bd63a2be3ac86"
@@ -121,6 +125,7 @@
       <proof
        prover="0"
        timelimit="20"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
@@ -128,7 +133,7 @@
      </goal>
      <goal
       name="WP_parameter tail.3"
-      locfile="./programs/vstte10_aqueue/../vstte10_aqueue.mlw"
+      locfile="programs/vstte10_aqueue/../vstte10_aqueue.mlw"
       loclnum="45" loccnumb="6" loccnume="10"
       expl="parameter tail"
       sum="dbcb916d4f7f9cd290fe34fd649677cb"
@@ -140,6 +145,7 @@
       <proof
        prover="0"
        timelimit="20"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.43"/>
@@ -149,7 +155,7 @@
    </goal>
    <goal
     name="WP_parameter enqueue"
-    locfile="./programs/vstte10_aqueue/../vstte10_aqueue.mlw"
+    locfile="programs/vstte10_aqueue/../vstte10_aqueue.mlw"
     loclnum="53" loccnumb="6" loccnume="13"
     expl="parameter enqueue"
     sum="f47cd14306fff86b54350c342342b1c0"
@@ -161,6 +167,7 @@
     <proof
      prover="0"
      timelimit="20"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.04"/>

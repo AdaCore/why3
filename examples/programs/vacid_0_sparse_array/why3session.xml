@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/home/jcf/why3/share/why3session.dtd">
+<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
 <why3session
- name="examples/programs/vacid_0_sparse_array/why3session.xml">
+ name="programs/vacid_0_sparse_array/why3session.xml">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -13,7 +13,7 @@
  <prover
   id="2"
   name="Coq"
-  version="8.3pl3"/>
+  version="8.3pl4"/>
  <prover
   id="3"
   name="Z3"
@@ -21,16 +21,16 @@
  <file
   name="../vacid_0_sparse_array.mlw"
   verified="true"
-  expanded="true">
+  expanded="false">
   <theory
    name="WP SparseArray"
-   locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+   locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
    loclnum="1" loccnumb="7" loccnume="18"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter create"
-    locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+    locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
     loclnum="58" loccnumb="6" loccnume="12"
     expl="normal postcondition"
     sum="f22f75ebf53546c0698a2ea02f73d99d"
@@ -42,6 +42,7 @@
     <proof
      prover="3"
      timelimit="5"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.02"/>
@@ -49,6 +50,7 @@
     <proof
      prover="1"
      timelimit="5"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.01"/>
@@ -56,14 +58,15 @@
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.02"/>
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="WP_parameter test"
-    locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+    locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
     loclnum="70" loccnumb="6" loccnume="10"
     expl="parameter test"
     sum="12d663d84110efe2caff1778562d1ddc"
@@ -75,13 +78,15 @@
     <proof
      prover="3"
      timelimit="5"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.02"/>
+     <result status="valid" time="0.01"/>
     </proof>
     <proof
      prover="1"
      timelimit="5"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.03"/>
@@ -89,6 +94,7 @@
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.09"/>
@@ -96,7 +102,7 @@
    </goal>
    <goal
     name="WP_parameter get"
-    locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+    locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
     loclnum="75" loccnumb="6" loccnume="9"
     expl="parameter get"
     sum="881344612d4803e7d9a657e3a4f0f0b7"
@@ -108,6 +114,7 @@
     <proof
      prover="3"
      timelimit="5"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.02"/>
@@ -115,6 +122,7 @@
     <proof
      prover="1"
      timelimit="5"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.01"/>
@@ -122,14 +130,15 @@
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.02"/>
+     <result status="valid" time="0.03"/>
     </proof>
    </goal>
    <goal
     name="permutation"
-    locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+    locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
     loclnum="87" loccnumb="8" loccnume="19"
     sum="a5d3393708c61c6a1db79431938e6bce"
     proved="true"
@@ -138,15 +147,16 @@
     <proof
      prover="2"
      timelimit="10"
+     memlimit="0"
      edited="vacid_0_sparse_array_WP_SparseArray_permutation_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="1.15"/>
+     <result status="valid" time="0.64"/>
     </proof>
    </goal>
    <goal
     name="WP_parameter set"
-    locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+    locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
     loclnum="92" loccnumb="6" loccnume="9"
     expl="parameter set"
     sum="2983f776c8bce03ca219163bb8675759"
@@ -161,7 +171,7 @@
      expanded="true">
      <goal
       name="WP_parameter set.1"
-      locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+      locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
       loclnum="92" loccnumb="6" loccnume="9"
       expl="precondition"
       sum="87ca8564d1f6e4d4204aaa45f0937224"
@@ -173,6 +183,7 @@
       <proof
        prover="3"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
@@ -180,6 +191,7 @@
       <proof
        prover="1"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -187,6 +199,7 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -194,7 +207,7 @@
      </goal>
      <goal
       name="WP_parameter set.2"
-      locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+      locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
       loclnum="92" loccnumb="6" loccnume="9"
       expl="precondition"
       sum="346c51e235eda6b241d5e49a8be2ef98"
@@ -206,6 +219,7 @@
       <proof
        prover="3"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
@@ -213,6 +227,7 @@
       <proof
        prover="1"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.03"/>
@@ -220,14 +235,15 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.14"/>
+       <result status="valid" time="0.13"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter set.3"
-      locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+      locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
       loclnum="92" loccnumb="6" loccnume="9"
       expl="assertion"
       sum="3589e5bc911868b6ee412a13df330027"
@@ -239,6 +255,7 @@
       <proof
        prover="3"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
@@ -246,6 +263,7 @@
       <proof
        prover="1"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
@@ -253,6 +271,7 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
@@ -260,7 +279,7 @@
      </goal>
      <goal
       name="WP_parameter set.4"
-      locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+      locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
       loclnum="92" loccnumb="6" loccnume="9"
       expl="precondition"
       sum="abf084bb44c94722f8e2fb1f2a4b2ea6"
@@ -272,6 +291,7 @@
       <proof
        prover="3"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
@@ -279,6 +299,7 @@
       <proof
        prover="1"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
@@ -286,6 +307,7 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -293,7 +315,7 @@
      </goal>
      <goal
       name="WP_parameter set.5"
-      locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+      locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
       loclnum="92" loccnumb="6" loccnume="9"
       expl="precondition"
       sum="ff6c1a6bc46075a1ca58c64b09c05814"
@@ -305,6 +327,7 @@
       <proof
        prover="3"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
@@ -312,6 +335,7 @@
       <proof
        prover="1"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
@@ -319,6 +343,7 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -326,7 +351,7 @@
      </goal>
      <goal
       name="WP_parameter set.6"
-      locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+      locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
       loclnum="92" loccnumb="6" loccnume="9"
       expl="normal postcondition"
       sum="e7f4c35cee4057e7aa3770ab48b7873c"
@@ -341,7 +366,7 @@
        expanded="true">
        <goal
         name="WP_parameter set.6.1"
-        locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+        locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
         loclnum="92" loccnumb="6" loccnume="9"
         expl="parameter set"
         sum="105c6180c2ef6fb39b55e0ad7f3cf387"
@@ -353,6 +378,7 @@
         <proof
          prover="3"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.04"/>
@@ -360,14 +386,15 @@
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.70"/>
+         <result status="valid" time="0.64"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter set.6.2"
-        locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+        locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
         loclnum="92" loccnumb="6" loccnume="9"
         expl="parameter set"
         sum="ffa34764f9ca763c6c6f60c32adc2ece"
@@ -379,21 +406,23 @@
         <proof
          prover="3"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.03"/>
+         <result status="valid" time="0.02"/>
         </proof>
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.53"/>
+         <result status="valid" time="0.44"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter set.6.3"
-        locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+        locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
         loclnum="92" loccnumb="6" loccnume="9"
         expl="parameter set"
         sum="1c1747f26715f0c6e8485db08b3d343d"
@@ -405,23 +434,25 @@
         <proof
          prover="3"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.05"/>
+         <result status="valid" time="0.04"/>
         </proof>
         <proof
          prover="1"
-         timelimit="5"
+         timelimit="6"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="2.58"/>
+         <result status="valid" time="2.54"/>
         </proof>
        </goal>
       </transf>
      </goal>
      <goal
       name="WP_parameter set.7"
-      locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+      locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
       loclnum="92" loccnumb="6" loccnume="9"
       expl="normal postcondition"
       sum="26f8ba6513a86423d7788e01c21b2019"
@@ -433,6 +464,7 @@
       <proof
        prover="3"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.03"/>
@@ -440,13 +472,15 @@
       <proof
        prover="1"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.09"/>
+       <result status="valid" time="0.08"/>
       </proof>
       <proof
        prover="0"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.33"/>
@@ -457,13 +491,13 @@
   </theory>
   <theory
    name="WP Harness"
-   locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+   locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
    loclnum="107" loccnumb="7" loccnume="14"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter harness"
-    locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+    locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
     loclnum="117" loccnumb="6" loccnume="13"
     expl="parameter harness"
     sum="54152814b5185a5177f4f2111f5e8a33"
@@ -478,7 +512,7 @@
      expanded="true">
      <goal
       name="WP_parameter harness.1"
-      locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+      locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
       loclnum="117" loccnumb="6" loccnume="13"
       expl="precondition"
       sum="46c3393607ec0b9a6ce9333d9b8852bb"
@@ -490,6 +524,7 @@
       <proof
        prover="3"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -497,6 +532,7 @@
       <proof
        prover="1"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -504,14 +540,15 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.00"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter harness.2"
-      locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+      locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
       loclnum="117" loccnumb="6" loccnume="13"
       expl="precondition"
       sum="33aa79bbbc2512982d9ab5096a26fb32"
@@ -523,6 +560,7 @@
       <proof
        prover="3"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -530,6 +568,7 @@
       <proof
        prover="1"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -537,14 +576,15 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.00"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter harness.3"
-      locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+      locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
       loclnum="117" loccnumb="6" loccnume="13"
       expl="precondition"
       sum="8167bc5dfeea478964f36c9cfd1bdc18"
@@ -556,6 +596,7 @@
       <proof
        prover="3"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
@@ -563,6 +604,7 @@
       <proof
        prover="1"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -570,14 +612,15 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.00"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter harness.4"
-      locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+      locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
       loclnum="117" loccnumb="6" loccnume="13"
       expl="assertion"
       sum="06f47b3b4ba697660932fe9f9783bc53"
@@ -589,6 +632,7 @@
       <proof
        prover="3"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
@@ -596,6 +640,7 @@
       <proof
        prover="1"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -603,6 +648,7 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
@@ -610,7 +656,7 @@
      </goal>
      <goal
       name="WP_parameter harness.5"
-      locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+      locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
       loclnum="117" loccnumb="6" loccnume="13"
       expl="precondition"
       sum="b9124b2163ae00574ae2412572e8cf6c"
@@ -622,6 +668,7 @@
       <proof
        prover="3"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
@@ -629,6 +676,7 @@
       <proof
        prover="1"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -636,14 +684,15 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter harness.6"
-      locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+      locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
       loclnum="117" loccnumb="6" loccnume="13"
       expl="assertion"
       sum="ccd0f42f0cec5aa1f26df46085017d5b"
@@ -655,6 +704,7 @@
       <proof
        prover="3"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
@@ -662,6 +712,7 @@
       <proof
        prover="1"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
@@ -669,6 +720,7 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
@@ -676,7 +728,7 @@
      </goal>
      <goal
       name="WP_parameter harness.7"
-      locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+      locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
       loclnum="117" loccnumb="6" loccnume="13"
       expl="precondition"
       sum="6839b16fea659e466aa4077761576c12"
@@ -688,6 +740,7 @@
       <proof
        prover="3"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -695,13 +748,15 @@
       <proof
        prover="1"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.00"/>
+       <result status="valid" time="0.01"/>
       </proof>
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -709,7 +764,7 @@
      </goal>
      <goal
       name="WP_parameter harness.8"
-      locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+      locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
       loclnum="117" loccnumb="6" loccnume="13"
       expl="precondition"
       sum="b23fc51502f9a4f780bdd7958b5a8a39"
@@ -721,6 +776,7 @@
       <proof
        prover="3"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
@@ -728,6 +784,7 @@
       <proof
        prover="1"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -735,6 +792,7 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -742,7 +800,7 @@
      </goal>
      <goal
       name="WP_parameter harness.9"
-      locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+      locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
       loclnum="117" loccnumb="6" loccnume="13"
       expl="precondition"
       sum="808f3f3cabbbbe9b1cd16308f0684a95"
@@ -754,6 +812,7 @@
       <proof
        prover="3"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
@@ -761,13 +820,15 @@
       <proof
        prover="1"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.02"/>
       </proof>
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -775,7 +836,7 @@
      </goal>
      <goal
       name="WP_parameter harness.10"
-      locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+      locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
       loclnum="117" loccnumb="6" loccnume="13"
       expl="assertion"
       sum="91d2bcf774927279e7ca7d1b4270a07e"
@@ -787,6 +848,7 @@
       <proof
        prover="3"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -794,6 +856,7 @@
       <proof
        prover="1"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
@@ -801,6 +864,7 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -808,7 +872,7 @@
      </goal>
      <goal
       name="WP_parameter harness.11"
-      locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+      locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
       loclnum="117" loccnumb="6" loccnume="13"
       expl="precondition"
       sum="48d89b926ef4315948354b4277a5d294"
@@ -820,6 +884,7 @@
       <proof
        prover="3"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
@@ -827,6 +892,7 @@
       <proof
        prover="1"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
@@ -834,14 +900,15 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter harness.12"
-      locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+      locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
       loclnum="117" loccnumb="6" loccnume="13"
       expl="assertion"
       sum="dc937960557f7f97917ce6e28a2f38df"
@@ -853,6 +920,7 @@
       <proof
        prover="3"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -860,6 +928,7 @@
       <proof
        prover="1"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
@@ -867,14 +936,15 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter harness.13"
-      locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+      locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
       loclnum="117" loccnumb="6" loccnume="13"
       expl="precondition"
       sum="0c33e210f8a61791b6631a50b024243f"
@@ -886,13 +956,15 @@
       <proof
        prover="3"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.03"/>
+       <result status="valid" time="0.02"/>
       </proof>
       <proof
        prover="1"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -900,14 +972,15 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter harness.14"
-      locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+      locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
       loclnum="117" loccnumb="6" loccnume="13"
       expl="assertion"
       sum="6f5872dd112f6cc06f7a2195b3353097"
@@ -919,6 +992,7 @@
       <proof
        prover="3"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.03"/>
@@ -926,6 +1000,7 @@
       <proof
        prover="1"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.11"/>
@@ -933,6 +1008,7 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.14"/>
@@ -940,7 +1016,7 @@
      </goal>
      <goal
       name="WP_parameter harness.15"
-      locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+      locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
       loclnum="117" loccnumb="6" loccnume="13"
       expl="precondition"
       sum="f241d94b718e34bdfcd883da6ce64097"
@@ -952,6 +1028,7 @@
       <proof
        prover="3"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
@@ -959,6 +1036,7 @@
       <proof
        prover="1"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -966,6 +1044,7 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -973,7 +1052,7 @@
      </goal>
      <goal
       name="WP_parameter harness.16"
-      locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+      locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
       loclnum="117" loccnumb="6" loccnume="13"
       expl="assertion"
       sum="b672015fd5ce8e62d2d0ea2f8a85a428"
@@ -985,6 +1064,7 @@
       <proof
        prover="3"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
@@ -992,6 +1072,7 @@
       <proof
        prover="1"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.21"/>
@@ -999,14 +1080,15 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.11"/>
+       <result status="valid" time="0.12"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter harness.17"
-      locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+      locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
       loclnum="117" loccnumb="6" loccnume="13"
       expl="precondition"
       sum="e93f892100b2a6d969a0cd3b295dc8f8"
@@ -1018,6 +1100,7 @@
       <proof
        prover="3"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
@@ -1025,6 +1108,7 @@
       <proof
        prover="1"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
@@ -1032,14 +1116,15 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter harness.18"
-      locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+      locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
       loclnum="117" loccnumb="6" loccnume="13"
       expl="assertion"
       sum="a17e914b65f40164019d641c44b26097"
@@ -1051,6 +1136,7 @@
       <proof
        prover="3"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.03"/>
@@ -1058,13 +1144,15 @@
       <proof
        prover="1"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.22"/>
+       <result status="valid" time="0.23"/>
       </proof>
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.13"/>
@@ -1072,7 +1160,7 @@
      </goal>
      <goal
       name="WP_parameter harness.19"
-      locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+      locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
       loclnum="117" loccnumb="6" loccnume="13"
       expl="precondition"
       sum="33323956c6e1593628f58f64b1471aaf"
@@ -1084,13 +1172,15 @@
       <proof
        prover="3"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.03"/>
+       <result status="valid" time="0.02"/>
       </proof>
       <proof
        prover="1"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
@@ -1098,6 +1188,7 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
@@ -1105,7 +1196,7 @@
      </goal>
      <goal
       name="WP_parameter harness.20"
-      locfile="examples/programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
+      locfile="programs/vacid_0_sparse_array/../vacid_0_sparse_array.mlw"
       loclnum="117" loccnumb="6" loccnume="13"
       expl="assertion"
       sum="1cc66f657bf235506324db0ced6ed90e"
@@ -1117,6 +1208,7 @@
       <proof
        prover="3"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.03"/>
@@ -1124,13 +1216,15 @@
       <proof
        prover="1"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.39"/>
+       <result status="valid" time="0.27"/>
       </proof>
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.14"/>

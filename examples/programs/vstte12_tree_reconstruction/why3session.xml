@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/home/jc/why3/share/why3session.dtd">
+<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
 <why3session
- name="vstte12_tree_reconstruction/why3session.xml">
+ name="programs/vstte12_tree_reconstruction/why3session.xml">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -17,7 +17,7 @@
  <prover
   id="3"
   name="Coq"
-  version="8.3pl3"/>
+  version="8.3pl4"/>
  <prover
   id="4"
   name="Z3"
@@ -25,16 +25,16 @@
  <file
   name="../vstte12_tree_reconstruction.mlw"
   verified="true"
-  expanded="true">
+  expanded="false">
   <theory
    name="Tree"
-   locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+   locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
    loclnum="12" loccnumb="7" loccnume="11"
    verified="true"
    expanded="false">
    <goal
     name="depths_head"
-    locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+    locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
     loclnum="28" loccnumb="8" loccnume="19"
     sum="217db5876bf9b69f0a3905de3866fdee"
     proved="true"
@@ -47,12 +47,12 @@
      edited="vstte12_tree_reconstruction_Tree_depths_head_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.61"/>
+     <result status="valid" time="0.45"/>
     </proof>
    </goal>
    <goal
     name="depths_unique"
-    locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+    locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
     loclnum="32" loccnumb="8" loccnume="21"
     sum="9edf97ab6074e9854733b7dd8aef103e"
     proved="true"
@@ -65,12 +65,12 @@
      edited="vstte12_tree_reconstruction_Tree_depths_unique_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.68"/>
+     <result status="valid" time="0.48"/>
     </proof>
    </goal>
    <goal
     name="depths_prefix"
-    locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+    locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
     loclnum="36" loccnumb="8" loccnume="21"
     sum="bf1a2eb4da4aa233c726f1eaadf983f1"
     proved="true"
@@ -83,12 +83,12 @@
      edited="vstte12_tree_reconstruction_Tree_depths_prefix_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.96"/>
+     <result status="valid" time="0.58"/>
     </proof>
    </goal>
    <goal
     name="depths_prefix_simple"
-    locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+    locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
     loclnum="40" loccnumb="8" loccnume="28"
     sum="039504401c65b016589afcfe31943480"
     proved="true"
@@ -100,12 +100,12 @@
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.05"/>
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="depths_subtree"
-    locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+    locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
     loclnum="44" loccnumb="8" loccnume="22"
     sum="aefabaa390151b38fb35064fbefac09f"
     proved="true"
@@ -118,12 +118,12 @@
      edited="vstte12_tree_reconstruction_Tree_depths_subtree_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="1.37"/>
+     <result status="valid" time="0.84"/>
     </proof>
    </goal>
    <goal
     name="depths_unique2"
-    locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+    locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
     loclnum="48" loccnumb="8" loccnume="22"
     sum="6ccbf0409c611d976c4226259dd94618"
     proved="true"
@@ -136,19 +136,19 @@
      edited="vstte12_tree_reconstruction_Tree_depths_unique2_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="1.18"/>
+     <result status="valid" time="0.74"/>
     </proof>
    </goal>
   </theory>
   <theory
    name="WP TreeReconstruction"
-   locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+   locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
    loclnum="54" loccnumb="7" loccnume="25"
    verified="true"
    expanded="false">
    <goal
     name="WP_parameter build_rec"
-    locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+    locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
     loclnum="73" loccnumb="10" loccnume="19"
     expl="parameter build_rec"
     sum="1f0a559ee2bdee72a429e85364c91bc0"
@@ -160,10 +160,10 @@
     <transf
      name="split_goal"
      proved="true"
-     expanded="false">
+     expanded="true">
      <goal
       name="WP_parameter build_rec.1"
-      locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+      locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
       loclnum="73" loccnumb="10" loccnume="19"
       expl="parameter build_rec"
       sum="7fa9963474e600869d37c1bcd6835676"
@@ -178,12 +178,12 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter build_rec.2"
-      locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+      locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
       loclnum="73" loccnumb="10" loccnume="19"
       expl="parameter build_rec"
       sum="0955ad4c06599f347ac45b3d8ca514dc"
@@ -198,12 +198,12 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="2.28"/>
+       <result status="valid" time="1.17"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter build_rec.3"
-      locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+      locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
       loclnum="73" loccnumb="10" loccnume="19"
       expl="parameter build_rec"
       sum="6736206bb58a1b78870f8b0fd270d21d"
@@ -218,12 +218,12 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.03"/>
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter build_rec.4"
-      locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+      locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
       loclnum="73" loccnumb="10" loccnume="19"
       expl="parameter build_rec"
       sum="17d4bdda20962f9760fd774252eb36b4"
@@ -235,10 +235,10 @@
       <transf
        name="split_goal"
        proved="true"
-       expanded="false">
+       expanded="true">
        <goal
         name="WP_parameter build_rec.4.1"
-        locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+        locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
         loclnum="73" loccnumb="10" loccnume="19"
         expl="parameter build_rec"
         sum="17d4bdda20962f9760fd774252eb36b4"
@@ -253,14 +253,14 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.06"/>
+         <result status="valid" time="0.04"/>
         </proof>
        </goal>
       </transf>
      </goal>
      <goal
       name="WP_parameter build_rec.5"
-      locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+      locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
       loclnum="73" loccnumb="10" loccnume="19"
       expl="parameter build_rec"
       sum="665720c412bae07c49aff9e12a7c7f5a"
@@ -275,12 +275,12 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.05"/>
+       <result status="valid" time="0.03"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter build_rec.6"
-      locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+      locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
       loclnum="73" loccnumb="10" loccnume="19"
       expl="parameter build_rec"
       sum="b61dc28999374c9423bc82c6fce2e45d"
@@ -295,12 +295,12 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.10"/>
+       <result status="valid" time="0.05"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter build_rec.7"
-      locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+      locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
       loclnum="73" loccnumb="10" loccnume="19"
       expl="parameter build_rec"
       sum="9cf435699ae92ae5a23cfc37be4f3026"
@@ -316,12 +316,12 @@
        edited="vstte12_tree_reconstruction_WP_TreeReconstruction_WP_parameter_build_rec_3.v"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.96"/>
+       <result status="valid" time="0.59"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter build_rec.8"
-      locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+      locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
       loclnum="73" loccnumb="10" loccnume="19"
       expl="parameter build_rec"
       sum="97c04f6d0f5a9804f86b10db4ebb464d"
@@ -337,14 +337,14 @@
        edited="vstte12_tree_reconstruction_WP_TreeReconstruction_WP_parameter_build_rec_4.v"
        obsolete="false"
        archived="false">
-       <result status="valid" time="1.16"/>
+       <result status="valid" time="0.53"/>
       </proof>
      </goal>
     </transf>
    </goal>
    <goal
     name="WP_parameter build"
-    locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+    locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
     loclnum="91" loccnumb="6" loccnume="11"
     expl="parameter build"
     sum="60d07ec529ae69b810170c33643cb83f"
@@ -356,10 +356,10 @@
     <transf
      name="split_goal"
      proved="true"
-     expanded="false">
+     expanded="true">
      <goal
       name="WP_parameter build.1"
-      locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+      locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
       loclnum="91" loccnumb="6" loccnume="11"
       expl="parameter build"
       sum="5bf38a83e6ddd4b8928dc964847b38ab"
@@ -374,12 +374,12 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter build.2"
-      locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+      locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
       loclnum="91" loccnumb="6" loccnume="11"
       expl="parameter build"
       sum="9e209fdc34f6f2f2357e4ef6aaf9f5e6"
@@ -395,12 +395,12 @@
        edited="vstte12_tree_reconstruction_WP_TreeReconstruction_WP_parameter_build_3.v"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.75"/>
+       <result status="valid" time="0.48"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter build.3"
-      locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+      locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
       loclnum="91" loccnumb="6" loccnume="11"
       expl="exceptional postcondition"
       sum="3b78c1400c2e9c4f8446c0f3259e6625"
@@ -416,7 +416,7 @@
        edited="vstte12_tree_reconstruction_WP_TreeReconstruction_WP_parameter_build_4.v"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.90"/>
+       <result status="valid" time="0.45"/>
       </proof>
      </goal>
     </transf>
@@ -424,13 +424,13 @@
   </theory>
   <theory
    name="WP Harness"
-   locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+   locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
    loclnum="103" loccnumb="7" loccnume="14"
    verified="true"
    expanded="false">
    <goal
     name="WP_parameter harness"
-    locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+    locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
     loclnum="107" loccnumb="6" loccnume="13"
     expl="parameter harness"
     sum="248a62c6ba5eaaa09dd87ef407cf2e97"
@@ -442,10 +442,10 @@
     <transf
      name="split_goal"
      proved="true"
-     expanded="false">
+     expanded="true">
      <goal
       name="WP_parameter harness.1"
-      locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+      locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
       loclnum="107" loccnumb="6" loccnume="13"
       expl="normal postcondition"
       sum="088ea0e1f4ace61f97eb7c6a7f78723b"
@@ -461,12 +461,12 @@
        edited="vstte12_tree_reconstruction_WP_Harness_WP_parameter_harness_3.v"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.97"/>
+       <result status="valid" time="0.46"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter harness.2"
-      locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+      locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
       loclnum="107" loccnumb="6" loccnume="13"
       expl="parameter harness"
       sum="a918402adf4521cf7c7077406832a6fc"
@@ -482,14 +482,14 @@
        edited="vstte12_tree_reconstruction_WP_Harness_WP_parameter_harness_4.v"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.96"/>
+       <result status="valid" time="0.46"/>
       </proof>
      </goal>
     </transf>
    </goal>
    <goal
     name="WP_parameter harness2"
-    locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+    locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
     loclnum="112" loccnumb="6" loccnume="14"
     expl="parameter harness2"
     sum="dd151504cc8d1540c7e24d96dfc69785"
@@ -505,20 +505,20 @@
      edited="vstte12_tree_reconstruction_WP_Harness_WP_parameter_harness2_2.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.98"/>
+     <result status="valid" time="0.61"/>
     </proof>
    </goal>
   </theory>
   <theory
    name="WP ZipperBasedTermination"
-   locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-   loclnum="136" loccnumb="7" loccnume="29"
+   locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+   loclnum="139" loccnumb="7" loccnume="29"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter tc"
-    locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-    loclnum="145" loccnumb="10" loccnume="12"
+    locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+    loclnum="148" loccnumb="10" loccnume="12"
     expl="parameter tc"
     sum="dd16a79b67b39a6c7105debe48766740"
     proved="true"
@@ -531,9 +531,9 @@
      proved="true"
      expanded="true">
      <goal
-      name="WP_parameter tc.0"
-      locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="145" loccnumb="10" loccnume="12"
+      name="WP_parameter tc.1"
+      locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+      loclnum="148" loccnumb="10" loccnume="12"
       expl="parameter tc"
       sum="bcf32b8a9f00e30ebb1fb7dc2c04dfd3"
       proved="true"
@@ -547,13 +547,13 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.07"/>
+       <result status="valid" time="0.05"/>
       </proof>
      </goal>
      <goal
-      name="WP_parameter tc.1"
-      locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="145" loccnumb="10" loccnume="12"
+      name="WP_parameter tc.2"
+      locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+      loclnum="148" loccnumb="10" loccnume="12"
       expl="parameter tc"
       sum="224e1d3ba19871773bd015e244c0f97e"
       proved="true"
@@ -571,9 +571,9 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter tc.2"
-      locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="145" loccnumb="10" loccnume="12"
+      name="WP_parameter tc.3"
+      locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+      loclnum="148" loccnumb="10" loccnume="12"
       expl="parameter tc"
       sum="afcaa64bd0abccb13cb37c8b4ca8556b"
       proved="true"
@@ -587,13 +587,13 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.00"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
-      name="WP_parameter tc.3"
-      locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="145" loccnumb="10" loccnume="12"
+      name="WP_parameter tc.4"
+      locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+      loclnum="148" loccnumb="10" loccnume="12"
       expl="parameter tc"
       sum="be39116606dcb701b1a1b882dcc36e93"
       proved="true"
@@ -607,13 +607,13 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.07"/>
+       <result status="valid" time="0.06"/>
       </proof>
      </goal>
      <goal
-      name="WP_parameter tc.4"
-      locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="145" loccnumb="10" loccnume="12"
+      name="WP_parameter tc.5"
+      locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+      loclnum="148" loccnumb="10" loccnume="12"
       expl="parameter tc"
       sum="bbe49a0b86ee6af5e5b443280c3a49e7"
       proved="true"
@@ -631,9 +631,9 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter tc.5"
-      locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="145" loccnumb="10" loccnume="12"
+      name="WP_parameter tc.6"
+      locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+      loclnum="148" loccnumb="10" loccnume="12"
       expl="parameter tc"
       sum="600db2abee17ec857f4c5b373df18eeb"
       proved="true"
@@ -647,13 +647,13 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.06"/>
+       <result status="valid" time="0.04"/>
       </proof>
      </goal>
      <goal
-      name="WP_parameter tc.6"
-      locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="145" loccnumb="10" loccnume="12"
+      name="WP_parameter tc.7"
+      locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+      loclnum="148" loccnumb="10" loccnume="12"
       expl="parameter tc"
       sum="5c4d1beb3902bc6f5636c0d1a8eea382"
       proved="true"
@@ -667,7 +667,7 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
     </transf>
@@ -675,14 +675,14 @@
   </theory>
   <theory
    name="WP ZipperBased"
-   locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-   loclnum="163" loccnumb="7" loccnume="18"
+   locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+   loclnum="168" loccnumb="7" loccnume="18"
    verified="true"
    expanded="false">
    <goal
     name="forest_depths_append"
-    locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-    loclnum="180" loccnumb="8" loccnume="28"
+    locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+    loclnum="185" loccnumb="8" loccnume="28"
     sum="48b3b7209947894b8dd4c1bad5974049"
     proved="true"
     expanded="false"
@@ -694,13 +694,13 @@
      edited="vstte12_tree_reconstruction_WP_ZipperBased_forest_depths_append_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.99"/>
+     <result status="valid" time="0.47"/>
     </proof>
    </goal>
    <goal
     name="g_append"
-    locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-    loclnum="196" loccnumb="8" loccnume="16"
+    locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+    loclnum="209" loccnumb="8" loccnume="16"
     sum="241cf81bd475b9ff1b6c72392a6f00a4"
     proved="true"
     expanded="false"
@@ -712,31 +712,31 @@
      edited="vstte12_tree_reconstruction_WP_ZipperBased_g_append_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="2.26"/>
+     <result status="valid" time="0.97"/>
     </proof>
    </goal>
    <goal
     name="right_nil"
-    locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-    loclnum="199" loccnumb="8" loccnume="17"
+    locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+    loclnum="219" loccnumb="8" loccnume="17"
     sum="9bd780162c6258ef94694c87346e80d8"
     proved="true"
     expanded="false"
     shape="ainfix =aforest_depthsareverseV0adepthsV2V1NFIagV0Iainfix &gt;=alengthV0c2F">
     <proof
      prover="3"
-     timelimit="24"
+     timelimit="29"
      memlimit="0"
      edited="vstte12_tree_reconstruction_WP_ZipperBased_right_nil_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="14.33"/>
+     <result status="valid" time="7.79"/>
     </proof>
    </goal>
    <goal
     name="main_lemma"
-    locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-    loclnum="204" loccnumb="8" loccnume="18"
+    locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+    loclnum="227" loccnumb="8" loccnume="18"
     sum="31b8dc4f6b40060d58b698938647cb4a"
     proved="true"
     expanded="false"
@@ -748,13 +748,13 @@
      edited="vstte12_tree_reconstruction_WP_ZipperBased_main_lemma_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="1.57"/>
+     <result status="valid" time="0.67"/>
     </proof>
    </goal>
    <goal
     name="WP_parameter tc"
-    locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-    loclnum="219" loccnumb="10" loccnume="12"
+    locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+    loclnum="243" loccnumb="10" loccnume="12"
     expl="parameter tc"
     sum="dca93bbd08ced381be380f88fec84765"
     proved="true"
@@ -765,11 +765,11 @@
     <transf
      name="split_goal"
      proved="true"
-     expanded="false">
+     expanded="true">
      <goal
       name="WP_parameter tc.1"
-      locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="219" loccnumb="10" loccnume="12"
+      locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+      loclnum="243" loccnumb="10" loccnume="12"
       expl="parameter tc"
       sum="52e9457450c259da5663e75c182b5277"
       proved="true"
@@ -780,11 +780,11 @@
       <transf
        name="split_goal"
        proved="true"
-       expanded="false">
+       expanded="true">
        <goal
         name="WP_parameter tc.1.1"
-        locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-        loclnum="219" loccnumb="10" loccnume="12"
+        locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+        loclnum="243" loccnumb="10" loccnume="12"
         expl="parameter tc"
         sum="646402a7ac1ef39b759868d307c41950"
         proved="true"
@@ -798,13 +798,13 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.24"/>
+         <result status="valid" time="0.09"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter tc.1.2"
-        locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-        loclnum="219" loccnumb="10" loccnume="12"
+        locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+        loclnum="243" loccnumb="10" loccnume="12"
         expl="parameter tc"
         sum="5890e5e9218cea4c7d18082a9c211f68"
         proved="true"
@@ -818,13 +818,13 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.07"/>
+         <result status="valid" time="0.02"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter tc.1.3"
-        locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-        loclnum="219" loccnumb="10" loccnume="12"
+        locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+        loclnum="243" loccnumb="10" loccnume="12"
         expl="parameter tc"
         sum="5d56bea78351318ecf01bfb00f5461d7"
         proved="true"
@@ -838,13 +838,13 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.06"/>
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter tc.1.4"
-        locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-        loclnum="219" loccnumb="10" loccnume="12"
+        locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+        loclnum="243" loccnumb="10" loccnume="12"
         expl="parameter tc"
         sum="08929f41a9287c7d804bb0ae5acfd042"
         proved="true"
@@ -858,15 +858,15 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.06"/>
+         <result status="valid" time="0.02"/>
         </proof>
        </goal>
       </transf>
      </goal>
      <goal
       name="WP_parameter tc.2"
-      locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="219" loccnumb="10" loccnume="12"
+      locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+      loclnum="243" loccnumb="10" loccnume="12"
       expl="parameter tc"
       sum="0cae9e3f5f4b09f3c512cfc2979f571e"
       proved="true"
@@ -880,13 +880,13 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="1.58"/>
+       <result status="valid" time="0.70"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter tc.3"
-      locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="219" loccnumb="10" loccnume="12"
+      locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+      loclnum="243" loccnumb="10" loccnume="12"
       expl="parameter tc"
       sum="a993018d127f58e3b7a6f4b78063c34c"
       proved="true"
@@ -901,13 +901,13 @@
        edited="vstte12_tree_reconstruction_WP_ZipperBased_WP_parameter_tc_2.v"
        obsolete="false"
        archived="false">
-       <result status="valid" time="1.37"/>
+       <result status="valid" time="0.81"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter tc.4"
-      locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="219" loccnumb="10" loccnume="12"
+      locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+      loclnum="243" loccnumb="10" loccnume="12"
       expl="parameter tc"
       sum="53babd5be75ee68b92fcda9aac72ddc8"
       proved="true"
@@ -918,11 +918,11 @@
       <transf
        name="split_goal"
        proved="true"
-       expanded="false">
+       expanded="true">
        <goal
         name="WP_parameter tc.4.1"
-        locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-        loclnum="219" loccnumb="10" loccnume="12"
+        locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+        loclnum="243" loccnumb="10" loccnume="12"
         expl="parameter tc"
         sum="58107793b2d829c4deeae305fdfe11d2"
         proved="true"
@@ -936,13 +936,13 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="9.82"/>
+         <result status="valid" time="5.50"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter tc.4.2"
-        locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-        loclnum="219" loccnumb="10" loccnume="12"
+        locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+        loclnum="243" loccnumb="10" loccnume="12"
         expl="parameter tc"
         sum="010cc062d08039fe81906ff0c55c0e28"
         proved="true"
@@ -956,13 +956,13 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.06"/>
+         <result status="valid" time="0.02"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter tc.4.3"
-        locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-        loclnum="219" loccnumb="10" loccnume="12"
+        locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+        loclnum="243" loccnumb="10" loccnume="12"
         expl="parameter tc"
         sum="cc321c19d7e2912a0f0942beed75c9c6"
         proved="true"
@@ -976,13 +976,13 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.06"/>
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter tc.4.4"
-        locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-        loclnum="219" loccnumb="10" loccnume="12"
+        locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+        loclnum="243" loccnumb="10" loccnume="12"
         expl="parameter tc"
         sum="21eb614f1f12320f4c321df6583ef147"
         proved="true"
@@ -996,15 +996,15 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.06"/>
+         <result status="valid" time="0.02"/>
         </proof>
        </goal>
       </transf>
      </goal>
      <goal
       name="WP_parameter tc.5"
-      locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="219" loccnumb="10" loccnume="12"
+      locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+      loclnum="243" loccnumb="10" loccnume="12"
       expl="parameter tc"
       sum="d2d1e6622226887958395bdb2e1eca6b"
       proved="true"
@@ -1018,7 +1018,7 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.03"/>
+       <result status="valid" time="0.02"/>
       </proof>
       <proof
        prover="2"
@@ -1026,13 +1026,13 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.28"/>
+       <result status="valid" time="0.12"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter tc.6"
-      locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="219" loccnumb="10" loccnume="12"
+      locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+      loclnum="243" loccnumb="10" loccnume="12"
       expl="parameter tc"
       sum="09132a03b4be90145b7d0e58a24be223"
       proved="true"
@@ -1046,7 +1046,7 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.03"/>
+       <result status="valid" time="0.02"/>
       </proof>
       <proof
        prover="2"
@@ -1054,13 +1054,13 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.13"/>
+       <result status="valid" time="0.06"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter tc.7"
-      locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="219" loccnumb="10" loccnume="12"
+      locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+      loclnum="243" loccnumb="10" loccnume="12"
       expl="parameter tc"
       sum="eb1c285d0afb14d426b84209509b7f31"
       proved="true"
@@ -1074,13 +1074,13 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.06"/>
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter tc.8"
-      locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="219" loccnumb="10" loccnume="12"
+      locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+      loclnum="243" loccnumb="10" loccnume="12"
       expl="parameter tc"
       sum="dc55b47132da93167eb901cf961c574a"
       proved="true"
@@ -1094,13 +1094,13 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.14"/>
+       <result status="valid" time="0.06"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter tc.9"
-      locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="219" loccnumb="10" loccnume="12"
+      locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+      loclnum="243" loccnumb="10" loccnume="12"
       expl="parameter tc"
       sum="1e68a0f2f4647381c11eb95d0b5333fb"
       proved="true"
@@ -1111,11 +1111,11 @@
       <transf
        name="split_goal"
        proved="true"
-       expanded="false">
+       expanded="true">
        <goal
         name="WP_parameter tc.9.1"
-        locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-        loclnum="219" loccnumb="10" loccnume="12"
+        locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+        loclnum="243" loccnumb="10" loccnume="12"
         expl="parameter tc"
         sum="a4775f97266292d118596fd4adecd19e"
         proved="true"
@@ -1129,13 +1129,13 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.25"/>
+         <result status="valid" time="0.11"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter tc.9.2"
-        locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-        loclnum="219" loccnumb="10" loccnume="12"
+        locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+        loclnum="243" loccnumb="10" loccnume="12"
         expl="parameter tc"
         sum="2a37615a15748bfdf135aa9aa605d428"
         proved="true"
@@ -1149,13 +1149,13 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.07"/>
+         <result status="valid" time="0.02"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter tc.9.3"
-        locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-        loclnum="219" loccnumb="10" loccnume="12"
+        locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+        loclnum="243" loccnumb="10" loccnume="12"
         expl="parameter tc"
         sum="beafde0aead34d72e199751c871ea210"
         proved="true"
@@ -1169,13 +1169,13 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.07"/>
+         <result status="valid" time="0.02"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter tc.9.4"
-        locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-        loclnum="219" loccnumb="10" loccnume="12"
+        locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+        loclnum="243" loccnumb="10" loccnume="12"
         expl="parameter tc"
         sum="c7dba7be2b6ab4d36715cdd034cae6c6"
         proved="true"
@@ -1189,15 +1189,15 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.06"/>
+         <result status="valid" time="0.02"/>
         </proof>
        </goal>
       </transf>
      </goal>
      <goal
       name="WP_parameter tc.10"
-      locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="219" loccnumb="10" loccnume="12"
+      locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+      loclnum="243" loccnumb="10" loccnume="12"
       expl="parameter tc"
       sum="8ce54ac317f0c550219fddab7a04f9dd"
       proved="true"
@@ -1212,13 +1212,13 @@
        edited="vstte12_tree_reconstruction_WP_ZipperBased_WP_parameter_tc_3.v"
        obsolete="false"
        archived="false">
-       <result status="valid" time="1.15"/>
+       <result status="valid" time="0.52"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter tc.11"
-      locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="219" loccnumb="10" loccnume="12"
+      locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+      loclnum="243" loccnumb="10" loccnume="12"
       expl="parameter tc"
       sum="ccc03f94a9d543b689619b6c910951ea"
       proved="true"
@@ -1233,13 +1233,13 @@
        edited="vstte12_tree_reconstruction_WP_ZipperBased_WP_parameter_tc_4.v"
        obsolete="false"
        archived="false">
-       <result status="valid" time="1.88"/>
+       <result status="valid" time="0.82"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter tc.12"
-      locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="219" loccnumb="10" loccnume="12"
+      locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+      loclnum="243" loccnumb="10" loccnume="12"
       expl="parameter tc"
       sum="a0812d5d31fd355dc9edbcddacae82be"
       proved="true"
@@ -1250,11 +1250,11 @@
       <transf
        name="split_goal"
        proved="true"
-       expanded="false">
+       expanded="true">
        <goal
         name="WP_parameter tc.12.1"
-        locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-        loclnum="219" loccnumb="10" loccnume="12"
+        locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+        loclnum="243" loccnumb="10" loccnume="12"
         expl="parameter tc"
         sum="7e2d7760443eb8797f34e4c5b38f86e9"
         proved="true"
@@ -1264,17 +1264,17 @@
          name="expl:parameter tc"/>
         <proof
          prover="0"
-         timelimit="30"
+         timelimit="32"
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="15.77"/>
+         <result status="valid" time="11.55"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter tc.12.2"
-        locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-        loclnum="219" loccnumb="10" loccnume="12"
+        locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+        loclnum="243" loccnumb="10" loccnume="12"
         expl="parameter tc"
         sum="5f0231a7cf5077d3e384eb34fce46799"
         proved="true"
@@ -1288,13 +1288,13 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.06"/>
+         <result status="valid" time="0.02"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter tc.12.3"
-        locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-        loclnum="219" loccnumb="10" loccnume="12"
+        locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+        loclnum="243" loccnumb="10" loccnume="12"
         expl="parameter tc"
         sum="24a58732c6cbff5f6281bb708f577878"
         proved="true"
@@ -1308,13 +1308,13 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.09"/>
+         <result status="valid" time="0.05"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter tc.12.4"
-        locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-        loclnum="219" loccnumb="10" loccnume="12"
+        locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+        loclnum="243" loccnumb="10" loccnume="12"
         expl="parameter tc"
         sum="3403444653f708f5b2b5f7bd6451a185"
         proved="true"
@@ -1328,15 +1328,15 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.23"/>
+         <result status="valid" time="0.10"/>
         </proof>
        </goal>
       </transf>
      </goal>
      <goal
       name="WP_parameter tc.13"
-      locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="219" loccnumb="10" loccnume="12"
+      locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+      loclnum="243" loccnumb="10" loccnume="12"
       expl="parameter tc"
       sum="9822838fc335854fcb5d42bff60dbd3a"
       proved="true"
@@ -1350,7 +1350,7 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.03"/>
+       <result status="valid" time="0.02"/>
       </proof>
       <proof
        prover="2"
@@ -1358,13 +1358,13 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.05"/>
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter tc.14"
-      locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="219" loccnumb="10" loccnume="12"
+      locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+      loclnum="243" loccnumb="10" loccnume="12"
       expl="parameter tc"
       sum="d645c6dceaab97313d55bed31a550d2d"
       proved="true"
@@ -1378,7 +1378,7 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.04"/>
+       <result status="valid" time="0.02"/>
       </proof>
       <proof
        prover="2"
@@ -1386,7 +1386,7 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.06"/>
+       <result status="valid" time="0.02"/>
       </proof>
       <proof
        prover="4"
@@ -1394,13 +1394,13 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.05"/>
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter tc.15"
-      locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="219" loccnumb="10" loccnume="12"
+      locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+      loclnum="243" loccnumb="10" loccnume="12"
       expl="parameter tc"
       sum="4f147bdbb237b5057178548f5eb870cc"
       proved="true"
@@ -1414,21 +1414,21 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.18"/>
+       <result status="valid" time="0.08"/>
       </proof>
       <proof
        prover="4"
        timelimit="20"
        memlimit="0"
-       obsolete="true"
+       obsolete="false"
        archived="false">
-       <result status="timeout" time="20.33"/>
+       <result status="timeout" time="20.05"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter tc.16"
-      locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="219" loccnumb="10" loccnume="12"
+      locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+      loclnum="243" loccnumb="10" loccnume="12"
       expl="parameter tc"
       sum="dc3689f8793254cfb799867db80db07d"
       proved="true"
@@ -1450,13 +1450,13 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.06"/>
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter tc.17"
-      locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="219" loccnumb="10" loccnume="12"
+      locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+      loclnum="243" loccnumb="10" loccnume="12"
       expl="parameter tc"
       sum="c6e9b843b7a0d0446107c0d814ba4594"
       proved="true"
@@ -1478,7 +1478,7 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.06"/>
+       <result status="valid" time="0.02"/>
       </proof>
       <proof
        prover="4"
@@ -1486,13 +1486,13 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.05"/>
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter tc.18"
-      locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-      loclnum="219" loccnumb="10" loccnume="12"
+      locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+      loclnum="243" loccnumb="10" loccnume="12"
       expl="parameter tc"
       sum="aa81641ac5c9120bead59226ca415034"
       proved="true"
@@ -1506,15 +1506,15 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.29"/>
+       <result status="valid" time="0.12"/>
       </proof>
      </goal>
     </transf>
    </goal>
    <goal
     name="map_leaf_depths"
-    locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-    loclnum="257" loccnumb="8" loccnume="23"
+    locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+    loclnum="285" loccnumb="8" loccnume="23"
     sum="3a443911666b83e8c971eebe219d2e45"
     proved="true"
     expanded="false"
@@ -1526,13 +1526,13 @@
      edited="vstte12_tree_reconstruction_WP_ZipperBased_map_leaf_depths_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.79"/>
+     <result status="valid" time="0.46"/>
     </proof>
    </goal>
    <goal
     name="map_leaf_only_leaf"
-    locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-    loclnum="260" loccnumb="8" loccnume="26"
+    locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+    loclnum="288" loccnumb="8" loccnume="26"
     sum="7a1291e2aeb35e9864c22a73d4ba7b64"
     proved="true"
     expanded="false"
@@ -1544,13 +1544,13 @@
      edited="vstte12_tree_reconstruction_WP_ZipperBased_map_leaf_only_leaf_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.95"/>
+     <result status="valid" time="0.45"/>
     </proof>
    </goal>
    <goal
     name="WP_parameter build"
-    locfile="vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
-    loclnum="263" loccnumb="6" loccnume="11"
+    locfile="programs/vstte12_tree_reconstruction/../vstte12_tree_reconstruction.mlw"
+    loclnum="291" loccnumb="6" loccnume="11"
     expl="parameter build"
     sum="681ad9636649f18a445a13c3ff1c7217"
     proved="true"
@@ -1564,7 +1564,7 @@
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.05"/>
+     <result status="valid" time="0.04"/>
     </proof>
    </goal>
   </theory>

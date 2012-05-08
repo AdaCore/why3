@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/home/jcf/why3/share/why3session.dtd">
+<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
 <why3session
- name="examples/programs/flag/why3session.xml">
+ name="programs/flag/why3session.xml">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -17,7 +17,7 @@
  <prover
   id="3"
   name="Coq"
-  version="8.3pl3"/>
+  version="8.3pl4"/>
  <prover
   id="4"
   name="Z3"
@@ -32,13 +32,13 @@
   expanded="false">
   <theory
    name="WP Flag"
-   locfile="examples/programs/flag/../flag.mlw"
+   locfile="programs/flag/../flag.mlw"
    loclnum="3" loccnumb="7" loccnume="11"
    verified="true"
    expanded="false">
    <goal
     name="WP_parameter swap"
-    locfile="examples/programs/flag/../flag.mlw"
+    locfile="programs/flag/../flag.mlw"
     loclnum="15" loccnumb="6" loccnume="10"
     expl="parameter swap"
     sum="777622005a738532e4808309ae553373"
@@ -50,6 +50,7 @@
     <proof
      prover="4"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.02"/>
@@ -57,6 +58,7 @@
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.01"/>
@@ -64,7 +66,7 @@
    </goal>
    <goal
     name="WP_parameter dutch_flag"
-    locfile="examples/programs/flag/../flag.mlw"
+    locfile="programs/flag/../flag.mlw"
     loclnum="24" loccnumb="6" loccnume="16"
     expl="parameter dutch_flag"
     sum="06561a9ad8666d011b8c3cbe5d0fff7f"
@@ -76,10 +78,10 @@
     <transf
      name="split_goal"
      proved="true"
-     expanded="false">
+     expanded="true">
      <goal
       name="WP_parameter dutch_flag.1"
-      locfile="examples/programs/flag/../flag.mlw"
+      locfile="programs/flag/../flag.mlw"
       loclnum="24" loccnumb="6" loccnume="16"
       expl="loop invariant init"
       sum="ed734bef6c0bfdf9136327808ccc39bd"
@@ -91,10 +93,10 @@
       <transf
        name="split_goal"
        proved="true"
-       expanded="false">
+       expanded="true">
        <goal
         name="WP_parameter dutch_flag.1.1"
-        locfile="examples/programs/flag/../flag.mlw"
+        locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
         sum="4654f83e2e69876c41e22b343eac0f8e"
@@ -106,6 +108,7 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -113,7 +116,7 @@
        </goal>
        <goal
         name="WP_parameter dutch_flag.1.2"
-        locfile="examples/programs/flag/../flag.mlw"
+        locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
         sum="4654f83e2e69876c41e22b343eac0f8e"
@@ -125,14 +128,15 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.00"/>
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter dutch_flag.1.3"
-        locfile="examples/programs/flag/../flag.mlw"
+        locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
         sum="cf066c20be4c118203c75d75a8831074"
@@ -144,6 +148,7 @@
         <proof
          prover="4"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
@@ -151,14 +156,15 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.01"/>
+         <result status="valid" time="0.00"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter dutch_flag.1.4"
-        locfile="examples/programs/flag/../flag.mlw"
+        locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
         sum="bde4e86147d640c4c241f4571b1c62e1"
@@ -170,6 +176,7 @@
         <proof
          prover="4"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.00"/>
@@ -177,6 +184,7 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.00"/>
@@ -184,7 +192,7 @@
        </goal>
        <goal
         name="WP_parameter dutch_flag.1.5"
-        locfile="examples/programs/flag/../flag.mlw"
+        locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
         sum="786e08e42f1da7d85e79d13b2c757b34"
@@ -196,6 +204,7 @@
         <proof
          prover="4"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -203,6 +212,7 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.00"/>
@@ -210,7 +220,7 @@
        </goal>
        <goal
         name="WP_parameter dutch_flag.1.6"
-        locfile="examples/programs/flag/../flag.mlw"
+        locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
         sum="a685824398501b29a8bc2d65d78dc8bf"
@@ -222,6 +232,7 @@
         <proof
          prover="4"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -229,14 +240,15 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.01"/>
+         <result status="valid" time="0.00"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter dutch_flag.1.7"
-        locfile="examples/programs/flag/../flag.mlw"
+        locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
         sum="f6ff520d83d083093dcaba29e2cbdfbd"
@@ -248,6 +260,7 @@
         <proof
          prover="4"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -255,6 +268,7 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.00"/>
@@ -262,7 +276,7 @@
        </goal>
        <goal
         name="WP_parameter dutch_flag.1.8"
-        locfile="examples/programs/flag/../flag.mlw"
+        locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
         sum="16c9b0a7c72719c6a52716bfa6ee9365"
@@ -274,20 +288,23 @@
         <proof
          prover="4"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.02"/>
+         <result status="valid" time="0.01"/>
         </proof>
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.00"/>
+         <result status="valid" time="0.01"/>
         </proof>
         <proof
          prover="1"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.00"/>
@@ -295,7 +312,7 @@
        </goal>
        <goal
         name="WP_parameter dutch_flag.1.9"
-        locfile="examples/programs/flag/../flag.mlw"
+        locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
         sum="740c9816d470b081cdda7a88d56d1186"
@@ -307,6 +324,7 @@
         <proof
          prover="4"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
@@ -314,16 +332,17 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.00"/>
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
       </transf>
      </goal>
      <goal
       name="WP_parameter dutch_flag.2"
-      locfile="examples/programs/flag/../flag.mlw"
+      locfile="programs/flag/../flag.mlw"
       loclnum="24" loccnumb="6" loccnume="16"
       expl="precondition"
       sum="533af1ec471f7bc989fa3955c0c593b5"
@@ -335,10 +354,10 @@
       <transf
        name="split_goal"
        proved="true"
-       expanded="false">
+       expanded="true">
        <goal
         name="WP_parameter dutch_flag.2.1"
-        locfile="examples/programs/flag/../flag.mlw"
+        locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
         sum="fefb7b625eb65ecde797366cb7c43240"
@@ -350,6 +369,7 @@
         <proof
          prover="4"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
@@ -357,6 +377,7 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -364,7 +385,7 @@
        </goal>
        <goal
         name="WP_parameter dutch_flag.2.2"
-        locfile="examples/programs/flag/../flag.mlw"
+        locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
         sum="c4a7d6335e743b0763d8607d70d30637"
@@ -376,6 +397,7 @@
         <proof
          prover="4"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
@@ -383,6 +405,7 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -392,7 +415,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.3"
-      locfile="examples/programs/flag/../flag.mlw"
+      locfile="programs/flag/../flag.mlw"
       loclnum="24" loccnumb="6" loccnume="16"
       expl="parameter dutch_flag"
       sum="74b36344a46fce0be381d5b68a9af153"
@@ -404,6 +427,7 @@
       <proof
        prover="4"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
@@ -411,6 +435,7 @@
       <proof
        prover="1"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
@@ -418,6 +443,7 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -425,7 +451,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.4"
-      locfile="examples/programs/flag/../flag.mlw"
+      locfile="programs/flag/../flag.mlw"
       loclnum="24" loccnumb="6" loccnume="16"
       expl="parameter dutch_flag"
       sum="a9c53dcbcd17ffa76af7405ad7f77dc0"
@@ -437,10 +463,10 @@
       <transf
        name="split_goal"
        proved="true"
-       expanded="false">
+       expanded="true">
        <goal
         name="WP_parameter dutch_flag.4.1"
-        locfile="examples/programs/flag/../flag.mlw"
+        locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
         sum="84f21b321a8ff1281b37704826273337"
@@ -452,6 +478,7 @@
         <proof
          prover="4"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
@@ -459,6 +486,7 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -466,7 +494,7 @@
        </goal>
        <goal
         name="WP_parameter dutch_flag.4.2"
-        locfile="examples/programs/flag/../flag.mlw"
+        locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
         sum="be119594437eee9f8ce2feb58f104dc1"
@@ -478,6 +506,7 @@
         <proof
          prover="4"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
@@ -485,14 +514,15 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.00"/>
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter dutch_flag.4.3"
-        locfile="examples/programs/flag/../flag.mlw"
+        locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
         sum="16b532da44410a0f2d36024d668f6d72"
@@ -504,6 +534,7 @@
         <proof
          prover="4"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
@@ -511,6 +542,7 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -518,7 +550,7 @@
        </goal>
        <goal
         name="WP_parameter dutch_flag.4.4"
-        locfile="examples/programs/flag/../flag.mlw"
+        locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
         sum="e691b99cc6df113746b5d4bfd04c329b"
@@ -530,6 +562,7 @@
         <proof
          prover="4"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
@@ -537,6 +570,7 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -544,7 +578,7 @@
        </goal>
        <goal
         name="WP_parameter dutch_flag.4.5"
-        locfile="examples/programs/flag/../flag.mlw"
+        locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
         sum="1f10d0164afccbd8045909ef7b44a212"
@@ -556,15 +590,16 @@
         <proof
          prover="3"
          timelimit="10"
+         memlimit="0"
          edited="flag_WP_Flag_WP_parameter_dutch_flag_1.v"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.56"/>
+         <result status="valid" time="0.54"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter dutch_flag.4.6"
-        locfile="examples/programs/flag/../flag.mlw"
+        locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
         sum="dcaa48396700b97657133154acf7ee80"
@@ -576,15 +611,16 @@
         <proof
          prover="3"
          timelimit="10"
+         memlimit="0"
          edited="flag_WP_Flag_WP_parameter_dutch_flag_4.v"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.55"/>
+         <result status="valid" time="0.54"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter dutch_flag.4.7"
-        locfile="examples/programs/flag/../flag.mlw"
+        locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
         sum="00849e81d620944aeefb00e6e5bffda1"
@@ -596,14 +632,15 @@
         <proof
          prover="1"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.25"/>
+         <result status="valid" time="0.23"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter dutch_flag.4.8"
-        locfile="examples/programs/flag/../flag.mlw"
+        locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
         sum="9c4b4d2fd9c71e23a98c95615a0caaa9"
@@ -615,14 +652,15 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.00"/>
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter dutch_flag.4.9"
-        locfile="examples/programs/flag/../flag.mlw"
+        locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
         sum="98ef83775172d975db3d47b9caecf0c4"
@@ -634,30 +672,33 @@
         <proof
          prover="0"
          timelimit="60"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="29.01"/>
+         <result status="valid" time="27.80"/>
         </proof>
         <proof
          prover="2"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="timeout" time="10.09"/>
+         <result status="timeout" time="10.03"/>
         </proof>
         <proof
          prover="5"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="timeout" time="10.10"/>
+         <result status="timeout" time="10.03"/>
         </proof>
        </goal>
       </transf>
      </goal>
      <goal
       name="WP_parameter dutch_flag.5"
-      locfile="examples/programs/flag/../flag.mlw"
+      locfile="programs/flag/../flag.mlw"
       loclnum="24" loccnumb="6" loccnume="16"
       expl="parameter dutch_flag"
       sum="e496a6ed3b300e2fe16fc2e079021f03"
@@ -669,6 +710,7 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -676,7 +718,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.6"
-      locfile="examples/programs/flag/../flag.mlw"
+      locfile="programs/flag/../flag.mlw"
       loclnum="24" loccnumb="6" loccnume="16"
       expl="parameter dutch_flag"
       sum="eb54bac704e68b0d8870b5422592087f"
@@ -688,10 +730,10 @@
       <transf
        name="split_goal"
        proved="true"
-       expanded="false">
+       expanded="true">
        <goal
         name="WP_parameter dutch_flag.6.1"
-        locfile="examples/programs/flag/../flag.mlw"
+        locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
         sum="6da17c7ee52b2983389ca652e5548d88"
@@ -703,6 +745,7 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -710,7 +753,7 @@
        </goal>
        <goal
         name="WP_parameter dutch_flag.6.2"
-        locfile="examples/programs/flag/../flag.mlw"
+        locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
         sum="ce49d41d8bd56e2c5f0e6a2b7c2383c4"
@@ -722,6 +765,7 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -729,7 +773,7 @@
        </goal>
        <goal
         name="WP_parameter dutch_flag.6.3"
-        locfile="examples/programs/flag/../flag.mlw"
+        locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
         sum="d21e82f6083327dec5e082f63b8125d1"
@@ -741,6 +785,7 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -748,7 +793,7 @@
        </goal>
        <goal
         name="WP_parameter dutch_flag.6.4"
-        locfile="examples/programs/flag/../flag.mlw"
+        locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
         sum="61ee566cf709aae1652f9e112df0848c"
@@ -760,6 +805,7 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -767,7 +813,7 @@
        </goal>
        <goal
         name="WP_parameter dutch_flag.6.5"
-        locfile="examples/programs/flag/../flag.mlw"
+        locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
         sum="9fc5d090a293316209a6f26878743074"
@@ -779,6 +825,7 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -786,7 +833,7 @@
        </goal>
        <goal
         name="WP_parameter dutch_flag.6.6"
-        locfile="examples/programs/flag/../flag.mlw"
+        locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
         sum="85304862931e1dd5c2d69b69213ba303"
@@ -798,6 +845,7 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -805,7 +853,7 @@
        </goal>
        <goal
         name="WP_parameter dutch_flag.6.7"
-        locfile="examples/programs/flag/../flag.mlw"
+        locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
         sum="5107608840c0d193cddb3584a077bfb5"
@@ -817,14 +865,15 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.00"/>
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter dutch_flag.6.8"
-        locfile="examples/programs/flag/../flag.mlw"
+        locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
         sum="d1df6a7de124be44162ac2c972e87b18"
@@ -836,6 +885,7 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -843,7 +893,7 @@
        </goal>
        <goal
         name="WP_parameter dutch_flag.6.9"
-        locfile="examples/programs/flag/../flag.mlw"
+        locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
         sum="1597348fc4b398f043a36b8cbe0366a6"
@@ -855,6 +905,7 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -864,7 +915,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.7"
-      locfile="examples/programs/flag/../flag.mlw"
+      locfile="programs/flag/../flag.mlw"
       loclnum="24" loccnumb="6" loccnume="16"
       expl="parameter dutch_flag"
       sum="68de391c098ecbbd712947f79920e41a"
@@ -876,10 +927,10 @@
       <transf
        name="split_goal"
        proved="true"
-       expanded="false">
+       expanded="true">
        <goal
         name="WP_parameter dutch_flag.7.1"
-        locfile="examples/programs/flag/../flag.mlw"
+        locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
         sum="1443f25e1dd6db3eb658419360ae7d44"
@@ -891,6 +942,7 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -898,7 +950,7 @@
        </goal>
        <goal
         name="WP_parameter dutch_flag.7.2"
-        locfile="examples/programs/flag/../flag.mlw"
+        locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
         sum="a76558d3840c45a87e45b5133f5b6347"
@@ -910,6 +962,7 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -919,7 +972,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.8"
-      locfile="examples/programs/flag/../flag.mlw"
+      locfile="programs/flag/../flag.mlw"
       loclnum="24" loccnumb="6" loccnume="16"
       expl="parameter dutch_flag"
       sum="9d9db6b7d4f0df7d6a1e5fe805122e24"
@@ -931,6 +984,7 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -938,7 +992,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.9"
-      locfile="examples/programs/flag/../flag.mlw"
+      locfile="programs/flag/../flag.mlw"
       loclnum="24" loccnumb="6" loccnume="16"
       expl="parameter dutch_flag"
       sum="c500f440ac873a6c93202ec323cc8723"
@@ -950,10 +1004,10 @@
       <transf
        name="split_goal"
        proved="true"
-       expanded="false">
+       expanded="true">
        <goal
         name="WP_parameter dutch_flag.9.1"
-        locfile="examples/programs/flag/../flag.mlw"
+        locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
         sum="a49cdd97c4346d6513c70316897e2ae5"
@@ -965,6 +1019,7 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -972,7 +1027,7 @@
        </goal>
        <goal
         name="WP_parameter dutch_flag.9.2"
-        locfile="examples/programs/flag/../flag.mlw"
+        locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
         sum="988790b07fe547306ee349e65c3f3c92"
@@ -984,6 +1039,7 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -991,7 +1047,7 @@
        </goal>
        <goal
         name="WP_parameter dutch_flag.9.3"
-        locfile="examples/programs/flag/../flag.mlw"
+        locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
         sum="b014dbaf90757bd4b4c16a4854b40aaa"
@@ -1003,6 +1059,7 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -1010,7 +1067,7 @@
        </goal>
        <goal
         name="WP_parameter dutch_flag.9.4"
-        locfile="examples/programs/flag/../flag.mlw"
+        locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
         sum="919a9ca6ef91806a1052d37b55e30375"
@@ -1022,6 +1079,7 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -1029,7 +1087,7 @@
        </goal>
        <goal
         name="WP_parameter dutch_flag.9.5"
-        locfile="examples/programs/flag/../flag.mlw"
+        locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
         sum="84520208dad05608fad9d4e199373a54"
@@ -1041,14 +1099,15 @@
         <proof
          prover="1"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.24"/>
+         <result status="valid" time="0.23"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter dutch_flag.9.6"
-        locfile="examples/programs/flag/../flag.mlw"
+        locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
         sum="b1187925401d131c86e8eecc008526db"
@@ -1060,14 +1119,15 @@
         <proof
          prover="1"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.54"/>
+         <result status="valid" time="0.51"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter dutch_flag.9.7"
-        locfile="examples/programs/flag/../flag.mlw"
+        locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
         sum="68ecb4047fb559ed67873f9d1458d14a"
@@ -1079,14 +1139,15 @@
         <proof
          prover="1"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.42"/>
+         <result status="valid" time="1.33"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter dutch_flag.9.8"
-        locfile="examples/programs/flag/../flag.mlw"
+        locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
         sum="5c549c96ea27f0f43e274795e8880e99"
@@ -1098,14 +1159,15 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.00"/>
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter dutch_flag.9.9"
-        locfile="examples/programs/flag/../flag.mlw"
+        locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
         sum="aca7dba42f88501014e38c469a8ffa8e"
@@ -1116,31 +1178,34 @@
          name="expl:parameter dutch_flag"/>
         <proof
          prover="0"
-         timelimit="30"
+         timelimit="59"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="29.18"/>
+         <result status="valid" time="27.52"/>
         </proof>
         <proof
          prover="2"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="timeout" time="10.09"/>
+         <result status="timeout" time="10.03"/>
         </proof>
         <proof
          prover="5"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="timeout" time="10.09"/>
+         <result status="timeout" time="10.03"/>
         </proof>
        </goal>
       </transf>
      </goal>
      <goal
       name="WP_parameter dutch_flag.10"
-      locfile="examples/programs/flag/../flag.mlw"
+      locfile="programs/flag/../flag.mlw"
       loclnum="24" loccnumb="6" loccnume="16"
       expl="parameter dutch_flag"
       sum="d507b6bcbebb194252f92f268fe15a49"
@@ -1152,10 +1217,10 @@
       <transf
        name="split_goal"
        proved="true"
-       expanded="false">
+       expanded="true">
        <goal
         name="WP_parameter dutch_flag.10.1"
-        locfile="examples/programs/flag/../flag.mlw"
+        locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
         sum="9ffd620532d603dc5885809b7119a99b"
@@ -1167,14 +1232,15 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.00"/>
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter dutch_flag.10.2"
-        locfile="examples/programs/flag/../flag.mlw"
+        locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
         sum="eeade988bfad952b62cc4144ce4d26ef"
@@ -1186,6 +1252,7 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -1195,7 +1262,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.11"
-      locfile="examples/programs/flag/../flag.mlw"
+      locfile="programs/flag/../flag.mlw"
       loclnum="24" loccnumb="6" loccnume="16"
       expl="normal postcondition"
       sum="0fc3034b8f66c269c045d9858885df44"
@@ -1207,10 +1274,10 @@
       <transf
        name="split_goal"
        proved="true"
-       expanded="false">
+       expanded="true">
        <goal
         name="WP_parameter dutch_flag.11.1"
-        locfile="examples/programs/flag/../flag.mlw"
+        locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
         sum="350c45b30e8a745d812826dc68fae1b8"
@@ -1222,6 +1289,7 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -1229,7 +1297,7 @@
        </goal>
        <goal
         name="WP_parameter dutch_flag.11.2"
-        locfile="examples/programs/flag/../flag.mlw"
+        locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
         sum="eddcf747e87cc8156eebab4f4612ee15"
@@ -1241,6 +1309,7 @@
         <proof
          prover="1"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>

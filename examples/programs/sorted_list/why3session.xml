@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
 <why3session
- name="./programs/sorted_list/why3session.xml">
+ name="programs/sorted_list/why3session.xml">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -12,21 +12,22 @@
   expanded="false">
   <theory
    name="WP FindInSortedList"
-   locfile="./programs/sorted_list/../sorted_list.mlw"
+   locfile="programs/sorted_list/../sorted_list.mlw"
    loclnum="3" loccnumb="7" loccnume="23"
    verified="true"
    expanded="true">
    <goal
     name="Sorted_not_mem"
-    locfile="./programs/sorted_list/../sorted_list.mlw"
+    locfile="programs/sorted_list/../sorted_list.mlw"
     loclnum="9" loccnumb="8" loccnume="22"
     sum="e1989cf39dd0d382ea357462fc4a2561"
     proved="true"
     expanded="true"
-    shape="amemV0aConsV1V2NIasortedaConsV1V2Iainfix <V0V1F">
+    shape="amemV0aConsV1V2NIasortedaConsV1V2Iainfix &lt;V0V1F">
     <proof
      prover="0"
      timelimit="20"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.01"/>
@@ -34,18 +35,19 @@
    </goal>
    <goal
     name="WP_parameter find"
-    locfile="./programs/sorted_list/../sorted_list.mlw"
+    locfile="programs/sorted_list/../sorted_list.mlw"
     loclnum="13" loccnumb="10" loccnume="14"
     expl="parameter find"
     sum="7780f361b245c4c4264bada975c18722"
     proved="true"
     expanded="true"
-    shape="CV1aNilamemV0V1NaConsVVamemV0V1qainfix =V4aTrueAainfix >V0V2Oainfix =V0V2IamemV0V3qainfix =V4aTrueFAasortedV3IasortedV1FF">
+    shape="CV1aNilamemV0V1NaConsVVamemV0V1qainfix =V4aTrueAainfix &gt;V0V2Oainfix =V0V2IamemV0V3qainfix =V4aTrueFAasortedV3IasortedV1FF">
     <label
      name="expl:parameter find"/>
     <proof
      prover="0"
      timelimit="20"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.01"/>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/home/jcf/why3/share/why3session.dtd">
+<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
 <why3session
- name="vstte12_combinators/why3session.xml">
+ name="programs/vstte12_combinators/why3session.xml">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -13,7 +13,7 @@
  <prover
   id="2"
   name="Coq"
-  version="8.3pl3"/>
+  version="8.3pl4"/>
  <prover
   id="3"
   name="Z3"
@@ -21,16 +21,16 @@
  <file
   name="../vstte12_combinators.mlw"
   verified="true"
-  expanded="true">
+  expanded="false">
   <theory
    name="WP Combinators"
-   locfile="vstte12_combinators/../vstte12_combinators.mlw"
+   locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
    loclnum="8" loccnumb="7" loccnume="18"
    verified="true"
    expanded="true">
    <goal
     name="red_left"
-    locfile="vstte12_combinators/../vstte12_combinators.mlw"
+    locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
     loclnum="51" loccnumb="8" loccnume="16"
     sum="0c2e604dedffc01dc9573f834defe388"
     proved="true"
@@ -39,14 +39,15 @@
     <proof
      prover="3"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="1.35"/>
+     <result status="valid" time="0.93"/>
     </proof>
    </goal>
    <goal
     name="red_right"
-    locfile="vstte12_combinators/../vstte12_combinators.mlw"
+    locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
     loclnum="54" loccnumb="8" loccnume="17"
     sum="9eca6504a972796214bc04edab0ee931"
     proved="true"
@@ -55,14 +56,15 @@
     <proof
      prover="3"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.41"/>
+     <result status="valid" time="0.29"/>
     </proof>
    </goal>
    <goal
     name="red_star_left"
-    locfile="vstte12_combinators/../vstte12_combinators.mlw"
+    locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
     loclnum="61" loccnumb="8" loccnume="21"
     sum="eb3b64fe7eddef88fb8acf525dee4a99"
     proved="true"
@@ -71,15 +73,16 @@
     <proof
      prover="2"
      timelimit="10"
+     memlimit="0"
      edited="vstte12_combinators_WP_Combinators_red_star_left_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.74"/>
+     <result status="valid" time="0.44"/>
     </proof>
    </goal>
    <goal
     name="red_star_right"
-    locfile="vstte12_combinators/../vstte12_combinators.mlw"
+    locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
     loclnum="64" loccnumb="8" loccnume="22"
     sum="c7a5d5afd27d920cf9183be20996a9e4"
     proved="true"
@@ -88,15 +91,16 @@
     <proof
      prover="2"
      timelimit="10"
+     memlimit="0"
      edited="vstte12_combinators_WP_Combinators_red_star_right_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.73"/>
+     <result status="valid" time="0.44"/>
     </proof>
    </goal>
    <goal
     name="WP_parameter reduction"
-    locfile="vstte12_combinators/../vstte12_combinators.mlw"
+    locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
     loclnum="69" loccnumb="10" loccnume="19"
     expl="parameter reduction"
     sum="294c655dff463b894676e714ebf629d6"
@@ -111,7 +115,7 @@
      expanded="true">
      <goal
       name="WP_parameter reduction.1"
-      locfile="vstte12_combinators/../vstte12_combinators.mlw"
+      locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
       loclnum="69" loccnumb="10" loccnume="19"
       expl="parameter reduction"
       sum="6f1cb12dad284b35a02f820c17af4e93"
@@ -123,6 +127,7 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -130,7 +135,7 @@
      </goal>
      <goal
       name="WP_parameter reduction.2"
-      locfile="vstte12_combinators/../vstte12_combinators.mlw"
+      locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
       loclnum="69" loccnumb="10" loccnume="19"
       expl="parameter reduction"
       sum="3a7cf7df3765ffb6c49e2f5f36a20f3f"
@@ -142,14 +147,15 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.00"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter reduction.3"
-      locfile="vstte12_combinators/../vstte12_combinators.mlw"
+      locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
       loclnum="69" loccnumb="10" loccnume="19"
       expl="parameter reduction"
       sum="7d167c065c92bbee687dd7f89b914897"
@@ -164,7 +170,7 @@
        expanded="true">
        <goal
         name="WP_parameter reduction.3.1"
-        locfile="vstte12_combinators/../vstte12_combinators.mlw"
+        locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
         loclnum="69" loccnumb="10" loccnume="19"
         expl="parameter reduction"
         sum="63940e6437a1003df169a2db3e7c8bb5"
@@ -176,15 +182,16 @@
         <proof
          prover="2"
          timelimit="10"
+         memlimit="0"
          edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction_1.v"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.72"/>
+         <result status="valid" time="0.44"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter reduction.3.2"
-        locfile="vstte12_combinators/../vstte12_combinators.mlw"
+        locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
         loclnum="69" loccnumb="10" loccnume="19"
         expl="parameter reduction"
         sum="854abe15f4431c7271532724f1ea39c4"
@@ -196,16 +203,17 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.01"/>
+         <result status="valid" time="0.00"/>
         </proof>
        </goal>
       </transf>
      </goal>
      <goal
       name="WP_parameter reduction.4"
-      locfile="vstte12_combinators/../vstte12_combinators.mlw"
+      locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
       loclnum="69" loccnumb="10" loccnume="19"
       expl="parameter reduction"
       sum="9b3c1eecaac7256eae9aedb56f68c67b"
@@ -220,7 +228,7 @@
        expanded="true">
        <goal
         name="WP_parameter reduction.4.1"
-        locfile="vstte12_combinators/../vstte12_combinators.mlw"
+        locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
         loclnum="69" loccnumb="10" loccnume="19"
         expl="parameter reduction"
         sum="3e86437519af57bf8e62f4d1004425a0"
@@ -232,15 +240,16 @@
         <proof
          prover="2"
          timelimit="10"
+         memlimit="0"
          edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction_2.v"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.73"/>
+         <result status="valid" time="0.44"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter reduction.4.2"
-        locfile="vstte12_combinators/../vstte12_combinators.mlw"
+        locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
         loclnum="69" loccnumb="10" loccnume="19"
         expl="parameter reduction"
         sum="4c905af7a1108164da284fce4c779cbf"
@@ -252,16 +261,17 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.00"/>
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
       </transf>
      </goal>
      <goal
       name="WP_parameter reduction.5"
-      locfile="vstte12_combinators/../vstte12_combinators.mlw"
+      locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
       loclnum="69" loccnumb="10" loccnume="19"
       expl="parameter reduction"
       sum="1830ea4a4f7813a126004fca26909365"
@@ -276,7 +286,7 @@
        expanded="true">
        <goal
         name="WP_parameter reduction.5.1"
-        locfile="vstte12_combinators/../vstte12_combinators.mlw"
+        locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
         loclnum="69" loccnumb="10" loccnume="19"
         expl="parameter reduction"
         sum="c2d21f9b6c551250cbb5557b3e2ce2f9"
@@ -288,15 +298,16 @@
         <proof
          prover="2"
          timelimit="10"
+         memlimit="0"
          edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction_3.v"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.74"/>
+         <result status="valid" time="0.44"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter reduction.5.2"
-        locfile="vstte12_combinators/../vstte12_combinators.mlw"
+        locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
         loclnum="69" loccnumb="10" loccnume="19"
         expl="parameter reduction"
         sum="849fa4aa1e7c12c00332789ae72f0c33"
@@ -308,16 +319,17 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.00"/>
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
       </transf>
      </goal>
      <goal
       name="WP_parameter reduction.6"
-      locfile="vstte12_combinators/../vstte12_combinators.mlw"
+      locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
       loclnum="69" loccnumb="10" loccnume="19"
       expl="parameter reduction"
       sum="1d41e8821a3e646320992db6e17457fb"
@@ -332,7 +344,7 @@
        expanded="true">
        <goal
         name="WP_parameter reduction.6.1"
-        locfile="vstte12_combinators/../vstte12_combinators.mlw"
+        locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
         loclnum="69" loccnumb="10" loccnume="19"
         expl="parameter reduction"
         sum="87f9ea812839cc4ed7e0069a230ecb61"
@@ -344,15 +356,16 @@
         <proof
          prover="2"
          timelimit="10"
+         memlimit="0"
          edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction_4.v"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.74"/>
+         <result status="valid" time="0.43"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter reduction.6.2"
-        locfile="vstte12_combinators/../vstte12_combinators.mlw"
+        locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
         loclnum="69" loccnumb="10" loccnume="19"
         expl="parameter reduction"
         sum="8f61e2fe4ef40a1fa5d56137a7652224"
@@ -364,16 +377,17 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.01"/>
+         <result status="valid" time="0.02"/>
         </proof>
        </goal>
       </transf>
      </goal>
      <goal
       name="WP_parameter reduction.7"
-      locfile="vstte12_combinators/../vstte12_combinators.mlw"
+      locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
       loclnum="69" loccnumb="10" loccnume="19"
       expl="parameter reduction"
       sum="9343dd0f978d3267dd08cf1a73b7e305"
@@ -388,7 +402,7 @@
        expanded="true">
        <goal
         name="WP_parameter reduction.7.1"
-        locfile="vstte12_combinators/../vstte12_combinators.mlw"
+        locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
         loclnum="69" loccnumb="10" loccnume="19"
         expl="parameter reduction"
         sum="9639ef8e3188cecdcb28451337f39d41"
@@ -400,15 +414,16 @@
         <proof
          prover="2"
          timelimit="10"
+         memlimit="0"
          edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction_5.v"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.73"/>
+         <result status="valid" time="0.44"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter reduction.7.2"
-        locfile="vstte12_combinators/../vstte12_combinators.mlw"
+        locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
         loclnum="69" loccnumb="10" loccnume="19"
         expl="parameter reduction"
         sum="5beda9ffe2c57951bb6cb0055bf9765f"
@@ -420,16 +435,17 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.00"/>
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
       </transf>
      </goal>
      <goal
       name="WP_parameter reduction.8"
-      locfile="vstte12_combinators/../vstte12_combinators.mlw"
+      locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
       loclnum="69" loccnumb="10" loccnume="19"
       expl="parameter reduction"
       sum="4c28665e5c6f60e714fa64b839fc0541"
@@ -441,16 +457,17 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.05"/>
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
     </transf>
    </goal>
    <goal
     name="reducible_or_value"
-    locfile="vstte12_combinators/../vstte12_combinators.mlw"
+    locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
     loclnum="88" loccnumb="8" loccnume="26"
     sum="ac428172cd8677985912f83b056e7219"
     proved="true"
@@ -459,15 +476,16 @@
     <proof
      prover="2"
      timelimit="10"
+     memlimit="0"
      edited="vstte12_combinators_WP_Combinators_reducible_or_value_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="1.13"/>
+     <result status="valid" time="0.64"/>
     </proof>
    </goal>
    <goal
     name="irreducible_is_value"
-    locfile="vstte12_combinators/../vstte12_combinators.mlw"
+    locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
     loclnum="93" loccnumb="8" loccnume="28"
     sum="4466bb7d2aa5ed096282ffb44ca87f6e"
     proved="true"
@@ -476,15 +494,16 @@
     <proof
      prover="2"
      timelimit="10"
+     memlimit="0"
      edited="vstte12_combinators_WP_Combinators_irreducible_is_value_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="3.82"/>
+     <result status="valid" time="2.06"/>
     </proof>
    </goal>
    <goal
     name="only_K_reduces"
-    locfile="vstte12_combinators/../vstte12_combinators.mlw"
+    locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
     loclnum="106" loccnumb="8" loccnume="22"
     sum="1848b64cc790b85618c78c766a766a37"
     proved="true"
@@ -493,15 +512,16 @@
     <proof
      prover="2"
      timelimit="10"
+     memlimit="0"
      edited="vstte12_combinators_WP_Combinators_only_K_reduces_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="1.13"/>
+     <result status="valid" time="0.63"/>
     </proof>
    </goal>
    <goal
     name="size_nonneg"
-    locfile="vstte12_combinators/../vstte12_combinators.mlw"
+    locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
     loclnum="115" loccnumb="8" loccnume="19"
     sum="ecbc0e34606466a53b835bc488fbd780"
     proved="true"
@@ -510,15 +530,16 @@
     <proof
      prover="2"
      timelimit="10"
+     memlimit="0"
      edited="vstte12_combinators_WP_Combinators_size_nonneg_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.74"/>
+     <result status="valid" time="0.45"/>
     </proof>
    </goal>
    <goal
     name="WP_parameter reduction2"
-    locfile="vstte12_combinators/../vstte12_combinators.mlw"
+    locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
     loclnum="117" loccnumb="10" loccnume="20"
     expl="parameter reduction2"
     sum="552e83ee56039db4294146d50cc99540"
@@ -533,7 +554,7 @@
      expanded="true">
      <goal
       name="WP_parameter reduction2.1"
-      locfile="vstte12_combinators/../vstte12_combinators.mlw"
+      locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
       loclnum="117" loccnumb="10" loccnume="20"
       expl="parameter reduction2"
       sum="e6209acaad3ba24a99ea86a7d17451d5"
@@ -545,6 +566,7 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -552,7 +574,7 @@
      </goal>
      <goal
       name="WP_parameter reduction2.2"
-      locfile="vstte12_combinators/../vstte12_combinators.mlw"
+      locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
       loclnum="117" loccnumb="10" loccnume="20"
       expl="parameter reduction2"
       sum="437522cb9114a971119f17b281b56a29"
@@ -564,14 +586,15 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter reduction2.3"
-      locfile="vstte12_combinators/../vstte12_combinators.mlw"
+      locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
       loclnum="117" loccnumb="10" loccnume="20"
       expl="parameter reduction2"
       sum="23b097721c95de61d3da2e97aaf4b699"
@@ -583,14 +606,15 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.07"/>
+       <result status="valid" time="0.06"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter reduction2.4"
-      locfile="vstte12_combinators/../vstte12_combinators.mlw"
+      locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
       loclnum="117" loccnumb="10" loccnume="20"
       expl="parameter reduction2"
       sum="a5cd19b25a18aa0844875f5061c3f6a3"
@@ -602,14 +626,15 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.14"/>
+       <result status="valid" time="0.12"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter reduction2.5"
-      locfile="vstte12_combinators/../vstte12_combinators.mlw"
+      locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
       loclnum="117" loccnumb="10" loccnume="20"
       expl="parameter reduction2"
       sum="38fd940dfb44250e2d7a3c1345271e05"
@@ -621,6 +646,7 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
@@ -628,7 +654,7 @@
      </goal>
      <goal
       name="WP_parameter reduction2.6"
-      locfile="vstte12_combinators/../vstte12_combinators.mlw"
+      locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
       loclnum="117" loccnumb="10" loccnume="20"
       expl="parameter reduction2"
       sum="8c8283ce1e23b4997d74ffcd8b490e8a"
@@ -640,14 +666,15 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.24"/>
+       <result status="valid" time="0.17"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter reduction2.7"
-      locfile="vstte12_combinators/../vstte12_combinators.mlw"
+      locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
       loclnum="117" loccnumb="10" loccnume="20"
       expl="parameter reduction2"
       sum="4779bf2ec33155e8fd0ec294df6ca71b"
@@ -659,6 +686,7 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -666,7 +694,7 @@
      </goal>
      <goal
       name="WP_parameter reduction2.8"
-      locfile="vstte12_combinators/../vstte12_combinators.mlw"
+      locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
       loclnum="117" loccnumb="10" loccnume="20"
       expl="parameter reduction2"
       sum="bfbf4514912735a8ccd35422719e8512"
@@ -678,14 +706,15 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.32"/>
+       <result status="valid" time="0.24"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter reduction2.9"
-      locfile="vstte12_combinators/../vstte12_combinators.mlw"
+      locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
       loclnum="117" loccnumb="10" loccnume="20"
       expl="parameter reduction2"
       sum="d05f1f558a47837711d88f926dcc4deb"
@@ -697,14 +726,15 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="1.33"/>
+       <result status="valid" time="0.98"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter reduction2.10"
-      locfile="vstte12_combinators/../vstte12_combinators.mlw"
+      locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
       loclnum="117" loccnumb="10" loccnume="20"
       expl="parameter reduction2"
       sum="76d38280981418a2250025058a031b41"
@@ -716,14 +746,15 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.41"/>
+       <result status="valid" time="0.32"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter reduction2.11"
-      locfile="vstte12_combinators/../vstte12_combinators.mlw"
+      locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
       loclnum="117" loccnumb="10" loccnume="20"
       expl="parameter reduction2"
       sum="c59cbce2c9ef7ad64fe5747c82afda51"
@@ -735,14 +766,15 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.08"/>
+       <result status="valid" time="0.05"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter reduction2.12"
-      locfile="vstte12_combinators/../vstte12_combinators.mlw"
+      locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
       loclnum="117" loccnumb="10" loccnume="20"
       expl="parameter reduction2"
       sum="b01796cacc566b72555dd48f2d8b7433"
@@ -754,14 +786,15 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.66"/>
+       <result status="valid" time="0.49"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter reduction2.13"
-      locfile="vstte12_combinators/../vstte12_combinators.mlw"
+      locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
       loclnum="117" loccnumb="10" loccnume="20"
       expl="parameter reduction2"
       sum="e00c063e51af8138e6d2f80bfdb6fe45"
@@ -776,7 +809,7 @@
        expanded="true">
        <goal
         name="WP_parameter reduction2.13.1"
-        locfile="vstte12_combinators/../vstte12_combinators.mlw"
+        locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
         loclnum="117" loccnumb="10" loccnume="20"
         expl="parameter reduction2"
         sum="1cc844b392ea21c9e22e65af4f524f21"
@@ -788,14 +821,15 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.00"/>
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter reduction2.13.2"
-        locfile="vstte12_combinators/../vstte12_combinators.mlw"
+        locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
         loclnum="117" loccnumb="10" loccnume="20"
         expl="parameter reduction2"
         sum="3a57cfcd6ce2dbb46c56e6e3ce38592c"
@@ -807,15 +841,16 @@
         <proof
          prover="2"
          timelimit="10"
+         memlimit="0"
          edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction2_1.v"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.77"/>
+         <result status="valid" time="0.47"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter reduction2.13.3"
-        locfile="vstte12_combinators/../vstte12_combinators.mlw"
+        locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
         loclnum="117" loccnumb="10" loccnume="20"
         expl="parameter reduction2"
         sum="6b457dc32cc56f79735eaa1aa4c24b75"
@@ -827,17 +862,18 @@
         <proof
          prover="2"
          timelimit="10"
+         memlimit="0"
          edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction2_2.v"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.77"/>
+         <result status="valid" time="0.46"/>
         </proof>
        </goal>
       </transf>
      </goal>
      <goal
       name="WP_parameter reduction2.14"
-      locfile="vstte12_combinators/../vstte12_combinators.mlw"
+      locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
       loclnum="117" loccnumb="10" loccnume="20"
       expl="parameter reduction2"
       sum="9874bef55363ccfe9d4ba364e9ff46d6"
@@ -849,14 +885,15 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter reduction2.15"
-      locfile="vstte12_combinators/../vstte12_combinators.mlw"
+      locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
       loclnum="117" loccnumb="10" loccnume="20"
       expl="parameter reduction2"
       sum="134b4c22d77faf9c6ed2a56702b2d702"
@@ -868,16 +905,17 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.66"/>
+       <result status="valid" time="0.50"/>
       </proof>
      </goal>
     </transf>
    </goal>
    <goal
     name="ks1"
-    locfile="vstte12_combinators/../vstte12_combinators.mlw"
+    locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
     loclnum="141" loccnumb="8" loccnume="11"
     sum="30a4c394b5c436d3bd30237dbe831e50"
     proved="true"
@@ -886,14 +924,15 @@
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.02"/>
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="only_K_ks"
-    locfile="vstte12_combinators/../vstte12_combinators.mlw"
+    locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
     loclnum="143" loccnumb="8" loccnume="17"
     sum="d1ec487ed37828af4017debccf693aa9"
     proved="true"
@@ -902,15 +941,16 @@
     <proof
      prover="2"
      timelimit="10"
+     memlimit="0"
      edited="vstte12_combinators_WP_Combinators_only_K_ks_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.72"/>
+     <result status="valid" time="0.44"/>
     </proof>
    </goal>
    <goal
     name="ks_inversion"
-    locfile="vstte12_combinators/../vstte12_combinators.mlw"
+    locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
     loclnum="145" loccnumb="8" loccnume="20"
     sum="56d6e240a66f9cab711cb7fced895696"
     proved="true"
@@ -919,14 +959,15 @@
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.02"/>
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="ks_injective"
-    locfile="vstte12_combinators/../vstte12_combinators.mlw"
+    locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
     loclnum="148" loccnumb="8" loccnume="20"
     sum="bfd321f7701ec5fa9161ea7f94095ced"
     proved="true"
@@ -935,15 +976,16 @@
     <proof
      prover="2"
      timelimit="10"
+     memlimit="0"
      edited="vstte12_combinators_WP_Combinators_ks_injective_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="1.27"/>
+     <result status="valid" time="0.73"/>
     </proof>
    </goal>
    <goal
     name="WP_parameter reduction3"
-    locfile="vstte12_combinators/../vstte12_combinators.mlw"
+    locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
     loclnum="153" loccnumb="10" loccnume="20"
     expl="parameter reduction3"
     sum="756b1eefed564243773595c2908ef2a4"
@@ -958,7 +1000,7 @@
      expanded="true">
      <goal
       name="WP_parameter reduction3.1"
-      locfile="vstte12_combinators/../vstte12_combinators.mlw"
+      locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
       loclnum="153" loccnumb="10" loccnume="20"
       expl="parameter reduction3"
       sum="6efb1113823d1682687a1c7e6f03fc87"
@@ -970,14 +1012,15 @@
       <proof
        prover="0"
        timelimit="13"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="5.98"/>
+       <result status="valid" time="4.37"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter reduction3.2"
-      locfile="vstte12_combinators/../vstte12_combinators.mlw"
+      locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
       loclnum="153" loccnumb="10" loccnume="20"
       expl="parameter reduction3"
       sum="19a51e6c4c9e91fbc96f0f61738780ce"
@@ -992,7 +1035,7 @@
        expanded="true">
        <goal
         name="WP_parameter reduction3.2.1"
-        locfile="vstte12_combinators/../vstte12_combinators.mlw"
+        locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
         loclnum="153" loccnumb="10" loccnume="20"
         expl="parameter reduction3"
         sum="3250d8e2b6dda1c35d620623ccef812a"
@@ -1004,6 +1047,7 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -1011,21 +1055,23 @@
         <proof
          prover="1"
          timelimit="10"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.03"/>
-        </proof>
-        <proof
-         prover="3"
-         timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
         </proof>
+        <proof
+         prover="3"
+         timelimit="10"
+         memlimit="0"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.00"/>
+        </proof>
        </goal>
        <goal
         name="WP_parameter reduction3.2.2"
-        locfile="vstte12_combinators/../vstte12_combinators.mlw"
+        locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
         loclnum="153" loccnumb="10" loccnume="20"
         expl="parameter reduction3"
         sum="ae705b0d0d96a0a7d43f49e5361c174c"
@@ -1037,14 +1083,15 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.02"/>
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter reduction3.2.3"
-        locfile="vstte12_combinators/../vstte12_combinators.mlw"
+        locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
         loclnum="153" loccnumb="10" loccnume="20"
         expl="parameter reduction3"
         sum="69a35e5769461bde2c23bb76e53578c5"
@@ -1056,6 +1103,7 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -1065,7 +1113,7 @@
      </goal>
      <goal
       name="WP_parameter reduction3.3"
-      locfile="vstte12_combinators/../vstte12_combinators.mlw"
+      locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
       loclnum="153" loccnumb="10" loccnume="20"
       expl="parameter reduction3"
       sum="41d222384e183f1d0b53ab554236ad34"
@@ -1077,14 +1125,15 @@
       <proof
        prover="1"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="1.00"/>
+       <result status="valid" time="0.71"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter reduction3.4"
-      locfile="vstte12_combinators/../vstte12_combinators.mlw"
+      locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
       loclnum="153" loccnumb="10" loccnume="20"
       expl="parameter reduction3"
       sum="ca3ee7bad7558574ec94c663ae074918"
@@ -1096,14 +1145,15 @@
       <proof
        prover="1"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.08"/>
+       <result status="valid" time="0.06"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter reduction3.5"
-      locfile="vstte12_combinators/../vstte12_combinators.mlw"
+      locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
       loclnum="153" loccnumb="10" loccnume="20"
       expl="parameter reduction3"
       sum="b925e144342e37c0cb4d7fae400a9445"
@@ -1118,7 +1168,7 @@
        expanded="true">
        <goal
         name="WP_parameter reduction3.5.1"
-        locfile="vstte12_combinators/../vstte12_combinators.mlw"
+        locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
         loclnum="153" loccnumb="10" loccnume="20"
         expl="parameter reduction3"
         sum="216900e5e5eb27a95248914bd5b78ea1"
@@ -1130,14 +1180,15 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.03"/>
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter reduction3.5.2"
-        locfile="vstte12_combinators/../vstte12_combinators.mlw"
+        locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
         loclnum="153" loccnumb="10" loccnume="20"
         expl="parameter reduction3"
         sum="af58b22fa023a7ea4a110d30e70e8b1d"
@@ -1149,15 +1200,16 @@
         <proof
          prover="2"
          timelimit="10"
+         memlimit="0"
          edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction3_3.v"
          obsolete="false"
          archived="false">
-         <result status="valid" time="4.44"/>
+         <result status="valid" time="3.10"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter reduction3.5.3"
-        locfile="vstte12_combinators/../vstte12_combinators.mlw"
+        locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
         loclnum="153" loccnumb="10" loccnume="20"
         expl="parameter reduction3"
         sum="b34668bc3a000233aaebc82732b655c5"
@@ -1169,17 +1221,18 @@
         <proof
          prover="2"
          timelimit="10"
+         memlimit="0"
          edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction3_4.v"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.54"/>
+         <result status="valid" time="0.87"/>
         </proof>
        </goal>
       </transf>
      </goal>
      <goal
       name="WP_parameter reduction3.6"
-      locfile="vstte12_combinators/../vstte12_combinators.mlw"
+      locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
       loclnum="153" loccnumb="10" loccnume="20"
       expl="parameter reduction3"
       sum="628c56e89353a331d0ddd3ab669e8689"
@@ -1191,14 +1244,15 @@
       <proof
        prover="1"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.08"/>
+       <result status="valid" time="0.05"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter reduction3.7"
-      locfile="vstte12_combinators/../vstte12_combinators.mlw"
+      locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
       loclnum="153" loccnumb="10" loccnume="20"
       expl="parameter reduction3"
       sum="a7b201b6d15c4d27e1603cd33401fd38"
@@ -1210,15 +1264,16 @@
       <proof
        prover="2"
        timelimit="10"
+       memlimit="0"
        edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction3_6.v"
        obsolete="false"
        archived="false">
-       <result status="valid" time="1.14"/>
+       <result status="valid" time="0.63"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter reduction3.8"
-      locfile="vstte12_combinators/../vstte12_combinators.mlw"
+      locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
       loclnum="153" loccnumb="10" loccnume="20"
       expl="parameter reduction3"
       sum="c5047621975a78ab305c458f13b46a8d"
@@ -1230,14 +1285,15 @@
       <proof
        prover="1"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.11"/>
+       <result status="valid" time="0.07"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter reduction3.9"
-      locfile="vstte12_combinators/../vstte12_combinators.mlw"
+      locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
       loclnum="153" loccnumb="10" loccnume="20"
       expl="parameter reduction3"
       sum="4cbd7f4b189fe9ad86a6903a4a881aa9"
@@ -1252,7 +1308,7 @@
        expanded="true">
        <goal
         name="WP_parameter reduction3.9.1"
-        locfile="vstte12_combinators/../vstte12_combinators.mlw"
+        locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
         loclnum="153" loccnumb="10" loccnume="20"
         expl="parameter reduction3"
         sum="a520c998a3ec2fcc3c6dbaf409f8f5f5"
@@ -1264,28 +1320,31 @@
         <proof
          prover="0"
          timelimit="10"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.07"/>
-        </proof>
-        <proof
-         prover="1"
-         timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.05"/>
         </proof>
         <proof
-         prover="3"
+         prover="1"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.04"/>
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof
+         prover="3"
+         timelimit="10"
+         memlimit="0"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter reduction3.9.2"
-        locfile="vstte12_combinators/../vstte12_combinators.mlw"
+        locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
         loclnum="153" loccnumb="10" loccnume="20"
         expl="parameter reduction3"
         sum="99892cd6395bea80107901f97f406da9"
@@ -1297,15 +1356,16 @@
         <proof
          prover="2"
          timelimit="10"
+         memlimit="0"
          edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction3_5.v"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.22"/>
+         <result status="valid" time="0.72"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter reduction3.9.3"
-        locfile="vstte12_combinators/../vstte12_combinators.mlw"
+        locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
         loclnum="153" loccnumb="10" loccnume="20"
         expl="parameter reduction3"
         sum="06d685409b806f28e5f5ec496dd48ea2"
@@ -1317,16 +1377,17 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.96"/>
+         <result status="valid" time="0.71"/>
         </proof>
        </goal>
       </transf>
      </goal>
      <goal
       name="WP_parameter reduction3.10"
-      locfile="vstte12_combinators/../vstte12_combinators.mlw"
+      locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
       loclnum="153" loccnumb="10" loccnume="20"
       expl="parameter reduction3"
       sum="723686e59af3bfebb85f6f825c7e6fa4"
@@ -1338,14 +1399,15 @@
       <proof
        prover="1"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.09"/>
+       <result status="valid" time="0.06"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter reduction3.11"
-      locfile="vstte12_combinators/../vstte12_combinators.mlw"
+      locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
       loclnum="153" loccnumb="10" loccnume="20"
       expl="parameter reduction3"
       sum="dd754b1f2914c830773bfc751343d319"
@@ -1357,15 +1419,16 @@
       <proof
        prover="2"
        timelimit="10"
+       memlimit="0"
        edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction3_9.v"
        obsolete="false"
        archived="false">
-       <result status="valid" time="1.86"/>
+       <result status="valid" time="1.21"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter reduction3.12"
-      locfile="vstte12_combinators/../vstte12_combinators.mlw"
+      locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
       loclnum="153" loccnumb="10" loccnume="20"
       expl="parameter reduction3"
       sum="29a98e1748561045c943d5d53736d6ae"
@@ -1377,14 +1440,15 @@
       <proof
        prover="1"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.11"/>
+       <result status="valid" time="0.07"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter reduction3.13"
-      locfile="vstte12_combinators/../vstte12_combinators.mlw"
+      locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
       loclnum="153" loccnumb="10" loccnume="20"
       expl="parameter reduction3"
       sum="040e8b6aaecdd9a06bcf9c895c2efe41"
@@ -1396,15 +1460,16 @@
       <proof
        prover="2"
        timelimit="10"
+       memlimit="0"
        edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction3_7.v"
        obsolete="false"
        archived="false">
-       <result status="valid" time="2.03"/>
+       <result status="valid" time="1.33"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter reduction3.14"
-      locfile="vstte12_combinators/../vstte12_combinators.mlw"
+      locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
       loclnum="153" loccnumb="10" loccnume="20"
       expl="parameter reduction3"
       sum="754bd8cca88a8294b7332dd3c3b3a6e5"
@@ -1416,15 +1481,16 @@
       <proof
        prover="2"
        timelimit="10"
+       memlimit="0"
        edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction3_8.v"
        obsolete="false"
        archived="false">
-       <result status="valid" time="2.03"/>
+       <result status="valid" time="1.35"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter reduction3.15"
-      locfile="vstte12_combinators/../vstte12_combinators.mlw"
+      locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
       loclnum="153" loccnumb="10" loccnume="20"
       expl="parameter reduction3"
       sum="6d9201867215085214c7967fc18a7a86"
@@ -1436,30 +1502,33 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.39"/>
+       <result status="valid" time="0.29"/>
       </proof>
       <proof
        prover="1"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.37"/>
+       <result status="valid" time="0.26"/>
       </proof>
       <proof
        prover="3"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.49"/>
+       <result status="valid" time="0.35"/>
       </proof>
      </goal>
     </transf>
    </goal>
    <goal
     name="ks_value"
-    locfile="vstte12_combinators/../vstte12_combinators.mlw"
+    locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
     loclnum="172" loccnumb="9" loccnume="17"
     sum="9c9c4aab7021c4bef3a4fae149560189"
     proved="true"
@@ -1468,15 +1537,16 @@
     <proof
      prover="2"
      timelimit="10"
+     memlimit="0"
      edited="vstte12_combinators_WP_Combinators_ks_value_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.77"/>
+     <result status="valid" time="0.48"/>
     </proof>
    </goal>
    <goal
     name="ks_even_odd"
-    locfile="vstte12_combinators/../vstte12_combinators.mlw"
+    locfile="programs/vstte12_combinators/../vstte12_combinators.mlw"
     loclnum="175" loccnumb="9" loccnume="20"
     sum="86ff8047b0a43afa459b01b14498b1a5"
     proved="true"
@@ -1485,10 +1555,11 @@
     <proof
      prover="2"
      timelimit="10"
+     memlimit="0"
      edited="vstte12_combinators_WP_Combinators_ks_even_odd_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.76"/>
+     <result status="valid" time="0.48"/>
     </proof>
    </goal>
   </theory>

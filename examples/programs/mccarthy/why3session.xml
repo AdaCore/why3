@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
 <why3session
- name="./programs/mccarthy/why3session.xml">
+ name="programs/mccarthy/why3session.xml">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -24,24 +24,25 @@
   expanded="false">
   <theory
    name="WP McCarthy91"
-   locfile="./programs/mccarthy/../mccarthy.mlw"
+   locfile="programs/mccarthy/../mccarthy.mlw"
    loclnum="4" loccnumb="7" loccnume="17"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter f91"
-    locfile="./programs/mccarthy/../mccarthy.mlw"
+    locfile="programs/mccarthy/../mccarthy.mlw"
     loclnum="10" loccnumb="10" loccnume="13"
     expl="parameter f91"
     sum="bc78483b4274918300a9d67162a2f328"
     proved="true"
     expanded="true"
-    shape="iainfix <=V0c100Liainfix <=ainfix +V0c11c100c91ainfix -ainfix +V0c11c10ainfix =iainfix <=V1c100c91ainfix -V1c10iainfix <=V0c100c91ainfix -V0c10Aainfix <ainfix -c101V1ainfix -c101V0Aainfix <=c0ainfix -c101V0Aainfix <ainfix -c101ainfix +V0c11ainfix -c101V0Aainfix <=c0ainfix -c101V0ainfix =ainfix -V0c10iainfix <=V0c100c91ainfix -V0c10F">
+    shape="iainfix &lt;=V0c100Liainfix &lt;=ainfix +V0c11c100c91ainfix -ainfix +V0c11c10ainfix =iainfix &lt;=V1c100c91ainfix -V1c10iainfix &lt;=V0c100c91ainfix -V0c10Aainfix &lt;ainfix -c101V1ainfix -c101V0Aainfix &lt;=c0ainfix -c101V0Aainfix &lt;ainfix -c101ainfix +V0c11ainfix -c101V0Aainfix &lt;=c0ainfix -c101V0ainfix =ainfix -V0c10iainfix &lt;=V0c100c91ainfix -V0c10F">
     <label
      name="expl:parameter f91"/>
     <proof
      prover="3"
      timelimit="2"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.01"/>
@@ -49,6 +50,7 @@
     <proof
      prover="1"
      timelimit="2"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
@@ -56,6 +58,7 @@
     <proof
      prover="0"
      timelimit="2"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.01"/>
@@ -63,6 +66,7 @@
     <proof
      prover="2"
      timelimit="2"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
@@ -70,13 +74,13 @@
    </goal>
    <goal
     name="WP_parameter f91_nonrec"
-    locfile="./programs/mccarthy/../mccarthy.mlw"
+    locfile="programs/mccarthy/../mccarthy.mlw"
     loclnum="29" loccnumb="6" loccnume="16"
     expl="parameter f91_nonrec"
     sum="e7d12103da4267b1322037eb27b67a42"
     proved="true"
     expanded="true"
-    shape="iainfix >V2c0iainfix >V1c100alexaTuple2ainfix +ainfix -c101V3ainfix *c10V4V4aTuple2ainfix +ainfix -c101V1ainfix *c10V2V2Aainfix =aiterV4V3afV0Aainfix >=V4c0Iainfix =V4ainfix -V2c1FIainfix =V3ainfix -V1c10FalexaTuple2ainfix +ainfix -c101V5ainfix *c10V6V6aTuple2ainfix +ainfix -c101V1ainfix *c10V2V2Aainfix =aiterV6V5afV0Aainfix >=V6c0Iainfix =V6ainfix +V2c1FIainfix =V5ainfix +V1c11Fainfix =V1afV0Iainfix =aiterV2V1afV0Aainfix >=V2c0FFAainfix =aiterc1V0afV0Aainfix >=c1c0F">
+    shape="iainfix &gt;V2c0iainfix &gt;V1c100alexaTuple2ainfix +ainfix -c101V3ainfix *c10V4V4aTuple2ainfix +ainfix -c101V1ainfix *c10V2V2Aainfix =aiterV4V3afV0Aainfix &gt;=V4c0Iainfix =V4ainfix -V2c1FIainfix =V3ainfix -V1c10FalexaTuple2ainfix +ainfix -c101V5ainfix *c10V6V6aTuple2ainfix +ainfix -c101V1ainfix *c10V2V2Aainfix =aiterV6V5afV0Aainfix &gt;=V6c0Iainfix =V6ainfix +V2c1FIainfix =V5ainfix +V1c11Fainfix =V1afV0Iainfix =aiterV2V1afV0Aainfix &gt;=V2c0FFAainfix =aiterc1V0afV0Aainfix &gt;=c1c0F">
     <label
      name="expl:parameter f91_nonrec"/>
     <transf
@@ -85,18 +89,19 @@
      expanded="true">
      <goal
       name="WP_parameter f91_nonrec.1"
-      locfile="./programs/mccarthy/../mccarthy.mlw"
+      locfile="programs/mccarthy/../mccarthy.mlw"
       loclnum="29" loccnumb="6" loccnume="16"
       expl="loop invariant init"
       sum="ebc29ad9ce59b6754018afad9fad7a71"
       proved="true"
       expanded="true"
-      shape="ainfix =aiterc1V0afV0Aainfix >=c1c0F">
+      shape="ainfix =aiterc1V0afV0Aainfix &gt;=c1c0F">
       <label
        name="expl:parameter f91_nonrec"/>
       <proof
        prover="3"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -104,6 +109,7 @@
       <proof
        prover="1"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -111,25 +117,27 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.00"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter f91_nonrec.2"
-      locfile="./programs/mccarthy/../mccarthy.mlw"
+      locfile="programs/mccarthy/../mccarthy.mlw"
       loclnum="29" loccnumb="6" loccnume="16"
       expl="loop invariant preservation"
       sum="6cac933cd554260e730e700a548a401e"
       proved="true"
       expanded="true"
-      shape="ainfix =aiterV4V3afV0Aainfix >=V4c0Iainfix =V4ainfix -V2c1FIainfix =V3ainfix -V1c10FIainfix >V1c100Iainfix >V2c0Iainfix =aiterV2V1afV0Aainfix >=V2c0FFF">
+      shape="ainfix =aiterV4V3afV0Aainfix &gt;=V4c0Iainfix =V4ainfix -V2c1FIainfix =V3ainfix -V1c10FIainfix &gt;V1c100Iainfix &gt;V2c0Iainfix =aiterV2V1afV0Aainfix &gt;=V2c0FFF">
       <label
        name="expl:parameter f91_nonrec"/>
       <proof
        prover="3"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -137,6 +145,7 @@
       <proof
        prover="1"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -144,6 +153,7 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -151,18 +161,19 @@
      </goal>
      <goal
       name="WP_parameter f91_nonrec.3"
-      locfile="./programs/mccarthy/../mccarthy.mlw"
+      locfile="programs/mccarthy/../mccarthy.mlw"
       loclnum="29" loccnumb="6" loccnume="16"
       expl="loop variant decreases"
       sum="e077e18db57e282c4db36781582c6753"
       proved="true"
       expanded="true"
-      shape="alexaTuple2ainfix +ainfix -c101V3ainfix *c10V4V4aTuple2ainfix +ainfix -c101V1ainfix *c10V2V2Iainfix =aiterV4V3afV0Aainfix >=V4c0Iainfix =V4ainfix -V2c1FIainfix =V3ainfix -V1c10FIainfix >V1c100Iainfix >V2c0Iainfix =aiterV2V1afV0Aainfix >=V2c0FFF">
+      shape="alexaTuple2ainfix +ainfix -c101V3ainfix *c10V4V4aTuple2ainfix +ainfix -c101V1ainfix *c10V2V2Iainfix =aiterV4V3afV0Aainfix &gt;=V4c0Iainfix =V4ainfix -V2c1FIainfix =V3ainfix -V1c10FIainfix &gt;V1c100Iainfix &gt;V2c0Iainfix =aiterV2V1afV0Aainfix &gt;=V2c0FFF">
       <label
        name="expl:parameter f91_nonrec"/>
       <proof
        prover="3"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -170,13 +181,15 @@
       <proof
        prover="1"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.00"/>
+       <result status="valid" time="0.01"/>
       </proof>
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -184,32 +197,35 @@
      </goal>
      <goal
       name="WP_parameter f91_nonrec.4"
-      locfile="./programs/mccarthy/../mccarthy.mlw"
+      locfile="programs/mccarthy/../mccarthy.mlw"
       loclnum="29" loccnumb="6" loccnume="16"
       expl="loop invariant preservation"
       sum="83b28db664708aec5e270a765c7ac7bf"
       proved="true"
       expanded="true"
-      shape="ainfix =aiterV4V3afV0Aainfix >=V4c0Iainfix =V4ainfix +V2c1FIainfix =V3ainfix +V1c11FIainfix >V1c100NIainfix >V2c0Iainfix =aiterV2V1afV0Aainfix >=V2c0FFF">
+      shape="ainfix =aiterV4V3afV0Aainfix &gt;=V4c0Iainfix =V4ainfix +V2c1FIainfix =V3ainfix +V1c11FIainfix &gt;V1c100NIainfix &gt;V2c0Iainfix =aiterV2V1afV0Aainfix &gt;=V2c0FFF">
       <label
        name="expl:parameter f91_nonrec"/>
       <proof
        prover="3"
        timelimit="10"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="1"
-       timelimit="10"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.03"/>
-      </proof>
-      <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.42"/>
@@ -217,18 +233,19 @@
      </goal>
      <goal
       name="WP_parameter f91_nonrec.5"
-      locfile="./programs/mccarthy/../mccarthy.mlw"
+      locfile="programs/mccarthy/../mccarthy.mlw"
       loclnum="29" loccnumb="6" loccnume="16"
       expl="loop variant decreases"
       sum="0dcf266184c9c6e4dd9841340f02ecff"
       proved="true"
       expanded="true"
-      shape="alexaTuple2ainfix +ainfix -c101V3ainfix *c10V4V4aTuple2ainfix +ainfix -c101V1ainfix *c10V2V2Iainfix =aiterV4V3afV0Aainfix >=V4c0Iainfix =V4ainfix +V2c1FIainfix =V3ainfix +V1c11FIainfix >V1c100NIainfix >V2c0Iainfix =aiterV2V1afV0Aainfix >=V2c0FFF">
+      shape="alexaTuple2ainfix +ainfix -c101V3ainfix *c10V4V4aTuple2ainfix +ainfix -c101V1ainfix *c10V2V2Iainfix =aiterV4V3afV0Aainfix &gt;=V4c0Iainfix =V4ainfix +V2c1FIainfix =V3ainfix +V1c11FIainfix &gt;V1c100NIainfix &gt;V2c0Iainfix =aiterV2V1afV0Aainfix &gt;=V2c0FFF">
       <label
        name="expl:parameter f91_nonrec"/>
       <proof
        prover="3"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -236,6 +253,7 @@
       <proof
        prover="1"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -243,6 +261,7 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -250,18 +269,19 @@
      </goal>
      <goal
       name="WP_parameter f91_nonrec.6"
-      locfile="./programs/mccarthy/../mccarthy.mlw"
+      locfile="programs/mccarthy/../mccarthy.mlw"
       loclnum="29" loccnumb="6" loccnume="16"
       expl="normal postcondition"
       sum="e011b46a23295ec8f79b39e866ec2822"
       proved="true"
       expanded="true"
-      shape="ainfix =V1afV0Iainfix >V2c0NIainfix =aiterV2V1afV0Aainfix >=V2c0FFF">
+      shape="ainfix =V1afV0Iainfix &gt;V2c0NIainfix =aiterV2V1afV0Aainfix &gt;=V2c0FFF">
       <label
        name="expl:parameter f91_nonrec"/>
       <proof
        prover="3"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -269,13 +289,15 @@
       <proof
        prover="1"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.00"/>
+       <result status="valid" time="0.01"/>
       </proof>
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/home/jcf/why3/share/why3session.dtd">
+<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
 <why3session
- name="examples/programs/vstte10_max_sum/why3session.xml">
+ name="programs/vstte10_max_sum/why3session.xml">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -13,7 +13,7 @@
  <prover
   id="2"
   name="Coq"
-  version="8.3pl3"/>
+  version="8.3pl4"/>
  <prover
   id="3"
   name="Z3"
@@ -25,16 +25,16 @@
  <file
   name="../vstte10_max_sum.mlw"
   verified="true"
-  expanded="true">
+  expanded="false">
   <theory
    name="WP MaxAndSum"
-   locfile="examples/programs/vstte10_max_sum/../vstte10_max_sum.mlw"
+   locfile="programs/vstte10_max_sum/../vstte10_max_sum.mlw"
    loclnum="9" loccnumb="7" loccnume="16"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter max_sum"
-    locfile="examples/programs/vstte10_max_sum/../vstte10_max_sum.mlw"
+    locfile="programs/vstte10_max_sum/../vstte10_max_sum.mlw"
     loclnum="15" loccnumb="6" loccnume="13"
     expl="parameter max_sum"
     sum="bf425dfd9022999f2f98644a6df1d436"
@@ -49,7 +49,7 @@
      expanded="true">
      <goal
       name="WP_parameter max_sum.1"
-      locfile="examples/programs/vstte10_max_sum/../vstte10_max_sum.mlw"
+      locfile="programs/vstte10_max_sum/../vstte10_max_sum.mlw"
       loclnum="15" loccnumb="6" loccnume="13"
       expl="normal postcondition"
       sum="3909f7695e3d7cb4ce17d403d67f2b7e"
@@ -61,6 +61,7 @@
       <proof
        prover="3"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -68,6 +69,7 @@
       <proof
        prover="1"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -75,6 +77,7 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -82,7 +85,7 @@
      </goal>
      <goal
       name="WP_parameter max_sum.2"
-      locfile="examples/programs/vstte10_max_sum/../vstte10_max_sum.mlw"
+      locfile="programs/vstte10_max_sum/../vstte10_max_sum.mlw"
       loclnum="15" loccnumb="6" loccnume="13"
       expl="for loop initialization"
       sum="2651bf89eeb1d873ba207d979571ee38"
@@ -94,6 +97,7 @@
       <proof
        prover="3"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -101,6 +105,7 @@
       <proof
        prover="1"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -108,6 +113,7 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -115,7 +121,7 @@
      </goal>
      <goal
       name="WP_parameter max_sum.3"
-      locfile="examples/programs/vstte10_max_sum/../vstte10_max_sum.mlw"
+      locfile="programs/vstte10_max_sum/../vstte10_max_sum.mlw"
       loclnum="15" loccnumb="6" loccnume="13"
       expl="for loop preservation"
       sum="c934a4d4c756f3c208bd526fda106981"
@@ -130,7 +136,7 @@
        expanded="true">
        <goal
         name="WP_parameter max_sum.3.1"
-        locfile="examples/programs/vstte10_max_sum/../vstte10_max_sum.mlw"
+        locfile="programs/vstte10_max_sum/../vstte10_max_sum.mlw"
         loclnum="15" loccnumb="6" loccnume="13"
         expl="for loop preservation"
         sum="35d858bccce32ba2858d0558fc6a2456"
@@ -142,6 +148,7 @@
         <proof
          prover="3"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -149,6 +156,7 @@
         <proof
          prover="1"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.00"/>
@@ -156,6 +164,7 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -163,7 +172,7 @@
        </goal>
        <goal
         name="WP_parameter max_sum.3.2"
-        locfile="examples/programs/vstte10_max_sum/../vstte10_max_sum.mlw"
+        locfile="programs/vstte10_max_sum/../vstte10_max_sum.mlw"
         loclnum="15" loccnumb="6" loccnume="13"
         expl="for loop preservation"
         sum="9bcc072a794f98ef05daa30fff228165"
@@ -175,6 +184,7 @@
         <proof
          prover="3"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.00"/>
@@ -182,6 +192,7 @@
         <proof
          prover="1"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.00"/>
@@ -189,14 +200,15 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.01"/>
+         <result status="valid" time="0.00"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter max_sum.3.3"
-        locfile="examples/programs/vstte10_max_sum/../vstte10_max_sum.mlw"
+        locfile="programs/vstte10_max_sum/../vstte10_max_sum.mlw"
         loclnum="15" loccnumb="6" loccnume="13"
         expl="for loop preservation"
         sum="1060f50fc80bf7fef62eadb1f638779e"
@@ -208,6 +220,7 @@
         <proof
          prover="3"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -215,6 +228,7 @@
         <proof
          prover="1"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.00"/>
@@ -222,6 +236,7 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -229,7 +244,7 @@
        </goal>
        <goal
         name="WP_parameter max_sum.3.4"
-        locfile="examples/programs/vstte10_max_sum/../vstte10_max_sum.mlw"
+        locfile="programs/vstte10_max_sum/../vstte10_max_sum.mlw"
         loclnum="15" loccnumb="6" loccnume="13"
         expl="for loop preservation"
         sum="e1cbb486d7eab79931689a47dd498016"
@@ -241,6 +256,7 @@
         <proof
          prover="3"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
@@ -248,15 +264,16 @@
         <proof
          prover="2"
          timelimit="10"
+         memlimit="0"
          edited="vstte10_max_sum_MaxAndSum_WP_parameter_max_sum_1.v"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.50"/>
+         <result status="valid" time="0.48"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter max_sum.3.5"
-        locfile="examples/programs/vstte10_max_sum/../vstte10_max_sum.mlw"
+        locfile="programs/vstte10_max_sum/../vstte10_max_sum.mlw"
         loclnum="15" loccnumb="6" loccnume="13"
         expl="for loop preservation"
         sum="5d53784daabace63a75a0763c8f81e6a"
@@ -268,6 +285,7 @@
         <proof
          prover="3"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.00"/>
@@ -275,6 +293,7 @@
         <proof
          prover="1"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.00"/>
@@ -282,6 +301,7 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.00"/>
@@ -289,7 +309,7 @@
        </goal>
        <goal
         name="WP_parameter max_sum.3.6"
-        locfile="examples/programs/vstte10_max_sum/../vstte10_max_sum.mlw"
+        locfile="programs/vstte10_max_sum/../vstte10_max_sum.mlw"
         loclnum="15" loccnumb="6" loccnume="13"
         expl="for loop preservation"
         sum="75f3c2c8dbefcf0bf87c6866c302299f"
@@ -301,6 +321,7 @@
         <proof
          prover="3"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -308,6 +329,7 @@
         <proof
          prover="1"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.00"/>
@@ -315,16 +337,17 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.00"/>
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
       </transf>
      </goal>
      <goal
       name="WP_parameter max_sum.4"
-      locfile="examples/programs/vstte10_max_sum/../vstte10_max_sum.mlw"
+      locfile="programs/vstte10_max_sum/../vstte10_max_sum.mlw"
       loclnum="15" loccnumb="6" loccnume="13"
       expl="normal postcondition"
       sum="a3b5b0fb6d3c4283917807229204fa3e"
@@ -336,6 +359,7 @@
       <proof
        prover="3"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -343,6 +367,7 @@
       <proof
        prover="1"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -350,6 +375,7 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -360,13 +386,13 @@
   </theory>
   <theory
    name="WP MaxAndSum2"
-   locfile="examples/programs/vstte10_max_sum/../vstte10_max_sum.mlw"
+   locfile="programs/vstte10_max_sum/../vstte10_max_sum.mlw"
    loclnum="29" loccnumb="7" loccnume="17"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter max_sum"
-    locfile="examples/programs/vstte10_max_sum/../vstte10_max_sum.mlw"
+    locfile="programs/vstte10_max_sum/../vstte10_max_sum.mlw"
     loclnum="41" loccnumb="6" loccnume="13"
     expl="parameter max_sum"
     sum="058b873372a34149565985eecb658486"
@@ -381,7 +407,7 @@
      expanded="true">
      <goal
       name="WP_parameter max_sum.1"
-      locfile="examples/programs/vstte10_max_sum/../vstte10_max_sum.mlw"
+      locfile="programs/vstte10_max_sum/../vstte10_max_sum.mlw"
       loclnum="41" loccnumb="6" loccnume="13"
       expl="normal postcondition"
       sum="90056b32ee732967a4c33304c2526f1b"
@@ -393,6 +419,7 @@
       <proof
        prover="3"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -400,6 +427,7 @@
       <proof
        prover="1"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -407,6 +435,7 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -414,7 +443,7 @@
      </goal>
      <goal
       name="WP_parameter max_sum.2"
-      locfile="examples/programs/vstte10_max_sum/../vstte10_max_sum.mlw"
+      locfile="programs/vstte10_max_sum/../vstte10_max_sum.mlw"
       loclnum="41" loccnumb="6" loccnume="13"
       expl="for loop initialization"
       sum="3cbff2c018ba1a60aad71fa08400715d"
@@ -426,6 +455,7 @@
       <proof
        prover="3"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -433,6 +463,7 @@
       <proof
        prover="1"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -440,6 +471,7 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -447,7 +479,7 @@
      </goal>
      <goal
       name="WP_parameter max_sum.3"
-      locfile="examples/programs/vstte10_max_sum/../vstte10_max_sum.mlw"
+      locfile="programs/vstte10_max_sum/../vstte10_max_sum.mlw"
       loclnum="41" loccnumb="6" loccnume="13"
       expl="for loop preservation"
       sum="024a28341ee045971fe38fef2e4f65cd"
@@ -462,7 +494,7 @@
        expanded="true">
        <goal
         name="WP_parameter max_sum.3.1"
-        locfile="examples/programs/vstte10_max_sum/../vstte10_max_sum.mlw"
+        locfile="programs/vstte10_max_sum/../vstte10_max_sum.mlw"
         loclnum="41" loccnumb="6" loccnume="13"
         expl="for loop preservation"
         sum="448c990ff72afa4f3a43cb0b3209c2a8"
@@ -474,6 +506,7 @@
         <proof
          prover="3"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -481,6 +514,7 @@
         <proof
          prover="1"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.00"/>
@@ -488,6 +522,7 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.00"/>
@@ -495,7 +530,7 @@
        </goal>
        <goal
         name="WP_parameter max_sum.3.2"
-        locfile="examples/programs/vstte10_max_sum/../vstte10_max_sum.mlw"
+        locfile="programs/vstte10_max_sum/../vstte10_max_sum.mlw"
         loclnum="41" loccnumb="6" loccnume="13"
         expl="for loop preservation"
         sum="1a3cabc40ad0165dd8691c991b7039ec"
@@ -507,6 +542,7 @@
         <proof
          prover="3"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.00"/>
@@ -514,6 +550,7 @@
         <proof
          prover="1"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.00"/>
@@ -521,6 +558,7 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -528,7 +566,7 @@
        </goal>
        <goal
         name="WP_parameter max_sum.3.3"
-        locfile="examples/programs/vstte10_max_sum/../vstte10_max_sum.mlw"
+        locfile="programs/vstte10_max_sum/../vstte10_max_sum.mlw"
         loclnum="41" loccnumb="6" loccnume="13"
         expl="for loop preservation"
         sum="cf6fa62d459b8e06870b0e140d4b7206"
@@ -540,6 +578,7 @@
         <proof
          prover="3"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -547,6 +586,7 @@
         <proof
          prover="1"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -554,6 +594,7 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.00"/>
@@ -561,7 +602,7 @@
        </goal>
        <goal
         name="WP_parameter max_sum.3.4"
-        locfile="examples/programs/vstte10_max_sum/../vstte10_max_sum.mlw"
+        locfile="programs/vstte10_max_sum/../vstte10_max_sum.mlw"
         loclnum="41" loccnumb="6" loccnume="13"
         expl="for loop preservation"
         sum="f97cf172b1eac039589ebd1a48a89832"
@@ -573,6 +614,7 @@
         <proof
          prover="3"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
@@ -580,6 +622,7 @@
         <proof
          prover="1"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -587,6 +630,7 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.00"/>
@@ -594,7 +638,7 @@
        </goal>
        <goal
         name="WP_parameter max_sum.3.5"
-        locfile="examples/programs/vstte10_max_sum/../vstte10_max_sum.mlw"
+        locfile="programs/vstte10_max_sum/../vstte10_max_sum.mlw"
         loclnum="41" loccnumb="6" loccnume="13"
         expl="for loop preservation"
         sum="34cecc80a74e9c2d88c4c5bde600a05f"
@@ -606,13 +650,15 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="timeout" time="10.07"/>
+         <result status="timeout" time="10.03"/>
         </proof>
         <proof
          prover="4"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
@@ -620,7 +666,7 @@
        </goal>
        <goal
         name="WP_parameter max_sum.3.6"
-        locfile="examples/programs/vstte10_max_sum/../vstte10_max_sum.mlw"
+        locfile="programs/vstte10_max_sum/../vstte10_max_sum.mlw"
         loclnum="41" loccnumb="6" loccnume="13"
         expl="for loop preservation"
         sum="89c3efa21d3ee6d658be2e8e080f3c98"
@@ -632,6 +678,7 @@
         <proof
          prover="2"
          timelimit="10"
+         memlimit="0"
          edited="vstte10_max_sum_WP_MaxAndSum2_WP_parameter_max_sum_1.v"
          obsolete="false"
          archived="false">
@@ -640,7 +687,7 @@
        </goal>
        <goal
         name="WP_parameter max_sum.3.7"
-        locfile="examples/programs/vstte10_max_sum/../vstte10_max_sum.mlw"
+        locfile="programs/vstte10_max_sum/../vstte10_max_sum.mlw"
         loclnum="41" loccnumb="6" loccnume="13"
         expl="for loop preservation"
         sum="5f894f9e0cfe6b1731a07432cb2032f0"
@@ -652,6 +699,7 @@
         <proof
          prover="3"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.00"/>
@@ -659,6 +707,7 @@
         <proof
          prover="1"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.00"/>
@@ -666,6 +715,7 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.00"/>
@@ -673,7 +723,7 @@
        </goal>
        <goal
         name="WP_parameter max_sum.3.8"
-        locfile="examples/programs/vstte10_max_sum/../vstte10_max_sum.mlw"
+        locfile="programs/vstte10_max_sum/../vstte10_max_sum.mlw"
         loclnum="41" loccnumb="6" loccnume="13"
         expl="for loop preservation"
         sum="a6e1d21c95a7de832eceafec94a68341"
@@ -685,6 +735,7 @@
         <proof
          prover="3"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
@@ -692,6 +743,7 @@
         <proof
          prover="1"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -699,6 +751,7 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -706,7 +759,7 @@
        </goal>
        <goal
         name="WP_parameter max_sum.3.9"
-        locfile="examples/programs/vstte10_max_sum/../vstte10_max_sum.mlw"
+        locfile="programs/vstte10_max_sum/../vstte10_max_sum.mlw"
         loclnum="41" loccnumb="6" loccnume="13"
         expl="for loop preservation"
         sum="ff61d4e410f7e6890815e5e9673b8d99"
@@ -718,6 +771,7 @@
         <proof
          prover="1"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.03"/>
@@ -725,14 +779,15 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="timeout" time="10.07"/>
+         <result status="timeout" time="10.03"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter max_sum.3.10"
-        locfile="examples/programs/vstte10_max_sum/../vstte10_max_sum.mlw"
+        locfile="programs/vstte10_max_sum/../vstte10_max_sum.mlw"
         loclnum="41" loccnumb="6" loccnume="13"
         expl="for loop preservation"
         sum="1a18e0ecd662de58dbd1c37e8086e82e"
@@ -744,6 +799,7 @@
         <proof
          prover="3"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -751,6 +807,7 @@
         <proof
          prover="1"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -758,16 +815,17 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.00"/>
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
       </transf>
      </goal>
      <goal
       name="WP_parameter max_sum.4"
-      locfile="examples/programs/vstte10_max_sum/../vstte10_max_sum.mlw"
+      locfile="programs/vstte10_max_sum/../vstte10_max_sum.mlw"
       loclnum="41" loccnumb="6" loccnume="13"
       expl="normal postcondition"
       sum="12bcff7732c9a9763057b9319207037b"
@@ -779,6 +837,7 @@
       <proof
        prover="3"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -786,6 +845,7 @@
       <proof
        prover="1"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -793,6 +853,7 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -803,13 +864,13 @@
   </theory>
   <theory
    name="WP TestCase"
-   locfile="examples/programs/vstte10_max_sum/../vstte10_max_sum.mlw"
+   locfile="programs/vstte10_max_sum/../vstte10_max_sum.mlw"
    loclnum="55" loccnumb="7" loccnume="15"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter test_case"
-    locfile="examples/programs/vstte10_max_sum/../vstte10_max_sum.mlw"
+    locfile="programs/vstte10_max_sum/../vstte10_max_sum.mlw"
     loclnum="61" loccnumb="6" loccnume="15"
     expl="parameter test_case"
     sum="4496e619053b87b254afcbbfc0072080"
@@ -824,7 +885,7 @@
      expanded="true">
      <goal
       name="WP_parameter test_case.1"
-      locfile="examples/programs/vstte10_max_sum/../vstte10_max_sum.mlw"
+      locfile="programs/vstte10_max_sum/../vstte10_max_sum.mlw"
       loclnum="61" loccnumb="6" loccnume="15"
       expl="precondition"
       sum="10c411e842e40da99cc7b94b5d7ab36a"
@@ -836,6 +897,7 @@
       <proof
        prover="3"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -843,6 +905,7 @@
       <proof
        prover="1"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -850,6 +913,7 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -857,7 +921,7 @@
      </goal>
      <goal
       name="WP_parameter test_case.2"
-      locfile="examples/programs/vstte10_max_sum/../vstte10_max_sum.mlw"
+      locfile="programs/vstte10_max_sum/../vstte10_max_sum.mlw"
       loclnum="61" loccnumb="6" loccnume="15"
       expl="precondition"
       sum="ae99e944cb607d139ce77b9c0acd2884"
@@ -869,6 +933,7 @@
       <proof
        prover="3"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -876,6 +941,7 @@
       <proof
        prover="1"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -883,14 +949,15 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.00"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter test_case.3"
-      locfile="examples/programs/vstte10_max_sum/../vstte10_max_sum.mlw"
+      locfile="programs/vstte10_max_sum/../vstte10_max_sum.mlw"
       loclnum="61" loccnumb="6" loccnume="15"
       expl="precondition"
       sum="72bbbe0bfcad6428f989875873dc42a6"
@@ -902,6 +969,7 @@
       <proof
        prover="3"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -909,6 +977,7 @@
       <proof
        prover="1"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -916,14 +985,15 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.00"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter test_case.4"
-      locfile="examples/programs/vstte10_max_sum/../vstte10_max_sum.mlw"
+      locfile="programs/vstte10_max_sum/../vstte10_max_sum.mlw"
       loclnum="61" loccnumb="6" loccnume="15"
       expl="precondition"
       sum="8f3bcb790c6c17a0812357ef52b6cdb4"
@@ -935,6 +1005,7 @@
       <proof
        prover="3"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -942,6 +1013,7 @@
       <proof
        prover="1"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -949,6 +1021,7 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -956,7 +1029,7 @@
      </goal>
      <goal
       name="WP_parameter test_case.5"
-      locfile="examples/programs/vstte10_max_sum/../vstte10_max_sum.mlw"
+      locfile="programs/vstte10_max_sum/../vstte10_max_sum.mlw"
       loclnum="61" loccnumb="6" loccnume="15"
       expl="precondition"
       sum="a6eedb22ad0ceb5fefa9693985b8c7e2"
@@ -968,6 +1041,7 @@
       <proof
        prover="3"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -975,13 +1049,15 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.00"/>
+       <result status="valid" time="0.01"/>
       </proof>
       <proof
        prover="1"
        timelimit="3"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -989,7 +1065,7 @@
      </goal>
      <goal
       name="WP_parameter test_case.6"
-      locfile="examples/programs/vstte10_max_sum/../vstte10_max_sum.mlw"
+      locfile="programs/vstte10_max_sum/../vstte10_max_sum.mlw"
       loclnum="61" loccnumb="6" loccnume="15"
       expl="precondition"
       sum="e9066e8cbe182399f4301413ffcdbb3d"
@@ -1001,6 +1077,7 @@
       <proof
        prover="3"
        timelimit="3"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -1008,6 +1085,7 @@
       <proof
        prover="1"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -1015,14 +1093,15 @@
       <proof
        prover="0"
        timelimit="3"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter test_case.7"
-      locfile="examples/programs/vstte10_max_sum/../vstte10_max_sum.mlw"
+      locfile="programs/vstte10_max_sum/../vstte10_max_sum.mlw"
       loclnum="61" loccnumb="6" loccnume="15"
       expl="precondition"
       sum="8ff022d9f37a8d99c6fac34d5d7e95a5"
@@ -1034,6 +1113,7 @@
       <proof
        prover="3"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -1041,6 +1121,7 @@
       <proof
        prover="1"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -1048,14 +1129,15 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter test_case.8"
-      locfile="examples/programs/vstte10_max_sum/../vstte10_max_sum.mlw"
+      locfile="programs/vstte10_max_sum/../vstte10_max_sum.mlw"
       loclnum="61" loccnumb="6" loccnume="15"
       expl="precondition"
       sum="7c36ecaeb548a1d07e8f15e10ae8b941"
@@ -1067,6 +1149,7 @@
       <proof
        prover="3"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -1074,6 +1157,7 @@
       <proof
        prover="1"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -1081,14 +1165,15 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter test_case.9"
-      locfile="examples/programs/vstte10_max_sum/../vstte10_max_sum.mlw"
+      locfile="programs/vstte10_max_sum/../vstte10_max_sum.mlw"
       loclnum="61" loccnumb="6" loccnume="15"
       expl="precondition"
       sum="21c39d418dd439ff0d8c49a520d3d3c1"
@@ -1100,6 +1185,7 @@
       <proof
        prover="3"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -1107,6 +1193,7 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -1114,6 +1201,7 @@
       <proof
        prover="1"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -1121,7 +1209,7 @@
      </goal>
      <goal
       name="WP_parameter test_case.10"
-      locfile="examples/programs/vstte10_max_sum/../vstte10_max_sum.mlw"
+      locfile="programs/vstte10_max_sum/../vstte10_max_sum.mlw"
       loclnum="61" loccnumb="6" loccnume="15"
       expl="precondition"
       sum="82fcc5839b24738d8eb2dfbd17ff9df8"
@@ -1133,6 +1221,7 @@
       <proof
        prover="3"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -1140,6 +1229,7 @@
       <proof
        prover="1"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -1147,14 +1237,15 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.00"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter test_case.11"
-      locfile="examples/programs/vstte10_max_sum/../vstte10_max_sum.mlw"
+      locfile="programs/vstte10_max_sum/../vstte10_max_sum.mlw"
       loclnum="61" loccnumb="6" loccnume="15"
       expl="precondition"
       sum="acb3f1d0482adcfa179e7601ea0e598f"
@@ -1166,6 +1257,7 @@
       <proof
        prover="3"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -1173,6 +1265,7 @@
       <proof
        prover="1"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -1180,14 +1273,15 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.00"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter test_case.12"
-      locfile="examples/programs/vstte10_max_sum/../vstte10_max_sum.mlw"
+      locfile="programs/vstte10_max_sum/../vstte10_max_sum.mlw"
       loclnum="61" loccnumb="6" loccnume="15"
       expl="precondition"
       sum="cc696ffa4986327ad152395f9ba97fcf"
@@ -1199,6 +1293,7 @@
       <proof
        prover="3"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
@@ -1206,6 +1301,7 @@
       <proof
        prover="1"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
@@ -1213,6 +1309,7 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.03"/>
@@ -1220,7 +1317,7 @@
      </goal>
      <goal
       name="WP_parameter test_case.13"
-      locfile="examples/programs/vstte10_max_sum/../vstte10_max_sum.mlw"
+      locfile="programs/vstte10_max_sum/../vstte10_max_sum.mlw"
       loclnum="61" loccnumb="6" loccnume="15"
       expl="assertion"
       sum="4a0d9394ba034778ad02cfddc781f780"
@@ -1232,6 +1329,7 @@
       <proof
        prover="3"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.03"/>
@@ -1239,6 +1337,7 @@
       <proof
        prover="1"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.08"/>
@@ -1246,7 +1345,7 @@
      </goal>
      <goal
       name="WP_parameter test_case.14"
-      locfile="examples/programs/vstte10_max_sum/../vstte10_max_sum.mlw"
+      locfile="programs/vstte10_max_sum/../vstte10_max_sum.mlw"
       loclnum="61" loccnumb="6" loccnume="15"
       expl="assertion"
       sum="362b2684c6927461c118d6f2177c19fb"
@@ -1258,6 +1357,7 @@
       <proof
        prover="3"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
@@ -1265,9 +1365,10 @@
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.87"/>
+       <result status="valid" time="0.84"/>
       </proof>
      </goal>
     </transf>

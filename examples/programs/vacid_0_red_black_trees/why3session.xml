@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/home/jcf/why3/share/why3session.dtd">
+<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
 <why3session
- name="examples/programs/vacid_0_red_black_trees/why3session.xml">
+ name="programs/vacid_0_red_black_trees/why3session.xml">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -17,7 +17,7 @@
  <prover
   id="3"
   name="Coq"
-  version="8.3pl3"/>
+  version="8.3pl4"/>
  <prover
   id="4"
   name="Z3"
@@ -29,16 +29,16 @@
  <file
   name="../vacid_0_red_black_trees.mlw"
   verified="true"
-  expanded="true">
+  expanded="false">
   <theory
    name="WP RedBlackTree"
-   locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+   locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
    loclnum="2" loccnumb="7" loccnume="19"
    verified="true"
    expanded="true">
    <goal
     name="memt_color"
-    locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="23" loccnumb="8" loccnume="18"
     sum="0ba445d26ca701f2f22d6840c792c36b"
     proved="true"
@@ -47,14 +47,15 @@
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.00"/>
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="lt_leaf"
-    locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="37" loccnumb="8" loccnume="15"
     sum="0277900b29104359e543926c578f3ed7"
     proved="true"
@@ -63,14 +64,15 @@
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
     name="gt_leaf"
-    locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="39" loccnumb="8" loccnume="15"
     sum="703dbf166e8b8fbb55b2d2536c56352d"
     proved="true"
@@ -79,6 +81,7 @@
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
@@ -86,7 +89,7 @@
    </goal>
    <goal
     name="lt_tree_node"
-    locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="41" loccnumb="8" loccnume="20"
     sum="c2b90a1c49b7930044ea2aa33b5b8515"
     proved="true"
@@ -95,14 +98,15 @@
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.00"/>
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="gt_tree_node"
-    locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="45" loccnumb="8" loccnume="20"
     sum="37e14b8b42d74afed5b8cb3facc1070e"
     proved="true"
@@ -111,14 +115,15 @@
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.00"/>
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="lt_node_lt"
-    locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="49" loccnumb="8" loccnume="18"
     sum="c79c70190be40496fe5cde2c74470da3"
     proved="true"
@@ -127,15 +132,16 @@
     <proof
      prover="3"
      timelimit="10"
+     memlimit="0"
      edited="vacid_0_red_black_trees_WP_RedBlackTree_lt_node_lt_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.49"/>
+     <result status="valid" time="0.44"/>
     </proof>
    </goal>
    <goal
     name="gt_node_gt"
-    locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="53" loccnumb="8" loccnume="18"
     sum="17ab048a444cf9f918c34b5d02c85e47"
     proved="true"
@@ -144,15 +150,16 @@
     <proof
      prover="3"
      timelimit="10"
+     memlimit="0"
      edited="vacid_0_red_black_trees_WP_RedBlackTree_gt_node_gt_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.45"/>
+     <result status="valid" time="0.43"/>
     </proof>
    </goal>
    <goal
     name="lt_left"
-    locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="57" loccnumb="8" loccnume="15"
     sum="9464e533b61e4cb90470f8d6b4f10c1a"
     proved="true"
@@ -161,14 +168,15 @@
     <proof
      prover="1"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.06"/>
+     <result status="valid" time="0.05"/>
     </proof>
    </goal>
    <goal
     name="lt_right"
-    locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="61" loccnumb="8" loccnume="16"
     sum="268c12f799539d5ab58b47a669a74923"
     proved="true"
@@ -177,6 +185,7 @@
     <proof
      prover="1"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.06"/>
@@ -184,7 +193,7 @@
    </goal>
    <goal
     name="gt_left"
-    locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="65" loccnumb="8" loccnume="15"
     sum="9681bc612eb0d3dc2d33a66ff13b2922"
     proved="true"
@@ -193,14 +202,15 @@
     <proof
      prover="1"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.06"/>
+     <result status="valid" time="0.05"/>
     </proof>
    </goal>
    <goal
     name="gt_right"
-    locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="69" loccnumb="8" loccnume="16"
     sum="84810daf3f6c6e39b7664a3e6839f1ca"
     proved="true"
@@ -209,6 +219,7 @@
     <proof
      prover="1"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.06"/>
@@ -216,7 +227,7 @@
    </goal>
    <goal
     name="lt_tree_not_in"
-    locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="73" loccnumb="8" loccnume="22"
     sum="996aa9456c2fa2b36baa207586cb19f4"
     proved="true"
@@ -225,14 +236,15 @@
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.00"/>
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="lt_tree_trans"
-    locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="76" loccnumb="8" loccnume="21"
     sum="c13aa94f50ced4fad3afa51318d56237"
     proved="true"
@@ -241,6 +253,7 @@
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.01"/>
@@ -248,7 +261,7 @@
    </goal>
    <goal
     name="gt_tree_not_in"
-    locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="79" loccnumb="8" loccnume="22"
     sum="ee75a38dec15980c5ac9db5e67145432"
     proved="true"
@@ -257,14 +270,15 @@
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
     name="gt_tree_trans"
-    locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="82" loccnumb="8" loccnume="21"
     sum="e3d5f24f71f76358a6c61260dc907a76"
     proved="true"
@@ -273,6 +287,7 @@
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.01"/>
@@ -280,7 +295,7 @@
    </goal>
    <goal
     name="bst_Leaf"
-    locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="91" loccnumb="8" loccnume="16"
     sum="fd1bbc87769d9bd382d4818f10f05e98"
     proved="true"
@@ -289,6 +304,7 @@
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.01"/>
@@ -296,7 +312,7 @@
    </goal>
    <goal
     name="bst_left"
-    locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="93" loccnumb="8" loccnume="16"
     sum="65e7cdef8a81545f39e23193d6d9a42d"
     proved="true"
@@ -305,6 +321,7 @@
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
@@ -312,7 +329,7 @@
    </goal>
    <goal
     name="bst_right"
-    locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="96" loccnumb="8" loccnume="17"
     sum="4843506af0b56461d147e6249332993b"
     proved="true"
@@ -321,6 +338,7 @@
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.01"/>
@@ -328,7 +346,7 @@
    </goal>
    <goal
     name="bst_color"
-    locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="99" loccnumb="8" loccnume="17"
     sum="dac650a747a03ef3a678c28a364d801b"
     proved="true"
@@ -337,14 +355,15 @@
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.02"/>
     </proof>
    </goal>
    <goal
     name="rotate_left"
-    locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="103" loccnumb="8" loccnume="19"
     sum="fa2f24bb87fdd377da2580e17bc13f13"
     proved="true"
@@ -353,20 +372,23 @@
     <proof
      prover="4"
      timelimit="100"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.02"/>
     </proof>
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.14"/>
+     <result status="valid" time="0.13"/>
     </proof>
     <proof
      prover="5"
      timelimit="100"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.02"/>
@@ -374,7 +396,7 @@
    </goal>
    <goal
     name="rotate_right"
-    locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="108" loccnumb="8" loccnume="20"
     sum="155dcebba5681fb9d8fd0581ec7abcc5"
     proved="true"
@@ -383,14 +405,15 @@
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.14"/>
+     <result status="valid" time="0.13"/>
     </proof>
    </goal>
    <goal
     name="rbtree_Leaf"
-    locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="136" loccnumb="8" loccnume="19"
     sum="4ed4c976e98aa3ec2b246ce08994ad25"
     proved="true"
@@ -399,6 +422,7 @@
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.01"/>
@@ -406,7 +430,7 @@
    </goal>
    <goal
     name="rbtree_Node1"
-    locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="139" loccnumb="8" loccnume="20"
     sum="4e915bc2572782630a8559f01ca87d51"
     proved="true"
@@ -415,6 +439,7 @@
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.04"/>
@@ -422,7 +447,7 @@
    </goal>
    <goal
     name="rbtree_left"
-    locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="142" loccnumb="8" loccnume="19"
     sum="7549372b32c5480566649f8dc9eb0c57"
     proved="true"
@@ -431,6 +456,7 @@
     <proof
      prover="1"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.06"/>
@@ -438,7 +464,7 @@
    </goal>
    <goal
     name="rbtree_right"
-    locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="146" loccnumb="8" loccnume="20"
     sum="6ec739d58c23627e6e18a8198ea085b1"
     proved="true"
@@ -447,6 +473,7 @@
     <proof
      prover="1"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.10"/>
@@ -454,7 +481,7 @@
    </goal>
    <goal
     name="WP_parameter find"
-    locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="154" loccnumb="10" loccnume="14"
     expl="parameter find"
     sum="81a6cab0a24d00f4cd1b2388b3edd8e7"
@@ -466,6 +493,7 @@
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.03"/>
@@ -473,7 +501,7 @@
    </goal>
    <goal
     name="rbtree_almost_rbtree"
-    locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="180" loccnumb="8" loccnume="28"
     sum="81ed87d783d666b5b42340f5167581dc"
     proved="true"
@@ -482,6 +510,7 @@
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.02"/>
@@ -489,7 +518,7 @@
    </goal>
    <goal
     name="rbtree_almost_rbtree_ex"
-    locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="183" loccnumb="8" loccnume="31"
     sum="f7449f252d0b220074cd878c5d1af62b"
     proved="true"
@@ -498,6 +527,7 @@
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.01"/>
@@ -505,7 +535,7 @@
    </goal>
    <goal
     name="almost_rbtree_rbtree_black"
-    locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="187" loccnumb="8" loccnume="34"
     sum="5eff2c3becf48f0d29341498c64b1e84"
     proved="true"
@@ -514,14 +544,15 @@
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
     name="WP_parameter lbalance"
-    locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="201" loccnumb="6" loccnume="14"
     expl="parameter lbalance"
     sum="395993968118a7b054b2b896d8a585fd"
@@ -533,10 +564,10 @@
     <transf
      name="split_goal"
      proved="true"
-     expanded="false">
+     expanded="true">
      <goal
       name="WP_parameter lbalance.1"
-      locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+      locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
       loclnum="201" loccnumb="6" loccnume="14"
       expl="parameter lbalance"
       sum="84cbcd8b667b01f9e3b831a1187325be"
@@ -548,10 +579,10 @@
       <transf
        name="split_goal"
        proved="true"
-       expanded="false">
+       expanded="true">
        <goal
         name="WP_parameter lbalance.1.1"
-        locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="201" loccnumb="6" loccnume="14"
         expl="parameter lbalance"
         sum="28aec8c25283356e6e6fd92a89a1fbbe"
@@ -562,22 +593,24 @@
          name="expl:parameter lbalance"/>
         <proof
          prover="0"
-         timelimit="7"
+         timelimit="11"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="5.34"/>
+         <result status="valid" time="5.03"/>
         </proof>
         <proof
          prover="5"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.42"/>
+         <result status="valid" time="1.33"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter lbalance.1.2"
-        locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="201" loccnumb="6" loccnume="14"
         expl="parameter lbalance"
         sum="d31805bb960cfdd9e05a9584d2c6f17b"
@@ -589,15 +622,16 @@
         <proof
          prover="3"
          timelimit="100"
+         memlimit="0"
          edited="vacid_0_red_black_trees_WP_RedBlackTree_WP_parameter_lbalance_1.v"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.54"/>
+         <result status="valid" time="0.52"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter lbalance.1.3"
-        locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="201" loccnumb="6" loccnume="14"
         expl="parameter lbalance"
         sum="ce75c6784f66f2aab138b568a1b0d01c"
@@ -609,14 +643,15 @@
         <proof
          prover="0"
          timelimit="100"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="13.98"/>
+         <result status="valid" time="13.38"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter lbalance.1.4"
-        locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="201" loccnumb="6" loccnume="14"
         expl="parameter lbalance"
         sum="b99ed2c29e822f9eb6e697301f8bfcbe"
@@ -628,28 +663,31 @@
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.76"/>
+         <result status="valid" time="1.66"/>
         </proof>
         <proof
          prover="0"
-         timelimit="5"
+         timelimit="7"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="3.31"/>
+         <result status="valid" time="3.11"/>
         </proof>
         <proof
          prover="2"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.81"/>
+         <result status="valid" time="1.72"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter lbalance.1.5"
-        locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="201" loccnumb="6" loccnume="14"
         expl="parameter lbalance"
         sum="aaa3578ab2be98079a40aa4806b79110"
@@ -660,17 +698,18 @@
          name="expl:parameter lbalance"/>
         <proof
          prover="0"
-         timelimit="5"
+         timelimit="6"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="2.56"/>
+         <result status="valid" time="2.43"/>
         </proof>
        </goal>
       </transf>
      </goal>
      <goal
       name="WP_parameter lbalance.2"
-      locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+      locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
       loclnum="201" loccnumb="6" loccnume="14"
       expl="parameter lbalance"
       sum="90412600b8974e5928b33040ed3119f7"
@@ -682,10 +721,10 @@
       <transf
        name="split_goal"
        proved="true"
-       expanded="false">
+       expanded="true">
        <goal
         name="WP_parameter lbalance.2.1"
-        locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="201" loccnumb="6" loccnume="14"
         expl="parameter lbalance"
         sum="168a4cd4e3ebd4be54f618a93e8d80f6"
@@ -697,6 +736,7 @@
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
@@ -704,6 +744,7 @@
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
@@ -711,6 +752,7 @@
         <proof
          prover="2"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
@@ -718,7 +760,7 @@
        </goal>
        <goal
         name="WP_parameter lbalance.2.2"
-        locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="201" loccnumb="6" loccnume="14"
         expl="parameter lbalance"
         sum="d765249d097afc6271c5bca101bc188a"
@@ -730,21 +772,23 @@
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.67"/>
+         <result status="valid" time="0.63"/>
         </proof>
         <proof
          prover="2"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.76"/>
+         <result status="valid" time="0.72"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter lbalance.2.3"
-        locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="201" loccnumb="6" loccnume="14"
         expl="parameter lbalance"
         sum="b6c895a9185bae974c35901cf8f38985"
@@ -755,22 +799,24 @@
          name="expl:parameter lbalance"/>
         <proof
          prover="1"
-         timelimit="6"
+         timelimit="8"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="3.55"/>
+         <result status="valid" time="3.06"/>
         </proof>
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.83"/>
+         <result status="valid" time="0.79"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter lbalance.2.4"
-        locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="201" loccnumb="6" loccnume="14"
         expl="parameter lbalance"
         sum="9d424b08a2ac781cdac5e2f73240edcd"
@@ -782,28 +828,31 @@
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.39"/>
+         <result status="valid" time="0.36"/>
         </proof>
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.14"/>
+         <result status="valid" time="0.13"/>
         </proof>
         <proof
          prover="2"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.35"/>
+         <result status="valid" time="0.33"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter lbalance.2.5"
-        locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="201" loccnumb="6" loccnume="14"
         expl="parameter lbalance"
         sum="1dc584496b07d02fc68f81c3a4b578c4"
@@ -815,23 +864,26 @@
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.16"/>
+         <result status="valid" time="0.15"/>
         </proof>
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.13"/>
+         <result status="valid" time="0.12"/>
         </proof>
         <proof
          prover="2"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.14"/>
+         <result status="valid" time="0.12"/>
         </proof>
        </goal>
       </transf>
@@ -840,7 +892,7 @@
    </goal>
    <goal
     name="WP_parameter rbalance"
-    locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="226" loccnumb="6" loccnume="14"
     expl="parameter rbalance"
     sum="5e9652805a5b368293addf65631bf480"
@@ -852,10 +904,10 @@
     <transf
      name="split_goal"
      proved="true"
-     expanded="false">
+     expanded="true">
      <goal
       name="WP_parameter rbalance.1"
-      locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+      locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
       loclnum="226" loccnumb="6" loccnume="14"
       expl="parameter rbalance"
       sum="c43d05e71488b570190a05b39fa25030"
@@ -867,10 +919,10 @@
       <transf
        name="split_goal"
        proved="true"
-       expanded="false">
+       expanded="true">
        <goal
         name="WP_parameter rbalance.1.1"
-        locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="226" loccnumb="6" loccnume="14"
         expl="parameter rbalance"
         sum="6233c7120867976bb0b9876c815c680a"
@@ -881,22 +933,24 @@
          name="expl:parameter rbalance"/>
         <proof
          prover="0"
-         timelimit="9"
+         timelimit="13"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="6.46"/>
+         <result status="valid" time="6.14"/>
         </proof>
         <proof
          prover="5"
          timelimit="30"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.20"/>
+         <result status="valid" time="1.13"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter rbalance.1.2"
-        locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="226" loccnumb="6" loccnume="14"
         expl="parameter rbalance"
         sum="e82ece2c29623d8f79a42c6816934207"
@@ -908,15 +962,16 @@
         <proof
          prover="3"
          timelimit="100"
+         memlimit="0"
          edited="vacid_0_red_black_trees_WP_RedBlackTree_WP_parameter_rbalance_1.v"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.56"/>
+         <result status="valid" time="0.52"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter rbalance.1.3"
-        locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="226" loccnumb="6" loccnume="14"
         expl="parameter rbalance"
         sum="634bfe1c40ae1501f0735c69e14c3058"
@@ -928,14 +983,15 @@
         <proof
          prover="0"
          timelimit="100"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="14.32"/>
+         <result status="valid" time="13.64"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter rbalance.1.4"
-        locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="226" loccnumb="6" loccnume="14"
         expl="parameter rbalance"
         sum="0cb982a15a16fce3ea2e781feaff1c63"
@@ -947,28 +1003,31 @@
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.70"/>
+         <result status="valid" time="1.59"/>
         </proof>
         <proof
          prover="0"
-         timelimit="5"
+         timelimit="7"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="3.14"/>
+         <result status="valid" time="2.96"/>
         </proof>
         <proof
          prover="2"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.82"/>
+         <result status="valid" time="1.72"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter rbalance.1.5"
-        locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="226" loccnumb="6" loccnume="14"
         expl="parameter rbalance"
         sum="1238989132e511bf3526702c2a62673a"
@@ -979,17 +1038,18 @@
          name="expl:parameter rbalance"/>
         <proof
          prover="0"
-         timelimit="5"
+         timelimit="6"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="2.67"/>
+         <result status="valid" time="2.53"/>
         </proof>
        </goal>
       </transf>
      </goal>
      <goal
       name="WP_parameter rbalance.2"
-      locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+      locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
       loclnum="226" loccnumb="6" loccnume="14"
       expl="parameter rbalance"
       sum="1ed0d518e2601adaba1b6302d8e6c254"
@@ -1001,23 +1061,25 @@
       <proof
        prover="1"
        timelimit="100"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="9.82"/>
+       <result status="valid" time="9.16"/>
       </proof>
       <proof
        prover="2"
        timelimit="100"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="9.37"/>
+       <result status="valid" time="8.95"/>
       </proof>
      </goal>
     </transf>
    </goal>
    <goal
     name="WP_parameter insert"
-    locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="246" loccnumb="10" loccnume="16"
     expl="parameter insert"
     sum="76a83d12b135ce89f15446571b7cb7d0"
@@ -1032,7 +1094,7 @@
      expanded="true">
      <goal
       name="WP_parameter insert.1"
-      locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+      locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
       loclnum="246" loccnumb="10" loccnume="16"
       expl="parameter insert"
       sum="35afa86fa1f0549ec65e82e98b0801b8"
@@ -1044,20 +1106,23 @@
       <proof
        prover="1"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.04"/>
+       <result status="valid" time="0.03"/>
       </proof>
       <proof
        prover="0"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.08"/>
+       <result status="valid" time="0.07"/>
       </proof>
       <proof
        prover="2"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.04"/>
@@ -1065,7 +1130,7 @@
      </goal>
      <goal
       name="WP_parameter insert.2"
-      locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+      locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
       loclnum="246" loccnumb="10" loccnume="16"
       expl="parameter insert"
       sum="a5190b546e61b01e194acf774168196f"
@@ -1077,6 +1142,7 @@
       <proof
        prover="1"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -1084,13 +1150,15 @@
       <proof
        prover="0"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.06"/>
+       <result status="valid" time="0.05"/>
       </proof>
       <proof
        prover="2"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
@@ -1098,7 +1166,7 @@
      </goal>
      <goal
       name="WP_parameter insert.3"
-      locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+      locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
       loclnum="246" loccnumb="10" loccnume="16"
       expl="parameter insert"
       sum="bfaecdf473a76abced65e54442dc366d"
@@ -1110,10 +1178,10 @@
       <transf
        name="split_goal"
        proved="true"
-       expanded="false">
+       expanded="true">
        <goal
         name="WP_parameter insert.3.1"
-        locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
         sum="25b4496684c5e6ddd55afd7856796d0a"
@@ -1125,6 +1193,7 @@
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.05"/>
@@ -1132,7 +1201,7 @@
        </goal>
        <goal
         name="WP_parameter insert.3.2"
-        locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
         sum="37fae91e3a6822dfac8fb0c6e46a6095"
@@ -1144,21 +1213,23 @@
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="2.36"/>
+         <result status="valid" time="2.19"/>
         </proof>
         <proof
          prover="2"
-         timelimit="5"
+         timelimit="6"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="2.66"/>
+         <result status="valid" time="2.50"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter insert.3.3"
-        locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
         sum="a9327a1cc279459ad55f7ab345d56178"
@@ -1170,6 +1241,7 @@
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
@@ -1177,6 +1249,7 @@
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.08"/>
@@ -1184,6 +1257,7 @@
         <proof
          prover="2"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
@@ -1191,7 +1265,7 @@
        </goal>
        <goal
         name="WP_parameter insert.3.4"
-        locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
         sum="2b071fc1597b63fc9e153745e33c2da0"
@@ -1203,6 +1277,7 @@
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
@@ -1210,6 +1285,7 @@
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -1217,6 +1293,7 @@
         <proof
          prover="2"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
@@ -1224,7 +1301,7 @@
        </goal>
        <goal
         name="WP_parameter insert.3.5"
-        locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
         sum="6db2c36685d132acd4da2bb803069371"
@@ -1236,6 +1313,7 @@
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.12"/>
@@ -1243,7 +1321,7 @@
        </goal>
        <goal
         name="WP_parameter insert.3.6"
-        locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
         sum="bbe1bfb3d126fd0bfcc5b4c386f7e7f1"
@@ -1254,22 +1332,24 @@
          name="expl:parameter insert"/>
         <proof
          prover="1"
-         timelimit="7"
+         timelimit="8"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="3.60"/>
+         <result status="valid" time="3.33"/>
         </proof>
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.12"/>
+         <result status="valid" time="0.11"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter insert.3.7"
-        locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
         sum="55903fc74443943d6bf8dd56dbec6a99"
@@ -1280,24 +1360,26 @@
          name="expl:parameter insert"/>
         <proof
          prover="1"
-         timelimit="7"
+         timelimit="8"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="3.63"/>
+         <result status="valid" time="3.25"/>
         </proof>
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.04"/>
+         <result status="valid" time="0.03"/>
         </proof>
        </goal>
       </transf>
      </goal>
      <goal
       name="WP_parameter insert.4"
-      locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+      locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
       loclnum="246" loccnumb="10" loccnume="16"
       expl="parameter insert"
       sum="1bcec0e2777b249f42b0b9a677135dae"
@@ -1309,6 +1391,7 @@
       <proof
        prover="1"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -1316,6 +1399,7 @@
       <proof
        prover="0"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.06"/>
@@ -1323,14 +1407,15 @@
       <proof
        prover="2"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter insert.5"
-      locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+      locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
       loclnum="246" loccnumb="10" loccnume="16"
       expl="parameter insert"
       sum="92ffead4ed806edc20b6f0ef815c523c"
@@ -1342,10 +1427,10 @@
       <transf
        name="split_goal"
        proved="true"
-       expanded="false">
+       expanded="true">
        <goal
         name="WP_parameter insert.5.1"
-        locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
         sum="0892c67ff433f1d45c8e8105f7c4e4db"
@@ -1357,6 +1442,7 @@
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.05"/>
@@ -1364,7 +1450,7 @@
        </goal>
        <goal
         name="WP_parameter insert.5.2"
-        locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
         sum="419316d059276e090b8146a4c22ef994"
@@ -1376,21 +1462,23 @@
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="2.41"/>
+         <result status="valid" time="2.19"/>
         </proof>
         <proof
          prover="2"
-         timelimit="5"
+         timelimit="6"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="2.64"/>
+         <result status="valid" time="2.47"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter insert.5.3"
-        locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
         sum="748d35a89e0608b5f6e991932f79ec11"
@@ -1402,6 +1490,7 @@
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
@@ -1409,6 +1498,7 @@
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.11"/>
@@ -1416,6 +1506,7 @@
         <proof
          prover="2"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
@@ -1423,7 +1514,7 @@
        </goal>
        <goal
         name="WP_parameter insert.5.4"
-        locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
         sum="861f5c76198e35562a3bef93754a3e04"
@@ -1435,6 +1526,7 @@
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
@@ -1442,6 +1534,7 @@
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -1449,6 +1542,7 @@
         <proof
          prover="2"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
@@ -1456,7 +1550,7 @@
        </goal>
        <goal
         name="WP_parameter insert.5.5"
-        locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
         sum="d2d94e46eaf5e9844c449f0e326fb2f1"
@@ -1467,29 +1561,32 @@
          name="expl:parameter insert"/>
         <proof
          prover="1"
-         timelimit="7"
+         timelimit="8"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="3.56"/>
+         <result status="valid" time="3.26"/>
         </proof>
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.15"/>
+         <result status="valid" time="0.14"/>
         </proof>
         <proof
          prover="2"
-         timelimit="8"
+         timelimit="9"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="4.08"/>
+         <result status="valid" time="3.87"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter insert.5.6"
-        locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
         sum="ad8d5783655ba8340d43023ad44e6b28"
@@ -1500,22 +1597,24 @@
          name="expl:parameter insert"/>
         <proof
          prover="1"
-         timelimit="7"
+         timelimit="8"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="3.70"/>
+         <result status="valid" time="3.32"/>
         </proof>
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.12"/>
+         <result status="valid" time="0.11"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter insert.5.7"
-        locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
         sum="edb30322a2599d6f19763ec09daed78a"
@@ -1527,23 +1626,25 @@
         <proof
          prover="1"
          timelimit="8"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="3.99"/>
+         <result status="valid" time="3.66"/>
         </proof>
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.04"/>
+         <result status="valid" time="0.05"/>
         </proof>
        </goal>
       </transf>
      </goal>
      <goal
       name="WP_parameter insert.6"
-      locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+      locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
       loclnum="246" loccnumb="10" loccnume="16"
       expl="parameter insert"
       sum="c9913947ef22ace1e39c5d2b50d5d916"
@@ -1555,6 +1656,7 @@
       <proof
        prover="0"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.12"/>
@@ -1562,7 +1664,7 @@
      </goal>
      <goal
       name="WP_parameter insert.7"
-      locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+      locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
       loclnum="246" loccnumb="10" loccnume="16"
       expl="parameter insert"
       sum="bee4af818fd08ff9986968cb01fefd3a"
@@ -1574,6 +1676,7 @@
       <proof
        prover="1"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -1581,13 +1684,15 @@
       <proof
        prover="0"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.22"/>
+       <result status="valid" time="0.21"/>
       </proof>
       <proof
        prover="2"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
@@ -1595,7 +1700,7 @@
      </goal>
      <goal
       name="WP_parameter insert.8"
-      locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+      locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
       loclnum="246" loccnumb="10" loccnume="16"
       expl="parameter insert"
       sum="b6af890c21c20ee1c801f2f9fdf9b374"
@@ -1607,6 +1712,7 @@
       <proof
        prover="0"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.07"/>
@@ -1614,7 +1720,7 @@
      </goal>
      <goal
       name="WP_parameter insert.9"
-      locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+      locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
       loclnum="246" loccnumb="10" loccnume="16"
       expl="parameter insert"
       sum="2d530426232baca129cbf73c791f695d"
@@ -1629,7 +1735,7 @@
        expanded="true">
        <goal
         name="WP_parameter insert.9.1"
-        locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
         sum="ce1d4c16330d43af6e9a63dac423a1e5"
@@ -1641,6 +1747,7 @@
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -1648,21 +1755,23 @@
         <proof
          prover="0"
          timelimit="5"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.00"/>
-        </proof>
-        <proof
-         prover="2"
-         timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
         </proof>
+        <proof
+         prover="2"
+         timelimit="5"
+         memlimit="0"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
        </goal>
        <goal
         name="WP_parameter insert.9.2"
-        locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
         sum="5542e0b2a62f74684b428f60e466bbb0"
@@ -1674,14 +1783,15 @@
         <proof
          prover="1"
          timelimit="100"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="32.12"/>
+         <result status="valid" time="29.37"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter insert.9.3"
-        locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
         sum="069f7e85a6e7a0321a18275fb75d848d"
@@ -1692,15 +1802,16 @@
          name="expl:parameter insert"/>
         <proof
          prover="1"
-         timelimit="109"
+         timelimit="120"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="59.88"/>
+         <result status="valid" time="57.85"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter insert.9.4"
-        locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
         sum="2ed66c4fc9e2d93ee8f6fa32576935a9"
@@ -1712,6 +1823,7 @@
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.08"/>
@@ -1719,21 +1831,23 @@
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.02"/>
+         <result status="valid" time="0.01"/>
         </proof>
         <proof
          prover="2"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.10"/>
+         <result status="valid" time="0.08"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter insert.9.5"
-        locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
         sum="defe144203bcea74cfc6361f186a9808"
@@ -1745,28 +1859,31 @@
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.98"/>
+         <result status="valid" time="0.90"/>
         </proof>
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.44"/>
+         <result status="valid" time="0.41"/>
         </proof>
         <proof
          prover="2"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.83"/>
+         <result status="valid" time="0.74"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter insert.9.6"
-        locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
         sum="d4708f9d7cd33d55449081461470bf18"
@@ -1778,28 +1895,31 @@
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.11"/>
+         <result status="valid" time="1.04"/>
         </proof>
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.38"/>
+         <result status="valid" time="0.35"/>
         </proof>
         <proof
          prover="2"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.03"/>
+         <result status="valid" time="0.94"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter insert.9.7"
-        locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
         sum="e08bd47cc27e6b843e695a53ec5ed3ac"
@@ -1811,6 +1931,7 @@
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.12"/>
@@ -1820,7 +1941,7 @@
      </goal>
      <goal
       name="WP_parameter insert.10"
-      locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+      locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
       loclnum="246" loccnumb="10" loccnume="16"
       expl="parameter insert"
       sum="0bb161e0d994f6d42d379a32da5f4b98"
@@ -1832,6 +1953,7 @@
       <proof
        prover="1"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -1839,13 +1961,15 @@
       <proof
        prover="0"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.23"/>
+       <result status="valid" time="0.22"/>
       </proof>
       <proof
        prover="2"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -1853,7 +1977,7 @@
      </goal>
      <goal
       name="WP_parameter insert.11"
-      locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+      locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
       loclnum="246" loccnumb="10" loccnume="16"
       expl="parameter insert"
       sum="8f1957f338ccae5553783ddd593e1a95"
@@ -1865,14 +1989,15 @@
       <proof
        prover="0"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.07"/>
+       <result status="valid" time="0.08"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter insert.12"
-      locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+      locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
       loclnum="246" loccnumb="10" loccnume="16"
       expl="parameter insert"
       sum="0d6f00c9a7b47abf1e429ff22acb557f"
@@ -1887,7 +2012,7 @@
        expanded="true">
        <goal
         name="WP_parameter insert.12.1"
-        locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
         sum="aa54a2308dd1b62ac54153fd71fdff80"
@@ -1899,13 +2024,15 @@
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.02"/>
+         <result status="valid" time="0.01"/>
         </proof>
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -1913,6 +2040,7 @@
         <proof
          prover="2"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -1920,7 +2048,7 @@
        </goal>
        <goal
         name="WP_parameter insert.12.2"
-        locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
         sum="be16da04ebca009a20ae334add0ec587"
@@ -1932,14 +2060,15 @@
         <proof
          prover="1"
          timelimit="100"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="31.54"/>
+         <result status="valid" time="28.72"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter insert.12.3"
-        locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
         sum="06aca69448760b03fe6021cf29223f1f"
@@ -1951,14 +2080,15 @@
         <proof
          prover="1"
          timelimit="117"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="54.32"/>
+         <result status="valid" time="58.76"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter insert.12.4"
-        locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
         sum="d395b0d78a2315b00afac801b48d7360"
@@ -1970,13 +2100,15 @@
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.08"/>
+         <result status="valid" time="0.07"/>
         </proof>
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -1984,14 +2116,15 @@
         <proof
          prover="2"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.09"/>
+         <result status="valid" time="0.08"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter insert.12.5"
-        locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
         sum="1783f4d9b1a4d4607214f94030be844f"
@@ -2003,14 +2136,15 @@
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.47"/>
+         <result status="valid" time="0.45"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter insert.12.6"
-        locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
         sum="12f28e8855c3b47fc328614b457a19bc"
@@ -2022,28 +2156,31 @@
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.13"/>
+         <result status="valid" time="1.06"/>
         </proof>
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.36"/>
+         <result status="valid" time="0.35"/>
         </proof>
         <proof
          prover="2"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.04"/>
+         <result status="valid" time="0.93"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter insert.12.7"
-        locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
         sum="606538ebb69fd30e498dc8a3abd79836"
@@ -2055,16 +2192,17 @@
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.13"/>
+         <result status="valid" time="0.12"/>
         </proof>
        </goal>
       </transf>
      </goal>
      <goal
       name="WP_parameter insert.13"
-      locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+      locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
       loclnum="246" loccnumb="10" loccnume="16"
       expl="parameter insert"
       sum="488dccd1fe91d6fef5902be8746ebd60"
@@ -2076,6 +2214,7 @@
       <proof
        prover="0"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.30"/>
@@ -2085,7 +2224,7 @@
    </goal>
    <goal
     name="WP_parameter add"
-    locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="269" loccnumb="6" loccnume="9"
     expl="parameter add"
     sum="2de35281b71d9c81c5a21cd1064f52d4"
@@ -2097,10 +2236,10 @@
     <transf
      name="split_goal"
      proved="true"
-     expanded="false">
+     expanded="true">
      <goal
       name="WP_parameter add.1"
-      locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+      locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
       loclnum="269" loccnumb="6" loccnume="9"
       expl="precondition"
       sum="b85d949c77bf259e74bc20da630ee4eb"
@@ -2112,6 +2251,7 @@
       <proof
        prover="1"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -2119,6 +2259,7 @@
       <proof
        prover="0"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -2126,6 +2267,7 @@
       <proof
        prover="2"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -2133,7 +2275,7 @@
      </goal>
      <goal
       name="WP_parameter add.2"
-      locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+      locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
       loclnum="269" loccnumb="6" loccnume="9"
       expl="parameter add"
       sum="79f2fcd80d23136c69aadf47f686060b"
@@ -2145,10 +2287,10 @@
       <transf
        name="split_goal"
        proved="true"
-       expanded="false">
+       expanded="true">
        <goal
         name="WP_parameter add.2.1"
-        locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="269" loccnumb="6" loccnume="9"
         expl="parameter add"
         sum="9c566483a2862e58d50ebcdc37d0a086"
@@ -2160,6 +2302,7 @@
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -2167,6 +2310,7 @@
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -2174,6 +2318,7 @@
         <proof
          prover="2"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -2181,7 +2326,7 @@
        </goal>
        <goal
         name="WP_parameter add.2.2"
-        locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="269" loccnumb="6" loccnume="9"
         expl="parameter add"
         sum="0fed386346db28f3bb4467afa25c01e2"
@@ -2193,10 +2338,10 @@
         <transf
          name="inline_goal"
          proved="true"
-         expanded="false">
+         expanded="true">
          <goal
           name="WP_parameter add.2.2.1"
-          locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+          locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
           loclnum="269" loccnumb="6" loccnume="9"
           expl="parameter add"
           sum="e909723cafc821ecbefeb3ed7bea70d2"
@@ -2208,17 +2353,18 @@
           <proof
            prover="3"
            timelimit="10"
+           memlimit="0"
            edited="vacid_0_red_black_trees_WP_RedBlackTree_WP_parameter_add_1.v"
            obsolete="false"
            archived="false">
-           <result status="valid" time="0.51"/>
+           <result status="valid" time="0.48"/>
           </proof>
          </goal>
         </transf>
        </goal>
        <goal
         name="WP_parameter add.2.3"
-        locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="269" loccnumb="6" loccnume="9"
         expl="parameter add"
         sum="fe305da211071fd9def649f8725b2fdc"
@@ -2230,6 +2376,7 @@
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -2237,6 +2384,7 @@
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -2244,14 +2392,15 @@
         <proof
          prover="2"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.02"/>
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter add.2.4"
-        locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="269" loccnumb="6" loccnume="9"
         expl="parameter add"
         sum="85f083ef8c1ad0bc02560222267e2391"
@@ -2263,6 +2412,7 @@
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.12"/>
@@ -2270,6 +2420,7 @@
         <proof
          prover="2"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.13"/>
@@ -2277,7 +2428,7 @@
        </goal>
        <goal
         name="WP_parameter add.2.5"
-        locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="269" loccnumb="6" loccnume="9"
         expl="parameter add"
         sum="e595b2ab5c746a40a8c7ca768c5f0c49"
@@ -2289,21 +2440,23 @@
         <proof
          prover="1"
          timelimit="5"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.01"/>
-        </proof>
-        <proof
-         prover="2"
-         timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
         </proof>
+        <proof
+         prover="2"
+         timelimit="5"
+         memlimit="0"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.01"/>
+        </proof>
        </goal>
        <goal
         name="WP_parameter add.2.6"
-        locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+        locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="269" loccnumb="6" loccnume="9"
         expl="parameter add"
         sum="a5050543c9c4a3d32f876b38e8af50ef"
@@ -2315,6 +2468,7 @@
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -2322,16 +2476,17 @@
         <proof
          prover="2"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.01"/>
+         <result status="valid" time="0.02"/>
         </proof>
        </goal>
       </transf>
      </goal>
      <goal
       name="WP_parameter add.3"
-      locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+      locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
       loclnum="269" loccnumb="6" loccnume="9"
       expl="parameter add"
       sum="e6e0c1a29e0cd09399e7b06df780c465"
@@ -2343,13 +2498,15 @@
       <proof
        prover="1"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.00"/>
+       <result status="valid" time="0.01"/>
       </proof>
       <proof
        prover="0"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -2357,9 +2514,10 @@
       <proof
        prover="2"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.00"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
     </transf>
@@ -2367,13 +2525,13 @@
   </theory>
   <theory
    name="WP Vacid0"
-   locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+   locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
    loclnum="282" loccnumb="7" loccnume="13"
    verified="true"
    expanded="false">
    <goal
     name="WP_parameter create"
-    locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="301" loccnumb="6" loccnume="12"
     expl="normal postcondition"
     sum="abe2a5a44d0d506ba2606ad94e4143a2"
@@ -2385,6 +2543,7 @@
     <proof
      prover="1"
      timelimit="5"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.01"/>
@@ -2392,6 +2551,7 @@
     <proof
      prover="0"
      timelimit="5"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.01"/>
@@ -2399,14 +2559,15 @@
     <proof
      prover="2"
      timelimit="5"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.02"/>
     </proof>
    </goal>
    <goal
     name="WP_parameter replace"
-    locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="308" loccnumb="6" loccnume="13"
     expl="parameter replace"
     sum="fac42000acc11404d6533c3343d9fb73"
@@ -2418,6 +2579,7 @@
     <proof
      prover="1"
      timelimit="5"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.03"/>
@@ -2425,6 +2587,7 @@
     <proof
      prover="2"
      timelimit="5"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.03"/>
@@ -2432,7 +2595,7 @@
    </goal>
    <goal
     name="WP_parameter lookup"
-    locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="317" loccnumb="6" loccnume="12"
     expl="parameter lookup"
     sum="d96de7b12d2763e1a2cb6f5cabceed56"
@@ -2444,6 +2607,7 @@
     <proof
      prover="1"
      timelimit="5"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.01"/>
@@ -2451,13 +2615,15 @@
     <proof
      prover="0"
      timelimit="5"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.02"/>
+     <result status="valid" time="0.01"/>
     </proof>
     <proof
      prover="2"
      timelimit="5"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.02"/>
@@ -2465,7 +2631,7 @@
    </goal>
    <goal
     name="WP_parameter remove"
-    locfile="examples/programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="324" loccnumb="6" loccnume="12"
     expl="parameter remove"
     sum="be77d465dc2e8138932a9e666a5b41b7"
@@ -2477,6 +2643,7 @@
     <proof
      prover="1"
      timelimit="5"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.01"/>
@@ -2484,13 +2651,15 @@
     <proof
      prover="0"
      timelimit="5"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.03"/>
+     <result status="valid" time="0.02"/>
     </proof>
     <proof
      prover="2"
      timelimit="5"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.02"/>
