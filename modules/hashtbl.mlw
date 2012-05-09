@@ -1,9 +1,9 @@
 
 (** {1 Hash tables}
 
-This module provides Hash tables à la OCaml. Each key is mapped to a *stack* of values,
+This module provides Hash tables à la OCaml. Each key is mapped to a {h <b>stack</b>} of values,
    with [add h k v] pushing a new value [v] for key [k],
-   and [remove h k] popping a value for key [key]. 
+   and [remove h k] popping a value for key [k].
 
 *)
 
@@ -101,7 +101,6 @@ module TestHashtbl
     assert { h[k1] = Cons False (Cons True Nil) };
     replace h k1 True;
     assert { h[k1] = Cons True (Cons True Nil) }
-
 
 end
 

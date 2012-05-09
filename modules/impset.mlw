@@ -1,7 +1,7 @@
 
 (** {1 Imperative sets}
 
- An imperative set is simply a reference containing a finite set 
+An imperative set is simply a reference containing a finite set.
 
 *)
 
@@ -25,7 +25,7 @@ module Impset
   let is_empty (b: t 'a) =
     {}
     is_empty !b
-    { result=True <-> is_empty !b }
+    { result = True <-> is_empty !b }
 
   let push (x: 'a) (b: t 'a) =
     {}

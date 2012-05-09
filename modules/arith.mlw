@@ -3,7 +3,7 @@
 
 (** {2 Integer Division} 
 
- It is checked that divisor is not null
+It is checked that divisor is not null.
 
 *)
 
@@ -14,14 +14,14 @@ module Int
 
   let (/) (x: int) (y:int) = { y <> 0 } div x y { result = div x y }
 
- 
 end
 
 (** {2 Machine integers}
 
- 32-bit integers and such go here 
+32-bit integers and such go here.
 
 *)
+
 module Int32
 
   use export int.Int
@@ -47,11 +47,12 @@ module Int32
 
 end
 
-(** {2 Division on real numbers} 
+(** {2 Division on real numbers}
 
-See also Floating-Point theories
+See also {h <a href="floating_point.why.html">Floating-Point theories</a>.}
 
 *)
+
 module Real
 
   use import real.Real

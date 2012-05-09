@@ -2,7 +2,8 @@
 
 (** {2 Generic Arrays}
 
-The length is a non-mutable field, so that we get for free that modification of an array does not modify its length
+The length is a non-mutable field, so that we get for free that
+modification of an array does not modify its length.
 
 *)
 
@@ -110,7 +111,6 @@ module Array
 
 end
 
-
 (** {2 Sorted Arrays} *)
 
 module ArraySorted
@@ -194,7 +194,6 @@ module ArraySum
   clone import map.MapSum as M
 
   (** [sum a l h] is the sum of [a[i]] for [l <= i < h] *)
-
   function sum (a: array int) (l h: int) : int = M.sum a.elts l h
 
 end
