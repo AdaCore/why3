@@ -91,10 +91,7 @@ theory GappaEq2
   goal G2 : forall q:double. q = result ->
      value q - value q1 * value q2 <= 0x1.p-52
 
-  constant q : double
-
-  axiom H3 : q = result
-
-  goal G3 : value q - value q1 * value q2 <= 0x1.p-52
+  goal G3 : forall q:double. ("lab1" q) = result ->
+     value ("lab2" q) - value q1 * value q2 <= 0x1.p-52
 
 end
