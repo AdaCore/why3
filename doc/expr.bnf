@@ -13,7 +13,8 @@
        | "if" expr "then" expr ("else" expr)?     ; conditional
        | expr ";" expr                            ; sequence
        | "loop" loop-annot "end"                  ; infinite loop
-       | "while" expr "do" loop-annot expr "done" ; while loop
+       | "while" expr                             ; while loop
+         "do" loop-annot expr "done"              ;
        | "for" lident "=" expr to-downto expr     ; for loop
          "do" loop-inv expr "done"                ;
        | assert annotation                        ; assertion
@@ -27,7 +28,7 @@
          ("|" expr-case)+ "end"                   ;
        | "(" expr ("," expr)+ ")"                 ; tuple
        | "{|" field-value+ "|}"                   ; record
-       | exopr "." lqualid                        ; field access
+       | expr "." lqualid                         ; field access
        | expr "." lqualid "<-" expr               ; field assignment
        | "{|" expr "with" field-value+ "|}"       ; field update
        | expr ":" type 	                          ; cast
@@ -41,14 +42,4 @@
   \
   triple ::= expr                                 ;
     | pre expr post                               ; Hoare triple
-  \
-  assert ::= "assert" | "assume" | "check"
-  \
-  to-downto ::= "to" | "downto"
-  \
-  loop-annot ::= loop-inv? variant?
-  \
-  loop-inv ::= "invariant" annotation
-  \
-  variant ::= "variant" "{" term "}" ("with" lqualid)?
 \end{syntax}

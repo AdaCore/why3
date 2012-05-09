@@ -518,7 +518,9 @@ the loop is reached, \texttt{True} is returned.
       { 0 <= pos < length board }
       try
         for q = 0 to pos - 1 do
-          invariant { forall j:int. 0 <= j < q -> consistent_row board pos j }
+          invariant {
+            forall j:int. 0 <= j < q -> consistent_row board pos j
+          }
           let bq   = board[q]   in
           let bpos = board[pos] in
           if bq        = bpos    then raise (Inconsistent q);
@@ -555,7 +557,9 @@ module NQueens
     { 0 <= pos < length board }
     try
       for q = 0 to pos - 1 do
-        invariant { forall j:int. 0 <= j < q -> consistent_row board pos j }
+        invariant {
+          forall j:int. 0 <= j < q -> consistent_row board pos j
+        }
         let bq   = board[q]   in
         let bpos = board[pos] in
         if bq        = bpos    then raise (Inconsistent q);
@@ -606,7 +610,8 @@ The backtracking code is a recursive function \verb|bt_queens| which
 takes the chess board, its size, and the starting row for the search.
 The termination is ensured by the obvious variant \texttt{n-pos}.
 \begin{verbatim}
-    let rec bt_queens (board: array int) (n: int) (pos: int) variant {n-pos} =
+    let rec bt_queens (board: array int) (n: int) (pos: int) 
+                      variant {n-pos} =
 \end{verbatim}
 The precondition relates \texttt{board}, \texttt{pos}, and \texttt{n}
 and requires \texttt{board} to be a solution up to \texttt{pos}:
@@ -634,7 +639,8 @@ extend this prefix with a queen on row \texttt{pos} at a column below
         invariant {
           eq_board board (at board 'Init) pos /\
           forall b:array int. length b = n -> is_board b n ->
-            eq_board board b pos -> 0 <= b[pos] < i -> not (solution b n) }
+            eq_board board b pos -> 0 <= b[pos] < i ->
+              not (solution b n) }
 \end{verbatim}
 Then we assign column \texttt{i} to the queen on row \texttt{pos} and
 we check for a possible attack with \verb|check_is_consistent|. If
@@ -664,7 +670,8 @@ search on row 0. The postcondition is also twofold, as for
     let queens (board: array int) (n: int) =
       { 0 <= length board = n }
       bt_queens board n 0
-      { forall b:array int. length b = n -> is_board b n -> not (solution b n) }
+      { forall b:array int. length b = n -> is_board b n ->
+                              not (solution b n) }
       | Solution -> { solution board n }
 \end{verbatim}
 This second part of the solution is given Figure~\ref{fig:NQueens2}.
@@ -686,7 +693,8 @@ automatically, including the verification of the lemmas themselves.
 
   exception Solution
 
-  let rec bt_queens (board: array int) (n: int) (pos: int) variant { n - pos } =
+  let rec bt_queens (board: array int) (n: int) (pos: int)
+                    variant { n - pos } =
     { length board = n /\ 0 <= pos <= n /\ solution board pos }
     'Init:
     if pos = n then raise Solution;
@@ -709,7 +717,8 @@ automatically, including the verification of the lemmas themselves.
   let queens (board: array int) (n: int) =
     { 0 <= length board = n }
     bt_queens board n 0
-    { forall b:array int. length b = n -> is_board b n -> not (solution b n) }
+    { forall b:array int. length b = n -> is_board b n ->
+                            not (solution b n) }
     | Solution -> { solution board n }
 end
 \end{verbatim}
@@ -854,8 +863,7 @@ module AmortizedQueue
   predicate inv (q: queue 'a) =
     length q.front = q.lenf >= length q.rear = q.lenr
 
-  function sequence (q: queue 'a) : list 'a =
-    q.front ++ reverse q.rear
+  function sequence (q: queue 'a) : list 'a = q.front ++ reverse q.rear
 
   let empty () =
     {}
