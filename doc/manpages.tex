@@ -816,10 +816,51 @@ to verified goals.
 \section{The \texttt{why3doc} tool}
 \label{sec:why3doc}
 
-This tool can produce HTML pages from \why source code.
+This tool can produce HTML pages from \why source code. A source file
+is scanned, \why code for theories or modules is output in
+preformatted HTML code. Comments are interpreted in three different ways.
+\begin{itemize}
+\item Comments starting with at least three stars are completed
+  ignored.
+\item Comments starting with two stars are interpreted as textual
+  documentation. Special constructs are interpreted as described
+  below.
+\item Comments starting with one star only are interpreted as code
+  comments, and are typeset as the code
+\end{itemize}
 
-\todo{Documenter}
+Additionally, all the \why identifiers are typeset with links so that
+one can navigate through the HTML documentation, going from some
+identifier use to its definition.
 
+\paragraph{Options}
+
+\begin{itemize}
+\item Option \texttt{-o \textsl{<dir>}} defines the directory where to
+  output the HTML files
+\item Option \verb|--output| is the same as \verb|-o|
+\end{itemize}
+
+\paragraph{Typesetting textual comments}
+
+Some constructs are interpreted:
+\begin{itemize}
+\item \texttt{\{\textsl{c text}\}} interprets character \textsl{c} as
+  some typesetting command, detailed below
+\item \texttt{[\textsl{code}]} is a code escape: the text
+  \textsl{code} is typeset as \why code.
+\end{itemize}
+
+The typesetting commands are
+\begin{description}
+\item[1-6] a heading of level 1 to 6 respectively
+\item[h] raw HTML
+\end{description}
+
+The HTML rendering is controlled via a CSS file \verb|style.css|
+generated in the same directory as output files. This CSS style can be
+modified manually: regenerating the doc will not overwrite an existing
+\verb|style.css| file.
 
 
 
