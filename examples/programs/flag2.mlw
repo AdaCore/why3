@@ -1,0 +1,83 @@
+(** {1 Dijkstra's "Dutch national flag"}
+
+  Variant which number of occurrences instead of permut predicate
+
+*)
+
+module Flag
+
+  use import int.Int
+  use import map.Map
+  use import module ref.Ref
+
+  type color = Blue | White | Red
+
+  predicate monochrome (a:map int color) (i:int) (j:int) (c:color) =
+    forall k:int. i <= k < j -> a[k]=c
+
+  function nb_occ (a:map int color) (i:int) (j:int) (c:color) : int
+
+  axiom nb_occ_null:
+    forall a:map int color, i j:int, c:color.
+       i >= j -> nb_occ a i j c = 0
+  axiom nb_occ_add:
+    forall a:map int color, i j:int, c:color.
+       i < j -> nb_occ a i j c = nb_occ a i (j-1) c +
+         (if get a (j-1) = c then 1 else 0)
+
+  lemma nb_occ_store:
+    forall a:map int color, i j k:int, c c':color.
+      i <= k < j ->
+       nb_occ (set a k c) i j c' =
+          nb_occ a i j c' + (if c=c' then 1 else 0) - (if get a k = c' then 1 else 0)
+
+  lemma nb_occ_store_outside:
+    forall a:map int color, i j k:int, c c':color.
+      not (i <= k < j) -> nb_occ (set a k c) i j c' = nb_occ a i j c'
+
+ let swap(a:ref (map int color)) (i:int) (j:int) : unit =
+   { }
+   let ai = get !a i in
+   let aj = get !a j in
+   a := set !a i aj;
+   a := set !a j ai
+   { get !a i = get (old !a) j /\
+     get !a j = get (old !a) i /\
+     (forall k:int. k <> i /\ k <> j -> get !a k = get (old !a) k) /\
+     (forall i j:int, c:color. nb_occ !a i j c = nb_occ (old !a) i j c)
+   }
+
+
+ let dutch_flag (a:ref (map int color)) (n:int) =
+  { 0 <= n }
+  let b = ref 0 in
+  let i = ref 0 in
+  let r = ref n in
+  'Init:
+  while !i < !r do
+       invariant { 
+         0 <= !b <= !i <= !r <= n /\
+         monochrome !a 0 !b Blue /\
+         monochrome !a !b !i White /\
+         monochrome !a !r n  Red /\
+         forall c:color. nb_occ !a 0 n c = nb_occ (at !a 'Init) 0 n c }
+       variant { !r - !i }
+       match get !a !i with
+       | Blue -> swap a !b !i; b := !b + 1; i := !i + 1
+       | White -> i := !i + 1
+       | Red -> r := !r - 1; swap a !r !i
+       end
+    done
+    { (exists b:int. exists r:int.
+        monochrome !a 0 b Blue /\
+        monochrome !a b r White /\
+        monochrome !a r n Red)
+      /\ forall c:color. nb_occ !a 0 n c = nb_occ (old !a) 0 n c }
+
+end
+
+(***
+Local Variables:
+compile-command: "unset LANG; make -C ../.. examples/programs/flag2.gui"
+End:
+*)

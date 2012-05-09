@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
+<!DOCTYPE why3session SYSTEM "/usr/local/share/why3/why3session.dtd">
 <why3session
- name="./foveoos2011/tree_max/why3session.xml">
+ name="tree_max/why3session.xml">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -9,95 +9,80 @@
  <prover
   id="1"
   name="Coq"
-  version="8.3pl3"/>
- <prover
-  id="2"
-  name="Z3"
-  version="2.19"/>
+  version="8.3pl4"/>
  <file
   name="../tree_max.mlw"
-  verified="false"
-  expanded="false">
+  verified="true"
+  expanded="true">
   <theory
    name="BinTree"
-   locfile="./foveoos2011/tree_max/../tree_max.mlw"
+   locfile="tree_max/../tree_max.mlw"
    loclnum="26" loccnumb="7" loccnume="14"
-   verified="false"
+   verified="true"
    expanded="true">
    <goal
     name="ge_trans"
-    locfile="./foveoos2011/tree_max/../tree_max.mlw"
+    locfile="tree_max/../tree_max.mlw"
     loclnum="47" loccnumb="8" loccnume="16"
     sum="a42fd40c97a8473c63c4df5f3809a29e"
-    proved="false"
+    proved="true"
     expanded="true"
-    shape="age_treeV1V0Iage_treeV2V0Aainfix >=V1V2F">
+    shape="age_treeV1V0Iage_treeV2V0Aainfix &gt;=V1V2F">
     <proof
      prover="1"
      timelimit="5"
+     memlimit="0"
      edited="tree_max_BinTree_ge_trans_1.v"
-     obsolete="true"
+     obsolete="false"
      archived="false">
-     <result status="valid" time="0.46"/>
+     <result status="valid" time="0.47"/>
     </proof>
    </goal>
   </theory>
   <theory
    name="WP TreeMax"
-   locfile="./foveoos2011/tree_max/../tree_max.mlw"
+   locfile="tree_max/../tree_max.mlw"
    loclnum="52" loccnumb="7" loccnume="14"
-   verified="false"
+   verified="true"
    expanded="true">
    <goal
     name="WP_parameter max_aux"
-    locfile="./foveoos2011/tree_max/../tree_max.mlw"
+    locfile="tree_max/../tree_max.mlw"
     loclnum="58" loccnumb="10" loccnume="17"
     expl="parameter max_aux"
     sum="fd19a0d15660fc84baa28f170db90b43"
-    proved="false"
+    proved="true"
     expanded="true"
-    shape="CV0aNullainfix >=V1V1Aage_treeV1V0aTreeVVVamemV6V0Oainfix =V6V1Aainfix >=V6V1Aage_treeV6V0IamemV6V3Oainfix =V6V5Aainfix >=V6V5Aage_treeV6V3FIamemV5V4Oainfix =V5amaxV2V1Aainfix >=V5amaxV2V1Aage_treeV5V4FFF">
+    shape="CV0aNullainfix &gt;=V1V1Aage_treeV1V0aTreeVVVamemV6V0Oainfix =V6V1Aainfix &gt;=V6V1Aage_treeV6V0IamemV6V3Oainfix =V6V5Aainfix &gt;=V6V5Aage_treeV6V3FIamemV5V4Oainfix =V5amaxV2V1Aainfix &gt;=V5amaxV2V1Aage_treeV5V4FFF">
     <label
      name="expl:parameter max_aux"/>
     <proof
-     prover="2"
-     timelimit="5"
-     obsolete="true"
-     archived="false">
-     <result status="valid" time="1.70"/>
-    </proof>
-    <proof
      prover="0"
      timelimit="5"
-     obsolete="true"
+     memlimit="0"
+     obsolete="false"
      archived="false">
-     <result status="valid" time="0.06"/>
+     <result status="valid" time="0.04"/>
     </proof>
    </goal>
    <goal
     name="WP_parameter max"
-    locfile="./foveoos2011/tree_max/../tree_max.mlw"
+    locfile="tree_max/../tree_max.mlw"
     loclnum="68" loccnumb="6" loccnume="9"
     expl="parameter max"
     sum="2b396ce2e0ce29212289ff83a143c14c"
-    proved="false"
+    proved="true"
     expanded="true"
-    shape="CV0aNullfaTreeVVVamemV5V0Aage_treeV5V0IamemV5V2Oainfix =V5V4Aainfix >=V5V4Aage_treeV5V2FIamemV4V3Oainfix =V4V1Aainfix >=V4V1Aage_treeV4V3FIainfix =V0aNullNF">
+    shape="CV0aNullfaTreeVVVamemV5V0Aage_treeV5V0IamemV5V2Oainfix =V5V4Aainfix &gt;=V5V4Aage_treeV5V2FIamemV4V3Oainfix =V4V1Aainfix &gt;=V4V1Aage_treeV4V3FIainfix =V0aNullNF">
     <label
      name="expl:parameter max"/>
     <proof
-     prover="2"
-     timelimit="5"
-     obsolete="true"
-     archived="false">
-     <result status="valid" time="0.05"/>
-    </proof>
-    <proof
      prover="0"
      timelimit="5"
-     obsolete="true"
+     memlimit="0"
+     obsolete="false"
      archived="false">
-     <result status="valid" time="0.03"/>
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
   </theory>
