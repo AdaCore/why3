@@ -1194,10 +1194,10 @@ STDMODS = ref array arith hashtbl impset pqueue 	queue 	random 	stack 	string
 STDLIBFILES = $(addsuffix .why, $(addprefix theories/, $(STDLIBS)))
 STDMODFILES = $(addsuffix .mlw, $(addprefix modules/, $(STDMODS)))
 
-stdlibdoc: $(STDLIBFILES) $(STDMODFILES) bin/why3doc
+stdlibdoc: $(STDLIBFILES) $(STDMODFILES) bin/why3doc.@OCAMLBEST@
 	mkdir -p doc/stdlibdoc
 	rm -f doc/stdlibdoc/style.css
-	WHY3LOADPATH=theories bin/why3doc -L modules -o doc/stdlibdoc \
+	WHY3LOADPATH=theories bin/why3doc.@OCAMLBEST@ -L modules -o doc/stdlibdoc \
 		$(STDLIBFILES) $(STDMODFILES)
 
 clean::
