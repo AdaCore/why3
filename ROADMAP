@@ -85,13 +85,20 @@
  - also: BTS 13736
 https://gforge.inria.fr/tracker/index.php?func=detail&aid=13736&group_id=2990
 
+
+* Documentation
  - (ANDREI) make the glossary available 
+ - (CLAUDE) revoir documentation du smoke detector
+ - (CLAUDE) complete api.tex: explain how to build theories, apply
+   transformations, write new functions on terms (A)
 
 
 * detect editors
 *** check if coqide and also emacs/proof-general is installed
 
+
 * deplacer option -bench de why3replayer dans une commande de why3session
+
 
 * IDE
 ** todo: run detection immediately at start up if conf file absent or
@@ -103,9 +110,6 @@ https://gforge.inria.fr/tracker/index.php?func=detail&aid=13736&group_id=2990
    NEED FEEDBACK which ones ???
 
 * (JCF) reject global "val"s in typing environment for logic decls.
-
-* (CLAUDE) complete api.tex: explain how to build theories, apply
-   transformations, write new functions on terms (A)
 
 
 ==================== Roadmap for release 0.72 ========================
@@ -175,11 +179,6 @@ See manual Section xx
 
  install.tex:179:% \todo{que devient l'option -to-known-prover de why3session ?
  manpages.tex:790:% \todo{A adapter en fonction de la decision sur l'upgrade de prover}
- library.tex:8:\todo{Plutot la version produite avec why3doc}
- library.tex:42:\section{Library \texttt{int}} \todo{Completer}
- library.tex:120:\section{Library \texttt{array}} \todo{Mettre a jour}
- library.tex:224:\section{Library \texttt{string}} \todo{Detailler}
- manpages.tex:15:\item[\texttt{why3bench}] produces benchmarks \todo{obsolete ?}
  manpages.tex:809:\section{The \texttt{why3doc} tool} \todo{Documenter}
 
 
@@ -189,8 +188,6 @@ See manual Section xx
  - DONE (GUILLAUME) Realisations Coq, comment fait l'utilisateur pour faire
    ses realisations ne pas oublier de dire que les dependances avec le
    .why ou .mlw: ne sera pas vérifié
-
- - (CLAUDE) revoir documentation du smoke detector
 
  - DONE Documenter l'utilisation de plusieurs versions du meme
    prouveur comme CVC3 et Z3
