@@ -138,7 +138,7 @@ why3 --list-transforms
 definitions~\cite{paskevich09rr}
 
 \item[eliminate\_builtin] Suppress definitions of symbols which are
-  declared as builtin in the driver, i.e. with a ``syntax'' rule.
+  declared as builtin in the driver, \ie with a ``syntax'' rule.
 \item[eliminate\_definition\_func]
   Replaces all function definitions with axioms.
 \item[eliminate\_definition\_pred]
@@ -162,7 +162,7 @@ definitions~\cite{paskevich09rr}
   Apply both transformations above.
 
 \item[eliminate\_inductive] replaces inductive predicates by
-  (incomplete) axiomatic definitions, i.e. construction axioms and
+  (incomplete) axiomatic definitions, \ie construction axioms and
   an inversion axiom.
 
 \item[eliminate\_let\_fmla]
@@ -223,7 +223,7 @@ each $x_1$ .. $x_n$ occur at most once in the $e_i$
   and f'' to ``f'', etc.
 
 \item[simplify\_recursive\_definition] reduces mutually recursive
-  definitions if they are not really mutually recursive, e.g.:
+  definitions if they are not really mutually recursive, \eg
 \begin{verbatim}
 function f : ... = .... g ...
 

@@ -9,7 +9,7 @@ provided by the \why environment. These are as follows:
 \item[\texttt{why3}] reads \why input files and call provers, on the command-line
 \item[\texttt{why3ide}] graphical interface to display goals, run
   provers and transformations on them.
-\item[\texttt{why3ml}] as \texttt{why3} but reads \why{} ML programs instead
+\item[\texttt{why3ml}] as \texttt{why3} but reads \whyml programs instead
 \item[\texttt{why3replayer}] replay the proofs stored in a session,
   for regression test purposes
 \item[\texttt{why3bench}] produces benchmarks.
@@ -134,8 +134,8 @@ The \texttt{why3} tool executes the following steps:
   transformations, plugins can add more of them.
 \item Apply the driver selected with the \verb|-D/--driver| option,
   or the driver of the prover selected with \verb|-P/--prover|
-  option. \verb|--list-provers| lists the known provers, i.e.~the ones
-  which appear in the configuration file.
+  option. \verb|--list-provers| lists the known provers, \ie the ones
+  that appear in the configuration file.
 \item If the option \verb|-P/--prover| is given, call the selected prover
   on each generated task and print the results. If the option
   \verb|-D/--driver| is given, print each generated task using
@@ -274,7 +274,7 @@ are groups together under several tabs
   \begin{itemize}
   \item introduce premises: if selected, the goal of the task shownin
     top-right window is displayed after introduction of universally
-    quantified variables and implications, e.g. a goal of the form
+    quantified variables and implications, \eg a goal of the form
     $\forall x: t. P \rightarrow Q$ is displayed as
     \[
     \begin{array}{l}
