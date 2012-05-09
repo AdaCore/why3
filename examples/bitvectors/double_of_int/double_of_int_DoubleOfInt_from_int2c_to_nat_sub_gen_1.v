@@ -28,6 +28,8 @@ Axiom Power_1 : ((pow2 1%Z) = 2%Z).
 Axiom Power_sum : forall (n:Z) (m:Z), ((0%Z <= n)%Z /\ (0%Z <= m)%Z) ->
   ((pow2 (n + m)%Z) = ((pow2 n) * (pow2 m))%Z).
 
+Axiom pow2pos : forall (i:Z), (0%Z <= i)%Z -> (0%Z < (pow2 i))%Z.
+
 Axiom pow2_0 : ((pow2 0%Z) = 1%Z).
 
 Axiom pow2_1 : ((pow2 1%Z) = 2%Z).
@@ -156,9 +158,49 @@ Axiom pow2_62 : ((pow2 62%Z) = 4611686018427387904%Z).
 
 Axiom pow2_63 : ((pow2 63%Z) = 9223372036854775808%Z).
 
-Parameter bv : Type.
+Parameter pow21: Z -> R.
+
+Axiom Power_01 : ((pow21 0%Z) = 1%R).
+
+Axiom Power_s1 : forall (n:Z), (0%Z <= n)%Z ->
+  ((pow21 (n + 1%Z)%Z) = (2%R * (pow21 n))%R).
+
+Axiom Power_p : forall (n:Z), (n <= 0%Z)%Z ->
+  ((pow21 (n - 1%Z)%Z) = ((05 / 10)%R * (pow21 n))%R).
+
+Axiom Power_s_all : forall (n:Z),
+  ((pow21 (n + 1%Z)%Z) = (2%R * (pow21 n))%R).
+
+Axiom Power_p_all : forall (n:Z),
+  ((pow21 (n - 1%Z)%Z) = ((05 / 10)%R * (pow21 n))%R).
+
+Axiom Power_1_2 : ((05 / 10)%R = (Rdiv 1%R 2%R)%R).
+
+Axiom Power_11 : ((pow21 1%Z) = 2%R).
+
+Axiom Power_neg1 : ((pow21 (-1%Z)%Z) = (05 / 10)%R).
+
+Axiom Power_non_null_aux : forall (n:Z), (0%Z <= n)%Z -> ~ ((pow21 n) = 0%R).
+
+Axiom Power_neg_aux : forall (n:Z), (0%Z <= n)%Z ->
+  ((pow21 (-n)%Z) = (Rdiv 1%R (pow21 n))%R).
+
+Axiom Power_non_null : forall (n:Z), ~ ((pow21 n) = 0%R).
+
+Axiom Power_neg : forall (n:Z), ((pow21 (-n)%Z) = (Rdiv 1%R (pow21 n))%R).
+
+Axiom Power_sum_aux : forall (n:Z) (m:Z), (0%Z <= m)%Z ->
+  ((pow21 (n + m)%Z) = ((pow21 n) * (pow21 m))%R).
+
+Axiom Power_sum1 : forall (n:Z) (m:Z),
+  ((pow21 (n + m)%Z) = ((pow21 n) * (pow21 m))%R).
+
+Axiom Pow2_int_real : forall (x:Z), (0%Z <= x)%Z ->
+  ((pow21 x) = (IZR (pow2 x))).
 
 Axiom size_positive : (1%Z < 32%Z)%Z.
+
+Parameter bv : Type.
 
 Parameter nth: bv -> Z -> bool.
 
@@ -293,8 +335,6 @@ Axiom nth_from_int_low_even : forall (n:Z), ((int.EuclideanDivision.mod1 n
 Axiom nth_from_int_low_odd : forall (n:Z), (~ ((int.EuclideanDivision.mod1 n
   2%Z) = 0%Z)) -> ((nth (from_int n) 0%Z) = true).
 
-Axiom pow2i : forall (i:Z), (0%Z <= i)%Z -> ~ ((pow2 i) = 0%Z).
-
 Axiom nth_from_int_0 : forall (i:Z), ((i < 32%Z)%Z /\ (0%Z <= i)%Z) ->
   ((nth (from_int 0%Z) i) = false).
 
@@ -330,9 +370,9 @@ Axiom nth_from_int2c_plus_pow2 : forall (x:Z) (k:Z) (i:Z), ((0%Z <= k)%Z /\
   (k < i)%Z) -> ((nth (from_int2c (x + (pow2 i))%Z) k) = (nth (from_int2c x)
   k)).
 
-Parameter bv1 : Type.
-
 Axiom size_positive1 : (1%Z < 64%Z)%Z.
+
+Parameter bv1 : Type.
 
 Parameter nth1: bv1 -> Z -> bool.
 
@@ -469,8 +509,6 @@ Axiom nth_from_int_low_even1 : forall (n:Z), ((int.EuclideanDivision.mod1 n
 Axiom nth_from_int_low_odd1 : forall (n:Z), (~ ((int.EuclideanDivision.mod1 n
   2%Z) = 0%Z)) -> ((nth1 (from_int1 n) 0%Z) = true).
 
-Axiom pow2i1 : forall (i:Z), (0%Z <= i)%Z -> ~ ((pow2 i) = 0%Z).
-
 Axiom nth_from_int_01 : forall (i:Z), ((i < 64%Z)%Z /\ (0%Z <= i)%Z) ->
   ((nth1 (from_int1 0%Z) i) = false).
 
@@ -513,46 +551,6 @@ Axiom concat_low : forall (b1:bv) (b2:bv), forall (i:Z), ((0%Z <= i)%Z /\
 
 Axiom concat_high : forall (b1:bv) (b2:bv), forall (i:Z), ((32%Z <= i)%Z /\
   (i < 64%Z)%Z) -> ((nth1 (concat b1 b2) i) = (nth b1 (i - 32%Z)%Z)).
-
-Parameter pow21: Z -> R.
-
-Axiom Power_01 : ((pow21 0%Z) = 1%R).
-
-Axiom Power_s1 : forall (n:Z), (0%Z <= n)%Z ->
-  ((pow21 (n + 1%Z)%Z) = (2%R * (pow21 n))%R).
-
-Axiom Power_p : forall (n:Z), (n <= 0%Z)%Z ->
-  ((pow21 (n - 1%Z)%Z) = ((05 / 10)%R * (pow21 n))%R).
-
-Axiom Power_s_all : forall (n:Z),
-  ((pow21 (n + 1%Z)%Z) = (2%R * (pow21 n))%R).
-
-Axiom Power_p_all : forall (n:Z),
-  ((pow21 (n - 1%Z)%Z) = ((05 / 10)%R * (pow21 n))%R).
-
-Axiom Power_1_2 : ((05 / 10)%R = (Rdiv 1%R 2%R)%R).
-
-Axiom Power_11 : ((pow21 1%Z) = 2%R).
-
-Axiom Power_neg1 : ((pow21 (-1%Z)%Z) = (05 / 10)%R).
-
-Axiom Power_non_null_aux : forall (n:Z), (0%Z <= n)%Z -> ~ ((pow21 n) = 0%R).
-
-Axiom Power_neg_aux : forall (n:Z), (0%Z <= n)%Z ->
-  ((pow21 (-n)%Z) = (Rdiv 1%R (pow21 n))%R).
-
-Axiom Power_non_null : forall (n:Z), ~ ((pow21 n) = 0%R).
-
-Axiom Power_neg : forall (n:Z), ((pow21 (-n)%Z) = (Rdiv 1%R (pow21 n))%R).
-
-Axiom Power_sum_aux : forall (n:Z) (m:Z), (0%Z <= m)%Z ->
-  ((pow21 (n + m)%Z) = ((pow21 n) * (pow21 m))%R).
-
-Axiom Power_sum1 : forall (n:Z) (m:Z),
-  ((pow21 (n + m)%Z) = ((pow21 n) * (pow21 m))%R).
-
-Axiom Pow2_int_real : forall (x:Z), (0%Z <= x)%Z ->
-  ((pow21 x) = (IZR (pow2 x))).
 
 Parameter double_of_bv64: bv1 -> R.
 
@@ -676,72 +674,54 @@ Axiom jpxorx_pos : forall (x:Z), (0%Z <= x)%Z ->
   ((nth (bw_xor (from_int 2147483648%Z) (from_int2c x)) 31%Z) = true).
 
 Open Scope Z_scope.
+Require Import Why3.
+Ltac ae := why3 "alt-ergo" timelimit 3.
 
 (* Why3 goal *)
 Theorem from_int2c_to_nat_sub_gen : forall (i:Z), ((0%Z <= i)%Z /\
   (i <= 30%Z)%Z) -> forall (x:Z), ((0%Z <= x)%Z /\ (x < (pow2 i))%Z) ->
   ((to_nat_sub (from_int2c x) (i - 1%Z)%Z 0%Z) = x).
-(* YOU MAY EDIT THE PROOF BELOW *)
-intros i H.
-generalize H.
-cut (0 <= i); auto with zarith.
-pattern i; apply Z_lt_induction; auto with zarith.
-intros i0 Hind Hi0_pos Hi0 x0 Hx0.
-assert (h:(i0=0 \/ 0 < i0)) by omega.
+intros i (h & h2).
+generalize h2; generalize h.
+pattern i; apply Z_lt_induction; auto.
+clear i h h2.
+intros i Hind Hi_pos Hi x Hx.
+assert (h:(i=0 \/ 0 < i)) by omega.
 destruct h.
 
-(* case i0 = 0 *)
+(* case i = 0 *)
+ae.
 
-subst i0.
-rewrite pow2_0 in Hx0.
-assert (x0=0) by omega.
-subst x0.
-apply to_nat_sub_high;auto with zarith.
-(*apply to_nat_of_zero; auto with zarith.
-intros.
-assert (k=0) by omega.
-subst k.
-apply nth_from_int2c_0; omega.
-*)
-(* case i0 > 0 *)
+(* case i > 0 *)
 
-assert (h:(0 <= x0 < pow2 (i0-1) \/ 
-           pow2 (i0-1) <= x0 < pow2 i0)) by omega.
+assert (h:(0 <= x < pow2 (i-1) \/ 
+           pow2 (i-1) <= x < pow2 i)) by omega.
 destruct h.
 
 (* sub-case x0 < 2^(i0-1) *)
-
 rewrite to_nat_sub_zero; auto with zarith.
 apply nth_from_int2c_high_even; 
    split; auto with zarith.
 rewrite EuclideanDivision.Div_inf; auto.
 
 (* sub-case 2^(i0-1) <= x0 < 2^i0*)
-
-rewrite to_nat_sub_one; auto with zarith. 
+rewrite to_nat_sub_one; auto with zarith.
 rewrite to_nat_sub_footprint with 
-  (b2 := (from_int2c (x0 - pow2 (i0-1)))); auto with zarith.
+  (b2 := (from_int2c (x - pow2 (i-1)))); auto with zarith.
 rewrite Hind; auto with zarith.
+ae.
+(*
 replace (i0 - 1 - 0) with (i0 -1) by omega; omega.
-split; auto with zarith.
-apply Zplus_lt_reg_r with (n:=x0- pow2 (i0 - 1))(m:=pow2 (i0 - 1)) (p:= pow2 (i0 - 1)).
-rewrite Zplus_diag_eq_mult_2.
-replace (x0 - pow2 (i0 - 1) + pow2 (i0 - 1)) with (x0) by omega.
-rewrite Zmult_comm.
-rewrite<-Power_s;auto with zarith.
-replace (i0 - 1 + 1) with i0 by omega.
-apply Hx0.
-replace (i0-1-1) with (i0-2) by omega.
+*)
+ae.
 intros k Hk.
-replace x0 with (x0 - pow2 (i0 - 1) + pow2 (i0 - 1)) by omega.
-replace (x0 - pow2 (i0 - 1) + pow2 (i0 - 1) - pow2 (i0 - 1)) 
-            with (x0 - pow2 (i0 - 1)) by omega.
-apply nth_from_int2c_plus_pow2 with(x:= x0 - pow2 (i0 - 1));auto with zarith.
+replace x with (x - pow2 (i - 1) + pow2 (i - 1)) by omega.
+ae.
 rewrite nth_from_int2c_high_odd;auto.
 split.
 split;auto with zarith.
-rewrite Div_pow;auto with zarith.
-rewrite Mod_1y;omega.
+rewrite Div_pow; auto with zarith.
+rewrite Mod_1y; omega.
 Qed.
 
 
