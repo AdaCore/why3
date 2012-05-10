@@ -20,20 +20,48 @@ module Flag
   axiom nb_occ_null:
     forall a:map int color, i j:int, c:color.
        i >= j -> nb_occ a i j c = 0
-  axiom nb_occ_add:
+
+  axiom nb_occ_add_eq:
     forall a:map int color, i j:int, c:color.
-       i < j -> nb_occ a i j c = nb_occ a i (j-1) c +
-         (if get a (j-1) = c then 1 else 0)
+       i < j /\ get a (j-1) = c -> nb_occ a i j c = nb_occ a i (j-1) c + 1
 
-  lemma nb_occ_store:
-    forall a:map int color, i j k:int, c c':color.
-      i <= k < j ->
-       nb_occ (set a k c) i j c' =
-          nb_occ a i j c' + (if c=c' then 1 else 0) - (if get a k = c' then 1 else 0)
+  axiom nb_occ_add_neq:
+    forall a:map int color, i j:int, c:color.
+       i < j /\ get a (j-1) <> c -> nb_occ a i j c = nb_occ a i (j-1) c
 
-  lemma nb_occ_store_outside:
+  lemma nb_occ_split:
+    forall a:map int color, i j k:int, c:color.
+       i <= j <= k ->
+         nb_occ a i k c = nb_occ a i j c + nb_occ a j k c
+
+  lemma nb_occ_store_outside_up:
+    forall a:map int color, i j k:int, c:color.
+      i <= j <= k -> nb_occ (set a k c) i j c = nb_occ a i j c
+
+  lemma nb_occ_store_outside_down:
+    forall a:map int color, i j k:int, c:color.
+      k < i <= j -> nb_occ (set a k c) i j c = nb_occ a i j c
+
+  lemma nb_occ_store_eq_eq:
+    forall a:map int color, i j k:int, c:color.
+      i <= k < j -> get a k = c ->
+       nb_occ (set a k c) i j c = nb_occ a i j c
+
+  lemma nb_occ_store_eq_neq:
+    forall a:map int color, i j k:int, c:color.
+      i <= k < j -> get a k <> c ->
+       nb_occ (set a k c) i j c = nb_occ a i j c + 1
+
+  lemma nb_occ_store_neq_eq:
     forall a:map int color, i j k:int, c c':color.
-      not (i <= k < j) -> nb_occ (set a k c) i j c' = nb_occ a i j c'
+      i <= k < j -> c <> c' -> get a k = c ->
+       nb_occ (set a k c') i j c = nb_occ a i j c - 1
+
+  lemma nb_occ_store_neq_neq:
+    forall a:map int color, i j k:int, c c':color.
+      i <= k < j -> c <> c' -> get a k <> c ->
+       nb_occ (set a k c') i j c = nb_occ a i j c
+
 
  let swap(a:ref (map int color)) (i:int) (j:int) : unit =
    { }
@@ -44,7 +72,8 @@ module Flag
    { get !a i = get (old !a) j /\
      get !a j = get (old !a) i /\
      (forall k:int. k <> i /\ k <> j -> get !a k = get (old !a) k) /\
-     (forall i j:int, c:color. nb_occ !a i j c = nb_occ (old !a) i j c)
+     (forall k1 k2:int, c:color. k1 <= i < k2 /\ k1 <= j < k2 ->
+        nb_occ !a k1 k2 c = nb_occ (old !a) k1 k2 c)
    }
 
 
@@ -55,7 +84,7 @@ module Flag
   let r = ref n in
   'Init:
   while !i < !r do
-       invariant { 
+       invariant {
          0 <= !b <= !i <= !r <= n /\
          monochrome !a 0 !b Blue /\
          monochrome !a !b !i White /\
