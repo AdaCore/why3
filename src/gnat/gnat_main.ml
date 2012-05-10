@@ -251,8 +251,7 @@ module Implem =
      let idle x    = Scheduler.idle x
      let notify_timer_state _ _ _= ()
 
-     let unknown_prover _ _ = None
-     let replace_prover _ _ = false
+     let uninstalled_prover _ _ = Whyconf.CPU_keep
   end
 
 module M = Session_scheduler.Make (Implem)
@@ -481,6 +480,7 @@ and actually_schedule_goal g =
    M.prover_on_goal env_session sched_state
      ~callback:interpret_result
      ~timelimit:Gnat_config.timeout
+     ~memlimit:0
      Gnat_config.prover.Whyconf.prover g
 
 let apply_split_goal_if_needed g =
@@ -521,7 +521,7 @@ let _ =
       Display_Progress.set_num_goals (Objectives.get_num_goals ());
       Objectives.iter (fun _ goalset -> schedule_goal (GoalSet.choose goalset));
       Scheduler.main_loop ();
-      Session.save_session env_session.Session.session
+      Session.save_session Gnat_config.config env_session.Session.session
     with e when not (Debug.test_flag Debug.stack_trace) ->
        Format.eprintf "%a.@." Exn_printer.exn_printer e;
        Gnat_util.abort_with_message ""
