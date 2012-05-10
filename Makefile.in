@@ -518,7 +518,6 @@ opt:  bin/gnatwhy3.opt
 bin/gnatwhy3.opt: src/why3.cmxa $(PGMCMX) $(GNATCMX)
 	$(if $(QUIET), @echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
-	$(STRIP) $@
 
 bin/gnatwhy3.byte: src/why3.cma $(PGMCMO) $(GNATCMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
