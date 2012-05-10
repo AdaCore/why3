@@ -109,8 +109,9 @@ let () =
       let add fn =
         let header = Doc_lexer.extract_header fn in
         let header = if header = "" then "" else ": " ^ header in
-        fprintf fmt "<li> <a href=\"%s\">%s</a> %s </li>@\n"
-          (Doc_def.output_file fn) (Filename.basename fn) header
+        let basename = Filename.basename fn in
+        fprintf fmt "<li> <a href=\"%s.html\">%s</a> %s </li>@\n"
+          basename basename header
       in
       Queue.iter add opt_queue;
       fprintf fmt "</ul>@\n";
