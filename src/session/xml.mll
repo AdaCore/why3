@@ -183,7 +183,7 @@ and string_val = parse
   | "&amp;"
       { Buffer.add_char buf '&';
         string_val lexbuf }
-  | [^ '\\' '"'] as c
+  | [^ '"'] as c
       { Buffer.add_char buf c;
         string_val lexbuf }
 (*
