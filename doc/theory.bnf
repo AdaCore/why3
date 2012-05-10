@@ -13,17 +13,6 @@
     | "clone" imp-exp tqualid ("as" uident-opt)? subst? ;
     | "namespace" "import"? uident-opt decl* "end" ;
   \
-  type-decl ::= lident label* ("'" lident label*)* type-defn;
-  \
-  type-defn ::=                                      ; abstract type
-    | "=" type                                       ; alias type
-    | "=" "|"? type-case ("|" type-case)*            ; algebraic type
-    | "=" "{|" record-field (";" record-field)* "|}" ; record type
-  \
-  type-case ::= uident label* type-param*
-  \
-  record-field ::= lident label* ":" type
-  \
   logic-decl ::= function-decl ;
     | predicate-decl
   \
@@ -35,12 +24,6 @@
   \
   predicate-decl ::= lident label* type-param* ;
     | lident label* type-param* "=" formula
-  \
-  type-param ::= "'" lident   ;
-   | lqualid                  ;
-   | "(" lident+ ":" type ")" ;
-   | "(" type ("," type)* ")" ;
-   | "()"
   \
   inductive-decl ::= lident label* type-param* "=" ;
                      "|"? ind-case ("|" ind-case)* ;
@@ -60,5 +43,7 @@
     | "lemma" uqualid 	  		   ;
     | "goal"  uqualid			   ;
   \
-  tqualid ::= uident | ident ("." ident)* "." uident ; %
+  tqualid ::= uident | ident ("." ident)* "." uident ;
+  \ 
+  type-decl ::= lident label* ("'" lident label*)* type-defn; %
 \end{syntax}

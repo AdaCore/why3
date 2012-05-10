@@ -1,0 +1,185 @@
+
+(* The 2nd Verified Software Competition (VSTTE 2012)
+   https://sites.google.com/site/vstte2012/compet
+
+   Problem 2:
+   Combinators S and K *)
+
+module Combinators
+
+  type term = S | K | App term term
+
+  (* specification of the CBV reduction *)
+
+  predicate is_value (t: term) = match t with
+    | K | S -> true
+    | App K v | App S v -> is_value v
+    | App (App S v1) v2 -> is_value v1 /\ is_value v2
+    | _ -> false
+  end
+
+  (* contexts *)
+
+  type context = Hole | Left context term | Right term context
+
+  predicate is_context (c: context) = match c with
+    | Hole -> true
+    | Left c _ -> is_context c
+    | Right v c -> is_value v && is_context c
+  end
+
+  function subst (c: context) (t: term) : term = match c with
+    | Hole -> t
+    | Left c1 t2 -> App (subst c1 t) t2
+    | Right v1 c2 -> App v1 (subst c2 t)
+  end
+
+  (* one step reduction
+     (the notion of context is inlined in the following definition) *)
+
+  inductive (-->) (t1 t2: term) =
+    | red_K:
+       forall c: context. is_context c ->
+       forall v1 v2: term. is_value v1 -> is_value v2 ->
+       subst c (App (App K v1) v2) --> subst c v1
+    | red_S:
+       forall c: context. is_context c ->
+       forall v1 v2 v3: term. is_value v1 -> is_value v2 -> is_value v3 ->
+       subst c (App (App (App S v1) v2) v3) -->
+       subst c (App (App v1 v3) (App v2 v3))
+
+  lemma red_left:
+    forall t1 t2 t: term. t1 --> t2 -> App t1 t --> App t2 t
+
+  lemma red_right:
+    forall v t1 t2: term. is_value v -> t1 --> t2 -> App v t1 --> App v t2
+
+  clone import relations.ReflTransClosure
+    with type t = term, predicate rel = (-->)
+  predicate (-->*) (t1 t2: term) = relTR t1 t2
+
+  lemma red_star_left:
+    forall t1 t2 t: term. t1 -->* t2 -> App t1 t -->* App t2 t
+
+  lemma red_star_right:
+    forall v t1 t2: term. is_value v -> t1 -->* t2 -> App v t1 -->* App v t2
+
+  (* task 1: implement CBV reduction *)
+
+  let rec reduction (t: term) : term =
+    {}
+    match t with
+    | S -> S
+    | K -> K
+    | App t1 t2 -> match reduction t1 with
+      | K -> App K (reduction t2)
+      | S -> App S (reduction t2)
+      | App K v1 -> let _ = reduction t2 in v1
+      | App S v1 -> App (App S v1) (reduction t2)
+      | App (App S v1) v2 ->
+          let v3 = reduction t2 in reduction (App (App v1 v3) (App v2 v3))
+      | _ -> absurd
+      end
+    end
+    { t-->*result /\ is_value result }
+
+  (* an irreducible term is a value *)
+
+  lemma reducible_or_value:
+    forall t: term. (exists t': term. t-->t') \/ is_value t
+
+  predicate irreducible (t: term) = forall t': term. not (t-->t')
+
+  lemma irreducible_is_value:
+    forall t: term. irreducible t <-> is_value t
+
+  (* task 2 *)
+
+  use import int.Int
+
+  inductive only_K (t: term) =
+    | only_K_K:
+        only_K K
+    | only_K_App:
+        forall t1 t2: term. only_K t1 -> only_K t2 -> only_K (App t1 t2)
+
+  lemma only_K_reduces:
+    forall t: term. only_K t ->
+    exists v: term. t -->* v /\ is_value v /\ only_K v
+
+  function size (t: term) : int = match t with
+    | K | S -> 0
+    | App t1 t2 -> 1 + size t1 + size t2
+  end
+
+  lemma size_nonneg: forall t: term. size t >= 0
+
+  let rec reduction2 (t: term) : term variant { size t } =
+    { only_K t }
+    match t with
+    | S -> S
+    | K -> K
+    | App t1 t2 -> match reduction2 t1 with
+      | K -> App K (reduction2 t2)
+      | S -> App S (reduction2 t2)
+      | App K v1 -> let _ = reduction2 t2 in v1
+      | App S v1 -> App (App S v1) (reduction2 t2)
+      | App (App S v1) v2 ->
+          let v3 = reduction2 t2 in reduction2 (App (App v1 v3) (App v2 v3))
+      | _ -> absurd
+      end
+    end
+    { only_K result /\ is_value result }
+
+  (* task 3 *)
+
+  function ks (n: int) : term
+
+  axiom ksO: ks 0 = K
+  axiom ksS: forall n: int. n >= 0 -> ks (n+1) = App (ks n) K
+
+  lemma ks1: ks 1 = App K K
+
+  lemma only_K_ks: forall n: int. n >= 0 -> only_K (ks n)
+
+  lemma ks_inversion: forall n: int. n >= 0 ->
+    n = 0 \/ n > 0 /\ ks n = App (ks (n-1)) K
+
+  lemma ks_injective:
+    forall n1 n2: int. n1 >= 0 -> n2 >= 0 -> ks n1 = ks n2 -> n1 = n2
+
+  use import int.Div2
+
+  let rec reduction3 (t: term) : term =
+    { exists n: int. n >= 0 /\ t = ks n }
+    match t with
+    | S -> S
+    | K -> K
+    | App t1 t2 -> match reduction3 t1 with
+      | K -> App K (reduction3 t2)
+      | S -> App S (reduction3 t2)
+      | App K v1 -> let _ = reduction3 t2 in v1
+      | App S v1 -> App (App S v1) (reduction3 t2)
+      | App (App S v1) v2 ->
+          let v3 = reduction3 t2 in reduction3 (App (App v1 v3) (App v2 v3))
+      | _ -> absurd
+      end
+    end
+    { is_value result /\
+      forall n: int. n >= 0 -> (t = ks (2*n)   -> result = K)
+                            /\ (t = ks (2*n+1) -> result = App K K) }
+
+   lemma ks_value:
+     forall n: int. 0 <= n -> is_value (ks n) -> 0 <= n <= 1
+
+   lemma ks_even_odd:
+    forall n: int. 0 <= n -> ks (2*n)   -->* K
+                          /\ ks (2*n+1) -->* App K K
+
+end
+
+(*
+Local Variables:
+compile-command: "why3ide vstte12_combinators.mlw"
+End:
+*)

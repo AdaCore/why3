@@ -1,0 +1,90 @@
+theory BV_double
+
+  use import int.Int
+  use import real.RealInfix
+  use import real.FromInt
+  use import power2.Pow2real
+  use import bitvector.BV64
+
+  function double_of_bv64 (b:bv) : real
+
+  (* TODO: axioms
+
+    real represented by bv =  sign . exp . mantissa
+
+    sign on bit 63
+
+    exp on bits 62..52
+
+    mantissa on bits 51..0
+
+    si exp = 0 : zero or denormalized, we specify only zero
+
+    si exp = 2047 : infinities or nan, we don't specify anything
+
+    si  1 <= exp <= 2046 : the number represented is
+
+      (-1)^sign * 2^(exp - bias) * (1 + mantissa * 2^(1-prec))
+
+   where bias = 1023, prec = 53
+   (e.g. the largest representable number is 2^(2046-1023) * (1+ (2^52-1)* 2^(-52))  =
+        2^1023 * (1 + 1 - 2^-52) = 2^1024 - 2^(1023-52) = 2^1024 - 2^971
+)
+
+  *)
+
+  function exp (b:bv) : int = BV64.to_nat_sub b 62 52
+  function mantissa (b:bv) : int = BV64.to_nat_sub b 51 0
+  function sign (b:bv) : bool = BV64.nth b 63
+
+  function sign_value(s:bool):real
+
+  axiom sign_value_false:
+  	sign_value(False) = 1.0
+
+  axiom sign_value_true:
+  	sign_value(True) = -.1.0
+
+  axiom zero : forall b:bv.
+     exp(b) = 0 /\ mantissa(b) = 0 -> double_of_bv64(b) = 0.0
+
+  axiom sign_of_double_positive:
+     forall b:bv. sign b = False -> double_of_bv64(b) >=. 0.0
+  axiom sign_of_double_negative:
+     forall b:bv. sign b = True -> double_of_bv64(b) <=. 0.0
+
+  axiom double_of_bv64_value:
+     forall b:bv. 0 < exp(b) < 2047 ->
+       double_of_bv64(b) =
+         sign_value(sign(b)) *.
+         (pow2 ((exp b) - 1023)) *.
+         (1.0 +. (FromInt.from_int (mantissa b)) *. (pow2 (-52)))
+
+end
+
+theory TestDouble
+
+  use import int.Int
+  use import bitvector.BV64
+  use import BV_double
+
+  function one:bv = from_int 4607182418800017408 (* 1.0 *)
+
+  lemma nth_one1: forall i:int. 0 <= i <= 51 -> nth one i = False
+  lemma nth_one2: forall i:int. 52 <= i <= 61 -> nth one i = True
+  lemma nth_one3: forall i:int. 62 <= i <= 63 -> nth one i = False
+
+  lemma sign_one: sign(one) = False
+  lemma exp_one: exp(one) = 1023
+  lemma mantissa_one: mantissa(one) = 0
+
+  lemma double_value_of_1: double_of_bv64(one) = 1.0
+
+end
+
+
+(*
+Local Variables:
+compile-command: "why3ide -L . double.why"
+End:
+*)

@@ -1,5 +1,7 @@
 
-(* Polymorphic mutable stacks *)
+(** {1 Stacks} *)
+
+(** {2 Polymorphic mutable stacks} *)
 
 module Stack
 
@@ -39,7 +41,7 @@ module Stack
   val is_empty:
     s: t 'a -> {} bool reads s { result=True <-> s.elts = Nil }
 
-  (*
+  (***
   val length: s: t 'a -> {} int reads s { result = length s.elts }
   *)
   function length (s: t 'a) : int = L.length s.elts
@@ -70,7 +72,7 @@ module Test
 
 end
 
-(*
+(***
 Local Variables:
 compile-command: "unset LANG; make -C .. modules/stack"
 End:

@@ -1,9 +1,10 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  Copyright (C) 2010-2011                                               *)
+(*  Copyright (C) 2010-2012                                               *)
 (*    François Bobot                                                      *)
 (*    Jean-Christophe Filliâtre                                           *)
 (*    Claude Marché                                                       *)
+(*    Guillaume Melquiond                                                 *)
 (*    Andrei Paskevich                                                    *)
 (*                                                                        *)
 (*  This software is free software; you can redistribute it and/or        *)
@@ -27,6 +28,7 @@ open Term
 open Theory
 open Pretty
 open Mlw_ty
+open Mlw_ty.T
 open Mlw_expr
 open Mlw_decl
 open Mlw_module
@@ -49,7 +51,7 @@ let print_reg fmt reg =
     (id_unique rprinter reg.reg_name)
 
 let print_pv fmt pv =
-  fprintf fmt "%s%a" (if pv.pv_ghost then "?" else "")
+  fprintf fmt "%s%a" (if pv.pv_vtv.vtv_ghost then "?" else "")
     print_vs pv.pv_vs
 
 let forget_pv pv = forget_var pv.pv_vs
@@ -86,8 +88,10 @@ let print_reg_opt fmt = function
   | Some r -> fprintf fmt "<%a>" print_regty r
   | None -> ()
 
+(*
 let print_pvty fmt pv = fprintf fmt "%a%a:@,%a"
   print_pv pv print_reg_opt pv.pv_mutable print_ity pv.pv_ity
+*)
 
 (* Labels and locs - copied from Pretty *)
 
@@ -106,31 +110,25 @@ let print_tv_arg fmt tv = fprintf fmt "@ %a" print_tv tv
 let print_ty_arg fmt ty = fprintf fmt "@ %a" (print_ity_node true) ty
 
 let print_constr fmt (cs,pjl) =
-  let rec cs_args vty pjl = match vty, pjl with
-    | VTvalue _, [] -> []
-    | VTarrow a, pj::pjl ->
-        let pv, vty = open_vty_arrow a in
-        (pv,pj) :: cs_args vty pjl
-    | _, _ -> assert false
-  in
-  let pjl = cs_args cs.ps.p_vty pjl in
-  let print_pj fmt (pv,pj) = match pj with
-    | Some { ls = ls } ->
+  let print_pj fmt (vtv,pj) = match pj with
+    | Some { pl_ls = ls } ->
         fprintf fmt "@ (%s%s%a%a:@,%a)"
-          (if pv.pv_ghost then "ghost " else "")
-          (if pv.pv_mutable <> None then "mutable " else "")
-          print_ls ls print_reg_opt pv.pv_mutable print_ity pv.pv_ity
-    | None when pv.pv_ghost || pv.pv_mutable <> None ->
-        fprintf fmt "@ (%s%a@ %a)"
-          (if pv.pv_ghost then "ghost" else "")
-          print_reg_opt pv.pv_mutable
-          print_ity pv.pv_ity
+          (if vtv.vtv_ghost then "ghost " else "")
+          (if vtv.vtv_mut <> None then "mutable " else "")
+          print_ls ls print_reg_opt vtv.vtv_mut print_ity vtv.vtv_ity
+    | None when vtv.vtv_ghost || vtv.vtv_mut <> None ->
+        fprintf fmt "@ (%s%s%a@ %a)"
+          (if vtv.vtv_ghost then "ghost" else "")
+          (if vtv.vtv_mut <> None then "mutable " else "")
+          print_reg_opt vtv.vtv_mut
+          print_ity vtv.vtv_ity
     | None ->
-        print_ty_arg fmt pv.pv_ity
+        print_ty_arg fmt vtv.vtv_ity
   in
-  fprintf fmt "@[<hov 4>| %a%a%a@]" print_cs cs.ls
-    print_ident_labels cs.ls.ls_name
-    (print_list nothing print_pj) pjl
+  fprintf fmt "@[<hov 4>| %a%a%a@]" print_cs cs.pl_ls
+    print_ident_labels cs.pl_ls.ls_name
+    (print_list nothing print_pj)
+    (List.map2 (fun vtv pj -> (vtv,pj)) cs.pl_args pjl)
 
 let print_head fst fmt ts =
   fprintf fmt "%s %s%s%a%a <%a>%a"

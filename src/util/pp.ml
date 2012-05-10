@@ -1,9 +1,10 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  Copyright (C) 2010-2011                                               *)
+(*  Copyright (C) 2010-2012                                               *)
 (*    François Bobot                                                      *)
 (*    Jean-Christophe Filliâtre                                           *)
 (*    Claude Marché                                                       *)
+(*    Guillaume Melquiond                                                 *)
 (*    Andrei Paskevich                                                    *)
 (*                                                                        *)
 (*  This software is free software; you can redistribute it and/or        *)
@@ -85,6 +86,7 @@ let underscore fmt () = fprintf fmt "_"
 let semi fmt () = fprintf fmt ";@ "
 let space fmt () = fprintf fmt "@ "
 let alt fmt () = fprintf fmt "|@ "
+let alt2 fmt () = fprintf fmt "@ | "
 let equal fmt () = fprintf fmt "@ =@ "
 let newline fmt () = fprintf fmt "@\n"
 let newline2 fmt () = fprintf fmt "@\n@\n"

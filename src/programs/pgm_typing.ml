@@ -1,9 +1,10 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  Copyright (C) 2010-2011                                               *)
+(*  Copyright (C) 2010-2012                                               *)
 (*    François Bobot                                                      *)
 (*    Jean-Christophe Filliâtre                                           *)
 (*    Claude Marché                                                       *)
+(*    Guillaume Melquiond                                                 *)
 (*    Andrei Paskevich                                                    *)
 (*                                                                        *)
 (*  This software is free software; you can redistribute it and/or        *)
@@ -2194,9 +2195,11 @@ let add_types uc dl =
         | Ty.Tyapp (ts, tyl) ->
             let y = ts.ts_name.id_string in
             let n =
+(**
               if Mstr.mem y def then begin
                 visit y; of_option (Hashtbl.find nregions y)
               end else
+**)
                 (get_mtsymbol ts).mt_regions
             in
             let rl = regions_tyapp ts n tyl in

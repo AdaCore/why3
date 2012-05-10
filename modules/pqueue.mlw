@@ -1,14 +1,18 @@
 
-(* Polymorphic mutable priority queues. *)
+(** {1 Priority queues} *)
+
+(** {2 Polymorphic mutable priority queues} *)
 
 module Pqueue
 
+  (** {3 Types} *)
+
   type elt
 
-  (* [elt] is equipped with a total order [rel] *)
+  (** [elt] is equipped with a total order [rel] *)
   clone export relations.TotalOrder with type t = elt
 
-  (* the priority queue is modeled as a list of elements *)
+  (** the priority queue is modeled as a list of elements *)
   use import list.List
   use import list.Mem
   use import list.Permut
@@ -16,26 +20,26 @@ module Pqueue
 
   type t model {| mutable elts: list elt |}
 
-  (* Operations. *)
+  (** {3 Operations} *)
 
-  (* creates a fresh, empty queue *)
+  (** creates a fresh, empty queue *)
   val create: unit -> {} t { result.elts = Nil }
 
-  (* pushes an element in a queue *)
+  (** pushes an element in a queue *)
   val push:
     x: elt -> q: t ->
     { }
     unit writes q
     { q.elts = Cons x (old q.elts) }
 
-  (* exception raised by pop and peek to signal an empty queue *)
+  (** exception raised by [pop] and [peek] to signal an empty queue *)
   exception Empty
 
-  (* pop and peek return the minimal element, defined as follows *)
+  (** [pop] and [peek] return the minimal element, defined as follows *)
   predicate minimal_elt (x: elt) (s: list elt) =
      mem x s /\ forall e: elt. mem e s -> rel x e
 
-  (* removes and returns the minimal element *)
+  (** removes and returns the minimal element *)
   val pop:
     q: t ->
     {}
@@ -45,7 +49,7 @@ module Pqueue
       minimal_elt result (old q.elts) }
     | Empty -> { q.elts = (old q.elts) = Nil }
 
-  (* returns the minimal element, without modifying the queue *)
+  (** returns the minimal element, without modifying the queue *)
   val peek:
     q: t ->
     {}
@@ -53,17 +57,17 @@ module Pqueue
     reads q raises Empty
     { minimal_elt result q.elts } | Empty -> { q.elts = Nil }
 
-  (* empties the queue *)
+  (** empties the queue *)
   val clear: q: t -> {} unit writes q {q.elts = Nil }
 
-  (* returns a fresh copy of the queue *)
+  (** returns a fresh copy of the queue *)
   val copy: q: t -> {} t reads q { result = q }
 
-  (* checks whether the queue is empty *)
+  (** checks whether the queue is empty *)
   val is_empty:
     q: t -> {} bool reads q { result=True <-> q.elts = Nil }
 
-  (* returns the number of elements in the queue *)
+  (** returns the number of elements in the queue *)
   val length: q: t -> {} int reads q { result = length q.elts }
 
 end
@@ -95,43 +99,47 @@ module Test
 
 end
 
-(* Simpler interface when duplicate elements are not allowed *)
+(** {2 Simpler interface}
+
+when duplicate elements are not allowed 
+
+*)
 
 module PqueueNoDup
 
-  (* Types. *)
+  (** {3 Types} *)
 
-  (* the abstract type of elements *)
+  (** the abstract type of elements *)
   type elt
 
-  (* [elt] is equipped with a total order [rel] *)
+  (** [elt] is equipped with a total order [rel] *)
   clone export relations.TotalOrder with type t = elt
 
-  (* the priority queue is modeled as a finite set of elements *)
+  (** the priority queue is modeled as a finite set of elements *)
   use import set.Fset
 
   type t model {| mutable elts: set elt |}
 
-  (* Operations. *)
+  (** {3 Operations} *)
 
-  (* creates a fresh, empty queue *)
+  (** creates a fresh, empty queue *)
   val create: unit -> {} t { result.elts = empty }
 
-  (* pushes an element in a queue *)
+  (** pushes an element in a queue *)
   val push:
     x: elt -> q: t ->
     { }
     unit writes q
     { q.elts = add x (old q.elts) }
 
-  (* exception raised by pop and peek to signal an empty queue *)
+  (** exception raised by [pop] and [peek] to signal an empty queue *)
   exception Empty
 
-  (* pop and peek return the minimal element, defined as follows *)
+  (** [pop] and [peek] return the minimal element, defined as follows *)
   predicate minimal_elt (x: elt) (s: set elt) =
      mem x s /\ forall e: elt. mem e s -> rel x e
 
-  (* removes and returns the minimal element *)
+  (** removes and returns the minimal element *)
   val pop:
     q: t ->
     {}
@@ -140,7 +148,7 @@ module PqueueNoDup
     { q.elts = remove result (old q.elts) /\ minimal_elt result (old q.elts) }
     | Empty -> { q.elts = (old q.elts) = empty }
 
-  (* returns the minimal element, without modifying the queue *)
+  (** returns the minimal element, without modifying the queue *)
   val peek:
     q: t ->
     {}
@@ -148,17 +156,17 @@ module PqueueNoDup
     reads q raises Empty
     { minimal_elt result q.elts } | Empty -> { q.elts = empty }
 
-  (* empties the queue *)
+  (** empties the queue *)
   val clear: q: t -> {} unit writes q {q.elts = empty }
 
-  (* returns a fresh copy of the queue *)
+  (** returns a fresh copy of the queue *)
   val copy: q: t -> {} t reads q { result = q }
 
-  (* checks whether the queue is empty *)
+  (** checks whether the queue is empty *)
   val is_empty:
     q: t -> {} bool reads q { result=True <-> q.elts = empty }
 
-  (* returns the number of elements in the queue *)
+  (** returns the number of elements in the queue *)
   val length: q: t -> {} int reads q { result = cardinal q.elts }
 
 end
@@ -190,7 +198,7 @@ module TestNoDup
 
 end
 
-(*
+(***
 Local Variables:
 compile-command: "unset LANG; make -C .. modules/pqueue"
 End:

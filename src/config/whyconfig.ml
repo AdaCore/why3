@@ -1,9 +1,10 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  Copyright (C) 2010-2011                                               *)
+(*  Copyright (C) 2010-2012                                               *)
 (*    François Bobot                                                      *)
 (*    Jean-Christophe Filliâtre                                           *)
 (*    Claude Marché                                                       *)
+(*    Guillaume Melquiond                                                 *)
 (*    Andrei Paskevich                                                    *)
 (*                                                                        *)
 (*  This software is free software; you can redistribute it and/or        *)
@@ -47,18 +48,6 @@ let set_oref r = (fun s -> r := Some s)
 
 let prover_bins = Queue.create ()
 
-let add_prover arg =
-  let res =
-    try
-      let index = String.index arg ':' in
-      (String.sub arg 0 index),
-      (String.sub arg (index+1) (String.length arg - (index + 1)))
-    with Not_found ->
-      eprintf "Error: provide a path to the prover binary.@.";
-      exit 1
-  in
-  Queue.add res prover_bins
-
 let plugins = Queue.create ()
 let add_plugin x = Queue.add x plugins
 
@@ -77,8 +66,11 @@ let option_list = Arg.align [
   " Search for plugins in the default library directory";
   "--detect", Arg.Unit (fun () -> autoprovers := true; autoplugins := true),
   " Search for both provers and plugins";
-  "--add-prover", Arg.String add_prover,
-  "<id>:<file> Add a new prover executable";
+  "--add-prover", Arg.Tuple
+    (let id = ref "" in
+     [Arg.Set_string id;
+      Arg.String (fun name -> Queue.add (!id, name) prover_bins)]),
+  "<id> <file> Add a new prover executable";
   "--list-prover-ids", Arg.Set opt_list_prover_ids,
   " List known prover families";
   "--install-plugin", Arg.String add_plugin,

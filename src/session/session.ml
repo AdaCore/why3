@@ -1,9 +1,10 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  Copyright (C) 2010-2011                                               *)
+(*  Copyright (C) 2010-2012                                               *)
 (*    François Bobot                                                      *)
 (*    Jean-Christophe Filliâtre                                           *)
 (*    Claude Marché                                                       *)
+(*    Guillaume Melquiond                                                 *)
 (*    Andrei Paskevich                                                    *)
 (*                                                                        *)
 (*  This software is free software; you can redistribute it and/or        *)
@@ -62,10 +63,11 @@ type 'a goal =
 
 and 'a proof_attempt =
     { proof_key : 'a;
-      proof_prover : Whyconf.prover;
+      mutable proof_prover : Whyconf.prover;
       proof_parent : 'a goal;
       mutable proof_state : proof_attempt_status;
       mutable proof_timelimit : int;
+      mutable proof_memlimit : int;
       mutable proof_obsolete : bool;
       mutable proof_archived : bool;
       mutable proof_edited_as : string option;
@@ -118,10 +120,11 @@ type loaded_provers = loaded_prover option PHprover.t
 
 type 'a env_session =
     { env : Env.env;
-      whyconf : Whyconf.config;
+      mutable whyconf : Whyconf.config;
       loaded_provers : loaded_provers;
       session : 'a session}
 
+let update_env_session_config e c = e.whyconf <- c
 
 (*************************)
 (**       Iterators      *)
@@ -329,7 +332,7 @@ let save_status fmt s =
         fprintf fmt "<undone/>@\n"
     | InternalFailure msg ->
         fprintf fmt "<internalfailure reason=\"%s\"/>@\n"
-          (Printexc.to_string msg)
+          (String.escaped (Printexc.to_string msg))
     | Done r -> save_result fmt r
 
 
@@ -339,9 +342,10 @@ let opt lab fmt = function
 
 let save_proof_attempt provers fmt _key a =
   fprintf fmt
-    "@\n@[<v 1><proof@ prover=\"%i\"@ timelimit=\"%d\"@ %a\
-obsolete=\"%b\"@ archived=\"%b\">"
+    "@\n@[<v 1><proof@ prover=\"%i\"@ timelimit=\"%d\"@ \
+memlimit=\"%d\"@ %aobsolete=\"%b\"@ archived=\"%b\">"
     (Mprover.find a.proof_prover provers) a.proof_timelimit
+    a.proof_memlimit
     (opt "edited") a.proof_edited_as a.proof_obsolete
     a.proof_archived;
   save_status fmt a.proof_state;
@@ -358,17 +362,28 @@ let save_ident fmt id =
         file lnum cnumb cnume
 
 let save_label fmt s =
-  fprintf fmt "@\n@[<v 1><label@ name=\"%s\">@,</label>@]" s.Ident.lab_string
+  fprintf fmt "@\n@[<v 1><label@ name=\"%s\"/>@]" s.Ident.lab_string
+
+let save_string fmt s =
+  for i=0 to String.length s - 1 do
+    match String.get s i with
+      | '\"' -> pp_print_string fmt "&quot;"
+      | '\'' -> pp_print_string fmt "&apos;"
+      | '<' -> pp_print_string fmt "&lt;"
+      | '>' -> pp_print_string fmt "&gt;"
+      | '&' -> pp_print_string fmt "&amp;"
+      | c -> pp_print_char fmt c
+  done
 
 let rec save_goal provers fmt g =
   assert (g.goal_shape <> "");
   fprintf fmt
     "@\n@[<v 1><goal@ %a@ %asum=\"%s\"@ proved=\"%b\"@ \
-expanded=\"%b\"@ shape=\"%s\">"
+expanded=\"%b\"@ shape=\"%a\">"
     save_ident g.goal_name
     (opt "expl") g.goal_expl
     g.goal_checksum g.goal_verified  g.goal_expanded
-    g.goal_shape;
+    save_string g.goal_shape;
   Ident.Slab.iter (save_label fmt) g.goal_name.Ident.id_label;
   PHprover.iter (save_proof_attempt provers fmt) g.goal_external_proofs;
   PHstr.iter (save_trans provers fmt) g.goal_transformations;
@@ -403,11 +418,12 @@ name=\"%s\"@ version=\"%s\"%a/>@]"
     p.C.prover_altern;
   Mprover.add p id provers, id+1
 
-let save fname session =
+let save fname config session =
   let ch = open_out fname in
   let fmt = formatter_of_out_channel ch in
   fprintf fmt "<?xml version=\"1.0\" encoding=\"UTF-8\"?>@\n";
-  fprintf fmt "<!DOCTYPE why3session SYSTEM \"why3session.dtd\">@\n";
+  fprintf fmt "<!DOCTYPE why3session SYSTEM \"%s\">@\n"
+    (Filename.concat (Whyconf.datadir (Whyconf.get_main config)) "why3session.dtd");
   fprintf fmt "@[<v 1><why3session@ name=\"%s\">" fname;
   let provers,_ = Sprover.fold (save_prover fmt) (get_used_provers session)
     (Mprover.empty,0) in
@@ -416,10 +432,10 @@ let save fname session =
   fprintf fmt "@.";
   close_out ch
 
-let save_session session =
+let save_session config session =
   let f = Filename.concat session.session_dir db_filename in
   Sysutil.backup_file f;
-  save f session
+  save f config session
 
 (*******************************)
 (*          explanations       *)
@@ -532,7 +548,7 @@ type 'a keygen = ?parent:'a -> unit -> 'a
 let add_external_proof
     ?(notify=notify)
     ~(keygen:'a keygen) ~obsolete
-    ~archived ~timelimit ~edit (g:'a goal) p result =
+    ~archived ~timelimit ~memlimit ~edit (g:'a goal) p result =
   assert (edit <> Some "");
   let key = keygen ~parent:g.goal_key () in
   let a = { proof_prover = p;
@@ -542,6 +558,7 @@ let add_external_proof
             proof_archived = archived;
             proof_state = result;
             proof_timelimit = timelimit;
+            proof_memlimit = memlimit;
             proof_edited_as = edit;
           }
   in
@@ -562,9 +579,17 @@ let set_proof_state ?(notify=notify) ~obsolete ~archived res a =
   notify (Proof_attempt a);
   check_goal_proved notify a.proof_parent
 
+let change_prover a p =
+  let g = a.proof_parent in
+  PHprover.remove g.goal_external_proofs a.proof_prover;
+  PHprover.add g.goal_external_proofs p a;
+  a.proof_prover <- p;
+  a.proof_obsolete <- true
+
 let set_edited_as edited_as a = a.proof_edited_as <- edited_as
 
 let set_timelimit timelimit a = a.proof_timelimit <- timelimit
+let set_memlimit memlimit a = a.proof_memlimit <- memlimit
 
 let set_obsolete ?(notify=notify) a =
   a.proof_obsolete <- true;
@@ -728,6 +753,7 @@ let load_result r =
           Call_provers.pr_answer = answer;
           Call_provers.pr_time = time;
           Call_provers.pr_output = "";
+          Call_provers.pr_status = Unix.WEXITED 0
         }
     | "undone" -> Undone Interrupted
     | "unedited" -> Undone Unedited
@@ -803,16 +829,19 @@ and load_proof_or_transf ~old_provers mg a =
         let edit = match edit with None | Some "" -> None | _ -> edit in
         let obsolete = bool_attribute "obsolete" a true in
         let archived = bool_attribute "archived" a false in
-        let timelimit = int_attribute "timelimit" a (-1) in
+        let timelimit = int_attribute "timelimit" a 2 in
+        let memlimit = int_attribute "memlimit" a 0 in
+(*
         if timelimit < 0 then begin
-            eprintf "[Error] incorrector unspecified  timelimit '%i'@."
+            eprintf "[Error] incorrect or unspecified  timelimit '%i'@."
               timelimit;
             raise (LoadError (a,sprintf "incorrect or unspecified timelimit %i"
               timelimit))
         end;
+*)
         let (_ : 'a proof_attempt) =
           add_external_proof ~keygen ~archived ~obsolete
-            ~timelimit ~edit mg p res
+            ~timelimit ~memlimit ~edit mg p res
         in
         ()
     | "transf" ->
@@ -1117,6 +1146,8 @@ let load_prover eS prover =
     PHprover.add eS.loaded_provers prover r;
     r
 
+let unload_provers eS = PHprover.clear eS.loaded_provers
+
 let () = Exn_printer.register
   (fun fmt exn ->
     match exn with
@@ -1143,7 +1174,7 @@ let ft_of_pa a =
     But since it will be perhaps removed...
  *)
 let copy_external_proof
-    ?notify ~keygen ?obsolete ?archived ?timelimit ?edit
+    ?notify ~keygen ?obsolete ?archived ?timelimit ?memlimit ?edit
     ?goal ?prover ?attempt_status ?env_session ?session a =
   let session = match env_session with
     | Some eS -> Some eS.session
@@ -1151,6 +1182,7 @@ let copy_external_proof
   let obsolete = def_option a.proof_obsolete obsolete in
   let archived = def_option a.proof_archived archived in
   let timelimit = def_option a.proof_timelimit timelimit in
+  let memlimit = def_option a.proof_memlimit memlimit in
   let pas = def_option a.proof_state attempt_status in
   let ngoal = def_option a.proof_parent goal in
   let nprover = match prover with
@@ -1197,7 +1229,7 @@ let copy_external_proof
             Some (dst_file)
   in
   add_external_proof ?notify ~keygen
-    ~obsolete ~archived ~timelimit ~edit ngoal nprover pas
+    ~obsolete ~archived ~timelimit ~memlimit ~edit ngoal nprover pas
 
 exception UnloadableProver of Whyconf.prover
 
@@ -1250,10 +1282,10 @@ let print_attempt_status fmt = function
   | InternalFailure _ -> pp_print_string fmt "Failure"
 
 let print_external_proof fmt p =
-  fprintf fmt "%a - %a (%i)%s%s%s"
+  fprintf fmt "%a - %a (%i, %i)%s%s%s"
     Whyconf.print_prover p.proof_prover
     print_attempt_status p.proof_state
-    p.proof_timelimit
+    p.proof_timelimit p.proof_memlimit
     (if p.proof_obsolete then " obsolete" else "")
     (if p.proof_archived then " archived" else "")
     (if p.proof_edited_as <> None then " edited" else "")
@@ -1583,6 +1615,7 @@ let merge_proof ~keygen obsolete to_goal _ from_proof =
        ~obsolete:(obsolete || from_proof.proof_obsolete)
        ~archived:from_proof.proof_archived
        ~timelimit:from_proof.proof_timelimit
+       ~memlimit:from_proof.proof_memlimit
        ~edit:from_proof.proof_edited_as
        to_goal
        from_proof.proof_prover

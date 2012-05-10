@@ -145,12 +145,18 @@ $A~\texttt{and}~B$ into subgoals $A$ and $B$, whereas it transforms
 $A~\verb|&&|~B$ into subgoals $A$ and $A\rightarrow B$.
 
 \paragraph{Theories.}
-The syntax for theories is given Figure~\ref{fig:bnf:theory}.
+The syntax for theories is given on Figure~\ref{fig:bnf:theorya} and~\ref{fig:bnf:theoryb}.
 
 \begin{figure}
   \begin{center}\framebox{\input{./theory_bnf.tex}}\end{center}
-  \caption{Syntax for theories.}
-\label{fig:bnf:theory}
+  \caption{Syntax for theories (part 1).}
+\label{fig:bnf:theorya}
+\end{figure}
+
+\begin{figure}
+  \begin{center}\framebox{\input{./theory2_bnf.tex}}\end{center}
+  \caption{Syntax for theories (part 2).}
+\label{fig:bnf:theoryb}
 \end{figure}
 
 \paragraph{Files.}
@@ -163,7 +169,7 @@ A \why input file is a (possibly empty) list of theories.
 \section{Why3ML Language}\label{sec:syntax:whyml}
 
 \paragraph{Types.}
-The syntax for program types is given in figure~\ref{fig:bnf:typev}.
+The syntax for program types is given in Figure~\ref{fig:bnf:typev}.
 \begin{figure}
   \begin{center}\framebox{\input{./typev_bnf.tex}}\end{center}
   \caption{Syntax for program types.}
@@ -171,15 +177,21 @@ The syntax for program types is given in figure~\ref{fig:bnf:typev}.
 \end{figure}
 
 \paragraph{Expressions.}
-The syntax for program expressions is given in figure~\ref{fig:bnf:expr}.
+The syntax for program expressions is given in Figure~\ref{fig:bnf:expra} and~Figure~\ref{fig:bnf:exprb}.
 \begin{figure}
   \begin{center}\framebox{\input{./expr_bnf.tex}}\end{center}
-  \caption{Syntax for program expressions.}
-\label{fig:bnf:expr}
+  \caption{Syntax for program expressions (part1).}
+\label{fig:bnf:expra}
+\end{figure}
+
+\begin{figure}
+  \begin{center}\framebox{\input{./expr2_bnf.tex}}\end{center}
+  \caption{Syntax for program expressions (part2).}
+\label{fig:bnf:exprb}
 \end{figure}
 
 \paragraph{Modules.}
-The syntax for modules is given in figure~\ref{fig:bnf:module}.
+The syntax for modules is given in Figure~\ref{fig:bnf:module}.
 \begin{figure}
   \begin{center}\framebox{\input{./module_bnf.tex}}\end{center}
   \caption{Syntax for modules.}

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "why3session.dtd">
+<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
 <why3session
  name="check-builtin/int/why3session.xml">
  <prover
@@ -12,12 +12,20 @@
   version="2.2"/>
  <prover
   id="2"
+  name="Simplify"
+  version="1.5.4"/>
+ <prover
+  id="3"
   name="Spass"
   version="3.7"/>
  <prover
-  id="3"
+  id="4"
   name="Z3"
   version="2.19"/>
+ <prover
+  id="5"
+  name="Z3"
+  version="3.2"/>
  <file
   name="../int.why"
   verified="true"
@@ -37,22 +45,25 @@
     expanded="true"
     shape="ainfix =ainfix *c5c10c50">
     <proof
-     prover="3"
+     prover="4"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="2"
+     prover="3"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="10.11"/>
+     <result status="timeout" time="10.78"/>
     </proof>
     <proof
      prover="1"
-     timelimit="10"
+     timelimit="3"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
@@ -60,6 +71,23 @@
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="3"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
@@ -74,22 +102,25 @@
     expanded="true"
     shape="ainfix =ainfix +ainfix -ainfix +V0V0V0V0ainfix *c2V0F">
     <proof
-     prover="3"
+     prover="4"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="2"
+     prover="3"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="10.52"/>
+     <result status="timeout" time="10.23"/>
     </proof>
     <proof
      prover="1"
-     timelimit="10"
+     timelimit="3"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
@@ -97,6 +128,23 @@
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="3"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
@@ -109,24 +157,27 @@
     sum="1b02d100b4d433ff30662e69e3b9a17b"
     proved="true"
     expanded="true"
-    shape="ainfix <=ainfix +V0V2ainfix +V1V2Iainfix <=V0V1F">
+    shape="ainfix &lt;=ainfix +V0V2ainfix +V1V2Iainfix &lt;=V0V1F">
     <proof
-     prover="3"
+     prover="4"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="2"
+     prover="3"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.01"/>
     </proof>
     <proof
      prover="1"
-     timelimit="10"
+     timelimit="3"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
@@ -134,6 +185,23 @@
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="3"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
@@ -146,24 +214,27 @@
     sum="7a34aecb05d3edc2b9ec4c9d5d672ce1"
     proved="true"
     expanded="true"
-    shape="ainfix <=ainfix *V0V2ainfix *V1V2Iainfix <=c0V2Iainfix <=V0V1F">
+    shape="ainfix &lt;=ainfix *V0V2ainfix *V1V2Iainfix &lt;=c0V2Iainfix &lt;=V0V1F">
     <proof
-     prover="3"
+     prover="4"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="2"
+     prover="3"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.01"/>
     </proof>
     <proof
      prover="1"
-     timelimit="10"
+     timelimit="3"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
@@ -171,6 +242,23 @@
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="3"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
@@ -185,22 +273,25 @@
     expanded="true"
     shape="ainfix =aprefix -ainfix *V0V1ainfix *V0aprefix -V1Aainfix =ainfix *aprefix -V0V1aprefix -ainfix *V0V1F">
     <proof
-     prover="3"
+     prover="4"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="2"
+     prover="3"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="10.22"/>
+     <result status="timeout" time="10.32"/>
     </proof>
     <proof
      prover="1"
-     timelimit="10"
+     timelimit="3"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
@@ -208,9 +299,26 @@
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.00"/>
     </proof>
    </goal>
    <goal
@@ -222,22 +330,25 @@
     expanded="true"
     shape="ainfix =ainfix *V0V0ainfix *aprefix -V0aprefix -V0F">
     <proof
-     prover="3"
+     prover="4"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="2"
+     prover="3"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="10.98"/>
+     <result status="timeout" time="10.29"/>
     </proof>
     <proof
      prover="1"
-     timelimit="10"
+     timelimit="3"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
@@ -245,9 +356,26 @@
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.00"/>
     </proof>
    </goal>
    <goal
@@ -259,22 +387,25 @@
     expanded="true"
     shape="ainfix =c0ainfix *c0V0Aainfix =ainfix *V0c0c0F">
     <proof
-     prover="3"
+     prover="4"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="2"
+     prover="3"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="10.03"/>
+     <result status="timeout" time="10.35"/>
     </proof>
     <proof
      prover="1"
-     timelimit="10"
+     timelimit="3"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
@@ -282,6 +413,23 @@
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="3"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
@@ -294,24 +442,27 @@
     sum="3a1830da7c435b4a368232b4378a9bb9"
     proved="true"
     expanded="true"
-    shape="ainfix <=c0ainfix *V0V0Iainfix <=V0c0F">
+    shape="ainfix &lt;=c0ainfix *V0V0Iainfix &lt;=V0c0F">
     <proof
-     prover="3"
+     prover="4"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="2"
+     prover="3"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="10.24"/>
+     <result status="timeout" time="10.00"/>
     </proof>
     <proof
      prover="1"
-     timelimit="10"
+     timelimit="3"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
@@ -319,9 +470,26 @@
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.00"/>
     </proof>
    </goal>
    <goal
@@ -331,24 +499,27 @@
     sum="22a3331ee0912a82bdc49173fb9adbdf"
     proved="true"
     expanded="true"
-    shape="ainfix <=c0ainfix *V0V0F">
+    shape="ainfix &lt;=c0ainfix *V0V0F">
     <proof
-     prover="3"
+     prover="4"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="2"
+     prover="3"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="10.07"/>
+     <result status="timeout" time="10.02"/>
     </proof>
     <proof
      prover="1"
-     timelimit="10"
+     timelimit="3"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
@@ -356,9 +527,26 @@
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.00"/>
     </proof>
    </goal>
    <goal
@@ -368,24 +556,27 @@
     sum="6604e319a9bbef2cd14445ca8d994b6f"
     proved="true"
     expanded="true"
-    shape="ainfix <=c0c1">
+    shape="ainfix &lt;=c0c1">
+    <proof
+     prover="4"
+     timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
     <proof
      prover="3"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="10"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
+     <result status="valid" time="0.01"/>
     </proof>
     <proof
      prover="1"
-     timelimit="10"
+     timelimit="3"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
@@ -393,6 +584,23 @@
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="3"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
@@ -414,22 +622,25 @@
     expanded="true"
     shape="ainfix =aminc1aminc3c2c1">
     <proof
-     prover="3"
+     prover="4"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.00"/>
+     <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="2"
+     prover="3"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="10.12"/>
+     <result status="timeout" time="10.05"/>
     </proof>
     <proof
      prover="1"
-     timelimit="10"
+     timelimit="3"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
@@ -437,6 +648,23 @@
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="3"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>

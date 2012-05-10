@@ -1,9 +1,10 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  Copyright (C) 2010-2011                                               *)
+(*  Copyright (C) 2010-2012                                               *)
 (*    François Bobot                                                      *)
 (*    Jean-Christophe Filliâtre                                           *)
 (*    Claude Marché                                                       *)
+(*    Guillaume Melquiond                                                 *)
 (*    Andrei Paskevich                                                    *)
 (*                                                                        *)
 (*  This software is free software; you can redistribute it and/or        *)
@@ -33,10 +34,11 @@ open Stdlib
   - 9 coq realizations
   - 10 require %f in editor lines
   - 11 change prover identifiers in provers-detection-data.conf
+  - 12 split editors out of provers
 
 If a configuration doesn't contain the actual magic number we don't use it.*)
 
-let magicnumber = 11
+let magicnumber = 12
 
 exception WrongMagicNumber
 
@@ -60,9 +62,10 @@ type prover =
     }
 
 let print_prover fmt p =
-  Format.fprintf fmt "%s (%s%s%s)"
-    p.prover_name p.prover_version
-    (if p.prover_altern = "" then "" else " ") p.prover_altern
+  Format.fprintf fmt "%s (%s)" p.prover_name p.prover_version
+  (* Format.fprintf fmt "%s (%s%s%s)" *)
+  (*   p.prover_name p.prover_version *)
+  (*   (if p.prover_altern = "" then "" else " ") p.prover_altern *)
 
 module Prover = struct
   type t = prover
@@ -71,29 +74,39 @@ module Prover = struct
     let c = String.compare s1.prover_name s2.prover_name in
     if c <> 0 then c else
     let c = String.compare s1.prover_version s2.prover_version in
-    if c <> 0 then c else
-    let c = String.compare s1.prover_altern s2.prover_altern in
+    (* if c <> 0 then c else *)
+    (* let c = String.compare s1.prover_altern s2.prover_altern in *)
     c
 
   let equal s1 s2 =
     s1 == s2 ||
       (s1.prover_name = s2.prover_name &&
-       s1.prover_version = s2.prover_version &&
-       s1.prover_altern = s2.prover_altern)
+       s1.prover_version = s2.prover_version(*  && *)
+       (* s1.prover_altern = s2.prover_altern *))
 
   let hash s1 =
       2 * Hashtbl.hash s1.prover_name +
-      3 * Hashtbl.hash s1.prover_version +
-      5 * Hashtbl.hash s1.prover_altern
-
-
+      3 * Hashtbl.hash s1.prover_version (* + *)
+      (* 5 * Hashtbl.hash s1.prover_altern *)
 end
 
 module Mprover = Map.Make(Prover)
 module Sprover = Mprover.Set
 module Hprover = Hashtbl.Make(Prover)
 
+module Editor = struct
+  type t = string
+  let compare = Pervasives.compare
+end
+
+module Meditor = Map.Make(Editor)
+
 (* Configuration file *)
+
+type prover_upgrade_policy =
+  | CPU_keep
+  | CPU_upgrade of prover
+  | CPU_duplicate of prover
 
 type config_prover = {
   prover  : prover;
@@ -105,6 +118,12 @@ type config_prover = {
   extra_options : string list;
   extra_drivers : string list;
 }
+
+type config_editor = {
+  editor_command : string;
+  editor_options : string list;
+}
+
 
 type main = {
   libdir   : string;      (* "/usr/local/lib/why/" *)
@@ -174,6 +193,8 @@ type config = {
   config    : Rc.t;
   main      : main;
   provers   : config_prover Mprover.t;
+  editors   : config_editor Meditor.t;
+  provers_upgrade_policy : prover_upgrade_policy Mprover.t;
 }
 
 let default_main =
@@ -181,9 +202,9 @@ let default_main =
     libdir = Relocatable.libdir;
     datadir = Relocatable.datadir;
     loadpath = default_loadpath;
-    timelimit = 10;
-    memlimit = 0;
-    running_provers_max = 2;
+    timelimit = 5;   (* 5 seconds *)
+    memlimit = 1000; (* 1 Mb *)
+    running_provers_max = 2; (* two provers run in parallel *)
     plugins = [];
   }
 
@@ -211,8 +232,7 @@ let set_prover _ prover (ids,family) =
   let section = set_string section "command" prover.command in
   let section = set_string section "driver" prover.driver in
   let section = set_string section "version" prover.prover.prover_version in
-  let section = set_string ~default:""
-    section "alternative" prover.prover.prover_altern in
+  let section = set_string ~default:"" section "alternative" prover.prover.prover_altern in
   let section = set_string section "editor" prover.editor in
   let section = set_bool section "interactive" prover.interactive in
   (Sstr.add prover.id ids,(prover.id,section)::family)
@@ -221,16 +241,55 @@ let set_provers rc provers =
   let _,family = Mprover.fold set_prover provers (Sstr.empty,[]) in
   set_family rc "prover" family
 
+let set_editor id editor (ids, family) =
+  if Sstr.mem id ids then raise NonUniqueId;
+  let section = empty_section in
+  let section = set_string section "command" editor.editor_command in
+  (Sstr.add id ids, (id, section)::family)
+
+let set_editors rc editors =
+  let _,family = Meditor.fold set_editor editors (Sstr.empty,[]) in
+  set_family rc "editor" family
+
+let set_prover_upgrade_policy prover policy (i, family) =
+  let section = empty_section in
+  let section = set_string section "name" prover.prover_name in
+  let section = set_string section "version" prover.prover_version in
+  let section = set_string section "alternative" prover.prover_altern in
+  let section =
+    match policy with
+      | CPU_keep -> 
+        set_string section "policy" "keep"
+      | CPU_upgrade p ->
+        let section = set_string section "target_name" p.prover_name in
+        let section = set_string section "target_version" p.prover_version in
+        let section = set_string section "target_alternative" p.prover_altern in
+        set_string section "policy" "upgrade"
+      | CPU_duplicate p ->
+        let section = set_string section "target_name" p.prover_name in
+        let section = set_string section "target_version" p.prover_version in
+        let section = set_string section "target_alternative" p.prover_altern in
+        set_string section "policy" "duplicate"
+  in
+  (i+1,("policy" ^ string_of_int i, section)::family)
+
+let set_policies rc policy =
+  let _,family =
+    Mprover.fold set_prover_upgrade_policy policy (0,[])
+  in
+  set_family rc "uninstalled_prover" family
+
 let absolute_filename = Sysutil.absolutize_filename
 
 let load_prover dirname provers (id,section) =
+  let name = get_string section "name" in
   let version = get_string ~default:"" section "version" in
   let altern = get_string ~default:"" section "alternative" in
-  let name = get_string section "name" in
   let prover =
     { prover_name = name;
       prover_version = version;
-      prover_altern = altern}
+      prover_altern = altern;
+    }
   in
   Mprover.add prover
     { id = id;
@@ -242,6 +301,42 @@ let load_prover dirname provers (id,section) =
       extra_options = [];
       extra_drivers = [];
     } provers
+
+let load_editor editors (id, section) =
+  Meditor.add id
+    { editor_command = get_string section "command";
+      editor_options = [];
+    } editors
+
+let load_policy provers acc (_,section) =
+  let source =
+    {prover_name = get_string section "name";
+     prover_version = get_string section "version";
+     prover_altern = get_string ~default:"" section "alternative"
+    } in
+  try
+    match get_string section "policy" with
+      | "keep" -> Mprover.add source CPU_keep acc
+      | "upgrade" ->
+        let target =
+          { prover_name = get_string section "target_name";
+            prover_version = get_string section "target_version";
+            prover_altern = get_string ~default:"" section "target_alternative";
+          }
+        in
+        let _target = Mprover.find target provers in
+        Mprover.add source (CPU_upgrade target) acc
+      | "duplicate" -> 
+        let target =
+          { prover_name = get_string section "target_name";
+            prover_version = get_string section "target_version";
+            prover_altern = get_string ~default:"" section "target_alternative";
+          }
+        in
+        let _target = Mprover.find target provers in
+        Mprover.add source (CPU_duplicate target) acc
+      | _ -> raise Not_found
+  with Not_found -> acc
 
 let load_main dirname section =
   if get_int ~default:0 section "magic" <> magicnumber then
@@ -287,10 +382,16 @@ let get_config (filename,rc) =
   in
   let provers = get_family rc "prover" in
   let provers = List.fold_left (load_prover dirname) Mprover.empty provers in
+  let editors = get_family rc "editor" in
+  let editors = List.fold_left load_editor Meditor.empty editors in
+  let policy = get_family rc "uninstalled_prover" in
+  let policy = List.fold_left (load_policy provers) Mprover.empty policy in
   { conf_file = filename;
     config    = rc;
     main      = main;
     provers   = provers;
+    editors   = editors;
+    provers_upgrade_policy = policy;
   }
 
 let default_config conf_file =
@@ -332,7 +433,17 @@ let merge_config config filename =
       with
         Not_found -> load_prover dirname provers (id, section)
     ) config.provers provers in
-  { config with main = main; provers = provers }
+  let editors = get_family rc "editor" in
+  let editors = List.fold_left
+    (fun editors (id, section) ->
+      try
+        let c = Meditor.find id editors in
+        let opt = (get_stringl ~default:[] section "option") @ c.editor_options in
+        Meditor.add id { c with editor_options = opt } editors
+      with
+        Not_found -> load_editor editors (id, section)
+    ) config.editors editors in
+  { config with main = main; provers = provers; editors = editors }
 
 let save_config config =
   let filename = config.conf_file in
@@ -341,6 +452,9 @@ let save_config config =
 
 let get_main config = config.main
 let get_provers config = config.provers
+let get_policies config = config.provers_upgrade_policy
+let get_prover_upgrade_policy config p =
+  Mprover.find p config.provers_upgrade_policy
 
 let set_main config main =
   {config with
@@ -353,6 +467,26 @@ let set_provers config provers =
     config = set_provers config.config provers;
     provers = provers;
   }
+
+let set_editors config editors =
+  { config with
+    config = set_editors config.config editors;
+    editors = editors;
+  }
+
+let set_prover_upgrade_policy config prover target =
+  let m = Mprover.add prover target config.provers_upgrade_policy in
+  {config with
+    config = set_policies config.config m;
+    provers_upgrade_policy = m;
+  }
+
+let set_policies config policies = 
+  { config with
+    config = set_policies config.config policies;
+    provers_upgrade_policy = policies }
+
+
 
 (*******)
 
@@ -383,6 +517,10 @@ let () = Exn_printer.register
       | e -> raise e
   )
 
+let get_editors c = c.editors
+
+let editor_by_id whyconf id =
+  Meditor.find id whyconf.editors
 
 (******)
 

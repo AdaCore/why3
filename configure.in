@@ -1,9 +1,10 @@
 ##########################################################################
 #                                                                        #
-#  Copyright (C) 2010-2011                                               #
+#  Copyright (C) 2010-2012                                               #
 #    François Bobot                                                      #
 #    Jean-Christophe Filliâtre                                           #
 #    Claude Marché                                                       #
+#    Guillaume Melquiond                                                 #
 #    Andrei Paskevich                                                    #
 #                                                                        #
 #  This software is free software; you can redistribute it and/or        #
@@ -104,6 +105,12 @@ AC_ARG_ENABLE(hypothesis-selection,
 AC_ARG_ENABLE(doc,
     [  --enable-doc            build documentation],,
     enable_doc=yes)
+
+# debug symbols
+
+AC_ARG_ENABLE(debug,
+    [  --enable-debug          enable debugging symbols],,
+    enable_debug=no)
 
 # profiling
 
@@ -489,6 +496,7 @@ dnl AC_SUBST(FORPACK)
 AC_SUBST(OCAMLGRAPHLIB)
 dnl AC_SUBST(OCAMLWEB)
 
+AC_SUBST(enable_debug)
 AC_SUBST(enable_profiling)
 
 AC_SUBST(CAMLP5O)
@@ -555,5 +563,6 @@ if test "$enable_coq_support" = "yes" ; then
    fi
 fi
 echo "hypothesis selection    : $enable_hypothesis_selection"
+echo "debugging symbols       : $enable_debug"
 echo "profiling               : $enable_profiling"
 echo "localdir                : $enable_local"

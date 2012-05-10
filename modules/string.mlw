@@ -1,4 +1,8 @@
 
+(** {1 Characters and Strings} *)
+
+(** {2 Characters} *)
+
 module Char
 
   use import int.Int
@@ -25,11 +29,13 @@ module Char
   val uppercase : c:char -> {} char { result = uppercase c }
   val lowercase : c:char -> {} char { result = lowercase c }
 
-  (* TODO
+  (*** TODO
      - compare ?
    *)
 
 end
+
+(** {2 Strings} *)
 
 module String
 
@@ -82,7 +88,7 @@ module String
       forall i:int. 0 <= i < length result ->
         result[i] = Char.lowercase s[i] }
 
-  (* TODO
+  (*** TODO
      - copy
      - sub
      - fill
@@ -94,6 +100,8 @@ module String
   *)
 
 end
+
+(** {2 Buffers} *)
 
 module Buffer
 
@@ -128,7 +136,7 @@ module Buffer
       (forall i: int.
          0 <= i < S.length s -> b.contents[old (length b) + i] = S.get s i) }
 
-  (* TODO
+  (*** TODO
      - add_substring
      - add_buffer
   *)
@@ -161,7 +169,7 @@ module Test
 end
 ***)
 
-(*
+(***
 Local Variables:
 compile-command: "unset LANG; make -C .. modules/string"
 End:

@@ -2,8 +2,12 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import ZArith.
 Require Import Rbase.
-Parameter pow2: Z -> R.
+Require int.Int.
+Require real.Real.
+Require real.RealInfix.
+Require real.FromInt.
 
+Parameter pow2: Z -> R.
 
 Axiom Power_0 : ((pow2 0%Z) = 1%R).
 
@@ -40,7 +44,6 @@ Axiom Power_sum : forall (n:Z) (m:Z),
   ((pow2 (n + m)%Z) = ((pow2 n) * (pow2 m))%R).
 
 Parameter pow21: Z -> Z.
-
 
 Axiom Power_01 : ((pow21 0%Z) = 1%Z).
 
@@ -180,10 +183,9 @@ Axiom pow2_62 : ((pow21 62%Z) = 4611686018427387904%Z).
 
 Axiom pow2_63 : ((pow21 63%Z) = 9223372036854775808%Z).
 
-(* YOU MAY EDIT THE CONTEXT BELOW *)
 Open Scope Z_scope.
-(* DO NOT EDIT BELOW *)
 
+(* Why3 goal *)
 Theorem Pow2_int_real : forall (x:Z), (0%Z <= x)%Z ->
   ((pow2 x) = (IZR (pow21 x))).
 (* YOU MAY EDIT THE PROOF BELOW *)
@@ -217,6 +219,5 @@ rewrite mult_IZR.
 rewrite Hind;auto with zarith.
 exact H.
 Qed.
-(* DO NOT EDIT BELOW *)
 
 

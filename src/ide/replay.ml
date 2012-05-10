@@ -1,9 +1,10 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  Copyright (C) 2010-2011                                               *)
+(*  Copyright (C) 2010-2012                                               *)
 (*    François Bobot                                                      *)
 (*    Jean-Christophe Filliâtre                                           *)
 (*    Claude Marché                                                       *)
+(*    Guillaume Melquiond                                                 *)
 (*    Andrei Paskevich                                                    *)
 (*                                                                        *)
 (*  This software is free software; you can redistribute it and/or        *)
@@ -27,8 +28,10 @@ let file = ref None
 let opt_version = ref false
 let opt_stats = ref true
 let opt_force = ref false
+(*
 let opt_convert_unknown_provers = ref false
-
+*)
+let opt_bench = ref false
 
 (** {2 Smoke detector} *)
 
@@ -68,18 +71,24 @@ let spec = Arg.align [
    "<file> Read additional configuration from <file>") ;
   ("-force",
    Arg.Set opt_force,
-   " enforce saving of session even if replay failed") ;
+   " enforce saving the session after replay") ;
   ("-smoke-detector",
    Arg.Symbol (["none";"top";"deep"],set_opt_smoke),
    " try to detect if the context is self-contradicting") ;
+(*
+  ("-bench",
+   Arg.Set opt_bench, " run as bench (experimental)");
+*)
   ("-s",
    Arg.Clear opt_stats,
    " do not print statistics") ;
   ("-v",
    Arg.Set opt_version,
    " print version information") ;
+(*
   "--convert-unknown-provers", Arg.Set opt_convert_unknown_provers,
   " try to find compatible provers for all unknown provers";
+*)
   Debug.Opt.desc_debug_list;
   Debug.Opt.desc_shortcut "parse_only" "--parse-only" " Stop after parsing";
   Debug.Opt.desc_shortcut
@@ -195,9 +204,17 @@ let notify _any = ()
           (Session.transformation_id tr.M.transf) tr.M.transf_proved
 *)
 
+(*
 let unknown_prover _ _ = None
 
 let replace_prover _ _ = false
+*)
+
+let uninstalled_prover _eS unknown =
+  try
+    Whyconf.get_prover_upgrade_policy config unknown 
+  with Not_found ->
+    Whyconf.CPU_keep 
 
 module Scheduler = Session_scheduler.Base_scheduler(struct end)
 
@@ -208,19 +225,22 @@ end
 module M = Session_scheduler.Make(O)
 
 let print_result fmt
-    {Call_provers.pr_answer=ans; Call_provers.pr_output=out;
-     Call_provers.pr_time=_t} =
-(*
+    { Call_provers.pr_answer=ans;
+      Call_provers.pr_output=out;
+      Call_provers.pr_time=t } =
   fprintf fmt "%a (%.1fs)" Call_provers.print_prover_answer ans t;
-*)
+(*
   fprintf fmt "%a" Call_provers.print_prover_answer ans;
-  if ans == Call_provers.HighFailure then
-    fprintf fmt "@\nProver output:@\n%s@." out
+*)
+  match ans with
+    | Call_provers.HighFailure ->
+      fprintf fmt "@\nProver output:@\n%s@." out
+    | _ -> ()
+      (*
+        fprintf fmt "[limit=%s@\nProver output:@\n%s@." out
+      *)
 
 let main_loop = O.main_loop
-(*
-let model_index = Hashtbl.create 257
-*)
 
 let project_dir =
   try
@@ -260,22 +280,24 @@ let print_statistics files =
   List.iter print_file (List.rev files)
 
 
-let print_report (g,p,r) =
+let print_report (g,p,t,r) =
   printf "   goal '%s', prover '%a': " g.Ident.id_string Whyconf.print_prover p;
   match r with
   | M.Result(new_res,old_res) ->
     (* begin match !opt_smoke with *)
     (*   | Session.SD_None -> *)
-        printf "%a instead of %a@."
-          print_result new_res print_result old_res
+        printf "%a instead of %a (timelimit=%d)@."
+          print_result new_res print_result old_res t
     (*   | _ -> *)
     (*     printf "Smoke detected!!!@." *)
     (* end *)
   | M.No_former_result new_res ->
-      printf "no former result available : %a@." print_result new_res
+      printf "no former result available, new result is: %a@." print_result new_res
   | M.CallFailed msg ->
       printf "internal failure '%a'@." Exn_printer.exn_printer msg;
-  | M.Prover_not_installed ->
+  | M.Edited_file_absent f ->
+      printf "proof script absent (%s)@." f
+ | M.Prover_not_installed ->
       printf "not installed@."
 
 
@@ -288,7 +310,7 @@ let same_result r1 r2 =
     | Call_provers.Failure _, Call_provers.Failure _-> true
     | _ -> false
 
-let add_to_check_no_smoke found_obs env_session sched =
+let add_to_check_no_smoke config found_obs env_session sched =
       let session = env_session.S.session in
       let callback report =
         eprintf "@.";
@@ -296,29 +318,33 @@ let add_to_check_no_smoke found_obs env_session sched =
           S.PHstr.fold file_statistics
             session.S.session_files ([],0,0)
 	in
-        let report = List.filter (function
-          | (_,_,M.Result(new_res,old_res)) ->not (same_result new_res old_res)
-          | _ -> true) report in
+        let report =
+          List.filter
+            (function
+              | (_,_,_,M.Result(new_res,old_res)) ->
+                not (same_result new_res old_res)
+              | _ -> true)
+            report
+        in
         if report = [] then begin
+          if !opt_force then
+            printf " %d/%d (replay OK, session going to be saved since -force was given)@." n m
+          else
             if found_obs then
               if n=m then
                 printf " %d/%d (replay OK, all proved: obsolete session \
 updated)@." n m
               else
-                if !opt_force then
-                  printf " %d/%d (replay OK, but not all proved: obsolete \
-session updated since -force was given)@." n m
-                else
-                  printf " %d/%d (replay OK, but not all proved: obsolete \
+                printf " %d/%d (replay OK, but not all proved: obsolete \
 session NOT updated)@." n m
             else
               printf " %d/%d@." n m ;
             if !opt_stats && n<m then print_statistics files;
             eprintf "Everything replayed OK.@.";
-            if found_obs && (n=m || !opt_force) then
+            if (found_obs && n=m) || !opt_force then
               begin
-                eprintf "Updating obsolete session...@?";
-                S.save_session session;
+                eprintf "Saving session...@?";
+                S.save_session config session;
                 eprintf " done@."
               end;
             exit 0
@@ -336,12 +362,15 @@ session NOT updated)@." n m
 let add_to_check_smoke env_session sched =
   let callback report =
     eprintf "@.";
-    let report = List.filter (function
-      | (_,_,M.Result({Call_provers.pr_answer = Call_provers.Valid} ,_))
-        -> true
-      | (_,_,M.No_former_result({Call_provers.pr_answer = Call_provers.Valid}))
-        -> true
-      | _ -> false) report in
+    let report =
+      List.filter
+        (function
+          | (_,_,_,M.Result({Call_provers.pr_answer = Call_provers.Valid} ,_))
+            -> true
+          | (_,_,_,M.No_former_result({Call_provers.pr_answer = Call_provers.Valid}))
+            -> true
+          | _ -> false) report
+    in
     if report = [] then begin
         eprintf "No smoke detected.@.";
         exit 0
@@ -354,9 +383,9 @@ let add_to_check_smoke env_session sched =
   in
   M.check_all ~callback env_session sched
 
-let add_to_check found_obs =
+let add_to_check config found_obs =
   match !opt_smoke with
-    | SD_None -> add_to_check_no_smoke found_obs;
+    | SD_None -> add_to_check_no_smoke config found_obs;
     | _ -> assert (not found_obs); add_to_check_smoke
 
 let transform_smoke env_session =
@@ -369,14 +398,46 @@ let transform_smoke env_session =
     | SD_Deep -> trans "smoke_detector_deep" env_session
 
 
+let run_as_bench env_session =
+  let sched =
+    M.init (Whyconf.running_provers_max (Whyconf.get_main config))
+  in
+  eprintf "Provers:@ ";
+  let provers =
+    Whyconf.Mprover.fold
+      (fun _ p acc ->
+        if p.Whyconf.interactive then acc else
+          begin
+            eprintf "%a@ " Whyconf.print_prover p.Whyconf.prover;
+            p.Whyconf.prover :: acc
+          end)
+      (Whyconf.get_provers env_session.Session.whyconf) []
+  in
+  eprintf "@.";
+  let callback () =
+    eprintf "Saving session...@?";
+    Session.save_session config env_session.Session.session;
+    eprintf " done.@.";
+    exit 0
+  in
+  M.play_all env_session sched ~callback ~timelimit:2 ~memlimit:0 provers;
+  main_loop ();
+  eprintf "main replayer (in bench mode) exited unexpectedly@.";
+  exit 1
+
 let () =
   try
     eprintf "Opening session...@?";
     let env_session,found_obs =
       let session = S.read_session project_dir in
-      M.update_session ~allow_obsolete:true session env config in
+      M.update_session ~allow_obsolete:true session env config
+    in
+    eprintf " done.@.";
+    if !opt_bench then run_as_bench env_session;
     transform_smoke env_session;
+(*
     if !opt_convert_unknown_provers then M.convert_unknown_prover env_session;
+*)
     let sched =
       M.init (Whyconf.running_provers_max (Whyconf.get_main config)) in
     if found_obs then begin
@@ -389,9 +450,9 @@ let () =
     end;
     (* M.smoke_detector := !opt_smoke; *)
     eprintf " done.";
-    add_to_check found_obs env_session sched;
-    main_loop (); 
-    eprintf "main replayer exited unexpectedly@."; 
+    add_to_check config found_obs env_session sched;
+    main_loop ();
+    eprintf "main replayer exited unexpectedly@.";
     exit 1
   with
     | S.OutdatedSession ->

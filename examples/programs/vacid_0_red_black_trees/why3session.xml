@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "why3session.dtd">
+<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
 <why3session
  name="programs/vacid_0_red_black_trees/why3session.xml">
  <prover
@@ -17,7 +17,7 @@
  <prover
   id="3"
   name="Coq"
-  version="8.3pl3"/>
+  version="8.3pl4"/>
  <prover
   id="4"
   name="Z3"
@@ -40,45 +40,48 @@
     name="memt_color"
     locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="23" loccnumb="8" loccnume="18"
-    sum="ec5925357b1698b05c8b10e54630c48d"
+    sum="0ba445d26ca701f2f22d6840c792c36b"
     proved="true"
     expanded="false"
     shape="amemtaNodeV7V0V2V4V1V3V5IamemtaNodeV6V0V2V4V1V3V5F">
     <proof
      prover="0"
      timelimit="10"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
-    name="lt_leaf"
-    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
-    loclnum="37" loccnumb="8" loccnume="15"
-    sum="5d2c57fc0a964fc5ef828c6d8edf81f0"
-    proved="true"
-    expanded="false"
-    shape="alt_treeV0aLeafF">
-    <proof
-     prover="0"
-     timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
+    name="lt_leaf"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    loclnum="37" loccnumb="8" loccnume="15"
+    sum="0277900b29104359e543926c578f3ed7"
+    proved="true"
+    expanded="false"
+    shape="alt_treeV0aLeafF">
+    <proof
+     prover="0"
+     timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
     name="gt_leaf"
     locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="39" loccnumb="8" loccnume="15"
-    sum="504cbb28e67bab6770b4a46f90f518a7"
+    sum="703dbf166e8b8fbb55b2d2536c56352d"
     proved="true"
     expanded="false"
     shape="agt_treeV0aLeafF">
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
@@ -88,29 +91,31 @@
     name="lt_tree_node"
     locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="41" loccnumb="8" loccnume="20"
-    sum="88e12f31d4ec3654a849877c413b1da8"
+    sum="c2b90a1c49b7930044ea2aa33b5b8515"
     proved="true"
     expanded="false"
-    shape="alt_treeV0aNodeV5V3V1V2V4Iainfix <V1V0Ialt_treeV0V4Ialt_treeV0V3F">
+    shape="alt_treeV0aNodeV5V3V1V2V4Iainfix &lt;V1V0Ialt_treeV0V4Ialt_treeV0V3F">
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.00"/>
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="gt_tree_node"
     locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="45" loccnumb="8" loccnume="20"
-    sum="9cf7e7eb5a4bcaacee85fcc798a020d4"
+    sum="37e14b8b42d74afed5b8cb3facc1070e"
     proved="true"
     expanded="false"
-    shape="agt_treeV0aNodeV5V3V1V2V4Iainfix <V0V1Iagt_treeV0V4Iagt_treeV0V3F">
+    shape="agt_treeV0aNodeV5V3V1V2V4Iainfix &lt;V0V1Iagt_treeV0V4Iagt_treeV0V3F">
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.01"/>
@@ -120,63 +125,67 @@
     name="lt_node_lt"
     locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="49" loccnumb="8" loccnume="18"
-    sum="6f02dd0af4453b7fd03196c3bd12b510"
+    sum="c79c70190be40496fe5cde2c74470da3"
     proved="true"
     expanded="false"
-    shape="ainfix <V1V0Ialt_treeV0aNodeV5V3V1V2V4F">
+    shape="ainfix &lt;V1V0Ialt_treeV0aNodeV5V3V1V2V4F">
     <proof
      prover="3"
      timelimit="10"
+     memlimit="0"
      edited="vacid_0_red_black_trees_WP_RedBlackTree_lt_node_lt_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.50"/>
+     <result status="valid" time="0.44"/>
     </proof>
    </goal>
    <goal
     name="gt_node_gt"
     locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="53" loccnumb="8" loccnume="18"
-    sum="a37e546a6304a1ae29365f580b24c500"
+    sum="17ab048a444cf9f918c34b5d02c85e47"
     proved="true"
     expanded="false"
-    shape="ainfix <V0V1Iagt_treeV0aNodeV5V3V1V2V4F">
+    shape="ainfix &lt;V0V1Iagt_treeV0aNodeV5V3V1V2V4F">
     <proof
      prover="3"
      timelimit="10"
+     memlimit="0"
      edited="vacid_0_red_black_trees_WP_RedBlackTree_gt_node_gt_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.50"/>
+     <result status="valid" time="0.43"/>
     </proof>
    </goal>
    <goal
     name="lt_left"
     locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="57" loccnumb="8" loccnume="15"
-    sum="09d87734595bb5565b6ff7a883c80f38"
+    sum="9464e533b61e4cb90470f8d6b4f10c1a"
     proved="true"
     expanded="false"
     shape="alt_treeV0V3Ialt_treeV0aNodeV5V3V1V2V4F">
     <proof
      prover="1"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.06"/>
+     <result status="valid" time="0.05"/>
     </proof>
    </goal>
    <goal
     name="lt_right"
     locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="61" loccnumb="8" loccnume="16"
-    sum="1d06cf3c05595fc6cb35dbe7fef1f5da"
+    sum="268c12f799539d5ab58b47a669a74923"
     proved="true"
     expanded="false"
     shape="alt_treeV0V4Ialt_treeV0aNodeV5V3V1V2V4F">
     <proof
      prover="1"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.06"/>
@@ -186,29 +195,31 @@
     name="gt_left"
     locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="65" loccnumb="8" loccnume="15"
-    sum="88f9b296a69456f9dec9f7357a989064"
+    sum="9681bc612eb0d3dc2d33a66ff13b2922"
     proved="true"
     expanded="false"
     shape="agt_treeV0V3Iagt_treeV0aNodeV5V3V1V2V4F">
     <proof
      prover="1"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.06"/>
+     <result status="valid" time="0.05"/>
     </proof>
    </goal>
    <goal
     name="gt_right"
     locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="69" loccnumb="8" loccnume="16"
-    sum="b0e4dcc60e07d6de24d5907f13df2468"
+    sum="84810daf3f6c6e39b7664a3e6839f1ca"
     proved="true"
     expanded="false"
     shape="agt_treeV0V4Iagt_treeV0aNodeV5V3V1V2V4F">
     <proof
      prover="1"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.06"/>
@@ -218,13 +229,14 @@
     name="lt_tree_not_in"
     locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="73" loccnumb="8" loccnume="22"
-    sum="ff224412106688ea81691ccf8304efaa"
+    sum="996aa9456c2fa2b36baa207586cb19f4"
     proved="true"
     expanded="false"
     shape="amemtV1V0V2NFIalt_treeV0V1F">
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.01"/>
@@ -234,29 +246,31 @@
     name="lt_tree_trans"
     locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="76" loccnumb="8" loccnume="21"
-    sum="d1f265850f39ea7d8a759c4983dbddf4"
+    sum="c13aa94f50ced4fad3afa51318d56237"
     proved="true"
     expanded="false"
-    shape="alt_treeV1V2Ialt_treeV0V2FIainfix <V0V1F">
+    shape="alt_treeV1V2Ialt_treeV0V2FIainfix &lt;V0V1F">
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.00"/>
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="gt_tree_not_in"
     locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="79" loccnumb="8" loccnume="22"
-    sum="b841ddcd785dd2c0c5080185425ad77b"
+    sum="ee75a38dec15980c5ac9db5e67145432"
     proved="true"
     expanded="false"
     shape="amemtV1V0V2NFIagt_treeV0V1F">
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
@@ -266,29 +280,31 @@
     name="gt_tree_trans"
     locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="82" loccnumb="8" loccnume="21"
-    sum="2befa5f07b650074834b8deb324e8e5d"
+    sum="e3d5f24f71f76358a6c61260dc907a76"
     proved="true"
     expanded="false"
-    shape="agt_treeV1V2Iagt_treeV0V2FIainfix <V1V0F">
+    shape="agt_treeV1V2Iagt_treeV0V2FIainfix &lt;V1V0F">
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.00"/>
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="bst_Leaf"
     locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="91" loccnumb="8" loccnume="16"
-    sum="9b383aa7ea7ce6b905da5eb210f82d32"
+    sum="fd1bbc87769d9bd382d4818f10f05e98"
     proved="true"
     expanded="false"
     shape="abstaLeaf">
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.01"/>
@@ -298,61 +314,65 @@
     name="bst_left"
     locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="93" loccnumb="8" loccnume="16"
-    sum="b377d97a1aebf18434d9f1cf5ab38cbf"
+    sum="65e7cdef8a81545f39e23193d6d9a42d"
     proved="true"
     expanded="false"
     shape="abstV2IabstaNodeV4V2V0V1V3F">
     <proof
      prover="0"
      timelimit="10"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-   </goal>
-   <goal
-    name="bst_right"
-    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
-    loclnum="96" loccnumb="8" loccnume="17"
-    sum="ce8fc261f09ad16caf9f0403337dc943"
-    proved="true"
-    expanded="false"
-    shape="abstV3IabstaNodeV4V2V0V1V3F">
-    <proof
-     prover="0"
-     timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
-    name="bst_color"
+    name="bst_right"
     locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
-    loclnum="99" loccnumb="8" loccnume="17"
-    sum="ded4d1ae5bbda300a67555775e9f0d1d"
+    loclnum="96" loccnumb="8" loccnume="17"
+    sum="4843506af0b56461d147e6249332993b"
     proved="true"
     expanded="false"
-    shape="abstaNodeV1V4V2V3V5IabstaNodeV0V4V2V3V5F">
+    shape="abstV3IabstaNodeV4V2V0V1V3F">
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
+    name="bst_color"
+    locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
+    loclnum="99" loccnumb="8" loccnume="17"
+    sum="dac650a747a03ef3a678c28a364d801b"
+    proved="true"
+    expanded="false"
+    shape="abstaNodeV1V4V2V3V5IabstaNodeV0V4V2V3V5F">
+    <proof
+     prover="0"
+     timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
     name="rotate_left"
     locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="103" loccnumb="8" loccnume="19"
-    sum="faaa3c5fbc1abb5c50b820ad93470950"
+    sum="fa2f24bb87fdd377da2580e17bc13f13"
     proved="true"
     expanded="false"
     shape="abstaNodeV9aNodeV10V4V0V2V5V1V3V6IabstaNodeV7V4V0V2aNodeV8V5V1V3V6F">
     <proof
      prover="4"
      timelimit="100"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.02"/>
@@ -360,13 +380,15 @@
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.09"/>
+     <result status="valid" time="0.13"/>
     </proof>
     <proof
      prover="5"
      timelimit="100"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.02"/>
@@ -376,61 +398,65 @@
     name="rotate_right"
     locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="108" loccnumb="8" loccnume="20"
-    sum="64bdfee9f0a454043b7f22833aae26f4"
+    sum="155dcebba5681fb9d8fd0581ec7abcc5"
     proved="true"
     expanded="false"
     shape="abstaNodeV7V4V0V2aNodeV8V5V1V3V6IabstaNodeV9aNodeV10V4V0V2V5V1V3V6F">
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.09"/>
+     <result status="valid" time="0.13"/>
     </proof>
    </goal>
    <goal
     name="rbtree_Leaf"
     locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="136" loccnumb="8" loccnume="19"
-    sum="74cc3fae8d264d913bef1615f963ec79"
+    sum="4ed4c976e98aa3ec2b246ce08994ad25"
     proved="true"
     expanded="false"
     shape="arbtreec0aLeaf">
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.00"/>
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="rbtree_Node1"
     locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="139" loccnumb="8" loccnume="20"
-    sum="4d9ee3f6b14a2cf1677f9c948c821f96"
+    sum="4e915bc2572782630a8559f01ca87d51"
     proved="true"
     expanded="false"
     shape="arbtreec0aNodeaRedaLeafV0V1aLeafF">
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.03"/>
+     <result status="valid" time="0.04"/>
     </proof>
    </goal>
    <goal
     name="rbtree_left"
     locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="142" loccnumb="8" loccnume="19"
-    sum="5a795f36462892580d46f914b49f3853"
+    sum="7549372b32c5480566649f8dc9eb0c57"
     proved="true"
     expanded="false"
     shape="arbtreeV5V2EIarbtreeV6aNodeV4V2V0V1V3EF">
     <proof
      prover="1"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.06"/>
@@ -440,13 +466,14 @@
     name="rbtree_right"
     locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="146" loccnumb="8" loccnume="20"
-    sum="0ac871a36bbe4af57fc9f17d8f3cd4fc"
+    sum="6ec739d58c23627e6e18a8198ea085b1"
     proved="true"
     expanded="false"
     shape="arbtreeV5V3EIarbtreeV6aNodeV4V2V0V1V3EF">
     <proof
      prover="1"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.10"/>
@@ -457,67 +484,70 @@
     locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="154" loccnumb="10" loccnume="14"
     expl="parameter find"
-    sum="31b49c921bced8255f0f79cee7288c14"
+    sum="81a6cab0a24d00f4cd1b2388b3edd8e7"
     proved="true"
     expanded="false"
-    shape="CV0aLeafamemtV0V1V2NFaNodewVVVViainfix =V1V4amemtV0V1V5iainfix <V1V4amemtV0V1V7NFIamemtV3V1V8NFAamemtV0V1V9IamemtV3V1V9FAabstV3amemtV0V1V10NFIamemtV6V1V11NFAamemtV0V1V12IamemtV6V1V12FAabstV6IabstV0FF">
+    shape="CV0aLeafamemtV0V1V2NFaNodewVVVViainfix =V1V4amemtV0V1V5iainfix &lt;V1V4amemtV0V1V7NFIamemtV3V1V8NFAamemtV0V1V9IamemtV3V1V9FAabstV3amemtV0V1V10NFIamemtV6V1V11NFAamemtV0V1V12IamemtV6V1V12FAabstV6IabstV0FF">
     <label
-     name="expl:parameter find">
-     </label>
+     name="expl:parameter find"/>
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.02"/>
+     <result status="valid" time="0.03"/>
     </proof>
    </goal>
    <goal
     name="rbtree_almost_rbtree"
     locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="180" loccnumb="8" loccnume="28"
-    sum="3c9c711c5e3a0be24624f72ef09ca37b"
+    sum="81ed87d783d666b5b42340f5167581dc"
     proved="true"
     expanded="false"
     shape="aalmost_rbtreeV0V1IarbtreeV0V1F">
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.02"/>
     </proof>
    </goal>
    <goal
     name="rbtree_almost_rbtree_ex"
     locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="183" loccnumb="8" loccnume="31"
-    sum="d857917b62b16b07b9fb22b5ec534e80"
+    sum="f7449f252d0b220074cd878c5d1af62b"
     proved="true"
     expanded="false"
     shape="aalmost_rbtreeV1V0EIarbtreeV2V0EF">
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.00"/>
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="almost_rbtree_rbtree_black"
     locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="187" loccnumb="8" loccnume="34"
-    sum="3dde5f79d40600a13a23f24ce7f1ab71"
+    sum="5eff2c3becf48f0d29341498c64b1e84"
     proved="true"
     expanded="false"
     shape="arbtreeV4aNodeaBlackV2V0V1V3Iaalmost_rbtreeV4aNodeaBlackV2V0V1V3F">
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
@@ -525,13 +555,12 @@
     locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="201" loccnumb="6" loccnume="14"
     expl="parameter lbalance"
-    sum="b46331886803d7e74b1fac05900923fc"
+    sum="395993968118a7b054b2b896d8a585fd"
     proved="true"
     expanded="false"
     shape="CV0aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVViainfix =V11V1ainfix =V12V2amemtV3V11V12OamemtV0V11V12qamemtaNodeaRedaNodeaBlackV4V5V6V7V8V9aNodeaBlackV10V1V2V3V11V12FAarbtreeainfix +V13c1aNodeaRedaNodeaBlackV4V5V6V7V8V9aNodeaBlackV10V1V2V3IarbtreeV13V3Iaalmost_rbtreeV13V0FAabstaNodeaRedaNodeaBlackV4V5V6V7V8V9aNodeaBlackV10V1V2V3wiainfix =V14V1ainfix =V15V2amemtV3V14V15OamemtV0V14V15qamemtaNodeaBlackV0V1V2V3V14V15FAarbtreeainfix +V16c1aNodeaBlackV0V1V2V3IarbtreeV16V3Iaalmost_rbtreeV16V0FAabstaNodeaBlackV0V1V2V3IabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
     <label
-     name="expl:parameter lbalance">
-     </label>
+     name="expl:parameter lbalance"/>
     <transf
      name="split_goal"
      proved="true"
@@ -541,13 +570,12 @@
       locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
       loclnum="201" loccnumb="6" loccnume="14"
       expl="parameter lbalance"
-      sum="fc3da87dd558e4fd7e3a5530bf4712b3"
+      sum="84cbcd8b667b01f9e3b831a1187325be"
       proved="true"
       expanded="false"
       shape="CV0aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVViainfix =V11V1ainfix =V12V2amemtV3V11V12OamemtV0V11V12qamemtaNodeaRedaNodeaBlackV4V5V6V7V8V9aNodeaBlackV10V1V2V3V11V12FAarbtreeainfix +V13c1aNodeaRedaNodeaBlackV4V5V6V7V8V9aNodeaBlackV10V1V2V3IarbtreeV13V3Iaalmost_rbtreeV13V0FAabstaNodeaRedaNodeaBlackV4V5V6V7V8V9aNodeaBlackV10V1V2V3wtIabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
       <label
-       name="expl:parameter lbalance">
-       </label>
+       name="expl:parameter lbalance"/>
       <transf
        name="split_goal"
        proved="true"
@@ -557,26 +585,27 @@
         locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="201" loccnumb="6" loccnume="14"
         expl="parameter lbalance"
-        sum="c89aa88872308525aa7ab6b7ade0dbd7"
+        sum="28aec8c25283356e6e6fd92a89a1fbbe"
         proved="true"
         expanded="false"
         shape="CV0aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVabstaNodeaRedaNodeaBlackV4V5V6V7V8V9aNodeaBlackV10V1V2V3wtIabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
         <label
-         name="expl:parameter lbalance">
-         </label>
+         name="expl:parameter lbalance"/>
         <proof
          prover="0"
-         timelimit="5"
+         timelimit="11"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="3.80"/>
+         <result status="valid" time="5.03"/>
         </proof>
         <proof
          prover="5"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.43"/>
+         <result status="valid" time="1.33"/>
         </proof>
        </goal>
        <goal
@@ -584,20 +613,20 @@
         locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="201" loccnumb="6" loccnume="14"
         expl="parameter lbalance"
-        sum="70f15b72f6790148d5476dafa3a37c0f"
+        sum="d31805bb960cfdd9e05a9584d2c6f17b"
         proved="true"
         expanded="false"
         shape="CV0aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVarbtreeainfix +V11c1aNodeaRedaNodeaBlackV4V5V6V7V8V9aNodeaBlackV10V1V2V3IarbtreeV11V3Iaalmost_rbtreeV11V0FwtIabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
         <label
-         name="expl:parameter lbalance">
-         </label>
+         name="expl:parameter lbalance"/>
         <proof
          prover="3"
          timelimit="100"
+         memlimit="0"
          edited="vacid_0_red_black_trees_WP_RedBlackTree_WP_parameter_lbalance_1.v"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.57"/>
+         <result status="valid" time="0.52"/>
         </proof>
        </goal>
        <goal
@@ -605,19 +634,19 @@
         locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="201" loccnumb="6" loccnume="14"
         expl="parameter lbalance"
-        sum="1219064aa28f40d72ed59dc4c2efac30"
+        sum="ce75c6784f66f2aab138b568a1b0d01c"
         proved="true"
         expanded="false"
         shape="CV0aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVainfix =V12V2Iainfix =V11V1IamemtaNodeaRedaNodeaBlackV4V5V6V7V8V9aNodeaBlackV10V1V2V3V11V12FwtIabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
         <label
-         name="expl:parameter lbalance">
-         </label>
+         name="expl:parameter lbalance"/>
         <proof
          prover="0"
          timelimit="100"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="10.65"/>
+         <result status="valid" time="13.38"/>
         </proof>
        </goal>
        <goal
@@ -625,33 +654,35 @@
         locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="201" loccnumb="6" loccnume="14"
         expl="parameter lbalance"
-        sum="987019667df0b5be6ef466212a272cba"
+        sum="b99ed2c29e822f9eb6e697301f8bfcbe"
         proved="true"
         expanded="false"
         shape="CV0aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVamemtV3V11V12OamemtV0V11V12Iainfix =V11V1NIamemtaNodeaRedaNodeaBlackV4V5V6V7V8V9aNodeaBlackV10V1V2V3V11V12FwtIabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
         <label
-         name="expl:parameter lbalance">
-         </label>
+         name="expl:parameter lbalance"/>
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.78"/>
+         <result status="valid" time="1.66"/>
         </proof>
         <proof
          prover="0"
-         timelimit="5"
+         timelimit="7"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="2.23"/>
+         <result status="valid" time="3.11"/>
         </proof>
         <proof
          prover="2"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.82"/>
+         <result status="valid" time="1.72"/>
         </proof>
        </goal>
        <goal
@@ -659,19 +690,19 @@
         locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="201" loccnumb="6" loccnume="14"
         expl="parameter lbalance"
-        sum="415261793042430722142a7775ebad5d"
+        sum="aaa3578ab2be98079a40aa4806b79110"
         proved="true"
         expanded="false"
         shape="CV0aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVamemtaNodeaRedaNodeaBlackV4V5V6V7V8V9aNodeaBlackV10V1V2V3V11V12Iiainfix =V11V1ainfix =V12V2amemtV3V11V12OamemtV0V11V12FwtIabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
         <label
-         name="expl:parameter lbalance">
-         </label>
+         name="expl:parameter lbalance"/>
         <proof
          prover="0"
-         timelimit="5"
+         timelimit="6"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.88"/>
+         <result status="valid" time="2.43"/>
         </proof>
        </goal>
       </transf>
@@ -681,13 +712,12 @@
       locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
       loclnum="201" loccnumb="6" loccnume="14"
       expl="parameter lbalance"
-      sum="8284f41e57d2dfaa59c02ce0f1d52976"
+      sum="90412600b8974e5928b33040ed3119f7"
       proved="true"
       expanded="false"
       shape="CV0aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVtwiainfix =V11V1ainfix =V12V2amemtV3V11V12OamemtV0V11V12qamemtaNodeaBlackV0V1V2V3V11V12FAarbtreeainfix +V13c1aNodeaBlackV0V1V2V3IarbtreeV13V3Iaalmost_rbtreeV13V0FAabstaNodeaBlackV0V1V2V3IabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
       <label
-       name="expl:parameter lbalance">
-       </label>
+       name="expl:parameter lbalance"/>
       <transf
        name="split_goal"
        proved="true"
@@ -697,16 +727,16 @@
         locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="201" loccnumb="6" loccnume="14"
         expl="parameter lbalance"
-        sum="fafaa296e1656663cae342e0f9a34b60"
+        sum="168a4cd4e3ebd4be54f618a93e8d80f6"
         proved="true"
         expanded="false"
         shape="CV0aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVtwabstaNodeaBlackV0V1V2V3IabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
         <label
-         name="expl:parameter lbalance">
-         </label>
+         name="expl:parameter lbalance"/>
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
@@ -714,6 +744,7 @@
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
@@ -721,6 +752,7 @@
         <proof
          prover="2"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
@@ -731,26 +763,27 @@
         locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="201" loccnumb="6" loccnume="14"
         expl="parameter lbalance"
-        sum="0b9ae7b26daf031d02dd6d999c54a98c"
+        sum="d765249d097afc6271c5bca101bc188a"
         proved="true"
         expanded="false"
         shape="CV0aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVtwarbtreeainfix +V11c1aNodeaBlackV0V1V2V3IarbtreeV11V3Iaalmost_rbtreeV11V0FIabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
         <label
-         name="expl:parameter lbalance">
-         </label>
+         name="expl:parameter lbalance"/>
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.71"/>
+         <result status="valid" time="0.63"/>
         </proof>
         <proof
          prover="2"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.77"/>
+         <result status="valid" time="0.72"/>
         </proof>
        </goal>
        <goal
@@ -758,26 +791,27 @@
         locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="201" loccnumb="6" loccnume="14"
         expl="parameter lbalance"
-        sum="af36cc894e64c81dfab5c525617436a7"
+        sum="b6c895a9185bae974c35901cf8f38985"
         proved="true"
         expanded="false"
         shape="CV0aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVtwainfix =V12V2Iainfix =V11V1IamemtaNodeaBlackV0V1V2V3V11V12FIabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
         <label
-         name="expl:parameter lbalance">
-         </label>
+         name="expl:parameter lbalance"/>
         <proof
          prover="1"
-         timelimit="5"
+         timelimit="8"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="3.38"/>
+         <result status="valid" time="3.06"/>
         </proof>
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.69"/>
+         <result status="valid" time="0.79"/>
         </proof>
        </goal>
        <goal
@@ -785,33 +819,35 @@
         locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="201" loccnumb="6" loccnume="14"
         expl="parameter lbalance"
-        sum="39f948a38021c1a109422a317b4f3509"
+        sum="9d424b08a2ac781cdac5e2f73240edcd"
         proved="true"
         expanded="false"
         shape="CV0aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVtwamemtV3V11V12OamemtV0V11V12Iainfix =V11V1NIamemtaNodeaBlackV0V1V2V3V11V12FIabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
         <label
-         name="expl:parameter lbalance">
-         </label>
+         name="expl:parameter lbalance"/>
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.38"/>
+         <result status="valid" time="0.36"/>
         </proof>
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.12"/>
+         <result status="valid" time="0.13"/>
         </proof>
         <proof
          prover="2"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.36"/>
+         <result status="valid" time="0.33"/>
         </proof>
        </goal>
        <goal
@@ -819,23 +855,24 @@
         locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="201" loccnumb="6" loccnume="14"
         expl="parameter lbalance"
-        sum="0eb26df00cadc1f11917eff60f7a8c47"
+        sum="1dc584496b07d02fc68f81c3a4b578c4"
         proved="true"
         expanded="false"
         shape="CV0aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVtwamemtaNodeaBlackV0V1V2V3V11V12Iiainfix =V11V1ainfix =V12V2amemtV3V11V12OamemtV0V11V12FIabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
         <label
-         name="expl:parameter lbalance">
-         </label>
+         name="expl:parameter lbalance"/>
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.17"/>
+         <result status="valid" time="0.15"/>
         </proof>
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.12"/>
@@ -843,9 +880,10 @@
         <proof
          prover="2"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.13"/>
+         <result status="valid" time="0.12"/>
         </proof>
        </goal>
       </transf>
@@ -857,13 +895,12 @@
     locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="226" loccnumb="6" loccnume="14"
     expl="parameter rbalance"
-    sum="cae61b91244401f64decf309eab7c5ab"
+    sum="5e9652805a5b368293addf65631bf480"
     proved="true"
     expanded="false"
     shape="CV3aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVViainfix =V11V1ainfix =V12V2amemtV3V11V12OamemtV0V11V12qamemtaNodeaRedaNodeaBlackV0V1V2V4V5V6aNodeaBlackV7V8V9V10V11V12FAarbtreeainfix +V13c1aNodeaRedaNodeaBlackV0V1V2V4V5V6aNodeaBlackV7V8V9V10IarbtreeV13V0Iaalmost_rbtreeV13V3FAabstaNodeaRedaNodeaBlackV0V1V2V4V5V6aNodeaBlackV7V8V9V10wiainfix =V14V1ainfix =V15V2amemtV3V14V15OamemtV0V14V15qamemtaNodeaBlackV0V1V2V3V14V15FAarbtreeainfix +V16c1aNodeaBlackV0V1V2V3IarbtreeV16V0Iaalmost_rbtreeV16V3FAabstaNodeaBlackV0V1V2V3IabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
     <label
-     name="expl:parameter rbalance">
-     </label>
+     name="expl:parameter rbalance"/>
     <transf
      name="split_goal"
      proved="true"
@@ -873,13 +910,12 @@
       locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
       loclnum="226" loccnumb="6" loccnume="14"
       expl="parameter rbalance"
-      sum="f1401666d505b5304fb1f43c1037e581"
+      sum="c43d05e71488b570190a05b39fa25030"
       proved="true"
       expanded="false"
       shape="CV3aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVViainfix =V11V1ainfix =V12V2amemtV3V11V12OamemtV0V11V12qamemtaNodeaRedaNodeaBlackV0V1V2V4V5V6aNodeaBlackV7V8V9V10V11V12FAarbtreeainfix +V13c1aNodeaRedaNodeaBlackV0V1V2V4V5V6aNodeaBlackV7V8V9V10IarbtreeV13V0Iaalmost_rbtreeV13V3FAabstaNodeaRedaNodeaBlackV0V1V2V4V5V6aNodeaBlackV7V8V9V10wtIabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
       <label
-       name="expl:parameter rbalance">
-       </label>
+       name="expl:parameter rbalance"/>
       <transf
        name="split_goal"
        proved="true"
@@ -889,26 +925,27 @@
         locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="226" loccnumb="6" loccnume="14"
         expl="parameter rbalance"
-        sum="d60c81b0bda631ff7d6e0e0801f6107d"
+        sum="6233c7120867976bb0b9876c815c680a"
         proved="true"
         expanded="false"
         shape="CV3aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVabstaNodeaRedaNodeaBlackV0V1V2V4V5V6aNodeaBlackV7V8V9V10wtIabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
         <label
-         name="expl:parameter rbalance">
-         </label>
+         name="expl:parameter rbalance"/>
         <proof
          prover="0"
-         timelimit="5"
+         timelimit="13"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="4.66"/>
+         <result status="valid" time="6.14"/>
         </proof>
         <proof
          prover="5"
          timelimit="30"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.21"/>
+         <result status="valid" time="1.13"/>
         </proof>
        </goal>
        <goal
@@ -916,20 +953,20 @@
         locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="226" loccnumb="6" loccnume="14"
         expl="parameter rbalance"
-        sum="506637a8f2213fb4a46fca14b5bbe900"
+        sum="e82ece2c29623d8f79a42c6816934207"
         proved="true"
         expanded="false"
         shape="CV3aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVarbtreeainfix +V11c1aNodeaRedaNodeaBlackV0V1V2V4V5V6aNodeaBlackV7V8V9V10IarbtreeV11V0Iaalmost_rbtreeV11V3FwtIabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
         <label
-         name="expl:parameter rbalance">
-         </label>
+         name="expl:parameter rbalance"/>
         <proof
          prover="3"
          timelimit="100"
+         memlimit="0"
          edited="vacid_0_red_black_trees_WP_RedBlackTree_WP_parameter_rbalance_1.v"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.58"/>
+         <result status="valid" time="0.52"/>
         </proof>
        </goal>
        <goal
@@ -937,19 +974,19 @@
         locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="226" loccnumb="6" loccnume="14"
         expl="parameter rbalance"
-        sum="178d032028ff996d863d55c980d991ad"
+        sum="634bfe1c40ae1501f0735c69e14c3058"
         proved="true"
         expanded="false"
         shape="CV3aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVainfix =V12V2Iainfix =V11V1IamemtaNodeaRedaNodeaBlackV0V1V2V4V5V6aNodeaBlackV7V8V9V10V11V12FwtIabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
         <label
-         name="expl:parameter rbalance">
-         </label>
+         name="expl:parameter rbalance"/>
         <proof
          prover="0"
          timelimit="100"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="10.87"/>
+         <result status="valid" time="13.64"/>
         </proof>
        </goal>
        <goal
@@ -957,33 +994,35 @@
         locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="226" loccnumb="6" loccnume="14"
         expl="parameter rbalance"
-        sum="abf127f56eaef7227bc5c46e0ca1072c"
+        sum="0cb982a15a16fce3ea2e781feaff1c63"
         proved="true"
         expanded="false"
         shape="CV3aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVamemtV3V11V12OamemtV0V11V12Iainfix =V11V1NIamemtaNodeaRedaNodeaBlackV0V1V2V4V5V6aNodeaBlackV7V8V9V10V11V12FwtIabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
         <label
-         name="expl:parameter rbalance">
-         </label>
+         name="expl:parameter rbalance"/>
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.72"/>
+         <result status="valid" time="1.59"/>
         </proof>
         <proof
          prover="0"
-         timelimit="5"
+         timelimit="7"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="2.13"/>
+         <result status="valid" time="2.96"/>
         </proof>
         <proof
          prover="2"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.94"/>
+         <result status="valid" time="1.72"/>
         </proof>
        </goal>
        <goal
@@ -991,19 +1030,19 @@
         locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="226" loccnumb="6" loccnume="14"
         expl="parameter rbalance"
-        sum="d295cae4f40a3afaf14ae6c5cb64205e"
+        sum="1238989132e511bf3526702c2a62673a"
         proved="true"
         expanded="false"
         shape="CV3aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVamemtaNodeaRedaNodeaBlackV0V1V2V4V5V6aNodeaBlackV7V8V9V10V11V12Iiainfix =V11V1ainfix =V12V2amemtV3V11V12OamemtV0V11V12FwtIabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
         <label
-         name="expl:parameter rbalance">
-         </label>
+         name="expl:parameter rbalance"/>
         <proof
          prover="0"
-         timelimit="5"
+         timelimit="6"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.93"/>
+         <result status="valid" time="2.53"/>
         </proof>
        </goal>
       </transf>
@@ -1013,26 +1052,27 @@
       locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
       loclnum="226" loccnumb="6" loccnume="14"
       expl="parameter rbalance"
-      sum="1855137374b75ad9ec42bc5678b24e7b"
+      sum="1ed0d518e2601adaba1b6302d8e6c254"
       proved="true"
       expanded="false"
       shape="CV3aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVtwiainfix =V11V1ainfix =V12V2amemtV3V11V12OamemtV0V11V12qamemtaNodeaBlackV0V1V2V3V11V12FAarbtreeainfix +V13c1aNodeaBlackV0V1V2V3IarbtreeV13V0Iaalmost_rbtreeV13V3FAabstaNodeaBlackV0V1V2V3IabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0FFFF">
       <label
-       name="expl:parameter rbalance">
-       </label>
+       name="expl:parameter rbalance"/>
       <proof
        prover="1"
        timelimit="100"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="8.54"/>
+       <result status="valid" time="9.16"/>
       </proof>
       <proof
        prover="2"
        timelimit="100"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="9.42"/>
+       <result status="valid" time="8.95"/>
       </proof>
      </goal>
     </transf>
@@ -1042,13 +1082,12 @@
     locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="246" loccnumb="10" loccnume="16"
     expl="parameter insert"
-    sum="b997a311206898c055fbbd4ba7a614f0"
+    sum="76a83d12b135ce89f15446571b7cb7d0"
     proved="true"
     expanded="true"
-    shape="CV0aLeafiainfix =V3V1ainfix =V4V2amemtV0V3V4qamemtaNodeaRedaLeafV1V2aLeafV3V4FAamemtaNodeaRedaLeafV1V2aLeafV1V2AarbtreeV5aNodeaRedaLeafV1V2aLeafICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV5aNodeaRedaLeafV1V2aLeafIarbtreeV5V0FAabstaNodeaRedaLeafV1V2aLeafaNodeaRedVVVViainfix <V1V7iainfix =V11V1ainfix =V12V2amemtV0V11V12qamemtaNodeaRedV10V7V8V9V11V12FAamemtaNodeaRedV10V7V8V9V1V2AarbtreeV13aNodeaRedV10V7V8V9ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV13aNodeaRedV10V7V8V9IarbtreeV13V0FAabstaNodeaRedV10V7V8V9Iiainfix =V14V1ainfix =V15V2amemtV6V14V15qamemtV10V14V15FAamemtV10V1V2AarbtreeV16V10ICV6aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV16V10IarbtreeV16V6FAabstV10FAarbtreeV17V6EAabstV6iainfix <V7V1iainfix =V19V1ainfix =V20V2amemtV0V19V20qamemtaNodeaRedV6V7V8V18V19V20FAamemtaNodeaRedV6V7V8V18V1V2AarbtreeV21aNodeaRedV6V7V8V18ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV21aNodeaRedV6V7V8V18IarbtreeV21V0FAabstaNodeaRedV6V7V8V18Iiainfix =V22V1ainfix =V23V2amemtV9V22V23qamemtV18V22V23FAamemtV18V1V2AarbtreeV24V18ICV9aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV24V18IarbtreeV24V9FAabstV18FAarbtreeV25V9EAabstV9iainfix =V26V1ainfix =V27V2amemtV0V26V27qamemtaNodeaRedV6V7V2V9V26V27FAamemtaNodeaRedV6V7V2V9V1V2AarbtreeV28aNodeaRedV6V7V2V9ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV28aNodeaRedV6V7V2V9IarbtreeV28V0FAabstaNodeaRedV6V7V2V9aNodeaBlackVVVViainfix <V1V30iainfix =V35V1ainfix =V36V2amemtV0V35V36qamemtV34V35V36FAamemtV34V1V2AarbtreeV37V34ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV37V34IarbtreeV37V0FAabstV34Iiainfix =V38V30ainfix =V39V31amemtV32V38V39OamemtV33V38V39qamemtV34V38V39FAarbtreeainfix +V40c1V34IarbtreeV40V32Iaalmost_rbtreeV40V33FAabstV34FAabstV32AabstV33Aagt_treeV30V32Aalt_treeV30V33Iiainfix =V41V1ainfix =V42V2amemtV29V41V42qamemtV33V41V42FAamemtV33V1V2AarbtreeV43V33ICV29aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV43V33IarbtreeV43V29FAabstV33FAarbtreeV44V29EAabstV29iainfix <V30V1iainfix =V47V1ainfix =V48V2amemtV0V47V48qamemtV46V47V48FAamemtV46V1V2AarbtreeV49V46ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV49V46IarbtreeV49V0FAabstV46Iiainfix =V50V30ainfix =V51V31amemtV45V50V51OamemtV29V50V51qamemtV46V50V51FAarbtreeainfix +V52c1V46IarbtreeV52V29Iaalmost_rbtreeV52V45FAabstV46FAabstV45AabstV29Aagt_treeV30V45Aalt_treeV30V29Iiainfix =V53V1ainfix =V54V2amemtV32V53V54qamemtV45V53V54FAamemtV45V1V2AarbtreeV55V45ICV32aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV55V45IarbtreeV55V32FAabstV45FAarbtreeV56V32EAabstV32iainfix =V57V1ainfix =V58V2amemtV0V57V58qamemtaNodeaBlackV29V30V2V32V57V58FAamemtaNodeaBlackV29V30V2V32V1V2AarbtreeV59aNodeaBlackV29V30V2V32ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV59aNodeaBlackV29V30V2V32IarbtreeV59V0FAabstaNodeaBlackV29V30V2V32IarbtreeV60V0EAabstV0FFF">
+    shape="CV0aLeafiainfix =V3V1ainfix =V4V2amemtV0V3V4qamemtaNodeaRedaLeafV1V2aLeafV3V4FAamemtaNodeaRedaLeafV1V2aLeafV1V2AarbtreeV5aNodeaRedaLeafV1V2aLeafICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV5aNodeaRedaLeafV1V2aLeafIarbtreeV5V0FAabstaNodeaRedaLeafV1V2aLeafaNodeaRedVVVViainfix &lt;V1V7iainfix =V11V1ainfix =V12V2amemtV0V11V12qamemtaNodeaRedV10V7V8V9V11V12FAamemtaNodeaRedV10V7V8V9V1V2AarbtreeV13aNodeaRedV10V7V8V9ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV13aNodeaRedV10V7V8V9IarbtreeV13V0FAabstaNodeaRedV10V7V8V9Iiainfix =V14V1ainfix =V15V2amemtV6V14V15qamemtV10V14V15FAamemtV10V1V2AarbtreeV16V10ICV6aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV16V10IarbtreeV16V6FAabstV10FAarbtreeV17V6EAabstV6iainfix &lt;V7V1iainfix =V19V1ainfix =V20V2amemtV0V19V20qamemtaNodeaRedV6V7V8V18V19V20FAamemtaNodeaRedV6V7V8V18V1V2AarbtreeV21aNodeaRedV6V7V8V18ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV21aNodeaRedV6V7V8V18IarbtreeV21V0FAabstaNodeaRedV6V7V8V18Iiainfix =V22V1ainfix =V23V2amemtV9V22V23qamemtV18V22V23FAamemtV18V1V2AarbtreeV24V18ICV9aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV24V18IarbtreeV24V9FAabstV18FAarbtreeV25V9EAabstV9iainfix =V26V1ainfix =V27V2amemtV0V26V27qamemtaNodeaRedV6V7V2V9V26V27FAamemtaNodeaRedV6V7V2V9V1V2AarbtreeV28aNodeaRedV6V7V2V9ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV28aNodeaRedV6V7V2V9IarbtreeV28V0FAabstaNodeaRedV6V7V2V9aNodeaBlackVVVViainfix &lt;V1V30iainfix =V35V1ainfix =V36V2amemtV0V35V36qamemtV34V35V36FAamemtV34V1V2AarbtreeV37V34ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV37V34IarbtreeV37V0FAabstV34Iiainfix =V38V30ainfix =V39V31amemtV32V38V39OamemtV33V38V39qamemtV34V38V39FAarbtreeainfix +V40c1V34IarbtreeV40V32Iaalmost_rbtreeV40V33FAabstV34FAabstV32AabstV33Aagt_treeV30V32Aalt_treeV30V33Iiainfix =V41V1ainfix =V42V2amemtV29V41V42qamemtV33V41V42FAamemtV33V1V2AarbtreeV43V33ICV29aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV43V33IarbtreeV43V29FAabstV33FAarbtreeV44V29EAabstV29iainfix &lt;V30V1iainfix =V47V1ainfix =V48V2amemtV0V47V48qamemtV46V47V48FAamemtV46V1V2AarbtreeV49V46ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV49V46IarbtreeV49V0FAabstV46Iiainfix =V50V30ainfix =V51V31amemtV45V50V51OamemtV29V50V51qamemtV46V50V51FAarbtreeainfix +V52c1V46IarbtreeV52V29Iaalmost_rbtreeV52V45FAabstV46FAabstV45AabstV29Aagt_treeV30V45Aalt_treeV30V29Iiainfix =V53V1ainfix =V54V2amemtV32V53V54qamemtV45V53V54FAamemtV45V1V2AarbtreeV55V45ICV32aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV55V45IarbtreeV55V32FAabstV45FAarbtreeV56V32EAabstV32iainfix =V57V1ainfix =V58V2amemtV0V57V58qamemtaNodeaBlackV29V30V2V32V57V58FAamemtaNodeaBlackV29V30V2V32V1V2AarbtreeV59aNodeaBlackV29V30V2V32ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV59aNodeaBlackV29V30V2V32IarbtreeV59V0FAabstaNodeaBlackV29V30V2V32IarbtreeV60V0EAabstV0FFF">
     <label
-     name="expl:parameter insert">
-     </label>
+     name="expl:parameter insert"/>
     <transf
      name="split_goal"
      proved="true"
@@ -1058,16 +1097,16 @@
       locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
       loclnum="246" loccnumb="10" loccnume="16"
       expl="parameter insert"
-      sum="326c58ee54c6c5182a269cd280c3a570"
+      sum="35afa86fa1f0549ec65e82e98b0801b8"
       proved="true"
       expanded="false"
       shape="CV0aLeafiainfix =V3V1ainfix =V4V2amemtV0V3V4qamemtaNodeaRedaLeafV1V2aLeafV3V4FAamemtaNodeaRedaLeafV1V2aLeafV1V2AarbtreeV5aNodeaRedaLeafV1V2aLeafICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV5aNodeaRedaLeafV1V2aLeafIarbtreeV5V0FAabstaNodeaRedaLeafV1V2aLeafaNodeaRedVVVVtaNodeaBlackVVVVtIarbtreeV14V0EAabstV0FFF">
       <label
-       name="expl:parameter insert">
-       </label>
+       name="expl:parameter insert"/>
       <proof
        prover="1"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.03"/>
@@ -1075,13 +1114,15 @@
       <proof
        prover="0"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.10"/>
+       <result status="valid" time="0.07"/>
       </proof>
       <proof
        prover="2"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.04"/>
@@ -1092,16 +1133,16 @@
       locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
       loclnum="246" loccnumb="10" loccnume="16"
       expl="parameter insert"
-      sum="47c6d820fe2c0596c64de9cbbf7d9ea6"
+      sum="a5190b546e61b01e194acf774168196f"
       proved="true"
       expanded="false"
-      shape="CV0aLeaftaNodeaRedVVVVarbtreeV7V3EAabstV3Iainfix <V1V4aNodeaBlackVVVVtIarbtreeV12V0EAabstV0FFF">
+      shape="CV0aLeaftaNodeaRedVVVVarbtreeV7V3EAabstV3Iainfix &lt;V1V4aNodeaBlackVVVVtIarbtreeV12V0EAabstV0FFF">
       <label
-       name="expl:parameter insert">
-       </label>
+       name="expl:parameter insert"/>
       <proof
        prover="1"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -1109,13 +1150,15 @@
       <proof
        prover="0"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.04"/>
+       <result status="valid" time="0.05"/>
       </proof>
       <proof
        prover="2"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
@@ -1126,13 +1169,12 @@
       locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
       loclnum="246" loccnumb="10" loccnume="16"
       expl="parameter insert"
-      sum="67d6d027e6f1bffbc0f69b0e521b79ea"
+      sum="bfaecdf473a76abced65e54442dc366d"
       proved="true"
       expanded="false"
-      shape="CV0aLeaftaNodeaRedVVVViainfix =V8V1ainfix =V9V2amemtV0V8V9qamemtaNodeaRedV7V4V5V6V8V9FAamemtaNodeaRedV7V4V5V6V1V2AarbtreeV10aNodeaRedV7V4V5V6ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV10aNodeaRedV7V4V5V6IarbtreeV10V0FAabstaNodeaRedV7V4V5V6Iiainfix =V11V1ainfix =V12V2amemtV3V11V12qamemtV7V11V12FAamemtV7V1V2AarbtreeV13V7ICV3aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV13V7IarbtreeV13V3FAabstV7FIarbtreeV14V3EAabstV3Iainfix <V1V4aNodeaBlackVVVVtIarbtreeV19V0EAabstV0FFF">
+      shape="CV0aLeaftaNodeaRedVVVViainfix =V8V1ainfix =V9V2amemtV0V8V9qamemtaNodeaRedV7V4V5V6V8V9FAamemtaNodeaRedV7V4V5V6V1V2AarbtreeV10aNodeaRedV7V4V5V6ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV10aNodeaRedV7V4V5V6IarbtreeV10V0FAabstaNodeaRedV7V4V5V6Iiainfix =V11V1ainfix =V12V2amemtV3V11V12qamemtV7V11V12FAamemtV7V1V2AarbtreeV13V7ICV3aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV13V7IarbtreeV13V3FAabstV7FIarbtreeV14V3EAabstV3Iainfix &lt;V1V4aNodeaBlackVVVVtIarbtreeV19V0EAabstV0FFF">
       <label
-       name="expl:parameter insert">
-       </label>
+       name="expl:parameter insert"/>
       <transf
        name="split_goal"
        proved="true"
@@ -1142,19 +1184,19 @@
         locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
-        sum="c1ac152525d1e3567538b89f9915585f"
+        sum="25b4496684c5e6ddd55afd7856796d0a"
         proved="true"
         expanded="false"
-        shape="CV0aLeaftaNodeaRedVVVVabstaNodeaRedV7V4V5V6Iiainfix =V8V1ainfix =V9V2amemtV3V8V9qamemtV7V8V9FAamemtV7V1V2AarbtreeV10V7ICV3aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV10V7IarbtreeV10V3FAabstV7FIarbtreeV11V3EAabstV3Iainfix <V1V4aNodeaBlackVVVVtIarbtreeV16V0EAabstV0FFF">
+        shape="CV0aLeaftaNodeaRedVVVVabstaNodeaRedV7V4V5V6Iiainfix =V8V1ainfix =V9V2amemtV3V8V9qamemtV7V8V9FAamemtV7V1V2AarbtreeV10V7ICV3aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV10V7IarbtreeV10V3FAabstV7FIarbtreeV11V3EAabstV3Iainfix &lt;V1V4aNodeaBlackVVVVtIarbtreeV16V0EAabstV0FFF">
         <label
-         name="expl:parameter insert">
-         </label>
+         name="expl:parameter insert"/>
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.04"/>
+         <result status="valid" time="0.05"/>
         </proof>
        </goal>
        <goal
@@ -1162,26 +1204,27 @@
         locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
-        sum="af76d48f447a2b67eaea19cc52da663e"
+        sum="37fae91e3a6822dfac8fb0c6e46a6095"
         proved="true"
         expanded="false"
-        shape="CV0aLeaftaNodeaRedVVVVaalmost_rbtreeV8aNodeaRedV7V4V5V6IarbtreeV8V0FIiainfix =V9V1ainfix =V10V2amemtV3V9V10qamemtV7V9V10FAamemtV7V1V2AarbtreeV11V7ICV3aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV11V7IarbtreeV11V3FAabstV7FIarbtreeV12V3EAabstV3Iainfix <V1V4aNodeaBlackVVVVtIarbtreeV17V0EAabstV0FFF">
+        shape="CV0aLeaftaNodeaRedVVVVaalmost_rbtreeV8aNodeaRedV7V4V5V6IarbtreeV8V0FIiainfix =V9V1ainfix =V10V2amemtV3V9V10qamemtV7V9V10FAamemtV7V1V2AarbtreeV11V7ICV3aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV11V7IarbtreeV11V3FAabstV7FIarbtreeV12V3EAabstV3Iainfix &lt;V1V4aNodeaBlackVVVVtIarbtreeV17V0EAabstV0FFF">
         <label
-         name="expl:parameter insert">
-         </label>
+         name="expl:parameter insert"/>
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="2.57"/>
+         <result status="valid" time="2.19"/>
         </proof>
         <proof
          prover="2"
-         timelimit="5"
+         timelimit="6"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="2.69"/>
+         <result status="valid" time="2.50"/>
         </proof>
        </goal>
        <goal
@@ -1189,16 +1232,16 @@
         locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
-        sum="97004b3aba1ee80c0dcecac8fbc1dd8f"
+        sum="a9327a1cc279459ad55f7ab345d56178"
         proved="true"
         expanded="false"
-        shape="CV0aLeaftaNodeaRedVVVVarbtreeV8aNodeaRedV7V4V5V6ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftIarbtreeV8V0FIiainfix =V9V1ainfix =V10V2amemtV3V9V10qamemtV7V9V10FAamemtV7V1V2AarbtreeV11V7ICV3aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV11V7IarbtreeV11V3FAabstV7FIarbtreeV12V3EAabstV3Iainfix <V1V4aNodeaBlackVVVVtIarbtreeV17V0EAabstV0FFF">
+        shape="CV0aLeaftaNodeaRedVVVVarbtreeV8aNodeaRedV7V4V5V6ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftIarbtreeV8V0FIiainfix =V9V1ainfix =V10V2amemtV3V9V10qamemtV7V9V10FAamemtV7V1V2AarbtreeV11V7ICV3aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV11V7IarbtreeV11V3FAabstV7FIarbtreeV12V3EAabstV3Iainfix &lt;V1V4aNodeaBlackVVVVtIarbtreeV17V0EAabstV0FFF">
         <label
-         name="expl:parameter insert">
-         </label>
+         name="expl:parameter insert"/>
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
@@ -1206,13 +1249,15 @@
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.10"/>
+         <result status="valid" time="0.08"/>
         </proof>
         <proof
          prover="2"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
@@ -1223,16 +1268,16 @@
         locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
-        sum="4c90e2b4cc786f5c8f945618ebeabe08"
+        sum="2b071fc1597b63fc9e153745e33c2da0"
         proved="true"
         expanded="false"
-        shape="CV0aLeaftaNodeaRedVVVVamemtaNodeaRedV7V4V5V6V1V2Iiainfix =V8V1ainfix =V9V2amemtV3V8V9qamemtV7V8V9FAamemtV7V1V2AarbtreeV10V7ICV3aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV10V7IarbtreeV10V3FAabstV7FIarbtreeV11V3EAabstV3Iainfix <V1V4aNodeaBlackVVVVtIarbtreeV16V0EAabstV0FFF">
+        shape="CV0aLeaftaNodeaRedVVVVamemtaNodeaRedV7V4V5V6V1V2Iiainfix =V8V1ainfix =V9V2amemtV3V8V9qamemtV7V8V9FAamemtV7V1V2AarbtreeV10V7ICV3aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV10V7IarbtreeV10V3FAabstV7FIarbtreeV11V3EAabstV3Iainfix &lt;V1V4aNodeaBlackVVVVtIarbtreeV16V0EAabstV0FFF">
         <label
-         name="expl:parameter insert">
-         </label>
+         name="expl:parameter insert"/>
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
@@ -1240,13 +1285,15 @@
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.00"/>
+         <result status="valid" time="0.01"/>
         </proof>
         <proof
          prover="2"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
@@ -1257,19 +1304,19 @@
         locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
-        sum="e466b7b65dce1eef4ec72c0dc853594f"
+        sum="6db2c36685d132acd4da2bb803069371"
         proved="true"
         expanded="false"
-        shape="CV0aLeaftaNodeaRedVVVVainfix =V9V2Iainfix =V8V1IamemtaNodeaRedV7V4V5V6V8V9FIiainfix =V10V1ainfix =V11V2amemtV3V10V11qamemtV7V10V11FAamemtV7V1V2AarbtreeV12V7ICV3aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV12V7IarbtreeV12V3FAabstV7FIarbtreeV13V3EAabstV3Iainfix <V1V4aNodeaBlackVVVVtIarbtreeV18V0EAabstV0FFF">
+        shape="CV0aLeaftaNodeaRedVVVVainfix =V9V2Iainfix =V8V1IamemtaNodeaRedV7V4V5V6V8V9FIiainfix =V10V1ainfix =V11V2amemtV3V10V11qamemtV7V10V11FAamemtV7V1V2AarbtreeV12V7ICV3aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV12V7IarbtreeV12V3FAabstV7FIarbtreeV13V3EAabstV3Iainfix &lt;V1V4aNodeaBlackVVVVtIarbtreeV18V0EAabstV0FFF">
         <label
-         name="expl:parameter insert">
-         </label>
+         name="expl:parameter insert"/>
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.10"/>
+         <result status="valid" time="0.12"/>
         </proof>
        </goal>
        <goal
@@ -1277,26 +1324,27 @@
         locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
-        sum="0e7ef55cd167abb8bbcc8b2e02e1a55b"
+        sum="bbe1bfb3d126fd0bfcc5b4c386f7e7f1"
         proved="true"
         expanded="false"
-        shape="CV0aLeaftaNodeaRedVVVVamemtV0V8V9Iainfix =V8V1NIamemtaNodeaRedV7V4V5V6V8V9FIiainfix =V10V1ainfix =V11V2amemtV3V10V11qamemtV7V10V11FAamemtV7V1V2AarbtreeV12V7ICV3aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV12V7IarbtreeV12V3FAabstV7FIarbtreeV13V3EAabstV3Iainfix <V1V4aNodeaBlackVVVVtIarbtreeV18V0EAabstV0FFF">
+        shape="CV0aLeaftaNodeaRedVVVVamemtV0V8V9Iainfix =V8V1NIamemtaNodeaRedV7V4V5V6V8V9FIiainfix =V10V1ainfix =V11V2amemtV3V10V11qamemtV7V10V11FAamemtV7V1V2AarbtreeV12V7ICV3aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV12V7IarbtreeV12V3FAabstV7FIarbtreeV13V3EAabstV3Iainfix &lt;V1V4aNodeaBlackVVVVtIarbtreeV18V0EAabstV0FFF">
         <label
-         name="expl:parameter insert">
-         </label>
+         name="expl:parameter insert"/>
         <proof
          prover="1"
-         timelimit="5"
+         timelimit="8"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="3.88"/>
+         <result status="valid" time="3.33"/>
         </proof>
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.09"/>
+         <result status="valid" time="0.11"/>
         </proof>
        </goal>
        <goal
@@ -1304,23 +1352,24 @@
         locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
-        sum="9015d2e89f8cf5052bcdc85a39c2f72d"
+        sum="55903fc74443943d6bf8dd56dbec6a99"
         proved="true"
         expanded="false"
-        shape="CV0aLeaftaNodeaRedVVVVamemtaNodeaRedV7V4V5V6V8V9Iiainfix =V8V1ainfix =V9V2amemtV0V8V9FIiainfix =V10V1ainfix =V11V2amemtV3V10V11qamemtV7V10V11FAamemtV7V1V2AarbtreeV12V7ICV3aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV12V7IarbtreeV12V3FAabstV7FIarbtreeV13V3EAabstV3Iainfix <V1V4aNodeaBlackVVVVtIarbtreeV18V0EAabstV0FFF">
+        shape="CV0aLeaftaNodeaRedVVVVamemtaNodeaRedV7V4V5V6V8V9Iiainfix =V8V1ainfix =V9V2amemtV0V8V9FIiainfix =V10V1ainfix =V11V2amemtV3V10V11qamemtV7V10V11FAamemtV7V1V2AarbtreeV12V7ICV3aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV12V7IarbtreeV12V3FAabstV7FIarbtreeV13V3EAabstV3Iainfix &lt;V1V4aNodeaBlackVVVVtIarbtreeV18V0EAabstV0FFF">
         <label
-         name="expl:parameter insert">
-         </label>
+         name="expl:parameter insert"/>
         <proof
          prover="1"
-         timelimit="5"
+         timelimit="8"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="3.63"/>
+         <result status="valid" time="3.25"/>
         </proof>
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.03"/>
@@ -1333,16 +1382,16 @@
       locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
       loclnum="246" loccnumb="10" loccnume="16"
       expl="parameter insert"
-      sum="cd338b3f4414ea497fc831b8c235a043"
+      sum="1bcec0e2777b249f42b0b9a677135dae"
       proved="true"
       expanded="false"
-      shape="CV0aLeaftaNodeaRedVVVVarbtreeV7V6EAabstV6Iainfix <V4V1Iainfix <V1V4NaNodeaBlackVVVVtIarbtreeV12V0EAabstV0FFF">
+      shape="CV0aLeaftaNodeaRedVVVVarbtreeV7V6EAabstV6Iainfix &lt;V4V1Iainfix &lt;V1V4NaNodeaBlackVVVVtIarbtreeV12V0EAabstV0FFF">
       <label
-       name="expl:parameter insert">
-       </label>
+       name="expl:parameter insert"/>
       <proof
        prover="1"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -1350,13 +1399,15 @@
       <proof
        prover="0"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.04"/>
+       <result status="valid" time="0.06"/>
       </proof>
       <proof
        prover="2"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
@@ -1367,13 +1418,12 @@
       locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
       loclnum="246" loccnumb="10" loccnume="16"
       expl="parameter insert"
-      sum="e0d5a53febecb031a3a21c64149924cd"
+      sum="92ffead4ed806edc20b6f0ef815c523c"
       proved="true"
-      expanded="true"
-      shape="CV0aLeaftaNodeaRedVVVViainfix =V8V1ainfix =V9V2amemtV0V8V9qamemtaNodeaRedV3V4V5V7V8V9FAamemtaNodeaRedV3V4V5V7V1V2AarbtreeV10aNodeaRedV3V4V5V7ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV10aNodeaRedV3V4V5V7IarbtreeV10V0FAabstaNodeaRedV3V4V5V7Iiainfix =V11V1ainfix =V12V2amemtV6V11V12qamemtV7V11V12FAamemtV7V1V2AarbtreeV13V7ICV6aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV13V7IarbtreeV13V6FAabstV7FIarbtreeV14V6EAabstV6Iainfix <V4V1Iainfix <V1V4NaNodeaBlackVVVVtIarbtreeV19V0EAabstV0FFF">
+      expanded="false"
+      shape="CV0aLeaftaNodeaRedVVVViainfix =V8V1ainfix =V9V2amemtV0V8V9qamemtaNodeaRedV3V4V5V7V8V9FAamemtaNodeaRedV3V4V5V7V1V2AarbtreeV10aNodeaRedV3V4V5V7ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV10aNodeaRedV3V4V5V7IarbtreeV10V0FAabstaNodeaRedV3V4V5V7Iiainfix =V11V1ainfix =V12V2amemtV6V11V12qamemtV7V11V12FAamemtV7V1V2AarbtreeV13V7ICV6aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV13V7IarbtreeV13V6FAabstV7FIarbtreeV14V6EAabstV6Iainfix &lt;V4V1Iainfix &lt;V1V4NaNodeaBlackVVVVtIarbtreeV19V0EAabstV0FFF">
       <label
-       name="expl:parameter insert">
-       </label>
+       name="expl:parameter insert"/>
       <transf
        name="split_goal"
        proved="true"
@@ -1383,19 +1433,19 @@
         locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
-        sum="a243f763e07198e4d0093d71afc35c9a"
+        sum="0892c67ff433f1d45c8e8105f7c4e4db"
         proved="true"
         expanded="false"
-        shape="CV0aLeaftaNodeaRedVVVVabstaNodeaRedV3V4V5V7Iiainfix =V8V1ainfix =V9V2amemtV6V8V9qamemtV7V8V9FAamemtV7V1V2AarbtreeV10V7ICV6aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV10V7IarbtreeV10V6FAabstV7FIarbtreeV11V6EAabstV6Iainfix <V4V1Iainfix <V1V4NaNodeaBlackVVVVtIarbtreeV16V0EAabstV0FFF">
+        shape="CV0aLeaftaNodeaRedVVVVabstaNodeaRedV3V4V5V7Iiainfix =V8V1ainfix =V9V2amemtV6V8V9qamemtV7V8V9FAamemtV7V1V2AarbtreeV10V7ICV6aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV10V7IarbtreeV10V6FAabstV7FIarbtreeV11V6EAabstV6Iainfix &lt;V4V1Iainfix &lt;V1V4NaNodeaBlackVVVVtIarbtreeV16V0EAabstV0FFF">
         <label
-         name="expl:parameter insert">
-         </label>
+         name="expl:parameter insert"/>
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.04"/>
+         <result status="valid" time="0.05"/>
         </proof>
        </goal>
        <goal
@@ -1403,26 +1453,27 @@
         locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
-        sum="e3504ad577c66fe4901ce0e4b572697e"
+        sum="419316d059276e090b8146a4c22ef994"
         proved="true"
         expanded="false"
-        shape="CV0aLeaftaNodeaRedVVVVaalmost_rbtreeV8aNodeaRedV3V4V5V7IarbtreeV8V0FIiainfix =V9V1ainfix =V10V2amemtV6V9V10qamemtV7V9V10FAamemtV7V1V2AarbtreeV11V7ICV6aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV11V7IarbtreeV11V6FAabstV7FIarbtreeV12V6EAabstV6Iainfix <V4V1Iainfix <V1V4NaNodeaBlackVVVVtIarbtreeV17V0EAabstV0FFF">
+        shape="CV0aLeaftaNodeaRedVVVVaalmost_rbtreeV8aNodeaRedV3V4V5V7IarbtreeV8V0FIiainfix =V9V1ainfix =V10V2amemtV6V9V10qamemtV7V9V10FAamemtV7V1V2AarbtreeV11V7ICV6aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV11V7IarbtreeV11V6FAabstV7FIarbtreeV12V6EAabstV6Iainfix &lt;V4V1Iainfix &lt;V1V4NaNodeaBlackVVVVtIarbtreeV17V0EAabstV0FFF">
         <label
-         name="expl:parameter insert">
-         </label>
+         name="expl:parameter insert"/>
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="2.47"/>
+         <result status="valid" time="2.19"/>
         </proof>
         <proof
          prover="2"
-         timelimit="5"
+         timelimit="6"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="2.77"/>
+         <result status="valid" time="2.47"/>
         </proof>
        </goal>
        <goal
@@ -1430,16 +1481,16 @@
         locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
-        sum="1197491ae07536ab62db92b40cad6283"
+        sum="748d35a89e0608b5f6e991932f79ec11"
         proved="true"
         expanded="false"
-        shape="CV0aLeaftaNodeaRedVVVVarbtreeV8aNodeaRedV3V4V5V7ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftIarbtreeV8V0FIiainfix =V9V1ainfix =V10V2amemtV6V9V10qamemtV7V9V10FAamemtV7V1V2AarbtreeV11V7ICV6aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV11V7IarbtreeV11V6FAabstV7FIarbtreeV12V6EAabstV6Iainfix <V4V1Iainfix <V1V4NaNodeaBlackVVVVtIarbtreeV17V0EAabstV0FFF">
+        shape="CV0aLeaftaNodeaRedVVVVarbtreeV8aNodeaRedV3V4V5V7ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftIarbtreeV8V0FIiainfix =V9V1ainfix =V10V2amemtV6V9V10qamemtV7V9V10FAamemtV7V1V2AarbtreeV11V7ICV6aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV11V7IarbtreeV11V6FAabstV7FIarbtreeV12V6EAabstV6Iainfix &lt;V4V1Iainfix &lt;V1V4NaNodeaBlackVVVVtIarbtreeV17V0EAabstV0FFF">
         <label
-         name="expl:parameter insert">
-         </label>
+         name="expl:parameter insert"/>
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
@@ -1447,16 +1498,18 @@
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.14"/>
+         <result status="valid" time="0.11"/>
         </proof>
         <proof
          prover="2"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.03"/>
+         <result status="valid" time="0.02"/>
         </proof>
        </goal>
        <goal
@@ -1464,16 +1517,16 @@
         locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
-        sum="23b1e7da40d8ea8c50ac9de5ae8e1f09"
+        sum="861f5c76198e35562a3bef93754a3e04"
         proved="true"
         expanded="false"
-        shape="CV0aLeaftaNodeaRedVVVVamemtaNodeaRedV3V4V5V7V1V2Iiainfix =V8V1ainfix =V9V2amemtV6V8V9qamemtV7V8V9FAamemtV7V1V2AarbtreeV10V7ICV6aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV10V7IarbtreeV10V6FAabstV7FIarbtreeV11V6EAabstV6Iainfix <V4V1Iainfix <V1V4NaNodeaBlackVVVVtIarbtreeV16V0EAabstV0FFF">
+        shape="CV0aLeaftaNodeaRedVVVVamemtaNodeaRedV3V4V5V7V1V2Iiainfix =V8V1ainfix =V9V2amemtV6V8V9qamemtV7V8V9FAamemtV7V1V2AarbtreeV10V7ICV6aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV10V7IarbtreeV10V6FAabstV7FIarbtreeV11V6EAabstV6Iainfix &lt;V4V1Iainfix &lt;V1V4NaNodeaBlackVVVVtIarbtreeV16V0EAabstV0FFF">
         <label
-         name="expl:parameter insert">
-         </label>
+         name="expl:parameter insert"/>
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
@@ -1481,6 +1534,7 @@
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -1488,6 +1542,7 @@
         <proof
          prover="2"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
@@ -1498,33 +1553,35 @@
         locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
-        sum="bb9e884677b24f00cc87ea08b490d14c"
+        sum="d2d94e46eaf5e9844c449f0e326fb2f1"
         proved="true"
         expanded="false"
-        shape="CV0aLeaftaNodeaRedVVVVainfix =V9V2Iainfix =V8V1IamemtaNodeaRedV3V4V5V7V8V9FIiainfix =V10V1ainfix =V11V2amemtV6V10V11qamemtV7V10V11FAamemtV7V1V2AarbtreeV12V7ICV6aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV12V7IarbtreeV12V6FAabstV7FIarbtreeV13V6EAabstV6Iainfix <V4V1Iainfix <V1V4NaNodeaBlackVVVVtIarbtreeV18V0EAabstV0FFF">
+        shape="CV0aLeaftaNodeaRedVVVVainfix =V9V2Iainfix =V8V1IamemtaNodeaRedV3V4V5V7V8V9FIiainfix =V10V1ainfix =V11V2amemtV6V10V11qamemtV7V10V11FAamemtV7V1V2AarbtreeV12V7ICV6aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV12V7IarbtreeV12V6FAabstV7FIarbtreeV13V6EAabstV6Iainfix &lt;V4V1Iainfix &lt;V1V4NaNodeaBlackVVVVtIarbtreeV18V0EAabstV0FFF">
         <label
-         name="expl:parameter insert">
-         </label>
+         name="expl:parameter insert"/>
         <proof
          prover="1"
-         timelimit="5"
+         timelimit="8"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="3.58"/>
+         <result status="valid" time="3.26"/>
         </proof>
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.13"/>
+         <result status="valid" time="0.14"/>
         </proof>
         <proof
          prover="2"
-         timelimit="5"
+         timelimit="9"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="4.13"/>
+         <result status="valid" time="3.87"/>
         </proof>
        </goal>
        <goal
@@ -1532,26 +1589,27 @@
         locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
-        sum="ab256d5dfedd5dd41f53209cbdade2fd"
+        sum="ad8d5783655ba8340d43023ad44e6b28"
         proved="true"
-        expanded="true"
-        shape="CV0aLeaftaNodeaRedVVVVamemtV0V8V9Iainfix =V8V1NIamemtaNodeaRedV3V4V5V7V8V9FIiainfix =V10V1ainfix =V11V2amemtV6V10V11qamemtV7V10V11FAamemtV7V1V2AarbtreeV12V7ICV6aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV12V7IarbtreeV12V6FAabstV7FIarbtreeV13V6EAabstV6Iainfix <V4V1Iainfix <V1V4NaNodeaBlackVVVVtIarbtreeV18V0EAabstV0FFF">
+        expanded="false"
+        shape="CV0aLeaftaNodeaRedVVVVamemtV0V8V9Iainfix =V8V1NIamemtaNodeaRedV3V4V5V7V8V9FIiainfix =V10V1ainfix =V11V2amemtV6V10V11qamemtV7V10V11FAamemtV7V1V2AarbtreeV12V7ICV6aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV12V7IarbtreeV12V6FAabstV7FIarbtreeV13V6EAabstV6Iainfix &lt;V4V1Iainfix &lt;V1V4NaNodeaBlackVVVVtIarbtreeV18V0EAabstV0FFF">
         <label
-         name="expl:parameter insert">
-         </label>
+         name="expl:parameter insert"/>
         <proof
          prover="1"
-         timelimit="5"
+         timelimit="8"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="3.95"/>
+         <result status="valid" time="3.32"/>
         </proof>
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.09"/>
+         <result status="valid" time="0.11"/>
         </proof>
        </goal>
        <goal
@@ -1559,26 +1617,27 @@
         locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
-        sum="d325db6f515a897d50d5ddcec6ddbdde"
+        sum="edb30322a2599d6f19763ec09daed78a"
         proved="true"
         expanded="false"
-        shape="CV0aLeaftaNodeaRedVVVVamemtaNodeaRedV3V4V5V7V8V9Iiainfix =V8V1ainfix =V9V2amemtV0V8V9FIiainfix =V10V1ainfix =V11V2amemtV6V10V11qamemtV7V10V11FAamemtV7V1V2AarbtreeV12V7ICV6aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV12V7IarbtreeV12V6FAabstV7FIarbtreeV13V6EAabstV6Iainfix <V4V1Iainfix <V1V4NaNodeaBlackVVVVtIarbtreeV18V0EAabstV0FFF">
+        shape="CV0aLeaftaNodeaRedVVVVamemtaNodeaRedV3V4V5V7V8V9Iiainfix =V8V1ainfix =V9V2amemtV0V8V9FIiainfix =V10V1ainfix =V11V2amemtV6V10V11qamemtV7V10V11FAamemtV7V1V2AarbtreeV12V7ICV6aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV12V7IarbtreeV12V6FAabstV7FIarbtreeV13V6EAabstV6Iainfix &lt;V4V1Iainfix &lt;V1V4NaNodeaBlackVVVVtIarbtreeV18V0EAabstV0FFF">
         <label
-         name="expl:parameter insert">
-         </label>
+         name="expl:parameter insert"/>
         <proof
          prover="1"
-         timelimit="5"
+         timelimit="8"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="4.02"/>
+         <result status="valid" time="3.66"/>
         </proof>
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.04"/>
+         <result status="valid" time="0.05"/>
         </proof>
        </goal>
       </transf>
@@ -1588,19 +1647,19 @@
       locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
       loclnum="246" loccnumb="10" loccnume="16"
       expl="parameter insert"
-      sum="20e0a4343e0fa4702f0a355f9abb7ace"
+      sum="c9913947ef22ace1e39c5d2b50d5d916"
       proved="true"
       expanded="false"
-      shape="CV0aLeaftaNodeaRedVVVViainfix =V7V1ainfix =V8V2amemtV0V7V8qamemtaNodeaRedV3V4V2V6V7V8FAamemtaNodeaRedV3V4V2V6V1V2AarbtreeV9aNodeaRedV3V4V2V6ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV9aNodeaRedV3V4V2V6IarbtreeV9V0FAabstaNodeaRedV3V4V2V6Iainfix <V4V1NIainfix <V1V4NaNodeaBlackVVVVtIarbtreeV14V0EAabstV0FFF">
+      shape="CV0aLeaftaNodeaRedVVVViainfix =V7V1ainfix =V8V2amemtV0V7V8qamemtaNodeaRedV3V4V2V6V7V8FAamemtaNodeaRedV3V4V2V6V1V2AarbtreeV9aNodeaRedV3V4V2V6ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV9aNodeaRedV3V4V2V6IarbtreeV9V0FAabstaNodeaRedV3V4V2V6Iainfix &lt;V4V1NIainfix &lt;V1V4NaNodeaBlackVVVVtIarbtreeV14V0EAabstV0FFF">
       <label
-       name="expl:parameter insert">
-       </label>
+       name="expl:parameter insert"/>
       <proof
        prover="0"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.11"/>
+       <result status="valid" time="0.12"/>
       </proof>
      </goal>
      <goal
@@ -1608,16 +1667,16 @@
       locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
       loclnum="246" loccnumb="10" loccnume="16"
       expl="parameter insert"
-      sum="a69276b73e4895d20f3a9e0f86698d81"
+      sum="bee4af818fd08ff9986968cb01fefd3a"
       proved="true"
       expanded="false"
-      shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVarbtreeV11V7EAabstV7Iainfix <V1V8IarbtreeV12V0EAabstV0FFF">
+      shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVarbtreeV11V7EAabstV7Iainfix &lt;V1V8IarbtreeV12V0EAabstV0FFF">
       <label
-       name="expl:parameter insert">
-       </label>
+       name="expl:parameter insert"/>
       <proof
        prover="1"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -1625,13 +1684,15 @@
       <proof
        prover="0"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.15"/>
+       <result status="valid" time="0.21"/>
       </proof>
       <proof
        prover="2"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
@@ -1642,19 +1703,19 @@
       locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
       loclnum="246" loccnumb="10" loccnume="16"
       expl="parameter insert"
-      sum="2510c892fd9e965b3ce35bfac003acdd"
+      sum="b6af890c21c20ee1c801f2f9fdf9b374"
       proved="true"
       expanded="false"
-      shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVabstV10AabstV11Aagt_treeV8V10Aalt_treeV8V11Iiainfix =V12V1ainfix =V13V2amemtV7V12V13qamemtV11V12V13FAamemtV11V1V2AarbtreeV14V11ICV7aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV14V11IarbtreeV14V7FAabstV11FIarbtreeV15V7EAabstV7Iainfix <V1V8IarbtreeV16V0EAabstV0FFF">
+      shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVabstV10AabstV11Aagt_treeV8V10Aalt_treeV8V11Iiainfix =V12V1ainfix =V13V2amemtV7V12V13qamemtV11V12V13FAamemtV11V1V2AarbtreeV14V11ICV7aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV14V11IarbtreeV14V7FAabstV11FIarbtreeV15V7EAabstV7Iainfix &lt;V1V8IarbtreeV16V0EAabstV0FFF">
       <label
-       name="expl:parameter insert">
-       </label>
+       name="expl:parameter insert"/>
       <proof
        prover="0"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.06"/>
+       <result status="valid" time="0.07"/>
       </proof>
      </goal>
      <goal
@@ -1662,13 +1723,12 @@
       locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
       loclnum="246" loccnumb="10" loccnume="16"
       expl="parameter insert"
-      sum="b3bd43047455d13c4bbbbf85ab83d46f"
+      sum="2d530426232baca129cbf73c791f695d"
       proved="true"
-      expanded="false"
-      shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVViainfix =V13V1ainfix =V14V2amemtV0V13V14qamemtV12V13V14FAamemtV12V1V2AarbtreeV15V12ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV15V12IarbtreeV15V0FAabstV12Iiainfix =V16V8ainfix =V17V9amemtV10V16V17OamemtV11V16V17qamemtV12V16V17FAarbtreeainfix +V18c1V12IarbtreeV18V10Iaalmost_rbtreeV18V11FAabstV12FIabstV10AabstV11Aagt_treeV8V10Aalt_treeV8V11Iiainfix =V19V1ainfix =V20V2amemtV7V19V20qamemtV11V19V20FAamemtV11V1V2AarbtreeV21V11ICV7aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV21V11IarbtreeV21V7FAabstV11FIarbtreeV22V7EAabstV7Iainfix <V1V8IarbtreeV23V0EAabstV0FFF">
+      expanded="true"
+      shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVViainfix =V13V1ainfix =V14V2amemtV0V13V14qamemtV12V13V14FAamemtV12V1V2AarbtreeV15V12ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV15V12IarbtreeV15V0FAabstV12Iiainfix =V16V8ainfix =V17V9amemtV10V16V17OamemtV11V16V17qamemtV12V16V17FAarbtreeainfix +V18c1V12IarbtreeV18V10Iaalmost_rbtreeV18V11FAabstV12FIabstV10AabstV11Aagt_treeV8V10Aalt_treeV8V11Iiainfix =V19V1ainfix =V20V2amemtV7V19V20qamemtV11V19V20FAamemtV11V1V2AarbtreeV21V11ICV7aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV21V11IarbtreeV21V7FAabstV11FIarbtreeV22V7EAabstV7Iainfix &lt;V1V8IarbtreeV23V0EAabstV0FFF">
       <label
-       name="expl:parameter insert">
-       </label>
+       name="expl:parameter insert"/>
       <transf
        name="split_goal"
        proved="true"
@@ -1678,23 +1738,24 @@
         locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
-        sum="06383930d7860fbbeadf31bd94f8a924"
+        sum="ce1d4c16330d43af6e9a63dac423a1e5"
         proved="true"
         expanded="false"
-        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVabstV12Iiainfix =V13V8ainfix =V14V9amemtV10V13V14OamemtV11V13V14qamemtV12V13V14FAarbtreeainfix +V15c1V12IarbtreeV15V10Iaalmost_rbtreeV15V11FAabstV12FIabstV10AabstV11Aagt_treeV8V10Aalt_treeV8V11Iiainfix =V16V1ainfix =V17V2amemtV7V16V17qamemtV11V16V17FAamemtV11V1V2AarbtreeV18V11ICV7aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV18V11IarbtreeV18V7FAabstV11FIarbtreeV19V7EAabstV7Iainfix <V1V8IarbtreeV20V0EAabstV0FFF">
+        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVabstV12Iiainfix =V13V8ainfix =V14V9amemtV10V13V14OamemtV11V13V14qamemtV12V13V14FAarbtreeainfix +V15c1V12IarbtreeV15V10Iaalmost_rbtreeV15V11FAabstV12FIabstV10AabstV11Aagt_treeV8V10Aalt_treeV8V11Iiainfix =V16V1ainfix =V17V2amemtV7V16V17qamemtV11V16V17FAamemtV11V1V2AarbtreeV18V11ICV7aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV18V11IarbtreeV18V7FAabstV11FIarbtreeV19V7EAabstV7Iainfix &lt;V1V8IarbtreeV20V0EAabstV0FFF">
         <label
-         name="expl:parameter insert">
-         </label>
+         name="expl:parameter insert"/>
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.02"/>
+         <result status="valid" time="0.01"/>
         </proof>
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -1702,6 +1763,7 @@
         <proof
          prover="2"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
@@ -1712,19 +1774,19 @@
         locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
-        sum="b50bb3adfc63aa2a57a378c63bd3ee97"
+        sum="5542e0b2a62f74684b428f60e466bbb0"
         proved="true"
         expanded="false"
-        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVaalmost_rbtreeV13V12IarbtreeV13V0FIiainfix =V14V8ainfix =V15V9amemtV10V14V15OamemtV11V14V15qamemtV12V14V15FAarbtreeainfix +V16c1V12IarbtreeV16V10Iaalmost_rbtreeV16V11FAabstV12FIabstV10AabstV11Aagt_treeV8V10Aalt_treeV8V11Iiainfix =V17V1ainfix =V18V2amemtV7V17V18qamemtV11V17V18FAamemtV11V1V2AarbtreeV19V11ICV7aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV19V11IarbtreeV19V7FAabstV11FIarbtreeV20V7EAabstV7Iainfix <V1V8IarbtreeV21V0EAabstV0FFF">
+        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVaalmost_rbtreeV13V12IarbtreeV13V0FIiainfix =V14V8ainfix =V15V9amemtV10V14V15OamemtV11V14V15qamemtV12V14V15FAarbtreeainfix +V16c1V12IarbtreeV16V10Iaalmost_rbtreeV16V11FAabstV12FIabstV10AabstV11Aagt_treeV8V10Aalt_treeV8V11Iiainfix =V17V1ainfix =V18V2amemtV7V17V18qamemtV11V17V18FAamemtV11V1V2AarbtreeV19V11ICV7aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV19V11IarbtreeV19V7FAabstV11FIarbtreeV20V7EAabstV7Iainfix &lt;V1V8IarbtreeV21V0EAabstV0FFF">
         <label
-         name="expl:parameter insert">
-         </label>
+         name="expl:parameter insert"/>
         <proof
          prover="1"
          timelimit="100"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="27.56"/>
+         <result status="valid" time="29.37"/>
         </proof>
        </goal>
        <goal
@@ -1732,19 +1794,19 @@
         locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
-        sum="a2c49fdb0dd8f3947fa84ed93c2cc882"
+        sum="069f7e85a6e7a0321a18275fb75d848d"
         proved="true"
-        expanded="false"
-        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVarbtreeV13V12ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftIarbtreeV13V0FIiainfix =V14V8ainfix =V15V9amemtV10V14V15OamemtV11V14V15qamemtV12V14V15FAarbtreeainfix +V16c1V12IarbtreeV16V10Iaalmost_rbtreeV16V11FAabstV12FIabstV10AabstV11Aagt_treeV8V10Aalt_treeV8V11Iiainfix =V17V1ainfix =V18V2amemtV7V17V18qamemtV11V17V18FAamemtV11V1V2AarbtreeV19V11ICV7aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV19V11IarbtreeV19V7FAabstV11FIarbtreeV20V7EAabstV7Iainfix <V1V8IarbtreeV21V0EAabstV0FFF">
+        expanded="true"
+        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVarbtreeV13V12ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftIarbtreeV13V0FIiainfix =V14V8ainfix =V15V9amemtV10V14V15OamemtV11V14V15qamemtV12V14V15FAarbtreeainfix +V16c1V12IarbtreeV16V10Iaalmost_rbtreeV16V11FAabstV12FIabstV10AabstV11Aagt_treeV8V10Aalt_treeV8V11Iiainfix =V17V1ainfix =V18V2amemtV7V17V18qamemtV11V17V18FAamemtV11V1V2AarbtreeV19V11ICV7aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV19V11IarbtreeV19V7FAabstV11FIarbtreeV20V7EAabstV7Iainfix &lt;V1V8IarbtreeV21V0EAabstV0FFF">
         <label
-         name="expl:parameter insert">
-         </label>
+         name="expl:parameter insert"/>
         <proof
          prover="1"
-         timelimit="100"
+         timelimit="120"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="54.51"/>
+         <result status="valid" time="57.85"/>
         </proof>
        </goal>
        <goal
@@ -1752,16 +1814,16 @@
         locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
-        sum="67531f54805f0953528f44340a6bf5d5"
+        sum="2ed66c4fc9e2d93ee8f6fa32576935a9"
         proved="true"
         expanded="false"
-        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVamemtV12V1V2Iiainfix =V13V8ainfix =V14V9amemtV10V13V14OamemtV11V13V14qamemtV12V13V14FAarbtreeainfix +V15c1V12IarbtreeV15V10Iaalmost_rbtreeV15V11FAabstV12FIabstV10AabstV11Aagt_treeV8V10Aalt_treeV8V11Iiainfix =V16V1ainfix =V17V2amemtV7V16V17qamemtV11V16V17FAamemtV11V1V2AarbtreeV18V11ICV7aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV18V11IarbtreeV18V7FAabstV11FIarbtreeV19V7EAabstV7Iainfix <V1V8IarbtreeV20V0EAabstV0FFF">
+        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVamemtV12V1V2Iiainfix =V13V8ainfix =V14V9amemtV10V13V14OamemtV11V13V14qamemtV12V13V14FAarbtreeainfix +V15c1V12IarbtreeV15V10Iaalmost_rbtreeV15V11FAabstV12FIabstV10AabstV11Aagt_treeV8V10Aalt_treeV8V11Iiainfix =V16V1ainfix =V17V2amemtV7V16V17qamemtV11V16V17FAamemtV11V1V2AarbtreeV18V11ICV7aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV18V11IarbtreeV18V7FAabstV11FIarbtreeV19V7EAabstV7Iainfix &lt;V1V8IarbtreeV20V0EAabstV0FFF">
         <label
-         name="expl:parameter insert">
-         </label>
+         name="expl:parameter insert"/>
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.08"/>
@@ -1769,6 +1831,7 @@
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -1776,9 +1839,10 @@
         <proof
          prover="2"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.10"/>
+         <result status="valid" time="0.08"/>
         </proof>
        </goal>
        <goal
@@ -1786,33 +1850,35 @@
         locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
-        sum="c83d75f21650fb044bec52c6a53451e1"
+        sum="defe144203bcea74cfc6361f186a9808"
         proved="true"
         expanded="false"
-        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVainfix =V14V2Iainfix =V13V1IamemtV12V13V14FIiainfix =V15V8ainfix =V16V9amemtV10V15V16OamemtV11V15V16qamemtV12V15V16FAarbtreeainfix +V17c1V12IarbtreeV17V10Iaalmost_rbtreeV17V11FAabstV12FIabstV10AabstV11Aagt_treeV8V10Aalt_treeV8V11Iiainfix =V18V1ainfix =V19V2amemtV7V18V19qamemtV11V18V19FAamemtV11V1V2AarbtreeV20V11ICV7aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV20V11IarbtreeV20V7FAabstV11FIarbtreeV21V7EAabstV7Iainfix <V1V8IarbtreeV22V0EAabstV0FFF">
+        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVainfix =V14V2Iainfix =V13V1IamemtV12V13V14FIiainfix =V15V8ainfix =V16V9amemtV10V15V16OamemtV11V15V16qamemtV12V15V16FAarbtreeainfix +V17c1V12IarbtreeV17V10Iaalmost_rbtreeV17V11FAabstV12FIabstV10AabstV11Aagt_treeV8V10Aalt_treeV8V11Iiainfix =V18V1ainfix =V19V2amemtV7V18V19qamemtV11V18V19FAamemtV11V1V2AarbtreeV20V11ICV7aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV20V11IarbtreeV20V7FAabstV11FIarbtreeV21V7EAabstV7Iainfix &lt;V1V8IarbtreeV22V0EAabstV0FFF">
         <label
-         name="expl:parameter insert">
-         </label>
+         name="expl:parameter insert"/>
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.00"/>
+         <result status="valid" time="0.90"/>
         </proof>
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.29"/>
+         <result status="valid" time="0.41"/>
         </proof>
         <proof
          prover="2"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.82"/>
+         <result status="valid" time="0.74"/>
         </proof>
        </goal>
        <goal
@@ -1820,33 +1886,35 @@
         locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
-        sum="cfe62447dc2027e0d4fbd93375dc55b3"
+        sum="d4708f9d7cd33d55449081461470bf18"
         proved="true"
         expanded="false"
-        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVamemtV0V13V14Iainfix =V13V1NIamemtV12V13V14FIiainfix =V15V8ainfix =V16V9amemtV10V15V16OamemtV11V15V16qamemtV12V15V16FAarbtreeainfix +V17c1V12IarbtreeV17V10Iaalmost_rbtreeV17V11FAabstV12FIabstV10AabstV11Aagt_treeV8V10Aalt_treeV8V11Iiainfix =V18V1ainfix =V19V2amemtV7V18V19qamemtV11V18V19FAamemtV11V1V2AarbtreeV20V11ICV7aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV20V11IarbtreeV20V7FAabstV11FIarbtreeV21V7EAabstV7Iainfix <V1V8IarbtreeV22V0EAabstV0FFF">
+        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVamemtV0V13V14Iainfix =V13V1NIamemtV12V13V14FIiainfix =V15V8ainfix =V16V9amemtV10V15V16OamemtV11V15V16qamemtV12V15V16FAarbtreeainfix +V17c1V12IarbtreeV17V10Iaalmost_rbtreeV17V11FAabstV12FIabstV10AabstV11Aagt_treeV8V10Aalt_treeV8V11Iiainfix =V18V1ainfix =V19V2amemtV7V18V19qamemtV11V18V19FAamemtV11V1V2AarbtreeV20V11ICV7aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV20V11IarbtreeV20V7FAabstV11FIarbtreeV21V7EAabstV7Iainfix &lt;V1V8IarbtreeV22V0EAabstV0FFF">
         <label
-         name="expl:parameter insert">
-         </label>
+         name="expl:parameter insert"/>
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.16"/>
+         <result status="valid" time="1.04"/>
         </proof>
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.24"/>
+         <result status="valid" time="0.35"/>
         </proof>
         <proof
          prover="2"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.05"/>
+         <result status="valid" time="0.94"/>
         </proof>
        </goal>
        <goal
@@ -1854,19 +1922,19 @@
         locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
-        sum="19cd453419e33329a8937cc10f31f82a"
+        sum="e08bd47cc27e6b843e695a53ec5ed3ac"
         proved="true"
         expanded="false"
-        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVamemtV12V13V14Iiainfix =V13V1ainfix =V14V2amemtV0V13V14FIiainfix =V15V8ainfix =V16V9amemtV10V15V16OamemtV11V15V16qamemtV12V15V16FAarbtreeainfix +V17c1V12IarbtreeV17V10Iaalmost_rbtreeV17V11FAabstV12FIabstV10AabstV11Aagt_treeV8V10Aalt_treeV8V11Iiainfix =V18V1ainfix =V19V2amemtV7V18V19qamemtV11V18V19FAamemtV11V1V2AarbtreeV20V11ICV7aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV20V11IarbtreeV20V7FAabstV11FIarbtreeV21V7EAabstV7Iainfix <V1V8IarbtreeV22V0EAabstV0FFF">
+        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVamemtV12V13V14Iiainfix =V13V1ainfix =V14V2amemtV0V13V14FIiainfix =V15V8ainfix =V16V9amemtV10V15V16OamemtV11V15V16qamemtV12V15V16FAarbtreeainfix +V17c1V12IarbtreeV17V10Iaalmost_rbtreeV17V11FAabstV12FIabstV10AabstV11Aagt_treeV8V10Aalt_treeV8V11Iiainfix =V18V1ainfix =V19V2amemtV7V18V19qamemtV11V18V19FAamemtV11V1V2AarbtreeV20V11ICV7aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV20V11IarbtreeV20V7FAabstV11FIarbtreeV21V7EAabstV7Iainfix &lt;V1V8IarbtreeV22V0EAabstV0FFF">
         <label
-         name="expl:parameter insert">
-         </label>
+         name="expl:parameter insert"/>
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.09"/>
+         <result status="valid" time="0.12"/>
         </proof>
        </goal>
       </transf>
@@ -1876,16 +1944,16 @@
       locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
       loclnum="246" loccnumb="10" loccnume="16"
       expl="parameter insert"
-      sum="9da6e65047dce23c3ce5cc1d1bd29c52"
+      sum="0bb161e0d994f6d42d379a32da5f4b98"
       proved="true"
       expanded="false"
-      shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVarbtreeV11V10EAabstV10Iainfix <V8V1Iainfix <V1V8NIarbtreeV12V0EAabstV0FFF">
+      shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVarbtreeV11V10EAabstV10Iainfix &lt;V8V1Iainfix &lt;V1V8NIarbtreeV12V0EAabstV0FFF">
       <label
-       name="expl:parameter insert">
-       </label>
+       name="expl:parameter insert"/>
       <proof
        prover="1"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -1893,13 +1961,15 @@
       <proof
        prover="0"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.14"/>
+       <result status="valid" time="0.22"/>
       </proof>
       <proof
        prover="2"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -1910,19 +1980,19 @@
       locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
       loclnum="246" loccnumb="10" loccnume="16"
       expl="parameter insert"
-      sum="3a35da936c9f6699abad52d9c30514bb"
+      sum="8f1957f338ccae5553783ddd593e1a95"
       proved="true"
       expanded="false"
-      shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVabstV11AabstV7Aagt_treeV8V11Aalt_treeV8V7Iiainfix =V12V1ainfix =V13V2amemtV10V12V13qamemtV11V12V13FAamemtV11V1V2AarbtreeV14V11ICV10aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV14V11IarbtreeV14V10FAabstV11FIarbtreeV15V10EAabstV10Iainfix <V8V1Iainfix <V1V8NIarbtreeV16V0EAabstV0FFF">
+      shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVabstV11AabstV7Aagt_treeV8V11Aalt_treeV8V7Iiainfix =V12V1ainfix =V13V2amemtV10V12V13qamemtV11V12V13FAamemtV11V1V2AarbtreeV14V11ICV10aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV14V11IarbtreeV14V10FAabstV11FIarbtreeV15V10EAabstV10Iainfix &lt;V8V1Iainfix &lt;V1V8NIarbtreeV16V0EAabstV0FFF">
       <label
-       name="expl:parameter insert">
-       </label>
+       name="expl:parameter insert"/>
       <proof
        prover="0"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.06"/>
+       <result status="valid" time="0.08"/>
       </proof>
      </goal>
      <goal
@@ -1930,13 +2000,12 @@
       locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
       loclnum="246" loccnumb="10" loccnume="16"
       expl="parameter insert"
-      sum="0d8f6eed1fa3b4ab5841271ca3d277d4"
+      sum="0d6f00c9a7b47abf1e429ff22acb557f"
       proved="true"
       expanded="true"
-      shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVViainfix =V13V1ainfix =V14V2amemtV0V13V14qamemtV12V13V14FAamemtV12V1V2AarbtreeV15V12ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV15V12IarbtreeV15V0FAabstV12Iiainfix =V16V8ainfix =V17V9amemtV11V16V17OamemtV7V16V17qamemtV12V16V17FAarbtreeainfix +V18c1V12IarbtreeV18V7Iaalmost_rbtreeV18V11FAabstV12FIabstV11AabstV7Aagt_treeV8V11Aalt_treeV8V7Iiainfix =V19V1ainfix =V20V2amemtV10V19V20qamemtV11V19V20FAamemtV11V1V2AarbtreeV21V11ICV10aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV21V11IarbtreeV21V10FAabstV11FIarbtreeV22V10EAabstV10Iainfix <V8V1Iainfix <V1V8NIarbtreeV23V0EAabstV0FFF">
+      shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVViainfix =V13V1ainfix =V14V2amemtV0V13V14qamemtV12V13V14FAamemtV12V1V2AarbtreeV15V12ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV15V12IarbtreeV15V0FAabstV12Iiainfix =V16V8ainfix =V17V9amemtV11V16V17OamemtV7V16V17qamemtV12V16V17FAarbtreeainfix +V18c1V12IarbtreeV18V7Iaalmost_rbtreeV18V11FAabstV12FIabstV11AabstV7Aagt_treeV8V11Aalt_treeV8V7Iiainfix =V19V1ainfix =V20V2amemtV10V19V20qamemtV11V19V20FAamemtV11V1V2AarbtreeV21V11ICV10aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV21V11IarbtreeV21V10FAabstV11FIarbtreeV22V10EAabstV10Iainfix &lt;V8V1Iainfix &lt;V1V8NIarbtreeV23V0EAabstV0FFF">
       <label
-       name="expl:parameter insert">
-       </label>
+       name="expl:parameter insert"/>
       <transf
        name="split_goal"
        proved="true"
@@ -1946,23 +2015,24 @@
         locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
-        sum="d9c58c4d080903cd54daa9e8103132d8"
+        sum="aa54a2308dd1b62ac54153fd71fdff80"
         proved="true"
         expanded="false"
-        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVabstV12Iiainfix =V13V8ainfix =V14V9amemtV11V13V14OamemtV7V13V14qamemtV12V13V14FAarbtreeainfix +V15c1V12IarbtreeV15V7Iaalmost_rbtreeV15V11FAabstV12FIabstV11AabstV7Aagt_treeV8V11Aalt_treeV8V7Iiainfix =V16V1ainfix =V17V2amemtV10V16V17qamemtV11V16V17FAamemtV11V1V2AarbtreeV18V11ICV10aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV18V11IarbtreeV18V10FAabstV11FIarbtreeV19V10EAabstV10Iainfix <V8V1Iainfix <V1V8NIarbtreeV20V0EAabstV0FFF">
+        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVabstV12Iiainfix =V13V8ainfix =V14V9amemtV11V13V14OamemtV7V13V14qamemtV12V13V14FAarbtreeainfix +V15c1V12IarbtreeV15V7Iaalmost_rbtreeV15V11FAabstV12FIabstV11AabstV7Aagt_treeV8V11Aalt_treeV8V7Iiainfix =V16V1ainfix =V17V2amemtV10V16V17qamemtV11V16V17FAamemtV11V1V2AarbtreeV18V11ICV10aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV18V11IarbtreeV18V10FAabstV11FIarbtreeV19V10EAabstV10Iainfix &lt;V8V1Iainfix &lt;V1V8NIarbtreeV20V0EAabstV0FFF">
         <label
-         name="expl:parameter insert">
-         </label>
+         name="expl:parameter insert"/>
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.02"/>
+         <result status="valid" time="0.01"/>
         </proof>
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -1970,9 +2040,10 @@
         <proof
          prover="2"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.02"/>
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
        <goal
@@ -1980,19 +2051,19 @@
         locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
-        sum="7bd78e604e6c96c0814a69e50a869ded"
+        sum="be16da04ebca009a20ae334add0ec587"
         proved="true"
         expanded="false"
-        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVaalmost_rbtreeV13V12IarbtreeV13V0FIiainfix =V14V8ainfix =V15V9amemtV11V14V15OamemtV7V14V15qamemtV12V14V15FAarbtreeainfix +V16c1V12IarbtreeV16V7Iaalmost_rbtreeV16V11FAabstV12FIabstV11AabstV7Aagt_treeV8V11Aalt_treeV8V7Iiainfix =V17V1ainfix =V18V2amemtV10V17V18qamemtV11V17V18FAamemtV11V1V2AarbtreeV19V11ICV10aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV19V11IarbtreeV19V10FAabstV11FIarbtreeV20V10EAabstV10Iainfix <V8V1Iainfix <V1V8NIarbtreeV21V0EAabstV0FFF">
+        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVaalmost_rbtreeV13V12IarbtreeV13V0FIiainfix =V14V8ainfix =V15V9amemtV11V14V15OamemtV7V14V15qamemtV12V14V15FAarbtreeainfix +V16c1V12IarbtreeV16V7Iaalmost_rbtreeV16V11FAabstV12FIabstV11AabstV7Aagt_treeV8V11Aalt_treeV8V7Iiainfix =V17V1ainfix =V18V2amemtV10V17V18qamemtV11V17V18FAamemtV11V1V2AarbtreeV19V11ICV10aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV19V11IarbtreeV19V10FAabstV11FIarbtreeV20V10EAabstV10Iainfix &lt;V8V1Iainfix &lt;V1V8NIarbtreeV21V0EAabstV0FFF">
         <label
-         name="expl:parameter insert">
-         </label>
+         name="expl:parameter insert"/>
         <proof
          prover="1"
          timelimit="100"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="33.87"/>
+         <result status="valid" time="28.72"/>
         </proof>
        </goal>
        <goal
@@ -2000,19 +2071,19 @@
         locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
-        sum="da2aaae467a45b7e1b9b4f9f939f4845"
+        sum="06aca69448760b03fe6021cf29223f1f"
         proved="true"
         expanded="true"
-        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVarbtreeV13V12ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftIarbtreeV13V0FIiainfix =V14V8ainfix =V15V9amemtV11V14V15OamemtV7V14V15qamemtV12V14V15FAarbtreeainfix +V16c1V12IarbtreeV16V7Iaalmost_rbtreeV16V11FAabstV12FIabstV11AabstV7Aagt_treeV8V11Aalt_treeV8V7Iiainfix =V17V1ainfix =V18V2amemtV10V17V18qamemtV11V17V18FAamemtV11V1V2AarbtreeV19V11ICV10aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV19V11IarbtreeV19V10FAabstV11FIarbtreeV20V10EAabstV10Iainfix <V8V1Iainfix <V1V8NIarbtreeV21V0EAabstV0FFF">
+        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVarbtreeV13V12ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftIarbtreeV13V0FIiainfix =V14V8ainfix =V15V9amemtV11V14V15OamemtV7V14V15qamemtV12V14V15FAarbtreeainfix +V16c1V12IarbtreeV16V7Iaalmost_rbtreeV16V11FAabstV12FIabstV11AabstV7Aagt_treeV8V11Aalt_treeV8V7Iiainfix =V17V1ainfix =V18V2amemtV10V17V18qamemtV11V17V18FAamemtV11V1V2AarbtreeV19V11ICV10aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV19V11IarbtreeV19V10FAabstV11FIarbtreeV20V10EAabstV10Iainfix &lt;V8V1Iainfix &lt;V1V8NIarbtreeV21V0EAabstV0FFF">
         <label
-         name="expl:parameter insert">
-         </label>
+         name="expl:parameter insert"/>
         <proof
          prover="1"
-         timelimit="100"
+         timelimit="117"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="58.65"/>
+         <result status="valid" time="58.76"/>
         </proof>
        </goal>
        <goal
@@ -2020,23 +2091,24 @@
         locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
-        sum="0500c29f3320434e4e65981b2321e14f"
+        sum="d395b0d78a2315b00afac801b48d7360"
         proved="true"
         expanded="false"
-        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVamemtV12V1V2Iiainfix =V13V8ainfix =V14V9amemtV11V13V14OamemtV7V13V14qamemtV12V13V14FAarbtreeainfix +V15c1V12IarbtreeV15V7Iaalmost_rbtreeV15V11FAabstV12FIabstV11AabstV7Aagt_treeV8V11Aalt_treeV8V7Iiainfix =V16V1ainfix =V17V2amemtV10V16V17qamemtV11V16V17FAamemtV11V1V2AarbtreeV18V11ICV10aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV18V11IarbtreeV18V10FAabstV11FIarbtreeV19V10EAabstV10Iainfix <V8V1Iainfix <V1V8NIarbtreeV20V0EAabstV0FFF">
+        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVamemtV12V1V2Iiainfix =V13V8ainfix =V14V9amemtV11V13V14OamemtV7V13V14qamemtV12V13V14FAarbtreeainfix +V15c1V12IarbtreeV15V7Iaalmost_rbtreeV15V11FAabstV12FIabstV11AabstV7Aagt_treeV8V11Aalt_treeV8V7Iiainfix =V16V1ainfix =V17V2amemtV10V16V17qamemtV11V16V17FAamemtV11V1V2AarbtreeV18V11ICV10aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV18V11IarbtreeV18V10FAabstV11FIarbtreeV19V10EAabstV10Iainfix &lt;V8V1Iainfix &lt;V1V8NIarbtreeV20V0EAabstV0FFF">
         <label
-         name="expl:parameter insert">
-         </label>
+         name="expl:parameter insert"/>
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.09"/>
+         <result status="valid" time="0.07"/>
         </proof>
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -2044,9 +2116,10 @@
         <proof
          prover="2"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.09"/>
+         <result status="valid" time="0.08"/>
         </proof>
        </goal>
        <goal
@@ -2054,19 +2127,19 @@
         locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
-        sum="efe0a94c43f289d09cc89130279f8cc8"
+        sum="1783f4d9b1a4d4607214f94030be844f"
         proved="true"
         expanded="false"
-        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVainfix =V14V2Iainfix =V13V1IamemtV12V13V14FIiainfix =V15V8ainfix =V16V9amemtV11V15V16OamemtV7V15V16qamemtV12V15V16FAarbtreeainfix +V17c1V12IarbtreeV17V7Iaalmost_rbtreeV17V11FAabstV12FIabstV11AabstV7Aagt_treeV8V11Aalt_treeV8V7Iiainfix =V18V1ainfix =V19V2amemtV10V18V19qamemtV11V18V19FAamemtV11V1V2AarbtreeV20V11ICV10aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV20V11IarbtreeV20V10FAabstV11FIarbtreeV21V10EAabstV10Iainfix <V8V1Iainfix <V1V8NIarbtreeV22V0EAabstV0FFF">
+        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVainfix =V14V2Iainfix =V13V1IamemtV12V13V14FIiainfix =V15V8ainfix =V16V9amemtV11V15V16OamemtV7V15V16qamemtV12V15V16FAarbtreeainfix +V17c1V12IarbtreeV17V7Iaalmost_rbtreeV17V11FAabstV12FIabstV11AabstV7Aagt_treeV8V11Aalt_treeV8V7Iiainfix =V18V1ainfix =V19V2amemtV10V18V19qamemtV11V18V19FAamemtV11V1V2AarbtreeV20V11ICV10aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV20V11IarbtreeV20V10FAabstV11FIarbtreeV21V10EAabstV10Iainfix &lt;V8V1Iainfix &lt;V1V8NIarbtreeV22V0EAabstV0FFF">
         <label
-         name="expl:parameter insert">
-         </label>
+         name="expl:parameter insert"/>
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.36"/>
+         <result status="valid" time="0.45"/>
         </proof>
        </goal>
        <goal
@@ -2074,33 +2147,35 @@
         locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
-        sum="eccb7df9c9ffc7cadd16edb6f9a57689"
+        sum="12f28e8855c3b47fc328614b457a19bc"
         proved="true"
         expanded="false"
-        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVamemtV0V13V14Iainfix =V13V1NIamemtV12V13V14FIiainfix =V15V8ainfix =V16V9amemtV11V15V16OamemtV7V15V16qamemtV12V15V16FAarbtreeainfix +V17c1V12IarbtreeV17V7Iaalmost_rbtreeV17V11FAabstV12FIabstV11AabstV7Aagt_treeV8V11Aalt_treeV8V7Iiainfix =V18V1ainfix =V19V2amemtV10V18V19qamemtV11V18V19FAamemtV11V1V2AarbtreeV20V11ICV10aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV20V11IarbtreeV20V10FAabstV11FIarbtreeV21V10EAabstV10Iainfix <V8V1Iainfix <V1V8NIarbtreeV22V0EAabstV0FFF">
+        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVamemtV0V13V14Iainfix =V13V1NIamemtV12V13V14FIiainfix =V15V8ainfix =V16V9amemtV11V15V16OamemtV7V15V16qamemtV12V15V16FAarbtreeainfix +V17c1V12IarbtreeV17V7Iaalmost_rbtreeV17V11FAabstV12FIabstV11AabstV7Aagt_treeV8V11Aalt_treeV8V7Iiainfix =V18V1ainfix =V19V2amemtV10V18V19qamemtV11V18V19FAamemtV11V1V2AarbtreeV20V11ICV10aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV20V11IarbtreeV20V10FAabstV11FIarbtreeV21V10EAabstV10Iainfix &lt;V8V1Iainfix &lt;V1V8NIarbtreeV22V0EAabstV0FFF">
         <label
-         name="expl:parameter insert">
-         </label>
+         name="expl:parameter insert"/>
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.16"/>
+         <result status="valid" time="1.06"/>
         </proof>
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.24"/>
+         <result status="valid" time="0.35"/>
         </proof>
         <proof
          prover="2"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.02"/>
+         <result status="valid" time="0.93"/>
         </proof>
        </goal>
        <goal
@@ -2108,19 +2183,19 @@
         locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="246" loccnumb="10" loccnume="16"
         expl="parameter insert"
-        sum="84177a3c7c0ef1ff543498e163e28baf"
+        sum="606538ebb69fd30e498dc8a3abd79836"
         proved="true"
         expanded="false"
-        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVamemtV12V13V14Iiainfix =V13V1ainfix =V14V2amemtV0V13V14FIiainfix =V15V8ainfix =V16V9amemtV11V15V16OamemtV7V15V16qamemtV12V15V16FAarbtreeainfix +V17c1V12IarbtreeV17V7Iaalmost_rbtreeV17V11FAabstV12FIabstV11AabstV7Aagt_treeV8V11Aalt_treeV8V7Iiainfix =V18V1ainfix =V19V2amemtV10V18V19qamemtV11V18V19FAamemtV11V1V2AarbtreeV20V11ICV10aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV20V11IarbtreeV20V10FAabstV11FIarbtreeV21V10EAabstV10Iainfix <V8V1Iainfix <V1V8NIarbtreeV22V0EAabstV0FFF">
+        shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVVamemtV12V13V14Iiainfix =V13V1ainfix =V14V2amemtV0V13V14FIiainfix =V15V8ainfix =V16V9amemtV11V15V16OamemtV7V15V16qamemtV12V15V16FAarbtreeainfix +V17c1V12IarbtreeV17V7Iaalmost_rbtreeV17V11FAabstV12FIabstV11AabstV7Aagt_treeV8V11Aalt_treeV8V7Iiainfix =V18V1ainfix =V19V2amemtV10V18V19qamemtV11V18V19FAamemtV11V1V2AarbtreeV20V11ICV10aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV20V11IarbtreeV20V10FAabstV11FIarbtreeV21V10EAabstV10Iainfix &lt;V8V1Iainfix &lt;V1V8NIarbtreeV22V0EAabstV0FFF">
         <label
-         name="expl:parameter insert">
-         </label>
+         name="expl:parameter insert"/>
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.10"/>
+         <result status="valid" time="0.12"/>
         </proof>
        </goal>
       </transf>
@@ -2130,19 +2205,19 @@
       locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
       loclnum="246" loccnumb="10" loccnume="16"
       expl="parameter insert"
-      sum="1004c53024921724eae82990ac0c3599"
+      sum="488dccd1fe91d6fef5902be8746ebd60"
       proved="true"
       expanded="false"
-      shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVViainfix =V11V1ainfix =V12V2amemtV0V11V12qamemtaNodeaBlackV7V8V2V10V11V12FAamemtaNodeaBlackV7V8V2V10V1V2AarbtreeV13aNodeaBlackV7V8V2V10ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV13aNodeaBlackV7V8V2V10IarbtreeV13V0FAabstaNodeaBlackV7V8V2V10Iainfix <V8V1NIainfix <V1V8NIarbtreeV14V0EAabstV0FFF">
+      shape="CV0aLeaftaNodeaRedVVVVtaNodeaBlackVVVViainfix =V11V1ainfix =V12V2amemtV0V11V12qamemtaNodeaBlackV7V8V2V10V11V12FAamemtaNodeaBlackV7V8V2V10V1V2AarbtreeV13aNodeaBlackV7V8V2V10ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV13aNodeaBlackV7V8V2V10IarbtreeV13V0FAabstaNodeaBlackV7V8V2V10Iainfix &lt;V8V1NIainfix &lt;V1V8NIarbtreeV14V0EAabstV0FFF">
       <label
-       name="expl:parameter insert">
-       </label>
+       name="expl:parameter insert"/>
       <proof
        prover="0"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.22"/>
+       <result status="valid" time="0.30"/>
       </proof>
      </goal>
     </transf>
@@ -2152,13 +2227,12 @@
     locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="269" loccnumb="6" loccnume="9"
     expl="parameter add"
-    sum="c8cd9beab6254b7379aac490a151f74f"
+    sum="2de35281b71d9c81c5a21cd1064f52d4"
     proved="true"
     expanded="false"
     shape="CV3aNodewVVVViainfix =V8V1ainfix =V9V2amemtV0V8V9qamemtaNodeaBlackV4V5V6V7V8V9FAamemtaNodeaBlackV4V5V6V7V1V2AarbtreeV10aNodeaBlackV4V5V6V7EAabstaNodeaBlackV4V5V6V7aLeaffIiainfix =V11V1ainfix =V12V2amemtV0V11V12qamemtV3V11V12FAamemtV3V1V2AarbtreeV13V3ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV13V3IarbtreeV13V0FAabstV3FAarbtreeV14V0EAabstV0IarbtreeV15V0EAabstV0FFF">
     <label
-     name="expl:parameter add">
-     </label>
+     name="expl:parameter add"/>
     <transf
      name="split_goal"
      proved="true"
@@ -2168,16 +2242,16 @@
       locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
       loclnum="269" loccnumb="6" loccnume="9"
       expl="precondition"
-      sum="08f8b620c36fe7fa96e7b811a3779ddd"
+      sum="b85d949c77bf259e74bc20da630ee4eb"
       proved="true"
       expanded="false"
       shape="arbtreeV3V0EAabstV0IarbtreeV4V0EAabstV0FFF">
       <label
-       name="expl:parameter add">
-       </label>
+       name="expl:parameter add"/>
       <proof
        prover="1"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -2185,6 +2259,7 @@
       <proof
        prover="0"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -2192,6 +2267,7 @@
       <proof
        prover="2"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -2202,13 +2278,12 @@
       locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
       loclnum="269" loccnumb="6" loccnume="9"
       expl="parameter add"
-      sum="35346021b124ac923dfa0683eca1d417"
+      sum="79f2fcd80d23136c69aadf47f686060b"
       proved="true"
       expanded="false"
       shape="CV3aNodewVVVViainfix =V8V1ainfix =V9V2amemtV0V8V9qamemtaNodeaBlackV4V5V6V7V8V9FAamemtaNodeaBlackV4V5V6V7V1V2AarbtreeV10aNodeaBlackV4V5V6V7EAabstaNodeaBlackV4V5V6V7aLeaftIiainfix =V11V1ainfix =V12V2amemtV0V11V12qamemtV3V11V12FAamemtV3V1V2AarbtreeV13V3ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV13V3IarbtreeV13V0FAabstV3FIarbtreeV14V0EAabstV0IarbtreeV15V0EAabstV0FFF">
       <label
-       name="expl:parameter add">
-       </label>
+       name="expl:parameter add"/>
       <transf
        name="split_goal"
        proved="true"
@@ -2218,16 +2293,16 @@
         locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="269" loccnumb="6" loccnume="9"
         expl="parameter add"
-        sum="6d22a9f694169b9697654103b8ed3e0f"
+        sum="9c566483a2862e58d50ebcdc37d0a086"
         proved="true"
         expanded="false"
         shape="CV3aNodewVVVVabstaNodeaBlackV4V5V6V7aLeaftIiainfix =V8V1ainfix =V9V2amemtV0V8V9qamemtV3V8V9FAamemtV3V1V2AarbtreeV10V3ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV10V3IarbtreeV10V0FAabstV3FIarbtreeV11V0EAabstV0IarbtreeV12V0EAabstV0FFF">
         <label
-         name="expl:parameter add">
-         </label>
+         name="expl:parameter add"/>
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -2235,6 +2310,7 @@
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -2242,6 +2318,7 @@
         <proof
          prover="2"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -2252,13 +2329,12 @@
         locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="269" loccnumb="6" loccnume="9"
         expl="parameter add"
-        sum="24ca99fd23aec1bf03fe50f00a2e8193"
+        sum="0fed386346db28f3bb4467afa25c01e2"
         proved="true"
         expanded="false"
         shape="CV3aNodewVVVVarbtreeV8aNodeaBlackV4V5V6V7EaLeaftIiainfix =V9V1ainfix =V10V2amemtV0V9V10qamemtV3V9V10FAamemtV3V1V2AarbtreeV11V3ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV11V3IarbtreeV11V0FAabstV3FIarbtreeV12V0EAabstV0IarbtreeV13V0EAabstV0FFF">
         <label
-         name="expl:parameter add">
-         </label>
+         name="expl:parameter add"/>
         <transf
          name="inline_goal"
          proved="true"
@@ -2268,20 +2344,20 @@
           locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
           loclnum="269" loccnumb="6" loccnume="9"
           expl="parameter add"
-          sum="1953e6601e048d7f87bfee2f001bcecb"
+          sum="e909723cafc821ecbefeb3ed7bea70d2"
           proved="true"
           expanded="false"
           shape="CV3aNodewVVVVarbtreeV8aNodeaBlackV4V5V6V7EaLeaftIiainfix =V9V1ainfix =V10V2amemtV0V9V10qamemtV3V9V10FAamemtV3V1V2AarbtreeV11V3ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftACV3aLeafainfix =V11c0aNodeaRedVwwVarbtreeV11V13AarbtreeV11V12aNodeaBlackVwwVarbtreeainfix -V11c1V15Aarbtreeainfix -V11c1V14IarbtreeV11V0FAabstV3FIarbtreeV16V0EAabstV0IarbtreeV17V0EAabstV0FFF">
           <label
-           name="expl:parameter add">
-           </label>
+           name="expl:parameter add"/>
           <proof
            prover="3"
            timelimit="10"
+           memlimit="0"
            edited="vacid_0_red_black_trees_WP_RedBlackTree_WP_parameter_add_1.v"
            obsolete="false"
            archived="false">
-           <result status="valid" time="0.54"/>
+           <result status="valid" time="0.48"/>
           </proof>
          </goal>
         </transf>
@@ -2291,16 +2367,16 @@
         locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="269" loccnumb="6" loccnume="9"
         expl="parameter add"
-        sum="f5acea239c2a0caf0a4f5ae15aa0cbde"
+        sum="fe305da211071fd9def649f8725b2fdc"
         proved="true"
         expanded="false"
         shape="CV3aNodewVVVVamemtaNodeaBlackV4V5V6V7V1V2aLeaftIiainfix =V8V1ainfix =V9V2amemtV0V8V9qamemtV3V8V9FAamemtV3V1V2AarbtreeV10V3ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV10V3IarbtreeV10V0FAabstV3FIarbtreeV11V0EAabstV0IarbtreeV12V0EAabstV0FFF">
         <label
-         name="expl:parameter add">
-         </label>
+         name="expl:parameter add"/>
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -2308,6 +2384,7 @@
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -2315,9 +2392,10 @@
         <proof
          prover="2"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.02"/>
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
        <goal
@@ -2325,16 +2403,16 @@
         locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="269" loccnumb="6" loccnume="9"
         expl="parameter add"
-        sum="3bb9e1f187197a1e63e8878e8c1124b2"
+        sum="85f083ef8c1ad0bc02560222267e2391"
         proved="true"
         expanded="false"
         shape="CV3aNodewVVVVainfix =V9V2Iainfix =V8V1IamemtaNodeaBlackV4V5V6V7V8V9FaLeaftIiainfix =V10V1ainfix =V11V2amemtV0V10V11qamemtV3V10V11FAamemtV3V1V2AarbtreeV12V3ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV12V3IarbtreeV12V0FAabstV3FIarbtreeV13V0EAabstV0IarbtreeV14V0EAabstV0FFF">
         <label
-         name="expl:parameter add">
-         </label>
+         name="expl:parameter add"/>
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.12"/>
@@ -2342,9 +2420,10 @@
         <proof
          prover="2"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.14"/>
+         <result status="valid" time="0.13"/>
         </proof>
        </goal>
        <goal
@@ -2352,26 +2431,27 @@
         locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="269" loccnumb="6" loccnume="9"
         expl="parameter add"
-        sum="39c7a57c52ad93b3a276250aaa61b64e"
+        sum="e595b2ab5c746a40a8c7ca768c5f0c49"
         proved="true"
         expanded="false"
         shape="CV3aNodewVVVVamemtV0V8V9Iainfix =V8V1NIamemtaNodeaBlackV4V5V6V7V8V9FaLeaftIiainfix =V10V1ainfix =V11V2amemtV0V10V11qamemtV3V10V11FAamemtV3V1V2AarbtreeV12V3ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV12V3IarbtreeV12V0FAabstV3FIarbtreeV13V0EAabstV0IarbtreeV14V0EAabstV0FFF">
         <label
-         name="expl:parameter add">
-         </label>
+         name="expl:parameter add"/>
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.01"/>
+         <result status="valid" time="0.02"/>
         </proof>
         <proof
          prover="2"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.02"/>
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
        <goal
@@ -2379,23 +2459,24 @@
         locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
         loclnum="269" loccnumb="6" loccnume="9"
         expl="parameter add"
-        sum="eee186ad7828937193c20e9714363e1a"
+        sum="a5050543c9c4a3d32f876b38e8af50ef"
         proved="true"
         expanded="false"
         shape="CV3aNodewVVVVamemtaNodeaBlackV4V5V6V7V8V9Iiainfix =V8V1ainfix =V9V2amemtV0V8V9FaLeaftIiainfix =V10V1ainfix =V11V2amemtV0V10V11qamemtV3V10V11FAamemtV3V1V2AarbtreeV12V3ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV12V3IarbtreeV12V0FAabstV3FIarbtreeV13V0EAabstV0IarbtreeV14V0EAabstV0FFF">
         <label
-         name="expl:parameter add">
-         </label>
+         name="expl:parameter add"/>
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.02"/>
+         <result status="valid" time="0.01"/>
         </proof>
         <proof
          prover="2"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
@@ -2408,16 +2489,16 @@
       locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
       loclnum="269" loccnumb="6" loccnume="9"
       expl="parameter add"
-      sum="19091ab4a108c28a376fa62c78b78e76"
+      sum="e6e0c1a29e0cd09399e7b06df780c465"
       proved="true"
       expanded="false"
       shape="CV3aNodewVVVVtaLeaffIiainfix =V8V1ainfix =V9V2amemtV0V8V9qamemtV3V8V9FAamemtV3V1V2AarbtreeV10V3ICV0aNodeaRedwwwwfaNodeaBlackwwwwOaLeaftAaalmost_rbtreeV10V3IarbtreeV10V0FAabstV3FIarbtreeV11V0EAabstV0IarbtreeV12V0EAabstV0FFF">
       <label
-       name="expl:parameter add">
-       </label>
+       name="expl:parameter add"/>
       <proof
        prover="1"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -2425,6 +2506,7 @@
       <proof
        prover="0"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -2432,6 +2514,7 @@
       <proof
        prover="2"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -2451,16 +2534,16 @@
     locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="301" loccnumb="6" loccnume="12"
     expl="normal postcondition"
-    sum="7037c138c23b8d3df9737ddd9bce7d06"
+    sum="abe2a5a44d0d506ba2606ad94e4143a2"
     proved="true"
     expanded="false"
     shape="ainfix =V2V0qamemaTuple2V0aLeafV1V2FAainfix =V0V0AainvaTuple2V0aLeafF">
     <label
-     name="expl:parameter create">
-     </label>
+     name="expl:parameter create"/>
     <proof
      prover="1"
      timelimit="5"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.01"/>
@@ -2468,13 +2551,15 @@
     <proof
      prover="0"
      timelimit="5"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.02"/>
+     <result status="valid" time="0.01"/>
     </proof>
     <proof
      prover="2"
      timelimit="5"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.02"/>
@@ -2485,16 +2570,16 @@
     locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="308" loccnumb="6" loccnume="13"
     expl="parameter replace"
-    sum="291c8855c7b8d4c8bfbd90ca330a0e66"
+    sum="fac42000acc11404d6533c3343d9fb73"
     proved="true"
     expanded="false"
     shape="iainfix =V7V0ainfix =V8V1amemaTuple2V2V3V7V8qamemaTuple2V5V6V7V8FAainfix =V5V2AainvaTuple2V5V6Iainfix =aTuple2V5V6aTuple2V2V4FIiainfix =V9V0ainfix =V10V1amemtV3V9V10qamemtV4V9V10FAamemtV4V0V1AarbtreeV11V4EAabstV4FAarbtreeV12V3EAabstV3IainvaTuple2V2V3FFF">
     <label
-     name="expl:parameter replace">
-     </label>
+     name="expl:parameter replace"/>
     <proof
      prover="1"
      timelimit="5"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.03"/>
@@ -2502,9 +2587,10 @@
     <proof
      prover="2"
      timelimit="5"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.04"/>
+     <result status="valid" time="0.03"/>
     </proof>
    </goal>
    <goal
@@ -2512,16 +2598,16 @@
     locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="317" loccnumb="6" loccnume="12"
     expl="parameter lookup"
-    sum="0fae503ee7b70f1e9f826459ceeb5e6a"
+    sum="d96de7b12d2763e1a2cb6f5cabceed56"
     proved="true"
     expanded="false"
     shape="amemaTuple2V1V2V0V1IamemtV2V0V3NFAamemaTuple2V1V2V0V4IamemtV2V0V4FAabstV2IainvaTuple2V1V2FF">
     <label
-     name="expl:parameter lookup">
-     </label>
+     name="expl:parameter lookup"/>
     <proof
      prover="1"
      timelimit="5"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.01"/>
@@ -2529,13 +2615,15 @@
     <proof
      prover="0"
      timelimit="5"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.02"/>
+     <result status="valid" time="0.01"/>
     </proof>
     <proof
      prover="2"
      timelimit="5"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.02"/>
@@ -2546,16 +2634,16 @@
     locfile="programs/vacid_0_red_black_trees/../vacid_0_red_black_trees.mlw"
     loclnum="324" loccnumb="6" loccnume="12"
     expl="parameter remove"
-    sum="1cd2778b4c4334104650e585d30618a9"
+    sum="be77d465dc2e8138932a9e666a5b41b7"
     proved="true"
     expanded="false"
     shape="iainfix =V5V0ainfix =V6V3amemaTuple2V1V2V5V6qamemaTuple2V3V4V5V6FAainfix =V3V1AainvaTuple2V3V4Iiainfix =V7V0ainfix =V8V1amemaTuple2V1V2V7V8qamemaTuple2V3V4V7V8FAainfix =V3V1AainvaTuple2V3V4FAainvaTuple2V1V2IainvaTuple2V1V2FF">
     <label
-     name="expl:parameter remove">
-     </label>
+     name="expl:parameter remove"/>
     <proof
      prover="1"
      timelimit="5"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.01"/>
@@ -2563,13 +2651,15 @@
     <proof
      prover="0"
      timelimit="5"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.04"/>
+     <result status="valid" time="0.02"/>
     </proof>
     <proof
      prover="2"
      timelimit="5"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.02"/>

@@ -14,7 +14,7 @@ version_bad = "0.92"
 version_bad = "0.91"
 version_bad = "0.9"
 version_bad = "0.8"
-command = "@LOCALBIN@why3-cpulimit %t %m -s %e %f"
+command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e %f"
 driver = "drivers/alt_ergo.drv"
 
 [ATP alt-ergo]
@@ -33,7 +33,7 @@ version_bad = "0.92"
 version_bad = "0.91"
 version_bad = "0.9"
 version_bad = "0.8"
-command = "@LOCALBIN@why3-cpulimit %t %m -s %e %f"
+command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e %f"
 driver = "drivers/alt_ergo_0.93.drv"
 
 [ATP alt-ergo]
@@ -56,7 +56,7 @@ version_old = "0.92"
 version_old = "0.91"
 version_old = "0.9"
 version_old = "0.8"
-command = "@LOCALBIN@why3-cpulimit %t %m -s %e %f"
+command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e %f"
 driver = "drivers/alt_ergo_bare.drv"
 
 [ATP cvc3-2.4]
@@ -71,7 +71,7 @@ version_old = "2.4"
 version_bad = "2.2"
 version_bad = "2.1"
 # the -timeout option is unreliable in CVC3 2.4.1
-command = "@LOCALBIN@why3-cpulimit %t %m -s %e %f"
+command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e %f"
 driver = "drivers/cvc3.drv"
 
 [ATP cvc3-2.2]
@@ -86,7 +86,7 @@ version_bad = "2.4"
 version_ok  = "2.2"
 version_old = "2.1"
 # we pass time 0 to why3-cpulimit to avoid race
-command = "@LOCALBIN@why3-cpulimit %T %m -s %e -timeout %t %f"
+command = "'@LOCALBIN@why3-cpulimit' %T %m -s %e -timeout %t %f"
 driver = "drivers/cvc3.drv"
 
 [ATP yices]
@@ -101,7 +101,7 @@ version_ok = "1.0.26"
 version_ok = "1.0.25"
 version_old = "1.0.17"
 version_old = "1.0.24"
-command = "@LOCALBIN@why3-cpulimit %t %m -s %e"
+command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e"
 driver = "drivers/yices.drv"
 
 [ATP eprover]
@@ -111,7 +111,7 @@ version_switch = "--version"
 version_regexp = "E \\([-0-9.]+\\) [^\n]+"
 version_ok = "1.4"
 # we pass time 0 to why3-cpulimit to avoid race
-command = "@LOCALBIN@why3-cpulimit %T %m -s %e -s -R -xAuto -tAuto --cpu-limit=%t --tstp-in %f"
+command = "'@LOCALBIN@why3-cpulimit' %T %m -s %e -s -R -xAuto -tAuto --cpu-limit=%t --tstp-in %f"
 driver = "drivers/tptp.drv"
 
 [ATP gappa]
@@ -130,7 +130,7 @@ version_old = "0.12.2"
 version_old = "0.12.1"
 version_old = "0.12.0"
 version_old = "0.11.2"
-command = "@LOCALBIN@why3-cpulimit %t %m -s %e"
+command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e"
 driver = "drivers/gappa.drv"
 
 [ATP simplify]
@@ -143,7 +143,7 @@ version_switch = "-version"
 version_regexp = "Simplify version \\([^ \n,]+\\)"
 version_ok = "1.5.5"
 version_ok = "1.5.4"
-command = "@LOCALBIN@why3-cpulimit %t %m -s %e %f"
+command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e %f"
 driver = "drivers/simplify.drv"
 
 [ATP spass]
@@ -153,7 +153,7 @@ version_switch = "-TPTP || true"
 version_regexp = "SPASS V \\([^ \n\t]+\\)"
 version_ok = "3.7"
 # we pass time 0 to why3-cpulimit to avoid race
-command = "@LOCALBIN@why3-cpulimit %T %m -s %e -TPTP -PGiven=0 -PProblem=0 -TimeLimit=%t %f"
+command = "'@LOCALBIN@why3-cpulimit' %T %m -s %e -TPTP -PGiven=0 -PProblem=0 -TimeLimit=%t %f"
 driver = "drivers/tptp.drv"
 
 [ATP vampire]
@@ -162,7 +162,7 @@ exec = "vampire"
 version_switch = "--version"
 version_regexp = "Vampire \\([0-9.]+\\)"
 # we pass time 0 to why3-cpulimit to avoid race
-command = "@LOCALBIN@why3-cpulimit %T %m -s %e -t %t"
+command = "'@LOCALBIN@why3-cpulimit' %T %m -s %e -t %t"
 driver = "drivers/vampire.drv"
 version_ok = "0.6"
 
@@ -172,7 +172,7 @@ exec = "veriT"
 exec = "verit"
 version_switch = "--help"
 version_regexp = "Version: \\([^ \n\r]+\\)"
-command = "@LOCALBIN@why3-cpulimit %t %m -s %e %f"
+command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e %f"
 driver = "drivers/verit.drv"
 
 [ATP z3-3]
@@ -195,7 +195,7 @@ version_bad = "2.1"
 version_bad = "1.3"
 driver = "drivers/z3.drv"
 # the -T is unreliable in Z3 3.2
-command = "@LOCALBIN@why3-cpulimit %t %m -s %e -smt2 -rs:42 %f"
+command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e -smt2 -rs:42 %f"
 
 [ATP z3-2]
 name = "Z3"
@@ -217,7 +217,7 @@ version_bad = "2.2"
 version_bad = "2.1"
 version_bad = "1.3"
 driver = "drivers/z3.drv"
-command = "@LOCALBIN@why3-cpulimit %t %m -s %e -smt2 -rs:42 \
+command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e -smt2 -rs:42 \
 PHASE_SELECTION=0 \
 RESTART_STRATEGY=0 \
 RESTART_FACTOR=1.5 \
@@ -251,7 +251,7 @@ version_bad = "3.0"
 version_old = "2.2"
 version_old = "2.1"
 version_old = "1.3"
-command = "@LOCALBIN@why3-cpulimit %t %m -s %e -smt %f"
+command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e -smt %f"
 driver = "drivers/z3_smtv1.drv"
 
 [ITP coq]
@@ -259,6 +259,7 @@ name = "Coq"
 exec = "coqtop -batch"
 version_switch = "-v"
 version_regexp = "The Coq Proof Assistant, version \\([^ \n]+\\)"
+version_ok = "8.3pl4"
 version_ok = "8.3pl3"
 version_ok = "8.3pl2"
 version_ok = "8.3pl1"
@@ -268,16 +269,25 @@ version_old = "8.2pl1"
 version_old = "8.2"
 version_old = "8.1"
 version_old = "8.0"
-command = "@LOCALBIN@why3-cpulimit 0 %m -s %e -R %l/coq Why3 -l %f"
+command = "'@LOCALBIN@why3-cpulimit' 0 %m -s %e -I %l/coq-tactic -R %l/coq Why3 -l %f"
 driver = "drivers/coq.drv"
-editor = "coqide -R %l/coq Why3 %f"
+editor = "coqide"
 
-[ITP pvs]
-name = "PVS"
-exec = "pvs"
-version_switch = "-version"
-version_regexp = "PVS Version \\([^ \n]+\\)"
-version_ok = "5.0"
-command = "@LOCALBIN@why3-cpulimit 0 %m -s proveit %f"
-driver = "drivers/pvs.drv"
-editor = "pvs %f"
+# [ITP pvs]
+# name = "PVS"
+# exec = "pvs"
+# version_switch = "-version"
+# version_regexp = "PVS Version \\([^ \n]+\\)"
+# version_ok = "5.0"
+# command = "'@LOCALBIN@why3-cpulimit' 0 %m -s proveit %f"
+# driver = "drivers/pvs.drv"
+# editor = "pvs"
+
+# [editor pvs]
+# command = "pvs %f"
+
+[editor coqide]
+command = "coqide -I %l/coq-tactic -R %l/coq Why3 %f"
+
+[editor proofgeneral-coq]
+command = "emacs23 --eval \"(setq coq-load-path '((\\\"%l/coq\\\" \\\"Why3\\\")))\" %f"

@@ -1,5 +1,11 @@
+(** {1 Arrays} *)
 
-(* Arrays *)
+(** {2 Generic Arrays}
+
+The length is a non-mutable field, so that we get for free that
+modification of an array does not modify its length.
+
+*)
 
 module Array
 
@@ -13,7 +19,7 @@ module Array
   function set (a: array 'a) (i: int) (v: 'a) : array 'a =
     {| a with elts = M.set a.elts i v |}
 
-  (* syntactic sugar *)
+  (** syntactic sugar *)
   function ([]) (a: array 'a) (i: int) : 'a = get a i
   function ([<-]) (a: array 'a) (i: int) (v: 'a) : array 'a = set a i v
 
@@ -25,7 +31,7 @@ module Array
 
   val length (a: array 'a) : {} int { result = a.length }
 
-  (* unsafe get/set operations with no precondition *)
+  (** unsafe get/set operations with no precondition *)
   exception OutOfBounds
 
   let defensive_get (a: array 'a) (i: int) =
@@ -46,7 +52,7 @@ module Array
     { n >= 0 }
     array 'a
     { result = {| length = n; elts = M.const v |} }
-    (* { length result = n /\ forall i:int. 0 <= i < n -> result[i] = v} *)
+     (*** { length result = n /\ forall i:int. 0 <= i < n -> result[i] = v} *)
 
   val append (a1: array 'a) (a2: array 'a) :
     {}
@@ -97,13 +103,15 @@ module Array
       (forall i:int.
         ofs2 <= i < ofs2 + len -> a2[i] = a1[ofs1 + i - ofs2]) }
 
-  (* TODO?
+  (*** TODO?
      - concat : 'a array list -> 'a array
      - to_list
      - of_list
   *)
 
 end
+
+(** {2 Sorted Arrays} *)
 
 module ArraySorted
 
@@ -119,6 +127,8 @@ module ArraySorted
 
 end
 
+(** {2 Arrays Equality} *)
+
 module ArrayEq
 
   use import module Array
@@ -132,6 +142,8 @@ module ArrayEq
     array_eq_sub a1 a2 0 a1.length
 
 end
+
+(** {2 Permutation} *)
 
 module ArrayPermut
 
@@ -174,13 +186,14 @@ module ArrayPermut
 
 end
 
+(** {2 Sum of elements} *)
+
 module ArraySum
 
   use import module Array
   clone import map.MapSum as M
 
-  (* [sum a l h] is the sum of a[i] for l <= i < h *)
-
+  (** [sum a l h] is the sum of [a[i]] for [l <= i < h] *)
   function sum (a: array int) (l h: int) : int = M.sum a.elts l h
 
 end
@@ -222,7 +235,7 @@ module TestArray
 
 end
 
-(*
+(***
 Local Variables:
 compile-command: "unset LANG; make -C .. modules/array"
 End:

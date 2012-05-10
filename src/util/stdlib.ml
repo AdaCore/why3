@@ -58,6 +58,7 @@ module type S =
     val diff : (key -> 'a -> 'b -> 'a option) -> 'a t -> 'b t -> 'a t
     val submap : (key -> 'a -> 'b -> bool) -> 'a t -> 'b t -> bool
     val disjoint : (key -> 'a -> 'b -> bool) -> 'a t -> 'b t -> bool
+    val set_union : 'a t -> 'a t -> 'a t
     val set_inter : 'a t -> 'b t -> 'a t
     val set_diff : 'a t -> 'b t -> 'a t
     val set_submap : 'a t -> 'b t -> bool
@@ -498,6 +499,7 @@ module Make(Ord: OrderedType) = struct
             disjoint pr (Node (Empty, v1, d1, r1, 0)) r2 && disjoint pr l1 t2
 
 
+    let set_union m1 m2 = union (fun _ x _ -> Some x) m1 m2
     let set_inter m1 m2 = inter (fun _ x _ -> Some x) m1 m2
     let set_diff m1 m2 = diff (fun _ _ _ -> None) m1 m2
     let set_submap m1 m2 = submap (fun _ _ _ -> true) m1 m2

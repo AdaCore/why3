@@ -1,7 +1,11 @@
 
-(* Hash tables à la OCaml: each key is mapped to a *stack* of values,
+(** {1 Hash tables}
+
+This module provides Hash tables à la OCaml. Each key is mapped to a {h <b>stack</b>} of values,
    with [add h k v] pushing a new value [v] for key [k],
-   and [remove h k] popping a value for key [key]. *)
+   and [remove h k] popping a value for key [k].
+
+*)
 
 module Hashtbl
 
@@ -67,7 +71,7 @@ module Hashtbl
       /\
       forall k': key. k' <> k -> h[k'] = (old h)[k'] }
 
-  (* TODO
+  (*** TODO
      - val length: t 'a -> int (the number of distinct key)
      - val iter : ('a -> 'b -> unit) -> ('a, 'b) t -> unit
      - val fold : ('a -> 'b -> 'c -> 'c) -> ('a, 'b) t -> 'c -> 'c
@@ -98,10 +102,9 @@ module TestHashtbl
     replace h k1 True;
     assert { h[k1] = Cons True (Cons True Nil) }
 
-
 end
 
-(*
+(***
 Local Variables:
 compile-command: "unset LANG; make -C .. modules/hashtbl"
 End:

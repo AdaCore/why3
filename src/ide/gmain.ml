@@ -1,9 +1,10 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  Copyright (C) 2010-2011                                               *)
+(*  Copyright (C) 2010-2012                                               *)
 (*    François Bobot                                                      *)
 (*    Jean-Christophe Filliâtre                                           *)
 (*    Claude Marché                                                       *)
+(*    Guillaume Melquiond                                                 *)
 (*    Andrei Paskevich                                                    *)
 (*                                                                        *)
 (*  This software is free software; you can redistribute it and/or        *)
@@ -413,7 +414,7 @@ let clear model = model#clear ()
 let image_of_result ~obsolete result =
   match result with
     | Session.Undone Session.Interrupted -> !image_undone
-    | Session.Undone Session.Unedited 
+    | Session.Undone Session.Unedited
     | Session.Undone Session.JustEdited -> !image_unknown
     | Session.Undone Session.Scheduled -> !image_scheduled
     | Session.Undone Session.Running -> !image_running
@@ -467,7 +468,8 @@ let set_proof_state a =
     | S.InternalFailure _ -> "(internal failure)"
     | S.Undone S.Interrupted -> "(interrupted)"
     | S.Undone (S.Scheduled | S.Running) ->
-        Format.sprintf "[limit=%d.0]" a.S.proof_timelimit
+        Format.sprintf "[limit=%d sec., %d M]" 
+          a.S.proof_timelimit a.S.proof_memlimit
   in
   let t = if obsolete then t ^ " (obsolete)" else t in
   (* TODO find a better way to signal arhived row *)
@@ -535,7 +537,7 @@ let update_task_view a =
     | S.Goal g ->
       if (Gconfig.config ()).intro_premises then
         let trans =
-          Trans.lookup_transform intro_transformation (env_session()).S.env 
+          Trans.lookup_transform intro_transformation (env_session()).S.env
         in
         display_task (Trans.apply trans (S.goal_task g))
       else
@@ -551,6 +553,10 @@ let update_task_view a =
               "proof not yet scheduled for running"
             | S.Undone S.Unedited -> "Interactive proof, not yet edited. Edit with \"Edit\" button"
             | S.Undone S.JustEdited -> "Edited interactive proof. Run it with \"Replay\" button"
+            | S.Done ({Call_provers.pr_answer = Call_provers.HighFailure} as r) ->
+              let b = Buffer.create 37 in
+              bprintf b "%a" Call_provers.print_prover_result r;
+              Buffer.contents b
             | S.Done r -> r.Call_provers.pr_output
             | S.Undone S.Scheduled-> "proof scheduled but not running yet"
             | S.Undone S.Running -> "prover currently running"
@@ -568,6 +574,7 @@ module M = Session_scheduler.Make
      type key = GTree.row_reference
 
      let create ?parent () =
+       session_needs_saving := true;
        let parent = match parent with
          | None -> None
          | Some r -> Some r#iter
@@ -578,9 +585,12 @@ module M = Session_scheduler.Make
 
 
      let remove row =
+       session_needs_saving := true;
        let (_:bool) = goals_model#remove row#iter in ()
 
-     let reset () = goals_model#clear ()
+     let reset () =
+       session_needs_saving := true;
+       goals_model#clear ()
 
      let idle f =
        let (_ : GMain.Idle.id) = GMain.Idle.add f in ()
@@ -599,25 +609,33 @@ module M = Session_scheduler.Make
            (if r=0 then "Running: 0" else
               "Running: " ^ (string_of_int r)^ " " ^ (fan (!c / 10)))
 
-
 let notify any =
   session_needs_saving := true;
   let row,exp =
     match any with
-      | S.Goal g ->
-          g.S.goal_key, g.S.goal_expanded
+      | S.Goal g -> g.S.goal_key, g.S.goal_expanded
       | S.Theory t -> t.S.theory_key, t.S.theory_expanded
       | S.File f -> f.S.file_key, f.S.file_expanded
       | S.Proof_attempt a -> a.S.proof_key,false
       | S.Transf tr -> tr.S.transf_key,tr.S.transf_expanded
   in
+  (* name is set by notify since upgrade policy may update the prover name *)
+  goals_model#set ~row:row#iter ~column:name_column
+    (match any with
+      | S.Goal g -> S.goal_expl g
+      | S.Theory th -> th.S.theory_name.Ident.id_string
+      | S.File f -> Filename.basename f.S.file_name
+      | S.Proof_attempt a ->
+        let p = a.S.proof_prover in
+        Pp.string_of_wnl C.print_prover p
+      | S.Transf tr -> tr.S.transf_name);
   let ind = goals_model#get ~row:row#iter ~column:index_column in
   begin
     match !current_selected_row with
       | Some r when r == ind ->
         update_task_view any
       | _ -> ()
-  end;  
+  end;
   if exp then goals_view#expand_to_path row#path else
     goals_view#collapse_row row#path;
   match any with
@@ -654,20 +672,15 @@ let init =
          | S.File _ -> !image_directory
          | S.Proof_attempt _ -> !image_prover
          | S.Transf _ -> !image_transf);
-    goals_model#set ~row:row#iter ~column:name_column
-      (match any with
-         | S.Goal g -> S.goal_expl g
-         | S.Theory th -> th.S.theory_name.Ident.id_string
-         | S.File f -> Filename.basename f.S.file_name
-         | S.Proof_attempt a ->
-           let p = a.S.proof_prover in
-           Pp.string_of_wnl C.print_prover p
-         | S.Transf tr -> tr.S.transf_name);
     notify any
 
+(*
 let unknown_prover = Gconfig.unknown_prover gconfig
 
-let replace_prover = Gconfig.replace_prover gconfig
+let replace_prover _ _ = false (* Gconfig.replace_prover gconfig *)
+*)
+
+let uninstalled_prover = Gconfig.uninstalled_prover gconfig
 
    end)
 
@@ -753,7 +766,9 @@ let sched =
       M.update_session ~allow_obsolete:true session gconfig.env
         gconfig.Gconfig.config
     in
-    let sched = M.init gconfig.max_running_processes in
+    let sched = M.init (Whyconf.running_provers_max
+                          (Whyconf.get_main gconfig.config))
+    in
     dprintf debug "@]@\n[Info] Opening session: done@.";
     session_needs_saving := false;
     current_env_session := Some env;
@@ -792,6 +807,9 @@ let () =
 (*****************************************************)
 
 let prover_on_selected_goals pr =
+  let main = Whyconf.get_main gconfig.config in
+  let timelimit = Whyconf.timelimit main in
+  let memlimit = Whyconf.memlimit main in
   List.iter
     (fun row ->
       try
@@ -799,7 +817,7 @@ let prover_on_selected_goals pr =
        M.run_prover
          (env_session()) sched
          ~context_unproved_goals_only:!context_unproved_goals_only
-         ~timelimit:gconfig.time_limit
+         ~timelimit ~memlimit
          pr a
       with e ->
         eprintf "@[Exception raised while running a prover:@ %a@.@]"
@@ -913,18 +931,34 @@ let file_menu = factory#add_submenu "_File"
 let file_factory = new GMenu.factory file_menu ~accel_group
 
 let (_ : GMenu.image_menu_item) =
-  file_factory#add_image_item ~key:GdkKeysyms._A
+  file_factory#add_image_item (* ~key:GdkKeysyms._A *)
     ~label:"_Add file" ~callback:select_file
     ()
+
+let refresh_provers = ref (fun () -> ())
 
 let (_ : GMenu.image_menu_item) =
   file_factory#add_image_item ~label:"_Preferences" ~callback:
     (fun () ->
-       Gconfig.preferences gconfig;
-       M.set_maximum_running_proofs gconfig.max_running_processes sched)
+      Gconfig.preferences gconfig;
+      begin
+        match !current_env_session with
+          | None -> ()
+          | Some e ->
+              Session.update_env_session_config e gconfig.config;
+              Session.unload_provers e
+      end;
+      !refresh_provers ();
+(*
+      Mprover.iter
+        (fun p pi ->
+          Format.eprintf "editor for %a : %s@." Whyconf.print_prover p
+            pi.editor)
+        (Whyconf.get_provers gconfig.config);
+*)
+      let nb = Whyconf.running_provers_max (Whyconf.get_main gconfig.config) in
+      M.set_maximum_running_proofs nb sched)
     ()
-
-let refresh_provers = ref (fun () -> ())
 
 let add_refresh_provers f _msg =
 (*
@@ -943,34 +977,13 @@ let (_ : GMenu.image_menu_item) =
 let save_session () =
   if !session_needs_saving then begin
     eprintf "[Info] saving session@.";
-    S.save_session (env_session()).S.session;
+    S.save_session gconfig.config (env_session()).S.session;
     session_needs_saving := false;
   end
 
 
 let exit_function ?(destroy=false) () =
-  eprintf "[Info] saving IDE config file@.";
   save_config ();
-  (*
-  eprintf "saving session (testing only)@.";
-  begin
-    M.test_save ();
-    try
-      let l = M.test_load () in
-      eprintf "reloaded successfully %d elements@." (List.length l);
-      match l with
-        | [] -> ()
-        | f :: _ ->
-            eprintf "first element is a '%s' with %d sub-elements@."
-              f.Xml.name (List.length f.Xml.elements);
-
-    with e -> eprintf "test reloading failed with exception %s@."
-      (Printexc.to_string e)
-  end;
-  let ret = Sys.command
-    "xmllint --noout --dtdvalid share/why3session.dtd essai.xml" in
-  if ret = 0 then eprintf "DTD validation succeeded, good!@.";
-  *)
   if not !session_needs_saving then GMain.quit () else
   match (Gconfig.config ()).saving_policy with
     | 0 -> save_session (); GMain.quit ()
@@ -1017,7 +1030,7 @@ let enlarge_font () =
   ()
 
 let reduce_font () =
-  decr font_size; 
+  decr font_size;
   change_font ();
 (*
   GConfig.save ()
@@ -1026,6 +1039,10 @@ let reduce_font () =
 
 let view_menu = factory#add_submenu "_View"
 let view_factory = new GMenu.factory view_menu ~accel_group
+
+let (_ : GMenu.image_menu_item) =
+  view_factory#add_image_item ~key:GdkKeysyms._A
+    ~label:"Select all" ~callback:(fun () -> goals_view#selection#select_all ()) ()
 
 let (_ : GMenu.menu_item) =
   view_factory#add_item ~key:GdkKeysyms._plus
@@ -1162,6 +1179,17 @@ let () = add_refresh_provers (fun () ->
 
 let () =
   let add_item_provers () =
+    let provers = C.get_provers gconfig.Gconfig.config in
+    let provers =
+      C.Mprover.fold
+        (fun k p acc ->
+          let pr = p.prover in
+          if List.mem (pr.prover_name ^ " " ^ pr.prover_version)
+            gconfig.hidden_provers
+          then acc
+          else C.Mprover.add k p acc)
+        provers C.Mprover.empty
+    in
     C.Mprover.iter
       (fun p _ ->
          let n = Pp.string_of_wnl C.print_prover p in
@@ -1183,7 +1211,7 @@ let () =
            b#connect#pressed
              ~callback:(fun () -> prover_on_selected_goals p)
          in ())
-      (C.get_provers gconfig.Gconfig.config)
+      provers
   in
   add_refresh_provers add_item_provers "Add in tools menu and provers box";
   add_item_provers ()
@@ -1490,8 +1518,18 @@ let edit_selected_row r =
     | S.File _file ->
         ()
     | S.Proof_attempt a ->
-        M.edit_proof
-          (env_session()) sched ~default_editor:gconfig.default_editor a
+        let e = env_session () in
+(*
+        let coq = { prover_name = "Coq" ; prover_version = "8.3pl3";
+                    prover_altern = "" } in
+        let c = e.Session.whyconf in
+        let p = Mprover.find coq (get_provers c) in
+        let time = Whyconf.timelimit (Whyconf.get_main c) in
+        Format.eprintf
+          "[debug] save_config %d: timelimit=%d ; editor for Coq=%s@."
+          0 time p.editor;
+*)
+        M.edit_proof e sched ~default_editor:gconfig.default_editor a
     | S.Transf _ -> ()
 
 let edit_current_proof () =
@@ -1674,7 +1712,7 @@ let () =
 (***************)
 
 
- 
+
 (* to be run when a row in the tree view is selected *)
 let select_row r =
   let ind = goals_model#get ~row:r#iter ~column:index_column in

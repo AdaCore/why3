@@ -4,18 +4,22 @@
   mdecl ::= decl                                ; theory declaration
     | "type" mtype-decl ("with" mtype-decl)*    ; mutable types
     | "let" lident label* pgm-defn              ;
-    | "let" "rec" recfun ("with" recfun)*  ;
-    | "val" lident label* pgm-decl        ;
+    | "let" "rec" recfun ("with" recfun)*       ;
+    | "val" lident label* pgm-decl              ;
     | "exception" lident label* type?           ;
-    | "use" imp-exp "module" tqualid ("as" uident-opt)?     ;
-    | "namespace" "import"? uident-opt mdecl* "end" ;
+    | "use" imp-exp "module" tqualid            ;
+                  ("as" uident-opt)?            ;
+    | "namespace" "import"? uident-opt          ;
+                  mdecl* "end"                  ;
   \
-  mtype-decl ::= lident label* ("'" lident label*)* mtype-defn;
+  mtype-decl ::= lident label* ("'" lident label*)* ;
+                              mtype-defn            ;
   \
-  mtype-defn ::=                                     ; abstract type
-    | "=" type                                       ; alias type
-    | "=" "|"? type-case ("|" type-case)*            ; algebraic type
-    | "=" "{|" mrecord-field (";" mrecord-field)* "|}" ; record type
+  mtype-defn ::=                                    ; abstract type
+    | "=" type                                      ; alias type
+    | "=" "|"? type-case ("|" type-case)*           ; algebraic type
+    | "=" "{|" mrecord-field                        ; record type
+          (";" mrecord-field)* "|}"                 ;
   \
   mrecord-field ::= "mutable"? lident label* ":" type
   \

@@ -1,5 +1,9 @@
 
-theory Map "Theory of maps"
+(** {1 Theory of maps} *)
+
+(** {2 Generic Maps} *)
+
+theory Map
 
   type map 'a 'b
 
@@ -26,6 +30,8 @@ theory Map "Theory of maps"
 
 end
 
+(** {2 Sorted Maps (indexed by integers)} *)
+
 theory MapSorted
 
   use import int.Int
@@ -41,6 +47,7 @@ theory MapSorted
 
 end
 
+(** {2 Maps Equality (indexed by integers)} *)
 theory MapEq
 
   use import int.Int
@@ -51,6 +58,7 @@ theory MapEq
 
 end
 
+(** {2 Injectivity and surjectivity for maps (indexed by integers)} *)
 theory MapInjection
 
   use import int.Int
@@ -72,6 +80,7 @@ theory MapInjection
 end
 
 
+(** {2 Map Permutation (indexed by integers)} *)
 theory MapPermut
 
   use import int.Int
@@ -117,6 +126,7 @@ theory MapPermut
 
 end
 
+(** {2 Sum of elements of a map (indexed by integers)} *)
 theory MapSum
 
   use import int.Int
@@ -128,6 +138,12 @@ theory MapSum
   clone export sum.Sum with type container = container, function f = get
 
 end
+
+(** {2 Bitvectors (arbitrary length)} 
+
+Seen as maps from int to bool
+
+*)
 
 theory BitVector
 
@@ -185,6 +201,7 @@ theory BitVector
 
 end
 
+(** {2 32-bits Bitvectors} *)
 
 theory BV32
 
@@ -193,7 +210,6 @@ theory BV32
   clone export BitVector with constant size = size
 
 end
-
 
 theory TestBv32
 
@@ -219,8 +235,7 @@ theory TestBv32
 
 end
 
-
-(*
+(***
 Local Variables:
 compile-command: "make -C .. theories/map"
 End:

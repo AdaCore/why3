@@ -1,5 +1,5 @@
 
-(* The 2nd Verified Software Competition (VSTTE 2012) 
+(* The 2nd Verified Software Competition (VSTTE 2012)
    https://sites.google.com/site/vstte2012/compet
 
    Problem 4: Tree Reconstruction
@@ -9,12 +9,11 @@
    lists from Why3's standard library.
 *)
 
-module TreeReconstruction
+theory Tree
 
-  use import int.Int
-  use import list.List
-  use import list.Length
-  use import list.Append
+  use export int.Int
+  use export list.List
+  use export list.Append
 
   type tree = Leaf | Node tree tree
 
@@ -24,7 +23,8 @@ module TreeReconstruction
     | Node l r -> depths (d+1) l ++ depths (d+1) r
   end
 
-  (* two lemmas on depths *)
+  (* lemmas on depths *)
+
   lemma depths_head:
     forall t: tree, d: int.
     match depths d t with Cons x _ -> x >= d | Nil -> false end
@@ -32,6 +32,29 @@ module TreeReconstruction
   lemma depths_unique:
     forall t1 t2: tree, d: int, s1 s2: list int.
     depths d t1 ++ s1 = depths d t2 ++ s2 -> t1 = t2 && s1 = s2
+
+  lemma depths_prefix:
+    forall t: tree, d1 d2: int, s1 s2: list int.
+    depths d1 t ++ s1 = depths d2 t ++ s2 -> d1 = d2
+
+  lemma depths_prefix_simple:
+    forall t: tree, d1 d2: int.
+    depths d1 t = depths d2 t -> d1 = d2
+
+  lemma depths_subtree:
+    forall t1 t2: tree, d1 d2: int, s1: list int.
+    depths d1 t1 ++ s1 = depths d2 t2 -> d1 >= d2
+
+  lemma depths_unique2:
+    forall t1 t2: tree, d1 d2: int.
+    depths d1 t1 = depths d2 t2 -> d1 = d2 && t1 = t2
+
+end
+
+module TreeReconstruction
+
+  use export Tree
+  use import list.Length
 
   (* termination of build_rec (below) requires a lexicographic order *)
   predicate lex (x1 x2: (list int, int)) =
@@ -79,7 +102,6 @@ end
 
 module Harness
 
-  use import list.List
   use import module TreeReconstruction
 
   let harness () =
@@ -93,6 +115,187 @@ module Harness
     { false } | Failure -> { true }
 
 end
+
+(*
+  A variant implementation proposed by Jayadev Misra
+
+  Given the input list [x1; x2; ...; xn], we first turn it into the
+  list of pairs [(x1, Leaf); (x2, Leaf); ...; (xn, Leaf)].  Then,
+  repeatedly, we scan this list from left to right, looking for two
+  consecutive pairs (v1, t1) and (v2, t2) with v1 = v2.  Then we
+  replace them with the pair (v1-1, Node t1 t2) and we start again.
+  We stop when there is only one pair left (v,t). Then we must have v=0.
+
+  The implementation below achieves linear complexity using a zipper
+  data structure to traverse the list of pairs. The left list contains
+  the elements already traversed (thus on the left), in reverse order,
+  and the right list contains the elements yet to be traversed.
+
+*)
+
+(* Proving termination is quite easy and we do it first (though we could,
+   obviously, do it together with proving correctness) *)
+
+module ZipperBasedTermination
+
+  use import Tree
+  use import int.Lex2
+  use import list.Length
+  use import list.Reverse
+
+  exception Failure
+
+  let rec tc (left: list (int, tree)) (right: list (int, tree)) : tree
+    variant { (length left + length right, length right) } with lex =
+    {}
+    match left, right with
+    | _, Nil ->
+        raise Failure
+    | Nil, Cons (v, t) Nil ->
+        if v = 0 then t else raise Failure
+    | Nil, Cons (v, t) right' ->
+        tc (Cons (v, t) Nil) right'
+    | Cons (v1, t1) left', Cons (v2, t2) right' ->
+        if v1 = v2 then tc left' (Cons (v1 - 1, Node t1 t2) right')
+        else tc (Cons (v2, t2) left) right'
+    end
+    {} | Failure -> {}
+
+end
+
+(* Now soundness and completeness *)
+
+module ZipperBased
+
+  use import Tree
+  use import int.Lex2
+  use import list.Length
+  use import list.Reverse
+
+  (* the following function generalizes function [depths] to a forest, that
+     is a list of pairs (depth, tree) *)
+
+  function forest_depths (f: list (int, tree)) : list int = match f with
+  | Nil -> Nil
+  | Cons (d, t) r -> depths d t ++ forest_depths r
+  end
+
+  (* an obvious lemma on [forest_depths] *)
+
+  lemma forest_depths_append:
+    forall f1 f2: list (int, tree).
+    forest_depths (f1 ++ f2) = forest_depths f1 ++ forest_depths f2
+
+  (* to prove completeness, one needs an invariant over the list [left].
+     The main ingredient is predicate [greedy] below, which states that
+     [d] is distinct from all depths along the left branch of [d1, t1]. *)
+
+  predicate greedy (d: int) (d1: int) (t1: tree) =
+    d <> d1 /\ match t1 with Leaf -> true | Node l1 _ -> greedy d (d1+1) l1 end
+
+  (* then we extend it to a list of pairs [(dn,tn); ...; (d2,t2); (d1,t1)]
+     as follows: [greedy d2 d1 t1], [greedy d3 d2 t2], etc.
+     this is inductive predicate [g] *)
+
+  inductive g (l: list (int, tree)) =
+    | Gnil: g Nil
+    | Gone: forall d: int, t: tree. g (Cons (d, t) Nil)
+    | Gtwo: forall d1 d2: int, t1 t2: tree, l: list (int, tree).
+        greedy d1 d2 t2 -> g (Cons (d1, t1) l) ->
+        g (Cons (d2, t2) (Cons (d1, t1) l))
+
+  (* an easy lemma on [g] *)
+
+  lemma g_append:
+    forall l1 l2: list (int, tree). g (l1 ++ l2) -> g l1
+
+  (* key lemma for completeness: whenever we fail because [right] is empty,
+     we have to prove that there is no solution
+
+     Note: the proof first generalizes the statement as follows:
+       forest_depths ((d1,t1) :: l) <> depths d t + s
+     whenever d < d1 (see the corresponding Coq file) *)
+
+  lemma right_nil:
+    forall l: list (int, tree). length l >= 2 -> g l ->
+    forall t: tree, d: int.
+    forest_depths (reverse l) <> depths d t
+
+  (* key lemma for soundness: preservation of the invariant when we move
+     a tree from [right] to [left] *)
+
+  lemma main_lemma:
+    forall l: list (int, tree), d1 d2: int, t1 t2: tree. d1 <> d2 ->
+    g (Cons (d1, t1) l) ->
+    match t2 with Node l2 _ -> greedy d1 (d2+1) l2 | Leaf -> true end ->
+    g (Cons (d2, t2) (Cons (d1, t1) l))
+
+  (* finally, we need a predicate to state that a forest [l] contains only
+     leaves *)
+
+  predicate only_leaf (l: list (int, tree)) = match l with
+    | Nil -> true
+    | Cons (_, t) r -> t = Leaf /\ only_leaf r
+  end
+
+  exception Failure
+
+  let rec tc (left: list (int, tree)) (right: list (int, tree)) : tree =
+    { (* list [left] satisfies the invariant *)
+      g left /\
+      (* when [left] has one element, it can't be a solution *)
+      match left with Cons (d1, t1) Nil -> d1 <> 0 \/ right <> Nil
+                    | _                 -> true                    end /\
+      (* apart (possibly) from its head, all elements in [right] are leaves;
+         moreover the left branch of [right]'s head already satisfies
+         invariant [g] when consed to [left] *)
+      match right with
+        | Cons (d2, t2) right' -> only_leaf right' /\
+            match t2 with Node l2 _ -> g (Cons (d2+1, l2) left)
+                        | Leaf      -> true end
+        | Nil -> true end
+    }
+    match left, right with
+    | _, Nil ->
+        raise Failure
+    | Nil, Cons (v, t) Nil ->
+        if v = 0 then t else raise Failure
+    | Nil, Cons (v, t) right' ->
+        tc (Cons (v, t) Nil) right'
+    | Cons (v1, t1) left', Cons (v2, t2) right' ->
+        if v1 = v2 then tc left' (Cons (v1 - 1, Node t1 t2) right')
+        else tc (Cons (v2, t2) left) right'
+    end
+    { depths 0 result = forest_depths (reverse left ++ right) }
+    | Failure ->
+    { forall t: tree. depths 0 t <> forest_depths (reverse left ++ right) }
+
+  (* Getting function [build] from [tc] is easy: from the list
+     [x1; x2; ...; xn] we simply build the list of pairs
+     [(x1, Leaf); (x2, Leaf); ...; (xn, Leaf)].
+     Function [map_leaf] below does this. *)
+
+  function map_leaf (l: list int) : list (int, tree) = match l with
+  | Nil -> Nil
+  | Cons d r -> Cons (d, Leaf) (map_leaf r)
+  end
+
+  (* two lemmas on [map_leaf] *)
+
+  lemma map_leaf_depths:
+    forall l: list int. forest_depths (map_leaf l) = l
+
+  lemma map_leaf_only_leaf:
+    forall l: list int. only_leaf (map_leaf l)
+
+  let build (s: list int) =
+    {}
+    tc Nil (map_leaf s)
+    { depths 0 result = s }
+    | Failure -> { forall t: tree. depths 0 t <> s }
+
+end
+
 
 (*
 Local Variables:

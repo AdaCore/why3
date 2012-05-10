@@ -2,8 +2,11 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import ZArith.
 Require Import Rbase.
-Parameter pow2: Z -> R.
+Require int.Int.
+Require real.Real.
+Require real.RealInfix.
 
+Parameter pow2: Z -> R.
 
 Axiom Power_0 : ((pow2 0%Z) = 1%R).
 
@@ -29,10 +32,9 @@ Axiom Power_non_null_aux : forall (n:Z), (0%Z <= n)%Z -> ~ ((pow2 n) = 0%R).
 Axiom Power_neg_aux : forall (n:Z), (0%Z <= n)%Z ->
   ((pow2 (-n)%Z) = (Rdiv 1%R (pow2 n))%R).
 
-(* YOU MAY EDIT THE CONTEXT BELOW *)
 Open Scope Z_scope.
-(* DO NOT EDIT BELOW *)
 
+(* Why3 goal *)
 Theorem Power_non_null : forall (n:Z), ~ ((pow2 n) = 0%R).
 (* YOU MAY EDIT THE PROOF BELOW *)
 intro n.
@@ -50,6 +52,5 @@ apply Power_non_null_aux.
 subst n'; auto with zarith.
 subst n'; auto with zarith.
 Qed.
-(* DO NOT EDIT BELOW *)
 
 

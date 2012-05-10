@@ -1,9 +1,10 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  Copyright (C) 2010-2011                                               *)
+(*  Copyright (C) 2010-2012                                               *)
 (*    François Bobot                                                      *)
 (*    Jean-Christophe Filliâtre                                           *)
 (*    Claude Marché                                                       *)
+(*    Guillaume Melquiond                                                 *)
 (*    Andrei Paskevich                                                    *)
 (*                                                                        *)
 (*  This software is free software; you can redistribute it and/or        *)
@@ -41,13 +42,6 @@ let print_version () =
   Format.printf "Why3 session, version %s (build date: %s)@."
     Config.version Config.builddate
 
-let simple_spec = [
-  ("-v", Arg.Set opt_version, " print version information") ;
-  Debug.Opt.desc_debug_list;
-  Debug.Opt.desc_debug_all;
-  Debug.Opt.desc_debug;
-]
-
 let read_simple_spec () =
   if !opt_version then begin
     print_version (); exit 0
@@ -57,29 +51,38 @@ let read_simple_spec () =
 
 
 
-let includes = ref []
 let opt_config = ref None
 let opt_loadpath = ref []
+let opt_extra = ref []
 
-let env_spec = [
+let common_options = [
   "-C", Arg.String (fun s -> opt_config := Some s),
-      "<file> Read configuration from <file>";
+      "<file> reads configuration from <file>";
   "--config", Arg.String (fun s -> opt_config := Some s),
-      " same as -C";
+      "<file> same as -C";
+  "--extra-config", Arg.String (fun s -> opt_extra := !opt_extra @ [s]),
+      "<file> reads additional configuration from <file>";
   "-L", Arg.String (fun s -> opt_loadpath := s :: !opt_loadpath),
-      "<dir> Add <dir> to the library search path";
+      "<dir> adds <dir> to the library search path";
   "--library", Arg.String (fun s -> opt_loadpath := s :: !opt_loadpath),
-      " same as -L";
-]@simple_spec
+      "<dir> same as -L";
+  "-v", Arg.Set opt_version, " prints version information" ;
+  Debug.Opt.desc_debug_list;
+  Debug.Opt.desc_debug_all;
+  Debug.Opt.desc_debug;
+]
+
+let env_spec = common_options 
 
 
 let read_env_spec () =
   (** Configuration *)
   let config = Whyconf.read_config !opt_config in
+  let config = List.fold_left Whyconf.merge_config config !opt_extra in
   let main = Whyconf.get_main config in
   Whyconf.load_plugins main;
   let loadpath = (Whyconf.loadpath (Whyconf.get_main config))
-    @ List.rev !includes in
+    @ List.rev !opt_loadpath in
   let env = Env.create_env loadpath in
   env,config,read_simple_spec ()
 

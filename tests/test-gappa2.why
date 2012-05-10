@@ -1,0 +1,23 @@
+
+theory T
+
+  use import real.Real
+  use import real.Abs
+  use import floating_point.Rounding
+  use import floating_point.Double
+
+  constant a : double
+  constant r : double
+  function f int : double
+
+  lemma Test_eq1:
+     value r = round NearestTiesToEven 0.1 ->
+     a = r ->
+     abs (value a - 0.1) <= 0x1.p-53
+
+  lemma Test_eq2:
+     value r = round NearestTiesToEven 0.1 ->
+     f 0 = r ->
+     abs (value (f 0) - 0.1) <= 0x1.p-53
+
+end

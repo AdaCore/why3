@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "why3session.dtd">
+<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
 <why3session
  name="programs/flag/why3session.xml">
  <prover
@@ -12,12 +12,20 @@
   version="2.2"/>
  <prover
   id="2"
-  name="Coq"
-  version="8.3pl3"/>
+  name="CVC3"
+  version="2.4.1"/>
  <prover
   id="3"
+  name="Coq"
+  version="8.3pl4"/>
+ <prover
+  id="4"
   name="Z3"
   version="2.19"/>
+ <prover
+  id="5"
+  name="Z3"
+  version="3.2"/>
  <file
   name="../flag.mlw"
   verified="true"
@@ -27,22 +35,22 @@
    locfile="programs/flag/../flag.mlw"
    loclnum="3" loccnumb="7" loccnume="11"
    verified="true"
-   expanded="true">
+   expanded="false">
    <goal
     name="WP_parameter swap"
     locfile="programs/flag/../flag.mlw"
     loclnum="15" loccnumb="6" loccnume="10"
     expl="parameter swap"
-    sum="6e9d7631e7b7c92a9ce097d0496b7e15"
+    sum="777622005a738532e4808309ae553373"
     proved="true"
-    expanded="true"
-    shape="aexchangeV3V5V1V2Iainfix =V5asetV4V2agetV3V1FAainfix <V2V0Aainfix <=c0V2Iainfix =V4asetV3V1agetV3V2FAainfix <V1V0Aainfix <=c0V1Aainfix <V2V0Aainfix <=c0V2Aainfix <V1V0Aainfix <=c0V1Iainfix <V2V0Aainfix <=c0V2Aainfix <V1V0Aainfix <=c0V1FFFF">
+    expanded="false"
+    shape="aexchangeV3V5V1V2Iainfix =V5asetV4V2agetV3V1FAainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V4asetV3V1agetV3V2FAainfix &lt;V1V0Aainfix &lt;=c0V1Aainfix &lt;V2V0Aainfix &lt;=c0V2Aainfix &lt;V1V0Aainfix &lt;=c0V1Iainfix &lt;V2V0Aainfix &lt;=c0V2Aainfix &lt;V1V0Aainfix &lt;=c0V1FFFF">
     <label
-     name="expl:parameter swap">
-     </label>
+     name="expl:parameter swap"/>
     <proof
-     prover="3"
+     prover="4"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.02"/>
@@ -50,6 +58,7 @@
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.01"/>
@@ -60,13 +69,12 @@
     locfile="programs/flag/../flag.mlw"
     loclnum="24" loccnumb="6" loccnume="16"
     expl="parameter dutch_flag"
-    sum="e51df69bd96db4569192e4895cc11549"
+    sum="06561a9ad8666d011b8c3cbe5d0fff7f"
     proved="true"
-    expanded="true"
-    shape="Lamk arrayV0V2Lamk arrayV0V7iainfix <V5V4CagetV7V5aBlueLamk arrayV0V9ainfix <ainfix -V4V12ainfix -V4V5Aainfix <=c0ainfix -V4V5Aapermut_subV2V9c0V1Aainfix =V0V1AamonochromeV10V4V1aRedAamonochromeV10V11V12aWhiteAamonochromeV10c0V11aBlueAainfix <=V4V1Aainfix <=V12V4Aainfix <=V11V12Aainfix <=c0V11Iainfix =V12ainfix +V5c1FIainfix =V11ainfix +V6c1FIaexchangeV7V9V6V5FAainfix <V5V0Aainfix <=c0V5Aainfix <V6V0Aainfix <=c0V6aWhiteainfix <ainfix -V4V13ainfix -V4V5Aainfix <=c0ainfix -V4V5Aapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V13aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V13V4Aainfix <=V6V13Aainfix <=c0V6Iainfix =V13ainfix +V5c1FaRedLamk arrayV0V15ainfix <ainfix -V14V5ainfix -V4V5Aainfix <=c0ainfix -V4V5Aapermut_subV2V15c0V1Aainfix =V0V1AamonochromeV16V14V1aRedAamonochromeV16V6V5aWhiteAamonochromeV16c0V6aBlueAainfix <=V14V1Aainfix <=V5V14Aainfix <=V6V5Aainfix <=c0V6IaexchangeV7V15V14V5FAainfix <V5V0Aainfix <=c0V5Aainfix <V14V0Aainfix <=c0V14Iainfix =V14ainfix -V4c1FAainfix <V5V0Aainfix <=c0V5apermutV3V8AamonochromeV8V18V1aRedAamonochromeV8V17V18aWhiteAamonochromeV8c0V17aBlueEEIapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFAapermut_subV2V2c0V1Aainfix =V0V1AamonochromeV3V1V1aRedAamonochromeV3c0c0aWhiteAamonochromeV3c0c0aBlueAainfix <=V1V1Aainfix <=c0V1Aainfix <=c0c0Aainfix <=c0c0Iainfix =V0V1Aainfix <=c0V1FFF">
+    expanded="false"
+    shape="Lamk arrayV0V2Lamk arrayV0V7iainfix &lt;V5V4CagetV7V5aBlueLamk arrayV0V9ainfix &lt;ainfix -V4V12ainfix -V4V5Aainfix &lt;=c0ainfix -V4V5Aapermut_subV2V9c0V1Aainfix =V0V1AamonochromeV10V4V1aRedAamonochromeV10V11V12aWhiteAamonochromeV10c0V11aBlueAainfix &lt;=V4V1Aainfix &lt;=V12V4Aainfix &lt;=V11V12Aainfix &lt;=c0V11Iainfix =V12ainfix +V5c1FIainfix =V11ainfix +V6c1FIaexchangeV7V9V6V5FAainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;V6V0Aainfix &lt;=c0V6aWhiteainfix &lt;ainfix -V4V13ainfix -V4V5Aainfix &lt;=c0ainfix -V4V5Aapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V13aWhiteAamonochromeV8c0V6aBlueAainfix &lt;=V4V1Aainfix &lt;=V13V4Aainfix &lt;=V6V13Aainfix &lt;=c0V6Iainfix =V13ainfix +V5c1FaRedLamk arrayV0V15ainfix &lt;ainfix -V14V5ainfix -V4V5Aainfix &lt;=c0ainfix -V4V5Aapermut_subV2V15c0V1Aainfix =V0V1AamonochromeV16V14V1aRedAamonochromeV16V6V5aWhiteAamonochromeV16c0V6aBlueAainfix &lt;=V14V1Aainfix &lt;=V5V14Aainfix &lt;=V6V5Aainfix &lt;=c0V6IaexchangeV7V15V14V5FAainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;V14V0Aainfix &lt;=c0V14Iainfix =V14ainfix -V4c1FAainfix &lt;V5V0Aainfix &lt;=c0V5apermutV3V8AamonochromeV8V18V1aRedAamonochromeV8V17V18aWhiteAamonochromeV8c0V17aBlueEEIapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix &lt;=V4V1Aainfix &lt;=V5V4Aainfix &lt;=V6V5Aainfix &lt;=c0V6FFFFAapermut_subV2V2c0V1Aainfix =V0V1AamonochromeV3V1V1aRedAamonochromeV3c0c0aWhiteAamonochromeV3c0c0aBlueAainfix &lt;=V1V1Aainfix &lt;=c0V1Aainfix &lt;=c0c0Aainfix &lt;=c0c0Iainfix =V0V1Aainfix &lt;=c0V1FFF">
     <label
-     name="expl:parameter dutch_flag">
-     </label>
+     name="expl:parameter dutch_flag"/>
     <transf
      name="split_goal"
      proved="true"
@@ -76,13 +84,12 @@
       locfile="programs/flag/../flag.mlw"
       loclnum="24" loccnumb="6" loccnume="16"
       expl="loop invariant init"
-      sum="6bdd195e34413ece90665a217e528de2"
+      sum="ed734bef6c0bfdf9136327808ccc39bd"
       proved="true"
-      expanded="true"
-      shape="Lamk arrayV0V2apermut_subV2V2c0V1Aainfix =V0V1AamonochromeV3V1V1aRedAamonochromeV3c0c0aWhiteAamonochromeV3c0c0aBlueAainfix <=V1V1Aainfix <=c0V1Aainfix <=c0c0Aainfix <=c0c0Iainfix =V0V1Aainfix <=c0V1FFF">
+      expanded="false"
+      shape="Lamk arrayV0V2apermut_subV2V2c0V1Aainfix =V0V1AamonochromeV3V1V1aRedAamonochromeV3c0c0aWhiteAamonochromeV3c0c0aBlueAainfix &lt;=V1V1Aainfix &lt;=c0V1Aainfix &lt;=c0c0Aainfix &lt;=c0c0Iainfix =V0V1Aainfix &lt;=c0V1FFF">
       <label
-       name="expl:parameter dutch_flag">
-       </label>
+       name="expl:parameter dutch_flag"/>
       <transf
        name="split_goal"
        proved="true"
@@ -92,16 +99,16 @@
         locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
-        sum="d299237e619c2679c867fea2e6d3aaf2"
+        sum="4654f83e2e69876c41e22b343eac0f8e"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V2ainfix <=c0c0Iainfix =V0V1Aainfix <=c0V1FFF">
+        expanded="false"
+        shape="Lamk arrayV0V2ainfix &lt;=c0c0Iainfix =V0V1Aainfix &lt;=c0V1FFF">
         <label
-         name="expl:parameter dutch_flag">
-         </label>
+         name="expl:parameter dutch_flag"/>
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -112,16 +119,16 @@
         locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
-        sum="d299237e619c2679c867fea2e6d3aaf2"
+        sum="4654f83e2e69876c41e22b343eac0f8e"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V2ainfix <=c0c0Iainfix =V0V1Aainfix <=c0V1FFF">
+        expanded="false"
+        shape="Lamk arrayV0V2ainfix &lt;=c0c0Iainfix =V0V1Aainfix &lt;=c0V1FFF">
         <label
-         name="expl:parameter dutch_flag">
-         </label>
+         name="expl:parameter dutch_flag"/>
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -132,16 +139,16 @@
         locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
-        sum="4848e5ca7f880deebdd1e90f3393189d"
+        sum="cf066c20be4c118203c75d75a8831074"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V2ainfix <=c0V1Iainfix =V0V1Aainfix <=c0V1FFF">
+        expanded="false"
+        shape="Lamk arrayV0V2ainfix &lt;=c0V1Iainfix =V0V1Aainfix &lt;=c0V1FFF">
         <label
-         name="expl:parameter dutch_flag">
-         </label>
+         name="expl:parameter dutch_flag"/>
         <proof
-         prover="3"
+         prover="4"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
@@ -149,9 +156,10 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.01"/>
+         <result status="valid" time="0.00"/>
         </proof>
        </goal>
        <goal
@@ -159,16 +167,16 @@
         locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
-        sum="d075fff792d081054d8b79faf19b819e"
+        sum="bde4e86147d640c4c241f4571b1c62e1"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V2ainfix <=V1V1Iainfix =V0V1Aainfix <=c0V1FFF">
+        expanded="false"
+        shape="Lamk arrayV0V2ainfix &lt;=V1V1Iainfix =V0V1Aainfix &lt;=c0V1FFF">
         <label
-         name="expl:parameter dutch_flag">
-         </label>
+         name="expl:parameter dutch_flag"/>
         <proof
-         prover="3"
+         prover="4"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.00"/>
@@ -176,6 +184,7 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.00"/>
@@ -186,16 +195,16 @@
         locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
-        sum="499b180eae3b3dbf04e5c4a745ac8d53"
+        sum="786e08e42f1da7d85e79d13b2c757b34"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V2amonochromeV3c0c0aBlueIainfix =V0V1Aainfix <=c0V1FFF">
+        expanded="false"
+        shape="Lamk arrayV0V2amonochromeV3c0c0aBlueIainfix =V0V1Aainfix &lt;=c0V1FFF">
         <label
-         name="expl:parameter dutch_flag">
-         </label>
+         name="expl:parameter dutch_flag"/>
         <proof
-         prover="3"
+         prover="4"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -203,9 +212,10 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.01"/>
+         <result status="valid" time="0.00"/>
         </proof>
        </goal>
        <goal
@@ -213,16 +223,16 @@
         locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
-        sum="1ac96584402a44dd33ca1bd770c1de81"
+        sum="a685824398501b29a8bc2d65d78dc8bf"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V2amonochromeV3c0c0aWhiteIainfix =V0V1Aainfix <=c0V1FFF">
+        expanded="false"
+        shape="Lamk arrayV0V2amonochromeV3c0c0aWhiteIainfix =V0V1Aainfix &lt;=c0V1FFF">
         <label
-         name="expl:parameter dutch_flag">
-         </label>
+         name="expl:parameter dutch_flag"/>
         <proof
-         prover="3"
+         prover="4"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -230,9 +240,10 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.01"/>
+         <result status="valid" time="0.00"/>
         </proof>
        </goal>
        <goal
@@ -240,16 +251,16 @@
         locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
-        sum="2ebed69944524329b324f8e329a56d2d"
+        sum="f6ff520d83d083093dcaba29e2cbdfbd"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V2amonochromeV3V1V1aRedIainfix =V0V1Aainfix <=c0V1FFF">
+        expanded="false"
+        shape="Lamk arrayV0V2amonochromeV3V1V1aRedIainfix =V0V1Aainfix &lt;=c0V1FFF">
         <label
-         name="expl:parameter dutch_flag">
-         </label>
+         name="expl:parameter dutch_flag"/>
         <proof
-         prover="3"
+         prover="4"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -257,9 +268,10 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.01"/>
+         <result status="valid" time="0.00"/>
         </proof>
        </goal>
        <goal
@@ -267,30 +279,32 @@
         locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
-        sum="8f8cd6098d3b7edebb799b17249c44e0"
+        sum="16c9b0a7c72719c6a52716bfa6ee9365"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V2ainfix =V0V1Iainfix =V0V1Aainfix <=c0V1FFF">
+        expanded="false"
+        shape="Lamk arrayV0V2ainfix =V0V1Iainfix =V0V1Aainfix &lt;=c0V1FFF">
         <label
-         name="expl:parameter dutch_flag">
-         </label>
+         name="expl:parameter dutch_flag"/>
         <proof
-         prover="3"
+         prover="4"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.02"/>
+         <result status="valid" time="0.01"/>
         </proof>
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.00"/>
+         <result status="valid" time="0.01"/>
         </proof>
         <proof
          prover="1"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.00"/>
@@ -301,16 +315,16 @@
         locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
-        sum="4feae3f048ab88c15961b5d4142ac13d"
+        sum="740c9816d470b081cdda7a88d56d1186"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V2apermut_subV2V2c0V1Iainfix =V0V1Aainfix <=c0V1FFF">
+        expanded="false"
+        shape="Lamk arrayV0V2apermut_subV2V2c0V1Iainfix =V0V1Aainfix &lt;=c0V1FFF">
         <label
-         name="expl:parameter dutch_flag">
-         </label>
+         name="expl:parameter dutch_flag"/>
         <proof
-         prover="3"
+         prover="4"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
@@ -318,6 +332,7 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -330,13 +345,12 @@
       locfile="programs/flag/../flag.mlw"
       loclnum="24" loccnumb="6" loccnume="16"
       expl="precondition"
-      sum="579acd5993997aced1c54acb1b8705fc"
+      sum="533af1ec471f7bc989fa3955c0c593b5"
       proved="true"
-      expanded="true"
-      shape="Lamk arrayV0V2Lamk arrayV0V7ainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+      expanded="false"
+      shape="Lamk arrayV0V2Lamk arrayV0V7ainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix &lt;=V4V1Aainfix &lt;=V5V4Aainfix &lt;=V6V5Aainfix &lt;=c0V6FFFFIainfix =V0V1Aainfix &lt;=c0V1FFF">
       <label
-       name="expl:parameter dutch_flag">
-       </label>
+       name="expl:parameter dutch_flag"/>
       <transf
        name="split_goal"
        proved="true"
@@ -346,16 +360,16 @@
         locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
-        sum="bc38b6d73dd2bd943efe8339d691ff3f"
+        sum="fefb7b625eb65ecde797366cb7c43240"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V2Lamk arrayV0V7ainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        expanded="false"
+        shape="Lamk arrayV0V2Lamk arrayV0V7ainfix &lt;=c0V5Iainfix &lt;V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix &lt;=V4V1Aainfix &lt;=V5V4Aainfix &lt;=V6V5Aainfix &lt;=c0V6FFFFIainfix =V0V1Aainfix &lt;=c0V1FFF">
         <label
-         name="expl:parameter dutch_flag">
-         </label>
+         name="expl:parameter dutch_flag"/>
         <proof
-         prover="3"
+         prover="4"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
@@ -363,9 +377,10 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.00"/>
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
        <goal
@@ -373,16 +388,16 @@
         locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
-        sum="aa710f2fbba663cae5a8413020f34b59"
+        sum="c4a7d6335e743b0763d8607d70d30637"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V2Lamk arrayV0V7ainfix <V5V0Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        expanded="false"
+        shape="Lamk arrayV0V2Lamk arrayV0V7ainfix &lt;V5V0Iainfix &lt;V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix &lt;=V4V1Aainfix &lt;=V5V4Aainfix &lt;=V6V5Aainfix &lt;=c0V6FFFFIainfix =V0V1Aainfix &lt;=c0V1FFF">
         <label
-         name="expl:parameter dutch_flag">
-         </label>
+         name="expl:parameter dutch_flag"/>
         <proof
-         prover="3"
+         prover="4"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
@@ -390,6 +405,7 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -402,16 +418,16 @@
       locfile="programs/flag/../flag.mlw"
       loclnum="24" loccnumb="6" loccnume="16"
       expl="parameter dutch_flag"
-      sum="6adc3a406bbfac4137d9b343211b5961"
+      sum="74b36344a46fce0be381d5b68a9af153"
       proved="true"
-      expanded="true"
-      shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBlueainfix <V5V0Aainfix <=c0V5Aainfix <V6V0Aainfix <=c0V6aWhitetaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+      expanded="false"
+      shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBlueainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;V6V0Aainfix &lt;=c0V6aWhitetaRedtIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix &lt;=V4V1Aainfix &lt;=V5V4Aainfix &lt;=V6V5Aainfix &lt;=c0V6FFFFIainfix =V0V1Aainfix &lt;=c0V1FFF">
       <label
-       name="expl:parameter dutch_flag">
-       </label>
+       name="expl:parameter dutch_flag"/>
       <proof
-       prover="3"
+       prover="4"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
@@ -419,13 +435,15 @@
       <proof
        prover="1"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.02"/>
       </proof>
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -436,13 +454,12 @@
       locfile="programs/flag/../flag.mlw"
       loclnum="24" loccnumb="6" loccnume="16"
       expl="parameter dutch_flag"
-      sum="753834d79eea3ba35217ee850a675027"
+      sum="a9c53dcbcd17ffa76af7405ad7f77dc0"
       proved="true"
-      expanded="true"
-      shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBlueLamk arrayV0V9apermut_subV2V9c0V1Aainfix =V0V1AamonochromeV10V4V1aRedAamonochromeV10V11V12aWhiteAamonochromeV10c0V11aBlueAainfix <=V4V1Aainfix <=V12V4Aainfix <=V11V12Aainfix <=c0V11Iainfix =V12ainfix +V5c1FIainfix =V11ainfix +V6c1FIaexchangeV7V9V6V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V6V0Aainfix <=c0V6aWhitetaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+      expanded="false"
+      shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBlueLamk arrayV0V9apermut_subV2V9c0V1Aainfix =V0V1AamonochromeV10V4V1aRedAamonochromeV10V11V12aWhiteAamonochromeV10c0V11aBlueAainfix &lt;=V4V1Aainfix &lt;=V12V4Aainfix &lt;=V11V12Aainfix &lt;=c0V11Iainfix =V12ainfix +V5c1FIainfix =V11ainfix +V6c1FIaexchangeV7V9V6V5FIainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;V6V0Aainfix &lt;=c0V6aWhitetaRedtIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix &lt;=V4V1Aainfix &lt;=V5V4Aainfix &lt;=V6V5Aainfix &lt;=c0V6FFFFIainfix =V0V1Aainfix &lt;=c0V1FFF">
       <label
-       name="expl:parameter dutch_flag">
-       </label>
+       name="expl:parameter dutch_flag"/>
       <transf
        name="split_goal"
        proved="true"
@@ -452,16 +469,16 @@
         locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
-        sum="b402de9e5d0dd4c625c572ddfeb1cc2a"
+        sum="84f21b321a8ff1281b37704826273337"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBlueLamk arrayV0V9ainfix <=c0V11Iainfix =V12ainfix +V5c1FIainfix =V11ainfix +V6c1FIaexchangeV7V9V6V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V6V0Aainfix <=c0V6aWhitetaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        expanded="false"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBlueLamk arrayV0V9ainfix &lt;=c0V11Iainfix =V12ainfix +V5c1FIainfix =V11ainfix +V6c1FIaexchangeV7V9V6V5FIainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;V6V0Aainfix &lt;=c0V6aWhitetaRedtIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix &lt;=V4V1Aainfix &lt;=V5V4Aainfix &lt;=V6V5Aainfix &lt;=c0V6FFFFIainfix =V0V1Aainfix &lt;=c0V1FFF">
         <label
-         name="expl:parameter dutch_flag">
-         </label>
+         name="expl:parameter dutch_flag"/>
         <proof
-         prover="3"
+         prover="4"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
@@ -469,9 +486,10 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.00"/>
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
        <goal
@@ -479,16 +497,16 @@
         locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
-        sum="e13a05d645ee39125c8377720f98abc7"
+        sum="be119594437eee9f8ce2feb58f104dc1"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBlueLamk arrayV0V9ainfix <=V11V12Iainfix =V12ainfix +V5c1FIainfix =V11ainfix +V6c1FIaexchangeV7V9V6V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V6V0Aainfix <=c0V6aWhitetaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        expanded="false"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBlueLamk arrayV0V9ainfix &lt;=V11V12Iainfix =V12ainfix +V5c1FIainfix =V11ainfix +V6c1FIaexchangeV7V9V6V5FIainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;V6V0Aainfix &lt;=c0V6aWhitetaRedtIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix &lt;=V4V1Aainfix &lt;=V5V4Aainfix &lt;=V6V5Aainfix &lt;=c0V6FFFFIainfix =V0V1Aainfix &lt;=c0V1FFF">
         <label
-         name="expl:parameter dutch_flag">
-         </label>
+         name="expl:parameter dutch_flag"/>
         <proof
-         prover="3"
+         prover="4"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
@@ -496,6 +514,7 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -506,16 +525,16 @@
         locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
-        sum="41d7cb8f0366bdf522b81de47dfd21d9"
+        sum="16b532da44410a0f2d36024d668f6d72"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBlueLamk arrayV0V9ainfix <=V12V4Iainfix =V12ainfix +V5c1FIainfix =V11ainfix +V6c1FIaexchangeV7V9V6V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V6V0Aainfix <=c0V6aWhitetaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        expanded="false"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBlueLamk arrayV0V9ainfix &lt;=V12V4Iainfix =V12ainfix +V5c1FIainfix =V11ainfix +V6c1FIaexchangeV7V9V6V5FIainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;V6V0Aainfix &lt;=c0V6aWhitetaRedtIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix &lt;=V4V1Aainfix &lt;=V5V4Aainfix &lt;=V6V5Aainfix &lt;=c0V6FFFFIainfix =V0V1Aainfix &lt;=c0V1FFF">
         <label
-         name="expl:parameter dutch_flag">
-         </label>
+         name="expl:parameter dutch_flag"/>
         <proof
-         prover="3"
+         prover="4"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
@@ -523,6 +542,7 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -533,16 +553,16 @@
         locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
-        sum="aa749521e9befe75ddcb06f3ee0d7aa5"
+        sum="e691b99cc6df113746b5d4bfd04c329b"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBlueLamk arrayV0V9ainfix <=V4V1Iainfix =V12ainfix +V5c1FIainfix =V11ainfix +V6c1FIaexchangeV7V9V6V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V6V0Aainfix <=c0V6aWhitetaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        expanded="false"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBlueLamk arrayV0V9ainfix &lt;=V4V1Iainfix =V12ainfix +V5c1FIainfix =V11ainfix +V6c1FIaexchangeV7V9V6V5FIainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;V6V0Aainfix &lt;=c0V6aWhitetaRedtIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix &lt;=V4V1Aainfix &lt;=V5V4Aainfix &lt;=V6V5Aainfix &lt;=c0V6FFFFIainfix =V0V1Aainfix &lt;=c0V1FFF">
         <label
-         name="expl:parameter dutch_flag">
-         </label>
+         name="expl:parameter dutch_flag"/>
         <proof
-         prover="3"
+         prover="4"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
@@ -550,6 +570,7 @@
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -560,20 +581,20 @@
         locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
-        sum="b1ee3f432a806c554b61be63bd12522f"
+        sum="1f10d0164afccbd8045909ef7b44a212"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBlueLamk arrayV0V9amonochromeV10c0V11aBlueIainfix =V12ainfix +V5c1FIainfix =V11ainfix +V6c1FIaexchangeV7V9V6V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V6V0Aainfix <=c0V6aWhitetaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        expanded="false"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBlueLamk arrayV0V9amonochromeV10c0V11aBlueIainfix =V12ainfix +V5c1FIainfix =V11ainfix +V6c1FIaexchangeV7V9V6V5FIainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;V6V0Aainfix &lt;=c0V6aWhitetaRedtIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix &lt;=V4V1Aainfix &lt;=V5V4Aainfix &lt;=V6V5Aainfix &lt;=c0V6FFFFIainfix =V0V1Aainfix &lt;=c0V1FFF">
         <label
-         name="expl:parameter dutch_flag">
-         </label>
+         name="expl:parameter dutch_flag"/>
         <proof
-         prover="2"
+         prover="3"
          timelimit="10"
+         memlimit="0"
          edited="flag_WP_Flag_WP_parameter_dutch_flag_1.v"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.57"/>
+         <result status="valid" time="0.54"/>
         </proof>
        </goal>
        <goal
@@ -581,20 +602,20 @@
         locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
-        sum="85736e5fda0597de6ec1af78cbca1506"
+        sum="dcaa48396700b97657133154acf7ee80"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBlueLamk arrayV0V9amonochromeV10V11V12aWhiteIainfix =V12ainfix +V5c1FIainfix =V11ainfix +V6c1FIaexchangeV7V9V6V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V6V0Aainfix <=c0V6aWhitetaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        expanded="false"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBlueLamk arrayV0V9amonochromeV10V11V12aWhiteIainfix =V12ainfix +V5c1FIainfix =V11ainfix +V6c1FIaexchangeV7V9V6V5FIainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;V6V0Aainfix &lt;=c0V6aWhitetaRedtIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix &lt;=V4V1Aainfix &lt;=V5V4Aainfix &lt;=V6V5Aainfix &lt;=c0V6FFFFIainfix =V0V1Aainfix &lt;=c0V1FFF">
         <label
-         name="expl:parameter dutch_flag">
-         </label>
+         name="expl:parameter dutch_flag"/>
         <proof
-         prover="2"
+         prover="3"
          timelimit="10"
+         memlimit="0"
          edited="flag_WP_Flag_WP_parameter_dutch_flag_4.v"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.59"/>
+         <result status="valid" time="0.54"/>
         </proof>
        </goal>
        <goal
@@ -602,19 +623,19 @@
         locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
-        sum="85a9d3052eed518d7ce03f4478fe94d3"
+        sum="00849e81d620944aeefb00e6e5bffda1"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBlueLamk arrayV0V9amonochromeV10V4V1aRedIainfix =V12ainfix +V5c1FIainfix =V11ainfix +V6c1FIaexchangeV7V9V6V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V6V0Aainfix <=c0V6aWhitetaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        expanded="false"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBlueLamk arrayV0V9amonochromeV10V4V1aRedIainfix =V12ainfix +V5c1FIainfix =V11ainfix +V6c1FIaexchangeV7V9V6V5FIainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;V6V0Aainfix &lt;=c0V6aWhitetaRedtIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix &lt;=V4V1Aainfix &lt;=V5V4Aainfix &lt;=V6V5Aainfix &lt;=c0V6FFFFIainfix =V0V1Aainfix &lt;=c0V1FFF">
         <label
-         name="expl:parameter dutch_flag">
-         </label>
+         name="expl:parameter dutch_flag"/>
         <proof
          prover="1"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.24"/>
+         <result status="valid" time="0.23"/>
         </proof>
        </goal>
        <goal
@@ -622,16 +643,16 @@
         locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
-        sum="e3a2768b7f265ded9ff6185c188a4300"
+        sum="9c4b4d2fd9c71e23a98c95615a0caaa9"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBlueLamk arrayV0V9ainfix =V0V1Iainfix =V12ainfix +V5c1FIainfix =V11ainfix +V6c1FIaexchangeV7V9V6V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V6V0Aainfix <=c0V6aWhitetaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        expanded="false"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBlueLamk arrayV0V9ainfix =V0V1Iainfix =V12ainfix +V5c1FIainfix =V11ainfix +V6c1FIaexchangeV7V9V6V5FIainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;V6V0Aainfix &lt;=c0V6aWhitetaRedtIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix &lt;=V4V1Aainfix &lt;=V5V4Aainfix &lt;=V6V5Aainfix &lt;=c0V6FFFFIainfix =V0V1Aainfix &lt;=c0V1FFF">
         <label
-         name="expl:parameter dutch_flag">
-         </label>
+         name="expl:parameter dutch_flag"/>
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -642,19 +663,35 @@
         locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
-        sum="2fc693bcf17ae3a7e6b3e125fc7f6fb1"
+        sum="98ef83775172d975db3d47b9caecf0c4"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBlueLamk arrayV0V9apermut_subV2V9c0V1Iainfix =V12ainfix +V5c1FIainfix =V11ainfix +V6c1FIaexchangeV7V9V6V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V6V0Aainfix <=c0V6aWhitetaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        expanded="false"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBlueLamk arrayV0V9apermut_subV2V9c0V1Iainfix =V12ainfix +V5c1FIainfix =V11ainfix +V6c1FIaexchangeV7V9V6V5FIainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;V6V0Aainfix &lt;=c0V6aWhitetaRedtIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix &lt;=V4V1Aainfix &lt;=V5V4Aainfix &lt;=V6V5Aainfix &lt;=c0V6FFFFIainfix =V0V1Aainfix &lt;=c0V1FFF">
         <label
-         name="expl:parameter dutch_flag">
-         </label>
+         name="expl:parameter dutch_flag"/>
         <proof
          prover="0"
-         timelimit="10"
+         timelimit="60"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="4.46"/>
+         <result status="valid" time="27.80"/>
+        </proof>
+        <proof
+         prover="2"
+         timelimit="10"
+         memlimit="0"
+         obsolete="false"
+         archived="false">
+         <result status="timeout" time="10.03"/>
+        </proof>
+        <proof
+         prover="5"
+         timelimit="10"
+         memlimit="0"
+         obsolete="false"
+         archived="false">
+         <result status="timeout" time="10.03"/>
         </proof>
        </goal>
       </transf>
@@ -664,16 +701,16 @@
       locfile="programs/flag/../flag.mlw"
       loclnum="24" loccnumb="6" loccnume="16"
       expl="parameter dutch_flag"
-      sum="0761c2d1220c458c88ead9d45db16a78"
+      sum="e496a6ed3b300e2fe16fc2e079021f03"
       proved="true"
-      expanded="true"
-      shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBlueLamk arrayV0V9ainfix <ainfix -V4V12ainfix -V4V5Aainfix <=c0ainfix -V4V5Iapermut_subV2V9c0V1Aainfix =V0V1AamonochromeV10V4V1aRedAamonochromeV10V11V12aWhiteAamonochromeV10c0V11aBlueAainfix <=V4V1Aainfix <=V12V4Aainfix <=V11V12Aainfix <=c0V11Iainfix =V12ainfix +V5c1FIainfix =V11ainfix +V6c1FIaexchangeV7V9V6V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V6V0Aainfix <=c0V6aWhitetaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+      expanded="false"
+      shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBlueLamk arrayV0V9ainfix &lt;ainfix -V4V12ainfix -V4V5Aainfix &lt;=c0ainfix -V4V5Iapermut_subV2V9c0V1Aainfix =V0V1AamonochromeV10V4V1aRedAamonochromeV10V11V12aWhiteAamonochromeV10c0V11aBlueAainfix &lt;=V4V1Aainfix &lt;=V12V4Aainfix &lt;=V11V12Aainfix &lt;=c0V11Iainfix =V12ainfix +V5c1FIainfix =V11ainfix +V6c1FIaexchangeV7V9V6V5FIainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;V6V0Aainfix &lt;=c0V6aWhitetaRedtIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix &lt;=V4V1Aainfix &lt;=V5V4Aainfix &lt;=V6V5Aainfix &lt;=c0V6FFFFIainfix =V0V1Aainfix &lt;=c0V1FFF">
       <label
-       name="expl:parameter dutch_flag">
-       </label>
+       name="expl:parameter dutch_flag"/>
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -684,13 +721,12 @@
       locfile="programs/flag/../flag.mlw"
       loclnum="24" loccnumb="6" loccnume="16"
       expl="parameter dutch_flag"
-      sum="8403f28de355fe4c0953e46e83a04750"
+      sum="eb54bac704e68b0d8870b5422592087f"
       proved="true"
-      expanded="true"
-      shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhiteapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V9aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V9V4Aainfix <=V6V9Aainfix <=c0V6Iainfix =V9ainfix +V5c1FaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+      expanded="false"
+      shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhiteapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V9aWhiteAamonochromeV8c0V6aBlueAainfix &lt;=V4V1Aainfix &lt;=V9V4Aainfix &lt;=V6V9Aainfix &lt;=c0V6Iainfix =V9ainfix +V5c1FaRedtIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix &lt;=V4V1Aainfix &lt;=V5V4Aainfix &lt;=V6V5Aainfix &lt;=c0V6FFFFIainfix =V0V1Aainfix &lt;=c0V1FFF">
       <label
-       name="expl:parameter dutch_flag">
-       </label>
+       name="expl:parameter dutch_flag"/>
       <transf
        name="split_goal"
        proved="true"
@@ -700,16 +736,16 @@
         locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
-        sum="3d6fd3ed56d380f95320ce7de685c3fa"
+        sum="6da17c7ee52b2983389ca652e5548d88"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhiteainfix <=c0V6Iainfix =V9ainfix +V5c1FaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        expanded="false"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhiteainfix &lt;=c0V6Iainfix =V9ainfix +V5c1FaRedtIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix &lt;=V4V1Aainfix &lt;=V5V4Aainfix &lt;=V6V5Aainfix &lt;=c0V6FFFFIainfix =V0V1Aainfix &lt;=c0V1FFF">
         <label
-         name="expl:parameter dutch_flag">
-         </label>
+         name="expl:parameter dutch_flag"/>
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -720,19 +756,19 @@
         locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
-        sum="e806ff3b6d74887ea83ece6eef51cb09"
+        sum="ce49d41d8bd56e2c5f0e6a2b7c2383c4"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhiteainfix <=V6V9Iainfix =V9ainfix +V5c1FaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        expanded="false"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhiteainfix &lt;=V6V9Iainfix =V9ainfix +V5c1FaRedtIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix &lt;=V4V1Aainfix &lt;=V5V4Aainfix &lt;=V6V5Aainfix &lt;=c0V6FFFFIainfix =V0V1Aainfix &lt;=c0V1FFF">
         <label
-         name="expl:parameter dutch_flag">
-         </label>
+         name="expl:parameter dutch_flag"/>
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.00"/>
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
        <goal
@@ -740,16 +776,16 @@
         locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
-        sum="4b657de05e70228963d75a1649bb105c"
+        sum="d21e82f6083327dec5e082f63b8125d1"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhiteainfix <=V9V4Iainfix =V9ainfix +V5c1FaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        expanded="false"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhiteainfix &lt;=V9V4Iainfix =V9ainfix +V5c1FaRedtIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix &lt;=V4V1Aainfix &lt;=V5V4Aainfix &lt;=V6V5Aainfix &lt;=c0V6FFFFIainfix =V0V1Aainfix &lt;=c0V1FFF">
         <label
-         name="expl:parameter dutch_flag">
-         </label>
+         name="expl:parameter dutch_flag"/>
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -760,19 +796,19 @@
         locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
-        sum="07d92f82104e88ce6a6547d174828278"
+        sum="61ee566cf709aae1652f9e112df0848c"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhiteainfix <=V4V1Iainfix =V9ainfix +V5c1FaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        expanded="false"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhiteainfix &lt;=V4V1Iainfix =V9ainfix +V5c1FaRedtIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix &lt;=V4V1Aainfix &lt;=V5V4Aainfix &lt;=V6V5Aainfix &lt;=c0V6FFFFIainfix =V0V1Aainfix &lt;=c0V1FFF">
         <label
-         name="expl:parameter dutch_flag">
-         </label>
+         name="expl:parameter dutch_flag"/>
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.00"/>
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
        <goal
@@ -780,16 +816,16 @@
         locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
-        sum="40ddb3d142c636ba747e70a01b9d3540"
+        sum="9fc5d090a293316209a6f26878743074"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhiteamonochromeV8c0V6aBlueIainfix =V9ainfix +V5c1FaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        expanded="false"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhiteamonochromeV8c0V6aBlueIainfix =V9ainfix +V5c1FaRedtIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix &lt;=V4V1Aainfix &lt;=V5V4Aainfix &lt;=V6V5Aainfix &lt;=c0V6FFFFIainfix =V0V1Aainfix &lt;=c0V1FFF">
         <label
-         name="expl:parameter dutch_flag">
-         </label>
+         name="expl:parameter dutch_flag"/>
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -800,16 +836,16 @@
         locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
-        sum="1b6372783a326c9b3d673ada899e27b1"
+        sum="85304862931e1dd5c2d69b69213ba303"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhiteamonochromeV8V6V9aWhiteIainfix =V9ainfix +V5c1FaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        expanded="false"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhiteamonochromeV8V6V9aWhiteIainfix =V9ainfix +V5c1FaRedtIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix &lt;=V4V1Aainfix &lt;=V5V4Aainfix &lt;=V6V5Aainfix &lt;=c0V6FFFFIainfix =V0V1Aainfix &lt;=c0V1FFF">
         <label
-         name="expl:parameter dutch_flag">
-         </label>
+         name="expl:parameter dutch_flag"/>
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -820,16 +856,16 @@
         locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
-        sum="c4f702557c7509d24153f78b5b5d1241"
+        sum="5107608840c0d193cddb3584a077bfb5"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhiteamonochromeV8V4V1aRedIainfix =V9ainfix +V5c1FaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        expanded="false"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhiteamonochromeV8V4V1aRedIainfix =V9ainfix +V5c1FaRedtIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix &lt;=V4V1Aainfix &lt;=V5V4Aainfix &lt;=V6V5Aainfix &lt;=c0V6FFFFIainfix =V0V1Aainfix &lt;=c0V1FFF">
         <label
-         name="expl:parameter dutch_flag">
-         </label>
+         name="expl:parameter dutch_flag"/>
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -840,16 +876,16 @@
         locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
-        sum="cbfda945aed2e7d242b3ff5d1433bfc3"
+        sum="d1df6a7de124be44162ac2c972e87b18"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhiteainfix =V0V1Iainfix =V9ainfix +V5c1FaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        expanded="false"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhiteainfix =V0V1Iainfix =V9ainfix +V5c1FaRedtIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix &lt;=V4V1Aainfix &lt;=V5V4Aainfix &lt;=V6V5Aainfix &lt;=c0V6FFFFIainfix =V0V1Aainfix &lt;=c0V1FFF">
         <label
-         name="expl:parameter dutch_flag">
-         </label>
+         name="expl:parameter dutch_flag"/>
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -860,16 +896,16 @@
         locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
-        sum="64f2f96d5029337fac23994056a3979c"
+        sum="1597348fc4b398f043a36b8cbe0366a6"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhiteapermut_subV2V7c0V1Iainfix =V9ainfix +V5c1FaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        expanded="false"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhiteapermut_subV2V7c0V1Iainfix =V9ainfix +V5c1FaRedtIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix &lt;=V4V1Aainfix &lt;=V5V4Aainfix &lt;=V6V5Aainfix &lt;=c0V6FFFFIainfix =V0V1Aainfix &lt;=c0V1FFF">
         <label
-         name="expl:parameter dutch_flag">
-         </label>
+         name="expl:parameter dutch_flag"/>
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -882,13 +918,12 @@
       locfile="programs/flag/../flag.mlw"
       loclnum="24" loccnumb="6" loccnume="16"
       expl="parameter dutch_flag"
-      sum="1485528aa1ffaeeef0389a70bb5a54ed"
+      sum="68de391c098ecbbd712947f79920e41a"
       proved="true"
-      expanded="true"
-      shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhiteainfix <ainfix -V4V9ainfix -V4V5Aainfix <=c0ainfix -V4V5Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V9aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V9V4Aainfix <=V6V9Aainfix <=c0V6Iainfix =V9ainfix +V5c1FaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+      expanded="false"
+      shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhiteainfix &lt;ainfix -V4V9ainfix -V4V5Aainfix &lt;=c0ainfix -V4V5Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V9aWhiteAamonochromeV8c0V6aBlueAainfix &lt;=V4V1Aainfix &lt;=V9V4Aainfix &lt;=V6V9Aainfix &lt;=c0V6Iainfix =V9ainfix +V5c1FaRedtIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix &lt;=V4V1Aainfix &lt;=V5V4Aainfix &lt;=V6V5Aainfix &lt;=c0V6FFFFIainfix =V0V1Aainfix &lt;=c0V1FFF">
       <label
-       name="expl:parameter dutch_flag">
-       </label>
+       name="expl:parameter dutch_flag"/>
       <transf
        name="split_goal"
        proved="true"
@@ -898,19 +933,19 @@
         locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
-        sum="fd55ea0d594747c0582f0eafab0156e5"
+        sum="1443f25e1dd6db3eb658419360ae7d44"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhiteainfix <=c0ainfix -V4V5Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V9aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V9V4Aainfix <=V6V9Aainfix <=c0V6Iainfix =V9ainfix +V5c1FaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        expanded="false"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhiteainfix &lt;=c0ainfix -V4V5Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V9aWhiteAamonochromeV8c0V6aBlueAainfix &lt;=V4V1Aainfix &lt;=V9V4Aainfix &lt;=V6V9Aainfix &lt;=c0V6Iainfix =V9ainfix +V5c1FaRedtIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix &lt;=V4V1Aainfix &lt;=V5V4Aainfix &lt;=V6V5Aainfix &lt;=c0V6FFFFIainfix =V0V1Aainfix &lt;=c0V1FFF">
         <label
-         name="expl:parameter dutch_flag">
-         </label>
+         name="expl:parameter dutch_flag"/>
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.00"/>
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
        <goal
@@ -918,19 +953,19 @@
         locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
-        sum="a6e69a42d84d78c737ec17ab3b96c83d"
+        sum="a76558d3840c45a87e45b5133f5b6347"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhiteainfix <ainfix -V4V9ainfix -V4V5Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V9aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V9V4Aainfix <=V6V9Aainfix <=c0V6Iainfix =V9ainfix +V5c1FaRedtIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        expanded="false"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhiteainfix &lt;ainfix -V4V9ainfix -V4V5Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V9aWhiteAamonochromeV8c0V6aBlueAainfix &lt;=V4V1Aainfix &lt;=V9V4Aainfix &lt;=V6V9Aainfix &lt;=c0V6Iainfix =V9ainfix +V5c1FaRedtIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix &lt;=V4V1Aainfix &lt;=V5V4Aainfix &lt;=V6V5Aainfix &lt;=c0V6FFFFIainfix =V0V1Aainfix &lt;=c0V1FFF">
         <label
-         name="expl:parameter dutch_flag">
-         </label>
+         name="expl:parameter dutch_flag"/>
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.00"/>
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
       </transf>
@@ -940,19 +975,19 @@
       locfile="programs/flag/../flag.mlw"
       loclnum="24" loccnumb="6" loccnume="16"
       expl="parameter dutch_flag"
-      sum="52036f72a11ad67676e322291fc326c6"
+      sum="9d9db6b7d4f0df7d6a1e5fe805122e24"
       proved="true"
-      expanded="true"
-      shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedainfix <V5V0Aainfix <=c0V5Aainfix <V9V0Aainfix <=c0V9Iainfix =V9ainfix -V4c1FIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+      expanded="false"
+      shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;V9V0Aainfix &lt;=c0V9Iainfix =V9ainfix -V4c1FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix &lt;=V4V1Aainfix &lt;=V5V4Aainfix &lt;=V6V5Aainfix &lt;=c0V6FFFFIainfix =V0V1Aainfix &lt;=c0V1FFF">
       <label
-       name="expl:parameter dutch_flag">
-       </label>
+       name="expl:parameter dutch_flag"/>
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.00"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
@@ -960,13 +995,12 @@
       locfile="programs/flag/../flag.mlw"
       loclnum="24" loccnumb="6" loccnume="16"
       expl="parameter dutch_flag"
-      sum="b89e7a06d833d5146420afd551bcb0e8"
+      sum="c500f440ac873a6c93202ec323cc8723"
       proved="true"
-      expanded="true"
-      shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedLamk arrayV0V10apermut_subV2V10c0V1Aainfix =V0V1AamonochromeV11V9V1aRedAamonochromeV11V6V5aWhiteAamonochromeV11c0V6aBlueAainfix <=V9V1Aainfix <=V5V9Aainfix <=V6V5Aainfix <=c0V6IaexchangeV7V10V9V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V9V0Aainfix <=c0V9Iainfix =V9ainfix -V4c1FIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+      expanded="false"
+      shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedLamk arrayV0V10apermut_subV2V10c0V1Aainfix =V0V1AamonochromeV11V9V1aRedAamonochromeV11V6V5aWhiteAamonochromeV11c0V6aBlueAainfix &lt;=V9V1Aainfix &lt;=V5V9Aainfix &lt;=V6V5Aainfix &lt;=c0V6IaexchangeV7V10V9V5FIainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;V9V0Aainfix &lt;=c0V9Iainfix =V9ainfix -V4c1FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix &lt;=V4V1Aainfix &lt;=V5V4Aainfix &lt;=V6V5Aainfix &lt;=c0V6FFFFIainfix =V0V1Aainfix &lt;=c0V1FFF">
       <label
-       name="expl:parameter dutch_flag">
-       </label>
+       name="expl:parameter dutch_flag"/>
       <transf
        name="split_goal"
        proved="true"
@@ -976,16 +1010,16 @@
         locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
-        sum="4ac36bf7e47f648276da714e075b1423"
+        sum="a49cdd97c4346d6513c70316897e2ae5"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedLamk arrayV0V10ainfix <=c0V6IaexchangeV7V10V9V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V9V0Aainfix <=c0V9Iainfix =V9ainfix -V4c1FIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        expanded="false"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedLamk arrayV0V10ainfix &lt;=c0V6IaexchangeV7V10V9V5FIainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;V9V0Aainfix &lt;=c0V9Iainfix =V9ainfix -V4c1FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix &lt;=V4V1Aainfix &lt;=V5V4Aainfix &lt;=V6V5Aainfix &lt;=c0V6FFFFIainfix =V0V1Aainfix &lt;=c0V1FFF">
         <label
-         name="expl:parameter dutch_flag">
-         </label>
+         name="expl:parameter dutch_flag"/>
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -996,19 +1030,19 @@
         locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
-        sum="e75b329fa929ec99fd5fdee375319d03"
+        sum="988790b07fe547306ee349e65c3f3c92"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedLamk arrayV0V10ainfix <=V6V5IaexchangeV7V10V9V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V9V0Aainfix <=c0V9Iainfix =V9ainfix -V4c1FIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        expanded="false"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedLamk arrayV0V10ainfix &lt;=V6V5IaexchangeV7V10V9V5FIainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;V9V0Aainfix &lt;=c0V9Iainfix =V9ainfix -V4c1FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix &lt;=V4V1Aainfix &lt;=V5V4Aainfix &lt;=V6V5Aainfix &lt;=c0V6FFFFIainfix =V0V1Aainfix &lt;=c0V1FFF">
         <label
-         name="expl:parameter dutch_flag">
-         </label>
+         name="expl:parameter dutch_flag"/>
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.00"/>
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
        <goal
@@ -1016,16 +1050,16 @@
         locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
-        sum="2fe74725696bbbbe74c581951afe716c"
+        sum="b014dbaf90757bd4b4c16a4854b40aaa"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedLamk arrayV0V10ainfix <=V5V9IaexchangeV7V10V9V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V9V0Aainfix <=c0V9Iainfix =V9ainfix -V4c1FIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        expanded="false"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedLamk arrayV0V10ainfix &lt;=V5V9IaexchangeV7V10V9V5FIainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;V9V0Aainfix &lt;=c0V9Iainfix =V9ainfix -V4c1FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix &lt;=V4V1Aainfix &lt;=V5V4Aainfix &lt;=V6V5Aainfix &lt;=c0V6FFFFIainfix =V0V1Aainfix &lt;=c0V1FFF">
         <label
-         name="expl:parameter dutch_flag">
-         </label>
+         name="expl:parameter dutch_flag"/>
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -1036,19 +1070,19 @@
         locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
-        sum="f8d103efb4f27684ef99a810cd9c9bd1"
+        sum="919a9ca6ef91806a1052d37b55e30375"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedLamk arrayV0V10ainfix <=V9V1IaexchangeV7V10V9V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V9V0Aainfix <=c0V9Iainfix =V9ainfix -V4c1FIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        expanded="false"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedLamk arrayV0V10ainfix &lt;=V9V1IaexchangeV7V10V9V5FIainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;V9V0Aainfix &lt;=c0V9Iainfix =V9ainfix -V4c1FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix &lt;=V4V1Aainfix &lt;=V5V4Aainfix &lt;=V6V5Aainfix &lt;=c0V6FFFFIainfix =V0V1Aainfix &lt;=c0V1FFF">
         <label
-         name="expl:parameter dutch_flag">
-         </label>
+         name="expl:parameter dutch_flag"/>
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.00"/>
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
        <goal
@@ -1056,19 +1090,19 @@
         locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
-        sum="7426a9d4634d2249d768f90aef3d0f2f"
+        sum="84520208dad05608fad9d4e199373a54"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedLamk arrayV0V10amonochromeV11c0V6aBlueIaexchangeV7V10V9V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V9V0Aainfix <=c0V9Iainfix =V9ainfix -V4c1FIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        expanded="false"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedLamk arrayV0V10amonochromeV11c0V6aBlueIaexchangeV7V10V9V5FIainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;V9V0Aainfix &lt;=c0V9Iainfix =V9ainfix -V4c1FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix &lt;=V4V1Aainfix &lt;=V5V4Aainfix &lt;=V6V5Aainfix &lt;=c0V6FFFFIainfix =V0V1Aainfix &lt;=c0V1FFF">
         <label
-         name="expl:parameter dutch_flag">
-         </label>
+         name="expl:parameter dutch_flag"/>
         <proof
          prover="1"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.24"/>
+         <result status="valid" time="0.23"/>
         </proof>
        </goal>
        <goal
@@ -1076,19 +1110,19 @@
         locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
-        sum="f819dc315a8f210718fdb5f2af4d12ea"
+        sum="b1187925401d131c86e8eecc008526db"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedLamk arrayV0V10amonochromeV11V6V5aWhiteIaexchangeV7V10V9V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V9V0Aainfix <=c0V9Iainfix =V9ainfix -V4c1FIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        expanded="false"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedLamk arrayV0V10amonochromeV11V6V5aWhiteIaexchangeV7V10V9V5FIainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;V9V0Aainfix &lt;=c0V9Iainfix =V9ainfix -V4c1FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix &lt;=V4V1Aainfix &lt;=V5V4Aainfix &lt;=V6V5Aainfix &lt;=c0V6FFFFIainfix =V0V1Aainfix &lt;=c0V1FFF">
         <label
-         name="expl:parameter dutch_flag">
-         </label>
+         name="expl:parameter dutch_flag"/>
         <proof
          prover="1"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.54"/>
+         <result status="valid" time="0.51"/>
         </proof>
        </goal>
        <goal
@@ -1096,19 +1130,19 @@
         locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
-        sum="0fc3097b81002770dd7c138512ebf663"
+        sum="68ecb4047fb559ed67873f9d1458d14a"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedLamk arrayV0V10amonochromeV11V9V1aRedIaexchangeV7V10V9V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V9V0Aainfix <=c0V9Iainfix =V9ainfix -V4c1FIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        expanded="false"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedLamk arrayV0V10amonochromeV11V9V1aRedIaexchangeV7V10V9V5FIainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;V9V0Aainfix &lt;=c0V9Iainfix =V9ainfix -V4c1FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix &lt;=V4V1Aainfix &lt;=V5V4Aainfix &lt;=V6V5Aainfix &lt;=c0V6FFFFIainfix =V0V1Aainfix &lt;=c0V1FFF">
         <label
-         name="expl:parameter dutch_flag">
-         </label>
+         name="expl:parameter dutch_flag"/>
         <proof
          prover="1"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.43"/>
+         <result status="valid" time="1.33"/>
         </proof>
        </goal>
        <goal
@@ -1116,19 +1150,19 @@
         locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
-        sum="5acc17e7cf38e6f3c42744d4778df297"
+        sum="5c549c96ea27f0f43e274795e8880e99"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedLamk arrayV0V10ainfix =V0V1IaexchangeV7V10V9V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V9V0Aainfix <=c0V9Iainfix =V9ainfix -V4c1FIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        expanded="false"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedLamk arrayV0V10ainfix =V0V1IaexchangeV7V10V9V5FIainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;V9V0Aainfix &lt;=c0V9Iainfix =V9ainfix -V4c1FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix &lt;=V4V1Aainfix &lt;=V5V4Aainfix &lt;=V6V5Aainfix &lt;=c0V6FFFFIainfix =V0V1Aainfix &lt;=c0V1FFF">
         <label
-         name="expl:parameter dutch_flag">
-         </label>
+         name="expl:parameter dutch_flag"/>
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.00"/>
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
        <goal
@@ -1136,19 +1170,35 @@
         locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
-        sum="01f7f137a621ff46e9eef746106b839b"
+        sum="aca7dba42f88501014e38c469a8ffa8e"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedLamk arrayV0V10apermut_subV2V10c0V1IaexchangeV7V10V9V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V9V0Aainfix <=c0V9Iainfix =V9ainfix -V4c1FIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        expanded="false"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedLamk arrayV0V10apermut_subV2V10c0V1IaexchangeV7V10V9V5FIainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;V9V0Aainfix &lt;=c0V9Iainfix =V9ainfix -V4c1FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix &lt;=V4V1Aainfix &lt;=V5V4Aainfix &lt;=V6V5Aainfix &lt;=c0V6FFFFIainfix =V0V1Aainfix &lt;=c0V1FFF">
         <label
-         name="expl:parameter dutch_flag">
-         </label>
+         name="expl:parameter dutch_flag"/>
         <proof
          prover="0"
-         timelimit="10"
+         timelimit="59"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="4.42"/>
+         <result status="valid" time="27.52"/>
+        </proof>
+        <proof
+         prover="2"
+         timelimit="10"
+         memlimit="0"
+         obsolete="false"
+         archived="false">
+         <result status="timeout" time="10.03"/>
+        </proof>
+        <proof
+         prover="5"
+         timelimit="10"
+         memlimit="0"
+         obsolete="false"
+         archived="false">
+         <result status="timeout" time="10.03"/>
         </proof>
        </goal>
       </transf>
@@ -1158,13 +1208,12 @@
       locfile="programs/flag/../flag.mlw"
       loclnum="24" loccnumb="6" loccnume="16"
       expl="parameter dutch_flag"
-      sum="446763ce989658d39bbb645b84f18e76"
+      sum="d507b6bcbebb194252f92f268fe15a49"
       proved="true"
-      expanded="true"
-      shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedLamk arrayV0V10ainfix <ainfix -V9V5ainfix -V4V5Aainfix <=c0ainfix -V4V5Iapermut_subV2V10c0V1Aainfix =V0V1AamonochromeV11V9V1aRedAamonochromeV11V6V5aWhiteAamonochromeV11c0V6aBlueAainfix <=V9V1Aainfix <=V5V9Aainfix <=V6V5Aainfix <=c0V6IaexchangeV7V10V9V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V9V0Aainfix <=c0V9Iainfix =V9ainfix -V4c1FIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+      expanded="false"
+      shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedLamk arrayV0V10ainfix &lt;ainfix -V9V5ainfix -V4V5Aainfix &lt;=c0ainfix -V4V5Iapermut_subV2V10c0V1Aainfix =V0V1AamonochromeV11V9V1aRedAamonochromeV11V6V5aWhiteAamonochromeV11c0V6aBlueAainfix &lt;=V9V1Aainfix &lt;=V5V9Aainfix &lt;=V6V5Aainfix &lt;=c0V6IaexchangeV7V10V9V5FIainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;V9V0Aainfix &lt;=c0V9Iainfix =V9ainfix -V4c1FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix &lt;=V4V1Aainfix &lt;=V5V4Aainfix &lt;=V6V5Aainfix &lt;=c0V6FFFFIainfix =V0V1Aainfix &lt;=c0V1FFF">
       <label
-       name="expl:parameter dutch_flag">
-       </label>
+       name="expl:parameter dutch_flag"/>
       <transf
        name="split_goal"
        proved="true"
@@ -1174,16 +1223,16 @@
         locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
-        sum="9e9f7d9a1f10e332cbe037629b515f92"
+        sum="9ffd620532d603dc5885809b7119a99b"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedLamk arrayV0V10ainfix <=c0ainfix -V4V5Iapermut_subV2V10c0V1Aainfix =V0V1AamonochromeV11V9V1aRedAamonochromeV11V6V5aWhiteAamonochromeV11c0V6aBlueAainfix <=V9V1Aainfix <=V5V9Aainfix <=V6V5Aainfix <=c0V6IaexchangeV7V10V9V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V9V0Aainfix <=c0V9Iainfix =V9ainfix -V4c1FIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        expanded="false"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedLamk arrayV0V10ainfix &lt;=c0ainfix -V4V5Iapermut_subV2V10c0V1Aainfix =V0V1AamonochromeV11V9V1aRedAamonochromeV11V6V5aWhiteAamonochromeV11c0V6aBlueAainfix &lt;=V9V1Aainfix &lt;=V5V9Aainfix &lt;=V6V5Aainfix &lt;=c0V6IaexchangeV7V10V9V5FIainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;V9V0Aainfix &lt;=c0V9Iainfix =V9ainfix -V4c1FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix &lt;=V4V1Aainfix &lt;=V5V4Aainfix &lt;=V6V5Aainfix &lt;=c0V6FFFFIainfix =V0V1Aainfix &lt;=c0V1FFF">
         <label
-         name="expl:parameter dutch_flag">
-         </label>
+         name="expl:parameter dutch_flag"/>
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -1194,16 +1243,16 @@
         locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
-        sum="f9a28f554ad8de26247da0db1d8ad66a"
+        sum="eeade988bfad952b62cc4144ce4d26ef"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedLamk arrayV0V10ainfix <ainfix -V9V5ainfix -V4V5Iapermut_subV2V10c0V1Aainfix =V0V1AamonochromeV11V9V1aRedAamonochromeV11V6V5aWhiteAamonochromeV11c0V6aBlueAainfix <=V9V1Aainfix <=V5V9Aainfix <=V6V5Aainfix <=c0V6IaexchangeV7V10V9V5FIainfix <V5V0Aainfix <=c0V5Aainfix <V9V0Aainfix <=c0V9Iainfix =V9ainfix -V4c1FIainfix <V5V0Aainfix <=c0V5Iainfix <V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        expanded="false"
+        shape="Lamk arrayV0V2Lamk arrayV0V7CagetV7V5aBluetaWhitetaRedLamk arrayV0V10ainfix &lt;ainfix -V9V5ainfix -V4V5Iapermut_subV2V10c0V1Aainfix =V0V1AamonochromeV11V9V1aRedAamonochromeV11V6V5aWhiteAamonochromeV11c0V6aBlueAainfix &lt;=V9V1Aainfix &lt;=V5V9Aainfix &lt;=V6V5Aainfix &lt;=c0V6IaexchangeV7V10V9V5FIainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;V9V0Aainfix &lt;=c0V9Iainfix =V9ainfix -V4c1FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V4Iapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix &lt;=V4V1Aainfix &lt;=V5V4Aainfix &lt;=V6V5Aainfix &lt;=c0V6FFFFIainfix =V0V1Aainfix &lt;=c0V1FFF">
         <label
-         name="expl:parameter dutch_flag">
-         </label>
+         name="expl:parameter dutch_flag"/>
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -1216,13 +1265,12 @@
       locfile="programs/flag/../flag.mlw"
       loclnum="24" loccnumb="6" loccnume="16"
       expl="normal postcondition"
-      sum="d8be25d27d017816b2330cd5ad3cd7f2"
+      sum="0fc3034b8f66c269c045d9858885df44"
       proved="true"
-      expanded="true"
-      shape="Lamk arrayV0V2Lamk arrayV0V7apermutV3V8AamonochromeV8V10V1aRedAamonochromeV8V9V10aWhiteAamonochromeV8c0V9aBlueEEIainfix <V5V4NIapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+      expanded="false"
+      shape="Lamk arrayV0V2Lamk arrayV0V7apermutV3V8AamonochromeV8V10V1aRedAamonochromeV8V9V10aWhiteAamonochromeV8c0V9aBlueEEIainfix &lt;V5V4NIapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix &lt;=V4V1Aainfix &lt;=V5V4Aainfix &lt;=V6V5Aainfix &lt;=c0V6FFFFIainfix =V0V1Aainfix &lt;=c0V1FFF">
       <label
-       name="expl:parameter dutch_flag">
-       </label>
+       name="expl:parameter dutch_flag"/>
       <transf
        name="split_goal"
        proved="true"
@@ -1232,19 +1280,19 @@
         locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
-        sum="e956aab57bbd6b380a485a3d3bb71723"
+        sum="350c45b30e8a745d812826dc68fae1b8"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V2Lamk arrayV0V7amonochromeV8V10V1aRedAamonochromeV8V9V10aWhiteAamonochromeV8c0V9aBlueEEIainfix <V5V4NIapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        expanded="false"
+        shape="Lamk arrayV0V2Lamk arrayV0V7amonochromeV8V10V1aRedAamonochromeV8V9V10aWhiteAamonochromeV8c0V9aBlueEEIainfix &lt;V5V4NIapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix &lt;=V4V1Aainfix &lt;=V5V4Aainfix &lt;=V6V5Aainfix &lt;=c0V6FFFFIainfix =V0V1Aainfix &lt;=c0V1FFF">
         <label
-         name="expl:parameter dutch_flag">
-         </label>
+         name="expl:parameter dutch_flag"/>
         <proof
          prover="0"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.00"/>
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
        <goal
@@ -1252,16 +1300,16 @@
         locfile="programs/flag/../flag.mlw"
         loclnum="24" loccnumb="6" loccnume="16"
         expl="parameter dutch_flag"
-        sum="52ac1b158670c6f5ca3adba2e717334f"
+        sum="eddcf747e87cc8156eebab4f4612ee15"
         proved="true"
-        expanded="true"
-        shape="Lamk arrayV0V2Lamk arrayV0V7apermutV3V8Iainfix <V5V4NIapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix <=V4V1Aainfix <=V5V4Aainfix <=V6V5Aainfix <=c0V6FFFFIainfix =V0V1Aainfix <=c0V1FFF">
+        expanded="false"
+        shape="Lamk arrayV0V2Lamk arrayV0V7apermutV3V8Iainfix &lt;V5V4NIapermut_subV2V7c0V1Aainfix =V0V1AamonochromeV8V4V1aRedAamonochromeV8V6V5aWhiteAamonochromeV8c0V6aBlueAainfix &lt;=V4V1Aainfix &lt;=V5V4Aainfix &lt;=V6V5Aainfix &lt;=c0V6FFFFIainfix =V0V1Aainfix &lt;=c0V1FFF">
         <label
-         name="expl:parameter dutch_flag">
-         </label>
+         name="expl:parameter dutch_flag"/>
         <proof
          prover="1"
          timelimit="10"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>

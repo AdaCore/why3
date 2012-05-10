@@ -1,0 +1,97 @@
+
+theory TestGappa
+
+   use import real.Real
+   use import real.Abs
+   use import real.Square
+   use import floating_point.Rounding
+   use floating_point.Single
+   use import floating_point.Double
+
+  lemma Round_single_01:
+    Single.round NearestTiesToEven 0.1 = 0x1.99999ap-4
+
+  lemma Round_double_01:
+    Double.round NearestTiesToEven 0.1 = 0x1.999999999999ap-4
+
+   lemma Test00: forall x:real.  abs x <= 2.0 -> -3.0 <= x
+
+   lemma Test01:
+       forall x:double.
+          -2.0 <= value x <= 2.0 ->
+             abs((value x) * (value x) -
+                 round NearestTiesToEven ((value x) * (value x))) <= 0x1p-52
+
+   lemma Test02:
+       forall x y:double.
+          abs (value x) <= 2.0 ->
+            y = x ->
+             abs((value y) * (value y) -
+                 round NearestTiesToEven ((value x) * (value x))) <= 0x1p-52
+
+   lemma Test03:
+       forall x y z:double.
+          abs (value x) <= 2.0 ->
+          value y = round NearestTiesToEven ((value x) * (value x)) ->
+          z = y ->
+          sqrt ((value z - (value x)*(value x))*(value y - (value x)*(value x))) <= 0x1p-52
+
+end
+
+theory GappaEq
+
+  use import real.Real
+  use import real.Abs
+  use import floating_point.Rounding
+  use import floating_point.Double
+
+  constant a : double
+  constant r : double
+  function f int : double
+  function g int int : double
+
+  lemma Test1:
+     value r = round NearestTiesToEven 0.1 ->
+     a = r ->
+     abs (value a - 0.1) <= 0x1.p-53
+
+  lemma Test2:
+     value r = round NearestTiesToEven 0.1 ->
+     f 0 = r ->
+     abs (value (f 0) - 0.1) <= 0x1.p-53
+
+  lemma Test3:
+     value r = round NearestTiesToEven 0.1 ->
+     g 0 1 = r ->
+     abs (value (g 0 1) - 0.1) <= 0x1.p-53
+
+end
+
+
+
+theory GappaEq2
+
+  use import real.Real
+
+  use import floating_point.Rounding
+  use import floating_point.Double
+
+  constant q1 : double
+  constant q2 : double
+  axiom H1 : -2.0 <= value q1 <= 2.0
+  axiom H2 : -2.0 <= value q2 <= 2.0
+
+  constant result : double
+  (* result = q1 * q2 *)
+  axiom H :
+    value result = round NearestTiesToEven (value q1 * value q2)
+
+  goal G1 : value result - value q1 * value q2 <= 0x1.p-52
+
+  goal G2 : forall q:double. q = result ->
+     value q - value q1 * value q2 <= 0x1.p-52
+
+  goal G3 : forall q:double. ("lab1" q) = result ->
+     value ("lab2" q) - value q1 * value q2 <= 0x1.p-52
+
+end

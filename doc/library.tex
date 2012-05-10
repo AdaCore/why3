@@ -1,10 +1,25 @@
-\chapter{Standard Library: Why3 Theories}
+\chapter{Standard Library}
 \label{chap:library}
 
-We provide here a short description of logic symbols defined in the
-standard library. Only the most general-purpose ones are
-described. For more details, one should directly read the
-corresponding file, or alternatively, use the \verb|why3| with option
+This chapter provides a short description of the contents of \why
+standard library. It contains both standard logic theories, described
+in Section~\ref{sec:stdlib}, and standard ML modules, described in
+Section~\ref{sec:mllibrary}.
+
+Only a rough introduction of the theories and modules is given
+here. For detailed information, one should refer to the on-line
+documentation automatically generated from the actual sources,
+available at \url{http://why3.lri.fr/stdlib/}.
+
+
+\section{Standard Theories}
+\label{sec:stdlib}
+
+We present the most important theories here, see the URL above for the
+others.
+
+Notice there is an alternative way to explore the contents of a
+library, using the \verb|why3| command with option 
 \verb|-T| and a qualified theory name, for example:
 \begin{verbatim}
 > why3 -T bool.Ite
@@ -21,154 +36,128 @@ theory Ite
 end
 \end{verbatim}
 
-In the following, for each library, we describe the (main) symbols
+In the following, for each library, we describe the main theories
 defined in it.
 
-\section{Library \texttt{bool}}
+\subsection{Library \texttt{bool}}
 
 \begin{description}
 
-\item[Bool] boolean data type \verb|bool| with constructors \verb|True| and
-  \verb|False|; operations \verb|andb|, \verb|orb|, \verb|xorb|, \verb|notb|.
+\item[Bool] provides the Boolean data type \verb|bool| with
+  constructors \verb|True| and \verb|False|; and operations \verb|andb|, \verb|orb|, \verb|xorb|, \verb|notb|.
 
-\item[Ite] polymorphic if-then-else operator written as \verb|ite|.
+\item[Ite] provides the polymorphic if-then-else operator written as \verb|ite|.
 
 \end{description}
 
-\section{Library \texttt{int}}
+\subsection{Library \texttt{int}}
 
 \begin{description}
 
-\item[Int] basic operations \verb|+|, \verb|-| and \verb|*|; comparison
-  operators \verb|<|, \verb|>|, \verb|>=| and \verb|<=|.
+\item[Int] provides the basic operations \verb|+|, \verb|-|, and
+  \verb|*|, and the comparison operators \verb|<|, \verb|>|, \verb|>=|, and
+  \verb|<=|.
 
-\item[Abs] absolute value written as \verb|abs|.
+\item[Abs] provides the absolute value written as \verb|abs|.
 
-\item[EuclideanDivision] division and modulo, where division rounds
+\item[EuclideanDivision] defines division and modulo, where division rounds
   down, written as \verb|div| and \verb|mod|.
 
-\item[ComputerDivision] division and modulo, where division rounds to
+\item[ComputerDivision] defines division and modulo, where division rounds to
   zero, also written as \verb|div| and \verb|mod|.
 
-\item[MinMax] \verb|min| and \verb|max| operators.
+\item[MinMax] provides \verb|min| and \verb|max| operators.
 
 \end{description}
 
-\section{Library \texttt{real}}
+See the on-line web documentation for the other theories defined in the
+\texttt{int} library.
+
+\subsection{Library \texttt{real}}
 
 \begin{description}
 
-\item[Real] basic operations \verb|+|, \verb|-|, \verb|*| and \verb|/|;
+\item[Real] provides basic operations \verb|+|, \verb|-|, \verb|*| and \verb|/|;
   comparison operators.
 
-\item[RealInfix] basic operations with alternative syntax \verb|+.|,
-  \verb|-.|, \verb|*.|, \verb|/.|, \verb|<.|, \verb|>.|, \verb|<=.| and \verb|>=.|, to
+\item[RealInfix] provides basic operations with alternative syntax \verb|+.|,
+  \verb|-.|, \verb|*.|, \verb|/.|, \verb|<.|, \verb|>.|, \verb|<=.|, and \verb|>=.|, to
   allow simultaneous use of integer and real operators.
 
-\item[Abs] absolute value written as \verb|abs|.
+\item[Abs] provides absolute value written as \verb|abs|.
 
-\item[MinMax] \verb|min| and \verb|max| operators.
+\item[MinMax] provides \verb|min| and \verb|max| operators.
 
-\item[FromInt] operator \verb|from_int| to convert an integer to a real.
+\item[FromInt] provides the operator \verb|from_int| to convert an integer to a real.
 
-\item[Truncate] conversion operators from real to integers:
-  \verb|truncate| rounds to 0, \verb|floor| rounds down and
+\item[Truncate] provides conversion operators from real to integers:
+  \verb|truncate| rounds to 0, \verb|floor| rounds down, and
   \verb|ceil| rounds up.
 
-\item[Square] operators \verb|sqr| and \verb|sqrt| for square and square root.
+\item[Square] provides operators \verb|sqr| and \verb|sqrt| for square and square root.
 
-\item[ExpLog] functions \verb|exp|, \verb|log|, \verb|log2|, and \verb|log10|.
+% \item[ExpLog] functions \verb|exp|, \verb|log|, \verb|log2|, and \verb|log10|.
 
-\item[Power] function \verb|pow| with two real parameters.
+% \item[PowerReal] function \verb|pow| with two real parameters.
 
-\item[Trigonometry] functions \verb|cos|, \verb|sin|, \verb|tan|, and
-  \verb|atan|. Constant \verb|pi|.
+% \item[PowerInt] function \verb|pow| with integer only exponents.
 
-\item[Hyperbolic] functions \verb|cosh|, \verb|sinh|, \verb|tanh|,
-  \verb|acosh|, \verb|asinh|, \verb|atanh|.
+% \item[Trigonometry] functions \verb|cos|, \verb|sin|, \verb|tan|, and
+%   \verb|atan|. Constant \verb|pi|.
 
-\item[Polar] functions \verb|hypot| and \verb|atan2|.
+% \item[Hyperbolic] functions \verb|cosh|, \verb|sinh|, \verb|tanh|,
+%   \verb|acosh|, \verb|asinh|, \verb|atanh|.
+
+% \item[Polar] functions \verb|hypot| and \verb|atan2|.
 
 \end{description}
 
-\section{Library \texttt{floating\_point}}
+See the on-line web documentation for the other theories defined in the
+\texttt{real} library, such exponential, logarithm, power,
+trigonometric functions.
+
+\subsection{Library \texttt{floating\_point}}
 
 This library provides a theory of IEEE-754 floating-point numbers. It
 is inspired by~\cite{ayad10ijcar}.
 
-\begin{description}
-\item[Rounding] type \verb|mode| with 5 constants
-  \verb|NearestTiesToEven|, \verb|ToZero|, \verb|Up|, \verb|Down| and
-  \verb|NearTiesToAway|.
-\item[SpecialValues] handling of infinities and NaN.
-\item[GenFloat] generic floats parameterized by the maximal
-  representable number. Functions \verb|round|, \verb|value|,
-  \verb|exact|, \verb|model|, predicate \verb|no_overflow|.
-\item[Single] instance of GenFloat for 32-bits single precision numbers.
-\item[Double] instance of GenFloat for 64-bits double precision numbers.
-\end{description}
+\subsection{Library \texttt{map}}
 
+This library provides the data type of purely applicative maps. It is
+polymorphic both in the index type and the contents. There are also a
+few theories and operators specialized to maps indexed by integers,
+such as the sorted predicate, permutation, etc.
 
-\section{Library \texttt{array}}
+\subsection{Library \texttt{option}}
 
-\begin{description}
+This library provides the classical ML option type with constructors
+\verb|None| and \verb|Some|.
 
-\item[Array] polymorphic arrays, a.k.a maps. Type \verb|t|
-  parameterized by both the type of indices and the type of
-  data. Functions \verb|get| and \verb|set| to access and update
-  arrays. Function \verb|create_const| to produce an array initialized
-  by a given constant.
+\subsection{Library \texttt{list}}
 
-\item[ArrayLength] arrays indexed by integers and holding their
-  length. Function \verb|length|.
+This library provides the classical ML type of polymorphic lists, with
+constructors \verb|Nil| and \verb|Cons|. Most of the classical list
+operators are provided in separate theories.
 
-\item[ArrayRich] additional functions on arrays indexed by
-  integers. Functions \verb|sub| and \verb|app| to extract a sub-array
-  and append arrays.
+\section{Standard ML Modules}
+\label{sec:mllibrary}
 
-\end{description}
+The standard ML modules provided allow to write imperative
+programs. The two main modules are the one providing ML references,
+and the one providing arrays.
 
-\section{Library \texttt{option}}
+\subsection{Library \texttt{ref}}
+
 
 \begin{description}
-\item[Option] data type \verb|option 'a| with constructors \verb|None| and
-  \verb|Some|.
-\end{description}
-
-
-\section{Library \texttt{list}}
-
-\begin{description}
-\item[List] data type \verb|list 'a| with constructors \verb|Nil| and
-  \verb|Cons|.
-\item[Length] function \verb|length|
-\item[Mem] function \verb|mem| for testing for list membership.
-\item[Nth] function \verb|nth| for extract the $n$-th element.
-\item[HdTl] functions \verb|hd| and \verb|tl|.
-\item[Append] function \verb|append|, concatenation of lists.
-\item[Reverse] function \verb|reverse| for list reversal.
-\item[Sorted] predicate \verb|sorted| for lists of integers.
-\item[NumOcc] number of occurrences in a list.
-\item[Permut] list permutations.
-\item[Induction] structural induction on lists.
-\item[Map] list map operator.
-\end{description}
-
-
-\chapter{Standard Library: Why3ML Modules}
-\label{chap:mllibrary}
-
-\section{Library \texttt{ref}}
-
-\begin{description}
-\item[Ref] references \emph{i.e.} mutable variables:
+\item[Ref] provides references \emph{i.e.} mutable variables:
   type \verb|ref 'a| and functions \verb|ref| for creation,
-  \verb|(!)| for access, and \verb|(:=)| for mutation
-\item[Refint] references with additional functions \texttt{incr} and
-  \texttt{decr} over integer references
+  \verb|(!)| for access, and \verb|(:=)| for mutation.
+\item[Refint] provides additional functions \texttt{incr},
+  \texttt{decr} and a few others, over integer references.
 \end{description}
 
-\section{Library \texttt{array}}
+\subsection{Library \texttt{array}}
 
 \begin{description}
 \item[Array]polymorphic arrays (type \texttt{array 'a}, infix
@@ -183,40 +172,13 @@ is inspired by~\cite{ayad10ijcar}.
   (\verb|permut_sub| and \verb|permut|)
 \end{description}
 
-\section{Library \texttt{queue}}
+\subsection{Standard Data Types}
 
-\begin{description}
-\item[Queue] polymorphic mutable queues (type \texttt{t 'a} and
-  functions \texttt{create}, \texttt{push}, \texttt{pop},
-  \texttt{top}, \texttt{clear}, \texttt{copy}, \texttt{is\_empty},
-  \texttt{length})
-\end{description}
+A few other classical data types are provided, such as queues (library
+\texttt{queue}), stacks (library \texttt{stack}), hash tables (library
+\texttt{hashtbl}), characters and strings (library \texttt{string}),
+etc.
 
-\section{Library \texttt{stack}}
-
-\begin{description}
-\item[Stack] polymorphic mutable stacks (type \texttt{t 'a} and
-  functions \texttt{create}, \texttt{push}, \texttt{pop},
-  \texttt{top}, \texttt{clear}, \texttt{copy}, \texttt{is\_empty},
-  \texttt{length})
-\end{description}
-
-\section{Library \texttt{hashtbl}}
-
-\begin{description}
-\item[Hashtbl] hash tables with monomorphic keys (type \texttt{key})
-  and polymorphic values (type \texttt{t 'a} of hash tables, syntax
-  $h[k]$ for access, functions \texttt{create}, \texttt{clear},
-  \texttt{add}, \texttt{mem}, \texttt{find}, \texttt{find\_all},
-  \texttt{copy}, \texttt{remove}, and \texttt{replace})
-\end{description}
-
-\section{Library \texttt{string}}
-
-\begin{description}
-\item[Char]
-\item[String]
-\end{description}
 
 %%% Local Variables:
 %%% mode: latex

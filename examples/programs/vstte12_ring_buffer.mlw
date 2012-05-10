@@ -1,0 +1,171 @@
+
+(* The 2nd Verified Software Competition (VSTTE 2012)
+   https://sites.google.com/site/vstte2012/compet
+
+   Problem 3:
+   Queue data structure implemented using a ring buffer *)
+
+module RingBuffer
+
+  use import int.Int
+  use import list.List
+  use import list.Append
+  use import module array.Array
+
+  type buffer 'a = {|
+    mutable first: int;
+    mutable len  : int;
+            data : array 'a;
+  |}
+
+  (* total capacity of the buffer *)
+  function size (b: buffer 'a) : int = Array.length b.data
+
+  (* length = number of elements *)
+  function length (b: buffer 'a) : int = b.len
+
+  predicate buffer_invariant (b: buffer 'a) =
+    0 <= b.first <  size b /\
+    0 <= b.len   <= size b
+
+  (* the model of a buffer is a list of elements *)
+
+  function sequence (b: buffer 'a) : list 'a
+
+  axiom sequence_def_1:
+    forall b: buffer 'a. buffer_invariant b ->
+    b.len = 0 -> sequence b = Nil
+
+  axiom sequence_def_2:
+    forall b: buffer 'a. buffer_invariant b ->
+    b.len > 0 -> b.first+1 < size b ->
+    sequence b = Cons b.data[b.first]
+                 (sequence {| b with first = b.first+1; len = b.len-1 |})
+
+  axiom sequence_def_3:
+    forall b: buffer 'a. buffer_invariant b ->
+    b.len > 0 -> b.first+1 = size b ->
+    sequence b = Cons b.data[b.first]
+                 (sequence {| b with first = 0; len = b.len-1 |})
+
+  lemma sequence_ind_1:
+    forall b: buffer 'a. buffer_invariant b ->
+    b.len > 0 -> b.first+b.len-1 < size b ->
+    sequence b = sequence {| b with first = b.first; len = b.len-1 |} ++
+                 Cons b.data[b.first+b.len-1] Nil
+
+  lemma sequence_ind_2:
+    forall b: buffer 'a. buffer_invariant b ->
+    b.len > 0 -> b.first+b.len-1 >= size b ->
+    sequence b = sequence {| b with first = b.first; len = b.len-1 |} ++
+                 Cons b.data[b.first+b.len-1 - size b] Nil
+
+  lemma sequence_invariance:
+    forall b1 b2: buffer 'a. buffer_invariant b1 -> buffer_invariant b2 ->
+    b1.first = b2.first -> b1.len = b2.len -> size b1 = size b2 ->
+    (forall i: int. b1.first <= i < b1.first+b1.len -> i < size b1 ->
+       b1.data[i] = b2.data[i]) ->
+    (forall i: int. 0 <= i < b1.first+b1.len - size b1 ->
+       b1.data[i] = b2.data[i]) ->
+    sequence b1 = sequence b2
+
+  (* code *)
+
+  let create (n: int) (dummy: 'a) =
+    { n > 0 }
+    {| first = 0; len = 0; data = make n dummy; |}
+    { buffer_invariant result /\ size result = n /\ sequence result = Nil }
+
+  let length (b: buffer 'a) =
+    { buffer_invariant b }
+    b.len
+    { result = length b }
+
+  let clear (b: buffer 'a) =
+    { buffer_invariant b }
+    b.len <- 0
+    { buffer_invariant b /\ length b = 0 /\ sequence b = Nil }
+
+  let push (b: buffer 'a) (x: 'a) =
+    { length b < size b /\ buffer_invariant b }
+    let i = b.first + b.len in
+    let n = Array.length b.data in
+    b.data[if i >= n then i - n else i] <- x;
+    b.len <- b.len + 1
+    { buffer_invariant b /\ length b = (old (length b)) + 1 /\
+      sequence b = (old (sequence b)) ++ Cons x Nil }
+
+  let head (b: buffer 'a) =
+    { length b > 0 /\ buffer_invariant b }
+    b.data[b.first]
+    { match sequence b with Nil -> false | Cons x _ -> result = x end }
+
+  let pop (b: buffer 'a) =
+    { length b > 0 /\ buffer_invariant b }
+    let r = b.data[b.first] in
+    b.len <- b.len - 1;
+    let n = Array.length b.data in
+    b.first <- b.first + 1;
+    if b.first = n then b.first <- 0;
+    r
+    { buffer_invariant b /\ length b = (old (length b)) - 1 /\
+      match old (sequence b) with
+      | Nil -> false
+      | Cons x l -> result = x /\ sequence b = l end }
+end
+
+module Harness
+
+  use import module RingBuffer
+  use import list.List
+
+  let harness () =
+    let b = create 10 0 in
+    push b 1;
+    push b 2;
+    push b 3;
+    let x = pop b in assert { x = 1 };
+    let x = pop b in assert { x = 2 };
+    let x = pop b in assert { x = 3 };
+    ()
+
+  let harness2 () =
+    let b = create 3 0 in
+    push b 1;
+    assert { sequence b = Cons 1 Nil };
+    push b 2;
+    assert { sequence b = Cons 1 (Cons 2 Nil) };
+    push b 3;
+    assert { sequence b = Cons 1 (Cons 2 (Cons 3 Nil)) };
+    let x = pop b in assert { x = 1 };
+    assert { sequence b = Cons 2 (Cons 3 Nil) };
+    push b 4;
+    assert { sequence b = Cons 2 (Cons 3 (Cons 4 Nil)) };
+    let x = pop b in assert { x = 2 };
+    assert { sequence b = Cons 3 (Cons 4 Nil) };
+    let x = pop b in assert { x = 3 };
+    assert { sequence b = Cons 4 Nil };
+    let x = pop b in assert { x = 4 };
+    ()
+
+  use import int.Int
+
+  let test (x: int) (y: int) (z: int) =
+    let b = create 2 0 in
+    push b x;
+    push b y;
+    assert { sequence b = Cons x (Cons y Nil) };
+    let h = pop b in assert { h = x };
+    assert { sequence b = Cons y Nil };
+    push b z;
+    assert { sequence b = Cons y (Cons z Nil) };
+    let h = pop b in assert { h = y };
+    let h = pop b in assert { h = z }
+
+end
+
+(*
+Local Variables:
+compile-command: "why3ide vstte12_ring_buffer.mlw"
+End:
+*)

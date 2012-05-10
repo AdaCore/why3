@@ -11,24 +11,34 @@
 <!ATTLIST file verified CDATA #REQUIRED>
 <!ATTLIST file expanded CDATA #IMPLIED>
 
-<!ELEMENT theory (goal*)>
+<!ELEMENT theory (label*,goal*)>
 <!ATTLIST theory name CDATA #REQUIRED>
 <!ATTLIST theory verified CDATA #REQUIRED>
 <!ATTLIST theory expanded CDATA #IMPLIED>
+<!ATTLIST theory locfile CDATA #IMPLIED>
+<!ATTLIST theory loclnum CDATA #IMPLIED>
+<!ATTLIST theory loccnumb CDATA #IMPLIED>
+<!ATTLIST theory loccnume CDATA #IMPLIED>
 
-<!ELEMENT goal (proof*, transf*)>
+<!ELEMENT goal (label*, proof*, transf*)>
 <!ATTLIST goal name CDATA #REQUIRED>
 <!ATTLIST goal expl CDATA #IMPLIED>
 <!ATTLIST goal proved CDATA #REQUIRED>
 <!ATTLIST goal sum CDATA #REQUIRED>
 <!ATTLIST goal shape CDATA #IMPLIED>
 <!ATTLIST goal expanded CDATA #IMPLIED>
+<!ATTLIST goal locfile CDATA #IMPLIED>
+<!ATTLIST goal loclnum CDATA #IMPLIED>
+<!ATTLIST goal loccnumb CDATA #IMPLIED>
+<!ATTLIST goal loccnume CDATA #IMPLIED>
 
 <!ELEMENT proof (result|undone)>
 <!ATTLIST proof prover CDATA #REQUIRED>
-<!ATTLIST proof timelimit CDATA #REQUIRED>
+<!ATTLIST proof timelimit CDATA #IMPLIED>
+<!ATTLIST proof memlimit CDATA #IMPLIED>
 <!ATTLIST proof edited CDATA #IMPLIED>
 <!ATTLIST proof obsolete CDATA #IMPLIED>
+<!ATTLIST proof archived CDATA #IMPLIED>
 
 <!ELEMENT result EMPTY>
 <!ATTLIST result status (valid|invalid|unknown|timeout|failure) #REQUIRED>
@@ -40,3 +50,6 @@
 <!ATTLIST transf name CDATA #REQUIRED>
 <!ATTLIST transf proved CDATA #REQUIRED>
 <!ATTLIST transf expanded CDATA #IMPLIED>
+
+<!ELEMENT label EMPTY>
+<!ATTLIST label name CDATA #REQUIRED>

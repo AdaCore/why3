@@ -1,9 +1,10 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  Copyright (C) 2010-2011                                               *)
+(*  Copyright (C) 2010-2012                                               *)
 (*    François Bobot                                                      *)
 (*    Jean-Christophe Filliâtre                                           *)
 (*    Claude Marché                                                       *)
+(*    Guillaume Melquiond                                                 *)
 (*    Andrei Paskevich                                                    *)
 (*                                                                        *)
 (*  This software is free software; you can redistribute it and/or        *)
@@ -20,20 +21,12 @@
 open Why3
 open Whyconf
 
-(** Todo do something generic perhaps*)
-type conf_replace_prover =
-  | CRP_Ask
-  | CRP_Not_Obsolete
-
 type t =
     { mutable window_width : int;
       mutable window_height : int;
       mutable tree_width : int;
       mutable task_height : int;
-      mutable time_limit : int;
-      mutable mem_limit : int;
       mutable verbose : int;
-      mutable max_running_processes : int;
       mutable default_editor : string;
       mutable intro_premises : bool;
       mutable show_labels : bool;
@@ -46,8 +39,9 @@ type t =
       mutable env : Why3.Env.env;
       mutable config : Whyconf.config;
       original_config : Whyconf.config;
-      mutable altern_provers : prover option Mprover.t;
-      mutable replace_prover : conf_replace_prover;
+      (* mutable altern_provers : prover option Mprover.t; *)
+      (* mutable replace_prover : conf_replace_prover; *)
+      mutable hidden_provers : string list;
     }
 
 val read_config : string option -> string list -> unit
@@ -103,10 +97,21 @@ val image_failure_obs : GdkPixbuf.pixbuf ref
 val show_legend_window : unit -> unit
 val show_about_window : unit -> unit
 val preferences : t -> unit
+
+val uninstalled_prover :
+  t -> 'key Session.env_session -> Whyconf.prover -> Whyconf.prover_upgrade_policy
+
+(*
 val unknown_prover :
   t -> 'key Session.env_session -> Whyconf.prover -> Whyconf.prover option
+*)
+
+(* obsolete dialog
 val replace_prover :
   t -> 'key Session.proof_attempt -> 'key Session.proof_attempt -> bool
+*)
+
+
 (*
 Local Variables:
 compile-command: "unset LANG; make -C ../.. bin/why3ide.byte"

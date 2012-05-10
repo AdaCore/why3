@@ -1,127 +1,70 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "why3session.dtd">
+<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
 <why3session
- name="hello_proof/why3session.xml">
+ name="./hello_proof/why3session.xml">
  <prover
-  id="alt-ergo"
+  id="0"
   name="Alt-Ergo"
   version="0.94"/>
  <prover
-  id="coq"
+  id="1"
   name="Coq"
-  version="8.3pl3"/>
+  version="8.3pl4"/>
  <prover
-  id="cvc3-2.2"
-  name="CVC3"
-  version="2.2"/>
- <prover
-  id="cvc3-2.4"
-  name="CVC3"
-  version="2.4.1"/>
- <prover
-  id="eprover"
-  name="Eprover"
-  version="1.4"/>
- <prover
-  id="gappa"
-  name="Gappa"
-  version="0.15.1"/>
- <prover
-  id="simplify"
+  id="2"
   name="Simplify"
   version="1.5.4"/>
- <prover
-  id="spass"
-  name="Spass"
-  version="3.7"/>
- <prover
-  id="vampire"
-  name="Vampire"
-  version="0.6"/>
- <prover
-  id="verit"
-  name="veriT"
-  version="dev"/>
- <prover
-  id="yices"
-  name="Yices"
-  version="1.0.25"/>
- <prover
-  id="z3-2"
-  name="Z3"
-  version="2.19"/>
- <prover
-  id="z3-3"
-  name="Z3"
-  version="3.2"/>
  <file
   name="../hello_proof.why"
   verified="false"
-  expanded="true">
+  expanded="false">
   <theory
    name="HelloProof"
+   locfile="./hello_proof/../hello_proof.why"
+   loclnum="1" loccnumb="7" loccnume="17"
    verified="false"
    expanded="true">
+   <label
+    name="My very first Why3 theory"/>
    <goal
     name="G1"
-    sum="770f70aa36289c763128092468f7b8be"
+    locfile="./hello_proof/../hello_proof.why"
+    loclnum="3" loccnumb="7" loccnume="9"
+    sum="4daf9675e70ee6481b1153fe95f7c750"
     proved="true"
     expanded="true"
     shape="t">
     <proof
-     prover="z3-2"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="z3-3"
-     timelimit="2"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="alt-ergo"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="cvc3-2.2"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="simplify"
-     timelimit="10"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="cvc3-2.4"
-     timelimit="5"
-     edited=""
-     obsolete="false">
+     prover="2"
+     timelimit="4"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
     name="G2"
-    sum="1ae84523049f00ab18c875871b9d5166"
+    locfile="./hello_proof/../hello_proof.why"
+    loclnum="5" loccnumb="7" loccnume="9"
+    sum="b16d2c9608c416dc0059ba3e95264abe"
     proved="false"
     expanded="true"
     shape="fOtAfIt">
     <proof
-     prover="simplify"
-     timelimit="10"
-     edited=""
-     obsolete="false">
+     prover="0"
+     timelimit="4"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.00"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="4"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="unknown" time="0.00"/>
     </proof>
     <transf
@@ -130,92 +73,60 @@
      expanded="true">
      <goal
       name="G2.1"
-      sum="a15523680b0d9b39d66fb889543da535"
+      locfile="./hello_proof/../hello_proof.why"
+      loclnum="5" loccnumb="7" loccnume="9"
+      sum="b84cad55140412a1b6f988cba7a0ebd1"
       proved="false"
       expanded="true"
       shape="fIt">
       <proof
-       prover="coq"
-       timelimit="3"
+       prover="0"
+       timelimit="4"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="unknown" time="0.00"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="4"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="unknown" time="0.00"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="4"
+       memlimit="0"
        edited="hello_proof_HelloProof_G2_1.v"
-       obsolete="false">
-       <result status="unknown" time="0.50"/>
-      </proof>
-      <proof
-       prover="z3-2"
-       timelimit="5"
-       edited=""
-       obsolete="false">
-       <result status="unknown" time="0.00"/>
-      </proof>
-      <proof
-       prover="z3-3"
-       timelimit="2"
-       edited=""
-       obsolete="false">
-       <result status="unknown" time="0.00"/>
-      </proof>
-      <proof
-       prover="alt-ergo"
-       timelimit="5"
-       edited=""
-       obsolete="false">
-       <result status="unknown" time="0.00"/>
-      </proof>
-      <proof
-       prover="simplify"
-       timelimit="10"
-       edited=""
-       obsolete="false">
-       <result status="unknown" time="0.00"/>
+       obsolete="false"
+       archived="false">
+       <result status="unknown" time="0.42"/>
       </proof>
      </goal>
      <goal
       name="G2.2"
-      sum="e9d36850fc1d1580f8c993cb578ca577"
+      locfile="./hello_proof/../hello_proof.why"
+      loclnum="5" loccnumb="7" loccnume="9"
+      sum="fdf75c799e5829c6e57c69e76f88886a"
       proved="true"
       expanded="true"
       shape="fOt">
       <proof
-       prover="z3-2"
-       timelimit="5"
-       edited=""
-       obsolete="false">
+       prover="0"
+       timelimit="4"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
        <result status="valid" time="0.00"/>
       </proof>
       <proof
-       prover="z3-3"
-       timelimit="2"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-      <proof
-       prover="alt-ergo"
-       timelimit="5"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-      <proof
-       prover="cvc3-2.2"
-       timelimit="5"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-      <proof
-       prover="simplify"
-       timelimit="10"
-       edited=""
-       obsolete="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-      <proof
-       prover="cvc3-2.4"
-       timelimit="5"
-       edited=""
-       obsolete="false">
+       prover="2"
+       timelimit="4"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
        <result status="valid" time="0.00"/>
       </proof>
      </goal>
@@ -223,51 +134,27 @@
    </goal>
    <goal
     name="G3"
-    sum="30f7a9e2b4315fc204f5d5e6bd9b23e3"
+    locfile="./hello_proof/../hello_proof.why"
+    loclnum="9" loccnumb="7" loccnume="9"
+    sum="d89b799516da55943a55251953e1068e"
     proved="true"
     expanded="true"
-    shape="ainfix >=ainfix *V0V0c0F">
+    shape="ainfix &gt;=ainfix *V0V0c0F">
     <proof
-     prover="z3-2"
-     timelimit="5"
-     edited=""
-     obsolete="false">
+     prover="0"
+     timelimit="4"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="z3-3"
-     timelimit="2"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="alt-ergo"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="cvc3-2.2"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="simplify"
-     timelimit="3"
-     edited=""
-     obsolete="false">
+     prover="2"
+     timelimit="4"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="unknown" time="0.00"/>
-    </proof>
-    <proof
-     prover="cvc3-2.4"
-     timelimit="5"
-     edited=""
-     obsolete="false">
-     <result status="valid" time="0.00"/>
     </proof>
    </goal>
   </theory>

@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
+<why3session
+ name="bitvectors/neg_as_xor/why3session.xml">
+ <prover
+  id="0"
+  name="Alt-Ergo"
+  version="0.94"/>
+ <prover
+  id="1"
+  name="Coq"
+  version="8.3pl4"/>
+ <prover
+  id="2"
+  name="Z3"
+  version="2.19"/>
+ <prover
+  id="3"
+  name="Z3"
+  version="3.2"/>
+ <file
+  name="../neg_as_xor.why"
+  verified="true"
+  expanded="false">
+  <theory
+   name="TestNegAsXOR"
+   locfile="bitvectors/neg_as_xor/../neg_as_xor.why"
+   loclnum="2" loccnumb="7" loccnume="19"
+   verified="true"
+   expanded="true">
+   <goal
+    name="Nth_j"
+    locfile="bitvectors/neg_as_xor/../neg_as_xor.why"
+    loclnum="13" loccnumb="8" loccnume="13"
+    sum="7ec4d7915c10debbadd32a08b1bba541"
+    proved="true"
+    expanded="false"
+    shape="ainfix =anthajV0aFalseIainfix &lt;=V0c62Aainfix &lt;=c0V0F">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.08"/>
+    </proof>
+   </goal>
+   <goal
+    name="sign_of_j"
+    locfile="bitvectors/neg_as_xor/../neg_as_xor.why"
+    loclnum="15" loccnumb="8" loccnume="17"
+    sum="fa860d7163dfa79ef6d19648db1e3bf3"
+    proved="true"
+    expanded="false"
+    shape="ainfix =asignajaTrue">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="mantissa_of_j"
+    locfile="bitvectors/neg_as_xor/../neg_as_xor.why"
+    loclnum="16" loccnumb="8" loccnume="21"
+    sum="593bd2ae8ac1580cd936f7465278b56a"
+    proved="true"
+    expanded="false"
+    shape="ainfix =amantissaajc0">
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.63"/>
+    </proof>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.14"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="10"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="2.91"/>
+    </proof>
+   </goal>
+   <goal
+    name="exp_of_j"
+    locfile="bitvectors/neg_as_xor/../neg_as_xor.why"
+    loclnum="17" loccnumb="8" loccnume="16"
+    sum="92d1d38910f3800cff767a0156f01ca4"
+    proved="true"
+    expanded="false"
+    shape="ainfix =aexpajc0">
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.64"/>
+    </proof>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.13"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="11"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="2.95"/>
+    </proof>
+   </goal>
+   <goal
+    name="int_of_bv"
+    locfile="bitvectors/neg_as_xor/../neg_as_xor.why"
+    loclnum="18" loccnumb="8" loccnume="17"
+    sum="5720bbc6be0a2fd678d97babf499bd80"
+    proved="true"
+    expanded="false"
+    shape="ainfix =adouble_of_bv64ajc0.0">
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.11"/>
+    </proof>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.04"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.10"/>
+    </proof>
+   </goal>
+   <goal
+    name="MainResultBits"
+    locfile="bitvectors/neg_as_xor/../neg_as_xor.why"
+    loclnum="20" loccnumb="8" loccnume="22"
+    sum="63b7e5215c95e3ef6b230f9d389e494a"
+    proved="true"
+    expanded="false"
+    shape="ainfix =anthabw_xorV0ajV1anthV0V1Iainfix &lt;V1c63Aainfix &lt;=c0V1FF">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.07"/>
+    </proof>
+   </goal>
+   <goal
+    name="MainResultSign"
+    locfile="bitvectors/neg_as_xor/../neg_as_xor.why"
+    loclnum="23" loccnumb="8" loccnume="22"
+    sum="30826f815867c84380c4207b9e3ab0b6"
+    proved="true"
+    expanded="false"
+    shape="ainfix =anthabw_xorV0ajc63anotbanthV0c63F">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="Sign_of_xor_j"
+    locfile="bitvectors/neg_as_xor/../neg_as_xor.why"
+    loclnum="25" loccnumb="8" loccnume="21"
+    sum="c3ffa2aae59ab871686c14e211d573d2"
+    proved="true"
+    expanded="false"
+    shape="ainfix =asignabw_xorV0ajanotbasignV0F">
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
+    name="Exp_of_xor_j"
+    locfile="bitvectors/neg_as_xor/../neg_as_xor.why"
+    loclnum="27" loccnumb="8" loccnume="20"
+    sum="bdd1a3dd5cf05477f7cc8de0d890c8c1"
+    proved="true"
+    expanded="false"
+    shape="ainfix =aexpabw_xorV0ajaexpV0F">
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.64"/>
+    </proof>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.86"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="10"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="2.78"/>
+    </proof>
+   </goal>
+   <goal
+    name="Mantissa_of_xor_j"
+    locfile="bitvectors/neg_as_xor/../neg_as_xor.why"
+    loclnum="29" loccnumb="8" loccnume="25"
+    sum="b997d22b0c326c06f927e5cdc38d194e"
+    proved="true"
+    expanded="false"
+    shape="ainfix =amantissaabw_xorV0ajamantissaV0F">
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.65"/>
+    </proof>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.53"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="10"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="3.07"/>
+    </proof>
+   </goal>
+   <goal
+    name="MainResultZero"
+    locfile="bitvectors/neg_as_xor/../neg_as_xor.why"
+    loclnum="31" loccnumb="8" loccnume="22"
+    sum="563c0cf0e2af6a9fc62ef235940036ba"
+    proved="true"
+    expanded="false"
+    shape="ainfix =adouble_of_bv64abw_xorV0ajaprefix -.adouble_of_bv64V0Iainfix =amantissaV0c0Aainfix =c0aexpV0F">
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.65"/>
+    </proof>
+    <proof
+     prover="0"
+     timelimit="6"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="1.66"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="10"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="2.73"/>
+    </proof>
+   </goal>
+   <goal
+    name="sign_neg"
+    locfile="bitvectors/neg_as_xor/../neg_as_xor.why"
+    loclnum="34" loccnumb="8" loccnume="16"
+    sum="abdf4c8e2fa5fd4e490a8315fd4c9548"
+    proved="true"
+    expanded="false"
+    shape="ainfix =asign_valueanotbasignV0aprefix -.asign_valueasignV0F">
+    <proof
+     prover="0"
+     timelimit="9"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="2.66"/>
+    </proof>
+   </goal>
+   <goal
+    name="MainResult"
+    locfile="bitvectors/neg_as_xor/../neg_as_xor.why"
+    loclnum="36" loccnumb="8" loccnume="18"
+    sum="7885f90ac0dd14f66c73365f153f63a2"
+    proved="true"
+    expanded="true"
+    shape="ainfix =adouble_of_bv64abw_xorV0ajaprefix -.adouble_of_bv64V0Iainfix &lt;aexpV0c2047Aainfix &lt;c0aexpV0F">
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     edited="neg_as_xor_TestNegAsXOR_MainResult_1.v"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.89"/>
+    </proof>
+   </goal>
+  </theory>
+ </file>
+</why3session>

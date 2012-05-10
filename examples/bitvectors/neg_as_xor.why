@@ -1,0 +1,45 @@
+
+theory TestNegAsXOR
+
+  use import int.Int
+  use import bool.Bool
+  use import real.RealInfix
+
+  use import bitvector.BV64
+  use import double.BV_double
+
+  function j : bv = from_int 0x8000000000000000
+
+  lemma Nth_j: forall i:int. 0 <= i <= 62 -> nth j i = False
+
+  lemma sign_of_j: sign(j) = True
+  lemma mantissa_of_j: mantissa(j) = 0
+  lemma exp_of_j: exp(j) = 0
+  lemma int_of_bv: double_of_bv64(j) = 0.0
+
+  lemma MainResultBits : forall x:bv. forall i:int. 0 <= i < 63 ->
+     nth (bw_xor x j) i = nth x i
+
+  lemma MainResultSign : forall x:bv. nth (bw_xor x j) 63 = notb (nth x 63)
+
+  lemma Sign_of_xor_j : forall x:bv. sign(bw_xor x j) = notb (sign x)
+
+  lemma Exp_of_xor_j : forall x:bv. exp(bw_xor x j) = exp(x)
+
+  lemma Mantissa_of_xor_j : forall x:bv. mantissa(bw_xor x j) = mantissa(x)
+
+  lemma MainResultZero : forall x:bv. 0 = exp(x) /\ mantissa(x) = 0 ->
+     double_of_bv64 (bw_xor x j) = -. double_of_bv64 x
+
+  lemma sign_neg:
+     forall x:bv. sign_value(notb(sign(x))) = -.sign_value(sign(x))
+  lemma MainResult : forall x:bv. 0 < exp(x) < 2047 ->
+     double_of_bv64 (bw_xor x j) = -. double_of_bv64 x
+
+end
+
+(*
+Local Variables:
+compile-command: "why3ide -L . neg_as_xor.why"
+End:
+*)

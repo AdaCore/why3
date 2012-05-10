@@ -1,9 +1,10 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  Copyright (C) 2010-2011                                               *)
+(*  Copyright (C) 2010-2012                                               *)
 (*    François Bobot                                                      *)
 (*    Jean-Christophe Filliâtre                                           *)
 (*    Claude Marché                                                       *)
+(*    Guillaume Melquiond                                                 *)
 (*    Andrei Paskevich                                                    *)
 (*                                                                        *)
 (*  This software is free software; you can redistribute it and/or        *)
@@ -42,10 +43,15 @@ module type OBSERVER = sig
 
   val notify : key any -> unit
 
+(*
   val unknown_prover :
     key env_session -> Whyconf.prover -> Whyconf.prover option
 
   val replace_prover : key proof_attempt -> key proof_attempt -> bool
+*)
+
+  val uninstalled_prover :
+    key env_session -> Whyconf.prover -> Whyconf.prover_upgrade_policy
 
 end
 
@@ -272,7 +278,7 @@ let cancel_scheduled_proofs t =
         callback (Undone Interrupted)
       done
     with
-      | Queue.Empty -> 
+      | Queue.Empty ->
           O.notify_timer_state 0 0 (List.length t.running_proofs)
 
 
@@ -323,6 +329,7 @@ let add_file env_session f =
 (*****************************************************)
 (* method: run a given prover on each unproved goals *)
 (*****************************************************)
+(*
 let rec find_loadable_prover eS prover =
   (** try the default one *)
   match load_prover eS prover with
@@ -333,29 +340,101 @@ let rec find_loadable_prover eS prover =
         | Some prover -> find_loadable_prover eS prover
     end
     | Some npc -> Some (prover,npc)
+*)
+
+let find_prover eS a =
+  match load_prover eS a.proof_prover with
+    | Some p -> Some (a.proof_prover, p,a)
+    | None ->
+        match O.uninstalled_prover eS a.proof_prover with
+          | Whyconf.CPU_keep -> None
+          | Whyconf.CPU_upgrade new_p ->
+            (* does a proof using new_p already exists ? *)
+            let g = a.proof_parent in
+            begin
+              try
+                let _ = PHprover.find g.goal_external_proofs new_p in
+                (* yes, then we do nothing *)
+                None
+              with Not_found ->
+                (* we modify the prover in-place *)
+                Session.change_prover a new_p;
+                match load_prover eS new_p with
+                  | Some p -> Some (new_p,p,a)
+                  | None -> 
+                    (* should never happen because at loading, config
+                       ignores uninstalled prover targets.
+                       Nevertheless, we can safely return None.
+                    *)
+                    None
+            end
+          | Whyconf.CPU_duplicate new_p -> 
+            (* does a proof using new_p already exists ? *)
+            let g = a.proof_parent in
+            begin
+              try
+                let _ = PHprover.find g.goal_external_proofs new_p in
+                (* yes, then we do nothing *)
+                None
+              with Not_found ->
+                (* we duplicate the proof_attempt *)
+                let new_a = copy_external_proof
+                  ~notify ~keygen:O.create ~prover:new_p ~env_session:eS a 
+                in
+                O.init new_a.proof_key (Proof_attempt new_a);
+                match load_prover eS new_p with
+                  | Some p -> Some (new_p,p,new_a)
+                  | None -> 
+                    (* should never happen because at loading, config
+                       ignores uninstalled prover targets.
+                       Nevertheless, we can safely return None.
+                    *)
+                    None
+            end
+
+
+let adapt_timelimit a =
+  match a.proof_state with
+    | Done { Call_provers.pr_answer = 
+        (Call_provers.Valid | Call_provers.Unknown _ | Call_provers.Invalid);
+             Call_provers.pr_time = t } ->
+      let time = max a.proof_timelimit (1 + truncate (2.0 *. t)) in
+      set_timelimit time a;
+      time
+    | _ -> a.proof_timelimit
 
 
 let run_external_proof eS eT ?callback a =
-  (** Perhaps this test, a.proof_archived, should be done somewhere else *)
+  (* check that the state is not Scheduled or Running *)
+  (* Perhaps this test, a.proof_archived, should be done somewhere else *)
   if a.proof_archived || running a then ()
   else
-    (* check that the state is not Scheduled or Running *)
-    (* info_window `ERROR "Proof already in progress" *)
+    match find_prover eS a with
+      | None ->
+        (* nothing to do *)
+        Util.apply_option2 () callback a a.proof_state
+      | Some(_,npc,a) ->
+(* 
     let ap = a.proof_prover in
     match find_loadable_prover eS a.proof_prover with
-      | None -> Debug.dprintf debug
-        "[Info] Can't redo an external proof since the prover %a is not \
-loaded@."
-        Whyconf.print_prover a.proof_prover
+      | None ->
+        Debug.dprintf debug
+          "[Info] Can't redo an external proof since the prover %a is not loaded@."
+          Whyconf.print_prover a.proof_prover;
+        Util.apply_option2 () callback a a.proof_state
       | Some (nap,npc) ->
+        (* eprintf "prover %a on goal %s@." *)
+        (*   Whyconf.print_prover a.proof_prover a.proof_parent.goal_name.Ident.id_string; *)
         let g = a.proof_parent in
         try
           if nap == ap then raise Not_found;
           let np_a = PHprover.find g.goal_external_proofs nap in
-          if O.replace_prover np_a a then begin
+          if O.replace_prover np_a a then
+            begin
             (** The notification will be done by the new proof_attempt *)
-            O.remove np_a.proof_key;
-            raise Not_found end
+              O.remove np_a.proof_key;
+              raise Not_found
+            end
         with Not_found ->
           (** replace [a] by a new_proof attempt if [a.proof_prover] was not
               loadable *)
@@ -364,13 +443,22 @@ loaded@."
             let a = copy_external_proof
               ~notify ~keygen:O.create ~prover:nap ~env_session:eS a in
             O.init a.proof_key (Proof_attempt a);
-            a in
+            a
+        in
+*)
+        let g = a.proof_parent in
         if a.proof_edited_as = None &&
           npc.prover_config.Whyconf.interactive then
-          set_proof_state ~notify ~obsolete:false ~archived:false
-            (Undone Unedited) a
-        else begin
+          begin
+            set_proof_state ~notify ~obsolete:false ~archived:false
+              (Undone Unedited) a;
+            Util.apply_option2 () callback a a.proof_state
+          end
+        else
+          begin
           let previous_result,previous_obs = a.proof_state,a.proof_obsolete in
+          let timelimit = adapt_timelimit a in
+          let memlimit = a.proof_memlimit in
           let callback result =
             begin match result with
               | Undone Interrupted ->
@@ -397,8 +485,9 @@ loaded@."
           let command =
             String.concat " " (npc.prover_config.Whyconf.command ::
                                  npc.prover_config.Whyconf.extra_options) in
+          (* eprintf "scheduling it...@."; *)
           schedule_proof_attempt
-            ~timelimit:a.proof_timelimit ~memlimit:0
+            ~timelimit ~memlimit
             ?old ~command
             ~driver:npc.prover_driver
             ~callback
@@ -406,51 +495,52 @@ loaded@."
             (goal_task g)
         end
 
-let rec prover_on_goal eS eT ?callback ~timelimit p g =
+let prover_on_goal eS eT ?callback ~timelimit ~memlimit p g =
   let a =
     try
       let a = PHprover.find g.goal_external_proofs p in
       set_timelimit timelimit a;
+      set_memlimit memlimit a;
       a
     with Not_found ->
       let ep = add_external_proof ~keygen:O.create ~obsolete:false
-        ~archived:false ~timelimit
+        ~archived:false ~timelimit ~memlimit 
         ~edit:None g p (Undone Interrupted) in
       O.init ep.proof_key (Proof_attempt ep);
       ep
   in
   run_external_proof eS eT ?callback a
 
-let rec prover_on_goal_or_children eS eT
-    ~context_unproved_goals_only ~timelimit p g =
+let prover_on_goal_or_children eS eT
+    ~context_unproved_goals_only ~timelimit ~memlimit p g =
   goal_iter_leaf_goal ~unproved_only:context_unproved_goals_only
-    (prover_on_goal eS eT ~timelimit p) g
+    (prover_on_goal eS eT ~timelimit ~memlimit p) g
 
-let run_prover eS eT ~context_unproved_goals_only ~timelimit pr a =
+let run_prover eS eT ~context_unproved_goals_only ~timelimit ~memlimit pr a =
   match a with
     | Goal g ->
         prover_on_goal_or_children eS eT
-          ~context_unproved_goals_only ~timelimit pr g
+          ~context_unproved_goals_only ~timelimit ~memlimit pr g
     | Theory th ->
         List.iter
           (prover_on_goal_or_children eS eT
-             ~context_unproved_goals_only ~timelimit pr)
+             ~context_unproved_goals_only ~timelimit ~memlimit pr)
           th.theory_goals
     | File file ->
         List.iter
           (fun th ->
              List.iter
                (prover_on_goal_or_children eS eT
-                  ~context_unproved_goals_only ~timelimit pr)
+                  ~context_unproved_goals_only ~timelimit ~memlimit pr)
                th.theory_goals)
           file.file_theories
     | Proof_attempt a ->
         prover_on_goal_or_children eS eT
-          ~context_unproved_goals_only ~timelimit pr a.proof_parent
+          ~context_unproved_goals_only ~timelimit ~memlimit pr a.proof_parent
     | Transf tr ->
         List.iter
           (prover_on_goal_or_children eS eT
-             ~context_unproved_goals_only ~timelimit pr)
+             ~context_unproved_goals_only ~timelimit ~memlimit pr)
           tr.transf_goals
 
 (**********************************)
@@ -459,7 +549,7 @@ let run_prover eS eT ~context_unproved_goals_only ~timelimit pr a =
 
 let proof_successful_or_just_edited a =
   match a.proof_state with
-    | Done { Call_provers.pr_answer = Call_provers.Valid } 
+    | Done { Call_provers.pr_answer = Call_provers.Valid }
     | Undone JustEdited -> true
     | _ -> false
 
@@ -528,6 +618,7 @@ type report =
   | Result of Call_provers.prover_result * Call_provers.prover_result
   | CallFailed of exn
   | Prover_not_installed
+  | Edited_file_absent of string
   | No_former_result of Call_provers.prover_result
 
 module Todo = struct
@@ -556,8 +647,10 @@ module Todo = struct
     dprintf debug "[Sched] todo : %i@." todo.todo
 end
 
-let push_report report (g,p,r) =
-  report := (g.goal_name,p,r)::!report
+let push_report report (g,p,t,r) =
+  report := (g.goal_name,p,t,r)::!report
+
+exception NoFile of string
 
 (** When no smoke *)
 let check_external_proof eS eT todo a =
@@ -569,67 +662,61 @@ let check_external_proof eS eT todo a =
   else
     begin
       Todo.todo todo;
-      let ap = a.proof_prover in
-      match find_loadable_prover eS ap with
+      match find_prover eS a with
         | None ->
-          dprintf debug "[sched] prover not found : %a@."
-            Whyconf.print_prover ap;
-            Todo._done todo (g,ap,Prover_not_installed)
-            (* set_proof_state ~notify ~obsolete:false a Undone *)
-        | Some (nap,npc) ->
-          let g = a.proof_parent in
+          (* nothing to do 
+             TODO: report an non replayable proof if some option is set
+          *)
+          Todo._done todo (g,a.proof_prover,0,Prover_not_installed);
+        | Some(ap,npc,a) ->
           try
-            if nap == ap then raise Not_found;
-            let np_a = PHprover.find g.goal_external_proofs nap in
-            if O.replace_prover np_a a then begin
-              (** The notification will be done by the new proof_attempt *)
-              O.remove np_a.proof_key;
-              raise Not_found end
-          with Not_found ->
-          (** replace [a] by a new_proof attempt if [a.proof_prover] was not
-              loadable *)
-          let a = if nap == ap then a
-            else
-              let a = copy_external_proof
-                 ~notify ~keygen:O.create ~prover:nap ~env_session:eS a in
-              O.init a.proof_key (Proof_attempt a);
-              a in
-          let callback result =
+            let old =
+              match a.proof_edited_as with
+                | None -> None
+                | Some edited_as ->
+                  let f = Filename.concat eS.session.session_dir edited_as in
+                  if Sys.file_exists f then
+                    begin
+                    (* Format.eprintf "Info: proving using edited file %s@." f; *)
+                      (Some (open_in f))
+                    end
+                  else
+                    raise (NoFile f)
+            in
+            let timelimit = adapt_timelimit a in
+            let memlimit = a.proof_memlimit in
+            let callback result =
               match result with
                 | Undone Scheduled | Undone Running | Undone Interrupted -> ()
                 | Undone (Unedited | JustEdited) -> assert false
                 | InternalFailure msg ->
-                  Todo._done todo (g,ap,(CallFailed msg));
+                  Todo._done todo (g,ap,timelimit,(CallFailed msg));
                   set_proof_state ~notify ~obsolete:false ~archived:false
                     result a
                 | Done new_res ->
                   begin
                     match a.proof_state with
                       | Done old_res ->
-                          Todo._done todo (g,ap,(Result(new_res,old_res)))
+                          Todo._done todo
+                            (g,ap,timelimit,(Result(new_res,old_res)))
                       | _ ->
-                        Todo._done todo (g,ap,No_former_result new_res)
+                        Todo._done todo
+                          (g,ap,timelimit,No_former_result new_res)
                   end;
                   set_proof_state ~notify ~obsolete:false ~archived:false
                     result a
-          in
-          let old =
-            match a.proof_edited_as with
-              | None -> None
-              | Some edited_as ->
-                let f = Filename.concat eS.session.session_dir edited_as in
-              (* Format.eprintf "Info: proving using edited file %s@." f; *)
-                (Some (open_in f))
-          in
-          let command =
-            String.concat " " (npc.prover_config.Whyconf.command ::
-                                 npc.prover_config.Whyconf.extra_options) in
-          schedule_proof_attempt eT
-            ~timelimit:a.proof_timelimit ~memlimit:0
-            ?old ~command
-            ~driver:npc.prover_driver
-            ~callback
-            (goal_task g)
+            in
+            let command =
+              String.concat " " (npc.prover_config.Whyconf.command ::
+                                   npc.prover_config.Whyconf.extra_options) in
+            schedule_proof_attempt eT
+              ~timelimit ~memlimit
+              ?old ~command
+              ~driver:npc.prover_driver
+              ~callback
+              (goal_task g)
+          with NoFile f ->
+            Todo._done todo (g,a.proof_prover,0,Edited_file_absent f);
     end
 
 let check_goal_and_children eS eT todo g =
@@ -642,20 +729,60 @@ let check_all eS eT ~callback =
     eS.session;
   let timeout () =
     match Todo._end todo with
-      | None ->
-        (*
-          Printf.eprintf "Progress: %d/%d\r%!" !proofs_done !proofs_to_do;
-        *)
-        true
-      | Some reports ->
-        (*
-          Printf.eprintf "\n%!";
-        *)
-        callback !reports;false
-        (* decr maximum_running_proofs; *)
+      | None -> true
+      | Some reports -> callback !reports;false
   in
-  (* incr maximum_running_proofs; *)
   schedule_any_timeout eT timeout
+
+
+(***********************************)
+(* play all                        *)
+(***********************************)
+
+let rec play_on_goal_and_children eS eT ~timelimit ~memlimit todo l g =
+  let callback _key status =
+    match status with
+      | Undone Running | Undone Scheduled -> ()
+      |  _ ->
+        Todo._done todo ();
+        (* eprintf "todo decreased to %d@." todo.Todo.todo *)
+  in
+  List.iter
+    (fun p ->
+      Todo.todo todo;
+      (* eprintf "todo increased to %d@." todo.Todo.todo; *)
+      (* eprintf "prover %a on goal %s@." *)
+      (*   Whyconf.print_prover p g.goal_name.Ident.id_string; *)
+      prover_on_goal eS eT ~callback ~timelimit ~memlimit p g)
+    l;
+  PHstr.iter
+    (fun _ t ->
+       List.iter
+         (play_on_goal_and_children eS eT ~timelimit ~memlimit todo l)
+         t.transf_goals)
+    g.goal_transformations
+
+
+let play_all eS eT ~callback ~timelimit ~memlimit l =
+  let todo = Todo.create (ref ()) (fun _ _ -> ())  in
+  PHstr.iter
+    (fun _ file ->
+      List.iter
+        (fun th ->
+          List.iter
+            (play_on_goal_and_children eS eT ~timelimit ~memlimit todo l)
+            th.theory_goals)
+        file.file_theories)
+    eS.session.session_files;
+  let timeout () =
+    (* eprintf "Timeout handler@."; *)
+    match Todo._end todo with
+      | None ->  true
+      | Some _ -> callback (); false
+  in
+  schedule_any_timeout eT timeout
+
+
 
 (** Transformation *)
 
@@ -726,6 +853,14 @@ let edit_proof eS sched ~default_editor a =
     info_window `ERROR "Edition already in progress"
 *)
   else
+      match find_prover eS a with
+        | None ->
+          (* nothing to do 
+             TODO: report an non replayable proof if some option is set
+          *)
+          ()
+        | Some(_,npc,a) ->
+(*
     let ap = a.proof_prover in
     match find_loadable_prover eS a.proof_prover with
       | None -> ()
@@ -749,33 +884,27 @@ let edit_proof eS sched ~default_editor a =
               O.init a.proof_key (Proof_attempt a);
               a in
           (** Now [a] is a proof_attempt of the lodable prover [nap] *)
-          let old_res = a.proof_state in
+*)
+
           let callback res =
             match res with
-              | Done _ ->
-                begin
-                  match old_res with
-                    | Undone Unedited ->
-                      set_proof_state ~notify ~obsolete:true ~archived:false
-                        (Undone JustEdited) a
-                    | _ ->
-                      set_proof_state ~notify ~obsolete:true ~archived:false
-                        old_res a
-                end
+              | Done {Call_provers.pr_answer = Call_provers.Unknown ""} ->
+                set_proof_state ~notify ~obsolete:true ~archived:false
+                  (Undone JustEdited) a
               | _ ->
                   set_proof_state ~notify ~obsolete:false ~archived:false
                     res a
           in
           let editor =
             match npc.prover_config.Whyconf.editor with
-              | "" -> default_editor
-              | s ->
-                String.concat " "(s :: npc.prover_config.Whyconf.extra_options)
+            | "" -> default_editor
+            | s ->
+              try
+                let ed = Whyconf.editor_by_id eS.whyconf s in
+                String.concat " "(ed.Whyconf.editor_command ::
+                  ed.Whyconf.editor_options)
+              with Not_found -> default_editor
           in
-          (*
-            eprintf "[Editing] goal %s with command %s %s@."
-            g.Decl.pr_name.id_string editor file;
-          *)
           let file = update_edit_external_proof eS a in
           dprintf debug "[Editing] goal %a with command %s %s@."
             (fun fmt a -> pp_print_string fmt

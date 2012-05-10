@@ -183,7 +183,7 @@ Fixpoint subst(f:fmla) (x:Z) (v:Z) {struct f}: fmla :=
   | (Fand f1 f2) => (Fand (subst f1 x v) (subst f2 x v))
   | (Fnot f1) => (Fnot (subst f1 x v))
   | (Fimplies f1 f2) => (Fimplies (subst f1 x v) (subst f2 x v))
-  | (Flet y t f1) => (Flet y t (subst f1 x v))
+  | (Flet y t f1) => (Flet y (subst_term t x v) (subst f1 x v))
   | (Fforall y ty f1) => (Fforall y ty (subst f1 x v))
   end.
 Unset Implicit Arguments.
@@ -275,38 +275,6 @@ Definition valid_triple(p:fmla) (i:stmt) (q:fmla): Prop := forall (sigma:(map
   Z value)) (pi:(map Z value)), (eval_fmla sigma pi p) ->
   forall (sigmaqt:(map Z value)) (piqt:(map Z value)) (n:Z),
   (many_steps sigma pi i sigmaqt piqt Sskip n) -> (eval_fmla sigmaqt piqt q).
-
-Axiom skip_rule : forall (q:fmla), (valid_triple q Sskip q).
-
-Axiom assign_rule : forall (q:fmla) (x:Z) (id:Z) (e:term), (fresh_in_fmla id
-  q) -> (valid_triple (Flet id e (subst q x id)) (Sassign x e) q).
-
-Axiom seq_rule : forall (p:fmla) (q:fmla) (r:fmla) (i1:stmt) (i2:stmt),
-  ((valid_triple p i1 r) /\ (valid_triple r i2 q)) -> (valid_triple p
-  (Sseq i1 i2) q).
-
-Axiom if_rule : forall (e:term) (p:fmla) (q:fmla) (i1:stmt) (i2:stmt),
-  ((valid_triple (Fand p (Fterm e)) i1 q) /\ (valid_triple (Fand p
-  (Fnot (Fterm e))) i2 q)) -> (valid_triple p (Sif e i1 i2) q).
-
-Axiom assert_rule : forall (f:fmla) (p:fmla), (valid_fmla (Fimplies p f)) ->
-  (valid_triple p (Sassert f) p).
-
-Axiom assert_rule_ext : forall (f:fmla) (p:fmla), (valid_triple (Fimplies f
-  p) (Sassert f) p).
-
-Axiom while_rule : forall (e:term) (inv:fmla) (i:stmt),
-  (valid_triple (Fand (Fterm e) inv) i inv) -> (valid_triple inv (Swhile e
-  inv i) (Fand (Fnot (Fterm e)) inv)).
-
-Axiom while_rule_ext : forall (e:term) (inv:fmla) (invqt:fmla) (i:stmt),
-  (valid_fmla (Fimplies invqt inv)) -> ((valid_triple (Fand (Fterm e) invqt)
-  i invqt) -> (valid_triple invqt (Swhile e inv i) (Fand (Fnot (Fterm e))
-  invqt))).
-
-Axiom consequence_rule : forall (p:fmla) (pqt:fmla) (q:fmla) (qqt:fmla)
-  (i:stmt), (valid_fmla (Fimplies pqt p)) -> ((valid_triple p i q) ->
-  ((valid_fmla (Fimplies q qqt)) -> (valid_triple pqt i qqt))).
 
 Parameter set1 : forall (a:Type), Type.
 
@@ -414,6 +382,38 @@ Fixpoint stmt_writes(i:stmt) (w:(set1 Z)) {struct i}: Prop :=
   end.
 Unset Implicit Arguments.
 
+Axiom consequence_rule : forall (p:fmla) (pqt:fmla) (q:fmla) (qqt:fmla)
+  (i:stmt), (valid_fmla (Fimplies pqt p)) -> ((valid_triple p i q) ->
+  ((valid_fmla (Fimplies q qqt)) -> (valid_triple pqt i qqt))).
+
+Axiom skip_rule : forall (q:fmla), (valid_triple q Sskip q).
+
+Axiom assign_rule : forall (q:fmla) (x:Z) (id:Z) (e:term), (fresh_in_fmla id
+  q) -> (valid_triple (Flet id e (subst q x id)) (Sassign x e) q).
+
+Axiom seq_rule : forall (p:fmla) (q:fmla) (r:fmla) (i1:stmt) (i2:stmt),
+  ((valid_triple p i1 r) /\ (valid_triple r i2 q)) -> (valid_triple p
+  (Sseq i1 i2) q).
+
+Axiom if_rule : forall (e:term) (p:fmla) (q:fmla) (i1:stmt) (i2:stmt),
+  ((valid_triple (Fand p (Fterm e)) i1 q) /\ (valid_triple (Fand p
+  (Fnot (Fterm e))) i2 q)) -> (valid_triple p (Sif e i1 i2) q).
+
+Axiom assert_rule : forall (f:fmla) (p:fmla), (valid_fmla (Fimplies p f)) ->
+  (valid_triple p (Sassert f) p).
+
+Axiom assert_rule_ext : forall (f:fmla) (p:fmla), (valid_triple (Fimplies f
+  p) (Sassert f) p).
+
+Axiom while_rule : forall (e:term) (inv:fmla) (i:stmt),
+  (valid_triple (Fand (Fterm e) inv) i inv) -> (valid_triple inv (Swhile e
+  inv i) (Fand (Fnot (Fterm e)) inv)).
+
+Axiom while_rule_ext : forall (e:term) (inv:fmla) (invqt:fmla) (i:stmt),
+  (valid_fmla (Fimplies invqt inv)) -> ((valid_triple (Fand (Fterm e) invqt)
+  i invqt) -> (valid_triple invqt (Swhile e inv i) (Fand (Fnot (Fterm e))
+  invqt))).
+
 (* Why3 goal *)
 Theorem WP_parameter_wp : forall (i:stmt), forall (q:fmla),
   match i with
@@ -424,15 +424,53 @@ Theorem WP_parameter_wp : forall (i:stmt), forall (q:fmla),
   | (Sassert f) => True
   | (Swhile e inv i1) => forall (result:fmla), (valid_triple result i1
       inv) -> forall (result1:fmla), (forall (sigma:(map Z value)) (pi:(map Z
-      value)) (sigmaqt:(map Z value)) (piqt:(map Z value)) (w:(set1 Z)),
-      ((eval_fmla sigma pi (Fand (Fimplies (Fand (Fterm e) inv) result)
-      (Fimplies (Fand (Fnot (Fterm e)) inv) q))) /\ ((stmt_writes i1 w) /\
-      (assigns sigma w sigmaqt))) -> (eval_fmla sigmaqt piqt
+      value)), (eval_fmla sigma pi result1) -> ((eval_fmla sigma pi
       (Fand (Fimplies (Fand (Fterm e) inv) result)
-      (Fimplies (Fand (Fnot (Fterm e)) inv) q)))) -> (valid_triple (Fand inv
-      result1) i q)
+      (Fimplies (Fand (Fnot (Fterm e)) inv) q))) /\ forall (sigmaqt:(map Z
+      value)) (piqt:(map Z value)) (n:Z), (many_steps sigma pi i1 sigmaqt
+      piqt Sskip n) -> (eval_fmla sigmaqt piqt result1))) ->
+      (valid_triple (Fand inv result1) i q)
   end.
-
+destruct i; trivial.
+rename t into cond.
+rename f into inv.
+rename i into body.
+intros Post WP_body H_WP_body.
+intros abstracted_fmla H_abstracted.
+red.
+intros s1 p1 H1 s2 p2 n Hsteps.
+assert (H_n_pos := steps_non_neg _ _ _ _ _ _ _ Hsteps).
+generalize s1 p1 H1 Hsteps; clear s1 p1 H1 Hsteps.
+apply Z_lt_induction with (P := 
+  fun n => forall s1 p1 : map Z value,
+    eval_fmla s1 p1 (Fand inv abstracted_fmla) ->
+    many_steps s1 p1 (Swhile cond inv body) s2 p2 Sskip n ->
+    eval_fmla s2 p2 Post); auto.
+intros.
+elim H0; clear H0; intros H_inv_in_s2 H_abstr_in_s2.
+inversion H1; subst; clear H1.
+inversion H0; subst; clear H0.
+(* case cond = true *)
+destruct (many_steps_seq _ _ _ _ _ _ _ H2) as 
+  (s3 & p3 & n1 & n2 & First_iter & Next_iter & Hn1n2).
+clear H2.
+apply H with (3:=Next_iter).
+  assert (Hn1_pos := steps_non_neg _ _ _ _ _ _ _ First_iter).
+  assert (Hn2_pos := steps_non_neg _ _ _ _ _ _ _ Next_iter).
+  omega.
+destruct (H_abstracted sigma2 pi2 H_abstr_in_s2) as ((Htrue,_) & Hnext).
+clear H_abstracted.
+assert (H_abstr_in_s3 := Hnext s3 p3 n1 First_iter); clear Hnext.
+split; auto.
+red in H_WP_body.
+apply H_WP_body with (2:=First_iter).
+apply Htrue; auto.
+(* case cond = false *)
+inversion H2; [subst; clear H2 | inversion H0].
+destruct (H_abstracted s2 p2 H_abstr_in_s2) as ((_,Hfalse) & Hnext).
+clear H_abstracted.
+apply Hfalse; split; auto.
+rewrite H11; discriminate.
 Qed.
 
 

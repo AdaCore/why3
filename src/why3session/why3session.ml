@@ -1,9 +1,10 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  Copyright (C) 2010-2011                                               *)
+(*  Copyright (C) 2010-2012                                               *)
 (*    François Bobot                                                      *)
 (*    Jean-Christophe Filliâtre                                           *)
 (*    Claude Marché                                                       *)
+(*    Guillaume Melquiond                                                 *)
 (*    Andrei Paskevich                                                    *)
 (*                                                                        *)
 (*  This software is free software; you can redistribute it and/or        *)
@@ -23,13 +24,13 @@ open Why3session_lib
 
 let cmds =
   [|
+    Why3session_info.cmd;
+    Why3session_latex.cmd;
+    Why3session_html.cmd;
     Why3session_copy.cmd_mod;
     Why3session_copy.cmd_copy;
     Why3session_copy.cmd_archive;
-    Why3session_info.cmd;
     Why3session_rm.cmd;
-    Why3session_latex.cmd;
-    Why3session_html.cmd;
   |]
 
 let exec_name = Sys.argv.(0)
@@ -37,22 +38,24 @@ let exec_name = Sys.argv.(0)
 let print_usage () =
   let maxl = Array.fold_left
     (fun acc e -> max acc (String.length e.cmd_name)) 0 cmds in
-  eprintf "%s <command> [options]@.@.available commands:@.@[<hov>%a@]@\n@."
+  eprintf "%s <command> [options] <session directories>@\n@\navailable commands:@.@[<hov>%a@]@\n@."
     exec_name 
     (Pp.print_iter1 Array.iter Pp.newline
        (fun fmt e -> fprintf fmt "%s   @[<hov>%s@]"
          (Util.padd_string ' ' e.cmd_name maxl) e.cmd_desc)) cmds;
-  eprintf "detailed command options: %s <command> -help@." exec_name;
+  Arg.usage (Arg.align Why3session_lib.common_options) "common options:";
+  eprintf "@\nspecific command options: %s <command> -help@." exec_name;
   exit 1
-
-
 
 let () =
   if Array.length Sys.argv < 2 then print_usage ();
   let cmd_name = Sys.argv.(1) in
-  match cmd_name with "-h" | "--help" -> print_usage ()
-    | "-v" | "--version" -> print_version ()
-    | _ -> ();
+  begin
+    match cmd_name with 
+      | "-h" | "--help" -> print_usage ()
+      | "-v" | "--version" -> print_version (); exit 0
+      | _ -> ()
+  end;
   let module M = struct exception Found of cmd end in
   let cmd =
     try
@@ -66,4 +69,8 @@ let () =
   incr Arg.current;
   let cmd_usage = sprintf "%s %s [options]:" Sys.argv.(0) cmd_name in
   Arg.parse (Arg.align cmd.cmd_spec) anon_fun cmd_usage;
-  cmd.cmd_run ()
+  try
+    cmd.cmd_run ()
+  with e when not (Debug.test_flag Debug.stack_trace) ->
+    eprintf "@.%a@." Exn_printer.exn_printer e;
+    exit 1

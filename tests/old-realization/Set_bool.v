@@ -36,8 +36,12 @@ Notation "x == y" := (infix_eqeq x y) (at level 70, no associativity).
 
 Require Import FunctionalExtensionality.
 (*
+Require Classical.
+Require ClassicalFacts.
+Require PredicateExtensionality.
 Require ProofIrrelevance.
 *)
+
 (* DO NOT EDIT BELOW *)
 
 Lemma extensionality : forall (a:Type), forall (s1:(set a)) (s2:(set a)),

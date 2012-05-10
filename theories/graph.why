@@ -1,32 +1,73 @@
 
-(* graph theory *)
+(** {1 Graph theory} *)
 
 theory Path
 
-  type graph
+  use export list.List
+  use export list.Append
 
   type vertex
 
-  predicate edge graph vertex vertex
+  predicate edge vertex vertex
 
-  inductive path graph vertex vertex =
-  | Path_empty :
-      forall g : graph, v : vertex. path g v v
-  | Path_append:
-      forall g : graph, v1 v2 src dst : vertex.
-      path g src v1 -> edge g v1 v2 -> path g v2 dst ->
-      path g src dst
+  (** [path v0 [v0; v1; ...; vn-1] vn]
+     means a path from [v0] to [vn] composed of [n] edges [(vi,vi+1)]. *)
+  inductive path vertex (list vertex) vertex =
+  | Path_empty:
+      forall x: vertex. path x Nil x
+  | Path_cons:
+      forall x y z: vertex, l: list vertex.
+      edge x y -> path y l z -> path x (Cons x l) z
 
-  lemma path_left_extension :
-    forall g : graph, v1 v2 v3 : vertex.
-    edge g v1 v2 -> path g v2 v3 -> path g v1 v3
+  lemma path_right_extension:
+    forall x y z: vertex, l: list vertex.
+    path x l y -> edge y z -> path x (l ++ Cons y Nil) z
 
-  lemma path_right_extension :
-    forall g : graph, v1 v2 v3 : vertex.
-    path g v1 v2 -> edge g v2 v3 -> path g v1 v3
+  lemma path_right_inversion:
+    forall x z: vertex, l: list vertex. path x l z ->
+       (x = z /\ l = Nil)
+    \/ (exists y: vertex, l': list vertex.
+        path x l' y /\ edge y z /\ l = l' ++ Cons y Nil)
+
+  lemma path_trans:
+    forall x y z: vertex, l1 l2: list vertex.
+    path x l1 y -> path y l2 z -> path x (l1 ++ l2) z
+
+  lemma empty_path:
+    forall x y: vertex. path x Nil y -> x = y
+
+  lemma path_decomposition:
+    forall x y z: vertex, l1 l2: list vertex.
+    path x (l1 ++ Cons y l2) z -> path x l1 y /\ path y (Cons y l2) z
 
 end
 
+theory IntPathWeight
+
+  clone export Path
+  use export int.Int
+
+  function weight vertex vertex : int
+
+  (** the total weight of a path [path _ l dst] *)
+  function path_weight (l: list vertex) (dst: vertex) : int = match l with
+    | Nil -> 0
+    | Cons x Nil -> weight x dst
+    | Cons x ((Cons y _) as r) -> weight x y + path_weight r dst
+  end
+
+  lemma path_weight_right_extension:
+    forall x y z: vertex, l: list vertex.
+    path_weight (l ++ Cons x Nil) y = path_weight l x + weight x y
+
+  lemma path_weight_decomposition:
+    forall y z: vertex, l1 l2: list vertex.
+    path_weight (l1 ++ Cons y l2) z =
+    path_weight l1 y + path_weight (Cons y l2) z
+
+end
+
+(***
 theory SimplePath
 
   use import list.List
@@ -53,3 +94,10 @@ theory SimplePath
     exists l : list vertex. l <> Nil /\ simple_path g v l v
 
 end
+*)
+
+(***
+Local Variables:
+compile-command: "make -C .. theories/graph.gui"
+End:
+*)

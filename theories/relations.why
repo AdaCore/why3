@@ -1,3 +1,7 @@
+
+(** {1 Relations} *)
+
+
 theory EndoRelation
   type t
   predicate rel t t
@@ -109,7 +113,7 @@ theory ReflTransClosure
     forall x y z: t. relTR x y -> relTR y z -> relTR x z
 end
 
-(*
+(***
 theory PreOrder
 
   type t
@@ -143,8 +147,7 @@ theory TotalPreOrder
 end
 *)
 
-
-(*
+(***
 theory TotalOrder
 
   type t
@@ -184,7 +187,7 @@ theory Lex
 
 end
 
-(*
+(***
 theory MinMax
 
   clone export TotalOrder
@@ -208,10 +211,8 @@ theory WellFounded
 
 end
 
-(*
+(***
 Local Variables:
 compile-command: "make -C .. theories/relations"
 End:
 *)
-
-

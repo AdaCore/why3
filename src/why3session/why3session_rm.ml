@@ -1,9 +1,10 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  Copyright (C) 2010-2011                                               *)
+(*  Copyright (C) 2010-2012                                               *)
 (*    François Bobot                                                      *)
 (*    Jean-Christophe Filliâtre                                           *)
 (*    Claude Marché                                                       *)
+(*    Guillaume Melquiond                                                 *)
 (*    Andrei Paskevich                                                    *)
 (*                                                                        *)
 (*  This software is free software; you can redistribute it and/or        *)
@@ -55,7 +56,7 @@ associated to proved goals (same as --filter-verified-goal --conservative)")::
 (*  ("--never", Arg.Unit (set_remove Never),
    " never remove a proof")::
   ("-n", Arg.Unit (set_remove Never), " same as --never")::*)
-  (filter_spec @ env_spec)
+  (filter_spec @ common_options)
 
 let rec interactive to_remove =
   eprintf "Do you want to remove the external proof %a (y/n)@."
@@ -76,7 +77,7 @@ let run_one env config filters fname =
         | Interactive -> interactive pr
         | Not_valid -> not (proof_verified pr) in
       if remove then remove_external_proof pr) env_session.session;
-  save_session env_session.session
+  save_session config env_session.session
 
 
 let run () =

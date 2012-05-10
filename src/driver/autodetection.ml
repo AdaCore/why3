@@ -1,9 +1,10 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  Copyright (C) 2010-2011                                               *)
+(*  Copyright (C) 2010-2012                                               *)
 (*    François Bobot                                                      *)
 (*    Jean-Christophe Filliâtre                                           *)
 (*    Claude Marché                                                       *)
+(*    Guillaume Melquiond                                                 *)
 (*    Andrei Paskevich                                                    *)
 (*                                                                        *)
 (*  This software is free software; you can redistribute it and/or        *)
@@ -66,6 +67,17 @@ let load_prover kind (id,section) =
     prover_editor = get_string section ~default:"" "editor";
   }
 
+let editor_keys =
+  let add acc k = Sstr.add k acc in
+  List.fold_left add Sstr.empty
+    ["command"]
+
+let load_editor section =
+  check_exhaustive section prover_keys;
+  { editor_command = get_string section "command";
+    editor_options = []
+  }
+
 (** returned in reverse order *)
 let load rc =
   let atps = get_family rc "ATP" in
@@ -90,6 +102,19 @@ let provers_found = ref 0
 
 let prover_tips_info = ref false
 
+let read_editors main =
+  let filename = Filename.concat (Whyconf.datadir main)
+    "provers-detection-data.conf" in
+  try
+    let rc = Rc.from_file filename in
+    List.fold_left (fun editors (id, section) ->
+      Meditor.add id (load_editor section) editors
+    ) Meditor.empty (get_family rc "editor")
+  with
+    | Failure "lexing" ->
+        Loc.errorm "Syntax error in provers-detection-data.conf@."
+    | Not_found ->
+        Loc.errorm "provers-detection-data.conf not found at %s@." filename
 
 let make_command exec com =
   let cmd_regexp = Str.regexp "%\\(.\\)" in
@@ -207,7 +232,7 @@ let run_auto_detection config =
   let detect = List.fold_left (detect_prover main) Mprover.empty l in
   let length = Mprover.cardinal detect in
   eprintf "%d provers detected.@." length;
-  set_provers config detect
+  set_provers (set_editors config (read_editors main)) detect
 
 let list_prover_ids () =
   let config = default_config "/dev/null" in

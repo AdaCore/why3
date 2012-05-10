@@ -4,6 +4,7 @@
 \newcommand{\why}{\textsf{Why3}\xspace}
 \newcommand{\whyml}{\textsf{Why3ML}\xspace}
 \newcommand{\eg}{\emph{e.g.}\xspace}
+\newcommand{\ie}{\emph{i.e.}\xspace}
 
 % BNF grammar
 \newcommand{\keyword}[1]{\texttt{#1}}
@@ -32,6 +33,57 @@
 \newcommand{\synt}[1]{$\spacefalse#1$}
 \newcommand{\emptystring}{$\epsilon$}
 \newcommand{\below}{See\; below}
+
+%%% listings for Why3 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\RequirePackage{listings}
+\RequirePackage{amssymb}
+
+\lstset{basicstyle={\ttfamily},framesep=2pt,frame=single}
+
+\lstdefinelanguage{why3}
+{
+morekeywords=[1]{namespace,predicate,function,inductive,type,use,clone,%
+import,export,theory,end,in,with,%
+goal,axiom,lemma,forall},%
+keywordstyle=[1]{\color{blue}},%
+otherkeywords={},%
+string=[b]",%
+showstringspaces=false,%
+stringstyle=\itshape,%
+commentstyle=\itshape,%
+columns=[l]fullflexible,%
+sensitive=true,%
+morecomment=[s]{(*}{*)},%
+escapeinside={*?}{?*},%
+keepspaces=true,
+literate=%
+%{'a}{$\alpha$}{1}%
+%{'b}{$\beta$}{1}%
+%{<}{$<$}{1}%
+%{>}{$>$}{1}%
+%{<=}{$\le$}{1}%
+%{>=}{$\ge$}{1}%
+% {<>}{$\ne$}{1}%
+% {/\\}{$\land$}{1}%
+% {\\/}{ $\lor$ }{3}%
+% {\ or(}{ $\lor$(}{3}%
+% {not\ }{$\lnot$ }{1}%
+% {not(}{$\lnot$(}{1}%
+% {+->}{\texttt{+->}}{2}%
+% % {+->}{$\mapsto$}{2}%
+% {-->}{\texttt{-\relax->}}{2}%
+% %{-->}{$\longrightarrow$}{2}%
+% {->}{$\rightarrow$}{2}%
+% {<->}{$\leftrightarrow$}{2}%
+%
+%
+}
+
+% default language is Why3
+\lstset{language=why3}
+
+\lstnewenvironment{why3}{\lstset{language=why3}}{}
 
 %%% Local Variables:
 %%% mode: latex

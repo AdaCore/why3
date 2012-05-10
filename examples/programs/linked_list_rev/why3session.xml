@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "why3session.dtd">
+<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
 <why3session
  name="programs/linked_list_rev/why3session.xml">
  <prover
@@ -17,7 +17,7 @@
  <prover
   id="3"
   name="Coq"
-  version="8.3pl3"/>
+  version="8.3pl4"/>
  <prover
   id="4"
   name="Z3"
@@ -54,10 +54,11 @@
     <proof
      prover="3"
      timelimit="5"
+     memlimit="0"
      edited="linked_list_rev_WP_InPlaceRev_list_seg_frame_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.56"/>
+     <result status="valid" time="0.48"/>
     </proof>
    </goal>
    <goal
@@ -71,10 +72,11 @@
     <proof
      prover="3"
      timelimit="5"
+     memlimit="0"
      edited="linked_list_rev_WP_InPlaceRev_list_seg_functional_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.56"/>
+     <result status="valid" time="0.50"/>
     </proof>
    </goal>
    <goal
@@ -88,10 +90,11 @@
     <proof
      prover="3"
      timelimit="5"
+     memlimit="0"
      edited="linked_list_rev_WP_InPlaceRev_list_seg_sublistl_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.52"/>
+     <result status="valid" time="0.48"/>
     </proof>
    </goal>
    <goal
@@ -105,10 +108,11 @@
     <proof
      prover="3"
      timelimit="5"
+     memlimit="0"
      edited="linked_list_rev_WP_InPlaceRev_list_seg_no_repet_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.54"/>
+     <result status="valid" time="0.48"/>
     </proof>
    </goal>
    <goal
@@ -118,11 +122,10 @@
     expl="parameter in_place_reverse"
     sum="62efbae2ad15158c3672fddc3b35f83d"
     proved="true"
-    expanded="true"
+    expanded="false"
     shape="iainfix =V6anullNainfix =ainfix ++areverseV12V11areverseV1AadisjointV12V11Aalist_segV9V8V11anullAalist_segV10V8V12anullIainfix =V12atailV5FIainfix =V11aConsaheadV5V3FIainfix =V10agetV7V6FIainfix =V9V6FAalist_segV4V8V3anullIainfix =V8asetV7V6V4Falist_segV4V7areverseV1anullIainfix =ainfix ++areverseV5V3areverseV1AadisjointV5V3Aalist_segV4V7V3anullAalist_segV6V7V5anullFFFFFAainfix =ainfix ++areverseV1aNilareverseV1AadisjointV1aNilAalist_seganullV2aNilanullAalist_segV0V2V1anullIalist_segV0V2V1anullFFF">
     <label
-     name="expl:parameter in_place_reverse">
-     </label>
+     name="expl:parameter in_place_reverse"/>
     <transf
      name="split_goal"
      proved="true"
@@ -137,18 +140,19 @@
       expanded="false"
       shape="ainfix =ainfix ++areverseV1aNilareverseV1AadisjointV1aNilAalist_seganullV2aNilanullAalist_segV0V2V1anullIalist_segV0V2V1anullFFF">
       <label
-       name="expl:parameter in_place_reverse">
-       </label>
+       name="expl:parameter in_place_reverse"/>
       <proof
        prover="4"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.16"/>
+       <result status="valid" time="0.15"/>
       </proof>
       <proof
        prover="1"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
@@ -156,13 +160,15 @@
       <proof
        prover="0"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.02"/>
       </proof>
       <proof
        prover="2"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
@@ -170,9 +176,10 @@
       <proof
        prover="5"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.13"/>
+       <result status="valid" time="0.14"/>
       </proof>
      </goal>
      <goal
@@ -185,11 +192,11 @@
       expanded="false"
       shape="alist_segV4V8V3anullIainfix =V8asetV7V6V4FIainfix =V6anullNIainfix =ainfix ++areverseV5V3areverseV1AadisjointV5V3Aalist_segV4V7V3anullAalist_segV6V7V5anullFFFFFIalist_segV0V2V1anullFFF">
       <label
-       name="expl:parameter in_place_reverse">
-       </label>
+       name="expl:parameter in_place_reverse"/>
       <proof
        prover="0"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
@@ -202,11 +209,10 @@
       expl="loop invariant preservation"
       sum="37a75132d15c997a62f3d5eb1eef7f6c"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="ainfix =ainfix ++areverseV12V11areverseV1AadisjointV12V11Aalist_segV9V8V11anullAalist_segV10V8V12anullIainfix =V12atailV5FIainfix =V11aConsaheadV5V3FIainfix =V10agetV7V6FIainfix =V9V6FIalist_segV4V8V3anullIainfix =V8asetV7V6V4FIainfix =V6anullNIainfix =ainfix ++areverseV5V3areverseV1AadisjointV5V3Aalist_segV4V7V3anullAalist_segV6V7V5anullFFFFFIalist_segV0V2V1anullFFF">
       <label
-       name="expl:parameter in_place_reverse">
-       </label>
+       name="expl:parameter in_place_reverse"/>
       <transf
        name="split_goal"
        proved="true"
@@ -221,14 +227,14 @@
         expanded="false"
         shape="alist_segV10V8V12anullIainfix =V12atailV5FIainfix =V11aConsaheadV5V3FIainfix =V10agetV7V6FIainfix =V9V6FIalist_segV4V8V3anullIainfix =V8asetV7V6V4FIainfix =V6anullNIainfix =ainfix ++areverseV5V3areverseV1AadisjointV5V3Aalist_segV4V7V3anullAalist_segV6V7V5anullFFFFFIalist_segV0V2V1anullFFF">
         <label
-         name="expl:parameter in_place_reverse">
-         </label>
+         name="expl:parameter in_place_reverse"/>
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.12"/>
+         <result status="valid" time="1.06"/>
         </proof>
        </goal>
        <goal
@@ -241,28 +247,30 @@
         expanded="false"
         shape="alist_segV9V8V11anullIainfix =V12atailV5FIainfix =V11aConsaheadV5V3FIainfix =V10agetV7V6FIainfix =V9V6FIalist_segV4V8V3anullIainfix =V8asetV7V6V4FIainfix =V6anullNIainfix =ainfix ++areverseV5V3areverseV1AadisjointV5V3Aalist_segV4V7V3anullAalist_segV6V7V5anullFFFFFIalist_segV0V2V1anullFFF">
         <label
-         name="expl:parameter in_place_reverse">
-         </label>
+         name="expl:parameter in_place_reverse"/>
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.69"/>
+         <result status="valid" time="0.62"/>
         </proof>
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.91"/>
+         <result status="valid" time="0.88"/>
         </proof>
         <proof
          prover="2"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.70"/>
+         <result status="valid" time="0.67"/>
         </proof>
        </goal>
        <goal
@@ -275,21 +283,22 @@
         expanded="false"
         shape="adisjointV12V11Iainfix =V12atailV5FIainfix =V11aConsaheadV5V3FIainfix =V10agetV7V6FIainfix =V9V6FIalist_segV4V8V3anullIainfix =V8asetV7V6V4FIainfix =V6anullNIainfix =ainfix ++areverseV5V3areverseV1AadisjointV5V3Aalist_segV4V7V3anullAalist_segV6V7V5anullFFFFFIalist_segV0V2V1anullFFF">
         <label
-         name="expl:parameter in_place_reverse">
-         </label>
+         name="expl:parameter in_place_reverse"/>
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.12"/>
+         <result status="valid" time="0.11"/>
         </proof>
         <proof
          prover="2"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.14"/>
+         <result status="valid" time="0.13"/>
         </proof>
        </goal>
        <goal
@@ -302,21 +311,22 @@
         expanded="false"
         shape="ainfix =ainfix ++areverseV12V11areverseV1Iainfix =V12atailV5FIainfix =V11aConsaheadV5V3FIainfix =V10agetV7V6FIainfix =V9V6FIalist_segV4V8V3anullIainfix =V8asetV7V6V4FIainfix =V6anullNIainfix =ainfix ++areverseV5V3areverseV1AadisjointV5V3Aalist_segV4V7V3anullAalist_segV6V7V5anullFFFFFIalist_segV0V2V1anullFFF">
         <label
-         name="expl:parameter in_place_reverse">
-         </label>
+         name="expl:parameter in_place_reverse"/>
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.10"/>
+         <result status="valid" time="0.09"/>
         </proof>
         <proof
          prover="2"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.10"/>
+         <result status="valid" time="0.09"/>
         </proof>
        </goal>
       </transf>
@@ -331,11 +341,11 @@
       expanded="false"
       shape="alist_segV4V7areverseV1anullIainfix =V6anullNNIainfix =ainfix ++areverseV5V3areverseV1AadisjointV5V3Aalist_segV4V7V3anullAalist_segV6V7V5anullFFFFFIalist_segV0V2V1anullFFF">
       <label
-       name="expl:parameter in_place_reverse">
-       </label>
+       name="expl:parameter in_place_reverse"/>
       <proof
        prover="1"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -343,6 +353,7 @@
       <proof
        prover="0"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="2.13"/>
@@ -350,9 +361,10 @@
       <proof
        prover="2"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
     </transf>

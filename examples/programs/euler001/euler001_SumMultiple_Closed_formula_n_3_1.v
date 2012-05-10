@@ -3,11 +3,11 @@
 Require Import ZArith.
 Require Import Rbase.
 Require Import ZOdiv.
-Axiom Abs_le : forall (x:Z) (y:Z), ((Zabs x) <= y)%Z <-> (((-y)%Z <= x)%Z /\
-  (x <= y)%Z).
+Require int.Int.
+Require int.Abs.
+Require int.ComputerDivision.
 
 Parameter sum_multiple_3_5_lt: Z -> Z.
-
 
 Axiom SumEmpty : ((sum_multiple_3_5_lt 0%Z) = 0%Z).
 
@@ -19,31 +19,33 @@ Axiom SumYes : forall (n:Z), (0%Z <= n)%Z -> ((((ZOmod n 3%Z) = 0%Z) \/
   ((ZOmod n 5%Z) = 0%Z)) ->
   ((sum_multiple_3_5_lt (n + 1%Z)%Z) = ((sum_multiple_3_5_lt n) + n)%Z)).
 
+(* Why3 assumption *)
 Definition closed_formula(n:Z): Z := let n3 := (ZOdiv n 3%Z) in let n5 :=
   (ZOdiv n 5%Z) in let n15 := (ZOdiv n 15%Z) in
   (ZOdiv ((((3%Z * n3)%Z * (n3 + 1%Z)%Z)%Z + ((5%Z * n5)%Z * (n5 + 1%Z)%Z)%Z)%Z - ((15%Z * n15)%Z * (n15 + 1%Z)%Z)%Z)%Z 2%Z).
 
+(* Why3 assumption *)
 Definition p(n:Z): Prop :=
   ((sum_multiple_3_5_lt (n + 1%Z)%Z) = (closed_formula n)).
 
 Axiom Closed_formula_0 : (p 0%Z).
 
 Axiom mod_div_unique : forall (x:Z) (y:Z) (q:Z) (r:Z), ((0%Z <= x)%Z /\
-  ((0%Z <  y)%Z /\ ((x = ((q * y)%Z + r)%Z) /\ ((0%Z <= r)%Z /\
-  (r <  y)%Z)))) -> ((q = (ZOdiv x y)) /\ (r = (ZOmod x y))).
+  ((0%Z < y)%Z /\ ((x = ((q * y)%Z + r)%Z) /\ ((0%Z <= r)%Z /\
+  (r < y)%Z)))) -> ((q = (ZOdiv x y)) /\ (r = (ZOmod x y))).
 
-Axiom mod_succ_1 : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (0%Z <  y)%Z) ->
+Axiom mod_succ_1 : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (0%Z < y)%Z) ->
   ((~ ((ZOmod (x + 1%Z)%Z y) = 0%Z)) ->
   ((ZOmod (x + 1%Z)%Z y) = ((ZOmod x y) + 1%Z)%Z)).
 
-Axiom mod_succ_2 : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (0%Z <  y)%Z) ->
+Axiom mod_succ_2 : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (0%Z < y)%Z) ->
   (((ZOmod (x + 1%Z)%Z y) = 0%Z) -> ((ZOmod x y) = (y - 1%Z)%Z)).
 
-Axiom div_succ_1 : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (0%Z <  y)%Z) ->
+Axiom div_succ_1 : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (0%Z < y)%Z) ->
   (((ZOmod (x + 1%Z)%Z y) = 0%Z) ->
   ((ZOdiv (x + 1%Z)%Z y) = ((ZOdiv x y) + 1%Z)%Z)).
 
-Axiom div_succ_2 : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (0%Z <  y)%Z) ->
+Axiom div_succ_2 : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (0%Z < y)%Z) ->
   ((~ ((ZOmod (x + 1%Z)%Z y) = 0%Z)) ->
   ((ZOdiv (x + 1%Z)%Z y) = (ZOdiv x y))).
 
@@ -51,16 +53,22 @@ Axiom mod_15 : forall (n:Z), ((ZOmod n 15%Z) = 0%Z) <->
   (((ZOmod n 3%Z) = 0%Z) /\ ((ZOmod n 5%Z) = 0%Z)).
 
 Axiom triangle_numbers : forall (n:Z),
-  ((2%Z * (ZOdiv (n * (n + 1%Z)%Z)%Z 2%Z))%Z = (n * (n + 1%Z)%Z)%Z).
+  ((ZOmod (n * (n + 1%Z)%Z)%Z 2%Z) = 0%Z).
+
+Axiom div2_simpl : forall (x:Z) (y:Z), ((2%Z * x)%Z = y) ->
+  (x = (ZOdiv y 2%Z)).
+
+Axiom add_div2 : forall (x:Z) (y:Z), ((ZOmod x 2%Z) = 0%Z) ->
+  ((ZOdiv (x + y)%Z 2%Z) = ((ZOdiv x 2%Z) + (ZOdiv y 2%Z))%Z).
 
 Axiom Closed_formula_n : forall (n:Z), (0%Z <= n)%Z -> ((p n) ->
   (((~ ((ZOmod (n + 1%Z)%Z 3%Z) = 0%Z)) /\
   ~ ((ZOmod (n + 1%Z)%Z 5%Z) = 0%Z)) -> (p (n + 1%Z)%Z))).
 
-(* YOU MAY EDIT THE CONTEXT BELOW *)
+Require Import Why3.
+Ltac ae := why3 "alt-ergo" timelimit 2.
 
-(* DO NOT EDIT BELOW *)
-
+(* Why3 goal *)
 Theorem Closed_formula_n_3 : forall (n:Z), (0%Z <= n)%Z -> ((p n) ->
   ((((ZOmod (n + 1%Z)%Z 3%Z) = 0%Z) /\ ~ ((ZOmod (n + 1%Z)%Z 5%Z) = 0%Z)) ->
   (p (n + 1%Z)%Z))).
@@ -74,10 +82,12 @@ rewrite (div_succ_1 n 3); auto with zarith.
 rewrite (div_succ_2 n 5); auto with zarith.
 rewrite (div_succ_2 n 15); auto with zarith.
 2: generalize (mod_15 (n+1)); intuition.
-
+apply div2_simpl.
 ring_simplify.
+rewrite add_div2.
+
+ae.
 
 Qed.
-(* DO NOT EDIT BELOW *)
 
 

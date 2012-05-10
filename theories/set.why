@@ -1,31 +1,35 @@
 
+(** {1 Set theories} *)
+
+(** {2 General Sets} *)
+
 theory Set
 
   type set 'a
 
-  (* membership *)
+  (** membership *)
   predicate mem 'a (set 'a)
 
-  (* equality *)
+  (** equality *)
   predicate (==) (s1 s2: set 'a) = forall x : 'a. mem x s1 <-> mem x s2
 
   axiom extensionality:
     forall s1 s2: set 'a. s1 == s2 -> s1 = s2
 
-  (* inclusion *)
+  (** inclusion *)
   predicate subset (s1 s2: set 'a) = forall x : 'a. mem x s1 -> mem x s2
 
   lemma subset_trans:
     forall s1 s2 s3: set 'a. subset s1 s2 -> subset s2 s3 -> subset s1 s3
 
-  (* empty set *)
+  (** empty set *)
   constant empty : set 'a
 
   predicate is_empty (s: set 'a) = forall x: 'a. not (mem x s)
 
   axiom empty_def1: is_empty (empty : set 'a)
 
-  (* addition *)
+  (** addition *)
   function add 'a (set 'a) : set 'a
 
   axiom add_def1:
@@ -34,7 +38,7 @@ theory Set
 
   function singleton (x: 'a) : set 'a = add x empty
 
-  (* removal *)
+  (** removal *)
   function remove 'a (set 'a) : set 'a
 
   axiom remove_def1:
@@ -44,21 +48,21 @@ theory Set
   lemma subset_remove:
     forall x: 'a, s: set 'a. subset (remove x s) s
 
-  (* union *)
+  (** union *)
   function union (set 'a) (set 'a) : set 'a
 
   axiom union_def1:
     forall s1 s2: set 'a, x: 'a.
     mem x (union s1 s2) <-> mem x s1 \/ mem x s2
 
-  (* intersection *)
+  (** intersection *)
   function inter (set 'a) (set 'a) : set 'a
 
   axiom inter_def1:
     forall s1 s2: set 'a, x: 'a.
     mem x (inter s1 s2) <-> mem x s1 /\ mem x s2
 
-  (* difference *)
+  (** difference *)
   function diff (set 'a) (set 'a) : set 'a
 
   axiom diff_def1:
@@ -68,30 +72,38 @@ theory Set
   lemma subset_diff:
     forall s1 s2: set 'a. subset (diff s1 s2) s1
 
-  (* the set of all x of type 'a *)
+  (** arbitrary element *)
+  function choose (s:set 'a) : 'a
+
+  axiom choose_def:
+    forall s: set 'a. not (is_empty s) -> mem (choose s) s
+
+  (** the set of all x of type 'a *)
   constant all: set 'a
 
   axiom all_def: forall x: 'a. mem x all
 
 end
 
+(** {2 Set Comprehension} *)
+
 theory SetComprehension
 
   use export Set
   use HighOrd as HO
 
-  (* { x | p x } *)
+  (** { x | p x } *)
   function comprehension (p: HO.pred 'a) : set 'a
 
   axiom comprehension_def:
     forall p: HO.pred 'a.
     forall x: 'a. mem x (comprehension p) <-> p x
 
-  (* { x | x in U and p(x) *)
+  (** { x | x in U and p(x) } *)
   function filter (p: HO.pred 'a) (u: set 'a) : set 'a =
     comprehension (\ x: 'a. p x /\ mem x u)
 
-  (* { f x | x in U } *)
+  (** { f x | x in U } *)
   function map (f: HO.func 'a 'b) (u: set 'a) : set 'b =
     comprehension (\ y: 'b. exists x: 'a. mem x u /\ y = f x)
 
@@ -101,8 +113,10 @@ theory SetComprehension
 
 end
 
-(* finite sets *)
+(** {2 Finite sets} *)
+
 theory Fset
+
   use import int.Int
   clone export Set
 
@@ -124,9 +138,24 @@ theory Fset
   axiom cardinal_subset:
     forall s1 s2 : set 'a. subset s1 s2 -> cardinal s1 <= cardinal s2
 
+  lemma cardinal1:
+    forall s: set 'a. cardinal s = 1 ->
+    forall x: 'a. mem x s -> x = choose s
+
+  function nth (i: int) (s: set 'a) : 'a
+
+  axiom nth_injective:
+    forall s: set 'a, i j: int.
+    0 <= i < cardinal s -> 0 <= j < cardinal s -> nth i s = nth j s -> i = j
+
+  axiom nth_surjective:
+    forall s: set 'a, x: 'a. mem x s ->
+    exists i: int. 0 <= i < cardinal s -> x = nth i s
+
 end
 
-(* finite sets of integers *)
+(** {2 Finite sets of integers} *)
+
 theory Fsetint
 
   use export int.Int
@@ -148,7 +177,7 @@ theory Fsetint
     forall s: set int. not (is_empty s) ->
     forall x: int. mem x s -> x <= max_elt s
 
-  (* the set {0,1,...,n-1} *)
+  (** the set {0,1,...,n-1} *)
   function below int : set int
 
   axiom below_def: forall x n: int. mem x (below n) <-> 0 <= x < n
@@ -157,6 +186,8 @@ theory Fsetint
     forall n: int. cardinal (below n) = if n >= 0 then n else 0
 
 end
+
+(** {2 Set extensionality} *)
 
 theory FsetExt
 
@@ -167,7 +198,10 @@ theory FsetExt
 
 end
 
+(** {2 Sets realized as maps} *)
+
 theory SetMap
+
   use import map.Map
   use import bool.Bool
 
@@ -217,8 +251,7 @@ theory SetMap
 
 end
 
-
-(*
+(***
 Local Variables:
 compile-command: "make -C .. theories/set"
 End:

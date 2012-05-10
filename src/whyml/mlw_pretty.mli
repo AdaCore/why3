@@ -1,9 +1,10 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  Copyright (C) 2010-2011                                               *)
+(*  Copyright (C) 2010-2012                                               *)
 (*    François Bobot                                                      *)
 (*    Jean-Christophe Filliâtre                                           *)
 (*    Claude Marché                                                       *)
+(*    Guillaume Melquiond                                                 *)
 (*    Andrei Paskevich                                                    *)
 (*                                                                        *)
 (*  This software is free software; you can redistribute it and/or        *)
@@ -20,6 +21,7 @@
 open Format
 open Why3
 open Mlw_ty
+open Mlw_ty.T
 open Mlw_expr
 open Mlw_decl
 open Mlw_module
@@ -36,7 +38,10 @@ val print_its : formatter -> itysymbol -> unit    (* type symbol *)
 val print_mod : formatter -> modul -> unit        (* module name *)
 
 val print_ity : formatter -> ity -> unit          (* individual type *)
+
+(*
 val print_pvty : formatter -> pvsymbol -> unit    (* variable : type *)
+*)
 
 val print_ty_decl : formatter -> itysymbol -> unit
 val print_data_decl : formatter -> data_decl -> unit

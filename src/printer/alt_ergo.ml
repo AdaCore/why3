@@ -1,9 +1,10 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  Copyright (C) 2010-2011                                               *)
+(*  Copyright (C) 2010-2012                                               *)
 (*    François Bobot                                                      *)
 (*    Jean-Christophe Filliâtre                                           *)
 (*    Claude Marché                                                       *)
+(*    Guillaume Melquiond                                                 *)
 (*    Andrei Paskevich                                                    *)
 (*                                                                        *)
 (*  This software is free software; you can redistribute it and/or        *)
@@ -190,8 +191,8 @@ let print_type_decl fmt ts = match ts.ts_args with
 
 let print_enum_decl fmt ts csl =
   let print_cs fmt (ls,_) = print_ident fmt ls.ls_name in
-  fprintf fmt "type %a =@ %a@\n@\n" print_ident ts.ts_name
-    (print_list alt print_cs) csl
+  fprintf fmt "@[<hov 2>type %a =@ %a@]@\n@\n" print_ident ts.ts_name
+    (print_list alt2 print_cs) csl
 
 let print_ty_decl info fmt ts =
   if Mid.mem ts.ts_name info.info_syn then () else
@@ -219,6 +220,10 @@ let print_param_decl info fmt ls =
     (print_list comma (print_type info)) ls.ls_args
     (if ls.ls_args = [] then "" else " -> ")
     (print_option_or_default "prop" (print_type info)) ls.ls_value
+
+let print_param_decl info fmt ls =
+  if Mid.mem ls.ls_name info.info_syn || Sls.mem ls info.info_pjs
+    then () else (print_param_decl info fmt ls; forget_tvs ())
 
 let print_logic_decl info fmt ls ld =
   let vl,e = open_ls_defn ld in

@@ -1,9 +1,10 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  Copyright (C) 2010-2011                                               *)
+(*  Copyright (C) 2010-2012                                               *)
 (*    François Bobot                                                      *)
 (*    Jean-Christophe Filliâtre                                           *)
 (*    Claude Marché                                                       *)
+(*    Guillaume Melquiond                                                 *)
 (*    Andrei Paskevich                                                    *)
 (*                                                                        *)
 (*  This software is free software; you can redistribute it and/or        *)
@@ -49,7 +50,7 @@ module Wenv = Hashweak.Make(struct type t = env let tag = env_tag end)
 (** Environment construction and utilisation *)
 
 let create_env = let c = ref (-1) in fun lp -> {
-  env_path = List.fold_left (fun acc s -> Sstr.add s acc) Sstr.empty lp;
+  env_path = List.fold_right Sstr.add lp Sstr.empty;
   env_tag  = (incr c; Hashweak.create_tag !c)
 }
 

@@ -1,6 +1,6 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  Copyright (C) 2010-2011                                               *)
+(*  Copyright (C) 2010-2012                                               *)
 (*    François Bobot                                                      *)
 (*    Jean-Christophe Filliâtre                                           *)
 (*    Claude Marché                                                       *)
@@ -44,8 +44,13 @@ let () =
   Trans.register_transform "simplify_unknown_lsymbols"
     (syntactic_transform (fun check_ls -> Trans.goal (fun pr f ->
       [create_prop_decl Pgoal pr (Simplify_formula.fmla_cond_subst
-        (fun t _ -> match t.t_node with
-          | Tconst _ | Tapp(_,[]) -> false
+        (fun t1 t2 -> match t1.t_node with
+          | Tconst _ -> false
+          | Tapp(_,[]) ->
+            begin match t2.t_node with
+            | Tconst _ | Tapp(_,[]) -> true
+            | _ -> false
+            end
           | Tapp(ls,_) -> not (check_ls ls)
           | _ -> true) f)
       ])))

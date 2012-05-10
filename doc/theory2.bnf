@@ -1,0 +1,16 @@
+\begin{syntax}
+  type-defn ::=                                      ; abstract type
+    | "=" type                                       ; alias type
+    | "=" "|"? type-case ("|" type-case)*            ; algebraic type
+    | "=" "{|" record-field (";" record-field)* "|}" ; record type
+  \
+  type-case ::= uident label* type-param*
+  \
+  record-field ::= lident label* ":" type
+  \
+  type-param ::= "'" lident   ;
+   | lqualid                  ;
+   | "(" lident+ ":" type ")" ;
+   | "(" type ("," type)* ")" ;
+   | "()"
+\end{syntax}

@@ -1,3 +1,4 @@
+
 *.tmp
 *~
 *.bak
@@ -47,19 +48,14 @@ why3.conf
 /bin/why3.byte
 /bin/why3.opt
 /bin/why3
-/bin/why3realize.byte
-/bin/why3realize.opt
-/bin/why3realize
 /bin/why3ml.byte
 /bin/why3ml.opt
 /bin/why3ml
 /bin/why3ide.byte
 /bin/why3ide.opt
 /bin/why3ide
-/bin/why3gui.byte
-/bin/why3gui.opt
-/bin/why3gui
 /bin/why3-cpulimit
+/bin/why3-cpulimit.exe
 /bin/why3config.byte
 /bin/why3config.opt
 /bin/why3config
@@ -114,6 +110,7 @@ why3.conf
 /doc/*_bnf.tex
 /doc/apidoc.tex
 /doc/apidoc/
+/doc/stdlibdoc/
 
 # /share/
 /share/provers-detection-data.conf
@@ -127,8 +124,10 @@ why3.conf
 /src/*.cmxa
 /src/*.a
 
-# /src/coq-plugin/
-/src/coq-plugin/g_whytac.ml
+# Coq tactic
+/src/coq-tactic/g_why3tac.ml
+/src/coq-tactic/.why3-vo-*
+/lib/coq-tactic/why3tac.cma
 
 # /src/driver/
 /src/driver/driver_lexer.ml
@@ -142,11 +141,8 @@ why3.conf
 /src/parser/parser.mli
 /src/parser/parser.output
 
-# /src/ide/
-/src/ide/xml.ml
-
 # /src/why3doc/
-/src/why3doc/to_html.ml
+/src/why3doc/doc_lexer.ml
 
 # /src/util/
 /src/util/rc.ml
@@ -180,6 +176,15 @@ why3.conf
 /examples/programs/algo65/
 /examples/programs/binary_search_c/
 /examples/programs/dijkstra/
+/examples/why3bench.html
+/examples/why3regtests.err
+/examples/why3regtests.out
+/examples/*/*.html
+/examples/*/*/*.html
+/examples/*/*/*/*.html
+/examples/*/*.tex
+/examples/*/*/*.tex
+/examples/*/*/*/*.tex
 
 # modules
 /modules/string/

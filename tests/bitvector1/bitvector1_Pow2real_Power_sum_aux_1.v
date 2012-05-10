@@ -4,8 +4,9 @@ Require Import ZArith.
 Require Import Rbase.
 Require int.Int.
 Require real.Real.
-Parameter pow2: Z -> R.
+Require real.RealInfix.
 
+Parameter pow2: Z -> R.
 
 Axiom Power_0 : ((pow2 0%Z) = 1%R).
 
@@ -35,10 +36,9 @@ Axiom Power_non_null : forall (n:Z), ~ ((pow2 n) = 0%R).
 
 Axiom Power_neg : forall (n:Z), ((pow2 (-n)%Z) = (Rdiv 1%R (pow2 n))%R).
 
-(* YOU MAY EDIT THE CONTEXT BELOW *)
 Open Scope Z_scope.
-(* DO NOT EDIT BELOW *)
 
+(* Why3 goal *)
 Theorem Power_sum_aux : forall (n:Z) (m:Z), (0%Z <= m)%Z ->
   ((pow2 (n + m)%Z) = ((pow2 n) * (pow2 m))%R).
 (* YOU MAY EDIT THE PROOF BELOW *)
@@ -67,6 +67,5 @@ rewrite Rmult_comm with (r1:=pow2 n)(r2:=2%R).
 auto with zarith.
 
 Qed.
-(* DO NOT EDIT BELOW *)
 
 

@@ -1,9 +1,10 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  Copyright (C) 2010-2011                                               *)
+(*  Copyright (C) 2010-2012                                               *)
 (*    François Bobot                                                      *)
 (*    Jean-Christophe Filliâtre                                           *)
 (*    Claude Marché                                                       *)
+(*    Guillaume Melquiond                                                 *)
 (*    Andrei Paskevich                                                    *)
 (*                                                                        *)
 (*  This software is free software; you can redistribute it and/or        *)
@@ -18,10 +19,6 @@
 (**************************************************************************)
 
 open Format
-open Why3
-open Theory
-
-val print_theory : formatter -> theory -> unit
 
 val print_header : formatter -> ?title:string -> ?css:string -> unit -> unit
 val print_footer : formatter -> unit -> unit

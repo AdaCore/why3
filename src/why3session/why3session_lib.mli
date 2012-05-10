@@ -1,9 +1,10 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  Copyright (C) 2010-2011                                               *)
+(*  Copyright (C) 2010-2012                                               *)
 (*    François Bobot                                                      *)
 (*    Jean-Christophe Filliâtre                                           *)
 (*    Claude Marché                                                       *)
+(*    Guillaume Melquiond                                                 *)
 (*    Andrei Paskevich                                                    *)
 (*                                                                        *)
 (*  This software is free software; you can redistribute it and/or        *)
@@ -41,14 +42,15 @@ val print_version : unit -> unit
 
 
 (** {2 Spec for version, debug} *)
-val simple_spec : spec_list
+(* val simple_spec : spec_list *)
 
-val read_simple_spec : unit -> bool
+(*
+val read_simple_spec : unit -> bool 
 (** return if we must exit *)
+*)
 
-(** {2 Spec for configuratio, loadpath} *)
-val env_spec : spec_list
-(** include simple_spec *)
+(** {2 Spec for configuration, loadpath} *)
+val common_options : spec_list
 
 val read_env_spec : unit -> Env.env * Whyconf.config * bool
 (** read_simple_spec also *)

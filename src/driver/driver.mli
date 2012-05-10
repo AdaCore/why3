@@ -1,9 +1,10 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  Copyright (C) 2010-2011                                               *)
+(*  Copyright (C) 2010-2012                                               *)
 (*    François Bobot                                                      *)
 (*    Jean-Christophe Filliâtre                                           *)
 (*    Claude Marché                                                       *)
+(*    Guillaume Melquiond                                                 *)
 (*    Andrei Paskevich                                                    *)
 (*                                                                        *)
 (*  This software is free software; you can redistribute it and/or        *)
@@ -46,6 +47,7 @@ val call_on_buffer :
   command    : string ->
   ?timelimit : int ->
   ?memlimit  : int ->
+  filename   : string ->
   driver -> Buffer.t -> Call_provers.pre_prover_call
 
 

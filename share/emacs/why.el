@@ -247,8 +247,8 @@
   (make-local-variable 'font-lock-defaults)
   (setq font-lock-defaults '(why-font-lock-keywords))
   ; indentation
-  (make-local-variable 'indent-line-function)
-  (setq indent-line-function 'why-indent-line)
+  ;(make-local-variable 'indent-line-function)
+  ;(setq indent-line-function 'why-indent-line)
   ; OCaml style comments for comment-region, comment-dwim, etc.
   ; (setq comment-start "(\\*" comment-end "\\*)")
   ; menu

@@ -1,9 +1,10 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  Copyright (C) 2010-2011                                               *)
+(*  Copyright (C) 2010-2012                                               *)
 (*    François Bobot                                                      *)
 (*    Jean-Christophe Filliâtre                                           *)
 (*    Claude Marché                                                       *)
+(*    Guillaume Melquiond                                                 *)
 (*    Andrei Paskevich                                                    *)
 (*                                                                        *)
 (*  This software is free software; you can redistribute it and/or        *)
@@ -30,16 +31,16 @@ let opt_output_dir = ref ""
 let opt_longtable = ref false
 
 let spec =
-  ("-style <n>",
+  ("-style",
    Arg.Set_int opt_style,
-   " sets output style (1 or 2, default 1)") ::
-  ("-o <path>",
+   "<n> sets output style (1 or 2, default 1)") ::
+  ("-o",
    Arg.Set_string opt_output_dir,
-   " where to produce LaTeX files (default: session dir)") ::
+   "<path> where to produce LaTeX files (default: session dir)") ::
   ("-longtable",
    Arg.Set opt_longtable,
-   " produce tables using longtable package instead of tabular") ::
-  simple_spec
+   " use 'longtable' environment instead of 'tabular'") ::
+  common_options
 
 
 (* Statistics in LaTeX*)
@@ -298,7 +299,7 @@ let run_one fname =
   print_latex_statistics !opt_style (table ()) dir session
 
 let run () =
-  let should_exit1 = read_simple_spec () in
+  let _,_,should_exit1 = read_env_spec () in
   if should_exit1 then exit 1;
   iter_files run_one
 

@@ -1,9 +1,10 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  Copyright (C) 2010-2011                                               *)
+(*  Copyright (C) 2010-2012                                               *)
 (*    François Bobot                                                      *)
 (*    Jean-Christophe Filliâtre                                           *)
 (*    Claude Marché                                                       *)
+(*    Guillaume Melquiond                                                 *)
 (*    Andrei Paskevich                                                    *)
 (*                                                                        *)
 (*  This software is free software; you can redistribute it and/or        *)
@@ -761,7 +762,7 @@ let create_theory ?(path=[]) n =
 
 let bool_theory =
   let uc = empty_theory (id_fresh "Bool") [] in
-  let uc = add_data_decl uc [ts_bool, [fs_true,[]; fs_false,[]]] in
+  let uc = add_data_decl uc [ts_bool, [fs_bool_true,[]; fs_bool_false,[]]] in
   close_theory uc
 
 let highord_theory =

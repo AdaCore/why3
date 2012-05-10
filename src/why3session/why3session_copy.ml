@@ -1,9 +1,10 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  Copyright (C) 2010-2011                                               *)
+(*  Copyright (C) 2010-2012                                               *)
 (*    François Bobot                                                      *)
 (*    Jean-Christophe Filliâtre                                           *)
 (*    Claude Marché                                                       *)
+(*    Guillaume Melquiond                                                 *)
 (*    Andrei Paskevich                                                    *)
 (*                                                                        *)
 (*  This software is free software; you can redistribute it and/or        *)
@@ -64,9 +65,11 @@ let spec =
    " the proof is set to archive" ) ::
   ("--unset-archive", Arg.Unit unset_opt_archived,
    " the proof is set to replayable" ) ::
+(*
   ("--to-known-prover",
    Arg.Set opt_to_known,
    " convert the unknown provers to the most similar known prover.")::
+*)
   ["--to-prover",
    Arg.String (fun s -> opt_to_prover := Some (read_opt_prover s)),
    " the proof is copied to this new prover";
@@ -81,7 +84,7 @@ let spec =
    "-c", Arg.Unit (set_replace Not_valid), " same as --conservative";
    "--never", Arg.Unit (set_replace Never), " never replace a proof";
    "-n", Arg.Unit (set_replace Never), " same as --never"]@
-    (force_obsolete_spec @ filter_spec @ env_spec)
+    (force_obsolete_spec @ filter_spec @ common_options)
 
 type action =
   | Copy
@@ -170,7 +173,7 @@ let run_one ~action env config filters pk fname =
           | Mod when to_prover <> SameProver -> remove_external_proof pr
           | _ -> ()
   ) s;
-  save_session env_session.session
+  save_session config env_session.session
 
 let read_to_prover config =
   match !opt_to_prover with

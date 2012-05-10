@@ -1,4 +1,13 @@
 
+(** {1 Theory of reals} 
+
+This file provides the basic theory of real numbers, and several
+additional theories for classical real functions.
+
+*)
+
+(** {2 Real numbers and the basic unary and binary operators} *)
+
 theory Real
 
   constant zero : real = 0.0
@@ -11,11 +20,18 @@ theory Real
   clone export algebra.OrderedField with type t = real,
     constant zero = zero, constant one = one, predicate (<=) = (<=)
 
-(*
+(***
   lemma sub_zero: forall x y:real. x - y = 0.0 -> x = y
 *)
 
 end
+
+(** {2 Alternative Infix Operators}
+
+This theory should be used instead of Real when one wants to use both
+integer and real binary operators.
+
+*)
 
 theory RealInfix
 
@@ -26,6 +42,7 @@ theory RealInfix
   function ( *.) (x:real) (y:real) : real = x * y
   function (/.) (x:real) (y:real) : real = x / y
   function (-._) (x:real) : real = - x
+  function inv (x:real) : real = Real.inv x
 
   predicate (<=.) (x:real) (y:real) = x <= y
   predicate (>=.) (x:real) (y:real) = x >= y
@@ -33,6 +50,8 @@ theory RealInfix
   predicate ( >.) (x:real) (y:real) = x > y
 
 end
+
+(** {2 Absolute Value} *)
 
 theory Abs
 
@@ -44,7 +63,7 @@ theory Abs
 
   lemma Abs_pos: forall x:real. abs x >= 0.0
 
-(*
+(***
   lemma Abs_zero: forall x:real. abs x = 0.0 -> x = 0.0
 *)
 
@@ -56,6 +75,8 @@ theory Abs
     forall x y z:real. abs(x-z) <= abs(x-y) + abs(y-z)
 
 end
+
+(** {2 Minimum and Maximum} *)
 
 theory MinMax
 
@@ -70,6 +91,8 @@ theory MinMax
   axiom Min_is_some : forall x y:real. min x y = x \/ min x y = y
 
 end
+
+(** {2 Injection of integers into reals} *)
 
 theory FromInt
 
@@ -92,20 +115,14 @@ theory FromInt
 
 end
 
-theory FromIntTest
-
-  use import FromInt
-
-  lemma Test1: from_int 2 = 2.0
-
-end
+(** {2 Various truncation functions} *)
 
 theory Truncate
 
   use import Real
   use import FromInt
 
-  (* truncate: rounds towards zero *)
+  (** truncate: rounds towards zero *)
 
   function truncate real : int
 
@@ -132,7 +149,7 @@ theory Truncate
   axiom Truncate_monotonic_int2:
     forall x:real, i:int. from_int i <= x -> Int.(<=) i (truncate x)
 
-  (* roundings up and down *)
+  (** roundings up and down *)
 
   function floor real : int
   function ceil real : int
@@ -157,6 +174,7 @@ theory Truncate
 
 end
 
+(** {2 Square and Square Root} *)
 
 theory Square
 
@@ -177,15 +195,7 @@ theory Square
 
 end
 
-theory SquareTest
-
-  use import Square
-
-  lemma Sqrt_zero: sqrt 0.0 = 0.0
-  lemma Sqrt_one: sqrt 1.0 = 1.0
-  lemma Sqrt_four: sqrt 4.0 = 2.0
-
-end
+(** {2 Exponential and Logarithm} *)
 
 theory ExpLog
 
@@ -211,16 +221,21 @@ theory ExpLog
 
 end
 
-theory ExpLogTest
+(** {2 Power of a real to an integer} *)
 
-  use import ExpLog
+theory PowerInt
 
-  lemma Log_e : log e = 1.0
+  use int.Int
+  use Real
+
+  clone export int.Exponentiation with
+    type t = real, constant one = Real.one, function (*) = Real.(*)
 
 end
 
+(** {2 Power of a real to a real exponent} *)
 
-theory Power
+theory PowerReal
 
   use import Real
   use import Square
@@ -251,19 +266,12 @@ theory Power
 
 end
 
-theory PowerTest
+(** {2 Trigonometric Functions}
 
-  use import Power
+See the {h <a href="http://en.wikipedia.org/wiki/Trigonometric_function">wikipedia page</a>}.
 
-  lemma Pow_2_2 : pow 2.0 2.0 = 4.0
-
-end
-
-
-
-(** Trigonometric functions
-    [http://en.wikipedia.org/wiki/Trigonometric_function]
 *)
+
 theory Trigonometry
 
   use import Real
@@ -318,22 +326,12 @@ theory Trigonometry
 
 end
 
-theory TrigonometryTest
+(** {2 Hyperbolic Functions}
 
-  use import Real
-  use import Trigonometry
-  use import Square
+See the {h <a href="http://en.wikipedia.org/wiki/Hyperbolic_function">wikipedia page</a>}.
 
-  lemma Cos_2_pi : cos (2.0 * pi) = 1.0
-  lemma Sin_2_pi : sin (2.0 * pi) = 0.
-  lemma Tan_pi_3 : tan (pi / 2.0) = sqrt 3.0
-  lemma Atan_1   : atan 1.0 = pi / 4.0
-
-end
-
-(** hyperbolic functions
-    [http://en.wikipedia.org/wiki/Hyperbolic_function]
 *)
+
 theory Hyperbolic
 
   use import Real
@@ -354,9 +352,12 @@ theory Hyperbolic
 
 end
 
-(** polar coordinates: atan2, hypot
-    [http://en.wikipedia.org/wiki/Atan2]
+(** {2 Polar Coordinates}
+
+See the {h <a href="http://en.wikipedia.org/wiki/Atan2">wikipedia page</a>}.
+
 *)
+
 theory Polar
 
   use import Real
@@ -371,5 +372,6 @@ theory Polar
 
   axiom Y_from_polar:
     forall x y:real. y = hypot x y * sin (atan2 y x)
+
 end
 

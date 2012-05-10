@@ -1,9 +1,10 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  Copyright (C) 2010-2011                                               *)
+(*  Copyright (C) 2010-2012                                               *)
 (*    François Bobot                                                      *)
 (*    Jean-Christophe Filliâtre                                           *)
 (*    Claude Marché                                                       *)
+(*    Guillaume Melquiond                                                 *)
 (*    Andrei Paskevich                                                    *)
 (*                                                                        *)
 (*  This software is free software; you can redistribute it and/or        *)
@@ -79,10 +80,11 @@ type 'a goal = private
 
 and 'a proof_attempt = private
     { proof_key : 'a;
-      proof_prover : Whyconf.prover;
+      mutable proof_prover : Whyconf.prover;
       proof_parent : 'a goal;
       mutable proof_state : proof_attempt_status;
       mutable proof_timelimit : int;
+      mutable proof_memlimit : int;
       mutable proof_obsolete : bool;
       mutable proof_archived : bool;
       mutable proof_edited_as : string option;
@@ -155,7 +157,7 @@ val read_session : string -> notask session
 (** Read a session stored on the disk. It returns a session without any
     task attached to goals *)
 
-val save_session : 'key session -> unit
+val save_session : Whyconf.config -> 'key session -> unit
 (** Save a session on disk *)
 
 (** {2 Context of a session} *)
@@ -172,12 +174,19 @@ type loaded_provers = loaded_prover option PHprover.t
 
 type 'a env_session = private
     { env : Env.env;
-      whyconf : Whyconf.config;
+      mutable whyconf : Whyconf.config;
       loaded_provers : loaded_provers;
       session : 'a session}
 
+val update_env_session_config : 'a env_session -> Whyconf.config -> unit
+(** updates the configuration *)
+
 val load_prover : 'a env_session -> Whyconf.prover -> loaded_prover option
 (** load a prover *)
+
+val unload_provers : 'a env_session -> unit
+(** forces unloading of all provers, 
+    to force reading again the configuration *)
 
 (** {2 Update session} *)
 
@@ -259,6 +268,7 @@ val add_external_proof :
   obsolete:bool ->
   archived:bool ->
   timelimit:int ->
+  memlimit:int ->
   edit:string option ->
   'key goal ->
   Whyconf.prover ->
@@ -273,6 +283,8 @@ val set_proof_state :
   archived:bool ->
   proof_attempt_status ->
   'key proof_attempt -> unit
+
+val change_prover : 'a proof_attempt -> Whyconf.prover -> unit
 
 val set_obsolete : ?notify:'key notify -> 'key proof_attempt -> unit
 
@@ -290,6 +302,7 @@ val update_edit_external_proof :
 
 
 val set_timelimit : int -> 'key proof_attempt -> unit
+val set_memlimit : int -> 'key proof_attempt -> unit
 
 val copy_external_proof :
   ?notify:'key notify ->
@@ -297,6 +310,7 @@ val copy_external_proof :
   ?obsolete:bool ->
   ?archived:bool ->
   ?timelimit:int ->
+  ?memlimit:int ->
   ?edit:string option ->
   ?goal:'key goal ->
   ?prover:Whyconf.prover ->

@@ -1,9 +1,10 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  Copyright (C) 2010-2011                                               *)
+(*  Copyright (C) 2010-2012                                               *)
 (*    François Bobot                                                      *)
 (*    Jean-Christophe Filliâtre                                           *)
 (*    Claude Marché                                                       *)
+(*    Guillaume Melquiond                                                 *)
 (*    Andrei Paskevich                                                    *)
 (*                                                                        *)
 (*  This software is free software; you can redistribute it and/or        *)
@@ -121,6 +122,8 @@ rule token = parse
       Loc.transfer_loc lexbuf lex_dumb;
       match tok with
         | INPUT filename ->
+          let dirname = Filename.dirname lexbuf.lex_curr_p.pos_fname in
+          let filename = Sysutil.absolutize_filename dirname filename in
           Stack.push (input_lexbuf filename) s;
           multifile lex_dumb
         | EOF -> ignore (Stack.pop s);

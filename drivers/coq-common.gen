@@ -58,9 +58,9 @@ theory int.Int
   syntax function (-_) "(-%1)%Z"
 
   syntax predicate (<=) "(%1 <= %2)%Z"
-  syntax predicate (<)  "(%1 <  %2)%Z"
+  syntax predicate (<)  "(%1 < %2)%Z"
   syntax predicate (>=) "(%1 >= %2)%Z"
-  syntax predicate (>)  "(%1 >  %2)%Z"
+  syntax predicate (>)  "(%1 > %2)%Z"
 
   remove prop CommutativeGroup.Comm.Comm
   remove prop CommutativeGroup.Assoc.Assoc
@@ -158,9 +158,9 @@ theory real.Real
   syntax function inv  "(Rinv %1)"
 
   syntax predicate (<=) "(%1 <= %2)%R"
-  syntax predicate (<)  "(%1 <  %2)%R"
+  syntax predicate (<)  "(%1 < %2)%R"
   syntax predicate (>=) "(%1 >= %2)%R"
-  syntax predicate (>)  "(%1 >  %2)%R"
+  syntax predicate (>)  "(%1 > %2)%R"
 
   remove prop CommutativeGroup.Comm.Comm
   remove prop CommutativeGroup.Assoc.Assoc
@@ -256,11 +256,27 @@ theory real.ExpLog
 end
 
 
-theory real.Power
+theory real.PowerInt
+
+  prelude "Require Import Rfunctions."
+
+  syntax function power "(powerRZ %1 %2)"
+
+  remove prop Power_0 (* already as powerRZ_O *)
+  (* remove prop Power_s *)
+  remove prop Power_1 (* already as powerRZ_1 *)
+  (* remove prop Power_sum *) (* not the same as powerRZ_add *)
+  (* remove prop Power_mult *)
+
+
+end
+
+theory real.PowerReal
 
   prelude "Require Import Rpower."
 
-  (* no power: R -> R -> R in Coq ? (only powerRZ: R -> Z -> R) *)
+  syntax function pow "(Rpower %1 %2)"
+
 end
 
 theory real.Trigonometry

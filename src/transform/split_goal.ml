@@ -1,9 +1,10 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  Copyright (C) 2010-2011                                               *)
+(*  Copyright (C) 2010-2012                                               *)
 (*    François Bobot                                                      *)
 (*    Jean-Christophe Filliâtre                                           *)
 (*    Claude Marché                                                       *)
+(*    Guillaume Melquiond                                                 *)
 (*    Andrei Paskevich                                                    *)
 (*                                                                        *)
 (*  This software is free software; you can redistribute it and/or        *)
@@ -32,7 +33,7 @@ let split_case forig spl c acc tl bl =
   let bl = List.rev_map t_open_branch_cb bl in
   let bll,_ = List.fold_left (fun (bll,el) (pl,f,close) ->
     let spf = spl [] f in
-    let brc = t_close_branch pl c in
+    let brc = close pl c in
     let bll = List.map (fun rl -> brc::rl) bll in
     let bll = apply_append (fun f -> close pl f :: el) bll spf in
     bll, brc::el) ([],[]) bl

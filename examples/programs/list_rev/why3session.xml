@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "why3session.dtd">
+<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
 <why3session
- name="examples/programs/list_rev/why3session.xml">
+ name="programs/list_rev/why3session.xml">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -13,7 +13,7 @@
  <prover
   id="2"
   name="Coq"
-  version="8.3pl3"/>
+  version="8.3pl4"/>
  <prover
   id="3"
   name="Spass"
@@ -25,225 +25,41 @@
  <file
   name="../list_rev.mlw"
   verified="false"
-  expanded="true">
+  expanded="false">
   <theory
    name="WP M"
-   locfile="examples/programs/list_rev/../list_rev.mlw"
+   locfile="programs/list_rev/../list_rev.mlw"
    loclnum="2" loccnumb="7" loccnume="8"
    verified="false"
    expanded="true">
    <goal
     name="acyclic_list"
-    locfile="examples/programs/list_rev/../list_rev.mlw"
+    locfile="programs/list_rev/../list_rev.mlw"
     loclnum="109" loccnumb="8" loccnume="20"
-    sum="d35a041582f238bfa17b769abc512e6c"
+    sum="5710dc4b05a686cd509018e81b131008"
     proved="false"
     expanded="true"
     shape="asep_node_listV0V1amixfix []V0V1Iais_listV0V1Iainfix =V1anullNF">
     <proof
      prover="4"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="10.08"/>
+     <result status="timeout" time="10.04"/>
     </proof>
     <proof
      prover="1"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="unknown" time="2.90"/>
+     <result status="unknown" time="2.04"/>
     </proof>
     <proof
      prover="0"
      timelimit="10"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="0.02"/>
-    </proof>
-   </goal>
-   <goal
-    name="consistent"
-    locfile="examples/programs/list_rev/../list_rev.mlw"
-    loclnum="112" loccnumb="7" loccnume="17"
-    sum="ae7367ded667875617fd1fe16c8ac36a"
-    proved="false"
-    expanded="true"
-    shape="fIais_listV0V2Iais_listV0V1F">
-    <proof
-     prover="4"
-     timelimit="10"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="0.02"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="10"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="0.16"/>
-    </proof>
-    <proof
-     prover="0"
-     timelimit="10"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="10.08"/>
-    </proof>
-   </goal>
-   <goal
-    name="WP_parameter list_rev"
-    locfile="examples/programs/list_rev/../list_rev.mlw"
-    loclnum="115" loccnumb="6" loccnume="14"
-    expl="parameter list_rev"
-    sum="212d78b3d7c9036f1b7a78675ba00de1"
-    proved="true"
-    expanded="false"
-    shape="iainfix =V3anullNasep_list_listV5V7V6Aais_listV5V6Aais_listV5V7Iainfix =V7amixfix []V4V3FIainfix =V6V3FIainfix =V5amixfix [<-]V4V3V2Fais_listV4V2Iasep_list_listV4V3V2Aais_listV4V2Aais_listV4V3FFFAasep_list_listV1V0anullAais_listV1anullAais_listV1V0Iais_listV1V0FF">
-    <label
-     name="expl:parameter list_rev">
-     </label>
-    <proof
-     prover="1"
-     timelimit="10"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.09"/>
-    </proof>
-   </goal>
-   <goal
-    name="reverse_append"
-    locfile="examples/programs/list_rev/../list_rev.mlw"
-    loclnum="145" loccnumb="8" loccnume="22"
-    sum="06910e5daa14762e1ad92cf9c9787107"
-    proved="true"
-    expanded="false"
-    shape="ainfix =ainfix ++areverseaConsV2V0V1ainfix ++areverseV0aConsV2V1Fainfix ++areverseV0aConsV2V1ainfix ++areverseaConsV2V0V1">
-    <proof
-     prover="0"
-     timelimit="10"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-   </goal>
-   <goal
-    name="WP_parameter list_rev_behv"
-    locfile="examples/programs/list_rev/../list_rev.mlw"
-    loclnum="156" loccnumb="6" loccnume="19"
-    expl="parameter list_rev_behv"
-    sum="705e257a68f5df607de8b8456a988bee"
-    proved="false"
-    expanded="true"
-    shape="iainfix =V3anullNainfix =areverseamodelV1V0ainfix ++areverseamodelV5V7amodelV5V6Aasep_list_listV5V7V6Aais_listV5V6Aais_listV5V7Iainfix =V7amixfix []V4V3FIainfix =V6V3FAainfix =ainfix ++areverseaConsV3amodelV5amixfix []V4V3amodelV5V2ainfix ++areverseamodelV5amixfix []V4V3aConsV3amodelV5V2Iainfix =V5amixfix [<-]V4V3V2Fainfix =areverseamodelV1V0amodelV4V2Aais_listV4V2Iainfix =areverseamodelV1V0ainfix ++areverseamodelV4V3amodelV4V2Aasep_list_listV4V3V2Aais_listV4V2Aais_listV4V3FFFAainfix =areverseamodelV1V0ainfix ++areverseamodelV1V0amodelV1anullAasep_list_listV1V0anullAais_listV1anullAais_listV1V0Iais_listV1V0FF">
-    <label
-     name="expl:parameter list_rev_behv">
-     </label>
-    <proof
-     prover="4"
-     timelimit="10"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="10.09"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="10"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="10.09"/>
-    </proof>
-    <proof
-     prover="0"
-     timelimit="10"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="10.10"/>
-    </proof>
-   </goal>
-  </theory>
-  <theory
-   name="WP M2"
-   locfile="examples/programs/list_rev/../list_rev.mlw"
-   loclnum="182" loccnumb="7" loccnume="9"
-   verified="false"
-   expanded="true">
-   <goal
-    name="is_list_disjoint_case"
-    locfile="examples/programs/list_rev/../list_rev.mlw"
-    loclnum="207" loccnumb="7" loccnume="28"
-    sum="91f32fbbc3a05a01dee5ad1f96e82b76"
-    proved="true"
-    expanded="false"
-    shape="fIais_listV0amixfix []V0V1Aainfix =V1anullNAainfix =V1anullF">
-    <proof
-     prover="0"
-     timelimit="10"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
-    name="frame_list"
-    locfile="examples/programs/list_rev/../list_rev.mlw"
-    loclnum="253" loccnumb="8" loccnume="18"
-    sum="c6b90fbd14885f0114b3a8c1a0f26af2"
-    proved="true"
-    expanded="false"
-    shape="ais_listamixfix [<-]V0V2V3V1Iais_listV0V1Iain_ftV2alist_ftV0V1NFais_listamixfix [<-]V0V2V3V1">
-    <proof
-     prover="2"
-     timelimit="10"
-     edited="list_rev_M2_frame_list_1.v"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.49"/>
-    </proof>
-   </goal>
-   <goal
-    name="frame_list_ft"
-    locfile="examples/programs/list_rev/../list_rev.mlw"
-    loclnum="264" loccnumb="8" loccnume="21"
-    sum="ee67ec8c2421f1f52a083807527ba7bd"
-    proved="true"
-    expanded="false"
-    shape="ainfix =alist_ftV0V1alist_ftamixfix [<-]V0V2V3V1Iais_listV0V1Iain_ftV2alist_ftV0V1NF">
-    <proof
-     prover="2"
-     timelimit="10"
-     edited="list_rev_M2_frame_list_ft_1.v"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.50"/>
-    </proof>
-   </goal>
-   <goal
-    name="acyclic_list"
-    locfile="examples/programs/list_rev/../list_rev.mlw"
-    loclnum="278" loccnumb="8" loccnume="20"
-    sum="d767c9ba03e46f563240cc49dcc33c02"
-    proved="false"
-    expanded="true"
-    shape="asep_node_listV0V1amixfix []V0V1Iais_listV0V1Iainfix =V1anullNF">
-    <proof
-     prover="4"
-     timelimit="10"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="0.02"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="10"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="2.77"/>
-    </proof>
-    <proof
-     prover="0"
-     timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="unknown" time="0.00"/>
@@ -251,15 +67,215 @@
    </goal>
    <goal
     name="consistent"
-    locfile="examples/programs/list_rev/../list_rev.mlw"
-    loclnum="281" loccnumb="7" loccnume="17"
-    sum="b30a6fdc5bfa65d12fc35befebb91a83"
+    locfile="programs/list_rev/../list_rev.mlw"
+    loclnum="112" loccnumb="7" loccnume="17"
+    sum="aa3b1676d488c661545e1f2d5dbd5f50"
     proved="false"
     expanded="true"
     shape="fIais_listV0V2Iais_listV0V1F">
     <proof
      prover="4"
      timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.02"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.15"/>
+    </proof>
+    <proof
+     prover="0"
+     timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="10.03"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter list_rev"
+    locfile="programs/list_rev/../list_rev.mlw"
+    loclnum="115" loccnumb="6" loccnume="14"
+    expl="parameter list_rev"
+    sum="e8f581818ea406d945670eb658f5cf1d"
+    proved="true"
+    expanded="false"
+    shape="iainfix =V3anullNasep_list_listV5V7V6Aais_listV5V6Aais_listV5V7Iainfix =V7amixfix []V4V3FIainfix =V6V3FIainfix =V5amixfix [&lt;-]V4V3V2Fais_listV4V2Iasep_list_listV4V3V2Aais_listV4V2Aais_listV4V3FFFAasep_list_listV1V0anullAais_listV1anullAais_listV1V0Iais_listV1V0FF">
+    <label
+     name="expl:parameter list_rev"/>
+    <proof
+     prover="1"
+     timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.09"/>
+    </proof>
+   </goal>
+   <goal
+    name="reverse_append"
+    locfile="programs/list_rev/../list_rev.mlw"
+    loclnum="145" loccnumb="8" loccnume="22"
+    sum="52ee2514fc19450222f3336eb4e77a9d"
+    proved="true"
+    expanded="false"
+    shape="ainfix =ainfix ++areverseaConsV2V0V1ainfix ++areverseV0aConsV2V1Fainfix ++areverseV0aConsV2V1ainfix ++areverseaConsV2V0V1">
+    <proof
+     prover="0"
+     timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter list_rev_behv"
+    locfile="programs/list_rev/../list_rev.mlw"
+    loclnum="156" loccnumb="6" loccnume="19"
+    expl="parameter list_rev_behv"
+    sum="a7f9665c126d22e2b4f15277e2bfeb58"
+    proved="false"
+    expanded="true"
+    shape="iainfix =V3anullNainfix =areverseamodelV1V0ainfix ++areverseamodelV5V7amodelV5V6Aasep_list_listV5V7V6Aais_listV5V6Aais_listV5V7Iainfix =V7amixfix []V4V3FIainfix =V6V3FAainfix =ainfix ++areverseaConsV3amodelV5amixfix []V4V3amodelV5V2ainfix ++areverseamodelV5amixfix []V4V3aConsV3amodelV5V2Iainfix =V5amixfix [&lt;-]V4V3V2Fainfix =areverseamodelV1V0amodelV4V2Aais_listV4V2Iainfix =areverseamodelV1V0ainfix ++areverseamodelV4V3amodelV4V2Aasep_list_listV4V3V2Aais_listV4V2Aais_listV4V3FFFAainfix =areverseamodelV1V0ainfix ++areverseamodelV1V0amodelV1anullAasep_list_listV1V0anullAais_listV1anullAais_listV1V0Iais_listV1V0FF">
+    <label
+     name="expl:parameter list_rev_behv"/>
+    <proof
+     prover="4"
+     timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="10.03"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="10.03"/>
+    </proof>
+    <proof
+     prover="0"
+     timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="10.03"/>
+    </proof>
+   </goal>
+  </theory>
+  <theory
+   name="WP M2"
+   locfile="programs/list_rev/../list_rev.mlw"
+   loclnum="182" loccnumb="7" loccnume="9"
+   verified="false"
+   expanded="true">
+   <goal
+    name="is_list_disjoint_case"
+    locfile="programs/list_rev/../list_rev.mlw"
+    loclnum="207" loccnumb="7" loccnume="28"
+    sum="be619d7722957d9d28dbf7cdf1dbbea3"
+    proved="true"
+    expanded="false"
+    shape="fIais_listV0amixfix []V0V1Aainfix =V1anullNAainfix =V1anullF">
+    <proof
+     prover="0"
+     timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
+    name="frame_list"
+    locfile="programs/list_rev/../list_rev.mlw"
+    loclnum="253" loccnumb="8" loccnume="18"
+    sum="b2c32d3c295230c36840748ea6551e38"
+    proved="true"
+    expanded="false"
+    shape="ais_listamixfix [&lt;-]V0V2V3V1Iais_listV0V1Iain_ftV2alist_ftV0V1NFais_listamixfix [&lt;-]V0V2V3V1">
+    <proof
+     prover="2"
+     timelimit="10"
+     memlimit="0"
+     edited="list_rev_M2_frame_list_1.v"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.44"/>
+    </proof>
+   </goal>
+   <goal
+    name="frame_list_ft"
+    locfile="programs/list_rev/../list_rev.mlw"
+    loclnum="264" loccnumb="8" loccnume="21"
+    sum="331caa0e62e761cddeae0a3a5704db40"
+    proved="true"
+    expanded="false"
+    shape="ainfix =alist_ftV0V1alist_ftamixfix [&lt;-]V0V2V3V1Iais_listV0V1Iain_ftV2alist_ftV0V1NF">
+    <proof
+     prover="2"
+     timelimit="10"
+     memlimit="0"
+     edited="list_rev_M2_frame_list_ft_1.v"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.46"/>
+    </proof>
+   </goal>
+   <goal
+    name="acyclic_list"
+    locfile="programs/list_rev/../list_rev.mlw"
+    loclnum="278" loccnumb="8" loccnume="20"
+    sum="712599fffac92515c8289d18d591d97b"
+    proved="false"
+    expanded="true"
+    shape="asep_node_listV0V1amixfix []V0V1Iais_listV0V1Iainfix =V1anullNF">
+    <proof
+     prover="4"
+     timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.02"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="1.89"/>
+    </proof>
+    <proof
+     prover="0"
+     timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.01"/>
+    </proof>
+   </goal>
+   <goal
+    name="consistent"
+    locfile="programs/list_rev/../list_rev.mlw"
+    loclnum="281" loccnumb="7" loccnume="17"
+    sum="366137eb3a39d63632f1ec113b8fd39b"
+    proved="false"
+    expanded="true"
+    shape="fIais_listV0V2Iais_listV0V1F">
+    <proof
+     prover="4"
+     timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="unknown" time="0.01"/>
@@ -267,33 +283,35 @@
     <proof
      prover="3"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="10.50"/>
+     <result status="timeout" time="10.09"/>
     </proof>
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="unknown" time="0.10"/>
+     <result status="unknown" time="0.09"/>
     </proof>
    </goal>
    <goal
     name="WP_parameter list_rev"
-    locfile="examples/programs/list_rev/../list_rev.mlw"
+    locfile="programs/list_rev/../list_rev.mlw"
     loclnum="284" loccnumb="6" loccnume="14"
     expl="parameter list_rev"
-    sum="1314d0bcd5c7e203f6d3b10b25658bfe"
+    sum="743f729f726f1c6bd7fea024a8efa9ac"
     proved="true"
     expanded="false"
-    shape="iainfix =V3anullNasep_list_listV5V7V6Aais_listV5V6Aais_listV5V7Iainfix =V7amixfix []V4V3FIainfix =V6V3FIainfix =V5amixfix [<-]V4V3V2Fais_listV4V2Iasep_list_listV4V3V2Aais_listV4V2Aais_listV4V3FFFAasep_list_listV1V0anullAais_listV1anullAais_listV1V0Iais_listV1V0FF">
+    shape="iainfix =V3anullNasep_list_listV5V7V6Aais_listV5V6Aais_listV5V7Iainfix =V7amixfix []V4V3FIainfix =V6V3FIainfix =V5amixfix [&lt;-]V4V3V2Fais_listV4V2Iasep_list_listV4V3V2Aais_listV4V2Aais_listV4V3FFFAasep_list_listV1V0anullAais_listV1anullAais_listV1V0Iais_listV1V0FF">
     <label
-     name="expl:parameter list_rev">
-     </label>
+     name="expl:parameter list_rev"/>
     <proof
      prover="4"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.01"/>
@@ -301,69 +319,73 @@
    </goal>
    <goal
     name="frame_model"
-    locfile="examples/programs/list_rev/../list_rev.mlw"
+    locfile="programs/list_rev/../list_rev.mlw"
     loclnum="318" loccnumb="8" loccnume="19"
-    sum="447d0e59563d81c230e1de042dde3ef1"
+    sum="820f941c518ca9703d817b7d6d76c80d"
     proved="true"
     expanded="false"
-    shape="ainfix =amodelV1V2amodelamixfix [<-]V1V3V4V2Iain_ftV3alist_ftV1V2NIais_listV1V2Famodelamixfix [<-]V1V3V4V2">
+    shape="ainfix =amodelV1V2amodelamixfix [&lt;-]V1V3V4V2Iain_ftV3alist_ftV1V2NIais_listV1V2Famodelamixfix [&lt;-]V1V3V4V2">
     <proof
      prover="2"
      timelimit="10"
+     memlimit="0"
      edited="list_rev_M2_frame_model_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.50"/>
+     <result status="valid" time="0.47"/>
     </proof>
    </goal>
    <goal
     name="consistent_behv"
-    locfile="examples/programs/list_rev/../list_rev.mlw"
+    locfile="programs/list_rev/../list_rev.mlw"
     loclnum="325" loccnumb="7" loccnume="22"
-    sum="93e9064a451789022796008721ec6e67"
+    sum="e66607dc390f56a739a0e7716c952a59"
     proved="false"
     expanded="true"
     shape="fIais_listV0V2Iais_listV0V1F">
     <proof
      prover="4"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="10.08"/>
+     <result status="timeout" time="10.03"/>
     </proof>
     <proof
      prover="3"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="10.47"/>
+     <result status="timeout" time="10.31"/>
     </proof>
     <proof
      prover="0"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="unknown" time="0.11"/>
+     <result status="unknown" time="0.09"/>
     </proof>
    </goal>
    <goal
     name="WP_parameter list_rev_behv"
-    locfile="examples/programs/list_rev/../list_rev.mlw"
+    locfile="programs/list_rev/../list_rev.mlw"
     loclnum="328" loccnumb="6" loccnume="19"
     expl="parameter list_rev_behv"
-    sum="1fb6f61371058e377e5768d09f9714a2"
+    sum="2d44e99b1f30228c40143ae3265f7b98"
     proved="true"
     expanded="false"
-    shape="iainfix =V3anullNainfix =areverseamodelV1V0ainfix ++areverseamodelV5V7amodelV5V6Aasep_list_listV5V7V6Aais_listV5V6Aais_listV5V7Iainfix =V7amixfix []V4V3FIainfix =V6V3FIainfix =V5amixfix [<-]V4V3V2Fainfix =areverseamodelV1V0amodelV4V2Aais_listV4V2Iainfix =areverseamodelV1V0ainfix ++areverseamodelV4V3amodelV4V2Aasep_list_listV4V3V2Aais_listV4V2Aais_listV4V3FFFAainfix =areverseamodelV1V0ainfix ++areverseamodelV1V0amodelV1anullAasep_list_listV1V0anullAais_listV1anullAais_listV1V0Iais_listV1V0FF">
+    shape="iainfix =V3anullNainfix =areverseamodelV1V0ainfix ++areverseamodelV5V7amodelV5V6Aasep_list_listV5V7V6Aais_listV5V6Aais_listV5V7Iainfix =V7amixfix []V4V3FIainfix =V6V3FIainfix =V5amixfix [&lt;-]V4V3V2Fainfix =areverseamodelV1V0amodelV4V2Aais_listV4V2Iainfix =areverseamodelV1V0ainfix ++areverseamodelV4V3amodelV4V2Aasep_list_listV4V3V2Aais_listV4V2Aais_listV4V3FFFAainfix =areverseamodelV1V0ainfix ++areverseamodelV1V0amodelV1anullAasep_list_listV1V0anullAais_listV1anullAais_listV1V0Iais_listV1V0FF">
     <label
-     name="expl:parameter list_rev_behv">
-     </label>
+     name="expl:parameter list_rev_behv"/>
     <proof
      prover="4"
      timelimit="10"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="2.05"/>
+     <result status="valid" time="2.04"/>
     </proof>
    </goal>
   </theory>

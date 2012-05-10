@@ -1,11 +1,18 @@
 
+(** {1 Polymorphic Lists} *)
+
+(** {2 Basic theory of polymorphic lists} *)
+
 theory List
 
   type list 'a = Nil | Cons 'a (list 'a)
 
 end
 
+(** {2 Length of a list} *)
+
 theory Length
+
   use import int.Int
   use import List
 
@@ -21,6 +28,8 @@ theory Length
 
 end
 
+(** {2 Membership in a list} *)
+
 theory Mem
   use export List
 
@@ -31,7 +40,10 @@ theory Mem
 
 end
 
+(** {2 Nth element of a list} *)
+
 theory Nth
+
   use export List
   use export option.Option
   use import int.Int
@@ -43,7 +55,9 @@ theory Nth
 
 end
 
-theory HdTl "head and tail"
+(** {2 Head and tail} *)
+
+theory HdTl
 
   use export List
   use export option.Option
@@ -60,6 +74,8 @@ theory HdTl "head and tail"
 
 end
 
+(** {2 Relation between head, tail, and nth} *)
+
 theory NthHdTl
 
   use import int.Int
@@ -75,6 +91,7 @@ theory NthHdTl
 
 end
 
+(** {2 Appending two lists} *)
 
 theory Append
   use export List
@@ -109,6 +126,8 @@ theory Append
 
 end
 
+(** {2 Reversing a list} *)
+
 theory Reverse
 
   use export List
@@ -132,6 +151,8 @@ theory Reverse
     forall l: list 'a. length (reverse l) = length l
 
 end
+
+(** {2 Sorted lists for some order as parameter} *)
 
 theory Sorted
 
@@ -157,6 +178,8 @@ theory Sorted
 
 end
 
+(** {2 Sorted lists of integers} *)
+
 theory SortedInt
 
   use import int.Int
@@ -164,12 +187,14 @@ theory SortedInt
 
 end
 
+(** {2 Number of occurrences in a list} *)
+
 theory NumOcc
 
   use import int.Int
   use import List
 
-  (* number of occurence of x in l *)
+  (* number of occurrence of x in l *)
   function num_occ (x: 'a) (l: list 'a) : int =
     match l with
     | Nil      -> 0
@@ -188,6 +213,8 @@ theory NumOcc
     num_occ x (l1 ++ l2) = num_occ x l1 + num_occ x l2
 
 end
+
+(** {2 Permutation of lists} *)
 
 theory Permut
 
@@ -241,6 +268,8 @@ theory Permut
 
 end
 
+(** {2 List with pairwise distinct elements} *)
+
 theory Distinct
 
   use import List
@@ -262,7 +291,10 @@ theory Distinct
 
 end
 
+(** {2 Induction on lists} *)
+
 theory Induction
+
   use import List
 
   type elt
@@ -276,7 +308,10 @@ theory Induction
 
 end
 
+(** {2 Maps as lists of pairs} *)
+
 theory Map
+
   use import List
 
   type a
@@ -290,7 +325,10 @@ theory Map
     end
 end
 
+(** {2 Generic recursors on lists} *)
+
 theory FoldLeft
+
   use import List
 
   type a
@@ -302,9 +340,11 @@ theory FoldLeft
     | Nil      -> acc
     | Cons x r -> fold_left (f acc x) r
     end
+
 end
 
 theory FoldRight
+
   use import List
 
   type a
@@ -316,9 +356,13 @@ theory FoldRight
     | Nil      -> acc
     | Cons x r -> f x (fold_right r acc)
     end
+
 end
 
+(** {2 Importation of all list theories in one} *)
+
 theory ListRich
+
   use export List
   use export Length
   use export Mem
@@ -330,9 +374,10 @@ theory ListRich
   use export Sorted
   use export NumOcc
   use export Permut
+
 end
 
-(*
+(***
 Local Variables:
 compile-command: "make -C .. theories/list"
 End:

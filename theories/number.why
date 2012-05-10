@@ -1,5 +1,8 @@
 
-(* number theory *)
+(** {1 Number theory} *)
+
+
+(** {2 Parity properties} *)
 
 theory Parity
 
@@ -23,6 +26,8 @@ theory Parity
   lemma odd_2k1: forall k: int. odd (2 * k + 1)
 
 end
+
+(** {2 Divisibility} *)
 
 theory Divisibility
 
@@ -88,6 +93,8 @@ theory Divisibility
 
 end
 
+(** {2 Greateast Common Divisor} *)
+
 theory Gcd
 
   use export int.Int
@@ -111,7 +118,7 @@ theory Gcd
   clone algebra.AC with type t = int, function op = gcd,
     lemma Comm.Comm, lemma Assoc.Assoc
 
-  (* FIXME: Alt-Ergo proves gcd_0_pos even without gcd_unique *)
+  (*** FIXME: Alt-Ergo proves gcd_0_pos even without gcd_unique *)
   lemma gcd_0_pos: forall a: int. 0 <= a -> gcd a 0 = a
   lemma gcd_0_neg: forall a: int. a <  0 -> gcd a 0 = -a
 
@@ -122,18 +129,20 @@ theory Gcd
   use int.ComputerDivision
 
   lemma Gcd_computer_mod:
-    forall a b: int [gcd a (ComputerDivision.mod a b)].
-    b <> 0 -> gcd a (ComputerDivision.mod a b) = gcd a b
+    forall a b: int [gcd b (ComputerDivision.mod a b)].
+    b <> 0 -> gcd b (ComputerDivision.mod a b) = gcd a b
 
   use int.EuclideanDivision
 
   lemma Gcd_euclidean_mod:
-    forall a b g: int [gcd a (EuclideanDivision.mod a b)].
-    b <> 0 -> gcd a (EuclideanDivision.mod a b) = gcd a b
+    forall a b g: int [gcd b (EuclideanDivision.mod a b)].
+    b <> 0 -> gcd b (EuclideanDivision.mod a b) = gcd a b
 
   lemma gcd_mult: forall a b c: int. 0 <= c -> gcd (c * a) (c * b) = c * gcd a b
 
 end
+
+(** {2 Prime numbers} *)
 
 theory Prime
 
@@ -164,6 +173,8 @@ theory Prime
 
 end
 
+(** {2 Coprime numbers} *)
+
 theory Coprime
 
   use export int.Int
@@ -180,7 +191,7 @@ theory Coprime
 
 end
 
-(*
+(***
 Local Variables:
 compile-command: "make -C .. theories/number"
 End:

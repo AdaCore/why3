@@ -2,8 +2,16 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import ZArith.
 Require Import Rbase.
-Parameter pow2: Z -> Z.
+Require int.Int.
 
+(* Why3 assumption *)
+Definition implb(x:bool) (y:bool): bool := match (x,
+  y) with
+  | (true, false) => false
+  | (_, _) => true
+  end.
+
+Parameter pow2: Z -> Z.
 
 Axiom Power_0 : ((pow2 0%Z) = 1%Z).
 
@@ -145,26 +153,23 @@ Axiom pow2_63 : ((pow2 63%Z) = 9223372036854775808%Z).
 
 Parameter size: Z.
 
-
 Parameter bv : Type.
 
-Axiom size_positive : (0%Z <  size)%Z.
+Axiom size_positive : (1%Z <  size)%Z.
 
 Parameter nth: bv -> Z -> bool.
 
-
 Parameter bvzero: bv.
-
 
 Axiom Nth_zero : forall (n:Z), ((0%Z <= n)%Z /\ (n <  size)%Z) ->
   ((nth bvzero n) = false).
 
 Parameter bvone: bv.
 
-
 Axiom Nth_one : forall (n:Z), ((0%Z <= n)%Z /\ (n <  size)%Z) -> ((nth bvone
   n) = true).
 
+(* Why3 assumption *)
 Definition eq(v1:bv) (v2:bv): Prop := forall (n:Z), ((0%Z <= n)%Z /\
   (n <  size)%Z) -> ((nth v1 n) = (nth v2 n)).
 
@@ -172,18 +177,15 @@ Axiom extensionality : forall (v1:bv) (v2:bv), (eq v1 v2) -> (v1 = v2).
 
 Parameter bw_and: bv -> bv -> bv.
 
-
 Axiom Nth_bw_and : forall (v1:bv) (v2:bv) (n:Z), ((0%Z <= n)%Z /\
   (n <  size)%Z) -> ((nth (bw_and v1 v2) n) = (andb (nth v1 n) (nth v2 n))).
 
 Parameter bw_or: bv -> bv -> bv.
 
-
 Axiom Nth_bw_or : forall (v1:bv) (v2:bv) (n:Z), ((0%Z <= n)%Z /\
   (n <  size)%Z) -> ((nth (bw_or v1 v2) n) = (orb (nth v1 n) (nth v2 n))).
 
 Parameter bw_xor: bv -> bv -> bv.
-
 
 Axiom Nth_bw_xor : forall (v1:bv) (v2:bv) (n:Z), ((0%Z <= n)%Z /\
   (n <  size)%Z) -> ((nth (bw_xor v1 v2) n) = (xorb (nth v1 n) (nth v2 n))).
@@ -206,12 +208,10 @@ Axiom Nth_bw_xor_v2false : forall (v1:bv) (v2:bv) (n:Z), (((0%Z <= n)%Z /\
 
 Parameter bw_not: bv -> bv.
 
-
 Axiom Nth_bw_not : forall (v:bv) (n:Z), ((0%Z <= n)%Z /\ (n <  size)%Z) ->
   ((nth (bw_not v) n) = (negb (nth v n))).
 
 Parameter lsr: bv -> Z -> bv.
-
 
 Axiom lsr_nth_low : forall (b:bv) (n:Z) (s:Z), (((0%Z <= n)%Z /\
   (n <  size)%Z) /\ (((0%Z <= s)%Z /\ (s <  size)%Z) /\
@@ -223,7 +223,6 @@ Axiom lsr_nth_high : forall (b:bv) (n:Z) (s:Z), (((0%Z <= n)%Z /\
 
 Parameter asr: bv -> Z -> bv.
 
-
 Axiom asr_nth_low : forall (b:bv) (n:Z) (s:Z), ((0%Z <= n)%Z /\
   (n <  size)%Z) -> ((0%Z <= s)%Z -> (((n + s)%Z <  size)%Z -> ((nth (asr b
   s) n) = (nth b (n + s)%Z)))).
@@ -234,7 +233,6 @@ Axiom asr_nth_high : forall (b:bv) (n:Z) (s:Z), ((0%Z <= n)%Z /\
 
 Parameter lsl: bv -> Z -> bv.
 
-
 Axiom lsl_nth_high : forall (b:bv) (n:Z) (s:Z), ((0%Z <= n)%Z /\
   (n <  size)%Z) -> ((0%Z <= s)%Z -> ((0%Z <= (n - s)%Z)%Z -> ((nth (lsl b s)
   n) = (nth b (n - s)%Z)))).
@@ -244,7 +242,6 @@ Axiom lsl_nth_low : forall (b:bv) (n:Z) (s:Z), ((0%Z <= n)%Z /\
   n) = false))).
 
 Parameter to_nat_sub: bv -> Z -> Z -> Z.
-
 
 Axiom to_nat_sub_zero : forall (b:bv) (j:Z) (i:Z), (((0%Z <= i)%Z /\
   (i <= j)%Z) /\ (j <  size)%Z) -> (((nth b j) = false) -> ((to_nat_sub b j
@@ -262,19 +259,18 @@ Axiom to_nat_of_zero2 : forall (b:bv) (i:Z) (j:Z), (((j <  size)%Z /\
   (i <  k)%Z) -> ((nth b k) = false)) -> ((to_nat_sub b j
   0%Z) = (to_nat_sub b i 0%Z))).
 
-Axiom to_nat_of_zero : forall (b:bv) (i:Z) (j:Z), (((j <  size)%Z /\
-  (i <= j)%Z) /\ (0%Z <= i)%Z) -> ((forall (k:Z), ((k <= j)%Z /\
-  (i <= k)%Z) -> ((nth b k) = false)) -> ((to_nat_sub b j i) = 0%Z)).
+Axiom to_nat_of_zero : forall (b:bv) (i:Z) (j:Z), ((j <  size)%Z /\
+  (0%Z <= i)%Z) -> ((forall (k:Z), ((k <= j)%Z /\ (i <= k)%Z) -> ((nth b
+  k) = false)) -> ((to_nat_sub b j i) = 0%Z)).
 
 Axiom to_nat_of_one : forall (b:bv) (i:Z) (j:Z), (((j <  size)%Z /\
   (i <= j)%Z) /\ (0%Z <= i)%Z) -> ((forall (k:Z), ((k <= j)%Z /\
   (i <= k)%Z) -> ((nth b k) = true)) -> ((to_nat_sub b j
   i) = ((pow2 ((j - i)%Z + 1%Z)%Z) - 1%Z)%Z)).
 
-(* YOU MAY EDIT THE CONTEXT BELOW *)
 Open Scope Z_scope.
-(* DO NOT EDIT BELOW *)
 
+(* Why3 goal *)
 Theorem to_nat_sub_footprint : forall (b1:bv) (b2:bv) (j:Z) (i:Z),
   ((j <  size)%Z /\ (0%Z <= i)%Z) -> ((forall (k:Z), ((i <= k)%Z /\
   (k <= j)%Z) -> ((nth b1 k) = (nth b2 k))) -> ((to_nat_sub b1 j
@@ -343,6 +339,5 @@ exact H.
 exact Hij.
 
 Qed.
-(* DO NOT EDIT BELOW *)
 
 

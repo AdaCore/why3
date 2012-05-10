@@ -3,9 +3,9 @@
        | formula "->"  formula ; implication
        | formula "<->" formula ; equivalence
        | formula "/\" formula ; conjunction
-       | formula "&&"  formula ; asymmetric conjunction
+       | formula "&&"  formula ; asymmetric conj.
        | formula "\/"  formula ; disjunction
-       | formula "||"  formula ; asymmetric disjunction
+       | formula "||"  formula ; asymmetric disj.
        | "not" formula         ; negation
        | lqualid 	       ; symbol
        | prefix-op term        ;

@@ -1,9 +1,10 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  Copyright (C) 2010-2011                                               *)
+(*  Copyright (C) 2010-2012                                               *)
 (*    François Bobot                                                      *)
 (*    Jean-Christophe Filliâtre                                           *)
 (*    Claude Marché                                                       *)
+(*    Guillaume Melquiond                                                 *)
 (*    Andrei Paskevich                                                    *)
 (*                                                                        *)
 (*  This software is free software; you can redistribute it and/or        *)
@@ -802,8 +803,11 @@ let ps_equ =
 let t_equ t1 t2 = ps_app ps_equ [t1; t2]
 let t_neq t1 t2 = t_not (ps_app ps_equ [t1; t2])
 
-let fs_true  = create_fsymbol (id_fresh "True") [] ty_bool
-let fs_false = create_fsymbol (id_fresh "False") [] ty_bool
+let fs_bool_true  = create_fsymbol (id_fresh "True") [] ty_bool
+let fs_bool_false = create_fsymbol (id_fresh "False") [] ty_bool
+
+let t_bool_true  = fs_app fs_bool_true [] ty_bool
+let t_bool_false = fs_app fs_bool_false [] ty_bool
 
 let fs_tuple_ids = Hid.create 17
 

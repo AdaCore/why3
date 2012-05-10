@@ -2,26 +2,32 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import ZArith.
 Require Import Rbase.
+Require int.Int.
+
+(* Why3 assumption *)
 Definition unit  := unit.
 
-Parameter mark : Type.
+Parameter qtmark : Type.
 
-Parameter at1: forall (a:Type), a -> mark  -> a.
-
+Parameter at1: forall (a:Type), a -> qtmark -> a.
 Implicit Arguments at1.
 
-Parameter old: forall (a:Type), a  -> a.
-
+Parameter old: forall (a:Type), a -> a.
 Implicit Arguments old.
+
+(* Why3 assumption *)
+Definition implb(x:bool) (y:bool): bool := match (x,
+  y) with
+  | (true, false) => false
+  | (_, _) => true
+  end.
 
 Parameter map : forall (a:Type) (b:Type), Type.
 
-Parameter get: forall (a:Type) (b:Type), (map a b) -> a  -> b.
-
+Parameter get: forall (a:Type) (b:Type), (map a b) -> a -> b.
 Implicit Arguments get.
 
-Parameter set: forall (a:Type) (b:Type), (map a b) -> a -> b  -> (map a b).
-
+Parameter set: forall (a:Type) (b:Type), (map a b) -> a -> b -> (map a b).
 Implicit Arguments set.
 
 Axiom Select_eq : forall (a:Type) (b:Type), forall (m:(map a b)),
@@ -32,91 +38,101 @@ Axiom Select_neq : forall (a:Type) (b:Type), forall (m:(map a b)),
   forall (a1:a) (a2:a), forall (b1:b), (~ (a1 = a2)) -> ((get (set m a1 b1)
   a2) = (get m a2)).
 
-Parameter const: forall (b:Type) (a:Type), b  -> (map a b).
-
+Parameter const: forall (b:Type) (a:Type), b -> (map a b).
 Set Contextual Implicit.
 Implicit Arguments const.
 Unset Contextual Implicit.
 
-Axiom Const : forall (b:Type) (a:Type), forall (b1:b) (a1:a), ((get (const(
-  b1):(map a b)) a1) = b1).
+Axiom Const : forall (b:Type) (a:Type), forall (b1:b) (a1:a),
+  ((get (const b1:(map a b)) a1) = b1).
 
+(* Why3 assumption *)
 Inductive array (a:Type) :=
   | mk_array : Z -> (map Z a) -> array a.
 Implicit Arguments mk_array.
 
-Definition elts (a:Type)(u:(array a)): (map Z a) :=
-  match u with
-  | mk_array _ elts1 => elts1
+(* Why3 assumption *)
+Definition elts (a:Type)(v:(array a)): (map Z a) :=
+  match v with
+  | (mk_array x x1) => x1
   end.
 Implicit Arguments elts.
 
-Definition length (a:Type)(u:(array a)): Z :=
-  match u with
-  | mk_array length1 _ => length1
+(* Why3 assumption *)
+Definition length (a:Type)(v:(array a)): Z :=
+  match v with
+  | (mk_array x x1) => x
   end.
 Implicit Arguments length.
 
+(* Why3 assumption *)
 Definition get1 (a:Type)(a1:(array a)) (i:Z): a := (get (elts a1) i).
 Implicit Arguments get1.
 
+(* Why3 assumption *)
 Definition set1 (a:Type)(a1:(array a)) (i:Z) (v:a): (array a) :=
-  match a1 with
-  | mk_array xcl0 _ => (mk_array xcl0 (set (elts a1) i v))
-  end.
+  (mk_array (length a1) (set (elts a1) i v)).
 Implicit Arguments set1.
 
+(* Why3 assumption *)
 Inductive sparse_array (a:Type) :=
   | mk_sparse_array : (array a) -> (array Z) -> (array Z) -> Z
       -> a -> sparse_array a.
 Implicit Arguments mk_sparse_array.
 
-Definition back (a:Type)(u:(sparse_array a)): (array Z) :=
-  match u with
-  | mk_sparse_array _ _ back1 _ _ => back1
-  end.
-Implicit Arguments back.
-
-Definition card (a:Type)(u:(sparse_array a)): Z :=
-  match u with
-  | mk_sparse_array _ _ _ card1 _ => card1
-  end.
-Implicit Arguments card.
-
-Definition def (a:Type)(u:(sparse_array a)): a :=
-  match u with
-  | mk_sparse_array _ _ _ _ def1 => def1
+(* Why3 assumption *)
+Definition def (a:Type)(v:(sparse_array a)): a :=
+  match v with
+  | (mk_sparse_array x x1 x2 x3 x4) => x4
   end.
 Implicit Arguments def.
 
-Definition index (a:Type)(u:(sparse_array a)): (array Z) :=
-  match u with
-  | mk_sparse_array _ index1 _ _ _ => index1
+(* Why3 assumption *)
+Definition card (a:Type)(v:(sparse_array a)): Z :=
+  match v with
+  | (mk_sparse_array x x1 x2 x3 x4) => x3
+  end.
+Implicit Arguments card.
+
+(* Why3 assumption *)
+Definition back (a:Type)(v:(sparse_array a)): (array Z) :=
+  match v with
+  | (mk_sparse_array x x1 x2 x3 x4) => x2
+  end.
+Implicit Arguments back.
+
+(* Why3 assumption *)
+Definition index (a:Type)(v:(sparse_array a)): (array Z) :=
+  match v with
+  | (mk_sparse_array x x1 x2 x3 x4) => x1
   end.
 Implicit Arguments index.
 
-Definition values (a:Type)(u:(sparse_array a)): (array a) :=
-  match u with
-  | mk_sparse_array values1 _ _ _ _ => values1
+(* Why3 assumption *)
+Definition values (a:Type)(v:(sparse_array a)): (array a) :=
+  match v with
+  | (mk_sparse_array x x1 x2 x3 x4) => x
   end.
 Implicit Arguments values.
 
+(* Why3 assumption *)
 Definition is_elt (a:Type)(a1:(sparse_array a)) (i:Z): Prop :=
   ((0%Z <= (get1 (index a1) i))%Z /\ ((get1 (index a1) i) <  (card a1))%Z) /\
   ((get1 (back a1) (get1 (index a1) i)) = i).
 Implicit Arguments is_elt.
 
-Parameter value: forall (a:Type), (sparse_array a) -> Z  -> a.
-
+Parameter value: forall (a:Type), (sparse_array a) -> Z -> a.
 Implicit Arguments value.
 
 Axiom value_def : forall (a:Type), forall (a1:(sparse_array a)) (i:Z),
   ((is_elt a1 i) -> ((value a1 i) = (get1 (values a1) i))) /\ ((~ (is_elt a1
   i)) -> ((value a1 i) = (def a1))).
 
+(* Why3 assumption *)
 Definition length1 (a:Type)(a1:(sparse_array a)): Z := (length (values a1)).
 Implicit Arguments length1.
 
+(* Why3 assumption *)
 Definition sa_inv (a:Type)(a1:(sparse_array a)): Prop :=
   (((0%Z <= (card a1))%Z /\ ((card a1) <= (length1 a1))%Z) /\
   ((length1 a1) <= 1000%Z)%Z) /\
@@ -127,20 +143,27 @@ Definition sa_inv (a:Type)(a1:(sparse_array a)): Prop :=
   (get1 (back a1) i)) = i))).
 Implicit Arguments sa_inv.
 
+(* Why3 assumption *)
 Definition injective(a:(map Z Z)) (n:Z): Prop := forall (i:Z) (j:Z),
   ((0%Z <= i)%Z /\ (i <  n)%Z) -> (((0%Z <= j)%Z /\ (j <  n)%Z) ->
   ((~ (i = j)) -> ~ ((get a i) = (get a j)))).
 
+(* Why3 assumption *)
 Definition surjective(a:(map Z Z)) (n:Z): Prop := forall (i:Z),
   ((0%Z <= i)%Z /\ (i <  n)%Z) -> exists j:Z, ((0%Z <= j)%Z /\ (j <  n)%Z) /\
   ((get a j) = i).
 
+(* Why3 assumption *)
 Definition range(a:(map Z Z)) (n:Z): Prop := forall (i:Z), ((0%Z <= i)%Z /\
   (i <  n)%Z) -> ((0%Z <= (get a i))%Z /\ ((get a i) <  n)%Z).
 
 Axiom injective_surjective : forall (a:(map Z Z)) (n:Z), (injective a n) ->
   ((range a n) -> (surjective a n)).
 
+Require Import Why3.
+Ltac ae := why3 "alt-ergo".
+
+(* Why3 goal *)
 Theorem permutation : forall (a:Type), forall (a1:(sparse_array a)),
   (sa_inv a1) -> (((card a1) = (length1 a1)) -> forall (i:Z),
   ((0%Z <= i)%Z /\ (i <  (length1 a1))%Z) -> (is_elt a1 i)).
@@ -151,29 +174,11 @@ intro H; decompose [and] H; clear H.
 clear a_values a_def H0 H3 H4.
 subst n1 n2.
 intros. subst a_card.
-assert (inj: injective a_back n0).
-red; intros.
-red; intro.
-generalize (H5 i0 H).
-generalize (H5 j H1).
-intuition.
-apply H2.
-rewrite <- H11.
-rewrite <- H12.
-apply f_equal; assumption.
-assert (rng: range a_back n0).
-red; intros.
-generalize (H5 i0); intuition.
+assert (inj: injective a_back n0) by ae.
+assert (rng: range a_back n0) by ae.
 generalize (injective_surjective a_back n0 inj rng); intro surj.
 destruct (surj i H0) as (j, (hj1, hj2)).
-generalize (H5 j hj1); intros (hi1, hi2).
-split.
-rewrite <- hj2.
-rewrite hi2; auto.
-rewrite <- hj2.
-generalize (H5 j hj1); intuition.
-rewrite H8; auto.
+ae.
 Qed.
-(* DO NOT EDIT BELOW *)
 
 

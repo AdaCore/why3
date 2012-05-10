@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "why3session.dtd">
+<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
 <why3session
  name="programs/power/why3session.xml">
  <prover
@@ -13,7 +13,7 @@
  <prover
   id="2"
   name="Coq"
-  version="8.3pl3"/>
+  version="8.3pl4"/>
  <prover
   id="3"
   name="Z3"
@@ -39,6 +39,7 @@
     <proof
      prover="3"
      timelimit="2"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.01"/>
@@ -46,6 +47,7 @@
     <proof
      prover="1"
      timelimit="2"
+     memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
@@ -58,14 +60,15 @@
     sum="9762280403897367fe27961be8abcd84"
     proved="true"
     expanded="true"
-    shape="ainfix =apowerV0ainfix +V1V2ainfix *apowerV0V1apowerV0V2Iainfix <=c0V2Iainfix <=c0V1F">
+    shape="ainfix =apowerV0ainfix +V1V2ainfix *apowerV0V1apowerV0V2Iainfix &lt;=c0V2Iainfix &lt;=c0V1F">
     <proof
      prover="2"
-     timelimit="2"
+     timelimit="10"
+     memlimit="0"
      edited="power_Power_Power_sum_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.52"/>
+     <result status="valid" time="1.19"/>
     </proof>
    </goal>
    <goal
@@ -75,14 +78,15 @@
     sum="e99359f55abd122604307bcf989669a8"
     proved="true"
     expanded="true"
-    shape="ainfix =apowerV0ainfix *V1V2apowerapowerV0V1V2Iainfix <=c0V2Iainfix <=c0V1F">
+    shape="ainfix =apowerV0ainfix *V1V2apowerapowerV0V1V2Iainfix &lt;=c0V2Iainfix &lt;=c0V1F">
     <proof
      prover="2"
      timelimit="2"
+     memlimit="0"
      edited="power_Power_Power_mult_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.58"/>
+     <result status="valid" time="0.51"/>
     </proof>
    </goal>
    <goal
@@ -92,14 +96,15 @@
     sum="b9b87f974a9380e1286402f7dae71e1b"
     proved="true"
     expanded="true"
-    shape="ainfix =apowerainfix *V0V1V2ainfix *apowerV0V2apowerV1V2Iainfix <=c0V2F">
+    shape="ainfix =apowerainfix *V0V1V2ainfix *apowerV0V2apowerV1V2Iainfix &lt;=c0V2F">
     <proof
      prover="2"
      timelimit="5"
+     memlimit="0"
      edited="power_Power_Power_mult2_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.51"/>
+     <result status="valid" time="0.46"/>
     </proof>
    </goal>
   </theory>
@@ -117,16 +122,16 @@
     sum="52fa687dcf1a4190fcc17725f0bcd80d"
     proved="true"
     expanded="true"
-    shape="iainfix =V1c0ainfix =c1apowerV0V1LapowerV0adivV1c2ainfix =iainfix =amodV1c2c0ainfix *V2V2ainfix *ainfix *V2V2V0apowerV0V1Aainfix <=c0adivV1c2Aainfix <adivV1c2V1Aainfix <=c0V1Iainfix <=c0V1FF">
+    shape="iainfix =V1c0ainfix =c1apowerV0V1LapowerV0adivV1c2ainfix =iainfix =amodV1c2c0ainfix *V2V2ainfix *ainfix *V2V2V0apowerV0V1Aainfix &lt;=c0adivV1c2Aainfix &lt;adivV1c2V1Aainfix &lt;=c0V1Iainfix &lt;=c0V1FF">
     <label
-     name="expl:parameter fast_exp">
-     </label>
+     name="expl:parameter fast_exp"/>
     <proof
      prover="0"
      timelimit="2"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.66"/>
+     <result status="valid" time="0.65"/>
     </proof>
    </goal>
    <goal
@@ -137,10 +142,9 @@
     sum="54bb42459f1b0e5d98f727d0b550ffaf"
     proved="true"
     expanded="true"
-    shape="iainfix >V2c0iainfix =amodV2c2c1ainfix <V7V2Aainfix <=c0V2Aainfix =ainfix *V5apowerV6V7apowerV0V1Aainfix <=c0V7Iainfix =V7adivV2c2FIainfix =V6ainfix *V3V3FIainfix =V5ainfix *V4V3Fainfix <V9V2Aainfix <=c0V2Aainfix =ainfix *V4apowerV8V9apowerV0V1Aainfix <=c0V9Iainfix =V9adivV2c2FIainfix =V8ainfix *V3V3Fainfix =V4apowerV0V1Iainfix =ainfix *V4apowerV3V2apowerV0V1Aainfix <=c0V2FFFAainfix =ainfix *c1apowerV0V1apowerV0V1Aainfix <=c0V1Iainfix <=c0V1FF">
+    shape="iainfix &gt;V2c0iainfix =amodV2c2c1ainfix &lt;V7V2Aainfix &lt;=c0V2Aainfix =ainfix *V5apowerV6V7apowerV0V1Aainfix &lt;=c0V7Iainfix =V7adivV2c2FIainfix =V6ainfix *V3V3FIainfix =V5ainfix *V4V3Fainfix &lt;V9V2Aainfix &lt;=c0V2Aainfix =ainfix *V4apowerV8V9apowerV0V1Aainfix &lt;=c0V9Iainfix =V9adivV2c2FIainfix =V8ainfix *V3V3Fainfix =V4apowerV0V1Iainfix =ainfix *V4apowerV3V2apowerV0V1Aainfix &lt;=c0V2FFFAainfix =ainfix *c1apowerV0V1apowerV0V1Aainfix &lt;=c0V1Iainfix &lt;=c0V1FF">
     <label
-     name="expl:parameter fast_exp_imperative">
-     </label>
+     name="expl:parameter fast_exp_imperative"/>
     <transf
      name="split_goal"
      proved="true"
@@ -153,13 +157,13 @@
       sum="c4fac372e5383b3478298856a5aa6edc"
       proved="true"
       expanded="true"
-      shape="ainfix =ainfix *c1apowerV0V1apowerV0V1Aainfix <=c0V1Iainfix <=c0V1FF">
+      shape="ainfix =ainfix *c1apowerV0V1apowerV0V1Aainfix &lt;=c0V1Iainfix &lt;=c0V1FF">
       <label
-       name="expl:parameter fast_exp_imperative">
-       </label>
+       name="expl:parameter fast_exp_imperative"/>
       <proof
        prover="3"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -167,6 +171,7 @@
       <proof
        prover="0"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -174,6 +179,7 @@
       <proof
        prover="1"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -187,23 +193,24 @@
       sum="1802dccb142bbacf78c0b6cc5cc92fd4"
       proved="true"
       expanded="true"
-      shape="ainfix =ainfix *V5apowerV6V7apowerV0V1Aainfix <=c0V7Iainfix =V7adivV2c2FIainfix =V6ainfix *V3V3FIainfix =V5ainfix *V4V3FIainfix =amodV2c2c1Iainfix >V2c0Iainfix =ainfix *V4apowerV3V2apowerV0V1Aainfix <=c0V2FFFIainfix <=c0V1FF">
+      shape="ainfix =ainfix *V5apowerV6V7apowerV0V1Aainfix &lt;=c0V7Iainfix =V7adivV2c2FIainfix =V6ainfix *V3V3FIainfix =V5ainfix *V4V3FIainfix =amodV2c2c1Iainfix &gt;V2c0Iainfix =ainfix *V4apowerV3V2apowerV0V1Aainfix &lt;=c0V2FFFIainfix &lt;=c0V1FF">
       <label
-       name="expl:parameter fast_exp_imperative">
-       </label>
+       name="expl:parameter fast_exp_imperative"/>
       <proof
        prover="1"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.05"/>
+       <result status="valid" time="0.06"/>
       </proof>
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.38"/>
+       <result status="valid" time="0.37"/>
       </proof>
      </goal>
      <goal
@@ -214,30 +221,32 @@
       sum="407eb0177dbae812bbdd96bd08ae63eb"
       proved="true"
       expanded="true"
-      shape="ainfix <V7V2Aainfix <=c0V2Iainfix =ainfix *V5apowerV6V7apowerV0V1Aainfix <=c0V7Iainfix =V7adivV2c2FIainfix =V6ainfix *V3V3FIainfix =V5ainfix *V4V3FIainfix =amodV2c2c1Iainfix >V2c0Iainfix =ainfix *V4apowerV3V2apowerV0V1Aainfix <=c0V2FFFIainfix <=c0V1FF">
+      shape="ainfix &lt;V7V2Aainfix &lt;=c0V2Iainfix =ainfix *V5apowerV6V7apowerV0V1Aainfix &lt;=c0V7Iainfix =V7adivV2c2FIainfix =V6ainfix *V3V3FIainfix =V5ainfix *V4V3FIainfix =amodV2c2c1Iainfix &gt;V2c0Iainfix =ainfix *V4apowerV3V2apowerV0V1Aainfix &lt;=c0V2FFFIainfix &lt;=c0V1FF">
       <label
-       name="expl:parameter fast_exp_imperative">
-       </label>
+       name="expl:parameter fast_exp_imperative"/>
       <proof
        prover="3"
        timelimit="5"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="0"
-       timelimit="10"
+       prover="1"
+       timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.09"/>
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.10"/>
       </proof>
      </goal>
      <goal
@@ -248,10 +257,9 @@
       sum="9516c33632eb87e3674420d6a7db3900"
       proved="true"
       expanded="true"
-      shape="ainfix =ainfix *V4apowerV5V6apowerV0V1Aainfix <=c0V6Iainfix =V6adivV2c2FIainfix =V5ainfix *V3V3FIainfix =amodV2c2c1NIainfix >V2c0Iainfix =ainfix *V4apowerV3V2apowerV0V1Aainfix <=c0V2FFFIainfix <=c0V1FF">
+      shape="ainfix =ainfix *V4apowerV5V6apowerV0V1Aainfix &lt;=c0V6Iainfix =V6adivV2c2FIainfix =V5ainfix *V3V3FIainfix =amodV2c2c1NIainfix &gt;V2c0Iainfix =ainfix *V4apowerV3V2apowerV0V1Aainfix &lt;=c0V2FFFIainfix &lt;=c0V1FF">
       <label
-       name="expl:parameter fast_exp_imperative">
-       </label>
+       name="expl:parameter fast_exp_imperative"/>
       <transf
        name="split_goal"
        proved="true"
@@ -264,13 +272,13 @@
         sum="8fb404c15f4b8e074f0ac4d521abc4b2"
         proved="true"
         expanded="true"
-        shape="ainfix <=c0V6Iainfix =V6adivV2c2FIainfix =V5ainfix *V3V3FIainfix =amodV2c2c1NIainfix >V2c0Iainfix =ainfix *V4apowerV3V2apowerV0V1Aainfix <=c0V2FFFIainfix <=c0V1FF">
+        shape="ainfix &lt;=c0V6Iainfix =V6adivV2c2FIainfix =V5ainfix *V3V3FIainfix =amodV2c2c1NIainfix &gt;V2c0Iainfix =ainfix *V4apowerV3V2apowerV0V1Aainfix &lt;=c0V2FFFIainfix &lt;=c0V1FF">
         <label
-         name="expl:parameter fast_exp_imperative">
-         </label>
+         name="expl:parameter fast_exp_imperative"/>
         <proof
          prover="3"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -278,6 +286,7 @@
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -285,9 +294,10 @@
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.00"/>
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
        <goal
@@ -298,17 +308,17 @@
         sum="fc7d5238adf8fc223ac176f55479ad14"
         proved="true"
         expanded="true"
-        shape="ainfix =ainfix *V4apowerV5V6apowerV0V1Iainfix =V6adivV2c2FIainfix =V5ainfix *V3V3FIainfix =amodV2c2c1NIainfix >V2c0Iainfix =ainfix *V4apowerV3V2apowerV0V1Aainfix <=c0V2FFFIainfix <=c0V1FF">
+        shape="ainfix =ainfix *V4apowerV5V6apowerV0V1Iainfix =V6adivV2c2FIainfix =V5ainfix *V3V3FIainfix =amodV2c2c1NIainfix &gt;V2c0Iainfix =ainfix *V4apowerV3V2apowerV0V1Aainfix &lt;=c0V2FFFIainfix &lt;=c0V1FF">
         <label
-         name="expl:parameter fast_exp_imperative">
-         </label>
+         name="expl:parameter fast_exp_imperative"/>
         <proof
          prover="2"
          timelimit="5"
+         memlimit="0"
          edited="power_WP_M_WP_parameter_fast_exp_imperative_3.v"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.63"/>
+         <result status="valid" time="0.60"/>
         </proof>
        </goal>
       </transf>
@@ -321,13 +331,13 @@
       sum="dd6d50af777c7d10f7a97a5a9daf0c39"
       proved="true"
       expanded="true"
-      shape="ainfix <V6V2Aainfix <=c0V2Iainfix =ainfix *V4apowerV5V6apowerV0V1Aainfix <=c0V6Iainfix =V6adivV2c2FIainfix =V5ainfix *V3V3FIainfix =amodV2c2c1NIainfix >V2c0Iainfix =ainfix *V4apowerV3V2apowerV0V1Aainfix <=c0V2FFFIainfix <=c0V1FF">
+      shape="ainfix &lt;V6V2Aainfix &lt;=c0V2Iainfix =ainfix *V4apowerV5V6apowerV0V1Aainfix &lt;=c0V6Iainfix =V6adivV2c2FIainfix =V5ainfix *V3V3FIainfix =amodV2c2c1NIainfix &gt;V2c0Iainfix =ainfix *V4apowerV3V2apowerV0V1Aainfix &lt;=c0V2FFFIainfix &lt;=c0V1FF">
       <label
-       name="expl:parameter fast_exp_imperative">
-       </label>
+       name="expl:parameter fast_exp_imperative"/>
       <proof
        prover="3"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -335,16 +345,18 @@
       <proof
        prover="1"
        timelimit="5"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.00"/>
+       <result status="valid" time="0.01"/>
       </proof>
       <proof
        prover="0"
        timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.04"/>
+       <result status="valid" time="0.05"/>
       </proof>
      </goal>
      <goal
@@ -355,10 +367,9 @@
       sum="4256da97e8d3b66a11209149bf47594f"
       proved="true"
       expanded="true"
-      shape="ainfix =V4apowerV0V1Iainfix >V2c0NIainfix =ainfix *V4apowerV3V2apowerV0V1Aainfix <=c0V2FFFIainfix <=c0V1FF">
+      shape="ainfix =V4apowerV0V1Iainfix &gt;V2c0NIainfix =ainfix *V4apowerV3V2apowerV0V1Aainfix &lt;=c0V2FFFIainfix &lt;=c0V1FF">
       <label
-       name="expl:parameter fast_exp_imperative">
-       </label>
+       name="expl:parameter fast_exp_imperative"/>
       <transf
        name="split_goal"
        proved="true"
@@ -371,13 +382,13 @@
         sum="4256da97e8d3b66a11209149bf47594f"
         proved="true"
         expanded="true"
-        shape="ainfix =V4apowerV0V1Iainfix >V2c0NIainfix =ainfix *V4apowerV3V2apowerV0V1Aainfix <=c0V2FFFIainfix <=c0V1FF">
+        shape="ainfix =V4apowerV0V1Iainfix &gt;V2c0NIainfix =ainfix *V4apowerV3V2apowerV0V1Aainfix &lt;=c0V2FFFIainfix &lt;=c0V1FF">
         <label
-         name="expl:parameter fast_exp_imperative">
-         </label>
+         name="expl:parameter fast_exp_imperative"/>
         <proof
          prover="1"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.00"/>
@@ -385,9 +396,10 @@
         <proof
          prover="0"
          timelimit="5"
+         memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.01"/>
+         <result status="valid" time="0.00"/>
         </proof>
        </goal>
       </transf>

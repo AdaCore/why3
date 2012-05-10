@@ -2,6 +2,11 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import ZArith.
 Require Import Rbase.
+Require int.Int.
+Require int.Abs.
+Require int.EuclideanDivision.
+
+(* Why3 assumption *)
 Definition implb(x:bool) (y:bool): bool := match (x,
   y) with
   | (true, false) => false
@@ -9,7 +14,6 @@ Definition implb(x:bool) (y:bool): bool := match (x,
   end.
 
 Parameter pow2: Z -> Z.
-
 
 Axiom Power_0 : ((pow2 0%Z) = 1%Z).
 
@@ -151,26 +155,23 @@ Axiom pow2_63 : ((pow2 63%Z) = 9223372036854775808%Z).
 
 Parameter size: Z.
 
-
 Parameter bv : Type.
 
-Axiom size_positive : (0%Z <  size)%Z.
+Axiom size_positive : (1%Z <  size)%Z.
 
 Parameter nth: bv -> Z -> bool.
 
-
 Parameter bvzero: bv.
-
 
 Axiom Nth_zero : forall (n:Z), ((0%Z <= n)%Z /\ (n <  size)%Z) ->
   ((nth bvzero n) = false).
 
 Parameter bvone: bv.
 
-
 Axiom Nth_one : forall (n:Z), ((0%Z <= n)%Z /\ (n <  size)%Z) -> ((nth bvone
   n) = true).
 
+(* Why3 assumption *)
 Definition eq(v1:bv) (v2:bv): Prop := forall (n:Z), ((0%Z <= n)%Z /\
   (n <  size)%Z) -> ((nth v1 n) = (nth v2 n)).
 
@@ -178,18 +179,15 @@ Axiom extensionality : forall (v1:bv) (v2:bv), (eq v1 v2) -> (v1 = v2).
 
 Parameter bw_and: bv -> bv -> bv.
 
-
 Axiom Nth_bw_and : forall (v1:bv) (v2:bv) (n:Z), ((0%Z <= n)%Z /\
   (n <  size)%Z) -> ((nth (bw_and v1 v2) n) = (andb (nth v1 n) (nth v2 n))).
 
 Parameter bw_or: bv -> bv -> bv.
 
-
 Axiom Nth_bw_or : forall (v1:bv) (v2:bv) (n:Z), ((0%Z <= n)%Z /\
   (n <  size)%Z) -> ((nth (bw_or v1 v2) n) = (orb (nth v1 n) (nth v2 n))).
 
 Parameter bw_xor: bv -> bv -> bv.
-
 
 Axiom Nth_bw_xor : forall (v1:bv) (v2:bv) (n:Z), ((0%Z <= n)%Z /\
   (n <  size)%Z) -> ((nth (bw_xor v1 v2) n) = (xorb (nth v1 n) (nth v2 n))).
@@ -212,12 +210,10 @@ Axiom Nth_bw_xor_v2false : forall (v1:bv) (v2:bv) (n:Z), (((0%Z <= n)%Z /\
 
 Parameter bw_not: bv -> bv.
 
-
 Axiom Nth_bw_not : forall (v:bv) (n:Z), ((0%Z <= n)%Z /\ (n <  size)%Z) ->
   ((nth (bw_not v) n) = (negb (nth v n))).
 
 Parameter lsr: bv -> Z -> bv.
-
 
 Axiom lsr_nth_low : forall (b:bv) (n:Z) (s:Z), (((0%Z <= n)%Z /\
   (n <  size)%Z) /\ (((0%Z <= s)%Z /\ (s <  size)%Z) /\
@@ -229,7 +225,6 @@ Axiom lsr_nth_high : forall (b:bv) (n:Z) (s:Z), (((0%Z <= n)%Z /\
 
 Parameter asr: bv -> Z -> bv.
 
-
 Axiom asr_nth_low : forall (b:bv) (n:Z) (s:Z), ((0%Z <= n)%Z /\
   (n <  size)%Z) -> ((0%Z <= s)%Z -> (((n + s)%Z <  size)%Z -> ((nth (asr b
   s) n) = (nth b (n + s)%Z)))).
@@ -239,7 +234,6 @@ Axiom asr_nth_high : forall (b:bv) (n:Z) (s:Z), ((0%Z <= n)%Z /\
   s) n) = (nth b (size - 1%Z)%Z)))).
 
 Parameter lsl: bv -> Z -> bv.
-
 
 Axiom lsl_nth_high : forall (b:bv) (n:Z) (s:Z), ((0%Z <= n)%Z /\
   (n <  size)%Z) -> ((0%Z <= s)%Z -> ((0%Z <= (n - s)%Z)%Z -> ((nth (lsl b s)
@@ -251,83 +245,56 @@ Axiom lsl_nth_low : forall (b:bv) (n:Z) (s:Z), ((0%Z <= n)%Z /\
 
 Parameter to_nat_sub: bv -> Z -> Z -> Z.
 
+Axiom to_nat_sub_zero : forall (b:bv) (j:Z) (i:Z), (((0%Z <= i)%Z /\
+  (i <= j)%Z) /\ (j <  size)%Z) -> (((nth b j) = false) -> ((to_nat_sub b j
+  i) = (to_nat_sub b (j - 1%Z)%Z i))).
 
-Axiom to_nat_sub_zero : forall (b:bv) (j:Z) (i:Z), ((0%Z <= i)%Z /\
-  (i <= j)%Z) -> (((nth b j) = false) -> ((to_nat_sub b j i) = (to_nat_sub b
-  (j - 1%Z)%Z i))).
-
-Axiom to_nat_sub_one : forall (b:bv) (j:Z) (i:Z), ((0%Z <= i)%Z /\
-  (i <= j)%Z) -> (((nth b j) = true) -> ((to_nat_sub b j
+Axiom to_nat_sub_one : forall (b:bv) (j:Z) (i:Z), (((0%Z <= i)%Z /\
+  (i <= j)%Z) /\ (j <  size)%Z) -> (((nth b j) = true) -> ((to_nat_sub b j
   i) = ((pow2 (j - i)%Z) + (to_nat_sub b (j - 1%Z)%Z i))%Z)).
 
 Axiom to_nat_sub_high : forall (b:bv) (j:Z) (i:Z), (j <  i)%Z ->
   ((to_nat_sub b j i) = 0%Z).
 
-Axiom to_nat_of_zero2 : forall (b:bv) (i:Z) (j:Z), ((i <= j)%Z /\
-  (0%Z <= i)%Z) -> ((forall (k:Z), ((k <= j)%Z /\ (i <  k)%Z) -> ((nth b
-  k) = false)) -> ((to_nat_sub b j 0%Z) = (to_nat_sub b i 0%Z))).
+Axiom to_nat_of_zero2 : forall (b:bv) (i:Z) (j:Z), (((j <  size)%Z /\
+  (i <= j)%Z) /\ (0%Z <= i)%Z) -> ((forall (k:Z), ((k <= j)%Z /\
+  (i <  k)%Z) -> ((nth b k) = false)) -> ((to_nat_sub b j
+  0%Z) = (to_nat_sub b i 0%Z))).
 
-Axiom to_nat_of_zero : forall (b:bv) (i:Z) (j:Z), ((i <= j)%Z /\
+Axiom to_nat_of_zero : forall (b:bv) (i:Z) (j:Z), ((j <  size)%Z /\
   (0%Z <= i)%Z) -> ((forall (k:Z), ((k <= j)%Z /\ (i <= k)%Z) -> ((nth b
   k) = false)) -> ((to_nat_sub b j i) = 0%Z)).
 
-Axiom to_nat_of_one : forall (b:bv) (i:Z) (j:Z), ((i <= j)%Z /\
-  (0%Z <= i)%Z) -> ((forall (k:Z), ((k <= j)%Z /\ (i <= k)%Z) -> ((nth b
-  k) = true)) -> ((to_nat_sub b j
+Axiom to_nat_of_one : forall (b:bv) (i:Z) (j:Z), (((j <  size)%Z /\
+  (i <= j)%Z) /\ (0%Z <= i)%Z) -> ((forall (k:Z), ((k <= j)%Z /\
+  (i <= k)%Z) -> ((nth b k) = true)) -> ((to_nat_sub b j
   i) = ((pow2 ((j - i)%Z + 1%Z)%Z) - 1%Z)%Z)).
 
 Axiom to_nat_sub_footprint : forall (b1:bv) (b2:bv) (j:Z) (i:Z),
-  ((i <= j)%Z /\ (0%Z <= i)%Z) -> ((forall (k:Z), ((i <= k)%Z /\
+  ((j <  size)%Z /\ (0%Z <= i)%Z) -> ((forall (k:Z), ((i <= k)%Z /\
   (k <= j)%Z) -> ((nth b1 k) = (nth b2 k))) -> ((to_nat_sub b1 j
   i) = (to_nat_sub b2 j i))).
 
-Axiom lsr_to_nat_sub : forall (b:bv) (s:Z), ((0%Z <= s)%Z /\
-  (s <  size)%Z) -> ((to_nat_sub (lsr b s) (size - 1%Z)%Z
-  0%Z) = (to_nat_sub b ((size - 1%Z)%Z - s)%Z 0%Z)).
-
 Parameter from_int: Z -> bv.
 
-
-Axiom Abs_le : forall (x:Z) (y:Z), ((Zabs x) <= y)%Z <-> (((-y)%Z <= x)%Z /\
-  (x <= y)%Z).
-
-Parameter div: Z -> Z -> Z.
-
-
-Parameter mod1: Z -> Z -> Z.
-
-
-Axiom Div_mod : forall (x:Z) (y:Z), (~ (y = 0%Z)) -> (x = ((y * (div x
-  y))%Z + (mod1 x y))%Z).
-
-Axiom Div_bound : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (0%Z <  y)%Z) ->
-  ((0%Z <= (div x y))%Z /\ ((div x y) <= x)%Z).
-
-Axiom Mod_bound : forall (x:Z) (y:Z), (~ (y = 0%Z)) -> ((0%Z <= (mod1 x
-  y))%Z /\ ((mod1 x y) <  (Zabs y))%Z).
-
-Axiom Mod_1 : forall (x:Z), ((mod1 x 1%Z) = 0%Z).
-
-Axiom Div_1 : forall (x:Z), ((div x 1%Z) = x).
-
 Axiom nth_from_int_high_even : forall (n:Z) (i:Z), (((i <  size)%Z /\
-  (0%Z <= i)%Z) /\ ((mod1 (div n (pow2 i)) 2%Z) = 0%Z)) -> ((nth (from_int n)
-  i) = false).
+  (0%Z <= i)%Z) /\ ((int.EuclideanDivision.mod1 (int.EuclideanDivision.div n
+  (pow2 i)) 2%Z) = 0%Z)) -> ((nth (from_int n) i) = false).
 
 Axiom nth_from_int_high_odd : forall (n:Z) (i:Z), (((i <  size)%Z /\
-  (0%Z <= i)%Z) /\ ~ ((mod1 (div n (pow2 i)) 2%Z) = 0%Z)) ->
-  ((nth (from_int n) i) = true).
+  (0%Z <= i)%Z) /\
+  ~ ((int.EuclideanDivision.mod1 (int.EuclideanDivision.div n (pow2 i))
+  2%Z) = 0%Z)) -> ((nth (from_int n) i) = true).
 
-Axiom nth_from_int_low_even : forall (n:Z), ((mod1 n 2%Z) = 0%Z) ->
-  ((nth (from_int n) 0%Z) = false).
+Axiom nth_from_int_low_even : forall (n:Z), ((int.EuclideanDivision.mod1 n
+  2%Z) = 0%Z) -> ((nth (from_int n) 0%Z) = false).
 
-Axiom nth_from_int_low_odd : forall (n:Z), (~ ((mod1 n 2%Z) = 0%Z)) ->
-  ((nth (from_int n) 0%Z) = true).
+Axiom nth_from_int_low_odd : forall (n:Z), (~ ((int.EuclideanDivision.mod1 n
+  2%Z) = 0%Z)) -> ((nth (from_int n) 0%Z) = true).
 
-(* YOU MAY EDIT THE CONTEXT BELOW *)
 Open Scope Z_scope.
-(* DO NOT EDIT BELOW *)
 
+(* Why3 goal *)
 Theorem pow2i : forall (i:Z), (0%Z <= i)%Z -> ~ ((pow2 i) = 0%Z).
 (* YOU MAY EDIT THE PROOF BELOW *)
 intros i Hi.
@@ -353,11 +320,5 @@ Proof.
   apply Zmult_integral, Hxy.
   apply and_not_or ; intuition. 
 Qed.
-apply Zmult_neq_0_compat.
-auto with zarith.
-apply Hind;auto with zarith.
-
-Qed.
-(* DO NOT EDIT BELOW *)
 
 

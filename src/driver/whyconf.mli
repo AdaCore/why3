@@ -1,9 +1,10 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  Copyright (C) 2010-2011                                               *)
+(*  Copyright (C) 2010-2012                                               *)
 (*    François Bobot                                                      *)
 (*    Jean-Christophe Filliâtre                                           *)
 (*    Claude Marché                                                       *)
+(*    Guillaume Melquiond                                                 *)
 (*    Andrei Paskevich                                                    *)
 (*                                                                        *)
 (*  This software is free software; you can redistribute it and/or        *)
@@ -109,7 +110,7 @@ type config_prover = {
   command : string;   (* "exec why-limit %t %m alt-ergo %f" *)
   driver  : string;   (* "/usr/local/share/why/drivers/ergo-spec.drv" *)
   editor  : string;   (* Dedicated editor *)
-  interactive : bool; (* Interative theorem prover *)
+  interactive : bool; (* Interactive theorem prover *)
   extra_options : string list;
   extra_drivers : string list;
 }
@@ -130,6 +131,45 @@ exception ProverNotFound of config * string
 val prover_by_id : config -> string -> config_prover
 (** return the configuration of the prover if found, otherwise return
     ProverNotFound *)
+
+type config_editor = {
+  editor_command : string;
+  editor_options : string list;
+}
+
+module Meditor : Stdlib.Map.S with type key = string
+
+val set_editors : config -> config_editor Meditor.t -> config
+(** replace the set of editors *)
+
+val get_editors : config -> config_editor Meditor.t
+(** returns the set of editors *)
+
+val editor_by_id : config -> string -> config_editor
+(** return the configuration of the editor if found, otherwise return
+    Not_found *)
+
+
+(** prover upgrade policy *)
+
+type prover_upgrade_policy =
+  | CPU_keep
+  | CPU_upgrade of prover
+  | CPU_duplicate of prover
+
+val set_prover_upgrade_policy :
+  config -> prover -> prover_upgrade_policy -> config
+(** [set_prover_upgrade c p cpu] sets or updates the policy to follow if the
+    prover [p] is absent from the system *)
+
+val get_prover_upgrade_policy : config -> prover -> prover_upgrade_policy
+(** [get_prover_upgrade config] returns a map providing the policy to
+    follow for each absent prover (if it has already been decided
+    by the user and thus stored in the config) *)
+
+val get_policies : config -> prover_upgrade_policy Mprover.t
+
+val set_policies : config -> prover_upgrade_policy Mprover.t -> config
 
 (** {2 For accesing other parts of the configuration } *)
 

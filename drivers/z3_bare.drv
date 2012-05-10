@@ -132,15 +132,15 @@ theory int.EuclideanDivision
    remove prop Div_1
 end
 
-(*
 theory real.FromInt
-  syntax function from_int "(from_int %1)"
+  syntax function from_int "(to_real %1)"
+  remove prop Zero
+  remove prop One
   remove prop Add
   remove prop Sub
   remove prop Mul
   remove prop Neg
 end
-*)
 
 (*
 theory real.Truncate

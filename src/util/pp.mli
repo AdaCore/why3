@@ -1,9 +1,10 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  Copyright (C) 2010-2011                                               *)
+(*  Copyright (C) 2010-2012                                               *)
 (*    François Bobot                                                      *)
 (*    Jean-Christophe Filliâtre                                           *)
 (*    Claude Marché                                                       *)
+(*    Guillaume Melquiond                                                 *)
 (*    Andrei Paskevich                                                    *)
 (*                                                                        *)
 (*  This software is free software; you can redistribute it and/or        *)
@@ -80,6 +81,7 @@ val print_iter22:
 
 val space : formatter -> unit -> unit
 val alt : formatter -> unit -> unit
+val alt2 : formatter -> unit -> unit
 val newline : formatter -> unit -> unit
 val newline2 : formatter -> unit -> unit
 val dot : formatter -> unit -> unit

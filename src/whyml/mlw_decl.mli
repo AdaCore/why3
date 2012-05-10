@@ -1,9 +1,10 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  Copyright (C) 2010-2011                                               *)
+(*  Copyright (C) 2010-2012                                               *)
 (*    François Bobot                                                      *)
 (*    Jean-Christophe Filliâtre                                           *)
 (*    Claude Marché                                                       *)
+(*    Guillaume Melquiond                                                 *)
 (*    Andrei Paskevich                                                    *)
 (*                                                                        *)
 (*  This software is free software; you can redistribute it and/or        *)
@@ -22,13 +23,12 @@ open Ident
 open Ty
 open Term
 open Mlw_ty
+open Mlw_ty.T
 open Mlw_expr
 
 (** {2 Type declaration} *)
 
-type ps_ls = private { ps : psymbol; ls : lsymbol }
-
-type constructor = ps_ls * ps_ls option list
+type constructor = plsymbol * plsymbol option list
 
 type data_decl = itysymbol * constructor list
 
@@ -41,7 +41,7 @@ type pdecl = private {
   pd_tag  : int;           (* unique tag *)
 }
 
-and pdecl_node =
+and pdecl_node = private
   | PDtype of itysymbol
   | PDdata of data_decl list
 
