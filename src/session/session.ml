@@ -313,6 +313,18 @@ open Format
 
 let db_filename = "why3session.xml"
 
+let save_string fmt s =
+  for i=0 to String.length s - 1 do
+    match String.get s i with
+      | '\"' -> pp_print_string fmt "&quot;"
+      | '\'' -> pp_print_string fmt "&apos;"
+      | '<' -> pp_print_string fmt "&lt;"
+      | '>' -> pp_print_string fmt "&gt;"
+      | '&' -> pp_print_string fmt "&amp;"
+      | c -> pp_print_char fmt c
+  done
+
+
 let save_result fmt r =
   fprintf fmt "@\n<result status=\"%s\" time=\"%.2f\"/>"
     (match r.Call_provers.pr_answer with
@@ -331,14 +343,14 @@ let save_status fmt s =
     | Undone _ ->
         fprintf fmt "<undone/>@\n"
     | InternalFailure msg ->
-        fprintf fmt "<internalfailure reason=\"%s\"/>@\n"
-          (String.escaped (Printexc.to_string msg))
+        fprintf fmt "<internalfailure reason=\"%a\"/>@\n"
+          save_string (Printexc.to_string msg)
     | Done r -> save_result fmt r
 
 
 let opt lab fmt = function
   | None -> ()
-  | Some s -> fprintf fmt "%s=\"%s\"@ " lab s
+  | Some s -> fprintf fmt "%s=\"%a\"@ " lab save_string s
 
 let save_proof_attempt provers fmt _key a =
   fprintf fmt
@@ -352,37 +364,26 @@ memlimit=\"%d\"@ %aobsolete=\"%b\"@ archived=\"%b\">"
   fprintf fmt "@]@\n</proof>"
 
 let save_ident fmt id =
-  fprintf fmt "name=\"%s\"" id.Ident.id_string;
+  fprintf fmt "name=\"%a\"" save_string id.Ident.id_string;
   match id.Ident.id_loc with
     | None -> ()
     | Some loc ->
       let file,lnum,cnumb,cnume = Loc.get loc in
       fprintf fmt
-        "@ locfile=\"%s\"@ loclnum=\"%i\" loccnumb=\"%i\" loccnume=\"%i\""
-        file lnum cnumb cnume
+        "@ locfile=\"%a\"@ loclnum=\"%i\" loccnumb=\"%i\" loccnume=\"%i\""
+        save_string file lnum cnumb cnume
 
 let save_label fmt s =
-  fprintf fmt "@\n@[<v 1><label@ name=\"%s\"/>@]" s.Ident.lab_string
-
-let save_string fmt s =
-  for i=0 to String.length s - 1 do
-    match String.get s i with
-      | '\"' -> pp_print_string fmt "&quot;"
-      | '\'' -> pp_print_string fmt "&apos;"
-      | '<' -> pp_print_string fmt "&lt;"
-      | '>' -> pp_print_string fmt "&gt;"
-      | '&' -> pp_print_string fmt "&amp;"
-      | c -> pp_print_char fmt c
-  done
+  fprintf fmt "@\n@[<v 1><label@ name=\"%a\"/>@]" save_string s.Ident.lab_string
 
 let rec save_goal provers fmt g =
   assert (g.goal_shape <> "");
   fprintf fmt
-    "@\n@[<v 1><goal@ %a@ %asum=\"%s\"@ proved=\"%b\"@ \
+    "@\n@[<v 1><goal@ %a@ %asum=\"%a\"@ proved=\"%b\"@ \
 expanded=\"%b\"@ shape=\"%a\">"
     save_ident g.goal_name
     (opt "expl") g.goal_expl
-    g.goal_checksum g.goal_verified  g.goal_expanded
+    save_string g.goal_checksum g.goal_verified  g.goal_expanded
     save_string g.goal_shape;
   Ident.Slab.iter (save_label fmt) g.goal_name.Ident.id_label;
   PHprover.iter (save_proof_attempt provers fmt) g.goal_external_proofs;
@@ -390,8 +391,8 @@ expanded=\"%b\"@ shape=\"%a\">"
   fprintf fmt "@]@\n</goal>"
 
 and save_trans provers fmt _ t =
-  fprintf fmt "@\n@[<v 1><transf@ name=\"%s\"@ proved=\"%b\"@ expanded=\"%b\">"
-    t.transf_name t.transf_verified t.transf_expanded;
+  fprintf fmt "@\n@[<v 1><transf@ name=\"%a\"@ proved=\"%b\"@ expanded=\"%b\">"
+    save_string t.transf_name t.transf_verified t.transf_expanded;
   List.iter (save_goal provers fmt) t.transf_goals;
   fprintf fmt "@]@\n</transf>"
 
@@ -405,16 +406,16 @@ let save_theory provers fmt t =
   fprintf fmt "@]@\n</theory>"
 
 let save_file provers fmt _ f =
-  fprintf fmt "@\n@[<v 1><file@ name=\"%s\"@ verified=\"%b\"@ expanded=\"%b\">"
-    f.file_name f.file_verified f.file_expanded;
+  fprintf fmt "@\n@[<v 1><file@ name=\"%a\"@ verified=\"%b\"@ expanded=\"%b\">"
+    save_string f.file_name f.file_verified f.file_expanded;
   List.iter (save_theory provers fmt) f.file_theories;
   fprintf fmt "@]@\n</file>"
 
 let save_prover fmt p (provers,id) =
   fprintf fmt "@\n@[<v 1><prover@ id=\"%i\"@ \
-name=\"%s\"@ version=\"%s\"%a/>@]"
-    id p.C.prover_name p.C.prover_version
-    (fun fmt s -> if s <> "" then fprintf fmt "@ alternative=\"%s\"" s)
+name=\"%a\"@ version=\"%a\"%a/>@]"
+    id save_string p.C.prover_name save_string p.C.prover_version
+    (fun fmt s -> if s <> "" then fprintf fmt "@ alternative=\"%a\"" save_string s)
     p.C.prover_altern;
   Mprover.add p id provers, id+1
 
@@ -422,9 +423,9 @@ let save fname config session =
   let ch = open_out fname in
   let fmt = formatter_of_out_channel ch in
   fprintf fmt "<?xml version=\"1.0\" encoding=\"UTF-8\"?>@\n";
-  fprintf fmt "<!DOCTYPE why3session SYSTEM \"%s\">@\n"
-    (Filename.concat (Whyconf.datadir (Whyconf.get_main config)) "why3session.dtd");
-  fprintf fmt "@[<v 1><why3session@ name=\"%s\">" fname;
+  fprintf fmt "<!DOCTYPE why3session SYSTEM \"%a\">@\n"
+    save_string (Filename.concat (Whyconf.datadir (Whyconf.get_main config)) "why3session.dtd");
+  fprintf fmt "@[<v 1><why3session@ name=\"%a\">" save_string fname;
   let provers,_ = Sprover.fold (save_prover fmt) (get_used_provers session)
     (Mprover.empty,0) in
   PHstr.iter (save_file provers fmt) session.session_files;
