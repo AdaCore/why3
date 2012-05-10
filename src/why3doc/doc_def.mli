@@ -26,6 +26,7 @@ open Ident
 
 val set_loadpath: string list -> unit
 val set_output_dir: string option -> unit
+val set_stdlib_url: string -> unit
 
 val output_file: string -> string
 
@@ -39,6 +40,8 @@ val is_def: string * int * int -> tag
   (* if [loc] is a definition point, returns the corresponding tag,
      otrherwise raises [Not_found] *)
 
-val locate: ident -> string * tag
+type url = string
+
+val locate: ident -> url * tag
   (* or raises [Not_found] *)
 

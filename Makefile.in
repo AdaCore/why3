@@ -1189,7 +1189,7 @@ STDLIBS = bool comparison relations \
 	option list map set bag graph
 # function ? sum ? tptp ?
 
-STDMODS = ref array arith hashtbl impset pqueue 	queue 	random 	stack 	string
+STDMODS = ref array arith hashtbl impset pqueue queue random stack string
 
 STDLIBFILES = $(addsuffix .why, $(addprefix theories/, $(STDLIBS)))
 STDMODFILES = $(addsuffix .mlw, $(addprefix modules/, $(STDMODS)))

@@ -42,6 +42,8 @@ let option_list = Arg.align [
       "<dir> Print files in <dir>";
   "--output", Arg.String (fun s -> opt_output := Some s),
       " same as -o";
+  "--stdlib-url", Arg.String Doc_def.set_stdlib_url,
+      "<url> Add links to <url> for files found on loadpath";
 ]
 
 let add_opt_file x = Queue.add x opt_queue
@@ -56,8 +58,7 @@ let () =
 
 let css =
   let css_fname = "style.css" in
-  let css_full_fname = 
-    match !opt_output with
+  let css_full_fname = match !opt_output with
     | None -> css_fname
     | Some dir -> Filename.concat dir css_fname
   in
