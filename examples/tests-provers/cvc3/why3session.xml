@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/home/cmarche/recherche/why3/share/why3session.dtd">
+<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
 <why3session
- name="cvc3/why3session.xml">
+ name="tests-provers/cvc3/why3session.xml">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -25,16 +25,16 @@
  <file
   name="../cvc3.why"
   verified="false"
-  expanded="true">
+  expanded="false">
   <theory
    name="Test"
-   locfile="cvc3/../cvc3.why"
+   locfile="tests-provers/cvc3/../cvc3.why"
    loclnum="3" loccnumb="7" loccnume="11"
    verified="false"
    expanded="true">
    <goal
     name="test1"
-    locfile="cvc3/../cvc3.why"
+    locfile="tests-provers/cvc3/../cvc3.why"
     loclnum="7" loccnumb="8" loccnume="13"
     sum="dc3cb70423d6eca6adecf25c7851eb72"
     proved="false"
@@ -42,48 +42,32 @@
     shape="ainfix =ainfix /V0c0.0c0.0F">
     <proof
      prover="3"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="0.02"/>
-    </proof>
-    <proof
-     prover="0"
-     timelimit="10"
+     timelimit="5"
      memlimit="0"
      obsolete="false"
      archived="false">
      <result status="unknown" time="0.01"/>
     </proof>
     <proof
-     prover="1"
-     timelimit="10"
+     prover="0"
+     timelimit="5"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="highfailure" time="0.01"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="highfailure" time="0.01"/>
+     <result status="unknown" time="0.00"/>
     </proof>
     <proof
      prover="4"
-     timelimit="10"
+     timelimit="5"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="unknown" time="0.02"/>
+     <result status="unknown" time="0.00"/>
     </proof>
    </goal>
    <goal
     name="test2"
-    locfile="cvc3/../cvc3.why"
+    locfile="tests-provers/cvc3/../cvc3.why"
     loclnum="9" loccnumb="8" loccnume="13"
     sum="22bd943d68d90a9351eac18fab347e1f"
     proved="false"
@@ -91,48 +75,48 @@
     shape="ainfix =ainfix /V0V0c1.0F">
     <proof
      prover="3"
-     timelimit="10"
+     timelimit="5"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="10.71"/>
+     <result status="timeout" time="5.01"/>
     </proof>
     <proof
      prover="0"
-     timelimit="10"
+     timelimit="5"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="unknown" time="0.02"/>
+     <result status="unknown" time="0.00"/>
     </proof>
     <proof
      prover="1"
-     timelimit="10"
+     timelimit="5"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="unknown" time="0.02"/>
+     <result status="unknown" time="0.01"/>
     </proof>
     <proof
      prover="2"
-     timelimit="10"
+     timelimit="5"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="unknown" time="0.02"/>
+     <result status="unknown" time="0.01"/>
     </proof>
     <proof
      prover="4"
-     timelimit="10"
+     timelimit="5"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="10.21"/>
+     <result status="timeout" time="5.01"/>
     </proof>
    </goal>
    <goal
     name="test3"
-    locfile="cvc3/../cvc3.why"
+    locfile="tests-provers/cvc3/../cvc3.why"
     loclnum="11" loccnumb="8" loccnume="13"
     sum="6d1f1ea06944f8f4e597d966b6d38fb2"
     proved="true"
@@ -140,43 +124,27 @@
     shape="f">
     <proof
      prover="3"
-     timelimit="10"
+     timelimit="5"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.02"/>
+     <result status="valid" time="0.01"/>
     </proof>
     <proof
      prover="0"
-     timelimit="10"
+     timelimit="5"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="unknown" time="0.01"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="highfailure" time="0.01"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="highfailure" time="0.01"/>
+     <result status="unknown" time="0.00"/>
     </proof>
     <proof
      prover="4"
-     timelimit="10"
+     timelimit="5"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.02"/>
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
   </theory>

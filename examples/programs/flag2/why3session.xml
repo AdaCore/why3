@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/usr/local/share/why3/why3session.dtd">
+<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
 <why3session
- name="examples/programs/flag2/why3session.xml">
+ name="programs/flag2/why3session.xml">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -17,7 +17,7 @@
  <prover
   id="3"
   name="Coq"
-  version="8.3pl3"/>
+  version="8.3pl4"/>
  <prover
   id="4"
   name="Z3"
@@ -29,16 +29,16 @@
  <file
   name="../flag2.mlw"
   verified="true"
-  expanded="true">
+  expanded="false">
   <theory
    name="WP Flag"
-   locfile="examples/programs/flag2/../flag2.mlw"
+   locfile="programs/flag2/../flag2.mlw"
    loclnum="7" loccnumb="7" loccnume="11"
    verified="true"
    expanded="true">
    <goal
     name="nb_occ_split"
-    locfile="examples/programs/flag2/../flag2.mlw"
+    locfile="programs/flag2/../flag2.mlw"
     loclnum="32" loccnumb="8" loccnume="20"
     sum="0dc1ed5568d24660261154804da8857d"
     proved="true"
@@ -51,12 +51,12 @@
      edited="flag2_WP_Flag_nb_occ_split_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="1.70"/>
+     <result status="valid" time="1.20"/>
     </proof>
    </goal>
    <goal
     name="nb_occ_store_outside_up"
-    locfile="examples/programs/flag2/../flag2.mlw"
+    locfile="programs/flag2/../flag2.mlw"
     loclnum="37" loccnumb="8" loccnume="31"
     sum="85942e6816f2a7609dee2f4c7da68d34"
     proved="true"
@@ -69,12 +69,12 @@
      edited="flag2_WP_Flag_nb_occ_store_outside_up_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="1.04"/>
+     <result status="valid" time="0.70"/>
     </proof>
    </goal>
    <goal
     name="nb_occ_store_outside_down"
-    locfile="examples/programs/flag2/../flag2.mlw"
+    locfile="programs/flag2/../flag2.mlw"
     loclnum="41" loccnumb="8" loccnume="33"
     sum="a7926ea0926ff8fa74d3a3eb701dbfb5"
     proved="true"
@@ -87,12 +87,12 @@
      edited="flag2_WP_Flag_nb_occ_store_outside_down_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="1.05"/>
+     <result status="valid" time="0.69"/>
     </proof>
    </goal>
    <goal
     name="nb_occ_store_eq_eq"
-    locfile="examples/programs/flag2/../flag2.mlw"
+    locfile="programs/flag2/../flag2.mlw"
     loclnum="45" loccnumb="8" loccnume="26"
     sum="c5368e4c17818064380f1662f9449fc4"
     proved="true"
@@ -104,7 +104,7 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.04"/>
+     <result status="valid" time="0.02"/>
     </proof>
     <proof
      prover="1"
@@ -112,7 +112,7 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.00"/>
     </proof>
     <proof
      prover="2"
@@ -120,7 +120,7 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.00"/>
     </proof>
     <proof
      prover="5"
@@ -128,12 +128,12 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.19"/>
+     <result status="valid" time="0.12"/>
     </proof>
    </goal>
    <goal
     name="nb_occ_store_eq_neq"
-    locfile="examples/programs/flag2/../flag2.mlw"
+    locfile="programs/flag2/../flag2.mlw"
     loclnum="50" loccnumb="8" loccnume="27"
     sum="ba1e3636f06055d38d329744a798a499"
     proved="true"
@@ -146,12 +146,12 @@
      edited="flag2_WP_Flag_nb_occ_store_eq_neq_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="1.54"/>
+     <result status="valid" time="1.01"/>
     </proof>
    </goal>
    <goal
     name="nb_occ_store_neq_eq"
-    locfile="examples/programs/flag2/../flag2.mlw"
+    locfile="programs/flag2/../flag2.mlw"
     loclnum="55" loccnumb="8" loccnume="27"
     sum="3b48d4b3a8a6aa4ef960fa12bba19041"
     proved="true"
@@ -159,16 +159,16 @@
     shape="ainfix =anb_occasetV0V3V5V1V2V4ainfix -anb_occV0V1V2V4c1Iainfix =agetV0V3V4Iainfix =V4V5NIainfix &lt;V3V2Aainfix &lt;=V1V3F">
     <proof
      prover="5"
-     timelimit="20"
+     timelimit="34"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="16.84"/>
+     <result status="valid" time="12.36"/>
     </proof>
    </goal>
    <goal
     name="nb_occ_store_neq_neq"
-    locfile="examples/programs/flag2/../flag2.mlw"
+    locfile="programs/flag2/../flag2.mlw"
     loclnum="60" loccnumb="8" loccnume="28"
     sum="712bbe859a9d2929dfb23224f5ccc0c5"
     proved="true"
@@ -176,16 +176,16 @@
     shape="ainfix =anb_occasetV0V3V5V1V2V4anb_occV0V1V2V4Iainfix =agetV0V3V4NIainfix =V4V5NIainfix &lt;V3V2Aainfix &lt;=V1V3F">
     <proof
      prover="5"
-     timelimit="5"
+     timelimit="8"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="3.69"/>
+     <result status="valid" time="2.50"/>
     </proof>
    </goal>
    <goal
     name="WP_parameter swap"
-    locfile="examples/programs/flag2/../flag2.mlw"
+    locfile="programs/flag2/../flag2.mlw"
     loclnum="66" loccnumb="5" loccnume="9"
     expl="normal postcondition"
     sum="25b53d672c9cd22905f82a09e8ad6b6e"
@@ -197,10 +197,10 @@
     <transf
      name="split_goal"
      proved="true"
-     expanded="false">
+     expanded="true">
      <goal
       name="WP_parameter swap.1"
-      locfile="examples/programs/flag2/../flag2.mlw"
+      locfile="programs/flag2/../flag2.mlw"
       loclnum="66" loccnumb="5" loccnume="9"
       expl="normal postcondition"
       sum="25b53d672c9cd22905f82a09e8ad6b6e"
@@ -212,10 +212,10 @@
       <transf
        name="split_goal"
        proved="true"
-       expanded="false">
+       expanded="true">
        <goal
         name="WP_parameter swap.1.1"
-        locfile="examples/programs/flag2/../flag2.mlw"
+        locfile="programs/flag2/../flag2.mlw"
         loclnum="66" loccnumb="5" loccnume="9"
         expl="parameter swap"
         sum="6e663a96b73145caef9b928ef9de07e3"
@@ -230,7 +230,7 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.02"/>
+         <result status="valid" time="0.01"/>
         </proof>
         <proof
          prover="1"
@@ -238,7 +238,7 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.01"/>
+         <result status="valid" time="0.00"/>
         </proof>
         <proof
          prover="0"
@@ -246,7 +246,7 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.00"/>
+         <result status="valid" time="0.01"/>
         </proof>
         <proof
          prover="2"
@@ -254,7 +254,7 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.01"/>
+         <result status="valid" time="0.00"/>
         </proof>
         <proof
          prover="5"
@@ -262,12 +262,12 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.02"/>
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter swap.1.2"
-        locfile="examples/programs/flag2/../flag2.mlw"
+        locfile="programs/flag2/../flag2.mlw"
         loclnum="66" loccnumb="5" loccnume="9"
         expl="parameter swap"
         sum="4266eee612d5af852390f412ed0ee906"
@@ -282,7 +282,7 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.03"/>
+         <result status="valid" time="0.01"/>
         </proof>
         <proof
          prover="1"
@@ -290,7 +290,7 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.01"/>
+         <result status="valid" time="0.00"/>
         </proof>
         <proof
          prover="0"
@@ -306,7 +306,7 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.01"/>
+         <result status="valid" time="0.00"/>
         </proof>
         <proof
          prover="5"
@@ -314,12 +314,12 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.02"/>
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter swap.1.3"
-        locfile="examples/programs/flag2/../flag2.mlw"
+        locfile="programs/flag2/../flag2.mlw"
         loclnum="66" loccnumb="5" loccnume="9"
         expl="parameter swap"
         sum="1a3f2c9fb35fbf03cb1c7ea7a02916fb"
@@ -334,7 +334,7 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.03"/>
+         <result status="valid" time="0.01"/>
         </proof>
         <proof
          prover="1"
@@ -342,7 +342,7 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.01"/>
+         <result status="valid" time="0.00"/>
         </proof>
         <proof
          prover="0"
@@ -350,7 +350,7 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.00"/>
+         <result status="valid" time="0.01"/>
         </proof>
         <proof
          prover="2"
@@ -358,7 +358,7 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.01"/>
+         <result status="valid" time="0.00"/>
         </proof>
         <proof
          prover="5"
@@ -366,12 +366,12 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.03"/>
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter swap.1.4"
-        locfile="examples/programs/flag2/../flag2.mlw"
+        locfile="programs/flag2/../flag2.mlw"
         loclnum="66" loccnumb="5" loccnume="9"
         expl="parameter swap"
         sum="84fcf497a5741a67b796f1b27585671e"
@@ -386,7 +386,7 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.11"/>
+         <result status="valid" time="0.07"/>
         </proof>
         <proof
          prover="5"
@@ -394,7 +394,7 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.14"/>
+         <result status="valid" time="0.10"/>
         </proof>
        </goal>
       </transf>
@@ -403,7 +403,7 @@
    </goal>
    <goal
     name="WP_parameter dutch_flag"
-    locfile="examples/programs/flag2/../flag2.mlw"
+    locfile="programs/flag2/../flag2.mlw"
     loclnum="80" loccnumb="5" loccnume="15"
     expl="parameter dutch_flag"
     sum="42e7bb71334f4e0083505b5c43273067"
@@ -415,10 +415,10 @@
     <transf
      name="split_goal"
      proved="true"
-     expanded="false">
+     expanded="true">
      <goal
       name="WP_parameter dutch_flag.1"
-      locfile="examples/programs/flag2/../flag2.mlw"
+      locfile="programs/flag2/../flag2.mlw"
       loclnum="80" loccnumb="5" loccnume="15"
       expl="loop invariant init"
       sum="8bd32b08cc02840c8ed58b7f3b28146c"
@@ -433,7 +433,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.01"/>
       </proof>
       <proof
        prover="1"
@@ -441,7 +441,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.00"/>
       </proof>
       <proof
        prover="0"
@@ -449,7 +449,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.00"/>
+       <result status="valid" time="0.01"/>
       </proof>
       <proof
        prover="2"
@@ -457,7 +457,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.00"/>
       </proof>
       <proof
        prover="5"
@@ -465,12 +465,12 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter dutch_flag.2"
-      locfile="examples/programs/flag2/../flag2.mlw"
+      locfile="programs/flag2/../flag2.mlw"
       loclnum="80" loccnumb="5" loccnume="15"
       expl="parameter dutch_flag"
       sum="e58a3f70b23b06b88b00a0a634803494"
@@ -485,215 +485,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.05"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.05"/>
-      </proof>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.11"/>
-      </proof>
-      <proof
-       prover="2"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.11"/>
-      </proof>
-      <proof
-       prover="5"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
        <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter dutch_flag.3"
-      locfile="examples/programs/flag2/../flag2.mlw"
-      loclnum="80" loccnumb="5" loccnume="15"
-      expl="parameter dutch_flag"
-      sum="d0229e71c63f6020ea908de314fe6385"
-      proved="true"
-      expanded="false"
-      shape="CagetV5V3aBlueainfix &lt;ainfix -V2V8ainfix -V2V3Aainfix &lt;=c0ainfix -V2V3Iainfix =anb_occV6c0V0V9anb_occV1c0V0V9FAamonochromeV6V2V0aRedAamonochromeV6V7V8aWhiteAamonochromeV6c0V7aBlueAainfix &lt;=V2V0Aainfix &lt;=V8V2Aainfix &lt;=V7V8Aainfix &lt;=c0V7Iainfix =V8ainfix +V3c1FIainfix =V7ainfix +V4c1FIainfix =anb_occV6V10V11V12anb_occV5V10V11V12Iainfix &lt;V3V11Aainfix &lt;=V10V3Aainfix &lt;V4V11Aainfix &lt;=V10V4FAainfix =agetV6V13agetV5V13Iainfix =V13V3NAainfix =V13V4NFAainfix =agetV6V3agetV5V4Aainfix =agetV6V4agetV5V3FaWhitetaRedtIainfix &lt;V3V2Iainfix =anb_occV5c0V0V14anb_occV1c0V0V14FAamonochromeV5V2V0aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FFFFIainfix &lt;=c0V0FF">
-      <label
-       name="expl:parameter dutch_flag"/>
-      <proof
-       prover="4"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.03"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof
-       prover="2"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof
-       prover="5"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter dutch_flag.4"
-      locfile="examples/programs/flag2/../flag2.mlw"
-      loclnum="80" loccnumb="5" loccnume="15"
-      expl="parameter dutch_flag"
-      sum="878e5e8c273d6769a2f138c583c62c0f"
-      proved="true"
-      expanded="false"
-      shape="CagetV5V3aBluetaWhiteainfix =anb_occV5c0V0V7anb_occV1c0V0V7FAamonochromeV5V2V0aRedAamonochromeV5V4V6aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V6V2Aainfix &lt;=V4V6Aainfix &lt;=c0V4Iainfix =V6ainfix +V3c1FaRedtIainfix &lt;V3V2Iainfix =anb_occV5c0V0V8anb_occV1c0V0V8FAamonochromeV5V2V0aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FFFFIainfix &lt;=c0V0FF">
-      <label
-       name="expl:parameter dutch_flag"/>
-      <proof
-       prover="4"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.03"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof
-       prover="2"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.03"/>
-      </proof>
-      <proof
-       prover="5"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter dutch_flag.5"
-      locfile="examples/programs/flag2/../flag2.mlw"
-      loclnum="80" loccnumb="5" loccnume="15"
-      expl="parameter dutch_flag"
-      sum="ef141f95840f47f573b3c4356fd5310e"
-      proved="true"
-      expanded="false"
-      shape="CagetV5V3aBluetaWhiteainfix &lt;ainfix -V2V6ainfix -V2V3Aainfix &lt;=c0ainfix -V2V3Iainfix =anb_occV5c0V0V7anb_occV1c0V0V7FAamonochromeV5V2V0aRedAamonochromeV5V4V6aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V6V2Aainfix &lt;=V4V6Aainfix &lt;=c0V4Iainfix =V6ainfix +V3c1FaRedtIainfix &lt;V3V2Iainfix =anb_occV5c0V0V8anb_occV1c0V0V8FAamonochromeV5V2V0aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FFFFIainfix &lt;=c0V0FF">
-      <label
-       name="expl:parameter dutch_flag"/>
-      <proof
-       prover="4"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.03"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-      <proof
-       prover="2"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof
-       prover="5"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter dutch_flag.6"
-      locfile="examples/programs/flag2/../flag2.mlw"
-      loclnum="80" loccnumb="5" loccnume="15"
-      expl="parameter dutch_flag"
-      sum="48d47246262e9aab9cd0d9ffa7895868"
-      proved="true"
-      expanded="false"
-      shape="CagetV5V3aBluetaWhitetaRedainfix =anb_occV7c0V0V8anb_occV1c0V0V8FAamonochromeV7V6V0aRedAamonochromeV7V4V3aWhiteAamonochromeV7c0V4aBlueAainfix &lt;=V6V0Aainfix &lt;=V3V6Aainfix &lt;=V4V3Aainfix &lt;=c0V4Iainfix =anb_occV7V9V10V11anb_occV5V9V10V11Iainfix &lt;V3V10Aainfix &lt;=V9V3Aainfix &lt;V6V10Aainfix &lt;=V9V6FAainfix =agetV7V12agetV5V12Iainfix =V12V3NAainfix =V12V6NFAainfix =agetV7V3agetV5V6Aainfix =agetV7V6agetV5V3FIainfix =V6ainfix -V2c1FIainfix &lt;V3V2Iainfix =anb_occV5c0V0V13anb_occV1c0V0V13FAamonochromeV5V2V0aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FFFFIainfix &lt;=c0V0FF">
-      <label
-       name="expl:parameter dutch_flag"/>
-      <proof
-       prover="4"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.03"/>
       </proof>
       <proof
        prover="1"
@@ -709,7 +501,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.07"/>
+       <result status="valid" time="0.09"/>
       </proof>
       <proof
        prover="2"
@@ -717,7 +509,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.22"/>
+       <result status="valid" time="0.08"/>
       </proof>
       <proof
        prover="5"
@@ -725,18 +517,18 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.03"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
-      name="WP_parameter dutch_flag.7"
-      locfile="examples/programs/flag2/../flag2.mlw"
+      name="WP_parameter dutch_flag.3"
+      locfile="programs/flag2/../flag2.mlw"
       loclnum="80" loccnumb="5" loccnume="15"
       expl="parameter dutch_flag"
-      sum="f0fb5578dc0fdb50d1243dcc2f706acc"
+      sum="d0229e71c63f6020ea908de314fe6385"
       proved="true"
       expanded="false"
-      shape="CagetV5V3aBluetaWhitetaRedainfix &lt;ainfix -V6V3ainfix -V2V3Aainfix &lt;=c0ainfix -V2V3Iainfix =anb_occV7c0V0V8anb_occV1c0V0V8FAamonochromeV7V6V0aRedAamonochromeV7V4V3aWhiteAamonochromeV7c0V4aBlueAainfix &lt;=V6V0Aainfix &lt;=V3V6Aainfix &lt;=V4V3Aainfix &lt;=c0V4Iainfix =anb_occV7V9V10V11anb_occV5V9V10V11Iainfix &lt;V3V10Aainfix &lt;=V9V3Aainfix &lt;V6V10Aainfix &lt;=V9V6FAainfix =agetV7V12agetV5V12Iainfix =V12V3NAainfix =V12V6NFAainfix =agetV7V3agetV5V6Aainfix =agetV7V6agetV5V3FIainfix =V6ainfix -V2c1FIainfix &lt;V3V2Iainfix =anb_occV5c0V0V13anb_occV1c0V0V13FAamonochromeV5V2V0aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FFFFIainfix &lt;=c0V0FF">
+      shape="CagetV5V3aBlueainfix &lt;ainfix -V2V8ainfix -V2V3Aainfix &lt;=c0ainfix -V2V3Iainfix =anb_occV6c0V0V9anb_occV1c0V0V9FAamonochromeV6V2V0aRedAamonochromeV6V7V8aWhiteAamonochromeV6c0V7aBlueAainfix &lt;=V2V0Aainfix &lt;=V8V2Aainfix &lt;=V7V8Aainfix &lt;=c0V7Iainfix =V8ainfix +V3c1FIainfix =V7ainfix +V4c1FIainfix =anb_occV6V10V11V12anb_occV5V10V11V12Iainfix &lt;V3V11Aainfix &lt;=V10V3Aainfix &lt;V4V11Aainfix &lt;=V10V4FAainfix =agetV6V13agetV5V13Iainfix =V13V3NAainfix =V13V4NFAainfix =agetV6V3agetV5V4Aainfix =agetV6V4agetV5V3FaWhitetaRedtIainfix &lt;V3V2Iainfix =anb_occV5c0V0V14anb_occV1c0V0V14FAamonochromeV5V2V0aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FFFFIainfix &lt;=c0V0FF">
       <label
        name="expl:parameter dutch_flag"/>
       <proof
@@ -745,7 +537,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.03"/>
+       <result status="valid" time="0.02"/>
       </proof>
       <proof
        prover="1"
@@ -777,12 +569,220 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter dutch_flag.4"
+      locfile="programs/flag2/../flag2.mlw"
+      loclnum="80" loccnumb="5" loccnume="15"
+      expl="parameter dutch_flag"
+      sum="878e5e8c273d6769a2f138c583c62c0f"
+      proved="true"
+      expanded="false"
+      shape="CagetV5V3aBluetaWhiteainfix =anb_occV5c0V0V7anb_occV1c0V0V7FAamonochromeV5V2V0aRedAamonochromeV5V4V6aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V6V2Aainfix &lt;=V4V6Aainfix &lt;=c0V4Iainfix =V6ainfix +V3c1FaRedtIainfix &lt;V3V2Iainfix =anb_occV5c0V0V8anb_occV1c0V0V8FAamonochromeV5V2V0aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FFFFIainfix &lt;=c0V0FF">
+      <label
+       name="expl:parameter dutch_flag"/>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter dutch_flag.5"
+      locfile="programs/flag2/../flag2.mlw"
+      loclnum="80" loccnumb="5" loccnume="15"
+      expl="parameter dutch_flag"
+      sum="ef141f95840f47f573b3c4356fd5310e"
+      proved="true"
+      expanded="false"
+      shape="CagetV5V3aBluetaWhiteainfix &lt;ainfix -V2V6ainfix -V2V3Aainfix &lt;=c0ainfix -V2V3Iainfix =anb_occV5c0V0V7anb_occV1c0V0V7FAamonochromeV5V2V0aRedAamonochromeV5V4V6aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V6V2Aainfix &lt;=V4V6Aainfix &lt;=c0V4Iainfix =V6ainfix +V3c1FaRedtIainfix &lt;V3V2Iainfix =anb_occV5c0V0V8anb_occV1c0V0V8FAamonochromeV5V2V0aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FFFFIainfix &lt;=c0V0FF">
+      <label
+       name="expl:parameter dutch_flag"/>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter dutch_flag.6"
+      locfile="programs/flag2/../flag2.mlw"
+      loclnum="80" loccnumb="5" loccnume="15"
+      expl="parameter dutch_flag"
+      sum="48d47246262e9aab9cd0d9ffa7895868"
+      proved="true"
+      expanded="false"
+      shape="CagetV5V3aBluetaWhitetaRedainfix =anb_occV7c0V0V8anb_occV1c0V0V8FAamonochromeV7V6V0aRedAamonochromeV7V4V3aWhiteAamonochromeV7c0V4aBlueAainfix &lt;=V6V0Aainfix &lt;=V3V6Aainfix &lt;=V4V3Aainfix &lt;=c0V4Iainfix =anb_occV7V9V10V11anb_occV5V9V10V11Iainfix &lt;V3V10Aainfix &lt;=V9V3Aainfix &lt;V6V10Aainfix &lt;=V9V6FAainfix =agetV7V12agetV5V12Iainfix =V12V3NAainfix =V12V6NFAainfix =agetV7V3agetV5V6Aainfix =agetV7V6agetV5V3FIainfix =V6ainfix -V2c1FIainfix &lt;V3V2Iainfix =anb_occV5c0V0V13anb_occV1c0V0V13FAamonochromeV5V2V0aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FFFFIainfix &lt;=c0V0FF">
+      <label
+       name="expl:parameter dutch_flag"/>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
        <result status="valid" time="0.03"/>
+      </proof>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.06"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.17"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter dutch_flag.7"
+      locfile="programs/flag2/../flag2.mlw"
+      loclnum="80" loccnumb="5" loccnume="15"
+      expl="parameter dutch_flag"
+      sum="f0fb5578dc0fdb50d1243dcc2f706acc"
+      proved="true"
+      expanded="false"
+      shape="CagetV5V3aBluetaWhitetaRedainfix &lt;ainfix -V6V3ainfix -V2V3Aainfix &lt;=c0ainfix -V2V3Iainfix =anb_occV7c0V0V8anb_occV1c0V0V8FAamonochromeV7V6V0aRedAamonochromeV7V4V3aWhiteAamonochromeV7c0V4aBlueAainfix &lt;=V6V0Aainfix &lt;=V3V6Aainfix &lt;=V4V3Aainfix &lt;=c0V4Iainfix =anb_occV7V9V10V11anb_occV5V9V10V11Iainfix &lt;V3V10Aainfix &lt;=V9V3Aainfix &lt;V6V10Aainfix &lt;=V9V6FAainfix =agetV7V12agetV5V12Iainfix =V12V3NAainfix =V12V6NFAainfix =agetV7V3agetV5V6Aainfix =agetV7V6agetV5V3FIainfix =V6ainfix -V2c1FIainfix &lt;V3V2Iainfix =anb_occV5c0V0V13anb_occV1c0V0V13FAamonochromeV5V2V0aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FFFFIainfix &lt;=c0V0FF">
+      <label
+       name="expl:parameter dutch_flag"/>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter dutch_flag.8"
-      locfile="examples/programs/flag2/../flag2.mlw"
+      locfile="programs/flag2/../flag2.mlw"
       loclnum="80" loccnumb="5" loccnume="15"
       expl="normal postcondition"
       sum="e61b3c9adb2a53a899b0a80fec76ab3a"
@@ -805,7 +805,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.02"/>
       </proof>
       <proof
        prover="2"
@@ -813,7 +813,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
     </transf>

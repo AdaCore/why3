@@ -74,13 +74,7 @@ theory real.Real
 
   prelude "%%% this is a prelude for CVC3 real arithmetic"
 
-  prelude "inv_partial: (REAL) -> REAL;
-  ASSERT (FORALL (x : REAL): ((NOT (x = 0)) => (inv_partial(x) = (1 / x))));
-  div_partial: (REAL, REAL) -> REAL;
-  ASSERT
-  (FORALL (x : REAL, y : REAL):
-  ((NOT (y = 0)) => (div_partial(x, y) = (x / y))));
-"
+  prelude "div_by_zero: (REAL) -> REAL;"
 
   syntax function zero "0"
   syntax function one  "1"
@@ -88,9 +82,9 @@ theory real.Real
   syntax function (+)  "(%1 + %2)"
   syntax function (-)  "(%1 - %2)"
   syntax function (*)  "(%1 * %2)"
-  syntax function (/)  "div_partial(%1,%2)"
+  syntax function (/)  "(IF (%2 = 0) THEN (div_by_zero(%1)) ELSE (%1 / %2) ENDIF)"
   syntax function (-_) "(- %1)"
-  syntax function inv  "inv_partial(%1)"
+  syntax function inv  "(IF (%1 = 0) THEN (div_by_zero(1)) ELSE (1 / %1) ENDIF)"
 
   syntax predicate (<=) "(%1 <= %2)"
   syntax predicate (<)  "(%1 < %2)"
