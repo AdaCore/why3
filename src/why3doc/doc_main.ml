@@ -33,6 +33,7 @@ let usage_msg = sprintf
 
 let opt_loadpath = ref []
 let opt_output = ref None
+let opt_index = ref None (* default behavior *)
 let opt_queue = Queue.create ()
 
 let option_list = Arg.align [
@@ -44,6 +45,10 @@ let option_list = Arg.align [
       " same as -o";
   "--stdlib-url", Arg.String Doc_def.set_stdlib_url,
       "<url> Add links to <url> for files found on loadpath";
+  "--index", Arg.Unit (fun () -> opt_index := Some true),
+    " generates an index file index.html";
+  "--no-index", Arg.Unit (fun () -> opt_index := Some false),
+    " do not generate an index file index.html";
 ]
 
 let add_opt_file x = Queue.add x opt_queue
@@ -55,6 +60,10 @@ let () =
   opt_loadpath := List.rev_append !opt_loadpath (Whyconf.loadpath main);
   Doc_def.set_loadpath !opt_loadpath;
   Doc_def.set_output_dir !opt_output
+
+let index = match !opt_index with
+  | Some b -> b
+  | None -> Queue.length opt_queue > 1
 
 let css =
   let css_fname = "style.css" in
@@ -87,8 +96,27 @@ let () =
   Queue.iter Doc_def.add_file opt_queue;
   try
     let env = Env.create_env !opt_loadpath in
+    (* process files *)
     Queue.iter (do_file env) opt_queue;
-    Queue.iter print_file opt_queue
+    Queue.iter print_file opt_queue;
+    (* then generate the index *)
+    if index then begin
+      let fhtml = Doc_def.output_file "index" in
+      let c = open_out fhtml in
+      let fmt = formatter_of_out_channel c in
+      Doc_html.print_header fmt ~title:"why3doc index" ~css ();
+      fprintf fmt "<ul>@\n";
+      let add fn =
+        let header = Doc_lexer.extract_header fn in
+        let header = if header = "" then "" else ": " ^ header in
+        fprintf fmt "<li> <a href=\"%s\">%s</a> %s </li>@\n"
+          (Doc_def.output_file fn) (Filename.basename fn) header
+      in
+      Queue.iter add opt_queue;
+      fprintf fmt "</ul>@\n";
+      Doc_html.print_footer fmt ();
+      close_out c
+    end
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1
@@ -98,3 +126,4 @@ Local Variables:
 compile-command: "unset LANG; make -C ../.. bin/why3doc.opt"
 End:
 *)
+

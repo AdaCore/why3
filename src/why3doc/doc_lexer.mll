@@ -92,6 +92,7 @@
 
 }
 
+let space = [' ' '\t']
 let ident = ['A'-'Z' 'a'-'z' '_'] ['A'-'Z' 'a'-'z' '0'-'9' '_']*
 let special = ['<' '>' '&']
 
@@ -247,7 +248,21 @@ and raw_html fmt depth = parse
   | _ as c { pp_print_char fmt c; raw_html fmt depth lexbuf }
 
 
+and extract_header = parse
+  | "(**" space* "{" ['1'-'6'] ([^ '}']* as header) "}"
+      { header }
+  | space+ | "\n"
+      { extract_header lexbuf }
+  | "(*"
+      { skip_comment lexbuf; extract_header lexbuf }
+  | eof | _
+      { "" }
 
+and skip_comment = parse
+  | "*)" { () }
+  | "(*" { skip_comment lexbuf; skip_comment lexbuf }
+  | eof  { () }
+  | _    { skip_comment lexbuf }
 
 {
 
@@ -262,6 +277,13 @@ and raw_html fmt depth = parse
     scan fmt lb;
     fprintf fmt "</pre>@\n";
     close_in cin
+
+  let extract_header fname =
+    let cin = open_in fname in
+    let lb = Lexing.from_channel cin in
+    let h = extract_header lb in
+    close_in cin;
+    h
 
 }
 
