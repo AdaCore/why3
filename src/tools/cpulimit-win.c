@@ -17,6 +17,7 @@
 
 /* $Id: cpulimit-win.c,v 1.3 2009-12-09 08:28:00 nrousset Exp $ */
 
+#define WINVER 0x0501
 #include <windows.h>
 #include <stdlib.h>
 #include <stdio.h>
