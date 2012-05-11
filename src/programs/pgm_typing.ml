@@ -2186,15 +2186,7 @@ let add_types uc dl =
         | Ty.Tyvar _ ->
             ()
         | Ty.Tyapp (ts, tyl) ->
-            let y = ts.ts_name.id_string in
-            let n =
-(**
-              if Mstr.mem y def then begin
-                visit y; of_option (Hashtbl.find nregions y)
-              end else
-**)
-                (get_mtsymbol ts).mt_regions
-            in
+            let n = (get_mtsymbol ts).mt_regions in
             let rl = regions_tyapp ts n tyl in
             List.iter (fun r -> declare_region_type r.R.r_ty) rl;
             List.iter visit_type tyl
