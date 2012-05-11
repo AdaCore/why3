@@ -104,6 +104,9 @@ let loc_of_pos l =
 let simple_print_loc fmt l =
    Format.fprintf fmt "%s:%d:%d" l.file l.line l.col
 
+let print_line_loc fmt l =
+   Format.fprintf fmt "%s:%d" l.file l.line
+
 let print_loc _ _ =
    assert false
 
@@ -116,7 +119,15 @@ let print_expl proven fmt p =
         simple_print_loc (List.hd p.loc) print_reason p.reason
    else
       Format.fprintf fmt "%a: %a not proved"
-        simple_print_loc (List.hd p.loc) print_reason p.reason
+        simple_print_loc (List.hd p.loc) print_reason p.reason;
+   match p.loc with
+   | [] -> assert false
+   | [_] -> ()
+   | hd :: rest ->
+         List.iter (fun secondary_sloc ->
+            Format.fprintf fmt "@.%a:   instantiated from %a"
+              simple_print_loc hd
+              print_line_loc secondary_sloc) rest
 
 let print_skipped fmt p =
    Format.fprintf fmt "%a: %a skipped"

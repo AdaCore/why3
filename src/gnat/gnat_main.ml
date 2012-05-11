@@ -28,10 +28,20 @@ let extract_explanation s =
            | ["GP_Reason"; reason] ->
                  b.reason <- Some (Gnat_expl.reason_from_string reason)
            | ["GP_Subp"; file; line] ->
-                 b.subp <-
-                    Some (Gnat_expl.mk_loc_line file (int_of_string line))
+                 begin try
+                    b.subp <-
+                       Some (Gnat_expl.mk_loc_line file (int_of_string line))
+                 with Failure "int_of_string" ->
+                    Format.printf "GP_Subp: cannot parse string: %s" s;
+                    Gnat_util.abort_with_message ""
+                 end
            | "GP_Sloc" :: rest ->
-                 b.loc <- Some (Gnat_expl.parse_loc rest)
+                 begin try
+                    b.loc <- Some (Gnat_expl.parse_loc rest)
+                 with Failure "int_of_string" ->
+                    Format.printf "GP_Sloc: cannot parse string: %s" s;
+                    Gnat_util.abort_with_message ""
+                 end
            | _ ->
                  Gnat_util.abort_with_message
                      "found malformed GNATprove label"
