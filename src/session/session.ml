@@ -1554,8 +1554,10 @@ lower than min = %d@." min;
     else
       match match_shape n rem with
         | false, rem2 ->
+(*
             eprintf "[Merge] try_associate: claiming dropped because head was \
 consumed by larger similarity@.";
+*)
             match_shape min (hd::rem2)
         | true, [] -> assert false
         | true, _::rem2 ->
