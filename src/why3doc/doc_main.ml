@@ -34,6 +34,7 @@ let usage_msg = sprintf
 let opt_loadpath = ref []
 let opt_output = ref None
 let opt_index = ref None (* default behavior *)
+let opt_title = ref None
 let opt_queue = Queue.create ()
 
 let option_list = Arg.align [
@@ -49,6 +50,8 @@ let option_list = Arg.align [
     " generates an index file index.html";
   "--no-index", Arg.Unit (fun () -> opt_index := Some false),
     " do not generate an index file index.html";
+  "--title", Arg.String (fun s -> opt_title := Some s),
+    " <title> Set a title for the index page";
 ]
 
 let add_opt_file x = Queue.add x opt_queue
@@ -64,6 +67,10 @@ let () =
 let index = match !opt_index with
   | Some b -> b
   | None -> Queue.length opt_queue > 1
+
+let title = match !opt_title with
+  | None -> "why3doc index"
+  | Some s -> s
 
 let css =
   let css_fname = "style.css" in
@@ -104,7 +111,8 @@ let () =
       let fhtml = Doc_def.output_file "index" in
       let c = open_out fhtml in
       let fmt = formatter_of_out_channel c in
-      Doc_html.print_header fmt ~title:"why3doc index" ~css ();
+      Doc_html.print_header fmt ~title ~css ();
+      fprintf fmt "<h1>%s</h1>\n" title;
       fprintf fmt "<ul>@\n";
       let add fn =
         let header = Doc_lexer.extract_header fn in
