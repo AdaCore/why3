@@ -96,7 +96,7 @@ let print_file fname =
   let f = Filename.basename fname in
   Doc_html.print_header fmt ~title:f ~css ();
   if index then
-    fprintf fmt "%s <a href=\"index.html\">index</a>@\n<hr>@\n" title;
+    fprintf fmt "<p>%s <a href=\"index.html\">index</a></p>@\n<hr>@\n" title;
   Doc_lexer.do_file fmt fname;
   Doc_html.print_footer fmt ();
   close_out c
