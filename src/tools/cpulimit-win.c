@@ -150,7 +150,16 @@ int main(int argc, char *argv[]) {
     }
 
   // launches "child" process with command line parameter
-  if(!CreateProcess(NULL,p,NULL,NULL,FALSE,CREATE_SUSPENDED,NULL,NULL,&si,&pi))
+  if(!CreateProcess(NULL,
+                    p,
+                    NULL,
+                    NULL,
+                    FALSE,
+                    CREATE_SUSPENDED | CREATE_BREAKAWAY_FROM_JOB,
+                    NULL,
+                    NULL,
+                    &si,
+                    &pi))
     {
       printf( "%s: Error: failed when launching <%s>\n", argv[0], p);
       ErrorReport("CreateProcess");
