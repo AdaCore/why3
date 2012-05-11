@@ -1184,12 +1184,23 @@ clean::
 
 .PHONY: stdlibdoc
 
-STDLIBS = bool comparison relations \
-	algebra int real number floating_point \
-	option list map set bag graph
+STDLIBS = algebra \
+	bag \
+	bool \
+	comparison \
+	floating_point \
+	graph \
+	int \
+	list \
+	map \
+	number \
+	option \
+	real \
+	relations \
+	set
 # function ? sum ? tptp ?
 
-STDMODS = ref array arith hashtbl impset pqueue queue random stack string
+STDMODS = arith array hashtbl impset pqueue queue random ref stack string
 
 STDLIBFILES = $(addsuffix .why, $(addprefix theories/, $(STDLIBS)))
 STDMODFILES = $(addsuffix .mlw, $(addprefix modules/, $(STDMODS)))

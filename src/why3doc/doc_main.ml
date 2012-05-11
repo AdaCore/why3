@@ -123,13 +123,7 @@ let () =
         fprintf fmt "<li> <a href=\"%s.html\">%s</a> %s </li>@\n"
           basename basename header
       in
-      let l = Queue.fold (fun acc f -> f :: acc) [] opt_queue in
-      let l = List.sort
-        (fun f1 f2 ->
-          Pervasives.compare (Filename.basename f1) (Filename.basename f2))
-        l
-      in
-      List.iter add l;
+      Queue.iter add opt_queue;
       fprintf fmt "</ul>@\n";
       Doc_html.print_footer fmt ();
       close_out c
