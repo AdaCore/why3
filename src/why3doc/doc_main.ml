@@ -95,6 +95,8 @@ let print_file fname =
   let fmt = formatter_of_out_channel c in
   let f = Filename.basename fname in
   Doc_html.print_header fmt ~title:f ~css ();
+  if index then
+    fprintf fmt "%s <a href=\"index.html\">index</a>@\n<hr>@\n" title;
   Doc_lexer.do_file fmt fname;
   Doc_html.print_footer fmt ();
   close_out c
@@ -112,7 +114,7 @@ let () =
       let c = open_out fhtml in
       let fmt = formatter_of_out_channel c in
       Doc_html.print_header fmt ~title ~css ();
-      fprintf fmt "<h1>%s</h1>\n" title;
+      fprintf fmt "<h1>%s</h1>@\n" title;
       fprintf fmt "<ul>@\n";
       let add fn =
         let header = Doc_lexer.extract_header fn in
@@ -121,7 +123,13 @@ let () =
         fprintf fmt "<li> <a href=\"%s.html\">%s</a> %s </li>@\n"
           basename basename header
       in
-      Queue.iter add opt_queue;
+      let l = Queue.fold (fun acc f -> f :: acc) [] opt_queue in
+      let l = List.sort
+        (fun f1 f2 ->
+          Pervasives.compare (Filename.basename f1) (Filename.basename f2))
+        l
+      in
+      List.iter add l;
       fprintf fmt "</ul>@\n";
       Doc_html.print_footer fmt ();
       close_out c
