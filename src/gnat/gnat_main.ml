@@ -445,7 +445,9 @@ let rec handle_vc_result goal result detailed =
       end else begin
          print false (Objectives.get_objective goal)
       end;
-      Save_VCs.save_trace goal
+      Save_VCs.save_trace goal;
+      Format.printf "%a@."
+        (Driver.print_task Gnat_config.gnat_driver) (Session.goal_task goal)
    end
 
 and interpret_result pa pas =
