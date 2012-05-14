@@ -165,7 +165,15 @@ let print_vsty fmt v =
 
 let print_const = Pretty.print_const
 let print_quant = Pretty.print_quant
-let print_binop = Pretty.print_binop
+
+let print_binop ~asym fmt x =
+   match x with
+  | Tand when asym -> fprintf fmt "and then"
+  | Tor when asym -> fprintf fmt "or else"
+  | Tand -> fprintf fmt "and"
+  | Tor -> fprintf fmt "or"
+  | Timplies -> fprintf fmt "->"
+  | Tiff -> fprintf fmt "="
 
 let prio_binop = function
   | Tand -> 3
@@ -231,6 +239,8 @@ and print_tnode pri fmt t = match t.t_node with
       fprintf fmt "true"
   | Tfalse ->
       fprintf fmt "false"
+  | Tbinop (Timplies,f1,f2) ->
+        fprintf fmt "(if %a then %a)" print_term f1 print_term f2
   | Tbinop (b,f1,f2) ->
       let asym = Slab.mem Term.asym_label f1.t_label in
       let p = prio_binop b in

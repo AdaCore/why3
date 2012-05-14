@@ -358,7 +358,7 @@ let goal_has_been_tried g =
 
 module Save_VCs : sig
    val save_vc : goal -> unit
-   val save_trace : goal -> unit
+   val save_trace_and_pretty_vc : goal -> unit
 end = struct
 
    let count_map : (int ref) Gnat_expl.HExpl.t = Gnat_expl.HExpl.create 17
@@ -369,6 +369,12 @@ end = struct
          let r = ref 0 in
          Gnat_expl.HExpl.add count_map expl r;
          r
+
+   let with_fmt_channel filename f =
+      let cout = open_out filename in
+      let fmt  = Format.formatter_of_out_channel cout in
+      f fmt;
+      close_out cout
 
    let vc_name expl =
       let r = find expl in
@@ -384,22 +390,23 @@ end = struct
       let task = Session.goal_task goal in
       let dr = Gnat_config.prover_driver in
       let vc_fn = vc_name expl in
-      let cout = open_out vc_fn in
-      let fmt  = Format.formatter_of_out_channel cout in
-      Driver.print_task dr fmt task;
-      Format.printf "saved VC to %s@." vc_fn;
-      close_out cout
+      with_fmt_channel vc_fn (fun fmt -> Driver.print_task dr fmt task);
+      Format.printf "saved VC to %s@." vc_fn
 
-   let save_trace goal =
+   let save_trace_and_pretty_vc goal =
       let expl = Objectives.get_objective goal in
-      let fn = Gnat_expl.to_filename expl ^ ".trace" in
-      let cout = open_out fn in
-      let fmt  = Format.formatter_of_out_channel cout in
-      List.iter (fun l ->
-         Format.fprintf fmt "%a@." Gnat_expl.simple_print_loc
-         (Gnat_expl.orig_loc l))
-        (Objectives.get_trace goal);
-      close_out cout
+      let base = Gnat_expl.to_filename expl in
+      let trace_fn = base ^ ".trace" in
+      let pretty_vc_fn = base ^ ".pretty" in
+      with_fmt_channel trace_fn (fun fmt ->
+         List.iter (fun l ->
+            Format.fprintf fmt "%a@." Gnat_expl.simple_print_loc
+           (Gnat_expl.orig_loc l))
+      (Objectives.get_trace goal));
+      let task = Session.goal_task goal in
+      let dr = Gnat_config.gnat_driver in
+      with_fmt_channel pretty_vc_fn (fun fmt ->
+         Driver.print_task dr fmt task)
 
 end
 
@@ -445,9 +452,7 @@ let rec handle_vc_result goal result detailed =
       end else begin
          print false (Objectives.get_objective goal)
       end;
-      Save_VCs.save_trace goal;
-      Format.printf "%a@."
-        (Driver.print_task Gnat_config.gnat_driver) (Session.goal_task goal)
+      Save_VCs.save_trace_and_pretty_vc goal
    end
 
 and interpret_result pa pas =
