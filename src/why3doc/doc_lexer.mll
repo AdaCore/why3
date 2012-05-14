@@ -67,6 +67,8 @@
       | '&' -> "&amp;"
       | _ -> assert false)
 
+  let current_file = ref ""
+
   let print_ident fmt lexbuf s =
     if is_keyword1 s then
       fprintf fmt "<span class=\"keyword1\">%s</span>" s
@@ -83,8 +85,9 @@
       (* is this a use point? *)
       try
         let id = Glob.locate loc in
-        let fn, t = Doc_def.locate id in
-        fprintf fmt "<a href=\"%s#%s\">%s</a>" fn t s
+        let fn, url, t = Doc_def.locate id in
+        let url = if fn = !current_file then "" else url in
+        fprintf fmt "<a href=\"%s#%s\">%s</a>" url t s
       with Not_found ->
         (* otherwise, just print it *)
         pp_print_string fmt s
@@ -267,15 +270,18 @@ and skip_comment = parse
 {
 
   let do_file fmt fname =
+    current_file := fname;
     (* input *)
     let cin = open_in fname in
     let lb = Lexing.from_channel cin in
     lb.Lexing.lex_curr_p <-
       { lb.Lexing.lex_curr_p with Lexing.pos_fname = fname };
     (* output *)
-    fprintf fmt "<pre>";
+    fprintf fmt "<span class=\"why3doc\">@\n";
+    fprintf fmt "<pre>@\n";
     scan fmt lb;
     fprintf fmt "</pre>@\n";
+    fprintf fmt "</span>@\n";
     close_in cin
 
   let extract_header fname =
