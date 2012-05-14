@@ -152,6 +152,10 @@ val split_string_rev : string -> char -> string list
 val ends_with : string -> string -> bool
 (** test if a string ends with another *)
 
+val starts_with : string -> string -> bool
+(* [starts_with s suffix] checks whether [s] starts with [suffix] *)
+
+
 val padd_string : char -> string -> int -> string
 (** extract or padd the given string in order to have the given length *)
 

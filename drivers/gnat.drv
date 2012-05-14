@@ -1,4 +1,4 @@
-(* Why driver for Why3 syntax *)
+(* Why3 driver for GNAT VC for reading syntax *)
 
 printer "gnat"
 filename "%f-%t-%g.vc"
@@ -7,5 +7,55 @@ theory BuiltIn
   syntax type  int  "int"
   syntax type  real "real"
   syntax predicate (=)  "(%1 = %2)"
+end
+
+
+theory int.Int
+
+  syntax function zero "0"
+  syntax function one  "1"
+
+  syntax function (+)  "(%1 + %2)"
+  syntax function (-)  "(%1 - %2)"
+  syntax function (*)  "(%1 * %2)"
+  syntax function (-_) "(-%1)"
+
+  syntax predicate (<=) "(%1 <= %2)"
+  syntax predicate (<)  "(%1 <  %2)"
+  syntax predicate (>=) "(%1 >= %2)"
+  syntax predicate (>)  "(%1 >  %2)"
+end
+
+theory real.RealInfix
+
+  syntax function (+.)  "(%1 + %2)"
+  syntax function (-.)  "(%1 - %2)"
+  syntax function ( *.) "(%1 * %2)"
+  syntax function (/.)  "(%1 / %2)"
+  syntax function (-._) "(-%1)"
+
+  syntax predicate (<=.) "(%1 <= %2)"
+  syntax predicate (<.)  "(%1 <  %2)"
+  syntax predicate (>=.) "(%1 >= %2)"
+  syntax predicate (>.)  "(%1 >  %2)"
+
+end
+
+theory Bool
+  syntax type     bool  "Boolean"
+  syntax function True  "True"
+  syntax function False "False"
+end
+
+theory bool.Bool
+  syntax function andb  "(and %1 %2)"
+  syntax function orb   "(or %1 %2)"
+  syntax function xorb  "(xor %1 %2)"
+  syntax function notb  "(not %1)"
+end
+
+theory Tuple0
+  syntax type     tuple0 "Void"
+  syntax function Tuple0 ""
 end
 

@@ -23,7 +23,7 @@ let extract_explanation s =
    Slab.iter
      (fun x ->
         let s = x.lab_string in
-        if Gnat_util.starts_with s "GP_" then
+        if Util.starts_with s "GP_" then
            match Util.colon_split s with
            | ["GP_Reason"; reason] ->
                  b.reason <- Some (Gnat_expl.reason_from_string reason)
@@ -51,7 +51,7 @@ let extract_explanation s =
      if b.reason = Some Gnat_expl.VC_Loop_Invariant then begin
         Slab.iter (fun x ->
            let s = x.lab_string in
-           if Gnat_util.starts_with s "expl:" then
+           if Util.starts_with s "expl:" then
               if s = "expl:loop invariant init" then
                  b.reason <- Some Gnat_expl.VC_Loop_Invariant_Init
               else

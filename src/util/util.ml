@@ -217,6 +217,17 @@ let ends_with s suf =
   let suflen = String.length suf in
   slen >= suflen && aux s suf suflen (slen - suflen) 0
 
+let starts_with s start =
+   let start_len = String.length start in
+   if start_len > String.length s then false
+   else
+      try
+         for i = 0 to start_len - 1 do
+            if s.[i] <> start.[i] then raise Exit
+         done;
+         true
+      with Exit -> false
+
 let padd_string c s i =
   let sl = String.length s in
   if sl < i then

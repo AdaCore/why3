@@ -19,16 +19,6 @@ let ends_with s suffix =
          true
       with Exit -> false
 
-let starts_with s start =
-   if String.length start > String.length s then false
-   else
-      try
-         for i = 0 to String.length start - 1 do
-            if s.[i] <> start.[i] then raise Exit
-         done;
-         true
-      with Exit -> false
-
 let cmp_timestamps f1 f2 =
    let s1 = Unix.stat f1 in
    let s2 = Unix.stat f2 in

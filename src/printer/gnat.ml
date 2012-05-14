@@ -30,6 +30,8 @@ open Decl
 open Printer
 open Theory
 
+let conversion_label = create_label "GP_Kind:Conversion"
+
 let iprinter,aprinter,tprinter,pprinter =
   let bl = ["theory"; "type"; "function"; "predicate"; "inductive";
             "axiom"; "lemma"; "goal"; "use"; "clone"; "prop"; "meta";
@@ -43,21 +45,47 @@ let iprinter,aprinter,tprinter,pprinter =
   create_ident_printer bl ~sanitizer:lsanitize,
   create_ident_printer bl ~sanitizer:isanitize
 
+let forget_tvs () =
+  forget_all aprinter
+
+let forget_all () =
+  forget_all iprinter;
+  forget_all aprinter;
+  forget_all tprinter;
+  forget_all pprinter
+
 (* type variables always start with a quote *)
 let print_tv fmt tv =
   fprintf fmt "'%s" (id_unique aprinter tv.tv_name)
 
+exception Name_Found of string
+
+let ada_name_from_labels labels =
+   try
+      Slab.iter (fun lab ->
+         let s = lab.lab_string in
+         if Util.starts_with s "GP_Ada_Name" then
+            let l = Util.colon_split s in
+            raise (Name_Found (List.nth l 1))
+      ) labels;
+      None
+   with Name_Found x -> Some x
+
+let print_labels fmt id =
+   let labels = id.id_label in
+   Format.printf "{";
+   Slab.iter (fun x -> Format.fprintf fmt "%s," x.lab_string) labels;
+   Format.printf "}"
+
 (* logic variables always start with a lower case letter *)
 let print_vs fmt vs =
-  let sanitizer = String.uncapitalize in
-  fprintf fmt "%s" (id_unique iprinter ~sanitizer vs.vs_name)
+   match ada_name_from_labels vs.vs_name.id_label with
+   | Some x -> fprintf fmt "%s" x
+   | None ->
+         let sanitizer = String.uncapitalize in
+         fprintf fmt "%s" (id_unique iprinter ~sanitizer vs.vs_name)
 
 let forget_var vs = forget_id iprinter vs.vs_name
-
-(* theory names always start with an upper case letter *)
-let print_th fmt th =
-  let sanitizer = String.capitalize in
-  fprintf fmt "%s" (id_unique iprinter ~sanitizer th.th_name)
 
 let print_ts fmt ts =
   fprintf fmt "%s" (id_unique tprinter ts.ts_name)
@@ -68,9 +96,6 @@ let print_ls fmt ls =
 let print_cs fmt ls =
   let sanitizer = String.capitalize in
   fprintf fmt "%s" (id_unique iprinter ~sanitizer ls.ls_name)
-
-let print_pr fmt pr =
-  fprintf fmt "%s" (id_unique pprinter pr.pr_name)
 
 (* info *)
 
@@ -151,13 +176,25 @@ let prio_binop = function
 let rec print_term fmt t = print_tnode 0 fmt t
 
 and print_app pri fs fmt tl =
-  match query_syntax fs.ls_name with
-    | Some s -> syntax_arguments s print_term fmt tl
-    | None -> begin match tl with
-        | [] -> print_ls fmt fs
-        | tl -> fprintf fmt (protect_on (pri > 5) "%a@ %a")
-            print_ls fs (print_list space (print_tnode 6)) tl
-        end
+   match tl with
+   | [] ->
+         begin match ada_name_from_labels fs.ls_name.id_label with
+         | None -> print_normal_app pri fs fmt tl
+         | Some x -> Format.fprintf fmt "%s" x
+         end
+   | [x] when Slab.mem conversion_label fs.ls_name.id_label ->
+         print_tnode pri fmt x
+   | _ -> print_normal_app pri fs fmt tl
+
+and print_normal_app pri fs fmt tl =
+   match query_syntax fs.ls_name with
+   | Some s -> syntax_arguments s print_term fmt tl
+   | None -> begin match tl with
+             | [] -> print_ls fmt fs
+             | tl ->
+                   fprintf fmt (protect_on (pri > 5) "%a@ %a")
+                   print_ls fs (print_list space (print_tnode 6)) tl
+  end
 
 and print_tnode pri fmt t = match t.t_node with
   | Tvar v ->
@@ -211,24 +248,43 @@ and print_tl fmt tl =
   if tl = [] then () else fprintf fmt "@ [%a]"
     (print_list alt (print_list comma print_term)) tl
 
-let rec print_right_most fmt t =
+let rec print_rightmost fmt t =
    match t.t_node with
    | Tquant (_,tq) ->
          let _,_,t = t_open_quant tq in
-         print_right_most fmt t
+         print_rightmost fmt t
    | Tlet (_,tb) ->
          let _, t = t_open_bound tb in
-         print_right_most fmt t
+         print_rightmost fmt t
    | Tbinop (Timplies,_,t2) ->
-         print_right_most fmt t2
+         print_rightmost fmt t2
    | _ ->
          print_term fmt t
 
+let print_prop_decl fmt (_,_,f) =
+   print_rightmost fmt f
+
+let print_prop_decl fmt (k,pr,f) = match k with
+  | Pgoal -> print_prop_decl fmt (k,pr,f); forget_tvs ()
+  | _ -> ()
+
+let print_decl fmt d = match d.d_node with
+  | Dtype _ | Dind _ | Dparam _ | Dlogic _ | Ddata _ -> ()
+  | Dprop p   -> print_prop_decl fmt p
+
+let print_tdecl fmt td = match td.td_node with
+  | Decl d ->
+      print_decl fmt d
+  | Use _ | Clone _ | Meta _ -> ()
+
+let print_tdecls =
+  let print sm fmt td =
+    info := { info_syn = sm };
+    print_tdecl fmt td in
+  Printer.sprint_tdecls print
 
 let print_task _env _ _ ?old:_ fmt task =
-   (* only print the rightmost predicate *)
-   let fml = Task.task_goal_fmla task in
-   print_right_most fmt fml
+    print_list nothing string fmt (List.rev (Trans.apply print_tdecls task))
 
 let () = register_printer "gnat" print_task
 
