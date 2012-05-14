@@ -35,6 +35,7 @@ let opt_loadpath = ref []
 let opt_output = ref None
 let opt_index = ref None (* default behavior *)
 let opt_title = ref None
+let opt_body = ref false
 let opt_queue = Queue.create ()
 
 let option_list = Arg.align [
@@ -52,6 +53,8 @@ let option_list = Arg.align [
     " do not generate an index file index.html";
   "--title", Arg.String (fun s -> opt_title := Some s),
     " <title> Set a title for the index page";
+  "--body-only", Arg.Set opt_body,
+    " Only produce the body of the HTML document";
 ]
 
 let add_opt_file x = Queue.add x opt_queue
@@ -83,22 +86,26 @@ let css =
   css_fname
 
 let do_file env fname =
-  let m = Env.read_file env fname in
-  let add _s th =
-    Doc_def.add_ident th.th_name;
-    Ident.Sid.iter Doc_def.add_ident th.th_local in
-  Mstr.iter add m
+  try
+    let m = Env.read_file env fname in
+    let add _s th =
+      Doc_def.add_ident th.th_name;
+      Ident.Sid.iter Doc_def.add_ident th.th_local in
+    Mstr.iter add m
+  with e ->
+    eprintf "warning: could not read file '%s'@." fname;
+    eprintf "(%a)@." Exn_printer.exn_printer e
 
 let print_file fname =
   let fhtml = Doc_def.output_file fname in
   let c = open_out fhtml in
   let fmt = formatter_of_out_channel c in
   let f = Filename.basename fname in
-  Doc_html.print_header fmt ~title:f ~css ();
+  if not !opt_body then Doc_html.print_header fmt ~title:f ~css ();
   if index then
     fprintf fmt "<p>%s <a href=\"index.html\">index</a></p>@\n<hr>@\n" title;
   Doc_lexer.do_file fmt fname;
-  Doc_html.print_footer fmt ();
+  if not !opt_body then Doc_html.print_footer fmt ();
   close_out c
 
 let () =
@@ -113,7 +120,7 @@ let () =
       let fhtml = Doc_def.output_file "index" in
       let c = open_out fhtml in
       let fmt = formatter_of_out_channel c in
-      Doc_html.print_header fmt ~title ~css ();
+      if not !opt_body then Doc_html.print_header fmt ~title ~css ();
       fprintf fmt "<h1>%s</h1>@\n" title;
       fprintf fmt "<ul>@\n";
       let add fn =
@@ -125,7 +132,7 @@ let () =
       in
       Queue.iter add opt_queue;
       fprintf fmt "</ul>@\n";
-      Doc_html.print_footer fmt ();
+      if not !opt_body then Doc_html.print_footer fmt ();
       close_out c
     end
   with e when not (Debug.test_flag Debug.stack_trace) ->
