@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session SYSTEM "/home/jcf/why3/share/why3session.dtd">
+<why3session
+ name="relabel/why3session.xml">
+ <prover
+  id="0"
+  name="Alt-Ergo"
+  version="0.94"/>
+ <file
+  name="../relabel.mlw"
+  verified="true"
+  expanded="true">
+  <theory
+   name="WP Relabel"
+   locfile="relabel/../relabel.mlw"
+   loclnum="8" loccnumb="7" loccnume="14"
+   verified="true"
+   expanded="true">
+   <goal
+    name="labels_Leaf"
+    locfile="relabel/../relabel.mlw"
+    loclnum="23" loccnumb="8" loccnume="19"
+    sum="10882ada64a50ed4460c935a669bd6d6"
+    proved="true"
+    expanded="false"
+    shape="ainfix =V0V1qamemV0alabelsaLeafV1F">
+    <proof
+     prover="0"
+     timelimit="60"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.05"/>
+    </proof>
+   </goal>
+   <goal
+    name="labels_Node"
+    locfile="relabel/../relabel.mlw"
+    loclnum="26" loccnumb="8" loccnume="19"
+    sum="e25bea65ea82351c3ec7e8c4725e9425"
+    proved="true"
+    expanded="false"
+    shape="amemV0alabelsV2OamemV0alabelsV1qamemV0alabelsaNodeV1V2F">
+    <proof
+     prover="0"
+     timelimit="60"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter fresh"
+    locfile="relabel/../relabel.mlw"
+    loclnum="44" loccnumb="6" loccnume="11"
+    expl="normal postcondition"
+    sum="c859815445c454d17e63d9500da7aae6"
+    proved="true"
+    expanded="false"
+    shape="ainfix =V1V1Aainfix =V1ainfix +V0c1Iainfix =V1ainfix +V0c1FF">
+    <label
+     name="expl:parameter fresh"/>
+    <proof
+     prover="0"
+     timelimit="60"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter relabel"
+    locfile="relabel/../relabel.mlw"
+    loclnum="47" loccnumb="10" loccnume="17"
+    expl="parameter relabel"
+    sum="5fa856a0ffa27b8bbc2159d0de9cb32e"
+    proved="true"
+    expanded="true"
+    shape="CV0aLeafwainfix &lt;=V3V2Aainfix &lt;V1V3IamemV3alabelsaLeafV2FAainfix &lt;=V1V2AadistinctalabelsaLeafV2Aasame_shapeV0aLeafV2Iainfix =V2ainfix +V1c1FaNodeVVainfix &lt;=V10V8Aainfix &lt;V1V10IamemV10alabelsaNodeV7V9FAainfix &lt;=V1V8AadistinctalabelsaNodeV7V9Aasame_shapeV0aNodeV7V9Iainfix &lt;=V11V8Aainfix &lt;V6V11IamemV11alabelsV9FAainfix &lt;=V6V8AadistinctalabelsV9Aasame_shapeV5V9FFIainfix &lt;=V12V6Aainfix &lt;V1V12IamemV12alabelsV7FAainfix &lt;=V1V6AadistinctalabelsV7Aasame_shapeV4V7FFFF">
+    <label
+     name="expl:parameter relabel"/>
+    <transf
+     name="split_goal"
+     proved="true"
+     expanded="true">
+     <goal
+      name="WP_parameter relabel.0"
+      locfile="relabel/../relabel.mlw"
+      loclnum="47" loccnumb="10" loccnume="17"
+      expl="parameter relabel"
+      sum="77f7dcc066a54c04577bf403eddc0a83"
+      proved="true"
+      expanded="false"
+      shape="CV0aLeafwainfix &lt;=V3V2Aainfix &lt;V1V3IamemV3alabelsaLeafV2FAainfix &lt;=V1V2AadistinctalabelsaLeafV2Aasame_shapeV0aLeafV2Iainfix =V2ainfix +V1c1FaNodeVVtFF">
+      <label
+       name="expl:parameter relabel"/>
+      <proof
+       prover="0"
+       timelimit="60"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter relabel.1"
+      locfile="relabel/../relabel.mlw"
+      loclnum="47" loccnumb="10" loccnume="17"
+      expl="parameter relabel"
+      sum="f57998cc1fd2d5c8497ee8151b470678"
+      proved="true"
+      expanded="false"
+      shape="CV0aLeafwtaNodeVVainfix &lt;=V8V6Aainfix &lt;V1V8IamemV8alabelsaNodeV5V7FAainfix &lt;=V1V6AadistinctalabelsaNodeV5V7Aasame_shapeV0aNodeV5V7Iainfix &lt;=V9V6Aainfix &lt;V4V9IamemV9alabelsV7FAainfix &lt;=V4V6AadistinctalabelsV7Aasame_shapeV3V7FFIainfix &lt;=V10V4Aainfix &lt;V1V10IamemV10alabelsV5FAainfix &lt;=V1V4AadistinctalabelsV5Aasame_shapeV2V5FFFF">
+      <label
+       name="expl:parameter relabel"/>
+      <proof
+       prover="0"
+       timelimit="60"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.37"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+  </theory>
+ </file>
+</why3session>
