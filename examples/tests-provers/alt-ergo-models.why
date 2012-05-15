@@ -3,7 +3,7 @@ theory T1
 
   use import int.Int
 
-  goal G : forall x "0":int. ("cond" (x >= 42)) -> x + 3 <= 50
+  goal G : forall x "0":int. ("cond" x >= 42) -> x + 3 <= 50
 
 end
 

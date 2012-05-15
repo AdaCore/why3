@@ -30,7 +30,8 @@ open Task
 open Printer
 
 let meta_ac = Theory.register_meta "AC" [Theory.MTlsymbol]
-let meta_printer_option = Theory.register_meta "printer_option" [Theory.MTstring]
+let meta_printer_option =
+  Theory.register_meta "printer_option" [Theory.MTstring]
 
 type info = {
   info_syn : syntax_map;
@@ -134,7 +135,7 @@ and print_tapp info fmt = function
   | [] -> ()
   | tl -> fprintf fmt "(%a)" (print_list comma (print_term info)) tl
 
-let rec print_fmla info fmt f = 
+let rec print_fmla info fmt f =
   if info.info_show_labels then
     match Slab.elements f.t_label with
       | [] -> print_fmla_node info fmt f
@@ -312,12 +313,8 @@ let check_showlabels acc l =
   match l with
     | [Theory.MAstr s] ->
       begin match s with
-        | "show_labels" -> 
-          eprintf "printer_option show_labels set@.";
-          true
-        | _ -> 
-          eprintf "printer_option %s ignored@." s;
-          acc
+        | "show_labels" -> true
+        | _ -> acc
       end
     | _ -> assert false
 
