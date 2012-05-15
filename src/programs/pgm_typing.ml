@@ -1943,18 +1943,19 @@ let add_effect_decl uc ls =
 let add_impure_decl uc ls =
   Pgm_module.add_impure_decl (Decl.create_param_decl ls) uc
 
+let label_set_from_list loc labels =
+   List.fold_left
+      (fun (labels,loc) lab ->
+         match lab with
+            | Lstr s -> (Ident.Slab.add s labels,loc)
+            | Lpos l -> (labels,l))
+      (Slab.empty,loc)
+      labels
+
 let add_global_fun loc ~labels x tyv uc =
   let x = parameter x in
   try
-    let label,loc =
-      List.fold_left
-        (fun (labels,loc) lab ->
-           match lab with
-             | Lstr s -> (Ident.Slab.add s labels,loc)
-             | Lpos l -> (labels,l))
-        (Slab.empty,loc)
-        labels
-    in
+    let label, loc = label_set_from_list loc labels in
     let ls, ps = create_psymbol_fun (id_user ~label x loc) tyv in
     let d = Decl.create_param_decl ls in
     ps, Pgm_module.add_impure_decl d uc
@@ -2332,7 +2333,8 @@ let rec decl ~wp env ltm lmod uc = function
             in
             ps, uc
         | Tpure _ ->
-            let id = id_user id.id loc in
+            let label, _ = label_set_from_list loc id.id_lab in
+            let id = id_user ~label id.id loc in
             let pv = create_pvsymbol_v id tyv in
             let ls, ps = create_psymbol_var pv in
             let uc = add_pure_decl   uc ~loc ps.ps_pure in
