@@ -1,0 +1,18 @@
+
+theory T1
+
+  use import int.Int
+
+  goal G : forall x "0":int. ("cond" (x >= 42)) -> x + 3 <= 50
+
+end
+
+theory T2
+
+  use import int.Int
+
+  constant x : int
+
+  goal g : forall y:int. x >= y
+
+end

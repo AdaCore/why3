@@ -46,6 +46,19 @@ let ident_printer =
 let print_ident fmt id =
   fprintf fmt "%s" (id_unique ident_printer id)
 
+let print_label fmt l =
+  fprintf fmt "\"%s\"" l.lab_string
+
+let version_0_95 = false (* TODO *)
+
+let print_ident_label fmt id =
+  if version_0_95 then
+    fprintf fmt "%s %a"
+      (id_unique ident_printer id)
+      (print_list space print_label) (Slab.elements id.id_label)
+  else
+    print_ident fmt id
+
 let forget_var v = forget_id ident_printer v.vs_name
 
 let tv_printer =
@@ -121,7 +134,18 @@ and print_tapp info fmt = function
   | [] -> ()
   | tl -> fprintf fmt "(%a)" (print_list comma (print_term info)) tl
 
-let rec print_fmla info fmt f = match f.t_node with
+let rec print_fmla info fmt f = 
+  if version_0_95 then
+    match Slab.elements f.t_label with
+      | [] -> print_fmla_node info fmt f
+      | l ->
+        fprintf fmt "(%a : %a)"
+          (print_list colon print_label) l
+          (print_fmla_node info) f
+  else
+    print_fmla_node info fmt f
+
+and print_fmla_node info fmt f = match f.t_node with
   | Tapp ({ ls_name = id }, []) ->
       print_ident fmt id
   | Tapp (ls, tl) -> begin match query_syntax info.info_syn ls.ls_name with
@@ -136,7 +160,7 @@ let rec print_fmla info fmt f = match f.t_node with
         | Texists -> "exists", [] (* Alt-ergo has no triggers for exists *)
       in
       let forall fmt v =
-        fprintf fmt "%s %a:%a" q print_ident v.vs_name (print_type info) v.vs_ty
+        fprintf fmt "%s %a:%a" q print_ident_label v.vs_name (print_type info) v.vs_ty
       in
       fprintf fmt "@[(%a%a.@ %a)@]" (print_list dot forall) vl
         (print_triggers info) tl (print_fmla info) f;
