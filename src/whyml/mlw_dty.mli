@@ -27,6 +27,7 @@ open Term
 open Mlw_ty
 open Mlw_ty.T
 open Mlw_expr
+open Mlw_module
 
 type dity
 
@@ -41,6 +42,10 @@ val unify: dity -> dity -> unit
 val ity_of_dity: dity -> ity
   (** use with care, only once unification is done *)
 
-val specialize_lsymbol:  lsymbol  -> dity list * dity
-val specialize_psymbol:  psymbol  -> dity list * dity
-val specialize_plsymbol: plsymbol -> dity list * dity
+type darrow = dity list * dity
+
+val specialize_darrow: darrow -> darrow
+val specialize_lsymbol: lsymbol  -> darrow
+val specialize_prgsymbol: prgsymbol -> darrow
+
+val match_darrow: psymbol -> darrow -> ity_subst

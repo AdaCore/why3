@@ -33,6 +33,7 @@ open Mlw_ty.T
 open Mlw_expr
 open Mlw_decl
 open Mlw_module
+open Mlw_dty
 
 (** errors *)
 
@@ -90,25 +91,7 @@ let () = Exn_printer.register (fun fmt e -> match e with
 
 (** Typing type expressions *)
 
-let ts_arrow =
-  let a = create_tvsymbol (Ident.id_fresh "a") in
-  let b = create_tvsymbol (Ident.id_fresh "b") in
-  Ty.create_tysymbol (Ident.id_fresh "arrow") [a; b] None
 
-let ts_region =
-  let a = create_tvsymbol (Ident.id_fresh "a") in
-  let b = create_tvsymbol (Ident.id_fresh "b") in
-  Ty.create_tysymbol (Ident.id_fresh "region") [a; b] None
-
-(* let rec ity_of_dty = function *)
-(*   | Tyvar { type_val = Some t } -> *)
-(*       ty_of_dty t *)
-(*   | Tyvar { type_val = None; user = false; type_var_loc = loc } -> *)
-(*       error ?loc (AnyMessage "undefined type variable") *)
-(*   | Tyvar { tvsymbol = tv } -> *)
-(*       ty_var tv *)
-(*   | Tyapp (s, tl) -> *)
-(*       ty_app s (List.map ty_of_dty tl) *)
 
 (** Typing program expressions *)
 
@@ -122,7 +105,7 @@ let rec extract_labels labs loc e = match e.Ptree.expr_desc with
 
 type denv = {
   uc     : module_uc;
-  locals : Denv.dty Mstr.t;
+  locals : (bool * darrow) Mstr.t;
   denv   : Typing.denv; (* for user type variables only *)
 }
 
@@ -130,6 +113,33 @@ let create_denv uc =
   { uc = uc;
     locals = Mstr.empty;
     denv = Typing.create_denv (); }
+
+let unify_arg dity { dexpr_loc = loc; dexpr_type = (args, res) } =
+  if args <> [] then errorm ~loc "value expected";
+  unify dity res
+
+let unify_args ls args el =
+  try
+    List.iter2 unify_arg args el
+  with Invalid_argument _ ->
+    raise (Term.BadArity (ls, List.length args, List.length el))
+
+let unify_args_prg ~loc prg args el = match prg with
+  | PV { pv_vs = vs } ->
+      errorm ~loc "%s: not a function" vs.vs_name.id_string
+  | PL pl ->
+      unify_args pl.pl_ls args el; []
+  | PA { pa_name = id } | PS { ps_name = id } ->
+      let rec unify_list = function
+        | a :: args, e :: el -> unify_arg a e; unify_list (args, el)
+        | args, [] -> args
+        | [], _ :: _ -> errorm ~loc "too many arguments for %s" id.id_string
+      in
+      unify_list (args, el)
+
+let rec decompose_app args e = match e.Ptree.expr_desc with
+  | Eapply (e1, e2) -> decompose_app (e2 :: args) e1
+  | _ -> e, args
 
 let rec dexpr ~userloc denv e =
   let loc = e.Ptree.expr_loc in
@@ -141,11 +151,40 @@ let rec dexpr ~userloc denv e =
   in
   e
 
-and dexpr_desc ~userloc denv _loc = function
+and dexpr_desc ~userloc denv loc = function
   | Ptree.Eident (Qident {id=x}) when Mstr.mem x denv.locals ->
       (* local variable *)
-      let tyv = Mstr.find x denv.locals in
-      DElocal x, tyv
+      let poly, da = Mstr.find x denv.locals in
+      let da = if poly then specialize_darrow da else da in
+      DElocal x, da
+  | Ptree.Eident p ->
+      let x = Typing.string_list_of_qualid [] p in
+      begin
+        try
+          let prg = ns_find_ps (get_namespace denv.uc) x in
+          DEglobal (prg, []), specialize_prgsymbol prg
+        with Not_found -> try
+          let ls = ns_find_ls (Theory.get_namespace (get_theory denv.uc)) x in
+          DElogic (ls, []), specialize_lsymbol ls
+        with Not_found ->
+          errorm ~loc "unbound symbol %a" Typing.print_qualid p
+      end
+  | Ptree.Eapply (e1, e2) ->
+      let e, el = decompose_app [e2] e1 in
+      let e = dexpr ~userloc denv e in
+      let el = List.map (dexpr ~userloc denv) el in
+      begin match e.dexpr_desc with
+        | DElogic (ls, _) ->
+            let args, res = e.dexpr_type in
+            unify_args ls args el;
+            DElogic (ls, el), ([], res)
+        | DEglobal (prg, _) ->
+            let args, res = e.dexpr_type in
+            let args = unify_args_prg ~loc prg args el in
+            DEglobal (prg, el), (args, res)
+        | _ ->
+          assert false (*TODO*)
+      end
   | _ ->
       ignore (userloc);
       assert false (*TODO*)
@@ -153,10 +192,7 @@ and dexpr_desc ~userloc denv _loc = function
 type local_var =
   | Lpvsymbol of pvsymbol
   | Lpasymbol of pasymbol
-  | Lpsymbol  of psymbol * Denv.type_var Mtv.t * Denv.type_var Mreg.t
-
-let region_table : region Htv.t =
-  Htv.create 17 (* FIXME: use Wtv instead *)
+  | Lpsymbol  of psymbol * darrow
 
 let rec expr locals de = match de.dexpr_desc with
   | DElocal x ->
@@ -164,10 +200,7 @@ let rec expr locals de = match de.dexpr_desc with
       begin match Mstr.find x locals with
       | Lpvsymbol pv -> e_value pv
       | Lpasymbol pa -> e_arrow pa
-      | Lpsymbol  (_ps, _, _) ->
-          (* let ity = ity_of_dty de.dexpr_dty in *)
-          (* e_inst ps *)
-          assert false (*TODO*)
+      | Lpsymbol (ps, da) -> e_inst ps (match_darrow ps da)
       end
   | _ ->
       assert false (*TODO*)

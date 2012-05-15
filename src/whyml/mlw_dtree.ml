@@ -74,7 +74,7 @@ type dloop_annotation = {
 
 type dexpr = {
   dexpr_desc : dexpr_desc;
-  dexpr_type : Denv.dty;
+  dexpr_type : Mlw_dty.darrow;
   dexpr_lab  : Ident.label list;
   dexpr_loc  : loc;
 }
@@ -82,8 +82,8 @@ type dexpr = {
 and dexpr_desc =
   | DEconstant of constant
   | DElocal of string
-  | DEglobal of prgsymbol
-  | DElogic of Term.lsymbol
+  | DEglobal of prgsymbol * dexpr list
+  | DElogic of Term.lsymbol * dexpr list
   | DEapply of dexpr * dexpr
   | DEfun of dubinder list * dtriple
   | DElet of ident * dexpr * dexpr
