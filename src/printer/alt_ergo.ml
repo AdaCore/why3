@@ -30,6 +30,16 @@ open Task
 open Printer
 
 let meta_ac = Theory.register_meta "AC" [Theory.MTlsymbol]
+let meta_printer_option = Theory.register_meta "printer_option" [Theory.MTstring]
+
+type info = {
+  info_syn : syntax_map;
+  info_ac  : Sls.t;
+  info_show_labels : bool;
+  info_csm : lsymbol list Mls.t;
+  info_pjs : Sls.t;
+  info_axs : Spr.t;
+}
 
 let ident_printer =
   let bls = [
@@ -49,10 +59,8 @@ let print_ident fmt id =
 let print_label fmt l =
   fprintf fmt "\"%s\"" l.lab_string
 
-let version_0_95 = false (* TODO *)
-
-let print_ident_label fmt id =
-  if version_0_95 then
+let print_ident_label info fmt id =
+  if info.info_show_labels then
     fprintf fmt "%s %a"
       (id_unique ident_printer id)
       (print_list space print_label) (Slab.elements id.id_label)
@@ -69,14 +77,6 @@ let print_tvsymbol fmt tv =
   fprintf fmt "'%s" (id_unique tv_printer tv.tv_name)
 
 let forget_tvs () = forget_all tv_printer
-
-type info = {
-  info_syn : syntax_map;
-  info_ac  : Sls.t;
-  info_csm : lsymbol list Mls.t;
-  info_pjs : Sls.t;
-  info_axs : Spr.t;
-}
 
 let rec print_type info fmt ty = match ty.ty_node with
   | Tyvar id ->
@@ -135,7 +135,7 @@ and print_tapp info fmt = function
   | tl -> fprintf fmt "(%a)" (print_list comma (print_term info)) tl
 
 let rec print_fmla info fmt f = 
-  if version_0_95 then
+  if info.info_show_labels then
     match Slab.elements f.t_label with
       | [] -> print_fmla_node info fmt f
       | l ->
@@ -160,7 +160,8 @@ and print_fmla_node info fmt f = match f.t_node with
         | Texists -> "exists", [] (* Alt-ergo has no triggers for exists *)
       in
       let forall fmt v =
-        fprintf fmt "%s %a:%a" q print_ident_label v.vs_name (print_type info) v.vs_ty
+        fprintf fmt "%s %a:%a" q (print_ident_label info) v.vs_name
+          (print_type info) v.vs_ty
       in
       fprintf fmt "@[(%a%a.@ %a)@]" (print_list dot forall) vl
         (print_triggers info) tl (print_fmla info) f;
@@ -307,6 +308,20 @@ let add_projection (csm,pjs,axs) = function
       csm, Sls.add ls pjs, Spr.add pr axs
   | _ -> assert false
 
+let check_showlabels acc l =
+  match l with
+    | [Theory.MAstr s] ->
+      begin match s with
+        | "show_labels" -> 
+          eprintf "printer_option show_labels set@.";
+          true
+        | _ -> 
+          eprintf "printer_option %s ignored@." s;
+          acc
+      end
+    | _ -> assert false
+
+(*
 let print_task_old pr thpr fmt task =
   print_prelude fmt pr;
   print_th_prelude task fmt thpr;
@@ -315,6 +330,8 @@ let print_task_old pr thpr fmt task =
   let info = {
     info_syn = get_syntax_map task;
     info_ac  = Task.on_tagged_ls meta_ac task;
+    info_show_labels =
+      Task.on_meta meta_printer_option check_showlabels false task;
     info_csm = Mls.map Array.to_list csm;
     info_pjs = pjs;
     info_axs = axs;
@@ -326,22 +343,26 @@ let () = register_printer "alt-ergo-old"
   (fun _env pr thpr ?old:_ fmt task ->
      forget_all ident_printer;
      print_task_old pr thpr fmt task)
+*)
 
 let print_decls =
-  let print ac csm pjs axs sm fmt d =
+  let print ac sl csm pjs axs sm fmt d =
     let info = {
       info_syn = sm;
       info_ac  = ac;
+      info_show_labels = sl;
       info_csm = Mls.map Array.to_list csm;
       info_pjs = pjs;
       info_axs = axs;
     } in
     print_decl info fmt d in
   Trans.on_tagged_ls meta_ac (fun ac ->
+  Trans.on_meta meta_printer_option (fun args ->
+    let sl = List.fold_left check_showlabels false args in
   Trans.on_meta Eliminate_algebraic.meta_proj (fun mal ->
     let csm,pjs,axs = List.fold_left
       add_projection (Mls.empty,Sls.empty,Spr.empty) mal in
-    Printer.sprint_decls (print ac csm pjs axs)))
+    Printer.sprint_decls (print ac sl csm pjs axs))))
 
 let print_task _env pr thpr ?old:_ fmt task =
   (* In trans-based p-printing [forget_all] is a no-no *)
