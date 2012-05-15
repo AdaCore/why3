@@ -998,6 +998,15 @@ let rec purify_itype_v  = function
         (List.map (fun (v,_) -> v.i_impure.vs_ty) bl)
         (purify_itype_v c.ic_result_type)
 
+let label_set_from_list loc labels =
+   List.fold_left
+      (fun (labels,loc) lab ->
+         match lab with
+            | Lstr s -> (Ident.Slab.add s labels,loc)
+            | Lpos l -> (labels,l))
+      (Slab.empty,loc)
+      labels
+
 let rec iutype_v env = function
   | DUTpure ty ->
       ITpure (Denv.ty_of_dty ty)
@@ -1016,7 +1025,8 @@ and iutype_c env c =
 and iubinder env (x, ty, tyv) =
   let tyv = iutype_v env tyv in
   let ty = Denv.ty_of_dty ty in
-  let env, v = iadd_local env (id_user x.id x.id_loc) ty in
+  let label, _ = label_set_from_list x.id_loc x.id_lab in
+  let env, v = iadd_local env (id_user ~label x.id x.id_loc) ty in
   env, (v, tyv)
 
 let mk_iexpr loc ty d =
@@ -1942,15 +1952,6 @@ let add_effect_decl uc ls =
 
 let add_impure_decl uc ls =
   Pgm_module.add_impure_decl (Decl.create_param_decl ls) uc
-
-let label_set_from_list loc labels =
-   List.fold_left
-      (fun (labels,loc) lab ->
-         match lab with
-            | Lstr s -> (Ident.Slab.add s labels,loc)
-            | Lpos l -> (labels,l))
-      (Slab.empty,loc)
-      labels
 
 let add_global_fun loc ~labels x tyv uc =
   let x = parameter x in

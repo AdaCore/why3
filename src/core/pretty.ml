@@ -53,14 +53,30 @@ let forget_all () =
   forget_all tprinter;
   forget_all pprinter
 
+let print_label fmt l = fprintf fmt "\"%s\"" l.lab_string
+let print_labels = print_iter1 Slab.iter space print_label
+
+let print_loc fmt l =
+  let (f,l,b,e) = Loc.get l in
+  fprintf fmt "#\"%s\" %d %d %d#" f l b e
+
+let print_ident_labels fmt id =
+  if Debug.test_flag debug_print_labels &&
+      not (Slab.is_empty id.id_label) then
+    fprintf fmt "@ %a" print_labels id.id_label;
+  if Debug.test_flag debug_print_locs then
+    Util.option_iter (fprintf fmt "@ %a" print_loc) id.id_loc
+
 (* type variables always start with a quote *)
 let print_tv fmt tv =
   fprintf fmt "'%s" (id_unique aprinter tv.tv_name)
 
 (* logic variables always start with a lower case letter *)
 let print_vs fmt vs =
+  let id = vs.vs_name in
   let sanitizer = String.uncapitalize in
-  fprintf fmt "%s" (id_unique iprinter ~sanitizer vs.vs_name)
+  fprintf fmt "%s" (id_unique iprinter ~sanitizer id);
+  print_ident_labels fmt id
 
 let forget_var vs = forget_id iprinter vs.vs_name
 
@@ -186,19 +202,6 @@ let prio_binop = function
   | Timplies -> 1
   | Tiff -> 1
 
-let print_label fmt l = fprintf fmt "\"%s\"" l.lab_string
-let print_labels = print_iter1 Slab.iter space print_label
-
-let print_loc fmt l =
-  let (f,l,b,e) = Loc.get l in
-  fprintf fmt "#\"%s\" %d %d %d#" f l b e
-
-let print_ident_labels fmt id =
-  if Debug.test_flag debug_print_labels &&
-      not (Slab.is_empty id.id_label) then
-    fprintf fmt "@ %a" print_labels id.id_label;
-  if Debug.test_flag debug_print_locs then
-    Util.option_iter (fprintf fmt "@ %a" print_loc) id.id_loc
 
 let rec print_term fmt t = print_lterm 0 fmt t
 

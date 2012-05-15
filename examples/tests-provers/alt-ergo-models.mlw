@@ -3,9 +3,17 @@ module M1
 
   use import int.Int
 
-  let f (x:int) : int =
+  let f (x "0":int) : int =
     { } 
     if x >= 42 then x + 3 else 0
+    { result <= 50 }
+
+  use import module ref.Ref
+
+  let g (x "0": ref int) : int =
+    { } 
+    x := !x + 1;
+    if !x >= 42 then !x + 3 else 0
     { result <= 50 }
 
 end

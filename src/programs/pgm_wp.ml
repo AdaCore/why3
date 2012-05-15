@@ -102,7 +102,15 @@ let fresh_mark () =
   create_vsymbol (id_fresh "mark") ty_mark
 
 let wp_binder x f = match x.pv_tv with
-  | Tpure _ -> wp_forall x.pv_pure f
+  | Tpure _ ->
+(*
+    let v = x.pv_pure in
+    let label = Slab.singleton (create_label "clone:bind") in
+    let id = id_clone ~label v.vs_name in
+    let v' = create_vsymbol id v.vs_ty in
+    wp_forall v' f
+*)
+    wp_forall x.pv_pure f
   | Tarrow _ -> f
 
 let wp_binders = List.fold_right wp_binder
@@ -234,7 +242,10 @@ let quantify env rm sreg f =
         | Tyvar _ -> assert false
       in
       let id = Spv.fold test vars None in
-      let id = id_clone (def_option r.R.r_tv.tv_name id) in
+      (**)
+      let label = Slab.singleton (create_label "0") in
+      (**)
+      let id = id_clone ~label (def_option r.R.r_tv.tv_name id) in
       let r' = create_vsymbol id (purify r.R.r_ty) in
       Mtv.add r.R.r_tv r' m
     in
@@ -243,7 +254,10 @@ let quantify env rm sreg f =
   let vv' =
     let add pv s =
       let v = pv.pv_pure in
-      let v' = create_vsymbol (id_clone v.vs_name) v.vs_ty in
+      (**)
+      let label = Slab.singleton (create_label "clone:quantify(2)") in
+      (**)
+      let v' = create_vsymbol (id_clone ~label v.vs_name) v.vs_ty in
       Mvs.add v v' s
     in
     Spv.fold add vars Mvs.empty
