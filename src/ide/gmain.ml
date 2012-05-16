@@ -445,6 +445,8 @@ let fan n =
 
 module S = Session
 
+let session_needs_saving = ref false
+
 let set_row_status row b =
   if b then
     goals_model#set ~row:row#iter ~column:status_column !image_yes
@@ -516,7 +518,6 @@ let (_:GtkSignal.id) =
 let (_:GtkSignal.id) =
   goals_view#connect#row_expanded ~callback:(row_expanded true)
 
-let session_needs_saving = ref false
 let current_selected_row = ref None
 let current_env_session = ref None
 let env_session () =
