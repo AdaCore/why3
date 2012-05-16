@@ -154,6 +154,24 @@ theory Fset
 
 end
 
+(** {2 Induction principle on finite sets} *)
+
+theory FsetInduction
+
+  use import Fset
+
+  type t
+
+  predicate p (set t)
+
+  axiom Induction :
+    (forall s: set t. is_empty s -> p s) ->
+    (forall s: set t. p s -> forall t: t.
+      not (mem t s) -> p (add t s)) ->
+    forall s: set t. p s
+
+end
+
 (** {2 Finite sets of integers} *)
 
 theory Fsetint
