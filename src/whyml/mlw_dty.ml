@@ -67,10 +67,12 @@ let ts_app ts dl =
 (* unification *)
 
 let rec unify d1 d2 =
-  if d1 != d2 then begin
+  if !d1.uid <> !d2.uid then begin
     begin match !d1.node, !d2.node with
-    | Dvar, _ | _, Dvar ->
+    | Dvar, _ ->
         ()
+    | _, Dvar ->
+        d2 := !d1
     | Duvar s1, Duvar s2 when s1.id = s2.id ->
         ()
     | Dits (its1, dl1), Dits (its2, dl2) when its_equal its1 its2 ->
