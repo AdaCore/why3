@@ -1555,8 +1555,10 @@ lower than min = %d@." min;
     else
       match match_shape n rem with
         | false, rem2 ->
+(*
             eprintf "[Merge] try_associate: claiming dropped because head was \
 consumed by larger similarity@.";
+*)
             match_shape min (hd::rem2)
         | true, [] -> assert false
         | true, _::rem2 ->
@@ -1640,6 +1642,7 @@ and merge_trans ~keygen env to_goal _ from_transf =
   let goal (gid,name,t,_,_,_,_) = name, get_explanation gid t, t in
   let transf = add_transformation ~keygen ~goal
     from_transf_name to_goal goals in
+  set_transf_expanded transf from_transf.transf_expanded;
   List.iter2 (fun (_,_,_,_,_,from_goal,obsolete) to_goal ->
     match from_goal with
       | Some from_goal -> merge_any_goal ~keygen env obsolete
@@ -1649,6 +1652,7 @@ and merge_trans ~keygen env to_goal _ from_transf =
 exception OutdatedSession
 
 let merge_theory ~keygen env ~allow_obsolete from_th to_th =
+  set_theory_expanded to_th from_th.theory_expanded;
   let from_goals = List.fold_left
     (fun from_goals g ->
       Util.Mstr.add g.goal_name.Ident.id_string g from_goals)
@@ -1675,6 +1679,7 @@ let merge_theory ~keygen env ~allow_obsolete from_th to_th =
     ) to_th.theory_goals
 
 let merge_file ~keygen env ~allow_obsolete from_f to_f  =
+  set_file_expanded to_f from_f.file_expanded;
   let from_theories = List.fold_left
     (fun acc t -> Util.Mstr.add t.theory_name.Ident.id_string t acc)
     Util.Mstr.empty from_f.file_theories
@@ -1684,7 +1689,6 @@ let merge_file ~keygen env ~allow_obsolete from_f to_f  =
       try
         let from_th =
           Util.Mstr.find to_th.theory_name.Ident.id_string from_theories in
-        set_theory_expanded to_th from_th.theory_expanded;
         merge_theory ~keygen env ~allow_obsolete from_th to_th
       with
         | Not_found when allow_obsolete -> true

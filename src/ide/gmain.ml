@@ -468,7 +468,7 @@ let set_proof_state a =
     | S.InternalFailure _ -> "(internal failure)"
     | S.Undone S.Interrupted -> "(interrupted)"
     | S.Undone (S.Scheduled | S.Running) ->
-        Format.sprintf "[limit=%d sec., %d M]" 
+        Format.sprintf "[limit=%d sec., %d M]"
           a.S.proof_timelimit a.S.proof_memlimit
   in
   let t = if obsolete then t ^ " (obsolete)" else t in
@@ -497,6 +497,7 @@ let get_selected_row_references () =
     goals_view#selection#get_selected_rows
 
 let row_expanded b iter _path =
+  session_needs_saving := true;
   match get_any_from_iter iter with
     | S.File f ->
         S.set_file_expanded f b
