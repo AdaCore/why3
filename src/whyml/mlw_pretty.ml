@@ -47,8 +47,7 @@ let forget_all () = Ident.forget_all rprinter; forget_all ()
 
 (* ghost regions are prefixed with "?" *)
 let print_reg fmt reg =
-  fprintf fmt "%s%s" (if reg.reg_ghost then "?" else "")
-    (id_unique rprinter reg.reg_name)
+  fprintf fmt "%s" (id_unique rprinter reg.reg_name)
 
 let print_pv fmt pv =
   fprintf fmt "%s%a" (if pv.pv_vtv.vtv_ghost then "?" else "")

@@ -239,7 +239,8 @@ let e_label_copy { e_label = lab; e_loc = loc } e =
 exception GhostWrite of expr * region
 exception GhostRaise of expr * xsymbol
 
-let ghost_effect e =
+let ghost_effect e = e (* FIXME *)
+(*
   if vty_ghost e.e_vty then
     let eff = e.e_effect in
     let check r = not r.reg_ghost in
@@ -248,6 +249,7 @@ let ghost_effect e =
       raise (GhostWrite (e, Sreg.choose s))
     else e
   else e
+*)
 
 let mk_expr node vty eff vars =
   ghost_effect {

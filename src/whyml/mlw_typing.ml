@@ -374,7 +374,7 @@ let add_types uc tdl =
               let ity = parse f.f_pty in
               let fid = Denv.create_user_id f.f_ident in
               let s,mut = if f.f_mutable then
-                let r = create_region fid ~ghost ity in
+                let r = create_region fid ity in
                 Sreg.add r s, Some r
               else
                 Sreg.union s ity.ity_vars.vars_reg, None

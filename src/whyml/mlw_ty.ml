@@ -57,7 +57,6 @@ module rec T : sig
   and region = {
     reg_name  : ident;
     reg_ity   : ity;
-    reg_ghost : bool;
   }
 
 end = struct
@@ -90,7 +89,6 @@ end = struct
   and region = {
     reg_name  : ident;
     reg_ity   : ity;
-    reg_ghost : bool;
   }
 
 end
@@ -117,17 +115,7 @@ module Wreg = Reg.W
 let reg_equal : region -> region -> bool = (==)
 let reg_hash r = id_hash r.reg_name
 
-(* a region is ghost if and only if it corresponds to a ghost mutable field
-   in a record. The "contents" region of an ordinary reference is not ghost
-   even if the reference itself is ghost. This is because we can alias
-   a non-ghost reference with a ghost reference as follows:
-     let ghost_ref<ro> = K nonghost_ref<ro> ghost_value
-   Here, ghost_ref is ghost by contamination, but it shares <ro> with
-   a non-ghost reference. Notice that any write in ghost_ref is forbidden
-   (such a write would be a ghost expression touching a non-ghost region). *)
-
-let create_region id ?(ghost=false) ty =
-  { reg_name = id_register id; reg_ity = ty; reg_ghost = ghost }
+let create_region id ty = { reg_name = id_register id; reg_ity = ty }
 
 (* variable sets *)
 
@@ -251,13 +239,13 @@ let ity_s_any pr pts ity =
 
 (* traversal functions on type variables and regions *)
 
-let rec ity_v_map_unsafe fnv fnr ity = match ity.ity_node with
+let rec ity_v_map fnv fnr ity = match ity.ity_node with
   | Ityvar v ->
       fnv v
   | Itypur (f,tl) ->
-      ity_pur f (List.map (ity_v_map_unsafe fnv fnr) tl)
+      ity_pur f (List.map (ity_v_map fnv fnr) tl)
   | Ityapp (f,tl,rl) ->
-      ity_app f (List.map (ity_v_map_unsafe fnv fnr) tl) (List.map fnr rl)
+      ity_app f (List.map (ity_v_map fnv fnr) tl) (List.map fnr rl)
 
 let rec ity_v_fold fnv fnr acc ity = match ity.ity_node with
   | Ityvar v ->
@@ -274,7 +262,7 @@ let ity_v_any prv prr ity =
   try ity_v_fold (any_fn prv) (any_fn prr) false ity with FoldSkip -> true
 
 let ity_subst_unsafe mv mr ity =
-  ity_v_map_unsafe (fun v -> Mtv.find v mv) (fun r -> Mreg.find r mr) ity
+  ity_v_map (fun v -> Mtv.find v mv) (fun r -> Mreg.find r mr) ity
 
 let ity_closed ity = Stv.is_empty ity.ity_vars.vars_tv
 let ity_pure ity = Sreg.is_empty ity.ity_vars.vars_reg
@@ -296,20 +284,13 @@ let ity_equal_check ty1 ty2 =
 let reg_equal_check r1 r2 =
   if not (reg_equal r1 r2) then raise (RegionMismatch (r1, r2))
 
-let reg_protect fn r =
-  let nr = fn r in
-  if nr.reg_ghost <> r.reg_ghost then raise (RegionMismatch (r, nr));
-  nr
-
-let ity_v_map fnv fnr ity = ity_v_map_unsafe fnv (reg_protect fnr) ity
-
 type ity_subst = {
   ity_subst_tv  : ity Mtv.t;
   ity_subst_reg : region Mreg.t; (* must preserve ghost-ness *)
 }
 
 let ity_subst_empty = {
-  ity_subst_tv = Mtv.empty;
+  ity_subst_tv  = Mtv.empty;
   ity_subst_reg = Mreg.empty;
 }
 
@@ -319,20 +300,12 @@ let ity_subst_union s1 s2 =
   { ity_subst_tv  = Mtv.union  check_ity s1.ity_subst_tv  s2.ity_subst_tv;
     ity_subst_reg = Mreg.union check_reg s1.ity_subst_reg s2.ity_subst_reg }
 
-let reg_inst s r =
-  Mreg.find_def r r s.ity_subst_reg
+let tv_inst s v = Mtv.find_def (ity_var v) v s.ity_subst_tv
+let reg_inst s r = Mreg.find_def r r s.ity_subst_reg
+let ity_inst s ity = ity_v_map (tv_inst s) (reg_inst s) ity
 
-let reg_full_inst s r =
-  Mreg.find r s.ity_subst_reg
-
-let ity_inst s ity =
-  ity_v_map_unsafe
-    (fun v -> Mtv.find_def (ity_var v) v s.ity_subst_tv)
-    (fun r -> Mreg.find_def r r s.ity_subst_reg)
-    ity
-
-let ity_full_inst s ity =
-  ity_subst_unsafe s.ity_subst_tv s.ity_subst_reg ity
+let reg_full_inst s r = Mreg.find r s.ity_subst_reg
+let ity_full_inst s ity = ity_subst_unsafe s.ity_subst_tv s.ity_subst_reg ity
 
 let rec ity_match s ity1 ity2 =
   let set = function
@@ -353,8 +326,8 @@ let rec ity_match s ity1 ity2 =
 
 and reg_match s r1 r2 =
   let is_new = ref false in
-  let set = function (* must preserve ghost-ness of regions *)
-    | None when r1.reg_ghost = r2.reg_ghost -> is_new := true; Some r2
+  let set = function
+    | None -> is_new := true; Some r2
     | Some r3 as r when reg_equal r3 r2 -> r
     | _ -> raise Exit
   in
@@ -392,8 +365,7 @@ and reg_refresh mv mr r = match Mreg.find_opt r mr with
   | None ->
       let mr,ity = ity_inst_fresh mv mr r.reg_ity in
       let id = id_clone r.reg_name in
-      let ghost = r.reg_ghost in
-      let reg = create_region id ~ghost ity in
+      let reg = create_region id ity in
       Mreg.add r reg mr, reg
 
 let ity_app_fresh s tl =
@@ -602,8 +574,6 @@ let vty_value ?(ghost=false) ?mut ity =
   let vars = ity.ity_vars in
   let vars = match mut with
     | Some r ->
-        if r.reg_ghost && not ghost then
-          Loc.errorm "Ghost region in a non-ghost vty_value";
         ity_equal_check ity r.reg_ity;
         { vars with vars_reg = Sreg.add r vars.vars_reg }
     | None ->

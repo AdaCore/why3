@@ -56,7 +56,6 @@ module rec T : sig
   and region = private {
     reg_name  : ident;
     reg_ity   : ity;
-    reg_ghost : bool;
   }
 
 end
@@ -92,7 +91,7 @@ exception BadRegArity of itysymbol * int * int
 exception DuplicateRegion of region
 exception UnboundRegion of region
 
-val create_region : preid -> ?ghost:bool -> ity -> region
+val create_region : preid -> ity -> region
 
 val create_itysymbol : preid -> ?abst:bool -> ?priv:bool ->
   tvsymbol list -> region list -> ity option -> itysymbol
