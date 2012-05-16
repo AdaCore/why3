@@ -318,7 +318,12 @@ let e_let ({ let_var = lv ; let_expr = d } as ld) e =
      into a bigger ghost expression, then a ghost exception raised from d
      and catched there is benign. A good test is to traverse top-level
      definitions from top to bottom and check if exceptions escape from
-     the outermost ghost subexpressions. The same for ghost writes. *)
+     the outermost ghost subexpressions. The same goes for ghost writes,
+     though it is not really constraining: a normal use case for ghost
+     regions is via ghost mutable fields or ghost references, and in
+     both cases reading those regions would naturally be ghost, too.
+     For exceptions, it might be just enough to never catch a ghost
+     exception in a non-ghost code. *)
   (* If we make a ghost write inside d, then the modified region cannot
      be read in a later non-ghost code. We ignore eventual resets in e;
      a once ghostified region must stay so, even if if reset. *)
@@ -555,7 +560,22 @@ let e_assign_real mpv pv =
   let eff = eff_assign eff_empty ~ghost r pv.pv_vtv.vtv_ity in
   let vars = add_pv_vars pv (add_pv_vars mpv Mid.empty) in
   let vty = VTvalue (vty_value ~ghost ity_unit) in
-  mk_expr (Eassign (mpv,r,pv)) vty eff vars
+  let e = mk_expr (Eassign (mpv,r,pv)) vty eff vars in
+  (* FIXME? Ok, this is awkward. We prohibit assignments
+     where a ghost value is being written in a non-ghost
+     mutable lvalue (which is reasonable), but we build the
+     offending expression nonetheless and include it into
+     the exception! But in fact, there is nothing inherently
+     bad in such expressions, and the check here serves only
+     to catch potential problems early. Indeed, it is quite
+     easy to fool: it suffices to write (ghost r).val <- ghv,
+     to put a ghost value ghv into a non-ghost reference r.
+     The real check is written above in e_let, where we ensure
+     that every ghost write (whether it was made into a ghost
+     lvalue or not) is never followed by a non-ghost read. *)
+  if not mpv.pv_vtv.vtv_ghost && pv.pv_vtv.vtv_ghost then
+    raise (GhostWrite (e,r));
+  e
 
 let e_assign me e =
   let assign pv mpv = e_assign_real mpv pv in
