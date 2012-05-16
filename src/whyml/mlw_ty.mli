@@ -185,20 +185,24 @@ module Sexn: Mexn.Set
 type effect = private {
   eff_reads  : Sreg.t;
   eff_writes : Sreg.t;
+  eff_raises : Sexn.t;
+  eff_ghostr : Sreg.t; (* ghost reads *)
+  eff_ghostw : Sreg.t; (* ghost writes *)
+  eff_ghostx : Sexn.t; (* ghost raises *)
   (* if r1 -> Some r2 then r1 appears in ty(r2) *)
   eff_resets : region option Mreg.t;
-  eff_raises : Sexn.t;
 }
 
 val eff_empty : effect
 val eff_union : effect -> effect -> effect
+val eff_ghostify : effect -> effect
 
-val eff_read  : effect -> region -> effect
-val eff_write : effect -> region -> effect
+val eff_read  : effect -> ?ghost:bool -> region -> effect
+val eff_write : effect -> ?ghost:bool -> region -> effect
+val eff_raise : effect -> ?ghost:bool -> xsymbol -> effect
 val eff_reset : effect -> region -> effect
-val eff_raise : effect -> xsymbol -> effect
 
-val eff_assign : effect -> region -> ity -> effect
+val eff_assign : effect -> ?ghost:bool -> region -> ity -> effect
 
 val eff_remove_raise : effect -> xsymbol -> effect
 

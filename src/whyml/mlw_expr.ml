@@ -73,6 +73,7 @@ let create_plsymbol id args value =
   let ty_of_vtv vtv = ty_of_ity vtv.vtv_ity in
   let pure_args = List.map ty_of_vtv args in
   let ls = create_fsymbol id pure_args (ty_of_vtv value) in
+  let eff_read e r = eff_read e ~ghost:value.vtv_ghost r in
   let effect = Util.option_fold eff_read eff_empty value.vtv_mut in
   let arg_reset acc a = Util.option_fold eff_reset acc a.vtv_mut in
   let effect = List.fold_left arg_reset effect args in {
@@ -113,18 +114,19 @@ let ppat_plapp pls ppl vtv =
   let sbs = ity_match ity_subst_empty pls.pl_value.vtv_ity vtv.vtv_ity in
   let mtch eff arg pp =
     ignore (ity_match sbs arg.vtv_ity pp.ppat_vtv.vtv_ity);
-    if pp.ppat_vtv.vtv_ghost <> (vtv.vtv_ghost || arg.vtv_ghost) then
+    let ghost = pp.ppat_vtv.vtv_ghost in
+    if ghost <> (vtv.vtv_ghost || arg.vtv_ghost) then
       Loc.errorm "Ghost pattern in a non-ghost context";
     match arg.vtv_mut, pp.ppat_vtv.vtv_mut with
-      | Some r1, Some r2 ->
-          ignore (reg_match sbs r1 r2);
-          eff_read (eff_union eff pp.ppat_effect) (reg_full_inst sbs r1)
-      | Some r1, None ->
-          eff_read (eff_union eff pp.ppat_effect) (reg_full_inst sbs r1)
-      | None, None ->
-          eff_union eff pp.ppat_effect
-      | None, Some _ ->
-          Loc.errorm "Mutable pattern in a non-mutable position"
+    | Some r1, Some r2 ->
+        ignore (reg_match sbs r1 r2);
+        eff_read ~ghost (eff_union eff pp.ppat_effect) (reg_full_inst sbs r1)
+    | Some r1, None ->
+        eff_read ~ghost (eff_union eff pp.ppat_effect) (reg_full_inst sbs r1)
+    | None, None ->
+        eff_union eff pp.ppat_effect
+    | None, Some _ ->
+        Loc.errorm "Mutable pattern in a non-mutable position"
   in
   let eff = try List.fold_left2 mtch eff_empty pls.pl_args ppl
     with Invalid_argument _ -> raise
@@ -132,7 +134,7 @@ let ppat_plapp pls ppl vtv =
   let pl = List.map (fun pp -> pp.ppat_pattern) ppl in
   { ppat_pattern = pat_app pls.pl_ls pl (ty_of_ity vtv.vtv_ity);
     ppat_vtv     = vtv;
-    ppat_effect  = eff; }
+    ppat_effect  = if vtv.vtv_ghost then eff_ghostify eff else eff; }
 
 let ppat_lapp ls ppl vtv =
   let pls = {
@@ -239,27 +241,14 @@ let e_label_copy { e_label = lab; e_loc = loc } e =
 exception GhostWrite of expr * region
 exception GhostRaise of expr * xsymbol
 
-let ghost_effect e = e (* FIXME *)
-(*
-  if vty_ghost e.e_vty then
-    let eff = e.e_effect in
-    let check r = not r.reg_ghost in
-    if Sreg.exists check eff.eff_writes then
-      let s = Sreg.filter check eff.eff_writes in
-      raise (GhostWrite (e, Sreg.choose s))
-    else e
-  else e
-*)
-
-let mk_expr node vty eff vars =
-  ghost_effect {
-    e_node   = node;
-    e_vty    = vty;
-    e_effect = eff;
-    e_vars   = vars;
-    e_label  = Slab.empty;
-    e_loc    = None;
-  }
+let mk_expr node vty eff vars = {
+  e_node   = node;
+  e_vty    = vty;
+  e_effect = if vty_ghost vty then eff_ghostify eff else eff;
+  e_vars   = vars;
+  e_label  = Slab.empty;
+  e_loc    = None;
+}
 
 let varmap_join = Mid.fold (fun _ -> vars_union)
 let varmap_union = Mid.union (fun _ s1 s2 -> Some (vars_union s1 s2))
@@ -325,15 +314,19 @@ let e_let ({ let_var = lv ; let_expr = d } as ld) e =
     Mid.iter check_id vars
   in
   Mreg.iter check_reset d.e_effect.eff_resets;
+  (* FIXME: the tests below are too restrictive. If this let is embedded
+     into a bigger ghost expression, then a ghost exception raised from d
+     and catched there is benign. A good test is to traverse top-level
+     definitions from top to bottom and check if exceptions escape from
+     the outermost ghost subexpressions. The same for ghost writes. *)
+  (* If we make a ghost write inside d, then the modified region cannot
+     be read in a later non-ghost code. We ignore eventual resets in e;
+     a once ghostified region must stay so, even if if reset. *)
+  let badwr = Sreg.inter d.e_effect.eff_ghostw e.e_effect.eff_reads in
+  if not (Sreg.is_empty badwr) then raise (GhostWrite (d, Sreg.choose badwr));
   (* We should be able to raise and catch exceptions inside ghost expressions.
      The problematic case is a ghost exception that escapes into reality. *)
-  (* FIXME: this test is too restrictive. If this let is embedded into a
-     bigger ghost expression, then an exception raised from d and catched
-     there is benign. A good test is to traverse top-level definitions
-     from top to bottom and check if exceptions escape from the outermost
-     ghost subexpressions. *)
-  if vty_ghost d.e_vty && not (vty_ghost e.e_vty) &&
-      not (Sexn.is_empty d.e_effect.eff_raises) then
+  if not (vty_ghost e.e_vty) && not (Sexn.is_empty d.e_effect.eff_ghostx) then
     raise (GhostRaise (d, Sexn.choose d.e_effect.eff_raises));
   (* This should be the only expression constructor that deals with
      sequence of effects *)
@@ -558,9 +551,9 @@ let e_assign_real mpv pv =
     | Some r -> r
     | None -> raise (Immutable mpv)
   in
-  let eff = eff_assign eff_empty r pv.pv_vtv.vtv_ity in
-  let vars = add_pv_vars pv (add_pv_vars mpv Mid.empty) in
   let ghost = mpv.pv_vtv.vtv_ghost || pv.pv_vtv.vtv_ghost in
+  let eff = eff_assign eff_empty ~ghost r pv.pv_vtv.vtv_ity in
+  let vars = add_pv_vars pv (add_pv_vars mpv Mid.empty) in
   let vty = VTvalue (vty_value ~ghost ity_unit) in
   mk_expr (Eassign (mpv,r,pv)) vty eff vars
 

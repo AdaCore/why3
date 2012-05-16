@@ -465,37 +465,65 @@ module Mexn = Exn.M
 type effect = {
   eff_reads  : Sreg.t;
   eff_writes : Sreg.t;
+  eff_raises : Sexn.t;
+  eff_ghostr : Sreg.t; (* ghost reads *)
+  eff_ghostw : Sreg.t; (* ghost writes *)
+  eff_ghostx : Sexn.t; (* ghost raises *)
   (* if r1 -> Some r2 then r1 appears in ty(r2) *)
   eff_resets : region option Mreg.t;
-  eff_raises : Sexn.t;
 }
 
 let eff_empty = {
   eff_reads  = Sreg.empty;
   eff_writes = Sreg.empty;
+  eff_raises = Sexn.empty;
+  eff_ghostr = Sreg.empty;
+  eff_ghostw = Sreg.empty;
+  eff_ghostx = Sexn.empty;
   eff_resets = Mreg.empty;
-  eff_raises = Sexn.empty
 }
 
 let join_reset _key v1 v2 =
   Some (if option_eq reg_equal v1 v2 then v1 else None)
 
-let eff_union x y =
-  { eff_reads  = Sreg.union x.eff_reads  y.eff_reads;
-    eff_writes = Sreg.union x.eff_writes y.eff_writes;
-    eff_resets = Mreg.union join_reset x.eff_resets y.eff_resets;
-    eff_raises = Sexn.union x.eff_raises y.eff_raises;
-  }
+let eff_union x y = {
+  eff_reads  = Sreg.union x.eff_reads  y.eff_reads;
+  eff_writes = Sreg.union x.eff_writes y.eff_writes;
+  eff_raises = Sexn.union x.eff_raises y.eff_raises;
+  eff_ghostr = Sreg.union x.eff_ghostr y.eff_ghostr;
+  eff_ghostw = Sreg.union x.eff_ghostw y.eff_ghostw;
+  eff_ghostx = Sexn.union x.eff_ghostx y.eff_ghostx;
+  eff_resets = Mreg.union join_reset x.eff_resets y.eff_resets;
+}
 
-let eff_read  e r = { e with eff_reads  = Sreg.add r e.eff_reads }
-let eff_write e r = { e with eff_writes = Sreg.add r e.eff_writes }
-let eff_raise e x = { e with eff_raises = Sexn.add x e.eff_raises }
+let eff_ghostify e = {
+  eff_reads  = Sreg.empty;
+  eff_writes = Sreg.empty;
+  eff_raises = Sexn.empty;
+  eff_ghostr = Sreg.union e.eff_reads  e.eff_ghostr;
+  eff_ghostw = Sreg.union e.eff_writes e.eff_ghostw;
+  eff_ghostx = Sexn.union e.eff_raises e.eff_ghostx;
+  eff_resets = e.eff_resets;
+}
+
+let eff_read e ?(ghost=false) r = if ghost
+  then { e with eff_ghostr = Sreg.add r e.eff_ghostr }
+  else { e with eff_reads  = Sreg.add r e.eff_reads  }
+
+let eff_write e ?(ghost=false) r = if ghost
+  then { e with eff_ghostw = Sreg.add r e.eff_ghostw }
+  else { e with eff_writes = Sreg.add r e.eff_writes }
+
+let eff_raise e ?(ghost=false) x = if ghost
+  then { e with eff_ghostx = Sexn.add x e.eff_ghostx }
+  else { e with eff_raises = Sexn.add x e.eff_raises }
+
 let eff_reset e r = { e with eff_resets = Mreg.add r None e.eff_resets }
 
 exception IllegalAlias of region
 
-let eff_assign e r ty =
-  let e = eff_write e r in
+let eff_assign e ?(ghost=false) r ty =
+  let e = eff_write e ~ghost r in
   let sub = ity_match ity_subst_empty r.reg_ity ty in
   (* assignment cannot instantiate type variables *)
   let check tv ity = match ity.ity_node with
@@ -514,15 +542,19 @@ let eff_assign e r ty =
   let reset = Mreg.fold add_left sub.ity_subst_reg reset in
   { e with eff_resets = Mreg.union join_reset e.eff_resets reset }
 
-let eff_remove_raise e x = { e with eff_raises = Sexn.remove x e.eff_raises }
+let eff_remove_raise e x = { e with
+  eff_raises = Sexn.remove x e.eff_raises;
+  eff_ghostx = Sexn.remove x e.eff_ghostx;
+}
 
 let eff_full_inst s e =
   let s = s.ity_subst_reg in
   (* modified or reset regions in e *)
   let wr = Mreg.map (Util.const ()) e.eff_resets in
   let wr = Sreg.union e.eff_writes wr in
+  let wr = Sreg.union e.eff_ghostw wr in
   (* read-only regions in e *)
-  let ro = Sreg.diff e.eff_reads wr in
+  let ro = Sreg.diff (Sreg.union e.eff_reads e.eff_ghostr) wr in
   (* all modified or reset regions are instantiated into distinct regions *)
   let add_affected r acc =
     let r = Mreg.find r s in Sreg.add_new (IllegalAlias r) r acc in
@@ -532,13 +564,16 @@ let eff_full_inst s e =
     let r = Mreg.find r s in if Sreg.mem r wr then raise (IllegalAlias r) in
   Sreg.iter add_readonly ro;
   (* calculate instantiated effect *)
-  let add_inst r acc = Sreg.add (Mreg.find r s) acc in
-  let reads  = Sreg.fold add_inst e.eff_reads  Sreg.empty in
-  let writes = Sreg.fold add_inst e.eff_writes Sreg.empty in
-  let add_inst r v acc =
+  let add_sreg r acc = Sreg.add (Mreg.find r s) acc in
+  let add_mreg r v acc =
     Mreg.add (Mreg.find r s) (option_map (fun v -> Mreg.find v s) v) acc in
-  let resets = Mreg.fold add_inst e.eff_resets Mreg.empty in
-  { e with eff_reads = reads ; eff_writes = writes ; eff_resets = resets }
+  { e with
+    eff_reads  = Sreg.fold add_sreg e.eff_reads  Sreg.empty;
+    eff_writes = Sreg.fold add_sreg e.eff_writes Sreg.empty;
+    eff_ghostr = Sreg.fold add_sreg e.eff_ghostr Sreg.empty;
+    eff_ghostw = Sreg.fold add_sreg e.eff_ghostw Sreg.empty;
+    eff_resets = Mreg.fold add_mreg e.eff_resets Mreg.empty;
+  }
 
 (* program types *)
 
@@ -589,7 +624,7 @@ let vty_arrow vtv ?(effect=eff_empty) ?(ghost=false) vty =
   (* mutable arguments are rejected outright *)
   if vtv.vtv_mut <> None then
     Loc.errorm "Mutable arguments are not allowed in vty_arrow";
-  (* we accept a mutable vty_value for the result to simplify Mlw_expr,
+  (* we accept a mutable vty_value as a result to simplify Mlw_expr,
      but erase it in the signature: only projections return mutables *)
   let vty = match vty with
     | VTvalue ({ vtv_mut = Some r ; vtv_vars = vars } as vtv) ->
@@ -619,7 +654,11 @@ let vty_app_arrow vta vtv =
   ity_equal_check vta.vta_arg.vtv_ity vtv.vtv_ity;
   let ghost = vta.vta_ghost || (vtv.vtv_ghost && not vta.vta_arg.vtv_ghost) in
   let result = if ghost then vty_ghostify vta.vta_result else vta.vta_result in
-  vta.vta_effect, result
+  let effect =
+    if vty_ghost result then eff_ghostify vta.vta_effect else vta.vta_effect in
+    (* we don't really need this, because Mlw_expr will ensure that the effect
+       of every ghost expression is properly ghostified *)
+  effect, result
 
 (* vty instantiation *)
 
