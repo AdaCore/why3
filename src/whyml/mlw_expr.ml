@@ -539,6 +539,7 @@ let e_case_real pv bl =
         let ghost = ghost || vtv.vtv_ghost in
         let del_vs vs _ m = Mid.remove vs.vs_name m in
         let bvars = Mvs.fold del_vs pp.ppat_pattern.pat_vars e.e_vars in
+        let eff = eff_union (eff_union eff pp.ppat_effect) e.e_effect in
         branch ghost eff (varmap_union vars bvars) bl
     | [] ->
         let vty = VTvalue (vty_value ~ghost ity) in
