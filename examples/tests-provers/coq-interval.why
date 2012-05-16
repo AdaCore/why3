@@ -1,0 +1,9 @@
+theory P
+
+  use import real.Real
+  use import real.PowerInt
+
+  goal pow_eps2_max_int :
+    power (1.0 + (0x7.p-50 + 0x3.p-53)) 2147483647 <= 2.0
+
+end
