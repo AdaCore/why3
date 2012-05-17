@@ -66,6 +66,10 @@ and goal_depth g =
 let theory_depth t =
   List.fold_left (fun depth g -> max depth (goal_depth g)) 0 t.S.theory_goals
 
+let file_depth f =
+  List.fold_left (fun depth t -> max depth (theory_depth t)) 0
+    f.S.file_theories
+
 let provers_latex_stats_goal provers goal =
   S.goal_iter_proof_attempt (fun a ->
     Hashtbl.replace provers a.S.proof_prover a.S.proof_prover) goal
@@ -73,6 +77,10 @@ let provers_latex_stats_goal provers goal =
 let provers_latex_stats provers theory =
   S.theory_iter_proof_attempt (fun a ->
     Hashtbl.replace provers a.S.proof_prover a.S.proof_prover) theory
+
+let provers_latex_stats_file provers file =
+  S.file_iter_proof_attempt (fun a ->
+    Hashtbl.replace provers a.S.proof_prover a.S.proof_prover) file
 
 let protect s =
   let b = Buffer.create 7 in
@@ -252,12 +260,21 @@ let latex_tabular_goal n fmt depth provers g =
     goal_latex2_stat fmt provers 0 depth  0 g;
   print_tabular_foot fmt
 
-let latex_tabular n fmt depth provers t =
-  print_tabular_head n depth provers fmt;
+let latex_tabular_aux n fmt depth provers t =
   if n == 1 then
     List.iter (goal_latex_stat fmt provers 0 depth 0) t.S.theory_goals
   else
-    List.iter (goal_latex2_stat fmt provers 0 depth  0) t.S.theory_goals;
+    List.iter (goal_latex2_stat fmt provers 0 depth  0) t.S.theory_goals
+
+let latex_tabular n fmt depth provers t =
+  print_tabular_head n depth provers fmt;
+  latex_tabular_aux n fmt depth provers t;
+  print_tabular_foot fmt
+
+
+let latex_tabular_file n fmt depth provers f =
+  print_tabular_head n depth provers fmt;
+  List.iter (latex_tabular_aux n fmt depth provers) f.S.file_theories;
   print_tabular_foot fmt
 
 
@@ -330,6 +347,30 @@ let standalone_goal_latex_stat n _table dir g =
 *)
 close_out ch
 
+let file_latex_stat_all n _table dir f =
+  let provers = Hashtbl.create 9 in
+  provers_latex_stats_file provers f;
+  let provers = Hashtbl.fold (fun _ pr acc -> pr :: acc)
+    provers [] in
+  let provers = List.sort Whyconf.Prover.compare provers in
+  let depth = file_depth f in
+  let name = Filename.basename f.S.file_name in
+  let ch = open_out (Filename.concat dir(name^".tex")) in
+  let fmt = formatter_of_out_channel ch in
+  latex_tabular_file n fmt depth provers f;
+(*
+    if table = "tabular" then
+      begin
+      latex_tabular n fmt depth provers t
+      end
+    else
+      latex_longtable n fmt depth name provers t;
+
+*)
+    close_out ch
+
+
+
 let element_latex_stat_goal g n table dir r =
   begin
     match r with
@@ -355,7 +396,7 @@ let element_latex_stat_theory th n table dir e =
 
 let element_latex_stat_file f n table dir e =
   match e with
-    | [] -> file_latex_stat n table dir f
+    | [] -> file_latex_stat_all n table dir f
     | th :: r ->
       try
         let ths =
@@ -370,14 +411,23 @@ let element_latex_stat_file f n table dir e =
 
 let element_latex_stat files n table dir e =
   eprintf "Element %s@." e;
-  match Str.split (Str.regexp "|") e with
+  let re_dot = Str.regexp "\\." in
+  match Str.split re_dot e with
     | [] -> ()
     | f :: r ->
-      try
-        let f = S.PHstr.find files f in
-        element_latex_stat_file f n table dir r
-      with Not_found ->
-        eprintf "Warning: file not found in path: %s@." f
+      let found = ref false in
+      S.PHstr.iter
+        (fun fname file ->
+          let fname = Filename.basename fname in
+          let fname = List.hd (Str.split re_dot fname) in
+          if fname = f then 
+            begin
+              found := true;
+              element_latex_stat_file file n table dir r
+            end)
+        files;
+      if not !found then
+        eprintf "Warning: file not found for element %s@." e
 
 let print_latex_statistics n table dir session =
   let files = session.S.session_files in
