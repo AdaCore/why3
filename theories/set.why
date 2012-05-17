@@ -78,11 +78,12 @@ theory Set
   axiom choose_def:
     forall s: set 'a. not (is_empty s) -> mem (choose s) s
 
+(*
   (** the set of all x of type 'a *)
   constant all: set 'a
 
   axiom all_def: forall x: 'a. mem x all
-
+*)
 end
 
 (** {2 Set Comprehension} *)
