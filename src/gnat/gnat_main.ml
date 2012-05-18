@@ -467,9 +467,7 @@ and schedule_goal g =
    (* first deal with command line options *)
    if Gnat_config.debug then
       Save_VCs.save_vc g;
-   if Gnat_config.noproof then
-      Format.printf "%a@." Gnat_expl.print_skipped (Objectives.get_objective g)
-   else if Gnat_config.force then
+   if Gnat_config.force then
       actually_schedule_goal g
    else
       (* then implement reproving logic *)
