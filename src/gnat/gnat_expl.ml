@@ -114,20 +114,20 @@ let print_reason fmt r =
    Format.fprintf fmt "%s" (string_of_reason r)
 
 let print_expl proven fmt p =
-   if proven then
-      Format.fprintf fmt "%a: info: %a proved"
-        simple_print_loc (List.hd p.loc) print_reason p.reason
-   else
-      Format.fprintf fmt "%a: %a not proved"
-        simple_print_loc (List.hd p.loc) print_reason p.reason;
    match p.loc with
-   | [] -> assert false
-   | [_] -> ()
-   | hd :: rest ->
-         List.iter (fun secondary_sloc ->
-            Format.fprintf fmt "@.%a:   instantiated from %a"
-              simple_print_loc hd
-              print_line_loc secondary_sloc) rest
+   | [] -> assert false (* the sloc of a VC is never empty *)
+   | primary :: secondaries ->
+         if proven then begin
+            Format.fprintf fmt "%a: info: %a proved"
+            simple_print_loc primary print_reason p.reason
+         end else begin
+            Format.fprintf fmt "%a: %a not proved"
+            simple_print_loc primary print_reason p.reason
+         end;
+         List.iter
+         (fun secondary_sloc ->
+            Format.fprintf fmt ", in instantiation at %a"
+              print_line_loc secondary_sloc) secondaries
 
 let print_skipped fmt p =
    Format.fprintf fmt "%a: %a skipped"
