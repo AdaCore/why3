@@ -15,8 +15,8 @@ let opt_ide_progress_bar = ref false
 let opt_parallel = ref 1
 let opt_prover : string option ref = ref None
 
-let opt_limit_line : Gnat_expl.loc option ref = ref None
-let opt_limit_subp : Gnat_expl.loc option ref = ref None
+let opt_limit_line : Gnat_loc.loc option ref = ref None
+let opt_limit_subp : Gnat_loc.loc option ref = ref None
 
 let set_filename s =
    if !opt_filename = None then
@@ -43,7 +43,7 @@ let parse_line_spec caller s =
       let line =
          int_of_string (String.sub s (index + 1) (String.length s - index - 1))
       in
-      Gnat_expl.mk_loc_line fn line
+      Gnat_loc.mk_loc_line fn line
    with
    | Not_found ->
       Gnat_util.abort_with_message

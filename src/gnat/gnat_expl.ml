@@ -1,4 +1,5 @@
 open Why3
+open Gnat_loc
 
 type reason =
    | VC_Division_Check
@@ -11,9 +12,6 @@ type reason =
    | VC_Loop_Invariant_Init
    | VC_Loop_Invariant_Preserv
    | VC_Assert
-
-type simple_loc  = { file : string; line : int ; col : int }
-type loc = simple_loc list
 
 type expl = { loc : loc ; reason : reason ; subp : loc }
 (* The subp field should not differentiate two otherwise equal explanations *)
@@ -59,61 +57,21 @@ let string_of_reason s =
    | VC_Loop_Invariant_Preserv    -> "loop invariant preservation"
    | VC_Assert                    -> "assertion"
 
-let mk_simple_loc fn l c =
-   { file = fn; line = l; col = c }
-let mk_loc fn l c =
-   [mk_simple_loc fn l c]
-
-let mk_loc_line fn l = mk_loc fn l 0
-
-let equal_line l1 l2 =
-   let l1 = List.hd l1 and l2 = List.hd l2 in
-   l1.line = l2.line && l1.file = l2.file
-
 let get_loc e = e.loc
 let get_subp_loc e = e.subp
-
-let parse_loc =
-   let rec parse_loc_list acc l =
-      match l with
-      | file::line::col::rest ->
-            let new_loc =
-               mk_simple_loc file (int_of_string line) (int_of_string col) in
-            parse_loc_list (new_loc :: acc) rest
-      | [] -> acc
-      | _ -> Gnat_util.abort_with_message "location list malformed."
-   in
-   fun l -> List.rev (parse_loc_list [] l)
-
-let orig_loc l =
-   (* the original source is always the last source location *)
-   List.hd (List.rev l)
 
 let to_filename expl =
    let s = String.copy (string_of_reason expl.reason) in
    for i = 0 to String.length s - 1 do
       if s.[i] = ' ' then s.[i] <- '_'
    done;
-   let l = List.hd expl.loc in
-   Format.sprintf "%s_%d_%d_%s" l.file l.line l.col s
-
-let loc_of_pos l =
-   let f,l,c,_ = Loc.get l in
-   { file = f; line = l; col = c }
-
-let simple_print_loc fmt l =
-   Format.fprintf fmt "%s:%d:%d" l.file l.line l.col
-
-let print_line_loc fmt l =
-   Format.fprintf fmt "%s:%d" l.file l.line
-
-let print_loc _ _ =
-   assert false
+   let l = orig_loc expl.loc in
+   Format.sprintf "%s_%d_%d_%s" (get_file l) (get_line l) (get_col l) s
 
 let print_reason fmt r =
    Format.fprintf fmt "%s" (string_of_reason r)
 
-let print_expl proven fmt p =
+let print_expl proven task fmt p =
    match p.loc with
    | [] -> assert false (* the sloc of a VC is never empty *)
    | primary :: secondaries ->
@@ -122,7 +80,9 @@ let print_expl proven fmt p =
             simple_print_loc primary print_reason p.reason
          end else begin
             Format.fprintf fmt "%a: %a not proved"
-            simple_print_loc primary print_reason p.reason
+            simple_print_loc primary print_reason p.reason;
+            Format.fprintf fmt ", requires %a"
+              (Driver.print_task Gnat_config.gnat_driver) task;
          end;
          List.iter
          (fun secondary_sloc ->

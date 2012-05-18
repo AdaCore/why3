@@ -3,15 +3,15 @@ open Term
 open Ident
 
 type my_expl =
-   { mutable loc : Gnat_expl.loc option ;
+   { mutable loc : Gnat_loc.loc option ;
      mutable reason : Gnat_expl.reason option ;
-     mutable subp : Gnat_expl.loc option }
+     mutable subp : Gnat_loc.loc option }
 (* The type that is used to extract information from a VC, is filled up field
    by field *)
 
 type node_info =
    | Expl of Gnat_expl.expl
-   | Sloc of Gnat_expl.loc
+   | Sloc of Gnat_loc.loc
    | No_Info
 (* The information that has been found in a node *)
 
@@ -32,14 +32,14 @@ let extract_explanation s =
            | ["GP_Subp"; file; line] ->
                  begin try
                     b.subp <-
-                       Some (Gnat_expl.mk_loc_line file (int_of_string line))
+                       Some (Gnat_loc.mk_loc_line file (int_of_string line))
                  with Failure "int_of_string" ->
                     Format.printf "GP_Subp: cannot parse string: %s" s;
                     Gnat_util.abort_with_message ""
                  end
            | "GP_Sloc" :: rest ->
                  begin try
-                    b.loc <- Some (Gnat_expl.parse_loc rest)
+                    b.loc <- Some (Gnat_loc.parse_loc rest)
                  with Failure "int_of_string" ->
                     Format.printf "GP_Sloc: cannot parse string: %s" s;
                     Gnat_util.abort_with_message ""
@@ -68,7 +68,7 @@ let extract_explanation s =
            No_Info
 
 type vc_info =
-   { expl : Gnat_expl.expl option; trace : Gnat_expl.loc list }
+   { expl : Gnat_expl.expl option; trace : Gnat_loc.loc list }
 (* The VC information that has been found in a VC *)
 
 let rec search_labels acc f =
@@ -164,7 +164,7 @@ module Objectives : sig
       *)
 
 
-   val add_to_expl : Gnat_expl.expl -> goal -> Gnat_expl.loc list -> unit
+   val add_to_expl : Gnat_expl.expl -> goal -> Gnat_loc.loc list -> unit
    (* register the goal with the given objective and trace. If this is the
       first time we register a goal for given objective, the objective is
       registered as well. Only do the registering if the objective is to de
@@ -191,7 +191,7 @@ module Objectives : sig
    val get_objective : goal -> Gnat_expl.expl
    (* get the objective associated with a goal *)
 
-   val get_trace : goal -> Gnat_expl.loc list
+   val get_trace : goal -> Gnat_loc.loc list
    (* get the trace of a given goal *)
 
    val iter : (Gnat_expl.expl -> GoalSet.t -> unit) -> unit
@@ -213,7 +213,7 @@ end = struct
    let goalmap : Gnat_expl.expl GoalMap.t = GoalMap.create 17
    (* maps goals to their objectives *)
 
-   let tracemap : Gnat_expl.loc list GoalMap.t = GoalMap.create 17
+   let tracemap : Gnat_loc.loc list GoalMap.t = GoalMap.create 17
 
    let get_goals expl = Gnat_expl.HExpl.find explmap expl
    let get_objective goal = GoalMap.find goalmap goal
@@ -230,11 +230,11 @@ end = struct
    let add_to_expl ex go trace_list =
       let filter =
          match Gnat_config.limit_line with
-         | Some l -> Gnat_expl.equal_line l (Gnat_expl.get_loc ex)
+         | Some l -> Gnat_loc.equal_line l (Gnat_expl.get_loc ex)
          | None ->
              match Gnat_config.limit_subp with
              | None -> true
-             | Some l -> Gnat_expl.equal_line l (Gnat_expl.get_subp_loc ex)
+             | Some l -> Gnat_loc.equal_line l (Gnat_expl.get_subp_loc ex)
       in
       if filter then begin
          incr nb_goals;
@@ -266,12 +266,12 @@ end = struct
    let get_num_goals () = !nb_goals
 end
 
-let print ?(endline=true) b expl =
+let print ?(endline=true) b task expl =
    (* Print a positive or negative message for objectives *)
    if endline then
-      Format.printf "%a@." (Gnat_expl.print_expl b) expl
+      Format.printf "%a@." (Gnat_expl.print_expl b task) expl
    else
-      Format.printf "%a" (Gnat_expl.print_expl b) expl
+      Format.printf "%a" (Gnat_expl.print_expl b task) expl
 
 let count = ref 0
 
@@ -412,13 +412,13 @@ let goal_has_been_tried g =
    with Exit -> true
 
 module Save_VCs : sig
-   (* Provide saving of VCs, traces and pretty-printed VCs *)
+   (* Provide saving of VCs, traces *)
 
    val save_vc : goal -> unit
    (* Save the goal to a file *)
 
-   val save_trace_and_pretty_vc : goal -> unit
-   (* save the trace to a file and the pretty printed VC to another file *)
+   val save_trace : goal -> unit
+   (* save the trace to a file *)
 end = struct
 
    let count_map : (int ref) Gnat_expl.HExpl.t = Gnat_expl.HExpl.create 17
@@ -453,20 +453,15 @@ end = struct
       with_fmt_channel vc_fn (fun fmt -> Driver.print_task dr fmt task);
       Format.printf "saved VC to %s@." vc_fn
 
-   let save_trace_and_pretty_vc goal =
+   let save_trace goal =
       let expl = Objectives.get_objective goal in
       let base = Gnat_expl.to_filename expl in
       let trace_fn = base ^ ".trace" in
-      let pretty_vc_fn = base ^ ".pretty" in
       with_fmt_channel trace_fn (fun fmt ->
          List.iter (fun l ->
-            Format.fprintf fmt "%a@." Gnat_expl.simple_print_loc
-           (Gnat_expl.orig_loc l))
-      (Objectives.get_trace goal));
-      let task = Session.goal_task goal in
-      let dr = Gnat_config.gnat_driver in
-      with_fmt_channel pretty_vc_fn (fun fmt ->
-         Driver.print_task dr fmt task)
+            Format.fprintf fmt "%a@." Gnat_loc.simple_print_loc
+           (Gnat_loc.orig_loc l))
+      (Objectives.get_trace goal))
 
 end
 
@@ -501,7 +496,8 @@ let rec handle_vc_result goal result detailed =
       if GoalSet.is_empty remaining then begin
          match Gnat_config.report with
          | (Gnat_config.Verbose | Gnat_config.Detailed) ->
-               print true (Objectives.get_objective goal)
+               print true (Session.goal_task goal)
+                 (Objectives.get_objective goal)
          | _ -> ()
       end else begin
          schedule_goal (GoalSet.choose remaining)
@@ -512,12 +508,13 @@ let rec handle_vc_result goal result detailed =
       begin
          let detailed =
             match detailed with None -> assert false | Some x -> x in
-         print ~endline:false false (Objectives.get_objective goal);
+         print ~endline:false false (Session.goal_task goal)
+           (Objectives.get_objective goal);
          Format.printf " (%a)@." Call_provers.print_prover_answer detailed
       end else begin
-         print false (Objectives.get_objective goal)
+         print false (Session.goal_task goal) (Objectives.get_objective goal)
       end;
-      Save_VCs.save_trace_and_pretty_vc goal
+      Save_VCs.save_trace goal
    end
 
 and interpret_result pa pas =
