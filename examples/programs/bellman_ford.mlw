@@ -54,6 +54,29 @@ theory Graph
               l ++ [v] = l1 ++ [u] ++ l2 ++ [u] ++ l3
        Two cases depending on l3=[] (and thus u=v) conclude the proof. Qed.
   *)
+
+  clone pigeon.Pigeonhole with type t = vertex
+
+  lemma long_path_decomposition_pigeon1:
+    forall l: list vertex, v: vertex.
+    path s l v -> l <> Nil ->
+    (forall v1: vertex. Mem.mem v1 (Cons v l) -> mem v1 vertices)
+
+  lemma long_path_decomposition_pigeon2:
+    forall l: list vertex, v: vertex.
+    (forall v1: vertex. Mem.mem v1 (Cons v l) -> mem v1 vertices) ->
+    length (Cons v l) > cardinal vertices ->
+    (exists e: vertex, l1 l2 l3: list vertex.
+    (Cons v l) = l1 ++ (Cons e (l2 ++ (Cons e l3))))
+
+  lemma long_path_decomposition_pigeon3:
+    forall l: list vertex, v: vertex.
+    (exists e: vertex, l1 l2 l3: list vertex.
+    (Cons v l) = l1 ++ (Cons e (l2 ++ (Cons e l3)))) ->
+       (exists l1 l2: list vertex. l = l1 ++ Cons v l2)
+    \/ (exists n: vertex, l1 l2 l3: list vertex.
+          l = l1 ++ Cons n (l2 ++ Cons n l3))
+
   lemma long_path_decomposition:
     forall l: list vertex, v: vertex.
     path s l v -> length l >= cardinal vertices ->
