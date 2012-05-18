@@ -1,0 +1,585 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session SYSTEM "/usr/local/share/why3/why3session.dtd">
+<why3session
+ name="triangle_inequality/why3session.xml">
+ <prover
+  id="0"
+  name="Alt-Ergo"
+  version="0.94"/>
+ <prover
+  id="1"
+  name="Alt-Ergo"
+  version="0.95-dev"/>
+ <prover
+  id="2"
+  name="CVC3"
+  version="2.2"/>
+ <prover
+  id="3"
+  name="CVC3"
+  version="2.4.1"/>
+ <prover
+  id="4"
+  name="Z3"
+  version="2.19"/>
+ <prover
+  id="5"
+  name="Z3"
+  version="3.2"/>
+ <file
+  name="../triangle_inequality.why"
+  verified="true"
+  expanded="true">
+  <theory
+   name="CauchySchwarzInequality"
+   locfile="triangle_inequality/../triangle_inequality.why"
+   loclnum="16" loccnumb="7" loccnume="30"
+   verified="true"
+   expanded="true">
+   <goal
+    name="norm2_pos"
+    locfile="triangle_inequality/../triangle_inequality.why"
+    loclnum="30" loccnumb="8" loccnume="17"
+    sum="fd02659868bf23693dc6818171dd9f6c"
+    proved="true"
+    expanded="false"
+    shape="ainfix &gt;=anorm2V0V1c0.0F">
+    <proof
+     prover="4"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="p_expr"
+    locfile="triangle_inequality/../triangle_inequality.why"
+    loclnum="43" loccnumb="8" loccnume="14"
+    sum="e3e2e3f2ab3514176916677a2c9dcda8"
+    proved="true"
+    expanded="false"
+    shape="ainfix =apV0V1V2V3V4anorm2ainfix +V0ainfix *V4V2ainfix +V1ainfix *V4V3F">
+    <proof
+     prover="4"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="30"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
+    name="p_pos"
+    locfile="triangle_inequality/../triangle_inequality.why"
+    loclnum="47" loccnumb="8" loccnume="13"
+    sum="9d300338932b8b2f1d30f1a5ef4048aa"
+    proved="true"
+    expanded="false"
+    shape="ainfix &gt;=apV0V1V2V3V4c0.0F">
+    <proof
+     prover="2"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="0"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
+    name="mul_div_simpl"
+    locfile="triangle_inequality/../triangle_inequality.why"
+    loclnum="50" loccnumb="8" loccnume="21"
+    sum="0e5fcd8b0be29c6785efa726694586ee"
+    proved="true"
+    expanded="false"
+    shape="ainfix =ainfix *ainfix /V0V1V1V0Iainfix =V1c0.0NF">
+    <proof
+     prover="4"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="p_val_part"
+    locfile="triangle_inequality/../triangle_inequality.why"
+    loclnum="53" loccnumb="8" loccnume="18"
+    sum="a8005b01333c545026eb549c56c77150"
+    proved="true"
+    expanded="false"
+    shape="ainfix =apV0V1V2V3ainfix /aprefix -adotV0V1V2V3anorm2V2V3ainfix -anorm2V0V1ainfix /asqradotV0V1V2V3anorm2V2V3Iainfix &gt;anorm2V2V3c0.0F">
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.48"/>
+    </proof>
+   </goal>
+   <goal
+    name="p_val_part_pos"
+    locfile="triangle_inequality/../triangle_inequality.why"
+    loclnum="59" loccnumb="8" loccnume="22"
+    sum="11a72ee799d55da41bc2ed13dd13d256"
+    proved="true"
+    expanded="false"
+    shape="ainfix &gt;=ainfix -anorm2V0V1ainfix /asqradotV0V1V2V3anorm2V2V3c0.0Iainfix &gt;anorm2V2V3c0.0F">
+    <proof
+     prover="0"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.08"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.08"/>
+    </proof>
+   </goal>
+   <goal
+    name="p_val_part_pos_aux"
+    locfile="triangle_inequality/../triangle_inequality.why"
+    loclnum="64" loccnumb="8" loccnume="26"
+    sum="42ca4b825e25d19e11bcea616ff9899b"
+    proved="true"
+    expanded="false"
+    shape="ainfix &gt;=ainfix *anorm2V2V3apV0V1V2V3ainfix /aprefix -adotV0V1V2V3anorm2V2V3c0.0Iainfix &gt;anorm2V2V3c0.0F">
+    <proof
+     prover="0"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
+    name="CauchySchwarz_aux_non_null"
+    locfile="triangle_inequality/../triangle_inequality.why"
+    loclnum="69" loccnumb="8" loccnume="34"
+    sum="7e5d4f7d5ec9b060aef81e2e9fe1dc7a"
+    proved="true"
+    expanded="false"
+    shape="ainfix &lt;=asqradotV0V1V2V3ainfix *anorm2V0V1anorm2V2V3Iainfix &gt;anorm2V2V3c0.0F">
+    <proof
+     prover="0"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="2.21"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="30"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="3.13"/>
+    </proof>
+   </goal>
+   <goal
+    name="norm_null"
+    locfile="triangle_inequality/../triangle_inequality.why"
+    loclnum="74" loccnumb="8" loccnume="17"
+    sum="36c8c6f1440139424e8350659c9d1015"
+    proved="true"
+    expanded="false"
+    shape="ainfix =V1c0.0Oainfix =V0c0.0Iainfix =anorm2V0V1c0.0F">
+    <proof
+     prover="0"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="CauchySchwarz_aux_null"
+    locfile="triangle_inequality/../triangle_inequality.why"
+    loclnum="78" loccnumb="8" loccnume="30"
+    sum="2f87efe9a9c8a6f07547730599e78603"
+    proved="true"
+    expanded="false"
+    shape="ainfix &lt;=asqradotV0V1V2V3ainfix *anorm2V0V1anorm2V2V3Iainfix =anorm2V2V3c0.0F">
+    <proof
+     prover="4"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="0"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.09"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.44"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.10"/>
+    </proof>
+   </goal>
+   <goal
+    name="CauchySchwarz_aux"
+    locfile="triangle_inequality/../triangle_inequality.why"
+    loclnum="83" loccnumb="8" loccnume="25"
+    sum="2066809714d06cd146a2ab0420567848"
+    proved="true"
+    expanded="false"
+    shape="ainfix &lt;=asqradotV0V1V2V3ainfix *anorm2V0V1anorm2V2V3F">
+    <proof
+     prover="4"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.25"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="0"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+   <goal
+    name="norm_pos"
+    locfile="triangle_inequality/../triangle_inequality.why"
+    loclnum="91" loccnumb="8" loccnume="16"
+    sum="530b849b4fa14adfd7c6319ea00fe993"
+    proved="true"
+    expanded="false"
+    shape="ainfix &gt;=anormV0V1c0.0F">
+    <proof
+     prover="4"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="0"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+   <goal
+    name="sqr_le_sqrt"
+    locfile="triangle_inequality/../triangle_inequality.why"
+    loclnum="95" loccnumb="8" loccnume="19"
+    sum="ca0493ceacb48fdb54fe6ad2971a5718"
+    proved="true"
+    expanded="false"
+    shape="ainfix &lt;=V0asqrtV1Iainfix &lt;=asqrV0V1Aainfix &lt;=c0.0asqrV0Aainfix &lt;=c0.0V0F">
+    <proof
+     prover="0"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+   </goal>
+   <goal
+    name="CauchySchwarz"
+    locfile="triangle_inequality/../triangle_inequality.why"
+    loclnum="99" loccnumb="8" loccnume="21"
+    sum="f2b8e94668d253d2296401415e4bc7ce"
+    proved="true"
+    expanded="false"
+    shape="ainfix &lt;=adotV0V1V2V3ainfix *anormV0V1anormV2V3F">
+    <proof
+     prover="0"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.28"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.29"/>
+    </proof>
+   </goal>
+  </theory>
+  <theory
+   name="TriangleInequality"
+   locfile="triangle_inequality/../triangle_inequality.why"
+   loclnum="106" loccnumb="7" loccnume="25"
+   verified="true"
+   expanded="true">
+   <goal
+    name="triangle_aux"
+    locfile="triangle_inequality/../triangle_inequality.why"
+    loclnum="118" loccnumb="8" loccnume="20"
+    sum="0f00b9d5ce4bdd983f431768131409ec"
+    proved="true"
+    expanded="false"
+    shape="ainfix &lt;=anorm2ainfix +V0V2ainfix +V1V3asqrainfix +anormV0V1anormV2V3F">
+    <proof
+     prover="4"
+     timelimit="30"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+   </goal>
+   <goal
+    name="sqr_sqrt_le"
+    locfile="triangle_inequality/../triangle_inequality.why"
+    loclnum="123" loccnumb="8" loccnume="19"
+    sum="85a70a1b4d66ffa566d69099cc699bcc"
+    proved="true"
+    expanded="false"
+    shape="ainfix &lt;=asqrtV0V1Iainfix &lt;=V0asqrV1Aainfix &lt;=c0.0V0Aainfix &lt;=c0.0V1F">
+    <proof
+     prover="2"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="0"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+   </goal>
+   <goal
+    name="triangle"
+    locfile="triangle_inequality/../triangle_inequality.why"
+    loclnum="126" loccnumb="8" loccnume="16"
+    sum="a4b471db5616eda06c01264368fdb7cd"
+    proved="true"
+    expanded="false"
+    shape="ainfix &lt;=anormainfix +V0V2ainfix +V1V3ainfix +anormV0V1anormV2V3F">
+    <proof
+     prover="0"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.16"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.15"/>
+    </proof>
+   </goal>
+  </theory>
+ </file>
+</why3session>

@@ -1,0 +1,130 @@
+
+(** {1 The Triangle Inequality} 
+
+  by Claude Marché, using suggestions from Guillaume Melquiond
+
+  We first prove the Cauchy-Schwarz inequality. 
+
+  See also on Wikipedia: {h <a
+href="http://en.wikipedia.org/wiki/Cauchy–Schwarz_inequality">Cauchy-Schwarz
+inequality</a>} and {h <a
+href="http://en.wikipedia.org/wiki/Triangle_inequality">Triangle
+inequality</a>}
+
+*)
+
+theory CauchySchwarzInequality
+
+  use import real.Real
+  use import real.Square
+
+  (** dot product, a.k.a. scalar product, of two vectors *)
+  function dot (x1:real) (x2:real) (y1:real) (y2:real) : real =
+     x1*y1 + x2*y2
+
+  (** square of the norm of a vector *)
+  function norm2 (x1:real) (x2:real) : real =
+     sqr x1 + sqr x2
+
+  (** square of the norm is non-negative *)
+  lemma norm2_pos :
+     forall x1 x2:real. norm2 x1 x2 >= 0.0
+
+  (** main Cauchy-Schwarz lemma *)
+  (** paper proof:
+  ||x||² + 2t<x,y> + t²||y||² = P(t) = ||x+t*y||² >= 0
+  but  P(-<x,y>/||y||²) = ||x||² - <x,y>²/||y||²
+  hence <x,y>² <= ||x||²*||y||²
+  *)
+
+  function p (x1:real) (x2:real) (y1:real) (y2:real) (t:real) : real =
+    norm2 x1 x2 + 2.0 * t * dot x1 x2 y1 y2 + sqr t * norm2 y1 y2
+
+  lemma p_expr :
+    forall x1 x2 y1 y2 t:real.
+      p x1 x2 y1 y2 t = norm2 (x1 + t * y1) (x2 + t * y2)
+
+  lemma p_pos:
+    forall x1 x2 y1 y2 t:real. p x1 x2 y1 y2 t >= 0.0
+
+  lemma mul_div_simpl :
+    forall x y:real. y <> 0.0 -> (x/y)*y = x
+
+  lemma p_val_part:
+    forall x1 x2 y1 y2 t:real.
+      norm2 y1 y2 > 0.0 ->
+        p x1 x2 y1 y2 (- dot x1 x2 y1 y2 / norm2 y1 y2) =
+        norm2 x1 x2 - sqr (dot x1 x2 y1 y2) / norm2 y1 y2
+
+  lemma p_val_part_pos:
+    forall x1 x2 y1 y2 t:real.
+      norm2 y1 y2 > 0.0 ->
+        norm2 x1 x2 - sqr (dot x1 x2 y1 y2) / norm2 y1 y2 >= 0.0
+
+  lemma p_val_part_pos_aux:
+    forall x1 x2 y1 y2 t:real.
+      norm2 y1 y2 > 0.0 ->
+        norm2 y1 y2 * p x1 x2 y1 y2 (- dot x1 x2 y1 y2 / norm2 y1 y2) >= 0.0
+
+  lemma CauchySchwarz_aux_non_null:
+     forall x1 x2 y1 y2 : real.
+       norm2 y1 y2 > 0.0 ->
+        sqr (dot x1 x2 y1 y2) <= norm2 x1 x2 * norm2 y1 y2
+
+  lemma norm_null:
+     forall y1 y2 : real.
+       norm2 y1 y2 = 0.0 -> y1 = 0.0 \/ y2 = 0.0
+
+  lemma CauchySchwarz_aux_null:
+     forall x1 x2 y1 y2 : real.
+       norm2 y1 y2 = 0.0 ->
+        sqr (dot x1 x2 y1 y2) <= norm2 x1 x2 * norm2 y1 y2
+
+  lemma CauchySchwarz_aux:
+     forall x1 x2 y1 y2 : real.
+        sqr (dot x1 x2 y1 y2) <= norm2 x1 x2 * norm2 y1 y2
+
+  (** norm of a vector *)
+  function norm (x1:real) (x2:real) : real = sqrt (norm2 x1 x2)
+
+  (** norm is non-negative *)
+  lemma norm_pos :
+     forall x1 x2:real. norm x1 x2 >= 0.0
+
+  (** lemma to help the next one *)
+  lemma sqr_le_sqrt :
+    forall x y:real. 0.0 <= x /\ 0.0 <= sqr x <= y -> x <= sqrt y
+
+  (** Cauchy-Schwarz inequality : <x,y> <= ||x||*||y|| *)
+  lemma CauchySchwarz:
+     forall x1 x2 y1 y2 : real.
+        dot x1 x2 y1 y2 <= norm x1 x2 * norm y1 y2
+
+end
+
+
+theory TriangleInequality
+
+  use import real.Real
+  use import real.Square
+  use import CauchySchwarzInequality
+
+(** Triangle inequality, proved thanks to
+  ||x+y||² = ||x||² + 2<x,y> + ||y||²
+           <= ||x||² + 2||x||*||y|| + ||y||²
+           = (||x|| + ||y||)²
+*)
+
+  lemma triangle_aux :
+    forall x1 x2 y1 y2 : real.
+      norm2 (x1+y1) (x2+y2) <= sqr (norm x1 x2 + norm y1 y2)
+
+  (* lemma to help the next one *)
+  lemma sqr_sqrt_le :
+    forall x y:real. 0.0 <= y /\ 0.0 <= x <= sqr y -> sqrt x <= y
+
+  lemma triangle :
+    forall x1 x2 y1 y2 : real.
+      norm (x1+y1) (x2+y2) <= norm x1 x2 + norm y1 y2
+
+end
