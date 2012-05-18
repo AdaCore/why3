@@ -92,6 +92,30 @@ Qed.
 Definition infix_sl(x:R) (y:R): R := (infix_as x (inv y)).
 
 (* Why3 goal *)
+Lemma add_div : forall (x:R) (y:R) (z:R), (~ (z = 0%R)) ->
+  ((infix_sl (infix_pl x y) z) = (infix_pl (infix_sl x z) (infix_sl y z))).
+intros.
+unfold infix_sl, infix_as, infix_pl.
+field.
+Qed.
+
+(* Why3 goal *)
+Lemma sub_div : forall (x:R) (y:R) (z:R), (~ (z = 0%R)) ->
+  ((infix_sl (infix_mn x y) z) = (infix_mn (infix_sl x z) (infix_sl y z))).
+intros.
+unfold infix_sl, infix_as, infix_mn, infix_pl, prefix_mn.
+field.
+Qed.
+
+(* Why3 goal *)
+Lemma neg_div : forall (x:R) (y:R), (~ (y = 0%R)) -> ((infix_sl (prefix_mn x)
+  y) = (prefix_mn (infix_sl x y))).
+intros.
+unfold infix_sl, infix_as, prefix_mn.
+field.
+Qed.
+
+(* Why3 goal *)
 Lemma assoc_mul_div : forall (x:R) (y:R) (z:R), (~ (z = 0%R)) ->
   ((infix_sl (infix_as x y) z) = (infix_as x (infix_sl y z))).
 intros x y z _.
