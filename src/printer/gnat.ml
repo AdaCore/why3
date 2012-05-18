@@ -77,10 +77,39 @@ let print_labels fmt id =
    Slab.iter (fun x -> Format.fprintf fmt "%s," x.lab_string) labels;
    Format.printf "}"
 
-(* logic variables always start with a lower case letter *)
+let get_ada_name, clear_map =
+   let ident_to_string_map = Hid.create 17 in
+   let string_to_counter_map = Hashtbl.create 17 in
+   let get_ada_name ident str =
+      try
+         Hid.find ident_to_string_map ident
+      with Not_found ->
+         let result =
+            let suffix =
+               try
+                  let r = Hashtbl.find string_to_counter_map str in
+                  incr r;
+                  string_of_int !r
+               with Not_found ->
+                  let r = ref 0 in
+                  Hashtbl.add string_to_counter_map str r;
+                  ""
+            in
+            str ^ suffix
+         in
+         Hid.add ident_to_string_map ident result;
+         result
+   in
+   let clear_map () =
+      Hid.clear ident_to_string_map;
+      Hashtbl.clear string_to_counter_map
+   in
+   get_ada_name, clear_map
+
+
 let print_vs fmt vs =
    match ada_name_from_labels vs.vs_name.id_label with
-   | Some x -> fprintf fmt "%s" x
+   | Some x -> Format.fprintf fmt "%s" (get_ada_name vs.vs_name x)
    | None ->
          let sanitizer = String.uncapitalize in
          fprintf fmt "%s" (id_unique iprinter ~sanitizer vs.vs_name)
@@ -200,7 +229,7 @@ and print_normal_app pri fs fmt tl =
    | None -> begin match tl with
              | [] -> print_ls fmt fs
              | tl ->
-                   fprintf fmt (protect_on (pri > 5) "%a@ %a")
+                   fprintf fmt (protect_on (pri > 5) "%a %a")
                    print_ls fs (print_list space (print_tnode 6)) tl
   end
 
@@ -244,7 +273,7 @@ and print_tnode pri fmt t = match t.t_node with
   | Tbinop (b,f1,f2) ->
       let asym = Slab.mem Term.asym_label f1.t_label in
       let p = prio_binop b in
-      fprintf fmt (protect_on (pri > p) "%a %a@ %a")
+      fprintf fmt (protect_on (pri > p) "%a %a %a")
         (print_tnode (p + 1)) f1 (print_binop ~asym) b (print_tnode p) f2
   | Tnot f ->
       fprintf fmt (protect_on (pri > 4) "not %a") (print_tnode 4) f
@@ -294,7 +323,8 @@ let print_tdecls =
   Printer.sprint_tdecls print
 
 let print_task _env _ _ ?old:_ fmt task =
-    print_list nothing string fmt (List.rev (Trans.apply print_tdecls task))
+   clear_map ();
+   print_list nothing string fmt (List.rev (Trans.apply print_tdecls task))
 
 let () = register_printer "gnat" print_task
 
