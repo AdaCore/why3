@@ -463,37 +463,49 @@ option \verb|-force| described below.
 
 \paragraph{Smoke Detector}
 
-The smoke detector tries to detect if the context is self-contradicting
- and, thus, that anything can be proved in this context. The smoke
- detector can't be run on outdated session and does not modify the session.
- It has three possible configurations:
- \begin{itemize}
+The smoke detector tries to detect if the context is
+self-contradicting and, thus, that anything can be proved in this
+context. The smoke detector can't be run on an outdated session and does
+not modify the session.  It has three possible configurations:
+\begin{itemize}
 \item \texttt{none}: Do not run the smoke detector.
-\item \texttt{top}: The negation of each proved goal is sent with the
-same timeout to the prover that proved the original goal.
-\begin{verbatim}
-Goal G : forall x:int. q x -> (p1 x \/ p2 x)
-\end{verbatim}
-becomes
-\begin{verbatim}
-Goal G : ~ (forall x:int. q x -> (p1 x \/ p2 x))
-\end{verbatim}
-\item \texttt{deep}: This is the same technique as \texttt{top} but the
-   negation is pushed under the universal quantification (without
-   changing them) and under the implication. The previous example becomes
-\begin{verbatim}
-Goal G : forall x:int. q x /\ ~ (p1 x \/ p2 x)
-\end{verbatim}
- \end{itemize}
 
-\noindent
-The name of the goals that triggered the smoke detector are printed:
+\item \texttt{top}: The negation of each proved goal is sent with the
+  same timeout to the prover that proved the original goal.
 \begin{verbatim}
-   goal 'G', prover 'Alt-Ergo 0.93.1': Smoke detected!!!
+  Goal G : forall x:int. q x -> (p1 x \/ p2 x)
 \end{verbatim}
-Moreover \texttt{Smoke detected} (exit code 1) is printed at the end if the smoke
-detector has been triggered, or \texttt{No smoke detected} (exit code 0)
-otherwise.
+  becomes
+\begin{verbatim}
+  Goal G : ~ (forall x:int. q x -> (p1 x \/ p2 x))
+\end{verbatim}
+  In other words, if the smoke detector is triggered, it means that the context
+  of the goal \texttt{G} is self-contradicting.
+
+\item \texttt{deep}: This is the same technique as \texttt{top} but
+  the negation is pushed under the universal quantification (without
+  changing them) and under the implication. The previous example
+  becomes
+\begin{verbatim}
+  Goal G : forall x:int. q x /\ ~ (p1 x \/ p2 x)
+\end{verbatim}
+  In other words, the premises of goal \texttt{G} are pushed in the
+  context, so that if the smoke detector is triggered, it means that
+  the context of the goal \texttt{G} and its premises are
+  self-contradicting. It should be clear that detecting smoke in that
+  case does not necessarily means that there is a mistake: for
+  example, this could occur in the WP of a program with an infeasible
+  path.
+\end{itemize}
+
+At the end of the replay, the name of the goals that triggered the
+smoke detector are printed:
+\begin{verbatim}
+  goal 'G', prover 'Alt-Ergo 0.93.1': Smoke detected!!!
+\end{verbatim}
+Moreover \texttt{Smoke detected} (exit code 1) is printed at the end
+if the smoke detector has been triggered, or \texttt{No smoke
+  detected} (exit code 0) otherwise.
 
 
 
