@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/home/jcf/why3/share/why3session.dtd">
+<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
 <why3session
- name="examples/programs/bellman_ford/why3session.xml">
+ name="bellman_ford/why3session.xml">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -24,13 +24,13 @@
   expanded="true">
   <theory
    name="Graph"
-   locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+   locfile="bellman_ford/../bellman_ford.mlw"
    loclnum="7" loccnumb="7" loccnume="12"
    verified="true"
    expanded="false">
    <goal
     name="vertices_cardinal_pos"
-    locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+    locfile="bellman_ford/../bellman_ford.mlw"
     loclnum="30" loccnumb="8" loccnume="29"
     sum="e689d8101c8f203ccf910d07c40c40c7"
     proved="true"
@@ -47,7 +47,7 @@
    </goal>
    <goal
     name="path_in_vertices"
-    locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+    locfile="bellman_ford/../bellman_ford.mlw"
     loclnum="36" loccnumb="8" loccnume="24"
     sum="9ad7d24daaf7be8205dc22a475c9cdbd"
     proved="true"
@@ -65,7 +65,7 @@
    </goal>
    <goal
     name="long_path_decomposition_pigeon1"
-    locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+    locfile="bellman_ford/../bellman_ford.mlw"
     loclnum="60" loccnumb="8" loccnume="39"
     sum="5f7173fef11f43d617b7cd97d69ce353"
     proved="true"
@@ -83,7 +83,7 @@
    </goal>
    <goal
     name="long_path_decomposition_pigeon2"
-    locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+    locfile="bellman_ford/../bellman_ford.mlw"
     loclnum="65" loccnumb="8" loccnume="39"
     sum="354da02be1a221dd9faacd3d5412c882"
     proved="true"
@@ -100,7 +100,7 @@
    </goal>
    <goal
     name="long_path_decomposition_pigeon3"
-    locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+    locfile="bellman_ford/../bellman_ford.mlw"
     loclnum="72" loccnumb="8" loccnume="39"
     sum="ed3f75d56c5263c53942ffd05a29b3e0"
     proved="true"
@@ -118,7 +118,7 @@
    </goal>
    <goal
     name="long_path_decomposition"
-    locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+    locfile="bellman_ford/../bellman_ford.mlw"
     loclnum="80" loccnumb="8" loccnume="31"
     sum="518beb16fb68ecde5aac875f34356202"
     proved="true"
@@ -136,7 +136,7 @@
    </goal>
    <goal
     name="simple_path"
-    locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+    locfile="bellman_ford/../bellman_ford.mlw"
     loclnum="87" loccnumb="8" loccnume="19"
     sum="d3c447e94f6d360cbe2a50aa47df6fcc"
     proved="true"
@@ -154,7 +154,7 @@
    </goal>
    <goal
     name="key_lemma_1"
-    locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+    locfile="bellman_ford/../bellman_ford.mlw"
     loclnum="108" loccnumb="8" loccnume="19"
     sum="1616587f7a3eeb1a8b04d2b60e5dd643"
     proved="true"
@@ -173,13 +173,13 @@
   </theory>
   <theory
    name="WP BellmanFord"
-   locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+   locfile="bellman_ford/../bellman_ford.mlw"
    loclnum="120" loccnumb="7" loccnume="18"
    verified="true"
    expanded="true">
    <goal
     name="key_lemma_2"
-    locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+    locfile="bellman_ford/../bellman_ford.mlw"
     loclnum="172" loccnumb="8" loccnume="19"
     sum="c28e627aa6f2d2539459974ba863be05"
     proved="true"
@@ -187,17 +187,17 @@
     shape="anegative_cycleV1NFIainv2V0aedgesIainv1V0acardinalaverticesaemptyF">
     <proof
      prover="2"
-     timelimit="55"
-     memlimit="0"
+     timelimit="60"
+     memlimit="1000"
      edited="bf_WP_BellmanFord_key_lemma_2_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="20.13"/>
+     <result status="valid" time="22.35"/>
     </proof>
    </goal>
    <goal
     name="WP_parameter relax"
-    locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+    locfile="bellman_ford/../bellman_ford.mlw"
     loclnum="176" loccnumb="6" loccnume="11"
     expl="parameter relax"
     sum="a1b83fa732702e399d744e81b15523aa"
@@ -212,7 +212,7 @@
      expanded="false">
      <goal
       name="WP_parameter relax.1"
-      locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+      locfile="bellman_ford/../bellman_ford.mlw"
       loclnum="176" loccnumb="6" loccnume="11"
       expl="normal postcondition"
       sum="cfa50e69cd6f146c2c281d27358833db"
@@ -227,7 +227,7 @@
        expanded="false">
        <goal
         name="WP_parameter relax.1.1"
-        locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+        locfile="bellman_ford/../bellman_ford.mlw"
         loclnum="176" loccnumb="6" loccnume="11"
         expl="normal postcondition"
         sum="5c2443d4e85d2e664962c6a421beb924"
@@ -242,7 +242,7 @@
          expanded="false">
          <goal
           name="WP_parameter relax.1.1.1"
-          locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+          locfile="bellman_ford/../bellman_ford.mlw"
           loclnum="176" loccnumb="6" loccnume="11"
           expl="normal postcondition"
           sum="417aa09119dae186bdeb59412f454997"
@@ -263,7 +263,7 @@
          </goal>
          <goal
           name="WP_parameter relax.1.1.2"
-          locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+          locfile="bellman_ford/../bellman_ford.mlw"
           loclnum="176" loccnumb="6" loccnume="11"
           expl="normal postcondition"
           sum="58f597cc4e925d13564d1008b3bdc2cb"
@@ -291,7 +291,7 @@
          </goal>
          <goal
           name="WP_parameter relax.1.1.3"
-          locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+          locfile="bellman_ford/../bellman_ford.mlw"
           loclnum="176" loccnumb="6" loccnume="11"
           expl="normal postcondition"
           sum="e07e1e5fb78c2639e48f9b5bf7f9566e"
@@ -311,7 +311,7 @@
          </goal>
          <goal
           name="WP_parameter relax.1.1.4"
-          locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+          locfile="bellman_ford/../bellman_ford.mlw"
           loclnum="176" loccnumb="6" loccnume="11"
           expl="normal postcondition"
           sum="5b5b10428ae29dc1c982c15a96442528"
@@ -347,7 +347,7 @@
          </goal>
          <goal
           name="WP_parameter relax.1.1.5"
-          locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+          locfile="bellman_ford/../bellman_ford.mlw"
           loclnum="176" loccnumb="6" loccnume="11"
           expl="normal postcondition"
           sum="ac8d015292f9cff55031e0934b47673a"
@@ -371,7 +371,7 @@
      </goal>
      <goal
       name="WP_parameter relax.2"
-      locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+      locfile="bellman_ford/../bellman_ford.mlw"
       loclnum="176" loccnumb="6" loccnume="11"
       expl="normal postcondition"
       sum="c9321b77c9d9aba48bcb653d6b43480e"
@@ -386,7 +386,7 @@
        expanded="false">
        <goal
         name="WP_parameter relax.2.1"
-        locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+        locfile="bellman_ford/../bellman_ford.mlw"
         loclnum="176" loccnumb="6" loccnume="11"
         expl="normal postcondition"
         sum="e96a182bbbb6f55f5746c330b1dabf25"
@@ -401,7 +401,7 @@
          expanded="false">
          <goal
           name="WP_parameter relax.2.1.1"
-          locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+          locfile="bellman_ford/../bellman_ford.mlw"
           loclnum="176" loccnumb="6" loccnume="11"
           expl="normal postcondition"
           sum="c4b7d557fc5bc5d2a46886c46e0a6b83"
@@ -437,7 +437,7 @@
          </goal>
          <goal
           name="WP_parameter relax.2.1.2"
-          locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+          locfile="bellman_ford/../bellman_ford.mlw"
           loclnum="176" loccnumb="6" loccnume="11"
           expl="normal postcondition"
           sum="c69481234fadf57e8ec312c1ceb150e2"
@@ -473,7 +473,7 @@
          </goal>
          <goal
           name="WP_parameter relax.2.1.3"
-          locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+          locfile="bellman_ford/../bellman_ford.mlw"
           loclnum="176" loccnumb="6" loccnume="11"
           expl="normal postcondition"
           sum="68001ab7d7ce34f8af2116bc12a7ddf0"
@@ -501,7 +501,7 @@
          </goal>
          <goal
           name="WP_parameter relax.2.1.4"
-          locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+          locfile="bellman_ford/../bellman_ford.mlw"
           loclnum="176" loccnumb="6" loccnume="11"
           expl="normal postcondition"
           sum="de9749f3cd4343551c3be33bec759bb5"
@@ -537,7 +537,7 @@
          </goal>
          <goal
           name="WP_parameter relax.2.1.5"
-          locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+          locfile="bellman_ford/../bellman_ford.mlw"
           loclnum="176" loccnumb="6" loccnume="11"
           expl="normal postcondition"
           sum="da07cbf5e54e2f60a8cd25bb59f37dd5"
@@ -571,7 +571,7 @@
    </goal>
    <goal
     name="WP_parameter bellman_ford"
-    locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+    locfile="bellman_ford/../bellman_ford.mlw"
     loclnum="186" loccnumb="6" loccnume="18"
     expl="parameter bellman_ford"
     sum="e9454f86ea2b33cacfdfda9f4fce8ec0"
@@ -586,7 +586,7 @@
      expanded="true">
      <goal
       name="WP_parameter bellman_ford.1"
-      locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+      locfile="bellman_ford/../bellman_ford.mlw"
       loclnum="186" loccnumb="6" loccnume="18"
       expl="assertion"
       sum="69a630864a03833d0fcb299983c7b2e6"
@@ -606,7 +606,7 @@
      </goal>
      <goal
       name="WP_parameter bellman_ford.2"
-      locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+      locfile="bellman_ford/../bellman_ford.mlw"
       loclnum="186" loccnumb="6" loccnume="18"
       expl="loop invariant init"
       sum="d498f0a017bcca36ce802fd210feda59"
@@ -626,7 +626,7 @@
      </goal>
      <goal
       name="WP_parameter bellman_ford.3"
-      locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+      locfile="bellman_ford/../bellman_ford.mlw"
       loclnum="186" loccnumb="6" loccnume="18"
       expl="precondition"
       sum="205c21fbeea429ccc1eccba3d4241066"
@@ -646,7 +646,7 @@
      </goal>
      <goal
       name="WP_parameter bellman_ford.4"
-      locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+      locfile="bellman_ford/../bellman_ford.mlw"
       loclnum="186" loccnumb="6" loccnume="18"
       expl="exceptional postcondition"
       sum="b84df2bb6f0a6b681278ec5a45cdc416"
@@ -667,7 +667,7 @@
      </goal>
      <goal
       name="WP_parameter bellman_ford.5"
-      locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+      locfile="bellman_ford/../bellman_ford.mlw"
       loclnum="186" loccnumb="6" loccnume="18"
       expl="loop invariant preservation"
       sum="9ad8804ee46dc352e76810b7641ea85b"
@@ -682,7 +682,7 @@
        expanded="false">
        <goal
         name="WP_parameter bellman_ford.5.1"
-        locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+        locfile="bellman_ford/../bellman_ford.mlw"
         loclnum="186" loccnumb="6" loccnume="18"
         expl="parameter bellman_ford"
         sum="4d20ccd9e62ab284c7b88dac5c087080"
@@ -702,7 +702,7 @@
        </goal>
        <goal
         name="WP_parameter bellman_ford.5.2"
-        locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+        locfile="bellman_ford/../bellman_ford.mlw"
         loclnum="186" loccnumb="6" loccnume="18"
         expl="parameter bellman_ford"
         sum="a9f686ee304cbda3a52e47494132ec5d"
@@ -724,7 +724,7 @@
      </goal>
      <goal
       name="WP_parameter bellman_ford.6"
-      locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+      locfile="bellman_ford/../bellman_ford.mlw"
       loclnum="186" loccnumb="6" loccnume="18"
       expl="loop variant decreases"
       sum="b9e32caac66e97b93f8e256a936a73af"
@@ -744,7 +744,7 @@
      </goal>
      <goal
       name="WP_parameter bellman_ford.7"
-      locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+      locfile="bellman_ford/../bellman_ford.mlw"
       loclnum="186" loccnumb="6" loccnume="18"
       expl="assertion"
       sum="f061748745d0f2e8e5e7bafa95e76866"
@@ -759,7 +759,7 @@
        expanded="false">
        <goal
         name="WP_parameter bellman_ford.7.1"
-        locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+        locfile="bellman_ford/../bellman_ford.mlw"
         loclnum="186" loccnumb="6" loccnume="18"
         expl="assertion"
         sum="8fc732184d479a4bad695ec489aae111"
@@ -789,7 +789,7 @@
      </goal>
      <goal
       name="WP_parameter bellman_ford.8"
-      locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+      locfile="bellman_ford/../bellman_ford.mlw"
       loclnum="186" loccnumb="6" loccnume="18"
       expl="normal postcondition"
       sum="a383b773ed53951352f5d8a7e08a78a1"
@@ -804,7 +804,7 @@
        expanded="false">
        <goal
         name="WP_parameter bellman_ford.8.1"
-        locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+        locfile="bellman_ford/../bellman_ford.mlw"
         loclnum="186" loccnumb="6" loccnume="18"
         expl="normal postcondition"
         sum="58e8b9b70594bae23f4a838ce2d04980"
@@ -824,7 +824,7 @@
        </goal>
        <goal
         name="WP_parameter bellman_ford.8.2"
-        locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+        locfile="bellman_ford/../bellman_ford.mlw"
         loclnum="186" loccnumb="6" loccnume="18"
         expl="normal postcondition"
         sum="3234539fe1f4057496e1ed3b5ded7679"
@@ -844,7 +844,7 @@
        </goal>
        <goal
         name="WP_parameter bellman_ford.8.3"
-        locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+        locfile="bellman_ford/../bellman_ford.mlw"
         loclnum="186" loccnumb="6" loccnume="18"
         expl="normal postcondition"
         sum="849060cf4afd69caee7edcc59d0942d5"
@@ -882,7 +882,7 @@
      </goal>
      <goal
       name="WP_parameter bellman_ford.9"
-      locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+      locfile="bellman_ford/../bellman_ford.mlw"
       loclnum="186" loccnumb="6" loccnume="18"
       expl="for loop initialization"
       sum="b0662c9f6c8b52f1b311d5fbf8de2e85"
@@ -897,7 +897,7 @@
        expanded="false">
        <goal
         name="WP_parameter bellman_ford.9.1"
-        locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+        locfile="bellman_ford/../bellman_ford.mlw"
         loclnum="186" loccnumb="6" loccnume="18"
         expl="for loop initialization"
         sum="b0662c9f6c8b52f1b311d5fbf8de2e85"
@@ -919,22 +919,22 @@
      </goal>
      <goal
       name="WP_parameter bellman_ford.10"
-      locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+      locfile="bellman_ford/../bellman_ford.mlw"
       loclnum="186" loccnumb="6" loccnume="18"
       expl="for loop preservation"
       sum="86c6be55f989aedf817c6af5cbf22886"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="iainfix =V5aTrueNLaTuple2V7V8ainfix &lt;acardinalV6acardinalV3Aainfix &lt;=c0acardinalV3Aainv1V10V1adiffaedgesV6AasubsetV6aedgesIainv1V10V1aaddaTuple2V7V8adiffaedgesV3FAainv1V4V1adiffaedgesV3AamemaTuple2V7V8adiffaedgesV3NAamemaTuple2V7V8aedgesAainfix &lt;=c1V1Iainfix =V6aremoveV9V3AamemV9V3FFAais_emptyV3Nainv1V4ainfix +V1c1aemptyAainv1V4V1aedgesIais_emptyV3qainfix =V5aTrueFIainv1V4V1adiffaedgesV3AasubsetV3aedgesFFAainv1V0V1adiffaedgesV2AasubsetV2aedgesIainfix =V2aedgesFIainv1V0V1aemptyIainfix &lt;=V1ainfix -acardinalaverticesc1Aainfix &lt;=c1V1FFIainfix &lt;=c1ainfix -acardinalaverticesc1">
       <label
        name="expl:parameter bellman_ford"/>
       <transf
        name="split_goal"
        proved="true"
-       expanded="true">
+       expanded="false">
        <goal
         name="WP_parameter bellman_ford.10.1"
-        locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+        locfile="bellman_ford/../bellman_ford.mlw"
         loclnum="186" loccnumb="6" loccnume="18"
         expl="for loop preservation"
         sum="a8e86c647bfad928d367ac08bd50d0ae"
@@ -949,7 +949,7 @@
          expanded="false">
          <goal
           name="WP_parameter bellman_ford.10.1.1"
-          locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+          locfile="bellman_ford/../bellman_ford.mlw"
           loclnum="186" loccnumb="6" loccnume="18"
           expl="for loop preservation"
           sum="830d806011ae03fc55cdb26c081104b8"
@@ -969,7 +969,7 @@
          </goal>
          <goal
           name="WP_parameter bellman_ford.10.1.2"
-          locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+          locfile="bellman_ford/../bellman_ford.mlw"
           loclnum="186" loccnumb="6" loccnume="18"
           expl="for loop preservation"
           sum="714e554cb811afdfb2d8c03899324699"
@@ -991,7 +991,7 @@
        </goal>
        <goal
         name="WP_parameter bellman_ford.10.2"
-        locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+        locfile="bellman_ford/../bellman_ford.mlw"
         loclnum="186" loccnumb="6" loccnume="18"
         expl="for loop preservation"
         sum="95d030ee8c94feeb3e963b69d7c8b34d"
@@ -1011,7 +1011,7 @@
        </goal>
        <goal
         name="WP_parameter bellman_ford.10.3"
-        locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+        locfile="bellman_ford/../bellman_ford.mlw"
         loclnum="186" loccnumb="6" loccnume="18"
         expl="for loop preservation"
         sum="5d3aa67940978b09d5f143d114f39f35"
@@ -1031,7 +1031,7 @@
        </goal>
        <goal
         name="WP_parameter bellman_ford.10.4"
-        locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+        locfile="bellman_ford/../bellman_ford.mlw"
         loclnum="186" loccnumb="6" loccnume="18"
         expl="for loop preservation"
         sum="ecd38ab3e96578ed5e3e34ab0e859f2c"
@@ -1046,7 +1046,7 @@
          expanded="false">
          <goal
           name="WP_parameter bellman_ford.10.4.1"
-          locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+          locfile="bellman_ford/../bellman_ford.mlw"
           loclnum="186" loccnumb="6" loccnume="18"
           expl="for loop preservation"
           sum="77e44109fd3674fedc9c40741f6a669e"
@@ -1066,7 +1066,7 @@
          </goal>
          <goal
           name="WP_parameter bellman_ford.10.4.2"
-          locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+          locfile="bellman_ford/../bellman_ford.mlw"
           loclnum="186" loccnumb="6" loccnume="18"
           expl="for loop preservation"
           sum="ba399066f39c5becb5e64e55f76dddfe"
@@ -1081,7 +1081,7 @@
            expanded="false">
            <goal
             name="WP_parameter bellman_ford.10.4.2.1"
-            locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+            locfile="bellman_ford/../bellman_ford.mlw"
             loclnum="186" loccnumb="6" loccnume="18"
             expl="for loop preservation"
             sum="4b54c1491e3cffd9715a356701c51350"
@@ -1096,7 +1096,7 @@
              expanded="false">
              <goal
               name="WP_parameter bellman_ford.10.4.2.1.1"
-              locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+              locfile="bellman_ford/../bellman_ford.mlw"
               loclnum="186" loccnumb="6" loccnume="18"
               expl="for loop preservation"
               sum="a2cd64fb3731e0a2151764e3516d91af"
@@ -1116,7 +1116,7 @@
              </goal>
              <goal
               name="WP_parameter bellman_ford.10.4.2.1.2"
-              locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+              locfile="bellman_ford/../bellman_ford.mlw"
               loclnum="186" loccnumb="6" loccnume="18"
               expl="for loop preservation"
               sum="1c9cc29455ee4724944469cd64099034"
@@ -1136,7 +1136,7 @@
              </goal>
              <goal
               name="WP_parameter bellman_ford.10.4.2.1.3"
-              locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+              locfile="bellman_ford/../bellman_ford.mlw"
               loclnum="186" loccnumb="6" loccnume="18"
               expl="for loop preservation"
               sum="75e0b6ee4981dee670eda628ada019f8"
@@ -1156,7 +1156,7 @@
              </goal>
              <goal
               name="WP_parameter bellman_ford.10.4.2.1.4"
-              locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+              locfile="bellman_ford/../bellman_ford.mlw"
               loclnum="186" loccnumb="6" loccnume="18"
               expl="for loop preservation"
               sum="d379bbd59393b6638d10e0eba88f3c22"
@@ -1176,7 +1176,7 @@
              </goal>
              <goal
               name="WP_parameter bellman_ford.10.4.2.1.5"
-              locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+              locfile="bellman_ford/../bellman_ford.mlw"
               loclnum="186" loccnumb="6" loccnume="18"
               expl="for loop preservation"
               sum="867f75bd89251217ec6ced68232b2433"
@@ -1202,7 +1202,7 @@
        </goal>
        <goal
         name="WP_parameter bellman_ford.10.5"
-        locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+        locfile="bellman_ford/../bellman_ford.mlw"
         loclnum="186" loccnumb="6" loccnume="18"
         expl="for loop preservation"
         sum="d9d4e0e6a0b2980fd09fb2d811b1b382"
@@ -1222,27 +1222,27 @@
        </goal>
        <goal
         name="WP_parameter bellman_ford.10.6"
-        locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+        locfile="bellman_ford/../bellman_ford.mlw"
         loclnum="186" loccnumb="6" loccnume="18"
         expl="for loop preservation"
         sum="ed6b49be9b887a5180e05bb1288a9f9f"
         proved="true"
-        expanded="true"
+        expanded="false"
         shape="ainv1V4V1aedgesIainfix =V5aTrueNNIais_emptyV3qainfix =V5aTrueFIainv1V4V1adiffaedgesV3AasubsetV3aedgesFFIainfix =V2aedgesFIainv1V0V1aemptyIainfix &lt;=V1ainfix -acardinalaverticesc1Aainfix &lt;=c1V1FFIainfix &lt;=c1ainfix -acardinalaverticesc1">
         <label
          name="expl:parameter bellman_ford"/>
         <transf
          name="inline_goal"
          proved="true"
-         expanded="true">
+         expanded="false">
          <goal
           name="WP_parameter bellman_ford.10.6.1"
-          locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+          locfile="bellman_ford/../bellman_ford.mlw"
           loclnum="186" loccnumb="6" loccnume="18"
           expl="for loop preservation"
           sum="76fadc64385e7951d4e70ce04efeac74"
           proved="true"
-          expanded="true"
+          expanded="false"
           shape="Camixfix []V4V6aFiniteVainfix &gt;=ainfix +apath_weightV9V8aweightV8V6V7IamemaTuple2V8V6aedgesIainfix &lt;alengthV9V1IapathasV9V8FAainfix &gt;=apath_weightV10V6V7Iainfix &lt;alengthV10V1IapathasV10V6FAainfix =apath_weightV11V6V7AapathasV11V6EaInfiniteainfix &gt;=alengthV13V1IapathasV13V12FIamemaTuple2V12V6aedgesFAainfix &gt;=alengthV14V1IapathasV14V6FIamemV6averticesFIainfix =V5aTrueNNIamemV15V3NFqainfix =V5aTrueFICamixfix []V4V16aFiniteVainfix &gt;=ainfix +apath_weightV19V18aweightV18V16V17IamemaTuple2V18V16adiffaedgesV3Iainfix &lt;alengthV19V1IapathasV19V18FAainfix &gt;=apath_weightV20V16V17Iainfix &lt;alengthV20V1IapathasV20V16FAainfix =apath_weightV21V16V17AapathasV21V16EaInfiniteainfix &gt;=alengthV23V1IapathasV23V22FIamemaTuple2V22V16adiffaedgesV3FAainfix &gt;=alengthV24V1IapathasV24V16FIamemV16averticesFAamemV25aedgesIamemV25V3FFFIainfix =V2aedgesFICamixfix []V0V26aFiniteVainfix &gt;=ainfix +apath_weightV29V28aweightV28V26V27IamemaTuple2V28V26aemptyIainfix &lt;alengthV29V1IapathasV29V28FAainfix &gt;=apath_weightV30V26V27Iainfix &lt;alengthV30V1IapathasV30V26FAainfix =apath_weightV31V26V27AapathasV31V26EaInfiniteainfix &gt;=alengthV33V1IapathasV33V32FIamemaTuple2V32V26aemptyFAainfix &gt;=alengthV34V1IapathasV34V26FIamemV26averticesFIainfix =V1ainfix -acardinalaverticesc1Oainfix &lt;V1ainfix -acardinalaverticesc1Aainfix =c1V1Oainfix &lt;c1V1FFIainfix =c1ainfix -acardinalaverticesc1Oainfix &lt;c1ainfix -acardinalaverticesc1">
           <label
            name="expl:parameter bellman_ford"/>
@@ -1259,37 +1259,37 @@
        </goal>
        <goal
         name="WP_parameter bellman_ford.10.7"
-        locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+        locfile="bellman_ford/../bellman_ford.mlw"
         loclnum="186" loccnumb="6" loccnume="18"
         expl="for loop preservation"
         sum="f6abae15e5d2575cffb4831186bccdf8"
         proved="true"
-        expanded="true"
+        expanded="false"
         shape="ainv1V4ainfix +V1c1aemptyIainv1V4V1aedgesIainfix =V5aTrueNNIais_emptyV3qainfix =V5aTrueFIainv1V4V1adiffaedgesV3AasubsetV3aedgesFFIainfix =V2aedgesFIainv1V0V1aemptyIainfix &lt;=V1ainfix -acardinalaverticesc1Aainfix &lt;=c1V1FFIainfix &lt;=c1ainfix -acardinalaverticesc1">
         <label
          name="expl:parameter bellman_ford"/>
         <transf
          name="inline_goal"
          proved="true"
-         expanded="true">
+         expanded="false">
          <goal
           name="WP_parameter bellman_ford.10.7.1"
-          locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+          locfile="bellman_ford/../bellman_ford.mlw"
           loclnum="186" loccnumb="6" loccnume="18"
           expl="for loop preservation"
           sum="600439bf37073814dad5ab9c520964e3"
           proved="true"
-          expanded="true"
+          expanded="false"
           shape="Camixfix []V4V6aFiniteVainfix &gt;=ainfix +apath_weightV9V8aweightV8V6V7IamemaTuple2V8V6aemptyIainfix &lt;alengthV9ainfix +V1c1IapathasV9V8FAainfix &gt;=apath_weightV10V6V7Iainfix &lt;alengthV10ainfix +V1c1IapathasV10V6FAainfix =apath_weightV11V6V7AapathasV11V6EaInfiniteainfix &gt;=alengthV13ainfix +V1c1IapathasV13V12FIamemaTuple2V12V6aemptyFAainfix &gt;=alengthV14ainfix +V1c1IapathasV14V6FIamemV6averticesFICamixfix []V4V15aFiniteVainfix &gt;=ainfix +apath_weightV18V17aweightV17V15V16IamemaTuple2V17V15aedgesIainfix &lt;alengthV18V1IapathasV18V17FAainfix &gt;=apath_weightV19V15V16Iainfix &lt;alengthV19V1IapathasV19V15FAainfix =apath_weightV20V15V16AapathasV20V15EaInfiniteainfix &gt;=alengthV22V1IapathasV22V21FIamemaTuple2V21V15aedgesFAainfix &gt;=alengthV23V1IapathasV23V15FIamemV15averticesFIainfix =V5aTrueNNIamemV24V3NFqainfix =V5aTrueFICamixfix []V4V25aFiniteVainfix &gt;=ainfix +apath_weightV28V27aweightV27V25V26IamemaTuple2V27V25adiffaedgesV3Iainfix &lt;alengthV28V1IapathasV28V27FAainfix &gt;=apath_weightV29V25V26Iainfix &lt;alengthV29V1IapathasV29V25FAainfix =apath_weightV30V25V26AapathasV30V25EaInfiniteainfix &gt;=alengthV32V1IapathasV32V31FIamemaTuple2V31V25adiffaedgesV3FAainfix &gt;=alengthV33V1IapathasV33V25FIamemV25averticesFAamemV34aedgesIamemV34V3FFFIainfix =V2aedgesFICamixfix []V0V35aFiniteVainfix &gt;=ainfix +apath_weightV38V37aweightV37V35V36IamemaTuple2V37V35aemptyIainfix &lt;alengthV38V1IapathasV38V37FAainfix &gt;=apath_weightV39V35V36Iainfix &lt;alengthV39V1IapathasV39V35FAainfix =apath_weightV40V35V36AapathasV40V35EaInfiniteainfix &gt;=alengthV42V1IapathasV42V41FIamemaTuple2V41V35aemptyFAainfix &gt;=alengthV43V1IapathasV43V35FIamemV35averticesFIainfix =V1ainfix -acardinalaverticesc1Oainfix &lt;V1ainfix -acardinalaverticesc1Aainfix =c1V1Oainfix &lt;c1V1FFIainfix =c1ainfix -acardinalaverticesc1Oainfix &lt;c1ainfix -acardinalaverticesc1">
           <label
            name="expl:parameter bellman_ford"/>
           <transf
            name="split_goal"
            proved="true"
-           expanded="true">
+           expanded="false">
            <goal
             name="WP_parameter bellman_ford.10.7.1.1"
-            locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+            locfile="bellman_ford/../bellman_ford.mlw"
             loclnum="186" loccnumb="6" loccnume="18"
             expl="for loop preservation"
             sum="5852886a7449a58ba868a9a59a32100a"
@@ -1309,12 +1309,12 @@
            </goal>
            <goal
             name="WP_parameter bellman_ford.10.7.1.2"
-            locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+            locfile="bellman_ford/../bellman_ford.mlw"
             loclnum="186" loccnumb="6" loccnume="18"
             expl="for loop preservation"
             sum="4e23893df899284f1bdb2f773d9b2e95"
             proved="true"
-            expanded="true"
+            expanded="false"
             shape="Camixfix []V4V6aFiniteVainfix &gt;=apath_weightV8V6V7Iainfix &lt;alengthV8ainfix +V1c1IapathasV8V6FaInfinitetIamemV6averticesFICamixfix []V4V9aFiniteVainfix &gt;=ainfix +apath_weightV12V11aweightV11V9V10IamemaTuple2V11V9aedgesIainfix &lt;alengthV12V1IapathasV12V11FAainfix &gt;=apath_weightV13V9V10Iainfix &lt;alengthV13V1IapathasV13V9FAainfix =apath_weightV14V9V10AapathasV14V9EaInfiniteainfix &gt;=alengthV16V1IapathasV16V15FIamemaTuple2V15V9aedgesFAainfix &gt;=alengthV17V1IapathasV17V9FIamemV9averticesFIainfix =V5aTrueNNIamemV18V3NFqainfix =V5aTrueFICamixfix []V4V19aFiniteVainfix &gt;=ainfix +apath_weightV22V21aweightV21V19V20IamemaTuple2V21V19adiffaedgesV3Iainfix &lt;alengthV22V1IapathasV22V21FAainfix &gt;=apath_weightV23V19V20Iainfix &lt;alengthV23V1IapathasV23V19FAainfix =apath_weightV24V19V20AapathasV24V19EaInfiniteainfix &gt;=alengthV26V1IapathasV26V25FIamemaTuple2V25V19adiffaedgesV3FAainfix &gt;=alengthV27V1IapathasV27V19FIamemV19averticesFAamemV28aedgesIamemV28V3FFFIainfix =V2aedgesFICamixfix []V0V29aFiniteVainfix &gt;=ainfix +apath_weightV32V31aweightV31V29V30IamemaTuple2V31V29aemptyIainfix &lt;alengthV32V1IapathasV32V31FAainfix &gt;=apath_weightV33V29V30Iainfix &lt;alengthV33V1IapathasV33V29FAainfix =apath_weightV34V29V30AapathasV34V29EaInfiniteainfix &gt;=alengthV36V1IapathasV36V35FIamemaTuple2V35V29aemptyFAainfix &gt;=alengthV37V1IapathasV37V29FIamemV29averticesFIainfix =V1ainfix -acardinalaverticesc1Oainfix &lt;V1ainfix -acardinalaverticesc1Aainfix =c1V1Oainfix &lt;c1V1FFIainfix =c1ainfix -acardinalaverticesc1Oainfix &lt;c1ainfix -acardinalaverticesc1">
             <label
              name="expl:parameter bellman_ford"/>
@@ -1330,7 +1330,7 @@
            </goal>
            <goal
             name="WP_parameter bellman_ford.10.7.1.3"
-            locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+            locfile="bellman_ford/../bellman_ford.mlw"
             loclnum="186" loccnumb="6" loccnume="18"
             expl="for loop preservation"
             sum="275b80283944fb85adfe515670de6fa2"
@@ -1350,7 +1350,7 @@
            </goal>
            <goal
             name="WP_parameter bellman_ford.10.7.1.4"
-            locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+            locfile="bellman_ford/../bellman_ford.mlw"
             loclnum="186" loccnumb="6" loccnume="18"
             expl="for loop preservation"
             sum="78c22cd43ba8732bb3ef113baed5b670"
@@ -1361,17 +1361,17 @@
              name="expl:parameter bellman_ford"/>
             <proof
              prover="2"
-             timelimit="27"
-             memlimit="0"
+             timelimit="60"
+             memlimit="1000"
              edited="bf_WP_BellmanFord_WP_parameter_bellman_ford_18.v"
              obsolete="false"
              archived="false">
-             <result status="valid" time="9.46"/>
+             <result status="valid" time="10.42"/>
             </proof>
            </goal>
            <goal
             name="WP_parameter bellman_ford.10.7.1.5"
-            locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+            locfile="bellman_ford/../bellman_ford.mlw"
             loclnum="186" loccnumb="6" loccnume="18"
             expl="for loop preservation"
             sum="14713862218ec3a9fdf6eb6df09c9922"
@@ -1397,7 +1397,7 @@
      </goal>
      <goal
       name="WP_parameter bellman_ford.11"
-      locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+      locfile="bellman_ford/../bellman_ford.mlw"
       loclnum="186" loccnumb="6" loccnume="18"
       expl="assertion"
       sum="ca42f3c1aeb95019cbc18fb225e75dee"
@@ -1417,7 +1417,7 @@
      </goal>
      <goal
       name="WP_parameter bellman_ford.12"
-      locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+      locfile="bellman_ford/../bellman_ford.mlw"
       loclnum="186" loccnumb="6" loccnume="18"
       expl="loop invariant init"
       sum="3a55b428e47b8ff4e0ecfd039f41635f"
@@ -1437,7 +1437,7 @@
      </goal>
      <goal
       name="WP_parameter bellman_ford.13"
-      locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+      locfile="bellman_ford/../bellman_ford.mlw"
       loclnum="186" loccnumb="6" loccnume="18"
       expl="precondition"
       sum="e9f9c45ef1273af8bfdc1988b5d57f85"
@@ -1457,7 +1457,7 @@
      </goal>
      <goal
       name="WP_parameter bellman_ford.14"
-      locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+      locfile="bellman_ford/../bellman_ford.mlw"
       loclnum="186" loccnumb="6" loccnume="18"
       expl="exceptional postcondition"
       sum="ccfb6908a38c65f0423ff282a3274ffb"
@@ -1478,7 +1478,7 @@
      </goal>
      <goal
       name="WP_parameter bellman_ford.15"
-      locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+      locfile="bellman_ford/../bellman_ford.mlw"
       loclnum="186" loccnumb="6" loccnume="18"
       expl="loop invariant preservation"
       sum="d0119efbdb55d6dddf2dd770979cace7"
@@ -1493,7 +1493,7 @@
        expanded="false">
        <goal
         name="WP_parameter bellman_ford.15.1"
-        locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+        locfile="bellman_ford/../bellman_ford.mlw"
         loclnum="186" loccnumb="6" loccnume="18"
         expl="parameter bellman_ford"
         sum="24d5d4e31c0849f10aea961e4c79ee19"
@@ -1513,7 +1513,7 @@
        </goal>
        <goal
         name="WP_parameter bellman_ford.15.2"
-        locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+        locfile="bellman_ford/../bellman_ford.mlw"
         loclnum="186" loccnumb="6" loccnume="18"
         expl="parameter bellman_ford"
         sum="b7c3c91648546eb921ea300d7161e5ef"
@@ -1535,7 +1535,7 @@
      </goal>
      <goal
       name="WP_parameter bellman_ford.16"
-      locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+      locfile="bellman_ford/../bellman_ford.mlw"
       loclnum="186" loccnumb="6" loccnume="18"
       expl="loop variant decreases"
       sum="e1ce29d0921af5ca6e2441b4b4ed4ac9"
@@ -1555,7 +1555,7 @@
      </goal>
      <goal
       name="WP_parameter bellman_ford.17"
-      locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+      locfile="bellman_ford/../bellman_ford.mlw"
       loclnum="186" loccnumb="6" loccnume="18"
       expl="assertion"
       sum="2cfc8c7693ed0d03f751af8ddc001d75"
@@ -1575,7 +1575,7 @@
      </goal>
      <goal
       name="WP_parameter bellman_ford.18"
-      locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+      locfile="bellman_ford/../bellman_ford.mlw"
       loclnum="186" loccnumb="6" loccnume="18"
       expl="normal postcondition"
       sum="4a5dde338f91217d67c382535b825c12"
@@ -1590,7 +1590,7 @@
        expanded="false">
        <goal
         name="WP_parameter bellman_ford.18.1"
-        locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+        locfile="bellman_ford/../bellman_ford.mlw"
         loclnum="186" loccnumb="6" loccnume="18"
         expl="normal postcondition"
         sum="a1d2752a824135afa27d27999fd6c643"
@@ -1626,7 +1626,7 @@
        </goal>
        <goal
         name="WP_parameter bellman_ford.18.2"
-        locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+        locfile="bellman_ford/../bellman_ford.mlw"
         loclnum="186" loccnumb="6" loccnume="18"
         expl="normal postcondition"
         sum="f30b0ac425d1811d63033e17775cd89e"
@@ -1647,7 +1647,7 @@
        </goal>
        <goal
         name="WP_parameter bellman_ford.18.3"
-        locfile="examples/programs/bellman_ford/../bellman_ford.mlw"
+        locfile="bellman_ford/../bellman_ford.mlw"
         loclnum="186" loccnumb="6" loccnume="18"
         expl="normal postcondition"
         sum="b83600b88f931a5a928b3fb7a4285698"
