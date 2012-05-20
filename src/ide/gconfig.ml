@@ -728,12 +728,14 @@ let editors_page c (notebook:GPack.notebook) =
   let frame = GBin.frame ~label:"Specific editors" ~packing:page#pack () in
   let box = GPack.vbox ~border_width:5 ~packing:frame#add () in
   let editors = Whyconf.get_editors c.config in
-  let _,strings,indexes =
+  let _,strings,indexes,map =
     Meditor.fold
-      (fun k _ (i,str,ind) -> (i+1,k::str,Meditor.add k i ind))
-      editors (2, [], Meditor.empty)
+      (fun k data (i,str,ind,map) -> 
+        let n = data.editor_name in
+        (i+1, n::str, Meditor.add k i ind, Meditor.add n k map))
+      editors (2, [], Meditor.empty, Meditor.empty)
   in
-  let strings = "default" :: "--" :: (List.rev strings) in
+  let strings = "(default)" :: "--" :: (List.rev strings) in
   let add_prover p pi =
     let text = p.prover_name ^ " " ^ p.prover_version in
     let hb = GPack.hbox ~homogeneous:false ~packing:box#pack () in
@@ -754,8 +756,10 @@ let editors_page c (notebook:GPack.notebook) =
           | Some row ->
 	    let data = 
               match combo#model#get ~row ~column with
-                | "default" -> ""
-                | s -> s
+                | "(default)" -> ""
+                | s -> 
+                  try Meditor.find s map 
+                  with Not_found -> assert false
             in
 	    (* Format.eprintf "prover %a : selected editor '%s'@." *)
             (*   print_prover p data; *)

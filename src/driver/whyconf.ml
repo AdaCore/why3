@@ -120,6 +120,7 @@ type config_prover = {
 }
 
 type config_editor = {
+  editor_name : string;
   editor_command : string;
   editor_options : string list;
 }
@@ -244,6 +245,7 @@ let set_provers rc provers =
 let set_editor id editor (ids, family) =
   if Sstr.mem id ids then raise NonUniqueId;
   let section = empty_section in
+  let section = set_string section "name" editor.editor_name in
   let section = set_string section "command" editor.editor_command in
   (Sstr.add id ids, (id, section)::family)
 
@@ -304,7 +306,8 @@ let load_prover dirname provers (id,section) =
 
 let load_editor editors (id, section) =
   Meditor.add id
-    { editor_command = get_string section "command";
+    { editor_name = get_string ~default:id section "name";
+      editor_command = get_string section "command";
       editor_options = [];
     } editors
 

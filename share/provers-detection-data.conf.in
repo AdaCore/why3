@@ -309,10 +309,13 @@ editor = "coqide"
 # command = "pvs %f"
 
 [editor coqide]
+name = "CoqIDE"
 command = "coqide -I %l/coq-tactic -R %l/coq Why3 %f"
 
 [editor proofgeneral-coq]
+name = "Emacs/ProofGeneral/Coq"
 command = "emacs23 --eval \"(setq coq-load-path '((\\\"%l/coq\\\" \\\"Why3\\\")))\" %f"
 
 [editor altgr-ergo]
+name = "AltGr-Ergo"
 command = "altgr-ergo %f"
