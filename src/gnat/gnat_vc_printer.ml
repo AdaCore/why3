@@ -18,8 +18,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Why3 printer *)
+(** GNAT VC printer *)
 
+open Why3
 open Format
 open Pp
 open Util
@@ -327,5 +328,5 @@ let print_task _env _ _ ?old:_ fmt task =
    forget_all();
    print_list nothing string fmt (List.rev (Trans.apply print_tdecls task))
 
-let () = register_printer "gnat" print_task
+let () = register_printer "gnat_vc" print_task
 

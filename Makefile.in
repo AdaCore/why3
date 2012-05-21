@@ -139,7 +139,7 @@ LIB_TRANSFORM = simplify_recursive_definition simplify_formula \
 		eval_match instantiate_predicate smoke_detector
 
 LIB_PRINTER = alt_ergo why3printer smtv1 smtv2 coq pvs simplify gappa \
-	      cvc3 yices gnat
+	      cvc3 yices
 
 LIB_SESSION = xml termcode session session_tools session_scheduler
 
@@ -499,7 +499,7 @@ install_local: bin/why3ml
 # GNATWhy3
 ########
 
-GNAT_FILES = gnat_util gnat_loc gnat_config gnat_expl gnat_main
+GNAT_FILES = gnat_util gnat_loc gnat_config gnat_expl gnat_vc_printer gnat_main
 
 GNATMODULES = $(addprefix src/gnat/, $(GNAT_FILES))
 
