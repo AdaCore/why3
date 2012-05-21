@@ -80,6 +80,7 @@ val print_iter22:
 
 
 val space : formatter -> unit -> unit
+val simple_space : formatter -> unit -> unit
 val alt : formatter -> unit -> unit
 val alt2 : formatter -> unit -> unit
 val newline : formatter -> unit -> unit

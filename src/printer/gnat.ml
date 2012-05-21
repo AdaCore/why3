@@ -145,8 +145,8 @@ let rec print_ty_node inn fmt ty = match ty.ty_node with
       | Some s -> syntax_arguments s (print_ty_node false) fmt tl
       | None -> begin match tl with
           | [] -> print_ts fmt ts
-          | tl -> fprintf fmt (protect_on inn "%a@ %a")
-              print_ts ts (print_list space (print_ty_node true)) tl
+          | tl -> fprintf fmt (protect_on inn "%a %a")
+              print_ts ts (print_list simple_space (print_ty_node true)) tl
           end
       end
 
@@ -182,8 +182,8 @@ let rec print_pat_node pri fmt p = match p.pat_node with
       | Some s -> syntax_arguments s (print_pat_node 0) fmt pl
       | None -> begin match pl with
           | [] -> print_cs fmt cs
-          | pl -> fprintf fmt (protect_on (pri > 1) "%a@ %a")
-              print_cs cs (print_list space (print_pat_node 2)) pl
+          | pl -> fprintf fmt (protect_on (pri > 1) "%a %a")
+              print_cs cs (print_list simple_space (print_pat_node 2)) pl
           end
       end
 
@@ -230,7 +230,7 @@ and print_normal_app pri fs fmt tl =
              | [] -> print_ls fmt fs
              | tl ->
                    fprintf fmt (protect_on (pri > 5) "%a %a")
-                   print_ls fs (print_list space (print_tnode 6)) tl
+                   print_ls fs (print_list simple_space (print_tnode 6)) tl
   end
 
 and print_tnode pri fmt t = match t.t_node with
@@ -244,11 +244,11 @@ and print_tnode pri fmt t = match t.t_node with
       fprintf fmt (protect_on (pri > 0) "%a:%a")
         (print_app 5 fs) tl print_ty (t_type t)
   | Tif (f,t1,t2) ->
-      fprintf fmt (protect_on (pri > 0) "if @[%a@] then %a@ else %a")
+      fprintf fmt (protect_on (pri > 0) "if @[%a@] then %a else %a")
         print_term f print_term t1 print_term t2
   | Tlet (t1,tb) ->
       let v,t2 = t_open_bound tb in
-      fprintf fmt (protect_on (pri > 0) "let %a = @[%a@] in@ %a")
+      fprintf fmt (protect_on (pri > 0) "let %a = @[%a@] in %a")
         print_vs v (print_tnode 4) t1 print_term t2;
       forget_var v
   | Tcase (t1,bl) ->
@@ -256,12 +256,12 @@ and print_tnode pri fmt t = match t.t_node with
         print_term t1 (print_list newline print_tbranch) bl
   | Teps fb ->
       let v,f = t_open_bound fb in
-      fprintf fmt (protect_on (pri > 0) "epsilon %a.@ %a")
+      fprintf fmt (protect_on (pri > 0) "epsilon %a. %a")
         print_vsty v print_term f;
       forget_var v
   | Tquant (q,fq) ->
       let vl,tl,f = t_open_quant fq in
-      fprintf fmt (protect_on (pri > 0) "%a %a%a.@ %a") print_quant q
+      fprintf fmt (protect_on (pri > 0) "%a %a%a. %a") print_quant q
         (print_list comma print_vsty) vl print_tl tl print_term f;
       List.iter forget_var vl
   | Ttrue ->
@@ -280,11 +280,11 @@ and print_tnode pri fmt t = match t.t_node with
 
 and print_tbranch fmt br =
   let p,t = t_open_branch br in
-  fprintf fmt "@[<hov 4>| %a ->@ %a@]" print_pat p print_term t;
+  fprintf fmt "@[<hov 4>| %a -> %a@]" print_pat p print_term t;
   Svs.iter forget_var p.pat_vars
 
 and print_tl fmt tl =
-  if tl = [] then () else fprintf fmt "@ [%a]"
+  if tl = [] then () else fprintf fmt " [%a]"
     (print_list alt (print_list comma print_term)) tl
 
 let rec print_rightmost fmt t =
@@ -324,6 +324,7 @@ let print_tdecls =
 
 let print_task _env _ _ ?old:_ fmt task =
    clear_map ();
+   forget_all();
    print_list nothing string fmt (List.rev (Trans.apply print_tdecls task))
 
 let () = register_printer "gnat" print_task
