@@ -214,15 +214,19 @@ let prio_binop = function
 let rec print_term fmt t = print_tnode 0 fmt t
 
 and print_app pri fs fmt tl =
-   match tl with
-   | [] ->
-         begin match ada_name_from_labels fs.ls_name.id_label with
-         | None -> print_normal_app pri fs fmt tl
-         | Some x -> Format.fprintf fmt "%s" x
+   match ada_name_from_labels fs.ls_name.id_label with
+   | Some x ->
+         begin match tl with
+         | [] -> Format.fprintf fmt "%s" (get_ada_name fs.ls_name x)
+         | _ ->
+            Format.fprintf fmt "%s %a" (get_ada_name fs.ls_name x)
+              (print_list simple_space (print_tnode 6)) tl
          end
-   | [x] when Slab.mem conversion_label fs.ls_name.id_label ->
-         print_tnode pri fmt x
-   | _ -> print_normal_app pri fs fmt tl
+   | None ->
+         match tl with
+         | [x] when Slab.mem conversion_label fs.ls_name.id_label ->
+               print_tnode pri fmt x
+         | _ -> print_normal_app pri fs fmt tl
 
 and print_normal_app pri fs fmt tl =
    match query_syntax fs.ls_name with
