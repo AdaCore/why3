@@ -191,7 +191,7 @@ let rec print_pat_node pri fmt p = match p.pat_node with
 let print_pat = print_pat_node 0
 
 let print_vsty fmt v =
-  fprintf fmt "%a:@,%a" print_vs v print_ty v.vs_ty
+  fprintf fmt "%a: %a" print_vs v print_ty v.vs_ty
 
 let print_const = Pretty.print_const
 let print_quant = Pretty.print_quant
@@ -263,7 +263,7 @@ and print_tnode pri fmt t = match t.t_node with
   | Tquant (q,fq) ->
       let vl,tl,f = t_open_quant fq in
       fprintf fmt (protect_on (pri > 0) "%a %a%a. %a") print_quant q
-        (print_list comma print_vsty) vl print_tl tl print_term f;
+        (print_list simple_comma print_vsty) vl print_tl tl print_term f;
       List.iter forget_var vl
   | Ttrue ->
       fprintf fmt "true"
@@ -286,7 +286,7 @@ and print_tbranch fmt br =
 
 and print_tl fmt tl =
   if tl = [] then () else fprintf fmt " [%a]"
-    (print_list alt (print_list comma print_term)) tl
+    (print_list alt (print_list simple_comma print_term)) tl
 
 let rec print_rightmost fmt t =
    match t.t_node with
