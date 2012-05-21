@@ -64,4 +64,14 @@ theory _gnatprove_standard_th.Array__1__Func
    syntax function attr__ATTRIBUTE_LAST "%1'Last"
    syntax function attr__ATTRIBUTE_LENGTH "%1'Length"
    syntax function access "%2 (%1)"
+   syntax function bool_eq "(%1 = %2)"
+end
+
+theory _gnatprove_standard_th.Integer_Func
+  syntax function bool_eq "(%1 = %2)"
+  syntax function bool_ne "(%1 /= %2)"
+  syntax function bool_lt "(%1 < %2)"
+  syntax function bool_le "(%1 <= %2)"
+  syntax function bool_gt "(%1 > %2)"
+  syntax function bool_ge "(%1 >= %2)"
 end
