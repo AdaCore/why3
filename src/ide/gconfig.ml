@@ -233,11 +233,11 @@ let load_config config original_config =
   *)
 
 let debug_save_config n c =
-  let coq = { prover_name = "Coq" ; prover_version = "8.3pl3"; 
+  let coq = { prover_name = "Coq" ; prover_version = "8.3pl3";
               prover_altern = "" } in
   let p = Mprover.find coq (get_provers c) in
   let time = Whyconf.timelimit (Whyconf.get_main c) in
-  Format.eprintf "[debug] save_config %d: timelimit=%d ; editor for Coq=%s@." 
+  Format.eprintf "[debug] save_config %d: timelimit=%d ; editor for Coq=%s@."
     n time p.editor
 
 let save_config t =
@@ -730,7 +730,7 @@ let editors_page c (notebook:GPack.notebook) =
   let editors = Whyconf.get_editors c.config in
   let _,strings,indexes,map =
     Meditor.fold
-      (fun k data (i,str,ind,map) -> 
+      (fun k data (i,str,ind,map) ->
         let n = data.editor_name in
         (i+1, n::str, Meditor.add k i ind, Meditor.add n k map))
       editors (2, [], Meditor.empty, Meditor.empty)
@@ -754,11 +754,11 @@ let editors_page c (notebook:GPack.notebook) =
         match combo#active_iter with
           | None -> ()
           | Some row ->
-	    let data = 
+	    let data =
               match combo#model#get ~row ~column with
                 | "(default)" -> ""
-                | s -> 
-                  try Meditor.find s map 
+                | s ->
+                  try Meditor.find s map
                   with Not_found -> assert false
             in
 	    (* Format.eprintf "prover %a : selected editor '%s'@." *)
@@ -1004,7 +1004,8 @@ let replace_prover c to_be_removed to_be_copied =
   res
 *)
 
-let read_config conf_file extra_files = read_config conf_file extra_files; init ()
+let read_config conf_file extra_files =
+  read_config conf_file extra_files; init ()
 
 (*
 Local Variables:

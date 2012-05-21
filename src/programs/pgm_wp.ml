@@ -243,7 +243,7 @@ let quantify env rm sreg f =
       in
       let id = Spv.fold test vars None in
       (**)
-      let label = Slab.singleton (create_label "0") in
+      let label = Slab.singleton (create_label "model:0") in
       (**)
       let id = id_clone ~label (def_option r.R.r_tv.tv_name id) in
       let r' = create_vsymbol id (purify r.R.r_ty) in
@@ -490,6 +490,8 @@ and wp_desc env rm e q = match e.expr_desc with
   | Eif (e1, e2, e3) ->
       let res = v_result e1.expr_type in
       let test = t_equ (t_var res) (t_True env) in
+      let label = Slab.singleton (create_label "model:cond") in
+      let test = t_label ~loc:e1.expr_loc label test in
       (* if both branches are pure, do not split *)
       let q1 =
         try

@@ -186,9 +186,9 @@ and print_fmla_node info fmt f = match f.t_node with
         (print_fmla info) f1 (print_fmla info) f2 (print_fmla info)
         f1 (print_fmla info) f3
   | Tlet _ -> unsupportedTerm f
-      "alt-ergo : you must eliminate let in formula"
+      "alt-ergo: you must eliminate let in formula"
   | Tcase _ -> unsupportedTerm f
-      "alt-ergo : you must eliminate match"
+      "alt-ergo: you must eliminate match"
   | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
 
 and print_expr info fmt =
