@@ -400,7 +400,9 @@ let ity_app s tl rl =
 let ity_pur s tl = match s.ts_def with
   | Some ty ->
       let add m v t = Mtv.add v t m in
-      let m = List.fold_left2 add Mtv.empty s.ts_args tl in
+      let m = try List.fold_left2 add Mtv.empty s.ts_args tl
+        with Invalid_argument _ ->
+          raise (Ty.BadTypeArity (s, List.length s.ts_args, List.length tl)) in
       ity_subst_unsafe m Mreg.empty (ity_of_ty ty)
   | None ->
       ity_pur s tl

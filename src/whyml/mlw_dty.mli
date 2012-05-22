@@ -29,11 +29,12 @@ open Mlw_ty.T
 open Mlw_expr
 open Mlw_module
 
+type dreg
 type dity
 
 val create_user_type_variable: Ptree.ident -> dity
 val create_type_variable: unit -> dity
-val its_app: itysymbol -> dity list -> dity
+val its_app: user:bool -> itysymbol -> dity list -> dity
 val ts_app: tysymbol -> dity list -> dity
 
 val unify: dity -> dity -> unit
@@ -44,8 +45,11 @@ val ity_of_dity: dity -> ity
 
 type darrow = dity list * dity
 
+(***
+
 val specialize_darrow: darrow -> darrow
 val specialize_lsymbol: lsymbol  -> darrow
 val specialize_prgsymbol: prgsymbol -> darrow
 
 val match_darrow: psymbol -> darrow -> ity_subst
+***)

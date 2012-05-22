@@ -151,7 +151,8 @@ let rec dexpr ~userloc denv e =
   in
   e
 
-and dexpr_desc ~userloc denv loc = function
+and dexpr_desc ~userloc _denv _loc = function
+(***
   | Ptree.Eident (Qident {id=x}) when Mstr.mem x denv.locals ->
       (* local variable *)
       let poly, da = Mstr.find x denv.locals in
@@ -185,6 +186,7 @@ and dexpr_desc ~userloc denv loc = function
         | _ ->
           assert false (*TODO*)
       end
+***)
   | _ ->
       ignore (userloc);
       assert false (*TODO*)
@@ -194,7 +196,8 @@ type local_var =
   | Lpasymbol of pasymbol
   | Lpsymbol  of psymbol * darrow
 
-let rec expr locals de = match de.dexpr_desc with
+let rec expr _locals de = match de.dexpr_desc with
+(***
   | DElocal x ->
       assert (Mstr.mem x locals);
       begin match Mstr.find x locals with
@@ -202,6 +205,7 @@ let rec expr locals de = match de.dexpr_desc with
       | Lpasymbol pa -> e_arrow pa
       | Lpsymbol (ps, da) -> e_inst ps (match_darrow ps da)
       end
+***)
   | _ ->
       assert false (*TODO*)
 

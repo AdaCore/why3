@@ -41,8 +41,17 @@ and dity_desc = {
 and dity_node =
   | Duvar of Ptree.ident (* user type variable *)
   | Dvar
-  | Dits of itysymbol * dity list
+  | Dits of itysymbol * dity list * dreg list
   | Dts  of tysymbol  * dity list
+
+and dreg = dreg_desc ref
+
+and dreg_desc = {
+  rid:   int;
+  rity:  dity;
+  ruser: bool;
+  reg:   region Lazy.t;
+}
 
 let unique = let r = ref 0 in fun () -> incr r; !r
 
@@ -58,11 +67,86 @@ let create_type_variable () =
 
 let ity_of_dity d = Lazy.force !d.ity
 
-let its_app its dl =
-  create (Dits (its, dl)) (lazy (ity_app_fresh its (List.map ity_of_dity dl)))
+let reg_of_dreg d = Lazy.force !d.reg
+
+let create_dreg ?(user=false) dity =
+  ref { rid = unique (); rity = dity; ruser = user;
+        reg = lazy (create_region (id_fresh "rho") (ity_of_dity dity)) }
+
+let find_type_variable htv tv =
+  try
+    Htv.find htv tv
+  with Not_found ->
+    let dtv = create_type_variable () in
+    Htv.add htv tv dtv;
+    dtv
 
 let ts_app ts dl =
   create (Dts (ts, dl)) (lazy (ity_pur ts (List.map ity_of_dity dl)))
+
+let its_app_real its dl rl =
+  create (Dits (its, dl, rl))
+    (lazy (ity_app its (List.map ity_of_dity dl) (List.map reg_of_dreg rl)))
+
+(*
+let rec dity_inst mv mr dity = match !dity.node with
+  | Duvar _ ->
+      dity
+  | Dvar ->
+      Mint.find !dity.uid mv
+  | Dts (s,tl) ->
+      let mr,tl = List.map (dity_inst mv mr) tl in
+      ts_app s tl
+  | Dits (s,tl,rl) ->
+      let tl = List.map (dity_inst mv mr) tl in
+      let rl = List.map (dreg_inst mr) rl in
+      its_app s tl rl
+
+and dreg_inst mr r = Mint.find !r.rid mr
+*)
+
+let rec ity_inst_fresh ~user mv mr ity = match ity.ity_node with
+  | Ityvar v ->
+      mr, Mtv.find v mv
+  | Itypur (s,tl) ->
+      let mr,tl = Util.map_fold_left (ity_inst_fresh ~user mv) mr tl in
+      mr, ts_app s tl
+  | Ityapp (s,tl,rl) ->
+      let mr,tl = Util.map_fold_left (ity_inst_fresh ~user mv) mr tl in
+      let mr,rl = Util.map_fold_left (reg_refresh ~user mv) mr rl in
+      mr, its_app_real s tl rl
+
+and reg_refresh ~user mv mr r = match Mreg.find_opt r mr with
+  | Some r ->
+      mr, r
+  | None ->
+      let mr,ity = ity_inst_fresh ~user mv mr r.reg_ity in
+      let reg = create_dreg ~user ity in
+      Mreg.add r reg mr, reg
+
+let its_app ~user s tl =
+  let add m v t = Mtv.add v t m in
+  let mv = try List.fold_left2 add Mtv.empty s.its_args tl
+    with Invalid_argument _ ->
+      raise (BadItyArity (s, List.length s.its_args, List.length tl))
+  in
+  match s.its_def with
+  | Some ity ->
+      snd (ity_inst_fresh ~user mv Mreg.empty ity)
+  | None ->
+      let _, rl =
+        Util.map_fold_left (reg_refresh ~user mv) Mreg.empty s.its_regs in
+      its_app_real s tl rl
+
+let ts_app ts dl = match ts.ts_def with
+  | Some ty ->
+      let add m v t = Mtv.add v t m in
+      let mv = try List.fold_left2 add Mtv.empty ts.ts_args dl
+        with Invalid_argument _ ->
+          raise (BadTypeArity (ts, List.length ts.ts_args, List.length dl)) in
+      snd (ity_inst_fresh ~user:true mv Mreg.empty (ity_of_ty ty))
+  | None ->
+      ts_app ts dl
 
 (* unification *)
 
@@ -75,7 +159,7 @@ let rec unify d1 d2 =
         d2 := !d1
     | Duvar s1, Duvar s2 when s1.id = s2.id ->
         ()
-    | Dits (its1, dl1), Dits (its2, dl2) when its_equal its1 its2 ->
+    | Dits (its1, dl1, _rl1), Dits (its2, dl2, _rl2) when its_equal its1 its2 ->
         if List.length dl1 <> List.length dl2 then raise Exit;
         List.iter2 unify dl1 dl2
     | Dts (ts1, dl1), Dts (ts2, dl2) when ts_equal ts1 ts2 ->
@@ -91,31 +175,37 @@ let unify d1 d2 =
   try unify d1 d2
   with Exit -> raise (TypeMismatch (ity_of_dity d1, ity_of_dity d2))
 
-let find_type_variable htv tv =
-  try
-    Htv.find htv tv
-  with Not_found ->
-    let dtv = create_type_variable () in
-    Htv.add htv tv dtv;
-    dtv
-
 type darrow = dity list * dity
 
-let rec dity_of_ity htv ity = match ity.ity_node with
-  | Ityvar tv -> find_type_variable htv tv
-  | Itypur (ts, ityl) -> ts_app ts (List.map (dity_of_ity htv) ityl)
-  | Ityapp (its, ityl, _) -> its_app its (List.map (dity_of_ity htv) ityl)
+let rec dity_of_ity ~user htv hreg ity = match ity.ity_node with
+  | Ityvar tv -> assert (not user); find_type_variable htv tv
+  | Itypur (ts, ityl) -> ts_app ts (List.map (dity_of_ity ~user htv hreg) ityl)
+  | Ityapp (its, ityl, rl) ->
+      its_app_real its (List.map (dity_of_ity ~user htv hreg) ityl)
+        (List.map (dreg_of_reg ~user htv hreg) rl)
 
-let dity_of_vtv htv v = dity_of_ity htv v.vtv_ity
+and dreg_of_reg ~user htv hreg r =
+  try
+    Hreg.find hreg r
+  with Not_found ->
+    let dreg = create_dreg ~user (dity_of_ity ~user htv hreg r.reg_ity) in
+    Hreg.add hreg r dreg;
+    dreg
 
-let specialize_vtvalue vtv =
+let dity_of_vtv ~user htv hreg v = dity_of_ity ~user htv hreg v.vtv_ity
+
+(***
+
+let specialize_vtvalue ~user vtv =
   let htv = Htv.create 17 in
-  [], dity_of_vtv htv vtv
+  let hreg = Hreg.create 17 in
+  [], dity_of_vtv ~user htv hreg vtv
 
-let specialize_vtarrow vta =
+let specialize_vtarrow ~user vta =
   let htv = Htv.create 17 in
+  let hreg = Hreg.create 17 in
   let rec decompose args a =
-    let args = dity_of_vtv htv a.vta_arg :: args in
+    let args = dity_of_vtv ~user htv a.vta_arg :: args in
     match a.vta_result with
     | VTvalue v -> List.rev args, dity_of_vtv htv v
     | VTarrow a1 -> decompose args a1
@@ -173,3 +263,4 @@ let match_darrow ps da =
   in
   match_arrow ity_subst_empty ps.ps_vta da
 
+***)
