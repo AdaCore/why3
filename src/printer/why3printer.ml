@@ -306,16 +306,20 @@ let print_ind fmt (pr,f) =
   fprintf fmt "@[<hov 4>| %a%a :@ %a@]"
     print_pr pr print_ident_labels pr.pr_name print_term f
 
-let print_ind_decl fst fmt (ps,bl) =
+let ind_sign = function
+  | Ind   -> "inductive"
+  | Coind -> "coinductive"
+
+let print_ind_decl s fst fmt (ps,bl) =
   fprintf fmt "@[<hov 2>%s %a%a%a =@ @[<hov>%a@]@]@\n@\n"
-    (if fst then "inductive" else "with") print_ls ps
+    (if fst then ind_sign s else "with") print_ls ps
     print_ident_labels ps.ls_name
     (print_list nothing print_ty_arg) ps.ls_args
     (print_list newline print_ind) bl
 
-let print_ind_decl first fmt d =
+let print_ind_decl s first fmt d =
   if not (query_remove (fst d).ls_name) then
-    (print_ind_decl first fmt d; forget_tvs ())
+    (print_ind_decl s first fmt d; forget_tvs ())
 
 let print_pkind = Pretty.print_pkind
 
@@ -338,7 +342,7 @@ let print_decl fmt d = match d.d_node with
   | Ddata tl  -> print_list_next nothing print_data_decl fmt tl
   | Dparam ls -> print_param_decl fmt ls
   | Dlogic ll -> print_list_next nothing print_logic_decl fmt ll
-  | Dind il   -> print_list_next nothing print_ind_decl fmt il
+  | Dind (s, il) -> print_list_next nothing (print_ind_decl s) fmt il
   | Dprop p   -> print_prop_decl fmt p
 
 let print_inst_ts fmt (ts1,ts2) =

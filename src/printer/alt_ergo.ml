@@ -296,7 +296,7 @@ let print_decl info fmt d = match d.d_node with
   | Dlogic dl ->
       print_list nothing (print_logic_decl info) fmt dl
   | Dind _ -> unsupportedDecl d
-      "alt-ergo : inductive definition are not supported"
+      "alt-ergo: inductive definitions are not supported"
   | Dprop (k,pr,f) -> print_prop_decl info fmt k pr f
 
 let print_decl info fmt = catch_unsupportedDecl (print_decl info fmt)

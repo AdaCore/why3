@@ -764,8 +764,11 @@ let print_decl ~old info fmt d = match d.d_node with
       print_logic_decl ~old info fmt ld
   | Dlogic ll ->
       print_recursive_decl info fmt ll
-  | Dind il   ->
+  | Dind (Ind, il) ->
       print_list nothing (print_ind_decl info) fmt il
+  | Dind (Coind, _) ->
+      unsupportedDecl d
+      "PVS: coinductive definitions are not supported"
   | Dprop (_, pr, _) when Mid.mem pr.pr_name info.info_syn ->
       ()
   | Dprop (k, pr, f) ->

@@ -208,7 +208,7 @@ let decl_shape ~(push:string->'a->'a) (acc:'a) d : 'a =
         List.fold_right
           (fun d acc -> logic_decl_shape ~push acc d)
           ldl (push tag_Dlogic acc)
-    | Decl.Dind idl ->
+    | Decl.Dind (_, idl) ->
         List.fold_right
           (fun d acc -> logic_ind_decl_shape ~push acc d)
           idl (push tag_Dind acc)

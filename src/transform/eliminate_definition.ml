@@ -33,9 +33,9 @@ let elim q spr d = match d.d_node with
   | Dlogic l ->
       let ld, id = List.fold_right (add_id q) l ([],[]) in
       ld @ (if id = [] then [] else [create_logic_decl id])
-  | Dind l ->
+  | Dind (s, l) ->
       let ld, id = List.fold_right (add_id q) l ([],[]) in
-      ld @ (if id = [] then [] else [create_ind_decl id])
+      ld @ (if id = [] then [] else [create_ind_decl s id])
   | Dprop (Paxiom,pr,_) when Spr.mem pr spr -> []
   | _ -> [d]
 

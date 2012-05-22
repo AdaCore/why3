@@ -2264,7 +2264,7 @@ let add_logics uc d =
   in
   match d with
     | LogicDecl dl -> List.fold_left add uc dl
-    | IndDecl dl -> List.fold_left addi uc dl
+    | IndDecl (_, dl) -> List.fold_left addi uc dl
     | Meta _ | PropDecl _ | TypeDecl _ -> assert false
 
 let find_module penv lmod q id = match q with

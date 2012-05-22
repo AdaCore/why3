@@ -52,7 +52,7 @@ let inv acc (ps,al) =
   create_prop_decl Paxiom (create_prsymbol nm) ax :: acc
 
 let elim d = match d.d_node with
-  | Dind il ->
+  | Dind (_, il) ->
       let dl = List.fold_left log [] il in
       let dl = List.fold_left imp dl il in
       let dl = List.fold_left inv dl il in

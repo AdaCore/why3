@@ -228,10 +228,10 @@ let d_monomorph kept lsmap d =
           close ls vl (t_mono vmap e)
         in
         [create_logic_decl (List.map conv ldl)]
-    | Dind idl ->
+    | Dind (s, idl) ->
         let iconv (pr,f) = pr, t_mono Mvs.empty f in
         let conv (ls,il) = lsmap ls, List.map iconv il in
-        [create_ind_decl (List.map conv idl)]
+        [create_ind_decl s (List.map conv idl)]
     | Dprop (k,pr,f) ->
         [create_prop_decl k pr (t_mono Mvs.empty f)]
   in

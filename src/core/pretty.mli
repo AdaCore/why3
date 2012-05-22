@@ -58,7 +58,7 @@ val print_ty_decl : formatter -> tysymbol -> unit
 val print_data_decl : formatter -> data_decl -> unit
 val print_param_decl : formatter -> lsymbol -> unit
 val print_logic_decl : formatter -> logic_decl -> unit
-val print_ind_decl : formatter -> ind_decl -> unit
+val print_ind_decl : formatter -> ind_sign -> ind_decl -> unit
 val print_next_data_decl : formatter -> data_decl -> unit
 val print_next_logic_decl : formatter -> logic_decl -> unit
 val print_next_ind_decl : formatter -> ind_decl -> unit

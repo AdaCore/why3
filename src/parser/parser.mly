@@ -202,7 +202,7 @@ end
 
 /* keywords */
 
-%token AS AXIOM CLONE CONSTANT
+%token AS AXIOM CLONE COINDUCTIVE CONSTANT
 %token ELSE END EPSILON EXISTS EXPORT FALSE FORALL FUNCTION
 %token GOAL IF IMPORT IN INDUCTIVE LEMMA
 %token LET MATCH META NAMESPACE NOT PROP PREDICATE
@@ -336,8 +336,8 @@ decl:
     { LogicDecl $2 }
 | PREDICATE list1_logic_decl_predicate
     { LogicDecl $2 }
-| INDUCTIVE list1_inductive_decl
-    { IndDecl $2 }
+| inductive list1_inductive_decl
+    { IndDecl ($1, $2) }
 | AXIOM ident labels COLON lexpr
     { PropDecl (floc (), Kaxiom, add_lab $2 $3, $5) }
 | LEMMA ident labels COLON lexpr
@@ -346,6 +346,11 @@ decl:
     { PropDecl (floc (), Kgoal, add_lab $2 $3, $5) }
 | META sident list1_meta_arg_sep_comma
     { Meta (floc (), $2, $3) }
+;
+
+inductive:
+| INDUCTIVE   { Decl.Ind }
+| COINDUCTIVE { Decl.Coind }
 ;
 
 /* Use and clone */

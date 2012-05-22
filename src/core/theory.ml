@@ -380,7 +380,7 @@ let add_decl uc d =
     | Ddata dl  -> List.fold_left add_data uc dl
     | Dparam ls -> add_symbol add_ls ls.ls_name ls uc
     | Dlogic dl -> List.fold_left add_logic uc dl
-    | Dind dl   -> List.fold_left add_ind uc dl
+    | Dind (_, dl) -> List.fold_left add_ind uc dl
     | Dprop p   -> add_prop uc p
 
 (** Declaration constructors + add_decl *)
@@ -389,7 +389,7 @@ let add_ty_decl uc ts = add_decl uc (create_ty_decl ts)
 let add_data_decl uc dl = add_decl uc (create_data_decl dl)
 let add_param_decl uc ls = add_decl uc (create_param_decl ls)
 let add_logic_decl uc dl = add_decl uc (create_logic_decl dl)
-let add_ind_decl uc dl = add_decl uc (create_ind_decl dl)
+let add_ind_decl uc s dl = add_decl uc (create_ind_decl s dl)
 let add_prop_decl uc k p f = add_decl uc (create_prop_decl k p f)
 
 (** Use *)
@@ -566,7 +566,7 @@ let cl_logic cl inst ldl =
   in
   create_logic_decl (List.map add_logic ldl)
 
-let cl_ind cl inst idl =
+let cl_ind cl inst (s, idl) =
   let add_case (pr,f) =
     if Spr.mem pr inst.inst_lemma || Spr.mem pr inst.inst_goal
       then raise (CannotInstantiate pr.pr_name)
@@ -577,7 +577,7 @@ let cl_ind cl inst idl =
       then raise (CannotInstantiate ps.ls_name)
       else cl_find_ls cl ps, List.map add_case la
   in
-  create_ind_decl (List.map add_ind idl)
+  create_ind_decl s (List.map add_ind idl)
 
 let cl_prop cl inst (k,pr,f) =
   let k' = match k with

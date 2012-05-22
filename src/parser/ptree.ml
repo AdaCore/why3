@@ -167,7 +167,7 @@ type use_clone = loc * use * clone_subst list option
 type decl =
   | TypeDecl of type_decl list
   | LogicDecl of logic_decl list
-  | IndDecl of ind_decl list
+  | IndDecl of Decl.ind_sign * ind_decl list
   | PropDecl of loc * prop_kind * ident * lexpr
   | Meta of loc * ident * metarg list
 

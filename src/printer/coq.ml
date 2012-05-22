@@ -648,18 +648,19 @@ let print_recursive_decl info fmt dl =
 let print_ind info fmt (pr,f) =
   fprintf fmt "@[<hov 4>| %a : %a@]" print_pr pr (print_fmla info) f
 
-let print_ind_decl info fmt (ps,bl) =
+let print_ind_decl info s fmt (ps,bl) =
   let ty_vars_args, ty_vars_value, all_ty_params = ls_ty_vars ps in
-  fprintf fmt "(* Why3 assumption *)@\n@[<hov 2>Inductive %a%a : %a -> Prop :=@ @[<hov>%a@].@]@\n"
+  fprintf fmt "(* Why3 assumption *)@\n@[<hov 2>%s %a%a : %a -> Prop :=@ @[<hov>%a@].@]@\n"
+    (match s with Ind -> "Inductive" | Coind -> "CoInductive")
      print_ls ps print_implicit_params all_ty_params
     (print_arrow_list (print_ty info)) ps.ls_args
      (print_list newline (print_ind info)) bl;
   print_implicits fmt ps ty_vars_args ty_vars_value all_ty_params;
   fprintf fmt "@\n"
 
-let print_ind_decl info fmt d =
+let print_ind_decl info s fmt d =
   if not (Mid.mem (fst d).ls_name info.info_syn) then
-    (print_ind_decl info fmt d; forget_tvs ())
+    (print_ind_decl info s fmt d; forget_tvs ())
 
 let print_prop_decl ~prev info fmt (k,pr,f) =
   let params = t_ty_freevars Stv.empty f in
@@ -687,11 +688,11 @@ let print_decl ~old info fmt d =
     | Ddata ((ts, _)::_) -> id_unique iprinter ts.ts_name
     | Dparam ls
     | Dlogic ((ls,_)::_)
-    | Dind ((ls,_)::_) -> id_unique iprinter ls.ls_name
+    | Dind (_, (ls,_)::_) -> id_unique iprinter ls.ls_name
     | Dprop (_,pr,_) -> id_unique iprinter pr.pr_name
     | Ddata []
     | Dlogic []
-    | Dind [] -> assert false in
+    | Dind (_, []) -> assert false in
   let prev = output_till_statement fmt old name in
   match d.d_node with
   | Dtype ts ->
@@ -704,8 +705,8 @@ let print_decl ~old info fmt d =
       print_logic_decl info fmt ld
   | Dlogic ll ->
       print_recursive_decl info fmt ll
-  | Dind il ->
-      print_list nothing (print_ind_decl info) fmt il
+  | Dind (s, il) ->
+      print_list nothing (print_ind_decl info s) fmt il
   | Dprop (_,pr,_) when Mid.mem pr.pr_name info.info_syn ->
       ()
   | Dprop pr ->
