@@ -59,14 +59,6 @@ theory Tuple0
   syntax function Tuple0 ""
 end
 
-theory _gnatprove_standard_th.Array__1__Func
-   syntax function attr__ATTRIBUTE_FIRST "%1'First"
-   syntax function attr__ATTRIBUTE_LAST "%1'Last"
-   syntax function attr__ATTRIBUTE_LENGTH "%1'Length"
-   syntax function access "%2 (%1)"
-   syntax function bool_eq "(%1 = %2)"
-end
-
 theory _gnatprove_standard_th.Integer_Func
   syntax function bool_eq "(%1 = %2)"
   syntax function bool_ne "(%1 /= %2)"
@@ -78,4 +70,23 @@ theory _gnatprove_standard_th.Integer_Func
   syntax function math_div "(%1 / %2)"
   syntax function computer_mod "(%1 mod %2)"
   syntax function math_mod "(%1 mod %2)"
+end
+
+theory _gnatprove_standard_th.Array__1__Func
+   syntax function attr__ATTRIBUTE_FIRST "%1'First"
+   syntax function attr__ATTRIBUTE_LAST "%1'Last"
+   syntax function attr__ATTRIBUTE_LENGTH "%1'Length"
+   syntax function access "%2 (%1)"
+   syntax function bool_eq "(%1 = %2)"
+end
+
+theory _gnatprove_standard_th.Array__2__Func
+   syntax function attr__ATTRIBUTE_FIRST "%1'First"
+   syntax function attr__ATTRIBUTE_LAST "%1'Last"
+   syntax function attr__ATTRIBUTE_LENGTH "%1'Length"
+   syntax function attr__ATTRIBUTE_LENGTH_2 "%1'Length(2)"
+   syntax function attr__ATTRIBUTE_FIRST_2 "%1'First(2)"
+   syntax function attr__ATTRIBUTE_LAST_2 "%1'Last(2)"
+   syntax function access "%3 (%1, %2)"
+   syntax function bool_eq "(%1 = %2)"
 end
