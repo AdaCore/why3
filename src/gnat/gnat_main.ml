@@ -170,11 +170,15 @@ module Objectives : sig
       registered as well. Only do the registering if the objective is to de
       discharged (ie, if the --limit-subp / --limit-line directives apply). *)
 
-   val add_expl         : Gnat_expl.expl -> unit
+   val add_expl    : Gnat_expl.expl -> unit
    (* register an objective without associating a goal (useful for trivial
       goals) *)
 
-   val discharge        : goal -> GoalSet.t
+   val add_clone   : derive:goal -> goal -> unit
+   (* [add_clone ~derive:from new_goal] adds [new_goal] to the objective of
+      [from], with the same trace as [from] *)
+
+   val discharge   : goal -> GoalSet.t
    (* Assume that the goal is proven, return the set of remaining goals for the
       same objective *)
 
@@ -245,6 +249,11 @@ end = struct
       end
 
    let add_expl e = ignore (find e)
+
+   let add_clone ~derive goal =
+      let obj = get_objective derive in
+      let trace = get_trace derive in
+      add_to_expl obj goal trace
 
    let discharge goal =
       let expl = get_objective goal in
@@ -468,12 +477,15 @@ end
 module Display_Progress : sig
   val set_num_goals : int -> unit
   val complete_goals : int -> unit
+  val incr_num_goals : unit -> unit
 end = struct
 
   let total_num_goals = ref 0
   let current_num_goals = ref 0
 
   let set_num_goals num = total_num_goals := num
+
+  let incr_num_goals () = incr total_num_goals
 
   let complete_goals num =
     if Gnat_config.ide_progress_bar then begin
@@ -483,6 +495,10 @@ end = struct
         (!current_num_goals * 100 / !total_num_goals)
     end
 end
+
+let is_full_split_goal goal =
+   Session.PHstr.mem goal.Session.goal_transformations
+      Gnat_config.full_split_name
 
 let rec handle_vc_result goal result detailed =
    (* This function is called when the prover has returned from a VC.
@@ -504,17 +520,40 @@ let rec handle_vc_result goal result detailed =
       end
    end else begin
       Display_Progress.complete_goals (GoalSet.count remaining + 1);
-      if Gnat_config.report = Gnat_config.Detailed && detailed <> None then
-      begin
-         let detailed =
-            match detailed with None -> assert false | Some x -> x in
-         print ~endline:false false (Session.goal_task goal)
-           (Objectives.get_objective goal);
-         Format.printf " (%a)@." Call_provers.print_prover_answer detailed
-      end else begin
-         print false (Session.goal_task goal) (Objectives.get_objective goal)
-      end;
-      Save_VCs.save_trace goal
+      (* When a "leaf goal" has not been proved, we try to further split it.
+         Here we don't know yet, whether "goal" is an original VC or if it has
+         been split already. We check that first. Then we check whether an
+         additional split actually gives new goals. Only in that case do we add
+         new goals, in all other cases we give up and declare the goal as not
+         proved. *)
+      try
+         if is_full_split_goal goal then raise Exit;
+         let transf =
+           Session.add_registered_transformation
+              ~keygen env_session Gnat_config.full_split_name goal in
+         let new_goals = transf.Session.transf_goals in
+         if List.length new_goals <= 1 then begin
+            Session.remove_transformation transf;
+            raise Exit
+         end else begin
+            List.iter (fun g ->
+               Objectives.add_clone ~derive:goal g;
+               Display_Progress.incr_num_goals ()) new_goals;
+            schedule_goal (List.hd new_goals)
+         end
+      with Exit ->
+         if Gnat_config.report = Gnat_config.Detailed && detailed <> None then
+         begin
+            let detailed =
+               match detailed with None -> assert false | Some x -> x in
+            print ~endline:false false (Session.goal_task goal)
+               (Objectives.get_objective goal);
+            Format.printf " (%a)@." Call_provers.print_prover_answer detailed
+         end else begin
+            print false (Session.goal_task goal)
+              (Objectives.get_objective goal)
+         end;
+         Save_VCs.save_trace goal
    end
 
 and interpret_result pa pas =

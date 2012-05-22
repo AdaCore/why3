@@ -42,6 +42,9 @@ val noproof : bool
 val split_name : string
 (* name of the "split_goal" transformation *)
 
+val full_split_name : string
+(* name of the "full_split_goal" transformation *)
+
 val limit_line : Gnat_loc.loc option
 (* set if option --limit-line was given; we only prove VCs from that line *)
 
