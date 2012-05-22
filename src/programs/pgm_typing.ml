@@ -992,6 +992,15 @@ let iupost env ty (q, ql) =
   let q = ifmla ~old:true env q in
   (v.i_pure, q), List.map dexn ql
 
+let label_set_from_list loc labels =
+   List.fold_left
+      (fun (labels,loc) lab ->
+         match lab with
+            | Lstr s -> (Ident.Slab.add s labels,loc)
+            | Lpos l -> (labels,l))
+      (Slab.empty,loc)
+      labels
+
 let rec purify_itype_v  = function
   | ITpure ty ->
       ty
@@ -1230,7 +1239,9 @@ and iexpr_desc env loc ty = function
       IEfun (bl, itriple env e1)
   | DElet (x, e1, e2) ->
       let e1 = iexpr env e1 in
-      let env, v = iadd_local env (id_user x.id x.id_loc) e1.iexpr_type in
+      let label, loc = label_set_from_list x.id_loc x.id_lab in
+      let env, v =
+         iadd_local env (id_user ~label x.id loc) e1.iexpr_type in
       IElet (v, e1, iexpr env e2)
   | DEletrec (dl, e1) ->
       let env, dl = iletrec env dl in
@@ -1949,15 +1960,6 @@ let add_effect_decl uc ls =
 
 let add_impure_decl uc ls =
   Pgm_module.add_impure_decl (Decl.create_param_decl ls) uc
-
-let label_set_from_list loc labels =
-   List.fold_left
-      (fun (labels,loc) lab ->
-         match lab with
-            | Lstr s -> (Ident.Slab.add s labels,loc)
-            | Lpos l -> (labels,l))
-      (Slab.empty,loc)
-      labels
 
 let add_global_fun loc ~labels x tyv uc =
   let x = parameter x in
