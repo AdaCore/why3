@@ -4,7 +4,6 @@ Require Import ZArith.
 Require Import Rbase.
 Require int.Int.
 
-(* Why3 assumption *)
 Definition implb(x:bool) (y:bool): bool := match (x,
   y) with
   | (true, false) => false

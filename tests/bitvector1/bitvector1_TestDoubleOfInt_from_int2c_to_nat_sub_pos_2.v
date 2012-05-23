@@ -293,6 +293,14 @@ Axiom Div_inf1 : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (x <  y)%Z) ->
 Axiom Div_inf_neg : forall (x:Z) (y:Z), ((0%Z <  x)%Z /\ (x <= y)%Z) ->
   ((int.EuclideanDivision.div (-x)%Z y) = (-1%Z)%Z).
 
+Axiom Div_pow : forall (x:Z) (i:Z), (((pow2 (i - 1%Z)%Z) <= x)%Z /\
+  (x <  (pow2 i))%Z) -> ((int.EuclideanDivision.div x
+  (pow2 (i - 1%Z)%Z)) = 1%Z).
+
+Axiom Div_pow2 : forall (x:Z) (i:Z), (((-(pow2 i))%Z <= x)%Z /\
+  (x <  (-(pow2 (i - 1%Z)%Z))%Z)%Z) -> ((int.EuclideanDivision.div x
+  (pow2 (i - 1%Z)%Z)) = (-2%Z)%Z).
+
 Axiom Mod_01 : forall (y:Z), (~ (y = 0%Z)) ->
   ((int.EuclideanDivision.mod1 0%Z y) = 0%Z).
 
@@ -302,13 +310,9 @@ Axiom Mod_1y : forall (y:Z), (1%Z <  y)%Z -> ((int.EuclideanDivision.mod1 1%Z
 Axiom Mod_neg1y : forall (y:Z), (1%Z <  y)%Z ->
   ((int.EuclideanDivision.mod1 (-1%Z)%Z y) = 1%Z).
 
-Axiom Div_pow : forall (x:Z) (i:Z), (((pow2 (i - 1%Z)%Z) <= x)%Z /\
-  (x <  (pow2 i))%Z) -> ((int.EuclideanDivision.div x
-  (pow2 (i - 1%Z)%Z)) = 1%Z).
-
-Axiom Div_pow2 : forall (x:Z) (i:Z), (((-(pow2 i))%Z <= x)%Z /\
-  (x <  (-(pow2 (i - 1%Z)%Z))%Z)%Z) -> ((int.EuclideanDivision.div x
-  (pow2 (i - 1%Z)%Z)) = 1%Z).
+Axiom Mod_pow2 : forall (x:Z) (i:Z),
+  ((int.EuclideanDivision.mod1 (x + (pow2 i))%Z
+  2%Z) = (int.EuclideanDivision.mod1 x 2%Z)).
 
 Axiom nth_from_int_high_even : forall (n:Z) (i:Z), (((i <  32%Z)%Z /\
   (0%Z <= i)%Z) /\ ((int.EuclideanDivision.mod1 (int.EuclideanDivision.div n
@@ -667,12 +671,8 @@ Axiom sign_const : ((nth1 (concat (from_int 1127219200%Z)
 Axiom exp_const : ((to_nat_sub1 (concat (from_int 1127219200%Z)
   (from_int 2147483648%Z)) 62%Z 52%Z) = 1075%Z).
 
-Axiom to_nat_mantissa_1 : ((to_nat_sub1 (concat (from_int 1127219200%Z)
+Axiom to_nat_mantissa : ((to_nat_sub1 (concat (from_int 1127219200%Z)
   (from_int 2147483648%Z)) 30%Z 0%Z) = 0%Z).
-
-Axiom mantissa_const_nth2 : forall (i:Z), ((32%Z <= i)%Z /\ (i <= 51%Z)%Z) ->
-  ((nth1 (concat (from_int 1127219200%Z) (from_int 2147483648%Z))
-  i) = false).
 
 Axiom mantissa_const_to_nat51 : ((to_nat_sub1 (concat (from_int 1127219200%Z)
   (from_int 2147483648%Z)) 51%Z
@@ -694,9 +694,9 @@ Axiom const_value0 : ((double_of_bv64 (concat (from_int 1127219200%Z)
 Axiom const_value : ((double_of_bv64 (concat (from_int 1127219200%Z)
   (from_int 2147483648%Z))) = ((pow21 52%Z) + (pow21 31%Z))%R).
 
-Definition jpxor(i:Z): bv := (bw_xor (from_int 2147483648%Z) (from_int2c i)).
+Definition jpxor(x:Z): bv := (bw_xor (from_int 2147483648%Z) (from_int2c x)).
 
-Definition var(i:Z): bv1 := (concat (from_int 1127219200%Z) (jpxor i)).
+Definition var(x:Z): bv1 := (concat (from_int 1127219200%Z) (jpxor x)).
 
 Definition var_as_double(x:Z): R := (double_of_bv64 (var x)).
 
