@@ -11,9 +11,9 @@ theory T
   goal g_lab1 : forall x "model:1":int. ("model:cond" x >= 42) -> 
     ("model:concl" x + 3 <= 50)
 
-  constant x : int
+  constant g : int
 
-  goal g2_lab : forall y "model:0":int. ("model:concl" x >= y)
+  goal g2_lab : forall x "model:0":int. ("model:concl" g >= x)
 
 
 end
@@ -50,7 +50,8 @@ goal test_overflow_int16_alt:
 
 goal test_overflow_int16_bis:
   forall x "model:0" y "model:0" :  int.
-     is_int16 x /\ is_int16 y /\ 0 <= x <= y -> is_int16 (x + y)
+     is_int16 x /\ is_int16 y /\ 
+     ("model:cond1" 0 <= x) /\ (x <= y) -> is_int16 (x + y)
 
 predicate is_int32 (x:int) = -2147483648 <= x <= 2147483647
 
@@ -61,6 +62,10 @@ goal test_overflow_int32:
 goal test_overflow_int32_bis:
   forall x "model:0" y "model:0" :  int.
      is_int32 x /\ is_int32 y /\ 0 <= x <= y -> is_int32 (x + y)
+
+goal test_overflow_int32_bis_inline:
+  forall x "model:0" y "model:0" :  int.
+     -2147483648 <= x <= 2147483647 /\ -2147483648 <= y <= 2147483647 /\ 0 <= x <= y -> -2147483648 <= x + y <= 2147483647
 
 end
 
