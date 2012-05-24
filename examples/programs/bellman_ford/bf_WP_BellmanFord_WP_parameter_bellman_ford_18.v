@@ -176,11 +176,11 @@ Parameter nth: forall (a:Type), Z -> (set1 a) -> a.
 Implicit Arguments nth.
 
 Axiom nth_injective : forall (a:Type), forall (s:(set1 a)) (i:Z) (j:Z),
-  ((0%Z <= i)%Z /\ (i <  (cardinal s))%Z) -> (((0%Z <= j)%Z /\
-  (j <  (cardinal s))%Z) -> (((nth i s) = (nth j s)) -> (i = j))).
+  ((0%Z <= i)%Z /\ (i < (cardinal s))%Z) -> (((0%Z <= j)%Z /\
+  (j < (cardinal s))%Z) -> (((nth i s) = (nth j s)) -> (i = j))).
 
 Axiom nth_surjective : forall (a:Type), forall (s:(set1 a)) (x:a), (mem x
-  s) -> exists i:Z, ((0%Z <= i)%Z /\ (i <  (cardinal s))%Z) -> (x = (nth i
+  s) -> exists i:Z, ((0%Z <= i)%Z /\ (i < (cardinal s))%Z) -> (x = (nth i
   s)).
 
 Parameter vertex : Type.
@@ -199,7 +199,7 @@ Parameter s: vertex.
 
 Axiom s_in_graph : (mem s vertices).
 
-Axiom vertices_cardinal_pos : (0%Z <  (cardinal vertices))%Z.
+Axiom vertices_cardinal_pos : (0%Z < (cardinal vertices))%Z.
 
 (* Why3 assumption *)
 Set Implicit Arguments.
@@ -258,6 +258,10 @@ Axiom path_trans : forall (x:vertex) (y:vertex) (z:vertex) (l1:(list vertex))
 Axiom empty_path : forall (x:vertex) (y:vertex), (path x (Nil :(list vertex))
   y) -> (x = y).
 
+Axiom path_decomposition : forall (x:vertex) (y:vertex) (z:vertex) (l1:(list
+  vertex)) (l2:(list vertex)), (path x (infix_plpl l1 (Cons y l2)) z) ->
+  ((path x l1 y) /\ (path y (Cons y l2) z)).
+
 Parameter weight: vertex -> vertex -> Z.
 
 (* Why3 assumption *)
@@ -274,22 +278,84 @@ Axiom path_weight_right_extension : forall (x:vertex) (y:vertex) (l:(list
   vertex)), ((path_weight (infix_plpl l (Cons x (Nil :(list vertex))))
   y) = ((path_weight l x) + (weight x y))%Z).
 
+Axiom path_weight_decomposition : forall (y:vertex) (z:vertex) (l1:(list
+  vertex)) (l2:(list vertex)), ((path_weight (infix_plpl l1 (Cons y l2))
+  z) = ((path_weight l1 y) + (path_weight (Cons y l2) z))%Z).
+
 Axiom path_in_vertices : forall (v1:vertex) (v2:vertex) (l:(list vertex)),
   (mem v1 vertices) -> ((path v1 l v2) -> (mem v2 vertices)).
 
+(* Why3 assumption *)
+Definition pigeon_set(s1:(set1 vertex)): Prop := forall (l:(list vertex)),
+  (forall (e:vertex), (mem1 e l) -> (mem e s1)) ->
+  (((cardinal s1) < (length l))%Z -> exists e:vertex, exists l1:(list
+  vertex), exists l2:(list vertex), exists l3:(list vertex),
+  (l = (infix_plpl l1 (Cons e (infix_plpl l2 (Cons e l3)))))).
+
+Axiom Induction : (forall (s1:(set1 vertex)), (is_empty s1) ->
+  (pigeon_set s1)) -> ((forall (s1:(set1 vertex)), (pigeon_set s1) ->
+  forall (t:vertex), (~ (mem t s1)) -> (pigeon_set (add t s1))) ->
+  forall (s1:(set1 vertex)), (pigeon_set s1)).
+
+Axiom corner : forall (s1:(set1 vertex)) (l:(list vertex)),
+  ((length l) = (cardinal s1)) -> ((forall (e:vertex), (mem1 e l) -> (mem e
+  s1)) -> ((exists e:vertex, (exists l1:(list vertex), (exists l2:(list
+  vertex), (exists l3:(list vertex), (l = (infix_plpl l1 (Cons e
+  (infix_plpl l2 (Cons e l3))))))))) \/ forall (e:vertex), (mem e s1) ->
+  (mem1 e l))).
+
+Axiom pigeon_0 : (pigeon_set (empty :(set1 vertex))).
+
+Axiom pigeon_1 : forall (s1:(set1 vertex)), (pigeon_set s1) ->
+  forall (t:vertex), (pigeon_set (add t s1)).
+
+Axiom pigeon_2 : forall (s1:(set1 vertex)), (pigeon_set s1).
+
+Axiom pigeonhole : forall (s1:(set1 vertex)) (l:(list vertex)),
+  (forall (e:vertex), (mem1 e l) -> (mem e s1)) ->
+  (((cardinal s1) < (length l))%Z -> exists e:vertex, exists l1:(list
+  vertex), exists l2:(list vertex), exists l3:(list vertex),
+  (l = (infix_plpl l1 (Cons e (infix_plpl l2 (Cons e l3)))))).
+
+Axiom long_path_decomposition_pigeon1 : forall (l:(list vertex)) (v:vertex),
+  (path s l v) -> ((~ (l = (Nil :(list vertex)))) -> forall (v1:vertex),
+  (mem1 v1 (Cons v l)) -> (mem v1 vertices)).
+
+Axiom long_path_decomposition_pigeon2 : forall (l:(list vertex)) (v:vertex),
+  (forall (v1:vertex), (mem1 v1 (Cons v l)) -> (mem v1 vertices)) ->
+  (((cardinal vertices) < (length (Cons v l)))%Z -> exists e:vertex,
+  exists l1:(list vertex), exists l2:(list vertex), exists l3:(list vertex),
+  ((Cons v l) = (infix_plpl l1 (Cons e (infix_plpl l2 (Cons e l3)))))).
+
+Axiom long_path_decomposition_pigeon3 : forall (l:(list vertex)) (v:vertex),
+  (exists e:vertex, (exists l1:(list vertex), (exists l2:(list vertex),
+  (exists l3:(list vertex), ((Cons v l) = (infix_plpl l1 (Cons e
+  (infix_plpl l2 (Cons e l3))))))))) -> ((exists l1:(list vertex),
+  (exists l2:(list vertex), (l = (infix_plpl l1 (Cons v l2))))) \/
+  exists n:vertex, exists l1:(list vertex), exists l2:(list vertex),
+  exists l3:(list vertex), (l = (infix_plpl l1 (Cons n (infix_plpl l2 (Cons n
+  l3)))))).
+
+Axiom long_path_decomposition : forall (l:(list vertex)) (v:vertex), (path s
+  l v) -> (((cardinal vertices) <= (length l))%Z -> ((exists l1:(list
+  vertex), (exists l2:(list vertex), (l = (infix_plpl l1 (Cons v l2))))) \/
+  exists n:vertex, exists l1:(list vertex), exists l2:(list vertex),
+  exists l3:(list vertex), (l = (infix_plpl l1 (Cons n (infix_plpl l2 (Cons n
+  l3))))))).
+
 Axiom simple_path : forall (v:vertex) (l:(list vertex)), (path s l v) ->
   exists lqt:(list vertex), (path s lqt v) /\
-  ((length lqt) <  (cardinal vertices))%Z.
+  ((length lqt) < (cardinal vertices))%Z.
 
 (* Why3 assumption *)
 Definition negative_cycle(v:vertex): Prop := (mem v vertices) /\
   ((exists l1:(list vertex), (path s l1 v)) /\ exists l2:(list vertex),
-  (path v l2 v) /\ ((path_weight l2 v) <  0%Z)%Z).
+  (path v l2 v) /\ ((path_weight l2 v) < 0%Z)%Z).
 
 Axiom key_lemma_1 : forall (v:vertex) (n:Z), (forall (l:(list vertex)),
-  (path s l v) -> (((length l) <  (cardinal vertices))%Z ->
+  (path s l v) -> (((length l) < (cardinal vertices))%Z ->
   (n <= (path_weight l v))%Z)) -> ((exists l:(list vertex), (path s l v) /\
-  ((path_weight l v) <  n)%Z) -> exists u:vertex, (negative_cycle u)).
+  ((path_weight l v) < n)%Z) -> exists u:vertex, (negative_cycle u)).
 
 (* Why3 assumption *)
 Inductive t  :=
@@ -314,7 +380,7 @@ Definition lt(x:t) (y:t): Prop :=
   | (Finite x1) =>
       match y with
       | Infinite => True
-      | (Finite y1) => (x1 <  y1)%Z
+      | (Finite y1) => (x1 < y1)%Z
       end
   end.
 
@@ -353,9 +419,9 @@ Definition inv1(m:(map vertex t)) (pass:Z) (via:(set1 (vertex*
   v) with
   | (Finite n) => (exists l:(list vertex), (path s l v) /\ ((path_weight l
       v) = n)) /\ ((forall (l:(list vertex)), (path s l v) ->
-      (((length l) <  pass)%Z -> (n <= (path_weight l v))%Z)) /\
+      (((length l) < pass)%Z -> (n <= (path_weight l v))%Z)) /\
       forall (u:vertex) (l:(list vertex)), (path s l u) ->
-      (((length l) <  pass)%Z -> ((mem (u, v) via) -> (n <= ((path_weight l
+      (((length l) < pass)%Z -> ((mem (u, v) via) -> (n <= ((path_weight l
       u) + (weight u v))%Z)%Z)))
   | Infinite => (forall (l:(list vertex)), (path s l v) ->
       (pass <= (length l))%Z) /\ forall (u:vertex), (mem (u, v) via) ->
@@ -367,25 +433,26 @@ Definition inv2(m:(map vertex t)) (via:(set1 (vertex* vertex)%type)): Prop :=
   forall (u:vertex) (v:vertex), (mem (u, v) via) -> (le (get m v)
   (add1 (get m u) (Finite (weight u v)))).
 
-Axiom key_lemma_2 : forall (m:(map vertex t)), (inv2 m edges) ->
-  forall (v:vertex), ~ (negative_cycle v).
+Axiom key_lemma_2 : forall (m:(map vertex t)), (inv1 m (cardinal vertices)
+  (empty :(set1 (vertex* vertex)%type))) -> ((inv2 m edges) ->
+  forall (v:vertex), ~ (negative_cycle v)).
 
 Require Import Why3.
-Ltac ae := why3 "alt-ergo".
+Ltac ae := why3 "alt-ergo" timelimit 30.
 
 (* Why3 goal *)
-Theorem WP_parameter_bellman_ford : ((1%Z <  ((cardinal vertices) - 1%Z)%Z)%Z \/
+Theorem WP_parameter_bellman_ford : ((1%Z < ((cardinal vertices) - 1%Z)%Z)%Z \/
   (1%Z = ((cardinal vertices) - 1%Z)%Z)) -> forall (m:(map vertex t)),
-  forall (i:Z), (((1%Z <  i)%Z \/ (1%Z = i)) /\
-  ((i <  ((cardinal vertices) - 1%Z)%Z)%Z \/
+  forall (i:Z), (((1%Z < i)%Z \/ (1%Z = i)) /\
+  ((i < ((cardinal vertices) - 1%Z)%Z)%Z \/
   (i = ((cardinal vertices) - 1%Z)%Z))) -> ((forall (v:vertex), (mem v
   vertices) -> match (get m
   v) with
   | (Finite n) => (exists l:(list vertex), (path s l v) /\ ((path_weight l
       v) = n)) /\ ((forall (l:(list vertex)), (path s l v) ->
-      (((length l) <  i)%Z -> (n <= (path_weight l v))%Z)) /\
+      (((length l) < i)%Z -> (n <= (path_weight l v))%Z)) /\
       forall (u:vertex) (l:(list vertex)), (path s l u) ->
-      (((length l) <  i)%Z -> ((mem (u, v) (empty :(set1 (vertex*
+      (((length l) < i)%Z -> ((mem (u, v) (empty :(set1 (vertex*
       vertex)%type))) -> (n <= ((path_weight l u) + (weight u v))%Z)%Z)))
   | Infinite => (forall (l:(list vertex)), (path s l v) ->
       (i <= (length l))%Z) /\ forall (u:vertex), (mem (u, v) (empty :(set1
@@ -398,9 +465,9 @@ Theorem WP_parameter_bellman_ford : ((1%Z <  ((cardinal vertices) - 1%Z)%Z)%Z \/
   v) with
   | (Finite n) => (exists l:(list vertex), (path s l v) /\ ((path_weight l
       v) = n)) /\ ((forall (l:(list vertex)), (path s l v) ->
-      (((length l) <  i)%Z -> (n <= (path_weight l v))%Z)) /\
+      (((length l) < i)%Z -> (n <= (path_weight l v))%Z)) /\
       forall (u:vertex) (l:(list vertex)), (path s l u) ->
-      (((length l) <  i)%Z -> ((mem (u, v) (diff edges es)) ->
+      (((length l) < i)%Z -> ((mem (u, v) (diff edges es)) ->
       (n <= ((path_weight l u) + (weight u v))%Z)%Z)))
   | Infinite => (forall (l:(list vertex)), (path s l v) ->
       (i <= (length l))%Z) /\ forall (u:vertex), (mem (u, v) (diff edges
@@ -412,9 +479,9 @@ Theorem WP_parameter_bellman_ford : ((1%Z <  ((cardinal vertices) - 1%Z)%Z)%Z \/
   v) with
   | (Finite n) => (exists l:(list vertex), (path s l v) /\ ((path_weight l
       v) = n)) /\ ((forall (l:(list vertex)), (path s l v) ->
-      (((length l) <  i)%Z -> (n <= (path_weight l v))%Z)) /\
+      (((length l) < i)%Z -> (n <= (path_weight l v))%Z)) /\
       forall (u:vertex) (l:(list vertex)), (path s l u) ->
-      (((length l) <  i)%Z -> ((mem (u, v) edges) -> (n <= ((path_weight l
+      (((length l) < i)%Z -> ((mem (u, v) edges) -> (n <= ((path_weight l
       u) + (weight u v))%Z)%Z)))
   | Infinite => (forall (l:(list vertex)), (path s l v) ->
       (i <= (length l))%Z) /\ forall (u:vertex), (mem (u, v) edges) ->
