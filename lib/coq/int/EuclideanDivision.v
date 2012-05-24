@@ -90,12 +90,80 @@ now rewrite Zmod_small.
 Qed.
 
 (* Why3 goal *)
+Lemma Div_inf_neg : forall (x:Z) (y:Z), ((0%Z < x)%Z /\ (x <= y)%Z) ->
+  ((div (-x)%Z y) = (-1%Z)%Z).
+intros x y Hxy.
+assert (h: (x < y \/ x = y)%Z) by omega.
+destruct h.
+(* case 0 < x < y *)
+assert (h1: (x mod y = x)%Z).
+  rewrite Zmod_small; auto with zarith.
+assert (h2: ((-x) mod y = y - x)%Z).
+  rewrite Z_mod_nz_opp_full.
+  rewrite h1; auto.
+rewrite h1; auto with zarith.
+unfold div.
+case Z_le_dec; auto with zarith.
+intros h3.
+rewrite Z_div_nz_opp_full; auto with zarith.
+rewrite Zdiv_small; auto with zarith.
+
+(* case x = y *)
+subst.
+assert (h1: (y mod y = 0)%Z).
+  rewrite Z_mod_same_full; auto with zarith.
+assert (h2: ((-y) mod y = 0)%Z).
+  rewrite Z_mod_zero_opp_full; auto with zarith.
+unfold div.
+case Z_le_dec; rewrite h2; auto with zarith.
+intro.
+rewrite Z_div_zero_opp_full; auto with zarith.
+rewrite Z_div_same_full; auto with zarith.
+Qed.
+
+(* Why3 goal *)
 Lemma Mod_0 : forall (y:Z), (~ (y = 0%Z)) -> ((mod1 0%Z y) = 0%Z).
 intros y Hy.
 unfold mod1, div.
 rewrite Zmod_0_l.
 simpl.
 now rewrite Zdiv_0_l, Zmult_0_r.
+Qed.
+
+(* Why3 goal *)
+Lemma Div_1_left : forall (y:Z), (1%Z < y)%Z -> ((div 1%Z y) = 0%Z).
+intros y Hy.
+rewrite Div_inf; auto with zarith.
+Qed.
+
+(* Why3 goal *)
+Lemma Div_minus1_left : forall (y:Z), (1%Z < y)%Z -> ((div (-1%Z)%Z
+  y) = (-1%Z)%Z).
+intros y Hy.
+unfold div.
+assert (h1: (1 mod y = 1)%Z).
+apply Zmod_1_l; auto.
+assert (h2: ((-(1)) mod y = y-1)%Z).
+  rewrite Z_mod_nz_opp_full; auto with zarith.
+case Z_le_dec; auto with zarith.
+intro.
+rewrite Z_div_nz_opp_full; auto with zarith.
+rewrite Zdiv_small; auto with zarith.
+Qed.
+
+(* Why3 goal *)
+Lemma Mod_1_left : forall (y:Z), (1%Z < y)%Z -> ((mod1 1%Z y) = 1%Z).
+intros y Hy.
+unfold mod1.
+rewrite Div_1_left; auto with zarith.
+Qed.
+
+(* Why3 goal *)
+Lemma Mod_minus1_left : forall (y:Z), (1%Z < y)%Z -> ((mod1 (-1%Z)%Z
+  y) = (y - 1%Z)%Z).
+intros y Hy.
+unfold mod1.
+rewrite Div_minus1_left; auto with zarith.
 Qed.
 
 
