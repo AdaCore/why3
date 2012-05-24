@@ -25,13 +25,7 @@ module M1
 
   use import module ref.Ref
 
-  let g (x "model:0": ref int) : int =
-    { }
-    x := !x + 1;
-    if ("model:cond" !x >= 42) then !x + 3 else 0
-    { "model:post" result <= 50 }
-
-  let g_no_label (x : ref int) : int =
+  let g (x : ref int) : int =
     { }
     x := !x + 1;
     if (!x >= 42) then !x + 3 else 0
