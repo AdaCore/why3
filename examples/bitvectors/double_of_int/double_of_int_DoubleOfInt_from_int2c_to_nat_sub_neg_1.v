@@ -158,6 +158,14 @@ Axiom pow2_62 : ((pow2 62%Z) = 4611686018427387904%Z).
 
 Axiom pow2_63 : ((pow2 63%Z) = 9223372036854775808%Z).
 
+Axiom Div_pow : forall (x:Z) (i:Z), (((pow2 (i - 1%Z)%Z) <= x)%Z /\
+  (x < (pow2 i))%Z) -> ((int.EuclideanDivision.div x
+  (pow2 (i - 1%Z)%Z)) = 1%Z).
+
+Axiom Div_pow2 : forall (x:Z) (i:Z), (((-(pow2 i))%Z <= x)%Z /\
+  (x < (-(pow2 (i - 1%Z)%Z))%Z)%Z) -> ((int.EuclideanDivision.div x
+  (pow2 (i - 1%Z)%Z)) = (-2%Z)%Z).
+
 Parameter pow21: Z -> R.
 
 Axiom Power_01 : ((pow21 0%Z) = 1%R).
@@ -673,59 +681,73 @@ Axiom to_nat_sub_0_30 : forall (x:Z), (is_int32 x) ->
 Axiom jpxorx_pos : forall (x:Z), (0%Z <= x)%Z ->
   ((nth (bw_xor (from_int 2147483648%Z) (from_int2c x)) 31%Z) = true).
 
-Axiom from_int2c_to_nat_sub_gen : forall (i:Z), ((0%Z <= i)%Z /\
-  (i <= 30%Z)%Z) -> forall (x:Z), ((0%Z <= x)%Z /\ (x < (pow2 i))%Z) ->
+Axiom from_int2c_to_nat_sub_pos : forall (i:Z), ((0%Z <= i)%Z /\
+  (i <= 31%Z)%Z) -> forall (x:Z), ((0%Z <= x)%Z /\ (x < (pow2 i))%Z) ->
   ((to_nat_sub (from_int2c x) (i - 1%Z)%Z 0%Z) = x).
-
-Axiom from_int2c_to_nat_sub : forall (x:Z), ((is_int32 x) /\ (0%Z <= x)%Z) ->
-  ((to_nat_sub (from_int2c x) 30%Z 0%Z) = x).
 
 Axiom lemma1_pos : forall (x:Z), ((is_int32 x) /\ (0%Z <= x)%Z) ->
   ((to_nat_sub (jpxor x) 31%Z 0%Z) = ((pow2 31%Z) + x)%Z).
 
-Axiom to_nat_sub_0_30_neg : forall (x:Z), ((is_int32 x) /\ (x < 0%Z)%Z) ->
-  ((to_nat_sub (bw_xor (from_int 2147483648%Z) (from_int2c x)) 30%Z
-  0%Z) = (to_nat_sub (from_int2c x) 30%Z 0%Z)).
-
-Axiom to_nat_sub_0_30_neg1 : forall (x:Z), ((is_int32 x) /\ (x < 0%Z)%Z) ->
-  ((to_nat_sub (from_int2c x) 30%Z 0%Z) = ((pow2 31%Z) + x)%Z).
-
-Axiom lemma1_neg : forall (x:Z), ((is_int32 x) /\ (x < 0%Z)%Z) ->
-  ((to_nat_sub (jpxor x) 31%Z 0%Z) = ((pow2 31%Z) + x)%Z).
-
-Axiom lemma1 : forall (x:Z), (is_int32 x) -> ((to_nat_sub (jpxor x) 31%Z
-  0%Z) = ((pow2 31%Z) + x)%Z).
-
-Axiom nth_var_0_31 : forall (x:Z), forall (i:Z), ((is_int32 x) /\
-  ((0%Z <= i)%Z /\ (i <= 31%Z)%Z)) -> ((nth1 (var x) i) = (nth (jpxor x) i)).
-
-Axiom to_nat_bv32_bv64_aux : forall (b1:bv), forall (b2:bv), forall (j:Z),
-  ((0%Z <= j)%Z /\ (j < 32%Z)%Z) -> ((to_nat_sub1 (concat b1 b2) j
-  0%Z) = (to_nat_sub b2 j 0%Z)).
-
-Axiom to_nat_bv32_bv64 : forall (b1:bv), forall (b2:bv),
-  ((to_nat_sub1 (concat b1 b2) 31%Z 0%Z) = (to_nat_sub b2 31%Z 0%Z)).
-
-Axiom to_nat_var_0_31 : forall (x:Z), (is_int32 x) -> ((to_nat_sub1 (var x)
-  31%Z 0%Z) = (to_nat_sub (jpxor x) 31%Z 0%Z)).
-
-Axiom nth_var32to63 : forall (x:Z) (k:Z), ((32%Z <= k)%Z /\ (k <= 63%Z)%Z) ->
-  ((nth1 (var x) k) = (nth (from_int 1127219200%Z) (k - 32%Z)%Z)).
-
-Axiom nth_var3 : forall (x:Z), forall (i:Z), ((32%Z <= i)%Z /\
-  (i <= 51%Z)%Z) -> ((nth1 (var x) i) = false).
+Axiom jpxorx_neg : forall (x:Z), (x < 0%Z)%Z ->
+  ((nth (bw_xor (from_int 2147483648%Z) (from_int2c x)) 31%Z) = false).
 
 Open Scope Z_scope.
 Require Import Why3.
-Ltac ae := why3 "alt-ergo" timelimit 5.
+Ltac ae := why3 "alt-ergo" timelimit 3.
 
 (* Why3 goal *)
-Theorem lemma2 : forall (x:Z), (is_int32 x) -> ((to_nat_sub1 (var x) 51%Z
-  0%Z) = ((pow2 31%Z) + x)%Z).
-intros.
-rewrite to_nat_of_zero21 with (i:=31);auto with zarith.
+Theorem from_int2c_to_nat_sub_neg : forall (i:Z), ((0%Z <= i)%Z /\
+  (i <= 31%Z)%Z) -> forall (x:Z), (((-(pow2 i))%Z <= x)%Z /\ (x < 0%Z)%Z) ->
+  ((to_nat_sub (from_int2c x) (i - 1%Z)%Z 0%Z) = ((pow2 i) + x)%Z).
+intros i (h1 & h2).
+generalize h1 h2.
+pattern i; apply Z_lt_induction; auto.
+clear i h1 h2.
+intros i Hind Hi_pos Hi j Hj.
+assert (h:(i=0 \/ 0 < i)) by omega.
+destruct h.
+(* case i = 0 *)
 ae.
+
+(* case i > 0 *)
+
+assert (h:(-pow2 (i-1) <= j < 0 )\/
+          (-pow2 i <= j < - pow2 (i-1))) by omega.
+destruct h.
+
+(* sub-case (-pow2 (i-1) <= j < 0*)
+
+rewrite to_nat_sub_one; auto with zarith.
+rewrite Hind with (x:= j)(y:=i-1);auto with zarith.
 ae.
+
+apply nth_from_int2c_high_odd; 
+   split; auto with zarith.
+pose (j':= -j).
+replace (j) with (-j') by (subst j';omega).
+
+(* TODO *)
+rewrite EuclideanDivision.Div_inf_neg.
+rewrite EuclideanDivision.Mod_minus1_left;auto with zarith.
+subst j';omega.
+
+(* sub-case 2^(i0-1) <= x0 < 2^i0*)
+
+rewrite to_nat_sub_zero; auto with zarith. 
+rewrite to_nat_sub_footprint with 
+  (b2 := (from_int2c (j + pow2 (i-1)))); auto with zarith.
+rewrite Hind; auto with zarith.
+ae.
+
+ae.
+
+ae.
+
+rewrite nth_from_int2c_high_even; auto with zarith.
+
+split;auto with zarith.
+rewrite Div_pow2; auto.
+
 Qed.
 
 

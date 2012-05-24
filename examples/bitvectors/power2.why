@@ -80,6 +80,15 @@ theory Pow2int
   lemma pow2_62: pow2 62 =  4611686018427387904
   lemma pow2_63: pow2 63 =  9223372036854775808
 
+
+  use import int.EuclideanDivision
+
+  lemma Div_pow: forall x i:int. pow2 (i-1) <= x < pow2 i ->
+		 div x (pow2 (i-1)) = 1
+
+  lemma Div_pow2: forall x i:int. -pow2 i <= x < -pow2 (i-1) ->
+  		 div x (pow2 (i-1)) = -2
+
 end
 
 
