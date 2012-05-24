@@ -242,9 +242,7 @@ let quantify env rm sreg f =
         | Tyvar _ -> assert false
       in
       let id = Spv.fold test vars None in
-      (**)
-      let label = Slab.singleton (create_label "model:0") in
-      (**)
+      let label = Slab.singleton (create_label "model:1") in
       let id = id_clone ~label (def_option r.R.r_tv.tv_name id) in
       let r' = create_vsymbol id (purify r.R.r_ty) in
       Mtv.add r.R.r_tv r' m
@@ -255,7 +253,7 @@ let quantify env rm sreg f =
     let add pv s =
       let v = pv.pv_pure in
       (**)
-      let label = Slab.singleton (create_label "clone:quantify(2)") in
+      let label = Slab.singleton (create_label "model:quantify(2)") in
       (**)
       let v' = create_vsymbol (id_clone ~label v.vs_name) v.vs_ty in
       Mvs.add v v' s
