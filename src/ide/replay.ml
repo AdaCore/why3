@@ -327,27 +327,27 @@ let add_to_check_no_smoke config found_obs env_session sched =
             report
         in
         if report = [] then begin
-          if !opt_force then
-            printf " %d/%d (replay OK, session going to be saved since -force was given)@." n m
-          else
-            if found_obs then
-              if n=m then
-                printf " %d/%d (replay OK, all proved: obsolete session \
+          if found_obs then
+            if n=m then
+              printf " %d/%d (replay OK, all proved: obsolete session \
 updated)@." n m
+            else
+              if !opt_force then
+                printf " %d/%d (replay OK, but not all proved: session going to be saved since -force was given)@." n m
               else
                 printf " %d/%d (replay OK, but not all proved: obsolete \
 session NOT updated)@." n m
-            else
-              printf " %d/%d@." n m ;
-            if !opt_stats && n<m then print_statistics files;
-            eprintf "Everything replayed OK.@.";
-            if (found_obs && n=m) || !opt_force then
-              begin
-                eprintf "Saving session...@?";
-                S.save_session config session;
-                eprintf " done@."
-              end;
-            exit 0
+          else
+            printf " %d/%d@." n m ;
+          if !opt_stats && n<m then print_statistics files;
+          eprintf "Everything replayed OK.@.";
+          if found_obs && (n=m || !opt_force) then
+            begin
+              eprintf "Saving session...@?";
+              S.save_session config session;
+              eprintf " done@."
+            end;
+          exit 0
         end
         else
           begin
