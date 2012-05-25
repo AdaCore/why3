@@ -32,6 +32,10 @@ open Mlw_module
 type dreg
 type dity
 
+type tvars (* a set of type variables *)
+val empty_tvars: tvars
+val add_tvars: tvars -> dity -> tvars
+
 val create_user_type_variable: Ptree.ident -> dity
 val create_type_variable: unit -> dity
 val its_app: user:bool -> itysymbol -> dity list -> dity
@@ -43,13 +47,11 @@ val unify: dity -> dity -> unit
 val ity_of_dity: dity -> ity
   (** use with care, only once unification is done *)
 
-type darrow = dity list * dity
+val specialize_scheme: tvars -> dity -> dity
 
 (***
-
-val specialize_darrow: darrow -> darrow
-val specialize_lsymbol: lsymbol  -> darrow
-val specialize_prgsymbol: prgsymbol -> darrow
+val specialize_lsymbol: lsymbol -> dity
+val specialize_prgsymbol: prgsymbol -> dity
 
 val match_darrow: psymbol -> darrow -> ity_subst
 ***)

@@ -74,7 +74,7 @@ type dloop_annotation = {
 
 type dexpr = {
   dexpr_desc : dexpr_desc;
-  dexpr_type : Mlw_dty.darrow;
+  dexpr_type : Mlw_dty.dity;
   dexpr_lab  : Ident.label list;
   dexpr_loc  : loc;
 }

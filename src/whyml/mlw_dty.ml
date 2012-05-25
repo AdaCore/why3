@@ -21,6 +21,7 @@
 (* destructive types for program type inference *)
 
 open Why3
+open Util
 open Ident
 open Ty
 open Term
@@ -69,7 +70,7 @@ let ity_of_dity d = Lazy.force !d.ity
 
 let reg_of_dreg d = Lazy.force !d.reg
 
-let create_dreg ?(user=false) dity =
+let create_dreg ~user dity =
   ref { rid = unique (); rity = dity; ruser = user;
         reg = lazy (create_region (id_fresh "rho") (ity_of_dity dity)) }
 
@@ -81,36 +82,19 @@ let find_type_variable htv tv =
     Htv.add htv tv dtv;
     dtv
 
-let ts_app ts dl =
+let ts_app_real ts dl =
   create (Dts (ts, dl)) (lazy (ity_pur ts (List.map ity_of_dity dl)))
 
 let its_app_real its dl rl =
   create (Dits (its, dl, rl))
     (lazy (ity_app its (List.map ity_of_dity dl) (List.map reg_of_dreg rl)))
 
-(*
-let rec dity_inst mv mr dity = match !dity.node with
-  | Duvar _ ->
-      dity
-  | Dvar ->
-      Mint.find !dity.uid mv
-  | Dts (s,tl) ->
-      let mr,tl = List.map (dity_inst mv mr) tl in
-      ts_app s tl
-  | Dits (s,tl,rl) ->
-      let tl = List.map (dity_inst mv mr) tl in
-      let rl = List.map (dreg_inst mr) rl in
-      its_app s tl rl
-
-and dreg_inst mr r = Mint.find !r.rid mr
-*)
-
 let rec ity_inst_fresh ~user mv mr ity = match ity.ity_node with
   | Ityvar v ->
       mr, Mtv.find v mv
   | Itypur (s,tl) ->
       let mr,tl = Util.map_fold_left (ity_inst_fresh ~user mv) mr tl in
-      mr, ts_app s tl
+      mr, ts_app_real s tl
   | Ityapp (s,tl,rl) ->
       let mr,tl = Util.map_fold_left (ity_inst_fresh ~user mv) mr tl in
       let mr,rl = Util.map_fold_left (reg_refresh ~user mv) mr rl in
@@ -146,7 +130,7 @@ let ts_app ts dl = match ts.ts_def with
           raise (BadTypeArity (ts, List.length ts.ts_args, List.length dl)) in
       snd (ity_inst_fresh ~user:true mv Mreg.empty (ity_of_ty ty))
   | None ->
-      ts_app ts dl
+      ts_app_real ts dl
 
 (* unification *)
 
@@ -159,11 +143,13 @@ let rec unify d1 d2 =
         d2 := !d1
     | Duvar s1, Duvar s2 when s1.id = s2.id ->
         ()
-    | Dits (its1, dl1, _rl1), Dits (its2, dl2, _rl2) when its_equal its1 its2 ->
-        if List.length dl1 <> List.length dl2 then raise Exit;
-        List.iter2 unify dl1 dl2
+    | Dits (its1, dl1, rl1), Dits (its2, dl2, rl2) when its_equal its1 its2 ->
+        assert (List.length rl1 = List.length rl2);
+        assert (List.length dl1 = List.length dl2);
+        List.iter2 unify dl1 dl2;
+        List.iter2 unify_reg rl1 rl2
     | Dts (ts1, dl1), Dts (ts2, dl2) when ts_equal ts1 ts2 ->
-        if List.length dl1 <> List.length dl2 then raise Exit;
+        assert (List.length dl1 = List.length dl2);
         List.iter2 unify dl1 dl2
     | _ ->
         raise Exit
@@ -171,11 +157,20 @@ let rec unify d1 d2 =
     d1 := !d2
   end
 
+and unify_reg r1 r2 =
+  if !r1.rid <> !r2.rid then
+    if not !r1.ruser then r1 := !r2
+    else if not !r2.ruser then r2 := !r1
+    else begin (* two user regions *)
+      if not (Lazy.lazy_is_val !r1.reg) then raise Exit;
+      if not (Lazy.lazy_is_val !r2.reg) then raise Exit;
+      if not (reg_equal (Lazy.force !r1.reg) (Lazy.force !r2.reg)) then
+        raise Exit
+    end
+
 let unify d1 d2 =
   try unify d1 d2
   with Exit -> raise (TypeMismatch (ity_of_dity d1, ity_of_dity d2))
-
-type darrow = dity list * dity
 
 let rec dity_of_ity ~user htv hreg ity = match ity.ity_node with
   | Ityvar tv -> assert (not user); find_type_variable htv tv
@@ -193,6 +188,55 @@ and dreg_of_reg ~user htv hreg r =
     dreg
 
 let dity_of_vtv ~user htv hreg v = dity_of_ity ~user htv hreg v.vtv_ity
+
+let ts_arrow =
+  let v = List.map (fun s -> create_tvsymbol (Ident.id_fresh s)) ["a"; "b"] in
+  Ty.create_tysymbol (Ident.id_fresh "arrow") v None
+
+let make_arrow_type tyl ty =
+  let arrow ty1 ty2 =
+    create (Dts (ts_arrow, [ty1; ty2])) (lazy (invalid_arg "ity_of_dity")) in
+  List.fold_right arrow tyl ty
+
+type tvars = Sint.t (* a set of type variables *)
+let empty_tvars = Sint.empty
+
+let rec add_tvars tvs d = match !d.node with
+  | Duvar _ | Dvar _ -> Sint.add !d.uid tvs
+  | Dits (_, dl, rl) ->
+      let add_reg tvs r = add_tvars (Sint.add !r.rid tvs) !r.rity in
+      List.fold_left add_reg (List.fold_left add_tvars tvs dl) rl
+  | Dts (_, dl) -> List.fold_left add_tvars tvs dl
+
+let specialize_scheme tvs dity =
+  let hv = Hashtbl.create 17 in
+  let huv = Hashtbl.create 17 in
+  let hr = Hashtbl.create 17 in
+  let rec specialize d = match !d.node with
+    | Duvar _ | Dvar when Sint.mem !d.uid tvs -> d
+    | Duvar id -> begin
+        try Hashtbl.find huv id.id
+        with Not_found ->
+          let v = create_type_variable () in Hashtbl.add huv id.id v; v
+      end
+    | Dvar -> begin
+        try Hashtbl.find hv !d.uid
+        with Not_found ->
+          let v = create_type_variable () in Hashtbl.add hv !d.uid v; v
+      end
+    | Dits (its, dl, rl) ->
+        its_app_real its (List.map specialize dl) (List.map spec_reg rl)
+    | Dts (ts, dl) -> ts_app_real ts (List.map specialize dl)
+  and spec_reg r =
+    if Sint.mem !r.rid tvs then r
+    else if !r.ruser && Lazy.lazy_is_val !r.reg then r
+    else
+      try Hashtbl.find hr !r.rid
+      with Not_found ->
+        let v = create_dreg ~user:false (specialize !r.rity) in
+        Hashtbl.add hr !r.rid v; v
+  in
+  specialize dity
 
 (***
 

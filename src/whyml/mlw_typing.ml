@@ -89,9 +89,40 @@ let () = Exn_printer.register (fun fmt e -> match e with
 
 (* TODO: let type_only = Debug.test_flag Typing.debug_type_only in *)
 
+type denv = {
+  uc     : module_uc;
+  locals : (tvars * dity) Mstr.t;
+  tvars  : tvars;
+  denv   : Typing.denv; (* for user type variables only *)
+}
+
+let create_denv uc =
+  { uc = uc;
+    locals = Mstr.empty;
+    tvars = empty_tvars;
+    denv = Typing.create_denv (); }
+
 (** Typing type expressions *)
 
-
+let rec dity_of_pty ~user denv = function
+  | Ptree.PPTtyvar id ->
+      create_user_type_variable id
+  | Ptree.PPTtyapp (pl, p) ->
+      let dl = List.map (dity_of_pty ~user denv) pl in
+      let x = Typing.string_list_of_qualid [] p in
+      begin
+        try
+          let its = ns_find_it (get_namespace denv.uc) x in
+          its_app ~user its dl
+        with Not_found -> try
+          let ts = ns_find_ts (Theory.get_namespace (get_theory denv.uc)) x in
+          ts_app ts dl
+        with Not_found ->
+          let loc = Typing.qloc p in
+          errorm ~loc "unbound symbol %a" Typing.print_qualid p
+      end
+  | Ptree.PPTtuple pl ->
+      ts_app (ts_tuple (List.length pl)) (List.map (dity_of_pty ~user denv) pl)
 
 (** Typing program expressions *)
 
@@ -103,17 +134,7 @@ let rec extract_labels labs loc e = match e.Ptree.expr_desc with
       labs, loc, Ptree.Ecast ({ e with Ptree.expr_desc = d }, ty)
   | e -> List.rev labs, loc, e
 
-type denv = {
-  uc     : module_uc;
-  locals : (bool * darrow) Mstr.t;
-  denv   : Typing.denv; (* for user type variables only *)
-}
-
-let create_denv uc =
-  { uc = uc;
-    locals = Mstr.empty;
-    denv = Typing.create_denv (); }
-
+(*
 let unify_arg dity { dexpr_loc = loc; dexpr_type = (args, res) } =
   if args <> [] then errorm ~loc "value expected";
   unify dity res
@@ -140,6 +161,13 @@ let unify_args_prg ~loc prg args el = match prg with
 let rec decompose_app args e = match e.Ptree.expr_desc with
   | Eapply (e1, e2) -> decompose_app (e2 :: args) e1
   | _ -> e, args
+*)
+
+(* value restriction *)
+let rec is_fun e = match e.dexpr_desc with
+  | DEfun _ -> true
+  | DEmark (_, e) -> is_fun e
+  | _ -> false
 
 let rec dexpr ~userloc denv e =
   let loc = e.Ptree.expr_loc in
@@ -151,13 +179,13 @@ let rec dexpr ~userloc denv e =
   in
   e
 
-and dexpr_desc ~userloc _denv _loc = function
-(***
+and dexpr_desc ~userloc denv _loc = function
   | Ptree.Eident (Qident {id=x}) when Mstr.mem x denv.locals ->
       (* local variable *)
-      let poly, da = Mstr.find x denv.locals in
-      let da = if poly then specialize_darrow da else da in
-      DElocal x, da
+      let tvs, dity = Mstr.find x denv.locals in
+      let dity = specialize_scheme tvs dity in
+      DElocal x, dity
+(***
   | Ptree.Eident p ->
       let x = Typing.string_list_of_qualid [] p in
       begin
@@ -187,14 +215,28 @@ and dexpr_desc ~userloc _denv _loc = function
           assert false (*TODO*)
       end
 ***)
+  | Ptree.Elet (id, e1, e2) ->
+      let e1 = dexpr ~userloc denv e1 in
+      let tvars =
+        if is_fun e1 then denv.tvars else add_tvars denv.tvars e1.dexpr_type in
+      let s = tvars, e1.dexpr_type in
+      let denv =
+        { denv with locals = Mstr.add id.id s denv.locals; tvars = tvars } in
+      let e2 = dexpr ~userloc denv e2 in
+      DElet (id, e1, e2), e2.dexpr_type
+  | Ptree.Ecast (e1, pty) ->
+      let e1 = dexpr ~userloc denv e1 in
+      unify e1.dexpr_type (dity_of_pty ~user:false denv pty);
+      e1.dexpr_desc, e1.dexpr_type
+  | Ptree.Enamed _ ->
+      assert false
   | _ ->
-      ignore (userloc);
       assert false (*TODO*)
 
 type local_var =
   | Lpvsymbol of pvsymbol
   | Lpasymbol of pasymbol
-  | Lpsymbol  of psymbol * darrow
+  | Lpsymbol  of psymbol * dity
 
 let rec expr _locals de = match de.dexpr_desc with
 (***
