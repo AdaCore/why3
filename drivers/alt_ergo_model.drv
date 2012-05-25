@@ -1,8 +1,29 @@
-import "alt_ergo.drv"
+import "alt_ergo_bare.drv"
 
 theory BuiltIn
   meta "printer_option" "show_labels"
+  meta "eliminate_algebraic" "keep_enums"
+  meta "eliminate_algebraic" "keep_recs"
 end
+
+
+theory int.EuclideanDivision
+
+  syntax function div "(%1 / %2)"
+  syntax function mod "(%1 % %2)"
+
+end
+
+theory map.Map
+  syntax type  map "(%1,%2) farray"
+
+  syntax function get "(%1[%2])"
+  syntax function set "(%1[%2 <- %3])"
+
+  remove prop Select_eq
+  remove prop Select_neq
+end
+
 
 (*
 Local Variables:
