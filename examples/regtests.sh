@@ -18,6 +18,8 @@ TMPERR=$PWD/why3regtests.err
 
 cd `dirname $0`
 
+# too early to do that
+# REPLAYOPT="$REPLAYOPT -smoke-detector top"
 
 res=0
 export success=0
