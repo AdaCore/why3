@@ -72,6 +72,8 @@ val id_clone : ?label:Slab.t -> ident -> preid
 (* create a derived pre-ident (inherit labels and location) *)
 val id_derive : ?label:Slab.t -> string -> ident -> preid
 
+(* retrieve preid name without registering *)
+val preid_name : preid -> string
 
 (** Unique persistent names for pretty printing *)
 

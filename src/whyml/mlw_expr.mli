@@ -19,6 +19,7 @@
 (**************************************************************************)
 
 open Why3
+open Util
 open Ident
 open Ty
 open Term
@@ -108,6 +109,16 @@ val ppat_plapp : plsymbol -> ppattern list -> vty_value -> ppattern
 val ppat_lapp : lsymbol -> ppattern list -> vty_value -> ppattern
 val ppat_or : ppattern -> ppattern -> ppattern
 val ppat_as : ppattern -> pvsymbol -> ppattern
+
+type pre_ppattern =
+  | PPwild
+  | PPvar of preid
+  | PPlapp of lsymbol * pre_ppattern list
+  | PPpapp of plsymbol * pre_ppattern list
+  | PPor of pre_ppattern * pre_ppattern
+  | PPas of pre_ppattern * preid
+
+val make_ppattern : pre_ppattern -> vty_value -> pvsymbol Mstr.t * ppattern
 
 (** program expressions *)
 

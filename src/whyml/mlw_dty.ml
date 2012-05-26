@@ -202,7 +202,7 @@ type tvars = Sint.t (* a set of type variables *)
 let empty_tvars = Sint.empty
 
 let rec add_tvars tvs d = match !d.node with
-  | Duvar _ | Dvar _ -> Sint.add !d.uid tvs
+  | Duvar _ | Dvar -> Sint.add !d.uid tvs
   | Dits (_, dl, rl) ->
       let add_reg tvs r = add_tvars (Sint.add !r.rid tvs) !r.rity in
       List.fold_left add_reg (List.fold_left add_tvars tvs dl) rl

@@ -19,6 +19,7 @@
 (**************************************************************************)
 
 open Why3
+open Util
 open Ident
 open Ty
 open Term
@@ -170,6 +171,93 @@ let ppat_as pp pv =
   { ppat_pattern = pat_as pp.ppat_pattern pv.pv_vs;
     ppat_vtv     = vtv;
     ppat_effect  = pp.ppat_effect; }
+
+(* reconstruct a pattern from an untyped skeleton *)
+
+type pre_ppattern =
+  | PPwild
+  | PPvar of preid
+  | PPlapp of lsymbol * pre_ppattern list
+  | PPpapp of plsymbol * pre_ppattern list
+  | PPor of pre_ppattern * pre_ppattern
+  | PPas of pre_ppattern * preid
+
+let make_ppattern pp vtv =
+  let hv = Hashtbl.create 3 in
+  let find id vtv =
+    let nm = preid_name id in
+    try
+      let pv = Hashtbl.find hv nm in
+      ity_equal_check vtv.vtv_ity pv.pv_vtv.vtv_ity;
+      pv
+    with Not_found ->
+      let pv = create_pvsymbol id vtv in
+      Hashtbl.add hv nm pv; pv
+  in
+  let unmut vtv = vty_value ~ghost:vtv.vtv_ghost vtv.vtv_ity in
+  let rec make vtv = function
+    | PPwild -> {
+        ppat_pattern = pat_wild (ty_of_ity vtv.vtv_ity);
+        ppat_vtv     = unmut vtv;
+        ppat_effect  = eff_empty; }
+    | PPvar id -> {
+        ppat_pattern = pat_var (find id vtv).pv_vs;
+        ppat_vtv     = vtv;
+        ppat_effect  = eff_empty; }
+    | PPpapp (pls,ppl) ->
+        (* FIXME? Since pls is a constructor, the result type vtv will
+           cover every type variable and region in the signature of pls.
+           Then the following ity_match call is enough to build the full
+           substitution. If, however, we are given a bad pls, say, a
+           projection, then the following code may break with a less
+           than understandable error message. Is it really important? *)
+        let sbs = ity_match ity_subst_empty pls.pl_value.vtv_ity vtv.vtv_ity in
+        let mtch arg pp =
+          let ity = ity_full_inst sbs arg.vtv_ity in
+          let ghost = vtv.vtv_ghost || arg.vtv_ghost in
+          let mut = Util.option_map (reg_full_inst sbs) arg.vtv_mut in
+          let pp = make (vty_value ~ghost ?mut ity) pp in
+          Util.option_fold (eff_read ~ghost) pp.ppat_effect mut, pp
+        in
+        let ppl = try List.map2 mtch pls.pl_args ppl with Invalid_argument _ ->
+          raise (Term.BadArity
+            (pls.pl_ls, List.length pls.pl_args, List.length ppl)) in
+        let eff = List.fold_left
+          (fun acc (eff,_) -> eff_union acc eff) eff_empty ppl in
+        let pl = List.map (fun (_,pp) -> pp.ppat_pattern) ppl in
+        { ppat_pattern = pat_app pls.pl_ls pl (ty_of_ity vtv.vtv_ity);
+          ppat_vtv     = unmut vtv;
+          ppat_effect  = if vtv.vtv_ghost then eff_ghostify eff else eff; }
+    | PPlapp (ls,ppl) ->
+        let ity = ity_of_ty (Util.def_option ty_bool ls.ls_value) in
+        let sbs = ity_match ity_subst_empty ity vtv.vtv_ity in
+        let mtch arg pp =
+          let ity = ity_full_inst sbs (ity_of_ty arg) in
+          make (vty_value ~ghost:vtv.vtv_ghost ity) pp
+        in
+        let ppl = try List.map2 mtch ls.ls_args ppl with Invalid_argument _ ->
+          raise (Term.BadArity (ls,List.length ls.ls_args,List.length ppl)) in
+        let eff = List.fold_left
+          (fun acc pp -> eff_union acc pp.ppat_effect) eff_empty ppl in
+        let pl = List.map (fun pp -> pp.ppat_pattern) ppl in
+        { ppat_pattern = pat_app ls pl (ty_of_ity vtv.vtv_ity);
+          ppat_vtv     = unmut vtv;
+          ppat_effect  = if vtv.vtv_ghost then eff_ghostify eff else eff; }
+    | PPor (pp1,pp2) ->
+        let vtv = unmut vtv in
+        let pp1 = make vtv pp1 in
+        let pp2 = make vtv pp2 in
+        { ppat_pattern = pat_or pp1.ppat_pattern pp2.ppat_pattern;
+          ppat_vtv     = vtv;
+          ppat_effect  = eff_union pp1.ppat_effect pp2.ppat_effect; }
+    | PPas (pp,id) ->
+        let pp = make vtv pp in
+        { ppat_pattern = pat_as pp.ppat_pattern (find id vtv).pv_vs;
+          ppat_vtv     = unmut vtv;
+          ppat_effect  = pp.ppat_effect; }
+  in
+  let pp = make (unmut vtv) pp in
+  Hashtbl.fold Mstr.add hv Mstr.empty, pp
 
 (** program expressions *)
 
