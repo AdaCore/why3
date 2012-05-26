@@ -201,6 +201,7 @@ val e_plapp : plsymbol -> expr list -> ity -> expr
 
 val create_let_defn : preid -> expr -> let_defn
 val create_fun_defn : preid -> lambda -> rec_defn
+val create_rec_defn : (psymbol * lambda) list -> rec_defn list
 
 exception StaleRegion of region * ident * expr
 (* a previously reset region is associated to an ident occurring in expr.

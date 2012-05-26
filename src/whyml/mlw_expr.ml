@@ -447,12 +447,16 @@ let create_fun_defn id lam =
        in the postcondition formula when lam.l_expr.e_vty is an arrow? *)
   end;
   Mexn.iter (fun xs t -> check_post xs.xs_ity t) lam.l_xpost;
+(*
   if lam.l_variant <> [] then
     Loc.errorm "Variants are not allowed in a non-recursive definition";
+*)
   (* compute rec_vars and ps.ps_vars *)
   let add_term t s = Mvs.set_union t.t_vars s in
   let vsset = add_term lam.l_post (add_term lam.l_pre Mvs.empty) in
   let vsset = Mexn.fold (fun _ -> add_term) lam.l_xpost vsset in
+  let vsset =
+    List.fold_right (fun v -> add_term v.v_term) lam.l_variant vsset in
   let add_vs vs _ m = Mid.add vs.vs_name (vs_vars vars_empty vs) m in
   let del_pv m pv = Mid.remove pv.pv_vs.vs_name m in
   let recvars = Mvs.fold add_vs vsset Mid.empty in
@@ -669,6 +673,93 @@ let e_assign me e =
   let assign pv mpv = e_assign_real mpv pv in
   let assign pv = on_value (assign pv) me in
   on_value assign e
+
+(* Computing the fixpoint on recursive definitions *)
+
+let vars_equal vs1 vs2 =
+  Stv.equal vs1.vars_tv vs2.vars_tv &&
+  Sreg.equal vs1.vars_reg vs2.vars_reg
+
+let eff_equal eff1 eff2 =
+  Sreg.equal eff1.eff_reads  eff2.eff_reads  &&
+  Sreg.equal eff1.eff_writes eff2.eff_writes &&
+  Sexn.equal eff1.eff_raises eff2.eff_raises &&
+  Sreg.equal eff1.eff_ghostr eff2.eff_ghostr &&
+  Sreg.equal eff1.eff_ghostw eff2.eff_ghostw &&
+  Sexn.equal eff1.eff_ghostx eff2.eff_ghostx &&
+  Mreg.equal (Util.option_eq reg_equal) eff1.eff_resets eff2.eff_resets
+
+let vtv_equal vtv1 vtv2 =
+  ity_equal vtv1.vtv_ity vtv2.vtv_ity &&
+  vtv1.vtv_ghost = vtv2.vtv_ghost &&
+  option_eq reg_equal vtv1.vtv_mut vtv2.vtv_mut
+
+let rec vta_equal vta1 vta2 =
+  vtv_equal vta1.vta_arg vta2.vta_arg &&
+  eff_equal vta1.vta_effect vta2.vta_effect &&
+  vta1.vta_ghost = vta2.vta_ghost &&
+  match vta1.vta_result, vta2.vta_result with
+    | VTvalue vtv1, VTvalue vtv2 -> vtv_equal vtv1 vtv2
+    | VTarrow vta1, VTarrow vta2 -> vta_equal vta1 vta2
+    | _, _ -> false
+
+let ps_compat ps1 ps2 =
+  vta_equal ps1.ps_vta ps2.ps_vta &&
+  vars_equal ps1.ps_vars ps2.ps_vars
+
+let rec vta_match sbs vta1 vta2 =
+  let sbs = ity_match sbs vta1.vta_arg.vtv_ity vta2.vta_arg.vtv_ity in
+  match vta1.vta_result, vta2.vta_result with
+    | VTvalue v1, VTvalue v2 -> ity_match sbs v1.vtv_ity v2.vtv_ity
+    | VTarrow a1, VTarrow a2 -> vta_match sbs a1 a2
+    | _ -> Loc.errorm "vty_arrow mismatch"
+
+let rec expr_subst pam psm e = match e.e_node with
+  | Earrow pa when Mid.mem pa.pa_name pam ->
+      e_arrow (Mid.find pa.pa_name pam)
+  | Einst ps when Mid.mem ps.ps_name psm ->
+      let ps = Mid.find ps.ps_name psm in
+      let vta = match e.e_vty with VTarrow vta -> vta | _ -> assert false in
+      e_inst ps (vta_match ity_subst_empty ps.ps_vta vta)
+  | Eapp (pa,pv) when Mid.mem pa.pa_name pam ->
+      e_app_real (Mid.find pa.pa_name pam) pv
+  | Elet ({ let_var = LetV pv ; let_expr = d }, e) ->
+      let nd = expr_subst pam psm d in
+      let vtv = match nd.e_vty with VTvalue vtv -> vtv | _ -> assert false in
+      if not (vtv_equal vtv pv.pv_vtv) then Loc.errorm "vty_value mismatch";
+      e_let { let_var = LetV pv ; let_expr = nd } (expr_subst pam psm e)
+  | Elet ({ let_var = LetA pa ; let_expr = d }, e) ->
+      let ld = create_let_defn (id_clone pa.pa_name) (expr_subst pam psm d) in
+      let npa = match ld.let_var with LetA a -> a | LetV _ -> assert false in
+      e_let ld (expr_subst (Mid.add pa.pa_name npa pam) psm e)
+  | Erec (rdl,e) ->
+      let conv lam = { lam with l_expr = expr_subst pam psm lam.l_expr } in
+      let defl = List.map (fun rd -> rd.rec_ps, conv rd.rec_lambda) rdl in
+      let rdl = create_rec_defn defl in
+      let add psm (ps,_) rd = Mid.add ps.ps_name rd.rec_ps psm in
+      e_rec rdl (expr_subst pam (List.fold_left2 add psm defl rdl) e)
+  | Eif (pv,e1,e2) ->
+      e_if_real pv (expr_subst pam psm e1) (expr_subst pam psm e2)
+  | Ecase (pv,bl) ->
+      e_case_real pv (List.map (fun (pp,e) -> pp, expr_subst pam psm e) bl)
+  | Elogic _ | Evalue _ | Earrow _ | Einst _ | Eapp _ | Eassign _ -> e
+
+and create_rec_defn defl =
+  let conv m (ps,lam) =
+    let rd = create_fun_defn (id_clone ps.ps_name) lam in
+    if ps_compat ps rd.rec_ps then
+      m, { rd with rec_ps = ps }
+    else
+      Mid.add ps.ps_name rd.rec_ps m, rd
+  in
+  let m, defl = Util.map_fold_left conv Mid.empty defl in
+  let subst { rec_ps = ps ; rec_lambda = lam } =
+    let expr = expr_subst Mid.empty m lam.l_expr in
+    Mid.find_def ps ps.ps_name m, { lam with l_expr = expr }
+  in
+  if Mid.is_empty m then defl else
+  create_rec_defn (List.map subst defl)
+
 
 (*
   - A "proper type" of a vty [v] is [v] with empty specification
