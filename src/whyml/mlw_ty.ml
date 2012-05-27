@@ -128,6 +128,11 @@ let vars_union s1 s2 = {
 
 let vs_vars s vs = { s with vars_tv = ty_freevars s.vars_tv vs.vs_ty }
 
+let create_varset tvs regs = {
+  vars_tv = Sreg.fold (fun r -> Stv.union r.reg_ity.ity_vars.vars_tv) regs tvs;
+  vars_reg = regs;
+}
+
 (* value type symbols *)
 
 module Itsym = WeakStructMake (struct
@@ -302,10 +307,16 @@ let ity_subst_union s1 s2 =
 
 let tv_inst s v = Mtv.find_def (ity_var v) v s.ity_subst_tv
 let reg_inst s r = Mreg.find_def r r s.ity_subst_reg
-let ity_inst s ity = ity_v_map (tv_inst s) (reg_inst s) ity
+
+let ity_inst s ity =
+  if ity_closed ity && ity_pure ity then ity
+  else ity_v_map (tv_inst s) (reg_inst s) ity
 
 let reg_full_inst s r = Mreg.find r s.ity_subst_reg
-let ity_full_inst s ity = ity_subst_unsafe s.ity_subst_tv s.ity_subst_reg ity
+
+let ity_full_inst s ity =
+  if ity_closed ity && ity_pure ity then ity
+  else ity_subst_unsafe s.ity_subst_tv s.ity_subst_reg ity
 
 let rec ity_match s ity1 ity2 =
   let set = function

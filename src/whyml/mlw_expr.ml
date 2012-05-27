@@ -59,6 +59,13 @@ type psymbol = {
 
 let ps_equal : psymbol -> psymbol -> bool = (==)
 
+let create_psymbol id vta vars = {
+  ps_name  = id_register id;
+  ps_vta   = vta;
+  ps_vars  = vars;
+  ps_subst = vars_freeze vars;
+}
+
 (** program/logic symbols *)
 
 type plsymbol = {
@@ -356,11 +363,21 @@ let e_inst ps sbs =
      type variables and regions introduced by the substitution could be
      generalized in this expression *)
   let vars = Mid.singleton ps.ps_name ps.ps_vars in
-  let vta =
-    if not (Mtv.is_empty sbs.ity_subst_tv && Mreg.is_empty sbs.ity_subst_reg)
-    then vta_full_inst (ity_subst_union ps.ps_subst sbs) ps.ps_vta
-    else ps.ps_vta
+  let vta = vta_full_inst (ity_subst_union ps.ps_subst sbs) ps.ps_vta in
+  mk_expr (Einst ps) (VTarrow vta) eff_empty vars
+
+let e_cast ps vty =
+  let rec vty_match sbs t1 t2 = match t1,t2 with
+    | VTvalue v1, VTvalue v2 ->
+        ity_match sbs v1.vtv_ity v2.vtv_ity
+    | VTarrow a1, VTarrow a2 ->
+        let sbs = ity_match sbs a1.vta_arg.vtv_ity a2.vta_arg.vtv_ity in
+        vty_match sbs a1.vta_result a2.vta_result
+    | _ -> invalid_arg "Mlw_expr.e_cast"
   in
+  let sbs = vty_match ps.ps_subst (VTarrow ps.ps_vta) vty in
+  let vars = Mid.singleton ps.ps_name ps.ps_vars in
+  let vta = vta_full_inst sbs ps.ps_vta in
   mk_expr (Einst ps) (VTarrow vta) eff_empty vars
 
 let e_app_real pa pv =
@@ -447,10 +464,6 @@ let create_fun_defn id lam =
        in the postcondition formula when lam.l_expr.e_vty is an arrow? *)
   end;
   Mexn.iter (fun xs t -> check_post xs.xs_ity t) lam.l_xpost;
-(*
-  if lam.l_variant <> [] then
-    Loc.errorm "Variants are not allowed in a non-recursive definition";
-*)
   (* compute rec_vars and ps.ps_vars *)
   let add_term t s = Mvs.set_union t.t_vars s in
   let vsset = add_term lam.l_post (add_term lam.l_pre Mvs.empty) in
@@ -471,14 +484,8 @@ let create_fun_defn id lam =
   let vta = vty_arrow arg.pv_vtv ~effect:e.e_effect e.e_vty in
   let add_arg vta pv = vty_arrow pv.pv_vtv (VTarrow vta) in
   let vta = List.fold_left add_arg vta argl in
-  (* construct rec_ps and rec_defn *)
-  let ps = {
-    ps_name  = id_register id;
-    ps_vta   = vta;
-    ps_vars  = vars;
-    ps_subst = vars_freeze vars; }
-  in {
-    rec_ps     = ps;
+  (* construct rec_defn *)
+  { rec_ps     = create_psymbol id vta vars;
     rec_lambda = lam;
     rec_vars   = recvars; }
 
@@ -707,20 +714,11 @@ let ps_compat ps1 ps2 =
   vta_equal ps1.ps_vta ps2.ps_vta &&
   vars_equal ps1.ps_vars ps2.ps_vars
 
-let rec vta_match sbs vta1 vta2 =
-  let sbs = ity_match sbs vta1.vta_arg.vtv_ity vta2.vta_arg.vtv_ity in
-  match vta1.vta_result, vta2.vta_result with
-    | VTvalue v1, VTvalue v2 -> ity_match sbs v1.vtv_ity v2.vtv_ity
-    | VTarrow a1, VTarrow a2 -> vta_match sbs a1 a2
-    | _ -> Loc.errorm "vty_arrow mismatch"
-
 let rec expr_subst pam psm e = match e.e_node with
   | Earrow pa when Mid.mem pa.pa_name pam ->
       e_arrow (Mid.find pa.pa_name pam)
   | Einst ps when Mid.mem ps.ps_name psm ->
-      let ps = Mid.find ps.ps_name psm in
-      let vta = match e.e_vty with VTarrow vta -> vta | _ -> assert false in
-      e_inst ps (vta_match ity_subst_empty ps.ps_vta vta)
+      e_cast (Mid.find ps.ps_name psm) e.e_vty
   | Eapp (pa,pv) when Mid.mem pa.pa_name pam ->
       e_app_real (Mid.find pa.pa_name pam) pv
   | Elet ({ let_var = LetV pv ; let_expr = d }, e) ->
@@ -747,19 +745,19 @@ let rec expr_subst pam psm e = match e.e_node with
 and create_rec_defn defl =
   let conv m (ps,lam) =
     let rd = create_fun_defn (id_clone ps.ps_name) lam in
-    if ps_compat ps rd.rec_ps then
-      m, { rd with rec_ps = ps }
-    else
-      Mid.add ps.ps_name rd.rec_ps m, rd
-  in
+    if ps_compat ps rd.rec_ps then m, { rd with rec_ps = ps }
+    else Mid.add ps.ps_name rd.rec_ps m, rd in
   let m, defl = Util.map_fold_left conv Mid.empty defl in
   let subst { rec_ps = ps ; rec_lambda = lam } =
     let expr = expr_subst Mid.empty m lam.l_expr in
-    Mid.find_def ps ps.ps_name m, { lam with l_expr = expr }
-  in
+    Mid.find_def ps ps.ps_name m, { lam with l_expr = expr } in
   if Mid.is_empty m then defl else
   create_rec_defn (List.map subst defl)
 
+let create_fun_defn id lam =
+  if lam.l_variant <> [] then
+    Loc.errorm "Variants are not allowed in a non-recursive definition";
+  create_fun_defn id lam
 
 (*
   - A "proper type" of a vty [v] is [v] with empty specification

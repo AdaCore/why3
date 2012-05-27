@@ -73,6 +73,8 @@ type psymbol = private {
 
 val ps_equal : psymbol -> psymbol -> bool
 
+val create_psymbol : preid -> vty_arrow -> varset -> psymbol
+
 (** program/logic symbols *)
 
 (* plymbols represent algebraic type constructors and projections.
@@ -187,6 +189,7 @@ val e_value : pvsymbol -> expr
 val e_arrow : pasymbol -> expr
 
 val e_inst : psymbol -> ity_subst -> expr
+val e_cast : psymbol -> vty -> expr
 
 exception ValueExpected of expr
 exception ArrowExpected of expr

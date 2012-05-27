@@ -170,6 +170,8 @@ val vars_freeze : varset -> ity_subst
 
 val vs_vars : varset -> vsymbol -> varset
 
+val create_varset : Stv.t -> Sreg.t -> varset
+
 (* exception symbols *)
 type xsymbol = private {
   xs_name : ident;
