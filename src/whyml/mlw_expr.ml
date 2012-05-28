@@ -292,6 +292,7 @@ and expr_node =
   | Eif     of pvsymbol * expr * expr
   | Ecase   of pvsymbol * (ppattern * expr) list
   | Eassign of pvsymbol * region * pvsymbol (* mutable pv <- expr *)
+  | Eghost  of expr
 
 and let_defn = {
   let_var  : let_var;
@@ -681,6 +682,9 @@ let e_assign me e =
   let assign pv = on_value (assign pv) me in
   on_value assign e
 
+let e_ghost e =
+  mk_expr (Eghost e) (vty_ghostify e.e_vty) e.e_effect e.e_vars
+
 (* Computing the fixpoint on recursive definitions *)
 
 let vars_equal vs1 vs2 =
@@ -740,6 +744,8 @@ let rec expr_subst pam psm e = match e.e_node with
       e_if_real pv (expr_subst pam psm e1) (expr_subst pam psm e2)
   | Ecase (pv,bl) ->
       e_case_real pv (List.map (fun (pp,e) -> pp, expr_subst pam psm e) bl)
+  | Eghost e ->
+      e_ghost (expr_subst pam psm e)
   | Elogic _ | Evalue _ | Earrow _ | Einst _ | Eapp _ | Eassign _ -> e
 
 and create_rec_defn defl =

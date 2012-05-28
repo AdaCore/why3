@@ -151,6 +151,7 @@ and expr_node = private
   | Eif     of pvsymbol * expr * expr
   | Ecase   of pvsymbol * (ppattern * expr) list
   | Eassign of pvsymbol * region * pvsymbol (* mutable pv <- expr *)
+  | Eghost  of expr
 
 and let_defn = private {
   let_var  : let_var;
@@ -219,6 +220,8 @@ val e_case : expr -> (ppattern * expr) list -> expr
 exception Immutable of pvsymbol
 
 val e_assign : expr -> expr -> expr
+
+val e_ghost : expr -> expr
 
 (* TODO: when should we check for escaping identifiers (regions?)
    in pre/post/xpost/effects? Here or in WP? *)
