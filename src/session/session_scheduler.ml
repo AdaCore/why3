@@ -652,7 +652,6 @@ let push_report report (g,p,t,r) =
 
 exception NoFile of string
 
-(** When no smoke *)
 let check_external_proof eS eT todo a =
   let g = a.proof_parent in
   dprintf debug "[Sched] Check external proof : %a@."

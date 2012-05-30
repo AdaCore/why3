@@ -311,55 +311,55 @@ let same_result r1 r2 =
     | _ -> false
 
 let add_to_check_no_smoke config found_obs env_session sched =
-      let session = env_session.S.session in
-      let callback report =
-        eprintf "@.";
-	let files,n,m =
-          S.PHstr.fold file_statistics
-            session.S.session_files ([],0,0)
-	in
-        let report =
-          List.filter
-            (function
-              | (_,_,_,M.Result(new_res,old_res)) ->
-                not (same_result new_res old_res)
-              | _ -> true)
-            report
-        in
-        if report = [] then 
-          begin
-            if found_obs then
-              if n=m then
-                printf " %d/%d (replay OK, all proved: obsolete session \
-updated)@." n m
-              else
-                if !opt_force then
-                  printf " %d/%d (replay OK, but not all proved: session going to be saved since -force was given)@." n m
-                else
-                  printf " %d/%d (replay OK, but not all proved: obsolete \
-session NOT updated)@." n m
-            else
-              printf " %d/%d@." n m ;
-            if !opt_stats && n<m then print_statistics files;
-            eprintf "Everything replayed OK.@.";
-            if found_obs && (n=m || !opt_force) then
-              begin
-                eprintf "Saving session...@?";
-                S.save_session config session;
-                eprintf " done@."
-              end;
-            exit 0
-          end
-        else
-          let report = List.rev report in
-          begin
-            printf " %d/%d (replay failed)@." n m ;
-            List.iter print_report report;
-            eprintf "Replay failed.@.";
-            exit 1
-          end
+  let session = env_session.S.session in
+  let callback report =
+    eprintf "@.";
+    let files,n,m =
+      S.PHstr.fold file_statistics
+        session.S.session_files ([],0,0)
     in
-    M.check_all ~callback env_session sched
+    let report =
+      List.filter
+        (function
+          | (_,_,_,M.Result(new_res,old_res)) ->
+            not (same_result new_res old_res)
+          | _ -> true)
+        report
+    in
+    if report = [] then 
+      begin
+        if found_obs then
+          if n=m then
+            printf " %d/%d (replay OK, all proved: obsolete session \
+updated)@." n m
+          else
+            if !opt_force then
+              printf " %d/%d (replay OK, but not all proved: session going to be saved since -force was given)@." n m
+            else
+              printf " %d/%d (replay OK, but not all proved: obsolete \
+session NOT updated)@." n m
+        else
+          printf " %d/%d@." n m ;
+        if !opt_stats && n<m then print_statistics files;
+        eprintf "Everything replayed OK.@.";
+        if found_obs && (n=m || !opt_force) then
+          begin
+            eprintf "Saving session...@?";
+            S.save_session config session;
+            eprintf " done@."
+          end;
+        exit 0
+      end
+    else
+      let report = List.rev report in
+      begin
+        printf " %d/%d (replay failed)@." n m ;
+        List.iter print_report report;
+        eprintf "Replay failed.@.";
+        exit 1
+      end
+  in
+  M.check_all ~callback env_session sched
 
 let add_to_check_smoke env_session sched =
   let callback report =
@@ -374,13 +374,13 @@ let add_to_check_smoke env_session sched =
           | _ -> false) report
     in
     if report = [] then begin
-        eprintf "No smoke detected.@.";
-        exit 0
+      eprintf "No smoke detected.@.";
+      exit 0
     end
     else begin
-        List.iter print_report report;
-        eprintf "Smoke detected.@.";
-        exit 1
+      List.iter print_report report;
+      eprintf "Smoke detected.@.";
+      exit 1
     end
   in
   M.check_all ~callback env_session sched
@@ -436,38 +436,27 @@ let () =
     in
     eprintf " done.@.";
     if !opt_bench then run_as_bench env_session;
-    transform_smoke env_session;
-(*
-    if !opt_convert_unknown_provers then M.convert_unknown_prover env_session;
-*)
+    let () = transform_smoke env_session in
     let sched =
-      M.init (Whyconf.running_provers_max (Whyconf.get_main config)) in
-    if found_obs then begin
-      if (* !opt_smoke <> Session.SD_None *) false then begin
-        eprintf
-          "[Error] I can't run the smoke detector if the session is obsolete";
-        exit 1
-      end;
-      eprintf "[Warning] session is obsolete@.";
-    end;
-    (* M.smoke_detector := !opt_smoke; *)
-    eprintf " done.";
+      M.init (Whyconf.running_provers_max (Whyconf.get_main config))
+    in
+    if found_obs then eprintf "[Warning] session is obsolete@.";
     add_to_check config found_obs env_session sched;
     main_loop ();
-    eprintf "main replayer exited unexpectedly@.";
+    eprintf "main replayer loop exited unexpectedly@.";
     exit 1
   with
     | S.OutdatedSession ->
-        eprintf "The session database '%s' is outdated, cannot replay@."
-          project_dir;
-        eprintf "Aborting...@.";
-        exit 1
+      eprintf "The session database '%s' is outdated, cannot replay@."
+        project_dir;
+      eprintf "Aborting...@.";
+      exit 1
     | e when not (Debug.test_flag Debug.stack_trace) ->
-        eprintf "Error while opening session with database '%s' : %a@."
-          project_dir
-          Exn_printer.exn_printer e;
-        eprintf "Aborting...@.";
-        exit 1
+      eprintf "Error while opening session with database '%s' : %a@."
+        project_dir
+        Exn_printer.exn_printer e;
+      eprintf "Aborting...@.";
+      exit 1
 
 
 (*
