@@ -32,7 +32,6 @@ open Mlw_decl
 
 type prgsymbol =
   | PV of pvsymbol
-  | PA of pasymbol
   | PS of psymbol
   | PL of plsymbol
 

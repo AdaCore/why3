@@ -39,20 +39,6 @@ val pv_equal : pvsymbol -> pvsymbol -> bool
 
 val create_pvsymbol : preid -> vty_value -> pvsymbol
 
-(* pasymbols represent higher-order intermediate computation results
-   introduced by let-expressions. They cannot be type-instantiated. *)
-
-type pasymbol = private {
-  pa_name : ident;
-  pa_vta  : vty_arrow;
-  pa_vars : varset;
-  (* this varset contains pa_vta.vta_vars together with all type
-     variables and regions of the defining expression, in order to
-     cover effects and specification and not overgeneralize *)
-}
-
-val pa_equal : pasymbol -> pasymbol -> bool
-
 (** program symbols *)
 
 (* psymbols represent lambda-abstractions. They are polymorphic and
@@ -114,11 +100,11 @@ val ppat_as : ppattern -> pvsymbol -> ppattern
 
 type pre_ppattern =
   | PPwild
-  | PPvar of preid
+  | PPvar  of preid
   | PPlapp of lsymbol * pre_ppattern list
   | PPpapp of plsymbol * pre_ppattern list
-  | PPor of pre_ppattern * pre_ppattern
-  | PPas of pre_ppattern * preid
+  | PPor   of pre_ppattern * pre_ppattern
+  | PPas   of pre_ppattern * preid
 
 val make_ppattern : pre_ppattern -> vty_value -> pvsymbol Mstr.t * ppattern
 
@@ -143,9 +129,8 @@ type expr = private {
 and expr_node = private
   | Elogic  of term
   | Evalue  of pvsymbol
-  | Earrow  of pasymbol
-  | Einst   of psymbol
-  | Eapp    of pasymbol * pvsymbol
+  | Earrow  of psymbol
+  | Eapp    of expr * pvsymbol
   | Elet    of let_defn * expr
   | Erec    of rec_defn list * expr
   | Eif     of pvsymbol * expr * expr
@@ -160,7 +145,7 @@ and let_defn = private {
 
 and let_var =
   | LetV of pvsymbol
-  | LetA of pasymbol
+  | LetA of psymbol
 
 and rec_defn = private {
   rec_ps     : psymbol;
@@ -187,7 +172,6 @@ val e_label_add : label -> expr -> expr
 val e_label_copy : expr -> expr -> expr
 
 val e_value : pvsymbol -> expr
-val e_arrow : pasymbol -> expr
 
 val e_inst : psymbol -> ity_subst -> expr
 val e_cast : psymbol -> vty -> expr
@@ -207,9 +191,8 @@ val create_let_defn : preid -> expr -> let_defn
 val create_fun_defn : preid -> lambda -> rec_defn
 val create_rec_defn : (psymbol * lambda) list -> rec_defn list
 
-exception StaleRegion of region * ident * expr
-(* a previously reset region is associated to an ident occurring in expr.
-   In other terms, freshness violation. *)
+exception StaleRegion of region * ident
+(* freshness violation: a previously reset region is associated to an ident *)
 
 val e_let : let_defn -> expr -> expr
 val e_rec : rec_defn list -> expr -> expr

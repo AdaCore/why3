@@ -235,7 +235,6 @@ and dexpr_desc ~userloc denv _loc = function
 
 type local_var =
   | Lpvsymbol of pvsymbol
-  | Lpasymbol of pasymbol
   | Lpsymbol  of psymbol * dity
 
 let rec expr _locals de = match de.dexpr_desc with

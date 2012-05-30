@@ -44,7 +44,6 @@ open Mlw_decl
 
 type prgsymbol =
   | PV of pvsymbol
-  | PA of pasymbol
   | PS of psymbol
   | PL of plsymbol
 
@@ -70,7 +69,6 @@ let ns_union eq chk =
 
 let prg_equal p1 p2 = match p1,p2 with
   | PV p1, PV p2 -> pv_equal p1 p2
-  | PA p1, PA p2 -> pa_equal p1 p2
   | PS p1, PS p2 -> ps_equal p1 p2
   | PL p1, PL p2 -> pl_equal p1 p2
   | _, _ -> false

@@ -40,14 +40,6 @@ let create_pvsymbol id vtv = {
   pv_vtv  = vtv;
 }
 
-type pasymbol = {
-  pa_name : ident;
-  pa_vta  : vty_arrow;
-  pa_vars : varset;
-}
-
-let pa_equal : pasymbol -> pasymbol -> bool = (==)
-
 (** program symbols *)
 
 type psymbol = {
@@ -183,11 +175,11 @@ let ppat_as pp pv =
 
 type pre_ppattern =
   | PPwild
-  | PPvar of preid
+  | PPvar  of preid
   | PPlapp of lsymbol * pre_ppattern list
   | PPpapp of plsymbol * pre_ppattern list
-  | PPor of pre_ppattern * pre_ppattern
-  | PPas of pre_ppattern * preid
+  | PPor   of pre_ppattern * pre_ppattern
+  | PPas   of pre_ppattern * preid
 
 let make_ppattern pp vtv =
   let hv = Hashtbl.create 3 in
@@ -284,9 +276,8 @@ type expr = {
 and expr_node =
   | Elogic  of term
   | Evalue  of pvsymbol
-  | Earrow  of pasymbol
-  | Einst   of psymbol
-  | Eapp    of pasymbol * pvsymbol
+  | Earrow  of psymbol
+  | Eapp    of expr * pvsymbol
   | Elet    of let_defn * expr
   | Erec    of rec_defn list * expr
   | Eif     of pvsymbol * expr * expr
@@ -301,7 +292,7 @@ and let_defn = {
 
 and let_var =
   | LetV of pvsymbol
-  | LetA of pasymbol
+  | LetA of psymbol
 
 and rec_defn = {
   rec_ps     : psymbol;
@@ -350,14 +341,10 @@ let varmap_join = Mid.fold (fun _ -> vars_union)
 let varmap_union = Mid.union (fun _ s1 s2 -> Some (vars_union s1 s2))
 
 let add_pv_vars pv m = Mid.add pv.pv_vs.vs_name pv.pv_vtv.vtv_vars m
-let add_pa_vars pa m = Mid.add pa.pa_name pa.pa_vars m
 let add_e_vars e m = varmap_union e.e_vars m
 
 let e_value pv =
   mk_expr (Evalue pv) (VTvalue pv.pv_vtv) eff_empty (add_pv_vars pv Mid.empty)
-
-let e_arrow pa =
-  mk_expr (Earrow pa) (VTarrow pa.pa_vta) eff_empty (add_pa_vars pa Mid.empty)
 
 let e_inst ps sbs =
   (* we only count the fixed type variables and regions of ps, so that
@@ -365,7 +352,7 @@ let e_inst ps sbs =
      generalized in this expression *)
   let vars = Mid.singleton ps.ps_name ps.ps_vars in
   let vta = vta_full_inst (ity_subst_union ps.ps_subst sbs) ps.ps_vta in
-  mk_expr (Einst ps) (VTarrow vta) eff_empty vars
+  mk_expr (Earrow ps) (VTarrow vta) eff_empty vars
 
 let e_cast ps vty =
   let rec vty_match sbs t1 t2 = match t1,t2 with
@@ -379,70 +366,68 @@ let e_cast ps vty =
   let sbs = vty_match ps.ps_subst (VTarrow ps.ps_vta) vty in
   let vars = Mid.singleton ps.ps_name ps.ps_vars in
   let vta = vta_full_inst sbs ps.ps_vta in
-  mk_expr (Einst ps) (VTarrow vta) eff_empty vars
-
-let e_app_real pa pv =
-  let eff,vty = vty_app_arrow pa.pa_vta pv.pv_vtv in
-  mk_expr (Eapp (pa,pv)) vty eff (add_pv_vars pv (add_pa_vars pa Mid.empty))
+  mk_expr (Earrow ps) (VTarrow vta) eff_empty vars
 
 let create_let_defn id e =
   let lv = match e.e_vty with
-    | VTvalue vtv -> LetV (create_pvsymbol id vtv)
-    | VTarrow vta -> LetA {
-        pa_name = Ident.id_register id;
-        pa_vta  = vta;
-        pa_vars = varmap_join e.e_vars vta.vta_vars; }
+    | VTvalue vtv ->
+        LetV (create_pvsymbol id vtv)
+    | VTarrow vta ->
+        let vars = varmap_join e.e_vars vta.vta_vars in
+        LetA (create_psymbol id vta vars)
   in
   { let_var = lv ; let_expr = e }
 
-exception StaleRegion of region * ident * expr
+exception StaleRegion of region * ident
 
-let e_let ({ let_var = lv ; let_expr = d } as ld) e =
-  let id = match lv with
-    | LetV pv -> pv.pv_vs.vs_name
-    | LetA pa -> pa.pa_name
-  in
-  let vars = Mid.remove id e.e_vars in
-  (* If we reset some region in the first expression d, then it may only
-     occur in the second expression e in association to pv. Otherwise,
-     this is a freshness violation: some symbol defined earlier carries
-     that region into e. *)
-  (* FIXME? bad complexity, we should be able to do better *)
-  let check_reset r u = (* does r occur in e? *)
+let check_reset e vars =
+  (* If we reset a region, then it may only occur in the later code
+     as the result of the resetting expression. Otherwise, this is
+     a freshness violation: some symbol defined earlier carries that
+     region into the later code. *)
+  let check_reset r u = (* does r occur in vars? *)
     let check_id id s = (* does r occur among the regions of id? *)
       let rec check_reg reg =
         reg_equal r reg || match u with
           | Some u when reg_equal u reg -> false
           | _ -> ity_v_any Util.ffalse check_reg reg.reg_ity
       in
-      if Sreg.exists check_reg s.vars_reg then raise (StaleRegion (r,id,e))
+      if Sreg.exists check_reg s.vars_reg then raise (StaleRegion (r,id))
     in
     Mid.iter check_id vars
   in
-  Mreg.iter check_reset d.e_effect.eff_resets;
-  (* FIXME: the tests below are too restrictive. If this let is embedded
-     into a bigger ghost expression, then a ghost exception raised from d
-     and catched there is benign. A good test is to traverse top-level
-     definitions from top to bottom and check if exceptions escape from
-     the outermost ghost subexpressions. The same goes for ghost writes,
-     though it is not really constraining: a normal use case for ghost
-     regions is via ghost mutable fields or ghost references, and in
-     both cases reading those regions would naturally be ghost, too.
-     For exceptions, it might be just enough to never catch a ghost
-     exception in a non-ghost code. *)
-  (* If we make a ghost write inside d, then the modified region cannot
-     be read in a later non-ghost code. We ignore eventual resets in e;
-     a once ghostified region must stay so, even if if reset. *)
-  let badwr = Sreg.inter d.e_effect.eff_ghostw e.e_effect.eff_reads in
-  if not (Sreg.is_empty badwr) then raise (GhostWrite (d, Sreg.choose badwr));
-  (* We should be able to raise and catch exceptions inside ghost expressions.
-     The problematic case is a ghost exception that escapes into reality. *)
-  if not (vty_ghost e.e_vty) && not (Sexn.is_empty d.e_effect.eff_ghostx) then
-    raise (GhostRaise (d, Sexn.choose d.e_effect.eff_raises));
-  (* This should be the only expression constructor that deals with
-     sequence of effects *)
+  Mreg.iter check_reset e.e_effect.eff_resets
+
+let check_ghost_write e eff =
+  (* If we make a ghost write, then the modified region cannot
+     be read in a later non-ghost code. We ignore any resets:
+     a once ghostified region must stay so, even if it is reset. *)
+  let badwr = Sreg.inter e.e_effect.eff_ghostw eff.eff_reads in
+  if not (Sreg.is_empty badwr) then raise (GhostWrite (e, Sreg.choose badwr))
+
+let e_let ({ let_var = lv ; let_expr = d } as ld) e =
+  let id = match lv with
+    | LetV pv -> pv.pv_vs.vs_name
+    | LetA ps -> ps.ps_name in
+  let vars = Mid.remove id e.e_vars in
+  check_reset d vars;
+  check_ghost_write d e.e_effect;
   let eff = eff_union d.e_effect e.e_effect in
   mk_expr (Elet (ld,e)) e.e_vty eff (add_e_vars d vars)
+
+exception ValueExpected of expr
+exception ArrowExpected of expr
+
+let e_app_real e pv =
+  let vta = match e.e_vty with
+    | VTarrow vta -> vta
+    | VTvalue _ -> raise (ArrowExpected e)
+  in
+  let eff,vty = vty_app_arrow vta pv.pv_vtv in
+  check_reset e (add_pv_vars pv Mid.empty);
+  check_ghost_write e eff;
+  let eff = eff_union e.e_effect eff in
+  mk_expr (Eapp (e,pv)) vty eff (add_pv_vars pv e.e_vars)
 
 let create_post vs f = t_eps_close vs f
 
@@ -497,9 +482,6 @@ let e_rec rdl e =
   let vars = List.fold_left remove_ps vars rdl in
   mk_expr (Erec (rdl,e)) e.e_vty e.e_effect vars
 
-exception ValueExpected of expr
-exception ArrowExpected of expr
-
 let on_value fn e = match e.e_node with
   | Evalue pv -> fn pv
   | _ ->
@@ -510,28 +492,16 @@ let on_value fn e = match e.e_node with
       in
       e_let ld (fn pv)
 
-let on_arrow fn e = match e.e_node with
-  | Earrow pa -> fn pa
-  | _ ->
-      let ld = create_let_defn (id_fresh "o") e in
-      let pa = match ld.let_var with
-        | LetV _ -> raise (ArrowExpected e)
-        | LetA pa -> pa
-      in
-      e_let ld (fn pa)
-
 (* We adopt right-to-left evaluation order so that expression
      get_ref (create_ref 5)
    produces
      let pv : ref<ro> int =
         let pv1 : int = Elogic 5 in
-        let pa1 : int -> ref<ro> int = Einst create_ref in
-        Eapp pa1 pv1 [reset ro]
+        Eapp (Earrow create_ref) pv1 [reset ro]
      in
-     let pa : ref<ro> int -> int = Einst get_ref in
-     Eapp pa pv [read ro]
-   which is ok. If pa is computed before pv, then Eapp pa pv would
-   violate the freshness of ro.
+     Eapp (Earrow get_ref) pv [read ro]
+   which is ok. If (Earrow get_ref) is computed before pv,
+   the second application would violate the freshness of ro.
 
    FIXME? This means that some reasonable programs, such as
      let local_get_ref = get_ref in
@@ -540,15 +510,7 @@ let on_arrow fn e = match e.e_node with
    will be rejected, since local_get_ref is instantiated to
    the region introduced (reset) by create_ref. Is it bad? *)
 
-let e_app e el =
-  let rec apply = function
-    | [] -> e
-    | e::el ->
-        let app pv pa = e_app_real pa pv in
-        let app pv = on_arrow (app pv) (apply el) in
-        on_value app e
-  in
-  apply (List.rev el)
+let e_app = List.fold_left (fun e -> on_value (e_app_real e))
 
 let e_plapp pls el ity =
   let rec app tl vars ghost eff sbs vtvl argl =
@@ -718,35 +680,33 @@ let ps_compat ps1 ps2 =
   vta_equal ps1.ps_vta ps2.ps_vta &&
   vars_equal ps1.ps_vars ps2.ps_vars
 
-let rec expr_subst pam psm e = match e.e_node with
-  | Earrow pa when Mid.mem pa.pa_name pam ->
-      e_arrow (Mid.find pa.pa_name pam)
-  | Einst ps when Mid.mem ps.ps_name psm ->
+let rec expr_subst psm e = match e.e_node with
+  | Earrow ps when Mid.mem ps.ps_name psm ->
       e_cast (Mid.find ps.ps_name psm) e.e_vty
-  | Eapp (pa,pv) when Mid.mem pa.pa_name pam ->
-      e_app_real (Mid.find pa.pa_name pam) pv
+  | Eapp (e,pv) ->
+      e_app_real (expr_subst psm e) pv
   | Elet ({ let_var = LetV pv ; let_expr = d }, e) ->
-      let nd = expr_subst pam psm d in
+      let nd = expr_subst psm d in
       let vtv = match nd.e_vty with VTvalue vtv -> vtv | _ -> assert false in
       if not (vtv_equal vtv pv.pv_vtv) then Loc.errorm "vty_value mismatch";
-      e_let { let_var = LetV pv ; let_expr = nd } (expr_subst pam psm e)
-  | Elet ({ let_var = LetA pa ; let_expr = d }, e) ->
-      let ld = create_let_defn (id_clone pa.pa_name) (expr_subst pam psm d) in
-      let npa = match ld.let_var with LetA a -> a | LetV _ -> assert false in
-      e_let ld (expr_subst (Mid.add pa.pa_name npa pam) psm e)
+      e_let { let_var = LetV pv ; let_expr = nd } (expr_subst psm e)
+  | Elet ({ let_var = LetA ps ; let_expr = d }, e) ->
+      let ld = create_let_defn (id_clone ps.ps_name) (expr_subst psm d) in
+      let ns = match ld.let_var with LetA a -> a | LetV _ -> assert false in
+      e_let ld (expr_subst (Mid.add ps.ps_name ns psm) e)
   | Erec (rdl,e) ->
-      let conv lam = { lam with l_expr = expr_subst pam psm lam.l_expr } in
+      let conv lam = { lam with l_expr = expr_subst psm lam.l_expr } in
       let defl = List.map (fun rd -> rd.rec_ps, conv rd.rec_lambda) rdl in
       let rdl = create_rec_defn defl in
       let add psm (ps,_) rd = Mid.add ps.ps_name rd.rec_ps psm in
-      e_rec rdl (expr_subst pam (List.fold_left2 add psm defl rdl) e)
+      e_rec rdl (expr_subst (List.fold_left2 add psm defl rdl) e)
   | Eif (pv,e1,e2) ->
-      e_if_real pv (expr_subst pam psm e1) (expr_subst pam psm e2)
+      e_if_real pv (expr_subst psm e1) (expr_subst psm e2)
   | Ecase (pv,bl) ->
-      e_case_real pv (List.map (fun (pp,e) -> pp, expr_subst pam psm e) bl)
+      e_case_real pv (List.map (fun (pp,e) -> pp, expr_subst psm e) bl)
   | Eghost e ->
-      e_ghost (expr_subst pam psm e)
-  | Elogic _ | Evalue _ | Earrow _ | Einst _ | Eapp _ | Eassign _ -> e
+      e_ghost (expr_subst psm e)
+  | Elogic _ | Evalue _ | Earrow _ | Eassign _ -> e
 
 and create_rec_defn defl =
   let conv m (ps,lam) =
@@ -755,8 +715,8 @@ and create_rec_defn defl =
     else Mid.add ps.ps_name rd.rec_ps m, rd in
   let m, defl = Util.map_fold_left conv Mid.empty defl in
   let subst { rec_ps = ps ; rec_lambda = lam } =
-    let expr = expr_subst Mid.empty m lam.l_expr in
-    Mid.find_def ps ps.ps_name m, { lam with l_expr = expr } in
+    let lam = { lam with l_expr = expr_subst m lam.l_expr } in
+    Mid.find_def ps ps.ps_name m, lam in
   if Mid.is_empty m then defl else
   create_rec_defn (List.map subst defl)
 
