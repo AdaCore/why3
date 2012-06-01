@@ -640,9 +640,9 @@ and wp_desc env rm e q = match e.expr_desc with
       let p = wp_label e (wp_expl "precondition" c.c_pre) in
       let p = t_label ~loc:e.expr_loc p.t_label p in
       wp_and p w
-  | Eabstract(e1,((_normal,_exns) as post)) ->
+  | Eabstract(e1,post) ->
       let w1 = wp_expr env rm e1 post in
-      let w2 = t_false (* TODO *) in
+      let w2 = opaque_wp env rm e1.expr_effect.E.writes post q in
       wp_and ~sym:true w1 w2
 
 and wp_triple env rm bl (p, e, q) =
