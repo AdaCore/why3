@@ -1119,6 +1119,7 @@ let why3tac ?(timelimit=timelimit) s gl =
       | Unknown s -> error ("Don't know: " ^ s)
       | Failure s -> error ("Failure: " ^ s)
       | Timeout -> error "Timeout"
+      | OutOfMemory -> error "Out Of Memory"
       | HighFailure ->
           error ("Prover failure\n" ^ res.pr_output ^ "\n")
   with

@@ -306,6 +306,7 @@ let same_result r1 r2 =
     | Call_provers.Valid, Call_provers.Valid -> true
     | Call_provers.Invalid, Call_provers.Invalid -> true
     | Call_provers.Timeout, Call_provers.Timeout -> true
+    | Call_provers.OutOfMemory, Call_provers.OutOfMemory -> true
     | Call_provers.Unknown _, Call_provers.Unknown _-> true
     | Call_provers.Failure _, Call_provers.Failure _-> true
     | _ -> false

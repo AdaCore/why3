@@ -71,6 +71,17 @@
 * extraction vers Caml
  - PRIORITAIRE, JCF, ANDREI
 
+* terminaison
+** generer une obligation de preuve de well-foundedness quand on utilise
+   un variant avec "with R" (une seule fois pour chaque R !)
+** quand une definition logique recursive ne peut pas etre verifiee
+   bien-fondee statiquement, generer une obligation de preuve
+   (feature wish de F Besson)
+
+* Coq detection
+** refuser de detecter Coq si on n'a pas compilé avec le support de Coq
+   (i.e. si Coq a ete installé apres)
+
 * Coq tactic
 ** ajout de bases de hint
 

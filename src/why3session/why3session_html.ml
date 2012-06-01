@@ -142,12 +142,17 @@ let print_results fmt provers proofs =
                   fprintf fmt "FF0000\">Invalid"
 		| Call_provers.Timeout ->
                   fprintf fmt "FF8000\">Timeout"
+		| Call_provers.OutOfMemory ->
+                  fprintf fmt "FF8000\">Out Of Memory"
 		| Call_provers.Unknown _ ->
                   fprintf fmt "FF8000\">%.2f" res.Call_provers.pr_time
-		| _ ->
+		| Call_provers.Failure _ ->
                   fprintf fmt "FF8000\">Failure "
+		| Call_provers.HighFailure _ ->
+                  fprintf fmt "FF8000\">High Failure "
 	    end
-	  | _ -> fprintf fmt "E0E0E0\">Undone"
+	  | S.Undone _ -> fprintf fmt "E0E0E0\">Undone"
+	  | S.InternalFailure _ -> fprintf fmt "E0E0E0\">Internal Failure"
       with Not_found -> fprintf fmt "E0E0E0\">---"
     end;
     fprintf fmt "</td>") provers

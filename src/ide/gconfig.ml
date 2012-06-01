@@ -324,11 +324,13 @@ let iconname_valid = "accept32"
 let iconname_unknown = "help32"
 let iconname_invalid = "delete32"
 let iconname_timeout = "clock32"
+let iconname_outofmemory = "deletefile32"
 let iconname_failure = "bug32"
 let iconname_valid_obs = "obsaccept32"
 let iconname_unknown_obs = "obshelp32"
 let iconname_invalid_obs = "obsdelete32"
 let iconname_timeout_obs = "obsclock32"
+let iconname_outofmemory_obs = "obsdeletefile32"
 let iconname_failure_obs = "obsbug32"
 let iconname_yes = "accept32"
 let iconname_no = "delete32"
@@ -340,7 +342,7 @@ let iconname_editor = "edit32"
 let iconname_replay = "refresh32"
 let iconname_cancel = "cut32"
 let iconname_reload = "movefile32"
-let iconname_remove = "deletefile32"
+let iconname_remove = "delete32"
 let iconname_cleaning = "trashb32"
 
 let image_default = ref (GdkPixbuf.create ~width:1 ~height:1 ())
@@ -352,11 +354,13 @@ let image_valid = ref !image_default
 let image_unknown = ref !image_default
 let image_invalid = ref !image_default
 let image_timeout = ref !image_default
+let image_outofmemory = ref !image_default
 let image_failure = ref !image_default
 let image_valid_obs = ref !image_default
 let image_unknown_obs = ref !image_default
 let image_invalid_obs = ref !image_default
 let image_timeout_obs = ref !image_default
+let image_outofmemory_obs = ref !image_default
 let image_failure_obs = ref !image_default
 let image_yes = ref !image_default
 let image_no = ref !image_default
@@ -382,11 +386,13 @@ let resize_images size =
   image_unknown := image ~size iconname_unknown;
   image_invalid := image ~size iconname_invalid;
   image_timeout := image ~size iconname_timeout;
+  image_outofmemory := image ~size iconname_outofmemory;
   image_failure := image ~size iconname_failure;
   image_valid_obs := image ~size iconname_valid_obs;
   image_unknown_obs := image ~size iconname_unknown_obs;
   image_invalid_obs := image ~size iconname_invalid_obs;
   image_timeout_obs := image ~size iconname_timeout_obs;
+  image_outofmemory_obs := image ~size iconname_outofmemory_obs;
   image_failure_obs := image ~size iconname_failure_obs;
   image_yes := image ~size iconname_yes;
   image_no := image ~size iconname_no;
@@ -441,6 +447,8 @@ let show_legend_window () =
 *)
   ib image_timeout;
   i "   External prover reached the time limit\n";
+  ib image_outofmemory;
+  i "   External prover ran out of memory\n";
   ib image_unknown;
   i "   External prover answer not conclusive\n";
   ib image_failure;

@@ -132,17 +132,20 @@ let print_result_prov proofs prov fmt=
     let pr = S.PHprover.find proofs p in
     let s = pr.S.proof_state in
       match s with
-	  Session.Done res ->
+	| Session.Done res ->
 	    begin
 	      match res.Call_provers.pr_answer with
 		  Call_provers.Valid ->
                     fprintf fmt "& \\valid{%.2f} " res.Call_provers.pr_time
 		| Call_provers.Invalid -> fprintf fmt "& \\invalid "
 		| Call_provers.Timeout -> fprintf fmt "& \\timeout "
-		| Call_provers.Unknown _s -> fprintf fmt "& \\unknown "
-		| _ -> fprintf fmt "& \\failure "
+		| Call_provers.OutOfMemory -> fprintf fmt "& \\outofmemory "
+		| Call_provers.Unknown _ -> fprintf fmt "& \\unknown "
+		| Call_provers.Failure _ -> fprintf fmt "& \\failure "
+		| Call_provers.HighFailure _ -> fprintf fmt "& \\highfailure "
 	    end
-	| _ -> fprintf fmt "& Undone"
+	| Session.InternalFailure _ -> fprintf fmt "& Internal Failure"
+	| Session.Undone _ -> fprintf fmt "& Undone"
   with Not_found -> fprintf fmt "& \\noresult") prov;
   fprintf fmt "\\\\ @."
 

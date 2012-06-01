@@ -333,6 +333,7 @@ let save_result fmt r =
        | Call_provers.Unknown _ -> "unknown"
        | Call_provers.HighFailure -> "highfailure"
        | Call_provers.Timeout -> "timeout"
+       | Call_provers.OutOfMemory -> "outofmemory"
        | Call_provers.Invalid -> "invalid")
     r.Call_provers.pr_time
 
@@ -739,6 +740,7 @@ let load_result r =
             | "invalid" -> Call_provers.Invalid
             | "unknown" -> Call_provers.Unknown ""
             | "timeout" -> Call_provers.Timeout
+            | "outofmemory" -> Call_provers.OutOfMemory
             | "failure" -> Call_provers.Failure ""
             | "highfailure" -> Call_provers.Failure ""
             | s ->

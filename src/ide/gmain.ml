@@ -426,6 +426,8 @@ let image_of_result ~obsolete result =
             if obsolete then !image_invalid_obs else !image_invalid
         | Call_provers.Timeout ->
             if obsolete then !image_timeout_obs else !image_timeout
+        | Call_provers.OutOfMemory ->
+            if obsolete then !image_outofmemory_obs else !image_outofmemory
         | Call_provers.Unknown _ ->
             if obsolete then !image_unknown_obs else !image_unknown
         | Call_provers.Failure _ ->
