@@ -104,6 +104,7 @@ and dexpr_desc =
   | DEassert of assertion_kind * Ptree.lexpr
   | DEmark of string * dexpr
   | DEany of dutype_c
+  | DEabstract of dexpr * dpost
 
 and drecfun = (ident * Denv.dty) * dubinder list * dvariant option * dtriple
 
@@ -205,6 +206,7 @@ and iexpr_desc =
   | IEassert of assertion_kind * Term.term
   | IEmark of mark * iexpr
   | IEany of itype_c
+  | IEabstract of iexpr * ipost
 
 and irecfun = ivsymbol * ibinder list * irec_variant option * itriple
 
@@ -261,6 +263,7 @@ and expr_desc =
   | Eassert of assertion_kind * Term.term
   | Emark of mark * expr
   | Eany of type_c
+  | Eabstract of expr * post
 
 and recfun = pvsymbol * pvsymbol list * triple * E.t
 

@@ -710,6 +710,10 @@ and dexpr_desc ~ghost ~userloc env loc = function
   | Ptree.Eany c ->
       let c = dutype_c env c in
       DEany c, dpurify_utype_v c.duc_result_type
+  | Ptree.Eabstract(e1,q) ->
+      let e1 = dexpr ~ghost ~userloc env e1 in
+      let q = dpost env.uc q in
+      DEabstract(e1, q), e1.dexpr_type
   | Ptree.Enamed _ ->
       assert false
 
@@ -1339,6 +1343,11 @@ and iexpr_desc env loc ty = function
   | DEany c ->
       let c = iutype_c env c in
       IEany c
+  | DEabstract(e1, q) ->
+      let e1 = iexpr env e1 in
+      let ty = e1.iexpr_type in
+      let q = iupost env ty q in
+      IEabstract(e1,q)
 
 and decompose_app env e args = match e.dexpr_desc with
   | DEapply (e1, e2) ->
@@ -1550,6 +1559,7 @@ let rec is_pure_expr e =
   | Elocal _ | Elogic _ -> true
   | Eif (e1, e2, e3) -> is_pure_expr e1 && is_pure_expr e2 && is_pure_expr e3
   | Elet (_, e1, e2) -> is_pure_expr e1 && is_pure_expr e2
+  | Eabstract (e1, _) 
   | Emark (_, e1) -> is_pure_expr e1
   | Eany c -> E.no_side_effect c.c_effect
   | Eassert _ | Etry _ | Efor _ | Eraise _ | Ematch _
@@ -1785,6 +1795,13 @@ and expr_desc gl env loc ty = function
   | IEany c ->
       let c = type_c env c in
       Eany c, c.c_result_type, c.c_effect
+  | IEabstract(e1, q) ->
+      let e1 = expr gl env e1 in
+      let q = saturation e1.expr_loc e1.expr_effect q in
+      let ef = e1.expr_effect in
+      let ef, q = post_effect ef q in
+      let e1 = { e1 with expr_effect = ef } in
+      Eabstract(e1,q), e1.expr_type_v, ef
 
 and triple ?(sat_exn=true) gl env (p, e, q) =
   let e = expr gl env e in
@@ -1916,7 +1933,7 @@ let rec fresh_expr gl ~term locals e = match e.expr_desc with
       List.iter (fun (_, _, e2) -> fresh_expr gl ~term locals e2) hl
   | Efor (_, _, _, _, _, e1) ->
       fresh_expr gl ~term:false locals e1
-
+  | Eabstract(e, _)
   | Emark (_, e) ->
       fresh_expr gl ~term locals e
   | Eassert _ | Eany _ ->

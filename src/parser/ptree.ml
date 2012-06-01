@@ -241,6 +241,7 @@ and expr_desc =
   | Emark of ident * expr
   | Ecast of expr * pty
   | Eany of type_c
+  | Eabstract of expr * post
   | Enamed of label * expr
 
   (* TODO: ghost *)

@@ -1190,6 +1190,8 @@ expr:
    { mk_expr (Etry ($2, $5)) }
 | ANY simple_type_c
    { mk_expr (Eany $2) }
+| ABSTRACT expr post
+   { mk_expr (Eabstract($2, $3)) }
 | label expr %prec prec_named
    { mk_expr (Enamed ($1, $2)) }
 ;

@@ -483,6 +483,8 @@ let rec print_expr fmt e = match e.expr_desc with
       fprintf fmt "<todo: Eletrec>"
   | Eabsurd ->
       fprintf fmt "assert false (* absurd *)"
+  | Eabstract(e, _) ->
+      fprintf fmt "@[%a (* abstract *)@]" print_expr e
 
 and print_lexpr fmt e =
   print_expr fmt e
