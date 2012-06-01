@@ -168,7 +168,8 @@ A \why input file is a (possibly empty) list of theories.
 \clearpage
 \section{Why3ML Language}\label{sec:syntax:whyml}
 
-\paragraph{Types.}
+\subsection{Types}
+
 The syntax for program types is given in Figure~\ref{fig:bnf:typev}.
 \begin{figure}
   \begin{center}\framebox{\input{./typev_bnf.tex}}\end{center}
@@ -176,8 +177,10 @@ The syntax for program types is given in Figure~\ref{fig:bnf:typev}.
 \label{fig:bnf:typev}
 \end{figure}
 
-\paragraph{Expressions.}
-The syntax for program expressions is given in Figure~\ref{fig:bnf:expra} and~Figure~\ref{fig:bnf:exprb}.
+\subsection{Expressions}
+
+The syntax for program expressions is given in
+Figure~\ref{fig:bnf:expra} and~Figure~\ref{fig:bnf:exprb}.
 \begin{figure}
   \begin{center}\framebox{\input{./expr_bnf.tex}}\end{center}
   \caption{Syntax for program expressions (part1).}
@@ -190,7 +193,114 @@ The syntax for program expressions is given in Figure~\ref{fig:bnf:expra} and~Fi
 \label{fig:bnf:exprb}
 \end{figure}
 
-\paragraph{Modules.}
+In the following we describe the informal semantics of each constructs, and provide the corresponding rule for computing the weakest precondition.
+
+
+\subsubsection{Constant expressions}
+
+Integer and real constants are as in the logic language
+
+TODO
+
+\subsubsection{Unary and Binary Operators}
+
+\subsubsection{Array accesses and updates, fields access and updates}
+
+TODO
+
+\subsubsection{Let binding, sequences}
+
+TODO
+
+\subsubsection{Function definition}
+
+TODO: fun, let rec
+
+\subsubsection{Function call}
+
+TODO
+
+\subsubsection{Exception throwing and catching}
+
+TODO: raise, try with end
+
+\subsubsection{Conditional expression, pattern matching}
+
+if then else. Discuss standar WP versus fast WP
+
+\subsubsection{Loops}
+
+while, loop, for
+
+\subsubsection{Assertions, Code Contracts}
+
+There are several form of expressions for inserting annotations in the code.
+The first form of those are the \emph{assertions} which have the form
+\begin{flushleft}\ttfamily
+  \textsl{keyword} \{ \textsl{proposition} \}
+\end{flushleft}
+where \textsl{keyword} is either \texttt{assert}, \texttt{assume} or
+\texttt{check}. They all state that the given proposition holds at the given program point. The differences are:
+\begin{itemize}
+\item \texttt{assert} requires to prove that the proposition holds, and then make it available in the context of the remaining of the code
+\item \texttt{check} requires to prove that the proposition holds, but
+  does not make it visible in the remaining
+\item \texttt{assume} assumes that the proposition holds and make it
+  visible in the context of the remiaing code, without requiring to
+  prove it. It acts like an axiom, but within a program.
+\end{itemize}
+The corresponding rules for computing WP are as follows:
+\begin{eqnarray*}
+  WP(\texttt{assert} \{ P \}, Q) &=& P \mathop{\&\&} Q = P \land (P \rightarrow Q)\\
+  WP(\texttt{check} \{ P \}, Q) &=& P \land Q \\
+  WP(\texttt{assume} \{ P \}, Q) &=& P \rightarrow Q
+\end{eqnarray*}
+
+The other forms of code contracts allow to abstract a piece of code by specifications.
+\begin{itemize}
+\item $\texttt{any}~\{ P \}~\tau~\epsilon~\{ Q \}$ is a
+  non-deterministic expression which requires the precondition $P$ to
+  hold, then makes some side effects $\epsilon$ and returns any value
+  of type $\tau$ such that $Q$ holds. This construct acts as an axiom
+  in the sense that it is not check whether there exists any program
+  that can effectively establish the post-condition (similarly as the
+  introduction of a \texttt{val} at the global level).
+\item $\texttt{contract}~e~\{ Q \}$ evaluates expression $e$ and the
+  ensures that the post-condition $Q$ holds afterwards.
+\item $\texttt{abstract}~e~\{ Q \}$ makes sure that the evaluation of
+  expression $e$ establishes the post-condition $Q$, and then abstract
+  away the program state by the post-condition $Q$ (similarly to the
+  \texttt{any} construct).
+\end{itemize}
+The corresponding rules for computing WP are as follows:
+\[
+\begin{array}{l}
+  WP(\texttt{any}~\{ P \}~\tau~\epsilon~\{ Q \mid exn_i \Rightarrow R_i \} ,
+  Q'  exn_i \Rightarrow R'_i) = \\
+  \qquad\qquad P \mathop{\&\&} \forall result, \epsilon.
+  (Q \rightarrow Q') \land (R_i \rightarrow R'_i) \\
+  WP(\texttt{contract}~e~\{ Q \mid exn_i \Rightarrow R_i \} ,
+  Q' \mid exn_i \Rightarrow R'_i) = \\
+  \qquad\qquad WP(e,Q \land Q' \mid exn_i \Rightarrow R_i \land R'_i) \\
+  WP(\texttt{abstract}~e~\{ Q \mid exn_i \Rightarrow R_i \} ,
+  Q' \mid exn_i \Rightarrow R'_i) = \\
+  \qquad\qquad WP(e,Q \mid exn_i \Rightarrow R_i) \land
+  \forall result, \epsilon, Q \rightarrow Q' \land R_i \Rightarrow R'_i
+\end{array}
+\]
+
+TODO ? sandbox:
+\[
+WP(\texttt{sandbox}~e, Q) = WP(e,true) \land Q
+\]
+(side-effects in $e$ are "forgotten"...)
+
+\subsubsection{Labels, old, at}
+
+TODO
+
+\subsection{Modules}
+
 The syntax for modules is given in Figure~\ref{fig:bnf:module}.
 \begin{figure}
   \begin{center}\framebox{\input{./module_bnf.tex}}\end{center}
@@ -202,7 +312,8 @@ module. Additionally, modules can introduce record types with mutable
 fields and declarations which are specific to programs (global
 variables, functions, exceptions).
 
-\paragraph{Files.}
+\subsection{Files}
+
 A \whyml input file is a (possibly empty) list of theories and modules.
 \begin{center}\framebox{\input{./whyml_file_bnf.tex}}\end{center}
 A theory defined in a \whyml\ file can only be used within that
