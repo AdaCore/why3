@@ -45,7 +45,7 @@ let spec =
   ("-o",
    Arg.Set_string opt_output_dir,
    "<dir> where to produce LaTeX files (default: session dir)") ::
-  ("-e", 
+  ("-e",
    Arg.String add_element,
    "<path> produce a table for the element denoted by <path>") ::
   ("-longtable",
@@ -142,7 +142,8 @@ let print_result_prov proofs prov fmt=
 		| Call_provers.OutOfMemory -> fprintf fmt "& \\outofmemory "
 		| Call_provers.Unknown _ -> fprintf fmt "& \\unknown "
 		| Call_provers.Failure _ -> fprintf fmt "& \\failure "
-		| Call_provers.HighFailure _ -> fprintf fmt "& \\highfailure "
+		| Call_provers.HighFailure -> fprintf fmt "& \\highfailure "
+
 	    end
 	| Session.InternalFailure _ -> fprintf fmt "& Internal Failure"
 	| Session.Undone _ -> fprintf fmt "& Undone"
@@ -389,7 +390,7 @@ let element_latex_stat_theory th n table dir e =
     | g :: r ->
       try
         let goals =
-          List.map (fun g -> (g.S.goal_name.Ident.id_string,g)) 
+          List.map (fun g -> (g.S.goal_name.Ident.id_string,g))
             th.S.theory_goals
         in
         let g = List.assoc g goals in
@@ -423,7 +424,7 @@ let element_latex_stat files n table dir e =
         (fun fname file ->
           let fname = Filename.basename fname in
           let fname = List.hd (Str.split re_dot fname) in
-          if fname = f then 
+          if fname = f then
             begin
               found := true;
               element_latex_stat_file file n table dir r

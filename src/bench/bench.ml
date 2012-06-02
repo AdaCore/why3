@@ -432,6 +432,7 @@ let empty_tool_res =
               {tr with timeout = add_nb_avg tr.timeout time}
           | Db.Done Call_provers.Invalid ->
               {tr with invalid = add_nb_avg tr.invalid time}
+          | Db.Done Call_provers.OutOfMemory
           | Db.Undone | Db.Done (Call_provers.Unknown _) ->
               {tr with unknown = add_nb_avg tr.unknown time}
           | Db.Done (Call_provers.Failure _)
