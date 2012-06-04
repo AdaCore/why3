@@ -213,6 +213,8 @@ clean::
 install_no_local::
 	mkdir -p $(BINDIR)
 	mkdir -p $(DATADIR)/why3/images
+	mkdir -p $(DATADIR)/why3/images/boomy
+	mkdir -p $(DATADIR)/why3/images/fatcow
 	mkdir -p $(DATADIR)/why3/emacs
 	mkdir -p $(DATADIR)/why3/lang
 	mkdir -p $(DATADIR)/why3/theories
@@ -222,7 +224,10 @@ install_no_local::
 	cp -f modules/*.mlw $(DATADIR)/why3/modules
 	cp -f drivers/*.drv drivers/*.gen $(DATADIR)/why3/drivers
 	cp -f share/provers-detection-data.conf $(DATADIR)/why3/
+	cp -f share/images/icons.rc $(DATADIR)/why3/images
 	cp -f share/images/*.png $(DATADIR)/why3/images
+	cp -f share/images/boomy/*.png $(DATADIR)/why3/images/boomy
+	cp -f share/images/fatcow/*.png $(DATADIR)/why3/images/fatcow
 	cp -f share/why3session.dtd $(DATADIR)/why3
 	cp -rf share/javascript $(DATADIR)/why3/javascript
 	cp -f share/emacs/why.el $(DATADIR)/why3/emacs/why.el
@@ -1319,7 +1324,8 @@ DISTRIB_FILES = Version Makefile.in configure.in META.in configure \
       share/javascript/themes/default/*.gif \
       share/javascript/themes/default/*.png \
       share/javascript/themes/default/*.css \
-      share/emacs/why.el share/images/*.png share/lang/*.lang \
+      share/emacs/why.el share/lang/*.lang \
+      share/images/icons.rc share/images/*.png share/images/*/*.png \
       share/bash/why3 share/zsh/_why3 share/vim/why3.vim
 
 # TODO?

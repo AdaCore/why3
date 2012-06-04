@@ -495,16 +495,16 @@ let show_legend_window () =
   ib image_transf;
   i "   Transformation\n";
   it "Status column\n";
+  ib image_undone;
+  i "   External proof attempt not done\n";
   ib image_scheduled;
   i "   Scheduled external proof attempt\n";
   ib image_running;
   i "   Running external proof attempt\n";
   ib image_valid;
   i "   Goal is proved / Theory is fully verified\n";
-(*
   ib image_invalid;
   i "   External prover disproved the goal\n";
-*)
   ib image_timeout;
   i "   External prover reached the time limit\n";
   ib image_outofmemory;
@@ -513,6 +513,14 @@ let show_legend_window () =
   i "   External prover answer not conclusive\n";
   ib image_failure;
   i "   External prover call failed\n";
+  ib image_valid_obs;
+  i "   Valid but obsolete result\n";
+  ib image_unknown_obs;
+  i "   Answer not conclusive and obsolete\n";
+  ib image_invalid_obs;
+  i "   Prover disproved goal, but obsolete\n";
+  ib image_failure_obs;
+  i "   External prover call failed, obsolete\n";
   dialog#add_button "Close" `CLOSE ;
   let t = b#create_tag [`LEFT_MARGIN 10; `RIGHT_MARGIN 10 ] in
   b#apply_tag t ~start:b#start_iter ~stop:b#end_iter;
