@@ -316,35 +316,6 @@ let image ?size f =
     | Some s ->
         GdkPixbuf.from_file_at_size ~width:s ~height:s n
 
-let iconname_default = "undone32"
-let iconname_undone = "undone32"
-let iconname_scheduled = "pausehalf32"
-let iconname_running = "play32"
-let iconname_valid = "accept32"
-let iconname_unknown = "help32"
-let iconname_invalid = "delete32"
-let iconname_timeout = "clock32"
-let iconname_outofmemory = "deletefile32"
-let iconname_failure = "bug32"
-let iconname_valid_obs = "obsaccept32"
-let iconname_unknown_obs = "obshelp32"
-let iconname_invalid_obs = "obsdelete32"
-let iconname_timeout_obs = "obsclock32"
-let iconname_outofmemory_obs = "obsdeletefile32"
-let iconname_failure_obs = "obsbug32"
-let iconname_yes = "accept32"
-let iconname_no = "delete32"
-let iconname_directory = "folder32"
-let iconname_file = "file32"
-let iconname_prover = "wizard32"
-let iconname_transf = "configure32"
-let iconname_editor = "edit32"
-let iconname_replay = "refresh32"
-let iconname_cancel = "cut32"
-let iconname_reload = "movefile32"
-let iconname_remove = "delete32"
-let iconname_cleaning = "trashb32"
-
 let image_default = ref (GdkPixbuf.create ~width:1 ~height:1 ())
 (** dumb pixbuf *)
 let image_undone = ref !image_default
@@ -377,39 +348,109 @@ let image_cleaning = ref !image_default
 
 let why_icon = ref !image_default
 
+let iconset = "boomy"
+
+let iconname_default = ref ""
+let iconname_undone = ref ""
+let iconname_scheduled = ref ""
+let iconname_running = ref ""
+let iconname_valid = ref ""
+let iconname_unknown = ref ""
+let iconname_invalid = ref ""
+let iconname_timeout = ref ""
+let iconname_outofmemory = ref ""
+let iconname_failure = ref ""
+let iconname_valid_obs = ref ""
+let iconname_unknown_obs = ref ""
+let iconname_invalid_obs = ref ""
+let iconname_timeout_obs = ref ""
+let iconname_outofmemory_obs = ref ""
+let iconname_failure_obs = ref ""
+let iconname_yes = ref ""
+let iconname_no = ref ""
+let iconname_directory = ref ""
+let iconname_file = ref ""
+let iconname_prover = ref ""
+let iconname_transf = ref ""
+let iconname_editor = ref ""
+let iconname_replay = ref ""
+let iconname_cancel = ref ""
+let iconname_reload = ref ""
+let iconname_remove = ref ""
+let iconname_cleaning = ref ""
+
+let load_icon_names () =
+  let main = get_main () in
+  let n =
+    Filename.concat (datadir main) (Filename.concat "images" "icons.rc")
+  in
+  let d = Rc.from_file n in
+  let d = Rc.get_family d "iconset" in
+  let d = List.assoc iconset d in
+  iconname_default := get_string ~default:"default" d "default";
+  iconname_undone := get_string ~default:"default" d "undone";
+  iconname_scheduled := get_string ~default:"default" d "scheduled";
+  iconname_running := get_string ~default:"default" d "running";
+  iconname_valid := get_string ~default:"default" d "valid";
+  iconname_unknown := get_string ~default:"default" d "unknown";
+  iconname_invalid := get_string ~default:"default" d "invalid";
+  iconname_timeout := get_string ~default:"default" d "timeout";
+  iconname_outofmemory := get_string ~default:"default" d "outofmemory";
+  iconname_failure := get_string ~default:"default" d "failure";
+  iconname_valid_obs := get_string ~default:"default" d "valid_obs";
+  iconname_unknown_obs := get_string ~default:"default" d "unknown_obs";
+  iconname_invalid_obs := get_string ~default:"default" d "invalid_obs";
+  iconname_timeout_obs := get_string ~default:"default" d "timeout_obs";
+  iconname_outofmemory_obs := get_string ~default:"default" d "outofmemory_obs";
+  iconname_failure_obs := get_string ~default:"default" d "failure_obs";
+  iconname_yes := get_string ~default:"default" d "yes";
+  iconname_no := get_string ~default:"default" d "no";
+  iconname_directory := get_string ~default:"default" d "directory";
+  iconname_file := get_string ~default:"default" d "file";
+  iconname_prover := get_string ~default:"default" d "prover";
+  iconname_transf := get_string ~default:"default" d "transf";
+  iconname_editor := get_string ~default:"default" d "editor";
+  iconname_replay := get_string ~default:"default" d "replay";
+  iconname_cancel := get_string ~default:"default" d "cancel";
+  iconname_reload := get_string ~default:"default" d "reload";
+  iconname_remove := get_string ~default:"default" d "remove";
+  iconname_cleaning := get_string ~default:"default" d "cleaning";
+  ()
+
 let resize_images size =
-  image_default := image ~size iconname_default;
-  image_undone := image ~size iconname_undone;
-  image_scheduled := image ~size iconname_scheduled;
-  image_running := image ~size iconname_running;
-  image_valid := image ~size iconname_valid;
-  image_unknown := image ~size iconname_unknown;
-  image_invalid := image ~size iconname_invalid;
-  image_timeout := image ~size iconname_timeout;
-  image_outofmemory := image ~size iconname_outofmemory;
-  image_failure := image ~size iconname_failure;
-  image_valid_obs := image ~size iconname_valid_obs;
-  image_unknown_obs := image ~size iconname_unknown_obs;
-  image_invalid_obs := image ~size iconname_invalid_obs;
-  image_timeout_obs := image ~size iconname_timeout_obs;
-  image_outofmemory_obs := image ~size iconname_outofmemory_obs;
-  image_failure_obs := image ~size iconname_failure_obs;
-  image_yes := image ~size iconname_yes;
-  image_no := image ~size iconname_no;
-  image_directory := image ~size iconname_directory;
-  image_file := image ~size iconname_file;
-  image_prover := image ~size iconname_prover;
-  image_transf := image ~size iconname_transf;
-  image_editor := image ~size iconname_editor;
-  image_replay := image ~size iconname_replay;
-  image_cancel := image ~size iconname_cancel;
-  image_reload := image ~size iconname_reload;
-  image_remove := image ~size iconname_remove;
-  image_cleaning := image ~size iconname_cleaning;
+  image_default := image ~size !iconname_default;
+  image_undone := image ~size !iconname_undone;
+  image_scheduled := image ~size !iconname_scheduled;
+  image_running := image ~size !iconname_running;
+  image_valid := image ~size !iconname_valid;
+  image_unknown := image ~size !iconname_unknown;
+  image_invalid := image ~size !iconname_invalid;
+  image_timeout := image ~size !iconname_timeout;
+  image_outofmemory := image ~size !iconname_outofmemory;
+  image_failure := image ~size !iconname_failure;
+  image_valid_obs := image ~size !iconname_valid_obs;
+  image_unknown_obs := image ~size !iconname_unknown_obs;
+  image_invalid_obs := image ~size !iconname_invalid_obs;
+  image_timeout_obs := image ~size !iconname_timeout_obs;
+  image_outofmemory_obs := image ~size !iconname_outofmemory_obs;
+  image_failure_obs := image ~size !iconname_failure_obs;
+  image_yes := image ~size !iconname_yes;
+  image_no := image ~size !iconname_no;
+  image_directory := image ~size !iconname_directory;
+  image_file := image ~size !iconname_file;
+  image_prover := image ~size !iconname_prover;
+  image_transf := image ~size !iconname_transf;
+  image_editor := image ~size !iconname_editor;
+  image_replay := image ~size !iconname_replay;
+  image_cancel := image ~size !iconname_cancel;
+  image_reload := image ~size !iconname_reload;
+  image_remove := image ~size !iconname_remove;
+  image_cleaning := image ~size !iconname_cleaning;
   ()
 
 let init () =
   eprintf "[Info] reading icons...@?";
+  load_icon_names ();
   why_icon := image "logo-why";
   resize_images 20;
   eprintf " done.@."
