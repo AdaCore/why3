@@ -671,9 +671,9 @@ let init =
     (* useless since it has no child: goals_view#expand_row row#path; *)
     goals_model#set ~row:row#iter ~column:icon_column
       (match any with
-         | S.Goal _ -> !image_file
-         | S.Theory _
-         | S.File _ -> !image_directory
+         | S.Goal _ -> !image_goal
+         | S.Theory _ -> !image_theory
+         | S.File _ -> !image_file
          | S.Proof_attempt _ -> !image_prover
          | S.Transf _ -> !image_transf);
     notify any

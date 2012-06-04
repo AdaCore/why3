@@ -52,6 +52,7 @@ type t =
       mutable premise_color : string;
       mutable goal_color : string;
       mutable error_color : string;
+      mutable iconset : string;
       (** colors *)
       mutable env : Env.env;
       mutable config : Whyconf.config;
@@ -77,6 +78,7 @@ type ide = {
   ide_premise_color : string;
   ide_goal_color : string;
   ide_error_color : string;
+  ide_iconset : string;
   ide_default_editor : string;
   (* ide_replace_prover : conf_replace_prover; *)
   ide_hidden_provers : string list;
@@ -96,6 +98,7 @@ let default_ide =
     ide_premise_color = "chartreuse";
     ide_goal_color = "gold";
     ide_error_color = "orange";
+    ide_iconset = "boomy";
     (* ide_replace_prover = CRP_Ask; *)
     ide_default_editor =
       (try Sys.getenv "EDITOR" ^ " %f"
@@ -135,6 +138,9 @@ let load_ide section =
     ide_error_color =
       get_string section ~default:default_ide.ide_error_color
         "error_color";
+    ide_iconset = 
+      get_string section ~default:default_ide.ide_iconset
+        "iconset";
     ide_default_editor =
       get_string section ~default:default_ide.ide_default_editor
         "default_editor";
@@ -204,6 +210,7 @@ let load_config config original_config =
     premise_color = ide.ide_premise_color;
     goal_color = ide.ide_goal_color;
     error_color = ide.ide_error_color;
+    iconset = ide.ide_iconset;
     default_editor = ide.ide_default_editor;
     config         = config;
     original_config = original_config;
@@ -269,6 +276,7 @@ let save_config t =
   let ide = set_string ide "premise_color" t.premise_color in
   let ide = set_string ide "goal_color" t.goal_color in
   let ide = set_string ide "error_color" t.error_color in
+  let ide = set_string ide "iconset" t.iconset in
   let ide = set_string ide "default_editor" t.default_editor in
   let ide = set_stringl ide "hidden_prover" t.hidden_provers in
   let config = set_section config "ide" ide in
@@ -306,16 +314,6 @@ let get_main () = (get_main (config ()).config)
 
 *)
 
-let image ?size f =
-  let main = get_main () in
-  let n = Filename.concat (datadir main) (Filename.concat "images" (f^".png"))
-  in
-  match size with
-    | None ->
-        GdkPixbuf.from_file n
-    | Some s ->
-        GdkPixbuf.from_file_at_size ~width:s ~height:s n
-
 let image_default = ref (GdkPixbuf.create ~width:1 ~height:1 ())
 (** dumb pixbuf *)
 let image_undone = ref !image_default
@@ -335,8 +333,9 @@ let image_outofmemory_obs = ref !image_default
 let image_failure_obs = ref !image_default
 let image_yes = ref !image_default
 let image_no = ref !image_default
-let image_directory = ref !image_default
 let image_file = ref !image_default
+let image_theory = ref !image_default
+let image_goal = ref !image_default
 let image_prover = ref !image_default
 let image_transf = ref !image_default
 let image_editor = ref !image_default
@@ -348,7 +347,17 @@ let image_cleaning = ref !image_default
 
 let why_icon = ref !image_default
 
-let iconset = "boomy"
+let image ?size f =
+  let main = get_main () in
+  let n = 
+    Filename.concat (datadir main)
+      (Filename.concat "images" (f^".png"))
+  in
+  match size with
+    | None ->
+        GdkPixbuf.from_file n
+    | Some s ->
+        GdkPixbuf.from_file_at_size ~width:s ~height:s n
 
 let iconname_default = ref ""
 let iconname_undone = ref ""
@@ -368,8 +377,9 @@ let iconname_outofmemory_obs = ref ""
 let iconname_failure_obs = ref ""
 let iconname_yes = ref ""
 let iconname_no = ref ""
-let iconname_directory = ref ""
 let iconname_file = ref ""
+let iconname_theory = ref ""
+let iconname_goal = ref ""
 let iconname_prover = ref ""
 let iconname_transf = ref ""
 let iconname_editor = ref ""
@@ -380,6 +390,8 @@ let iconname_remove = ref ""
 let iconname_cleaning = ref ""
 
 let load_icon_names () =
+  let ide = config () in
+  let iconset = ide.iconset in
   let main = get_main () in
   let n =
     Filename.concat (datadir main) (Filename.concat "images" "icons.rc")
@@ -387,34 +399,38 @@ let load_icon_names () =
   let d = Rc.from_file n in
   let d = Rc.get_family d "iconset" in
   let d = List.assoc iconset d in
-  iconname_default := get_string ~default:"default" d "default";
-  iconname_undone := get_string ~default:"default" d "undone";
-  iconname_scheduled := get_string ~default:"default" d "scheduled";
-  iconname_running := get_string ~default:"default" d "running";
-  iconname_valid := get_string ~default:"default" d "valid";
-  iconname_unknown := get_string ~default:"default" d "unknown";
-  iconname_invalid := get_string ~default:"default" d "invalid";
-  iconname_timeout := get_string ~default:"default" d "timeout";
-  iconname_outofmemory := get_string ~default:"default" d "outofmemory";
-  iconname_failure := get_string ~default:"default" d "failure";
-  iconname_valid_obs := get_string ~default:"default" d "valid_obs";
-  iconname_unknown_obs := get_string ~default:"default" d "unknown_obs";
-  iconname_invalid_obs := get_string ~default:"default" d "invalid_obs";
-  iconname_timeout_obs := get_string ~default:"default" d "timeout_obs";
-  iconname_outofmemory_obs := get_string ~default:"default" d "outofmemory_obs";
-  iconname_failure_obs := get_string ~default:"default" d "failure_obs";
-  iconname_yes := get_string ~default:"default" d "yes";
-  iconname_no := get_string ~default:"default" d "no";
-  iconname_directory := get_string ~default:"default" d "directory";
-  iconname_file := get_string ~default:"default" d "file";
-  iconname_prover := get_string ~default:"default" d "prover";
-  iconname_transf := get_string ~default:"default" d "transf";
-  iconname_editor := get_string ~default:"default" d "editor";
-  iconname_replay := get_string ~default:"default" d "replay";
-  iconname_cancel := get_string ~default:"default" d "cancel";
-  iconname_reload := get_string ~default:"default" d "reload";
-  iconname_remove := get_string ~default:"default" d "remove";
-  iconname_cleaning := get_string ~default:"default" d "cleaning";
+  let get_icon_name n =
+    Filename.concat iconset (get_string ~default:"default" d n)
+  in
+  iconname_default := get_icon_name "default";
+  iconname_undone := get_icon_name "undone";
+  iconname_scheduled := get_icon_name "scheduled";
+  iconname_running := get_icon_name "running";
+  iconname_valid := get_icon_name "valid";
+  iconname_unknown := get_icon_name "unknown";
+  iconname_invalid := get_icon_name "invalid";
+  iconname_timeout := get_icon_name "timeout";
+  iconname_outofmemory := get_icon_name "outofmemory";
+  iconname_failure := get_icon_name "failure";
+  iconname_valid_obs := get_icon_name "valid_obs";
+  iconname_unknown_obs := get_icon_name "unknown_obs";
+  iconname_invalid_obs := get_icon_name "invalid_obs";
+  iconname_timeout_obs := get_icon_name "timeout_obs";
+  iconname_outofmemory_obs := get_icon_name "outofmemory_obs";
+  iconname_failure_obs := get_icon_name "failure_obs";
+  iconname_yes := get_icon_name "yes";
+  iconname_no := get_icon_name "no";
+  iconname_file := get_icon_name "file";
+  iconname_theory := get_icon_name "theory";
+  iconname_goal := get_icon_name "goal";
+  iconname_prover := get_icon_name "prover";
+  iconname_transf := get_icon_name "transf";
+  iconname_editor := get_icon_name "editor";
+  iconname_replay := get_icon_name "replay";
+  iconname_cancel := get_icon_name "cancel";
+  iconname_reload := get_icon_name "reload";
+  iconname_remove := get_icon_name "remove";
+  iconname_cleaning := get_icon_name "cleaning";
   ()
 
 let resize_images size =
@@ -436,8 +452,9 @@ let resize_images size =
   image_failure_obs := image ~size !iconname_failure_obs;
   image_yes := image ~size !iconname_yes;
   image_no := image ~size !iconname_no;
-  image_directory := image ~size !iconname_directory;
   image_file := image ~size !iconname_file;
+  image_theory := image ~size !iconname_theory;
+  image_goal := image ~size !iconname_goal;
   image_prover := image ~size !iconname_prover;
   image_transf := image ~size !iconname_transf;
   image_editor := image ~size !iconname_editor;
@@ -467,9 +484,11 @@ let show_legend_window () =
   let it s = b#insert ~iter:b#end_iter ~tags:[tt] s in
   let ib i = b#insert_pixbuf ~iter:b#end_iter ~pixbuf:!i in
   it "Tree view\n";
-  ib image_directory;
-  i "   Theory, containing a set of goals\n";
   ib image_file;
+  i "   File, containing a set of theories\n";
+  ib image_theory;
+  i "   Theory, containing a set of goals\n";
+  ib image_goal;
   i "   Goal\n";
   ib image_prover;
   i "   External prover\n";
