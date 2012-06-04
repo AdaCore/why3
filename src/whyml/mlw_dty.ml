@@ -159,8 +159,14 @@ let rec unify d1 d2 =
 
 and unify_reg r1 r2 =
   if !r1.rid <> !r2.rid then
-    if not !r1.ruser then r1 := !r2
-    else if not !r2.ruser then r2 := !r1
+    if not !r1.ruser then begin
+      unify !r1.rity !r2.rity;
+      r1 := !r2
+    end
+    else if not !r2.ruser then begin
+      unify !r1.rity !r2.rity;
+      r2 := !r1
+    end
     else begin (* two user regions *)
       if not (Lazy.lazy_is_val !r1.reg) then raise Exit;
       if not (Lazy.lazy_is_val !r2.reg) then raise Exit;

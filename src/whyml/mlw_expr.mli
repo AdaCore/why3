@@ -137,6 +137,7 @@ and expr_node = private
   | Ecase   of pvsymbol * (ppattern * expr) list
   | Eassign of pvsymbol * region * pvsymbol (* mutable pv <- expr *)
   | Eghost  of expr
+  | Eany    of any_effect
 
 and let_defn = private {
   let_var  : let_var;
@@ -165,6 +166,15 @@ and lambda = {
 and variant = {
   v_term : term;           (* : tau *)
   v_rel  : lsymbol option; (* tau tau : prop *)
+}
+
+(* TODO? Every top region in the type of Eany is reset.
+   This is enough for our current purposes, but we might
+   need to be more flexible later. *)
+and any_effect = {
+  aeff_reads  : expr list; (* for a ghost read, use a ghost expression *)
+  aeff_writes : expr list; (* for a ghost write, use a ghost expression *)
+  aeff_raises : (bool * xsymbol) list; (* ghost raise * exception symbol *)
 }
 
 val e_label : ?loc:Loc.position -> Slab.t -> expr -> expr
@@ -200,11 +210,13 @@ val e_rec : rec_defn list -> expr -> expr
 val e_if : expr -> expr -> expr -> expr
 val e_case : expr -> (ppattern * expr) list -> expr
 
-exception Immutable of pvsymbol
+exception Immutable of expr
 
 val e_assign : expr -> expr -> expr
 
 val e_ghost : expr -> expr
+
+val e_any : any_effect -> ity -> expr
 
 (* TODO: when should we check for escaping identifiers (regions?)
    in pre/post/xpost/effects? Here or in WP? *)

@@ -284,6 +284,7 @@ and expr_node =
   | Ecase   of pvsymbol * (ppattern * expr) list
   | Eassign of pvsymbol * region * pvsymbol (* mutable pv <- expr *)
   | Eghost  of expr
+  | Eany    of any_effect
 
 and let_defn = {
   let_var  : let_var;
@@ -312,6 +313,12 @@ and lambda = {
 and variant = {
   v_term : term;           (* : tau *)
   v_rel  : lsymbol option; (* tau tau : prop *)
+}
+
+and any_effect = {
+  aeff_reads  : expr list;
+  aeff_writes : expr list;
+  aeff_raises : (bool * xsymbol) list;
 }
 
 (* smart constructors *)
@@ -611,12 +618,12 @@ let e_case_real pv bl =
 
 let e_case e bl = on_value (fun pv -> e_case_real pv bl) e
 
-exception Immutable of pvsymbol
+exception Immutable of expr
 
-let e_assign_real mpv pv =
+let e_assign_real me mpv pv =
   let r = match mpv.pv_vtv.vtv_mut with
     | Some r -> r
-    | None -> raise (Immutable mpv)
+    | None -> raise (Immutable me)
   in
   let ghost = mpv.pv_vtv.vtv_ghost || pv.pv_vtv.vtv_ghost in
   let eff = eff_assign eff_empty ~ghost r pv.pv_vtv.vtv_ity in
@@ -640,14 +647,35 @@ let e_assign_real mpv pv =
   e
 
 let e_assign me e =
-  let assign pv mpv = e_assign_real mpv pv in
+  let assign pv mpv = e_assign_real me mpv pv in
   let assign pv = on_value (assign pv) me in
   on_value assign e
 
 let e_ghost e =
   mk_expr (Eghost e) (vty_ghostify e.e_vty) e.e_effect e.e_vars
 
-(* Computing the fixpoint on recursive definitions *)
+let e_any ee ity =
+  let add_effect fn eff e =
+    let vtv = vtv_of_expr e in
+    let r = match vtv.vtv_mut with
+      | Some r -> r
+      | None -> raise (Immutable e) in
+    fn eff ?ghost:(Some vtv.vtv_ghost) r
+  in
+  let add_raise eff (ghost,xs) =
+    eff_raise eff ~ghost xs
+  in
+  let eff = eff_empty in
+  let eff = List.fold_left (add_effect eff_read) eff ee.aeff_reads in
+  let eff = List.fold_left (add_effect eff_read) eff ee.aeff_writes in
+  let eff = List.fold_left add_raise eff ee.aeff_raises in
+  let eff = Sreg.fold (fun r e -> eff_reset e r) ity.ity_vars.vars_reg eff in
+  let vars = Mid.empty in
+  let vars = List.fold_right add_e_vars ee.aeff_reads vars in
+  let vars = List.fold_right add_e_vars ee.aeff_writes vars in
+  mk_expr (Eany ee) (VTvalue (vty_value ity)) eff vars
+
+(* Compute the fixpoint on recursive definitions *)
 
 let vars_equal vs1 vs2 =
   Stv.equal vs1.vars_tv vs2.vars_tv &&
@@ -706,6 +734,12 @@ let rec expr_subst psm e = match e.e_node with
       e_case_real pv (List.map (fun (pp,e) -> pp, expr_subst psm e) bl)
   | Eghost e ->
       e_ghost (expr_subst psm e)
+  | Eany ee ->
+      e_any {
+        aeff_reads  = List.map (expr_subst psm) ee.aeff_reads;
+        aeff_writes = List.map (expr_subst psm) ee.aeff_writes;
+        aeff_raises = ee.aeff_raises;
+      } (vtv_of_expr e).vtv_ity
   | Elogic _ | Evalue _ | Earrow _ | Eassign _ -> e
 
 and create_rec_defn defl =
