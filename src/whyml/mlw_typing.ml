@@ -191,7 +191,11 @@ and dexpr_desc ~userloc denv _loc = function
       begin
         try
           let prg = ns_find_ps (get_namespace denv.uc) x in
-          DEglobal (prg, []), specialize_prgsymbol prg
+          begin match prg with
+            | PV pv -> DEglobal_pv pv, specialize_pvsymbol pv
+            | PS ps -> DEglobal_ps ps, specialize_psymbol  ps
+            | PL pl -> DEglobal_pl (pl, []), specialize_plsymbol pl
+          end
         with Not_found -> try
           let ls = ns_find_ls (Theory.get_namespace (get_theory denv.uc)) x in
           DElogic (ls, []), specialize_lsymbol ls
@@ -233,22 +237,69 @@ and dexpr_desc ~userloc denv _loc = function
   | _ ->
       assert false (*TODO*)
 
-type local_var =
-  | Lpvsymbol of pvsymbol
-  | Lpsymbol  of psymbol * dity
+let id_user x = id_user x.id x.id_loc
 
-let rec expr _locals de = match de.dexpr_desc with
-(***
+let rec expr locals de = match de.dexpr_desc with
   | DElocal x ->
       assert (Mstr.mem x locals);
       begin match Mstr.find x locals with
-      | Lpvsymbol pv -> e_value pv
-      | Lpasymbol pa -> e_arrow pa
-      | Lpsymbol (ps, da) -> e_inst ps (match_darrow ps da)
+      | LetV pv -> e_value pv
+      | LetA ps -> e_cast ps (vty_of_dity de.dexpr_type)
       end
-***)
+  | DElet (x, { dexpr_desc = DEfun (bl, tr) }, de2) ->
+      let def1 = expr_fun locals x bl tr in
+      let locals = Mstr.add x.id (LetA def1.rec_ps) locals in
+      let e2 = expr locals de2 in
+      e_rec [def1] e2
+  | DEfun (bl, tr) ->
+      let x = { id = "fun"; id_loc = de.dexpr_loc; id_lab = [] } in
+      let def = expr_fun locals x bl tr in
+      let e2 = e_cast def.rec_ps (VTarrow def.rec_ps.ps_vta) in
+      e_rec [def] e2
+  | DElet (x, de1, de2) ->
+      let e1 = expr locals de1 in
+      let def1 = create_let_defn (id_user x) e1 in
+      let locals = Mstr.add x.id def1.let_var locals in
+      let e2 = expr locals de2 in
+      e_let def1 e2
+  | DEapply (de1, de2) ->
+      let e1 = expr locals de1 in
+      let e2 = expr locals de2 in
+      e_app e1 [e2]
+  | DEglobal_pv pv ->
+      e_value pv
+  | DEglobal_ps ps ->
+      e_cast ps (vty_of_dity de.dexpr_type)
+  | DEglobal_pl (pls, del) ->
+      let ity = ity_of_dity de.dexpr_type in
+      e_plapp pls (List.map (expr locals) del) ity
+  | DElogic (ls, del) ->
+      let ity = ity_of_dity de.dexpr_type in
+      e_lapp ls (List.map (expr locals) del) ity
   | _ ->
       assert false (*TODO*)
+
+and expr_fun locals x bl (_, e1, _) =
+  let binder (id, ghost, dity) =
+    let vtv = vty_value ~ghost (ity_of_dity dity) in
+    create_pvsymbol (id_user id) vtv in
+  let pvl = List.map binder bl in
+  let add_binder pv = Mstr.add pv.pv_vs.vs_name.id_string (LetV pv) in
+  let locals' = List.fold_right add_binder pvl locals in
+  let e1 = expr locals' e1 in
+  let ty1 = match e1.e_vty with
+    | VTarrow _ -> ty_tuple []
+    | VTvalue vtv -> ty_of_ity vtv.vtv_ity in
+  let res1 = create_vsymbol (id_fresh "result") ty1 in
+  let lam = {
+    l_args = pvl;
+    l_variant = [];
+    l_pre = t_true;                   (* TODO *)
+    l_expr = e1;
+    l_post = create_post res1 t_true; (* TODO *)
+    l_xpost = Mexn.empty;             (* TODO *)
+      } in
+  create_fun_defn (id_user x) lam
 
 (** Type declaration *)
 

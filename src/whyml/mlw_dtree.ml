@@ -23,7 +23,10 @@ open Ident
 open Denv
 open Ty
 open Mlw_ty
+open Mlw_ty.T
+open Mlw_expr
 open Mlw_module
+open Mlw_dty
 
 type loc = Loc.position
 
@@ -42,6 +45,7 @@ type for_direction = Ptree.for_direction
 
 (* user type_v *)
 
+type ghost = bool
 type dpre = Ptree.pre
 type dpost_fmla = Ptree.lexpr
 type dexn_post_fmla = Ptree.lexpr
@@ -53,6 +57,9 @@ type dueffect = {
   du_raises : xsymbol list;
 }
 
+type dubinder = ident * ghost * dity
+
+(**
 type dutype_v =
   | DUTpure  of Denv.dty
   | DUTarrow of dubinder list * dutype_c
@@ -62,8 +69,7 @@ and dutype_c =
     duc_effect      : dueffect;
     duc_pre         : Ptree.lexpr;
     duc_post        : Ptree.lexpr * (Term.lsymbol * Ptree.lexpr) list; }
-
-and dubinder = ident * Denv.dty * dutype_v
+**)
 
 type dvariant = Ptree.lexpr * Term.lsymbol option
 
@@ -74,7 +80,7 @@ type dloop_annotation = {
 
 type dexpr = {
   dexpr_desc : dexpr_desc;
-  dexpr_type : Mlw_dty.dity;
+  dexpr_type : dity;
   dexpr_lab  : Ident.label list;
   dexpr_loc  : loc;
 }
@@ -82,7 +88,9 @@ type dexpr = {
 and dexpr_desc =
   | DEconstant of constant
   | DElocal of string
-  | DEglobal of prgsymbol * dexpr list
+  | DEglobal_pv of pvsymbol
+  | DEglobal_ps of psymbol
+  | DEglobal_pl of plsymbol * dexpr list
   | DElogic of Term.lsymbol * dexpr list
   | DEapply of dexpr * dexpr
   | DEfun of dubinder list * dtriple
@@ -101,7 +109,7 @@ and dexpr_desc =
   | DEfor of ident * dexpr * for_direction * dexpr * Ptree.lexpr option * dexpr
   | DEassert of assertion_kind * Ptree.lexpr
   | DEmark of string * dexpr
-  | DEany of dutype_c
+  (* | DEany of dutype_c *)
 
 and drecfun = (ident * Denv.dty) * dubinder list * dvariant option * dtriple
 

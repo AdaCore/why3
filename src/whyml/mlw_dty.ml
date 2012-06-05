@@ -204,6 +204,12 @@ let make_arrow_type tyl ty =
     create (Dts (ts_arrow, [ty1; ty2])) (lazy (invalid_arg "ity_of_dity")) in
   List.fold_right arrow tyl ty
 
+let rec vty_of_dity dity = match !dity.node with
+  | Dts (ts, [d1; d2]) when ts_equal ts ts_arrow ->
+      VTarrow (vty_arrow (vty_value (ity_of_dity d1)) (vty_of_dity d2))
+  | _ ->
+      VTvalue (vty_value (ity_of_dity dity))
+
 type tvars = Sint.t (* a set of type variables *)
 let empty_tvars = Sint.empty
 

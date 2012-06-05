@@ -45,13 +45,16 @@ val unify: dity -> dity -> unit
   (** destructive unification *)
 
 val ity_of_dity: dity -> ity
+val vty_of_dity: dity -> vty
   (** use with care, only once unification is done *)
 
 val specialize_scheme: tvars -> dity -> dity
 
 (***
 val specialize_lsymbol: lsymbol -> dity
-val specialize_prgsymbol: prgsymbol -> dity
+val specialize_pvsymbol: pvsymbol -> dity
+val specialize_psymbol: psymbol -> dity
+val specialize_plsymbol: plsymbol -> dity
 
 val match_darrow: psymbol -> darrow -> ity_subst
 ***)
