@@ -37,6 +37,10 @@ let debug_print_labels = Debug.register_flag "print_labels"
 let debug_print_locs = Debug.register_flag "print_locs"
 let debug_print_reg_types = Debug.register_flag "print_reg_types"
 
+let iprinter =
+  let isanitize = sanitizer char_to_alpha char_to_alnumus in
+  create_ident_printer [] ~sanitizer:isanitize
+
 let rprinter =
   let isanitize = sanitizer char_to_alpha char_to_alnumus in
   create_ident_printer [] ~sanitizer:isanitize
@@ -45,7 +49,19 @@ let forget_regs () = Ident.forget_all rprinter
 let forget_tvs_regs () = Ident.forget_all rprinter; forget_tvs ()
 let forget_all () = Ident.forget_all rprinter; forget_all ()
 
-(* ghost regions are prefixed with "?" *)
+(* Labels and locs - copied from Pretty *)
+
+let print_labels = print_iter1 Slab.iter space print_label
+
+let print_ident_labels fmt id =
+  if Debug.test_flag debug_print_labels &&
+      not (Slab.is_empty id.id_label) then
+    fprintf fmt "@ %a" print_labels id.id_label;
+  if Debug.test_flag debug_print_locs then
+    Util.option_iter (fprintf fmt "@ %a" print_loc) id.id_loc
+
+(* identifiers *)
+
 let print_reg fmt reg =
   fprintf fmt "%s" (id_unique rprinter reg.reg_name)
 
@@ -54,6 +70,17 @@ let print_pv fmt pv =
     print_vs pv.pv_vs
 
 let forget_pv pv = forget_var pv.pv_vs
+
+let print_name fmt id =
+  fprintf fmt "%s%a" (id_unique iprinter id) print_ident_labels id
+
+let print_xs fmt xs = print_name fmt xs.xs_name
+
+let print_ps fmt ps =
+  fprintf fmt "%s%a" (if ps.ps_vta.vta_ghost then "?" else "")
+    print_name ps.ps_name
+
+let forget_ps ps = forget_id iprinter ps.ps_name
 
 (* theory names always start with an upper case letter *)
 let print_mod fmt m = print_th fmt m.mod_theory
@@ -87,21 +114,148 @@ let print_reg_opt fmt = function
   | Some r -> fprintf fmt "<%a>" print_regty r
   | None -> ()
 
-(*
+let print_effect fmt eff =
+  let print_xs s xs = fprintf fmt "{%s %a}@ " s print_xs xs in
+  let print_reg s r = fprintf fmt "{%s %a}@ " s print_regty r in
+  let print_reset r = function
+    | None -> print_reg "fresh" r
+    | Some u ->
+        fprintf fmt "{reset %a@ under %a}@ " print_regty r print_regty u
+  in
+  Sreg.iter (print_reg "read") eff.eff_reads;
+  Sreg.iter (print_reg "write") eff.eff_writes;
+  Sexn.iter (print_xs  "raise") eff.eff_raises;
+  Sreg.iter (print_reg "ghost read") eff.eff_ghostr;
+  Sreg.iter (print_reg "ghost write") eff.eff_ghostw;
+  Sexn.iter (print_xs  "ghost raise") eff.eff_ghostx;
+  Mreg.iter print_reset eff.eff_resets
+
+let print_vtv fmt vtv =
+  fprintf fmt "%s%a" (if vtv.vtv_ghost then "?" else "") print_ity vtv.vtv_ity
+
+let rec print_vta fmt vta =
+  fprintf fmt "%a@ ->@ %a%a" print_vtv vta.vta_arg
+    print_effect vta.vta_effect print_vty vta.vta_result
+
+and print_vty fmt = function
+  | VTarrow vta -> print_vta fmt vta
+  | VTvalue vtv -> print_vtv fmt vtv
+
 let print_pvty fmt pv = fprintf fmt "%a%a:@,%a"
-  print_pv pv print_reg_opt pv.pv_mutable print_ity pv.pv_ity
+  print_pv pv print_reg_opt pv.pv_vtv.vtv_mut print_vtv pv.pv_vtv
+
+let print_psty fmt ps =
+  let print_tvs fmt tvs = if not (Stv.is_empty tvs) then
+    fprintf fmt "[%a]@ " (print_list comma print_tv) (Stv.elements tvs) in
+  let print_regs fmt regs = if not (Sreg.is_empty regs) then
+    fprintf fmt "<%a>@ " (print_list comma print_regty) (Sreg.elements regs) in
+  let vars = ps.ps_vta.vta_vars in
+  fprintf fmt "%a :@ %a%a%a"
+    print_ps ps
+    print_tvs (Stv.diff vars.vars_tv ps.ps_vars.vars_tv)
+    print_regs (Mreg.set_diff vars.vars_reg ps.ps_subst.ity_subst_reg)
+    print_vta ps.ps_vta
+
+let print_ppat fmt ppat = print_pat fmt ppat.ppat_pattern
+
+(*
+(* expressions *)
+
+let rec print_expr fmt e = print_lexpr 0 fmt e
+
+and print_lexpr pri fmt e =
+  let print_elab pri fmt e =
+    if Debug.test_flag debug_print_labels && not (Slab.is_empty e.e_label)
+    then fprintf fmt (protect_on (pri > 0) "@[<hov 0>%a@ %a@]")
+      print_labels e.e_label (print_enode 0) e
+    else print_enode pri fmt e in
+  let print_eloc pri fmt e =
+    if Debug.test_flag debug_print_locs && e.e_loc <> None
+    then fprintf fmt (protect_on (pri > 0) "@[<hov 0>%a@ %a@]")
+      (print_option print_loc) e.e_loc (print_elab 0) e
+    else print_elab pri fmt e in
+  print_eloc pri fmt e
+
+(*
+and print_app pri ls fmt tl = match extract_op ls, tl with
+  | _, [] ->
+      print_ls fmt ls
+  | Some s, [t1] when tight_op s ->
+      fprintf fmt (protect_on (pri > 7) "%s%a")
+        s (print_lterm 7) t1
+  | Some s, [t1] ->
+      fprintf fmt (protect_on (pri > 4) "%s %a")
+        s (print_lterm 5) t1
+  | Some s, [t1;t2] ->
+      fprintf fmt (protect_on (pri > 4) "@[<hov 1>%a %s@ %a@]")
+        (print_lterm 5) t1 s (print_lterm 5) t2
+  | _, [t1;t2] when ls.ls_name.id_string = "mixfix []" ->
+      fprintf fmt (protect_on (pri > 6) "%a[%a]")
+        (print_lterm 6) t1 print_term t2
+  | _, [t1;t2;t3] when ls.ls_name.id_string = "mixfix [<-]" ->
+      fprintf fmt (protect_on (pri > 6) "%a[%a <- %a]")
+        (print_lterm 6) t1 (print_lterm 5) t2 (print_lterm 5) t3
+  | _, tl ->
+      fprintf fmt (protect_on (pri > 5) "@[<hov 1>%a@ %a@]")
+        print_ls ls (print_list space (print_lterm 6)) tl
 *)
 
-(* Labels and locs - copied from Pretty *)
+and print_enode pri fmt e = match e.e_node with
+  | Elogic t ->
+      fprintf fmt "(%a)" print_term t
+  | Evalue v ->
+      print_pv fmt v
+  | Earrow a ->
+      print_ps fmt a
+  | Eapp (e,v) ->
+      fprint fmt "%a@ %a" (print_lexpr pri) e print_pv v
+  | Eif (v,e1,e2) ->
+      fprintf fmt (protect_on (pri > 0) "if %a then %a@ else %a")
+        print_pv v print_expr e1 print_expr e2
+  | Tlet (t1,tb) ->
+      let v,t2 = t_open_bound tb in
+      fprintf fmt (protect_on (pri > 0) "let %a = @[%a@] in@ %a")
+        print_vs v (print_lterm 4) t1 print_term t2;
+      forget_var v
+  | Tcase (v,bl) ->
+      fprintf fmt "match %a with@\n@[<hov>%a@]@\nend"
+        print_expr v (print_list newline print_branch) bl
+  | Teps fb ->
+      let v,f = t_open_bound fb in
+      fprintf fmt (protect_on (pri > 0) "epsilon %a.@ %a")
+        print_vsty v print_term f;
+      forget_var v
+  | Tquant (q,fq) ->
+      let vl,tl,f = t_open_quant fq in
+      fprintf fmt (protect_on (pri > 0) "@[<hov 1>%a %a%a.@ %a@]") print_quant q
+        (print_list comma print_vsty) vl print_tl tl print_term f;
+      List.iter forget_var vl
+  | Ttrue ->
+      fprintf fmt "true"
+  | Tfalse ->
+      fprintf fmt "false"
+  | Tbinop (b,f1,f2) ->
+      let asym = Slab.mem Term.asym_label f1.t_label in
+      let p = prio_binop b in
+      fprintf fmt (protect_on (pri > p) "@[<hov 1>%a %a@ %a@]")
+        (print_lterm (p + 1)) f1 (print_binop ~asym) b (print_lterm p) f2
+  | Tnot f ->
+      fprintf fmt (protect_on (pri > 4) "not %a") (print_lterm 4) f
 
-let print_labels = print_iter1 Slab.iter space print_label
+and print_tbranch fmt br =
+  let p,t = t_open_branch br in
+  fprintf fmt "@[<hov 4>| %a ->@ %a@]" print_pat p print_term t;
+  Svs.iter forget_var p.pat_vars
 
-let print_ident_labels fmt id =
-  if Debug.test_flag debug_print_labels &&
-      not (Slab.is_empty id.id_label) then
-    fprintf fmt "@ %a" print_labels id.id_label;
-  if Debug.test_flag debug_print_locs then
-    Util.option_iter (fprintf fmt "@ %a" print_loc) id.id_loc
+and print_tl fmt tl =
+  if tl = [] then () else fprintf fmt "@ [%a]"
+    (print_list alt (print_list comma print_term)) tl
+
+
+(*
+val print_expr : formatter -> expr -> unit        (* expression *)
+*)
+*)
 
 (** Type declarations *)
 

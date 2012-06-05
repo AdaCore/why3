@@ -29,18 +29,31 @@ open Mlw_module
 val forget_all      : unit -> unit     (* flush id_unique *)
 val forget_regs     : unit -> unit     (* flush id_unique for regions *)
 val forget_tvs_regs : unit -> unit     (* flush for type vars and regions *)
-val forget_pv       : pvsymbol -> unit (* flush for a program variable *)
+
+val forget_pv : pvsymbol -> unit (* flush for a program variable *)
+val forget_ps : psymbol  -> unit (* flush for a program symbol *)
+
+val print_xs  : formatter -> xsymbol -> unit      (* exception symbol *)
 
 val print_reg : formatter -> region -> unit       (* region *)
-val print_pv  : formatter -> pvsymbol -> unit     (* program variable *)
-
 val print_its : formatter -> itysymbol -> unit    (* type symbol *)
-val print_mod : formatter -> modul -> unit        (* module name *)
-
 val print_ity : formatter -> ity -> unit          (* individual type *)
 
+val print_vtv : formatter -> vty_value -> unit    (* value type *)
+val print_vta : formatter -> vty_arrow -> unit    (* arrow type *)
+val print_vty : formatter -> vty -> unit          (* expression type *)
+
+val print_pv   : formatter -> pvsymbol -> unit    (* program variable *)
+val print_pvty : formatter -> pvsymbol -> unit    (* pvsymbol : type *)
+val print_ps   : formatter -> psymbol  -> unit    (* program symbol *)
+val print_psty : formatter -> psymbol  -> unit    (* psymbol : type *)
+
+val print_effect : formatter -> effect -> unit    (* effect *)
+
+val print_ppat : formatter -> ppattern -> unit    (* program patterns *)
+
 (*
-val print_pvty : formatter -> pvsymbol -> unit    (* variable : type *)
+val print_expr : formatter -> expr -> unit        (* expression *)
 *)
 
 val print_ty_decl : formatter -> itysymbol -> unit
@@ -49,5 +62,6 @@ val print_next_data_decl : formatter -> data_decl -> unit
 
 val print_pdecl : formatter -> pdecl -> unit
 
-val print_module : formatter -> modul -> unit
+val print_mod : formatter -> modul -> unit        (* module name *)
+val print_module : formatter -> modul -> unit     (* module *)
 
