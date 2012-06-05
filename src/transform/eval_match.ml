@@ -28,25 +28,36 @@ open Pretty
 type inline = known_map -> lsymbol -> ty list -> ty option -> bool
 
 let unfold def tl ty =
+   (* Unfold the definition [defn], given the argument list [tl] and the
+      expected type [ty] *)
   let vl, e = open_ls_defn def in
   let add (mt,mv) x y = ty_match mt x.vs_ty (t_type y), Mvs.add x y mv in
   let (mt,mv) = List.fold_left2 add (Mtv.empty, Mvs.empty) vl tl in
   let mt = oty_match mt e.t_ty ty in
   t_ty_subst mt mv e
 
-let is_constructor kn ls = match Mid.find ls.ls_name kn with
+let is_constructor kn ls =
+   (* check whether logic symbol [ls] is a constructor; for this, [ls] must
+      appear as a constructor in an algebraic data type definition *)
+   match Mid.find ls.ls_name kn with
   | { d_node = Ddata dl } ->
       let constr (_,csl) = List.exists (fun (cs,_) -> ls_equal cs ls) csl in
       List.exists constr dl
   | _ -> false
 
-let is_projection kn ls = match Mid.find ls.ls_name kn with
+let is_projection kn ls =
+   (* check whether logic symbol [ls] is a projection; for this, [ls] must
+      appear as a projection in an algebraic data type definition *)
+   match Mid.find ls.ls_name kn with
   | { d_node = Ddata dl } ->
       let constr (_,csl) = List.exists (fun (cs,_) -> ls_equal cs ls) csl in
       not (List.exists constr dl)
   | _ -> false
 
-let apply_projection kn ls t = t_label_copy t (match t.t_node with
+let apply_projection kn ls t =
+   (* [ls] is a projection, [t] is a term of the form [mk a1 ... an];
+      reduce the term to the [ai] that corresponds to the projection *)
+   t_label_copy t (match t.t_node with
   | Tapp (cs,tl) ->
       let ts = match cs.ls_value with
         | Some { ty_node = Tyapp (ts,_) } -> ts
@@ -61,6 +72,7 @@ let apply_projection kn ls t = t_label_copy t (match t.t_node with
   | _ -> assert false)
 
 let make_flat_case kn t bl =
+   (* ??? *)
   let mk_b b = let p,t = t_open_branch b in [p],t in
   let find_constructors kn ts = List.map fst (find_constructors kn ts) in
   Pattern.CompileTerm.compile (find_constructors kn) [t] (List.map mk_b bl)
