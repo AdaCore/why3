@@ -41,6 +41,8 @@ val create_type_variable: unit -> dity
 val its_app: user:bool -> itysymbol -> dity list -> dity
 val ts_app: tysymbol -> dity list -> dity
 
+val make_arrow_type: dity list -> dity -> dity
+
 val unify: dity -> dity -> unit
   (** destructive unification *)
 
@@ -50,11 +52,7 @@ val vty_of_dity: dity -> vty
 
 val specialize_scheme: tvars -> dity -> dity
 
-(***
 val specialize_lsymbol: lsymbol -> dity
 val specialize_pvsymbol: pvsymbol -> dity
 val specialize_psymbol: psymbol -> dity
 val specialize_plsymbol: plsymbol -> dity
-
-val match_darrow: psymbol -> darrow -> ity_subst
-***)

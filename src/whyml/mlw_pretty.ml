@@ -158,7 +158,6 @@ let print_psty fmt ps =
 
 let print_ppat fmt ppat = print_pat fmt ppat.ppat_pattern
 
-(*
 (* expressions *)
 
 let rec print_expr fmt e = print_lexpr 0 fmt e
@@ -208,10 +207,11 @@ and print_enode pri fmt e = match e.e_node with
   | Earrow a ->
       print_ps fmt a
   | Eapp (e,v) ->
-      fprint fmt "%a@ %a" (print_lexpr pri) e print_pv v
+      fprintf fmt "%a@ %a" (print_lexpr pri) e print_pv v
   | Eif (v,e1,e2) ->
       fprintf fmt (protect_on (pri > 0) "if %a then %a@ else %a")
         print_pv v print_expr e1 print_expr e2
+(*
   | Tlet (t1,tb) ->
       let v,t2 = t_open_bound tb in
       fprintf fmt (protect_on (pri > 0) "let %a = @[%a@] in@ %a")
@@ -241,7 +241,11 @@ and print_enode pri fmt e = match e.e_node with
         (print_lterm (p + 1)) f1 (print_binop ~asym) b (print_lterm p) f2
   | Tnot f ->
       fprintf fmt (protect_on (pri > 4) "not %a") (print_lterm 4) f
+*)
+  | _ ->
+      fprintf fmt "<expr TODO>"
 
+(*
 and print_tbranch fmt br =
   let p,t = t_open_branch br in
   fprintf fmt "@[<hov 4>| %a ->@ %a@]" print_pat p print_term t;
@@ -250,11 +254,6 @@ and print_tbranch fmt br =
 and print_tl fmt tl =
   if tl = [] then () else fprintf fmt "@ [%a]"
     (print_list alt (print_list comma print_term)) tl
-
-
-(*
-val print_expr : formatter -> expr -> unit        (* expression *)
-*)
 *)
 
 (** Type declarations *)

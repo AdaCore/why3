@@ -12,6 +12,7 @@ module M
 end
 
 module N
+  use import int.Int
   use import M
   goal G1: f 41 = 42
 
@@ -19,6 +20,8 @@ module N
   with forest 'a = Cons (tree 'a) (forest 'a) | Nil
 
   type ref 'a = {| ghost mutable contents : 'a |}
+
+  let f x = x + x
 end
 
 (*

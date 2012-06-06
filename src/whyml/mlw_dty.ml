@@ -74,14 +74,6 @@ let create_dreg ~user dity =
   ref { rid = unique (); rity = dity; ruser = user;
         reg = lazy (create_region (id_fresh "rho") (ity_of_dity dity)) }
 
-let find_type_variable htv tv =
-  try
-    Htv.find htv tv
-  with Not_found ->
-    let dtv = create_type_variable () in
-    Htv.add htv tv dtv;
-    dtv
-
 let ts_app_real ts dl =
   create (Dts (ts, dl)) (lazy (ity_pur ts (List.map ity_of_dity dl)))
 
@@ -178,31 +170,9 @@ let unify d1 d2 =
   try unify d1 d2
   with Exit -> raise (TypeMismatch (ity_of_dity d1, ity_of_dity d2))
 
-let rec dity_of_ity ~user htv hreg ity = match ity.ity_node with
-  | Ityvar tv -> assert (not user); find_type_variable htv tv
-  | Itypur (ts, ityl) -> ts_app ts (List.map (dity_of_ity ~user htv hreg) ityl)
-  | Ityapp (its, ityl, rl) ->
-      its_app_real its (List.map (dity_of_ity ~user htv hreg) ityl)
-        (List.map (dreg_of_reg ~user htv hreg) rl)
-
-and dreg_of_reg ~user htv hreg r =
-  try
-    Hreg.find hreg r
-  with Not_found ->
-    let dreg = create_dreg ~user (dity_of_ity ~user htv hreg r.reg_ity) in
-    Hreg.add hreg r dreg;
-    dreg
-
-let dity_of_vtv ~user htv hreg v = dity_of_ity ~user htv hreg v.vtv_ity
-
 let ts_arrow =
   let v = List.map (fun s -> create_tvsymbol (Ident.id_fresh s)) ["a"; "b"] in
   Ty.create_tysymbol (Ident.id_fresh "arrow") v None
-
-let make_arrow_type tyl ty =
-  let arrow ty1 ty2 =
-    create (Dts (ts_arrow, [ty1; ty2])) (lazy (invalid_arg "ity_of_dity")) in
-  List.fold_right arrow tyl ty
 
 let rec vty_of_dity dity = match !dity.node with
   | Dts (ts, [d1; d2]) when ts_equal ts ts_arrow ->
@@ -250,73 +220,75 @@ let specialize_scheme tvs dity =
   in
   specialize dity
 
-(***
+(* Specialization of symbols *)
+
+let find_type_variable htv tv =
+  try
+    Htv.find htv tv
+  with Not_found ->
+    let dtv = create_type_variable () in
+    Htv.add htv tv dtv;
+    dtv
+
+let rec dity_of_ity ~user htv hreg ity = match ity.ity_node with
+  | Ityvar tv -> assert (not user); find_type_variable htv tv
+  | Itypur (ts, ityl) -> ts_app ts (List.map (dity_of_ity ~user htv hreg) ityl)
+  | Ityapp (its, ityl, rl) ->
+      its_app_real its (List.map (dity_of_ity ~user htv hreg) ityl)
+        (List.map (dreg_of_reg ~user htv hreg) rl)
+
+and dreg_of_reg ~user htv hreg r =
+  try
+    Hreg.find hreg r
+  with Not_found ->
+    let dreg = create_dreg ~user (dity_of_ity ~user htv hreg r.reg_ity) in
+    Hreg.add hreg r dreg;
+    dreg
+
+let dity_of_vtv ~user htv hreg v = dity_of_ity ~user htv hreg v.vtv_ity
 
 let specialize_vtvalue ~user vtv =
   let htv = Htv.create 17 in
   let hreg = Hreg.create 17 in
-  [], dity_of_vtv ~user htv hreg vtv
+  dity_of_vtv ~user htv hreg vtv
 
-let specialize_vtarrow ~user vta =
+let specialize_pvsymbol pv =
+  specialize_vtvalue ~user:true pv.pv_vtv
+
+let make_arrow_type tyl ty =
+  let arrow ty1 ty2 =
+    create (Dts (ts_arrow, [ty1; ty2])) (lazy (invalid_arg "ity_of_dity")) in
+  List.fold_right arrow tyl ty
+
+let specialize_vtarrow vta =
   let htv = Htv.create 17 in
   let hreg = Hreg.create 17 in
-  let rec decompose args a =
-    let args = dity_of_vtv ~user htv a.vta_arg :: args in
-    match a.vta_result with
-    | VTvalue v -> List.rev args, dity_of_vtv htv v
-    | VTarrow a1 -> decompose args a1
+  let rec specialize a =
+    let arg = dity_of_vtv ~user:false htv hreg a.vta_arg in
+    let res = match a.vta_result with
+      | VTvalue v -> dity_of_vtv ~user:false htv hreg v
+      | VTarrow a1 -> specialize a1
+    in
+    make_arrow_type [arg] res
   in
-  decompose [] vta
+  specialize vta
+
+let specialize_psymbol ps = specialize_vtarrow ps.ps_vta
 
 let specialize_plsymbol pls =
   let htv = Htv.create 17 in
-  List.map (dity_of_vtv htv) pls.pl_args, dity_of_vtv htv pls.pl_value
+  let hreg = Hreg.create 17 in
+  let args = List.map (dity_of_vtv ~user:false htv hreg) pls.pl_args in
+  make_arrow_type args (dity_of_vtv ~user:false htv hreg pls.pl_value)
 
-let dity_of_ty htv ty = dity_of_ity htv (ity_of_ty ty)
+let dity_of_ty ~user htv hreg ty = dity_of_ity ~user htv hreg (ity_of_ty ty)
 
 let specialize_lsymbol ls =
   let htv = Htv.create 17 in
+  let hreg = Hreg.create 17 in
   let ty = match ls.ls_value with
-    | None -> dity_of_ity htv ity_bool
-    | Some ty -> dity_of_ty htv ty
+    | None -> dity_of_ity ~user:false htv hreg ity_bool
+    | Some ty -> dity_of_ty ~user:false htv hreg ty
   in
-  List.map (dity_of_ty htv) ls.ls_args, ty
-
-let specialize_prgsymbol = function
-  | PV pv -> specialize_vtvalue pv.pv_vtv
-  | PA pa -> specialize_vtarrow pa.pa_vta
-  | PS ps -> specialize_vtarrow ps.ps_vta
-  | PL pl -> specialize_plsymbol pl
-
-let specialize_darrow (args, res) =
-  let htv = Hashtbl.create 17 in
-  let rec specialize_dity d =
-    try Hashtbl.find htv !d.uid
-    with Not_found ->
-      let d = match !d.node with
-        | Dvar -> create_type_variable ()
-        | Duvar s -> create_user_type_variable s
-        | Dits (its, dl) -> its_app its (List.map specialize_dity dl)
-        | Dts (ts, dl) -> ts_app ts (List.map specialize_dity dl)
-      in
-      Hashtbl.add htv !d.uid d;
-      d
-  in
-  List.map specialize_dity args, specialize_dity res
-
-let match_darrow ps da =
-  let rec match_arrow s vta (args, res) =
-    let s, args = match args with
-      | [] -> assert false
-      | arg :: args ->
-        let ity1 = vta.vta_arg.vtv_ity in
-        let ity2 = ity_of_dity arg in
-        ity_match s ity1 ity2, args
-    in
-    match vta.vta_result with
-      | VTvalue v -> assert (args = []); ity_match s v.vtv_ity (ity_of_dity res)
-      | VTarrow a -> match_arrow s a (args, res)
-  in
-  match_arrow ity_subst_empty ps.ps_vta da
-
-***)
+  let args = List.map (dity_of_ty ~user:false htv hreg) ls.ls_args in
+  make_arrow_type args ty

@@ -196,6 +196,8 @@ type pre = lexpr
 
 type post = lexpr * (qualid * lexpr) list
 
+type binder = ident * pty option
+
 type type_v =
   | Tpure of pty
   | Tarrow of binder list * type_c
@@ -205,8 +207,6 @@ and type_c =
     pc_effect      : effect;
     pc_pre         : pre;
     pc_post        : post; }
-
-and binder = ident * type_v option
 
 type expr = {
   expr_desc : expr_desc;

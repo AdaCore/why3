@@ -90,9 +90,9 @@ and dexpr_desc =
   | DElocal of string
   | DEglobal_pv of pvsymbol
   | DEglobal_ps of psymbol
-  | DEglobal_pl of plsymbol * dexpr list
-  | DElogic of Term.lsymbol * dexpr list
-  | DEapply of dexpr * dexpr
+  | DEglobal_pl of plsymbol
+  | DEglobal_ls of Term.lsymbol
+  | DEapply of dexpr * dexpr list
   | DEfun of dubinder list * dtriple
   | DElet of ident * dexpr * dexpr
   | DEletrec of drecfun list * dexpr

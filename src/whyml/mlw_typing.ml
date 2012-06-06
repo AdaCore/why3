@@ -134,17 +134,13 @@ let rec extract_labels labs loc e = match e.Ptree.expr_desc with
       labs, loc, Ptree.Ecast ({ e with Ptree.expr_desc = d }, ty)
   | e -> List.rev labs, loc, e
 
+let unify_args args dity =
+  let a = create_type_variable () in
+  let dity' = make_arrow_type (List.map (fun a -> a.dexpr_type) args) a in
+  unify dity dity';
+  a
+
 (*
-let unify_arg dity { dexpr_loc = loc; dexpr_type = (args, res) } =
-  if args <> [] then errorm ~loc "value expected";
-  unify dity res
-
-let unify_args ls args el =
-  try
-    List.iter2 unify_arg args el
-  with Invalid_argument _ ->
-    raise (Term.BadArity (ls, List.length args, List.length el))
-
 let unify_args_prg ~loc prg args el = match prg with
   | PV { pv_vs = vs } ->
       errorm ~loc "%s: not a function" vs.vs_name.id_string
@@ -157,11 +153,11 @@ let unify_args_prg ~loc prg args el = match prg with
         | [], _ :: _ -> errorm ~loc "too many arguments for %s" id.id_string
       in
       unify_list (args, el)
+*)
 
 let rec decompose_app args e = match e.Ptree.expr_desc with
   | Eapply (e1, e2) -> decompose_app (e2 :: args) e1
   | _ -> e, args
-*)
 
 (* value restriction *)
 let rec is_fun e = match e.dexpr_desc with
@@ -179,13 +175,12 @@ let rec dexpr ~userloc denv e =
   in
   e
 
-and dexpr_desc ~userloc denv _loc = function
+and dexpr_desc ~userloc denv loc = function
   | Ptree.Eident (Qident {id=x}) when Mstr.mem x denv.locals ->
       (* local variable *)
       let tvs, dity = Mstr.find x denv.locals in
       let dity = specialize_scheme tvs dity in
       DElocal x, dity
-(***
   | Ptree.Eident p ->
       let x = Typing.string_list_of_qualid [] p in
       begin
@@ -194,11 +189,11 @@ and dexpr_desc ~userloc denv _loc = function
           begin match prg with
             | PV pv -> DEglobal_pv pv, specialize_pvsymbol pv
             | PS ps -> DEglobal_ps ps, specialize_psymbol  ps
-            | PL pl -> DEglobal_pl (pl, []), specialize_plsymbol pl
+            | PL pl -> DEglobal_pl pl, specialize_plsymbol pl
           end
         with Not_found -> try
           let ls = ns_find_ls (Theory.get_namespace (get_theory denv.uc)) x in
-          DElogic (ls, []), specialize_lsymbol ls
+          DEglobal_ls ls, specialize_lsymbol ls
         with Not_found ->
           errorm ~loc "unbound symbol %a" Typing.print_qualid p
       end
@@ -206,19 +201,8 @@ and dexpr_desc ~userloc denv _loc = function
       let e, el = decompose_app [e2] e1 in
       let e = dexpr ~userloc denv e in
       let el = List.map (dexpr ~userloc denv) el in
-      begin match e.dexpr_desc with
-        | DElogic (ls, _) ->
-            let args, res = e.dexpr_type in
-            unify_args ls args el;
-            DElogic (ls, el), ([], res)
-        | DEglobal (prg, _) ->
-            let args, res = e.dexpr_type in
-            let args = unify_args_prg ~loc prg args el in
-            DEglobal (prg, el), (args, res)
-        | _ ->
-          assert false (*TODO*)
-      end
-***)
+      let res = unify_args el e.dexpr_type in
+      DEapply (e, el), res
   | Ptree.Elet (id, e1, e2) ->
       let e1 = dexpr ~userloc denv e1 in
       let tvars =
@@ -228,6 +212,24 @@ and dexpr_desc ~userloc denv _loc = function
         { denv with locals = Mstr.add id.id s denv.locals; tvars = tvars } in
       let e2 = dexpr ~userloc denv e2 in
       DElet (id, e1, e2), e2.dexpr_type
+  | Ptree.Efun (bl, tr) ->
+      let dbinder denv (id, pty) =
+        let dity = match pty with
+          | Some pty -> dity_of_pty ~user:false denv pty
+          | None -> create_type_variable ()
+        in
+        let tvars = add_tvars denv.tvars dity in
+        let denv = { denv with
+          locals = Mstr.add id.id (tvars, dity) denv.locals;
+          tvars = tvars }
+        in
+        denv, (id, false, dity)
+      in
+      let denv, bl = Util.map_fold_left dbinder denv bl in
+      let _,e,_ as tr = dtriple ~userloc denv tr in
+      let dity =
+        make_arrow_type (List.map (fun (_,_,d) -> d) bl) e.dexpr_type in
+      DEfun (bl, tr), dity
   | Ptree.Ecast (e1, pty) ->
       let e1 = dexpr ~userloc denv e1 in
       unify e1.dexpr_type (dity_of_pty ~user:false denv pty);
@@ -236,6 +238,14 @@ and dexpr_desc ~userloc denv _loc = function
       assert false
   | _ ->
       assert false (*TODO*)
+
+and dtriple ~userloc denv (p, e, q) =
+  let e = dexpr ~userloc denv e in
+  let q = dpost denv q in
+  p, e, q
+
+and dpost _denv (q, _ql) =
+  q, [] (* TODO *)
 
 let id_user x = id_user x.id x.id_loc
 
@@ -262,20 +272,22 @@ let rec expr locals de = match de.dexpr_desc with
       let locals = Mstr.add x.id def1.let_var locals in
       let e2 = expr locals de2 in
       e_let def1 e2
-  | DEapply (de1, de2) ->
+  | DEapply (de1, del) ->
       let e1 = expr locals de1 in
-      let e2 = expr locals de2 in
-      e_app e1 [e2]
+      let el = List.map (expr locals) del in
+      begin match de1.dexpr_desc with
+        | DEglobal_pl pls -> e_plapp pls el (ity_of_dity de.dexpr_type)
+        | DEglobal_ls ls  -> e_lapp  ls  el (ity_of_dity de.dexpr_type)
+        | _               -> e_app e1 el
+      end
   | DEglobal_pv pv ->
       e_value pv
   | DEglobal_ps ps ->
       e_cast ps (vty_of_dity de.dexpr_type)
-  | DEglobal_pl (pls, del) ->
-      let ity = ity_of_dity de.dexpr_type in
-      e_plapp pls (List.map (expr locals) del) ity
-  | DElogic (ls, del) ->
-      let ity = ity_of_dity de.dexpr_type in
-      e_lapp ls (List.map (expr locals) del) ity
+  | DEglobal_pl pls ->
+      e_plapp pls [] (ity_of_dity de.dexpr_type)
+  | DEglobal_ls ls ->
+      e_lapp ls [] (ity_of_dity de.dexpr_type)
   | _ ->
       assert false (*TODO*)
 
@@ -763,7 +775,8 @@ let add_module lib path mm mt m =
         Loc.try3 loc close_namespace uc import name
     | Dlet (_id, e) ->
         let e = dexpr ~userloc:None (create_denv uc) e in
-        ignore (expr Mstr.empty e);
+        let e = expr Mstr.empty e in
+        Format.eprintf "%a@." Mlw_pretty.print_expr e;
         uc
     | Dletrec _ | Dparam _ | Dexn _ ->
         assert false (* TODO *)

@@ -63,7 +63,7 @@ and dutype_c =
     duc_pre         : Ptree.lexpr;
     duc_post        : Ptree.lexpr * (Term.lsymbol * Ptree.lexpr) list; }
 
-and dubinder = ident * Denv.dty * dutype_v
+and dubinder = ident * Denv.dty
 
 type dvariant = Ptree.lexpr * Term.lsymbol option
 
@@ -154,7 +154,7 @@ and itype_c =
     ic_pre         : T.pre;
     ic_post        : T.post; }
 
-and ibinder = ivsymbol * itype_v
+and ibinder = ivsymbol * ty
 
 type mark = Term.vsymbol
 

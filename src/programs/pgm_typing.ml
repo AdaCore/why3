@@ -266,7 +266,7 @@ let rec dpurify_utype_v = function
   | DUTpure ty ->
       ty
   | DUTarrow (bl, c) ->
-      dcurrying (List.map (fun (_,ty,_) -> ty) bl)
+      dcurrying (List.map (fun (_,ty) -> ty) bl)
         (dpurify_utype_v c.duc_result_type)
 
 (* user indicates whether region type variables can be instantiated *)
@@ -307,12 +307,11 @@ and dutype_c env c =
   }
 
 and dubinder env ({id=x; id_loc=loc} as id, v) =
-  let v = match v with
-    | Some v -> dutype_v env v
-    | None -> DUTpure (create_type_var loc)
+  let ty = match v with
+    | Some v -> dtype ~user:true env v
+    | None -> create_type_var loc
   in
-  let ty = dpurify_utype_v v in
-  add_local env x ty, (id, ty, v)
+  add_local env x ty, (id, ty)
 
 let rec add_local_pat env p = match p.dp_node with
   | Denv.Pwild -> env
@@ -475,7 +474,7 @@ and dexpr_desc ~ghost ~userloc env loc = function
   | Ptree.Efun (bl, t) ->
       let env, bl = map_fold_left dubinder env bl in
       let (_,e,_) as t = dtriple ~ghost ~userloc env t in
-      let tyl = List.map (fun (_,ty,_) -> ty) bl in
+      let tyl = List.map (fun (_,ty) -> ty) bl in
       let ty = dcurrying tyl e.dexpr_type in
       DEfun (bl, t), ty
   | Ptree.Elet (x, e1, e2) ->
@@ -730,7 +729,7 @@ and dletrec ~ghost ~userloc env dl =
     let env, bl = map_fold_left dubinder env bl in
     let v = option_map (dvariant env) v in
     let (_,e,_) as t = dtriple ~ghost ~userloc env t in
-    let tyl = List.map (fun (_,ty,_) -> ty) bl in
+    let tyl = List.map (fun (_,ty) -> ty) bl in
     let ty = dcurrying tyl e.dexpr_type in
     if not (Denv.unify ty tyres) then
       errorm ~loc:id.id_loc
@@ -1026,12 +1025,11 @@ and iutype_c env c =
     ic_pre         = ifmla env c.duc_pre;
     ic_post        = iupost env ty c.duc_post; }
 
-and iubinder env (x, ty, tyv) =
-  let tyv = iutype_v env tyv in
+and iubinder env (x, ty) =
   let ty = Denv.ty_of_dty ty in
   let label, _ = label_set_from_list x.id_loc x.id_lab in
   let env, v = iadd_local env (id_user ~label x.id x.id_loc) ty in
-  env, (v, tyv)
+  env, (v, ty)
 
 let mk_iexpr loc ty d =
   { iexpr_desc = d; iexpr_loc = loc; iexpr_lab = []; iexpr_type = ty }
@@ -1502,8 +1500,8 @@ and type_c env c =
 and add_binders env bl =
   map_fold_left add_binder env bl
 
-and add_binder env (i, v) =
-  let v = type_v env v in
+and add_binder env (i, ty) =
+  let v = tpure ty in
   let env, vs = add_local env i v in
   env, vs
 

@@ -52,9 +52,7 @@ val print_effect : formatter -> effect -> unit    (* effect *)
 
 val print_ppat : formatter -> ppattern -> unit    (* program patterns *)
 
-(*
 val print_expr : formatter -> expr -> unit        (* expression *)
-*)
 
 val print_ty_decl : formatter -> itysymbol -> unit
 val print_data_decl : formatter -> data_decl -> unit

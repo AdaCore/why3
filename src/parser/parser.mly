@@ -161,7 +161,7 @@ end
 
   let exit_exn () = Qident (mk_id "%Exit" (floc ()))
   let id_anonymous () = mk_id "_" (floc ())
-  let ty_unit () = Tpure (PPTtuple [])
+  let ty_unit () = PPTtuple []
 
   let id_lt_nat () = Qident (mk_id "lt_nat" (floc ()))
 
@@ -1318,7 +1318,7 @@ type_v_binder:
 type_v_param:
 | LEFTPAR RIGHTPAR
    { [id_anonymous (), Some (ty_unit ())] }
-| LEFTPAR lidents_lab COLON type_v RIGHTPAR
+| LEFTPAR lidents_lab COLON primitive_type RIGHTPAR
    { List.map (fun i -> (i, Some $4)) $2 }
 ;
 
@@ -1334,9 +1334,9 @@ type_v:
 ;
 
 arrow_type_v:
-| simple_type_v ARROW type_c
+| primitive_type ARROW type_c
    { Tarrow ([id_anonymous (), Some $1], $3) }
-| lident labels COLON simple_type_v ARROW type_c
+| lident labels COLON primitive_type ARROW type_c
    { Tarrow ([add_lab $1 $2, Some $4], $6) }
    /* TODO: we could alllow lidents instead, e.g. x y : int -> ... */
    /*{ Tarrow (List.map (fun x -> x, Some $3) $1, $5) }*/
