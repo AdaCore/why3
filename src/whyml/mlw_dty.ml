@@ -257,7 +257,10 @@ let specialize_pvsymbol pv =
 
 let make_arrow_type tyl ty =
   let arrow ty1 ty2 =
+    ts_app_real ts_arrow [ty1;ty2] in
+(*
     create (Dts (ts_arrow, [ty1; ty2])) (lazy (invalid_arg "ity_of_dity")) in
+*)
   List.fold_right arrow tyl ty
 
 let specialize_vtarrow vta =

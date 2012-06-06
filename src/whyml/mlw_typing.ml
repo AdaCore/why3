@@ -134,27 +134,6 @@ let rec extract_labels labs loc e = match e.Ptree.expr_desc with
       labs, loc, Ptree.Ecast ({ e with Ptree.expr_desc = d }, ty)
   | e -> List.rev labs, loc, e
 
-let unify_args args dity =
-  let a = create_type_variable () in
-  let dity' = make_arrow_type (List.map (fun a -> a.dexpr_type) args) a in
-  unify dity dity';
-  a
-
-(*
-let unify_args_prg ~loc prg args el = match prg with
-  | PV { pv_vs = vs } ->
-      errorm ~loc "%s: not a function" vs.vs_name.id_string
-  | PL pl ->
-      unify_args pl.pl_ls args el; []
-  | PA { pa_name = id } | PS { ps_name = id } ->
-      let rec unify_list = function
-        | a :: args, e :: el -> unify_arg a e; unify_list (args, el)
-        | args, [] -> args
-        | [], _ :: _ -> errorm ~loc "too many arguments for %s" id.id_string
-      in
-      unify_list (args, el)
-*)
-
 let rec decompose_app args e = match e.Ptree.expr_desc with
   | Eapply (e1, e2) -> decompose_app (e2 :: args) e1
   | _ -> e, args
@@ -201,7 +180,9 @@ and dexpr_desc ~userloc denv loc = function
       let e, el = decompose_app [e2] e1 in
       let e = dexpr ~userloc denv e in
       let el = List.map (dexpr ~userloc denv) el in
-      let res = unify_args el e.dexpr_type in
+      let res = create_type_variable () in
+      let dity = make_arrow_type (List.map (fun a -> a.dexpr_type) el) res in
+      unify e.dexpr_type dity;
       DEapply (e, el), res
   | Ptree.Elet (id, e1, e2) ->
       let e1 = dexpr ~userloc denv e1 in
@@ -221,7 +202,7 @@ and dexpr_desc ~userloc denv loc = function
         let tvars = add_tvars denv.tvars dity in
         let denv = { denv with
           locals = Mstr.add id.id (tvars, dity) denv.locals;
-          tvars = tvars }
+          tvars  = tvars }
         in
         denv, (id, false, dity)
       in
@@ -262,7 +243,7 @@ let rec expr locals de = match de.dexpr_desc with
       let e2 = expr locals de2 in
       e_rec [def1] e2
   | DEfun (bl, tr) ->
-      let x = { id = "fun"; id_loc = de.dexpr_loc; id_lab = [] } in
+      let x = { id = "fn"; id_loc = de.dexpr_loc; id_lab = [] } in
       let def = expr_fun locals x bl tr in
       let e2 = e_cast def.rec_ps (VTarrow def.rec_ps.ps_vta) in
       e_rec [def] e2
@@ -273,20 +254,21 @@ let rec expr locals de = match de.dexpr_desc with
       let e2 = expr locals de2 in
       e_let def1 e2
   | DEapply (de1, del) ->
-      let e1 = expr locals de1 in
       let el = List.map (expr locals) del in
       begin match de1.dexpr_desc with
         | DEglobal_pl pls -> e_plapp pls el (ity_of_dity de.dexpr_type)
         | DEglobal_ls ls  -> e_lapp  ls  el (ity_of_dity de.dexpr_type)
-        | _               -> e_app e1 el
+        | _               -> e_app (expr locals de1) el
       end
   | DEglobal_pv pv ->
       e_value pv
   | DEglobal_ps ps ->
       e_cast ps (vty_of_dity de.dexpr_type)
-  | DEglobal_pl pls ->
-      e_plapp pls [] (ity_of_dity de.dexpr_type)
+  | DEglobal_pl pl ->
+      assert (pl.pl_ls.ls_args = []);
+      e_plapp pl [] (ity_of_dity de.dexpr_type)
   | DEglobal_ls ls ->
+      assert (ls.ls_args = []);
       e_lapp ls [] (ity_of_dity de.dexpr_type)
   | _ ->
       assert false (*TODO*)

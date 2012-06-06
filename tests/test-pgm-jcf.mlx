@@ -21,7 +21,7 @@ module N
 
   type ref 'a = {| ghost mutable contents : 'a |}
 
-  let f x = x + x
+  let f x = x.contents + zero
 end
 
 (*

@@ -207,40 +207,41 @@ and print_enode pri fmt e = match e.e_node with
   | Earrow a ->
       print_ps fmt a
   | Eapp (e,v) ->
-      fprintf fmt "%a@ %a" (print_lexpr pri) e print_pv v
+      fprintf fmt "(%a@ %a)" (print_lexpr pri) e print_pv v
+  | Elet ({ let_var = lv ; let_expr = e1 }, e2) ->
+      let print_lv fmt = function
+        | LetV pv -> print_pvty fmt pv
+        | LetA ps -> print_psty fmt ps in
+      let forget_lv = function
+        | LetV pv -> forget_pv pv
+        | LetA ps -> forget_ps ps in
+      fprintf fmt (protect_on (pri > 0) "let %a = @[%a@] in@ %a")
+        print_lv lv (print_lexpr 4) e1 print_expr e2;
+      forget_lv lv
+  | Erec (rdl,e) ->
+      let print_and fmt () = fprintf fmt "@\nand@\n" in
+      let print_post fmt post =
+        let vs,f = open_post post in
+        fprintf fmt "%a ->@ %a" print_vs vs print_term f in
+      let print_rd fmt { rec_ps = ps ; rec_lambda = lam } =
+        fprintf fmt "(%a) %a =@ { %a }@ %a@ { %a }"
+          print_psty ps
+          (print_list space print_pvty) lam.l_args
+          print_term lam.l_pre
+          print_expr lam.l_expr
+          print_post lam.l_post
+      in
+      let forget_rd rd = forget_ps rd.rec_ps in
+      fprintf fmt (protect_on (pri > 0) "@[<hov 4>let rec %a@]@ in@ %a")
+        (print_list print_and print_rd) rdl print_expr e;
+      List.iter forget_rd rdl
   | Eif (v,e1,e2) ->
       fprintf fmt (protect_on (pri > 0) "if %a then %a@ else %a")
         print_pv v print_expr e1 print_expr e2
 (*
-  | Tlet (t1,tb) ->
-      let v,t2 = t_open_bound tb in
-      fprintf fmt (protect_on (pri > 0) "let %a = @[%a@] in@ %a")
-        print_vs v (print_lterm 4) t1 print_term t2;
-      forget_var v
   | Tcase (v,bl) ->
       fprintf fmt "match %a with@\n@[<hov>%a@]@\nend"
         print_expr v (print_list newline print_branch) bl
-  | Teps fb ->
-      let v,f = t_open_bound fb in
-      fprintf fmt (protect_on (pri > 0) "epsilon %a.@ %a")
-        print_vsty v print_term f;
-      forget_var v
-  | Tquant (q,fq) ->
-      let vl,tl,f = t_open_quant fq in
-      fprintf fmt (protect_on (pri > 0) "@[<hov 1>%a %a%a.@ %a@]") print_quant q
-        (print_list comma print_vsty) vl print_tl tl print_term f;
-      List.iter forget_var vl
-  | Ttrue ->
-      fprintf fmt "true"
-  | Tfalse ->
-      fprintf fmt "false"
-  | Tbinop (b,f1,f2) ->
-      let asym = Slab.mem Term.asym_label f1.t_label in
-      let p = prio_binop b in
-      fprintf fmt (protect_on (pri > p) "@[<hov 1>%a %a@ %a@]")
-        (print_lterm (p + 1)) f1 (print_binop ~asym) b (print_lterm p) f2
-  | Tnot f ->
-      fprintf fmt (protect_on (pri > 4) "not %a") (print_lterm 4) f
 *)
   | _ ->
       fprintf fmt "<expr TODO>"
