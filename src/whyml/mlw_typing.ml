@@ -758,7 +758,7 @@ let add_module lib path mm mt m =
     | Dlet (_id, e) ->
         let e = dexpr ~userloc:None (create_denv uc) e in
         let e = expr Mstr.empty e in
-        Format.eprintf "%a@." Mlw_pretty.print_expr e;
+        Format.eprintf "@[%a@]@." Mlw_pretty.print_expr e;
         uc
     | Dletrec _ | Dparam _ | Dexn _ ->
         assert false (* TODO *)

@@ -139,10 +139,29 @@ let rec occur_check tv = function
   | Dits (_,dl,_) | Dts (_,dl) -> List.iter (occur_check tv) dl
   | Duvar _ -> ()
 
+let rec occur_check_reg tv = function
+  | Dvar { contents = Dval d } -> occur_check_reg tv d
+  | Dvar { contents = Dtvs _ } | Duvar _ -> ()
+  | Dits (_,dl,rl) ->
+      let rec check = function
+        | Rvar { contents = Rval dreg } -> check dreg
+        | Rvar { contents = Rtvs (tv',dity,_) } ->
+            if tv_equal tv tv' then raise Exit;
+            occur_check_reg tv dity
+        | Rureg _ | Rreg _ -> ()
+      in
+      List.iter (occur_check_reg tv) dl;
+      List.iter check rl
+  | Dts (_,dl) ->
+      List.iter (occur_check_reg tv) dl
+
 let rec unify d1 d2 = match d1,d2 with
   | Dvar { contents = Dval d1 }, d2
   | d1, Dvar { contents = Dval d2 } ->
       unify d1 d2
+  | Dvar { contents = Dtvs tv1 },
+    Dvar { contents = Dtvs tv2 } when tv_equal tv1 tv2 ->
+      ()
   | Dvar ({ contents = Dtvs tv } as r), d
   | d, Dvar ({ contents = Dtvs tv } as r) ->
       occur_check tv d; r := Dval d
@@ -165,9 +184,16 @@ and unify_reg r1 r2 =
   in
   match r1,r2 with
     | Rvar { contents = Rval r1 }, r2
-    | r1, Rvar { contents = Rval r2 } -> unify_reg r1 r2
-    | Rvar r, d | d, Rvar r ->
-        unify (dity_of_reg r1) (dity_of_reg r2);
+    | r1, Rvar { contents = Rval r2 } ->
+        unify_reg r1 r2
+    | Rvar { contents = Rtvs (tv1,_,_) },
+      Rvar { contents = Rtvs (tv2,_,_) } when tv_equal tv1 tv2 ->
+        ()
+    | Rvar ({ contents = Rtvs (tv,rd,_) } as r), d
+    | d, Rvar ({ contents = Rtvs (tv,rd,_) } as r) ->
+        let dity = dity_of_reg d in
+        occur_check_reg tv dity;
+        unify rd dity;
         r := Rval d
     | Rureg (tv1,_,_), Rureg (tv2,_,_) when tv_equal tv1 tv2 -> ()
     | Rreg (reg1,_), Rreg (reg2,_) when reg_equal reg1 reg2 -> ()
@@ -187,22 +213,16 @@ let rec vty_of_dity = function
   | dity ->
       VTvalue (vty_value (ity_of_dity dity))
 
-type tvars = Stv.t (* a set of type variables *)
-let empty_tvars = Stv.empty
+type tvars = dity list
+let empty_tvars = []
 
-let rec add_tvars tvs = function
-  | Dvar { contents = Dval d } -> add_tvars tvs d
-  | Dvar { contents = Dtvs tv } | Duvar tv -> Stv.add tv tvs
-  | Dits (_,dl,rl) ->
-      List.fold_left add_tvars_reg (List.fold_left add_tvars tvs dl) rl
-  | Dts (_, dl) ->
-      List.fold_left add_tvars tvs dl
+let add_tvars tvs dity = dity :: tvs
 
-and add_tvars_reg tvs = function
-  | Rvar { contents = Rval r } -> add_tvars_reg tvs r
-  | Rvar { contents = Rtvs (tv,dity,_) }
-  | Rureg (tv,dity,_) -> add_tvars (Stv.add tv tvs) dity
-  | Rreg _ -> tvs
+let tv_in_tvars tv tvs =
+  try List.iter (occur_check tv) tvs; false with Exit -> true
+
+let reg_in_tvars tv tvs =
+  try List.iter (occur_check_reg tv) tvs; false with Exit -> true
 
 let specialize_scheme tvs dity =
   let htvs = Htv.create 17 in
@@ -210,7 +230,7 @@ let specialize_scheme tvs dity =
   let rec specialize = function
     | Dvar { contents = Dval d } -> specialize d
     | Dvar { contents = Dtvs tv } | Duvar tv as d ->
-        if Stv.mem tv tvs then d else
+        if tv_in_tvars tv tvs then d else
         begin try Htv.find htvs tv with Not_found ->
           let v = create_type_variable () in
           Htv.add htvs tv v; v
@@ -223,7 +243,7 @@ let specialize_scheme tvs dity =
     | Rvar { contents = Rval r } -> spec_reg r
     | Rvar { contents = Rtvs (tv,dity,_) }
     | Rureg (tv,dity,_) as r ->
-        if Stv.mem tv tvs then r else
+        if reg_in_tvars tv tvs then r else
         begin try Htv.find hreg tv with Not_found ->
           let v = create_dreg ~user:false (specialize dity) in
           Htv.add hreg tv v; v
