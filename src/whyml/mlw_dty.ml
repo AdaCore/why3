@@ -42,8 +42,9 @@ and dity_desc = {
 and dity_node =
   | Duvar of Ptree.ident (* user type variable *)
   | Dvar
-  | Dits of itysymbol * dity list * dreg list
-  | Dts  of tysymbol  * dity list
+  | Dskip of dity
+  | Dits  of itysymbol * dity list * dreg list
+  | Dts   of tysymbol  * dity list
 
 and dreg = dreg_desc ref
 
@@ -69,6 +70,8 @@ let create_type_variable () =
 let ity_of_dity d = Lazy.force !d.ity
 
 let reg_of_dreg d = Lazy.force !d.reg
+
+let create_skip d = create (Dskip d) (lazy (ity_of_dity d))
 
 let create_dreg ~user dity =
   ref { rid = unique (); rity = dity; ruser = user;
@@ -127,27 +130,32 @@ let ts_app ts dl = match ts.ts_def with
 (* unification *)
 
 let rec unify d1 d2 =
-  if !d1.uid <> !d2.uid then begin
-    begin match !d1.node, !d2.node with
+  if !d1.uid <> !d2.uid then
+  match !d1.node, !d2.node with
+    | Dskip d1, _ ->
+        unify d1 d2
+    | _, Dskip d2 ->
+        unify d1 d2
+    | Dvar, Dvar ->
+        d1 := !(create_skip d2)
     | Dvar, _ ->
-        ()
+        d1 := !d2
     | _, Dvar ->
         d2 := !d1
     | Duvar s1, Duvar s2 when s1.id = s2.id ->
-        ()
+        d1 := !d2
     | Dits (its1, dl1, rl1), Dits (its2, dl2, rl2) when its_equal its1 its2 ->
         assert (List.length rl1 = List.length rl2);
         assert (List.length dl1 = List.length dl2);
         List.iter2 unify dl1 dl2;
-        List.iter2 unify_reg rl1 rl2
+        List.iter2 unify_reg rl1 rl2;
+        d1 := !d2
     | Dts (ts1, dl1), Dts (ts2, dl2) when ts_equal ts1 ts2 ->
         assert (List.length dl1 = List.length dl2);
-        List.iter2 unify dl1 dl2
+        List.iter2 unify dl1 dl2;
+        d1 := !d2
     | _ ->
         raise Exit
-    end;
-    d1 := !d2
-  end
 
 and unify_reg r1 r2 =
   if !r1.rid <> !r2.rid then
@@ -185,6 +193,7 @@ let empty_tvars = Sint.empty
 
 let rec add_tvars tvs d = match !d.node with
   | Duvar _ | Dvar -> Sint.add !d.uid tvs
+  | Dskip d -> add_tvars tvs d
   | Dits (_, dl, rl) ->
       let add_reg tvs r = add_tvars (Sint.add !r.rid tvs) !r.rity in
       List.fold_left add_reg (List.fold_left add_tvars tvs dl) rl
@@ -196,6 +205,7 @@ let specialize_scheme tvs dity =
   let hr = Hashtbl.create 17 in
   let rec specialize d = match !d.node with
     | Duvar _ | Dvar when Sint.mem !d.uid tvs -> d
+    | Dskip d -> specialize d
     | Duvar id -> begin
         try Hashtbl.find huv id.id
         with Not_found ->
@@ -231,8 +241,10 @@ let find_type_variable htv tv =
     dtv
 
 let rec dity_of_ity ~user htv hreg ity = match ity.ity_node with
-  | Ityvar tv -> assert (not user); find_type_variable htv tv
-  | Itypur (ts, ityl) -> ts_app ts (List.map (dity_of_ity ~user htv hreg) ityl)
+  | Ityvar tv ->
+      assert (not user); find_type_variable htv tv
+  | Itypur (ts, ityl) ->
+      ts_app_real ts (List.map (dity_of_ity ~user htv hreg) ityl)
   | Ityapp (its, ityl, rl) ->
       its_app_real its (List.map (dity_of_ity ~user htv hreg) ityl)
         (List.map (dreg_of_reg ~user htv hreg) rl)

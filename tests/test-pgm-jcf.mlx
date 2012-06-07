@@ -19,9 +19,11 @@ module N
   type tree 'a = Node 'a (forest 'a) | Leaf
   with forest 'a = Cons (tree 'a) (forest 'a) | Nil
 
-  type ref 'a = {| ghost mutable contents : 'a |}
+  type ref 'b = {| ghost mutable contents : 'b |}
 
-  let f x = x.contents + zero
+  function id (tree 'c) : (tree 'c)
+
+  let h (x : tree 'd) = ((id x) : tree 'd)
 end
 
 (*
