@@ -29,7 +29,9 @@ module N
     let bang y = y.contents in
     let z = bang x + zero in
     let u = {| f1 = z; f2 = Node x Nil |} in
-    {| contents = {| u with f2 = Node one Nil |} |}
+    let r = {| contents = {| u with f2 = Node one Nil |} |} in
+    x.contents <- one;
+    r (* zero *)
 end
 
 (*

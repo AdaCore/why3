@@ -238,6 +238,9 @@ and print_enode pri fmt e = match e.e_node with
   | Eif (v,e1,e2) ->
       fprintf fmt (protect_on (pri > 0) "if %a then %a@ else %a")
         print_pv v print_expr e1 print_expr e2
+  | Eassign (pv1,r,pv2) ->
+      fprintf fmt (protect_on (pri > 0) "%a <%a> <- %a")
+        print_pv pv1 print_regty r print_pv pv2
 (*
   | Tcase (v,bl) ->
       fprintf fmt "match %a with@\n@[<hov>%a@]@\nend"

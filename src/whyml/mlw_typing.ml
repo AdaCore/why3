@@ -344,11 +344,16 @@ and dexpr_desc ~userloc denv loc = function
       in
       let res = dexpr_app (hidden_pl ~loc cs) (List.map get_val pjl) in
       mk_let ~loc ~userloc e1 res
+  | Ptree.Eassign (e1, q, e2) ->
+      let fl = { expr_desc = Eident q ; expr_loc = loc } in
+      let e1 = { expr_desc = Eapply (fl,e1) ; expr_loc = loc } in
+      let e1 = dexpr ~userloc denv e1 in
+      let e2 = dexpr ~userloc denv e2 in
+      expected_type e2 e1.dexpr_type;
+      DEassign (e1, e2), dity_unit
   | Ptree.Econstant _c ->
       assert false (*TODO*)
   | Ptree.Eletrec (_rdl, _e1) ->
-      assert false (*TODO*)
-  | Ptree.Eassign (_e1, _q, _e2) ->
       assert false (*TODO*)
   | Ptree.Eloop (_ann, _e1) ->
       assert false (*TODO*)
@@ -427,6 +432,8 @@ let rec expr locals de = match de.dexpr_desc with
       e_lapp ls [] (ity_of_dity de.dexpr_type)
   | DEif (de1, de2, de3) ->
       e_if (expr locals de1) (expr locals de2) (expr locals de3)
+  | DEassign (de1, de2) ->
+      e_assign (expr locals de1) (expr locals de2)
   | _ ->
       assert false (*TODO*)
 

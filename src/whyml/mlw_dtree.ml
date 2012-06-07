@@ -96,7 +96,7 @@ and dexpr_desc =
   | DEfun of dubinder list * dtriple
   | DElet of ident * dexpr * dexpr
   | DEletrec of drecfun list * dexpr
-  | DEassign of dexpr * Term.lsymbol * int * dexpr
+  | DEassign of dexpr * dexpr
   | DEsequence of dexpr * dexpr
   | DEif of dexpr * dexpr * dexpr
   | DEloop of dloop_annotation * dexpr
