@@ -16,14 +16,17 @@ module N
   use import M
   goal G1: f 41 = 42
 
+  type unit = ()
+
   type tree 'a = Node 'a (forest 'a) | Leaf
   with forest 'a = Cons (tree 'a) (forest 'a) | Nil
 
   type ref 'b = {| ghost mutable contents : 'b |}
 
-  function id (tree 'c) : (tree 'c)
-
-  let h (x : tree 'd) = ((id x) : tree 'd)
+  let h x =
+    let bang y = y.contents in
+    let z = bang x + zero in
+    Node x Nil
 end
 
 (*

@@ -292,7 +292,7 @@ and expr_fun locals x bl (_, e1, _) =
     l_expr = e1;
     l_post = create_post res1 t_true; (* TODO *)
     l_xpost = Mexn.empty;             (* TODO *)
-      } in
+  } in
   create_fun_defn (id_user x) lam
 
 (** Type declaration *)
