@@ -148,3 +148,11 @@ let known_add_decl lkn0 kn0 decl =
   let unk = Mid.set_diff unk lkn0 in
   if Sid.is_empty unk then kn
   else raise (UnknownIdent (Sid.choose unk))
+
+let find_constructors kn its =
+  match (Mid.find its.its_pure.ts_name kn).pd_node with
+  | PDtype _ -> []
+  | PDdata dl -> List.assq its dl
+(*
+  | _ -> assert false
+*)

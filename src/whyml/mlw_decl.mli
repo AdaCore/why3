@@ -62,3 +62,5 @@ type known_map = pdecl Mid.t
 val known_id : known_map -> ident -> unit
 val known_add_decl : Decl.known_map -> known_map -> pdecl -> known_map
 val merge_known : known_map -> known_map -> known_map
+
+val find_constructors : known_map -> itysymbol -> constructor list
