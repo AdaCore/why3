@@ -642,20 +642,19 @@ let find_constructors kn ts =
   match (Mid.find ts.ts_name kn).d_node with
   | Dtype _ -> []
   | Ddata dl -> List.assq ts dl
-  | _ -> assert false
+  | Dparam _ | Dlogic _ | Dind _ | Dprop _ -> assert false
 
 let find_inductive_cases kn ps =
   match (Mid.find ps.ls_name kn).d_node with
   | Dind (_, dl) -> List.assq ps dl
-  | Dlogic _ -> []
-  | Dtype _ -> []
-  | _ -> assert false
+  | Dlogic _ | Ddata _ -> []
+  | Dtype _ | Dparam _ | Dprop _ -> assert false
 
 let find_logic_definition kn ls =
   match (Mid.find ls.ls_name kn).d_node with
   | Dlogic dl -> Some (List.assq ls dl)
-  | Dparam _ | Dind _ | Dtype _ -> None
-  | _ -> assert false
+  | Dparam _ | Dind _ | Ddata _ -> None
+  | Dtype _ | Dprop _ -> assert false
 
 let find_prop kn pr =
   match (Mid.find pr.pr_name kn).d_node with
@@ -663,7 +662,7 @@ let find_prop kn pr =
       let test (_,l) = List.mem_assq pr l in
       List.assq pr (snd (List.find test dl))
   | Dprop (_,_,f) -> f
-  | _ -> assert false
+  | Dtype _ | Ddata _ | Dparam _ | Dlogic _ -> assert false
 
 let find_prop_decl kn pr =
   match (Mid.find pr.pr_name kn).d_node with
@@ -671,7 +670,7 @@ let find_prop_decl kn pr =
       let test (_,l) = List.mem_assq pr l in
       Paxiom, List.assq pr (snd (List.find test dl))
   | Dprop (k,_,f) -> k,f
-  | _ -> assert false
+  | Dtype _ | Ddata _ | Dparam _ | Dlogic _ -> assert false
 
 exception NonExhaustiveCase of pattern list * term
 
