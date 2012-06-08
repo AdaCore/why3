@@ -2,70 +2,6 @@ open Why3
 open Term
 open Ident
 
-type my_expl =
-   { mutable loc : Gnat_loc.loc option ;
-     mutable reason : Gnat_expl.reason option ;
-     mutable subp : Gnat_loc.loc option }
-(* The type that is used to extract information from a VC, is filled up field
-   by field *)
-
-type node_info =
-   | Expl of Gnat_expl.expl
-   | Sloc of Gnat_loc.loc
-   | No_Info
-(* The information that has been found in a node *)
-
-let extract_explanation s =
-   (* This function takes a set of labels and extracts a "node_info" from that
-      set. We start with an empty record; We fill it up by iterating over all
-      labels of the node. If the record is entirely filled, we return an
-      "Expl"; if there was at least a location, we return a "Sloc";
-      otherwise we return "No_Info" *)
-   let b = { loc = None; reason = None; subp = None } in
-   Slab.iter
-     (fun x ->
-        let s = x.lab_string in
-        if Util.starts_with s "GP_" then
-           match Util.colon_split s with
-           | ["GP_Reason"; reason] ->
-                 b.reason <- Some (Gnat_expl.reason_from_string reason)
-           | ["GP_Subp"; file; line] ->
-                 begin try
-                    b.subp <-
-                       Some (Gnat_loc.mk_loc_line file (int_of_string line))
-                 with Failure "int_of_string" ->
-                    Format.printf "GP_Subp: cannot parse string: %s" s;
-                    Gnat_util.abort_with_message ""
-                 end
-           | "GP_Sloc" :: rest ->
-                 begin try
-                    b.loc <- Some (Gnat_loc.parse_loc rest)
-                 with Failure "int_of_string" ->
-                    Format.printf "GP_Sloc: cannot parse string: %s" s;
-                    Gnat_util.abort_with_message ""
-                 end
-           | _ ->
-                 Gnat_util.abort_with_message
-                     "found malformed GNATprove label"
-     ) s;
-     (* We potentially need to rectify in the case of loop invariants: We need
-        to check whether the VC is for initialization or preservation *)
-     if b.reason = Some Gnat_expl.VC_Loop_Invariant then begin
-        Slab.iter (fun x ->
-           let s = x.lab_string in
-           if Util.starts_with s "expl:" then
-              if s = "expl:loop invariant init" then
-                 b.reason <- Some Gnat_expl.VC_Loop_Invariant_Init
-              else
-                 b.reason <- Some Gnat_expl.VC_Loop_Invariant_Preserv) s
-     end;
-     match b with
-     | { loc = Some sloc ; reason = Some reason; subp = Some subp } ->
-           Expl (Gnat_expl.mk_expl reason sloc subp)
-     | { loc = Some sloc ; reason = _; subp = _ } ->
-           Sloc sloc
-     | _ ->
-           No_Info
 
 type vc_info =
    { expl : Gnat_expl.expl option; trace : Gnat_loc.loc list }
@@ -75,16 +11,16 @@ let rec search_labels acc f =
    (* This function takes a VC formula, and returns the VC info found in that
       formula. The argument "acc" will be enriched at each node. *)
    let acc =
-      match extract_explanation f.t_label with
-      | Expl e ->
+      match Gnat_expl.extract_explanation f.t_label with
+      | Gnat_expl.Expl e ->
             begin match acc.expl with
             | Some e_old ->
                   { expl = Some e;
                     trace = Gnat_expl.get_loc e_old :: acc.trace }
             | None -> { expl = Some e; trace = acc.trace }
             end
-      | Sloc s -> { acc with trace = s :: acc.trace }
-      | No_Info -> acc in
+      | Gnat_expl.Sloc s -> { acc with trace = s :: acc.trace }
+      | Gnat_expl.No_Info -> acc in
    match f.t_node with
    | Ttrue | Tfalse | Tconst _ | Tvar _ | Tapp _  -> acc
    | Tif (c,t1,t2) ->

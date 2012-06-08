@@ -31,3 +31,11 @@ val get_subp_loc : expl -> loc
 
 module MExpl : Stdlib.Map.S with type key = expl
 module HExpl : Hashtbl.S with type key = expl
+
+type node_info =
+   | Expl of expl
+   | Sloc of Gnat_loc.loc
+   | No_Info
+
+val extract_explanation : Ident.Slab.t -> node_info
+(* from a label set, extract the auxiliary information it contains *)

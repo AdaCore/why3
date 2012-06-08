@@ -1,4 +1,5 @@
 open Why3
+open Term
 open Gnat_loc
 
 type reason =
@@ -71,6 +72,100 @@ let to_filename expl =
 let print_reason fmt r =
    Format.fprintf fmt "%s" (string_of_reason r)
 
+
+
+type my_expl =
+   { mutable expl_loc : Gnat_loc.loc option ;
+     mutable expl_reason : reason option ;
+     mutable expl_subp : Gnat_loc.loc option;
+     mutable expl_msg : string option
+   }
+(* The type that is used to extract information from a VC, is filled up field
+   by field *)
+
+type node_info =
+   | Expl of expl
+   | Sloc of Gnat_loc.loc
+   | No_Info
+(* The information that has been found in a node *)
+
+let read_labels s =
+   let b = { expl_loc    = None;
+             expl_reason = None;
+             expl_subp   = None ;
+             expl_msg    = None } in
+   Ident.Slab.iter
+     (fun x ->
+        let s = x.Ident.lab_string in
+        if Util.starts_with s "GP_" then
+           match Util.colon_split s with
+           | ["GP_Reason"; reason] ->
+                 b.expl_reason <- Some (reason_from_string reason)
+           | ["GP_Pretty_Ada"; msg] ->
+                 b.expl_msg <- Some msg
+           | ["GP_Subp"; file; line] ->
+                 begin try
+                    b.expl_subp <-
+                       Some (Gnat_loc.mk_loc_line file (int_of_string line))
+                 with Failure "int_of_string" ->
+                    Format.printf "GP_Subp: cannot parse string: %s" s;
+                    Gnat_util.abort_with_message ""
+                 end
+           | "GP_Sloc" :: rest ->
+                 begin try
+                    b.expl_loc <- Some (Gnat_loc.parse_loc rest)
+                 with Failure "int_of_string" ->
+                    Format.printf "GP_Sloc: cannot parse string: %s" s;
+                    Gnat_util.abort_with_message ""
+                 end
+           | _ ->
+                 Gnat_util.abort_with_message
+                     "found malformed GNATprove label"
+     ) s;
+     (* We potentially need to rectify in the case of loop invariants: We need
+        to check whether the VC is for initialization or preservation *)
+     if b.expl_reason = Some VC_Loop_Invariant then begin
+        Ident.Slab.iter (fun x ->
+           let s = x.Ident.lab_string in
+           if Util.starts_with s "expl:" then
+              if s = "expl:loop invariant init" then
+                 b.expl_reason <- Some VC_Loop_Invariant_Init
+              else
+                 b.expl_reason <- Some VC_Loop_Invariant_Preserv) s
+     end;
+     b
+
+let extract_explanation s =
+   (* This function takes a set of labels and extracts a "node_info" from that
+      set. We start with an empty record; We fill it up by iterating over all
+      labels of the node. If the record is entirely filled, we return an
+      "Expl"; if there was at least a location, we return a "Sloc";
+      otherwise we return "No_Info" *)
+     match read_labels s with
+     | { expl_loc = Some sloc ;
+         expl_reason = Some reason;
+         expl_subp = Some subp } ->
+           Expl (mk_expl reason sloc subp)
+     | { expl_loc = Some sloc ;
+         expl_reason = _;
+         expl_subp = _ ;
+         expl_msg = None } ->
+           Sloc sloc
+     | _ ->
+           No_Info
+
+let rec extract_msg t =
+   match t.t_node with
+   | Tbinop (Timplies,_, t) -> extract_msg t
+   | Tlet (_,tb) | Teps tb ->
+         let _, t = t_open_bound tb in
+         extract_msg t
+   | Tquant (_,tq) ->
+         let _,_,t = t_open_quant tq in
+         extract_msg t
+   | _ ->
+         read_labels t.t_label
+
 let print_expl proven task fmt p =
    match p.loc with
    | [] -> assert false (* the sloc of a VC is never empty *)
@@ -79,10 +174,17 @@ let print_expl proven task fmt p =
             Format.fprintf fmt "%a: info: %a proved"
             simple_print_loc primary print_reason p.reason
          end else begin
+            let g = Task.task_goal_fmla task in
+            let info = extract_msg g in
+            let sloc =
+               match info.expl_loc with
+               | None -> primary
+               | Some s -> List.hd s in
             Format.fprintf fmt "%a: %a not proved"
-            simple_print_loc primary print_reason p.reason;
-            Format.fprintf fmt ", requires %a"
-              (Driver.print_task Gnat_config.gnat_driver) task;
+            simple_print_loc sloc print_reason p.reason;
+            match info.expl_msg with
+            | None -> ()
+            | Some s -> Format.fprintf fmt ", requires %s" s
          end;
          List.iter
          (fun secondary_sloc ->
