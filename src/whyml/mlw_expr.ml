@@ -53,7 +53,7 @@ let ps_equal : psymbol -> psymbol -> bool = (==)
 
 let create_psymbol id vta vars = {
   ps_name  = id_register id;
-  ps_vta   = vta;
+  ps_vta   = vta_filter vars vta;
   ps_vars  = vars;
   ps_subst = vars_freeze vars;
 }

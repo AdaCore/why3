@@ -31,7 +31,7 @@ module N
     let u = {| f1 = z; f2 = Node x Nil |} in
     let r = {| contents = {| u with f2 = Node one Nil |} |} in
     x.contents <- one;
-    r (* zero *)
+    zero
 end
 
 (*

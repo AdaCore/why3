@@ -210,6 +210,8 @@ val eff_remove_raise : effect -> xsymbol -> effect
 
 val eff_full_inst : ity_subst -> effect -> effect
 
+val eff_filter : varset -> effect -> effect
+
 (** program types *)
 
 (* type of function arguments and values *)
@@ -251,6 +253,10 @@ val vty_ghostify : vty -> vty
 (* the substitution must cover not only vta.vta_tvs and vta.vta_regs
    but also every type variable and every region in vta_effect *)
 val vta_full_inst : ity_subst -> vty_arrow -> vty_arrow
+
+(* remove from the given arrow every effect that is covered
+   neither by the arrow's vta_vars nor by the given varset *)
+val vta_filter : varset -> vty_arrow -> vty_arrow
 
 (** THE FOLLOWING CODE MIGHT BE USEFUL LATER FOR WPgen *)
 (*

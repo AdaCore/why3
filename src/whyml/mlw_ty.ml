@@ -588,6 +588,26 @@ let eff_full_inst s e =
     eff_resets = Mreg.fold add_mreg e.eff_resets Mreg.empty;
   }
 
+let eff_filter vars e =
+  let rec check r vars =
+    Sreg.exists (occurs r) vars.vars_reg
+  and occurs r r' =
+    reg_equal r r' || check r r'.reg_ity.ity_vars
+  in
+  let check r = check r vars in
+  let reset r = function
+    | _ when not (check r) -> None
+    | Some u as v when check u -> Some v
+    | _ -> Some None
+  in
+  { e with
+    eff_reads  = Sreg.filter check e.eff_reads;
+    eff_writes = Sreg.filter check e.eff_writes;
+    eff_ghostr = Sreg.filter check e.eff_ghostr;
+    eff_ghostw = Sreg.filter check e.eff_ghostw;
+    eff_resets = Mreg.mapi_filter reset e.eff_resets;
+  }
+
 (* program types *)
 
 type vty_value = {
@@ -689,6 +709,17 @@ let rec vta_full_inst s vta =
 and vty_full_inst s = function
   | VTvalue vtv -> VTvalue (vtv_full_inst s vtv)
   | VTarrow vta -> VTarrow (vta_full_inst s vta)
+
+let vta_filter vars vta =
+  let vars = vars_union vars vta.vta_vars in
+  let rec filter a =
+    let vty = match a.vta_result with
+      | VTarrow a -> VTarrow (filter a)
+      | v -> v in
+    let effect = eff_filter vars a.vta_effect in
+    vty_arrow ~ghost:a.vta_ghost ~effect a.vta_arg vty
+  in
+  filter vta
 
 (** THE FOLLOWING CODE MIGHT BE USEFUL LATER FOR WPgen *)
 (*
