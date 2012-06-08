@@ -101,12 +101,13 @@ let make_induction vs km qvl t =
     Pretty.print_tv x Pretty.print_ty tx ) sigma;
 
   let make_case (ls, _) =
-     
+    let _ = if ls = ls then () else () in 
     let f = assert false (* TODO: instancier p sur le constructeur ls *) in
     t_forall_close qvl1 [] f
   in
   (* here I return the new term (TODO) *)
   let cl = find_constructors km ts in
+ 
   List.iter (fun (cs,_) -> Format.printf "%a @ \n" Pretty.print_cs cs) cl;
   List.map make_case cl
     
