@@ -181,10 +181,10 @@ let call_on_file ~command ?(timelimit=0) ?(memlimit=0)
         let ans = match ret with
           | Unix.WSTOPPED n ->
               Debug.dprintf debug "Call_provers: stopped by signal %d@." n;
-              HighFailure
+              grep out regexps
           | Unix.WSIGNALED n ->
               Debug.dprintf debug "Call_provers: killed by signal %d@." n;
-              HighFailure
+              grep out regexps
           | Unix.WEXITED n ->
               Debug.dprintf debug "Call_provers: exited with status %d@." n;
               (try List.assoc n exitcodes with Not_found -> grep out regexps)
