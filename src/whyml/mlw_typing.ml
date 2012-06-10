@@ -126,8 +126,10 @@ let rec dity_of_pty ~user denv = function
 
 (** Typing program expressions *)
 
-let dity_unit = ts_app (ts_tuple 0) []
+let dity_int  = ts_app ts_int []
+let dity_real = ts_app ts_real []
 let dity_bool = ts_app ts_bool []
+let dity_unit = ts_app (ts_tuple 0) []
 
 let expected_type e dity =
   unify e.dexpr_type dity
@@ -345,21 +347,29 @@ and dexpr_desc ~userloc denv loc = function
       let res = dexpr_app (hidden_pl ~loc cs) (List.map get_val pjl) in
       mk_let ~loc ~userloc e1 res
   | Ptree.Eassign (e1, q, e2) ->
-      let fl = { expr_desc = Eident q ; expr_loc = loc } in
-      let e1 = { expr_desc = Eapply (fl,e1) ; expr_loc = loc } in
+      let fl = { expr_desc = Eident q; expr_loc = loc } in
+      let e1 = { expr_desc = Eapply (fl,e1); expr_loc = loc } in
       let e1 = dexpr ~userloc denv e1 in
       let e2 = dexpr ~userloc denv e2 in
       expected_type e2 e1.dexpr_type;
       DEassign (e1, e2), dity_unit
-  | Ptree.Econstant _c ->
-      assert false (*TODO*)
+  | Ptree.Econstant (ConstInt _ as c) ->
+      DEconstant c, dity_int
+  | Ptree.Econstant (ConstReal _ as c) ->
+      DEconstant c, dity_real
+  | Ptree.Enot e1 ->
+      let e1 = dexpr ~userloc denv e1 in
+      expected_type e1 dity_bool;
+      DEnot e1, dity_bool
+  | Ptree.Elazy (op, e1, e2) ->
+      let e1 = dexpr ~userloc denv e1 in
+      let e2 = dexpr ~userloc denv e2 in
+      expected_type e1 dity_bool;
+      expected_type e2 dity_bool;
+      DElazy (op, e1, e2), dity_bool
   | Ptree.Eletrec (_rdl, _e1) ->
       assert false (*TODO*)
   | Ptree.Eloop (_ann, _e1) ->
-      assert false (*TODO*)
-  | Ptree.Elazy (_lazy_op, _e1, _e2) ->
-      assert false (*TODO*)
-  | Ptree.Enot (_e1) ->
       assert false (*TODO*)
   | Ptree.Ematch (_e1, _bl) ->
       assert false (*TODO*)
@@ -434,6 +444,14 @@ let rec expr locals de = match de.dexpr_desc with
       e_if (expr locals de1) (expr locals de2) (expr locals de3)
   | DEassign (de1, de2) ->
       e_assign (expr locals de1) (expr locals de2)
+  | DEconstant c ->
+      e_const c
+  | DElazy (LazyAnd, de1, de2) ->
+      e_lazy_and (expr locals de1) (expr locals de2)
+  | DElazy (LazyOr, de1, de2) ->
+      e_lazy_or (expr locals de1) (expr locals de2)
+  | DEnot de1 ->
+      e_not (expr locals de1)
   | _ ->
       assert false (*TODO*)
 

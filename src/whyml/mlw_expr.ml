@@ -136,11 +136,13 @@ let ppat_plapp pls ppl vtv =
     ppat_vtv     = vtv;
     ppat_effect  = if vtv.vtv_ghost then eff_ghostify eff else eff; }
 
+let ity_of_ty_opt ty = ity_of_ty (Util.def_option ty_bool ty)
+
 let ppat_lapp ls ppl vtv =
   let pls = {
     pl_ls     = ls;
     pl_args   = List.map (fun ty -> vty_value (ity_of_ty ty)) ls.ls_args;
-    pl_value  = vty_value (ity_of_ty (Util.def_option ty_bool ls.ls_value));
+    pl_value  = vty_value (ity_of_ty_opt ls.ls_value);
     pl_effect = eff_empty; }
   in
   ppat_plapp pls ppl vtv
@@ -228,7 +230,7 @@ let make_ppattern pp vtv =
           ppat_vtv     = unmut vtv;
           ppat_effect  = if vtv.vtv_ghost then eff_ghostify eff else eff; }
     | PPlapp (ls,ppl) ->
-        let ity = ity_of_ty (Util.def_option ty_bool ls.ls_value) in
+        let ity = ity_of_ty_opt ls.ls_value in
         let sbs = ity_match ity_subst_empty ity vtv.vtv_ity in
         let mtch arg pp =
           let ity = ity_full_inst sbs (ity_of_ty arg) in
@@ -495,8 +497,7 @@ let on_value fn e = match e.e_node with
       let ld = create_let_defn (id_fresh "o") e in
       let pv = match ld.let_var with
         | LetA _ -> raise (ValueExpected e)
-        | LetV pv -> pv
-      in
+        | LetV pv -> pv in
       e_let ld (fn pv)
 
 (* We adopt right-to-left evaluation order so that expression
@@ -518,6 +519,10 @@ let on_value fn e = match e.e_node with
    the region introduced (reset) by create_ref. Is it bad? *)
 
 let e_app = List.fold_left (fun e -> on_value (e_app_real e))
+
+let vtv_of_expr e = match e.e_vty with
+  | VTvalue vtv -> vtv
+  | VTarrow _ -> raise (ValueExpected e)
 
 let e_plapp pls el ity =
   let rec app tl vars ghost eff sbs vtvl argl =
@@ -544,10 +549,8 @@ let e_plapp pls el ity =
       | vtv::vtvl, ({ e_node = Elogic t } as e)::argl ->
           let t = match t.t_ty with
             | Some _ -> t
-            | None -> t_if t t_bool_true t_bool_false in
-          let evtv = match e.e_vty with
-            | VTvalue vtv -> vtv
-            | VTarrow _   -> assert false in
+            | None -> t_if_simp t t_bool_true t_bool_false in
+          let evtv = vtv_of_expr e in
           let ghost = ghost || (evtv.vtv_ghost && not vtv.vtv_ghost) in
           let eff = eff_union eff e.e_effect in
           let sbs = ity_match sbs vtv.vtv_ity evtv.vtv_ity in
@@ -569,14 +572,10 @@ let e_lapp ls el ity =
   let pls = {
     pl_ls     = ls;
     pl_args   = List.map (fun ty -> vty_value (ity_of_ty ty)) ls.ls_args;
-    pl_value  = vty_value (ity_of_ty (Util.def_option ty_bool ls.ls_value));
+    pl_value  = vty_value (ity_of_ty_opt ls.ls_value);
     pl_effect = eff_empty; }
   in
   e_plapp pls el ity
-
-let vtv_of_expr e = match e.e_vty with
-  | VTvalue vtv -> vtv
-  | VTarrow _ -> raise (ValueExpected e)
 
 let e_if_real pv e1 e2 =
   let vtv1 = vtv_of_expr e1 in
@@ -674,6 +673,57 @@ let e_any ee ity =
   let vars = List.fold_right add_e_vars ee.aeff_reads vars in
   let vars = List.fold_right add_e_vars ee.aeff_writes vars in
   mk_expr (Eany ee) (VTvalue (vty_value ity)) eff vars
+
+let e_const t =
+  let vtv = vty_value (ity_of_ty_opt t.t_ty) in
+  mk_expr (Elogic t) (VTvalue vtv) eff_empty Mid.empty
+
+let e_int_const s = e_const (t_int_const s)
+let e_real_const rc = e_const (t_real_const rc)
+let e_const c = e_const (t_const c)
+
+(* FIXME? Should we rather use boolean constants here? *)
+let e_true =
+  mk_expr (Elogic t_true) (VTvalue (vty_value ity_bool)) eff_empty Mid.empty
+
+let e_false =
+  mk_expr (Elogic t_false) (VTvalue (vty_value ity_bool)) eff_empty Mid.empty
+
+let on_fmla fn e = match e.e_node with
+  | Elogic ({ t_ty = None } as f) -> fn e f
+  | Elogic t -> fn e (t_equ_simp t t_bool_true)
+  | Evalue pv -> fn e (t_equ_simp (t_var pv.pv_vs) t_bool_true)
+  | _ ->
+      let ld = create_let_defn (id_fresh "o") e in
+      let pv = match ld.let_var with
+        | LetA _ -> raise (ValueExpected e)
+        | LetV pv -> pv in
+      e_let ld (fn (e_value pv) (t_equ_simp (t_var pv.pv_vs) t_bool_true))
+
+let e_not e =
+  on_fmla (fun e f ->
+    let vtv = vtv_of_expr e in
+    ity_equal_check vtv.vtv_ity ity_bool;
+    let vty = VTvalue (vty_value ~ghost:vtv.vtv_ghost ity_bool) in
+    mk_expr (Elogic (t_not f)) vty e.e_effect e.e_vars) e
+
+let e_binop op e1 e2 =
+  on_fmla (fun e2 f2 -> on_fmla (fun e1 f1 ->
+    let vtv1 = vtv_of_expr e1 in
+    let vtv2 = vtv_of_expr e2 in
+    ity_equal_check vtv1.vtv_ity ity_bool;
+    ity_equal_check vtv2.vtv_ity ity_bool;
+    let vars = add_e_vars e1 e2.e_vars in
+    let eff = eff_union e1.e_effect e2.e_effect in
+    let ghost = vtv1.vtv_ghost || vtv2.vtv_ghost in
+    let vty = VTvalue (vty_value ~ghost ity_bool) in
+    mk_expr (Elogic (t_binary op f1 f2)) vty eff vars) e1) e2
+
+let e_lazy_and e1 e2 =
+  if eff_is_empty e2.e_effect then e_binop Tand e1 e2 else e_if e1 e2 e_false
+
+let e_lazy_or e1 e2 =
+  if eff_is_empty e2.e_effect then e_binop Tor e1 e2 else e_if e1 e_true e2
 
 (* Compute the fixpoint on recursive definitions *)
 

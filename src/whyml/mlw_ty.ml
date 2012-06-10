@@ -496,6 +496,15 @@ let eff_empty = {
   eff_resets = Mreg.empty;
 }
 
+let eff_is_empty e =
+  Sreg.is_empty e.eff_reads &&
+  Sreg.is_empty e.eff_writes &&
+  Sexn.is_empty e.eff_raises &&
+  Sreg.is_empty e.eff_ghostr &&
+  Sreg.is_empty e.eff_ghostw &&
+  Sexn.is_empty e.eff_ghostx &&
+  Mreg.is_empty e.eff_resets
+
 let join_reset _key v1 v2 =
   Some (if option_eq reg_equal v1 v2 then v1 else None)
 

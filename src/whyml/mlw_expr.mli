@@ -213,10 +213,16 @@ val e_case : expr -> (ppattern * expr) list -> expr
 exception Immutable of expr
 
 val e_assign : expr -> expr -> expr
-
 val e_ghost : expr -> expr
-
 val e_any : any_effect -> ity -> expr
+
+val e_const : constant -> expr
+val e_int_const : string -> expr
+val e_real_const : real_constant -> expr
+
+val e_lazy_and : expr -> expr -> expr
+val e_lazy_or : expr -> expr -> expr
+val e_not : expr -> expr
 
 (* TODO: when should we check for escaping identifiers (regions?)
    in pre/post/xpost/effects? Here or in WP? *)

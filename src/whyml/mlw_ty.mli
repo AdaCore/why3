@@ -212,6 +212,8 @@ val eff_full_inst : ity_subst -> effect -> effect
 
 val eff_filter : varset -> effect -> effect
 
+val eff_is_empty : effect -> bool
+
 (** program types *)
 
 (* type of function arguments and values *)
