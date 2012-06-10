@@ -189,6 +189,8 @@ val e_cast : psymbol -> vty -> expr
 exception ValueExpected of expr
 exception ArrowExpected of expr
 
+val vtv_of_expr : expr -> vty_value
+
 exception GhostWrite of expr * region
 exception GhostRaise of expr * xsymbol
 (* a ghost expression writes in a non-ghost region or raises an exception *)

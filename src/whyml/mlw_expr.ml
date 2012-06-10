@@ -102,6 +102,10 @@ let ppat_var pv =
     ppat_vtv     = pv.pv_vtv;
     ppat_effect  = eff_empty; }
 
+let ppat_is_wild pp = match pp.ppat_pattern.pat_node with
+  | Pwild -> true
+  | _ -> false
+
 let ppat_plapp pls ppl vtv =
   if vtv.vtv_mut <> None then
     Loc.errorm "Only variable patterns can be mutable";
@@ -117,14 +121,17 @@ let ppat_plapp pls ppl vtv =
     let ghost = pp.ppat_vtv.vtv_ghost in
     if ghost <> (vtv.vtv_ghost || arg.vtv_ghost) then
       Loc.errorm "Ghost pattern in a non-ghost context";
+    let effect = eff_union eff pp.ppat_effect in
     match arg.vtv_mut, pp.ppat_vtv.vtv_mut with
+    | _ when ppat_is_wild pp ->
+        effect
     | Some r1, Some r2 ->
         ignore (reg_match sbs r1 r2);
-        eff_read ~ghost (eff_union eff pp.ppat_effect) (reg_full_inst sbs r1)
+        eff_read ~ghost effect (reg_full_inst sbs r1)
     | Some r1, None ->
-        eff_read ~ghost (eff_union eff pp.ppat_effect) (reg_full_inst sbs r1)
+        eff_read ~ghost effect (reg_full_inst sbs r1)
     | None, None ->
-        eff_union eff pp.ppat_effect
+        effect
     | None, Some _ ->
         Loc.errorm "Mutable pattern in a non-mutable position"
   in
@@ -218,6 +225,7 @@ let make_ppattern pp vtv =
           let ghost = vtv.vtv_ghost || arg.vtv_ghost in
           let mut = Util.option_map (reg_full_inst sbs) arg.vtv_mut in
           let pp = make (vty_value ~ghost ?mut ity) pp in
+          if ppat_is_wild pp then pp.ppat_effect, pp else
           Util.option_fold (eff_read ~ghost) pp.ppat_effect mut, pp
         in
         let ppl = try List.map2 mtch pls.pl_args ppl with Invalid_argument _ ->

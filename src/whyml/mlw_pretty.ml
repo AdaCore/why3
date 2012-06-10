@@ -241,20 +241,17 @@ and print_enode pri fmt e = match e.e_node with
   | Eassign (pv1,r,pv2) ->
       fprintf fmt (protect_on (pri > 0) "%a <%a> <- %a")
         print_pv pv1 print_regty r print_pv pv2
-(*
-  | Tcase (v,bl) ->
+  | Ecase (pv,bl) ->
       fprintf fmt "match %a with@\n@[<hov>%a@]@\nend"
-        print_expr v (print_list newline print_branch) bl
-*)
+        print_pv pv (print_list newline print_branch) bl
   | _ ->
       fprintf fmt "<expr TODO>"
 
-(*
-and print_tbranch fmt br =
-  let p,t = t_open_branch br in
-  fprintf fmt "@[<hov 4>| %a ->@ %a@]" print_pat p print_term t;
+and print_branch fmt ({ ppat_pattern = p }, e) =
+  fprintf fmt "@[<hov 4>| %a ->@ %a@]" print_pat p print_expr e;
   Svs.iter forget_var p.pat_vars
 
+(*
 and print_tl fmt tl =
   if tl = [] then () else fprintf fmt "@ [%a]"
     (print_list alt (print_list comma print_term)) tl

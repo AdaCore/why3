@@ -23,15 +23,14 @@ module N
 
   type ref 'b = {| ghost mutable contents : 'b |}
 
-  type myrec 'a = {| f1 : int ; f2 : tree 'a |}
+  type myrec 'a = {| f1 : int ; ghost f2 : tree 'a |}
 
   let h x =
     let bang y = y.contents in
-    let z = bang x + zero in
-    let u = {| f1 = z; f2 = Node x Nil |} in
-    let r = {| contents = {| u with f2 = Node one Nil |} |} in
-    x.contents <- one;
-    zero
+    match x with
+    | {| f2 = Node x _ |} -> Node x Nil
+    | _ -> Leaf
+    end
 end
 
 (*

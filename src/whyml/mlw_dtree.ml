@@ -102,7 +102,7 @@ and dexpr_desc =
   | DEloop of dloop_annotation * dexpr
   | DElazy of lazy_op * dexpr * dexpr
   | DEnot of dexpr
-  | DEmatch of dexpr * (Denv.dpattern * dexpr) list
+  | DEmatch of dexpr * (pre_ppattern * dexpr) list
   | DEabsurd
   | DEraise of xsymbol * dexpr option
   | DEtry of dexpr * (xsymbol * string option * dexpr) list
