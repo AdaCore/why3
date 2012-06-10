@@ -326,6 +326,10 @@ let print_rec_decl fst fmt rd =
   print_rec fst fmt rd;
   forget_tvs_regs ()
 
+let print_exn_decl fmt xs =
+  fprintf fmt "@[<hov 2>exception %a of@ %a@]"
+    print_xs xs print_ity xs.xs_ity
+
 (* Declarations *)
 
 let print_pdecl fmt d = match d.pd_node with
@@ -333,6 +337,7 @@ let print_pdecl fmt d = match d.pd_node with
   | PDdata tl -> print_list_next newline print_data_decl fmt tl
   | PDlet  ld -> print_let_decl fmt ld
   | PDrec rdl -> print_list_next newline print_rec_decl fmt rdl
+  | PDexn  xs -> print_exn_decl fmt xs
 
 let print_next_data_decl = print_data_decl false
 let print_data_decl      = print_data_decl true

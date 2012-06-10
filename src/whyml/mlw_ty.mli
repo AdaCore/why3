@@ -178,6 +178,8 @@ type xsymbol = private {
   xs_ity  : ity; (* closed and pure *)
 }
 
+val xs_equal : xsymbol -> xsymbol -> bool
+
 val create_xsymbol : preid -> ity -> xsymbol
 
 module Mexn: Map.S with type key = xsymbol

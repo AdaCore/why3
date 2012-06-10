@@ -460,6 +460,8 @@ type xsymbol = {
 exception PolymorphicException of ident * ity
 exception MutableException of ident * ity
 
+let xs_equal : xsymbol -> xsymbol -> bool = (==)
+
 let create_xsymbol id ity =
   let id = id_register id in
   if not (ity_closed ity) then raise (PolymorphicException (id, ity));

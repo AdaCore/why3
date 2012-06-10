@@ -34,6 +34,7 @@ type prgsymbol =
   | PV of pvsymbol
   | PS of psymbol
   | PL of plsymbol
+  | PX of xsymbol
 
 type namespace = private {
   ns_it : itysymbol Mstr.t;  (* type symbols *)
@@ -75,6 +76,7 @@ val get_known : module_uc -> known_map
 val use_export : module_uc -> modul -> module_uc
 
 (** Clone *)
+
 val clone_export : module_uc -> modul -> th_inst -> module_uc
 
 (** Logic decls *)

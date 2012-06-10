@@ -46,6 +46,7 @@ type prgsymbol =
   | PV of pvsymbol
   | PS of psymbol
   | PL of plsymbol
+  | PX of xsymbol
 
 type namespace = {
   ns_it : itysymbol Mstr.t;  (* type symbols *)
@@ -71,6 +72,7 @@ let prg_equal p1 p2 = match p1,p2 with
   | PV p1, PV p2 -> pv_equal p1 p2
   | PS p1, PS p2 -> ps_equal p1 p2
   | PL p1, PL p2 -> pl_equal p1 p2
+  | PX p1, PX p2 -> xs_equal p1 p2
   | _, _ -> false
 
 let rec merge_ns chk ns1 ns2 =
@@ -242,6 +244,9 @@ let add_let uc = function
 let add_rec uc { rec_ps = ps } =
   add_symbol add_ps ps.ps_name (PS ps) uc
 
+let add_exn uc xs =
+  add_symbol add_ps xs.xs_name (PX xs) uc
+
 let add_pdecl uc d =
   let uc =  { uc with
     muc_decls = d :: uc.muc_decls;
@@ -263,6 +268,8 @@ let add_pdecl uc d =
       add_let uc ld.let_var
   | PDrec rdl ->
       List.fold_left add_rec uc rdl
+  | PDexn xs ->
+      add_exn uc xs
 
 let add_pdecl_with_tuples uc d =
   let ids = Mid.set_diff d.pd_syms uc.muc_known in

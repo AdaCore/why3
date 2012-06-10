@@ -44,6 +44,7 @@ and pdecl_node =
   | PDdata of data_decl list
   | PDlet  of let_defn
   | PDrec  of rec_defn list
+  | PDexn  of xsymbol
 
 let pd_equal : pdecl -> pdecl -> bool = (==)
 
@@ -146,6 +147,11 @@ let create_rec_decl rdl =
   let syms = List.fold_left add_rd Sid.empty rdl in
   mk_decl (PDrec rdl) syms news
 
+let create_exn_decl xs =
+  let news = Sid.singleton xs.xs_name in
+  let syms = Sid.empty (* FIXME!!! *) in
+  mk_decl (PDexn xs) syms news
+
 (** {2 Known identifiers} *)
 
 type known_map = pdecl Mid.t
@@ -179,4 +185,4 @@ let find_constructors kn its =
   match (Mid.find its.its_pure.ts_name kn).pd_node with
   | PDtype _ -> []
   | PDdata dl -> List.assq its dl
-  | PDlet _ | PDrec _ -> assert false
+  | PDlet _ | PDrec _ | PDexn _ -> assert false

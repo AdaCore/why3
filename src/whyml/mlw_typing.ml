@@ -32,6 +32,7 @@ open Mlw_ty
 open Mlw_ty.T
 open Mlw_expr
 open Mlw_decl
+open Mlw_pretty
 open Mlw_module
 open Mlw_dty
 
@@ -96,11 +97,12 @@ type denv = {
   denv   : Typing.denv; (* for user type variables only *)
 }
 
-let create_denv uc =
-  { uc = uc;
-    locals = Mstr.empty;
-    tvars = empty_tvars;
-    denv = Typing.create_denv (); }
+let create_denv uc = {
+  uc     = uc;
+  locals = Mstr.empty;
+  tvars  = empty_tvars;
+  denv   = Typing.create_denv ();
+}
 
 (** Typing type expressions *)
 
@@ -170,7 +172,7 @@ let find_field ~loc uc (p,e) =
   let x = Typing.string_list_of_qualid [] p in
   try match ns_find_ps (get_namespace uc) x with
     | PL pl -> (pl,e)
-    | PV _ | PS _ -> errorm ~loc "bad record field %a" Typing.print_qualid p
+    | _ -> errorm ~loc "bad record field %a" Typing.print_qualid p
   with Not_found -> errorm ~loc "unbound symbol %a" Typing.print_qualid p
 
 let find_pure_field ~loc uc (p,e) =
@@ -215,7 +217,6 @@ let mk_let ~loc ~userloc e (desc,dity) =
   DElet ({ id = "q"; id_lab = []; id_loc = loc }, e, e1), dity
 
 (* patterns *)
-let id_user x = id_user x.id x.id_loc
 
 let add_var id dity denv =
   let tvars = add_tvars denv.tvars dity in
@@ -228,6 +229,7 @@ let specialize_qualid ~loc uc p =
     | PV pv -> DEglobal_pv pv, specialize_pvsymbol pv
     | PS ps -> DEglobal_ps ps, specialize_psymbol  ps
     | PL pl -> DEglobal_pl pl, specialize_plsymbol pl
+    | PX xs -> errorm ~loc "unexpected exception symbol %a" print_xs xs
   with Not_found -> try
     let ls = ns_find_ls (Theory.get_namespace (get_theory uc)) x in
     DEglobal_ls ls, specialize_lsymbol ls
@@ -242,7 +244,7 @@ let rec dpattern denv ({ pat_loc = loc } as pp) = match pp.pat_desc with
       PPwild, create_type_variable (), denv
   | Ptree.PPpvar id ->
       let dity = create_type_variable () in
-      PPvar (id_user id), dity, add_var id dity denv
+      PPvar (Denv.create_user_id id), dity, add_var id dity denv
   | Ptree.PPpapp (q,ppl) ->
       let sym, dity = specialize_qualid ~loc denv.uc q in
       dpat_app denv (mk_dexpr sym dity loc []) ppl
@@ -269,7 +271,7 @@ let rec dpattern denv ({ pat_loc = loc } as pp) = match pp.pat_desc with
       PPor (pp1, pp2), dity1, denv
   | Ptree.PPpas (pp, id) ->
       let pp, dity, denv = dpattern denv pp in
-      PPas (pp, id_user id), dity, add_var id dity denv
+      PPas (pp, Denv.create_user_id id), dity, add_var id dity denv
 
 and dpat_app denv ({ dexpr_loc = loc } as de) ppl =
   let add_pp pp (ppl, tyl, denv) =
@@ -278,10 +280,8 @@ and dpat_app denv ({ dexpr_loc = loc } as de) ppl =
   let pp = match de.dexpr_desc with
     | DEglobal_pl pl -> Mlw_expr.PPpapp (pl, ppl)
     | DEglobal_ls ls -> PPlapp (ls, ppl)
-    | DEglobal_pv pv ->
-        errorm ~loc "%a is not a constructor" Mlw_pretty.print_pv pv
-    | DEglobal_ps ps ->
-        errorm ~loc "%a is not a constructor" Mlw_pretty.print_ps ps
+    | DEglobal_pv pv -> errorm ~loc "%a is not a constructor" print_pv pv
+    | DEglobal_ps ps -> errorm ~loc "%a is not a constructor" print_ps ps
     | _ -> assert false
   in
   let res = create_type_variable () in
@@ -494,7 +494,7 @@ let rec expr locals de = match de.dexpr_desc with
       e_rec [def] e2
   | DElet (x, de1, de2) ->
       let e1 = expr locals de1 in
-      let def1 = create_let_defn (id_user x) e1 in
+      let def1 = create_let_defn (Denv.create_user_id x) e1 in
       let locals = Mstr.add x.id def1.let_var locals in
       let e2 = expr locals de2 in
       e_let def1 e2
@@ -548,7 +548,7 @@ and expr_rec locals rdl =
     let vta = match vty_of_dity dity with
       | VTarrow vta -> vta
       | VTvalue _ -> assert false in
-    let ps = create_psymbol (id_user id) vta vars_empty in
+    let ps = create_psymbol (Denv.create_user_id id) vta vars_empty in
     Mstr.add id.id (LetA ps) locals, (ps, bl, var, tr)
   in
   let locals, rdl = Util.map_fold_left step1 locals rdl in
@@ -557,12 +557,12 @@ and expr_rec locals rdl =
 
 and expr_fun locals x bl tr =
   let lam = expr_lam locals bl [] tr in
-  create_fun_defn (id_user x) lam
+  create_fun_defn (Denv.create_user_id x) lam
 
 and expr_lam locals bl _var (_, e, _) =
   let binder (id, ghost, dity) =
     let vtv = vty_value ~ghost (ity_of_dity dity) in
-    create_pvsymbol (id_user id) vtv in
+    create_pvsymbol (Denv.create_user_id id) vtv in
   let pvl = List.map binder bl in
   let add_binder pv = Mstr.add pv.pv_vs.vs_name.id_string (LetV pv) in
   let locals = List.fold_right add_binder pvl locals in
@@ -1047,7 +1047,7 @@ let add_module lib path mm mt m =
               create_rec_decl [def]
           | _ ->
               let e = expr Mstr.empty e in
-              let def = create_let_defn (id_user id) e in
+              let def = create_let_defn (Denv.create_user_id id) e in
               create_let_decl def
         in
         Loc.try2 loc add_pdecl_with_tuples uc pd
@@ -1056,9 +1056,15 @@ let add_module lib path mm mt m =
         let rdl = expr_rec Mstr.empty rdl in
         let pd = create_rec_decl rdl in
         Loc.try2 loc add_pdecl_with_tuples uc pd
-    | Dparam _ | Dexn _ ->
-        assert false (* TODO *)
-    | Duse _ ->
+    | Dexn (id, pty) ->
+        let ity = match pty with
+          | Some pty ->
+              ity_of_dity (dity_of_pty ~user:false (create_denv uc) pty)
+          | None -> ity_unit in
+        let xs = create_xsymbol (Denv.create_user_id id) ity in
+        let pd = create_exn_decl xs in
+        Loc.try2 loc add_pdecl_with_tuples uc pd
+    | Dparam _ | Duse _ ->
         assert false (*TO BE REMOVED EVENTUALLY *)
   in
   let uc = List.fold_left add_decl uc m.mod_decl in
