@@ -51,22 +51,22 @@ type dpost_fmla = Ptree.lexpr
 type dexn_post_fmla = Ptree.lexpr
 type dpost = dpost_fmla * (Term.lsymbol * dexn_post_fmla) list
 
-type dueffect = {
-  du_reads  : Ptree.lexpr list;
-  du_writes : Ptree.lexpr list;
-  du_raises : xsymbol list;
+type deffect = {
+  deff_reads  : Ptree.lexpr list;
+  deff_writes : Ptree.lexpr list;
+  deff_raises : xsymbol list;
 }
 
-type dubinder = ident * ghost * dity
+type dbinder = ident * ghost * dity
 
 (**
 type dutype_v =
   | DUTpure  of Denv.dty
-  | DUTarrow of dubinder list * dutype_c
+  | DUTarrow of dbinder list * dutype_c
 
 and dutype_c =
   { duc_result_type : dutype_v;
-    duc_effect      : dueffect;
+    duc_effect      : deffect;
     duc_pre         : Ptree.lexpr;
     duc_post        : Ptree.lexpr * (Term.lsymbol * Ptree.lexpr) list; }
 **)
@@ -75,7 +75,7 @@ type dvariant = Ptree.lexpr * Term.lsymbol option
 
 type dloop_annotation = {
   dloop_invariant : Ptree.lexpr option;
-  dloop_variant   : dvariant option;
+  dloop_variant   : dvariant list;
 }
 
 type dexpr = {
@@ -93,7 +93,7 @@ and dexpr_desc =
   | DEglobal_pl of plsymbol
   | DEglobal_ls of Term.lsymbol
   | DEapply of dexpr * dexpr list
-  | DEfun of dubinder list * dtriple
+  | DEfun of dbinder list * dtriple
   | DElet of ident * dexpr * dexpr
   | DEletrec of drecfun list * dexpr
   | DEassign of dexpr * dexpr
@@ -111,6 +111,6 @@ and dexpr_desc =
   | DEmark of string * dexpr
   (* | DEany of dutype_c *)
 
-and drecfun = (ident * Denv.dty) * dubinder list * dvariant option * dtriple
+and drecfun = ident * dity * dbinder list * dvariant list * dtriple
 
 and dtriple = dpre * dexpr * dpost

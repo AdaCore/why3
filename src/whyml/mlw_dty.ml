@@ -208,6 +208,8 @@ let ts_arrow =
   Ty.create_tysymbol (Ident.id_fresh "arrow") v None
 
 let rec vty_of_dity = function
+  | Dvar { contents = Dval d } ->
+      vty_of_dity d
   | Dts (ts, [d1; d2]) when ts_equal ts ts_arrow ->
       VTarrow (vty_arrow (vty_value (ity_of_dity d1)) (vty_of_dity d2))
   | dity ->

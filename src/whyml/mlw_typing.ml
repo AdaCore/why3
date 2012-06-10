@@ -327,16 +327,12 @@ and dexpr_desc ~userloc denv loc = function
       let denv = { denv with locals = locals; tvars = tvars } in
       let e2 = dexpr ~userloc denv e2 in
       DElet (id, e1, e2), e2.dexpr_type
+  | Ptree.Eletrec (rdl, e1) ->
+      let denv, dl = dletrec ~userloc denv rdl in
+      let e1 = dexpr ~userloc denv e1 in
+      DEletrec (dl, e1), e1.dexpr_type
   | Ptree.Efun (bl, tr) ->
-      let dbinder denv (id, pty) =
-        let dity = match pty with
-          | Some pty -> dity_of_pty ~user:false denv pty
-          | None -> create_type_variable () in
-        add_var id dity denv, (id, false, dity) in
-      let denv, bl = Util.map_fold_left dbinder denv bl in
-      let _,e,_ as tr = dtriple ~userloc denv tr in
-      let dity =
-        make_arrow_type (List.map (fun (_,_,d) -> d) bl) e.dexpr_type in
+      let bl, _, tr, dity = dlambda ~userloc denv bl None tr in
       DEfun (bl, tr), dity
   | Ptree.Ecast (e1, pty) ->
       let e1 = dexpr ~userloc denv e1 in
@@ -431,8 +427,6 @@ and dexpr_desc ~userloc denv loc = function
         expected_type e res;
         ppat, e in
       DEmatch (e1, List.map branch bl), res
-  | Ptree.Eletrec (_rdl, _e1) ->
-      assert false (*TODO*)
   | Ptree.Eloop (_ann, _e1) ->
       assert false (*TODO*)
   | Ptree.Eabsurd ->
@@ -452,10 +446,31 @@ and dexpr_desc ~userloc denv loc = function
   | Ptree.Eabstract (_e1, _post) ->
       assert false (*TODO*)
 
-and dtriple ~userloc denv (p, e, q) =
+and dletrec ~userloc denv rdl =
+  (* add all functions into environment *)
+  let add_one denv (id, bl, var, tr) =
+    let res = create_type_variable () in
+    let locals = Mstr.add id.id (denv.tvars, res) denv.locals in
+    { denv with locals = locals }, (id, res, bl, var, tr) in
+  let denv, rdl = Util.map_fold_left add_one denv rdl in
+  (* then type-check all of them and unify *)
+  let type_one (id, res, bl, var, tr) =
+    let bl, var, tr, dity = dlambda ~userloc denv bl var tr in
+    Loc.try2 id.id_loc unify dity res;
+    id, dity, bl, var, tr in
+  denv, List.map type_one rdl
+
+and dlambda ~userloc denv bl _var (p, e, q) =
+  let dbinder denv (id, pty) =
+    let dity = match pty with
+      | Some pty -> dity_of_pty ~user:false denv pty
+      | None -> create_type_variable () in
+    add_var id dity denv, (id, false, dity) in
+  let denv, bl = Util.map_fold_left dbinder denv bl in
+  let tyl = List.map (fun (_,_,d) -> d) bl in
   let e = dexpr ~userloc denv e in
   let q = dpost denv q in
-  p, e, q
+  bl, [], (p, e, q), make_arrow_type tyl e.dexpr_type
 
 and dpost _denv (q, _ql) =
   q, [] (* TODO *)
@@ -483,6 +498,11 @@ let rec expr locals de = match de.dexpr_desc with
       let locals = Mstr.add x.id def1.let_var locals in
       let e2 = expr locals de2 in
       e_let def1 e2
+  | DEletrec (rdl, de1) ->
+      let rdl = expr_rec locals rdl in
+      let add_rd { rec_ps = ps } = Mstr.add ps.ps_name.id_string (LetA ps) in
+      let e1 = expr (List.fold_right add_rd rdl locals) de1 in
+      e_rec rdl e1
   | DEapply (de1, del) ->
       let el = List.map (expr locals) del in
       begin match de1.dexpr_desc with
@@ -523,27 +543,41 @@ let rec expr locals de = match de.dexpr_desc with
   | _ ->
       assert false (*TODO*)
 
-and expr_fun locals x bl (_, e1, _) =
+and expr_rec locals rdl =
+  let step1 locals (id, dity, bl, var, tr) =
+    let vta = match vty_of_dity dity with
+      | VTarrow vta -> vta
+      | VTvalue _ -> assert false in
+    let ps = create_psymbol (id_user id) vta vars_empty in
+    Mstr.add id.id (LetA ps) locals, (ps, bl, var, tr)
+  in
+  let locals, rdl = Util.map_fold_left step1 locals rdl in
+  let step2 (ps, bl, var, tr) = ps, expr_lam locals bl var tr in
+  create_rec_defn (List.map step2 rdl)
+
+and expr_fun locals x bl tr =
+  let lam = expr_lam locals bl [] tr in
+  create_fun_defn (id_user x) lam
+
+and expr_lam locals bl _var (_, e, _) =
   let binder (id, ghost, dity) =
     let vtv = vty_value ~ghost (ity_of_dity dity) in
     create_pvsymbol (id_user id) vtv in
   let pvl = List.map binder bl in
   let add_binder pv = Mstr.add pv.pv_vs.vs_name.id_string (LetV pv) in
-  let locals' = List.fold_right add_binder pvl locals in
-  let e1 = expr locals' e1 in
-  let ty1 = match e1.e_vty with
+  let locals = List.fold_right add_binder pvl locals in
+  let e = expr locals e in
+  let ty = match e.e_vty with
     | VTarrow _ -> ty_tuple []
     | VTvalue vtv -> ty_of_ity vtv.vtv_ity in
-  let res1 = create_vsymbol (id_fresh "result") ty1 in
-  let lam = {
-    l_args = pvl;
-    l_variant = [];
+  let res = create_vsymbol (id_fresh "result") ty in
+  { l_args = pvl;
+    l_variant = [];                   (* TODO *)
     l_pre = t_true;                   (* TODO *)
-    l_expr = e1;
-    l_post = create_post res1 t_true; (* TODO *)
+    l_expr = e;
+    l_post = create_post res t_true;  (* TODO *)
     l_xpost = Mexn.empty;             (* TODO *)
-  } in
-  create_fun_defn (id_user x) lam
+  }
 
 (** Type declaration *)
 
@@ -1017,7 +1051,12 @@ let add_module lib path mm mt m =
               create_let_decl def
         in
         Loc.try2 loc add_pdecl_with_tuples uc pd
-    | Dletrec _ | Dparam _ | Dexn _ ->
+    | Dletrec rdl ->
+        let _, rdl = dletrec ~userloc:None (create_denv uc) rdl in
+        let rdl = expr_rec Mstr.empty rdl in
+        let pd = create_rec_decl rdl in
+        Loc.try2 loc add_pdecl_with_tuples uc pd
+    | Dparam _ | Dexn _ ->
         assert false (* TODO *)
     | Duse _ ->
         assert false (*TO BE REMOVED EVENTUALLY *)
