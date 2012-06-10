@@ -235,6 +235,13 @@ let add_data uc (its,csl) =
   let uc = add_symbol add_it its.its_pure.ts_name its uc in
   List.fold_left add_constr uc csl
 
+let add_let uc = function
+  | LetV pv -> add_symbol add_ps pv.pv_vs.vs_name (PV pv) uc
+  | LetA ps -> add_symbol add_ps ps.ps_name (PS ps) uc
+
+let add_rec uc { rec_ps = ps } =
+  add_symbol add_ps ps.ps_name (PS ps) uc
+
 let add_pdecl uc d =
   let uc =  { uc with
     muc_decls = d :: uc.muc_decls;
@@ -252,6 +259,10 @@ let add_pdecl uc d =
       let defn cl = List.map constructor cl in
       let dl = List.map (fun (its,cl) -> its.its_pure, defn cl) dl in
       add_to_theory Theory.add_data_decl uc dl
+  | PDlet ld ->
+      add_let uc ld.let_var
+  | PDrec rdl ->
+      List.fold_left add_rec uc rdl
 
 let add_pdecl_with_tuples uc d =
   let ids = Mid.set_diff d.pd_syms uc.muc_known in

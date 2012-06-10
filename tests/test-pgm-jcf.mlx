@@ -25,12 +25,9 @@ module N
 
   type myrec 'a = {| f1 : int ; ghost f2 : tree 'a |}
 
-  let h x =
-    let bang y = y.contents in
-    match x with
-    | {| f2 = Node x _ |} -> Node x Nil
-    | _ -> Leaf
-    end
+  let bang y = y.contents
+
+  let h () = bang
 end
 
 (*

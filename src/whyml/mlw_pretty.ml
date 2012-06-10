@@ -160,6 +160,12 @@ let print_ppat fmt ppat = print_pat fmt ppat.ppat_pattern
 
 (* expressions *)
 
+let print_list_next sep print fmt = function
+  | [] -> ()
+  | [x] -> print true fmt x
+  | x :: r -> print true fmt x; sep fmt ();
+      print_list sep (print false) fmt r
+
 let rec print_expr fmt e = print_lexpr 0 fmt e
 
 and print_lexpr pri fmt e =
@@ -219,21 +225,9 @@ and print_enode pri fmt e = match e.e_node with
         print_lv lv (print_lexpr 4) e1 print_expr e2;
       forget_lv lv
   | Erec (rdl,e) ->
-      let print_and fmt () = fprintf fmt "@\nand@\n" in
-      let print_post fmt post =
-        let vs,f = open_post post in
-        fprintf fmt "%a ->@ %a" print_vs vs print_term f in
-      let print_rd fmt { rec_ps = ps ; rec_lambda = lam } =
-        fprintf fmt "(%a) %a =@ { %a }@ %a@ { %a }"
-          print_psty ps
-          (print_list space print_pvty) lam.l_args
-          print_term lam.l_pre
-          print_expr lam.l_expr
-          print_post lam.l_post
-      in
+      fprintf fmt (protect_on (pri > 0) "%a@ in@ %a")
+        (print_list_next newline print_rec) rdl print_expr e;
       let forget_rd rd = forget_ps rd.rec_ps in
-      fprintf fmt (protect_on (pri > 0) "@[<hov 4>let rec %a@]@ in@ %a")
-        (print_list print_and print_rd) rdl print_expr e;
       List.iter forget_rd rdl
   | Eif (v,e1,e2) ->
       fprintf fmt (protect_on (pri > 0) "if %a then %a@ else %a")
@@ -250,6 +244,19 @@ and print_enode pri fmt e = match e.e_node with
 and print_branch fmt ({ ppat_pattern = p }, e) =
   fprintf fmt "@[<hov 4>| %a ->@ %a@]" print_pat p print_expr e;
   Svs.iter forget_var p.pat_vars
+
+and print_rec fst fmt { rec_ps = ps ; rec_lambda = lam } =
+  let print_post fmt post =
+    let vs,f = open_post post in
+    fprintf fmt "%a ->@ %a" print_vs vs print_term f in
+  let print_arg fmt pv = fprintf fmt "(%a)" print_pvty pv in
+  fprintf fmt "@[<hov 2>%s (%a) %a =@ { %a }@ %a@ { %a }@]"
+    (if fst then "let rec" else "with")
+    print_psty ps
+    (print_list space print_arg) lam.l_args
+    print_term lam.l_pre
+    print_expr lam.l_expr
+    print_post lam.l_post
 
 (*
 and print_tl fmt tl =
@@ -307,20 +314,31 @@ let print_data_decl fst fmt (ts,csl) =
     (print_head fst) ts (print_list newline print_constr) csl;
   forget_tvs_regs ()
 
-(* Declarations *)
+let print_let_decl fmt { let_var = lv ; let_expr = e } =
+  let print_lv fmt = function
+    | LetV pv -> print_pvty fmt pv
+    | LetA ps -> print_psty fmt ps in
+  fprintf fmt "@[<hov 2>let %a = @[%a@]@]" print_lv lv print_expr e;
+  (* FIXME: don't forget global regions *)
+  forget_tvs_regs ()
 
-let print_list_next sep print fmt = function
-  | [] -> ()
-  | [x] -> print true fmt x
-  | x :: r -> print true fmt x; sep fmt ();
-      print_list sep (print false) fmt r
+let print_rec_decl fst fmt rd =
+  print_rec fst fmt rd;
+  forget_tvs_regs ()
+
+(* Declarations *)
 
 let print_pdecl fmt d = match d.pd_node with
   | PDtype ts -> print_ty_decl fmt ts
   | PDdata tl -> print_list_next newline print_data_decl fmt tl
+  | PDlet  ld -> print_let_decl fmt ld
+  | PDrec rdl -> print_list_next newline print_rec_decl fmt rdl
 
-let print_next_data_decl  = print_data_decl false
-let print_data_decl       = print_data_decl true
+let print_next_data_decl = print_data_decl false
+let print_data_decl      = print_data_decl true
+
+let print_next_rec_decl  = print_rec_decl false
+let print_rec_decl       = print_rec_decl true
 
 let print_module fmt m =
   fprintf fmt "@[<hov 2>module %a%a@\n%a@]@\nend@."

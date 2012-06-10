@@ -1005,11 +1005,18 @@ let add_module lib path mm mt m =
         let uc = open_namespace uc in
         let uc = List.fold_left add_decl uc dl in
         Loc.try3 loc close_namespace uc import name
-    | Dlet (_id, e) ->
+    | Dlet (id, e) ->
         let e = dexpr ~userloc:None (create_denv uc) e in
-        let e = expr Mstr.empty e in
-        Format.eprintf "@[%a@]@." Mlw_pretty.print_expr e;
-        uc
+        let pd = match e.dexpr_desc with
+          | DEfun (bl, tr) ->
+              let def = expr_fun Mstr.empty id bl tr in
+              create_rec_decl [def]
+          | _ ->
+              let e = expr Mstr.empty e in
+              let def = create_let_defn (id_user id) e in
+              create_let_decl def
+        in
+        Loc.try2 loc add_pdecl_with_tuples uc pd
     | Dletrec _ | Dparam _ | Dexn _ ->
         assert false (* TODO *)
     | Duse _ ->
