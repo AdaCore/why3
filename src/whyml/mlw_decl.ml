@@ -42,6 +42,9 @@ type pdecl = {
 and pdecl_node =
   | PDtype of itysymbol
   | PDdata of data_decl list
+  | PDlet  of let_defn
+  | PDrec  of rec_defn list
+  | PDexn  of xsymbol
 
 let pd_equal : pdecl -> pdecl -> bool = (==)
 
@@ -121,6 +124,33 @@ let create_data_decl tdl =
   let tdl = List.map build_type tdl in
   mk_decl (PDdata tdl) !syms !news
 
+let create_let_decl ld =
+  let id = match ld.let_var with
+    | LetV pv -> pv.pv_vs.vs_name
+    | LetA ps -> ps.ps_name in
+  let news = Sid.singleton id in
+  (* FIXME!!! This is not a correct way of counting symbols,
+     since it ignores type symbols and exception symbols, and
+     lsymbols inside specifications. We should either extend
+     varmap keeping in Mlw_expr to track all those symbols
+     (associating them to empty varsets), or use per-symbol maps
+     and folds in Mlw_ty and Mlw_expr, like we do in Ty and Term. *)
+  let syms = Mid.map (fun _ -> ()) ld.let_expr.e_vars in
+  mk_decl (PDlet ld) syms news
+
+let create_rec_decl rdl =
+  if rdl = [] then raise Decl.EmptyDecl;
+  let add_rd s rd = news_id s rd.rec_ps.ps_name in
+  let news = List.fold_left add_rd Sid.empty rdl in
+  let add_rd s rd = Sid.union s (Mid.map (fun _ -> ()) rd.rec_vars) in
+  (* FIXME!!! See the comment in create_let_decl *)
+  let syms = List.fold_left add_rd Sid.empty rdl in
+  mk_decl (PDrec rdl) syms news
+
+let create_exn_decl xs =
+  let news = Sid.singleton xs.xs_name in
+  let syms = Sid.empty (* FIXME!!! *) in
+  mk_decl (PDexn xs) syms news
 
 (** {2 Known identifiers} *)
 
@@ -148,3 +178,11 @@ let known_add_decl lkn0 kn0 decl =
   let unk = Mid.set_diff unk lkn0 in
   if Sid.is_empty unk then kn
   else raise (UnknownIdent (Sid.choose unk))
+
+(* TODO: known_add_decl must check pattern matches for exhaustiveness *)
+
+let find_constructors kn its =
+  match (Mid.find its.its_pure.ts_name kn).pd_node with
+  | PDtype _ -> []
+  | PDdata dl -> List.assq its dl
+  | PDlet _ | PDrec _ | PDexn _ -> assert false

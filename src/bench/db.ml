@@ -477,6 +477,7 @@ let int64_from_status = function
   | Done (Call_provers.Failure _) -> 4L
   | Done Call_provers.Invalid     -> 5L
   | Done Call_provers.HighFailure -> 6L
+  | Done Call_provers.OutOfMemory -> 7L
 
 let status_array = [|
   Undone;
@@ -485,7 +486,9 @@ let status_array = [|
   Done (Call_provers.Unknown "");
   Done (Call_provers.Failure "");
   Done Call_provers.Invalid;
-  Done Call_provers.HighFailure; |]
+  Done Call_provers.HighFailure;
+  Done Call_provers.OutOfMemory;
+|]
 
 let status_from_int64 i =
   try

@@ -80,6 +80,7 @@ val dpat_list :
   theory_uc -> denv -> Denv.dty -> Ptree.pattern -> denv * Denv.dpattern
 
 val print_denv : Format.formatter -> denv -> unit
+val print_qualid: Format.formatter -> Ptree.qualid -> unit
 
 val split_qualid : Ptree.qualid -> string list * string
 val string_list_of_qualid : string list -> Ptree.qualid -> string list

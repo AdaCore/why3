@@ -186,18 +186,6 @@ and string_val = parse
   | [^ '"'] as c
       { Buffer.add_char buf c;
         string_val lexbuf }
-(*
-  | '\\' (['\\''\"'] as c)
-      { Buffer.add_char buf c;
-        string_val lexbuf }
-  | '\\' 'n'
-      { Buffer.add_char buf '\n';
-        string_val lexbuf }
-  | '\\' (_ as c)
-      { Buffer.add_char buf '\\';
-        Buffer.add_char buf c;
-        string_val lexbuf }
-*)
   | eof
       { parse_error "unterminated string" }
 

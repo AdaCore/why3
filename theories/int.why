@@ -93,7 +93,18 @@ theory EuclideanDivision
 
   lemma Div_inf: forall x y:int. 0 <= x < y -> div x y = 0
 
+  lemma Div_inf_neg: forall x y:int. 0 < x <= y -> div (-x) y = -1
+
   lemma Mod_0: forall y:int. y <> 0 -> mod 0 y = 0
+
+  lemma Div_1_left: forall y:int. y > 1 -> div 1 y = 0
+
+  lemma Div_minus1_left: forall y:int. y > 1 -> div (-1) y = -1
+
+  lemma Mod_1_left: forall y:int. y > 1 -> mod 1 y = 1
+
+  lemma Mod_minus1_left: forall y:int. y > 1 -> mod (-1) y = y - 1
+
 
 end
 

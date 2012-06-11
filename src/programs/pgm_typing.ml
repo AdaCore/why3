@@ -266,7 +266,7 @@ let rec dpurify_utype_v = function
   | DUTpure ty ->
       ty
   | DUTarrow (bl, c) ->
-      dcurrying (List.map (fun (_,ty,_) -> ty) bl)
+      dcurrying (List.map (fun (_,ty) -> ty) bl)
         (dpurify_utype_v c.duc_result_type)
 
 (* user indicates whether region type variables can be instantiated *)
@@ -307,12 +307,11 @@ and dutype_c env c =
   }
 
 and dubinder env ({id=x; id_loc=loc} as id, v) =
-  let v = match v with
-    | Some v -> dutype_v env v
-    | None -> DUTpure (create_type_var loc)
+  let ty = match v with
+    | Some v -> dtype ~user:true env v
+    | None -> create_type_var loc
   in
-  let ty = dpurify_utype_v v in
-  add_local env x ty, (id, ty, v)
+  add_local env x ty, (id, ty)
 
 let rec add_local_pat env p = match p.dp_node with
   | Denv.Pwild -> env
@@ -475,7 +474,7 @@ and dexpr_desc ~ghost ~userloc env loc = function
   | Ptree.Efun (bl, t) ->
       let env, bl = map_fold_left dubinder env bl in
       let (_,e,_) as t = dtriple ~ghost ~userloc env t in
-      let tyl = List.map (fun (_,ty,_) -> ty) bl in
+      let tyl = List.map (fun (_,ty) -> ty) bl in
       let ty = dcurrying tyl e.dexpr_type in
       DEfun (bl, t), ty
   | Ptree.Elet (x, e1, e2) ->
@@ -710,6 +709,10 @@ and dexpr_desc ~ghost ~userloc env loc = function
   | Ptree.Eany c ->
       let c = dutype_c env c in
       DEany c, dpurify_utype_v c.duc_result_type
+  | Ptree.Eabstract(e1,q) ->
+      let e1 = dexpr ~ghost ~userloc env e1 in
+      let q = dpost env.uc q in
+      DEabstract(e1, q), e1.dexpr_type
   | Ptree.Enamed _ ->
       assert false
 
@@ -726,7 +729,7 @@ and dletrec ~ghost ~userloc env dl =
     let env, bl = map_fold_left dubinder env bl in
     let v = option_map (dvariant env) v in
     let (_,e,_) as t = dtriple ~ghost ~userloc env t in
-    let tyl = List.map (fun (_,ty,_) -> ty) bl in
+    let tyl = List.map (fun (_,ty) -> ty) bl in
     let ty = dcurrying tyl e.dexpr_type in
     if not (Denv.unify ty tyres) then
       errorm ~loc:id.id_loc
@@ -1007,6 +1010,15 @@ let rec purify_itype_v  = function
         (List.map (fun (v,_) -> v.i_impure.vs_ty) bl)
         (purify_itype_v c.ic_result_type)
 
+let label_set_from_list loc labels =
+   List.fold_left
+      (fun (labels,loc) lab ->
+         match lab with
+            | Lstr s -> (Ident.Slab.add s labels,loc)
+            | Lpos l -> (labels,l))
+      (Slab.empty,loc)
+      labels
+
 let rec iutype_v env = function
   | DUTpure ty ->
       ITpure (Denv.ty_of_dty ty)
@@ -1022,11 +1034,11 @@ and iutype_c env c =
     ic_pre         = ifmla env c.duc_pre;
     ic_post        = iupost env ty c.duc_post; }
 
-and iubinder env (x, ty, tyv) =
-  let tyv = iutype_v env tyv in
+and iubinder env (x, ty) =
   let ty = Denv.ty_of_dty ty in
-  let env, v = iadd_local env (id_user x.id x.id_loc) ty in
-  env, (v, tyv)
+  let label, _ = label_set_from_list x.id_loc x.id_lab in
+  let env, v = iadd_local env (id_user ~label x.id x.id_loc) ty in
+  env, (v, ty)
 
 let mk_iexpr loc ty d =
   { iexpr_desc = d; iexpr_loc = loc; iexpr_lab = Slab.empty; iexpr_type = ty }
@@ -1340,6 +1352,11 @@ and iexpr_desc env loc ty = function
   | DEany c ->
       let c = iutype_c env c in
       IEany c
+  | DEabstract(e1, q) ->
+      let e1 = iexpr env e1 in
+      let ty = e1.iexpr_type in
+      let q = iupost env ty q in
+      IEabstract(e1,q)
 
 and decompose_app env e args = match e.dexpr_desc with
   | DEapply (e1, e2) ->
@@ -1494,8 +1511,8 @@ and type_c env c =
 and add_binders env bl =
   map_fold_left add_binder env bl
 
-and add_binder env (i, v) =
-  let v = type_v env v in
+and add_binder env (i, ty) =
+  let v = tpure ty in
   let env, vs = add_local env i v in
   env, vs
 
@@ -1551,6 +1568,7 @@ let rec is_pure_expr e =
   | Elocal _ | Elogic _ -> true
   | Eif (e1, e2, e3) -> is_pure_expr e1 && is_pure_expr e2 && is_pure_expr e3
   | Elet (_, e1, e2) -> is_pure_expr e1 && is_pure_expr e2
+  | Eabstract (e1, _) 
   | Emark (_, e1) -> is_pure_expr e1
   | Eany c -> E.no_side_effect c.c_effect
   | Eassert _ | Etry _ | Efor _ | Eraise _ | Ematch _
@@ -1786,6 +1804,13 @@ and expr_desc gl env loc ty = function
   | IEany c ->
       let c = type_c env c in
       Eany c, c.c_result_type, c.c_effect
+  | IEabstract(e1, q) ->
+      let e1 = expr gl env e1 in
+      let q = saturation e1.expr_loc e1.expr_effect q in
+      let ef = e1.expr_effect in
+      let ef, q = post_effect ef q in
+      let e1 = { e1 with expr_effect = ef } in
+      Eabstract(e1,q), e1.expr_type_v, ef
 
 and triple ?(sat_exn=true) gl env (p, e, q) =
   let e = expr gl env e in
@@ -1917,7 +1942,7 @@ let rec fresh_expr gl ~term locals e = match e.expr_desc with
       List.iter (fun (_, _, e2) -> fresh_expr gl ~term locals e2) hl
   | Efor (_, _, _, _, _, e1) ->
       fresh_expr gl ~term:false locals e1
-
+  | Eabstract(e, _)
   | Emark (_, e) ->
       fresh_expr gl ~term locals e
   | Eassert _ | Eany _ ->
@@ -2189,15 +2214,7 @@ let add_types uc dl =
         | Ty.Tyvar _ ->
             ()
         | Ty.Tyapp (ts, tyl) ->
-            let _ = ts.ts_name.id_string in
-            let n =
-(**
-              if Mstr.mem y def then begin
-                visit y; of_option (Hashtbl.find nregions y)
-              end else
-**)
-                (get_mtsymbol ts).mt_regions
-            in
+            let n = (get_mtsymbol ts).mt_regions in
             let rl = regions_tyapp ts n tyl in
             List.iter (fun r -> declare_region_type r.R.r_ty) rl;
             List.iter visit_type tyl
@@ -2273,7 +2290,7 @@ let add_logics uc d =
   in
   match d with
     | LogicDecl dl -> List.fold_left add uc dl
-    | IndDecl dl -> List.fold_left addi uc dl
+    | IndDecl (_, dl) -> List.fold_left addi uc dl
     | Meta _ | PropDecl _ | TypeDecl _ -> assert false
 
 let find_module penv lmod q id = match q with

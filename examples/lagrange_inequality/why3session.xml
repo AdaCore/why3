@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
+<why3session
+ name="lagrange_inequality/why3session.xml">
+ <prover
+  id="0"
+  name="Alt-Ergo"
+  version="0.94"/>
+ <prover
+  id="1"
+  name="Alt-Ergo"
+  version="0.95-dev"/>
+ <prover
+  id="2"
+  name="CVC3"
+  version="2.2"/>
+ <prover
+  id="3"
+  name="CVC3"
+  version="2.4.1"/>
+ <prover
+  id="4"
+  name="Z3"
+  version="2.19"/>
+ <prover
+  id="5"
+  name="Z3"
+  version="3.2"/>
+ <file
+  name="../lagrange_inequality.why"
+  verified="true"
+  expanded="true">
+  <theory
+   name="LagrangeInequality"
+   locfile="lagrange_inequality/../lagrange_inequality.why"
+   loclnum="3" loccnumb="7" loccnume="25"
+   verified="true"
+   expanded="true">
+   <goal
+    name="norm2_pos"
+    locfile="lagrange_inequality/../lagrange_inequality.why"
+    loclnum="24" loccnumb="8" loccnume="17"
+    sum="fd02659868bf23693dc6818171dd9f6c"
+    proved="true"
+    expanded="true"
+    shape="ainfix &gt;=anorm2V0V1c0.0F">
+    <proof
+     prover="4"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
+    name="Lagrange"
+    locfile="lagrange_inequality/../lagrange_inequality.why"
+    loclnum="28" loccnumb="8" loccnume="16"
+    sum="184f4de12978e4a3763526221fa5dea0"
+    proved="true"
+    expanded="true"
+    shape="ainfix =ainfix *anorm2V0V1anorm2V2V3ainfix +asqradotV0V1V2V3asqrainfix -ainfix *V0V3ainfix *V1V2F">
+    <proof
+     prover="4"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+  </theory>
+  <theory
+   name="CauchySchwarzInequality"
+   locfile="lagrange_inequality/../lagrange_inequality.why"
+   loclnum="35" loccnumb="7" loccnume="30"
+   verified="true"
+   expanded="true">
+   <goal
+    name="CauchySchwarz_aux"
+    locfile="lagrange_inequality/../lagrange_inequality.why"
+    loclnum="42" loccnumb="8" loccnume="25"
+    sum="ceb8172eff1990612894edbe86d0e0ee"
+    proved="true"
+    expanded="true"
+    shape="ainfix &lt;=asqradotV0V1V2V3ainfix *anorm2V0V1anorm2V2V3F">
+    <proof
+     prover="2"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+   <goal
+    name="norm_pos"
+    locfile="lagrange_inequality/../lagrange_inequality.why"
+    loclnum="50" loccnumb="8" loccnume="16"
+    sum="3ab2cc4360f06680ca64c6d080cabac2"
+    proved="true"
+    expanded="true"
+    shape="ainfix &gt;=anormV0V1c0.0F">
+    <proof
+     prover="4"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="0"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
+    name="sqr_le_sqrt"
+    locfile="lagrange_inequality/../lagrange_inequality.why"
+    loclnum="54" loccnumb="8" loccnume="19"
+    sum="f675352f887661cd60fb9434143fcef8"
+    proved="true"
+    expanded="true"
+    shape="ainfix &lt;=V0asqrtV1Iainfix &lt;=asqrV0V1Aainfix &lt;=c0.0asqrV0Aainfix &lt;=c0.0V0F">
+    <proof
+     prover="0"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="CauchySchwarz"
+    locfile="lagrange_inequality/../lagrange_inequality.why"
+    loclnum="57" loccnumb="8" loccnume="21"
+    sum="b8430a15a22fa2e6777792d95442dc26"
+    proved="true"
+    expanded="true"
+    shape="ainfix &lt;=adotV0V1V2V3ainfix *anormV0V1anormV2V3F">
+    <proof
+     prover="0"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.20"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.20"/>
+    </proof>
+   </goal>
+  </theory>
+  <theory
+   name="TriangleInequality"
+   locfile="lagrange_inequality/../lagrange_inequality.why"
+   loclnum="64" loccnumb="7" loccnume="25"
+   verified="true"
+   expanded="true">
+   <goal
+    name="triangle_aux"
+    locfile="lagrange_inequality/../lagrange_inequality.why"
+    loclnum="77" loccnumb="8" loccnume="20"
+    sum="7c01359cc259d67d2b387782f807dd16"
+    proved="true"
+    expanded="true"
+    shape="ainfix &lt;=anorm2ainfix +V0V2ainfix +V1V3asqrainfix +anormV0V1anormV2V3F">
+    <proof
+     prover="4"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+   <goal
+    name="sqr_sqrt_le"
+    locfile="lagrange_inequality/../lagrange_inequality.why"
+    loclnum="82" loccnumb="8" loccnume="19"
+    sum="4fc4adc9597d8e3b4291ac33824f9bb3"
+    proved="true"
+    expanded="true"
+    shape="ainfix &lt;=asqrtV0V1Iainfix &lt;=V0asqrV1Aainfix &lt;=c0.0V0Aainfix &lt;=c0.0V1F">
+    <proof
+     prover="2"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="0"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="triangle"
+    locfile="lagrange_inequality/../lagrange_inequality.why"
+    loclnum="85" loccnumb="8" loccnume="16"
+    sum="c3c879f39e33f3b76cb1ca93126529ca"
+    proved="true"
+    expanded="true"
+    shape="ainfix &lt;=anormainfix +V0V2ainfix +V1V3ainfix +anormV0V1anormV2V3F">
+    <proof
+     prover="0"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.10"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.09"/>
+    </proof>
+   </goal>
+  </theory>
+ </file>
+</why3session>

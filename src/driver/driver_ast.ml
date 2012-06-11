@@ -51,12 +51,14 @@ type global =
   | RegexpValid of string
   | RegexpInvalid of string
   | RegexpTimeout of string
+  | RegexpOutOfMemory of string
   | RegexpUnknown of string * string
   | RegexpFailure of string * string
   | TimeRegexp of string
   | ExitCodeValid of int
   | ExitCodeInvalid of int
   | ExitCodeTimeout of int
+  | ExitCodeOutOfMemory of int
   | ExitCodeUnknown of int * string
   | ExitCodeFailure of int * string
   | Filename of string

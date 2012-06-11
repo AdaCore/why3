@@ -156,7 +156,7 @@ let add_ty_decl uc ts = add_decl_with_tuples uc (create_ty_decl ts)
 let add_data_decl uc dl = add_decl_with_tuples uc (create_data_decl dl)
 let add_param_decl uc ls = add_decl_with_tuples uc (create_param_decl ls)
 let add_logic_decl uc dl = add_decl_with_tuples uc (create_logic_decl dl)
-let add_ind_decl uc dl = add_decl_with_tuples uc (create_ind_decl dl)
+let add_ind_decl uc s dl = add_decl_with_tuples uc (create_ind_decl s dl)
 let add_prop_decl uc k p f = add_decl_with_tuples uc (create_prop_decl k p f)
 
 let rec dty uc env = function
@@ -1036,7 +1036,7 @@ let add_prop k loc s f th =
 
 let loc_of_id id = of_option id.Ident.id_loc
 
-let add_inductives dl th =
+let add_inductives s dl th =
   (* 1. create all symbols and make an environment with these symbols *)
   let denv = create_denv () in
   let psymbols = Hashtbl.create 17 in
@@ -1062,7 +1062,7 @@ let add_inductives dl th =
     in
     ps, List.map clause d.in_def
   in
-  try add_ind_decl th (List.map type_decl dl)
+  try add_ind_decl th s (List.map type_decl dl)
   with
   | ClashSymbol s ->
       error ~loc:(Hashtbl.find propsyms s) (ClashSymbol s)
@@ -1115,8 +1115,8 @@ let add_decl th = function
       add_types dl th
   | LogicDecl dl ->
       add_logics dl th
-  | IndDecl dl ->
-      add_inductives dl th
+  | IndDecl (s, dl) ->
+      add_inductives s dl th
   | PropDecl (loc, k, s, f) ->
       add_prop (prop_kind k) loc s f th
   | Meta (loc, id, al) ->

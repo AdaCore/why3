@@ -78,11 +78,12 @@ theory Set
   axiom choose_def:
     forall s: set 'a. not (is_empty s) -> mem (choose s) s
 
+(*
   (** the set of all x of type 'a *)
   constant all: set 'a
 
   axiom all_def: forall x: 'a. mem x all
-
+*)
 end
 
 (** {2 Set Comprehension} *)
@@ -151,6 +152,24 @@ theory Fset
   axiom nth_surjective:
     forall s: set 'a, x: 'a. mem x s ->
     exists i: int. 0 <= i < cardinal s -> x = nth i s
+
+end
+
+(** {2 Induction principle on finite sets} *)
+
+theory FsetInduction
+
+  use import Fset
+
+  type t
+
+  predicate p (set t)
+
+  axiom Induction :
+    (forall s: set t. is_empty s -> p s) ->
+    (forall s: set t. p s -> forall t: t.
+      not (mem t s) -> p (add t s)) ->
+    forall s: set t. p s
 
 end
 

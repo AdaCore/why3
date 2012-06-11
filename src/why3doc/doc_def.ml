@@ -93,5 +93,5 @@ let locate id = match id.id_loc with
       raise Not_found
   | Some loc ->
       let fn, l, _, _ = Loc.get loc in
-      make_url fn, make_tag id.id_string l
+      fn, make_url fn, make_tag id.id_string l
 

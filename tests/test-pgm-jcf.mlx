@@ -12,13 +12,31 @@ module M
 end
 
 module N
+  use import int.Int
   use import M
   goal G1: f 41 = 42
+
+  type unit = ()
 
   type tree 'a = Node 'a (forest 'a) | Leaf
   with forest 'a = Cons (tree 'a) (forest 'a) | Nil
 
-  type ref 'a = {| ghost mutable contents : 'a |}
+  type ref 'b = {| (* ghost *) mutable contents : 'b |}
+
+  type myrec 'a = {| f1 : int ; ghost f2 : tree 'a |}
+
+  exception Exit (tree int)
+
+  let myfun r =
+    let rec on_tree t = match t with
+      | Node {| contents = v |} f -> v + on_forest f
+      | Leaf -> 0
+    end with on_forest f = match f with
+      | Cons t f -> on_tree t + on_forest f
+      | Nil -> 1
+    end
+    in
+    on_tree r
 end
 
 (*

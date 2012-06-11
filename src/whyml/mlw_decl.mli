@@ -44,6 +44,9 @@ type pdecl = private {
 and pdecl_node = private
   | PDtype of itysymbol
   | PDdata of data_decl list
+  | PDlet  of let_defn
+  | PDrec  of rec_defn list
+  | PDexn  of xsymbol
 
 (** {2 Declaration constructors} *)
 
@@ -55,6 +58,12 @@ val create_data_decl : pre_data_decl list -> pdecl
 
 val create_ty_decl : itysymbol -> pdecl
 
+val create_let_decl : let_defn -> pdecl
+
+val create_rec_decl : rec_defn list -> pdecl
+
+val create_exn_decl : xsymbol -> pdecl
+
 (** {2 Known identifiers} *)
 
 type known_map = pdecl Mid.t
@@ -62,3 +71,5 @@ type known_map = pdecl Mid.t
 val known_id : known_map -> ident -> unit
 val known_add_decl : Decl.known_map -> known_map -> pdecl -> known_map
 val merge_known : known_map -> known_map -> known_map
+
+val find_constructors : known_map -> itysymbol -> constructor list

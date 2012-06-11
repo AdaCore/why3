@@ -42,6 +42,6 @@ val is_def: string * int * int -> tag
 
 type url = string
 
-val locate: ident -> url * tag
-  (* or raises [Not_found] *)
+val locate: ident -> string * url * tag
+  (* returns (filename, url, tag) or raises [Not_found] *)
 

@@ -1,3 +1,24 @@
+[ATP alt-ergo-model]
+name = "Alt-Ergo"
+exec = "alt-ergo"
+exec = "alt-ergo-0.95-dev"
+version_switch = "-version"
+version_regexp = "\\([0-9.]+\\(-dev\\)?\\)"
+version_ok = "0.95-dev"
+version_bad = "0.94"
+version_bad = "0.93.1"
+version_bad = "0.93"
+version_bad = "0.92.3"
+version_bad = "0.92.2"
+version_bad = "0.92.1"
+version_bad = "0.92"
+version_bad = "0.91"
+version_bad = "0.9"
+version_bad = "0.8"
+command = "'@LOCALBIN@why3-cpulimit' %T %m -s %e -timelimit %t -model %f"
+driver = "drivers/alt_ergo_model.drv"
+editor = "altgr-ergo"
+
 [ATP alt-ergo]
 name = "Alt-Ergo"
 exec = "alt-ergo"
@@ -16,6 +37,7 @@ version_bad = "0.9"
 version_bad = "0.8"
 command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e %f"
 driver = "drivers/alt_ergo.drv"
+editor = "altgr-ergo"
 
 [ATP alt-ergo]
 name = "Alt-Ergo"
@@ -287,7 +309,13 @@ editor = "coqide"
 # command = "pvs %f"
 
 [editor coqide]
+name = "CoqIDE"
 command = "coqide -I %l/coq-tactic -R %l/coq Why3 %f"
 
 [editor proofgeneral-coq]
+name = "Emacs/ProofGeneral/Coq"
 command = "emacs23 --eval \"(setq coq-load-path '((\\\"%l/coq\\\" \\\"Why3\\\")))\" %f"
+
+[editor altgr-ergo]
+name = "AltGr-Ergo"
+command = "altgr-ergo %f"

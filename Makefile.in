@@ -127,7 +127,7 @@ LIB_DRIVER = relocatable call_provers driver_ast driver_parser driver_lexer driv
 	     whyconf autodetection
 
 LIB_TRANSFORM = simplify_recursive_definition simplify_formula \
-		inlining split_goal \
+		inlining split_goal induction \
 		eliminate_definition eliminate_algebraic \
 		eliminate_inductive eliminate_let eliminate_if \
 		libencoding discriminate protect_enumeration \
@@ -214,6 +214,8 @@ clean::
 install_no_local::
 	mkdir -p $(BINDIR)
 	mkdir -p $(DATADIR)/why3/images
+	mkdir -p $(DATADIR)/why3/images/boomy
+	mkdir -p $(DATADIR)/why3/images/fatcow
 	mkdir -p $(DATADIR)/why3/emacs
 	mkdir -p $(DATADIR)/why3/lang
 	mkdir -p $(DATADIR)/why3/theories
@@ -223,7 +225,11 @@ install_no_local::
 	cp -f modules/*.mlw $(DATADIR)/why3/modules
 	cp -f drivers/*.drv drivers/*.gen $(DATADIR)/why3/drivers
 	cp -f share/provers-detection-data.conf $(DATADIR)/why3/
+	cp -f share/images/icons.rc $(DATADIR)/why3/images
 	cp -f share/images/*.png $(DATADIR)/why3/images
+	cp -f share/images/boomy/*.png $(DATADIR)/why3/images/boomy
+	cp -f share/images/fatcow/*.png $(DATADIR)/why3/images/fatcow
+	cp -f share/why3session.dtd $(DATADIR)/why3
 	cp -rf share/javascript $(DATADIR)/why3/javascript
 	cp -f share/emacs/why.el $(DATADIR)/why3/emacs/why.el
 	cp -f share/lang/why.lang $(DATADIR)/why3/lang/why.lang
@@ -389,7 +395,7 @@ install_local: bin/why3
 ########
 
 MLW_FILES = mlw_ty mlw_expr mlw_decl mlw_module mlw_pretty \
-	    mlw_dtree mlw_typing mlw_main
+	    mlw_dtree mlw_dty mlw_typing mlw_main
 
 MLWMODULES = $(addprefix src/whyml/, $(MLW_FILES))
 
@@ -1242,12 +1248,23 @@ clean::
 
 .PHONY: stdlibdoc
 
-STDLIBS = bool comparison relations \
-	algebra int real number floating_point \
-	option list map set bag graph
+STDLIBS = algebra \
+	bag \
+	bool \
+	comparison \
+	floating_point \
+	graph \
+	int \
+	list \
+	map \
+	number \
+	option \
+	real \
+	relations \
+	set
 # function ? sum ? tptp ?
 
-STDMODS = ref array arith hashtbl impset pqueue queue random stack string
+STDMODS = arith array hashtbl impset pqueue queue random ref stack string
 
 STDLIBFILES = $(addsuffix .why, $(addprefix theories/, $(STDLIBS)))
 STDMODFILES = $(addsuffix .mlw, $(addprefix modules/, $(STDMODS)))
@@ -1255,8 +1272,9 @@ STDMODFILES = $(addsuffix .mlw, $(addprefix modules/, $(STDMODS)))
 stdlibdoc: $(STDLIBFILES) $(STDMODFILES) bin/why3doc.@OCAMLBEST@
 	mkdir -p doc/stdlibdoc
 	rm -f doc/stdlibdoc/style.css
-	WHY3LOADPATH=theories bin/why3doc.@OCAMLBEST@ -L modules -o doc/stdlibdoc \
-		$(STDLIBFILES) $(STDMODFILES)
+	WHY3LOADPATH=theories bin/why3doc.@OCAMLBEST@ -L modules \
+          -o doc/stdlibdoc --title "Why3 Standard Library" \
+	  $(STDLIBFILES) $(STDMODFILES)
 
 clean::
 	rm -f doc/stdlibdoc/*
@@ -1340,22 +1358,33 @@ NAME = why3-$(VERSION)
 DISTRIB_DIR = distrib/$(NAME)
 DISTRIB_TAR = $(DISTRIB_DIR).tar.gz
 
-# CHANGES (not up-to-date, moreover is in French)
 DISTRIB_FILES = Version Makefile.in configure.in META.in configure \
-      README INSTALL OCAML-LICENSE LICENSE src/config.sh.in \
+      README CHANGES INSTALL OCAML-LICENSE LICENSE src/config.sh.in \
       src/*.ml* src/*.dep src/*/*.ml* src/*/*.dep src/*/*.c \
       plugins/*/*.ml* plugins/*/*.dep \
       doc/version.tex.in doc/manual.pdf \
       drivers/*.drv drivers/*.gen \
       examples/*.why examples/programs/*.mlw examples/tptp/*.why \
-      examples/*/*.xml examples/*/*/*.xml \
-      examples/*/*.v   examples/*/*/*.v \
+      examples/tests-provers/*.why examples/check-builtin/*.why \
+      examples/bts/*.why \
+      examples/programs/vacid_0_binary_heaps/*.why \
+      examples/programs/vacid_0_binary_heaps/*.mlw \
+      examples/bitvectors/*.why \
+      examples/foveoos2011/*.mlw \
+      examples/*/*.xml examples/*/*/*.xml examples/*/*/*/*.xml \
+      examples/*/*.v   examples/*/*/*.v examples/*/*/*/*.v\
       examples/use_api.ml \
       theories/*.why \
       modules/*.mlw \
       lib/coq/*/*.v lib/coq-tactic/*.v \
       share/provers-detection-data.conf.in \
-      share/emacs/why.el share/images/*.png share/lang/*.lang \
+      share/why3session.dtd \
+      share/javascript/*.js share/javascript/*.css \
+      share/javascript/themes/default/*.gif \
+      share/javascript/themes/default/*.png \
+      share/javascript/themes/default/*.css \
+      share/emacs/why.el share/lang/*.lang \
+      share/images/icons.rc share/images/*.png share/images/*/*.png \
       share/bash/why3 share/zsh/_why3 share/vim/why3.vim
 
 # TODO?

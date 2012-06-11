@@ -167,7 +167,7 @@ type use_clone = loc * use * clone_subst list option
 type decl =
   | TypeDecl of type_decl list
   | LogicDecl of logic_decl list
-  | IndDecl of ind_decl list
+  | IndDecl of Decl.ind_sign * ind_decl list
   | PropDecl of loc * prop_kind * ident * lexpr
   | Meta of loc * ident * metarg list
 
@@ -196,6 +196,8 @@ type pre = lexpr
 
 type post = lexpr * (qualid * lexpr) list
 
+type binder = ident * pty option
+
 type type_v =
   | Tpure of pty
   | Tarrow of binder list * type_c
@@ -205,8 +207,6 @@ and type_c =
     pc_effect      : effect;
     pc_pre         : pre;
     pc_post        : post; }
-
-and binder = ident * type_v option
 
 type expr = {
   expr_desc : expr_desc;
@@ -241,6 +241,7 @@ and expr_desc =
   | Emark of ident * expr
   | Ecast of expr * pty
   | Eany of type_c
+  | Eabstract of expr * post
   | Enamed of label * expr
 
   (* TODO: ghost *)

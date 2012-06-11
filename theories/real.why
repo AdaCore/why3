@@ -193,6 +193,13 @@ theory Square
   axiom Square_sqrt:
     forall x:real. x >= 0.0 -> sqrt (x*x) = x
 
+  axiom Sqrt_mul:
+    forall x y:real. x >= 0.0 /\ y >= 0.0 ->
+      sqrt (x*y) = sqrt x * sqrt y
+
+  axiom Sqrt_le :
+    forall x y:real. 0.0 <= x <= y -> sqrt x <= sqrt y
+
 end
 
 (** {2 Exponential and Logarithm} *)

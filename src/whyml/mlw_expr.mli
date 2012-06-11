@@ -19,6 +19,7 @@
 (**************************************************************************)
 
 open Why3
+open Util
 open Ident
 open Ty
 open Term
@@ -37,20 +38,6 @@ type pvsymbol = private {
 val pv_equal : pvsymbol -> pvsymbol -> bool
 
 val create_pvsymbol : preid -> vty_value -> pvsymbol
-
-(* pasymbols represent higher-order intermediate computation results
-   introduced by let-expressions. They cannot be type-instantiated. *)
-
-type pasymbol = private {
-  pa_name : ident;
-  pa_vta  : vty_arrow;
-  pa_vars : varset;
-  (* this varset contains pa_vta.vta_vars together with all type
-     variables and regions of the defining expression, in order to
-     cover effects and specification and not overgeneralize *)
-}
-
-val pa_equal : pasymbol -> pasymbol -> bool
 
 (** program symbols *)
 
@@ -71,6 +58,8 @@ type psymbol = private {
 }
 
 val ps_equal : psymbol -> psymbol -> bool
+
+val create_psymbol : preid -> vty_arrow -> varset -> psymbol
 
 (** program/logic symbols *)
 
@@ -109,6 +98,16 @@ val ppat_lapp : lsymbol -> ppattern list -> vty_value -> ppattern
 val ppat_or : ppattern -> ppattern -> ppattern
 val ppat_as : ppattern -> pvsymbol -> ppattern
 
+type pre_ppattern =
+  | PPwild
+  | PPvar  of preid
+  | PPlapp of lsymbol * pre_ppattern list
+  | PPpapp of plsymbol * pre_ppattern list
+  | PPor   of pre_ppattern * pre_ppattern
+  | PPas   of pre_ppattern * preid
+
+val make_ppattern : pre_ppattern -> vty_value -> pvsymbol Mstr.t * ppattern
+
 (** program expressions *)
 
 type pre = term          (* precondition *)
@@ -130,14 +129,15 @@ type expr = private {
 and expr_node = private
   | Elogic  of term
   | Evalue  of pvsymbol
-  | Earrow  of pasymbol
-  | Einst   of psymbol
-  | Eapp    of pasymbol * pvsymbol
+  | Earrow  of psymbol
+  | Eapp    of expr * pvsymbol
   | Elet    of let_defn * expr
   | Erec    of rec_defn list * expr
   | Eif     of pvsymbol * expr * expr
   | Ecase   of pvsymbol * (ppattern * expr) list
   | Eassign of pvsymbol * region * pvsymbol (* mutable pv <- expr *)
+  | Eghost  of expr
+  | Eany    of any_effect
 
 and let_defn = private {
   let_var  : let_var;
@@ -146,7 +146,7 @@ and let_defn = private {
 
 and let_var =
   | LetV of pvsymbol
-  | LetA of pasymbol
+  | LetA of psymbol
 
 and rec_defn = private {
   rec_ps     : psymbol;
@@ -168,17 +168,28 @@ and variant = {
   v_rel  : lsymbol option; (* tau tau : prop *)
 }
 
+(* TODO? Every top region in the type of Eany is reset.
+   This is enough for our current purposes, but we might
+   need to be more flexible later. *)
+and any_effect = {
+  aeff_reads  : expr list; (* for a ghost read, use a ghost expression *)
+  aeff_writes : expr list; (* for a ghost write, use a ghost expression *)
+  aeff_raises : (bool * xsymbol) list; (* ghost raise * exception symbol *)
+}
+
 val e_label : ?loc:Loc.position -> Slab.t -> expr -> expr
 val e_label_add : label -> expr -> expr
 val e_label_copy : expr -> expr -> expr
 
 val e_value : pvsymbol -> expr
-val e_arrow : pasymbol -> expr
 
 val e_inst : psymbol -> ity_subst -> expr
+val e_cast : psymbol -> vty -> expr
 
 exception ValueExpected of expr
 exception ArrowExpected of expr
+
+val vtv_of_expr : expr -> vty_value
 
 exception GhostWrite of expr * region
 exception GhostRaise of expr * xsymbol
@@ -190,10 +201,10 @@ val e_plapp : plsymbol -> expr list -> ity -> expr
 
 val create_let_defn : preid -> expr -> let_defn
 val create_fun_defn : preid -> lambda -> rec_defn
+val create_rec_defn : (psymbol * lambda) list -> rec_defn list
 
-exception StaleRegion of region * ident * expr
-(* a previously reset region is associated to an ident occurring in expr.
-   In other terms, freshness violation. *)
+exception StaleRegion of region * ident
+(* freshness violation: a previously reset region is associated to an ident *)
 
 val e_let : let_defn -> expr -> expr
 val e_rec : rec_defn list -> expr -> expr
@@ -201,9 +212,19 @@ val e_rec : rec_defn list -> expr -> expr
 val e_if : expr -> expr -> expr -> expr
 val e_case : expr -> (ppattern * expr) list -> expr
 
-exception Immutable of pvsymbol
+exception Immutable of expr
 
 val e_assign : expr -> expr -> expr
+val e_ghost : expr -> expr
+val e_any : any_effect -> ity -> expr
+
+val e_const : constant -> expr
+val e_int_const : string -> expr
+val e_real_const : real_constant -> expr
+
+val e_lazy_and : expr -> expr -> expr
+val e_lazy_or : expr -> expr -> expr
+val e_not : expr -> expr
 
 (* TODO: when should we check for escaping identifiers (regions?)
    in pre/post/xpost/effects? Here or in WP? *)

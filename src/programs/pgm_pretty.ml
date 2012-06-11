@@ -58,6 +58,8 @@ let rec print_expr fmt e = match e.expr_desc with
 
   | Eany c ->
       fprintf fmt "@[[any %a]@]" print_type_c c
+  | Eabstract(e1,q) ->
+      fprintf fmt "@[abstract %a %a]@]" print_expr e1 print_post q
 
   | Emark (_, _)  ->
       fprintf fmt "<todo: Emark>"

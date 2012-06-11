@@ -113,6 +113,33 @@ theory DoubleOfInt
 
   lemma jpxorx_pos: forall x:int. x>=0 -> BV32.nth (BV32.bw_xor j' (BV32.from_int2c x)) 31 = True
 
+  lemma from_int2c_to_nat_sub_pos:
+  	forall i:int. 0 <= i <= 31 -> 
+          forall x:int. 0 <= x <  Pow2int.pow2 i -> 
+           BV32.to_nat_sub (BV32.from_int2c x) (i-1) 0 = x
+
+  lemma lemma1_pos : forall x:int. is_int32 x /\ x >= 0 -> 
+  	BV32.to_nat_sub (jpxor x) 31 0 = Pow2int.pow2 31 + x
+
+  (* case x < 0 *)
+
+  lemma jpxorx_neg: forall x:int. x<0 -> 
+  	BV32.nth (BV32.bw_xor j' (BV32.from_int2c x)) 31 = False
+
+  lemma from_int2c_to_nat_sub_neg:
+  	forall i:int. 0 <= i <= 31 -> 
+          forall x:int. -Pow2int.pow2 i <= x <  0 -> 
+           BV32.to_nat_sub (BV32.from_int2c x) (i-1) 0 = Pow2int.pow2 i + x
+	
+  lemma lemma1_neg : forall x:int. is_int32 x /\ x < 0 -> 
+  	BV32.to_nat_sub (jpxor x) 31 0 = Pow2int.pow2 31 + x
+
+(**** old
+
+  (* case x >= 0 *)
+
+  lemma jpxorx_pos: forall x:int. x>=0 -> BV32.nth (BV32.bw_xor j' (BV32.from_int2c x)) 31 = True
+
 (*
   lemma from_int2c_to_nat_sub31:
   	forall x:int. x >= 0 -> BV32.to_nat_sub (BV32.from_int2c x) 31 0 = x
@@ -138,9 +165,12 @@ theory DoubleOfInt
 
   lemma lemma1_neg : forall x:int. is_int32 x /\ x < 0 -> BV32.to_nat_sub (jpxor x) 31 0 = Pow2int.pow2 31 + x
 
-  (* final lemma *)
+****)
 
-  lemma lemma1 : forall x:int. is_int32 x -> BV32.to_nat_sub (jpxor x) 31 0 = Pow2int.pow2 31 + x
+
+  (* final lemma *)
+  lemma lemma1 : forall x:int. is_int32 x ->
+    BV32.to_nat_sub (jpxor x) 31 0 = Pow2int.pow2 31 + x
 
 
   (*********************************************************************)

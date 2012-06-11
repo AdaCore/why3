@@ -54,10 +54,9 @@ let is_projection kn ls =
       not (List.exists constr dl)
   | _ -> false
 
-let apply_projection kn ls t =
+let apply_projection kn ls t = match t.t_node with
    (* [ls] is a projection, [t] is a term of the form [mk a1 ... an];
       reduce the term to the [ai] that corresponds to the projection *)
-   t_label_copy t (match t.t_node with
   | Tapp (cs,tl) ->
       let ts = match cs.ls_value with
         | Some { ty_node = Tyapp (ts,_) } -> ts
@@ -69,7 +68,7 @@ let apply_projection kn ls t =
         | Some pj when ls_equal pj ls -> v
         | _ -> acc in
       List.fold_left2 find t_true tl pjl
-  | _ -> assert false)
+  | _ -> assert false
 
 let make_flat_case kn t bl =
    (* ??? *)
@@ -116,8 +115,27 @@ let dive_to_constructor kn fn env t =
   in
   dive env t
 
+let rec cs_equ kn env t1 t2 =
+  if t_equal t1 t2 then t_true
+  else match t1,t2 with
+    | { t_node = Tapp (cs,tl) }, t
+    | t, { t_node = Tapp (cs,tl) } when is_constructor kn cs ->
+        let fn = apply_cs_equ kn cs tl in
+        begin try dive_to_constructor kn fn env t
+        with Exit -> t_equ t1 t2 end
+    | _ -> t_equ t1 t2
+
+and apply_cs_equ kn cs1 tl1 env t = match t.t_node with
+  | Tapp (cs2,tl2) when ls_equal cs1 cs2 ->
+      let merge f t1 t2 = t_and_simp f (cs_equ kn env t1 t2) in
+      List.fold_left2 merge t_true tl1 tl2
+  | Tapp _ -> t_false
+  | _ -> assert false
+
 let eval_match ~inline kn t =
   let rec eval env t = t_label_copy t (match t.t_node with
+    | Tapp (ls, [t1;t2]) when ls_equal ls ps_equ ->
+        cs_equ kn env (eval env t1) (eval env t2)
     | Tapp (ls, [t1]) when is_projection kn ls ->
         let t1 = eval env t1 in
         let fn _env t = apply_projection kn ls t in

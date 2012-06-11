@@ -133,6 +133,7 @@ val prover_by_id : config -> string -> config_prover
     ProverNotFound *)
 
 type config_editor = {
+  editor_name : string;
   editor_command : string;
   editor_options : string list;
 }

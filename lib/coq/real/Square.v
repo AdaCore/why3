@@ -29,4 +29,17 @@ Lemma Square_sqrt : forall (x:R), (0%R <= x)%R -> ((sqrt (x * x)%R) = x).
 exact sqrt_square.
 Qed.
 
+(* Why3 goal *)
+Lemma Sqrt_mul : forall (x:R) (y:R), ((0%R <= x)%R /\ (0%R <= y)%R) ->
+  ((sqrt (x * y)%R) = ((sqrt x) * (sqrt y))%R).
+intros x y (hx & hy); now apply sqrt_mult.
+Qed.
+
+(* Why3 goal *)
+Lemma Sqrt_le : forall (x:R) (y:R), ((0%R <= x)%R /\ (x <= y)%R) ->
+  ((sqrt x) <= (sqrt y))%R.
+intros x y (h1 & h2); apply sqrt_le_1; auto.
+apply Rle_trans with x; auto.
+Qed.
+
 

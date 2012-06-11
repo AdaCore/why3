@@ -73,6 +73,7 @@ type prover_answer =
   | Valid
   | Invalid
   | Timeout
+  | OutOfMemory
   | Unknown of string
   | Failure of string
   | HighFailure
@@ -88,6 +89,7 @@ let print_prover_answer fmt = function
   | Valid -> fprintf fmt "Valid"
   | Invalid -> fprintf fmt "Invalid"
   | Timeout -> fprintf fmt "Timeout"
+  | OutOfMemory -> fprintf fmt "Ouf Of Memory"
   | Unknown "" -> fprintf fmt "Unknown"
   | Failure "" -> fprintf fmt "Failure"
   | Unknown s -> fprintf fmt "Unknown: %s" s
@@ -113,7 +115,7 @@ let rec grep out l = match l with
       begin try
         ignore (Str.search_forward re out 0);
         match pa with
-        | Valid | Invalid | Timeout -> pa
+        | Valid | Invalid | Timeout | OutOfMemory -> pa
         | Unknown s -> Unknown (Str.replace_matched s out)
         | Failure s -> Failure (Str.replace_matched s out)
         | HighFailure -> assert false
@@ -179,10 +181,10 @@ let call_on_file ~command ?(timelimit=0) ?(memlimit=0)
         let ans = match ret with
           | Unix.WSTOPPED n ->
               Debug.dprintf debug "Call_provers: stopped by signal %d@." n;
-              HighFailure
+              grep out regexps
           | Unix.WSIGNALED n ->
               Debug.dprintf debug "Call_provers: killed by signal %d@." n;
-              HighFailure
+              grep out regexps
           | Unix.WEXITED n ->
               Debug.dprintf debug "Call_provers: exited with status %d@." n;
               (try List.assoc n exitcodes with Not_found -> grep out regexps)

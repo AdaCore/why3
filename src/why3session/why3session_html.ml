@@ -36,7 +36,7 @@ let set_opt_style = function
   | "simple" -> opt_style := SimpleTree
   | "jstree" -> opt_style := Jstree
   | "table" -> opt_style := Table
-  | _ -> 
+  | _ ->
     eprintf "Unknown html style, ignored@."
 
 let () = set_opt_style default_style
@@ -120,9 +120,9 @@ struct
   let print_prover = Whyconf.print_prover
 
 
-  let color_of_status ?(dark=false) fmt b = 
-    fprintf fmt "%s" (if b then 
-        if dark then "008000" else "C0FFC0" 
+  let color_of_status ?(dark=false) fmt b =
+    fprintf fmt "%s" (if b then
+        if dark then "008000" else "C0FFC0"
       else "FF0000")
 
 let print_results fmt provers proofs =
@@ -142,28 +142,33 @@ let print_results fmt provers proofs =
                   fprintf fmt "FF0000\">Invalid"
 		| Call_provers.Timeout ->
                   fprintf fmt "FF8000\">Timeout"
+		| Call_provers.OutOfMemory ->
+                  fprintf fmt "FF8000\">Out Of Memory"
 		| Call_provers.Unknown _ ->
                   fprintf fmt "FF8000\">%.2f" res.Call_provers.pr_time
-		| _ ->
-                  fprintf fmt "FF8000\">Failure "
+		| Call_provers.Failure _ ->
+                  fprintf fmt "FF8000\">Failure"
+		| Call_provers.HighFailure ->
+                  fprintf fmt "FF8000\">High Failure"
 	    end
-	  | _ -> fprintf fmt "E0E0E0\">Undone"
+	  | S.Undone _ -> fprintf fmt "E0E0E0\">Undone"
+	  | S.InternalFailure _ -> fprintf fmt "E0E0E0\">Internal Failure"
       with Not_found -> fprintf fmt "E0E0E0\">---"
     end;
     fprintf fmt "</td>") provers
 
 let rec num_lines acc tr =
   List.fold_left
-    (fun acc g -> 1 + 
-      PHstr.fold (fun _ tr acc -> 1 + num_lines acc tr) 
+    (fun acc g -> 1 +
+      PHstr.fold (fun _ tr acc -> 1 + num_lines acc tr)
       g.goal_transformations acc)
     acc tr.transf_goals
 
   let rec print_transf fmt depth max_depth provers tr =
     fprintf fmt "<tr>";
     for i=1 to 0 (* depth-1 *) do fprintf fmt "<td></td>" done;
-    fprintf fmt "<td bgcolor=\"#%a\" colspan=\"%d\">" 
-      (color_of_status ~dark:false) tr.S.transf_verified 
+    fprintf fmt "<td bgcolor=\"#%a\" colspan=\"%d\">"
+      (color_of_status ~dark:false) tr.S.transf_verified
       (max_depth - depth + 1);
     (* for i=1 to depth-1 do fprintf fmt "&nbsp;&nbsp;&nbsp;&nbsp;" done; *)
     fprintf fmt "%s</td>" tr.transf_name ;
@@ -182,7 +187,7 @@ let rec num_lines acc tr =
   and print_goal fmt is_first depth max_depth provers g =
     if not is_first then fprintf fmt "<tr>";
     (* for i=1 to 0 (\* depth-1 *\) do fprintf fmt "<td></td>" done; *)
-    fprintf fmt "<td bgcolor=\"#%a\" colspan=\"%d\">" 
+    fprintf fmt "<td bgcolor=\"#%a\" colspan=\"%d\">"
       (color_of_status ~dark:false) g.S.goal_verified (max_depth - depth + 1);
     (* for i=1 to depth-1 do fprintf fmt "&nbsp;&nbsp;&nbsp;&nbsp;" done; *)
     fprintf fmt "%s</td>" (S.goal_expl g);
@@ -203,7 +208,7 @@ let rec num_lines acc tr =
     in
     let provers = List.sort Whyconf.Prover.compare provers in
     let name = th.S.theory_name.Ident.id_string in
-    fprintf fmt "<h2><font color=\"#%a\">Theory \"%s\": %s</font></h2>@\n" 
+    fprintf fmt "<h2><font color=\"#%a\">Theory \"%s\": %s</font></h2>@\n"
       (color_of_status ~dark:true) th.S.theory_verified
       name (if th.S.theory_verified then "fully verified" else "not fully verified")
     ;

@@ -52,6 +52,7 @@ type t =
       mutable premise_color : string;
       mutable goal_color : string;
       mutable error_color : string;
+      mutable iconset : string;
       (** colors *)
       mutable env : Env.env;
       mutable config : Whyconf.config;
@@ -77,6 +78,7 @@ type ide = {
   ide_premise_color : string;
   ide_goal_color : string;
   ide_error_color : string;
+  ide_iconset : string;
   ide_default_editor : string;
   (* ide_replace_prover : conf_replace_prover; *)
   ide_hidden_provers : string list;
@@ -96,6 +98,7 @@ let default_ide =
     ide_premise_color = "chartreuse";
     ide_goal_color = "gold";
     ide_error_color = "orange";
+    ide_iconset = "boomy";
     (* ide_replace_prover = CRP_Ask; *)
     ide_default_editor =
       (try Sys.getenv "EDITOR" ^ " %f"
@@ -135,6 +138,9 @@ let load_ide section =
     ide_error_color =
       get_string section ~default:default_ide.ide_error_color
         "error_color";
+    ide_iconset = 
+      get_string section ~default:default_ide.ide_iconset
+        "iconset";
     ide_default_editor =
       get_string section ~default:default_ide.ide_default_editor
         "default_editor";
@@ -204,6 +210,7 @@ let load_config config original_config =
     premise_color = ide.ide_premise_color;
     goal_color = ide.ide_goal_color;
     error_color = ide.ide_error_color;
+    iconset = ide.ide_iconset;
     default_editor = ide.ide_default_editor;
     config         = config;
     original_config = original_config;
@@ -233,11 +240,11 @@ let load_config config original_config =
   *)
 
 let debug_save_config n c =
-  let coq = { prover_name = "Coq" ; prover_version = "8.3pl3"; 
+  let coq = { prover_name = "Coq" ; prover_version = "8.3pl3";
               prover_altern = "" } in
   let p = Mprover.find coq (get_provers c) in
   let time = Whyconf.timelimit (Whyconf.get_main c) in
-  Format.eprintf "[debug] save_config %d: timelimit=%d ; editor for Coq=%s@." 
+  Format.eprintf "[debug] save_config %d: timelimit=%d ; editor for Coq=%s@."
     n time p.editor
 
 let save_config t =
@@ -269,6 +276,7 @@ let save_config t =
   let ide = set_string ide "premise_color" t.premise_color in
   let ide = set_string ide "goal_color" t.goal_color in
   let ide = set_string ide "error_color" t.error_color in
+  let ide = set_string ide "iconset" t.iconset in
   let ide = set_string ide "default_editor" t.default_editor in
   let ide = set_stringl ide "hidden_prover" t.hidden_provers in
   let config = set_section config "ide" ide in
@@ -306,43 +314,6 @@ let get_main () = (get_main (config ()).config)
 
 *)
 
-let image ?size f =
-  let main = get_main () in
-  let n = Filename.concat (datadir main) (Filename.concat "images" (f^".png"))
-  in
-  match size with
-    | None ->
-        GdkPixbuf.from_file n
-    | Some s ->
-        GdkPixbuf.from_file_at_size ~width:s ~height:s n
-
-let iconname_default = "undone32"
-let iconname_undone = "undone32"
-let iconname_scheduled = "pausehalf32"
-let iconname_running = "play32"
-let iconname_valid = "accept32"
-let iconname_unknown = "help32"
-let iconname_invalid = "delete32"
-let iconname_timeout = "clock32"
-let iconname_failure = "bug32"
-let iconname_valid_obs = "obsaccept32"
-let iconname_unknown_obs = "obshelp32"
-let iconname_invalid_obs = "obsdelete32"
-let iconname_timeout_obs = "obsclock32"
-let iconname_failure_obs = "obsbug32"
-let iconname_yes = "accept32"
-let iconname_no = "delete32"
-let iconname_directory = "folder32"
-let iconname_file = "file32"
-let iconname_prover = "wizard32"
-let iconname_transf = "configure32"
-let iconname_editor = "edit32"
-let iconname_replay = "refresh32"
-let iconname_cancel = "cut32"
-let iconname_reload = "movefile32"
-let iconname_remove = "deletefile32"
-let iconname_cleaning = "trashb32"
-
 let image_default = ref (GdkPixbuf.create ~width:1 ~height:1 ())
 (** dumb pixbuf *)
 let image_undone = ref !image_default
@@ -352,16 +323,19 @@ let image_valid = ref !image_default
 let image_unknown = ref !image_default
 let image_invalid = ref !image_default
 let image_timeout = ref !image_default
+let image_outofmemory = ref !image_default
 let image_failure = ref !image_default
 let image_valid_obs = ref !image_default
 let image_unknown_obs = ref !image_default
 let image_invalid_obs = ref !image_default
 let image_timeout_obs = ref !image_default
+let image_outofmemory_obs = ref !image_default
 let image_failure_obs = ref !image_default
 let image_yes = ref !image_default
 let image_no = ref !image_default
-let image_directory = ref !image_default
 let image_file = ref !image_default
+let image_theory = ref !image_default
+let image_goal = ref !image_default
 let image_prover = ref !image_default
 let image_transf = ref !image_default
 let image_editor = ref !image_default
@@ -373,37 +347,127 @@ let image_cleaning = ref !image_default
 
 let why_icon = ref !image_default
 
+let image ?size f =
+  let main = get_main () in
+  let n = 
+    Filename.concat (datadir main)
+      (Filename.concat "images" (f^".png"))
+  in
+  match size with
+    | None ->
+        GdkPixbuf.from_file n
+    | Some s ->
+        GdkPixbuf.from_file_at_size ~width:s ~height:s n
+
+let iconname_default = ref ""
+let iconname_undone = ref ""
+let iconname_scheduled = ref ""
+let iconname_running = ref ""
+let iconname_valid = ref ""
+let iconname_unknown = ref ""
+let iconname_invalid = ref ""
+let iconname_timeout = ref ""
+let iconname_outofmemory = ref ""
+let iconname_failure = ref ""
+let iconname_valid_obs = ref ""
+let iconname_unknown_obs = ref ""
+let iconname_invalid_obs = ref ""
+let iconname_timeout_obs = ref ""
+let iconname_outofmemory_obs = ref ""
+let iconname_failure_obs = ref ""
+let iconname_yes = ref ""
+let iconname_no = ref ""
+let iconname_file = ref ""
+let iconname_theory = ref ""
+let iconname_goal = ref ""
+let iconname_prover = ref ""
+let iconname_transf = ref ""
+let iconname_editor = ref ""
+let iconname_replay = ref ""
+let iconname_cancel = ref ""
+let iconname_reload = ref ""
+let iconname_remove = ref ""
+let iconname_cleaning = ref ""
+
+let load_icon_names () =
+  let ide = config () in
+  let iconset = ide.iconset in
+  let main = get_main () in
+  let n =
+    Filename.concat (datadir main) (Filename.concat "images" "icons.rc")
+  in
+  let d = Rc.from_file n in
+  let d = Rc.get_family d "iconset" in
+  let d = List.assoc iconset d in
+  let get_icon_name n =
+    Filename.concat iconset (get_string ~default:"default" d n)
+  in
+  iconname_default := get_icon_name "default";
+  iconname_undone := get_icon_name "undone";
+  iconname_scheduled := get_icon_name "scheduled";
+  iconname_running := get_icon_name "running";
+  iconname_valid := get_icon_name "valid";
+  iconname_unknown := get_icon_name "unknown";
+  iconname_invalid := get_icon_name "invalid";
+  iconname_timeout := get_icon_name "timeout";
+  iconname_outofmemory := get_icon_name "outofmemory";
+  iconname_failure := get_icon_name "failure";
+  iconname_valid_obs := get_icon_name "valid_obs";
+  iconname_unknown_obs := get_icon_name "unknown_obs";
+  iconname_invalid_obs := get_icon_name "invalid_obs";
+  iconname_timeout_obs := get_icon_name "timeout_obs";
+  iconname_outofmemory_obs := get_icon_name "outofmemory_obs";
+  iconname_failure_obs := get_icon_name "failure_obs";
+  iconname_yes := get_icon_name "yes";
+  iconname_no := get_icon_name "no";
+  iconname_file := get_icon_name "file";
+  iconname_theory := get_icon_name "theory";
+  iconname_goal := get_icon_name "goal";
+  iconname_prover := get_icon_name "prover";
+  iconname_transf := get_icon_name "transf";
+  iconname_editor := get_icon_name "editor";
+  iconname_replay := get_icon_name "replay";
+  iconname_cancel := get_icon_name "cancel";
+  iconname_reload := get_icon_name "reload";
+  iconname_remove := get_icon_name "remove";
+  iconname_cleaning := get_icon_name "cleaning";
+  ()
+
 let resize_images size =
-  image_default := image ~size iconname_default;
-  image_undone := image ~size iconname_undone;
-  image_scheduled := image ~size iconname_scheduled;
-  image_running := image ~size iconname_running;
-  image_valid := image ~size iconname_valid;
-  image_unknown := image ~size iconname_unknown;
-  image_invalid := image ~size iconname_invalid;
-  image_timeout := image ~size iconname_timeout;
-  image_failure := image ~size iconname_failure;
-  image_valid_obs := image ~size iconname_valid_obs;
-  image_unknown_obs := image ~size iconname_unknown_obs;
-  image_invalid_obs := image ~size iconname_invalid_obs;
-  image_timeout_obs := image ~size iconname_timeout_obs;
-  image_failure_obs := image ~size iconname_failure_obs;
-  image_yes := image ~size iconname_yes;
-  image_no := image ~size iconname_no;
-  image_directory := image ~size iconname_directory;
-  image_file := image ~size iconname_file;
-  image_prover := image ~size iconname_prover;
-  image_transf := image ~size iconname_transf;
-  image_editor := image ~size iconname_editor;
-  image_replay := image ~size iconname_replay;
-  image_cancel := image ~size iconname_cancel;
-  image_reload := image ~size iconname_reload;
-  image_remove := image ~size iconname_remove;
-  image_cleaning := image ~size iconname_cleaning;
+  image_default := image ~size !iconname_default;
+  image_undone := image ~size !iconname_undone;
+  image_scheduled := image ~size !iconname_scheduled;
+  image_running := image ~size !iconname_running;
+  image_valid := image ~size !iconname_valid;
+  image_unknown := image ~size !iconname_unknown;
+  image_invalid := image ~size !iconname_invalid;
+  image_timeout := image ~size !iconname_timeout;
+  image_outofmemory := image ~size !iconname_outofmemory;
+  image_failure := image ~size !iconname_failure;
+  image_valid_obs := image ~size !iconname_valid_obs;
+  image_unknown_obs := image ~size !iconname_unknown_obs;
+  image_invalid_obs := image ~size !iconname_invalid_obs;
+  image_timeout_obs := image ~size !iconname_timeout_obs;
+  image_outofmemory_obs := image ~size !iconname_outofmemory_obs;
+  image_failure_obs := image ~size !iconname_failure_obs;
+  image_yes := image ~size !iconname_yes;
+  image_no := image ~size !iconname_no;
+  image_file := image ~size !iconname_file;
+  image_theory := image ~size !iconname_theory;
+  image_goal := image ~size !iconname_goal;
+  image_prover := image ~size !iconname_prover;
+  image_transf := image ~size !iconname_transf;
+  image_editor := image ~size !iconname_editor;
+  image_replay := image ~size !iconname_replay;
+  image_cancel := image ~size !iconname_cancel;
+  image_reload := image ~size !iconname_reload;
+  image_remove := image ~size !iconname_remove;
+  image_cleaning := image ~size !iconname_cleaning;
   ()
 
 let init () =
   eprintf "[Info] reading icons...@?";
+  load_icon_names ();
   why_icon := image "logo-why";
   resize_images 20;
   eprintf " done.@."
@@ -420,31 +484,43 @@ let show_legend_window () =
   let it s = b#insert ~iter:b#end_iter ~tags:[tt] s in
   let ib i = b#insert_pixbuf ~iter:b#end_iter ~pixbuf:!i in
   it "Tree view\n";
-  ib image_directory;
-  i "   Theory, containing a set of goals\n";
   ib image_file;
+  i "   File, containing a set of theories\n";
+  ib image_theory;
+  i "   Theory, containing a set of goals\n";
+  ib image_goal;
   i "   Goal\n";
   ib image_prover;
   i "   External prover\n";
   ib image_transf;
   i "   Transformation\n";
   it "Status column\n";
+  ib image_undone;
+  i "   External proof attempt not done\n";
   ib image_scheduled;
   i "   Scheduled external proof attempt\n";
   ib image_running;
   i "   Running external proof attempt\n";
   ib image_valid;
   i "   Goal is proved / Theory is fully verified\n";
-(*
   ib image_invalid;
   i "   External prover disproved the goal\n";
-*)
   ib image_timeout;
   i "   External prover reached the time limit\n";
+  ib image_outofmemory;
+  i "   External prover ran out of memory\n";
   ib image_unknown;
   i "   External prover answer not conclusive\n";
   ib image_failure;
   i "   External prover call failed\n";
+  ib image_valid_obs;
+  i "   Valid but obsolete result\n";
+  ib image_unknown_obs;
+  i "   Answer not conclusive and obsolete\n";
+  ib image_invalid_obs;
+  i "   Prover disproved goal, but obsolete\n";
+  ib image_failure_obs;
+  i "   External prover call failed, obsolete\n";
   dialog#add_button "Close" `CLOSE ;
   let t = b#create_tag [`LEFT_MARGIN 10; `RIGHT_MARGIN 10 ] in
   b#apply_tag t ~start:b#start_iter ~stop:b#end_iter;
@@ -728,12 +804,14 @@ let editors_page c (notebook:GPack.notebook) =
   let frame = GBin.frame ~label:"Specific editors" ~packing:page#pack () in
   let box = GPack.vbox ~border_width:5 ~packing:frame#add () in
   let editors = Whyconf.get_editors c.config in
-  let _,strings,indexes =
+  let _,strings,indexes,map =
     Meditor.fold
-      (fun k _ (i,str,ind) -> (i+1,k::str,Meditor.add k i ind))
-      editors (2, [], Meditor.empty)
+      (fun k data (i,str,ind,map) ->
+        let n = data.editor_name in
+        (i+1, n::str, Meditor.add k i ind, Meditor.add n k map))
+      editors (2, [], Meditor.empty, Meditor.empty)
   in
-  let strings = "default" :: "--" :: (List.rev strings) in
+  let strings = "(default)" :: "--" :: (List.rev strings) in
   let add_prover p pi =
     let text = p.prover_name ^ " " ^ p.prover_version in
     let hb = GPack.hbox ~homogeneous:false ~packing:box#pack () in
@@ -752,10 +830,12 @@ let editors_page c (notebook:GPack.notebook) =
         match combo#active_iter with
           | None -> ()
           | Some row ->
-	    let data = 
+	    let data =
               match combo#model#get ~row ~column with
-                | "default" -> ""
-                | s -> s
+                | "(default)" -> ""
+                | s ->
+                  try Meditor.find s map
+                  with Not_found -> assert false
             in
 	    (* Format.eprintf "prover %a : selected editor '%s'@." *)
             (*   print_prover p data; *)
@@ -1000,7 +1080,8 @@ let replace_prover c to_be_removed to_be_copied =
   res
 *)
 
-let read_config conf_file extra_files = read_config conf_file extra_files; init ()
+let read_config conf_file extra_files =
+  read_config conf_file extra_files; init ()
 
 (*
 Local Variables:

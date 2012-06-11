@@ -19,6 +19,7 @@
 (**************************************************************************)
 
 open Why3
+open Util
 open Ident
 open Ty
 open Term
@@ -39,14 +40,6 @@ let create_pvsymbol id vtv = {
   pv_vtv  = vtv;
 }
 
-type pasymbol = {
-  pa_name : ident;
-  pa_vta  : vty_arrow;
-  pa_vars : varset;
-}
-
-let pa_equal : pasymbol -> pasymbol -> bool = (==)
-
 (** program symbols *)
 
 type psymbol = {
@@ -57,6 +50,13 @@ type psymbol = {
 }
 
 let ps_equal : psymbol -> psymbol -> bool = (==)
+
+let create_psymbol id vta vars = {
+  ps_name  = id_register id;
+  ps_vta   = vta_filter vars vta;
+  ps_vars  = vars;
+  ps_subst = vars_freeze vars;
+}
 
 (** program/logic symbols *)
 
@@ -73,6 +73,7 @@ let create_plsymbol id args value =
   let ty_of_vtv vtv = ty_of_ity vtv.vtv_ity in
   let pure_args = List.map ty_of_vtv args in
   let ls = create_fsymbol id pure_args (ty_of_vtv value) in
+  let eff_read e r = eff_read e ~ghost:value.vtv_ghost r in
   let effect = Util.option_fold eff_read eff_empty value.vtv_mut in
   let arg_reset acc a = Util.option_fold eff_reset acc a.vtv_mut in
   let effect = List.fold_left arg_reset effect args in {
@@ -101,6 +102,10 @@ let ppat_var pv =
     ppat_vtv     = pv.pv_vtv;
     ppat_effect  = eff_empty; }
 
+let ppat_is_wild pp = match pp.ppat_pattern.pat_node with
+  | Pwild -> true
+  | _ -> false
+
 let ppat_plapp pls ppl vtv =
   if vtv.vtv_mut <> None then
     Loc.errorm "Only variable patterns can be mutable";
@@ -113,18 +118,22 @@ let ppat_plapp pls ppl vtv =
   let sbs = ity_match ity_subst_empty pls.pl_value.vtv_ity vtv.vtv_ity in
   let mtch eff arg pp =
     ignore (ity_match sbs arg.vtv_ity pp.ppat_vtv.vtv_ity);
-    if pp.ppat_vtv.vtv_ghost <> (vtv.vtv_ghost || arg.vtv_ghost) then
+    let ghost = pp.ppat_vtv.vtv_ghost in
+    if ghost <> (vtv.vtv_ghost || arg.vtv_ghost) then
       Loc.errorm "Ghost pattern in a non-ghost context";
+    let effect = eff_union eff pp.ppat_effect in
     match arg.vtv_mut, pp.ppat_vtv.vtv_mut with
-      | Some r1, Some r2 ->
-          ignore (reg_match sbs r1 r2);
-          eff_read (eff_union eff pp.ppat_effect) (reg_full_inst sbs r1)
-      | Some r1, None ->
-          eff_read (eff_union eff pp.ppat_effect) (reg_full_inst sbs r1)
-      | None, None ->
-          eff_union eff pp.ppat_effect
-      | None, Some _ ->
-          Loc.errorm "Mutable pattern in a non-mutable position"
+    | _ when ppat_is_wild pp ->
+        effect
+    | Some r1, Some r2 ->
+        ignore (reg_match sbs r1 r2);
+        eff_read ~ghost effect (reg_full_inst sbs r1)
+    | Some r1, None ->
+        eff_read ~ghost effect (reg_full_inst sbs r1)
+    | None, None ->
+        effect
+    | None, Some _ ->
+        Loc.errorm "Mutable pattern in a non-mutable position"
   in
   let eff = try List.fold_left2 mtch eff_empty pls.pl_args ppl
     with Invalid_argument _ -> raise
@@ -132,13 +141,15 @@ let ppat_plapp pls ppl vtv =
   let pl = List.map (fun pp -> pp.ppat_pattern) ppl in
   { ppat_pattern = pat_app pls.pl_ls pl (ty_of_ity vtv.vtv_ity);
     ppat_vtv     = vtv;
-    ppat_effect  = eff; }
+    ppat_effect  = if vtv.vtv_ghost then eff_ghostify eff else eff; }
+
+let ity_of_ty_opt ty = ity_of_ty (Util.def_option ty_bool ty)
 
 let ppat_lapp ls ppl vtv =
   let pls = {
     pl_ls     = ls;
     pl_args   = List.map (fun ty -> vty_value (ity_of_ty ty)) ls.ls_args;
-    pl_value  = vty_value (ity_of_ty (Util.def_option ty_bool ls.ls_value));
+    pl_value  = vty_value (ity_of_ty_opt ls.ls_value);
     pl_effect = eff_empty; }
   in
   ppat_plapp pls ppl vtv
@@ -169,6 +180,94 @@ let ppat_as pp pv =
     ppat_vtv     = vtv;
     ppat_effect  = pp.ppat_effect; }
 
+(* reconstruct a pattern from an untyped skeleton *)
+
+type pre_ppattern =
+  | PPwild
+  | PPvar  of preid
+  | PPlapp of lsymbol * pre_ppattern list
+  | PPpapp of plsymbol * pre_ppattern list
+  | PPor   of pre_ppattern * pre_ppattern
+  | PPas   of pre_ppattern * preid
+
+let make_ppattern pp vtv =
+  let hv = Hashtbl.create 3 in
+  let find id vtv =
+    let nm = preid_name id in
+    try
+      let pv = Hashtbl.find hv nm in
+      ity_equal_check vtv.vtv_ity pv.pv_vtv.vtv_ity;
+      pv
+    with Not_found ->
+      let pv = create_pvsymbol id vtv in
+      Hashtbl.add hv nm pv; pv
+  in
+  let unmut vtv = vty_value ~ghost:vtv.vtv_ghost vtv.vtv_ity in
+  let rec make vtv = function
+    | PPwild -> {
+        ppat_pattern = pat_wild (ty_of_ity vtv.vtv_ity);
+        ppat_vtv     = unmut vtv;
+        ppat_effect  = eff_empty; }
+    | PPvar id -> {
+        ppat_pattern = pat_var (find id vtv).pv_vs;
+        ppat_vtv     = vtv;
+        ppat_effect  = eff_empty; }
+    | PPpapp (pls,ppl) ->
+        (* FIXME? Since pls is a constructor, the result type vtv will
+           cover every type variable and region in the signature of pls.
+           Then the following ity_match call is enough to build the full
+           substitution. If, however, we are given a bad pls, say, a
+           projection, then the following code may break with a less
+           than understandable error message. Is it really important? *)
+        let sbs = ity_match ity_subst_empty pls.pl_value.vtv_ity vtv.vtv_ity in
+        let mtch arg pp =
+          let ity = ity_full_inst sbs arg.vtv_ity in
+          let ghost = vtv.vtv_ghost || arg.vtv_ghost in
+          let mut = Util.option_map (reg_full_inst sbs) arg.vtv_mut in
+          let pp = make (vty_value ~ghost ?mut ity) pp in
+          if ppat_is_wild pp then pp.ppat_effect, pp else
+          Util.option_fold (eff_read ~ghost) pp.ppat_effect mut, pp
+        in
+        let ppl = try List.map2 mtch pls.pl_args ppl with Invalid_argument _ ->
+          raise (Term.BadArity
+            (pls.pl_ls, List.length pls.pl_args, List.length ppl)) in
+        let eff = List.fold_left
+          (fun acc (eff,_) -> eff_union acc eff) eff_empty ppl in
+        let pl = List.map (fun (_,pp) -> pp.ppat_pattern) ppl in
+        { ppat_pattern = pat_app pls.pl_ls pl (ty_of_ity vtv.vtv_ity);
+          ppat_vtv     = unmut vtv;
+          ppat_effect  = if vtv.vtv_ghost then eff_ghostify eff else eff; }
+    | PPlapp (ls,ppl) ->
+        let ity = ity_of_ty_opt ls.ls_value in
+        let sbs = ity_match ity_subst_empty ity vtv.vtv_ity in
+        let mtch arg pp =
+          let ity = ity_full_inst sbs (ity_of_ty arg) in
+          make (vty_value ~ghost:vtv.vtv_ghost ity) pp
+        in
+        let ppl = try List.map2 mtch ls.ls_args ppl with Invalid_argument _ ->
+          raise (Term.BadArity (ls,List.length ls.ls_args,List.length ppl)) in
+        let eff = List.fold_left
+          (fun acc pp -> eff_union acc pp.ppat_effect) eff_empty ppl in
+        let pl = List.map (fun pp -> pp.ppat_pattern) ppl in
+        { ppat_pattern = pat_app ls pl (ty_of_ity vtv.vtv_ity);
+          ppat_vtv     = unmut vtv;
+          ppat_effect  = if vtv.vtv_ghost then eff_ghostify eff else eff; }
+    | PPor (pp1,pp2) ->
+        let vtv = unmut vtv in
+        let pp1 = make vtv pp1 in
+        let pp2 = make vtv pp2 in
+        { ppat_pattern = pat_or pp1.ppat_pattern pp2.ppat_pattern;
+          ppat_vtv     = vtv;
+          ppat_effect  = eff_union pp1.ppat_effect pp2.ppat_effect; }
+    | PPas (pp,id) ->
+        let pp = make vtv pp in
+        { ppat_pattern = pat_as pp.ppat_pattern (find id vtv).pv_vs;
+          ppat_vtv     = unmut vtv;
+          ppat_effect  = pp.ppat_effect; }
+  in
+  let pp = make (unmut vtv) pp in
+  Hashtbl.fold Mstr.add hv Mstr.empty, pp
+
 (** program expressions *)
 
 type pre   = term (* precondition *)
@@ -187,14 +286,15 @@ type expr = {
 and expr_node =
   | Elogic  of term
   | Evalue  of pvsymbol
-  | Earrow  of pasymbol
-  | Einst   of psymbol
-  | Eapp    of pasymbol * pvsymbol
+  | Earrow  of psymbol
+  | Eapp    of expr * pvsymbol
   | Elet    of let_defn * expr
   | Erec    of rec_defn list * expr
   | Eif     of pvsymbol * expr * expr
   | Ecase   of pvsymbol * (ppattern * expr) list
   | Eassign of pvsymbol * region * pvsymbol (* mutable pv <- expr *)
+  | Eghost  of expr
+  | Eany    of any_effect
 
 and let_defn = {
   let_var  : let_var;
@@ -203,7 +303,7 @@ and let_defn = {
 
 and let_var =
   | LetV of pvsymbol
-  | LetA of pasymbol
+  | LetA of psymbol
 
 and rec_defn = {
   rec_ps     : psymbol;
@@ -225,6 +325,12 @@ and variant = {
   v_rel  : lsymbol option; (* tau tau : prop *)
 }
 
+and any_effect = {
+  aeff_reads  : expr list;
+  aeff_writes : expr list;
+  aeff_raises : (bool * xsymbol) list;
+}
+
 (* smart constructors *)
 
 let e_label ?loc l e = { e with e_label = l; e_loc = loc }
@@ -239,104 +345,106 @@ let e_label_copy { e_label = lab; e_loc = loc } e =
 exception GhostWrite of expr * region
 exception GhostRaise of expr * xsymbol
 
-let ghost_effect e =
-  if vty_ghost e.e_vty then
-    let eff = e.e_effect in
-    let check r = not r.reg_ghost in
-    if Sreg.exists check eff.eff_writes then
-      let s = Sreg.filter check eff.eff_writes in
-      raise (GhostWrite (e, Sreg.choose s))
-    else e
-  else e
-
-let mk_expr node vty eff vars =
-  ghost_effect {
-    e_node   = node;
-    e_vty    = vty;
-    e_effect = eff;
-    e_vars   = vars;
-    e_label  = Slab.empty;
-    e_loc    = None;
-  }
+let mk_expr node vty eff vars = {
+  e_node   = node;
+  e_vty    = vty;
+  e_effect = if vty_ghost vty then eff_ghostify eff else eff;
+  e_vars   = vars;
+  e_label  = Slab.empty;
+  e_loc    = None;
+}
 
 let varmap_join = Mid.fold (fun _ -> vars_union)
 let varmap_union = Mid.union (fun _ s1 s2 -> Some (vars_union s1 s2))
 
 let add_pv_vars pv m = Mid.add pv.pv_vs.vs_name pv.pv_vtv.vtv_vars m
-let add_pa_vars pa m = Mid.add pa.pa_name pa.pa_vars m
 let add_e_vars e m = varmap_union e.e_vars m
 
 let e_value pv =
   mk_expr (Evalue pv) (VTvalue pv.pv_vtv) eff_empty (add_pv_vars pv Mid.empty)
-
-let e_arrow pa =
-  mk_expr (Earrow pa) (VTarrow pa.pa_vta) eff_empty (add_pa_vars pa Mid.empty)
 
 let e_inst ps sbs =
   (* we only count the fixed type variables and regions of ps, so that
      type variables and regions introduced by the substitution could be
      generalized in this expression *)
   let vars = Mid.singleton ps.ps_name ps.ps_vars in
-  let vta =
-    if not (Mtv.is_empty sbs.ity_subst_tv && Mreg.is_empty sbs.ity_subst_reg)
-    then vta_full_inst (ity_subst_union ps.ps_subst sbs) ps.ps_vta
-    else ps.ps_vta
-  in
-  mk_expr (Einst ps) (VTarrow vta) eff_empty vars
+  let vta = vta_full_inst (ity_subst_union ps.ps_subst sbs) ps.ps_vta in
+  mk_expr (Earrow ps) (VTarrow vta) eff_empty vars
 
-let e_app_real pa pv =
-  let eff,vty = vty_app_arrow pa.pa_vta pv.pv_vtv in
-  mk_expr (Eapp (pa,pv)) vty eff (add_pv_vars pv (add_pa_vars pa Mid.empty))
+let e_cast ps vty =
+  let rec vty_match sbs t1 t2 = match t1,t2 with
+    | VTvalue v1, VTvalue v2 ->
+        ity_match sbs v1.vtv_ity v2.vtv_ity
+    | VTarrow a1, VTarrow a2 ->
+        let sbs = ity_match sbs a1.vta_arg.vtv_ity a2.vta_arg.vtv_ity in
+        vty_match sbs a1.vta_result a2.vta_result
+    | _ -> invalid_arg "Mlw_expr.e_cast"
+  in
+  let sbs = vty_match ps.ps_subst (VTarrow ps.ps_vta) vty in
+  let vars = Mid.singleton ps.ps_name ps.ps_vars in
+  let vta = vta_full_inst sbs ps.ps_vta in
+  mk_expr (Earrow ps) (VTarrow vta) eff_empty vars
 
 let create_let_defn id e =
   let lv = match e.e_vty with
-    | VTvalue vtv -> LetV (create_pvsymbol id vtv)
-    | VTarrow vta -> LetA {
-        pa_name = Ident.id_register id;
-        pa_vta  = vta;
-        pa_vars = varmap_join e.e_vars vta.vta_vars; }
+    | VTvalue vtv ->
+        LetV (create_pvsymbol id vtv)
+    | VTarrow vta ->
+        let vars = varmap_join e.e_vars vta.vta_vars in
+        LetA (create_psymbol id vta vars)
   in
   { let_var = lv ; let_expr = e }
 
-exception StaleRegion of region * ident * expr
+exception StaleRegion of region * ident
 
-let e_let ({ let_var = lv ; let_expr = d } as ld) e =
-  let id = match lv with
-    | LetV pv -> pv.pv_vs.vs_name
-    | LetA pa -> pa.pa_name
-  in
-  let vars = Mid.remove id e.e_vars in
-  (* If we reset some region in the first expression d, then it may only
-     occur in the second expression e in association to pv. Otherwise,
-     this is a freshness violation: some symbol defined earlier carries
-     that region into e. *)
-  (* FIXME? bad complexity, we should be able to do better *)
-  let check_reset r u = (* does r occur in e? *)
+let check_reset e vars =
+  (* If we reset a region, then it may only occur in the later code
+     as the result of the resetting expression. Otherwise, this is
+     a freshness violation: some symbol defined earlier carries that
+     region into the later code. *)
+  let check_reset r u = (* does r occur in vars? *)
     let check_id id s = (* does r occur among the regions of id? *)
       let rec check_reg reg =
         reg_equal r reg || match u with
           | Some u when reg_equal u reg -> false
           | _ -> ity_v_any Util.ffalse check_reg reg.reg_ity
       in
-      if Sreg.exists check_reg s.vars_reg then raise (StaleRegion (r,id,e))
+      if Sreg.exists check_reg s.vars_reg then raise (StaleRegion (r,id))
     in
     Mid.iter check_id vars
   in
-  Mreg.iter check_reset d.e_effect.eff_resets;
-  (* We should be able to raise and catch exceptions inside ghost expressions.
-     The problematic case is a ghost exception that escapes into reality. *)
-  (* FIXME: this test is too restrictive. If this let is embedded into a
-     bigger ghost expression, then an exception raised from d and catched
-     there is benign. A good test is to traverse top-level definitions
-     from top to bottom and check if exceptions escape from the outermost
-     ghost subexpressions. *)
-  if vty_ghost d.e_vty && not (vty_ghost e.e_vty) &&
-      not (Sexn.is_empty d.e_effect.eff_raises) then
-    raise (GhostRaise (d, Sexn.choose d.e_effect.eff_raises));
-  (* This should be the only expression constructor that deals with
-     sequence of effects *)
+  Mreg.iter check_reset e.e_effect.eff_resets
+
+let check_ghost_write e eff =
+  (* If we make a ghost write, then the modified region cannot
+     be read in a later non-ghost code. We ignore any resets:
+     a once ghostified region must stay so, even if it is reset. *)
+  let badwr = Sreg.inter e.e_effect.eff_ghostw eff.eff_reads in
+  if not (Sreg.is_empty badwr) then raise (GhostWrite (e, Sreg.choose badwr))
+
+let e_let ({ let_var = lv ; let_expr = d } as ld) e =
+  let id = match lv with
+    | LetV pv -> pv.pv_vs.vs_name
+    | LetA ps -> ps.ps_name in
+  let vars = Mid.remove id e.e_vars in
+  check_reset d vars;
+  check_ghost_write d e.e_effect;
   let eff = eff_union d.e_effect e.e_effect in
   mk_expr (Elet (ld,e)) e.e_vty eff (add_e_vars d vars)
+
+exception ValueExpected of expr
+exception ArrowExpected of expr
+
+let e_app_real e pv =
+  let vta = match e.e_vty with
+    | VTarrow vta -> vta
+    | VTvalue _ -> raise (ArrowExpected e)
+  in
+  let eff,vty = vty_app_arrow vta pv.pv_vtv in
+  check_reset e (add_pv_vars pv Mid.empty);
+  check_ghost_write e eff;
+  let eff = eff_union e.e_effect eff in
+  mk_expr (Eapp (e,pv)) vty eff (add_pv_vars pv e.e_vars)
 
 let create_post vs f = t_eps_close vs f
 
@@ -359,12 +467,12 @@ let create_fun_defn id lam =
        in the postcondition formula when lam.l_expr.e_vty is an arrow? *)
   end;
   Mexn.iter (fun xs t -> check_post xs.xs_ity t) lam.l_xpost;
-  if lam.l_variant <> [] then
-    Loc.errorm "Variants are not allowed in a non-recursive definition";
   (* compute rec_vars and ps.ps_vars *)
   let add_term t s = Mvs.set_union t.t_vars s in
   let vsset = add_term lam.l_post (add_term lam.l_pre Mvs.empty) in
   let vsset = Mexn.fold (fun _ -> add_term) lam.l_xpost vsset in
+  let vsset =
+    List.fold_right (fun v -> add_term v.v_term) lam.l_variant vsset in
   let add_vs vs _ m = Mid.add vs.vs_name (vs_vars vars_empty vs) m in
   let del_pv m pv = Mid.remove pv.pv_vs.vs_name m in
   let recvars = Mvs.fold add_vs vsset Mid.empty in
@@ -379,14 +487,8 @@ let create_fun_defn id lam =
   let vta = vty_arrow arg.pv_vtv ~effect:e.e_effect e.e_vty in
   let add_arg vta pv = vty_arrow pv.pv_vtv (VTarrow vta) in
   let vta = List.fold_left add_arg vta argl in
-  (* construct rec_ps and rec_defn *)
-  let ps = {
-    ps_name  = id_register id;
-    ps_vta   = vta;
-    ps_vars  = vars;
-    ps_subst = vars_freeze vars; }
-  in {
-    rec_ps     = ps;
+  (* construct rec_defn *)
+  { rec_ps     = create_psymbol id vta vars;
     rec_lambda = lam;
     rec_vars   = recvars; }
 
@@ -397,41 +499,25 @@ let e_rec rdl e =
   let vars = List.fold_left remove_ps vars rdl in
   mk_expr (Erec (rdl,e)) e.e_vty e.e_effect vars
 
-exception ValueExpected of expr
-exception ArrowExpected of expr
-
 let on_value fn e = match e.e_node with
   | Evalue pv -> fn pv
   | _ ->
       let ld = create_let_defn (id_fresh "o") e in
       let pv = match ld.let_var with
         | LetA _ -> raise (ValueExpected e)
-        | LetV pv -> pv
-      in
+        | LetV pv -> pv in
       e_let ld (fn pv)
-
-let on_arrow fn e = match e.e_node with
-  | Earrow pa -> fn pa
-  | _ ->
-      let ld = create_let_defn (id_fresh "o") e in
-      let pa = match ld.let_var with
-        | LetV _ -> raise (ArrowExpected e)
-        | LetA pa -> pa
-      in
-      e_let ld (fn pa)
 
 (* We adopt right-to-left evaluation order so that expression
      get_ref (create_ref 5)
    produces
      let pv : ref<ro> int =
         let pv1 : int = Elogic 5 in
-        let pa1 : int -> ref<ro> int = Einst create_ref in
-        Eapp pa1 pv1 [reset ro]
+        Eapp (Earrow create_ref) pv1 [reset ro]
      in
-     let pa : ref<ro> int -> int = Einst get_ref in
-     Eapp pa pv [read ro]
-   which is ok. If pa is computed before pv, then Eapp pa pv would
-   violate the freshness of ro.
+     Eapp (Earrow get_ref) pv [read ro]
+   which is ok. If (Earrow get_ref) is computed before pv,
+   the second application would violate the freshness of ro.
 
    FIXME? This means that some reasonable programs, such as
      let local_get_ref = get_ref in
@@ -440,15 +526,11 @@ let on_arrow fn e = match e.e_node with
    will be rejected, since local_get_ref is instantiated to
    the region introduced (reset) by create_ref. Is it bad? *)
 
-let e_app e el =
-  let rec apply = function
-    | [] -> e
-    | e::el ->
-        let app pv pa = e_app_real pa pv in
-        let app pv = on_arrow (app pv) (apply el) in
-        on_value app e
-  in
-  apply (List.rev el)
+let e_app = List.fold_left (fun e -> on_value (e_app_real e))
+
+let vtv_of_expr e = match e.e_vty with
+  | VTvalue vtv -> vtv
+  | VTarrow _ -> raise (ValueExpected e)
 
 let e_plapp pls el ity =
   let rec app tl vars ghost eff sbs vtvl argl =
@@ -475,10 +557,8 @@ let e_plapp pls el ity =
       | vtv::vtvl, ({ e_node = Elogic t } as e)::argl ->
           let t = match t.t_ty with
             | Some _ -> t
-            | None -> t_if t t_bool_true t_bool_false in
-          let evtv = match e.e_vty with
-            | VTvalue vtv -> vtv
-            | VTarrow _   -> assert false in
+            | None -> t_if_simp t t_bool_true t_bool_false in
+          let evtv = vtv_of_expr e in
           let ghost = ghost || (evtv.vtv_ghost && not vtv.vtv_ghost) in
           let eff = eff_union eff e.e_effect in
           let sbs = ity_match sbs vtv.vtv_ity evtv.vtv_ity in
@@ -500,14 +580,10 @@ let e_lapp ls el ity =
   let pls = {
     pl_ls     = ls;
     pl_args   = List.map (fun ty -> vty_value (ity_of_ty ty)) ls.ls_args;
-    pl_value  = vty_value (ity_of_ty (Util.def_option ty_bool ls.ls_value));
+    pl_value  = vty_value (ity_of_ty_opt ls.ls_value);
     pl_effect = eff_empty; }
   in
   e_plapp pls el ity
-
-let vtv_of_expr e = match e.e_vty with
-  | VTvalue vtv -> vtv
-  | VTarrow _ -> raise (ValueExpected e)
 
 let e_if_real pv e1 e2 =
   let vtv1 = vtv_of_expr e1 in
@@ -539,6 +615,7 @@ let e_case_real pv bl =
         let ghost = ghost || vtv.vtv_ghost in
         let del_vs vs _ m = Mid.remove vs.vs_name m in
         let bvars = Mvs.fold del_vs pp.ppat_pattern.pat_vars e.e_vars in
+        let eff = eff_union (eff_union eff pp.ppat_effect) e.e_effect in
         branch ghost eff (varmap_union vars bvars) bl
     | [] ->
         let vty = VTvalue (vty_value ~ghost ity) in
@@ -548,23 +625,197 @@ let e_case_real pv bl =
 
 let e_case e bl = on_value (fun pv -> e_case_real pv bl) e
 
-exception Immutable of pvsymbol
+exception Immutable of expr
 
-let e_assign_real mpv pv =
+let e_assign_real me mpv pv =
   let r = match mpv.pv_vtv.vtv_mut with
     | Some r -> r
-    | None -> raise (Immutable mpv)
+    | None -> raise (Immutable me)
   in
-  let eff = eff_assign eff_empty r pv.pv_vtv.vtv_ity in
-  let vars = add_pv_vars pv (add_pv_vars mpv Mid.empty) in
   let ghost = mpv.pv_vtv.vtv_ghost || pv.pv_vtv.vtv_ghost in
+  let eff = eff_assign eff_empty ~ghost r pv.pv_vtv.vtv_ity in
+  let vars = add_pv_vars pv (add_pv_vars mpv Mid.empty) in
   let vty = VTvalue (vty_value ~ghost ity_unit) in
-  mk_expr (Eassign (mpv,r,pv)) vty eff vars
+  let e = mk_expr (Eassign (mpv,r,pv)) vty eff vars in
+  (* FIXME? Ok, this is awkward. We prohibit assignments
+     where a ghost value is being written in a non-ghost
+     mutable lvalue (which is reasonable), but we build the
+     offending expression nonetheless and include it into
+     the exception! But in fact, there is nothing inherently
+     bad in such expressions, and the check here serves only
+     to catch potential problems early. Indeed, it is quite
+     easy to fool: it suffices to write (ghost r).val <- ghv,
+     to put a ghost value ghv into a non-ghost reference r.
+     The real check is written above in e_let, where we ensure
+     that every ghost write (whether it was made into a ghost
+     lvalue or not) is never followed by a non-ghost read. *)
+  if not mpv.pv_vtv.vtv_ghost && pv.pv_vtv.vtv_ghost then
+    raise (GhostWrite (e,r));
+  e
 
 let e_assign me e =
-  let assign pv mpv = e_assign_real mpv pv in
+  let assign pv mpv = e_assign_real me mpv pv in
   let assign pv = on_value (assign pv) me in
   on_value assign e
+
+let e_ghost e =
+  mk_expr (Eghost e) (vty_ghostify e.e_vty) e.e_effect e.e_vars
+
+let e_any ee ity =
+  let add_effect fn eff e =
+    let vtv = vtv_of_expr e in
+    let r = match vtv.vtv_mut with
+      | Some r -> r
+      | None -> raise (Immutable e) in
+    fn eff ?ghost:(Some vtv.vtv_ghost) r
+  in
+  let add_raise eff (ghost,xs) =
+    eff_raise eff ~ghost xs
+  in
+  let eff = eff_empty in
+  let eff = List.fold_left (add_effect eff_read) eff ee.aeff_reads in
+  let eff = List.fold_left (add_effect eff_read) eff ee.aeff_writes in
+  let eff = List.fold_left add_raise eff ee.aeff_raises in
+  let eff = Sreg.fold (fun r e -> eff_reset e r) ity.ity_vars.vars_reg eff in
+  let vars = Mid.empty in
+  let vars = List.fold_right add_e_vars ee.aeff_reads vars in
+  let vars = List.fold_right add_e_vars ee.aeff_writes vars in
+  mk_expr (Eany ee) (VTvalue (vty_value ity)) eff vars
+
+let e_const t =
+  let vtv = vty_value (ity_of_ty_opt t.t_ty) in
+  mk_expr (Elogic t) (VTvalue vtv) eff_empty Mid.empty
+
+let e_int_const s = e_const (t_int_const s)
+let e_real_const rc = e_const (t_real_const rc)
+let e_const c = e_const (t_const c)
+
+(* FIXME? Should we rather use boolean constants here? *)
+let e_true =
+  mk_expr (Elogic t_true) (VTvalue (vty_value ity_bool)) eff_empty Mid.empty
+
+let e_false =
+  mk_expr (Elogic t_false) (VTvalue (vty_value ity_bool)) eff_empty Mid.empty
+
+let on_fmla fn e = match e.e_node with
+  | Elogic ({ t_ty = None } as f) -> fn e f
+  | Elogic t -> fn e (t_equ_simp t t_bool_true)
+  | Evalue pv -> fn e (t_equ_simp (t_var pv.pv_vs) t_bool_true)
+  | _ ->
+      let ld = create_let_defn (id_fresh "o") e in
+      let pv = match ld.let_var with
+        | LetA _ -> raise (ValueExpected e)
+        | LetV pv -> pv in
+      e_let ld (fn (e_value pv) (t_equ_simp (t_var pv.pv_vs) t_bool_true))
+
+let e_not e =
+  on_fmla (fun e f ->
+    let vtv = vtv_of_expr e in
+    ity_equal_check vtv.vtv_ity ity_bool;
+    let vty = VTvalue (vty_value ~ghost:vtv.vtv_ghost ity_bool) in
+    mk_expr (Elogic (t_not f)) vty e.e_effect e.e_vars) e
+
+let e_binop op e1 e2 =
+  on_fmla (fun e2 f2 -> on_fmla (fun e1 f1 ->
+    let vtv1 = vtv_of_expr e1 in
+    let vtv2 = vtv_of_expr e2 in
+    ity_equal_check vtv1.vtv_ity ity_bool;
+    ity_equal_check vtv2.vtv_ity ity_bool;
+    let vars = add_e_vars e1 e2.e_vars in
+    let eff = eff_union e1.e_effect e2.e_effect in
+    let ghost = vtv1.vtv_ghost || vtv2.vtv_ghost in
+    let vty = VTvalue (vty_value ~ghost ity_bool) in
+    mk_expr (Elogic (t_binary op f1 f2)) vty eff vars) e1) e2
+
+let e_lazy_and e1 e2 =
+  if eff_is_empty e2.e_effect then e_binop Tand e1 e2 else e_if e1 e2 e_false
+
+let e_lazy_or e1 e2 =
+  if eff_is_empty e2.e_effect then e_binop Tor e1 e2 else e_if e1 e_true e2
+
+(* Compute the fixpoint on recursive definitions *)
+
+let vars_equal vs1 vs2 =
+  Stv.equal vs1.vars_tv vs2.vars_tv &&
+  Sreg.equal vs1.vars_reg vs2.vars_reg
+
+let eff_equal eff1 eff2 =
+  Sreg.equal eff1.eff_reads  eff2.eff_reads  &&
+  Sreg.equal eff1.eff_writes eff2.eff_writes &&
+  Sexn.equal eff1.eff_raises eff2.eff_raises &&
+  Sreg.equal eff1.eff_ghostr eff2.eff_ghostr &&
+  Sreg.equal eff1.eff_ghostw eff2.eff_ghostw &&
+  Sexn.equal eff1.eff_ghostx eff2.eff_ghostx &&
+  Mreg.equal (Util.option_eq reg_equal) eff1.eff_resets eff2.eff_resets
+
+let vtv_equal vtv1 vtv2 =
+  ity_equal vtv1.vtv_ity vtv2.vtv_ity &&
+  vtv1.vtv_ghost = vtv2.vtv_ghost &&
+  option_eq reg_equal vtv1.vtv_mut vtv2.vtv_mut
+
+let rec vta_equal vta1 vta2 =
+  vtv_equal vta1.vta_arg vta2.vta_arg &&
+  eff_equal vta1.vta_effect vta2.vta_effect &&
+  vta1.vta_ghost = vta2.vta_ghost &&
+  match vta1.vta_result, vta2.vta_result with
+    | VTvalue vtv1, VTvalue vtv2 -> vtv_equal vtv1 vtv2
+    | VTarrow vta1, VTarrow vta2 -> vta_equal vta1 vta2
+    | _, _ -> false
+
+let ps_compat ps1 ps2 =
+  vta_equal ps1.ps_vta ps2.ps_vta &&
+  vars_equal ps1.ps_vars ps2.ps_vars
+
+let rec expr_subst psm e = match e.e_node with
+  | Earrow ps when Mid.mem ps.ps_name psm ->
+      e_cast (Mid.find ps.ps_name psm) e.e_vty
+  | Eapp (e,pv) ->
+      e_app_real (expr_subst psm e) pv
+  | Elet ({ let_var = LetV pv ; let_expr = d }, e) ->
+      let nd = expr_subst psm d in
+      let vtv = match nd.e_vty with VTvalue vtv -> vtv | _ -> assert false in
+      if not (vtv_equal vtv pv.pv_vtv) then Loc.errorm "vty_value mismatch";
+      e_let { let_var = LetV pv ; let_expr = nd } (expr_subst psm e)
+  | Elet ({ let_var = LetA ps ; let_expr = d }, e) ->
+      let ld = create_let_defn (id_clone ps.ps_name) (expr_subst psm d) in
+      let ns = match ld.let_var with LetA a -> a | LetV _ -> assert false in
+      e_let ld (expr_subst (Mid.add ps.ps_name ns psm) e)
+  | Erec (rdl,e) ->
+      let conv lam = { lam with l_expr = expr_subst psm lam.l_expr } in
+      let defl = List.map (fun rd -> rd.rec_ps, conv rd.rec_lambda) rdl in
+      let rdl = create_rec_defn defl in
+      let add psm (ps,_) rd = Mid.add ps.ps_name rd.rec_ps psm in
+      e_rec rdl (expr_subst (List.fold_left2 add psm defl rdl) e)
+  | Eif (pv,e1,e2) ->
+      e_if_real pv (expr_subst psm e1) (expr_subst psm e2)
+  | Ecase (pv,bl) ->
+      e_case_real pv (List.map (fun (pp,e) -> pp, expr_subst psm e) bl)
+  | Eghost e ->
+      e_ghost (expr_subst psm e)
+  | Eany ee ->
+      e_any {
+        aeff_reads  = List.map (expr_subst psm) ee.aeff_reads;
+        aeff_writes = List.map (expr_subst psm) ee.aeff_writes;
+        aeff_raises = ee.aeff_raises;
+      } (vtv_of_expr e).vtv_ity
+  | Elogic _ | Evalue _ | Earrow _ | Eassign _ -> e
+
+and create_rec_defn defl =
+  let conv m (ps,lam) =
+    let rd = create_fun_defn (id_clone ps.ps_name) lam in
+    if ps_compat ps rd.rec_ps then m, { rd with rec_ps = ps }
+    else Mid.add ps.ps_name rd.rec_ps m, rd in
+  let m, defl = Util.map_fold_left conv Mid.empty defl in
+  let subst { rec_ps = ps ; rec_lambda = lam } =
+    let lam = { lam with l_expr = expr_subst m lam.l_expr } in
+    Mid.find_def ps ps.ps_name m, lam in
+  if Mid.is_empty m then defl else
+  create_rec_defn (List.map subst defl)
+
+let create_fun_defn id lam =
+  if lam.l_variant <> [] then
+    Loc.errorm "Variants are not allowed in a non-recursive definition";
+  create_fun_defn id lam
 
 (*
   - A "proper type" of a vty [v] is [v] with empty specification

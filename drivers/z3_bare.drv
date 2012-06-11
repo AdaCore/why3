@@ -8,12 +8,14 @@ filename "%f-%t-%g.smt"
 
 valid "^unsat"
 unknown "^\\(unknown\\|sat\\|Fail\\)" "Unknown"
+outofmemory "(error \"out of memory\")\\|Cannot allocate memory"
 time "why3cpulimit time : %s s"
 
 
 (* À discuter *)
 (*transformation "simplify_recursive_definition"*)
 transformation "inline_trivial"
+
 
 transformation "eliminate_builtin"
 transformation "eliminate_definition"

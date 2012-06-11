@@ -6,6 +6,7 @@
     | "function" function-decl ("with" logic-decl)* ;
     | "predicate" predicate-decl ("with" logic-decl)* ;
     | "inductive" inductive-decl ("with" inductive-decl)* ;
+    | "coinductive" inductive-decl ("with" inductive-decl)* ;
     | "axiom" ident ":" formula 	   ;
     | "lemma" ident ":" formula 	   ;
     | "goal"  ident ":" formula 	   ;

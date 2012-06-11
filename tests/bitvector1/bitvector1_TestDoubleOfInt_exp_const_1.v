@@ -6,10 +6,11 @@ Require int.Int.
 Require int.Abs.
 Require int.EuclideanDivision.
 Require real.Real.
+(*
 Require real.RealInfix.
+*)
 Require real.FromInt.
 
-(* Why3 assumption *)
 Definition implb(x:bool) (y:bool): bool := match (x,
   y) with
   | (true, false) => false
@@ -250,6 +251,7 @@ Axiom to_nat_sub_zero : forall (b:bv) (j:Z) (i:Z), (((0%Z <= i)%Z /\
   (i <= j)%Z) /\ (j <  32%Z)%Z) -> (((nth b j) = false) -> ((to_nat_sub b j
   i) = (to_nat_sub b (j - 1%Z)%Z i))).
 
+
 Axiom to_nat_sub_one : forall (b:bv) (j:Z) (i:Z), (((0%Z <= i)%Z /\
   (i <= j)%Z) /\ (j <  32%Z)%Z) -> (((nth b j) = true) -> ((to_nat_sub b j
   i) = ((pow2 (j - i)%Z) + (to_nat_sub b (j - 1%Z)%Z i))%Z)).
@@ -262,9 +264,9 @@ Axiom to_nat_of_zero2 : forall (b:bv) (i:Z) (j:Z), (((j <  32%Z)%Z /\
   (i <  k)%Z) -> ((nth b k) = false)) -> ((to_nat_sub b j
   0%Z) = (to_nat_sub b i 0%Z))).
 
-Axiom to_nat_of_zero : forall (b:bv) (i:Z) (j:Z), ((j <  32%Z)%Z /\
-  (0%Z <= i)%Z) -> ((forall (k:Z), ((k <= j)%Z /\ (i <= k)%Z) -> ((nth b
-  k) = false)) -> ((to_nat_sub b j i) = 0%Z)).
+Axiom to_nat_of_zero : forall (b:bv) (i:Z) (j:Z), (((j <  32%Z)%Z /\
+  (i <= j)%Z) /\ (0%Z <= i)%Z) -> ((forall (k:Z), ((k <= j)%Z /\
+  (i <= k)%Z) -> ((nth b k) = false)) -> ((to_nat_sub b j i) = 0%Z)).
 
 Axiom to_nat_of_one : forall (b:bv) (i:Z) (j:Z), (((j <  32%Z)%Z /\
   (i <= j)%Z) /\ (0%Z <= i)%Z) -> ((forall (k:Z), ((k <= j)%Z /\
@@ -277,6 +279,34 @@ Axiom to_nat_sub_footprint : forall (b1:bv) (b2:bv) (j:Z) (i:Z),
   i) = (to_nat_sub b2 j i))).
 
 Parameter from_int: Z -> bv.
+
+
+Axiom Div_inf1 : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (x <  y)%Z) ->
+  ((int.EuclideanDivision.div x y) = 0%Z).
+
+Axiom Div_inf_neg : forall (x:Z) (y:Z), ((0%Z <  x)%Z /\ (x <= y)%Z) ->
+  ((int.EuclideanDivision.div (-x)%Z y) = (-1%Z)%Z).
+
+Axiom Div_pow : forall (x:Z) (i:Z), (((pow2 (i - 1%Z)%Z) <= x)%Z /\
+  (x <  (pow2 i))%Z) -> ((int.EuclideanDivision.div x
+  (pow2 (i - 1%Z)%Z)) = 1%Z).
+
+Axiom Div_pow2 : forall (x:Z) (i:Z), (((-(pow2 i))%Z <= x)%Z /\
+  (x <  (-(pow2 (i - 1%Z)%Z))%Z)%Z) -> ((int.EuclideanDivision.div x
+  (pow2 (i - 1%Z)%Z)) = (-2%Z)%Z).
+
+Axiom Mod_01 : forall (y:Z), (~ (y = 0%Z)) ->
+  ((int.EuclideanDivision.mod1 0%Z y) = 0%Z).
+
+Axiom Mod_1y : forall (y:Z), (1%Z <  y)%Z -> ((int.EuclideanDivision.mod1 1%Z
+  y) = 1%Z).
+
+Axiom Mod_neg1y : forall (y:Z), (1%Z <  y)%Z ->
+  ((int.EuclideanDivision.mod1 (-1%Z)%Z y) = 1%Z).
+
+Axiom Mod_pow2 : forall (x:Z) (i:Z),
+  ((int.EuclideanDivision.mod1 (x + (pow2 i))%Z
+  2%Z) = (int.EuclideanDivision.mod1 x 2%Z)).
 
 Axiom nth_from_int_high_even : forall (n:Z) (i:Z), (((i <  32%Z)%Z /\
   (0%Z <= i)%Z) /\ ((int.EuclideanDivision.mod1 (int.EuclideanDivision.div n
@@ -439,9 +469,9 @@ Axiom to_nat_of_zero21 : forall (b:bv1) (i:Z) (j:Z), (((j <  64%Z)%Z /\
   (i <  k)%Z) -> ((nth1 b k) = false)) -> ((to_nat_sub1 b j
   0%Z) = (to_nat_sub1 b i 0%Z))).
 
-Axiom to_nat_of_zero1 : forall (b:bv1) (i:Z) (j:Z), ((j <  64%Z)%Z /\
-  (0%Z <= i)%Z) -> ((forall (k:Z), ((k <= j)%Z /\ (i <= k)%Z) -> ((nth1 b
-  k) = false)) -> ((to_nat_sub1 b j i) = 0%Z)).
+Axiom to_nat_of_zero1 : forall (b:bv1) (i:Z) (j:Z), (((j <  64%Z)%Z /\
+  (i <= j)%Z) /\ (0%Z <= i)%Z) -> ((forall (k:Z), ((k <= j)%Z /\
+  (i <= k)%Z) -> ((nth1 b k) = false)) -> ((to_nat_sub1 b j i) = 0%Z)).
 
 Axiom to_nat_of_one1 : forall (b:bv1) (i:Z) (j:Z), (((j <  64%Z)%Z /\
   (i <= j)%Z) /\ (0%Z <= i)%Z) -> ((forall (k:Z), ((k <= j)%Z /\

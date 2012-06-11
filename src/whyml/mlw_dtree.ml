@@ -23,7 +23,10 @@ open Ident
 open Denv
 open Ty
 open Mlw_ty
+open Mlw_ty.T
+open Mlw_expr
 open Mlw_module
+open Mlw_dty
 
 type loc = Loc.position
 
@@ -42,39 +45,42 @@ type for_direction = Ptree.for_direction
 
 (* user type_v *)
 
+type ghost = bool
 type dpre = Ptree.pre
 type dpost_fmla = Ptree.lexpr
 type dexn_post_fmla = Ptree.lexpr
 type dpost = dpost_fmla * (Term.lsymbol * dexn_post_fmla) list
 
-type dueffect = {
-  du_reads  : Ptree.lexpr list;
-  du_writes : Ptree.lexpr list;
-  du_raises : xsymbol list;
+type deffect = {
+  deff_reads  : Ptree.lexpr list;
+  deff_writes : Ptree.lexpr list;
+  deff_raises : xsymbol list;
 }
 
+type dbinder = ident * ghost * dity
+
+(**
 type dutype_v =
   | DUTpure  of Denv.dty
-  | DUTarrow of dubinder list * dutype_c
+  | DUTarrow of dbinder list * dutype_c
 
 and dutype_c =
   { duc_result_type : dutype_v;
-    duc_effect      : dueffect;
+    duc_effect      : deffect;
     duc_pre         : Ptree.lexpr;
     duc_post        : Ptree.lexpr * (Term.lsymbol * Ptree.lexpr) list; }
-
-and dubinder = ident * Denv.dty * dutype_v
+**)
 
 type dvariant = Ptree.lexpr * Term.lsymbol option
 
 type dloop_annotation = {
   dloop_invariant : Ptree.lexpr option;
-  dloop_variant   : dvariant option;
+  dloop_variant   : dvariant list;
 }
 
 type dexpr = {
   dexpr_desc : dexpr_desc;
-  dexpr_type : Denv.dty;
+  dexpr_type : dity;
   dexpr_lab  : Ident.label list;
   dexpr_loc  : loc;
 }
@@ -82,27 +88,29 @@ type dexpr = {
 and dexpr_desc =
   | DEconstant of constant
   | DElocal of string
-  | DEglobal of prgsymbol
-  | DElogic of Term.lsymbol
-  | DEapply of dexpr * dexpr
-  | DEfun of dubinder list * dtriple
+  | DEglobal_pv of pvsymbol
+  | DEglobal_ps of psymbol
+  | DEglobal_pl of plsymbol
+  | DEglobal_ls of Term.lsymbol
+  | DEapply of dexpr * dexpr list
+  | DEfun of dbinder list * dtriple
   | DElet of ident * dexpr * dexpr
   | DEletrec of drecfun list * dexpr
-  | DEassign of dexpr * Term.lsymbol * int * dexpr
+  | DEassign of dexpr * dexpr
   | DEsequence of dexpr * dexpr
   | DEif of dexpr * dexpr * dexpr
   | DEloop of dloop_annotation * dexpr
   | DElazy of lazy_op * dexpr * dexpr
   | DEnot of dexpr
-  | DEmatch of dexpr * (Denv.dpattern * dexpr) list
+  | DEmatch of dexpr * (pre_ppattern * dexpr) list
   | DEabsurd
   | DEraise of xsymbol * dexpr option
   | DEtry of dexpr * (xsymbol * string option * dexpr) list
   | DEfor of ident * dexpr * for_direction * dexpr * Ptree.lexpr option * dexpr
   | DEassert of assertion_kind * Ptree.lexpr
   | DEmark of string * dexpr
-  | DEany of dutype_c
+  (* | DEany of dutype_c *)
 
-and drecfun = (ident * Denv.dty) * dubinder list * dvariant option * dtriple
+and drecfun = ident * dity * dbinder list * dvariant list * dtriple
 
 and dtriple = dpre * dexpr * dpost

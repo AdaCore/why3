@@ -111,6 +111,22 @@ module M
 
 end
 
+
+module CodeAnnotations
+
+  use import int.Int
+  use import module ref.Ref
+
+  let f (x:int) : int =
+    { }
+    let y = ref 0 in
+    abstract y := !y + 1 { !y > 0 };
+    !y
+    { result = 1 (* should not be proved !*) }
+
+end
+
+
 (*
 Local Variables:
 compile-command: "unset LANG; make -C .. testl-ide"

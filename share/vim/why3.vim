@@ -87,7 +87,7 @@ syn region   whyNone matchgroup=whyKeyword start="\<\(axiom\|lemma\|goal\|prop\)
 syn keyword  whyKeyword  as constant
 syn keyword  whyKeyword  else epsilon exists
 syn keyword  whyKeyword  false forall function
-syn keyword  whyKeyword  if in inductive
+syn keyword  whyKeyword  if in inductive coinductive
 syn keyword  whyKeyword  let meta
 syn keyword  whyKeyword  not predicate
 syn keyword  whyKeyword  then true type with

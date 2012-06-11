@@ -36,6 +36,7 @@ type t =
       mutable premise_color : string;
       mutable goal_color : string;
       mutable error_color : string;
+      mutable iconset : string;
       mutable env : Why3.Env.env;
       mutable config : Whyconf.config;
       original_config : Whyconf.config;
@@ -64,8 +65,9 @@ val why_icon : GdkPixbuf.pixbuf ref
 val image_yes : GdkPixbuf.pixbuf ref
 
 (* tree object icons *)
-val image_directory : GdkPixbuf.pixbuf ref
 val image_file : GdkPixbuf.pixbuf ref
+val image_theory : GdkPixbuf.pixbuf ref
+val image_goal : GdkPixbuf.pixbuf ref
 val image_prover : GdkPixbuf.pixbuf ref
 val image_transf : GdkPixbuf.pixbuf ref
 val image_editor : GdkPixbuf.pixbuf ref
@@ -82,11 +84,13 @@ val image_running : GdkPixbuf.pixbuf ref
 val image_valid : GdkPixbuf.pixbuf ref
 val image_invalid : GdkPixbuf.pixbuf ref
 val image_timeout : GdkPixbuf.pixbuf ref
+val image_outofmemory : GdkPixbuf.pixbuf ref
 val image_unknown : GdkPixbuf.pixbuf ref
 val image_failure : GdkPixbuf.pixbuf ref
 val image_valid_obs : GdkPixbuf.pixbuf ref
 val image_invalid_obs : GdkPixbuf.pixbuf ref
 val image_timeout_obs : GdkPixbuf.pixbuf ref
+val image_outofmemory_obs : GdkPixbuf.pixbuf ref
 val image_unknown_obs : GdkPixbuf.pixbuf ref
 val image_failure_obs : GdkPixbuf.pixbuf ref
 

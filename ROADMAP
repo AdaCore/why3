@@ -71,6 +71,17 @@
 * extraction vers Caml
  - PRIORITAIRE, JCF, ANDREI
 
+* terminaison
+** generer une obligation de preuve de well-foundedness quand on utilise
+   un variant avec "with R" (une seule fois pour chaque R !)
+** quand une definition logique recursive ne peut pas etre verifiee
+   bien-fondee statiquement, generer une obligation de preuve
+   (feature wish de F Besson)
+
+* Coq detection
+** refuser de detecter Coq si on n'a pas compilé avec le support de Coq
+   (i.e. si Coq a ete installé apres)
+
 * Coq tactic
 ** ajout de bases de hint
 
@@ -80,24 +91,35 @@
   function x : 'a
   (cf: en caml cela ne marche pas)
 
+* new language constructs
+** sandbox, abstract
+
 * efficiency issues
  - understand problems when large number of goals (cf D Mentré examples)
  - also: BTS 13736
 https://gforge.inria.fr/tracker/index.php?func=detail&aid=13736&group_id=2990
 
+* Smoke detector and absurd: on pourrait mettre un label particulier
+  sur le "false" genéré par absurd, pour indiquer que c'est
+  intentionel que l'on veuille prouver false. Un tel cas pourrait etre
+  traité de facon speciale par le smoke detector avec option "deep",
+  pour eviter une fausse alarme.
 
 * Documentation
  - (ANDREI) make the glossary available 
- - (CLAUDE) revoir documentation du smoke detector
+ - DONE (CLAUDE) revoir documentation du smoke detector
  - (CLAUDE) complete api.tex: explain how to build theories, apply
    transformations, write new functions on terms (A)
 
+* DONE Ajouter un result de prouveur "outofmemory" analogue a "timeout"
+
+* Contre-exemples de Alt-Ergo
 
 * detect editors
 *** check if coqide and also emacs/proof-general is installed
 
-
 * deplacer option -bench de why3replayer dans une commande de why3session
+
 
 
 * IDE
@@ -226,9 +248,7 @@ See manual Section xx
 
 * (JCF) ameliorer why3doc
  - DONE rajouter la production des liens
- - produire un index.html
- - entree makefile pour produire la bibliotheque standard de Why3 en HTML
-   (pour mettre sur le site Web)
+ - DONE produire un index.html
 
 * DONE provers
  - DONE (CLAUDE) Ensure that we kill a prover after some time

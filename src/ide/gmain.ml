@@ -426,6 +426,8 @@ let image_of_result ~obsolete result =
             if obsolete then !image_invalid_obs else !image_invalid
         | Call_provers.Timeout ->
             if obsolete then !image_timeout_obs else !image_timeout
+        | Call_provers.OutOfMemory ->
+            if obsolete then !image_outofmemory_obs else !image_outofmemory
         | Call_provers.Unknown _ ->
             if obsolete then !image_unknown_obs else !image_unknown
         | Call_provers.Failure _ ->
@@ -444,6 +446,8 @@ let fan n =
     | _ -> assert false
 
 module S = Session
+
+let session_needs_saving = ref false
 
 let set_row_status row b =
   if b then
@@ -468,7 +472,7 @@ let set_proof_state a =
     | S.InternalFailure _ -> "(internal failure)"
     | S.Undone S.Interrupted -> "(interrupted)"
     | S.Undone (S.Scheduled | S.Running) ->
-        Format.sprintf "[limit=%d sec., %d M]" 
+        Format.sprintf "[limit=%d sec., %d M]"
           a.S.proof_timelimit a.S.proof_memlimit
   in
   let t = if obsolete then t ^ " (obsolete)" else t in
@@ -497,6 +501,7 @@ let get_selected_row_references () =
     goals_view#selection#get_selected_rows
 
 let row_expanded b iter _path =
+  session_needs_saving := true;
   match get_any_from_iter iter with
     | S.File f ->
         S.set_file_expanded f b
@@ -515,7 +520,6 @@ let (_:GtkSignal.id) =
 let (_:GtkSignal.id) =
   goals_view#connect#row_expanded ~callback:(row_expanded true)
 
-let session_needs_saving = ref false
 let current_selected_row = ref None
 let current_env_session = ref None
 let env_session () =
@@ -667,9 +671,9 @@ let init =
     (* useless since it has no child: goals_view#expand_row row#path; *)
     goals_model#set ~row:row#iter ~column:icon_column
       (match any with
-         | S.Goal _ -> !image_file
-         | S.Theory _
-         | S.File _ -> !image_directory
+         | S.Goal _ -> !image_goal
+         | S.Theory _ -> !image_theory
+         | S.File _ -> !image_file
          | S.Proof_attempt _ -> !image_prover
          | S.Transf _ -> !image_transf);
     notify any

@@ -74,7 +74,8 @@ let editor_keys =
 
 let load_editor section =
   check_exhaustive section prover_keys;
-  { editor_command = get_string section "command";
+  { editor_name = get_string section "name";
+    editor_command = get_string section "command";
     editor_options = []
   }
 

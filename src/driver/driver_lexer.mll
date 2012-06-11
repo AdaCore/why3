@@ -45,6 +45,7 @@
         "valid", VALID;
         "invalid", INVALID;
         "timeout", TIMEOUT;
+        "outofmemory", OUTOFMEMORY;
         "time",    TIME;
         "unknown", UNKNOWN;
         "fail", FAIL;

@@ -288,6 +288,10 @@ let create_prsymbol n = { pr_name = id_register n }
 
 type ind_decl = lsymbol * (prsymbol * term) list
 
+type ind_sign = Ind | Coind
+
+type ind_list = ind_sign * ind_decl list
+
 (** Proposition declaration *)
 
 type prop_kind =
@@ -312,7 +316,7 @@ and decl_node =
   | Ddata  of data_decl list    (* recursive algebraic types *)
   | Dparam of lsymbol           (* abstract functions and predicates *)
   | Dlogic of logic_decl list   (* recursive functions and predicates *)
-  | Dind   of ind_decl list     (* inductive predicates *)
+  | Dind   of ind_list          (* (co)inductive predicates *)
   | Dprop  of prop_decl         (* axiom / lemma / goal *)
 
 (** Declarations *)
@@ -341,7 +345,7 @@ module Hsdecl = Hashcons.Make (struct
     | Ddata  l1, Ddata  l2 -> list_all2 eq_td l1 l2
     | Dparam s1, Dparam s2 -> ls_equal s1 s2
     | Dlogic l1, Dlogic l2 -> list_all2 eq_ld l1 l2
-    | Dind   l1, Dind   l2 -> list_all2 eq_ind l1 l2
+    | Dind   (s1,l1), Dind (s2,l2) -> s1 = s2 && list_all2 eq_ind l1 l2
     | Dprop (k1,pr1,f1), Dprop (k2,pr2,f2) ->
         k1 = k2 && pr_equal pr1 pr2 && t_equal f1 f2
     | _,_ -> false
@@ -365,7 +369,7 @@ module Hsdecl = Hashcons.Make (struct
     | Ddata  l -> Hashcons.combine_list hs_td 3 l
     | Dparam s -> ls_hash s
     | Dlogic l -> Hashcons.combine_list hs_ld 5 l
-    | Dind   l -> Hashcons.combine_list hs_ind 7 l
+    | Dind (_,l) -> Hashcons.combine_list hs_ind 7 l
     | Dprop (k,pr,f) -> Hashcons.combine (hs_kind k) (hs_prop (pr,f))
 
   let tag n d = { d with d_tag = Hashweak.create_tag n }
@@ -506,7 +510,7 @@ let rec f_pos_ps sps pol f = match f.t_node, pol with
       f_pos_ps sps None f && f_pos_ps sps pol g && f_pos_ps sps pol h
   | _ -> TermTF.t_all (t_pos_ps sps) (f_pos_ps sps pol) f
 
-let create_ind_decl idl =
+let create_ind_decl s idl =
   if idl = [] then raise EmptyDecl;
   let add acc (ps,_) = Sls.add ps acc in
   let sps = List.fold_left add Sls.empty idl in
@@ -537,7 +541,7 @@ let create_ind_decl idl =
     List.fold_left (check_ax ps) (syms,news) al
   in
   let (syms,news) = List.fold_left check_decl (Sid.empty,Sid.empty) idl in
-  mk_decl (Dind idl) syms news
+  mk_decl (Dind (s, idl)) syms news
 
 let create_prop_decl k p f =
   let syms = syms_term Sid.empty f in
@@ -554,10 +558,10 @@ let decl_map fn d = match d.d_node with
         close ls vl (fn e)
       in
       create_logic_decl (List.map fn l)
-  | Dind l ->
+  | Dind (s, l) ->
       let fn (pr,f) = pr, fn f in
       let fn (ps,l) = ps, List.map fn l in
-      create_ind_decl (List.map fn l)
+      create_ind_decl s (List.map fn l)
   | Dprop (k,pr,f) ->
       create_prop_decl k pr (fn f)
 
@@ -569,7 +573,7 @@ let decl_fold fn acc d = match d.d_node with
         fn acc e
       in
       List.fold_left fn acc l
-  | Dind l ->
+  | Dind (_, l) ->
       let fn acc (_,f) = fn acc f in
       let fn acc (_,l) = List.fold_left fn acc l in
       List.fold_left fn acc l
@@ -591,9 +595,9 @@ let decl_map_fold fn acc d = match d.d_node with
       in
       let acc,l = Util.map_fold_left fn acc l in
       acc, create_logic_decl l
-  | Dind l ->
+  | Dind (s, l) ->
       let acc, l = list_rpair_map_fold (list_rpair_map_fold fn) acc l in
-      acc, create_ind_decl l
+      acc, create_ind_decl s l
   | Dprop (k,pr,f) ->
       let acc, f = fn acc f in
       acc, create_prop_decl k pr f
@@ -638,36 +642,35 @@ let find_constructors kn ts =
   match (Mid.find ts.ts_name kn).d_node with
   | Dtype _ -> []
   | Ddata dl -> List.assq ts dl
-  | _ -> assert false
+  | Dparam _ | Dlogic _ | Dind _ | Dprop _ -> assert false
 
 let find_inductive_cases kn ps =
   match (Mid.find ps.ls_name kn).d_node with
-  | Dind dl -> List.assq ps dl
-  | Dlogic _ -> []
-  | Dtype _ -> []
-  | _ -> assert false
+  | Dind (_, dl) -> List.assq ps dl
+  | Dlogic _ | Ddata _ -> []
+  | Dtype _ | Dparam _ | Dprop _ -> assert false
 
 let find_logic_definition kn ls =
   match (Mid.find ls.ls_name kn).d_node with
   | Dlogic dl -> Some (List.assq ls dl)
-  | Dparam _ | Dind _ | Dtype _ -> None
-  | _ -> assert false
+  | Dparam _ | Dind _ | Ddata _ -> None
+  | Dtype _ | Dprop _ -> assert false
 
 let find_prop kn pr =
   match (Mid.find pr.pr_name kn).d_node with
-  | Dind dl ->
+  | Dind (_, dl) ->
       let test (_,l) = List.mem_assq pr l in
       List.assq pr (snd (List.find test dl))
   | Dprop (_,_,f) -> f
-  | _ -> assert false
+  | Dtype _ | Ddata _ | Dparam _ | Dlogic _ -> assert false
 
 let find_prop_decl kn pr =
   match (Mid.find pr.pr_name kn).d_node with
-  | Dind dl ->
+  | Dind (_, dl) ->
       let test (_,l) = List.mem_assq pr l in
       Paxiom, List.assq pr (snd (List.find test dl))
   | Dprop (k,_,f) -> k,f
-  | _ -> assert false
+  | Dtype _ | Ddata _ | Dparam _ | Dlogic _ -> assert false
 
 exception NonExhaustiveCase of pattern list * term
 

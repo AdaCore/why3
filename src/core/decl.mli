@@ -81,6 +81,10 @@ val pr_hash : prsymbol -> int
 
 type ind_decl = lsymbol * (prsymbol * term) list
 
+type ind_sign = Ind | Coind
+
+type ind_list = ind_sign * ind_decl list
+
 (* Proposition declaration *)
 
 type prop_kind =
@@ -105,7 +109,7 @@ and decl_node =
   | Ddata  of data_decl list    (* recursive algebraic types *)
   | Dparam of lsymbol           (* abstract functions and predicates *)
   | Dlogic of logic_decl list   (* recursive functions and predicates *)
-  | Dind   of ind_decl list     (* inductive predicates *)
+  | Dind   of ind_list          (* (co)inductive predicates *)
   | Dprop  of prop_decl         (* axiom / lemma / goal *)
 
 module Mdecl : Map.S with type key = decl
@@ -121,7 +125,7 @@ val create_ty_decl : tysymbol -> decl
 val create_data_decl : data_decl list -> decl
 val create_param_decl : lsymbol -> decl
 val create_logic_decl : logic_decl list -> decl
-val create_ind_decl : ind_decl list -> decl
+val create_ind_decl : ind_sign -> ind_decl list -> decl
 val create_prop_decl : prop_kind -> prsymbol -> term -> decl
 
 (* exceptions *)

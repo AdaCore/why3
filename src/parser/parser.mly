@@ -161,7 +161,7 @@ end
 
   let exit_exn () = Qident (mk_id "%Exit" (floc ()))
   let id_anonymous () = mk_id "_" (floc ())
-  let ty_unit () = Tpure (PPTtuple [])
+  let ty_unit () = PPTtuple []
 
   let id_lt_nat () = Qident (mk_id "lt_nat" (floc ()))
 
@@ -202,7 +202,7 @@ end
 
 /* keywords */
 
-%token AS AXIOM CLONE CONSTANT
+%token AS AXIOM CLONE COINDUCTIVE CONSTANT
 %token ELSE END EPSILON EXISTS EXPORT FALSE FORALL FUNCTION
 %token GOAL IF IMPORT IN INDUCTIVE LEMMA
 %token LET MATCH META NAMESPACE NOT PROP PREDICATE
@@ -336,8 +336,8 @@ decl:
     { LogicDecl $2 }
 | PREDICATE list1_logic_decl_predicate
     { LogicDecl $2 }
-| INDUCTIVE list1_inductive_decl
-    { IndDecl $2 }
+| inductive list1_inductive_decl
+    { IndDecl ($1, $2) }
 | AXIOM ident labels COLON lexpr
     { PropDecl (floc (), Kaxiom, add_lab $2 $3, $5) }
 | LEMMA ident labels COLON lexpr
@@ -346,6 +346,11 @@ decl:
     { PropDecl (floc (), Kgoal, add_lab $2 $3, $5) }
 | META sident list1_meta_arg_sep_comma
     { Meta (floc (), $2, $3) }
+;
+
+inductive:
+| INDUCTIVE   { Decl.Ind }
+| COINDUCTIVE { Decl.Coind }
 ;
 
 /* Use and clone */
@@ -1187,6 +1192,8 @@ expr:
    { mk_expr (Etry ($2, $5)) }
 | ANY simple_type_c
    { mk_expr (Eany $2) }
+| ABSTRACT expr post
+   { mk_expr (Eabstract($2, $3)) }
 | label expr %prec prec_named
    { mk_expr (Enamed ($1, $2)) }
 ;
@@ -1313,7 +1320,7 @@ type_v_binder:
 type_v_param:
 | LEFTPAR RIGHTPAR
    { [id_anonymous (), Some (ty_unit ())] }
-| LEFTPAR lidents_lab COLON type_v RIGHTPAR
+| LEFTPAR lidents_lab COLON primitive_type RIGHTPAR
    { List.map (fun i -> (i, Some $4)) $2 }
 ;
 
@@ -1329,9 +1336,9 @@ type_v:
 ;
 
 arrow_type_v:
-| simple_type_v ARROW type_c
+| primitive_type ARROW type_c
    { Tarrow ([id_anonymous (), Some $1], $3) }
-| lident labels COLON simple_type_v ARROW type_c
+| lident labels COLON primitive_type ARROW type_c
    { Tarrow ([add_lab $1 $2, Some $4], $6) }
    /* TODO: we could alllow lidents instead, e.g. x y : int -> ... */
    /*{ Tarrow (List.map (fun x -> x, Some $3) $1, $5) }*/

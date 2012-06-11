@@ -63,7 +63,7 @@ and dutype_c =
     duc_pre         : Ptree.lexpr;
     duc_post        : Ptree.lexpr * (Term.lsymbol * Ptree.lexpr) list; }
 
-and dubinder = ident * Denv.dty * dutype_v
+and dubinder = ident * Denv.dty
 
 type dvariant = Ptree.lexpr * Term.lsymbol option
 
@@ -104,6 +104,7 @@ and dexpr_desc =
   | DEassert of assertion_kind * Ptree.lexpr
   | DEmark of string * dexpr
   | DEany of dutype_c
+  | DEabstract of dexpr * dpost
 
 and drecfun = (ident * Denv.dty) * dubinder list * dvariant option * dtriple
 
@@ -153,7 +154,7 @@ and itype_c =
     ic_pre         : T.pre;
     ic_post        : T.post; }
 
-and ibinder = ivsymbol * itype_v
+and ibinder = ivsymbol * ty
 
 type mark = Term.vsymbol
 
@@ -205,6 +206,7 @@ and iexpr_desc =
   | IEassert of assertion_kind * Term.term
   | IEmark of mark * iexpr
   | IEany of itype_c
+  | IEabstract of iexpr * ipost
 
 and irecfun = ivsymbol * ibinder list * irec_variant option * itriple
 
@@ -261,6 +263,7 @@ and expr_desc =
   | Eassert of assertion_kind * Term.term
   | Emark of mark * expr
   | Eany of type_c
+  | Eabstract of expr * post
 
 and recfun = pvsymbol * pvsymbol list * triple * E.t
 

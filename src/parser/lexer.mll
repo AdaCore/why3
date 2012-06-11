@@ -45,6 +45,7 @@
         "as", AS;
         "axiom", AXIOM;
         "clone", CLONE;
+        "coinductive", COINDUCTIVE;
         "constant", CONSTANT;
         "else", ELSE;
         "end", END;

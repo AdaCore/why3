@@ -715,10 +715,9 @@ Axiom nth_var32to63 : forall (x:Z) (k:Z), ((32%Z <= k)%Z /\ (k <= 63%Z)%Z) ->
 Axiom nth_var3 : forall (x:Z), forall (i:Z), ((32%Z <= i)%Z /\
   (i <= 51%Z)%Z) -> ((nth1 (var x) i) = false).
 
-
 Open Scope Z_scope.
 Require Import Why3.
-Ltac ae := why3 "alt-ergo" timelimit 3.
+Ltac ae := why3 "alt-ergo" timelimit 5.
 
 (* Why3 goal *)
 Theorem lemma2 : forall (x:Z), (is_int32 x) -> ((to_nat_sub1 (var x) 51%Z

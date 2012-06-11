@@ -7,8 +7,9 @@ filename "%f-%t-%g.cvc"
 
 (* 'fail' must be before 'valid'; otherwise it is ignored *)
 fail "Parse Error: \\(.*\\)" "\\1"
-valid "Valid."
-unknown "Unknown." ""
+valid "Valid\\."
+unknown "Unknown\\." ""
+outofmemory "Out of memory\\|std::bad_alloc"
 time "why3cpulimit time : %s s"
 
 (* À discuter *)
@@ -74,15 +75,17 @@ theory real.Real
 
   prelude "%%% this is a prelude for CVC3 real arithmetic"
 
+  prelude "div_by_zero: (REAL) -> REAL;"
+
   syntax function zero "0"
   syntax function one  "1"
 
   syntax function (+)  "(%1 + %2)"
   syntax function (-)  "(%1 - %2)"
   syntax function (*)  "(%1 * %2)"
-  syntax function (/)  "(%1 / %2)"
+  syntax function (/)  "(IF (%2 = 0) THEN (div_by_zero(%1)) ELSE (%1 / %2) ENDIF)"
   syntax function (-_) "(- %1)"
-  syntax function inv  "(1 / %1)"
+  syntax function inv  "(IF (%1 = 0) THEN (div_by_zero(1)) ELSE (1 / %1) ENDIF)"
 
   syntax predicate (<=) "(%1 <= %2)"
   syntax predicate (<)  "(%1 < %2)"

@@ -209,10 +209,10 @@ module Transform = struct
         "Recursively-defined symbols are not supported, run eliminate_recursion"
 
   (** transform an inductive declaration *)
-  let ind_transform kept idl =
+  let ind_transform kept s idl =
     let iconv (pr,f) = pr, f_type_close_select kept f in
     let conv (ls,il) = findL ls, List.map iconv il in
-    [Decl.create_ind_decl (List.map conv idl)]
+    [Decl.create_ind_decl s (List.map conv idl)]
 
   (** transforms a proposition into another (mostly a substitution) *)
   let prop_transform kept (prop_kind, prop_name, f) =
@@ -231,7 +231,7 @@ let decl kept d = match d.d_node with
             not supported, run eliminate_algebraic"
   | Dparam ls -> Transform.param_transform kept ls
   | Dlogic ldl -> Transform.logic_transform kept d ldl
-  | Dind idl -> Transform.ind_transform kept idl
+  | Dind (s, idl) -> Transform.ind_transform kept s idl
   | Dprop prop -> Transform.prop_transform kept prop
 
 let empty_th =

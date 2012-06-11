@@ -104,10 +104,10 @@ module Transform = struct
     [Decl.create_logic_decl (List.map helper decls)]
 
   (** transform an inductive declaration *)
-  let ind_transform idl =
+  let ind_transform s idl =
     let iconv (pr,f) = pr, Libencoding.t_type_close term_transform f in
     let conv (ls,il) = findL ls, List.map iconv il in
-    [Decl.create_ind_decl (List.map conv idl)]
+    [Decl.create_ind_decl s (List.map conv idl)]
 
   (** transforms a proposition into another (mostly a substitution) *)
   let prop_transform (prop_kind, prop_name, f) =
@@ -126,7 +126,7 @@ let decl d = match d.d_node with
             not supported, run eliminate_algebraic"
   | Dparam ls -> Transform.param_transform ls
   | Dlogic ldl -> Transform.logic_transform ldl
-  | Dind idl -> Transform.ind_transform idl
+  | Dind (s, idl) -> Transform.ind_transform s idl
   | Dprop prop -> Transform.prop_transform prop
 
 let explicit = Trans.decl decl (Task.add_decl None d_ts_type)

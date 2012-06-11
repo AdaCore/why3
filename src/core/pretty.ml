@@ -53,14 +53,30 @@ let forget_all () =
   forget_all tprinter;
   forget_all pprinter
 
+let print_label fmt l = fprintf fmt "\"%s\"" l.lab_string
+let print_labels = print_iter1 Slab.iter space print_label
+
+let print_loc fmt l =
+  let (f,l,b,e) = Loc.get l in
+  fprintf fmt "#\"%s\" %d %d %d#" f l b e
+
+let print_ident_labels fmt id =
+  if Debug.test_flag debug_print_labels &&
+      not (Slab.is_empty id.id_label) then
+    fprintf fmt "@ %a" print_labels id.id_label;
+  if Debug.test_flag debug_print_locs then
+    Util.option_iter (fprintf fmt "@ %a" print_loc) id.id_loc
+
 (* type variables always start with a quote *)
 let print_tv fmt tv =
   fprintf fmt "'%s" (id_unique aprinter tv.tv_name)
 
 (* logic variables always start with a lower case letter *)
 let print_vs fmt vs =
+  let id = vs.vs_name in
   let sanitizer = String.uncapitalize in
-  fprintf fmt "%s" (id_unique iprinter ~sanitizer vs.vs_name)
+  fprintf fmt "%s" (id_unique iprinter ~sanitizer id);
+  print_ident_labels fmt id
 
 let forget_var vs = forget_id iprinter vs.vs_name
 
@@ -360,9 +376,13 @@ let print_ind fmt (pr,f) =
   fprintf fmt "@[<hov 4>| %a%a :@ %a@]"
     print_pr pr print_ident_labels pr.pr_name print_term f
 
-let print_ind_decl fst fmt (ps,bl) =
+let ind_sign = function
+  | Ind   -> "inductive"
+  | Coind -> "coinductive"
+
+let print_ind_decl s fst fmt (ps,bl) =
   fprintf fmt "@[<hov 2>%s %a%a%a =@ @[<hov>%a@]@]"
-    (if fst then "inductive" else "with") print_ls ps
+    (if fst then ind_sign s else "with") print_ls ps
     print_ident_labels ps.ls_name
     (print_list nothing print_ty_arg) ps.ls_args
     (print_list newline print_ind) bl;
@@ -392,15 +412,15 @@ let print_decl fmt d = match d.d_node with
   | Ddata tl  -> print_list_next newline print_data_decl fmt tl
   | Dparam ls -> print_param_decl fmt ls
   | Dlogic ll -> print_list_next newline print_logic_decl fmt ll
-  | Dind il   -> print_list_next newline print_ind_decl fmt il
+  | Dind (s, il) -> print_list_next newline (print_ind_decl s) fmt il
   | Dprop p   -> print_prop_decl fmt p
 
 let print_next_data_decl  = print_data_decl false
 let print_data_decl       = print_data_decl true
 let print_next_logic_decl = print_logic_decl false
 let print_logic_decl      = print_logic_decl true
-let print_next_ind_decl   = print_ind_decl false
-let print_ind_decl        = print_ind_decl true
+let print_next_ind_decl   = print_ind_decl Ind false
+let print_ind_decl fmt s  = print_ind_decl s true fmt
 
 let print_inst_ts fmt (ts1,ts2) =
   fprintf fmt "type %a = %a" print_ts ts1 print_ts ts2

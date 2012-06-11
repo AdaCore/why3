@@ -6,10 +6,11 @@ Require int.Int.
 Require int.Abs.
 Require int.EuclideanDivision.
 Require real.Real.
+(*
 Require real.RealInfix.
+*)
 Require real.FromInt.
 
-(* Why3 assumption *)
 Definition implb(x:bool) (y:bool): bool := match (x,
   y) with
   | (true, false) => false
@@ -278,6 +279,34 @@ Axiom to_nat_sub_footprint : forall (b1:bv) (b2:bv) (j:Z) (i:Z),
 
 Parameter from_int: Z -> bv.
 
+
+Axiom Div_inf1 : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (x <  y)%Z) ->
+  ((int.EuclideanDivision.div x y) = 0%Z).
+
+Axiom Div_inf_neg : forall (x:Z) (y:Z), ((0%Z <  x)%Z /\ (x <= y)%Z) ->
+  ((int.EuclideanDivision.div (-x)%Z y) = (-1%Z)%Z).
+
+Axiom Div_pow : forall (x:Z) (i:Z), (((pow2 (i - 1%Z)%Z) <= x)%Z /\
+  (x <  (pow2 i))%Z) -> ((int.EuclideanDivision.div x
+  (pow2 (i - 1%Z)%Z)) = 1%Z).
+
+Axiom Div_pow2 : forall (x:Z) (i:Z), (((-(pow2 i))%Z <= x)%Z /\
+  (x <  (-(pow2 (i - 1%Z)%Z))%Z)%Z) -> ((int.EuclideanDivision.div x
+  (pow2 (i - 1%Z)%Z)) = (-2%Z)%Z).
+
+Axiom Mod_01 : forall (y:Z), (~ (y = 0%Z)) ->
+  ((int.EuclideanDivision.mod1 0%Z y) = 0%Z).
+
+Axiom Mod_1y : forall (y:Z), (1%Z <  y)%Z -> ((int.EuclideanDivision.mod1 1%Z
+  y) = 1%Z).
+
+Axiom Mod_neg1y : forall (y:Z), (1%Z <  y)%Z ->
+  ((int.EuclideanDivision.mod1 (-1%Z)%Z y) = 1%Z).
+
+Axiom Mod_pow2 : forall (x:Z) (i:Z),
+  ((int.EuclideanDivision.mod1 (x + (pow2 i))%Z
+  2%Z) = (int.EuclideanDivision.mod1 x 2%Z)).
+
 Axiom nth_from_int_high_even : forall (n:Z) (i:Z), (((i <  64%Z)%Z /\
   (0%Z <= i)%Z) /\ ((int.EuclideanDivision.mod1 (int.EuclideanDivision.div n
   (pow2 i)) 2%Z) = 0%Z)) -> ((nth (from_int n) i) = false).
@@ -392,19 +421,6 @@ Axiom double_of_bv64_value : forall (b:bv), ((0%Z <  (to_nat_sub b 62%Z
   ((double_of_bv64 b) = (((sign_value (nth b 63%Z)) * (pow21 ((to_nat_sub b
   62%Z 52%Z) - 1023%Z)%Z))%R * (1%R + ((IZR (to_nat_sub b 51%Z
   0%Z)) * (pow21 (-52%Z)%Z))%R)%R)%R).
-
-Axiom Nth_j : forall (i:Z), ((0%Z <= i)%Z /\ (i <= 62%Z)%Z) ->
-  ((nth (from_int 9223372036854775808%Z) i) = false).
-
-Axiom sign_of_j : ((nth (from_int 9223372036854775808%Z) 63%Z) = true).
-
-Axiom mantissa_of_j : ((to_nat_sub (from_int 9223372036854775808%Z) 51%Z
-  0%Z) = 0%Z).
-
-Axiom exp_of_j : ((to_nat_sub (from_int 9223372036854775808%Z) 62%Z
-  52%Z) = 0%Z).
-
-Axiom int_of_bv : ((double_of_bv64 (from_int 9223372036854775808%Z)) = 0%R).
 
 Axiom MainResultBits : forall (x:bv), forall (i:Z), ((0%Z <= i)%Z /\
   (i <  63%Z)%Z) -> ((nth (bw_xor x (from_int 9223372036854775808%Z))

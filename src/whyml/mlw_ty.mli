@@ -56,7 +56,6 @@ module rec T : sig
   and region = private {
     reg_name  : ident;
     reg_ity   : ity;
-    reg_ghost : bool;
   }
 
 end
@@ -92,7 +91,7 @@ exception BadRegArity of itysymbol * int * int
 exception DuplicateRegion of region
 exception UnboundRegion of region
 
-val create_region : preid -> ?ghost:bool -> ity -> region
+val create_region : preid -> ity -> region
 
 val create_itysymbol : preid -> ?abst:bool -> ?priv:bool ->
   tvsymbol list -> region list -> ity option -> itysymbol
@@ -171,11 +170,15 @@ val vars_freeze : varset -> ity_subst
 
 val vs_vars : varset -> vsymbol -> varset
 
+val create_varset : Stv.t -> Sreg.t -> varset
+
 (* exception symbols *)
 type xsymbol = private {
   xs_name : ident;
   xs_ity  : ity; (* closed and pure *)
 }
+
+val xs_equal : xsymbol -> xsymbol -> bool
 
 val create_xsymbol : preid -> ity -> xsymbol
 
@@ -186,24 +189,32 @@ module Sexn: Mexn.Set
 type effect = private {
   eff_reads  : Sreg.t;
   eff_writes : Sreg.t;
+  eff_raises : Sexn.t;
+  eff_ghostr : Sreg.t; (* ghost reads *)
+  eff_ghostw : Sreg.t; (* ghost writes *)
+  eff_ghostx : Sexn.t; (* ghost raises *)
   (* if r1 -> Some r2 then r1 appears in ty(r2) *)
   eff_resets : region option Mreg.t;
-  eff_raises : Sexn.t;
 }
 
 val eff_empty : effect
 val eff_union : effect -> effect -> effect
+val eff_ghostify : effect -> effect
 
-val eff_read  : effect -> region -> effect
-val eff_write : effect -> region -> effect
+val eff_read  : effect -> ?ghost:bool -> region -> effect
+val eff_write : effect -> ?ghost:bool -> region -> effect
+val eff_raise : effect -> ?ghost:bool -> xsymbol -> effect
 val eff_reset : effect -> region -> effect
-val eff_raise : effect -> xsymbol -> effect
 
-val eff_assign : effect -> region -> ity -> effect
+val eff_assign : effect -> ?ghost:bool -> region -> ity -> effect
 
 val eff_remove_raise : effect -> xsymbol -> effect
 
 val eff_full_inst : ity_subst -> effect -> effect
+
+val eff_filter : varset -> effect -> effect
+
+val eff_is_empty : effect -> bool
 
 (** program types *)
 
@@ -246,6 +257,10 @@ val vty_ghostify : vty -> vty
 (* the substitution must cover not only vta.vta_tvs and vta.vta_regs
    but also every type variable and every region in vta_effect *)
 val vta_full_inst : ity_subst -> vty_arrow -> vty_arrow
+
+(* remove from the given arrow every effect that is covered
+   neither by the arrow's vta_vars nor by the given varset *)
+val vta_filter : varset -> vty_arrow -> vty_arrow
 
 (** THE FOLLOWING CODE MIGHT BE USEFUL LATER FOR WPgen *)
 (*

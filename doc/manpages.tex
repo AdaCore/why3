@@ -456,44 +456,56 @@ option \verb|-force| described below.
 \item Option \verb|-s| suppresses the output of the final tree view.
 \item Option \texttt{-I \textsl{<path>}} adds \texttt{\textsl{<path>}} to the loadpath.
 \item Option \verb|-force| enforces saving the session, if all proof
-  attempts replayed correctly, even if some goals are not proved.
+  attempts replayed correctly, even if some goals are not proved. 
 \item Option \texttt{-smoke-detector \{none|top|deep\}} tries to detect
   if the context is self-contradicting.
 \end{itemize}
 
 \paragraph{Smoke Detector}
 
-The smoke detector tries to detect if the context is self-contradicting
- and, thus, that anything can be proved in this context. The smoke
- detector can't be run on outdated session and does not modify the session.
- It has three possible configurations:
- \begin{itemize}
+The smoke detector tries to detect if the context is
+self-contradicting and, thus, that anything can be proved in this
+context. The smoke detector can't be run on an outdated session and does
+not modify the session.  It has three possible configurations:
+\begin{itemize}
 \item \texttt{none}: Do not run the smoke detector.
-\item \texttt{top}: The negation of each proved goal is sent with the
-same timeout to the prover that proved the original goal.
-\begin{verbatim}
-Goal G : forall x:int. q x -> (p1 x \/ p2 x)
-\end{verbatim}
-becomes
-\begin{verbatim}
-Goal G : ~ (forall x:int. q x -> (p1 x \/ p2 x))
-\end{verbatim}
-\item \texttt{deep}: This is the same technique as \texttt{top} but the
-   negation is pushed under the universal quantification (without
-   changing them) and under the implication. The previous example becomes
-\begin{verbatim}
-Goal G : forall x:int. q x /\ ~ (p1 x \/ p2 x)
-\end{verbatim}
- \end{itemize}
 
-\noindent
-The name of the goals that triggered the smoke detector are printed:
+\item \texttt{top}: The negation of each proved goal is sent with the
+  same timeout to the prover that proved the original goal.
 \begin{verbatim}
-   goal 'G', prover 'Alt-Ergo 0.93.1': Smoke detected!!!
+  Goal G : forall x:int. q x -> (p1 x \/ p2 x)
 \end{verbatim}
-Moreover \texttt{Smoke detected} (exit code 1) is printed at the end if the smoke
-detector has been triggered, or \texttt{No smoke detected} (exit code 0)
-otherwise.
+  becomes
+\begin{verbatim}
+  Goal G : ~ (forall x:int. q x -> (p1 x \/ p2 x))
+\end{verbatim}
+  In other words, if the smoke detector is triggered, it means that the context
+  of the goal \texttt{G} is self-contradicting.
+
+\item \texttt{deep}: This is the same technique as \texttt{top} but
+  the negation is pushed under the universal quantification (without
+  changing them) and under the implication. The previous example
+  becomes
+\begin{verbatim}
+  Goal G : forall x:int. q x /\ ~ (p1 x \/ p2 x)
+\end{verbatim}
+  In other words, the premises of goal \texttt{G} are pushed in the
+  context, so that if the smoke detector is triggered, it means that
+  the context of the goal \texttt{G} and its premises are
+  self-contradicting. It should be clear that detecting smoke in that
+  case does not necessarily means that there is a mistake: for
+  example, this could occur in the WP of a program with an infeasible
+  path.
+\end{itemize}
+
+At the end of the replay, the name of the goals that triggered the
+smoke detector are printed:
+\begin{verbatim}
+  goal 'G', prover 'Alt-Ergo 0.93.1': Smoke detected!!!
+\end{verbatim}
+Moreover \texttt{Smoke detected} (exit code 1) is printed at the end
+if the smoke detector has been triggered, or \texttt{No smoke
+  detected} (exit code 0) otherwise.
 
 
 
@@ -657,7 +669,16 @@ The specific options are
   output, with a different layout of the tables.
 \item[\texttt{-o <path>}] where
   to produce LaTeX files (default: session dir)
-\item[\texttt{-longtable}] use 'longtable' environment instead of 'tabular'
+\item[\texttt{-longtable}] use 'longtable' environment instead of
+  'tabular'
+\item[\texttt{-e <elem>}] produces a table for element <elem>, which is
+  either a file, a theory or a root goal. The <elem> must be specified
+  using its path in dot notation, e.g. \verb|file.theory.goal|. The
+  file produced is named accordingly,
+  e.g. \verb|file.theory.goal.tex|.  This option can be given several
+  times to produce several tables in one run. When this option is
+  given at least once, the default behavior that is to produce one
+  table per theory is disabled.
 \end{description}
 
 
@@ -837,14 +858,16 @@ identifier use to its definition.
 
 \begin{itemize}
 \item Option \texttt{-o \textsl{<dir>}} defines the directory where to
-  output the HTML files
-\item Option \verb|--output| is the same as \verb|-o|
-\item Option \verb|--stdlib-url|~\textsl{url} sets a URL for files
-  found in load path, so that links to definitions can be added
+  output the HTML files.
+\item Option \verb|--output| is the same as \verb|-o|.
 \item Option \verb|--index| (resp. \verb|--no-index|) to include
   (resp. exclude) the generation of an index file \texttt{index.html}.
   The default behavior is to generate an index if more than one file
   is passed on the command line.
+\item Option \verb|--title|~\textsl{s} sets title \textsl{s} for the
+  index page.
+\item Option \verb|--stdlib-url|~\textsl{url} sets a URL for files
+  found in load path, so that links to definitions can be added.
 \end{itemize}
 
 \paragraph{Typesetting textual comments}

@@ -414,7 +414,7 @@ let logic_decl fmt d = match d.d_node with
       print_param_decl fmt ls
   | Dlogic ll ->
       print_list_next newline print_logic_decl fmt ll
-  | Dind il ->
+  | Dind (_, il) ->
       print_list_next newline print_ind_decl fmt il
   | Dprop (pk, pr, _) ->
       fprintf fmt "(* %a %a *)" Pretty.print_pkind pk Pretty.print_pr pr
@@ -483,6 +483,8 @@ let rec print_expr fmt e = match e.expr_desc with
       fprintf fmt "<todo: Eletrec>"
   | Eabsurd ->
       fprintf fmt "assert false (* absurd *)"
+  | Eabstract(e, _) ->
+      fprintf fmt "@[%a (* abstract *)@]" print_expr e
 
 and print_lexpr fmt e =
   print_expr fmt e

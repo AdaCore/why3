@@ -1,16 +1,4 @@
 
-theory Div
-
-  use import int.Int
-  use export int.EuclideanDivision
-(*  
-  lemma Div_inf: forall x y:int. 0 <= x < y -> div x y = 0
-  lemma Mod_0: forall y:int. y <> 0 -> mod 0 y = 0
-*)
-
-end
-
-
 theory Pow2int
 
   use import int.Int
@@ -130,6 +118,33 @@ theory Pow2real
 
   lemma Pow2_int_real:
     forall x:int. x >= 0 -> pow2 x = from_int (Pow2int.pow2 x)
+
+end
+
+
+theory Div
+
+  use import int.Int
+  use export int.EuclideanDivision
+  use import Pow2int
+  
+  lemma Div_inf1: forall x y:int. 0 <= x < y -> div x y = 0
+
+  lemma Div_inf_neg: forall x y:int. 0 < x <= y -> div (-x) y = -1
+
+  lemma Div_pow: forall x i:int. pow2 (i-1) <= x < pow2 i ->
+  		 div x (pow2 (i-1)) = 1
+
+  lemma Div_pow2: forall x i:int. -pow2 i <= x < -pow2 (i-1) ->
+  		 div x (pow2 (i-1)) = -2
+
+  lemma Mod_01: forall y:int. y <> 0 -> mod 0 y = 0
+
+  lemma Mod_1y: forall y:int. y > 1 -> mod 1 y = 1
+
+  lemma Mod_neg1y: forall y:int. y > 1 -> mod (-1) y = 1
+
+  lemma Mod_pow2: forall x i:int. mod (x + pow2 i) 2 = mod x 2
 
 end
 
@@ -331,7 +346,7 @@ theory BitVector
 
 
   lemma to_nat_of_zero:
-    forall b:bv, i j:int. size > j /\ i >= 0 ->
+    forall b:bv, i j:int. size > j >= i >= 0 ->
       (forall k:int. j >= k >= i -> nth b k = False) ->
       to_nat_sub b j i = 0
 
@@ -628,13 +643,14 @@ theory TestNegAsXOR
   use import real.RealInfix
 
   function j : bv = from_int 0x8000000000000000
-
+(*
   lemma Nth_j: forall i:int. 0 <= i <= 62 -> nth j i = False
 
   lemma sign_of_j: sign(j) = True
   lemma mantissa_of_j: mantissa(j) = 0
   lemma exp_of_j: exp(j) = 0
   lemma int_of_bv: double_of_bv64(j) = 0.0
+*)
 
   lemma MainResultBits : forall x:bv. forall i:int. 0 <= i < 63 ->
      nth (bw_xor x j) i = nth x i
@@ -652,6 +668,7 @@ theory TestNegAsXOR
 
   lemma sign_neg:
      forall x:bv. sign_value(notb(sign(x))) = -.sign_value(sign(x))
+
   lemma MainResult : forall x:bv. 0 < exp(x) < 2047 ->
      double_of_bv64 (bw_xor x j) = -. double_of_bv64 x
 
@@ -709,10 +726,7 @@ theory TestDoubleOfInt
 
   lemma exp_const: exp(const) = 1075
 
-  lemma to_nat_mantissa_1: (BV64.to_nat_sub const 30 0) = 0
-
-  lemma mantissa_const_nth2:
-    forall i:int. 32 <= i <= 51 -> BV64.nth const i = False
+  lemma to_nat_mantissa: (BV64.to_nat_sub const 30 0) = 0
 
   lemma mantissa_const_to_nat51:
     BV64.to_nat_sub const 51 0 = BV64.to_nat_sub const 31 0
@@ -736,9 +750,9 @@ theory TestDoubleOfInt
   (*    var_as_double(x) : real = double_of_bv64(var(x))               *)
   (*********************************************************************)
 
-  function jpxor(i:int): BV32.bv = (BV32.bw_xor j' (BV32.from_int2c i))
+  function jpxor(x:int): BV32.bv = (BV32.bw_xor j' (BV32.from_int2c x))
 
-  function var(i:int): BV64.bv = (BV32_64.concat j (jpxor i))
+  function var(x:int): BV64.bv = (BV32_64.concat j (jpxor x))
 
   function var_as_double(x:int) : real = double_of_bv64 (var x)
 
@@ -748,57 +762,48 @@ theory TestDoubleOfInt
 
   predicate is_int32(x:int) = - Pow2int.pow2 31 <= x < Pow2int.pow2 31
 
-(*
-  lemma two_compl_pos: forall x:int. is_int32 x /\ x >= 0 -> BV32.to_nat_sub (BV32.from_int2c x) 31 0 = x
-  lemma two_compl_neg: forall x:int. is_int32 x /\ x < 0 -> BV32.to_nat_sub (BV32.from_int2c x) 31 0 = Pow2int.pow2 32 + x
-*)
-
   (* bits of jpxor x *)
   lemma nth_0_30: forall x:int. forall i:int. is_int32(x) /\  0<=i<=30 ->
-  BV32.nth (BV32.bw_xor j' (BV32.from_int2c x)) i = BV32.nth (BV32.from_int2c x) i
+  	BV32.nth (BV32.bw_xor j' (BV32.from_int2c x)) i = 
+                                                    BV32.nth (BV32.from_int2c x) i
   lemma nth_jpxor_0_30: forall x:int. forall i:int. is_int32(x) /\  0<=i<=30 ->
-  BV32.nth (jpxor x) i = BV32.nth (BV32.from_int2c x) i
+  	BV32.nth (jpxor x) i = BV32.nth (BV32.from_int2c x) i
   lemma nth_var31:
      forall x:int. (BV32.nth (jpxor x) 31) = notb (BV32.nth (BV32.from_int2c x) 31)
 
   lemma to_nat_sub_0_30: forall x:int. is_int32(x)   ->
-       (BV32.to_nat_sub (BV32.bw_xor j' (BV32.from_int2c x)) 30 0) = (BV32.to_nat_sub (BV32.from_int2c x) 30 0)
-
+       (BV32.to_nat_sub (BV32.bw_xor j' (BV32.from_int2c x)) 30 0) = 
+                                         (BV32.to_nat_sub (BV32.from_int2c x) 30 0)
 
 
   (* case x >= 0 *)
 
   lemma jpxorx_pos: forall x:int. x>=0 -> BV32.nth (BV32.bw_xor j' (BV32.from_int2c x)) 31 = True
 
-(*
-  lemma from_int2c_to_nat_sub31:
-  	forall x:int. x >= 0 -> BV32.to_nat_sub (BV32.from_int2c x) 31 0 = x
-*)
-
-  lemma from_int2c_to_nat_sub_gen:
-  	forall i:int. 0 <= i <= 30 -> 
+  lemma from_int2c_to_nat_sub_pos:
+  	forall i:int. 0 <= i <= 31 -> 
           forall x:int. 0 <= x <  Pow2int.pow2 i -> 
            BV32.to_nat_sub (BV32.from_int2c x) (i-1) 0 = x
 
-  lemma from_int2c_to_nat_sub:
-  	forall x:int. is_int32(x) /\ x >= 0 -> BV32.to_nat_sub (BV32.from_int2c x) 30 0 = x
-
-  lemma lemma1_pos : forall x:int. is_int32 x /\ x >= 0 -> BV32.to_nat_sub (jpxor x) 31 0 = Pow2int.pow2 31 + x
+  lemma lemma1_pos : forall x:int. is_int32 x /\ x >= 0 -> 
+  	BV32.to_nat_sub (jpxor x) 31 0 = Pow2int.pow2 31 + x
 
   (* case x < 0 *)
 
-  lemma to_nat_sub_0_30_neg: forall x:int. is_int32(x) /\ x<0  ->
-       (BV32.to_nat_sub (BV32.bw_xor j' (BV32.from_int2c x)) 30 0) = (BV32.to_nat_sub (BV32.from_int2c x) 30 0)
+  lemma jpxorx_neg: forall x:int. x<0 -> 
+  	BV32.nth (BV32.bw_xor j' (BV32.from_int2c x)) 31 = False
 
-  lemma to_nat_sub_0_30_neg1: forall x:int. is_int32(x) /\ x<0  ->
-       (BV32.to_nat_sub  (BV32.from_int2c x) 30 0) = Pow2int.pow2 31 + x
-
-  lemma lemma1_neg : forall x:int. is_int32 x /\ x < 0 -> BV32.to_nat_sub (jpxor x) 31 0 = Pow2int.pow2 31 + x
+  lemma from_int2c_to_nat_sub_neg:
+  	forall i:int. 0 <= i <= 31 -> 
+          forall x:int. -Pow2int.pow2 i <= x <  0 -> 
+           BV32.to_nat_sub (BV32.from_int2c x) (i-1) 0 = Pow2int.pow2 i + x
+	
+  lemma lemma1_neg : forall x:int. is_int32 x /\ x < 0 -> 
+  	BV32.to_nat_sub (jpxor x) 31 0 = Pow2int.pow2 31 + x
 
   (* final lemma *)
-
-  lemma lemma1 : forall x:int. is_int32 x -> BV32.to_nat_sub (jpxor x) 31 0 = Pow2int.pow2 31 + x
-
+  lemma lemma1 : forall x:int. is_int32 x -> 
+  	BV32.to_nat_sub (jpxor x) 31 0 = Pow2int.pow2 31 + x
 
   (*********************************************************************)
   (*  lemma 2: for all integer x, mantissa(var(x)) = 2^31 + x          *)
@@ -806,26 +811,39 @@ theory TestDoubleOfInt
 
   lemma nth_var_0_31: forall x:int. forall i:int. is_int32(x) /\ 0<=i<=31->
   		      BV64.nth (var x) i = BV32.nth (jpxor x) i
-  lemma to_nat_bv32_bv64_aux: forall b1:BV32.bv. forall b2:BV32.bv. forall j:int. 0<=j<32-> BV64.to_nat_sub  (BV32_64.concat b1 b2) j 0 = BV32.to_nat_sub b2 j 0
-  lemma to_nat_bv32_bv64: forall b1:BV32.bv. forall b2:BV32.bv. BV64.to_nat_sub  (BV32_64.concat b1 b2) 31 0 = BV32.to_nat_sub b2 31 0
+
+  lemma to_nat_bv32_bv64_aux: 
+  	forall b1:BV32.bv. forall b2:BV32.bv. forall j:int. 0<=j<32-> 
+	       BV64.to_nat_sub  (BV32_64.concat b1 b2) j 0 = BV32.to_nat_sub b2 j 0
+
+  lemma to_nat_bv32_bv64: 
+  	forall b1:BV32.bv. forall b2:BV32.bv. 
+	       BV64.to_nat_sub  (BV32_64.concat b1 b2) 31 0 = BV32.to_nat_sub b2 31 0
   
   lemma to_nat_var_0_31: forall x:int.  is_int32(x) ->
-  		      BV64.to_nat_sub (var x) 31 0 = BV32.to_nat_sub (jpxor x) 31 0
-  lemma nth_var32to63:
-     forall x k:int. 32 <= k <= 63 -> BV64.nth (var x) k = BV32.nth j (k - 32)
+  	BV64.to_nat_sub (var x) 31 0 = BV32.to_nat_sub (jpxor x) 31 0
 
-  lemma nth_var3: forall x:int. forall i:int. 32 <= i <= 51 -> BV64.nth (var x) i = False
+  lemma nth_var32to63:
+       forall x k:int. 32 <= k <= 63 -> BV64.nth (var x) k = BV32.nth j (k - 32)
+
+  lemma nth_var3: forall x:int. forall i:int. 32 <= i <= 51 -> 
+  	BV64.nth (var x) i = False
  
-  lemma lemma2 : forall x:int. is_int32 x -> mantissa(var(x)) = Pow2int.pow2 31 + x
+  lemma lemma2 : forall x:int. is_int32 x -> 
+  	mantissa(var(x)) = Pow2int.pow2 31 + x
 
   (*********************************************************************)
   (*  lemma 3: for all integer x, exp(var(x)) = 1075                   *)
   (*********************************************************************)
 
-  lemma nth_var4: forall x:int. forall i:int. 52 <= i <= 53 -> BV64.nth (var x) i = True
-  lemma nth_var5: forall x:int. forall i:int. 54 <= i <= 55 -> BV64.nth (var x) i = False
-  lemma nth_var6: forall x:int. forall i:int. 56 <= i <= 57 -> BV64.nth (var x) i = True
-  lemma nth_var7: forall x:int. forall i:int. 58 <= i <= 61 -> BV64.nth (var x) i = False
+  lemma nth_var4: forall x:int. forall i:int. 52 <= i <= 53 -> 
+  	BV64.nth (var x) i = True
+  lemma nth_var5: forall x:int. forall i:int. 54 <= i <= 55 -> 
+  	BV64.nth (var x) i = False
+  lemma nth_var6: forall x:int. forall i:int. 56 <= i <= 57 -> 
+  	BV64.nth (var x) i = True
+  lemma nth_var7: forall x:int. forall i:int. 58 <= i <= 61 -> 
+  	BV64.nth (var x) i = False
   lemma nth_var8: forall x:int. BV64.nth (var x) 62 = True
 
   lemma lemma3 : forall x:int. exp(var(x)) = 1075
@@ -842,29 +860,29 @@ theory TestDoubleOfInt
   (*  lemma 5: for all integer x, var_as_double(x) = 2^52 + 2^31 + x   *)
   (*********************************************************************)
   lemma sign_var: forall x:int. sign(var(x)) = False
- (*proved by Coq*)
-  lemma var_value0: forall x:int. is_int32(x) ->var_as_double(x) =
-    Pow2real.pow2 (1075 - 1023) *. (1.0 +. (from_int (Pow2int.pow2 31 + x)) *. Pow2real.pow2 (-52))
+
+  lemma var_value0: forall x:int. is_int32(x) ->
+  	var_as_double(x) = Pow2real.pow2 (1075 - 1023) *. 
+	     (1.0 +. (from_int (Pow2int.pow2 31 + x)) *. Pow2real.pow2 (-52))
 
 
   lemma from_int_sum : forall x:int. is_int32(x)->
-    from_int (Pow2int.pow2 31 + x) = from_int (Pow2int.pow2 31) +. from_int x
+    	from_int (Pow2int.pow2 31 + x) = from_int (Pow2int.pow2 31) +. from_int x
 
-  lemma var_value3: forall x:int. is_int32(x)->var_as_double(x) =
-    Pow2real.pow2 52 +. Pow2real.pow2 52 *. (from_int (Pow2int.pow2 31) +. from_int x) *. Pow2real.pow2 (-52)
-
+  lemma var_value3: forall x:int. is_int32(x)->
+  	var_as_double(x) = Pow2real.pow2 52 +. Pow2real.pow2 52 *. 
+	     (from_int (Pow2int.pow2 31) +. from_int x) *. Pow2real.pow2 (-52)
 
   lemma distr_pow52 : forall x:real.
-    Pow2real.pow2 52 *. x *. Pow2real.pow2 (-52) = x
+    	Pow2real.pow2 52 *. x *. Pow2real.pow2 (-52) = x
 
-  lemma var_value4: forall x:int. is_int32(x)->var_as_double(x) =
-    Pow2real.pow2 52 +. (from_int (Pow2int.pow2 31)) +. from_int x
+  lemma var_value4: forall x:int. is_int32(x)->
+  	var_as_double(x) = Pow2real.pow2 52 +. (from_int (Pow2int.pow2 31)) +. from_int x
 
   lemma pow31 : from_int (Pow2int.pow2 31) = Pow2real.pow2 31
 
-  lemma lemma5: forall x:int. is_int32(x)-> var_as_double(x) = Pow2real.pow2 52 +. Pow2real.pow2 31 +. (from_int x)
-
-
+  lemma lemma5: forall x:int. is_int32(x)-> 
+  	var_as_double(x) = Pow2real.pow2 52 +. Pow2real.pow2 31 +. (from_int x)
 
   (*********************************************************************)
   (* main result                                                       *)
@@ -873,7 +891,6 @@ theory TestDoubleOfInt
   function double_of_int32 (x:int) : real = var_as_double(x) -. const_as_double
 
   lemma MainResult: forall x:int. is_int32 x -> double_of_int32 x = from_int x
-
 
 end
 

@@ -728,7 +728,8 @@ and decompose_inductive dep env i =
     if cl = [] then Decl.create_param_decl ls :: pl, dl else pl, d :: dl
   in
   let pl, dl = List.fold_right add dl ([], []) in
-  pl, if dl = [] then None else Some (Decl.create_ind_decl dl)
+  let s = if mib.mind_finite then Decl.Ind else Decl.Coind in
+  pl, if dl = [] then None else Some (Decl.create_ind_decl s dl)
 
 (* translation of a Coq term
    assumption: t:T:Set *)
@@ -1118,6 +1119,7 @@ let why3tac ?(timelimit=timelimit) s gl =
       | Unknown s -> error ("Don't know: " ^ s)
       | Failure s -> error ("Failure: " ^ s)
       | Timeout -> error "Timeout"
+      | OutOfMemory -> error "Out Of Memory"
       | HighFailure ->
           error ("Prover failure\n" ^ res.pr_output ^ "\n")
   with

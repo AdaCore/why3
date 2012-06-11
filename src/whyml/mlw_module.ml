@@ -44,9 +44,9 @@ open Mlw_decl
 
 type prgsymbol =
   | PV of pvsymbol
-  | PA of pasymbol
   | PS of psymbol
   | PL of plsymbol
+  | PX of xsymbol
 
 type namespace = {
   ns_it : itysymbol Mstr.t;  (* type symbols *)
@@ -70,9 +70,9 @@ let ns_union eq chk =
 
 let prg_equal p1 p2 = match p1,p2 with
   | PV p1, PV p2 -> pv_equal p1 p2
-  | PA p1, PA p2 -> pa_equal p1 p2
   | PS p1, PS p2 -> ps_equal p1 p2
   | PL p1, PL p2 -> pl_equal p1 p2
+  | PX p1, PX p2 -> xs_equal p1 p2
   | _, _ -> false
 
 let rec merge_ns chk ns1 ns2 =
@@ -204,7 +204,8 @@ let add_ty_decl = add_to_theory Theory.add_ty_decl
 let add_data_decl = add_to_theory Theory.add_data_decl
 let add_param_decl = add_to_theory Theory.add_param_decl
 let add_logic_decl = add_to_theory Theory.add_logic_decl
-let add_ind_decl = add_to_theory Theory.add_ind_decl
+let add_ind_decl uc s dl =
+  { uc with muc_theory = Theory.add_ind_decl uc.muc_theory s dl }
 let add_prop_decl uc k pr f =
   { uc with muc_theory = Theory.add_prop_decl uc.muc_theory k pr f }
 
@@ -236,6 +237,16 @@ let add_data uc (its,csl) =
   let uc = add_symbol add_it its.its_pure.ts_name its uc in
   List.fold_left add_constr uc csl
 
+let add_let uc = function
+  | LetV pv -> add_symbol add_ps pv.pv_vs.vs_name (PV pv) uc
+  | LetA ps -> add_symbol add_ps ps.ps_name (PS ps) uc
+
+let add_rec uc { rec_ps = ps } =
+  add_symbol add_ps ps.ps_name (PS ps) uc
+
+let add_exn uc xs =
+  add_symbol add_ps xs.xs_name (PX xs) uc
+
 let add_pdecl uc d =
   let uc =  { uc with
     muc_decls = d :: uc.muc_decls;
@@ -253,6 +264,12 @@ let add_pdecl uc d =
       let defn cl = List.map constructor cl in
       let dl = List.map (fun (its,cl) -> its.its_pure, defn cl) dl in
       add_to_theory Theory.add_data_decl uc dl
+  | PDlet ld ->
+      add_let uc ld.let_var
+  | PDrec rdl ->
+      List.fold_left add_rec uc rdl
+  | PDexn xs ->
+      add_exn uc xs
 
 let add_pdecl_with_tuples uc d =
   let ids = Mid.set_diff d.pd_syms uc.muc_known in
