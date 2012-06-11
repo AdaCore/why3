@@ -104,7 +104,6 @@
         "variant", VARIANT;
         "while", WHILE;
         "writes", WRITES;
-        "sandbox", SANDBOX;
       ]
 
   let newline lexbuf =

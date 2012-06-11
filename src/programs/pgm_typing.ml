@@ -712,8 +712,6 @@ and dexpr_desc ~ghost ~userloc env loc = function
       DEany c, dpurify_utype_v c.duc_result_type
   | Ptree.Enamed _ ->
       assert false
-  | Ptree.ESandbox e ->
-        DEsandbox (dexpr ~ghost ~userloc env e), dty_unit
 
 and dletrec ~ghost ~userloc env dl =
   (* add all functions into environment *)
@@ -1333,8 +1331,6 @@ and iexpr_desc env loc ty = function
       IElet (v1, e1, mk_iexpr loc ty (
       IElet (v2, e2, mk_iexpr loc ty (
       IEfor (vx, v1, d, v2, inv, e3)))))
-  | DEsandbox e ->
-      IESandbox (iexpr env e)
   | DEassert (k, f) ->
       let f = ifmla env f in
       IEassert (k, f)
@@ -1558,7 +1554,7 @@ let rec is_pure_expr e =
   | Emark (_, e1) -> is_pure_expr e1
   | Eany c -> E.no_side_effect c.c_effect
   | Eassert _ | Etry _ | Efor _ | Eraise _ | Ematch _
-  | Eloop _ | Eletrec _ | Efun _ | ESandbox _
+  | Eloop _ | Eletrec _ | Efun _
   | Eglobal _ | Eabsurd -> false (* TODO: improve *)
 
 let mk_expr ?(lab=Slab.empty) loc ty ef d =
@@ -1790,9 +1786,6 @@ and expr_desc gl env loc ty = function
   | IEany c ->
       let c = type_c env c in
       Eany c, c.c_result_type, c.c_effect
-  | IESandbox e ->
-      let e = expr gl env e in
-      ESandbox e, type_v_unit gl, E.empty
 
 and triple ?(sat_exn=true) gl env (p, e, q) =
   let e = expr gl env e in
@@ -1925,7 +1918,7 @@ let rec fresh_expr gl ~term locals e = match e.expr_desc with
   | Efor (_, _, _, _, _, e1) ->
       fresh_expr gl ~term:false locals e1
 
-  | Emark (_, e) | ESandbox e ->
+  | Emark (_, e) ->
       fresh_expr gl ~term locals e
   | Eassert _ | Eany _ ->
       ()
