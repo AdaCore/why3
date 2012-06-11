@@ -27,18 +27,61 @@ open Task
 
 let debug = Debug.register_flag "induction"
 
+(*
 let print_candidates vs =
-  Svs.iter (fun x -> Format.eprintf "Candidate %a@." Pretty.print_vs x) vs
+  Svs.iter (fun x -> Format.printf ": %a" Pretty.print_vs x) vs
 
-(******* Searching for variable candidates to induction tactic  *******)
+ (*if Debug.test_flag debug then
+    Format.printf "\n Ind_var type:  %a @ \n" Pretty.print_ty ty; *)
+
+type ind_info =
+    {tact : string ;
+     cands : Term.Svs.t;
+     ind_v : Term.vsymbol;
+     itsk : Term.term;
+     pred : Term.term;
+     shma : Term.term list;
+     }
+
+let show_info i =
+   Printf.printf "Induction tactic:   \n"
+   (*Format.printf "Init_task: %a  \n" Pretty.print_term i.itsk*)
+
+(* if Debug.test_flag debug then
+    begin
+     Format.printf "Init_task: %a @ \n" Pretty.print_term init_t
+    end; *)
+
+(* if Debug.test_flag debug then begin
+    print_string "sigma_inst: ";
+    Mtv.iter (fun x tx -> Format.printf "(%a : %a) @ \n"
+      Pretty.print_tv x Pretty.print_ty tx ) sigma
+  end; *)
+
+(*if Debug.test_flag debug then
+    Format.printf "Ind_pred: @  %a @ \n" Pretty.print_term p; *)
+
+   (*if Debug.test_flag debug then
+      Format.printf "Induction sub-task: %a @ \n" Pretty.print_term goal;*)
+
+ (*if Debug.test_flag debug then
+    begin
+      let data = {
+	tact = ""; cands = vs; ind_v = x; itsk = init_t;
+	pred = p; shma = []}
+      in if data = data then () else ()
+    end; *)
+
+*)
+
+
 let decompose_forall t =
   let rec aux qvl_acc t = match t.t_node with
-  | Tquant (Tforall, q) ->
-      let qvl, _, t = t_open_quant q in
-      aux (qvl_acc @ qvl) t
-  | _ -> qvl_acc, t
-  in let qvl, t = aux [] t
-     in (List.fold_right Svs.add qvl Svs.empty), qvl, t
+    | Tquant (Tforall, qt) ->
+      let qvl, _, t = t_open_quant qt in aux (qvl_acc @ qvl) t
+    | _ -> qvl_acc, t
+  in
+  let qvl, t = aux [] t in (List.fold_right Svs.add qvl Svs.empty), qvl, t
 
 let defn_candidate vs_acc km ls tl qvs =
   let arg_candidate  = function
@@ -61,22 +104,22 @@ let t_candidates km qvs t =
    in t_candidate Svs.empty t
 
 
-let heuristic = Svs.choose (* IMPROVE ME *)
+let indv_ty x = match x.vs_ty.ty_node with
+  | Tyapp (ts, _) -> ts, ty_app ts (List.map ty_var ts.ts_args)
+  | Tyvar _ -> assert false
 
-
-(******* Tranforming the goal into corresponding induction scheme  *******)
+let heuristic vss =
+  let x = Svs.choose vss in
+  let ts, ty = indv_ty x in
+  x, ts, ty
 
 let split_quantifiers x qvl =
   let rec aux left = function
     | hd :: tl when vs_equal x hd -> List.rev left, tl
     | hd :: tl -> aux (hd :: left) tl
     | [] -> assert false
-  in
-  aux [] qvl
+  in aux [] qvl
 
-let indv_ty x = match x.vs_ty.ty_node with
-  | Tyapp (ts, _) -> ts, ty_app ts (List.map ty_var ts.ts_args)
-  | Tyvar _ -> assert false
 
 let name_from_type ty =
   let s = match ty.ty_node with
@@ -85,24 +128,12 @@ let name_from_type ty =
   in
   if s = "" then "x" else String.make 1 s.[0]
 
+
 let make_induction vs km qvl t =
-  let x = heuristic vs in
-  let qvl1, qvl2 = split_quantifiers x qvl in
-  let init_t = t_forall_close qvl [] t in
-  if Debug.test_flag debug then
-    Format.printf "Initial task: %a @ \n" Pretty.print_term init_t;
-  let p = t_forall_close qvl2 [] t in
-  if Debug.test_flag debug then
-    Format.printf "Induction predicate:@  %a @ \n" Pretty.print_term p;
-  let ts,ty = indv_ty x in
-  if Debug.test_flag debug then begin
-    Format.printf "induction on tysymbol:  %a @ \n" Pretty.print_ts ts;
-    Format.printf "induction on type:  %a @ \n" Pretty.print_ty ty
-  end;
+  let x, ts, ty  = heuristic vs in
   let sigma = ty_match Mtv.empty ty x.vs_ty in
-  if Debug.test_flag debug then
-    Mtv.iter (fun x tx -> Format.printf "(%a : %a) @ \n"
-      Pretty.print_tv x Pretty.print_ty tx ) sigma;
+  let qvl1, qvl2 = split_quantifiers x qvl in
+  let p = t_forall_close qvl2 [] t in
   let make_case (ls, _) =
     let create_var ty =
       let ty = ty_inst sigma ty in
@@ -110,7 +141,6 @@ let make_induction vs km qvl t =
       Term.create_vsymbol id ty
     in
     let ind_vl = List.map create_var ls.ls_args in
-    (* MAKE IT REALLY FRESH *)
     let ind_tl = List.map t_var ind_vl in
     let goal = t_subst_single x (t_app ls ind_tl (Some x.vs_ty)) p in
     let goal = List.fold_left
@@ -120,21 +150,16 @@ let make_induction vs km qvl t =
 	else goal) goal ind_vl
     in
     let goal = t_forall_close (qvl1 @ ind_vl) [] goal in
-    if Debug.test_flag debug then
-      Format.printf "Induction sub-task: %a @ \n" Pretty.print_term goal;
     goal
   in
+  let _ = t_forall_close qvl [] t in
   let cl = find_constructors km ts in
   List.map make_case cl
 
 
-
-
-(*******                  Applying induction tactic                *******)
 let induction km t0 =
   let qvs, qvl, t = decompose_forall t0 in
   let vs = t_candidates km qvs t in
-  if Debug.test_flag debug then print_candidates vs;
   if Svs.is_empty vs then [t0] else make_induction vs km qvl t
 
 let induction = function
@@ -149,11 +174,94 @@ let () = Trans.register_transform_l "induction" (Trans.store induction)
 
 
 
-
-
+(*
+Local Variables:
+compile-command: "unset LANG; make -C ../.."
+End:
+*)
 
 
 (*************************************************************************)
+
+
+
+(*
+
+
+
+    (*
+
+let make_induction vs km qvl t =
+  if Debug.test_flag debug then
+    begin
+      let init_t = t_forall_close qvl [] t in
+      Format.printf "Init_task: %a @ \n" Pretty.print_term init_t
+    end;
+  let x, ts, ty  = heuristic vs in
+  let sigma = ty_match Mtv.empty ty x.vs_ty in
+  if Debug.test_flag debug then begin
+    print_string "sigma_inst: ";
+    Mtv.iter (fun x tx -> Format.printf "(%a : %a) @ \n"
+      Pretty.print_tv x Pretty.print_ty tx ) sigma
+  end;
+  let qvl1, qvl2 = split_quantifiers x qvl in
+  let p = t_forall_close qvl2 [] t in
+  if Debug.test_flag debug then
+    Format.printf "Ind_pred: @  %a @ \n" Pretty.print_term p;
+  let make_case (ls, _) =
+    let create_var ty =
+      let ty = ty_inst sigma ty in
+      let id = Ident.id_fresh (name_from_type ty) in
+      Term.create_vsymbol id ty
+    in
+    let ind_vl = List.map create_var ls.ls_args in
+    let ind_tl = List.map t_var ind_vl in
+    let goal = t_subst_single x (t_app ls ind_tl (Some x.vs_ty)) p in
+    let goal = List.fold_left
+      (fun goal vs ->
+	if ty_equal vs.vs_ty x.vs_ty
+	then Term.t_implies (t_subst_single x (t_var vs) p) goal
+	else goal) goal ind_vl
+    in
+    let goal = t_forall_close (qvl1 @ ind_vl) [] goal in
+    if Debug.test_flag debug then
+      Format.printf "Induction sub-task: %a @ \n" Pretty.print_term goal;
+    goal
+  in
+  
+    if Debug.test_flag debug then
+      let data = {tact = "" }
+  let cl = find_constructors km ts in
+  List.map make_case cl
+    *)
+
+
+
+let make_induction vs km qvl t =
+  let x, ts, ty  = heuristic vs in
+  let sigma = ty_match Mtv.empty ty x.vs_ty in
+  let qvl1, qvl2 = split_quantifiers x qvl in
+  let p = t_forall_close qvl2 [] t in
+    let make_case (ls, _) =
+     let create_var ty =
+     let ty = ty_inst sigma ty in
+     let id = Ident.id_fresh (name_from_type ty) in
+     Term.create_vsymbol id ty in
+    let ind_vl = List.map create_var ls.ls_args in
+    let ind_tl = List.map t_var ind_vl in
+    let goal = t_subst_single x (t_app ls ind_tl (Some x.vs_ty)) p in
+    let goal = List.fold_left
+      (fun goal vs ->
+	if ty_equal vs.vs_ty x.vs_ty
+	then Term.t_implies (t_subst_single x (t_var vs) p) goal
+  else goal) goal ind_vl
+  in t_forall_close (qvl1 @ ind_vl) [] goal in goal
+
+  in
+  let cl = find_constructors km ts in
+  List.map make_case cl *)
+
+
 
 (*List.iter (fun (cs, _) ->
     print_int (List.length cs.ls_args); print_string "\n";
@@ -177,126 +285,3 @@ List.iter (fun ty ->
     let f = init_t in f
      assert false (* TODO: instancier p sur le constructeur ls *) in
     t_forall_close qvl1 [] f *)
-
-
-(*
-
-let make_induction vs km qvl t =
-  (* here I print the initial term *)
-  let init_t = t_forall_close qvl [] t in
-  Format.printf "Initial task: %a @ \n" Pretty.print_term init_t;
-
-  (* here I print the transformed term *)
-  let x = heuristic vs in
-  let qvl1, qvl2 = split_quantifiers x qvl in
-  let p = t_forall_close qvl2 [] t in
-  let ts,ty = indv_ty x in
-  let sigma = ty_match Mtv.empty ty x.vs_ty in
-
-  Format.printf "Induction predicate:@  %a @ \n" Pretty.print_term p;
-  Format.printf "induction on type_symbol:  %a @ \n" Pretty.print_ts ts;
-  Format.printf "induction on type:  %a @ \n" Pretty.print_ty ty;
-  Mtv.iter (fun x tx -> Format.printf "(%a : %a) @ \n"
-    Pretty.print_tv x Pretty.print_ty tx ) sigma;
-
-  let make_case (ls, _) =
-    let _ = if ls = ls then () else () in
-    let f = assert false (* TODO: instancier p sur le constructeur ls *) in
-    t_forall_close qvl1 [] f
-  in
-  (* here I return the new term (TODO) *)
-  let cl = find_constructors km ts in
-
-  List.iter (fun (cs,_) -> Format.printf "%a @ \n" Pretty.print_cs cs) cl;
-  List.map make_case cl
-
-
-
-let make_indb = t_subst_single
-
-let t_candidates km qvs t =
-  let rec t_candidates_aux vs_acc t =
-    let vs_acc = match t.t_node with
-      | Tapp (ls, tl) -> begin match find_logic_definition km ls with
-	  | Some defn -> begin match ls_defn_decrease defn with
-	      | [i] -> begin match (List.nth tl i).t_node with
-		  | Tvar x when Svs.mem x qvs -> Svs.add x vs_acc
-		  | _ -> vs_acc
-	      end
-	      | _ -> vs_acc
-	  end
-	  | None -> vs_acc
-      end
-      | _ -> vs_acc
-    in
-    t_fold t_candidates_aux vs_acc t
-  in t_candidates_aux Svs.empty t
-
-
-(* Term.Svs.t -> Term.term -> Term.Svs.t *)
-let induction km f0 =
-  let qvs, qvl, f = decompose_forall [] f0 in
-  let rec candidate vs f =
-    let vs = match f.t_node with
-      | Tapp (ls, tl) -> begin match find_logic_definition km ls with
-	  | Some defn -> begin match ls_defn_decrease defn with
-	      | [i] -> begin match (List.nth tl i).t_node with
-		  | Tvar x when Svs.mem x qvs -> Svs.add x vs
-		  | _ -> vs (*here rec call *)
-	      end
-	      | _ -> vs
-	  end
-	  | None -> vs
-      end
-      | _ -> vs
-    in
-    t_fold candidate vs f
-  in
-  let candidates =
-    candidate Svs.empty f in print_vs candidates;
-  if Svs.is_empty candidates
-  then [f0]
-  else make_induction km qvl f candidates
-
-let make_induction_bk vs _km qvl t =
-  let _x = heuristic vs in
-  [t_forall_close qvl [] t]
-
-
-Format.printf "induction on type %a @ " Pretty.print_ts ts;
-
-let make_induction vs km qvl t =
-
-  (* here I print the initial term *)
-  let init_t = t_forall_close qvl [] t in
-  Format.printf "Initial task: %a @ " Pretty.print_term init_t;
-
-  (* here I print the transformed term *)
-  let x = heuristic vs in
-  let qvl1, qvl2 = split_quantifiers x qvl in
-  let p = t_forall_close qvl2 [] t in
-  Format.printf "Induction predicate:@ %a @ " Pretty.print_term p;
-
-  let ts = match x.vs_ty.ty_node with
-    | Tyapp (ts, _) -> ts
-    | Tyvar _ -> assert false
-  in
-  Format.printf "induction on type %a @ " Pretty.print_ts ts;
-
-  let sigma =
-    let ty = ty_app ts (List.map ty_var ts.ts_args) in
-    ty_match Mtv.empty ty x.vs_ty
-  in
-
-
-  let make_case (ls, _) =
-    let f = assert false (* TODO: instancier p sur ls constructeur ls *) in
-    t_forall_close qvl1 [] f
-  in
-  (* here I return the new term (TODO) *)
-  List.map make_case (find_constructors km ts)
-
-
-
-
-*)
