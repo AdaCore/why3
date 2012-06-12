@@ -295,6 +295,8 @@ and expr_node =
   | Eassign of pvsymbol * region * pvsymbol (* mutable pv <- expr *)
   | Eghost  of expr
   | Eany    of any_effect
+  | Eraise  of xsymbol * pvsymbol
+  | Etry    of expr * (xsymbol * pvsymbol * expr) list
 
 and let_defn = {
   let_var  : let_var;
@@ -733,6 +735,50 @@ let e_lazy_and e1 e2 =
 let e_lazy_or e1 e2 =
   if eff_is_empty e2.e_effect then e_binop Tor e1 e2 else e_if e1 e_true e2
 
+let e_raise_real xs pv =
+  ity_equal_check xs.xs_ity pv.pv_vtv.vtv_ity;
+  let ghost = pv.pv_vtv.vtv_ghost in
+  let vars = add_pv_vars pv Mid.empty in
+  let vtv = vty_value ~ghost ity_unit in
+  let eff = eff_raise eff_empty ~ghost xs in
+  mk_expr (Eraise (xs,pv)) (VTvalue vtv) eff vars
+
+let e_raise xs e = on_value (e_raise_real xs) e
+
+let e_try d bl =
+  let dvtv = vtv_of_expr d in
+  let rec branch ghost eff vars = function
+    | (xs,pv,e)::bl ->
+        let vtv = vtv_of_expr e in
+        ity_equal_check dvtv.vtv_ity vtv.vtv_ity;
+        ity_equal_check xs.xs_ity pv.pv_vtv.vtv_ity;
+        if pv.pv_vtv.vtv_mut <> None then
+          Loc.errorm "Mutable variable in a try-with branch";
+        (* we don't care about pv being ghost *)
+        let ghost = ghost || vtv.vtv_ghost in
+        let eff = eff_union eff e.e_effect in
+        let bvars = Mid.remove pv.pv_vs.vs_name e.e_vars in
+        branch ghost eff (varmap_union vars bvars) bl
+    | [] ->
+        let vty = VTvalue (vty_value ~ghost dvtv.vtv_ity) in
+        (* the cumulated effect of all branches, w/out d *)
+        let eff = if ghost then eff_ghostify eff else eff in
+        check_reset d vars; (* cumulated vars of all branches *)
+        check_ghost_write d eff;
+        (* remove from d.e_effect the catched exceptions *)
+        let remove deff (xs,_,_) =
+          (* we catch in a ghost exception in a non-ghost code *)
+          if not ghost && Sexn.mem xs deff.eff_ghostx then
+            raise (GhostRaise (d,xs));
+          eff_remove_raise deff xs in
+        let deff = List.fold_left remove d.e_effect bl in
+        (* total effect and vars *)
+        let eff = eff_union deff eff in
+        let vars = add_e_vars d vars in
+        mk_expr (Etry (d,bl)) vty eff vars
+  in
+  branch dvtv.vtv_ghost eff_empty Mid.empty bl
+
 (* Compute the fixpoint on recursive definitions *)
 
 let vars_equal vs1 vs2 =
@@ -798,7 +844,10 @@ let rec expr_subst psm e = match e.e_node with
         aeff_writes = List.map (expr_subst psm) ee.aeff_writes;
         aeff_raises = ee.aeff_raises;
       } (vtv_of_expr e).vtv_ity
-  | Elogic _ | Evalue _ | Earrow _ | Eassign _ -> e
+  | Etry (e,bl) ->
+      let branch (xs,pv,e) = xs, pv, expr_subst psm e in
+      e_try (expr_subst psm e) (List.map branch bl)
+  | Elogic _ | Evalue _ | Earrow _ | Eassign _ | Eraise _ -> e
 
 and create_rec_defn defl =
   let conv m (ps,lam) =

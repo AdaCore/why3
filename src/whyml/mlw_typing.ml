@@ -1069,7 +1069,9 @@ let add_module lib path mm mt m =
         let xs = create_xsymbol (Denv.create_user_id id) ity in
         let pd = create_exn_decl xs in
         Loc.try2 loc add_pdecl_with_tuples uc pd
-    | Dparam _ | Duse _ ->
+    | Dparam _ ->
+        assert false (*TODO*)
+    | Duse _ ->
         assert false (*TO BE REMOVED EVENTUALLY *)
   in
   let uc = List.fold_left add_decl uc m.mod_decl in

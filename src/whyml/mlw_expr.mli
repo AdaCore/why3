@@ -138,6 +138,8 @@ and expr_node = private
   | Eassign of pvsymbol * region * pvsymbol (* mutable pv <- expr *)
   | Eghost  of expr
   | Eany    of any_effect
+  | Eraise  of xsymbol * pvsymbol
+  | Etry    of expr * (xsymbol * pvsymbol * expr) list
 
 and let_defn = private {
   let_var  : let_var;
@@ -226,6 +228,6 @@ val e_lazy_and : expr -> expr -> expr
 val e_lazy_or : expr -> expr -> expr
 val e_not : expr -> expr
 
-(* TODO: when should we check for escaping identifiers (regions?)
-   in pre/post/xpost/effects? Here or in WP? *)
+val e_raise : xsymbol -> expr -> expr
+val e_try : expr -> (xsymbol * pvsymbol * expr) list -> expr
 
