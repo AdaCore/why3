@@ -32,7 +32,7 @@ module N
       | Node {| contents = v |} f -> v + on_forest f
       | Leaf -> 0
     end with on_forest f = match f with
-      | Cons t f -> on_tree t + on_forest f
+      | Cons t f -> let ee = Leaf in on_tree t + on_forest f + on_tree ee
       | Nil -> 1
     end
     in

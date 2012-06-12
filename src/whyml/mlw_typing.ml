@@ -328,9 +328,12 @@ and dexpr_desc ~userloc denv loc = function
       let e2 = dexpr ~userloc denv e2 in
       DElet (id, e1, e2), e2.dexpr_type
   | Ptree.Eletrec (rdl, e1) ->
-      let denv, dl = dletrec ~userloc denv rdl in
+      let rdl = dletrec ~userloc denv rdl in
+      let add_one denv ({ id = id }, dity, _, _, _) =
+        { denv with locals = Mstr.add id (denv.tvars, dity) denv.locals } in
+      let denv = List.fold_left add_one denv rdl in
       let e1 = dexpr ~userloc denv e1 in
-      DEletrec (dl, e1), e1.dexpr_type
+      DEletrec (rdl, e1), e1.dexpr_type
   | Ptree.Efun (bl, tr) ->
       let bl, _, tr, dity = dlambda ~userloc denv bl None tr in
       DEfun (bl, tr), dity
@@ -450,15 +453,17 @@ and dletrec ~userloc denv rdl =
   (* add all functions into environment *)
   let add_one denv (id, bl, var, tr) =
     let res = create_type_variable () in
-    let locals = Mstr.add id.id (denv.tvars, res) denv.locals in
-    { denv with locals = locals }, (id, res, bl, var, tr) in
+    let tvars = add_tvars denv.tvars res in
+    let locals = Mstr.add id.id (tvars, res) denv.locals in
+    let denv = { denv with locals = locals; tvars = tvars } in
+    denv, (id, res, bl, var, tr) in
   let denv, rdl = Util.map_fold_left add_one denv rdl in
   (* then type-check all of them and unify *)
   let type_one (id, res, bl, var, tr) =
     let bl, var, tr, dity = dlambda ~userloc denv bl var tr in
     Loc.try2 id.id_loc unify dity res;
     id, dity, bl, var, tr in
-  denv, List.map type_one rdl
+  List.map type_one rdl
 
 and dlambda ~userloc denv bl _var (p, e, q) =
   let dbinder denv (id, pty) =
@@ -1052,7 +1057,7 @@ let add_module lib path mm mt m =
         in
         Loc.try2 loc add_pdecl_with_tuples uc pd
     | Dletrec rdl ->
-        let _, rdl = dletrec ~userloc:None (create_denv uc) rdl in
+        let rdl = dletrec ~userloc:None (create_denv uc) rdl in
         let rdl = expr_rec Mstr.empty rdl in
         let pd = create_rec_decl rdl in
         Loc.try2 loc add_pdecl_with_tuples uc pd
