@@ -104,6 +104,10 @@ let name_from_type ty =
   if s = "" then "x" else String.make 1 s.[0]
 
 
+(*********************************************************)
+(*******   Induction tactic on type definition   *********)
+(*********************************************************)
+
 let make_induction vs km qvl t =
   let x, ts, ty  = heuristic vs in
   let sigma = ty_match Mtv.empty ty x.vs_ty in
@@ -153,11 +157,46 @@ let induction = function
 let () = Trans.register_transform_l "induction" (Trans.store induction)
 
 
+(*********************************************************)
+(******* Induction tactic on function definition *********)
+(*********************************************************)
+
+type scheme =  Inode of bool * scheme list   
+
+(*
+let t_candidates km qvs t =
+   let rec t_candidate vs_acc t =
+     let vs_acc = match t.t_node with
+       | Tapp (ls, tl) -> defn_candidate vs_acc km ls tl qvs
+       | _ -> vs_acc
+     in t_fold t_candidate vs_acc t
+   in t_candidate Svs.empty t
+*)
+
+let make_ind_f _vss _km qvl t = 
+   [t_forall_close qvl [] t]
+
+let ind_f km t0 =
+  let qvs, qvl, t = decompose_forall t0 in
+  let vss = t_candidates km qvs t in
+  if Svs.is_empty vss then [t0] else make_ind_f vss km qvl t
+
+let ind_f = function 
+  | Some { task_decl = { td_node = Decl { d_node = Dprop (Pgoal, pr, f) } };
+	   task_prev = prev;
+	   task_known = km } ->
+      List.map (add_prop_decl prev Pgoal pr) (ind_f km f)
+  | _ -> assert false
+
+let () = Trans.register_transform_l "induction_fdef" (Trans.store ind_f) 
+
+
+
 
 
 (*
 Local Variables:
-compile-command: "unset LANG; make -C ../.."
+compile-command: "unset LANG; make -C ../..$"
 End:
 *)
 
