@@ -142,8 +142,10 @@ theory GenFloatSpecStrict
 
   use import bool.Bool
 
-  predicate lt_post (x:t) (y:t) (r:bool) =
-    if r = True then value x < value y else value x >= value y
+  predicate lt (x:t) (y:t) = value x < value y
+
+  predicate gt (x:t) (y:t) = value x > value y
+
 
 end
 
@@ -244,46 +246,6 @@ theory GenFloatFull
     | (NearestTiesToAway | NearestTiesToEven), _ -> is_infinite x
     end
 
-  (** {3 binary operations} *)
-
-
-  (** {3 Comparisons} *)
-
-  predicate le_full (x:t) (y:t) =
-    (is_finite x /\ is_finite y /\ value x <= value y)
-    \/ (is_minus_infinity x /\ is_not_NaN y)
-    \/ (is_not_NaN x /\ is_plus_infinity y)
-
-  predicate lt_full (x:t) (y:t) =
-    (is_finite x /\ is_finite y /\ value x < value y)
-    \/ (is_minus_infinity x /\ is_not_NaN y /\ not (is_minus_infinity y))
-    \/ (is_not_NaN x /\ not (is_plus_infinity x) /\ is_plus_infinity y)
-
-  predicate ge_full (x:t) (y:t) = le_full y x
-
-  predicate gt_full (x:t) (y:t) = lt_full y x
-
-  predicate eq_full (x:t) (y:t) =
-    is_not_NaN x /\ is_not_NaN y /\
-      ((is_finite x /\ is_finite y /\ value x = value y) \/
-       (is_infinite x /\ is_infinite y /\ same_sign x y))
-
-  predicate ne_full (x:t) (y:t) = not (eq_full x y)
-
-  lemma le_lt_full_trans:
-    forall x y z:t. le_full x y /\ lt_full y z -> lt_full x z
-
-  lemma lt_le_full_trans:
-    forall x y z:t. lt_full x y /\ le_full y z -> lt_full x z
-
-  lemma le_ge_full_asym:
-    forall x y:t. le_full x y /\ ge_full x y -> eq_full x y
-
-  lemma not_lt_ge_full: forall x y:t.
-    not (lt_full x y) /\ is_not_NaN x /\ is_not_NaN y -> ge_full x y
-
-  lemma not_gt_le_full: forall x y:t.
-    not (gt_full x y) /\ is_not_NaN x /\ is_not_NaN y -> le_full x y
 
 end
 
@@ -376,10 +338,41 @@ theory GenFloatSpecFull
 
   (** {3 Comparisons} *)
 
-  use import bool.Bool
+  predicate le (x:t) (y:t) =
+    (is_finite x /\ is_finite y /\ value x <= value y)
+    \/ (is_minus_infinity x /\ is_not_NaN y)
+    \/ (is_not_NaN x /\ is_plus_infinity y)
 
-  predicate lt_post (x:t) (y:t) (r:bool) =
-    if r = True then lt_full x y else not (lt_full x y)
+  predicate lt (x:t) (y:t) =
+    (is_finite x /\ is_finite y /\ value x < value y)
+    \/ (is_minus_infinity x /\ is_not_NaN y /\ not (is_minus_infinity y))
+    \/ (is_not_NaN x /\ not (is_plus_infinity x) /\ is_plus_infinity y)
+
+  predicate ge (x:t) (y:t) = le y x
+
+  predicate gt (x:t) (y:t) = lt y x
+
+  predicate eq (x:t) (y:t) =
+    is_not_NaN x /\ is_not_NaN y /\
+      ((is_finite x /\ is_finite y /\ value x = value y) \/
+       (is_infinite x /\ is_infinite y /\ same_sign x y))
+
+  predicate ne (x:t) (y:t) = not (eq x y)
+
+  lemma le_lt_trans:
+    forall x y z:t. le x y /\ lt y z -> lt x z
+
+  lemma lt_le_trans:
+    forall x y z:t. lt x y /\ le y z -> lt x z
+
+  lemma le_ge_asym:
+    forall x y:t. le x y /\ ge x y -> eq x y
+
+  lemma not_lt_ge: forall x y:t.
+    not (lt x y) /\ is_not_NaN x /\ is_not_NaN y -> ge x y
+
+  lemma not_gt_le: forall x y:t.
+    not (gt x y) /\ is_not_NaN x /\ is_not_NaN y -> le x y
 
 end
 

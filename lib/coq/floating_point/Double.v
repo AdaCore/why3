@@ -118,4 +118,50 @@ Lemma Round_up_neg : forall (x:R), ((round floating_point.Rounding.Up
 now apply Round_up_neg.
 Qed.
 
+(* Why3 assumption *)
+Definition add_post(m:floating_point.Rounding.mode) (x:double) (y:double)
+  (res:double): Prop := ((value res) = (round m
+  ((value x) + (value y))%R)) /\
+  (((exact res) = ((exact x) + (exact y))%R) /\
+  ((model res) = ((model x) + (model y))%R)).
+
+(* Why3 assumption *)
+Definition sub_post(m:floating_point.Rounding.mode) (x:double) (y:double)
+  (res:double): Prop := ((value res) = (round m
+  ((value x) - (value y))%R)) /\
+  (((exact res) = ((exact x) - (exact y))%R) /\
+  ((model res) = ((model x) - (model y))%R)).
+
+(* Why3 assumption *)
+Definition mul_post(m:floating_point.Rounding.mode) (x:double) (y:double)
+  (res:double): Prop := ((value res) = (round m
+  ((value x) * (value y))%R)) /\
+  (((exact res) = ((exact x) * (exact y))%R) /\
+  ((model res) = ((model x) * (model y))%R)).
+
+(* Why3 assumption *)
+Definition div_post(m:floating_point.Rounding.mode) (x:double) (y:double)
+  (res:double): Prop := ((value res) = (round m
+  (Rdiv (value x) (value y))%R)) /\
+  (((exact res) = (Rdiv (exact x) (exact y))%R) /\
+  ((model res) = (Rdiv (model x) (model y))%R)).
+
+(* Why3 assumption *)
+Definition neg_post(x:double) (res:double): Prop :=
+  ((value res) = (-(value x))%R) /\ (((exact res) = (-(exact x))%R) /\
+  ((model res) = (-(model x))%R)).
+
+(* Why3 assumption *)
+Definition implb(x:bool) (y:bool): bool := match (x,
+  y) with
+  | (true, false) => false
+  | (_, _) => true
+  end.
+
+(* Why3 assumption *)
+Definition lt(x:double) (y:double): Prop := ((value x) < (value y))%R.
+
+(* Why3 assumption *)
+Definition gt(x:double) (y:double): Prop := ((value y) < (value x))%R.
+
 
