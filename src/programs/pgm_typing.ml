@@ -86,7 +86,7 @@ type denv = {
 let create_denv uc =
   { uc = uc;
     locals = Mstr.empty;
-    denv = Typing.create_denv (); }
+    denv = Typing.denv_empty; }
 
 let loc_of_id id = Util.of_option id.Ident.id_loc
 

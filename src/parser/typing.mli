@@ -61,7 +61,7 @@ val create_user_type_var : string -> Denv.dty
 
 type denv
 
-val create_denv : unit -> denv
+val denv_empty : denv
 
 val mem_var : string -> denv -> bool
 val find_var : string -> denv -> Denv.dty

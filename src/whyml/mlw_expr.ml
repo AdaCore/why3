@@ -273,6 +273,7 @@ let make_ppattern pp vtv =
 type pre   = term (* precondition *)
 type post  = term (* postcondition *)
 type xpost = post Mexn.t (* exceptional postconditions *)
+type assertion_kind = Ptree.assertion_kind
 
 type expr = {
   e_node   : expr_node;
@@ -297,6 +298,8 @@ and expr_node =
   | Eany    of any_effect
   | Eraise  of xsymbol * pvsymbol
   | Etry    of expr * (xsymbol * pvsymbol * expr) list
+  | Eassert of assertion_kind * term
+  | Eabsurd
 
 and let_defn = {
   let_var  : let_var;
@@ -779,6 +782,15 @@ let e_try d bl =
   in
   branch dvtv.vtv_ghost eff_empty Mid.empty bl
 
+let e_absurd ity =
+  let vty = VTvalue (vty_value ity) in
+  mk_expr Eabsurd vty eff_empty Mid.empty
+
+let e_assert ass f =
+  let eff, vars = assert false (*TODO*) in
+  let vty = VTvalue (vty_value ity_unit) in
+  mk_expr (Eassert (ass, f)) vty eff vars
+
 (* Compute the fixpoint on recursive definitions *)
 
 let vars_equal vs1 vs2 =
@@ -847,7 +859,8 @@ let rec expr_subst psm e = match e.e_node with
   | Etry (e,bl) ->
       let branch (xs,pv,e) = xs, pv, expr_subst psm e in
       e_try (expr_subst psm e) (List.map branch bl)
-  | Elogic _ | Evalue _ | Earrow _ | Eassign _ | Eraise _ -> e
+  | Elogic _ | Evalue _ | Earrow _ | Eassign _ | Eraise _
+  | Eabsurd | Eassert _ -> e
 
 and create_rec_defn defl =
   let conv m (ps,lam) =

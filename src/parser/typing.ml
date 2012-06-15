@@ -120,9 +120,7 @@ type denv = {
   dvars   : dty Mstr.t;    (* local variables, to be bound later *)
 }
 
-let create_denv () = {
-  dvars = Mstr.empty;
-}
+let denv_empty = { dvars = Mstr.empty }
 
 let mem_var x denv = Mstr.mem x denv.dvars
 let find_var x denv = Mstr.find x denv.dvars
@@ -936,7 +934,7 @@ let add_logics dl th =
   let create_symbol th d =
     let id = d.ld_ident.id in
     let v = create_user_id d.ld_ident in
-    let denv = create_denv () in
+    let denv = denv_empty in
     Hashtbl.add denvs id denv;
     let type_ty (_,t) = ty_of_dty (dty th t) in
     let pl = List.map type_ty d.ld_params in
@@ -1020,14 +1018,14 @@ let type_fmla uc denv env f =
 
 let add_prop k loc s f th =
   let pr = create_prsymbol (create_user_id s) in
-  let f = type_fmla th (create_denv ()) Mstr.empty f in
+  let f = type_fmla th denv_empty Mstr.empty f in
   Loc.try4 loc add_prop_decl th k pr f
 
 let loc_of_id id = of_option id.Ident.id_loc
 
 let add_inductives s dl th =
   (* 1. create all symbols and make an environment with these symbols *)
-  let denv = create_denv () in
+  let denv = denv_empty in
   let psymbols = Hashtbl.create 17 in
   let create_symbol th d =
     let id = d.in_ident.id in

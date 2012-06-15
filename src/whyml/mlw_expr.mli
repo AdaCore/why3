@@ -113,6 +113,7 @@ val make_ppattern : pre_ppattern -> vty_value -> pvsymbol Mstr.t * ppattern
 type pre = term          (* precondition *)
 type post                (* postcondition: a formula with a bound variable *)
 type xpost = post Mexn.t (* exceptional postconditions *)
+type assertion_kind = Ptree.assertion_kind
 
 val create_post : vsymbol -> term -> post
 val open_post : post -> vsymbol * term
@@ -140,6 +141,8 @@ and expr_node = private
   | Eany    of any_effect
   | Eraise  of xsymbol * pvsymbol
   | Etry    of expr * (xsymbol * pvsymbol * expr) list
+  | Eassert of assertion_kind * term
+  | Eabsurd
 
 and let_defn = private {
   let_var  : let_var;
@@ -230,4 +233,7 @@ val e_not : expr -> expr
 
 val e_raise : xsymbol -> expr -> expr
 val e_try : expr -> (xsymbol * pvsymbol * expr) list -> expr
+
+val e_absurd : ity -> expr
+val e_assert : assertion_kind -> term -> expr
 
