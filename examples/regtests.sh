@@ -5,6 +5,9 @@ case "$1" in
   "-force")
         REPLAYOPT="-force"
         ;;
+  "-obsolete-only")
+        REPLAYOPT="-obsolete-only -force"
+        ;;
   "")
         REPLAYOPT=""
         ;;
