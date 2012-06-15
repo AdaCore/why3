@@ -103,7 +103,8 @@ let rec create_regions ~user n =
     []
   else
     let tv = create_tvsymbol (id_fresh "rho") in
-    tyvar (create_ty_decl_var ~user tv) :: create_regions ~user (n - 1)
+    let r = if user then tyuvar tv else tyvar (create_ty_decl_var tv) in
+    r :: create_regions ~user (n - 1)
 
 (* region variables are collected in the following list of lists
    so that we can check after typing that two region variables in the same
@@ -120,16 +121,19 @@ let push_region_var tv vloc = match !region_vars with
 
 let check_region_vars () =
   let values = Htv.create 17 in
-  let check tv (v, loc) = match view_dty (tyvar v) with
+  let check_tv tv tv' loc =
+    try
+      let tv'' = Htv.find values tv' in
+      if not (tv_equal tv tv'') then
+        errorm ~loc "this application would create an alias";
+    with Not_found ->
+      Htv.add values tv' tv
+  in
+  let check tv (v, loc) = match view_dty v with
     | Tyvar v'  ->
-        let tv' = tvsymbol_of_type_var v' in
-        begin try
-          let tv'' = Htv.find values tv' in
-          if not (tv_equal tv tv'') then
-            errorm ~loc "this application would create an alias";
-        with Not_found ->
-          Htv.add values tv' tv
-        end
+        check_tv tv (tvsymbol_of_type_var v') loc
+    | Tyuvar tv' ->
+        check_tv tv tv' loc
     | Tyapp _ ->
         assert false
   in
@@ -146,13 +150,13 @@ let rec specialize_ty ?(policy=Region_var) ~loc htv ty = match ty.ty_node with
       let n = (get_mtsymbol ts).mt_regions in
       let mk_region ty = match ty.ty_node with
         | Ty.Tyvar _ when policy = Region_ret ->
-            tyvar (Typing.create_user_type_var "fresh")
+            tyuvar (create_tvsymbol (id_fresh "fresh"))
         | Ty.Tyvar tv when policy = Region_var ->
             let v = Denv.find_type_var ~loc htv tv in
-            push_region_var tv (v, loc);
+            push_region_var tv (tyvar v, loc);
             tyvar v
         | Ty.Tyvar tv (* policy = Region_glob *) ->
-            tyvar (create_ty_decl_var ~user:true tv)
+            tyuvar tv
         | Ty.Tyapp _ ->
             assert false
       in
@@ -172,8 +176,7 @@ let rec specialize_type_v ?(policy=Region_var) ~loc htv = function
       in
       Sreg.iter
         (fun r ->
-           let v = create_ty_decl_var ~user:true r.R.r_tv in
-           push_region_var r.R.r_tv (v, loc))
+           push_region_var r.R.r_tv (tyuvar r.R.r_tv, loc))
         globals;
       dcurrying
         (List.map (fun pv -> specialize_type_v ~loc htv pv.pv_tv) bl)
@@ -205,7 +208,7 @@ let specialize_exception loc x uc =
 
 let create_type_var loc =
   let tv = Ty.create_tvsymbol (id_user "a" loc) in
-  tyvar (create_ty_decl_var ~loc ~user:false tv)
+  tyvar (create_ty_decl_var ~loc tv)
 
 let add_pure_var id ty denv = match view_dty ty with
   | Tyapp (ts, _) when Ty.ts_equal ts ts_arrow -> denv
@@ -272,7 +275,7 @@ let rec dpurify_utype_v = function
 (* user indicates whether region type variables can be instantiated *)
 let rec dtype ~user env = function
   | PPTtyvar {id=x} ->
-      tyvar (Typing.find_user_type_var x env.denv)
+      Typing.create_user_type_var x
   | PPTtyapp (p, x) ->
       let loc = Typing.qloc x in
       let ts = Typing.specialize_tysymbol loc x (impure_uc env.uc) in
@@ -811,18 +814,18 @@ let create_ivsymbol id ty =
   in
   { i_impure = vs; i_effect = vse; i_pure = vsp }
 
-let rec dty_of_ty denv ty = match ty.ty_node with
+let rec dty_of_ty ty = match ty.ty_node with
   | Ty.Tyvar v ->
-      Denv.tyvar (Typing.find_user_type_var v.tv_name.id_string denv)
+      Typing.create_user_type_var v.tv_name.id_string
   | Ty.Tyapp (ts, tyl) ->
-      Denv.tyapp ts (List.map (dty_of_ty denv) tyl)
+      Denv.tyapp ts (List.map dty_of_ty tyl)
 
 let iadd_local env x ty =
   let v = create_ivsymbol x ty in
   let s = v.i_impure.vs_name.id_string in
   let env = { env with
     i_denv =
-      (let dty = dty_of_ty env.i_denv v.i_pure.vs_ty in
+      (let dty = dty_of_ty v.i_pure.vs_ty in
        add_pure_var s dty env.i_denv);
     i_impures = Mstr.add s v env.i_impures;
     i_effects = Mstr.add s v.i_effect env.i_effects;
@@ -1952,8 +1955,7 @@ let create_ienv denv = {
 }
 
 let type_type uc ty =
-  let denv = create_denv uc in
-  let dty = Typing.dty (impure_uc uc) denv.denv ty in
+  let dty = Typing.dty (impure_uc uc) ty in
   Denv.ty_of_dty dty
 
 let add_pure_decl uc ?loc ls =

@@ -31,17 +31,18 @@ open Theory
 
 type dty_view =
   | Tyvar of type_var
+  | Tyuvar of tvsymbol
   | Tyapp of tysymbol * dty_view list
 
 and type_var = {
   tag : int;
-  user : bool;
   tvsymbol : tvsymbol;
   mutable type_val : dty_view option;
   type_var_loc : loc option;
 }
 
 let tyvar v = Tyvar v
+let tyuvar tv = Tyuvar tv
 
 let rec type_inst s ty = match ty.ty_node with
   | Ty.Tyvar n -> Mtv.find n s
@@ -62,8 +63,9 @@ let tvsymbol_of_type_var tv = tv.tvsymbol
 let rec print_dty fmt = function
   | Tyvar { type_val = Some t } ->
       print_dty fmt t
-  | Tyvar { type_val = None; tvsymbol = v } ->
-      Pretty.print_tv fmt v
+  | Tyvar { type_val = None; tvsymbol = tv }
+  | Tyuvar tv ->
+      Pretty.print_tv fmt tv
   | Tyapp (s, []) ->
       fprintf fmt "%s" s.ts_name.id_string
   | Tyapp (s, [t]) ->
@@ -77,14 +79,14 @@ let rec view_dty = function
 
 let create_ty_decl_var =
   let t = ref 0 in
-  fun ?loc ~user tv ->
+  fun ?loc tv ->
     incr t;
-    { tag = !t; user = user; tvsymbol = tv; type_val = None;
-      type_var_loc = loc }
+    { tag = !t; tvsymbol = tv; type_val = None; type_var_loc = loc }
 
 let rec occurs v = function
   | Tyvar { type_val = Some t } -> occurs v t
   | Tyvar { tag = t; type_val = None } -> v.tag = t
+  | Tyuvar _ -> false
   | Tyapp (_, l) -> List.exists (occurs v) l
 
 (* destructive type unification *)
@@ -95,27 +97,26 @@ let rec unify t1 t2 = match t1, t2 with
       unify t1 t2
   | Tyvar v1, Tyvar v2 when v1.tag = v2.tag ->
       true
-        (* instantiable variables *)
-  | Tyvar ({user=false} as v), t
-  | t, Tyvar ({user=false} as v) ->
+  (* instantiable variables *)
+  | Tyvar v, t | t, Tyvar v ->
       not (occurs v t) && (v.type_val <- Some t; true)
-        (* recursive types *)
+  (* recursive types *)
   | Tyapp (s1, l1), Tyapp (s2, l2) ->
       ts_equal s1 s2 && List.length l1 = List.length l2 &&
           List.for_all2 unify l1 l2
   | Tyapp _, _ | _, Tyapp _ ->
       false
-        (* other cases *)
-  | Tyvar {user=true; tag=t1}, Tyvar {user=true; tag=t2} ->
-      t1 = t2
+  (* other cases *)
+  | Tyuvar tv1, Tyuvar tv2  ->
+      tv_equal tv1 tv2
 
 (* intermediate types -> types *)
 let rec ty_of_dty = function
   | Tyvar { type_val = Some t } ->
       ty_of_dty t
-  | Tyvar { type_val = None; user = false; type_var_loc = loc } ->
+  | Tyvar { type_val = None; type_var_loc = loc } ->
       Loc.errorm ?loc "undefined type variable"
-  | Tyvar { tvsymbol = tv } ->
+  | Tyuvar tv ->
       ty_var tv
   | Tyapp (s, tl) ->
       ty_app s (List.map ty_of_dty tl)
@@ -280,7 +281,7 @@ let find_type_var ~loc env tv =
   try
     Htv.find env tv
   with Not_found ->
-    let v = create_ty_decl_var ~loc ~user:false tv in
+    let v = create_ty_decl_var ~loc (create_tvsymbol (id_clone tv.tv_name)) in
     Htv.add env tv v;
     v
 

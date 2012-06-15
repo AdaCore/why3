@@ -31,13 +31,6 @@ open Mlw_ty.T
 open Mlw_expr
 open Mlw_module
 
-let create_user_tv =
-  let hs = Hashtbl.create 17 in
-  fun s -> try Hashtbl.find hs s with Not_found ->
-  let tv = create_tvsymbol (id_fresh s) in
-  Hashtbl.add hs s tv;
-  tv
-
 type dity =
   | Dvar  of dvar ref
   | Duvar of tvsymbol
@@ -73,7 +66,7 @@ and reg_of_dreg = function
   | Rvar { contents = Rval dreg } -> reg_of_dreg dreg
 
 let create_user_type_variable x =
-  Duvar (create_user_tv x.id)
+  Duvar (Typing.create_user_tv x.id)
 
 let create_type_variable () =
   Dvar (ref (Dtvs (create_tvsymbol (id_fresh "a"))))

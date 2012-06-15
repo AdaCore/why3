@@ -430,17 +430,17 @@ and dexpr_desc ~userloc denv loc = function
         expected_type e res;
         ppat, e in
       DEmatch (e1, List.map branch bl), res
-  | Ptree.Eloop (_ann, _e1) ->
-      assert false (*TODO*)
   | Ptree.Eabsurd ->
+      DEabsurd, create_type_variable ()
+  | Ptree.Eassert (ass, lexpr) ->
+      DEassert (ass, lexpr), dity_unit
+  | Ptree.Eloop (_ann, _e1) ->
       assert false (*TODO*)
   | Ptree.Eraise (_q, _e1) ->
       assert false (*TODO*)
   | Ptree.Etry (_e1, _cl) ->
       assert false (*TODO*)
   | Ptree.Efor (_id, _e1, _dir, _e2, _lexpr_opt, _e3) ->
-      assert false (*TODO*)
-  | Ptree.Eassert (_ass, _lexpr) ->
       assert false (*TODO*)
   | Ptree.Emark (_id, _e1) ->
       assert false (*TODO*)
@@ -480,7 +480,7 @@ and dlambda ~userloc denv bl _var (p, e, q) =
 and dpost _denv (q, _ql) =
   q, [] (* TODO *)
 
-let rec expr locals de = match de.dexpr_desc with
+let rec expr uc locals de = match de.dexpr_desc with
   | DElocal x ->
       assert (Mstr.mem x locals);
       begin match Mstr.find x locals with
@@ -488,32 +488,32 @@ let rec expr locals de = match de.dexpr_desc with
       | LetA ps -> e_cast ps (vty_of_dity de.dexpr_type)
       end
   | DElet (x, { dexpr_desc = DEfun (bl, tr) }, de2) ->
-      let def1 = expr_fun locals x bl tr in
+      let def1 = expr_fun uc locals x bl tr in
       let locals = Mstr.add x.id (LetA def1.rec_ps) locals in
-      let e2 = expr locals de2 in
+      let e2 = expr uc locals de2 in
       e_rec [def1] e2
   | DEfun (bl, tr) ->
       let x = { id = "fn"; id_loc = de.dexpr_loc; id_lab = [] } in
-      let def = expr_fun locals x bl tr in
+      let def = expr_fun uc locals x bl tr in
       let e2 = e_cast def.rec_ps (VTarrow def.rec_ps.ps_vta) in
       e_rec [def] e2
   | DElet (x, de1, de2) ->
-      let e1 = expr locals de1 in
+      let e1 = expr uc locals de1 in
       let def1 = create_let_defn (Denv.create_user_id x) e1 in
       let locals = Mstr.add x.id def1.let_var locals in
-      let e2 = expr locals de2 in
+      let e2 = expr uc locals de2 in
       e_let def1 e2
   | DEletrec (rdl, de1) ->
-      let rdl = expr_rec locals rdl in
+      let rdl = expr_rec uc locals rdl in
       let add_rd { rec_ps = ps } = Mstr.add ps.ps_name.id_string (LetA ps) in
-      let e1 = expr (List.fold_right add_rd rdl locals) de1 in
+      let e1 = expr uc (List.fold_right add_rd rdl locals) de1 in
       e_rec rdl e1
   | DEapply (de1, del) ->
-      let el = List.map (expr locals) del in
+      let el = List.map (expr uc locals) del in
       begin match de1.dexpr_desc with
         | DEglobal_pl pls -> e_plapp pls el (ity_of_dity de.dexpr_type)
         | DEglobal_ls ls  -> e_lapp  ls  el (ity_of_dity de.dexpr_type)
-        | _               -> e_app (expr locals de1) el
+        | _               -> e_app (expr uc locals de1) el
       end
   | DEglobal_pv pv ->
       e_value pv
@@ -526,29 +526,32 @@ let rec expr locals de = match de.dexpr_desc with
       assert (ls.ls_args = []);
       e_lapp ls [] (ity_of_dity de.dexpr_type)
   | DEif (de1, de2, de3) ->
-      e_if (expr locals de1) (expr locals de2) (expr locals de3)
+      e_if (expr uc locals de1) (expr uc locals de2) (expr uc locals de3)
   | DEassign (de1, de2) ->
-      e_assign (expr locals de1) (expr locals de2)
+      e_assign (expr uc locals de1) (expr uc locals de2)
   | DEconstant c ->
       e_const c
   | DElazy (LazyAnd, de1, de2) ->
-      e_lazy_and (expr locals de1) (expr locals de2)
+      e_lazy_and (expr uc locals de1) (expr uc locals de2)
   | DElazy (LazyOr, de1, de2) ->
-      e_lazy_or (expr locals de1) (expr locals de2)
+      e_lazy_or (expr uc locals de1) (expr uc locals de2)
   | DEnot de1 ->
-      e_not (expr locals de1)
+      e_not (expr uc locals de1)
   | DEmatch (de1, bl) ->
-      let e1 = expr locals de1 in
+      let e1 = expr uc locals de1 in
       let vtv = vtv_of_expr e1 in
       let branch (pp,de) =
         let vm, pp = make_ppattern pp vtv in
         let locals = Mstr.fold (fun s pv -> Mstr.add s (LetV pv)) vm locals in
-        pp, expr locals de in
+        pp, expr uc locals de in
       e_case e1 (List.map branch bl)
+  | DEassert (ass, lexpr) ->
+      (* let f = Typing.type_fmla (get_theory uc) *)
+assert false (*TODO*)
   | _ ->
       assert false (*TODO*)
 
-and expr_rec locals rdl =
+and expr_rec uc locals rdl =
   let step1 locals (id, dity, bl, var, tr) =
     let vta = match vty_of_dity dity with
       | VTarrow vta -> vta
@@ -557,21 +560,21 @@ and expr_rec locals rdl =
     Mstr.add id.id (LetA ps) locals, (ps, bl, var, tr)
   in
   let locals, rdl = Util.map_fold_left step1 locals rdl in
-  let step2 (ps, bl, var, tr) = ps, expr_lam locals bl var tr in
+  let step2 (ps, bl, var, tr) = ps, expr_lam uc locals bl var tr in
   create_rec_defn (List.map step2 rdl)
 
-and expr_fun locals x bl tr =
-  let lam = expr_lam locals bl [] tr in
+and expr_fun uc locals x bl tr =
+  let lam = expr_lam uc locals bl [] tr in
   create_fun_defn (Denv.create_user_id x) lam
 
-and expr_lam locals bl _var (_, e, _) =
+and expr_lam uc locals bl _var (_, e, _) =
   let binder (id, ghost, dity) =
     let vtv = vty_value ~ghost (ity_of_dity dity) in
     create_pvsymbol (Denv.create_user_id id) vtv in
   let pvl = List.map binder bl in
   let add_binder pv = Mstr.add pv.pv_vs.vs_name.id_string (LetV pv) in
   let locals = List.fold_right add_binder pvl locals in
-  let e = expr locals e in
+  let e = expr uc locals e in
   let ty = match e.e_vty with
     | VTarrow _ -> ty_tuple []
     | VTvalue vtv -> ty_of_ity vtv.vtv_ity in
@@ -1048,17 +1051,17 @@ let add_module lib path mm mt m =
         let e = dexpr ~userloc:None (create_denv uc) e in
         let pd = match e.dexpr_desc with
           | DEfun (bl, tr) ->
-              let def = expr_fun Mstr.empty id bl tr in
+              let def = expr_fun uc Mstr.empty id bl tr in
               create_rec_decl [def]
           | _ ->
-              let e = expr Mstr.empty e in
+              let e = expr uc Mstr.empty e in
               let def = create_let_defn (Denv.create_user_id id) e in
               create_let_decl def
         in
         Loc.try2 loc add_pdecl_with_tuples uc pd
     | Dletrec rdl ->
         let rdl = dletrec ~userloc:None (create_denv uc) rdl in
-        let rdl = expr_rec Mstr.empty rdl in
+        let rdl = expr_rec uc Mstr.empty rdl in
         let pd = create_rec_decl rdl in
         Loc.try2 loc add_pdecl_with_tuples uc pd
     | Dexn (id, pty) ->
