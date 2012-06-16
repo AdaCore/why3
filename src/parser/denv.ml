@@ -281,7 +281,7 @@ let find_type_var ~loc env tv =
   try
     Htv.find env tv
   with Not_found ->
-    let v = create_ty_decl_var ~loc (create_tvsymbol (id_clone tv.tv_name)) in
+    let v = create_ty_decl_var ~loc tv in
     Htv.add env tv v;
     v
 
