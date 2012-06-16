@@ -1,0 +1,32 @@
+
+theory Th1
+   use import set.Fsetint
+(* proved with vampire 0.6 and eprover 1.4 *)
+   lemma l_false : false
+end
+
+
+theory Th2
+  use import set.Fsetint
+
+  function integer : set int
+  lemma mem_integer: forall x:int. mem x integer
+
+  goal foo : false
+
+end 
+
+
+theory Th3
+
+  use import int.Int
+
+  type set 'a
+
+  function f (set int) : int
+  function g (set int) : int
+  axiom axiom1: forall s: set int, x: int.  f s <= x <= g s
+
+  goal foo : false
+
+end

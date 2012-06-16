@@ -4,6 +4,10 @@
 
 == Papers to write ==
 
+  * paper on the module system, its semantics, realizations, avec en
+    particulier la solution avec les types classes qui reste a
+    implanter
+
   * DONE Encodings and transformations (Andrei+Francois)
   * DONE Why presentation at the IVL workshop of CADE:
     (http://research.microsoft.com/en-us/um/people/moskal/boogie2011/)
@@ -101,14 +105,17 @@
 * Coq tactic
 ** ajout de bases de hint
 
-* Coq output
+* PRIORITAIRE Coq output
  - corriger l'incoherence, comprendre si on veut vraiment accepter
 
   function x : 'a
   (cf: en caml cela ne marche pas)
+ Solution proposee: utiliser des types classes, en particulier Inhabited
 
 * new language constructs
-** sandbox, abstract
+** NOT NEEDED ANYMORE sandbox
+** DONE abstract e { q }
+** contract e { q }
 
 * efficiency issues
  - understand problems when large number of goals (cf D Mentré examples)
@@ -202,7 +209,7 @@ See manual Section xx
 == TODOs ==
 
 
-* BUG CVC3 avec la division par 0, cf examples/tests-provers/cvc3.why
+* DONE bug CVC3 avec la division par 0, cf examples/tests-provers/cvc3.why
 
 * DONE Document the Coq plugin and tactic
 ** DONE option timelimit <n>

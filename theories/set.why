@@ -3,7 +3,7 @@
 
 (** {2 General Sets} *)
 
-theory Set
+theory SetGen
 
   type set 'a
 
@@ -78,12 +78,19 @@ theory Set
   axiom choose_def:
     forall s: set 'a. not (is_empty s) -> mem (choose s) s
 
-(*
+end
+
+(** {2 Potentially infinite sets} *)
+
+theory Set
+
+  clone export SetGen
+  
   (** the set of all x of type 'a *)
   constant all: set 'a
 
   axiom all_def: forall x: 'a. mem x all
-*)
+
 end
 
 (** {2 Set Comprehension} *)
@@ -119,7 +126,7 @@ end
 theory Fset
 
   use import int.Int
-  clone export Set
+  clone export SetGen
 
   function cardinal (set 'a) : int
 
@@ -203,17 +210,6 @@ theory Fsetint
 
   lemma cardinal_below:
     forall n: int. cardinal (below n) = if n >= 0 then n else 0
-
-end
-
-(** {2 Set extensionality} *)
-
-theory FsetExt
-
-  use export Fset
-
-  axiom ext: forall s1 s2 : set 'a.
-    s1 = s2 <-> (forall x : 'a. mem x s1 <-> mem x s2)
 
 end
 
