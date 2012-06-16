@@ -236,6 +236,14 @@ let specialize_qualid ~loc uc p =
   with Not_found ->
     errorm ~loc "unbound symbol %a" Typing.print_qualid p
 
+let specialize_exception ~loc uc p =
+  let x = Typing.string_list_of_qualid [] p in
+  try match ns_find_ps (get_namespace uc) x with
+    | PX xs -> xs, specialize_xsymbol xs
+    | _ -> errorm ~loc "exception symbol expected"
+  with Not_found ->
+    errorm ~loc "unbound symbol %a" Typing.print_qualid p
+
 let mk_dexpr desc dity loc labs =
   { dexpr_desc = desc; dexpr_type = dity; dexpr_loc = loc; dexpr_lab = labs }
 
@@ -430,15 +438,31 @@ and dexpr_desc ~userloc denv loc = function
         expected_type e res;
         ppat, e in
       DEmatch (e1, List.map branch bl), res
+  | Ptree.Eraise (q, e1) ->
+      let res = create_type_variable () in
+      let xs, dity = specialize_exception ~loc denv.uc q in
+      let e1 = match e1 with
+        | Some e1 -> dexpr ~userloc denv e1
+        | None when ity_equal xs.xs_ity ity_unit -> hidden_ls ~loc (fs_tuple 0)
+        | _ -> errorm ~loc "exception argument expected" in
+      expected_type e1 dity;
+      DEraise (xs, e1), res
+  | Ptree.Etry (e1, cl) ->
+      let e1 = dexpr ~userloc denv e1 in
+      let branch (q, id, e) =
+        let xs, dity = specialize_exception ~loc denv.uc q in
+        let id, denv = match id with
+          | Some id -> id, add_var id dity denv
+          | None -> { id = "void" ; id_loc = loc ; id_lab = [] }, denv in
+        xs, id, dexpr ~userloc denv e
+      in
+      let cl = List.map branch cl in
+      DEtry (e1, cl), e1.dexpr_type
   | Ptree.Eabsurd ->
       DEabsurd, create_type_variable ()
   | Ptree.Eassert (ass, lexpr) ->
       DEassert (ass, lexpr), dity_unit
   | Ptree.Eloop (_ann, _e1) ->
-      assert false (*TODO*)
-  | Ptree.Eraise (_q, _e1) ->
-      assert false (*TODO*)
-  | Ptree.Etry (_e1, _cl) ->
       assert false (*TODO*)
   | Ptree.Efor (_id, _e1, _dir, _e2, _lexpr_opt, _e3) ->
       assert false (*TODO*)
@@ -453,10 +477,7 @@ and dletrec ~userloc denv rdl =
   (* add all functions into environment *)
   let add_one denv (id, bl, var, tr) =
     let res = create_type_variable () in
-    let tvars = add_tvars denv.tvars res in
-    let locals = Mstr.add id.id (tvars, res) denv.locals in
-    let denv = { denv with locals = locals; tvars = tvars } in
-    denv, (id, res, bl, var, tr) in
+    add_var id res denv, (id, res, bl, var, tr) in
   let denv, rdl = Util.map_fold_left add_one denv rdl in
   (* then type-check all of them and unify *)
   let type_one (id, res, bl, var, tr) =
@@ -468,7 +489,7 @@ and dletrec ~userloc denv rdl =
 and dlambda ~userloc denv bl _var (p, e, q) =
   let dbinder denv (id, pty) =
     let dity = match pty with
-      | Some pty -> dity_of_pty ~user:false denv pty
+      | Some pty -> dity_of_pty ~user:true denv pty
       | None -> create_type_variable () in
     add_var id dity denv, (id, false, dity) in
   let denv, bl = Util.map_fold_left dbinder denv bl in
@@ -578,6 +599,16 @@ let rec expr uc locals de = match de.dexpr_desc with
       e_assert ass f
   | DEabsurd ->
       e_absurd (ity_of_dity de.dexpr_type)
+  | DEraise (xs, de1) ->
+      e_raise xs (expr uc locals de1) (ity_of_dity de.dexpr_type)
+  | DEtry (de1, bl) ->
+      let e1 = expr uc locals de1 in
+      let branch (xs,id,de) =
+        let vtv = vty_value xs.xs_ity in
+        let pv = create_pvsymbol (Denv.create_user_id id) vtv in
+        let locals = add_local id.id (LetV pv) locals in
+        xs, pv, expr uc locals de in
+      e_try e1 (List.map branch bl)
   | _ ->
       assert false (*TODO*)
 

@@ -56,3 +56,4 @@ val specialize_lsymbol: lsymbol -> dity
 val specialize_pvsymbol: pvsymbol -> dity
 val specialize_psymbol: psymbol -> dity
 val specialize_plsymbol: plsymbol -> dity
+val specialize_xsymbol: xsymbol -> dity

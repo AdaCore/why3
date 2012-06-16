@@ -590,6 +590,8 @@ let e_lapp ls el ity =
   in
   e_plapp pls el ity
 
+let e_void = e_lapp (fs_tuple 0) [] ity_unit
+
 let e_if_real pv e1 e2 =
   let vtv1 = vtv_of_expr e1 in
   let vtv2 = vtv_of_expr e2 in
@@ -738,15 +740,15 @@ let e_lazy_and e1 e2 =
 let e_lazy_or e1 e2 =
   if eff_is_empty e2.e_effect then e_binop Tor e1 e2 else e_if e1 e_true e2
 
-let e_raise_real xs pv =
+let e_raise_real xs ity pv =
   ity_equal_check xs.xs_ity pv.pv_vtv.vtv_ity;
   let ghost = pv.pv_vtv.vtv_ghost in
   let vars = add_pv_vars pv Mid.empty in
-  let vtv = vty_value ~ghost ity_unit in
+  let vtv = vty_value ~ghost ity in
   let eff = eff_raise eff_empty ~ghost xs in
   mk_expr (Eraise (xs,pv)) (VTvalue vtv) eff vars
 
-let e_raise xs e = on_value (e_raise_real xs) e
+let e_raise xs e ity = on_value (e_raise_real xs ity) e
 
 let e_try d bl =
   let dvtv = vtv_of_expr d in

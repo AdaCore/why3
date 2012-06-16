@@ -238,12 +238,21 @@ and print_enode pri fmt e = match e.e_node with
   | Ecase (pv,bl) ->
       fprintf fmt "match %a with@\n@[<hov>%a@]@\nend"
         print_pv pv (print_list newline print_branch) bl
+  | Eraise (xs,pv) ->
+      fprintf fmt "raise (%a %a)" print_xs xs print_pv pv
+  | Etry (e,bl) ->
+      fprintf fmt "try %a with@\n@[<hov>%a@]@\nend"
+        print_expr e (print_list newline print_xbranch) bl
   | _ ->
       fprintf fmt "<expr TODO>"
 
 and print_branch fmt ({ ppat_pattern = p }, e) =
   fprintf fmt "@[<hov 4>| %a ->@ %a@]" print_pat p print_expr e;
   Svs.iter forget_var p.pat_vars
+
+and print_xbranch fmt (xs, pv, e) =
+  fprintf fmt "@[<hov 4>| %a %a ->@ %a@]" print_xs xs print_pv pv print_expr e;
+  forget_pv pv
 
 and print_rec fst fmt { rec_ps = ps ; rec_lambda = lam } =
   let print_post fmt post =

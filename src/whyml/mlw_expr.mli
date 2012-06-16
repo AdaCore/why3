@@ -223,6 +223,8 @@ val e_assign : expr -> expr -> expr
 val e_ghost : expr -> expr
 val e_any : any_effect -> ity -> expr
 
+val e_void : expr
+
 val e_const : constant -> expr
 val e_int_const : string -> expr
 val e_real_const : real_constant -> expr
@@ -231,7 +233,7 @@ val e_lazy_and : expr -> expr -> expr
 val e_lazy_or : expr -> expr -> expr
 val e_not : expr -> expr
 
-val e_raise : xsymbol -> expr -> expr
+val e_raise : xsymbol -> expr -> ity -> expr
 val e_try : expr -> (xsymbol * pvsymbol * expr) list -> expr
 
 val e_absurd : ity -> expr

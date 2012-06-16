@@ -279,6 +279,9 @@ let specialize_vtvalue ~user vtv =
 let specialize_pvsymbol pv =
   specialize_vtvalue ~user:true pv.pv_vtv
 
+let specialize_xsymbol xs =
+  specialize_vtvalue ~user:true (vty_value xs.xs_ity)
+
 let make_arrow_type tyl ty =
   let arrow ty1 ty2 = ts_app_real ts_arrow [ty1;ty2] in
   List.fold_right arrow tyl ty

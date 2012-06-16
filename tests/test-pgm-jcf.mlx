@@ -30,13 +30,13 @@ module N
   let myfun r =
     let rec on_tree t = match t with
       | Node {| contents = v |} f -> v + on_forest f
-      | Leaf -> 0
+      | Leaf -> raise (Exit Leaf)
     end with on_forest f = match f with
       | Cons t f -> let ee = Leaf in on_tree t + on_forest f + on_tree ee
       | Nil -> 1
     end
     in
-    on_tree r
+    try on_tree r with Exit -> 0 end
 end
 
 (*

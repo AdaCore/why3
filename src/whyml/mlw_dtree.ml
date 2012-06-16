@@ -104,8 +104,8 @@ and dexpr_desc =
   | DEnot of dexpr
   | DEmatch of dexpr * (pre_ppattern * dexpr) list
   | DEabsurd
-  | DEraise of xsymbol * dexpr option
-  | DEtry of dexpr * (xsymbol * string option * dexpr) list
+  | DEraise of xsymbol * dexpr
+  | DEtry of dexpr * (xsymbol * ident * dexpr) list
   | DEfor of ident * dexpr * for_direction * dexpr * Ptree.lexpr option * dexpr
   | DEassert of assertion_kind * Ptree.lexpr
   | DEmark of string * dexpr
