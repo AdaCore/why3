@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/usr/local/share/why3/why3session.dtd">
+<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
 <why3session
- name="wp3/why3session.xml">
+ name="examples/hoare_logic/wp3/why3session.xml">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -16,6 +16,10 @@
   version="8.3pl3"/>
  <prover
   id="3"
+  name="Coq"
+  version="8.3pl4"/>
+ <prover
+  id="4"
   name="Z3"
   version="3.2"/>
  <file
@@ -24,13 +28,13 @@
   expanded="true">
   <theory
    name="ImpExpr"
-   locfile="wp3/../wp3.mlw"
+   locfile="examples/hoare_logic/wp3/../wp3.mlw"
    loclnum="6" loccnumb="7" loccnume="14"
    verified="false"
    expanded="true">
    <goal
     name="eval_subst_term"
-    locfile="wp3/../wp3.mlw"
+    locfile="examples/hoare_logic/wp3/../wp3.mlw"
     loclnum="101" loccnumb="6" loccnume="21"
     sum="ef98d2b97884863e1cbe533969818f1f"
     proved="false"
@@ -40,30 +44,30 @@
      prover="0"
      timelimit="2"
      memlimit="1000"
-     obsolete="true"
+     obsolete="false"
      archived="false">
-     <result status="unknown" time="0.24"/>
+     <result status="unknown" time="0.16"/>
     </proof>
     <proof
      prover="1"
      timelimit="2"
      memlimit="1000"
-     obsolete="true"
+     obsolete="false"
      archived="false">
-     <result status="timeout" time="2.19"/>
+     <result status="timeout" time="2.08"/>
     </proof>
     <proof
-     prover="3"
+     prover="4"
      timelimit="2"
      memlimit="1000"
-     obsolete="true"
+     obsolete="false"
      archived="false">
-     <result status="timeout" time="2.28"/>
+     <result status="timeout" time="2.09"/>
     </proof>
    </goal>
    <goal
     name="eval_term_change_free"
-    locfile="wp3/../wp3.mlw"
+    locfile="examples/hoare_logic/wp3/../wp3.mlw"
     loclnum="107" loccnumb="6" loccnume="27"
     sum="430b7d02bdb3f2e8cec81e288e46c026"
     proved="false"
@@ -73,30 +77,30 @@
      prover="0"
      timelimit="2"
      memlimit="1000"
-     obsolete="true"
+     obsolete="false"
      archived="false">
-     <result status="unknown" time="0.21"/>
+     <result status="unknown" time="0.15"/>
     </proof>
     <proof
      prover="1"
      timelimit="2"
      memlimit="1000"
-     obsolete="true"
+     obsolete="false"
      archived="false">
-     <result status="timeout" time="2.10"/>
+     <result status="timeout" time="2.06"/>
     </proof>
     <proof
-     prover="3"
+     prover="4"
      timelimit="2"
      memlimit="1000"
-     obsolete="true"
+     obsolete="false"
      archived="false">
-     <result status="timeout" time="2.08"/>
+     <result status="timeout" time="2.01"/>
     </proof>
    </goal>
    <goal
     name="eval_subst"
-    locfile="wp3/../wp3.mlw"
+    locfile="examples/hoare_logic/wp3/../wp3.mlw"
     loclnum="133" loccnumb="6" loccnume="16"
     sum="b9e2179371c7b6be3e45cd792f8954a3"
     proved="false"
@@ -106,63 +110,63 @@
      prover="0"
      timelimit="2"
      memlimit="1000"
-     obsolete="true"
+     obsolete="false"
      archived="false">
-     <result status="unknown" time="0.11"/>
+     <result status="unknown" time="0.07"/>
     </proof>
     <proof
      prover="1"
      timelimit="2"
      memlimit="1000"
-     obsolete="true"
+     obsolete="false"
      archived="false">
-     <result status="timeout" time="2.11"/>
+     <result status="timeout" time="2.06"/>
     </proof>
     <proof
-     prover="3"
+     prover="4"
      timelimit="2"
      memlimit="1000"
-     obsolete="true"
+     obsolete="false"
      archived="false">
-     <result status="timeout" time="2.19"/>
+     <result status="timeout" time="2.06"/>
     </proof>
    </goal>
    <goal
     name="eval_swap"
-    locfile="wp3/../wp3.mlw"
+    locfile="examples/hoare_logic/wp3/../wp3.mlw"
     loclnum="139" loccnumb="6" loccnume="15"
     sum="c507b815677e32c2dc3fa56fcbc973f8"
-    proved="false"
+    proved="true"
     expanded="true"
     shape="aeval_fmlaV1asetasetV2V4V6V3V5V0qaeval_fmlaV1asetasetV2V3V5V4V6V0Iainfix =V3V4NF">
     <proof
      prover="0"
      timelimit="2"
      memlimit="1000"
-     obsolete="true"
+     obsolete="false"
      archived="false">
-     <result status="unknown" time="0.06"/>
+     <result status="unknown" time="0.02"/>
     </proof>
     <proof
      prover="1"
      timelimit="2"
      memlimit="1000"
-     obsolete="true"
+     obsolete="false"
      archived="false">
-     <result status="valid" time="0.03"/>
+     <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="3"
+     prover="4"
      timelimit="2"
      memlimit="1000"
-     obsolete="true"
+     obsolete="false"
      archived="false">
-     <result status="timeout" time="2.10"/>
+     <result status="timeout" time="2.06"/>
     </proof>
    </goal>
    <goal
     name="eval_change_free"
-    locfile="wp3/../wp3.mlw"
+    locfile="examples/hoare_logic/wp3/../wp3.mlw"
     loclnum="145" loccnumb="6" loccnume="22"
     sum="7bbed035dda60f5a6987d1f3fd286823"
     proved="false"
@@ -172,30 +176,30 @@
      prover="0"
      timelimit="2"
      memlimit="1000"
-     obsolete="true"
+     obsolete="false"
      archived="false">
-     <result status="unknown" time="0.06"/>
+     <result status="unknown" time="0.03"/>
     </proof>
     <proof
      prover="1"
      timelimit="2"
      memlimit="1000"
-     obsolete="true"
+     obsolete="false"
      archived="false">
-     <result status="timeout" time="2.07"/>
+     <result status="timeout" time="2.06"/>
     </proof>
     <proof
-     prover="3"
+     prover="4"
      timelimit="2"
      memlimit="1000"
-     obsolete="true"
+     obsolete="false"
      archived="false">
-     <result status="timeout" time="2.11"/>
+     <result status="timeout" time="2.02"/>
     </proof>
    </goal>
    <goal
     name="steps_non_neg"
-    locfile="wp3/../wp3.mlw"
+    locfile="examples/hoare_logic/wp3/../wp3.mlw"
     loclnum="247" loccnumb="6" loccnume="19"
     sum="47ef5cdb603762b8f2a23ff84df56ff1"
     proved="false"
@@ -205,30 +209,30 @@
      prover="0"
      timelimit="2"
      memlimit="1000"
-     obsolete="true"
+     obsolete="false"
      archived="false">
-     <result status="timeout" time="3.38"/>
+     <result status="timeout" time="2.04"/>
     </proof>
     <proof
      prover="1"
      timelimit="2"
      memlimit="1000"
-     obsolete="true"
+     obsolete="false"
      archived="false">
-     <result status="timeout" time="2.08"/>
+     <result status="timeout" time="2.09"/>
     </proof>
     <proof
-     prover="3"
+     prover="4"
      timelimit="2"
      memlimit="1000"
-     obsolete="true"
+     obsolete="false"
      archived="false">
-     <result status="timeout" time="2.20"/>
+     <result status="timeout" time="2.09"/>
     </proof>
    </goal>
    <goal
     name="many_steps_seq"
-    locfile="wp3/../wp3.mlw"
+    locfile="examples/hoare_logic/wp3/../wp3.mlw"
     loclnum="251" loccnumb="6" loccnume="20"
     sum="a9a72fc851bf1edc92c0860aaa3c1c30"
     proved="false"
@@ -237,7 +241,7 @@
    </goal>
    <goal
     name="many_steps_let"
-    locfile="wp3/../wp3.mlw"
+    locfile="examples/hoare_logic/wp3/../wp3.mlw"
     loclnum="259" loccnumb="6" loccnume="20"
     sum="23aae6e7f5564e085f32d44b76c12a71"
     proved="false"
@@ -252,7 +256,7 @@
      <result status="timeout" time="32.39"/>
     </proof>
     <proof
-     prover="3"
+     prover="4"
      timelimit="30"
      memlimit="1000"
      obsolete="false"
@@ -263,13 +267,13 @@
   </theory>
   <theory
    name="TestSemantics"
-   locfile="wp3/../wp3.mlw"
+   locfile="examples/hoare_logic/wp3/../wp3.mlw"
    loclnum="291" loccnumb="7" loccnume="20"
    verified="false"
    expanded="false">
    <goal
     name="Test13"
-    locfile="wp3/../wp3.mlw"
+    locfile="examples/hoare_logic/wp3/../wp3.mlw"
     loclnum="298" loccnumb="5" loccnume="11"
     sum="ead7d89a707311b213181db878860610"
     proved="true"
@@ -294,7 +298,7 @@
    </goal>
    <goal
     name="Test13expr"
-    locfile="wp3/../wp3.mlw"
+    locfile="examples/hoare_logic/wp3/../wp3.mlw"
     loclnum="301" loccnumb="5" loccnume="15"
     sum="33a1806704df9b75da946b47a42d853b"
     proved="true"
@@ -317,7 +321,7 @@
      <result status="valid" time="0.05"/>
     </proof>
     <proof
-     prover="3"
+     prover="4"
      timelimit="2"
      memlimit="1000"
      obsolete="false"
@@ -327,7 +331,7 @@
    </goal>
    <goal
     name="Test42"
-    locfile="wp3/../wp3.mlw"
+    locfile="examples/hoare_logic/wp3/../wp3.mlw"
     loclnum="304" loccnumb="5" loccnume="11"
     sum="e3eaa291dfaab7128ef8221f04c673f1"
     proved="true"
@@ -352,7 +356,7 @@
    </goal>
    <goal
     name="Test42expr"
-    locfile="wp3/../wp3.mlw"
+    locfile="examples/hoare_logic/wp3/../wp3.mlw"
     loclnum="307" loccnumb="5" loccnume="15"
     sum="179b541d8affa3ce648a884ef118425a"
     proved="false"
@@ -375,7 +379,7 @@
      <result status="timeout" time="2.09"/>
     </proof>
     <proof
-     prover="3"
+     prover="4"
      timelimit="2"
      memlimit="1000"
      obsolete="false"
@@ -385,7 +389,7 @@
    </goal>
    <goal
     name="Test0"
-    locfile="wp3/../wp3.mlw"
+    locfile="examples/hoare_logic/wp3/../wp3.mlw"
     loclnum="310" loccnumb="5" loccnume="10"
     sum="fac39d9404713bd52b4838a84ad8f831"
     proved="true"
@@ -410,7 +414,7 @@
    </goal>
    <goal
     name="Test0expr"
-    locfile="wp3/../wp3.mlw"
+    locfile="examples/hoare_logic/wp3/../wp3.mlw"
     loclnum="313" loccnumb="5" loccnume="14"
     sum="fa65c99c66ede71e6f39f0f8bfaeae8d"
     proved="false"
@@ -433,7 +437,7 @@
      <result status="timeout" time="2.10"/>
     </proof>
     <proof
-     prover="3"
+     prover="4"
      timelimit="2"
      memlimit="1000"
      obsolete="false"
@@ -443,7 +447,7 @@
    </goal>
    <goal
     name="Test55"
-    locfile="wp3/../wp3.mlw"
+    locfile="examples/hoare_logic/wp3/../wp3.mlw"
     loclnum="316" loccnumb="5" loccnume="11"
     sum="fa03e1e309a2d466079a17bffe854460"
     proved="false"
@@ -466,7 +470,7 @@
      <result status="timeout" time="2.02"/>
     </proof>
     <proof
-     prover="3"
+     prover="4"
      timelimit="2"
      memlimit="1000"
      obsolete="false"
@@ -476,7 +480,7 @@
    </goal>
    <goal
     name="Test55expr"
-    locfile="wp3/../wp3.mlw"
+    locfile="examples/hoare_logic/wp3/../wp3.mlw"
     loclnum="319" loccnumb="5" loccnume="15"
     sum="d770d18e60fe1f55bd5d0731a8310fb7"
     proved="false"
@@ -499,7 +503,7 @@
      <result status="timeout" time="2.09"/>
     </proof>
     <proof
-     prover="3"
+     prover="4"
      timelimit="2"
      memlimit="1000"
      obsolete="false"
@@ -509,7 +513,7 @@
    </goal>
    <goal
     name="Ass42"
-    locfile="wp3/../wp3.mlw"
+    locfile="examples/hoare_logic/wp3/../wp3.mlw"
     loclnum="322" loccnumb="5" loccnume="10"
     sum="a560436181574173983d2e79b9031910"
     proved="true"
@@ -532,7 +536,7 @@
      <result status="valid" time="0.33"/>
     </proof>
     <proof
-     prover="3"
+     prover="4"
      timelimit="2"
      memlimit="1000"
      obsolete="false"
@@ -542,7 +546,7 @@
    </goal>
    <goal
     name="If42"
-    locfile="wp3/../wp3.mlw"
+    locfile="examples/hoare_logic/wp3/../wp3.mlw"
     loclnum="328" loccnumb="5" loccnume="9"
     sum="bb26fa2bb5914de3ee223b069e3464dd"
     proved="true"
@@ -557,7 +561,7 @@
      <result status="valid" time="1.26"/>
     </proof>
     <proof
-     prover="3"
+     prover="4"
      timelimit="2"
      memlimit="1000"
      obsolete="false"
@@ -568,13 +572,13 @@
   </theory>
   <theory
    name="HoareLogic"
-   locfile="wp3/../wp3.mlw"
+   locfile="examples/hoare_logic/wp3/../wp3.mlw"
    loclnum="343" loccnumb="7" loccnume="17"
    verified="false"
    expanded="true">
    <goal
     name="consequence_rule"
-    locfile="wp3/../wp3.mlw"
+    locfile="examples/hoare_logic/wp3/../wp3.mlw"
     loclnum="350" loccnumb="6" loccnume="22"
     sum="c5cb6be37e89d9c5661f66c78a912280"
     proved="true"
@@ -606,7 +610,7 @@
      <result status="valid" time="0.92"/>
     </proof>
     <proof
-     prover="3"
+     prover="4"
      timelimit="9"
      memlimit="1000"
      obsolete="false"
@@ -616,7 +620,7 @@
    </goal>
    <goal
     name="value_rule"
-    locfile="wp3/../wp3.mlw"
+    locfile="examples/hoare_logic/wp3/../wp3.mlw"
     loclnum="357" loccnumb="6" loccnume="16"
     sum="1e1dd30ea2493b363e94770d1aa6e3a5"
     proved="true"
@@ -633,7 +637,7 @@
    </goal>
    <goal
     name="assign_rule"
-    locfile="wp3/../wp3.mlw"
+    locfile="examples/hoare_logic/wp3/../wp3.mlw"
     loclnum="361" loccnumb="6" loccnume="17"
     sum="894704112a2021ba101377704b73116a"
     proved="false"
@@ -656,7 +660,7 @@
      <result status="timeout" time="5.11"/>
     </proof>
     <proof
-     prover="3"
+     prover="4"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -666,7 +670,7 @@
    </goal>
    <goal
     name="seq_rule"
-    locfile="wp3/../wp3.mlw"
+    locfile="examples/hoare_logic/wp3/../wp3.mlw"
     loclnum="366" loccnumb="6" loccnume="14"
     sum="a40770ca424b42e254bfef74075df734"
     proved="false"
@@ -689,7 +693,7 @@
      <result status="timeout" time="5.13"/>
     </proof>
     <proof
-     prover="3"
+     prover="4"
      timelimit="30"
      memlimit="2000"
      obsolete="false"
@@ -699,7 +703,7 @@
    </goal>
    <goal
     name="let_rule"
-    locfile="wp3/../wp3.mlw"
+    locfile="examples/hoare_logic/wp3/../wp3.mlw"
     loclnum="371" loccnumb="6" loccnume="14"
     sum="96181ba232a56bb3ab530a656d7130ad"
     proved="false"
@@ -714,15 +718,6 @@
      <result status="timeout" time="5.15"/>
     </proof>
     <proof
-     prover="2"
-     timelimit="30"
-     memlimit="1000"
-     edited="wp3_HoareLogic_let_rule_1.v"
-     obsolete="true"
-     archived="false"><undone/>
-     
-    </proof>
-    <proof
      prover="1"
      timelimit="5"
      memlimit="1000"
@@ -731,17 +726,26 @@
      <result status="timeout" time="5.22"/>
     </proof>
     <proof
-     prover="3"
+     prover="4"
      timelimit="30"
      memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="outofmemory" time="27.71"/>
     </proof>
+    <proof
+     prover="3"
+     timelimit="30"
+     memlimit="1000"
+     edited="wp3_HoareLogic_let_rule_1.v"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.51"/>
+    </proof>
    </goal>
    <goal
     name="assert_rule"
-    locfile="wp3/../wp3.mlw"
+    locfile="examples/hoare_logic/wp3/../wp3.mlw"
     loclnum="385" loccnumb="6" loccnume="17"
     sum="79ac82f8098961ef578e348043fc69f1"
     proved="false"
@@ -764,7 +768,7 @@
      <result status="timeout" time="5.10"/>
     </proof>
     <proof
-     prover="3"
+     prover="4"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -774,7 +778,7 @@
    </goal>
    <goal
     name="assert_rule_ext"
-    locfile="wp3/../wp3.mlw"
+    locfile="examples/hoare_logic/wp3/../wp3.mlw"
     loclnum="389" loccnumb="6" loccnume="21"
     sum="5a3edd8cb1953245bab9843b1dd717a9"
     proved="false"
@@ -797,7 +801,7 @@
      <result status="timeout" time="5.67"/>
     </proof>
     <proof
-     prover="3"
+     prover="4"
      timelimit="5"
      memlimit="1000"
      obsolete="false"

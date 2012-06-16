@@ -1,66 +1,70 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
 <why3session
- name="./explicit_subst/why3session.xml">
+ name="examples/explicit_subst/why3session.xml">
  <prover
   id="0"
   name="Alt-Ergo"
   version="0.94"/>
  <prover
   id="1"
-  name="CVC3"
-  version="2.2"/>
+  name="Alt-Ergo"
+  version="0.95-dev"/>
  <prover
   id="2"
   name="CVC3"
-  version="2.4.1"/>
+  version="2.2"/>
  <prover
   id="3"
+  name="CVC3"
+  version="2.4.1"/>
+ <prover
+  id="4"
   name="Eprover"
   version="1.4"/>
  <prover
-  id="4"
+  id="5"
   name="Spass"
   version="3.7"/>
  <prover
-  id="5"
+  id="6"
   name="Vampire"
   version="0.6"/>
  <prover
-  id="6"
+  id="7"
   name="Z3"
   version="2.19"/>
  <prover
-  id="7"
+  id="8"
   name="Z3"
   version="3.2"/>
  <file
   name="../explicit_subst.why"
   verified="true"
-  expanded="false">
+  expanded="true">
   <theory
    name="LambdaCalc"
-   locfile="./explicit_subst/../explicit_subst.why"
+   locfile="examples/explicit_subst/../explicit_subst.why"
    loclnum="7" loccnumb="7" loccnume="17"
    verified="true"
    expanded="true">
   </theory>
   <theory
    name="Example"
-   locfile="./explicit_subst/../explicit_subst.why"
+   locfile="examples/explicit_subst/../explicit_subst.why"
    loclnum="65" loccnumb="7" loccnume="14"
    verified="true"
-   expanded="true">
+   expanded="false">
    <goal
     name="G1"
-    locfile="./explicit_subst/../explicit_subst.why"
+    locfile="examples/explicit_subst/../explicit_subst.why"
     loclnum="75" loccnumb="7" loccnume="9"
     sum="137a5691a495d488639102d1f7692edd"
     proved="true"
-    expanded="true"
+    expanded="false"
     shape="ainfix =aappaLambdaaVaraZeroaaaa">
     <proof
-     prover="6"
+     prover="7"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -68,7 +72,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="4"
+     prover="5"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -84,31 +88,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="1"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
      prover="2"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="5"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -123,17 +103,41 @@
      archived="false">
      <result status="valid" time="0.00"/>
     </proof>
+    <proof
+     prover="8"
+     timelimit="5"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="5"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="5"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
    </goal>
    <goal
     name="G2"
-    locfile="./explicit_subst/../explicit_subst.why"
+    locfile="examples/explicit_subst/../explicit_subst.why"
     loclnum="81" loccnumb="7" loccnume="9"
     sum="f33cbcd65c12ee1fb3249be04cf813cf"
     proved="true"
-    expanded="true"
+    expanded="false"
     shape="ainfix =aappaLambdaaVaraZeroaaab">
     <proof
-     prover="6"
+     prover="7"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -141,7 +145,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="4"
+     prover="5"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -157,7 +161,7 @@
      <result status="timeout" time="10.85"/>
     </proof>
     <proof
-     prover="1"
+     prover="2"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -165,7 +169,7 @@
      <result status="valid" time="0.10"/>
     </proof>
     <proof
-     prover="2"
+     prover="3"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -173,7 +177,7 @@
      <result status="valid" time="0.13"/>
     </proof>
     <proof
-     prover="7"
+     prover="8"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -181,7 +185,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="5"
+     prover="6"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -189,7 +193,7 @@
      <result status="valid" time="2.11"/>
     </proof>
     <proof
-     prover="3"
+     prover="4"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -199,14 +203,14 @@
    </goal>
    <goal
     name="G5b"
-    locfile="./explicit_subst/../explicit_subst.why"
+    locfile="examples/explicit_subst/../explicit_subst.why"
     loclnum="85" loccnumb="7" loccnume="10"
     sum="24d8f3d46544b3c101fcfdd045627645"
     proved="true"
-    expanded="true"
+    expanded="false"
     shape="LaLambdaasubstaVaraSaZeroaSaZeroaaLaLambdaaaainfix =V0V1">
     <proof
-     prover="6"
+     prover="7"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -214,7 +218,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="4"
+     prover="5"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -230,31 +234,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="1"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
      prover="2"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="5"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -267,19 +247,43 @@
      memlimit="0"
      obsolete="false"
      archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="8"
+     timelimit="5"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="5"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="5"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
      <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
     name="G5c"
-    locfile="./explicit_subst/../explicit_subst.why"
+    locfile="examples/explicit_subst/../explicit_subst.why"
     loclnum="90" loccnumb="7" loccnume="10"
     sum="873d4513281800c074e10dc2bfc64730"
     proved="true"
-    expanded="true"
+    expanded="false"
     shape="LasubstaLambdaaVaraSaZeroaZeroaaLaLambdaaaainfix =V0V1">
     <proof
-     prover="6"
+     prover="7"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -287,7 +291,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="4"
+     prover="5"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -303,14 +307,6 @@
      <result status="timeout" time="5.92"/>
     </proof>
     <proof
-     prover="1"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
      prover="2"
      timelimit="5"
      memlimit="0"
@@ -319,7 +315,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="7"
+     prover="3"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -327,30 +323,13 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="5"
+     prover="8"
      timelimit="5"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.02"/>
+     <result status="valid" time="0.01"/>
     </proof>
-    <proof
-     prover="3"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-   </goal>
-   <goal
-    name="G5"
-    locfile="./explicit_subst/../explicit_subst.why"
-    loclnum="95" loccnumb="7" loccnume="9"
-    sum="07419a7d25509b969ad4d9a5be17e551"
-    proved="true"
-    expanded="true"
-    shape="LaLambdaaLambdaaVaraSaZeroLaLambdaaaainfix =aappV0aaV1">
     <proof
      prover="6"
      timelimit="5"
@@ -361,6 +340,31 @@
     </proof>
     <proof
      prover="4"
+     timelimit="5"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="G5"
+    locfile="examples/explicit_subst/../explicit_subst.why"
+    loclnum="95" loccnumb="7" loccnume="9"
+    sum="07419a7d25509b969ad4d9a5be17e551"
+    proved="true"
+    expanded="false"
+    shape="LaLambdaaLambdaaVaraSaZeroLaLambdaaaainfix =aappV0aaV1">
+    <proof
+     prover="7"
+     timelimit="5"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="5"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -376,7 +380,7 @@
      <result status="timeout" time="6.22"/>
     </proof>
     <proof
-     prover="1"
+     prover="2"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -384,7 +388,7 @@
      <result status="valid" time="0.23"/>
     </proof>
     <proof
-     prover="2"
+     prover="3"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -392,7 +396,7 @@
      <result status="valid" time="0.30"/>
     </proof>
     <proof
-     prover="7"
+     prover="8"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -400,7 +404,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="5"
+     prover="6"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -408,7 +412,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="3"
+     prover="4"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -418,14 +422,14 @@
    </goal>
    <goal
     name="G3"
-    locfile="./explicit_subst/../explicit_subst.why"
+    locfile="examples/explicit_subst/../explicit_subst.why"
     loclnum="100" loccnumb="7" loccnume="9"
     sum="0012eb4de0a62ca30f115a44d74865a3"
     proved="true"
-    expanded="true"
+    expanded="false"
     shape="LaLambdaaLambdaaappaVaraZeroaVaraSaZeroainfix =aappaappV0aaaidaa">
     <proof
-     prover="6"
+     prover="7"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -433,7 +437,7 @@
      <result status="valid" time="0.05"/>
     </proof>
     <proof
-     prover="4"
+     prover="5"
      timelimit="9"
      memlimit="0"
      obsolete="false"
@@ -449,13 +453,46 @@
      <result status="unknown" time="1.17"/>
     </proof>
     <proof
-     prover="2"
+     prover="3"
      timelimit="5"
      memlimit="0"
      obsolete="false"
      archived="false">
      <result status="timeout" time="6.32"/>
     </proof>
+    <proof
+     prover="8"
+     timelimit="5"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="5"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="2.26"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="5"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.24"/>
+    </proof>
+   </goal>
+   <goal
+    name="G4"
+    locfile="examples/explicit_subst/../explicit_subst.why"
+    loclnum="104" loccnumb="7" loccnume="9"
+    sum="b9c367f95a4495be77064c26471458da"
+    proved="true"
+    expanded="false"
+    shape="LaLambdaaLambdaaappaVaraZeroaVaraSaZeroLaLambdaaappaVaraZeroaaainfix =aappV0aaV1">
     <proof
      prover="7"
      timelimit="5"
@@ -466,39 +503,6 @@
     </proof>
     <proof
      prover="5"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="2.26"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.24"/>
-    </proof>
-   </goal>
-   <goal
-    name="G4"
-    locfile="./explicit_subst/../explicit_subst.why"
-    loclnum="104" loccnumb="7" loccnume="9"
-    sum="b9c367f95a4495be77064c26471458da"
-    proved="true"
-    expanded="true"
-    shape="LaLambdaaLambdaaappaVaraZeroaVaraSaZeroLaLambdaaappaVaraZeroaaainfix =aappV0aaV1">
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="4"
      timelimit="7"
      memlimit="0"
      obsolete="false"
@@ -514,7 +518,7 @@
      <result status="unknown" time="1.04"/>
     </proof>
     <proof
-     prover="1"
+     prover="2"
      timelimit="10"
      memlimit="0"
      obsolete="false"
@@ -522,7 +526,7 @@
      <result status="valid" time="5.45"/>
     </proof>
     <proof
-     prover="2"
+     prover="3"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -530,7 +534,7 @@
      <result status="timeout" time="5.71"/>
     </proof>
     <proof
-     prover="7"
+     prover="8"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -538,7 +542,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="5"
+     prover="6"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -546,7 +550,7 @@
      <result status="valid" time="2.34"/>
     </proof>
     <proof
-     prover="3"
+     prover="4"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -557,27 +561,27 @@
   </theory>
   <theory
    name="LambdaCalc2"
-   locfile="./explicit_subst/../explicit_subst.why"
+   locfile="examples/explicit_subst/../explicit_subst.why"
    loclnum="114" loccnumb="7" loccnume="18"
    verified="true"
    expanded="true">
   </theory>
   <theory
    name="Example2"
-   locfile="./explicit_subst/../explicit_subst.why"
+   locfile="examples/explicit_subst/../explicit_subst.why"
    loclnum="159" loccnumb="7" loccnume="15"
    verified="true"
    expanded="true">
    <goal
     name="G1"
-    locfile="./explicit_subst/../explicit_subst.why"
+    locfile="examples/explicit_subst/../explicit_subst.why"
     loclnum="168" loccnumb="7" loccnume="9"
     sum="9f66f6710bf89c0991aa15516ee3908e"
     proved="true"
     expanded="true"
     shape="ainfix =aappalambdaavaraZeroaaaa">
     <proof
-     prover="6"
+     prover="7"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -585,7 +589,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="4"
+     prover="5"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -601,7 +605,7 @@
      <result status="unknown" time="0.00"/>
     </proof>
     <proof
-     prover="2"
+     prover="3"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -609,7 +613,7 @@
      <result status="timeout" time="5.62"/>
     </proof>
     <proof
-     prover="7"
+     prover="8"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -617,7 +621,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="5"
+     prover="6"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -625,7 +629,15 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
+     prover="1"
+     timelimit="30"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.00"/>
+    </proof>
+    <proof
+     prover="4"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -635,22 +647,22 @@
    </goal>
    <goal
     name="G2"
-    locfile="./explicit_subst/../explicit_subst.why"
+    locfile="examples/explicit_subst/../explicit_subst.why"
     loclnum="174" loccnumb="7" loccnume="9"
     sum="50948e41c5172a350eb58f9cbf47cfc8"
     proved="true"
     expanded="true"
     shape="ainfix =aappalambdaavaraZeroaaab">
     <proof
-     prover="6"
-     timelimit="7"
-     memlimit="0"
+     prover="7"
+     timelimit="30"
+     memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="2.99"/>
+     <result status="timeout" time="30.00"/>
     </proof>
     <proof
-     prover="4"
+     prover="5"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -666,7 +678,7 @@
      <result status="unknown" time="0.00"/>
     </proof>
     <proof
-     prover="2"
+     prover="3"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -674,38 +686,13 @@
      <result status="timeout" time="5.42"/>
     </proof>
     <proof
-     prover="7"
+     prover="8"
      timelimit="5"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="2.09"/>
+     <result status="valid" time="2.06"/>
     </proof>
-    <proof
-     prover="5"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-   </goal>
-   <goal
-    name="G5b"
-    locfile="./explicit_subst/../explicit_subst.why"
-    loclnum="178" loccnumb="7" loccnume="10"
-    sum="53f144bf3b2a3023e31642f9fac9da74"
-    proved="true"
-    expanded="true"
-    shape="LalambdaasubstavaraSaZeroaSaZeroaaLalambdaaaainfix =V0V1">
     <proof
      prover="6"
      timelimit="5"
@@ -715,7 +702,40 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
+     prover="1"
+     timelimit="30"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.00"/>
+    </proof>
+    <proof
      prover="4"
+     timelimit="5"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+   <goal
+    name="G5b"
+    locfile="examples/explicit_subst/../explicit_subst.why"
+    loclnum="178" loccnumb="7" loccnume="10"
+    sum="53f144bf3b2a3023e31642f9fac9da74"
+    proved="true"
+    expanded="true"
+    shape="LalambdaasubstavaraSaZeroaSaZeroaaLalambdaaaainfix =V0V1">
+    <proof
+     prover="7"
+     timelimit="5"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="5"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -731,13 +751,54 @@
      <result status="timeout" time="5.82"/>
     </proof>
     <proof
-     prover="2"
+     prover="3"
      timelimit="5"
      memlimit="0"
      obsolete="false"
      archived="false">
      <result status="timeout" time="5.92"/>
     </proof>
+    <proof
+     prover="8"
+     timelimit="5"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="5"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="30"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="29.93"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="5"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
+    name="G5c"
+    locfile="examples/explicit_subst/../explicit_subst.why"
+    loclnum="183" loccnumb="7" loccnume="10"
+    sum="c7e27b687114a30fdb74d6c273986cb0"
+    proved="true"
+    expanded="true"
+    shape="LasubstalambdaavaraSaZeroaZeroaaLalambdaaaainfix =V0V1">
     <proof
      prover="7"
      timelimit="5"
@@ -748,39 +809,6 @@
     </proof>
     <proof
      prover="5"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
-    name="G5c"
-    locfile="./explicit_subst/../explicit_subst.why"
-    loclnum="183" loccnumb="7" loccnume="10"
-    sum="c7e27b687114a30fdb74d6c273986cb0"
-    proved="true"
-    expanded="true"
-    shape="LasubstalambdaavaraSaZeroaZeroaaLalambdaaaainfix =V0V1">
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="4"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -796,13 +824,54 @@
      <result status="timeout" time="6.22"/>
     </proof>
     <proof
-     prover="2"
+     prover="3"
      timelimit="5"
      memlimit="0"
      obsolete="false"
      archived="false">
      <result status="timeout" time="5.72"/>
     </proof>
+    <proof
+     prover="8"
+     timelimit="5"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="5"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="30"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="29.91"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="5"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
+    name="G5"
+    locfile="examples/explicit_subst/../explicit_subst.why"
+    loclnum="188" loccnumb="7" loccnume="9"
+    sum="1be80eaccf1aa2d1a7676389c57b53f0"
+    proved="true"
+    expanded="true"
+    shape="LalambdaalambdaavaraSaZeroLalambdaaaainfix =aappV0aaV1">
     <proof
      prover="7"
      timelimit="5"
@@ -813,39 +882,6 @@
     </proof>
     <proof
      prover="5"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
-    name="G5"
-    locfile="./explicit_subst/../explicit_subst.why"
-    loclnum="188" loccnumb="7" loccnume="9"
-    sum="1be80eaccf1aa2d1a7676389c57b53f0"
-    proved="true"
-    expanded="true"
-    shape="LalambdaalambdaavaraSaZeroLalambdaaaainfix =aappV0aaV1">
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="4"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -861,7 +897,7 @@
      <result status="timeout" time="5.41"/>
     </proof>
     <proof
-     prover="2"
+     prover="3"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -869,7 +905,7 @@
      <result status="timeout" time="6.02"/>
     </proof>
     <proof
-     prover="7"
+     prover="8"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -877,7 +913,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="5"
+     prover="6"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -885,7 +921,15 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="3"
+     prover="1"
+     timelimit="30"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="29.91"/>
+    </proof>
+    <proof
+     prover="4"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -895,14 +939,14 @@
    </goal>
    <goal
     name="G3"
-    locfile="./explicit_subst/../explicit_subst.why"
+    locfile="examples/explicit_subst/../explicit_subst.why"
     loclnum="193" loccnumb="7" loccnume="9"
     sum="95123425d7e0c2bb90e1e10ccc5d4421"
     proved="true"
     expanded="true"
     shape="LalambdaalambdaaappavaraZeroavaraSaZeroainfix =aappaappV0aaaidaa">
     <proof
-     prover="4"
+     prover="5"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -918,7 +962,7 @@
      <result status="unknown" time="0.02"/>
     </proof>
     <proof
-     prover="2"
+     prover="3"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -926,7 +970,7 @@
      <result status="timeout" time="6.12"/>
     </proof>
     <proof
-     prover="7"
+     prover="8"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -934,7 +978,7 @@
      <result status="timeout" time="5.32"/>
     </proof>
     <proof
-     prover="5"
+     prover="6"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -942,7 +986,15 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="3"
+     prover="1"
+     timelimit="30"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.02"/>
+    </proof>
+    <proof
+     prover="4"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -952,14 +1004,14 @@
    </goal>
    <goal
     name="G4"
-    locfile="./explicit_subst/../explicit_subst.why"
+    locfile="examples/explicit_subst/../explicit_subst.why"
     loclnum="197" loccnumb="7" loccnume="9"
     sum="79068dfa7dab0710aa5af02e64b9df90"
     proved="true"
     expanded="true"
     shape="LalambdaalambdaaappavaraZeroavaraSaZeroLalambdaaappavaraZeroaaainfix =aappV0aaV1">
     <proof
-     prover="4"
+     prover="5"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -975,7 +1027,7 @@
      <result status="unknown" time="0.02"/>
     </proof>
     <proof
-     prover="2"
+     prover="3"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -983,7 +1035,7 @@
      <result status="timeout" time="5.61"/>
     </proof>
     <proof
-     prover="7"
+     prover="8"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -991,7 +1043,7 @@
      <result status="timeout" time="5.42"/>
     </proof>
     <proof
-     prover="5"
+     prover="6"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -999,7 +1051,15 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="3"
+     prover="1"
+     timelimit="30"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.02"/>
+    </proof>
+    <proof
+     prover="4"
      timelimit="5"
      memlimit="0"
      obsolete="false"
