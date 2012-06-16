@@ -1,7 +1,9 @@
 
 (** {1 Formalization of Floating-Point Arithmetic}
 
-This formalization follows the {h <a href="http://ieeexplore.ieee.org/servlet/opac?punumber=4610933">IEEE-754 standard</a>}.
+This formalization follows the {h <a
+href="http://ieeexplore.ieee.org/servlet/opac?punumber=4610933">IEEE-754
+standard</a>}.
 
 *)
 
@@ -10,7 +12,7 @@ This formalization follows the {h <a href="http://ieeexplore.ieee.org/servlet/op
 theory Rounding
 
   type mode = NearestTiesToEven | ToZero | Up | Down | NearestTiesToAway
-    (** nearest ties to even, to zero, upward, downward, nearest ties to away *)
+  (** nearest ties to even, to zero, upward, downward, nearest ties to away *)
 
 end
 
@@ -18,8 +20,8 @@ end
 
 Special values are +infinity, -infinity, NaN, +0, -0.  These are
 handled as described in {h <a
-href="http://www.lri.fr/~marche/ayad10ijcar.pdf">[Ayad, Marché,
-IJCAR, 2010]</a>}.
+href="http://www.lri.fr/~marche/ayad10ijcar.pdf">[Ayad, Marché, IJCAR,
+2010]</a>}.
 
 *)
 
@@ -35,12 +37,45 @@ theory SpecialValues
     | Neg_case: forall x:real. x < 0.0 -> same_sign_real Neg x
     | Pos_case: forall x:real. x > 0.0 -> same_sign_real Pos x
 
+(* useful ???
+
+lemma sign_not_pos_neg : forall x:t.
+      sign(x) <> Pos -> sign(x) = Neg
+lemma sign_not_neg_pos : forall x:t.
+      sign(x) <> Neg -> sign(x) = Pos
+
+lemma sign_not_pos_neg : forall x:double.
+      sign(x) <> Pos -> sign(x) = Neg
+lemma sign_not_neg_pos : forall x:double.
+      sign(x) <> Neg -> sign(x) = Pos
+*)
+
+lemma same_sign_real_zero1 :
+  forall b:sign. not same_sign_real b 0.0
+
+lemma same_sign_real_zero2 :
+  forall x:real.
+    same_sign_real Neg x /\ same_sign_real Pos x -> false
+
+lemma same_sign_real_zero3 :
+  forall b:sign, x:real. same_sign_real b x -> x <> 0.0
+
+lemma same_sign_real_correct2 :
+  forall b:sign, x:real.
+    same_sign_real b x -> (x < 0.0 <-> b = Neg)
+
+lemma same_sign_real_correct3 :
+  forall b:sign, x:real.
+    same_sign_real b x -> (x > 0.0 <-> b = Pos)
+
+
 end
 
 (** {2 Generic theory of floats}
 
 The theory is parametrized by the real constant [max] which denotes
-the maximal representable number, and the integer constant
+the maximal representable number, the real constant [min] which denotes
+the minimal number whose rounding is not null, and the integer constant
 [max_representable_integer] which is the maximal integer [n] such that
 every integer between [0] and [n] are representable.
 
@@ -250,6 +285,8 @@ theory GenFloatFull
 
   function sign t  : sign
 
+  predicate same_sign_real (x:t) (y:real) =
+    SpecialValues.same_sign_real (sign x) y
   predicate same_sign (x:t) (y:t)  = sign x = sign y
   predicate diff_sign (x:t) (y:t)  = sign x <> sign y
 
@@ -266,6 +303,41 @@ theory GenFloatFull
   predicate is_gen_zero_plus (x:t) = is_gen_zero x /\ sign x = Pos
   predicate is_gen_zero_minus (x:t) = is_gen_zero x /\ sign x = Neg
 
+  (** {3 Useful lemmas on sign} *)
+
+  (* non-zero finite gen_float has the same sign as its float_value *)
+  lemma finite_sign :
+    forall x:t.
+      class x = Finite /\ value x <> 0.0 -> same_sign_real x (value x)
+
+  lemma finite_sign_pos1:
+    forall x:t.
+      class x = Finite /\ value x > 0.0 -> sign x = Pos
+
+  lemma finite_sign_pos2:
+    forall x:t.
+      class x = Finite /\ value x <> 0.0 /\ sign x = Pos -> value x > 0.0
+
+  lemma finite_sign_neg1:
+    forall x:t. class x = Finite /\ value x < 0.0 -> sign x = Neg
+
+  lemma finite_sign_neg2:
+    forall x:t.
+      class x = Finite /\ value x <> 0.0 /\ sign x = Neg -> value x < 0.0
+
+  lemma diff_sign_trans:
+    forall x y z:t. diff_sign x y /\ diff_sign y z -> same_sign x z
+
+  lemma diff_sign_product:
+    forall x y:t.
+      class x = Finite /\ class y = Finite /\ value x * value y < 0.0
+      -> diff_sign x y
+
+  lemma same_sign_product:
+    forall x y:t.
+      class x = Finite /\ class y = Finite /\ same_sign x y
+      -> value x * value y >= 0.0
+
   (** {3 overflow} *)
 
   (** This predicate tells what is the result of a rounding in case
@@ -281,6 +353,56 @@ theory GenFloatFull
     | (NearestTiesToAway | NearestTiesToEven), _ -> is_infinite x
     end
 
+
+  (** rounding in logic *)
+  lemma round1 :
+    forall m:mode, x:real.
+      no_overflow m x ->
+        is_finite (round_logic m x) /\ value(round_logic m x) = round m x
+
+  lemma round2 :
+    forall m:mode, x:real.
+      not no_overflow m x ->
+        same_sign_real (round_logic m x) x /\
+        overflow_value m (round_logic m x)
+
+  lemma round3 : forall m:mode, x:real. exact (round_logic m x) = x
+
+  lemma round4 : forall m:mode, x:real. model (round_logic m x) = x
+
+  (** rounding of zero *)
+
+  lemma round_of_zero : forall m:mode. is_gen_zero (round_logic m 0.0)
+
+  use import real.Abs
+
+  lemma round_logic_le : forall m:mode, x:real.
+    is_finite (round_logic m x) -> abs (value (round_logic m x)) <= max
+
+  lemma round_no_overflow : forall m:mode, x:real.
+    abs x <= max ->
+    is_finite (round_logic m x) /\ value (round_logic m x) = round m x
+
+  constant min : real
+
+  lemma positive_constant : forall m:mode, x:real.
+    min <= x <= max ->
+    is_finite (round_logic m x) /\ value (round_logic m x) > 0.0 /\
+    sign (round_logic m x) = Pos
+
+  lemma negative_constant : forall m:mode, x:real.
+    - max <= x <= - min ->
+    is_finite (round_logic m x) /\ value (round_logic m x) < 0.0 /\
+    sign (round_logic m x) = Neg
+
+  (** lemmas on gen_zero *)
+
+  lemma is_gen_zero_comp1 : forall x y:t.
+    is_gen_zero x /\ value x = value y /\ is_finite y -> is_gen_zero y
+
+  lemma is_gen_zero_comp2 : forall x y:t.
+    is_finite x /\ not (is_gen_zero x) /\ value x = value y
+    -> not (is_gen_zero y)
 
 end
 
@@ -418,6 +540,10 @@ theory SingleFull
 
   use export SingleFormat
 
+  constant max_single : real = 0x1.FFFFFEp127
+  constant min_single : real = 0x1p-149
+  constant max_int : int = 16777216 (* 2^24 *)
+
   clone export GenFloatSpecFull with
     type t = single,
     constant max = max_single,
@@ -430,6 +556,10 @@ end
 theory DoubleFull
 
   use export DoubleFormat
+
+  constant max_double : real = 0x1.FFFFFFFFFFFFFp1023
+  constant min_double : real = 0x1p-1074
+  constant max_int : int = 9007199254740992 (* 2^53 *)
 
   clone export GenFloatSpecFull with
     type t = double,
