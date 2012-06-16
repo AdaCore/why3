@@ -597,10 +597,14 @@ let rec expr lenv de = match de.dexpr_desc with
         let lenv = Mstr.fold (fun s pv -> add_local s (LetV pv)) vm lenv in
         pp, expr lenv de in
       e_case e1 (List.map branch bl)
-  | DEassert (ass, f) ->
+  | DEassert (ak, f) ->
       let th = get_theory lenv.mod_uc in
       let f = Typing.type_fmla th lenv.log_denv lenv.log_vars f in
-      e_assert ass f
+      let ak = match ak with
+        | Ptree.Aassert -> Aassert
+        | Ptree.Aassume -> Aassume
+        | Ptree.Acheck  -> Acheck in
+      e_assert ak f
   | DEabsurd ->
       e_absurd (ity_of_dity de.dexpr_type)
   | DEraise (xs, de1) ->

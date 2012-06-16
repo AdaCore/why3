@@ -110,10 +110,11 @@ val make_ppattern : pre_ppattern -> vty_value -> pvsymbol Mstr.t * ppattern
 
 (** program expressions *)
 
+type assertion_kind = Aassert | Aassume | Acheck
+
 type pre = term          (* precondition *)
 type post                (* postcondition: a formula with a bound variable *)
 type xpost = post Mexn.t (* exceptional postconditions *)
-type assertion_kind = Ptree.assertion_kind
 
 val create_post : vsymbol -> term -> post
 val open_post : post -> vsymbol * term

@@ -32,17 +32,6 @@ type loc = Loc.position
 
 type ident = Ptree.ident
 
-type constant = Term.constant
-
-type assertion_kind = Ptree.assertion_kind
-
-type lazy_op = Ptree.lazy_op
-
-type for_direction = Ptree.for_direction
-
-(*****************************************************************************)
-(* phase 1: introduction of destructive types *)
-
 (* user type_v *)
 
 type ghost = bool
@@ -73,10 +62,7 @@ and dutype_c =
 
 type dvariant = Ptree.lexpr * Term.lsymbol option
 
-type dloop_annotation = {
-  dloop_invariant : Ptree.lexpr option;
-  dloop_variant   : dvariant list;
-}
+type dinvariant = Ptree.lexpr option
 
 type dexpr = {
   dexpr_desc : dexpr_desc;
@@ -86,7 +72,7 @@ type dexpr = {
 }
 
 and dexpr_desc =
-  | DEconstant of constant
+  | DEconstant of Term.constant
   | DElocal of string
   | DEglobal_pv of pvsymbol
   | DEglobal_ps of psymbol
@@ -99,15 +85,15 @@ and dexpr_desc =
   | DEassign of dexpr * dexpr
   | DEsequence of dexpr * dexpr
   | DEif of dexpr * dexpr * dexpr
-  | DEloop of dloop_annotation * dexpr
-  | DElazy of lazy_op * dexpr * dexpr
+  | DEloop of dvariant list * dinvariant * dexpr
+  | DElazy of Ptree.lazy_op * dexpr * dexpr
   | DEnot of dexpr
   | DEmatch of dexpr * (pre_ppattern * dexpr) list
   | DEabsurd
   | DEraise of xsymbol * dexpr
   | DEtry of dexpr * (xsymbol * ident * dexpr) list
-  | DEfor of ident * dexpr * for_direction * dexpr * Ptree.lexpr option * dexpr
-  | DEassert of assertion_kind * Ptree.lexpr
+  | DEfor of ident * dexpr * Ptree.for_direction * dexpr * dinvariant * dexpr
+  | DEassert of Ptree.assertion_kind * Ptree.lexpr
   | DEmark of string * dexpr
   (* | DEany of dutype_c *)
 

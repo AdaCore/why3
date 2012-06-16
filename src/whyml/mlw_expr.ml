@@ -273,7 +273,8 @@ let make_ppattern pp vtv =
 type pre   = term (* precondition *)
 type post  = term (* postcondition *)
 type xpost = post Mexn.t (* exceptional postconditions *)
-type assertion_kind = Ptree.assertion_kind
+
+type assertion_kind = Aassert | Aassume | Acheck
 
 type expr = {
   e_node   : expr_node;
