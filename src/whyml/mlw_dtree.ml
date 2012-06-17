@@ -36,9 +36,8 @@ type ident = Ptree.ident
 
 type ghost = bool
 type dpre = Ptree.pre
-type dpost_fmla = Ptree.lexpr
-type dexn_post_fmla = Ptree.lexpr
-type dpost = dpost_fmla * (Term.lsymbol * dexn_post_fmla) list
+type dpost = Ptree.pre
+type dxpost = (xsymbol * dpost) list
 
 type deffect = {
   deff_reads  : Ptree.lexpr list;
@@ -79,7 +78,7 @@ and dexpr_desc =
   | DEglobal_pl of plsymbol
   | DEglobal_ls of Term.lsymbol
   | DEapply of dexpr * dexpr list
-  | DEfun of dbinder list * dtriple
+  | DEfun of dlambda
   | DElet of ident * dexpr * dexpr
   | DEletrec of drecfun list * dexpr
   | DEassign of dexpr * dexpr
@@ -97,6 +96,6 @@ and dexpr_desc =
   | DEmark of string * dexpr
   (* | DEany of dutype_c *)
 
-and drecfun = ident * dity * dbinder list * dvariant list * dtriple
+and drecfun = ident * dity * dlambda
 
-and dtriple = dpre * dexpr * dpost
+and dlambda = dbinder list * dvariant list * dpre * dexpr * dpost * dxpost

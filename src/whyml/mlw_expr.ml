@@ -286,6 +286,11 @@ type xpost = post Mexn.t (* exceptional postconditions *)
 
 type assertion_kind = Aassert | Aassume | Acheck
 
+type variant = {
+  v_term : term;           (* : tau *)
+  v_rel  : lsymbol option; (* tau tau : prop *)
+}
+
 type expr = {
   e_node   : expr_node;
   e_vty    : vty;
@@ -334,11 +339,6 @@ and lambda = {
   l_expr    : expr;
   l_post    : post;
   l_xpost   : xpost;
-}
-
-and variant = {
-  v_term : term;           (* : tau *)
-  v_rel  : lsymbol option; (* tau tau : prop *)
 }
 
 and any_effect = {
@@ -489,10 +489,12 @@ let create_fun_defn id lam =
   Mexn.iter (fun xs t -> check_post xs.xs_ity t) lam.l_xpost;
   (* compute rec_vars and ps.ps_vars *)
   let add_term t s = Mvs.set_union t.t_vars s in
+  let add_variant { v_term = t; v_rel = ps } s =
+    ignore (Util.option_map (fun ps -> ps_app ps [t;t]) ps);
+    add_term t s in
   let vsset = add_term lam.l_post (add_term lam.l_pre Mvs.empty) in
   let vsset = Mexn.fold (fun _ -> add_term) lam.l_xpost vsset in
-  let vsset =
-    List.fold_right (fun v -> add_term v.v_term) lam.l_variant vsset in
+  let vsset = List.fold_right add_variant lam.l_variant vsset in
   let add_vs vs _ m = add_vs_vars vs m in
   let del_pv m pv = Mid.remove pv.pv_vs.vs_name m in
   let recvars = Mvs.fold add_vs vsset lam.l_expr.e_vars in

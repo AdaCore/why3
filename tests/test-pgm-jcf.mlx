@@ -31,7 +31,7 @@ module N
 
   let create_dref i = {| dcontents = {| contents = i |} |}
 
-  let myfun r =
+  let myfun r = { r = r }
     let rec on_tree t = match t with
       | Node {| contents = v |} f -> v + on_forest f
       | Leaf -> raise (Exit Leaf)
@@ -46,6 +46,7 @@ module N
     dr.dcontents <- nr;
     assert { r = r };
     try on_tree r with Exit -> 0 end
+    { result = 0 }
 end
 
 (*

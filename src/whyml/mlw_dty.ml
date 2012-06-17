@@ -192,12 +192,8 @@ and unify_reg r1 r2 =
     | Rreg (reg1,_), Rreg (reg2,_) when reg_equal reg1 reg2 -> ()
     | _ -> raise Exit
 
-let unify_weak d1 d2 =
-  try unify ~weak:true d1 d2
-  with Exit -> raise (TypeMismatch (ity_of_dity d1, ity_of_dity d2))
-
-let unify d1 d2 =
-  try unify ~weak:false d1 d2
+let unify ?(weak=false) d1 d2 =
+  try unify ~weak d1 d2
   with Exit -> raise (TypeMismatch (ity_of_dity d1, ity_of_dity d2))
 
 let ts_arrow =

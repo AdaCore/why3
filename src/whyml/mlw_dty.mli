@@ -43,11 +43,8 @@ val ts_app: tysymbol -> dity list -> dity
 
 val make_arrow_type: dity list -> dity -> dity
 
-val unify: dity -> dity -> unit
-  (** destructive unification *)
-
-val unify_weak: dity -> dity -> unit
-  (** destructive unification, ignores regions *)
+val unify: ?weak:bool -> dity -> dity -> unit
+  (** destructive unification, with or without region unification *)
 
 val ity_of_dity: dity -> ity
 val vty_of_dity: dity -> vty

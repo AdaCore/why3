@@ -119,6 +119,11 @@ type xpost = post Mexn.t (* exceptional postconditions *)
 val create_post : vsymbol -> term -> post
 val open_post : post -> vsymbol * term
 
+type variant = {
+  v_term : term;           (* : tau *)
+  v_rel  : lsymbol option; (* tau tau : prop *)
+}
+
 type expr = private {
   e_node   : expr_node;
   e_vty    : vty;
@@ -167,11 +172,6 @@ and lambda = {
   l_expr    : expr;
   l_post    : post;
   l_xpost   : xpost;
-}
-
-and variant = {
-  v_term : term;           (* : tau *)
-  v_rel  : lsymbol option; (* tau tau : prop *)
 }
 
 (* TODO? Every top region in the type of Eany is reset.
