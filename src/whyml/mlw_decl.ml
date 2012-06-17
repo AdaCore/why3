@@ -42,6 +42,7 @@ type pdecl = {
 and pdecl_node =
   | PDtype of itysymbol
   | PDdata of data_decl list
+  | PDval  of val_decl
   | PDlet  of let_defn
   | PDrec  of rec_defn list
   | PDexn  of xsymbol
@@ -147,6 +148,15 @@ let create_rec_decl rdl =
   let syms = List.fold_left add_rd Sid.empty rdl in
   mk_decl (PDrec rdl) syms news
 
+let create_val_decl vd =
+  let id = match vd.val_name with
+    | LetV pv -> pv.pv_vs.vs_name
+    | LetA ps -> ps.ps_name in
+  let news = Sid.singleton id in
+  (* FIXME!!! See the comment in create_let_decl *)
+  let syms = Mid.map (fun _ -> ()) vd.val_vars in
+  mk_decl (PDval vd) syms news
+
 let create_exn_decl xs =
   let news = Sid.singleton xs.xs_name in
   let syms = Sid.empty (* FIXME!!! *) in
@@ -185,4 +195,4 @@ let find_constructors kn its =
   match (Mid.find its.its_pure.ts_name kn).pd_node with
   | PDtype _ -> []
   | PDdata dl -> List.assq its dl
-  | PDlet _ | PDrec _ | PDexn _ -> assert false
+  | PDval _ | PDlet _ | PDrec _ | PDexn _ -> assert false

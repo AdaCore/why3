@@ -54,6 +54,9 @@ val print_ppat : formatter -> ppattern -> unit    (* program patterns *)
 
 val print_expr : formatter -> expr -> unit        (* expression *)
 
+val print_type_c : formatter -> type_c -> unit
+val print_type_v : formatter -> type_v -> unit
+
 val print_ty_decl : formatter -> itysymbol -> unit
 val print_data_decl : formatter -> data_decl -> unit
 val print_next_data_decl : formatter -> data_decl -> unit

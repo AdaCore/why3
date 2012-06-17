@@ -156,9 +156,37 @@ let print_psty fmt ps =
     print_regs (Mreg.set_diff vars.vars_reg ps.ps_subst.ity_subst_reg)
     print_vta ps.ps_vta
 
-let print_ppat fmt ppat = print_pat fmt ppat.ppat_pattern
+(* specification *)
+
+let print_post fmt post =
+  let vs,f = open_post post in
+  fprintf fmt "%a ->@ %a" print_vs vs print_term f
+
+let print_lv fmt = function
+  | LetV pv -> print_pvty fmt pv
+  | LetA ps -> print_psty fmt ps
+
+let forget_lv = function
+  | LetV pv -> forget_pv pv
+  | LetA ps -> forget_ps ps
+
+let rec print_type_v fmt = function
+  | SpecV vtv -> print_vtv fmt vtv
+  | SpecA (pvl,tyc) ->
+      let print_arg fmt pv = fprintf fmt "(%a) ->@ " print_pvty pv in
+      fprintf fmt "%a%a" (print_list nothing print_arg) pvl print_type_c tyc
+
+and print_type_c fmt tyc =
+  fprintf fmt "{ %a }@ %a%a@ { %a }@]"
+    print_term tyc.c_pre
+    print_effect tyc.c_effect
+    print_type_v tyc.c_result
+    print_post tyc.c_post
+    (* TODO: print_xpost *)
 
 (* expressions *)
+
+let print_ppat fmt ppat = print_pat fmt ppat.ppat_pattern
 
 let print_ak fmt = function
   | Aassert -> fprintf fmt "assert"
@@ -220,12 +248,6 @@ and print_enode pri fmt e = match e.e_node with
   | Eapp (e,v) ->
       fprintf fmt "(%a@ %a)" (print_lexpr pri) e print_pv v
   | Elet ({ let_var = lv ; let_expr = e1 }, e2) ->
-      let print_lv fmt = function
-        | LetV pv -> print_pvty fmt pv
-        | LetA ps -> print_psty fmt ps in
-      let forget_lv = function
-        | LetV pv -> forget_pv pv
-        | LetA ps -> forget_ps ps in
       fprintf fmt (protect_on (pri > 0) "let %a = @[%a@] in@ %a")
         print_lv lv (print_lexpr 4) e1 print_expr e2;
       forget_lv lv
@@ -251,9 +273,11 @@ and print_enode pri fmt e = match e.e_node with
   | Eabsurd ->
       fprintf fmt "absurd"
   | Eassert (ak,f) ->
-      fprintf fmt "%a@ (%a)" print_ak ak print_term f
-  | _ ->
-      fprintf fmt "<expr TODO>"
+      fprintf fmt "%a@ { %a }" print_ak ak print_term f
+  | Eghost e ->
+      fprintf fmt "ghost@ %a" print_expr e
+  | Eany tyc ->
+      fprintf fmt "any@ %a" print_type_c tyc
 
 and print_branch fmt ({ ppat_pattern = p }, e) =
   fprintf fmt "@[<hov 4>| %a ->@ %a@]" print_pat p print_expr e;
@@ -264,9 +288,6 @@ and print_xbranch fmt (xs, pv, e) =
   forget_pv pv
 
 and print_rec fst fmt { rec_ps = ps ; rec_lambda = lam } =
-  let print_post fmt post =
-    let vs,f = open_post post in
-    fprintf fmt "%a ->@ %a" print_vs vs print_term f in
   let print_arg fmt pv = fprintf fmt "(%a)" print_pvty pv in
   fprintf fmt "@[<hov 2>%s (%a) %a =@ { %a }@ %a@ { %a }@]"
     (if fst then "let rec" else "with")
@@ -275,6 +296,7 @@ and print_rec fst fmt { rec_ps = ps ; rec_lambda = lam } =
     print_term lam.l_pre
     print_expr lam.l_expr
     print_post lam.l_post
+    (* TODO: print_xpost *)
 
 (*
 and print_tl fmt tl =
@@ -332,10 +354,12 @@ let print_data_decl fst fmt (ts,csl) =
     (print_head fst) ts (print_list newline print_constr) csl;
   forget_tvs_regs ()
 
+let print_val_decl fmt { val_name = lv ; val_spec = tyv } =
+  fprintf fmt "@[<hov 2>val %a : @[%a@]@]" print_lv lv print_type_v tyv;
+  (* FIXME: don't forget global regions *)
+  forget_tvs_regs ()
+
 let print_let_decl fmt { let_var = lv ; let_expr = e } =
-  let print_lv fmt = function
-    | LetV pv -> print_pvty fmt pv
-    | LetA ps -> print_psty fmt ps in
   fprintf fmt "@[<hov 2>let %a = @[%a@]@]" print_lv lv print_expr e;
   (* FIXME: don't forget global regions *)
   forget_tvs_regs ()
@@ -353,6 +377,7 @@ let print_exn_decl fmt xs =
 let print_pdecl fmt d = match d.pd_node with
   | PDtype ts -> print_ty_decl fmt ts
   | PDdata tl -> print_list_next newline print_data_decl fmt tl
+  | PDval  vd -> print_val_decl fmt vd
   | PDlet  ld -> print_let_decl fmt ld
   | PDrec rdl -> print_list_next newline print_rec_decl fmt rdl
   | PDexn  xs -> print_exn_decl fmt xs

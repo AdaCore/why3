@@ -44,6 +44,7 @@ type pdecl = private {
 and pdecl_node = private
   | PDtype of itysymbol
   | PDdata of data_decl list
+  | PDval  of val_decl
   | PDlet  of let_defn
   | PDrec  of rec_defn list
   | PDexn  of xsymbol
@@ -57,6 +58,8 @@ type pre_data_decl = itysymbol * pre_constructor list
 val create_data_decl : pre_data_decl list -> pdecl
 
 val create_ty_decl : itysymbol -> pdecl
+
+val create_val_decl : val_decl -> pdecl
 
 val create_let_decl : let_defn -> pdecl
 

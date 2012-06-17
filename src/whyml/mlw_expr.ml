@@ -116,7 +116,7 @@ type let_var =
 
 type val_decl = {
   val_name : let_var;
-  val_decl : type_v;
+  val_spec : type_v;
   val_vars : varset Mid.t;
 }
 
@@ -221,7 +221,7 @@ let create_val_decl id tyv =
   let name = match build_v vars tyv with
     | VTarrow vta -> LetA (create_psymbol id vta vars)
     | VTvalue vtv -> LetV (create_pvsymbol id vtv) in
-  { val_name = name; val_decl = tyv; val_vars = varm }
+  { val_name = name; val_spec = tyv; val_vars = varm }
 
 (** patterns *)
 

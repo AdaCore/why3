@@ -110,7 +110,7 @@ type let_var =
 
 type val_decl = private {
   val_name : let_var;
-  val_decl : type_v;
+  val_spec : type_v;
   val_vars : varset Mid.t;
 }
 

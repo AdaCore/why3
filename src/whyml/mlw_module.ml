@@ -274,8 +274,8 @@ let add_pdecl uc d =
       let defn cl = List.map constructor cl in
       let dl = List.map (fun (its,cl) -> its.its_pure, defn cl) dl in
       add_to_theory Theory.add_data_decl uc dl
-  | PDlet ld ->
-      add_let uc ld.let_var
+  | PDval { val_name = lv } | PDlet { let_var = lv } ->
+      add_let uc lv
   | PDrec rdl ->
       List.fold_left add_rec uc rdl
   | PDexn xs ->
