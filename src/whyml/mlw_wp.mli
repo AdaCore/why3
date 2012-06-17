@@ -19,6 +19,9 @@
 (**************************************************************************)
 
 open Why3
+open Mlw_ty
+open Mlw_ty.T
+open Mlw_expr
 
 (** WP-only builtins *)
 
@@ -31,4 +34,4 @@ val fs_at  : Term.lsymbol
 val th_mark : Theory.theory
 
 val fs_setmark : Term.lsymbol
-val e_setmark  : Mlw_expr.expr
+val e_setmark  : expr

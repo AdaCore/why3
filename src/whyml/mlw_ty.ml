@@ -131,6 +131,10 @@ let create_varset tvs regs = {
   vars_reg = regs;
 }
 
+let rec reg_occurs r vars =
+  let check r r' = reg_equal r r' || reg_occurs r r'.reg_ity.ity_vars in
+  Sreg.exists (check r) vars.vars_reg
+
 (* value type symbols *)
 
 module Itsym = WeakStructMake (struct
@@ -601,12 +605,7 @@ let eff_full_inst s e =
   }
 
 let eff_filter vars e =
-  let rec check r vars =
-    Sreg.exists (occurs r) vars.vars_reg
-  and occurs r r' =
-    reg_equal r r' || check r r'.reg_ity.ity_vars
-  in
-  let check r = check r vars in
+  let check r = reg_occurs r vars in
   let reset r = function
     | _ when not (check r) -> None
     | Some u as v when check u -> Some v
@@ -665,6 +664,10 @@ let vty_value ?(ghost=false) ?mut ity =
     vtv_vars  = vars;
   }
 
+let vtv_unmut vtv =
+  if vtv.vtv_mut = None then vtv else
+    vty_value ~ghost:vtv.vtv_ghost vtv.vtv_ity
+
 let vty_arrow vtv ?(effect=eff_empty) ?(ghost=false) vty =
   (* mutable arguments are rejected outright *)
   if vtv.vtv_mut <> None then
@@ -672,10 +675,8 @@ let vty_arrow vtv ?(effect=eff_empty) ?(ghost=false) vty =
   (* we accept a mutable vty_value as a result to simplify Mlw_expr,
      but erase it in the signature: only projections return mutables *)
   let vty = match vty with
-    | VTvalue ({ vtv_mut = Some r ; vtv_vars = vars } as vtv) ->
-        let vars = { vars with vars_reg = Sreg.remove r vars.vars_reg } in
-        VTvalue { vtv with vtv_mut = None ; vtv_vars = vars }
-    | _ -> vty
+    | VTvalue v -> VTvalue (vtv_unmut v)
+    | VTarrow _ -> vty
   in {
     vta_arg    = vtv;
     vta_result = vty;
@@ -722,16 +723,16 @@ and vty_full_inst s = function
   | VTvalue vtv -> VTvalue (vtv_full_inst s vtv)
   | VTarrow vta -> VTarrow (vta_full_inst s vta)
 
-let vta_filter vars vta =
-  let vars = vars_union vars vta.vta_vars in
-  let rec filter a =
-    let vty = match a.vta_result with
-      | VTarrow a -> VTarrow (filter a)
-      | v -> v in
-    let effect = eff_filter vars a.vta_effect in
-    vty_arrow ~ghost:a.vta_ghost ~effect a.vta_arg vty
-  in
-  filter vta
+let rec vta_filter vars a =
+  let vars = vars_union vars a.vta_arg.vtv_vars in
+  let vty, vars = match a.vta_result with
+    (* FIXME? We allow effects on the regions from a VTvalue result,
+       but only reset is actually meaningful. Should we require that
+       any new region in the result be reset? *)
+    | VTvalue v -> a.vta_result, vars_union vars v.vtv_vars
+    | VTarrow a -> VTarrow (vta_filter vars a), vars in
+  let effect = eff_filter vars a.vta_effect in
+  vty_arrow ~ghost:a.vta_ghost ~effect a.vta_arg vty
 
 (** THE FOLLOWING CODE MIGHT BE USEFUL LATER FOR WPgen *)
 (*

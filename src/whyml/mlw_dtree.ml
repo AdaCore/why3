@@ -38,13 +38,6 @@ type ghost = bool
 type dpre = Ptree.pre
 type dpost = Ptree.pre
 type dxpost = (xsymbol * dpost) list
-
-type deffect = {
-  deff_reads  : Ptree.lexpr list;
-  deff_writes : Ptree.lexpr list;
-  deff_raises : xsymbol list;
-}
-
 type dbinder = ident * ghost * dity
 
 (**
@@ -82,7 +75,6 @@ and dexpr_desc =
   | DElet of ident * dexpr * dexpr
   | DEletrec of drecfun list * dexpr
   | DEassign of dexpr * dexpr
-  | DEsequence of dexpr * dexpr
   | DEif of dexpr * dexpr * dexpr
   | DEloop of dvariant list * dinvariant * dexpr
   | DElazy of Ptree.lazy_op * dexpr * dexpr
@@ -94,8 +86,19 @@ and dexpr_desc =
   | DEfor of ident * dexpr * Ptree.for_direction * dexpr * dinvariant * dexpr
   | DEassert of Ptree.assertion_kind * Ptree.lexpr
   | DEmark of ident * dexpr
-  (* | DEany of dutype_c *)
+  | DEghost of dexpr
+(*
+  | DEany of deffect
+*)
 
 and drecfun = ident * dity * dlambda
 
 and dlambda = dbinder list * dvariant list * dpre * dexpr * dpost * dxpost
+
+(*
+and deffect = {
+  deff_reads  : dexpr list;
+  deff_writes : dexpr list;
+  deff_raises : (ghost * xsymbol) list;
+}
+*)

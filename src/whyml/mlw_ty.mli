@@ -86,6 +86,8 @@ val ity_hash : ity -> int
 val reg_equal : region -> region -> bool
 val reg_hash : region -> int
 
+val reg_occurs : region -> varset -> bool
+
 exception BadItyArity of itysymbol * int * int
 exception BadRegArity of itysymbol * int * int
 exception DuplicateRegion of region
@@ -254,6 +256,8 @@ val vty_vars : varset -> vty -> varset
 
 val vty_ghost : vty -> bool
 val vty_ghostify : vty -> vty
+
+val vtv_unmut : vty_value -> vty_value
 
 (* the substitution must cover not only vta.vta_tvs and vta.vta_regs
    but also every type variable and every region in vta_effect *)

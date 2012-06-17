@@ -83,6 +83,39 @@ val create_plsymbol : preid -> vty_value list -> vty_value -> plsymbol
   (* FIXME? Effect calculation is hardwired to correspond to constructors
      and projections: mutable arguments are reset, mutable result is read. *)
 
+(** specification *)
+
+type pre = term          (* precondition *)
+type post                (* postcondition: a formula with a bound variable *)
+type xpost = post Mexn.t (* exceptional postconditions *)
+
+val create_post : vsymbol -> term -> post
+val open_post : post -> vsymbol * term
+
+type type_c = {
+  c_pre    : pre;
+  c_effect : effect;
+  c_result : type_v;
+  c_post   : post;
+  c_xpost  : xpost;
+}
+
+and type_v =
+  | SpecV of vty_value
+  | SpecA of pvsymbol list * type_c
+
+type let_var =
+  | LetV of pvsymbol
+  | LetA of psymbol
+
+type val_decl = private {
+  val_name : let_var;
+  val_decl : type_v;
+  val_vars : varset Mid.t;
+}
+
+val create_val_decl : Ident.preid -> type_v -> val_decl
+
 (** patterns *)
 
 type ppattern = private {
@@ -112,18 +145,6 @@ val make_ppattern : pre_ppattern -> vty_value -> pvsymbol Mstr.t * ppattern
 
 type assertion_kind = Aassert | Aassume | Acheck
 
-type pre = term          (* precondition *)
-type post                (* postcondition: a formula with a bound variable *)
-type xpost = post Mexn.t (* exceptional postconditions *)
-
-val create_post : vsymbol -> term -> post
-val open_post : post -> vsymbol * term
-
-type variant = {
-  v_term : term;           (* : tau *)
-  v_rel  : lsymbol option; (* tau tau : prop *)
-}
-
 type expr = private {
   e_node   : expr_node;
   e_vty    : vty;
@@ -144,7 +165,7 @@ and expr_node = private
   | Ecase   of expr * (ppattern * expr) list
   | Eassign of expr * region * pvsymbol
   | Eghost  of expr
-  | Eany    of any_effect
+  | Eany    of type_c
   | Eraise  of xsymbol * expr
   | Etry    of expr * (xsymbol * pvsymbol * expr) list
   | Eassert of assertion_kind * term
@@ -154,10 +175,6 @@ and let_defn = private {
   let_var  : let_var;
   let_expr : expr;
 }
-
-and let_var =
-  | LetV of pvsymbol
-  | LetA of psymbol
 
 and rec_defn = private {
   rec_ps     : psymbol;
@@ -174,13 +191,9 @@ and lambda = {
   l_xpost   : xpost;
 }
 
-(* TODO? Every top region in the type of Eany is reset.
-   This is enough for our current purposes, but we might
-   need to be more flexible later. *)
-and any_effect = {
-  aeff_reads  : expr list; (* for a ghost read, use a ghost expression *)
-  aeff_writes : expr list; (* for a ghost write, use a ghost expression *)
-  aeff_raises : (bool * xsymbol) list; (* ghost raise * exception symbol *)
+and variant = {
+  v_term : term;           (* : tau *)
+  v_rel  : lsymbol option; (* tau tau : prop *)
 }
 
 val e_label : ?loc:Loc.position -> Slab.t -> expr -> expr
@@ -222,7 +235,7 @@ exception Immutable of expr
 
 val e_assign : expr -> expr -> expr
 val e_ghost : expr -> expr
-val e_any : any_effect -> ity -> expr
+val e_any : type_c -> expr
 
 val e_void : expr
 
@@ -239,4 +252,3 @@ val e_try : expr -> (xsymbol * pvsymbol * expr) list -> expr
 
 val e_absurd : ity -> expr
 val e_assert : assertion_kind -> term -> expr
-

@@ -211,12 +211,17 @@ let mk_var e =
     dexpr_loc  = e.dexpr_loc;
     dexpr_lab  = [] }
 
+let mk_id s loc =
+  { id = s; id_loc = loc; id_lab = [] }
+
+let mk_dexpr desc dity loc labs =
+  { dexpr_desc = desc; dexpr_type = dity; dexpr_loc = loc; dexpr_lab = labs }
+
 let mk_let ~loc ~uloc e (desc,dity) =
   if test_var e then desc, dity else
   let loc = def_option loc uloc in
-  let e1 = {
-    dexpr_desc = desc; dexpr_type = dity; dexpr_loc = loc; dexpr_lab = [] } in
-  DElet ({ id = "q"; id_lab = []; id_loc = loc }, e, e1), dity
+  let e1 = mk_dexpr desc dity loc [] in
+  DElet (mk_id "q" loc, e, e1), dity
 
 (* patterns *)
 
@@ -256,9 +261,6 @@ let find_variant_ls ~loc uc p =
       | ls -> errorm ~loc "%a is not a binary relation" Pretty.print_ls ls
   with Not_found ->
     errorm ~loc "unbound symbol %a" Typing.print_qualid p
-
-let mk_dexpr desc dity loc labs =
-  { dexpr_desc = desc; dexpr_type = dity; dexpr_loc = loc; dexpr_lab = labs }
 
 let rec dpattern denv ({ pat_loc = loc } as pp) = match pp.pat_desc with
   | Ptree.PPpwild ->
@@ -308,6 +310,16 @@ and dpat_app denv ({ dexpr_loc = loc } as de) ppl =
   let res = create_type_variable () in
   Loc.try2 loc unify de.dexpr_type (make_arrow_type tyl res);
   pp, res, denv
+
+(*
+let deff_of_peff ~loc denv pe =
+  { deff_reads  = pe.pe_reads;
+    deff_writes = pe.pe_writes;
+    deff_raises =
+      List.map (fun q -> false, find_xsymbol ~loc denv.uc q) pe.pe_raises; }
+*)
+
+let dexpr_unit ~loc = hidden_ls ~loc (fs_tuple 0)
 
 let dexpr_app e el =
   let res = create_type_variable () in
@@ -365,7 +377,7 @@ and dexpr_desc denv loc = function
       let e1 = dexpr denv e1 in
       expected_type e1 dity_unit;
       let e2 = dexpr denv e2 in
-      DElet ({ id = "_"; id_lab = []; id_loc = loc }, e1, e2), e2.dexpr_type
+      DElet (mk_id "_" loc, e1, e2), e2.dexpr_type
   | Ptree.Eif (e1, e2, e3) ->
       let e1 = dexpr denv e1 in
       expected_type e1 dity_bool;
@@ -454,7 +466,7 @@ and dexpr_desc denv loc = function
       let dity = specialize_xsymbol xs in
       let e1 = match e1 with
         | Some e1 -> dexpr denv e1
-        | None when ity_equal xs.xs_ity ity_unit -> hidden_ls ~loc (fs_tuple 0)
+        | None when ity_equal xs.xs_ity ity_unit -> dexpr_unit ~loc
         | _ -> errorm ~loc "exception argument expected" in
       expected_type e1 dity;
       DEraise (xs, e1), res
@@ -465,7 +477,7 @@ and dexpr_desc denv loc = function
         let dity = specialize_xsymbol xs in
         let id, denv = match id with
           | Some id -> id, add_var id dity denv
-          | None -> { id = "void" ; id_loc = loc ; id_lab = [] }, denv in
+          | None -> mk_id "void" loc, denv in
         xs, id, dexpr denv e
       in
       let cl = List.map branch cl in
@@ -477,11 +489,34 @@ and dexpr_desc denv loc = function
   | Ptree.Emark (id, e1) ->
       let e1 = dexpr denv e1 in
       DEmark (id, e1), e1.dexpr_type
+  | Ptree.Eany _ ->
+      errorm ~loc "\"any\" expressions are not supported"
+(*
+  | Ptree.Eany { pc_result_type = Tpure pty;
+                 pc_effect      = pe;
+                 pc_pre         = { pp_desc = PPtrue };
+                 pc_post        = { pp_desc = PPtrue },[]; } ->
+      let dity = dity_of_pty ~user:true denv pty in
+      DEany (deff_of_peff pe), dity
+  | Ptree.Eany { pc_result_type = Tarrow (bl,tyc);
+                 pc_effect      = pe;
+                 pc_pre         = { pp_desc = PPtrue };
+                 pc_post        = { pp_desc = PPtrue },[]; } ->
+      let e1 = mk_dexpr (DEany (deff_of_peff pe)) dity_unit loc [] in
+      let e2 = { pp_desc = Ptree.Eany tyc; pp_loc = loc } in
+      let d2 = Ptree.Efun (bl,(tyc.pc_pre,e2,tyc.pc_post)) in
+      let e2 = dexpr denv { pp_desc = d2; pp_loc = loc } in
+      DElet (mk_id "_" loc, e1, e2), e2.dexpr_type
+  | Ptree.Eany tyc ->
+      let bl = [mk_id "_" loc, None] in
+      let e = dtype_v tyc.pc_effect tyc.pc_result_type in
+      let lam,dity = dlambda ~loc denv bl None (tyc.pc_pre, e, tyc.pc_post) in
+      let fn = mk_dexpr (DEfun lam) dity loc [] in
+      dexpr_app fn [dexpr_unit ~loc]
+*)
   | Ptree.Eloop (_ann, _e1) ->
       assert false (*TODO*)
   | Ptree.Efor (_id, _e1, _dir, _e2, _lexpr_opt, _e3) ->
-      assert false (*TODO*)
-  | Ptree.Eany (_type_c) ->
       assert false (*TODO*)
   | Ptree.Eabstract (_e1, _post) ->
       assert false (*TODO*)
@@ -519,6 +554,20 @@ and dlambda ~loc denv bl var (p, e, (q, xq)) =
   let xq = List.map
     (fun (q,f) -> find_xsymbol ~loc:f.pp_loc denv.uc q, f) xq in
   (bl, var, p, e, q, xq), make_arrow_type tyl e.dexpr_type
+
+(*
+and dtype_v ~loc denv = function
+  | Ptree.Tpure pty ->
+      let dity = dity_of_pty ~user:true denv pty in
+      let deff = { deff_reads = []; deff_writes = []; deff_raises = [] } in
+      DEany deff, dity
+  | Ptree.Tarrow (bl, tyc) ->
+      let pptrue = { pp_desc = PPtrue ; pp_loc = loc } in
+      let d = Ptree.Eany { tyc with pc_pre = pptrue; pc_post = pptrue,[] } in
+      let tr = tyc.pc_pre, { expr_desc = d; expr_loc = loc }, tyc.pc_post in
+      let lam, dity = dlambda ~loc denv bl None tr in
+      DEfun lam, dity
+*)
 
 type lenv = {
   mod_uc   : module_uc;
@@ -577,7 +626,7 @@ let rec expr lenv de = match de.dexpr_desc with
       let e2 = expr lenv de2 in
       e_rec [def] e2
   | DEfun lam ->
-      let x = { id = "fn"; id_loc = de.dexpr_loc; id_lab = [] } in
+      let x = mk_id "fn" de.dexpr_loc in
       let def = expr_fun lenv x lam in
       let e2 = e_cast def.rec_ps (VTarrow def.rec_ps.ps_vta) in
       e_rec [def] e2
@@ -651,6 +700,16 @@ let rec expr lenv de = match de.dexpr_desc with
       let ld = create_let_defn (Denv.create_user_id x) e_setmark in
       let lenv = add_local x.id ld.let_var lenv in
       e_let ld (expr lenv de1)
+(*
+  | DEany deff ->
+      let aeff = {
+        aeff_reads  = List.map (expr lenv) deff.deff_reads;
+        aeff_writes = List.map (expr lenv) deff.deff_writes;
+        aeff_raises = deff.deff_raises } in
+      e_any aeff (ity_of_dity de.dexpr_type)
+*)
+  | DEghost de1 ->
+      e_ghost (expr lenv de1)
   | _ ->
       assert false (*TODO*)
 
