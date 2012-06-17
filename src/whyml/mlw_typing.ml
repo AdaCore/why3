@@ -136,6 +136,9 @@ let dity_unit = ts_app (ts_tuple 0) []
 let expected_type e dity =
   unify e.dexpr_type dity
 
+let expected_type_weak e dity =
+  unify_weak e.dexpr_type dity
+
 let rec extract_labels labs loc e = match e.Ptree.expr_desc with
   | Ptree.Enamed (Ptree.Lstr s, e) -> extract_labels (s :: labs) loc e
   | Ptree.Enamed (Ptree.Lpos p, e) -> extract_labels labs (Some p) e
@@ -413,7 +416,7 @@ and dexpr_desc denv loc = function
       let e1 = { expr_desc = Eapply (fl,e1); expr_loc = loc } in
       let e1 = dexpr denv e1 in
       let e2 = dexpr denv e2 in
-      expected_type e2 e1.dexpr_type;
+      expected_type_weak e2 e1.dexpr_type;
       DEassign (e1, e2), dity_unit
   | Ptree.Econstant (ConstInt _ as c) ->
       DEconstant c, dity_int

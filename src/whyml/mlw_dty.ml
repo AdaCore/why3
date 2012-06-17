@@ -148,10 +148,10 @@ let rec occur_check_reg tv = function
   | Dts (_,dl) ->
       List.iter (occur_check_reg tv) dl
 
-let rec unify d1 d2 = match d1,d2 with
+let rec unify ~weak d1 d2 = match d1,d2 with
   | Dvar { contents = Dval d1 }, d2
   | d1, Dvar { contents = Dval d2 } ->
-      unify d1 d2
+      unify ~weak d1 d2
   | Dvar { contents = Dtvs tv1 },
     Dvar { contents = Dtvs tv2 } when tv_equal tv1 tv2 ->
       ()
@@ -162,11 +162,11 @@ let rec unify d1 d2 = match d1,d2 with
   | Dits (its1, dl1, rl1), Dits (its2, dl2, rl2) when its_equal its1 its2 ->
       assert (List.length rl1 = List.length rl2);
       assert (List.length dl1 = List.length dl2);
-      List.iter2 unify dl1 dl2;
-      List.iter2 unify_reg rl1 rl2
+      List.iter2 (unify ~weak) dl1 dl2;
+      if not weak then List.iter2 unify_reg rl1 rl2
   | Dts (ts1, dl1), Dts (ts2, dl2) when ts_equal ts1 ts2 ->
       assert (List.length dl1 = List.length dl2);
-      List.iter2 unify dl1 dl2
+      List.iter2 (unify ~weak) dl1 dl2
   | _ -> raise Exit
 
 and unify_reg r1 r2 =
@@ -186,14 +186,18 @@ and unify_reg r1 r2 =
     | d, Rvar ({ contents = Rtvs (tv,rd,_) } as r) ->
         let dity = dity_of_reg d in
         occur_check_reg tv dity;
-        unify rd dity;
+        unify ~weak:false rd dity;
         r := Rval d
     | Rureg (tv1,_,_), Rureg (tv2,_,_) when tv_equal tv1 tv2 -> ()
     | Rreg (reg1,_), Rreg (reg2,_) when reg_equal reg1 reg2 -> ()
     | _ -> raise Exit
 
+let unify_weak d1 d2 =
+  try unify ~weak:true d1 d2
+  with Exit -> raise (TypeMismatch (ity_of_dity d1, ity_of_dity d2))
+
 let unify d1 d2 =
-  try unify d1 d2
+  try unify ~weak:false d1 d2
   with Exit -> raise (TypeMismatch (ity_of_dity d1, ity_of_dity d2))
 
 let ts_arrow =

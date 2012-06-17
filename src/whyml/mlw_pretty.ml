@@ -160,6 +160,11 @@ let print_ppat fmt ppat = print_pat fmt ppat.ppat_pattern
 
 (* expressions *)
 
+let print_ak fmt = function
+  | Aassert -> fprintf fmt "assert"
+  | Aassume -> fprintf fmt "assume"
+  | Acheck  -> fprintf fmt "check"
+
 let print_list_next sep print fmt = function
   | [] -> ()
   | [x] -> print true fmt x
@@ -243,6 +248,10 @@ and print_enode pri fmt e = match e.e_node with
   | Etry (e,bl) ->
       fprintf fmt "try %a with@\n@[<hov>%a@]@\nend"
         print_expr e (print_list newline print_xbranch) bl
+  | Eabsurd ->
+      fprintf fmt "absurd"
+  | Eassert (ak,f) ->
+      fprintf fmt "%a@ (%a)" print_ak ak print_term f
   | _ ->
       fprintf fmt "<expr TODO>"
 

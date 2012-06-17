@@ -37,6 +37,7 @@ end)
 module Svs = Vsym.S
 module Mvs = Vsym.M
 module Hvs = Vsym.H
+module Wvs = Vsym.W
 
 let vs_equal : vsymbol -> vsymbol -> bool = (==)
 

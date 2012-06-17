@@ -27,6 +27,10 @@ module N
 
   exception Exit (tree int)
 
+  type dref 'a = {| mutable dcontents : ref 'a |}
+
+  let create_dref i = {| dcontents = {| contents = i |} |}
+
   let myfun r =
     let rec on_tree t = match t with
       | Node {| contents = v |} f -> v + on_forest f
@@ -36,6 +40,11 @@ module N
       | Nil -> 1
     end
     in
+    let dr = create_dref 0 in
+    let or = dr.dcontents in
+    let nr = {| contents = 1 |} in
+    dr.dcontents <- nr;
+    assert { r = r };
     try on_tree r with Exit -> 0 end
 end
 

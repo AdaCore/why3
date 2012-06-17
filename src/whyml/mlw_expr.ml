@@ -40,6 +40,15 @@ let create_pvsymbol id vtv = {
   pv_vtv  = vtv;
 }
 
+let create_pvsymbol, restore_pv =
+  let vs_to_pv = Wvs.create 17 in
+  (fun id vtv ->
+    let pv = create_pvsymbol id vtv in
+    Wvs.set vs_to_pv pv.pv_vs pv;
+    pv),
+  (fun vs -> try Wvs.find vs_to_pv vs with
+    Not_found -> raise (Decl.UnboundVar vs))
+
 (** program symbols *)
 
 type psymbol = {
@@ -362,9 +371,12 @@ let mk_expr node vty eff vars = {
 }
 
 let varmap_join = Mid.fold (fun _ -> vars_union)
-let varmap_union = Mid.union (fun _ s1 s2 -> Some (vars_union s1 s2))
+let varmap_union = Mid.set_union
 
 let add_pv_vars pv m = Mid.add pv.pv_vs.vs_name pv.pv_vtv.vtv_vars m
+let add_vs_vars vs m = add_pv_vars (restore_pv vs) m
+
+let add_t_vars t m = Mvs.fold (fun vs _ m -> add_vs_vars vs m) t.t_vars m
 let add_e_vars e m = varmap_union e.e_vars m
 
 let e_value pv =
@@ -481,10 +493,9 @@ let create_fun_defn id lam =
   let vsset = Mexn.fold (fun _ -> add_term) lam.l_xpost vsset in
   let vsset =
     List.fold_right (fun v -> add_term v.v_term) lam.l_variant vsset in
-  let add_vs vs _ m = Mid.add vs.vs_name (vs_vars vars_empty vs) m in
+  let add_vs vs _ m = add_vs_vars vs m in
   let del_pv m pv = Mid.remove pv.pv_vs.vs_name m in
-  let recvars = Mvs.fold add_vs vsset Mid.empty in
-  let recvars = add_e_vars lam.l_expr recvars in
+  let recvars = Mvs.fold add_vs vsset lam.l_expr.e_vars in
   let recvars = List.fold_left del_pv recvars lam.l_args in
   let vars = varmap_join recvars vars_empty in
   (* compute rec_ps.ps_vta *)
@@ -793,9 +804,9 @@ let e_absurd ity =
   mk_expr Eabsurd vty eff_empty Mid.empty
 
 let e_assert ak f =
-  let eff, vars = assert false (*TODO*) in
+  let vars = add_t_vars f Mid.empty in
   let vty = VTvalue (vty_value ity_unit) in
-  mk_expr (Eassert (ak, f)) vty eff vars
+  mk_expr (Eassert (ak, f)) vty eff_empty vars
 
 (* Compute the fixpoint on recursive definitions *)
 

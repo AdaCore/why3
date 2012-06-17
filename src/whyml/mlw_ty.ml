@@ -126,8 +126,6 @@ let vars_union s1 s2 = {
   vars_reg = Sreg.union s1.vars_reg s2.vars_reg;
 }
 
-let vs_vars s vs = { s with vars_tv = ty_freevars s.vars_tv vs.vs_ty }
-
 let create_varset tvs regs = {
   vars_tv = Sreg.fold (fun r -> Stv.union r.reg_ity.ity_vars.vars_tv) regs tvs;
   vars_reg = regs;
