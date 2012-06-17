@@ -50,6 +50,12 @@ let show_info i =
       Pretty.print_tv x Pretty.print_ty tx ) sigma
   end; *)
 
+let show_me_pvars _km _t bl = 
+  let _ = List.map t_open_branch bl in
+  ()
+  
+
+
 let decompose_forall t =
   let rec aux qvl_acc t = match t.t_node with
     | Tquant (Tforall, qt) ->
@@ -74,6 +80,7 @@ let t_candidates km qvs t =
    let rec t_candidate vs_acc t =
      let vs_acc = match t.t_node with
        | Tapp (ls, tl) -> defn_candidate vs_acc km ls tl qvs
+       | Tcase (t, bl) -> show_me_pvars km t bl; vs_acc
        | _ -> vs_acc
      in t_fold t_candidate vs_acc t
    in t_candidate Svs.empty t
@@ -161,7 +168,30 @@ let () = Trans.register_transform_l "induction" (Trans.store induction)
 (******* Induction tactic on function definition *********)
 (*********************************************************)
   
-  
+(*
+type ind_pattern = private {
+  ipat_node : ind_pattern_node;
+  ipat_vars : Svs.t;
+  ipat_ty   : ty;
+  ipat_tag  : int;
+}
+
+
+and ind_pattern_node = private
+  | IPwild
+  | IPvar of bool * vsymbol
+  | IPapp of lsymbol * ind_pattern list
+ 
+let 
+*)
+
+
+
+
+
+(*********************************************************)
+(*********************** OBSOLETE ************************)
+(*********************************************************) 
 type ihl =  Ihl of bool * ihl list   
 type scheme = {vset1 : Svs.t; vset2 : Svs.t; hl : ihl list }
     
