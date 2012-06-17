@@ -135,12 +135,12 @@ and expr_node = private
   | Eapp    of expr * pvsymbol
   | Elet    of let_defn * expr
   | Erec    of rec_defn list * expr
-  | Eif     of pvsymbol * expr * expr
-  | Ecase   of pvsymbol * (ppattern * expr) list
-  | Eassign of pvsymbol * region * pvsymbol (* mutable pv <- expr *)
+  | Eif     of expr * expr * expr
+  | Ecase   of expr * (ppattern * expr) list
+  | Eassign of expr * region * pvsymbol
   | Eghost  of expr
   | Eany    of any_effect
-  | Eraise  of xsymbol * pvsymbol
+  | Eraise  of xsymbol * expr
   | Etry    of expr * (xsymbol * pvsymbol * expr) list
   | Eassert of assertion_kind * term
   | Eabsurd

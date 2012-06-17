@@ -190,6 +190,8 @@ type pre_ppattern =
   | PPor   of pre_ppattern * pre_ppattern
   | PPas   of pre_ppattern * preid
 
+let vtv_unmut vtv = vty_value ~ghost:vtv.vtv_ghost vtv.vtv_ity
+
 let make_ppattern pp vtv =
   let hv = Hashtbl.create 3 in
   let find id vtv =
@@ -202,11 +204,10 @@ let make_ppattern pp vtv =
       let pv = create_pvsymbol id vtv in
       Hashtbl.add hv nm pv; pv
   in
-  let unmut vtv = vty_value ~ghost:vtv.vtv_ghost vtv.vtv_ity in
   let rec make vtv = function
     | PPwild -> {
         ppat_pattern = pat_wild (ty_of_ity vtv.vtv_ity);
-        ppat_vtv     = unmut vtv;
+        ppat_vtv     = vtv_unmut vtv;
         ppat_effect  = eff_empty; }
     | PPvar id -> {
         ppat_pattern = pat_var (find id vtv).pv_vs;
@@ -235,7 +236,7 @@ let make_ppattern pp vtv =
           (fun acc (eff,_) -> eff_union acc eff) eff_empty ppl in
         let pl = List.map (fun (_,pp) -> pp.ppat_pattern) ppl in
         { ppat_pattern = pat_app pls.pl_ls pl (ty_of_ity vtv.vtv_ity);
-          ppat_vtv     = unmut vtv;
+          ppat_vtv     = vtv_unmut vtv;
           ppat_effect  = if vtv.vtv_ghost then eff_ghostify eff else eff; }
     | PPlapp (ls,ppl) ->
         let ity = ity_of_ty_opt ls.ls_value in
@@ -250,10 +251,10 @@ let make_ppattern pp vtv =
           (fun acc pp -> eff_union acc pp.ppat_effect) eff_empty ppl in
         let pl = List.map (fun pp -> pp.ppat_pattern) ppl in
         { ppat_pattern = pat_app ls pl (ty_of_ity vtv.vtv_ity);
-          ppat_vtv     = unmut vtv;
+          ppat_vtv     = vtv_unmut vtv;
           ppat_effect  = if vtv.vtv_ghost then eff_ghostify eff else eff; }
     | PPor (pp1,pp2) ->
-        let vtv = unmut vtv in
+        let vtv = vtv_unmut vtv in
         let pp1 = make vtv pp1 in
         let pp2 = make vtv pp2 in
         { ppat_pattern = pat_or pp1.ppat_pattern pp2.ppat_pattern;
@@ -262,10 +263,10 @@ let make_ppattern pp vtv =
     | PPas (pp,id) ->
         let pp = make vtv pp in
         { ppat_pattern = pat_as pp.ppat_pattern (find id vtv).pv_vs;
-          ppat_vtv     = unmut vtv;
+          ppat_vtv     = vtv_unmut vtv;
           ppat_effect  = pp.ppat_effect; }
   in
-  let pp = make (unmut vtv) pp in
+  let pp = make (vtv_unmut vtv) pp in
   Hashtbl.fold Mstr.add hv Mstr.empty, pp
 
 (** program expressions *)
@@ -292,12 +293,12 @@ and expr_node =
   | Eapp    of expr * pvsymbol
   | Elet    of let_defn * expr
   | Erec    of rec_defn list * expr
-  | Eif     of pvsymbol * expr * expr
-  | Ecase   of pvsymbol * (ppattern * expr) list
-  | Eassign of pvsymbol * region * pvsymbol (* mutable pv <- expr *)
+  | Eif     of expr * expr * expr
+  | Ecase   of expr * (ppattern * expr) list
+  | Eassign of expr * region * pvsymbol
   | Eghost  of expr
   | Eany    of any_effect
-  | Eraise  of xsymbol * pvsymbol
+  | Eraise  of xsymbol * expr
   | Etry    of expr * (xsymbol * pvsymbol * expr) list
   | Eassert of assertion_kind * term
   | Eabsurd
@@ -394,10 +395,9 @@ let e_cast ps vty =
 let create_let_defn id e =
   let lv = match e.e_vty with
     | VTvalue vtv ->
-        LetV (create_pvsymbol id vtv)
+        LetV (create_pvsymbol id (vtv_unmut vtv))
     | VTarrow vta ->
-        let vars = varmap_join e.e_vars vta.vta_vars in
-        LetA (create_psymbol id vta vars)
+        LetA (create_psymbol id vta (varmap_join e.e_vars vta.vta_vars))
   in
   { let_var = lv ; let_expr = e }
 
@@ -428,13 +428,16 @@ let check_ghost_write e eff =
   let badwr = Sreg.inter e.e_effect.eff_ghostw eff.eff_reads in
   if not (Sreg.is_empty badwr) then raise (GhostWrite (e, Sreg.choose badwr))
 
+let check_postexpr e eff vars =
+  check_ghost_write e eff;
+  check_reset e vars
+
 let e_let ({ let_var = lv ; let_expr = d } as ld) e =
   let id = match lv with
     | LetV pv -> pv.pv_vs.vs_name
     | LetA ps -> ps.ps_name in
   let vars = Mid.remove id e.e_vars in
-  check_reset d vars;
-  check_ghost_write d e.e_effect;
+  check_postexpr d e.e_effect vars;
   let eff = eff_union d.e_effect e.e_effect in
   mk_expr (Elet (ld,e)) e.e_vty eff (add_e_vars d vars)
 
@@ -447,8 +450,7 @@ let e_app_real e pv =
     | VTvalue _ -> raise (ArrowExpected e)
   in
   let eff,vty = vty_app_arrow vta pv.pv_vtv in
-  check_reset e (add_pv_vars pv Mid.empty);
-  check_ghost_write e eff;
+  check_postexpr e eff (add_pv_vars pv Mid.empty);
   let eff = eff_union e.e_effect eff in
   mk_expr (Eapp (e,pv)) vty eff (add_pv_vars pv e.e_vars)
 
@@ -548,11 +550,6 @@ let e_plapp pls el ity =
           let mut = Util.option_map (reg_full_inst sbs) vtv.vtv_mut in
           let vty = VTvalue (vty_value ~ghost ?mut ity) in
           let eff = eff_union eff (eff_full_inst sbs pls.pl_effect) in
-(* FIXME? We will need to check later in Mlw_module that all symbols
-   we use are defined: including lsymbols, plsymbols, itysymbols,
-   and tysymbols. We can care about lsymbols and plsymbols here.
-   What should we do about type symbols? *)
-          let vars = Mid.add pls.pl_ls.ls_name vars_empty vars in
           let t = match pls.pl_ls.ls_value with
             | Some _ -> fs_app pls.pl_ls tl (ty_of_ity ity)
             | None   -> ps_app pls.pl_ls tl in
@@ -593,58 +590,66 @@ let e_lapp ls el ity =
 
 let e_void = e_lapp (fs_tuple 0) [] ity_unit
 
-let e_if_real pv e1 e2 =
+let e_if e0 e1 e2 =
+  let vtv0 = vtv_of_expr e0 in
   let vtv1 = vtv_of_expr e1 in
   let vtv2 = vtv_of_expr e2 in
+  ity_equal_check vtv0.vtv_ity ity_bool;
   ity_equal_check vtv1.vtv_ity vtv2.vtv_ity;
-  ity_equal_check pv.pv_vtv.vtv_ity ity_bool;
   let eff = eff_union e1.e_effect e2.e_effect in
-  let vars = add_e_vars e2 (add_e_vars e1 (add_pv_vars pv Mid.empty)) in
-  let ghost = pv.pv_vtv.vtv_ghost || vtv1.vtv_ghost || vtv2.vtv_ghost in
+  let vars = add_e_vars e2 (add_e_vars e1 Mid.empty) in
+  let ghost = vtv0.vtv_ghost || vtv1.vtv_ghost || vtv2.vtv_ghost in
   let vty = VTvalue (vty_value ~ghost vtv1.vtv_ity) in
-  mk_expr (Eif (pv,e1,e2)) vty eff vars
+  let eff = if ghost then eff_ghostify eff else eff in
+  check_postexpr e0 eff vars;
+  let vars = add_e_vars e0 vars in
+  let eff = eff_union e0.e_effect eff in
+  mk_expr (Eif (e0,e1,e2)) vty eff vars
 
-let e_if e e1 e2 = on_value (fun pv -> e_if_real pv e1 e2) e
-
-let e_case_real pv bl =
-  let ity = match bl with
-    | [] -> raise Term.EmptyCase
+let e_case e0 bl =
+  let vtv0 = vtv_of_expr e0 in
+  let bity = match bl with
     | (_,e)::_ -> (vtv_of_expr e).vtv_ity
-  in
+    | [] -> raise Term.EmptyCase in
   let rec branch ghost eff vars = function
     | (pp,e)::bl ->
         let vtv = vtv_of_expr e in
         if pp.ppat_vtv.vtv_mut <> None then
           Loc.errorm "Mutable pattern in a non-mutable position";
-        if pp.ppat_vtv.vtv_ghost <> pv.pv_vtv.vtv_ghost then
+        if pp.ppat_vtv.vtv_ghost <> vtv0.vtv_ghost then
           Loc.errorm "Non-ghost pattern in a ghost position";
-        ity_equal_check pv.pv_vtv.vtv_ity pp.ppat_vtv.vtv_ity;
-        ity_equal_check ity vtv.vtv_ity;
+        ity_equal_check vtv0.vtv_ity pp.ppat_vtv.vtv_ity;
+        ity_equal_check bity vtv.vtv_ity;
         let ghost = ghost || vtv.vtv_ghost in
         let del_vs vs _ m = Mid.remove vs.vs_name m in
         let bvars = Mvs.fold del_vs pp.ppat_pattern.pat_vars e.e_vars in
         let eff = eff_union (eff_union eff pp.ppat_effect) e.e_effect in
         branch ghost eff (varmap_union vars bvars) bl
     | [] ->
-        let vty = VTvalue (vty_value ~ghost ity) in
-        mk_expr (Ecase (pv,bl)) vty eff (add_pv_vars pv vars)
+        (* the cumulated effect of all branches, w/out e0 *)
+        let eff = if ghost then eff_ghostify eff else eff in
+        check_postexpr e0 eff vars; (* cumulated vars *)
+        let eff = eff_union e0.e_effect eff in
+        let vty = VTvalue (vty_value ~ghost bity) in
+        mk_expr (Ecase (e0,bl)) vty eff (add_e_vars e0 vars)
   in
-  branch pv.pv_vtv.vtv_ghost eff_empty Mid.empty bl
-
-let e_case e bl = on_value (fun pv -> e_case_real pv bl) e
+  branch vtv0.vtv_ghost eff_empty Mid.empty bl
 
 exception Immutable of expr
 
-let e_assign_real me mpv pv =
-  let r = match mpv.pv_vtv.vtv_mut with
+let e_assign_real e0 pv =
+  let vtv0 = vtv_of_expr e0 in
+  let r = match vtv0.vtv_mut with
     | Some r -> r
-    | None -> raise (Immutable me)
-  in
-  let ghost = mpv.pv_vtv.vtv_ghost || pv.pv_vtv.vtv_ghost in
+    | None -> raise (Immutable e0) in
+  let ghost = vtv0.vtv_ghost || pv.pv_vtv.vtv_ghost in
   let eff = eff_assign eff_empty ~ghost r pv.pv_vtv.vtv_ity in
-  let vars = add_pv_vars pv (add_pv_vars mpv Mid.empty) in
+  let vars = add_pv_vars pv Mid.empty in
+  check_postexpr e0 eff vars;
+  let vars = add_e_vars e0 vars in
+  let eff = eff_union e0.e_effect eff in
   let vty = VTvalue (vty_value ~ghost ity_unit) in
-  let e = mk_expr (Eassign (mpv,r,pv)) vty eff vars in
+  let e = mk_expr (Eassign (e0,r,pv)) vty eff vars in
   (* FIXME? Ok, this is awkward. We prohibit assignments
      where a ghost value is being written in a non-ghost
      mutable lvalue (which is reasonable), but we build the
@@ -657,14 +662,11 @@ let e_assign_real me mpv pv =
      The real check is written above in e_let, where we ensure
      that every ghost write (whether it was made into a ghost
      lvalue or not) is never followed by a non-ghost read. *)
-  if not mpv.pv_vtv.vtv_ghost && pv.pv_vtv.vtv_ghost then
+  if not vtv0.vtv_ghost && pv.pv_vtv.vtv_ghost then
     raise (GhostWrite (e,r));
   e
 
-let e_assign me e =
-  let assign pv mpv = e_assign_real me mpv pv in
-  let assign pv = on_value (assign pv) me in
-  on_value assign e
+let e_assign me e = on_value (e_assign_real me) e
 
 let e_ghost e =
   mk_expr (Eghost e) (vty_ghostify e.e_vty) e.e_effect e.e_vars
@@ -741,22 +743,24 @@ let e_lazy_and e1 e2 =
 let e_lazy_or e1 e2 =
   if eff_is_empty e2.e_effect then e_binop Tor e1 e2 else e_if e1 e_true e2
 
-let e_raise_real xs ity pv =
-  ity_equal_check xs.xs_ity pv.pv_vtv.vtv_ity;
-  let ghost = pv.pv_vtv.vtv_ghost in
-  let vars = add_pv_vars pv Mid.empty in
-  let vtv = vty_value ~ghost ity in
-  let eff = eff_raise eff_empty ~ghost xs in
-  mk_expr (Eraise (xs,pv)) (VTvalue vtv) eff vars
+(* FIXME? We don't call check_postexpr to verify that raising
+   an exception is ok after the computation of e, because with
+   the current semantics of whyml it always is. However, this
+   might break some day. *)
+let e_raise xs e ity =
+  let vtv = vtv_of_expr e in
+  ity_equal_check xs.xs_ity vtv.vtv_ity;
+  let ghost = vtv.vtv_ghost in
+  let eff = eff_raise e.e_effect ~ghost xs in
+  let vty = VTvalue (vty_value ~ghost ity) in
+  mk_expr (Eraise (xs,e)) vty eff e.e_vars
 
-let e_raise xs e ity = on_value (e_raise_real xs ity) e
-
-let e_try d bl =
-  let dvtv = vtv_of_expr d in
+let e_try e0 bl =
+  let vtv0 = vtv_of_expr e0 in
   let rec branch ghost eff vars = function
     | (xs,pv,e)::bl ->
         let vtv = vtv_of_expr e in
-        ity_equal_check dvtv.vtv_ity vtv.vtv_ity;
+        ity_equal_check vtv0.vtv_ity vtv.vtv_ity;
         ity_equal_check xs.xs_ity pv.pv_vtv.vtv_ity;
         if pv.pv_vtv.vtv_mut <> None then
           Loc.errorm "Mutable variable in a try-with branch";
@@ -766,33 +770,32 @@ let e_try d bl =
         let bvars = Mid.remove pv.pv_vs.vs_name e.e_vars in
         branch ghost eff (varmap_union vars bvars) bl
     | [] ->
-        let vty = VTvalue (vty_value ~ghost dvtv.vtv_ity) in
-        (* the cumulated effect of all branches, w/out d *)
+        let vty = VTvalue (vty_value ~ghost vtv0.vtv_ity) in
+        (* the cumulated effect of all branches, w/out e0 *)
         let eff = if ghost then eff_ghostify eff else eff in
-        check_reset d vars; (* cumulated vars of all branches *)
-        check_ghost_write d eff;
-        (* remove from d.e_effect the catched exceptions *)
-        let remove deff (xs,_,_) =
+        check_postexpr e0 eff vars; (* cumulated vars *)
+        (* remove from e0.e_effect the catched exceptions *)
+        let remove eff0 (xs,_,_) =
           (* we catch in a ghost exception in a non-ghost code *)
-          if not ghost && Sexn.mem xs deff.eff_ghostx then
-            raise (GhostRaise (d,xs));
-          eff_remove_raise deff xs in
-        let deff = List.fold_left remove d.e_effect bl in
+          if not ghost && Sexn.mem xs eff0.eff_ghostx then
+            raise (GhostRaise (e0,xs));
+          eff_remove_raise eff0 xs in
+        let eff0 = List.fold_left remove e0.e_effect bl in
         (* total effect and vars *)
-        let eff = eff_union deff eff in
-        let vars = add_e_vars d vars in
-        mk_expr (Etry (d,bl)) vty eff vars
+        let eff = eff_union eff0 eff in
+        let vars = add_e_vars e0 vars in
+        mk_expr (Etry (e0,bl)) vty eff vars
   in
-  branch dvtv.vtv_ghost eff_empty Mid.empty bl
+  branch vtv0.vtv_ghost eff_empty Mid.empty bl
 
 let e_absurd ity =
   let vty = VTvalue (vty_value ity) in
   mk_expr Eabsurd vty eff_empty Mid.empty
 
-let e_assert ass f =
+let e_assert ak f =
   let eff, vars = assert false (*TODO*) in
   let vty = VTvalue (vty_value ity_unit) in
-  mk_expr (Eassert (ass, f)) vty eff vars
+  mk_expr (Eassert (ak, f)) vty eff vars
 
 (* Compute the fixpoint on recursive definitions *)
 
@@ -847,10 +850,13 @@ let rec expr_subst psm e = match e.e_node with
       let rdl = create_rec_defn defl in
       let add psm (ps,_) rd = Mid.add ps.ps_name rd.rec_ps psm in
       e_rec rdl (expr_subst (List.fold_left2 add psm defl rdl) e)
-  | Eif (pv,e1,e2) ->
-      e_if_real pv (expr_subst psm e1) (expr_subst psm e2)
-  | Ecase (pv,bl) ->
-      e_case_real pv (List.map (fun (pp,e) -> pp, expr_subst psm e) bl)
+  | Eif (e,e1,e2) ->
+      e_if (expr_subst psm e) (expr_subst psm e1) (expr_subst psm e2)
+  | Ecase (e,bl) ->
+      let branch (pp,e) = pp, expr_subst psm e in
+      e_case (expr_subst psm e) (List.map branch bl)
+  | Eassign (e,_,pv) ->
+      e_assign_real (expr_subst psm e) pv
   | Eghost e ->
       e_ghost (expr_subst psm e)
   | Eany ee ->
@@ -859,11 +865,12 @@ let rec expr_subst psm e = match e.e_node with
         aeff_writes = List.map (expr_subst psm) ee.aeff_writes;
         aeff_raises = ee.aeff_raises;
       } (vtv_of_expr e).vtv_ity
+  | Eraise (xs,e0) ->
+      e_raise xs (expr_subst psm e0) (vtv_of_expr e).vtv_ity
   | Etry (e,bl) ->
       let branch (xs,pv,e) = xs, pv, expr_subst psm e in
       e_try (expr_subst psm e) (List.map branch bl)
-  | Elogic _ | Evalue _ | Earrow _ | Eassign _ | Eraise _
-  | Eabsurd | Eassert _ -> e
+  | Elogic _ | Evalue _ | Earrow _ | Eabsurd | Eassert _ -> e
 
 and create_rec_defn defl =
   let conv m (ps,lam) =

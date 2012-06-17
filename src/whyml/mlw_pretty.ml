@@ -229,17 +229,17 @@ and print_enode pri fmt e = match e.e_node with
         (print_list_next newline print_rec) rdl print_expr e;
       let forget_rd rd = forget_ps rd.rec_ps in
       List.iter forget_rd rdl
-  | Eif (v,e1,e2) ->
+  | Eif (e0,e1,e2) ->
       fprintf fmt (protect_on (pri > 0) "if %a then %a@ else %a")
-        print_pv v print_expr e1 print_expr e2
-  | Eassign (pv1,r,pv2) ->
+        print_expr e0 print_expr e1 print_expr e2
+  | Eassign (e,r,pv) ->
       fprintf fmt (protect_on (pri > 0) "%a <%a> <- %a")
-        print_pv pv1 print_regty r print_pv pv2
-  | Ecase (pv,bl) ->
+        print_expr e print_regty r print_pv pv
+  | Ecase (e0,bl) ->
       fprintf fmt "match %a with@\n@[<hov>%a@]@\nend"
-        print_pv pv (print_list newline print_branch) bl
-  | Eraise (xs,pv) ->
-      fprintf fmt "raise (%a %a)" print_xs xs print_pv pv
+        print_expr e0 (print_list newline print_branch) bl
+  | Eraise (xs,e) ->
+      fprintf fmt "raise (%a %a)" print_xs xs print_expr e
   | Etry (e,bl) ->
       fprintf fmt "try %a with@\n@[<hov>%a@]@\nend"
         print_expr e (print_list newline print_xbranch) bl
