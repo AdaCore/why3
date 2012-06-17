@@ -93,7 +93,7 @@ and dexpr_desc =
   | DEtry of dexpr * (xsymbol * ident * dexpr) list
   | DEfor of ident * dexpr * Ptree.for_direction * dexpr * dinvariant * dexpr
   | DEassert of Ptree.assertion_kind * Ptree.lexpr
-  | DEmark of string * dexpr
+  | DEmark of ident * dexpr
   (* | DEany of dutype_c *)
 
 and drecfun = ident * dity * dlambda

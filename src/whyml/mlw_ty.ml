@@ -438,9 +438,12 @@ let create_itysymbol name ?(abst=false) ?(priv=false) args regs def =
     its_abst  = abst;
     its_priv  = priv }
 
+let ts_unit = ts_tuple 0
+let ty_unit = ty_tuple []
+
 let ity_int  = ity_of_ty Ty.ty_int
 let ity_bool = ity_of_ty Ty.ty_bool
-let ity_unit = ity_of_ty (Ty.ty_tuple [])
+let ity_unit = ity_of_ty ty_unit
 
 let vars_freeze s =
   let sbs = Stv.fold (fun v -> Mtv.add v (ity_var v)) s.vars_tv Mtv.empty in

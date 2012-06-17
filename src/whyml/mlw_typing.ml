@@ -34,6 +34,7 @@ open Mlw_expr
 open Mlw_decl
 open Mlw_pretty
 open Mlw_module
+open Mlw_wp
 open Mlw_dty
 
 (** errors *)
@@ -128,10 +129,11 @@ let rec dity_of_pty ~user denv = function
 
 (** Typing program expressions *)
 
-let dity_int  = ts_app ts_int []
+let dity_int  = ts_app ts_int  []
 let dity_real = ts_app ts_real []
 let dity_bool = ts_app ts_bool []
-let dity_unit = ts_app (ts_tuple 0) []
+let dity_unit = ts_app ts_unit []
+let dity_mark = ts_app ts_mark []
 
 let expected_type ?(weak=false) e dity =
   unify ~weak e.dexpr_type dity
@@ -307,12 +309,6 @@ and dpat_app denv ({ dexpr_loc = loc } as de) ppl =
   Loc.try2 loc unify de.dexpr_type (make_arrow_type tyl res);
   pp, res, denv
 
-(* value restriction *)
-let rec is_fun e = match e.dexpr_desc with
-  | DEfun _ -> true
-  | DEmark (_, e) -> is_fun e
-  | _ -> false
-
 let dexpr_app e el =
   let res = create_type_variable () in
   let tyl = List.map (fun a -> a.dexpr_type) el in
@@ -342,7 +338,9 @@ and dexpr_desc denv loc = function
   | Ptree.Elet (id, e1, e2) ->
       let e1 = dexpr denv e1 in
       let dity = e1.dexpr_type in
-      let tvars = if is_fun e1 then denv.tvars else add_tvars denv.tvars dity in
+      let tvars = match e1.dexpr_desc with
+        | DEfun _ -> denv.tvars
+        | _ -> add_tvars denv.tvars dity in
       let locals = Mstr.add id.id (tvars, dity) denv.locals in
       let denv = { denv with locals = locals; tvars = tvars } in
       let e2 = dexpr denv e2 in
@@ -476,11 +474,12 @@ and dexpr_desc denv loc = function
       DEabsurd, create_type_variable ()
   | Ptree.Eassert (ak, lexpr) ->
       DEassert (ak, lexpr), dity_unit
+  | Ptree.Emark (id, e1) ->
+      let e1 = dexpr denv e1 in
+      DEmark (id, e1), e1.dexpr_type
   | Ptree.Eloop (_ann, _e1) ->
       assert false (*TODO*)
   | Ptree.Efor (_id, _e1, _dir, _e2, _lexpr_opt, _e3) ->
-      assert false (*TODO*)
-  | Ptree.Emark (_id, _e1) ->
       assert false (*TODO*)
   | Ptree.Eany (_type_c) ->
       assert false (*TODO*)
@@ -545,8 +544,10 @@ let create_post lenv x ty f =
   let res = create_vsymbol (id_fresh x) ty in
   let log_vars = Mstr.add x res lenv.log_vars in
   let log_denv = Typing.add_var x (dty_of_ty ty) lenv.log_denv in
-  let f = Typing.type_fmla (get_theory lenv.mod_uc) log_denv log_vars f in
-  create_post res f
+  (* FIXME? We could add th_mark in create_lenv, but then at/old
+     would be available in preconditions, variants, etc... *)
+  let th = Theory.use_export (get_theory lenv.mod_uc) Mlw_wp.th_mark in
+  create_post res (Typing.type_fmla th log_denv log_vars f)
 
 let create_pre lenv f =
   Typing.type_fmla (get_theory lenv.mod_uc) lenv.log_denv lenv.log_vars f
@@ -646,6 +647,10 @@ let rec expr lenv de = match de.dexpr_desc with
         let lenv = add_local id.id (LetV pv) lenv in
         xs, pv, expr lenv de in
       e_try e1 (List.map branch bl)
+  | DEmark (x, de1) ->
+      let ld = create_let_defn (Denv.create_user_id x) e_setmark in
+      let lenv = add_local x.id ld.let_var lenv in
+      e_let ld (expr lenv de1)
   | _ ->
       assert false (*TODO*)
 
@@ -674,7 +679,7 @@ and expr_lam lenv (bl, var, p, e, q, xq) =
   let lenv = List.fold_right add_binder pvl lenv in
   let e = expr lenv e in
   let ty = match e.e_vty with
-    | VTarrow _ -> ty_tuple []
+    | VTarrow _ -> ty_unit
     | VTvalue vtv -> ty_of_ity vtv.vtv_ity in
   let mk_variant (t,r) = { v_term = create_pre lenv t; v_rel = r } in
   let add_exn m (xs,f) =

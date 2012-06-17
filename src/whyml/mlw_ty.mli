@@ -136,6 +136,9 @@ val ity_v_any : (tvsymbol -> bool) -> (region -> bool) -> ity -> bool
 val ity_closed : ity -> bool
 val ity_pure : ity -> bool
 
+val ts_unit : tysymbol
+val ty_unit : ty
+
 val ity_int : ity
 val ity_bool : ity
 val ity_unit : ity

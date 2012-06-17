@@ -16,8 +16,6 @@ module N
   use import M
   goal G1: f 41 = 42
 
-  type unit = ()
-
   type tree 'a = Node 'a (forest 'a) | Leaf
   with forest 'a = Cons (tree 'a) (forest 'a) | Nil
 
@@ -32,10 +30,12 @@ module N
   let create_dref i = {| dcontents = {| contents = i |} |}
 
   let myfun r = { r = r }
-    let rec on_tree t = match t with
+  'L:
+    let rec on_tree t = { true } match t with
       | Node {| contents = v |} f -> v + on_forest f
       | Leaf -> raise (Exit Leaf)
-    end with on_forest f = match f with
+    end { at r 'L = t }
+    with on_forest f = match f with
       | Cons t f -> let ee = Leaf in on_tree t + on_forest f + on_tree ee
       | Nil -> 1
     end
@@ -46,7 +46,7 @@ module N
     dr.dcontents <- nr;
     assert { r = r };
     try on_tree r with Exit -> 0 end
-    { result = 0 }
+    { old result = 0 }
 end
 
 (*

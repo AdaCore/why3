@@ -215,8 +215,18 @@ let clone_export_theory uc th i =
 let add_meta uc m al =
   { uc with muc_theory = Theory.add_meta uc.muc_theory m al }
 
+let th_unit =
+  let ts = create_tysymbol (id_fresh "unit") [] (Some ty_unit) in
+  let uc = create_theory (id_fresh "Unit") in
+  let uc = Theory.use_export uc (tuple_theory 0) in
+  let uc = Theory.add_ty_decl uc ts in
+  close_theory uc
+
 let create_module ?(path=[]) n =
-  use_export_theory (empty_module n path) bool_theory
+  let m = empty_module n path in
+  let m = use_export_theory m bool_theory in
+  let m = use_export_theory m th_unit in
+  m
 
 (** Program decls *)
 
