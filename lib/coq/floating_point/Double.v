@@ -8,13 +8,9 @@ Require real.Real.
 Require real.Abs.
 Require real.FromInt.
 Require floating_point.Rounding.
+Require floating_point.DoubleFormat.
 
 Require Import floating_point.GenFloat.
-
-(* Why3 goal *)
-Definition double : Type.
-exact (t 53 1024).
-Defined.
 
 (* Why3 goal *)
 Definition round: floating_point.Rounding.mode -> R -> R.
@@ -22,30 +18,33 @@ exact (round 53 1024).
 Defined.
 
 (* Why3 goal *)
-Definition round_logic: floating_point.Rounding.mode -> R -> double.
+Definition round_logic: floating_point.Rounding.mode -> R ->
+  floating_point.DoubleFormat.double.
 exact (round_logic 53 1024 (refl_equal true) (refl_equal true)).
 Defined.
 
 (* Why3 goal *)
-Definition value: double -> R.
+Definition value: floating_point.DoubleFormat.double -> R.
 exact (value 53 1024).
 Defined.
 
 (* Why3 goal *)
-Definition exact: double -> R.
+Definition exact: floating_point.DoubleFormat.double -> R.
 exact (exact 53 1024).
 Defined.
 
 (* Why3 goal *)
-Definition model: double -> R.
+Definition model: floating_point.DoubleFormat.double -> R.
 exact (model 53 1024).
 Defined.
 
 (* Why3 assumption *)
-Definition round_error(x:double): R := (Rabs ((value x) - (exact x))%R).
+Definition round_error(x:floating_point.DoubleFormat.double): R :=
+  (Rabs ((value x) - (exact x))%R).
 
 (* Why3 assumption *)
-Definition total_error(x:double): R := (Rabs ((value x) - (model x))%R).
+Definition total_error(x:floating_point.DoubleFormat.double): R :=
+  (Rabs ((value x) - (model x))%R).
 
 (* Why3 assumption *)
 Definition no_overflow(m:floating_point.Rounding.mode) (x:R): Prop :=
@@ -75,13 +74,13 @@ now apply Round_idempotent.
 Qed.
 
 (* Why3 goal *)
-Lemma Round_value : forall (m:floating_point.Rounding.mode) (x:double),
-  ((round m (value x)) = (value x)).
+Lemma Round_value : forall (m:floating_point.Rounding.mode)
+  (x:floating_point.DoubleFormat.double), ((round m (value x)) = (value x)).
 now apply Round_value.
 Qed.
 
 (* Why3 goal *)
-Lemma Bounded_value : forall (x:double),
+Lemma Bounded_value : forall (x:floating_point.DoubleFormat.double),
   ((Rabs (value x)) <= (9007199254740991 * 19958403095347198116563727130368385660674512604354575415025472424372118918689640657849579654926357010893424468441924952439724379883935936607391717982848314203200056729510856765175377214443629871826533567445439239933308104551208703888888552684480441575071209068757560416423584952303440099278848)%R)%R.
 now apply Bounded_value.
 Qed.
@@ -119,35 +118,49 @@ now apply Round_up_neg.
 Qed.
 
 (* Why3 assumption *)
-Definition add_post(m:floating_point.Rounding.mode) (x:double) (y:double)
-  (res:double): Prop := ((value res) = (round m
+Definition of_real_post(m:floating_point.Rounding.mode) (x:R)
+  (res:floating_point.DoubleFormat.double): Prop := ((value res) = (round m
+  x)) /\ (((exact res) = x) /\ ((model res) = x)).
+
+(* Why3 assumption *)
+Definition add_post(m:floating_point.Rounding.mode)
+  (x:floating_point.DoubleFormat.double)
+  (y:floating_point.DoubleFormat.double)
+  (res:floating_point.DoubleFormat.double): Prop := ((value res) = (round m
   ((value x) + (value y))%R)) /\
   (((exact res) = ((exact x) + (exact y))%R) /\
   ((model res) = ((model x) + (model y))%R)).
 
 (* Why3 assumption *)
-Definition sub_post(m:floating_point.Rounding.mode) (x:double) (y:double)
-  (res:double): Prop := ((value res) = (round m
+Definition sub_post(m:floating_point.Rounding.mode)
+  (x:floating_point.DoubleFormat.double)
+  (y:floating_point.DoubleFormat.double)
+  (res:floating_point.DoubleFormat.double): Prop := ((value res) = (round m
   ((value x) - (value y))%R)) /\
   (((exact res) = ((exact x) - (exact y))%R) /\
   ((model res) = ((model x) - (model y))%R)).
 
 (* Why3 assumption *)
-Definition mul_post(m:floating_point.Rounding.mode) (x:double) (y:double)
-  (res:double): Prop := ((value res) = (round m
+Definition mul_post(m:floating_point.Rounding.mode)
+  (x:floating_point.DoubleFormat.double)
+  (y:floating_point.DoubleFormat.double)
+  (res:floating_point.DoubleFormat.double): Prop := ((value res) = (round m
   ((value x) * (value y))%R)) /\
   (((exact res) = ((exact x) * (exact y))%R) /\
   ((model res) = ((model x) * (model y))%R)).
 
 (* Why3 assumption *)
-Definition div_post(m:floating_point.Rounding.mode) (x:double) (y:double)
-  (res:double): Prop := ((value res) = (round m
+Definition div_post(m:floating_point.Rounding.mode)
+  (x:floating_point.DoubleFormat.double)
+  (y:floating_point.DoubleFormat.double)
+  (res:floating_point.DoubleFormat.double): Prop := ((value res) = (round m
   (Rdiv (value x) (value y))%R)) /\
   (((exact res) = (Rdiv (exact x) (exact y))%R) /\
   ((model res) = (Rdiv (model x) (model y))%R)).
 
 (* Why3 assumption *)
-Definition neg_post(x:double) (res:double): Prop :=
+Definition neg_post(x:floating_point.DoubleFormat.double)
+  (res:floating_point.DoubleFormat.double): Prop :=
   ((value res) = (-(value x))%R) /\ (((exact res) = (-(exact x))%R) /\
   ((model res) = (-(model x))%R)).
 
@@ -159,9 +172,15 @@ Definition implb(x:bool) (y:bool): bool := match (x,
   end.
 
 (* Why3 assumption *)
-Definition lt(x:double) (y:double): Prop := ((value x) < (value y))%R.
+Definition lt(x:floating_point.DoubleFormat.double)
+  (y:floating_point.DoubleFormat.double): Prop := ((value x) < (value y))%R.
 
 (* Why3 assumption *)
-Definition gt(x:double) (y:double): Prop := ((value y) < (value x))%R.
+Definition gt(x:floating_point.DoubleFormat.double)
+  (y:floating_point.DoubleFormat.double): Prop := ((value y) < (value x))%R.
 
 
+(* Unused content named double
+exact (t 53 1024).
+Defined.
+ *)

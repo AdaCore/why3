@@ -887,7 +887,7 @@ COQLIBS_NUMBER_FILES = Divisibility Gcd Parity Prime
 COQLIBS_NUMBER = $(addprefix lib/coq/number/, $(COQLIBS_NUMBER_FILES))
 
 ifeq (@enable_coq_fp_libs@,yes)
-COQLIBS_FP_FILES = Rounding Single Double
+COQLIBS_FP_FILES = Rounding SingleFormat Single DoubleFormat Double
 COQLIBS_FP_ALL_FILES = GenFloat $(COQLIBS_FP_FILES)
 COQLIBS_FP = $(addprefix lib/coq/floating_point/, $(COQLIBS_FP_ALL_FILES))
 endif

@@ -167,6 +167,16 @@ theory real.FromInt
 
 end
 
+theory floating_point.Rounding
+
+  syntax function NearestTiesToEven "ne"
+  syntax function ToZero "zr"
+  syntax function Up "up"
+  syntax function Down "dn"
+  syntax function NearestTiesToAway "na"
+
+end
+
 theory floating_point.Single
 
   syntax function round "float<ieee_32,%1>(%2)"
@@ -181,15 +191,22 @@ theory floating_point.Double
 
 end
 
-theory floating_point.Rounding
+(*
+theory floating_point.SingleMultiRounding
 
-  syntax function NearestTiesToEven "ne"
-  syntax function ToZero "zr"
-  syntax function Up "up"
-  syntax function Down "dn"
-  syntax function NearestTiesToAway "na"
+  syntax function round "float<ieee_32,%1>(%2)"
+  meta "instantiate : auto" prop Bounded_value
 
 end
+*)
+
+theory floating_point.DoubleMultiRounding
+
+  syntax function round "float<ieee_64,%1>(%2)"
+  meta "instantiate : auto" prop Bounded_value
+
+end
+
 
 (*
 Local Variables:

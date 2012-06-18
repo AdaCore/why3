@@ -8,13 +8,9 @@ Require real.Real.
 Require real.Abs.
 Require real.FromInt.
 Require floating_point.Rounding.
+Require floating_point.SingleFormat.
 
 Require Import floating_point.GenFloat.
-
-(* Why3 goal *)
-Definition single : Type.
-exact (t 24 128).
-Defined.
 
 (* Why3 goal *)
 Definition round: floating_point.Rounding.mode -> R -> R.
@@ -22,30 +18,33 @@ exact (round 24 128).
 Defined.
 
 (* Why3 goal *)
-Definition round_logic: floating_point.Rounding.mode -> R -> single.
+Definition round_logic: floating_point.Rounding.mode -> R ->
+  floating_point.SingleFormat.single.
 exact (round_logic 24 128 (refl_equal true) (refl_equal true)).
 Defined.
 
 (* Why3 goal *)
-Definition value: single -> R.
+Definition value: floating_point.SingleFormat.single -> R.
 exact (value 24 128).
 Defined.
 
 (* Why3 goal *)
-Definition exact: single -> R.
+Definition exact: floating_point.SingleFormat.single -> R.
 exact (exact 24 128).
 Defined.
 
 (* Why3 goal *)
-Definition model: single -> R.
+Definition model: floating_point.SingleFormat.single -> R.
 exact (model 24 128).
 Defined.
 
 (* Why3 assumption *)
-Definition round_error(x:single): R := (Rabs ((value x) - (exact x))%R).
+Definition round_error(x:floating_point.SingleFormat.single): R :=
+  (Rabs ((value x) - (exact x))%R).
 
 (* Why3 assumption *)
-Definition total_error(x:single): R := (Rabs ((value x) - (model x))%R).
+Definition total_error(x:floating_point.SingleFormat.single): R :=
+  (Rabs ((value x) - (model x))%R).
 
 (* Why3 assumption *)
 Definition no_overflow(m:floating_point.Rounding.mode) (x:R): Prop :=
@@ -82,13 +81,13 @@ now apply Round_idempotent.
 Qed.
 
 (* Why3 goal *)
-Lemma Round_value : forall (m:floating_point.Rounding.mode) (x:single),
-  ((round m (value x)) = (value x)).
+Lemma Round_value : forall (m:floating_point.Rounding.mode)
+  (x:floating_point.SingleFormat.single), ((round m (value x)) = (value x)).
 now apply Round_value.
 Qed.
 
 (* Why3 goal *)
-Lemma Bounded_value : forall (x:single),
+Lemma Bounded_value : forall (x:floating_point.SingleFormat.single),
   ((Rabs (value x)) <= (33554430 * 10141204801825835211973625643008)%R)%R.
 rewrite max_single_eq.
 now apply Bounded_value.
@@ -127,35 +126,49 @@ now apply Round_up_neg.
 Qed.
 
 (* Why3 assumption *)
-Definition add_post(m:floating_point.Rounding.mode) (x:single) (y:single)
-  (res:single): Prop := ((value res) = (round m
+Definition of_real_post(m:floating_point.Rounding.mode) (x:R)
+  (res:floating_point.SingleFormat.single): Prop := ((value res) = (round m
+  x)) /\ (((exact res) = x) /\ ((model res) = x)).
+
+(* Why3 assumption *)
+Definition add_post(m:floating_point.Rounding.mode)
+  (x:floating_point.SingleFormat.single)
+  (y:floating_point.SingleFormat.single)
+  (res:floating_point.SingleFormat.single): Prop := ((value res) = (round m
   ((value x) + (value y))%R)) /\
   (((exact res) = ((exact x) + (exact y))%R) /\
   ((model res) = ((model x) + (model y))%R)).
 
 (* Why3 assumption *)
-Definition sub_post(m:floating_point.Rounding.mode) (x:single) (y:single)
-  (res:single): Prop := ((value res) = (round m
+Definition sub_post(m:floating_point.Rounding.mode)
+  (x:floating_point.SingleFormat.single)
+  (y:floating_point.SingleFormat.single)
+  (res:floating_point.SingleFormat.single): Prop := ((value res) = (round m
   ((value x) - (value y))%R)) /\
   (((exact res) = ((exact x) - (exact y))%R) /\
   ((model res) = ((model x) - (model y))%R)).
 
 (* Why3 assumption *)
-Definition mul_post(m:floating_point.Rounding.mode) (x:single) (y:single)
-  (res:single): Prop := ((value res) = (round m
+Definition mul_post(m:floating_point.Rounding.mode)
+  (x:floating_point.SingleFormat.single)
+  (y:floating_point.SingleFormat.single)
+  (res:floating_point.SingleFormat.single): Prop := ((value res) = (round m
   ((value x) * (value y))%R)) /\
   (((exact res) = ((exact x) * (exact y))%R) /\
   ((model res) = ((model x) * (model y))%R)).
 
 (* Why3 assumption *)
-Definition div_post(m:floating_point.Rounding.mode) (x:single) (y:single)
-  (res:single): Prop := ((value res) = (round m
+Definition div_post(m:floating_point.Rounding.mode)
+  (x:floating_point.SingleFormat.single)
+  (y:floating_point.SingleFormat.single)
+  (res:floating_point.SingleFormat.single): Prop := ((value res) = (round m
   (Rdiv (value x) (value y))%R)) /\
   (((exact res) = (Rdiv (exact x) (exact y))%R) /\
   ((model res) = (Rdiv (model x) (model y))%R)).
 
 (* Why3 assumption *)
-Definition neg_post(x:single) (res:single): Prop :=
+Definition neg_post(x:floating_point.SingleFormat.single)
+  (res:floating_point.SingleFormat.single): Prop :=
   ((value res) = (-(value x))%R) /\ (((exact res) = (-(exact x))%R) /\
   ((model res) = (-(model x))%R)).
 
@@ -167,9 +180,15 @@ Definition implb(x:bool) (y:bool): bool := match (x,
   end.
 
 (* Why3 assumption *)
-Definition lt(x:single) (y:single): Prop := ((value x) < (value y))%R.
+Definition lt(x:floating_point.SingleFormat.single)
+  (y:floating_point.SingleFormat.single): Prop := ((value x) < (value y))%R.
 
 (* Why3 assumption *)
-Definition gt(x:single) (y:single): Prop := ((value y) < (value x))%R.
+Definition gt(x:floating_point.SingleFormat.single)
+  (y:floating_point.SingleFormat.single): Prop := ((value y) < (value x))%R.
 
 
+(* Unused content named single
+exact (t 24 128).
+Defined.
+ *)
