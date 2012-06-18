@@ -565,7 +565,7 @@ type lenv = {
 }
 
 let create_lenv uc = {
-  mod_uc   = uc;
+  mod_uc   = use_export_theory uc Mlw_wp.th_mark;
   let_vars = Mstr.empty;
   log_vars = Mstr.empty;
   log_denv = Typing.denv_empty;
@@ -581,10 +581,8 @@ let create_post lenv x ty f =
   let res = create_vsymbol (id_fresh x) ty in
   let log_vars = Mstr.add x res lenv.log_vars in
   let log_denv = Typing.add_var x (dty_of_ty ty) lenv.log_denv in
-  (* FIXME? We could add th_mark in create_lenv, but then at/old
-     would be available in preconditions, variants, etc... *)
-  let th = Theory.use_export (get_theory lenv.mod_uc) Mlw_wp.th_mark in
-  create_post res (Typing.type_fmla th log_denv log_vars f)
+  let f = Typing.type_fmla (get_theory lenv.mod_uc) log_denv log_vars f in
+  create_post res f
 
 let create_pre lenv f =
   Typing.type_fmla (get_theory lenv.mod_uc) lenv.log_denv lenv.log_vars f
