@@ -215,7 +215,7 @@ and build_v vars = function
       let vty = build_c (List.fold_left add_arg vars pvl) tyc in
       VTarrow (spec_arrow pvl tyc.c_effect vty)
 
-let create_val_decl id tyv =
+let create_val id tyv =
   let varm = check_v tyv in
   let vars = varmap_join varm vars_empty in
   let name = match build_v vars tyv with

@@ -44,7 +44,7 @@ type deffect = {
 }
 
 type dtype_v =
-  | DSpecV of dity
+  | DSpecV of ghost * dity
   | DSpecA of dbinder list * dtype_c
 
 and dtype_c = {

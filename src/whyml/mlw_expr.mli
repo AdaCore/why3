@@ -114,7 +114,7 @@ type val_decl = private {
   val_vars : varset Mid.t;
 }
 
-val create_val_decl : Ident.preid -> type_v -> val_decl
+val create_val : Ident.preid -> type_v -> val_decl
 
 (** patterns *)
 

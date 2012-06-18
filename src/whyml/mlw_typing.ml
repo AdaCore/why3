@@ -313,13 +313,14 @@ and dpat_app denv ({ de_loc = loc } as de) ppl =
 
 (* specifications *)
 
-let dbinder (id,pty) (denv,bl,tyl) =
-  let dity = match pty with
-    | Some pty -> dity_of_pty ~user:true denv pty
-    | None -> create_type_variable () in
-  add_var id dity denv, (id,false,dity)::bl, dity::tyl
-
-let dbinders denv bl = List.fold_right dbinder bl (denv,[],[])
+let dbinders denv bl =
+  let dbinder (id,pty) (denv,bl,tyl) =
+    let dity = match pty with
+      | Some pty -> dity_of_pty ~user:true denv pty
+      | None -> create_type_variable () in
+    add_var id dity denv, (id,false,dity)::bl, dity::tyl
+  in
+  List.fold_right dbinder bl (denv,[],[])
 
 let deff_of_peff uc pe =
   { deff_reads  = List.map (fun le -> false, le) pe.pe_reads;
@@ -340,7 +341,7 @@ let rec dtype_c denv tyc =
 and dtype_v denv = function
   | Tpure pty ->
       let dity = dity_of_pty ~user:true denv pty in
-      DSpecV dity, dity
+      DSpecV (false,dity), dity
   | Tarrow (bl,tyc) ->
       let denv,bl,tyl = dbinders denv bl in
       let tyc,dity = dtype_c denv tyc in
@@ -554,7 +555,7 @@ and dlambda denv bl var (p, e, (q, xq)) =
 *)
   (bl, var, p, e, q, dxpost denv.uc xq), make_arrow_type tyl e.de_type
 
-(* second stage *)
+(** stage 2 *)
 
 type lenv = {
   mod_uc   : module_uc;
@@ -599,6 +600,41 @@ let add_local x lv lenv = match lv with
         log_denv = Typing.add_var x dty lenv.log_denv }
 
 exception DuplicateException of xsymbol
+
+let binders lenv bl =
+  let binder lenv (id, ghost, dity) =
+    let vtv = vty_value ~ghost (ity_of_dity dity) in
+    let pv = create_pvsymbol (Denv.create_user_id id) vtv in
+    add_local id.id (LetV pv) lenv, pv in
+  Util.map_fold_left binder lenv bl
+
+let xpost lenv xq =
+  let add_exn m (xs,f) =
+    let f = create_post lenv "result" (ty_of_ity xs.xs_ity) f in
+    Mexn.add_new (DuplicateException xs) xs f m in
+  List.fold_left add_exn Mexn.empty xq
+
+let eff_of_deff _lenv _deff = eff_empty (* TODO *)
+
+let rec type_c lenv dtyc =
+  let result = type_v lenv dtyc.dc_result in
+  let ty = match result with
+    | SpecV v -> ty_of_ity v.vtv_ity
+    | SpecA _ -> ty_unit in
+  { c_pre    = create_pre lenv dtyc.dc_pre;
+    c_effect = eff_of_deff lenv dtyc.dc_effect;
+    c_result = result;
+    c_post   = create_post lenv "result" ty dtyc.dc_post;
+    c_xpost  = xpost lenv dtyc.dc_xpost; }
+
+and type_v lenv = function
+  | DSpecV (ghost,v) ->
+      SpecV (vty_value ~ghost (ity_of_dity v))
+  | DSpecA (bl,tyc) ->
+      let lenv, pvl = binders lenv bl in
+      SpecA (pvl, type_c lenv tyc)
+
+(* expressions *)
 
 let rec expr lenv de = match de.de_desc with
   | DElocal x ->
@@ -687,14 +723,8 @@ let rec expr lenv de = match de.de_desc with
       let ld = create_let_defn (Denv.create_user_id x) e_setmark in
       let lenv = add_local x.id ld.let_var lenv in
       e_let ld (expr lenv de1)
-(*
-  | DEany deff ->
-      let aeff = {
-        aeff_reads  = List.map (expr lenv) deff.deff_reads;
-        aeff_writes = List.map (expr lenv) deff.deff_writes;
-        aeff_raises = deff.deff_raises } in
-      e_any aeff (ity_of_dity de.de_type)
-*)
+  | DEany dtyc ->
+      e_any (type_c lenv dtyc)
   | DEghost de1 ->
       e_ghost (expr lenv de1)
   | _ ->
@@ -706,8 +736,7 @@ and expr_rec lenv rdl =
       | VTarrow vta -> vta
       | VTvalue _ -> assert false in
     let ps = create_psymbol (Denv.create_user_id id) vta vars_empty in
-    add_local id.id (LetA ps) lenv, (ps, lam)
-  in
+    add_local id.id (LetA ps) lenv, (ps, lam) in
   let lenv, rdl = Util.map_fold_left step1 lenv rdl in
   let step2 (ps, lam) = ps, expr_lam lenv lam in
   create_rec_defn (List.map step2 rdl)
@@ -717,27 +746,18 @@ and expr_fun lenv x lam =
   create_fun_defn (Denv.create_user_id x) lam
 
 and expr_lam lenv (bl, var, p, e, q, xq) =
-  let binder (id, ghost, dity) =
-    let vtv = vty_value ~ghost (ity_of_dity dity) in
-    create_pvsymbol (Denv.create_user_id id) vtv in
-  let pvl = List.map binder bl in
-  let add_binder pv = add_local pv.pv_vs.vs_name.id_string (LetV pv) in
-  let lenv = List.fold_right add_binder pvl lenv in
+  let lenv, pvl = binders lenv bl in
   let e = expr lenv e in
   let ty = match e.e_vty with
     | VTarrow _ -> ty_unit
     | VTvalue vtv -> ty_of_ity vtv.vtv_ity in
   let mk_variant (t,r) = { v_term = create_pre lenv t; v_rel = r } in
-  let add_exn m (xs,f) =
-    let f = create_post lenv "result" (ty_of_ity xs.xs_ity) f in
-    Mexn.add_new (DuplicateException xs) xs f m in
   { l_args = pvl;
     l_variant = List.map mk_variant var;
     l_pre = create_pre lenv p;
     l_expr = e;
     l_post = create_post lenv "result" ty q;
-    l_xpost = List.fold_left add_exn Mexn.empty xq;
-  }
+    l_xpost = xpost lenv xq; }
 
 (** Type declaration *)
 
@@ -1224,8 +1244,12 @@ let add_module lib path mm mt m =
         let xs = create_xsymbol (Denv.create_user_id id) ity in
         let pd = create_exn_decl xs in
         Loc.try2 loc add_pdecl_with_tuples uc pd
-    | Dparam _ ->
-        assert false (*TODO*)
+    | Dparam (id, tyv) ->
+        let tyv, _ = dtype_v (create_denv uc) tyv in
+        let tyv = type_v (create_lenv uc) tyv in
+        let vd = create_val (Denv.create_user_id id) tyv in
+        let pd = create_val_decl vd in
+        Loc.try2 loc add_pdecl_with_tuples uc pd
     | Duse _ ->
         assert false (*TO BE REMOVED EVENTUALLY *)
   in

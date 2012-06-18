@@ -29,6 +29,15 @@ module N
 
   let create_dref i = {| dcontents = {| contents = i |} |}
 
+  let foo (x : ref int) (y : ref int) =
+    x.contents <- 1;
+    y.contents <- 2
+
+  val gr : ref int
+
+  let test () =
+    foo gr {| contents = 5 |}
+
   let myfun r = { r = r }
   'L:
     let rec on_tree t = { true } match t with
