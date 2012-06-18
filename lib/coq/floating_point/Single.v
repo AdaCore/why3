@@ -188,7 +188,8 @@ Definition gt(x:floating_point.SingleFormat.single)
   (y:floating_point.SingleFormat.single): Prop := ((value y) < (value x))%R.
 
 
-(* Unused content named single
+(* (* Unused content named single
 exact (t 24 128).
 Defined.
  *)
+*)

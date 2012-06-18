@@ -540,9 +540,7 @@ theory SingleFull
 
   use export SingleFormat
 
-  constant max_single : real = 0x1.FFFFFEp127
   constant min_single : real = 0x1p-149
-  constant max_int : int = 16777216 (* 2^24 *)
 
   clone export GenFloatSpecFull with
     type t = single,
@@ -557,9 +555,7 @@ theory DoubleFull
 
   use export DoubleFormat
 
-  constant max_double : real = 0x1.FFFFFFFFFFFFFp1023
   constant min_double : real = 0x1p-1074
-  constant max_int : int = 9007199254740992 (* 2^53 *)
 
   clone export GenFloatSpecFull with
     type t = double,

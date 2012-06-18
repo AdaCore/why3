@@ -180,7 +180,8 @@ Definition gt(x:floating_point.DoubleFormat.double)
   (y:floating_point.DoubleFormat.double): Prop := ((value y) < (value x))%R.
 
 
-(* Unused content named double
+(* (* Unused content named double
 exact (t 53 1024).
 Defined.
  *)
+*)
