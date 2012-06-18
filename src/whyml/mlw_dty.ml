@@ -249,72 +249,70 @@ let specialize_scheme tvs dity =
 
 (* Specialization of symbols *)
 
-let rec dity_of_ity ~user htv hreg ity = match ity.ity_node with
+let rec dity_of_ity htv hreg vars ity = match ity.ity_node with
   | Ityvar tv ->
-      assert (not user);
+      assert (not (Stv.mem tv vars.vars_tv));
       begin try Htv.find htv tv with Not_found ->
         let dtv = create_type_variable () in
         Htv.add htv tv dtv;
         dtv
       end
   | Itypur (ts, ityl) ->
-      ts_app_real ts (List.map (dity_of_ity ~user htv hreg) ityl)
+      ts_app_real ts (List.map (dity_of_ity htv hreg vars) ityl)
   | Ityapp (its, ityl, rl) ->
-      its_app_real its (List.map (dity_of_ity ~user htv hreg) ityl)
-        (List.map (dreg_of_reg ~user htv hreg) rl)
+      its_app_real its (List.map (dity_of_ity htv hreg vars) ityl)
+        (List.map (dreg_of_reg htv hreg vars) rl)
 
-and dreg_of_reg ~user htv hreg r =
+and dreg_of_reg htv hreg vars r =
   try Hreg.find hreg r with Not_found ->
-  let dreg = create_dreg ~user (dity_of_ity ~user htv hreg r.reg_ity) in
+  let dity = dity_of_ity htv hreg vars r.reg_ity in
+  let dreg = if reg_occurs r vars then Rreg (r,dity)
+    else create_dreg ~user:false dity in
   Hreg.add hreg r dreg;
   dreg
 
-let dity_of_vtv ~user htv hreg v = dity_of_ity ~user htv hreg v.vtv_ity
+let dity_of_vtv htv hreg vars v = dity_of_ity htv hreg vars v.vtv_ity
 
-let specialize_vtvalue ~user vtv =
-  let htv = Htv.create 17 in
-  let hreg = Hreg.create 17 in
-  dity_of_vtv ~user htv hreg vtv
+let specialize_vtvalue vtv =
+  let htv = Htv.create 3 and hreg = Hreg.create 3 in
+  dity_of_vtv htv hreg vtv.vtv_ity.ity_vars vtv
 
 let specialize_pvsymbol pv =
-  specialize_vtvalue ~user:true pv.pv_vtv
+  specialize_vtvalue pv.pv_vtv
 
 let specialize_xsymbol xs =
-  specialize_vtvalue ~user:true (vty_value xs.xs_ity)
+  specialize_vtvalue (vty_value xs.xs_ity)
 
 let make_arrow_type tyl ty =
   let arrow ty1 ty2 = ts_app_real ts_arrow [ty1;ty2] in
   List.fold_right arrow tyl ty
 
-let specialize_vtarrow vta =
-  let htv = Htv.create 17 in
-  let hreg = Hreg.create 17 in
+let specialize_vtarrow vars vta =
+  let htv = Htv.create 3 and hreg = Hreg.create 3 in
+  let conv vtv = dity_of_vtv htv hreg vars vtv in
   let rec specialize a =
-    let arg = dity_of_vtv ~user:false htv hreg a.vta_arg in
+    let arg = conv a.vta_arg in
     let res = match a.vta_result with
-      | VTvalue v -> dity_of_vtv ~user:false htv hreg v
-      | VTarrow a1 -> specialize a1
+      | VTvalue v -> conv v
+      | VTarrow a -> specialize a
     in
     make_arrow_type [arg] res
   in
   specialize vta
 
-let specialize_psymbol ps = specialize_vtarrow ps.ps_vta
+let specialize_psymbol ps =
+  specialize_vtarrow ps.ps_vars ps.ps_vta
 
 let specialize_plsymbol pls =
-  let htv = Htv.create 17 in
-  let hreg = Hreg.create 17 in
-  let args = List.map (dity_of_vtv ~user:false htv hreg) pls.pl_args in
-  make_arrow_type args (dity_of_vtv ~user:false htv hreg pls.pl_value)
+  let htv = Htv.create 3 and hreg = Hreg.create 3 in
+  let conv vtv = dity_of_vtv htv hreg vars_empty vtv in
+  make_arrow_type (List.map conv pls.pl_args) (conv pls.pl_value)
 
-let dity_of_ty ~user htv hreg ty = dity_of_ity ~user htv hreg (ity_of_ty ty)
+let dity_of_ty htv hreg vars ty =
+  dity_of_ity htv hreg vars (ity_of_ty ty)
 
 let specialize_lsymbol ls =
-  let htv = Htv.create 17 in
-  let hreg = Hreg.create 17 in
-  let ty = match ls.ls_value with
-    | None -> dity_of_ity ~user:false htv hreg ity_bool
-    | Some ty -> dity_of_ty ~user:false htv hreg ty
-  in
-  let args = List.map (dity_of_ty ~user:false htv hreg) ls.ls_args in
-  make_arrow_type args ty
+  let htv = Htv.create 3 and hreg = Hreg.create 3 in
+  let conv ty = dity_of_ty htv hreg vars_empty ty in
+  let ty = Util.def_option ty_bool ls.ls_value in
+  make_arrow_type (List.map conv ls.ls_args) (conv ty)

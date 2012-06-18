@@ -36,7 +36,7 @@ module N
   val gr : ref int
 
   let test () =
-    foo gr {| contents = 5 |}
+    foo gr gr
 
   let myfun r = { r = r }
   'L:
