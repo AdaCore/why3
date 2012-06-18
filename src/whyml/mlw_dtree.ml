@@ -29,10 +29,7 @@ open Mlw_module
 open Mlw_dty
 
 type loc = Loc.position
-
 type ident = Ptree.ident
-
-(* user type_v *)
 
 type ghost = bool
 type dpre = Ptree.pre
@@ -40,27 +37,33 @@ type dpost = Ptree.pre
 type dxpost = (xsymbol * dpost) list
 type dbinder = ident * ghost * dity
 
-(**
-type dutype_v =
-  | DUTpure  of Denv.dty
-  | DUTarrow of dbinder list * dutype_c
+type deffect = {
+  deff_reads  : (ghost * Ptree.lexpr) list;
+  deff_writes : (ghost * Ptree.lexpr) list;
+  deff_raises : (ghost * xsymbol) list;
+}
 
-and dutype_c =
-  { duc_result_type : dutype_v;
-    duc_effect      : deffect;
-    duc_pre         : Ptree.lexpr;
-    duc_post        : Ptree.lexpr * (Term.lsymbol * Ptree.lexpr) list; }
-**)
+type dtype_v =
+  | DSpecV of dity
+  | DSpecA of dbinder list * dtype_c
+
+and dtype_c = {
+  dc_result : dtype_v;
+  dc_effect : deffect;
+  dc_pre    : dpre;
+  dc_post   : dpost;
+  dc_xpost  : dxpost;
+}
 
 type dvariant = Ptree.lexpr * Term.lsymbol option
 
 type dinvariant = Ptree.lexpr option
 
 type dexpr = {
-  dexpr_desc : dexpr_desc;
-  dexpr_type : dity;
-  dexpr_lab  : Ident.label list;
-  dexpr_loc  : loc;
+  de_desc : dexpr_desc;
+  de_type : dity;
+  de_lab  : Ident.label list;
+  de_loc  : loc;
 }
 
 and dexpr_desc =
@@ -87,18 +90,8 @@ and dexpr_desc =
   | DEassert of Ptree.assertion_kind * Ptree.lexpr
   | DEmark of ident * dexpr
   | DEghost of dexpr
-(*
-  | DEany of deffect
-*)
+  | DEany of dtype_c
 
 and drecfun = ident * dity * dlambda
 
 and dlambda = dbinder list * dvariant list * dpre * dexpr * dpost * dxpost
-
-(*
-and deffect = {
-  deff_reads  : dexpr list;
-  deff_writes : dexpr list;
-  deff_raises : (ghost * xsymbol) list;
-}
-*)

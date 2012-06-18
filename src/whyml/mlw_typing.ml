@@ -56,9 +56,8 @@ exception UnboundSymbol of string list
 let error = Loc.error
 let errorm = Loc.errorm
 
-let rec print_qualid fmt = function
-  | Qident s -> Format.fprintf fmt "%s" s.id
-  | Qdot (m, s) -> Format.fprintf fmt "%a.%s" print_qualid m s.id
+let qloc = Typing.qloc
+let print_qualid = Typing.print_qualid
 
 let () = Exn_printer.register (fun fmt e -> match e with
   | DuplicateTypeVar s ->
@@ -121,8 +120,7 @@ let rec dity_of_pty ~user denv = function
           let ts = ns_find_ts (Theory.get_namespace (get_theory denv.uc)) x in
           ts_app ts dl
         with Not_found ->
-          let loc = Typing.qloc p in
-          errorm ~loc "unbound symbol %a" Typing.print_qualid p
+          errorm ~loc:(qloc p) "unbound symbol %a" print_qualid p
       end
   | Ptree.PPTtuple pl ->
       ts_app (ts_tuple (List.length pl)) (List.map (dity_of_pty ~user denv) pl)
@@ -136,7 +134,7 @@ let dity_unit = ts_app ts_unit []
 let dity_mark = ts_app ts_mark []
 
 let expected_type ?(weak=false) e dity =
-  unify ~weak e.dexpr_type dity
+  unify ~weak e.de_type dity
 
 let rec extract_labels labs loc e = match e.Ptree.expr_desc with
   | Ptree.Enamed (Ptree.Lstr s, e) -> extract_labels (s :: labs) loc e
@@ -170,52 +168,52 @@ let parse_record uc fll =
   in
   cs,pjl,flm
 
-let find_field ~loc uc (p,e) =
+let find_field uc (p,e) =
   let x = Typing.string_list_of_qualid [] p in
   try match ns_find_ps (get_namespace uc) x with
     | PL pl -> (pl,e)
-    | _ -> errorm ~loc "bad record field %a" Typing.print_qualid p
-  with Not_found -> errorm ~loc "unbound symbol %a" Typing.print_qualid p
+    | _ -> errorm ~loc:(qloc p) "bad record field %a" print_qualid p
+  with Not_found -> errorm ~loc:(qloc p) "unbound symbol %a" print_qualid p
 
-let find_pure_field ~loc uc (p,e) =
+let find_pure_field uc (p,e) =
   let x = Typing.string_list_of_qualid [] p in
   try ns_find_ls (Theory.get_namespace (get_theory uc)) x, e
-  with Not_found -> errorm ~loc "unbound symbol %a" Typing.print_qualid p
+  with Not_found -> errorm ~loc:(qloc p) "unbound symbol %a" print_qualid p
 
-let pure_record ~loc uc = function
-  | [] -> error ~loc Decl.EmptyRecord
+let pure_record uc = function
+  | [] -> raise Decl.EmptyRecord
   | (p,_)::_ ->
       let x = Typing.string_list_of_qualid [] p in
       begin try ignore (ns_find_ps (get_namespace uc) x); false
       with Not_found -> true end
 
 let hidden_pl ~loc pl =
-  { dexpr_desc = DEglobal_pl pl;
-    dexpr_type = specialize_plsymbol pl;
-    dexpr_loc  = loc; dexpr_lab = [] }
+  { de_desc = DEglobal_pl pl;
+    de_type = specialize_plsymbol pl;
+    de_loc  = loc; de_lab = [] }
 
 let hidden_ls ~loc ls =
-  { dexpr_desc = DEglobal_ls ls;
-    dexpr_type = specialize_lsymbol ls;
-    dexpr_loc  = loc; dexpr_lab = [] }
+  { de_desc = DEglobal_ls ls;
+    de_type = specialize_lsymbol ls;
+    de_loc  = loc; de_lab = [] }
 
 (* helper functions for let-expansion *)
-let test_var e = match e.dexpr_desc with
+let test_var e = match e.de_desc with
   | DElocal _ | DEglobal_pv _ -> true
   | _ -> false
 
 let mk_var e =
   if test_var e then e else
-  { dexpr_desc = DElocal "q";
-    dexpr_type = e.dexpr_type;
-    dexpr_loc  = e.dexpr_loc;
-    dexpr_lab  = [] }
+  { de_desc = DElocal "q";
+    de_type = e.de_type;
+    de_loc  = e.de_loc;
+    de_lab  = [] }
 
 let mk_id s loc =
   { id = s; id_loc = loc; id_lab = [] }
 
 let mk_dexpr desc dity loc labs =
-  { dexpr_desc = desc; dexpr_type = dity; dexpr_loc = loc; dexpr_lab = labs }
+  { de_desc = desc; de_type = dity; de_loc = loc; de_lab = labs }
 
 let mk_let ~loc ~uloc e (desc,dity) =
   if test_var e then desc, dity else
@@ -230,37 +228,39 @@ let add_var id dity denv =
   let locals = Mstr.add id.id (tvars,dity) denv.locals in
   { denv with locals = locals; tvars = tvars }
 
-let specialize_qualid ~loc uc p =
+let specialize_qualid uc p =
   let x = Typing.string_list_of_qualid [] p in
   try match ns_find_ps (get_namespace uc) x with
     | PV pv -> DEglobal_pv pv, specialize_pvsymbol pv
     | PS ps -> DEglobal_ps ps, specialize_psymbol  ps
     | PL pl -> DEglobal_pl pl, specialize_plsymbol pl
-    | PX xs -> errorm ~loc "unexpected exception symbol %a" print_xs xs
+    | PX xs ->
+        errorm ~loc:(qloc p) "unexpected exception symbol %a" print_xs xs
   with Not_found -> try
     let ls = ns_find_ls (Theory.get_namespace (get_theory uc)) x in
     DEglobal_ls ls, specialize_lsymbol ls
   with Not_found ->
-    errorm ~loc "unbound symbol %a" Typing.print_qualid p
+    errorm ~loc:(qloc p) "unbound symbol %a" print_qualid p
 
-let find_xsymbol ~loc uc p =
+let find_xsymbol uc p =
   let x = Typing.string_list_of_qualid [] p in
   try match ns_find_ps (get_namespace uc) x with
     | PX xs -> xs
-    | _ -> errorm ~loc "exception symbol expected"
+    | _ -> errorm ~loc:(qloc p) "exception symbol expected"
   with Not_found ->
-    errorm ~loc "unbound symbol %a" Typing.print_qualid p
+    errorm ~loc:(qloc p) "unbound symbol %a" print_qualid p
 
-let find_variant_ls ~loc uc p =
+let find_variant_ls uc p =
   let x = Typing.string_list_of_qualid [] p in
   try match ns_find_ps (get_namespace uc) x with
-    | _ -> errorm ~loc "%a is not a binary relation" Typing.print_qualid p
+    | _ -> errorm ~loc:(qloc p) "%a is not a binary relation" print_qualid p
   with Not_found -> try
     match ns_find_ls (Theory.get_namespace (get_theory uc)) x with
       | { ls_args = [u;v]; ls_value = None } as ls when ty_equal u v -> ls
-      | ls -> errorm ~loc "%a is not a binary relation" Pretty.print_ls ls
+      | ls ->
+          errorm ~loc:(qloc p) "%a is not a binary relation" Pretty.print_ls ls
   with Not_found ->
-    errorm ~loc "unbound symbol %a" Typing.print_qualid p
+    errorm ~loc:(qloc p) "unbound symbol %a" print_qualid p
 
 let rec dpattern denv ({ pat_loc = loc } as pp) = match pp.pat_desc with
   | Ptree.PPpwild ->
@@ -269,17 +269,17 @@ let rec dpattern denv ({ pat_loc = loc } as pp) = match pp.pat_desc with
       let dity = create_type_variable () in
       PPvar (Denv.create_user_id id), dity, add_var id dity denv
   | Ptree.PPpapp (q,ppl) ->
-      let sym, dity = specialize_qualid ~loc denv.uc q in
+      let sym, dity = specialize_qualid denv.uc q in
       dpat_app denv (mk_dexpr sym dity loc []) ppl
-  | Ptree.PPprec fl when pure_record ~loc denv.uc fl ->
+  | Ptree.PPprec fl when pure_record denv.uc fl ->
       let kn = Theory.get_known (get_theory denv.uc) in
-      let fl = List.map (find_pure_field ~loc denv.uc) fl in
+      let fl = List.map (find_pure_field denv.uc) fl in
       let cs,pjl,flm = Loc.try2 loc Decl.parse_record kn fl in
       let wild = { pat_desc = Ptree.PPpwild; pat_loc = loc } in
       let get_val pj = Mls.find_def wild pj flm in
       dpat_app denv (hidden_ls ~loc cs) (List.map get_val pjl)
   | Ptree.PPprec fl ->
-      let fl = List.map (find_field ~loc denv.uc) fl in
+      let fl = List.map (find_field denv.uc) fl in
       let cs,pjl,flm = Loc.try2 loc parse_record denv.uc fl in
       let wild = { pat_desc = Ptree.PPpwild; pat_loc = loc } in
       let get_val pj = Mls.find_def wild pj.pl_ls flm in
@@ -296,11 +296,11 @@ let rec dpattern denv ({ pat_loc = loc } as pp) = match pp.pat_desc with
       let pp, dity, denv = dpattern denv pp in
       PPas (pp, Denv.create_user_id id), dity, add_var id dity denv
 
-and dpat_app denv ({ dexpr_loc = loc } as de) ppl =
+and dpat_app denv ({ de_loc = loc } as de) ppl =
   let add_pp pp (ppl, tyl, denv) =
     let pp,ty,denv = dpattern denv pp in pp::ppl,ty::tyl,denv in
   let ppl, tyl, denv = List.fold_right add_pp ppl ([],[],denv) in
-  let pp = match de.dexpr_desc with
+  let pp = match de.de_desc with
     | DEglobal_pl pl -> Mlw_expr.PPpapp (pl, ppl)
     | DEglobal_ls ls -> PPlapp (ls, ppl)
     | DEglobal_pv pv -> errorm ~loc "%a is not a constructor" print_pv pv
@@ -308,22 +308,51 @@ and dpat_app denv ({ dexpr_loc = loc } as de) ppl =
     | _ -> assert false
   in
   let res = create_type_variable () in
-  Loc.try2 loc unify de.dexpr_type (make_arrow_type tyl res);
+  Loc.try2 loc unify de.de_type (make_arrow_type tyl res);
   pp, res, denv
 
-(*
-let deff_of_peff ~loc denv pe =
-  { deff_reads  = pe.pe_reads;
-    deff_writes = pe.pe_writes;
-    deff_raises =
-      List.map (fun q -> false, find_xsymbol ~loc denv.uc q) pe.pe_raises; }
-*)
+(* specifications *)
 
-let dexpr_unit ~loc = hidden_ls ~loc (fs_tuple 0)
+let dbinder (id,pty) (denv,bl,tyl) =
+  let dity = match pty with
+    | Some pty -> dity_of_pty ~user:true denv pty
+    | None -> create_type_variable () in
+  add_var id dity denv, (id,false,dity)::bl, dity::tyl
 
-let dexpr_app e el =
+let dbinders denv bl = List.fold_right dbinder bl (denv,[],[])
+
+let deff_of_peff uc pe =
+  { deff_reads  = List.map (fun le -> false, le) pe.pe_reads;
+    deff_writes = List.map (fun le -> false, le) pe.pe_writes;
+    deff_raises = List.map (fun q -> false, find_xsymbol uc q) pe.pe_raises; }
+
+let dxpost uc ql = List.map (fun (q,f) -> find_xsymbol uc q, f) ql
+
+let rec dtype_c denv tyc =
+  let tyv, dity = dtype_v denv tyc.pc_result_type in
+  { dc_result = tyv;
+    dc_effect = deff_of_peff denv.uc tyc.pc_effect;
+    dc_pre    = tyc.pc_pre;
+    dc_post   = fst tyc.pc_post;
+    dc_xpost  = dxpost denv.uc (snd tyc.pc_post); },
+  dity
+
+and dtype_v denv = function
+  | Tpure pty ->
+      let dity = dity_of_pty ~user:true denv pty in
+      DSpecV dity, dity
+  | Tarrow (bl,tyc) ->
+      let denv,bl,tyl = dbinders denv bl in
+      let tyc,dity = dtype_c denv tyc in
+      DSpecA (bl,tyc), make_arrow_type tyl dity
+
+(* expressions *)
+
+let de_unit ~loc = hidden_ls ~loc (fs_tuple 0)
+
+let de_app e el =
   let res = create_type_variable () in
-  let tyl = List.map (fun a -> a.dexpr_type) el in
+  let tyl = List.map (fun a -> a.de_type) el in
   expected_type e (make_arrow_type tyl res);
   DEapply (e, el), res
 
@@ -331,110 +360,110 @@ let rec dexpr denv e =
   let loc = e.Ptree.expr_loc in
   let labs, uloc, d = extract_labels [] denv.uloc e in
   let denv = { denv with uloc = uloc } in
-  let d, ty = dexpr_desc denv loc d in
+  let d, ty = de_desc denv loc d in
   let loc = def_option loc uloc in
   mk_dexpr d ty loc labs
 
-and dexpr_desc denv loc = function
+and de_desc denv loc = function
   | Ptree.Eident (Qident {id=x}) when Mstr.mem x denv.locals ->
       (* local variable *)
       let tvs, dity = Mstr.find x denv.locals in
       let dity = specialize_scheme tvs dity in
       DElocal x, dity
   | Ptree.Eident p ->
-      specialize_qualid ~loc denv.uc p
+      specialize_qualid denv.uc p
   | Ptree.Eapply (e1, e2) ->
       let e, el = decompose_app [e2] e1 in
       let el = List.map (dexpr denv) el in
-      dexpr_app (dexpr denv e) el
+      de_app (dexpr denv e) el
   | Ptree.Elet (id, e1, e2) ->
       let e1 = dexpr denv e1 in
-      let dity = e1.dexpr_type in
-      let tvars = match e1.dexpr_desc with
+      let dity = e1.de_type in
+      let tvars = match e1.de_desc with
         | DEfun _ -> denv.tvars
         | _ -> add_tvars denv.tvars dity in
       let locals = Mstr.add id.id (tvars, dity) denv.locals in
       let denv = { denv with locals = locals; tvars = tvars } in
       let e2 = dexpr denv e2 in
-      DElet (id, e1, e2), e2.dexpr_type
+      DElet (id, e1, e2), e2.de_type
   | Ptree.Eletrec (rdl, e1) ->
       let rdl = dletrec denv rdl in
       let add_one denv ({ id = id }, dity, _) =
         { denv with locals = Mstr.add id (denv.tvars, dity) denv.locals } in
       let denv = List.fold_left add_one denv rdl in
       let e1 = dexpr denv e1 in
-      DEletrec (rdl, e1), e1.dexpr_type
+      DEletrec (rdl, e1), e1.de_type
   | Ptree.Efun (bl, tr) ->
-      let lam, dity = dlambda ~loc denv bl None tr in
+      let lam, dity = dlambda denv bl None tr in
       DEfun lam, dity
   | Ptree.Ecast (e1, pty) ->
       let e1 = dexpr denv e1 in
       expected_type e1 (dity_of_pty ~user:false denv pty);
-      e1.dexpr_desc, e1.dexpr_type
+      e1.de_desc, e1.de_type
   | Ptree.Enamed _ ->
       assert false
   | Ptree.Esequence (e1, e2) ->
       let e1 = dexpr denv e1 in
       expected_type e1 dity_unit;
       let e2 = dexpr denv e2 in
-      DElet (mk_id "_" loc, e1, e2), e2.dexpr_type
+      DElet (mk_id "_" loc, e1, e2), e2.de_type
   | Ptree.Eif (e1, e2, e3) ->
       let e1 = dexpr denv e1 in
       expected_type e1 dity_bool;
       let e2 = dexpr denv e2 in
       let e3 = dexpr denv e3 in
-      expected_type e3 e2.dexpr_type;
-      DEif (e1, e2, e3), e2.dexpr_type
+      expected_type e3 e2.de_type;
+      DEif (e1, e2, e3), e2.de_type
   | Ptree.Etuple el ->
       let ls = fs_tuple (List.length el) in
       let el = List.map (dexpr denv) el in
-      dexpr_app (hidden_ls ~loc ls) el
-  | Ptree.Erecord fl when pure_record ~loc denv.uc fl ->
+      de_app (hidden_ls ~loc ls) el
+  | Ptree.Erecord fl when pure_record denv.uc fl ->
       let kn = Theory.get_known (get_theory denv.uc) in
-      let fl = List.map (find_pure_field ~loc denv.uc) fl in
+      let fl = List.map (find_pure_field denv.uc) fl in
       let cs,pjl,flm = Loc.try2 loc Decl.parse_record kn fl in
       let get_val pj = match Mls.find_opt pj flm with
         | Some e -> dexpr denv e
         | None -> error ~loc (Decl.RecordFieldMissing (cs,pj)) in
-      dexpr_app (hidden_ls ~loc cs) (List.map get_val pjl)
+      de_app (hidden_ls ~loc cs) (List.map get_val pjl)
   | Ptree.Erecord fl ->
-      let fl = List.map (find_field ~loc denv.uc) fl in
+      let fl = List.map (find_field denv.uc) fl in
       let cs,pjl,flm = Loc.try2 loc parse_record denv.uc fl in
       let get_val pj = match Mls.find_opt pj.pl_ls flm with
         | Some e -> dexpr denv e
         | None -> error ~loc (Decl.RecordFieldMissing (cs.pl_ls,pj.pl_ls)) in
-      dexpr_app (hidden_pl ~loc cs) (List.map get_val pjl)
-  | Ptree.Eupdate (e1, fl) when pure_record ~loc denv.uc fl ->
+      de_app (hidden_pl ~loc cs) (List.map get_val pjl)
+  | Ptree.Eupdate (e1, fl) when pure_record denv.uc fl ->
       let e1 = dexpr denv e1 in
       let e0 = mk_var e1 in
       let kn = Theory.get_known (get_theory denv.uc) in
-      let fl = List.map (find_pure_field ~loc denv.uc) fl in
+      let fl = List.map (find_pure_field denv.uc) fl in
       let cs,pjl,flm = Loc.try2 loc Decl.parse_record kn fl in
       let get_val pj = match Mls.find_opt pj flm with
         | Some e -> dexpr denv e
         | None ->
-            let d, dity = dexpr_app (hidden_ls ~loc pj) [e0] in
+            let d, dity = de_app (hidden_ls ~loc pj) [e0] in
             mk_dexpr d dity loc [] in
-      let res = dexpr_app (hidden_ls ~loc cs) (List.map get_val pjl) in
+      let res = de_app (hidden_ls ~loc cs) (List.map get_val pjl) in
       mk_let ~loc ~uloc:denv.uloc e1 res
   | Ptree.Eupdate (e1, fl) ->
       let e1 = dexpr denv e1 in
       let e0 = mk_var e1 in
-      let fl = List.map (find_field ~loc denv.uc) fl in
+      let fl = List.map (find_field denv.uc) fl in
       let cs,pjl,flm = Loc.try2 loc parse_record denv.uc fl in
       let get_val pj = match Mls.find_opt pj.pl_ls flm with
         | Some e -> dexpr denv e
         | None ->
-            let d, dity = dexpr_app (hidden_pl ~loc pj) [e0] in
+            let d, dity = de_app (hidden_pl ~loc pj) [e0] in
             mk_dexpr d dity loc [] in
-      let res = dexpr_app (hidden_pl ~loc cs) (List.map get_val pjl) in
+      let res = de_app (hidden_pl ~loc cs) (List.map get_val pjl) in
       mk_let ~loc ~uloc:denv.uloc e1 res
   | Ptree.Eassign (e1, q, e2) ->
       let fl = { expr_desc = Eident q; expr_loc = loc } in
       let e1 = { expr_desc = Eapply (fl,e1); expr_loc = loc } in
       let e1 = dexpr denv e1 in
       let e2 = dexpr denv e2 in
-      expected_type ~weak:true e2 e1.dexpr_type;
+      expected_type ~weak:true e2 e1.de_type;
       DEassign (e1, e2), dity_unit
   | Ptree.Econstant (ConstInt _ as c) ->
       DEconstant c, dity_int
@@ -456,24 +485,24 @@ and dexpr_desc denv loc = function
       let branch (pp,e) =
         let ppat, dity, denv = dpattern denv pp in
         let e = dexpr denv e in
-        Loc.try2 pp.pat_loc unify dity e1.dexpr_type;
+        Loc.try2 pp.pat_loc unify dity e1.de_type;
         expected_type e res;
         ppat, e in
       DEmatch (e1, List.map branch bl), res
   | Ptree.Eraise (q, e1) ->
       let res = create_type_variable () in
-      let xs = find_xsymbol ~loc denv.uc q in
+      let xs = find_xsymbol denv.uc q in
       let dity = specialize_xsymbol xs in
       let e1 = match e1 with
         | Some e1 -> dexpr denv e1
-        | None when ity_equal xs.xs_ity ity_unit -> dexpr_unit ~loc
+        | None when ity_equal xs.xs_ity ity_unit -> de_unit ~loc
         | _ -> errorm ~loc "exception argument expected" in
       expected_type e1 dity;
       DEraise (xs, e1), res
   | Ptree.Etry (e1, cl) ->
       let e1 = dexpr denv e1 in
       let branch (q, id, e) =
-        let xs = find_xsymbol ~loc denv.uc q in
+        let xs = find_xsymbol denv.uc q in
         let dity = specialize_xsymbol xs in
         let id, denv = match id with
           | Some id -> id, add_var id dity denv
@@ -481,39 +510,17 @@ and dexpr_desc denv loc = function
         xs, id, dexpr denv e
       in
       let cl = List.map branch cl in
-      DEtry (e1, cl), e1.dexpr_type
+      DEtry (e1, cl), e1.de_type
   | Ptree.Eabsurd ->
       DEabsurd, create_type_variable ()
   | Ptree.Eassert (ak, lexpr) ->
       DEassert (ak, lexpr), dity_unit
   | Ptree.Emark (id, e1) ->
       let e1 = dexpr denv e1 in
-      DEmark (id, e1), e1.dexpr_type
-  | Ptree.Eany _ ->
-      errorm ~loc "\"any\" expressions are not supported"
-(*
-  | Ptree.Eany { pc_result_type = Tpure pty;
-                 pc_effect      = pe;
-                 pc_pre         = { pp_desc = PPtrue };
-                 pc_post        = { pp_desc = PPtrue },[]; } ->
-      let dity = dity_of_pty ~user:true denv pty in
-      DEany (deff_of_peff pe), dity
-  | Ptree.Eany { pc_result_type = Tarrow (bl,tyc);
-                 pc_effect      = pe;
-                 pc_pre         = { pp_desc = PPtrue };
-                 pc_post        = { pp_desc = PPtrue },[]; } ->
-      let e1 = mk_dexpr (DEany (deff_of_peff pe)) dity_unit loc [] in
-      let e2 = { pp_desc = Ptree.Eany tyc; pp_loc = loc } in
-      let d2 = Ptree.Efun (bl,(tyc.pc_pre,e2,tyc.pc_post)) in
-      let e2 = dexpr denv { pp_desc = d2; pp_loc = loc } in
-      DElet (mk_id "_" loc, e1, e2), e2.dexpr_type
+      DEmark (id, e1), e1.de_type
   | Ptree.Eany tyc ->
-      let bl = [mk_id "_" loc, None] in
-      let e = dtype_v tyc.pc_effect tyc.pc_result_type in
-      let lam,dity = dlambda ~loc denv bl None (tyc.pc_pre, e, tyc.pc_post) in
-      let fn = mk_dexpr (DEfun lam) dity loc [] in
-      dexpr_app fn [dexpr_unit ~loc]
-*)
+      let tyc, dity = dtype_c denv tyc in
+      DEany tyc, dity
   | Ptree.Eloop (_ann, _e1) ->
       assert false (*TODO*)
   | Ptree.Efor (_id, _e1, _dir, _e2, _lexpr_opt, _e3) ->
@@ -529,45 +536,25 @@ and dletrec denv rdl =
   let denv, rdl = Util.map_fold_left add_one denv rdl in
   (* then type-check all of them and unify *)
   let type_one (id, res, bl, var, tr) =
-    let lam, dity = dlambda ~loc:id.id_loc denv bl var tr in
+    let lam, dity = dlambda denv bl var tr in
     Loc.try2 id.id_loc unify dity res;
     id, dity, lam in
   List.map type_one rdl
 
-and dlambda ~loc denv bl var (p, e, (q, xq)) =
-  let dbinder denv (id, pty) =
-    let dity = match pty with
-      | Some pty -> dity_of_pty ~user:true denv pty
-      | None -> create_type_variable () in
-    add_var id dity denv, (id, false, dity) in
-  let denv, bl = Util.map_fold_left dbinder denv bl in
-  let tyl = List.map (fun (_,_,d) -> d) bl in
+and dlambda denv bl var (p, e, (q, xq)) =
+  let denv,bl,tyl = dbinders denv bl in
   let e = dexpr denv e in
   let var = match var with
-    | Some (le, Some q) -> [le, Some (find_variant_ls ~loc denv.uc q)]
+    | Some (le, Some q) -> [le, Some (find_variant_ls denv.uc q)]
     | Some (le, None) -> [le, None]
     | None -> [] in
 (* TODO: accept a list of variants in the surface language
   let var = List.map (fun (le,q) ->
-    le, Util.option_map (find_variant_ls ~loc denv.uc) q) var in
+    le, Util.option_map (find_variant_ls denv.uc) q) var in
 *)
-  let xq = List.map
-    (fun (q,f) -> find_xsymbol ~loc:f.pp_loc denv.uc q, f) xq in
-  (bl, var, p, e, q, xq), make_arrow_type tyl e.dexpr_type
+  (bl, var, p, e, q, dxpost denv.uc xq), make_arrow_type tyl e.de_type
 
-(*
-and dtype_v ~loc denv = function
-  | Ptree.Tpure pty ->
-      let dity = dity_of_pty ~user:true denv pty in
-      let deff = { deff_reads = []; deff_writes = []; deff_raises = [] } in
-      DEany deff, dity
-  | Ptree.Tarrow (bl, tyc) ->
-      let pptrue = { pp_desc = PPtrue ; pp_loc = loc } in
-      let d = Ptree.Eany { tyc with pc_pre = pptrue; pc_post = pptrue,[] } in
-      let tr = tyc.pc_pre, { expr_desc = d; expr_loc = loc }, tyc.pc_post in
-      let lam, dity = dlambda ~loc denv bl None tr in
-      DEfun lam, dity
-*)
+(* second stage *)
 
 type lenv = {
   mod_uc   : module_uc;
@@ -613,20 +600,20 @@ let add_local x lv lenv = match lv with
 
 exception DuplicateException of xsymbol
 
-let rec expr lenv de = match de.dexpr_desc with
+let rec expr lenv de = match de.de_desc with
   | DElocal x ->
       assert (Mstr.mem x lenv.let_vars);
       begin match Mstr.find x lenv.let_vars with
       | LetV pv -> e_value pv
-      | LetA ps -> e_cast ps (vty_of_dity de.dexpr_type)
+      | LetA ps -> e_cast ps (vty_of_dity de.de_type)
       end
-  | DElet (x, { dexpr_desc = DEfun lam }, de2) ->
+  | DElet (x, { de_desc = DEfun lam }, de2) ->
       let def = expr_fun lenv x lam in
       let lenv = add_local x.id (LetA def.rec_ps) lenv in
       let e2 = expr lenv de2 in
       e_rec [def] e2
   | DEfun lam ->
-      let x = mk_id "fn" de.dexpr_loc in
+      let x = mk_id "fn" de.de_loc in
       let def = expr_fun lenv x lam in
       let e2 = e_cast def.rec_ps (VTarrow def.rec_ps.ps_vta) in
       e_rec [def] e2
@@ -643,21 +630,21 @@ let rec expr lenv de = match de.dexpr_desc with
       e_rec rdl e1
   | DEapply (de1, del) ->
       let el = List.map (expr lenv) del in
-      begin match de1.dexpr_desc with
-        | DEglobal_pl pls -> e_plapp pls el (ity_of_dity de.dexpr_type)
-        | DEglobal_ls ls  -> e_lapp  ls  el (ity_of_dity de.dexpr_type)
+      begin match de1.de_desc with
+        | DEglobal_pl pls -> e_plapp pls el (ity_of_dity de.de_type)
+        | DEglobal_ls ls  -> e_lapp  ls  el (ity_of_dity de.de_type)
         | _               -> e_app (expr lenv de1) el
       end
   | DEglobal_pv pv ->
       e_value pv
   | DEglobal_ps ps ->
-      e_cast ps (vty_of_dity de.dexpr_type)
+      e_cast ps (vty_of_dity de.de_type)
   | DEglobal_pl pl ->
       assert (pl.pl_ls.ls_args = []);
-      e_plapp pl [] (ity_of_dity de.dexpr_type)
+      e_plapp pl [] (ity_of_dity de.de_type)
   | DEglobal_ls ls ->
       assert (ls.ls_args = []);
-      e_lapp ls [] (ity_of_dity de.dexpr_type)
+      e_lapp ls [] (ity_of_dity de.de_type)
   | DEif (de1, de2, de3) ->
       e_if (expr lenv de1) (expr lenv de2) (expr lenv de3)
   | DEassign (de1, de2) ->
@@ -685,9 +672,9 @@ let rec expr lenv de = match de.dexpr_desc with
         | Ptree.Acheck  -> Acheck in
       e_assert ak (create_pre lenv f)
   | DEabsurd ->
-      e_absurd (ity_of_dity de.dexpr_type)
+      e_absurd (ity_of_dity de.de_type)
   | DEraise (xs, de1) ->
-      e_raise xs (expr lenv de1) (ity_of_dity de.dexpr_type)
+      e_raise xs (expr lenv de1) (ity_of_dity de.de_type)
   | DEtry (de1, bl) ->
       let e1 = expr lenv de1 in
       let branch (xs,id,de) =
@@ -706,7 +693,7 @@ let rec expr lenv de = match de.dexpr_desc with
         aeff_reads  = List.map (expr lenv) deff.deff_reads;
         aeff_writes = List.map (expr lenv) deff.deff_writes;
         aeff_raises = deff.deff_raises } in
-      e_any aeff (ity_of_dity de.dexpr_type)
+      e_any aeff (ity_of_dity de.de_type)
 *)
   | DEghost de1 ->
       e_ghost (expr lenv de1)
@@ -1214,7 +1201,7 @@ let add_module lib path mm mt m =
         Loc.try3 loc close_namespace uc import name
     | Dlet (id, e) ->
         let e = dexpr (create_denv uc) e in
-        let pd = match e.dexpr_desc with
+        let pd = match e.de_desc with
           | DEfun lam ->
               let def = expr_fun (create_lenv uc) id lam in
               create_rec_decl [def]
