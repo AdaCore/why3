@@ -145,6 +145,12 @@ val make_ppattern : pre_ppattern -> vty_value -> pvsymbol Mstr.t * ppattern
 
 type assertion_kind = Aassert | Aassume | Acheck
 
+type for_direction = To | DownTo
+
+type for_bounds = pvsymbol * for_direction * pvsymbol
+
+type invariant = term option
+
 type expr = private {
   e_node   : expr_node;
   e_vty    : vty;
@@ -166,6 +172,8 @@ and expr_node = private
   | Eassign of expr * region * pvsymbol
   | Eghost  of expr
   | Eany    of type_c
+  | Eloop   of invariant * variant list * expr
+  | Efor    of pvsymbol * for_bounds * invariant * expr
   | Eraise  of xsymbol * expr
   | Etry    of expr * (xsymbol * pvsymbol * expr) list
   | Eassert of assertion_kind * term
@@ -250,5 +258,10 @@ val e_not : expr -> expr
 val e_raise : xsymbol -> expr -> ity -> expr
 val e_try : expr -> (xsymbol * pvsymbol * expr) list -> expr
 
-val e_absurd : ity -> expr
+val e_loop : invariant -> variant list -> expr -> expr
+
+val e_for :
+  pvsymbol -> expr -> for_direction -> expr -> invariant -> expr -> expr
+
 val e_assert : assertion_kind -> term -> expr
+val e_absurd : ity -> expr

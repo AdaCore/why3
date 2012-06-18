@@ -587,6 +587,9 @@ let create_post lenv x ty f =
 let create_pre lenv f =
   Typing.type_fmla (get_theory lenv.mod_uc) lenv.log_denv lenv.log_vars f
 
+let create_variant lenv t =
+  Typing.type_term (get_theory lenv.mod_uc) lenv.log_denv lenv.log_vars t
+
 let add_local x lv lenv = match lv with
   | LetA _ ->
       { lenv with let_vars = Mstr.add x lv lenv.let_vars }
@@ -749,7 +752,7 @@ and expr_lam lenv (bl, var, p, e, q, xq) =
   let ty = match e.e_vty with
     | VTarrow _ -> ty_unit
     | VTvalue vtv -> ty_of_ity vtv.vtv_ity in
-  let mk_variant (t,r) = { v_term = create_pre lenv t; v_rel = r } in
+  let mk_variant (t,r) = { v_term = create_variant lenv t; v_rel = r } in
   { l_args = pvl;
     l_variant = List.map mk_variant var;
     l_pre = create_pre lenv p;

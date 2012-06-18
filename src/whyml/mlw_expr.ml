@@ -92,6 +92,14 @@ let create_plsymbol id args value =
     pl_effect = effect;
   }
 
+let ity_of_ty_opt ty = ity_of_ty (Util.def_option ty_bool ty)
+
+let fake_pls = Wls.memoize 17 (fun ls ->
+  { pl_ls     = ls;
+    pl_args   = List.map (fun ty -> vty_value (ity_of_ty ty)) ls.ls_args;
+    pl_value  = vty_value (ity_of_ty_opt ls.ls_value);
+    pl_effect = eff_empty })
+
 (** specification *)
 
 type pre   = term (* precondition *)
@@ -137,30 +145,28 @@ let varmap_union = Mid.set_union
 let add_pv_vars pv m = Mid.add pv.pv_vs.vs_name pv.pv_vtv.vtv_vars m
 let add_vs_vars vs m = add_pv_vars (restore_pv vs) m
 
-let spec_vars varm variant pre post xpost _effect result =
-  (* sanity check *)
-  if pre.t_ty <> None then raise (FmlaExpected pre);
-  let check_post ity post =
-    let ty = ty_of_ity ity in
-    if not (ty_equal ty (t_type post)) then
-      raise (Ty.TypeMismatch (ty, t_type post))
-  in
-  begin match result with
-    | Some vtv -> check_post vtv.vtv_ity post
-    | None -> ()
-    (* FIXME? Should we check that the bound variable does not occur
-       in the postcondition formula when result is an arrow? *)
-  end;
-  (* FIXME? Should we check that every raised exception is in xpost? *)
-  Mexn.iter (fun xs t -> check_post xs.xs_ity t) xpost;
-  (* compute rec_vars and ps.ps_vars *)
-  let add_term t s = Mvs.set_union t.t_vars s in
-  let add_variant { v_term = t; v_rel = ps } s =
+let fmla_vars f vsset =
+  if f.t_ty <> None then raise (FmlaExpected f);
+  Mvs.set_union vsset f.t_vars
+
+let post_vars ity f vsset =
+  Ty.ty_equal_check (ty_of_ity ity) (t_type f);
+  Mvs.set_union vsset f.t_vars
+
+let xpost_vars = Mexn.fold (fun xs -> post_vars xs.xs_ity)
+
+let variant_vars varl vsset =
+  let add_variant s { v_term = t; v_rel = ps } =
     ignore (Util.option_map (fun ps -> ps_app ps [t;t]) ps);
-    add_term t s in
-  let vsset = add_term post (add_term pre Mvs.empty) in
-  let vsset = Mexn.fold (fun _ -> add_term) xpost vsset in
-  let vsset = List.fold_right add_variant variant vsset in
+    Mvs.set_union s t.t_vars in
+  List.fold_left add_variant vsset varl
+
+(* FIXME? Should we check that every raised exception is in xpost? *)
+let spec_vars varm variant pre post xpost _effect result =
+  let vsset = fmla_vars pre Mvs.empty in
+  let vsset = post_vars result post vsset in
+  let vsset = xpost_vars xpost vsset in
+  let vsset = variant_vars variant vsset in
   Mvs.fold (fun vs _ m -> add_vs_vars vs m) vsset varm
 
 let spec_arrow pvl effect vty =
@@ -174,8 +180,8 @@ let spec_arrow pvl effect vty =
 let rec check_c tyc =
   let varm = check_v tyc.c_result in
   let result = match tyc.c_result with
-    | SpecV v -> Some v
-    | SpecA _ -> None in
+    | SpecV v -> v.vtv_ity
+    | SpecA _ -> ity_unit in
   spec_vars varm [] tyc.c_pre tyc.c_post tyc.c_xpost tyc.c_effect result
 
 and check_v = function
@@ -283,16 +289,7 @@ let ppat_plapp pls ppl vtv =
     ppat_vtv     = vtv;
     ppat_effect  = if vtv.vtv_ghost then eff_ghostify eff else eff; }
 
-let ity_of_ty_opt ty = ity_of_ty (Util.def_option ty_bool ty)
-
-let ppat_lapp ls ppl vtv =
-  let pls = {
-    pl_ls     = ls;
-    pl_args   = List.map (fun ty -> vty_value (ity_of_ty ty)) ls.ls_args;
-    pl_value  = vty_value (ity_of_ty_opt ls.ls_value);
-    pl_effect = eff_empty; }
-  in
-  ppat_plapp pls ppl vtv
+let ppat_lapp ls ppl vtv = ppat_plapp (fake_pls ls) ppl vtv
 
 let ppat_or p1 p2 =
   ity_equal_check p1.ppat_vtv.vtv_ity p2.ppat_vtv.vtv_ity;
@@ -411,6 +408,12 @@ let make_ppattern pp vtv =
 
 type assertion_kind = Aassert | Aassume | Acheck
 
+type for_direction = To | DownTo
+
+type for_bounds = pvsymbol * for_direction * pvsymbol
+
+type invariant = term option
+
 type expr = {
   e_node   : expr_node;
   e_vty    : vty;
@@ -432,6 +435,8 @@ and expr_node =
   | Eassign of expr * region * pvsymbol
   | Eghost  of expr
   | Eany    of type_c
+  | Eloop   of invariant * variant list * expr
+  | Efor    of pvsymbol * for_bounds * invariant * expr
   | Eraise  of xsymbol * expr
   | Etry    of expr * (xsymbol * pvsymbol * expr) list
   | Eassert of assertion_kind * term
@@ -573,8 +578,8 @@ let e_app_real e pv =
 let create_fun_defn id lam =
   let e = lam.l_expr in
   let result = match e.e_vty with
-    | VTvalue v -> Some v
-    | VTarrow _ -> None in
+    | VTvalue v -> v.vtv_ity
+    | VTarrow _ -> ity_unit in
   let varm = spec_vars e.e_vars lam.l_variant
       lam.l_pre lam.l_post lam.l_xpost e.e_effect result in
   let del_pv m pv = Mid.remove pv.pv_vs.vs_name m in
@@ -665,14 +670,7 @@ let e_plapp pls el ity =
   let argl = List.rev el in
   app [] Mid.empty false eff_empty ity_subst_empty vtvl argl
 
-let e_lapp ls el ity =
-  let pls = {
-    pl_ls     = ls;
-    pl_args   = List.map (fun ty -> vty_value (ity_of_ty ty)) ls.ls_args;
-    pl_value  = vty_value (ity_of_ty_opt ls.ls_value);
-    pl_effect = eff_empty; }
-  in
-  e_plapp pls el ity
+let e_lapp ls el ity = e_plapp (fake_pls ls) el ity
 
 let e_void = e_lapp (fs_tuple 0) [] ity_unit
 
@@ -813,6 +811,41 @@ let e_lazy_and e1 e2 =
 let e_lazy_or e1 e2 =
   if eff_is_empty e2.e_effect then e_binop Tor e1 e2 else e_if e1 e_true e2
 
+let e_loop inv variant e =
+  let vtv = vtv_of_expr e in
+  ity_equal_check vtv.vtv_ity ity_unit;
+  let vsset = Util.option_fold (fun s f -> fmla_vars f s) Mvs.empty inv in
+  let vsset = variant_vars variant vsset in
+  let vars = Mvs.fold (fun vs _ m -> add_vs_vars vs m) vsset e.e_vars in
+  check_postexpr e e.e_effect vars;
+  let vty = VTvalue (vtv_unmut vtv) in
+  mk_expr (Eloop (inv,variant,e)) vty e.e_effect vars
+
+let e_for_real pv bounds inv e =
+  let vtv = vtv_of_expr e in
+  let pvfrom,_,pvto = bounds in
+  ity_equal_check vtv.vtv_ity ity_unit;
+  ity_equal_check pv.pv_vtv.vtv_ity ity_int;
+  ity_equal_check pvfrom.pv_vtv.vtv_ity ity_int;
+  ity_equal_check pvto.pv_vtv.vtv_ity ity_int;
+  let ghost = pv.pv_vtv.vtv_ghost || pvfrom.pv_vtv.vtv_ghost ||
+    pvto.pv_vtv.vtv_ghost || vtv.vtv_ghost in
+  let eff = if ghost then eff_ghostify e.e_effect else e.e_effect in
+  let vars = Util.option_fold (fun m f -> add_t_vars f m) e.e_vars inv in
+  (* FIXME? We check that no variable in the loop body, _including_
+     the index variable, is not invalidated because of a region reset.
+     We ignore the loop bounds, since they are computed just once. *)
+  check_postexpr e eff vars;
+  let vars = Mid.remove pv.pv_vs.vs_name vars in
+  let vars = add_pv_vars pvfrom (add_pv_vars pvto vars) in
+  let vty = VTvalue (vty_value ~ghost ity_unit) in
+  mk_expr (Efor (pv,bounds,inv,e)) vty eff vars
+
+let e_for pv efrom dir eto inv e =
+  let apply pvto pvfrom = e_for_real pv (pvfrom,dir,pvto) inv e in
+  let apply pvto = on_value (apply pvto) efrom in
+  on_value apply eto
+
 (* FIXME? We don't call check_postexpr to verify that raising
    an exception is ok after the computation of e, because with
    the current semantics of whyml it always is. However, this
@@ -858,14 +891,14 @@ let e_try e0 bl =
   in
   branch vtv0.vtv_ghost eff_empty Mid.empty bl
 
-let e_absurd ity =
-  let vty = VTvalue (vty_value ity) in
-  mk_expr Eabsurd vty eff_empty Mid.empty
-
 let e_assert ak f =
   let vars = add_t_vars f Mid.empty in
   let vty = VTvalue (vty_value ity_unit) in
   mk_expr (Eassert (ak, f)) vty eff_empty vars
+
+let e_absurd ity =
+  let vty = VTvalue (vty_value ity) in
+  mk_expr Eabsurd vty eff_empty Mid.empty
 
 (* Compute the fixpoint on recursive definitions *)
 
@@ -934,6 +967,10 @@ let rec expr_subst psm e = match e.e_node with
   | Etry (e,bl) ->
       let branch (xs,pv,e) = xs, pv, expr_subst psm e in
       e_try (expr_subst psm e) (List.map branch bl)
+  | Eloop (inv,var,e) ->
+      e_loop inv var (expr_subst psm e)
+  | Efor (pv,bounds,inv,e) ->
+      e_for_real pv bounds inv (expr_subst psm e)
   | Elogic _ | Evalue _ | Earrow _ | Eany _ | Eabsurd | Eassert _ -> e
 
 and create_rec_defn defl =

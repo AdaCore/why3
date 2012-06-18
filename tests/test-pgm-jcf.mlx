@@ -36,7 +36,7 @@ module N
   val gr : ref int
 
   let test () =
-    foo gr gr
+    foo gr {| contents = 4 |}
 
   let myfun r = { r = r }
   'L:
@@ -44,7 +44,7 @@ module N
       | Node {| contents = v |} f -> v + on_forest f
       | Leaf -> raise (Exit Leaf)
     end { at r 'L = t }
-    with on_forest f = match f with
+    with on_forest f variant { f } = match f with
       | Cons t f -> let ee = Leaf in on_tree t + on_forest f + on_tree ee
       | Nil -> 1
     end
