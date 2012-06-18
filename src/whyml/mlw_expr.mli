@@ -149,7 +149,7 @@ type for_direction = To | DownTo
 
 type for_bounds = pvsymbol * for_direction * pvsymbol
 
-type invariant = term option
+type invariant = term
 
 type expr = private {
   e_node   : expr_node;

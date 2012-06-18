@@ -157,7 +157,11 @@ let xpost_vars = Mexn.fold (fun xs -> post_vars xs.xs_ity)
 
 let variant_vars varl vsset =
   let add_variant s { v_term = t; v_rel = ps } =
-    ignore (Util.option_map (fun ps -> ps_app ps [t;t]) ps);
+    begin match ps with
+      | Some ps -> ignore (ps_app ps [t;t])
+      | None -> t_ty_check t (Some ty_int)
+      (* TODO: allow algebraic types in variants *)
+    end;
     Mvs.set_union s t.t_vars in
   List.fold_left add_variant vsset varl
 
@@ -412,7 +416,7 @@ type for_direction = To | DownTo
 
 type for_bounds = pvsymbol * for_direction * pvsymbol
 
-type invariant = term option
+type invariant = term
 
 type expr = {
   e_node   : expr_node;
@@ -814,7 +818,7 @@ let e_lazy_or e1 e2 =
 let e_loop inv variant e =
   let vtv = vtv_of_expr e in
   ity_equal_check vtv.vtv_ity ity_unit;
-  let vsset = Util.option_fold (fun s f -> fmla_vars f s) Mvs.empty inv in
+  let vsset = fmla_vars inv Mvs.empty in
   let vsset = variant_vars variant vsset in
   let vars = Mvs.fold (fun vs _ m -> add_vs_vars vs m) vsset e.e_vars in
   check_postexpr e e.e_effect vars;
@@ -828,10 +832,12 @@ let e_for_real pv bounds inv e =
   ity_equal_check pv.pv_vtv.vtv_ity ity_int;
   ity_equal_check pvfrom.pv_vtv.vtv_ity ity_int;
   ity_equal_check pvto.pv_vtv.vtv_ity ity_int;
+  if pv.pv_vtv.vtv_mut <> None then
+    Loc.errorm "mutable index in a for loop";
   let ghost = pv.pv_vtv.vtv_ghost || pvfrom.pv_vtv.vtv_ghost ||
     pvto.pv_vtv.vtv_ghost || vtv.vtv_ghost in
   let eff = if ghost then eff_ghostify e.e_effect else e.e_effect in
-  let vars = Util.option_fold (fun m f -> add_t_vars f m) e.e_vars inv in
+  let vars = add_t_vars inv e.e_vars in
   (* FIXME? We check that no variable in the loop body, _including_
      the index variable, is not invalidated because of a region reset.
      We ignore the loop bounds, since they are computed just once. *)

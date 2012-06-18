@@ -174,7 +174,8 @@ let rec print_type_v fmt = function
   | SpecV vtv -> print_vtv fmt vtv
   | SpecA (pvl,tyc) ->
       let print_arg fmt pv = fprintf fmt "(%a) ->@ " print_pvty pv in
-      fprintf fmt "%a%a" (print_list nothing print_arg) pvl print_type_c tyc
+      fprintf fmt "%a%a" (print_list nothing print_arg) pvl print_type_c tyc;
+      List.iter forget_pv pvl
 
 and print_type_c fmt tyc =
   fprintf fmt "{ %a }@ %a%a@ { %a }@]"
@@ -184,9 +185,8 @@ and print_type_c fmt tyc =
     print_post tyc.c_post
     (* TODO: print_xpost *)
 
-let print_invariant fmt = function
-  | Some f -> fprintf fmt "invariant@ { %a }@ " Pretty.print_term f
-  | None -> ()
+let print_invariant fmt f =
+  fprintf fmt "invariant@ { %a }@ " Pretty.print_term f
 
 let print_variant fmt varl =
   let print_rel fmt = function
@@ -195,6 +195,10 @@ let print_variant fmt varl =
   let print_var fmt { v_term = t; v_rel = ps } =
     fprintf fmt " %a%a" Pretty.print_term t print_rel ps in
   fprintf fmt "variant@ {%a }@ " (print_list comma print_var) varl
+
+let print_invariant fmt f = match f.t_node with
+  | Ttrue -> ()
+  | _ -> print_invariant fmt f
 
 let print_variant fmt = function
   | [] -> ()
@@ -263,12 +267,17 @@ and print_enode pri fmt e = match e.e_node with
       print_ps fmt a
   | Eapp (e,v) ->
       fprintf fmt "(%a@ %a)" (print_lexpr pri) e print_pv v
+  | Elet ({ let_var = LetV pv ; let_expr = e1 }, e2)
+    when pv.pv_vs.vs_name.id_string = "_" &&
+         ity_equal pv.pv_vtv.vtv_ity ity_unit ->
+      fprintf fmt (protect_on (pri > 0) "%a;@\n%a")
+        print_expr e1 print_expr e2;
   | Elet ({ let_var = lv ; let_expr = e1 }, e2) ->
-      fprintf fmt (protect_on (pri > 0) "let %a = @[%a@] in@ %a")
+      fprintf fmt (protect_on (pri > 0) "@[<hov 2>let %a =@ %a@ in@]@\n%a")
         print_lv lv (print_lexpr 4) e1 print_expr e2;
       forget_lv lv
   | Erec (rdl,e) ->
-      fprintf fmt (protect_on (pri > 0) "%a@ in@ %a")
+      fprintf fmt (protect_on (pri > 0) "%a@ in@\n%a")
         (print_list_next newline print_rec) rdl print_expr e;
       let forget_rd rd = forget_ps rd.rec_ps in
       List.iter forget_rd rdl
@@ -285,7 +294,7 @@ and print_enode pri fmt e = match e.e_node with
       fprintf fmt "loop@ %a%a@\n@[<hov>%a@]@\nend"
         print_invariant inv print_variant var print_expr e
   | Efor (pv,(pvfrom,dir,pvto),inv,e) ->
-      fprintf fmt "for@ %a@ =@ %a@ %s@ %a@ %ado\n@[<hov>%a@]@\ndone"
+      fprintf fmt "@[<hov 2>for@ %a@ =@ %a@ %s@ %a@ %ado@\n%a@]@\ndone"
         print_pv pv print_pv pvfrom
         (if dir = To then "to" else "downto") print_pv pvto
         print_invariant inv print_expr e
@@ -313,7 +322,7 @@ and print_xbranch fmt (xs, pv, e) =
 
 and print_rec fst fmt { rec_ps = ps ; rec_lambda = lam } =
   let print_arg fmt pv = fprintf fmt "(%a)" print_pvty pv in
-  fprintf fmt "@[<hov 2>%s (%a) %a =@ { %a }@ %a%a@ { %a }@]"
+  fprintf fmt "@[<hov 2>%s (%a) %a =@\n{ %a }@\n%a%a@\n{ %a }@]"
     (if fst then "let rec" else "with")
     print_psty ps
     (print_list space print_arg) lam.l_args

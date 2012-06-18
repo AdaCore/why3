@@ -347,6 +347,14 @@ and dtype_v denv = function
       let tyc,dity = dtype_c denv tyc in
       DSpecA (bl,tyc), make_arrow_type tyl dity
 
+let dvariant uc = function
+  | Some (le, Some q) -> [le, Some (find_variant_ls uc q)]
+  | Some (le, None) -> [le, None]
+  | None -> []
+(* TODO: accept a list of variants in the surface language
+  List.map (fun (le,q) -> le, Util.option_map (find_variant_ls uc) q) var
+*)
+
 (* expressions *)
 
 let de_unit ~loc = hidden_ls ~loc (fs_tuple 0)
@@ -522,10 +530,20 @@ and de_desc denv loc = function
   | Ptree.Eany tyc ->
       let tyc, dity = dtype_c denv tyc in
       DEany tyc, dity
-  | Ptree.Eloop (_ann, _e1) ->
-      assert false (*TODO*)
-  | Ptree.Efor (_id, _e1, _dir, _e2, _lexpr_opt, _e3) ->
-      assert false (*TODO*)
+  | Ptree.Eloop ({ loop_invariant = inv; loop_variant = var }, e1) ->
+      let e1 = dexpr denv e1 in
+      let var = dvariant denv.uc var in
+      expected_type e1 dity_unit;
+      DEloop (var,inv,e1), e1.de_type
+  | Ptree.Efor (id, efrom, dir, eto, inv, e1) ->
+      let efrom = dexpr denv efrom in
+      let eto = dexpr denv eto in
+      let denv = add_var id dity_int denv in
+      let e1 = dexpr denv e1 in
+      expected_type efrom dity_int;
+      expected_type eto dity_int;
+      expected_type e1 dity_unit;
+      DEfor (id,efrom,dir,eto,inv,e1), e1.de_type
   | Ptree.Eabstract (_e1, _post) ->
       assert false (*TODO*)
 
@@ -545,15 +563,9 @@ and dletrec denv rdl =
 and dlambda denv bl var (p, e, (q, xq)) =
   let denv,bl,tyl = dbinders denv bl in
   let e = dexpr denv e in
-  let var = match var with
-    | Some (le, Some q) -> [le, Some (find_variant_ls denv.uc q)]
-    | Some (le, None) -> [le, None]
-    | None -> [] in
-(* TODO: accept a list of variants in the surface language
-  let var = List.map (fun (le,q) ->
-    le, Util.option_map (find_variant_ls denv.uc) q) var in
-*)
-  (bl, var, p, e, q, dxpost denv.uc xq), make_arrow_type tyl e.de_type
+  let var = dvariant denv.uc var in
+  let xq = dxpost denv.uc xq in
+  (bl, var, p, e, q, xq), make_arrow_type tyl e.de_type
 
 (** stage 2 *)
 
@@ -587,8 +599,10 @@ let create_post lenv x ty f =
 let create_pre lenv f =
   Typing.type_fmla (get_theory lenv.mod_uc) lenv.log_denv lenv.log_vars f
 
-let create_variant lenv t =
-  Typing.type_term (get_theory lenv.mod_uc) lenv.log_denv lenv.log_vars t
+let create_variant lenv (t,r) =
+  let t =
+    Typing.type_term (get_theory lenv.mod_uc) lenv.log_denv lenv.log_vars t in
+  { v_term = t; v_rel = r }
 
 let add_local x lv lenv = match lv with
   | LetA _ ->
@@ -728,8 +742,25 @@ let rec expr lenv de = match de.de_desc with
       e_any (type_c lenv dtyc)
   | DEghost de1 ->
       e_ghost (expr lenv de1)
-  | _ ->
-      assert false (*TODO*)
+  | DEloop (var,inv,de1) ->
+      let inv = match inv with
+        | Some inv -> create_pre lenv inv
+        | None -> t_true in
+      let var = List.map (create_variant lenv) var in
+      e_loop inv var (expr lenv de1)
+  | DEfor (x,defrom,dir,deto,inv,de1) ->
+      let efrom = expr lenv defrom in
+      let eto = expr lenv deto in
+      let pv = create_pvsymbol (Denv.create_user_id x) (vty_value ity_int) in
+      let lenv = add_local x.id (LetV pv) lenv in
+      let dir = match dir with
+        | Ptree.To -> To
+        | Ptree.Downto -> DownTo in
+      let inv = match inv with
+        | Some inv -> create_pre lenv inv
+        | None -> t_true in
+      let e1 = expr lenv de1 in
+      e_for pv efrom dir eto inv e1
 
 and expr_rec lenv rdl =
   let step1 lenv (id, dity, lam) =
@@ -751,10 +782,10 @@ and expr_lam lenv (bl, var, p, e, q, xq) =
   let e = expr lenv e in
   let ty = match e.e_vty with
     | VTarrow _ -> ty_unit
-    | VTvalue vtv -> ty_of_ity vtv.vtv_ity in
-  let mk_variant (t,r) = { v_term = create_variant lenv t; v_rel = r } in
+    | VTvalue vtv -> ty_of_ity vtv.vtv_ity
+  in
   { l_args = pvl;
-    l_variant = List.map mk_variant var;
+    l_variant = List.map (create_variant lenv) var;
     l_pre = create_pre lenv p;
     l_expr = e;
     l_post = create_post lenv "result" ty q;
