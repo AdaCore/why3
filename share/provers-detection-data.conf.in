@@ -152,7 +152,25 @@ version_old = "0.12.2"
 version_old = "0.12.1"
 version_old = "0.12.0"
 version_old = "0.11.2"
-command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e"
+command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e -Eprecision=70"
+driver = "drivers/gappa.drv"
+
+[ATP gappa015]
+name = "Gappa"
+exec = "gappa-0.15.1"
+version_switch = "--version"
+version_regexp = "Gappa \\([^ \n]*\\)"
+version_ok = "0.15.1"
+command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e -Eprecision=70"
+driver = "drivers/gappa.drv"
+
+[ATP gappa014]
+name = "Gappa"
+exec = "gappa-0.14.1"
+version_switch = "--version"
+version_regexp = "Gappa \\([^ \n]*\\)"
+version_ok = "0.14.1"
+command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e -Eprecision=70"
 driver = "drivers/gappa.drv"
 
 [ATP simplify]
