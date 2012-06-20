@@ -168,32 +168,137 @@ let () = Trans.register_transform_l "induction" (Trans.store induction)
 (******* Induction tactic on function definition *********)
 (*********************************************************)
   
-(*
-type ind_pattern = private {
-  ipat_node : ind_pattern_node;
-  ipat_vars : Svs.t;
-  ipat_ty   : ty;
-  ipat_tag  : int;
-}
-
-
-and ind_pattern_node = private
-  | IPwild
-  | IPvar of bool * vsymbol
-  | IPapp of lsymbol * ind_pattern list
- 
-let 
-*)
 
 
 
 
+
+
+(* see t_collect_data below *)
+let defn_collect_data acc km ls tl qvs =
+  let arg_collect_data  = function
+    | Tvar x when Svs.mem x qvs ->  
+      Mvs.add x (Sls.add ls (Mvs.find x acc)) acc
+    | _ -> acc 
+  in 
+  match (find_logic_definition km ls) with
+    | Some defn ->
+      begin match ls_defn_decrease defn with
+	| [i] -> arg_collect_data (List.nth tl i).t_node
+	| _  -> acc
+      end
+    | None -> acc
+      
+(* constructs map of induction candidates 
+  with associated recursive functions (callers) names *)     
+let t_collect_data km qvs t =
+  let rec t_collect acc t =
+    let acc = match t.t_node with
+      | Tapp (ls, tl) -> defn_collect_data acc km ls tl qvs
+      | _ -> acc
+    in t_fold t_collect acc t
+  in t_collect (Mvs.empty) t
+  
+
+
+
+let unify_ihpll _ihpm = 
+  []
+    
+
+(* For each recursive function name jumps to its definition 
+   and store the extracted induction scheme in the map. *)
+let construct_ihpll _km _x lss = 
+  let construct ls  = ls 
+    
+  in  Sls.fold (fun ls pll -> (construct ls) :: pll) lss [] 
+    
+    
+type ihl =  Ihl of bool * ihl list   
+type scheme = {vset1 : Svs.t; vset2 : Svs.t; hl : ihl list }
+    
+let defn_scheme defn fnme vs = 
+  let _fvars, t = open_ls_defn defn in
+  let rec t_scheme acc t =
+    let acc = match t.t_node with
+      | Tapp (ls, _tl) when ls_equal ls fnme -> 
+	acc (*TODO : enrich vset1 *)
+      | Tcase (t0, tbl) -> 
+	begin match t0.t_node with
+	  | Tvar x when Svs.mem x acc.vset2 -> 
+	    let ptl = (List.map t_open_branch tbl) in
+	    let vset, hl = List.fold_left
+	      (fun (vset, hl) (p,t) -> 
+		let vset1, scheme = 
+		  p_scheme acc.vset1 (Svs.add x acc.vset2) p t 
+		in Svs.union vset1 vset, scheme :: hl)
+	      (acc.vset1, acc.hl) ptl 
+	    in (*unify parallel patterns of the same level*)
+	    {vset1 = vset; vset2 = acc.vset2; 
+	     hl = [Ihl ((Svs.mem x vset),hl)]}
+	  | _ -> acc (*IMPROVE : what if "match" *)
+	end
+      | _ -> acc
+    in t_fold t_scheme acc t
+  and p_scheme vset1 vset2 p t = match p.pat_node with
+    | Pvar x ->  let acc = t_scheme 
+		   {vset1 = vset1; vset2 = (Svs.add x vset2); hl = []} t
+		 in acc.vset1, Ihl (Svs.mem x acc.vset1, acc.hl)
+    | Papp (_, pl) -> 
+      List.fold_left
+	(fun (vset1, Ihl (x, hl)) p -> 
+	  let vset1', scheme = p_scheme vset1 vset2 p t in
+	  Svs.union vset1' vset1, Ihl (x, scheme :: hl)) 
+	(vset1, Ihl (false, [])) 
+	pl
+	  
+    | _ -> vset1, Ihl (false,[]) (* TODO Por Pas Pwild *)
+      
+  in 
+  let acc = 
+    t_scheme {vset1 = Svs.empty; vset2 = Svs.add vs Svs.empty; hl = []} t 
+  in Ihl (false, acc.hl)
+
+
+
+      
+    
+let apply_induction_scheme qvl x ihpl t0 = 
+  let ihp_close_branch p vss = 
+    let pat_t = 
+      Svs.fold (fun v goal -> 
+	t_implies (t_subst_single x (t_var v) t0) goal) vss t0
+    in t_close_branch p pat_t   
+  in
+  let tbl = List.map (fun (p,vss) -> ihp_close_branch p vss) ihpl in
+  let goal = t_case (t_var x) tbl
+  in [t_forall_close qvl [] goal]
+  
+
+let functional_induction km t =
+  let qvs, qvl, t0 = decompose_forall t in
+  let cmap = t_collect_data km qvs t0 in
+  if Mvs.is_empty cmap  
+  then 
+    [t] 
+  else 
+    let x, defnl =  Mvs.choose cmap in
+    let ihpll = construct_ihpll km x defnl in
+    let ihpl = unify_ihpll ihpll in
+    apply_induction_scheme qvl x ihpl t0 
+      
+let functional_induction  = function 
+  | Some { task_decl = { td_node = Decl { d_node = Dprop (Pgoal, pr, f) } };
+	   task_prev = prev;
+	   task_known = km } ->
+    List.map (add_prop_decl prev Pgoal pr) (functional_induction km f)
+  | _ -> assert false
+    
+    
 
 (*********************************************************)
 (*********************** OBSOLETE ************************)
 (*********************************************************) 
-type ihl =  Ihl of bool * ihl list   
-type scheme = {vset1 : Svs.t; vset2 : Svs.t; hl : ihl list }
     
 let defn_scheme defn fnme vs = 
   let _fvars, t = open_ls_defn defn in
@@ -270,6 +375,22 @@ End:
 
 (*************************************************************************)
 
+(*
+type ind_pattern = private {
+  ipat_node : ind_pattern_node;
+  ipat_vars : Svs.t;
+  ipat_ty   : ty;
+  ipat_tag  : int;
+}
+
+
+and ind_pattern_node = private
+  | IPwild
+  | IPvar of bool * vsymbol
+  | IPapp of lsymbol * ind_pattern list
+ 
+let 
+*)
 
 
 (*
