@@ -62,6 +62,7 @@ val create_user_type_var : string -> Denv.dty
 type denv
 
 val denv_empty : denv
+val denv_empty_with_globals : (Ptree.qualid -> vsymbol option) -> denv
 
 val mem_var : string -> denv -> bool
 val find_var : string -> denv -> Denv.dty

@@ -262,6 +262,13 @@ let find_variant_ls uc p =
   with Not_found ->
     errorm ~loc:(qloc p) "unbound symbol %a" print_qualid p
 
+let find_global_vs uc p =
+  let x = Typing.string_list_of_qualid [] p in
+  try match ns_find_ps (get_namespace uc) x with
+    | PV pv -> Some pv.pv_vs
+    | _ -> None
+  with Not_found -> None
+
 let rec dpattern denv ({ pat_loc = loc } as pp) = match pp.pat_desc with
   | Ptree.PPpwild ->
       PPwild, create_type_variable (), denv
@@ -580,7 +587,7 @@ let create_lenv uc = {
   mod_uc   = use_export_theory uc Mlw_wp.th_mark;
   let_vars = Mstr.empty;
   log_vars = Mstr.empty;
-  log_denv = Typing.denv_empty;
+  log_denv = Typing.denv_empty_with_globals (find_global_vs uc);
 }
 
 let rec dty_of_ty ty = match ty.ty_node with

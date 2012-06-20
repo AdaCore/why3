@@ -117,14 +117,16 @@ let create_user_type_var x =
   tyuvar (create_user_tv x)
 
 type denv = {
-  dvars   : dty Mstr.t;    (* local variables, to be bound later *)
+  dvars : dty Mstr.t;    (* local variables, to be bound later *)
+  gvars : qualid -> vsymbol option; (* global variables, for programs *)
 }
 
-let denv_empty = { dvars = Mstr.empty }
+let denv_empty = { dvars = Mstr.empty; gvars = Util.const None }
+let denv_empty_with_globals gv = { dvars = Mstr.empty; gvars = gv }
 
 let mem_var x denv = Mstr.mem x denv.dvars
 let find_var x denv = Mstr.find x denv.dvars
-let add_var x ty denv = { dvars = Mstr.add x ty denv.dvars }
+let add_var x ty denv = { denv with dvars = Mstr.add x ty denv.dvars }
 
 let print_denv fmt denv =
   Mstr.iter (fun x ty -> fprintf fmt "%s:%a,@ " x print_dty ty) denv.dvars
@@ -342,7 +344,7 @@ and dpat_node loc uc env = function
       env, Pwild, ty
   | PPpvar x ->
       let ty = fresh_type_var loc in
-      let env = { dvars = Mstr.add x.id ty env.dvars } in
+      let env = add_var x.id ty env in
       env, Pvar x, ty
   | PPpapp (x, pl) ->
       let s, tyl, ty = specialize_fsymbol x uc in
@@ -374,7 +376,7 @@ and dpat_node loc uc env = function
       env, Papp (s, pl), ty
   | PPpas (p, x) ->
       let env, p = dpat uc env p in
-      let env = { dvars = Mstr.add x.id p.dp_ty env.dvars } in
+      let env = add_var x.id p.dp_ty env in
       env, Pas (p,x), p.dp_ty
   | PPpor (p, q) ->
       let env, p = dpat uc env p in
@@ -413,7 +415,8 @@ let check_quant_linearity uqu =
 
 let check_highord uc env x tl = match x with
   | Qident { id = x } when Mstr.mem x env.dvars -> true
-  | _ -> List.length tl > List.length ((find_lsymbol x uc).ls_args)
+  | _ -> env.gvars x <> None ||
+      List.length tl > List.length ((find_lsymbol x uc).ls_args)
 
 let apply_highord loc x tl = match List.rev tl with
   | a::[] -> [{pp_loc = loc; pp_desc = PPvar x}; a]
@@ -438,6 +441,11 @@ and dterm_node ~localize loc uc env = function
       (* local variable *)
       let ty = Mstr.find x env.dvars in
       Tvar x, ty
+  | PPvar x when env.gvars x <> None ->
+      let vs = Util.of_option (env.gvars x) in
+      assert (ty_closed vs.vs_ty);
+      let ty = specialize_ty ~loc (Htv.create 0) vs.vs_ty in
+      Tgvar vs, ty
   | PPvar x ->
       (* 0-arity symbol (constant) *)
       let s, tyl, ty = specialize_fsymbol x uc in
@@ -471,7 +479,7 @@ and dterm_node ~localize loc uc env = function
   | PPlet (x, e1, e2) ->
       let e1 = dterm ~localize uc env e1 in
       let ty = e1.dt_ty in
-      let env = { dvars = Mstr.add x.id ty env.dvars } in
+      let env = add_var x.id ty env in
       let e2 = dterm ~localize uc env e2 in
       Tlet (e1, x, e2), e2.dt_ty
   | PPmatch (e1, bl) ->
@@ -508,7 +516,7 @@ and dterm_node ~localize loc uc env = function
       Tif (dfmla ~localize uc env e1, e2, e3), e2.dt_ty
   | PPeps (x, ty, e1) ->
       let ty = dty uc ty in
-      let env = { dvars = Mstr.add x.id ty env.dvars } in
+      let env = add_var x.id ty env in
       let e1 = dfmla ~localize uc env e1 in
       Teps (x, ty, e1), ty
   | PPquant ((PPlambda|PPfunc|PPpred) as q, uqu, trl, a) ->
@@ -519,7 +527,7 @@ and dterm_node ~localize loc uc env = function
           | Some id -> id
           | None -> assert false
         in
-        { dvars = Mstr.add id.id ty env.dvars }, (id,ty)
+        add_var id.id ty env, (id,ty)
       in
       let env, uqu = map_fold_left uquant env uqu in
       let trigger e =
@@ -638,7 +646,7 @@ and dfmla_node ~localize loc uc env = function
           | Some id -> id
           | None -> assert false
         in
-        { dvars = Mstr.add id.id ty env.dvars }, (id,ty)
+        add_var id.id ty env, (id,ty)
       in
       let env, uqu = map_fold_left uquant env uqu in
       let trigger e =
@@ -677,7 +685,7 @@ and dfmla_node ~localize loc uc env = function
   | PPlet (x, e1, e2) ->
       let e1 = dterm ~localize uc env e1 in
       let ty = e1.dt_ty in
-      let env = { dvars = Mstr.add x.id ty env.dvars } in
+      let env = add_var x.id ty env in
       let e2 = dfmla ~localize uc env e2 in
       Flet (e1, x, e2)
   | PPmatch (e1, bl) ->
@@ -958,9 +966,7 @@ let add_logics dl th =
     check_quant_linearity d.ld_params;
     let dadd_var denv (x, ty) = match x with
       | None -> denv
-      | Some id ->
-          let ty = dty th' ty in
-          { dvars = Mstr.add id.id ty denv.dvars }
+      | Some id -> add_var id.id (dty th' ty) denv
     in
     let denv = Hashtbl.find denvs id in
     let denv = List.fold_left dadd_var denv d.ld_params in

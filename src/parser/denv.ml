@@ -170,6 +170,7 @@ type dterm = { dt_node : dterm_node; dt_ty : dty }
 
 and dterm_node =
   | Tvar of string
+  | Tgvar of vsymbol
   | Tconst of constant
   | Tapp of lsymbol * dterm list
   | Tif of dfmla * dterm * dterm
@@ -199,6 +200,8 @@ let rec term env t = match t.dt_node with
   | Tvar x ->
       assert (Mstr.mem x env);
       t_var (Mstr.find x env)
+  | Tgvar vs ->
+      t_var vs
   | Tconst c ->
       t_const c
   | Tapp (s, tl) ->

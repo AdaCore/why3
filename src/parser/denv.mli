@@ -68,6 +68,7 @@ type dterm = { dt_node : dterm_node; dt_ty : dty }
 
 and dterm_node =
   | Tvar of string
+  | Tgvar of vsymbol
   | Tconst of constant
   | Tapp of lsymbol * dterm list
   | Tif of dfmla * dterm * dterm

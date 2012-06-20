@@ -37,7 +37,7 @@ module N
 
   val add :
       x:int -> y: ref int ->
-            {} unit writes gr { y.contents = (old y.contents) + 4 }
+            {} unit writes gr { gr.contents = (old gr.contents) + 4 }
 
 
   let test () =
