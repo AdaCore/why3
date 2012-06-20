@@ -163,6 +163,15 @@ Axiom Div_pow2 : forall (x:Z) (i:Z), (((-(pow2 i))%Z <= x)%Z /\
   (x < (-(pow2 (i - 1%Z)%Z))%Z)%Z) -> ((int.EuclideanDivision.div x
   (pow2 (i - 1%Z)%Z)) = (-2%Z)%Z).
 
+Axiom Mod_pow2 : forall (x:Z) (i:Z),
+  ((int.EuclideanDivision.mod1 (x + (pow2 i))%Z
+  2%Z) = (int.EuclideanDivision.mod1 x 2%Z)).
+
+Axiom Mod_pow2_gen : forall (x:Z) (i:Z) (k:Z), ((0%Z <= k)%Z /\ (k < i)%Z) ->
+  ((int.EuclideanDivision.mod1 (int.EuclideanDivision.div (x + (pow2 i))%Z
+  (pow2 k)) 2%Z) = (int.EuclideanDivision.mod1 (int.EuclideanDivision.div x
+  (pow2 k)) 2%Z)).
+
 Parameter size: Z.
 
 Axiom size_positive : (1%Z < size)%Z.
@@ -338,31 +347,23 @@ Require Import Why3.
 Ltac ae := why3 "alt-ergo" timelimit 3.
 
 (* Why3 goal *)
-Theorem nth_from_int2c_plus_pow2 : forall (x:Z) (k:Z) (i:Z), ((0%Z <= k)%Z /\
-  (k < i)%Z) -> ((nth (from_int2c (x + (pow2 i))%Z) k) = (nth (from_int2c x)
-  k)).
+Theorem nth_from_int2c_plus_pow2 : forall (x:Z) (k:Z) (i:Z),
+  (((0%Z <= k)%Z /\ (k < i)%Z) /\ (k < (size - 1%Z)%Z)%Z) ->
+  ((nth (from_int2c (x + (pow2 i))%Z) k) = (nth (from_int2c x) k)).
+
 intros x k i (h1 & h2).
-generalize i h1 h2.
-pattern k; apply Z_lt_induction; auto.
-clear k i h1 h2.
-intros k Hind i Hk Hki.
-assert (h: k = 0 \/ k > 0) by omega.
+assert (h: int.EuclideanDivision.mod1 
+               (int.EuclideanDivision.div x (pow2 k)) 2 = 0 \/
+           int.EuclideanDivision.mod1 
+               (int.EuclideanDivision.div x (pow2 k)) 2 <> 0) by omega.
 destruct h.
-
-(*case k = 0*)
-subst k.
-assert (h: nth (from_int2c (x)) 0 = true 
-        \/ nth (from_int2c (x)) 0 = false).
-destruct (nth (from_int2c (x)) 0);auto.
-destruct h.
-rewrite H.
-apply nth_from_int2c_low_odd.
-rewrite Mod_pow2.
-
-
-
-(*case k >0*)
-
+rewrite nth_from_int2c_high_even; intuition.
+rewrite nth_from_int2c_high_even; intuition.
+rewrite Mod_pow2_gen; auto.
+rewrite nth_from_int2c_high_odd.
+rewrite nth_from_int2c_high_odd; intuition.
+split; auto with zarith.
+rewrite Mod_pow2_gen; auto.
 Qed.
 
 
