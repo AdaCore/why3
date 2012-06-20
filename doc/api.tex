@@ -291,8 +291,8 @@ access the internal identifier for addition: it must be retrieved from
 the standard theory \texttt{Int} of the file \texttt{int.why} (see
 Chap~\ref{chap:library}).
 \begin{verbatim}
-let two : Term.term = Term.t_const (Term.ConstInt "2")
-let four : Term.term = Term.t_const (Term.ConstInt "4")
+let two : Term.term = Term.t_const (Term.ConstInt (Term.IConstDecimal "2"))
+let four : Term.term = Term.t_const (Term.ConstInt (Term.IConstDecimal "4"))
 let int_theory : Theory.theory =
   Env.find_theory env ["int"] "Int"
 let plus_symbol : Term.lsymbol =
