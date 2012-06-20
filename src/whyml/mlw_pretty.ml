@@ -160,7 +160,8 @@ let print_psty fmt ps =
 
 let print_post fmt post =
   let vs,f = open_post post in
-  fprintf fmt "%a ->@ %a" print_vs vs print_term f
+  fprintf fmt "%a ->@ %a" print_vs vs print_term f;
+  Pretty.forget_var vs
 
 let print_lv fmt = function
   | LetV pv -> print_pvty fmt pv

@@ -62,7 +62,7 @@ type dinvariant = Ptree.lexpr option
 type dexpr = {
   de_desc : dexpr_desc;
   de_type : dity;
-  de_lab  : Ident.label list;
+  de_lab  : Ident.Slab.t;
   de_loc  : loc;
 }
 

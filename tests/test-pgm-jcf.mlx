@@ -35,6 +35,11 @@ module N
 
   val gr : ref int
 
+  val add :
+      x:int -> y: ref int ->
+            {} unit writes gr { y.contents = (old y.contents) + 4 }
+
+
   let test () =
     foo gr {| contents = 4 |}
 
