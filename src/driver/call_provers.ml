@@ -92,8 +92,8 @@ let print_prover_answer fmt = function
   | OutOfMemory -> fprintf fmt "Ouf Of Memory"
   | Unknown "" -> fprintf fmt "Unknown"
   | Failure "" -> fprintf fmt "Failure"
-  | Unknown s -> fprintf fmt "Unknown: %s" s
-  | Failure s -> fprintf fmt "Failure: %s" s
+  | Unknown s -> fprintf fmt "Unknown (%s)" s
+  | Failure s -> fprintf fmt "Failure (%s)" s
   | HighFailure -> fprintf fmt "HighFailure"
 
 let print_prover_status fmt = function
