@@ -522,6 +522,7 @@ theory GenFloatSpecFull
   lemma lt_le_trans:
     forall x y z:t. lt x y /\ le y z -> lt x z
 
+(*
   lemma le_ge_asym:
     forall x y:t. le x y /\ ge x y -> eq x y
 
@@ -530,6 +531,7 @@ theory GenFloatSpecFull
 
   lemma not_gt_le: forall x y:t.
     not (gt x y) /\ is_not_NaN x /\ is_not_NaN y -> le x y
+*)
 
 end
 

@@ -65,12 +65,12 @@ Axiom Select_neq : forall (a:Type) (b:Type), forall (m:(map a b)),
   forall (a1:a) (a2:a), forall (b1:b), (~ (a1 = a2)) -> ((get (set m a1 b1)
   a2) = (get m a2)).
 
-Parameter const: forall (b:Type) (a:Type), b -> (map a b).
+Parameter const: forall (a:Type) (b:Type), b -> (map a b).
 Set Contextual Implicit.
 Implicit Arguments const.
 Unset Contextual Implicit.
 
-Axiom Const : forall (b:Type) (a:Type), forall (b1:b) (a1:a),
+Axiom Const : forall (a:Type) (b:Type), forall (b1:b) (a1:a),
   ((get (const b1:(map a b)) a1) = b1).
 
 (* Why3 assumption *)
@@ -221,7 +221,8 @@ Theorem eval_swap : forall (f:fmla) (sigma:(map Z value)) (pi:(list (Z*
   value)%type)) (id1:Z) (id2:Z) (v1:value) (v2:value), (~ (id1 = id2)) ->
   ((eval_fmla sigma (Cons (id1, v1) (Cons (id2, v2) pi)) f) <->
   (eval_fmla sigma (Cons (id2, v2) (Cons (id1, v1) pi)) f)).
-induction f; try ae; intros sigma pi id1 id2 v1 v2.
+induction f.
+intros sigma pi id1 id2 v1 v2.
 
 Qed.
 
