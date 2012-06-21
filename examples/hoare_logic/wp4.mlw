@@ -63,6 +63,14 @@ function get_stack (i:ident) (pi:stack) : value =
   | Cons (x,v) r -> if x=i then v else get_stack i r
   end
 
+lemma get_stack_eq:
+  forall x:ident, v:value, r:stack.
+    get_stack x (Cons (x,v) r) = v
+
+lemma get_stack_neq:
+  forall x i:ident, v:value, r:stack.
+    x <> i -> get_stack i (Cons (x,v) r) = get_stack i r 
+
 function eval_term (sigma:env) (pi:stack) (t:term) : value =
   match t with
   | Tvalue v -> v
@@ -228,7 +236,7 @@ inductive one_step env stack expr env stack expr =
 
   | one_step_while:
       forall sigma:env, pi:stack, e:expr, inv:fmla, e':expr.
-        one_step sigma pi (Ewhile e inv e') sigma pi 
+        one_step sigma pi (Ewhile e inv e') sigma pi
         (Eif e (Eseq e' (Ewhile e inv e')) void)
 
 (***
@@ -507,7 +515,7 @@ predicate expr_writes (i:expr) (w:Set.set ident) =
           (abstract_effects i
             (Fand
                 (Fimplies (Fand (Fterm e) inv) (wp i inv))
-                (Fimplies (Fand (Fnot (Fterm e)) inv) q))) 
+                (Fimplies (Fand (Fnot (Fterm e)) inv) q)))
 
     end
     { valid_triple result i q }
