@@ -155,6 +155,15 @@ version_old = "0.11.2"
 command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e -Eprecision=70"
 driver = "drivers/gappa.drv"
 
+[ATP gappa016dev]
+name = "Gappa+dev"
+exec = "gappa-0.16.0+dev"
+version_switch = "--version"
+version_regexp = "Gappa \\([^ \n]*\\)"
+version_ok = "0.16.0"
+command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e -Eprecision=70"
+driver = "drivers/gappa.drv"
+
 [ATP gappa015]
 name = "Gappa"
 exec = "gappa-0.15.1"
