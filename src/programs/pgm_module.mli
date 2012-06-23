@@ -80,7 +80,8 @@ val add_effect_pdecl : Ptree.decl -> uc -> uc
 val add_pure_pdecl : Ptree.decl -> uc -> uc
 
 val add_use_clone :
-  t Mstr.t Env.library -> Theory.theory Mstr.t -> Ptree.use_clone -> uc -> uc
+  t Mstr.t Env.library -> Theory.theory Mstr.t ->
+    Loc.position -> Ptree.use_clone -> uc -> uc
   (** add in impure, effect and pure *)
 
 (** builtins *)

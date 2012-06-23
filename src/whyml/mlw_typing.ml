@@ -404,7 +404,7 @@ and de_desc denv loc = function
       DElet (id, gh, e1, e2), e2.de_type
   | Ptree.Eletrec (rdl, e1) ->
       let rdl = dletrec denv rdl in
-      let add_one denv ({ id = id }, _, dity, _) =
+      let add_one denv (_, { id = id }, _, dity, _) =
         { denv with locals = Mstr.add id (denv.tvars, dity) denv.locals } in
       let denv = List.fold_left add_one denv rdl in
       let e1 = dexpr denv e1 in
@@ -559,16 +559,16 @@ and de_desc denv loc = function
 
 and dletrec denv rdl =
   (* add all functions into environment *)
-  let add_one denv (id, gh, bl, var, tr) =
+  let add_one denv (_,id,_,_,_,_) =
     let res = create_type_variable () in
-    add_var id res denv, (id, gh, res, bl, var, tr) in
-  let denv, rdl = Util.map_fold_left add_one denv rdl in
+    add_var id res denv, res in
+  let denv, tyl = Util.map_fold_left add_one denv rdl in
   (* then type-check all of them and unify *)
-  let type_one (id, gh, res, bl, var, tr) =
+  let type_one (loc, id, gh, bl, var, tr) res =
     let lam, dity = dlambda denv bl var tr in
     Loc.try2 id.id_loc unify dity res;
-    id, gh, dity, lam in
-  List.map type_one rdl
+    loc, id, gh, dity, lam in
+  List.map2 type_one rdl tyl
 
 and dlambda denv bl var (p, e, (q, xq)) =
   let denv,bl,tyl = dbinders denv bl in
@@ -881,7 +881,7 @@ and expr_desc lenv loc de = match de.de_desc with
       e_for pv efrom dir eto inv e1
 
 and expr_rec lenv rdl =
-  let step1 lenv (id, gh, dity, lam) =
+  let step1 lenv (_loc, id, gh, dity, lam) =
     let vta = match vty_ghostify gh (vty_of_dity dity) with
       | VTarrow vta -> vta
       | VTvalue _ -> assert false in
@@ -1304,10 +1304,10 @@ let add_theory lib path mt m =
   let { id = id; id_loc = loc } = m.pth_name in
   if Mstr.mem id mt then Loc.errorm ~loc "clash with previous theory %s" id;
   let uc = create_theory ~path (Denv.create_user_id m.pth_name) in
-  let rec add_decl uc = function
+  let rec add_decl uc (loc, decl) = match decl with
     | Dlogic d ->
         Typing.add_decl uc d
-    | Duseclone (loc, use, inst) ->
+    | Duseclone (use, inst) ->
         let path, s = Typing.split_qualid use.use_theory in
         let th = find_theory loc lib mt path s in
         (* open namespace, if any *)
@@ -1325,7 +1325,7 @@ let add_theory lib path mt m =
           | None -> uc
           | Some imp -> Theory.close_namespace uc imp use.use_as
         end
-    | Dnamespace (loc, name, import, dl) ->
+    | Dnamespace (name, import, dl) ->
         let uc = Theory.open_namespace uc in
         let uc = List.fold_left add_decl uc dl in
         Loc.try3 loc Theory.close_namespace uc import name
@@ -1341,12 +1341,12 @@ let add_module lib path mm mt m =
   if Mstr.mem id mm then Loc.errorm ~loc "clash with previous module %s" id;
   if Mstr.mem id mt then Loc.errorm ~loc "clash with previous theory %s" id;
   let uc = create_module ~path (Denv.create_user_id m.mod_name) in
-  let rec add_decl uc = function
+  let rec add_decl uc (loc,decl) = match decl with
     | Dlogic (TypeDecl tdl) ->
         add_types uc tdl
     | Dlogic d ->
         add_to_theory Typing.add_decl uc d
-    | Duseclone (loc, use, inst) ->
+    | Duseclone (use, inst) ->
         let path, s = Typing.split_qualid use.use_theory in
         let mth = find_module loc lib mm mt path s in
         (* open namespace, if any *)
@@ -1367,7 +1367,7 @@ let add_module lib path mm mt m =
           | None -> uc
           | Some imp -> close_namespace uc imp use.use_as
         end
-    | Dnamespace (loc, name, import, dl) ->
+    | Dnamespace (name, import, dl) ->
         let uc = open_namespace uc in
         let uc = List.fold_left add_decl uc dl in
         Loc.try3 loc close_namespace uc import name

@@ -281,12 +281,12 @@ let add_effect_pdecl d uc =
 let add_pure_pdecl d uc =
   { uc with uc_pure = Typing.add_decl uc.uc_pure d; }
 
-let add_use_clone env ltm d uc =
+let add_use_clone env ltm loc d uc =
   let env = Lexer.library_of_env (Env.env_of_library env) in
   { uc with
-      uc_impure = Typing.add_use_clone env ltm uc.uc_impure d;
-      uc_effect = Typing.add_use_clone env ltm uc.uc_effect d;
-      uc_pure   = Typing.add_use_clone env ltm uc.uc_pure   d; }
+      uc_impure = Typing.add_use_clone env ltm uc.uc_impure loc d;
+      uc_effect = Typing.add_use_clone env ltm uc.uc_effect loc d;
+      uc_pure   = Typing.add_use_clone env ltm uc.uc_pure   loc d; }
 
 (*
 Local Variables:

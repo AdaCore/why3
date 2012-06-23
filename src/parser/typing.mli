@@ -33,7 +33,8 @@ val debug_type_only : Debug.flag
 val add_decl : theory_uc -> Ptree.decl -> theory_uc
 
 val add_use_clone :
-  unit Env.library -> theory Mstr.t -> theory_uc -> Ptree.use_clone -> theory_uc
+  unit Env.library -> theory Mstr.t -> theory_uc ->
+    Loc.position -> Ptree.use_clone -> theory_uc
 
 val close_namespace :
   Loc.position -> bool -> string option -> theory_uc -> theory_uc

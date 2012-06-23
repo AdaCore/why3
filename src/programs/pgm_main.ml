@@ -42,12 +42,12 @@ let add_theory env path lenv m =
   let loc = id.id_loc in
   let env = Lexer.library_of_env (Env.env_of_library env) in
   let th = Theory.create_theory ~path (Denv.create_user_id id) in
-  let rec add_decl th = function
+  let rec add_decl th (loc,dcl) = match dcl with
     | Dlogic d ->
         Typing.add_decl th d
     | Duseclone d ->
-        Typing.add_use_clone env lenv th d
-    | Dnamespace (loc, name, import, dl) ->
+        Typing.add_use_clone env lenv th loc d
+    | Dnamespace (name, import, dl) ->
         let th = Theory.open_namespace th in
         let th = List.fold_left add_decl th dl in
         Typing.close_namespace loc import name th

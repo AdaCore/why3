@@ -92,6 +92,6 @@ and dexpr_desc =
   | DEghost of dexpr
   | DEany of dtype_c
 
-and drecfun = ident * ghost * dity * dlambda
+and drecfun = loc * ident * ghost * dity * dlambda
 
 and dlambda = dbinder list * dvariant list * dpre * dexpr * dpost * dxpost

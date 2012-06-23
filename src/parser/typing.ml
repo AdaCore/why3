@@ -1165,7 +1165,7 @@ let type_inst th t s =
   in
   List.fold_left add_inst empty_inst s
 
-let add_use_clone env lenv th (loc, use, subst) =
+let add_use_clone env lenv th loc (use, subst) =
   if Debug.test_flag debug_parse_only then th else
   let use_or_clone th =
     let q, id = split_qualid use.use_theory in

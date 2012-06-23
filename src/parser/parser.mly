@@ -60,9 +60,9 @@ module Incremental = struct
   let new_decl d =
     ref_set uc_ref (Typing.add_decl (ref_get uc_ref) d)
 
-  let new_use_clone d =
+  let new_use_clone loc d =
     let env = ref_get env_ref in let lenv = ref_get lenv_ref in
-    ref_set uc_ref (Typing.add_use_clone env lenv (ref_get uc_ref) d)
+    ref_set uc_ref (Typing.add_use_clone env lenv (ref_get uc_ref) loc d)
 
 end
 
@@ -313,9 +313,9 @@ new_decl:
 | decl
    { Incremental.new_decl $1 }
 | use_clone
-   { Incremental.new_use_clone $1 }
+   { Incremental.new_use_clone (floc ()) $1 }
 | namespace_head namespace_import namespace_name list0_decl END
-   { Incremental.close_namespace (floc_i 3) $2 $3 }
+   { Incremental.close_namespace (floc_ij 1 3) $2 $3 }
 ;
 
 namespace_head:
@@ -364,9 +364,9 @@ inductive:
 
 use_clone:
 | USE use
-    { (floc (), $2, None) }
+    { ($2, None) }
 | CLONE use clone_subst
-    { (floc (), $2, Some $3) }
+    { ($2, Some $3) }
 ;
 
 use:
@@ -1034,11 +1034,11 @@ list1_full_decl:
 
 full_decl:
 | decl
-   { Dlogic $1 }
+   { floc (), Dlogic $1 }
 | use_clone
-   { Duseclone $1 }
+   { floc (), Duseclone $1 }
 | NAMESPACE namespace_import namespace_name list0_full_decl END
-   { Dnamespace (floc_i 3, $3, $2, $4) }
+   { floc_ij 1 3, Dnamespace ($3, $2, $4) }
 ;
 
 list0_program_decl:
@@ -1056,6 +1056,13 @@ list1_program_decl:
 ;
 
 program_decl:
+| program_decl_one
+    { floc (), $1 }
+| NAMESPACE namespace_import namespace_name list0_program_decl END
+    { floc_ij 1 3, Dnamespace ($3, $2, $4) }
+;
+
+program_decl_one:
 | decl
     { Dlogic $1 }
 | use_clone
@@ -1076,8 +1083,6 @@ program_decl:
     { Dexn (add_lab $2 $3, Some $4) }
 | USE use_module
     { $2 }
-| NAMESPACE namespace_import namespace_name list0_program_decl END
-    { Dnamespace (floc_i 3, $3, $2, $4) }
 ;
 
 lident_rich_pgm:
@@ -1107,7 +1112,7 @@ list1_recfun_sep_and:
 recfun:
 | ghost lident_rich_pgm labels list1_type_v_binder
      opt_cast opt_variant EQUAL triple
-   { add_lab $2 $3, $1, $4, $6, cast_body $5 $8 }
+   { floc (), add_lab $2 $3, $1, $4, $6, cast_body $5 $8 }
 ;
 
 expr:

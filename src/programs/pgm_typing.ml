@@ -731,7 +731,7 @@ and dexpr_desc ~ghost ~userloc env loc = function
 
 and dletrec ~ghost ~userloc env dl =
   (* add all functions into environment *)
-  let add_one env (id, gh, bl, var, t) =
+  let add_one env (_loc, id, gh, bl, var, t) =
     no_ghost gh;
     let ty = create_type_var id.id_loc in
     let env = add_local_top env id.id ty in
@@ -2305,7 +2305,7 @@ let find_module penv lmod q id = match q with
 
 (* env  = to retrieve theories and modules from the loadpath
    lmod = local modules *)
-let rec decl ~wp env ltm lmod uc = function
+let rec decl ~wp env ltm lmod uc (loc,dcl) = match dcl with
   | Ptree.Dlet (id, gh, e) ->
       no_ghost gh;
       let denv = create_denv uc in
@@ -2399,7 +2399,7 @@ let rec decl ~wp env ltm lmod uc = function
       with ClashSymbol s ->
         errorm ~loc "clash with previous symbol %s" s
       end
-  | Ptree.Dnamespace (loc, id, import, dl) ->
+  | Ptree.Dnamespace (id, import, dl) ->
       let uc = open_namespace uc in
       let uc = List.fold_left (decl ~wp env ltm lmod) uc dl in
       begin try close_namespace uc import id
@@ -2411,7 +2411,7 @@ let rec decl ~wp env ltm lmod uc = function
   | Ptree.Dlogic (PropDecl _ | Meta _ as d) ->
       Pgm_module.add_pure_pdecl d uc
   | Ptree.Duseclone d ->
-      Pgm_module.add_use_clone env ltm d uc
+      Pgm_module.add_use_clone env ltm loc d uc
 
 (*
 Local Variables:
