@@ -88,6 +88,7 @@ and dexpr_desc =
   | DEtry of dexpr * (xsymbol * ident * dexpr) list
   | DEfor of ident * dexpr * Ptree.for_direction * dexpr * dinvariant * dexpr
   | DEassert of Ptree.assertion_kind * Ptree.lexpr
+  | DEabstract of dexpr * dpost * dxpost
   | DEmark of ident * dexpr
   | DEghost of dexpr
   | DEany of dtype_c

@@ -176,6 +176,7 @@ and expr_node = private
   | Efor    of pvsymbol * for_bounds * invariant * expr
   | Eraise  of xsymbol * expr
   | Etry    of expr * (xsymbol * pvsymbol * expr) list
+  | Eabstr  of expr * post * xpost
   | Eassert of assertion_kind * term
   | Eabsurd
 
@@ -263,5 +264,6 @@ val e_loop : invariant -> variant list -> expr -> expr
 val e_for :
   pvsymbol -> expr -> for_direction -> expr -> invariant -> expr -> expr
 
+val e_abstract : expr -> post -> xpost -> expr
 val e_assert : assertion_kind -> term -> expr
 val e_absurd : ity -> expr

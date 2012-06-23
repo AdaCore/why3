@@ -540,6 +540,10 @@ and de_desc denv loc = function
   | Ptree.Eghost e1 ->
       let e1 = dexpr denv e1 in
       DEghost e1, e1.de_type
+  | Ptree.Eabstract (e1, (q,xq)) ->
+      let e1 = dexpr denv e1 in
+      let xq = dxpost denv.uc xq in
+      DEabstract (e1, q, xq), e1.de_type
   | Ptree.Eloop ({ loop_invariant = inv; loop_variant = var }, e1) ->
       let e1 = dexpr denv e1 in
       let var = dvariant denv.uc var in
@@ -554,8 +558,6 @@ and de_desc denv loc = function
       expected_type eto dity_int;
       expected_type e1 dity_unit;
       DEfor (id,efrom,dir,eto,inv,e1), e1.de_type
-  | Ptree.Eabstract (_e1, _post) ->
-      assert false (*TODO*)
 
 and dletrec denv rdl =
   (* add all functions into environment *)
@@ -829,6 +831,13 @@ and expr_desc lenv loc de = match de.de_desc with
         let lenv = Mstr.fold (fun s pv -> add_local s (LetV pv)) vm lenv in
         pp, expr lenv de in
       e_case e1 (List.map branch bl)
+  | DEabstract (de1, q, xq) ->
+      let e1 = expr lenv de1 in
+      let ty = match e1.e_vty with
+        | VTvalue v -> ty_of_ity v.vtv_ity
+        | VTarrow _ -> ty_unit in
+      let q = create_post lenv "result" ty q in
+      e_abstract e1 q (xpost lenv xq)
   | DEassert (ak, f) ->
       let ak = match ak with
         | Ptree.Aassert -> Aassert
@@ -901,9 +910,8 @@ and expr_lam lenv gh (bl, var, p, de, q, xq) =
   if not gh && vty_ghost e.e_vty then
     errorm ~loc:de.de_loc "ghost body in a non-ghost function";
   let ty = match e.e_vty with
-    | VTarrow _ -> ty_unit
     | VTvalue vtv -> ty_of_ity vtv.vtv_ity
-  in
+    | VTarrow _ -> ty_unit in
   { l_args = pvl;
     l_variant = List.map (create_variant lenv) var;
     l_pre = create_pre lenv p;

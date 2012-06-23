@@ -308,6 +308,9 @@ and print_enode pri fmt e = match e.e_node with
       fprintf fmt "absurd"
   | Eassert (ak,f) ->
       fprintf fmt "%a@ { %a }" print_ak ak print_term f
+  | Eabstr (e,q,_xq) ->
+    (* TODO: print_xpost *)
+      fprintf fmt "abstract %a@ { %a }" print_expr e print_post q
   | Eghost e ->
       fprintf fmt "ghost@ %a" print_expr e
   | Eany tyc ->

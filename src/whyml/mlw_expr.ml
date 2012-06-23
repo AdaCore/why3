@@ -443,6 +443,7 @@ and expr_node =
   | Efor    of pvsymbol * for_bounds * invariant * expr
   | Eraise  of xsymbol * expr
   | Etry    of expr * (xsymbol * pvsymbol * expr) list
+  | Eabstr  of expr * post * xpost
   | Eassert of assertion_kind * term
   | Eabsurd
 
@@ -897,6 +898,13 @@ let e_try e0 bl =
   in
   branch vtv0.vtv_ghost eff_empty Mid.empty bl
 
+let e_abstract e q xq =
+  let result = match e.e_vty with
+    | VTvalue v -> v.vtv_ity
+    | VTarrow _ -> ity_unit in
+  let vars = spec_vars e.e_vars [] t_true q xq e.e_effect result in
+  mk_expr (Eabstr (e,q,xq)) e.e_vty e.e_effect vars
+
 let e_assert ak f =
   let vars = add_t_vars f Mid.empty in
   let vty = VTvalue (vty_value ity_unit) in
@@ -968,6 +976,8 @@ let rec expr_subst psm e = match e.e_node with
       e_assign_real (expr_subst psm e) pv
   | Eghost e ->
       e_ghost (expr_subst psm e)
+  | Eabstr (e,q,xq) ->
+      e_abstract (expr_subst psm e) q xq
   | Eraise (xs,e0) ->
       e_raise xs (expr_subst psm e0) (vtv_of_expr e).vtv_ity
   | Etry (e,bl) ->
