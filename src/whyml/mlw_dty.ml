@@ -205,7 +205,15 @@ let make_arrow_type tyl ty =
   List.fold_right arrow tyl ty
 
 let rec unify_list d1 el res =
-  let unify_loc loc d1 d2 = try unify d1 d2 with
+  let rec check_val loc = function
+    | Dts (ts, _) when ts_equal ts ts_arrow ->
+        Loc.errorm ~loc "This expression is not a first-order value"
+    | Dvar { contents = Dval d } -> check_val loc d
+    | _ -> ()
+  in
+  let unify_loc loc d1 d2 =
+    check_val loc d2;
+    try unify d1 d2 with
     | TypeMismatch (ity1, ity2) ->
         Loc.errorm ~loc "This expression has type %a, \
           but is expected to have type %a"

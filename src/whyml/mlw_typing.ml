@@ -537,7 +537,9 @@ and de_desc denv loc = function
         let id, denv = match id with
           | Some id -> id, add_var id dity denv
           | None -> mk_id "void" loc, denv in
-        xs, id, dexpr denv e
+        let e = dexpr denv e in
+        expected_type e e1.de_type;
+        xs, id, e
       in
       let cl = List.map branch cl in
       DEtry (e1, cl), e1.de_type
@@ -610,10 +612,8 @@ let create_lenv uc = {
 }
 
 let rec dty_of_ty ty = match ty.ty_node with
-  | Ty.Tyvar v ->
-      Typing.create_user_type_var v.tv_name.id_string
-  | Ty.Tyapp (ts, tyl) ->
-      Denv.tyapp ts (List.map dty_of_ty tyl)
+  | Ty.Tyapp (ts, tyl) -> Denv.tyapp ts (List.map dty_of_ty tyl)
+  | Ty.Tyvar v -> Denv.tyuvar v
 
 let create_post lenv x ty f =
   let res = create_vsymbol (id_fresh x) ty in
@@ -820,10 +820,8 @@ and expr_desc lenv loc de = match de.de_desc with
   | DEglobal_ps ps ->
       e_cast ps (vty_of_dity de.de_type)
   | DEglobal_pl pl ->
-      assert (pl.pl_ls.ls_args = []);
       e_plapp pl [] (ity_of_dity de.de_type)
   | DEglobal_ls ls ->
-      assert (ls.ls_args = []);
       e_lapp ls [] (ity_of_dity de.de_type)
   | DEif (de1, de2, de3) ->
       e_if (expr lenv de1) (expr lenv de2) (expr lenv de3)

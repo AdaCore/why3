@@ -307,7 +307,7 @@ and print_enode pri fmt e = match e.e_node with
   | Eabsurd ->
       fprintf fmt "absurd"
   | Eassert (ak,f) ->
-      fprintf fmt "%a@ { %a }" print_ak ak print_term f
+      fprintf fmt "%a { %a }" print_ak ak print_term f
   | Eabstr (e,q,_xq) ->
     (* TODO: print_xpost *)
       fprintf fmt "abstract %a@ { %a }" print_expr e print_post q
@@ -388,17 +388,17 @@ let print_ty_decl fmt ts =
   print_ty_decl fmt ts; forget_tvs_regs ()
 
 let print_data_decl fst fmt (ts,csl) =
-  fprintf fmt "@[<hov 2>%a =@\n@[<hov>%a@]@]"
+  fprintf fmt "@[<hov 2>%a =@ %a@]"
     (print_head fst) ts (print_list newline print_constr) csl;
   forget_tvs_regs ()
 
 let print_val_decl fmt { val_name = lv ; val_spec = tyv } =
-  fprintf fmt "@[<hov 2>val (%a) : @[%a@]@]" print_lv lv print_type_v tyv;
+  fprintf fmt "@[<hov 2>val (%a) :@ %a@]" print_lv lv print_type_v tyv;
   (* FIXME: don't forget global regions *)
   forget_tvs_regs ()
 
 let print_let_decl fmt { let_var = lv ; let_expr = e } =
-  fprintf fmt "@[<hov 2>let %a = @[%a@]@]" print_lv lv print_expr e;
+  fprintf fmt "@[<hov 2>let %a =@ %a@]" print_lv lv print_expr e;
   (* FIXME: don't forget global regions *)
   forget_tvs_regs ()
 
