@@ -134,7 +134,12 @@ let dity_unit = ts_app ts_unit []
 let dity_mark = ts_app ts_mark []
 
 let expected_type ?(weak=false) e dity =
-  unify ~weak e.de_type dity
+  try unify ~weak e.de_type dity with
+    | TypeMismatch (ity1,ity2) ->
+        errorm ~loc:e.de_loc "This expression has type %a, \
+          but is expected to have type %a"
+        Mlw_pretty.print_ity ity1 Mlw_pretty.print_ity ity2
+    | exn -> error ~loc:e.de_loc exn
 
 let rec extract_labels labs loc e = match e.Ptree.expr_desc with
   | Ptree.Enamed (Ptree.Lstr s, e) -> extract_labels (Slab.add s labs) loc e
@@ -321,7 +326,10 @@ and dpat_app denv ({ de_loc = loc } as de) ppl =
 (* specifications *)
 
 let dbinders denv bl =
+  let hv = Hashtbl.create 3 in
   let dbinder (id,gh,pty) (denv,bl,tyl) =
+    if Hashtbl.mem hv id.id then errorm "duplicate argument %s" id.id;
+    Hashtbl.add hv id.id ();
     let dity = match pty with
       | Some pty -> dity_of_pty ~user:true denv pty
       | None -> create_type_variable () in
@@ -654,15 +662,20 @@ let rec get_eff_expr lenv { pp_desc = d; pp_loc = loc } = match d with
         | PV pv -> e_value pv
         | _ -> errorm ~loc:(qloc p) "%a is not a variable" print_qualid p
       with Not_found -> errorm ~loc "unbound variable %a" print_qualid p end
-  | Ptree.PPapp (p, [e]) ->
-      let e = get_eff_expr lenv e in
+  | Ptree.PPapp (p, [le]) ->
+      let e = get_eff_expr lenv le in
       let ity = (vtv_of_expr e).vtv_ity in
       let x = Typing.string_list_of_qualid [] p in
       let quit () =
         errorm ~loc:(qloc p) "%a is not a projection symbol" print_qualid p in
       begin try match ns_find_ps (get_namespace lenv.mod_uc) x with
         | PL ({pl_args = [{vtv_ity = ta}]; pl_value = {vtv_ity = tr}} as pl) ->
-            let sbs = ity_match ity_subst_empty ta ity in
+            let sbs = try ity_match ity_subst_empty ta ity with
+              | TypeMismatch (ity1,ity2) ->
+                  errorm ~loc:le.pp_loc "This expression has type %a, \
+                    but is expected to have type %a"
+                  Mlw_pretty.print_ity ity2 Mlw_pretty.print_ity ity1
+              | exn -> error ~loc:le.pp_loc exn in
             let res = try ity_full_inst sbs tr with Not_found -> quit () in
             e_plapp pl [e] res
         | _ -> quit ()

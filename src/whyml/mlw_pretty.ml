@@ -106,7 +106,7 @@ let rec print_ity_node inn fmt ity = match ity.ity_node with
 
 and print_regty fmt reg =
   if Debug.test_flag debug_print_reg_types then print_reg fmt reg else
-  fprintf fmt "%a:@,%a" print_reg reg (print_ity_node false) reg.reg_ity
+  fprintf fmt "@[%a:@,%a@]" print_reg reg (print_ity_node false) reg.reg_ity
 
 let print_ity = print_ity_node false
 
@@ -134,14 +134,14 @@ let print_vtv fmt vtv =
   fprintf fmt "%s%a" (if vtv.vtv_ghost then "?" else "") print_ity vtv.vtv_ity
 
 let rec print_vta fmt vta =
-  fprintf fmt "%a@ ->@ %a%a" print_vtv vta.vta_arg
+  fprintf fmt "%a ->@ %a%a" print_vtv vta.vta_arg
     print_effect vta.vta_effect print_vty vta.vta_result
 
 and print_vty fmt = function
   | VTarrow vta -> print_vta fmt vta
   | VTvalue vtv -> print_vtv fmt vtv
 
-let print_pvty fmt pv = fprintf fmt "%a%a:@,%a"
+let print_pvty fmt pv = fprintf fmt "@[%a%a:@,%a@]"
   print_pv pv print_reg_opt pv.pv_vtv.vtv_mut print_vtv pv.pv_vtv
 
 let print_psty fmt ps =
@@ -150,7 +150,7 @@ let print_psty fmt ps =
   let print_regs fmt regs = if not (Sreg.is_empty regs) then
     fprintf fmt "<%a>@ " (print_list comma print_regty) (Sreg.elements regs) in
   let vars = ps.ps_vta.vta_vars in
-  fprintf fmt "%a :@ %a%a%a"
+  fprintf fmt "@[%a :@ %a%a%a@]"
     print_ps ps
     print_tvs (Stv.diff vars.vars_tv ps.ps_vars.vars_tv)
     print_regs (Mreg.set_diff vars.vars_reg ps.ps_subst.ity_subst_reg)
@@ -160,7 +160,7 @@ let print_psty fmt ps =
 
 let print_post fmt post =
   let vs,f = open_post post in
-  fprintf fmt "%a ->@ %a" print_vs vs print_term f;
+  fprintf fmt "@[%a ->@ %a@]" print_vs vs print_term f;
   Pretty.forget_var vs
 
 let print_lv fmt = function
@@ -174,12 +174,12 @@ let forget_lv = function
 let rec print_type_v fmt = function
   | SpecV vtv -> print_vtv fmt vtv
   | SpecA (pvl,tyc) ->
-      let print_arg fmt pv = fprintf fmt "(%a) ->@ " print_pvty pv in
+      let print_arg fmt pv = fprintf fmt "@[(%a)@] ->@ " print_pvty pv in
       fprintf fmt "%a%a" (print_list nothing print_arg) pvl print_type_c tyc;
       List.iter forget_pv pvl
 
 and print_type_c fmt tyc =
-  fprintf fmt "{ %a }@ %a%a@ { %a }@]"
+  fprintf fmt "{ %a }@ %a%a@ { %a }"
     print_term tyc.c_pre
     print_effect tyc.c_effect
     print_type_v tyc.c_result
@@ -295,7 +295,7 @@ and print_enode pri fmt e = match e.e_node with
       fprintf fmt "loop@ %a%a@\n@[<hov>%a@]@\nend"
         print_invariant inv print_variant var print_expr e
   | Efor (pv,(pvfrom,dir,pvto),inv,e) ->
-      fprintf fmt "@[<hov 2>for@ %a@ =@ %a@ %s@ %a@ %ado@\n%a@]@\ndone"
+      fprintf fmt "@[<hov 2>for@ %a =@ %a@ %s@ %a@ %ado@\n%a@]@\ndone"
         print_pv pv print_pv pvfrom
         (if dir = To then "to" else "downto") print_pv pvto
         print_invariant inv print_expr e
@@ -325,8 +325,8 @@ and print_xbranch fmt (xs, pv, e) =
   forget_pv pv
 
 and print_rec fst fmt { rec_ps = ps ; rec_lambda = lam } =
-  let print_arg fmt pv = fprintf fmt "(%a)" print_pvty pv in
-  fprintf fmt "@[<hov 2>%s (%a) %a =@\n{ %a }@\n%a%a@\n{ %a }@]"
+  let print_arg fmt pv = fprintf fmt "@[(%a)@]" print_pvty pv in
+  fprintf fmt "@[<hov 2>%s (%a)@ %a =@\n{ %a }@\n%a%a@\n{ %a }@]"
     (if fst then "let rec" else "with")
     print_psty ps
     (print_list space print_arg) lam.l_args

@@ -96,7 +96,7 @@ syn keyword  whyKeyword  abstract absurd any assert assume
 syn keyword  whyKeyword  check exception fun ghost
 syn keyword  whyKeyword  invariant model mutable
 syn keyword  whyKeyword  private raise raises reads rec
-syn keyword  whyKeyword  variant while writes
+syn keyword  whyKeyword  val variant while writes
 
 syn keyword  whyType     bool int list map option real
 syn keyword  whyType     array ref unit
