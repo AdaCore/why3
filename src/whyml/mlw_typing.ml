@@ -1398,32 +1398,32 @@ let add_module lib path mm mt m =
         let pd = match e.de_desc with
           | DEfun lam ->
               let def = expr_fun (create_lenv uc) id gh lam in
-              create_rec_decl [def]
+              Loc.try1 loc create_rec_decl [def]
           | _ ->
               let e = e_ghostify gh (expr (create_lenv uc) e) in
               if not gh && vty_ghost e.e_vty then
                 errorm ~loc "%s must be a ghost variable" id.id;
               let def = create_let_defn (Denv.create_user_id id) e in
-              create_let_decl def
+              Loc.try1 loc create_let_decl def
         in
         Loc.try2 loc add_pdecl_with_tuples uc pd
     | Dletrec rdl ->
         let rdl = dletrec (create_denv uc) rdl in
         let rdl = expr_rec (create_lenv uc) rdl in
-        let pd = create_rec_decl rdl in
+        let pd = Loc.try1 loc create_rec_decl rdl in
         Loc.try2 loc add_pdecl_with_tuples uc pd
     | Dexn (id, pty) ->
         let ity = match pty with
           | Some pty ->
               ity_of_dity (dity_of_pty ~user:false (create_denv uc) pty)
           | None -> ity_unit in
-        let xs = create_xsymbol (Denv.create_user_id id) ity in
-        let pd = create_exn_decl xs in
+        let xs = Loc.try2 loc create_xsymbol (Denv.create_user_id id) ity in
+        let pd = Loc.try1 loc create_exn_decl xs in
         Loc.try2 loc add_pdecl_with_tuples uc pd
     | Dparam (id, gh, tyv) ->
         let tyv, _ = dtype_v (create_denv uc) tyv in
         let tyv = type_v (create_lenv uc) gh vars_empty tyv in
-        let vd = create_val (Denv.create_user_id id) tyv in
+        let vd = Loc.try2 loc create_val (Denv.create_user_id id) tyv in
         begin match vd.val_name with
           | LetA { ps_vta = { vta_ghost = true }} when not gh ->
               errorm ~loc "%s must be a ghost function" id.id
@@ -1431,7 +1431,7 @@ let add_module lib path mm mt m =
               errorm ~loc "%s must be a ghost variable" id.id
           | _ -> ()
         end;
-        let pd = create_val_decl vd in
+        let pd = Loc.try1 loc create_val_decl vd in
         Loc.try2 loc add_pdecl_with_tuples uc pd
     (* TODO: this is made obsolete by Duseclone, remove later *)
     | Duse (qid, use_imp_exp, use_as) ->

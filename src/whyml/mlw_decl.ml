@@ -125,11 +125,16 @@ let create_data_decl tdl =
   let tdl = List.map build_type tdl in
   mk_decl (PDdata tdl) !syms !news
 
+let check_vars vars =
+  if not (Stv.is_empty vars.vars_tv) then
+    raise (UnboundTypeVar (Stv.choose vars.vars_tv))
+
+let letvar_news = function
+  | LetV pv -> check_vars pv.pv_vtv.vtv_vars; Sid.singleton pv.pv_vs.vs_name
+  | LetA ps -> check_vars ps.ps_vars; Sid.singleton ps.ps_name
+
 let create_let_decl ld =
-  let id = match ld.let_var with
-    | LetV pv -> pv.pv_vs.vs_name
-    | LetA ps -> ps.ps_name in
-  let news = Sid.singleton id in
+  let news = letvar_news ld.let_var in
   (* FIXME!!! This is not a correct way of counting symbols,
      since it ignores type symbols and exception symbols, and
      lsymbols inside specifications. We should either extend
@@ -141,7 +146,7 @@ let create_let_decl ld =
 
 let create_rec_decl rdl =
   if rdl = [] then raise Decl.EmptyDecl;
-  let add_rd s rd = news_id s rd.rec_ps.ps_name in
+  let add_rd s { rec_ps = p } = check_vars p.ps_vars; news_id s p.ps_name in
   let news = List.fold_left add_rd Sid.empty rdl in
   let add_rd s rd = Sid.union s (Mid.map (fun _ -> ()) rd.rec_vars) in
   (* FIXME!!! See the comment in create_let_decl *)
@@ -149,10 +154,7 @@ let create_rec_decl rdl =
   mk_decl (PDrec rdl) syms news
 
 let create_val_decl vd =
-  let id = match vd.val_name with
-    | LetV pv -> pv.pv_vs.vs_name
-    | LetA ps -> ps.ps_name in
-  let news = Sid.singleton id in
+  let news = letvar_news vd.val_name in
   (* FIXME!!! See the comment in create_let_decl *)
   let syms = Mid.map (fun _ -> ()) vd.val_vars in
   mk_decl (PDval vd) syms news
