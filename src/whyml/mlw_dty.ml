@@ -128,9 +128,9 @@ let ts_app ts dl = match ts.ts_def with
 
 let rec occur_check tv = function
   | Dvar { contents = Dval d } -> occur_check tv d
-  | Dvar { contents = Dtvs tv' } -> if tv_equal tv tv' then raise Exit
   | Dits (_,dl,_) | Dts (_,dl) -> List.iter (occur_check tv) dl
-  | Duvar _ -> ()
+  | Dvar { contents = Dtvs tv' } | Duvar tv' ->
+      if tv_equal tv tv' then raise Exit
 
 let rec occur_check_reg tv = function
   | Dvar { contents = Dval d } -> occur_check_reg tv d
@@ -138,10 +138,10 @@ let rec occur_check_reg tv = function
   | Dits (_,dl,rl) ->
       let rec check = function
         | Rvar { contents = Rval dreg } -> check dreg
-        | Rvar { contents = Rtvs (tv',dity,_) } ->
+        | Rvar { contents = Rtvs (tv',dity,_) } | Rureg (tv',dity,_) ->
             if tv_equal tv tv' then raise Exit;
             occur_check_reg tv dity
-        | Rureg _ | Rreg _ -> ()
+        | Rreg _ -> ()
       in
       List.iter (occur_check_reg tv) dl;
       List.iter check rl
