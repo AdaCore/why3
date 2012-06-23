@@ -46,8 +46,8 @@ let create_pvsymbol, restore_pv =
     let pv = create_pvsymbol id vtv in
     Wvs.set vs_to_pv pv.pv_vs pv;
     pv),
-  (fun vs -> try Wvs.find vs_to_pv vs with
-    Not_found -> raise (Decl.UnboundVar vs))
+  (fun vs -> try Wvs.find vs_to_pv vs with Not_found ->
+    Loc.error ?loc:vs.vs_name.id_loc (Decl.UnboundVar vs))
 
 (** program symbols *)
 
@@ -146,7 +146,7 @@ let add_pv_vars pv m = Mid.add pv.pv_vs.vs_name pv.pv_vtv.vtv_vars m
 let add_vs_vars vs m = add_pv_vars (restore_pv vs) m
 
 let fmla_vars f vsset =
-  if f.t_ty <> None then raise (FmlaExpected f);
+  if f.t_ty <> None then Loc.error ?loc:f.t_loc (FmlaExpected f);
   Mvs.set_union vsset f.t_vars
 
 let post_vars ity f vsset =
@@ -527,7 +527,7 @@ let create_let_defn id e =
   in
   { let_var = lv ; let_expr = e }
 
-exception StaleRegion of region * ident
+exception StaleRegion of expr * region * ident
 
 let check_reset e vars =
   (* If we reset a region, then it may only occur in the later code
@@ -541,7 +541,8 @@ let check_reset e vars =
           | Some u when reg_equal u reg -> false
           | _ -> ity_v_any Util.ffalse check_reg reg.reg_ity
       in
-      if Sreg.exists check_reg s.vars_reg then raise (StaleRegion (r,id))
+      if Sreg.exists check_reg s.vars_reg then
+        Loc.error ?loc:e.e_loc (StaleRegion (e,r,id))
     in
     Mid.iter check_id vars
   in
@@ -552,7 +553,8 @@ let check_ghost_write e eff =
      be read in a later non-ghost code. We ignore any resets:
      a once ghostified region must stay so, even if it is reset. *)
   let badwr = Sreg.inter e.e_effect.eff_ghostw eff.eff_reads in
-  if not (Sreg.is_empty badwr) then raise (GhostWrite (e, Sreg.choose badwr))
+  if not (Sreg.is_empty badwr) then
+    Loc.error ?loc:e.e_loc (GhostWrite (e, Sreg.choose badwr))
 
 let check_postexpr e eff vars =
   check_ghost_write e eff;
@@ -572,9 +574,8 @@ exception ArrowExpected of expr
 
 let e_app_real e pv =
   let vta = match e.e_vty with
-    | VTarrow vta -> vta
-    | VTvalue _ -> raise (ArrowExpected e)
-  in
+    | VTvalue _ -> Loc.error ?loc:e.e_loc (ArrowExpected e)
+    | VTarrow vta -> vta in
   let eff,vty = vty_app_arrow vta pv.pv_vtv in
   check_postexpr e eff (add_pv_vars pv Mid.empty);
   let eff = eff_union e.e_effect eff in
@@ -608,7 +609,7 @@ let on_value fn e = match e.e_node with
   | _ ->
       let ld = create_let_defn (id_fresh "o") e in
       let pv = match ld.let_var with
-        | LetA _ -> raise (ValueExpected e)
+        | LetA _ -> Loc.error ?loc:e.e_loc (ValueExpected e)
         | LetV pv -> pv in
       e_let ld (fn pv)
 
@@ -634,7 +635,7 @@ let e_app = List.fold_left (fun e -> on_value (e_app_real e))
 
 let vtv_of_expr e = match e.e_vty with
   | VTvalue vtv -> vtv
-  | VTarrow _ -> raise (ValueExpected e)
+  | VTarrow _ -> Loc.error ?loc:e.e_loc (ValueExpected e)
 
 let e_plapp pls el ity =
   let rec app tl vars ghost eff sbs vtvl argl =
@@ -730,7 +731,7 @@ let e_assign_real e0 pv =
   let vtv0 = vtv_of_expr e0 in
   let r = match vtv0.vtv_mut with
     | Some r -> r
-    | None -> raise (Immutable e0) in
+    | None -> Loc.error ?loc:e0.e_loc (Immutable e0) in
   let ghost = vtv0.vtv_ghost || pv.pv_vtv.vtv_ghost in
   let eff = eff_assign eff_empty ~ghost r pv.pv_vtv.vtv_ity in
   let vars = add_pv_vars pv Mid.empty in
@@ -752,7 +753,7 @@ let e_assign_real e0 pv =
      that every ghost write (whether it was made into a ghost
      lvalue or not) is never followed by a non-ghost read. *)
   if not vtv0.vtv_ghost && pv.pv_vtv.vtv_ghost then
-    raise (GhostWrite (e,r));
+    Loc.error ?loc:e.e_loc (GhostWrite (e,r));
   e
 
 let e_assign me e = on_value (e_assign_real me) e
@@ -787,7 +788,7 @@ let on_fmla fn e = match e.e_node with
   | _ ->
       let ld = create_let_defn (id_fresh "o") e in
       let pv = match ld.let_var with
-        | LetA _ -> raise (ValueExpected e)
+        | LetA _ -> Loc.error ?loc:e.e_loc (ValueExpected e)
         | LetV pv -> pv in
       e_let ld (fn (e_value pv) (t_equ_simp (t_var pv.pv_vs) t_bool_true))
 
@@ -888,7 +889,7 @@ let e_try e0 bl =
         let remove eff0 (xs,_,_) =
           (* we catch in a ghost exception in a non-ghost code *)
           if not ghost && Sexn.mem xs eff0.eff_ghostx then
-            raise (GhostRaise (e0,xs));
+            Loc.error ?loc:e0.e_loc (GhostRaise (e0,xs));
           eff_remove_raise eff0 xs in
         let eff0 = List.fold_left remove e0.e_effect bl in
         (* total effect and vars *)

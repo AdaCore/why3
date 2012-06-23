@@ -183,6 +183,9 @@ type xsymbol = private {
 
 val xs_equal : xsymbol -> xsymbol -> bool
 
+exception PolymorphicException of ident * ity
+exception MutableException of ident * ity
+
 val create_xsymbol : preid -> ity -> xsymbol
 
 module Mexn: Map.S with type key = xsymbol
@@ -212,6 +215,8 @@ val eff_reset : effect -> region -> effect
 val eff_assign : effect -> ?ghost:bool -> region -> ity -> effect
 
 val eff_remove_raise : effect -> xsymbol -> effect
+
+exception IllegalAlias of region
 
 val eff_full_inst : ity_subst -> effect -> effect
 

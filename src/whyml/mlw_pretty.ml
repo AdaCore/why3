@@ -435,23 +435,43 @@ let print_module fmt m =
 
 let () = Exn_printer.register
   begin fun fmt exn -> match exn with
-  | BadItyArity (ts, ts_arg, app_arg) ->
+  | Mlw_ty.BadItyArity (ts, ts_arg, app_arg) ->
       fprintf fmt "Bad type arity: type symbol %a must be applied \
                    to %i arguments, but is applied to %i"
         print_its ts ts_arg app_arg
-  | BadRegArity (ts, ts_arg, app_arg) ->
+  | Mlw_ty.BadRegArity (ts, ts_arg, app_arg) ->
       fprintf fmt "Bad region arity: type symbol %a must be applied \
                    to %i regions, but is applied to %i"
         print_its ts ts_arg app_arg
-  | DuplicateRegion r ->
+  | Mlw_ty.DuplicateRegion r ->
       fprintf fmt "Region %a is used twice" print_reg r
-  | UnboundRegion r ->
+  | Mlw_ty.UnboundRegion r ->
       fprintf fmt "Unbound region %a" print_reg r
-  | RegionMismatch (r1,r2) ->
+  | Mlw_ty.RegionMismatch (r1,r2) ->
       fprintf fmt "Region mismatch between %a and %a"
         print_regty r1 print_regty r2
   | Mlw_ty.TypeMismatch (t1,t2) ->
       fprintf fmt "Type mismatch between %a and %a"
         print_ity t1 print_ity t2
+  | Mlw_ty.PolymorphicException (id,_ity) ->
+      fprintf fmt "Exception %s has a polymorphic type" id.id_string
+  | Mlw_ty.MutableException (id,_ity) ->
+      fprintf fmt "The type of exception %s has mutable components" id.id_string
+  | Mlw_ty.IllegalAlias _reg ->
+      fprintf fmt "This application creates an illegal alias"
+  | Mlw_expr.GhostWrite (_e, _reg) ->
+      fprintf fmt "This expression stores a ghost value in a non-ghost location"
+  | Mlw_expr.GhostRaise (_e, xs) ->
+      fprintf fmt "This expression raises a ghost exception %a \
+        catched by a non-ghost code" print_xs xs
+  | Mlw_expr.StaleRegion (_e, _reg, id) ->
+      fprintf fmt "This expression prohibits further \
+        usage of variable %s" id.id_string
+  | Mlw_expr.ValueExpected _e ->
+      fprintf fmt "This expression is not a first-order value"
+  | Mlw_expr.ArrowExpected _e ->
+      fprintf fmt "This expression is not a function and cannot be applied"
+  | Mlw_expr.Immutable _e ->
+      fprintf fmt "Mutable expression expected"
   | _ -> raise exn
   end
