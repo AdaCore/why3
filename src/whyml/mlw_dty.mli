@@ -46,6 +46,8 @@ val make_arrow_type: dity list -> dity -> dity
 val unify: ?weak:bool -> dity -> dity -> unit
   (** destructive unification, with or without region unification *)
 
+val unify_list: dity -> (Loc.position * dity) list -> dity -> unit
+
 val ity_of_dity: dity -> ity
 val vty_of_dity: dity -> vty
   (** use with care, only once unification is done *)

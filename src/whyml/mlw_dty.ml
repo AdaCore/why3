@@ -200,6 +200,30 @@ let ts_arrow =
   let v = List.map (fun s -> create_tvsymbol (Ident.id_fresh s)) ["a"; "b"] in
   Ty.create_tysymbol (Ident.id_fresh "arrow") v None
 
+let make_arrow_type tyl ty =
+  let arrow ty1 ty2 = ts_app_real ts_arrow [ty1;ty2] in
+  List.fold_right arrow tyl ty
+
+let rec unify_list d1 el res =
+  let unify_loc loc d1 d2 = try unify d1 d2 with
+    | TypeMismatch (ity1, ity2) ->
+        Loc.errorm ~loc "This expression has type %a, \
+          but is expected to have type %a"
+        Mlw_pretty.print_ity ity2 Mlw_pretty.print_ity ity1
+    | exn -> Loc.error ~loc exn
+  in
+  match d1, el with
+  | Dts (ts, [d1;d2]), ((loc,dity)::el) when ts_equal ts ts_arrow ->
+      (* this is an ugly and overcomplicated way to treat
+         implicit fields in record update expressions *)
+      if Loc.equal loc Loc.dummy_position
+      then (unify_loc loc d1 dity; unify_list d2 el res)
+      else (unify_list d2 el res; unify_loc loc d1 dity)
+  | Dvar { contents = Dval d1 }, _ ->
+      unify_list d1 el res
+  | _ ->
+      unify d1 (make_arrow_type (List.map snd el) res)
+
 let rec vty_of_dity = function
   | Dvar { contents = Dval d } ->
       vty_of_dity d
@@ -282,10 +306,6 @@ let specialize_pvsymbol pv =
 
 let specialize_xsymbol xs =
   specialize_vtvalue (vty_value xs.xs_ity)
-
-let make_arrow_type tyl ty =
-  let arrow ty1 ty2 = ts_app_real ts_arrow [ty1;ty2] in
-  List.fold_right arrow tyl ty
 
 let specialize_vtarrow vars vta =
   let htv = Htv.create 3 and hreg = Hreg.create 3 in

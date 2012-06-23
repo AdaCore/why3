@@ -133,13 +133,16 @@ let dity_bool = ts_app ts_bool []
 let dity_unit = ts_app ts_unit []
 let dity_mark = ts_app ts_mark []
 
-let expected_type ?(weak=false) e dity =
-  try unify ~weak e.de_type dity with
+let unify_loc loc fn_unify x1 x2 =
+  try fn_unify x1 x2 with
     | TypeMismatch (ity1,ity2) ->
-        errorm ~loc:e.de_loc "This expression has type %a, \
+        errorm ~loc "This expression has type %a, \
           but is expected to have type %a"
-        Mlw_pretty.print_ity ity1 Mlw_pretty.print_ity ity2
-    | exn -> error ~loc:e.de_loc exn
+        Mlw_pretty.print_ity ity2 Mlw_pretty.print_ity ity1
+    | exn -> error ~loc exn
+
+let expected_type ?(weak=false) e dity =
+  unify_loc e.de_loc (unify ~weak) dity e.de_type
 
 let rec extract_labels labs loc e = match e.Ptree.expr_desc with
   | Ptree.Enamed (Ptree.Lstr s, e) -> extract_labels (Slab.add s labs) loc e
@@ -282,35 +285,36 @@ let rec dpattern denv ({ pat_loc = loc } as pp) = match pp.pat_desc with
       PPvar (Denv.create_user_id id), dity, add_var id dity denv
   | Ptree.PPpapp (q,ppl) ->
       let sym, dity = specialize_qualid denv.uc q in
-      dpat_app denv (mk_dexpr sym dity loc Slab.empty) ppl
+      dpat_app denv loc (mk_dexpr sym dity loc Slab.empty) ppl
   | Ptree.PPprec fl when pure_record denv.uc fl ->
       let kn = Theory.get_known (get_theory denv.uc) in
       let fl = List.map (find_pure_field denv.uc) fl in
       let cs,pjl,flm = Loc.try2 loc Decl.parse_record kn fl in
       let wild = { pat_desc = Ptree.PPpwild; pat_loc = loc } in
       let get_val pj = Mls.find_def wild pj flm in
-      dpat_app denv (hidden_ls ~loc cs) (List.map get_val pjl)
+      dpat_app denv loc (hidden_ls ~loc cs) (List.map get_val pjl)
   | Ptree.PPprec fl ->
       let fl = List.map (find_field denv.uc) fl in
       let cs,pjl,flm = Loc.try2 loc parse_record denv.uc fl in
       let wild = { pat_desc = Ptree.PPpwild; pat_loc = loc } in
       let get_val pj = Mls.find_def wild pj.pl_ls flm in
-      dpat_app denv (hidden_pl ~loc cs) (List.map get_val pjl)
+      dpat_app denv loc (hidden_pl ~loc cs) (List.map get_val pjl)
   | Ptree.PPptuple ppl ->
       let cs = fs_tuple (List.length ppl) in
-      dpat_app denv (hidden_ls ~loc cs) ppl
-  | Ptree.PPpor (pp1, pp2) ->
-      let pp1, dity1, denv = dpattern denv pp1 in
-      let pp2, dity2, denv = dpattern denv pp2 in
-      Loc.try2 loc unify dity1 dity2;
+      dpat_app denv loc (hidden_ls ~loc cs) ppl
+  | Ptree.PPpor (lpp1, lpp2) ->
+      let pp1, dity1, denv = dpattern denv lpp1 in
+      let pp2, dity2, denv = dpattern denv lpp2 in
+      unify_loc lpp2.pat_loc unify dity1 dity2;
       PPor (pp1, pp2), dity1, denv
   | Ptree.PPpas (pp, id) ->
       let pp, dity, denv = dpattern denv pp in
       PPas (pp, Denv.create_user_id id), dity, add_var id dity denv
 
-and dpat_app denv ({ de_loc = loc } as de) ppl =
-  let add_pp pp (ppl, tyl, denv) =
-    let pp,ty,denv = dpattern denv pp in pp::ppl,ty::tyl,denv in
+and dpat_app denv gloc ({ de_loc = loc } as de) ppl =
+  let add_pp lp (ppl, tyl, denv) =
+    let pp, ty, denv = dpattern denv lp in
+    pp::ppl, (lp.pat_loc,ty)::tyl, denv in
   let ppl, tyl, denv = List.fold_right add_pp ppl ([],[],denv) in
   let pp = match de.de_desc with
     | DEglobal_pl pl -> Mlw_expr.PPpapp (pl, ppl)
@@ -320,7 +324,7 @@ and dpat_app denv ({ de_loc = loc } as de) ppl =
     | _ -> assert false
   in
   let res = create_type_variable () in
-  Loc.try2 loc unify de.de_type (make_arrow_type tyl res);
+  Loc.try2 gloc unify_list de.de_type tyl res;
   pp, res, denv
 
 (* specifications *)
@@ -374,10 +378,10 @@ let dvariant uc = function
 
 let de_unit ~loc = hidden_ls ~loc (fs_tuple 0)
 
-let de_app e el =
+let de_app loc e el =
   let res = create_type_variable () in
-  let tyl = List.map (fun a -> a.de_type) el in
-  expected_type e (make_arrow_type tyl res);
+  let tyl = List.map (fun a -> (a.de_loc, a.de_type)) el in
+  Loc.try2 loc unify_list e.de_type tyl res;
   DEapply (e, el), res
 
 let rec dexpr denv e =
@@ -399,7 +403,7 @@ and de_desc denv loc = function
   | Ptree.Eapply (e1, e2) ->
       let e, el = decompose_app [e2] e1 in
       let el = List.map (dexpr denv) el in
-      de_app (dexpr denv e) el
+      de_app loc (dexpr denv e) el
   | Ptree.Elet (id, gh, e1, e2) ->
       let e1 = dexpr denv e1 in
       let dity = e1.de_type in
@@ -441,7 +445,7 @@ and de_desc denv loc = function
   | Ptree.Etuple el ->
       let ls = fs_tuple (List.length el) in
       let el = List.map (dexpr denv) el in
-      de_app (hidden_ls ~loc ls) el
+      de_app loc (hidden_ls ~loc ls) el
   | Ptree.Erecord fl when pure_record denv.uc fl ->
       let kn = Theory.get_known (get_theory denv.uc) in
       let fl = List.map (find_pure_field denv.uc) fl in
@@ -449,14 +453,14 @@ and de_desc denv loc = function
       let get_val pj = match Mls.find_opt pj flm with
         | Some e -> dexpr denv e
         | None -> error ~loc (Decl.RecordFieldMissing (cs,pj)) in
-      de_app (hidden_ls ~loc cs) (List.map get_val pjl)
+      de_app loc (hidden_ls ~loc cs) (List.map get_val pjl)
   | Ptree.Erecord fl ->
       let fl = List.map (find_field denv.uc) fl in
       let cs,pjl,flm = Loc.try2 loc parse_record denv.uc fl in
       let get_val pj = match Mls.find_opt pj.pl_ls flm with
         | Some e -> dexpr denv e
         | None -> error ~loc (Decl.RecordFieldMissing (cs.pl_ls,pj.pl_ls)) in
-      de_app (hidden_pl ~loc cs) (List.map get_val pjl)
+      de_app loc (hidden_pl ~loc cs) (List.map get_val pjl)
   | Ptree.Eupdate (e1, fl) when pure_record denv.uc fl ->
       let e1 = dexpr denv e1 in
       let e0 = mk_var e1 in
@@ -466,9 +470,10 @@ and de_desc denv loc = function
       let get_val pj = match Mls.find_opt pj flm with
         | Some e -> dexpr denv e
         | None ->
-            let d, dity = de_app (hidden_ls ~loc pj) [e0] in
+            let loc = Loc.dummy_position in
+            let d, dity = de_app loc (hidden_ls ~loc pj) [e0] in
             mk_dexpr d dity loc Slab.empty in
-      let res = de_app (hidden_ls ~loc cs) (List.map get_val pjl) in
+      let res = de_app loc (hidden_ls ~loc cs) (List.map get_val pjl) in
       mk_let ~loc ~uloc:denv.uloc e1 res
   | Ptree.Eupdate (e1, fl) ->
       let e1 = dexpr denv e1 in
@@ -478,9 +483,10 @@ and de_desc denv loc = function
       let get_val pj = match Mls.find_opt pj.pl_ls flm with
         | Some e -> dexpr denv e
         | None ->
-            let d, dity = de_app (hidden_pl ~loc pj) [e0] in
+            let loc = Loc.dummy_position in
+            let d, dity = de_app loc (hidden_pl ~loc pj) [e0] in
             mk_dexpr d dity loc Slab.empty in
-      let res = de_app (hidden_pl ~loc cs) (List.map get_val pjl) in
+      let res = de_app loc (hidden_pl ~loc cs) (List.map get_val pjl) in
       mk_let ~loc ~uloc:denv.uloc e1 res
   | Ptree.Eassign (e1, q, e2) ->
       let fl = { expr_desc = Eident q; expr_loc = loc } in
@@ -508,8 +514,8 @@ and de_desc denv loc = function
       let res = create_type_variable () in
       let branch (pp,e) =
         let ppat, dity, denv = dpattern denv pp in
+        unify_loc pp.pat_loc unify e1.de_type dity;
         let e = dexpr denv e in
-        Loc.try2 pp.pat_loc unify dity e1.de_type;
         expected_type e res;
         ppat, e in
       DEmatch (e1, List.map branch bl), res
@@ -670,12 +676,7 @@ let rec get_eff_expr lenv { pp_desc = d; pp_loc = loc } = match d with
         errorm ~loc:(qloc p) "%a is not a projection symbol" print_qualid p in
       begin try match ns_find_ps (get_namespace lenv.mod_uc) x with
         | PL ({pl_args = [{vtv_ity = ta}]; pl_value = {vtv_ity = tr}} as pl) ->
-            let sbs = try ity_match ity_subst_empty ta ity with
-              | TypeMismatch (ity1,ity2) ->
-                  errorm ~loc:le.pp_loc "This expression has type %a, \
-                    but is expected to have type %a"
-                  Mlw_pretty.print_ity ity2 Mlw_pretty.print_ity ity1
-              | exn -> error ~loc:le.pp_loc exn in
+            let sbs = unify_loc le.pp_loc (ity_match ity_subst_empty) ta ity in
             let res = try ity_full_inst sbs tr with Not_found -> quit () in
             e_plapp pl [e] res
         | _ -> quit ()
