@@ -1419,8 +1419,22 @@ let add_module lib path mm mt m =
         end;
         let pd = create_val_decl vd in
         Loc.try2 loc add_pdecl_with_tuples uc pd
-    | Duse _ ->
-        assert false (*TO BE REMOVED EVENTUALLY *)
+    (* TODO: this is made obsolete by Duseclone, remove later *)
+    | Duse (qid, use_imp_exp, use_as) ->
+        let path, s = Typing.split_qualid qid in
+        let mth = find_module loc lib mm mt path s in
+        (* open namespace, if any *)
+        let uc = if use_imp_exp <> None then open_namespace uc else uc in
+        (* use or clone *)
+        let uc = match mth with
+          | Theory _ -> errorm ~loc "Module not found: %a" print_qualid qid
+          | Module m -> use_export uc m
+        in
+        (* close namespace, if any *)
+        begin match use_imp_exp with
+          | None -> uc
+          | Some imp -> close_namespace uc imp use_as
+        end
   in
   let uc = List.fold_left add_decl uc m.mod_decl in
   let m = close_module uc in
