@@ -248,12 +248,17 @@ let dexception uc qid =
       print_dty ty;
   r
 
+let no_ghost gh =
+  if gh then errorm "ghost types are not supported in this version of WhyML"
+
+let eff_no_ghost l = List.map (fun (gh,x) -> no_ghost gh; x) l
+
 let dueffect env e =
-  { du_reads  = e.Ptree.pe_reads;
-    du_writes = e.Ptree.pe_writes;
+  { du_reads  = eff_no_ghost e.Ptree.pe_reads;
+    du_writes = eff_no_ghost e.Ptree.pe_writes;
     du_raises =
       List.map (fun id -> let ls,_,_ = dexception env.uc id in ls)
-        e.Ptree.pe_raises; }
+        (eff_no_ghost e.Ptree.pe_raises); }
 
 let dpost uc (q, ql) =
   let dexn (id, l) = let s, _, _ = dexception uc id in s, l in
@@ -309,7 +314,8 @@ and dutype_c env c =
     duc_post        = dpost env.uc c.Ptree.pc_post;
   }
 
-and dubinder env ({id=x; id_loc=loc} as id, v) =
+and dubinder env ({id=x; id_loc=loc} as id, gh, v) =
+  no_ghost gh;
   let ty = match v with
     | Some v -> dtype ~user:true env v
     | None -> create_type_var loc
@@ -480,7 +486,8 @@ and dexpr_desc ~ghost ~userloc env loc = function
       let tyl = List.map (fun (_,ty) -> ty) bl in
       let ty = dcurrying tyl e.dexpr_type in
       DEfun (bl, t), ty
-  | Ptree.Elet (x, e1, e2) ->
+  | Ptree.Elet (x, gh, e1, e2) ->
+      no_ghost gh;
       let e1 = dexpr ~ghost ~userloc env e1 in
       let ty1 = e1.dexpr_type in
       let env = add_local env x.id ty1 in
@@ -716,12 +723,16 @@ and dexpr_desc ~ghost ~userloc env loc = function
       let e1 = dexpr ~ghost ~userloc env e1 in
       let q = dpost env.uc q in
       DEabstract(e1, q), e1.dexpr_type
+  | Ptree.Eghost _ ->
+      no_ghost true;
+      assert false
   | Ptree.Enamed _ ->
       assert false
 
 and dletrec ~ghost ~userloc env dl =
   (* add all functions into environment *)
-  let add_one env (id, bl, var, t) =
+  let add_one env (id, gh, bl, var, t) =
+    no_ghost gh;
     let ty = create_type_var id.id_loc in
     let env = add_local_top env id.id ty in
     env, ((id, ty), bl, var, t)
@@ -1560,7 +1571,7 @@ let rec is_pure_expr e =
   | Elocal _ | Elogic _ -> true
   | Eif (e1, e2, e3) -> is_pure_expr e1 && is_pure_expr e2 && is_pure_expr e3
   | Elet (_, e1, e2) -> is_pure_expr e1 && is_pure_expr e2
-  | Eabstract (e1, _) 
+  | Eabstract (e1, _)
   | Emark (_, e1) -> is_pure_expr e1
   | Eany c -> E.no_side_effect c.c_effect
   | Eassert _ | Etry _ | Efor _ | Eraise _ | Ematch _
@@ -2295,7 +2306,8 @@ let find_module penv lmod q id = match q with
 (* env  = to retrieve theories and modules from the loadpath
    lmod = local modules *)
 let rec decl ~wp env ltm lmod uc = function
-  | Ptree.Dlet (id, e) ->
+  | Ptree.Dlet (id, gh, e) ->
+      no_ghost gh;
       let denv = create_denv uc in
       let e = dexpr ~ghost:false ~userloc:None denv e in
       let e = iexpr (create_ienv denv) e in
@@ -2334,7 +2346,8 @@ let rec decl ~wp env ltm lmod uc = function
       let d = Dletrec dl in
       let uc = add_decl d uc in
       if wp then Pgm_wp.decl uc d else uc
-  | Ptree.Dparam (id, tyv) ->
+  | Ptree.Dparam (id, gh, tyv) ->
+      no_ghost gh;
       let loc = id.id_loc in
       let denv = create_denv uc in
       let tyv = dutype_v denv tyv in

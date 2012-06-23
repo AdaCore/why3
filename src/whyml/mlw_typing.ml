@@ -219,7 +219,7 @@ let mk_let ~loc ~uloc e (desc,dity) =
   if test_var e then desc, dity else
   let loc = def_option loc uloc in
   let e1 = mk_dexpr desc dity loc Slab.empty in
-  DElet (mk_id "q" loc, e, e1), dity
+  DElet (mk_id "q" loc, false, e, e1), dity
 
 (* patterns *)
 
@@ -321,18 +321,18 @@ and dpat_app denv ({ de_loc = loc } as de) ppl =
 (* specifications *)
 
 let dbinders denv bl =
-  let dbinder (id,pty) (denv,bl,tyl) =
+  let dbinder (id,gh,pty) (denv,bl,tyl) =
     let dity = match pty with
       | Some pty -> dity_of_pty ~user:true denv pty
       | None -> create_type_variable () in
-    add_var id dity denv, (id,false,dity)::bl, dity::tyl
+    add_var id dity denv, (id,gh,dity)::bl, dity::tyl
   in
   List.fold_right dbinder bl (denv,[],[])
 
 let deff_of_peff uc pe =
-  { deff_reads  = List.map (fun le -> false, le) pe.pe_reads;
-    deff_writes = List.map (fun le -> false, le) pe.pe_writes;
-    deff_raises = List.map (fun q -> false, find_xsymbol uc q) pe.pe_raises; }
+  { deff_reads  = pe.pe_reads;
+    deff_writes = pe.pe_writes;
+    deff_raises = List.map (fun (gh,q) -> gh, find_xsymbol uc q) pe.pe_raises; }
 
 let dxpost uc ql = List.map (fun (q,f) -> find_xsymbol uc q, f) ql
 
@@ -392,7 +392,7 @@ and de_desc denv loc = function
       let e, el = decompose_app [e2] e1 in
       let el = List.map (dexpr denv) el in
       de_app (dexpr denv e) el
-  | Ptree.Elet (id, e1, e2) ->
+  | Ptree.Elet (id, gh, e1, e2) ->
       let e1 = dexpr denv e1 in
       let dity = e1.de_type in
       let tvars = match e1.de_desc with
@@ -401,10 +401,10 @@ and de_desc denv loc = function
       let locals = Mstr.add id.id (tvars, dity) denv.locals in
       let denv = { denv with locals = locals; tvars = tvars } in
       let e2 = dexpr denv e2 in
-      DElet (id, e1, e2), e2.de_type
+      DElet (id, gh, e1, e2), e2.de_type
   | Ptree.Eletrec (rdl, e1) ->
       let rdl = dletrec denv rdl in
-      let add_one denv ({ id = id }, dity, _) =
+      let add_one denv ({ id = id }, _, dity, _) =
         { denv with locals = Mstr.add id (denv.tvars, dity) denv.locals } in
       let denv = List.fold_left add_one denv rdl in
       let e1 = dexpr denv e1 in
@@ -422,7 +422,7 @@ and de_desc denv loc = function
       let e1 = dexpr denv e1 in
       expected_type e1 dity_unit;
       let e2 = dexpr denv e2 in
-      DElet (mk_id "_" loc, e1, e2), e2.de_type
+      DElet (mk_id "_" loc, false, e1, e2), e2.de_type
   | Ptree.Eif (e1, e2, e3) ->
       let e1 = dexpr denv e1 in
       expected_type e1 dity_bool;
@@ -537,6 +537,9 @@ and de_desc denv loc = function
   | Ptree.Eany tyc ->
       let tyc, dity = dtype_c denv tyc in
       DEany tyc, dity
+  | Ptree.Eghost e1 ->
+      let e1 = dexpr denv e1 in
+      DEghost e1, e1.de_type
   | Ptree.Eloop ({ loop_invariant = inv; loop_variant = var }, e1) ->
       let e1 = dexpr denv e1 in
       let var = dvariant denv.uc var in
@@ -556,15 +559,15 @@ and de_desc denv loc = function
 
 and dletrec denv rdl =
   (* add all functions into environment *)
-  let add_one denv (id, bl, var, tr) =
+  let add_one denv (id, gh, bl, var, tr) =
     let res = create_type_variable () in
-    add_var id res denv, (id, res, bl, var, tr) in
+    add_var id res denv, (id, gh, res, bl, var, tr) in
   let denv, rdl = Util.map_fold_left add_one denv rdl in
   (* then type-check all of them and unify *)
-  let type_one (id, res, bl, var, tr) =
+  let type_one (id, gh, res, bl, var, tr) =
     let lam, dity = dlambda denv bl var tr in
     Loc.try2 id.id_loc unify dity res;
-    id, dity, lam in
+    id, gh, dity, lam in
   List.map type_one rdl
 
 and dlambda denv bl var (p, e, (q, xq)) =
@@ -707,8 +710,8 @@ let eff_of_deff lenv deff =
   let eff = List.fold_left add_raise eff deff.deff_raises in
   eff
 
-let rec type_c lenv vars dtyc =
-  let result = type_v lenv vars dtyc.dc_result in
+let rec type_c lenv gh vars dtyc =
+  let result = type_v lenv gh vars dtyc.dc_result in
   let ty = match result with
     | SpecV v -> ty_of_ity v.vtv_ity
     | SpecA _ -> ty_unit in
@@ -727,16 +730,23 @@ let rec type_c lenv vars dtyc =
     c_post   = create_post lenv "result" ty dtyc.dc_post;
     c_xpost  = xpost lenv dtyc.dc_xpost; }
 
-and type_v lenv vars = function
+and type_v lenv gh vars = function
   | DSpecV (ghost,v) ->
+      let ghost = ghost || gh in
       SpecV (vty_value ~ghost (ity_of_dity v))
   | DSpecA (bl,tyc) ->
       let lenv, pvl = binders lenv bl in
       let add_pv s pv = vars_union s pv.pv_vtv.vtv_vars in
       let vars = List.fold_left add_pv vars pvl in
-      SpecA (pvl, type_c lenv vars tyc)
+      SpecA (pvl, type_c lenv gh vars tyc)
 
 (* expressions *)
+
+let vty_ghostify gh vty =
+  if gh && not (vty_ghost vty) then vty_ghostify vty else vty
+
+let e_ghostify gh e =
+  if gh && not (vty_ghost e.e_vty) then e_ghost e else e
 
 let rec expr lenv de =
   let loc = de.de_loc in
@@ -750,18 +760,29 @@ and expr_desc lenv loc de = match de.de_desc with
       | LetV pv -> e_value pv
       | LetA ps -> e_cast ps (vty_of_dity de.de_type)
       end
-  | DElet (x, { de_desc = DEfun lam }, de2) ->
-      let def = expr_fun lenv x lam in
+  | DElet (x, gh, { de_desc = DEfun lam }, de2) ->
+      let def = expr_fun lenv x gh lam in
       let lenv = add_local x.id (LetA def.rec_ps) lenv in
       let e2 = expr lenv de2 in
       e_rec [def] e2
   | DEfun lam ->
       let x = mk_id "fn" loc in
-      let def = expr_fun lenv x lam in
+      let def = expr_fun lenv x false lam in
       let e2 = e_cast def.rec_ps (VTarrow def.rec_ps.ps_vta) in
       e_rec [def] e2
-  | DElet (x, de1, de2) ->
-      let e1 = expr lenv de1 in
+  (* FIXME? (ghost "lab" fun x -> ...) loses the label "lab" *)
+  | DEghost { de_desc = DEfun lam } ->
+      let x = mk_id "fn" loc in
+      let def = expr_fun lenv x true lam in
+      let e2 = e_cast def.rec_ps (VTarrow def.rec_ps.ps_vta) in
+      e_rec [def] e2
+  | DElet (x, gh, de1, de2) ->
+      let e1 = e_ghostify gh (expr lenv de1) in
+      begin match e1.e_vty with
+        | VTarrow { vta_ghost = true } when not gh ->
+            errorm ~loc "%s must be a ghost function" x.id
+        | _ -> ()
+      end;
       let def1 = create_let_defn (Denv.create_user_id x) e1 in
       let lenv = add_local x.id def1.let_var lenv in
       let e2 = expr lenv de2 in
@@ -826,14 +847,19 @@ and expr_desc lenv loc de = match de.de_desc with
         let lenv = add_local id.id (LetV pv) lenv in
         xs, pv, expr lenv de in
       e_try e1 (List.map branch bl)
+  (* We push ghost down in order to safely capture even non-ghost
+     raises of the inner expression in "ghost try e1 with ..." *)
+  | DEghost ({ de_desc = DEtry (de2, bl) } as de1) ->
+      let de2 = { de1 with de_desc = DEghost de2 } in
+      expr lenv { de1 with de_desc = DEtry (de2, bl) }
   | DEmark (x, de1) ->
       let ld = create_let_defn (Denv.create_user_id x) e_setmark in
       let lenv = add_local x.id ld.let_var lenv in
       e_let ld (expr lenv de1)
   | DEany dtyc ->
-      e_any (type_c lenv vars_empty dtyc)
+      e_any (type_c lenv false vars_empty dtyc)
   | DEghost de1 ->
-      e_ghost (expr lenv de1)
+      e_ghostify true (expr lenv de1)
   | DEloop (var,inv,de1) ->
       let inv = match inv with
         | Some inv -> create_pre lenv inv
@@ -855,23 +881,25 @@ and expr_desc lenv loc de = match de.de_desc with
       e_for pv efrom dir eto inv e1
 
 and expr_rec lenv rdl =
-  let step1 lenv (id, dity, lam) =
-    let vta = match vty_of_dity dity with
+  let step1 lenv (id, gh, dity, lam) =
+    let vta = match vty_ghostify gh (vty_of_dity dity) with
       | VTarrow vta -> vta
       | VTvalue _ -> assert false in
     let ps = create_psymbol (Denv.create_user_id id) vta vars_empty in
-    add_local id.id (LetA ps) lenv, (ps, lam) in
+    add_local id.id (LetA ps) lenv, (ps, gh, lam) in
   let lenv, rdl = Util.map_fold_left step1 lenv rdl in
-  let step2 (ps, lam) = ps, expr_lam lenv lam in
+  let step2 (ps, gh, lam) = ps, expr_lam lenv gh lam in
   create_rec_defn (List.map step2 rdl)
 
-and expr_fun lenv x lam =
-  let lam = expr_lam lenv lam in
+and expr_fun lenv x gh lam =
+  let lam = expr_lam lenv gh lam in
   create_fun_defn (Denv.create_user_id x) lam
 
-and expr_lam lenv (bl, var, p, e, q, xq) =
+and expr_lam lenv gh (bl, var, p, de, q, xq) =
   let lenv, pvl = binders lenv bl in
-  let e = expr lenv e in
+  let e = e_ghostify gh (expr lenv de) in
+  if not gh && vty_ghost e.e_vty then
+    errorm ~loc:de.de_loc "ghost body in a non-ghost function";
   let ty = match e.e_vty with
     | VTarrow _ -> ty_unit
     | VTvalue vtv -> ty_of_ity vtv.vtv_ity
@@ -1343,14 +1371,16 @@ let add_module lib path mm mt m =
         let uc = open_namespace uc in
         let uc = List.fold_left add_decl uc dl in
         Loc.try3 loc close_namespace uc import name
-    | Dlet (id, e) ->
+    | Dlet (id, gh, e) ->
         let e = dexpr (create_denv uc) e in
         let pd = match e.de_desc with
           | DEfun lam ->
-              let def = expr_fun (create_lenv uc) id lam in
+              let def = expr_fun (create_lenv uc) id gh lam in
               create_rec_decl [def]
           | _ ->
-              let e = expr (create_lenv uc) e in
+              let e = e_ghostify gh (expr (create_lenv uc) e) in
+              if not gh && vty_ghost e.e_vty then
+                errorm ~loc "%s must be a ghost variable" id.id;
               let def = create_let_defn (Denv.create_user_id id) e in
               create_let_decl def
         in
@@ -1368,10 +1398,17 @@ let add_module lib path mm mt m =
         let xs = create_xsymbol (Denv.create_user_id id) ity in
         let pd = create_exn_decl xs in
         Loc.try2 loc add_pdecl_with_tuples uc pd
-    | Dparam (id, tyv) ->
+    | Dparam (id, gh, tyv) ->
         let tyv, _ = dtype_v (create_denv uc) tyv in
-        let tyv = type_v (create_lenv uc) vars_empty tyv in
+        let tyv = type_v (create_lenv uc) gh vars_empty tyv in
         let vd = create_val (Denv.create_user_id id) tyv in
+        begin match vd.val_name with
+          | LetA { ps_vta = { vta_ghost = true }} when not gh ->
+              errorm ~loc "%s must be a ghost function" id.id
+          | LetV { pv_vtv = { vtv_ghost = true }} when not gh ->
+              errorm ~loc "%s must be a ghost variable" id.id
+          | _ -> ()
+        end;
         let pd = create_val_decl vd in
         Loc.try2 loc add_pdecl_with_tuples uc pd
     | Duse _ ->

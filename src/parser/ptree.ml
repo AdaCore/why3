@@ -186,17 +186,19 @@ type loop_annotation = {
 
 type for_direction = To | Downto
 
+type ghost = bool
+
 type effect = {
-  pe_reads  : lexpr list;
-  pe_writes : lexpr list;
-  pe_raises : qualid list;
+  pe_reads  : (ghost * lexpr) list;
+  pe_writes : (ghost * lexpr) list;
+  pe_raises : (ghost * qualid) list;
 }
 
 type pre = lexpr
 
 type post = lexpr * (qualid * lexpr) list
 
-type binder = ident * pty option
+type binder = ident * ghost * pty option
 
 type type_v =
   | Tpure of pty
@@ -219,8 +221,9 @@ and expr_desc =
   | Eident of qualid
   | Eapply of expr * expr
   | Efun of binder list * triple
-  | Elet of ident * expr * expr
-  | Eletrec of (ident * binder list * variant option * triple) list * expr
+  | Elet of ident * ghost * expr * expr
+  | Eletrec of
+      (ident * ghost * binder list * variant option * triple) list * expr
   | Etuple of expr list
   | Erecord of (qualid * expr) list
   | Eupdate of expr * (qualid * expr) list
@@ -241,19 +244,18 @@ and expr_desc =
   | Emark of ident * expr
   | Ecast of expr * pty
   | Eany of type_c
+  | Eghost of expr
   | Eabstract of expr * post
   | Enamed of label * expr
-
-  (* TODO: ghost *)
 
 and triple = pre * expr * post
 
 type program_decl =
-  | Dlet    of ident * expr
-  | Dletrec of (ident * binder list * variant option * triple) list
+  | Dlet    of ident * ghost * expr
+  | Dletrec of (ident * ghost * binder list * variant option * triple) list
   | Dlogic  of decl
   | Duseclone of use_clone
-  | Dparam  of ident * type_v
+  | Dparam  of ident * ghost * type_v
   | Dexn    of ident * pty option
   (* modules *)
   | Duse    of qualid * bool option * (*as:*) string option

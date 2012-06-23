@@ -75,7 +75,7 @@ and dexpr_desc =
   | DEglobal_ls of Term.lsymbol
   | DEapply of dexpr * dexpr list
   | DEfun of dlambda
-  | DElet of ident * dexpr * dexpr
+  | DElet of ident * ghost * dexpr * dexpr
   | DEletrec of drecfun list * dexpr
   | DEassign of dexpr * dexpr
   | DEif of dexpr * dexpr * dexpr
@@ -92,6 +92,6 @@ and dexpr_desc =
   | DEghost of dexpr
   | DEany of dtype_c
 
-and drecfun = ident * dity * dlambda
+and drecfun = ident * ghost * dity * dlambda
 
 and dlambda = dbinder list * dvariant list * dpre * dexpr * dpost * dxpost

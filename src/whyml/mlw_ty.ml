@@ -668,6 +668,10 @@ let vtv_unmut vtv =
   if vtv.vtv_mut = None then vtv else
     vty_value ~ghost:vtv.vtv_ghost vtv.vtv_ity
 
+let vty_ghost = function
+  | VTvalue vtv -> vtv.vtv_ghost
+  | VTarrow vta -> vta.vta_ghost
+
 let vty_arrow vtv ?(effect=eff_empty) ?(ghost=false) vty =
   (* mutable arguments are rejected outright *)
   if vtv.vtv_mut <> None then
@@ -681,13 +685,9 @@ let vty_arrow vtv ?(effect=eff_empty) ?(ghost=false) vty =
     vta_arg    = vtv;
     vta_result = vty;
     vta_effect = effect;
-    vta_ghost  = ghost;
+    vta_ghost  = ghost || vty_ghost vty;
     vta_vars   = vty_vars vtv.vtv_vars vty;
   }
-
-let vty_ghost = function
-  | VTvalue vtv -> vtv.vtv_ghost
-  | VTarrow vta -> vta.vta_ghost
 
 let vtv_ghostify vtv = { vtv with vtv_ghost = true }
 let vta_ghostify vta = { vta with vta_ghost = true }

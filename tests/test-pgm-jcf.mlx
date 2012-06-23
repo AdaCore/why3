@@ -19,7 +19,7 @@ module N
   type tree 'a = Node 'a (forest 'a) | Leaf
   with forest 'a = Cons (tree 'a) (forest 'a) | Nil
 
-  type ref 'b = {| (* ghost *) mutable contents : 'b |}
+  type ref 'b = {| ghost mutable contents : 'b |}
 
   type myrec 'a = {| f1 : int ; ghost f2 : tree 'a |}
 
@@ -29,7 +29,7 @@ module N
 
   let create_dref i = {| dcontents = {| contents = i |} |}
 
-  let foo (x : ref int) (y : ref int) =
+  let ghost foo (x : ref int) (y : ref int) =
     x.contents <- 1;
     y.contents <- 2
 
@@ -40,16 +40,16 @@ module N
             {} unit writes gr { gr.contents = (old gr.contents) + 4 }
 
 
-  let test () =
+  let ghost test () =
     foo gr {| contents = 4 |}
 
-  let myfun r = { r = r }
+  let ghost myfun r = { r = r }
   'L:
-    let rec on_tree t = { true } match t with
+    let rec ghost on_tree t = { true } match t with
       | Node {| contents = v |} f -> v + on_forest f
       | Leaf -> raise (Exit Leaf)
     end { at r 'L = t }
-    with on_forest f = match f with
+    with ghost on_forest f = match f with
       | Cons t f -> let ee = Leaf in on_tree t + on_forest f + on_tree ee
       | Nil -> 1
     end
