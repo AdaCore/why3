@@ -104,6 +104,27 @@ let create_denv uc = {
   uloc   = None;
 }
 
+(* Handle tuple symbols *)
+
+let ht_tuple   = Hashtbl.create 3
+let ts_tuple n = Hashtbl.replace ht_tuple n (); ts_tuple n
+let fs_tuple n = Hashtbl.replace ht_tuple n (); fs_tuple n
+
+let count_term_tuples t =
+  let syms_ts _ ts = match is_ts_tuple_id ts.ts_name with
+    | Some n -> Hashtbl.replace ht_tuple n () | _ -> () in
+  let syms_ty _ ty = ty_s_fold syms_ts () ty in
+  t_s_fold syms_ty (fun _ _ -> ()) () t
+
+let add_pdecl_with_tuples uc pd =
+  let kn = Theory.get_known (get_theory uc) in
+  let add_tuple n _ uc =
+    if Mid.mem (ts_tuple n).ts_name kn then uc
+    else use_export_theory uc (tuple_theory n) in
+  let uc = Hashtbl.fold add_tuple ht_tuple uc in
+  Hashtbl.clear ht_tuple;
+  add_pdecl uc pd
+
 (** Typing type expressions *)
 
 let rec dity_of_pty ~user denv = function
@@ -379,7 +400,7 @@ let dvariant uc = function
 
 (* expressions *)
 
-let de_unit ~loc = hidden_ls ~loc (fs_tuple 0)
+let de_unit ~loc = hidden_ls ~loc (Term.fs_tuple 0)
 
 let de_app loc e el =
   let res = create_type_variable () in
@@ -619,18 +640,24 @@ let rec dty_of_ty ty = match ty.ty_node with
   | Ty.Tyvar v -> Denv.tyuvar v
 
 let create_post lenv x ty f =
+  let th = get_theory lenv.mod_uc in
   let res = create_vsymbol (id_fresh x) ty in
   let log_vars = Mstr.add x res lenv.log_vars in
   let log_denv = Typing.add_var x (dty_of_ty ty) lenv.log_denv in
-  let f = Typing.type_fmla (get_theory lenv.mod_uc) log_denv log_vars f in
+  let f = Typing.type_fmla th log_denv log_vars f in
+  count_term_tuples f;
   create_post res f
 
 let create_pre lenv f =
-  Typing.type_fmla (get_theory lenv.mod_uc) lenv.log_denv lenv.log_vars f
+  let th = get_theory lenv.mod_uc in
+  let f = Typing.type_fmla th lenv.log_denv lenv.log_vars f in
+  count_term_tuples f;
+  f
 
 let create_variant lenv (t,r) =
-  let t =
-    Typing.type_term (get_theory lenv.mod_uc) lenv.log_denv lenv.log_vars t in
+  let th = get_theory lenv.mod_uc in
+  let t = Typing.type_term th lenv.log_denv lenv.log_vars t in
+  count_term_tuples t;
   { v_term = t; v_rel = r }
 
 let add_local x lv lenv = match lv with

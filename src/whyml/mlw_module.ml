@@ -268,6 +268,7 @@ let add_pdecl uc d =
   | PDexn xs ->
       add_exn uc xs
 
+(*
 let add_pdecl_with_tuples uc d =
   let ids = Mid.set_diff d.pd_syms uc.muc_known in
   let ids = Mid.set_diff ids (Theory.get_known uc.muc_theory) in
@@ -277,6 +278,7 @@ let add_pdecl_with_tuples uc d =
   let ixs = Sid.fold add ids Sint.empty in
   let add n uc = use_export_theory uc (tuple_theory n) in
   add_pdecl (Sint.fold add ixs uc) d
+*)
 
 (* create module *)
 
@@ -290,6 +292,7 @@ let th_unit =
 let mod_exit =
   let xs = create_xsymbol (id_fresh "%Exit") ity_unit in
   let uc = empty_module (id_fresh "Exit") [] in
+  let uc = use_export_theory uc (tuple_theory 0) in
   let uc = add_pdecl uc (create_exn_decl xs) in
   close_module uc
 

@@ -271,3 +271,7 @@ val e_for :
 val e_abstract : expr -> post -> xpost -> expr
 val e_assert : assertion_kind -> term -> expr
 val e_absurd : ity -> expr
+
+(** expression traversal *)
+
+val e_fold : ('a -> expr -> 'a) -> 'a -> expr -> 'a

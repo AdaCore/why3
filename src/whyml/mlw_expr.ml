@@ -1005,6 +1005,26 @@ let create_fun_defn id lam =
     Loc.errorm "Variants are not allowed in a non-recursive definition";
   create_fun_defn id lam
 
+(* fold *)
+
+let e_fold fn acc e = match e.e_node with
+  | Elet (ld,e) -> fn (fn acc ld.let_expr) e
+  | Erec (rdl,e) ->
+      let fnrd acc rd = fn acc rd.rec_lambda.l_expr in
+      fn (List.fold_left fnrd acc rdl) e
+  | Ecase (e,bl) ->
+      let fnbr acc (_,e) = fn acc e in
+      List.fold_left fnbr (fn acc e) bl
+  | Etry (e,bl) ->
+      let fnbr acc (_,_,e) = fn acc e in
+      List.fold_left fnbr (fn acc e) bl
+  | Eif (e1,e2,e3) -> fn (fn (fn acc e1) e2) e3
+  | Eapp (e,_) | Eassign (e,_,_) | Eghost e
+  | Eloop (_,_,e) | Efor (_,_,_,e) | Eraise (_,e)
+  | Eabstr (e,_,_) -> fn acc e
+  | Elogic _ | Evalue _ | Earrow _
+  | Eany _ | Eassert _ | Eabsurd -> acc
+
 (*
   - A "proper type" of a vty [v] is [v] with empty specification
     (effect/pre/post/xpost). Basically, it is formed from pv_ity's
