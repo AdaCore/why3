@@ -1400,9 +1400,9 @@ let add_module lib path mm mt m =
   let uc = create_module ~path (Denv.create_user_id m.mod_name) in
   let rec add_decl uc (loc,decl) = match decl with
     | Dlogic (TypeDecl tdl) ->
-        add_types uc tdl
+        Loc.try2 loc add_types uc tdl
     | Dlogic d ->
-        add_to_theory Typing.add_decl uc d
+        Loc.try3 loc add_to_theory Typing.add_decl uc d
     | Duseclone (use, inst) ->
         let path, s = Typing.split_qualid use.use_theory in
         let mth = find_module loc lib mm mt path s in
