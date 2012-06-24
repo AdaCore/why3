@@ -246,6 +246,10 @@ type ppattern = {
   ppat_effect  : effect;
 }
 
+let ppat_is_wild pp = match pp.ppat_pattern.pat_node with
+  | Pwild -> true
+  | _ -> false
+
 let ppat_wild vtv =
   if vtv.vtv_mut <> None then Loc.errorm "Wildcard patterns are immutable";
   { ppat_pattern = pat_wild (ty_of_ity vtv.vtv_ity);
@@ -257,20 +261,10 @@ let ppat_var pv =
     ppat_vtv     = pv.pv_vtv;
     ppat_effect  = eff_empty; }
 
-let ppat_is_wild pp = match pp.ppat_pattern.pat_node with
-  | Pwild -> true
-  | _ -> false
-
 let ppat_plapp pls ppl vtv =
   if vtv.vtv_mut <> None then
     Loc.errorm "Only variable patterns can be mutable";
   if pls.pl_hidden then raise (HiddenPLS pls.pl_ls);
-  (* FIXME? Since pls is a constructor, the result type vtv will
-     cover every type variable and region in the signature of pls.
-     Then the following ity_match call is enough to build the full
-     substitution. If, however, we are given a bad pls, say, a
-     projection, then the following code may break with a less
-     than understandable error message. Is it really important? *)
   let sbs = ity_match ity_subst_empty pls.pl_value.vtv_ity vtv.vtv_ity in
   let mtch eff arg pp =
     ignore (ity_match sbs arg.vtv_ity pp.ppat_vtv.vtv_ity);
@@ -291,9 +285,10 @@ let ppat_plapp pls ppl vtv =
     | None, Some _ ->
         Loc.errorm "Mutable pattern in a non-mutable position"
   in
-  let eff = try List.fold_left2 mtch eff_empty pls.pl_args ppl
-    with Invalid_argument _ -> raise
-      (Term.BadArity (pls.pl_ls, List.length pls.pl_args, List.length ppl)) in
+  let eff = try List.fold_left2 mtch eff_empty pls.pl_args ppl with
+    | Not_found -> raise (Pattern.ConstructorExpected pls.pl_ls)
+    | Invalid_argument _ -> raise (Term.BadArity
+        (pls.pl_ls, List.length pls.pl_args, List.length ppl)) in
   let pl = List.map (fun pp -> pp.ppat_pattern) ppl in
   { ppat_pattern = pat_app pls.pl_ls pl (ty_of_ity vtv.vtv_ity);
     ppat_vtv     = vtv;
@@ -360,12 +355,6 @@ let make_ppattern pp vtv =
         ppat_effect  = eff_empty; }
     | PPpapp (pls,ppl) ->
         if pls.pl_hidden then raise (HiddenPLS pls.pl_ls);
-        (* FIXME? Since pls is a constructor, the result type vtv will
-           cover every type variable and region in the signature of pls.
-           Then the following ity_match call is enough to build the full
-           substitution. If, however, we are given a bad pls, say, a
-           projection, then the following code may break with a less
-           than understandable error message. Is it really important? *)
         let sbs = ity_match ity_subst_empty pls.pl_value.vtv_ity vtv.vtv_ity in
         let mtch arg pp =
           let ity = ity_full_inst sbs arg.vtv_ity in
@@ -375,9 +364,10 @@ let make_ppattern pp vtv =
           if ppat_is_wild pp then pp.ppat_effect, pp else
           Util.option_fold (eff_read ~ghost) pp.ppat_effect mut, pp
         in
-        let ppl = try List.map2 mtch pls.pl_args ppl with Invalid_argument _ ->
-          raise (Term.BadArity
-            (pls.pl_ls, List.length pls.pl_args, List.length ppl)) in
+        let ppl = try List.map2 mtch pls.pl_args ppl with
+          | Not_found -> raise (Pattern.ConstructorExpected pls.pl_ls)
+          | Invalid_argument _ -> raise (Term.BadArity
+              (pls.pl_ls, List.length pls.pl_args, List.length ppl)) in
         let eff = List.fold_left
           (fun acc (eff,_) -> eff_union acc eff) eff_empty ppl in
         let pl = List.map (fun (_,pp) -> pp.ppat_pattern) ppl in
@@ -391,8 +381,10 @@ let make_ppattern pp vtv =
           let ity = ity_full_inst sbs (ity_of_ty arg) in
           make (vty_value ~ghost:vtv.vtv_ghost ity) pp
         in
-        let ppl = try List.map2 mtch ls.ls_args ppl with Invalid_argument _ ->
-          raise (Term.BadArity (ls,List.length ls.ls_args,List.length ppl)) in
+        let ppl = try List.map2 mtch ls.ls_args ppl with
+          | Not_found -> raise (Pattern.ConstructorExpected ls)
+          | Invalid_argument _ -> raise (Term.BadArity
+              (ls,List.length ls.ls_args,List.length ppl)) in
         let eff = List.fold_left
           (fun acc pp -> eff_union acc pp.ppat_effect) eff_empty ppl in
         let pl = List.map (fun pp -> pp.ppat_pattern) ppl in
@@ -761,7 +753,7 @@ let e_assign_real e0 pv =
      that every ghost write (whether it was made into a ghost
      lvalue or not) is never followed by a non-ghost read. *)
   if not vtv0.vtv_ghost && pv.pv_vtv.vtv_ghost then
-    Loc.error ?loc:e.e_loc (GhostWrite (e,r));
+    Loc.error (GhostWrite (e,r));
   e
 
 let e_assign me e = on_value (e_assign_real me) e
@@ -862,16 +854,14 @@ let e_for pv efrom dir eto inv e =
   let apply pvto = on_value (apply pvto) efrom in
   on_value apply eto
 
-(* FIXME? We don't call check_postexpr to verify that raising
-   an exception is ok after the computation of e, because with
-   the current semantics of whyml it always is. However, this
-   might break some day. *)
 let e_raise xs e ity =
   let vtv = vtv_of_expr e in
-  ity_equal_check xs.xs_ity vtv.vtv_ity;
   let ghost = vtv.vtv_ghost in
-  let eff = eff_raise e.e_effect ~ghost xs in
+  ity_equal_check xs.xs_ity vtv.vtv_ity;
+  let eff = eff_raise eff_empty ~ghost xs in
   let vty = VTvalue (vty_value ~ghost ity) in
+  check_postexpr e eff Mid.empty;
+  let eff = eff_union eff e.e_effect in
   mk_expr (Eraise (xs,e)) vty eff e.e_vars
 
 let e_try e0 bl =
