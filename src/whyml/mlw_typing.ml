@@ -156,6 +156,33 @@ let rec decompose_app args e = match e.Ptree.expr_desc with
   | Eapply (e1, e2) -> decompose_app (e2 :: args) e1
   | _ -> e, args
 
+(* namespace lookup *)
+
+let uc_find_ls uc p =
+  let x = Typing.string_list_of_qualid [] p in
+  ns_find_ls (Theory.get_namespace (get_theory uc)) x
+
+let uc_find_prgs uc p =
+  let x = Typing.string_list_of_qualid [] p in
+  ns_find_ps (get_namespace uc) x
+
+exception LS of lsymbol
+
+let uc_find_ps_or_ls uc p =
+  let x = Typing.string_list_of_qualid [] p in
+  try ns_find_ps (get_namespace uc) x with Not_found ->
+  (* we didn't find p in the module namespace *)
+  let ls = ns_find_ls (Theory.get_namespace (get_theory uc)) x in
+  (* and we did find it in the pure theory *)
+  if Mid.mem ls.ls_name (get_known uc) then
+    (* but it was defined in a program declaration! *)
+    error ~loc:(qloc p) (HiddenPLS ls);
+  (* fine, it's just a pure lsymbol *)
+  raise (LS ls)
+
+let uc_find_ps uc p =
+  try uc_find_ps_or_ls uc p with LS _ -> raise Not_found
+
 (* record parsing *)
 
 let parse_record uc fll =
@@ -176,24 +203,17 @@ let parse_record uc fll =
   in
   cs,pjl,flm
 
-let find_field uc (p,e) =
-  let x = Typing.string_list_of_qualid [] p in
-  try match ns_find_ps (get_namespace uc) x with
-    | PL pl -> (pl,e)
-    | _ -> errorm ~loc:(qloc p) "bad record field %a" print_qualid p
+let find_field uc (p,e) = try match uc_find_ps uc p with
+  | PL pl -> (pl,e)
+  | _ -> errorm ~loc:(qloc p) "bad record field %a" print_qualid p
   with Not_found -> errorm ~loc:(qloc p) "unbound symbol %a" print_qualid p
 
-let find_pure_field uc (p,e) =
-  let x = Typing.string_list_of_qualid [] p in
-  try ns_find_ls (Theory.get_namespace (get_theory uc)) x, e
+let find_pure_field uc (p,e) = try uc_find_ls uc p, e
   with Not_found -> errorm ~loc:(qloc p) "unbound symbol %a" print_qualid p
 
 let pure_record uc = function
   | [] -> raise Decl.EmptyRecord
-  | (p,_)::_ ->
-      let x = Typing.string_list_of_qualid [] p in
-      begin try ignore (ns_find_ps (get_namespace uc) x); false
-      with Not_found -> true end
+  | (p,_)::_ -> (try ignore (uc_find_ps uc p); false with Not_found -> true)
 
 let hidden_pl ~loc pl =
   { de_desc = DEglobal_pl pl;
@@ -236,45 +256,28 @@ let add_var id dity denv =
   let locals = Mstr.add id.id (tvars,dity) denv.locals in
   { denv with locals = locals; tvars = tvars }
 
-let specialize_qualid uc p =
-  let x = Typing.string_list_of_qualid [] p in
-  try match ns_find_ps (get_namespace uc) x with
-    | PV pv -> DEglobal_pv pv, specialize_pvsymbol pv
-    | PS ps -> DEglobal_ps ps, specialize_psymbol  ps
-    | PL pl -> DEglobal_pl pl, specialize_plsymbol pl
-    | PX xs ->
-        errorm ~loc:(qloc p) "unexpected exception symbol %a" print_xs xs
-  with Not_found -> try
-    let ls = ns_find_ls (Theory.get_namespace (get_theory uc)) x in
-    DEglobal_ls ls, specialize_lsymbol ls
-  with Not_found ->
-    errorm ~loc:(qloc p) "unbound symbol %a" print_qualid p
+let specialize_qualid uc p = try match uc_find_ps_or_ls uc p with
+  | PV pv -> DEglobal_pv pv, specialize_pvsymbol pv
+  | PS ps -> DEglobal_ps ps, specialize_psymbol  ps
+  | PL pl -> DEglobal_pl pl, specialize_plsymbol pl
+  | PX xs -> errorm ~loc:(qloc p) "unexpected exception symbol %a" print_xs xs
+  with
+  | LS ls -> DEglobal_ls ls, specialize_lsymbol ls
+  | Not_found -> errorm ~loc:(qloc p) "unbound symbol %a" print_qualid p
 
-let find_xsymbol uc p =
-  let x = Typing.string_list_of_qualid [] p in
-  try match ns_find_ps (get_namespace uc) x with
-    | PX xs -> xs
-    | _ -> errorm ~loc:(qloc p) "exception symbol expected"
-  with Not_found ->
-    errorm ~loc:(qloc p) "unbound symbol %a" print_qualid p
+let find_xsymbol uc p = try match uc_find_prgs uc p with
+  | PX xs -> xs
+  | _ -> errorm ~loc:(qloc p) "exception symbol expected"
+  with Not_found -> errorm ~loc:(qloc p) "unbound symbol %a" print_qualid p
 
-let find_variant_ls uc p =
-  let x = Typing.string_list_of_qualid [] p in
-  try match ns_find_ps (get_namespace uc) x with
-    | _ -> errorm ~loc:(qloc p) "%a is not a binary relation" print_qualid p
-  with Not_found -> try
-    match ns_find_ls (Theory.get_namespace (get_theory uc)) x with
-      | { ls_args = [u;v]; ls_value = None } as ls when ty_equal u v -> ls
-      | ls ->
-          errorm ~loc:(qloc p) "%a is not a binary relation" Pretty.print_ls ls
-  with Not_found ->
-    errorm ~loc:(qloc p) "unbound symbol %a" print_qualid p
+let find_variant_ls uc p = try match uc_find_ls uc p with
+  | { ls_args = [u;v]; ls_value = None } as ls when ty_equal u v -> ls
+  | ls -> errorm ~loc:(qloc p) "%a is not a binary relation" Pretty.print_ls ls
+  with Not_found -> errorm ~loc:(qloc p) "unbound symbol %a" print_qualid p
 
-let find_global_vs uc p =
-  let x = Typing.string_list_of_qualid [] p in
-  try match ns_find_ps (get_namespace uc) x with
-    | PV pv -> Some pv.pv_vs
-    | _ -> None
+let find_global_vs uc p = try match uc_find_prgs uc p with
+  | PV pv -> Some pv.pv_vs
+  | _ -> None
   with Not_found -> None
 
 let rec dpattern denv ({ pat_loc = loc } as pp) = match pp.pat_desc with
@@ -659,46 +662,53 @@ let xpost lenv xq =
 let rec get_eff_expr lenv { pp_desc = d; pp_loc = loc } = match d with
   | Ptree.PPvar (Ptree.Qident {id=x}) when Mstr.mem x lenv.let_vars ->
       begin match Mstr.find x lenv.let_vars with
-        | LetV pv -> e_value pv
+        | LetV pv -> pv.pv_vtv
         | LetA _ -> errorm ~loc "%s must be a first-order value" x
       end
   | Ptree.PPvar p ->
-      let x = Typing.string_list_of_qualid [] p in
-      begin try match ns_find_ps (get_namespace lenv.mod_uc) x with
-        | PV pv -> e_value pv
+      begin try match uc_find_prgs lenv.mod_uc p with
+        | PV pv -> pv.pv_vtv
         | _ -> errorm ~loc:(qloc p) "%a is not a variable" print_qualid p
       with Not_found -> errorm ~loc "unbound variable %a" print_qualid p end
   | Ptree.PPapp (p, [le]) ->
-      let e = get_eff_expr lenv le in
-      let ity = (vtv_of_expr e).vtv_ity in
-      let x = Typing.string_list_of_qualid [] p in
-      let quit () =
-        errorm ~loc:(qloc p) "%a is not a projection symbol" print_qualid p in
-      begin try match ns_find_ps (get_namespace lenv.mod_uc) x with
-        | PL ({pl_args = [{vtv_ity = ta}]; pl_value = {vtv_ity = tr}} as pl) ->
-            let sbs = unify_loc le.pp_loc (ity_match ity_subst_empty) ta ity in
-            let res = try ity_full_inst sbs tr with Not_found -> quit () in
-            e_plapp pl [e] res
+      let vtv = get_eff_expr lenv le in
+      let quit () = errorm ~loc:le.pp_loc "This expression is not a record" in
+      let pjm = match vtv.vtv_ity.ity_node with
+        | Ityapp (its,_,_) ->
+            let pjl = match find_constructors (get_known lenv.mod_uc) its with
+              | (_,pjl)::_ -> pjl | _ -> quit () in
+            let add_pj m pj = match pj with
+              | Some { pl_ls = ls; pl_args = [vtva]; pl_value = vtvv } ->
+                  Mls.add ls (vtva.vtv_ity, vtvv) m
+              | Some _ -> assert false
+              | None -> m in
+            List.fold_left add_pj Mls.empty pjl
+        | Itypur (ts,_) ->
+            let kn = Theory.get_known (get_theory lenv.mod_uc) in
+            let pjl = match Decl.find_constructors kn ts with
+              | (_,pjl)::_ -> pjl | _ -> quit () in
+            let add_pj m pj = match pj with
+              | Some ({ ls_args = [tya]; ls_value = Some tyv } as ls) ->
+                  Mls.add ls (ity_of_ty tya, vty_value (ity_of_ty tyv)) m
+              | Some _ -> assert false
+              | None -> m in
+            List.fold_left add_pj Mls.empty pjl
         | _ -> quit ()
-      with Not_found -> try
-        let th = get_theory lenv.mod_uc in
-        match ns_find_ls (Theory.get_namespace th) x with
-        | { ls_args = [ta]; ls_value = Some tr } as ls ->
-            let sbs = ity_match ity_subst_empty (ity_of_ty ta) ity in
-            let res = try ity_full_inst sbs (ity_of_ty tr) with _ -> quit () in
-            e_lapp ls [e] res
-        | _ -> quit ()
-      with Not_found ->
-        errorm ~loc:(qloc p) "unbound symbol %a" print_qualid p
-      end
+      in
+      let itya, vtvv =
+        try Mls.find (uc_find_ls lenv.mod_uc p) pjm with Not_found ->
+          errorm ~loc:(qloc p) "%a is not a field name" print_qualid p in
+      let sbs = unify_loc loc (ity_match ity_subst_empty) itya vtv.vtv_ity in
+      let mut = Util.option_map (reg_full_inst sbs) vtvv.vtv_mut in
+      let ghost = vtv.vtv_ghost || vtvv.vtv_ghost in
+      vty_value ~ghost ?mut (ity_full_inst sbs vtvv.vtv_ity)
   | Ptree.PPcast (e,_) | Ptree.PPnamed (_,e) ->
       get_eff_expr lenv e
   | _ ->
       errorm ~loc "unsupported effect expression"
 
 let get_eff_regs lenv fn eff ghost le =
-  let e = get_eff_expr lenv le in
-  let vtv = vtv_of_expr e in
+  let vtv = get_eff_expr lenv le in
   let ghost = ghost || vtv.vtv_ghost in
   match vtv.vtv_mut, vtv.vtv_ity.ity_node with
   | Some reg, _ ->
@@ -1078,7 +1088,7 @@ let add_types uc tdl =
                     try
                       let pv = Hashtbl.find projs id.id in
                       let ty = pv.pv_vtv.vtv_ity in
-                      (* once we have ghost/mutable fields in algebraics,
+                      (* TODO: once we have ghost/mutable fields in algebraics,
                          don't forget to check here that they coincide, too *)
                       ignore (Loc.try3 id.id_loc ity_match sbs ty ity);
                       s, (pv, true)

@@ -435,6 +435,7 @@ list1_type_decl:
 type_decl:
 | lident labels type_args typedefn
   { let model, vis, def = $4 in
+    let vis = if model then Abstract else vis in
     { td_loc = floc (); td_ident = add_lab $1 $2;
       td_params = $3; td_model = model; td_vis = vis; td_def = def } }
 ;

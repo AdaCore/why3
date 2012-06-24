@@ -74,11 +74,12 @@ type plsymbol = {
   pl_args   : vty_value list;
   pl_value  : vty_value;
   pl_effect : effect;
+  pl_hidden : bool;
 }
 
 let pl_equal : plsymbol -> plsymbol -> bool = (==)
 
-let create_plsymbol id args value =
+let create_plsymbol ?(hidden=false) id args value =
   let ty_of_vtv vtv = ty_of_ity vtv.vtv_ity in
   let pure_args = List.map ty_of_vtv args in
   let ls = create_fsymbol id pure_args (ty_of_vtv value) in
@@ -90,6 +91,7 @@ let create_plsymbol id args value =
     pl_args   = args;
     pl_value  = value;
     pl_effect = effect;
+    pl_hidden = hidden;
   }
 
 let ity_of_ty_opt ty = ity_of_ty (Util.def_option ty_bool ty)
@@ -98,7 +100,10 @@ let fake_pls = Wls.memoize 17 (fun ls ->
   { pl_ls     = ls;
     pl_args   = List.map (fun ty -> vty_value (ity_of_ty ty)) ls.ls_args;
     pl_value  = vty_value (ity_of_ty_opt ls.ls_value);
-    pl_effect = eff_empty })
+    pl_effect = eff_empty;
+    pl_hidden = false })
+
+exception HiddenPLS of lsymbol
 
 (** specification *)
 
@@ -259,6 +264,7 @@ let ppat_is_wild pp = match pp.ppat_pattern.pat_node with
 let ppat_plapp pls ppl vtv =
   if vtv.vtv_mut <> None then
     Loc.errorm "Only variable patterns can be mutable";
+  if pls.pl_hidden then raise (HiddenPLS pls.pl_ls);
   (* FIXME? Since pls is a constructor, the result type vtv will
      cover every type variable and region in the signature of pls.
      Then the following ity_match call is enough to build the full
@@ -353,6 +359,7 @@ let make_ppattern pp vtv =
         ppat_vtv     = vtv;
         ppat_effect  = eff_empty; }
     | PPpapp (pls,ppl) ->
+        if pls.pl_hidden then raise (HiddenPLS pls.pl_ls);
         (* FIXME? Since pls is a constructor, the result type vtv will
            cover every type variable and region in the signature of pls.
            Then the following ity_match call is enough to build the full
@@ -638,6 +645,7 @@ let vtv_of_expr e = match e.e_vty with
   | VTarrow _ -> Loc.error ?loc:e.e_loc (ValueExpected e)
 
 let e_plapp pls el ity =
+  if pls.pl_hidden then raise (HiddenPLS pls.pl_ls);
   let rec app tl vars ghost eff sbs vtvl argl =
     match vtvl, argl with
       | [],[] ->

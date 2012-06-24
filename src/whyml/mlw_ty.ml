@@ -434,7 +434,9 @@ let create_itysymbol name ?(abst=false) ?(priv=false) args regs def =
   (* all regions in [def] must be in [regs] *)
   let check r = Sreg.mem r sregs || raise (UnboundRegion r) in
   ignore (option_map (ity_v_all Util.ttrue check) def);
-  (* if a type is an alias then abst and priv will be ignored *)
+  (* if a type is an alias then it cannot be abstract or private *)
+  if abst && def <> None then Loc.errorm "Type alias cannot be abstract";
+  if priv && def <> None then Loc.errorm "Type alias cannot be private";
   { its_pure  = purets;
     its_args  = args;
     its_regs  = regs;

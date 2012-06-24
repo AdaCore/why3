@@ -232,7 +232,7 @@ let add_data uc (its,csl) =
   let add_proj = option_fold add_pls in
   let add_constr uc (ps,pjl) = List.fold_left add_proj (add_pls uc ps) pjl in
   let uc = add_symbol add_it its.its_pure.ts_name its uc in
-  List.fold_left add_constr uc csl
+  if its.its_abst then uc else List.fold_left add_constr uc csl
 
 let add_let uc = function
   | LetV pv -> add_symbol add_ps pv.pv_vs.vs_name (PV pv) uc
@@ -245,7 +245,7 @@ let add_exn uc xs =
   add_symbol add_ps xs.xs_name (PX xs) uc
 
 let add_pdecl uc d =
-  let uc =  { uc with
+  let uc = { uc with
     muc_decls = d :: uc.muc_decls;
     muc_known = known_add_decl (Theory.get_known uc.muc_theory) uc.muc_known d;
     muc_local = Sid.union uc.muc_local d.pd_news }
