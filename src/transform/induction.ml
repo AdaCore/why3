@@ -169,290 +169,133 @@ let () = Trans.register_transform_l "induction" (Trans.store induction)
 (*********************************************************)
   
 
-(*
+type htree
 
-(* constructs map of induction candidates 
-  with associated recursive functions (callers) names *)     
+let mk_term (_tree : htree) x = (x : Term.term) 
+
+
+let t_iter_scheme km t = 
+  
+  let ty_cl ts = 
+    List.map (fun (ls, _) -> ls ) (find_constructors km ts) in    
+  
+  let rec t_patc (acc,n) t =   
+    match t.t_node with
+      | Tapp (ls, tl)      -> t_tapp (acc,n) (ls,tl)
+      | Tif (c, t1, t2)    -> t_tif (acc,n)  (c, t1,t2)
+      | Tlet (t, tb)       -> t_tlet (acc,n) (t,tb)
+      | Tcase (t, tbl)     -> t_tcase (acc,n) (t, tbl) 
+      | Tvar _ | Tconst _  -> acc, n 
+      | Ttrue | Tfalse | Tnot _ | Tbinop (_, _, _) | Tquant (_,_) -> acc, n
+      | Teps _ -> acc,n 
+		
+  and t_tcase (acc,n) (t0, bl) = match t0.t_node with
+    | (Tvar x)  -> 
+      begin
+        match x.vs_ty.ty_node with
+          | Tyapp (_, _) ->
+            let tpl = List.map 
+	      (fun b -> let (p,t) = t_open_branch b in (p, t)) bl in 
+            let sub_ctl = 
+              List.fold_left (fun acc (_, t) -> 
+                let ctl,_ = (t_patc ([],(n+1)) t) in ctl @ acc) [] tpl in
+            let tpl = 
+              List.map (fun b -> let (p,t) = t_open_branch b in [p], t) bl
+            in
+            let patc = Pattern.CompileTerm.compile ty_cl [t0] tpl in
+            let acc = ((patc, n) :: sub_ctl) @ acc in
+            acc,n
+          | _ -> assert false
+      end
+    | _ ->  
+      let tl = List.map (fun b -> let (_,t) = t_open_branch b in t) bl in 
+      List.fold_left (fun (acc,n) t -> t_patc (acc,n) t) (acc,n) tl 
+	
+  and t_tapp (acc,n) (_ls,tl) = 
+    List.fold_left (fun (acc,n) t -> t_patc (acc,n) t) (acc,n) tl
+      
+  and t_tif (acc,n) (_c,t1,t2) =
+    let acc, n = (t_patc (acc,n) t1) in t_patc (acc,n) t2 
+				     
+  and t_tlet (acc,n) (_t,_tb) = acc,n  in
+  
+  
+  let acc, _ = t_patc ([],0) t in 
+  List.iter (fun (pc, n ) -> 
+    Format.printf "%d: %a \n @." n Pretty.print_term pc  )  
+    (List.rev acc) 
+    
+ 
+    
+
 let t_collect_data km qvs t =
+  
   let defn_collect_data acc ls tl =
-    let arg_collect_data  i = function
+    
+    let arg_collect_data i defn = function
       | Tvar x when Svs.mem x qvs ->
-	let lmap = 
-	  try 
-	    Mvs.find x acc 
-	  with Not_found -> 
-	    Mls.empty 
-	in Mvs.add x (Mls.add ls i lmap) acc
+        let lmap = 
+          try 
+            Mvs.find x acc 
+          with Not_found -> 
+            Mls.empty 
+        in Mvs.add x (Mls.add ls (i,defn) lmap) acc
       | _ -> acc 
     in 
+    
     match (find_logic_definition km ls) with
       | Some defn ->
-	begin match ls_defn_decrease defn with
-	  | [i] -> arg_collect_data i (List.nth tl i).t_node
-	  | _  -> acc
-	end
-      | None -> acc
+        begin match ls_defn_decrease defn with
+          | [i] -> arg_collect_data i defn (List.nth tl i).t_node
+          | _  -> acc
+        end
+      | None -> acc 
   in
+  
   let rec t_collect acc t =
     let acc = match t.t_node with
       | Tapp (ls, tl) -> defn_collect_data acc ls tl 
       | _ -> acc
     in t_fold t_collect acc t
+  
   in t_collect (Mvs.empty) t
-  
-  
-let unify_schemes _km _ihpll = []
-
-(* type ihl =  Ihl of bool * ihl list   
-type scheme = {vset1 : Svs.t; vset2 : Svs.t; hl : ihl list }
 
 
 
-let ptl = (List.map t_open_branch tbl) in
-	    let vset, hl = List.fold_left
-	      (fun (vset, hl) (p,t) -> 
-		let vset1, scheme = 
-		  p_scheme acc.vset1 (Svs.add x acc.vset2) p t 
-		in Svs.union vset1 vset, scheme :: hl)
-	      (acc.vset1, acc.hl) ptl 
-	    in (*unify parallel patterns of the same level*)
-	    {vset1 = vset; vset2 = acc.vset2; 
-	     hl = [Ihl ((Svs.mem x vset),hl)]}
-*)
 
-type ihp =  {pat: pattern; local : Svs.t; global : Svs.t} 
-type ihb = {ihpl : ihp list; pvset : Svs.t}
-type ihs = ihp 
-
-
-(*t_scheme acc : ihpl list *)
-
-
-let defn_scheme lsdef i ty =
-  let t_app_scheme acc tl = match ((List.nth tl i).t_node) with
-    | Tvar x when Svs.mem x acc.vset -> {acc with Svs.add x acc.vset}
-    | _ -> acc 
-  in 
-  let t_case_scheme acc ihs tbl =
-    let ptl = (List.map t_open_branch tbl) in
-    List.fold_left (fun acc (p,t) ->  
-      let acc1 (* : p,vset liste*) = p_scheme p t in
-      
-
-) acc ptl
-    
-  in 
-  let rec t_scheme acc ihs t = match t.t_node with
-    | Tapp (ls,tl) when ls_equal ls lsdef -> t_app_scheme acc ihs tl
-    | Tcase(Tvar x, tbl) when ty_equal x.vs_ty ty -> t_case_scheme acc tbl
-    | _ -> acc
-  and p_scheme acc p,t  = match p.pat_node with
-    | Pwild -> {pat = p; local = Svs.empty; global = acc.global} :: acc
-    | Pvar x ->  (t_scheme (Svs.add x bvs) [] t) @ acc  
-    | Pas (p, vs) -> 
-      p_scheme {acc with global = (Svs.add vs acc.global}
-
- { pat = p_scheme acc p t; hvset =  
-    | Papp (ls, pl) ->   
-  in
-  let acc = [] 
-  in t_scheme (acc : ihs list) ([] : ihs) t 
-  *)
-
-(*bvs : branch variable set *)
-
- (*
- | Papp (_, pl) -> 
-      List.fold_left
-	(fun (vset1, Ihl (x, hl)) p -> 
-	  let vset1', scheme = p_scheme vset1 vset2 p t in
-	  Svs.union vset1' vset1, Ihl (x, scheme :: hl)) 
-	(vset1, Ihl (false, [])) 
-	pl
-	  
-    
-let apply_induction_scheme qvl x ihpl t0 = 
-  let ihp_close_branch p vss = 
-    let pat_t = 
-      Svs.fold (fun v goal -> 
-	t_implies (t_subst_single x (t_var v) t0) goal) vss t0
-    in t_close_branch p pat_t   
-  in
-  let tbl = List.map (fun (p,vss) -> ihp_close_branch p vss) ihpl in
-  let goal = t_case (t_var x) tbl
-  in [t_forall_close qvl [] goal]
-  
-
-let functional_induction km t =
-  let qvs, qvl, t0 = decompose_forall t in
-  let vmap = t_collect_data km qvs t0 in
-  if Mvs.is_empty vmap  
+let functional_induction km t0 =
+  let qvs, _qvl, t = decompose_forall t0 in
+  let vmap = t_collect_data km qvs t in
+  let _x, lmap =  Mvs.choose vmap in
+  let _ = Mls.iter (fun _ls (_i,defn) -> 
+    let (_,t) = open_ls_defn defn in t_iter_scheme km t) lmap in  
+  if (Mvs.is_empty vmap)
   then 
-    [t] 
+    [t0] 
   else 
-    let x, lmap =  Mvs.choose vmap in
-    let ihpll = Mls.fold (fun ls i l -> make_scheme km ls i :: l) lmap [] in  
-    let ihpl = unify_schemes km ihpll in
-    apply_induction_scheme qvl x ihpl t0 
+    [t0] 
       
+               
+
+              
 let functional_induction  = function 
   | Some { task_decl = { td_node = Decl { d_node = Dprop (Pgoal, pr, f) } };
-	   task_prev = prev;
-	   task_known = km } ->
+           task_prev = prev;
+           task_known = km } ->
     List.map (add_prop_decl prev Pgoal pr) (functional_induction km f)
   | _ -> assert false
 
 
-    *)
-(*
-  
-let unify_ihpll _ihpm = 
-  []
-    
-
-    
-    
-type ihl =  Ihl of bool * ihl list   
-type scheme = {vset1 : Svs.t; vset2 : Svs.t; hl : ihl list }
-    
-let defn_scheme defn fnme vs = 
-  let _fvars, t = open_ls_defn defn in
-  let rec t_scheme acc t =
-    let acc = match t.t_node with
-      | Tapp (ls, _tl) when ls_equal ls fnme -> 
-	acc (*TODO : enrich vset1 *)
-      | Tcase (t0, tbl) -> 
-	begin match t0.t_node with
-	  | Tvar x when Svs.mem x acc.vset2 -> 
-	    let ptl = (List.map t_open_branch tbl) in
-	    let vset, hl = List.fold_left
-	      (fun (vset, hl) (p,t) -> 
-		let vset1, scheme = 
-		  p_scheme acc.vset1 (Svs.add x acc.vset2) p t 
-		in Svs.union vset1 vset, scheme :: hl)
-	      (acc.vset1, acc.hl) ptl 
-	    in (*unify parallel patterns of the same level*)
-	    {vset1 = vset; vset2 = acc.vset2; 
-	     hl = [Ihl ((Svs.mem x vset),hl)]}
-	  | _ -> acc (*IMPROVE : what if "match" *)
-	end
-      | _ -> acc
-    in t_fold t_scheme acc t
-  and p_scheme vset1 vset2 p t = match p.pat_node with
-    | Pvar x ->  let acc = t_scheme 
-		   {vset1 = vset1; vset2 = (Svs.add x vset2); hl = []} t
-		 in acc.vset1, Ihl (Svs.mem x acc.vset1, acc.hl)
-    | Papp (_, pl) -> 
-      List.fold_left
-	(fun (vset1, Ihl (x, hl)) p -> 
-	  let vset1', scheme = p_scheme vset1 vset2 p t in
-	  Svs.union vset1' vset1, Ihl (x, scheme :: hl)) 
-	(vset1, Ihl (false, [])) 
-	pl
-	  
-    | _ -> vset1, Ihl (false,[]) (* TODO Por Pas Pwild *)
-      
-  in 
-  let acc = 
-    t_scheme {vset1 = Svs.empty; vset2 = Svs.add vs Svs.empty; hl = []} t 
-  in Ihl (false, acc.hl)
+let () = Trans.register_transform_l 
+  "induction_on_function_definition" 
+  (Trans.store functional_induction)
 
 
 
-      
-
-    
-*)
-
-(*    
-
-(*********************************************************)
-(*********************** OBSOLETE ************************)
-(*********************************************************) 
-    
-(*
-(* see t_collect_data below *)
-let defn_collect_data acc km ls tl qvs =
-  let arg_collect_data  = function
-    | Tvar x when Svs.mem x qvs ->  
-      Mvs.add x (Sls.add (ls,i) (Mvs.find x acc)) acc
-    | _ -> acc 
-  in 
-  match (find_logic_definition km ls) with
-    | Some defn ->
-      begin match ls_defn_decrease defn with
-	| [i] -> arg_collect_data (List.nth tl i).t_node
-	| _  -> acc
-      end
-    | None -> acc
-*) 
-
-
-let defn_scheme defn fnme vs = 
-  let _fvars, t = open_ls_defn defn in
-  let rec t_scheme acc t =
-    let acc = match t.t_node with
-      | Tapp (ls, _tl) when ls_equal ls fnme -> 
-	acc (*TODO : enrich vset1 *)
-      | Tcase (t0, tbl) -> 
-	begin match t0.t_node with
-	  | Tvar x when Svs.mem x acc.vset2 -> 
-	    let ptl = (List.map t_open_branch tbl) in
-	    let vset, hl = List.fold_left
-	      (fun (vset, hl) (p,t) -> 
-		let vset1, scheme = 
-		  p_scheme acc.vset1 (Svs.add x acc.vset2) p t 
-		in Svs.union vset1 vset, scheme :: hl)
-	      (acc.vset1, acc.hl) ptl 
-	    in (*unify parallel patterns of the same level*)
-	    {vset1 = vset; vset2 = acc.vset2; 
-	     hl = [Ihl ((Svs.mem x vset),hl)]}
-	  | _ -> acc (*IMPROVE : what if "match" *)
-	end
-      | _ -> acc
-    in t_fold t_scheme acc t
-  and p_scheme vset1 vset2 p t = match p.pat_node with
-    | Pvar x ->  let acc = t_scheme 
-		   {vset1 = vset1; vset2 = (Svs.add x vset2); hl = []} t
-		 in acc.vset1, Ihl (Svs.mem x acc.vset1, acc.hl)
-    | Papp (_, pl) -> 
-      List.fold_left
-	(fun (vset1, Ihl (x, hl)) p -> 
-	  let vset1', scheme = p_scheme vset1 vset2 p t in
-	  Svs.union vset1' vset1, Ihl (x, scheme :: hl)) 
-	(vset1, Ihl (false, [])) 
-	pl
-	  
-    | _ -> vset1, Ihl (false,[]) (* TODO Por Pas Pwild *)
-      
-  in 
-  let acc = 
-    t_scheme {vset1 = Svs.empty; vset2 = Svs.add vs Svs.empty; hl = []} t 
-  in Ihl (false, acc.hl)
-
-
-let make_ind_f _vss _km qvl t = 
-  [t_forall_close qvl [] t]
-
-let ind_f km t0 =
-  let qvs, qvl, t = decompose_forall t0 in
-  let vss = t_candidates km qvs t in
-  if Svs.is_empty vss then [t0] else make_ind_f vss km qvl t
-
-
-let ind_f  = function 
-  | Some { task_decl = { td_node = Decl { d_node = Dprop (Pgoal, pr, f) } };
-	   task_prev = prev;
-	   task_known = km } ->
-      List.map (add_prop_decl prev Pgoal pr) (ind_f km f)
-  | _ -> assert false
-
-
-let () = Trans.register_transform_l "induction_fdef" (Trans.store ind_f) 
 
 
 
-*)
+
 
 (*
 Local Variables:
@@ -461,202 +304,3 @@ End:
 *)
 
 
-(*************************************************************************)
-
-(*
-type ind_pattern = private {
-  ipat_node : ind_pattern_node;
-  ipat_vars : Svs.t;
-  ipat_ty   : ty;
-  ipat_tag  : int;
-}
-
-
-and ind_pattern_node = private
-  | IPwild
-  | IPvar of bool * vsymbol
-  | IPapp of lsymbol * ind_pattern list
- 
-let 
-*)
-
-
-(*
-
- (*
-and p_scheme acc env p t = match p.pat_node with
-  | Pwild -> {acc with hl = Ihl (false, []) :: acc.hl}
-  | Pvar vs -> let acc' = t_scheme {acc with hl = []} (Svs.add vs env) t in
-	       {env = acc'.env; 
-		hl = Ihl (Svs.mem vs acc'.env, acc'.hl) :: acc.hl}
-  | Pas (p, vs) -> p_scheme acc (Svs.add vs env) p t 
-  | Papp (_, pl) ->  
-    let acc' = List.fold_left (fun acc p -> 
-      let acc' = p_scheme acc env p t in   
-      {env = Svs.union acc.env acc'.env; hl = acc'.hl :: acc.hl}) 
-      acc pl 
-    in {env = acc'.env; hl = Ihl (false, acc'.hl)}
-  | Por (_,_)-> {acc with hl = Ihl (false,[]) :: acc.hl}     
-    
-  *)
-
-
-    (*
-
-let make_induction vs km qvl t =
-  if Debug.test_flag debug then
-    begin
-      let init_t = t_forall_close qvl [] t in
-      Format.printf "Init_task: %a @ \n" Pretty.print_term init_t
-    end;
-  let x, ts, ty  = heuristic vs in
-  let sigma = ty_match Mtv.empty ty x.vs_ty in
-  if Debug.test_flag debug then begin
-    print_string "sigma_inst: ";
-    Mtv.iter (fun x tx -> Format.printf "(%a : %a) @ \n"
-      Pretty.print_tv x Pretty.print_ty tx ) sigma
-  end;
-  let qvl1, qvl2 = split_quantifiers x qvl in
-  let p = t_forall_close qvl2 [] t in
-  if Debug.test_flag debug then
-    Format.printf "Ind_pred: @  %a @ \n" Pretty.print_term p;
-  let make_case (ls, _) =
-    let create_var ty =
-      let ty = ty_inst sigma ty in
-      let id = Ident.id_fresh (name_from_type ty) in
-      Term.create_vsymbol id ty
-    in
-    let ind_vl = List.map create_var ls.ls_args in
-    let ind_tl = List.map t_var ind_vl in
-    let goal = t_subst_single x (t_app ls ind_tl (Some x.vs_ty)) p in
-    let goal = List.fold_left
-      (fun goal vs ->
-	if ty_equal vs.vs_ty x.vs_ty
-	then Term.t_implies (t_subst_single x (t_var vs) p) goal
-	else goal) goal ind_vl
-    in
-    let goal = t_forall_close (qvl1 @ ind_vl) [] goal in
-    if Debug.test_flag debug then
-      Format.printf "Induction sub-task: %a @ \n" Pretty.print_term goal;
-    goal
-  in
-  
-    if Debug.test_flag debug then
-      let data = {tact = "" }
-  let cl = find_constructors km ts in
-  List.map make_case cl
-    *)
-
-
-let make_induction vs km qvl t =
-  let x, ts, ty  = heuristic vs in
-  let sigma = ty_match Mtv.empty ty x.vs_ty in
-  let qvl1, qvl2 = split_quantifiers x qvl in
-  let p = t_forall_close qvl2 [] t in
-    let make_case (ls, _) =
-     let create_var ty =
-     let ty = ty_inst sigma ty in
-     let id = Ident.id_fresh (name_from_type ty) in
-     Term.create_vsymbol id ty in
-    let ind_vl = List.map create_var ls.ls_args in
-    let ind_tl = List.map t_var ind_vl in
-    let goal = t_subst_single x (t_app ls ind_tl (Some x.vs_ty)) p in
-    let goal = List.fold_left
-      (fun goal vs ->
-	if ty_equal vs.vs_ty x.vs_ty
-	then Term.t_implies (t_subst_single x (t_var vs) p) goal
-  else goal) goal ind_vl
-  in t_forall_close (qvl1 @ ind_vl) [] goal in goal
-
-  in
-  let cl = find_constructors km ts in
-  List.map make_case cl *)
-
-
-
-(*List.iter (fun (cs, _) ->
-    print_int (List.length cs.ls_args); print_string "\n";
-    Format.printf "Constructor:  %a \n  with args:" Pretty.print_cs cs;
-    List.iter (fun ty ->
-      Format.printf " %a " Pretty.print_ty ty) cs.ls_args) cl;
-
-      print_string "\n";*)
-(*
-
-List.iter (fun vs ->
-      if ty_equal vs.vs_ty x.vs_ty
-      then
-	begin
-	  Format.printf "new_var = %a \n" Pretty.print_vsty vs
-	end
-      else ()) ind_vl;
-
-List.iter (fun ty ->
-      Format.printf "inst_ty = %a \n" Pretty.print_ty ty) tyl;
-    let f = init_t in f
-     assert false (* TODO: instancier p sur le constructeur ls *) in
-    t_forall_close qvl1 [] f *)
-      
-(*
-let def_scheme vset2 km (fnme, fbdy) =     
-  let rec t_scheme acc t = 
-    let acc = match t.t_node with
-      | Tapp (ls,tl) when ls_equal ls fnme -> 
-	{acc with vset =  vs_scheme (km,ls,tl) acc.vset vset2}
-      | Tcase (t0, tbl) -> 
-	begin match t0.t_node with
-	  | Tvar x when Svs.mem x vset2 -> 
-	    let ptl = (List.map t_open_branch tbl) in
-	    let vset, hl = List.fold_left
-	      (fun (vset1, hl) (p,t) -> 
-		let vset, scheme = 
-		  p_scheme acc.vset (Svs.add x vset2) p t in
-		Svs.union vset1 vset, scheme :: hl) 
-	      (acc.vset, acc.hl) ptl 
-	    in {vset = vset; hl = [Ihl ((Svs.mem x vset),hl)]}
-	  | _ -> acc
-	end 
-      | _ -> acc
-    in t_fold t_scheme_head acc t 
-  and p_scheme = (fun _ _ _ _ -> Svs.empty, Ihl (false, [])) 
-  in t_scheme {vset = Svs.empty; hl = []} fbdy  
-*)
-
-(*
-let vs_scheme  (km,ls,tl) vset1 vset2 =
-  let arg_candidate  = function
-    | Tvar x when Svs.mem x vset2 -> Svs.add x vset1
-    | _ -> vset1
-  in match (find_logic_definition km ls) with
-    | Some defn ->
-      begin match ls_defn_decrease defn with
-	| [i] -> arg_candidate (List.nth tl i).t_node
-	| _  -> vset1
-      end
-    | None -> vset1
-
-let match_scheme t0 vset2 = match t0.t_node with
-  | Tvar x when Svs.mem x vset2 -> Svs.add x vset2
-  | _ -> vset2
-*) 
-   
-(*
-
-  and p_scheme vset1 vset2 p t = match p.pat_node with
-    | Pwild -> vset1, Ihl (false, []) 
-    | Pvar x -> let acc = t_scheme {vset = vset1; hl = []} (Svs.add x vset2) t 
-		in acc.vset, Ihl (Svs.mem x acc.vset, acc.hl) 
-	
-    | Pas (p, vs) -> 
-      let vset1, Ihl (_, scheme) = p_scheme vset1 (Svs.add vs vset2) p t 
-      in  vset1, Ihl (Svs.mem vs vset1, scheme)
-	
-    | Papp (_, pl) ->  
-      List.fold_left (fun (vset1', Ihl(x,hl)) p -> 
-	let vset1, scheme = p_scheme vset1 vset2 p t in   
-	Svs.union vset1' vset1, Ihl (x, scheme :: hl)) 
-	(vset1, Ihl (false, [])) pl 
-    | Por (_,_)-> vset1, Ihl (false,[]) 
-    
-
-*)
