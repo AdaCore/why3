@@ -236,8 +236,46 @@ Inductive expr  :=
   | Ewhile : expr -> fmla -> expr -> expr .
 
 (* Why3 assumption *)
+Set Implicit Arguments.
+Fixpoint fresh_in_expr(id:Z) (e:expr) {struct e}: Prop :=
+  match e with
+  | (Evalue _) => True
+  | ((Eseq e1 e2)|(Ebin e1 _ e2)) => (fresh_in_expr id e1) /\
+      (fresh_in_expr id e2)
+  | (Evar v) => ~ (id = v)
+  | (Ederef _) => True
+  | (Eassign _ e1) => (fresh_in_expr id e1)
+  | (Elet v e1 e2) => (~ (id = v)) /\ ((fresh_in_expr id e1) /\
+      (fresh_in_expr id e2))
+  | (Eif e1 e2 e3) => (fresh_in_expr id e1) /\ ((fresh_in_expr id e2) /\
+      (fresh_in_expr id e3))
+  | (Eassert f) => (fresh_in_fmla id f)
+  | (Ewhile cond inv body) => (fresh_in_expr id cond) /\ ((fresh_in_fmla id
+      inv) /\ (fresh_in_expr id body))
+  end.
+Unset Implicit Arguments.
+
+(* Why3 assumption *)
 Inductive one_step : (map Z value) -> (list (Z* value)%type) -> expr -> (map
   Z value) -> (list (Z* value)%type) -> expr -> Prop :=
+  | one_step_var : forall (sigma:(map Z value)) (pi:(list (Z* value)%type))
+      (v:Z), (one_step sigma pi (Evar v) sigma pi (Evalue (get_stack v pi)))
+  | one_step_deref : forall (sigma:(map Z value)) (pi:(list (Z* value)%type))
+      (v:Z), (one_step sigma pi (Ederef v) sigma pi (Evalue (get sigma v)))
+  | one_step_bin_ctxt1 : forall (sigma:(map Z value)) (sigmaqt:(map Z value))
+      (pi:(list (Z* value)%type)) (piqt:(list (Z* value)%type)) (op:operator)
+      (e1:expr) (e1qt:expr) (e2:expr), (one_step sigma pi e1 sigmaqt piqt
+      e1qt) -> (one_step sigma pi (Ebin e1 op e2) sigmaqt piqt (Ebin e1qt op
+      e2))
+  | one_step_bin_ctxt2 : forall (sigma:(map Z value)) (sigmaqt:(map Z value))
+      (pi:(list (Z* value)%type)) (piqt:(list (Z* value)%type)) (op:operator)
+      (v1:value) (e2:expr) (e2qt:expr), (one_step sigma pi e2 sigmaqt piqt
+      e2qt) -> (one_step sigma pi (Ebin (Evalue v1) op e2) sigmaqt piqt
+      (Ebin (Evalue v1) op e2qt))
+  | one_step_bin_value : forall (sigma:(map Z value)) (sigmaqt:(map Z value))
+      (pi:(list (Z* value)%type)) (piqt:(list (Z* value)%type)) (op:operator)
+      (v1:value) (v2:value), (one_step sigma pi (Ebin (Evalue v1) op
+      (Evalue v2)) sigmaqt piqt (Evalue (eval_bin v1 op v2)))
   | one_step_assign_ctxt : forall (sigma:(map Z value)) (sigmaqt:(map Z
       value)) (pi:(list (Z* value)%type)) (piqt:(list (Z* value)%type)) (x:Z)
       (e:expr) (eqt:expr), (one_step sigma pi e sigmaqt piqt eqt) ->
@@ -311,6 +349,12 @@ Axiom many_steps_let : forall (sigma1:(map Z value)) (sigma3:(map Z value))
   value)%type), exists v1:value, exists n1:Z, exists n2:Z, (many_steps sigma1
   pi1 e1 sigma2 pi2 (Evalue v1) n1) /\ ((many_steps sigma2 (Cons (id, v1)
   pi2) e2 sigma3 pi3 (Evalue v2) n2) /\ (n = ((1%Z + n1)%Z + n2)%Z)).
+
+Axiom one_step_change_free : forall (e:expr) (eqt:expr) (sigma:(map Z value))
+  (sigmaqt:(map Z value)) (pi:(list (Z* value)%type)) (piqt:(list (Z*
+  value)%type)) (id:Z) (v:value), (fresh_in_expr id e) -> ((one_step sigma
+  (Cons (id, v) pi) e sigmaqt piqt eqt) -> (one_step sigma pi e sigmaqt piqt
+  eqt)).
 
 (* Why3 assumption *)
 Definition valid_fmla(p:fmla): Prop := forall (sigma:(map Z value)) (pi:(list
@@ -446,7 +490,13 @@ Fixpoint expr_writes(e:expr) (w:(set1 Z)) {struct e}: Prop :=
   end.
 Unset Implicit Arguments.
 
-Parameter fresh_from_fmla: fmla -> Z.
+Parameter fresh_from: fmla -> expr -> Z.
+
+Axiom fresh_from_fmla : forall (e:expr) (f:fmla),
+  (fresh_in_fmla (fresh_from f e) f).
+
+Axiom fresh_from_expr : forall (e:expr) (f:fmla),
+  (fresh_in_expr (fresh_from f e) e).
 
 Parameter abstract_effects: expr -> fmla -> fmla.
 
@@ -460,11 +510,11 @@ Fixpoint wp(e:expr) (q:fmla) {struct e}: fmla :=
   | (Eassert f) => (Fand f (Fimplies f q))
   | (Eseq e1 e2) => (wp e1 (wp e2 q))
   | (Elet id e1 e2) => (wp e1 (Flet id (Tvar (-1%Z)%Z) (wp e2 q)))
-  | (Ebin e1 op e2) => let t1 := (fresh_from_fmla q) in let t2 :=
-      (fresh_from_fmla (Fand (Fterm (Tvar t1)) q)) in let qqt :=
-      (Flet (-1%Z)%Z (Tbin (Tvar t1) op (Tvar t2)) q) in let f := (wp e2
-      (Flet t2 (Tvar (-1%Z)%Z) qqt)) in (wp e1 (Flet t1 (Tvar (-1%Z)%Z) f))
-  | (Eassign x e1) => let id := (fresh_from_fmla q) in let qqt :=
+  | (Ebin e1 op e2) => let t1 := (fresh_from q e) in let t2 :=
+      (fresh_from (Fand (Fterm (Tvar t1)) q) e) in let qqt := (Flet (-1%Z)%Z
+      (Tbin (Tvar t1) op (Tvar t2)) q) in let f := (wp e2 (Flet t2
+      (Tvar (-1%Z)%Z) qqt)) in (wp e1 (Flet t1 (Tvar (-1%Z)%Z) f))
+  | (Eassign x e1) => let id := (fresh_from q e1) in let qqt :=
       (Flet (-1%Z)%Z (Tvalue Vvoid) q) in (wp e1 (Flet id (Tvar (-1%Z)%Z)
       (subst qqt x id)))
   | (Eif e1 e2 e3) => let f := (Fand (Fimplies (Fterm (Tvar (-1%Z)%Z)) (wp e2
@@ -481,19 +531,39 @@ Axiom wp_conj : forall (sigma:(map Z value)) (pi:(list (Z* value)%type))
 
 Require Why3.
 Ltac ae := why3 "alt-ergo" timelimit 2.
+Ltac ae10 := why3 "alt-ergo" timelimit 10.
+Ltac cvc10 := why3 "cvc3-2.4" timelimit 10.
 
 (* Why3 goal *)
 Theorem wp_reduction : forall (sigma:(map Z value)) (sigmaqt:(map Z value))
   (pi:(list (Z* value)%type)) (piqt:(list (Z* value)%type)) (e:expr)
-  (eqt:expr) (q:fmla), ((one_step sigma pi e sigmaqt piqt eqt) /\
-  (eval_fmla sigma pi (wp e q))) -> (eval_fmla sigmaqt piqt (wp eqt q)).
-intros sigma sigma' pi pi' e e' q (h1 & h2).
-elim h1.
+  (eqt:expr), (one_step sigma pi e sigmaqt piqt eqt) -> forall (q:fmla),
+  (eval_fmla sigma pi (wp e q)) -> (eval_fmla sigmaqt piqt (wp eqt q)).
+induction 1.
+(* case 1: var *)
+auto.
+(* case 2: deref *)
+auto.
+(* case 3: bin,  ctxt1 *)
+simpl. intros q h.
+apply IHone_step.
+admit. (* needs lemmas on fresh_from *)
+(* case 4: bin,  ctxt2 *)
+simpl. intros q h.
+admit. 
+
+(* case 5: bin, value *)
+intros q h.
+admit. 
+
 (* case x := e -> x := e' *)
 admit.
 (* case x := v -> void *)
-simpl.
-ae.
+admit.
+
+
+
+
 Qed.
 
 

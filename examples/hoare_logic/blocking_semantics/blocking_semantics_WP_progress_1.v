@@ -236,8 +236,46 @@ Inductive expr  :=
   | Ewhile : expr -> fmla -> expr -> expr .
 
 (* Why3 assumption *)
+Set Implicit Arguments.
+Fixpoint fresh_in_expr(id:Z) (e:expr) {struct e}: Prop :=
+  match e with
+  | (Evalue _) => True
+  | ((Eseq e1 e2)|(Ebin e1 _ e2)) => (fresh_in_expr id e1) /\
+      (fresh_in_expr id e2)
+  | (Evar v) => ~ (id = v)
+  | (Ederef _) => True
+  | (Eassign _ e1) => (fresh_in_expr id e1)
+  | (Elet v e1 e2) => (~ (id = v)) /\ ((fresh_in_expr id e1) /\
+      (fresh_in_expr id e2))
+  | (Eif e1 e2 e3) => (fresh_in_expr id e1) /\ ((fresh_in_expr id e2) /\
+      (fresh_in_expr id e3))
+  | (Eassert f) => (fresh_in_fmla id f)
+  | (Ewhile cond inv body) => (fresh_in_expr id cond) /\ ((fresh_in_fmla id
+      inv) /\ (fresh_in_expr id body))
+  end.
+Unset Implicit Arguments.
+
+(* Why3 assumption *)
 Inductive one_step : (map Z value) -> (list (Z* value)%type) -> expr -> (map
   Z value) -> (list (Z* value)%type) -> expr -> Prop :=
+  | one_step_var : forall (sigma:(map Z value)) (pi:(list (Z* value)%type))
+      (v:Z), (one_step sigma pi (Evar v) sigma pi (Evalue (get_stack v pi)))
+  | one_step_deref : forall (sigma:(map Z value)) (pi:(list (Z* value)%type))
+      (v:Z), (one_step sigma pi (Ederef v) sigma pi (Evalue (get sigma v)))
+  | one_step_bin_ctxt1 : forall (sigma:(map Z value)) (sigmaqt:(map Z value))
+      (pi:(list (Z* value)%type)) (piqt:(list (Z* value)%type)) (op:operator)
+      (e1:expr) (e1qt:expr) (e2:expr), (one_step sigma pi e1 sigmaqt piqt
+      e1qt) -> (one_step sigma pi (Ebin e1 op e2) sigmaqt piqt (Ebin e1qt op
+      e2))
+  | one_step_bin_ctxt2 : forall (sigma:(map Z value)) (sigmaqt:(map Z value))
+      (pi:(list (Z* value)%type)) (piqt:(list (Z* value)%type)) (op:operator)
+      (v1:value) (e2:expr) (e2qt:expr), (one_step sigma pi e2 sigmaqt piqt
+      e2qt) -> (one_step sigma pi (Ebin (Evalue v1) op e2) sigmaqt piqt
+      (Ebin (Evalue v1) op e2qt))
+  | one_step_bin_value : forall (sigma:(map Z value)) (sigmaqt:(map Z value))
+      (pi:(list (Z* value)%type)) (piqt:(list (Z* value)%type)) (op:operator)
+      (v1:value) (v2:value), (one_step sigma pi (Ebin (Evalue v1) op
+      (Evalue v2)) sigmaqt piqt (Evalue (eval_bin v1 op v2)))
   | one_step_assign_ctxt : forall (sigma:(map Z value)) (sigmaqt:(map Z
       value)) (pi:(list (Z* value)%type)) (piqt:(list (Z* value)%type)) (x:Z)
       (e:expr) (eqt:expr), (one_step sigma pi e sigmaqt piqt eqt) ->
@@ -311,6 +349,12 @@ Axiom many_steps_let : forall (sigma1:(map Z value)) (sigma3:(map Z value))
   value)%type), exists v1:value, exists n1:Z, exists n2:Z, (many_steps sigma1
   pi1 e1 sigma2 pi2 (Evalue v1) n1) /\ ((many_steps sigma2 (Cons (id, v1)
   pi2) e2 sigma3 pi3 (Evalue v2) n2) /\ (n = ((1%Z + n1)%Z + n2)%Z)).
+
+Axiom one_step_change_free : forall (e:expr) (eqt:expr) (sigma:(map Z value))
+  (sigmaqt:(map Z value)) (pi:(list (Z* value)%type)) (piqt:(list (Z*
+  value)%type)) (id:Z) (v:value), (fresh_in_expr id e) -> ((one_step sigma
+  (Cons (id, v) pi) e sigmaqt piqt eqt) -> (one_step sigma pi e sigmaqt piqt
+  eqt)).
 
 (* Why3 assumption *)
 Definition valid_fmla(p:fmla): Prop := forall (sigma:(map Z value)) (pi:(list
@@ -446,9 +490,13 @@ Fixpoint expr_writes(e:expr) (w:(set1 Z)) {struct e}: Prop :=
   end.
 Unset Implicit Arguments.
 
-Parameter fresh_from_fmla: fmla -> Z.
+Parameter fresh_from: fmla -> expr -> Z.
 
-Axiom fresh : forall (f:fmla), (fresh_in_fmla (fresh_from_fmla f) f).
+Axiom fresh_from_fmla : forall (e:expr) (f:fmla),
+  (fresh_in_fmla (fresh_from f e) f).
+
+Axiom fresh_from_expr : forall (e:expr) (f:fmla),
+  (fresh_in_expr (fresh_from f e) e).
 
 Parameter abstract_effects: expr -> fmla -> fmla.
 
@@ -462,11 +510,11 @@ Fixpoint wp(e:expr) (q:fmla) {struct e}: fmla :=
   | (Eassert f) => (Fand f (Fimplies f q))
   | (Eseq e1 e2) => (wp e1 (wp e2 q))
   | (Elet id e1 e2) => (wp e1 (Flet id (Tvar (-1%Z)%Z) (wp e2 q)))
-  | (Ebin e1 op e2) => let t1 := (fresh_from_fmla q) in let t2 :=
-      (fresh_from_fmla (Fand (Fterm (Tvar t1)) q)) in let qqt :=
-      (Flet (-1%Z)%Z (Tbin (Tvar t1) op (Tvar t2)) q) in let f := (wp e2
-      (Flet t2 (Tvar (-1%Z)%Z) qqt)) in (wp e1 (Flet t1 (Tvar (-1%Z)%Z) f))
-  | (Eassign x e1) => let id := (fresh_from_fmla q) in let qqt :=
+  | (Ebin e1 op e2) => let t1 := (fresh_from q e) in let t2 :=
+      (fresh_from (Fand (Fterm (Tvar t1)) q) e) in let qqt := (Flet (-1%Z)%Z
+      (Tbin (Tvar t1) op (Tvar t2)) q) in let f := (wp e2 (Flet t2
+      (Tvar (-1%Z)%Z) qqt)) in (wp e1 (Flet t1 (Tvar (-1%Z)%Z) f))
+  | (Eassign x e1) => let id := (fresh_from q e1) in let qqt :=
       (Flet (-1%Z)%Z (Tvalue Vvoid) q) in (wp e1 (Flet id (Tvar (-1%Z)%Z)
       (subst qqt x id)))
   | (Eif e1 e2 e3) => let f := (Fand (Fimplies (Fterm (Tvar (-1%Z)%Z)) (wp e2
@@ -477,35 +525,145 @@ Fixpoint wp(e:expr) (q:fmla) {struct e}: fmla :=
   end.
 Unset Implicit Arguments.
 
-Require Why3.
-Ltac ae := why3 "alt-ergo" timelimit 2.
-Ltac ae10 := why3 "alt-ergo" timelimit 10.
-Ltac cvc10 := why3 "cvc3-2.4" timelimit 10.
-
-(* Why3 goal *)
-Theorem wp_conj : forall (sigma:(map Z value)) (pi:(list (Z* value)%type))
+Axiom wp_conj : forall (sigma:(map Z value)) (pi:(list (Z* value)%type))
   (e:expr) (p:fmla) (q:fmla), (eval_fmla sigma pi (wp e (Fand p q))) <->
   ((eval_fmla sigma pi (wp e p)) /\ (eval_fmla sigma pi (wp e q))).
+
+Axiom wp_reduction : forall (sigma:(map Z value)) (sigmaqt:(map Z value))
+  (pi:(list (Z* value)%type)) (piqt:(list (Z* value)%type)) (e:expr)
+  (eqt:expr) (q:fmla), ((one_step sigma pi e sigmaqt piqt eqt) /\
+  (eval_fmla sigma pi (wp e q))) -> (eval_fmla sigmaqt piqt (wp eqt q)).
+
+(* Why3 assumption *)
+Definition not_a_value(e:expr): Prop :=
+  match e with
+  | (Evalue _) => False
+  | _ => True
+  end.
+
+Axiom decide_value : forall (e:expr), (not_a_value e) \/ exists v:value,
+  (e = (Evalue v)).
+
+(* Why3 goal *)
+Theorem progress : forall (e:expr) (sigma:(map Z value)) (pi:(list (Z*
+  value)%type)) (q:fmla), ((eval_fmla sigma pi (wp e q)) /\
+  (not_a_value e)) -> exists sigmaqt:(map Z value), exists piqt:(list (Z*
+  value)%type), exists eqt:expr, (one_step sigma pi e sigmaqt piqt eqt).
 induction e.
-(* Evalue *)
-ae.
-(* Ebin *)
+simpl; tauto.
+(* case 1: e = bin e1 op e2 *)
+(* case 1.1: e1 not a value *)
+destruct (decide_value e1).
+intros sigma pi q (h1 & _).
+generalize (IHe1 _ _ _ (conj h1 H)).
+intros (sigma' & pi' & e' & h).
+exists sigma'.
+exists pi'.
+exists (Ebin e' o e2).
+apply one_step_bin_ctxt1; auto.
+(* case 1.2: e1 is a value *)
+elim H; clear H; intros v He1_v.
+subst e1.
+(* case 1.2.1: e2 not a value *)
+destruct (decide_value e2).
+intros sigma pi q (h1 & _).
+generalize (IHe2 _ _ _ (conj h1 H)).
+intros (sigma' & pi' & e' & h).
+exists sigma'.
+eexists.
+exists (Ebin (Evalue v) o e').
+apply one_step_bin_ctxt2.
+assert (Hfresh : fresh_in_expr 
+   (fresh_from q (Ebin (Evalue v) o e2)) e2).
+  assert (Hf : fresh_in_expr 
+   (fresh_from q (Ebin (Evalue v) o e2)) (Ebin (Evalue v) o e2)).
+  apply fresh_from_expr.
+  simpl in Hf; tauto.
+generalize (one_step_change_free _ _ _ _ _ _ _ _ Hfresh h).
+apply one_step_change_free.
+admit. (* typage *)
+(* case 1.2.2: e2 is a value *)
+elim H; clear H; intros v2 He2_v.
+subst e2.
+intros sigma pi q (h2 & h3).
+exists sigma.
+exists pi.
+exists (Evalue (eval_bin v o v2)).
+apply one_step_bin_value.
+
+
+(* case 2 : e = var *)
+intros sigma pi q (h1 & _).
+eexists.
+eexists.
+eexists.
+apply one_step_var.
+
+(* case 3 : e = deref *)
+intros sigma pi q (h1 & _).
+eexists.
+eexists.
+eexists.
+apply one_step_deref.
+
+(* case 4 : e = assign x e' *)
+(* case 4.1: e' not a value *)
+destruct (decide_value e).
+intros sigma pi q (h1 & _).
+generalize (IHe _ _ _ (conj h1 H)).
+intros (sigma' & pi' & e' & h).
+exists sigma'.
+exists pi'.
+exists (Eassign z e').
+apply one_step_assign_ctxt; auto.
+(* case 4.2: e' is a value *)
+elim H; clear H; intros v He_v.
+subst e.
+intros sigma pi q (h2 & h3).
+eexists.
+exists pi.
+eexists.
+eapply one_step_assign_value.
+
+(* case 5: e = e1; e2 *)
+destruct (decide_value e1).
+(* case 5.1: e1 not a value *)
+admit. (* TODO by Asma *)
+(* case 1.2: e1 is a value *)
+admit. (* TODO by Asma *)
+
+(* case 6: e = let id = e1 in e2 *)
+destruct (decide_value e1).
+(* case 6.1: e1 not a value *)
+admit. (* TODO by Asma *)
+(* case 6.2: e1 is a value *)
+admit. (* TODO by Asma *)
+
+(* case 7: e = if e1 then e2 else e3 *)
+destruct (decide_value e1).
+(* case 6.1: e1 not a value *)
+admit. (* TODO by Asma *)
+(* case 6.2: e1 is a value *)
+(* problem : typage pour savoir que v est true ou false *)
 admit.
-(* Evar *)
-ae.
-(* Ederef *)
-ae.
-(* Eassign *)
+
+(* case 8 : e = assert f *)
+intros sigma pi q (h1 & _ ).
+simpl in h1.
+destruct h1 as (h&_).
+eexists.
+eexists.
+eexists.
+apply one_step_assert; auto.
+
+(* case 9: e = while cond inv body *)
+destruct (decide_value e1).
+(* case 6.1: e1 not a value *)
+admit. (* TODO by Asma *)
+(* case 6.2: e1 is a value *)
+(* problem : typage pour savoir que v est true ou false *)
 admit.
-(* Eseq *)
-admit.
-(* Elet *)
-admit.
-(* Eif *)
-admit.
-(* Eassert *)
-ae10.
-(* Ewhile *)
+
 
 Qed.
 

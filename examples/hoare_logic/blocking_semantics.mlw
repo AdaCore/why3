@@ -176,11 +176,49 @@ type expr =
   | Eassert fmla
   | Ewhile expr fmla expr  (* while cond invariant inv body *)
 
+predicate fresh_in_expr (id:ident) (e:expr) =
+  match e with
+  | Evalue _ -> true
+  | Eseq e1 e2
+  | Ebin e1 _ e2 -> fresh_in_expr id e1 /\ fresh_in_expr id e2
+  | Evar v -> id <> v
+  | Ederef _ -> true
+  | Eassign _ e -> fresh_in_expr id e
+  | Elet v e1 e2 -> id <>v /\ fresh_in_expr id e1 /\ fresh_in_expr id e2
+  | Eif e1 e2 e3 -> fresh_in_expr id e1 /\ fresh_in_expr id e2 /\ fresh_in_expr id e3
+  | Eassert f -> fresh_in_fmla id f
+  | Ewhile cond inv body -> fresh_in_expr id cond /\ fresh_in_fmla id inv /\ fresh_in_expr id body
+  end
+
+
 constant void : expr = Evalue Vvoid
 
 (** small-steps semantics for expressions *)
 
 inductive one_step env stack expr env stack expr =
+
+  | one_step_var:
+      forall sigma:env, pi:stack, v:ident.
+        one_step sigma pi (Evar v) sigma pi (Evalue (get_stack v pi))
+
+  | one_step_deref:
+      forall sigma:env, pi:stack, v:ident.
+        one_step sigma pi (Ederef v) sigma pi (Evalue (get_env v sigma))
+
+  | one_step_bin_ctxt1:
+      forall sigma sigma':env, pi pi':stack, op:operator,
+        e1 e1' e2:expr.
+        one_step sigma pi e1 sigma' pi' e1' ->
+          one_step sigma pi (Ebin e1 op e2) sigma' pi' (Ebin e1' op e2)
+
+  | one_step_bin_ctxt2:
+      forall sigma sigma':env, pi pi':stack, op:operator, v1:value, e2 e2':expr.
+        one_step sigma pi e2 sigma' pi' e2' ->
+          one_step sigma pi (Ebin (Evalue v1) op e2) sigma' pi' (Ebin (Evalue v1) op e2')
+
+  | one_step_bin_value:
+      forall sigma sigma':env, pi pi':stack, op:operator, v1 v2:value.
+        one_step sigma pi (Ebin (Evalue v1) op (Evalue v2)) sigma' pi' (Evalue (eval_bin v1 op v2))
 
   | one_step_assign_ctxt:
       forall sigma sigma':env, pi pi':stack, x:ident, e e':expr.
@@ -267,6 +305,13 @@ inductive one_step env stack expr env stack expr =
         many_steps sigma1 pi1 e1 sigma2 pi2 (Evalue v1) n1 /\
         many_steps sigma2 (Cons (id,v1) pi2) e2 sigma3 pi3 (Evalue v2) n2 /\
         n = 1 + n1 + n2
+
+ lemma one_step_change_free :
+  forall e e':expr, sigma sigma':env, pi pi':stack, id:ident, v:value.
+    fresh_in_expr id e ->
+    one_step sigma (Cons (id,v) pi) e sigma' pi' e' ->
+    one_step sigma pi e sigma' pi' e'
+
 
   (** [valid_fmla f] is true when [f] is valid in any environment *)
   predicate valid_fmla (p:fmla) = forall sigma:env, pi:stack. eval_fmla sigma pi p
@@ -452,7 +497,13 @@ predicate expr_writes (e:expr) (w:Set.set ident) =
   | Ewhile cond _ body -> expr_writes cond w /\ expr_writes body w
   end
 
-  function fresh_from_fmla (f:fmla) : ident
+  function fresh_from (f:fmla) (e:expr) : ident
+
+  axiom fresh_from_fmla: forall e:expr, f:fmla.
+     fresh_in_fmla (fresh_from f e) f
+
+  axiom fresh_from_expr: forall e:expr, f:fmla.
+     fresh_in_expr (fresh_from f e) e
 
   function abstract_effects (e:expr) (f:fmla) : fmla
 
@@ -469,13 +520,13 @@ predicate expr_writes (e:expr) (w:Set.set ident) =
     | Eseq e1 e2 -> wp e1 (wp e2 q)
     | Elet id e1 e2 -> wp e1 (Flet id (Tvar result) (wp e2 q))
     | Ebin e1 op e2 ->
-       let t1 = fresh_from_fmla q in
-       let t2 = fresh_from_fmla (Fand (Fterm (Tvar t1)) q) in
+       let t1 = fresh_from q e in
+       let t2 = fresh_from (Fand (Fterm (Tvar t1)) q) e in
        let q' = Flet result (Tbin (Tvar t1) op (Tvar t2)) q in
        let f = wp e2 (Flet t2 (Tvar result) q') in
        wp e1 (Flet t1 (Tvar result) f)
     | Eassign x e ->
-        let id = fresh_from_fmla q in
+        let id = fresh_from q e in
         let q' = Flet result (Tvalue Vvoid) q in
         wp e (Flet id (Tvar result) (subst q' x id))
     | Eif e1 e2 e3 ->
@@ -504,10 +555,11 @@ predicate expr_writes (e:expr) (w:Set.set ident) =
 
 
   lemma wp_reduction:
-    forall sigma sigma':env, pi pi':stack, e e':expr, q:fmla.
-    one_step sigma pi e sigma' pi' e' /\
-    eval_fmla sigma pi (wp e q) ->
-    eval_fmla sigma' pi' (wp e' q)
+    forall sigma sigma':env, pi pi':stack, e e':expr.
+    one_step sigma pi e sigma' pi' e' ->
+    forall q:fmla.
+      eval_fmla sigma pi (wp e q) ->
+      eval_fmla sigma' pi' (wp e' q)
 
   predicate not_a_value (e:expr) =
     match e with
@@ -515,8 +567,11 @@ predicate expr_writes (e:expr) (w:Set.set ident) =
     | _ -> true
     end
 
+  lemma decide_value: 
+    forall e:expr. not_a_value e \/ exists v:value. e = Evalue v
+
   lemma progress:
-    forall sigma:env, pi:stack, e:expr, q:fmla.
+    forall e:expr, sigma:env, pi:stack, q:fmla.
     eval_fmla sigma pi (wp e q) /\ not_a_value e ->
     exists sigma':env, pi':stack, e':expr.
       one_step sigma pi e sigma' pi' e'
@@ -589,7 +644,7 @@ end
 
 (***
 Local Variables:
-compile-command: "why3ide wp4.mlw"
+compile-command: "why3ide blocking_semantics.mlw"
 End:
 *)
 
