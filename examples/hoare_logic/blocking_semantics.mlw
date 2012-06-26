@@ -17,9 +17,11 @@ type value = Vvoid | Vint int | Vbool bool
 
 type operator = Oplus | Ominus | Omult | Ole
 
-type ident = int
+(* TODO: introduce two distinct
+   types mident and ident *)
+type ident 
 
-constant result : ident = (-1)
+constant result : ident 
 
 type term =
   | Tvalue value
@@ -144,6 +146,13 @@ function subst (f:fmla) (x:ident) (v:ident) : fmla =
   | Fforall y ty f -> Fforall y ty (subst f x v)
   end
 
+lemma subst_fresh :
+  forall f:fmla, x v:ident.
+   fresh_in_fmla x f -> subst f x v = f
+
+lemma let_subst:
+    forall t:term, f:fmla, x id id':ident.
+    subst (Flet x t f) id id' = Flet x (subst_term t id id') (subst f id id')
 
 lemma eval_subst:
   forall f:fmla, sigma:env, pi:stack, x:ident, v:ident.
@@ -161,6 +170,16 @@ lemma eval_change_free :
   forall f:fmla, sigma:env, pi:stack, id:ident, v:value.
     fresh_in_fmla id f ->
     (eval_fmla sigma (Cons (id,v) pi) f <-> eval_fmla sigma pi f)
+
+
+  (** [valid_fmla f] is true when [f] is valid in any environment *)
+  predicate valid_fmla (p:fmla) = forall sigma:env, pi:stack. eval_fmla sigma pi p
+
+lemma let_equiv :
+  forall id id':ident, t:term, f:fmla.
+    forall sigma:env, pi:stack.
+      eval_fmla sigma pi (Flet id' t (subst f id id'))
+      -> eval_fmla sigma pi (Flet id t f)
 
 (* expressions *)
 
@@ -313,8 +332,6 @@ inductive one_step env stack expr env stack expr =
     one_step sigma pi e sigma' pi' e'
 
 
-  (** [valid_fmla f] is true when [f] is valid in any environment *)
-  predicate valid_fmla (p:fmla) = forall sigma:env, pi:stack. eval_fmla sigma pi p
 
 (** {3 Hoare triples} *)
 
@@ -340,7 +357,8 @@ theory TestSemantics
 use import ImpExpr
 
 function my_sigma : env = IdMap.const (Vint 0)
-function my_pi : stack = Cons (0, Vint 42) Nil
+constant x : ident
+function my_pi : stack = Cons (x, Vint 42) Nil
 
 goal Test13 :
   eval_term my_sigma my_pi (Tvalue (Vint 13)) = Vint 13
@@ -349,31 +367,29 @@ goal Test13expr :
   many_steps my_sigma my_pi (Evalue (Vint 13)) my_sigma my_pi (Evalue (Vint 13)) 0
 
 goal Test42 :
-  eval_term my_sigma my_pi (Tvar 0) = Vint 42
+  eval_term my_sigma my_pi (Tvar x) = Vint 42
 
 goal Test42expr :
-  many_steps my_sigma my_pi (Evar 0) my_sigma my_pi (Evalue (Vint 42)) 1
+  many_steps my_sigma my_pi (Evar x) my_sigma my_pi (Evalue (Vint 42)) 1
 
 goal Test0 :
-  eval_term my_sigma my_pi (Tderef 0) = Vint 0
+  eval_term my_sigma my_pi (Tderef x) = Vint 0
 
 goal Test0expr :
-  many_steps my_sigma my_pi (Ederef 0) my_sigma my_pi (Evalue (Vint 0)) 1
+  many_steps my_sigma my_pi (Ederef x) my_sigma my_pi (Evalue (Vint 0)) 1
 
 goal Test55 :
-  eval_term my_sigma my_pi (Tbin (Tvar 0) Oplus (Tvalue (Vint 13))) = Vint 55
+  eval_term my_sigma my_pi (Tbin (Tvar x) Oplus (Tvalue (Vint 13))) = Vint 55
 
 goal Test55expr :
-  many_steps my_sigma my_pi (Ebin (Evar 0) Oplus (Evalue (Vint 13))) my_sigma my_pi (Evalue (Vint 55)) 2
+  many_steps my_sigma my_pi (Ebin (Evar x) Oplus (Evalue (Vint 13))) my_sigma my_pi (Evalue (Vint 55)) 2
 
 goal Ass42 :
-  let x = 0 in
   forall sigma':env, pi':stack.
     one_step my_sigma my_pi (Eassign x (Evalue (Vint 42))) sigma' pi' void ->
       IdMap.get sigma' x = Vint 42
 
 goal If42 :
-    let x = 0 in
     forall sigma1 sigma2:env, pi1 pi2:stack, e:expr.
       one_step my_sigma my_pi
         (Eif (Ebin (Ederef x) Ole (Evalue (Vint 10)))
@@ -545,6 +561,233 @@ predicate expr_writes (e:expr) (w:Set.set ident) =
 
     end
 
+  lemma wp_subst:
+    forall e:expr, q:fmla, id id':ident.
+    fresh_in_expr id e ->
+      subst (wp e q) id id' = wp e (subst q id id')
+
+  lemma wp_implies:
+    forall p q:fmla.
+     (forall sigma:env, pi:stack.
+        eval_fmla sigma pi p -> eval_fmla sigma pi q)
+     ->
+     forall sigma:env, pi:stack, e:expr.
+       eval_fmla sigma pi (wp e p) ->
+       eval_fmla sigma pi (wp e q)
+
+  lemma wp_conj:
+    forall sigma:env, pi:stack, e:expr, p q:fmla.
+     eval_fmla sigma pi (wp e (Fand p q)) <->
+       (eval_fmla sigma pi (wp e p)) /\
+       (eval_fmla sigma pi (wp e q))
+
+
+  lemma wp_reduction:
+    forall sigma sigma':env, pi pi':stack, e e':expr.
+    one_step sigma pi e sigma' pi' e' ->
+    forall q:fmla.
+      eval_fmla sigma pi (wp e q) ->
+      eval_fmla sigma' pi' (wp e' q)
+
+  predicate not_a_value (e:expr) =
+    match e with
+    | Evalue _ -> false
+    | _ -> true
+    end
+
+  lemma decide_value: 
+    forall e:expr. not_a_value e \/ exists v:value. e = Evalue v
+
+  lemma progress:
+    forall e:expr, sigma:env, pi:stack, q:fmla.
+    eval_fmla sigma pi (wp e q) /\ not_a_value e ->
+    exists sigma':env, pi':stack, e':expr.
+      one_step sigma pi e sigma' pi' e'
+
+(*
+  let rec compute_writes (s:expr) : Set.set ident =
+   { }
+    match s with
+    | Sskip -> Set.empty
+    | Sassign i _ -> Set.singleton i
+    | Sseq s1 s2 -> Set.union (compute_writes s1) (compute_writes s2)
+    | Sif _ s1 s2 -> Set.union (compute_writes s1) (compute_writes s2)
+    | Swhile _ _ s -> compute_writes s
+    | Sassert _ -> Set.empty
+    end
+   { forall sigma sigma':env, pi pi':stack, n:int.
+       many_steps sigma pi s sigma' pi' Sskip n ->
+       assigns sigma result sigma' }
+
+  val fresh_from_fmla (q:fmla) :
+     { }
+     ident
+     { fresh_in_fmla result q }
+
+  val abstract_effects (i:expr) (f:fmla) :
+    { }
+    fmla
+    { forall sigma:env, pi:stack. eval_fmla sigma pi result ->
+        eval_fmla sigma pi f /\
+(***
+        forall sigma':env, w:Set.set ident.
+        expr_writes i w /\ assigns sigma w sigma' ->
+        eval_fmla sigma' pi result
+*)
+        forall sigma' pi':env, n:int.
+           many_steps sigma pi i sigma' pi' Sskip n ->
+           eval_fmla sigma' pi' result
+     }
+
+  use HoareLogic
+
+  let rec wp (i:expr) (q:fmla) =
+    { true }
+    match i with
+    | Sskip -> q
+    | Sseq i1 i2 -> wp i1 (wp i2 q)
+    | Sassign x e ->
+        let id = fresh_from_fmla q in Flet id e (subst q x id)
+    | Sif e i1 i2 ->
+        Fand (Fimplies (Fterm e) (wp i1 q))
+             (Fimplies (Fnot (Fterm e)) (wp i2 q))
+    | Sassert f ->
+       Fimplies f q (* liberal wp, no termination required *)
+       (* Fand f q *) (* strict wp, termination required *)
+    | Swhile e inv i ->
+        Fand inv
+          (abstract_effects i
+            (Fand
+                (Fimplies (Fand (Fterm e) inv) (wp i inv))
+                (Fimplies (Fand (Fnot (Fterm e)) inv) q)))
+
+    end
+    { valid_triple result i q }
+
+*)
+
+end
+
+(* pas concluant
+
+(** {2 WP calculus, variant} *)
+
+theory WP2
+
+use import ImpExpr
+
+use set.Set
+
+(** [assigns sigma W sigma'] is true when the only differences between
+    [sigma] and [sigma'] are the value of references in [W] *)
+
+predicate assigns (sigma:env) (a:Set.set ident) (sigma':env) =
+  forall i:ident. not (Set.mem i a) ->
+    IdMap.get sigma i = IdMap.get sigma' i
+
+lemma assigns_refl:
+  forall sigma:env, a:Set.set ident. assigns sigma a sigma
+
+lemma assigns_trans:
+  forall sigma1 sigma2 sigma3:env, a:Set.set ident.
+    assigns sigma1 a sigma2 /\ assigns sigma2 a sigma3 ->
+    assigns sigma1 a sigma3
+
+lemma assigns_union_left:
+  forall sigma sigma':env, s1 s2:Set.set ident.
+    assigns sigma s1 sigma' -> assigns sigma (Set.union s1 s2) sigma'
+
+lemma assigns_union_right:
+  forall sigma sigma':env, s1 s2:Set.set ident.
+    assigns sigma s2 sigma' -> assigns sigma (Set.union s1 s2) sigma'
+
+(** [expr_writes e W] is true when the only references modified by [e] are in [W] *) 
+predicate expr_writes (e:expr) (w:Set.set ident) =
+  match e with
+  | Evalue _ | Evar _ | Ederef _ | Eassert _ -> true
+  | Ebin e1 _ e2 -> expr_writes e1 w /\ expr_writes e2 w
+  | Eassign id _ -> Set.mem id w
+  | Eseq e1 e2 -> expr_writes e1 w /\ expr_writes e2 w
+  | Elet id e1 e2 -> expr_writes e1 w /\ expr_writes e2 w
+  | Eif e1 e2 e3 -> expr_writes e1 w /\ expr_writes e2 w /\ expr_writes e3 w
+  | Ewhile cond _ body -> expr_writes cond w /\ expr_writes body w
+  end
+
+  function fresh_from (f:fmla) (e:expr) : ident
+
+  axiom fresh_from_fmla: forall e:expr, f:fmla.
+     fresh_in_fmla (fresh_from f e) f
+
+  axiom fresh_from_expr: forall e:expr, f:fmla.
+     fresh_in_expr (fresh_from f e) e
+
+  function abstract_effects (e:expr) (f:fmla) : fmla
+
+  predicate is_pure (e:expr) =
+    match e with
+    | Evalue _ | Evar _ | Ederef _ -> true
+    | Eassert _ -> false (* true *)
+    | Eseq e1 e2 -> false (* is_pure e1 /\ is_pure e2 *)
+    | Elet id e1 e2 -> false (* is_pure e1 /\ is_pure e2 *)
+    | Ebin e1 op e2 -> false (* is_pure e1 /\ is_pure e2 *)
+    | Eassign x e -> false
+    | Eif e1 e2 e3 -> false (* is_pure e1 /\ is_pure e2 /\ is_pure e3 *)
+    | Ewhile cond inv body -> false
+    end
+
+  function purify (e:expr) : term =
+    match e with
+    | Evalue v -> Tvalue v
+    | Evar id -> Tvar id
+    | Ederef id -> Tderef id
+    | _ -> Tvalue Vvoid
+   end
+
+  function wp (e:expr) (q:fmla) : fmla =
+    match e with
+    | Evalue v ->
+        (* let result = e in q *)
+        Flet result (Tvalue v) q
+    | Evar v -> Flet result (Tvar v) q
+    | Ederef x -> Flet result (Tderef x) q
+    | Eassert f ->
+        (* asymmetric and *)
+        Fand f (Fimplies f q)
+    | Eseq e1 e2 -> wp e1 (wp e2 q)
+    | Elet id e1 e2 -> wp e1 (Flet id (Tvar result) (wp e2 q))
+    | Ebin e1 op e2 ->
+       if is_pure e1 then
+          if is_pure e2 then
+             Flet result (Tbin (purify e1) op (purify e2)) q
+          else
+             let id = fresh_from q e in
+             wp (Elet id e2 (Ebin e1 op (Evar id))) q
+       else
+          let id = fresh_from q e in
+          wp (Elet id e1 (Ebin (Evar id) op e2)) q
+    | Eassign x e ->
+        if is_pure e then
+          let q' = Flet result (Tvalue Vvoid) q in
+          let id = fresh_from q' e in
+          Flet id (purify e) (subst q' x id)
+        else
+          let id = fresh_from q e in
+          wp (Elet id e (Eassign x (Evar id))) q
+    | Eif e1 e2 e3 ->
+        let f =
+          Fand (Fimplies (Fterm (Tvar result)) (wp e2 q))
+            (Fimplies (Fnot (Fterm (Tvar result))) (wp e3 q))
+        in
+        wp e1 f
+    | Ewhile cond inv body ->
+        Fand inv
+          (abstract_effects body
+            (wp cond
+             (Fand
+              (Fimplies (Fand (Fterm (Tvar result)) inv) (wp body inv))
+              (Fimplies (Fand (Fnot (Fterm (Tvar result))) inv) q))))
+
+    end
 
 
   lemma wp_conj:
@@ -640,7 +883,7 @@ predicate expr_writes (e:expr) (w:Set.set ident) =
 
 end
 
-
+*)
 
 (***
 Local Variables:

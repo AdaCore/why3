@@ -209,6 +209,13 @@ Fixpoint subst(f:fmla) (x:Z) (v:Z) {struct f}: fmla :=
   end.
 Unset Implicit Arguments.
 
+Axiom subst_fresh : forall (f:fmla) (x:Z) (v:Z), (fresh_in_fmla x f) ->
+  ((subst f x v) = f).
+
+Axiom let_subst : forall (t:term) (f:fmla) (x:Z) (id:Z) (idqt:Z),
+  ((subst (Flet x t f) id idqt) = (Flet x (subst_term t id idqt) (subst f id
+  idqt))).
+
 Axiom eval_subst : forall (f:fmla) (sigma:(map Z value)) (pi:(list (Z*
   value)%type)) (x:Z) (v:Z), (fresh_in_fmla v f) -> ((eval_fmla sigma pi
   (subst f x v)) <-> (eval_fmla (set sigma x (get_stack v pi)) pi f)).
@@ -221,6 +228,14 @@ Axiom eval_swap : forall (f:fmla) (sigma:(map Z value)) (pi:(list (Z*
 Axiom eval_change_free : forall (f:fmla) (sigma:(map Z value)) (pi:(list (Z*
   value)%type)) (id:Z) (v:value), (fresh_in_fmla id f) -> ((eval_fmla sigma
   (Cons (id, v) pi) f) <-> (eval_fmla sigma pi f)).
+
+(* Why3 assumption *)
+Definition valid_fmla(p:fmla): Prop := forall (sigma:(map Z value)) (pi:(list
+  (Z* value)%type)), (eval_fmla sigma pi p).
+
+Axiom let_equiv : forall (id:Z) (idqt:Z) (t:term) (f:fmla),
+  forall (sigma:(map Z value)) (pi:(list (Z* value)%type)), (eval_fmla sigma
+  pi (Flet idqt t (subst f id idqt))) -> (eval_fmla sigma pi (Flet id t f)).
 
 (* Why3 assumption *)
 Inductive expr  :=
@@ -355,10 +370,6 @@ Axiom one_step_change_free : forall (e:expr) (eqt:expr) (sigma:(map Z value))
   value)%type)) (id:Z) (v:value), (fresh_in_expr id e) -> ((one_step sigma
   (Cons (id, v) pi) e sigmaqt piqt eqt) -> (one_step sigma pi e sigmaqt piqt
   eqt)).
-
-(* Why3 assumption *)
-Definition valid_fmla(p:fmla): Prop := forall (sigma:(map Z value)) (pi:(list
-  (Z* value)%type)), (eval_fmla sigma pi p).
 
 (* Why3 assumption *)
 Definition valid_triple(p:fmla) (e:expr) (q:fmla): Prop := forall (sigma:(map
@@ -525,6 +536,14 @@ Fixpoint wp(e:expr) (q:fmla) {struct e}: fmla :=
   end.
 Unset Implicit Arguments.
 
+Axiom wp_subst : forall (e:expr) (q:fmla) (id:Z) (idqt:Z), (fresh_in_expr id
+  e) -> ((subst (wp e q) id idqt) = (wp e (subst q id idqt))).
+
+Axiom wp_implies : forall (p:fmla) (q:fmla), (forall (sigma:(map Z value))
+  (pi:(list (Z* value)%type)), (eval_fmla sigma pi p) -> (eval_fmla sigma pi
+  q)) -> forall (sigma:(map Z value)) (pi:(list (Z* value)%type)) (e:expr),
+  (eval_fmla sigma pi (wp e p)) -> (eval_fmla sigma pi (wp e q)).
+
 Axiom wp_conj : forall (sigma:(map Z value)) (pi:(list (Z* value)%type))
   (e:expr) (p:fmla) (q:fmla), (eval_fmla sigma pi (wp e (Fand p q))) <->
   ((eval_fmla sigma pi (wp e p)) /\ (eval_fmla sigma pi (wp e q))).
@@ -545,8 +564,36 @@ auto.
 (* case 2: deref *)
 auto.
 (* case 3: bin,  ctxt1 *)
-simpl. intros q h.
+simpl.
+intros q.
+pose (t1 := fresh_from q (Ebin e1 op e2)).
+fold t1.
+pose (t1' := fresh_from q (Ebin e1qt op e2)).
+fold t1'.
+pose (t2 := fresh_from (Fand (Fterm (Tvar t1)) q) (Ebin e1 op e2)).
+fold t2.
+pose (t2' := fresh_from (Fand (Fterm (Tvar t1')) q) (Ebin e1qt op e2)).
+fold t2'.
+intros h.
 apply IHone_step.
+apply wp_implies with (2:=h).
+unfold valid_fmla.
+intros s p.
+intro.
+apply let_equiv with (idqt:=t1).
+rewrite wp_subst.
+rewrite let_subst.
+rewrite let_subst.
+rewrite subst_fresh.
+rewrite (subst_term_def (Tbin (Tvar t1') op (Tvar t2'))).
+rewrite (subst_term_def (Tvar (-1)) t1' t1).
+rewrite (subst_term_def (Tvar t1') t1' t1).
+rewrite (subst_term_def (Tvar t2') t1' t1).
+simpl.
+
+Print let_equiv.
+apply let_equiv with (idqt:=t2).
+
 admit. (* needs lemmas on fresh_from *)
 (* case 4: bin,  ctxt2 *)
 simpl. intros q h.
@@ -561,6 +608,15 @@ admit.
 (* case x := v -> void *)
 admit.
 
+
+admit.
+admit.
+admit.
+admit.
+admit.
+admit.
+admit.
+admit.
 
 
 
