@@ -1295,13 +1295,14 @@ type mlw_library = mlw_contents library
 type mlw_file = mlw_contents * Theory.theory Mstr.t
 
 let find_theory loc lib path s =
-  (* search first in .mlw files (using lib) *)
+  (* search first in .mlw files or among the built-ins *)
   let thm =
     try Some (Env.read_lib_theory lib path s)
     with LibFileNotFound _ | TheoryNotFound _ -> None
   in
-  (* search also in .why files *)
+  (* search also in .why files, unless the theory is built-in *)
   let th =
+    if path = [] then None else
     try Some (Env.find_theory (Env.env_of_library lib) path s)
     with LibFileNotFound _ | TheoryNotFound _ -> None
   in
