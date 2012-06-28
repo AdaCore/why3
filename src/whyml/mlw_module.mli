@@ -30,20 +30,25 @@ open Mlw_ty.T
 open Mlw_expr
 open Mlw_decl
 
-type prgsymbol =
+type type_symbol =
+  | PT of itysymbol
+  | TS of tysymbol
+
+type prog_symbol =
   | PV of pvsymbol
   | PS of psymbol
   | PL of plsymbol
-  | PX of xsymbol
+  | XS of xsymbol
+  | LS of lsymbol
 
-type namespace = private {
-  ns_it : itysymbol Mstr.t;  (* type symbols *)
-  ns_ps : prgsymbol Mstr.t;  (* program symbols *)
-  ns_ns : namespace Mstr.t;  (* inner namespaces *)
+type namespace = {
+  ns_ts : type_symbol Mstr.t;  (* type symbols *)
+  ns_ps : prog_symbol Mstr.t;  (* program symbols *)
+  ns_ns : namespace   Mstr.t;  (* inner namespaces *)
 }
 
-val ns_find_it : namespace -> string list -> itysymbol
-val ns_find_ps : namespace -> string list -> prgsymbol
+val ns_find_ts : namespace -> string list -> type_symbol
+val ns_find_ps : namespace -> string list -> prog_symbol
 val ns_find_ns : namespace -> string list -> namespace
 
 (** Module *)

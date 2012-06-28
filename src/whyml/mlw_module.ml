@@ -42,66 +42,80 @@ open Mlw_decl
     3. program decls
 *)
 
-type prgsymbol =
+type type_symbol =
+  | PT of itysymbol
+  | TS of tysymbol
+
+type prog_symbol =
   | PV of pvsymbol
   | PS of psymbol
   | PL of plsymbol
-  | PX of xsymbol
+  | XS of xsymbol
+  | LS of lsymbol
 
 type namespace = {
-  ns_it : itysymbol Mstr.t;  (* type symbols *)
-  ns_ps : prgsymbol Mstr.t;  (* program symbols *)
-  ns_ns : namespace Mstr.t;  (* inner namespaces *)
+  ns_ts : type_symbol Mstr.t;  (* type symbols *)
+  ns_ps : prog_symbol Mstr.t;  (* program symbols *)
+  ns_ns : namespace   Mstr.t;  (* inner namespaces *)
 }
 
 let empty_ns = {
-  ns_it = Mstr.empty;
+  ns_ts = Mstr.empty;
   ns_ps = Mstr.empty;
   ns_ns = Mstr.empty;
 }
 
-let ns_replace eq chk x vo vn =
+let ns_replace sub chk x vo vn =
   if not chk then vn else
-  if eq vo vn then vo else
+  if sub vo vn then vn else
   raise (ClashSymbol x)
 
-let ns_union eq chk =
-  Mstr.union (fun x vn vo -> Some (ns_replace eq chk x vo vn))
+let tsym_sub t1 t2 = match t1,t2 with
+  | PT t1, PT t2 -> its_equal t1 t2
+  | TS t1, TS t2 -> ts_equal t1 t2
+  | _, _ -> false
 
-let prg_equal p1 p2 = match p1,p2 with
+let psym_sub p1 p2 = match p1,p2 with
   | PV p1, PV p2 -> pv_equal p1 p2
   | PS p1, PS p2 -> ps_equal p1 p2
   | PL p1, PL p2 -> pl_equal p1 p2
-  | PX p1, PX p2 -> xs_equal p1 p2
+  | XS p1, XS p2 -> xs_equal p1 p2
+  | LS p1, LS p2 -> ls_equal p1 p2
+  (* program symbols may overshadow pure symbols *)
+  | LS _, (PV _|PS _|PL _|XS _) -> true
   | _, _ -> false
 
 let rec merge_ns chk ns1 ns2 =
+  let join sub x n o = Some (ns_replace sub chk x o n) in
+  let ns_union sub m1 m2 = Mstr.union (join sub) m1 m2 in
   let fusion _ ns1 ns2 = Some (merge_ns chk ns1 ns2) in
-  { ns_it = ns_union its_equal chk ns1.ns_it ns2.ns_it;
-    ns_ps = ns_union prg_equal chk ns1.ns_ps ns2.ns_ps;
-    ns_ns = Mstr.union fusion      ns1.ns_ns ns2.ns_ns; }
+  { ns_ts = ns_union tsym_sub ns1.ns_ts ns2.ns_ts;
+    ns_ps = ns_union psym_sub ns1.ns_ps ns2.ns_ps;
+    ns_ns = Mstr.union fusion ns1.ns_ns ns2.ns_ns; }
 
-let nm_add chk x ns m = Mstr.change (function
-  | None -> Some ns
-  | Some os -> Some (merge_ns chk ns os)) x m
+let add_ns chk x ns m = Mstr.change (function
+  | Some os -> Some (merge_ns chk ns os)
+  | None    -> Some ns) x m
 
-let ns_add eq chk x v m = Mstr.change (function
-  | None -> Some v
-  | Some vo -> Some (ns_replace eq chk x vo v)) x m
+let ns_add sub chk x vn m = Mstr.change (function
+  | Some vo -> Some (ns_replace sub chk x vo vn)
+  | None    -> Some vn) x m
 
-let it_add = ns_add its_equal
-let ps_add = ns_add prg_equal
+let add_ts chk x ts ns = { ns with ns_ts = ns_add tsym_sub chk x ts ns.ns_ts }
+let add_ps chk x pf ns = { ns with ns_ps = ns_add psym_sub chk x pf ns.ns_ps }
+let add_ns chk x nn ns = { ns with ns_ns = add_ns          chk x nn ns.ns_ns }
 
-let add_it chk x ts ns = { ns with ns_it = it_add chk x ts ns.ns_it }
-let add_ps chk x pf ns = { ns with ns_ps = ps_add chk x pf ns.ns_ps }
-let add_ns chk x nn ns = { ns with ns_ns = nm_add chk x nn ns.ns_ns }
+let rec convert_pure_ns ns =
+  { ns_ts = Mstr.map (fun ts -> TS ts) ns.Theory.ns_ts;
+    ns_ps = Mstr.map (fun ls -> LS ls) ns.Theory.ns_ls;
+    ns_ns = Mstr.map convert_pure_ns ns.Theory.ns_ns; }
 
 let rec ns_find get_map ns = function
   | []   -> assert false
   | [a]  -> Mstr.find a (get_map ns)
   | a::l -> ns_find get_map (Mstr.find a ns.ns_ns) l
 
-let ns_find_it = ns_find (fun ns -> ns.ns_it)
+let ns_find_ts = ns_find (fun ns -> ns.ns_ts)
 let ns_find_ps = ns_find (fun ns -> ns.ns_ps)
 let ns_find_ns = ns_find (fun ns -> ns.ns_ns)
 
@@ -175,36 +189,27 @@ let close_namespace uc import s =
 
 (** Use *)
 
+let add_to_module uc th ns =
+  match uc.muc_import, uc.muc_export with
+  | i0 :: sti, e0 :: ste -> { uc with
+      muc_theory = th;
+      muc_import = merge_ns false ns i0 :: sti;
+      muc_export = merge_ns true  ns e0 :: ste; }
+  | _ -> assert false
+
 let use_export uc m =
   let mth = m.mod_theory in
   let id = mth.th_name in
   let uc =
-    if not (Sid.mem id uc.muc_used) then
-      { uc with
-          muc_known = merge_known uc.muc_known m.mod_known;
-          muc_used  = Sid.add id uc.muc_used; }
-    else
-      uc
-  in
-  match uc.muc_import, uc.muc_export with
-  | i0 :: sti, e0 :: ste -> { uc with
-      muc_theory = Theory.use_export uc.muc_theory mth;
-      muc_import = merge_ns false m.mod_export i0 :: sti;
-      muc_export = merge_ns true  m.mod_export e0 :: ste; }
-  | _ -> assert false
+    if Sid.mem id uc.muc_used then uc else { uc with
+      muc_known = merge_known uc.muc_known m.mod_known;
+      muc_used  = Sid.add id uc.muc_used } in
+  let th = Theory.use_export uc.muc_theory mth in
+  add_to_module uc th m.mod_export
 
 (** Logic decls *)
 
 let add_to_theory f uc x = { uc with muc_theory = f uc.muc_theory x }
-
-let add_decl = add_to_theory Theory.add_decl
-let use_export_theory = add_to_theory Theory.use_export
-let clone_export_theory uc th i =
-  { uc with muc_theory = Theory.clone_export uc.muc_theory th i }
-let add_meta uc m al =
-  { uc with muc_theory = Theory.add_meta uc.muc_theory m al }
-
-(** Program decls *)
 
 let add_symbol add id v uc =
   match uc.muc_import, uc.muc_export with
@@ -213,15 +218,58 @@ let add_symbol add id v uc =
       muc_export = add true  id.id_string v e0 :: ste }
   | _ -> assert false
 
+let add_decl uc d =
+  let add_ts uc ts = add_symbol add_ts ts.ts_name (TS ts) uc in
+  let add_ls uc ls = add_symbol add_ps ls.ls_name (LS ls) uc in
+  let add_pj uc pj = Util.option_fold add_ls uc pj in
+  let add_cs uc (cs,pjl) = List.fold_left add_pj (add_ls uc cs) pjl in
+  let add_data uc (ts,csl) = List.fold_left add_cs (add_ts uc ts) csl in
+  let add_logic uc (ls,_) = add_ls uc ls in
+  let uc = match d.Decl.d_node with
+    | Decl.Dtype ts -> add_ts uc ts
+    | Decl.Ddata dl -> List.fold_left add_data uc dl
+    | Decl.Dparam ls -> add_ls uc ls
+    | Decl.Dlogic dl -> List.fold_left add_logic uc dl
+    | Decl.Dind (_,dl) -> List.fold_left add_logic uc dl
+    | Decl.Dprop _ -> uc
+  in
+  add_to_theory Theory.add_decl uc d
+
+let use_export_theory uc th =
+  let nth = Theory.use_export uc.muc_theory th in
+  let nns = convert_pure_ns th.th_export in
+  add_to_module uc nth nns
+
+let clone_export_theory uc th inst =
+  let nth = Theory.clone_export uc.muc_theory th inst in
+  let sm = match Theory.get_rev_decls nth with
+    | { td_node = Clone (_,sm) } :: _ -> sm
+    | _ -> assert false in
+  let g_ts _ ts = not (Mts.mem ts inst.inst_ts) in
+  let g_ls _ ls = not (Mls.mem ls inst.inst_ls) in
+  let f_ts ts = TS (Mts.find_def ts ts sm.sm_ts) in
+  let f_ls ls = LS (Mls.find_def ls ls sm.sm_ls) in
+  let rec f_ns ns = {
+    ns_ts = Mstr.map f_ts (Mstr.filter g_ts ns.Theory.ns_ts);
+    ns_ps = Mstr.map f_ls (Mstr.filter g_ls ns.Theory.ns_ls);
+    ns_ns = Mstr.map f_ns ns.Theory.ns_ns; }
+  in
+  add_to_module uc nth (f_ns th.th_export)
+
+let add_meta uc m al =
+  { uc with muc_theory = Theory.add_meta uc.muc_theory m al }
+
+(** Program decls *)
+
 let add_type uc its =
-  add_symbol add_it its.its_pure.ts_name its uc
+  add_symbol add_ts its.its_pure.ts_name (PT its) uc
 
 let add_data uc (its,csl) =
-  let add_pls uc pls = add_symbol add_ps pls.pl_ls.ls_name (PL pls) uc in
-  let add_proj = option_fold add_pls in
-  let add_constr uc (ps,pjl) = List.fold_left add_proj (add_pls uc ps) pjl in
-  let uc = add_symbol add_it its.its_pure.ts_name its uc in
-  if its.its_abst then uc else List.fold_left add_constr uc csl
+  let add_pl uc pl = add_symbol add_ps pl.pl_ls.ls_name (PL pl) uc in
+  let add_pj uc pj = Util.option_fold add_pl uc pj in
+  let add_cs uc (cs,pjl) = List.fold_left add_pj (add_pl uc cs) pjl in
+  let uc = add_symbol add_ts its.its_pure.ts_name (PT its) uc in
+  if its.its_abst then uc else List.fold_left add_cs uc csl
 
 let add_let uc = function
   | LetV pv -> add_symbol add_ps pv.pv_vs.vs_name (PV pv) uc
@@ -231,7 +279,7 @@ let add_rec uc { rec_ps = ps } =
   add_symbol add_ps ps.ps_name (PS ps) uc
 
 let add_exn uc xs =
-  add_symbol add_ps xs.xs_name (PX xs) uc
+  add_symbol add_ps xs.xs_name (XS xs) uc
 
 let add_pdecl uc d =
   let uc = { uc with
@@ -256,18 +304,6 @@ let add_pdecl uc d =
       List.fold_left add_rec uc rdl
   | PDexn xs ->
       add_exn uc xs
-
-(*
-let add_pdecl_with_tuples uc d =
-  let ids = Mid.set_diff d.pd_syms uc.muc_known in
-  let ids = Mid.set_diff ids (Theory.get_known uc.muc_theory) in
-  let add id s = match is_ts_tuple_id id with
-    | Some n -> Sint.add n s
-    | None -> s in
-  let ixs = Sid.fold add ids Sint.empty in
-  let add n uc = use_export_theory uc (tuple_theory n) in
-  add_pdecl (Sint.fold add ixs uc) d
-*)
 
 (* create module *)
 

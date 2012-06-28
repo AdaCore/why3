@@ -28,7 +28,7 @@ open Ty
 open Term
 open Decl
 
-type namespace = private {
+type namespace = {
   ns_ts : tysymbol Mstr.t;   (* type symbols *)
   ns_ls : lsymbol Mstr.t;    (* logic symbols *)
   ns_pr : prsymbol Mstr.t;   (* propositions *)

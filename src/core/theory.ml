@@ -48,32 +48,27 @@ let ns_replace eq chk x vo vn =
   if eq vo vn then vo else
   raise (ClashSymbol x)
 
-let ns_union eq chk =
-  Mstr.union (fun x vn vo -> Some (ns_replace eq chk x vo vn))
-
 let rec merge_ns chk ns1 ns2 =
+  let join eq x n o = Some (ns_replace eq chk x o n) in
+  let ns_union eq m1 m2 = Mstr.union (join eq) m1 m2 in
   let fusion _ ns1 ns2 = Some (merge_ns chk ns1 ns2) in
-  { ns_ts = ns_union ts_equal chk ns1.ns_ts ns2.ns_ts;
-    ns_ls = ns_union ls_equal chk ns1.ns_ls ns2.ns_ls;
-    ns_pr = ns_union pr_equal chk ns1.ns_pr ns2.ns_pr;
-    ns_ns = Mstr.union fusion     ns1.ns_ns ns2.ns_ns; }
+  { ns_ts = ns_union ts_equal ns1.ns_ts ns2.ns_ts;
+    ns_ls = ns_union ls_equal ns1.ns_ls ns2.ns_ls;
+    ns_pr = ns_union pr_equal ns1.ns_pr ns2.ns_pr;
+    ns_ns = Mstr.union fusion ns1.ns_ns ns2.ns_ns; }
 
-let nm_add chk x ns m = Mstr.change (function
-  | None -> Some ns
-  | Some os -> Some (merge_ns chk ns os)) x m
+let add_ns chk x ns m = Mstr.change (function
+  | Some os -> Some (merge_ns chk ns os)
+  | None    -> Some ns) x m
 
-let ns_add eq chk x v m = Mstr.change (function
-  | None -> Some v
-  | Some vo -> Some (ns_replace eq chk x vo v)) x m
+let ns_add eq chk x vn m = Mstr.change (function
+  | Some vo -> Some (ns_replace eq chk x vo vn)
+  | None    -> Some vn) x m
 
-let ts_add = ns_add ts_equal
-let ls_add = ns_add ls_equal
-let pr_add = ns_add pr_equal
-
-let add_ts chk x ts ns = { ns with ns_ts = ts_add chk x ts ns.ns_ts }
-let add_ls chk x ls ns = { ns with ns_ls = ls_add chk x ls ns.ns_ls }
-let add_pr chk x pf ns = { ns with ns_pr = pr_add chk x pf ns.ns_pr }
-let add_ns chk x nn ns = { ns with ns_ns = nm_add chk x nn ns.ns_ns }
+let add_ts chk x ts ns = { ns with ns_ts = ns_add ts_equal chk x ts ns.ns_ts }
+let add_ls chk x ls ns = { ns with ns_ls = ns_add ls_equal chk x ls ns.ns_ls }
+let add_pr chk x pf ns = { ns with ns_pr = ns_add pr_equal chk x pf ns.ns_pr }
+let add_ns chk x nn ns = { ns with ns_ns = add_ns          chk x nn ns.ns_ns }
 
 let rec ns_find get_map ns = function
   | []   -> assert false

@@ -51,7 +51,7 @@ exception UnboundTheory of qualid
 exception UnboundType of string list
 *)
 exception UnboundTypeVar of string
-exception UnboundSymbol of string list
+exception UnboundSymbol of qualid
 
 let error = Loc.error
 let errorm = Loc.errorm
@@ -82,10 +82,9 @@ let () = Exn_printer.register (fun fmt e -> match e with
         (Pp.print_list Pp.dot Pp.pp_print_string) sl
 *)
   | UnboundTypeVar s ->
-      Format.fprintf fmt "unbound type variable '%s" s
-  | UnboundSymbol sl ->
-      Format.fprintf fmt "Unbound symbol '%a'"
-        (Pp.print_list Pp.dot Format.pp_print_string) sl
+      Format.fprintf fmt "Unbound type variable '%s" s
+  | UnboundSymbol q ->
+      Format.fprintf fmt "Unbound symbol '%a'" print_qualid q
   | _ -> raise e)
 
 (* TODO: let type_only = Debug.test_flag Typing.debug_type_only in *)
@@ -128,6 +127,23 @@ let flush_tuples uc =
 let add_pdecl_with_tuples uc pd = add_pdecl (flush_tuples uc) pd
 let add_decl_with_tuples uc d = add_decl (flush_tuples uc) d
 
+(** Namespace lookup *)
+
+let uc_find_ls uc p =
+  let x = Typing.string_list_of_qualid [] p in
+  try ns_find_ls (Theory.get_namespace (get_theory uc)) x
+  with Not_found -> error ~loc:(qloc p) (UnboundSymbol p)
+
+let uc_find_ts uc p =
+  let x = Typing.string_list_of_qualid [] p in
+  try ns_find_ts (get_namespace uc) x
+  with Not_found -> error ~loc:(qloc p) (UnboundSymbol p)
+
+let uc_find_ps uc p =
+  let x = Typing.string_list_of_qualid [] p in
+  try ns_find_ps (get_namespace uc) x
+  with Not_found -> error ~loc:(qloc p) (UnboundSymbol p)
+
 (** Typing type expressions *)
 
 let rec dity_of_pty ~user denv = function
@@ -135,19 +151,13 @@ let rec dity_of_pty ~user denv = function
       create_user_type_variable id
   | Ptree.PPTtyapp (pl, p) ->
       let dl = List.map (dity_of_pty ~user denv) pl in
-      let x = Typing.string_list_of_qualid [] p in
-      begin
-        try
-          let its = ns_find_it (get_namespace denv.uc) x in
-          its_app ~user its dl
-        with Not_found -> try
-          let ts = ns_find_ts (Theory.get_namespace (get_theory denv.uc)) x in
-          ts_app ts dl
-        with Not_found ->
-          errorm ~loc:(qloc p) "unbound symbol %a" print_qualid p
+      begin match uc_find_ts denv.uc p with
+        | PT ts -> its_app ~user ts dl
+        | TS ts -> ts_app ts dl
       end
   | Ptree.PPTtuple pl ->
-      ts_app (ts_tuple (List.length pl)) (List.map (dity_of_pty ~user denv) pl)
+      let dl = List.map (dity_of_pty ~user denv) pl in
+      ts_app (ts_tuple (List.length pl)) dl
 
 (** Typing program expressions *)
 
@@ -180,33 +190,6 @@ let rec decompose_app args e = match e.Ptree.expr_desc with
   | Eapply (e1, e2) -> decompose_app (e2 :: args) e1
   | _ -> e, args
 
-(* namespace lookup *)
-
-let uc_find_ls uc p =
-  let x = Typing.string_list_of_qualid [] p in
-  ns_find_ls (Theory.get_namespace (get_theory uc)) x
-
-let uc_find_prgs uc p =
-  let x = Typing.string_list_of_qualid [] p in
-  ns_find_ps (get_namespace uc) x
-
-exception LS of lsymbol
-
-let uc_find_ps_or_ls uc p =
-  let x = Typing.string_list_of_qualid [] p in
-  try ns_find_ps (get_namespace uc) x with Not_found ->
-  (* we didn't find p in the module namespace *)
-  let ls = ns_find_ls (Theory.get_namespace (get_theory uc)) x in
-  (* and we did find it in the pure theory *)
-  if Mid.mem ls.ls_name (get_known uc) then
-    (* but it was defined in a program declaration! *)
-    error ~loc:(qloc p) (HiddenPLS ls);
-  (* fine, it's just a pure lsymbol *)
-  raise (LS ls)
-
-let uc_find_ps uc p =
-  try uc_find_ps_or_ls uc p with LS _ -> raise Not_found
-
 (* record parsing *)
 
 let parse_record uc fll =
@@ -227,17 +210,14 @@ let parse_record uc fll =
   in
   cs,pjl,flm
 
-let find_field uc (p,e) = try match uc_find_ps uc p with
-  | PL pl -> (pl,e)
-  | _ -> errorm ~loc:(qloc p) "bad record field %a" print_qualid p
-  with Not_found -> errorm ~loc:(qloc p) "unbound symbol %a" print_qualid p
+let find_prog_field uc (p,e) = match uc_find_ps uc p with PL pl -> pl, e
+  | _ -> errorm ~loc:(qloc p) "'%a' is not a record field" print_qualid p
 
-let find_pure_field uc (p,e) = try uc_find_ls uc p, e
-  with Not_found -> errorm ~loc:(qloc p) "unbound symbol %a" print_qualid p
+let find_pure_field uc (p,e) = uc_find_ls uc p, e
 
-let pure_record uc = function
+let is_pure_record uc = function
+  | fl :: _ -> (try ignore (find_prog_field uc fl); false with _ -> true)
   | [] -> raise Decl.EmptyRecord
-  | (p,_)::_ -> (try ignore (uc_find_ps uc p); false with Not_found -> true)
 
 let hidden_pl ~loc pl =
   { de_desc = DEglobal_pl pl;
@@ -280,29 +260,25 @@ let add_var id dity denv =
   let locals = Mstr.add id.id (tvars,dity) denv.locals in
   { denv with locals = locals; tvars = tvars }
 
-let specialize_qualid uc p = try match uc_find_ps_or_ls uc p with
+let specialize_qualid uc p = match uc_find_ps uc p with
   | PV pv -> DEglobal_pv pv, specialize_pvsymbol pv
   | PS ps -> DEglobal_ps ps, specialize_psymbol  ps
   | PL pl -> DEglobal_pl pl, specialize_plsymbol pl
-  | PX xs -> errorm ~loc:(qloc p) "unexpected exception symbol %a" print_xs xs
-  with
   | LS ls -> DEglobal_ls ls, specialize_lsymbol ls
-  | Not_found -> errorm ~loc:(qloc p) "unbound symbol %a" print_qualid p
+  | XS xs -> errorm ~loc:(qloc p) "unexpected exception symbol %a" print_xs xs
 
-let find_xsymbol uc p = try match uc_find_prgs uc p with
-  | PX xs -> xs
+let find_xsymbol uc p = match uc_find_ps uc p with
+  | XS xs -> xs
   | _ -> errorm ~loc:(qloc p) "exception symbol expected"
-  with Not_found -> errorm ~loc:(qloc p) "unbound symbol %a" print_qualid p
 
-let find_variant_ls uc p = try match uc_find_ls uc p with
+let find_variant_ls uc p = match uc_find_ls uc p with
   | { ls_args = [u;v]; ls_value = None } as ls when ty_equal u v -> ls
   | ls -> errorm ~loc:(qloc p) "%a is not a binary relation" Pretty.print_ls ls
-  with Not_found -> errorm ~loc:(qloc p) "unbound symbol %a" print_qualid p
 
-let find_global_vs uc p = try match uc_find_prgs uc p with
+let find_global_vs uc p = try match uc_find_ps uc p with
   | PV pv -> Some pv.pv_vs
   | _ -> None
-  with Not_found -> None
+  with _ -> None
 
 let rec dpattern denv ({ pat_loc = loc } as pp) = match pp.pat_desc with
   | Ptree.PPpwild ->
@@ -313,7 +289,7 @@ let rec dpattern denv ({ pat_loc = loc } as pp) = match pp.pat_desc with
   | Ptree.PPpapp (q,ppl) ->
       let sym, dity = specialize_qualid denv.uc q in
       dpat_app denv loc (mk_dexpr sym dity loc Slab.empty) ppl
-  | Ptree.PPprec fl when pure_record denv.uc fl ->
+  | Ptree.PPprec fl when is_pure_record denv.uc fl ->
       let kn = Theory.get_known (get_theory denv.uc) in
       let fl = List.map (find_pure_field denv.uc) fl in
       let cs,pjl,flm = Loc.try2 loc Decl.parse_record kn fl in
@@ -321,7 +297,7 @@ let rec dpattern denv ({ pat_loc = loc } as pp) = match pp.pat_desc with
       let get_val pj = Mls.find_def wild pj flm in
       dpat_app denv loc (hidden_ls ~loc cs) (List.map get_val pjl)
   | Ptree.PPprec fl ->
-      let fl = List.map (find_field denv.uc) fl in
+      let fl = List.map (find_prog_field denv.uc) fl in
       let cs,pjl,flm = Loc.try2 loc parse_record denv.uc fl in
       let wild = { pat_desc = Ptree.PPpwild; pat_loc = loc } in
       let get_val pj = Mls.find_def wild pj.pl_ls flm in
@@ -359,7 +335,7 @@ and dpat_app denv gloc ({ de_loc = loc } as de) ppl =
 let dbinders denv bl =
   let hv = Hashtbl.create 3 in
   let dbinder (id,gh,pty) (denv,bl,tyl) =
-    if Hashtbl.mem hv id.id then errorm "duplicate argument %s" id.id;
+    if Hashtbl.mem hv id.id then raise (DuplicateProgVar id.id);
     Hashtbl.add hv id.id ();
     let dity = match pty with
       | Some pty -> dity_of_pty ~user:true denv pty
@@ -473,7 +449,7 @@ and de_desc denv loc = function
       let ls = fs_tuple (List.length el) in
       let el = List.map (dexpr denv) el in
       de_app loc (hidden_ls ~loc ls) el
-  | Ptree.Erecord fl when pure_record denv.uc fl ->
+  | Ptree.Erecord fl when is_pure_record denv.uc fl ->
       let kn = Theory.get_known (get_theory denv.uc) in
       let fl = List.map (find_pure_field denv.uc) fl in
       let cs,pjl,flm = Loc.try2 loc Decl.parse_record kn fl in
@@ -482,13 +458,13 @@ and de_desc denv loc = function
         | None -> error ~loc (Decl.RecordFieldMissing (cs,pj)) in
       de_app loc (hidden_ls ~loc cs) (List.map get_val pjl)
   | Ptree.Erecord fl ->
-      let fl = List.map (find_field denv.uc) fl in
+      let fl = List.map (find_prog_field denv.uc) fl in
       let cs,pjl,flm = Loc.try2 loc parse_record denv.uc fl in
       let get_val pj = match Mls.find_opt pj.pl_ls flm with
         | Some e -> dexpr denv e
         | None -> error ~loc (Decl.RecordFieldMissing (cs.pl_ls,pj.pl_ls)) in
       de_app loc (hidden_pl ~loc cs) (List.map get_val pjl)
-  | Ptree.Eupdate (e1, fl) when pure_record denv.uc fl ->
+  | Ptree.Eupdate (e1, fl) when is_pure_record denv.uc fl ->
       let e1 = dexpr denv e1 in
       let e0 = mk_var e1 in
       let kn = Theory.get_known (get_theory denv.uc) in
@@ -505,7 +481,7 @@ and de_desc denv loc = function
   | Ptree.Eupdate (e1, fl) ->
       let e1 = dexpr denv e1 in
       let e0 = mk_var e1 in
-      let fl = List.map (find_field denv.uc) fl in
+      let fl = List.map (find_prog_field denv.uc) fl in
       let cs,pjl,flm = Loc.try2 loc parse_record denv.uc fl in
       let get_val pj = match Mls.find_opt pj.pl_ls flm with
         | Some e -> dexpr denv e
@@ -693,13 +669,13 @@ let rec get_eff_expr lenv { pp_desc = d; pp_loc = loc } = match d with
   | Ptree.PPvar (Ptree.Qident {id=x}) when Mstr.mem x lenv.let_vars ->
       begin match Mstr.find x lenv.let_vars with
         | LetV pv -> pv.pv_vtv
-        | LetA _ -> errorm ~loc "%s must be a first-order value" x
+        | LetA _ -> errorm ~loc "'%s' must be a first-order value" x
       end
   | Ptree.PPvar p ->
-      begin try match uc_find_prgs lenv.mod_uc p with
+      begin match uc_find_ps lenv.mod_uc p with
         | PV pv -> pv.pv_vtv
-        | _ -> errorm ~loc:(qloc p) "%a is not a variable" print_qualid p
-      with Not_found -> errorm ~loc "unbound variable %a" print_qualid p end
+        | _ -> errorm ~loc:(qloc p) "'%a' must be a variable" print_qualid p
+      end
   | Ptree.PPapp (p, [le]) ->
       let vtv = get_eff_expr lenv le in
       let quit () = errorm ~loc:le.pp_loc "This expression is not a record" in
@@ -727,7 +703,7 @@ let rec get_eff_expr lenv { pp_desc = d; pp_loc = loc } = match d with
       in
       let itya, vtvv =
         try Mls.find (uc_find_ls lenv.mod_uc p) pjm with Not_found ->
-          errorm ~loc:(qloc p) "%a is not a field name" print_qualid p in
+          errorm ~loc:(qloc p) "'%a' must be a field name" print_qualid p in
       let sbs = unify_loc loc (ity_match ity_subst_empty) itya vtv.vtv_ity in
       let mut = Util.option_map (reg_full_inst sbs) vtvv.vtv_mut in
       let ghost = vtv.vtv_ghost || vtvv.vtv_ghost in
@@ -973,16 +949,6 @@ and expr_lam lenv gh (bl, var, p, de, q, xq) =
 
 (** Type declaration *)
 
-type tys = ProgTS of itysymbol | PureTS of tysymbol
-
-let find_tysymbol q uc =
-  let loc = Typing.qloc q in
-  let sl = Typing.string_list_of_qualid [] q in
-  try ProgTS (ns_find_it (get_namespace uc) sl)
-  with Not_found ->
-  try PureTS (ns_find_ts (Theory.get_namespace (get_theory uc)) sl)
-  with Not_found -> error ~loc (UnboundSymbol sl)
-
 let look_for_loc tdl s =
   let look_id loc id = if id.id = s then Some id.id_loc else loc in
   let look_pj loc (id,_) = option_fold look_id loc id in
@@ -1035,9 +1001,11 @@ let add_types uc tdl =
       let ts_mut = function
         | Qident { id = x } when Mstr.mem x def -> mut_visit x
         | q ->
-            begin match find_tysymbol q uc with
-              | ProgTS s -> s.its_regs <> []
-              | PureTS _ -> false end in
+            begin match uc_find_ts uc q with
+              | PT its -> its.its_regs <> []
+              | TS _ -> false
+            end
+      in
       let rec check = function
         | PPTtyvar _ -> false
         | PPTtyapp (tyl,q) -> ts_mut q || List.exists check tyl
@@ -1080,8 +1048,8 @@ let add_types uc tdl =
       let priv = d.td_vis = Private in
       Hashtbl.add tysymbols x None;
       let get_ts = function
-        | Qident { id = x } when Mstr.mem x def -> ProgTS (its_visit x)
-        | q -> find_tysymbol q uc
+        | Qident { id = x } when Mstr.mem x def -> PT (its_visit x)
+        | q -> uc_find_ts uc q
       in
       let rec parse = function
         | PPTtyvar { id = v ; id_loc = loc } ->
@@ -1090,8 +1058,8 @@ let add_types uc tdl =
         | PPTtyapp (tyl,q) ->
             let tyl = List.map parse tyl in
             begin match get_ts q with
-              | PureTS ts -> Loc.try2 (Typing.qloc q) ity_pur ts tyl
-              | ProgTS ts -> Loc.try2 (Typing.qloc q) ity_app_fresh ts tyl
+              | TS ts -> Loc.try2 (qloc q) ity_pur ts tyl
+              | PT ts -> Loc.try2 (qloc q) ity_app_fresh ts tyl
             end
         | PPTtuple tyl ->
             let ts = ts_tuple (List.length tyl) in
@@ -1169,8 +1137,8 @@ let add_types uc tdl =
     let vars = List.fold_left2 add_tv Mstr.empty d.td_params ts.its_args in
     let get_ts = function
       | Qident { id = x } when Mstr.mem x def ->
-          ProgTS (Util.of_option (Hashtbl.find tysymbols x))
-      | q -> find_tysymbol q uc
+          PT (Util.of_option (Hashtbl.find tysymbols x))
+      | q -> uc_find_ts uc q
     in
     let rec parse = function
       | PPTtyvar { id = v ; id_loc = loc } ->
@@ -1179,8 +1147,8 @@ let add_types uc tdl =
       | PPTtyapp (tyl,q) ->
           let tyl = List.map parse tyl in
           begin match get_ts q with
-            | PureTS ts -> Loc.try2 (Typing.qloc q) ity_pur ts tyl
-            | ProgTS ts -> Loc.try3 (Typing.qloc q) ity_app ts tyl []
+            | TS ts -> Loc.try2 (qloc q) ity_pur ts tyl
+            | PT ts -> Loc.try3 (qloc q) ity_app ts tyl []
           end
       | PPTtuple tyl ->
           let ts = ts_tuple (List.length tyl) in

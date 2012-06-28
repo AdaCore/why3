@@ -460,7 +460,7 @@ let () = Exn_printer.register
   | Mlw_ty.IllegalAlias _reg ->
       fprintf fmt "This application creates an illegal alias"
   | Mlw_expr.HiddenPLS ls ->
-      fprintf fmt "`%a' is a constructor/field of an abstract type \
+      fprintf fmt "'%a' is a constructor/field of an abstract type \
       and cannot be used in a program" print_ls ls;
   | Mlw_expr.GhostWrite (_e, _reg) ->
       fprintf fmt "This expression stores a ghost value in a non-ghost location"
