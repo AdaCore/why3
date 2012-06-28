@@ -116,14 +116,17 @@ let count_term_tuples t =
   let syms_ty _ ty = ty_s_fold syms_ts () ty in
   t_s_fold syms_ty (fun _ _ -> ()) () t
 
-let add_pdecl_with_tuples uc pd =
+let flush_tuples uc =
   let kn = Theory.get_known (get_theory uc) in
   let add_tuple n _ uc =
     if Mid.mem (ts_tuple n).ts_name kn then uc
     else use_export_theory uc (tuple_theory n) in
   let uc = Hashtbl.fold add_tuple ht_tuple uc in
   Hashtbl.clear ht_tuple;
-  add_pdecl uc pd
+  uc
+
+let add_pdecl_with_tuples uc pd = add_pdecl (flush_tuples uc) pd
+let add_decl_with_tuples uc d = add_decl (flush_tuples uc) d
 
 (** Typing type expressions *)
 
@@ -1362,7 +1365,8 @@ let add_theory lib path mt m =
   let { id = id; id_loc = loc } = m.pth_name in
   if Mstr.mem id mt then Loc.errorm ~loc "clash with previous theory %s" id;
   let uc = create_theory ~path (Denv.create_user_id m.pth_name) in
-  let rec add_decl uc (loc, decl) = match decl with
+  let rec add_pure_decl uc (loc,decl) = Loc.try3 loc real_add uc loc decl
+  and real_add uc loc decl = match decl with
     | Dlogic d ->
         Typing.add_decl uc d
     | Duseclone (use, inst) ->
@@ -1385,12 +1389,12 @@ let add_theory lib path mt m =
         end
     | Dnamespace (name, import, dl) ->
         let uc = Theory.open_namespace uc in
-        let uc = List.fold_left add_decl uc dl in
-        Loc.try3 loc Theory.close_namespace uc import name
+        let uc = List.fold_left add_pure_decl uc dl in
+        Theory.close_namespace uc import name
     | Dlet _ | Dletrec _ | Dparam _ | Dexn _ | Duse _ ->
         assert false
   in
-  let uc = List.fold_left add_decl uc m.pth_decl in
+  let uc = List.fold_left add_pure_decl uc m.pth_decl in
   let th = close_theory uc in
   Mstr.add id th mt
 
@@ -1399,11 +1403,28 @@ let add_module lib path mm mt m =
   if Mstr.mem id mm then Loc.errorm ~loc "clash with previous module %s" id;
   if Mstr.mem id mt then Loc.errorm ~loc "clash with previous theory %s" id;
   let uc = create_module ~path (Denv.create_user_id m.mod_name) in
-  let rec add_decl uc (loc,decl) = match decl with
+  let rec add_prog_decl uc (loc,decl) = Loc.try3 loc real_add uc loc decl
+  and real_add uc loc decl = match decl with
     | Dlogic (TypeDecl tdl) ->
-        Loc.try2 loc add_types uc tdl
+        add_types uc tdl
     | Dlogic d ->
-        Loc.try3 loc add_to_theory Typing.add_decl uc d
+        let th0 = get_theory uc in
+        let dl0 = get_rev_decls th0 in
+        let seen td = match dl0 with
+          | td0 :: _ -> td_equal td td0
+          | [] -> false in
+        (* we extract the added declarations and readd it to uc *)
+        let rec add_td uc = function
+          | [] -> uc
+          | td :: _ when seen td -> uc
+          | { td_node = Theory.Decl d } :: dl ->
+              add_decl (add_td uc dl) d
+          | { td_node = Theory.Meta (m,al) } :: dl ->
+              add_meta (add_td uc dl) m al
+          | { td_node = Theory.Use th } :: dl ->
+              use_export_theory (add_td uc dl) th
+          | { td_node = Theory.Clone _ } :: _ -> assert false in
+        add_td uc (get_rev_decls (Typing.add_decl th0 d))
     | Duseclone (use, inst) ->
         let path, s = Typing.split_qualid use.use_theory in
         let mth = find_module loc lib mm mt path s in
@@ -1427,39 +1448,39 @@ let add_module lib path mm mt m =
         end
     | Dnamespace (name, import, dl) ->
         let uc = open_namespace uc in
-        let uc = List.fold_left add_decl uc dl in
-        Loc.try3 loc close_namespace uc import name
+        let uc = List.fold_left add_prog_decl uc dl in
+        close_namespace uc import name
     | Dlet (id, gh, e) ->
         let e = dexpr (create_denv uc) e in
         let pd = match e.de_desc with
           | DEfun lam ->
               let def = expr_fun (create_lenv uc) id gh lam in
-              Loc.try1 loc create_rec_decl [def]
+              create_rec_decl [def]
           | _ ->
               let e = e_ghostify gh (expr (create_lenv uc) e) in
               if not gh && vty_ghost e.e_vty then
                 errorm ~loc "%s must be a ghost variable" id.id;
               let def = create_let_defn (Denv.create_user_id id) e in
-              Loc.try1 loc create_let_decl def
+              create_let_decl def
         in
-        Loc.try2 loc add_pdecl_with_tuples uc pd
+        add_pdecl_with_tuples uc pd
     | Dletrec rdl ->
         let rdl = dletrec (create_denv uc) rdl in
         let rdl = expr_rec (create_lenv uc) rdl in
-        let pd = Loc.try1 loc create_rec_decl rdl in
-        Loc.try2 loc add_pdecl_with_tuples uc pd
+        let pd = create_rec_decl rdl in
+        add_pdecl_with_tuples uc pd
     | Dexn (id, pty) ->
         let ity = match pty with
           | Some pty ->
               ity_of_dity (dity_of_pty ~user:false (create_denv uc) pty)
           | None -> ity_unit in
-        let xs = Loc.try2 loc create_xsymbol (Denv.create_user_id id) ity in
-        let pd = Loc.try1 loc create_exn_decl xs in
-        Loc.try2 loc add_pdecl_with_tuples uc pd
+        let xs = create_xsymbol (Denv.create_user_id id) ity in
+        let pd = create_exn_decl xs in
+        add_pdecl_with_tuples uc pd
     | Dparam (id, gh, tyv) ->
         let tyv, _ = dtype_v (create_denv uc) tyv in
         let tyv = type_v (create_lenv uc) gh vars_empty tyv in
-        let vd = Loc.try2 loc create_val (Denv.create_user_id id) tyv in
+        let vd = create_val (Denv.create_user_id id) tyv in
         begin match vd.val_name with
           | LetA { ps_vta = { vta_ghost = true }} when not gh ->
               errorm ~loc "%s must be a ghost function" id.id
@@ -1467,8 +1488,8 @@ let add_module lib path mm mt m =
               errorm ~loc "%s must be a ghost variable" id.id
           | _ -> ()
         end;
-        let pd = Loc.try1 loc create_val_decl vd in
-        Loc.try2 loc add_pdecl_with_tuples uc pd
+        let pd = create_val_decl vd in
+        add_pdecl_with_tuples uc pd
     (* TODO: this is made obsolete by Duseclone, remove later *)
     | Duse (qid, use_imp_exp, use_as) ->
         let path, s = Typing.split_qualid qid in
@@ -1486,7 +1507,7 @@ let add_module lib path mm mt m =
           | Some imp -> close_namespace uc imp use_as
         end
   in
-  let uc = List.fold_left add_decl uc m.mod_decl in
+  let uc = List.fold_left add_prog_decl uc m.mod_decl in
   let m = close_module uc in
   Mstr.add id m mm, Mstr.add id m.mod_theory mt
 

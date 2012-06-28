@@ -173,7 +173,6 @@ let close_namespace uc import s =
   | _ ->
       assert false
 
-
 (** Use *)
 
 let use_export uc m =
@@ -199,16 +198,6 @@ let use_export uc m =
 let add_to_theory f uc x = { uc with muc_theory = f uc.muc_theory x }
 
 let add_decl = add_to_theory Theory.add_decl
-let add_decl_with_tuples = add_to_theory Theory.add_decl_with_tuples
-let add_ty_decl = add_to_theory Theory.add_ty_decl
-let add_data_decl = add_to_theory Theory.add_data_decl
-let add_param_decl = add_to_theory Theory.add_param_decl
-let add_logic_decl = add_to_theory Theory.add_logic_decl
-let add_ind_decl uc s dl =
-  { uc with muc_theory = Theory.add_ind_decl uc.muc_theory s dl }
-let add_prop_decl uc k pr f =
-  { uc with muc_theory = Theory.add_prop_decl uc.muc_theory k pr f }
-
 let use_export_theory = add_to_theory Theory.use_export
 let clone_export_theory uc th i =
   { uc with muc_theory = Theory.clone_export uc.muc_theory th i }

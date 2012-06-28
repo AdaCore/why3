@@ -130,6 +130,8 @@ val close_namespace : theory_uc -> bool -> string option -> theory_uc
 val get_namespace : theory_uc -> namespace
 val get_known : theory_uc -> known_map
 
+val get_rev_decls : theory_uc -> tdecl list
+
 (** Declaration constructors *)
 
 val create_decl : decl -> tdecl

@@ -81,19 +81,7 @@ val clone_export : module_uc -> modul -> th_inst -> module_uc
 
 (** Logic decls *)
 
-val add_to_theory :
-  (theory_uc -> 'a -> theory_uc) -> module_uc -> 'a -> module_uc
-
 val add_decl : module_uc -> decl -> module_uc
-val add_decl_with_tuples : module_uc -> decl -> module_uc
-
-val add_ty_decl : module_uc -> tysymbol -> module_uc
-val add_data_decl : module_uc -> Decl.data_decl list -> module_uc
-val add_param_decl : module_uc -> lsymbol -> module_uc
-val add_logic_decl : module_uc -> logic_decl list -> module_uc
-val add_ind_decl : module_uc -> ind_sign -> ind_decl list -> module_uc
-val add_prop_decl : module_uc -> prop_kind -> prsymbol -> term -> module_uc
-
 val use_export_theory: module_uc -> theory -> module_uc
 val clone_export_theory: module_uc -> theory -> th_inst -> module_uc
 val add_meta : module_uc -> meta -> meta_arg list -> module_uc
@@ -101,4 +89,3 @@ val add_meta : module_uc -> meta -> meta_arg list -> module_uc
 (** Program decls *)
 
 val add_pdecl : module_uc -> pdecl -> module_uc
-(* val add_pdecl_with_tuples : module_uc -> pdecl -> module_uc *)

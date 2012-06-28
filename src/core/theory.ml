@@ -294,6 +294,8 @@ let close_theory uc = match uc.uc_export with
 let get_namespace uc = List.hd uc.uc_import
 let get_known uc = uc.uc_known
 
+let get_rev_decls uc = uc.uc_decls
+
 let open_namespace uc = match uc.uc_import with
   | ns :: _ -> { uc with
       uc_import =       ns :: uc.uc_import;
