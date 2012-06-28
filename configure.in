@@ -66,6 +66,12 @@ AC_ARG_ENABLE(local,
     [  --enable-local          use Why3 in the build directory (no installation)],,
     enable_local=no)
 
+# RELOCATABLE INSTALLATION
+
+AC_ARG_ENABLE(relocation,
+    [  --enable-relocation     allow for later relocation of Why3 installation],,
+    enable_relocation=no)
+
 # NATIVE
 
 AC_ARG_ENABLE(native-code,
@@ -117,6 +123,13 @@ AC_ARG_ENABLE(debug,
 AC_ARG_ENABLE(profiling,
     [  --enable-profiling      enable profiling],,
     enable_profiling=no)
+
+# either relocation or local, not both
+if test "$enable_relocation" = yes ; then
+if test "$enable_local" = yes ; then
+    AC_MSG_ERROR(cannot use --enable-relocation and --enable-local at the same time.)
+fi
+fi
 
 # Check for arch/OS
 
@@ -525,6 +538,8 @@ AC_SUBST(enable_local)
 AC_SUBST(LOCALDIR)
 AC_SUBST(LOCALBIN)
 
+AC_SUBST(enable_relocation)
+
 dnl AC_SUBST(PSVIEWER)
 dnl AC_SUBST(PDFVIEWER)
 
@@ -565,4 +580,5 @@ fi
 echo "hypothesis selection    : $enable_hypothesis_selection"
 echo "debugging symbols       : $enable_debug"
 echo "profiling               : $enable_profiling"
+echo "relocatable install     : $enable_relocation"
 echo "localdir                : $enable_local"
