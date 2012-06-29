@@ -143,7 +143,7 @@ and print_fmla info fmt f = match f.t_node with
       let print_vsty fmt vs =
         fprintf fmt "%a:@,%a" print_var vs (print_type info) vs.vs_ty
       in
-      fprintf fmt "%s [%a]:@ %a" q
+      fprintf fmt "%s[%a]:@ %a" q
         (print_list comma print_vsty) vl (print_fmla info) f;
       List.iter forget_var vl
   | Tlet (t1,tb) ->
@@ -166,7 +166,7 @@ let star fmt _ = fprintf fmt " *@ "
 let print_fmla info fmt f =
   let tvs = t_ty_freevars Stv.empty f in
   if Stv.is_empty tvs then print_fmla info fmt f else
-  fprintf fmt "!> [%a]:@ %a" print_tvargs tvs (print_fmla info) f;
+  fprintf fmt "![%a]:@ %a" print_tvargs tvs (print_fmla info) f;
   Stv.iter forget_tvar tvs
 
 let print_decl info fmt d = match d.d_node with
@@ -197,8 +197,12 @@ let print_decl info fmt d = match d.d_node with
       let print_sig fmt ls =
         let tvs = List.fold_left ty_freevars Stv.empty ls.ls_args in
         let tvs = oty_freevars tvs ls.ls_value in
-        if Stv.is_empty tvs then print_sig fmt ls else
-        fprintf fmt "!> [%a]:@ %a" print_tvargs tvs print_sig ls;
+        if Stv.is_empty tvs then
+          print_sig fmt ls
+        else if ls.ls_args = [] then
+          fprintf fmt "!>[%a]:@ %a" print_tvargs tvs print_sig ls
+        else
+          fprintf fmt "!>[%a]:@ (%a)" print_tvargs tvs print_sig ls;
         Stv.iter forget_tvar tvs
       in
       fprintf fmt "@[<hov 2>tff(%s, type,@ %a:@ %a).@]@\n@\n"
