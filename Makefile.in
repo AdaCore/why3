@@ -115,7 +115,7 @@ LIBGENERATED = src/util/rc.ml src/parser/lexer.ml \
 	       src/driver/driver_parser.mli src/driver/driver_parser.ml \
 	       src/driver/driver_lexer.ml src/session/xml.ml
 
-LIB_UTIL = stdlib exn_printer pp debug loc print_tree print_number \
+LIB_UTIL = stdlib exn_printer pp debug loc print_tree \
 	   cmdline hashweak hashcons util sysutil rc plugin
 
 LIB_CORE = ident ty term pattern decl theory task pretty env trans printer
@@ -137,8 +137,8 @@ LIB_TRANSFORM = simplify_recursive_definition simplify_formula \
 		introduction abstraction close_epsilon lift_epsilon \
 		eval_match instantiate_predicate smoke_detector
 
-LIB_PRINTER = alt_ergo why3printer smtv1 smtv2 coq pvs simplify gappa \
-	      cvc3 yices
+LIB_PRINTER = print_number alt_ergo why3printer smtv1 smtv2 coq pvs \
+		simplify gappa cvc3 yices
 
 LIB_SESSION = xml termcode session session_tools session_scheduler
 
@@ -260,11 +260,11 @@ PLUGGENERATED = plugins/tptp/tptp_lexer.ml \
 		plugins/tptp/tptp_parser.ml plugins/tptp/tptp_parser.mli
 
 PLUG_PARSER = genequlin
-PLUG_PRINTER = tptpfof
+PLUG_PRINTER = tptp_fof tptp_tff
 PLUG_TRANSFORM =
 PLUG_TPTP = tptp_ast tptp_parser tptp_typing tptp_lexer
 
-PLUGINS = genequlin tptpfof tptp
+PLUGINS = genequlin tptp_fof tptp_tff tptp
 
 TPTPMODULES = $(addprefix plugins/tptp/, $(PLUG_TPTP))
 
@@ -1422,7 +1422,7 @@ headers:
 	    src/transform/abstraction.ml* \
 	    src/transform/instantiate_predicate.ml* \
 	    src/transform/simplify_formula.ml* \
-	    src/util/print_number.ml* \
+	    src/printer/print_number.ml* \
 	    src/printer/gappa.ml*
 	headache -c misc/headache_config.txt -h misc/header_jk.txt \
 	    src/transform/close_epsilon.ml* \
