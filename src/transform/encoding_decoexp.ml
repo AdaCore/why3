@@ -72,9 +72,9 @@ let deco_term kept tvar =
 
 let ls_inf_type = create_psymbol (id_fresh "infinite") [ty_type]
 
-let deco_decl kept enum phmap d = match d.d_node with
+let deco_decl kept inf_ts ma_map d = match d.d_node with
   | Dtype { ts_def = Some _ } -> []
-  | Dtype ts when not (Mts.mem ts enum) ->
+  | Dtype ts when Mts.mem ts inf_ts ->
       let ls = ls_of_ts ts in
       let vs_of_tv v = create_vsymbol (id_clone v.tv_name) ty_type in
       let vl = List.map vs_of_tv ts.ts_args in
@@ -97,15 +97,15 @@ let deco_decl kept enum phmap d = match d.d_node with
       let vs_of_tv v = create_vsymbol (id_clone v.tv_name) ty_type in
       let vl = List.map vs_of_tv ts.ts_args in
       let t = fs_app ls (List.map t_var vl) ty_type in
-      let phl = try Mts.find ts phmap with Not_found ->
-        List.map Util.ffalse ts.ts_args in
-      let add ph v l = if ph then l else
+      let add mat v l = if not mat then l else
         let id = id_fresh ("Inf_ts_" ^ ts.ts_name.id_string) in
         let f = ps_app ls_inf_type [t] in
         let h = ps_app ls_inf_type [t_var v] in
         let f = t_forall_close vl [] (t_implies h f) in
         create_prop_decl Paxiom (create_prsymbol id) f :: l in
-      let inf_tss = List.fold_right2 add phl vl [] in
+      let inf_tss =
+        try List.fold_right2 add (Mts.find ts ma_map) vl []
+        with Not_found -> [] in
       [d; lsdecl_of_ts ts] @ inf_tss
   | Ddata _ -> Printer.unsupportedDecl d
       "Algebraic and recursively-defined types are \
@@ -141,22 +141,10 @@ let deco_init =
   init
 
 let deco kept =
-  Trans.on_tagged_ts Eliminate_algebraic.meta_enum (fun enum ->
-  Trans.on_meta Eliminate_algebraic.meta_phantom (fun phlist ->
-  let add_ph phmap = function
-    | [Theory.MAts ts; Theory.MAint i] ->
-        let phmap, pha = try phmap, Mts.find ts phmap with
-          | Not_found ->
-              let pha = Array.make (List.length ts.ts_args) false in
-              Mts.add ts pha phmap, pha
-        in
-        Array.set pha i true;
-        phmap
-    | _ -> assert false
-  in
-  let phmap = List.fold_left add_ph Mts.empty phlist in
-  let phmap = Mts.map Array.to_list phmap in
-  Trans.decl (deco_decl kept enum phmap) deco_init))
+  Trans.on_tagged_ts Eliminate_algebraic.meta_infinite (fun infts ->
+  Trans.on_meta Eliminate_algebraic.meta_material (fun matl ->
+  let ma_map = Eliminate_algebraic.get_material_args matl in
+  Trans.decl (deco_decl kept infts ma_map) deco_init))
 
 (** Monomorphisation *)
 
@@ -175,9 +163,7 @@ let lsmap kept = Wls.memoize 63 (fun ls ->
      && List.for_all2 ty_equal tyl ls.ls_args then ls
   else create_lsymbol (id_clone ls.ls_name) tyl tyr)
 
-let mono_init =
-  let init = Task.add_ty_decl None ts_base in
-  init
+let mono_init = Task.add_decl None d_ts_base
 
 let mono kept =
   let kept = Sty.add ty_type kept in

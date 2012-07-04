@@ -62,15 +62,16 @@ let decl tenv d = match d.d_node with
       let decl fs () decls = create_param_decl fs :: decls in
       Hls.fold decl hls [d]
 
-let protect_enumeration =
+let protect_finite =
   Trans.on_tagged_ty Libencoding.meta_kept (fun kept ->
-  Trans.on_tagged_ts Eliminate_algebraic.meta_enum (fun enum ->
-  Trans.on_meta Eliminate_algebraic.meta_phantom (fun phlist ->
-    let finite_ty = Eliminate_algebraic.is_finite_ty enum phlist in
+  Trans.on_tagged_ts Eliminate_algebraic.meta_infinite (fun infts ->
+  Trans.on_meta Eliminate_algebraic.meta_material (fun matl ->
+    let ma_map = Eliminate_algebraic.get_material_args matl in
+    let inf_ty = Eliminate_algebraic.is_infinite_ty infts ma_map in
     let add_protect ty tenv =
-      if not (finite_ty ty) then tenv else
+      if inf_ty ty then tenv else
       let ts = match ty.ty_node with Tyapp (s,_) -> s | _ -> assert false in
-      let id = id_fresh ("protect_enum_" ^ ts.ts_name.id_string) in
+      let id = id_fresh ("protect_finite_" ^ ts.ts_name.id_string) in
       let fs = create_fsymbol id [ty] ty in
       Mty.add ty fs tenv
     in

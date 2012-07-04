@@ -65,7 +65,7 @@ let encoding_tptp env = Trans.seq [
   Trans.print_meta Libencoding.debug Libencoding.meta_kept;
   Trans.on_flag meta_enco_kept ft_enco_kept def_enco_kept_tptp env;
   Trans.on_flag meta_enco_poly ft_enco_poly def_enco_poly_tptp env;
-  Protect_enumeration.protect_enumeration]
+  Protect_finite.protect_finite]
 
 let () = register_env_transform "encoding_smt" encoding_smt
 let () = register_env_transform "encoding_tptp" encoding_tptp

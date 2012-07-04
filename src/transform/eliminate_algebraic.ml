@@ -26,53 +26,34 @@ open Decl
 open Theory
 open Task
 
-(* a type constructor tagged "enumeration" generates a finite type
-   if and only if all of its non-phantom arguments are finite types *)
+(* a type constructor generates an infinite type if either it is tagged by
+   meta_infinite or one of its "material" arguments is an infinite type *)
 
-let meta_enum = register_meta "enumeration_type" [MTtysymbol]
-let meta_phantom = register_meta "phantom_type_arg" [MTtysymbol;MTint]
+let meta_infinite = register_meta "infinite_type" [MTtysymbol]
+let meta_material = register_meta "material_type_arg" [MTtysymbol;MTint]
 
-let rec enum_ts kn sts ts =
-  assert (ts.ts_def = None);
-  if Sts.mem ts sts then raise Exit else
-  match find_constructors kn ts with
-    | [] -> raise Exit
-    | csl ->
-        let sts = Sts.add ts sts in
-        let rec finite_ty stv ty = match ty.ty_node with
-          | Tyvar tv -> Stv.add tv stv
-          | Tyapp (ts,tl) ->
-              let check acc ph ty = if ph then acc else finite_ty acc ty in
-              List.fold_left2 check stv (enum_ts kn sts ts) tl
-        in
-        let check_cs acc (ls,_) = List.fold_left finite_ty acc ls.ls_args in
-        let stv = List.fold_left check_cs Stv.empty csl in
-        List.map (fun v -> not (Stv.mem v stv)) ts.ts_args
-
-let enum_ts kn ts = try Some (enum_ts kn Sts.empty ts) with Exit -> None
-
-let is_finite_ty enum phlist =
-  let add_ph phmap = function
+let get_material_args matl =
+  let add_arg acc = function
     | [MAts ts; MAint i] ->
-        let phmap, pha = try phmap, Mts.find ts phmap with
-          | Not_found ->
-              let pha = Array.make (List.length ts.ts_args) false in
-              Mts.add ts pha phmap, pha
-        in
-        Array.set pha i true;
-        phmap
+        let acc, mat = try acc, Mts.find ts acc with Not_found ->
+          let mat = Array.make (List.length ts.ts_args) false in
+          Mts.add ts mat acc, mat in
+        Array.set mat i true;
+        acc
     | _ -> assert false
   in
-  let phmap = List.fold_left add_ph Mts.empty phlist in
-  let phmap = Mts.map Array.to_list phmap in
-  let rec finite_ty ty = match ty.ty_node with
-    | Tyapp (ts,tl) when Mts.mem ts enum ->
-        let phl = try Mts.find ts phmap with Not_found ->
-          List.map Util.ffalse ts.ts_args in
-        List.for_all2 (fun ph ty -> ph || finite_ty ty) phl tl
-    | _ -> false
+  Mts.map Array.to_list (List.fold_left add_arg Mts.empty matl)
+
+let is_infinite_ty inf_ts ma_map =
+  let rec inf_ty ty = match ty.ty_node with
+    | Tyapp (ts,_) when Mts.mem ts inf_ts -> true
+    | Tyapp (ts,_) when not (Mts.mem ts ma_map) -> false
+    | Tyapp (ts,l) ->
+        let mat = Mts.find ts ma_map in
+        List.exists2 (fun mat ty -> mat && inf_ty ty) mat l
+    | _ -> false (* FIXME? can we have non-ground types here? *)
   in
-  finite_ty
+  inf_ty
 
 (** Compile match patterns *)
 
@@ -99,6 +80,8 @@ type state = {
   mt_map : lsymbol Mts.t;       (* from type symbols to selector functions *)
   pj_map : lsymbol list Mls.t;  (* from constructors to projections *)
   tp_map : decl Mid.t;          (* skipped tuple symbols *)
+  inf_ts : Sts.t;               (* infinite types *)
+  ma_map : bool list Mts.t;     (* material type arguments *)
   keep_t : bool;                (* keep algebraic type definitions *)
   keep_e : bool;                (* keep monomorphic enumeration types *)
   keep_r : bool;                (* keep non-recursive records *)
@@ -109,6 +92,8 @@ let empty_state = {
   mt_map = Mts.empty;
   pj_map = Mls.empty;
   tp_map = Mid.empty;
+  inf_ts = Sts.add ts_real (Sts.singleton ts_int);
+  ma_map = Mts.empty;
   keep_t = false;
   keep_e = false;
   keep_r = false;
@@ -336,7 +321,7 @@ let add_inversion (state,task) ts ty csl =
   let ax_f = t_forall_close [ax_vs] [] ax_f in
   state, add_prop_decl task Paxiom ax_pr ax_f
 
-let add_type kn (state,task) ts csl =
+let add_type (state,task) (ts,csl) =
   (* declare constructors as abstract functions *)
   let cs_add tsk (cs,_) = add_param_decl tsk cs in
   let task =
@@ -347,21 +332,34 @@ let add_type kn (state,task) ts csl =
   let state,task = add_indexer (state,task) ts ty csl in
   let state,task = add_projections (state,task) ts ty csl in
   let state,task = add_inversion (state,task) ts ty csl in
-  (* add the tags for enumeration if the type is one *)
-  let task = match enum_ts kn ts with
-    | None -> task
-    | Some phs ->
-        let task = add_meta task meta_enum [MAts ts] in
-        let cpt = ref (-1) in
-        let add task ph =
-          incr cpt;
-          if ph then
-            add_meta task meta_phantom [MAts ts; MAint !cpt]
-          else task in
-        List.fold_left add task phs
-  in
-  (* return the updated state and task *)
   state, task
+
+let add_tags mts (state,task) (ts,csl) =
+  let rec mat_ts sts ts csl =
+    let sts = Sts.add ts sts in
+    let add s (ls,_) = List.fold_left (mat_ty sts) s ls.ls_args in
+    let stv = List.fold_left add Stv.empty csl in
+    List.map (fun v -> Stv.mem v stv) ts.ts_args
+  and mat_ty sts stv ty = match ty.ty_node with
+    | Tyvar tv -> Stv.add tv stv
+    | Tyapp (ts,tl) ->
+        if Sts.mem ts sts then raise Exit; (* infinite type *)
+        let matl = try Mts.find ts state.ma_map with
+          Not_found -> mat_ts sts ts (Mts.find_def [] ts mts) in
+        let add s mat ty = if mat then mat_ty sts s ty else s in
+        List.fold_left2 add stv matl tl
+  in try
+    let matl = mat_ts state.inf_ts ts csl in
+    let state = { state with ma_map = Mts.add ts matl state.ma_map } in
+    let c = ref (-1) in
+    let add_material task m =
+      incr c;
+      if m then add_meta task meta_material [MAts ts; MAint !c] else task
+    in
+    state, List.fold_left add_material task matl
+  with Exit ->
+    let state = { state with inf_ts = Sts.add ts state.inf_ts } in
+    state, add_meta task meta_infinite [MAts ts]
 
 let comp t (state,task) = match t.task_decl.td_node with
   | Decl { d_node = Ddata dl } ->
@@ -373,12 +371,25 @@ let comp t (state,task) = match t.task_decl.td_node with
         else List.fold_left (fun t (ts,_) -> add_ty_decl t ts) task dl
       in
       (* add needed functions and axioms *)
-      let add acc (ts,csl) = add_type t.task_known acc ts csl in
-      List.fold_left add (state,task) dl
+      let state, task = List.fold_left add_type (state,task) dl in
+      (* add the tags for infitite types and material arguments *)
+      let mts = List.fold_right (fun (t,l) -> Mts.add t l) dl Mts.empty in
+      let state, task = List.fold_left (add_tags mts) (state,task) dl in
+      (* return the updated state and task *)
+      state, task
   | Decl d ->
       let fnT = rewriteT t.task_known state in
       let fnF = rewriteF t.task_known state Svs.empty true in
       state, add_decl task (DeclTF.decl_map fnT fnF d)
+  | Meta (m, [MAts ts]) when meta_equal m meta_infinite ->
+      let state = { state with inf_ts = Sts.add ts state.inf_ts } in
+      state, add_tdecl task t.task_decl
+  | Meta (m, [MAts ts; MAint i]) when meta_equal m meta_material ->
+      let ma = try Array.of_list (Mts.find ts state.ma_map) with
+        | Not_found -> Array.make (List.length ts.ts_args) false in
+      let ml = Array.set ma i true; Array.to_list ma in
+      let state = { state with ma_map = Mts.add ts ml state.ma_map } in
+      state, add_tdecl task t.task_decl
   | _ ->
       state, add_tdecl task t.task_decl
 
@@ -417,8 +428,13 @@ let comp t (state,task) = match t.task_decl.td_node with
   | _ ->
       comp t (state,task)
 
-let eliminate_match = Trans.compose compile_match
-  (Trans.fold_map comp empty_state None)
+let init_task =
+  let init = Task.add_meta None meta_infinite [MAts ts_int] in
+  let init = Task.add_meta init meta_infinite [MAts ts_real] in
+  init
+
+let eliminate_match =
+  Trans.compose compile_match (Trans.fold_map comp empty_state init_task)
 
 let meta_elim = register_meta "eliminate_algebraic" [MTstring]
 
@@ -433,7 +449,7 @@ let eliminate_algebraic = Trans.compose compile_match
       | _ -> raise (Invalid_argument "meta eliminate_algebraic")
     in
     let st = List.fold_left check st ml in
-    Trans.fold_map comp st None))
+    Trans.fold_map comp st init_task))
 
 (** Eliminate user-supplied projection functions *)
 
