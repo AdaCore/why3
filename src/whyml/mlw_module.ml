@@ -281,11 +281,22 @@ let add_rec uc { rec_ps = ps } =
 let add_exn uc xs =
   add_symbol add_ps xs.xs_name (XS xs) uc
 
+let pdecl_vc km th d = match d.pd_node with
+  | PDtype _ | PDdata _ | PDexn _ -> th
+  | PDval lv -> Mlw_wp.wp_val km th lv
+  | PDlet ld -> Mlw_wp.wp_let km th ld
+  | PDrec rdl -> Mlw_wp.wp_rec km th rdl
+
 let add_pdecl uc d =
   let uc = { uc with
     muc_decls = d :: uc.muc_decls;
     muc_known = known_add_decl (Theory.get_known uc.muc_theory) uc.muc_known d;
     muc_local = Sid.union uc.muc_local d.pd_news }
+  in
+  let uc =
+    if Debug.test_flag Typing.debug_type_only then uc else
+    let th = pdecl_vc uc.muc_known uc.muc_theory d in
+    { uc with muc_theory = th }
   in
   match d.pd_node with
   | PDtype its ->
