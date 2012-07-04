@@ -90,7 +90,7 @@ exception HiddenPLS of lsymbol
 (** specification *)
 
 type pre = term          (* precondition *)
-type post                (* postcondition: a formula with a bound variable *)
+type post = term         (* postcondition: a formula with a bound variable *)
 type xpost = post Mexn.t (* exceptional postconditions *)
 
 val create_post : vsymbol -> term -> post

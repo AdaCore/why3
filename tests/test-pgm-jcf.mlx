@@ -1,4 +1,10 @@
 
+module TestWP
+  use import int.Int
+  let a () = {} 42 { result > 41 }
+end
+
+(***
 theory T
   type t = int
 end
@@ -63,6 +69,7 @@ module N
     try on_tree r with Exit -> 0 end
     { old result = 0 }
 end
+***)
 
 (*
 Local Variables:
