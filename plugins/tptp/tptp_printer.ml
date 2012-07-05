@@ -57,6 +57,7 @@ let forget_tvar v = forget_id ident_printer v.tv_name
 
 type info = {
   info_syn : syntax_map;
+  info_fof : bool;
 }
 
 let rec print_type info fmt ty = match ty.ty_node with
@@ -93,16 +94,16 @@ and print_term info fmt t = match t.t_node with
       print_app info fmt ls tl t.t_ty
   | Tconst c ->
       let number_format = {
-          Print_number.long_int_support = true;
-          Print_number.dec_int_support = Print_number.Number_default;
-          Print_number.hex_int_support = Print_number.Number_unsupported;
-          Print_number.oct_int_support = Print_number.Number_unsupported;
-          Print_number.bin_int_support = Print_number.Number_unsupported;
-          Print_number.def_int_support = Print_number.Number_unsupported;
-          Print_number.dec_real_support = Print_number.Number_default;
-          Print_number.hex_real_support = Print_number.Number_unsupported;
-          Print_number.frac_real_support = Print_number.Number_unsupported;
-          Print_number.def_real_support = Print_number.Number_unsupported;
+        Print_number.long_int_support = true;
+        Print_number.dec_int_support = Print_number.Number_default;
+        Print_number.hex_int_support = Print_number.Number_unsupported;
+        Print_number.oct_int_support = Print_number.Number_unsupported;
+        Print_number.bin_int_support = Print_number.Number_unsupported;
+        Print_number.def_int_support = Print_number.Number_unsupported;
+        Print_number.dec_real_support = Print_number.Number_default;
+        Print_number.hex_real_support = Print_number.Number_unsupported;
+        Print_number.frac_real_support = Print_number.Number_unsupported;
+        Print_number.def_real_support = Print_number.Number_unsupported;
       } in
       Print_number.print number_format fmt c
   | Tlet (t1,tb) ->
@@ -122,15 +123,10 @@ and print_term info fmt t = match t.t_node with
 and print_fmla info fmt f = match f.t_node with
   | Tapp (ls, tl) ->
       print_app info fmt ls tl f.t_ty
-  | Tbinop (Tand, f1, f2) ->
-      fprintf fmt "(%a@ & %a)" (print_fmla info) f1 (print_fmla info) f2
-  | Tbinop (Tor, f1, f2) ->
-      fprintf fmt "(%a@ | %a)" (print_fmla info) f1 (print_fmla info) f2
-  | Tbinop (Timplies, f1, f2) ->
-      fprintf fmt "(%a@ => %a)"
-        (print_fmla info) f1 (print_fmla info) f2
-  | Tbinop (Tiff, f1, f2) ->
-      fprintf fmt "(%a@ <=> %a)" (print_fmla info) f1 (print_fmla info) f2
+  | Tbinop (op, f1, f2) ->
+      let s = match op with
+        | Tand -> "&" | Tor -> "|" | Timplies -> "=>" | Tiff -> "<=>" in
+      fprintf fmt "(%a@ %s %a)" (print_fmla info) f1 s (print_fmla info) f2
   | Tnot f ->
       fprintf fmt "~@ (%a)" (print_fmla info) f
   | Ttrue ->
@@ -141,8 +137,8 @@ and print_fmla info fmt f = match f.t_node with
       let q = match q with Tforall -> "!" | Texists -> "?" in
       let vl, _tl, f = t_open_quant fq in
       let print_vsty fmt vs =
-        fprintf fmt "%a:@,%a" print_var vs (print_type info) vs.vs_ty
-      in
+        if info.info_fof then fprintf fmt "%a" print_var vs
+        else fprintf fmt "%a:@,%a" print_var vs (print_type info) vs.vs_ty in
       fprintf fmt "%s[%a]:@ %a" q
         (print_list comma print_vsty) vl (print_fmla info) f;
       List.iter forget_var vl
@@ -170,6 +166,7 @@ let print_fmla info fmt f =
   Stv.iter forget_tvar tvs
 
 let print_decl info fmt d = match d.d_node with
+  | Dtype _ when info.info_fof -> ()
   | Dtype { ts_def = Some _ } -> ()
   | Dtype ts when query_syntax info.info_syn ts.ts_name <> None -> ()
   | Dtype ts ->
@@ -182,6 +179,7 @@ let print_decl info fmt d = match d.d_node with
       fprintf fmt "@[<hov 2>tff(%s, type,@ %a:@ %a).@]@\n@\n"
         (id_unique pr_printer ts.ts_name)
         print_symbol ts.ts_name print_sig ts
+  | Dparam _ when info.info_fof -> ()
   | Dparam ls when query_syntax info.info_syn ls.ls_name <> None -> ()
   | Dparam ls ->
       let print_type = print_type info in
@@ -216,22 +214,25 @@ let print_decl info fmt d = match d.d_node with
       "TPTP does not support inductive predicates, use eliminate_inductive"
   | Dprop (Paxiom, pr, _) when Mid.mem pr.pr_name info.info_syn -> ()
   | Dprop (Paxiom, pr, f) ->
-      fprintf fmt "@[<hov 2>tff(%a, axiom,@ %a).@]@\n@\n"
-        print_pr pr (print_fmla info) f
+      let head = if info.info_fof then "fof" else "tff" in
+      fprintf fmt "@[<hov 2>%s(%a, axiom,@ %a).@]@\n@\n"
+        head print_pr pr (print_fmla info) f
   | Dprop (Pgoal, pr, f) ->
-      fprintf fmt "@[<hov 2>tff(%a, conjecture,@ %a).@]@\n"
-        print_pr pr (print_fmla info) f
+      let head = if info.info_fof then "fof" else "tff" in
+      fprintf fmt "@[<hov 2>%s(%a, conjecture,@ %a).@]@\n"
+        head print_pr pr (print_fmla info) f
   | Dprop ((Plemma|Pskip), _, _) -> assert false
 
 let print_decl info fmt = catch_unsupportedDecl (print_decl info fmt)
 
-let print_task _env pr thpr ?old:_ fmt task =
+let print_task fof _env pr thpr ?old:_ fmt task =
   forget_all ident_printer;
   forget_all pr_printer;
   print_prelude fmt pr;
   print_th_prelude task fmt thpr;
-  let info = { info_syn = get_syntax_map task } in
+  let info = { info_syn = get_syntax_map task; info_fof = fof } in
   fprintf fmt "@[%a@]@."
     (print_list nothing (print_decl info)) (Task.task_decls task)
 
-let () = register_printer "tptp-tff" print_task
+let () = register_printer "tptp-tff" (print_task false)
+let () = register_printer "tptp-fof" (print_task true)

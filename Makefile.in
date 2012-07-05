@@ -260,11 +260,11 @@ PLUGGENERATED = plugins/tptp/tptp_lexer.ml \
 		plugins/tptp/tptp_parser.ml plugins/tptp/tptp_parser.mli
 
 PLUG_PARSER = genequlin
-PLUG_PRINTER = tptp_fof tptp_tff
+PLUG_PRINTER =
 PLUG_TRANSFORM =
-PLUG_TPTP = tptp_ast tptp_parser tptp_typing tptp_lexer
+PLUG_TPTP = tptp_ast tptp_parser tptp_typing tptp_lexer tptp_printer
 
-PLUGINS = genequlin tptp_fof tptp_tff tptp
+PLUGINS = genequlin tptp
 
 TPTPMODULES = $(addprefix plugins/tptp/, $(PLUG_TPTP))
 
