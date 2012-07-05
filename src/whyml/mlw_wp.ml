@@ -130,27 +130,28 @@ let rec wp_expr km lkm e q xq =
   let lab = fresh_mark () in
   let q = old_mark lab q in
   let xq = Mexn.map (old_mark lab) xq in
-  let f = wp_desc km lkm e q xq in
+  let tyv, f = wp_desc km lkm e q xq in
   let f = erase_mark lab f in
   if Debug.test_flag debug then begin
     (* eprintf "@[--------@\n@[<hov 2>e = %a@]@\n" Mlw_pretty.print_expr e; *)
     Format.eprintf "@[<hov 2>q = %a@]@\n" Pretty.print_term q;
     Format.eprintf "@[<hov 2>f = %a@]@\n----@]@." Pretty.print_term f;
   end;
-  f
+  tyv, f
 
 and wp_desc km lkm e q xq = match e.e_node with
   | Eabsurd ->
-      wp_label e t_absurd
+      SpecV (vtv_of_expr e), wp_label e t_absurd
   | Erec (rdl, e) ->
       let fr = wp_rec_defn km lkm rdl in
-      let fe = wp_expr km lkm e q xq in
-      wp_and ~sym:true (wp_ands ~sym:true fr) fe
+      let tyv, fe = wp_expr km lkm e q xq in
+      tyv, wp_and ~sym:true (wp_ands ~sym:true fr) fe
   | Elogic t ->
       let v, q = open_post q in
       let t = wp_label e t in
       let t = if t.t_ty = None then mk_t_if t else t in
-      t_subst_single v t q
+      SpecV (vtv_of_expr e), t_subst_single v t q
+  | Earrow _-> assert false
   |Eassert (_, _)-> assert false
   |Eabstr (_, _, _)-> assert false
   |Etry (_, _)-> assert false
@@ -164,25 +165,26 @@ and wp_desc km lkm e q xq = match e.e_node with
   |Eif (_, _, _)-> assert false
   |Elet (_, _)-> assert false
   |Eapp (_, _)-> assert false
-  |Earrow _-> assert false
   |Evalue _ -> assert false (*TODO*)
-
 
 and wp_lambda km lkm l =
   let q = wp_expl "normal postcondition" l.l_post in
   let xq = Mexn.map (wp_expl "exceptional postcondition") l.l_xpost in
-  let f = wp_expr km lkm l.l_expr q xq in
+  let tyv, f = wp_expr km lkm l.l_expr q xq in
   let f = wp_implies l.l_pre f in
   let f = wp_close_state km lkm l.l_expr.e_effect f in
-  wp_binders l.l_args f
+  let tyc = { c_pre = l.l_pre; c_effect = l.l_expr.e_effect;
+              c_result = tyv; c_post = l.l_post; c_xpost = l.l_xpost } in
+  SpecA (l.l_args, tyc), wp_binders l.l_args f
 
 and wp_rec_defn km lkm rdl =
-  let rec_defn d = wp_lambda km lkm d.rec_lambda in
+  (* TODO: fill the table with type_v for the recursive functions *)
+  let rec_defn d = snd (wp_lambda km lkm d.rec_lambda) in
   List.map rec_defn rdl
 
 let wp km lkm e =
   let q, xq = default_post e.e_vty e.e_effect in
-  let f = wp_expr km lkm e q xq in
+  let _, f = wp_expr km lkm e q xq in
   let vl = Mvs.keys f.t_vars in
   t_forall_close vl [] f
 

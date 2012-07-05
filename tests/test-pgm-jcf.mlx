@@ -1,7 +1,11 @@
 
 module TestWP
   use import int.Int
-  let a () = {} 42 { result > 41 }
+  let h x =
+    let rec f (x:int) = {} g x {}
+       with g (x:int) = {} f x {}
+    in
+    f x x
 end
 
 (***
