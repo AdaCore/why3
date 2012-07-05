@@ -31,31 +31,29 @@ open Mlw_module
 
 type dreg
 type dity
+type dvty = dity list * dity (* A -> B -> C == ([A;B],C) *)
 
 type tvars (* a set of type variables *)
 val empty_tvars: tvars
-val add_tvars: tvars -> dity -> tvars
+val add_dity: tvars -> dity -> tvars
+val add_dvty: tvars -> dvty -> tvars
 
-val create_user_type_variable: Ptree.ident -> dity
 val create_type_variable: unit -> dity
+val create_user_type_variable: Ptree.ident -> dity
 val its_app: user:bool -> itysymbol -> dity list -> dity
 val ts_app: tysymbol -> dity list -> dity
 
-val make_arrow_type: dity list -> dity -> dity
-
-val unify: ?weak:bool -> dity -> dity -> unit
-  (** destructive unification, with or without region unification *)
-
-val unify_list: dity -> (Loc.position * dity) list -> dity -> unit
+val unify: dity -> dity -> unit
+val unify_weak: dity -> dity -> unit (* don't unify regions *)
 
 val ity_of_dity: dity -> ity
-val vty_of_dity: dity -> vty
+val vty_of_dvty: dvty -> vty
   (** use with care, only once unification is done *)
 
-val specialize_scheme: tvars -> dity -> dity
+val specialize_scheme: tvars -> dvty -> dvty
 
-val specialize_lsymbol: lsymbol -> dity
+val specialize_lsymbol: lsymbol -> dvty
 val specialize_pvsymbol: pvsymbol -> dity
-val specialize_psymbol: psymbol -> dity
-val specialize_plsymbol: plsymbol -> dity
+val specialize_psymbol: psymbol -> dvty
+val specialize_plsymbol: plsymbol -> dvty
 val specialize_xsymbol: xsymbol -> dity

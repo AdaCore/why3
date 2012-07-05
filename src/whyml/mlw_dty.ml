@@ -192,58 +192,25 @@ and unify_reg r1 r2 =
     | Rreg (reg1,_), Rreg (reg2,_) when reg_equal reg1 reg2 -> ()
     | _ -> raise Exit
 
-let unify ?(weak=false) d1 d2 =
+let unify ~weak d1 d2 =
   try unify ~weak d1 d2
   with Exit -> raise (TypeMismatch (ity_of_dity d1, ity_of_dity d2))
 
-let ts_arrow =
-  let v = List.map (fun s -> create_tvsymbol (Ident.id_fresh s)) ["a"; "b"] in
-  Ty.create_tysymbol (Ident.id_fresh "arrow") v None
+let unify_weak d1 d2 = unify ~weak:true d1 d2
+let unify d1 d2 = unify ~weak:false d1 d2
 
-let make_arrow_type tyl ty =
-  let arrow ty1 ty2 = ts_app_real ts_arrow [ty1;ty2] in
-  List.fold_right arrow tyl ty
+type dvty = dity list * dity (* A -> B -> C == ([A;B],C) *)
 
-let rec unify_list d1 el res =
-  let rec check_val loc = function
-    | Dts (ts, _) when ts_equal ts ts_arrow ->
-        Loc.errorm ~loc "This expression is not a first-order value"
-    | Dvar { contents = Dval d } -> check_val loc d
-    | _ -> ()
-  in
-  let unify_loc loc d1 d2 =
-    check_val loc d2;
-    try unify d1 d2 with
-    | TypeMismatch (ity1, ity2) ->
-        Loc.errorm ~loc "This expression has type %a, \
-          but is expected to have type %a"
-        Mlw_pretty.print_ity ity2 Mlw_pretty.print_ity ity1
-    | exn -> Loc.error ~loc exn
-  in
-  match d1, el with
-  | Dts (ts, [d1;d2]), ((loc,dity)::el) when ts_equal ts ts_arrow ->
-      (* this is an ugly and overcomplicated way to treat
-         implicit fields in record update expressions *)
-      if Loc.equal loc Loc.dummy_position
-      then (unify_loc loc d1 dity; unify_list d2 el res)
-      else (unify_list d2 el res; unify_loc loc d1 dity)
-  | Dvar { contents = Dval d1 }, _ ->
-      unify_list d1 el res
-  | _ ->
-      unify d1 (make_arrow_type (List.map snd el) res)
-
-let rec vty_of_dity = function
-  | Dvar { contents = Dval d } ->
-      vty_of_dity d
-  | Dts (ts, [d1; d2]) when ts_equal ts ts_arrow ->
-      VTarrow (vty_arrow (vty_value (ity_of_dity d1)) (vty_of_dity d2))
-  | dity ->
-      VTvalue (vty_value (ity_of_dity dity))
+let vty_of_dvty (argl,res) =
+  let add a v = VTarrow (vty_arrow (vty_value (ity_of_dity a)) v) in
+  List.fold_right add argl (VTvalue (vty_value (ity_of_dity res)))
 
 type tvars = dity list
+
 let empty_tvars = []
 
-let add_tvars tvs dity = dity :: tvs
+let add_dity tvs dity = dity :: tvs
+let add_dvty tvs (argl,res) = res :: List.rev_append argl tvs
 
 let tv_in_tvars tv tvs =
   try List.iter (occur_check tv) tvs; false with Exit -> true
@@ -251,7 +218,7 @@ let tv_in_tvars tv tvs =
 let reg_in_tvars tv tvs =
   try List.iter (occur_check_reg tv) tvs; false with Exit -> true
 
-let specialize_scheme tvs dity =
+let specialize_scheme tvs (argl,res) =
   let htvs = Htv.create 17 in
   let hreg = Htv.create 17 in
   let rec specialize = function
@@ -277,7 +244,7 @@ let specialize_scheme tvs dity =
         end
     | Rreg _ as r -> r
   in
-  specialize dity
+  List.map specialize argl, specialize res
 
 (* Specialization of symbols *)
 
@@ -320,11 +287,11 @@ let specialize_vtarrow vars vta =
   let conv vtv = dity_of_vtv htv hreg vars vtv in
   let rec specialize a =
     let arg = conv a.vta_arg in
-    let res = match a.vta_result with
-      | VTvalue v -> conv v
+    let argl,res = match a.vta_result with
+      | VTvalue v -> [], conv v
       | VTarrow a -> specialize a
     in
-    make_arrow_type [arg] res
+    arg::argl, res
   in
   specialize vta
 
@@ -334,7 +301,7 @@ let specialize_psymbol ps =
 let specialize_plsymbol pls =
   let htv = Htv.create 3 and hreg = Hreg.create 3 in
   let conv vtv = dity_of_vtv htv hreg vars_empty vtv in
-  make_arrow_type (List.map conv pls.pl_args) (conv pls.pl_value)
+  List.map conv pls.pl_args, conv pls.pl_value
 
 let dity_of_ty htv hreg vars ty =
   dity_of_ity htv hreg vars (ity_of_ty ty)
@@ -343,4 +310,4 @@ let specialize_lsymbol ls =
   let htv = Htv.create 3 and hreg = Hreg.create 3 in
   let conv ty = dity_of_ty htv hreg vars_empty ty in
   let ty = Util.def_option ty_bool ls.ls_value in
-  make_arrow_type (List.map conv ls.ls_args) (conv ty)
+  List.map conv ls.ls_args, conv ty

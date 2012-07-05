@@ -61,7 +61,7 @@ type dinvariant = Ptree.lexpr option
 
 type dexpr = {
   de_desc : dexpr_desc;
-  de_type : dity;
+  de_type : dvty;
   de_lab  : Ident.Slab.t;
   de_loc  : loc;
 }
@@ -93,6 +93,6 @@ and dexpr_desc =
   | DEghost of dexpr
   | DEany of dtype_c
 
-and drecfun = loc * ident * ghost * dity * dlambda
+and drecfun = loc * ident * ghost * dvty * dlambda
 
 and dlambda = dbinder list * dvariant list * dpre * dexpr * dpost * dxpost
