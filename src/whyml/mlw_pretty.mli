@@ -24,7 +24,6 @@ open Mlw_ty
 open Mlw_ty.T
 open Mlw_expr
 open Mlw_decl
-open Mlw_module
 
 val forget_all      : unit -> unit     (* flush id_unique *)
 val forget_regs     : unit -> unit     (* flush id_unique for regions *)
@@ -62,7 +61,4 @@ val print_data_decl : formatter -> data_decl -> unit
 val print_next_data_decl : formatter -> data_decl -> unit
 
 val print_pdecl : formatter -> pdecl -> unit
-
-val print_mod : formatter -> modul -> unit        (* module name *)
-val print_module : formatter -> modul -> unit     (* module *)
 

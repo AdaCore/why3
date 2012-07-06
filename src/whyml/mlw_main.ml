@@ -20,6 +20,7 @@
 
 open Why3
 open Util
+open Mlw_module
 open Mlw_typing
 
 let read_channel env path file c =
@@ -33,7 +34,9 @@ let read_channel env path file c =
       List.fold_left (add_theory_module env path) (Mstr.empty, Mstr.empty) ml
     in
     Mstr.iter (fun _ m ->
-      Mlw_pretty.print_module Format.err_formatter m;
+      Format.fprintf Format.err_formatter
+        "@[<hov 2>module %a@\n%a@]@\nend@." Pretty.print_th m.mod_theory
+        (Pp.print_list Pp.newline2 Mlw_pretty.print_pdecl) m.mod_decls;
       Format.pp_print_newline Format.err_formatter ()) mm;
     mm, tm
 

@@ -168,7 +168,7 @@ let dity_unit = ts_app ts_unit []
 let dity_mark = ts_app ts_mark []
 
 let unify_loc unify_fn loc x1 x2 = try unify_fn x1 x2 with
-  | TypeMismatch (ity1,ity2) -> errorm ~loc 
+  | TypeMismatch (ity1,ity2) -> errorm ~loc
       "This expression has type %a, but is expected to have type %a"
       Mlw_pretty.print_ity ity2 Mlw_pretty.print_ity ity1
   | exn -> error ~loc exn

@@ -31,7 +31,6 @@ open Mlw_ty
 open Mlw_ty.T
 open Mlw_expr
 open Mlw_decl
-open Mlw_module
 
 let debug_print_labels = Debug.register_flag "print_labels"
 let debug_print_locs = Debug.register_flag "print_locs"
@@ -81,9 +80,6 @@ let print_ps fmt ps =
     print_name ps.ps_name
 
 let forget_ps ps = forget_id iprinter ps.ps_name
-
-(* theory names always start with an upper case letter *)
-let print_mod fmt m = print_th fmt m.mod_theory
 
 let print_its fmt ts = print_ts fmt ts.its_pure
 
@@ -425,11 +421,6 @@ let print_data_decl      = print_data_decl true
 
 let print_next_rec_decl  = print_rec_decl false
 let print_rec_decl       = print_rec_decl true
-
-let print_module fmt m =
-  fprintf fmt "@[<hov 2>module %a%a@\n%a@]@\nend@."
-    print_mod m print_ident_labels m.mod_theory.th_name
-    (print_list newline2 print_pdecl) m.mod_decls
 
 (* Print exceptions *)
 
