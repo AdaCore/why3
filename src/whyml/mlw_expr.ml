@@ -19,6 +19,7 @@
 (**************************************************************************)
 
 open Why3
+open Stdlib
 open Util
 open Ident
 open Ty
@@ -34,6 +35,16 @@ type pvsymbol = {
 }
 
 let pv_equal : pvsymbol -> pvsymbol -> bool = (==)
+
+module PVsym = WeakStructMake (struct
+  type t = pvsymbol
+  let tag pv = pv.pv_vs.vs_name.id_tag
+end)
+
+module Spv = PVsym.S
+module Mpv = PVsym.M
+module Hpv = PVsym.H
+module Wpv = PVsym.W
 
 let create_pvsymbol id vtv = {
   pv_vs   = create_vsymbol id (ty_of_ity vtv.vtv_ity);
@@ -107,8 +118,8 @@ exception HiddenPLS of lsymbol
 
 (** specification *)
 
-type pre   = term (* precondition *)
-type post  = term (* postcondition *)
+type pre = term          (* precondition: pre_fmla *)
+type post = term         (* postcondition: eps result . post_fmla *)
 type xpost = post Mexn.t (* exceptional postconditions *)
 
 type type_c = {
@@ -142,7 +153,11 @@ let create_post vs f = t_eps_close vs f
 
 let open_post f = match f.t_node with
   | Teps bf -> t_open_bound bf
-  | _ -> assert false
+  | _ -> Loc.errorm "invalid post-condition"
+
+let check_post f = match f.t_node with
+  | Teps _ -> ()
+  | _ -> Loc.errorm "invalid post-condition"
 
 let varmap_join = Mid.fold (fun _ -> vars_union)
 let varmap_union = Mid.set_union
@@ -155,6 +170,7 @@ let fmla_vars f vsset =
   Mvs.set_union vsset f.t_vars
 
 let post_vars ity f vsset =
+  check_post f;
   Ty.ty_equal_check (ty_of_ity ity) (t_type f);
   Mvs.set_union vsset f.t_vars
 
@@ -170,12 +186,17 @@ let variant_vars varl vsset =
     Mvs.set_union s t.t_vars in
   List.fold_left add_variant vsset varl
 
-(* FIXME? Should we check that every raised exception is in xpost? *)
-let spec_vars varm variant pre post xpost _effect result =
+exception UnboundException of xsymbol
+
+let spec_vars varm variant pre post xpost eff result =
   let vsset = fmla_vars pre Mvs.empty in
   let vsset = post_vars result post vsset in
   let vsset = xpost_vars xpost vsset in
   let vsset = variant_vars variant vsset in
+  let badex = Sexn.union eff.eff_raises eff.eff_ghostx in
+  let badex = Mexn.set_diff badex xpost in
+  if not (Sexn.is_empty badex) then
+    raise (UnboundException (Sexn.choose badex));
   Mvs.fold (fun vs _ m -> add_vs_vars vs m) vsset varm
 
 let spec_arrow pvl effect vty =

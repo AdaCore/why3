@@ -19,6 +19,7 @@
 (**************************************************************************)
 
 open Why3
+open Stdlib
 open Util
 open Ident
 open Ty
@@ -35,9 +36,16 @@ type pvsymbol = private {
   pv_vtv : vty_value;
 }
 
+module Mpv : Map.S with type key = pvsymbol
+module Spv : Mpv.Set
+module Hpv : Hashtbl.S with type key = pvsymbol
+module Wpv : Hashweak.S with type key = pvsymbol
+
 val pv_equal : pvsymbol -> pvsymbol -> bool
 
 val create_pvsymbol : preid -> vty_value -> pvsymbol
+
+val restore_pv : vsymbol -> pvsymbol
 
 (** program symbols *)
 
@@ -89,8 +97,8 @@ exception HiddenPLS of lsymbol
 
 (** specification *)
 
-type pre = term          (* precondition *)
-type post = term         (* postcondition: a formula with a bound variable *)
+type pre = term          (* precondition: pre_fmla *)
+type post = term         (* postcondition: eps result . post_fmla *)
 type xpost = post Mexn.t (* exceptional postconditions *)
 
 val create_post : vsymbol -> term -> post
@@ -119,6 +127,8 @@ type val_decl = private {
 }
 
 val create_val : Ident.preid -> type_v -> val_decl
+
+exception UnboundException of xsymbol
 
 (** patterns *)
 

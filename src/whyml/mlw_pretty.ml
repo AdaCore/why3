@@ -467,5 +467,8 @@ let () = Exn_printer.register
       fprintf fmt "This expression is not a function and cannot be applied"
   | Mlw_expr.Immutable _e ->
       fprintf fmt "Mutable expression expected"
+  | Mlw_expr.UnboundException xs ->
+      fprintf fmt "This function raises %a but does not \
+        specify a post-condition for it" print_xs xs
   | _ -> raise exn
   end
