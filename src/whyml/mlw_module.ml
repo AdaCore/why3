@@ -140,9 +140,10 @@ type module_uc = {
   muc_known  : known_map;
   muc_local  : Sid.t;
   muc_used   : Sid.t;
+  muc_env    : Env.env;
 }
 
-let empty_module n p = {
+let empty_module env n p = {
   muc_theory = create_theory ~path:p n;
   muc_decls  = [];
   muc_import = [empty_ns];
@@ -150,6 +151,7 @@ let empty_module n p = {
   muc_known  = Mid.empty;
   muc_local  = Sid.empty;
   muc_used   = Sid.empty;
+  muc_env    = env;
 }
 
 let close_module uc =
@@ -281,11 +283,11 @@ let add_rec uc { rec_ps = ps } =
 let add_exn uc xs =
   add_symbol add_ps xs.xs_name (XS xs) uc
 
-let pdecl_vc km th d = match d.pd_node with
+let pdecl_vc env km th d = match d.pd_node with
   | PDtype _ | PDdata _ | PDexn _ -> th
-  | PDval lv -> Mlw_wp.wp_val km th lv
-  | PDlet ld -> Mlw_wp.wp_let km th ld
-  | PDrec rdl -> Mlw_wp.wp_rec km th rdl
+  | PDval lv -> Mlw_wp.wp_val env km th lv
+  | PDlet ld -> Mlw_wp.wp_let env km th ld
+  | PDrec rdl -> Mlw_wp.wp_rec env km th rdl
 
 let add_pdecl uc d =
   let uc = { uc with
@@ -295,7 +297,7 @@ let add_pdecl uc d =
   in
   let uc =
     if Debug.test_flag Typing.debug_type_only then uc else
-    let th = pdecl_vc uc.muc_known uc.muc_theory d in
+    let th = pdecl_vc uc.muc_env uc.muc_known uc.muc_theory d in
     { uc with muc_theory = th }
   in
   match d.pd_node with
@@ -325,18 +327,10 @@ let th_unit =
   let uc = Theory.add_ty_decl uc ts in
   close_theory uc
 
-let mod_exit =
-  let xs = create_xsymbol (id_fresh "%Exit") ity_unit in
-  let uc = empty_module (id_fresh "Exit") [] in
-  let uc = use_export_theory uc (tuple_theory 0) in
-  let uc = add_pdecl uc (create_exn_decl xs) in
-  close_module uc
-
-let create_module ?(path=[]) n =
-  let m = empty_module n path in
+let create_module env ?(path=[]) n =
+  let m = empty_module env n path in
   let m = use_export_theory m bool_theory in
   let m = use_export_theory m th_unit in
-  let m = use_export m mod_exit in
   m
 
 (** Clone *)

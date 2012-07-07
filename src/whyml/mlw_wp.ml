@@ -119,9 +119,14 @@ let wp_and ?(sym=false) f1 f2 =
 let wp_ands ?(sym=false) fl =
   if sym then t_and_simp_l fl else t_and_asym_simp_l fl
 
-let wp_implies = t_implies_simp
+let wp_implies f1 f2 = t_implies_simp f1 f2
 
-let wp_forall v f = match f.t_node with
+let wp_forall vl f = t_forall_close_simp vl [] f
+
+let wp_let v t f = t_let_close_simp v t f
+
+(*
+match f.t_node with
   | Tbinop (Timplies, {t_node = Tapp (s,[{t_node = Tvar u};r])},h)
     when ls_equal s ps_equ && vs_equal u v && not (Mvs.mem v r.t_vars) ->
       t_let_close_simp v r h
@@ -133,17 +138,24 @@ let wp_forall v f = match f.t_node with
       t_forall_close_simp [v] [] f
   | _ ->
       f
+*)
 
-let wp_binder pv f = wp_forall pv.pv_vs f
-let wp_binders = List.fold_right wp_binder
+(** WP state *)
+
+type wp_env = {
+  prog_known : Mlw_decl.known_map;
+  pure_known : Decl.known_map;
+  toplevel_v : type_v Hid.t;
+  global_env : Env.env;
+}
 
 (** Reconstruct pure values after writes *)
 
-let find_constructors km lkm sts ity = match ity.ity_node with
+let find_constructors env sts ity = match ity.ity_node with
   | Itypur (ts,_) ->
       let base = ity_pur ts (List.map ity_var ts.ts_args) in
       let sbs = ity_match ity_subst_empty base ity in
-      let csl = Decl.find_constructors lkm ts in
+      let csl = Decl.find_constructors env.pure_known ts in
       if csl = [] || Sts.mem ts sts then Loc.errorm
         "Cannot update values of type %a" Mlw_pretty.print_ity base;
       let subst ty = ity_full_inst sbs (ity_of_ty ty), None in
@@ -152,7 +164,7 @@ let find_constructors km lkm sts ity = match ity.ity_node with
   | Ityapp (its,_,_) ->
       let base = ity_app its (List.map ity_var its.its_args) its.its_regs in
       let sbs = ity_match ity_subst_empty base ity in
-      let csl = Mlw_decl.find_constructors km its in
+      let csl = Mlw_decl.find_constructors env.prog_known its in
       if csl = [] || Sts.mem its.its_pure sts then Loc.errorm
         "Cannot update values of type %a" Mlw_pretty.print_ity base;
       let subst vtv =
@@ -162,7 +174,7 @@ let find_constructors km lkm sts ity = match ity.ity_node with
       Sts.add its.its_pure sts, List.map cnstr csl
   | Ityvar _ -> assert false
 
-let update_var km lkm mreg vs =
+let update_var env mreg vs =
   let rec update sts vs ity mut =
     (* are we a mutable variable? *)
     let get_vs r = Mreg.find_def vs r mreg in
@@ -172,7 +184,7 @@ let update_var km lkm mreg vs =
     if ity_pure ity || not (Mreg.exists check_reg mreg) then
       t_var vs
     else
-      let sts, csl = find_constructors km lkm sts ity in
+      let sts, csl = find_constructors env sts ity in
       let branch (cs,ityl) =
         let mk_var (ity,_) = create_vsymbol (id_fresh "y") (ty_of_ity ity) in
         let vars = List.map mk_var ityl in
@@ -204,8 +216,8 @@ let model1_lab = Slab.singleton (create_label "model:1")
 let model2_lab = Slab.singleton (create_label "model:quantify(2)")
 let mk_var id label ty = create_vsymbol (id_clone ~label id) ty
 
-let quantify km lkm eff f =
-  (* mreg : modified rho -> vs *)
+let quantify env regs f =
+  (* mreg : updated region -> vs *)
   let get_var reg () =
     let test vs _ id = match (restore_pv vs).pv_vtv with
       | { vtv_ity = { ity_node = Ityapp (_,_,[r]) }}
@@ -214,10 +226,9 @@ let quantify km lkm eff f =
     let id = Mvs.fold test f.t_vars reg.reg_name in
     mk_var id model1_lab (ty_of_ity reg.reg_ity)
   in
-  let sreg = Sreg.union eff.eff_writes eff.eff_ghostw in
-  let mreg = Mreg.mapi get_var sreg in
+  let mreg = Mreg.mapi get_var regs in
   (* update all program variables involving these regions *)
-  let update_var vs _ = match update_var km lkm mreg vs with
+  let update_var vs _ = match update_var env mreg vs with
     | { t_node = Tvar nv } when vs_equal vs nv -> None
     | t -> Some t in
   let vars = Mvs.mapi_filter update_var f.t_vars in
@@ -225,34 +236,35 @@ let quantify km lkm eff f =
   let new_var vs _ = mk_var vs.vs_name model2_lab vs.vs_ty in
   let vv' = Mvs.mapi new_var vars in
   (* quantify *)
-  let update v t f = t_let_close_simp (Mvs.find v vv') t f in
+  let update v t f = wp_let (Mvs.find v vv') t f in
   let f = Mvs.fold update vars (drop_at true vv' f) in
-  Mreg.fold (Util.const wp_forall) mreg f
+  wp_forall (Mreg.values mreg) f
 
 (** Weakest preconditions *)
 
-let wp_close_state _km _lkm _ef f =
-  f (* TODO *)
+let regs_of_reads  eff = Sreg.union eff.eff_reads eff.eff_ghostr
+let regs_of_writes eff = Sreg.union eff.eff_writes eff.eff_ghostw
+let regs_of_effect eff = Sreg.union (regs_of_reads eff) (regs_of_writes eff)
 
-let rec wp_expr km lkm e q xq =
+let rec wp_expr env locals e q xq =
   let lab = fresh_mark () in
   let q = old_mark lab q in
   let xq = Mexn.map (old_mark lab) xq in
-  let tyv, f = wp_desc km lkm e q xq in
+  let tyv, f = wp_desc env locals e q xq in
   let f = erase_mark lab f in
   if Debug.test_flag debug then begin
-    (* eprintf "@[--------@\n@[<hov 2>e = %a@]@\n" Mlw_pretty.print_expr e; *)
+    Format.eprintf "@[--------@\n@[<hov 2>e = %a@]@\n" Mlw_pretty.print_expr e;
     Format.eprintf "@[<hov 2>q = %a@]@\n" Pretty.print_term q;
     Format.eprintf "@[<hov 2>f = %a@]@\n----@]@." Pretty.print_term f;
   end;
   tyv, f
 
-and wp_desc km lkm e q xq = match e.e_node with
+and wp_desc env locals e q xq = match e.e_node with
   | Eabsurd ->
       SpecV (vtv_of_expr e), wp_label e t_absurd
   | Erec (rdl, e) ->
-      let fr = wp_rec_defn km lkm rdl in
-      let tyv, fe = wp_expr km lkm e q xq in
+      let fr = wp_rec_defn env locals rdl in
+      let tyv, fe = wp_expr env locals e q xq in
       tyv, wp_and ~sym:true (wp_ands ~sym:true fr) fe
   | Elogic t ->
       let v, q = open_post q in
@@ -275,29 +287,21 @@ and wp_desc km lkm e q xq = match e.e_node with
   |Eapp (_, _)-> assert false
   |Evalue _ -> assert false (*TODO*)
 
-and wp_lambda km lkm l =
+and wp_lambda env locals l =
   let q = wp_expl "normal postcondition" l.l_post in
   let xq = Mexn.map (wp_expl "exceptional postcondition") l.l_xpost in
-  let tyv, f = wp_expr km lkm l.l_expr q xq in
+  let tyv, f = wp_expr env locals l.l_expr q xq in
   let f = wp_implies l.l_pre f in
-  let f = wp_close_state km lkm l.l_expr.e_effect f in
+  let f = quantify env (regs_of_effect l.l_expr.e_effect) f in
+  let f = wp_forall (List.map (fun pv -> pv.pv_vs) l.l_args) f in
   let tyc = { c_pre = l.l_pre; c_effect = l.l_expr.e_effect;
               c_result = tyv; c_post = l.l_post; c_xpost = l.l_xpost } in
-  SpecA (l.l_args, tyc), wp_binders l.l_args f
+  SpecA (l.l_args, tyc), f
 
-and wp_rec_defn km lkm rdl =
+and wp_rec_defn env locals rdl =
   (* TODO: fill the table with type_v for the recursive functions *)
-  let rec_defn d = snd (wp_lambda km lkm d.rec_lambda) in
+  let rec_defn d = snd (wp_lambda env locals d.rec_lambda) in
   List.map rec_defn rdl
-
-let wp km lkm e =
-  let q, xq = default_post e.e_vty e.e_effect in
-  let _, f = wp_expr km lkm e q xq in
-  let vl = Mvs.keys f.t_vars in
-  t_forall_close vl [] f
-
-let wp_val _km th _lv =
-  th
 
 (***
 let bool_to_prop env f =
@@ -380,20 +384,31 @@ let add_wp_decl name f uc =
   let d = create_prop_decl Pgoal pr f in
   Theory.add_decl uc d
 
-let wp_let km th ld =
-  let f = wp km (Theory.get_known th) ld.let_expr in
-  let id = match ld.let_var with
-    | LetV pv -> pv.pv_vs.vs_name | LetA ps -> ps.ps_name
-  in
+let mk_env env km th = {
+  prog_known = km;
+  pure_known = Theory.get_known th;
+  toplevel_v = Hid.create 5;
+  global_env = env;
+}
+
+let wp_let env km th { let_var = lv; let_expr = e } =
+  let env = mk_env env km th in
+  let q, xq = default_post e.e_vty e.e_effect in
+  let _, f = wp_expr env Mid.empty e q xq in
+  let f = wp_forall (Mvs.keys f.t_vars) f in
+  let id = match lv with
+    | LetV pv -> pv.pv_vs.vs_name
+    | LetA ps -> ps.ps_name in
   add_wp_decl id f th
 
-let wp_rec km th rdl =
-  let fl = wp_rec_defn km (Theory.get_known th) rdl in
+let wp_rec env km th rdl =
+  let env = mk_env env km th in
+  let fl = wp_rec_defn env Mid.empty rdl in
   let add_one th d f =
-    let id = d.rec_ps.ps_name in
     Debug.dprintf debug "wp %s = %a@\n----------------@."
-      id.id_string Pretty.print_term f;
-    add_wp_decl id f th
+      d.rec_ps.ps_name.id_string Pretty.print_term f;
+    add_wp_decl d.rec_ps.ps_name f th
   in
   List.fold_left2 add_one th rdl fl
 
+let wp_val _env _km th _lv = th

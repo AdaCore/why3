@@ -36,7 +36,6 @@ type data_decl = itysymbol * constructor list
 
 type pdecl = private {
   pd_node : pdecl_node;
-(*   pd_syms : Sid.t;         (* idents used in declaration *) *)
   pd_news : Sid.t;         (* idents introduced in declaration *)
   pd_tag  : int;           (* unique tag *)
 }

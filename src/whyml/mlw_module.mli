@@ -66,7 +66,7 @@ type modul = private {
 
 type module_uc (* a module under construction *)
 
-val create_module : ?path:string list -> preid -> module_uc
+val create_module : Env.env -> ?path:string list -> preid -> module_uc
 val close_module  : module_uc -> modul
 
 val open_namespace  : module_uc -> module_uc
@@ -76,12 +76,9 @@ val get_theory : module_uc -> theory_uc
 val get_namespace : module_uc -> namespace
 val get_known : module_uc -> known_map
 
-(** Use *)
+(** Use and clone *)
 
 val use_export : module_uc -> modul -> module_uc
-
-(** Clone *)
-
 val clone_export : module_uc -> modul -> th_inst -> module_uc
 
 (** Logic decls *)

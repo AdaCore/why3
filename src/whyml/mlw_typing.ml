@@ -1403,7 +1403,8 @@ let add_module lib path mm mt m =
   let { id = id; id_loc = loc } = m.mod_name in
   if Mstr.mem id mm then Loc.errorm ~loc "clash with previous module %s" id;
   if Mstr.mem id mt then Loc.errorm ~loc "clash with previous theory %s" id;
-  let uc = create_module ~path (Denv.create_user_id m.mod_name) in
+  let env = Env.env_of_library lib in
+  let uc = create_module env ~path (Denv.create_user_id m.mod_name) in
   let rec add_prog_decl uc (loc,decl) = Loc.try3 loc real_add uc loc decl
   and real_add uc loc decl = match decl with
     | Dlogic (TypeDecl tdl) ->
