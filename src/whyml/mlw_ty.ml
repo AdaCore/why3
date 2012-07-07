@@ -727,14 +727,16 @@ and vty_full_inst s = function
 
 let rec vta_filter vars a =
   let vars = vars_union vars a.vta_arg.vtv_vars in
-  let vty, vars = match a.vta_result with
-    (* FIXME? We allow effects on the regions from a VTvalue result,
-       but only reset is actually meaningful. Should we require that
-       any new region in the result be reset? *)
-    | VTvalue v -> a.vta_result, vars_union vars v.vtv_vars
-    | VTarrow a -> VTarrow (vta_filter vars a), vars in
-  let effect = eff_filter vars a.vta_effect in
-  vty_arrow ~ghost:a.vta_ghost ~effect a.vta_arg vty
+  let vty = match a.vta_result with
+    | VTarrow a -> VTarrow (vta_filter vars a)
+    | VTvalue _ -> a.vta_result in
+  (* reads and writes must come from the context,
+     resets may affect the regions in the result *)
+  let eff = eff_filter vars a.vta_effect in
+  let rst = { eff_empty with eff_resets = a.vta_effect.eff_resets } in
+  let rst = eff_filter (vty_vars vars a.vta_result) rst in
+  let eff = { eff with eff_resets = rst.eff_resets } in
+  vty_arrow ~ghost:a.vta_ghost ~effect:eff a.vta_arg vty
 
 (** THE FOLLOWING CODE MIGHT BE USEFUL LATER FOR WPgen *)
 (*

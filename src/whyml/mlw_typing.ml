@@ -955,7 +955,7 @@ and expr_rec lenv rdl =
     let vta = match vty_ghostify gh (vty_of_dvty dvty) with
       | VTarrow vta -> vta
       | VTvalue _ -> assert false in
-    let ps = create_psymbol (Denv.create_user_id id) vta vars_empty in
+    let ps = create_psymbol (Denv.create_user_id id) vta in
     add_local id.id (LetA ps) lenv, (ps, gh, lam) in
   let lenv, rdl = Util.map_fold_left step1 lenv rdl in
   let step2 (ps, gh, lam) = ps, expr_lam lenv gh lam in

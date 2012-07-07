@@ -72,7 +72,7 @@ module Wps : Hashweak.S with type key = psymbol
 
 val ps_equal : psymbol -> psymbol -> bool
 
-val create_psymbol : preid -> vty_arrow -> varset -> psymbol
+val create_psymbol : preid -> vty_arrow -> psymbol
 
 (** program/logic symbols *)
 

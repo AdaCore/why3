@@ -81,12 +81,17 @@ module Wps = PSsym.W
 
 let ps_equal : psymbol -> psymbol -> bool = (==)
 
-let create_psymbol id vta vars = {
-  ps_name  = id_register id;
-  ps_vta   = vta_filter vars vta;
-  ps_vars  = vars;
-  ps_subst = vars_freeze vars;
-}
+let create_psymbol_real ~poly id vta vars =
+  let frozen = if poly then vars else vars_union vars vta.vta_vars
+  in {
+    ps_name  = id_register id;
+    ps_vta   = vta_filter vars vta;
+    ps_vars  = frozen;
+    ps_subst = vars_freeze frozen; }
+
+let create_psymbol_poly   = create_psymbol_real ~poly:true
+let create_psymbol_mono   = create_psymbol_real ~poly:false
+let create_psymbol id vta = create_psymbol_poly id vta vars_empty
 
 (** program/logic symbols *)
 
@@ -265,7 +270,7 @@ let create_val id tyv =
   let varm = check_v tyv in
   let vars = varmap_join varm vars_empty in
   let name = match build_v vars tyv with
-    | VTarrow vta -> LetA (create_psymbol id vta vars)
+    | VTarrow vta -> LetA (create_psymbol_poly id vta vars)
     | VTvalue vtv -> LetV (create_pvsymbol id vtv) in
   { val_name = name; val_spec = tyv; val_vars = varm }
 
@@ -553,7 +558,8 @@ let create_let_defn id e =
     | VTvalue vtv ->
         LetV (create_pvsymbol id (vtv_unmut vtv))
     | VTarrow vta ->
-        LetA (create_psymbol id vta (varmap_join e.e_vars vta.vta_vars))
+        let vars = varmap_join e.e_vars vars_empty in
+        LetA (create_psymbol_mono id vta vars)
   in
   { let_var = lv ; let_expr = e }
 
@@ -623,7 +629,7 @@ let create_fun_defn id lam =
   let vars = varmap_join varm vars_empty in
   let vta = spec_arrow lam.l_args e.e_effect e.e_vty in
   (* construct rec_defn *)
-  { rec_ps     = create_psymbol id vta vars;
+  { rec_ps     = create_psymbol_poly id vta vars;
     rec_lambda = lam;
     rec_vars   = varm; }
 

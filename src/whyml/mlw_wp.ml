@@ -93,6 +93,49 @@ let rec drop_at now m t = match t.t_node with
 
 let psymbol_spec_t : type_v Wps.t = Wps.create 17
 
+let add_pv_varm pv m = Mid.add pv.pv_vs.vs_name pv.pv_vtv.vtv_vars m
+let add_pv_vars pv s = vars_union pv.pv_vtv.vtv_vars s
+
+let check_spec ps tyv =
+  let rec check vty tyv = match vty, tyv with
+    | VTvalue _, SpecV _ -> ()
+    | VTarrow vta, SpecA (_::(_::_ as pvl), tyc) ->
+        assert (eff_is_empty vta.vta_effect);
+        check vta.vta_result (SpecA (pvl, tyc))
+    | VTarrow vta, SpecA ([_], tyc) ->
+        let eff1 = vta.vta_effect in
+        let eff2 = tyc.c_effect in
+        assert (Sreg.equal eff1.eff_reads  eff2.eff_reads);
+        assert (Sreg.equal eff1.eff_writes eff2.eff_writes);
+        assert (Sexn.equal eff1.eff_raises eff2.eff_raises);
+        assert (Sreg.equal eff1.eff_ghostr eff2.eff_ghostr);
+        assert (Sreg.equal eff1.eff_ghostw eff2.eff_ghostw);
+        assert (Sexn.equal eff1.eff_ghostx eff2.eff_ghostx);
+        check vta.vta_result tyc.c_result
+    | _ -> assert false
+  in
+  check (VTarrow ps.ps_vta) tyv
+
+let rec filter_v ~strict varm vars = function
+  | SpecA (pvl, tyc) ->
+      let varm = List.fold_right add_pv_varm pvl varm in
+      let vars = List.fold_right add_pv_vars pvl vars in
+      SpecA (pvl, filter_c ~strict varm vars tyc)
+  | tyv -> tyv
+
+and filter_c ~strict varm vars tyc =
+  let result = filter_v ~strict varm vars tyc.c_result in
+  let effect = eff_filter vars tyc.c_effect in
+  if strict then begin
+    let add _ f s = Mvs.set_union f.t_vars s in
+    let vss = add () tyc.c_pre tyc.c_post.t_vars in
+    let vss = Mexn.fold add tyc.c_xpost vss in
+    let check { vs_name = id } _ = if not (Mid.mem id varm) then
+      Loc.errorm "Local variable %s escapes from its scope" id.id_string in
+    Mvs.iter check vss
+  end;
+  { tyc with c_effect = effect; c_result = result }
+
 let spec_lambda l tyv =
   let tyc = {
     c_pre    = l.l_pre;
@@ -104,12 +147,21 @@ let spec_lambda l tyv =
 
 let spec_val { val_name = lv; val_spec = tyv } = match lv with
   | LetA ps when not (Wps.mem psymbol_spec_t ps) ->
+      check_spec ps tyv; (* TODO: remove *)
       Wps.set psymbol_spec_t ps tyv
   | _ -> ()
 
-let rec spec_let { let_var = lv; let_expr = e } = match lv with
+let rec spec_let ~strict { let_var = lv; let_expr = e } = match lv with
   | LetA ps when not (Wps.mem psymbol_spec_t ps) ->
-      Wps.set psymbol_spec_t ps (spec_expr e)
+    (* FIXME: memoization is broken if one declares the same psymbol
+       both as a local (non-strict) let and as a global (strict) let.
+       First global, then local is safe. First local, then global
+       may lead to an escaping variable, which will or will not
+       be detected by the core API. *)
+      let vars = Mid.fold (fun _ -> vars_union) e.e_vars vars_empty in
+      let tyv = filter_v ~strict e.e_vars vars (spec_expr e) in
+      check_spec ps tyv; (* TODO: remove *)
+      Wps.set psymbol_spec_t ps tyv
   | _ -> ()
 
 and spec_rec rdl =
@@ -118,6 +170,7 @@ and spec_rec rdl =
   let add_early_spec rd = match rd.rec_lambda.l_expr.e_vty with
     | VTvalue vtv ->
         let tyv = spec_lambda rd.rec_lambda (SpecV vtv) in
+        check_spec rd.rec_ps tyv; (* TODO: remove *)
         Wps.set psymbol_spec_t rd.rec_ps tyv
     | VTarrow _ when Mid.mem rd.rec_ps.ps_name vars ->
         Loc.errorm ?loc:rd.rec_lambda.l_expr.e_loc
@@ -129,6 +182,7 @@ and spec_rec rdl =
     match rd.rec_lambda.l_expr.e_vty with
     | VTarrow _ ->
         let tyv = spec_lambda rd.rec_lambda tyv in
+        check_spec rd.rec_ps tyv; (* TODO: remove *)
         Wps.set psymbol_spec_t rd.rec_ps tyv
     | VTvalue _ -> () in
   List.iter add_late_spec rdl
@@ -144,7 +198,7 @@ and spec_expr e = match e.e_node with
          and compute it now. *)
   | Eapp (_, _) ->
       assert false (* TODO *)
-  | Elet (ld,e1) -> spec_let ld; spec_expr e1
+  | Elet (ld,e1) -> spec_let ~strict:false ld; spec_expr e1
   | Erec (rdl,e1) -> spec_rec rdl; spec_expr e1
   | Eghost e1 -> spec_expr e1
   | Eany tyc -> tyc.c_result
@@ -468,7 +522,7 @@ let mk_env env km th = {
 }
 
 let wp_let env km th ({ let_var = lv; let_expr = e } as ld) =
-  spec_let ld;
+  spec_let ~strict:true ld;
   let env = mk_env env km th in
   let q, xq = default_post e.e_vty e.e_effect in
   let f = wp_expr env e q xq in
