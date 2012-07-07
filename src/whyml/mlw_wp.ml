@@ -89,6 +89,85 @@ let rec drop_at now m t = match t.t_node with
   | _ ->
       t_map (drop_at now m) t
 
+(** Specifications *)
+
+let psymbol_spec_t : type_v Wps.t = Wps.create 17
+
+let spec_lambda l tyv =
+  let tyc = {
+    c_pre    = l.l_pre;
+    c_effect = l.l_expr.e_effect;
+    c_result = tyv;
+    c_post   = l.l_post;
+    c_xpost  = l.l_xpost } in
+  SpecA (l.l_args, tyc)
+
+let spec_val { val_name = lv; val_spec = tyv } = match lv with
+  | LetA ps when not (Wps.mem psymbol_spec_t ps) ->
+      Wps.set psymbol_spec_t ps tyv
+  | _ -> ()
+
+let rec spec_let { let_var = lv; let_expr = e } = match lv with
+  | LetA ps when not (Wps.mem psymbol_spec_t ps) ->
+      Wps.set psymbol_spec_t ps (spec_expr e)
+  | _ -> ()
+
+and spec_rec rdl =
+  let add_vars m rd = Mid.set_union m rd.rec_vars in
+  let vars = List.fold_left add_vars Mid.empty rdl in
+  let add_early_spec rd = match rd.rec_lambda.l_expr.e_vty with
+    | VTvalue vtv ->
+        let tyv = spec_lambda rd.rec_lambda (SpecV vtv) in
+        Wps.set psymbol_spec_t rd.rec_ps tyv
+    | VTarrow _ when Mid.mem rd.rec_ps.ps_name vars ->
+        Loc.errorm ?loc:rd.rec_lambda.l_expr.e_loc
+          "The body of a recursive function must be a first-order value"
+    | VTarrow _ -> () in
+  List.iter add_early_spec rdl;
+  let add_late_spec rd =
+    let tyv = spec_expr rd.rec_lambda.l_expr in
+    match rd.rec_lambda.l_expr.e_vty with
+    | VTarrow _ ->
+        let tyv = spec_lambda rd.rec_lambda tyv in
+        Wps.set psymbol_spec_t rd.rec_ps tyv
+    | VTvalue _ -> () in
+  List.iter add_late_spec rdl
+
+and spec_expr e = match e.e_node with
+  | Elogic _
+  | Eassert _
+  | Eabsurd -> SpecV (vtv_of_expr e)
+  | Evalue pv -> SpecV pv.pv_vtv
+  | Earrow ps -> Wps.find psymbol_spec_t ps
+      (* TODO: a ps may not be in the table, if it comes from a module
+         for which we never computed WPs. Pass the known_map to spec_expr
+         and compute it now. *)
+  | Eapp (_, _) ->
+      assert false (* TODO *)
+  | Elet (ld,e1) -> spec_let ld; spec_expr e1
+  | Erec (rdl,e1) -> spec_rec rdl; spec_expr e1
+  | Eghost e1 -> spec_expr e1
+  | Eany tyc -> tyc.c_result
+  | Eassign (e1,_,_)
+  | Eloop (_,_,e1)
+  | Efor (_,_,_,e1)
+  | Eraise (_,e1)
+  | Eabstr (e1,_,_) ->
+      ignore (spec_expr e1);
+      SpecV (vtv_of_expr e)
+  | Eif (e1,e2,e3) ->
+      ignore (spec_expr e1);
+      ignore (spec_expr e2);
+      spec_expr e3
+  | Ecase (e1,bl) ->
+      ignore (spec_expr e1);
+      List.iter (fun (_,e) -> ignore (spec_expr e)) bl;
+      SpecV (vtv_of_expr e)
+  | Etry (e1,bl) ->
+      ignore (spec_expr e1);
+      List.iter (fun (_,_,e) -> ignore (spec_expr e)) bl;
+      SpecV (vtv_of_expr e)
+
 (** WP utilities *)
 
 let ty_of_vty = function
@@ -145,7 +224,6 @@ match f.t_node with
 type wp_env = {
   prog_known : Mlw_decl.known_map;
   pure_known : Decl.known_map;
-  toplevel_v : type_v Hid.t;
   global_env : Env.env;
 }
 
@@ -246,59 +324,36 @@ let regs_of_reads  eff = Sreg.union eff.eff_reads eff.eff_ghostr
 let regs_of_writes eff = Sreg.union eff.eff_writes eff.eff_ghostw
 let regs_of_effect eff = Sreg.union (regs_of_reads eff) (regs_of_writes eff)
 
-let spec_of_lambda l tyv =
-  let tyc = {
-    c_pre    = l.l_pre;
-    c_effect = l.l_expr.e_effect;
-    c_result = tyv;
-    c_post   = l.l_post;
-    c_xpost  = l.l_xpost } in
-  SpecA (l.l_args, tyc)
-
-let spec_of_rec locals rdl =
-  let add_vars m rd = Mid.set_union m rd.rec_vars in
-  let vars = List.fold_left add_vars Mid.empty rdl in
-  let add_spec m rd = match rd.rec_lambda.l_expr.e_vty with
-    | VTvalue vtv ->
-        let tyv = spec_of_lambda rd.rec_lambda (SpecV vtv) in
-        Mid.add rd.rec_ps.ps_name tyv m
-    | VTarrow _ when Mid.mem rd.rec_ps.ps_name vars ->
-        Loc.errorm ?loc:rd.rec_lambda.l_expr.e_loc
-          "The body of a recursive function must be a first-order value"
-    | VTarrow _ -> m in
-  List.fold_left add_spec locals rdl
-
-let rec wp_expr env locals e q xq =
+let rec wp_expr env e q xq =
   let lab = fresh_mark () in
   let q = old_mark lab q in
   let xq = Mexn.map (old_mark lab) xq in
-  let tyv, f = wp_desc env locals e q xq in
+  let f = wp_desc env e q xq in
   let f = erase_mark lab f in
   if Debug.test_flag debug then begin
     Format.eprintf "@[--------@\n@[<hov 2>e = %a@]@\n" Mlw_pretty.print_expr e;
     Format.eprintf "@[<hov 2>q = %a@]@\n" Pretty.print_term q;
     Format.eprintf "@[<hov 2>f = %a@]@\n----@]@." Pretty.print_term f;
   end;
-  tyv, f
+  f
 
-and wp_desc env locals e q xq = match e.e_node with
+and wp_desc env e q xq = match e.e_node with
   | Elogic t ->
       let v, q = open_post q in
       let t = wp_label e t in
       let t = if t.t_ty = None then mk_t_if t else t in
-      SpecV (vtv_of_expr e), t_subst_single v t q
+      t_subst_single v t q
   | Evalue pv ->
       let v, q = open_post q in
       let t = wp_label e (t_var pv.pv_vs) in
-      SpecV (vtv_of_expr e), t_subst_single v t q
+      t_subst_single v t q
   | Erec (rdl, e) ->
-      let specl, fr = List.split (wp_rec_defn env locals rdl) in
-      let add_spec m rd tyv = Mid.add rd.rec_ps.ps_name tyv m in
-      let locals = List.fold_left2 add_spec locals rdl specl in
-      let tyv, fe = wp_expr env locals e q xq in
-      tyv, wp_and ~sym:true (wp_ands ~sym:true fr) fe
+      let fr = wp_rec_defn env rdl in
+      let fe = wp_expr env e q xq in
+      wp_and ~sym:true (wp_ands ~sym:true fr) fe
   | Eabsurd ->
-      SpecV (vtv_of_expr e), wp_label e t_absurd
+      wp_label e t_absurd
+
   |Earrow _-> assert false
   |Eassert (_, _)-> assert false
   |Eabstr (_, _, _)-> assert false
@@ -314,19 +369,16 @@ and wp_desc env locals e q xq = match e.e_node with
   |Elet (_, _)-> assert false
   |Eapp (_, _)-> assert false
 
-and wp_lambda env locals l =
+and wp_lambda env l =
   let q = wp_expl "normal postcondition" l.l_post in
   let xq = Mexn.map (wp_expl "exceptional postcondition") l.l_xpost in
-  let tyv, f = wp_expr env locals l.l_expr q xq in
+  let f = wp_expr env l.l_expr q xq in
   let f = wp_implies l.l_pre f in
   let f = quantify env (regs_of_effect l.l_expr.e_effect) f in
-  let f = wp_forall (List.map (fun pv -> pv.pv_vs) l.l_args) f in
-  spec_of_lambda l tyv, f
+  wp_forall (List.map (fun pv -> pv.pv_vs) l.l_args) f
 
-and wp_rec_defn env locals rdl =
-  let locals = spec_of_rec locals rdl in
-  let rec_defn rd = wp_lambda env locals rd.rec_lambda in
-  List.map rec_defn rdl
+and wp_rec_defn env rdl =
+  List.map (fun rd -> wp_lambda env rd.rec_lambda) rdl
 
 (***
 let bool_to_prop env f =
@@ -412,14 +464,14 @@ let add_wp_decl name f uc =
 let mk_env env km th = {
   prog_known = km;
   pure_known = Theory.get_known th;
-  toplevel_v = Hid.create 5;
   global_env = env;
 }
 
-let wp_let env km th { let_var = lv; let_expr = e } =
+let wp_let env km th ({ let_var = lv; let_expr = e } as ld) =
+  spec_let ld;
   let env = mk_env env km th in
   let q, xq = default_post e.e_vty e.e_effect in
-  let _, f = wp_expr env Mid.empty e q xq in
+  let f = wp_expr env e q xq in
   let f = wp_forall (Mvs.keys f.t_vars) f in
   let id = match lv with
     | LetV pv -> pv.pv_vs.vs_name
@@ -427,13 +479,14 @@ let wp_let env km th { let_var = lv; let_expr = e } =
   add_wp_decl id f th
 
 let wp_rec env km th rdl =
+  spec_rec rdl;
   let env = mk_env env km th in
-  let fl = wp_rec_defn env Mid.empty rdl in
-  let add_one th d (_,f) =
+  let fl = wp_rec_defn env rdl in
+  let add_one th d f =
     Debug.dprintf debug "wp %s = %a@\n----------------@."
       d.rec_ps.ps_name.id_string Pretty.print_term f;
     add_wp_decl d.rec_ps.ps_name f th
   in
   List.fold_left2 add_one th rdl fl
 
-let wp_val _env _km th _lv = th
+let wp_val _env _km th vd = spec_val vd; th

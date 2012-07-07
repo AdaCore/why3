@@ -34,8 +34,6 @@ type pvsymbol = {
   pv_vtv : vty_value;
 }
 
-let pv_equal : pvsymbol -> pvsymbol -> bool = (==)
-
 module PVsym = WeakStructMake (struct
   type t = pvsymbol
   let tag pv = pv.pv_vs.vs_name.id_tag
@@ -45,6 +43,8 @@ module Spv = PVsym.S
 module Mpv = PVsym.M
 module Hpv = PVsym.H
 module Wpv = PVsym.W
+
+let pv_equal : pvsymbol -> pvsymbol -> bool = (==)
 
 let create_pvsymbol id vtv = {
   pv_vs   = create_vsymbol id (ty_of_ity vtv.vtv_ity);
@@ -68,6 +68,16 @@ type psymbol = {
   ps_vars  : varset;
   ps_subst : ity_subst;
 }
+
+module PSsym = WeakStructMake (struct
+  type t = psymbol
+  let tag ps = ps.ps_name.id_tag
+end)
+
+module Sps = PSsym.S
+module Mps = PSsym.M
+module Hps = PSsym.H
+module Wps = PSsym.W
 
 let ps_equal : psymbol -> psymbol -> bool = (==)
 
