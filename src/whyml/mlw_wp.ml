@@ -62,7 +62,9 @@ let vs_now = create_vsymbol (id_fresh "'now") ty_mark
 
 let ls_absurd = create_lsymbol (id_fresh "absurd") [] None
 let t_absurd  = ps_app ls_absurd []
+
 let mk_t_if f = t_if f t_bool_true t_bool_false
+let to_term t = if t.t_ty = None then mk_t_if t else t
 
 (* replace [at(t,'old)] with [at(t,lab)] everywhere in formula [f] *)
 let old_mark lab t = t_subst_single vs_old (t_var lab) t
@@ -92,29 +94,27 @@ let rec drop_at now m t = match t.t_node with
 (** Specifications *)
 
 let psymbol_spec_t : type_v Wps.t = Wps.create 17
+let e_apply_spec_t : type_c Wexpr.t = Wexpr.create 17
 
 let add_pv_varm pv m = Mid.add pv.pv_vs.vs_name pv.pv_vtv.vtv_vars m
 let add_pv_vars pv s = vars_union pv.pv_vtv.vtv_vars s
 
-let check_spec ps tyv =
-  let rec check vty tyv = match vty, tyv with
-    | VTvalue _, SpecV _ -> ()
-    | VTarrow vta, SpecA (_::(_::_ as pvl), tyc) ->
-        assert (eff_is_empty vta.vta_effect);
-        check vta.vta_result (SpecA (pvl, tyc))
-    | VTarrow vta, SpecA ([_], tyc) ->
-        let eff1 = vta.vta_effect in
-        let eff2 = tyc.c_effect in
-        assert (Sreg.equal eff1.eff_reads  eff2.eff_reads);
-        assert (Sreg.equal eff1.eff_writes eff2.eff_writes);
-        assert (Sexn.equal eff1.eff_raises eff2.eff_raises);
-        assert (Sreg.equal eff1.eff_ghostr eff2.eff_ghostr);
-        assert (Sreg.equal eff1.eff_ghostw eff2.eff_ghostw);
-        assert (Sexn.equal eff1.eff_ghostx eff2.eff_ghostx);
-        check vta.vta_result tyc.c_result
-    | _ -> assert false
-  in
-  check (VTarrow ps.ps_vta) tyv
+let rec check_spec vty tyv = match vty, tyv with
+  | VTvalue _, SpecV _ -> ()
+  | VTarrow vta, SpecA (_::(_::_ as pvl), tyc) ->
+      assert (eff_is_empty vta.vta_effect);
+      check_spec vta.vta_result (SpecA (pvl, tyc))
+  | VTarrow vta, SpecA ([_], tyc) ->
+      let eff1 = vta.vta_effect in
+      let eff2 = tyc.c_effect in
+      assert (Sreg.equal eff1.eff_reads  eff2.eff_reads);
+      assert (Sreg.equal eff1.eff_writes eff2.eff_writes);
+      assert (Sexn.equal eff1.eff_raises eff2.eff_raises);
+      assert (Sreg.equal eff1.eff_ghostr eff2.eff_ghostr);
+      assert (Sreg.equal eff1.eff_ghostw eff2.eff_ghostw);
+      assert (Sexn.equal eff1.eff_ghostx eff2.eff_ghostx);
+      check_spec vta.vta_result tyc.c_result
+  | _ -> assert false
 
 let rec filter_v ~strict varm vars = function
   | SpecA (pvl, tyc) ->
@@ -136,6 +136,50 @@ and filter_c ~strict varm vars tyc =
   end;
   { tyc with c_effect = effect; c_result = result }
 
+let add_psymbol_spec ~strict varm ps tyv =
+  let vars = Mid.fold (fun _ -> vars_union) varm vars_empty in
+  let tyv = filter_v ~strict varm vars tyv in
+  check_spec (VTarrow ps.ps_vta) tyv; (* TODO: prove and remove *)
+  Wps.set psymbol_spec_t ps tyv
+
+(* TODO? move spec_inst and subst to Mlw_expr? *)
+let vtv_full_inst sbs vtv =
+  vty_value ~ghost:vtv.vtv_ghost (ity_full_inst sbs vtv.vtv_ity)
+
+let pv_full_inst sbs pv =
+  create_pvsymbol (id_clone pv.pv_vs.vs_name) (vtv_full_inst sbs pv.pv_vtv)
+
+let rec spec_inst_v sbs tvm vsm = function
+  | SpecV vtv ->
+      SpecV (vtv_full_inst sbs vtv)
+  | SpecA (pvl,tyc) ->
+      let add m pv =
+        let nv = pv_full_inst sbs pv in
+        Mvs.add pv.pv_vs (t_var nv.pv_vs) m, nv in
+      let vsm, pvl = Util.map_fold_left add vsm pvl in
+      SpecA (pvl, spec_inst_c sbs tvm vsm tyc)
+
+and spec_inst_c sbs tvm vsm tyc =
+  let subst = t_ty_subst tvm vsm in {
+    c_pre    = subst tyc.c_pre;
+    c_effect = eff_full_inst sbs tyc.c_effect;
+    c_result = spec_inst_v sbs tvm vsm tyc.c_result;
+    c_post   = subst tyc.c_post;
+    c_xpost  = Mexn.map subst tyc.c_xpost; }
+
+let rec subst_v pv t = function
+  | SpecA (pvl,tyc) when not (List.exists (pv_equal pv) pvl) ->
+      SpecA (pvl, subst_c pv t tyc)
+  | tyv -> tyv
+
+and subst_c pv t tyc =
+  let subst = t_subst (Mvs.singleton pv.pv_vs t) in {
+    c_pre    = subst tyc.c_pre;
+    c_effect = tyc.c_effect;
+    c_result = subst_v pv t tyc.c_result;
+    c_post   = subst tyc.c_post;
+    c_xpost  = Mexn.map subst tyc.c_xpost; }
+
 let spec_lambda l tyv =
   let tyc = {
     c_pre    = l.l_pre;
@@ -145,81 +189,104 @@ let spec_lambda l tyv =
     c_xpost  = l.l_xpost } in
   SpecA (l.l_args, tyc)
 
-let spec_val { val_name = lv; val_spec = tyv } = match lv with
-  | LetA ps when not (Wps.mem psymbol_spec_t ps) ->
-      check_spec ps tyv; (* TODO: remove *)
-      Wps.set psymbol_spec_t ps tyv
-  | _ -> ()
+let spec_val vd = match vd.val_name with
+  | LetA ps -> add_psymbol_spec ~strict:true vd.val_vars ps vd.val_spec
+  | LetV _  -> ()
 
-let rec spec_let ~strict { let_var = lv; let_expr = e } = match lv with
-  | LetA ps when not (Wps.mem psymbol_spec_t ps) ->
-    (* FIXME: memoization is broken if one declares the same psymbol
-       both as a local (non-strict) let and as a global (strict) let.
-       First global, then local is safe. First local, then global
-       may lead to an escaping variable, which will or will not
-       be detected by the core API. *)
-      let vars = Mid.fold (fun _ -> vars_union) e.e_vars vars_empty in
-      let tyv = filter_v ~strict e.e_vars vars (spec_expr e) in
-      check_spec ps tyv; (* TODO: remove *)
-      Wps.set psymbol_spec_t ps tyv
-  | _ -> ()
+let rec spec_let ~strict pvm { let_var = lv; let_expr = e } = match lv with
+  | LetA ps -> add_psymbol_spec ~strict e.e_vars ps (spec_expr pvm e)
+  | LetV _  -> ignore (spec_expr pvm e)
 
-and spec_rec rdl =
+and spec_rec pvm rdl =
   let add_vars m rd = Mid.set_union m rd.rec_vars in
   let vars = List.fold_left add_vars Mid.empty rdl in
   let add_early_spec rd = match rd.rec_lambda.l_expr.e_vty with
     | VTvalue vtv ->
         let tyv = spec_lambda rd.rec_lambda (SpecV vtv) in
-        check_spec rd.rec_ps tyv; (* TODO: remove *)
-        Wps.set psymbol_spec_t rd.rec_ps tyv
+        add_psymbol_spec ~strict:true rd.rec_vars rd.rec_ps tyv
     | VTarrow _ when Mid.mem rd.rec_ps.ps_name vars ->
         Loc.errorm ?loc:rd.rec_lambda.l_expr.e_loc
           "The body of a recursive function must be a first-order value"
     | VTarrow _ -> () in
   List.iter add_early_spec rdl;
   let add_late_spec rd =
-    let tyv = spec_expr rd.rec_lambda.l_expr in
+    let tyv = spec_expr pvm rd.rec_lambda.l_expr in
     match rd.rec_lambda.l_expr.e_vty with
     | VTarrow _ ->
         let tyv = spec_lambda rd.rec_lambda tyv in
-        check_spec rd.rec_ps tyv; (* TODO: remove *)
-        Wps.set psymbol_spec_t rd.rec_ps tyv
+        add_psymbol_spec ~strict:true rd.rec_vars rd.rec_ps tyv
     | VTvalue _ -> () in
   List.iter add_late_spec rdl
 
-and spec_expr e = match e.e_node with
+and spec_expr pvm e = match e.e_node with
   | Elogic _
   | Eassert _
   | Eabsurd -> SpecV (vtv_of_expr e)
   | Evalue pv -> SpecV pv.pv_vtv
-  | Earrow ps -> Wps.find psymbol_spec_t ps
-      (* TODO: a ps may not be in the table, if it comes from a module
-         for which we never computed WPs. Pass the known_map to spec_expr
-         and compute it now. *)
-  | Eapp (_, _) ->
-      assert false (* TODO *)
-  | Elet (ld,e1) -> spec_let ~strict:false ld; spec_expr e1
-  | Erec (rdl,e1) -> spec_rec rdl; spec_expr e1
-  | Eghost e1 -> spec_expr e1
+  | Earrow ps ->
+    (* TODO: a ps may not be in the table, if it comes from a module
+       for which we never computed WPs. Pass the known_map to spec_expr
+       and compute it now. *)
+      let rec vty_match sbs t1 t2 = match t1,t2 with
+        | VTvalue v1, VTvalue v2 ->
+            ity_match sbs v1.vtv_ity v2.vtv_ity
+        | VTarrow a1, VTarrow a2 ->
+            let sbs = ity_match sbs a1.vta_arg.vtv_ity a2.vta_arg.vtv_ity in
+            vty_match sbs a1.vta_result a2.vta_result
+        | _ -> assert false
+      in
+      let sbs = vty_match ps.ps_subst (VTarrow ps.ps_vta) e.e_vty in
+      let tvm = Mtv.map ty_of_ity sbs.ity_subst_tv in
+      let tyv = Wps.find psymbol_spec_t ps in
+      spec_inst_v sbs tvm Mvs.empty tyv
+  | Eapp (e1,pv) ->
+      let tyv = spec_expr pvm e1 in
+      let t = Mpv.find_def (t_var pv.pv_vs) pv pvm in
+      begin match tyv with
+        | SpecA ([pv],tyc) ->
+            let tyc = subst_c pv t tyc in
+            (* we will use this for WP *)
+            Wexpr.set e_apply_spec_t e tyc;
+            tyc.c_result
+        | SpecA (pv::pvl,tyc) ->
+            (* pv cannot occur in pvl *)
+            SpecA (pvl, subst_c pv t tyc)
+        | _ -> assert false
+      end
+  | Elet (ld,e1) ->
+      spec_let ~strict:false pvm ld;
+      let pvm = match ld.let_var, e1.e_node with
+        | LetV pv, Elogic t ->
+            Mpv.add pv (to_term t) pvm
+        | LetV pv, Evalue v ->
+            let t = Mpv.find_def (t_var v.pv_vs) v pvm in
+            Mpv.add pv t pvm
+        | _ -> pvm
+      in
+      spec_expr pvm e1
+  | Erec (rdl,e1) ->
+      spec_rec pvm rdl;
+      spec_expr pvm e1
+  | Eghost e1 -> spec_expr pvm e1
   | Eany tyc -> tyc.c_result
   | Eassign (e1,_,_)
   | Eloop (_,_,e1)
   | Efor (_,_,_,e1)
   | Eraise (_,e1)
   | Eabstr (e1,_,_) ->
-      ignore (spec_expr e1);
+      ignore (spec_expr pvm e1);
       SpecV (vtv_of_expr e)
   | Eif (e1,e2,e3) ->
-      ignore (spec_expr e1);
-      ignore (spec_expr e2);
-      spec_expr e3
+      ignore (spec_expr pvm e1);
+      ignore (spec_expr pvm e2);
+      spec_expr pvm e3
   | Ecase (e1,bl) ->
-      ignore (spec_expr e1);
-      List.iter (fun (_,e) -> ignore (spec_expr e)) bl;
+      ignore (spec_expr pvm e1);
+      List.iter (fun (_,e) -> ignore (spec_expr pvm e)) bl;
       SpecV (vtv_of_expr e)
   | Etry (e1,bl) ->
-      ignore (spec_expr e1);
-      List.iter (fun (_,_,e) -> ignore (spec_expr e)) bl;
+      ignore (spec_expr pvm e1);
+      List.iter (fun (_,_,e) -> ignore (spec_expr pvm e)) bl;
       SpecV (vtv_of_expr e)
 
 (** WP utilities *)
@@ -246,10 +313,10 @@ let wp_expl l f =
   let lab = Slab.add (Ident.create_label ("expl:" ^ l)) lab in
   t_label ?loc:f.t_loc lab f
 
-let wp_and ?(sym=false) f1 f2 =
+let wp_and ~sym f1 f2 =
   if sym then t_and_simp f1 f2 else t_and_asym_simp f1 f2
 
-let wp_ands ?(sym=false) fl =
+let wp_ands ~sym fl =
   if sym then t_and_simp_l fl else t_and_asym_simp_l fl
 
 let wp_implies f1 f2 = t_implies_simp f1 f2
@@ -378,6 +445,12 @@ let regs_of_reads  eff = Sreg.union eff.eff_reads eff.eff_ghostr
 let regs_of_writes eff = Sreg.union eff.eff_writes eff.eff_ghostw
 let regs_of_effect eff = Sreg.union (regs_of_reads eff) (regs_of_writes eff)
 
+let t_void = fs_app (fs_tuple 0) [] ty_unit
+
+let open_unit_post q =
+  let v, q = open_post q in
+  t_subst_single v t_void q
+
 let rec wp_expr env e q xq =
   let lab = fresh_mark () in
   let q = old_mark lab q in
@@ -395,21 +468,32 @@ and wp_desc env e q xq = match e.e_node with
   | Elogic t ->
       let v, q = open_post q in
       let t = wp_label e t in
-      let t = if t.t_ty = None then mk_t_if t else t in
-      t_subst_single v t q
+      t_subst_single v (to_term t) q
   | Evalue pv ->
       let v, q = open_post q in
       let t = wp_label e (t_var pv.pv_vs) in
       t_subst_single v t q
+  | Earrow _ ->
+      let q = open_unit_post q in
+      (* wp_label e *) q (* FIXME? *)
   | Erec (rdl, e) ->
       let fr = wp_rec_defn env rdl in
       let fe = wp_expr env e q xq in
       wp_and ~sym:true (wp_ands ~sym:true fr) fe
+  | Eassert (Aassert, f) ->
+      let q = open_unit_post q in
+      let f = wp_expl "assertion" f in
+      wp_and ~sym:false (wp_label e f) q
+  | Eassert (Acheck, f) ->
+      let q = open_unit_post q in
+      let f = wp_expl "check" f in
+      wp_and ~sym:true (wp_label e f) q
+  | Eassert (Aassume, f) ->
+      let q = open_unit_post q in
+      wp_implies (wp_label e f) q
   | Eabsurd ->
       wp_label e t_absurd
 
-  |Earrow _-> assert false
-  |Eassert (_, _)-> assert false
   |Eabstr (_, _, _)-> assert false
   |Etry (_, _)-> assert false
   |Eraise (_, _)-> assert false
@@ -522,7 +606,7 @@ let mk_env env km th = {
 }
 
 let wp_let env km th ({ let_var = lv; let_expr = e } as ld) =
-  spec_let ~strict:true ld;
+  spec_let ~strict:true Mpv.empty ld;
   let env = mk_env env km th in
   let q, xq = default_post e.e_vty e.e_effect in
   let f = wp_expr env e q xq in
@@ -533,7 +617,7 @@ let wp_let env km th ({ let_var = lv; let_expr = e } as ld) =
   add_wp_decl id f th
 
 let wp_rec env km th rdl =
-  spec_rec rdl;
+  spec_rec Mpv.empty rdl;
   let env = mk_env env km th in
   let fl = wp_rec_defn env rdl in
   let add_one th d f =

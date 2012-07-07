@@ -470,5 +470,7 @@ let () = Exn_printer.register
   | Mlw_expr.UnboundException xs ->
       fprintf fmt "This function raises %a but does not \
         specify a post-condition for it" print_xs xs
+  | Mlw_expr.DuplicateArg pv ->
+      fprintf fmt "Argument %a is used twice" print_pv pv
   | _ -> raise exn
   end

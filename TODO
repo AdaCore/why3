@@ -1,3 +1,14 @@
+WhyML
+-----
+
+  - should the API ensure that every psymbol resets the new regions?
+    Should they be always reset at the last arrow? What if they are
+    already reset at some earlier arrows, should we reset them again?
+
+  - in "val" and "any", when a region rho is written into, but some
+    subregion rho' of rho is not, should we reset rho' under rho?
+    In Mlw_typing or in Mlw_expr?
+
 
 syntaxe
 -------
@@ -13,10 +24,10 @@ syntaxe
        match ... with 0 :: r -> ... | ...
 
 
-sémantique
+sÃ©mantique
 ----------
 
-  - env should not contain theories under the null path. 
+  - env should not contain theories under the null path.
     The current implementation of Typing.find_theory is potentially broken.
 
   - should split_goal provide a "right-hand side only split"?
@@ -28,16 +39,16 @@ sémantique
     is not changed by a transformation, it will stay in the hash table forever,
     since the key is the value. Should we use generation numbers in arguments
     and results of transformations?
-     François -- I don't get that point the weak Hashtbl that we use
+     FranÃ§ois -- I don't get that point the weak Hashtbl that we use
    are designed to work on this case, even with the identity function.
    What we should do is a way to remove the task from a session when
    they are not needed anymore.
 
-  - uses : pour l'instant, l'ordre des théories dans le fichier est important 
-    i.e. les théories mentionnées par uses doivent être définies précédemment
+  - uses : pour l'instant, l'ordre des thÃ©ories dans le fichier est important
+    i.e. les thÃ©ories mentionnÃ©es par uses doivent Ãªtre dÃ©finies prÃ©cÃ©demment
 
-  - open (et échouer si "open A" et "open B" avec A et B déclarant un symbole 
-    de même nom)
+  - open (et Ã©chouer si "open A" et "open B" avec A et B dÃ©clarant un symbole
+    de mÃªme nom)
 
 error reporting
 ---------------

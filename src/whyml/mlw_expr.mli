@@ -133,6 +133,7 @@ type val_decl = private {
 
 val create_val : Ident.preid -> type_v -> val_decl
 
+exception DuplicateArg of pvsymbol
 exception UnboundException of xsymbol
 
 (** patterns *)
@@ -177,6 +178,7 @@ type expr = private {
   e_vars   : varset Mid.t;
   e_label  : Slab.t;
   e_loc    : Loc.position option;
+  e_tag    : Hashweak.tag;
 }
 
 and expr_node = private
@@ -223,6 +225,11 @@ and variant = {
   v_term : term;           (* : tau *)
   v_rel  : lsymbol option; (* tau tau : prop *)
 }
+
+module Mexpr : Map.S with type key = expr
+module Sexpr : Mexpr.Set
+module Hexpr : Hashtbl.S with type key = expr
+module Wexpr : Hashweak.S with type key = expr
 
 val e_label : ?loc:Loc.position -> Slab.t -> expr -> expr
 val e_label_add : label -> expr -> expr

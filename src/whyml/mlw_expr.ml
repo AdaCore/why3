@@ -214,7 +214,11 @@ let spec_vars varm variant pre post xpost eff result =
     raise (UnboundException (Sexn.choose badex));
   Mvs.fold (fun vs _ m -> add_vs_vars vs m) vsset varm
 
+exception DuplicateArg of pvsymbol
+
 let spec_arrow pvl effect vty =
+  let add pv s = Spv.add_new (DuplicateArg pv) pv s in
+  ignore (List.fold_right add pvl Spv.empty);
   let arg,argl = match List.rev pvl with
     | [] -> Loc.errorm "Empty argument list"
     | arg::argl -> arg, argl in
@@ -460,6 +464,7 @@ type expr = {
   e_vars   : varset Mid.t;
   e_label  : Slab.t;
   e_loc    : Loc.position option;
+  e_tag    : Hashweak.tag;
 }
 
 and expr_node =
@@ -502,6 +507,16 @@ and lambda = {
   l_xpost   : xpost;
 }
 
+module WSexpr = WeakStructMake (struct
+  type t = expr
+  let tag expr = expr.e_tag
+end)
+
+module Sexpr = WSexpr.S
+module Mexpr = WSexpr.M
+module Hexpr = WSexpr.H
+module Wexpr = WSexpr.W
+
 (* smart constructors *)
 
 let e_label ?loc l e = { e with e_label = l; e_loc = loc }
@@ -516,14 +531,23 @@ let e_label_copy { e_label = lab; e_loc = loc } e =
 exception GhostWrite of expr * region
 exception GhostRaise of expr * xsymbol
 
-let mk_expr node vty eff vars = {
+let mk_expr node vty eff vars c = {
   e_node   = node;
   e_vty    = vty;
   e_effect = if vty_ghost vty then eff_ghostify eff else eff;
   e_vars   = vars;
   e_label  = Slab.empty;
   e_loc    = None;
+  e_tag    = Hashweak.create_tag c;
 }
+
+let mk_expr =
+  let c = ref 0 in fun node vty eff vars ->
+    incr c; mk_expr node vty eff vars !c
+
+(* FIXME? e_label calls do not refresh the tag. This is safe
+   as long as we only use tags for "semantical things" such as
+   extended specification storage in WPs. *)
 
 let add_t_vars t m = Mvs.fold (fun vs _ m -> add_vs_vars vs m) t.t_vars m
 let add_e_vars e m = varmap_union e.e_vars m
