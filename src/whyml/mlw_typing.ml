@@ -930,7 +930,7 @@ and expr_desc lenv loc de = match de.de_desc with
       let de2 = { de1 with de_desc = DEghost de2 } in
       expr lenv { de1 with de_desc = DEtry (de2, bl) }
   | DEmark (x, de1) ->
-      let ld = create_let_defn (Denv.create_user_id x) e_setmark in
+      let ld = create_let_defn (Denv.create_user_id x) e_now in
       let lenv = add_local x.id ld.let_var lenv in
       e_let ld (expr lenv de1)
   | DEany dtyc ->

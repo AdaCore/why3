@@ -52,13 +52,11 @@ let th_mark =
   let uc = add_param_decl uc fs_old in
   close_theory uc
 
-let fs_setmark =
-  create_lsymbol (id_fresh "set_mark") [] (Some ty_mark)
-
-let e_setmark = e_lapp fs_setmark [] (ity_pur ts_mark [])
+let fs_now = create_lsymbol (id_fresh "'now") [] (Some ty_mark)
+let t_now = fs_app fs_now [] ty_mark
+let e_now = e_lapp fs_now [] (ity_pur ts_mark [])
 
 let vs_old = create_vsymbol (id_fresh "'old") ty_mark
-let vs_now = create_vsymbol (id_fresh "'now") ty_mark
 
 let ls_absurd = create_lsymbol (id_fresh "absurd") [] None
 let t_absurd  = ps_app ls_absurd []
@@ -70,7 +68,13 @@ let to_term t = if t.t_ty = None then mk_t_if t else t
 let old_mark lab t = t_subst_single vs_old (t_var lab) t
 
 (* replace [at(t,lab)] with [at(t,'now)] everywhere in formula [f] *)
-let erase_mark lab t = t_subst_single lab (t_var vs_now) t
+let erase_mark lab t = t_subst_single lab t_now t
+
+(* TODO: explain this *)
+let relativize fn q xq =
+  let lab = fresh_mark () in
+  let f = fn (old_mark lab q) (Mexn.map (old_mark lab) xq) in
+  erase_mark lab f
 
 (* replace [at(t,now)] with [t] modulo variable renaming *)
 let rec drop_at now m t = match t.t_node with
@@ -78,11 +82,13 @@ let rec drop_at now m t = match t.t_node with
       begin try t_var (Mvs.find vs m) with Not_found -> t end
   | Tapp (ls, _) when ls_equal ls fs_old ->
       assert false
-  | Tapp (ls, [e;{t_node = Tvar lab}]) when ls_equal ls fs_at ->
-      if vs_equal lab vs_old then assert false else
-      if vs_equal lab vs_now then drop_at true m e else
-      (* no longer assume that unmarked variables are at mark 'now *)
-      t_map (drop_at false m) t
+  | Tapp (ls, [e; mark]) when ls_equal ls fs_at ->
+      begin match mark.t_node with
+        | Tvar vs when vs_equal vs vs_old -> assert false
+        | Tapp (ls,[]) when ls_equal ls fs_now -> drop_at true m e
+        (* no longer assume that unmarked variables are at 'now *)
+        | _ -> t_map (drop_at false m) t
+      end
   | Tlet _ | Tcase _ | Teps _ | Tquant _ ->
       (* do not open unless necessary *)
       let m = Mvs.set_inter m t.t_vars in
@@ -293,10 +299,11 @@ let wp_label e f =
   let lab = Ident.Slab.union e.e_label f.t_label in
   t_label ?loc lab f
 
-let expl_assert = Ident.create_label "expl:assertion"
-let expl_check  = Ident.create_label "expl:check"
+let expl_pre    = Ident.create_label "expl:precondition"
 let expl_post   = Ident.create_label "expl:normal postcondition"
 let expl_xpost  = Ident.create_label "expl:exceptional postcondition"
+let expl_assert = Ident.create_label "expl:assertion"
+let expl_check  = Ident.create_label "expl:check"
 
 let wp_expl l f =
   let lab = Slab.add Split_goal.stop_split f.t_label in
@@ -317,6 +324,7 @@ let wp_let v t f = t_let_close_simp v t f
 let regs_of_reads  eff = Sreg.union eff.eff_reads eff.eff_ghostr
 let regs_of_writes eff = Sreg.union eff.eff_writes eff.eff_ghostw
 let regs_of_effect eff = Sreg.union (regs_of_reads eff) (regs_of_writes eff)
+let exns_of_raises eff = Sexn.union eff.eff_raises eff.eff_ghostx
 
 let t_void = fs_app (fs_tuple 0) [] ty_unit
 
@@ -451,11 +459,7 @@ let quantify env regs f =
 (** Weakest preconditions *)
 
 let rec wp_expr env e q xq =
-  let lab = fresh_mark () in
-  let q = old_mark lab q in
-  let xq = Mexn.map (old_mark lab) xq in
-  let f = wp_desc env e q xq in
-  let f = erase_mark lab f in
+  let f = relativize (wp_desc env e) q xq in
   if Debug.test_flag debug then begin
     Format.eprintf "@[--------@\n@[<hov 2>e = %a@]@\n" Mlw_pretty.print_expr e;
     Format.eprintf "@[<hov 2>q = %a@]@\n" Pretty.print_term q;
@@ -544,14 +548,42 @@ and wp_desc env e q xq = match e.e_node with
       wp_implies (wp_label e f) q
   | Eabsurd ->
       wp_label e t_absurd
+  | Eany tyc ->
+      let p = wp_label e (wp_expl expl_pre tyc.c_pre) in
+      let p = t_label ?loc:e.e_loc p.t_label p in
+      (* TODO: propagate call labels into tyc.c_post *)
+      let w = wp_abstract env tyc.c_effect tyc.c_post tyc.c_xpost q xq in
+      wp_and ~sym:false p w (* FIXME? do we need pre? *)
 
   (* TODO *)
   |Eabstr (_, _, _)-> t_true
   |Efor (_, _, _, _)-> t_true
   |Eloop (_, _, _)-> t_true
-  |Eany _-> t_true
   |Eassign (_, _, _)-> t_true
   |Eapp (_, _)-> t_true
+
+and wp_abstract env c_eff c_q c_xq q xq =
+  let regs = regs_of_writes c_eff in
+  let exns = exns_of_raises c_eff in
+  let quantify_post c_q q =
+    let v, f = open_post q in
+    let c_v, c_f = open_post c_q in
+    let c_f = t_subst_single c_v (t_var v) c_f in
+    (* TODO: optimize the case c_f == (... /\ v = t /\ ...) *)
+    let f = wp_forall [v] (wp_implies c_f f) in
+    quantify env regs f
+  in
+  let quantify_xpost _ c_xq xq =
+    Some (quantify_post c_xq xq) in
+  let proceed c_q c_xq =
+    let f = quantify_post c_q q in
+    (* every xs in exns is guaranteed to be in c_xq and xq *)
+    let xq = Mexn.set_inter xq exns in
+    let c_xq = Mexn.set_inter c_xq exns in
+    let mexn = Mexn.inter quantify_xpost c_xq xq in
+    wp_ands ~sym:true (f :: Mexn.values mexn)
+  in
+  relativize proceed c_q c_xq
 
 and wp_lambda env l =
   let q = wp_expl expl_post l.l_post in
@@ -611,6 +643,8 @@ let bool_to_prop env f =
   f_btop f
 ***)
 
+(* FIXME? Do we need this? *)
+(*
 (* replace every occurrence of [at(t,'now)] with [t] *)
 let rec remove_at f = match f.t_node with
   | Tapp (ls, [t;{t_node = Tvar lab}])
@@ -618,6 +652,7 @@ let rec remove_at f = match f.t_node with
       remove_at t
   | _ ->
       t_map remove_at f
+*)
 
 (* replace t_absurd with t_false *)
 let rec unabsurd f = match f.t_node with
@@ -634,7 +669,7 @@ let add_wp_decl name f uc =
   let id = id_fresh ~label ?loc:name.id_loc s in
   let pr = create_prsymbol id in
   (* prepare the VC formula *)
-  let f = remove_at f in
+  (* let f = remove_at f in *)
   (* let f = bool_to_prop uc f in *)
   let f = unabsurd f in
   (* get a known map with tuples added *)

@@ -35,8 +35,8 @@ val fs_at  : Term.lsymbol
 
 val th_mark : Theory.theory
 
-val fs_setmark : Term.lsymbol
-val e_setmark  : expr
+val fs_now : Term.lsymbol
+val e_now  : expr
 
 (** Weakest preconditions *)
 
