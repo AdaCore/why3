@@ -116,29 +116,30 @@ let rec check_spec vty tyv = match vty, tyv with
       check_spec vta.vta_result tyc.c_result
   | _ -> assert false
 
-let rec filter_v ~strict varm vars = function
+let rec filter_v varm vars = function
   | SpecA (pvl, tyc) ->
       let varm = List.fold_right add_pv_varm pvl varm in
       let vars = List.fold_right add_pv_vars pvl vars in
-      SpecA (pvl, filter_c ~strict varm vars tyc)
+      SpecA (pvl, filter_c varm vars tyc)
   | tyv -> tyv
 
-and filter_c ~strict varm vars tyc =
-  let result = filter_v ~strict varm vars tyc.c_result in
+and filter_c varm vars tyc =
+  let add _ f s = Mvs.set_union f.t_vars s in
+  let vss = add () tyc.c_pre tyc.c_post.t_vars in
+  let vss = Mexn.fold add tyc.c_xpost vss in
+  let check { vs_name = id } _ = if not (Mid.mem id varm) then
+    Loc.errorm "Local variable %s escapes from its scope" id.id_string in
+  Mvs.iter check vss;
+  let result = filter_v varm vars tyc.c_result in
   let effect = eff_filter vars tyc.c_effect in
-  if strict then begin
-    let add _ f s = Mvs.set_union f.t_vars s in
-    let vss = add () tyc.c_pre tyc.c_post.t_vars in
-    let vss = Mexn.fold add tyc.c_xpost vss in
-    let check { vs_name = id } _ = if not (Mid.mem id varm) then
-      Loc.errorm "Local variable %s escapes from its scope" id.id_string in
-    Mvs.iter check vss
-  end;
   { tyc with c_effect = effect; c_result = result }
 
-let add_psymbol_spec ~strict varm ps tyv =
+let add_psymbol_spec varm ps tyv =
   let vars = Mid.fold (fun _ -> vars_union) varm vars_empty in
-  let tyv = filter_v ~strict varm vars tyv in
+  let tyv = filter_v varm vars tyv in
+  if Debug.test_flag debug then
+    Format.eprintf "@[<hov 2>SPEC %a = %a@]@\n"
+      Mlw_pretty.print_psty ps Mlw_pretty.print_type_v tyv;
   check_spec (VTarrow ps.ps_vta) tyv; (* TODO: prove and remove *)
   Wps.set psymbol_spec_t ps tyv
 
@@ -190,35 +191,35 @@ let spec_lambda l tyv =
   SpecA (l.l_args, tyc)
 
 let spec_val vd = match vd.val_name with
-  | LetA ps -> add_psymbol_spec ~strict:true vd.val_vars ps vd.val_spec
+  | LetA ps -> add_psymbol_spec vd.val_vars ps vd.val_spec
   | LetV _  -> ()
 
-let rec spec_let ~strict pvm { let_var = lv; let_expr = e } = match lv with
-  | LetA ps -> add_psymbol_spec ~strict e.e_vars ps (spec_expr pvm e)
-  | LetV _  -> ignore (spec_expr pvm e)
+let rec spec_let { let_var = lv; let_expr = e } = match lv with
+  | LetA ps -> add_psymbol_spec e.e_vars ps (spec_expr e)
+  | LetV _  -> ignore (spec_expr e)
 
-and spec_rec pvm rdl =
+and spec_rec rdl =
   let add_vars m rd = Mid.set_union m rd.rec_vars in
   let vars = List.fold_left add_vars Mid.empty rdl in
   let add_early_spec rd = match rd.rec_lambda.l_expr.e_vty with
     | VTvalue vtv ->
         let tyv = spec_lambda rd.rec_lambda (SpecV vtv) in
-        add_psymbol_spec ~strict:true rd.rec_vars rd.rec_ps tyv
+        add_psymbol_spec rd.rec_vars rd.rec_ps tyv
     | VTarrow _ when Mid.mem rd.rec_ps.ps_name vars ->
         Loc.errorm ?loc:rd.rec_lambda.l_expr.e_loc
           "The body of a recursive function must be a first-order value"
     | VTarrow _ -> () in
   List.iter add_early_spec rdl;
   let add_late_spec rd =
-    let tyv = spec_expr pvm rd.rec_lambda.l_expr in
+    let tyv = spec_expr rd.rec_lambda.l_expr in
     match rd.rec_lambda.l_expr.e_vty with
     | VTarrow _ ->
         let tyv = spec_lambda rd.rec_lambda tyv in
-        add_psymbol_spec ~strict:true rd.rec_vars rd.rec_ps tyv
+        add_psymbol_spec rd.rec_vars rd.rec_ps tyv
     | VTvalue _ -> () in
   List.iter add_late_spec rdl
 
-and spec_expr pvm e = match e.e_node with
+and spec_expr e = match e.e_node with
   | Elogic _
   | Eassert _
   | Eabsurd -> SpecV (vtv_of_expr e)
@@ -240,8 +241,8 @@ and spec_expr pvm e = match e.e_node with
       let tyv = Wps.find psymbol_spec_t ps in
       spec_inst_v sbs tvm Mvs.empty tyv
   | Eapp (e1,pv) ->
-      let tyv = spec_expr pvm e1 in
-      let t = Mpv.find_def (t_var pv.pv_vs) pv pvm in
+      let tyv = spec_expr e1 in
+      let t = t_var pv.pv_vs in
       begin match tyv with
         | SpecA ([pv],tyc) ->
             let tyc = subst_c pv t tyc in
@@ -254,39 +255,31 @@ and spec_expr pvm e = match e.e_node with
         | _ -> assert false
       end
   | Elet (ld,e1) ->
-      spec_let ~strict:false pvm ld;
-      let pvm = match ld.let_var, e1.e_node with
-        | LetV pv, Elogic t ->
-            Mpv.add pv (to_term t) pvm
-        | LetV pv, Evalue v ->
-            let t = Mpv.find_def (t_var v.pv_vs) v pvm in
-            Mpv.add pv t pvm
-        | _ -> pvm
-      in
-      spec_expr pvm e1
+      spec_let ld;
+      spec_expr e1
   | Erec (rdl,e1) ->
-      spec_rec pvm rdl;
-      spec_expr pvm e1
-  | Eghost e1 -> spec_expr pvm e1
+      spec_rec rdl;
+      spec_expr e1
+  | Eghost e1 -> spec_expr e1
   | Eany tyc -> tyc.c_result
   | Eassign (e1,_,_)
   | Eloop (_,_,e1)
   | Efor (_,_,_,e1)
   | Eraise (_,e1)
   | Eabstr (e1,_,_) ->
-      ignore (spec_expr pvm e1);
+      ignore (spec_expr e1);
       SpecV (vtv_of_expr e)
   | Eif (e1,e2,e3) ->
-      ignore (spec_expr pvm e1);
-      ignore (spec_expr pvm e2);
-      spec_expr pvm e3
+      ignore (spec_expr e1);
+      ignore (spec_expr e2);
+      spec_expr e3
   | Ecase (e1,bl) ->
-      ignore (spec_expr pvm e1);
-      List.iter (fun (_,e) -> ignore (spec_expr pvm e)) bl;
+      ignore (spec_expr e1);
+      List.iter (fun (_,e) -> ignore (spec_expr e)) bl;
       SpecV (vtv_of_expr e)
   | Etry (e1,bl) ->
-      ignore (spec_expr pvm e1);
-      List.iter (fun (_,_,e) -> ignore (spec_expr pvm e)) bl;
+      ignore (spec_expr e1);
+      List.iter (fun (_,_,e) -> ignore (spec_expr e)) bl;
       SpecV (vtv_of_expr e)
 
 (** WP utilities *)
@@ -325,6 +318,7 @@ let wp_forall vl f = t_forall_close_simp vl [] f
 
 let wp_let v t f = t_let_close_simp v t f
 
+(* TODO: put this into abstract/opaque wp, it's only relevant there *)
 (*
 match f.t_node with
   | Tbinop (Timplies, {t_node = Tapp (s,[{t_node = Tvar u};r])},h)
@@ -494,18 +488,19 @@ and wp_desc env e q xq = match e.e_node with
   | Eabsurd ->
       wp_label e t_absurd
 
-  |Eabstr (_, _, _)-> assert false
-  |Etry (_, _)-> assert false
-  |Eraise (_, _)-> assert false
-  |Efor (_, _, _, _)-> assert false
-  |Eloop (_, _, _)-> assert false
-  |Eany _-> assert false
-  |Eghost _-> assert false
-  |Eassign (_, _, _)-> assert false
-  |Ecase (_, _)-> assert false
-  |Eif (_, _, _)-> assert false
-  |Elet (_, _)-> assert false
-  |Eapp (_, _)-> assert false
+  (* TODO *)
+  |Eabstr (_, _, _)-> t_true
+  |Etry (_, _)-> t_true
+  |Eraise (_, _)-> t_true
+  |Efor (_, _, _, _)-> t_true
+  |Eloop (_, _, _)-> t_true
+  |Eany _-> t_true
+  |Eghost _-> t_true
+  |Eassign (_, _, _)-> t_true
+  |Ecase (_, _)-> t_true
+  |Eif (_, _, _)-> t_true
+  |Elet (_, _)-> t_true
+  |Eapp (_, _)-> t_true
 
 and wp_lambda env l =
   let q = wp_expl "normal postcondition" l.l_post in
@@ -606,7 +601,7 @@ let mk_env env km th = {
 }
 
 let wp_let env km th ({ let_var = lv; let_expr = e } as ld) =
-  spec_let ~strict:true Mpv.empty ld;
+  spec_let ld;
   let env = mk_env env km th in
   let q, xq = default_post e.e_vty e.e_effect in
   let f = wp_expr env e q xq in
@@ -617,7 +612,7 @@ let wp_let env km th ({ let_var = lv; let_expr = e } as ld) =
   add_wp_decl id f th
 
 let wp_rec env km th rdl =
-  spec_rec Mpv.empty rdl;
+  spec_rec rdl;
   let env = mk_env env km th in
   let fl = wp_rec_defn env rdl in
   let add_one th d f =
