@@ -327,10 +327,15 @@ let th_unit =
   let uc = Theory.add_ty_decl uc ts in
   close_theory uc
 
+let pd_exit =
+  let xs = create_xsymbol (id_fresh "%Exit") ity_unit in
+  create_exn_decl xs
+
 let create_module env ?(path=[]) n =
   let m = empty_module env n path in
   let m = use_export_theory m bool_theory in
   let m = use_export_theory m th_unit in
+  let m = add_pdecl m pd_exit in
   m
 
 (** Clone *)

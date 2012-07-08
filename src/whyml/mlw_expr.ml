@@ -555,24 +555,19 @@ let add_e_vars e m = varmap_union e.e_vars m
 let e_value pv =
   mk_expr (Evalue pv) (VTvalue pv.pv_vtv) eff_empty (add_pv_vars pv Mid.empty)
 
-let e_inst ps sbs =
-  (* we only count the fixed type variables and regions of ps, so that
-     type variables and regions introduced by the substitution could be
-     generalized in this expression *)
-  let vars = Mid.singleton ps.ps_name ps.ps_vars in
-  let vta = vta_full_inst (ity_subst_union ps.ps_subst sbs) ps.ps_vta in
-  mk_expr (Earrow ps) (VTarrow vta) eff_empty vars
+exception ValueExpected of expr
+exception ArrowExpected of expr
 
-let e_cast ps vty =
-  let rec vty_match sbs t1 t2 = match t1,t2 with
-    | VTvalue v1, VTvalue v2 ->
-        ity_match sbs v1.vtv_ity v2.vtv_ity
-    | VTarrow a1, VTarrow a2 ->
-        let sbs = ity_match sbs a1.vta_arg.vtv_ity a2.vta_arg.vtv_ity in
-        vty_match sbs a1.vta_result a2.vta_result
-    | _ -> invalid_arg "Mlw_expr.e_cast"
-  in
-  let sbs = vty_match ps.ps_subst (VTarrow ps.ps_vta) vty in
+let vtv_of_expr e = match e.e_vty with
+  | VTvalue vtv -> vtv
+  | VTarrow _ -> Loc.error ?loc:e.e_loc (ValueExpected e)
+
+let vta_of_expr e = match e.e_vty with
+  | VTvalue _ -> Loc.error ?loc:e.e_loc (ArrowExpected e)
+  | VTarrow vta -> vta
+
+let e_arrow ps vta =
+  let sbs = vta_vars_match ps.ps_subst ps.ps_vta vta in
   let vars = Mid.singleton ps.ps_name ps.ps_vars in
   let vta = vta_full_inst sbs ps.ps_vta in
   mk_expr (Earrow ps) (VTarrow vta) eff_empty vars
@@ -629,14 +624,8 @@ let e_let ({ let_var = lv ; let_expr = d } as ld) e =
   let eff = eff_union d.e_effect e.e_effect in
   mk_expr (Elet (ld,e)) e.e_vty eff (add_e_vars d vars)
 
-exception ValueExpected of expr
-exception ArrowExpected of expr
-
 let e_app_real e pv =
-  let vta = match e.e_vty with
-    | VTvalue _ -> Loc.error ?loc:e.e_loc (ArrowExpected e)
-    | VTarrow vta -> vta in
-  let eff,vty = vty_app_arrow vta pv.pv_vtv in
+  let eff,vty = vty_app_arrow (vta_of_expr e) pv.pv_vtv in
   check_postexpr e eff (add_pv_vars pv Mid.empty);
   let eff = eff_union e.e_effect eff in
   mk_expr (Eapp (e,pv)) vty eff (add_pv_vars pv e.e_vars)
@@ -692,10 +681,6 @@ let on_value fn e = match e.e_node with
    the region introduced (reset) by create_ref. Is it bad? *)
 
 let e_app = List.fold_left (fun e -> on_value (e_app_real e))
-
-let vtv_of_expr e = match e.e_vty with
-  | VTvalue vtv -> vtv
-  | VTarrow _ -> Loc.error ?loc:e.e_loc (ValueExpected e)
 
 let e_plapp pls el ity =
   if pls.pl_hidden then raise (HiddenPLS pls.pl_ls);
@@ -1009,7 +994,7 @@ let ps_compat ps1 ps2 =
 
 let rec expr_subst psm e = match e.e_node with
   | Earrow ps when Mid.mem ps.ps_name psm ->
-      e_cast (Mid.find ps.ps_name psm) e.e_vty
+      e_arrow (Mid.find ps.ps_name psm) (vta_of_expr e)
   | Eapp (e,pv) ->
       e_app_real (expr_subst psm e) pv
   | Elet ({ let_var = LetV pv ; let_expr = d }, e) ->

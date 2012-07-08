@@ -236,14 +236,13 @@ val e_label_add : label -> expr -> expr
 val e_label_copy : expr -> expr -> expr
 
 val e_value : pvsymbol -> expr
-
-val e_inst : psymbol -> ity_subst -> expr
-val e_cast : psymbol -> vty -> expr
+val e_arrow : psymbol -> vty_arrow -> expr
 
 exception ValueExpected of expr
 exception ArrowExpected of expr
 
 val vtv_of_expr : expr -> vty_value
+val vta_of_expr : expr -> vty_arrow
 
 exception GhostWrite of expr * region
 exception GhostRaise of expr * xsymbol

@@ -823,7 +823,11 @@ and expr_desc lenv loc de = match de.de_desc with
       assert (Mstr.mem x lenv.let_vars);
       begin match Mstr.find x lenv.let_vars with
       | LetV pv -> e_value pv
-      | LetA ps -> e_cast ps (vty_of_dvty de.de_type)
+      | LetA ps ->
+          begin match vty_of_dvty de.de_type with
+            | VTarrow vta -> e_arrow ps vta
+            | VTvalue _ -> assert false
+          end
       end
   | DElet (x, gh, { de_desc = DEfun lam }, de2) ->
       let def = expr_fun lenv x gh lam in
@@ -833,13 +837,13 @@ and expr_desc lenv loc de = match de.de_desc with
   | DEfun lam ->
       let x = mk_id "fn" loc in
       let def = expr_fun lenv x false lam in
-      let e2 = e_cast def.rec_ps (VTarrow def.rec_ps.ps_vta) in
+      let e2 = e_arrow def.rec_ps def.rec_ps.ps_vta in
       e_rec [def] e2
   (* FIXME? (ghost "lab" fun x -> ...) loses the label "lab" *)
   | DEghost { de_desc = DEfun lam } ->
       let x = mk_id "fn" loc in
       let def = expr_fun lenv x true lam in
-      let e2 = e_cast def.rec_ps (VTarrow def.rec_ps.ps_vta) in
+      let e2 = e_arrow def.rec_ps def.rec_ps.ps_vta in
       e_rec [def] e2
   | DElet (x, gh, de1, de2) ->
       let e1 = e_ghostify gh (expr lenv de1) in
@@ -867,7 +871,10 @@ and expr_desc lenv loc de = match de.de_desc with
   | DEglobal_pv pv ->
       e_value pv
   | DEglobal_ps ps ->
-      e_cast ps (vty_of_dvty de.de_type)
+      begin match vty_of_dvty de.de_type with
+        | VTarrow vta -> e_arrow ps vta
+        | VTvalue _ -> assert false
+      end
   | DEglobal_pl pl ->
       e_plapp pl [] (ity_of_dity (snd de.de_type))
   | DEglobal_ls ls ->

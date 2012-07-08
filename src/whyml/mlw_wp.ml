@@ -228,15 +228,7 @@ and spec_expr e = match e.e_node with
     (* TODO: a ps may not be in the table, if it comes from a module
        for which we never computed WPs. Pass the known_map to spec_expr
        and compute it now. *)
-      let rec vty_match sbs t1 t2 = match t1,t2 with
-        | VTvalue v1, VTvalue v2 ->
-            ity_match sbs v1.vtv_ity v2.vtv_ity
-        | VTarrow a1, VTarrow a2 ->
-            let sbs = ity_match sbs a1.vta_arg.vtv_ity a2.vta_arg.vtv_ity in
-            vty_match sbs a1.vta_result a2.vta_result
-        | _ -> assert false
-      in
-      let sbs = vty_match ps.ps_subst (VTarrow ps.ps_vta) e.e_vty in
+      let sbs = vta_vars_match ps.ps_subst ps.ps_vta (vta_of_expr e) in
       let tvm = Mtv.map ty_of_ity sbs.ity_subst_tv in
       let tyv = Wps.find psymbol_spec_t ps in
       spec_inst_v sbs tvm Mvs.empty tyv

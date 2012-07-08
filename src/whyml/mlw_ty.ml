@@ -37,7 +37,7 @@ module rec T : sig
   type itysymbol = {
     its_pure : tysymbol;
     its_args : tvsymbol list;
-    its_regs : region   list;
+    its_regs : region list;
     its_def  : ity option;
     its_abst : bool;
     its_priv : bool;
@@ -708,6 +708,13 @@ let vty_app_arrow vta vtv =
        of every ghost expression is properly ghostified *)
   effect, result
 
+let rec vta_vars_match s vta1 vta2 =
+  let s = ity_match s vta1.vta_arg.vtv_ity vta2.vta_arg.vtv_ity in
+  match vta1.vta_result, vta2.vta_result with
+  | VTarrow vta1, VTarrow vta2 -> vta_vars_match s vta1 vta2
+  | VTvalue vtv1, VTvalue vtv2 -> ity_match s vtv1.vtv_ity vtv2.vtv_ity
+  | _ -> invalid_arg "Mlw_ty.vta_vars_match"
+
 (* vty instantiation *)
 
 let vtv_full_inst s vtv =
@@ -737,231 +744,3 @@ let rec vta_filter vars a =
   let rst = eff_filter (vty_vars vars a.vta_result) rst in
   let eff = { eff with eff_resets = rst.eff_resets } in
   vty_arrow ~ghost:a.vta_ghost ~effect:eff a.vta_arg vty
-
-(** THE FOLLOWING CODE MIGHT BE USEFUL LATER FOR WPgen *)
-(*
-(* program variables *)
-type pvsymbol = {
-  pv_vs      : vsymbol;
-  pv_ity     : ity;
-  pv_ghost   : bool;
-  pv_mutable : region option;
-  pv_tvs     : Stv.t;
-  pv_regs    : Sreg.t;
-}
-
-module Pv = StructMake (struct
-  type t = pvsymbol
-  let tag pv = Hashweak.tag_hash pv.pv_vs.vs_name.id_tag
-end)
-
-module Spv = Pv.S
-module Mpv = Pv.M
-
-let pv_equal : pvsymbol -> pvsymbol -> bool = (==)
-
-exception InvalidPVsymbol of ident
-
-let create_pvsymbol id ?mut ?(ghost=false) ity =
-  let ty = ty_of_ity ity in
-  let vs = create_vsymbol id ty in
-  begin match mut with
-    | Some r when
-      (* A ghost variable may contain a non-ghost region.
-         No writes are allowed in such a ghost variable. *)
-      not (ity_equal r.reg_ity ity) || (r.reg_ghost && not ghost) ->
-        raise (InvalidPVsymbol vs.vs_name)
-    | _ ->
-        ()
-  end;
-  let tvs = ity_freevars Stv.empty ity in
-  let regs = ity_topregions Sreg.empty ity in
-  let regs = option_fold (fun s r -> Sreg.add r s) regs mut in
-  { pv_vs      = vs;
-    pv_ity     = ity;
-    pv_ghost   = ghost;
-    pv_mutable = mut;
-    pv_tvs     = tvs;
-    pv_regs    = regs;
-  }
-
-let pv_clone pv =
-  let id = id_clone pv.pv_vs.vs_name in
-  let vs = create_vsymbol id pv.pv_vs.vs_ty in
-  { pv with pv_vs = vs }
-
-let pv_full_inst s pv =
-  let ghost = pv.pv_ghost in
-  let mut = option_map (reg_full_inst s) pv.pv_mutable in
-  let ity = ity_full_inst s pv.pv_ity in
-  create_pvsymbol (id_clone pv.pv_vs.vs_name) ~ghost ?mut ity
-
-(* value types *)
-
-type vty =
-  | VTvalue of pvsymbol
-  | VTarrow of vty_arrow
-
-(* computation types *)
-and vty_arrow = {
-  a_arg   : pvsymbol;
-  a_vty   : vty;
-  a_eff   : effect;
-  a_pre   : term; (* epsilon under a dummy variable, to accumulate substs *)
-  a_post  : term; (* epsilon under the value variable or under a dummy vs *)
-  a_xpost : term Mexn.t; (* epsilon under the exception value variable *)
-  a_tvs   : Stv.t; (* we do not count type variables in eff/pre/post/xpost *)
-  a_regs  : Sreg.t; (* we do not count regions in eff/pre/post/xpost *)
-}
-
-type pre = term
-type post = term
-type xpost = (vsymbol * post) Mexn.t
-
-type vty_comp = {
-  c_vty   : vty;
-  c_eff   : effect;
-  c_pre   : pre;
-  c_post  : post;
-  c_xpost : xpost;
-}
-
-let vty_freevars s = function
-  | VTvalue pv -> Stv.union s pv.pv_tvs
-  | VTarrow a  -> Stv.union s a.a_tvs
-
-let vty_topregions s = function
-  | VTvalue pv -> Sreg.union s pv.pv_regs
-  | VTarrow a  -> Sreg.union s a.a_regs
-
-(* smart constructors *)
-
-let vty_value pvs = VTvalue pvs
-
-exception InvalidExceptionPost of xsymbol
-
-(* this vs is used to close pre- and post-conditions in order
-   to accumulate substitutions into a_arg pvsymbols *)
-
-let close_spec =
-  let dummy = create_vsymbol (id_fresh "dummy") ty_int in
-  let dumbf = t_eps_close dummy t_true in
-  function
-    | { t_node = Ttrue } -> dumbf
-    | f -> t_eps_close dummy f
-
-let open_spec = function
-  | { t_node = Teps bf } -> t_open_bound bf
-  | _ -> assert false
-
-let vty_arrow
-  x ?(pre=t_true) ?(post=t_true) ?(xpost=Mexn.empty) ?(effect=eff_empty) vty =
-  (* check for clashes *)
-(* let check_vs y = if vs_equal x.pv_vs y then raise (DuplicateVar y) in *)
-  let check_pv y = if pv_equal x y then raise (DuplicateVar x.pv_vs) in
-  let rec check = function
-    | VTarrow a ->
-     (* Mexn.iter (fun _ (y,_) -> check_vs y) a.a_xpost; *)
-        check_pv a.a_arg;
-        check a.a_vty
-    | VTvalue y ->
-        check_pv y
-  in
-  check vty;
-  (* check that every raised exception is mentioned in xpost *)
-  if not (Mexn.set_submap effect.eff_raises xpost) then
-    (let d = Mexn.set_diff xpost effect.eff_raises in
-    raise (InvalidExceptionPost (fst (Mexn.choose d))));
-  (* check that every exception mentioned in xpost is raised *)
-  if not (Mexn.set_submap xpost effect.eff_raises) then
-    (let d = Mexn.set_diff effect.eff_raises xpost in
-    raise (InvalidExceptionPost (fst (Mexn.choose d))));
-  (* check that vsymbols in xpost have valid types *)
-  let conv_xpost xs (vs,f) =
-    if not (ty_equal (ty_of_ity xs.xs_ity) vs.vs_ty)
-    then raise (InvalidExceptionPost xs);
-    (* check_vs vs; *)
-    t_eps_close vs f
-  in
-  let post = match vty with
-    | VTvalue pv -> t_eps_close pv.pv_vs post
-    | VTarrow _  -> close_spec post
-  in
-  VTarrow {
-    a_arg   = x;
-    a_vty   = vty;
-    a_eff   = effect;
-    a_pre   = close_spec pre;
-    a_post  = post;
-    a_xpost = Mexn.mapi conv_xpost xpost;
-    a_tvs   = vty_freevars x.pv_tvs vty;
-    a_regs  = vty_topregions x.pv_regs vty;
-  }
-
-(*
-exception NotAFunction
-
-let get_arrow = function
-  | VTvalue _ -> raise NotAFunction
-  | VTarrow a -> a
-*)
-
-let vty_app_arrow arr x =
-  ity_equal_check arr.a_arg.pv_ity x.pv_ity;
-  let subst f = t_subst_single arr.a_arg.pv_vs (t_var x.pv_vs) f in
-  let _,pre = open_spec (subst arr.a_pre) in
-  let res,post = open_spec (subst arr.a_post) in
-  let xsubst e = open_spec (subst e) in
-  let rec arr_subst arr = { arr with
-    a_vty   = (match arr.a_vty with
-      | VTarrow a -> VTarrow (arr_subst a)
-      | VTvalue _ -> arr.a_vty);
-    a_pre   = subst arr.a_pre;
-    a_post  = subst arr.a_post;
-    a_xpost = Mexn.map subst arr.a_xpost;
-  }
-  in
-  let vty = match arr.a_vty with
-    (* here we make a new pvsymbol in a bad fashion. It should however
-       be safe, since res comes from t_open_bound and is guaranteed to
-       be fresh, so there can be no illegal sharing of idents *)
-    | VTvalue pv -> VTvalue { pv with pv_vs = res }
-    | VTarrow a  -> VTarrow (arr_subst a)
-  in {
-    c_vty   = vty;
-    c_eff   = arr.a_eff;
-    c_pre   = pre;
-    c_post  = post;
-    c_xpost = Mexn.map xsubst arr.a_xpost;
-  }
-
-let open_vty_arrow arr =
-  let pv = pv_clone arr.a_arg in
-  let c = vty_app_arrow arr pv in
-  pv, c.c_vty
-
-let vty_full_inst s vty =
-  let subT = Mtv.map ty_of_ity s.ity_subst_tv in
-  let rec inst subV = function
-    | VTvalue pv ->
-        (* this is not the same vsymbol anymore that is bound in
-           the preceding post. However, this should not matter. *)
-        VTvalue (pv_full_inst s pv)
-    | VTarrow a ->
-        let x = pv_full_inst s a.a_arg in
-        let subV = Mvs.add a.a_arg.pv_vs (t_var x.pv_vs) subV in
-        let subst = t_ty_subst subT subV in
-        let vty = inst subV a.a_vty in
-        VTarrow {
-          a_arg   = x;
-          a_vty   = vty;
-          a_eff   = eff_full_inst s a.a_eff;
-          a_pre   = subst a.a_pre;
-          a_post  = subst a.a_post;
-          a_xpost = Mexn.map subst a.a_xpost;
-          a_tvs   = vty_freevars x.pv_tvs vty;
-          a_regs  = vty_topregions x.pv_regs vty;
-        }
-  in
-  inst Mvs.empty vty
-*)

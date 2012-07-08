@@ -9,6 +9,31 @@ WhyML
     subregion rho' of rho is not, should we reset rho' under rho?
     In Mlw_typing or in Mlw_expr?
 
+  - current WP does not respect the lexical scope. In the program
+
+      let r = create 0 in
+      let v = !r in
+      incr r;
+      let () =
+        let v = !r in
+        ()
+      in
+      assert { v = 1 }
+
+    the last assert will be proven if the same let_defn [let v = !r]
+    and therefore the same pvsymbol v is used in both places (which
+    can be done using API). One possible solution is to ensure the
+    one-time usage of let_defns and rec_defns in programs.
+
+  - are mutable values worth it? They can only appear as pattern
+    variables standing for mutable fields, and allow us to have
+    mutable fields in algebraic types. On the other hand, they
+    require tedious checks pretty much everywhere in the code,
+    and they cannot be translated to OCaml.
+
+  - get rid of %Exit, implement unit-typed "break" and "continue",
+    usable in all kinds of loops, including "for". Why the heck
+    aren't these in OCaml?
 
 syntaxe
 -------

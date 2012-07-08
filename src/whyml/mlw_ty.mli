@@ -36,7 +36,7 @@ module rec T : sig
   type itysymbol = private {
     its_pure : tysymbol;
     its_args : tvsymbol list;
-    its_regs : region   list;
+    its_regs : region list;
     its_def  : ity option;
     its_abst : bool;
     its_priv : bool;
@@ -245,8 +245,7 @@ and vty_arrow = private {
   vta_ghost  : bool;
   vta_vars   : varset;
   (* this varset covers every type variable and region in vta_arg
-     and vta_result, but may skip some type variables and regions
-     in vta_effect *)
+     and vta_result, but not necessarily in vta_effect *)
 }
 
 (* smart constructors *)
@@ -264,65 +263,16 @@ val vty_ghostify : vty -> vty
 
 val vtv_unmut : vty_value -> vty_value
 
-(* the substitution must cover not only vta.vta_tvs and vta.vta_regs
-   but also every type variable and every region in vta_effect *)
+(* this only compares the types of arguments and results, and ignores
+   the effects. In other words, only the type variables and regions
+   in .vta_vars are matched. The caller should supply a "freezing"
+   substitution that covers all external type variables and regions. *)
+val vta_vars_match : ity_subst -> vty_arrow -> vty_arrow -> ity_subst
+
+(* the substitution must cover not only vta_vars but also every
+   type variable and every region in vta_effect *)
 val vta_full_inst : ity_subst -> vty_arrow -> vty_arrow
 
 (* remove from the given arrow every effect that is covered
    neither by the arrow's vta_vars nor by the given varset *)
 val vta_filter : varset -> vty_arrow -> vty_arrow
-
-(** THE FOLLOWING CODE MIGHT BE USEFUL LATER FOR WPgen *)
-(*
-(* program variables *)
-type pvsymbol = private {
-  pv_vs      : vsymbol;
-  pv_ity     : ity;
-  pv_ghost   : bool;
-  pv_mutable : region option;
-  pv_tvs     : Stv.t;
-  pv_regs    : Sreg.t;
-}
-
-val create_pvsymbol : preid -> ?mut:region -> ?ghost:bool -> ity -> pvsymbol
-
-val pv_equal : pvsymbol -> pvsymbol -> bool
-
-(* value types *)
-
-type pre   = term (* precondition *)
-type post  = term (* postcondition *)
-type xpost = (vsymbol * post) Mexn.t (* exceptional postconditions *)
-
-type vty_arrow  (* pvsymbol -> vty_comp *)
-
-type vty = private
-  | VTvalue of pvsymbol
-  | VTarrow of vty_arrow
-
-type vty_comp = private {
-  c_vty   : vty;
-  c_eff   : effect;
-  c_pre   : pre;
-  c_post  : post;
-  c_xpost : xpost;
-}
-
-(* smart constructors *)
-val vty_value : pvsymbol -> vty
-
-val vty_arrow : pvsymbol ->
-  ?pre:term -> ?post:term -> ?xpost:xpost -> ?effect:effect -> vty -> vty
-
-val vty_app_arrow : vty_arrow -> pvsymbol -> vty_comp
-
-val open_vty_arrow : vty_arrow -> pvsymbol * vty
-
-val vty_freevars : Stv.t -> vty -> Stv.t (* only args and values count... *)
-val vty_topregions : Sreg.t -> vty -> Sreg.t (* ...not eff/pre/post/xpost *)
-
-(* the substitution must cover not only the vty_freevars and
-   vty_topregions of vty, but also every type variable and
-   every region in effects and pre/post/xpost formulas *)
-val vty_full_inst : ity_subst -> vty -> vty
-*)
