@@ -35,7 +35,9 @@ let debug = Debug.register_flag "whyml_wp"
 let ts_mark = create_tysymbol (id_fresh "'mark") [] None
 let ty_mark = ty_app ts_mark []
 
-let fresh_mark () = create_vsymbol (id_fresh "mark") ty_mark
+let vtv_mark = vty_value (ity_pur ts_mark [])
+
+let fresh_mark () = create_vsymbol (id_fresh "'mark") ty_mark
 
 let fs_at =
   let ty = ty_var (create_tvsymbol (id_fresh "a")) in
@@ -45,10 +47,15 @@ let fs_old =
   let ty = ty_var (create_tvsymbol (id_fresh "a")) in
   create_lsymbol (id_fresh "old") [ty] (Some ty)
 
-let th_mark =
-  let uc = create_theory (id_fresh "WP builtins") in
+let th_mark_at =
+  let uc = create_theory (id_fresh "WP builtins: at") in
   let uc = add_ty_decl uc ts_mark in
   let uc = add_param_decl uc fs_at in
+  close_theory uc
+
+let th_mark_old =
+  let uc = create_theory (id_fresh "WP builtins: old") in
+  let uc = use_export uc th_mark_at in
   let uc = add_param_decl uc fs_old in
   close_theory uc
 
@@ -56,13 +63,34 @@ let fs_now = create_lsymbol (id_fresh "'now") [] (Some ty_mark)
 let t_now = fs_app fs_now [] ty_mark
 let e_now = e_lapp fs_now [] (ity_pur ts_mark [])
 
-let vs_old = create_vsymbol (id_fresh "'old") ty_mark
+(* [vs_old] appears in the postconditions given to the core API,
+   which expects every vsymbol to be a pure part of a pvsymbol *)
+let pv_old = create_pvsymbol (id_fresh "'old") vtv_mark
+let vs_old = pv_old.pv_vs
+let t_old  = t_var vs_old
 
 let ls_absurd = create_lsymbol (id_fresh "absurd") [] None
 let t_absurd  = ps_app ls_absurd []
 
 let mk_t_if f = t_if f t_bool_true t_bool_false
 let to_term t = if t.t_ty = None then mk_t_if t else t
+
+(* any vs in post/xpost is either a pvsymbol or a fresh mark *)
+let vtv_of_vs vs =
+  try (restore_pv vs).pv_vtv with UnboundVar _ -> vtv_mark
+
+(* replace every occurrence of [old(t)] with [at(t,'old)] *)
+let rec remove_old f = match f.t_node with
+  | Tapp (ls,[t]) when ls_equal ls fs_old ->
+      t_app fs_at [remove_old t; t_old] f.t_ty
+  | _ -> t_map remove_old f
+
+(* FIXME? Do we need this? *)
+(* replace every occurrence of [at(t,'now)] with [t] *)
+let rec remove_at f = match f.t_node with
+  | Tapp (ls, [t; { t_node = Tapp (fs,[]) }])
+    when ls_equal ls fs_at && ls_equal fs fs_now -> remove_at t
+  | _ -> t_map remove_at f
 
 (* replace [at(t,'old)] with [at(t,lab)] everywhere in formula [f] *)
 let old_mark lab t = t_subst_single vs_old (t_var lab) t
@@ -326,7 +354,8 @@ let regs_of_writes eff = Sreg.union eff.eff_writes eff.eff_ghostw
 let regs_of_effect eff = Sreg.union (regs_of_reads eff) (regs_of_writes eff)
 let exns_of_raises eff = Sexn.union eff.eff_raises eff.eff_ghostx
 
-let t_void = fs_app (fs_tuple 0) [] ty_unit
+let fs_void = fs_tuple 0
+let t_void = fs_app fs_void [] ty_unit
 
 let open_unit_post q =
   let v, q = open_post q in
@@ -408,7 +437,7 @@ let update_var env mreg vs =
         t_close_branch pat t in
       t_case (t_var vs) (List.map branch csl)
   in
-  let vtv = (restore_pv vs).pv_vtv in
+  let vtv = vtv_of_vs vs in
   update Sts.empty vs vtv.vtv_ity vtv.vtv_mut
 
 (* quantify over all references in eff
@@ -435,7 +464,7 @@ let mk_var id label ty = create_vsymbol (id_clone ~label id) ty
 let quantify env regs f =
   (* mreg : updated region -> vs *)
   let get_var reg () =
-    let test vs _ id = match (restore_pv vs).pv_vtv with
+    let test vs _ id = match vtv_of_vs vs with
       | { vtv_ity = { ity_node = Ityapp (_,_,[r]) }}
       | { vtv_mut = Some r } when reg_equal r reg -> vs.vs_name
       | _ -> id in
@@ -471,6 +500,9 @@ and wp_desc env e q xq = match e.e_node with
   | Elogic t ->
       let v, q = open_post q in
       let t = wp_label e t in
+      (* NOTE: if you replace this t_subst by t_let or anything else,
+         you must handle separately the case "let mark = 'now in ...",
+         which requires 'now to be substituted for mark in q *)
       t_subst_single v (to_term t) q
   | Evalue pv ->
       let v, q = open_post q in
@@ -515,6 +547,17 @@ and wp_desc env e q xq = match e.e_node with
       in
       let q = create_post res w in
       wp_label e (wp_expr env e1 q xq)
+  (* optimization for the particular case let _ = e1 in e2 *)
+  | Ecase (e1, [{ ppat_pattern = { pat_node = Term.Pwild }}, e2]) ->
+      let w = wp_expr env e2 q xq in
+      let q = create_post (vs_result e1) w in
+      wp_label e (wp_expr env e1 q xq)
+  (* optimization for the particular case let () = e1 in e2 *)
+  | Ecase (e1, [{ ppat_pattern = { pat_node = Term.Papp (cs,[]) }}, e2])
+    when ls_equal cs fs_void ->
+      let w = wp_expr env e2 q xq in
+      let q = create_unit_post w in
+      wp_label e (wp_expr env e1 q xq)
   | Ecase (e1, bl) ->
       let res = vs_result e1 in
       let branch ({ ppat_pattern = pat }, e) =
@@ -554,13 +597,42 @@ and wp_desc env e q xq = match e.e_node with
       (* TODO: propagate call labels into tyc.c_post *)
       let w = wp_abstract env tyc.c_effect tyc.c_post tyc.c_xpost q xq in
       wp_and ~sym:false p w (* FIXME? do we need pre? *)
+  | Eapp (e1,_) when Wexpr.mem e_apply_spec_t e ->
+      let tyc = Wexpr.find e_apply_spec_t e in
+      let p = wp_label e (wp_expl expl_pre tyc.c_pre) in
+      let p = t_label ?loc:e.e_loc p.t_label p in
+      (* TODO: propagate call labels into tyc.c_post *)
+      let w = wp_abstract env tyc.c_effect tyc.c_post tyc.c_xpost q xq in
+      let w = wp_and ~sym:false p w in (* FIXME? do we need pre? *)
+      let q = create_unit_post w in
+      wp_expr env e1 q xq (* FIXME? should (wp_label e) rather be here? *)
+  | Eapp (e1,_) -> (* no effect, no pre, no post, no xpost *)
+      let v, q = open_post q in
+      let w = wp_forall [v] q in
+      let q = create_unit_post w in
+      wp_label e (wp_expr env e1 q xq)
+  | Eabstr (e1, c_q, c_xq) ->
+      let w1 = wp_expr env e1 c_q c_xq in
+      let w2 = wp_abstract env e1.e_effect c_q c_xq q xq in
+      wp_and ~sym:true (wp_label e w1) w2
+  | Eassign (e1, reg, pv) ->
+      let rec get_term d = match d.e_node with
+        | Elogic t -> t
+        | Evalue v -> t_var v.pv_vs
+        | Eghost e | Elet (_,e) | Erec (_,e) -> get_term e
+        | _ -> Loc.errorm ?loc:e.e_loc
+            "Cannot compute the WP for this assignment"
+      in
+      let f = t_equ (get_term e1) (t_var pv.pv_vs) in
+      let c_q = create_unit_post f in
+      let eff = eff_write eff_empty reg in
+      let w = wp_abstract env eff c_q Mexn.empty q xq in
+      let q = create_post (vs_result e1) w in
+      wp_label e (wp_expr env e1 q xq)
 
   (* TODO *)
-  |Eabstr (_, _, _)-> t_true
   |Efor (_, _, _, _)-> t_true
   |Eloop (_, _, _)-> t_true
-  |Eassign (_, _, _)-> t_true
-  |Eapp (_, _)-> t_true
 
 and wp_abstract env c_eff c_q c_xq q xq =
   let regs = regs_of_writes c_eff in
@@ -578,6 +650,8 @@ and wp_abstract env c_eff c_q c_xq q xq =
   let proceed c_q c_xq =
     let f = quantify_post c_q q in
     (* every xs in exns is guaranteed to be in c_xq and xq *)
+    assert (Mexn.set_submap exns xq);
+    assert (Mexn.set_submap exns c_xq);
     let xq = Mexn.set_inter xq exns in
     let c_xq = Mexn.set_inter c_xq exns in
     let mexn = Mexn.inter quantify_xpost c_xq xq in
@@ -643,17 +717,6 @@ let bool_to_prop env f =
   f_btop f
 ***)
 
-(* FIXME? Do we need this? *)
-(*
-(* replace every occurrence of [at(t,'now)] with [t] *)
-let rec remove_at f = match f.t_node with
-  | Tapp (ls, [t;{t_node = Tvar lab}])
-    when ls_equal ls fs_at && vs_equal lab vs_now ->
-      remove_at t
-  | _ ->
-      t_map remove_at f
-*)
-
 (* replace t_absurd with t_false *)
 let rec unabsurd f = match f.t_node with
   | Tapp (ls, []) when ls_equal ls ls_absurd ->
@@ -669,7 +732,7 @@ let add_wp_decl name f uc =
   let id = id_fresh ~label ?loc:name.id_loc s in
   let pr = create_prsymbol id in
   (* prepare the VC formula *)
-  (* let f = remove_at f in *)
+  (* let f = remove_at f in (* FIXME: do we need this? *) *)
   (* let f = bool_to_prop uc f in *)
   let f = unabsurd f in
   (* get a known map with tuples added *)

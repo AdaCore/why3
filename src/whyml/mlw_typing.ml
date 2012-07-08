@@ -635,13 +635,17 @@ and dlambda denv bl var (p, e, (q, xq)) =
 
 type lenv = {
   mod_uc   : module_uc;
+  th_at    : Theory.theory_uc;
+  th_old   : Theory.theory_uc;
   let_vars : let_var Mstr.t;
   log_vars : vsymbol Mstr.t;
   log_denv : Typing.denv;
 }
 
 let create_lenv uc = {
-  mod_uc   = use_export_theory uc Mlw_wp.th_mark;
+  mod_uc   = uc;
+  th_at    = Theory.use_export (get_theory uc) Mlw_wp.th_mark_at;
+  th_old   = Theory.use_export (get_theory uc) Mlw_wp.th_mark_old;
   let_vars = Mstr.empty;
   log_vars = Mstr.empty;
   log_denv = Typing.denv_empty_with_globals (find_global_vs uc);
@@ -652,23 +656,21 @@ let rec dty_of_ty ty = match ty.ty_node with
   | Ty.Tyvar v -> Denv.tyuvar v
 
 let create_post lenv x ty f =
-  let th = get_theory lenv.mod_uc in
   let res = create_vsymbol (id_fresh x) ty in
   let log_vars = Mstr.add x res lenv.log_vars in
   let log_denv = Typing.add_var x (dty_of_ty ty) lenv.log_denv in
-  let f = Typing.type_fmla th log_denv log_vars f in
+  let f = Typing.type_fmla lenv.th_old log_denv log_vars f in
+  let f = remove_old f in
   count_term_tuples f;
   create_post res f
 
 let create_pre lenv f =
-  let th = get_theory lenv.mod_uc in
-  let f = Typing.type_fmla th lenv.log_denv lenv.log_vars f in
+  let f = Typing.type_fmla lenv.th_at lenv.log_denv lenv.log_vars f in
   count_term_tuples f;
   f
 
 let create_variant lenv (t,r) =
-  let th = get_theory lenv.mod_uc in
-  let t = Typing.type_term th lenv.log_denv lenv.log_vars t in
+  let t = Typing.type_term lenv.th_at lenv.log_denv lenv.log_vars t in
   count_term_tuples t;
   { v_term = t; v_rel = r }
 
@@ -677,7 +679,7 @@ let add_local x lv lenv = match lv with
       { lenv with let_vars = Mstr.add x lv lenv.let_vars }
   | LetV pv ->
       let dty = dty_of_ty pv.pv_vs.vs_ty in
-      { mod_uc   = lenv.mod_uc;
+      { lenv with
         let_vars = Mstr.add x lv lenv.let_vars;
         log_vars = Mstr.add x pv.pv_vs lenv.log_vars;
         log_denv = Typing.add_var x dty lenv.log_denv }

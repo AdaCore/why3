@@ -30,13 +30,15 @@ open Mlw_expr
 val ts_mark : Ty.tysymbol
 val ty_mark : Ty.ty
 
-val fs_old : Term.lsymbol
 val fs_at  : Term.lsymbol
+val fs_old : Term.lsymbol
 
-val th_mark : Theory.theory
+val th_mark_at  : Theory.theory
+val th_mark_old : Theory.theory
 
-val fs_now : Term.lsymbol
-val e_now  : expr
+val e_now : expr
+
+val remove_old : Term.term -> Term.term
 
 (** Weakest preconditions *)
 
