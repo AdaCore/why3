@@ -310,6 +310,9 @@ and spec_expr e = match e.e_node with
 
 (** WP utilities *)
 
+let fs_void = fs_tuple 0
+let t_void = fs_app fs_void [] ty_unit
+
 let ty_of_vty = function
   | VTvalue vtv -> ty_of_ity vtv.vtv_ity
   | VTarrow _   -> ty_unit
@@ -345,17 +348,38 @@ let wp_ands ~sym fl =
 
 let wp_implies f1 f2 = t_implies_simp f1 f2
 
+let wp_let v t f = t_let_close_simp v t f
+
 let wp_forall vl f = t_forall_close_simp vl [] f
 
-let wp_let v t f = t_let_close_simp v t f
+let wp_forall_post v p f =
+  (* we optimize for the case when a postcondition
+     is of the form (... /\ result = t /\ ...) *)
+  let rec down p = match p.t_node with
+    | Tbinop (Tand,l,r) ->
+        begin match down l with
+          | None, _ ->
+              let t, r = down r in
+              t, t_label_copy p (t_and_simp l r)
+          | t, l ->
+              t, t_label_copy p (t_and_simp l r)
+        end
+    | Tapp (ps,[{t_node = Tvar u};t])
+      when ls_equal ps ps_equ && vs_equal u v && not (Mvs.mem v t.t_vars) ->
+        Some t, t_true
+    | _ ->
+        None, p
+  in
+  if ty_equal v.vs_ty ty_unit then
+    t_subst_single v t_void (wp_implies p f)
+  else match down p with
+    | Some t, p -> wp_let v t (wp_implies p f)
+    | _ -> wp_forall [v] (wp_implies p f)
 
 let regs_of_reads  eff = Sreg.union eff.eff_reads eff.eff_ghostr
 let regs_of_writes eff = Sreg.union eff.eff_writes eff.eff_ghostw
 let regs_of_effect eff = Sreg.union (regs_of_reads eff) (regs_of_writes eff)
 let exns_of_raises eff = Sexn.union eff.eff_raises eff.eff_ghostx
-
-let fs_void = fs_tuple 0
-let t_void = fs_app fs_void [] ty_unit
 
 let open_unit_post q =
   let v, q = open_post q in
@@ -367,22 +391,6 @@ let create_unit_post =
 
 let vs_result e =
   create_vsymbol (id_fresh ?loc:e.e_loc "result") (ty_of_vty e.e_vty)
-
-(* TODO: put this into abstract/opaque wp, it's only relevant there *)
-(*
-match f.t_node with
-  | Tbinop (Timplies, {t_node = Tapp (s,[{t_node = Tvar u};r])},h)
-    when ls_equal s ps_equ && vs_equal u v && not (Mvs.mem v r.t_vars) ->
-      t_let_close_simp v r h
-  | Tbinop (Timplies, {t_node = Tbinop (Tand, g,
-                      {t_node = Tapp (s,[{t_node = Tvar u};r])})},h)
-    when ls_equal s ps_equ && vs_equal u v && not (Mvs.mem v r.t_vars) ->
-      t_let_close_simp v r (t_implies_simp g h)
-  | _ when Mvs.mem v f.t_vars ->
-      t_forall_close_simp [v] [] f
-  | _ ->
-      f
-*)
 
 (** WP state *)
 
@@ -641,8 +649,7 @@ and wp_abstract env c_eff c_q c_xq q xq =
     let v, f = open_post q in
     let c_v, c_f = open_post c_q in
     let c_f = t_subst_single c_v (t_var v) c_f in
-    (* TODO: optimize the case c_f == (... /\ v = t /\ ...) *)
-    let f = wp_forall [v] (wp_implies c_f f) in
+    let f = wp_forall_post v c_f f in
     quantify env regs f
   in
   let quantify_xpost _ c_xq xq =
@@ -767,6 +774,7 @@ let wp_rec env km th rdl =
   let add_one th d f =
     Debug.dprintf debug "wp %s = %a@\n----------------@."
       d.rec_ps.ps_name.id_string Pretty.print_term f;
+    let f = wp_forall (Mvs.keys f.t_vars) f in
     add_wp_decl d.rec_ps.ps_name f th
   in
   List.fold_left2 add_one th rdl fl
