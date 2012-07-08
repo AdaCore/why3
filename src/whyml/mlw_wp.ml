@@ -293,10 +293,14 @@ let wp_label e f =
   let lab = Ident.Slab.union e.e_label f.t_label in
   t_label ?loc lab f
 
+let expl_assert = Ident.create_label "expl:assertion"
+let expl_check  = Ident.create_label "expl:check"
+let expl_post   = Ident.create_label "expl:normal postcondition"
+let expl_xpost  = Ident.create_label "expl:exceptional postcondition"
+
 let wp_expl l f =
   let lab = Slab.add Split_goal.stop_split f.t_label in
-  let lab = Slab.add (Ident.create_label ("expl:" ^ l)) lab in
-  t_label ?loc:f.t_loc lab f
+  t_label ?loc:f.t_loc (Slab.add l lab) f
 
 let wp_and ~sym f1 f2 =
   if sym then t_and_simp f1 f2 else t_and_asym_simp f1 f2
@@ -309,6 +313,23 @@ let wp_implies f1 f2 = t_implies_simp f1 f2
 let wp_forall vl f = t_forall_close_simp vl [] f
 
 let wp_let v t f = t_let_close_simp v t f
+
+let regs_of_reads  eff = Sreg.union eff.eff_reads eff.eff_ghostr
+let regs_of_writes eff = Sreg.union eff.eff_writes eff.eff_ghostw
+let regs_of_effect eff = Sreg.union (regs_of_reads eff) (regs_of_writes eff)
+
+let t_void = fs_app (fs_tuple 0) [] ty_unit
+
+let open_unit_post q =
+  let v, q = open_post q in
+  t_subst_single v t_void q
+
+let create_unit_post =
+  let v = create_vsymbol (id_fresh "void") ty_unit in
+  fun q -> create_post v q
+
+let vs_result e =
+  create_vsymbol (id_fresh ?loc:e.e_loc "result") (ty_of_vty e.e_vty)
 
 (* TODO: put this into abstract/opaque wp, it's only relevant there *)
 (*
@@ -399,6 +420,8 @@ let update_var env mreg vs =
 
 let model1_lab = Slab.singleton (create_label "model:1")
 let model2_lab = Slab.singleton (create_label "model:quantify(2)")
+let model3_lab = Slab.singleton (create_label "model:cond")
+
 let mk_var id label ty = create_vsymbol (id_clone ~label id) ty
 
 let quantify env regs f =
@@ -427,16 +450,6 @@ let quantify env regs f =
 
 (** Weakest preconditions *)
 
-let regs_of_reads  eff = Sreg.union eff.eff_reads eff.eff_ghostr
-let regs_of_writes eff = Sreg.union eff.eff_writes eff.eff_ghostw
-let regs_of_effect eff = Sreg.union (regs_of_reads eff) (regs_of_writes eff)
-
-let t_void = fs_app (fs_tuple 0) [] ty_unit
-
-let open_unit_post q =
-  let v, q = open_post q in
-  t_subst_single v t_void q
-
 let rec wp_expr env e q xq =
   let lab = fresh_mark () in
   let q = old_mark lab q in
@@ -462,17 +475,69 @@ and wp_desc env e q xq = match e.e_node with
   | Earrow _ ->
       let q = open_unit_post q in
       (* wp_label e *) q (* FIXME? *)
+  | Elet ({ let_var = lv; let_expr = e1 }, e2) ->
+      (* FIXME? Pgm_wp applies filter_post everywhere, but doesn't
+         it suffice to do it only on Etry? The same question about
+         saturate_post: why do we supply default exceptional posts
+         instead of requiring an explicit xpost for every "raises"? *)
+      let w = wp_expr env e2 q xq in
+      let q = match lv with
+        | LetV v -> create_post v.pv_vs w
+        | LetA _ -> create_unit_post w in
+      wp_label e (wp_expr env e1 q xq)
   | Erec (rdl, e) ->
       let fr = wp_rec_defn env rdl in
       let fe = wp_expr env e q xq in
       wp_and ~sym:true (wp_ands ~sym:true fr) fe
+  | Eif (e1, e2, e3) ->
+      let res = vs_result e1 in
+      let test = t_equ (t_var res) t_bool_true in
+      let test = t_label ?loc:e1.e_loc model3_lab test in
+      (* if both branches are pure, do not split *)
+      let w =
+        let get_term e = match e.e_node with
+          | Elogic t -> to_term t
+          | Evalue v -> t_var v.pv_vs
+          | _ -> raise Exit in
+        try
+          let r2 = get_term e2 in
+          let r3 = get_term e3 in
+          let v, q = open_post q in
+          t_subst_single v (t_if_simp test r2 r3) q
+        with Exit ->
+          let w2 = wp_expr env e2 q xq in
+          let w3 = wp_expr env e3 q xq in
+          t_if_simp test w2 w3
+      in
+      let q = create_post res w in
+      wp_label e (wp_expr env e1 q xq)
+  | Ecase (e1, bl) ->
+      let res = vs_result e1 in
+      let branch ({ ppat_pattern = pat }, e) =
+        t_close_branch pat (wp_expr env e q xq) in
+      let w = t_case (t_var res) (List.map branch bl) in
+      let q = create_post res w in
+      wp_label e (wp_expr env e1 q xq)
+  | Eghost e1 ->
+      wp_label e (wp_expr env e1 q xq)
+  | Eraise (xs, e1) ->
+      let q = try Mexn.find xs xq with
+        Not_found -> assert false in
+      wp_label e (wp_expr env e1 q xq)
+  | Etry (e1, bl) ->
+      let branch (xs,v,e) acc =
+        let w = wp_expr env e q xq in
+        let q = create_post v.pv_vs w in
+        Mexn.add xs q acc in
+      let xq = List.fold_right branch bl xq in
+      wp_label e (wp_expr env e1 q xq)
   | Eassert (Aassert, f) ->
       let q = open_unit_post q in
-      let f = wp_expl "assertion" f in
+      let f = wp_expl expl_assert f in
       wp_and ~sym:false (wp_label e f) q
   | Eassert (Acheck, f) ->
       let q = open_unit_post q in
-      let f = wp_expl "check" f in
+      let f = wp_expl expl_check f in
       wp_and ~sym:true (wp_label e f) q
   | Eassert (Aassume, f) ->
       let q = open_unit_post q in
@@ -482,21 +547,15 @@ and wp_desc env e q xq = match e.e_node with
 
   (* TODO *)
   |Eabstr (_, _, _)-> t_true
-  |Etry (_, _)-> t_true
-  |Eraise (_, _)-> t_true
   |Efor (_, _, _, _)-> t_true
   |Eloop (_, _, _)-> t_true
   |Eany _-> t_true
-  |Eghost _-> t_true
   |Eassign (_, _, _)-> t_true
-  |Ecase (_, _)-> t_true
-  |Eif (_, _, _)-> t_true
-  |Elet (_, _)-> t_true
   |Eapp (_, _)-> t_true
 
 and wp_lambda env l =
-  let q = wp_expl "normal postcondition" l.l_post in
-  let xq = Mexn.map (wp_expl "exceptional postcondition") l.l_xpost in
+  let q = wp_expl expl_post l.l_post in
+  let xq = Mexn.map (wp_expl expl_xpost) l.l_xpost in
   let f = wp_expr env l.l_expr q xq in
   let f = wp_implies l.l_pre f in
   let f = quantify env (regs_of_effect l.l_expr.e_effect) f in
