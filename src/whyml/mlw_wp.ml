@@ -496,7 +496,9 @@ let quantify env regs f =
 (** Weakest preconditions *)
 
 let rec wp_expr env e q xq =
-  let f = relativize (wp_desc env e) q xq in
+  (* FIXME? We only need to remove 'old from user-supplied posts.
+     Therefore it suffices to do it for Erec, Eany, and Eabstr. *)
+  let f = (* relativize ( *) wp_desc env e (* ) *) q xq in
   if Debug.test_flag debug then begin
     Format.eprintf "@[--------@\n@[<hov 2>e = %a@]@\n" Mlw_pretty.print_expr e;
     Format.eprintf "@[<hov 2>q = %a@]@\n" Pretty.print_term q;
@@ -620,7 +622,7 @@ and wp_desc env e q xq = match e.e_node with
       let q = create_unit_post w in
       wp_label e (wp_expr env e1 q xq)
   | Eabstr (e1, c_q, c_xq) ->
-      let w1 = wp_expr env e1 c_q c_xq in
+      let w1 = relativize (wp_expr env e1) c_q c_xq in
       let w2 = wp_abstract env e1.e_effect c_q c_xq q xq in
       wp_and ~sym:true (wp_label e w1) w2
   | Eassign (e1, reg, pv) ->
@@ -669,7 +671,7 @@ and wp_abstract env c_eff c_q c_xq q xq =
 and wp_lambda env l =
   let q = wp_expl expl_post l.l_post in
   let xq = Mexn.map (wp_expl expl_xpost) l.l_xpost in
-  let f = wp_expr env l.l_expr q xq in
+  let f = relativize (wp_expr env l.l_expr) q xq in
   let f = wp_implies l.l_pre f in
   let f = quantify env (regs_of_effect l.l_expr.e_effect) f in
   wp_forall (List.map (fun pv -> pv.pv_vs) l.l_args) f
