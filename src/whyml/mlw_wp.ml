@@ -405,8 +405,11 @@ type wp_env = {
   prog_known : Mlw_decl.known_map;
   pure_known : Decl.known_map;
   global_env : Env.env;
-  ls_int_le  : Term.lsymbol;
-  ls_int_lt  : Term.lsymbol;
+  ps_int_le  : Term.lsymbol;
+  ps_int_ge  : Term.lsymbol;
+  ps_int_lt  : Term.lsymbol;
+  ps_int_gt  : Term.lsymbol;
+  fs_int_pl  : Term.lsymbol;
 }
 
 let decrease ?loc env mk_old varl =
@@ -418,8 +421,8 @@ let decrease ?loc env mk_old varl =
           | Some ls -> ps_app ls [t; old_t]
           | None when ty_equal (t_type t) ty_int ->
               t_and
-                (ps_app env.ls_int_le [t_int_const "0"; old_t])
-                (ps_app env.ls_int_lt [t; old_t])
+                (ps_app env.ps_int_le [t_int_const "0"; old_t])
+                (ps_app env.ps_int_lt [t; old_t])
           | None -> Loc.errorm ?loc
               "no default WF order for %a" Pretty.print_term t
         in
@@ -677,9 +680,43 @@ and wp_desc env e q xq = match e.e_node with
       let w = quantify env regs (wp_implies inv w) in
       let i = wp_expl expl_loop_init inv in
       wp_label e (wp_and ~sym:true i w)
-
-  (* TODO *)
-  |Efor (_, _, _, _)-> t_true
+  | Efor ({pv_vs = x}, ({pv_vs = v1}, d, {pv_vs = v2}), inv, e1) ->
+      (* wp(for x = v1 to v2 do inv { I(x) } e1, Q, R) =
+             v1 > v2  -> Q
+         and v1 <= v2 ->     I(v1)
+                         and forall S. forall i. v1 <= i <= v2 ->
+                                                 I(i) -> wp(e1, I(i+1), R)
+                                       and I(v2+1) -> Q *)
+      let gt, le, incr = match d with
+        | Mlw_expr.To     -> env.ps_int_gt, env.ps_int_le, t_int_const "1"
+        | Mlw_expr.DownTo -> env.ps_int_lt, env.ps_int_ge, t_int_const "-1" in
+      let v1_gt_v2 = ps_app gt [t_var v1; t_var v2] in
+      let v1_le_v2 = ps_app le [t_var v1; t_var v2] in
+      let q = open_unit_post q in
+      let wp_init =
+        wp_expl expl_for_init (t_subst_single x (t_var v1) inv) in
+      let wp_step =
+        let nextx = fs_app env.fs_int_pl [t_var x; incr] ty_int in
+        let post = create_unit_post (t_subst_single x nextx inv) in
+        wp_expr env e1 post xq in
+      let wp_last =
+        let v2pl1 = fs_app env.fs_int_pl [t_var v2; incr] ty_int in
+        wp_implies (t_subst_single x v2pl1 inv) q in
+      let wp_good = wp_and ~sym:true
+        wp_init
+        (quantify env (regs_of_writes e1.e_effect)
+           (wp_and ~sym:true
+              (wp_expl expl_for_keep (wp_forall [x] (wp_implies
+                (wp_and ~sym:true (ps_app le [t_var v1; t_var x])
+                                  (ps_app le [t_var x;  t_var v2]))
+                (wp_implies inv wp_step))))
+              wp_last))
+      in
+      let wp_full = wp_and ~sym:true
+        (wp_implies v1_gt_v2 q)
+        (wp_implies v1_le_v2 wp_good)
+      in
+      wp_label e wp_full
 
 and wp_abstract env c_eff c_q c_xq q xq =
   let regs = regs_of_writes c_eff in
@@ -794,8 +831,11 @@ let mk_env env km th =
   { prog_known = km;
     pure_known = Theory.get_known th;
     global_env = env;
-    ls_int_le  = Theory.ns_find_ls th_int.th_export ["infix <="];
-    ls_int_lt  = Theory.ns_find_ls th_int.th_export ["infix <"];
+    ps_int_le  = Theory.ns_find_ls th_int.th_export ["infix <="];
+    ps_int_ge  = Theory.ns_find_ls th_int.th_export ["infix >="];
+    ps_int_lt  = Theory.ns_find_ls th_int.th_export ["infix <"];
+    ps_int_gt  = Theory.ns_find_ls th_int.th_export ["infix >"];
+    fs_int_pl  = Theory.ns_find_ls th_int.th_export ["infix +"];
   }
 
 let wp_let env km th ({ let_var = lv; let_expr = e } as ld) =
