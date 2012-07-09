@@ -809,7 +809,7 @@ let rec unabsurd f = match f.t_node with
 
 let add_wp_decl name f uc =
   (* prepare a proposition symbol *)
-  let s = "WP_" ^ name.id_string in
+  let s = "WP_parameter_" ^ name.id_string in
   let lab = Ident.create_label ("expl:" ^ name.id_string) in
   let label = Slab.add lab name.id_label in
   let id = id_fresh ~label ?loc:name.id_loc s in
